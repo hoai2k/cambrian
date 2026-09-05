@@ -12,3 +12,14 @@ and the procedural environment.
 
 Start with the design doc if you want the game; start with the technical plan
 if you want to build it. The audit is the shared set of facts both rely on.
+
+## Implementation status
+
+The game is implemented in `src/` (see the repository README for layout).
+Compared with the milestones in the technical plan, M0–M3 are complete, M4–M7
+are implemented in a first pass (ecosystem, giants and detection, abilities,
+all four modes, split-screen and drop-in), and M8 polish is ongoing: new
+animation clips have not been authored yet, so the combat verbs run on the
+nine shipped clips plus the procedural layers described in the plan. Two
+headless checks exist: `tools/harness.ts` (balance) and `tools/smoke.mjs`
+(browser). Outstanding art is listed in `image-requests.md`.
