@@ -1,0 +1,249 @@
+import * as THREE from 'three';
+import { GLTFLoader, type GLTF } from 'three/examples/jsm/loaders/GLTFLoader.js';
+import { MeshoptDecoder } from 'three/examples/jsm/libs/meshopt_decoder.module.js';
+import * as SkeletonUtils from 'three/examples/jsm/utils/SkeletonUtils.js';
+import { clamp, damp } from '../shared/math';
+import { creature, type CreatureId } from '../sim/creatures';
+import { lengthOf } from '../sim/actors';
+import type { Actor } from '../sim/types';
+
+interface Loaded { gltf: GLTF; unit: number; center: THREE.Vector3; size: THREE.Vector3; }
+const cache = new Map<CreatureId, Promise<Loaded>>();
+const loader = new GLTFLoader().setMeshoptDecoder(MeshoptDecoder);
+
+export const creatureUrl = (id: CreatureId) => `${import.meta.env.BASE_URL}assets/creatures/${id}.glb`;
+
+export function loadCreature(id: CreatureId): Promise<Loaded> {
+  let p = cache.get(id);
+  if (!p) {
+    p = loader.loadAsync(creatureUrl(id)).then((gltf) => {
+      const box = new THREE.Box3().setFromObject(gltf.scene);
+      const size = box.getSize(new THREE.Vector3());
+      const center = box.getCenter(new THREE.Vector3());
+      const unit = 1 / Math.max(size.z, size.x, 0.01);
+      gltf.scene.traverse((o) => { if (o instanceof THREE.Mesh) { o.frustumCulled = false; } });
+      return { gltf, unit, center, size };
+    }).catch((e) => { cache.delete(id); throw new Error(`Could not load ${creature(id).name}: ${e?.message ?? e}`); });
+    cache.set(id, p);
+  }
+  return p;
+}
+export const preloadAll = (ids: CreatureId[]) => Promise.all(ids.map(loadCreature));
+export function loadedSync(id: CreatureId): Loaded | undefined { return loadedMap.get(id); }
+const loadedMap = new Map<CreatureId, Loaded>();
+export async function ensureLoaded(id: CreatureId) { const l = await loadCreature(id); loadedMap.set(id, l); return l; }
+
+const SPINE_RE = /^(body|segment)_(\d+)$/;
+
+export class CreatureView {
+  readonly group = new THREE.Group();
+  private inner = new THREE.Group();
+  private model: THREE.Object3D;
+  private mixer: THREE.AnimationMixer;
+  private actions = new Map<string, THREE.AnimationAction>();
+  private loco?: THREE.AnimationAction;
+  private oneShot?: THREE.AnimationAction;
+  private oneShotT = 0;
+  private additive: (THREE.AnimationAction | undefined)[] = [];
+  private addW = [0, 0, 0, 0];
+  private materials: THREE.MeshStandardMaterial[] = [];
+  private baseEmissive: THREE.Color[] = [];
+  private spine: THREE.Bone[] = [];
+  private wasAttack = false; private wasHit = false; private wasDead = false; private wasStagger = false;
+  private ring: THREE.Mesh;
+  private ringMat: THREE.MeshBasicMaterial;
+  private highlight = 0;
+  private highlightColor = new THREE.Color('#7ef0d8');
+  private tmpQ = new THREE.Quaternion(); private tmpQ2 = new THREE.Quaternion(); private up = new THREE.Vector3(0, 1, 0);
+  public lastUpdate = 0;
+  public visibleLength = 1;
+  readonly def;
+  readonly heightUnits: number;
+
+  constructor(readonly creatureId: CreatureId, loaded: Loaded, private shared: { ringGeo: THREE.BufferGeometry }) {
+    this.def = creature(creatureId);
+    this.model = SkeletonUtils.clone(loaded.gltf.scene);
+    this.model.scale.setScalar(loaded.unit);
+    this.model.position.copy(loaded.center).multiplyScalar(-loaded.unit);
+    this.heightUnits = loaded.size.y * loaded.unit;
+    this.inner.add(this.model);
+    this.group.add(this.inner);
+    this.model.traverse((o) => {
+      if (o instanceof THREE.Mesh) {
+        o.castShadow = true; o.receiveShadow = true; o.frustumCulled = false;
+        const mats = Array.isArray(o.material) ? o.material : [o.material];
+        const cloned = mats.map((m) => { const c = (m as THREE.MeshStandardMaterial).clone(); return c; });
+        o.material = Array.isArray(o.material) ? cloned : cloned[0];
+        for (const c of cloned) if (c instanceof THREE.MeshStandardMaterial) { this.materials.push(c); this.baseEmissive.push(c.emissive.clone()); }
+      }
+      if (o instanceof THREE.Bone) { const m = SPINE_RE.exec(o.name); if (m) this.spine.push(o); }
+    });
+    this.spine.sort((a, b) => Number(SPINE_RE.exec(a.name)![2]) - Number(SPINE_RE.exec(b.name)![2]));
+    this.mixer = new THREE.AnimationMixer(this.model);
+    for (const clip of loaded.gltf.animations) this.actions.set(clip.name, this.mixer.clipAction(clip));
+    this.playLoop('Idle');
+    this.additive = ['TurnLeft', 'TurnRight', 'Dive', 'Rise'].map((n) => {
+      const clip = loaded.gltf.animations.find((c) => c.name === n);
+      if (!clip) return undefined;
+      const add = THREE.AnimationUtils.makeClipAdditive(clip.clone());
+      const act = this.mixer.clipAction(add);
+      act.setEffectiveWeight(0).play(); act.time = clip.duration * 0.5; act.paused = true;
+      return act;
+    });
+    this.ringMat = new THREE.MeshBasicMaterial({ color: '#ffffff', transparent: true, opacity: 0, depthWrite: false, side: THREE.DoubleSide });
+    this.ring = new THREE.Mesh(shared.ringGeo, this.ringMat);
+    this.ring.rotation.x = -Math.PI / 2; this.ring.renderOrder = 3;
+    this.group.add(this.ring);
+  }
+
+  private playLoop(name: string) {
+    const act = this.actions.get(name);
+    if (!act || act === this.loco) return;
+    const prev = this.loco;
+    act.reset().setLoop(THREE.LoopRepeat, Infinity).setEffectiveTimeScale(1).setEffectiveWeight(1).play();
+    prev?.crossFadeTo(act, 0.2, false);
+    this.loco = act;
+  }
+  private playOnce(name: string, duration?: number, clamp = true) {
+    const act = this.actions.get(name);
+    if (!act) return;
+    this.oneShot?.fadeOut(0.08);
+    act.reset().setLoop(THREE.LoopOnce, 1); act.clampWhenFinished = clamp;
+    const d = duration ?? act.getClip().duration;
+    act.setEffectiveTimeScale(act.getClip().duration / d).setEffectiveWeight(1).fadeIn(0.06).play();
+    this.oneShot = act; this.oneShotT = d;
+  }
+
+  /** Ring under the creature, coloured per viewer. */
+  setRing(color: string | null, opacity: number) {
+    if (color) this.ringMat.color.set(color);
+    this.ringMat.opacity = opacity;
+    this.ring.visible = opacity > 0.01;
+  }
+  setHighlight(intensity: number, color?: string) { this.highlight = intensity; if (color) this.highlightColor.set(color); }
+
+  update(a: Actor, dt: number, time: number, animate = true) {
+    const def = this.def;
+    const L = lengthOf(a);
+    this.visibleLength = L;
+    const speed = Math.hypot(a.vel.x, a.vel.y, a.vel.z);
+    const cruise = def.speed * Math.pow(a.scale, 0.45);
+
+    if (animate) {
+      // locomotion layer
+      if (a.state === 'dead') { /* handled by one-shot */ }
+      else if (a.state === 'eating') { this.playLoop(def.ground ? 'Crawl' : 'Swim'); this.loco?.setEffectiveTimeScale(0.55); }
+      else {
+        this.playLoop(speed > 0.35 ? (def.ground ? 'Crawl' : 'Swim') : 'Idle');
+        // smaller creatures beat faster
+        const rateScale = 1 / Math.pow(Math.max(a.scale, 0.1), 0.35);
+        this.loco?.setEffectiveTimeScale(speed > 0.35 ? clamp((speed / cruise) * rateScale, 0.5, 2.6) : 0.75 * rateScale);
+      }
+      // one-shots
+      const inAttack = a.state === 'attack' || a.state === 'grabbing' || (a.state === 'ability' && (def.ability === 'snatch'));
+      if (inAttack && !this.wasAttack && a.move) this.playOnce('Attack', Math.max(0.35, a.move.windup + a.move.active + a.move.recovery * 0.6), false);
+      else if (inAttack && !this.wasAttack) this.playOnce('Attack', 0.6, false);
+      if (a.state === 'grabbing' && this.wasAttack && this.oneShotT <= 0) this.playOnce('Attack', 0.9, false);
+      const hurt = a.hitFlash > 0.3 && a.state !== 'dead';
+      if (hurt && !this.wasHit) this.playOnce('Hit', 0.5, false);
+      if (a.state === 'stagger' && !this.wasStagger) this.playOnce('Hit', a.stateDur, true);
+      if (a.state === 'dead' && !this.wasDead) this.playOnce('Death', undefined, true);
+      if (a.state !== 'dead' && this.wasDead) { this.oneShot?.stop(); this.oneShot = undefined; this.oneShotT = 0; this.playLoop('Idle'); }
+      this.wasAttack = inAttack; this.wasHit = hurt; this.wasDead = a.state === 'dead'; this.wasStagger = a.state === 'stagger';
+      if (this.oneShotT > 0) { this.oneShotT -= dt; if (this.oneShotT < 0.12 && a.state !== 'dead' && a.state !== 'stagger') this.oneShot?.fadeOut(0.12); }
+
+      // additive layers: turn / dive / rise, dodge & guard reuse them
+      const turnRate = a.bank * -6;
+      const dodging = a.state === 'dodge' ? 0.9 : 0;
+      const guarding = a.state === 'guard' || a.state === 'parry' ? 0.45 : 0;
+      const targets = [
+        Math.max(0, -turnRate) * 0.45 + (dodging && a.dodgeDir.x * Math.cos(a.yaw) - a.dodgeDir.z * Math.sin(a.yaw) < 0 ? dodging : 0),
+        Math.max(0, turnRate) * 0.45 + (dodging && a.dodgeDir.x * Math.cos(a.yaw) - a.dodgeDir.z * Math.sin(a.yaw) >= 0 ? dodging : 0),
+        Math.max(0, -a.vel.y) * 0.25 + guarding + (def.ground && a.state === 'guard' ? 0.3 : 0),
+        Math.max(0, a.vel.y) * 0.25,
+      ];
+      this.additive.forEach((act, i) => {
+        if (!act) return;
+        const t = a.state === 'dead' ? 0 : Math.min(0.95, targets[i]) * (a.state === 'attack' ? 0.4 : 1);
+        this.addW[i] = damp(this.addW[i], t, 8, dt);
+        act.setEffectiveWeight(this.addW[i]);
+      });
+      if (a.state === 'dead') this.loco?.setEffectiveWeight(Math.max(0, 1 - a.corpseT * 2));
+      else this.loco?.setEffectiveWeight(this.oneShotT > 0.1 ? 0.15 : 1);
+      this.mixer.update(a.hitStop > 0 ? dt * 0.1 : dt);
+
+      // procedural undulation along the spine for swimmers
+      if (this.spine.length > 3 && !def.ground && a.state !== 'dead') {
+        const amp = clamp(speed / Math.max(cruise, 0.1), 0, 1.6) * 0.045 + Math.abs(a.bank) * 0.02;
+        const freq = 5.5 / Math.pow(Math.max(a.scale, 0.1), 0.35);
+        for (let i = 0; i < this.spine.length; i++) {
+          const bone = this.spine[i];
+          const ang = Math.sin(time * freq - i * 0.55) * amp * (0.3 + i / this.spine.length);
+          if (!bone.parent) continue;
+          bone.parent.getWorldQuaternion(this.tmpQ);
+          this.tmpQ2.setFromAxisAngle(this.up, ang);
+          // rotate about world up expressed in the parent's local frame
+          const inv = this.tmpQ.clone().invert();
+          bone.quaternion.premultiply(inv.multiply(this.tmpQ2).multiply(this.tmpQ));
+        }
+      }
+    }
+
+    // Transform
+    this.group.position.set(a.pos.x, a.pos.y, a.pos.z);
+    this.group.quaternion.setFromEuler(new THREE.Euler(a.pitch, a.yaw, a.bank, 'YXZ'));
+    let sx = L, sy = L, sz = L, oy = 0;
+    if (a.state === 'ability' && a.abilityActive) {
+      const t = clamp(a.stateT / 0.5, 0, 1);
+      const tail = clamp((a.stateDur - a.stateT) / 0.5, 0, 1);
+      const k = Math.min(t, tail);
+      switch (def.ability) {
+        case 'burrow': sy = L * (1 - 0.75 * k); oy = -L * 0.22 * k; break;
+        case 'enroll': sz = L * (1 - 0.4 * k); sy = L * (1 + 0.35 * k); this.inner.rotation.x = a.roll; break;
+        case 'shellUp': sy = L * (1 - 0.15 * k); break;
+        case 'anchor': oy = -L * 0.06 * k; break;
+        case 'bristleFlare': sx = L * (1 + 0.12 * k); break;
+      }
+    } else this.inner.rotation.x = damp(this.inner.rotation.x, 0, 8, dt);
+    if (a.state === 'dead') { const e = a.eaten; sx *= 1 - e * 0.6; sy *= 1 - e * 0.6; sz *= 1 - e * 0.6; }
+    if (a.state === 'moult') { const p = Math.sin(a.stateT * 9) * 0.06; sx *= 1 + p; sz *= 1 - p; }
+    this.group.scale.set(sx, sy, sz);
+    this.inner.position.y = oy / Math.max(L, 1e-3);
+
+    // ring under the creature (in group space, undo scale)
+    this.ring.position.set(0, -(this.heightUnits * 0.5 + 0.08), 0);
+    const rs = 0.75;
+    this.ring.scale.set(rs, rs, rs);
+    this.ring.quaternion.copy(this.group.quaternion).invert().multiply(new THREE.Quaternion().setFromEuler(new THREE.Euler(-Math.PI / 2, 0, 0)));
+
+    // emissive: hit flash, highlight, ability glow
+    const flash = a.hitFlash > 0 ? Math.min(1, a.hitFlash * 2.2) : 0;
+    const glow = this.highlight;
+    const abilityGlow = a.abilityActive ? 0.25 + 0.15 * Math.sin(time * 12) : 0;
+    const moult = a.state === 'moult' ? 0.6 : 0;
+    const protect = a.spawnProtect > 0 ? 0.08 + 0.06 * Math.sin(time * 10) : 0;
+    const dead = a.state === 'dead' ? 1 : 0;
+    for (let i = 0; i < this.materials.length; i++) {
+      const m = this.materials[i];
+      m.emissive.copy(this.baseEmissive[i]);
+      if (flash > 0) m.emissive.lerp(new THREE.Color('#ff6a5a'), flash * 0.85);
+      if (glow > 0) m.emissive.lerp(this.highlightColor, glow * 0.7);
+      if (abilityGlow > 0) m.emissive.lerp(new THREE.Color(this.def.accent), abilityGlow);
+      if (moult > 0) m.emissive.lerp(new THREE.Color('#fff2c2'), moult);
+      if (protect > 0) m.emissive.lerp(new THREE.Color('#9be9ff'), protect);
+      if (dead) m.emissive.multiplyScalar(0.3);
+      m.emissiveIntensity = 1;
+      m.opacity = dead ? clamp(1 - Math.max(0, a.corpseT - 35) / 10, 0, 1) : 1;
+      m.transparent = dead > 0 && m.opacity < 1;
+    }
+    this.lastUpdate = time;
+  }
+
+  dispose() {
+    this.mixer.stopAllAction();
+    this.mixer.uncacheRoot(this.model);
+    this.materials.forEach((m) => m.dispose());
+    this.ringMat.dispose();
+    this.group.removeFromParent();
+  }
+}

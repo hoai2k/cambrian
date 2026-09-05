@@ -364,3 +364,38 @@ We consider the redesign working when playtests show:
 - Players choose different creatures for reasons they can articulate.
 - Four-player split-screen holds 60 fps on a mid-range GPU laptop at `low`
   quality and 30 fps minimum at `high`.
+
+## Magnification
+
+The same reef has to feel right whether you are a 0.7-unit larva or a 10-unit
+apex. We treat body length as a **magnification level** and let the camera,
+the fog and the detail layers follow it. Everything below is driven by one
+number, the viewing player's body length `L`, and is applied per viewport in
+split-screen so two players at different tiers see different reefs at once.
+
+| Level | Body length | Camera | What the reef reads as | Detail layers |
+| --- | --- | --- | --- | --- |
+| **Micro** | < 1.0 | ~3.3–3.6 units back, FOV 64 | Sponges are a forest; tufts are undergrowth; a boulder is a cliff; ambient adults are monsters. Fog is at its densest, so the world feels enormous and close. | Micro-tufts (filament grass) and pebble fragments on. |
+| **Small** | 1.0–2.0 | ~4–6 units back, FOV ~62 | Sponges are trees you can still hide in. Adults become rivals. | Micro-tufts fade out above 2.2. |
+| **Mid** | 2.0–4.5 | ~6–11 units back, FOV ~59 | The current stat-table scale. Sponge thickets are hedges: cover for the small, obstacles for you. Boulders are boulders. | Pebbles off above 4.5. Particle motes scale up. |
+| **Large** | 4.5–8 | ~11–18 units back, FOV ~57 | Sponges are shrubs, tufts are grass, the nursery is a lawn you cannot enter. Fog thins to half density: you see the channel from the shelf. | Only structural flora and boulders are drawn as geometry. |
+| **Colossal** | > 8 | ~18–24 units back, FOV 55 | Everything below is texture. You are the shadow on the light window for smaller players. | Same as Large. |
+
+Rules that fall out of this:
+
+- **Camera distance** is `2 × L + 2` units with a small floor for larvae, so
+  the creature always occupies roughly the same fraction of the frame.
+  Lock-on and being hunted pull the camera closer; death pulls it back.
+- **Fog density** scales with `2.2 / (L + 1.5)`, clamped between half and
+  1.15× the base. A larva's world ends 60 units away; an apex sees ~120.
+- **Detail layers are per-viewport toggles**, not per-object LOD, so they
+  cost nothing to switch and never desynchronise between players. They are
+  purely visual: cover volumes and collision come from the simulation, which
+  does not know about magnification.
+- **Creatures do not get a magnification treatment**: the same models render
+  at every tier. That is the point; the Marrella that terrified you as a
+  larva is the same mesh you swallow as an adult. Only their animation
+  frequency scales (smaller beats faster).
+- **Small creatures beyond fog range are culled**, and swarm members far
+  from every camera skip animation, which keeps four viewports at different
+  magnifications inside budget.
