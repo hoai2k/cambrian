@@ -117,7 +117,7 @@ A **move** is data:
 ```ts
 interface Move {
   id: MoveId; anim: ClipName; animSpeed: number;
-  windup: number; active: number; recovery: number;          // seconds at adult; scaled by 1/√scale? no: fixed; see below
+  windup: number; active: number; recovery: number;          // real seconds, identical at every size (see below)
   hitboxes: { socket: BoneName; radius: number; offset: Vec3 }[];
   damage: number; poiseDamage: number; knockback: number; stamina: number;
   lunge: number;            // body lengths of forward carry during windup+active
