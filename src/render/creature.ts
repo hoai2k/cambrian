@@ -49,7 +49,7 @@ export class CreatureView {
   private materials: THREE.MeshStandardMaterial[] = [];
   private baseEmissive: THREE.Color[] = [];
   private spine: THREE.Bone[] = [];
-  private wasAttack = false; private wasHit = false; private wasDead = false; private wasStagger = false;
+  private wasAttack = false; private wasHit = false; private wasDead = false; private wasStagger = false; private wasDodge = false; private wasParry = false;
   private ring: THREE.Mesh;
   private ringMat: THREE.MeshBasicMaterial;
   private highlight = 0;
@@ -96,6 +96,10 @@ export class CreatureView {
     this.group.add(this.ring);
   }
 
+  /** First clip name that exists on this rig. Lets hand-authored clips replace the stand-ins by name alone. */
+  private pick(...names: string[]) { return names.find((n) => this.actions.has(n)); }
+  has(name: string) { return this.actions.has(name); }
+
   private playLoop(name: string) {
     const act = this.actions.get(name);
     if (!act || act === this.loco) return;
@@ -105,7 +109,7 @@ export class CreatureView {
     this.loco = act;
   }
   private playOnce(name: string, duration?: number, clamp = true) {
-    const act = this.actions.get(name);
+    const act = name ? this.actions.get(name) : undefined;
     if (!act) return;
     this.oneShot?.fadeOut(0.08);
     act.reset().setLoop(THREE.LoopOnce, 1); act.clampWhenFinished = clamp;
@@ -131,8 +135,12 @@ export class CreatureView {
 
     if (animate) {
       // locomotion layer
+      const held = a.state === 'ability' && a.abilityActive && ['burrow', 'enroll', 'shellUp', 'anchor', 'bristleFlare'].includes(def.ability);
       if (a.state === 'dead') { /* handled by one-shot */ }
-      else if (a.state === 'eating') { this.playLoop(def.ground ? 'Crawl' : 'Swim'); this.loco?.setEffectiveTimeScale(0.55); }
+      else if (a.state === 'eating') { this.playLoop(this.pick('Eat') ?? (def.ground ? 'Crawl' : 'Swim')); this.loco?.setEffectiveTimeScale(this.has('Eat') ? 1 : 0.55); }
+      else if ((a.state === 'guard') && this.has('Guard')) { this.playLoop('Guard'); this.loco?.setEffectiveTimeScale(1); }
+      else if (held && this.has('Ability')) { this.playLoop('Ability'); this.loco?.setEffectiveTimeScale(1); }
+      else if (a.state === 'moult' && this.has('Moult')) { this.playLoop('Moult'); this.loco?.setEffectiveTimeScale(1); }
       else {
         this.playLoop(speed > 0.35 ? (def.ground ? 'Crawl' : 'Swim') : 'Idle');
         // smaller creatures beat faster
@@ -140,13 +148,21 @@ export class CreatureView {
         this.loco?.setEffectiveTimeScale(speed > 0.35 ? clamp((speed / cruise) * rateScale, 0.5, 2.6) : 0.75 * rateScale);
       }
       // one-shots
-      const inAttack = a.state === 'attack' || a.state === 'grabbing' || (a.state === 'ability' && (def.ability === 'snatch'));
-      if (inAttack && !this.wasAttack && a.move) this.playOnce('Attack', Math.max(0.35, a.move.windup + a.move.active + a.move.recovery * 0.6), false);
-      else if (inAttack && !this.wasAttack) this.playOnce('Attack', 0.6, false);
-      if (a.state === 'grabbing' && this.wasAttack && this.oneShotT <= 0) this.playOnce('Attack', 0.9, false);
-      const hurt = a.hitFlash > 0.3 && a.state !== 'dead';
+      const inAttack = a.state === 'attack' || a.state === 'grabbing' || (a.state === 'ability' && !held);
+      if (inAttack && !this.wasAttack) {
+        if (a.state === 'attack' && a.move) {
+          const clip = a.moveKind === 'heavy' ? this.pick('Heavy', 'Attack')! : this.pick('Bite', 'Attack')!;
+          this.playOnce(clip, Math.max(0.35, a.move.windup + a.move.active + a.move.recovery * 0.6), false);
+        } else if (a.state === 'grabbing') this.playOnce(this.pick('Grab', 'Heavy', 'Attack')!, 0.9, false);
+        else this.playOnce(this.pick('Ability', 'Attack')!, Math.max(0.4, a.stateDur), false);
+      }
+      if (a.state === 'grabbing' && this.wasAttack && this.oneShotT <= 0) this.playOnce(this.pick('Grab', 'Attack')!, 0.9, false);
+      if (a.state === 'dodge' && !this.wasDodge) this.playOnce(this.pick('Dodge') ?? '', a.stateDur + 0.1, false);
+      if (a.state === 'parry' && !this.wasParry && this.has('Parry')) this.playOnce('Parry', 0.35, false);
+      const hurt = a.hitFlash > 0.3 && a.state !== 'dead' && a.state !== 'stagger';
       if (hurt && !this.wasHit) this.playOnce('Hit', 0.5, false);
-      if (a.state === 'stagger' && !this.wasStagger) this.playOnce('Hit', a.stateDur, true);
+      if (a.state === 'stagger' && !this.wasStagger) this.playOnce(this.pick('Stagger', 'Hit')!, a.stateDur, true);
+      this.wasDodge = a.state === 'dodge'; this.wasParry = a.state === 'parry';
       if (a.state === 'dead' && !this.wasDead) this.playOnce('Death', undefined, true);
       if (a.state !== 'dead' && this.wasDead) { this.oneShot?.stop(); this.oneShot = undefined; this.oneShotT = 0; this.playLoop('Idle'); }
       this.wasAttack = inAttack; this.wasHit = hurt; this.wasDead = a.state === 'dead'; this.wasStagger = a.state === 'stagger';
@@ -154,8 +170,8 @@ export class CreatureView {
 
       // additive layers: turn / dive / rise, dodge & guard reuse them
       const turnRate = a.bank * -6;
-      const dodging = a.state === 'dodge' ? 0.9 : 0;
-      const guarding = a.state === 'guard' || a.state === 'parry' ? 0.45 : 0;
+      const dodging = a.state === 'dodge' && !this.has('Dodge') ? 0.9 : 0;
+      const guarding = (a.state === 'guard' || a.state === 'parry') && !this.has('Guard') ? 0.45 : 0;
       const targets = [
         Math.max(0, -turnRate) * 0.45 + (dodging && a.dodgeDir.x * Math.cos(a.yaw) - a.dodgeDir.z * Math.sin(a.yaw) < 0 ? dodging : 0),
         Math.max(0, turnRate) * 0.45 + (dodging && a.dodgeDir.x * Math.cos(a.yaw) - a.dodgeDir.z * Math.sin(a.yaw) >= 0 ? dodging : 0),
