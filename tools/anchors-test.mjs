@@ -13,7 +13,7 @@ if(record.file.startsWith('opabinia')){
 }
 // Every rig: attack contacts resolve to the nearest attack socket, and articulated ones steer toward a target without moving the root.
 {const root=model.getObjectByName('root')??model.children[0];const rootQ=root.quaternion.clone(),rootP=root.position.clone();const p=new THREE.Vector3(),contact=new THREE.Vector3();assert(anchors.world('anchor_mouth',p));const target=p.clone().add(new THREE.Vector3(.3,-.1,.5));assert(anchors.nearestAttack(target,contact)===anchors.attackSockets.length>0);
- const articulated=record.anchors.filter(a=>a.role==='attack'&&a.chain?.length);assert.equal(anchors.canAim,articulated.length>0);assert.equal(anchors.canGrasp,record.anchors.some(a=>a.name==='anchor_grasp'));
+ const articulated=record.anchors.filter(a=>a.role==='attack'&&a.chain?.length);assert.equal(anchors.canAim,articulated.length>0);assert.equal(anchors.canGrasp,record.anchors.some(a=>a.name==='anchor_grasp'&&a.chain?.length));
  if(anchors.canAim){const nearest=()=>Math.min(...articulated.map(a=>{anchors.world(a.name,p);return p.distanceTo(target)}));const before=nearest();const residual=anchors.solveAttack(target,1,2,12);assert(Number.isFinite(residual));const after=nearest();assert(after<before,`${record.file} aim ${after}/${before}`);assert(root.position.equals(rootP)&&root.quaternion.equals(rootQ));reachReport={...(reachReport||{}),aimBefore:+before.toFixed(3),aimAfter:+after.toFixed(3)};}
  else assert.equal(anchors.solveAttack(target),Infinity);
  model.traverse(o=>{assert(o.position.toArray().every(Number.isFinite));assert(o.quaternion.toArray().every(Number.isFinite));});}
