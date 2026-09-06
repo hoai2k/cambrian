@@ -47,6 +47,7 @@ export function makeActor(id: number, creatureId: CreatureId, controller: Contro
     hp: 0, hpMax: 0, stamina: 0, staminaMax: 0, exhausted: 0, poise: 0, poiseMax: 0,
     state: 'free', stateT: 0, stateDur: 0, combo: 0, comboT: 0, hitDone: new Set(),
     iframes: 0, lockTarget: -1, guardHeld: 0,
+    hideMode: 'none', hideT: 0, hideCd: 0, camoStrength: 0, camoScheme: 'default', camoLabel: '', camoSource: -1, emergenceHeavy: false,
     abilityCd: 0, abilityT: 0, abilityActive: false, senseCd: 0, senseT: 0, burstT: 0,
     hitFlash: 0, hitDir: v3(), hitStop: 0,
     grabbedBy: -1, grabbing: -1, grabT: 0, eatingTarget: -1, eatProgress: 0,
@@ -66,9 +67,7 @@ export function makeActor(id: number, creatureId: CreatureId, controller: Contro
 
 export const isAlive = (a: Actor) => a.state !== 'dead' && a.state !== 'swallowed';
 export const canAct = (a: Actor) => a.state === 'free' || a.state === 'guard';
-export const isHidden = (a: Actor) => a.abilityActive && a.state === 'ability' && a.seen <= 0 && (creature(a.creature).ability === 'burrow' || (creature(a.creature).ability === 'sedimentDive' && a.stateT < a.stateDur - .3));
-export const isInvulnerable = (a: Actor) =>
-  a.iframes > 0 || a.spawnProtect > 0 || a.state === 'moult' ||
-  (a.abilityActive && (creature(a.creature).ability === 'enroll' || creature(a.creature).ability === 'shellUp' || creature(a.creature).ability === 'burrow'));
+export const isHidden = (a: Actor) => a.hideMode === 'burrowed' && a.seen <= 0;
+export const isInvulnerable = (a: Actor) => a.iframes > 0 || a.spawnProtect > 0 || a.state === 'moult';
 
 export const staminaCost = (a: Actor, base: number) => base * clamp(0.6 + a.scale * 0.25, 0.6, 1.3);

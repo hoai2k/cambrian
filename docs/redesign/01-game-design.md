@@ -1,5 +1,7 @@
 # 01 · Game design: Cambrian — Rise of the Apex
 
+> Current combat and Y controls: [Hiding and native combat](05-hiding-and-combat.md) supersedes the original signature-ability mappings below.
+
 > Working title. The subtitle changes; the pitch does not.
 
 ## The pitch
@@ -145,6 +147,36 @@ expresses them differently so fights are varied.
 | **Sense pulse** | D-pad ↑ | 2 s highlight of everything within sense range through cover, colour-coded by size band. Cooldown 6 s. |
 | **Eat** | automatic | Biting a dead body or a Snack consumes it. Eating takes 0.6 s per 10% of your mass and can be interrupted, so eating a big kill in the open is a risk. |
 
+> **The shipped bindings are different.** The layout above is the design's first
+> proposal; play settled somewhere else, and `readGamepad()` in
+> `src/input/input.ts` is the authority. What the game actually reads:
+>
+> | Control | Button | Does |
+> | --- | --- | --- |
+> | Left stick | axes 0–1 | Camera-relative swim |
+> | Right stick | axes 2–3 | Orbit the camera |
+> | RS click + stick up/down | 11 | Zoom |
+> | LS click | 10 | Sink |
+> | **A** | 0 | **Sprint / burst** (analog-free, held) |
+> | **B** | 1 | **Guard** (hold) / **parry** (tap) |
+> | **X** | 2 | **Light bite** |
+> | **Y** | 3 | **Ability** |
+> | **LB** | 4 | **Dodge / dash** |
+> | **RB** | 5 | **Rise / hop** |
+> | **LT** (analog) | 6 | **Aim** — the centred crosshair picks the target |
+> | **RT** (analog) | 7 | **Heavy / pounce** |
+> | D-pad ↑ | 12 | Sense pulse |
+> | D-pad ↓ | 13 | Teleport menu (added with the endless sea) |
+> | D-pad ←/→ | 14/15 | Menu navigation and creature select |
+> | Menu | 9 | Pause |
+> | View | 8 | Read, but nothing consumes it yet |
+>
+> Keyboard layout 1: WASD swim, arrows look, PgUp/PgDn zoom, Shift sprint,
+> Space rise, C sink, F bite, G pounce, R ability, V dash, Q guard, Tab aim,
+> E sense, T teleport, Esc pause. Layout 2 mirrors it on IJKL.
+> The in-game **?** panel and `npm run bindings` are generated from the same
+> source, so they never drift from the code.
+
 ### Rules that make it dynamic
 
 - **Momentum carries into attacks.** Damage scales with closing speed
@@ -184,7 +216,10 @@ expresses them differently so fights are varied.
 
 All eight existing models become playable at every tier. Stats below are for
 the Adult tier and are the starting point for tuning; they deliberately spread
-creatures across a speed / armour / reach / trick triangle.
+creatures across a speed / armour / reach / trick triangle. **The roster is now
+21** — the thirteen additions and their kits are in
+[03 · Expanded creature roster](03-creature-expansion.md), and the shipped
+numbers live in `src/sim/creatures.ts` and `src/sim/expansion.ts`.
 
 | Creature | Archetype | Movement | Light | Heavy (X) | Ability (Y) | Passive | Weakness |
 | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -293,9 +328,11 @@ Everything is still procedural (seeded), so it costs no new art.
   instancing and shaders are reused as-is.
 - **Landmarks** (a few hand-placed by seed): a sponge archway, a boulder
   stack you can hop, a dead Giant's carcass that is a temporary feast and a
-  predator magnet.
+  predator magnet. *(Not built. Scenery in the streamed world is entirely
+  procedural; the escarpment is the landmark you navigate by.)*
 - **Time and light**: a slow day cycle (20 min) that changes caustic intensity
   and Giant activity (they hunt more at dusk). Optional; ships after core.
+  *(Not built.)*
 
 ## Modes
 
@@ -312,6 +349,13 @@ population.
 Bots (the current "nearest enemy" bots become the needs-based AI above) fill
 every mode, so nothing requires a second controller.
 
+> **As built.** All four modes ship (`updateModes()` in `src/sim/game.ts`).
+> Three details of this table did not: co-op **revive by bumping a downed ally**
+> (co-op does share nutrition from a nearby kill, which is the other half of the
+> paragraph), **spectating** for a dead player in versus, and **rotating** who
+> plays the giant in Hunter & Hunted — player 1 holds the role for the match,
+> which runs to six minutes.
+
 ## Local multiplayer specifics
 
 - 1 player: full screen. 2: vertical split. 3–4: quadrants (the current
@@ -326,7 +370,7 @@ every mode, so nothing requires a second controller.
   Rival amber, Threat orange, Giant red) is also encoded as an outline width
   and a HUD marker shape, so it reads at 480 px wide.
 - **Spectating**: a dead player in versus gets a free camera following the
-  leader until respawn.
+  leader until respawn. *(Not built.)*
 
 ## Readability, HUD and feedback
 
@@ -335,7 +379,8 @@ every mode, so nothing requires a second controller.
 - HUD per viewport: health bar, stamina bar, nutrition ring around a tier
   glyph, ability cooldown, lock-on reticle with target band colour, an eye
   icon that fills as a predator's detection score rises, and off-screen
-  arrows for Giants.
+  arrows for Giants. *(All shipped, plus a radar and a biome banner that came
+  with [the endless sea](04-infinite-ocean.md).)*
 - Sound is a gameplay system: burst has a swoosh others hear; Giant proximity
   brings a low drone and heartbeat; escape resolves with silence and a
   single chime; tier-up thumps.

@@ -1,3 +1,4 @@
+import { BURROWERS, hideLabel } from '../sim/concealment';
 import * as THREE from 'three';
 import { audio } from '../audio/audio';
 import { distanceAtten } from '../audio/mix';
@@ -85,7 +86,6 @@ export class Engine {
   private attachments = new Attachments();
   private contact = new THREE.Vector3();
 
-  private ringGeo = new THREE.RingGeometry(0.72, 0.85, 40);
   // forward-facing cap (the model's +Z is its nose)
   private shieldGeo = new THREE.SphereGeometry(1, 24, 12, 0, Math.PI * 2, 0, Math.PI * 0.42).rotateX(Math.PI / 2);
   private cams: CamState[] = [];
@@ -547,7 +547,7 @@ export class Engine {
       if (!v) {
         const loaded = loadedSync(a.creature, wantLod);
         if (!loaded) { void ensureLoaded(a.creature, undefined, wantLod); continue; }
-        v = new CreatureView(a.creature, loaded, { ringGeo: this.ringGeo, shieldGeo: this.shieldGeo }, wantLod);
+        v = new CreatureView(a.creature, loaded, { shieldGeo: this.shieldGeo }, wantLod);
         this.scene.add(v.group);
         this.views.set(a.id, v);
         v.update(a, 0, this.time, true);
@@ -577,7 +577,7 @@ export class Engine {
     return off < limit ? { x: this.contact.x, y: this.contact.y, z: this.contact.z } : fallback;
   }
 
-  /** Per-viewport pass: cull views outside this camera, then colour the rings for this viewer. */
+  /** Per-viewport pass: cull views outside this camera, then set the highlights for this viewer. */
   private prepareViewport(playerIndex: number, viewer?: Actor, cs?: CamState) {
     const game = this.game!;
     // This viewport's own camera and water colour: setViewLength has already applied the biome's
@@ -596,23 +596,20 @@ export class Engine {
       if (cs) {
         this.cullSphere.center.copy(v.group.position);
         this.cullSphere.radius = lengthOf(a) * 0.9 + 0.5;
-        v.group.visible = (!isHidden(a) || a.stateT <= 0.6) && cs.frustum.intersectsSphere(this.cullSphere);
+        v.group.visible = (!isHidden(a) || a.hideT <= 0.6) && cs.frustum.intersectsSphere(this.cullSphere);
         if (!v.group.visible) continue;
       }
       const haze = distanceHaze(Math.hypot(v.group.position.x - camPos.x, v.group.position.y - camPos.y, v.group.position.z - camPos.z), camFar);
       v.setHaze(haze);
-      if (!viewer || a.state === 'dead' || a.state === 'swallowed') { v.setRing(null, 0); v.setHighlight(0); continue; }
-      if (a.id === viewer.id) { v.setRing(null, 0); v.setHighlight(0); continue; }
+      if (!viewer || a.state === 'dead' || a.state === 'swallowed') { v.setHighlight(0); continue; }
+      if (a.id === viewer.id) { v.setHighlight(0); continue; }
       const band = bandOf(viewer, a);
       const d = Math.hypot(a.pos.x - viewer.pos.x, a.pos.y - viewer.pos.y, a.pos.z - viewer.pos.z);
       const L = lengthOf(viewer);
       const sensing = viewer.senseT > 0 && d < creature(viewer.creature).sense * L * 1.2;
       const locked = viewer.lockTarget === a.id;
-      const near = d < L * 7 + 4;
-      const opacity = locked ? 0.95 : sensing ? 0.8 : near ? (band === 'snack' ? 0.18 : 0.42) : 0;
-      v.setRing(BAND_COLOR[band], opacity * (a.controller === 'swarm' ? 0.5 : 1));
       const huntingMe = a.brain?.target === viewer.id && (a.brain.goal === 'hunt' || a.brain.goal === 'notice');
-      if (huntingMe) { v.setHaze(haze * HUNTER_HAZE); v.setRing(BAND_COLOR[band], 0.95); v.setHighlight(a.brain!.goal === 'hunt' ? 0.45 + 0.3 * Math.sin(this.time * 10) : 0.25 + 0.1 * Math.sin(this.time * 6), '#ff4b5c'); }
+      if (huntingMe) { v.setHaze(haze * HUNTER_HAZE); v.setHighlight(a.brain!.goal === 'hunt' ? 0.45 + 0.3 * Math.sin(this.time * 10) : 0.25 + 0.1 * Math.sin(this.time * 6), '#ff4b5c'); }
       else v.setHighlight(sensing ? 0.55 + 0.25 * Math.sin(this.time * 9) : locked ? 0.12 : 0, BAND_COLOR[band]);
     }
   }
@@ -781,7 +778,7 @@ export class Engine {
         index: i, creature: p.creature, color: PLAYER_COLORS[i % 4], alive: p.state !== 'dead', aim,
         hp: p.hp, hpMax: p.hpMax, stamina: p.stamina, staminaMax: p.staminaMax, exhausted: p.exhausted > 0,
         tier: p.tier, tierName: TIER_NAMES[p.tier], progress: p.tier >= 4 ? 1 : clamp(p.nutrition / TIER_NEED[p.tier], 0, 1), scale: p.scale,
-        abilityName: def.abilityName, abilityReady: 1 - clamp(p.abilityCd / def.abilityCooldown, 0, 1), abilityActive: p.abilityActive, abilityUnlocked: p.tier >= 2 || game.mode === 'reef' || game.mode === 'hunted',
+        abilityName: p.hideMode === 'descending' ? 'Sinking to burrow' : p.hideMode === 'burrowed' ? 'Buried · Y emerge' : p.hideMode === 'camouflage' ? `Camo: ${p.camoLabel}` : hideLabel(p.creature), abilityReady: p.hideMode === 'camouflage' ? p.stamina / p.staminaMax : 1 - clamp(p.hideCd / 2, 0, 1), abilityActive: p.hideMode !== 'none', abilityUnlocked: true,
         senseReady: 1 - clamp(p.senseCd / 6, 0, 1),
         lock: lockA && isAlive(lockA) ? { name: creature(lockA.creature).name, band: bandOf(p, lockA), hp: lockA.hp / lockA.hpMax, color: BAND_COLOR[bandOf(p, lockA)] } : undefined,
         hunted: p.hunted, hunterAngle, hunterName: hunter ? creature(hunter.creature).name : undefined,
@@ -815,7 +812,7 @@ export class Engine {
     this.clearMatch();
     this.sea?.dispose();
     this.bubbles.dispose(); this.sparkles.dispose(); this.impacts.dispose(); this.silt.dispose();
-    this.ringGeo.dispose(); this.shieldGeo.dispose();
+    this.shieldGeo.dispose();
     this.renderer.dispose();
     this.renderer.forceContextLoss();
     this.renderer.domElement.remove();

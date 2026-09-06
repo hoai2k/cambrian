@@ -1,7 +1,15 @@
 # Animation brief — new clips for Cambrian Explosion
 
+> **Delivered.** The 71 clips this brief asked for were authored and appended
+> to the original eight GLBs; the delivery record is in
+> [animation-delivery/DELIVERY.md](animation-delivery/DELIVERY.md). The brief is
+> kept as the contract: it is what any *new* or re-authored rig must satisfy,
+> and `node tools/check-creature-assets.mjs --strict` enforces the clip set.
+> The 13 expansion rigs ship their own action sets under the same contract — see
+> **Expansion rigs** at the end.
+
 This document is for the agent or animator producing new animation clips in
-Blender for the eight creature rigs in `public/assets/creatures/*.glb`. It
+Blender for the original eight creature rigs in `public/assets/creatures/*.glb`. It
 lists every clip the game will use, exactly how it must be named and timed,
 how the game plays it, and a prompt-style description of the motion for each
 creature. The game already picks these clips up **by name**; nothing in the
@@ -47,8 +55,8 @@ code needs to change when they land.
 
 | Clip | Type | Duration | Played when | Replaces (current stand-in) |
 | --- | --- | --- | --- | --- |
-| `Bite` | one-shot | 0.5 s (15 f) | Light attack (RB). Hit window is frames 4–9. Retimed by the engine to 0.35–0.6 s depending on creature. | `Attack` sped up |
-| `Heavy` | one-shot | 1.1 s (33 f) | Heavy attack (X). Wind-up frames 0–12 (the player can read it and dodge), strike frames 12–18, recovery 18–33. | `Attack` slowed down |
+| `Bite` | one-shot | 0.5 s (15 f) | Light attack (**X** on the shipped pad). Hit window is frames 4–9. Retimed by the engine to 0.35–0.6 s depending on creature. | `Attack` sped up |
+| `Heavy` | one-shot | 1.1 s (33 f) | Heavy attack / pounce (**RT** on the shipped pad). Wind-up frames 0–12 (the player can read it and dodge), strike frames 12–18, recovery 18–33. | `Attack` slowed down |
 | `Grab` | one-shot | 0.9 s (27 f) | Anomalocaris only: after a successful `Heavy`, holding and crushing a victim, then throwing it forward. Other creatures: not needed. | `Attack` |
 | `Guard` | loop | 1.0 s (30 f) | Held while LB is down. Braced, defensive, slight breathing motion so it isn't a freeze. | `Hit` frozen at 30% |
 | `Parry` | one-shot | 0.35 s (10 f) | Tap LB as a hit lands: a sharp deflecting twist or clash, then snap back to neutral. | turn clip burst |
