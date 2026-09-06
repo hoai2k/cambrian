@@ -5,7 +5,7 @@ export function XboxDiagram() {
   const line = (x1: number, y1: number, x2: number, y2: number) => <line x1={x1} y1={y1} x2={x2} y2={y2} className="pad-line" />;
   return (
     <svg className="xbox-diagram" viewBox="0 0 860 400" role="img" aria-labelledby="xbox-title">
-      <title id="xbox-title">Xbox controller layout: left stick swims, right stick looks and click-plus-up-or-down zooms, RT pounces, LB dashes, LT aims, RB rises, X bites, Y ability, B guards, A sprints, D-pad up senses, Menu pauses.</title>
+      <title id="xbox-title">Xbox controller layout: left stick swims, right stick looks and click-plus-up-or-down zooms, RT pounces, LB dashes, LT aims, RB rises, X bites, Y ability, B guards, A sprints, D-pad up senses, D-pad down opens the teleport menu, Menu pauses.</title>
       <defs>
         <linearGradient id="pad-shell" x2="0" y2="1"><stop stopColor="#2f4d58" /><stop offset="1" stopColor="#13262f" /></linearGradient>
       </defs>
@@ -30,7 +30,8 @@ export function XboxDiagram() {
       {line(320, 180, 200, 170)}{label(194, 174, 'Left stick · Swim', 'end')}
       {label(194, 194, 'click · Sink', 'end')}
       {line(378, 236, 200, 250)}{label(194, 254, 'D-pad ▲ · Sense pulse', 'end')}
-      {label(194, 274, 'D-pad ◀▶ · Pick creature', 'end')}
+      {label(194, 274, 'D-pad ▼ · Teleport menu', 'end')}
+      {label(194, 294, 'D-pad ◀▶ · Pick creature', 'end')}
       {line(520, 62, 660, 40)}{label(666, 44, 'RT · Pounce / lunge')}
       {line(520, 92, 660, 90)}{label(666, 94, 'RB · Rise / hop')}
       {line(514, 138, 660, 130)}{label(666, 134, 'Y · Signature ability')}

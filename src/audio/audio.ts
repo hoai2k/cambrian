@@ -17,8 +17,16 @@ const SAMPLES: Record<string, string[]> = {
   'ui-move': ['ui-move'], 'ui-confirm': ['ui-confirm'], 'ui-back': ['ui-back'], 'ui-join': ['ui-join'], 'ui-start': ['ui-start'], won: ['won'],
 };
 const LOOPS = { ambient: 'ambient-reef', drone: 'giant-drone' } as const;
-/** Background music (public/music). Starts with the first user gesture on the title screen and loops. */
-const MUSIC_URL = `${import.meta.env.BASE_URL}music/${encodeURIComponent('Tide of First Bones.mp3')}`;
+/**
+ * Background music (public/music). Starts with the first user gesture on the title screen and
+ * loops. Three moods follow the biome the first player is in (see docs/redesign/04-infinite-ocean.md):
+ * the reef theme is the default; a calm theme for the shallows and nurseries and a danger theme
+ * for the channels, escarpment and basin are optional files that fall back to the reef theme
+ * while they are missing.
+ */
+export type Mood = 'calm' | 'reef' | 'danger';
+const MUSIC_TRACKS: Record<Mood, string> = { reef: 'Tide of First Bones.mp3', calm: 'theme-calm.mp3', danger: 'theme-danger.mp3' };
+const musicUrl = (m: Mood) => `${import.meta.env.BASE_URL}music/${encodeURIComponent(MUSIC_TRACKS[m])}`;
 
 export class GameAudio {
   private ctx?: AudioContext;
@@ -30,6 +38,9 @@ export class GameAudio {
   private synthTensionGain?: GainNode;
   private musicGain?: GainNode;
   private musicStarted = false;
+  private tracks = new Map<Mood, { gain: GainNode; buf: AudioBuffer; src?: AudioBufferSourceNode }>();
+  private missing = new Set<Mood>();
+  private mood: Mood = 'reef';
   musicOn = true;
   private musicLevel = 0.3;
   private buffers = new Map<string, AudioBuffer>();
@@ -107,12 +118,44 @@ export class GameAudio {
   private async startMusic() {
     if (this.musicStarted || !this.ctx || !this.musicGain) return;
     this.musicStarted = true;
+    const t = await this.loadTrack(this.mood) ?? await this.loadTrack('reef');
+    if (!t || !this.ctx) { this.musicStarted = false; return; }
+    this.playTrack(t);
+    t.gain.gain.setValueAtTime(1, this.ctx.currentTime);
+    this.musicGain.gain.linearRampToValueAtTime(this.musicOn ? this.musicLevel : 0, this.ctx.currentTime + 4);
+  }
+  private async loadTrack(m: Mood) {
+    if (!this.ctx || !this.musicGain || this.missing.has(m)) return undefined;
+    const have = this.tracks.get(m); if (have) return have;
     try {
-      const res = await fetch(MUSIC_URL); if (!res.ok) throw new Error(String(res.status));
+      const res = await fetch(musicUrl(m)); if (!res.ok) throw new Error(String(res.status));
       const buf = await this.ctx.decodeAudioData(await res.arrayBuffer());
-      const src = this.ctx.createBufferSource(); src.buffer = buf; src.loop = true; src.connect(this.musicGain); src.start();
-      this.musicGain.gain.linearRampToValueAtTime(this.musicOn ? this.musicLevel : 0, this.ctx.currentTime + 4);
-    } catch { this.musicStarted = false; }
+      const gain = this.ctx.createGain(); gain.gain.value = 0; gain.connect(this.musicGain);
+      const t = { gain, buf }; this.tracks.set(m, t); return t;
+    } catch { this.missing.add(m); return undefined; }
+  }
+  private playTrack(t: { gain: GainNode; buf: AudioBuffer; src?: AudioBufferSourceNode }) {
+    if (t.src || !this.ctx) return;
+    const src = this.ctx.createBufferSource(); src.buffer = t.buf; src.loop = true; src.connect(t.gain); src.start();
+    t.src = src;
+  }
+  /** Follow the biome: crossfade to the mood's theme over a few seconds (a missing theme keeps the reef playing). */
+  async setMood(m: Mood) {
+    if (m === this.mood) return;
+    const prev = this.mood; this.mood = m;
+    if (!this.musicStarted || !this.ctx) return;
+    const next = await this.loadTrack(m) ?? await this.loadTrack('reef');
+    if (!next || !this.ctx || this.mood !== m) return;
+    const from = this.tracks.get(prev) ?? [...this.tracks.values()].find((t) => t.src && t !== next);
+    if (from === next) return;
+    const now = this.ctx.currentTime;
+    this.playTrack(next);
+    next.gain.gain.cancelScheduledValues(now); next.gain.gain.setValueAtTime(next.gain.gain.value, now); next.gain.gain.linearRampToValueAtTime(1, now + 5);
+    if (from?.src) {
+      const src = from.src; from.src = undefined;
+      from.gain.gain.cancelScheduledValues(now); from.gain.gain.setValueAtTime(from.gain.gain.value, now); from.gain.gain.linearRampToValueAtTime(0, now + 5);
+      src.stop(now + 5.2);
+    }
   }
   setMusic(on: boolean) { this.musicOn = on; if (this.musicGain && this.ctx) this.musicGain.gain.setTargetAtTime(on ? this.musicLevel * (1 - this.tension * 0.45) : 0, this.ctx.currentTime, 0.5); }
 
