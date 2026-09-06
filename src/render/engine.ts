@@ -75,7 +75,6 @@ export class Engine {
   private attachments = new Attachments();
   private contact = new THREE.Vector3();
 
-  private ringGeo = new THREE.RingGeometry(0.72, 0.85, 40);
   // forward-facing cap (the model's +Z is its nose)
   private shieldGeo = new THREE.SphereGeometry(1, 24, 12, 0, Math.PI * 2, 0, Math.PI * 0.42).rotateX(Math.PI / 2);
   private cams: CamState[] = [];
@@ -516,7 +515,7 @@ export class Engine {
       if (!v) {
         const loaded = loadedSync(a.creature, wantLod);
         if (!loaded) { void ensureLoaded(a.creature, undefined, wantLod); continue; }
-        v = new CreatureView(a.creature, loaded, { ringGeo: this.ringGeo, shieldGeo: this.shieldGeo }, wantLod);
+        v = new CreatureView(a.creature, loaded, { shieldGeo: this.shieldGeo }, wantLod);
         this.scene.add(v.group);
         this.views.set(a.id, v);
         v.update(a, 0, this.time, true);
@@ -546,7 +545,7 @@ export class Engine {
     return off < limit ? { x: this.contact.x, y: this.contact.y, z: this.contact.z } : fallback;
   }
 
-  /** Per-viewport pass: cull views outside this camera, then colour the rings for this viewer. */
+  /** Per-viewport pass: cull views outside this camera, then set the highlights for this viewer. */
   private prepareViewport(playerIndex: number, viewer?: Actor, cs?: CamState) {
     const game = this.game!;
     if (cs) {
@@ -564,18 +563,15 @@ export class Engine {
         v.group.visible = (!isHidden(a) || a.stateT <= 0.6) && cs.frustum.intersectsSphere(this.cullSphere);
         if (!v.group.visible) continue;
       }
-      if (!viewer || a.state === 'dead' || a.state === 'swallowed') { v.setRing(null, 0); v.setHighlight(0); continue; }
-      if (a.id === viewer.id) { v.setRing(null, 0); v.setHighlight(0); continue; }
+      if (!viewer || a.state === 'dead' || a.state === 'swallowed') { v.setHighlight(0); continue; }
+      if (a.id === viewer.id) { v.setHighlight(0); continue; }
       const band = bandOf(viewer, a);
       const d = Math.hypot(a.pos.x - viewer.pos.x, a.pos.y - viewer.pos.y, a.pos.z - viewer.pos.z);
       const L = lengthOf(viewer);
       const sensing = viewer.senseT > 0 && d < creature(viewer.creature).sense * L * 1.2;
       const locked = viewer.lockTarget === a.id;
-      const near = d < L * 7 + 4;
-      const opacity = locked ? 0.95 : sensing ? 0.8 : near ? (band === 'snack' ? 0.18 : 0.42) : 0;
-      v.setRing(BAND_COLOR[band], opacity * (a.controller === 'swarm' ? 0.5 : 1));
       const huntingMe = a.brain?.target === viewer.id && (a.brain.goal === 'hunt' || a.brain.goal === 'notice');
-      if (huntingMe) { v.setRing(BAND_COLOR[band], 0.95); v.setHighlight(a.brain!.goal === 'hunt' ? 0.45 + 0.3 * Math.sin(this.time * 10) : 0.25 + 0.1 * Math.sin(this.time * 6), '#ff4b5c'); }
+      if (huntingMe) { v.setHighlight(a.brain!.goal === 'hunt' ? 0.45 + 0.3 * Math.sin(this.time * 10) : 0.25 + 0.1 * Math.sin(this.time * 6), '#ff4b5c'); }
       else v.setHighlight(sensing ? 0.55 + 0.25 * Math.sin(this.time * 9) : locked ? 0.12 : 0, BAND_COLOR[band]);
     }
   }
@@ -774,7 +770,7 @@ export class Engine {
     this.clearMatch();
     this.sea?.dispose();
     this.bubbles.dispose(); this.sparkles.dispose(); this.impacts.dispose(); this.silt.dispose();
-    this.ringGeo.dispose(); this.shieldGeo.dispose();
+    this.shieldGeo.dispose();
     this.renderer.dispose();
     this.renderer.forceContextLoss();
     this.renderer.domElement.remove();
