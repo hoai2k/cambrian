@@ -32,7 +32,7 @@ All eight request groups, including the optional assets, were fulfilled. Painted
 
 ## 4. Creature select renders (upgrade)
 
-**Completed 2026-09-06.** Delivered all eight 1600×1200 transparent Blender renders at `public/assets/creatures/<id>.select.png` and updated selection to use them. The original `.png`, `.card.png`, and GLB files are preserved per repository policy. All models use the same camera direction, TurnLeft animation frame 17, coral rim light, and teal fill; PNG palettes preserve alpha. The previous `.card.png` files were already background-removed, but were not the requested render upgrade.
+**Completed 2026-09-06.** Delivered all eight 1600×1200 transparent Blender renders at `public/assets/creatures/<id>.select.png` and updated selection heroes and grid thumbnails to use them. Portraits were refreshed after merging the latest model updates from main. The original `.png`, `.card.png`, and GLB files are preserved per repository policy. All models use the same camera direction, TurnLeft animation frame 17, coral rim light, and teal fill; PNG palettes preserve alpha. The previous `.card.png` files were already background-removed, but were not the requested render upgrade.
 
 - **Files:** `public/assets/creatures/<id>.png` for all eight creatures (existing 1000×750 renders are usable placeholders)
 - **Replaces:** the current flat studio renders on dark grey.

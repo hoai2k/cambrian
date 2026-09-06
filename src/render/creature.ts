@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import { CreatureAnchors } from './anchors';
 import { GLTFLoader, type GLTF } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { MeshoptDecoder } from 'three/examples/jsm/libs/meshopt_decoder.module.js';
 import * as SkeletonUtils from 'three/examples/jsm/utils/SkeletonUtils.js';
@@ -45,6 +46,7 @@ export class CreatureView {
   readonly group = new THREE.Group();
   private inner = new THREE.Group();
   private model: THREE.Object3D;
+  readonly anchors: CreatureAnchors;
   private mixer: THREE.AnimationMixer;
   private actions = new Map<string, THREE.AnimationAction>();
   private loco?: THREE.AnimationAction;
@@ -77,6 +79,7 @@ export class CreatureView {
     this.model.scale.setScalar(loaded.unit);
     this.model.position.copy(loaded.center).multiplyScalar(-loaded.unit);
     this.heightUnits = loaded.size.y * loaded.unit;
+    this.anchors = new CreatureAnchors(this.model);
     this.inner.add(this.model);
     this.group.add(this.inner);
     this.model.traverse((o) => {
@@ -132,6 +135,15 @@ export class CreatureView {
     const d = duration ?? act.getClip().duration;
     act.setEffectiveTimeScale(act.getClip().duration / d).setEffectiveWeight(1).fadeIn(0.06).play();
     this.oneShot = act; this.oneShotT = d;
+  }
+
+  /** Synchronize the authored pickup/carry pose with actual consumption progress. */
+  poseFeeding(progress: number) {
+    const eat = this.actions.get('Eat'); if (!eat) return;
+    this.playLoop('Eat');
+    this.oneShot?.setEffectiveWeight(0);
+    eat.setEffectiveWeight(1); eat.time = THREE.MathUtils.clamp(progress, 0, .99999) * eat.getClip().duration;
+    this.mixer.update(0); this.group.updateWorldMatrix(true, true);
   }
 
   /** Distant creatures stop casting shadows; the shadow pass does not frustum-cull these meshes. */

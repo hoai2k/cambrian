@@ -7,3 +7,7 @@ Creature portraits: run `node tools/art/decode-models.mjs`, then `Blender -b --p
 Native vectors: `python3 tools/art/make-vectors.py` requires fonttools and Arial Black. Lettering is outlined, so the runtime does not require that font. `node tools/art/export-vectors.mjs` exports the PNG logo and icons using Chrome (adjust the executable path for other platforms).
 
 Review: `node tools/art/review-assets.mjs` makes a contact sheet in `/tmp`. `check-ui.mjs` checks a local Vite server on port 5174 with desktop and portrait viewports. Both use playwright-core and Chrome.
+
+## Validation on 2026-09-06
+
+Build, TypeScript and creature intake checks pass. All delivered raster dimensions and alpha channels were checked, all new files are below 600 KB, and desktop/mobile title plus selection artwork were visually reviewed. The UI smoke check reports an existing `Engine.frame` undefined `x` error when switching modes, also reproduced on the unchanged starting commit `2ca01a7`; it is not an image-loading error. The smoke script intentionally retains a nonzero exit for runtime errors.
