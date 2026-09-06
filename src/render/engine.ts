@@ -9,6 +9,7 @@ import { BAND_COLOR, emptyInput, TIER_NAMES, TIER_NEED, type Actor, type Band, t
 import { groundHeight, NURSERIES, resolveStatic, SURFACE_Y, type Boulder } from '../sim/world';
 import { AssetQueue, type AssetProgress } from './assets';
 import { CreatureView, ensureLoaded, loadedSync, type Lod } from './creature';
+import { feedingPhase } from './anchors';
 import { Bubbles, Impacts, Silt } from './fx';
 import { createSea, type Quality, type SeaEnvironment } from './sea';
 
@@ -22,7 +23,7 @@ export interface PlayerHud {
   lock?: { name: string; band: Band; hp: number; color: string };
   aim?: { hasTarget: boolean; inRange: boolean; name?: string; color: string; ready: boolean };
   hunted: number; hunterAngle: number | null; hunterName?: string; hunterState: 'none' | 'noticed' | 'hunting'; inCover: boolean; still: boolean;
-  hint?: string; respawnIn: number; fade: number; state: string; kills: number; eats: number; escapes: number; protect: boolean;
+  hint?: string; respawnIn: number; fade: number; state: string; modelReady: boolean; kills: number; eats: number; escapes: number; protect: boolean;
   bandMarkers: { x: number; y: number; band: Band; size: number }[];
 }
 export interface HudSnapshot {
@@ -60,6 +61,11 @@ export class Engine {
   private sea?: SeaEnvironment;
   game?: Game;
   private views = new Map<number, CreatureView>();
+  private feeding = new Map<number, { target: number; initialEaten: number; pickup: THREE.Vector3; startTip: THREE.Vector3; lastStateT: number }>();
+  private anchorPoint = new THREE.Vector3();
+  private mouthPoint = new THREE.Vector3();
+  private insidePoint = new THREE.Vector3();
+
   private ringGeo = new THREE.RingGeometry(0.72, 0.85, 40);
   // forward-facing cap (the model's +Z is its nose)
   private shieldGeo = new THREE.SphereGeometry(1, 24, 12, 0, Math.PI * 2, 0, Math.PI * 0.42).rotateX(Math.PI / 2);
@@ -113,12 +119,13 @@ export class Engine {
     // Stream assets by priority: the default pick first so the title can show, everything else on idle time.
     this.assets.onProgress((p) => {
       this.cb.onProgress?.(p);
-      if (!this.bootDone && p.ready.has('anomalocaris') && p.ready.has('waptia')) { this.bootDone = true; this.cb.onLoaded(); }
+      // The title never waits for 3D models; they stream during the title and pick screens.
+      if (!this.bootDone && (this.assets.isCardReady('anomalocaris') || performance.now() - this.bootStart > 4000)) { this.bootDone = true; this.cb.onLoaded(); }
     });
     this.assets.prioritize(['anomalocaris', 'waptia', 'marrella', 'opabinia', 'canadia', 'olenoides', 'hallucigenia', 'wiwaxia'], 'boot');
   }
   readonly assets = new AssetQueue();
-  private bootDone = false;
+  private bootDone = false; private bootStart = performance.now();
   /** Tell the loader which creatures are most likely to be needed next. */
   prioritize(creatures: CreatureId[], phase: 'boot' | 'title' | 'select' | 'playing') { this.assets.prioritize(creatures, phase); }
 
@@ -173,7 +180,7 @@ export class Engine {
 
   private clearMatch() {
     for (const v of this.views.values()) v.dispose();
-    this.views.clear();
+    this.views.clear(); this.feeding.clear();
     this.cams = [];
     this.game = undefined;
   }
@@ -465,10 +472,65 @@ export class Engine {
       v.setShadow(d < 32 && lengthOf(a) > 0.45);
       // Animate far views less often
       const far = d > 45;
-      const animate = !far || ((a.id + Math.floor(this.time * 60)) % 3 === 0);
-      v.update(a, animate ? (far ? dt * 3 : dt) : dt, this.time, animate);
+      const continuous = a.state === 'eating' || a.holdT > 0;
+      const animate = continuous || !far || ((a.id + Math.floor(this.time * 60)) % 3 === 0);
+      v.update(a, animate && far && !continuous ? dt * 3 : dt, this.time, animate);
     }
+    this.syncAttachments(game);
     for (const [id, v] of this.views) if (!keep.has(id)) { v.dispose(); this.views.delete(id); }
+  }
+
+  /** Visual attachment pass after every actor transform/animation has been updated. */
+  private syncAttachments(game: Game) {
+    const active = new Set<number>();
+    const claimed = new Set<number>();
+    for (const predator of game.actors) {
+      if (predator.creature !== 'opabinia' || predator.state !== 'eating') continue;
+      const food = game.byId(predator.eatingTarget), pv = this.views.get(predator.id);
+      const fv = food && this.views.get(food.id);
+      if (!food || !pv || !fv || claimed.has(food.id) || !pv.anchors.world('anchor_mouth', this.mouthPoint)) continue;
+      if (!pv.anchors.world('anchor_grasp', this.anchorPoint)) continue;
+      active.add(predator.id); claimed.add(food.id);
+      let state = this.feeding.get(predator.id);
+      if (!state || state.target !== food.id || predator.stateT < state.lastStateT) {
+        state = { target: food.id, initialEaten: food.eaten, pickup: fv.group.position.clone(), startTip: this.anchorPoint.clone(), lastStateT: predator.stateT };
+        this.feeding.set(predator.id, state);
+      }
+      state.lastStateT = predator.stateT;
+      const progress = THREE.MathUtils.clamp((food.eaten - state.initialEaten) / Math.max(.001, 1 - state.initialEaten), 0, 1);
+      const phase = feedingPhase(progress);
+      pv.poseFeeding(progress);
+      pv.anchors.world('anchor_mouth', this.mouthPoint);
+      this.insidePoint.copy(this.mouthPoint); pv.anchors.world('anchor_mouth_inside', this.insidePoint);
+      const target = state.startTip.clone().lerp(state.pickup, phase.pickup);
+      if (phase.attached) {
+        target.copy(state.pickup).lerp(this.mouthPoint, phase.carry);
+        // Carry beneath the head rather than through the head mesh.
+        const down = new THREE.Vector3(0, -pv.visibleLength * .13 * Math.sin(Math.PI * phase.carry), 0).applyQuaternion(pv.group.quaternion);
+        target.add(down);
+      }
+      pv.anchors.solveGrasp(target);
+      if (phase.attached && pv.anchors.world('anchor_grasp', this.anchorPoint)) {
+        fv.group.position.copy(this.anchorPoint).lerp(this.insidePoint, phase.swallow);
+        // A consumed corpse closes down to the aperture, then disappears inside it.
+        const aperture = Math.min(1, pv.visibleLength * .04 / Math.max(.001, fv.visibleLength));
+        fv.group.scale.multiplyScalar(THREE.MathUtils.lerp(1, aperture, phase.carry) * (1 - phase.swallow));
+        fv.group.updateWorldMatrix(true, true);
+      }
+    }
+    for (const id of this.feeding.keys()) if (!active.has(id)) this.feeding.delete(id);
+    // Other creatures can immediately use the same sockets for grabs and swallowing.
+    for (const food of game.actors) {
+      if (claimed.has(food.id)) continue;
+      const predatorId = food.state === 'grabbed' ? food.grabbedBy : food.state === 'swallowed' ? food.swallowedBy : -1;
+      const pv = this.views.get(predatorId), fv = this.views.get(food.id); if (!pv || !fv) continue;
+      if (food.state === 'grabbed') {
+        if (pv.anchors.world('anchor_grasp', this.anchorPoint) || pv.anchors.world('anchor_attack_primary', this.anchorPoint)) fv.group.position.copy(this.anchorPoint);
+      } else if (pv.anchors.world('anchor_mouth', this.anchorPoint)) {
+        this.insidePoint.copy(this.anchorPoint); pv.anchors.world('anchor_mouth_inside', this.insidePoint);
+        fv.group.position.copy(this.anchorPoint).lerp(this.insidePoint, THREE.MathUtils.clamp(food.stateT / Math.max(.001, food.stateDur), 0, 1));
+      }
+    }
   }
 
   /** Per-viewport pass: cull views outside this camera, then colour the rings for this viewer. */
@@ -484,7 +546,7 @@ export class Engine {
       if (!a) continue;
       // Creature meshes have frustumCulled off (skinned bounds are unreliable), so cull the group here.
       if (cs) {
-        this.cullSphere.center.set(a.pos.x, a.pos.y, a.pos.z);
+        this.cullSphere.center.copy(v.group.position);
         this.cullSphere.radius = lengthOf(a) * 0.9 + 0.5;
         v.group.visible = (!isHidden(a) || a.stateT <= 0.6) && cs.frustum.intersectsSphere(this.cullSphere);
         if (!v.group.visible) continue;
@@ -591,7 +653,7 @@ export class Engine {
         lock: lockA && isAlive(lockA) ? { name: creature(lockA.creature).name, band: bandOf(p, lockA), hp: lockA.hp / lockA.hpMax, color: BAND_COLOR[bandOf(p, lockA)] } : undefined,
         hunted: p.hunted, hunterAngle, hunterName: hunter ? creature(hunter.creature).name : undefined,
         hunterState: p.hunted >= 0.5 ? 'hunting' : p.hunted > 0.2 ? 'noticed' : 'none', inCover: p.cover > 0.3, still: Math.hypot(p.vel.x, p.vel.y, p.vel.z) < 0.3,
-        hint: game.hintFor(i), respawnIn: p.state === 'dead' ? Math.max(0, 3 - p.respawnT) : 0, fade: cs?.fade ?? 0, state: p.state,
+        hint: game.hintFor(i), respawnIn: p.state === 'dead' ? Math.max(0, 3 - p.respawnT) : 0, fade: cs?.fade ?? 0, state: p.state, modelReady: !!loadedSync(p.creature),
         kills: p.kills, eats: p.eats, escapes: p.escapes, protect: p.spawnProtect > 0, bandMarkers: markers.slice(0, 24),
       };
     });

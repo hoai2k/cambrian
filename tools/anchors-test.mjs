@@ -1,0 +1,15 @@
+// Run from repo root: node --experimental-transform-types tools/anchors-test.mjs
+import fs from 'node:fs';import assert from 'node:assert/strict';import * as THREE from 'three';import{GLTFLoader}from 'three/addons/loaders/GLTFLoader.js';import{MeshoptDecoder}from 'three/addons/libs/meshopt_decoder.module.js';import{clone}from 'three/addons/utils/SkeletonUtils.js';
+const {CreatureAnchors,feedingPhase}=await import('../src/render/anchors.ts');
+globalThis.self=globalThis;globalThis.createImageBitmap=async()=>({width:512,height:512,close(){}});
+const records=JSON.parse(fs.readFileSync('docs/creature-anchors-manifest.json')),reports=[];
+for(const record of records){const bytes=fs.readFileSync('public/assets/creatures/'+record.file);const gltf=await new GLTFLoader().setMeshoptDecoder(MeshoptDecoder).parseAsync(bytes.buffer.slice(bytes.byteOffset,bytes.byteOffset+bytes.byteLength),'');const model=clone(gltf.scene);const anchors=new CreatureAnchors(model);for(const a of record.anchors){const p=new THREE.Vector3();assert(anchors.world(a.name,p),a.name);assert(p.toArray().every(Number.isFinite));}let reachReport;
+if(record.file.startsWith('opabinia')){
+ const mixer=new THREE.AnimationMixer(model);const eat=gltf.animations.find(c=>c.name==='Eat');const action=mixer.clipAction(eat).play();mixer.setTime(.28);model.position.set(3,2,-4);model.scale.setScalar(2.3);model.rotation.set(.2,.7,-.1);model.updateWorldMatrix(true,true);
+ const sourceRoot=model.getObjectByName('root'),rootQ=sourceRoot.quaternion.clone(),rootP=sourceRoot.position.clone();const p=new THREE.Vector3();anchors.world('anchor_grasp',p);const target=p.clone().add(new THREE.Vector3(.12,-.12,.1));const before=p.distanceTo(target);const error=anchors.solveGrasp(target,1,24);assert(error<before*.15,`IK ${record.file} residual ${error}/${before}`);assert(sourceRoot.position.equals(rootP)&&sourceRoot.quaternion.equals(rootQ));
+ const unreachable=anchors.solveGrasp(new THREE.Vector3(1000,1000,1000));assert(Number.isFinite(unreachable));model.traverse(o=>{assert(o.position.toArray().every(Number.isFinite));assert(o.quaternion.toArray().every(Number.isFinite));});assert(sourceRoot.position.equals(rootP)&&sourceRoot.quaternion.equals(rootQ));
+ const originalAnchor=gltf.scene.getObjectByName('anchor_grasp');assert(originalAnchor!==anchors.sockets.get('anchor_grasp'));reachReport={nearTargetResidual:error,unreachableFinite:true,rootUnchanged:true,cloneIsolated:true};
+ action.stop();for(const name of record.changedClips){const c=gltf.animations.find(c=>c.name===name);assert(c);mixer.clipAction(c).play();for(let f=0;f<25;f++){mixer.setTime(c.duration*f/25);model.updateWorldMatrix(true,true);anchors.world('anchor_grasp',p);assert(p.toArray().every(Number.isFinite));}mixer.stopAllAction();}
+}
+reports.push({file:record.file,anchors:anchors.sockets.size,ik:reachReport});console.log(record.file,'PASS',anchors.sockets.size,'sockets',reachReport||'');}
+assert(!feedingPhase(.1).attached&&feedingPhase(.3).attached);assert(feedingPhase(0).swallow===0&&feedingPhase(1).swallow===1);assert(feedingPhase(.78).carry===1);
