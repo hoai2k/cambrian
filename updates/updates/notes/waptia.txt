@@ -1,0 +1,14 @@
+Waptia — new animation clips
+30 fps. Frame range 0–N inclusive; N frame intervals.
+
+Bite: 15 frames / 0.500000 s; one-shot; 264 channels.
+Heavy: 33 frames / 1.100000 s; one-shot; 264 channels.
+Dodge: 12 frames / 0.400000 s; one-shot; 264 channels.
+Eat: 24 frames / 0.800000 s; loop; 264 channels.
+Stagger: 36 frames / 1.200000 s; one-shot; 264 channels.
+Moult: 45 frames / 1.500000 s; loop; 264 channels.
+Ability: 14 frames / 0.466667 s; one-shot; 264 channels.
+
+All nine original clips preserved unchanged. Meshes, materials, textures, nodes, bone names and bind pose preserved.
+No root motion; scale channels are constant. One-shot endpoints match the original Idle start pose.
+Guard and Parry intentionally omitted, as specified.
