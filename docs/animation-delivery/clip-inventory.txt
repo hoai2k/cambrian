@@ -1,0 +1,56 @@
+
+## anomalocaris.glb
+bones=115 groups={"root":1,"body":8,"tail_L":6,"tail_R":6,"flap_L":32,"flap_R":32,"claw_L":14,"claw_R":14,"eye":1,"eye_-":1}
+root=root
+clips=Attack(0.87s, 345ch), Death(1.20s, 345ch), Dive(1.20s, 345ch), Hit(0.87s, 345ch), Idle(2.40s, 345ch), Rise(1.20s, 345ch), Swim(2.40s, 345ch), TurnLeft(1.20s, 345ch), TurnRight(1.20s, 345ch), Bite(0.50s, 345ch), Heavy(1.10s, 345ch), Guard(1.00s, 345ch), Parry(0.33s, 345ch), Dodge(0.40s, 345ch), Eat(0.80s, 345ch), Stagger(1.20s, 345ch), Moult(1.50s, 345ch), Grab(0.90s, 345ch), Ability(0.60s, 345ch)
+meshes=Anomalocaris_surface.006, Anomalocaris_surface.004, Anomalocaris_surface.001, Anomalocaris_surface.002, Anomalocaris_surface.005, Anomalocaris_surface.003
+sample bones: root, body_00, body_01, body_02, body_03, body_04, body_05, body_06, body_07, tail_L_0, tail_L_0_tip, tail_L_1 …
+
+## canadia.glb
+bones=70 groups={"root":1,"body":1,"proboscis":1,"segment":21,"parapodium":21,"parapodium_-":21,"tentacle":1,"tentacle_tip":1,"tentacle_-":1,"tentacle_tip_-":1}
+root=root
+clips=Attack(1.20s, 210ch), Death(1.60s, 210ch), Dive(2.40s, 210ch), Hit(0.60s, 210ch), Idle(2.40s, 210ch), Rise(2.40s, 210ch), Swim(2.40s, 210ch), TurnLeft(2.40s, 210ch), TurnRight(2.40s, 210ch), Bite(0.50s, 210ch), Heavy(1.10s, 210ch), Guard(1.00s, 210ch), Parry(0.33s, 210ch), Dodge(0.40s, 210ch), Eat(0.80s, 210ch), Stagger(1.20s, 210ch), Moult(1.50s, 210ch), Ability(1.00s, 210ch)
+meshes=canadia anatomy.003, canadia anatomy.002, canadia anatomy.001
+sample bones: root, body, proboscis, segment_00, parapodium_1_00, parapodium_-1_00, segment_01, parapodium_1_01, parapodium_-1_01, segment_02, parapodium_1_02, parapodium_-1_02 …
+
+## hallucigenia.glb
+bones=50 groups={"root":1,"body":9,"tentacle":12,"leg":28}
+root=root
+clips=Attack(1.33s, 150ch), Crawl(2.00s, 150ch), Death(2.00s, 150ch), Dive(2.00s, 150ch), Hit(0.83s, 150ch), Idle(2.00s, 150ch), Rise(2.00s, 150ch), TurnLeft(2.00s, 150ch), TurnRight(2.00s, 150ch), Bite(0.50s, 150ch), Heavy(1.10s, 150ch), Guard(1.00s, 150ch), Parry(0.33s, 150ch), Dodge(0.40s, 150ch), Eat(0.80s, 150ch), Stagger(1.20s, 150ch), Moult(1.50s, 150ch), Ability(1.00s, 150ch)
+meshes=hallucigenia anatomy.003, hallucigenia anatomy.002, hallucigenia anatomy.001, hallucigenia anatomy.004
+sample bones: root, body_00, body_01, tentacle_0_1, tentacle_0_1_tip, tentacle_0_-1, tentacle_0_-1_tip, tentacle_1_1, tentacle_1_1_tip, tentacle_1_-1, tentacle_1_-1_tip, body_02 …
+
+## marrella.glb
+bones=120 groups={"root":1,"body":9,"antenna":2,"antenna_-":2,"paddle":1,"paddle_-":1,"leg":104}
+root=root
+clips=Attack(1.33s, 360ch), Crawl(2.00s, 360ch), Death(2.00s, 360ch), Dive(2.00s, 360ch), Hit(0.83s, 360ch), Idle(2.00s, 360ch), Rise(2.00s, 360ch), TurnLeft(2.00s, 360ch), TurnRight(2.00s, 360ch), Bite(0.50s, 360ch), Heavy(1.10s, 360ch), Guard(1.00s, 360ch), Parry(0.33s, 360ch), Dodge(0.40s, 360ch), Eat(0.80s, 360ch), Stagger(1.20s, 360ch), Moult(1.50s, 360ch), Ability(1.00s, 360ch)
+meshes=marrella anatomy.002, marrella anatomy.003, marrella anatomy.001
+sample bones: root, body_00, body_01, antenna_1, antenna_1_tip, antenna_-1, antenna_-1_tip, paddle_1, paddle_-1, body_02, leg_00_L, leg_00_L_tip …
+
+## olenoides.glb
+bones=78 groups={"root":1,"body":9,"antenna":2,"antenna_-":2,"leg":60,"cercus":2,"cercus_-":2}
+root=root
+clips=Attack(1.33s, 234ch), Crawl(2.00s, 234ch), Death(2.00s, 234ch), Dive(2.00s, 234ch), Hit(0.83s, 234ch), Idle(2.00s, 234ch), Rise(2.00s, 234ch), TurnLeft(2.00s, 234ch), TurnRight(2.00s, 234ch), Bite(0.50s, 234ch), Heavy(1.10s, 234ch), Guard(1.00s, 234ch), Parry(0.33s, 234ch), Dodge(0.40s, 234ch), Eat(0.80s, 234ch), Stagger(1.20s, 234ch), Moult(1.50s, 234ch), Ability(1.00s, 234ch)
+meshes=olenoides anatomy.003, olenoides anatomy.002, olenoides anatomy.001, olenoides anatomy.004
+sample bones: root, body_00, body_01, antenna_1, antenna_1_tip, antenna_-1, antenna_-1_tip, leg_00_L, leg_00_L_tip, leg_00_R, leg_00_R_tip, leg_01_L …
+
+## opabinia.glb
+bones=72 groups={"root":1,"body":1,"eye":5,"proboscis":12,"jaw":1,"jaw_-":1,"segment":15,"flap":15,"flap_-":15,"tail":3,"tail_-":3}
+root=root
+clips=Attack(1.20s, 216ch), Death(1.60s, 216ch), Dive(2.40s, 216ch), Hit(0.60s, 216ch), Idle(2.40s, 216ch), Rise(2.40s, 216ch), Swim(2.40s, 216ch), TurnLeft(2.40s, 216ch), TurnRight(2.40s, 216ch), Bite(0.50s, 216ch), Heavy(1.10s, 216ch), Guard(1.00s, 216ch), Parry(0.33s, 216ch), Dodge(0.40s, 216ch), Eat(0.80s, 216ch), Stagger(1.20s, 216ch), Moult(1.50s, 216ch), Ability(0.57s, 216ch)
+meshes=opabinia anatomy.002, opabinia anatomy.004, opabinia anatomy.003, opabinia anatomy.001
+sample bones: root, body, eye_0, eye_1, eye_2, eye_3, eye_4, proboscis_00, proboscis_01, proboscis_02, proboscis_03, proboscis_04 …
+
+## waptia.glb
+bones=88 groups={"root":1,"body":1,"antenna":1,"antenna_tip":1,"antenna_-":1,"antenna_tip_-":1,"eye":1,"eye_-":1,"raptor":27,"raptor_-":27,"segment":12,"tail":1,"tail_-":1,"swimmer":6,"swimmer_-":6}
+root=root
+clips=Attack(1.20s, 264ch), Death(1.60s, 264ch), Dive(2.40s, 264ch), Hit(0.60s, 264ch), Idle(2.40s, 264ch), Rise(2.40s, 264ch), Swim(2.40s, 264ch), TurnLeft(2.40s, 264ch), TurnRight(2.40s, 264ch), Bite(0.50s, 264ch), Heavy(1.10s, 264ch), Dodge(0.40s, 264ch), Eat(0.80s, 264ch), Stagger(1.20s, 264ch), Moult(1.50s, 264ch), Ability(0.47s, 264ch)
+meshes=waptia anatomy.001, waptia anatomy.002, waptia anatomy.004, waptia anatomy.005, waptia anatomy.003
+sample bones: root, body, antenna_1, antenna_tip_1, antenna_-1, antenna_tip_-1, eye_1, eye_-1, raptor_1_0_0, raptor_1_0_1, raptor_1_0_2, raptor_1_0_3 …
+
+## wiwaxia.glb
+bones=10 groups={"root":1,"body":9}
+root=root
+clips=Attack(1.33s, 30ch), Crawl(2.00s, 30ch), Death(2.00s, 30ch), Dive(2.00s, 30ch), Hit(0.83s, 30ch), Idle(2.00s, 30ch), Rise(2.00s, 30ch), TurnLeft(2.00s, 30ch), TurnRight(2.00s, 30ch), Bite(0.50s, 30ch), Heavy(1.10s, 30ch), Guard(1.00s, 30ch), Parry(0.33s, 30ch), Dodge(0.40s, 30ch), Eat(0.80s, 30ch), Stagger(1.20s, 30ch), Moult(1.50s, 30ch), Ability(1.00s, 30ch)
+meshes=wiwaxia anatomy.003, wiwaxia anatomy.001, wiwaxia anatomy.002
+sample bones: root, body_00, body_01, body_02, body_03, body_04, body_05, body_06, body_07, body_08 

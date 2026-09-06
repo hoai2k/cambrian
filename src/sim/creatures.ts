@@ -1,0 +1,203 @@
+import { EXPANSION_CREATURES } from './expansion';
+
+export type CreatureId =
+  | 'anomalocaris' | 'opabinia' | 'waptia' | 'canadia'
+  | 'hallucigenia' | 'wiwaxia' | 'marrella' | 'olenoides'
+  | 'pikaia' | 'nectocaris' | 'burgessomedusa' | 'odaraia' | 'ottoia' | 'cambroraster'
+  | 'sidneyia' | 'leanchoilia' | 'isoxys' | 'odontogriphus' | 'ctenorhabdotus' | 'vetulicola' | 'tamisiocaris';
+
+export type AbilityId =
+  | 'ambushSurge' | 'snatch' | 'tailFlick' | 'bristleFlare'
+  | 'anchor' | 'shellUp' | 'burrow' | 'enroll'
+  | 'ribbonSlip' | 'tentacleSeize' | 'bellCorral' | 'collectorWake' | 'sedimentDive' | 'basketRake'
+  | 'shellCrush' | 'whipSearch' | 'spineIntercept' | 'adhesiveGlide' | 'combCruise' | 'pharyngealPump' | 'planktonComb';
+
+export interface MoveDef {
+  name: string;
+  windup: number;   // seconds before the hit window opens
+  active: number;   // seconds the hit window is open
+  recovery: number; // seconds after the hit window before you can act
+  damage: number;   // at adult, before size factor
+  poise: number;    // poise damage
+  knockback: number;
+  stamina: number;
+  lunge: number;    // body lengths carried forward during windup+active
+  armorPierce?: number; // fraction of armor reduction bypassed
+  guardBreak?: boolean;
+  grab?: boolean;   // Anomalocaris: hold the victim
+  sweep?: boolean;  // 360°, hits all around
+}
+
+export interface CreatureDef {
+  id: CreatureId;
+  name: string;
+  species: string;
+  tagline: string;     // energetic one-liner for the select screen
+  role: string;
+  ground: boolean;
+  diet?: 'deposit' | 'grazer' | 'filter';
+  provenance?: string;
+  bodyRadius?: number; // collision radius in body lengths
+  clearance?: number; // center height above terrain, in body lengths
+  proceduralUndulation?: boolean; // false when authored locomotion owns deformation
+  abilityDuration?: number;
+  abilityLoop?: boolean;
+  mobileAbility?: boolean;
+  adultLength: number; // world units at scale 1
+  speed: number;       // cruise, units/s at adult
+  burst: number;       // multiplier while holding RT
+  agility: number;     // velocity approach rate (higher = snappier)
+  turnRate: number;    // rad/s
+  glide: number;       // drag when stick released (lower = longer glide)
+  hp: number;
+  poise: number;
+  stamina: number;
+  defense: number;     // 0..1 flat damage reduction
+  sense: number;       // body lengths of sense range
+  color: string;
+  accent: string;
+  light: MoveDef;
+  heavy: MoveDef;
+  ability: AbilityId;
+  abilityName: string;
+  abilityCooldown: number;
+  abilityDesc: string;
+  passive: string;
+  weakness: string;
+  canGuard: boolean;
+}
+
+const light = (name: string, o: Partial<MoveDef> = {}): MoveDef => ({
+  name, windup: 0.14, active: 0.16, recovery: 0.22, damage: 9, poise: 12, knockback: 1.2, stamina: 6, lunge: 0.25, ...o,
+});
+const heavy = (name: string, o: Partial<MoveDef> = {}): MoveDef => ({
+  name, windup: 0.42, active: 0.2, recovery: 0.5, damage: 24, poise: 45, knockback: 3.5, stamina: 18, lunge: 0.9, guardBreak: true, ...o,
+});
+
+export const CREATURES: readonly CreatureDef[] = [
+  {
+    id: 'anomalocaris', name: 'Anomalocaris', species: 'A. canadensis',
+    tagline: 'The reef’s original nightmare. Grab it. Crush it. Keep swimming.',
+    role: 'Pursuit predator', ground: false, adultLength: 3.9,
+    speed: 5.6, burst: 1.9, agility: 3.0, turnRate: 2.2, glide: 0.55,
+    hp: 120, poise: 55, stamina: 110, defense: 0.06, sense: 14,
+    color: '#e0a05f', accent: '#ffcf8a',
+    light: light('Appendage rake', { damage: 10 }),
+    heavy: heavy('Grasp', { damage: 20, grab: true, lunge: 1.1, knockback: 1 }),
+    ability: 'ambushSurge', abilityName: 'Ambush surge', abilityCooldown: 14,
+    abilityDesc: 'Two seconds of silent, free burst. Prey never hears you coming.',
+    passive: 'Huge eyes: longest sight and sense range.',
+    weakness: 'Big silhouette, easy to spot. Soft for its size.',
+    canGuard: true,
+  },
+  {
+    id: 'opabinia', name: 'Opabinia', species: 'O. regalis',
+    tagline: 'Five eyes, one hose-nozzle claw, zero blind spots.',
+    role: 'Reach specialist', ground: false, adultLength: 3.0,
+    speed: 4.7, burst: 1.7, agility: 3.6, turnRate: 2.8, glide: 0.8,
+    hp: 90, poise: 45, stamina: 100, defense: 0.05, sense: 11,
+    color: '#6fc2b4', accent: '#b4f0e4',
+    light: light('Proboscis jab', { damage: 8, lunge: 0.15 }),
+    heavy: heavy('Proboscis hook', { damage: 18, lunge: 0.4, knockback: 2 }),
+    ability: 'snatch', abilityName: 'Snatch', abilityCooldown: 9,
+    abilityDesc: 'Fire the proboscis two body lengths and yank whatever it hooks into your mouth.',
+    passive: '360° vision: cannot be backstabbed.',
+    weakness: 'Lowest health among swimmers.',
+    canGuard: true,
+  },
+  {
+    id: 'waptia', name: 'Waptia', species: 'W. fieldensis',
+    tagline: 'Blink and it’s behind you. Blink again and it’s gone.',
+    role: 'Skirmisher', ground: false, adultLength: 2.7,
+    speed: 6.6, burst: 2.2, agility: 5.0, turnRate: 3.6, glide: 1.6,
+    hp: 78, poise: 30, stamina: 120, defense: 0.03, sense: 10,
+    color: '#f2b07a', accent: '#ffe0b8',
+    light: light('Rapid pinch', { damage: 7, windup: 0.1, active: 0.12, recovery: 0.16, stamina: 5 }),
+    heavy: heavy('Raptorial strike', { damage: 22, windup: 0.3, recovery: 0.4, lunge: 1.4, guardBreak: false }),
+    ability: 'tailFlick', abilityName: 'Tail flick', abilityCooldown: 8,
+    abilityDesc: 'Instant back-dash, fully invulnerable, leaves a silt cloud that breaks lock-on.',
+    passive: 'Eats on the move: snacks vanish at burst speed.',
+    weakness: 'Cannot guard. Lowest poise in the sea.',
+    canGuard: false,
+  },
+  {
+    id: 'canadia', name: 'Canadia', species: 'C. spinosa',
+    tagline: 'A ribbon of knives. Touch it and regret it.',
+    role: 'Controller', ground: false, adultLength: 2.8,
+    speed: 5.4, burst: 1.7, agility: 4.0, turnRate: 3.2, glide: 0.9,
+    hp: 85, poise: 40, stamina: 100, defense: 0.08, sense: 9,
+    color: '#b79dd4', accent: '#e4d2ff',
+    light: light('Bristle brush', { damage: 7, sweep: true }),
+    heavy: heavy('Bristle sweep', { damage: 16, sweep: true, knockback: 5, lunge: 0.2 }),
+    ability: 'bristleFlare', abilityName: 'Bristle flare', abilityCooldown: 12,
+    abilityDesc: 'Three seconds spines-out: every light attack that lands on you is auto-parried.',
+    passive: 'Anything that bites you takes a quarter of the damage back.',
+    weakness: 'Weak single-target damage; slow to close a kill.',
+    canGuard: true,
+  },
+  {
+    id: 'hallucigenia', name: 'Hallucigenia', species: 'H. sparsa',
+    tagline: 'Fourteen spines say no. Politely, then not.',
+    role: 'Fortress', ground: true, adultLength: 2.7,
+    speed: 3.3, burst: 1.6, agility: 5.0, turnRate: 2.6, glide: 3.0,
+    hp: 120, poise: 80, stamina: 95, defense: 0.3, sense: 8,
+    color: '#cdb377', accent: '#f0e0b0',
+    light: light('Spine jab', { damage: 9 }),
+    heavy: heavy('Spine sweep', { damage: 24, sweep: true, knockback: 4 }),
+    ability: 'anchor', abilityName: 'Anchor', abilityCooldown: 12,
+    abilityDesc: 'Dig in for four seconds: immune to knockback and grabs, guard costs nothing, every parry counters.',
+    passive: 'Attacks from above deal 60% to you and reflect half back.',
+    weakness: 'Very slow. Anything that leaves, gets away.',
+    canGuard: true,
+  },
+  {
+    id: 'wiwaxia', name: 'Wiwaxia', species: 'W. corrugata',
+    tagline: 'A walking wall of blades. Good luck.',
+    role: 'Tank', ground: true, adultLength: 2.6,
+    speed: 3.0, burst: 1.5, agility: 4.0, turnRate: 2.2, glide: 3.5,
+    hp: 160, poise: 110, stamina: 90, defense: 0.42, sense: 7,
+    color: '#a998cf', accent: '#d9ccf7',
+    light: light('Blade nudge', { damage: 10, knockback: 2 }),
+    heavy: heavy('Blade shove', { damage: 26, knockback: 8, lunge: 0.6, recovery: 0.7 }),
+    ability: 'shellUp', abilityName: 'Shell up', abilityCooldown: 14,
+    abilityDesc: 'Three seconds of total guard while you keep crawling, ending in a burst that staggers everything nearby.',
+    passive: 'Grazes microbial mats: grows without hunting.',
+    weakness: 'Cannot chase anything. Long recovery on heavy.',
+    canGuard: true,
+  },
+  {
+    id: 'marrella', name: 'Marrella', species: 'M. splendens',
+    tagline: 'Now you see it. Now it’s under the mud.',
+    role: 'Scout', ground: true, adultLength: 2.7,
+    speed: 5.0, burst: 1.9, agility: 6.0, turnRate: 3.8, glide: 2.5,
+    hp: 85, poise: 40, stamina: 115, defense: 0.12, sense: 16,
+    color: '#c2c46f', accent: '#ecefb0',
+    light: light('Limb sweep', { damage: 7, windup: 0.11, recovery: 0.18 }),
+    heavy: heavy('Scuttle rush', { damage: 18, lunge: 1.8, recovery: 0.35, guardBreak: false }),
+    ability: 'burrow', abilityName: 'Burrow', abilityCooldown: 12,
+    abilityDesc: 'Dig into the sediment. Invisible to everything for up to eight seconds; pop out with a free heavy.',
+    passive: 'Antennae: longest sense range, fastest sense pulse.',
+    weakness: 'Lowest damage. Paper-thin outside the burrow.',
+    canGuard: true,
+  },
+  {
+    id: 'olenoides', name: 'Olenoides', species: 'O. serratus',
+    tagline: 'Armor, momentum, and a very bad attitude.',
+    role: 'Bruiser', ground: true, adultLength: 3.0,
+    speed: 3.6, burst: 1.7, agility: 4.5, turnRate: 2.4, glide: 3.0,
+    hp: 150, poise: 100, stamina: 100, defense: 0.38, sense: 8,
+    color: '#c39a6e', accent: '#f0d0a8',
+    light: light('Cephalon bump', { damage: 10, knockback: 2 }),
+    heavy: heavy('Shield charge', { damage: 22, lunge: 2.2, knockback: 6, windup: 0.35 }),
+    ability: 'enroll', abilityName: 'Enroll', abilityCooldown: 13,
+    abilityDesc: 'Curl into a ball for five seconds: invulnerable to all but giants, roll with the slope, stagger anything you hit.',
+    passive: 'Guard costs 40% less stamina.',
+    weakness: 'Short reach, predictable. Useless in open water.',
+    canGuard: true,
+  },
+  ...EXPANSION_CREATURES,
+];
+
+const byId = new Map(CREATURES.map((c) => [c.id, c]));
+export const creature = (id: CreatureId) => byId.get(id)!;
+export const CREATURE_IDS = CREATURES.map((c) => c.id);

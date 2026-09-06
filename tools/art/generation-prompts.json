@@ -1,0 +1,32 @@
+[
+  {
+    "id": "keyart",
+    "prompt": "Use case: stylized-concept. Asset: Cambrian Explosion game art. Painterly but sharp cinematic underwater scene, deep teal #06161c water, warm caustics, coral #ff5b6e rim light, lagoon accents, organic sponge thickets, prehistoric Cambrian marine invertebrates. No text, logos, borders, modern fish or dinosaurs. Landscape 2560x1440, 16:9. Low angle underwater shot: small shrimp-like Waptia foreground bolting through sponge thicket, huge Anomalocaris silhouette overhead against light window. Keep upper-centre third quiet dark water for overlaid logo.",
+    "source": "exec-465ed672-caaf-4a07-bec0-b4a1c778b853.png"
+  },
+  {
+    "id": "keyart-mobile",
+    "prompt": "Use case: stylized-concept. Asset: Cambrian Explosion game art. Painterly but sharp cinematic underwater scene, deep teal #06161c water, warm caustics, coral #ff5b6e rim light, lagoon accents, organic sponge thickets, prehistoric Cambrian marine invertebrates. No text, logos, borders, modern fish or dinosaurs. Portrait 1080x1920, 9:16. Low angle underwater shot: small shrimp-like Waptia foreground bolting through sponge thicket, huge Anomalocaris silhouette overhead against light window. Keep upper-centre third quiet dark water for overlaid logo.",
+    "source": "exec-526a3549-39e4-4c95-bf93-888dc2134e4a.png"
+  },
+  {
+    "id": "mode-rise",
+    "prompt": "Use case: stylized-concept. Asset: Cambrian Explosion game art. Painterly but sharp cinematic underwater scene, deep teal #06161c water, warm caustics, coral #ff5b6e rim light, lagoon accents, organic sponge thickets, prehistoric Cambrian marine invertebrates. No text, logos, borders, modern fish or dinosaurs. Landscape 16:9. Small larva under a giant Anomalocaris shadow, strong scale contrast, readable at 640x360.",
+    "source": "exec-d1a71327-37f2-467e-9a22-d51d5eba6366.png"
+  },
+  {
+    "id": "mode-frenzy",
+    "prompt": "Use case: stylized-concept. Asset: Cambrian Explosion game art. Painterly but sharp cinematic underwater scene, deep teal #06161c water, warm caustics, coral #ff5b6e rim light, lagoon accents, organic sponge thickets, prehistoric Cambrian marine invertebrates. No text, logos, borders, modern fish or dinosaurs. Landscape 16:9. Exactly four Cambrian creatures converging on one small prey carcass, energetic circular composition, no gore, readable at 640x360.",
+    "source": "exec-8ba5214c-9f26-4444-83f9-bec7230441fb.png"
+  },
+  {
+    "id": "mode-hunted",
+    "prompt": "Use case: stylized-concept. Asset: Cambrian Explosion game art. Painterly but sharp cinematic underwater scene, deep teal #06161c water, warm caustics, coral #ff5b6e rim light, lagoon accents, organic sponge thickets, prehistoric Cambrian marine invertebrates. No text, logos, borders, modern fish or dinosaurs. Landscape 16:9. One huge Anomalocaris silhouette above and three small crustaceans hiding below among sponges, tense scene, readable at 640x360.",
+    "source": "exec-943d5dfb-f42f-4949-af2a-921fb17717fb.png"
+  },
+  {
+    "id": "mode-reef",
+    "prompt": "Use case: stylized-concept. Asset: Cambrian Explosion game art. Painterly but sharp cinematic underwater scene, deep teal #06161c water, warm caustics, coral #ff5b6e rim light, lagoon accents, organic sponge thickets, prehistoric Cambrian marine invertebrates. No text, logos, borders, modern fish or dinosaurs. Landscape 16:9. Calm wide shot of a Cambrian sponge forest, underwater sunlight and softly drifting particles, peaceful reef landscape, readable at 640x360.",
+    "source": "exec-0a3a5c26-cc4e-443e-8bca-7726754e04cd.png"
+  }
+]

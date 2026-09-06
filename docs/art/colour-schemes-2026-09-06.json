@@ -1,0 +1,195 @@
+{
+  "generated": "2026-09-06T17:54:24.828Z",
+  "note": "Colour scheme picked per creature in the viewer. Slots are assigned from GLB material names by slotFor() in src/shared/palettes.ts.",
+  "creatures": {
+    "anomalocaris": {
+      "scheme": "coral-flare",
+      "name": "Coral Flare",
+      "colors": {
+        "body": "#b52f45",
+        "eyes": "#1a070c",
+        "fins": "#ff5b6e",
+        "legs": "#d63f56",
+        "accent": "#ff9ac2",
+        "underside": "#e8687d"
+      }
+    },
+    "opabinia": {
+      "scheme": "seagrass-teal",
+      "name": "Seagrass Teal",
+      "colors": {
+        "body": "#235e58",
+        "eyes": "#0a1614",
+        "fins": "#3a827a",
+        "legs": "#2c6d66",
+        "accent": "#12403c",
+        "underside": "#468f86"
+      }
+    },
+    "waptia": {
+      "scheme": "sandflat-tan",
+      "name": "Sandflat Tan",
+      "colors": {
+        "body": "#8a7350",
+        "eyes": "#16120c",
+        "fins": "#a08a63",
+        "legs": "#937c57",
+        "accent": "#55442c",
+        "underside": "#a1906d"
+      }
+    },
+    "canadia": {
+      "scheme": "kelp-olive",
+      "name": "Kelp Olive",
+      "colors": {
+        "body": "#4c4f2a",
+        "eyes": "#101208",
+        "fins": "#67693a",
+        "legs": "#565932",
+        "accent": "#2c2e17",
+        "underside": "#5d6038"
+      }
+    },
+    "hallucigenia": {
+      "scheme": "sandflat-tan",
+      "name": "Sandflat Tan",
+      "colors": {
+        "body": "#8a7350",
+        "eyes": "#16120c",
+        "fins": "#a08a63",
+        "legs": "#937c57",
+        "accent": "#55442c",
+        "underside": "#a1906d"
+      }
+    },
+    "wiwaxia": {
+      "scheme": "wiwaxia-nacre",
+      "name": "Wiwaxia Nacre",
+      "colors": {
+        "body": "#6d7b86",
+        "eyes": "#14181c",
+        "fins": "#93a3ad",
+        "legs": "#7d8c97",
+        "accent": "#cdb9d6",
+        "underside": "#9fadb6"
+      }
+    },
+    "marrella": {
+      "scheme": "countershade",
+      "name": "Countershade",
+      "colors": {
+        "body": "#2f3a3d",
+        "eyes": "#0b0d0e",
+        "fins": "#8f9c99",
+        "legs": "#55635f",
+        "accent": "#1c2426",
+        "underside": "#b3bfba"
+      }
+    },
+    "olenoides": {
+      "scheme": "sandflat-tan",
+      "name": "Sandflat Tan",
+      "colors": {
+        "body": "#8a7350",
+        "eyes": "#16120c",
+        "fins": "#a08a63",
+        "legs": "#937c57",
+        "accent": "#55442c",
+        "underside": "#a1906d"
+      }
+    },
+    "pikaia": {
+      "scheme": "default",
+      "name": "Default (as authored)",
+      "colors": null
+    },
+    "nectocaris": {
+      "scheme": "canadia-iridium",
+      "name": "Canadia Iridium",
+      "colors": {
+        "body": "#37453a",
+        "eyes": "#0d120e",
+        "fins": "#5f7a5c",
+        "legs": "#b5924a",
+        "accent": "#7fb08a",
+        "underside": "#4c5c4d"
+      }
+    },
+    "burgessomedusa": {
+      "scheme": "default",
+      "name": "Default (as authored)",
+      "colors": null
+    },
+    "odaraia": {
+      "scheme": "default",
+      "name": "Default (as authored)",
+      "colors": null
+    },
+    "ottoia": {
+      "scheme": "countershade",
+      "name": "Countershade",
+      "colors": {
+        "body": "#2f3a3d",
+        "eyes": "#0b0d0e",
+        "fins": "#8f9c99",
+        "legs": "#55635f",
+        "accent": "#1c2426",
+        "underside": "#b3bfba"
+      }
+    },
+    "cambroraster": {
+      "scheme": "lagoon-neon",
+      "name": "Lagoon Neon",
+      "colors": {
+        "body": "#175d5a",
+        "eyes": "#061114",
+        "fins": "#61f2d5",
+        "legs": "#2a8f83",
+        "accent": "#ffb36b",
+        "underside": "#3fb5a4"
+      }
+    },
+    "sidneyia": {
+      "scheme": "default",
+      "name": "Default (as authored)",
+      "colors": null
+    },
+    "leanchoilia": {
+      "scheme": "default",
+      "name": "Default (as authored)",
+      "colors": null
+    },
+    "isoxys": {
+      "scheme": "default",
+      "name": "Default (as authored)",
+      "colors": null
+    },
+    "odontogriphus": {
+      "scheme": "sandflat-tan",
+      "name": "Sandflat Tan",
+      "colors": {
+        "body": "#8a7350",
+        "eyes": "#16120c",
+        "fins": "#a08a63",
+        "legs": "#937c57",
+        "accent": "#55442c",
+        "underside": "#a1906d"
+      }
+    },
+    "ctenorhabdotus": {
+      "scheme": "default",
+      "name": "Default (as authored)",
+      "colors": null
+    },
+    "vetulicola": {
+      "scheme": "default",
+      "name": "Default (as authored)",
+      "colors": null
+    },
+    "tamisiocaris": {
+      "scheme": "default",
+      "name": "Default (as authored)",
+      "colors": null
+    }
+  }
+}
