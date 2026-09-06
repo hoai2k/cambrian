@@ -52,7 +52,7 @@ export class AssetQueue {
       lod.priority = (phase === 'playing' ? 15 : 90) + i;
       // On the select screen the visible cards matter as much as the model of the pick itself.
       glb.priority = (i < creatures.length ? 10 : 100) + i;
-      card.priority = phase === 'select' ? (i < 3 ? 5 + i : 60 + i) : 50 + i;
+      card.priority = phase === 'boot' || phase === 'title' ? 1 + i : phase === 'select' ? (i < 3 ? 3 + i : 30 + i) : 50 + i;
     });
     SFX_FILES.forEach((n, i) => { const it = this.items.get(`sfx:${n}`)!; it.priority = (n.startsWith('ui') ? 40 : phase === 'playing' ? 20 : 120) + i; });
     this.pump();
@@ -104,6 +104,7 @@ export class AssetQueue {
     return t ? l / t : 1;
   }
   isReady(id: CreatureId) { return this.ready.has(id); }
+  isCardReady(id: CreatureId) { return this.items.get(`card:${id}`)?.status === 'done'; }
   private emit(_key?: string) { const p = this.progress(); for (const fn of this.listeners) fn(p); }
   dispose() { this.disposed = true; this.listeners.clear(); }
 }

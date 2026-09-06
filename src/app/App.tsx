@@ -4,12 +4,12 @@ import { gamepads, readGamepad, type RawControls } from '../input/input';
 import type { AssetProgress } from '../render/assets';
 import { Engine, type HudSnapshot } from '../render/engine';
 import type { Quality } from '../render/sea';
-import { CREATURE_IDS, creature, type CreatureId } from '../sim/creatures';
+import { CREATURE_IDS, CREATURES, creature, type CreatureId } from '../sim/creatures';
 import type { Mode, PlayerSetup } from '../sim/types';
 import { Hud } from './Hud';
 import { LoadingScreen } from './Loading';
 import { Dialogs, PauseMenu, Results } from './Overlays';
-import { SelectScreen } from './Select';
+import { gridColumns, SelectScreen } from './Select';
 import { TitleScreen } from './Title';
 import { Toolbar } from './Toolbar';
 
@@ -105,8 +105,7 @@ export function App() {
 
   const startMatch = useCallback(() => {
     const ps = playersRef.current;
-    if (!ps.length || !ps.every((p) => p.ready) || !engineRef.current || !loaded) return;
-    if (!ps.every((p) => engineRef.current!.assets.isReady(p.creature))) return;
+    if (!ps.length || !ps.every((p) => p.ready) || !engineRef.current) return;
     engineRef.current.startMatch(modeRef.current, ps);
     setPausedBoth(false);
     go('playing');
@@ -137,16 +136,25 @@ export function App() {
     go('playing');
   }, [go, setPausedBoth]);
 
-  const cycleCreature = useCallback((index: number, dir: number) => {
+  /** Move a player's cursor on the roster grid. Locked players must unlock first (B). */
+  const moveCursor = useCallback((index: number, dx: number, dy: number) => {
     const ps = [...playersRef.current];
-    const p = ps[index]; if (!p) return;
+    const p = ps[index]; if (!p || p.ready) return;
+    const n = CREATURES.length, cols = gridColumns(n);
     const i = CREATURE_IDS.indexOf(p.creature);
-    ps[index] = { ...p, creature: CREATURE_IDS[(i + dir + CREATURE_IDS.length) % CREATURE_IDS.length], ready: false };
+    let r = Math.floor(i / cols), c = i % cols;
+    const rows = Math.ceil(n / cols);
+    c = (c + dx + cols) % cols; r = (r + dy + rows) % rows;
+    let j = r * cols + c;
+    if (j >= n) j = dy !== 0 ? (dy > 0 ? c : (rows - 2) * cols + c) : n - 1;
+    if (j >= n || j < 0) j = i;
+    ps[index] = { ...p, creature: CREATURE_IDS[j] };
     updatePlayers(ps); audio.play('ui-move');
   }, [updatePlayers]);
+  const cycleCreature = useCallback((index: number, dir: number) => moveCursor(index, dir, 0), [moveCursor]);
   const setCreature = useCallback((index: number, c: CreatureId) => {
-    const ps = [...playersRef.current]; if (!ps[index]) return;
-    ps[index] = { ...ps[index], creature: c, ready: false }; updatePlayers(ps); audio.play('ui-move');
+    const ps = [...playersRef.current]; if (!ps[index] || ps[index].ready) return;
+    ps[index] = { ...ps[index], creature: c }; updatePlayers(ps); audio.play('ui-move');
   }, [updatePlayers]);
   const toggleReady = useCallback((index: number) => {
     const ps = [...playersRef.current]; if (!ps[index]) return;
@@ -193,11 +201,11 @@ export function App() {
           const idx = ps.findIndex((x) => x.device === gp.index);
           if (idx < 0) { if (just('confirm')) addPlayer(gp.index); }
           else {
-            const stickX = Math.abs(c.mx) > 0.6 ? Math.sign(c.mx) : 0;
-            const dir = just('dright') ? 1 : just('dleft') ? -1 : 0;
+            const stickX = Math.abs(c.mx) > 0.6 ? Math.sign(c.mx) : 0, stickY = Math.abs(c.my) > 0.6 ? -Math.sign(c.my) : 0;
+            const dx = just('dright') ? 1 : just('dleft') ? -1 : 0, dy = just('ddown') ? 1 : just('dup') ? -1 : 0;
             const lastRep = repeat.get(gp.index) ?? 0;
-            if (dir) { cycleCreature(idx, dir); repeat.set(gp.index, now); }
-            else if (stickX && now - lastRep > 260) { cycleCreature(idx, stickX); repeat.set(gp.index, now); }
+            if (dx || dy) { moveCursor(idx, dx, dy); repeat.set(gp.index, now); }
+            else if ((stickX || stickY) && now - lastRep > 240) { moveCursor(idx, stickX, stickY); repeat.set(gp.index, now); }
             if (just('confirm')) { if (ps[idx].ready) startMatch(); else toggleReady(idx); }
             if (just('back')) { if (ps[idx].ready) toggleReady(idx); else removePlayer(idx); }
             if (just('menu')) startMatch();
@@ -218,7 +226,7 @@ export function App() {
     };
     raf = requestAnimationFrame(loop);
     return () => cancelAnimationFrame(raf);
-  }, [addPlayer, backToSelect, backToTitle, changeMode, cycleCreature, openDialog, padCount, playAgain, removePlayer, setPausedBoth, startFromTitle, startMatch, toggleReady]);
+  }, [addPlayer, backToSelect, backToTitle, changeMode, moveCursor, openDialog, padCount, playAgain, removePlayer, setPausedBoth, startFromTitle, startMatch, toggleReady]);
 
   // ---- Keyboard menu navigation ----
   useEffect(() => {
@@ -231,8 +239,10 @@ export function App() {
         const ps = playersRef.current;
         const idx = ps.findIndex((x) => x.device === 'keyboard');
         if (idx >= 0) {
-          if (e.code === 'ArrowRight' || e.code === 'KeyD') cycleCreature(idx, 1);
-          if (e.code === 'ArrowLeft' || e.code === 'KeyA') cycleCreature(idx, -1);
+          if (e.code === 'ArrowRight' || e.code === 'KeyD') moveCursor(idx, 1, 0);
+          if (e.code === 'ArrowLeft' || e.code === 'KeyA') moveCursor(idx, -1, 0);
+          if (e.code === 'ArrowDown' || e.code === 'KeyS') moveCursor(idx, 0, 1);
+          if (e.code === 'ArrowUp' || e.code === 'KeyW') moveCursor(idx, 0, -1);
           if (e.code === 'Space' || e.code === 'Enter') { e.preventDefault(); if (ps[idx].ready) startMatch(); else toggleReady(idx); }
           if (e.code === 'Escape') { if (ps[idx].ready) toggleReady(idx); else backToTitle(); }
         } else if (e.code === 'Enter' || e.code === 'Space') addKeyboard();
@@ -252,21 +262,21 @@ export function App() {
     };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
-  }, [addKeyboard, backToSelect, backToTitle, changeMode, cycleCreature, openDialog, playAgain, setPausedBoth, startFromTitle, startMatch, toggleReady]);
+  }, [addKeyboard, backToSelect, backToTitle, changeMode, moveCursor, openDialog, playAgain, setPausedBoth, startFromTitle, startMatch, toggleReady]);
 
   // Idle-time preloading: tell the loader what is most likely to be needed next.
   useEffect(() => {
     const e = engineRef.current; if (!e) return;
     if (screen === 'title') e.prioritize(['anomalocaris', 'waptia', 'opabinia', 'marrella'], 'title');
     else if (screen === 'select') {
-      const picked = players.map((p) => p.creature);
-      const neighbours = players.flatMap((p) => { const i = CREATURE_IDS.indexOf(p.creature); return [CREATURE_IDS[(i + 1) % 8], CREATURE_IDS[(i + 7) % 8]]; });
-      e.prioritize([...new Set([...picked, ...neighbours])], 'select');
+      const n = CREATURE_IDS.length, cols = gridColumns(n);
+      const committed = players.filter((p) => p.ready).map((p) => p.creature);
+      const hovered = players.filter((p) => !p.ready).map((p) => p.creature);
+      const neighbours = players.flatMap((p) => { const i = CREATURE_IDS.indexOf(p.creature); return [i + 1, i - 1, i + cols, i - cols].filter((j) => j >= 0 && j < n).map((j) => CREATURE_IDS[j]); });
+      e.prioritize([...new Set([...committed, ...hovered, ...neighbours])], 'select');
     } else e.prioritize([...new Set(players.map((p) => p.creature))], 'playing');
   }, [screen, players, loaded]);
 
-  const chosenReady = players.every((p) => progress?.ready.has(p.creature) ?? false);
-  const chosenFraction = engineRef.current?.assets.subsetFraction(players.map((p) => p.creature)) ?? 0;
   const allReady = players.length > 0 && players.every((p) => p.ready);
   const modeInfo = useMemo(() => MODE_INFO, []);
 
@@ -275,13 +285,13 @@ export function App() {
       <div className="sea-canvas" ref={canvasRef} aria-label="Cambrian sea" />
       <div className="vignette" />
 
-      {!loaded && <LoadingScreen progress={progress} fraction={engineRef.current?.assets.subsetFraction(['anomalocaris', 'waptia']) ?? 0} />}
+      {!loaded && <LoadingScreen progress={progress} fraction={progress ? Math.min(1, progress.fraction * 4) : 0} />}
       {screen === 'title' && loaded && <TitleScreen loaded={loaded} onStart={() => startFromTitle('keyboard', true)} padCount={padCount} />}
 
       {screen === 'select' && (
         <SelectScreen
-          players={players} mode={mode} modes={MODES} modeInfo={modeInfo} loaded={loaded && chosenReady} loadFraction={chosenFraction} allReady={allReady} padCount={padCount}
-          onCycle={cycleCreature} onPick={setCreature} onReady={toggleReady} onRemove={removePlayer} onAddKeyboard={addKeyboard}
+          players={players} mode={mode} modes={MODES} modeInfo={modeInfo} allReady={allReady} padCount={padCount}
+          onPick={setCreature} onReady={toggleReady} onRemove={removePlayer} onAddKeyboard={addKeyboard}
           onMode={changeMode} onStart={startMatch} onBack={backToTitle}
         />
       )}

@@ -7,7 +7,10 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "check": "node tools/check-creature-assets.mjs",
+    "cards": "node tools/make-cards.mjs",
+    "lods": "node tools/make-lods.mjs"
   },
   "dependencies": {
     "react": "^19.1.0",

@@ -1,19 +1,24 @@
 import { PLAYER_COLORS } from '../render/engine';
 import { CREATURES, creature, type CreatureId } from '../sim/creatures';
 import type { Mode, PlayerSetup } from '../sim/types';
-import { CheckIcon, ChevronLeft, ChevronRight, Emblem, KeyboardIcon, PadIcon } from './icons';
+import { CheckIcon, Emblem, KeyboardIcon, PadIcon } from './icons';
 
 interface Props {
   players: PlayerSetup[]; mode: Mode; modes: Mode[]; modeInfo: Record<Mode, { name: string; blurb: string; players: string }>;
-  loaded: boolean; loadFraction: number; allReady: boolean; padCount: number;
-  onCycle: (i: number, d: number) => void; onPick: (i: number, c: CreatureId) => void; onReady: (i: number) => void; onRemove: (i: number) => void;
+  allReady: boolean; padCount: number;
+  onPick: (i: number, c: CreatureId) => void; onReady: (i: number) => void; onRemove: (i: number) => void;
   onAddKeyboard: () => void; onMode: (m: Mode) => void; onStart: () => void; onBack: () => void;
 }
 
 const stat = (v: number, max: number) => Math.round((v / max) * 5);
+const ASSETS = import.meta.env.BASE_URL;
+
+/** Grid columns: three rows at most, so 21 creatures sit in 7 x 3 and 8 sit in 4 x 2. */
+export const gridColumns = (n: number) => Math.max(4, Math.ceil(n / 3));
 
 export function SelectScreen(p: Props) {
-  const assetBase = import.meta.env.BASE_URL;
+  const cols = gridColumns(CREATURES.length);
+  const compact = p.players.length >= 3;
   return (
     <section className="select" aria-label="Choose your creature">
       <header className="select-header">
@@ -28,66 +33,87 @@ export function SelectScreen(p: Props) {
         <p className="mode-blurb">{p.modeInfo[p.mode].blurb} <span className="dim">LT / RT switch modes.</span></p>
       </header>
 
-      <div className={`crew crew-${p.players.length}`}>
-        {p.players.map((pl, i) => {
-          const def = creature(pl.creature);
-          return (
-            <article key={i} className={`crew-card ${pl.ready ? 'ready' : ''}`} style={{ ['--player' as string]: PLAYER_COLORS[i] }}>
-              <div className="crew-top">
-                <span className="player-chip">P{i + 1}</span>
-                <span className="device">{pl.device === 'keyboard' ? <><KeyboardIcon width={16} height={16} /> Keyboard 1</> : pl.device === 'keyboard2' ? <><KeyboardIcon width={16} height={16} /> Keyboard 2</> : <><PadIcon width={16} height={16} /> Controller {(pl.device as number) + 1}</>}</span>
-                <button className="remove" aria-label={`Remove player ${i + 1}`} onClick={() => p.onRemove(i)}>×</button>
-              </div>
-              <div className="creature-stage">
-                <button className="arrow" aria-label="Previous creature" onClick={() => p.onCycle(i, -1)}><ChevronLeft width={28} height={28} /></button>
-                <img src={`${assetBase}assets/creatures/${def.id}.card.png`} alt={`${def.name} reconstruction`} draggable={false} />
-                <button className="arrow" aria-label="Next creature" onClick={() => p.onCycle(i, 1)}><ChevronRight width={28} height={28} /></button>
-              </div>
-              <div className="creature-copy">
-                <span className="role">{def.ground ? 'SEAFLOOR' : 'SWIMMER'} · {def.role}</span>
-                <h2>{def.name}</h2>
-                <small className="provenance">{def.species} · {def.provenance ?? 'Burgess Shale'}</small>
-                <p className="tagline">{def.tagline}</p>
-                <div className="stats">
-                  <Stat label="Speed" v={stat(def.speed * def.burst, 14.6)} />
-                  <Stat label="Power" v={stat(def.heavy.damage, 26)} />
-                  <Stat label="Armor" v={stat(def.hp * (1 + def.defense), 233)} />
-                  <Stat label="Agility" v={stat(def.agility + def.turnRate, 8.6)} />
-                </div>
-                <dl className="kit">
-                  <div><dt>Y</dt><dd><b>{def.abilityName}.</b> {def.abilityDesc}</dd></div>
-                  <div><dt>X</dt><dd><b>{def.heavy.name}.</b> Heavy.</dd></div>
-                  <div><dt>+</dt><dd>{def.passive}</dd></div>
-                  <div><dt>−</dt><dd>{def.weakness}</dd></div>
-                </dl>
-              </div>
-              <div className="roster" role="listbox" aria-label={`Creature roster for player ${i + 1}`}>
-                {CREATURES.map((c) => (
-                  <button key={c.id} role="option" aria-selected={c.id === def.id} className={`roster-dot ${c.id === def.id ? 'active' : ''}`} style={{ ['--c' as string]: c.color }} title={c.name} aria-label={c.name} onClick={() => p.onPick(i, c.id)}><img src={`${assetBase}assets/creatures/${c.id}.card.png`} alt="" loading="lazy" /><span>{c.name}</span></button>
-                ))}
-              </div>
-              <button className="ready-button" aria-pressed={pl.ready} onClick={() => p.onReady(i)}>
-                {pl.ready ? <><CheckIcon width={18} height={18} /> LOCKED IN · A DIVES</> : 'LOCK IN  ·  A'}
+      <div className="pick-layout">
+        {/* ---- roster grid ---- */}
+        <div className={`roster-grid ${cols >= 6 ? 'dense' : ''}`} role="listbox" aria-label="Creatures" style={{ ['--cols' as string]: cols }}>
+          {CREATURES.map((c) => {
+            const hovering = p.players.map((pl, i) => ({ pl, i })).filter(({ pl }) => pl.creature === c.id);
+            const lockedBy = hovering.filter(({ pl }) => pl.ready);
+            const cls = ['cell', hovering.length ? 'hover' : '', lockedBy.length ? 'locked' : ''].join(' ');
+            return (
+              <button key={c.id} role="option" aria-selected={hovering.length > 0} className={cls}
+                style={{ ['--c' as string]: hovering.length ? PLAYER_COLORS[hovering[0].i] : c.color }}
+                onClick={() => { const i = p.players.findIndex((pl) => !pl.ready && typeof pl.device === 'string'); p.onPick(i >= 0 ? i : 0, c.id); }}
+                title={`${c.name} · ${c.role}`} aria-label={c.name}>
+                <img src={`${ASSETS}assets/creatures/${c.id}.thumb.png`} alt="" draggable={false} loading="eager" />
+                <span className="cell-name">{c.name}</span>
+                <span className="cell-rings">
+                  {hovering.map(({ i, pl }) => <i key={i} style={{ ['--c' as string]: PLAYER_COLORS[i], ['--k' as string]: i }} className={pl.ready ? 'ring locked' : 'ring'} />)}
+                </span>
+                {lockedBy.map(({ i }) => <span key={'b' + i} className="lock-badge" style={{ background: PLAYER_COLORS[i] }}>P{i + 1}</span>)}
               </button>
-            </article>
-          );
-        })}
-        {p.players.length < 4 && (
-          <div className="join-card">
-            <PadIcon width={40} height={40} />
-            <p><b>Press A</b> on another controller to join.</p>
-            <button className="ghost" onClick={p.onAddKeyboard}>Add a keyboard player</button>
-            <small>{p.padCount} controller{p.padCount === 1 ? '' : 's'} connected</small>
-          </div>
-        )}
+            );
+          })}
+        </div>
+
+        {/* ---- player cards ---- */}
+        <div className={`crew crew-${p.players.length} ${compact ? 'compact' : ''}`}>
+          {p.players.map((pl, i) => {
+            const def = creature(pl.creature);
+            return (
+              <article key={i} className={`crew-card ${pl.ready ? 'ready' : ''}`} style={{ ['--player' as string]: PLAYER_COLORS[i] }}>
+                {pl.ready && <span key={'fx' + pl.creature} className="lock-fx" aria-hidden="true" />}
+                <div className="crew-top">
+                  <span className="player-chip">P{i + 1}</span>
+                  <span className="device">{pl.device === 'keyboard' ? <><KeyboardIcon width={16} height={16} /> Keyboard 1</> : pl.device === 'keyboard2' ? <><KeyboardIcon width={16} height={16} /> Keyboard 2</> : <><PadIcon width={16} height={16} /> Controller {(pl.device as number) + 1}</>}</span>
+                  <button className="remove" aria-label={`Remove player ${i + 1}`} onClick={() => p.onRemove(i)}>×</button>
+                </div>
+                <div className="hero">
+                  <img key={def.id} src={`${ASSETS}assets/creatures/${def.id}.card.png`} alt={`${def.name} reconstruction`} draggable={false} />
+                </div>
+                <div className="creature-copy">
+                  <span className="role">{def.ground ? 'SEAFLOOR' : 'SWIMMER'} · {def.role}</span>
+                  <h2>{def.name}</h2>
+                  <small className="provenance">{def.species} · {def.provenance ?? 'Burgess Shale'}</small>
+                  <p className="tagline">{def.tagline}</p>
+                  {!compact && (
+                    <>
+                      <div className="stats">
+                        <Stat label="Speed" v={stat(def.speed * def.burst, 14.6)} />
+                        <Stat label="Power" v={stat(def.heavy.damage, 26)} />
+                        <Stat label="Armor" v={stat(def.hp * (1 + def.defense), 233)} />
+                        <Stat label="Agility" v={stat(def.agility + def.turnRate, 8.6)} />
+                      </div>
+                      <dl className="kit">
+                        <div><dt>Y</dt><dd><b>{def.abilityName}.</b> {def.abilityDesc}</dd></div>
+                        <div><dt>+</dt><dd>{def.passive}</dd></div>
+                        <div><dt>−</dt><dd>{def.weakness}</dd></div>
+                      </dl>
+                    </>
+                  )}
+                </div>
+                <button className="ready-button" aria-pressed={pl.ready} onClick={() => p.onReady(i)}>
+                  {pl.ready ? <><CheckIcon width={18} height={18} /> LOCKED IN · A DIVES</> : 'LOCK IN  ·  A'}
+                </button>
+              </article>
+            );
+          })}
+          {p.players.length < 4 && (
+            <div className="join-card">
+              <PadIcon width={32} height={32} />
+              <p><b>Press A</b> on another controller to join.</p>
+              <button className="ghost" onClick={p.onAddKeyboard}>Add a keyboard player</button>
+              <small>{p.padCount} controller{p.padCount === 1 ? '' : 's'} connected</small>
+            </div>
+          )}
+        </div>
       </div>
 
       <footer className="select-footer">
         <button className="ghost" onClick={p.onBack}>← Title</button>
         <div className="start-wrap">
-          {!p.allReady && p.loaded && <span className="dim">Lock in with <b>A</b>. Press <b>A</b> again to dive.</span>}
-          {!p.loaded && <span className="mini-progress" aria-label="Loading chosen creatures"><i style={{ width: `${Math.round(p.loadFraction * 100)}%` }} /><span>Waking your creatures · {Math.round(p.loadFraction * 100)}%</span></span>}
-          <button className={`start-button ${p.allReady && p.loaded ? 'focused' : ''}`} disabled={!p.allReady || !p.loaded} onClick={p.onStart}>{p.loaded ? 'DIVE IN  ·  A' : 'LOADING…'}</button>
+          {!p.allReady && <span className="dim">Move on the grid, <b>A</b> locks in, <b>A</b> again dives.</span>}
+          <button className={`start-button ${p.allReady ? 'focused' : ''}`} disabled={!p.allReady} onClick={p.onStart}>DIVE IN  ·  A</button>
         </div>
       </footer>
     </section>

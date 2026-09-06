@@ -38,8 +38,9 @@ every push to `main` (set the repository's Pages source to "GitHub Actions").
 | `src/input/`, `src/audio/` | Gamepad/keyboard reading; fully synthesized audio. |
 | `public/assets/creatures/` | The 21 rigged GLB models and card renders (unchanged originals plus `.card.png` cutouts). |
 | `docs/redesign/` | Design and technical plan. |
-| `tools/` | Headless sim harness (`harness.ts`), control-direction test (`controls-test.ts`), respawn test (`respawn-test.ts`), plant collision test (`flora-test.ts`), browser smoke test (`smoke.mjs`), LOD generator (`make-lods.mjs`), SFX generator (`gen-sfx.mjs`), card cutout script. |
+| `tools/` | Headless sim tests (`harness.ts`, `controls-test.ts`, `hunt-test.ts`, `fight-test.ts`, `corpse-test.ts`, `respawn-test.ts`, `flora-test.ts`), browser smoke tests (`smoke.mjs`, `viewer-smoke.mjs`), creature image intake (`make-cards.mjs`, `check-creature-assets.mjs`), LOD generator (`make-lods.mjs`), SFX generator (`gen-sfx.mjs`). |
 | `image-requests.md` | Art still needed (logo, favicon, key art…). |
+| `docs/creature-intake.md` | How to add a creature or change its look; `npm run check` enforces it. |
 
 ## Headless checks
 
