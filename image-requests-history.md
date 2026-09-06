@@ -1,5 +1,16 @@
 # Image request history — Cambrian Explosion
 
+## Illustrated logo and favicon — 2026-09-06
+
+**Completed.** Replaced the title/loading wordmark with the user-supplied natural-history illustration, preserved as `docs/art/sources/cambrian-explosion-original.png`. The full composition is delivered as `public/assets/brand/logo-illustrated.webp` (1536×1024); only web compression was applied. Title/loading layouts give the illustration space and remove the competing standalone neon emblem and reef backdrop.
+
+For small UI sizes, created `public/assets/brand/logo-engraved.webp` (1024×384, transparent) and `public/assets/brand/emblem-engraved.webp` (512×512) using the built-in image generator and the supplied illustration as reference. Exact prompts are in [docs/art/engraved-brand-prompts.json](docs/art/engraved-brand-prompts.json). The compact wordmark is used in the selection header; the emblem is shared by the UI.
+
+Matching PNG favicons are `public/favicon-engraved-16.png`, `favicon-engraved-32.png`, `favicon-engraved-192.png`, `favicon-engraved-512.png`, and `public/apple-touch-icon-engraved.png` (180×180). Both HTML entry points use the new icons. Prior brand assets remain available at their original paths. Every new runtime asset is below 600 KB; the unmodified source PNG is archived separately.
+
+Validated title layout at 1440×1000 and 390×844, compact header readability, favicon rendering at 16/32/192 px, image loading, build, and TypeScript. No browser errors or mobile horizontal overflow.
+
+
 Completed briefs are archived here. Open requests belong in [image-requests.md](image-requests.md).
 
 ## Delivery — 2026-09-06

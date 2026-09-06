@@ -23,7 +23,7 @@ export function SelectScreen(p: Props) {
   return (
     <section className="select" aria-label="Choose your creature">
       <header className="select-header">
-        <div className="brand"><Emblem size={34} /><img className="header-logo" src={`${ASSETS}assets/brand/logo.svg`} alt="Cambrian Explosion" /></div>
+        <div className="brand"><Emblem size={34} /><img className="header-logo" src={`${ASSETS}assets/brand/logo-engraved.webp`} alt="Cambrian Explosion" /></div>
         <div className="mode-picker" role="tablist" aria-label="Game mode">
           {p.modes.map((m) => (
             <button key={m} role="tab" aria-selected={p.mode === m} className={`mode-chip ${p.mode === m ? 'active' : ''}`} onClick={() => p.onMode(m)}>

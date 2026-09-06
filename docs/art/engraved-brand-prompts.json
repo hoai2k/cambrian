@@ -1,0 +1,12 @@
+[
+  {
+    "asset": "compact",
+    "prompt": "Create a compact logo adaptation from this reference image. Preserve the exact words CAMBRIAN EXPLOSION on two lines in the same Victorian natural-history engraved serif letterforms, black ink with warm parchment/gold fine outlines. ONLY the two-line wordmark, no creatures, flora, scenery, or rectangular backdrop. Real transparent background, strong pale parchment outer edging so the dark letterforms read on dark teal. Wide 8:3 composition tightly fitted, meticulous typography, all letters fully visible. This is a small in-game header logo derived from the reference, not a new brand.",
+    "source": "exec-948950ed-72af-4967-ac91-c93528082720.png"
+  },
+  {
+    "asset": "favicon",
+    "prompt": "Create a square favicon/emblem derived from the large Anomalocaris in the reference image. Close-up simplified three-quarter head: copper-brown rounded segmented head, two large black compound eyes, two curled frontal feeding appendages. Victorian engraved natural-history aesthetic with warm parchment highlights and very restrained hatching. Bold simplified silhouette and strong contrast that reads at 16px. Center on a solid very dark brown-black #17130f rounded-square tile. No text, no initials, no surrounding creatures, no flora, no extra border. Fill most of the square with the head. This must match the supplied sepia illustration's style, not the existing neon game mark.",
+    "source": "exec-bf896976-c64e-4302-830f-e3d2137f3488.png"
+  }
+]
