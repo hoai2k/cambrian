@@ -156,7 +156,7 @@ export class GameAudio {
     if (list) {
       const name = list[Math.floor(Math.random() * list.length)];
       const rate = (0.94 + Math.random() * 0.12) * (kind === 'eat' ? 1.15 - Math.min(0.3, s * 0.3) : 1);
-      const vol = kind.startsWith('ui') ? 0.7 : kind === 'eat' ? 0.45 + s * 0.3 : 0.6 + s * 0.35;
+      const vol = kind.startsWith('ui') ? 0.42 : kind === 'eat' ? 0.45 + s * 0.3 : 0.6 + s * 0.35;
       if (this.playSample(name, vol, pan, rate)) return;
       void this.load(name);
     }

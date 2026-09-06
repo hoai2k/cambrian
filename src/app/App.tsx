@@ -1,11 +1,13 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { audio } from '../audio/audio';
 import { gamepads, readGamepad, type RawControls } from '../input/input';
+import type { AssetProgress } from '../render/assets';
 import { Engine, type HudSnapshot } from '../render/engine';
 import type { Quality } from '../render/sea';
 import { CREATURE_IDS, creature, type CreatureId } from '../sim/creatures';
 import type { Mode, PlayerSetup } from '../sim/types';
 import { Hud } from './Hud';
+import { LoadingScreen } from './Loading';
 import { Dialogs, PauseMenu, Results } from './Overlays';
 import { SelectScreen } from './Select';
 import { TitleScreen } from './Title';
@@ -37,6 +39,7 @@ export function App() {
   const dialogRef = useRef<DialogKind>(null);
   const [settings, setSettings] = useState<Settings>(defaultSettings);
   const [loaded, setLoaded] = useState(false);
+  const [progress, setProgress] = useState<AssetProgress | null>(null);
   const [error, setError] = useState('');
   const [notice, setNotice] = useState('');
   const [isFs, setIsFs] = useState(false);
@@ -55,6 +58,7 @@ export function App() {
       onMenu: () => { if (screenRef.current === 'playing') { setPausedBoth(!pausedRef.current); audio.play('ui-confirm'); } },
       onError: (m) => setError(m),
       onLoaded: () => setLoaded(true),
+      onProgress: (p) => setProgress(p),
     });
     engineRef.current = engine;
     engine.setLook(settings.lookSpeed, settings.invertY);
@@ -102,6 +106,7 @@ export function App() {
   const startMatch = useCallback(() => {
     const ps = playersRef.current;
     if (!ps.length || !ps.every((p) => p.ready) || !engineRef.current || !loaded) return;
+    if (!ps.every((p) => engineRef.current!.assets.isReady(p.creature))) return;
     engineRef.current.startMatch(modeRef.current, ps);
     setPausedBoth(false);
     go('playing');
@@ -250,6 +255,19 @@ export function App() {
     return () => window.removeEventListener('keydown', onKey);
   }, [addKeyboard, backToSelect, backToTitle, changeMode, cycleCreature, openDialog, playAgain, setPausedBoth, startFromTitle, startMatch, toggleReady]);
 
+  // Idle-time preloading: tell the loader what is most likely to be needed next.
+  useEffect(() => {
+    const e = engineRef.current; if (!e) return;
+    if (screen === 'title') e.prioritize(['anomalocaris', 'waptia', 'opabinia', 'marrella'], 'title');
+    else if (screen === 'select') {
+      const picked = players.map((p) => p.creature);
+      const neighbours = players.flatMap((p) => { const i = CREATURE_IDS.indexOf(p.creature); return [CREATURE_IDS[(i + 1) % 8], CREATURE_IDS[(i + 7) % 8]]; });
+      e.prioritize([...new Set([...picked, ...neighbours])], 'select');
+    } else e.prioritize([...new Set(players.map((p) => p.creature))], 'playing');
+  }, [screen, players, loaded]);
+
+  const chosenReady = players.every((p) => progress?.ready.has(p.creature) ?? false);
+  const chosenFraction = engineRef.current?.assets.subsetFraction(players.map((p) => p.creature)) ?? 0;
   const allReady = players.length > 0 && players.every((p) => p.ready);
   const modeInfo = useMemo(() => MODE_INFO, []);
 
@@ -258,11 +276,12 @@ export function App() {
       <div className="sea-canvas" ref={canvasRef} aria-label="Cambrian sea" />
       <div className="vignette" />
 
-      {screen === 'title' && <TitleScreen loaded={loaded} onStart={() => startFromTitle('keyboard', true)} padCount={padCount} />}
+      {!loaded && <LoadingScreen progress={progress} fraction={engineRef.current?.assets.subsetFraction(['anomalocaris', 'waptia']) ?? 0} />}
+      {screen === 'title' && loaded && <TitleScreen loaded={loaded} onStart={() => startFromTitle('keyboard', true)} padCount={padCount} />}
 
       {screen === 'select' && (
         <SelectScreen
-          players={players} mode={mode} modes={MODES} modeInfo={modeInfo} loaded={loaded} allReady={allReady} padCount={padCount}
+          players={players} mode={mode} modes={MODES} modeInfo={modeInfo} loaded={loaded && chosenReady} loadFraction={chosenFraction} allReady={allReady} padCount={padCount}
           onCycle={cycleCreature} onPick={setCreature} onReady={toggleReady} onRemove={removePlayer} onAddKeyboard={addKeyboard}
           onMode={changeMode} onStart={startMatch} onBack={backToTitle}
         />

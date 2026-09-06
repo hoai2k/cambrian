@@ -223,3 +223,18 @@ input[type='checkbox'] { width: 20px; height: 20px; accent-color: var(--ember); 
   .ready-button { padding: 8px; }
   .join-card { min-height: 0; padding: 14px; gap: 6px; }
 }
+
+/* ---------- Loading ---------- */
+.loading { position: absolute; inset: 0; z-index: 12; display: grid; place-items: center; background: radial-gradient(ellipse at 50% 40%, rgba(6,22,28,.35), rgba(6,22,28,.92)); animation: fade-in .3s both; }
+.loading-art { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: .55; z-index: -1; }
+.loading-inner { text-align: center; padding: 24px; width: min(92vw, 560px); animation: rise-in .8s cubic-bezier(.2,.8,.2,1) both; }
+.title-logo.small .logo-line-1 { font-size: clamp(30px, 5vw, 56px); }
+.title-logo.small .logo-line-2 { font-size: clamp(26px, 4.5vw, 50px); }
+.loading-bar { height: 8px; border-radius: 8px; background: rgba(238,250,246,.12); overflow: hidden; margin: 26px 0 12px; border: 1px solid rgba(238,250,246,.1); }
+.loading-bar i { display: block; height: 100%; border-radius: inherit; background: linear-gradient(90deg, var(--ember), var(--coral)); box-shadow: 0 0 18px rgba(255,91,110,.6); transition: width .25s ease-out; }
+.loading-status { margin: 0; font-weight: 700; color: var(--mist); letter-spacing: .04em; }
+.loading-status b { color: var(--foam); margin-left: 6px; font-family: var(--font-display); font-size: 13px; }
+.loading-fact { margin: 18px 0 0; color: var(--dim); font-size: 14px; min-height: 2.6em; animation: fade-in .6s both; }
+.mini-progress { position: relative; display: inline-grid; align-items: center; width: 240px; height: 30px; border-radius: 10px; background: rgba(6,22,28,.6); border: 1px solid rgba(238,250,246,.14); overflow: hidden; font-size: 12px; color: var(--mist); }
+.mini-progress i { position: absolute; inset: 0 auto 0 0; background: linear-gradient(90deg, rgba(255,179,107,.35), rgba(255,91,110,.35)); transition: width .25s; }
+.mini-progress span { position: relative; text-align: center; font-weight: 700; letter-spacing: .04em; }
