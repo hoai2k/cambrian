@@ -1,3 +1,5 @@
+import { CreaturePortrait } from '../app/CreaturePortrait';
+import { creatureScheme } from '../shared/creature-schemes';
 import { useEffect, useRef, useState } from 'react';
 import { CREATURES, type CreatureId } from '../sim/creatures';
 import { DEFAULT_SCHEME, SCHEMES, scheme, SLOT_LABEL, type Slot } from '../shared/palettes';
@@ -39,7 +41,7 @@ export function Viewer() {
   // The show effect must not re-run when a pick changes, so it reads the picks through a ref.
   const picksRef = useRef(picks);
   picksRef.current = picks;
-  const schemeId = picks[id] ?? DEFAULT_SCHEME;
+  const schemeId = picks[id] ?? creatureScheme(id).id;
   const activeScheme = scheme(schemeId);
 
   useEffect(() => {
@@ -53,7 +55,7 @@ export function Viewer() {
     let cancelled = false;
     setLoading(true); setError(''); setClips([]); setSlots([]);
     // Set the scheme before the model is built so it never appears in the wrong palette first.
-    sceneRef.current?.setScheme(picksRef.current[id] ?? DEFAULT_SCHEME);
+    sceneRef.current?.setScheme(picksRef.current[id] ?? creatureScheme(id).id);
     sceneRef.current?.show(id)
       .then((names) => {
         if (cancelled) return;
@@ -74,7 +76,7 @@ export function Viewer() {
       generated: new Date().toISOString(),
       note: 'Colour scheme picked per creature in the viewer. Slots are assigned from GLB material names by slotFor() in src/shared/palettes.ts.',
       creatures: Object.fromEntries(CREATURES.map((c) => {
-        const s = scheme(picks[c.id] ?? DEFAULT_SCHEME);
+        const s = scheme(picks[c.id] ?? creatureScheme(c.id).id);
         return [c.id, { scheme: s.id, name: s.name, colors: s.colors }];
       })),
     };
@@ -87,7 +89,7 @@ export function Viewer() {
   }
 
   const def = CREATURES.find((c) => c.id === id)!;
-  const picked = CREATURES.filter((c) => (picks[c.id] ?? DEFAULT_SCHEME) !== DEFAULT_SCHEME).length;
+  const picked = CREATURES.filter((c) => (picks[c.id] ?? creatureScheme(c.id).id) !== DEFAULT_SCHEME).length;
 
   return (
     <div className="viewer">
@@ -102,7 +104,7 @@ export function Viewer() {
           {CREATURES.map((c) => (
             <li key={c.id}>
               <button className={`specimen ${c.id === id ? 'active' : ''}`} aria-pressed={c.id === id} onClick={() => setId(c.id)}>
-                <img src={`${ASSET_BASE}assets/creatures/${c.id}.card.png`} alt="" draggable={false} />
+                <CreaturePortrait creatureId={c.id} kind="thumb" assetBase={ASSET_BASE} schemeId={picks[c.id] ?? creatureScheme(c.id).id} alt="" draggable={false} />
                 <span>
                   <b>{c.name}</b>
                   <small>{c.species}</small>

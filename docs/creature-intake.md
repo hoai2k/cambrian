@@ -57,7 +57,7 @@ creature can be recoloured at runtime with no new art. `src/render/recolor.ts` r
 pixel as `slot colour x (luminance / the material's mean luminance)`: the mottling, gradients
 and baked shading all live in that ratio and survive, and only the hue is replaced. The schemes
 themselves are plain data in `src/shared/palettes.ts`, and the viewer has a dropdown to try them
-on. Nothing in the game is recoloured yet.
+on. The game now applies the committed per-creature picks in `src/shared/creature-schemes.ts`. Palette-aware portraits and preserved default fallbacks are described in [art/colour-rendering.md](art/colour-rendering.md).
 
 **Material names decide the palette slot.** `slotFor()` sorts each material into one of body,
 eyes, fins, legs, accent or underside by matching its name — "Dorsal cuticle" is a body,

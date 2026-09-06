@@ -1,3 +1,5 @@
+import { makeRecolor } from './recolor';
+import { creatureScheme } from '../shared/creature-schemes';
 import * as THREE from 'three';
 import { CreatureAnchors } from './anchors';
 import { GLTFLoader, type GLTF } from 'three/examples/jsm/loaders/GLTFLoader.js';
@@ -103,6 +105,8 @@ export class CreatureView {
       }
       if (o instanceof THREE.Bone) { const m = SPINE_RE.exec(o.name); if (m) this.spine.push(o); }
     });
+    // The same configured palette drives live models and the image-match guard, including LODs.
+    makeRecolor(this.model).setScheme(creatureScheme(creatureId).id);
     this.spine.sort((a, b) => Number(SPINE_RE.exec(a.name)![2]) - Number(SPINE_RE.exec(b.name)![2]));
     this.mixer = new THREE.AnimationMixer(this.model);
     for (const clip of loaded.gltf.animations) this.actions.set(clip.name, this.mixer.clipAction(clip));

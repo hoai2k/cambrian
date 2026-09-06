@@ -1,3 +1,4 @@
+import { creaturePortrait } from '../shared/creature-images';
 import assetSizes from './asset-sizes.json';
 /**
  * Priority asset loader. Everything heavy (creature GLBs, card images, sound files) goes through one
@@ -29,7 +30,7 @@ export class AssetQueue {
   constructor() {
     CREATURE_IDS.forEach((id, i) => {
       this.items.set(`glb:${id}`, { key: `glb:${id}`, kind: 'glb', url: `${BASE}assets/creatures/${id}.glb`, size: GLB_SIZES[id], priority: 100 + i, status: 'queued', loaded: 0 });
-      this.items.set(`card:${id}`, { key: `card:${id}`, kind: 'card', url: `${BASE}assets/creatures/${id}.card.png`, size: CARD_SIZE, priority: 200 + i, status: 'queued', loaded: 0 });
+      this.items.set(`card:${id}`, { key: `card:${id}`, kind: 'card', url: `${BASE}${creaturePortrait(id, 'card').src}`, size: CARD_SIZE, priority: 200 + i, status: 'queued', loaded: 0 });
       // Decimated copies used for anything small on screen. Small files, so they stream early.
       this.items.set(`lod:${id}`, { key: `lod:${id}`, kind: 'lod', url: `${BASE}assets/creatures/${id}.lod1.glb`, size: 600_000, priority: 90 + i, status: 'queued', loaded: 0 });
     });
@@ -77,7 +78,17 @@ export class AssetQueue {
       } else if (item.kind === 'lod') {
         await ensureLoaded(item.key.slice(4) as CreatureId, (loaded, total) => { item.loaded = loaded; if (total > 0) item.size = total; this.emit(item.key); }, 1);
       } else if (item.kind === 'card') {
-        await new Promise<void>((res, rej) => { const img = new Image(); img.onload = () => res(); img.onerror = () => rej(new Error('img')); img.src = item.url; });
+        await new Promise<void>((res, rej) => {
+          const img = new Image();
+          const fallback = `${BASE}${creaturePortrait(item.key.slice(5), 'card').fallback}`;
+          let triedFallback = item.url === fallback;
+          img.onload = () => res();
+          img.onerror = () => {
+            if (triedFallback) { rej(new Error('img')); return; }
+            triedFallback = true; img.src = fallback;
+          };
+          img.src = item.url;
+        });
       } else {
         const res = await fetch(item.url); if (!res.ok) throw new Error(String(res.status));
         item.size = Number(res.headers.get('content-length')) || item.size;
