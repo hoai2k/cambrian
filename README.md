@@ -38,7 +38,7 @@ every push to `main` (set the repository's Pages source to "GitHub Actions").
 | `src/input/`, `src/audio/` | Gamepad/keyboard reading; fully synthesized audio. |
 | `public/assets/creatures/` | The eight rigged GLB models and card renders (unchanged originals plus `.card.png` cutouts). |
 | `docs/redesign/` | Design and technical plan. |
-| `tools/` | Headless sim tests (`harness.ts`, `controls-test.ts`, `hunt-test.ts`, `fight-test.ts`, `corpse-test.ts`, `respawn-test.ts`), browser smoke test (`smoke.mjs`), creature image intake (`make-cards.mjs`, `check-creature-assets.mjs`), LOD generator (`make-lods.mjs`), SFX generator (`gen-sfx.mjs`). |
+| `tools/` | Headless sim tests (`harness.ts`, `controls-test.ts`, `hunt-test.ts`, `fight-test.ts`, `corpse-test.ts`, `respawn-test.ts`, `flora-test.ts`), browser smoke tests (`smoke.mjs`, `viewer-smoke.mjs`), creature image intake (`make-cards.mjs`, `check-creature-assets.mjs`), LOD generator (`make-lods.mjs`), SFX generator (`gen-sfx.mjs`). |
 | `image-requests.md` | Art still needed (logo, favicon, key art…). |
 | `docs/creature-intake.md` | How to add a creature or change its look; `npm run check` enforces it. |
 
@@ -48,6 +48,7 @@ every push to `main` (set the repository's Pages source to "GitHub Actions").
 run() { npx esbuild "$1" --bundle --platform=node --format=esm --outfile=/tmp/t.mjs && node /tmp/t.mjs "${@:2}"; }
 run tools/controls-test.ts        # camera-relative movement directions
 run tools/respawn-test.ts         # a giant eats a larva; it must come back
+run tools/flora-test.ts           # plants: slide around sponges, fold algae, spring back
 run tools/harness.ts all 240      # balance: hunting, growth, escapes per creature
 run tools/harness.ts duel         # rival fights between creature pairs
 npm run preview & node tools/smoke.mjs /tmp   # needs Chromium; writes screenshots

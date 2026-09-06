@@ -1,11 +1,20 @@
 import { clamp, fbm2, makeRng, noise2, smoothstep, TAU, type Vec3 } from '../shared/math';
+import { floraSize } from './flora';
 import { SpatialHash } from './spatial';
 
 export type Biome = 'nursery' | 'shelf' | 'boulders' | 'forest' | 'channel' | 'flats';
 export type FloraKind = 'vauxia' | 'sac' | 'choia' | 'thalli' | 'tuft';
 
 export interface Boulder { pos: Vec3; radius: number; height: number; sx: number; sy: number; sz: number; rot: number; shade: number; }
-export interface Flora { pos: Vec3; kind: FloraKind; scale: number; sy: number; rot: number; shade: number; }
+export interface Flora {
+  pos: Vec3; kind: FloraKind; scale: number; sy: number; rot: number; shade: number;
+  /** World-space height, base radius, and the furthest the top may be displaced. */
+  H: number; R: number; maxB: number;
+  /** Top displacement (world units) and its velocity: the plant's bend spring. */
+  bx: number; bz: number; bvx: number; bvz: number;
+  /** In `WorldData.activeFlora`. */
+  active: boolean;
+}
 export interface Cover { pos: Vec3; radius: number; maxLength: number; strength: number; temp?: boolean; t?: number; }
 export interface Bloom { pos: Vec3; radius: number; drift: number; }
 
@@ -81,6 +90,11 @@ export interface WorldData {
   blooms: Bloom[];
   boulderHash: SpatialHash<Boulder>;
   coverHash: SpatialHash<Cover>;
+  floraHash: SpatialHash<Flora>;
+  /** Plants currently bent away from rest; the sim springs them back and the renderer leans them. */
+  activeFlora: Flora[];
+  /** Largest radius-plus-lean of any plant: the broad-phase query margin. */
+  floraReach: number;
   seed: number;
 }
 
@@ -140,7 +154,8 @@ export function generateWorld(seed = 5052026): WorldData {
           const forest = biome === 'forest' ? 1.6 : 1;
           const s = (kind === 'vauxia' ? 0.6 + rng() * 1.6 : kind === 'tuft' ? 0.35 + rng() * 0.6 : 0.45 + rng() * 1.0) * forest;
           const y = sampleHeight(x, z) - 0.03;
-          flora.push({ pos: { x, y, z }, kind, scale: s, sy: s * (0.85 + rng() * 0.4), rot: rng() * TAU, shade: 0.7 + rng() * 0.28 });
+          const sy = s * (0.85 + rng() * 0.4);
+          flora.push({ pos: { x, y, z }, kind, scale: s, sy, rot: rng() * TAU, shade: 0.7 + rng() * 0.28, ...floraSize(kind, s, sy), bx: 0, bz: 0, bvx: 0, bvz: 0, active: false });
           if (kind === 'vauxia' || kind === 'sac' || kind === 'thalli')
             cover.push({ pos: { x, y: y + s * 0.6, z }, radius: s * 1.25, maxLength: s * 1.7, strength: 0.7 });
           else if (kind === 'tuft')
@@ -159,7 +174,11 @@ export function generateWorld(seed = 5052026): WorldData {
   boulderHash.rebuild(boulders);
   const coverHash = new SpatialHash<Cover>(8);
   coverHash.rebuild(cover);
-  return { boulders, flora, cover, blooms, boulderHash, coverHash, seed };
+  const floraHash = new SpatialHash<Flora>(6);
+  floraHash.rebuild(flora);
+  let floraReach = 0;
+  for (const f of flora) floraReach = Math.max(floraReach, f.R + f.maxB);
+  return { boulders, flora, cover, blooms, boulderHash, coverHash, floraHash, activeFlora: [], floraReach, seed };
 }
 
 /** Amount of cover (0..1) an actor of `length` gets at `pos`. */
