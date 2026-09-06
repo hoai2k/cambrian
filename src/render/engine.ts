@@ -169,6 +169,8 @@ export class Engine {
     this.game = new Game('reef', []);
     this.sea?.dispose();
     this.sea = createSea(this.scene, this.game.world, this.quality);
+    const n = nurseryAt(0);
+    this.sea.prime(n.x, n.z);
     this.attractT = 0;
   }
 
@@ -180,6 +182,9 @@ export class Engine {
     this.game = new Game(mode, setups, 5052026 + Math.floor(Math.random() * 1000));
     this.sea?.dispose();
     this.sea = createSea(this.scene, this.game.world, this.quality);
+    // Lay the seabed down before the first frame, or the match opens on a hole in the water.
+    const start = this.game.players[0] ?? { pos: nurseryAt(0) };
+    this.sea.prime(start.pos.x, start.pos.z);
     this.cams = setups.map((_, i) => {
       const p = this.game!.players[i];
       const cam = new THREE.PerspectiveCamera(60, 1, 0.08, 420);
@@ -693,7 +698,11 @@ export class Engine {
           // sparkles where they left and where they arrived; the camera snaps behind them on arrival
           this.sparkles.emit(e.pos, e.strength ? 50 : 30, 0.9, 1.4, 0.07, 1.8);
           this.bubbles.emit(e.pos, 20, 0.8, 3, 0.07, 1.2);
-          if (e.strength) { personal('ability', 0.8); if (e.player != null && e.player >= 0) { const d = padOf(e.player); if (typeof d === 'number') rumble(d, 0.5, 0.7, 250); } }
+          if (e.strength) {
+            personal('ability', 0.8);
+            this.sea?.prime(e.pos.x, e.pos.z, 220);     // arrive on solid ground, not in a hole
+            if (e.player != null && e.player >= 0) { const d = padOf(e.player); if (typeof d === 'number') rumble(d, 0.5, 0.7, 250); }
+          }
           break;
         }
       }

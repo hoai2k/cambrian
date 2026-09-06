@@ -40,7 +40,9 @@ export function tierForScale(s: number): Tier {
 export function makeActor(id: number, creatureId: CreatureId, controller: Controller, pos: Vec3, scale: number, player = -1): Actor {
   const a: Actor = {
     id, creature: creatureId, controller, player,
-    pos: { ...pos }, vel: v3(), yaw: Math.random() * 6.283, pitch: 0, bank: 0, roll: 0,
+    // Yaw is set by the caller from the game's seeded RNG: nothing in the simulation may use
+    // Math.random, or the same seed stops reproducing the same match.
+    pos: { ...pos }, vel: v3(), yaw: 0, pitch: 0, bank: 0, roll: 0,
     scale, tier: tierForScale(scale), nutrition: 0, ageGrowth: 0,
     hp: 0, hpMax: 0, stamina: 0, staminaMax: 0, exhausted: 0, poise: 0, poiseMax: 0,
     state: 'free', stateT: 0, stateDur: 0, combo: 0, comboT: 0, hitDone: new Set(),

@@ -88,7 +88,7 @@ export class Game implements AiWorld {
     this.world = new World(seed);
     const nursery = nurseryAt(0);
     this.world.loadAround(nursery);
-    this.hitCtx = { events: this.events, byId: (id) => this.idMap.get(id), time: 0 };
+    this.hitCtx = { events: this.events, byId: (id) => this.idMap.get(id), time: 0, rng: this.rng };
     setups.forEach((s, i) => {
       const startScale = mode === 'rise' ? TIER_SCALE[0] : mode === 'hunted' ? (i === 0 ? 3.0 : TIER_SCALE[1]) : mode === 'reef' ? TIER_SCALE[2] : TIER_SCALE[1];
       const a = this.spawn(s.creature, 'player', this.spawnPoint(nursery, s.creature, startScale, i), startScale, i);
@@ -146,6 +146,7 @@ export class Game implements AiWorld {
 
   spawn(c: CreatureId, controller: Actor['controller'], pos: Vec3, scale: number, player = -1): Actor {
     const a = makeActor(this.nextId++, c, controller, pos, scale, player);
+    a.yaw = this.rng() * TAU; a.prevT.yaw = a.yaw;
     this.actors.push(a);
     this.idMap.set(a.id, a);
     return a;
