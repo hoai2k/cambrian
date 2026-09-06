@@ -315,14 +315,16 @@ export class Game implements AiWorld {
       mag = clamp(Math.hypot(sx, sy), 0, 1);
       if (mag > 0) {
         let fwd: Vec3, right: Vec3;
+        // right = forward × up. With heading(yaw) = (sin, 0, cos) that is (-cos, 0, sin):
+        // getting this backwards makes the strafe axis mirror-image (verified against the camera).
         if (locked && isAlive(locked)) {
           const to = norm(sub(locked.pos, a.pos));
           fwd = def.ground ? norm({ x: to.x, y: 0, z: to.z }) : to;
-          right = norm({ x: fwd.z, y: 0, z: -fwd.x });
+          right = norm({ x: -fwd.z, y: 0, z: fwd.x });
         } else {
           const cy = input.camYaw, cp = def.ground ? 0 : input.camPitch;
           fwd = { x: Math.sin(cy) * Math.cos(cp), y: -Math.sin(cp), z: Math.cos(cy) * Math.cos(cp) };
-          right = { x: Math.cos(cy), y: 0, z: -Math.sin(cy) };
+          right = { x: -Math.cos(cy), y: 0, z: Math.sin(cy) };
         }
         dir = norm({ x: fwd.x * sy + right.x * sx, y: fwd.y * sy, z: fwd.z * sy + right.z * sx });
       }

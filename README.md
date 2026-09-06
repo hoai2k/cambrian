@@ -38,13 +38,32 @@ every push to `main` (set the repository's Pages source to "GitHub Actions").
 | `src/input/`, `src/audio/` | Gamepad/keyboard reading; fully synthesized audio. |
 | `public/assets/creatures/` | The eight rigged GLB models and card renders (unchanged originals plus `.card.png` cutouts). |
 | `docs/redesign/` | Design and technical plan. |
-| `tools/` | Headless sim harness (`harness.ts`), browser smoke test (`smoke.mjs`), card cutout script. |
+| `tools/` | Headless sim harness (`harness.ts`), control-direction test (`controls-test.ts`), respawn test (`respawn-test.ts`), browser smoke test (`smoke.mjs`), LOD generator (`make-lods.mjs`), SFX generator (`gen-sfx.mjs`), card cutout script. |
 | `image-requests.md` | Art still needed (logo, favicon, key art…). |
 
 ## Headless checks
 
 ```sh
-npx esbuild tools/harness.ts --bundle --platform=node --format=esm --outfile=/tmp/harness.mjs && node /tmp/harness.mjs all 240
-node /tmp/harness.mjs duel
+run() { npx esbuild "$1" --bundle --platform=node --format=esm --outfile=/tmp/t.mjs && node /tmp/t.mjs "${@:2}"; }
+run tools/controls-test.ts        # camera-relative movement directions
+run tools/respawn-test.ts         # a giant eats a larva; it must come back
+run tools/harness.ts all 240      # balance: hunting, growth, escapes per creature
+run tools/harness.ts duel         # rival fights between creature pairs
 npm run preview & node tools/smoke.mjs /tmp   # needs Chromium; writes screenshots
+```
+
+`window.__cambrian.stats()` in the browser console reports draw calls, triangles,
+live views, actor count and sim/render milliseconds for the current frame.
+
+## Rendering budget
+
+Scenery is instanced in 64-unit chunks so each chunk has a real bounding sphere and can be
+frustum- and distance-culled per viewport; the camera's far plane is pulled in to where fog
+has hidden everything anyway. Creatures switch to decimated `*.lod1.glb` copies (about 15% of
+the triangles, no textures, locomotion clips only) once they are small on screen, and only
+nearby ones cast shadows. The shadow map is rendered once per frame rather than once per
+split-screen viewport. Regenerate the LODs after changing a model:
+
+```sh
+node tools/make-lods.mjs 0.14
 ```
