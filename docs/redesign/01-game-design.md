@@ -439,6 +439,17 @@ Rules that fall out of this:
   Lock-on and being hunted pull the camera closer; death pulls it back.
 - **Fog density** scales with `2.2 / (L + 1.5)`, clamped between half and
   1.15× the base. A larva's world ends 60 units away; an apex sees ~120.
+- **Distance haze**: fog alone leaves a far-off giant reading as a solid dark
+  silhouette, because a big body stays large on screen long after everything
+  else has been culled. Each body is additionally mixed toward the water colour
+  by `distanceHaze(d, camera.far)` — nothing inside about an eighth of the view
+  distance, ramping to 0.9 by about two-thirds of it — so something across the
+  reef is pale background ambience and only resolves into a dark, obviously
+  present animal as it closes. It is applied per viewport, after fog, in the
+  fragment shader, so split-screen players each get their own distance and the
+  wash matches whatever water they are looking through. Anything **hunting
+  you** keeps most of its presence (`HUNTER_HAZE`) at any range: the warning
+  has to read.
 - **Detail layers are per-viewport toggles**, not per-object LOD, so they
   cost nothing to switch and never desynchronise between players. They are
   purely visual: cover volumes and collision come from the simulation, which

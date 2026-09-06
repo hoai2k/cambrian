@@ -33,6 +33,33 @@ for (const [name, x, s, yaw] of spots) {
   console.log(name, JSON.stringify(await stats()));
   await shot(`biome-${name}`);
 }
+// Distance haze: the same creature must read as background ambience far off and be solidly there close up.
+await page.evaluate(() => {
+  const e = window.__cambrian, g = e.game, p = g.players[0];
+  p.spawnProtect = 999; p.pos = { x: 0, y: 16, z: p.pos.z }; p.vel = { x: 0, y: 0, z: 0 };
+  e.cams[0].yaw = Math.PI;
+  const giant = g.actors.find(a => a.controller === 'giant');
+  if (giant) { giant.pos = { x: 0, y: 16, z: p.pos.z - 80 }; giant.vel = { x: 0, y: 0, z: 0 }; g.world.loadAround(giant.pos); }
+});
+await page.waitForTimeout(3000);
+console.log('haze:', JSON.stringify(await page.evaluate(() => {
+  const e = window.__cambrian, g = e.game, p = g.players[0];
+  const giant = g.actors.find(a => a.controller === 'giant');
+  const v = giant && e.views.get(giant.id);
+  if (!v) return { measured: false };
+  e.setPaused(true);
+  const at = (z, hunting) => {
+    giant.pos.z = p.pos.z - z; giant.prevT.z = giant.pos.z;
+    giant.brain.goal = hunting ? 'hunt' : 'patrol'; giant.brain.target = hunting ? p.id : -1;
+    e.syncViews(g, e.cams.map(c => c.camera.position), 0);
+    e.prepareViewport(0, p, e.cams[0]);
+    return +v.haze.toFixed(2);
+  };
+  const out = { near: at(20), mid: at(60), far: at(100), farHunting: at(100, true) };
+  e.setPaused(false);
+  return out;
+})));
+
 // two players, high detail, far apart: the streaming and render budget under the worst case
 await page.evaluate(() => localStorage.setItem('cambrian-settings', JSON.stringify({ quality: 'high', lookSpeed: 1, invertY: false, volume: 0.8, muted: true })));
 await page.reload({ waitUntil: 'load' }); await page.waitForTimeout(9000);

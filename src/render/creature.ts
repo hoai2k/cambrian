@@ -64,6 +64,8 @@ export class CreatureView {
   private addW = [0, 0, 0, 0];
   private materials: THREE.MeshStandardMaterial[] = [];
   private baseEmissive: THREE.Color[] = [];
+  private hazeU: { value: number }[] = [];
+  private haze = 0;
   private baseOpacity: number[] = [];
   private baseTransparent: boolean[] = [];
   private spine: THREE.Bone[] = [];
@@ -108,6 +110,24 @@ export class CreatureView {
     // the materials cloned just above rather than a second set of models. Both LODs share the
     // material names the slots are read from, so a distant creature keeps its colours.
     this.recolor = makeRecolor(this.model); this.recolor.setScheme(schemeForCreature(creatureId));
+    // Distance haze, chained after the palette hook (which owns onBeforeCompile). Mixing the
+    // finished pixel toward the water it is seen through is the only correct way to fade a body
+    // into the background: tinting the albedo would darken it instead, since a creature's colour
+    // lives in its vertex colours and material.color is a white multiplier.
+    for (const m of this.materials) {
+      const prev = m.onBeforeCompile, prevKey = m.customProgramCacheKey;
+      const u = { value: 0 };
+      this.hazeU.push(u);
+      m.onBeforeCompile = function (shader, renderer) {
+        prev?.call(this, shader, renderer);
+        shader.uniforms.uHaze = u;
+        shader.fragmentShader = 'uniform float uHaze;\n' + shader.fragmentShader.replace(
+          '#include <fog_fragment>',
+          '#include <fog_fragment>\n#ifdef USE_FOG\ngl_FragColor.rgb = mix(gl_FragColor.rgb, fogColor, uHaze);\n#endif');
+      };
+      m.customProgramCacheKey = function () { return (prevKey ? prevKey.call(this) : '') + '-haze'; };
+      m.needsUpdate = true;
+    }
     this.spine.sort((a, b) => Number(SPINE_RE.exec(a.name)![2]) - Number(SPINE_RE.exec(b.name)![2]));
     this.mixer = new THREE.AnimationMixer(this.model);
     for (const clip of loaded.gltf.animations) this.actions.set(clip.name, this.mixer.clipAction(clip));
@@ -167,6 +187,21 @@ export class CreatureView {
   private shadowOn = true;
 
   setHighlight(intensity: number, color?: string) { this.highlight = intensity; if (color) this.highlightColor.set(color); }
+
+  /**
+   * Distance haze. Fog alone leaves a far-off giant reading as a solid dark shape; this washes the
+   * body toward the water colour on top of it, so something across the reef is pale background
+   * ambience and only resolves into a dark, obviously-there animal as it closes. Set per viewport
+   * immediately before that viewport renders, so split-screen players each get their own distance.
+   * The colour mixed toward is the viewport's own fog colour, so it matches whatever water the
+   * viewer is in.
+   */
+  setHaze(amount: number) {
+    const a = clamp(amount, 0, 1);
+    if (a === this.haze) return;
+    this.haze = a;
+    for (const u of this.hazeU) u.value = a;
+  }
 
   /**
    * `alpha` is how far this frame sits between the last two simulation steps (0 = the previous

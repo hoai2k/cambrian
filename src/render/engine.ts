@@ -58,6 +58,16 @@ export const MAGNIFICATION = [
   { name: 'Micro', maxLength: 1.0 }, { name: 'Small', maxLength: 2.0 }, { name: 'Mid', maxLength: 4.5 }, { name: 'Large', maxLength: 8 }, { name: 'Colossal', maxLength: Infinity },
 ] as const;
 export const magnificationLevel = (L: number) => MAGNIFICATION.find((m) => L < m.maxLength) ?? MAGNIFICATION[4];
+/**
+ * How much a body at `d` from the camera is washed toward the water colour, on top of the fog.
+ * A far-off giant should read as pale background ambience and only resolve into a solid, dark,
+ * obviously-present animal as it closes. Scaled by the viewport's far plane, which already tracks
+ * magnification and the biome's fog, so a larva's short world and an apex's long one fade alike.
+ */
+export const distanceHaze = (d: number, far: number) => THREE.MathUtils.smoothstep(d, far * 0.12, far * 0.62) * 0.9;
+/** Something hunting you keeps most of its presence, however far off: the warning has to read. */
+export const HUNTER_HAZE = 0.4;
+
 /** Follow-camera distance for a body length: about two body lengths back plus a floor so larvae are still readable. */
 export const magnificationDistance = (L: number) => L * 1.45 + 1.15 + Math.max(0, 0.8 - L) * 0.9;
 
@@ -570,6 +580,10 @@ export class Engine {
   /** Per-viewport pass: cull views outside this camera, then set the highlights for this viewer. */
   private prepareViewport(playerIndex: number, viewer?: Actor, cs?: CamState) {
     const game = this.game!;
+    // This viewport's own camera and water colour: setViewLength has already applied the biome's
+    // fog for it, so the haze washes distant bodies toward exactly the water they are seen through.
+    const camPos = cs?.camera.position ?? this.attractCam.position;
+    const camFar = cs?.camera.far ?? this.attractCam.far;
     if (cs) {
       cs.camera.updateMatrixWorld();
       cs.projScreen.multiplyMatrices(cs.camera.projectionMatrix, cs.camera.matrixWorldInverse);
@@ -585,6 +599,8 @@ export class Engine {
         v.group.visible = (!isHidden(a) || a.hideT <= 0.6) && cs.frustum.intersectsSphere(this.cullSphere);
         if (!v.group.visible) continue;
       }
+      const haze = distanceHaze(Math.hypot(v.group.position.x - camPos.x, v.group.position.y - camPos.y, v.group.position.z - camPos.z), camFar);
+      v.setHaze(haze);
       if (!viewer || a.state === 'dead' || a.state === 'swallowed') { v.setHighlight(0); continue; }
       if (a.id === viewer.id) { v.setHighlight(0); continue; }
       const band = bandOf(viewer, a);
@@ -593,7 +609,7 @@ export class Engine {
       const sensing = viewer.senseT > 0 && d < creature(viewer.creature).sense * L * 1.2;
       const locked = viewer.lockTarget === a.id;
       const huntingMe = a.brain?.target === viewer.id && (a.brain.goal === 'hunt' || a.brain.goal === 'notice');
-      if (huntingMe) { v.setHighlight(a.brain!.goal === 'hunt' ? 0.45 + 0.3 * Math.sin(this.time * 10) : 0.25 + 0.1 * Math.sin(this.time * 6), '#ff4b5c'); }
+      if (huntingMe) { v.setHaze(haze * HUNTER_HAZE); v.setHighlight(a.brain!.goal === 'hunt' ? 0.45 + 0.3 * Math.sin(this.time * 10) : 0.25 + 0.1 * Math.sin(this.time * 6), '#ff4b5c'); }
       else v.setHighlight(sensing ? 0.55 + 0.25 * Math.sin(this.time * 9) : locked ? 0.12 : 0, BAND_COLOR[band]);
     }
   }
