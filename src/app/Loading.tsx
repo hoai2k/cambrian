@@ -16,17 +16,14 @@ const FACTS = [
 /** Boot screen: shows while the first creatures stream in. Key art slot falls back to the live reef. */
 export function LoadingScreen({ progress, fraction }: { progress: AssetProgress | null; fraction: number }) {
   const [fact, setFact] = useState(0);
-  const [hasArt, setHasArt] = useState(true);
   useEffect(() => { const t = setInterval(() => setFact((f) => (f + 1) % FACTS.length), 3800); return () => clearInterval(t); }, []);
   const pct = Math.round(Math.min(1, fraction) * 100);
   const current = progress?.current ? creature(progress.current as never)?.name : undefined;
   return (
-    <section className="loading" aria-busy="true" aria-live="polite">
-      {hasArt && <picture><source media="(orientation: portrait)" srcSet={`${import.meta.env.BASE_URL}assets/brand/keyart-mobile.webp`} /><img className="loading-art" src={`${import.meta.env.BASE_URL}assets/brand/keyart.webp`} alt="" onError={() => setHasArt(false)} /></picture>}
+    <section className="loading loading-illustrated" aria-busy="true" aria-live="polite">
       <div className="loading-inner">
-        <div className="title-mark"><img src={`${import.meta.env.BASE_URL}assets/ui/loading.svg`} width={72} height={72} alt="" /></div>
         <h1 className="title-logo small">
-          <img className="brand-logo" src={`${import.meta.env.BASE_URL}assets/brand/logo.svg`} alt="Cambrian Explosion" />
+          <img className="brand-logo illustrated-logo" src={`${import.meta.env.BASE_URL}assets/brand/logo-illustrated.webp`} alt="Cambrian Explosion" />
         </h1>
         <div className="loading-bar" role="progressbar" aria-valuemin={0} aria-valuemax={100} aria-valuenow={pct}>
           <i style={{ width: `${pct}%` }} />

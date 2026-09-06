@@ -262,8 +262,8 @@ export const SCHEMES: readonly Scheme[] = [
  * choice rather than an omission: nine of the twenty-one were picked as "Default (as authored)".
  *
  * Changing an entry recolours that creature everywhere it is rendered in 3D. It does NOT change
- * the baked `<id>.select.png` portrait on the pick screen — that comes out of Blender, so a
- * recoloured creature and its portrait can disagree. See docs/creature-intake.md.
+ * baked portraits. The image resolver compares this palette with the rendered snapshot and
+ * uses preserved default art on mismatch. See docs/art/colour-rendering.md.
  */
 export const CREATURE_SCHEMES: Readonly<Record<string, string>> = {
   anomalocaris: 'coral-flare',

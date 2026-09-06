@@ -357,3 +357,22 @@ input[type='checkbox'] { width: 20px; height: 20px; accent-color: var(--ember); 
 .join-card.waiting { border-color: var(--ember); box-shadow: 0 0 0 1px rgba(255, 179, 107, .35); }
 .join-card small.dim { color: var(--dim); }
 .crew-card .device .gone { font-style: normal; color: var(--coral); }
+
+/* Illustrated natural-history branding, with enough room for the complete supplied artwork. */
+.title-illustrated, .loading-illustrated { background: #090b09; }
+.title-illustrated { overflow: hidden; align-items: end; }
+.title-illustration { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: center; z-index: -2; }
+.title-illustrated .title-inner { width: 100%; padding: 24px 24px max(80px, env(safe-area-inset-bottom)); text-shadow: 0 2px 3px #000, 0 0 10px #000, 0 0 22px rgba(0,0,0,.85); }
+.title-illustrated .title-hint { color: #d6ddd7; }
+.title-illustrated .title-tag { margin: 8px 0 18px; }
+.title-illustrated .press-start { margin: 14px 0; }
+.loading-illustrated .loading-inner { width: min(92vw, 780px); }
+.loading-illustrated .title-logo.small .illustrated-logo { width: 100%; max-height: calc(100svh - 220px); object-fit: contain; }
+.loading-illustrated .loading-bar { margin-top: 16px; }
+.header-logo { width: 190px; max-height: 70px; object-fit: contain; }
+@media (max-width: 700px) {
+  .title-illustrated .title-inner { padding: 20px 20px max(88px, env(safe-area-inset-bottom)); }
+  .title-illustrated .title-tag { font-size: 13px; }
+  .header-logo { width: 150px; }
+}
+.title-illustrated > .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
