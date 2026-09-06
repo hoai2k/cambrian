@@ -2,7 +2,8 @@
  * Creature image intake. From each studio render (public/assets/creatures/<id>.png) produces:
  *   <id>.card.png   hero cutout (transparent background) for the select screen and results
  *   <id>.thumb.png  256x192 thumbnail for the picker grid
- * and records, in images.json, a fingerprint of the GLB the images were made from, so
+ * and records, in images.json, a fingerprint of the GLB the images were made from — plus a
+ * hash of the transparent select render (<id>.select.png) if one is present — so
  * tools/check-creature-assets.mjs can flag images that need regenerating after a model,
  * colour or texture change.
  *
@@ -60,12 +61,15 @@ for (const id of ids) {
   fs.writeFileSync(`${dir}/${id}.thumb.png`, PNG.sync.write(thumb));
 
   const glbPath = `${dir}/${id}.glb`;
+  const selectPath = `${dir}/${id}.select.png`;
+  const sha = (p) => crypto.createHash('sha256').update(fs.readFileSync(p)).digest('hex');
   manifest[id] = {
     ...(fs.existsSync(glbPath) ? fingerprint(glbPath) : {}),
-    renderSha256: crypto.createHash('sha256').update(fs.readFileSync(`${dir}/${id}.png`)).digest('hex'),
+    renderSha256: sha(`${dir}/${id}.png`),
+    ...(fs.existsSync(selectPath) ? { selectSha256: sha(selectPath) } : {}),
     generatedAt: new Date().toISOString(),
   };
-  console.log(`${id.padEnd(14)} card ${w}x${h}  thumb ${TW}x${TH}  subject ${bw}x${bh}`);
+  console.log(`${id.padEnd(14)} card ${w}x${h}  thumb ${TW}x${TH}  subject ${bw}x${bh}${fs.existsSync(selectPath) ? '  select ok' : '  NO select render'}`);
 }
 fs.writeFileSync(manifestPath, JSON.stringify(manifest, null, 2) + '\n');
 console.log('wrote', manifestPath);
