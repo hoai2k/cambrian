@@ -675,7 +675,7 @@ export class Game implements AiWorld {
       // Dodge (B for creatures that cannot guard, bots)
       else if (justDodge && a.controller !== 'player' && a.stamina >= 10 && a.exhausted === 0) this.startDodge(a, def, dir, mag, L, sf);
       // Guard / parry
-      else if (justGuard && def.canGuard && a.stamina > 5) { a.state = 'parry'; a.stateT = 0; a.hitDone.clear(); a.stateDur = def.ability === 'anchor' || def.ability === 'bristleFlare' ? .28 : .15; a.abilityActive = DEFENSIVE_SPECIALS.has(def.ability); this.blockPulse(a, def); this.flag(a, 'guard'); }
+      else if (justGuard && def.canGuard && a.stamina > 5) { a.state = 'parry'; a.stateT = 0; a.hitDone.clear(); a.stateDur = def.ability === 'anchor' || def.ability === 'bristleFlare' ? .28 : .15; a.abilityActive = DEFENSIVE_SPECIALS.has(def.ability); this.blockPulse(a, def); if (['ribbonSlip','combCruise'].includes(def.ability) && a.abilityCd <= 0 && a.stamina >= 10) { a.stamina -= 8; a.abilityCd = 4; this.evadeSpecial(a, def, L); } this.flag(a, 'guard'); }
       else if (justGuard && !def.canGuard && a.stamina >= 10 && a.exhausted === 0) this.startDodge(a, def, dir, mag, L, sf);
       else if (input.guard && def.canGuard && a.state === 'free' && a.stamina > 0 && a.stateT > 0.05) { a.state = 'guard'; a.stateT = 0; }
       else if (!input.guard && a.state === 'guard') { if (def.ability === 'shellUp' && a.guardHeld > .6) this.blockPulse(a, def); a.state = 'free'; a.stateT = 0; a.abilityActive = false; }
@@ -830,6 +830,7 @@ export class Game implements AiWorld {
     const power = (retreat ? 9 : 7.5) * Math.sqrt(sf) * (def.id === 'waptia' ? 1.25 : 1);
     a.vel.x = d.x * power; a.vel.y = def.ground ? a.vel.y : d.y * power * 0.7; a.vel.z = d.z * power;
     a.dodgeDir = d; a.dodgeTapT = retreat ? 0 : 0.35;
+    this.evadeSpecial(a, def, L);
     if (retreat) this.silt.push({ pos: { ...a.pos }, radius: 2.2 + L * 0.7, t: 4 });
     if (a.state === 'dodge') this.events.push({ kind: retreat ? 'silt' : 'dodge', pos: { ...a.pos }, actor: a.id, player: a.player, strength: L });
     this.flag(a, 'dodge');
@@ -872,6 +873,13 @@ export class Game implements AiWorld {
     }
   }
 
+  private evadeSpecial(a: Actor, def: ReturnType<typeof creature>, L: number) {
+    if (['tailFlick','ribbonSlip'].includes(def.ability)) {
+      this.silt.push({pos:{...a.pos},radius:L,t:2}); clearPursuit(a,this.actors);
+    }
+    if (def.ability === 'combCruise') { a.burstT = 1; a.stamina = Math.min(a.staminaMax,a.stamina+4); }
+  }
+
   private startDash(a: Actor, def: ReturnType<typeof creature>, dir: Vec3, L: number, sf: number) {
     let d: Vec3 = { ...dir }; if (def.ground) d.y = 0; d = norm(d);
     a.state = 'dodge'; a.stateT = 0; a.stateDur = 0.42;
@@ -879,10 +887,7 @@ export class Game implements AiWorld {
     const power = (L * 9.5 + 7) * (def.id === 'waptia' ? 1.2 : 1);
     a.vel.x = d.x * power; a.vel.y = def.ground ? a.vel.y : d.y * power * 0.7; a.vel.z = d.z * power;
     a.dodgeDir = d;
-    if (['tailFlick','ribbonSlip'].includes(def.ability)) {
-      this.silt.push({pos:{...a.pos},radius:L,t:2}); clearPursuit(a,this.actors);
-    }
-    if (def.ability === 'combCruise') { a.burstT = 1; a.stamina = Math.min(a.staminaMax,a.stamina+4); }
+    this.evadeSpecial(a, def, L);
     this.events.push({ kind: 'dodge', pos: { ...a.pos }, actor: a.id, player: a.player, strength: L });
     this.flag(a, 'dodge');
   }

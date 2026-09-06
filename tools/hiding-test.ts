@@ -84,4 +84,7 @@ for(const id of ['opabinia','nectocaris','cambroraster','sidneyia','isoxys'] as 
  console.log('PASS zero-energy attack emergence and no banked free-heavy exploit');
 }
 
+for (const id of ['waptia','pikaia'] as const) {
+ const {g,a}=setup(id);tick(g,a,{guard:true});assert.equal(a.state,creature(id).canGuard?'parry':'dodge');assert(g.silt.length>0,'B evade incorporates the escape special');
+}
 console.log('All hiding/combat input checks passed');

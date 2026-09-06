@@ -32,7 +32,7 @@ Camouflage reduces visual acquisition, particularly while still, and disrupts AI
 | --- | --- |
 | Anomalocaris | Sprint onset: ambush surge |
 | Opabinia | Heavy: snatch/pull |
-| Waptia, Pikaia | Evade: tail flick and silt escape |
+| Waptia, Pikaia | B defense and evade: tail flick / ribbon slip with silt escape |
 | Canadia | Block/parry: bristle flare |
 | Hallucigenia | Block/parry: anchored defense and counter |
 | Wiwaxia | Hold block: shell defense; release after charging: shove |
@@ -46,7 +46,7 @@ Camouflage reduces visual acquisition, particularly while still, and disrupts AI
 | Leanchoilia | Sense: whip search and food collection |
 | Isoxys | Heavy: spine intercept |
 | Odontogriphus | Block: adhesive glide |
-| Ctenorhabdotus | Evade: comb burst |
+| Ctenorhabdotus | B defense and evade: comb burst |
 | Vetulicola | Heavy: pharyngeal pump |
 | Tamisiocaris | Heavy: plankton comb |
 
