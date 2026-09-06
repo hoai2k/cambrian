@@ -173,6 +173,11 @@ export class Engine {
       return cs;
     });
     this.paused = false;
+    // The button that started the match is almost certainly still held right now. Seed the menu
+    // edge from what each device reads at this instant, or the first frame sees Start down with
+    // no previous state, calls it a fresh press, and pauses the match the moment it begins.
+    this.prevMenu.clear();
+    for (const s of setups) this.prevMenu.set(String(s.device), this.controlsFor(s, 0).menu);
     audio.play('ui-start');
   }
 

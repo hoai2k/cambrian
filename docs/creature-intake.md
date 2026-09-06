@@ -65,9 +65,7 @@ covers both LODs and every screen that renders a creature in 3D. The viewer star
 on its game scheme, and its **Export colours** button writes the current picks out as JSON — that
 file is the way a new set of defaults comes back into this map.
 
-The baked `<id>.select.png` portraits on the pick screen come out of Blender, so recolouring a
-creature does not update its portrait; re-render it (see the select-render step above) when you
-want the two to agree.
+Palette-aware portraits, cards, and thumbnails use an exact scheme/colour snapshot match and fall back to preserved authored images when no matching render exists. See [art/colour-rendering.md](art/colour-rendering.md) for the separate palette rendering workflow and fallback policy.
 
 **Material names decide the palette slot.** `slotFor()` sorts each material into one of body,
 eyes, fins, legs, accent or underside by matching its name — "Dorsal cuticle" is a body,

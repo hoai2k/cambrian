@@ -12,6 +12,8 @@ requested=sys.argv[sys.argv.index('--')+1:] if '--' in sys.argv else []
 ids=list(dict.fromkeys(requested or ORIGINALS))
 assert all(id in ORIGINALS+EXPANSION for id in ids), 'Unknown creature ID'
 INPUT=Path(os.environ.get('CAMBRIAN_ART_MODELS','/tmp/cambrian-art-models')).resolve()
+OUTPUT=Path(os.environ.get('CAMBRIAN_ART_OUTPUT',str(ROOT/'public/assets/creatures'))).resolve()
+OUTPUT.mkdir(parents=True,exist_ok=True)
 for id in ids:
  bpy.ops.wm.read_factory_settings(use_empty=True)
  bpy.ops.import_scene.gltf(filepath=str(INPUT/f'{id}.glb'))
@@ -43,14 +45,20 @@ for id in ids:
  def light(name,offset,power,color,size):
   bpy.ops.object.light_add(type='AREA',location=center+Vector(offset)*scale)
   o=bpy.context.object;o.name=name;o.data.energy=power*scale*scale;o.data.color=color;o.data.shape='DISK';o.data.size=size*scale;o.rotation_euler=(center-o.location).to_track_quat('-Z','Y').to_euler()
- light('soft key',(0,-1.3,2),180,(.78,.94,1),2)
- light('teal fill',(-1,-.6,.4),110,(.15,1,.8),1.6)
- light('coral rim',(.7,1.2,1),320,(1,.19,.26),1.2)
+ if os.environ.get('CAMBRIAN_ART_PALETTE_LIGHTING')=='1':
+  # Neutral dominant illumination keeps palette differences legible in small images.
+  light('soft key',(0,-1.3,2),65,(1,.97,.93),2)
+  light('teal fill',(-1,-.6,.4),20,(.35,.8,1),1.6)
+  light('coral rim',(.7,1.2,1),45,(1,.45,.35),1.2)
+ else:
+  light('soft key',(0,-1.3,2),180,(.78,.94,1),2)
+  light('teal fill',(-1,-.6,.4),110,(.15,1,.8),1.6)
+  light('coral rim',(.7,1.2,1),320,(1,.19,.26),1.2)
  scene.world=bpy.data.worlds.new('Studio');scene.world.use_nodes=True;scene.world.node_tree.nodes['Background'].inputs[0].default_value=(.06,.12,.14,1);scene.world.node_tree.nodes['Background'].inputs[1].default_value=.35
  scene.render.engine='CYCLES';scene.cycles.samples=32;scene.cycles.use_denoising=True
  scene.render.film_transparent=True;scene.render.resolution_x=1600;scene.render.resolution_y=1200;scene.render.resolution_percentage=100
  scene.render.image_settings.file_format='PNG';scene.render.image_settings.color_mode='RGBA'
- scene.render.filepath=str(ROOT/f'public/assets/creatures/{id}.select.png')
+ scene.render.filepath=str(OUTPUT/f'{id}.select.png')
  bpy.ops.render.render(write_still=True)
  # Keep the posed studio scene beside decoded inputs for repeatable review.
  if id in EXPANSION:

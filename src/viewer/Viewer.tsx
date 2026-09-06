@@ -1,3 +1,4 @@
+import { CreaturePortrait } from '../app/CreaturePortrait';
 import { useEffect, useRef, useState } from 'react';
 import { CREATURES, type CreatureId } from '../sim/creatures';
 import { SCHEMES, scheme, schemeForCreature, SLOT_LABEL, type Slot } from '../shared/palettes';
@@ -105,7 +106,7 @@ export function Viewer() {
           {CREATURES.map((c) => (
             <li key={c.id}>
               <button className={`specimen ${c.id === id ? 'active' : ''}`} aria-pressed={c.id === id} onClick={() => setId(c.id)}>
-                <img src={`${ASSET_BASE}assets/creatures/${c.id}.card.png`} alt="" draggable={false} />
+                <CreaturePortrait creatureId={c.id} kind="thumb" assetBase={ASSET_BASE} schemeId={picks[c.id] ?? schemeForCreature(c.id)} alt="" draggable={false} />
                 <span>
                   <b>{c.name}</b>
                   <small>{c.species}</small>
