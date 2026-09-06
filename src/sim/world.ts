@@ -3,9 +3,9 @@ import { floraSize } from './flora';
 import { SpatialHash } from './spatial';
 
 export type Biome = 'nursery' | 'shelf' | 'boulders' | 'forest' | 'channel' | 'flats';
-export type FloraKind = 'vauxia' | 'sac' | 'choia' | 'thalli' | 'tuft';
+export type FloraKind = 'vauxia' | 'sac' | 'choia' | 'thalli' | 'tuft' | 'cushion' | 'lettuce' | 'spine' | 'glass';
 
-export interface Boulder { pos: Vec3; radius: number; height: number; sx: number; sy: number; sz: number; rot: number; shade: number; }
+export interface Boulder { variant?: 'blade-spire'; pos: Vec3; radius: number; height: number; sx: number; sy: number; sz: number; rot: number; shade: number; }
 export interface Flora {
   pos: Vec3; kind: FloraKind; scale: number; sy: number; rot: number; shade: number;
   /** World-space height, base radius, and the furthest the top may be displaced. */
@@ -155,7 +155,8 @@ export function generateWorld(seed = 5052026): WorldData {
           const s = (kind === 'vauxia' ? 0.6 + rng() * 1.6 : kind === 'tuft' ? 0.35 + rng() * 0.6 : 0.45 + rng() * 1.0) * forest;
           const y = sampleHeight(x, z) - 0.03;
           const sy = s * (0.85 + rng() * 0.4);
-          flora.push({ pos: { x, y, z }, kind, scale: s, sy, rot: rng() * TAU, shade: 0.7 + rng() * 0.28, ...floraSize(kind, s, sy), bx: 0, bz: 0, bvx: 0, bvz: 0, active: false });
+          const actualKind = kind === 'sac' && biomeAt(x, z) === 'nursery' ? 'cushion' : kind;
+          flora.push({ pos: { x, y, z }, kind: actualKind, scale: s, sy, rot: rng() * TAU, shade: 0.7 + rng() * 0.28, ...floraSize(actualKind, s, sy), bx: 0, bz: 0, bvx: 0, bvz: 0, active: false });
           if (kind === 'vauxia' || kind === 'sac' || kind === 'thalli')
             cover.push({ pos: { x, y: y + s * 0.6, z }, radius: s * 1.25, maxLength: s * 1.7, strength: 0.7 });
           else if (kind === 'tuft')
@@ -168,6 +169,17 @@ export function generateWorld(seed = 5052026): WorldData {
   for (let i = 0; i < 9; i++) {
     const a = rng() * TAU, d = 20 + Math.sqrt(rng()) * (WORLD_RADIUS - 60);
     blooms.push({ pos: { x: Math.cos(a) * d, y: LIGHT_WINDOW_Y + 2 + rng() * 5, z: Math.sin(a) * d }, radius: 9 + rng() * 6, drift: rng() * TAU });
+  }
+
+  // Only existing channel-wall rocks receive the new extreme silhouette. Keep the
+  // legacy RNG sequence intact so the four standard reef biomes retain their look.
+  for (const b of boulders) if (biomeAt(b.pos.x, b.pos.z) === 'channel') {
+    b.variant = 'blade-spire';
+    const s = b.sx * 0.55;
+    b.pos.y = sampleHeight(b.pos.x, b.pos.z);
+    b.sx = b.sy = b.sz = s;
+    b.radius = 0.6 * s;
+    b.height = b.pos.y + 4 * s;
   }
 
   const boulderHash = new SpatialHash<Boulder>(12);
@@ -218,7 +230,7 @@ export function groundHeight(world: WorldData, x: number, z: number, scratch: Bo
     const d = Math.hypot(dx, dz);
     if (d < b.radius) {
       const dome = Math.sqrt(Math.max(0, 1 - (d / b.radius) ** 2));
-      h = Math.max(h, b.pos.y + b.sy * dome * 0.95);
+      h = Math.max(h, b.pos.y + b.sy * (b.variant === 'blade-spire' ? 4 : 1) * dome * 0.95);
     }
   }
   return h;

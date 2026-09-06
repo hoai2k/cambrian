@@ -1,8 +1,9 @@
 import * as THREE from 'three';
 import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js';
 import { makeRng, TAU } from '../shared/math';
+import { loadPropGeometry, type PropId } from './props';
 import { FLORA_PHYS } from '../sim/flora';
-import { LIGHT_WINDOW_Y, sampleCurrent, sampleHeight, SURFACE_Y, WORLD_RADIUS, type Flora, type WorldData } from '../sim/world';
+import { biomeAt, LIGHT_WINDOW_Y, sampleCurrent, sampleHeight, SURFACE_Y, WORLD_RADIUS, type Flora, type WorldData } from '../sim/world';
 
 export type Quality = 'high' | 'low';
 
@@ -29,6 +30,7 @@ export interface SeaEnvironment {
 type SeaKind = 'sediment' | 'rock' | 'sponge' | 'algae';
 
 export function createSea(scene: THREE.Scene, world: WorldData, quality: Quality): SeaEnvironment {
+  let disposed = false;
   const high = quality === 'high';
   const rng = makeRng(world.seed + 7);
   const group = new THREE.Group();
@@ -136,7 +138,7 @@ export function createSea(scene: THREE.Scene, world: WorldData, quality: Quality
   const chunked = <T extends { pos: { x: number; y: number; z: number } }>(
     name: string, geo: THREE.BufferGeometry, mat: THREE.Material, items: T[],
     place: (item: T, d: THREE.Object3D) => void,
-    opts: { castShadow?: boolean; color?: (item: T) => THREE.Color; range?: number; maxLength?: number; bend?: (item: T, attr: THREE.InstancedBufferAttribute, index: number) => void } = {},
+    opts: { include?: (item: T) => boolean; castShadow?: boolean; color?: (item: T) => THREE.Color; range?: number; maxLength?: number; bend?: (item: T, attr: THREE.InstancedBufferAttribute, index: number) => void } = {},
   ) => {
     const cells = new Map<number, T[]>();
     for (const it of items) {
@@ -146,19 +148,26 @@ export function createSea(scene: THREE.Scene, world: WorldData, quality: Quality
     }
     const meshes: THREE.InstancedMesh[] = [];
     for (const [key, arr] of cells) {
+      const count = opts.include ? arr.filter(opts.include).length : arr.length;
+      // Preserve the established scenery RNG even when a new prop replaces an item.
+      if (!count) { if (opts.color) arr.forEach(opts.color); continue; }
       // Per-instance attributes live on the geometry, so a bendable chunk needs its own copy.
       let cg = geo, bendAttr: THREE.InstancedBufferAttribute | undefined;
       if (opts.bend) {
         cg = G(geo.clone());
-        bendAttr = new THREE.InstancedBufferAttribute(new Float32Array(arr.length * 2), 2);
+        bendAttr = new THREE.InstancedBufferAttribute(new Float32Array(count * 2), 2);
         bendAttr.setUsage(THREE.DynamicDrawUsage);
         cg.setAttribute('aBend', bendAttr);
       }
-      const im = new THREE.InstancedMesh(cg, mat, arr.length);
+      const im = new THREE.InstancedMesh(cg, mat, count);
       im.name = name; im.castShadow = !!opts.castShadow && high; im.receiveShadow = true;
-      arr.forEach((it, i) => {
+      let instance = 0;
+      arr.forEach((it) => {
+        const tint = opts.color?.(it);
+        if (opts.include && !opts.include(it)) return;
+        const i = instance++;
         place(it, dummy); dummy.updateMatrix(); im.setMatrixAt(i, dummy.matrix);
-        if (opts.color) im.setColorAt(i, opts.color(it));
+        if (tint) im.setColorAt(i, tint);
         if (bendAttr) opts.bend!(it, bendAttr, i);
       });
       im.computeBoundingSphere();
@@ -169,6 +178,25 @@ export function createSea(scene: THREE.Scene, world: WorldData, quality: Quality
       });
     }
     return meshes;
+  };
+
+  // Swap a tiny static GLB into existing instance buckets after it loads. The
+  // fallback remains if loading fails; late loads never resurrect a disposed sea.
+  function useProp(id: PropId, meshes: THREE.InstancedMesh[], mat: THREE.Material) {
+    if (!meshes.length) return;
+    void loadPropGeometry(id).then(geo => {
+      if (disposed) { geo.dispose(); return; }
+      G(geo);
+      for (const mesh of meshes) {
+        const bend = mesh.geometry.getAttribute('aBend');
+        const next = bend ? G(geo.clone()) : geo;
+        if (bend) next.setAttribute('aBend', bend);
+        mesh.geometry = next; mesh.material = mat; mesh.computeBoundingSphere();
+      }
+    }).catch(error => console.warn(`Keeping scenery fallback for ${id}`, error));
+  }
+  const propMaterial = (kind: SeaKind, sway = false, bend = false) => {
+    const mat = seaMaterial('#ffffff', kind, sway, bend); mat.vertexColors = true; return mat;
   };
 
   // Boulders
@@ -187,7 +215,13 @@ export function createSea(scene: THREE.Scene, world: WorldData, quality: Quality
   const color = new THREE.Color();
   chunked('boulders', rockGeo(high ? 2 : 1), rockMat, world.boulders,
     (b, d) => { d.position.set(b.pos.x, b.pos.y, b.pos.z); d.rotation.set(0, b.rot, 0); d.scale.set(b.sx, b.sy, b.sz); },
-    { castShadow: true, range: 240, color: (b) => color.setHSL(0.1 + rng() * 0.05, 0.1 + rng() * 0.1, b.shade * 0.55) });
+    { include: b => !b.variant, castShadow: true, range: 240, color: (b) => color.setHSL(0.1 + rng() * 0.05, 0.1 + rng() * 0.1, b.shade * 0.55) });
+
+  const bladeFallback = G(new THREE.ConeGeometry(.6, 4, 5)); bladeFallback.translate(0, 2, 0);
+  const blades = chunked('blade-spire', bladeFallback, rockMat, world.boulders.filter(b => b.variant),
+    (b, d) => { d.position.set(b.pos.x, b.pos.y, b.pos.z); d.rotation.set(0, b.rot, 0); d.scale.set(b.sx, b.sy, b.sz); },
+    { castShadow: true, range: 240 });
+  useProp('blade-spire', blades, propMaterial('rock'));
 
   // Rock fragments scattered
   const fragItems: { pos: { x: number; y: number; z: number }; s: number; a: number }[] = [];
@@ -198,7 +232,13 @@ export function createSea(scene: THREE.Scene, world: WorldData, quality: Quality
   }
   chunked('frags', rockGeo(1), rockMat, fragItems,
     (f, d) => { d.position.set(f.pos.x, f.pos.y, f.pos.z); d.rotation.set(0, f.a, 0); d.scale.set(f.s * 1.5, f.s * 0.35, f.s); },
-    { range: 45, maxLength: 4.5, color: () => color.setHSL(0.1, 0.12, 0.42 + rng() * 0.2) });
+    { include: f => biomeAt(f.pos.x, f.pos.z) !== 'nursery', range: 45, maxLength: 4.5, color: () => color.setHSL(0.1, 0.12, 0.42 + rng() * 0.2) });
+
+  const pebbleFallback = G(new THREE.SphereGeometry(.3, 8, 3)); pebbleFallback.scale(1, .25, 1); pebbleFallback.translate(0, .075, 0);
+  const pebbles = chunked('pebble-cluster', pebbleFallback, rockMat, fragItems.filter(f => biomeAt(f.pos.x, f.pos.z) === 'nursery'),
+    (f, d) => { d.position.set(f.pos.x, f.pos.y, f.pos.z); d.rotation.set(0, f.a, 0); d.scale.setScalar(f.s * 4); },
+    { range: 45, maxLength: 4.5 });
+  useProp('pebble-cluster', pebbles, propMaterial('rock'));
 
   // Flora geometries (same reconstructions as the old build)
   const tube = (a: THREE.Vector3, b: THREE.Vector3, r: number, taper = 0.8) => {
@@ -237,8 +277,15 @@ export function createSea(scene: THREE.Scene, world: WorldData, quality: Quality
   for (let i = 0; i < (high ? 9 : 6); i++) { const a = rng() * TAU, t = 0.13 + rng() * 0.22, n = 0.2 + rng() * 0.4; tuftParts.push(curveTube([[0, 0, 0], [Math.cos(a) * t * 0.4, n * 0.4, Math.sin(a) * t * 0.4], [Math.cos(a) * t, n * 0.8, Math.sin(a) * t], [Math.cos(a + 0.2) * t * 1.2, n, Math.sin(a + 0.2) * t * 1.2]], 0.008, 4, 3)); }
   const tuftGeo = merged(tuftParts);
 
+  const cushionFallback = G(sacGeo.clone()); cushionFallback.scale(1.28, .6 / 1.13, 1.28);
+  const lettuceFallback = G(tuftGeo.clone()); lettuceFallback.scale(.8, .45 / .55, .8);
+  const spineFallback = G(sacGeo.clone()); spineFallback.scale(1.14, 2.6 / 1.13, 1.14);
+  const glassFallback = G(thalliGeo.clone()); glassFallback.scale(2, 1, .25);
+  const floraProps: Partial<Record<Flora['kind'], PropId>> = { cushion: 'cushion-sponge', lettuce: 'lettuce-tuft', spine: 'spine-sponge', glass: 'glass-fan' };
   const floraSlots = new Map<Flora, { attr: THREE.InstancedBufferAttribute; i: number }>();
   const floraSets: Record<string, { geo: THREE.BufferGeometry; mat: THREE.Material; items: typeof world.flora }> = {
+    cushion: { geo: cushionFallback, mat: spongeMat, items: [] }, lettuce: { geo: lettuceFallback, mat: tuftMat, items: [] },
+    spine: { geo: spineFallback, mat: spongeMat, items: [] }, glass: { geo: glassFallback, mat: spongeMat, items: [] },
     vauxia: { geo: vauxiaGeo, mat: spongeMat, items: [] }, sac: { geo: sacGeo, mat: spongeMat, items: [] },
     choia: { geo: choiaGeo, mat: spongeMat2, items: [] }, thalli: { geo: thalliGeo, mat: algaeMat, items: [] }, tuft: { geo: tuftGeo, mat: tuftMat, items: [] },
   };
@@ -248,10 +295,12 @@ export function createSea(scene: THREE.Scene, world: WorldData, quality: Quality
     // Sponges do not cast shadows: the sun is high and diffuse down here, and shadow-casting flora
     // was by far the most expensive thing in the frame (it is re-rendered for every viewport).
     const range = kind === 'tuft' ? 58 : kind === 'choia' ? 88 : kind === 'sac' ? 100 : 125;
-    chunked(`flora-${kind}`, set.geo, set.mat, set.items,
+    const meshes = chunked(`flora-${kind}`, set.geo, set.mat, set.items,
       (f, d) => { d.position.set(f.pos.x, f.pos.y, f.pos.z); d.rotation.set(0, f.rot, 0); d.scale.set(f.scale, f.sy, f.scale); },
-      { range, maxLength: kind === 'tuft' ? 7 : Infinity, color: (f) => color.setHSL(0.095 + rng() * 0.05, 0.14 + rng() * 0.12, f.shade * 0.72),
+      { range, maxLength: kind === 'tuft' ? 7 : Infinity, color: (f) => { const old = color.setHSL(0.095 + rng() * 0.05, 0.14 + rng() * 0.12, f.shade * 0.72); return floraProps[f.kind] ? color.setRGB(f.shade, f.shade, f.shade) : old; },
         bend: (f, attr, i) => floraSlots.set(f, { attr, i }) });
+    const propId = floraProps[kind as Flora['kind']];
+    if (propId) useProp(propId, meshes, propMaterial(kind === 'lettuce' ? 'algae' : 'sponge', kind === 'lettuce' || kind === 'glass', true));
   }
   /** Write a plant's sim bend into its instance attribute, in local geometry units. */
   const writeBend = (f: Flora, slot: { attr: THREE.InstancedBufferAttribute; i: number }) => {
@@ -341,7 +390,6 @@ export function createSea(scene: THREE.Scene, world: WorldData, quality: Quality
   const baseFog = high ? 0.0105 : 0.0125;
   const cur = { x: 0, y: 0, z: 0 };
   const shaftDummy = new THREE.Object3D();
-  let disposed = false;
   let pOrigin = new THREE.Vector3();
 
   return {

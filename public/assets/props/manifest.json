@@ -1,0 +1,120 @@
+{
+  "version": 1,
+  "units": "metres / world units",
+  "up": "+Y",
+  "pivot": "base centre",
+  "meshContract": "One mesh, one opaque vertex-colour material, one primitive, no textures, skins or animations.",
+  "props": [
+    {
+      "id": "cushion-sponge",
+      "file": "assets/props/cushion-sponge.glb",
+      "triangles": 480,
+      "triangleLimit": 500,
+      "width": 0.9,
+      "height": 0.6,
+      "depth": 0.914,
+      "bytes": 52764,
+      "biomes": [
+        "shallows",
+        "nursery"
+      ],
+      "rigging": false,
+      "movement": "Small shader bend only; no bones or clips."
+    },
+    {
+      "id": "lettuce-tuft",
+      "file": "assets/props/lettuce-tuft.glb",
+      "triangles": 392,
+      "triangleLimit": 400,
+      "width": 0.5,
+      "height": 0.45,
+      "depth": 0.5129,
+      "bytes": 43220,
+      "biomes": [
+        "shallows"
+      ],
+      "rigging": false,
+      "movement": "Soft shader sway and contact bend from the base; opaque green-gold shading suggests soft tissue."
+    },
+    {
+      "id": "pebble-cluster",
+      "file": "assets/props/pebble-cluster.glb",
+      "triangles": 294,
+      "triangleLimit": 300,
+      "width": 0.6,
+      "height": 0.15,
+      "depth": 0.6086,
+      "bytes": 32668,
+      "biomes": [
+        "shallows",
+        "nursery"
+      ],
+      "rigging": false,
+      "movement": "Static."
+    },
+    {
+      "id": "blade-spire",
+      "file": "assets/props/blade-spire.glb",
+      "triangles": 30,
+      "triangleLimit": 600,
+      "width": 1.2,
+      "height": 4,
+      "depth": 0.6882,
+      "bytes": 4124,
+      "biomes": [
+        "channel",
+        "escarpment",
+        "basin"
+      ],
+      "rigging": false,
+      "movement": "Static."
+    },
+    {
+      "id": "talus-shard",
+      "file": "assets/props/talus-shard.glb",
+      "triangles": 12,
+      "triangleLimit": 300,
+      "width": 1.5,
+      "height": 0.8,
+      "depth": 0.8571,
+      "bytes": 2164,
+      "biomes": [
+        "escarpment",
+        "basin"
+      ],
+      "rigging": false,
+      "movement": "Static."
+    },
+    {
+      "id": "spine-sponge",
+      "file": "assets/props/spine-sponge.glb",
+      "triangles": 476,
+      "triangleLimit": 800,
+      "width": 0.8,
+      "height": 2.6,
+      "depth": 0.808,
+      "bytes": 52320,
+      "biomes": [
+        "escarpment",
+        "basin"
+      ],
+      "rigging": false,
+      "movement": "Stiff shader contact bend only; no bones or clips."
+    },
+    {
+      "id": "glass-fan",
+      "file": "assets/props/glass-fan.glb",
+      "triangles": 900,
+      "triangleLimit": 900,
+      "width": 1.6,
+      "height": 1.4,
+      "depth": 0.0753,
+      "bytes": 98100,
+      "biomes": [
+        "basin"
+      ],
+      "rigging": false,
+      "movement": "Gentle shader sway/contact bend at the stalk; lattice is solid geometry, no alpha."
+    }
+  ]
+}
