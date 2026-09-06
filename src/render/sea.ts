@@ -385,11 +385,13 @@ export function createSea(scene: THREE.Scene, world: WorldData, quality: Quality
     if (pending.length) {
       pending.sort((a, b) => (a.detail === b.detail ? a.d - b.d : a.detail === 'full' ? -1 : 1));
       // Nearest full views first, then far tiles, inside a time budget so a slow machine streams
-      // more slowly rather than stuttering. At least one view is always built.
+      // more slowly rather than stuttering. At least one view is always built, and the budget
+      // opens up when a lot is outstanding (match start, a teleport) so the ground fills in fast.
+      const budget = pending.length > 60 ? 14 : pending.length > 20 ? 9 : 6;
       const t0 = performance.now();
       for (const p of pending) {
         buildView(p.cx, p.cz, p.detail);
-        if (performance.now() - t0 > 6) break;
+        if (performance.now() - t0 > budget) break;
       }
     }
   };
