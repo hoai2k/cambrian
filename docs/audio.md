@@ -64,6 +64,23 @@ npx esbuild tools/audio-mix-test.ts --bundle --platform=node --format=esm --outf
 It fails if a player would hear more than three one-shots a second, or hears
 anything from more than 60 m away.
 
+## Levels
+
+A sample can measure loud and still be inaudible in play. `ui-start` was: almost all of its
+energy sat below 150 Hz, where laptop and phone speakers do not reproduce, so it read as
+silence at any volume. Its peak above 150 Hz was −26.7 dBFS, sixteen decibels under the UI
+sounds either side of it.
+
+So the workbench measures every sample twice — as it is, and again through a 150 Hz high-pass —
+and it is the second number, shown on each file chip, that says whether a player will hear it.
+"Measure levels" decodes the whole library and flags anything whose mid-band peak is under
+−18 dBFS (`QUIET_MID_PEAK` in `src/workbench/levels.ts`). Run it after regenerating a sound.
+
+This is worth knowing when writing prompts: asking for "deep", "muffled", "dull" or "low"
+reliably produces a sub-bass rumble that meters loud and plays silent. Name something with a
+midrange instead — a squelch, a wet crack, a wooden knock, bubbles — and say "close and
+present".
+
 ## Music
 
 `src/audio/music.ts` holds the track list. One track is the **opener** and plays first every
@@ -104,9 +121,16 @@ ELEVENLABS_API_KEY=... node tools/gen-sfx.mjs parry
 
 Edit the prompt in the MANIFEST at the same time, so the file on disk and the
 prompt that produced it stay in step. Generation is a lottery — ask for several
-takes and pick one. A spectrogram is a fast way to tell them apart without an
-audio player: a metallic ring shows up as sustained horizontal partials in the
-high frequencies, a dry shell knock as a broadband transient that decays fast.
+takes and pick one. Sounds listed in `LOW_INFLUENCE` are generated at a lower
+`prompt_influence`, which leaves the model room to make a real recording rather
+than reciting the adjectives back; that is what got the organic takes.
+
+Two measurements tell most takes apart without an audio player: the level above
+150 Hz (see **Levels**), and the share of energy above about 2.5 kHz — the old
+`ability` had 78% of its energy up there, which is what "metallic" sounded like.
+Trust those over a spectrogram picture; the log-frequency plots that
+`ffmpeg -lavfi showspectrumpic` draws carry a bright horizontal line that is an
+artifact of the rendering, not a tone in the file.
 
 ## The workbench
 
@@ -117,6 +141,10 @@ in the game it fires from. It starts the audio graph with `ambience: false`, so
 the music and the reef bed stay off and single sounds can be heard clean; play
 them from the "Beds & music" section to hear them.
 
+A sound can also carry **backup takes** — earlier versions kept in the library but not wired
+into `SAMPLES`, listed in the catalogue's `alts` and shown as dashed chips. `escape` has one.
+Swapping one in is a rename.
+
 `node tools/workbench-smoke.mjs <outdir>` drives it headlessly against
-`npm run preview`, and reports any sample file the catalogue lists but the
-library does not have.
+`npm run preview`, measures the library, and reports any sample the catalogue lists that is
+missing or too quiet to read.
