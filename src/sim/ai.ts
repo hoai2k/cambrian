@@ -71,7 +71,8 @@ export function updateDetection(g: AiWorld, hunter: Actor, b: BrainState, dt: nu
     const sizeF = clamp(lengthOf(t) / L * 2.5, 0.25, 1.5);
     const speed = len3(t.vel);
     const motion = t.state === 'attack' ? 1.5 : speed > 0.3 ? (t.burstT > 0 || t.noise > 2 ? 2.5 : 1) : 0.5;
-    const coverF = (isHidden(t) ? 0.03 : 1 - t.cover * 0.95) * (L > 1.2 && nurseryFactor(t.pos.x, t.pos.z) > 0.35 ? 0.12 : 1);
+    const camo = t.hideMode === 'camouflage' ? 1 - t.camoStrength * (speed < .4 ? .88 : .70) : 1;
+    const coverF = camo * (isHidden(t) ? 0.03 : 1 - t.cover * 0.95) * (L > 1.2 && nurseryFactor(t.pos.x, t.pos.z) > 0.35 ? 0.12 : 1);
     const distF = clamp(1.6 - d / range, 0.2, 1.6);
     // Only clear signals grow the score: a still or covered target decays out of attention.
     const rate = sight * sizeF * motion * coverF * distF * 1.1 - 0.35;
@@ -186,6 +187,7 @@ export function thinkNeeds(g: AiWorld, a: Actor, b: BrainState, dt: number): Inp
   }
 
   const t = b.target >= 0 ? g.byId(b.target) : undefined;
+  if(a.hideMode === 'burrowed' && b.goal !== 'flee') out.ability = true;
   switch (b.goal) {
     case 'flee': {
       if (!t || !isAlive(t) || (b.courage > 0.6 && b.goalT > 12)) { b.goal = 'wander'; b.goalT = 0; break; }
@@ -198,7 +200,10 @@ export function thinkNeeds(g: AiWorld, a: Actor, b: BrainState, dt: number): Inp
         if (dist(a.pos, cover.pos) < cover.radius * 0.5) { out.worldMove = v3(); out.burst = 0; return out; } // hide, hold still
       }
       out.worldMove = dir; out.burst = a.stamina > 25 ? 1 : 0;
-      if (a.abilityCd <= 0 && (def.ability === 'tailFlick' || def.ability === 'burrow' || def.ability === 'enroll' || def.ability === 'shellUp' || ['ribbonSlip', 'sedimentDive', 'combCruise', 'adhesiveGlide', 'bellCorral'].includes(def.ability)) && dist(a.pos, t.pos) < L * 3) out.ability = true;
+      if (a.hideMode === 'none' && a.hideCd <= 0 && a.stamina > 10 && (def.ability === 'tailFlick' || def.ability === 'burrow' || def.ability === 'enroll' || def.ability === 'shellUp' || ['ribbonSlip', 'sedimentDive', 'combCruise', 'adhesiveGlide', 'bellCorral'].includes(def.ability)) && dist(a.pos, t.pos) < L * 3) out.ability = true;
+      if(out.ability) out.burst = 0;
+      if(a.hideMode === 'burrowed') { out.worldMove = v3(); out.burst = 0; }
+      else if(a.hideMode !== 'none') out.burst = 0;
       break;
     }
     case 'hunt': {
@@ -210,7 +215,7 @@ export function thinkNeeds(g: AiWorld, a: Actor, b: BrainState, dt: number): Inp
       steerToward(a, predicted, out);
       out.burst = d > L * 2.5 && a.stamina > 20 ? 1 : 0;
       if (d < L * 0.9 + lengthOf(t) * 0.4) { if (lengthOf(t) > L * 0.45 && a.state === 'free') out.heavy = true; else out.light = true; }
-      if (a.controller === 'bot' && d < L * 3 && def.ability === 'ambushSurge' && a.abilityCd <= 0) out.ability = true;
+      if (a.controller === 'bot' && d < L * 3 && def.ability === 'ambushSurge') out.burst = 1;
       break;
     }
     case 'fight': {
@@ -240,7 +245,7 @@ export function thinkNeeds(g: AiWorld, a: Actor, b: BrainState, dt: number): Inp
         const roll = g.rng();
         if (roll < 0.55) out.light = true;
         else if (roll < 0.8 && a.stamina > 30) out.heavy = true;
-        else if (a.abilityCd <= 0) out.ability = true;
+        else if (a.abilityCd <= 0) out.heavy = true;
         b.reactT = b.reaction * 1.5;
       }
       if (a.hp < a.hpMax * 0.3 && a.controller !== 'bot') { b.goal = 'flee'; b.goalT = 0; }
@@ -251,12 +256,12 @@ export function thinkNeeds(g: AiWorld, a: Actor, b: BrainState, dt: number): Inp
         const bloom = g.world.blooms.reduce<(typeof g.world.blooms)[number] | undefined>((best, v) => !best || dist(a.pos, v.pos) < dist(a.pos, best.pos) ? v : best, undefined);
         if (bloom) {
           steerToward(a, bloom.pos, out, dist(a.pos, bloom.pos) < bloom.radius * .7 ? .25 : .65);
-          if (a.abilityCd <= 0 && dist(a.pos, bloom.pos) < bloom.radius) out.ability = true;
+          if (a.abilityCd <= 0 && dist(a.pos, bloom.pos) < bloom.radius) out.heavy = true;
         }
       } else {
         out.worldMove = vscale(heading(a.yaw), def.diet ? .2 : 0);
         if (def.diet === 'deposit') out.sink = true;
-        if (a.abilityCd <= 0 && def.ability === 'adhesiveGlide') out.ability = true;
+        if (def.ability === 'adhesiveGlide') out.guard = true;
       }
       if (b.goalT > 6) { b.goal = 'wander'; pickWander(a, b, g.rng, 20); }
       break;

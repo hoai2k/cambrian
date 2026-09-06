@@ -1,3 +1,4 @@
+import { SAND_COLORS, floraTint, rockTint } from '../shared/environment-colors';
 import * as THREE from 'three';
 import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js';
 import { clamp, makeRng, TAU } from '../shared/math';
@@ -221,7 +222,7 @@ export function createSea(scene: THREE.Scene, world: WorldData, quality: Quality
    * where the beach climbs out of the water.
    */
   const tileW: BiomeWeights = { shallows: 0, nursery: 0, shelf: 0, forest: 0, boulders: 0, flats: 0, channel: 0, escarpment: 0, basin: 0 };
-  const sandColors = Object.fromEntries(BIOMES.map((b) => [b, new THREE.Color(ATMOS[b].sand)])) as Record<Biome, THREE.Color>;
+  const sandColors = Object.fromEntries(BIOMES.map((b) => [b, new THREE.Color(SAND_COLORS[b])])) as Record<Biome, THREE.Color>;
   const beach = new THREE.Color('#d9cfa4');
   const terrainTile = (view: ChunkView, segs: number) => {
     const x0 = view.x - CHUNK / 2, z0 = view.z - CHUNK / 2, step = CHUNK / segs;
@@ -338,7 +339,7 @@ export function createSea(scene: THREE.Scene, world: WorldData, quality: Quality
     terrainTile(view, detail === 'full' ? (high ? 32 : 20) : 8);
     instanced(view, 'boulders', boulderGeo, rockMat, chunk.boulders,
       (b, d) => { d.position.set(b.pos.x, b.pos.y, b.pos.z); d.rotation.set(0, b.rot, 0); d.scale.set(b.sx, b.sy, b.sz); },
-      { include: b => !b.variant, castShadow: detail === 'full', range: 400, color: (b) => color.setHSL(0.1 + crng() * 0.05, 0.1 + crng() * 0.1, b.shade * 0.55) });
+      { include: b => !b.variant, castShadow: detail === 'full', range: 400, color: (b) => color.fromArray(rockTint(b)) });
     for (const id of ['blade-spire', 'talus-shard'] as const) {
       instanced(view, id, id === 'blade-spire' ? bladeFallback : talusFallback, rockMat, chunk.boulders.filter(b => b.variant === id),
         (b, d) => { d.position.set(b.pos.x, b.pos.y, b.pos.z); d.rotation.set(0, b.rot, 0); d.scale.set(b.sx, b.sy, b.sz); },
@@ -368,7 +369,7 @@ export function createSea(scene: THREE.Scene, world: WorldData, quality: Quality
       const range = kind === 'tuft' ? 58 : kind === 'choia' ? 88 : kind === 'sac' ? 100 : kind === 'thalli' ? 100 : 125;
       instanced(view, `flora-${kind}`, set.geo, set.mat, items,
         (f, d) => { d.position.set(f.pos.x, f.pos.y, f.pos.z); d.rotation.set(0, f.rot, 0); d.scale.set(f.scale, f.sy, f.scale); },
-        { prop: floraProps[kind as Flora['kind']], range, maxLength: kind === 'tuft' || kind === 'lettuce' ? 7 : Infinity, color: (f) => { const old = color.setHSL(0.095 + crng() * 0.05, 0.14 + crng() * 0.12, f.shade * 0.72); return floraProps[f.kind] ? color.setRGB(f.shade, f.shade, f.shade) : old; },
+        { prop: floraProps[kind as Flora['kind']], range, maxLength: kind === 'tuft' || kind === 'lettuce' ? 7 : Infinity, color: (f) => color.fromArray(floraTint(f)),
           bend: (f, attr, i) => floraSlots.set(f, { attr, i }) });
     }
 

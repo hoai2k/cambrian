@@ -1,3 +1,4 @@
+import { BURROWERS, HEAVY_SPECIALS, DEFENSIVE_SPECIALS, CAMOUFLAGE_DRAIN, camouflageMatch, clearPursuit, stopHiding } from './concealment';
 import { abilitySpeed, beginExpansionAbility, stepExpansionAbility, bloomRate, grazeRate } from './expansion-abilities';
 import { add, clamp, damp, dist, distXZ, dot, heading, len3, lerp, makeRng, norm, scale as vscale, sub, TAU, v3, wrapAngle, yawOf, type Rng, type Vec3 } from '../shared/math';
 import { applyScaleStats, bandOf, bodyRadius, canAct, clearanceOf, isAlive, isHidden, isInvulnerable, lengthOf, makeActor, massOf, speedFactor, staminaCost } from './actors';
@@ -402,7 +403,7 @@ export class Game implements AiWorld {
     this.world.loadAround(nursery);
     a.pos = this.spawnPoint(nursery, a.creature, a.scale, a.player);
     a.vel = v3(); a.state = 'free'; a.stateT = 0; a.respawnT = 0; a.corpseT = 0; a.eaten = 0;
-    a.spawnProtect = 3.5; a.hitFlash = 0; a.abilityActive = false; a.abilityCd = 0; a.lockTarget = -1; a.hunted = 0; a.hunterId = -1; a.wasHunted = false; a.swallowedBy = -1; a.bank = 0; a.pitch = 0;
+    stopHiding(a); a.camoStrength = 0; a.hideCd = 0; a.emergenceHeavy = false; a.spawnProtect = 3.5; a.hitFlash = 0; a.abilityActive = false; a.abilityCd = 0; a.lockTarget = -1; a.hunted = 0; a.hunterId = -1; a.wasHunted = false; a.swallowedBy = -1; a.bank = 0; a.pitch = 0;
     a.yaw = Math.PI;
     // hatch-in: grow from a speck over a second (reuses the moult state with a smaller start scale)
     a.hatching = true; a.state = 'moult'; a.stateT = 0; a.stateDur = 1.0;
@@ -429,7 +430,7 @@ export class Game implements AiWorld {
     if (a.sinceHit > 6 && a.hp < a.hpMax && a.state !== 'dead') a.hp = Math.min(a.hpMax, a.hp + a.hpMax * (a.controller === 'player' || a.controller === 'bot' ? 0.035 : 0.02) * dt);
     if (a.brain) a.brain.courage = Math.min(1, a.brain.courage + 0.05 * dt);
 
-    if (a.state !== 'ability') a.abilityActive = false;
+    if (a.state !== 'ability') a.abilityActive = (a.state === 'guard' || a.state === 'parry') && DEFENSIVE_SPECIALS.has(def.ability);
 
     // Timers
     a.stateT += dt;
@@ -440,6 +441,7 @@ export class Game implements AiWorld {
     a.abilityCd = Math.max(0, a.abilityCd - dt);
     a.senseCd = Math.max(0, a.senseCd - dt);
     a.senseT = Math.max(0, a.senseT - dt);
+    if (def.ability === 'whipSearch' && a.senseT > 0) stepExpansionAbility(this.expansionContext(), a, def, dt);
     a.burstT = Math.max(0, a.burstT - dt);
     a.comboT = Math.max(0, a.comboT - dt);
     a.dodgeTapT = Math.max(0, a.dodgeTapT - dt);
@@ -449,14 +451,52 @@ export class Game implements AiWorld {
     if (a.poise < a.poiseMax && a.state !== 'stagger') a.poise = Math.min(a.poiseMax, a.poise + a.poiseMax * dt / 3);
     a.cover = this.coverFor(a);
 
+    // Hiding is independent of defensive/combat states and available at every growth tier.
+    a.hideCd = Math.max(0, a.hideCd - dt);
+    if (a.hideMode !== 'none' && (!isAlive(a) || ['grabbed', 'grabbing', 'stagger', 'swallowed', 'moult'].includes(a.state))) stopHiding(a);
+    if (justAbility && (a.state === 'free' || a.state === 'guard')) {
+      if (a.hideMode !== 'none') {
+        const buried = a.hideMode === 'burrowed'; stopHiding(a);
+        if (buried) { a.emergenceHeavy = true; this.emergeStrike(a, def); }
+      } else if (a.hideCd === 0 && (BURROWERS.has(a.creature) || a.stamina >= 8)) {
+        a.state = 'free'; a.abilityActive = false; a.hideT = 0; a.seen = 0;
+        if (BURROWERS.has(a.creature)) a.hideMode = 'descending';
+        else {
+          a.hideMode = 'camouflage'; a.stamina -= 3;
+          const match = camouflageMatch(a, this.world, this.nearby(a.pos, 80));
+          a.camoColors = match.colors; a.camoScheme = match.scheme; a.camoLabel = match.label; a.camoSource = match.actor;
+        }
+        clearPursuit(a, this.actors); this.flag(a, 'ability');
+      }
+    }
+    if (a.hideMode !== 'none' && (justLight || justHeavy || input.guard || input.burst > .1 || justDash)) {
+      const buried = a.hideMode === 'burrowed'; stopHiding(a);
+      a.emergenceHeavy = false;
+      if (buried && (justLight || justHeavy)) this.emergeStrike(a, def);
+    }
+    if (a.hideMode !== 'none') a.hideT += dt;
+    if (a.hideMode === 'descending' && a.hideT > 10 && a.grounded && a.pos.y > sampleHeight(a.pos.x,a.pos.z) + clearanceOf(a) + .3) stopHiding(a);
+    if (a.hideMode === 'descending' && a.pos.y <= sampleHeight(a.pos.x, a.pos.z) + clearanceOf(a) + .15) {
+      a.hideMode = 'burrowed'; a.hideT = 0; a.seen = 0; a.vel = v3();
+      clearPursuit(a, this.actors);
+      this.silt.push({pos:{...a.pos}, radius:L*.7, t:1.5});
+    }
+    a.camoStrength = damp(a.camoStrength, a.hideMode === 'camouflage' ? 1 : 0, 3, dt);
+    if (a.hideMode === 'camouflage') {
+      a.stamina = Math.max(0, a.stamina - CAMOUFLAGE_DRAIN * dt);
+      if (a.stamina === 0) stopHiding(a);
+    }
+    if (a.state === 'guard' || a.state === 'parry') a.guardHeld += dt;
+    else a.guardHeld = 0;
     // Stamina
     const speed = len3(a.vel);
     const burstIn = input.burst;
     const bursting = burstIn > 0.1 && a.stamina > 0 && a.state !== 'guard' && a.exhausted === 0;
+    if (def.ability === 'ambushSurge' && input.burst > .1 && !a.prev.burst && a.abilityCd <= 0) { a.burstT = 2.2; a.abilityCd = 10; }
     const freeBurst = a.burstT > 0;
     if (bursting && !freeBurst) a.stamina -= 22 * burstIn * dt;
     else if (a.state === 'guard') a.stamina -= 3 * dt;
-    else a.stamina = Math.min(a.staminaMax, a.stamina + (speed < 0.4 ? 24 : 14) * dt * (a.state === 'free' ? 1 : 0.5));
+    else if (a.hideMode !== 'camouflage') a.stamina = Math.min(a.staminaMax, a.stamina + (speed < 0.4 ? 24 : 14) * dt * (a.state === 'free' ? 1 : 0.5));
     if (a.stamina <= 0) { a.stamina = 0; if (a.exhausted === 0) a.exhausted = 1.6; }
 
     // Movement: desired direction
@@ -485,7 +525,7 @@ export class Game implements AiWorld {
     }
     if (def.ground) dir.y = 0;
     const controllable = a.holdT === 0 && (a.state === 'free' || a.state === 'guard' || (a.state === 'ability' && (def.mobileAbility || def.ability === 'shellUp' || def.ability === 'bristleFlare' || def.ability === 'ambushSurge')));
-    const slowMult = abilitySpeed(a) * (a.state === 'guard' ? 0.45 : (a.abilityActive && def.ability === 'shellUp') ? 0.35 : a.exhausted > 0 ? 0.7 : 1);
+    const slowMult = abilitySpeed(a) * (a.state === 'guard' ? (def.ability === 'anchor' ? 0 : def.ability === 'enroll' ? .8 : .45) : (a.abilityActive && def.ability === 'shellUp') ? 0.35 : a.exhausted > 0 ? 0.7 : 1);
     const burstMult = controllable && (bursting || freeBurst) ? (1 + (def.burst - 1) * (freeBurst ? 1.25 : burstIn) * (a.controller === 'swarm' ? 0.55 : giantish ? 0.35 : 1)) : 1;
     const cruise = def.speed * sf * slowMult * (a.controller === 'swarm' ? 0.62 : giantish ? 0.55 : 1);
     const cur = sampleCurrent(v3(), a.pos.x, a.pos.y, a.pos.z, this.time);
@@ -522,14 +562,23 @@ export class Game implements AiWorld {
         a.pos.x += h.x * lungeSpeed * dt; a.pos.z += h.z * lungeSpeed * dt; a.pos.y += pitchDir * lungeSpeed * dt * 0.6;
       }
     }
-    if (a.state === 'ability' && def.ability === 'enroll' && def.ground) {
+    if (a.state === 'guard' && def.ability === 'enroll' && def.ground) {
       // roll downhill and with the current
       const gx = sampleHeight(a.pos.x + 0.5, a.pos.z) - sampleHeight(a.pos.x - 0.5, a.pos.z);
       const gz = sampleHeight(a.pos.x, a.pos.z + 0.5) - sampleHeight(a.pos.x, a.pos.z - 0.5);
       a.vel.x += (-gx * 6 + cur.x * 2 + dir.x * 3 * mag) * dt; a.vel.z += (-gz * 6 + cur.z * 2 + dir.z * 3 * mag) * dt;
       a.roll += len3(a.vel) * dt / (L * 0.25);
+      if (len3(a.vel)>3) for(const o of this.nearby(a.pos,L*.9)) {
+        if(o.id===a.id || !isAlive(o) || a.hitDone.has(o.id) || this.expansionContext().allies(a,o)) continue;
+        a.hitDone.add(o.id); applyHit(this.hitCtx,a,o,{...def.light,damage:10,poise:40,knockback:4},.5);
+      }
     } else a.roll = damp(a.roll, 0, 6, dt);
 
+    // Idle camouflage sinks gently; any explicit translation cancels that extra descent.
+    const explicitMotion = Math.abs(input.mx) + Math.abs(input.my) > .08 || !!input.rise || !!input.sink || !!(input.worldMove && len3(input.worldMove) > .08);
+    if (a.hideMode === 'camouflage' && !explicitMotion && !def.ground) a.vel.y = damp(a.vel.y, -.32, 2, dt);
+    if (a.hideMode === 'descending') { a.vel.x *= Math.exp(-6*dt); a.vel.z *= Math.exp(-6*dt); a.vel.y = -Math.max(.8, L*.5); a.hopVel = Math.min(a.hopVel, -1); }
+    if (a.hideMode === 'burrowed') { a.vel = v3(); a.pos.y = sampleHeight(a.pos.x,a.pos.z) + clearanceOf(a); a.hopVel = 0; }
     // Integrate
     if (a.hitStop === 0) {
       a.pos.x += a.vel.x * dt; a.pos.y += a.vel.y * dt; a.pos.z += a.vel.z * dt;
@@ -537,7 +586,7 @@ export class Game implements AiWorld {
 
     // Hop (crawlers)
     if (def.ground) {
-      if (justRise && a.grounded && controllable && a.stamina > 8) { a.hopVel = 5.5 * Math.sqrt(sf); a.grounded = false; a.stamina -= 8; a.iframes = Math.max(a.iframes, 0.12); }
+      if (a.hideMode === 'none' && justRise && a.grounded && controllable && a.stamina > 8) { a.hopVel = 5.5 * Math.sqrt(sf); a.grounded = false; a.stamina -= 8; a.iframes = Math.max(a.iframes, 0.12); }
       if (!a.grounded) { a.pos.y += a.hopVel * dt; a.hopVel -= 16 * dt; }
     }
 
@@ -583,11 +632,11 @@ export class Game implements AiWorld {
     }
 
     // Noise / stillness
-    a.noise = a.state === 'attack' ? 1.5 : (bursting && !freeBurst) ? 2.5 : speed > 0.4 ? 1 : 0.5;
+    a.noise = a.hideMode !== 'none' ? .1 : a.state === 'attack' ? 1.5 : (bursting && !freeBurst) ? 2.5 : speed > 0.4 ? 1 : 0.5;
     a.stillness = speed < 0.3 ? Math.min(3, a.stillness + dt) : 0;
 
     // --- Actions ---
-    if (a.state === 'free' || a.state === 'guard') {
+    if ((a.state === 'free' || a.state === 'guard') && a.hideMode !== 'burrowed' && a.hideMode !== 'descending') {
       // Aim (LT held): the camera owns the crosshair; whatever it reports is the target. Bots toggle lock.
       if (a.controller === 'player') {
         a.aiming = input.aim;
@@ -602,15 +651,18 @@ export class Game implements AiWorld {
         if (nt) { a.lockTarget = nt.id; a.comboT = 0.4; }
       }
       // Sense
-      if (justSense && a.senseCd === 0) { a.senseT = 2.2; a.senseCd = def.ability === 'burrow' ? 3 : 6; this.flag(a, 'sense'); this.events.push({ kind: 'sense', pos: { ...a.pos }, actor: a.id, player: a.player }); }
+      if (justSense && a.senseCd === 0) { a.senseT = def.ability === 'whipSearch' ? 3.6 : 2.2; a.senseCd = def.ability === 'burrow' ? 3 : 6; this.flag(a, 'sense'); this.events.push({ kind: 'sense', pos: { ...a.pos }, actor: a.id, player: a.player }); }
       // Ability
-      if (justAbility && a.abilityCd === 0 && a.tier >= 2 || (justAbility && a.abilityCd === 0 && a.controller !== 'player')) this.startAbility(a, def);
+      if (justHeavy && a.emergenceHeavy) this.emergeStrike(a, def);
+      else if (justHeavy && HEAVY_SPECIALS.has(def.ability) && a.abilityCd <= 0 && a.stamina >= 18) {
+        a.stamina -= 18; this.startAbility(a, def); a.abilityCd = Math.max(2, a.stateDur + .6); this.flag(a, 'heavy');
+      }
       // Dash (LB): with a stick direction it fires at once; with a neutral stick it is queued for the
       // moment the stick moves. Fast and long enough to clear a predator's bite.
       else if (justDash && mag <= 0.3 && !input.worldMove) { a.dashQueued = true; }
       else if ((justDash || a.dashQueued) && mag > 0.3 && a.stamina >= 10 && a.exhausted === 0 && a.dashCd === 0 && !a.dashUsed) { a.dashUsed = true; a.dashQueued = false; this.startDash(a, def, dir, L, sf); }
       // Pounce (RT): at the aimed target when in range, else at whatever prey is in front, else a forward lunge
-      else if (justHeavy && a.controller === 'player' && a.pounceCd === 0 && a.stamina >= 12 && a.exhausted === 0) {
+      else if (justHeavy && !HEAVY_SPECIALS.has(def.ability) && a.controller === 'player' && a.pounceCd === 0 && a.stamina >= 12 && a.exhausted === 0) {
         const t = a.aiming && locked && isAlive(locked) ? (a.aimInRange ? locked : undefined) : this.pounceTargetAhead(a);
         if (t) this.startPounce(a, t, L, sf);
         else { const m = { ...def.heavy, lunge: def.heavy.lunge + 1.0 }; a.state = 'attack'; a.stateT = 0; a.move = m; a.moveKind = 'heavy'; a.hitDone.clear(); a.stamina -= staminaCost(a, m.stamina); a.combo = 0; a.pounceCd = 0.8; this.flag(a, 'heavy'); }
@@ -618,12 +670,12 @@ export class Game implements AiWorld {
       // Dodge (B for creatures that cannot guard, bots)
       else if (justDodge && a.controller !== 'player' && a.stamina >= 10 && a.exhausted === 0) this.startDodge(a, def, dir, mag, L, sf);
       // Guard / parry
-      else if (justGuard && def.canGuard && a.stamina > 5) { a.state = 'parry'; a.stateT = 0; a.stateDur = 0.15; this.flag(a, 'guard'); }
+      else if (justGuard && def.canGuard && a.stamina > 5) { a.state = 'parry'; a.stateT = 0; a.hitDone.clear(); a.stateDur = def.ability === 'anchor' || def.ability === 'bristleFlare' ? .28 : .15; a.abilityActive = DEFENSIVE_SPECIALS.has(def.ability); this.blockPulse(a, def); this.flag(a, 'guard'); }
       else if (justGuard && !def.canGuard && a.stamina >= 10 && a.exhausted === 0) this.startDodge(a, def, dir, mag, L, sf);
       else if (input.guard && def.canGuard && a.state === 'free' && a.stamina > 0 && a.stateT > 0.05) { a.state = 'guard'; a.stateT = 0; }
-      else if (!input.guard && a.state === 'guard') { a.state = 'free'; a.stateT = 0; }
+      else if (!input.guard && a.state === 'guard') { if (def.ability === 'shellUp' && a.guardHeld > .6) this.blockPulse(a, def); a.state = 'free'; a.stateT = 0; a.abilityActive = false; }
       // Attacks (also start eating on corpses)
-      else if (justLight || (justHeavy && a.controller !== 'player')) {
+      else if (justLight || (justHeavy && a.controller !== 'player' && !HEAVY_SPECIALS.has(def.ability))) {
         const corpse = justLight ? this.corpseInReach(a) : undefined;
         if (corpse) this.startEating(a, corpse);
         else {
@@ -797,6 +849,24 @@ export class Game implements AiWorld {
   }
 
   /** LB: a burst of speed in the stick direction with invulnerability, covering a few body lengths. */
+  private emergeStrike(a: Actor, def: ReturnType<typeof creature>) {
+    a.emergenceHeavy = false; a.state = 'attack'; a.stateT = 0;
+    a.move = { ...def.heavy, name: 'Emergence strike', stamina: 0, poise: def.heavy.poise + 12 };
+    a.moveKind = 'heavy'; a.hitDone.clear(); a.seen = 1;
+    this.silt.push({pos:{...a.pos}, radius:lengthOf(a)*.7, t:1.5});
+    this.flag(a, 'heavy');
+  }
+
+  private blockPulse(a: Actor, def: ReturnType<typeof creature>) {
+    if (!['bellCorral', 'shellUp'].includes(def.ability) || a.abilityCd > 0 || a.stamina < 10) return;
+    if (def.ability === 'shellUp' && a.guardHeld < .6) return;
+    a.stamina -= 10; a.abilityCd = 4;
+    for (const o of this.nearby(a.pos, lengthOf(a)*1.15)) {
+      if (o.id === a.id || !isAlive(o) || this.expansionContext().allies(a,o)) continue;
+      applyHit(this.hitCtx,a,o,{...def.light,damage:def.ability==='bellCorral'?7:0,poise:35,knockback:5,sweep:true},0);
+    }
+  }
+
   private startDash(a: Actor, def: ReturnType<typeof creature>, dir: Vec3, L: number, sf: number) {
     let d: Vec3 = { ...dir }; if (def.ground) d.y = 0; d = norm(d);
     a.state = 'dodge'; a.stateT = 0; a.stateDur = 0.42;
@@ -804,6 +874,10 @@ export class Game implements AiWorld {
     const power = (L * 9.5 + 7) * (def.id === 'waptia' ? 1.2 : 1);
     a.vel.x = d.x * power; a.vel.y = def.ground ? a.vel.y : d.y * power * 0.7; a.vel.z = d.z * power;
     a.dodgeDir = d;
+    if (['tailFlick','ribbonSlip'].includes(def.ability)) {
+      this.silt.push({pos:{...a.pos},radius:L,t:2}); clearPursuit(a,this.actors);
+    }
+    if (def.ability === 'combCruise') { a.burstT = 1; a.stamina = Math.min(a.staminaMax,a.stamina+4); }
     this.events.push({ kind: 'dodge', pos: { ...a.pos }, actor: a.id, player: a.player, strength: L });
     this.flag(a, 'dodge');
   }
@@ -822,32 +896,15 @@ export class Game implements AiWorld {
       allies: (a: Actor, b: Actor) => this.mode === 'rise' && a.controller === 'player' && b.controller === 'player' };
   }
 
+  /** Internal animation state for native heavy specials; Y never calls this. */
   private startAbility(a: Actor, def: ReturnType<typeof creature>) {
-    if (def.ability === 'sedimentDive' && !a.grounded) return;
-    a.abilityCd = def.abilityCooldown;
+    if (!HEAVY_SPECIALS.has(def.ability)) return;
+    a.abilityCd = Math.max(2, (def.abilityDuration ?? .55) + .6);
     a.abilityT = 0; a.abilityActive = true; a.state = 'ability'; a.stateT = 0;
-    const L = lengthOf(a);
-    a.hitDone.clear();
+    a.stateDur = def.abilityDuration ?? .55; a.hitDone.clear();
     beginExpansionAbility(this.expansionContext(), a, def);
-    switch (def.ability) {
-      case 'ambushSurge': a.stateDur = 0.1; a.burstT = 2.2; a.abilityActive = false; a.state = 'free'; break;
-      case 'snatch': a.stateDur = 0.55; break;
-      case 'tailFlick': {
-        const back = vscale(heading(a.yaw), -1);
-        a.stateDur = 0.42; a.iframes = 0.45; a.vel = { x: back.x * 12, y: 1.2, z: back.z * 12 };
-        this.silt.push({ pos: { ...a.pos }, radius: 2.5 + L * 0.8, t: 4.5 });
-        for (const o of this.actors) if (o.lockTarget === a.id) o.lockTarget = -1;
-        this.events.push({ kind: 'silt', pos: { ...a.pos }, actor: a.id, player: a.player, strength: L });
-        break;
-      }
-      case 'bristleFlare': a.stateDur = 3; break;
-      case 'anchor': a.stateDur = 4; break;
-      case 'shellUp': a.stateDur = 3; break;
-      case 'burrow': a.stateDur = 8; a.lockTarget = -1; for (const o of this.actors) if (o.lockTarget === a.id) o.lockTarget = -1; break;
-      case 'enroll': a.stateDur = 5; break;
-    }
-    this.events.push({ kind: 'ability', pos: { ...a.pos }, actor: a.id, player: a.player, strength: L });
-    this.flag(a, 'ability');
+    this.events.push({kind:'ability',pos:{...a.pos},actor:a.id,player:a.player,strength:lengthOf(a)});
+    this.flag(a, 'heavy');
   }
 
   private updateAbility(a: Actor, def: ReturnType<typeof creature>, dt: number, input: InputFrame, L: number, sf: number) {
@@ -861,7 +918,7 @@ export class Game implements AiWorld {
           const h = heading(a.yaw);
           let best: Actor | undefined, bd = Infinity;
           for (const o of this.nearby(a.pos, L * 2.4)) {
-            if (o.id === a.id || !isAlive(o) || isHidden(o)) continue;
+            if (o.id === a.id || !isAlive(o) || isHidden(o) || this.expansionContext().allies(a,o)) continue;
             const to = sub(o.pos, a.pos); const d = len3(to);
             if (d > L * 2.4 || dot(norm(to), h) < 0.72) continue;
             if (d < bd) { bd = d; best = o; }
@@ -878,24 +935,9 @@ export class Game implements AiWorld {
         }
         break;
       }
-      case 'shellUp': {
-        if (done) for (const o of this.nearby(a.pos, L * 1.3)) if (o.id !== a.id && isAlive(o) && bandOf(a, o) !== 'giant' && o.state !== 'stagger') { o.state = 'stagger'; o.stateT = 0; o.stateDur = 1.0; o.vel = add(o.vel, vscale(norm(sub(o.pos, a.pos)), 5)); this.events.push({ kind: 'stagger', pos: { ...o.pos }, actor: a.id, other: o.id }); }
-        break;
-      }
-      case 'burrow': {
-        if (input.ability && !a.prev.ability && a.stateT > 0.6) { a.stateT = a.stateDur; }
-        break;
-      }
-      case 'enroll': {
-        if (input.ability && !a.prev.ability && a.stateT > 0.5) a.stateT = a.stateDur;
-        // stagger rivals rolled into
-        if (len3(a.vel) > 3) for (const o of this.nearby(a.pos, L * 0.9)) if (o.id !== a.id && isAlive(o) && !a.hitDone.has(o.id) && bandOf(a, o) !== 'giant') { a.hitDone.add(o.id); applyHit(this.hitCtx, a, o, { ...def.light, damage: 12, poise: 60, knockback: 5 }, 1); }
-        break;
-      }
     }
     if (done) {
       a.abilityActive = false; a.state = 'free'; a.stateT = 0; a.hitDone.clear();
-      if (def.ability === 'burrow') { a.iframes = 0.3; /* free heavy: no stamina cost */ a.stamina = Math.min(a.staminaMax, a.stamina + 25); }
     }
   }
 
@@ -1157,7 +1199,7 @@ export class Game implements AiWorld {
     const g = groundHeight(this.world, pos.x, pos.z, this.scratchBoulders);
     pos.y = clamp(pos.y, g + clearanceOf(a) + 0.2, SURFACE_Y - 1 - clearanceOf(a));
     this.events.push({ kind: 'teleport', pos: { ...a.pos }, actor: a.id, player: i, strength: 0 });
-    a.pos = pos; a.vel = v3(); a.yaw = yaw; a.pitch = 0; a.bank = 0;
+    stopHiding(a); a.camoStrength = 0; a.emergenceHeavy = false; a.pos = pos; a.vel = v3(); a.yaw = yaw; a.pitch = 0; a.bank = 0;
     a.lockTarget = -1; a.hunted = 0; a.hunterId = -1; a.wasHunted = false; a.aiming = false;
     a.spawnProtect = Math.max(a.spawnProtect, 2.5); a.teleportCd = 20; a.hitFlash = 0;
     this.events.push({ kind: 'teleport', pos: { ...pos }, actor: a.id, player: i, strength: 1 });
@@ -1244,7 +1286,7 @@ export class Game implements AiWorld {
     if (p.tier >= 1 && !f.has('light')) return 'X bites. RT pounces. Hunt something your own size.';
     if (p.tier >= 1 && !f.has('dodge')) return 'LB with a stick direction dashes clear of a bite. A sprints.';
     if (p.tier >= 1 && !f.has('guard') && creature(p.creature).canGuard) return 'Hold B to guard. Tap it as a hit lands to parry.';
-    if (p.tier >= 2 && !f.has('ability')) return `Y: ${creature(p.creature).abilityName}. Your signature move is unlocked.`;
+    if (!f.has('ability')) return `Y: hide. Burrowers bury for free; camouflage copies nearby colours and uses stamina.`;
     if (!f.has('lock') && this.time > 30) return 'Hold LT to aim at prey. When the crosshair fills, RT pounces.';
     if (!f.has('teleport') && this.time > 60 && (this.players.length > 1 || distXZ(p.pos, p.home) > 150)) return 'D-pad down: teleport home, or to another player.';
     return undefined;

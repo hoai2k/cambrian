@@ -39,7 +39,7 @@ assert(hit(.75) > hit(0));
   for (let i=0;i<60;i++) stepExpansionAbility(ctx, a, creature(a.creature), 1/60);
   assert.equal(v.hp, hp);
 }
-// Every selectable creature can move and finish an ability through the actual simulation.
+// Every selectable creature can hide, emerge and resume moving through the actual simulation.
 for (const def of EXPANSION_CREATURES) {
   const g = new Game('reef', [{creature:def.id,device:'keyboard',ready:true}], 432);
   const a = g.players[0];
@@ -47,7 +47,9 @@ for (const def of EXPANSION_CREATURES) {
   a.pos = {x:0,y:def.ground ? 0 : 8,z:0}; a.yaw=0; a.spawnProtect=20;
   const f = {...emptyInput(),my:1,camYaw:0,ability:true};
   g.step(1/60,new Map([[0,f]])); f.ability=false;
-  assert(a.abilityCd > 0, `${def.id}: ability did not activate`);
+  assert.notEqual(a.hideMode, 'none', `${def.id}: hiding did not activate`);
+  g.step(1/60,new Map([[0,f]])); f.ability=true; g.step(1/60,new Map([[0,f]])); f.ability=false;
+  assert.equal(a.hideMode,'none',`${def.id}: hiding did not cancel`);
   const start={...a.pos};
   for(let i=0;i<300;i++) {g.step(1/60,new Map([[0,f]]));g.events.length=0;}
   assert.notEqual(a.state,'ability',`${def.id}: stuck in ability`);
@@ -78,4 +80,4 @@ for(const id of ['burgessomedusa','ctenorhabdotus'] as const){
   g.step(1/60,new Map([[0,emptyInput()]]));
   assert(a.pos.y+clearanceOf(a)<=SURFACE_Y-.8+1e-6,`${id}: body crosses surface`);
 }
-console.log('PASS: 21 unique options, 13 abilities, ally safety, finite state, armor piercing, one hit per activation, mobile abilities and all-tier feeding.');
+console.log('PASS: 21 unique options, 13 abilities, ally safety, finite state, armor piercing, one hit per activation, hide cancellation, movement and all-tier feeding.');

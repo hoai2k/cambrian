@@ -4,7 +4,7 @@ import { GLTFLoader, type GLTF } from 'three/examples/jsm/loaders/GLTFLoader.js'
 import { MeshoptDecoder } from 'three/examples/jsm/libs/meshopt_decoder.module.js';
 import * as SkeletonUtils from 'three/examples/jsm/utils/SkeletonUtils.js';
 import { clamp, damp } from '../shared/math';
-import { makeRecolor } from './recolor';
+import { makeRecolor, type Recolor } from './recolor';
 import { schemeForCreature } from '../shared/palettes';
 import { creature, type CreatureId } from '../sim/creatures';
 import { lengthOf } from '../sim/actors';
@@ -78,6 +78,7 @@ export class CreatureView {
   private tmpQ = new THREE.Quaternion(); private tmpQ2 = new THREE.Quaternion(); private up = new THREE.Vector3(0, 1, 0);
   private sideAxis = new THREE.Vector3(1, 0, 0);
   private tmpE = new THREE.Euler(); private ringQ = new THREE.Quaternion(); private ringE = new THREE.Euler(-Math.PI / 2, 0, 0);
+  private recolor: Recolor;
   public lastUpdate = 0;
   public visibleLength = 1;
   readonly def;
@@ -108,7 +109,7 @@ export class CreatureView {
     // All of a creature's colour lives in its vertex colours, so its palette is a shader hook on
     // the materials cloned just above rather than a second set of models. Both LODs share the
     // material names the slots are read from, so a distant creature keeps its colours.
-    makeRecolor(this.model).setScheme(schemeForCreature(creatureId));
+    this.recolor = makeRecolor(this.model); this.recolor.setScheme(schemeForCreature(creatureId));
     this.spine.sort((a, b) => Number(SPINE_RE.exec(a.name)![2]) - Number(SPINE_RE.exec(b.name)![2]));
     this.mixer = new THREE.AnimationMixer(this.model);
     for (const clip of loaded.gltf.animations) this.actions.set(clip.name, this.mixer.clipAction(clip));
@@ -188,10 +189,11 @@ export class CreatureView {
 
     if (animate) {
       // locomotion layer
-      const held = a.state === 'ability' && a.abilityActive && (def.abilityLoop || ['burrow', 'enroll', 'shellUp', 'anchor', 'bristleFlare'].includes(def.ability));
+      const held = a.state === 'ability' && a.abilityActive && ['collectorWake','pharyngealPump','planktonComb','whipSearch'].includes(def.ability);
       if (a.state === 'dead') { /* handled by one-shot */ }
       else if (a.state === 'eating' || a.holdT > 0) { this.playLoop(this.pick('Eat', 'Grab') ?? (def.ground ? 'Crawl' : 'Swim')); this.loco?.setEffectiveTimeScale(this.has('Eat') ? 1 : 0.55); }
       else if (a.state === 'swallowed') { this.playLoop(this.pick('Stagger', 'Hit') ?? 'Idle'); this.loco?.setEffectiveTimeScale(0.8); }
+      else if ((a.hideMode === 'burrowed' || ((a.state === 'guard' || a.state === 'parry') && ['anchor','enroll','shellUp','bristleFlare'].includes(def.ability))) && this.has('Ability')) { this.playLoop('Ability'); this.loco?.setEffectiveTimeScale(.55); }
       else if ((a.state === 'guard') && this.has('Guard')) { this.playLoop('Guard'); this.loco?.setEffectiveTimeScale(1); }
       else if (held && this.has('Ability')) { this.playLoop('Ability'); this.loco?.setEffectiveTimeScale(1); }
       else if (a.state === 'moult' && this.has('Moult')) { this.playLoop('Moult'); this.loco?.setEffectiveTimeScale(1); }
@@ -274,13 +276,14 @@ export class CreatureView {
       }
     }
 
+    this.recolor.blend(schemeForCreature(this.creatureId), a.camoColors, a.camoStrength);
     // Transform
     this.group.position.set(a.pos.x, a.pos.y, a.pos.z);
     this.group.quaternion.setFromEuler(this.tmpE.set(a.pitch, a.yaw, a.bank, 'YXZ'));
     let sx = L, sy = L, sz = L, oy = 0;
-    if (a.state === 'ability' && a.abilityActive) {
+    if ((a.state === 'guard' || a.state === 'parry') && a.abilityActive) {
       const t = clamp(a.stateT / 0.5, 0, 1);
-      const tail = clamp((a.stateDur - a.stateT) / 0.5, 0, 1);
+      const tail = 1;
       const k = Math.min(t, tail);
       switch (def.ability) {
         case 'sedimentDive': oy = -L * .20 * k; break;
@@ -291,6 +294,7 @@ export class CreatureView {
         case 'bristleFlare': sx = L * (1 + 0.12 * k); break;
       }
     } else this.inner.rotation.x = damp(this.inner.rotation.x, 0, 8, dt);
+    if (a.hideMode === 'burrowed') { const k = clamp(a.hideT / .6, 0, 1); oy -= L * .5 * k; sy *= 1 - .35*k; }
     if (a.state === 'dead') { const e = a.eaten; sx *= 1 - e * 0.6; sy *= 1 - e * 0.6; sz *= 1 - e * 0.6; }
     this.group.visible = !(a.state === 'dead' && a.eaten >= 1 && (a.controller === 'player' || a.controller === 'bot' || a.swallowedBy >= 0));
     if (a.state === 'swallowed') { const t = clamp(a.stateT / a.stateDur, 0, 1); const k = 1 - t * 0.9; sx *= k; sy *= k * (1 - t * 0.3); sz *= k; }
@@ -318,7 +322,7 @@ export class CreatureView {
     // emissive: hit flash, highlight, ability glow
     const flash = a.hitFlash > 0 ? Math.min(1, a.hitFlash * 2.2) : 0;
     const glow = this.highlight;
-    const abilityGlow = a.abilityActive ? 0.25 + 0.15 * Math.sin(time * 12) : 0;
+    const abilityGlow = a.hideMode === 'none' && a.abilityActive ? 0.25 + 0.15 * Math.sin(time * 12) : 0;
     const moult = a.state === 'moult' ? 0.6 : 0;
     const protect = a.spawnProtect > 0 ? 0.08 + 0.06 * Math.sin(time * 10) : 0;
     const dead = a.state === 'dead' ? 1 : 0;

@@ -1,5 +1,7 @@
 # 02 · Technical plan
 
+> Current combat and Y controls: [Hiding and native combat](05-hiding-and-combat.md) supersedes the original signature-ability mappings below.
+
 How the design in `01-game-design.md` gets built on top of the assets and
 techniques audited in `00-current-state.md`.
 

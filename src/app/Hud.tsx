@@ -1,3 +1,4 @@
+import { hideDescription } from '../sim/concealment';
 import { useEffect, useId, useRef, useState } from 'react';
 import type { HudSnapshot, PlayerHud, RadarBlipHud } from '../render/engine';
 import { creature } from '../sim/creatures';
@@ -83,9 +84,9 @@ function PlayerPanel({ p }: { p: PlayerHud }) {
         </div>
       )}
       <div className="hud-bottom">
-        <div className={`chip ability ${p.abilityUnlocked ? '' : 'locked'} ${p.abilityActive ? 'active' : ''}`} title={def.abilityDesc}>
+        <div className={`chip ability ${p.abilityUnlocked ? '' : 'locked'} ${p.abilityActive ? 'active' : ''}`} title={hideDescription(def.id)}>
           <span className="btn y">Y</span>
-          <span className="chip-label">{p.abilityUnlocked ? p.abilityName : 'Ability at Adult'}</span>
+          <span className="chip-label">{p.abilityUnlocked ? p.abilityName : 'Hide'}</span>
           <i className="cool" style={{ transform: `scaleX(${p.abilityUnlocked ? p.abilityReady : 0})` }} />
         </div>
         <div className={`chip sense ${p.senseReady >= 1 ? 'ready' : ''}`}>

@@ -1,3 +1,4 @@
+import { BURROWERS, hideLabel } from '../sim/concealment';
 import * as THREE from 'three';
 import { audio } from '../audio/audio';
 import { distanceAtten } from '../audio/mix';
@@ -561,7 +562,7 @@ export class Engine {
       if (cs) {
         this.cullSphere.center.copy(v.group.position);
         this.cullSphere.radius = lengthOf(a) * 0.9 + 0.5;
-        v.group.visible = (!isHidden(a) || a.stateT <= 0.6) && cs.frustum.intersectsSphere(this.cullSphere);
+        v.group.visible = (!isHidden(a) || a.hideT <= 0.6) && cs.frustum.intersectsSphere(this.cullSphere);
         if (!v.group.visible) continue;
       }
       if (!viewer || a.state === 'dead' || a.state === 'swallowed') { v.setRing(null, 0); v.setHighlight(0); continue; }
@@ -740,7 +741,7 @@ export class Engine {
         index: i, creature: p.creature, color: PLAYER_COLORS[i % 4], alive: p.state !== 'dead', aim,
         hp: p.hp, hpMax: p.hpMax, stamina: p.stamina, staminaMax: p.staminaMax, exhausted: p.exhausted > 0,
         tier: p.tier, tierName: TIER_NAMES[p.tier], progress: p.tier >= 4 ? 1 : clamp(p.nutrition / TIER_NEED[p.tier], 0, 1), scale: p.scale,
-        abilityName: def.abilityName, abilityReady: 1 - clamp(p.abilityCd / def.abilityCooldown, 0, 1), abilityActive: p.abilityActive, abilityUnlocked: p.tier >= 2 || game.mode === 'reef' || game.mode === 'hunted',
+        abilityName: p.hideMode === 'descending' ? 'Sinking to burrow' : p.hideMode === 'burrowed' ? 'Buried · Y emerge' : p.hideMode === 'camouflage' ? `Camo: ${p.camoLabel}` : hideLabel(p.creature), abilityReady: p.hideMode === 'camouflage' ? p.stamina / p.staminaMax : 1 - clamp(p.hideCd / 2, 0, 1), abilityActive: p.hideMode !== 'none', abilityUnlocked: true,
         senseReady: 1 - clamp(p.senseCd / 6, 0, 1),
         lock: lockA && isAlive(lockA) ? { name: creature(lockA.creature).name, band: bandOf(p, lockA), hp: lockA.hp / lockA.hpMax, color: BAND_COLOR[bandOf(p, lockA)] } : undefined,
         hunted: p.hunted, hunterAngle, hunterName: hunter ? creature(hunter.creature).name : undefined,

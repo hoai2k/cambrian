@@ -1,3 +1,4 @@
+import { hideLabel, hideDescription, HEAVY_SPECIALS, DEFENSIVE_SPECIALS } from '../sim/concealment';
 import { CreaturePortrait } from './CreaturePortrait';
 import { PLAYER_COLORS } from '../render/engine';
 import { CREATURES, creature, type CreatureId } from '../sim/creatures';
@@ -91,7 +92,9 @@ export function SelectScreen(p: Props) {
                         <Stat label="Agility" v={stat(def.agility + def.turnRate, 8.6)} />
                       </div>
                       <dl className="kit">
-                        <div><dt>Y</dt><dd><b>{def.abilityName}.</b> {def.abilityDesc}</dd></div>
+                        <div><dt>RT</dt><dd>{HEAVY_SPECIALS.has(def.ability) ? def.abilityName : def.heavy.name}</dd></div>
+                        <div><dt>B</dt><dd>{DEFENSIVE_SPECIALS.has(def.ability) ? def.abilityName : def.canGuard ? 'Block / parry' : 'Evade'}</dd></div>
+                        <div><dt>Y</dt><dd><b>{hideLabel(def.id)}.</b> {hideDescription(def.id)}</dd></div>
                         <div><dt>+</dt><dd>{def.passive}</dd></div>
                         <div><dt>−</dt><dd>{def.weakness}</dd></div>
                       </dl>

@@ -85,6 +85,10 @@ export interface Actor {
   lockTarget: number;
   guardHeld: number;
   abilityCd: number; abilityT: number; abilityActive: boolean;
+  hideMode: 'none' | 'descending' | 'burrowed' | 'camouflage';
+  hideT: number; hideCd: number; camoStrength: number;
+  camoColors?: import('./concealment').CamoColors; camoScheme: string; camoLabel: string; camoSource: number;
+  emergenceHeavy: boolean;
   senseCd: number; senseT: number;
   burstT: number;          // free burst timer (ambush surge)
   hitFlash: number; hitDir: Vec3; hitStop: number;

@@ -1,5 +1,7 @@
 # 01 · Game design: Cambrian — Rise of the Apex
 
+> Current combat and Y controls: [Hiding and native combat](05-hiding-and-combat.md) supersedes the original signature-ability mappings below.
+
 > Working title. The subtitle changes; the pitch does not.
 
 ## The pitch
