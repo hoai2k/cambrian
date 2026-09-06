@@ -301,7 +301,7 @@ export class Game implements AiWorld {
     const justDodge = input.dodge && !a.prev.dodge, justGuard = input.guard && !a.prev.guard, justLock = input.lock && !a.prev.lock;
     const justSense = input.sense && !a.prev.sense, justRise = input.rise && !a.prev.rise;
     const justDash = input.dash && !a.prev.dash;
-    if (input.dash) a.dashHoldT += dt; else { a.dashHoldT = 0; a.dashUsed = false; }
+    if (input.dash) a.dashHoldT += dt; else { a.dashHoldT = 0; a.dashUsed = false; a.dashQueued = false; }
     a.pounceCd = Math.max(0, a.pounceCd - dt);
 
     // Timers
@@ -324,8 +324,8 @@ export class Game implements AiWorld {
 
     // Stamina
     const speed = len3(a.vel);
-    // LB held is a sprint once the tap window has passed (a tap with a stick direction is a sidestep instead).
-    const sprint = input.dash && (a.dashHoldT > 0.22 || a.dashUsed === false && Math.hypot(input.mx, input.my) < 0.3 && !input.worldMove);
+    // LB held past the dash moment is a sprint (a queued dash with a neutral stick is not).
+    const sprint = input.dash && a.dashUsed && a.dashHoldT > 0.2;
     const burstIn = Math.max(input.burst, sprint ? 1 : 0);
     const bursting = burstIn > 0.1 && a.stamina > 0 && a.state !== 'guard' && a.exhausted === 0;
     const freeBurst = a.burstT > 0;
@@ -346,7 +346,7 @@ export class Game implements AiWorld {
         let fwd: Vec3, right: Vec3;
         // right = forward × up. With heading(yaw) = (sin, 0, cos) that is (-cos, 0, sin):
         // getting this backwards makes the strafe axis mirror-image (verified against the camera).
-        if (locked && isAlive(locked)) {
+        if (locked && isAlive(locked) && !a.aiming) {
           const to = norm(sub(locked.pos, a.pos));
           fwd = def.ground ? norm({ x: to.x, y: 0, z: to.z }) : to;
           right = norm({ x: -fwd.z, y: 0, z: fwd.x });
@@ -431,7 +431,8 @@ export class Game implements AiWorld {
     // Orientation
     const hv = Math.hypot(a.vel.x, a.vel.z);
     let targetYaw = a.yaw;
-    if (locked && isAlive(locked) && (a.state === 'free' || a.state === 'guard' || a.state === 'attack')) targetYaw = yawOf(sub(locked.pos, a.pos));
+    if (a.aiming && a.controller === 'player' && (a.state === 'free' || a.state === 'guard')) targetYaw = hv > 0.35 ? yawOf(a.vel) : input.camYaw;
+    else if (locked && isAlive(locked) && (a.state === 'free' || a.state === 'guard' || a.state === 'attack')) targetYaw = yawOf(sub(locked.pos, a.pos));
     else if (hv > 0.35 && a.state !== 'grabbed') targetYaw = yawOf(a.vel);
     const dy = wrapAngle(targetYaw - a.yaw);
     const tr = def.turnRate * (a.state === 'attack' ? 0.5 : 1) * (1 + hv * 0.05) * (giantish ? 0.45 : 1);
@@ -455,12 +456,10 @@ export class Game implements AiWorld {
 
     // --- Actions ---
     if (a.state === 'free' || a.state === 'guard') {
-      // Aim (LT held): track the best target while held; release lets go. Bots still toggle lock.
+      // Aim (LT held): the camera owns the crosshair; whatever it reports is the target. Bots toggle lock.
       if (a.controller === 'player') {
-        const justAim = input.aim && !a.prev.aim;
-        if (justAim || (input.aim && a.lockTarget < 0 && Math.floor(this.time * 4) !== Math.floor((this.time - dt) * 4))) a.lockTarget = this.pickLockTarget(a, 0, -1, true)?.id ?? -1;
-        if (!input.aim && a.lockTarget >= 0) a.lockTarget = -1;
         a.aiming = input.aim;
+        a.lockTarget = input.aim ? input.aimTarget : -1;
         if (input.aim) this.flag(a, 'lock');
       } else if (justLock) {
         if (a.lockTarget >= 0) a.lockTarget = -1;
@@ -474,8 +473,10 @@ export class Game implements AiWorld {
       if (justSense && a.senseCd === 0) { a.senseT = 2.2; a.senseCd = def.ability === 'burrow' ? 3 : 6; this.flag(a, 'sense'); this.events.push({ kind: 'sense', pos: { ...a.pos }, actor: a.id, player: a.player }); }
       // Ability
       if (justAbility && a.abilityCd === 0 && a.tier >= 2 || (justAbility && a.abilityCd === 0 && a.controller !== 'player')) this.startAbility(a, def);
-      // Dash sidestep: LB pressed together with a stick direction
-      else if (justDash && mag > 0.3 && a.stamina >= 10 && a.exhausted === 0) { a.dashUsed = true; this.startDodge(a, def, dir, mag, L, sf); }
+      // Dash: LB with a stick direction dashes that way at once. LB with a neutral stick queues the
+      // dash for the moment the stick moves. Either way, keeping LB held afterwards is a sprint.
+      else if (justDash && mag <= 0.3 && !input.worldMove) { a.dashQueued = true; }
+      else if ((justDash || a.dashQueued) && mag > 0.3 && a.stamina >= 10 && a.exhausted === 0 && !a.dashUsed) { a.dashUsed = true; a.dashQueued = false; this.startDodge(a, def, dir, mag, L, sf); }
       // Pounce: X while aiming at something in range
       else if (justHeavy && a.aiming && a.aimInRange && locked && isAlive(locked) && a.pounceCd === 0 && a.stamina >= 12 && a.exhausted === 0) this.startPounce(a, locked, L, sf);
       // Dodge (B for creatures that cannot guard, bots)
@@ -602,7 +603,7 @@ export class Game implements AiWorld {
     // Lock target validity
     if (a.lockTarget >= 0) {
       const t = this.idMap.get(a.lockTarget);
-      if (!t || !isAlive(t) || isHidden(t) || dist(a.pos, t.pos) > 16 + L * 8) a.lockTarget = -1;
+      if (!t || !isAlive(t) || isHidden(t) || (!a.aiming && dist(a.pos, t.pos) > 16 + L * 8)) a.lockTarget = -1;
     }
     // Hunted meter (for players)
     if (a.controller === 'player' || a.controller === 'bot') this.updateHunted(a);

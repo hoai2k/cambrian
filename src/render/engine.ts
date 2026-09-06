@@ -20,7 +20,7 @@ export interface PlayerHud {
   abilityName: string; abilityReady: number; abilityActive: boolean; abilityUnlocked: boolean;
   senseReady: number;
   lock?: { name: string; band: Band; hp: number; color: string };
-  aim?: { x: number; y: number; inRange: boolean; name: string; band: Band; color: string; ready: boolean };
+  aim?: { hasTarget: boolean; inRange: boolean; name?: string; color: string; ready: boolean };
   hunted: number; hunterAngle: number | null; hunterName?: string; hunterState: 'none' | 'noticed' | 'hunting'; inCover: boolean; still: boolean;
   hint?: string; respawnIn: number; state: string; kills: number; eats: number; escapes: number; protect: boolean;
   bandMarkers: { x: number; y: number; band: Band; size: number }[];
@@ -38,7 +38,7 @@ export interface EngineCallbacks {
 
 export const PLAYER_COLORS = ['#61f2d5', '#ffb457', '#c7a3ff', '#ff86a4'];
 
-interface CamState { yaw: number; pitch: number; zoom: number; pos: THREE.Vector3; look: THREE.Vector3; shake: number; camera: THREE.PerspectiveCamera; lockBlend: number; lastPos: THREE.Vector3; frustum: THREE.Frustum; projScreen: THREE.Matrix4; }
+interface CamState { yaw: number; pitch: number; zoom: number; aimBlend: number; aimTarget: number; aimSnapT: number; pos: THREE.Vector3; look: THREE.Vector3; shake: number; camera: THREE.PerspectiveCamera; lockBlend: number; lastPos: THREE.Vector3; frustum: THREE.Frustum; projScreen: THREE.Matrix4; }
 
 /** Magnification levels (see docs/redesign/01-game-design.md · Magnification). */
 export const MAGNIFICATION = [
@@ -160,7 +160,7 @@ export class Engine {
     this.cams = setups.map((_, i) => {
       const p = this.game!.players[i];
       const cam = new THREE.PerspectiveCamera(60, 1, 0.08, 420);
-      const cs: CamState = { yaw: p.yaw, pitch: 0.2, zoom: 1, pos: new THREE.Vector3(p.pos.x - Math.sin(p.yaw) * 6, p.pos.y + 2.5, p.pos.z - Math.cos(p.yaw) * 6), look: new THREE.Vector3(p.pos.x, p.pos.y, p.pos.z), shake: 0, camera: cam, lockBlend: 0, lastPos: new THREE.Vector3(p.pos.x, p.pos.y, p.pos.z), frustum: new THREE.Frustum(), projScreen: new THREE.Matrix4() };
+      const cs: CamState = { yaw: p.yaw, pitch: 0.2, zoom: 1, aimBlend: 0, aimTarget: -1, aimSnapT: 0, pos: new THREE.Vector3(p.pos.x - Math.sin(p.yaw) * 6, p.pos.y + 2.5, p.pos.z - Math.cos(p.yaw) * 6), look: new THREE.Vector3(p.pos.x, p.pos.y, p.pos.z), shake: 0, camera: cam, lockBlend: 0, lastPos: new THREE.Vector3(p.pos.x, p.pos.y, p.pos.z), frustum: new THREE.Frustum(), projScreen: new THREE.Matrix4() };
       cam.position.copy(cs.pos); cam.lookAt(cs.look);
       return cs;
     });
@@ -192,7 +192,7 @@ export class Engine {
     f.camPitch = clamp(-Math.asin(clamp(fwd.y, -1, 1)) * 0.75, -0.7, 0.7);
     f.burst = c.burst; f.rise = c.rise; f.sink = c.sink;
     f.light = c.light; f.heavy = c.heavy; f.ability = c.ability; f.dodge = c.dodge; f.guard = c.guard; f.lock = c.lock; f.sense = c.sense;
-    f.dash = c.dash; f.aim = c.aim;
+    f.dash = c.dash; f.aim = c.aim; f.aimTarget = c.aim ? cs.aimTarget : -1;
     void a;
     return f;
   }
@@ -225,6 +225,7 @@ export class Engine {
         // Increasing yaw rotates the view left, so a rightward stick decreases it.
         if (running) {
           const cs = this.cams[i];
+          this.updateAim(cs, game.players[i], c.aim, dt);
           if (c.rsClick) {
             // Right stick pressed in: up/down zooms instead of pitching.
             cs.zoom = clamp(cs.zoom * Math.exp(c.lookY * dt * 1.6), 0.55, 2.2);
@@ -316,14 +317,57 @@ export class Engine {
     this.frameMs = this.frameMs * 0.9 + dtReal * 1000 * 0.1;
   }
 
+  /**
+   * Aim mode. The crosshair is the screen centre; whatever prey it is over (nearest to the camera
+   * forward ray, inside range) becomes the target. Entering aim snaps the camera onto the best
+   * candidate once, the way a console aim-assist does; after that the right stick steers freely.
+   */
+  private updateAim(cs: CamState, p: Actor | undefined, aiming: boolean, dt: number) {
+    if (!p || !this.game) { cs.aimBlend = 0; cs.aimTarget = -1; return; }
+    const wasAiming = cs.aimBlend > 0.5 || cs.aimSnapT > 0;
+    cs.aimBlend = damp(cs.aimBlend, aiming ? 1 : 0, 9, dt);
+    if (!aiming) { cs.aimTarget = -1; cs.aimSnapT = 0; return; }
+    const L = lengthOf(p);
+    const range = this.game.pounceRange(p) * 2.4;
+    const fwd = this.tmpV.copy(cs.look).sub(cs.camera.position).normalize();
+    let best: Actor | undefined; let bestAng = Infinity;
+    for (const o of this.game.nearby(p.pos, range)) {
+      if (o.id === p.id || !isAlive(o) || isHidden(o)) continue;
+      const band = bandOf(p, o);
+      if (band === 'giant' || band === 'threat') continue;
+      if (this.game.mode === 'rise' && o.controller === 'player') continue;
+      const to = this.tmpDesired.set(o.pos.x - cs.camera.position.x, o.pos.y - cs.camera.position.y, o.pos.z - cs.camera.position.z);
+      const d = to.length(); if (d < 0.01) continue;
+      to.divideScalar(d);
+      // angular distance from the crosshair, widened slightly for close/large targets
+      const ang = Math.acos(clamp(fwd.dot(to), -1, 1)) - Math.min(0.08, lengthOf(o) * 0.5 / d);
+      const bandW = band === 'prey' ? 0.85 : band === 'snack' ? 1 : 1.25;
+      if (ang * bandW < bestAng) { bestAng = ang * bandW; best = o; }
+    }
+    const cone = cs.aimSnapT > 0 || !wasAiming ? 0.6 : 0.2;   // wide on entry (snap), tight afterwards
+    if (best && bestAng < cone) {
+      cs.aimTarget = best.id;
+      if (!wasAiming) cs.aimSnapT = 0.25;
+      if (cs.aimSnapT > 0) {
+        // ease the camera onto the target
+        const dx = best.pos.x - cs.camera.position.x, dy = best.pos.y - cs.camera.position.y, dz = best.pos.z - cs.camera.position.z;
+        const ty = Math.atan2(dx, dz), tp = clamp(Math.atan2(-dy, Math.hypot(dx, dz)) + 0.12, -0.55, 1.15);
+        const k = 1 - Math.exp(-14 * dt);
+        cs.yaw = wrapAngle(cs.yaw + wrapAngle(ty - cs.yaw) * k);
+        cs.pitch += (tp - cs.pitch) * k;
+        cs.aimSnapT -= dt;
+      }
+    } else { cs.aimTarget = -1; if (!wasAiming) cs.aimSnapT = 0; }
+  }
+
   private updateCamera(cs: CamState, p: Actor, dt: number) {
     const L = lengthOf(p);
     const def = creature(p.creature);
     const target = p.lockTarget >= 0 ? this.game!.byId(p.lockTarget) : undefined;
-    const locked = !!target && isAlive(target);
+    const locked = !!target && isAlive(target) && !p.aiming;
     cs.lockBlend = damp(cs.lockBlend, locked ? 1 : 0, 5, dt);
     // Magnification: camera distance and framing scale with body length so the world re-reads at every tier.
-    let dist = magnificationDistance(L) * cs.zoom;
+    let dist = magnificationDistance(L) * cs.zoom * (1 - 0.3 * cs.aimBlend);
     if (p.state === 'dead') dist *= 1.5;
     if (p.hunted > 0.5) dist *= 0.85;
     // Snap in behind the creature when it teleports (respawn), otherwise keep the player's framing.
@@ -341,6 +385,13 @@ export class Engine {
       dist += Math.min(d * 0.35, L * 3) * cs.lockBlend;
     }
     const yaw = cs.yaw;
+    // Aim mode: over-the-shoulder. Shift both the camera and its look point sideways so the
+    // specimen sits to the left and the crosshair (screen centre) is free to be steered onto prey.
+    if (cs.aimBlend > 0.001) {
+      const k = L * 0.75 * cs.aimBlend;                  // right = (-cos yaw, 0, sin yaw)
+      lookAt.x += -Math.cos(yaw) * k; lookAt.z += Math.sin(yaw) * k;
+      lookAt.y += L * 0.1 * cs.aimBlend;
+    }
     const pitch = cs.pitch + (locked ? 0.1 : 0) + (def.ground ? 0.12 : 0);
     const desired = this.tmpDesired.set(
       lookAt.x - Math.sin(yaw) * Math.cos(pitch) * dist,
@@ -512,9 +563,9 @@ export class Engine {
         }
       }
       let aim: PlayerHud['aim'];
-      if (p.aiming && lockA && isAlive(lockA) && cs) {
-        const v = this.tmpProj.set(lockA.pos.x, lockA.pos.y, lockA.pos.z).project(cs.camera);
-        if (v.z < 1) aim = { x: clamp((v.x + 1) / 2, 0.03, 0.97), y: clamp((1 - v.y) / 2, 0.05, 0.95), inRange: p.aimInRange, name: creature(lockA.creature).name, band: bandOf(p, lockA), color: BAND_COLOR[bandOf(p, lockA)], ready: p.pounceCd === 0 && p.stamina >= 12 };
+      if (p.aiming && cs) {
+        const t = lockA && isAlive(lockA) ? lockA : undefined;
+        aim = { hasTarget: !!t, inRange: !!t && p.aimInRange, name: t ? creature(t.creature).name : undefined, color: t ? BAND_COLOR[bandOf(p, t)] : '#eefaf6', ready: p.pounceCd === 0 && p.stamina >= 12 };
       }
       return {
         index: i, creature: p.creature, color: PLAYER_COLORS[i % 4], alive: p.state !== 'dead', aim,
