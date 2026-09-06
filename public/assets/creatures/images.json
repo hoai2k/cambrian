@@ -105,8 +105,8 @@
     "generatedAt": "2026-09-06T16:01:19.427Z"
   },
   "olenoides": {
-    "glbSha256": "2a2e35a8961bc4dbe114111f058384f04f454679edf3e84844bcd64a70737f9e",
-    "appearanceSha256": "94c9aaa886e9cb0502425b4b1f3ca4e4f52861ad8f33e4514442e559aac8b26d",
+    "glbSha256": "09e5c0237325f7ac00ef27b5c8ab0b6fd57486cf7fe9f8ccc569165c1fd273dd",
+    "appearanceSha256": "ac83f3c228b3e2d13a0d1246b57d6fb19696312468ba781200211490e0710c87",
     "clips": [
       "Attack",
       "Crawl",
@@ -127,8 +127,8 @@
       "Moult",
       "Ability"
     ],
-    "renderSha256": "ce6557eb683bed7e73de3b799b93eda6c8c565bff9a398cd5dd46764d23553ff",
-    "generatedAt": "2026-09-06T16:01:19.948Z"
+    "renderSha256": "4e38474a981528384c48b8441911832c756beaf5cf26f1fded00ca5490f92567",
+    "generatedAt": "2026-09-06T16:14:24.016Z"
   },
   "opabinia": {
     "glbSha256": "2dbd465cb9b39769631042294dbe3d1fa7a179a186b733d6b5102168cf625c07",
