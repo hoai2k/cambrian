@@ -3,7 +3,7 @@ import { CreatureAnchors } from './anchors';
 import { GLTFLoader, type GLTF } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { MeshoptDecoder } from 'three/examples/jsm/libs/meshopt_decoder.module.js';
 import * as SkeletonUtils from 'three/examples/jsm/utils/SkeletonUtils.js';
-import { clamp, damp } from '../shared/math';
+import { clamp, damp, wrapAngle } from '../shared/math';
 import { makeRecolor } from './recolor';
 import { schemeForCreature } from '../shared/palettes';
 import { creature, type CreatureId } from '../sim/creatures';
@@ -179,7 +179,13 @@ export class CreatureView {
   }
   setHighlight(intensity: number, color?: string) { this.highlight = intensity; if (color) this.highlightColor.set(color); }
 
-  update(a: Actor, dt: number, time: number, animate = true) {
+  /**
+   * `alpha` is how far this frame sits between the last two simulation steps (0 = the previous
+   * step, 1 = the current one). The body's transform is interpolated across it so motion is smooth
+   * on displays that do not happen to refresh at exactly the simulation's 60 Hz. A jump larger
+   * than the creature could have made in one step is a teleport or a respawn, and snaps instead.
+   */
+  update(a: Actor, dt: number, time: number, animate = true, alpha = 1) {
     const def = this.def;
     const L = lengthOf(a);
     this.visibleLength = L;
@@ -275,8 +281,14 @@ export class CreatureView {
     }
 
     // Transform
-    this.group.position.set(a.pos.x, a.pos.y, a.pos.z);
-    this.group.quaternion.setFromEuler(this.tmpE.set(a.pitch, a.yaw, a.bank, 'YXZ'));
+    const t = a.prevT;
+    const jump = Math.hypot(a.pos.x - t.x, a.pos.y - t.y, a.pos.z - t.z) > Math.max(2, L * 3);
+    const k = jump ? 1 : clamp(alpha, 0, 1);
+    this.group.position.set(t.x + (a.pos.x - t.x) * k, t.y + (a.pos.y - t.y) * k, t.z + (a.pos.z - t.z) * k);
+    this.group.quaternion.setFromEuler(this.tmpE.set(
+      t.pitch + wrapAngle(a.pitch - t.pitch) * k,
+      t.yaw + wrapAngle(a.yaw - t.yaw) * k,
+      t.bank + wrapAngle(a.bank - t.bank) * k, 'YXZ'));
     let sx = L, sy = L, sz = L, oy = 0;
     if (a.state === 'ability' && a.abilityActive) {
       const t = clamp(a.stateT / 0.5, 0, 1);

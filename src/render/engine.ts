@@ -106,6 +106,8 @@ export class Engine {
   private attractT = 0;
   private generation = 0;
   private lastFocus = new THREE.Vector3();
+  private alpha = 1;
+  private tmpPos = new THREE.Vector3(); private tmpPred = new THREE.Vector3();
   quality: Quality;
 
   constructor(private container: HTMLElement, quality: Quality, private cb: EngineCallbacks) {
@@ -273,6 +275,10 @@ export class Engine {
       let steps = 0;
       while (this.acc >= 1 / 60 && steps < 3) { game.step(1 / 60, inputs); this.acc -= 1 / 60; steps++; }
       if (steps === 3) this.acc = 0;
+      // How far this frame sits past the last completed step. The renderer interpolates across it,
+      // so a display refreshing at 144 Hz shows smooth motion rather than each 60 Hz step held for
+      // two or three frames.
+      this.alpha = clamp(this.acc * 60, 0, 1);
     }
     this.simMs = this.simMs * 0.9 + (performance.now() - tSim) * 0.1;
     this.keyboard.endFrame();
@@ -425,8 +431,17 @@ export class Engine {
     } else { cs.aimTarget = -1; if (!wasAiming) cs.aimSnapT = 0; }
   }
 
+  /** The transform the renderer is drawing this actor at: interpolated across the current step. */
+  private renderPos(a: Actor, out: THREE.Vector3) {
+    const t = a.prevT;
+    const k = Math.hypot(a.pos.x - t.x, a.pos.y - t.y, a.pos.z - t.z) > Math.max(2, lengthOf(a) * 3) ? 1 : this.alpha;
+    return out.set(t.x + (a.pos.x - t.x) * k, t.y + (a.pos.y - t.y) * k, t.z + (a.pos.z - t.z) * k);
+  }
+
   private updateCamera(cs: CamState, p: Actor, dt: number) {
     const L = lengthOf(p);
+    // Follow where the creature is drawn, not where the simulation last put it.
+    const pp = this.renderPos(p, this.tmpPos);
     const def = creature(p.creature);
     const target = p.lockTarget >= 0 ? this.game!.byId(p.lockTarget) : undefined;
     const locked = !!target && isAlive(target) && !p.aiming;
@@ -436,26 +451,27 @@ export class Engine {
     if (p.state === 'dead') dist *= 1.5;
     if (p.hunted > 0.5) dist *= 0.85;
     // Snap in behind the creature when it teleports (respawn), otherwise keep the player's framing.
-    const jumped = cs.lastPos.distanceTo(this.tmpV.set(p.pos.x, p.pos.y, p.pos.z)) > 20;
-    cs.lastPos.set(p.pos.x, p.pos.y, p.pos.z);
+    const jumped = cs.lastPos.distanceTo(pp) > 20;
+    cs.lastPos.copy(pp);
     if (jumped) { cs.yaw = p.yaw; cs.fade = 1; }
     // Eaten: ride along with the predator from the same angle until the respawn.
     const pred = (p.state === 'swallowed' || (p.state === 'dead' && p.swallowedBy >= 0)) ? this.game!.byId(p.swallowedBy) : undefined;
     const lookAt = pred
-      ? this.tmpLook.set(pred.pos.x, pred.pos.y + lengthOf(pred) * 0.1, pred.pos.z)
-      : this.tmpLook.set(p.pos.x, p.pos.y + L * 0.15, p.pos.z);
+      ? this.renderPos(pred, this.tmpLook).setY(this.tmpLook.y + lengthOf(pred) * 0.1)
+      : this.tmpLook.set(pp.x, pp.y + L * 0.15, pp.z);
     if (pred) dist = magnificationDistance(lengthOf(pred)) * cs.zoom * 0.85;
     // Fade to black just before the respawn, and in again just after.
     const dying = p.state === 'dead' || p.state === 'swallowed';
     const fadeTarget = dying && (p.state === 'dead' ? p.respawnT : p.stateT) > (p.state === 'dead' ? 2.6 : 99) ? 1 : 0;
     cs.fade = damp(cs.fade, fadeTarget, fadeTarget > cs.fade ? 6 : 4, dt);
     if (locked && target) {
-      const dx = target.pos.x - p.pos.x, dz = target.pos.z - p.pos.z;
+      const tp = this.renderPos(target, this.tmpPred);
+      const dx = tp.x - pp.x, dz = tp.z - pp.z;
       const ty = Math.atan2(dx, dz);
       // Lock-on eases the camera behind the player relative to the target; the stick still works.
       cs.yaw = wrapAngle(cs.yaw + wrapAngle(ty - cs.yaw) * (1 - Math.exp(-2.5 * dt)));
-      const d = Math.hypot(dx, dz, target.pos.y - p.pos.y);
-      lookAt.lerp(this.tmpV.set(target.pos.x, target.pos.y, target.pos.z), 0.42 * cs.lockBlend);
+      const d = Math.hypot(dx, dz, tp.y - pp.y);
+      lookAt.lerp(tp, 0.42 * cs.lockBlend);
       dist += Math.min(d * 0.35, L * 3) * cs.lockBlend;
     }
     const yaw = cs.yaw;
@@ -529,7 +545,7 @@ export class Engine {
       const far = d > 45;
       const continuous = a.state === 'eating' || a.holdT > 0;
       const animate = continuous || !far || ((a.id + Math.floor(this.time * 60)) % 3 === 0);
-      v.update(a, animate && far && !continuous ? dt * 3 : dt, this.time, animate);
+      v.update(a, animate && far && !continuous ? dt * 3 : dt, this.time, animate, this.alpha);
     }
     this.attachments.sync(game, this.views, dt);
     for (const [id, v] of this.views) if (!keep.has(id)) { v.dispose(); this.views.delete(id); }
