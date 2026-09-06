@@ -56,8 +56,8 @@ async function save(id,parts,width,height,limit,biomes,movement){
   const a=k/7*TAU,g=new T.BufferGeometry(),verts=[],idx=[];
   for(let j=0;j<7;j++)for(let i=0;i<5;i++){
    const t=j/6,u=(i-2)/2,w=[.003,.035,.072,.095,.095,.073,.028][j],lateral=u*w;
-   const r=.012+t*.26+(j===6?.04*(1-u*u):0);
-   const y=Math.sin(t*Math.PI*.88)*(.36+(k%3)*.018)+u*u*.016*Math.sin(Math.PI*t);
+   const r=.012+t*t*.26+(j===6?.04*(1-u*u):0);
+   const y=Math.sin(t*Math.PI*.52)*(.36+(k%3)*.018)+u*u*.016*Math.sin(Math.PI*t);
    verts.push(Math.cos(a)*r-Math.sin(a)*lateral,y,Math.sin(a)*r+Math.cos(a)*lateral);
   }
   for(let j=0;j<6;j++)for(let i=0;i<4;i++){const n=j*5+i;idx.push(n,n+1,n+5,n+1,n+6,n+5);}
