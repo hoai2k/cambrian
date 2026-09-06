@@ -64,6 +64,7 @@ export class CreatureView {
   private highlight = 0;
   private highlightColor = new THREE.Color('#7ef0d8');
   private tmpQ = new THREE.Quaternion(); private tmpQ2 = new THREE.Quaternion(); private up = new THREE.Vector3(0, 1, 0);
+  private sideAxis = new THREE.Vector3(1, 0, 0);
   private tmpE = new THREE.Euler(); private ringQ = new THREE.Quaternion(); private ringE = new THREE.Euler(-Math.PI / 2, 0, 0);
   public lastUpdate = 0;
   public visibleLength = 1;
@@ -211,10 +212,24 @@ export class CreatureView {
         this.addW[i] = damp(this.addW[i], t, 8, dt);
         act.setEffectiveWeight(this.addW[i]);
       });
-      if (a.state === 'dead') this.loco?.setEffectiveWeight(Math.max(0, 1 - a.corpseT * 2));
+      if (a.state === 'dead') { this.loco?.setEffectiveWeight(Math.max(0, 1 - a.corpseT * 2)); this.oneShot?.setEffectiveWeight(Math.max(0.15, 1 - a.corpseT * 0.7)); }
       else this.loco?.setEffectiveWeight(this.oneShotT > 0.1 ? 0.15 : 1);
       this.mixer.update(a.hitStop > 0 ? dt * 0.1 : dt);
 
+      // Limp "ragdoll": once dead the spine sags and sways with decaying wobble, and the animation
+      // fades out underneath it, so the body hangs rather than holding a pose.
+      if (this.spine.length > 2 && a.state === 'dead') {
+        const k = Math.exp(-a.corpseT * 0.5);
+        for (let i = 0; i < this.spine.length; i++) {
+          const f = i / this.spine.length;
+          const sag = (0.12 + 0.35 * k) * f * Math.sin(time * 2.1 + i * 0.8 + a.id);
+          const droop = 0.18 * f * (1 - k * 0.5);
+          this.tmpQ2.setFromAxisAngle(this.up, sag * 0.6);
+          this.spine[i].quaternion.multiply(this.tmpQ2);
+          this.tmpQ2.setFromAxisAngle(this.sideAxis, droop + sag * 0.4);
+          this.spine[i].quaternion.multiply(this.tmpQ2);
+        }
+      }
       // procedural undulation along the spine for swimmers
       if (this.spine.length > 3 && !def.ground && a.state !== 'dead') {
         const amp = clamp(speed / Math.max(cruise, 0.1), 0, 1.6) * 0.045 + Math.abs(a.bank) * 0.02;
@@ -246,6 +261,7 @@ export class CreatureView {
       }
     } else this.inner.rotation.x = damp(this.inner.rotation.x, 0, 8, dt);
     if (a.state === 'dead') { const e = a.eaten; sx *= 1 - e * 0.6; sy *= 1 - e * 0.6; sz *= 1 - e * 0.6; }
+    this.group.visible = !(a.state === 'dead' && a.eaten >= 1 && (a.controller === 'player' || a.controller === 'bot' || a.swallowedBy >= 0));
     if (a.state === 'swallowed') { const t = clamp(a.stateT / a.stateDur, 0, 1); const k = 1 - t * 0.9; sx *= k; sy *= k * (1 - t * 0.3); sz *= k; }
     // shield
     const guarding = a.state === 'guard' || a.state === 'parry' || (a.abilityActive && (def.ability === 'shellUp' || def.ability === 'anchor'));

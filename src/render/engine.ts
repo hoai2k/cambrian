@@ -22,7 +22,7 @@ export interface PlayerHud {
   lock?: { name: string; band: Band; hp: number; color: string };
   aim?: { hasTarget: boolean; inRange: boolean; name?: string; color: string; ready: boolean };
   hunted: number; hunterAngle: number | null; hunterName?: string; hunterState: 'none' | 'noticed' | 'hunting'; inCover: boolean; still: boolean;
-  hint?: string; respawnIn: number; state: string; kills: number; eats: number; escapes: number; protect: boolean;
+  hint?: string; respawnIn: number; fade: number; state: string; kills: number; eats: number; escapes: number; protect: boolean;
   bandMarkers: { x: number; y: number; band: Band; size: number }[];
 }
 export interface HudSnapshot {
@@ -38,7 +38,7 @@ export interface EngineCallbacks {
 
 export const PLAYER_COLORS = ['#61f2d5', '#ffb457', '#c7a3ff', '#ff86a4'];
 
-interface CamState { yaw: number; pitch: number; zoom: number; aimBlend: number; aimTarget: number; aimSnapT: number; pos: THREE.Vector3; look: THREE.Vector3; shake: number; camera: THREE.PerspectiveCamera; lockBlend: number; lastPos: THREE.Vector3; frustum: THREE.Frustum; projScreen: THREE.Matrix4; }
+interface CamState { yaw: number; pitch: number; zoom: number; fade: number; aimBlend: number; aimTarget: number; aimSnapT: number; pos: THREE.Vector3; look: THREE.Vector3; shake: number; camera: THREE.PerspectiveCamera; lockBlend: number; lastPos: THREE.Vector3; frustum: THREE.Frustum; projScreen: THREE.Matrix4; }
 
 /** Magnification levels (see docs/redesign/01-game-design.md · Magnification). */
 export const MAGNIFICATION = [
@@ -66,6 +66,7 @@ export class Engine {
   private cams: CamState[] = [];
   private attractCam = new THREE.PerspectiveCamera(55, 1, 0.1, 400);
   private bubbles = new Bubbles();
+  private sparkles = new Bubbles(400, [1.0, 0.86, 0.5], 0.25);
   private impacts = new Impacts();
   private silt = new Silt();
   private keyboard = new KeyboardInput();
@@ -102,7 +103,7 @@ export class Engine {
     // Split-screen renders the scene once per player; without this the shadow map is rebuilt every time.
     this.renderer.shadowMap.autoUpdate = false;
     container.appendChild(this.renderer.domElement);
-    this.scene.add(this.bubbles.points, this.impacts.group, this.silt.group);
+    this.scene.add(this.bubbles.points, this.sparkles.points, this.impacts.group, this.silt.group);
     (window as any).__cambrian = this;
     this.resize = new ResizeObserver(() => this.onResize());
     this.resize.observe(container);
@@ -162,7 +163,7 @@ export class Engine {
     this.cams = setups.map((_, i) => {
       const p = this.game!.players[i];
       const cam = new THREE.PerspectiveCamera(60, 1, 0.08, 420);
-      const cs: CamState = { yaw: p.yaw, pitch: 0.2, zoom: 1, aimBlend: 0, aimTarget: -1, aimSnapT: 0, pos: new THREE.Vector3(p.pos.x - Math.sin(p.yaw) * 6, p.pos.y + 2.5, p.pos.z - Math.cos(p.yaw) * 6), look: new THREE.Vector3(p.pos.x, p.pos.y, p.pos.z), shake: 0, camera: cam, lockBlend: 0, lastPos: new THREE.Vector3(p.pos.x, p.pos.y, p.pos.z), frustum: new THREE.Frustum(), projScreen: new THREE.Matrix4() };
+      const cs: CamState = { yaw: p.yaw, pitch: 0.2, zoom: 1, fade: 0, aimBlend: 0, aimTarget: -1, aimSnapT: 0, pos: new THREE.Vector3(p.pos.x - Math.sin(p.yaw) * 6, p.pos.y + 2.5, p.pos.z - Math.cos(p.yaw) * 6), look: new THREE.Vector3(p.pos.x, p.pos.y, p.pos.z), shake: 0, camera: cam, lockBlend: 0, lastPos: new THREE.Vector3(p.pos.x, p.pos.y, p.pos.z), frustum: new THREE.Frustum(), projScreen: new THREE.Matrix4() };
       cam.position.copy(cs.pos); cam.lookAt(cs.look);
       return cs;
     });
@@ -275,7 +276,7 @@ export class Engine {
 
     // Views
     this.syncViews(game, camPositions, dt);
-    this.bubbles.update(dt);
+    this.bubbles.update(dt); this.sparkles.update(dt);
     this.impacts.update(dt, focus);
     this.silt.sync(game.silt, this.time);
 
@@ -375,8 +376,17 @@ export class Engine {
     // Snap in behind the creature when it teleports (respawn), otherwise keep the player's framing.
     const jumped = cs.lastPos.distanceTo(this.tmpV.set(p.pos.x, p.pos.y, p.pos.z)) > 20;
     cs.lastPos.set(p.pos.x, p.pos.y, p.pos.z);
-    if (jumped) cs.yaw = p.yaw;
-    const lookAt = this.tmpLook.set(p.pos.x, p.pos.y + L * 0.15, p.pos.z);
+    if (jumped) { cs.yaw = p.yaw; cs.fade = 1; }
+    // Eaten: ride along with the predator from the same angle until the respawn.
+    const pred = (p.state === 'swallowed' || (p.state === 'dead' && p.swallowedBy >= 0)) ? this.game!.byId(p.swallowedBy) : undefined;
+    const lookAt = pred
+      ? this.tmpLook.set(pred.pos.x, pred.pos.y + lengthOf(pred) * 0.1, pred.pos.z)
+      : this.tmpLook.set(p.pos.x, p.pos.y + L * 0.15, p.pos.z);
+    if (pred) dist = magnificationDistance(lengthOf(pred)) * cs.zoom * 0.85;
+    // Fade to black just before the respawn, and in again just after.
+    const dying = p.state === 'dead' || p.state === 'swallowed';
+    const fadeTarget = dying && (p.state === 'dead' ? p.respawnT : p.stateT) > (p.state === 'dead' ? 2.6 : 99) ? 1 : 0;
+    cs.fade = damp(cs.fade, fadeTarget, fadeTarget > cs.fade ? 6 : 4, dt);
     if (locked && target) {
       const dx = target.pos.x - p.pos.x, dz = target.pos.z - p.pos.z;
       const ty = Math.atan2(dx, dz);
@@ -529,6 +539,7 @@ export class Engine {
         case 'noticed': { audio.play('noticed', 0.5); break; }
         case 'sense': { audio.play('sense'); break; }
         case 'swallow': { audio.play('grab', 1.2); this.bubbles.emit(e.pos, 30, 1, 3, 0.09, 1.5); if (e.player != null && e.player >= 0) { const d = padOf(e.player); if (typeof d === 'number') rumble(d, 1, 1, 900); this.shake(e.player, 1.2); } break; }
+        case 'disintegrate': { this.sparkles.emit(e.pos, Math.round(28 + (e.strength ?? 1) * 10), 0.5 + (e.strength ?? 1) * 0.25, 0.9, 0.06, 2.2); audio.play('escape', 0.5); break; }
         case 'routed': { audio.play('escape', 0.8); this.impacts.spawn(e.pos, '#9ff6ff', 2.5, 0.6); break; }
         case 'pounce': { this.impacts.spawn(e.pos, '#ffe08a', 1.2 + (e.strength ?? 1) * 0.5, 0.35); this.bubbles.emit(e.pos, 24, 0.9, 4, 0.08); audio.play('hit', 1.3); if (e.player != null && e.player >= 0) { const d = padOf(e.player); if (typeof d === 'number') rumble(d, 0.7, 0.4, 140); this.shake(e.player, 0.6); } break; }
         case 'burst': { audio.play('burst'); break; }
@@ -580,7 +591,7 @@ export class Engine {
         lock: lockA && isAlive(lockA) ? { name: creature(lockA.creature).name, band: bandOf(p, lockA), hp: lockA.hp / lockA.hpMax, color: BAND_COLOR[bandOf(p, lockA)] } : undefined,
         hunted: p.hunted, hunterAngle, hunterName: hunter ? creature(hunter.creature).name : undefined,
         hunterState: p.hunted >= 0.5 ? 'hunting' : p.hunted > 0.2 ? 'noticed' : 'none', inCover: p.cover > 0.3, still: Math.hypot(p.vel.x, p.vel.y, p.vel.z) < 0.3,
-        hint: game.hintFor(i), respawnIn: p.state === 'dead' ? Math.max(0, 4.5 - p.respawnT) : 0, state: p.state,
+        hint: game.hintFor(i), respawnIn: p.state === 'dead' ? Math.max(0, 3 - p.respawnT) : 0, fade: cs?.fade ?? 0, state: p.state,
         kills: p.kills, eats: p.eats, escapes: p.escapes, protect: p.spawnProtect > 0, bandMarkers: markers.slice(0, 24),
       };
     });
@@ -606,7 +617,7 @@ export class Engine {
     this.assets.dispose();
     this.clearMatch();
     this.sea?.dispose();
-    this.bubbles.dispose(); this.impacts.dispose(); this.silt.dispose();
+    this.bubbles.dispose(); this.sparkles.dispose(); this.impacts.dispose(); this.silt.dispose();
     this.ringGeo.dispose(); this.shieldGeo.dispose();
     this.renderer.dispose();
     this.renderer.forceContextLoss();

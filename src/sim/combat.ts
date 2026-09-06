@@ -151,6 +151,9 @@ export function kill(ctx: HitContext, victim: Actor, killer?: Actor) {
   victim.hp = 0;
   victim.state = 'dead'; victim.stateT = 0; victim.corpseT = 0; victim.eaten = 0;
   victim.killer = killer?.id ?? -1;
+  victim.deathY = victim.pos.y; victim.sparkled = false;
+  // a little random spin so the body tumbles as it goes limp
+  victim.tumble = { x: (Math.random() - 0.5) * 2.2, y: (Math.random() - 0.5) * 1.2, z: (Math.random() - 0.5) * 2.2 };
   victim.lockTarget = -1; victim.abilityActive = false;
   if (victim.grabbing >= 0) { const g = ctx.byId(victim.grabbing); if (g && g.state === 'grabbed') { g.state = 'free'; g.grabbedBy = -1; } victim.grabbing = -1; }
   if (victim.grabbedBy >= 0) { const g = ctx.byId(victim.grabbedBy); if (g && g.state === 'grabbing') { g.state = 'free'; g.grabbing = -1; } victim.grabbedBy = -1; }

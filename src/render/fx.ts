@@ -6,7 +6,7 @@ export class Bubbles {
   readonly points: THREE.Points;
   private pos: Float32Array; private vel: Float32Array; private life: Float32Array; private size: Float32Array;
   private geo: THREE.BufferGeometry; private cursor = 0;
-  constructor(private max = 900) {
+  constructor(private max = 900, color = [0.8, 0.95, 0.95], private rise = 0.6) {
     this.pos = new Float32Array(max * 3); this.vel = new Float32Array(max * 3); this.life = new Float32Array(max); this.size = new Float32Array(max);
     this.geo = new THREE.BufferGeometry();
     this.geo.setAttribute('position', new THREE.BufferAttribute(this.pos, 3).setUsage(THREE.DynamicDrawUsage));
@@ -15,7 +15,8 @@ export class Bubbles {
     const mat = new THREE.ShaderMaterial({
       transparent: true, depthWrite: false, blending: THREE.AdditiveBlending,
       vertexShader: `attribute float aLife;attribute float aSize;varying float vA;void main(){vec4 mv=modelViewMatrix*vec4(position,1.);gl_Position=projectionMatrix*mv;gl_PointSize=clamp(aSize*380./max(1.,-mv.z),0.,18.)*step(0.001,aLife);vA=clamp(aLife,0.,1.);}`,
-      fragmentShader: `varying float vA;void main(){float r=length(gl_PointCoord-.5)*2.;float ring=smoothstep(1.,.55,r)*(.35+.65*smoothstep(.2,.7,r));gl_FragColor=vec4(.8,.95,.95,ring*vA*.8);}`,
+      uniforms: { uColor: { value: new THREE.Color(color[0], color[1], color[2]) } },
+      fragmentShader: `uniform vec3 uColor;varying float vA;void main(){float r=length(gl_PointCoord-.5)*2.;float ring=smoothstep(1.,.55,r)*(.35+.65*smoothstep(.2,.7,r));gl_FragColor=vec4(uColor,ring*vA*.8);}`,
     });
     this.points = new THREE.Points(this.geo, mat);
     this.points.frustumCulled = false; this.points.name = 'bubbles';
@@ -25,7 +26,7 @@ export class Bubbles {
       const k = this.cursor; this.cursor = (this.cursor + 1) % this.max;
       const a = Math.random() * 6.283, b = Math.random() * 3.14;
       this.pos[k * 3] = p.x + (Math.random() - 0.5) * spread; this.pos[k * 3 + 1] = p.y + (Math.random() - 0.5) * spread; this.pos[k * 3 + 2] = p.z + (Math.random() - 0.5) * spread;
-      this.vel[k * 3] = Math.cos(a) * Math.sin(b) * speed; this.vel[k * 3 + 1] = Math.abs(Math.cos(b)) * speed * 0.6 + 0.6; this.vel[k * 3 + 2] = Math.sin(a) * Math.sin(b) * speed;
+      this.vel[k * 3] = Math.cos(a) * Math.sin(b) * speed; this.vel[k * 3 + 1] = Math.abs(Math.cos(b)) * speed * 0.6 + this.rise; this.vel[k * 3 + 2] = Math.sin(a) * Math.sin(b) * speed;
       this.life[k] = life * (0.6 + Math.random() * 0.6); this.size[k] = size * (0.6 + Math.random() * 0.8);
     }
   }

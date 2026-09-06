@@ -268,3 +268,5 @@ input[type='checkbox'] { width: 20px; height: 20px; accent-color: var(--ember); 
 .aim.cooling i { opacity: .3; }
 .aim-label { position: absolute; left: 50%; top: 100%; transform: translate(-50%, .35em); white-space: nowrap; font: 700 .7em var(--font-display); letter-spacing: .14em; color: var(--foam); text-shadow: 0 0 6px rgba(0,0,0,.8); }
 .aim.in-range .aim-label { color: currentColor; }
+
+.fade { position: absolute; inset: 0; background: #020a0d; pointer-events: none; z-index: 6; }
