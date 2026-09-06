@@ -22,10 +22,11 @@ export function SelectScreen(p: Props) {
   return (
     <section className="select" aria-label="Choose your creature">
       <header className="select-header">
-        <div className="brand"><Emblem size={34} /><span className="brand-name">CAMBRIAN <b>EXPLOSION</b></span></div>
+        <div className="brand"><Emblem size={34} /><img className="header-logo" src={`${ASSETS}assets/brand/logo.svg`} alt="Cambrian Explosion" /></div>
         <div className="mode-picker" role="tablist" aria-label="Game mode">
           {p.modes.map((m) => (
             <button key={m} role="tab" aria-selected={p.mode === m} className={`mode-chip ${p.mode === m ? 'active' : ''}`} onClick={() => p.onMode(m)}>
+              <img className="mode-art" src={`${ASSETS}assets/ui/mode-${m}.webp`} alt="" />
               <span>{p.modeInfo[m].name}</span><small>{p.modeInfo[m].players}</small>
             </button>
           ))}
@@ -45,7 +46,7 @@ export function SelectScreen(p: Props) {
                 style={{ ['--c' as string]: hovering.length ? PLAYER_COLORS[hovering[0].i] : c.color }}
                 onClick={() => { const i = p.players.findIndex((pl) => !pl.ready && typeof pl.device === 'string'); p.onPick(i >= 0 ? i : 0, c.id); }}
                 title={`${c.name} · ${c.role}`} aria-label={c.name}>
-                <img src={`${ASSETS}assets/creatures/${c.id}.thumb.png`} alt="" draggable={false} loading="eager" />
+                <img src={`${ASSETS}assets/creatures/${c.id}.select.png`} alt="" draggable={false} loading="eager" />
                 <span className="cell-name">{c.name}</span>
                 <span className="cell-rings">
                   {hovering.map(({ i, pl }) => <i key={i} style={{ ['--c' as string]: PLAYER_COLORS[i], ['--k' as string]: i }} className={pl.ready ? 'ring locked' : 'ring'} />)}
@@ -69,7 +70,7 @@ export function SelectScreen(p: Props) {
                   <button className="remove" aria-label={`Remove player ${i + 1}`} onClick={() => p.onRemove(i)}>×</button>
                 </div>
                 <div className="hero">
-                  <img key={def.id} src={`${ASSETS}assets/creatures/${def.id}.card.png`} alt={`${def.name} reconstruction`} draggable={false} />
+                  <img key={def.id} src={`${ASSETS}assets/creatures/${def.id}.select.png`} alt={`${def.name} reconstruction`} draggable={false} />
                 </div>
                 <div className="creature-copy">
                   <span className="role">{def.ground ? 'SEAFLOOR' : 'SWIMMER'} · {def.role}</span>

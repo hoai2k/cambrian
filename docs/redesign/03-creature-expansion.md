@@ -92,8 +92,10 @@ Every new full/LOD model carries the shared v1 mouth, inner-mouth and primary
 attack sockets. Dedicated feeding appendages also carry grasp/paired contacts
 and CCD chains; body, root and locomotor bones are excluded. The 150 sockets
 per detail level attach existing grabbed/swallowed actors to animated anatomy.
-See [anchor behavior and API](../creature-anchors.md) for the distinction between
-these shared attachments and Opabinia's specialized adaptive corpse transfer.
+The merged [attachment runtime](../creature-anchors.md) also guides articulated
+attack contacts and corpse transfer for all rigs. New animals keep their
+authored Eat loops; Opabinia additionally scrubs its special feeding
+performance against consumption progress.
 
 Editable Blender scenes and intermediate review images stay in
 `cambrian/local/expansion-authoring/`. Committed sources, neutral ImageGen

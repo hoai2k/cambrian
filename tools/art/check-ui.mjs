@@ -1,0 +1,12 @@
+import { chromium } from 'playwright-core';
+const browser=await chromium.launch({executablePath:'/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',headless:true});
+const page=await browser.newPage({viewport:{width:1440,height:1000}});const errors=[];page.on('pageerror',e=>errors.push(e.stack));
+await page.goto(process.env.ART_CHECK_URL || 'http://127.0.0.1:5174/');await page.locator('.title').waitFor({timeout:60000});
+await page.screenshot({animations:'disabled',path:'/tmp/cambrian-title.png'});await page.locator('.title').click();await page.locator('.select').waitFor();
+await page.evaluate(async()=>{await Promise.all([...document.images].map(i=>i.decode()))});
+await page.screenshot({animations:'disabled',path:'/tmp/cambrian-select.png'});
+for(const tab of await page.getByRole('tab').all()) await tab.click();
+await page.setViewportSize({width:390,height:844});await page.getByRole('button',{name:'← Title'}).click();
+await page.screenshot({animations:'disabled',path:'/tmp/cambrian-mobile.png'});
+console.log(JSON.stringify({errors,art:await page.locator('.title-art').evaluate(i=>({source:i.currentSrc,width:i.naturalWidth,height:i.naturalHeight})),overflow:await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth)}));
+await browser.close();if(errors.length)process.exitCode=1;

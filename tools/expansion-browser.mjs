@@ -3,6 +3,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 const base=(process.env.QA_BASE_URL || 'http://127.0.0.1:5173').replace(/\/$/,'');
 const viewerOnly=Boolean(process.env.QA_VIEWER_ONLY);
+const auditOnly=Boolean(process.env.QA_AUDIT_ONLY);
 const out=process.env.CAMBRIAN_QA_DIR || '../expansion-authoring/review';fs.mkdirSync(out,{recursive:true});
 const browser=await chromium.launch({executablePath:process.env.CHROME_PATH || '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',args:['--use-gl=angle','--use-angle=swiftshader','--enable-unsafe-swiftshader','--no-sandbox']});
 const page=await browser.newPage({viewport:{width:1440,height:1000}});
@@ -16,7 +17,7 @@ const audit=await page.evaluate(async()=>{const m=await import('/tools/asset-aud
 fs.writeFileSync(path.join(out,'runtime-asset-audit.json'),JSON.stringify(audit,null,2));
 console.log('PASS: runtime loading, textures, skinning, all clips, loops and LOD reduction for',audit.length,'new creatures');
 }
-for(const id of ['pikaia','nectocaris','burgessomedusa','odaraia','ottoia','cambroraster','sidneyia','leanchoilia','isoxys','odontogriphus','ctenorhabdotus','vetulicola','tamisiocaris']) {
+if(!auditOnly)for(const id of ['pikaia','nectocaris','burgessomedusa','odaraia','ottoia','cambroraster','sidneyia','leanchoilia','isoxys','odontogriphus','ctenorhabdotus','vetulicola','tamisiocaris']) {
  const name=id[0].toUpperCase()+id.slice(1);
  await page.getByRole('button',{name:new RegExp('^'+name+' ')}).click();
  await page.locator('.status').waitFor({state:'hidden',timeout:30000});
@@ -24,7 +25,7 @@ for(const id of ['pikaia','nectocaris','burgessomedusa','odaraia','ottoia','camb
  await page.screenshot({path:path.join(out,`viewer-${id}.png`)});
 }
 }
-if(!viewerOnly){
+if(!viewerOnly&&!auditOnly){
 await page.goto(`${base}/`,{waitUntil:'networkidle',timeout:120000});
 await page.keyboard.press('Enter');await page.locator('.select').waitFor();
 await page.getByRole('option',{name:'Burgessomedusa',exact:true}).click();

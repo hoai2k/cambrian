@@ -41,6 +41,12 @@ export async function ensureLoaded(id: CreatureId, onProgress?: (loaded: number,
 }
 
 const SPINE_RE = /^(body|segment)_(\d+)$/;
+/**
+ * Rigs whose Eat clip is an authored reach/grasp/carry performance, scrubbed by consumption progress
+ * (see `changedClips` in docs/creature-anchors-manifest.json). Every other rig loops its Eat clip while
+ * the attachment pass moves the food through its sockets.
+ */
+const FEEDING_PERFORMANCE: ReadonlySet<CreatureId> = new Set<CreatureId>(['opabinia']);
 
 export class CreatureView {
   readonly group = new THREE.Group();
@@ -74,6 +80,8 @@ export class CreatureView {
   public visibleLength = 1;
   readonly def;
   readonly heightUnits: number;
+  /** The Eat clip is a progress-driven performance rather than a loop. */
+  readonly feedingPerformance: boolean;
 
   constructor(readonly creatureId: CreatureId, loaded: Loaded, private shared: { ringGeo: THREE.BufferGeometry; shieldGeo: THREE.BufferGeometry }, readonly lod: Lod = 0) {
     this.def = creature(creatureId);
@@ -82,6 +90,7 @@ export class CreatureView {
     this.model.position.copy(loaded.center).multiplyScalar(-loaded.unit);
     this.heightUnits = loaded.size.y * loaded.unit;
     this.anchors = new CreatureAnchors(this.model);
+    this.feedingPerformance = FEEDING_PERFORMANCE.has(creatureId) && loaded.gltf.animations.some((c) => c.name === 'Eat');
     this.inner.add(this.model);
     this.group.add(this.inner);
     this.model.traverse((o) => {
