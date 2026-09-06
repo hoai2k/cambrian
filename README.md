@@ -38,7 +38,7 @@ every push to `main` (set the repository's Pages source to "GitHub Actions").
 | `src/input/`, `src/audio/` | Gamepad/keyboard reading; fully synthesized audio. |
 | `public/assets/creatures/` | The eight rigged GLB models and card renders (unchanged originals plus `.card.png` cutouts). |
 | `docs/redesign/` | Design and technical plan. |
-| `tools/` | Headless sim harness (`harness.ts`), control-direction test (`controls-test.ts`), respawn test (`respawn-test.ts`), browser smoke test (`smoke.mjs`), LOD generator (`make-lods.mjs`), SFX generator (`gen-sfx.mjs`), card cutout script. |
+| `tools/` | Headless sim harness (`harness.ts`), control-direction test (`controls-test.ts`), respawn test (`respawn-test.ts`), plant collision test (`flora-test.ts`), browser smoke test (`smoke.mjs`), LOD generator (`make-lods.mjs`), SFX generator (`gen-sfx.mjs`), card cutout script. |
 | `image-requests.md` | Art still needed (logo, favicon, key art…). |
 
 ## Headless checks
@@ -47,6 +47,7 @@ every push to `main` (set the repository's Pages source to "GitHub Actions").
 run() { npx esbuild "$1" --bundle --platform=node --format=esm --outfile=/tmp/t.mjs && node /tmp/t.mjs "${@:2}"; }
 run tools/controls-test.ts        # camera-relative movement directions
 run tools/respawn-test.ts         # a giant eats a larva; it must come back
+run tools/flora-test.ts           # plants: slide around sponges, fold algae, spring back
 run tools/harness.ts all 240      # balance: hunting, growth, escapes per creature
 run tools/harness.ts duel         # rival fights between creature pairs
 npm run preview & node tools/smoke.mjs /tmp   # needs Chromium; writes screenshots

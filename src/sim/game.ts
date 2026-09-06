@@ -3,9 +3,10 @@ import { applyScaleStats, bandOf, bodyRadius, canAct, clearanceOf, isAlive, isHi
 import { makeBrain, think, type AiWorld } from './ai';
 import { applyHit, kill, startSwallow, type HitContext } from './combat';
 import { creature, CREATURE_IDS, type CreatureId, type MoveDef } from './creatures';
+import { resolveFlora, stepFlora } from './flora';
 import { SpatialHash } from './spatial';
 import { emptyInput, TIER_NEED, TIER_SCALE, type Actor, type InputFrame, type Mode, type PlayerSetup, type Prompt, type SiltCloud, type Tier, type WorldEvent } from './types';
-import { biomeAt, channelDistance, coverAt, generateWorld, groundHeight, LIGHT_WINDOW_Y, microbialAt, NURSERIES, nurseryFactor, resolveStatic, sampleCurrent, sampleHeight, SURFACE_Y, WORLD_RADIUS, type Boulder, type Cover, type WorldData } from './world';
+import { biomeAt, channelDistance, coverAt, generateWorld, groundHeight, LIGHT_WINDOW_Y, microbialAt, NURSERIES, nurseryFactor, resolveStatic, sampleCurrent, sampleHeight, SURFACE_Y, WORLD_RADIUS, type Boulder, type Cover, type Flora, type WorldData } from './world';
 
 export interface PlayerProgress {
   prompts: Prompt[];
@@ -51,7 +52,9 @@ export class Game implements AiWorld {
   private scratchActors: Actor[] = [];
   private scratchBoulders: Boulder[] = [];
   private scratchCover: Cover[] = [];
+  private scratchFlora: Flora[] = [];
   private ambientTimer = 0;
+  private stepIndex = 0;
   private schoolCount = 0;
   private hitCtx: HitContext;
   setups: PlayerSetup[];
@@ -230,6 +233,7 @@ export class Game implements AiWorld {
   step(dt: number, inputs: Map<number, InputFrame>) {
     if (this.state.status !== 'playing') return;
     this.time += dt; this.hitCtx.time = this.time;
+    this.stepIndex++;
     this.hash.rebuild(this.actors);
 
     for (const a of this.actors) {
@@ -239,6 +243,7 @@ export class Game implements AiWorld {
       this.updateActor(a, input, dt);
     }
     this.resolveActorOverlap();
+    stepFlora(this.world, dt);
     this.updateSilt(dt);
     this.updatePopulation(dt);
     this.updateModes(dt);
@@ -466,6 +471,11 @@ export class Game implements AiWorld {
     // Static collision
     const hitWall = resolveStatic(this.world, a.pos, bodyRadius(a), this.scratchBoulders);
     if (hitWall && !def.ground) { a.vel.x *= 0.6; a.vel.z *= 0.6; }
+    // Plants: swarm snacks are numerous and tiny, so they take turns on alternate steps.
+    if (!isHidden(a) && a.state !== 'grabbed') {
+      if (a.controller !== 'swarm') resolveFlora(this.world, a, dt, this.scratchFlora);
+      else if (((a.id + this.stepIndex) & 1) === 0) resolveFlora(this.world, a, dt * 2, this.scratchFlora);
+    }
     const floor = groundHeight(this.world, a.pos.x, a.pos.z, this.scratchBoulders) + clearanceOf(a);
     if (def.ground) {
       if (a.grounded || a.pos.y <= floor) { a.pos.y = a.grounded ? damp(a.pos.y, floor, 18, dt) : floor; if (!a.grounded && a.hopVel < 0) { a.grounded = true; a.hopVel = 0; } }

@@ -1,7 +1,8 @@
 import * as THREE from 'three';
 import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js';
 import { makeRng, TAU } from '../shared/math';
-import { LIGHT_WINDOW_Y, sampleCurrent, sampleHeight, SURFACE_Y, WORLD_RADIUS, type WorldData } from '../sim/world';
+import { FLORA_PHYS } from '../sim/flora';
+import { LIGHT_WINDOW_Y, sampleCurrent, sampleHeight, SURFACE_Y, WORLD_RADIUS, type Flora, type WorldData } from '../sim/world';
 
 export type Quality = 'high' | 'low';
 
@@ -56,13 +57,18 @@ export function createSea(scene: THREE.Scene, world: WorldData, quality: Quality
   fill.position.set(20, 8, -18);
   group.add(fill);
 
-  function seaMaterial(color: string, kind: SeaKind, sway = false) {
+  function seaMaterial(color: string, kind: SeaKind, sway = false, bend = false) {
     const m = M(new THREE.MeshStandardMaterial({ color, roughness: kind === 'algae' ? 0.66 : 0.92, metalness: 0 }));
     m.onBeforeCompile = (shader) => {
       shader.uniforms.uSeaTime = seaTime;
       shader.vertexShader = shader.vertexShader
-        .replace('#include <common>', `#include <common>\nuniform float uSeaTime;\nvarying vec3 vSeaWorld;`)
+        .replace('#include <common>', `#include <common>\nuniform float uSeaTime;\nvarying vec3 vSeaWorld;${bend ? '\nattribute vec2 aBend;' : ''}`)
         .replace('#include <begin_vertex>', `#include <begin_vertex>
+        ${bend ? `// Sim-driven lean: aBend is the top displacement in local units, pre-divided by height^1.3.
+        float bendF = pow(max(position.y, 0.), 1.3);
+        vec2 bendD = aBend * bendF;
+        transformed.xz += bendD;
+        transformed.y -= dot(bendD, bendD) * .5 / max(position.y, .15);` : ''}
         ${sway ? `vec3 origin = vec3(0.);
         #ifdef USE_INSTANCING
         origin = instanceMatrix[3].xyz;
@@ -97,16 +103,18 @@ export function createSea(scene: THREE.Scene, world: WorldData, quality: Quality
         outgoingLight += diffuseColor.rgb*vec3(.34,.5,.42)*caustic*exp(-max(0.,${SURFACE_Y.toFixed(1)}-vSeaWorld.y)*.03);
         #include <opaque_fragment>`);
     };
-    m.customProgramCacheKey = () => `cambrian-sea-${kind}-${sway}`;
+    m.customProgramCacheKey = () => `cambrian-sea-${kind}-${sway}-${bend}`;
     return m;
   }
 
   const sedimentMat = seaMaterial('#a3a682', 'sediment');
   const rockMat = seaMaterial('#75837a', 'rock');
-  const spongeMat = seaMaterial('#c9a468', 'sponge');
-  const spongeMat2 = seaMaterial('#b8a97c', 'sponge');
-  const algaeMat = seaMaterial('#7a6040', 'algae', true);
-  const tuftMat = seaMaterial('#5d7a43', 'algae', true);
+  const spongeMat = seaMaterial('#c9a468', 'sponge', false, true);
+  const spongeMat2 = seaMaterial('#b8a97c', 'sponge', false, true);
+  const algaeMat = seaMaterial('#7a6040', 'algae', true, true);
+  const tuftMat = seaMaterial('#5d7a43', 'algae', true, true);
+  // Micro-tufts share the tuft look but are static scatter with no sim state.
+  const microMat = seaMaterial('#5d7a43', 'algae', true);
 
   // Terrain
   const size = WORLD_RADIUS * 2 + 40;
@@ -128,7 +136,7 @@ export function createSea(scene: THREE.Scene, world: WorldData, quality: Quality
   const chunked = <T extends { pos: { x: number; y: number; z: number } }>(
     name: string, geo: THREE.BufferGeometry, mat: THREE.Material, items: T[],
     place: (item: T, d: THREE.Object3D) => void,
-    opts: { castShadow?: boolean; color?: (item: T) => THREE.Color; range?: number; maxLength?: number } = {},
+    opts: { castShadow?: boolean; color?: (item: T) => THREE.Color; range?: number; maxLength?: number; bend?: (item: T, attr: THREE.InstancedBufferAttribute, index: number) => void } = {},
   ) => {
     const cells = new Map<number, T[]>();
     for (const it of items) {
@@ -138,11 +146,20 @@ export function createSea(scene: THREE.Scene, world: WorldData, quality: Quality
     }
     const meshes: THREE.InstancedMesh[] = [];
     for (const [key, arr] of cells) {
-      const im = new THREE.InstancedMesh(geo, mat, arr.length);
+      // Per-instance attributes live on the geometry, so a bendable chunk needs its own copy.
+      let cg = geo, bendAttr: THREE.InstancedBufferAttribute | undefined;
+      if (opts.bend) {
+        cg = G(geo.clone());
+        bendAttr = new THREE.InstancedBufferAttribute(new Float32Array(arr.length * 2), 2);
+        bendAttr.setUsage(THREE.DynamicDrawUsage);
+        cg.setAttribute('aBend', bendAttr);
+      }
+      const im = new THREE.InstancedMesh(cg, mat, arr.length);
       im.name = name; im.castShadow = !!opts.castShadow && high; im.receiveShadow = true;
       arr.forEach((it, i) => {
         place(it, dummy); dummy.updateMatrix(); im.setMatrixAt(i, dummy.matrix);
         if (opts.color) im.setColorAt(i, opts.color(it));
+        if (bendAttr) opts.bend!(it, bendAttr, i);
       });
       im.computeBoundingSphere();
       group.add(im); meshes.push(im);
@@ -220,6 +237,7 @@ export function createSea(scene: THREE.Scene, world: WorldData, quality: Quality
   for (let i = 0; i < (high ? 9 : 6); i++) { const a = rng() * TAU, t = 0.13 + rng() * 0.22, n = 0.2 + rng() * 0.4; tuftParts.push(curveTube([[0, 0, 0], [Math.cos(a) * t * 0.4, n * 0.4, Math.sin(a) * t * 0.4], [Math.cos(a) * t, n * 0.8, Math.sin(a) * t], [Math.cos(a + 0.2) * t * 1.2, n, Math.sin(a + 0.2) * t * 1.2]], 0.008, 4, 3)); }
   const tuftGeo = merged(tuftParts);
 
+  const floraSlots = new Map<Flora, { attr: THREE.InstancedBufferAttribute; i: number }>();
   const floraSets: Record<string, { geo: THREE.BufferGeometry; mat: THREE.Material; items: typeof world.flora }> = {
     vauxia: { geo: vauxiaGeo, mat: spongeMat, items: [] }, sac: { geo: sacGeo, mat: spongeMat, items: [] },
     choia: { geo: choiaGeo, mat: spongeMat2, items: [] }, thalli: { geo: thalliGeo, mat: algaeMat, items: [] }, tuft: { geo: tuftGeo, mat: tuftMat, items: [] },
@@ -232,8 +250,22 @@ export function createSea(scene: THREE.Scene, world: WorldData, quality: Quality
     const range = kind === 'tuft' ? 58 : kind === 'choia' ? 88 : kind === 'sac' ? 100 : 125;
     chunked(`flora-${kind}`, set.geo, set.mat, set.items,
       (f, d) => { d.position.set(f.pos.x, f.pos.y, f.pos.z); d.rotation.set(0, f.rot, 0); d.scale.set(f.scale, f.sy, f.scale); },
-      { range, maxLength: kind === 'tuft' ? 7 : Infinity, color: (f) => color.setHSL(0.095 + rng() * 0.05, 0.14 + rng() * 0.12, f.shade * 0.72) });
+      { range, maxLength: kind === 'tuft' ? 7 : Infinity, color: (f) => color.setHSL(0.095 + rng() * 0.05, 0.14 + rng() * 0.12, f.shade * 0.72),
+        bend: (f, attr, i) => floraSlots.set(f, { attr, i }) });
   }
+  /** Write a plant's sim bend into its instance attribute, in local geometry units. */
+  const writeBend = (f: Flora, slot: { attr: THREE.InstancedBufferAttribute; i: number }) => {
+    // World top displacement -> undo the instance yaw, divide by the xz scale, then by h^1.3 so the
+    // shader's pow(y,1.3) ramp lands exactly on it at the top of the geometry.
+    const k = 1 / (Math.max(f.scale, 1e-3) * Math.pow(FLORA_PHYS[f.kind].h, 1.3));
+    const c = Math.cos(f.rot), sn = Math.sin(f.rot);
+    // rotation.y = rot maps local (x,z) to world (x c + z sn, -x sn + z c); this is the inverse.
+    const lx = (f.bx * c - f.bz * sn) * k, lz = (f.bx * sn + f.bz * c) * k;
+    const a = slot.attr.array as Float32Array;
+    a[slot.i * 2] = lx; a[slot.i * 2 + 1] = lz;
+    slot.attr.needsUpdate = true;
+  };
+  const bentSlots = new Set<Flora>();
 
   // Water surface / light window
   const surfaceMat = M(new THREE.ShaderMaterial({
@@ -302,7 +334,7 @@ export function createSea(scene: THREE.Scene, world: WorldData, quality: Quality
     const s = 0.6 + rng() * 1.4;
     microItems.push({ pos: { x, y: sampleHeight(x, z) - 0.02, z }, s, a, rx: (rng() - 0.5) * 0.5, rz: (rng() - 0.5) * 0.5, sy: s * (0.8 + rng() * 0.8) });
   }
-  chunked('micro-tufts', microGeo, tuftMat, microItems,
+  chunked('micro-tufts', microGeo, microMat, microItems,
     (m, d) => { d.position.set(m.pos.x, m.pos.y, m.pos.z); d.rotation.set(m.rx, m.a, m.rz); d.scale.set(m.s, m.sy, m.s); },
     { range: 32, maxLength: 2.2, color: () => color.setHSL(0.22 + rng() * 0.08, 0.3, 0.3 + rng() * 0.2) });
 
@@ -336,6 +368,9 @@ export function createSea(scene: THREE.Scene, world: WorldData, quality: Quality
     update(time, dt, focus) {
       if (disposed) return;
       seaTime.value = time;
+      // Plants the sim has disturbed lean in the shader; ones that settled get written back to rest once.
+      for (const f of world.activeFlora) { const slot = floraSlots.get(f); if (slot) { writeBend(f, slot); bentSlots.add(f); } }
+      for (const f of bentSlots) if (!f.active) { const slot = floraSlots.get(f); if (slot) writeBend(f, slot); bentSlots.delete(f); }
       sun.position.set(focus.x - 40, 70, focus.z + 20); sun.target.position.copy(focus); sun.target.updateMatrixWorld();
       // shafts orbit slowly around the focus
       for (let i = 0; i < shaftCount; i++) {
