@@ -47,7 +47,13 @@ function PlayerPanel({ p }: { p: PlayerHud }) {
           <div className={`bar stamina ${p.exhausted ? 'exhausted' : ''}`}><i style={{ width: `${(p.stamina / p.staminaMax) * 100}%` }} /></div>
         </div>
       </div>
-      {p.lock && (
+      {p.aim && (
+        <div className={`aim ${p.aim.inRange ? 'in-range' : ''} ${p.aim.ready ? '' : 'cooling'}`} style={{ left: `${p.aim.x * 100}%`, top: `${p.aim.y * 100}%`, color: p.aim.color }}>
+          <i /><i /><i /><i />
+          <span className="aim-label">{p.aim.inRange ? (p.aim.ready ? 'X · POUNCE' : '…') : p.aim.name}</span>
+        </div>
+      )}
+      {p.lock && !p.aim && (
         <div className="lock-panel" style={{ color: p.lock.color }}>
           <span className="lock-band">{p.lock.band.toUpperCase()}</span>
           <b>{p.lock.name}</b>

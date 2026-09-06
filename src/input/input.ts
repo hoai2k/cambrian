@@ -3,6 +3,7 @@ export interface RawControls {
   mx: number; my: number; lookX: number; lookY: number;
   burst: number; rise: boolean; sink: boolean;
   light: boolean; heavy: boolean; ability: boolean; dodge: boolean; guard: boolean; lock: boolean; sense: boolean;
+  dash: boolean; aim: boolean; rsClick: boolean;
   menu: boolean; view: boolean; confirm: boolean; back: boolean;
   dleft: boolean; dright: boolean; dup: boolean; ddown: boolean;
   any: boolean;
@@ -11,6 +12,7 @@ export interface RawControls {
 export const emptyControls = (): RawControls => ({
   mx: 0, my: 0, lookX: 0, lookY: 0, burst: 0, rise: false, sink: false,
   light: false, heavy: false, ability: false, dodge: false, guard: false, lock: false, sense: false,
+  dash: false, aim: false, rsClick: false,
   menu: false, view: false, confirm: false, back: false, dleft: false, dright: false, dup: false, ddown: false, any: false,
 });
 
@@ -30,7 +32,8 @@ export function readGamepad(gp: Gamepad): RawControls {
   const c: RawControls = {
     mx, my: -my, lookX: lx, lookY: ly,
     burst: v(7), rise: b(0), sink: b(10),
-    light: b(5), heavy: b(2), ability: b(3), dodge: b(1), guard: b(4), lock: v(6) > 0.4, sense: b(12),
+    light: b(5), heavy: b(2), ability: b(3), dodge: b(4), guard: b(1), lock: v(6) > 0.4, sense: b(12),
+    dash: b(4), aim: v(6) > 0.4, rsClick: b(11),
     menu: b(9), view: b(8), confirm: b(0), back: b(1),
     dleft: b(14), dright: b(15), dup: b(12), ddown: b(13),
     any: false,
@@ -63,13 +66,14 @@ export class KeyboardInput {
       c.mx = Number(k('KeyD')) - Number(k('KeyA')); c.my = Number(k('KeyW')) - Number(k('KeyS'));
       c.lookX = Number(k('ArrowRight')) - Number(k('ArrowLeft')); c.lookY = Number(k('ArrowDown')) - Number(k('ArrowUp'));
       c.burst = k('ShiftLeft') ? 1 : 0; c.rise = k('Space'); c.sink = k('KeyC');
-      c.light = k('KeyF'); c.heavy = k('KeyG'); c.ability = k('KeyR'); c.dodge = k('KeyV'); c.guard = k('KeyQ'); c.lock = k('Tab'); c.sense = k('KeyE');
+      c.light = k('KeyF'); c.heavy = k('KeyG'); c.ability = k('KeyR'); c.dodge = k('KeyV'); c.dash = k('KeyV'); c.guard = k('KeyQ'); c.lock = k('Tab'); c.aim = k('Tab'); c.sense = k('KeyE');
+      if (k('PageUp') || k('PageDown')) { c.rsClick = true; c.lookY = k('PageUp') ? -1 : 1; }
       c.menu = k('Escape'); c.confirm = k('Enter') || k('Space'); c.back = k('Backspace');
       c.dleft = k('ArrowLeft'); c.dright = k('ArrowRight'); c.dup = k('ArrowUp'); c.ddown = k('ArrowDown');
     } else {
       c.mx = Number(k('KeyL')) - Number(k('KeyJ')); c.my = Number(k('KeyI')) - Number(k('KeyK'));
       c.burst = k('ShiftRight') ? 1 : 0; c.rise = k('KeyN'); c.sink = k('KeyM');
-      c.light = k('Semicolon'); c.heavy = k('Quote'); c.ability = k('KeyP'); c.dodge = k('Slash'); c.guard = k('KeyU'); c.lock = k('KeyO'); c.sense = k('KeyY');
+      c.light = k('Semicolon'); c.heavy = k('Quote'); c.ability = k('KeyP'); c.dodge = k('Slash'); c.dash = k('Slash'); c.guard = k('KeyU'); c.lock = k('KeyO'); c.aim = k('KeyO'); c.sense = k('KeyY');
       c.confirm = k('Enter'); c.back = k('Backspace');
       c.dleft = k('KeyJ'); c.dright = k('KeyL'); c.dup = k('KeyI'); c.ddown = k('KeyK');
     }
