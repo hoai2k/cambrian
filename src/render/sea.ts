@@ -27,6 +27,8 @@ export interface SeaEnvironment {
   update(time: number, dt: number, focus: THREE.Vector3, cams?: readonly THREE.Vector3[]): void;
   dispose(): void;
   sun: THREE.DirectionalLight;
+  /** Build the coarse tiles around a point up front, so a new view is never a hole. */
+  prime(x: number, z: number, radius?: number): void;
   /** Streaming counters for the profiler. */
   stats(): { chunks: number; far: number; pending: number };
 }
@@ -419,7 +421,12 @@ export function createSea(scene: THREE.Scene, world: WorldData, quality: Quality
     for (const c of world.chunks.values()) {
       scratchKeys.add(c.key);
       const v = views.get(c.key);
-      if (!v || v.detail !== 'full') { let d = Infinity; for (const cam of cams) d = Math.min(d, Math.hypot(cam.x - c.x, cam.z - c.z)); pending.push({ cx: c.cx, cz: c.cz, d, detail: 'full' }); }
+      if (v?.detail === 'full') continue;
+      let d = Infinity; for (const cam of cams) d = Math.min(d, Math.hypot(cam.x - c.x, cam.z - c.z));
+      // A chunk with no view at all draws nothing, which is a hole in the seabed. Lay the cheap
+      // coarse tile down first for cover, then upgrade it to full detail.
+      if (!v) pending.push({ cx: c.cx, cz: c.cz, d, detail: 'far' });
+      pending.push({ cx: c.cx, cz: c.cz, d, detail: 'full' });
     }
     const span = Math.ceil(FAR_RADIUS / CHUNK) + 1;
     for (const cam of cams) {
@@ -439,13 +446,20 @@ export function createSea(scene: THREE.Scene, world: WorldData, quality: Quality
       if (v.detail === 'full' && !world.chunks.has(v.key)) disposeView(v);
     }
     if (pending.length) {
-      pending.sort((a, b) => (a.detail === b.detail ? a.d - b.d : a.detail === 'full' ? -1 : 1));
-      // Nearest full views first, then far tiles, inside a time budget so a slow machine streams
-      // more slowly rather than stuttering. At least one view is always built, and the budget
-      // opens up when a lot is outstanding (match start, a teleport) so the ground fills in fast.
+      // Cover the ground before detailing it: anything with no view yet gets its cheap coarse tile
+      // first, nearest to a camera first, and only then are near chunks upgraded to full detail.
+      pending.sort((a, b) => {
+        const ac = a.detail === 'far' && !views.has(chunkKey(a.cx, a.cz)) ? 0 : a.detail === 'full' ? 1 : 2;
+        const bc = b.detail === 'far' && !views.has(chunkKey(b.cx, b.cz)) ? 0 : b.detail === 'full' ? 1 : 2;
+        return ac === bc ? a.d - b.d : ac - bc;
+      });
+      // A time budget per frame, so a slow machine streams more slowly rather than stuttering. At
+      // least one view is always built, and the budget opens up when a lot is outstanding (match
+      // start, a teleport) so the ground fills in fast.
       const budget = pending.length > 60 ? 14 : pending.length > 20 ? 9 : 6;
       const t0 = performance.now();
       for (const p of pending) {
+        if (p.detail === 'full' && views.get(chunkKey(p.cx, p.cz))?.detail === 'full') continue;
         buildView(p.cx, p.cz, p.detail);
         if (performance.now() - t0 > budget) break;
       }
@@ -591,6 +605,23 @@ export function createSea(scene: THREE.Scene, world: WorldData, quality: Quality
       particles.position.set(pOrigin.x, 0, pOrigin.z);
       (pGeo.attributes.position as THREE.BufferAttribute).needsUpdate = true;
       bloomMat.opacity = 0.65 + 0.25 * Math.sin(time * 1.3);
+    },
+    /**
+     * Lay the coarse tiles down around a point before the first frame is drawn. Match start and a
+     * teleport both drop the camera somewhere with no scenery built; without this the player sees
+     * the seabed end in mid-water for the second or two the budgeted streaming takes to catch up.
+     */
+    prime(x: number, z: number, radius = FAR_RADIUS) {
+      if (disposed) return;
+      const span = Math.ceil(radius / CHUNK) + 1;
+      const acx = chunkCoord(x), acz = chunkCoord(z);
+      const want: { cx: number; cz: number; d: number }[] = [];
+      for (let cx = acx - span; cx <= acx + span; cx++) for (let cz = acz - span; cz <= acz + span; cz++) {
+        const d = Math.hypot(x - (cx + 0.5) * CHUNK, z - (cz + 0.5) * CHUNK);
+        if (d <= radius && !views.has(chunkKey(cx, cz))) want.push({ cx, cz, d });
+      }
+      want.sort((a, b) => a.d - b.d);
+      for (const w of want) buildView(w.cx, w.cz, 'far');
     },
     stats() { let far = 0; for (const v of views.values()) if (v.detail === 'far') far++; return { chunks: views.size - far, far, pending: pending.length }; },
     dispose() {

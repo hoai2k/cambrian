@@ -12,6 +12,7 @@ How the game makes noise, where the sounds come from, and how to work on them.
 | `src/render/engine.ts` | Turns sim events into sounds: `syncListeners()` and `hearing()` decide how loud and how far to the side each one is, `handleEvents()` picks the sound. |
 | `public/assets/sfx/*.mp3` | The sample library. |
 | `tools/gen-sfx.mjs` | Generates the library from the prompts in its MANIFEST, via the ElevenLabs sound-generation API. |
+| `public/music/*.mp3` | The soundtrack. Open music requests are in [audio-requests.md](audio-requests.md). |
 | `src/workbench/` | The audio workbench at `/workbench/?edit=audio`. |
 
 ## Event kinds and files
@@ -96,9 +97,13 @@ A track may also name the biomes it was written for:
 
 Entering a biome that has a track of its own cues that track, rate-limited by `BIOME_HOLD` so a
 player weaving across an edge does not flip the score back and forth. `src/render/engine.ts`
-reports the first player's biome every frame via `audio.setBiome()`. No track names a biome
-today, so the rotation is purely random — but the wiring is live, and tagging a track is all it
-takes to switch a location on.
+reports the first player's biome every frame via `audio.setBiome()`.
+
+Two tracks are tagged today: `theme-calm` (shallows, nursery) and `theme-danger` (channels,
+escarpment, basin). **Neither file exists yet** — they are the one outstanding asset request, in
+[audio-requests.md](audio-requests.md). A track whose file fails to load joins `MISSING`, leaves
+the rotation and stops cueing its biomes, so until the files land the two untagged reef tracks
+rotate everywhere. Dropping the mp3s into `public/music/` is the whole integration.
 
 Tracks are streamed through media elements rather than decoded into AudioBuffers: they run for
 minutes, and a decoded three-minute track costs around 80 MB where a stream costs nothing. The

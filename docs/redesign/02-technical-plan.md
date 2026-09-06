@@ -5,6 +5,14 @@
 How the design in `01-game-design.md` gets built on top of the assets and
 techniques audited in `00-current-state.md`.
 
+> **This is the plan, and it has been built.** Everything through M8 shipped
+> except two music files; see
+> [the implementation status](README.md#implementation-status) for what is and
+> is not in the game. Where the built thing diverged from the plan — the
+> repository layout, the controller bindings, the bounded world, swarm
+> impostors — the divergence is marked in place below and the code is the
+> authority.
+
 ## Ground rules
 
 1. **Fresh source tree, same stack.** The repo only has a compiled bundle.
@@ -48,6 +56,16 @@ cambrian/
 ├─ tools/             glb-inspect, clip-bake, balance sheet export
 └─ docs/redesign/     these documents
 ```
+
+> **What was actually built.** The split between `sim`, `render`, `app`,
+> `input`, `audio` and `shared` held; the sub-directories under `sim/` did not.
+> `src/sim/` is flat files — `world.ts`, `actors.ts`, `combat.ts`, `ai.ts`,
+> `creatures.ts`, `expansion.ts`, `expansion-abilities.ts`, `flora.ts`,
+> `spatial.ts`, `types.ts` — and the four mode rule sets live in `game.ts`
+> rather than a `modes/` directory. The entry points are `index.html`,
+> `viewer/index.html` and `workbench/index.html` (three Vite inputs), and
+> `src/workbench/` is a development surface this plan did not anticipate. See
+> the repository README for the layout as it stands.
 
 ## Simulation architecture
 
@@ -205,7 +223,10 @@ target) pair within sense range using the spatial hash, at 10 Hz.
   - 3 LODs: game GLB (LOD0), a decimated GLB baked with `gltf-transform`
     (LOD1, ~25%), and an impostor billboard for swarm members past 40 units.
     Giants use the high-poly `anomalocaris.glb` as LOD0 in the viewport they
-    are near.
+    are near. *(Built with two LODs; the impostor billboard was not needed —
+    swarm members take the same `*.lod1.glb` path by on-screen size, and the
+    performance targets were met. LOD1 is about 15% of the triangles for the
+    original rigs and 38–51% for the detailed expansion rigs.)*
 - `render/fx/`: hit sparks (bubbles), silt clouds (soft particle volumes
   that also register as cover), blood trail particles in the current, moult
   flash, Giant wake distortion.
@@ -236,6 +257,14 @@ target) pair within sense range using the spatial hash, at 10 Hz.
 | Menu | 9 | pause / start |
 | D-pad ↑ | 12 | sense pulse |
 | D-pad ←/→ | 14/15 | creature select (lobby) |
+
+> **Superseded by what shipped.** The table above is the plan; the bindings the
+> game reads are in `readGamepad()` in `src/input/input.ts` and are listed in
+> [01 · Combat](01-game-design.md#verbs). The differences that matter: **A** is
+> sprint (not rise), **RB** is rise (not light), **X** is light (not heavy),
+> **RT** is heavy/pounce (not burst), **LB** is dodge (not guard), **B** is
+> guard/parry (not dodge), **LT** is aim rather than a lock-on toggle, and
+> **D-pad ↓** opens the teleport menu, which this plan predates.
 
 - Rumble via `gamepad.vibrationActuator` on hits taken, Giant proximity
   heartbeat, tier-up.
@@ -294,6 +323,11 @@ in parallel.
 | **M6** | Abilities and identity (3 wks) | All eight abilities and passives, per-creature move tuning, Wiwaxia grazing, Marrella burrow, Olenoides enroll physics | Every creature has a reason to be picked | Can players say why they picked theirs? |
 | **M7** | Modes and couch (2 wks) | Feeding frenzy, Hunter & hunted, Reef, drop-in, spectate, per-viewport readability pass, bot difficulty | Four players, any mode, no keyboard | Does quarter-screen read? |
 | **M8** | Polish (3 wks) | New clips swapped in, audio pass, onboarding prompts, rumble, quality tiers, performance to targets, viewer updated to show new clips | 60 fps 4-player `low` on a mid laptop; onboarding hits its 60-second goal | Ship it? |
+
+**Status: M0–M8 are done**, bar the two biome music loops in
+[`docs/audio-requests.md`](../audio-requests.md). The roster grew from 8 to 21
+along the way and the world became endless — both after this table was written.
+See [the implementation status](README.md#implementation-status).
 
 Total: roughly 22–24 weeks for the full design; **M0–M3 (8–9 weeks) is the
 proof that the core is fun** and is the point to decide how far to go.

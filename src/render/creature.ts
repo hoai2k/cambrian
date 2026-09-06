@@ -3,7 +3,7 @@ import { CreatureAnchors } from './anchors';
 import { GLTFLoader, type GLTF } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { MeshoptDecoder } from 'three/examples/jsm/libs/meshopt_decoder.module.js';
 import * as SkeletonUtils from 'three/examples/jsm/utils/SkeletonUtils.js';
-import { clamp, damp } from '../shared/math';
+import { clamp, damp, wrapAngle } from '../shared/math';
 import { makeRecolor, type Recolor } from './recolor';
 import { schemeForCreature } from '../shared/palettes';
 import { creature, type CreatureId } from '../sim/creatures';
@@ -68,8 +68,6 @@ export class CreatureView {
   private baseTransparent: boolean[] = [];
   private spine: THREE.Bone[] = [];
   private wasAttack = false; private wasHit = false; private wasDead = false; private wasStagger = false; private wasDodge = false; private wasParry = false;
-  private ring: THREE.Mesh;
-  private ringMat: THREE.MeshBasicMaterial;
   private shield: THREE.Mesh;
   private shieldMat: THREE.MeshBasicMaterial;
   private shieldA = 0;
@@ -77,7 +75,7 @@ export class CreatureView {
   private highlightColor = new THREE.Color('#7ef0d8');
   private tmpQ = new THREE.Quaternion(); private tmpQ2 = new THREE.Quaternion(); private up = new THREE.Vector3(0, 1, 0);
   private sideAxis = new THREE.Vector3(1, 0, 0);
-  private tmpE = new THREE.Euler(); private ringQ = new THREE.Quaternion(); private ringE = new THREE.Euler(-Math.PI / 2, 0, 0);
+  private tmpE = new THREE.Euler();
   private recolor: Recolor;
   public lastUpdate = 0;
   public visibleLength = 1;
@@ -86,7 +84,7 @@ export class CreatureView {
   /** The Eat clip is a progress-driven performance rather than a loop. */
   readonly feedingPerformance: boolean;
 
-  constructor(readonly creatureId: CreatureId, loaded: Loaded, private shared: { ringGeo: THREE.BufferGeometry; shieldGeo: THREE.BufferGeometry }, readonly lod: Lod = 0) {
+  constructor(readonly creatureId: CreatureId, loaded: Loaded, private shared: { shieldGeo: THREE.BufferGeometry }, readonly lod: Lod = 0) {
     this.def = creature(creatureId);
     this.model = SkeletonUtils.clone(loaded.gltf.scene);
     this.model.scale.setScalar(loaded.unit);
@@ -122,10 +120,6 @@ export class CreatureView {
       act.setEffectiveWeight(0).play(); act.time = clip.duration * 0.5; act.paused = true;
       return act;
     });
-    this.ringMat = new THREE.MeshBasicMaterial({ color: '#ffffff', transparent: true, opacity: 0, depthWrite: false, side: THREE.DoubleSide });
-    this.ring = new THREE.Mesh(shared.ringGeo, this.ringMat);
-    this.ring.rotation.x = -Math.PI / 2; this.ring.renderOrder = 3;
-    this.group.add(this.ring);
     // Guard shield: a translucent cap in front of the body so a block reads instantly.
     this.shieldMat = new THREE.MeshBasicMaterial({ color: '#7ff0ff', transparent: true, opacity: 0, depthWrite: false, side: THREE.DoubleSide, blending: THREE.AdditiveBlending });
     this.shield = new THREE.Mesh(shared.shieldGeo, this.shieldMat);
@@ -172,15 +166,15 @@ export class CreatureView {
   }
   private shadowOn = true;
 
-  /** Ring under the creature, coloured per viewer. */
-  setRing(color: string | null, opacity: number) {
-    if (color) this.ringMat.color.set(color);
-    this.ringMat.opacity = opacity;
-    this.ring.visible = opacity > 0.01;
-  }
   setHighlight(intensity: number, color?: string) { this.highlight = intensity; if (color) this.highlightColor.set(color); }
 
-  update(a: Actor, dt: number, time: number, animate = true) {
+  /**
+   * `alpha` is how far this frame sits between the last two simulation steps (0 = the previous
+   * step, 1 = the current one). The body's transform is interpolated across it so motion is smooth
+   * on displays that do not happen to refresh at exactly the simulation's 60 Hz. A jump larger
+   * than the creature could have made in one step is a teleport or a respawn, and snaps instead.
+   */
+  update(a: Actor, dt: number, time: number, animate = true, alpha = 1) {
     const def = this.def;
     const L = lengthOf(a);
     this.visibleLength = L;
@@ -278,8 +272,14 @@ export class CreatureView {
 
     this.recolor.blend(schemeForCreature(this.creatureId), a.camoColors, a.camoStrength);
     // Transform
-    this.group.position.set(a.pos.x, a.pos.y, a.pos.z);
-    this.group.quaternion.setFromEuler(this.tmpE.set(a.pitch, a.yaw, a.bank, 'YXZ'));
+    const t = a.prevT;
+    const jump = Math.hypot(a.pos.x - t.x, a.pos.y - t.y, a.pos.z - t.z) > Math.max(2, L * 3);
+    const k = jump ? 1 : clamp(alpha, 0, 1);
+    this.group.position.set(t.x + (a.pos.x - t.x) * k, t.y + (a.pos.y - t.y) * k, t.z + (a.pos.z - t.z) * k);
+    this.group.quaternion.setFromEuler(this.tmpE.set(
+      t.pitch + wrapAngle(a.pitch - t.pitch) * k,
+      t.yaw + wrapAngle(a.yaw - t.yaw) * k,
+      t.bank + wrapAngle(a.bank - t.bank) * k, 'YXZ'));
     let sx = L, sy = L, sz = L, oy = 0;
     if ((a.state === 'guard' || a.state === 'parry') && a.abilityActive) {
       const t = clamp(a.stateT / 0.5, 0, 1);
@@ -313,12 +313,6 @@ export class CreatureView {
     this.group.scale.set(sx, sy, sz);
     this.inner.position.y = oy / Math.max(L, 1e-3);
 
-    // ring under the creature (in group space, undo scale)
-    this.ring.position.set(0, -(this.heightUnits * 0.5 + 0.08), 0);
-    const rs = 0.75;
-    this.ring.scale.set(rs, rs, rs);
-    this.ring.quaternion.copy(this.group.quaternion).invert().multiply(this.ringQ.setFromEuler(this.ringE));
-
     // emissive: hit flash, highlight, ability glow
     const flash = a.hitFlash > 0 ? Math.min(1, a.hitFlash * 2.2) : 0;
     const glow = this.highlight;
@@ -346,7 +340,7 @@ export class CreatureView {
     this.mixer.stopAllAction();
     this.mixer.uncacheRoot(this.model);
     this.materials.forEach((m) => m.dispose());
-    this.ringMat.dispose(); this.shieldMat.dispose();
+    this.shieldMat.dispose();
     this.group.removeFromParent();
   }
 }

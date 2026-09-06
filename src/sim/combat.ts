@@ -8,6 +8,8 @@ export interface HitContext {
   events: WorldEvent[];
   byId: (id: number) => Actor | undefined;
   time: number;
+  /** The game's seeded RNG. Combat must not use Math.random, or a seed stops reproducing a match. */
+  rng: () => number;
 }
 
 /** Damage multiplier from relative size. Same size = 1. */
@@ -27,7 +29,7 @@ export function applyHit(ctx: HitContext, attacker: Actor, victim: Actor, move: 
   const dir: Vec3 = { x: toVictim.x, y: toVictim.y, z: toVictim.z };
 
   // Parry window: victim wins the exchange. AI parries only as often as its skill allows; otherwise the tap is a plain guard.
-  if (victim.state === 'parry' && victim.brain && Math.random() > victim.brain.parrySkill) { victim.state = 'guard'; }
+  if (victim.state === 'parry' && victim.brain && ctx.rng() > victim.brain.parrySkill) { victim.state = 'guard'; }
   if (victim.state === 'parry') {
     if (!(victim.abilityActive && vdef.ability === 'enroll')) {
       attacker.state = 'stagger'; attacker.stateT = 0; attacker.stateDur = 0.8;
@@ -156,7 +158,7 @@ export function kill(ctx: HitContext, victim: Actor, killer?: Actor) {
   victim.killer = killer?.id ?? -1;
   victim.deathY = victim.pos.y; victim.sparkled = false;
   // a little random spin so the body tumbles as it goes limp
-  victim.tumble = { x: (Math.random() - 0.5) * 2.2, y: (Math.random() - 0.5) * 1.2, z: (Math.random() - 0.5) * 2.2 };
+  victim.tumble = { x: (ctx.rng() - 0.5) * 2.2, y: (ctx.rng() - 0.5) * 1.2, z: (ctx.rng() - 0.5) * 2.2 };
   stopHiding(victim); victim.lockTarget = -1; victim.abilityActive = false;
   if (victim.grabbing >= 0) { const g = ctx.byId(victim.grabbing); if (g && g.state === 'grabbed') { g.state = 'free'; g.grabbedBy = -1; } victim.grabbing = -1; }
   if (victim.grabbedBy >= 0) { const g = ctx.byId(victim.grabbedBy); if (g && g.state === 'grabbing') { g.state = 'free'; g.grabbing = -1; } victim.grabbedBy = -1; }

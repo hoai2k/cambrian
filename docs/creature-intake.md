@@ -1,7 +1,8 @@
 # Creature intake
 
 Everything a creature needs to ship, and the check that enforces it. Run `node tools/check-creature-assets.mjs --strict`
-before merging; CI runs it too.
+before merging. CI (`.github/workflows/pages.yml`) runs `npm run check` — the same script without
+`--strict`, so it fails on errors but only warns about stale images; run the strict form yourself.
 
 ## Adding a creature
 
