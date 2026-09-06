@@ -36,9 +36,10 @@ every push to `main` (set the repository's Pages source to "GitHub Actions").
 | `src/render/` | Three.js: sea environment, creature views and animation layering, effects, cameras, split-screen engine. |
 | `src/app/` | React shell: title, creature select, HUD, pause/results, help and settings. |
 | `src/input/`, `src/audio/` | Gamepad/keyboard reading; fully synthesized audio. |
+| `src/shared/palettes.ts` | Creature colour schemes and the material-name to slot mapping they apply through (`src/render/recolor.ts`). |
 | `public/assets/creatures/` | The eight rigged GLB models and their renders (unchanged originals, `.card.png` cutouts, and the transparent `.select.png` portraits the pick screen shows). |
 | `docs/redesign/` | Design and technical plan. |
-| `tools/` | Headless sim tests (`harness.ts`, `controls-test.ts`, `hunt-test.ts`, `fight-test.ts`, `corpse-test.ts`, `respawn-test.ts`, `flora-test.ts`), browser smoke tests (`smoke.mjs`, `viewer-smoke.mjs`), creature image intake (`make-cards.mjs`, `check-creature-assets.mjs`), LOD generator (`make-lods.mjs`), SFX generator (`gen-sfx.mjs`). |
+| `tools/` | Headless sim tests (`harness.ts`, `controls-test.ts`, `hunt-test.ts`, `fight-test.ts`, `corpse-test.ts`, `respawn-test.ts`, `flora-test.ts`), browser smoke tests (`smoke.mjs`, `viewer-smoke.mjs`), creature image intake (`make-cards.mjs`, `check-creature-assets.mjs`), colour-slot check (`palette-test.mjs`), LOD generator (`make-lods.mjs`), SFX generator (`gen-sfx.mjs`). |
 | `public/assets/brand/`, `public/assets/ui/` | Delivered art: logo and key art, tier and band glyphs, mode panels, loading motif. |
 | `tools/art/` | How that art was made: generation prompts, the Blender portrait render, vector export and review scripts. |
 | `image-requests.md` | Open art requests — currently none; delivered briefs are in `image-requests-history.md`. |

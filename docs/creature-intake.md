@@ -47,6 +47,27 @@ check says so:
 Geometry- or clip-only changes are noted but do not invalidate the images. An LOD older than its
 model is also flagged; rerun `node tools/make-lods.mjs`.
 
+## Colours and schemes
+
+None of the colour is textured. Every creature's GLB carries a white `baseColorFactor` and puts
+all of its colour in `COLOR_0` vertex colours, with a normal map as the only texture, so a
+creature can be recoloured at runtime with no new art. `src/render/recolor.ts` rebuilds each
+pixel as `slot colour x (luminance / the material's mean luminance)`: the mottling, gradients
+and baked shading all live in that ratio and survive, and only the hue is replaced. The schemes
+themselves are plain data in `src/shared/palettes.ts`, and the viewer has a dropdown to try them
+on. Nothing in the game is recoloured yet.
+
+**Material names decide the palette slot.** `slotFor()` sorts each material into one of body,
+eyes, fins, legs, accent or underside by matching its name — "Dorsal cuticle" is a body,
+"Sclerotized tips" are accents, "Thin swimming membranes" are fins. So the names in Blender are
+load-bearing: rename a material and its colour slot moves with it. Follow the convention the
+eight use and a new creature gets sensible slots for free.
+
+    npm run palettes
+
+checks that every shipped material (models and LODs) still lands in the slot the schemes assume,
+and that every scheme covers every slot. Run it after any material rename.
+
 ## Loading behaviour
 
 The pick screen never waits for 3D models. The select renders are small images loaded
