@@ -1,8 +1,7 @@
 # Creature palette images
 
 The approved 2026-09-06 mappings are archived in `colour-schemes-2026-09-06.json`.
-`src/shared/creature-schemes.ts` selects each creature's game scheme; its current six slot colours
-come from `src/shared/palettes.ts`. Game models (including LODs) and fresh viewer sessions use
+`CREATURE_SCHEMES` in `src/shared/palettes.ts` selects each creature's game scheme; its current six slot colours come from `SCHEMES` in that same file. Game models (including LODs) and fresh viewer sessions use
 these picks. Existing viewer session overrides still take precedence.
 
 ## Image matching and fallbacks
@@ -34,7 +33,7 @@ including material RGB factors and preserving vertex/material alpha. Normal maps
 remain unchanged. Blender renders the same camera and TurnLeft frame 17 with a neutral key and
 subtle teal fill/coral rim so illumination does not hide the new palettes.
 
-1. Update the picks in `src/shared/creature-schemes.ts` and, if needed, colours in `palettes.ts`.
+1. Update the picks in `CREATURE_SCHEMES` and, if needed, scheme colours in `src/shared/palettes.ts`.
 2. Run `node tools/art/prepare-palette-renders.mjs`. It validates the supplied JSON against the
    current palette values. For a later approved mapping set `CAMBRIAN_SCHEME_MAPPING` to that JSON.
 3. Render the changed IDs (the temporary manifest lists them):

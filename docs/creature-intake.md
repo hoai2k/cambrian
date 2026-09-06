@@ -56,8 +56,16 @@ all of its colour in `COLOR_0` vertex colours, with a normal map as the only tex
 creature can be recoloured at runtime with no new art. `src/render/recolor.ts` rebuilds each
 pixel as `slot colour x (luminance / the material's mean luminance)`: the mottling, gradients
 and baked shading all live in that ratio and survive, and only the hue is replaced. The schemes
-themselves are plain data in `src/shared/palettes.ts`, and the viewer has a dropdown to try them
-on. The game now applies the committed per-creature picks in `src/shared/creature-schemes.ts`. Palette-aware portraits and preserved default fallbacks are described in [art/colour-rendering.md](art/colour-rendering.md).
+themselves are plain data in `src/shared/palettes.ts`.
+
+**`CREATURE_SCHEMES` in that file is what the game draws.** Twelve creatures are assigned a
+scheme; the other nine keep the colours authored into their models, which is a deliberate choice
+rather than an omission. `CreatureView` applies the creature's scheme when it builds, so it
+covers both LODs and every screen that renders a creature in 3D. The viewer starts each specimen
+on its game scheme, and its **Export colours** button writes the current picks out as JSON — that
+file is the way a new set of defaults comes back into this map.
+
+Palette-aware portraits, cards, and thumbnails use an exact scheme/colour snapshot match and fall back to preserved authored images when no matching render exists. See [art/colour-rendering.md](art/colour-rendering.md) for the separate palette rendering workflow and fallback policy.
 
 **Material names decide the palette slot.** `slotFor()` sorts each material into one of body,
 eyes, fins, legs, accent or underside by matching its name — "Dorsal cuticle" is a body,

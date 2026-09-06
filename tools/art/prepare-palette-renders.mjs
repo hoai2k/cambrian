@@ -6,15 +6,15 @@ import { NodeIO, Accessor } from '@gltf-transform/core';
 import { ALL_EXTENSIONS } from '@gltf-transform/extensions';
 import { MeshoptDecoder } from 'meshoptimizer';
 import { Color } from 'three';
-await build({stdin:{contents:"export * from './src/shared/palettes'; export * from './src/shared/creature-schemes'; export * from './src/shared/portrait-match';",resolveDir:process.cwd()},bundle:true,platform:'node',format:'esm',outfile:'/tmp/cambrian-palette-data.mjs'});
-const {creatureScheme,slotFor,PORTRAIT_RECOLOR_VERSION,CREATURE_SCHEMES,paletteSignature}=await import('/tmp/cambrian-palette-data.mjs?'+Date.now());
+await build({stdin:{contents:"export * from './src/shared/palettes'; export * from './src/shared/portrait-match';",resolveDir:process.cwd()},bundle:true,platform:'node',format:'esm',outfile:'/tmp/cambrian-palette-data.mjs'});
+const {scheme,schemeForCreature,slotFor,PORTRAIT_RECOLOR_VERSION,CREATURE_SCHEMES,paletteSignature}=await import('/tmp/cambrian-palette-data.mjs?'+Date.now());
 const source=JSON.parse(fs.readFileSync(process.env.CAMBRIAN_SCHEME_MAPPING || 'docs/art/colour-schemes-2026-09-06.json','utf8')).creatures;
 const dir='/tmp/cambrian-palette-models';fs.mkdirSync(dir,{recursive:true});
 const io=new NodeIO().registerExtensions(ALL_EXTENSIONS).registerDependencies({'meshopt.decoder':MeshoptDecoder});
 await MeshoptDecoder.ready;
 const manifest={};
-for(const id of Object.keys(CREATURE_SCHEMES)) {
- const selected=creatureScheme(id);
+for(const id of Object.keys(source)) {
+ const selected=scheme(schemeForCreature(id));
  if(paletteSignature(selected)!==paletteSignature({id:source[id].scheme,colors:source[id].colors}))throw Error(`${id}: current palette differs from supplied mapping`);
  if(!selected.colors)continue;
  const path=`public/assets/creatures/${id}.glb`;const doc=await io.read(path);

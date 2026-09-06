@@ -256,6 +256,33 @@ export const SCHEMES: readonly Scheme[] = [
   },
 ];
 
+/**
+ * The scheme each creature wears in the game, chosen in the viewer and exported from it on
+ * 2026-09-06. Anything not listed keeps the colours authored into its model, which is a real
+ * choice rather than an omission: nine of the twenty-one were picked as "Default (as authored)".
+ *
+ * Changing an entry recolours that creature everywhere it is rendered in 3D. It does NOT change
+ * baked portraits. The image resolver compares this palette with the rendered snapshot and
+ * uses preserved default art on mismatch. See docs/art/colour-rendering.md.
+ */
+export const CREATURE_SCHEMES: Readonly<Record<string, string>> = {
+  anomalocaris: 'coral-flare',
+  opabinia: 'seagrass-teal',
+  waptia: 'sandflat-tan',
+  canadia: 'kelp-olive',
+  hallucigenia: 'sandflat-tan',
+  wiwaxia: 'wiwaxia-nacre',
+  marrella: 'countershade',
+  olenoides: 'sandflat-tan',
+  nectocaris: 'canadia-iridium',
+  ottoia: 'countershade',
+  cambroraster: 'lagoon-neon',
+  odontogriphus: 'sandflat-tan',
+};
+
 export const DEFAULT_SCHEME = SCHEMES[0].id;
+
+/** The scheme a creature should be drawn in unless something overrides it. */
+export const schemeForCreature = (creatureId: string): string => CREATURE_SCHEMES[creatureId] ?? DEFAULT_SCHEME;
 
 export const scheme = (id: string): Scheme => SCHEMES.find((s) => s.id === id) ?? SCHEMES[0];
