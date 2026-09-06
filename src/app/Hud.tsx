@@ -48,9 +48,9 @@ function PlayerPanel({ p }: { p: PlayerHud }) {
         </div>
       </div>
       {p.aim && (
-        <div className={`aim ${p.aim.inRange ? 'in-range' : ''} ${p.aim.ready ? '' : 'cooling'}`} style={{ left: `${p.aim.x * 100}%`, top: `${p.aim.y * 100}%`, color: p.aim.color }}>
-          <i /><i /><i /><i />
-          <span className="aim-label">{p.aim.inRange ? (p.aim.ready ? 'X · POUNCE' : '…') : p.aim.name}</span>
+        <div className={`aim ${p.aim.hasTarget ? 'on-target' : ''} ${p.aim.inRange ? 'in-range' : ''} ${p.aim.ready ? '' : 'cooling'}`} style={{ color: p.aim.color }}>
+          <i /><i /><i /><i /><b />
+          <span className="aim-label">{p.aim.inRange ? (p.aim.ready ? 'X · POUNCE' : '…') : p.aim.name ?? ''}</span>
         </div>
       )}
       {p.lock && !p.aim && (

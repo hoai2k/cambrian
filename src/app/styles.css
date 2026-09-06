@@ -251,16 +251,20 @@ input[type='checkbox'] { width: 20px; height: 20px; accent-color: var(--ember); 
 .start-button.focused { animation: focus-pulse 1.4s ease-in-out infinite; outline: 2px solid rgba(255,255,255,.65); outline-offset: 3px; }
 @keyframes focus-pulse { 0%, 100% { box-shadow: 0 10px 40px rgba(255, 91, 110, .4); transform: none; } 50% { box-shadow: 0 10px 56px rgba(255, 179, 107, .75); transform: translateY(-2px) scale(1.03); } }
 
-/* ---------- Aim crosshair ---------- */
-.aim { position: absolute; width: 3.4em; height: 3.4em; transform: translate(-50%, -50%); transition: left .06s linear, top .06s linear; }
-.aim i { position: absolute; width: 1em; height: 1em; border: 2px solid currentColor; opacity: .7; }
+/* ---------- Aim crosshair (fixed at screen centre; steer the camera onto prey) ---------- */
+.aim { position: absolute; left: 50%; top: 50%; width: 3.6em; height: 3.6em; transform: translate(-50%, -50%); transition: width .12s, height .12s; animation: fade-in .15s both; }
+.aim i { position: absolute; width: 1em; height: 1em; border: 2px solid currentColor; opacity: .55; transition: opacity .15s; }
 .aim i:nth-child(1) { left: 0; top: 0; border-right: 0; border-bottom: 0; }
 .aim i:nth-child(2) { right: 0; top: 0; border-left: 0; border-bottom: 0; }
 .aim i:nth-child(3) { left: 0; bottom: 0; border-right: 0; border-top: 0; }
-.aim i:nth-child(4) { right: 0; bottom: 0; border-left: 0; border-top: 0; }
-.aim.in-range { width: 2.6em; height: 2.6em; }
-.aim.in-range i { opacity: 1; box-shadow: 0 0 10px currentColor; }
-.aim.in-range::before { content: ''; position: absolute; inset: 22%; border-radius: 50%; border: 2px solid currentColor; animation: heartbeat .6s ease-in-out infinite; }
-.aim.cooling i { opacity: .35; }
-.aim-label { position: absolute; left: 50%; top: 100%; transform: translate(-50%, .3em); white-space: nowrap; font: 700 .7em var(--font-display); letter-spacing: .14em; color: var(--foam); text-shadow: 0 0 6px rgba(0,0,0,.8); }
+.aim i:nth-child(4) { right: 0; bottom: 0; border-right: 0; border-top: 0; border-left: 2px solid currentColor; border-right: 0; }
+.aim i:nth-child(4) { border-left: 0; border-right: 2px solid currentColor; }
+.aim b { position: absolute; left: 50%; top: 50%; width: .3em; height: .3em; border-radius: 50%; background: currentColor; transform: translate(-50%, -50%); opacity: .9; }
+.aim.on-target { width: 3em; height: 3em; }
+.aim.on-target i { opacity: 1; }
+.aim.in-range { width: 2.4em; height: 2.4em; }
+.aim.in-range i { box-shadow: 0 0 10px currentColor; }
+.aim.in-range::before { content: ''; position: absolute; inset: 18%; border-radius: 50%; border: 2px solid currentColor; animation: heartbeat .6s ease-in-out infinite; }
+.aim.cooling i { opacity: .3; }
+.aim-label { position: absolute; left: 50%; top: 100%; transform: translate(-50%, .35em); white-space: nowrap; font: 700 .7em var(--font-display); letter-spacing: .14em; color: var(--foam); text-shadow: 0 0 6px rgba(0,0,0,.8); }
 .aim.in-range .aim-label { color: currentColor; }

@@ -68,7 +68,7 @@ export function Dialogs({ kind, onClose, settings, onSettings }: { kind: DialogK
           <div className="help-columns">
             <section>
               <h3>Hunting</h3>
-              <p>Hold <b>LT</b> to aim: the crosshair snaps to the best prey in front of you. When it fills, press <b>X</b> to pounce straight onto it. Hold <b>LB</b> (or <b>RT</b>) to sprint; tap <b>LB</b> with a stick direction to sidestep an attack or a lunging predator. Press the <b>right stick</b> in and push up or down to zoom the camera.</p>
+              <p>Hold <b>LT</b> to aim: the view moves over your shoulder and a crosshair sits at the centre of the screen. It snaps to nearby prey as you enter aim; after that, steer it with the right stick. When the crosshair fills, press <b>X</b> to pounce straight onto the target. <b>LB</b> dashes: press it with a stick direction to dash that way, or hold it with the stick centred and the dash fires the moment you move. Keep holding after the dash to sprint (<b>RT</b> sprints too). Press the <b>right stick</b> in and push up or down to zoom the camera.</p>
               <h3>Fighting</h3>
               <p><b>RB</b> chains three bites, the third hits hard. <b>X</b> is your heavy: slow, breaks guard, carries you forward. <b>B</b> held guards; tapped as a hit lands, it parries and staggers them (Waptia cannot guard, so B dodges). Hits from behind or below hurt more. Stamina runs everything: an exhausted creature can't dodge.</p>
               </section>

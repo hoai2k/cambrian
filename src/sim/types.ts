@@ -31,15 +31,15 @@ export interface InputFrame {
   lock: boolean; sense: boolean;
   /** LB: tap with a stick direction = sidestep dash, hold = sprint. */
   dash: boolean;
-  /** LT held: aim at the best prey; X while aiming and in range pounces. */
-  aim: boolean;
+  /** LT held: aim mode. The renderer decides what the centred crosshair is over and passes it here. */
+  aim: boolean; aimTarget: number;
   lookX: number; lookY: number;
 }
 
 export const emptyInput = (): InputFrame => ({
   mx: 0, my: 0, camYaw: 0, camPitch: 0, burst: 0, rise: false, sink: false,
   light: false, heavy: false, ability: false, dodge: false, guard: false, lock: false, sense: false,
-  dash: false, aim: false,
+  dash: false, aim: false, aimTarget: -1,
   lookX: 0, lookY: 0,
 });
 
@@ -98,7 +98,7 @@ export interface Actor {
   prev: { light: boolean; heavy: boolean; ability: boolean; dodge: boolean; guard: boolean; lock: boolean; sense: boolean; rise: boolean; burst: boolean; dash: boolean; aim: boolean };
   brain?: BrainState;
   respawnT: number; hatching: boolean;
-  dashHoldT: number; dashUsed: boolean; pounceCd: number; aimInRange: boolean; aiming: boolean;
+  dashHoldT: number; dashUsed: boolean; dashQueued: boolean; pounceCd: number; aimInRange: boolean; aiming: boolean;
   kills: number; eats: number; escapes: number;
   hunted: number;          // 0..1 highest detection score against this actor (HUD)
   hunterId: number;
