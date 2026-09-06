@@ -17,13 +17,19 @@ const audit=await page.evaluate(async()=>{const m=await import('/tools/asset-aud
 fs.writeFileSync(path.join(out,'runtime-asset-audit.json'),JSON.stringify(audit,null,2));
 console.log('PASS: runtime loading, textures, skinning, all clips, loops and LOD reduction for',audit.length,'new creatures');
 }
+const viewerReport=[];
+if(!auditOnly && await page.locator('.specimen').count()!==21)throw Error('Viewer roster incomplete');
 if(!auditOnly)for(const id of ['pikaia','nectocaris','burgessomedusa','odaraia','ottoia','cambroraster','sidneyia','leanchoilia','isoxys','odontogriphus','ctenorhabdotus','vetulicola','tamisiocaris']) {
  const name=id[0].toUpperCase()+id.slice(1);
  await page.getByRole('button',{name:new RegExp('^'+name+' ')}).click();
  await page.locator('.status').waitFor({state:'hidden',timeout:30000});
+ const clips=await page.locator('.clip-grid .clip').allTextContents();
+ if((await page.locator('.info h2').textContent())!==name||clips.length<18)throw Error(`Viewer did not load ${id}'s model/animations`);
+ viewerReport.push({id,clips});
  await page.getByRole('button',{name:'Ability',exact:true}).click();await page.waitForTimeout(450);
  await page.screenshot({path:path.join(out,`viewer-${id}.png`)});
 }
+if(!auditOnly){fs.writeFileSync(path.join(out,'viewer-verification.json'),JSON.stringify({base,creatures:viewerReport},null,2));console.log('PASS: all',viewerReport.length,'new specimens loaded with full action controls in the viewer');}
 }
 if(!viewerOnly&&!auditOnly){
 await page.goto(`${base}/`,{waitUntil:'networkidle',timeout:120000});

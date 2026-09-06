@@ -129,3 +129,23 @@ For every CCD record the ordered chain contains **feeding appendage bones
 only**; `root`, `body` and all `segment_*` locomotor trunk bones are excluded.
 The socket's parent matches `effectorBone`, the final chain member. Anchors
 without chains may use body/segment parents to track their anatomical tissue.
+
+### Rigid-shell animation clearance
+
+Odaraia's carapace is one rigid shell. Its enclosed hubs `segment_00` through
+`segment_10` therefore remain at neutral local rotation in every action.
+The exposed terminal segment and tail remain articulated; whole-body banking,
+yaw, dive pitch, recoil and asymmetric tail-rudder action convey maneuvers.
+Internal filter strokes are bounded and do not inherit generic limb-splay
+motions during Parry or Death. This prevents the previously observed turn/
+dodge bending from pushing filtering limbs through the side of the shell.
+
+After an Odaraia rebuild, run Blender with
+`--python tools/creatures/arthropods/check-odaraia-clearance.py`. It evaluates
+actual skinned filter vertices at **every frame of all 18 actions**, returns
+them to the rigid shell's bind coordinates, and checks the elliptical shell
+cross-section away from its open apertures. The final 622-frame audit had a
+maximum normalized radius squared of 0.981396 (inside the shell's limit of 1)
+and exactly zero enclosed-hub rotation. Reports remain in local authoring.
+This correction changes animation only; anatomical geometry, skin weights,
+material appearance and source socket positions remain unchanged.

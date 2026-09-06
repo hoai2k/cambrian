@@ -90,7 +90,7 @@ and [animation brief](../animation-brief.md) for integration and verification.
 
 Every new full/LOD model carries the shared v1 mouth, inner-mouth and primary
 attack sockets. Dedicated feeding appendages also carry grasp/paired contacts
-and CCD chains; body, root and locomotor bones are excluded. The 150 sockets
+and CCD chains; body, root and locomotor bones are excluded. The 140 sockets
 per detail level attach existing grabbed/swallowed actors to animated anatomy.
 The merged [attachment runtime](../creature-anchors.md) also guides articulated
 attack contacts and corpse transfer for all rigs. New animals keep their

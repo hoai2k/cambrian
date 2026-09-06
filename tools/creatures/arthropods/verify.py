@@ -3,7 +3,9 @@ import array,json,math,struct,sys
 from pathlib import Path
 ROOT=Path(__file__).resolve().parents[3]
 NAMES={'Idle','Swim','Attack','Hit','Death','TurnLeft','TurnRight','Dive','Rise','Bite','Heavy','Guard','Parry','Dodge','Eat','Stagger','Ability','Moult'}
-for name in ['odaraia','sidneyia','leanchoilia','isoxys']:
+ids=sys.argv[1:] or ['odaraia','sidneyia','leanchoilia','isoxys']
+assert all(name in ['odaraia','sidneyia','leanchoilia','isoxys'] for name in ids), 'Unknown arthropod ID'
+for name in ids:
  for suffix in ['', '.lod1']:
   p=ROOT/'public/assets/creatures'/f'{name}{suffix}.glb';raw=p.read_bytes();n=struct.unpack_from('<I',raw,12)[0];g=json.loads(raw[20:20+n]);base=28+n
   def data(ai):

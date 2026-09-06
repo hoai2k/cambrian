@@ -2397,8 +2397,8 @@
     "file": "odaraia.glb",
     "source": "tools/creatures/arthropods/anchors.json",
     "newSpecimen": true,
-    "updatedSHA256": "9199d5f0b3b980dcf156acefc6873e669bc74a86c113fc89780639a4d7b0f4fe",
-    "bytes": 6921836,
+    "updatedSHA256": "bf21bc96020a30ba6b210461e78ecf85ae0e6cbc33f1980157c40eea41bf2a04",
+    "bytes": 6757808,
     "changedClips": [],
     "anchors": [
       {
@@ -2443,8 +2443,8 @@
     "file": "odaraia.lod1.glb",
     "source": "tools/creatures/arthropods/anchors.json",
     "newSpecimen": true,
-    "updatedSHA256": "ec9cc097af2ca24a202fb1240fc75cf2d32572df571652eeacb40a40cfd26513",
-    "bytes": 1314044,
+    "updatedSHA256": "00a0d13c37dbb1a5461f146d198ac94faa8b7278e9c2ddbde44bad277cf40c3b",
+    "bytes": 1265488,
     "changedClips": [],
     "anchors": [
       {

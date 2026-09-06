@@ -2,7 +2,7 @@
 
 ## Included
 
-- All 21 specimens have `anchor_mouth`, `anchor_mouth_inside`, `anchor_attack_primary`, plus per-appendage attack sockets where the rig has articulated attack parts. 240 named sockets per complete detail-level set, matched in LOD1 (90 original, 150 expansion).
+- All 21 specimens have `anchor_mouth`, `anchor_mouth_inside`, `anchor_attack_primary`, plus per-appendage attack sockets where the rig has articulated attack parts. 230 named sockets per complete detail-level set, matched in LOD1 (90 original, 140 expansion).
 - Opabinia's `anchor_grasp` is a non-deforming child of `proboscis_11`, at the center of the terminal claw, not at the joint origin. Its metadata lists the full 12-bone IK chain. Mouth sockets follow the head. A world-space target supplied by the game stays separate from the moving grasp point.
 - Opabinia `Attack`, `Bite`, `Heavy`, `Ability`, `Eat`, and `Grab` now use the revised trunk performance. Attack winds upward/back into a pronounced curve and then unfolds forward as the jaws close. Feeding reaches out, grasps, curls beneath the head and presents food at the ventral mouth. `Grab` is added where absent. The two detail levels share this motion.
 - The runtime uses actual consumption progress to pose the feeding clip, solve the grasp point toward prey, transfer the prey beneath the head and shrink it into `anchor_mouth_inside`. Cancelled sessions are cleared. Simulation positions, damage and nutrition rules are unchanged. For other creatures the existing grabbed/swallowed states now follow their available sockets.
@@ -35,7 +35,7 @@ A GLB cannot bind itself to another actor or delete prey. The delivered TypeScri
 
 Run `npm run typecheck`, `npm run build`, `node --experimental-transform-types tools/anchors-test.mjs` and `node tools/feeding-test.mjs` from the repository root (Node 22.7+). The headless tests stub texture decoding and exercise actual GLTF loading, cloned sockets, transformed-instance IK, attack aiming on every rig and LOD, and the production attachment pass for all 21 species (grasp, limb and mouth-only feeding, strike aiming and release). They do not test visual texture quality or physical controller input.
 
-All 42 GLBs remain below 25 MB. The 26 expansion files retain 150 anatomical sockets per detail level. Full-detail Olenoides adds 9,696 triangles; LOD1 adds 2,160. Authoring validation checked all 30 leg roots over nine samples of each of 18 clips and found them enclosed by the new tissue.
+All 42 GLBs remain below 25 MB. The 26 expansion files retain 140 anatomical sockets per detail level. Full-detail Olenoides adds 9,696 triangles; LOD1 adds 2,160. Authoring validation checked all 30 leg roots over nine samples of each of 18 clips and found them enclosed by the new tissue.
 
 ## Expansion anatomy and authoring
 

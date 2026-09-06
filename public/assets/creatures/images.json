@@ -216,7 +216,7 @@
     "generatedAt": "2026-09-06T16:24:30.509Z"
   },
   "burgessomedusa": {
-    "glbSha256": "0d4632c7dda67162b6ef661d63ab4e5c1fd8f0801018fa83e944088648302a7f",
+    "glbSha256": "a02ce57f3ae03f734ec920538bc3d76187273aab2403a4bf12e3e03fed6b2076",
     "appearanceSha256": "cc79243cfce1bfaf36fec448891df4cd0ce080bd34e44b75ba84072e3970db23",
     "clips": [
       "Ability",
@@ -239,10 +239,11 @@
       "TurnRight"
     ],
     "renderSha256": "15a5b8e9f5b28400c3519ed4414ea3f9e54f563d8ba3526e8a01d7d2c2509a18",
-    "generatedAt": "2026-09-06T16:21:29.976Z"
+    "selectSha256": "078ebb8ce04c1b9517605f01c5ea58e22d8e79d46637d366947be5be7e2351e3",
+    "generatedAt": "2026-09-06T16:40:40.939Z"
   },
   "cambroraster": {
-    "glbSha256": "8189141e80ab6cc6580fed5d11dd982eea6d932f87d956ad2972aeba8b18f191",
+    "glbSha256": "8481c903b5bd3cdb3f4925d62e7a7999f66fa31743915f88bef3398090cc5d4e",
     "appearanceSha256": "06ab6eb5ec5988c289fe8ec020a407d96ad860f85e5637a88f7009b139ffc002",
     "clips": [
       "Ability",
@@ -265,10 +266,11 @@
       "TurnRight"
     ],
     "renderSha256": "2adc9119bd468708ba778f72fc35ccc99c172368938e3b3e88710ec2962fe0af",
-    "generatedAt": "2026-09-06T16:21:30.108Z"
+    "selectSha256": "e3f7c5e250e0eceaf758a4c0c90e60e093069160e092b8ed25fdfb469e637fa0",
+    "generatedAt": "2026-09-06T16:40:41.081Z"
   },
   "ctenorhabdotus": {
-    "glbSha256": "ed44b7af7a9b979ad425aa44ec1eb74150f926a4816f45693e0ecb9a5bc8b2e7",
+    "glbSha256": "53dc1eff94165e36b7d163b7748a2e701581c76ac571c403a6ab53101f43b3e8",
     "appearanceSha256": "23432a1cf5e7cb5b6d6ddd277a971bbad92fa8b96cb45c379eb7ab9b02eb79bd",
     "clips": [
       "Ability",
@@ -291,10 +293,11 @@
       "TurnRight"
     ],
     "renderSha256": "7acf893027b0413b5774e3437873cfd74ffded17503431244709424b43c04a39",
-    "generatedAt": "2026-09-06T16:21:30.243Z"
+    "selectSha256": "dc1dd3bb0a47e6913d1e52fc2ae2421e168231c24f2e76977e12e102362d9830",
+    "generatedAt": "2026-09-06T16:40:41.219Z"
   },
   "isoxys": {
-    "glbSha256": "683155b50c69d9a3d26a87e96457de5c20edf2084481fed15e27d8001501773e",
+    "glbSha256": "69427575d8bf033d87f0015940917e9079bc9e27ba97c5bea7e892ec3cb73c05",
     "appearanceSha256": "6d7933f03afa2b579fbb1e7d7dceb7d3122f035adadd0438fd57c96bee9a25a4",
     "clips": [
       "Ability",
@@ -317,10 +320,11 @@
       "TurnRight"
     ],
     "renderSha256": "513b6ed47401e08769fe9aff01e836e6539d18bb8644e13704c9d63be6717f50",
-    "generatedAt": "2026-09-06T16:21:30.375Z"
+    "selectSha256": "badc5b45c240ee42cbe815effa35a281a7d09bceffd7fa251ddb60fc04f59415",
+    "generatedAt": "2026-09-06T16:40:41.353Z"
   },
   "leanchoilia": {
-    "glbSha256": "7e0b2c20d31cc006701f5a445d2cfaa0af554261b8438e92ddb31d8d2ed8e2f8",
+    "glbSha256": "eb68d9496abb20f6a2aaeb8597bfc60c58832d5df8a6d0521fc8628b96d55519",
     "appearanceSha256": "8e89abfacb6b520c1a8e1c30e4a438323c8960f8813c4a9a085b87ada4e051b4",
     "clips": [
       "Ability",
@@ -343,10 +347,11 @@
       "TurnRight"
     ],
     "renderSha256": "ff8ef28c31978c8cd40328a67bcac4c3f32efbd4a0d4f724858cc45569109614",
-    "generatedAt": "2026-09-06T16:21:30.509Z"
+    "selectSha256": "f0fcebde6ca88b9a8f80a91e45d1ebbd4cbfd0264f091a46b2cc4cab408f6e19",
+    "generatedAt": "2026-09-06T16:40:41.486Z"
   },
   "nectocaris": {
-    "glbSha256": "2cd9275fab8ba20a83a3de31d674d92da3e9cfcee981bef26920d21558617cec",
+    "glbSha256": "90ea973c4220c70155dd7ea109717e9b536969420dbf38ecc45152afbee1a76f",
     "appearanceSha256": "32ad7cbe73e1a27367c43f09465210d4fdaa9dc7f964151cb71bf995bd695a29",
     "clips": [
       "Ability",
@@ -370,10 +375,11 @@
       "TurnRight"
     ],
     "renderSha256": "b2b44146a3f8b630f5401648c57c8d0fb8c90277cba336d4254817d25b00fd21",
-    "generatedAt": "2026-09-06T16:21:30.610Z"
+    "selectSha256": "9abbddb75d7d8218a895bab7450cca77666f324ed419b0fcd5205be12e480594",
+    "generatedAt": "2026-09-06T16:40:41.584Z"
   },
   "odaraia": {
-    "glbSha256": "a53c37a59719741b41877100ea052438b8691066217432954cfe58bcdcdeb9d8",
+    "glbSha256": "bf21bc96020a30ba6b210461e78ecf85ae0e6cbc33f1980157c40eea41bf2a04",
     "appearanceSha256": "4212729ba299472da09e05644db45d52d129fc36254a04d3bb372c33a823a44e",
     "clips": [
       "Ability",
@@ -395,11 +401,12 @@
       "TurnLeft",
       "TurnRight"
     ],
-    "renderSha256": "01ed62c0472276a3b1b7fbae2fe460a8b99c884bd4170709f8768e0b583b3b88",
-    "generatedAt": "2026-09-06T16:21:30.737Z"
+    "renderSha256": "c750cefd79c5d03117276fb49fa9c7564c99aef315f766f94b17e97a259d193b",
+    "selectSha256": "95db43432085bc173c95d8e0671afafea467b164b6fed3fa155c644606e0abf0",
+    "generatedAt": "2026-09-06T16:49:51.543Z"
   },
   "odontogriphus": {
-    "glbSha256": "f2fbccb836de148a5a02ca1bb636e228b9d59de531c82f54d33eccaefc39794a",
+    "glbSha256": "d8b773d65c0a817d23ee5fbd27184ac0cf9fb26540ca4031d9873bd9f36fb1ef",
     "appearanceSha256": "325810e1332b16c9928ae86ff62f04bf78e529777abcb949abe9b854e0c48133",
     "clips": [
       "Ability",
@@ -422,10 +429,11 @@
       "TurnRight"
     ],
     "renderSha256": "f91637c2eafcb5716a2b590a0d8e9090480c2978de903462db39f8a266751cc4",
-    "generatedAt": "2026-09-06T16:21:30.806Z"
+    "selectSha256": "ce94f46a861e9eb0ffe457348abb72bb839285f38e926ceab351bf2e03d10bcf",
+    "generatedAt": "2026-09-06T16:40:41.666Z"
   },
   "ottoia": {
-    "glbSha256": "d6919e5e4391615ddd759c57bcb6c5600d58e1b52c8bcffcf693dd7cd5ab5d63",
+    "glbSha256": "aa7b0b3999bdbe13d2cab8593e6ae2ef8deef4e45b97af3e18be991895f6a221",
     "appearanceSha256": "ddce34bb59896b7d980de2a08ad69f026dc957a99fe368da62642c0959862559",
     "clips": [
       "Ability",
@@ -448,10 +456,11 @@
       "TurnRight"
     ],
     "renderSha256": "bcf7208553d55973dba3d3fca1615512cb79b09c5b2525515e7a8668773a8248",
-    "generatedAt": "2026-09-06T16:21:30.877Z"
+    "selectSha256": "2e85ed5aea620a8c106c2a4065ad1ed7d9412088749bfc74fc1d664ff9134e46",
+    "generatedAt": "2026-09-06T16:40:41.738Z"
   },
   "pikaia": {
-    "glbSha256": "3b7ec3d74e123f7866f038d58b5f50fc75053defcca7bb40ba0264987be7992a",
+    "glbSha256": "d8680d9842f11d370c80124e372883888126848878efe79bd8ca353138265d73",
     "appearanceSha256": "9030de1acc986802df7525ac9d5733c625cb6bd49133e245635d208ff116c9a8",
     "clips": [
       "Ability",
@@ -474,10 +483,11 @@
       "TurnRight"
     ],
     "renderSha256": "c7b20ad16d72564a3d0cea763f558f9dc81147efa00c058f614bc909d0e708f5",
-    "generatedAt": "2026-09-06T16:21:30.949Z"
+    "selectSha256": "cea3689c67746f501460a2f4aeff1d1e3297035d66e96bf7e9ebabdccd619660",
+    "generatedAt": "2026-09-06T16:40:41.809Z"
   },
   "sidneyia": {
-    "glbSha256": "d07ccf0f2110878513c5e73fabe37a6d12d7ecb77b09e356bb8d83eae9c1a1ee",
+    "glbSha256": "7c7fbfe40085b6fee003a476152526a0e05d03cbf351c0432ce61b02166ff1a3",
     "appearanceSha256": "d0320fc71739b3c8b45bab8752e07a292f9867992559cd2e16726007e4c0eac6",
     "clips": [
       "Ability",
@@ -501,10 +511,11 @@
       "TurnRight"
     ],
     "renderSha256": "e06bbc17a95cd18a7e0008c529186c6407911e03f4db6b4afaf8ec9d39215aa0",
-    "generatedAt": "2026-09-06T16:21:31.077Z"
+    "selectSha256": "ccf05fae2cba947e399976fc9a161c9dce6e026287e7ea3c5295548de04bd268",
+    "generatedAt": "2026-09-06T16:40:41.937Z"
   },
   "tamisiocaris": {
-    "glbSha256": "ec61ac281e8f5bf9ef4338f67e3ae2b77f2083a2a7fde3dea5d6e91d40f2d002",
+    "glbSha256": "56855bd30d6bdf7a558a1c1850c327b5c71621df3d2ec3aa23762371b12a4484",
     "appearanceSha256": "e9aff9ba275cbb17e29d9ffdb6b471375f7d3e6c5ca0557fe8962dd76ecf461e",
     "clips": [
       "Ability",
@@ -527,10 +538,11 @@
       "TurnRight"
     ],
     "renderSha256": "a771eb320316b9113abdea57562ae5beb7b2473ee1cedb415a7ed257edc7b3af",
-    "generatedAt": "2026-09-06T16:21:31.200Z"
+    "selectSha256": "08db9521097a67ce4c5f6b27a5744292a7f69b868727f3d246448ea16857c970",
+    "generatedAt": "2026-09-06T16:40:42.065Z"
   },
   "vetulicola": {
-    "glbSha256": "0c9299ab9910db24e61a3d0faa9c188de557d048b63fd8b18112bc8eedef4759",
+    "glbSha256": "7ec986872f47b3599c497bcb0e6a30daca1b9654575ed7a33873c70b817f7f5c",
     "appearanceSha256": "ad21f0db805c4023f0825e0649df664543d4d8b3c1460e4e8ceda0984e9f23d9",
     "clips": [
       "Ability",
@@ -553,6 +565,7 @@
       "TurnRight"
     ],
     "renderSha256": "2eb822d8a33e5f118f383f254cce302cff9c7e8fad43db2da5a70747b3fdff1e",
-    "generatedAt": "2026-09-06T16:21:31.275Z"
+    "selectSha256": "607e3c0fa24ad60f6f4d7f149c74b0ed3501a7fb7b57ca0f137f2016f05f90f5",
+    "generatedAt": "2026-09-06T16:40:42.140Z"
   }
 }

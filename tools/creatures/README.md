@@ -24,11 +24,15 @@ Run the pipeline in this order:
    node indexes/properties, animation data, skins and mesh data are unchanged.
    Only new nodes and corresponding additions to parent `children` arrays are
    permitted. A second application must return byte-identical files.
-4. **Create thumbnails.** Run `node tools/make-cards.mjs` with the 13 expansion
+4. **Render selection portraits.** Run `node tools/art/decode-models.mjs` with
+   the expansion IDs, then Blender with `tools/art/render-creatures.py -- <ids>`.
+   This creates matching 1600×1200 transparent `.select.png` images for the
+   merged picker. Use `CAMBRIAN_ART_MODELS` to keep render inputs locally.
+5. **Create thumbnails.** Run `node tools/make-cards.mjs` with the 13 expansion
    IDs above. Authored alpha is preserved; this also creates 256×192 grid
    thumbnails and records appearance fingerprints. Do not omit IDs when
    preserving the original roster artwork.
-5. **Update byte sizes and registry.** Run `node tools/update-asset-sizes.mjs` after the
+6. **Update byte sizes and registry.** Run `node tools/update-asset-sizes.mjs` after the
    anchor pass, since the added JSON changes file sizes. Then run the normal
    integration build/typecheck and game verification.
 

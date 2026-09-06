@@ -304,6 +304,9 @@ def finish(b,notes):
     if clip=='Dodge':pose.rotation_euler.z+=.075*env*sin(i*.15+.5)
     pose.rotation_euler.x+=.016*attack+.04*hit*sin(i*.42)+.025*death
     if clip=='Moult':pose.rotation_euler.x+=.015*sin(phase*3-i*.4)
+    # Odaraia's first eleven hubs are enclosed by one rigid carapace.
+    # A locomotor wave here would push its internal limbs through the shell.
+    if b.id=='odaraia' and i<11:pose.rotation_euler=(0,0,0)
    for name,kind,i,s in b.motion:
     pose=pb[name];p=phase*2-i*.55
     if kind=='flap':
@@ -337,6 +340,11 @@ def finish(b,notes):
     elif kind=='eye':pose.rotation_euler.z=s*.05*amp*sin(phase+i);pose.rotation_euler.x=.04*amp*cos(phase)
     if clip=='Parry':pose.rotation_euler.z+=s*.17*env
     if clip=='Stagger':pose.rotation_euler.z+=.09*hit*sin(i*1.8)
+    if b.id=='odaraia' and name.startswith('filter_'):
+     # Short confined feeding strokes; no generic parry/death limb splay.
+     filteramp=max(amp,.45*abs(attack))
+     pose.rotation_euler.x=s*.10*filteramp*sin(p)
+     pose.rotation_euler.z=.025*filteramp*cos(p)
    body=pb['body'];body.rotation_euler.x=.022*amp*sin(phase)+.10*attack+.12*hit;body.rotation_euler.y=.8*death
    if clip=='Dodge':body.rotation_euler.y=.23*env;body.location.x=.06*env
    if clip=='Eat':body.rotation_euler.x=-.11+.018*sin(phase*2)
@@ -344,6 +352,14 @@ def finish(b,notes):
    if clip=='Stagger':body.rotation_euler.y+=.30*env*sin(pi*u)
    if clip=='Ability' and b.id=='odaraia':body.rotation_euler.x=.055*sin(phase)
    if clip=='Ability' and b.id=='isoxys':body.rotation_euler.x=.025*sin(phase*2)
+   if b.id=='odaraia':
+    if clip in ('TurnLeft','TurnRight'):
+     direction=-1 if clip=='TurnLeft' else 1
+     body.rotation_euler.z+=direction*.13*env;body.rotation_euler.y+=direction*.08*env
+     for name,kind,i,s in b.motion:
+      if kind=='tail':pb[name].rotation_euler.x+=s*direction*.14*env;pb[name].rotation_euler.z+=direction*.10*env
+    if clip in ('Dive','Rise'):body.rotation_euler.x+=(-1 if clip=='Dive' else 1)*.17*env
+    if clip=='Moult':body.rotation_euler.x+=.035*sin(phase*3)
    rots=np.array([tuple(p.rotation_euler) for p in pb]);locs=np.array([tuple(p.location)for p in pb]);vals=np.concatenate([rots,locs])
    if frame==0:first=vals.copy()
    if frame==last:seams[clip]=float(abs(vals-first).max())

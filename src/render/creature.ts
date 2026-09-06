@@ -235,13 +235,14 @@ export class CreatureView {
         this.addW[i] = damp(this.addW[i], t, 8, dt);
         act.setEffectiveWeight(this.addW[i]);
       });
-      if (a.state === 'dead') { this.loco?.setEffectiveWeight(Math.max(0, 1 - a.corpseT * 2)); this.oneShot?.setEffectiveWeight(Math.max(0.15, 1 - a.corpseT * 0.7)); }
+      if (a.state === 'dead') { this.loco?.setEffectiveWeight(Math.max(0, 1 - a.corpseT * 2)); this.oneShot?.setEffectiveWeight(def.proceduralUndulation === false ? 1 : Math.max(0.15, 1 - a.corpseT * 0.7)); }
       else this.loco?.setEffectiveWeight(this.oneShotT > 0.1 ? 0.15 : 1);
       this.mixer.update(a.hitStop > 0 ? dt * 0.1 : dt);
 
       // Limp "ragdoll": once dead the spine sags and sways with decaying wobble, and the animation
       // fades out underneath it, so the body hangs rather than holding a pose.
-      if (this.spine.length > 2 && a.state === 'dead') {
+      // New anatomical rigs own their death deformation as well as locomotion.
+      if (this.spine.length > 2 && def.proceduralUndulation !== false && a.state === 'dead') {
         const k = Math.exp(-a.corpseT * 0.5);
         for (let i = 0; i < this.spine.length; i++) {
           const f = i / this.spine.length;
