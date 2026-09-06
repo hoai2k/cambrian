@@ -21,4 +21,8 @@ unless the user explicitly asks for a PR. Steps:
   fixed-step simulation. `src/render` draws it. `src/app` is the React shell.
 - Creature GLBs and card renders live in `public/assets/creatures/` and must
   not be modified in place; new animation clips are added, never replaced.
-- Design docs live in `docs/redesign/`. Image needs go in `image-requests.md`.
+- Any change to a creature's model, colours or textures must go through
+  `docs/creature-intake.md`: re-render, `npm run cards`, `npm run lods`, and
+  `npm run check` must pass. The check flags stale images automatically.
+- Design docs live in `docs/redesign/`. Image needs go in `image-requests.md`; move each
+  brief to `image-requests-history.md` once its assets are delivered and integrated.

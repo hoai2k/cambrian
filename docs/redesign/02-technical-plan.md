@@ -314,3 +314,41 @@ proof that the core is fun** and is the point to decide how far to go.
 | Split-screen GPU cost with high-poly rigs | Per-viewport LOD, impostors for swarms, shared shadow pass, `low` tier. Budgets are hard limits in M8. |
 | Procedural stand-in animations look poor | They ship only until the art track lands; the state machine is clip-name-driven so replacement is zero-code. |
 | Losing the current viewer | The viewer is kept as a second entry and gains the new clips; it doubles as our animation QA tool. |
+
+
+## 21-creature integration
+
+`src/sim/expansion.ts` defines 13 additional options. The shared `CreatureDef`
+adds optional diet/provenance, collision radius, terrain clearance, authored
+locomotion ownership and held/mobile ability metadata. Existing definitions
+keep their defaults. `expansion-abilities.ts` owns new ability effects and food
+rates; `Game` provides spatial queries, nutrition, events and ally checks.
+Armor-piercing moves pass their bypass fraction through the regular combat
+pipeline so guard, invulnerability, death and relative-size rules still apply.
+
+The renderer preserves material opacity/transparency for gelatinous models,
+plays authored Ability loops while moving, and disables its extra spine wave
+and legacy corpse bending when the model owns its deformation. Assets retain the existing URL convention:
+`<id>.glb`, `<id>.lod1.glb`, `<id>.card.png`, `<id>.thumb.png`. LODs contain genuinely simplified
+geometry. Streaming still prioritizes selected species; no 21-model boot gate.
+The selector uses the shared 7-by-3 thumbnail grid and individual player cards.
+Short screens scroll the grid/card area while keeping the start controls available.
+
+Authoring scripts and texture inputs are committed under `tools/creatures/`.
+Original `.blend` files and intermediate renders remain in the user's local
+`cambrian/local/expansion-authoring/` workspace. Preserve all eight old GLBs.
+
+Verification: typecheck and production build; existing controls/respawn/flora
+checks; `tools/expansion-test.ts` for ability activation/completion, ally safety,
+armor piercing, once-per-target damage and all-tier feeding; asset validation
+for required clips, finite skinned poses, loop endpoints, LOD reduction and
+rendered appearance. Browser review covers the expanded selector and loaded
+models. Physical controller testing is distinct from browser/simulation checks.
+
+All 13 additions share [the v1 attachment contract](../creature-anchors.md).
+There are 140 new named sockets per detail level. Anatomical mouths, internal
+swallow destinations, primary/paired contacts and dedicated feeding-only CCD
+chains are stored on non-deforming child nodes. The final anchor pass preserves
+all mesh, skin, material and animation binary bytes; it is idempotent. Update
+both sizes and the shared anchor registry after this pass. Runtime tests cover
+transformed instances, every articulated chain and attachment behavior.

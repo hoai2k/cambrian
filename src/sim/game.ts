@@ -1,3 +1,4 @@
+import { abilitySpeed, beginExpansionAbility, stepExpansionAbility, bloomRate, grazeRate } from './expansion-abilities';
 import { add, clamp, damp, dist, distXZ, dot, heading, len3, lerp, makeRng, norm, scale as vscale, sub, TAU, v3, wrapAngle, yawOf, type Rng, type Vec3 } from '../shared/math';
 import { applyScaleStats, bandOf, bodyRadius, canAct, clearanceOf, isAlive, isHidden, isInvulnerable, lengthOf, makeActor, massOf, speedFactor, staminaCost } from './actors';
 import { makeBrain, think, type AiWorld } from './ai';
@@ -29,10 +30,10 @@ const SNACK_SCHOOLS: { creature: CreatureId; scale: number; count: number }[] = 
   { creature: 'marrella', scale: 0.085, count: 14 }, { creature: 'olenoides', scale: 0.075, count: 12 },
   { creature: 'hallucigenia', scale: 0.085, count: 10 }, { creature: 'marrella', scale: 0.08, count: 14 },
   // open reef
-  { creature: 'waptia', scale: 0.1, count: 12 }, { creature: 'canadia', scale: 0.095, count: 10 },
-  { creature: 'olenoides', scale: 0.08, count: 10 }, { creature: 'marrella', scale: 0.09, count: 12 },
-  { creature: 'waptia', scale: 0.16, count: 8 }, { creature: 'marrella', scale: 0.15, count: 8 },
-  { creature: 'canadia', scale: 0.17, count: 7 }, { creature: 'olenoides', scale: 0.14, count: 8 },
+  { creature: 'pikaia', scale: 0.1, count: 12 }, { creature: 'ctenorhabdotus', scale: 0.095, count: 10 },
+  { creature: 'odontogriphus', scale: 0.08, count: 10 }, { creature: 'odaraia', scale: 0.09, count: 12 },
+  { creature: 'isoxys', scale: 0.16, count: 8 }, { creature: 'leanchoilia', scale: 0.15, count: 8 },
+  { creature: 'vetulicola', scale: 0.17, count: 7 }, { creature: 'ottoia', scale: 0.14, count: 8 },
 ];
 
 export class Game implements AiWorld {
@@ -155,7 +156,7 @@ export class Game implements AiWorld {
   private spawnPreyFor(p: Actor) {
     const L = lengthOf(p);
     const def = creature(p.creature);
-    const pool: CreatureId[] = def.ground ? ['marrella', 'olenoides', 'hallucigenia', 'waptia', 'canadia'] : ['waptia', 'canadia', 'opabinia', 'marrella', 'olenoides'];
+    const pool = CREATURE_IDS.filter((id) => creature(id).ground === def.ground || !creature(id).ground);
     const c = pool[Math.floor(this.rng() * pool.length)];
     const cd = creature(c);
     const ratio = 0.28 + this.rng() * 0.32;            // snack to small prey relative to the player
@@ -358,6 +359,8 @@ export class Game implements AiWorld {
     if (a.sinceHit > 6 && a.hp < a.hpMax && a.state !== 'dead') a.hp = Math.min(a.hpMax, a.hp + a.hpMax * (a.controller === 'player' || a.controller === 'bot' ? 0.035 : 0.02) * dt);
     if (a.brain) a.brain.courage = Math.min(1, a.brain.courage + 0.05 * dt);
 
+    if (a.state !== 'ability') a.abilityActive = false;
+
     // Timers
     a.stateT += dt;
     a.iframes = Math.max(0, a.iframes - dt);
@@ -411,8 +414,8 @@ export class Game implements AiWorld {
       }
     }
     if (def.ground) dir.y = 0;
-    const controllable = a.holdT === 0 && (a.state === 'free' || a.state === 'guard' || (a.state === 'ability' && (def.ability === 'shellUp' || def.ability === 'bristleFlare' || def.ability === 'ambushSurge')));
-    const slowMult = a.state === 'guard' ? 0.45 : (a.abilityActive && def.ability === 'shellUp') ? 0.35 : a.exhausted > 0 ? 0.7 : 1;
+    const controllable = a.holdT === 0 && (a.state === 'free' || a.state === 'guard' || (a.state === 'ability' && (def.mobileAbility || def.ability === 'shellUp' || def.ability === 'bristleFlare' || def.ability === 'ambushSurge')));
+    const slowMult = abilitySpeed(a) * (a.state === 'guard' ? 0.45 : (a.abilityActive && def.ability === 'shellUp') ? 0.35 : a.exhausted > 0 ? 0.7 : 1);
     const burstMult = controllable && (bursting || freeBurst) ? (1 + (def.burst - 1) * (freeBurst ? 1.25 : burstIn) * (a.controller === 'swarm' ? 0.55 : giantish ? 0.35 : 1)) : 1;
     const cruise = def.speed * sf * slowMult * (a.controller === 'swarm' ? 0.62 : giantish ? 0.55 : 1);
     const cur = sampleCurrent(v3(), a.pos.x, a.pos.y, a.pos.z, this.time);
@@ -482,7 +485,7 @@ export class Game implements AiWorld {
       if (a.pos.y < floor) a.pos.y = floor;
     } else {
       if (a.pos.y < floor) { a.pos.y = floor; if (a.vel.y < 0) a.vel.y *= -0.2; }
-      const ceiling = SURFACE_Y - 0.8 - L * 0.2;
+      const ceiling = SURFACE_Y - 0.8 - clearanceOf(a);
       if (a.pos.y > ceiling) { a.pos.y = ceiling; if (a.vel.y > 0) a.vel.y = 0; }
     }
 
@@ -498,6 +501,7 @@ export class Game implements AiWorld {
     const prevYaw = a.yaw;
     a.yaw = wrapAngle(a.yaw + turn * dt);
     const turnRate = wrapAngle(a.yaw - prevYaw) / Math.max(dt, 1e-4);
+    if (a.state === 'ability' && def.ability === 'spineIntercept') a.yaw = yawOf(a.dodgeDir);
     a.bank = damp(a.bank, def.ground ? 0 : clamp(-turnRate * 0.16, -0.7, 0.7), 4, dt);
     if (def.ground) {
       const ahead = groundHeight(this.world, a.pos.x + Math.sin(a.yaw) * L * 0.4, a.pos.z + Math.cos(a.yaw) * L * 0.4, this.scratchBoulders);
@@ -653,10 +657,19 @@ export class Game implements AiWorld {
 
     // Snacks: swim-through consume
     if (a.state !== 'moult' && a.state !== 'grabbed' && a.controller !== 'swarm') this.consumeSnacks(a, L, def);
-    // Plankton & grazing
-    if (a.controller === 'player' || a.controller === 'bot') {
-      for (const b of this.world.blooms) if (dist(a.pos, b.pos) < b.radius && L < 2.4) { this.gainNutrition(a, undefined, dt * 2.2 * clamp(1 - L / 2.4, 0, 1)); if (Math.random() < dt * 2) this.events.push({ kind: 'eat', pos: { ...a.pos }, actor: a.id, strength: 0.1, player: a.player }); }
-      if (def.id === 'wiwaxia' && a.stillness > 0.5) { const m = microbialAt(a.pos.x, a.pos.z); if (m > 0.2) this.gainNutrition(a, undefined, dt * 1.6 * m); }
+    // Mobile suspension feeders can grow in blooms at every tier. Depositors must be near the bottom.
+    if (isAlive(a) && a.state !== 'moult' && a.controller !== 'swarm') {
+      for (const b of this.world.blooms) if (dist(a.pos, b.pos) < b.radius) {
+        const food = bloomRate(a, def) * dt;
+        if (food > 0) this.gainNutrition(a, undefined, food);
+        if (food > 0 && this.rng() < dt * 2) this.events.push({ kind: 'eat', pos: { ...a.pos }, actor: a.id, strength: .1, player: a.player });
+        break;
+      }
+      const rate = grazeRate(a, def);
+      if (rate > 0 && a.pos.y < sampleHeight(a.pos.x, a.pos.z) + clearanceOf(a) + .8) {
+        const m = microbialAt(a.pos.x, a.pos.z);
+        if (m > .2) this.gainNutrition(a, undefined, dt * rate * m);
+      }
     }
 
     // Aim range: the crosshair fills when a pounce would connect
@@ -734,10 +747,18 @@ export class Game implements AiWorld {
     void sf;
   }
 
+  private expansionContext() {
+    return { hit: this.hitCtx, nearby: (pos: Vec3, radius: number) => this.nearby(pos, radius), silt: this.silt,
+      allies: (a: Actor, b: Actor) => this.mode === 'rise' && a.controller === 'player' && b.controller === 'player' };
+  }
+
   private startAbility(a: Actor, def: ReturnType<typeof creature>) {
+    if (def.ability === 'sedimentDive' && !a.grounded) return;
     a.abilityCd = def.abilityCooldown;
     a.abilityT = 0; a.abilityActive = true; a.state = 'ability'; a.stateT = 0;
     const L = lengthOf(a);
+    a.hitDone.clear();
+    beginExpansionAbility(this.expansionContext(), a, def);
     switch (def.ability) {
       case 'ambushSurge': a.stateDur = 0.1; a.burstT = 2.2; a.abilityActive = false; a.state = 'free'; break;
       case 'snatch': a.stateDur = 0.55; break;
@@ -762,6 +783,8 @@ export class Game implements AiWorld {
   private updateAbility(a: Actor, def: ReturnType<typeof creature>, dt: number, input: InputFrame, L: number, sf: number) {
     a.abilityT += dt;
     const done = a.stateT >= a.stateDur;
+    stepExpansionAbility(this.expansionContext(), a, def, dt);
+    if (a.state !== 'ability') return;
     switch (def.ability) {
       case 'snatch': {
         if (a.stateT >= 0.2 && a.stateT < 0.35 && a.hitDone.size === 0) {

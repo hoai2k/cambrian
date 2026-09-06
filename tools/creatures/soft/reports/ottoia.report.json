@@ -1,0 +1,268 @@
+{
+  "id": "ottoia",
+  "sourceOrientation": "Blender +Z up, -Y anterior; glTF +Y up, +Z anterior",
+  "boundsBlender": {
+    "min": [
+      -0.4409871995449066,
+      -2.2427115440368652,
+      -0.36953169107437134
+    ],
+    "max": [
+      0.4409871995449066,
+      2.2607688903808594,
+      0.41831088066101074
+    ]
+  },
+  "triangles": 66030,
+  "lodTriangles": 25090,
+  "vertices": 33629,
+  "bones": 22,
+  "durations": {
+    "Idle": 2.0,
+    "Attack": 1.0,
+    "Hit": 0.6,
+    "Death": 1.6,
+    "TurnLeft": 2.4,
+    "TurnRight": 2.4,
+    "Dive": 2.4,
+    "Rise": 2.4,
+    "Bite": 0.5,
+    "Heavy": 1.1,
+    "Guard": 1.0,
+    "Parry": 0.35,
+    "Dodge": 0.4,
+    "Eat": 0.8,
+    "Stagger": 1.2,
+    "Ability": 1.2,
+    "Moult": 1.5,
+    "Crawl": 2.0
+  },
+  "clipFrames": {
+    "Idle": 60.0,
+    "Attack": 30.0,
+    "Hit": 18.0,
+    "Death": 48.0,
+    "TurnLeft": 72.0,
+    "TurnRight": 72.0,
+    "Dive": 72.0,
+    "Rise": 72.0,
+    "Bite": 15.0,
+    "Heavy": 33.0,
+    "Guard": 30.0,
+    "Parry": 10.5,
+    "Dodge": 12.0,
+    "Eat": 24.0,
+    "Stagger": 36.0,
+    "Ability": 36.0,
+    "Moult": 45.0,
+    "Crawl": 60.0
+  },
+  "scientificNotes": [
+    "Annulated muscular trunk; mobile eversible introvert with 28 rows of backward-curved hooks and an actual recessed toothed oral funnel; two rings of four posterior hooks.",
+    "Burrowing and extension use bone rotations and introvert translations without animated scale. Body never becomes permanently rooted to a burrow."
+  ],
+  "sources": [
+    "https://burgess-shale.rom.on.ca/fossils/ottoia-prolifica/",
+    "https://doi.org/10.1111/pala.12168"
+  ],
+  "validation": {
+    "full": {
+      "bytes": 4158360,
+      "clips": [
+        "Ability",
+        "Attack",
+        "Bite",
+        "Crawl",
+        "Death",
+        "Dive",
+        "Dodge",
+        "Eat",
+        "Guard",
+        "Heavy",
+        "Hit",
+        "Idle",
+        "Moult",
+        "Parry",
+        "Rise",
+        "Stagger",
+        "TurnLeft",
+        "TurnRight"
+      ],
+      "materials": {
+        "ottoia Living integument": {
+          "min": 0.055237659266041045,
+          "max": 0.5517662317845426,
+          "mean": 0.2312379108390854
+        },
+        "ottoia Marginal tissue": {
+          "min": 0.07074082551308461,
+          "max": 0.4631418326085298,
+          "mean": 0.2538661696123902
+        },
+        "ottoia Oral cuticle": {
+          "min": 0.014404516670481423,
+          "max": 0.7311818112458991,
+          "mean": 0.1841049368772279
+        }
+      },
+      "rootStatic": true,
+      "noScaleAnimation": true
+    },
+    "lod": {
+      "bytes": 2336008,
+      "clips": [
+        "Ability",
+        "Attack",
+        "Bite",
+        "Crawl",
+        "Death",
+        "Dive",
+        "Dodge",
+        "Eat",
+        "Guard",
+        "Heavy",
+        "Hit",
+        "Idle",
+        "Moult",
+        "Parry",
+        "Rise",
+        "Stagger",
+        "TurnLeft",
+        "TurnRight"
+      ],
+      "materials": {
+        "ottoia Living integument": {
+          "min": 0.05889982452124819,
+          "max": 0.5378805218585488,
+          "mean": 0.22791810800110274
+        },
+        "ottoia Marginal tissue": {
+          "min": 0.08575570305943389,
+          "max": 0.45780117494468603,
+          "mean": 0.25255931944762344
+        },
+        "ottoia Oral cuticle": {
+          "min": 0.014511329823758298,
+          "max": 0.7283436331731136,
+          "mean": 0.18701339816894508
+        }
+      },
+      "rootStatic": true,
+      "noScaleAnimation": true
+    },
+    "evaluatedSkin": {
+      "Idle": {
+        "finite": true,
+        "samples": 5,
+        "maxDimension": 4.519741773605347
+      },
+      "Attack": {
+        "finite": true,
+        "samples": 5,
+        "maxDimension": 4.730968236923218
+      },
+      "Hit": {
+        "finite": true,
+        "samples": 5,
+        "maxDimension": 4.503480434417725
+      },
+      "Death": {
+        "finite": true,
+        "samples": 5,
+        "maxDimension": 4.503480434417725
+      },
+      "TurnLeft": {
+        "finite": true,
+        "samples": 5,
+        "maxDimension": 4.503480434417725
+      },
+      "TurnRight": {
+        "finite": true,
+        "samples": 5,
+        "maxDimension": 4.503480434417725
+      },
+      "Dive": {
+        "finite": true,
+        "samples": 5,
+        "maxDimension": 4.503480434417725
+      },
+      "Rise": {
+        "finite": true,
+        "samples": 5,
+        "maxDimension": 4.503480434417725
+      },
+      "Bite": {
+        "finite": true,
+        "samples": 5,
+        "maxDimension": 4.73578667640686
+      },
+      "Heavy": {
+        "finite": true,
+        "samples": 5,
+        "maxDimension": 4.730944633483887
+      },
+      "Guard": {
+        "finite": true,
+        "samples": 5,
+        "maxDimension": 4.192825078964233
+      },
+      "Parry": {
+        "finite": true,
+        "samples": 5,
+        "maxDimension": 4.503480434417725
+      },
+      "Dodge": {
+        "finite": true,
+        "samples": 5,
+        "maxDimension": 4.503480434417725
+      },
+      "Eat": {
+        "finite": true,
+        "samples": 5,
+        "maxDimension": 4.678326606750488
+      },
+      "Stagger": {
+        "finite": true,
+        "samples": 5,
+        "maxDimension": 4.503480434417725
+      },
+      "Ability": {
+        "finite": true,
+        "samples": 5,
+        "maxDimension": 3.8555372953414917
+      },
+      "Moult": {
+        "finite": true,
+        "samples": 5,
+        "maxDimension": 4.5101494789123535
+      },
+      "Crawl": {
+        "finite": true,
+        "samples": 5,
+        "maxDimension": 4.528172254562378
+      }
+    },
+    "endpointMaxRadiansOrUnits": {
+      "Idle": 3.3273383566927697e-18,
+      "Attack": 1.2298030163497426e-33,
+      "Hit": 2.8415858607350646e-34,
+      "Death": 0.949999988079071,
+      "TurnLeft": 1.2323475732157915e-17,
+      "TurnRight": 1.2323475732157915e-17,
+      "Dive": 1.2323475732157915e-17,
+      "Rise": 1.2323475732157915e-17,
+      "Bite": 1.2298030163497426e-33,
+      "Heavy": 1.2298030163497426e-33,
+      "Guard": 1.6312295328663162e-18,
+      "Parry": 2.9995195879107854e-33,
+      "Dodge": 3.2994715834360624e-33,
+      "Eat": 2.218225640060231e-18,
+      "Stagger": 2.3756195327271252e-33,
+      "Ability": 5.845324014382137e-19,
+      "Moult": 4.6629365578418697e-17,
+      "Crawl": 1.2323475732157915e-17
+    },
+    "renderInspected": true
+  },
+  "sourceBlend": "cambrian/local/expansion-authoring/soft/ottoia.blend"
+}

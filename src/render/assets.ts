@@ -1,3 +1,4 @@
+import assetSizes from './asset-sizes.json';
 /**
  * Priority asset loader. Everything heavy (creature GLBs, card images, sound files) goes through one
  * queue so the title screen can appear as soon as the first creature is in, and idle time on the
@@ -11,10 +12,7 @@ export interface AssetItem { key: string; kind: AssetKind; url: string; size: nu
 export interface AssetProgress { loaded: number; total: number; fraction: number; done: number; count: number; current?: string; ready: Set<CreatureId>; }
 
 /** Known byte sizes so the bar is honest before the first request returns. */
-export const GLB_SIZES: Record<CreatureId, number> = {
-  anomalocaris: 7653264, canadia: 4655664, hallucigenia: 2617276, marrella: 5178312,
-  olenoides: 3770468, opabinia: 5075332, waptia: 4420232, wiwaxia: 2303784,
-};
+export const GLB_SIZES: Record<CreatureId, number> = assetSizes;
 const CARD_SIZE = 1_010_000;
 export const SFX_FILES = ['ui-start', 'ui-confirm', 'ui-move', 'ui-back', 'ui-join', 'bite-1', 'bite-2', 'bite-3', 'crunch-1', 'crunch-2', 'hit-light-1', 'hit-light-2', 'hit-heavy-1', 'hit-heavy-2', 'ambient-reef', 'giant-drone', 'heartbeat', 'parry', 'guard-break', 'stagger', 'dodge-1', 'dodge-2', 'burst', 'silt', 'grab', 'kill', 'death', 'tier-up', 'hunted', 'escape', 'sense', 'ability', 'won'];
 
@@ -54,7 +52,7 @@ export class AssetQueue {
       lod.priority = (phase === 'playing' ? 15 : 90) + i;
       // On the select screen the visible cards matter as much as the model of the pick itself.
       glb.priority = (i < creatures.length ? 10 : 100) + i;
-      card.priority = phase === 'select' ? (i < 3 ? 5 + i : 60 + i) : 50 + i;
+      card.priority = phase === 'boot' || phase === 'title' ? 1 + i : phase === 'select' ? (i < 3 ? 3 + i : 30 + i) : 50 + i;
     });
     SFX_FILES.forEach((n, i) => { const it = this.items.get(`sfx:${n}`)!; it.priority = (n.startsWith('ui') ? 40 : phase === 'playing' ? 20 : 120) + i; });
     this.pump();
@@ -106,6 +104,7 @@ export class AssetQueue {
     return t ? l / t : 1;
   }
   isReady(id: CreatureId) { return this.ready.has(id); }
+  isCardReady(id: CreatureId) { return this.items.get(`card:${id}`)?.status === 'done'; }
   private emit(_key?: string) { const p = this.progress(); for (const fn of this.listeners) fn(p); }
   dispose() { this.disposed = true; this.listeners.clear(); }
 }

@@ -1,0 +1,972 @@
+{
+  "pikaia": {
+    "full": {
+      "meshes": 4,
+      "clips": {
+        "Ability": {
+          "seconds": 1.2000000476837158,
+          "maximumSampledDisplacement": 2.0478929136841053,
+          "endpointDistance": 9.986569603944978e-8
+        },
+        "Attack": {
+          "seconds": 1,
+          "maximumSampledDisplacement": 2.045545179136447,
+          "endpointDistance": 9.986569603944978e-8
+        },
+        "Bite": {
+          "seconds": 0.5,
+          "maximumSampledDisplacement": 1.9524415593958149,
+          "endpointDistance": 9.986569603944978e-8
+        },
+        "Death": {
+          "seconds": 1.600000023841858,
+          "maximumSampledDisplacement": 2.0399892204174277,
+          "endpointDistance": 2.2610290336194607
+        },
+        "Dive": {
+          "seconds": 2.4000000953674316,
+          "maximumSampledDisplacement": 1.9790144856308143,
+          "endpointDistance": 9.986569603944978e-8
+        },
+        "Dodge": {
+          "seconds": 0.4000000059604645,
+          "maximumSampledDisplacement": 4.891738020707446,
+          "endpointDistance": 9.986569603944978e-8
+        },
+        "Eat": {
+          "seconds": 0.800000011920929,
+          "maximumSampledDisplacement": 0.3247197503867297,
+          "endpointDistance": 9.986569603944978e-8
+        },
+        "Guard": {
+          "seconds": 1,
+          "maximumSampledDisplacement": 0.3172128597974559,
+          "endpointDistance": 9.986569603944978e-8
+        },
+        "Heavy": {
+          "seconds": 1.100000023841858,
+          "maximumSampledDisplacement": 2.031596108206243,
+          "endpointDistance": 9.986569603944978e-8
+        },
+        "Hit": {
+          "seconds": 0.6000000238418579,
+          "maximumSampledDisplacement": 0.9666979115777352,
+          "endpointDistance": 9.986569603944978e-8
+        },
+        "Idle": {
+          "seconds": 2.4000000953674316,
+          "maximumSampledDisplacement": 0.48436139163361075,
+          "endpointDistance": 9.986569603944978e-8
+        },
+        "Moult": {
+          "seconds": 1.5,
+          "maximumSampledDisplacement": 1.3281692451878981,
+          "endpointDistance": 9.986569603944978e-8
+        },
+        "Parry": {
+          "seconds": 0.3499999940395355,
+          "maximumSampledDisplacement": 1.9291496941765103,
+          "endpointDistance": 9.986569603944978e-8
+        },
+        "Rise": {
+          "seconds": 2.4000000953674316,
+          "maximumSampledDisplacement": 2.317881248612601,
+          "endpointDistance": 9.986569603944978e-8
+        },
+        "Stagger": {
+          "seconds": 1.2000000476837158,
+          "maximumSampledDisplacement": 1.7406280724672043,
+          "endpointDistance": 9.986569603944978e-8
+        },
+        "Swim": {
+          "seconds": 2.4000000953674316,
+          "maximumSampledDisplacement": 1.7615396741640315,
+          "endpointDistance": 9.986569603944978e-8
+        },
+        "TurnLeft": {
+          "seconds": 2.4000000953674316,
+          "maximumSampledDisplacement": 0.8859988269062322,
+          "endpointDistance": 9.986569603944978e-8
+        },
+        "TurnRight": {
+          "seconds": 2.4000000953674316,
+          "maximumSampledDisplacement": 3.6823143776270575,
+          "endpointDistance": 9.986569603944978e-8
+        }
+      }
+    },
+    ".lod1": {
+      "meshes": 4,
+      "clips": {
+        "Ability": {
+          "seconds": 1.2000000476837158,
+          "maximumSampledDisplacement": 2.027025002779301,
+          "endpointDistance": 9.982604084432483e-8
+        },
+        "Attack": {
+          "seconds": 1,
+          "maximumSampledDisplacement": 2.0309470710679496,
+          "endpointDistance": 9.982604084432483e-8
+        },
+        "Bite": {
+          "seconds": 0.5,
+          "maximumSampledDisplacement": 1.939268828975123,
+          "endpointDistance": 9.982604084432483e-8
+        },
+        "Death": {
+          "seconds": 1.600000023841858,
+          "maximumSampledDisplacement": 2.0218440246024736,
+          "endpointDistance": 2.2406989902783154
+        },
+        "Dive": {
+          "seconds": 2.4000000953674316,
+          "maximumSampledDisplacement": 1.9584461165707066,
+          "endpointDistance": 9.982604084432483e-8
+        },
+        "Dodge": {
+          "seconds": 0.4000000059604645,
+          "maximumSampledDisplacement": 4.854405707965034,
+          "endpointDistance": 9.982604084432483e-8
+        },
+        "Eat": {
+          "seconds": 0.800000011920929,
+          "maximumSampledDisplacement": 0.3226479805786968,
+          "endpointDistance": 9.982604084432483e-8
+        },
+        "Guard": {
+          "seconds": 1,
+          "maximumSampledDisplacement": 0.31430785412237355,
+          "endpointDistance": 9.982604084432483e-8
+        },
+        "Heavy": {
+          "seconds": 1.100000023841858,
+          "maximumSampledDisplacement": 2.017100321426417,
+          "endpointDistance": 9.982604084432483e-8
+        },
+        "Hit": {
+          "seconds": 0.6000000238418579,
+          "maximumSampledDisplacement": 0.9588268735122362,
+          "endpointDistance": 9.982604084432483e-8
+        },
+        "Idle": {
+          "seconds": 2.4000000953674316,
+          "maximumSampledDisplacement": 0.4797575608943985,
+          "endpointDistance": 9.982604084432483e-8
+        },
+        "Moult": {
+          "seconds": 1.5,
+          "maximumSampledDisplacement": 1.316529361592408,
+          "endpointDistance": 9.982604084432483e-8
+        },
+        "Parry": {
+          "seconds": 0.3499999940395355,
+          "maximumSampledDisplacement": 1.9140739335934607,
+          "endpointDistance": 9.982604084432483e-8
+        },
+        "Rise": {
+          "seconds": 2.4000000953674316,
+          "maximumSampledDisplacement": 2.2968502816169987,
+          "endpointDistance": 9.982604084432483e-8
+        },
+        "Stagger": {
+          "seconds": 1.2000000476837158,
+          "maximumSampledDisplacement": 1.7271416543206257,
+          "endpointDistance": 9.982604084432483e-8
+        },
+        "Swim": {
+          "seconds": 2.4000000953674316,
+          "maximumSampledDisplacement": 1.7449048334291106,
+          "endpointDistance": 9.982604084432483e-8
+        },
+        "TurnLeft": {
+          "seconds": 2.4000000953674316,
+          "maximumSampledDisplacement": 0.876485362872431,
+          "endpointDistance": 9.982604084432483e-8
+        },
+        "TurnRight": {
+          "seconds": 2.4000000953674316,
+          "maximumSampledDisplacement": 3.6496940442573376,
+          "endpointDistance": 9.982604084432483e-8
+        }
+      }
+    }
+  },
+  "nectocaris": {
+    "full": {
+      "meshes": 5,
+      "clips": {
+        "Ability": {
+          "seconds": 1.2000000476837158,
+          "maximumSampledDisplacement": 0.45480902258932804,
+          "endpointDistance": 7.323601803020633e-8
+        },
+        "Attack": {
+          "seconds": 1,
+          "maximumSampledDisplacement": 1.2271797140316616,
+          "endpointDistance": 6.627476700568154e-8
+        },
+        "Bite": {
+          "seconds": 0.5,
+          "maximumSampledDisplacement": 0.7927815153200859,
+          "endpointDistance": 6.627476700568154e-8
+        },
+        "Death": {
+          "seconds": 1.600000023841858,
+          "maximumSampledDisplacement": 1.3225913176801618,
+          "endpointDistance": 1.428752704302263
+        },
+        "Dive": {
+          "seconds": 2.4000000953674316,
+          "maximumSampledDisplacement": 0.6270096256638815,
+          "endpointDistance": 6.627476700568154e-8
+        },
+        "Dodge": {
+          "seconds": 0.4000000059604645,
+          "maximumSampledDisplacement": 1.0004042349424591,
+          "endpointDistance": 6.627476700568154e-8
+        },
+        "Eat": {
+          "seconds": 0.800000011920929,
+          "maximumSampledDisplacement": 0.4523381218928403,
+          "endpointDistance": 7.323601803020633e-8
+        },
+        "Grab": {
+          "seconds": 0.8999999761581421,
+          "maximumSampledDisplacement": 1.2275341038924492,
+          "endpointDistance": 6.627476700568154e-8
+        },
+        "Guard": {
+          "seconds": 1,
+          "maximumSampledDisplacement": 0.09482972801541935,
+          "endpointDistance": 2.026362358489587e-7
+        },
+        "Heavy": {
+          "seconds": 1.100000023841858,
+          "maximumSampledDisplacement": 1.2116091906399808,
+          "endpointDistance": 6.627476700568154e-8
+        },
+        "Hit": {
+          "seconds": 0.6000000238418579,
+          "maximumSampledDisplacement": 0.563562500239182,
+          "endpointDistance": 6.627476700568154e-8
+        },
+        "Idle": {
+          "seconds": 2.4000000953674316,
+          "maximumSampledDisplacement": 0.14178558078871945,
+          "endpointDistance": 6.627476700568154e-8
+        },
+        "Moult": {
+          "seconds": 1.5,
+          "maximumSampledDisplacement": 0.5638053926914196,
+          "endpointDistance": 6.627476700568154e-8
+        },
+        "Parry": {
+          "seconds": 0.3499999940395355,
+          "maximumSampledDisplacement": 0.7989855631998942,
+          "endpointDistance": 6.627476700568154e-8
+        },
+        "Rise": {
+          "seconds": 2.4000000953674316,
+          "maximumSampledDisplacement": 0.9167489775123991,
+          "endpointDistance": 6.627476700568154e-8
+        },
+        "Stagger": {
+          "seconds": 1.2000000476837158,
+          "maximumSampledDisplacement": 1.0396216103819957,
+          "endpointDistance": 6.627476700568154e-8
+        },
+        "Swim": {
+          "seconds": 2.4000000953674316,
+          "maximumSampledDisplacement": 0.5182080177438058,
+          "endpointDistance": 6.627476700568154e-8
+        },
+        "TurnLeft": {
+          "seconds": 2.4000000953674316,
+          "maximumSampledDisplacement": 0.8335400425220831,
+          "endpointDistance": 6.627476700568154e-8
+        },
+        "TurnRight": {
+          "seconds": 2.4000000953674316,
+          "maximumSampledDisplacement": 1.2538022224468972,
+          "endpointDistance": 6.627476700568154e-8
+        }
+      }
+    },
+    ".lod1": {
+      "meshes": 5,
+      "clips": {
+        "Ability": {
+          "seconds": 1.2000000476837158,
+          "maximumSampledDisplacement": 0.465180634690269,
+          "endpointDistance": 7.433859050128793e-8
+        },
+        "Attack": {
+          "seconds": 1,
+          "maximumSampledDisplacement": 1.2231329401695985,
+          "endpointDistance": 6.668315214667506e-8
+        },
+        "Bite": {
+          "seconds": 0.5,
+          "maximumSampledDisplacement": 0.7924119050953755,
+          "endpointDistance": 6.668315214667506e-8
+        },
+        "Death": {
+          "seconds": 1.600000023841858,
+          "maximumSampledDisplacement": 1.3254451115118029,
+          "endpointDistance": 1.434597133881885
+        },
+        "Dive": {
+          "seconds": 2.4000000953674316,
+          "maximumSampledDisplacement": 0.6353524718567424,
+          "endpointDistance": 6.668315214667506e-8
+        },
+        "Dodge": {
+          "seconds": 0.4000000059604645,
+          "maximumSampledDisplacement": 1.0151826735329614,
+          "endpointDistance": 6.668315214667506e-8
+        },
+        "Eat": {
+          "seconds": 0.800000011920929,
+          "maximumSampledDisplacement": 0.462673302766981,
+          "endpointDistance": 7.433859050128793e-8
+        },
+        "Grab": {
+          "seconds": 0.8999999761581421,
+          "maximumSampledDisplacement": 1.2280967783929548,
+          "endpointDistance": 6.668315214667506e-8
+        },
+        "Guard": {
+          "seconds": 1,
+          "maximumSampledDisplacement": 0.09618652621372059,
+          "endpointDistance": 2.0246743789572912e-7
+        },
+        "Heavy": {
+          "seconds": 1.100000023841858,
+          "maximumSampledDisplacement": 1.207708472052914,
+          "endpointDistance": 6.668315214667506e-8
+        },
+        "Hit": {
+          "seconds": 0.6000000238418579,
+          "maximumSampledDisplacement": 0.5657660226041747,
+          "endpointDistance": 6.668315214667506e-8
+        },
+        "Idle": {
+          "seconds": 2.4000000953674316,
+          "maximumSampledDisplacement": 0.14389582453736374,
+          "endpointDistance": 6.668315214667506e-8
+        },
+        "Moult": {
+          "seconds": 1.5,
+          "maximumSampledDisplacement": 0.57118409119386,
+          "endpointDistance": 6.668315214667506e-8
+        },
+        "Parry": {
+          "seconds": 0.3499999940395355,
+          "maximumSampledDisplacement": 0.8078667585363833,
+          "endpointDistance": 6.668315214667506e-8
+        },
+        "Rise": {
+          "seconds": 2.4000000953674316,
+          "maximumSampledDisplacement": 0.9311077904136773,
+          "endpointDistance": 6.668315214667506e-8
+        },
+        "Stagger": {
+          "seconds": 1.2000000476837158,
+          "maximumSampledDisplacement": 1.0474754817454304,
+          "endpointDistance": 6.668315214667506e-8
+        },
+        "Swim": {
+          "seconds": 2.4000000953674316,
+          "maximumSampledDisplacement": 0.5267487004407859,
+          "endpointDistance": 6.668315214667506e-8
+        },
+        "TurnLeft": {
+          "seconds": 2.4000000953674316,
+          "maximumSampledDisplacement": 0.8520485731517432,
+          "endpointDistance": 6.668315214667506e-8
+        },
+        "TurnRight": {
+          "seconds": 2.4000000953674316,
+          "maximumSampledDisplacement": 1.2657377882923673,
+          "endpointDistance": 6.668315214667506e-8
+        }
+      }
+    }
+  },
+  "ottoia": {
+    "full": {
+      "meshes": 3,
+      "clips": {
+        "Ability": {
+          "seconds": 1.2000000476837158,
+          "maximumSampledDisplacement": 0.4100443949718193,
+          "endpointDistance": 7.84712655564239e-8
+        },
+        "Attack": {
+          "seconds": 1,
+          "maximumSampledDisplacement": 0.7279351099392883,
+          "endpointDistance": 0
+        },
+        "Bite": {
+          "seconds": 0.5,
+          "maximumSampledDisplacement": 0.7164389273152247,
+          "endpointDistance": 0
+        },
+        "Crawl": {
+          "seconds": 2,
+          "maximumSampledDisplacement": 0.7251102853014764,
+          "endpointDistance": 1.1295700899707568e-16
+        },
+        "Death": {
+          "seconds": 1.600000023841858,
+          "maximumSampledDisplacement": 1.4860297227835755,
+          "endpointDistance": 1.6461755129466493
+        },
+        "Dive": {
+          "seconds": 2.4000000953674316,
+          "maximumSampledDisplacement": 1.045065495769575,
+          "endpointDistance": 1.1295700899707568e-16
+        },
+        "Dodge": {
+          "seconds": 0.4000000059604645,
+          "maximumSampledDisplacement": 1.7097896600122682,
+          "endpointDistance": 1.5407439555097887e-33
+        },
+        "Eat": {
+          "seconds": 0.800000011920929,
+          "maximumSampledDisplacement": 0.19432535174044438,
+          "endpointDistance": 6.262066167500667e-9
+        },
+        "Guard": {
+          "seconds": 1,
+          "maximumSampledDisplacement": 0.13001661407581763,
+          "endpointDistance": 1.0367976808912932e-8
+        },
+        "Heavy": {
+          "seconds": 1.100000023841858,
+          "maximumSampledDisplacement": 0.7233855336522221,
+          "endpointDistance": 0
+        },
+        "Hit": {
+          "seconds": 0.6000000238418579,
+          "maximumSampledDisplacement": 0.604307128497904,
+          "endpointDistance": 0
+        },
+        "Idle": {
+          "seconds": 2,
+          "maximumSampledDisplacement": 0.19690370328559248,
+          "endpointDistance": 5.551115123125783e-17
+        },
+        "Moult": {
+          "seconds": 1.5,
+          "maximumSampledDisplacement": 0.6094109786549804,
+          "endpointDistance": 2.5438405243138006e-16
+        },
+        "Parry": {
+          "seconds": 0.3499999940395355,
+          "maximumSampledDisplacement": 1.2139513237257726,
+          "endpointDistance": 0
+        },
+        "Rise": {
+          "seconds": 2.4000000953674316,
+          "maximumSampledDisplacement": 1.2961656752745543,
+          "endpointDistance": 1.1295700899707568e-16
+        },
+        "Stagger": {
+          "seconds": 1.2000000476837158,
+          "maximumSampledDisplacement": 1.211927923735483,
+          "endpointDistance": 1.5407439555097887e-33
+        },
+        "TurnLeft": {
+          "seconds": 2.4000000953674316,
+          "maximumSampledDisplacement": 0.8082181527894374,
+          "endpointDistance": 1.1295700899707568e-16
+        },
+        "TurnRight": {
+          "seconds": 2.4000000953674316,
+          "maximumSampledDisplacement": 2.0981420043525842,
+          "endpointDistance": 1.1295700899707568e-16
+        }
+      }
+    },
+    ".lod1": {
+      "meshes": 3,
+      "clips": {
+        "Ability": {
+          "seconds": 1.2000000476837158,
+          "maximumSampledDisplacement": 0.4137526569524179,
+          "endpointDistance": 8.24143811129652e-8
+        },
+        "Attack": {
+          "seconds": 1,
+          "maximumSampledDisplacement": 0.7786554583850362,
+          "endpointDistance": 0
+        },
+        "Bite": {
+          "seconds": 0.5,
+          "maximumSampledDisplacement": 0.7667450629172288,
+          "endpointDistance": 0
+        },
+        "Crawl": {
+          "seconds": 2,
+          "maximumSampledDisplacement": 0.7293844313643267,
+          "endpointDistance": 8.881784197001252e-16
+        },
+        "Death": {
+          "seconds": 1.600000023841858,
+          "maximumSampledDisplacement": 1.5874206955826182,
+          "endpointDistance": 1.7608884014287236
+        },
+        "Dive": {
+          "seconds": 2.4000000953674316,
+          "maximumSampledDisplacement": 1.1323366477489418,
+          "endpointDistance": 8.881784197001252e-16
+        },
+        "Dodge": {
+          "seconds": 0.4000000059604645,
+          "maximumSampledDisplacement": 1.8795714404860435,
+          "endpointDistance": 0
+        },
+        "Eat": {
+          "seconds": 0.800000011920929,
+          "maximumSampledDisplacement": 0.2068658794653744,
+          "endpointDistance": 6.836311548329959e-9
+        },
+        "Guard": {
+          "seconds": 1,
+          "maximumSampledDisplacement": 0.12994448510397433,
+          "endpointDistance": 1.1282898280012274e-8
+        },
+        "Heavy": {
+          "seconds": 1.100000023841858,
+          "maximumSampledDisplacement": 0.7737694964950776,
+          "endpointDistance": 0
+        },
+        "Hit": {
+          "seconds": 0.6000000238418579,
+          "maximumSampledDisplacement": 0.6206400924388075,
+          "endpointDistance": 0
+        },
+        "Idle": {
+          "seconds": 2,
+          "maximumSampledDisplacement": 0.19822175686215024,
+          "endpointDistance": 2.220446049250313e-16
+        },
+        "Moult": {
+          "seconds": 1.5,
+          "maximumSampledDisplacement": 0.6132086302921095,
+          "endpointDistance": 2.220446049250313e-16
+        },
+        "Parry": {
+          "seconds": 0.3499999940395355,
+          "maximumSampledDisplacement": 1.3118078564585494,
+          "endpointDistance": 0
+        },
+        "Rise": {
+          "seconds": 2.4000000953674316,
+          "maximumSampledDisplacement": 1.4147317041712377,
+          "endpointDistance": 8.881784197001252e-16
+        },
+        "Stagger": {
+          "seconds": 1.2000000476837158,
+          "maximumSampledDisplacement": 1.3209524159976593,
+          "endpointDistance": 0
+        },
+        "TurnLeft": {
+          "seconds": 2.4000000953674316,
+          "maximumSampledDisplacement": 0.9811438226757682,
+          "endpointDistance": 8.881784197001252e-16
+        },
+        "TurnRight": {
+          "seconds": 2.4000000953674316,
+          "maximumSampledDisplacement": 2.2710571837262927,
+          "endpointDistance": 8.881784197001252e-16
+        }
+      }
+    }
+  },
+  "odontogriphus": {
+    "full": {
+      "meshes": 4,
+      "clips": {
+        "Ability": {
+          "seconds": 1.2000000476837158,
+          "maximumSampledDisplacement": 0.34310621289232274,
+          "endpointDistance": 2.4312994496137848e-8
+        },
+        "Attack": {
+          "seconds": 1,
+          "maximumSampledDisplacement": 1.1180941935130804,
+          "endpointDistance": 2.431299448223362e-8
+        },
+        "Bite": {
+          "seconds": 0.5,
+          "maximumSampledDisplacement": 0.9811287594029684,
+          "endpointDistance": 2.431299448223362e-8
+        },
+        "Crawl": {
+          "seconds": 2,
+          "maximumSampledDisplacement": 0.29448901851818654,
+          "endpointDistance": 2.4312994485014466e-8
+        },
+        "Death": {
+          "seconds": 1.600000023841858,
+          "maximumSampledDisplacement": 1.4982091361934264,
+          "endpointDistance": 1.6632537383544708
+        },
+        "Dive": {
+          "seconds": 2.4000000953674316,
+          "maximumSampledDisplacement": 0.7685179216637654,
+          "endpointDistance": 2.4312994485014466e-8
+        },
+        "Dodge": {
+          "seconds": 0.4000000059604645,
+          "maximumSampledDisplacement": 0.6240603470318583,
+          "endpointDistance": 2.431299448223362e-8
+        },
+        "Eat": {
+          "seconds": 0.800000011920929,
+          "maximumSampledDisplacement": 0.17840167231502502,
+          "endpointDistance": 2.44184708196347e-8
+        },
+        "Guard": {
+          "seconds": 1,
+          "maximumSampledDisplacement": 0.05261821435110087,
+          "endpointDistance": 2.4546740844009435e-8
+        },
+        "Heavy": {
+          "seconds": 1.100000023841858,
+          "maximumSampledDisplacement": 1.1011263032931007,
+          "endpointDistance": 2.431299448223362e-8
+        },
+        "Hit": {
+          "seconds": 0.6000000238418579,
+          "maximumSampledDisplacement": 0.5458483371459134,
+          "endpointDistance": 2.431299448223362e-8
+        },
+        "Idle": {
+          "seconds": 2,
+          "maximumSampledDisplacement": 0.0799558959304989,
+          "endpointDistance": 2.4312994485014466e-8
+        },
+        "Moult": {
+          "seconds": 1.5,
+          "maximumSampledDisplacement": 0.6319137111796115,
+          "endpointDistance": 2.4312994511855415e-8
+        },
+        "Parry": {
+          "seconds": 0.3499999940395355,
+          "maximumSampledDisplacement": 1.0215138809053492,
+          "endpointDistance": 2.431299448223362e-8
+        },
+        "Rise": {
+          "seconds": 2.4000000953674316,
+          "maximumSampledDisplacement": 1.1329599407609443,
+          "endpointDistance": 2.4312994485014466e-8
+        },
+        "Stagger": {
+          "seconds": 1.2000000476837158,
+          "maximumSampledDisplacement": 1.1036336036513903,
+          "endpointDistance": 2.431299448223362e-8
+        },
+        "TurnLeft": {
+          "seconds": 2.4000000953674316,
+          "maximumSampledDisplacement": 1.2186533473618135,
+          "endpointDistance": 2.4312994485014466e-8
+        },
+        "TurnRight": {
+          "seconds": 2.4000000953674316,
+          "maximumSampledDisplacement": 1.52725357527218,
+          "endpointDistance": 2.4312994485014466e-8
+        }
+      }
+    },
+    ".lod1": {
+      "meshes": 4,
+      "clips": {
+        "Ability": {
+          "seconds": 1.2000000476837158,
+          "maximumSampledDisplacement": 0.3436147636894023,
+          "endpointDistance": 2.432123566683865e-8
+        },
+        "Attack": {
+          "seconds": 1,
+          "maximumSampledDisplacement": 1.1182819231763508,
+          "endpointDistance": 2.4321235650040267e-8
+        },
+        "Bite": {
+          "seconds": 0.5,
+          "maximumSampledDisplacement": 0.9819660551915866,
+          "endpointDistance": 2.4321235650040267e-8
+        },
+        "Crawl": {
+          "seconds": 2,
+          "maximumSampledDisplacement": 0.2946112617898235,
+          "endpointDistance": 2.432123565284e-8
+        },
+        "Death": {
+          "seconds": 1.600000023841858,
+          "maximumSampledDisplacement": 1.4516201080421964,
+          "endpointDistance": 1.6119646681079831
+        },
+        "Dive": {
+          "seconds": 2.4000000953674316,
+          "maximumSampledDisplacement": 0.7733068220671588,
+          "endpointDistance": 2.432123565284e-8
+        },
+        "Dodge": {
+          "seconds": 0.4000000059604645,
+          "maximumSampledDisplacement": 0.6270375302015303,
+          "endpointDistance": 2.4321235650040267e-8
+        },
+        "Eat": {
+          "seconds": 0.800000011920929,
+          "maximumSampledDisplacement": 0.17838993478326887,
+          "endpointDistance": 2.4426838977793585e-8
+        },
+        "Guard": {
+          "seconds": 1,
+          "maximumSampledDisplacement": 0.052571220949327,
+          "endpointDistance": 2.293433573978136e-8
+        },
+        "Heavy": {
+          "seconds": 1.100000023841858,
+          "maximumSampledDisplacement": 1.1013087640718253,
+          "endpointDistance": 2.4321235650040267e-8
+        },
+        "Hit": {
+          "seconds": 0.6000000238418579,
+          "maximumSampledDisplacement": 0.5458247361718022,
+          "endpointDistance": 2.4321235650040267e-8
+        },
+        "Idle": {
+          "seconds": 2,
+          "maximumSampledDisplacement": 0.0800041389299409,
+          "endpointDistance": 2.432123565284e-8
+        },
+        "Moult": {
+          "seconds": 1.5,
+          "maximumSampledDisplacement": 0.6338585762947105,
+          "endpointDistance": 2.4321235679817727e-8
+        },
+        "Parry": {
+          "seconds": 0.3499999940395355,
+          "maximumSampledDisplacement": 1.0257366969751074,
+          "endpointDistance": 2.4321235650040267e-8
+        },
+        "Rise": {
+          "seconds": 2.4000000953674316,
+          "maximumSampledDisplacement": 1.1357215886880114,
+          "endpointDistance": 2.432123565284e-8
+        },
+        "Stagger": {
+          "seconds": 1.2000000476837158,
+          "maximumSampledDisplacement": 1.0994961540245367,
+          "endpointDistance": 2.4321235650040267e-8
+        },
+        "TurnLeft": {
+          "seconds": 2.4000000953674316,
+          "maximumSampledDisplacement": 1.2275661013935903,
+          "endpointDistance": 2.432123565284e-8
+        },
+        "TurnRight": {
+          "seconds": 2.4000000953674316,
+          "maximumSampledDisplacement": 1.5239387522365215,
+          "endpointDistance": 2.432123565284e-8
+        }
+      }
+    }
+  },
+  "vetulicola": {
+    "full": {
+      "meshes": 4,
+      "clips": {
+        "Ability": {
+          "seconds": 1.2000000476837158,
+          "maximumSampledDisplacement": 0.6056357357446879,
+          "endpointDistance": 2.254873622441467e-16
+        },
+        "Attack": {
+          "seconds": 1,
+          "maximumSampledDisplacement": 0.5576549065798811,
+          "endpointDistance": 3.851859888774472e-33
+        },
+        "Bite": {
+          "seconds": 0.5,
+          "maximumSampledDisplacement": 0.6218675142715986,
+          "endpointDistance": 3.851859888774472e-33
+        },
+        "Death": {
+          "seconds": 1.600000023841858,
+          "maximumSampledDisplacement": 0.7070015701639136,
+          "endpointDistance": 0.7898357502317097
+        },
+        "Dive": {
+          "seconds": 2.4000000953674316,
+          "maximumSampledDisplacement": 1.0558633468850496,
+          "endpointDistance": 2.237726045655905e-16
+        },
+        "Dodge": {
+          "seconds": 0.4000000059604645,
+          "maximumSampledDisplacement": 1.1416583478954185,
+          "endpointDistance": 1.232595164407831e-32
+        },
+        "Eat": {
+          "seconds": 0.800000011920929,
+          "maximumSampledDisplacement": 0.19283099871571072,
+          "endpointDistance": 1.3908890845138334e-9
+        },
+        "Guard": {
+          "seconds": 1,
+          "maximumSampledDisplacement": 0.20069022727550526,
+          "endpointDistance": 3.1937123614475445e-9
+        },
+        "Heavy": {
+          "seconds": 1.100000023841858,
+          "maximumSampledDisplacement": 0.5548118858571868,
+          "endpointDistance": 3.851859888774472e-33
+        },
+        "Hit": {
+          "seconds": 0.6000000238418579,
+          "maximumSampledDisplacement": 0.7144598586179557,
+          "endpointDistance": 1.5407439555097887e-33
+        },
+        "Idle": {
+          "seconds": 2.4000000953674316,
+          "maximumSampledDisplacement": 0.30122987572713295,
+          "endpointDistance": 2.2212177739155433e-16
+        },
+        "Moult": {
+          "seconds": 1.5,
+          "maximumSampledDisplacement": 0.8754047186285209,
+          "endpointDistance": 7.551608150142992e-16
+        },
+        "Parry": {
+          "seconds": 0.3499999940395355,
+          "maximumSampledDisplacement": 0.5748579969687476,
+          "endpointDistance": 3.851859888774472e-33
+        },
+        "Rise": {
+          "seconds": 2.4000000953674316,
+          "maximumSampledDisplacement": 1.2104282420353623,
+          "endpointDistance": 2.237726045655905e-16
+        },
+        "Stagger": {
+          "seconds": 1.2000000476837158,
+          "maximumSampledDisplacement": 1.3021547398773385,
+          "endpointDistance": 5.3926038442842604e-33
+        },
+        "Swim": {
+          "seconds": 2.4000000953674316,
+          "maximumSampledDisplacement": 1.0964415607227258,
+          "endpointDistance": 2.237726045655905e-16
+        },
+        "TurnLeft": {
+          "seconds": 2.4000000953674316,
+          "maximumSampledDisplacement": 0.6654941387514803,
+          "endpointDistance": 2.237726045655905e-16
+        },
+        "TurnRight": {
+          "seconds": 2.4000000953674316,
+          "maximumSampledDisplacement": 1.5247499667507765,
+          "endpointDistance": 2.237726045655905e-16
+        }
+      }
+    },
+    ".lod1": {
+      "meshes": 4,
+      "clips": {
+        "Ability": {
+          "seconds": 1.2000000476837158,
+          "maximumSampledDisplacement": 0.6056473406969766,
+          "endpointDistance": 2.2215299868541707e-16
+        },
+        "Attack": {
+          "seconds": 1,
+          "maximumSampledDisplacement": 0.5576021013656998,
+          "endpointDistance": 3.851859888774472e-33
+        },
+        "Bite": {
+          "seconds": 0.5,
+          "maximumSampledDisplacement": 0.6217961964915322,
+          "endpointDistance": 3.851859888774472e-33
+        },
+        "Death": {
+          "seconds": 1.600000023841858,
+          "maximumSampledDisplacement": 0.6254084024962235,
+          "endpointDistance": 0.699112289065009
+        },
+        "Dive": {
+          "seconds": 2.4000000953674316,
+          "maximumSampledDisplacement": 1.0559149662473803,
+          "endpointDistance": 2.242025235105681e-16
+        },
+        "Dodge": {
+          "seconds": 0.4000000059604645,
+          "maximumSampledDisplacement": 1.1434203376818095,
+          "endpointDistance": 1.232595164407831e-32
+        },
+        "Eat": {
+          "seconds": 0.800000011920929,
+          "maximumSampledDisplacement": 0.19283207455846738,
+          "endpointDistance": 1.3908965964114405e-9
+        },
+        "Guard": {
+          "seconds": 1,
+          "maximumSampledDisplacement": 0.2005937806099527,
+          "endpointDistance": 3.1931560939365558e-9
+        },
+        "Heavy": {
+          "seconds": 1.100000023841858,
+          "maximumSampledDisplacement": 0.5547595956490737,
+          "endpointDistance": 3.851859888774472e-33
+        },
+        "Hit": {
+          "seconds": 0.6000000238418579,
+          "maximumSampledDisplacement": 0.7145092488828264,
+          "endpointDistance": 1.5407439555097887e-33
+        },
+        "Idle": {
+          "seconds": 2.4000000953674316,
+          "maximumSampledDisplacement": 0.30120155744071303,
+          "endpointDistance": 2.220446049250313e-16
+        },
+        "Moult": {
+          "seconds": 1.5,
+          "maximumSampledDisplacement": 0.875128891265082,
+          "endpointDistance": 7.550651705563114e-16
+        },
+        "Parry": {
+          "seconds": 0.3499999940395355,
+          "maximumSampledDisplacement": 0.5841165199386366,
+          "endpointDistance": 4.622231866529366e-33
+        },
+        "Rise": {
+          "seconds": 2.4000000953674316,
+          "maximumSampledDisplacement": 1.2096863299003704,
+          "endpointDistance": 2.242025235105681e-16
+        },
+        "Stagger": {
+          "seconds": 1.2000000476837158,
+          "maximumSampledDisplacement": 1.308298903826718,
+          "endpointDistance": 6.162975822039155e-33
+        },
+        "Swim": {
+          "seconds": 2.4000000953674316,
+          "maximumSampledDisplacement": 1.0961082500419461,
+          "endpointDistance": 2.242025235105681e-16
+        },
+        "TurnLeft": {
+          "seconds": 2.4000000953674316,
+          "maximumSampledDisplacement": 0.6652447051868642,
+          "endpointDistance": 2.242025235105681e-16
+        },
+        "TurnRight": {
+          "seconds": 2.4000000953674316,
+          "maximumSampledDisplacement": 1.5244081249794004,
+          "endpointDistance": 2.242025235105681e-16
+        }
+      }
+    }
+  }
+}

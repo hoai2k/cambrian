@@ -9,6 +9,7 @@ import { BAND_COLOR, emptyInput, TIER_NAMES, TIER_NEED, type Actor, type Band, t
 import { groundHeight, NURSERIES, resolveStatic, SURFACE_Y, type Boulder } from '../sim/world';
 import { AssetQueue, type AssetProgress } from './assets';
 import { CreatureView, ensureLoaded, loadedSync, type Lod } from './creature';
+import { Attachments } from './attachments';
 import { Bubbles, Impacts, Silt } from './fx';
 import { createSea, type Quality, type SeaEnvironment } from './sea';
 
@@ -22,7 +23,7 @@ export interface PlayerHud {
   lock?: { name: string; band: Band; hp: number; color: string };
   aim?: { hasTarget: boolean; inRange: boolean; name?: string; color: string; ready: boolean };
   hunted: number; hunterAngle: number | null; hunterName?: string; hunterState: 'none' | 'noticed' | 'hunting'; inCover: boolean; still: boolean;
-  hint?: string; respawnIn: number; fade: number; state: string; kills: number; eats: number; escapes: number; protect: boolean;
+  hint?: string; respawnIn: number; fade: number; state: string; modelReady: boolean; kills: number; eats: number; escapes: number; protect: boolean;
   bandMarkers: { x: number; y: number; band: Band; size: number }[];
 }
 export interface HudSnapshot {
@@ -60,6 +61,9 @@ export class Engine {
   private sea?: SeaEnvironment;
   game?: Game;
   private views = new Map<number, CreatureView>();
+  private attachments = new Attachments();
+  private contact = new THREE.Vector3();
+
   private ringGeo = new THREE.RingGeometry(0.72, 0.85, 40);
   // forward-facing cap (the model's +Z is its nose)
   private shieldGeo = new THREE.SphereGeometry(1, 24, 12, 0, Math.PI * 2, 0, Math.PI * 0.42).rotateX(Math.PI / 2);
@@ -113,12 +117,13 @@ export class Engine {
     // Stream assets by priority: the default pick first so the title can show, everything else on idle time.
     this.assets.onProgress((p) => {
       this.cb.onProgress?.(p);
-      if (!this.bootDone && p.ready.has('anomalocaris') && p.ready.has('waptia')) { this.bootDone = true; this.cb.onLoaded(); }
+      // The title never waits for 3D models; they stream during the title and pick screens.
+      if (!this.bootDone && (this.assets.isCardReady('anomalocaris') || performance.now() - this.bootStart > 4000)) { this.bootDone = true; this.cb.onLoaded(); }
     });
     this.assets.prioritize(['anomalocaris', 'waptia', 'marrella', 'opabinia', 'canadia', 'olenoides', 'hallucigenia', 'wiwaxia'], 'boot');
   }
   readonly assets = new AssetQueue();
-  private bootDone = false;
+  private bootDone = false; private bootStart = performance.now();
   /** Tell the loader which creatures are most likely to be needed next. */
   prioritize(creatures: CreatureId[], phase: 'boot' | 'title' | 'select' | 'playing') { this.assets.prioritize(creatures, phase); }
 
@@ -173,7 +178,7 @@ export class Engine {
 
   private clearMatch() {
     for (const v of this.views.values()) v.dispose();
-    this.views.clear();
+    this.views.clear(); this.attachments.clear();
     this.cams = [];
     this.game = undefined;
   }
@@ -203,7 +208,7 @@ export class Engine {
   private frame = (now: number) => {
     if (this.disposed) return;
     this.raf = requestAnimationFrame(this.frame);
-    const dtReal = Math.min((now - this.last) / 1000, 0.08);
+    const dtReal = Math.max(0, Math.min((now - this.last) / 1000, 0.08));
     this.last = now;
     this.fpsFrames++; this.fpsT += dtReal; if (this.fpsT > 1) { this.fps = this.fpsFrames / this.fpsT; this.fpsFrames = 0; this.fpsT = 0; }
     const game = this.game;
@@ -465,10 +470,23 @@ export class Engine {
       v.setShadow(d < 32 && lengthOf(a) > 0.45);
       // Animate far views less often
       const far = d > 45;
-      const animate = !far || ((a.id + Math.floor(this.time * 60)) % 3 === 0);
-      v.update(a, animate ? (far ? dt * 3 : dt) : dt, this.time, animate);
+      const continuous = a.state === 'eating' || a.holdT > 0;
+      const animate = continuous || !far || ((a.id + Math.floor(this.time * 60)) % 3 === 0);
+      v.update(a, animate && far && !continuous ? dt * 3 : dt, this.time, animate);
     }
+    this.attachments.sync(game, this.views, dt);
     for (const [id, v] of this.views) if (!keep.has(id)) { v.dispose(); this.views.delete(id); }
+  }
+
+  /** Impact effects land where the attacker's nearest attack socket is, not at the victim's centre, when the rig has one. */
+  private impactPos(attackerId: number | undefined, victimId: number | undefined, fallback: { x: number; y: number; z: number }) {
+    const victim = victimId != null && victimId >= 0 ? this.game?.byId(victimId) : undefined;
+    const pv = attackerId != null && attackerId >= 0 ? this.views.get(attackerId) : undefined;
+    if (!pv || !this.attachments.contactPoint(pv, fallback, this.contact)) return fallback;
+    // A socket far from the body it supposedly hit means the clip has not reached it: keep the sim's point.
+    const limit = victim ? lengthOf(victim) * 0.9 + 0.3 : 1;
+    const off = Math.hypot(this.contact.x - fallback.x, this.contact.y - fallback.y, this.contact.z - fallback.z);
+    return off < limit ? { x: this.contact.x, y: this.contact.y, z: this.contact.z } : fallback;
   }
 
   /** Per-viewport pass: cull views outside this camera, then colour the rings for this viewer. */
@@ -484,7 +502,7 @@ export class Engine {
       if (!a) continue;
       // Creature meshes have frustumCulled off (skinned bounds are unreliable), so cull the group here.
       if (cs) {
-        this.cullSphere.center.set(a.pos.x, a.pos.y, a.pos.z);
+        this.cullSphere.center.copy(v.group.position);
         this.cullSphere.radius = lengthOf(a) * 0.9 + 0.5;
         v.group.visible = (!isHidden(a) || a.stateT <= 0.6) && cs.frustum.intersectsSphere(this.cullSphere);
         if (!v.group.visible) continue;
@@ -515,8 +533,9 @@ export class Engine {
       switch (e.kind) {
         case 'hit': {
           const s = e.strength ?? 1;
-          this.bubbles.emit(e.pos, Math.round(6 + s * 10), 0.4, 2 + s * 2, 0.07);
-          this.impacts.spawn(e.pos, '#ffd0a0', 0.5 + s * 0.8, 0.28);
+          const at = this.impactPos(e.actor, e.other, e.pos);
+          this.bubbles.emit(at, Math.round(6 + s * 10), 0.4, 2 + s * 2, 0.07);
+          this.impacts.spawn(at, '#ffd0a0', 0.5 + s * 0.8, 0.28);
           audio.play('hit', s, pan);
           if (e.player != null && e.player >= 0) { const d = padOf(e.player); if (typeof d === 'number') rumble(d, Math.min(1, 0.4 + s * 0.4), 0.3, 120); this.shake(e.player, 0.5 + s * 0.5); }
           const attacker = game.byId(e.actor);
@@ -527,13 +546,13 @@ export class Engine {
         case 'death': { audio.play('death'); if (e.player != null && e.player >= 0) { const d = padOf(e.player); if (typeof d === 'number') rumble(d, 1, 1, 400); this.shake(e.player, 1.4); } break; }
         case 'eat': { this.bubbles.emit(e.pos, 5, 0.3, 1.2, 0.05, 0.8); audio.play('eat', e.strength ?? 0.5, pan); break; }
         case 'tierUp': { this.bubbles.emit(e.pos, 90, 2.5, 5, 0.14, 2.2); this.impacts.spawn(e.pos, '#fff0b0', 4 + (e.strength ?? 1) * 2, 0.9); audio.play('tierUp'); if (e.player != null && e.player >= 0) { const d = padOf(e.player); if (typeof d === 'number') rumble(d, 0.8, 0.8, 600); this.shake(e.player, 0.8); } break; }
-        case 'parry': { this.impacts.spawn(e.pos, '#9ff6ff', 2, 0.4); this.bubbles.emit(e.pos, 20, 0.6, 5, 0.08); audio.play('parry'); if (e.player != null && e.player >= 0) { const d = padOf(e.player); if (typeof d === 'number') rumble(d, 0.9, 0.2, 90); } break; }
-        case 'guardBreak': { this.impacts.spawn(e.pos, '#ff6a5a', 1.8, 0.4); audio.play('guardBreak'); break; }
+        case 'parry': { const at = this.impactPos(e.other, e.actor, e.pos); this.impacts.spawn(at, '#9ff6ff', 2, 0.4); this.bubbles.emit(at, 20, 0.6, 5, 0.08); audio.play('parry'); if (e.player != null && e.player >= 0) { const d = padOf(e.player); if (typeof d === 'number') rumble(d, 0.9, 0.2, 90); } break; }
+        case 'guardBreak': { this.impacts.spawn(this.impactPos(e.other, e.actor, e.pos), '#ff6a5a', 1.8, 0.4); audio.play('guardBreak'); break; }
         case 'stagger': { audio.play('stagger'); break; }
         case 'dodge': { this.bubbles.emit(e.pos, 14, 0.8, 2.5, 0.06, 0.7); audio.play('dodge'); break; }
         case 'silt': { this.bubbles.emit(e.pos, 30, 1.5, 2, 0.08, 1.2); audio.play('silt'); break; }
         case 'ability': { this.impacts.spawn(e.pos, '#c8fff0', 1.2 + (e.strength ?? 1) * 0.4, 0.45); this.bubbles.emit(e.pos, 20, 1, 3, 0.08); audio.play('ability'); break; }
-        case 'grab': { this.impacts.spawn(e.pos, '#ffb070', 1.4, 0.35); audio.play('grab'); if (e.player != null && e.player >= 0) { const d = padOf(e.player); if (typeof d === 'number') rumble(d, 1, 0.6, 300); } break; }
+        case 'grab': { this.impacts.spawn(this.impactPos(e.actor, e.other, e.pos), '#ffb070', 1.4, 0.35); audio.play('grab'); if (e.player != null && e.player >= 0) { const d = padOf(e.player); if (typeof d === 'number') rumble(d, 1, 0.6, 300); } break; }
         case 'hunted': { audio.play('hunted'); if (e.player != null && e.player >= 0) { const d = padOf(e.player); if (typeof d === 'number') rumble(d, 0.6, 0.9, 500); } break; }
         case 'escape': { audio.play('escape'); break; }
         case 'noticed': { audio.play('noticed', 0.5); break; }
@@ -591,7 +610,7 @@ export class Engine {
         lock: lockA && isAlive(lockA) ? { name: creature(lockA.creature).name, band: bandOf(p, lockA), hp: lockA.hp / lockA.hpMax, color: BAND_COLOR[bandOf(p, lockA)] } : undefined,
         hunted: p.hunted, hunterAngle, hunterName: hunter ? creature(hunter.creature).name : undefined,
         hunterState: p.hunted >= 0.5 ? 'hunting' : p.hunted > 0.2 ? 'noticed' : 'none', inCover: p.cover > 0.3, still: Math.hypot(p.vel.x, p.vel.y, p.vel.z) < 0.3,
-        hint: game.hintFor(i), respawnIn: p.state === 'dead' ? Math.max(0, 3 - p.respawnT) : 0, fade: cs?.fade ?? 0, state: p.state,
+        hint: game.hintFor(i), respawnIn: p.state === 'dead' ? Math.max(0, 3 - p.respawnT) : 0, fade: cs?.fade ?? 0, state: p.state, modelReady: !!loadedSync(p.creature),
         kills: p.kills, eats: p.eats, escapes: p.escapes, protect: p.spawnProtect > 0, bandMarkers: markers.slice(0, 24),
       };
     });
