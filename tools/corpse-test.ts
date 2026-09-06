@@ -13,7 +13,7 @@ const wrap = (a: number) => Math.atan2(Math.sin(a), Math.cos(a));
   const g = new Game('reef', [{ creature: 'anomalocaris', device: 'keyboard', ready: true }], 4);
   const p = g.players[0]; p.pos = { x: 60, y: 6, z: -30 };
   const o = g.spawn('waptia', 'ambient', { x: 70, y: 6, z: -30 }, 0.9); o.brain = makeBrain('needs', o.pos, g.rng);
-  const hitCtx = { events: g.events, byId: (id: number) => g.byId(id), time: 0 };
+  const hitCtx = { events: g.events, byId: (id: number) => g.byId(id), time: 0, rng: g.rng };
   kill(hitCtx, o, p);
   const y0 = o.pos.y;
   stepN(g, 60 * 4);
@@ -25,7 +25,7 @@ const wrap = (a: number) => Math.atan2(Math.sin(a), Math.cos(a));
 {
   const g = new Game('reef', [{ creature: 'waptia', device: 'keyboard', ready: true }], 6);
   const p = g.players[0]; p.pos = { x: 60, y: 6, z: -30 }; p.spawnProtect = 0;
-  const hitCtx = { events: g.events, byId: (id: number) => g.byId(id), time: 0 };
+  const hitCtx = { events: g.events, byId: (id: number) => g.byId(id), time: 0, rng: g.rng };
   kill(hitCtx, p, undefined);
   let sparkAt = -1, respawnAt = -1;
   const m = new Map([[0, emptyInput()]]);

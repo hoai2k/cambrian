@@ -112,6 +112,13 @@ export interface Actor {
   /** Where this creature last hatched: the nursery it teleports home to. */
   home: Vec3;
   teleportCd: number;
+  /**
+   * The transform at the start of the current sim step. The simulation is a fixed 60 Hz but the
+   * screen refreshes at its own rate, so the renderer interpolates between this and the current
+   * transform; without it every creature holds still for two or three frames and then jumps.
+   * Write-only as far as the simulation is concerned.
+   */
+  prevT: { x: number; y: number; z: number; yaw: number; pitch: number; bank: number };
 }
 
 export interface Corpse { id: number; }
