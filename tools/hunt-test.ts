@@ -21,15 +21,21 @@ const run = (g: Game, f: InputFrame, steps: number) => { const m = new Map([[0, 
   run(g3, { ...emptyInput(), dash: true, my: 1 }, 2);
   check('...then dashes the moment the stick moves', r.state === 'dodge', `state=${r.state}`);
   run(g3, { ...emptyInput(), dash: true, my: 1 }, 90);
-  const sp = Math.hypot(r.vel.x, r.vel.z);
-  check('...and sprints while still held', r.state === 'free' && sp > 7, `speed=${sp.toFixed(1)}`);
+  check('...and does not dash again while still held', r.state === 'free' && r.dashUsed, `state=${r.state}`);
   const g2 = new Game('reef', [{ creature: 'anomalocaris', device: 'keyboard', ready: true }], 7);
   const q = g2.players[0]; q.pos = { x: 10, y: 8, z: 10 }; q.spawnProtect = 0;
   run(g2, { ...emptyInput(), my: 1 }, 60);
   const cruise = Math.hypot(q.vel.x, q.vel.z);
-  run(g2, { ...emptyInput(), my: 1, dash: true }, 60);
+  run(g2, { ...emptyInput(), my: 1, burst: 1 }, 60);
   const sprint = Math.hypot(q.vel.x, q.vel.z);
-  check('LB held sprints (faster than cruise)', sprint > cruise * 1.3 && q.state === 'free', `cruise=${cruise.toFixed(1)} sprint=${sprint.toFixed(1)}`);
+  check('A held sprints (faster than cruise)', sprint > cruise * 1.3 && q.state === 'free', `cruise=${cruise.toFixed(1)} sprint=${sprint.toFixed(1)}`);
+  // dash distance: must clear a body length or three quickly
+  const g4 = new Game('reef', [{ creature: 'anomalocaris', device: 'keyboard', ready: true }], 7);
+  const w = g4.players[0]; w.pos = { x: 10, y: 8, z: 10 }; w.spawnProtect = 0; run(g4, emptyInput(), 5);
+  const x0 = { ...w.pos };
+  run(g4, { ...emptyInput(), dash: true, mx: 1, camYaw: 0 }, 27);
+  const dashed = Math.hypot(w.pos.x - x0.x, w.pos.z - x0.z) / lengthOf(w);
+  check('dash covers 2.5+ body lengths in 0.45 s', dashed > 2.5, `${dashed.toFixed(2)} body lengths`);
 }
 // --- LT aims at prey; X pounces when in range and eats it ---
 {

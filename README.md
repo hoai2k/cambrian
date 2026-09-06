@@ -14,8 +14,8 @@ npm run dev        # http://localhost:5173
 
 Press any button on a connected Xbox controller, any key, or click to start.
 Controls are in the in-game **?** panel (bottom right). Keyboard works too:
-WASD swim, arrows look, PgUp/PgDn zoom, Shift burst, Space rise, F bite, G heavy or
-pounce, R ability, V dash, Q guard, Tab aim, E sense, Esc pause.
+WASD swim, arrows look, PgUp/PgDn zoom, Shift sprint, Space rise, F bite, G pounce,
+R ability, V dash, Q guard, Tab aim, E sense, Esc pause.
 
 ## Build
 

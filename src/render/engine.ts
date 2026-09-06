@@ -61,6 +61,8 @@ export class Engine {
   game?: Game;
   private views = new Map<number, CreatureView>();
   private ringGeo = new THREE.RingGeometry(0.72, 0.85, 40);
+  // forward-facing cap (the model's +Z is its nose)
+  private shieldGeo = new THREE.SphereGeometry(1, 24, 12, 0, Math.PI * 2, 0, Math.PI * 0.42).rotateX(Math.PI / 2);
   private cams: CamState[] = [];
   private attractCam = new THREE.PerspectiveCamera(55, 1, 0.1, 400);
   private bubbles = new Bubbles();
@@ -442,7 +444,7 @@ export class Engine {
       if (!v) {
         const loaded = loadedSync(a.creature, wantLod);
         if (!loaded) { void ensureLoaded(a.creature, undefined, wantLod); continue; }
-        v = new CreatureView(a.creature, loaded, { ringGeo: this.ringGeo }, wantLod);
+        v = new CreatureView(a.creature, loaded, { ringGeo: this.ringGeo, shieldGeo: this.shieldGeo }, wantLod);
         this.scene.add(v.group);
         this.views.set(a.id, v);
         v.update(a, 0, this.time, true);
@@ -477,8 +479,8 @@ export class Engine {
         v.group.visible = (!isHidden(a) || a.stateT <= 0.6) && cs.frustum.intersectsSphere(this.cullSphere);
         if (!v.group.visible) continue;
       }
-      if (!viewer || a.state === 'dead') { v.setRing(null, a && a.controller === 'player' && a.state !== 'dead' ? 0.5 : 0); v.setHighlight(0); continue; }
-      if (a.id === viewer.id) { v.setRing(PLAYER_COLORS[playerIndex % 4], 0.28); v.setHighlight(0); continue; }
+      if (!viewer || a.state === 'dead' || a.state === 'swallowed') { v.setRing(null, 0); v.setHighlight(0); continue; }
+      if (a.id === viewer.id) { v.setRing(null, 0); v.setHighlight(0); continue; }
       const band = bandOf(viewer, a);
       const d = Math.hypot(a.pos.x - viewer.pos.x, a.pos.y - viewer.pos.y, a.pos.z - viewer.pos.z);
       const L = lengthOf(viewer);
@@ -526,6 +528,8 @@ export class Engine {
         case 'escape': { audio.play('escape'); break; }
         case 'noticed': { audio.play('noticed', 0.5); break; }
         case 'sense': { audio.play('sense'); break; }
+        case 'swallow': { audio.play('grab', 1.2); this.bubbles.emit(e.pos, 30, 1, 3, 0.09, 1.5); if (e.player != null && e.player >= 0) { const d = padOf(e.player); if (typeof d === 'number') rumble(d, 1, 1, 900); this.shake(e.player, 1.2); } break; }
+        case 'routed': { audio.play('escape', 0.8); this.impacts.spawn(e.pos, '#9ff6ff', 2.5, 0.6); break; }
         case 'pounce': { this.impacts.spawn(e.pos, '#ffe08a', 1.2 + (e.strength ?? 1) * 0.5, 0.35); this.bubbles.emit(e.pos, 24, 0.9, 4, 0.08); audio.play('hit', 1.3); if (e.player != null && e.player >= 0) { const d = padOf(e.player); if (typeof d === 'number') rumble(d, 0.7, 0.4, 140); this.shake(e.player, 0.6); } break; }
         case 'burst': { audio.play('burst'); break; }
       }
@@ -603,7 +607,7 @@ export class Engine {
     this.clearMatch();
     this.sea?.dispose();
     this.bubbles.dispose(); this.impacts.dispose(); this.silt.dispose();
-    this.ringGeo.dispose();
+    this.ringGeo.dispose(); this.shieldGeo.dispose();
     this.renderer.dispose();
     this.renderer.forceContextLoss();
     this.renderer.domElement.remove();

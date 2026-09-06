@@ -10,8 +10,12 @@ export interface HitContext {
 }
 
 /** Damage multiplier from relative size. Same size = 1. */
+/**
+ * Same size = 1. A predator twice your length hits about twice as hard (three good bites kill),
+ * and you still chip it: nothing you can reach is immune, which is what makes a giant fightable.
+ */
 export const sizeFactor = (attacker: Actor, victim: Actor) =>
-  clamp(Math.pow(lengthOf(attacker) / lengthOf(victim), 1.6), 0.05, 6);
+  clamp(Math.pow(lengthOf(attacker) / lengthOf(victim), 1.15), 0.45, 2.3);
 
 export type HitResult = 'hit' | 'blocked' | 'parried' | 'immune' | 'countered';
 
@@ -101,6 +105,12 @@ export function applyHit(ctx: HitContext, attacker: Actor, victim: Actor, move: 
 
   victim.hp -= dmg;
   victim.hitFlash = 0.42;
+  victim.sinceHit = 0; victim.lastHitBy = attacker.id;
+  // Courage: being bitten by something smaller than you is alarming. Enough of it and you run.
+  if (victim.brain && lengthOf(attacker) < lengthOf(victim)) {
+    victim.brain.courage -= dmg / (victim.hpMax * 0.08) + 0.05;
+    if (victim.brain.courage <= 0 && victim.brain.goal !== 'flee') ctx.events.push({ kind: 'routed', pos: { ...victim.pos }, actor: victim.id, other: attacker.id, player: attacker.player });
+  }
   victim.hitDir = { x: -dir.x, y: -dir.y, z: -dir.z };
   victim.hitStop = result === 'hit' ? 0.06 : 0.03;
   attacker.hitStop = 0.06;
@@ -116,9 +126,24 @@ export function applyHit(ctx: HitContext, attacker: Actor, victim: Actor, move: 
     ctx.events.push({ kind: 'grab', pos: { ...victim.pos }, actor: attacker.id, other: victim.id, player: victim.player });
   }
 
-  if (victim.hp <= 0) kill(ctx, victim, attacker);
+  if (victim.hp <= 0) {
+    // A clearly bigger predator swallows what it just killed; peers leave a corpse.
+    if (lengthOf(attacker) >= lengthOf(victim) * 1.35 && attacker.state !== 'dead') startSwallow(ctx, attacker, victim);
+    else kill(ctx, victim, attacker);
+  }
   if (attacker.hp <= 0) kill(ctx, attacker, victim);
   return result;
+}
+
+/** The victim is taken into the predator's mouth and gulped down over ~1.5 s, then it is gone. */
+export function startSwallow(ctx: HitContext, predator: Actor, victim: Actor) {
+  victim.hp = 0;
+  victim.state = 'swallowed'; victim.stateT = 0; victim.stateDur = 1.6;
+  victim.swallowedBy = predator.id; victim.lockTarget = -1; victim.abilityActive = false; victim.vel = { x: 0, y: 0, z: 0 };
+  if (victim.grabbedBy >= 0) { const g = ctx.byId(victim.grabbedBy); if (g && g.grabbing === victim.id) { g.state = 'free'; g.grabbing = -1; } victim.grabbedBy = -1; }
+  predator.holdT = 1.4;
+  if (predator.state === 'attack' || predator.state === 'pounce') { predator.state = 'free'; predator.stateT = 0; }
+  ctx.events.push({ kind: 'swallow', pos: { ...victim.pos }, actor: predator.id, other: victim.id, player: victim.player, strength: lengthOf(victim) / lengthOf(predator) });
 }
 
 export function kill(ctx: HitContext, victim: Actor, killer?: Actor) {

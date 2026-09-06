@@ -22,7 +22,7 @@ export const bandOf = (me: Actor, other: Actor): Band => bandRatio(lengthOf(othe
 export function applyScaleStats(a: Actor, keepFraction = true) {
   const def = creature(a.creature);
   const hpFrac = a.hpMax > 0 ? a.hp / a.hpMax : 1;
-  const k = Math.pow(a.scale, 1.3);
+  const k = Math.pow(a.scale, 1.1);
   a.hpMax = Math.round(def.hp * k);
   a.poiseMax = Math.round(def.poise * k);
   a.staminaMax = Math.round(def.stamina * (0.7 + 0.3 * Math.min(a.scale, 2.6)));
@@ -51,7 +51,7 @@ export function makeActor(id: number, creatureId: CreatureId, controller: Contro
     corpseT: 0, eaten: 0, killer: -1, noise: 0.5, cover: 0, stillness: 0,
     dodgeDir: v3(0, 0, 1), dodgeTapT: 0, hopVel: 0, grounded: true,
     prev: { light: false, heavy: false, ability: false, dodge: false, guard: false, lock: false, sense: false, rise: false, burst: false, dash: false, aim: false },
-    respawnT: 0, hatching: false, dashHoldT: 0, dashUsed: false, dashQueued: false, pounceCd: 0, aimInRange: false, aiming: false, kills: 0, eats: 0, escapes: 0, hunted: 0, hunterId: -1, wasHunted: false, seen: 0, bubbles: 0,
+    respawnT: 0, hatching: false, dashHoldT: 0, dashUsed: false, dashQueued: false, pounceCd: 0, dashCd: 0, sinceHit: 99, lastHitBy: -1, swallowedBy: -1, holdT: 0, aimInRange: false, aiming: false, kills: 0, eats: 0, escapes: 0, hunted: 0, hunterId: -1, wasHunted: false, seen: 0, bubbles: 0,
     spawnProtect: controller === 'player' ? 3 : 0,
   };
   applyScaleStats(a, false);
@@ -59,7 +59,7 @@ export function makeActor(id: number, creatureId: CreatureId, controller: Contro
   return a;
 }
 
-export const isAlive = (a: Actor) => a.state !== 'dead';
+export const isAlive = (a: Actor) => a.state !== 'dead' && a.state !== 'swallowed';
 export const canAct = (a: Actor) => a.state === 'free' || a.state === 'guard';
 export const isHidden = (a: Actor) => a.abilityActive && (creature(a.creature).ability === 'burrow');
 export const isInvulnerable = (a: Actor) =>
