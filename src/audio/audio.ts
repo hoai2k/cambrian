@@ -2,10 +2,20 @@
  * Game audio. Generated sample library (public/assets/sfx, made with tools/gen-sfx.mjs) with a
  * synthesized fallback for anything that has not loaded yet, so the game is never silent.
  */
-const SFX_BASE = `${import.meta.env.BASE_URL}assets/sfx/`;
+import { AUDIBLE_FLOOR, MIN_GAP } from './mix';
+
+/**
+ * Prefix for the asset folders. The game page sits at the app root, but a built bundle's
+ * BASE_URL is './', so a page one directory down (the workbench) would resolve samples to
+ * `/workbench/assets/`. Those pages call `setAssetBase('../')` before playing anything.
+ */
+let ASSET_BASE = import.meta.env.BASE_URL;
+export function setAssetBase(base: string) { ASSET_BASE = base; }
+/** URL of a sample file in the library, by bare name (no extension). */
+export const sfxUrl = (name: string) => `${ASSET_BASE}assets/sfx/${name}.mp3`;
 
 /** event kind → sample files (variants are chosen at random) */
-const SAMPLES: Record<string, string[]> = {
+export const SAMPLES: Record<string, string[]> = {
   eat: ['bite-1', 'bite-2', 'bite-3'],
   crunch: ['crunch-1', 'crunch-2'],
   hit: ['hit-light-1', 'hit-light-2'],
@@ -13,12 +23,14 @@ const SAMPLES: Record<string, string[]> = {
   parry: ['parry'], guardBreak: ['guard-break'], stagger: ['stagger'],
   dodge: ['dodge-1', 'dodge-2'], burst: ['burst'], silt: ['silt'], grab: ['grab'],
   kill: ['kill'], death: ['death'], tierUp: ['tier-up'], hunted: ['hunted'], escape: ['escape'],
-  sense: ['sense'], ability: ['ability'], heartbeat: ['heartbeat'], noticed: ['hunted'], respawn: ['ui-join'],
+  sense: ['sense'], ability: ['ability'], heartbeat: ['heartbeat'], noticed: ['noticed'], respawn: ['respawn'],
+  pounce: ['pounce'], swallow: ['swallow'], disintegrate: ['disintegrate'], routed: ['routed'],
   'ui-move': ['ui-move'], 'ui-confirm': ['ui-confirm'], 'ui-back': ['ui-back'], 'ui-join': ['ui-join'], 'ui-start': ['ui-start'], won: ['won'],
 };
-const LOOPS = { ambient: 'ambient-reef', drone: 'giant-drone' } as const;
+export const LOOPS = { ambient: 'ambient-reef', drone: 'giant-drone' } as const;
 /** Background music (public/music). Starts with the first user gesture on the title screen and loops. */
-const MUSIC_URL = `${import.meta.env.BASE_URL}music/${encodeURIComponent('Tide of First Bones.mp3')}`;
+export const MUSIC_NAME = 'Tide of First Bones';
+export const musicUrl = () => `${ASSET_BASE}music/${encodeURIComponent(MUSIC_NAME)}.mp3`;
 
 export class GameAudio {
   private ctx?: AudioContext;
@@ -30,21 +42,28 @@ export class GameAudio {
   private synthTensionGain?: GainNode;
   private musicGain?: GainNode;
   private musicStarted = false;
+  private ambience = true;
   musicOn = true;
   private musicLevel = 0.3;
   private buffers = new Map<string, AudioBuffer>();
+  private previews = new Map<string, AudioBuffer>();
   private loading = new Set<string>();
   private heartT = 0;
   private tension = 0;
   private started = false;
   private ambientStarted = false;
-  private lastPlay = new Map<string, number>();
+  private lastPlay = new Map<string, { t: number; vol: number }>();
   volume = 0.8;
   muted = false;
 
-  init() {
+  /**
+   * Bring up the audio graph. `ambience: false` leaves out the beds — music, the reef loop and
+   * the synth drones — for the audio workbench, which auditions single sounds on a silent stage.
+   */
+  init(opts: { ambience?: boolean } = {}) {
     if (this.started) return;
     this.started = true;
+    this.ambience = opts.ambience !== false;
     const Ctx = (window.AudioContext || (window as any).webkitAudioContext) as typeof AudioContext | undefined;
     if (!Ctx) return;
     const ctx = new Ctx();
@@ -55,6 +74,7 @@ export class GameAudio {
     this.ambGain = ctx.createGain(); this.ambGain.gain.value = 0; this.ambGain.connect(this.master);
     this.tensionGain = ctx.createGain(); this.tensionGain.gain.value = 0; this.tensionGain.connect(this.master);
     // Synth fallbacks: drones through a low-pass, plus a filtered noise wash
+    if (!this.ambience) { void this.preload(); this.watchFocus(); return; }
     this.synthAmbGain = ctx.createGain(); this.synthAmbGain.gain.value = 0; this.synthAmbGain.connect(this.master);
     const lp = ctx.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 420; lp.connect(this.synthAmbGain);
     for (const [f, type] of [[55, 'sine'], [82.5, 'triangle'], [110.2, 'sine']] as const) {
@@ -70,7 +90,10 @@ export class GameAudio {
     this.musicGain = ctx.createGain(); this.musicGain.gain.value = 0; this.musicGain.connect(this.master);
     void this.startMusic();
     void this.preload();
-    // (focus) silence the game when the tab or window is not in front
+    this.watchFocus();
+  }
+  /** (focus) silence the game when the tab or window is not in front */
+  private watchFocus() {
     const onVis = () => this.applyGain();
     document.addEventListener('visibilitychange', onVis);
     window.addEventListener('blur', onVis); window.addEventListener('focus', onVis);
@@ -94,12 +117,12 @@ export class GameAudio {
     if (this.loading.has(name)) return undefined;
     this.loading.add(name);
     try {
-      const res = await fetch(`${SFX_BASE}${name}.mp3`);
+      const res = await fetch(sfxUrl(name));
       if (!res.ok) throw new Error(String(res.status));
       const buf = await this.ctx.decodeAudioData(await res.arrayBuffer());
       this.buffers.set(name, buf);
-      if (name === LOOPS.ambient) this.startAmbient();
-      if (name === LOOPS.drone) this.startDrone();
+      if (this.ambience && name === LOOPS.ambient) this.startAmbient();
+      if (this.ambience && name === LOOPS.drone) this.startDrone();
       return buf;
     } catch { return undefined; } finally { this.loading.delete(name); }
   }
@@ -108,7 +131,7 @@ export class GameAudio {
     if (this.musicStarted || !this.ctx || !this.musicGain) return;
     this.musicStarted = true;
     try {
-      const res = await fetch(MUSIC_URL); if (!res.ok) throw new Error(String(res.status));
+      const res = await fetch(musicUrl()); if (!res.ok) throw new Error(String(res.status));
       const buf = await this.ctx.decodeAudioData(await res.arrayBuffer());
       const src = this.ctx.createBufferSource(); src.buffer = buf; src.loop = true; src.connect(this.musicGain); src.start();
       this.musicGain.gain.linearRampToValueAtTime(this.musicOn ? this.musicLevel : 0, this.ctx.currentTime + 4);
@@ -161,37 +184,84 @@ export class GameAudio {
     }
   }
 
-  private playSample(name: string, vol: number, pan = 0, rate = 1) {
-    const ctx = this.ctx; const buf = this.buffers.get(name); if (!ctx || !buf || !this.sfxBus) return false;
-    const src = ctx.createBufferSource(); src.buffer = buf; src.playbackRate.value = rate;
+  /**
+   * One sfx voice. `muffle` is the distance factor from the listener (1 = right here, 0 = at the
+   * audible limit); below 1 it rolls off the highs, so far-off bites and clacks read as soft
+   * thuds instead of a carpet of clicks — water swallows high frequencies over distance.
+   */
+  private voice(buf: AudioBuffer, vol: number, pan = 0, rate = 1, muffle = 1, loop = false) {
+    const ctx = this.ctx!;
+    const src = ctx.createBufferSource(); src.buffer = buf; src.playbackRate.value = rate; src.loop = loop;
     const g = ctx.createGain(); g.gain.value = Math.min(1.5, vol);
     const p = ctx.createStereoPanner(); p.pan.value = pan;
-    src.connect(g); g.connect(p); p.connect(this.sfxBus); src.start();
+    src.connect(g);
+    if (muffle < 0.999) {
+      const lp = ctx.createBiquadFilter(); lp.type = 'lowpass';
+      lp.frequency.value = 480 + 19000 * Math.pow(Math.max(0, muffle), 1.6);
+      g.connect(lp); lp.connect(p);
+    } else g.connect(p);
+    p.connect(this.sfxBus!); src.start();
+    return src;
+  }
+
+  private playSample(name: string, vol: number, pan = 0, rate = 1, muffle = 1) {
+    const buf = this.buffers.get(name); if (!this.ctx || !buf || !this.sfxBus) return false;
+    this.voice(buf, vol, pan, rate, muffle);
     return true;
   }
 
-  /** Play a game or UI event. `strength` scales volume and slightly pitch. */
-  play(kind: string, strength = 1, pan = 0) {
-    if (!this.ctx) return;
-    // rate-limit spammy kinds so schools of snacks do not turn into a machine gun
-    const now = performance.now(); const last = this.lastPlay.get(kind) ?? 0;
-    const minGap = kind === 'eat' ? 70 : kind === 'hit' ? 40 : 0;
-    if (now - last < minGap) return;
-    this.lastPlay.set(kind, now);
+  /**
+   * Play one audio file through the sfx bus and hand back a stop handle. The audio workbench
+   * uses this to audition the library file by file (loops included); the game goes through
+   * `play()`, which picks the file and the volume for an event kind.
+   */
+  async preview(url: string, opts: { vol?: number; pan?: number; atten?: number; loop?: boolean } = {}) {
+    const ctx = this.ctx; if (!ctx || !this.sfxBus) return undefined;
+    let buf = this.previews.get(url);
+    if (!buf) {
+      try {
+        const res = await fetch(url); if (!res.ok) return undefined;
+        buf = await ctx.decodeAudioData(await res.arrayBuffer());
+      } catch { return undefined; }
+      this.previews.set(url, buf);
+    }
+    const atten = opts.atten ?? 1;
+    const src = this.voice(buf, (opts.vol ?? 0.8) * atten, opts.pan ?? 0, 1, atten, opts.loop);
+    return { duration: buf.duration, stop: () => { try { src.stop(); } catch { /* already ended */ } } };
+  }
 
+  /**
+   * Play a game or UI event. `strength` scales volume and slightly pitch; `atten` is the
+   * distance attenuation from the listener (1 = at the camera, 0 = out of earshot).
+   */
+  play(kind: string, strength = 1, pan = 0, atten = 1) {
+    if (!this.ctx) return;
+    if (atten <= AUDIBLE_FLOOR) return;               // out of earshot: never queued, never heard
     const s = Math.min(2, Math.max(0.2, strength));
     let key = kind;
     if (kind === 'hit' && s > 1.1) key = 'hit-heavy';
     if (kind === 'eat' && s > 0.5) key = 'crunch';
+    const baseVol = kind.startsWith('ui') ? 0.42 : kind === 'noticed' ? 0.3 : kind === 'eat' ? 0.45 + s * 0.3 : 0.6 + s * 0.35;
+    const vol = baseVol * atten;
+
+    // Rate-limit spammy kinds so a reef full of grazers is not a machine gun. A louder (nearer)
+    // event still gets through inside the window — quiet distant ones must never mask the one
+    // that is happening to you.
+    const minGap = MIN_GAP[kind] ?? 0;
+    if (minGap) {
+      const now = performance.now(); const last = this.lastPlay.get(kind);
+      if (last && now - last.t < minGap && vol <= last.vol * 1.15) return;
+      this.lastPlay.set(kind, { t: now, vol });
+    }
+
     const list = SAMPLES[key] ?? SAMPLES[kind];
     if (list) {
       const name = list[Math.floor(Math.random() * list.length)];
       const rate = (0.94 + Math.random() * 0.12) * (kind === 'eat' ? 1.15 - Math.min(0.3, s * 0.3) : 1);
-      const vol = kind.startsWith('ui') ? 0.42 : kind === 'noticed' ? 0.3 : kind === 'eat' ? 0.45 + s * 0.3 : 0.6 + s * 0.35;
-      if (this.playSample(name, vol, pan, rate)) return;
+      if (this.playSample(name, vol, pan, rate, atten)) return;
       void this.load(name);
     }
-    this.synth(kind, s, pan);
+    this.synth(kind, s * atten, pan);
   }
 
   // ---------- synthesized fallbacks ----------

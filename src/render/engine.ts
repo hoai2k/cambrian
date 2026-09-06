@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import { audio } from '../audio/audio';
+import { distanceAtten } from '../audio/mix';
 import { emptyControls, gamepads, KeyboardInput, readGamepad, rumble, type RawControls } from '../input/input';
 import { clamp, damp, TAU, wrapAngle } from '../shared/math';
 import { bandOf, isAlive, isHidden, lengthOf } from '../sim/actors';
@@ -68,6 +69,8 @@ export class Engine {
   // forward-facing cap (the model's +Z is its nose)
   private shieldGeo = new THREE.SphereGeometry(1, 24, 12, 0, Math.PI * 2, 0, Math.PI * 0.42).rotateX(Math.PI / 2);
   private cams: CamState[] = [];
+  /** Where the local views hear from, refreshed each frame; see `hearing()`. */
+  private listeners: { pos: THREE.Vector3; right: THREE.Vector3; ref: number }[] = [];
   private attractCam = new THREE.PerspectiveCamera(55, 1, 0.1, 400);
   private bubbles = new Bubbles();
   private sparkles = new Bubbles(400, [1.0, 0.86, 0.5], 0.25);
@@ -528,45 +531,99 @@ export class Engine {
     }
   }
 
+  /**
+   * Refresh the audio listeners from the cameras. One listener per split-screen view (or the
+   * attract camera), each carrying the camera distance that view is framed at, which sets the
+   * scale of the falloff in `hearing()`.
+   */
+  private syncListeners(game: Game) {
+    const add = (i: number, cam: THREE.PerspectiveCamera, ref: number) => {
+      let l = this.listeners[i];
+      if (!l) l = this.listeners[i] = { pos: new THREE.Vector3(), right: new THREE.Vector3(), ref };
+      cam.updateMatrixWorld();
+      l.pos.copy(cam.position);
+      l.right.setFromMatrixColumn(cam.matrixWorld, 0).normalize();   // camera-space +X, for panning
+      l.ref = ref;
+    };
+    if (this.attract) {
+      add(0, this.attractCam, 6);
+      this.listeners.length = 1;
+      return;
+    }
+    this.cams.forEach((cs, i) => {
+      const p = game.players[i];
+      add(i, cs.camera, magnificationDistance(p ? lengthOf(p) : 1) * cs.zoom);
+    });
+    this.listeners.length = this.cams.length;
+  }
+
+  /**
+   * How loud, and how far to the side, a sound at `pos` is for the nearest local view.
+   * `atten` is 1 at the camera and reaches 0 at the edge of earshot, so the reef's constant
+   * chatter of distant grazers and scuffles fades out instead of piling up at full volume.
+   */
+  private hearing(pos: { x: number; y: number; z: number }): { atten: number; pan: number } {
+    let atten = 0, pan = 0;
+    for (const l of this.listeners) {
+      const dx = pos.x - l.pos.x, dy = pos.y - l.pos.y, dz = pos.z - l.pos.z;
+      const d = Math.hypot(dx, dy, dz);
+      const a = distanceAtten(d, l.ref);
+      if (a > atten) {
+        atten = a;
+        pan = d > 0.001 ? clamp((dx * l.right.x + dy * l.right.y + dz * l.right.z) / d, -1, 1) * 0.75 : 0;
+      }
+    }
+    return { atten, pan };
+  }
+
   private handleEvents(game: Game) {
     const evs = game.events;
     if (!evs.length) return;
+    this.syncListeners(game);
     for (const e of evs) {
-      const pan = 0;
       const playerActor = e.player != null && e.player >= 0 ? game.players[e.player] : undefined;
       const padOf = (pi: number | undefined) => (pi != null && pi >= 0 ? this.setups[pi]?.device : undefined);
+      /** A world sound: attenuated and panned by where it happened. */
+      const world = (kind: string, at: { x: number; y: number; z: number }, strength = 1, scale = 1) => {
+        const h = this.hearing(at);
+        audio.play(kind, strength, h.pan, h.atten * scale);
+      };
+      /** A sting that is about *you* — only played for a local player, and never attenuated. */
+      const personal = (kind: string, strength = 1) => { if (e.player != null && e.player >= 0) audio.play(kind, strength); };
       switch (e.kind) {
         case 'hit': {
           const s = e.strength ?? 1;
           const at = this.impactPos(e.actor, e.other, e.pos);
           this.bubbles.emit(at, Math.round(6 + s * 10), 0.4, 2 + s * 2, 0.07);
           this.impacts.spawn(at, '#ffd0a0', 0.5 + s * 0.8, 0.28);
-          audio.play('hit', s, pan);
+          world('hit', at, s);
           if (e.player != null && e.player >= 0) { const d = padOf(e.player); if (typeof d === 'number') rumble(d, Math.min(1, 0.4 + s * 0.4), 0.3, 120); this.shake(e.player, 0.5 + s * 0.5); }
           const attacker = game.byId(e.actor);
           if (attacker?.player != null && attacker.player >= 0) { const d = padOf(attacker.player); if (typeof d === 'number') rumble(d, 0.25, 0.5, 70); }
           break;
         }
-        case 'kill': { this.bubbles.emit(e.pos, 30, 1.2, 4, 0.1, 1.8); this.impacts.spawn(e.pos, '#ff8a6a', 1.5 + (e.strength ?? 1), 0.5); audio.play('kill', 1, pan); if (playerActor) this.shake(e.player!, 0.7); break; }
-        case 'death': { audio.play('death'); if (e.player != null && e.player >= 0) { const d = padOf(e.player); if (typeof d === 'number') rumble(d, 1, 1, 400); this.shake(e.player, 1.4); } break; }
-        case 'eat': { this.bubbles.emit(e.pos, 5, 0.3, 1.2, 0.05, 0.8); audio.play('eat', e.strength ?? 0.5, pan); break; }
-        case 'tierUp': { this.bubbles.emit(e.pos, 90, 2.5, 5, 0.14, 2.2); this.impacts.spawn(e.pos, '#fff0b0', 4 + (e.strength ?? 1) * 2, 0.9); audio.play('tierUp'); if (e.player != null && e.player >= 0) { const d = padOf(e.player); if (typeof d === 'number') rumble(d, 0.8, 0.8, 600); this.shake(e.player, 0.8); } break; }
-        case 'parry': { const at = this.impactPos(e.other, e.actor, e.pos); this.impacts.spawn(at, '#9ff6ff', 2, 0.4); this.bubbles.emit(at, 20, 0.6, 5, 0.08); audio.play('parry'); if (e.player != null && e.player >= 0) { const d = padOf(e.player); if (typeof d === 'number') rumble(d, 0.9, 0.2, 90); } break; }
-        case 'guardBreak': { this.impacts.spawn(this.impactPos(e.other, e.actor, e.pos), '#ff6a5a', 1.8, 0.4); audio.play('guardBreak'); break; }
-        case 'stagger': { audio.play('stagger'); break; }
-        case 'dodge': { this.bubbles.emit(e.pos, 14, 0.8, 2.5, 0.06, 0.7); audio.play('dodge'); break; }
-        case 'silt': { this.bubbles.emit(e.pos, 30, 1.5, 2, 0.08, 1.2); audio.play('silt'); break; }
-        case 'ability': { this.impacts.spawn(e.pos, '#c8fff0', 1.2 + (e.strength ?? 1) * 0.4, 0.45); this.bubbles.emit(e.pos, 20, 1, 3, 0.08); audio.play('ability'); break; }
-        case 'grab': { this.impacts.spawn(this.impactPos(e.actor, e.other, e.pos), '#ffb070', 1.4, 0.35); audio.play('grab'); if (e.player != null && e.player >= 0) { const d = padOf(e.player); if (typeof d === 'number') rumble(d, 1, 0.6, 300); } break; }
-        case 'hunted': { audio.play('hunted'); if (e.player != null && e.player >= 0) { const d = padOf(e.player); if (typeof d === 'number') rumble(d, 0.6, 0.9, 500); } break; }
-        case 'escape': { audio.play('escape'); break; }
-        case 'noticed': { audio.play('noticed', 0.5); break; }
-        case 'sense': { audio.play('sense'); break; }
-        case 'swallow': { audio.play('grab', 1.2); this.bubbles.emit(e.pos, 30, 1, 3, 0.09, 1.5); if (e.player != null && e.player >= 0) { const d = padOf(e.player); if (typeof d === 'number') rumble(d, 1, 1, 900); this.shake(e.player, 1.2); } break; }
-        case 'disintegrate': { this.sparkles.emit(e.pos, Math.round(28 + (e.strength ?? 1) * 10), 0.5 + (e.strength ?? 1) * 0.25, 0.9, 0.06, 2.2); audio.play('escape', 0.5); break; }
-        case 'routed': { audio.play('escape', 0.8); this.impacts.spawn(e.pos, '#9ff6ff', 2.5, 0.6); break; }
-        case 'pounce': { this.impacts.spawn(e.pos, '#ffe08a', 1.2 + (e.strength ?? 1) * 0.5, 0.35); this.bubbles.emit(e.pos, 24, 0.9, 4, 0.08); audio.play('hit', 1.3); if (e.player != null && e.player >= 0) { const d = padOf(e.player); if (typeof d === 'number') rumble(d, 0.7, 0.4, 140); this.shake(e.player, 0.6); } break; }
-        case 'burst': { audio.play('burst'); break; }
+        case 'kill': { this.bubbles.emit(e.pos, 30, 1.2, 4, 0.1, 1.8); this.impacts.spawn(e.pos, '#ff8a6a', 1.5 + (e.strength ?? 1), 0.5); world('kill', e.pos); if (playerActor) this.shake(e.player!, 0.7); break; }
+        case 'death': { if (e.player != null && e.player >= 0) audio.play('death'); else world('death', e.pos, 1, 0.7); if (e.player != null && e.player >= 0) { const d = padOf(e.player); if (typeof d === 'number') rumble(d, 1, 1, 400); this.shake(e.player, 1.4); } break; }
+        case 'eat': { this.bubbles.emit(e.pos, 5, 0.3, 1.2, 0.05, 0.8); world('eat', e.pos, e.strength ?? 0.5); break; }
+        case 'tierUp': { this.bubbles.emit(e.pos, 90, 2.5, 5, 0.14, 2.2); this.impacts.spawn(e.pos, '#fff0b0', 4 + (e.strength ?? 1) * 2, 0.9); if (e.player != null && e.player >= 0) audio.play('tierUp'); else world('tierUp', e.pos, 1, 0.6); if (e.player != null && e.player >= 0) { const d = padOf(e.player); if (typeof d === 'number') rumble(d, 0.8, 0.8, 600); this.shake(e.player, 0.8); } break; }
+        case 'parry': { const at = this.impactPos(e.other, e.actor, e.pos); this.impacts.spawn(at, '#9ff6ff', 2, 0.4); this.bubbles.emit(at, 20, 0.6, 5, 0.08); world('parry', at); if (e.player != null && e.player >= 0) { const d = padOf(e.player); if (typeof d === 'number') rumble(d, 0.9, 0.2, 90); } break; }
+        case 'guardBreak': { const at = this.impactPos(e.other, e.actor, e.pos); this.impacts.spawn(at, '#ff6a5a', 1.8, 0.4); world('guardBreak', at); break; }
+        case 'stagger': { world('stagger', e.pos); break; }
+        case 'dodge': { this.bubbles.emit(e.pos, 14, 0.8, 2.5, 0.06, 0.7); world('dodge', e.pos); break; }
+        case 'silt': { this.bubbles.emit(e.pos, 30, 1.5, 2, 0.08, 1.2); world('silt', e.pos); break; }
+        case 'ability': { this.impacts.spawn(e.pos, '#c8fff0', 1.2 + (e.strength ?? 1) * 0.4, 0.45); this.bubbles.emit(e.pos, 20, 1, 3, 0.08); world('ability', e.pos); break; }
+        case 'grab': { const at = this.impactPos(e.actor, e.other, e.pos); this.impacts.spawn(at, '#ffb070', 1.4, 0.35); world('grab', at); if (e.player != null && e.player >= 0) { const d = padOf(e.player); if (typeof d === 'number') rumble(d, 1, 0.6, 300); } break; }
+        case 'hunted': { personal('hunted'); if (e.player != null && e.player >= 0) { const d = padOf(e.player); if (typeof d === 'number') rumble(d, 0.6, 0.9, 500); } break; }
+        case 'escape': { personal('escape'); break; }
+        case 'noticed': { personal('noticed', 0.5); break; }
+        case 'sense': { if (e.player != null && e.player >= 0) audio.play('sense'); else world('sense', e.pos, 1, 0.5); break; }
+        case 'swallow': { world('swallow', e.pos, 1.2); this.bubbles.emit(e.pos, 30, 1, 3, 0.09, 1.5); if (e.player != null && e.player >= 0) { const d = padOf(e.player); if (typeof d === 'number') rumble(d, 1, 1, 900); this.shake(e.player, 1.2); } break; }
+        case 'disintegrate': { this.sparkles.emit(e.pos, Math.round(28 + (e.strength ?? 1) * 10), 0.5 + (e.strength ?? 1) * 0.25, 0.9, 0.06, 2.2); world('disintegrate', e.pos, 0.6); break; }
+        case 'routed': { world('routed', e.pos, 0.8); this.impacts.spawn(e.pos, '#9ff6ff', 2.5, 0.6); break; }
+        case 'pounce': { this.impacts.spawn(e.pos, '#ffe08a', 1.2 + (e.strength ?? 1) * 0.5, 0.35); this.bubbles.emit(e.pos, 24, 0.9, 4, 0.08); world('pounce', e.pos, 1.3); if (e.player != null && e.player >= 0) { const d = padOf(e.player); if (typeof d === 'number') rumble(d, 0.7, 0.4, 140); this.shake(e.player, 0.6); } break; }
+        case 'burst': { world('burst', e.pos); break; }
+        // Hatching out of a nursery after a respawn (the moult state is reused for the hatch-in).
+        case 'moult': { if (e.player != null && e.player >= 0) audio.play('respawn'); else world('respawn', e.pos, 1, 0.5); break; }
       }
     }
     evs.length = 0;
