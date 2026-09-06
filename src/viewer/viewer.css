@@ -41,9 +41,10 @@ h1, h2, h3 { font-family: var(--font-display); margin: 0; }
 .specimen small { color: var(--dim); font-size: 11px; font-style: italic; }
 
 /* ---------- info card ---------- */
-.info { right: 18px; top: 18px; width: 260px; padding: 16px 18px; }
+.info { container-type: inline-size; right: 18px; top: 18px; width: 260px; padding: 16px 18px; }
 .info .role { font: 700 10px var(--font-display); letter-spacing: .22em; color: var(--ember); }
 .info h2 { font-size: 26px; margin: 4px 0 6px; }
+.info h2.long-name { font-size: clamp(16px, 9cqw, 22px); }
 .info p { margin: 0 0 4px; color: var(--mist); font-size: 13px; }
 .info .hint { color: var(--dim); font-size: 12px; margin-bottom: 12px; }
 .ghost { padding: 8px 14px; border-radius: 10px; border: 1px solid var(--line); background: transparent; font-size: 13px; transition: background .15s, border-color .15s; }

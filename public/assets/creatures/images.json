@@ -55,31 +55,31 @@
     "generatedAt": "2026-09-06T16:24:28.675Z"
   },
   "hallucigenia": {
-    "glbSha256": "ccf9b8441f96e14216eff9767e8a336088b3872499d76d6f70f7f82317b410b6",
+    "glbSha256": "a17e87a46c89df96b1946c933d4709654c5fb32996fd6f802102cf9d457c8341",
     "appearanceSha256": "ed9685038b61bcbb8c87098304066c3989f14f2d981d9aaddd7c51e68fd9cf61",
     "clips": [
+      "Ability",
       "Attack",
+      "Bite",
       "Crawl",
       "Death",
       "Dive",
-      "Hit",
-      "Idle",
-      "Rise",
-      "TurnLeft",
-      "TurnRight",
-      "Bite",
-      "Heavy",
-      "Guard",
-      "Parry",
       "Dodge",
       "Eat",
-      "Stagger",
+      "Guard",
+      "Heavy",
+      "Hit",
+      "Idle",
       "Moult",
-      "Ability"
+      "Parry",
+      "Rise",
+      "Stagger",
+      "TurnLeft",
+      "TurnRight"
     ],
-    "renderSha256": "75e76d167be1a1cbacba26052ae449183633167bd7fa7d8b301225b044c04174",
-    "selectSha256": "13ddf6d6273b9fecb282b3058701020c571695e4d3e9d02e905d22120737176d",
-    "generatedAt": "2026-09-06T16:24:29.026Z"
+    "renderSha256": "2b4f476f2fe0e496b836fdcad41af9c14a671692e1622c8be9508567e7369990",
+    "selectSha256": "f423874e5bdb1cada2a9e7eee2b88e7ff917dc492df7b7e5a329765c8eeb2707",
+    "generatedAt": "2026-09-06T16:57:10.829Z"
   },
   "marrella": {
     "glbSha256": "d63f401218409ad32e73a192114b2203e17f30b001943df8779801ef39327cce",
