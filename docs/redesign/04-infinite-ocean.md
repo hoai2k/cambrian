@@ -91,13 +91,18 @@ two things:
      desaturated colours with cold blue-black fog, low sun. Anything that
      reads as "teeth".
 
-   The biomes differ by plant *density*, rock density, terrain and atmosphere
-   (fog colour, density, sky and sun intensity blend per biome in
-   `render/sea.ts`), **and** by dedicated props: the seven relaxing/extreme
-   models were delivered and are placed by `generateChunk` as the `cushion`,
-   `lettuce`, `spine` and `glass` `FloraKind`s and as blade-spire and
-   talus-shard boulder variants. See
-   [environment-assets.md](../environment-assets.md).
+   Both ends now have their own models, delivered 2026-09-06 and documented in
+   [environment assets](../environment-assets.md): cushion sponges, lettuce
+   tufts and pebble clusters for the calm end; blade spires, talus shards,
+   spine sponges and glass fans for the deadly one. `generateChunk` swaps the
+   standard reef plants for them by biome (`cushion`, `lettuce`, `spine` and
+   `glass` are `FloraKind`s; `blade-spire` and `talus-shard` are boulder
+   variants), each with its own entry in `FLORA_PHYS` so it collides and bends
+   like the plant it is. The renderer loads each GLB once per sea, lazily, and
+   instances it in place of the fallback geometry, so a missing or slow model
+   costs nothing. On top of the models the biomes still differ by plant and
+   rock density, terrain, and atmosphere (fog colour, density, sky and sun
+   intensity blend per biome in `render/sea.ts`).
 
 ## Streaming
 
@@ -115,6 +120,11 @@ two things:
   never sees chunks at all (`World.rebuild`). Match start, respawn and
   teleport call `loadAround` so the ground is there before anyone stands on
   it. Tests can `freeze` the world.
+- **Nothing is ever a hole.** A chunk with no view yet would draw no seabed at
+  all, so the cheap coarse tile is always laid down first, nearest camera
+  first, and only then upgraded to full detail. `prime()` builds that coarse
+  ring synchronously at match start, when the attract scene begins and on
+  arrival from a teleport, so the first frame of a new view is solid ground.
 - The renderer builds a **full view** (seabed tile with per-vertex biome
   colour and apron-correct normals, rocks, every plant, undergrowth, blooms)
   for each sim chunk and a **far view** (coarse tile, big rocks only) for the

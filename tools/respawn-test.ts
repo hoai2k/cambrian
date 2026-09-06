@@ -10,7 +10,7 @@ const p = g.players[0];
 p.spawnProtect = 0;
 const giant = g.actors.find(a => a.controller === 'giant' && a.creature === 'anomalocaris')!;
 p.pos = {x:60,y:4,z:-20}; giant.pos = {x:61,y:4,z:-20};
-applyHit({events:g.events,byId:id=>g.byId(id),time:0},giant,p,{...creature(giant.creature).heavy,damage:p.hpMax*10,grab:false},0);
+applyHit({events:g.events,byId:id=>g.byId(id),time:0,rng:g.rng},giant,p,{...creature(giant.creature).heavy,damage:p.hpMax*10,grab:false},0);
 assert(!isAlive(p),'Lethal giant hit must kill or swallow the larva');
 let respawned=-1,hatchSeen=false;
 for(let t=0;t<60*12;t++){

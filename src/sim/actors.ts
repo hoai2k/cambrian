@@ -40,7 +40,9 @@ export function tierForScale(s: number): Tier {
 export function makeActor(id: number, creatureId: CreatureId, controller: Controller, pos: Vec3, scale: number, player = -1): Actor {
   const a: Actor = {
     id, creature: creatureId, controller, player,
-    pos: { ...pos }, vel: v3(), yaw: Math.random() * 6.283, pitch: 0, bank: 0, roll: 0,
+    // Yaw is set by the caller from the game's seeded RNG: nothing in the simulation may use
+    // Math.random, or the same seed stops reproducing the same match.
+    pos: { ...pos }, vel: v3(), yaw: 0, pitch: 0, bank: 0, roll: 0,
     scale, tier: tierForScale(scale), nutrition: 0, ageGrowth: 0,
     hp: 0, hpMax: 0, stamina: 0, staminaMax: 0, exhausted: 0, poise: 0, poiseMax: 0,
     state: 'free', stateT: 0, stateDur: 0, combo: 0, comboT: 0, hitDone: new Set(),
@@ -54,9 +56,11 @@ export function makeActor(id: number, creatureId: CreatureId, controller: Contro
     respawnT: 0, hatching: false, dashHoldT: 0, dashUsed: false, dashQueued: false, pounceCd: 0, dashCd: 0, sinceHit: 99, lastHitBy: -1, swallowedBy: -1, holdT: 0, deathY: 0, sparkled: false, tumble: v3(), aimInRange: false, aiming: false, kills: 0, eats: 0, escapes: 0, hunted: 0, hunterId: -1, wasHunted: false, seen: 0, bubbles: 0,
     spawnProtect: controller === 'player' ? 3 : 0,
     home: { ...pos }, teleportCd: 0,
+    prevT: { x: pos.x, y: pos.y, z: pos.z, yaw: 0, pitch: 0, bank: 0 },
   };
   applyScaleStats(a, false);
   a.stamina = a.staminaMax;
+  a.prevT.yaw = a.yaw;
   return a;
 }
 

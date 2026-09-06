@@ -88,7 +88,7 @@ export class Game implements AiWorld {
     this.world = new World(seed);
     const nursery = nurseryAt(0);
     this.world.loadAround(nursery);
-    this.hitCtx = { events: this.events, byId: (id) => this.idMap.get(id), time: 0 };
+    this.hitCtx = { events: this.events, byId: (id) => this.idMap.get(id), time: 0, rng: this.rng };
     setups.forEach((s, i) => {
       const startScale = mode === 'rise' ? TIER_SCALE[0] : mode === 'hunted' ? (i === 0 ? 3.0 : TIER_SCALE[1]) : mode === 'reef' ? TIER_SCALE[2] : TIER_SCALE[1];
       const a = this.spawn(s.creature, 'player', this.spawnPoint(nursery, s.creature, startScale, i), startScale, i);
@@ -146,6 +146,7 @@ export class Game implements AiWorld {
 
   spawn(c: CreatureId, controller: Actor['controller'], pos: Vec3, scale: number, player = -1): Actor {
     const a = makeActor(this.nextId++, c, controller, pos, scale, player);
+    a.yaw = this.rng() * TAU; a.prevT.yaw = a.yaw;
     this.actors.push(a);
     this.idMap.set(a.id, a);
     return a;
@@ -295,6 +296,11 @@ export class Game implements AiWorld {
     if (this.state.status !== 'playing') return;
     this.time += dt; this.hitCtx.time = this.time;
     this.stepIndex++;
+    // Snapshot every transform so the renderer can interpolate across this step.
+    for (const a of this.actors) {
+      const t = a.prevT;
+      t.x = a.pos.x; t.y = a.pos.y; t.z = a.pos.z; t.yaw = a.yaw; t.pitch = a.pitch; t.bank = a.bank;
+    }
     // The sea streams in around whoever is in it, a couple of chunks a step so nothing hitches.
     this.world.stream(this.anchors(), 2);
     this.hash.rebuild(this.actors);
@@ -546,8 +552,7 @@ export class Game implements AiWorld {
     if (hitWall && !def.ground) { a.vel.x *= 0.6; a.vel.z *= 0.6; }
     // Plants: swarm snacks are numerous and tiny, so they take turns on alternate steps.
     if (!isHidden(a) && a.state !== 'grabbed') {
-      if (a.controller !== 'swarm') resolveFlora(this.world, a, dt, this.scratchFlora);
-      else if (((a.id + this.stepIndex) & 1) === 0) resolveFlora(this.world, a, dt * 2, this.scratchFlora);
+      resolveFlora(this.world, a, dt, this.scratchFlora);
     }
     const floor = groundHeight(this.world, a.pos.x, a.pos.z, this.scratchBoulders) + clearanceOf(a);
     if (def.ground) {

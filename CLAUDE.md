@@ -29,6 +29,12 @@ unless the user explicitly asks for a PR. Steps:
   assume a world bound; anything that places things in the world must go through the biome
   weights and `shoreDistance`. Design and contract: `docs/redesign/04-infinite-ocean.md`;
   `tools/world-test.ts` must pass.
+- `src/sim` must be reproducible: given the same seed and inputs a match replays exactly.
+  Nothing there may call `Math.random` — take randomness from the game's `rng` (combat gets it
+  through `HitContext.rng`). `tools/` tests rely on this; without it failures do not reproduce.
+- The renderer interpolates between fixed simulation steps using each actor's `prevT` snapshot,
+  so anything that moves an actor by more than it could swim in one step (teleport, respawn)
+  must read as a jump. `tools/motion-test.ts` guards this.
 - All docs live in `docs/`. Design docs are in `docs/redesign/`. Image, glyph and prop
   needs go in `docs/image-requests.md` and move to `docs/image-requests-history.md` once
   delivered and integrated; sound and music needs go in `docs/audio-requests.md`.
