@@ -17,10 +17,11 @@ export function SelectScreen(p: Props) {
   return (
     <section className="select" aria-label="Choose your creature">
       <header className="select-header">
-        <div className="brand"><Emblem size={34} /><span className="brand-name">CAMBRIAN <b>EXPLOSION</b></span></div>
+        <div className="brand"><Emblem size={34} /><img className="header-logo" src={`${assetBase}assets/brand/logo.svg`} alt="Cambrian Explosion" /></div>
         <div className="mode-picker" role="tablist" aria-label="Game mode">
           {p.modes.map((m) => (
             <button key={m} role="tab" aria-selected={p.mode === m} className={`mode-chip ${p.mode === m ? 'active' : ''}`} onClick={() => p.onMode(m)}>
+              <img className="mode-art" src={`${assetBase}assets/ui/mode-${m}.webp`} alt="" />
               <span>{p.modeInfo[m].name}</span><small>{p.modeInfo[m].players}</small>
             </button>
           ))}
@@ -40,7 +41,7 @@ export function SelectScreen(p: Props) {
               </div>
               <div className="creature-stage">
                 <button className="arrow" aria-label="Previous creature" onClick={() => p.onCycle(i, -1)}><ChevronLeft width={28} height={28} /></button>
-                <img src={`${assetBase}assets/creatures/${def.id}.card.png`} alt={`${def.name} reconstruction`} draggable={false} />
+                <img src={`${assetBase}assets/creatures/${def.id}.select.png`} alt={`${def.name} reconstruction`} draggable={false} />
                 <button className="arrow" aria-label="Next creature" onClick={() => p.onCycle(i, 1)}><ChevronRight width={28} height={28} /></button>
               </div>
               <div className="creature-copy">

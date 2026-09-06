@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react';
 import type { AssetProgress } from '../render/assets';
 import { creature } from '../sim/creatures';
-import { Emblem } from './icons';
 
 const FACTS = [
   'Anomalocaris was the largest animal of its time. About a metre. Terrifying, then.',
@@ -23,12 +22,11 @@ export function LoadingScreen({ progress, fraction }: { progress: AssetProgress 
   const current = progress?.current ? creature(progress.current as never)?.name : undefined;
   return (
     <section className="loading" aria-busy="true" aria-live="polite">
-      {hasArt && <img className="loading-art" src={`${import.meta.env.BASE_URL}assets/brand/keyart.webp`} alt="" onError={() => setHasArt(false)} />}
+      {hasArt && <picture><source media="(orientation: portrait)" srcSet={`${import.meta.env.BASE_URL}assets/brand/keyart-mobile.webp`} /><img className="loading-art" src={`${import.meta.env.BASE_URL}assets/brand/keyart.webp`} alt="" onError={() => setHasArt(false)} /></picture>}
       <div className="loading-inner">
-        <div className="title-mark"><Emblem size={72} /></div>
+        <div className="title-mark"><img src={`${import.meta.env.BASE_URL}assets/ui/loading.svg`} width={72} height={72} alt="" /></div>
         <h1 className="title-logo small">
-          <span className="logo-line-1">CAMBRIAN</span>
-          <span className="logo-line-2">EXPLOSION</span>
+          <img className="brand-logo" src={`${import.meta.env.BASE_URL}assets/brand/logo.svg`} alt="Cambrian Explosion" />
         </h1>
         <div className="loading-bar" role="progressbar" aria-valuemin={0} aria-valuemax={100} aria-valuenow={pct}>
           <i style={{ width: `${pct}%` }} />

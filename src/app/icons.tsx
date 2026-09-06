@@ -27,18 +27,7 @@ export const KeyboardIcon = (p: SVGProps<SVGSVGElement>) => (
 );
 export const CheckIcon = (p: SVGProps<SVGSVGElement>) => (<svg {...base(p)}><path d="m5 12 5 5L20 7" /></svg>);
 
-/** Emblem mark used until the real logo arrives (see image-requests.md). */
+/** Shared production emblem. */
 export const Emblem = ({ size = 48 }: { size?: number }) => (
-  <svg width={size} height={size} viewBox="0 0 64 64" aria-hidden="true">
-    <defs>
-      <radialGradient id="emblem-g" cx="50%" cy="45%" r="60%">
-        <stop offset="0" stopColor="#ffb36b" />
-        <stop offset="0.55" stopColor="#ff5b6e" />
-        <stop offset="1" stopColor="#1f5d6b" />
-      </radialGradient>
-    </defs>
-    <path d="M32 4 L37.5 24 L55 13 L42.5 30 L61 34 L42.5 38 L53 57 L37.5 42 L32 61 L26.5 42 L11 57 L21.5 38 L3 34 L21.5 30 L9 13 L26.5 24 Z" fill="url(#emblem-g)" />
-    <circle cx="32" cy="34" r="7.5" fill="#eefaf6" />
-    <circle cx="32" cy="34" r="3.4" fill="#07202a" />
-  </svg>
+  <img src={`${import.meta.env.BASE_URL}favicon.svg`} width={size} height={size} alt="" aria-hidden="true" />
 );

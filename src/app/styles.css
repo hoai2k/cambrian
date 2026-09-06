@@ -270,3 +270,19 @@ input[type='checkbox'] { width: 20px; height: 20px; accent-color: var(--ember); 
 .aim.in-range .aim-label { color: currentColor; }
 
 .fade { position: absolute; inset: 0; background: #020a0d; pointer-events: none; z-index: 6; }
+
+/* Delivered image assets. */
+.brand-logo { width: min(78vw, 720px); height: auto; display: block; }
+.title-logo.small .brand-logo { width: min(72vw, 420px); }
+.header-logo { width: 170px; height: auto; }
+.title-art { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; z-index: -1; opacity: .6; }
+.title { isolation: isolate; }
+.mode-chip { position: relative; overflow: hidden; isolation: isolate; min-height: 78px; justify-content: flex-end; }
+.mode-art { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; z-index: -2; }
+.mode-chip::after { content: ''; position: absolute; inset: 0; background: linear-gradient(transparent, rgba(6,22,28,.95)); z-index: -1; }
+.mode-chip small { color: var(--foam); }
+.tier-glyph { display: block; width: 28px; height: 28px; background: currentColor; mask: center / contain no-repeat; }
+.marker { width: calc(1.1em * var(--s)); height: calc(1.1em * var(--s)); transform: translate(-50%, -50%); border: 0; border-radius: 0; background: currentColor; mask: center / contain no-repeat; box-shadow: none; }
+@media (max-width: 700px) { .mode-chip { min-height: 68px; padding: 7px 10px; } .header-logo { width: 140px; } }
+.title > picture { display: contents; }
+.title-art { opacity: 1; filter: brightness(.6); }
