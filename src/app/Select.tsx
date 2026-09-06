@@ -45,7 +45,7 @@ export function SelectScreen(p: Props) {
               <button key={c.id} role="option" aria-selected={hovering.length > 0} className={cls}
                 style={{ ['--c' as string]: hovering.length ? PLAYER_COLORS[hovering[0].i] : c.color }}
                 onClick={() => { const i = p.players.findIndex((pl) => !pl.ready && typeof pl.device === 'string'); p.onPick(i >= 0 ? i : 0, c.id); }}
-                title={`${c.name} · ${c.role}`}>
+                title={`${c.name} · ${c.role}`} aria-label={c.name}>
                 <img src={`${ASSETS}assets/creatures/${c.id}.select.png`} alt="" draggable={false} loading="eager" />
                 <span className="cell-name">{c.name}</span>
                 <span className="cell-rings">
@@ -75,6 +75,7 @@ export function SelectScreen(p: Props) {
                 <div className="creature-copy">
                   <span className="role">{def.ground ? 'SEAFLOOR' : 'SWIMMER'} · {def.role}</span>
                   <h2>{def.name}</h2>
+                  <small className="provenance">{def.species} · {def.provenance ?? 'Burgess Shale'}</small>
                   <p className="tagline">{def.tagline}</p>
                   {!compact && (
                     <>

@@ -7,6 +7,8 @@ import { SEA_GLSL } from '../render/sea';
 import { sampleCurrent, SURFACE_Y } from '../sim/world';
 import { TAU } from '../shared/math';
 import { creature, type CreatureId } from '../sim/creatures';
+import { cloneMaterials, makeRecolor, type Recolor } from '../render/recolor';
+import { DEFAULT_SCHEME, type Slot } from '../shared/palettes';
 
 /**
  * The viewer page lives one directory below the app, so `BASE_URL` ('./' in a built bundle)
@@ -39,6 +41,10 @@ export interface ViewerScene {
   /** Plays a clip. One-shots fade back to the resting loop unless `loop` forces a repeat. */
   play(name: string, loop: boolean): void;
   setSpeed(s: number): void;
+  /** Applies a colour scheme to the specimen on stage, and to any loaded after it. */
+  setScheme(id: string): void;
+  /** Which palette slots the specimen on stage actually has materials for. */
+  activeSlots(): readonly Slot[];
   /** The clip currently driving the rig, so the button grid can follow auto-returns. */
   onClip(cb: (name: string) => void): void;
   resetCamera(): void;
@@ -162,6 +168,10 @@ export function createViewerScene(canvas: HTMLCanvasElement): ViewerScene {
   let current: THREE.AnimationAction | undefined;
   let currentName = '';
   let restingClip = 'Idle';
+  let modelMaterials: THREE.Material[] = [];
+  let recolor: Recolor | undefined;
+  let schemeId = DEFAULT_SCHEME;
+  let abilityLoops = false;
   let speed = 1;
   let frameRadius = 3;
   let token = 0;
@@ -169,11 +179,13 @@ export function createViewerScene(canvas: HTMLCanvasElement): ViewerScene {
 
   const setClip = (name: string) => { currentName = name; clipCb(name); };
 
-  // Geometry and materials belong to the cached GLTF and are shared with every clone, so the
-  // model is only detached here, never disposed.
+  // Geometry belongs to the cached GLTF and is shared with every clone, so it is only detached
+  // here. The materials are this model's own (see cloneMaterials), so those do get disposed.
   function clearModel() {
     mixer?.stopAllAction();
     if (model) stage.remove(model);
+    modelMaterials.forEach((m) => m.dispose());
+    modelMaterials = []; recolor = undefined;
     model = undefined; mixer = undefined; current = undefined;
     actions = new Map();
   }
@@ -194,9 +206,10 @@ export function createViewerScene(canvas: HTMLCanvasElement): ViewerScene {
     const gltf = await loadCreature(id);
     if (mine !== token) return orderClips(gltf.animations.map((c) => c.name));
     clearModel();
+    abilityLoops = !!creature(id).abilityLoop;
 
     // The GLBs are authored at arbitrary scale; normalise, then blow back up to the creature's
-    // real adult length so relative sizes match the game.
+    // gameplay adult length so relative sizes match the game.
     const src = SkeletonUtils.clone(gltf.scene);
     const box = new THREE.Box3().setFromObject(src);
     const size = box.getSize(new THREE.Vector3());
@@ -206,6 +219,11 @@ export function createViewerScene(canvas: HTMLCanvasElement): ViewerScene {
     src.position.copy(center).multiplyScalar(-unit);
     src.traverse((o) => { if (o instanceof THREE.Mesh) o.frustumCulled = false; });
     frameRadius = Math.max(size.x, size.y, size.z) * unit * 0.5;
+
+    // Own the materials before touching them: the clone above shares them with the cached GLTF.
+    modelMaterials = cloneMaterials(src);
+    recolor = makeRecolor(src);
+    recolor.setScheme(schemeId);
 
     model = src;
     stage.add(model);
@@ -227,7 +245,7 @@ export function createViewerScene(canvas: HTMLCanvasElement): ViewerScene {
   function play(name: string, loop: boolean) {
     const act = actions.get(name);
     if (!act) return;
-    const repeat = loop || LOOPING.has(name);
+    const repeat = loop || LOOPING.has(name) || (name === 'Ability' && abilityLoops);
     const prev = current;
     act.reset();
     act.setLoop(repeat ? THREE.LoopRepeat : THREE.LoopOnce, repeat ? Infinity : 1);
@@ -289,6 +307,8 @@ export function createViewerScene(canvas: HTMLCanvasElement): ViewerScene {
     show,
     play,
     setSpeed(s) { speed = s; },
+    setScheme(id) { schemeId = id; recolor?.setScheme(id); },
+    activeSlots() { return recolor?.slots ?? []; },
     onClip(cb) { clipCb = cb; cb(currentName); },
     resetCamera: frame,
     dispose() {

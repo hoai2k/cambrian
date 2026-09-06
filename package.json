@@ -9,6 +9,7 @@
     "preview": "vite preview",
     "typecheck": "tsc --noEmit",
     "check": "node tools/check-creature-assets.mjs",
+    "palettes": "node tools/palette-test.mjs",
     "cards": "node tools/make-cards.mjs",
     "lods": "node tools/make-lods.mjs"
   },

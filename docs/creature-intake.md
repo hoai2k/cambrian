@@ -1,6 +1,6 @@
 # Creature intake
 
-Everything a creature needs to ship, and the check that enforces it. Run `npm run check`
+Everything a creature needs to ship, and the check that enforces it. Run `node tools/check-creature-assets.mjs --strict`
 before merging; CI runs it too.
 
 ## Adding a creature
@@ -8,13 +8,13 @@ before merging; CI runs it too.
 1. **Model.** `public/assets/creatures/<id>.glb`, meshopt-compressed, with the clip set in
    `docs/animation-brief.md` (Idle, Swim/Crawl, Attack, Hit, Death, Turn/Dive/Rise, Bite, Heavy,
    Guard, Parry, Dodge, Eat, Stagger, Ability, Moult; Grab if it grabs). Colour comes from vertex
-   colours and material factors; the only texture is a normal map.
-2. **Data.** Add an entry to `src/sim/creatures.ts` (stats, moves, ability, copy). The roster
+   pigmentation, material factors and embedded albedo/normal maps as appropriate.
+2. **Data.** Add an entry to `src/sim/creatures.ts` (or the expansion registry in `src/sim/expansion.ts`) (stats, moves, ability, copy). The roster
    grid on the pick screen lays itself out from this list: three rows, `ceil(n / 3)` columns,
    so 21 creatures sit in 7 × 3 without scrolling.
 3. **Render.** A studio render at `public/assets/creatures/<id>.png`, 1000–1200 px wide,
-   three-quarter front view on the flat dark backdrop the existing eight use (the cutout is
-   keyed from the corner pixel). Same framing and lighting as the others so the grid reads
+   three-quarter front view on the flat dark backdrop the existing eight use, or an authored transparent background
+   (existing alpha is preserved; opaque backdrops are keyed from the corner pixel). Same framing and lighting as the others so the grid reads
    as one set.
 4. **Select render.** A transparent 1600 × 1200 portrait at
    `public/assets/creatures/<id>.select.png` — this is what the pick screen actually shows,
@@ -26,7 +26,9 @@ before merging; CI runs it too.
    used by the viewer and the streaming preloader), the 256 × 192 grid thumbnail
    (`<id>.thumb.png`) and records the model's appearance fingerprint — and a hash of the
    select render — in `images.json`.
-6. **LOD.** `node tools/make-lods.mjs` writes `<id>.lod1.glb` (about 15% of the triangles, no
+6. **LOD.** For expansion rigs follow `tools/creatures/README.md`: authored reduced
+   meshes preserve small anatomical parts, then package, append anchors and update sizes.
+   For legacy models, `node tools/make-lods.mjs` writes `<id>.lod1.glb` (about 15% of the triangles, no
    textures, locomotion clips only) for distant rendering.
 7. **Check.** `node tools/check-creature-assets.mjs` must report no errors.
 
@@ -46,6 +48,27 @@ check says so:
 
 Geometry- or clip-only changes are noted but do not invalidate the images. An LOD older than its
 model is also flagged; rerun `node tools/make-lods.mjs`.
+
+## Colours and schemes
+
+None of the colour is textured. Every creature's GLB carries a white `baseColorFactor` and puts
+all of its colour in `COLOR_0` vertex colours, with a normal map as the only texture, so a
+creature can be recoloured at runtime with no new art. `src/render/recolor.ts` rebuilds each
+pixel as `slot colour x (luminance / the material's mean luminance)`: the mottling, gradients
+and baked shading all live in that ratio and survive, and only the hue is replaced. The schemes
+themselves are plain data in `src/shared/palettes.ts`, and the viewer has a dropdown to try them
+on. Nothing in the game is recoloured yet.
+
+**Material names decide the palette slot.** `slotFor()` sorts each material into one of body,
+eyes, fins, legs, accent or underside by matching its name — "Dorsal cuticle" is a body,
+"Sclerotized tips" are accents, "Thin swimming membranes" are fins. So the names in Blender are
+load-bearing: rename a material and its colour slot moves with it. Follow the convention the
+eight use and a new creature gets sensible slots for free.
+
+    npm run palettes
+
+checks that every shipped material (models and LODs) still lands in the slot the schemes assume,
+and that every scheme covers every slot. Run it after any material rename.
 
 ## Loading behaviour
 
