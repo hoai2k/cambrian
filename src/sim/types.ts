@@ -16,7 +16,7 @@ export type Controller = 'player' | 'bot' | 'ambient' | 'giant' | 'swarm' | 'sha
 
 export type ActorState =
   | 'free' | 'attack' | 'dodge' | 'guard' | 'parry' | 'stagger'
-  | 'grabbed' | 'grabbing' | 'eating' | 'ability' | 'moult' | 'dead' | 'pounce';
+  | 'grabbed' | 'grabbing' | 'eating' | 'ability' | 'moult' | 'dead' | 'pounce' | 'swallowed';
 
 export interface InputFrame {
   /** Left stick, -1..1, y is forward. */
@@ -57,6 +57,7 @@ export interface BrainState {
   schoolId?: number;
   hunger: number; lastEats: number;
   parrySkill: number;      // chance a well-timed guard becomes a parry (players always 1)
+  courage: number;         // drops when hit by something smaller; below zero the creature runs
   cached?: InputFrame;
   aggression: number;      // 0..1
   reaction: number;        // seconds of reaction delay
@@ -99,6 +100,7 @@ export interface Actor {
   brain?: BrainState;
   respawnT: number; hatching: boolean;
   dashHoldT: number; dashUsed: boolean; dashQueued: boolean; pounceCd: number; aimInRange: boolean; aiming: boolean;
+  dashCd: number; sinceHit: number; lastHitBy: number; swallowedBy: number; holdT: number;
   kills: number; eats: number; escapes: number;
   hunted: number;          // 0..1 highest detection score against this actor (HUD)
   hunterId: number;
@@ -119,6 +121,6 @@ export type Mode = 'rise' | 'frenzy' | 'hunted' | 'reef';
 export interface Prompt { text: string; t: number; }
 
 export interface WorldEvent {
-  kind: 'hit' | 'kill' | 'eat' | 'tierUp' | 'parry' | 'guardBreak' | 'burst' | 'escape' | 'noticed' | 'hunted' | 'dodge' | 'ability' | 'grab' | 'moult' | 'death' | 'silt' | 'stagger' | 'sense' | 'pounce';
+  kind: 'hit' | 'kill' | 'eat' | 'tierUp' | 'parry' | 'guardBreak' | 'burst' | 'escape' | 'noticed' | 'hunted' | 'dodge' | 'ability' | 'grab' | 'moult' | 'death' | 'silt' | 'stagger' | 'sense' | 'pounce' | 'swallow' | 'routed';
   pos: Vec3; actor: number; other?: number; strength?: number; player?: number;
 }

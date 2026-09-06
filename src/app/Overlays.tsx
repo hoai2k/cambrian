@@ -68,17 +68,17 @@ export function Dialogs({ kind, onClose, settings, onSettings }: { kind: DialogK
           <div className="help-columns">
             <section>
               <h3>Hunting</h3>
-              <p>Hold <b>LT</b> to aim: the view moves over your shoulder and a crosshair sits at the centre of the screen. It snaps to nearby prey as you enter aim; after that, steer it with the right stick. When the crosshair fills, press <b>X</b> to pounce straight onto the target. <b>LB</b> dashes: press it with a stick direction to dash that way, or hold it with the stick centred and the dash fires the moment you move. Keep holding after the dash to sprint (<b>RT</b> sprints too). Press the <b>right stick</b> in and push up or down to zoom the camera.</p>
+              <p>Hold <b>LT</b> to aim: the view moves over your shoulder and a crosshair sits at the centre of the screen. It snaps to nearby prey as you enter aim; after that, steer it with the right stick. When the crosshair fills, press <b>RT</b> to pounce straight onto the target; RT without aiming pounces on whatever is ahead, or lunges. <b>LB</b> dashes: press it with a stick direction to burst that way with a moment of invulnerability, far enough to clear a giant's bite, or hold it with the stick centred and the dash fires the moment you move. <b>A</b> sprints, <b>RB</b> rises. Press the <b>right stick</b> in and push up or down to zoom the camera.</p>
               <h3>Fighting</h3>
-              <p><b>RB</b> chains three bites, the third hits hard. <b>X</b> is your heavy: slow, breaks guard, carries you forward. <b>B</b> held guards; tapped as a hit lands, it parries and staggers them (Waptia cannot guard, so B dodges). Hits from behind or below hurt more. Stamina runs everything: an exhausted creature can't dodge.</p>
+              <p><b>X</b> chains three bites, the third hits hard. <b>RT</b> is the pounce: a long committed lunge that breaks guard. <b>B</b> held raises a shield; tapped as a hit lands, it parries and staggers them (Waptia cannot guard, so B dodges). Hits from behind or below hurt more. Stamina runs everything: an exhausted creature can't dash. Nothing dies in one bite unless it is far smaller than you: a peer takes a couple of hits, a giant needs about three good bites to kill you, and after six seconds out of the fight your health starts to return. Bite a bigger predator enough and it breaks off and runs.</p>
               </section>
             <section>
               <h3>Giants</h3>
-              <p>The big ones cruise high in the light and only dive when they are hungry. When one turns your way an eye fills at the top of your screen: <b>stop moving</b>, or slip under the sponges and <b>hold still</b> until it loses you. They are slow to turn and cannot get their heads into dense cover.</p>
+              <p>The big ones cruise high in the light and only dive when they are hungry. When one turns your way an eye fills at the top of your screen: <b>stop moving</b>, or slip under the sponges and <b>hold still</b> until it loses you. They are slow to turn and cannot get their heads into dense cover. Their bite is a slow heavy: dash the moment you see the wind-up. If one does catch you at zero health, it swallows you whole.</p>
               <h3>Growing</h3>
               <p>The ring fills as you eat. Fill it, moult, get bigger. Kills of your own size are worth far more than plankton. Dying drops you a tier but keeps half your progress. Your signature <b>Y</b> ability unlocks at Adult.</p>
               <h3>Keyboard</h3>
-              <p><b>1:</b> WASD swim · arrows look · PgUp/PgDn zoom · Shift burst · Space rise · C sink · F bite · G heavy/pounce · R ability · V dash · Q guard · Tab aim · E sense · Esc pause.<br /><b>2:</b> IJKL swim · Right Shift burst · N rise · M sink · ; bite · ' heavy/pounce · P ability · / dash · U guard · O aim · Y sense.</p>
+              <p><b>1:</b> WASD swim · arrows look · PgUp/PgDn zoom · Shift sprint · Space rise · C sink · F bite · G pounce · R ability · V dash · Q guard · Tab aim · E sense · Esc pause.<br /><b>2:</b> IJKL swim · Right Shift sprint · N rise · M sink · ; bite · ' pounce · P ability · / dash · U guard · O aim · Y sense.</p>
             </section>
           </div>
         </div>

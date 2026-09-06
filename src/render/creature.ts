@@ -58,6 +58,9 @@ export class CreatureView {
   private wasAttack = false; private wasHit = false; private wasDead = false; private wasStagger = false; private wasDodge = false; private wasParry = false;
   private ring: THREE.Mesh;
   private ringMat: THREE.MeshBasicMaterial;
+  private shield: THREE.Mesh;
+  private shieldMat: THREE.MeshBasicMaterial;
+  private shieldA = 0;
   private highlight = 0;
   private highlightColor = new THREE.Color('#7ef0d8');
   private tmpQ = new THREE.Quaternion(); private tmpQ2 = new THREE.Quaternion(); private up = new THREE.Vector3(0, 1, 0);
@@ -67,7 +70,7 @@ export class CreatureView {
   readonly def;
   readonly heightUnits: number;
 
-  constructor(readonly creatureId: CreatureId, loaded: Loaded, private shared: { ringGeo: THREE.BufferGeometry }, readonly lod: Lod = 0) {
+  constructor(readonly creatureId: CreatureId, loaded: Loaded, private shared: { ringGeo: THREE.BufferGeometry; shieldGeo: THREE.BufferGeometry }, readonly lod: Lod = 0) {
     this.def = creature(creatureId);
     this.model = SkeletonUtils.clone(loaded.gltf.scene);
     this.model.scale.setScalar(loaded.unit);
@@ -101,6 +104,11 @@ export class CreatureView {
     this.ring = new THREE.Mesh(shared.ringGeo, this.ringMat);
     this.ring.rotation.x = -Math.PI / 2; this.ring.renderOrder = 3;
     this.group.add(this.ring);
+    // Guard shield: a translucent cap in front of the body so a block reads instantly.
+    this.shieldMat = new THREE.MeshBasicMaterial({ color: '#7ff0ff', transparent: true, opacity: 0, depthWrite: false, side: THREE.DoubleSide, blending: THREE.AdditiveBlending });
+    this.shield = new THREE.Mesh(shared.shieldGeo, this.shieldMat);
+    this.shield.renderOrder = 4; this.shield.visible = false;
+    this.inner.add(this.shield);
   }
 
   /** First clip name that exists on this rig. Lets hand-authored clips replace the stand-ins by name alone. */
@@ -152,7 +160,8 @@ export class CreatureView {
       // locomotion layer
       const held = a.state === 'ability' && a.abilityActive && ['burrow', 'enroll', 'shellUp', 'anchor', 'bristleFlare'].includes(def.ability);
       if (a.state === 'dead') { /* handled by one-shot */ }
-      else if (a.state === 'eating') { this.playLoop(this.pick('Eat') ?? (def.ground ? 'Crawl' : 'Swim')); this.loco?.setEffectiveTimeScale(this.has('Eat') ? 1 : 0.55); }
+      else if (a.state === 'eating' || a.holdT > 0) { this.playLoop(this.pick('Eat', 'Grab') ?? (def.ground ? 'Crawl' : 'Swim')); this.loco?.setEffectiveTimeScale(this.has('Eat') ? 1 : 0.55); }
+      else if (a.state === 'swallowed') { this.playLoop(this.pick('Stagger', 'Hit') ?? 'Idle'); this.loco?.setEffectiveTimeScale(0.8); }
       else if ((a.state === 'guard') && this.has('Guard')) { this.playLoop('Guard'); this.loco?.setEffectiveTimeScale(1); }
       else if (held && this.has('Ability')) { this.playLoop('Ability'); this.loco?.setEffectiveTimeScale(1); }
       else if (a.state === 'moult' && this.has('Moult')) { this.playLoop('Moult'); this.loco?.setEffectiveTimeScale(1); }
@@ -237,6 +246,18 @@ export class CreatureView {
       }
     } else this.inner.rotation.x = damp(this.inner.rotation.x, 0, 8, dt);
     if (a.state === 'dead') { const e = a.eaten; sx *= 1 - e * 0.6; sy *= 1 - e * 0.6; sz *= 1 - e * 0.6; }
+    if (a.state === 'swallowed') { const t = clamp(a.stateT / a.stateDur, 0, 1); const k = 1 - t * 0.9; sx *= k; sy *= k * (1 - t * 0.3); sz *= k; }
+    // shield
+    const guarding = a.state === 'guard' || a.state === 'parry' || (a.abilityActive && (def.ability === 'shellUp' || def.ability === 'anchor'));
+    this.shieldA = damp(this.shieldA, guarding ? (a.state === 'parry' ? 1 : 0.55) + (a.hitFlash > 0.25 ? 0.5 : 0) : 0, guarding ? 18 : 10, dt);
+    this.shield.visible = this.shieldA > 0.02;
+    if (this.shield.visible) {
+      this.shieldMat.opacity = this.shieldA * 0.36;
+      this.shieldMat.color.set(a.state === 'parry' ? '#ffffff' : a.hitFlash > 0.25 ? '#dfffff' : '#7ff0ff');
+      const r = 0.36;                            // group is scaled by L; shield is in unit (body-length) space
+      this.shield.scale.setScalar(r * (1 + (1 - this.shieldA) * 0.25));
+      this.shield.position.set(0, 0.04, 0.36);
+    }
     if (a.state === 'moult') { const p = Math.sin(a.stateT * 9) * 0.06; sx *= 1 + p; sz *= 1 - p; }
     this.group.scale.set(sx, sy, sz);
     this.inner.position.y = oy / Math.max(L, 1e-3);
@@ -274,7 +295,7 @@ export class CreatureView {
     this.mixer.stopAllAction();
     this.mixer.uncacheRoot(this.model);
     this.materials.forEach((m) => m.dispose());
-    this.ringMat.dispose();
+    this.ringMat.dispose(); this.shieldMat.dispose();
     this.group.removeFromParent();
   }
 }

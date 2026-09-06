@@ -31,8 +31,9 @@ export function readGamepad(gp: Gamepad): RawControls {
   const v = (i: number) => gp.buttons[i]?.value ?? 0;
   const c: RawControls = {
     mx, my: -my, lookX: lx, lookY: ly,
-    burst: v(7), rise: b(0), sink: b(10),
-    light: b(5), heavy: b(2), ability: b(3), dodge: b(4), guard: b(1), lock: v(6) > 0.4, sense: b(12),
+    // A sprint · RB rise · LS click sink · X bite · RT pounce · Y ability · LB dash · B guard · LT aim
+    burst: b(0) ? 1 : 0, rise: b(5), sink: b(10),
+    light: b(2), heavy: v(7) > 0.5, ability: b(3), dodge: b(4), guard: b(1), lock: v(6) > 0.4, sense: b(12),
     dash: b(4), aim: v(6) > 0.4, rsClick: b(11),
     menu: b(9), view: b(8), confirm: b(0), back: b(1),
     dleft: b(14), dright: b(15), dup: b(12), ddown: b(13),

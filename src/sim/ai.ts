@@ -20,7 +20,7 @@ export interface AiWorld {
 export function makeBrain(kind: BrainState['kind'], home: Vec3, rng: Rng, opts: Partial<BrainState> = {}): BrainState {
   return {
     kind, goal: kind === 'giant' ? 'patrol' : 'wander', target: -1, goalT: 0, thinkT: rng() * 0.3,
-    wanderTo: { ...home }, home: { ...home }, patrolIndex: 0, detection: new Map(), hunger: 3, lastEats: 0, parrySkill: 0.3,
+    wanderTo: { ...home }, home: { ...home }, patrolIndex: 0, detection: new Map(), hunger: 3, lastEats: 0, parrySkill: 0.3, courage: 1,
     aggression: rng(), reaction: 0.15 + rng() * 0.25, reactT: 0, ...opts,
   };
 }
@@ -172,7 +172,10 @@ export function thinkNeeds(g: AiWorld, a: Actor, b: BrainState, dt: number): Inp
       }
     }
     const hungry = b.hunger > 4 || a.hp < a.hpMax * 0.9 || a.controller === 'bot';
-    if (worst) { if (b.goal !== 'flee') b.goalT = 0; b.goal = 'flee'; b.target = worst.id; }
+    const attacker = a.lastHitBy >= 0 ? g.byId(a.lastHitBy) : undefined;
+    const routed = b.courage <= 0 && attacker && isAlive(attacker);
+    if (routed && a.controller !== 'bot') { if (b.goal !== 'flee') b.goalT = 0; b.goal = 'flee'; b.target = attacker.id; }
+    else if (worst) { if (b.goal !== 'flee') b.goalT = 0; b.goal = 'flee'; b.target = worst.id; }
     else if (rival && (a.hp > a.hpMax * 0.35 || a.controller === 'bot')) { if (b.goal !== 'fight') b.goalT = 0; b.goal = 'fight'; b.target = rival.id; }
     else if (prey && hungry) { if (b.goal !== 'hunt') b.goalT = 0; b.goal = 'hunt'; b.target = prey.id; }
     else if (def.id === 'wiwaxia' && biomeAt(a.pos.x, a.pos.z) === 'flats' && g.rng() < 0.6) { b.goal = 'graze'; b.target = -1; }
@@ -182,7 +185,7 @@ export function thinkNeeds(g: AiWorld, a: Actor, b: BrainState, dt: number): Inp
   const t = b.target >= 0 ? g.byId(b.target) : undefined;
   switch (b.goal) {
     case 'flee': {
-      if (!t || !isAlive(t)) { b.goal = 'wander'; break; }
+      if (!t || !isAlive(t) || (b.courage > 0.6 && b.goalT > 12)) { b.goal = 'wander'; b.goalT = 0; break; }
       const away = norm(sub(a.pos, t.pos));
       let dir: Vec3 = { ...away };
       const cover = g.nearestCover(a.pos, L, 30);
@@ -203,7 +206,7 @@ export function thinkNeeds(g: AiWorld, a: Actor, b: BrainState, dt: number): Inp
       const predicted = add(t.pos, vscale(t.vel, clamp(d / 8, 0, 0.6)));
       steerToward(a, predicted, out);
       out.burst = d > L * 2.5 && a.stamina > 20 ? 1 : 0;
-      if (d < L * 0.9 + lengthOf(t) * 0.4) out.light = true;
+      if (d < L * 0.9 + lengthOf(t) * 0.4) { if (lengthOf(t) > L * 0.45 && a.state === 'free') out.heavy = true; else out.light = true; }
       if (a.controller === 'bot' && d < L * 3 && def.ability === 'ambushSurge' && a.abilityCd <= 0) out.ability = true;
       break;
     }
@@ -267,7 +270,9 @@ export function thinkGiant(g: AiWorld, a: Actor, b: BrainState, dt: number): Inp
   const hungry = b.hunger > 70 + (a.id % 30);
   const shadow = a.controller === 'shadow';
 
-  if (b.goal !== 'hunt' && b.goal !== 'sleep' && b.goal !== 'notice') {
+  // Routed: enough bites from something smaller and even a giant backs off for a while.
+  if (b.courage <= 0 && b.goal !== 'flee' && a.lastHitBy >= 0) { b.goal = 'flee'; b.goalT = 0; b.target = a.lastHitBy; }
+  if (b.goal !== 'hunt' && b.goal !== 'sleep' && b.goal !== 'notice' && b.goal !== 'flee') {
     const found = bestDetected(b, 1, g);
     if (found) {
       const score = b.detection.get(found.id) ?? 0;
@@ -298,8 +303,15 @@ export function thinkGiant(g: AiWorld, a: Actor, b: BrainState, dt: number): Inp
       if (shadow) predicted.y = Math.max(predicted.y, LIGHT_WINDOW_Y - 1);
       steerToward(a, predicted, out);
       out.burst = d > L * 1.5 ? 1 : 0;
-      if (d < L * 0.75 + lengthOf(cur) * 0.4) out.light = true;
+      // A giant's bite is the heavy: a visible wind-up you can dash out of.
+      if (d < L * 0.8 + lengthOf(cur) * 0.4 && a.state === 'free') out.heavy = true;
       if (b.goalT > 18) { b.goal = 'patrol'; b.target = -1; b.goalT = 0; b.hunger = 20; }
+      break;
+    }
+    case 'flee': {
+      const from = b.target >= 0 ? g.byId(b.target) : undefined;
+      if (from && isAlive(from)) { const away = norm(sub(a.pos, from.pos)); out.worldMove = { x: away.x, y: 0.25, z: away.z }; out.burst = 1; }
+      if (b.goalT > 16 || !from || !isAlive(from)) { b.goal = 'patrol'; b.goalT = 0; b.target = -1; b.courage = 0.7; b.hunger = 0; }
       break;
     }
     case 'search': {

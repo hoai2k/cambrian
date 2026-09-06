@@ -50,7 +50,7 @@ function PlayerPanel({ p }: { p: PlayerHud }) {
       {p.aim && (
         <div className={`aim ${p.aim.hasTarget ? 'on-target' : ''} ${p.aim.inRange ? 'in-range' : ''} ${p.aim.ready ? '' : 'cooling'}`} style={{ color: p.aim.color }}>
           <i /><i /><i /><i /><b />
-          <span className="aim-label">{p.aim.inRange ? (p.aim.ready ? 'X · POUNCE' : '…') : p.aim.name ?? ''}</span>
+          <span className="aim-label">{p.aim.inRange ? (p.aim.ready ? 'RT · POUNCE' : '…') : p.aim.name ?? ''}</span>
         </div>
       )}
       {p.lock && !p.aim && (
@@ -85,7 +85,7 @@ function PlayerPanel({ p }: { p: PlayerHud }) {
       {!p.alive && (
         <div className="dead-overlay">
           <b>EATEN</b>
-          <span>Back in {Math.ceil(p.respawnIn)}… you slip down a tier.</span>
+          <span>Back in a moment… you slip down a tier.</span>
         </div>
       )}
     </>
