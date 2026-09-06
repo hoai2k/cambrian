@@ -1,8 +1,15 @@
 # 00 · Current state audit
 
-This is what exists in the repository today, read directly from the shipped
-build (there is no source code checked in). Everything in the redesign is
-grounded in these facts.
+> **Historical.** This audits the *pre-redesign* arena demo as it stood before
+> any of this work started, read directly from its shipped build (at the time,
+> no source was checked in). It is not a description of the repository today —
+> the redesign has since been built, the source lives in `src/`, the roster is
+> 21 creatures and the sea is endless. The document is kept unchanged because
+> every decision in `01` and `02` is grounded in these facts. For where the
+> project actually stands, see [the implementation status](README.md#implementation-status).
+
+This is what existed in the repository at the time of the audit. Everything in
+the redesign is grounded in these facts.
 
 ## What the repo contains
 
@@ -49,7 +56,7 @@ Bounding boxes are roughly 3–4 units long. The game rescales each model so its
 length equals the `length` stat below, so **uniform scaling already works**
 and growth can reuse the same pipeline.
 
-## Creature stat table shipped today
+## Creature stat table shipped at the time
 
 | id | ground | length | speed | hp | damage | reach | cooldown | defense | role |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -86,7 +93,7 @@ Playable area is a circle of radius ~33 units. Depth ranges from the
 seabed (~ −1 to 1) to y = 16. It looks good and it is procedural, so it can
 be made much bigger and more varied by parameterising the same generator.
 
-## Gameplay as shipped
+## Gameplay as it was shipped then
 
 - **Modes:** Co-op survival (gather 18 food, clear 3 predator waves) and
   Versus (first to 5 knockouts or lead after 4 minutes).
@@ -107,7 +114,7 @@ be made much bigger and more varied by parameterising the same generator.
   additive TurnLeft/TurnRight/Dive/Rise layers weighted by turn rate and
   vertical velocity. This is a solid base and is kept.
 
-## Why it is not fun (the problems the redesign solves)
+## Why it was not fun (the problems the redesign solved)
 
 1. **One button, one attack, no defence.** No block, dodge with invulnerability,
    parry, lock-on or spacing. Fights are two creatures facing each other and

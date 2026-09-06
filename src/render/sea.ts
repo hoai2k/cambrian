@@ -1,3 +1,4 @@
+import { SAND_COLORS, floraTint, rockTint } from '../shared/environment-colors';
 import * as THREE from 'three';
 import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js';
 import { clamp, makeRng, TAU } from '../shared/math';
@@ -26,6 +27,8 @@ export interface SeaEnvironment {
   update(time: number, dt: number, focus: THREE.Vector3, cams?: readonly THREE.Vector3[]): void;
   dispose(): void;
   sun: THREE.DirectionalLight;
+  /** Build the coarse tiles around a point up front, so a new view is never a hole. */
+  prime(x: number, z: number, radius?: number): void;
   /** Streaming counters for the profiler. */
   stats(): { chunks: number; far: number; pending: number };
 }
@@ -221,7 +224,7 @@ export function createSea(scene: THREE.Scene, world: WorldData, quality: Quality
    * where the beach climbs out of the water.
    */
   const tileW: BiomeWeights = { shallows: 0, nursery: 0, shelf: 0, forest: 0, boulders: 0, flats: 0, channel: 0, escarpment: 0, basin: 0 };
-  const sandColors = Object.fromEntries(BIOMES.map((b) => [b, new THREE.Color(ATMOS[b].sand)])) as Record<Biome, THREE.Color>;
+  const sandColors = Object.fromEntries(BIOMES.map((b) => [b, new THREE.Color(SAND_COLORS[b])])) as Record<Biome, THREE.Color>;
   const beach = new THREE.Color('#d9cfa4');
   const terrainTile = (view: ChunkView, segs: number) => {
     const x0 = view.x - CHUNK / 2, z0 = view.z - CHUNK / 2, step = CHUNK / segs;
@@ -338,7 +341,7 @@ export function createSea(scene: THREE.Scene, world: WorldData, quality: Quality
     terrainTile(view, detail === 'full' ? (high ? 32 : 20) : 8);
     instanced(view, 'boulders', boulderGeo, rockMat, chunk.boulders,
       (b, d) => { d.position.set(b.pos.x, b.pos.y, b.pos.z); d.rotation.set(0, b.rot, 0); d.scale.set(b.sx, b.sy, b.sz); },
-      { include: b => !b.variant, castShadow: detail === 'full', range: 400, color: (b) => color.setHSL(0.1 + crng() * 0.05, 0.1 + crng() * 0.1, b.shade * 0.55) });
+      { include: b => !b.variant, castShadow: detail === 'full', range: 400, color: (b) => color.fromArray(rockTint(b)) });
     for (const id of ['blade-spire', 'talus-shard'] as const) {
       instanced(view, id, id === 'blade-spire' ? bladeFallback : talusFallback, rockMat, chunk.boulders.filter(b => b.variant === id),
         (b, d) => { d.position.set(b.pos.x, b.pos.y, b.pos.z); d.rotation.set(0, b.rot, 0); d.scale.set(b.sx, b.sy, b.sz); },
@@ -368,7 +371,7 @@ export function createSea(scene: THREE.Scene, world: WorldData, quality: Quality
       const range = kind === 'tuft' ? 58 : kind === 'choia' ? 88 : kind === 'sac' ? 100 : kind === 'thalli' ? 100 : 125;
       instanced(view, `flora-${kind}`, set.geo, set.mat, items,
         (f, d) => { d.position.set(f.pos.x, f.pos.y, f.pos.z); d.rotation.set(0, f.rot, 0); d.scale.set(f.scale, f.sy, f.scale); },
-        { prop: floraProps[kind as Flora['kind']], range, maxLength: kind === 'tuft' || kind === 'lettuce' ? 7 : Infinity, color: (f) => { const old = color.setHSL(0.095 + crng() * 0.05, 0.14 + crng() * 0.12, f.shade * 0.72); return floraProps[f.kind] ? color.setRGB(f.shade, f.shade, f.shade) : old; },
+        { prop: floraProps[kind as Flora['kind']], range, maxLength: kind === 'tuft' || kind === 'lettuce' ? 7 : Infinity, color: (f) => color.fromArray(floraTint(f)),
           bend: (f, attr, i) => floraSlots.set(f, { attr, i }) });
     }
 
@@ -418,7 +421,12 @@ export function createSea(scene: THREE.Scene, world: WorldData, quality: Quality
     for (const c of world.chunks.values()) {
       scratchKeys.add(c.key);
       const v = views.get(c.key);
-      if (!v || v.detail !== 'full') { let d = Infinity; for (const cam of cams) d = Math.min(d, Math.hypot(cam.x - c.x, cam.z - c.z)); pending.push({ cx: c.cx, cz: c.cz, d, detail: 'full' }); }
+      if (v?.detail === 'full') continue;
+      let d = Infinity; for (const cam of cams) d = Math.min(d, Math.hypot(cam.x - c.x, cam.z - c.z));
+      // A chunk with no view at all draws nothing, which is a hole in the seabed. Lay the cheap
+      // coarse tile down first for cover, then upgrade it to full detail.
+      if (!v) pending.push({ cx: c.cx, cz: c.cz, d, detail: 'far' });
+      pending.push({ cx: c.cx, cz: c.cz, d, detail: 'full' });
     }
     const span = Math.ceil(FAR_RADIUS / CHUNK) + 1;
     for (const cam of cams) {
@@ -438,13 +446,20 @@ export function createSea(scene: THREE.Scene, world: WorldData, quality: Quality
       if (v.detail === 'full' && !world.chunks.has(v.key)) disposeView(v);
     }
     if (pending.length) {
-      pending.sort((a, b) => (a.detail === b.detail ? a.d - b.d : a.detail === 'full' ? -1 : 1));
-      // Nearest full views first, then far tiles, inside a time budget so a slow machine streams
-      // more slowly rather than stuttering. At least one view is always built, and the budget
-      // opens up when a lot is outstanding (match start, a teleport) so the ground fills in fast.
+      // Cover the ground before detailing it: anything with no view yet gets its cheap coarse tile
+      // first, nearest to a camera first, and only then are near chunks upgraded to full detail.
+      pending.sort((a, b) => {
+        const ac = a.detail === 'far' && !views.has(chunkKey(a.cx, a.cz)) ? 0 : a.detail === 'full' ? 1 : 2;
+        const bc = b.detail === 'far' && !views.has(chunkKey(b.cx, b.cz)) ? 0 : b.detail === 'full' ? 1 : 2;
+        return ac === bc ? a.d - b.d : ac - bc;
+      });
+      // A time budget per frame, so a slow machine streams more slowly rather than stuttering. At
+      // least one view is always built, and the budget opens up when a lot is outstanding (match
+      // start, a teleport) so the ground fills in fast.
       const budget = pending.length > 60 ? 14 : pending.length > 20 ? 9 : 6;
       const t0 = performance.now();
       for (const p of pending) {
+        if (p.detail === 'full' && views.get(chunkKey(p.cx, p.cz))?.detail === 'full') continue;
         buildView(p.cx, p.cz, p.detail);
         if (performance.now() - t0 > budget) break;
       }
@@ -590,6 +605,23 @@ export function createSea(scene: THREE.Scene, world: WorldData, quality: Quality
       particles.position.set(pOrigin.x, 0, pOrigin.z);
       (pGeo.attributes.position as THREE.BufferAttribute).needsUpdate = true;
       bloomMat.opacity = 0.65 + 0.25 * Math.sin(time * 1.3);
+    },
+    /**
+     * Lay the coarse tiles down around a point before the first frame is drawn. Match start and a
+     * teleport both drop the camera somewhere with no scenery built; without this the player sees
+     * the seabed end in mid-water for the second or two the budgeted streaming takes to catch up.
+     */
+    prime(x: number, z: number, radius = FAR_RADIUS) {
+      if (disposed) return;
+      const span = Math.ceil(radius / CHUNK) + 1;
+      const acx = chunkCoord(x), acz = chunkCoord(z);
+      const want: { cx: number; cz: number; d: number }[] = [];
+      for (let cx = acx - span; cx <= acx + span; cx++) for (let cz = acz - span; cz <= acz + span; cz++) {
+        const d = Math.hypot(x - (cx + 0.5) * CHUNK, z - (cz + 0.5) * CHUNK);
+        if (d <= radius && !views.has(chunkKey(cx, cz))) want.push({ cx, cz, d });
+      }
+      want.sort((a, b) => a.d - b.d);
+      for (const w of want) buildView(w.cx, w.cz, 'far');
     },
     stats() { let far = 0; for (const v of views.values()) if (v.detail === 'far') far++; return { chunks: views.size - far, far, pending: pending.length }; },
     dispose() {

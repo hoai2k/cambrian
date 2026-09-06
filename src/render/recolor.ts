@@ -76,6 +76,7 @@ interface Target {
 export interface Recolor {
   /** Applies a scheme by id. Unknown ids fall back to the authored colours. */
   setScheme(id: string): void;
+  blend(baseId: string, colors: Record<Slot, string> | undefined, amount: number): void;
   /** The slots this particular creature actually uses, in palette order. */
   readonly slots: readonly Slot[];
 }
@@ -116,6 +117,17 @@ export function makeRecolor(root: THREE.Object3D): Recolor {
   return {
     // Palette order, not the order the meshes happen to be traversed in.
     slots: SLOTS.filter((s) => used.has(s)),
+    blend(baseId, colors, amount) {
+      const base = scheme(baseId).colors;
+      const k = THREE.MathUtils.clamp(amount, 0, 1);
+      for (const t of targets) {
+        t.amount.value = colors ? (base ? 1 : k) : (base ? 1 : 0);
+        if (colors) {
+          t.tint.value.set(colors[t.slot]);
+          if (base) t.tint.value.lerp(new THREE.Color(base[t.slot]), 1-k);
+        } else if (base) t.tint.value.set(base[t.slot]);
+      }
+    },
     setScheme(id) {
       const colors = scheme(id).colors;
       for (const t of targets) {

@@ -1,0 +1,181 @@
+{
+  "creatures": {
+    "anomalocaris": {
+      "body": "#896742",
+      "eyes": "#485041",
+      "fins": "#9c7c53",
+      "legs": "#bf9860",
+      "accent": "#b0885b",
+      "underside": "#573d2a"
+    },
+    "burgessomedusa": {
+      "body": "#708a96",
+      "eyes": "#080c0a",
+      "fins": "#9b817b",
+      "legs": "#708a96",
+      "accent": "#708a96",
+      "underside": "#708a96"
+    },
+    "cambroraster": {
+      "body": "#7b6644",
+      "eyes": "#171e1a",
+      "fins": "#917a51",
+      "legs": "#ab956e",
+      "accent": "#9d845a",
+      "underside": "#7b6644"
+    },
+    "canadia": {
+      "body": "#815c5a",
+      "eyes": "#080c0a",
+      "fins": "#996a5e",
+      "legs": "#958d73",
+      "accent": "#815c5a",
+      "underside": "#815c5a"
+    },
+    "ctenorhabdotus": {
+      "body": "#507488",
+      "eyes": "#080c0a",
+      "fins": "#727a8c",
+      "legs": "#6e8499",
+      "accent": "#507488",
+      "underside": "#507488"
+    },
+    "hallucigenia": {
+      "body": "#765a48",
+      "eyes": "#0a0d0a",
+      "fins": "#765a48",
+      "legs": "#90725b",
+      "accent": "#4c4034",
+      "underside": "#765a48"
+    },
+    "isoxys": {
+      "body": "#778d9a",
+      "eyes": "#161e19",
+      "fins": "#91afba",
+      "legs": "#9dbdca",
+      "accent": "#7b939e",
+      "underside": "#778d9a"
+    },
+    "leanchoilia": {
+      "body": "#8b7493",
+      "eyes": "#171e19",
+      "fins": "#a98cb1",
+      "legs": "#b697bf",
+      "accent": "#8b7394",
+      "underside": "#8b7493"
+    },
+    "marrella": {
+      "body": "#57736a",
+      "eyes": "#080c0a",
+      "fins": "#57736a",
+      "legs": "#8d8462",
+      "accent": "#55614d",
+      "underside": "#57736a"
+    },
+    "nectocaris": {
+      "body": "#94735b",
+      "eyes": "#27322a",
+      "fins": "#80907f",
+      "legs": "#94735b",
+      "accent": "#6e563c",
+      "underside": "#94735b"
+    },
+    "odaraia": {
+      "body": "#759178",
+      "eyes": "#171e19",
+      "fins": "#80a180",
+      "legs": "#afb289",
+      "accent": "#80af9c",
+      "underside": "#759178"
+    },
+    "odontogriphus": {
+      "body": "#938c6a",
+      "eyes": "#080c0a",
+      "fins": "#a68560",
+      "legs": "#b99872",
+      "accent": "#ac936e",
+      "underside": "#938c6a"
+    },
+    "olenoides": {
+      "body": "#725f4a",
+      "eyes": "#201d14",
+      "fins": "#725f4a",
+      "legs": "#867355",
+      "accent": "#4b4132",
+      "underside": "#5a4937"
+    },
+    "opabinia": {
+      "body": "#735233",
+      "eyes": "#171e19",
+      "fins": "#8d6a42",
+      "legs": "#735233",
+      "accent": "#7b5a36",
+      "underside": "#735233"
+    },
+    "ottoia": {
+      "body": "#a18161",
+      "eyes": "#080c0a",
+      "fins": "#ab885c",
+      "legs": "#a18161",
+      "accent": "#95754c",
+      "underside": "#a18161"
+    },
+    "pikaia": {
+      "body": "#7b9b90",
+      "eyes": "#080c0a",
+      "fins": "#98a288",
+      "legs": "#a1af87",
+      "accent": "#716b55",
+      "underside": "#7b9b90"
+    },
+    "sidneyia": {
+      "body": "#8b714d",
+      "eyes": "#171e19",
+      "fins": "#a68760",
+      "legs": "#b69469",
+      "accent": "#907651",
+      "underside": "#8b714d"
+    },
+    "tamisiocaris": {
+      "body": "#627f7e",
+      "eyes": "#171f1b",
+      "fins": "#729995",
+      "legs": "#afae90",
+      "accent": "#9c7e54",
+      "underside": "#627f7e"
+    },
+    "vetulicola": {
+      "body": "#8a8b72",
+      "eyes": "#080c0a",
+      "fins": "#b09361",
+      "legs": "#b69467",
+      "accent": "#816945",
+      "underside": "#8a8b72"
+    },
+    "waptia": {
+      "body": "#83623c",
+      "eyes": "#161d18",
+      "fins": "#9a7d56",
+      "legs": "#a6885f",
+      "accent": "#87653e",
+      "underside": "#83623c"
+    },
+    "wiwaxia": {
+      "body": "#707a63",
+      "eyes": "#080c0a",
+      "fins": "#707a63",
+      "legs": "#8d8668",
+      "accent": "#4f6159",
+      "underside": "#707a63"
+    }
+  },
+  "props": {
+    "blade-spire": "#344955",
+    "cushion-sponge": "#c99e78",
+    "glass-fan": "#bcd8dd",
+    "lettuce-tuft": "#a2aa65",
+    "pebble-cluster": "#c2bdb8",
+    "spine-sponge": "#c2c7bb",
+    "talus-shard": "#445665"
+  }
+}

@@ -1,3 +1,4 @@
+import { stopHiding } from './concealment';
 import { clamp, dot, heading, norm, sub, type Vec3 } from '../shared/math';
 import { creature, type MoveDef } from './creatures';
 import { bandOf, isInvulnerable, lengthOf, massOf } from './actors';
@@ -7,6 +8,8 @@ export interface HitContext {
   events: WorldEvent[];
   byId: (id: number) => Actor | undefined;
   time: number;
+  /** The game's seeded RNG. Combat must not use Math.random, or a seed stops reproducing a match. */
+  rng: () => number;
 }
 
 /** Damage multiplier from relative size. Same size = 1. */
@@ -26,8 +29,8 @@ export function applyHit(ctx: HitContext, attacker: Actor, victim: Actor, move: 
   const dir: Vec3 = { x: toVictim.x, y: toVictim.y, z: toVictim.z };
 
   // Parry window: victim wins the exchange. AI parries only as often as its skill allows; otherwise the tap is a plain guard.
-  if (victim.state === 'parry' && victim.brain && Math.random() > victim.brain.parrySkill) { victim.state = 'guard'; }
-  if (victim.state === 'parry' || (victim.abilityActive && vdef.ability === 'bristleFlare' && move.damage < 15)) {
+  if (victim.state === 'parry' && victim.brain && ctx.rng() > victim.brain.parrySkill) { victim.state = 'guard'; }
+  if (victim.state === 'parry') {
     if (!(victim.abilityActive && vdef.ability === 'enroll')) {
       attacker.state = 'stagger'; attacker.stateT = 0; attacker.stateDur = 0.8;
       attacker.poise = attacker.poiseMax * 0.5;
@@ -64,12 +67,12 @@ export function applyHit(ctx: HitContext, attacker: Actor, victim: Actor, move: 
   const sf = sizeFactor(attacker, victim);
   const base = move.damage * (1 + 0.35 * momentum) * dirBonus * sf;
   let dmg = base * (1 - vdef.defense * (1 - clamp(move.armorPierce ?? 0, 0, 1)));
-  if (victim.abilityActive && victim.state === 'ability' && (vdef.ability === 'adhesiveGlide' || vdef.ability === 'combCruise')) dmg *= vdef.ability === 'adhesiveGlide' ? .55 : .7;
+  if (victim.abilityActive && (victim.state === 'guard' || victim.state === 'parry') && (vdef.ability === 'adhesiveGlide' || vdef.ability === 'combCruise')) dmg *= vdef.ability === 'adhesiveGlide' ? .55 : .7;
   let result: HitResult = 'hit';
 
   const guarding = victim.state === 'guard' && vdef.canGuard;
   if (guarding && !(move.guardBreak && move.damage >= 20 && sf >= 0.8)) {
-    dmg *= 0.45;
+    dmg *= vdef.ability === 'shellUp' || vdef.ability === 'enroll' ? .25 : .45;
     const cost = 10 * sf * (vdef.id === 'olenoides' ? 0.6 : 1) * (victim.abilityActive && vdef.ability === 'anchor' ? 0 : 1);
     victim.stamina -= cost;
     result = 'blocked';
@@ -105,6 +108,7 @@ export function applyHit(ctx: HitContext, attacker: Actor, victim: Actor, move: 
   }
 
   victim.hp -= dmg;
+  if (dmg > 0 && victim.hideMode !== 'none') { stopHiding(victim); victim.seen = 2; }
   victim.hitFlash = 0.42;
   victim.sinceHit = 0; victim.lastHitBy = attacker.id;
   // Courage: being bitten by something smaller than you is alarming. Enough of it and you run.
@@ -140,7 +144,7 @@ export function applyHit(ctx: HitContext, attacker: Actor, victim: Actor, move: 
 export function startSwallow(ctx: HitContext, predator: Actor, victim: Actor) {
   victim.hp = 0;
   victim.state = 'swallowed'; victim.stateT = 0; victim.stateDur = 1.6;
-  victim.swallowedBy = predator.id; victim.lockTarget = -1; victim.abilityActive = false; victim.vel = { x: 0, y: 0, z: 0 };
+  stopHiding(victim); victim.swallowedBy = predator.id; victim.lockTarget = -1; victim.abilityActive = false; victim.vel = { x: 0, y: 0, z: 0 };
   if (victim.grabbedBy >= 0) { const g = ctx.byId(victim.grabbedBy); if (g && g.grabbing === victim.id) { g.state = 'free'; g.grabbing = -1; } victim.grabbedBy = -1; }
   predator.holdT = 1.4;
   if (predator.state === 'attack' || predator.state === 'pounce') { predator.state = 'free'; predator.stateT = 0; }
@@ -154,8 +158,8 @@ export function kill(ctx: HitContext, victim: Actor, killer?: Actor) {
   victim.killer = killer?.id ?? -1;
   victim.deathY = victim.pos.y; victim.sparkled = false;
   // a little random spin so the body tumbles as it goes limp
-  victim.tumble = { x: (Math.random() - 0.5) * 2.2, y: (Math.random() - 0.5) * 1.2, z: (Math.random() - 0.5) * 2.2 };
-  victim.lockTarget = -1; victim.abilityActive = false;
+  victim.tumble = { x: (ctx.rng() - 0.5) * 2.2, y: (ctx.rng() - 0.5) * 1.2, z: (ctx.rng() - 0.5) * 2.2 };
+  stopHiding(victim); victim.lockTarget = -1; victim.abilityActive = false;
   if (victim.grabbing >= 0) { const g = ctx.byId(victim.grabbing); if (g && g.state === 'grabbed') { g.state = 'free'; g.grabbedBy = -1; } victim.grabbing = -1; }
   if (victim.grabbedBy >= 0) { const g = ctx.byId(victim.grabbedBy); if (g && g.state === 'grabbing') { g.state = 'free'; g.grabbing = -1; } victim.grabbedBy = -1; }
   if (killer) {

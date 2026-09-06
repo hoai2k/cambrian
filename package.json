@@ -13,7 +13,8 @@
     "bindings": "esbuild tools/menu-bindings-test.ts --bundle --platform=node --format=esm --outfile=node_modules/.cache/menu-bindings.mjs && node node_modules/.cache/menu-bindings.mjs",
     "cards": "node tools/make-cards.mjs",
     "lods": "node tools/make-lods.mjs",
-    "portraits": "node tools/portrait-test.mjs"
+    "portraits": "node tools/portrait-test.mjs",
+    "hiding": "esbuild tools/hiding-test.ts --bundle --platform=node --format=esm --outfile=node_modules/.cache/hiding-test.mjs && node node_modules/.cache/hiding-test.mjs"
   },
   "dependencies": {
     "react": "^19.1.0",
