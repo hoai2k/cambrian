@@ -418,6 +418,8 @@ export class Engine {
         case 'hunted': { audio.play('hunted'); if (e.player != null && e.player >= 0) { const d = padOf(e.player); if (typeof d === 'number') rumble(d, 0.6, 0.9, 500); } break; }
         case 'escape': { audio.play('escape'); break; }
         case 'noticed': { audio.play('noticed'); break; }
+        case 'sense': { audio.play('sense'); break; }
+        case 'burst': { audio.play('burst'); break; }
       }
     }
     evs.length = 0;

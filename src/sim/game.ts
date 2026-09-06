@@ -425,7 +425,7 @@ export class Game implements AiWorld {
         if (nt) { a.lockTarget = nt.id; a.comboT = 0.4; }
       }
       // Sense
-      if (justSense && a.senseCd === 0) { a.senseT = 2.2; a.senseCd = def.ability === 'burrow' ? 3 : 6; this.flag(a, 'sense'); }
+      if (justSense && a.senseCd === 0) { a.senseT = 2.2; a.senseCd = def.ability === 'burrow' ? 3 : 6; this.flag(a, 'sense'); this.events.push({ kind: 'sense', pos: { ...a.pos }, actor: a.id, player: a.player }); }
       // Ability
       if (justAbility && a.abilityCd === 0 && a.tier >= 2 || (justAbility && a.abilityCd === 0 && a.controller !== 'player')) this.startAbility(a, def);
       // Dodge
@@ -536,7 +536,8 @@ export class Game implements AiWorld {
     // Hunted meter (for players)
     if (a.controller === 'player' || a.controller === 'bot') this.updateHunted(a);
 
-    a.prev = { light: input.light, heavy: input.heavy, ability: input.ability, dodge: input.dodge, guard: input.guard, lock: input.lock, sense: input.sense, rise: input.rise };
+    if (bursting && !a.prev.burst && a.controller === 'player') this.events.push({ kind: 'burst', pos: { ...a.pos }, actor: a.id, player: a.player });
+    a.prev = { light: input.light, heavy: input.heavy, ability: input.ability, dodge: input.dodge, guard: input.guard, lock: input.lock, sense: input.sense, rise: input.rise, burst: bursting };
     // onboarding flags
     if (a.controller === 'player') {
       if (mag > 0.2) this.flag(a, 'moved');

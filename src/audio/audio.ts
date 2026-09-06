@@ -1,12 +1,38 @@
-/** Fully synthesized audio: no sample files needed. */
+/**
+ * Game audio. Generated sample library (public/assets/sfx, made with tools/gen-sfx.mjs) with a
+ * synthesized fallback for anything that has not loaded yet, so the game is never silent.
+ */
+const SFX_BASE = `${import.meta.env.BASE_URL}assets/sfx/`;
+
+/** event kind → sample files (variants are chosen at random) */
+const SAMPLES: Record<string, string[]> = {
+  eat: ['bite-1', 'bite-2', 'bite-3'],
+  crunch: ['crunch-1', 'crunch-2'],
+  hit: ['hit-light-1', 'hit-light-2'],
+  'hit-heavy': ['hit-heavy-1', 'hit-heavy-2'],
+  parry: ['parry'], guardBreak: ['guard-break'], stagger: ['stagger'],
+  dodge: ['dodge-1', 'dodge-2'], burst: ['burst'], silt: ['silt'], grab: ['grab'],
+  kill: ['kill'], death: ['death'], tierUp: ['tier-up'], hunted: ['hunted'], escape: ['escape'],
+  sense: ['sense'], ability: ['ability'], heartbeat: ['heartbeat'], noticed: ['sense'], respawn: ['ui-join'],
+  'ui-move': ['ui-move'], 'ui-confirm': ['ui-confirm'], 'ui-back': ['ui-back'], 'ui-join': ['ui-join'], 'ui-start': ['ui-start'], won: ['won'],
+};
+const LOOPS = { ambient: 'ambient-reef', drone: 'giant-drone' } as const;
+
 export class GameAudio {
   private ctx?: AudioContext;
   private master?: GainNode;
+  private sfxBus?: GainNode;
   private ambGain?: GainNode;
+  private synthAmbGain?: GainNode;
   private tensionGain?: GainNode;
+  private synthTensionGain?: GainNode;
+  private buffers = new Map<string, AudioBuffer>();
+  private loading = new Set<string>();
   private heartT = 0;
   private tension = 0;
   private started = false;
+  private ambientStarted = false;
+  private lastPlay = new Map<string, number>();
   volume = 0.8;
   muted = false;
 
@@ -17,23 +43,66 @@ export class GameAudio {
     if (!Ctx) return;
     const ctx = new Ctx();
     this.ctx = ctx;
-    this.master = ctx.createGain(); this.master.gain.value = this.volume; this.master.connect(ctx.destination);
-    // Ambience: two slow detuned drones through a low-pass, plus a filtered noise wash.
-    this.ambGain = ctx.createGain(); this.ambGain.gain.value = 0.0; this.ambGain.connect(this.master);
-    const lp = ctx.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 420; lp.connect(this.ambGain);
+    this.master = ctx.createGain(); this.master.gain.value = this.muted ? 0 : this.volume; this.master.connect(ctx.destination);
+    this.sfxBus = ctx.createGain(); this.sfxBus.gain.value = 0.9; this.sfxBus.connect(this.master);
+    // Sample-based ambience and tension (start silent, fade in once loaded)
+    this.ambGain = ctx.createGain(); this.ambGain.gain.value = 0; this.ambGain.connect(this.master);
+    this.tensionGain = ctx.createGain(); this.tensionGain.gain.value = 0; this.tensionGain.connect(this.master);
+    // Synth fallbacks: drones through a low-pass, plus a filtered noise wash
+    this.synthAmbGain = ctx.createGain(); this.synthAmbGain.gain.value = 0; this.synthAmbGain.connect(this.master);
+    const lp = ctx.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 420; lp.connect(this.synthAmbGain);
     for (const [f, type] of [[55, 'sine'], [82.5, 'triangle'], [110.2, 'sine']] as const) {
       const o = ctx.createOscillator(); o.type = type; o.frequency.value = f;
       const g = ctx.createGain(); g.gain.value = f < 60 ? 0.35 : 0.14; o.connect(g); g.connect(lp); o.start();
-      const lfo = ctx.createOscillator(); lfo.frequency.value = 0.05 + Math.random() * 0.05; const lg = ctx.createGain(); lg.gain.value = 1.5; lfo.connect(lg); lg.connect(o.detune); lfo.start();
     }
     const noise = this.noiseSource(); const nf = ctx.createBiquadFilter(); nf.type = 'bandpass'; nf.frequency.value = 600; nf.Q.value = 0.5;
-    const ng = ctx.createGain(); ng.gain.value = 0.05; noise.connect(nf); nf.connect(ng); ng.connect(this.ambGain);
-    this.ambGain.gain.linearRampToValueAtTime(0.6, ctx.currentTime + 3);
-    // Tension layer: low pulsing drone
-    this.tensionGain = ctx.createGain(); this.tensionGain.gain.value = 0; this.tensionGain.connect(this.master);
+    const ng = ctx.createGain(); ng.gain.value = 0.05; noise.connect(nf); nf.connect(ng); ng.connect(this.synthAmbGain);
+    this.synthAmbGain.gain.linearRampToValueAtTime(0.5, ctx.currentTime + 3);
+    this.synthTensionGain = ctx.createGain(); this.synthTensionGain.gain.value = 0; this.synthTensionGain.connect(this.master);
     const td = ctx.createOscillator(); td.type = 'sawtooth'; td.frequency.value = 41; const tf = ctx.createBiquadFilter(); tf.type = 'lowpass'; tf.frequency.value = 160;
-    td.connect(tf); tf.connect(this.tensionGain); td.start();
+    td.connect(tf); tf.connect(this.synthTensionGain); td.start();
+    void this.preload();
   }
+
+  private async preload() {
+    const names = new Set<string>([...Object.values(SAMPLES).flat(), ...Object.values(LOOPS)]);
+    // UI and frequent sounds first
+    const order = ['ui-start', 'ui-confirm', 'ui-move', 'bite-1', 'hit-light-1', 'ambient-reef', 'giant-drone', 'heartbeat', ...names];
+    for (const n of order) await this.load(n);
+  }
+  private async load(name: string): Promise<AudioBuffer | undefined> {
+    if (!this.ctx) return undefined;
+    if (this.buffers.has(name)) return this.buffers.get(name);
+    if (this.loading.has(name)) return undefined;
+    this.loading.add(name);
+    try {
+      const res = await fetch(`${SFX_BASE}${name}.mp3`);
+      if (!res.ok) throw new Error(String(res.status));
+      const buf = await this.ctx.decodeAudioData(await res.arrayBuffer());
+      this.buffers.set(name, buf);
+      if (name === LOOPS.ambient) this.startAmbient();
+      if (name === LOOPS.drone) this.startDrone();
+      return buf;
+    } catch { return undefined; } finally { this.loading.delete(name); }
+  }
+
+  private startLoop(name: string, dest: AudioNode) {
+    const ctx = this.ctx!; const buf = this.buffers.get(name); if (!buf) return;
+    const src = ctx.createBufferSource(); src.buffer = buf; src.loop = true;
+    // gentle crossfade seam: start slightly in, with a short loop region trimmed off the ends
+    src.loopStart = 0.05; src.loopEnd = Math.max(0.1, buf.duration - 0.05);
+    src.connect(dest); src.start(0, 0.05);
+  }
+  private startAmbient() {
+    if (this.ambientStarted || !this.ctx || !this.ambGain || !this.synthAmbGain) return;
+    this.ambientStarted = true;
+    this.startLoop(LOOPS.ambient, this.ambGain);
+    const t = this.ctx.currentTime;
+    this.ambGain.gain.linearRampToValueAtTime(0.55, t + 2.5);
+    this.synthAmbGain.gain.linearRampToValueAtTime(0, t + 2.5);
+  }
+  private startDrone() { if (this.tensionGain) this.startLoop(LOOPS.drone, this.tensionGain); }
+
   resume() { this.ctx?.resume(); }
   private noiseSource() {
     const ctx = this.ctx!;
@@ -43,12 +112,58 @@ export class GameAudio {
   }
   setVolume(v: number) { this.volume = v; if (this.master) this.master.gain.value = this.muted ? 0 : v; }
   setMuted(m: boolean) { this.muted = m; this.setVolume(this.volume); }
-  setTension(t: number) { this.tension = t; if (this.tensionGain && this.ctx) this.tensionGain.gain.setTargetAtTime(t * 0.35, this.ctx.currentTime, 0.4); }
+  setTension(t: number) {
+    this.tension = t;
+    if (!this.ctx) return;
+    const now = this.ctx.currentTime;
+    const haveDrone = this.buffers.has(LOOPS.drone);
+    this.tensionGain?.gain.setTargetAtTime(haveDrone ? t * 0.7 : 0, now, 0.5);
+    this.synthTensionGain?.gain.setTargetAtTime(haveDrone ? 0 : t * 0.3, now, 0.5);
+  }
   update(dt: number) {
     if (!this.ctx || this.tension < 0.2) { this.heartT = 0; return; }
     this.heartT -= dt;
-    if (this.heartT <= 0) { this.heartT = 1.1 - this.tension * 0.55; this.thump(0.5 + this.tension * 0.5); setTimeout(() => this.thump(0.3 + this.tension * 0.3), 140); }
+    if (this.heartT <= 0) {
+      this.heartT = 1.15 - this.tension * 0.55;
+      if (this.buffers.has('heartbeat')) this.playSample('heartbeat', 0.5 + this.tension * 0.5, 0, 1 + (this.tension - 0.5) * 0.15);
+      else { this.thump(0.5 + this.tension * 0.5); setTimeout(() => this.thump(0.3 + this.tension * 0.3), 140); }
+    }
   }
+
+  private playSample(name: string, vol: number, pan = 0, rate = 1) {
+    const ctx = this.ctx; const buf = this.buffers.get(name); if (!ctx || !buf || !this.sfxBus) return false;
+    const src = ctx.createBufferSource(); src.buffer = buf; src.playbackRate.value = rate;
+    const g = ctx.createGain(); g.gain.value = Math.min(1.5, vol);
+    const p = ctx.createStereoPanner(); p.pan.value = pan;
+    src.connect(g); g.connect(p); p.connect(this.sfxBus); src.start();
+    return true;
+  }
+
+  /** Play a game or UI event. `strength` scales volume and slightly pitch. */
+  play(kind: string, strength = 1, pan = 0) {
+    if (!this.ctx) return;
+    // rate-limit spammy kinds so schools of snacks do not turn into a machine gun
+    const now = performance.now(); const last = this.lastPlay.get(kind) ?? 0;
+    const minGap = kind === 'eat' ? 70 : kind === 'hit' ? 40 : 0;
+    if (now - last < minGap) return;
+    this.lastPlay.set(kind, now);
+
+    const s = Math.min(2, Math.max(0.2, strength));
+    let key = kind;
+    if (kind === 'hit' && s > 1.1) key = 'hit-heavy';
+    if (kind === 'eat' && s > 0.5) key = 'crunch';
+    const list = SAMPLES[key] ?? SAMPLES[kind];
+    if (list) {
+      const name = list[Math.floor(Math.random() * list.length)];
+      const rate = (0.94 + Math.random() * 0.12) * (kind === 'eat' ? 1.15 - Math.min(0.3, s * 0.3) : 1);
+      const vol = kind.startsWith('ui') ? 0.7 : kind === 'eat' ? 0.45 + s * 0.3 : 0.6 + s * 0.35;
+      if (this.playSample(name, vol, pan, rate)) return;
+      void this.load(name);
+    }
+    this.synth(kind, s, pan);
+  }
+
+  // ---------- synthesized fallbacks ----------
   private thump(vol: number) {
     const ctx = this.ctx; if (!ctx || !this.master) return;
     const o = ctx.createOscillator(); o.type = 'sine'; o.frequency.setValueAtTime(70, ctx.currentTime); o.frequency.exponentialRampToValueAtTime(38, ctx.currentTime + 0.18);
@@ -71,10 +186,7 @@ export class GameAudio {
     const p = ctx.createStereoPanner(); p.pan.value = pan;
     src.connect(f); f.connect(g); g.connect(p); p.connect(this.master); src.stop(ctx.currentTime + dur + 0.05);
   }
-
-  play(kind: string, strength = 1, pan = 0) {
-    if (!this.ctx) return;
-    const s = Math.min(2, Math.max(0.2, strength));
+  private synth(kind: string, s: number, pan: number) {
     switch (kind) {
       case 'hit': this.burstNoise(0.12, 0.35 * s, 700, 0.8, pan); this.tone(120, 0.16, 0.35 * s, 'sine', 55, pan); break;
       case 'eat': this.tone(520 + Math.random() * 200, 0.08, 0.12, 'triangle', 300, pan); this.burstNoise(0.05, 0.08, 2400, 2, pan); break;
@@ -91,9 +203,8 @@ export class GameAudio {
       case 'tierUp': [0, 0.12, 0.24, 0.4].forEach((d, i) => setTimeout(() => { this.tone([261, 329, 392, 523][i], 0.8, 0.25, 'triangle'); }, d * 1000)); this.thump(1); break;
       case 'hunted': this.tone(55, 1.2, 0.35, 'sawtooth', 45); this.thump(1); break;
       case 'escape': [0, 0.18].forEach((d, i) => setTimeout(() => this.tone([880, 1320][i], 0.9, 0.18, 'sine'), d * 1000)); break;
-      case 'noticed': this.tone(330, 0.3, 0.12, 'sine', 220); break;
+      case 'noticed': case 'sense': this.tone(330, 0.3, 0.12, 'sine', 220); break;
       case 'respawn': this.tone(392, 0.5, 0.15, 'triangle', 523); break;
-      // UI
       case 'ui-move': this.tone(700, 0.06, 0.08, 'square'); break;
       case 'ui-confirm': this.tone(520, 0.12, 0.15, 'triangle', 780); break;
       case 'ui-back': this.tone(400, 0.12, 0.12, 'triangle', 260); break;
