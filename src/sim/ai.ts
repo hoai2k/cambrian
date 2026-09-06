@@ -1,7 +1,7 @@
 import { add, clamp, dist, distXZ, dot, heading, len3, norm, scale as vscale, sub, TAU, v3, type Rng, type Vec3 } from '../shared/math';
 import { bandOf, isAlive, isHidden, lengthOf } from './actors';
 import { creature } from './creatures';
-import type { Actor, BrainState, InputFrame } from './types';
+import type { Actor, BrainState, InputFrame, WorldEvent } from './types';
 import { emptyInput } from './types';
 import { biomeAt, LIGHT_WINDOW_Y, nurseryFactor, sampleHeight, SURFACE_Y, WORLD_RADIUS, type Cover, type WorldData } from './world';
 
@@ -14,6 +14,7 @@ export interface AiWorld {
   rng: Rng;
   nearestCover(pos: Vec3, length: number, r: number): Cover | undefined;
   players: Actor[];
+  events: WorldEvent[];
 }
 
 export function makeBrain(kind: BrainState['kind'], home: Vec3, rng: Rng, opts: Partial<BrainState> = {}): BrainState {
@@ -67,12 +68,14 @@ export function updateDetection(g: AiWorld, hunter: Actor, b: BrainState, dt: nu
     const sizeF = clamp(lengthOf(t) / L * 2.5, 0.25, 1.5);
     const speed = len3(t.vel);
     const motion = t.state === 'attack' ? 1.5 : speed > 0.3 ? (t.burstT > 0 || t.noise > 2 ? 2.5 : 1) : 0.5;
-    const coverF = (isHidden(t) ? 0.03 : 1 - t.cover * 0.85) * (L > 1.2 && nurseryFactor(t.pos.x, t.pos.z) > 0.35 ? 0.12 : 1);
+    const coverF = (isHidden(t) ? 0.03 : 1 - t.cover * 0.95) * (L > 1.2 && nurseryFactor(t.pos.x, t.pos.z) > 0.35 ? 0.12 : 1);
     const distF = clamp(1.6 - d / range, 0.2, 1.6);
-    const rate = sight * sizeF * motion * coverF * distF * 1.1;
+    // Only clear signals grow the score: a still or covered target decays out of attention.
+    const rate = sight * sizeF * motion * coverF * distF * 1.1 - 0.35;
     const prev = b.detection.get(t.id) ?? 0;
-    const next = clamp(prev + rate * dt - 0.5 * dt * (rate === 0 ? 1 : 0), 0, 3);
+    const next = clamp(prev + rate * dt, 0, 3);
     b.detection.set(t.id, next);
+    if (prev < 1 && next >= 1 && t.controller === 'player') g.events.push({ kind: 'noticed', pos: { ...hunter.pos }, actor: hunter.id, other: t.id, player: t.player });
   }
   for (const [id, v] of b.detection) {
     if (!seenIds.has(id)) {
@@ -195,6 +198,7 @@ export function thinkNeeds(g: AiWorld, a: Actor, b: BrainState, dt: number): Inp
     case 'hunt': {
       if (!t || !isAlive(t) || isHidden(t)) { b.goal = 'wander'; b.target = -1; break; }
       if (L > 1.2 && nurseryFactor(t.pos.x, t.pos.z) > 0.35) { b.goal = 'wander'; b.target = -1; b.goalT = 0; pickWander(a, b, g.rng, 30); break; }
+      if (b.goalT > 9 || (t.cover > 0.45 && t.stillness > 0.8 && lengthOf(t) < L * 0.7)) { b.goal = 'wander'; b.target = -1; b.goalT = 0; b.hunger = 0; pickWander(a, b, g.rng, 30); break; }
       const d = dist(a.pos, t.pos);
       const predicted = add(t.pos, vscale(t.vel, clamp(d / 8, 0, 0.6)));
       steerToward(a, predicted, out);
@@ -253,35 +257,56 @@ export function thinkGiant(g: AiWorld, a: Actor, b: BrainState, dt: number): Inp
   const out = emptyInput();
   const def = creature(a.creature);
   const L = lengthOf(a);
-  b.goalT += dt; b.thinkT -= dt;
+  b.goalT += dt; b.thinkT -= dt; b.hunger += dt;
+  if (a.eats !== b.lastEats) { b.lastEats = a.eats; b.hunger = 0; }
   if (b.thinkT <= 0) { b.thinkT = 0.1; updateDetection(g, a, b, 0.1); }
   const cur = b.target >= 0 ? g.byId(b.target) : undefined;
   const curScore = cur ? (b.detection.get(cur.id) ?? 0) : 0;
+  // Giants cruise high and only come down when hungry (roughly once every 70–100 s) or when
+  // something practically swims into their mouth. Noticing is telegraphed before any dive.
+  const hungry = b.hunger > 70 + (a.id % 30);
+  const shadow = a.controller === 'shadow';
 
-  if (b.goal !== 'hunt' && b.goal !== 'sleep') {
-    const found = bestDetected(b, 2, g);
-    if (found) { b.goal = 'hunt'; b.target = found.id; b.goalT = 0; b.lastSeen = { ...found.pos }; }
+  if (b.goal !== 'hunt' && b.goal !== 'sleep' && b.goal !== 'notice') {
+    const found = bestDetected(b, 1, g);
+    if (found) {
+      const score = b.detection.get(found.id) ?? 0;
+      if (score >= 2.8 || (hungry && score >= 2)) { b.goal = 'hunt'; b.target = found.id; b.goalT = 0; b.lastSeen = { ...found.pos }; }
+      else if (b.goal !== 'search') { b.goal = 'notice'; b.target = found.id; b.goalT = 0; }
+    }
   }
   switch (b.goal) {
+    case 'notice': {
+      // Turn toward it and hang in the water: the player sees the head swing round and the eye fill.
+      if (cur && isAlive(cur)) { const to = norm(sub(cur.pos, a.pos)); out.worldMove = vscale({ x: to.x, y: 0, z: to.z }, 0.18); }
+      if (cur && isAlive(cur) && (curScore >= 2.8 || (hungry && curScore >= 2))) { b.goal = 'hunt'; b.goalT = 0; b.lastSeen = { ...cur.pos }; break; }
+      if (b.goalT > 3 || !cur || !isAlive(cur) || curScore < 0.6) {
+        b.goal = 'patrol'; b.goalT = 0; b.target = -1;
+        if (cur) b.detection.set(cur.id, Math.min(curScore, 0.8)); // it looked, it lost interest; do not re-notice instantly
+      }
+      break;
+    }
     case 'hunt': {
-      if (!cur || !isAlive(cur) || curScore < 0.5 || isHidden(cur) || (nurseryFactor(cur.pos.x, cur.pos.z) > 0.35 && a.controller !== 'shadow')) {
+      if (!cur || !isAlive(cur) || curScore < 0.5 || isHidden(cur) || (nurseryFactor(cur.pos.x, cur.pos.z) > 0.35 && !shadow)) {
         b.goal = 'search'; b.goalT = 0; b.target = -1; if (cur) b.detection.set(cur.id, Math.min(curScore, 0.4)); break;
       }
       b.lastSeen = { ...cur.pos };
       const d = dist(a.pos, cur.pos);
-      const predicted = add(cur.pos, vscale(cur.vel, clamp(d / 10, 0, 0.7)));
-      if (a.controller === 'shadow') predicted.y = Math.max(predicted.y, LIGHT_WINDOW_Y - 1);
+      // cannot get its head into dense cover: circles, then gives up
+      if (cur.cover > 0.45 && d < L * 1.2) { b.goalT += dt * 2; const side = { x: -(cur.pos.z - a.pos.z), y: 0, z: cur.pos.x - a.pos.x }; out.worldMove = vscale(norm(side), 0.5); if (b.goalT > 14) { b.goal = 'search'; b.goalT = 0; b.target = -1; b.detection.set(cur.id, 0.3); } break; }
+      const predicted = add(cur.pos, vscale(cur.vel, clamp(d / 10, 0, 0.6)));
+      if (shadow) predicted.y = Math.max(predicted.y, LIGHT_WINDOW_Y - 1);
       steerToward(a, predicted, out);
-      out.burst = d > L * 1.2 ? 1 : 0;
+      out.burst = d > L * 1.5 ? 1 : 0;
       if (d < L * 0.75 + lengthOf(cur) * 0.4) out.light = true;
-      if (b.goalT > 40) { b.goal = 'patrol'; b.target = -1; b.goalT = 0; }
+      if (b.goalT > 18) { b.goal = 'patrol'; b.target = -1; b.goalT = 0; b.hunger = 20; }
       break;
     }
     case 'search': {
-      const found = bestDetected(b, 1.2, g);
-      if (found) { b.goal = 'hunt'; b.target = found.id; b.goalT = 0; break; }
-      if (b.lastSeen) steerToward(a, add(b.lastSeen, { x: Math.sin(g.time * 0.8) * 6, y: 0, z: Math.cos(g.time * 0.7) * 6 }), out, 0.6);
-      if (b.goalT > 6) { b.goal = 'patrol'; b.goalT = 0; }
+      const found = bestDetected(b, 1.6, g);
+      if (found && (hungry || (b.detection.get(found.id) ?? 0) >= 2.8)) { b.goal = 'hunt'; b.target = found.id; b.goalT = 0; break; }
+      if (b.lastSeen) steerToward(a, add(b.lastSeen, { x: Math.sin(g.time * 0.8) * 6, y: 2, z: Math.cos(g.time * 0.7) * 6 }), out, 0.5);
+      if (b.goalT > 5) { b.goal = 'patrol'; b.goalT = 0; b.hunger = Math.min(b.hunger, 40); }
       break;
     }
     case 'sleep': {
@@ -292,15 +317,12 @@ export function thinkGiant(g: AiWorld, a: Actor, b: BrainState, dt: number): Inp
     default: {
       const route = b.patrol ?? [b.home];
       const wp = route[b.patrolIndex % route.length];
-      steerToward(a, wp, out, 0.5);
-      if (distXZ(a.pos, wp) < L * 1.2) { b.patrolIndex = (b.patrolIndex + 1) % route.length; if (b.patrolIndex === 0 && g.rng() < 0.35 && a.controller !== 'shadow') { b.goal = 'sleep'; b.goalT = 0; } }
-      // opportunistic snack on ambient adults
-      const found = bestDetected(b, 2, g);
-      if (found) { b.goal = 'hunt'; b.target = found.id; b.goalT = 0; }
+      steerToward(a, wp, out, 0.45);
+      if (distXZ(a.pos, wp) < L * 1.2) { b.patrolIndex = (b.patrolIndex + 1) % route.length; if (b.patrolIndex === 0 && g.rng() < 0.35 && !shadow) { b.goal = 'sleep'; b.goalT = 0; } }
       break;
     }
   }
-  if (a.controller === 'shadow' && out.worldMove) out.worldMove.y = clamp((SURFACE_Y - 3 - a.pos.y) * 0.5, -0.4, 0.4);
+  if (shadow && out.worldMove) out.worldMove.y = clamp((SURFACE_Y - 3 - a.pos.y) * 0.5, -0.4, 0.4);
   return out;
 }
 

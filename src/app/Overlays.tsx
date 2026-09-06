@@ -71,6 +71,8 @@ export function Dialogs({ kind, onClose, settings, onSettings }: { kind: DialogK
               <p><b>RB</b> chains three bites, the third hits hard. <b>X</b> is your heavy: slow, breaks guard, carries you forward. <b>B</b> dodges with a moment of invulnerability; tap twice to retreat and drop silt. <b>LB</b> held guards; tapped as a hit lands, it parries and staggers them. <b>LT</b> locks on and turns the stick into orbit. Hits from behind or below hurt more. Stamina runs everything: an exhausted creature can't dodge.</p>
             </section>
             <section>
+              <h3>Giants</h3>
+              <p>The big ones cruise high in the light and only dive when they are hungry. When one turns your way an eye fills at the top of your screen: <b>stop moving</b>, or slip under the sponges and <b>hold still</b> until it loses you. They are slow to turn and cannot get their heads into dense cover.</p>
               <h3>Growing</h3>
               <p>The ring fills as you eat. Fill it, moult, get bigger. Kills of your own size are worth far more than plankton. Dying drops you a tier but keeps half your progress. Your signature <b>Y</b> ability unlocks at Adult.</p>
               <h3>Keyboard</h3>
@@ -100,6 +102,10 @@ export function Dialogs({ kind, onClose, settings, onSettings }: { kind: DialogK
           <label className="setting-row" htmlFor="volume">
             <span>Volume <small>{Math.round(settings.volume * 100)}%</small></span>
             <input id="volume" type="range" min={0} max={1} step={0.05} value={settings.volume} onChange={(e) => onSettings({ ...settings, volume: Number(e.target.value) })} />
+          </label>
+          <label className="setting-row">
+            <span>Music <small>Tide of First Bones</small></span>
+            <input type="checkbox" checked={settings.music} onChange={(e) => onSettings({ ...settings, music: e.target.checked })} />
           </label>
           <label className="setting-row">
             <span>Mute</span>

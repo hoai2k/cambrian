@@ -40,7 +40,7 @@ export const emptyInput = (): InputFrame => ({
 
 export interface BrainState {
   kind: 'swarm' | 'needs' | 'giant';
-  goal: 'wander' | 'hunt' | 'flee' | 'hide' | 'fight' | 'patrol' | 'search' | 'sleep' | 'graze';
+  goal: 'wander' | 'hunt' | 'flee' | 'hide' | 'fight' | 'patrol' | 'search' | 'sleep' | 'graze' | 'notice';
   target: number;          // actor id or -1
   goalT: number;           // time in goal
   thinkT: number;          // countdown to next decision
@@ -92,7 +92,7 @@ export interface Actor {
   hopVel: number; grounded: boolean;
   prev: { light: boolean; heavy: boolean; ability: boolean; dodge: boolean; guard: boolean; lock: boolean; sense: boolean; rise: boolean; burst: boolean };
   brain?: BrainState;
-  respawnT: number;
+  respawnT: number; hatching: boolean;
   kills: number; eats: number; escapes: number;
   hunted: number;          // 0..1 highest detection score against this actor (HUD)
   hunterId: number;
