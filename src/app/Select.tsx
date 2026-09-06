@@ -5,7 +5,7 @@ import { CheckIcon, Emblem, KeyboardIcon, PadIcon } from './icons';
 
 interface Props {
   players: PlayerSetup[]; mode: Mode; modes: Mode[]; modeInfo: Record<Mode, { name: string; blurb: string; players: string }>;
-  allReady: boolean; padCount: number;
+  allReady: boolean; padIndices: number[];
   onPick: (i: number, c: CreatureId) => void; onReady: (i: number) => void; onRemove: (i: number) => void;
   onAddKeyboard: () => void; onMode: (m: Mode) => void; onStart: () => void; onBack: () => void;
 }
@@ -19,6 +19,10 @@ export const gridColumns = (n: number) => Math.max(4, Math.ceil(n / 3));
 export function SelectScreen(p: Props) {
   const cols = gridColumns(CREATURES.length);
   const compact = p.players.length >= 3;
+  // Controllers the game can see that have not joined yet, and joined players whose controller
+  // has since gone away (an Xbox pad that went to sleep looks exactly like an unplugged one).
+  const joined = new Set(p.players.map((pl) => pl.device));
+  const waiting = p.padIndices.filter((i) => !joined.has(i));
   return (
     <section className="select" aria-label="Choose your creature">
       <header className="select-header">
@@ -31,7 +35,7 @@ export function SelectScreen(p: Props) {
             </button>
           ))}
         </div>
-        <p className="mode-blurb">{p.modeInfo[p.mode].blurb} <span className="dim">LT / RT switch modes.</span></p>
+        <p className="mode-blurb">{p.modeInfo[p.mode].blurb} <span className="dim">LB / RB switch modes.</span></p>
       </header>
 
       <div className="pick-layout">
@@ -66,7 +70,7 @@ export function SelectScreen(p: Props) {
                 {pl.ready && <span key={'fx' + pl.creature} className="lock-fx" aria-hidden="true" />}
                 <div className="crew-top">
                   <span className="player-chip">P{i + 1}</span>
-                  <span className="device">{pl.device === 'keyboard' ? <><KeyboardIcon width={16} height={16} /> Keyboard 1</> : pl.device === 'keyboard2' ? <><KeyboardIcon width={16} height={16} /> Keyboard 2</> : <><PadIcon width={16} height={16} /> Controller {(pl.device as number) + 1}</>}</span>
+                  <span className="device">{pl.device === 'keyboard' ? <><KeyboardIcon width={16} height={16} /> Keyboard 1</> : pl.device === 'keyboard2' ? <><KeyboardIcon width={16} height={16} /> Keyboard 2</> : <><PadIcon width={16} height={16} /> Controller {(pl.device as number) + 1}{!p.padIndices.includes(pl.device as number) && <em className="gone"> · disconnected</em>}</>}</span>
                   <button className="remove" aria-label={`Remove player ${i + 1}`} onClick={() => p.onRemove(i)}>×</button>
                 </div>
                 <div className="hero">
@@ -100,11 +104,17 @@ export function SelectScreen(p: Props) {
             );
           })}
           {p.players.length < 4 && (
-            <div className="join-card">
+            <div className={`join-card ${waiting.length ? 'waiting' : ''}`}>
               <PadIcon width={32} height={32} />
-              <p><b>Press A</b> on another controller to join.</p>
+              <p><b>Press any button</b> on another controller to join.</p>
               <button className="ghost" onClick={p.onAddKeyboard}>Add a keyboard player</button>
-              <small>{p.padCount} controller{p.padCount === 1 ? '' : 's'} connected</small>
+              <small>
+                {p.padIndices.length} controller{p.padIndices.length === 1 ? '' : 's'} connected
+                {waiting.length > 0 && <> · <b>{waiting.map((i) => `Controller ${i + 1}`).join(', ')}</b> {waiting.length === 1 ? 'has' : 'have'} not joined</>}
+              </small>
+              {p.padIndices.length <= p.players.length && (
+                <small className="dim">A controller only shows up here once you press a button on it.</small>
+              )}
             </div>
           )}
         </div>

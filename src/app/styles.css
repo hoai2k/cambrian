@@ -352,3 +352,8 @@ input[type='checkbox'] { width: 20px; height: 20px; accent-color: var(--ember); 
 @media (max-width: 700px) { .mode-chip { min-height: 68px; padding: 7px 10px; } .header-logo { width: 140px; } }
 .title > picture { display: contents; }
 .title-art { opacity: 1; filter: brightness(.6); }
+
+/* A controller the game can see but nobody has joined with, and a player whose pad has gone. */
+.join-card.waiting { border-color: var(--ember); box-shadow: 0 0 0 1px rgba(255, 179, 107, .35); }
+.join-card small.dim { color: var(--dim); }
+.crew-card .device .gone { font-style: normal; color: var(--coral); }
