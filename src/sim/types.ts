@@ -101,6 +101,7 @@ export interface Actor {
   respawnT: number; hatching: boolean;
   dashHoldT: number; dashUsed: boolean; dashQueued: boolean; pounceCd: number; aimInRange: boolean; aiming: boolean;
   dashCd: number; sinceHit: number; lastHitBy: number; swallowedBy: number; holdT: number;
+  deathY: number; sparkled: boolean; tumble: Vec3;
   kills: number; eats: number; escapes: number;
   hunted: number;          // 0..1 highest detection score against this actor (HUD)
   hunterId: number;
@@ -121,6 +122,6 @@ export type Mode = 'rise' | 'frenzy' | 'hunted' | 'reef';
 export interface Prompt { text: string; t: number; }
 
 export interface WorldEvent {
-  kind: 'hit' | 'kill' | 'eat' | 'tierUp' | 'parry' | 'guardBreak' | 'burst' | 'escape' | 'noticed' | 'hunted' | 'dodge' | 'ability' | 'grab' | 'moult' | 'death' | 'silt' | 'stagger' | 'sense' | 'pounce' | 'swallow' | 'routed';
+  kind: 'hit' | 'kill' | 'eat' | 'tierUp' | 'parry' | 'guardBreak' | 'burst' | 'escape' | 'noticed' | 'hunted' | 'dodge' | 'ability' | 'grab' | 'moult' | 'death' | 'silt' | 'stagger' | 'sense' | 'pounce' | 'swallow' | 'routed' | 'disintegrate';
   pos: Vec3; actor: number; other?: number; strength?: number; player?: number;
 }

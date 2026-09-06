@@ -263,24 +263,45 @@ export class Game implements AiWorld {
       a.eaten = 1;                                        // nothing left to scavenge
       const val = this.nutritionValue(pred, a);
       this.gainNutrition(pred, a, val); pred.eats++; pred.hp = Math.min(pred.hpMax, pred.hp + val * 0.5);
-      if (a.controller === 'player' || a.controller === 'bot') a.respawnT = 1.4; else this.remove(a);
+      if (a.controller === 'player' || a.controller === 'bot') a.respawnT = a.stateDur; else this.remove(a);
     }
   }
 
+  /**
+   * Corpses go limp, roll belly-up and drift slowly upward with the current, so a dead thing reads as
+   * dead at a glance. Players and bots dissolve into sparkles after three seconds and respawn.
+   */
   private updateCorpse(a: Actor, dt: number) {
     a.corpseT += dt; a.stateT += dt;
     const def = creature(a.creature);
-    const floor = groundHeight(this.world, a.pos.x, a.pos.z, this.scratchBoulders) + clearanceOf(a) * 0.5;
-    const cur = sampleCurrent(v3(), a.pos.x, a.pos.y, a.pos.z, this.time);
-    a.vel.x = damp(a.vel.x, cur.x * 0.5, 1.5, dt); a.vel.z = damp(a.vel.z, cur.z * 0.5, 1.5, dt);
-    a.vel.y = damp(a.vel.y, a.pos.y > floor ? -0.8 : 0, 1.2, dt);
-    a.pos.x += a.vel.x * dt; a.pos.y = Math.max(floor, a.pos.y + a.vel.y * dt); a.pos.z += a.vel.z * dt;
-    a.bank = damp(a.bank, def.ground ? 0 : Math.PI * 0.9, 1.5, dt);
+    const inMouth = a.eaten >= 1 && a.swallowedBy >= 0;
+    if (!inMouth) {
+      const floor = groundHeight(this.world, a.pos.x, a.pos.z, this.scratchBoulders) + clearanceOf(a) * 0.6;
+      const cur = sampleCurrent(v3(), a.pos.x, a.pos.y, a.pos.z, this.time);
+      const ceiling = Math.min(SURFACE_Y - 2, a.deathY + 4 + lengthOf(a));
+      a.vel.x = damp(a.vel.x, cur.x * 0.8, 1.2, dt); a.vel.z = damp(a.vel.z, cur.z * 0.8, 1.2, dt);
+      a.vel.y = damp(a.vel.y, a.pos.y < ceiling ? 0.45 : 0, 0.9, dt);
+      a.pos.x += a.vel.x * dt; a.pos.y = Math.max(floor, a.pos.y + a.vel.y * dt); a.pos.z += a.vel.z * dt;
+      // roll over, then keep a lazy tumble that dies away
+      const k = Math.exp(-a.corpseT * 0.6);
+      a.bank = damp(a.bank, Math.PI + a.tumble.z * 0.5 * k, 2.2, dt);
+      a.pitch = damp(a.pitch, a.tumble.x * 0.45 * k, 2, dt);
+      a.yaw = wrapAngle(a.yaw + a.tumble.y * k * dt);
+      void def;
+    }
     a.hitFlash = Math.max(0, a.hitFlash - dt);
-    if ((a.controller === 'player' || a.controller === 'bot')) {
+    if (a.controller === 'player' || a.controller === 'bot') {
       a.respawnT += dt;
-      // Just long enough to watch the death or the swallow, then straight back in.
-      if (a.respawnT > (a.controller === 'player' ? 2.2 : 6)) this.respawn(a);
+      // three seconds of corpse (or of being digested), a puff of sparkles, then back in
+      const total = 3.0;
+      if (!a.sparkled && a.respawnT > total - 0.4) {
+        a.sparkled = true;
+        const pred = inMouth ? this.idMap.get(a.swallowedBy) : undefined;
+        const at = pred ? { x: pred.pos.x - Math.sin(pred.yaw) * lengthOf(pred) * 0.1, y: pred.pos.y - lengthOf(pred) * 0.05, z: pred.pos.z - Math.cos(pred.yaw) * lengthOf(pred) * 0.1 } : { ...a.pos };
+        this.events.push({ kind: 'disintegrate', pos: at, actor: a.id, other: pred?.id, player: a.player, strength: lengthOf(a) });
+        if (!inMouth) a.eaten = 1;     // body dissolves
+      }
+      if (a.respawnT > total) this.respawn(a);
     }
   }
 
@@ -306,7 +327,7 @@ export class Game implements AiWorld {
     }
     a.pos = this.spawnPoint(nursery, a.creature, a.scale, a.player);
     a.vel = v3(); a.state = 'free'; a.stateT = 0; a.respawnT = 0; a.corpseT = 0; a.eaten = 0;
-    a.spawnProtect = 3.5; a.hitFlash = 0; a.abilityActive = false; a.abilityCd = 0; a.lockTarget = -1; a.hunted = 0; a.hunterId = -1; a.wasHunted = false;
+    a.spawnProtect = 3.5; a.hitFlash = 0; a.abilityActive = false; a.abilityCd = 0; a.lockTarget = -1; a.hunted = 0; a.hunterId = -1; a.wasHunted = false; a.swallowedBy = -1; a.bank = 0; a.pitch = 0;
     a.yaw = Math.atan2(-nursery.x, -nursery.z);
     // hatch-in: grow from a speck over a second (reuses the moult state with a smaller start scale)
     a.hatching = true; a.state = 'moult'; a.stateT = 0; a.stateDur = 1.0;
@@ -930,7 +951,7 @@ export class Game implements AiWorld {
       const ra = bodyRadius(a);
       for (const o of this.hash.query(a.pos.x, a.pos.z, ra + 6, this.scratchActors)) {
         if (o.id <= a.id || !isAlive(o)) continue;
-        if (a.state === 'grabbed' || o.state === 'grabbed') continue;
+        if (a.state === 'grabbed' || o.state === 'grabbed' || a.state === 'swallowed' || o.state === 'swallowed') continue;
         const min = ra + bodyRadius(o);
         const dx = o.pos.x - a.pos.x, dy = o.pos.y - a.pos.y, dz = o.pos.z - a.pos.z;
         const d = Math.hypot(dx, dy, dz);

@@ -82,7 +82,8 @@ function PlayerPanel({ p }: { p: PlayerHud }) {
         </div>
       )}
       {p.hint && p.hunterState === 'none' && <p className="hint">{p.hint}</p>}
-      {!p.alive && (
+      <div className="fade" style={{ opacity: p.fade }} />
+      {!p.alive && p.fade < 0.9 && (
         <div className="dead-overlay">
           <b>EATEN</b>
           <span>Back in a moment… you slip down a tier.</span>
