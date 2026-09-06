@@ -24,4 +24,5 @@ unless the user explicitly asks for a PR. Steps:
 - Any change to a creature's model, colours or textures must go through
   `docs/creature-intake.md`: re-render, `npm run cards`, `npm run lods`, and
   `npm run check` must pass. The check flags stale images automatically.
-- Design docs live in `docs/redesign/`. Image needs go in `image-requests.md`.
+- Design docs live in `docs/redesign/`. Image needs go in `image-requests.md`; move each
+  brief to `image-requests-history.md` once its assets are delivered and integrated.

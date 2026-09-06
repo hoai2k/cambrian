@@ -22,4 +22,7 @@ all four modes, split-screen and drop-in), and M8 polish is ongoing: new
 animation clips have not been authored yet, so the combat verbs run on the
 nine shipped clips plus the procedural layers described in the plan. Two
 headless checks exist: `tools/harness.ts` (balance) and `tools/smoke.mjs`
-(browser). Outstanding art is listed in `image-requests.md`.
+(browser). The art requested for the shell — logo, icons, key art, transparent creature
+portraits, tier and band glyphs, mode panels — has been delivered and integrated; the briefs
+and their asset paths are in `image-requests-history.md`, and `image-requests.md` is where new
+requests go.
