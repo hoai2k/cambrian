@@ -18,11 +18,11 @@ if you want to build it. The audit is the shared set of facts both rely on.
 The game is implemented in `src/` (see the repository README for layout).
 Compared with the milestones in the technical plan, M0–M3 are complete, M4–M7
 are implemented in a first pass (ecosystem, giants and detection, abilities,
-all four modes, split-screen and drop-in), and M8 polish is ongoing: new
-animation clips have not been authored yet, so the combat verbs run on the
-nine shipped clips plus the procedural layers described in the plan. Two
-headless checks exist: `tools/harness.ts` (balance) and `tools/smoke.mjs`
-(browser). The art requested for the shell — logo, icons, key art, transparent creature
+all four modes, split-screen and drop-in), and M8 polish is ongoing: the roster now includes 13 additional creatures with complete authored action
+sets, unique abilities and feeding routes. Headless simulation, browser, skinning
+and anchor checks cover the expansion; see the repository README for commands. The art requested for the shell — logo, icons, key art, transparent creature
 portraits, tier and band glyphs, mode panels — has been delivered and integrated; the briefs
 and their asset paths are in `image-requests-history.md`, and `image-requests.md` is where new
 requests go.
+
+- [03 · Expanded creature roster](03-creature-expansion.md): 13 additions, feeding routes, abilities, anatomy, animation and references.

@@ -177,8 +177,8 @@ export function thinkNeeds(g: AiWorld, a: Actor, b: BrainState, dt: number): Inp
     if (routed && a.controller !== 'bot') { if (b.goal !== 'flee') b.goalT = 0; b.goal = 'flee'; b.target = attacker.id; }
     else if (worst) { if (b.goal !== 'flee') b.goalT = 0; b.goal = 'flee'; b.target = worst.id; }
     else if (rival && (a.hp > a.hpMax * 0.35 || a.controller === 'bot')) { if (b.goal !== 'fight') b.goalT = 0; b.goal = 'fight'; b.target = rival.id; }
-    else if (prey && hungry) { if (b.goal !== 'hunt') b.goalT = 0; b.goal = 'hunt'; b.target = prey.id; }
-    else if (def.id === 'wiwaxia' && biomeAt(a.pos.x, a.pos.z) === 'flats' && g.rng() < 0.6) { b.goal = 'graze'; b.target = -1; }
+    else if (prey && hungry && !def.diet) { if (b.goal !== 'hunt') b.goalT = 0; b.goal = 'hunt'; b.target = prey.id; }
+    else if ((def.diet || def.id === 'wiwaxia') && (def.diet === 'filter' || biomeAt(a.pos.x, a.pos.z) === 'flats') && g.rng() < .8) { b.goal = 'graze'; b.target = -1; }
     else if (b.goal !== 'wander' || distXZ(a.pos, b.wanderTo) < 3 || b.goalT > 14) { b.goal = 'wander'; b.target = -1; b.goalT = 0; pickWander(a, b, g.rng, a.controller === 'bot' ? 60 : 32); }
   }
 
@@ -195,7 +195,7 @@ export function thinkNeeds(g: AiWorld, a: Actor, b: BrainState, dt: number): Inp
         if (dist(a.pos, cover.pos) < cover.radius * 0.5) { out.worldMove = v3(); out.burst = 0; return out; } // hide, hold still
       }
       out.worldMove = dir; out.burst = a.stamina > 25 ? 1 : 0;
-      if (a.abilityCd <= 0 && (def.ability === 'tailFlick' || def.ability === 'burrow' || def.ability === 'enroll' || def.ability === 'shellUp') && dist(a.pos, t.pos) < L * 3) out.ability = true;
+      if (a.abilityCd <= 0 && (def.ability === 'tailFlick' || def.ability === 'burrow' || def.ability === 'enroll' || def.ability === 'shellUp' || ['ribbonSlip', 'sedimentDive', 'combCruise', 'adhesiveGlide', 'bellCorral'].includes(def.ability)) && dist(a.pos, t.pos) < L * 3) out.ability = true;
       break;
     }
     case 'hunt': {
@@ -244,7 +244,17 @@ export function thinkNeeds(g: AiWorld, a: Actor, b: BrainState, dt: number): Inp
       break;
     }
     case 'graze': {
-      out.worldMove = v3();
+      if (def.diet === 'filter') {
+        const bloom = g.world.blooms.reduce<(typeof g.world.blooms)[number] | undefined>((best, v) => !best || dist(a.pos, v.pos) < dist(a.pos, best.pos) ? v : best, undefined);
+        if (bloom) {
+          steerToward(a, bloom.pos, out, dist(a.pos, bloom.pos) < bloom.radius * .7 ? .25 : .65);
+          if (a.abilityCd <= 0 && dist(a.pos, bloom.pos) < bloom.radius) out.ability = true;
+        }
+      } else {
+        out.worldMove = vscale(heading(a.yaw), def.diet ? .2 : 0);
+        if (def.diet === 'deposit') out.sink = true;
+        if (a.abilityCd <= 0 && def.ability === 'adhesiveGlide') out.ability = true;
+      }
       if (b.goalT > 6) { b.goal = 'wander'; pickWander(a, b, g.rng, 20); }
       break;
     }

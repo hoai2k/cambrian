@@ -23,7 +23,9 @@ function view(gltf, scale, performance = false) {
   const box = new THREE.Box3().setFromObject(model), size = box.getSize(new THREE.Vector3());
   const unit = 1 / Math.max(size.z, size.x, .01); model.scale.setScalar(unit); model.position.copy(box.getCenter(new THREE.Vector3())).multiplyScalar(-unit);
   group.scale.setScalar(scale);
-  const mixer = new THREE.AnimationMixer(model), eatClip = gltf.animations.find(c => c.name === 'Eat'), eat = mixer.clipAction(eatClip).play();
+  const mixer = new THREE.AnimationMixer(model), eatClip = gltf.animations.find(c => c.name === 'Eat') ?? gltf.animations.find(c => ['Swim', 'Crawl', 'Idle'].includes(c.name));
+  assert(eatClip, 'Feeding fixture requires Eat or a locomotion clip');
+  const eat = mixer.clipAction(eatClip).play();
   const v = { group, model, mixer, anchors: new CreatureAnchors(model), visibleLength: scale, feedingPerformance: performance,
     poseFeeding(p) { eat.time = p * eatClip.duration * .99; mixer.update(0); group.updateWorldMatrix(true, true); },
     tick(dt) { mixer.update(dt); group.updateWorldMatrix(true, true); } };
@@ -33,7 +35,8 @@ function view(gltf, scale, performance = false) {
 const actor = (id, cid, scale, o = {}) => ({ id, creature: cid, scale, state: 'free', stateT: 0, stateDur: 1, pos: { x: 0, y: 0, z: 0 }, yaw: 0, eaten: 0,
   eatingTarget: -1, lockTarget: -1, grabbedBy: -1, swallowedBy: -1, abilityActive: false, ...o });
 const results = {};
-for (const id of CREATURE_IDS) {
+const originalIds = ['anomalocaris','opabinia','waptia','canadia','hallucigenia','wiwaxia','marrella','olenoides'];
+for (const id of originalIds) {
   const def = creature(id), gltf = await load(id);
   const predScale = 1, pred = actor(1, id, predScale / def.adultLength, { state: 'eating', eatingTarget: 2 });
   const L = lengthOf(pred); assert(Math.abs(L - predScale) < 1e-9);
@@ -89,3 +92,119 @@ for (const id of CREATURE_IDS) {
   results[id] = { grasp: pv.anchors.canGrasp, articulated: pv.anchors.canAim, heldError, midDist: +midDist.toFixed(3), finalScale: +finalScale.toFixed(4), inside: +inside.toFixed(4), aim };
   console.log(id, 'PASS', results[id]);
 }
+
+// Expansion regression: the production Attachments class on both full and
+// intentionally locomotion-only distant rigs, including gelatinous mouth-only
+// feeders. Each is independently translated, rotated, and scaled like game views.
+const expansionIds = ['pikaia','nectocaris','burgessomedusa','odaraia','ottoia','cambroraster','sidneyia','leanchoilia','isoxys','odontogriphus','ctenorhabdotus','vetulicola','tamisiocaris'];
+assert.deepEqual([...CREATURE_IDS].sort(), [...originalIds,...expansionIds].sort());
+const poseValues=o=>[...o.position.toArray(),...o.quaternion.toArray(),...o.scale.toArray()];
+const localSnapshot = object => {const rows=[];object.traverse(o=>rows.push([o.name,...poseValues(o)]));return JSON.stringify(rows);};
+const socketPoint = (v,name) => {const socket=v.anchors.sockets.get(name);assert(socket,`Missing ${name}`);socket.updateWorldMatrix(true,false);return socket.getWorldPosition(new THREE.Vector3());};
+const closePoint = (actual,expected,label) => {assert(actual.toArray().every(Number.isFinite),`${label}: nonfinite`);assert(actual.distanceTo(expected)<1e-6,`${label}: offset ${actual.distanceTo(expected)}`);};
+const finiteView = (v,label) => v.model.traverse(o=>assert(poseValues(o).every(Number.isFinite),`${label}: nonfinite ${o.name}`));
+let fallbackCases=0,grabPoseCases=0,noGraspFeeders=0,mouthOnlyFeeders=0;
+const expansionReports=[];
+// A primary attack alias must not consume both of solveAttack's two slots.
+// Both Nectocaris tentacles should reach toward a shared target, while all six
+// socket names remain discoverable and root/body transforms remain fixed.
+for(const suffix of ['', '.lod1']){
+  const gltf=await load('nectocaris'+suffix),v=view(gltf,1.7);
+  v.group.position.set(3,2,-4);v.group.rotation.set(.12,.55,-.09);v.group.updateWorldMatrix(true,true);
+  assert.equal(v.anchors.sockets.size,6,'Nectocaris metadata sockets must remain six');
+  const l=socketPoint(v,'anchor_attack_tentacle_L'),r=socketPoint(v,'anchor_attack_tentacle_R');
+  const target=l.clone().lerp(r,.48).add(new THREE.Vector3(0,-.025,.035).applyQuaternion(v.group.quaternion));
+  const chains=['anchor_attack_tentacle_L','anchor_attack_tentacle_R'].map(name=>v.anchors.sockets.get(name).userData.cambrianAnchor.chain.map(n=>v.model.getObjectByName(n)));
+  const before=chains.map(chain=>chain.map(b=>b.quaternion.clone()));
+  const root=v.model.getObjectByName('root'),body=v.model.getObjectByName('body'),rootPose=poseValues(root),bodyPose=poseValues(body);
+  const residual=v.anchors.solveAttack(target,1,2,14);assert(Number.isFinite(residual));
+  for(let side=0;side<2;side++)assert(chains[side].some((b,i)=>b.quaternion.angleTo(before[side][i])>1e-6),`Nectocaris${suffix}: solveAttack left an entire tentacle unchanged`);
+  assert.deepEqual(poseValues(root),rootPose);assert.deepEqual(poseValues(body),bodyPose);
+  assert.equal(v.anchors.sockets.size,6);finiteView(v,'Nectocaris bilateral solve');
+}
+for(const id of expansionIds) for(const lod of [0,1]){
+  const file=`${id}${lod?'.lod1':''}`,gltf=await load(file),templateSnapshot=localSnapshot(gltf.scene);
+  const left=view(gltf,2.3),right=view(gltf,.65);
+  left.group.position.set(7,4,-9);left.group.rotation.set(.21,.8,-.17);
+  right.group.position.set(-5,3,12);right.group.rotation.set(-.13,-.6,.11);
+  left.group.updateWorldMatrix(true,true);right.group.updateWorldMatrix(true,true);
+  for(const[name,node]of left.anchors.sockets){assert.notEqual(node,right.anchors.sockets.get(name));assert.notEqual(node,gltf.scene.getObjectByName(name));}
+  left.model.traverse(o=>{if(o.isBone){assert.notEqual(o,right.model.getObjectByName(o.name));assert.notEqual(o,gltf.scene.getObjectByName(o.name));}});
+  const rightSnapshot=localSnapshot(right.model);
+  const def=creature(id);
+  const predatorA=actor(100,id,2.3/def.adultLength,{state:'grabbing',pos:{x:7,y:4,z:-9},grabbing:102});
+  const predatorB=actor(101,id,.65/def.adultLength,{state:'grabbing',pos:{x:-5,y:3,z:12},grabbing:103});
+  const foodA=actor(102,'marrella',.2/creature('marrella').adultLength,{state:'grabbed',grabbedBy:100,pos:{x:40,y:20,z:50},stateDur:1.6});
+  const foodB=actor(103,'marrella',.15/creature('marrella').adultLength,{state:'grabbed',grabbedBy:101,pos:{x:-40,y:30,z:-50},stateDur:1.6});
+  const fvA={group:new THREE.Group(),visibleLength:.2,anchors:{canAim:false}},fvB={group:new THREE.Group(),visibleLength:.15,anchors:{canAim:false}};
+  const actors=[predatorA,predatorB,foodA,foodB],world={actors,byId(i){return actors.find(a=>a.id===i)}};
+  const views=new Map([[100,left],[101,right],[102,fvA],[103,fvB]]),attachments=new Attachments();
+  const desired=id==='nectocaris'?'Grab':'Attack';
+  const clip=gltf.animations.find(c=>c.name===desired)??(lod?gltf.animations.find(c=>['Swim','Crawl'].includes(c.name)):undefined);
+  assert(clip,`${file}: missing ${desired}/LOD locomotion`);
+  left.mixer.stopAllAction();const action=left.mixer.clipAction(clip).play();
+  const contact=left.anchors.has('anchor_grasp')?'anchor_grasp':'anchor_attack_primary';if(contact==='anchor_attack_primary')fallbackCases++;
+  for(const fraction of [0,.23,.57,.91]){
+    action.time=clip.duration*fraction;left.mixer.update(0);left.group.updateWorldMatrix(true,true);
+    assert.equal(localSnapshot(right.model),rightSnapshot,`${file}: animation changes sibling`);
+    foodA.state=foodB.state='grabbed';foodA.grabbedBy=100;foodB.grabbedBy=101;
+    fvA.group.position.set(50,70,90);fvB.group.position.set(-50,-70,-90);
+    const expectedA=socketPoint(left,contact),expectedB=socketPoint(right,contact),before=JSON.stringify(actors);
+    const rootPose=poseValues(left.model.getObjectByName('root'));
+    attachments.sync(world,views,1/60);
+    assert.equal(JSON.stringify(actors),before,`${file}: grab mutates simulation`);
+    closePoint(fvA.group.position,expectedA,`${file}: grab A`);closePoint(fvB.group.position,expectedB,`${file}: grab B`);
+    assert.deepEqual(poseValues(left.model.getObjectByName('root')),rootPose,`${file}: grab moves root`);
+    if(id==='nectocaris'&&clip.name==='Grab')grabPoseCases++;
+    for(const progress of [0,.5,1]){
+      foodA.state=foodB.state='swallowed';foodA.swallowedBy=100;foodB.swallowedBy=101;foodA.stateT=foodB.stateT=1.6*progress;
+      const a=socketPoint(left,'anchor_mouth').lerp(socketPoint(left,'anchor_mouth_inside'),progress),b=socketPoint(right,'anchor_mouth').lerp(socketPoint(right,'anchor_mouth_inside'),progress);
+      const sim=JSON.stringify(actors);attachments.sync(world,views,1/60);
+      assert.equal(JSON.stringify(actors),sim,`${file}: swallow mutates simulation`);
+      closePoint(fvA.group.position,a,`${file}: swallow A@${progress}`);closePoint(fvB.group.position,b,`${file}: swallow B@${progress}`);
+    }
+  }
+  // Actual generalized feeding. Put the food near a usable contact, not at an
+  // unreachable fixture position: a medusa's short marginal tentacles cannot
+  // reach a generic target near the center of its bell.
+  attachments.clear();left.mixer.stopAllAction();
+  const feedingClip=gltf.animations.find(c=>c.name==='Eat')??gltf.animations.find(c=>['Swim','Crawl','Idle'].includes(c.name));assert(feedingClip);
+  const feedAction=left.mixer.clipAction(feedingClip).play();
+  predatorA.state='eating';predatorA.eatingTarget=102;predatorA.stateT=0;foodA.state='dead';foodA.eaten=0;
+  predatorB.state='free';foodB.state='free';foodB.grabbedBy=foodB.swallowedBy=-1;
+  left.group.updateWorldMatrix(true,true);
+  const mouth=socketPoint(left,'anchor_mouth');
+  const origin=(left.anchors.canGrasp?socketPoint(left,'anchor_grasp'):mouth.clone()).add(new THREE.Vector3(.06,-.06,.12).applyQuaternion(left.group.quaternion));
+  foodA.pos={x:origin.x,y:origin.y,z:origin.z};
+  let heldError=null,finalInside=null,finalScale=null;
+  if(!left.anchors.canGrasp)noGraspFeeders++;if(!left.anchors.canGrasp&&!left.anchors.canAim)mouthOnlyFeeders++;
+  for(let frame=0;frame<=100;frame++){
+    const progress=frame/100;foodA.eaten=progress;predatorA.stateT=progress;
+    feedAction.time=feedingClip.duration*((frame*.013)%1);left.mixer.update(0);left.group.updateWorldMatrix(true,true);
+    fvA.group.position.copy(origin);fvA.group.scale.setScalar(fvA.visibleLength);
+    const rootBefore=poseValues(left.model.getObjectByName('root')),sim=JSON.stringify(actors),other=localSnapshot(right.model),mouthBefore=socketPoint(left,'anchor_mouth');
+    attachments.sync(world,views,1/60);
+    assert.equal(JSON.stringify(actors),sim,`${file}: feeding mutates simulation`);
+    assert.deepEqual(poseValues(left.model.getObjectByName('root')),rootBefore,`${file}: CCD moves root`);
+    assert.equal(localSnapshot(right.model),other,`${file}: CCD changes sibling`);
+    finiteView(left,file);assert([...fvA.group.position.toArray(),...fvA.group.scale.toArray()].every(Number.isFinite));
+    if(frame===0)closePoint(fvA.group.position,origin,`${file}: pickup begins at corpse`);
+    if(frame===50){
+      if(left.anchors.canGrasp){heldError=socketPoint(left,'anchor_grasp').distanceTo(fvA.group.position);assert(heldError<1e-6,`${file}: grasp carry is detached`);}
+      else {
+        // At p=.5, carry interpolation is halfway; additive down-arc is .13L.
+        const target=origin.clone().lerp(mouthBefore,.5).add(new THREE.Vector3(0,-left.visibleLength*.13,0).applyQuaternion(left.group.quaternion));
+        closePoint(fvA.group.position,target,`${file}: no-chain carry midpoint`);
+      }
+      assert(fvA.group.scale.x<fvA.visibleLength,`${file}: carry does not approach aperture size`);
+    }
+    if(frame===100){finalInside=socketPoint(left,'anchor_mouth_inside').distanceTo(fvA.group.position);finalScale=fvA.group.scale.x;assert(finalInside<1e-6,`${file}: food misses inside socket by ${finalInside}`);assert.equal(finalScale,0,`${file}: completed swallow remains visible`);}
+  }
+  predatorA.state='free';attachments.sync(world,views,1/60);assert.equal(attachments['feeding'].size,0,`${file}: cancelled/finished session leaked`);
+  assert.equal(localSnapshot(gltf.scene),templateSnapshot,`${file}: cached template changed`);
+  assert.equal(localSnapshot(right.model),rightSnapshot,`${file}: sibling pose changed`);
+  expansionReports.push({file,contact,pose:clip.name,grasp:left.anchors.canGrasp,aim:left.anchors.canAim,heldError,finalInside,finalScale});
+  console.log(file,'PASS eating/carry, grab/swallow, clone isolation, finite/root-safe');
+}
+assert.equal(expansionReports.length,26);assert(fallbackCases>0);assert(grabPoseCases>=4);assert(noGraspFeeders>0);assert(mouthOnlyFeeders>0);
+console.log({expansionProductionAttachments:true,assets:26,grabPoseCases,fallbackCases,noGraspFeeders,mouthOnlyFeeders,feedingFrames:26*101,grabbedSamples:26*4*2,swallowSamples:26*4*3*2,clonesIndependent:true,simulationUnchanged:true,rootSafe:true});

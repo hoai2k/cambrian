@@ -1,10 +1,16 @@
+import { EXPANSION_CREATURES } from './expansion';
+
 export type CreatureId =
   | 'anomalocaris' | 'opabinia' | 'waptia' | 'canadia'
-  | 'hallucigenia' | 'wiwaxia' | 'marrella' | 'olenoides';
+  | 'hallucigenia' | 'wiwaxia' | 'marrella' | 'olenoides'
+  | 'pikaia' | 'nectocaris' | 'burgessomedusa' | 'odaraia' | 'ottoia' | 'cambroraster'
+  | 'sidneyia' | 'leanchoilia' | 'isoxys' | 'odontogriphus' | 'ctenorhabdotus' | 'vetulicola' | 'tamisiocaris';
 
 export type AbilityId =
   | 'ambushSurge' | 'snatch' | 'tailFlick' | 'bristleFlare'
-  | 'anchor' | 'shellUp' | 'burrow' | 'enroll';
+  | 'anchor' | 'shellUp' | 'burrow' | 'enroll'
+  | 'ribbonSlip' | 'tentacleSeize' | 'bellCorral' | 'collectorWake' | 'sedimentDive' | 'basketRake'
+  | 'shellCrush' | 'whipSearch' | 'spineIntercept' | 'adhesiveGlide' | 'combCruise' | 'pharyngealPump' | 'planktonComb';
 
 export interface MoveDef {
   name: string;
@@ -16,6 +22,7 @@ export interface MoveDef {
   knockback: number;
   stamina: number;
   lunge: number;    // body lengths carried forward during windup+active
+  armorPierce?: number; // fraction of armor reduction bypassed
   guardBreak?: boolean;
   grab?: boolean;   // Anomalocaris: hold the victim
   sweep?: boolean;  // 360°, hits all around
@@ -28,6 +35,14 @@ export interface CreatureDef {
   tagline: string;     // energetic one-liner for the select screen
   role: string;
   ground: boolean;
+  diet?: 'deposit' | 'grazer' | 'filter';
+  provenance?: string;
+  bodyRadius?: number; // collision radius in body lengths
+  clearance?: number; // center height above terrain, in body lengths
+  proceduralUndulation?: boolean; // false when authored locomotion owns deformation
+  abilityDuration?: number;
+  abilityLoop?: boolean;
+  mobileAbility?: boolean;
   adultLength: number; // world units at scale 1
   speed: number;       // cruise, units/s at adult
   burst: number;       // multiplier while holding RT
@@ -180,6 +195,7 @@ export const CREATURES: readonly CreatureDef[] = [
     weakness: 'Short reach, predictable. Useless in open water.',
     canGuard: true,
   },
+  ...EXPANSION_CREATURES,
 ];
 
 const byId = new Map(CREATURES.map((c) => [c.id, c]));
