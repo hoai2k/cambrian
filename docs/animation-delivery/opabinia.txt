@@ -1,0 +1,15 @@
+Opabinia — new animation clips
+30 fps. Frame range 0–N inclusive; N frame intervals.
+
+Bite: 15 frames / 0.500000 s; one-shot; 216 channels.
+Heavy: 33 frames / 1.100000 s; one-shot; 216 channels.
+Guard: 30 frames / 1.000000 s; loop; 216 channels.
+Parry: 10 frames / 0.333333 s; one-shot; 216 channels.
+Dodge: 12 frames / 0.400000 s; one-shot; 216 channels.
+Eat: 24 frames / 0.800000 s; loop; 216 channels.
+Stagger: 36 frames / 1.200000 s; one-shot; 216 channels.
+Moult: 45 frames / 1.500000 s; loop; 216 channels.
+Ability: 17 frames / 0.566667 s; one-shot; 216 channels.
+
+All nine original clips preserved unchanged. Meshes, materials, textures, nodes, bone names and bind pose preserved.
+No root motion; scale channels are constant. One-shot endpoints match the original Idle start pose.
