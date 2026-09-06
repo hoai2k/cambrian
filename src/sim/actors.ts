@@ -50,7 +50,7 @@ export function makeActor(id: number, creatureId: CreatureId, controller: Contro
     grabbedBy: -1, grabbing: -1, grabT: 0, eatingTarget: -1, eatProgress: 0,
     corpseT: 0, eaten: 0, killer: -1, noise: 0.5, cover: 0, stillness: 0,
     dodgeDir: v3(0, 0, 1), dodgeTapT: 0, hopVel: 0, grounded: true,
-    prev: { light: false, heavy: false, ability: false, dodge: false, guard: false, lock: false, sense: false, rise: false },
+    prev: { light: false, heavy: false, ability: false, dodge: false, guard: false, lock: false, sense: false, rise: false, burst: false },
     respawnT: 0, kills: 0, eats: 0, escapes: 0, hunted: 0, hunterId: -1, wasHunted: false, seen: 0, bubbles: 0,
     spawnProtect: controller === 'player' ? 3 : 0,
   };

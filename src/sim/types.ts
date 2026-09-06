@@ -90,7 +90,7 @@ export interface Actor {
   noise: number; cover: number; stillness: number;
   dodgeDir: Vec3; dodgeTapT: number;
   hopVel: number; grounded: boolean;
-  prev: { light: boolean; heavy: boolean; ability: boolean; dodge: boolean; guard: boolean; lock: boolean; sense: boolean; rise: boolean };
+  prev: { light: boolean; heavy: boolean; ability: boolean; dodge: boolean; guard: boolean; lock: boolean; sense: boolean; rise: boolean; burst: boolean };
   brain?: BrainState;
   respawnT: number;
   kills: number; eats: number; escapes: number;
@@ -113,6 +113,6 @@ export type Mode = 'rise' | 'frenzy' | 'hunted' | 'reef';
 export interface Prompt { text: string; t: number; }
 
 export interface WorldEvent {
-  kind: 'hit' | 'kill' | 'eat' | 'tierUp' | 'parry' | 'guardBreak' | 'burst' | 'escape' | 'noticed' | 'hunted' | 'dodge' | 'ability' | 'grab' | 'moult' | 'death' | 'silt' | 'stagger';
+  kind: 'hit' | 'kill' | 'eat' | 'tierUp' | 'parry' | 'guardBreak' | 'burst' | 'escape' | 'noticed' | 'hunted' | 'dodge' | 'ability' | 'grab' | 'moult' | 'death' | 'silt' | 'stagger' | 'sense';
   pos: Vec3; actor: number; other?: number; strength?: number; player?: number;
 }

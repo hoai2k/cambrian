@@ -3,10 +3,11 @@ import { audio } from '../audio/audio';
 import { emptyControls, gamepads, KeyboardInput, readGamepad, rumble, type RawControls } from '../input/input';
 import { clamp, damp, TAU, wrapAngle } from '../shared/math';
 import { bandOf, isAlive, isHidden, lengthOf } from '../sim/actors';
-import { creature, CREATURE_IDS, type CreatureId } from '../sim/creatures';
+import { creature, type CreatureId } from '../sim/creatures';
 import { Game } from '../sim/game';
 import { BAND_COLOR, emptyInput, TIER_NAMES, TIER_NEED, type Actor, type Band, type InputFrame, type Mode, type PlayerSetup } from '../sim/types';
 import { groundHeight, NURSERIES, resolveStatic, SURFACE_Y, type Boulder } from '../sim/world';
+import { AssetQueue, type AssetProgress } from './assets';
 import { CreatureView, ensureLoaded, loadedSync } from './creature';
 import { Bubbles, Impacts, Silt } from './fx';
 import { createSea, type Quality, type SeaEnvironment } from './sea';
@@ -31,6 +32,7 @@ export interface EngineCallbacks {
   onMenu(player: number): void;
   onError(msg: string): void;
   onLoaded(): void;
+  onProgress?(p: AssetProgress): void;
 }
 
 export const PLAYER_COLORS = ['#61f2d5', '#ffb457', '#c7a3ff', '#ff86a4'];
@@ -100,15 +102,17 @@ export class Engine {
     this.onResize();
     this.startAttract();
     this.raf = requestAnimationFrame(this.frame);
-    void this.preload();
+    // Stream assets by priority: the default pick first so the title can show, everything else on idle time.
+    this.assets.onProgress((p) => {
+      this.cb.onProgress?.(p);
+      if (!this.bootDone && p.ready.has('anomalocaris') && p.ready.has('waptia')) { this.bootDone = true; this.cb.onLoaded(); }
+    });
+    this.assets.prioritize(['anomalocaris', 'waptia', 'marrella', 'opabinia', 'canadia', 'olenoides', 'hallucigenia', 'wiwaxia'], 'boot');
   }
-
-  private async preload() {
-    try {
-      await Promise.all(CREATURE_IDS.map((id) => ensureLoaded(id)));
-      if (!this.disposed) this.cb.onLoaded();
-    } catch (e) { this.cb.onError(e instanceof Error ? e.message : String(e)); }
-  }
+  readonly assets = new AssetQueue();
+  private bootDone = false;
+  /** Tell the loader which creatures are most likely to be needed next. */
+  prioritize(creatures: CreatureId[], phase: 'boot' | 'title' | 'select' | 'playing') { this.assets.prioritize(creatures, phase); }
 
   private onResize() {
     const w = this.container.clientWidth || 1, h = this.container.clientHeight || 1;
@@ -418,6 +422,8 @@ export class Engine {
         case 'hunted': { audio.play('hunted'); if (e.player != null && e.player >= 0) { const d = padOf(e.player); if (typeof d === 'number') rumble(d, 0.6, 0.9, 500); } break; }
         case 'escape': { audio.play('escape'); break; }
         case 'noticed': { audio.play('noticed'); break; }
+        case 'sense': { audio.play('sense'); break; }
+        case 'burst': { audio.play('burst'); break; }
       }
     }
     evs.length = 0;
@@ -472,6 +478,7 @@ export class Engine {
     cancelAnimationFrame(this.raf);
     this.resize.disconnect();
     this.keyboard.dispose();
+    this.assets.dispose();
     this.clearMatch();
     this.sea?.dispose();
     this.bubbles.dispose(); this.impacts.dispose(); this.silt.dispose();

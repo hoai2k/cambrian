@@ -13,10 +13,10 @@ const loader = new GLTFLoader().setMeshoptDecoder(MeshoptDecoder);
 
 export const creatureUrl = (id: CreatureId) => `${import.meta.env.BASE_URL}assets/creatures/${id}.glb`;
 
-export function loadCreature(id: CreatureId): Promise<Loaded> {
+export function loadCreature(id: CreatureId, onProgress?: (loaded: number, total: number) => void): Promise<Loaded> {
   let p = cache.get(id);
   if (!p) {
-    p = loader.loadAsync(creatureUrl(id)).then((gltf) => {
+    p = new Promise<GLTF>((res, rej) => loader.load(creatureUrl(id), res, (e) => onProgress?.(e.loaded, e.total), rej)).then((gltf) => {
       const box = new THREE.Box3().setFromObject(gltf.scene);
       const size = box.getSize(new THREE.Vector3());
       const center = box.getCenter(new THREE.Vector3());
@@ -28,10 +28,10 @@ export function loadCreature(id: CreatureId): Promise<Loaded> {
   }
   return p;
 }
-export const preloadAll = (ids: CreatureId[]) => Promise.all(ids.map(loadCreature));
+export const preloadAll = (ids: CreatureId[]) => Promise.all(ids.map((id) => loadCreature(id)));
 export function loadedSync(id: CreatureId): Loaded | undefined { return loadedMap.get(id); }
 const loadedMap = new Map<CreatureId, Loaded>();
-export async function ensureLoaded(id: CreatureId) { const l = await loadCreature(id); loadedMap.set(id, l); return l; }
+export async function ensureLoaded(id: CreatureId, onProgress?: (loaded: number, total: number) => void) { const l = await loadCreature(id, onProgress); loadedMap.set(id, l); return l; }
 
 const SPINE_RE = /^(body|segment)_(\d+)$/;
 

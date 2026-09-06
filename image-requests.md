@@ -17,7 +17,7 @@ Everything below is currently a placeholder (procedural SVG or CSS). Each entry 
 ## 3. Title screen key art
 
 - **File:** `public/assets/brand/keyart.webp` (2560×1440) and `keyart-mobile.webp` (1080×1920)
-- **Replaces:** nothing yet; the title currently shows the live 3D reef behind the logo. If supplied, it becomes a full-bleed backdrop that fades into the live reef after the first input.
+- **Replaces:** the loading screen's backdrop (currently the live 3D reef behind a dark gradient). The loading screen already tries to load `assets/brand/keyart.webp` and silently falls back if it is missing, so dropping the file in is the whole integration.
 - **Brief:** a low-angle underwater shot: a small Waptia in the foreground bolting through a sponge thicket, a huge Anomalocaris silhouette above against the light window. Warm caustics, deep teal water, coral rim-light on the predator. Painterly but sharp. Leave the upper-centre third quiet for the logo.
 
 ## 4. Creature select renders (upgrade)

@@ -5,7 +5,7 @@ import { CheckIcon, ChevronLeft, ChevronRight, Emblem, KeyboardIcon, PadIcon } f
 
 interface Props {
   players: PlayerSetup[]; mode: Mode; modes: Mode[]; modeInfo: Record<Mode, { name: string; blurb: string; players: string }>;
-  loaded: boolean; allReady: boolean; padCount: number;
+  loaded: boolean; loadFraction: number; allReady: boolean; padCount: number;
   onCycle: (i: number, d: number) => void; onPick: (i: number, c: CreatureId) => void; onReady: (i: number) => void; onRemove: (i: number) => void;
   onAddKeyboard: () => void; onMode: (m: Mode) => void; onStart: () => void; onBack: () => void;
 }
@@ -84,7 +84,8 @@ export function SelectScreen(p: Props) {
       <footer className="select-footer">
         <button className="ghost" onClick={p.onBack}>← Title</button>
         <div className="start-wrap">
-          {!p.allReady && <span className="dim">Everyone locks in, then <b>Menu</b> starts.</span>}
+          {!p.allReady && p.loaded && <span className="dim">Everyone locks in, then <b>Menu</b> starts.</span>}
+          {!p.loaded && <span className="mini-progress" aria-label="Loading chosen creatures"><i style={{ width: `${Math.round(p.loadFraction * 100)}%` }} /><span>Waking your creatures · {Math.round(p.loadFraction * 100)}%</span></span>}
           <button className="start-button" disabled={!p.allReady || !p.loaded} onClick={p.onStart}>{p.loaded ? 'DIVE IN' : 'LOADING…'}</button>
         </div>
       </footer>
