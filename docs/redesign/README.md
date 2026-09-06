@@ -26,3 +26,4 @@ and their asset paths are in `image-requests-history.md`, and `image-requests.md
 requests go.
 
 - [03 · Expanded creature roster](03-creature-expansion.md): 13 additions, feeding routes, abilities, anatomy, animation and references.
+- [04 · The endless sea](04-infinite-ocean.md): the shoreline, nine biomes banded by distance from it with danger levels and moods, chunk streaming, the teleport menu and the radar.

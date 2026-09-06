@@ -1,0 +1,108 @@
+/* Standalone shell for the development workbenches. Same palette as the game menus. */
+:root {
+  --ink: #06161c;
+  --foam: #eefaf6;
+  --mist: rgba(238, 250, 246, 0.72);
+  --dim: rgba(238, 250, 246, 0.5);
+  --coral: #ff5b6e;
+  --ember: #ffb36b;
+  --lagoon: #61f2d5;
+  --font-display: 'Unbounded', 'Arial Black', 'Segoe UI', sans-serif;
+  --font-body: 'Manrope', 'Segoe UI', system-ui, sans-serif;
+  --panel: rgba(6, 22, 28, 0.62);
+  --line: rgba(238, 250, 246, 0.16);
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+html, body, #root { min-height: 100%; margin: 0; }
+body {
+  background: radial-gradient(120% 90% at 50% 0%, #0d2b33 0%, var(--ink) 62%) fixed;
+  color: var(--foam); font-family: var(--font-body); font-size: 15px; line-height: 1.45;
+  -webkit-font-smoothing: antialiased;
+}
+button { font: inherit; color: inherit; cursor: pointer; }
+button:disabled { cursor: not-allowed; opacity: .45; }
+button:focus-visible, input:focus-visible, a:focus-visible { outline: 2px solid var(--ember); outline-offset: 3px; }
+h1, h2, h3 { font-family: var(--font-display); margin: 0; }
+code { font-size: .92em; color: var(--lagoon); }
+
+.bench { max-width: 1080px; margin: 0 auto; padding: 32px 24px 80px; }
+
+/* ---------- header ---------- */
+.bench-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 24px; flex-wrap: wrap; margin-bottom: 24px; }
+.bench-head h1 { font-size: 28px; letter-spacing: .04em; margin: 6px 0 4px; }
+.back { color: var(--dim); font-size: 12px; text-decoration: none; letter-spacing: .08em; }
+.back:hover { color: var(--ember); }
+.sub { margin: 0; color: var(--mist); font-size: 14px; max-width: 62ch; }
+.primary {
+  padding: 12px 22px; border-radius: 12px; border: 1px solid var(--ember);
+  background: rgba(255, 179, 107, .16); font: 700 14px var(--font-body); letter-spacing: .04em;
+  transition: background .15s;
+}
+.primary:hover:not(:disabled) { background: rgba(255, 179, 107, .3); }
+
+/* ---------- playback controls ---------- */
+.controls {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 14px 24px;
+  padding: 18px 20px; margin-bottom: 28px;
+  background: var(--panel); border: 1px solid var(--line); border-radius: 16px; backdrop-filter: blur(14px);
+}
+.slider { display: flex; flex-direction: column; gap: 6px; }
+.slider-label { display: flex; justify-content: space-between; gap: 12px; font-size: 12px; letter-spacing: .1em; text-transform: uppercase; color: var(--dim); }
+.slider-label b { color: var(--lagoon); font-size: 12px; letter-spacing: 0; text-transform: none; }
+.slider input { width: 100%; accent-color: var(--lagoon); }
+.readout { grid-column: 1 / -1; margin: 0; color: var(--mist); font-size: 13px; font-variant-numeric: tabular-nums; min-height: 1.4em; }
+
+/* ---------- sound groups ---------- */
+.group { margin-bottom: 30px; }
+.group h2 { font-size: 15px; letter-spacing: .2em; text-transform: uppercase; color: var(--ember); }
+.group.warn h2 { color: var(--coral); }
+.blurb { margin: 6px 0 14px; color: var(--dim); font-size: 13px; max-width: 78ch; }
+.sounds { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+
+.row {
+  position: relative; display: flex; align-items: center; flex-wrap: wrap; gap: 8px;
+  padding: 8px 10px; border-radius: 12px; border: 1px solid transparent;
+  background: rgba(238, 250, 246, .04);
+  transition: background .15s, border-color .15s;
+}
+.row:hover, .row:focus-within { background: rgba(238, 250, 246, .09); border-color: var(--line); }
+
+.name {
+  display: flex; align-items: baseline; gap: 10px; min-width: 210px;
+  padding: 8px 14px; border-radius: 10px; border: 1px solid var(--line);
+  background: rgba(97, 242, 213, .1); text-align: left; text-decoration: none;
+  transition: background .15s, border-color .15s;
+}
+.name:hover:not(:disabled) { background: rgba(97, 242, 213, .22); border-color: var(--lagoon); }
+.name b { font: 700 14px var(--font-body); }
+.name small { color: var(--dim); font-size: 11px; letter-spacing: .06em; }
+
+.chip {
+  padding: 6px 11px; border-radius: 999px; border: 1px solid var(--line);
+  background: rgba(6, 22, 28, .5); color: var(--mist);
+  font: 600 12px ui-monospace, 'SF Mono', Menlo, monospace;
+  transition: background .15s, color .15s;
+}
+button.chip:hover:not(:disabled) { background: rgba(255, 179, 107, .2); color: var(--foam); }
+.chip.missing { border-color: var(--coral); color: var(--coral); }
+
+.row.soundtrack { background: rgba(97, 242, 213, .08); border-color: var(--line); }
+.row.soundtrack .name { min-width: 260px; }
+
+/* ---------- usage tooltip ---------- */
+.usage {
+  position: absolute; left: 12px; top: calc(100% - 6px); z-index: 20;
+  margin: 0; padding: 10px 14px; max-width: min(560px, calc(100% - 24px));
+  background: #0a2028; border: 1px solid var(--lagoon); border-radius: 12px;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, .55);
+  color: var(--mist); font-size: 13px; line-height: 1.5;
+  opacity: 0; visibility: hidden; transform: translateY(-4px);
+  transition: opacity .12s ease, transform .12s ease, visibility .12s;
+  pointer-events: none;
+}
+.row:hover .usage, .row:focus-within .usage { opacity: 1; visibility: visible; transform: translateY(0); }
+
+@media (prefers-reduced-motion: reduce) {
+  .row, .usage, .name, .chip, .primary { transition: none; }
+}

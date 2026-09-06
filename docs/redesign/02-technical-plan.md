@@ -271,6 +271,10 @@ Giant movement (their audible radius is a gameplay signal), and UI stingers
 for tier-up and escape. Everything routes through one bus per viewport so
 volumes can be balanced per player.
 
+See [docs/audio.md](../audio.md) for what is actually built: the sound library
+and how to regenerate it, the distance falloff for world sounds, and the audio
+workbench at `/workbench/?edit=audio`.
+
 ## Milestones
 
 Each milestone ends with a playable build and a specific question for

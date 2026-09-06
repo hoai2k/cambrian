@@ -4,6 +4,8 @@ import { GLTFLoader, type GLTF } from 'three/examples/jsm/loaders/GLTFLoader.js'
 import { MeshoptDecoder } from 'three/examples/jsm/libs/meshopt_decoder.module.js';
 import * as SkeletonUtils from 'three/examples/jsm/utils/SkeletonUtils.js';
 import { clamp, damp } from '../shared/math';
+import { makeRecolor } from './recolor';
+import { schemeForCreature } from '../shared/palettes';
 import { creature, type CreatureId } from '../sim/creatures';
 import { lengthOf } from '../sim/actors';
 import type { Actor } from '../sim/types';
@@ -103,6 +105,10 @@ export class CreatureView {
       }
       if (o instanceof THREE.Bone) { const m = SPINE_RE.exec(o.name); if (m) this.spine.push(o); }
     });
+    // All of a creature's colour lives in its vertex colours, so its palette is a shader hook on
+    // the materials cloned just above rather than a second set of models. Both LODs share the
+    // material names the slots are read from, so a distant creature keeps its colours.
+    makeRecolor(this.model).setScheme(schemeForCreature(creatureId));
     this.spine.sort((a, b) => Number(SPINE_RE.exec(a.name)![2]) - Number(SPINE_RE.exec(b.name)![2]));
     this.mixer = new THREE.AnimationMixer(this.model);
     for (const clip of loaded.gltf.animations) this.actions.set(clip.name, this.mixer.clipAction(clip));

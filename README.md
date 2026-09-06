@@ -35,30 +35,37 @@ every push to `main` (set the repository's Pages source to "GitHub Actions").
 | `src/sim/` | Pure TypeScript simulation: world, creatures, movement, combat, growth, AI, modes. No Three.js. |
 | `src/render/` | Three.js: sea environment, creature views and animation layering, effects, cameras, split-screen engine. |
 | `src/app/` | React shell: title, creature select, HUD, pause/results, help and settings. |
-| `src/input/`, `src/audio/` | Gamepad/keyboard reading; fully synthesized audio. |
+| `src/input/`, `src/audio/` | Gamepad/keyboard reading; the WebAudio graph, its sample library and the distance falloff for world sounds. |
+| `src/workbench/` | Development workbenches at `/workbench/?edit=<name>`. `?edit=audio` plays every sound in the game through the real audio module. |
 | `src/shared/palettes.ts` | Creature colour schemes and the material-name to slot mapping they apply through (`src/render/recolor.ts`). |
 | `public/assets/creatures/` | 21 rigged full models, reduced LODs, anatomical anchors, studio renders, hero cards, thumbnails and transparent `.select.png` portraits. |
 | `docs/redesign/` | Design and technical plan. |
-| `tools/` | Headless sim tests (`harness.ts`, `controls-test.ts`, `hunt-test.ts`, `fight-test.ts`, `corpse-test.ts`, `respawn-test.ts`, `flora-test.ts`), browser smoke tests (`smoke.mjs`, `viewer-smoke.mjs`), creature image intake (`make-cards.mjs`, `check-creature-assets.mjs`), colour-slot check (`palette-test.mjs`), LOD generator (`make-lods.mjs`), SFX generator (`gen-sfx.mjs`). |
+| `tools/` | Headless sim tests (`harness.ts`, `controls-test.ts`, `hunt-test.ts`, `fight-test.ts`, `corpse-test.ts`, `respawn-test.ts`, `flora-test.ts`, `world-test.ts`), browser smoke tests (`smoke.mjs`, `viewer-smoke.mjs`, `workbench-smoke.mjs`), menu button-binding check (`menu-bindings-test.ts`), creature image intake (`make-cards.mjs`, `check-creature-assets.mjs`), colour-slot check (`palette-test.mjs`), audio density check (`audio-mix-test.ts`), LOD generator (`make-lods.mjs`), SFX generator (`gen-sfx.mjs`). |
 | `public/assets/brand/`, `public/assets/ui/` | Delivered art: logo and key art, tier and band glyphs, mode panels, loading motif. |
 | `tools/art/` | How that art was made: generation prompts, the Blender portrait render, vector export and review scripts. |
 | `image-requests.md` | Open art requests — currently none; delivered briefs are in `image-requests-history.md`. |
 | `docs/creature-intake.md` | How to add a creature or change its look; `node tools/check-creature-assets.mjs --strict` enforces it. |
+| `docs/audio.md` | The sound library, how to regenerate a sound, the distance falloff, and the audio workbench. |
 
 ## Headless checks
 
 ```sh
 run() { npx esbuild "$1" --bundle --platform=node --format=esm --outfile=/tmp/t.mjs && node /tmp/t.mjs "${@:2}"; }
+npm run bindings                  # no two menu actions share a controller button
 run tools/controls-test.ts        # camera-relative movement directions
 run tools/respawn-test.ts         # a giant eats a larva; it must come back
 run tools/flora-test.ts           # plants: slide around sponges, fold algae, spring back
 run tools/expansion-test.ts       # all new kits, feeding, tracking and body clearance
+run tools/world-test.ts           # the endless sea: shore, biome bands, streaming, teleport, radar
 node --experimental-transform-types tools/anchors-test.mjs
 node --experimental-transform-types tools/feeding-test.mjs
 node tools/check-creature-assets.mjs --strict
+run tools/audio-mix-test.ts       # audio density: how much of the reef's noise is in earshot
 run tools/harness.ts all 240      # balance: hunting, growth, escapes per creature
 run tools/harness.ts duel         # rival fights between creature pairs
 npm run preview & node tools/smoke.mjs /tmp   # needs Chromium; writes screenshots
+npm run preview & node tools/biome-tour.mjs /tmp   # drives through every biome band; screenshots and streaming stats
+npm run preview & node tools/workbench-smoke.mjs /tmp   # audio workbench: plays sounds, flags missing samples
 ```
 
 `window.__cambrian.stats()` in the browser console reports draw calls, triangles,

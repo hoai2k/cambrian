@@ -29,5 +29,5 @@ export const CheckIcon = (p: SVGProps<SVGSVGElement>) => (<svg {...base(p)}><pat
 
 /** Shared production emblem. */
 export const Emblem = ({ size = 48 }: { size?: number }) => (
-  <img src={`${import.meta.env.BASE_URL}favicon.svg`} width={size} height={size} alt="" aria-hidden="true" />
+  <img src={`${import.meta.env.BASE_URL}assets/brand/emblem-engraved.webp`} width={size} height={size} alt="" aria-hidden="true" />
 );

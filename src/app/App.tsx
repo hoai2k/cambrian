@@ -43,7 +43,8 @@ export function App() {
   const [error, setError] = useState('');
   const [notice, setNotice] = useState('');
   const [isFs, setIsFs] = useState(false);
-  const [padCount, setPadCount] = useState(0);
+  const [padIndices, setPadIndices] = useState<number[]>([]);
+  const padCount = padIndices.length;
 
   const updatePlayers = useCallback((p: PlayerSetup[]) => { playersRef.current = p; setPlayers(p); }, []);
   const go = useCallback((s: Screen) => { screenRef.current = s; setScreen(s); }, []);
@@ -185,9 +186,14 @@ export function App() {
     const loop = () => {
       raf = requestAnimationFrame(loop);
       const pads = gamepads();
-      if (pads.length !== padCount) setPadCount(pads.length);
-      const s = screenRef.current;
+      const live = pads.map((g) => g.index);
+      setPadIndices((old) => (old.length === live.length && old.every((v, i) => v === live[i]) ? old : live));
       for (const gp of pads) {
+        // Re-read the screen for every pad. One pad starting the game moves everyone to the
+        // select screen immediately, and the pads after it in this same frame must see that —
+        // otherwise a second pad pressing at the same moment restarts from the title and throws
+        // the first player away.
+        const s = screenRef.current;
         const c = readGamepad(gp);
         const p = prev.get(gp.index);
         const just = (k: keyof RawControls) => !!c[k] && !p?.[k];
@@ -199,7 +205,9 @@ export function App() {
         } else if (s === 'select') {
           const ps = playersRef.current;
           const idx = ps.findIndex((x) => x.device === gp.index);
-          if (idx < 0) { if (just('confirm')) addPlayer(gp.index); }
+          // Any button joins, not just A. The title says PRESS START, so Start has to work here
+          // too, and a pad that reports a non-standard mapping still gets its player in.
+          if (idx < 0) { if (just('anyButton')) addPlayer(gp.index); }
           else {
             const stickX = Math.abs(c.mx) > 0.6 ? Math.sign(c.mx) : 0, stickY = Math.abs(c.my) > 0.6 ? -Math.sign(c.my) : 0;
             const dx = just('dright') ? 1 : just('dleft') ? -1 : 0, dy = just('ddown') ? 1 : just('dup') ? -1 : 0;
@@ -209,8 +217,12 @@ export function App() {
             if (just('confirm')) { if (ps[idx].ready) startMatch(); else toggleReady(idx); }
             if (just('back')) { if (ps[idx].ready) toggleReady(idx); else removePlayer(idx); }
             if (just('menu')) startMatch();
-            if (just('lock')) changeMode(MODES[(MODES.indexOf(modeRef.current) + MODES.length - 1) % MODES.length]);
-            if (just('burst') && c.burst > 0.5) changeMode(MODES[(MODES.indexOf(modeRef.current) + 1) % MODES.length]);
+            // LB and RB cycle the mode. Bind to the raw shoulder buttons, never to a gameplay
+            // control: this used to read `burst`, which is button 0 — the same button as confirm —
+            // so every A press locked the player in and then changed mode, and changeMode
+            // un-readies everyone, which meant nobody could ever lock in or start a match.
+            if (just('lb')) changeMode(MODES[(MODES.indexOf(modeRef.current) + MODES.length - 1) % MODES.length]);
+            if (just('rb')) changeMode(MODES[(MODES.indexOf(modeRef.current) + 1) % MODES.length]);
           }
         } else if (s === 'playing' && pausedRef.current) {
           if (just('confirm')) setPausedBoth(false);
@@ -223,10 +235,16 @@ export function App() {
         }
         prev.set(gp.index, c);
       }
+      // Forget pads that have gone, so a reconnect starts from a clean edge rather than
+      // inheriting the buttons that were held when it vanished.
+      for (const index of prev.keys()) if (!live.includes(index)) { prev.delete(index); repeat.delete(index); }
     };
     raf = requestAnimationFrame(loop);
     return () => cancelAnimationFrame(raf);
-  }, [addPlayer, backToSelect, backToTitle, changeMode, moveCursor, openDialog, padCount, playAgain, removePlayer, setPausedBoth, startFromTitle, startMatch, toggleReady]);
+    // padIndices is deliberately not a dependency: it is written from inside this loop, and
+    // listing it would tear the loop down and rebuild it every time a pad connects, losing the
+    // button edges held in `prev`.
+  }, [addPlayer, backToSelect, backToTitle, changeMode, moveCursor, openDialog, playAgain, removePlayer, setPausedBoth, startFromTitle, startMatch, toggleReady]);
 
   // ---- Keyboard menu navigation ----
   useEffect(() => {
@@ -290,7 +308,7 @@ export function App() {
 
       {screen === 'select' && (
         <SelectScreen
-          players={players} mode={mode} modes={MODES} modeInfo={modeInfo} allReady={allReady} padCount={padCount}
+          players={players} mode={mode} modes={MODES} modeInfo={modeInfo} allReady={allReady} padIndices={padIndices}
           onPick={setCreature} onReady={toggleReady} onRemove={removePlayer} onAddKeyboard={addKeyboard}
           onMode={changeMode} onStart={startMatch} onBack={backToTitle}
         />

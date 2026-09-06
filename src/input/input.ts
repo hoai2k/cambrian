@@ -7,15 +7,22 @@ export interface RawControls {
   /** D-pad down: the in-game teleport menu. */
   teleport: boolean;
   menu: boolean; view: boolean; confirm: boolean; back: boolean;
+  /** Raw shoulder buttons. Menus bind to these rather than to `dodge`/`rise`, which share them. */
+  lb: boolean; rb: boolean;
   dleft: boolean; dright: boolean; dup: boolean; ddown: boolean;
+  /** Any button or stick movement: used by the title screen, where anything at all starts. */
   any: boolean;
+  /** Any button, ignoring the sticks. Joining uses this so stick drift cannot add a player. */
+  anyButton: boolean;
 }
 
 export const emptyControls = (): RawControls => ({
   mx: 0, my: 0, lookX: 0, lookY: 0, burst: 0, rise: false, sink: false,
   light: false, heavy: false, ability: false, dodge: false, guard: false, lock: false, sense: false,
   dash: false, aim: false, rsClick: false, teleport: false,
-  menu: false, view: false, confirm: false, back: false, dleft: false, dright: false, dup: false, ddown: false, any: false,
+  menu: false, view: false, confirm: false, back: false, lb: false, rb: false,
+  dleft: false, dright: false, dup: false, ddown: false,
+  any: false, anyButton: false,
 });
 
 export function deadzone(x: number, y: number, dz = 0.15): [number, number] {
@@ -37,11 +44,14 @@ export function readGamepad(gp: Gamepad): RawControls {
     burst: b(0) ? 1 : 0, rise: b(5), sink: b(10),
     light: b(2), heavy: v(7) > 0.5, ability: b(3), dodge: b(4), guard: b(1), lock: v(6) > 0.4, sense: b(12),
     dash: b(4), aim: v(6) > 0.4, rsClick: b(11), teleport: b(13),
-    menu: b(9), view: b(8), confirm: b(0), back: b(1),
+    menu: b(9), view: b(8), confirm: b(0), back: b(1), lb: b(4), rb: b(5),
     dleft: b(14), dright: b(15), dup: b(12), ddown: b(13),
-    any: false,
+    any: false, anyButton: false,
   };
-  c.any = gp.buttons.some((x) => x.pressed) || Math.hypot(mx, my) > 0.5;
+  // Buttons are read straight off the device rather than through the named controls above, so a
+  // pad that reports a non-standard mapping (where A is not button 0) can still join and start.
+  c.anyButton = gp.buttons.some((x) => x.pressed);
+  c.any = c.anyButton || Math.hypot(mx, my) > 0.5;
   return c;
 }
 
@@ -82,7 +92,7 @@ export class KeyboardInput {
       c.confirm = k('Enter'); c.back = k('Backspace');
       c.dleft = k('KeyJ'); c.dright = k('KeyL'); c.dup = k('KeyI'); c.ddown = k('KeyK');
     }
-    c.any = this.keys.size > 0;
+    c.any = c.anyButton = this.keys.size > 0;
     return c;
   }
   endFrame() { this.pressedThisFrame.clear(); this.anyPress = false; }

@@ -2,10 +2,25 @@
  * Game audio. Generated sample library (public/assets/sfx, made with tools/gen-sfx.mjs) with a
  * synthesized fallback for anything that has not loaded yet, so the game is never silent.
  */
-const SFX_BASE = `${import.meta.env.BASE_URL}assets/sfx/`;
+import { AUDIBLE_FLOOR, MIN_GAP } from './mix';
+import { biomeHasTrack, BIOME_HOLD, CROSSFADE, FIRST_FADE, MISSING, OPENING_TRACK, pickNext, type MusicTrack } from './music';
+import type { Biome } from '../sim/world';
+
+/** One playing music track: a streaming media element on its own gain, for crossfading. */
+interface MusicVoice { track: MusicTrack; el: HTMLAudioElement; node: MediaElementAudioSourceNode; gain: GainNode }
+
+/**
+ * Prefix for the asset folders. The game page sits at the app root, but a built bundle's
+ * BASE_URL is './', so a page one directory down (the workbench) would resolve samples to
+ * `/workbench/assets/`. Those pages call `setAssetBase('../')` before playing anything.
+ */
+let ASSET_BASE = import.meta.env.BASE_URL;
+export function setAssetBase(base: string) { ASSET_BASE = base; }
+/** URL of a sample file in the library, by bare name (no extension). */
+export const sfxUrl = (name: string) => `${ASSET_BASE}assets/sfx/${name}.mp3`;
 
 /** event kind → sample files (variants are chosen at random) */
-const SAMPLES: Record<string, string[]> = {
+export const SAMPLES: Record<string, string[]> = {
   eat: ['bite-1', 'bite-2', 'bite-3'],
   crunch: ['crunch-1', 'crunch-2'],
   hit: ['hit-light-1', 'hit-light-2'],
@@ -13,20 +28,13 @@ const SAMPLES: Record<string, string[]> = {
   parry: ['parry'], guardBreak: ['guard-break'], stagger: ['stagger'],
   dodge: ['dodge-1', 'dodge-2'], burst: ['burst'], silt: ['silt'], grab: ['grab'],
   kill: ['kill'], death: ['death'], tierUp: ['tier-up'], hunted: ['hunted'], escape: ['escape'],
-  sense: ['sense'], ability: ['ability'], heartbeat: ['heartbeat'], noticed: ['hunted'], respawn: ['ui-join'],
+  sense: ['sense'], ability: ['ability'], heartbeat: ['heartbeat'], noticed: ['noticed'], respawn: ['respawn'],
+  pounce: ['pounce'], swallow: ['swallow'], disintegrate: ['disintegrate'], routed: ['routed'],
   'ui-move': ['ui-move'], 'ui-confirm': ['ui-confirm'], 'ui-back': ['ui-back'], 'ui-join': ['ui-join'], 'ui-start': ['ui-start'], won: ['won'],
 };
-const LOOPS = { ambient: 'ambient-reef', drone: 'giant-drone' } as const;
-/**
- * Background music (public/music). Starts with the first user gesture on the title screen and
- * loops. Three moods follow the biome the first player is in (see docs/redesign/04-infinite-ocean.md):
- * the reef theme is the default; a calm theme for the shallows and nurseries and a danger theme
- * for the channels, escarpment and basin are optional files that fall back to the reef theme
- * while they are missing.
- */
-export type Mood = 'calm' | 'reef' | 'danger';
-const MUSIC_TRACKS: Record<Mood, string> = { reef: 'Tide of First Bones.mp3', calm: 'theme-calm.mp3', danger: 'theme-danger.mp3' };
-const musicUrl = (m: Mood) => `${import.meta.env.BASE_URL}music/${encodeURIComponent(MUSIC_TRACKS[m])}`;
+export const LOOPS = { ambient: 'ambient-reef', drone: 'giant-drone' } as const;
+/** URL of a music track in public/music, by name (no extension). See `src/audio/music.ts`. */
+export const musicUrl = (name: string) => `${ASSET_BASE}music/${encodeURIComponent(name)}.mp3`;
 
 export class GameAudio {
   private ctx?: AudioContext;
@@ -38,24 +46,31 @@ export class GameAudio {
   private synthTensionGain?: GainNode;
   private musicGain?: GainNode;
   private musicStarted = false;
-  private tracks = new Map<Mood, { gain: GainNode; buf: AudioBuffer; src?: AudioBufferSourceNode }>();
-  private missing = new Set<Mood>();
-  private mood: Mood = 'reef';
+  private music?: MusicVoice;
+  private biome?: Biome;
+  private biomeCueAt = -BIOME_HOLD;
+  private ambience = true;
   musicOn = true;
   private musicLevel = 0.3;
   private buffers = new Map<string, AudioBuffer>();
+  private previews = new Map<string, AudioBuffer>();
   private loading = new Set<string>();
   private heartT = 0;
   private tension = 0;
   private started = false;
   private ambientStarted = false;
-  private lastPlay = new Map<string, number>();
+  private lastPlay = new Map<string, { t: number; vol: number }>();
   volume = 0.8;
   muted = false;
 
-  init() {
+  /**
+   * Bring up the audio graph. `ambience: false` leaves out the beds — music, the reef loop and
+   * the synth drones — for the audio workbench, which auditions single sounds on a silent stage.
+   */
+  init(opts: { ambience?: boolean } = {}) {
     if (this.started) return;
     this.started = true;
+    this.ambience = opts.ambience !== false;
     const Ctx = (window.AudioContext || (window as any).webkitAudioContext) as typeof AudioContext | undefined;
     if (!Ctx) return;
     const ctx = new Ctx();
@@ -65,7 +80,9 @@ export class GameAudio {
     // Sample-based ambience and tension (start silent, fade in once loaded)
     this.ambGain = ctx.createGain(); this.ambGain.gain.value = 0; this.ambGain.connect(this.master);
     this.tensionGain = ctx.createGain(); this.tensionGain.gain.value = 0; this.tensionGain.connect(this.master);
+    this.musicGain = ctx.createGain(); this.musicGain.gain.value = 0; this.musicGain.connect(this.master);
     // Synth fallbacks: drones through a low-pass, plus a filtered noise wash
+    if (!this.ambience) { void this.preload(); this.watchFocus(); return; }
     this.synthAmbGain = ctx.createGain(); this.synthAmbGain.gain.value = 0; this.synthAmbGain.connect(this.master);
     const lp = ctx.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 420; lp.connect(this.synthAmbGain);
     for (const [f, type] of [[55, 'sine'], [82.5, 'triangle'], [110.2, 'sine']] as const) {
@@ -78,10 +95,12 @@ export class GameAudio {
     this.synthTensionGain = ctx.createGain(); this.synthTensionGain.gain.value = 0; this.synthTensionGain.connect(this.master);
     const td = ctx.createOscillator(); td.type = 'sawtooth'; td.frequency.value = 41; const tf = ctx.createBiquadFilter(); tf.type = 'lowpass'; tf.frequency.value = 160;
     td.connect(tf); tf.connect(this.synthTensionGain); td.start();
-    this.musicGain = ctx.createGain(); this.musicGain.gain.value = 0; this.musicGain.connect(this.master);
-    void this.startMusic();
+    this.startSoundtrack();
     void this.preload();
-    // (focus) silence the game when the tab or window is not in front
+    this.watchFocus();
+  }
+  /** (focus) silence the game when the tab or window is not in front */
+  private watchFocus() {
     const onVis = () => this.applyGain();
     document.addEventListener('visibilitychange', onVis);
     window.addEventListener('blur', onVis); window.addEventListener('focus', onVis);
@@ -105,59 +124,115 @@ export class GameAudio {
     if (this.loading.has(name)) return undefined;
     this.loading.add(name);
     try {
-      const res = await fetch(`${SFX_BASE}${name}.mp3`);
+      const res = await fetch(sfxUrl(name));
       if (!res.ok) throw new Error(String(res.status));
       const buf = await this.ctx.decodeAudioData(await res.arrayBuffer());
       this.buffers.set(name, buf);
-      if (name === LOOPS.ambient) this.startAmbient();
-      if (name === LOOPS.drone) this.startDrone();
+      if (this.ambience && name === LOOPS.ambient) this.startAmbient();
+      if (this.ambience && name === LOOPS.drone) this.startDrone();
       return buf;
     } catch { return undefined; } finally { this.loading.delete(name); }
   }
 
-  private async startMusic() {
+  // ---------- music ----------
+  /**
+   * Tracks are streamed through media elements rather than decoded into AudioBuffers: they run
+   * for minutes, and a decoded one costs tens of megabytes where a stream costs nothing. It also
+   * gives us `ended` and `currentTime` for free, which is how the hand-over is timed.
+   */
+  private musicVoice(track: MusicTrack): MusicVoice | undefined {
+    const ctx = this.ctx; if (!ctx || !this.musicGain) return undefined;
+    const el = new Audio(musicUrl(track.name));
+    el.preload = 'auto';
+    const gain = ctx.createGain(); gain.gain.value = 0;
+    const node = ctx.createMediaElementSource(el);
+    node.connect(gain); gain.connect(this.musicGain);
+    const voice: MusicVoice = { track, el, node, gain };
+    el.addEventListener('timeupdate', () => {
+      // Hand over before the end so the tracks overlap rather than leaving a hole.
+      if (this.music !== voice || !el.duration) return;
+      if (el.duration - el.currentTime <= CROSSFADE) this.nextTrack();
+    });
+    el.addEventListener('ended', () => { if (this.music === voice) this.nextTrack(); });
+    // A track that is not there (a biome theme not yet delivered) leaves the rotation rather than silencing it.
+    el.addEventListener('error', () => { MISSING.add(track.name); if (this.music === voice) this.nextTrack(); });
+    void el.play().catch(() => { /* blocked until a gesture; the next track will try again */ });
+    return voice;
+  }
+
+  /** Fade `voice` out over `seconds` and tear it down. */
+  private endVoice(voice: MusicVoice, seconds: number) {
+    const ctx = this.ctx!;
+    voice.gain.gain.cancelScheduledValues(ctx.currentTime);
+    voice.gain.gain.setValueAtTime(voice.gain.gain.value, ctx.currentTime);
+    voice.gain.gain.linearRampToValueAtTime(0, ctx.currentTime + seconds);
+    window.setTimeout(() => {
+      voice.el.pause(); voice.el.removeAttribute('src'); voice.el.load();
+      voice.node.disconnect(); voice.gain.disconnect();
+    }, seconds * 1000 + 200);
+  }
+
+  /** Start `track`, crossfading out whatever is playing. */
+  private playTrack(track: MusicTrack, fade = CROSSFADE) {
+    const ctx = this.ctx; if (!ctx) return;
+    const outgoing = this.music;
+    const voice = this.musicVoice(track);
+    if (!voice) return;
+    this.music = voice;
+    voice.gain.gain.linearRampToValueAtTime(1, ctx.currentTime + fade);
+    if (outgoing) this.endVoice(outgoing, fade);
+  }
+
+  /** Move on to whatever `pickNext` chooses. */
+  private nextTrack() {
+    this.playTrack(pickNext(this.music?.track, this.biome));
+  }
+
+  /** Begin the soundtrack: the opening track, then the random rotation. */
+  startSoundtrack() {
     if (this.musicStarted || !this.ctx || !this.musicGain) return;
     this.musicStarted = true;
-    const t = await this.loadTrack(this.mood) ?? await this.loadTrack('reef');
-    if (!t || !this.ctx) { this.musicStarted = false; return; }
-    this.playTrack(t);
-    t.gain.gain.setValueAtTime(1, this.ctx.currentTime);
-    this.musicGain.gain.linearRampToValueAtTime(this.musicOn ? this.musicLevel : 0, this.ctx.currentTime + 4);
+    this.musicGain.gain.linearRampToValueAtTime(this.musicOn ? this.musicLevel : 0, this.ctx.currentTime + FIRST_FADE);
+    this.playTrack(OPENING_TRACK, FIRST_FADE);
   }
-  private async loadTrack(m: Mood) {
-    if (!this.ctx || !this.musicGain || this.missing.has(m)) return undefined;
-    const have = this.tracks.get(m); if (have) return have;
-    try {
-      const res = await fetch(musicUrl(m)); if (!res.ok) throw new Error(String(res.status));
-      const buf = await this.ctx.decodeAudioData(await res.arrayBuffer());
-      const gain = this.ctx.createGain(); gain.gain.value = 0; gain.connect(this.musicGain);
-      const t = { gain, buf }; this.tracks.set(m, t); return t;
-    } catch { this.missing.add(m); return undefined; }
+
+  setMusic(on: boolean) {
+    this.musicOn = on;
+    if (this.musicGain && this.ctx) this.musicGain.gain.setTargetAtTime(on ? this.musicLevel * (1 - this.tension * 0.45) : 0, this.ctx.currentTime, 0.5);
+    // Stop the stream outright when the music is off, so a silent track is not still downloading
+    // and counting down towards the next one.
+    if (this.music) { if (on) void this.music.el.play().catch(() => {}); else this.music.el.pause(); }
   }
-  private playTrack(t: { gain: GainNode; buf: AudioBuffer; src?: AudioBufferSourceNode }) {
-    if (t.src || !this.ctx) return;
-    const src = this.ctx.createBufferSource(); src.buffer = t.buf; src.loop = true; src.connect(t.gain); src.start();
-    t.src = src;
+
+  /** What is playing right now, for the audio workbench. */
+  get nowPlaying(): string | undefined { return this.music?.track.name; }
+  /** Workbench: hand over to the next track now. */
+  skipTrack() { if (this.music) this.nextTrack(); }
+  /**
+   * Workbench: jump to just before the hand-over, to hear one track give way to the next
+   * without sitting through the whole thing.
+   */
+  seekToHandover() {
+    const el = this.music?.el;
+    if (el?.duration) el.currentTime = Math.max(0, el.duration - CROSSFADE - 1);
   }
-  /** Follow the biome: crossfade to the mood's theme over a few seconds (a missing theme keeps the reef playing). */
-  async setMood(m: Mood) {
-    if (m === this.mood) return;
-    const prev = this.mood; this.mood = m;
-    if (!this.musicStarted || !this.ctx) return;
-    const next = await this.loadTrack(m) ?? await this.loadTrack('reef');
-    if (!next || !this.ctx || this.mood !== m) return;
-    const from = this.tracks.get(prev) ?? [...this.tracks.values()].find((t) => t.src && t !== next);
-    if (from === next) return;
+
+  /**
+   * Tell the music where the player is. A biome with a track of its own cues that track; the
+   * change is rate-limited by BIOME_HOLD so a player weaving across an edge does not thrash the
+   * score. No track names a biome yet, so today this only records where we are, and the biome
+   * then steers `pickNext` when the current track ends.
+   */
+  setBiome(biome: Biome) {
+    if (biome === this.biome) return;
+    this.biome = biome;
+    if (!this.ctx || !this.music || !biomeHasTrack(biome)) return;
+    if (this.music.track.biomes?.includes(biome)) return;         // already the right music
     const now = this.ctx.currentTime;
-    this.playTrack(next);
-    next.gain.gain.cancelScheduledValues(now); next.gain.gain.setValueAtTime(next.gain.gain.value, now); next.gain.gain.linearRampToValueAtTime(1, now + 5);
-    if (from?.src) {
-      const src = from.src; from.src = undefined;
-      from.gain.gain.cancelScheduledValues(now); from.gain.gain.setValueAtTime(from.gain.gain.value, now); from.gain.gain.linearRampToValueAtTime(0, now + 5);
-      src.stop(now + 5.2);
-    }
+    if (now - this.biomeCueAt < BIOME_HOLD) return;
+    this.biomeCueAt = now;
+    this.playTrack(pickNext(this.music.track, biome));
   }
-  setMusic(on: boolean) { this.musicOn = on; if (this.musicGain && this.ctx) this.musicGain.gain.setTargetAtTime(on ? this.musicLevel * (1 - this.tension * 0.45) : 0, this.ctx.currentTime, 0.5); }
 
   private startLoop(name: string, dest: AudioNode) {
     const ctx = this.ctx!; const buf = this.buffers.get(name); if (!buf) return;
@@ -204,37 +279,84 @@ export class GameAudio {
     }
   }
 
-  private playSample(name: string, vol: number, pan = 0, rate = 1) {
-    const ctx = this.ctx; const buf = this.buffers.get(name); if (!ctx || !buf || !this.sfxBus) return false;
-    const src = ctx.createBufferSource(); src.buffer = buf; src.playbackRate.value = rate;
+  /**
+   * One sfx voice. `muffle` is the distance factor from the listener (1 = right here, 0 = at the
+   * audible limit); below 1 it rolls off the highs, so far-off bites and clacks read as soft
+   * thuds instead of a carpet of clicks — water swallows high frequencies over distance.
+   */
+  private voice(buf: AudioBuffer, vol: number, pan = 0, rate = 1, muffle = 1, loop = false) {
+    const ctx = this.ctx!;
+    const src = ctx.createBufferSource(); src.buffer = buf; src.playbackRate.value = rate; src.loop = loop;
     const g = ctx.createGain(); g.gain.value = Math.min(1.5, vol);
     const p = ctx.createStereoPanner(); p.pan.value = pan;
-    src.connect(g); g.connect(p); p.connect(this.sfxBus); src.start();
+    src.connect(g);
+    if (muffle < 0.999) {
+      const lp = ctx.createBiquadFilter(); lp.type = 'lowpass';
+      lp.frequency.value = 480 + 19000 * Math.pow(Math.max(0, muffle), 1.6);
+      g.connect(lp); lp.connect(p);
+    } else g.connect(p);
+    p.connect(this.sfxBus!); src.start();
+    return src;
+  }
+
+  private playSample(name: string, vol: number, pan = 0, rate = 1, muffle = 1) {
+    const buf = this.buffers.get(name); if (!this.ctx || !buf || !this.sfxBus) return false;
+    this.voice(buf, vol, pan, rate, muffle);
     return true;
   }
 
-  /** Play a game or UI event. `strength` scales volume and slightly pitch. */
-  play(kind: string, strength = 1, pan = 0) {
-    if (!this.ctx) return;
-    // rate-limit spammy kinds so schools of snacks do not turn into a machine gun
-    const now = performance.now(); const last = this.lastPlay.get(kind) ?? 0;
-    const minGap = kind === 'eat' ? 70 : kind === 'hit' ? 40 : 0;
-    if (now - last < minGap) return;
-    this.lastPlay.set(kind, now);
+  /**
+   * Play one audio file through the sfx bus and hand back a stop handle. The audio workbench
+   * uses this to audition the library file by file (loops included); the game goes through
+   * `play()`, which picks the file and the volume for an event kind.
+   */
+  async preview(url: string, opts: { vol?: number; pan?: number; atten?: number; loop?: boolean } = {}) {
+    const ctx = this.ctx; if (!ctx || !this.sfxBus) return undefined;
+    let buf = this.previews.get(url);
+    if (!buf) {
+      try {
+        const res = await fetch(url); if (!res.ok) return undefined;
+        buf = await ctx.decodeAudioData(await res.arrayBuffer());
+      } catch { return undefined; }
+      this.previews.set(url, buf);
+    }
+    const atten = opts.atten ?? 1;
+    const src = this.voice(buf, (opts.vol ?? 0.8) * atten, opts.pan ?? 0, 1, atten, opts.loop);
+    return { duration: buf.duration, stop: () => { try { src.stop(); } catch { /* already ended */ } } };
+  }
 
+  /**
+   * Play a game or UI event. `strength` scales volume and slightly pitch; `atten` is the
+   * distance attenuation from the listener (1 = at the camera, 0 = out of earshot).
+   */
+  play(kind: string, strength = 1, pan = 0, atten = 1) {
+    if (!this.ctx) return;
+    if (atten <= AUDIBLE_FLOOR) return;               // out of earshot: never queued, never heard
     const s = Math.min(2, Math.max(0.2, strength));
     let key = kind;
     if (kind === 'hit' && s > 1.1) key = 'hit-heavy';
     if (kind === 'eat' && s > 0.5) key = 'crunch';
+    const baseVol = kind.startsWith('ui') ? 0.42 : kind === 'noticed' ? 0.3 : kind === 'eat' ? 0.45 + s * 0.3 : 0.6 + s * 0.35;
+    const vol = baseVol * atten;
+
+    // Rate-limit spammy kinds so a reef full of grazers is not a machine gun. A louder (nearer)
+    // event still gets through inside the window — quiet distant ones must never mask the one
+    // that is happening to you.
+    const minGap = MIN_GAP[kind] ?? 0;
+    if (minGap) {
+      const now = performance.now(); const last = this.lastPlay.get(kind);
+      if (last && now - last.t < minGap && vol <= last.vol * 1.15) return;
+      this.lastPlay.set(kind, { t: now, vol });
+    }
+
     const list = SAMPLES[key] ?? SAMPLES[kind];
     if (list) {
       const name = list[Math.floor(Math.random() * list.length)];
       const rate = (0.94 + Math.random() * 0.12) * (kind === 'eat' ? 1.15 - Math.min(0.3, s * 0.3) : 1);
-      const vol = kind.startsWith('ui') ? 0.42 : kind === 'noticed' ? 0.3 : kind === 'eat' ? 0.45 + s * 0.3 : 0.6 + s * 0.35;
-      if (this.playSample(name, vol, pan, rate)) return;
+      if (this.playSample(name, vol, pan, rate, atten)) return;
       void this.load(name);
     }
-    this.synth(kind, s, pan);
+    this.synth(kind, s * atten, pan);
   }
 
   // ---------- synthesized fallbacks ----------
@@ -287,6 +409,11 @@ export class GameAudio {
       case 'won': [0, 0.15, 0.3, 0.45, 0.7].forEach((d, i) => setTimeout(() => this.tone([392, 494, 587, 784, 988][i], 1.2, 0.22, 'triangle'), d * 1000)); break;
     }
   }
-  dispose() { this.ctx?.close(); this.ctx = undefined; this.started = false; }
+  dispose() {
+    // Stop the music stream first: a media element outlives the audio context it was routed into.
+    if (this.music) { this.music.el.pause(); this.music.el.removeAttribute('src'); this.music.el.load(); this.music = undefined; }
+    this.musicStarted = false;
+    this.ctx?.close(); this.ctx = undefined; this.started = false;
+  }
 }
 export const audio = new GameAudio();
