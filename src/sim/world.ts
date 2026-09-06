@@ -24,9 +24,9 @@ export const BIOME_NAMES: Record<Biome, string> = {
 export const BIOME_DANGER: Record<Biome, number> = {
   shallows: 0.08, nursery: 0.04, shelf: 0.4, forest: 0.5, boulders: 0.5, flats: 0.32, channel: 0.72, escarpment: 0.8, basin: 0.92,
 };
-export type FloraKind = 'vauxia' | 'sac' | 'choia' | 'thalli' | 'tuft';
+export type FloraKind = 'vauxia' | 'sac' | 'choia' | 'thalli' | 'tuft' | 'cushion' | 'lettuce' | 'spine' | 'glass';
 
-export interface Boulder { pos: Vec3; radius: number; height: number; sx: number; sy: number; sz: number; rot: number; shade: number; }
+export interface Boulder { variant?: 'blade-spire' | 'talus-shard'; pos: Vec3; radius: number; height: number; sx: number; sy: number; sz: number; rot: number; shade: number; }
 export interface Flora {
   pos: Vec3; kind: FloraKind; scale: number; sy: number; rot: number; shade: number;
   /** World-space height, base radius, and the furthest the top may be displaced. */
@@ -266,7 +266,7 @@ export function generateChunk(seed: number, cx: number, cz: number, detail: 'ful
     boulders.push({ pos: { x, y, z }, radius: Math.max(sx, sz) * 1.02, height: y + sy * 1.05, sx, sy, sz, rot: rng() * TAU, shade: 0.68 + rng() * 0.21 });
     if (big) cover.push({ pos: { x, y: y + sy * 0.4, z }, radius: Math.max(sx, sz) * 1.5, maxLength: sx * 0.9, strength: 0.45 });
   }
-  if (detail === 'far') return chunk;
+  if (detail === 'far') { applyBiomeProps(chunk); return chunk; }
 
   // Flora by blended biome density, per cell (five to a chunk edge), so biomes morph into each other.
   const cellSize = CHUNK / 5;
@@ -308,7 +308,38 @@ export function generateChunk(seed: number, cx: number, cz: number, detail: 'ful
     const x = x0 + 10 + rng() * (CHUNK - 20), z = z0 + 10 + rng() * (CHUNK - 20);
     if (shoreDistance(x, z) > 30) blooms.push({ pos: { x, y: LIGHT_WINDOW_Y + 2 + rng() * 5, z }, radius: 9 + rng() * 6, drift: rng() * TAU });
   }
+  applyBiomeProps(chunk);
   return chunk;
+}
+
+/** Replace the brief's scenery slots after generation, without consuming the placement RNG. */
+function applyBiomeProps(chunk: Chunk) {
+  for (const b of chunk.boulders) {
+    const biome = biomeAt(b.pos.x, b.pos.z);
+    const wall = channelFactor(b.pos.x, b.pos.z);
+    const blade = biome === 'channel' || (wall > .20 && wall <= .35 && shoreDistance(b.pos.x, b.pos.z) > 200)
+      || (biome === 'escarpment' && b.rot / TAU < .32) || (biome === 'basin' && b.rot / TAU < .14);
+    if (!blade && biome !== 'escarpment' && biome !== 'basin') continue;
+    b.variant = blade ? 'blade-spire' : 'talus-shard';
+    const scale = blade && biome === 'basin' ? 2 + b.shade : clamp(b.sx * (blade ? .55 : .9), .6, 2.5);
+    b.pos.y = sampleHeight(b.pos.x, b.pos.z);
+    b.sx = b.sy = b.sz = scale;
+    b.radius = (blade ? .624 : .864) * scale;
+    b.height = b.pos.y + (blade ? 4 : .8) * scale;
+  }
+  const flow = { x: 0, y: 0, z: 0 };
+  for (const f of chunk.flora) {
+    const biome = biomeAt(f.pos.x, f.pos.z), original = f.kind;
+    if ((biome === 'shallows' || biome === 'nursery') && original === 'sac') f.kind = 'cushion';
+    if (biome === 'shallows' && original === 'tuft' && f.rot < Math.PI) f.kind = 'lettuce';
+    if ((biome === 'escarpment' || biome === 'basin') && (original === 'vauxia' || original === 'sac')) f.kind = 'spine';
+    if (biome === 'basin' && (original === 'choia' || original === 'thalli')) {
+      f.kind = 'glass'; channelFlow(f.pos.x, f.pos.z, flow);
+      // The fan lies in local XY; its normal faces into the current.
+      f.rot = Math.atan2(flow.x, flow.z);
+    }
+    if (f.kind !== original) Object.assign(f, floraSize(f.kind, f.scale, f.sy));
+  }
 }
 
 /**
@@ -450,7 +481,7 @@ export function groundHeight(world: WorldData, x: number, z: number, scratch: Bo
     const d = Math.hypot(dx, dz);
     if (d < b.radius) {
       const dome = Math.sqrt(Math.max(0, 1 - (d / b.radius) ** 2));
-      h = Math.max(h, b.pos.y + b.sy * dome * 0.95);
+      h = Math.max(h, b.pos.y + b.sy * (b.variant === 'blade-spire' ? 4 : b.variant === 'talus-shard' ? .8 : 1) * dome * .95);
     }
   }
   return h;

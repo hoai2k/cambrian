@@ -15,6 +15,11 @@ export interface SoundEntry {
   usage: string;
   /** World sounds are placed and attenuated by distance; the rest play flat. */
   spatial: boolean;
+  /**
+   * Extra takes kept in the library but not wired into SAMPLES — an earlier version held on to
+   * as a backup. Swapping one in is a rename; the workbench plays them so they can be compared.
+   */
+  alts?: string[];
 }
 
 export interface SoundGroup { title: string; blurb: string; sounds: SoundEntry[] }
@@ -64,7 +69,7 @@ export const GROUPS: SoundGroup[] = [
     sounds: [
       { kind: 'tierUp', label: 'Tier up', spatial: false, usage: 'Your specimen moults into the next tier. Distance-faded and quieter when an AI creature tiers up instead.' },
       { kind: 'hunted', label: 'Hunted', spatial: false, usage: 'A predator has locked onto you and the hunted meter fills. Previously played for every AI creature that got hunted too — a big part of the noise.' },
-      { kind: 'escape', label: 'Escape', spatial: false, usage: 'You shake a hunter off and the hunted meter drains.' },
+      { kind: 'escape', label: 'Escape', spatial: false, alts: ['escape-alt'], usage: 'You shake a hunter off and the hunted meter drains. The previous take is kept alongside it as escape-alt.mp3.' },
       { kind: 'noticed', label: 'Noticed', spatial: false, usage: 'Something has just spotted you, before it commits to the hunt. Used to borrow the (much bigger) hunted sting.' },
       { kind: 'heartbeat', label: 'Heartbeat', spatial: false, usage: 'Not an event — the audio module pulses this on its own whenever tension is above 0.2, faster the higher it goes.' },
     ],

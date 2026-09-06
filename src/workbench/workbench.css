@@ -51,7 +51,7 @@ code { font-size: .92em; color: var(--lagoon); }
 .slider-label { display: flex; justify-content: space-between; gap: 12px; font-size: 12px; letter-spacing: .1em; text-transform: uppercase; color: var(--dim); }
 .slider-label b { color: var(--lagoon); font-size: 12px; letter-spacing: 0; text-transform: none; }
 .slider input { width: 100%; accent-color: var(--lagoon); }
-.readout { grid-column: 1 / -1; margin: 0; color: var(--mist); font-size: 13px; font-variant-numeric: tabular-nums; min-height: 1.4em; }
+.readout { grid-column: 1 / -1; display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin: 0; color: var(--mist); font-size: 13px; font-variant-numeric: tabular-nums; min-height: 1.4em; }
 
 /* ---------- sound groups ---------- */
 .group { margin-bottom: 30px; }
@@ -86,6 +86,10 @@ code { font-size: .92em; color: var(--lagoon); }
 }
 button.chip:hover:not(:disabled) { background: rgba(255, 179, 107, .2); color: var(--foam); }
 .chip.missing { border-color: var(--coral); color: var(--coral); }
+/* Measured too quiet above 150 Hz: present in the file, inaudible on a laptop speaker. */
+.chip.quiet { border-color: var(--ember); color: var(--ember); }
+/* A take kept as a backup, not wired into the game. */
+.chip.alt { border-style: dashed; color: var(--dim); }
 
 .row.soundtrack { background: rgba(97, 242, 213, .08); border-color: var(--line); }
 .row.soundtrack .name { min-width: 260px; }
