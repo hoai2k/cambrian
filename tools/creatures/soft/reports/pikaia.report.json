@@ -1,0 +1,278 @@
+{
+  "id": "pikaia",
+  "sourceOrientation": "Blender +Z up, -Y anterior; glTF +Y up, +Z anterior",
+  "boundsBlender": {
+    "min": [
+      -0.2787451148033142,
+      -2.672372341156006,
+      -0.37798061966896057
+    ],
+    "max": [
+      0.2787451148033142,
+      2.5,
+      0.42792022228240967
+    ]
+  },
+  "triangles": 23828,
+  "lodTriangles": 9054,
+  "vertices": 12107,
+  "bones": 40,
+  "durations": {
+    "Idle": 2.4,
+    "Swim": 2.4,
+    "Attack": 1.0,
+    "Hit": 0.6,
+    "Death": 1.6,
+    "TurnLeft": 2.4,
+    "TurnRight": 2.4,
+    "Dive": 2.4,
+    "Rise": 2.4,
+    "Bite": 0.5,
+    "Heavy": 1.1,
+    "Guard": 1.0,
+    "Parry": 0.35,
+    "Dodge": 0.4,
+    "Eat": 0.8,
+    "Stagger": 1.2,
+    "Ability": 1.2,
+    "Moult": 1.5
+  },
+  "clipFrames": {
+    "Idle": 72.0,
+    "Swim": 72.0,
+    "Attack": 30.0,
+    "Hit": 18.0,
+    "Death": 48.0,
+    "TurnLeft": 72.0,
+    "TurnRight": 72.0,
+    "Dive": 72.0,
+    "Rise": 72.0,
+    "Bite": 15.0,
+    "Heavy": 33.0,
+    "Guard": 30.0,
+    "Parry": 10.5,
+    "Dodge": 12.0,
+    "Eat": 24.0,
+    "Stagger": 36.0,
+    "Ability": 36.0,
+    "Moult": 45.0
+  },
+  "scientificNotes": [
+    "2024 reoriented anatomy: dorsally directed anterior gills, dorsal posterior fin extension, long thin ventral keel, sigmoidal myomere pigment and bilobed head. No camera eyes or fin rays added.",
+    "Palette and behavior reconstructed; posterior dorsal fin is integrated tissue rather than a separate ray-supported fish fin."
+  ],
+  "sources": [
+    "https://doi.org/10.1016/j.cub.2024.05.026",
+    "https://durham-repository.worktribe.com/OutputFile/2515077"
+  ],
+  "validation": {
+    "full": {
+      "bytes": 2266576,
+      "clips": [
+        "Ability",
+        "Attack",
+        "Bite",
+        "Death",
+        "Dive",
+        "Dodge",
+        "Eat",
+        "Guard",
+        "Heavy",
+        "Hit",
+        "Idle",
+        "Moult",
+        "Parry",
+        "Rise",
+        "Stagger",
+        "Swim",
+        "TurnLeft",
+        "TurnRight"
+      ],
+      "materials": {
+        "pikaia Gill filaments": {
+          "min": 0.17279316395819028,
+          "max": 0.5300984206912337,
+          "mean": 0.3420171232428042
+        },
+        "pikaia Living integument": {
+          "min": 0.08209353780422675,
+          "max": 0.546364538033112,
+          "mean": 0.268386399739929
+        },
+        "pikaia Marginal tissue": {
+          "min": 0.11316090638590066,
+          "max": 0.5421530479896238,
+          "mean": 0.30684077767811785
+        },
+        "pikaia Oral cuticle": {
+          "min": 0.024979018844892044,
+          "max": 0.30287632562752725,
+          "mean": 0.13423700851363662
+        }
+      },
+      "rootStatic": true,
+      "noScaleAnimation": true
+    },
+    "lod": {
+      "bytes": 1582268,
+      "clips": [
+        "Ability",
+        "Attack",
+        "Bite",
+        "Death",
+        "Dive",
+        "Dodge",
+        "Eat",
+        "Guard",
+        "Heavy",
+        "Hit",
+        "Idle",
+        "Moult",
+        "Parry",
+        "Rise",
+        "Stagger",
+        "Swim",
+        "TurnLeft",
+        "TurnRight"
+      ],
+      "materials": {
+        "pikaia Gill filaments": {
+          "min": 0.17279316395819028,
+          "max": 0.5300984206912337,
+          "mean": 0.3420171232428042
+        },
+        "pikaia Living integument": {
+          "min": 0.0904097047379263,
+          "max": 0.546364538033112,
+          "mean": 0.29056553084099057
+        },
+        "pikaia Marginal tissue": {
+          "min": 0.11316090638590066,
+          "max": 0.5421530479896238,
+          "mean": 0.29914330450191395
+        },
+        "pikaia Oral cuticle": {
+          "min": 0.02499427786678874,
+          "max": 0.30287632562752725,
+          "mean": 0.1246427654896412
+        }
+      },
+      "rootStatic": true,
+      "noScaleAnimation": true
+    },
+    "evaluatedSkin": {
+      "Idle": {
+        "finite": true,
+        "samples": 5,
+        "maxDimension": 5.172372102737427
+      },
+      "Swim": {
+        "finite": true,
+        "samples": 5,
+        "maxDimension": 5.172372102737427
+      },
+      "Attack": {
+        "finite": true,
+        "samples": 5,
+        "maxDimension": 5.172372102737427
+      },
+      "Hit": {
+        "finite": true,
+        "samples": 5,
+        "maxDimension": 5.172372102737427
+      },
+      "Death": {
+        "finite": true,
+        "samples": 5,
+        "maxDimension": 5.172372102737427
+      },
+      "TurnLeft": {
+        "finite": true,
+        "samples": 5,
+        "maxDimension": 5.172372102737427
+      },
+      "TurnRight": {
+        "finite": true,
+        "samples": 5,
+        "maxDimension": 5.172372102737427
+      },
+      "Dive": {
+        "finite": true,
+        "samples": 5,
+        "maxDimension": 5.172372102737427
+      },
+      "Rise": {
+        "finite": true,
+        "samples": 5,
+        "maxDimension": 5.172372102737427
+      },
+      "Bite": {
+        "finite": true,
+        "samples": 5,
+        "maxDimension": 5.173699617385864
+      },
+      "Heavy": {
+        "finite": true,
+        "samples": 5,
+        "maxDimension": 5.172372102737427
+      },
+      "Guard": {
+        "finite": true,
+        "samples": 5,
+        "maxDimension": 5.074328660964966
+      },
+      "Parry": {
+        "finite": true,
+        "samples": 5,
+        "maxDimension": 5.172372102737427
+      },
+      "Dodge": {
+        "finite": true,
+        "samples": 5,
+        "maxDimension": 5.172372102737427
+      },
+      "Eat": {
+        "finite": true,
+        "samples": 5,
+        "maxDimension": 5.160521984100342
+      },
+      "Stagger": {
+        "finite": true,
+        "samples": 5,
+        "maxDimension": 5.172372102737427
+      },
+      "Ability": {
+        "finite": true,
+        "samples": 5,
+        "maxDimension": 5.172372102737427
+      },
+      "Moult": {
+        "finite": true,
+        "samples": 5,
+        "maxDimension": 5.172372102737427
+      }
+    },
+    "endpointMaxRadiansOrUnits": {
+      "Idle": 1.6486811412757762e-17,
+      "Swim": 6.106226767787259e-17,
+      "Attack": 1.9496877872433082e-33,
+      "Hit": 2.8415858607350646e-34,
+      "Death": 0.949999988079071,
+      "TurnLeft": 6.106226767787259e-17,
+      "TurnRight": 6.106226767787259e-17,
+      "Dive": 6.106226767787259e-17,
+      "Rise": 6.106226767787259e-17,
+      "Bite": 1.9496877872433082e-33,
+      "Heavy": 1.9496877872433082e-33,
+      "Guard": 6.294964402717361e-18,
+      "Parry": 2.9995195879107854e-33,
+      "Dodge": 3.2994715834360624e-33,
+      "Eat": 1.0991207884232046e-17,
+      "Stagger": 2.3756195327271252e-33,
+      "Ability": 1.565067541202099e-16,
+      "Moult": 4.9893423584275394e-17
+    },
+    "renderInspected": true
+  },
+  "sourceBlend": "cambrian/local/expansion-authoring/soft/pikaia.blend"
+}

@@ -8,6 +8,19 @@ Native vectors: `python3 tools/art/make-vectors.py` requires fonttools and Arial
 
 Review: `node tools/art/review-assets.mjs` makes a contact sheet in `/tmp`. `check-ui.mjs` checks a local Vite server on port 5174 with desktop and portrait viewports. Both use playwright-core and Chrome.
 
-## Validation on 2026-09-06
+## Original art delivery validation on 2026-09-06
 
 Build, TypeScript and creature intake checks pass. All delivered raster dimensions and alpha channels were checked, all new files are below 600 KB, and desktop/mobile title plus selection artwork were visually reviewed. The UI smoke check reports an existing `Engine.frame` undefined `x` error when switching modes, also reproduced on the unchanged starting commit `2ca01a7`; it is not an image-loading error. The smoke script intentionally retains a nonzero exit for runtime errors.
+
+## Creature expansion integration
+
+Both model-decoding and portrait scripts also accept explicit creature IDs.
+Use `CAMBRIAN_ART_MODELS` for decoded inputs and `CAMBRIAN_ART_SOURCES` for
+editable portrait scenes under `cambrian/local/expansion-authoring/portraits/`.
+The 13 expansion portraits use the same lighting, transparent background and
+1600×1200 output contract. They are separate from the original eight renders.
+
+The startup `Engine.frame` issue described in the original review above was
+subsequently fixed by clamping the first frame delta to zero or greater.
+Expanded browser checks cover all 21 selection options, four players and the
+specimen viewer. See `tools/expansion-browser.mjs`.

@@ -1964,5 +1964,3485 @@
         "approximate": true
       }
     ]
+  },
+  {
+    "file": "pikaia.glb",
+    "source": "tools/creatures/soft/anchors.json",
+    "newSpecimen": true,
+    "updatedSHA256": "d8680d9842f11d370c80124e372883888126848878efe79bd8ca353138265d73",
+    "bytes": 1487644,
+    "changedClips": [],
+    "anchors": [
+      {
+        "name": "anchor_mouth",
+        "bone": "body",
+        "version": 1,
+        "role": "mouth"
+      },
+      {
+        "name": "anchor_mouth_inside",
+        "bone": "body",
+        "version": 1,
+        "role": "swallow"
+      },
+      {
+        "name": "anchor_attack_primary",
+        "bone": "body",
+        "version": 1,
+        "role": "attack"
+      }
+    ]
+  },
+  {
+    "file": "pikaia.lod1.glb",
+    "source": "tools/creatures/soft/anchors.json",
+    "newSpecimen": true,
+    "updatedSHA256": "18df22ca19d38b25e78a8000418c9844d1d11be67608f9370cc820e213ae264b",
+    "bytes": 421712,
+    "changedClips": [],
+    "anchors": [
+      {
+        "name": "anchor_mouth",
+        "bone": "body",
+        "version": 1,
+        "role": "mouth"
+      },
+      {
+        "name": "anchor_mouth_inside",
+        "bone": "body",
+        "version": 1,
+        "role": "swallow"
+      },
+      {
+        "name": "anchor_attack_primary",
+        "bone": "body",
+        "version": 1,
+        "role": "attack"
+      }
+    ]
+  },
+  {
+    "file": "nectocaris.glb",
+    "source": "tools/creatures/soft/anchors.json",
+    "newSpecimen": true,
+    "updatedSHA256": "90ea973c4220c70155dd7ea109717e9b536969420dbf38ecc45152afbee1a76f",
+    "bytes": 2461956,
+    "changedClips": [],
+    "anchors": [
+      {
+        "name": "anchor_mouth",
+        "bone": "body",
+        "version": 1,
+        "role": "mouth"
+      },
+      {
+        "name": "anchor_mouth_inside",
+        "bone": "body",
+        "version": 1,
+        "role": "swallow"
+      },
+      {
+        "name": "anchor_attack_tentacle_L",
+        "bone": "tentacle_1_07",
+        "version": 1,
+        "role": "attack",
+        "chain": [
+          "tentacle_1_00",
+          "tentacle_1_01",
+          "tentacle_1_02",
+          "tentacle_1_03",
+          "tentacle_1_04",
+          "tentacle_1_05",
+          "tentacle_1_06",
+          "tentacle_1_07"
+        ],
+        "effectorBone": "tentacle_1_07",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_attack_primary",
+        "bone": "tentacle_1_07",
+        "version": 1,
+        "role": "attack",
+        "chain": [
+          "tentacle_1_00",
+          "tentacle_1_01",
+          "tentacle_1_02",
+          "tentacle_1_03",
+          "tentacle_1_04",
+          "tentacle_1_05",
+          "tentacle_1_06",
+          "tentacle_1_07"
+        ],
+        "effectorBone": "tentacle_1_07",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_grasp",
+        "bone": "tentacle_1_07",
+        "version": 1,
+        "role": "grasp",
+        "chain": [
+          "tentacle_1_00",
+          "tentacle_1_01",
+          "tentacle_1_02",
+          "tentacle_1_03",
+          "tentacle_1_04",
+          "tentacle_1_05",
+          "tentacle_1_06",
+          "tentacle_1_07"
+        ],
+        "effectorBone": "tentacle_1_07",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_attack_tentacle_R",
+        "bone": "tentacle_-1_07",
+        "version": 1,
+        "role": "attack",
+        "chain": [
+          "tentacle_-1_00",
+          "tentacle_-1_01",
+          "tentacle_-1_02",
+          "tentacle_-1_03",
+          "tentacle_-1_04",
+          "tentacle_-1_05",
+          "tentacle_-1_06",
+          "tentacle_-1_07"
+        ],
+        "effectorBone": "tentacle_-1_07",
+        "solver": "CCD"
+      }
+    ]
+  },
+  {
+    "file": "nectocaris.lod1.glb",
+    "source": "tools/creatures/soft/anchors.json",
+    "newSpecimen": true,
+    "updatedSHA256": "b570bc01ce4df5b175b0407ec938bf0f14e2bd79257181156d4089092e72070c",
+    "bytes": 795624,
+    "changedClips": [],
+    "anchors": [
+      {
+        "name": "anchor_mouth",
+        "bone": "body",
+        "version": 1,
+        "role": "mouth"
+      },
+      {
+        "name": "anchor_mouth_inside",
+        "bone": "body",
+        "version": 1,
+        "role": "swallow"
+      },
+      {
+        "name": "anchor_attack_tentacle_L",
+        "bone": "tentacle_1_07",
+        "version": 1,
+        "role": "attack",
+        "chain": [
+          "tentacle_1_00",
+          "tentacle_1_01",
+          "tentacle_1_02",
+          "tentacle_1_03",
+          "tentacle_1_04",
+          "tentacle_1_05",
+          "tentacle_1_06",
+          "tentacle_1_07"
+        ],
+        "effectorBone": "tentacle_1_07",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_attack_primary",
+        "bone": "tentacle_1_07",
+        "version": 1,
+        "role": "attack",
+        "chain": [
+          "tentacle_1_00",
+          "tentacle_1_01",
+          "tentacle_1_02",
+          "tentacle_1_03",
+          "tentacle_1_04",
+          "tentacle_1_05",
+          "tentacle_1_06",
+          "tentacle_1_07"
+        ],
+        "effectorBone": "tentacle_1_07",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_grasp",
+        "bone": "tentacle_1_07",
+        "version": 1,
+        "role": "grasp",
+        "chain": [
+          "tentacle_1_00",
+          "tentacle_1_01",
+          "tentacle_1_02",
+          "tentacle_1_03",
+          "tentacle_1_04",
+          "tentacle_1_05",
+          "tentacle_1_06",
+          "tentacle_1_07"
+        ],
+        "effectorBone": "tentacle_1_07",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_attack_tentacle_R",
+        "bone": "tentacle_-1_07",
+        "version": 1,
+        "role": "attack",
+        "chain": [
+          "tentacle_-1_00",
+          "tentacle_-1_01",
+          "tentacle_-1_02",
+          "tentacle_-1_03",
+          "tentacle_-1_04",
+          "tentacle_-1_05",
+          "tentacle_-1_06",
+          "tentacle_-1_07"
+        ],
+        "effectorBone": "tentacle_-1_07",
+        "solver": "CCD"
+      }
+    ]
+  },
+  {
+    "file": "ottoia.glb",
+    "source": "tools/creatures/soft/anchors.json",
+    "newSpecimen": true,
+    "updatedSHA256": "aa7b0b3999bdbe13d2cab8593e6ae2ef8deef4e45b97af3e18be991895f6a221",
+    "bytes": 2307764,
+    "changedClips": [],
+    "anchors": [
+      {
+        "name": "anchor_mouth",
+        "bone": "introvert_03",
+        "version": 1,
+        "role": "mouth"
+      },
+      {
+        "name": "anchor_mouth_inside",
+        "bone": "introvert_03",
+        "version": 1,
+        "role": "swallow"
+      },
+      {
+        "name": "anchor_attack_primary",
+        "bone": "introvert_03",
+        "version": 1,
+        "role": "attack",
+        "chain": [
+          "introvert_00",
+          "introvert_01",
+          "introvert_02",
+          "introvert_03"
+        ],
+        "effectorBone": "introvert_03",
+        "solver": "CCD"
+      }
+    ]
+  },
+  {
+    "file": "ottoia.lod1.glb",
+    "source": "tools/creatures/soft/anchors.json",
+    "newSpecimen": true,
+    "updatedSHA256": "7b0992430cf6f0f30b7e460a5a1c5fe766f88860702ed9a11e98feaa3d04a446",
+    "bytes": 903528,
+    "changedClips": [],
+    "anchors": [
+      {
+        "name": "anchor_mouth",
+        "bone": "introvert_03",
+        "version": 1,
+        "role": "mouth"
+      },
+      {
+        "name": "anchor_mouth_inside",
+        "bone": "introvert_03",
+        "version": 1,
+        "role": "swallow"
+      },
+      {
+        "name": "anchor_attack_primary",
+        "bone": "introvert_03",
+        "version": 1,
+        "role": "attack",
+        "chain": [
+          "introvert_00",
+          "introvert_01",
+          "introvert_02",
+          "introvert_03"
+        ],
+        "effectorBone": "introvert_03",
+        "solver": "CCD"
+      }
+    ]
+  },
+  {
+    "file": "odontogriphus.glb",
+    "source": "tools/creatures/soft/anchors.json",
+    "newSpecimen": true,
+    "updatedSHA256": "d8b773d65c0a817d23ee5fbd27184ac0cf9fb26540ca4031d9873bd9f36fb1ef",
+    "bytes": 3060960,
+    "changedClips": [],
+    "anchors": [
+      {
+        "name": "anchor_mouth",
+        "bone": "radula",
+        "version": 1,
+        "role": "mouth"
+      },
+      {
+        "name": "anchor_mouth_inside",
+        "bone": "radula",
+        "version": 1,
+        "role": "swallow"
+      },
+      {
+        "name": "anchor_attack_primary",
+        "bone": "radula",
+        "version": 1,
+        "role": "attack"
+      }
+    ]
+  },
+  {
+    "file": "odontogriphus.lod1.glb",
+    "source": "tools/creatures/soft/anchors.json",
+    "newSpecimen": true,
+    "updatedSHA256": "8e4ab3391b48c606a4ba2e965fa142ba1bbc35945ab8414f7a7f1eb2645c4cb0",
+    "bytes": 896276,
+    "changedClips": [],
+    "anchors": [
+      {
+        "name": "anchor_mouth",
+        "bone": "radula",
+        "version": 1,
+        "role": "mouth"
+      },
+      {
+        "name": "anchor_mouth_inside",
+        "bone": "radula",
+        "version": 1,
+        "role": "swallow"
+      },
+      {
+        "name": "anchor_attack_primary",
+        "bone": "radula",
+        "version": 1,
+        "role": "attack"
+      }
+    ]
+  },
+  {
+    "file": "vetulicola.glb",
+    "source": "tools/creatures/soft/anchors.json",
+    "newSpecimen": true,
+    "updatedSHA256": "7ec986872f47b3599c497bcb0e6a30daca1b9654575ed7a33873c70b817f7f5c",
+    "bytes": 1533316,
+    "changedClips": [],
+    "anchors": [
+      {
+        "name": "anchor_mouth",
+        "bone": "body",
+        "version": 1,
+        "role": "mouth"
+      },
+      {
+        "name": "anchor_mouth_inside",
+        "bone": "body",
+        "version": 1,
+        "role": "swallow"
+      },
+      {
+        "name": "anchor_attack_primary",
+        "bone": "body",
+        "version": 1,
+        "role": "attack"
+      }
+    ]
+  },
+  {
+    "file": "vetulicola.lod1.glb",
+    "source": "tools/creatures/soft/anchors.json",
+    "newSpecimen": true,
+    "updatedSHA256": "ba57f916f0f12d08f333df4431e0d60a0fb489ff9aebd2c3a349311dc6838b3b",
+    "bytes": 538740,
+    "changedClips": [],
+    "anchors": [
+      {
+        "name": "anchor_mouth",
+        "bone": "body",
+        "version": 1,
+        "role": "mouth"
+      },
+      {
+        "name": "anchor_mouth_inside",
+        "bone": "body",
+        "version": 1,
+        "role": "swallow"
+      },
+      {
+        "name": "anchor_attack_primary",
+        "bone": "body",
+        "version": 1,
+        "role": "attack"
+      }
+    ]
+  },
+  {
+    "file": "odaraia.glb",
+    "source": "tools/creatures/arthropods/anchors.json",
+    "newSpecimen": true,
+    "updatedSHA256": "bf21bc96020a30ba6b210461e78ecf85ae0e6cbc33f1980157c40eea41bf2a04",
+    "bytes": 6757808,
+    "changedClips": [],
+    "anchors": [
+      {
+        "name": "anchor_mouth",
+        "bone": "body",
+        "version": 1,
+        "role": "mouth"
+      },
+      {
+        "name": "anchor_mouth_inside",
+        "bone": "body",
+        "version": 1,
+        "role": "swallow"
+      },
+      {
+        "name": "anchor_attack_primary",
+        "bone": "filter_1_00",
+        "version": 1,
+        "role": "attack"
+      },
+      {
+        "name": "anchor_attack_left",
+        "bone": "filter_1_00",
+        "version": 1,
+        "role": "attack"
+      },
+      {
+        "name": "anchor_attack_right",
+        "bone": "filter_-1_00",
+        "version": 1,
+        "role": "attack"
+      },
+      {
+        "name": "anchor_grasp",
+        "bone": "segment_00",
+        "version": 1,
+        "role": "grasp"
+      }
+    ]
+  },
+  {
+    "file": "odaraia.lod1.glb",
+    "source": "tools/creatures/arthropods/anchors.json",
+    "newSpecimen": true,
+    "updatedSHA256": "00a0d13c37dbb1a5461f146d198ac94faa8b7278e9c2ddbde44bad277cf40c3b",
+    "bytes": 1265488,
+    "changedClips": [],
+    "anchors": [
+      {
+        "name": "anchor_mouth",
+        "bone": "body",
+        "version": 1,
+        "role": "mouth"
+      },
+      {
+        "name": "anchor_mouth_inside",
+        "bone": "body",
+        "version": 1,
+        "role": "swallow"
+      },
+      {
+        "name": "anchor_attack_primary",
+        "bone": "filter_1_00",
+        "version": 1,
+        "role": "attack"
+      },
+      {
+        "name": "anchor_attack_left",
+        "bone": "filter_1_00",
+        "version": 1,
+        "role": "attack"
+      },
+      {
+        "name": "anchor_attack_right",
+        "bone": "filter_-1_00",
+        "version": 1,
+        "role": "attack"
+      },
+      {
+        "name": "anchor_grasp",
+        "bone": "segment_00",
+        "version": 1,
+        "role": "grasp"
+      }
+    ]
+  },
+  {
+    "file": "sidneyia.glb",
+    "source": "tools/creatures/arthropods/anchors.json",
+    "newSpecimen": true,
+    "updatedSHA256": "7c7fbfe40085b6fee003a476152526a0e05d03cbf351c0432ce61b02166ff1a3",
+    "bytes": 6823956,
+    "changedClips": [],
+    "anchors": [
+      {
+        "name": "anchor_mouth",
+        "bone": "body",
+        "version": 1,
+        "role": "mouth"
+      },
+      {
+        "name": "anchor_mouth_inside",
+        "bone": "body",
+        "version": 1,
+        "role": "swallow"
+      },
+      {
+        "name": "anchor_attack_primary",
+        "bone": "leg_1_00_0",
+        "version": 1,
+        "role": "attack",
+        "chain": [
+          "leg_1_00_0"
+        ],
+        "effectorBone": "leg_1_00_0",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_attack_left",
+        "bone": "leg_1_00_0",
+        "version": 1,
+        "role": "attack",
+        "chain": [
+          "leg_1_00_0"
+        ],
+        "effectorBone": "leg_1_00_0",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_attack_right",
+        "bone": "leg_-1_00_0",
+        "version": 1,
+        "role": "attack",
+        "chain": [
+          "leg_-1_00_0"
+        ],
+        "effectorBone": "leg_-1_00_0",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_grasp",
+        "bone": "leg_1_00_2",
+        "version": 1,
+        "role": "grasp",
+        "chain": [
+          "leg_1_00_0",
+          "leg_1_00_1",
+          "leg_1_00_2"
+        ],
+        "effectorBone": "leg_1_00_2",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_grasp_right",
+        "bone": "leg_-1_00_2",
+        "version": 1,
+        "role": "grasp",
+        "chain": [
+          "leg_-1_00_0",
+          "leg_-1_00_1",
+          "leg_-1_00_2"
+        ],
+        "effectorBone": "leg_-1_00_2",
+        "solver": "CCD"
+      }
+    ]
+  },
+  {
+    "file": "sidneyia.lod1.glb",
+    "source": "tools/creatures/arthropods/anchors.json",
+    "newSpecimen": true,
+    "updatedSHA256": "ea284ad021019cd3b012a9643e21f846b935a6880228418ee084d9806dee9006",
+    "bytes": 1285068,
+    "changedClips": [],
+    "anchors": [
+      {
+        "name": "anchor_mouth",
+        "bone": "body",
+        "version": 1,
+        "role": "mouth"
+      },
+      {
+        "name": "anchor_mouth_inside",
+        "bone": "body",
+        "version": 1,
+        "role": "swallow"
+      },
+      {
+        "name": "anchor_attack_primary",
+        "bone": "leg_1_00_0",
+        "version": 1,
+        "role": "attack",
+        "chain": [
+          "leg_1_00_0"
+        ],
+        "effectorBone": "leg_1_00_0",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_attack_left",
+        "bone": "leg_1_00_0",
+        "version": 1,
+        "role": "attack",
+        "chain": [
+          "leg_1_00_0"
+        ],
+        "effectorBone": "leg_1_00_0",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_attack_right",
+        "bone": "leg_-1_00_0",
+        "version": 1,
+        "role": "attack",
+        "chain": [
+          "leg_-1_00_0"
+        ],
+        "effectorBone": "leg_-1_00_0",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_grasp",
+        "bone": "leg_1_00_2",
+        "version": 1,
+        "role": "grasp",
+        "chain": [
+          "leg_1_00_0",
+          "leg_1_00_1",
+          "leg_1_00_2"
+        ],
+        "effectorBone": "leg_1_00_2",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_grasp_right",
+        "bone": "leg_-1_00_2",
+        "version": 1,
+        "role": "grasp",
+        "chain": [
+          "leg_-1_00_0",
+          "leg_-1_00_1",
+          "leg_-1_00_2"
+        ],
+        "effectorBone": "leg_-1_00_2",
+        "solver": "CCD"
+      }
+    ]
+  },
+  {
+    "file": "leanchoilia.glb",
+    "source": "tools/creatures/arthropods/anchors.json",
+    "newSpecimen": true,
+    "updatedSHA256": "eb68d9496abb20f6a2aaeb8597bfc60c58832d5df8a6d0521fc8628b96d55519",
+    "bytes": 8256828,
+    "changedClips": [],
+    "anchors": [
+      {
+        "name": "anchor_mouth",
+        "bone": "body",
+        "version": 1,
+        "role": "mouth"
+      },
+      {
+        "name": "anchor_mouth_inside",
+        "bone": "body",
+        "version": 1,
+        "role": "swallow"
+      },
+      {
+        "name": "anchor_attack_primary",
+        "bone": "claw_1_1_01",
+        "version": 1,
+        "role": "attack",
+        "chain": [
+          "great_base_1",
+          "great_hand_1",
+          "claw_1_1_00",
+          "claw_1_1_01"
+        ],
+        "effectorBone": "claw_1_1_01",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_attack_left",
+        "bone": "claw_1_1_01",
+        "version": 1,
+        "role": "attack",
+        "chain": [
+          "great_base_1",
+          "great_hand_1",
+          "claw_1_1_00",
+          "claw_1_1_01"
+        ],
+        "effectorBone": "claw_1_1_01",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_attack_right",
+        "bone": "claw_-1_1_01",
+        "version": 1,
+        "role": "attack",
+        "chain": [
+          "great_base_-1",
+          "great_hand_-1",
+          "claw_-1_1_00",
+          "claw_-1_1_01"
+        ],
+        "effectorBone": "claw_-1_1_01",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_grasp",
+        "bone": "claw_1_1_00",
+        "version": 1,
+        "role": "grasp",
+        "chain": [
+          "great_base_1",
+          "great_hand_1",
+          "claw_1_1_00"
+        ],
+        "effectorBone": "claw_1_1_00",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_grasp_right",
+        "bone": "claw_-1_1_00",
+        "version": 1,
+        "role": "grasp",
+        "chain": [
+          "great_base_-1",
+          "great_hand_-1",
+          "claw_-1_1_00"
+        ],
+        "effectorBone": "claw_-1_1_00",
+        "solver": "CCD"
+      }
+    ]
+  },
+  {
+    "file": "leanchoilia.lod1.glb",
+    "source": "tools/creatures/arthropods/anchors.json",
+    "newSpecimen": true,
+    "updatedSHA256": "b71b507c70cc425cf02690c24a0dd47e32389be5ea5a8173493f61f80879657c",
+    "bytes": 1765256,
+    "changedClips": [],
+    "anchors": [
+      {
+        "name": "anchor_mouth",
+        "bone": "body",
+        "version": 1,
+        "role": "mouth"
+      },
+      {
+        "name": "anchor_mouth_inside",
+        "bone": "body",
+        "version": 1,
+        "role": "swallow"
+      },
+      {
+        "name": "anchor_attack_primary",
+        "bone": "claw_1_1_01",
+        "version": 1,
+        "role": "attack",
+        "chain": [
+          "great_base_1",
+          "great_hand_1",
+          "claw_1_1_00",
+          "claw_1_1_01"
+        ],
+        "effectorBone": "claw_1_1_01",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_attack_left",
+        "bone": "claw_1_1_01",
+        "version": 1,
+        "role": "attack",
+        "chain": [
+          "great_base_1",
+          "great_hand_1",
+          "claw_1_1_00",
+          "claw_1_1_01"
+        ],
+        "effectorBone": "claw_1_1_01",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_attack_right",
+        "bone": "claw_-1_1_01",
+        "version": 1,
+        "role": "attack",
+        "chain": [
+          "great_base_-1",
+          "great_hand_-1",
+          "claw_-1_1_00",
+          "claw_-1_1_01"
+        ],
+        "effectorBone": "claw_-1_1_01",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_grasp",
+        "bone": "claw_1_1_00",
+        "version": 1,
+        "role": "grasp",
+        "chain": [
+          "great_base_1",
+          "great_hand_1",
+          "claw_1_1_00"
+        ],
+        "effectorBone": "claw_1_1_00",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_grasp_right",
+        "bone": "claw_-1_1_00",
+        "version": 1,
+        "role": "grasp",
+        "chain": [
+          "great_base_-1",
+          "great_hand_-1",
+          "claw_-1_1_00"
+        ],
+        "effectorBone": "claw_-1_1_00",
+        "solver": "CCD"
+      }
+    ]
+  },
+  {
+    "file": "isoxys.glb",
+    "source": "tools/creatures/arthropods/anchors.json",
+    "newSpecimen": true,
+    "updatedSHA256": "69427575d8bf033d87f0015940917e9079bc9e27ba97c5bea7e892ec3cb73c05",
+    "bytes": 7747356,
+    "changedClips": [],
+    "anchors": [
+      {
+        "name": "anchor_mouth",
+        "bone": "segment_00",
+        "version": 1,
+        "role": "mouth"
+      },
+      {
+        "name": "anchor_mouth_inside",
+        "bone": "segment_00",
+        "version": 1,
+        "role": "swallow"
+      },
+      {
+        "name": "anchor_attack_primary",
+        "bone": "raptor_1_4",
+        "version": 1,
+        "role": "attack",
+        "chain": [
+          "raptor_1_0",
+          "raptor_1_1",
+          "raptor_1_2",
+          "raptor_1_3",
+          "raptor_1_4"
+        ],
+        "effectorBone": "raptor_1_4",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_attack_left",
+        "bone": "raptor_1_4",
+        "version": 1,
+        "role": "attack",
+        "chain": [
+          "raptor_1_0",
+          "raptor_1_1",
+          "raptor_1_2",
+          "raptor_1_3",
+          "raptor_1_4"
+        ],
+        "effectorBone": "raptor_1_4",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_attack_right",
+        "bone": "raptor_-1_4",
+        "version": 1,
+        "role": "attack",
+        "chain": [
+          "raptor_-1_0",
+          "raptor_-1_1",
+          "raptor_-1_2",
+          "raptor_-1_3",
+          "raptor_-1_4"
+        ],
+        "effectorBone": "raptor_-1_4",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_grasp",
+        "bone": "raptor_1_2",
+        "version": 1,
+        "role": "grasp",
+        "chain": [
+          "raptor_1_0",
+          "raptor_1_1",
+          "raptor_1_2"
+        ],
+        "effectorBone": "raptor_1_2",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_grasp_right",
+        "bone": "raptor_-1_2",
+        "version": 1,
+        "role": "grasp",
+        "chain": [
+          "raptor_-1_0",
+          "raptor_-1_1",
+          "raptor_-1_2"
+        ],
+        "effectorBone": "raptor_-1_2",
+        "solver": "CCD"
+      }
+    ]
+  },
+  {
+    "file": "isoxys.lod1.glb",
+    "source": "tools/creatures/arthropods/anchors.json",
+    "newSpecimen": true,
+    "updatedSHA256": "cbccfdef1c7f5addbfc81db9721b12e8d74016ac82b69a026ae610f0257aa870",
+    "bytes": 1656784,
+    "changedClips": [],
+    "anchors": [
+      {
+        "name": "anchor_mouth",
+        "bone": "segment_00",
+        "version": 1,
+        "role": "mouth"
+      },
+      {
+        "name": "anchor_mouth_inside",
+        "bone": "segment_00",
+        "version": 1,
+        "role": "swallow"
+      },
+      {
+        "name": "anchor_attack_primary",
+        "bone": "raptor_1_4",
+        "version": 1,
+        "role": "attack",
+        "chain": [
+          "raptor_1_0",
+          "raptor_1_1",
+          "raptor_1_2",
+          "raptor_1_3",
+          "raptor_1_4"
+        ],
+        "effectorBone": "raptor_1_4",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_attack_left",
+        "bone": "raptor_1_4",
+        "version": 1,
+        "role": "attack",
+        "chain": [
+          "raptor_1_0",
+          "raptor_1_1",
+          "raptor_1_2",
+          "raptor_1_3",
+          "raptor_1_4"
+        ],
+        "effectorBone": "raptor_1_4",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_attack_right",
+        "bone": "raptor_-1_4",
+        "version": 1,
+        "role": "attack",
+        "chain": [
+          "raptor_-1_0",
+          "raptor_-1_1",
+          "raptor_-1_2",
+          "raptor_-1_3",
+          "raptor_-1_4"
+        ],
+        "effectorBone": "raptor_-1_4",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_grasp",
+        "bone": "raptor_1_2",
+        "version": 1,
+        "role": "grasp",
+        "chain": [
+          "raptor_1_0",
+          "raptor_1_1",
+          "raptor_1_2"
+        ],
+        "effectorBone": "raptor_1_2",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_grasp_right",
+        "bone": "raptor_-1_2",
+        "version": 1,
+        "role": "grasp",
+        "chain": [
+          "raptor_-1_0",
+          "raptor_-1_1",
+          "raptor_-1_2"
+        ],
+        "effectorBone": "raptor_-1_2",
+        "solver": "CCD"
+      }
+    ]
+  },
+  {
+    "file": "burgessomedusa.glb",
+    "source": "tools/creatures/jellies/anchors.json",
+    "newSpecimen": true,
+    "updatedSHA256": "a02ce57f3ae03f734ec920538bc3d76187273aab2403a4bf12e3e03fed6b2076",
+    "bytes": 3048112,
+    "changedClips": [],
+    "anchors": [
+      {
+        "name": "anchor_mouth",
+        "bone": "body",
+        "version": 1,
+        "role": "mouth"
+      },
+      {
+        "name": "anchor_mouth_inside",
+        "bone": "body",
+        "version": 1,
+        "role": "swallow"
+      },
+      {
+        "name": "anchor_attack_primary",
+        "bone": "tentacle_tip_36",
+        "version": 1,
+        "role": "attack",
+        "chain": [
+          "tentacle_36",
+          "tentacle_tip_36"
+        ],
+        "effectorBone": "tentacle_tip_36",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_grasp",
+        "bone": "tentacle_tip_36",
+        "version": 1,
+        "role": "grasp",
+        "chain": [
+          "tentacle_36",
+          "tentacle_tip_36"
+        ],
+        "effectorBone": "tentacle_tip_36",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_grasp_L",
+        "bone": "tentacle_tip_42",
+        "version": 1,
+        "role": "grasp",
+        "chain": [
+          "tentacle_42",
+          "tentacle_tip_42"
+        ],
+        "effectorBone": "tentacle_tip_42",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_grasp_R",
+        "bone": "tentacle_tip_30",
+        "version": 1,
+        "role": "grasp",
+        "chain": [
+          "tentacle_30",
+          "tentacle_tip_30"
+        ],
+        "effectorBone": "tentacle_tip_30",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_attack_tentacle_00",
+        "bone": "tentacle_tip_00",
+        "version": 1,
+        "role": "attack",
+        "chain": [
+          "tentacle_00",
+          "tentacle_tip_00"
+        ],
+        "effectorBone": "tentacle_tip_00",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_attack_tentacle_01",
+        "bone": "tentacle_tip_01",
+        "version": 1,
+        "role": "attack",
+        "chain": [
+          "tentacle_01",
+          "tentacle_tip_01"
+        ],
+        "effectorBone": "tentacle_tip_01",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_attack_tentacle_02",
+        "bone": "tentacle_tip_02",
+        "version": 1,
+        "role": "attack",
+        "chain": [
+          "tentacle_02",
+          "tentacle_tip_02"
+        ],
+        "effectorBone": "tentacle_tip_02",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_attack_tentacle_03",
+        "bone": "tentacle_tip_03",
+        "version": 1,
+        "role": "attack",
+        "chain": [
+          "tentacle_03",
+          "tentacle_tip_03"
+        ],
+        "effectorBone": "tentacle_tip_03",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_attack_tentacle_04",
+        "bone": "tentacle_tip_04",
+        "version": 1,
+        "role": "attack",
+        "chain": [
+          "tentacle_04",
+          "tentacle_tip_04"
+        ],
+        "effectorBone": "tentacle_tip_04",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_attack_tentacle_05",
+        "bone": "tentacle_tip_05",
+        "version": 1,
+        "role": "attack",
+        "chain": [
+          "tentacle_05",
+          "tentacle_tip_05"
+        ],
+        "effectorBone": "tentacle_tip_05",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_attack_tentacle_06",
+        "bone": "tentacle_tip_06",
+        "version": 1,
+        "role": "attack",
+        "chain": [
+          "tentacle_06",
+          "tentacle_tip_06"
+        ],
+        "effectorBone": "tentacle_tip_06",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_attack_tentacle_07",
+        "bone": "tentacle_tip_07",
+        "version": 1,
+        "role": "attack",
+        "chain": [
+          "tentacle_07",
+          "tentacle_tip_07"
+        ],
+        "effectorBone": "tentacle_tip_07",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_attack_tentacle_08",
+        "bone": "tentacle_tip_08",
+        "version": 1,
+        "role": "attack",
+        "chain": [
+          "tentacle_08",
+          "tentacle_tip_08"
+        ],
+        "effectorBone": "tentacle_tip_08",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_attack_tentacle_09",
+        "bone": "tentacle_tip_09",
+        "version": 1,
+        "role": "attack",
+        "chain": [
+          "tentacle_09",
+          "tentacle_tip_09"
+        ],
+        "effectorBone": "tentacle_tip_09",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_attack_tentacle_10",
+        "bone": "tentacle_tip_10",
+        "version": 1,
+        "role": "attack",
+        "chain": [
+          "tentacle_10",
+          "tentacle_tip_10"
+        ],
+        "effectorBone": "tentacle_tip_10",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_attack_tentacle_11",
+        "bone": "tentacle_tip_11",
+        "version": 1,
+        "role": "attack",
+        "chain": [
+          "tentacle_11",
+          "tentacle_tip_11"
+        ],
+        "effectorBone": "tentacle_tip_11",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_attack_tentacle_12",
+        "bone": "tentacle_tip_12",
+        "version": 1,
+        "role": "attack",
+        "chain": [
+          "tentacle_12",
+          "tentacle_tip_12"
+        ],
+        "effectorBone": "tentacle_tip_12",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_attack_tentacle_13",
+        "bone": "tentacle_tip_13",
+        "version": 1,
+        "role": "attack",
+        "chain": [
+          "tentacle_13",
+          "tentacle_tip_13"
+        ],
+        "effectorBone": "tentacle_tip_13",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_attack_tentacle_14",
+        "bone": "tentacle_tip_14",
+        "version": 1,
+        "role": "attack",
+        "chain": [
+          "tentacle_14",
+          "tentacle_tip_14"
+        ],
+        "effectorBone": "tentacle_tip_14",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_attack_tentacle_15",
+        "bone": "tentacle_tip_15",
+        "version": 1,
+        "role": "attack",
+        "chain": [
+          "tentacle_15",
+          "tentacle_tip_15"
+        ],
+        "effectorBone": "tentacle_tip_15",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_attack_tentacle_16",
+        "bone": "tentacle_tip_16",
+        "version": 1,
+        "role": "attack",
+        "chain": [
+          "tentacle_16",
+          "tentacle_tip_16"
+        ],
+        "effectorBone": "tentacle_tip_16",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_attack_tentacle_17",
+        "bone": "tentacle_tip_17",
+        "version": 1,
+        "role": "attack",
+        "chain": [
+          "tentacle_17",
+          "tentacle_tip_17"
+        ],
+        "effectorBone": "tentacle_tip_17",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_attack_tentacle_18",
+        "bone": "tentacle_tip_18",
+        "version": 1,
+        "role": "attack",
+        "chain": [
+          "tentacle_18",
+          "tentacle_tip_18"
+        ],
+        "effectorBone": "tentacle_tip_18",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_attack_tentacle_19",
+        "bone": "tentacle_tip_19",
+        "version": 1,
+        "role": "attack",
+        "chain": [
+          "tentacle_19",
+          "tentacle_tip_19"
+        ],
+        "effectorBone": "tentacle_tip_19",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_attack_tentacle_20",
+        "bone": "tentacle_tip_20",
+        "version": 1,
+        "role": "attack",
+        "chain": [
+          "tentacle_20",
+          "tentacle_tip_20"
+        ],
+        "effectorBone": "tentacle_tip_20",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_attack_tentacle_21",
+        "bone": "tentacle_tip_21",
+        "version": 1,
+        "role": "attack",
+        "chain": [
+          "tentacle_21",
+          "tentacle_tip_21"
+        ],
+        "effectorBone": "tentacle_tip_21",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_attack_tentacle_22",
+        "bone": "tentacle_tip_22",
+        "version": 1,
+        "role": "attack",
+        "chain": [
+          "tentacle_22",
+          "tentacle_tip_22"
+        ],
+        "effectorBone": "tentacle_tip_22",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_attack_tentacle_23",
+        "bone": "tentacle_tip_23",
+        "version": 1,
+        "role": "attack",
+        "chain": [
+          "tentacle_23",
+          "tentacle_tip_23"
+        ],
+        "effectorBone": "tentacle_tip_23",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_attack_tentacle_24",
+        "bone": "tentacle_tip_24",
+        "version": 1,
+        "role": "attack",
+        "chain": [
+          "tentacle_24",
+          "tentacle_tip_24"
+        ],
+        "effectorBone": "tentacle_tip_24",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_attack_tentacle_25",
+        "bone": "tentacle_tip_25",
+        "version": 1,
+        "role": "attack",
+        "chain": [
+          "tentacle_25",
+          "tentacle_tip_25"
+        ],
+        "effectorBone": "tentacle_tip_25",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_attack_tentacle_26",
+        "bone": "tentacle_tip_26",
+        "version": 1,
+        "role": "attack",
+        "chain": [
+          "tentacle_26",
+          "tentacle_tip_26"
+        ],
+        "effectorBone": "tentacle_tip_26",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_attack_tentacle_27",
+        "bone": "tentacle_tip_27",
+        "version": 1,
+        "role": "attack",
+        "chain": [
+          "tentacle_27",
+          "tentacle_tip_27"
+        ],
+        "effectorBone": "tentacle_tip_27",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_attack_tentacle_28",
+        "bone": "tentacle_tip_28",
+        "version": 1,
+        "role": "attack",
+        "chain": [
+          "tentacle_28",
+          "tentacle_tip_28"
+        ],
+        "effectorBone": "tentacle_tip_28",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_attack_tentacle_29",
+        "bone": "tentacle_tip_29",
+        "version": 1,
+        "role": "attack",
+        "chain": [
+          "tentacle_29",
+          "tentacle_tip_29"
+        ],
+        "effectorBone": "tentacle_tip_29",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_attack_tentacle_30",
+        "bone": "tentacle_tip_30",
+        "version": 1,
+        "role": "attack",
+        "chain": [
+          "tentacle_30",
+          "tentacle_tip_30"
+        ],
+        "effectorBone": "tentacle_tip_30",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_attack_tentacle_31",
+        "bone": "tentacle_tip_31",
+        "version": 1,
+        "role": "attack",
+        "chain": [
+          "tentacle_31",
+          "tentacle_tip_31"
+        ],
+        "effectorBone": "tentacle_tip_31",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_attack_tentacle_32",
+        "bone": "tentacle_tip_32",
+        "version": 1,
+        "role": "attack",
+        "chain": [
+          "tentacle_32",
+          "tentacle_tip_32"
+        ],
+        "effectorBone": "tentacle_tip_32",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_attack_tentacle_33",
+        "bone": "tentacle_tip_33",
+        "version": 1,
+        "role": "attack",
+        "chain": [
+          "tentacle_33",
+          "tentacle_tip_33"
+        ],
+        "effectorBone": "tentacle_tip_33",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_attack_tentacle_34",
+        "bone": "tentacle_tip_34",
+        "version": 1,
+        "role": "attack",
+        "chain": [
+          "tentacle_34",
+          "tentacle_tip_34"
+        ],
+        "effectorBone": "tentacle_tip_34",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_attack_tentacle_35",
+        "bone": "tentacle_tip_35",
+        "version": 1,
+        "role": "attack",
+        "chain": [
+          "tentacle_35",
+          "tentacle_tip_35"
+        ],
+        "effectorBone": "tentacle_tip_35",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_attack_tentacle_36",
+        "bone": "tentacle_tip_36",
+        "version": 1,
+        "role": "attack",
+        "chain": [
+          "tentacle_36",
+          "tentacle_tip_36"
+        ],
+        "effectorBone": "tentacle_tip_36",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_attack_tentacle_37",
+        "bone": "tentacle_tip_37",
+        "version": 1,
+        "role": "attack",
+        "chain": [
+          "tentacle_37",
+          "tentacle_tip_37"
+        ],
+        "effectorBone": "tentacle_tip_37",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_attack_tentacle_38",
+        "bone": "tentacle_tip_38",
+        "version": 1,
+        "role": "attack",
+        "chain": [
+          "tentacle_38",
+          "tentacle_tip_38"
+        ],
+        "effectorBone": "tentacle_tip_38",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_attack_tentacle_39",
+        "bone": "tentacle_tip_39",
+        "version": 1,
+        "role": "attack",
+        "chain": [
+          "tentacle_39",
+          "tentacle_tip_39"
+        ],
+        "effectorBone": "tentacle_tip_39",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_attack_tentacle_40",
+        "bone": "tentacle_tip_40",
+        "version": 1,
+        "role": "attack",
+        "chain": [
+          "tentacle_40",
+          "tentacle_tip_40"
+        ],
+        "effectorBone": "tentacle_tip_40",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_attack_tentacle_41",
+        "bone": "tentacle_tip_41",
+        "version": 1,
+        "role": "attack",
+        "chain": [
+          "tentacle_41",
+          "tentacle_tip_41"
+        ],
+        "effectorBone": "tentacle_tip_41",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_attack_tentacle_42",
+        "bone": "tentacle_tip_42",
+        "version": 1,
+        "role": "attack",
+        "chain": [
+          "tentacle_42",
+          "tentacle_tip_42"
+        ],
+        "effectorBone": "tentacle_tip_42",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_attack_tentacle_43",
+        "bone": "tentacle_tip_43",
+        "version": 1,
+        "role": "attack",
+        "chain": [
+          "tentacle_43",
+          "tentacle_tip_43"
+        ],
+        "effectorBone": "tentacle_tip_43",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_attack_tentacle_44",
+        "bone": "tentacle_tip_44",
+        "version": 1,
+        "role": "attack",
+        "chain": [
+          "tentacle_44",
+          "tentacle_tip_44"
+        ],
+        "effectorBone": "tentacle_tip_44",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_attack_tentacle_45",
+        "bone": "tentacle_tip_45",
+        "version": 1,
+        "role": "attack",
+        "chain": [
+          "tentacle_45",
+          "tentacle_tip_45"
+        ],
+        "effectorBone": "tentacle_tip_45",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_attack_tentacle_46",
+        "bone": "tentacle_tip_46",
+        "version": 1,
+        "role": "attack",
+        "chain": [
+          "tentacle_46",
+          "tentacle_tip_46"
+        ],
+        "effectorBone": "tentacle_tip_46",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_attack_tentacle_47",
+        "bone": "tentacle_tip_47",
+        "version": 1,
+        "role": "attack",
+        "chain": [
+          "tentacle_47",
+          "tentacle_tip_47"
+        ],
+        "effectorBone": "tentacle_tip_47",
+        "solver": "CCD"
+      }
+    ]
+  },
+  {
+    "file": "burgessomedusa.lod1.glb",
+    "source": "tools/creatures/jellies/anchors.json",
+    "newSpecimen": true,
+    "updatedSHA256": "97e6ea20e0e880479f5c290aef806b881b45f730c4353e2e4278f62d3b8e0364",
+    "bytes": 817612,
+    "changedClips": [],
+    "anchors": [
+      {
+        "name": "anchor_mouth",
+        "bone": "body",
+        "version": 1,
+        "role": "mouth"
+      },
+      {
+        "name": "anchor_mouth_inside",
+        "bone": "body",
+        "version": 1,
+        "role": "swallow"
+      },
+      {
+        "name": "anchor_attack_primary",
+        "bone": "tentacle_tip_36",
+        "version": 1,
+        "role": "attack",
+        "chain": [
+          "tentacle_36",
+          "tentacle_tip_36"
+        ],
+        "effectorBone": "tentacle_tip_36",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_grasp",
+        "bone": "tentacle_tip_36",
+        "version": 1,
+        "role": "grasp",
+        "chain": [
+          "tentacle_36",
+          "tentacle_tip_36"
+        ],
+        "effectorBone": "tentacle_tip_36",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_grasp_L",
+        "bone": "tentacle_tip_42",
+        "version": 1,
+        "role": "grasp",
+        "chain": [
+          "tentacle_42",
+          "tentacle_tip_42"
+        ],
+        "effectorBone": "tentacle_tip_42",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_grasp_R",
+        "bone": "tentacle_tip_30",
+        "version": 1,
+        "role": "grasp",
+        "chain": [
+          "tentacle_30",
+          "tentacle_tip_30"
+        ],
+        "effectorBone": "tentacle_tip_30",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_attack_tentacle_00",
+        "bone": "tentacle_tip_00",
+        "version": 1,
+        "role": "attack",
+        "chain": [
+          "tentacle_00",
+          "tentacle_tip_00"
+        ],
+        "effectorBone": "tentacle_tip_00",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_attack_tentacle_01",
+        "bone": "tentacle_tip_01",
+        "version": 1,
+        "role": "attack",
+        "chain": [
+          "tentacle_01",
+          "tentacle_tip_01"
+        ],
+        "effectorBone": "tentacle_tip_01",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_attack_tentacle_02",
+        "bone": "tentacle_tip_02",
+        "version": 1,
+        "role": "attack",
+        "chain": [
+          "tentacle_02",
+          "tentacle_tip_02"
+        ],
+        "effectorBone": "tentacle_tip_02",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_attack_tentacle_03",
+        "bone": "tentacle_tip_03",
+        "version": 1,
+        "role": "attack",
+        "chain": [
+          "tentacle_03",
+          "tentacle_tip_03"
+        ],
+        "effectorBone": "tentacle_tip_03",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_attack_tentacle_04",
+        "bone": "tentacle_tip_04",
+        "version": 1,
+        "role": "attack",
+        "chain": [
+          "tentacle_04",
+          "tentacle_tip_04"
+        ],
+        "effectorBone": "tentacle_tip_04",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_attack_tentacle_05",
+        "bone": "tentacle_tip_05",
+        "version": 1,
+        "role": "attack",
+        "chain": [
+          "tentacle_05",
+          "tentacle_tip_05"
+        ],
+        "effectorBone": "tentacle_tip_05",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_attack_tentacle_06",
+        "bone": "tentacle_tip_06",
+        "version": 1,
+        "role": "attack",
+        "chain": [
+          "tentacle_06",
+          "tentacle_tip_06"
+        ],
+        "effectorBone": "tentacle_tip_06",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_attack_tentacle_07",
+        "bone": "tentacle_tip_07",
+        "version": 1,
+        "role": "attack",
+        "chain": [
+          "tentacle_07",
+          "tentacle_tip_07"
+        ],
+        "effectorBone": "tentacle_tip_07",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_attack_tentacle_08",
+        "bone": "tentacle_tip_08",
+        "version": 1,
+        "role": "attack",
+        "chain": [
+          "tentacle_08",
+          "tentacle_tip_08"
+        ],
+        "effectorBone": "tentacle_tip_08",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_attack_tentacle_09",
+        "bone": "tentacle_tip_09",
+        "version": 1,
+        "role": "attack",
+        "chain": [
+          "tentacle_09",
+          "tentacle_tip_09"
+        ],
+        "effectorBone": "tentacle_tip_09",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_attack_tentacle_10",
+        "bone": "tentacle_tip_10",
+        "version": 1,
+        "role": "attack",
+        "chain": [
+          "tentacle_10",
+          "tentacle_tip_10"
+        ],
+        "effectorBone": "tentacle_tip_10",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_attack_tentacle_11",
+        "bone": "tentacle_tip_11",
+        "version": 1,
+        "role": "attack",
+        "chain": [
+          "tentacle_11",
+          "tentacle_tip_11"
+        ],
+        "effectorBone": "tentacle_tip_11",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_attack_tentacle_12",
+        "bone": "tentacle_tip_12",
+        "version": 1,
+        "role": "attack",
+        "chain": [
+          "tentacle_12",
+          "tentacle_tip_12"
+        ],
+        "effectorBone": "tentacle_tip_12",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_attack_tentacle_13",
+        "bone": "tentacle_tip_13",
+        "version": 1,
+        "role": "attack",
+        "chain": [
+          "tentacle_13",
+          "tentacle_tip_13"
+        ],
+        "effectorBone": "tentacle_tip_13",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_attack_tentacle_14",
+        "bone": "tentacle_tip_14",
+        "version": 1,
+        "role": "attack",
+        "chain": [
+          "tentacle_14",
+          "tentacle_tip_14"
+        ],
+        "effectorBone": "tentacle_tip_14",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_attack_tentacle_15",
+        "bone": "tentacle_tip_15",
+        "version": 1,
+        "role": "attack",
+        "chain": [
+          "tentacle_15",
+          "tentacle_tip_15"
+        ],
+        "effectorBone": "tentacle_tip_15",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_attack_tentacle_16",
+        "bone": "tentacle_tip_16",
+        "version": 1,
+        "role": "attack",
+        "chain": [
+          "tentacle_16",
+          "tentacle_tip_16"
+        ],
+        "effectorBone": "tentacle_tip_16",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_attack_tentacle_17",
+        "bone": "tentacle_tip_17",
+        "version": 1,
+        "role": "attack",
+        "chain": [
+          "tentacle_17",
+          "tentacle_tip_17"
+        ],
+        "effectorBone": "tentacle_tip_17",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_attack_tentacle_18",
+        "bone": "tentacle_tip_18",
+        "version": 1,
+        "role": "attack",
+        "chain": [
+          "tentacle_18",
+          "tentacle_tip_18"
+        ],
+        "effectorBone": "tentacle_tip_18",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_attack_tentacle_19",
+        "bone": "tentacle_tip_19",
+        "version": 1,
+        "role": "attack",
+        "chain": [
+          "tentacle_19",
+          "tentacle_tip_19"
+        ],
+        "effectorBone": "tentacle_tip_19",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_attack_tentacle_20",
+        "bone": "tentacle_tip_20",
+        "version": 1,
+        "role": "attack",
+        "chain": [
+          "tentacle_20",
+          "tentacle_tip_20"
+        ],
+        "effectorBone": "tentacle_tip_20",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_attack_tentacle_21",
+        "bone": "tentacle_tip_21",
+        "version": 1,
+        "role": "attack",
+        "chain": [
+          "tentacle_21",
+          "tentacle_tip_21"
+        ],
+        "effectorBone": "tentacle_tip_21",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_attack_tentacle_22",
+        "bone": "tentacle_tip_22",
+        "version": 1,
+        "role": "attack",
+        "chain": [
+          "tentacle_22",
+          "tentacle_tip_22"
+        ],
+        "effectorBone": "tentacle_tip_22",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_attack_tentacle_23",
+        "bone": "tentacle_tip_23",
+        "version": 1,
+        "role": "attack",
+        "chain": [
+          "tentacle_23",
+          "tentacle_tip_23"
+        ],
+        "effectorBone": "tentacle_tip_23",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_attack_tentacle_24",
+        "bone": "tentacle_tip_24",
+        "version": 1,
+        "role": "attack",
+        "chain": [
+          "tentacle_24",
+          "tentacle_tip_24"
+        ],
+        "effectorBone": "tentacle_tip_24",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_attack_tentacle_25",
+        "bone": "tentacle_tip_25",
+        "version": 1,
+        "role": "attack",
+        "chain": [
+          "tentacle_25",
+          "tentacle_tip_25"
+        ],
+        "effectorBone": "tentacle_tip_25",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_attack_tentacle_26",
+        "bone": "tentacle_tip_26",
+        "version": 1,
+        "role": "attack",
+        "chain": [
+          "tentacle_26",
+          "tentacle_tip_26"
+        ],
+        "effectorBone": "tentacle_tip_26",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_attack_tentacle_27",
+        "bone": "tentacle_tip_27",
+        "version": 1,
+        "role": "attack",
+        "chain": [
+          "tentacle_27",
+          "tentacle_tip_27"
+        ],
+        "effectorBone": "tentacle_tip_27",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_attack_tentacle_28",
+        "bone": "tentacle_tip_28",
+        "version": 1,
+        "role": "attack",
+        "chain": [
+          "tentacle_28",
+          "tentacle_tip_28"
+        ],
+        "effectorBone": "tentacle_tip_28",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_attack_tentacle_29",
+        "bone": "tentacle_tip_29",
+        "version": 1,
+        "role": "attack",
+        "chain": [
+          "tentacle_29",
+          "tentacle_tip_29"
+        ],
+        "effectorBone": "tentacle_tip_29",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_attack_tentacle_30",
+        "bone": "tentacle_tip_30",
+        "version": 1,
+        "role": "attack",
+        "chain": [
+          "tentacle_30",
+          "tentacle_tip_30"
+        ],
+        "effectorBone": "tentacle_tip_30",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_attack_tentacle_31",
+        "bone": "tentacle_tip_31",
+        "version": 1,
+        "role": "attack",
+        "chain": [
+          "tentacle_31",
+          "tentacle_tip_31"
+        ],
+        "effectorBone": "tentacle_tip_31",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_attack_tentacle_32",
+        "bone": "tentacle_tip_32",
+        "version": 1,
+        "role": "attack",
+        "chain": [
+          "tentacle_32",
+          "tentacle_tip_32"
+        ],
+        "effectorBone": "tentacle_tip_32",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_attack_tentacle_33",
+        "bone": "tentacle_tip_33",
+        "version": 1,
+        "role": "attack",
+        "chain": [
+          "tentacle_33",
+          "tentacle_tip_33"
+        ],
+        "effectorBone": "tentacle_tip_33",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_attack_tentacle_34",
+        "bone": "tentacle_tip_34",
+        "version": 1,
+        "role": "attack",
+        "chain": [
+          "tentacle_34",
+          "tentacle_tip_34"
+        ],
+        "effectorBone": "tentacle_tip_34",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_attack_tentacle_35",
+        "bone": "tentacle_tip_35",
+        "version": 1,
+        "role": "attack",
+        "chain": [
+          "tentacle_35",
+          "tentacle_tip_35"
+        ],
+        "effectorBone": "tentacle_tip_35",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_attack_tentacle_36",
+        "bone": "tentacle_tip_36",
+        "version": 1,
+        "role": "attack",
+        "chain": [
+          "tentacle_36",
+          "tentacle_tip_36"
+        ],
+        "effectorBone": "tentacle_tip_36",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_attack_tentacle_37",
+        "bone": "tentacle_tip_37",
+        "version": 1,
+        "role": "attack",
+        "chain": [
+          "tentacle_37",
+          "tentacle_tip_37"
+        ],
+        "effectorBone": "tentacle_tip_37",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_attack_tentacle_38",
+        "bone": "tentacle_tip_38",
+        "version": 1,
+        "role": "attack",
+        "chain": [
+          "tentacle_38",
+          "tentacle_tip_38"
+        ],
+        "effectorBone": "tentacle_tip_38",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_attack_tentacle_39",
+        "bone": "tentacle_tip_39",
+        "version": 1,
+        "role": "attack",
+        "chain": [
+          "tentacle_39",
+          "tentacle_tip_39"
+        ],
+        "effectorBone": "tentacle_tip_39",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_attack_tentacle_40",
+        "bone": "tentacle_tip_40",
+        "version": 1,
+        "role": "attack",
+        "chain": [
+          "tentacle_40",
+          "tentacle_tip_40"
+        ],
+        "effectorBone": "tentacle_tip_40",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_attack_tentacle_41",
+        "bone": "tentacle_tip_41",
+        "version": 1,
+        "role": "attack",
+        "chain": [
+          "tentacle_41",
+          "tentacle_tip_41"
+        ],
+        "effectorBone": "tentacle_tip_41",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_attack_tentacle_42",
+        "bone": "tentacle_tip_42",
+        "version": 1,
+        "role": "attack",
+        "chain": [
+          "tentacle_42",
+          "tentacle_tip_42"
+        ],
+        "effectorBone": "tentacle_tip_42",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_attack_tentacle_43",
+        "bone": "tentacle_tip_43",
+        "version": 1,
+        "role": "attack",
+        "chain": [
+          "tentacle_43",
+          "tentacle_tip_43"
+        ],
+        "effectorBone": "tentacle_tip_43",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_attack_tentacle_44",
+        "bone": "tentacle_tip_44",
+        "version": 1,
+        "role": "attack",
+        "chain": [
+          "tentacle_44",
+          "tentacle_tip_44"
+        ],
+        "effectorBone": "tentacle_tip_44",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_attack_tentacle_45",
+        "bone": "tentacle_tip_45",
+        "version": 1,
+        "role": "attack",
+        "chain": [
+          "tentacle_45",
+          "tentacle_tip_45"
+        ],
+        "effectorBone": "tentacle_tip_45",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_attack_tentacle_46",
+        "bone": "tentacle_tip_46",
+        "version": 1,
+        "role": "attack",
+        "chain": [
+          "tentacle_46",
+          "tentacle_tip_46"
+        ],
+        "effectorBone": "tentacle_tip_46",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_attack_tentacle_47",
+        "bone": "tentacle_tip_47",
+        "version": 1,
+        "role": "attack",
+        "chain": [
+          "tentacle_47",
+          "tentacle_tip_47"
+        ],
+        "effectorBone": "tentacle_tip_47",
+        "solver": "CCD"
+      }
+    ]
+  },
+  {
+    "file": "ctenorhabdotus.glb",
+    "source": "tools/creatures/jellies/anchors.json",
+    "newSpecimen": true,
+    "updatedSHA256": "53dc1eff94165e36b7d163b7748a2e701581c76ac571c403a6ab53101f43b3e8",
+    "bytes": 1904616,
+    "changedClips": [],
+    "anchors": [
+      {
+        "name": "anchor_mouth",
+        "bone": "body",
+        "version": 1,
+        "role": "mouth"
+      },
+      {
+        "name": "anchor_mouth_inside",
+        "bone": "body",
+        "version": 1,
+        "role": "swallow"
+      },
+      {
+        "name": "anchor_attack_primary",
+        "bone": "oral_6",
+        "version": 1,
+        "role": "attack"
+      },
+      {
+        "name": "anchor_attack_oral_0",
+        "bone": "oral_0",
+        "version": 1,
+        "role": "attack"
+      },
+      {
+        "name": "anchor_attack_oral_1",
+        "bone": "oral_1",
+        "version": 1,
+        "role": "attack"
+      },
+      {
+        "name": "anchor_attack_oral_2",
+        "bone": "oral_2",
+        "version": 1,
+        "role": "attack"
+      },
+      {
+        "name": "anchor_attack_oral_3",
+        "bone": "oral_3",
+        "version": 1,
+        "role": "attack"
+      },
+      {
+        "name": "anchor_attack_oral_4",
+        "bone": "oral_4",
+        "version": 1,
+        "role": "attack"
+      },
+      {
+        "name": "anchor_attack_oral_5",
+        "bone": "oral_5",
+        "version": 1,
+        "role": "attack"
+      },
+      {
+        "name": "anchor_attack_oral_6",
+        "bone": "oral_6",
+        "version": 1,
+        "role": "attack"
+      },
+      {
+        "name": "anchor_attack_oral_7",
+        "bone": "oral_7",
+        "version": 1,
+        "role": "attack"
+      }
+    ]
+  },
+  {
+    "file": "ctenorhabdotus.lod1.glb",
+    "source": "tools/creatures/jellies/anchors.json",
+    "newSpecimen": true,
+    "updatedSHA256": "f9742aac623e952123556cc8c06319cfac285596c41831860bb8da8073cc4358",
+    "bytes": 560880,
+    "changedClips": [],
+    "anchors": [
+      {
+        "name": "anchor_mouth",
+        "bone": "body",
+        "version": 1,
+        "role": "mouth"
+      },
+      {
+        "name": "anchor_mouth_inside",
+        "bone": "body",
+        "version": 1,
+        "role": "swallow"
+      },
+      {
+        "name": "anchor_attack_primary",
+        "bone": "oral_6",
+        "version": 1,
+        "role": "attack"
+      },
+      {
+        "name": "anchor_attack_oral_0",
+        "bone": "oral_0",
+        "version": 1,
+        "role": "attack"
+      },
+      {
+        "name": "anchor_attack_oral_1",
+        "bone": "oral_1",
+        "version": 1,
+        "role": "attack"
+      },
+      {
+        "name": "anchor_attack_oral_2",
+        "bone": "oral_2",
+        "version": 1,
+        "role": "attack"
+      },
+      {
+        "name": "anchor_attack_oral_3",
+        "bone": "oral_3",
+        "version": 1,
+        "role": "attack"
+      },
+      {
+        "name": "anchor_attack_oral_4",
+        "bone": "oral_4",
+        "version": 1,
+        "role": "attack"
+      },
+      {
+        "name": "anchor_attack_oral_5",
+        "bone": "oral_5",
+        "version": 1,
+        "role": "attack"
+      },
+      {
+        "name": "anchor_attack_oral_6",
+        "bone": "oral_6",
+        "version": 1,
+        "role": "attack"
+      },
+      {
+        "name": "anchor_attack_oral_7",
+        "bone": "oral_7",
+        "version": 1,
+        "role": "attack"
+      }
+    ]
+  },
+  {
+    "file": "cambroraster.glb",
+    "source": "tools/creatures/jellies/anchors.json",
+    "newSpecimen": true,
+    "updatedSHA256": "8481c903b5bd3cdb3f4925d62e7a7999f66fa31743915f88bef3398090cc5d4e",
+    "bytes": 5542800,
+    "changedClips": [],
+    "anchors": [
+      {
+        "name": "anchor_mouth",
+        "bone": "body",
+        "version": 1,
+        "role": "mouth"
+      },
+      {
+        "name": "anchor_mouth_inside",
+        "bone": "body",
+        "version": 1,
+        "role": "swallow"
+      },
+      {
+        "name": "anchor_attack_primary",
+        "bone": "rake_1_4",
+        "version": 1,
+        "role": "attack",
+        "chain": [
+          "rake_1_0",
+          "rake_1_1",
+          "rake_1_2",
+          "rake_1_3",
+          "rake_1_4"
+        ],
+        "effectorBone": "rake_1_4",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_grasp",
+        "bone": "rake_1_4",
+        "version": 1,
+        "role": "grasp",
+        "chain": [
+          "rake_1_0",
+          "rake_1_1",
+          "rake_1_2",
+          "rake_1_3",
+          "rake_1_4"
+        ],
+        "effectorBone": "rake_1_4",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_grasp_L",
+        "bone": "rake_1_4",
+        "version": 1,
+        "role": "grasp",
+        "chain": [
+          "rake_1_0",
+          "rake_1_1",
+          "rake_1_2",
+          "rake_1_3",
+          "rake_1_4"
+        ],
+        "effectorBone": "rake_1_4",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_attack_L",
+        "bone": "rake_1_4",
+        "version": 1,
+        "role": "attack",
+        "chain": [
+          "rake_1_0",
+          "rake_1_1",
+          "rake_1_2",
+          "rake_1_3",
+          "rake_1_4"
+        ],
+        "effectorBone": "rake_1_4",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_attack_endite_L_0",
+        "bone": "rake_1_0",
+        "version": 1,
+        "role": "attack",
+        "chain": [
+          "rake_1_0"
+        ],
+        "effectorBone": "rake_1_0",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_attack_endite_L_1",
+        "bone": "rake_1_1",
+        "version": 1,
+        "role": "attack",
+        "chain": [
+          "rake_1_0",
+          "rake_1_1"
+        ],
+        "effectorBone": "rake_1_1",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_attack_endite_L_2",
+        "bone": "rake_1_2",
+        "version": 1,
+        "role": "attack",
+        "chain": [
+          "rake_1_0",
+          "rake_1_1",
+          "rake_1_2"
+        ],
+        "effectorBone": "rake_1_2",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_attack_endite_L_3",
+        "bone": "rake_1_3",
+        "version": 1,
+        "role": "attack",
+        "chain": [
+          "rake_1_0",
+          "rake_1_1",
+          "rake_1_2",
+          "rake_1_3"
+        ],
+        "effectorBone": "rake_1_3",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_attack_endite_L_4",
+        "bone": "rake_1_4",
+        "version": 1,
+        "role": "attack",
+        "chain": [
+          "rake_1_0",
+          "rake_1_1",
+          "rake_1_2",
+          "rake_1_3",
+          "rake_1_4"
+        ],
+        "effectorBone": "rake_1_4",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_grasp_R",
+        "bone": "rake_-1_4",
+        "version": 1,
+        "role": "grasp",
+        "chain": [
+          "rake_-1_0",
+          "rake_-1_1",
+          "rake_-1_2",
+          "rake_-1_3",
+          "rake_-1_4"
+        ],
+        "effectorBone": "rake_-1_4",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_attack_R",
+        "bone": "rake_-1_4",
+        "version": 1,
+        "role": "attack",
+        "chain": [
+          "rake_-1_0",
+          "rake_-1_1",
+          "rake_-1_2",
+          "rake_-1_3",
+          "rake_-1_4"
+        ],
+        "effectorBone": "rake_-1_4",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_attack_endite_R_0",
+        "bone": "rake_-1_0",
+        "version": 1,
+        "role": "attack",
+        "chain": [
+          "rake_-1_0"
+        ],
+        "effectorBone": "rake_-1_0",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_attack_endite_R_1",
+        "bone": "rake_-1_1",
+        "version": 1,
+        "role": "attack",
+        "chain": [
+          "rake_-1_0",
+          "rake_-1_1"
+        ],
+        "effectorBone": "rake_-1_1",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_attack_endite_R_2",
+        "bone": "rake_-1_2",
+        "version": 1,
+        "role": "attack",
+        "chain": [
+          "rake_-1_0",
+          "rake_-1_1",
+          "rake_-1_2"
+        ],
+        "effectorBone": "rake_-1_2",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_attack_endite_R_3",
+        "bone": "rake_-1_3",
+        "version": 1,
+        "role": "attack",
+        "chain": [
+          "rake_-1_0",
+          "rake_-1_1",
+          "rake_-1_2",
+          "rake_-1_3"
+        ],
+        "effectorBone": "rake_-1_3",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_attack_endite_R_4",
+        "bone": "rake_-1_4",
+        "version": 1,
+        "role": "attack",
+        "chain": [
+          "rake_-1_0",
+          "rake_-1_1",
+          "rake_-1_2",
+          "rake_-1_3",
+          "rake_-1_4"
+        ],
+        "effectorBone": "rake_-1_4",
+        "solver": "CCD"
+      }
+    ]
+  },
+  {
+    "file": "cambroraster.lod1.glb",
+    "source": "tools/creatures/jellies/anchors.json",
+    "newSpecimen": true,
+    "updatedSHA256": "075571986cad8fb0908ab53a2ed87b4f6cbda3af2e546fb01d083c1945b5b685",
+    "bytes": 788084,
+    "changedClips": [],
+    "anchors": [
+      {
+        "name": "anchor_mouth",
+        "bone": "body",
+        "version": 1,
+        "role": "mouth"
+      },
+      {
+        "name": "anchor_mouth_inside",
+        "bone": "body",
+        "version": 1,
+        "role": "swallow"
+      },
+      {
+        "name": "anchor_attack_primary",
+        "bone": "rake_1_4",
+        "version": 1,
+        "role": "attack",
+        "chain": [
+          "rake_1_0",
+          "rake_1_1",
+          "rake_1_2",
+          "rake_1_3",
+          "rake_1_4"
+        ],
+        "effectorBone": "rake_1_4",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_grasp",
+        "bone": "rake_1_4",
+        "version": 1,
+        "role": "grasp",
+        "chain": [
+          "rake_1_0",
+          "rake_1_1",
+          "rake_1_2",
+          "rake_1_3",
+          "rake_1_4"
+        ],
+        "effectorBone": "rake_1_4",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_grasp_L",
+        "bone": "rake_1_4",
+        "version": 1,
+        "role": "grasp",
+        "chain": [
+          "rake_1_0",
+          "rake_1_1",
+          "rake_1_2",
+          "rake_1_3",
+          "rake_1_4"
+        ],
+        "effectorBone": "rake_1_4",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_attack_L",
+        "bone": "rake_1_4",
+        "version": 1,
+        "role": "attack",
+        "chain": [
+          "rake_1_0",
+          "rake_1_1",
+          "rake_1_2",
+          "rake_1_3",
+          "rake_1_4"
+        ],
+        "effectorBone": "rake_1_4",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_attack_endite_L_0",
+        "bone": "rake_1_0",
+        "version": 1,
+        "role": "attack",
+        "chain": [
+          "rake_1_0"
+        ],
+        "effectorBone": "rake_1_0",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_attack_endite_L_1",
+        "bone": "rake_1_1",
+        "version": 1,
+        "role": "attack",
+        "chain": [
+          "rake_1_0",
+          "rake_1_1"
+        ],
+        "effectorBone": "rake_1_1",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_attack_endite_L_2",
+        "bone": "rake_1_2",
+        "version": 1,
+        "role": "attack",
+        "chain": [
+          "rake_1_0",
+          "rake_1_1",
+          "rake_1_2"
+        ],
+        "effectorBone": "rake_1_2",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_attack_endite_L_3",
+        "bone": "rake_1_3",
+        "version": 1,
+        "role": "attack",
+        "chain": [
+          "rake_1_0",
+          "rake_1_1",
+          "rake_1_2",
+          "rake_1_3"
+        ],
+        "effectorBone": "rake_1_3",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_attack_endite_L_4",
+        "bone": "rake_1_4",
+        "version": 1,
+        "role": "attack",
+        "chain": [
+          "rake_1_0",
+          "rake_1_1",
+          "rake_1_2",
+          "rake_1_3",
+          "rake_1_4"
+        ],
+        "effectorBone": "rake_1_4",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_grasp_R",
+        "bone": "rake_-1_4",
+        "version": 1,
+        "role": "grasp",
+        "chain": [
+          "rake_-1_0",
+          "rake_-1_1",
+          "rake_-1_2",
+          "rake_-1_3",
+          "rake_-1_4"
+        ],
+        "effectorBone": "rake_-1_4",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_attack_R",
+        "bone": "rake_-1_4",
+        "version": 1,
+        "role": "attack",
+        "chain": [
+          "rake_-1_0",
+          "rake_-1_1",
+          "rake_-1_2",
+          "rake_-1_3",
+          "rake_-1_4"
+        ],
+        "effectorBone": "rake_-1_4",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_attack_endite_R_0",
+        "bone": "rake_-1_0",
+        "version": 1,
+        "role": "attack",
+        "chain": [
+          "rake_-1_0"
+        ],
+        "effectorBone": "rake_-1_0",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_attack_endite_R_1",
+        "bone": "rake_-1_1",
+        "version": 1,
+        "role": "attack",
+        "chain": [
+          "rake_-1_0",
+          "rake_-1_1"
+        ],
+        "effectorBone": "rake_-1_1",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_attack_endite_R_2",
+        "bone": "rake_-1_2",
+        "version": 1,
+        "role": "attack",
+        "chain": [
+          "rake_-1_0",
+          "rake_-1_1",
+          "rake_-1_2"
+        ],
+        "effectorBone": "rake_-1_2",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_attack_endite_R_3",
+        "bone": "rake_-1_3",
+        "version": 1,
+        "role": "attack",
+        "chain": [
+          "rake_-1_0",
+          "rake_-1_1",
+          "rake_-1_2",
+          "rake_-1_3"
+        ],
+        "effectorBone": "rake_-1_3",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_attack_endite_R_4",
+        "bone": "rake_-1_4",
+        "version": 1,
+        "role": "attack",
+        "chain": [
+          "rake_-1_0",
+          "rake_-1_1",
+          "rake_-1_2",
+          "rake_-1_3",
+          "rake_-1_4"
+        ],
+        "effectorBone": "rake_-1_4",
+        "solver": "CCD"
+      }
+    ]
+  },
+  {
+    "file": "tamisiocaris.glb",
+    "source": "tools/creatures/jellies/anchors.json",
+    "newSpecimen": true,
+    "updatedSHA256": "56855bd30d6bdf7a558a1c1850c327b5c71621df3d2ec3aa23762371b12a4484",
+    "bytes": 5939112,
+    "changedClips": [],
+    "anchors": [
+      {
+        "name": "anchor_mouth",
+        "bone": "body",
+        "version": 1,
+        "role": "mouth"
+      },
+      {
+        "name": "anchor_mouth_inside",
+        "bone": "body",
+        "version": 1,
+        "role": "swallow"
+      },
+      {
+        "name": "anchor_attack_primary",
+        "bone": "filter_1_12",
+        "version": 1,
+        "role": "attack",
+        "chain": [
+          "filter_1_00",
+          "filter_1_01",
+          "filter_1_02",
+          "filter_1_03",
+          "filter_1_04",
+          "filter_1_05",
+          "filter_1_06",
+          "filter_1_07",
+          "filter_1_08",
+          "filter_1_09",
+          "filter_1_10",
+          "filter_1_11",
+          "filter_1_12"
+        ],
+        "effectorBone": "filter_1_12",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_grasp",
+        "bone": "filter_1_12",
+        "version": 1,
+        "role": "grasp",
+        "chain": [
+          "filter_1_00",
+          "filter_1_01",
+          "filter_1_02",
+          "filter_1_03",
+          "filter_1_04",
+          "filter_1_05",
+          "filter_1_06",
+          "filter_1_07",
+          "filter_1_08",
+          "filter_1_09",
+          "filter_1_10",
+          "filter_1_11",
+          "filter_1_12"
+        ],
+        "effectorBone": "filter_1_12",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_grasp_L",
+        "bone": "filter_1_12",
+        "version": 1,
+        "role": "grasp",
+        "chain": [
+          "filter_1_00",
+          "filter_1_01",
+          "filter_1_02",
+          "filter_1_03",
+          "filter_1_04",
+          "filter_1_05",
+          "filter_1_06",
+          "filter_1_07",
+          "filter_1_08",
+          "filter_1_09",
+          "filter_1_10",
+          "filter_1_11",
+          "filter_1_12"
+        ],
+        "effectorBone": "filter_1_12",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_attack_L",
+        "bone": "filter_1_12",
+        "version": 1,
+        "role": "attack",
+        "chain": [
+          "filter_1_00",
+          "filter_1_01",
+          "filter_1_02",
+          "filter_1_03",
+          "filter_1_04",
+          "filter_1_05",
+          "filter_1_06",
+          "filter_1_07",
+          "filter_1_08",
+          "filter_1_09",
+          "filter_1_10",
+          "filter_1_11",
+          "filter_1_12"
+        ],
+        "effectorBone": "filter_1_12",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_attack_comb_L_outer",
+        "bone": "filter_1_12",
+        "version": 1,
+        "role": "attack",
+        "chain": [
+          "filter_1_00",
+          "filter_1_01",
+          "filter_1_02",
+          "filter_1_03",
+          "filter_1_04",
+          "filter_1_05",
+          "filter_1_06",
+          "filter_1_07",
+          "filter_1_08",
+          "filter_1_09",
+          "filter_1_10",
+          "filter_1_11",
+          "filter_1_12"
+        ],
+        "effectorBone": "filter_1_12",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_attack_comb_L_inner",
+        "bone": "filter_1_12",
+        "version": 1,
+        "role": "attack",
+        "chain": [
+          "filter_1_00",
+          "filter_1_01",
+          "filter_1_02",
+          "filter_1_03",
+          "filter_1_04",
+          "filter_1_05",
+          "filter_1_06",
+          "filter_1_07",
+          "filter_1_08",
+          "filter_1_09",
+          "filter_1_10",
+          "filter_1_11",
+          "filter_1_12"
+        ],
+        "effectorBone": "filter_1_12",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_grasp_R",
+        "bone": "filter_-1_12",
+        "version": 1,
+        "role": "grasp",
+        "chain": [
+          "filter_-1_00",
+          "filter_-1_01",
+          "filter_-1_02",
+          "filter_-1_03",
+          "filter_-1_04",
+          "filter_-1_05",
+          "filter_-1_06",
+          "filter_-1_07",
+          "filter_-1_08",
+          "filter_-1_09",
+          "filter_-1_10",
+          "filter_-1_11",
+          "filter_-1_12"
+        ],
+        "effectorBone": "filter_-1_12",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_attack_R",
+        "bone": "filter_-1_12",
+        "version": 1,
+        "role": "attack",
+        "chain": [
+          "filter_-1_00",
+          "filter_-1_01",
+          "filter_-1_02",
+          "filter_-1_03",
+          "filter_-1_04",
+          "filter_-1_05",
+          "filter_-1_06",
+          "filter_-1_07",
+          "filter_-1_08",
+          "filter_-1_09",
+          "filter_-1_10",
+          "filter_-1_11",
+          "filter_-1_12"
+        ],
+        "effectorBone": "filter_-1_12",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_attack_comb_R_outer",
+        "bone": "filter_-1_12",
+        "version": 1,
+        "role": "attack",
+        "chain": [
+          "filter_-1_00",
+          "filter_-1_01",
+          "filter_-1_02",
+          "filter_-1_03",
+          "filter_-1_04",
+          "filter_-1_05",
+          "filter_-1_06",
+          "filter_-1_07",
+          "filter_-1_08",
+          "filter_-1_09",
+          "filter_-1_10",
+          "filter_-1_11",
+          "filter_-1_12"
+        ],
+        "effectorBone": "filter_-1_12",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_attack_comb_R_inner",
+        "bone": "filter_-1_12",
+        "version": 1,
+        "role": "attack",
+        "chain": [
+          "filter_-1_00",
+          "filter_-1_01",
+          "filter_-1_02",
+          "filter_-1_03",
+          "filter_-1_04",
+          "filter_-1_05",
+          "filter_-1_06",
+          "filter_-1_07",
+          "filter_-1_08",
+          "filter_-1_09",
+          "filter_-1_10",
+          "filter_-1_11",
+          "filter_-1_12"
+        ],
+        "effectorBone": "filter_-1_12",
+        "solver": "CCD"
+      }
+    ]
+  },
+  {
+    "file": "tamisiocaris.lod1.glb",
+    "source": "tools/creatures/jellies/anchors.json",
+    "newSpecimen": true,
+    "updatedSHA256": "17edfb6399ee8496c87d80c314d02d774d96536683b018ad79df5c18a03f8dc1",
+    "bytes": 931052,
+    "changedClips": [],
+    "anchors": [
+      {
+        "name": "anchor_mouth",
+        "bone": "body",
+        "version": 1,
+        "role": "mouth"
+      },
+      {
+        "name": "anchor_mouth_inside",
+        "bone": "body",
+        "version": 1,
+        "role": "swallow"
+      },
+      {
+        "name": "anchor_attack_primary",
+        "bone": "filter_1_12",
+        "version": 1,
+        "role": "attack",
+        "chain": [
+          "filter_1_00",
+          "filter_1_01",
+          "filter_1_02",
+          "filter_1_03",
+          "filter_1_04",
+          "filter_1_05",
+          "filter_1_06",
+          "filter_1_07",
+          "filter_1_08",
+          "filter_1_09",
+          "filter_1_10",
+          "filter_1_11",
+          "filter_1_12"
+        ],
+        "effectorBone": "filter_1_12",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_grasp",
+        "bone": "filter_1_12",
+        "version": 1,
+        "role": "grasp",
+        "chain": [
+          "filter_1_00",
+          "filter_1_01",
+          "filter_1_02",
+          "filter_1_03",
+          "filter_1_04",
+          "filter_1_05",
+          "filter_1_06",
+          "filter_1_07",
+          "filter_1_08",
+          "filter_1_09",
+          "filter_1_10",
+          "filter_1_11",
+          "filter_1_12"
+        ],
+        "effectorBone": "filter_1_12",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_grasp_L",
+        "bone": "filter_1_12",
+        "version": 1,
+        "role": "grasp",
+        "chain": [
+          "filter_1_00",
+          "filter_1_01",
+          "filter_1_02",
+          "filter_1_03",
+          "filter_1_04",
+          "filter_1_05",
+          "filter_1_06",
+          "filter_1_07",
+          "filter_1_08",
+          "filter_1_09",
+          "filter_1_10",
+          "filter_1_11",
+          "filter_1_12"
+        ],
+        "effectorBone": "filter_1_12",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_attack_L",
+        "bone": "filter_1_12",
+        "version": 1,
+        "role": "attack",
+        "chain": [
+          "filter_1_00",
+          "filter_1_01",
+          "filter_1_02",
+          "filter_1_03",
+          "filter_1_04",
+          "filter_1_05",
+          "filter_1_06",
+          "filter_1_07",
+          "filter_1_08",
+          "filter_1_09",
+          "filter_1_10",
+          "filter_1_11",
+          "filter_1_12"
+        ],
+        "effectorBone": "filter_1_12",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_attack_comb_L_outer",
+        "bone": "filter_1_12",
+        "version": 1,
+        "role": "attack",
+        "chain": [
+          "filter_1_00",
+          "filter_1_01",
+          "filter_1_02",
+          "filter_1_03",
+          "filter_1_04",
+          "filter_1_05",
+          "filter_1_06",
+          "filter_1_07",
+          "filter_1_08",
+          "filter_1_09",
+          "filter_1_10",
+          "filter_1_11",
+          "filter_1_12"
+        ],
+        "effectorBone": "filter_1_12",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_attack_comb_L_inner",
+        "bone": "filter_1_12",
+        "version": 1,
+        "role": "attack",
+        "chain": [
+          "filter_1_00",
+          "filter_1_01",
+          "filter_1_02",
+          "filter_1_03",
+          "filter_1_04",
+          "filter_1_05",
+          "filter_1_06",
+          "filter_1_07",
+          "filter_1_08",
+          "filter_1_09",
+          "filter_1_10",
+          "filter_1_11",
+          "filter_1_12"
+        ],
+        "effectorBone": "filter_1_12",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_grasp_R",
+        "bone": "filter_-1_12",
+        "version": 1,
+        "role": "grasp",
+        "chain": [
+          "filter_-1_00",
+          "filter_-1_01",
+          "filter_-1_02",
+          "filter_-1_03",
+          "filter_-1_04",
+          "filter_-1_05",
+          "filter_-1_06",
+          "filter_-1_07",
+          "filter_-1_08",
+          "filter_-1_09",
+          "filter_-1_10",
+          "filter_-1_11",
+          "filter_-1_12"
+        ],
+        "effectorBone": "filter_-1_12",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_attack_R",
+        "bone": "filter_-1_12",
+        "version": 1,
+        "role": "attack",
+        "chain": [
+          "filter_-1_00",
+          "filter_-1_01",
+          "filter_-1_02",
+          "filter_-1_03",
+          "filter_-1_04",
+          "filter_-1_05",
+          "filter_-1_06",
+          "filter_-1_07",
+          "filter_-1_08",
+          "filter_-1_09",
+          "filter_-1_10",
+          "filter_-1_11",
+          "filter_-1_12"
+        ],
+        "effectorBone": "filter_-1_12",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_attack_comb_R_outer",
+        "bone": "filter_-1_12",
+        "version": 1,
+        "role": "attack",
+        "chain": [
+          "filter_-1_00",
+          "filter_-1_01",
+          "filter_-1_02",
+          "filter_-1_03",
+          "filter_-1_04",
+          "filter_-1_05",
+          "filter_-1_06",
+          "filter_-1_07",
+          "filter_-1_08",
+          "filter_-1_09",
+          "filter_-1_10",
+          "filter_-1_11",
+          "filter_-1_12"
+        ],
+        "effectorBone": "filter_-1_12",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_attack_comb_R_inner",
+        "bone": "filter_-1_12",
+        "version": 1,
+        "role": "attack",
+        "chain": [
+          "filter_-1_00",
+          "filter_-1_01",
+          "filter_-1_02",
+          "filter_-1_03",
+          "filter_-1_04",
+          "filter_-1_05",
+          "filter_-1_06",
+          "filter_-1_07",
+          "filter_-1_08",
+          "filter_-1_09",
+          "filter_-1_10",
+          "filter_-1_11",
+          "filter_-1_12"
+        ],
+        "effectorBone": "filter_-1_12",
+        "solver": "CCD"
+      }
+    ]
   }
 ]

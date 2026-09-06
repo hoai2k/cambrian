@@ -21,45 +21,49 @@ function slotFor(materialName) {
   const n = materialName.toLowerCase();
   if (/eye/.test(n)) return 'eyes';
   if (/ventral|arthrodial/.test(n)) return 'underside';
-  if (/sclerotiz|oral plate|spine/.test(n)) return 'accent';
-  if (/membrane|swimming/.test(n)) return 'fins';
-  if (/bristle|appendage|endite|antenna|seta|leg/.test(n)) return 'legs';
+  if (/sclerotiz|oral|spine/.test(n)) return 'accent';
+  if (/membrane|swimming|marginal/.test(n)) return 'fins';
+  if (/bristle|appendage|endite|antenna|seta|gill|leg/.test(n)) return 'legs';
   return 'body';
 }
 
-/** What each shipped material is expected to be. Update deliberately, never to silence a failure. */
+/**
+ * What each material name means, with the creature-id prefix stripped ("waptia Cuticle" ->
+ * "cuticle"). Keyed by name rather than per creature because the roster reuses one naming
+ * convention, so this covers all 21 creatures and any that follow. A material whose name is not
+ * listed fails the check: a new name must be classified deliberately, not silently absorbed by
+ * the body fallback.
+ */
 const EXPECTED = {
-  anomalocaris: {
-    'Mottled umber cuticle': 'body', 'Compound eye': 'eyes', 'Thin swimming membranes': 'fins',
-    'Amber endites': 'legs', 'Oral plates': 'accent', 'Dark arthrodial membrane': 'underside',
-  },
-  canadia: { 'canadia Cuticle': 'body', 'canadia Membrane': 'fins', 'canadia Bristles': 'legs' },
-  hallucigenia: {
-    'hallucigenia Dorsal cuticle': 'body', 'hallucigenia Dark eyes': 'eyes',
-    'hallucigenia Soft appendages': 'legs', 'hallucigenia Sclerotized tips': 'accent',
-  },
-  marrella: {
-    'marrella Dorsal cuticle': 'body', 'marrella Soft appendages': 'legs',
-    'marrella Sclerotized tips': 'accent',
-  },
-  olenoides: {
-    'olenoides Dorsal cuticle': 'body', 'olenoides Dark eyes': 'eyes',
-    'olenoides Soft appendages': 'legs', 'olenoides Sclerotized tips': 'accent',
-    'Olenoides continuous ventral body': 'underside',
-  },
-  opabinia: {
-    'opabinia Cuticle': 'body', 'opabinia Eyes': 'eyes', 'opabinia Membrane': 'fins',
-    'opabinia Sclerotized edges': 'accent',
-  },
-  waptia: {
-    'waptia Cuticle': 'body', 'waptia Eyes': 'eyes', 'waptia Membrane': 'fins',
-    'waptia Bristles': 'legs', 'waptia Sclerotized edges': 'accent',
-  },
-  wiwaxia: {
-    'wiwaxia Dorsal cuticle': 'body', 'wiwaxia Soft appendages': 'legs',
-    'wiwaxia Sclerotized tips': 'accent',
-  },
+  'cuticle': 'body',
+  'dorsal cuticle': 'body',
+  'mottled umber cuticle': 'body',
+  'living integument': 'body',
+  'eyes': 'eyes',
+  'dark eyes': 'eyes',
+  'compound eye': 'eyes',
+  'membrane': 'fins',
+  'fin membrane': 'fins',
+  'thin swimming membranes': 'fins',
+  'marginal tissue': 'fins',
+  'bristles': 'legs',
+  'soft appendages': 'legs',
+  'amber endites': 'legs',
+  'gill filaments': 'legs',
+  'sclerotized tips': 'accent',
+  'sclerotized edges': 'accent',
+  'oral plates': 'accent',
+  'oral cuticle': 'accent',
+  'dark arthrodial membrane': 'underside',
+  'continuous ventral body': 'underside',
 };
+
+/** The whole roster: the base eight in creatures.ts plus the expansion in expansion.ts. */
+function rosterIds() {
+  const text = ['src/sim/creatures.ts', 'src/sim/expansion.ts']
+    .map((f) => fs.readFileSync(f, 'utf8')).join('\n');
+  return [...new Set([...text.matchAll(/\bid: '([a-z]+)'/g)].map((m) => m[1]))];
+}
 
 const src = fs.readFileSync('src/shared/palettes.ts', 'utf8');
 let failures = 0;
@@ -67,7 +71,7 @@ const fail = (m) => { console.log('FAIL  ' + m); failures++; };
 
 // --- the mirror above must still match the classifier in palettes.ts ---
 const body = src.slice(src.indexOf('export function slotFor'), src.indexOf('export interface Scheme'));
-for (const rule of ['eye', 'ventral|arthrodial', 'sclerotiz|oral plate|spine', 'membrane|swimming', 'bristle|appendage|endite|antenna|seta|leg']) {
+for (const rule of ['eye', 'ventral|arthrodial', 'sclerotiz|oral|spine', 'membrane|swimming|marginal', 'bristle|appendage|endite|antenna|seta|gill|leg']) {
   if (!body.includes(rule)) fail(`slotFor() in palettes.ts no longer has the /${rule}/ rule this check mirrors`);
 }
 
@@ -81,27 +85,30 @@ for (const [i, blockText] of colorBlocks.entries()) {
 }
 const schemeCount = schemeIds.length;
 
-// --- every shipped material classifies as expected ---
+// --- every shipped material, on every creature, classifies as expected ---
 const io = new NodeIO().registerExtensions(ALL_EXTENSIONS).registerDependencies({ 'meshopt.decoder': MeshoptDecoder });
+const ids = rosterIds();
 let materials = 0;
-for (const [id, expected] of Object.entries(EXPECTED)) {
+for (const id of ids) {
+  const slotsUsed = new Set();
   for (const file of [`${id}.glb`, `${id}.lod1.glb`]) {
     const path = `public/assets/creatures/${file}`;
     if (!fs.existsSync(path)) { fail(`${file} is missing`); continue; }
     const doc = await io.read(path);
-    const names = doc.getRoot().listMaterials().map((m) => m.getName());
-    for (const name of names) {
+    for (const name of doc.getRoot().listMaterials().map((m) => m.getName())) {
       materials++;
-      const want = expected[name];
-      if (!want) { fail(`${file}: material "${name}" is not in this check's expected list`); continue; }
+      // "waptia Cuticle" and "Olenoides continuous ventral body" both reduce to their suffix.
+      const key = name.toLowerCase().startsWith(id) ? name.slice(id.length).trim().toLowerCase() : name.toLowerCase();
+      const want = EXPECTED[key];
+      if (!want) { fail(`${file}: material "${name}" is not classified by this check — add it to EXPECTED`); continue; }
       const got = slotFor(name);
       if (got !== want) fail(`${file}: "${name}" classifies as ${got}, expected ${want}`);
-    }
-    for (const name of Object.keys(expected)) {
-      if (!names.includes(name)) fail(`${file}: expected material "${name}" is gone`);
+      slotsUsed.add(got);
     }
   }
+  // A creature with one slot cannot show a scheme at all: every material would take one colour.
+  if (slotsUsed.size === 1) fail(`${id}: every material lands in the "${[...slotsUsed][0]}" slot, so schemes cannot vary it`);
 }
 
-console.log(`\n${schemeCount} schemes · ${materials} materials checked · ${failures} failure(s)`);
+console.log(`\n${ids.length} creatures · ${schemeCount} schemes · ${materials} materials checked · ${failures} failure(s)`);
 process.exit(failures ? 1 : 0);

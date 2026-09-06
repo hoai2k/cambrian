@@ -1,0 +1,66 @@
+[
+  {
+    "id": "cambroraster",
+    "suffix": "",
+    "triangles": 58464,
+    "clips": 18,
+    "before": 8394480,
+    "after": 5536196
+  },
+  {
+    "id": "cambroraster",
+    "suffix": ".lod1",
+    "triangles": 29618,
+    "clips": 18,
+    "before": 6722512,
+    "after": 5173108
+  },
+  {
+    "id": "tamisiocaris",
+    "suffix": "",
+    "triangles": 57516,
+    "clips": 18,
+    "before": 9000728,
+    "after": 5932552
+  },
+  {
+    "id": "tamisiocaris",
+    "suffix": ".lod1",
+    "triangles": 29180,
+    "clips": 18,
+    "before": 7330284,
+    "after": 5551300
+  },
+  {
+    "id": "burgessomedusa",
+    "suffix": "",
+    "triangles": 36432,
+    "clips": 18,
+    "before": 5136704,
+    "after": 3029560
+  },
+  {
+    "id": "burgessomedusa",
+    "suffix": ".lod1",
+    "triangles": 15300,
+    "clips": 18,
+    "before": 4008368,
+    "after": 2780184
+  },
+  {
+    "id": "ctenorhabdotus",
+    "suffix": "",
+    "triangles": 50112,
+    "clips": 18,
+    "before": 4252092,
+    "after": 1901532
+  },
+  {
+    "id": "ctenorhabdotus",
+    "suffix": ".lod1",
+    "triangles": 21044,
+    "clips": 18,
+    "before": 2644900,
+    "after": 1539360
+  }
+]

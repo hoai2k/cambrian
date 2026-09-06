@@ -116,7 +116,7 @@ export function Viewer() {
       <div className="info">
         <span className="role">{def.ground ? 'SEAFLOOR' : 'SWIMMER'} · {def.role}</span>
         <h2>{def.name}</h2>
-        <p>{def.adultLength.toFixed(1)} m adult · {clips.length} clips</p>
+        <p>{def.provenance ?? 'Burgess Shale'} · {clips.length} clips</p>
         <p className="hint">Drag to orbit · right-drag to pan · scroll to zoom</p>
         <button className="ghost" onClick={() => sceneRef.current?.resetCamera()}>Reset view</button>
 

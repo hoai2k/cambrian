@@ -9,7 +9,7 @@ import { BAND_COLOR, emptyInput, TIER_NAMES, TIER_NEED, type Actor, type Band, t
 import { groundHeight, NURSERIES, resolveStatic, SURFACE_Y, type Boulder } from '../sim/world';
 import { AssetQueue, type AssetProgress } from './assets';
 import { CreatureView, ensureLoaded, loadedSync, type Lod } from './creature';
-import { feedingPhase } from './anchors';
+import { Attachments } from './attachments';
 import { Bubbles, Impacts, Silt } from './fx';
 import { createSea, type Quality, type SeaEnvironment } from './sea';
 
@@ -61,10 +61,8 @@ export class Engine {
   private sea?: SeaEnvironment;
   game?: Game;
   private views = new Map<number, CreatureView>();
-  private feeding = new Map<number, { target: number; initialEaten: number; pickup: THREE.Vector3; startTip: THREE.Vector3; lastStateT: number }>();
-  private anchorPoint = new THREE.Vector3();
-  private mouthPoint = new THREE.Vector3();
-  private insidePoint = new THREE.Vector3();
+  private attachments = new Attachments();
+  private contact = new THREE.Vector3();
 
   private ringGeo = new THREE.RingGeometry(0.72, 0.85, 40);
   // forward-facing cap (the model's +Z is its nose)
@@ -180,7 +178,7 @@ export class Engine {
 
   private clearMatch() {
     for (const v of this.views.values()) v.dispose();
-    this.views.clear(); this.feeding.clear();
+    this.views.clear(); this.attachments.clear();
     this.cams = [];
     this.game = undefined;
   }
@@ -210,7 +208,7 @@ export class Engine {
   private frame = (now: number) => {
     if (this.disposed) return;
     this.raf = requestAnimationFrame(this.frame);
-    const dtReal = Math.min((now - this.last) / 1000, 0.08);
+    const dtReal = Math.max(0, Math.min((now - this.last) / 1000, 0.08));
     this.last = now;
     this.fpsFrames++; this.fpsT += dtReal; if (this.fpsT > 1) { this.fps = this.fpsFrames / this.fpsT; this.fpsFrames = 0; this.fpsT = 0; }
     const game = this.game;
@@ -476,61 +474,19 @@ export class Engine {
       const animate = continuous || !far || ((a.id + Math.floor(this.time * 60)) % 3 === 0);
       v.update(a, animate && far && !continuous ? dt * 3 : dt, this.time, animate);
     }
-    this.syncAttachments(game);
+    this.attachments.sync(game, this.views, dt);
     for (const [id, v] of this.views) if (!keep.has(id)) { v.dispose(); this.views.delete(id); }
   }
 
-  /** Visual attachment pass after every actor transform/animation has been updated. */
-  private syncAttachments(game: Game) {
-    const active = new Set<number>();
-    const claimed = new Set<number>();
-    for (const predator of game.actors) {
-      if (predator.creature !== 'opabinia' || predator.state !== 'eating') continue;
-      const food = game.byId(predator.eatingTarget), pv = this.views.get(predator.id);
-      const fv = food && this.views.get(food.id);
-      if (!food || !pv || !fv || claimed.has(food.id) || !pv.anchors.world('anchor_mouth', this.mouthPoint)) continue;
-      if (!pv.anchors.world('anchor_grasp', this.anchorPoint)) continue;
-      active.add(predator.id); claimed.add(food.id);
-      let state = this.feeding.get(predator.id);
-      if (!state || state.target !== food.id || predator.stateT < state.lastStateT) {
-        state = { target: food.id, initialEaten: food.eaten, pickup: fv.group.position.clone(), startTip: this.anchorPoint.clone(), lastStateT: predator.stateT };
-        this.feeding.set(predator.id, state);
-      }
-      state.lastStateT = predator.stateT;
-      const progress = THREE.MathUtils.clamp((food.eaten - state.initialEaten) / Math.max(.001, 1 - state.initialEaten), 0, 1);
-      const phase = feedingPhase(progress);
-      pv.poseFeeding(progress);
-      pv.anchors.world('anchor_mouth', this.mouthPoint);
-      this.insidePoint.copy(this.mouthPoint); pv.anchors.world('anchor_mouth_inside', this.insidePoint);
-      const target = state.startTip.clone().lerp(state.pickup, phase.pickup);
-      if (phase.attached) {
-        target.copy(state.pickup).lerp(this.mouthPoint, phase.carry);
-        // Carry beneath the head rather than through the head mesh.
-        const down = new THREE.Vector3(0, -pv.visibleLength * .13 * Math.sin(Math.PI * phase.carry), 0).applyQuaternion(pv.group.quaternion);
-        target.add(down);
-      }
-      pv.anchors.solveGrasp(target);
-      if (phase.attached && pv.anchors.world('anchor_grasp', this.anchorPoint)) {
-        fv.group.position.copy(this.anchorPoint).lerp(this.insidePoint, phase.swallow);
-        // A consumed corpse closes down to the aperture, then disappears inside it.
-        const aperture = Math.min(1, pv.visibleLength * .04 / Math.max(.001, fv.visibleLength));
-        fv.group.scale.multiplyScalar(THREE.MathUtils.lerp(1, aperture, phase.carry) * (1 - phase.swallow));
-        fv.group.updateWorldMatrix(true, true);
-      }
-    }
-    for (const id of this.feeding.keys()) if (!active.has(id)) this.feeding.delete(id);
-    // Other creatures can immediately use the same sockets for grabs and swallowing.
-    for (const food of game.actors) {
-      if (claimed.has(food.id)) continue;
-      const predatorId = food.state === 'grabbed' ? food.grabbedBy : food.state === 'swallowed' ? food.swallowedBy : -1;
-      const pv = this.views.get(predatorId), fv = this.views.get(food.id); if (!pv || !fv) continue;
-      if (food.state === 'grabbed') {
-        if (pv.anchors.world('anchor_grasp', this.anchorPoint) || pv.anchors.world('anchor_attack_primary', this.anchorPoint)) fv.group.position.copy(this.anchorPoint);
-      } else if (pv.anchors.world('anchor_mouth', this.anchorPoint)) {
-        this.insidePoint.copy(this.anchorPoint); pv.anchors.world('anchor_mouth_inside', this.insidePoint);
-        fv.group.position.copy(this.anchorPoint).lerp(this.insidePoint, THREE.MathUtils.clamp(food.stateT / Math.max(.001, food.stateDur), 0, 1));
-      }
-    }
+  /** Impact effects land where the attacker's nearest attack socket is, not at the victim's centre, when the rig has one. */
+  private impactPos(attackerId: number | undefined, victimId: number | undefined, fallback: { x: number; y: number; z: number }) {
+    const victim = victimId != null && victimId >= 0 ? this.game?.byId(victimId) : undefined;
+    const pv = attackerId != null && attackerId >= 0 ? this.views.get(attackerId) : undefined;
+    if (!pv || !this.attachments.contactPoint(pv, fallback, this.contact)) return fallback;
+    // A socket far from the body it supposedly hit means the clip has not reached it: keep the sim's point.
+    const limit = victim ? lengthOf(victim) * 0.9 + 0.3 : 1;
+    const off = Math.hypot(this.contact.x - fallback.x, this.contact.y - fallback.y, this.contact.z - fallback.z);
+    return off < limit ? { x: this.contact.x, y: this.contact.y, z: this.contact.z } : fallback;
   }
 
   /** Per-viewport pass: cull views outside this camera, then colour the rings for this viewer. */
@@ -577,8 +533,9 @@ export class Engine {
       switch (e.kind) {
         case 'hit': {
           const s = e.strength ?? 1;
-          this.bubbles.emit(e.pos, Math.round(6 + s * 10), 0.4, 2 + s * 2, 0.07);
-          this.impacts.spawn(e.pos, '#ffd0a0', 0.5 + s * 0.8, 0.28);
+          const at = this.impactPos(e.actor, e.other, e.pos);
+          this.bubbles.emit(at, Math.round(6 + s * 10), 0.4, 2 + s * 2, 0.07);
+          this.impacts.spawn(at, '#ffd0a0', 0.5 + s * 0.8, 0.28);
           audio.play('hit', s, pan);
           if (e.player != null && e.player >= 0) { const d = padOf(e.player); if (typeof d === 'number') rumble(d, Math.min(1, 0.4 + s * 0.4), 0.3, 120); this.shake(e.player, 0.5 + s * 0.5); }
           const attacker = game.byId(e.actor);
@@ -589,13 +546,13 @@ export class Engine {
         case 'death': { audio.play('death'); if (e.player != null && e.player >= 0) { const d = padOf(e.player); if (typeof d === 'number') rumble(d, 1, 1, 400); this.shake(e.player, 1.4); } break; }
         case 'eat': { this.bubbles.emit(e.pos, 5, 0.3, 1.2, 0.05, 0.8); audio.play('eat', e.strength ?? 0.5, pan); break; }
         case 'tierUp': { this.bubbles.emit(e.pos, 90, 2.5, 5, 0.14, 2.2); this.impacts.spawn(e.pos, '#fff0b0', 4 + (e.strength ?? 1) * 2, 0.9); audio.play('tierUp'); if (e.player != null && e.player >= 0) { const d = padOf(e.player); if (typeof d === 'number') rumble(d, 0.8, 0.8, 600); this.shake(e.player, 0.8); } break; }
-        case 'parry': { this.impacts.spawn(e.pos, '#9ff6ff', 2, 0.4); this.bubbles.emit(e.pos, 20, 0.6, 5, 0.08); audio.play('parry'); if (e.player != null && e.player >= 0) { const d = padOf(e.player); if (typeof d === 'number') rumble(d, 0.9, 0.2, 90); } break; }
-        case 'guardBreak': { this.impacts.spawn(e.pos, '#ff6a5a', 1.8, 0.4); audio.play('guardBreak'); break; }
+        case 'parry': { const at = this.impactPos(e.other, e.actor, e.pos); this.impacts.spawn(at, '#9ff6ff', 2, 0.4); this.bubbles.emit(at, 20, 0.6, 5, 0.08); audio.play('parry'); if (e.player != null && e.player >= 0) { const d = padOf(e.player); if (typeof d === 'number') rumble(d, 0.9, 0.2, 90); } break; }
+        case 'guardBreak': { this.impacts.spawn(this.impactPos(e.other, e.actor, e.pos), '#ff6a5a', 1.8, 0.4); audio.play('guardBreak'); break; }
         case 'stagger': { audio.play('stagger'); break; }
         case 'dodge': { this.bubbles.emit(e.pos, 14, 0.8, 2.5, 0.06, 0.7); audio.play('dodge'); break; }
         case 'silt': { this.bubbles.emit(e.pos, 30, 1.5, 2, 0.08, 1.2); audio.play('silt'); break; }
         case 'ability': { this.impacts.spawn(e.pos, '#c8fff0', 1.2 + (e.strength ?? 1) * 0.4, 0.45); this.bubbles.emit(e.pos, 20, 1, 3, 0.08); audio.play('ability'); break; }
-        case 'grab': { this.impacts.spawn(e.pos, '#ffb070', 1.4, 0.35); audio.play('grab'); if (e.player != null && e.player >= 0) { const d = padOf(e.player); if (typeof d === 'number') rumble(d, 1, 0.6, 300); } break; }
+        case 'grab': { this.impacts.spawn(this.impactPos(e.actor, e.other, e.pos), '#ffb070', 1.4, 0.35); audio.play('grab'); if (e.player != null && e.player >= 0) { const d = padOf(e.player); if (typeof d === 'number') rumble(d, 1, 0.6, 300); } break; }
         case 'hunted': { audio.play('hunted'); if (e.player != null && e.player >= 0) { const d = padOf(e.player); if (typeof d === 'number') rumble(d, 0.6, 0.9, 500); } break; }
         case 'escape': { audio.play('escape'); break; }
         case 'noticed': { audio.play('noticed', 0.5); break; }

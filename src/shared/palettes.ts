@@ -35,20 +35,26 @@ export const SLOT_LABEL: Record<Slot, string> = {
 };
 
 /**
- * Which slot a GLB material belongs to, decided from its name. The eight creatures share one
- * naming convention ("<id> Dorsal cuticle", "Compound eye", "Thin swimming membranes",
- * "Sclerotized tips", "Soft appendages", …), so this classifies all 33 shipped materials without
- * a per-creature table and gives a new creature sensible slots for free. Order matters: the
- * ventral and arthrodial tests run before the membrane test, which would otherwise claim them.
- * tools/palette-test.ts asserts the shipped materials still land where this file says they do.
+ * Which slot a GLB material belongs to, decided from its name. The roster shares one naming
+ * convention ("<id> Dorsal cuticle", "Compound eye", "Thin swimming membranes", "Sclerotized
+ * tips", "Soft appendages", "Gill filaments", …), so this classifies every shipped material
+ * without a per-creature table and gives a new creature sensible slots for free.
+ *
+ * The slots are colour roles, not anatomy: gill filaments join the legs because they are the
+ * same filamentous soft tissue to paint, and a soft-bodied animal's marginal tissue joins the
+ * fins because that fringe is what a fin fold is. Order matters — the ventral and arthrodial
+ * tests run before the membrane test, which would otherwise claim them, and the oral test runs
+ * before the fallback, which would otherwise read "Oral cuticle" as body.
+ *
+ * tools/palette-test.mjs asserts the shipped materials still land where this file says they do.
  */
 export function slotFor(materialName: string): Slot {
   const n = materialName.toLowerCase();
   if (/eye/.test(n)) return 'eyes';
   if (/ventral|arthrodial/.test(n)) return 'underside';
-  if (/sclerotiz|oral plate|spine/.test(n)) return 'accent';
-  if (/membrane|swimming/.test(n)) return 'fins';
-  if (/bristle|appendage|endite|antenna|seta|leg/.test(n)) return 'legs';
+  if (/sclerotiz|oral|spine/.test(n)) return 'accent';
+  if (/membrane|swimming|marginal/.test(n)) return 'fins';
+  if (/bristle|appendage|endite|antenna|seta|gill|leg/.test(n)) return 'legs';
   return 'body';
 }
 
