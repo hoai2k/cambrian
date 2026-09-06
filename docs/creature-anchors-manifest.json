@@ -1080,9 +1080,28 @@
   {
     "file": "hallucigenia.glb",
     "originalSHA256": "6199dac3fa2b0b6161822ac7f909b2882de2778e543aa3c6ef06efc44273a849",
-    "updatedSHA256": "ccf9b8441f96e14216eff9767e8a336088b3872499d76d6f70f7f82317b410b6",
-    "bytes": 2620220,
-    "changedClips": [],
+    "updatedSHA256": "a17e87a46c89df96b1946c933d4709654c5fb32996fd6f802102cf9d457c8341",
+    "bytes": 3388916,
+    "changedClips": [
+      "Ability",
+      "Attack",
+      "Bite",
+      "Crawl",
+      "Death",
+      "Dive",
+      "Dodge",
+      "Eat",
+      "Guard",
+      "Heavy",
+      "Hit",
+      "Idle",
+      "Moult",
+      "Parry",
+      "Rise",
+      "Stagger",
+      "TurnLeft",
+      "TurnRight"
+    ],
     "anchors": [
       {
         "name": "anchor_mouth",
@@ -1185,9 +1204,13 @@
   {
     "file": "hallucigenia.lod1.glb",
     "originalSHA256": "70dc1817a15e9a72cad350f5fc23b73cbb4d44b6784acafdaaf6ebc7cd2e35c0",
-    "updatedSHA256": "f1f15b6aeb8c1779dbd4709084c2517885557faaf19fd298f0b52f75c25ea9e6",
-    "bytes": 296028,
-    "changedClips": [],
+    "updatedSHA256": "fdb495aa2192c5c2a45086dce2547f8d318753742b4fe46eb3ffc83e063906cb",
+    "bytes": 510528,
+    "changedClips": [
+      "Crawl",
+      "Death",
+      "Idle"
+    ],
     "anchors": [
       {
         "name": "anchor_mouth",
