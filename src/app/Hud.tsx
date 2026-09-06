@@ -22,9 +22,13 @@ export function Hud({ snapshot }: { snapshot: HudSnapshot }) {
 function PlayerPanel({ p }: { p: PlayerHud }) {
   const def = creature(p.creature);
   const R = 30, C = 2 * Math.PI * R;
+  // Red edges indicate low health only; predator awareness has its own text and arrow.
+  const healthWarning = p.alive && p.hpMax > 0
+    ? Math.max(0, Math.min(1, (0.3 - p.hp / p.hpMax) / 0.3))
+    : 0;
   return (
     <>
-      <div className="hunt-vignette" style={{ opacity: Math.max(0, Math.min(1, (p.hunted - 0.25) * 1.3)) }} />
+      <div className="health-vignette" aria-hidden="true" style={{ opacity: healthWarning }} />
       {p.bandMarkers.map((m, k) => (
         <span key={k} className={`marker marker-${m.band}`} style={{ left: `${m.x * 100}%`, top: `${m.y * 100}%`, ['--s' as string]: m.size, maskImage: `url(${import.meta.env.BASE_URL}assets/ui/band-${m.band}.svg)`, color: BAND_COLOR[m.band] }} />
       ))}
