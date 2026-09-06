@@ -357,8 +357,7 @@ input[type='checkbox'] { width: 20px; height: 20px; accent-color: var(--ember); 
 .title-illustrated, .loading-illustrated { background: #090b09; }
 .title-illustrated { overflow: hidden; align-items: end; }
 .title-illustration { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: center; z-index: -2; }
-.title-illustrated::after { content: ''; position: absolute; inset: 0; z-index: -1; pointer-events: none; background: linear-gradient(transparent 52%, rgba(9,11,9,.35) 70%, rgba(9,11,9,.94)); }
-.title-illustrated .title-inner { width: 100%; padding: 24px 24px max(80px, env(safe-area-inset-bottom)); text-shadow: 0 2px 12px #000; }
+.title-illustrated .title-inner { width: 100%; padding: 24px 24px max(80px, env(safe-area-inset-bottom)); text-shadow: 0 2px 3px #000, 0 0 10px #000, 0 0 22px rgba(0,0,0,.85); }
 .title-illustrated .title-hint { color: #d6ddd7; }
 .title-illustrated .title-tag { margin: 8px 0 18px; }
 .title-illustrated .press-start { margin: 14px 0; }
