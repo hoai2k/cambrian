@@ -1,6 +1,7 @@
 // Headless smoke test for the audio workbench: enables audio, plays a sound by event kind and a
-// raw file, checks the distance falloff reports a quieter sound further out, and reports any
-// sample file the catalogue lists but the library is missing.
+// raw file, checks the distance falloff reports a quieter sound further out, drives the
+// soundtrack through one track hand-over, and reports any sample file the catalogue lists but
+// the library is missing.
 // Usage: node tools/workbench-smoke.mjs <outdir>
 // Requires `npm run build && npx vite preview --port 4173` in another shell.
 import { chromium } from 'playwright-core';
@@ -33,6 +34,19 @@ await page.waitForTimeout(200);
 await page.click('.sounds .row:nth-child(1) .name');
 await page.waitForTimeout(300);
 console.log('far: ', await readout());
+
+// The soundtrack: the opening track hands over to a different one near its end.
+await page.click('.row.soundtrack .name');
+await page.waitForTimeout(3000);
+const opening = await page.textContent('.row.soundtrack .name small');
+await page.click('.row.soundtrack button.chip >> nth=1');       // seek to just before the end
+let handover = null;
+for (let i = 0; i < 20 && !handover; i++) {
+  await page.waitForTimeout(1000);
+  const now = await page.textContent('.row.soundtrack .name small');
+  if (now !== opening) handover = now;
+}
+console.log('music:', opening, '->', handover ?? 'NO HANDOVER');
 
 await page.hover('.sounds .row:nth-child(3) .name');
 await page.waitForTimeout(400);

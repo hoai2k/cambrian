@@ -7,7 +7,7 @@ import { bandOf, isAlive, isHidden, lengthOf } from '../sim/actors';
 import { creature, type CreatureId } from '../sim/creatures';
 import { Game } from '../sim/game';
 import { BAND_COLOR, emptyInput, TIER_NAMES, TIER_NEED, type Actor, type Band, type InputFrame, type Mode, type PlayerSetup } from '../sim/types';
-import { groundHeight, NURSERIES, resolveStatic, SURFACE_Y, type Boulder } from '../sim/world';
+import { biomeAt, groundHeight, NURSERIES, resolveStatic, SURFACE_Y, type Boulder } from '../sim/world';
 import { AssetQueue, type AssetProgress } from './assets';
 import { CreatureView, ensureLoaded, loadedSync, type Lod } from './creature';
 import { Attachments } from './attachments';
@@ -286,6 +286,9 @@ export class Engine {
     const focus = camPositions.length ? camPositions[0] : this.lastFocus;
     this.lastFocus.copy(focus);
     this.sea?.update(this.time, dt, focus);
+    // Tell the music where the first player is; a biome with a track of its own cues it.
+    const listener = game.players[0];
+    if (listener && !this.attract) audio.setBiome(biomeAt(listener.pos.x, listener.pos.z));
 
     // Views
     this.syncViews(game, camPositions, dt);

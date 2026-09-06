@@ -3,6 +3,11 @@
  * synthesized fallback for anything that has not loaded yet, so the game is never silent.
  */
 import { AUDIBLE_FLOOR, MIN_GAP } from './mix';
+import { biomeHasTrack, BIOME_HOLD, CROSSFADE, FIRST_FADE, OPENING_TRACK, pickNext, type MusicTrack } from './music';
+import type { Biome } from '../sim/world';
+
+/** One playing music track: a streaming media element on its own gain, for crossfading. */
+interface MusicVoice { track: MusicTrack; el: HTMLAudioElement; node: MediaElementAudioSourceNode; gain: GainNode }
 
 /**
  * Prefix for the asset folders. The game page sits at the app root, but a built bundle's
@@ -28,9 +33,8 @@ export const SAMPLES: Record<string, string[]> = {
   'ui-move': ['ui-move'], 'ui-confirm': ['ui-confirm'], 'ui-back': ['ui-back'], 'ui-join': ['ui-join'], 'ui-start': ['ui-start'], won: ['won'],
 };
 export const LOOPS = { ambient: 'ambient-reef', drone: 'giant-drone' } as const;
-/** Background music (public/music). Starts with the first user gesture on the title screen and loops. */
-export const MUSIC_NAME = 'Tide of First Bones';
-export const musicUrl = () => `${ASSET_BASE}music/${encodeURIComponent(MUSIC_NAME)}.mp3`;
+/** URL of a music track in public/music, by name (no extension). See `src/audio/music.ts`. */
+export const musicUrl = (name: string) => `${ASSET_BASE}music/${encodeURIComponent(name)}.mp3`;
 
 export class GameAudio {
   private ctx?: AudioContext;
@@ -42,6 +46,9 @@ export class GameAudio {
   private synthTensionGain?: GainNode;
   private musicGain?: GainNode;
   private musicStarted = false;
+  private music?: MusicVoice;
+  private biome?: Biome;
+  private biomeCueAt = -BIOME_HOLD;
   private ambience = true;
   musicOn = true;
   private musicLevel = 0.3;
@@ -73,6 +80,7 @@ export class GameAudio {
     // Sample-based ambience and tension (start silent, fade in once loaded)
     this.ambGain = ctx.createGain(); this.ambGain.gain.value = 0; this.ambGain.connect(this.master);
     this.tensionGain = ctx.createGain(); this.tensionGain.gain.value = 0; this.tensionGain.connect(this.master);
+    this.musicGain = ctx.createGain(); this.musicGain.gain.value = 0; this.musicGain.connect(this.master);
     // Synth fallbacks: drones through a low-pass, plus a filtered noise wash
     if (!this.ambience) { void this.preload(); this.watchFocus(); return; }
     this.synthAmbGain = ctx.createGain(); this.synthAmbGain.gain.value = 0; this.synthAmbGain.connect(this.master);
@@ -87,8 +95,7 @@ export class GameAudio {
     this.synthTensionGain = ctx.createGain(); this.synthTensionGain.gain.value = 0; this.synthTensionGain.connect(this.master);
     const td = ctx.createOscillator(); td.type = 'sawtooth'; td.frequency.value = 41; const tf = ctx.createBiquadFilter(); tf.type = 'lowpass'; tf.frequency.value = 160;
     td.connect(tf); tf.connect(this.synthTensionGain); td.start();
-    this.musicGain = ctx.createGain(); this.musicGain.gain.value = 0; this.musicGain.connect(this.master);
-    void this.startMusic();
+    this.startSoundtrack();
     void this.preload();
     this.watchFocus();
   }
@@ -127,17 +134,103 @@ export class GameAudio {
     } catch { return undefined; } finally { this.loading.delete(name); }
   }
 
-  private async startMusic() {
+  // ---------- music ----------
+  /**
+   * Tracks are streamed through media elements rather than decoded into AudioBuffers: they run
+   * for minutes, and a decoded one costs tens of megabytes where a stream costs nothing. It also
+   * gives us `ended` and `currentTime` for free, which is how the hand-over is timed.
+   */
+  private musicVoice(track: MusicTrack): MusicVoice | undefined {
+    const ctx = this.ctx; if (!ctx || !this.musicGain) return undefined;
+    const el = new Audio(musicUrl(track.name));
+    el.preload = 'auto';
+    const gain = ctx.createGain(); gain.gain.value = 0;
+    const node = ctx.createMediaElementSource(el);
+    node.connect(gain); gain.connect(this.musicGain);
+    const voice: MusicVoice = { track, el, node, gain };
+    el.addEventListener('timeupdate', () => {
+      // Hand over before the end so the tracks overlap rather than leaving a hole.
+      if (this.music !== voice || !el.duration) return;
+      if (el.duration - el.currentTime <= CROSSFADE) this.nextTrack();
+    });
+    el.addEventListener('ended', () => { if (this.music === voice) this.nextTrack(); });
+    void el.play().catch(() => { /* blocked until a gesture; the next track will try again */ });
+    return voice;
+  }
+
+  /** Fade `voice` out over `seconds` and tear it down. */
+  private endVoice(voice: MusicVoice, seconds: number) {
+    const ctx = this.ctx!;
+    voice.gain.gain.cancelScheduledValues(ctx.currentTime);
+    voice.gain.gain.setValueAtTime(voice.gain.gain.value, ctx.currentTime);
+    voice.gain.gain.linearRampToValueAtTime(0, ctx.currentTime + seconds);
+    window.setTimeout(() => {
+      voice.el.pause(); voice.el.removeAttribute('src'); voice.el.load();
+      voice.node.disconnect(); voice.gain.disconnect();
+    }, seconds * 1000 + 200);
+  }
+
+  /** Start `track`, crossfading out whatever is playing. */
+  private playTrack(track: MusicTrack, fade = CROSSFADE) {
+    const ctx = this.ctx; if (!ctx) return;
+    const outgoing = this.music;
+    const voice = this.musicVoice(track);
+    if (!voice) return;
+    this.music = voice;
+    voice.gain.gain.linearRampToValueAtTime(1, ctx.currentTime + fade);
+    if (outgoing) this.endVoice(outgoing, fade);
+  }
+
+  /** Move on to whatever `pickNext` chooses. */
+  private nextTrack() {
+    this.playTrack(pickNext(this.music?.track, this.biome));
+  }
+
+  /** Begin the soundtrack: the opening track, then the random rotation. */
+  startSoundtrack() {
     if (this.musicStarted || !this.ctx || !this.musicGain) return;
     this.musicStarted = true;
-    try {
-      const res = await fetch(musicUrl()); if (!res.ok) throw new Error(String(res.status));
-      const buf = await this.ctx.decodeAudioData(await res.arrayBuffer());
-      const src = this.ctx.createBufferSource(); src.buffer = buf; src.loop = true; src.connect(this.musicGain); src.start();
-      this.musicGain.gain.linearRampToValueAtTime(this.musicOn ? this.musicLevel : 0, this.ctx.currentTime + 4);
-    } catch { this.musicStarted = false; }
+    this.musicGain.gain.linearRampToValueAtTime(this.musicOn ? this.musicLevel : 0, this.ctx.currentTime + FIRST_FADE);
+    this.playTrack(OPENING_TRACK, FIRST_FADE);
   }
-  setMusic(on: boolean) { this.musicOn = on; if (this.musicGain && this.ctx) this.musicGain.gain.setTargetAtTime(on ? this.musicLevel * (1 - this.tension * 0.45) : 0, this.ctx.currentTime, 0.5); }
+
+  setMusic(on: boolean) {
+    this.musicOn = on;
+    if (this.musicGain && this.ctx) this.musicGain.gain.setTargetAtTime(on ? this.musicLevel * (1 - this.tension * 0.45) : 0, this.ctx.currentTime, 0.5);
+    // Stop the stream outright when the music is off, so a silent track is not still downloading
+    // and counting down towards the next one.
+    if (this.music) { if (on) void this.music.el.play().catch(() => {}); else this.music.el.pause(); }
+  }
+
+  /** What is playing right now, for the audio workbench. */
+  get nowPlaying(): string | undefined { return this.music?.track.name; }
+  /** Workbench: hand over to the next track now. */
+  skipTrack() { if (this.music) this.nextTrack(); }
+  /**
+   * Workbench: jump to just before the hand-over, to hear one track give way to the next
+   * without sitting through the whole thing.
+   */
+  seekToHandover() {
+    const el = this.music?.el;
+    if (el?.duration) el.currentTime = Math.max(0, el.duration - CROSSFADE - 1);
+  }
+
+  /**
+   * Tell the music where the player is. A biome with a track of its own cues that track; the
+   * change is rate-limited by BIOME_HOLD so a player weaving across an edge does not thrash the
+   * score. No track names a biome yet, so today this only records where we are, and the biome
+   * then steers `pickNext` when the current track ends.
+   */
+  setBiome(biome: Biome) {
+    if (biome === this.biome) return;
+    this.biome = biome;
+    if (!this.ctx || !this.music || !biomeHasTrack(biome)) return;
+    if (this.music.track.biomes?.includes(biome)) return;         // already the right music
+    const now = this.ctx.currentTime;
+    if (now - this.biomeCueAt < BIOME_HOLD) return;
+    this.biomeCueAt = now;
+    this.playTrack(pickNext(this.music.track, biome));
+  }
 
   private startLoop(name: string, dest: AudioNode) {
     const ctx = this.ctx!; const buf = this.buffers.get(name); if (!buf) return;
@@ -314,6 +407,11 @@ export class GameAudio {
       case 'won': [0, 0.15, 0.3, 0.45, 0.7].forEach((d, i) => setTimeout(() => this.tone([392, 494, 587, 784, 988][i], 1.2, 0.22, 'triangle'), d * 1000)); break;
     }
   }
-  dispose() { this.ctx?.close(); this.ctx = undefined; this.started = false; }
+  dispose() {
+    // Stop the music stream first: a media element outlives the audio context it was routed into.
+    if (this.music) { this.music.el.pause(); this.music.el.removeAttribute('src'); this.music.el.load(); this.music = undefined; }
+    this.musicStarted = false;
+    this.ctx?.close(); this.ctx = undefined; this.started = false;
+  }
 }
 export const audio = new GameAudio();
