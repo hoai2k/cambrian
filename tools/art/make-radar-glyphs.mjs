@@ -6,4 +6,4 @@ const glyphs={
  home:'<path fill="currentColor" fill-rule="evenodd" d="M3 21v-5C3 9 7 3 12 3s9 6 9 13v5ZM9 9a3 2 0 1 0 6 0 3 2 0 1 0-6 0Z"/>',
  shore:'<path d="M2 15c4 0 3-7 7-7s2 8 6 8 3-7 7-7" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>',
 };
-for(const [id,body] of Object.entries(glyphs))await writeFile(new URL(`../../public/assets/ui/radar-${id}.svg`,import.meta.url),`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24">${body}</svg>\n`);
+for(const [id,body] of Object.entries(glyphs))await writeFile(new URL(`../../public/assets/ui/radar-${id}.svg`,import.meta.url),`<svg id="glyph" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24">${body}</svg>\n`);

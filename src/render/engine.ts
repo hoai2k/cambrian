@@ -5,9 +5,9 @@ import { emptyControls, gamepads, KeyboardInput, readGamepad, rumble, type RawCo
 import { clamp, damp, TAU, wrapAngle } from '../shared/math';
 import { bandOf, isAlive, isHidden, lengthOf } from '../sim/actors';
 import { creature, type CreatureId } from '../sim/creatures';
-import { Game } from '../sim/game';
+import { Game, type TeleportDest } from '../sim/game';
 import { BAND_COLOR, emptyInput, TIER_NAMES, TIER_NEED, type Actor, type Band, type InputFrame, type Mode, type PlayerSetup } from '../sim/types';
-import { biomeAt, groundHeight, NURSERIES, resolveStatic, SURFACE_Y, type Boulder } from '../sim/world';
+import { BIOME_NAMES, biomeAt, groundHeight, nurseryAt, resolveStatic, SURFACE_Y, type Boulder } from '../sim/world';
 import { AssetQueue, type AssetProgress } from './assets';
 import { CreatureView, ensureLoaded, loadedSync, type Lod } from './creature';
 import { Attachments } from './attachments';
@@ -26,7 +26,14 @@ export interface PlayerHud {
   hunted: number; hunterAngle: number | null; hunterName?: string; hunterState: 'none' | 'noticed' | 'hunting'; inCover: boolean; still: boolean;
   hint?: string; respawnIn: number; fade: number; state: string; modelReady: boolean; kills: number; eats: number; escapes: number; protect: boolean;
   bandMarkers: { x: number; y: number; band: Band; size: number }[];
+  /** Dominant biome under the player. */
+  biome: string;
+  /** Radar contacts in radar space (x right, y down, unit circle = the radar's reach); `beyond` contacts are clamped to the rim. */
+  radar: { range: number; blips: RadarBlipHud[] };
+  /** The teleport menu, while open. */
+  teleport?: { options: { label: string; detail: string; distance: number; dest: TeleportDest }[]; index: number; cooldown: number };
 }
+export interface RadarBlipHud { x: number; y: number; kind: 'player' | 'threat' | 'giant' | 'home' | 'shore'; color: string; beyond: boolean; hunting: boolean; distance: number; }
 export interface HudSnapshot {
   players: PlayerHud[]; rects: Rect[]; time: number; status: 'playing' | 'won' | 'lost'; message: string; mode: Mode; winner: number; fps: number;
 }
@@ -40,7 +47,10 @@ export interface EngineCallbacks {
 
 export const PLAYER_COLORS = ['#61f2d5', '#ffb457', '#c7a3ff', '#ff86a4'];
 
-interface CamState { yaw: number; pitch: number; zoom: number; fade: number; aimBlend: number; aimTarget: number; aimSnapT: number; pos: THREE.Vector3; look: THREE.Vector3; shake: number; camera: THREE.PerspectiveCamera; lockBlend: number; lastPos: THREE.Vector3; frustum: THREE.Frustum; projScreen: THREE.Matrix4; }
+interface CamState { yaw: number; pitch: number; zoom: number; fade: number; aimBlend: number; aimTarget: number; aimSnapT: number; pos: THREE.Vector3; look: THREE.Vector3; shake: number; camera: THREE.PerspectiveCamera; lockBlend: number; lastPos: THREE.Vector3; frustum: THREE.Frustum; projScreen: THREE.Matrix4; tele: TeleMenu; }
+/** Per-player teleport menu state: opened with D-pad down, steered with the D-pad or stick, A confirms, B closes. */
+interface TeleMenu { open: boolean; index: number; prev: { teleport: boolean; up: boolean; down: boolean; confirm: boolean; back: boolean }; }
+const freshTele = (): TeleMenu => ({ open: false, index: 0, prev: { teleport: false, up: false, down: false, confirm: false, back: false } });
 
 /** Magnification levels (see docs/redesign/01-game-design.md · Magnification). */
 export const MAGNIFICATION = [
@@ -171,7 +181,7 @@ export class Engine {
     this.cams = setups.map((_, i) => {
       const p = this.game!.players[i];
       const cam = new THREE.PerspectiveCamera(60, 1, 0.08, 420);
-      const cs: CamState = { yaw: p.yaw, pitch: 0.2, zoom: 1, fade: 0, aimBlend: 0, aimTarget: -1, aimSnapT: 0, pos: new THREE.Vector3(p.pos.x - Math.sin(p.yaw) * 6, p.pos.y + 2.5, p.pos.z - Math.cos(p.yaw) * 6), look: new THREE.Vector3(p.pos.x, p.pos.y, p.pos.z), shake: 0, camera: cam, lockBlend: 0, lastPos: new THREE.Vector3(p.pos.x, p.pos.y, p.pos.z), frustum: new THREE.Frustum(), projScreen: new THREE.Matrix4() };
+      const cs: CamState = { yaw: p.yaw, pitch: 0.2, zoom: 1, fade: 0, aimBlend: 0, aimTarget: -1, aimSnapT: 0, pos: new THREE.Vector3(p.pos.x - Math.sin(p.yaw) * 6, p.pos.y + 2.5, p.pos.z - Math.cos(p.yaw) * 6), look: new THREE.Vector3(p.pos.x, p.pos.y, p.pos.z), shake: 0, camera: cam, lockBlend: 0, lastPos: new THREE.Vector3(p.pos.x, p.pos.y, p.pos.z), frustum: new THREE.Frustum(), projScreen: new THREE.Matrix4(), tele: freshTele() };
       cam.position.copy(cs.pos); cam.lookAt(cs.look);
       return cs;
     });
@@ -235,11 +245,13 @@ export class Engine {
         if (c.menu && !prevMenu) this.cb.onMenu(i);
         this.prevMenu.set(key, c.menu);
         const p = game.players[i];
-        if (p && running) inputs.set(i, this.toInput(c, this.cams[i], p));
+        const menuOpen = running && p ? this.updateTeleMenu(game, i, c) : false;
+        // While the teleport menu is up the creature drifts: A and B belong to the menu.
+        if (p && running) inputs.set(i, menuOpen ? this.toInput(emptyControls(), this.cams[i], p) : this.toInput(c, this.cams[i], p));
         // Camera orbit. The right stick is the ONLY thing that turns the camera: yaw is absolute
         // and never follows the creature's heading, so swimming back does not swing the view.
         // Increasing yaw rotates the view left, so a rightward stick decreases it.
-        if (running) {
+        if (running && !menuOpen) {
           const cs = this.cams[i];
           this.updateAim(cs, game.players[i], c.aim, dt);
           if (c.rsClick) {
@@ -272,7 +284,7 @@ export class Engine {
     const camPositions: THREE.Vector3[] = [];
     if (this.attract) {
       this.attractT += dt;
-      const n = NURSERIES[Math.floor(this.attractT / 40) % NURSERIES.length];
+      const n = nurseryAt(0);
       const a = this.attractT * 0.06;
       const r = 16 + Math.sin(this.attractT * 0.1) * 5;
       const x = n.x + Math.cos(a) * r, z = n.z + Math.sin(a) * r;
@@ -285,7 +297,7 @@ export class Engine {
     }
     const focus = camPositions.length ? camPositions[0] : this.lastFocus;
     this.lastFocus.copy(focus);
-    this.sea?.update(this.time, dt, focus);
+    this.sea?.update(this.time, dt, focus, camPositions);
     // Tell the music where the first player is; a biome with a track of its own cues it.
     const listener = game.players[0];
     if (listener && !this.attract) audio.setBiome(biomeAt(listener.pos.x, listener.pos.z));
@@ -334,6 +346,40 @@ export class Engine {
     }
     this.renderMs = this.renderMs * 0.9 + (performance.now() - tRender) * 0.1;
     this.frameMs = this.frameMs * 0.9 + dtReal * 1000 * 0.1;
+  }
+
+  /**
+   * The teleport menu. D-pad down opens it (and closes it again); up/down or the left stick move
+   * the cursor; A goes; B backs out. Returns whether the menu is open, in which case the player's
+   * other controls are swallowed for the frame.
+   */
+  private updateTeleMenu(game: Game, i: number, c: RawControls): boolean {
+    const cs = this.cams[i]; if (!cs) return false;
+    const t = cs.tele, prev = t.prev;
+    const p = game.players[i];
+    const justTele = c.teleport && !prev.teleport;
+    const up = c.dup || c.my > 0.6, down = c.ddown || c.my < -0.6;
+    const justUp = up && !prev.up, justDown = down && !prev.down;
+    const justConfirm = c.confirm && !prev.confirm, justBack = c.back && !prev.back;
+    prev.teleport = c.teleport; prev.up = up; prev.down = down; prev.confirm = c.confirm; prev.back = c.back;
+    if (justTele && !t.open) {
+      // D-pad down opens it; once open the same button steps down the list
+      if (isAlive(p) && (p.state === 'free' || p.state === 'guard')) { t.open = true; t.index = 0; prev.confirm = true; prev.down = true; audio.play('ui-confirm'); }
+      return t.open;
+    }
+    if (!t.open) return false;
+    if (!isAlive(p)) { t.open = false; return false; }
+    const options = game.teleportOptions(i);
+    if (justUp) { t.index = (t.index + options.length - 1) % options.length; audio.play('ui-move'); }
+    if (justDown || justTele) { t.index = (t.index + 1) % options.length; audio.play('ui-move'); }
+    if (justBack) { t.open = false; audio.play('ui-back'); return false; }
+    if (justConfirm) {
+      const opt = options[t.index];
+      if (opt && game.teleport(i, opt.dest)) { t.open = false; audio.play('ui-start'); }
+      else audio.play('ui-back');
+      return t.open;
+    }
+    return true;
   }
 
   /**
@@ -627,6 +673,13 @@ export class Engine {
         case 'burst': { world('burst', e.pos); break; }
         // Hatching out of a nursery after a respawn (the moult state is reused for the hatch-in).
         case 'moult': { if (e.player != null && e.player >= 0) audio.play('respawn'); else world('respawn', e.pos, 1, 0.5); break; }
+        case 'teleport': {
+          // sparkles where they left and where they arrived; the camera snaps behind them on arrival
+          this.sparkles.emit(e.pos, e.strength ? 50 : 30, 0.9, 1.4, 0.07, 1.8);
+          this.bubbles.emit(e.pos, 20, 0.8, 3, 0.07, 1.2);
+          if (e.strength) { personal('ability', 0.8); if (e.player != null && e.player >= 0) { const d = padOf(e.player); if (typeof d === 'number') rumble(d, 0.5, 0.7, 250); } }
+          break;
+        }
       }
     }
     evs.length = 0;
@@ -661,6 +714,23 @@ export class Engine {
           markers.push({ x: (v.x + 1) / 2, y: (1 - v.y) / 2, band, size: clamp(lengthOf(a) / Math.max(d, 1) * 8, 0.4, 1.6) });
         }
       }
+      // Radar: reach grows with the creature, contacts rotate into the camera frame (up = camera forward).
+      const radarRange = 55 + lengthOf(p) * 12;
+      const blips: RadarBlipHud[] = [];
+      if (cs) {
+        const sy = Math.sin(cs.yaw), cy = Math.cos(cs.yaw);
+        for (const b of game.radarFor(i, radarRange)) {
+          // forward = (sin yaw, cos yaw), right = (-cos yaw, sin yaw)
+          const f = (b.dx * sy + b.dz * cy) / radarRange, r = (-b.dx * cy + b.dz * sy) / radarRange;
+          let x = r, y = -f;
+          const l = Math.hypot(x, y);
+          const beyond = l > 1;
+          if (beyond) { x /= l; y /= l; }
+          const color = b.kind === 'player' ? PLAYER_COLORS[b.id % 4] : b.kind === 'giant' ? BAND_COLOR.giant : b.kind === 'threat' ? BAND_COLOR.threat : b.kind === 'home' ? '#9be9ff' : '#d9cfa4';
+          blips.push({ x, y, kind: b.kind, color, beyond, hunting: b.hunting, distance: b.distance });
+        }
+      }
+      const tele = cs?.tele.open ? { options: game.teleportOptions(i).map((o) => ({ label: o.label, detail: o.detail, distance: o.distance, dest: o.dest })), index: cs.tele.index, cooldown: p.teleportCd } : undefined;
       let aim: PlayerHud['aim'];
       if (p.aiming && cs) {
         const t = lockA && isAlive(lockA) ? lockA : undefined;
@@ -677,6 +747,7 @@ export class Engine {
         hunterState: p.hunted >= 0.5 ? 'hunting' : p.hunted > 0.2 ? 'noticed' : 'none', inCover: p.cover > 0.3, still: Math.hypot(p.vel.x, p.vel.y, p.vel.z) < 0.3,
         hint: game.hintFor(i), respawnIn: p.state === 'dead' ? Math.max(0, 3 - p.respawnT) : 0, fade: cs?.fade ?? 0, state: p.state, modelReady: !!loadedSync(p.creature),
         kills: p.kills, eats: p.eats, escapes: p.escapes, protect: p.spawnProtect > 0, bandMarkers: markers.slice(0, 24),
+        biome: BIOME_NAMES[game.biomeOf(i) ?? 'shelf'], radar: { range: radarRange, blips }, teleport: tele,
       };
     });
     return { players, rects, time: game.time, status: game.state.status, message: game.state.message, mode: game.mode, winner: game.state.winner, fps: this.fps };
@@ -688,6 +759,7 @@ export class Engine {
     return {
       players: this.cams.length, views: this.views.size, actors: this.game?.actors.length ?? 0,
       calls: info.render.calls, triangles: info.render.triangles, programs: info.programs?.length ?? 0,
+      sea: this.sea?.stats(), simChunks: this.game?.world.chunks.size ?? 0,
       frameMs: +this.frameMs.toFixed(2), simMs: +this.simMs.toFixed(2), renderMs: +this.renderMs.toFixed(2), fps: +this.fps.toFixed(1),
     };
   }

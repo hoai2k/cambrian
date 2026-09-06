@@ -1,6 +1,6 @@
 # Image, prop and music requests — Cambrian Explosion
 
-Only music remains outstanding. All requested environment images, radar glyphs and prop models were delivered on 2026-09-06. Completed briefs and paths are in [image-requests-history.md](image-requests-history.md); current versus future game placements are documented in [docs/environment-assets.md](docs/environment-assets.md).
+Only music remains outstanding. All requested environment images, radar glyphs and prop models were delivered on 2026-09-06. Completed briefs and paths are in [image-requests-history.md](image-requests-history.md); game integration are documented in [docs/environment-assets.md](docs/environment-assets.md).
 
 Keep this document limited to current asset requests. Move completed briefs to history. New requests should include destination path, dimensions, visual brief and intended consumer; prefer text-free art.
 

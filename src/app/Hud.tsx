@@ -1,5 +1,7 @@
-import type { HudSnapshot, PlayerHud } from '../render/engine';
+import { useEffect, useId, useRef, useState } from 'react';
+import type { HudSnapshot, PlayerHud, RadarBlipHud } from '../render/engine';
 import { creature } from '../sim/creatures';
+import { BIOME_ART, biomeArtPath, radarGlyphPath } from '../shared/environment-assets';
 import { BAND_COLOR } from '../sim/types';
 
 export function Hud({ snapshot }: { snapshot: HudSnapshot }) {
@@ -64,6 +66,22 @@ function PlayerPanel({ p }: { p: PlayerHud }) {
           <div className="bar target"><i style={{ width: `${p.lock.hp * 100}%` }} /></div>
         </div>
       )}
+      <BiomeBanner biome={p.biome} alive={p.alive} />
+      <Radar radar={p.radar} biome={p.biome} />
+      {p.teleport && (
+        <div className="tele-menu">
+          <p className="eyebrow">TELEPORT</p>
+          <ul>
+            {p.teleport.options.map((o, k) => (
+              <li key={k} className={k === p.teleport!.index ? 'sel' : ''}>
+                <b>{o.label}</b>
+                <span>{o.detail} · {fmtDist(o.distance)}</span>
+              </li>
+            ))}
+          </ul>
+          <small>{p.teleport.cooldown > 0 ? `Ready in ${Math.ceil(p.teleport.cooldown)} s` : <><kbd>A</kbd> go · <kbd>B</kbd> back · D-pad ▼ next</>}</small>
+        </div>
+      )}
       <div className="hud-bottom">
         <div className={`chip ability ${p.abilityUnlocked ? '' : 'locked'} ${p.abilityActive ? 'active' : ''}`} title={def.abilityDesc}>
           <span className="btn y">Y</span>
@@ -96,4 +114,72 @@ function PlayerPanel({ p }: { p: PlayerHud }) {
       )}
     </>
   );
+}
+
+const fmtDist = (d: number) => (d < 1000 ? `${Math.round(d)} m` : `${(d / 1000).toFixed(1)} km`);
+
+/**
+ * The radar: other players wherever they are, anything big enough to hurt within reach, whatever
+ * is hunting you, plus home and the shore as bearings. Up is the way the camera looks. Contacts
+ * further than the radar reaches sit on the rim, hollow, pointing the way.
+ */
+function Radar({ radar, biome }: { radar: PlayerHud['radar']; biome: string }) {
+  const R = 44, C = 50;
+  const outline = useId().replaceAll(':', '');
+  const dot = (b: RadarBlipHud, k: number) => {
+    const x = C + b.x * R * 0.92, y = C + b.y * R * 0.92;
+    const cls = `blip blip-${b.kind} ${b.beyond ? 'beyond' : ''} ${b.hunting ? 'hunting' : ''}`;
+    if (b.kind === 'shore') {
+      const sx = C + b.x * R, sy = C + b.y * R;
+      const angle = Math.atan2(b.y, b.x) * 180 / Math.PI + 90;
+      return <g key={k} className={cls} style={{ color: b.color }} transform={`rotate(${angle} ${sx} ${sy})`}>
+        <use href={`${import.meta.env.BASE_URL}${radarGlyphPath('shore')}#glyph`} x={sx - 10} y={sy - 5} width="20" height="10" />
+      </g>;
+    }
+    const size = b.kind === 'giant' ? 11 : 9;
+    return <g key={k} className={cls} style={{ color: b.color }}>
+      <g filter={b.beyond ? `url(#${outline})` : undefined}>
+        <use href={`${import.meta.env.BASE_URL}${radarGlyphPath(b.kind)}#glyph`} x={x - size / 2} y={y - size / 2} width={size} height={size}/>
+      </g>
+    </g>;
+  };
+  // rim contacts last so they draw over the ring
+  const inside = radar.blips.filter((b) => !b.beyond), rim = radar.blips.filter((b) => b.beyond);
+  return (
+    <div className="radar" aria-label={`Radar, ${Math.round(radar.range)} metre reach. ${biome}.`}>
+      <svg viewBox="0 0 100 100">
+        <defs><filter id={outline} colorInterpolationFilters="sRGB">
+          <feMorphology in="SourceAlpha" operator="erode" radius=".7" result="inside"/>
+          <feComposite in="SourceGraphic" in2="inside" operator="out"/>
+        </filter></defs>
+        <circle cx={C} cy={C} r={R} className="radar-bg" />
+        <circle cx={C} cy={C} r={R * 0.5} className="radar-ring" />
+        <line x1={C} y1={C - R} x2={C} y2={C + R} className="radar-ring" />
+        <line x1={C - R} y1={C} x2={C + R} y2={C} className="radar-ring" />
+        <use href={`${import.meta.env.BASE_URL}${radarGlyphPath('player')}#glyph`} x={C - 5} y={C - 5} width="10" height="10" className="radar-you" />
+        {inside.map(dot)}{rim.map(dot)}
+        <circle cx={C} cy={C} r={R} className="radar-rim" />
+      </svg>
+      <span className="radar-range">{Math.round(radar.range)} m</span>
+    </div>
+  );
+}
+
+/** Announces the biome for a few seconds whenever it changes. */
+function BiomeBanner({ biome, alive }: { biome: string; alive: boolean }) {
+  const [shown, setShown] = useState<string | null>(null);
+  const last = useRef<string | null>(null);
+  useEffect(() => {
+    if (biome === last.current) return;
+    const first = last.current === null;
+    last.current = biome;
+    if (first || !alive) return;
+    setShown(biome);
+    const t = setTimeout(() => setShown(null), 3200);
+    return () => clearTimeout(t);
+  }, [biome, alive]);
+  const art = BIOME_ART.find(b => b.name === shown);
+  return shown ? <div className="biome-banner" key={shown}>
+    {art && <img src={`${import.meta.env.BASE_URL}${biomeArtPath(art.id)}`} alt="" aria-hidden="true" />}
+    <span>ENTERING</span><b>{shown}</b></div> : null;
 }

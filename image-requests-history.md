@@ -89,7 +89,7 @@ Delivered all seven static prop GLBs, nine biome paintings, and five radar SVGs 
 
 **Rigging: none for all seven props.** One mesh, one primitive, one opaque vertex-colour material, +Y up, base-centred pivot, authored dimensions, no textures, skeletons or animation clips. Plant motion comes from the sea shader and contact spring. The lettuce's soft-tissue look uses opaque green-gold shading, resolving the brief's translucency wording in favour of its explicit no-transparency runtime contract.
 
-**Integration status:** At delivery, main still implements the six-biome arena in `generateWorld`, not the nine-biome `generateChunk`/`ATMOS` system described by the request. Nursery sac sponges now use cushions, nursery fragment scatter uses pebbles, and channel-wall boulders use blade spires with matching collision bounds. The four middle biomes retain their existing geometry, density and atmosphere. `FloraKind` and plant physics/render bindings include cushion, lettuce, spine and glass. The other placements below await the shallows, escarpment and basin implementation. All assets are integrated into the environment workbench; paintings and marks have typed paths in `src/shared/environment-assets.ts`. The radar, biome banner and discovery-results page do not yet exist on main, so there were no inline radar shapes or banner to replace. Do not request these assets again when those features arrive.
+**Integration status:** All seven models are integrated into the streamed nine-biome ocean and the environment workbench. Shallows and nursery sacs use cushions; half the shallow tufts become lettuce; shallow/nursery fragments use pebble clusters. Channel-wall and escarpment rocks include blade spires, with 2–3× basin landmarks; escarpment/basin boulders use talus. Escarpment and basin sponges use spine forms, with glass fans facing the basin current. Middle-biome scenery and atmosphere retain their established appearance. Plant and rock collision bounds follow the delivered models. All nine paintings are wired into biome entry banners; all five SVGs replace the radar's inline marks, preserving hollow distant contacts and hunting blink. Typed paths live in `src/shared/environment-assets.ts`. The optional discovery-results page remains a future UI feature; its artwork is already delivered and can be reused there.
 
 **Delivery and editable sources:**
 
@@ -98,7 +98,7 @@ Delivered all seven static prop GLBs, nine biome paintings, and five radar SVGs 
 - `tools/art/biome-prompts.json`: exact prompts and source filenames; generated with built-in imagegen. `tools/art/export-biomes.py` encodes delivery WebPs.
 - `tools/art/make-radar-glyphs.mjs`: editable native SVG sources.
 - `tools/art/check-environment-assets.mjs`: validates delivered model and glyph contracts.
-- `docs/environment-assets.md`: current consumers and future placement handoff.
+- `docs/environment-assets.md`: runtime consumers and asset contract.
 
 ### Original brief and constraints
 

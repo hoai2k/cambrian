@@ -30,10 +30,10 @@ export interface FloraPhys {
 }
 
 export const FLORA_PHYS: Record<FloraKind, FloraPhys> = {
-  cushion: { h: .6, r: .45, profile: () => .9, rigidity: 2.4, maxLean: .15, k: 38, c: 6.5, drag: .7 },
-  lettuce: { h: .45, r: .26, profile: f => .15 + .85 * f, rigidity: .15, maxLean: .85, k: 24, c: 3.2, drag: 2.6 },
-  spine: { h: 2.6, r: .405, profile: f => 1 - .35 * f, rigidity: 4, maxLean: .12, k: 42, c: 7, drag: .9 },
-  glass: { h: 1.4, r: .8, profile: f => .1 + .9 * f, rigidity: .5, maxLean: .22, k: 25, c: 5, drag: 1.2 },
+  cushion: { h: .6, r: .462, profile: () => .9, rigidity: 2.4, maxLean: .15, k: 38, c: 6.5, drag: .7 },
+  lettuce: { h: .45, r: .275, profile: f => .15 + .85 * f, rigidity: .15, maxLean: .85, k: 24, c: 3.2, drag: 2.6 },
+  spine: { h: 2.6, r: .428, profile: f => 1 - .35 * f, rigidity: 4, maxLean: .12, k: 42, c: 7, drag: .9 },
+  glass: { h: 1.4, r: .801, profile: f => .1 + .9 * f, rigidity: .5, maxLean: .22, k: 25, c: 5, drag: 1.2 },
   // Tall branching sponge. Stiff: bodies slide around it; only giants push it over.
   vauxia: { h: 1.9, r: 0.36, profile: (f) => 0.35 + 0.65 * f, rigidity: 3.2, maxLean: 0.28, k: 42, c: 7, drag: 0.9 },
   // Sac sponge. Firm bulb; nudges most things aside.

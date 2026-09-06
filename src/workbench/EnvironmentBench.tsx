@@ -22,7 +22,7 @@ function PropPreview({ id }: { id: PropId }) {
     scene.add(new THREE.HemisphereLight('#e6f6f6', '#605949', 2));
     const light = new THREE.DirectionalLight('#fff0d4', 3); light.position.set(3, 5, 4); scene.add(light);
     let disposed = false, geometry: THREE.BufferGeometry | undefined;
-    const material = new THREE.MeshStandardMaterial({ vertexColors: true, roughness: .88 });
+    const material = new THREE.MeshStandardMaterial({ vertexColors: true, roughness: .88, side: id === 'lettuce-tuft' ? THREE.DoubleSide : THREE.FrontSide });
     const draw = () => { if (!disposed) renderer.render(scene, camera); };
     controls.addEventListener('change', draw);
     const observer = new ResizeObserver(() => {
@@ -46,7 +46,7 @@ export function EnvironmentBench() {
   return <div className="bench environment-bench">
     <header className="bench-head"><div><a className="back" href="./">← Workbenches</a><h1>Environment</h1>
       <p className="sub">Seven props, nine painted biomes, five radar marks. Drag a model to orbit; scroll to zoom.</p></div></header>
-    <p className="environment-note">All props are static and need no rigging. The nursery cushions and pebbles, and channel spires, are in the current game. The remaining biome placements, discovery cards and radar await the endless-ocean update.</p>
+    <p className="environment-note">All props are static and need no rigging. Rounded props appear in the shallows and nurseries; angular rocks and sponges appear in the channels, escarpment and basin. Paintings appear behind biome announcements, and the radar uses the new marks.</p>
     <h2>Seabed props</h2><div className="environment-grid">
       {manifest.props.map(p => <article className="environment-card" key={p.id}>
         <PropPreview id={p.id as PropId}/><div className="environment-copy"><h3>{p.id.replaceAll('-', ' ')}</h3>

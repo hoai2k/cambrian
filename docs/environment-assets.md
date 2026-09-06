@@ -15,65 +15,57 @@ while the existing sea shader displaces vertices higher up the plant.
 | Prop | Triangles / budget | Width × height | Motion |
 | --- | ---: | --- | --- |
 | cushion-sponge | 480 / 500 | 0.9 × 0.6 | Small contact bend |
-| lettuce-tuft | 392 / 400 | 0.5 × 0.45 | Soft current sway and contact bend |
+| lettuce-tuft | 336 / 400 | 0.5 × 0.45 | Soft current sway and contact bend |
 | pebble-cluster | 294 / 300 | 0.6 × 0.15 | Static |
 | blade-spire | 30 / 600 | 1.2 × 4 | Static |
 | talus-shard | 12 / 300 | 1.5 × 0.8 | Static |
 | spine-sponge | 476 / 800 | 0.8 × 2.6 | Stiff contact bend |
 | glass-fan | 900 / 900 | 1.6 × 1.4 | Gentle sway and contact bend |
 
-The lettuce uses opaque green-gold shading for soft tissue; the glass fan's
+The lettuce uses opaque, two-sided green-gold frond surfaces for soft tissue; the glass fan's
 openings are geometric lattice holes. Neither requires transparency sorting.
 Detailed dimensions and byte counts are in `public/assets/props/manifest.json`.
 
-## Current game integration
+## Game integration
 
-Main's current runtime is a bounded six-biome arena. The nine-biome endless
-sea described in `docs/redesign/04-infinite-ocean.md` has not been implemented
-here. This delivery does not introduce that separate world-system redesign.
+All seven models are used in the streamed ocean. `generateChunk` first creates
+its deterministic legacy placements, then replaces the requested slots by
+biome. This consumes no extra placement randomness. The four standard reef
+biomes retain their established scenery and atmosphere; channel flanks get
+the requested spires.
 
-- Nursery sac sponges become `cushion` flora; their contact bounds use the
-  delivered 0.6 height and 0.45 radius.
-- Nursery rock fragments become instanced pebble clusters.
-- Existing channel-wall boulders become blade spires. Their base, collision
-  radius and top height follow the delivered geometry.
-- Shelf, forest, boulder field and microbial flats keep their established
-  scenery and atmosphere. Legacy placement RNG consumption is retained.
+| Asset | Placement |
+| --- | --- |
+| cushion-sponge | Sac replacement in shallows and nursery clearing edges |
+| lettuce-tuft | Half of the shallows' filament tuft slots |
+| pebble-cluster | Shallows and nursery floor scatter |
+| blade-spire | Channel flanks, some escarpment rocks, 2–3× basin landmarks |
+| talus-shard | Remaining escarpment/basin boulders |
+| spine-sponge | Stalked and sac sponge slots in escarpment/basin |
+| glass-fan | Low sponge/algal slots in basin, facing the local current |
+
+The four new `FloraKind`s are `cushion`, `lettuce`, `spine`, and `glass`.
+Their contact bounds and bend springs use the delivered geometry dimensions.
+Rock variants use a base on the seabed, a containing footprint radius and
+the authored height. Full and distant chunk views both show the new rocks.
 
 `src/render/props.ts` loads GLBs and returns owned geometry. The sea renderer
-uses vertex colours with its existing underwater surface detail and caustics.
-Each cell remains instanced; bend attributes stay per cell. A lightweight
-procedural shape remains visible if an asset fails to load. Disposing a sea
-also prevents a delayed load from attaching new geometry.
+loads each needed model once per sea, sharing its geometry across streamed
+cells. Vertex colours retain the existing underwater detail and caustics.
+Bend attributes stay per cell; unloading a cell disposes its cloned geometry.
+A lightweight procedural shape remains visible if a file fails to load, and
+late loads cannot attach to an unloaded cell or a disposed sea.
 
-## Handoff for the endless sea
+`BIOME_ART` and `biomeArtPath` from `src/shared/environment-assets.ts` provide
+all nine text-free paintings behind the existing biome-entry announcements.
+The image remains faint and the announcement retains a strong text shadow.
+The optional discovery-results page can reuse these assets when implemented.
 
-| Asset | Intended placement when the biome exists |
-| --- | --- |
-| cushion-sponge | Replace sac sponges in shallows; nursery clearing edges |
-| lettuce-tuft | `lettuce` FloraKind; replace half of shallows filament tufts |
-| pebble-cluster | Shallows and nursery floor scatter |
-| blade-spire | Channel walls, escarpment foot, 2–3× basin landmarks |
-| talus-shard | Escarpment/basin boulder variant; keep middle-biome round rocks |
-| spine-sponge | `spine` FloraKind; escarpment and basin sponge gardens |
-| glass-fan | `glass` FloraKind; basin gardens, orient toward current |
-
-All four new plant kinds already have geometry bindings and `FLORA_PHYS`
-profiles. Their density entries are intentionally absent for biomes that
-main does not yet have. Talus is supplied through `loadPropGeometry` and the
-workbench; add it to the future boulder-variant generator when integrating
-escarpment and basin. Keep its collision envelope aligned with its scale.
-
-Use `BIOME_ART` and `biomeArtPath` from `src/shared/environment-assets.ts`
-for discovery cards and banner backdrops. These functions return paths
-relative to the app asset base. There is no discovery-results page or biome
-banner on main yet.
-
-Use `RADAR_GLYPHS` and `radarGlyphPath` for the future radar. The marks are
-monochrome `currentColor` SVGs. Apply them as CSS masks with the contact colour,
-as the workbench demonstrates; an external `<img>` does not inherit the
-parent's `currentColor`. Hollow off-range contacts remain a radar rendering
-state, separate from these filled silhouettes.
+`RADAR_GLYPHS` and `radarGlyphPath` provide all five radar marks. Each SVG
+exposes `#glyph` for an external SVG `<use>` and inherits the contact colour.
+The HUD retains hunting blink and uses an alpha outline filter for hollow
+out-of-range contacts. Each split-screen radar has its own filter ID.
+The environment workbench also demonstrates CSS-mask use at 24 and 8 pixels.
 
 ## Sources and validation
 
@@ -83,10 +75,11 @@ state, separate from these filled silhouettes.
   and original PNG filenames. Preserve the original generation outputs.
 - `python3 tools/art/export-biomes.py <source-directory>` encodes the nine
   final WebPs using Pillow; every image is under 250 KB.
+- `tools/environment-test.ts` checks biome placement, collision bounds and deterministic regeneration.
 - `node tools/art/check-environment-assets.mjs` checks triangle budgets,
   dimensions, pivot, normals, single-mesh structure, material opacity and
   absence of rigs/clips/textures.
 
 The delivery was reviewed in desktop and mobile workbench layouts and in the
 actual instanced sea renderer. Build, TypeScript and the flora physics suite
-also pass. Full briefs are retained in `image-requests-history.md`.
+and the streamed-world suite pass. Full briefs are retained in `image-requests-history.md`.

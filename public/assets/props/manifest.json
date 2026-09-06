@@ -24,17 +24,17 @@
     {
       "id": "lettuce-tuft",
       "file": "assets/props/lettuce-tuft.glb",
-      "triangles": 392,
+      "triangles": 336,
       "triangleLimit": 400,
       "width": 0.5,
       "height": 0.45,
       "depth": 0.5129,
-      "bytes": 43220,
+      "bytes": 37192,
       "biomes": [
         "shallows"
       ],
       "rigging": false,
-      "movement": "Soft shader sway and contact bend from the base; opaque green-gold shading suggests soft tissue."
+      "movement": "Soft shader sway and contact bend from the base; opaque green-gold two-sided fronds."
     },
     {
       "id": "pebble-cluster",

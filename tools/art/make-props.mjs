@@ -27,7 +27,7 @@ async function save(id,parts,width,height,limit,biomes,movement){
  for(const [name,semantic] of [['position','POSITION'],['normal','NORMAL'],['color','COLOR_0']]){
   primitive.setAttribute(semantic,doc.createAccessor().setType('VEC3').setArray(new Float32Array(g.attributes[name].array)).setBuffer(buf));
  }
- primitive.setMaterial(doc.createMaterial(id).setBaseColorFactor([1,1,1,1]).setRoughnessFactor(.88).setMetallicFactor(0));
+ primitive.setMaterial(doc.createMaterial(id).setBaseColorFactor([1,1,1,1]).setRoughnessFactor(.88).setMetallicFactor(0).setDoubleSided(id==='lettuce-tuft'));
  const node=doc.createNode(id).setMesh(doc.createMesh(id).addPrimitive(primitive));
  doc.createScene(id).addChild(node); await new NodeIO().write(new URL(id+'.glb',out).pathname,doc);
  const rec={id,file:`assets/props/${id}.glb`,triangles:tris,triangleLimit:limit,width,height,depth:+(g.boundingBox.max.z-g.boundingBox.min.z).toFixed(4),bytes:(await stat(new URL(id+'.glb',out))).size,biomes,rigging:false,movement};
@@ -48,24 +48,25 @@ async function save(id,parts,width,height,limit,biomes,movement){
  }
  await save('cushion-sponge',parts,.9,.6,500,['shallows','nursery'],'Small shader bend only; no bones or clips.');
 }
-// Seven thick, closed fronds. Their shared narrow root is at y=0; rounded tips curl out.
+// Seven rounded, curled frond surfaces. Opaque two-sided sheets spend the budget
+// on the leaf contour and curvature; there are no alpha textures or bones.
 {
  const parts=[];
  for(let k=0;k<7;k++){
-  const verts=[],idx=[],a=k/7*TAU;
-  for(const side of [-1,1])for(let j=0;j<5;j++)for(let i=0;i<3;i++){
-   const t=j/4,w=[.006,.065,.105,.095,.035][j], lateral=(i-1)*w;
-   const r=.01+Math.sin(t*Math.PI*.47)*.23+(j===4&&i===1?.025:0),y=Math.sin(t*Math.PI*.76)*(.39+(k%3)*.025)+(i===1?.008:0)+side*.004;
+  const a=k/7*TAU,g=new T.BufferGeometry(),verts=[],idx=[];
+  for(let j=0;j<7;j++)for(let i=0;i<5;i++){
+   const t=j/6,u=(i-2)/2,w=[.003,.035,.072,.095,.095,.073,.028][j],lateral=u*w;
+   const r=.012+t*.26+(j===6?.04*(1-u*u):0);
+   const y=Math.sin(t*Math.PI*.88)*(.36+(k%3)*.018)+u*u*.016*Math.sin(Math.PI*t);
    verts.push(Math.cos(a)*r-Math.sin(a)*lateral,y,Math.sin(a)*r+Math.cos(a)*lateral);
   }
-  for(let j=0;j<4;j++)for(let i=0;i<2;i++){const n=j*3+i;idx.push(n,n+3,n+1,n+1,n+3,n+4,n+15,n+16,n+18,n+16,n+19,n+18);}
-  const edge=[0,1,2,5,8,11,14,13,12,9,6,3];
-  for(let i=0;i<edge.length;i++){const n=edge[i],m=edge[(i+1)%edge.length];idx.push(n,m,n+15,m,m+15,n+15);}
-  const g=new T.BufferGeometry();g.setAttribute('position',new T.Float32BufferAttribute(verts,3));g.setIndex(idx);g.computeVertexNormals();
+  for(let j=0;j<6;j++)for(let i=0;i<4;i++){const n=j*5+i;idx.push(n,n+1,n+5,n+1,n+6,n+5);}
+  g.setAttribute('position',new T.Float32BufferAttribute(verts,3));g.setIndex(idx);g.computeVertexNormals();
   parts.push(paint(g,k%2?'#9eaf64':'#b7ba72',(x,y)=>.7+.3*y/.45));
  }
- await save('lettuce-tuft',parts,.5,.45,400,['shallows'],'Soft shader sway and contact bend from the base; opaque green-gold shading suggests soft tissue.');
+ await save('lettuce-tuft',parts,.5,.45,400,['shallows'],'Soft shader sway and contact bend from the base; opaque green-gold two-sided fronds.');
 }
+
 {
  const parts=[];
  for(let k=0;k<7;k++){
