@@ -1,0 +1,1968 @@
+[
+  {
+    "file": "anomalocaris.glb",
+    "originalSHA256": "9810622016d2f3b222dfd11a37cb0b5a6e27d188a357bf7cea9ea1306b151b26",
+    "updatedSHA256": "6d0065058f8f4958e34b35eed550221e1ba4f8bd5c1c27f8fe13e202736ce775",
+    "bytes": 7655084,
+    "changedClips": [],
+    "anchors": [
+      {
+        "name": "anchor_mouth",
+        "bone": "body_00",
+        "role": "mouth"
+      },
+      {
+        "name": "anchor_mouth_inside",
+        "bone": "body_00",
+        "role": "swallow"
+      },
+      {
+        "name": "anchor_grasp",
+        "bone": "claw_L_13",
+        "role": "grasp",
+        "chain": [
+          "claw_L_00",
+          "claw_L_01",
+          "claw_L_02",
+          "claw_L_03",
+          "claw_L_04",
+          "claw_L_05",
+          "claw_L_06",
+          "claw_L_07",
+          "claw_L_08",
+          "claw_L_09",
+          "claw_L_10",
+          "claw_L_11",
+          "claw_L_12",
+          "claw_L_13"
+        ],
+        "effectorBone": "claw_L_13",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_attack_claw_L_13",
+        "bone": "claw_L_13",
+        "role": "attack",
+        "chain": [
+          "claw_L_00",
+          "claw_L_01",
+          "claw_L_02",
+          "claw_L_03",
+          "claw_L_04",
+          "claw_L_05",
+          "claw_L_06",
+          "claw_L_07",
+          "claw_L_08",
+          "claw_L_09",
+          "claw_L_10",
+          "claw_L_11",
+          "claw_L_12",
+          "claw_L_13"
+        ],
+        "effectorBone": "claw_L_13",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_attack_claw_R_13",
+        "bone": "claw_R_13",
+        "role": "attack",
+        "chain": [
+          "claw_R_00",
+          "claw_R_01",
+          "claw_R_02",
+          "claw_R_03",
+          "claw_R_04",
+          "claw_R_05",
+          "claw_R_06",
+          "claw_R_07",
+          "claw_R_08",
+          "claw_R_09",
+          "claw_R_10",
+          "claw_R_11",
+          "claw_R_12",
+          "claw_R_13"
+        ],
+        "effectorBone": "claw_R_13",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_attack_primary",
+        "bone": "body_00",
+        "role": "attack",
+        "contactType": "mouth"
+      }
+    ]
+  },
+  {
+    "file": "anomalocaris.lod1.glb",
+    "originalSHA256": "41a872b7c95c8d8ca74f4fa5141145b43cf205a9b4081c6d55e5927908fd7b8d",
+    "updatedSHA256": "70fb88387f52800011d95a979f3760bbed80a79b8ace5c56363cfd5b6388a2ef",
+    "bytes": 936244,
+    "changedClips": [],
+    "anchors": [
+      {
+        "name": "anchor_mouth",
+        "bone": "body_00",
+        "role": "mouth"
+      },
+      {
+        "name": "anchor_mouth_inside",
+        "bone": "body_00",
+        "role": "swallow"
+      },
+      {
+        "name": "anchor_grasp",
+        "bone": "claw_L_13",
+        "role": "grasp",
+        "chain": [
+          "claw_L_00",
+          "claw_L_01",
+          "claw_L_02",
+          "claw_L_03",
+          "claw_L_04",
+          "claw_L_05",
+          "claw_L_06",
+          "claw_L_07",
+          "claw_L_08",
+          "claw_L_09",
+          "claw_L_10",
+          "claw_L_11",
+          "claw_L_12",
+          "claw_L_13"
+        ],
+        "effectorBone": "claw_L_13",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_attack_claw_L_13",
+        "bone": "claw_L_13",
+        "role": "attack",
+        "chain": [
+          "claw_L_00",
+          "claw_L_01",
+          "claw_L_02",
+          "claw_L_03",
+          "claw_L_04",
+          "claw_L_05",
+          "claw_L_06",
+          "claw_L_07",
+          "claw_L_08",
+          "claw_L_09",
+          "claw_L_10",
+          "claw_L_11",
+          "claw_L_12",
+          "claw_L_13"
+        ],
+        "effectorBone": "claw_L_13",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_attack_claw_R_13",
+        "bone": "claw_R_13",
+        "role": "attack",
+        "chain": [
+          "claw_R_00",
+          "claw_R_01",
+          "claw_R_02",
+          "claw_R_03",
+          "claw_R_04",
+          "claw_R_05",
+          "claw_R_06",
+          "claw_R_07",
+          "claw_R_08",
+          "claw_R_09",
+          "claw_R_10",
+          "claw_R_11",
+          "claw_R_12",
+          "claw_R_13"
+        ],
+        "effectorBone": "claw_R_13",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_attack_primary",
+        "bone": "body_00",
+        "role": "attack",
+        "contactType": "mouth"
+      }
+    ]
+  },
+  {
+    "file": "canadia.glb",
+    "originalSHA256": "f82bf00f59b5710bdc5a1e69c92867c3d47cbba2a365115a9d5363a20d704016",
+    "updatedSHA256": "50550cee4234961203da8bb2bd430e50cd6f19a6137e4001c73d33074134ba4a",
+    "bytes": 4668960,
+    "changedClips": [],
+    "anchors": [
+      {
+        "name": "anchor_mouth",
+        "bone": "body",
+        "role": "mouth"
+      },
+      {
+        "name": "anchor_mouth_inside",
+        "bone": "body",
+        "role": "swallow"
+      },
+      {
+        "name": "anchor_attack_parapodium_1_00",
+        "bone": "parapodium_1_00",
+        "role": "attack",
+        "chain": [
+          "parapodium_1_00"
+        ],
+        "effectorBone": "parapodium_1_00",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_attack_parapodium_-1_00",
+        "bone": "parapodium_-1_00",
+        "role": "attack",
+        "chain": [
+          "parapodium_-1_00"
+        ],
+        "effectorBone": "parapodium_-1_00",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_attack_parapodium_1_01",
+        "bone": "parapodium_1_01",
+        "role": "attack",
+        "chain": [
+          "parapodium_1_01"
+        ],
+        "effectorBone": "parapodium_1_01",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_attack_parapodium_-1_01",
+        "bone": "parapodium_-1_01",
+        "role": "attack",
+        "chain": [
+          "parapodium_-1_01"
+        ],
+        "effectorBone": "parapodium_-1_01",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_attack_parapodium_1_02",
+        "bone": "parapodium_1_02",
+        "role": "attack",
+        "chain": [
+          "parapodium_1_02"
+        ],
+        "effectorBone": "parapodium_1_02",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_attack_parapodium_-1_02",
+        "bone": "parapodium_-1_02",
+        "role": "attack",
+        "chain": [
+          "parapodium_-1_02"
+        ],
+        "effectorBone": "parapodium_-1_02",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_attack_parapodium_1_03",
+        "bone": "parapodium_1_03",
+        "role": "attack",
+        "chain": [
+          "parapodium_1_03"
+        ],
+        "effectorBone": "parapodium_1_03",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_attack_parapodium_-1_03",
+        "bone": "parapodium_-1_03",
+        "role": "attack",
+        "chain": [
+          "parapodium_-1_03"
+        ],
+        "effectorBone": "parapodium_-1_03",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_attack_parapodium_1_04",
+        "bone": "parapodium_1_04",
+        "role": "attack",
+        "chain": [
+          "parapodium_1_04"
+        ],
+        "effectorBone": "parapodium_1_04",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_attack_parapodium_-1_04",
+        "bone": "parapodium_-1_04",
+        "role": "attack",
+        "chain": [
+          "parapodium_-1_04"
+        ],
+        "effectorBone": "parapodium_-1_04",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_attack_parapodium_1_05",
+        "bone": "parapodium_1_05",
+        "role": "attack",
+        "chain": [
+          "parapodium_1_05"
+        ],
+        "effectorBone": "parapodium_1_05",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_attack_parapodium_-1_05",
+        "bone": "parapodium_-1_05",
+        "role": "attack",
+        "chain": [
+          "parapodium_-1_05"
+        ],
+        "effectorBone": "parapodium_-1_05",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_attack_parapodium_1_06",
+        "bone": "parapodium_1_06",
+        "role": "attack",
+        "chain": [
+          "parapodium_1_06"
+        ],
+        "effectorBone": "parapodium_1_06",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_attack_parapodium_-1_06",
+        "bone": "parapodium_-1_06",
+        "role": "attack",
+        "chain": [
+          "parapodium_-1_06"
+        ],
+        "effectorBone": "parapodium_-1_06",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_attack_parapodium_1_07",
+        "bone": "parapodium_1_07",
+        "role": "attack",
+        "chain": [
+          "parapodium_1_07"
+        ],
+        "effectorBone": "parapodium_1_07",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_attack_parapodium_-1_07",
+        "bone": "parapodium_-1_07",
+        "role": "attack",
+        "chain": [
+          "parapodium_-1_07"
+        ],
+        "effectorBone": "parapodium_-1_07",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_attack_parapodium_1_08",
+        "bone": "parapodium_1_08",
+        "role": "attack",
+        "chain": [
+          "parapodium_1_08"
+        ],
+        "effectorBone": "parapodium_1_08",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_attack_parapodium_-1_08",
+        "bone": "parapodium_-1_08",
+        "role": "attack",
+        "chain": [
+          "parapodium_-1_08"
+        ],
+        "effectorBone": "parapodium_-1_08",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_attack_parapodium_1_09",
+        "bone": "parapodium_1_09",
+        "role": "attack",
+        "chain": [
+          "parapodium_1_09"
+        ],
+        "effectorBone": "parapodium_1_09",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_attack_parapodium_-1_09",
+        "bone": "parapodium_-1_09",
+        "role": "attack",
+        "chain": [
+          "parapodium_-1_09"
+        ],
+        "effectorBone": "parapodium_-1_09",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_attack_parapodium_1_10",
+        "bone": "parapodium_1_10",
+        "role": "attack",
+        "chain": [
+          "parapodium_1_10"
+        ],
+        "effectorBone": "parapodium_1_10",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_attack_parapodium_-1_10",
+        "bone": "parapodium_-1_10",
+        "role": "attack",
+        "chain": [
+          "parapodium_-1_10"
+        ],
+        "effectorBone": "parapodium_-1_10",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_attack_parapodium_1_11",
+        "bone": "parapodium_1_11",
+        "role": "attack",
+        "chain": [
+          "parapodium_1_11"
+        ],
+        "effectorBone": "parapodium_1_11",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_attack_parapodium_-1_11",
+        "bone": "parapodium_-1_11",
+        "role": "attack",
+        "chain": [
+          "parapodium_-1_11"
+        ],
+        "effectorBone": "parapodium_-1_11",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_attack_parapodium_1_12",
+        "bone": "parapodium_1_12",
+        "role": "attack",
+        "chain": [
+          "parapodium_1_12"
+        ],
+        "effectorBone": "parapodium_1_12",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_attack_parapodium_-1_12",
+        "bone": "parapodium_-1_12",
+        "role": "attack",
+        "chain": [
+          "parapodium_-1_12"
+        ],
+        "effectorBone": "parapodium_-1_12",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_attack_parapodium_1_13",
+        "bone": "parapodium_1_13",
+        "role": "attack",
+        "chain": [
+          "parapodium_1_13"
+        ],
+        "effectorBone": "parapodium_1_13",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_attack_parapodium_-1_13",
+        "bone": "parapodium_-1_13",
+        "role": "attack",
+        "chain": [
+          "parapodium_-1_13"
+        ],
+        "effectorBone": "parapodium_-1_13",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_attack_parapodium_1_14",
+        "bone": "parapodium_1_14",
+        "role": "attack",
+        "chain": [
+          "parapodium_1_14"
+        ],
+        "effectorBone": "parapodium_1_14",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_attack_parapodium_-1_14",
+        "bone": "parapodium_-1_14",
+        "role": "attack",
+        "chain": [
+          "parapodium_-1_14"
+        ],
+        "effectorBone": "parapodium_-1_14",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_attack_parapodium_1_15",
+        "bone": "parapodium_1_15",
+        "role": "attack",
+        "chain": [
+          "parapodium_1_15"
+        ],
+        "effectorBone": "parapodium_1_15",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_attack_parapodium_-1_15",
+        "bone": "parapodium_-1_15",
+        "role": "attack",
+        "chain": [
+          "parapodium_-1_15"
+        ],
+        "effectorBone": "parapodium_-1_15",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_attack_parapodium_1_16",
+        "bone": "parapodium_1_16",
+        "role": "attack",
+        "chain": [
+          "parapodium_1_16"
+        ],
+        "effectorBone": "parapodium_1_16",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_attack_parapodium_-1_16",
+        "bone": "parapodium_-1_16",
+        "role": "attack",
+        "chain": [
+          "parapodium_-1_16"
+        ],
+        "effectorBone": "parapodium_-1_16",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_attack_parapodium_1_17",
+        "bone": "parapodium_1_17",
+        "role": "attack",
+        "chain": [
+          "parapodium_1_17"
+        ],
+        "effectorBone": "parapodium_1_17",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_attack_parapodium_-1_17",
+        "bone": "parapodium_-1_17",
+        "role": "attack",
+        "chain": [
+          "parapodium_-1_17"
+        ],
+        "effectorBone": "parapodium_-1_17",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_attack_parapodium_1_18",
+        "bone": "parapodium_1_18",
+        "role": "attack",
+        "chain": [
+          "parapodium_1_18"
+        ],
+        "effectorBone": "parapodium_1_18",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_attack_parapodium_-1_18",
+        "bone": "parapodium_-1_18",
+        "role": "attack",
+        "chain": [
+          "parapodium_-1_18"
+        ],
+        "effectorBone": "parapodium_-1_18",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_attack_parapodium_1_19",
+        "bone": "parapodium_1_19",
+        "role": "attack",
+        "chain": [
+          "parapodium_1_19"
+        ],
+        "effectorBone": "parapodium_1_19",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_attack_parapodium_-1_19",
+        "bone": "parapodium_-1_19",
+        "role": "attack",
+        "chain": [
+          "parapodium_-1_19"
+        ],
+        "effectorBone": "parapodium_-1_19",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_attack_parapodium_1_20",
+        "bone": "parapodium_1_20",
+        "role": "attack",
+        "chain": [
+          "parapodium_1_20"
+        ],
+        "effectorBone": "parapodium_1_20",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_attack_parapodium_-1_20",
+        "bone": "parapodium_-1_20",
+        "role": "attack",
+        "chain": [
+          "parapodium_-1_20"
+        ],
+        "effectorBone": "parapodium_-1_20",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_attack_primary",
+        "bone": "body",
+        "role": "attack",
+        "contactType": "mouth"
+      }
+    ]
+  },
+  {
+    "file": "canadia.lod1.glb",
+    "originalSHA256": "894e3d44b08653d6fa2940e30861df12efae62c0f7b0a6f150efed84bbea85e6",
+    "updatedSHA256": "a4f4d073ee93566c06240b6ed6564ef0d1a60d83c74a1a4da04ca8144841520e",
+    "bytes": 603772,
+    "changedClips": [],
+    "anchors": [
+      {
+        "name": "anchor_mouth",
+        "bone": "body",
+        "role": "mouth"
+      },
+      {
+        "name": "anchor_mouth_inside",
+        "bone": "body",
+        "role": "swallow"
+      },
+      {
+        "name": "anchor_attack_parapodium_1_00",
+        "bone": "parapodium_1_00",
+        "role": "attack",
+        "chain": [
+          "parapodium_1_00"
+        ],
+        "effectorBone": "parapodium_1_00",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_attack_parapodium_-1_00",
+        "bone": "parapodium_-1_00",
+        "role": "attack",
+        "chain": [
+          "parapodium_-1_00"
+        ],
+        "effectorBone": "parapodium_-1_00",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_attack_parapodium_1_01",
+        "bone": "parapodium_1_01",
+        "role": "attack",
+        "chain": [
+          "parapodium_1_01"
+        ],
+        "effectorBone": "parapodium_1_01",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_attack_parapodium_-1_01",
+        "bone": "parapodium_-1_01",
+        "role": "attack",
+        "chain": [
+          "parapodium_-1_01"
+        ],
+        "effectorBone": "parapodium_-1_01",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_attack_parapodium_1_02",
+        "bone": "parapodium_1_02",
+        "role": "attack",
+        "chain": [
+          "parapodium_1_02"
+        ],
+        "effectorBone": "parapodium_1_02",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_attack_parapodium_-1_02",
+        "bone": "parapodium_-1_02",
+        "role": "attack",
+        "chain": [
+          "parapodium_-1_02"
+        ],
+        "effectorBone": "parapodium_-1_02",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_attack_parapodium_1_03",
+        "bone": "parapodium_1_03",
+        "role": "attack",
+        "chain": [
+          "parapodium_1_03"
+        ],
+        "effectorBone": "parapodium_1_03",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_attack_parapodium_-1_03",
+        "bone": "parapodium_-1_03",
+        "role": "attack",
+        "chain": [
+          "parapodium_-1_03"
+        ],
+        "effectorBone": "parapodium_-1_03",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_attack_parapodium_1_04",
+        "bone": "parapodium_1_04",
+        "role": "attack",
+        "chain": [
+          "parapodium_1_04"
+        ],
+        "effectorBone": "parapodium_1_04",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_attack_parapodium_-1_04",
+        "bone": "parapodium_-1_04",
+        "role": "attack",
+        "chain": [
+          "parapodium_-1_04"
+        ],
+        "effectorBone": "parapodium_-1_04",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_attack_parapodium_1_05",
+        "bone": "parapodium_1_05",
+        "role": "attack",
+        "chain": [
+          "parapodium_1_05"
+        ],
+        "effectorBone": "parapodium_1_05",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_attack_parapodium_-1_05",
+        "bone": "parapodium_-1_05",
+        "role": "attack",
+        "chain": [
+          "parapodium_-1_05"
+        ],
+        "effectorBone": "parapodium_-1_05",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_attack_parapodium_1_06",
+        "bone": "parapodium_1_06",
+        "role": "attack",
+        "chain": [
+          "parapodium_1_06"
+        ],
+        "effectorBone": "parapodium_1_06",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_attack_parapodium_-1_06",
+        "bone": "parapodium_-1_06",
+        "role": "attack",
+        "chain": [
+          "parapodium_-1_06"
+        ],
+        "effectorBone": "parapodium_-1_06",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_attack_parapodium_1_07",
+        "bone": "parapodium_1_07",
+        "role": "attack",
+        "chain": [
+          "parapodium_1_07"
+        ],
+        "effectorBone": "parapodium_1_07",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_attack_parapodium_-1_07",
+        "bone": "parapodium_-1_07",
+        "role": "attack",
+        "chain": [
+          "parapodium_-1_07"
+        ],
+        "effectorBone": "parapodium_-1_07",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_attack_parapodium_1_08",
+        "bone": "parapodium_1_08",
+        "role": "attack",
+        "chain": [
+          "parapodium_1_08"
+        ],
+        "effectorBone": "parapodium_1_08",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_attack_parapodium_-1_08",
+        "bone": "parapodium_-1_08",
+        "role": "attack",
+        "chain": [
+          "parapodium_-1_08"
+        ],
+        "effectorBone": "parapodium_-1_08",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_attack_parapodium_1_09",
+        "bone": "parapodium_1_09",
+        "role": "attack",
+        "chain": [
+          "parapodium_1_09"
+        ],
+        "effectorBone": "parapodium_1_09",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_attack_parapodium_-1_09",
+        "bone": "parapodium_-1_09",
+        "role": "attack",
+        "chain": [
+          "parapodium_-1_09"
+        ],
+        "effectorBone": "parapodium_-1_09",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_attack_parapodium_1_10",
+        "bone": "parapodium_1_10",
+        "role": "attack",
+        "chain": [
+          "parapodium_1_10"
+        ],
+        "effectorBone": "parapodium_1_10",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_attack_parapodium_-1_10",
+        "bone": "parapodium_-1_10",
+        "role": "attack",
+        "chain": [
+          "parapodium_-1_10"
+        ],
+        "effectorBone": "parapodium_-1_10",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_attack_parapodium_1_11",
+        "bone": "parapodium_1_11",
+        "role": "attack",
+        "chain": [
+          "parapodium_1_11"
+        ],
+        "effectorBone": "parapodium_1_11",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_attack_parapodium_-1_11",
+        "bone": "parapodium_-1_11",
+        "role": "attack",
+        "chain": [
+          "parapodium_-1_11"
+        ],
+        "effectorBone": "parapodium_-1_11",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_attack_parapodium_1_12",
+        "bone": "parapodium_1_12",
+        "role": "attack",
+        "chain": [
+          "parapodium_1_12"
+        ],
+        "effectorBone": "parapodium_1_12",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_attack_parapodium_-1_12",
+        "bone": "parapodium_-1_12",
+        "role": "attack",
+        "chain": [
+          "parapodium_-1_12"
+        ],
+        "effectorBone": "parapodium_-1_12",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_attack_parapodium_1_13",
+        "bone": "parapodium_1_13",
+        "role": "attack",
+        "chain": [
+          "parapodium_1_13"
+        ],
+        "effectorBone": "parapodium_1_13",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_attack_parapodium_-1_13",
+        "bone": "parapodium_-1_13",
+        "role": "attack",
+        "chain": [
+          "parapodium_-1_13"
+        ],
+        "effectorBone": "parapodium_-1_13",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_attack_parapodium_1_14",
+        "bone": "parapodium_1_14",
+        "role": "attack",
+        "chain": [
+          "parapodium_1_14"
+        ],
+        "effectorBone": "parapodium_1_14",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_attack_parapodium_-1_14",
+        "bone": "parapodium_-1_14",
+        "role": "attack",
+        "chain": [
+          "parapodium_-1_14"
+        ],
+        "effectorBone": "parapodium_-1_14",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_attack_parapodium_1_15",
+        "bone": "parapodium_1_15",
+        "role": "attack",
+        "chain": [
+          "parapodium_1_15"
+        ],
+        "effectorBone": "parapodium_1_15",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_attack_parapodium_-1_15",
+        "bone": "parapodium_-1_15",
+        "role": "attack",
+        "chain": [
+          "parapodium_-1_15"
+        ],
+        "effectorBone": "parapodium_-1_15",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_attack_parapodium_1_16",
+        "bone": "parapodium_1_16",
+        "role": "attack",
+        "chain": [
+          "parapodium_1_16"
+        ],
+        "effectorBone": "parapodium_1_16",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_attack_parapodium_-1_16",
+        "bone": "parapodium_-1_16",
+        "role": "attack",
+        "chain": [
+          "parapodium_-1_16"
+        ],
+        "effectorBone": "parapodium_-1_16",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_attack_parapodium_1_17",
+        "bone": "parapodium_1_17",
+        "role": "attack",
+        "chain": [
+          "parapodium_1_17"
+        ],
+        "effectorBone": "parapodium_1_17",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_attack_parapodium_-1_17",
+        "bone": "parapodium_-1_17",
+        "role": "attack",
+        "chain": [
+          "parapodium_-1_17"
+        ],
+        "effectorBone": "parapodium_-1_17",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_attack_parapodium_1_18",
+        "bone": "parapodium_1_18",
+        "role": "attack",
+        "chain": [
+          "parapodium_1_18"
+        ],
+        "effectorBone": "parapodium_1_18",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_attack_parapodium_-1_18",
+        "bone": "parapodium_-1_18",
+        "role": "attack",
+        "chain": [
+          "parapodium_-1_18"
+        ],
+        "effectorBone": "parapodium_-1_18",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_attack_parapodium_1_19",
+        "bone": "parapodium_1_19",
+        "role": "attack",
+        "chain": [
+          "parapodium_1_19"
+        ],
+        "effectorBone": "parapodium_1_19",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_attack_parapodium_-1_19",
+        "bone": "parapodium_-1_19",
+        "role": "attack",
+        "chain": [
+          "parapodium_-1_19"
+        ],
+        "effectorBone": "parapodium_-1_19",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_attack_parapodium_1_20",
+        "bone": "parapodium_1_20",
+        "role": "attack",
+        "chain": [
+          "parapodium_1_20"
+        ],
+        "effectorBone": "parapodium_1_20",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_attack_parapodium_-1_20",
+        "bone": "parapodium_-1_20",
+        "role": "attack",
+        "chain": [
+          "parapodium_-1_20"
+        ],
+        "effectorBone": "parapodium_-1_20",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_attack_primary",
+        "bone": "body",
+        "role": "attack",
+        "contactType": "mouth"
+      }
+    ]
+  },
+  {
+    "file": "hallucigenia.glb",
+    "originalSHA256": "6199dac3fa2b0b6161822ac7f909b2882de2778e543aa3c6ef06efc44273a849",
+    "updatedSHA256": "ccf9b8441f96e14216eff9767e8a336088b3872499d76d6f70f7f82317b410b6",
+    "bytes": 2620220,
+    "changedClips": [],
+    "anchors": [
+      {
+        "name": "anchor_mouth",
+        "bone": "body_00",
+        "role": "mouth"
+      },
+      {
+        "name": "anchor_mouth_inside",
+        "bone": "body_00",
+        "role": "swallow"
+      },
+      {
+        "name": "anchor_attack_tentacle_0_1_tip",
+        "bone": "tentacle_0_1_tip",
+        "role": "attack",
+        "chain": [
+          "tentacle_0_1",
+          "tentacle_0_1_tip"
+        ],
+        "effectorBone": "tentacle_0_1_tip",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_attack_tentacle_0_-1_tip",
+        "bone": "tentacle_0_-1_tip",
+        "role": "attack",
+        "chain": [
+          "tentacle_0_-1",
+          "tentacle_0_-1_tip"
+        ],
+        "effectorBone": "tentacle_0_-1_tip",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_attack_tentacle_1_1_tip",
+        "bone": "tentacle_1_1_tip",
+        "role": "attack",
+        "chain": [
+          "tentacle_1_1",
+          "tentacle_1_1_tip"
+        ],
+        "effectorBone": "tentacle_1_1_tip",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_attack_tentacle_1_-1_tip",
+        "bone": "tentacle_1_-1_tip",
+        "role": "attack",
+        "chain": [
+          "tentacle_1_-1",
+          "tentacle_1_-1_tip"
+        ],
+        "effectorBone": "tentacle_1_-1_tip",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_attack_tentacle_2_1_tip",
+        "bone": "tentacle_2_1_tip",
+        "role": "attack",
+        "chain": [
+          "tentacle_2_1",
+          "tentacle_2_1_tip"
+        ],
+        "effectorBone": "tentacle_2_1_tip",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_attack_tentacle_2_-1_tip",
+        "bone": "tentacle_2_-1_tip",
+        "role": "attack",
+        "chain": [
+          "tentacle_2_-1",
+          "tentacle_2_-1_tip"
+        ],
+        "effectorBone": "tentacle_2_-1_tip",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_attack_primary",
+        "bone": "body_00",
+        "role": "attack",
+        "contactType": "mouth"
+      },
+      {
+        "name": "anchor_attack_spines_L",
+        "bone": "body_04",
+        "role": "attack",
+        "contactType": "spine-field",
+        "approximate": true
+      },
+      {
+        "name": "anchor_attack_spines_R",
+        "bone": "body_04",
+        "role": "attack",
+        "contactType": "spine-field",
+        "approximate": true
+      }
+    ]
+  },
+  {
+    "file": "hallucigenia.lod1.glb",
+    "originalSHA256": "70dc1817a15e9a72cad350f5fc23b73cbb4d44b6784acafdaaf6ebc7cd2e35c0",
+    "updatedSHA256": "f1f15b6aeb8c1779dbd4709084c2517885557faaf19fd298f0b52f75c25ea9e6",
+    "bytes": 296028,
+    "changedClips": [],
+    "anchors": [
+      {
+        "name": "anchor_mouth",
+        "bone": "body_00",
+        "role": "mouth"
+      },
+      {
+        "name": "anchor_mouth_inside",
+        "bone": "body_00",
+        "role": "swallow"
+      },
+      {
+        "name": "anchor_attack_tentacle_0_1_tip",
+        "bone": "tentacle_0_1_tip",
+        "role": "attack",
+        "chain": [
+          "tentacle_0_1",
+          "tentacle_0_1_tip"
+        ],
+        "effectorBone": "tentacle_0_1_tip",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_attack_tentacle_0_-1_tip",
+        "bone": "tentacle_0_-1_tip",
+        "role": "attack",
+        "chain": [
+          "tentacle_0_-1",
+          "tentacle_0_-1_tip"
+        ],
+        "effectorBone": "tentacle_0_-1_tip",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_attack_tentacle_1_1_tip",
+        "bone": "tentacle_1_1_tip",
+        "role": "attack",
+        "chain": [
+          "tentacle_1_1",
+          "tentacle_1_1_tip"
+        ],
+        "effectorBone": "tentacle_1_1_tip",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_attack_tentacle_1_-1_tip",
+        "bone": "tentacle_1_-1_tip",
+        "role": "attack",
+        "chain": [
+          "tentacle_1_-1",
+          "tentacle_1_-1_tip"
+        ],
+        "effectorBone": "tentacle_1_-1_tip",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_attack_tentacle_2_1_tip",
+        "bone": "tentacle_2_1_tip",
+        "role": "attack",
+        "chain": [
+          "tentacle_2_1",
+          "tentacle_2_1_tip"
+        ],
+        "effectorBone": "tentacle_2_1_tip",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_attack_tentacle_2_-1_tip",
+        "bone": "tentacle_2_-1_tip",
+        "role": "attack",
+        "chain": [
+          "tentacle_2_-1",
+          "tentacle_2_-1_tip"
+        ],
+        "effectorBone": "tentacle_2_-1_tip",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_attack_primary",
+        "bone": "body_00",
+        "role": "attack",
+        "contactType": "mouth"
+      },
+      {
+        "name": "anchor_attack_spines_L",
+        "bone": "body_04",
+        "role": "attack",
+        "contactType": "spine-field",
+        "approximate": true
+      },
+      {
+        "name": "anchor_attack_spines_R",
+        "bone": "body_04",
+        "role": "attack",
+        "contactType": "spine-field",
+        "approximate": true
+      }
+    ]
+  },
+  {
+    "file": "marrella.glb",
+    "originalSHA256": "679847b84c9c62d02661c4375b4a70f23809285a338927f0f23c9ec69610fb5c",
+    "updatedSHA256": "d63f401218409ad32e73a192114b2203e17f30b001943df8779801ef39327cce",
+    "bytes": 5179400,
+    "changedClips": [],
+    "anchors": [
+      {
+        "name": "anchor_mouth",
+        "bone": "body_01",
+        "role": "mouth"
+      },
+      {
+        "name": "anchor_mouth_inside",
+        "bone": "body_01",
+        "role": "swallow"
+      },
+      {
+        "name": "anchor_attack_paddle_1",
+        "bone": "paddle_1",
+        "role": "attack",
+        "chain": [
+          "paddle_1"
+        ],
+        "effectorBone": "paddle_1",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_attack_paddle_-1",
+        "bone": "paddle_-1",
+        "role": "attack",
+        "chain": [
+          "paddle_-1"
+        ],
+        "effectorBone": "paddle_-1",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_attack_primary",
+        "bone": "body_01",
+        "role": "attack",
+        "contactType": "mouth"
+      }
+    ]
+  },
+  {
+    "file": "marrella.lod1.glb",
+    "originalSHA256": "ed0385a901a392af201941d9e39c4ce8c8416db42d68075711e7023e53343b98",
+    "updatedSHA256": "de3a34591cd35074ed2800e0d72fe613059b5adf6acf7a34f8cc85013eca05ed",
+    "bytes": 642772,
+    "changedClips": [],
+    "anchors": [
+      {
+        "name": "anchor_mouth",
+        "bone": "body_01",
+        "role": "mouth"
+      },
+      {
+        "name": "anchor_mouth_inside",
+        "bone": "body_01",
+        "role": "swallow"
+      },
+      {
+        "name": "anchor_attack_paddle_1",
+        "bone": "paddle_1",
+        "role": "attack",
+        "chain": [
+          "paddle_1"
+        ],
+        "effectorBone": "paddle_1",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_attack_paddle_-1",
+        "bone": "paddle_-1",
+        "role": "attack",
+        "chain": [
+          "paddle_-1"
+        ],
+        "effectorBone": "paddle_-1",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_attack_primary",
+        "bone": "body_01",
+        "role": "attack",
+        "contactType": "mouth"
+      }
+    ]
+  },
+  {
+    "file": "olenoides.glb",
+    "originalSHA256": "2a2e35a8961bc4dbe114111f058384f04f454679edf3e84844bcd64a70737f9e",
+    "updatedSHA256": "09e5c0237325f7ac00ef27b5c8ab0b6fd57486cf7fe9f8ccc569165c1fd273dd",
+    "bytes": 3996488,
+    "changedClips": [],
+    "anchors": [
+      {
+        "name": "anchor_mouth",
+        "bone": "body_01",
+        "role": "mouth"
+      },
+      {
+        "name": "anchor_mouth_inside",
+        "bone": "body_01",
+        "role": "swallow"
+      },
+      {
+        "name": "anchor_attack_primary",
+        "bone": "body_00",
+        "role": "attack",
+        "contactType": "head-or-body"
+      }
+    ]
+  },
+  {
+    "file": "olenoides.lod1.glb",
+    "originalSHA256": "39f0c88990d3360e43873b7e09bc0486169c8de1b3b70e804ef304b60f34409f",
+    "updatedSHA256": "eaadf10dc3db49aece4895d57dea3ac057b1f0eb6249a109fff8056f1971e9bb",
+    "bytes": 498256,
+    "changedClips": [],
+    "anchors": [
+      {
+        "name": "anchor_mouth",
+        "bone": "body_01",
+        "role": "mouth"
+      },
+      {
+        "name": "anchor_mouth_inside",
+        "bone": "body_01",
+        "role": "swallow"
+      },
+      {
+        "name": "anchor_attack_primary",
+        "bone": "body_00",
+        "role": "attack",
+        "contactType": "head-or-body"
+      }
+    ]
+  },
+  {
+    "file": "opabinia.glb",
+    "originalSHA256": "2dbd465cb9b39769631042294dbe3d1fa7a179a186b733d6b5102168cf625c07",
+    "updatedSHA256": "894891eb756db62d3895865fb9a1c26399d05e4d57d07724975d5e5f3c109c1f",
+    "bytes": 5963116,
+    "changedClips": [
+      "Attack",
+      "Bite",
+      "Heavy",
+      "Ability",
+      "Eat",
+      "Grab"
+    ],
+    "anchors": [
+      {
+        "name": "anchor_mouth",
+        "bone": "body",
+        "role": "mouth"
+      },
+      {
+        "name": "anchor_mouth_inside",
+        "bone": "body",
+        "role": "swallow"
+      },
+      {
+        "name": "anchor_grasp",
+        "bone": "proboscis_11",
+        "role": "grasp",
+        "chain": [
+          "proboscis_00",
+          "proboscis_01",
+          "proboscis_02",
+          "proboscis_03",
+          "proboscis_04",
+          "proboscis_05",
+          "proboscis_06",
+          "proboscis_07",
+          "proboscis_08",
+          "proboscis_09",
+          "proboscis_10",
+          "proboscis_11"
+        ],
+        "effectorBone": "proboscis_11",
+        "solver": "CCD",
+        "maxJointCorrectionRadians": 0.22
+      },
+      {
+        "name": "anchor_attack_jaw_L",
+        "bone": "jaw_1",
+        "role": "attack",
+        "chain": [
+          "proboscis_00",
+          "proboscis_01",
+          "proboscis_02",
+          "proboscis_03",
+          "proboscis_04",
+          "proboscis_05",
+          "proboscis_06",
+          "proboscis_07",
+          "proboscis_08",
+          "proboscis_09",
+          "proboscis_10",
+          "proboscis_11",
+          "jaw_1"
+        ],
+        "effectorBone": "jaw_1",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_attack_jaw_R",
+        "bone": "jaw_-1",
+        "role": "attack",
+        "chain": [
+          "proboscis_00",
+          "proboscis_01",
+          "proboscis_02",
+          "proboscis_03",
+          "proboscis_04",
+          "proboscis_05",
+          "proboscis_06",
+          "proboscis_07",
+          "proboscis_08",
+          "proboscis_09",
+          "proboscis_10",
+          "proboscis_11",
+          "jaw_-1"
+        ],
+        "effectorBone": "jaw_-1",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_attack_primary",
+        "bone": "proboscis_11",
+        "role": "attack"
+      }
+    ]
+  },
+  {
+    "file": "opabinia.lod1.glb",
+    "originalSHA256": "f1aba08a36ed332fa8785ec2cc04896d60d0b0c5d9b0da0ff92e8ea1fcd3f32a",
+    "updatedSHA256": "0619408e4af182c4e65b157f9296272c2fb839e00c7eee5f1e793375a775a180",
+    "bytes": 1890392,
+    "changedClips": [
+      "Attack",
+      "Bite",
+      "Heavy",
+      "Ability",
+      "Eat",
+      "Grab"
+    ],
+    "anchors": [
+      {
+        "name": "anchor_mouth",
+        "bone": "body",
+        "role": "mouth"
+      },
+      {
+        "name": "anchor_mouth_inside",
+        "bone": "body",
+        "role": "swallow"
+      },
+      {
+        "name": "anchor_grasp",
+        "bone": "proboscis_11",
+        "role": "grasp",
+        "chain": [
+          "proboscis_00",
+          "proboscis_01",
+          "proboscis_02",
+          "proboscis_03",
+          "proboscis_04",
+          "proboscis_05",
+          "proboscis_06",
+          "proboscis_07",
+          "proboscis_08",
+          "proboscis_09",
+          "proboscis_10",
+          "proboscis_11"
+        ],
+        "effectorBone": "proboscis_11",
+        "solver": "CCD",
+        "maxJointCorrectionRadians": 0.22
+      },
+      {
+        "name": "anchor_attack_jaw_L",
+        "bone": "jaw_1",
+        "role": "attack",
+        "chain": [
+          "proboscis_00",
+          "proboscis_01",
+          "proboscis_02",
+          "proboscis_03",
+          "proboscis_04",
+          "proboscis_05",
+          "proboscis_06",
+          "proboscis_07",
+          "proboscis_08",
+          "proboscis_09",
+          "proboscis_10",
+          "proboscis_11",
+          "jaw_1"
+        ],
+        "effectorBone": "jaw_1",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_attack_jaw_R",
+        "bone": "jaw_-1",
+        "role": "attack",
+        "chain": [
+          "proboscis_00",
+          "proboscis_01",
+          "proboscis_02",
+          "proboscis_03",
+          "proboscis_04",
+          "proboscis_05",
+          "proboscis_06",
+          "proboscis_07",
+          "proboscis_08",
+          "proboscis_09",
+          "proboscis_10",
+          "proboscis_11",
+          "jaw_-1"
+        ],
+        "effectorBone": "jaw_-1",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_attack_primary",
+        "bone": "proboscis_11",
+        "role": "attack"
+      }
+    ]
+  },
+  {
+    "file": "waptia.glb",
+    "originalSHA256": "536705101c8f510fd7cea17f8fa328ddeee2fbb4691739075c4c8bb837664049",
+    "updatedSHA256": "c48261c91f745139d4f8395818452f986d7130f4165a5c6c14944dd49de077ed",
+    "bytes": 4423256,
+    "changedClips": [],
+    "anchors": [
+      {
+        "name": "anchor_mouth",
+        "bone": "body",
+        "role": "mouth"
+      },
+      {
+        "name": "anchor_mouth_inside",
+        "bone": "body",
+        "role": "swallow"
+      },
+      {
+        "name": "anchor_attack_raptor_1_0_8",
+        "bone": "raptor_1_0_8",
+        "role": "attack",
+        "chain": [
+          "raptor_1_0_0",
+          "raptor_1_0_1",
+          "raptor_1_0_2",
+          "raptor_1_0_3",
+          "raptor_1_0_4",
+          "raptor_1_0_5",
+          "raptor_1_0_6",
+          "raptor_1_0_7",
+          "raptor_1_0_8"
+        ],
+        "effectorBone": "raptor_1_0_8",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_attack_raptor_1_1_8",
+        "bone": "raptor_1_1_8",
+        "role": "attack",
+        "chain": [
+          "raptor_1_1_0",
+          "raptor_1_1_1",
+          "raptor_1_1_2",
+          "raptor_1_1_3",
+          "raptor_1_1_4",
+          "raptor_1_1_5",
+          "raptor_1_1_6",
+          "raptor_1_1_7",
+          "raptor_1_1_8"
+        ],
+        "effectorBone": "raptor_1_1_8",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_attack_raptor_1_2_8",
+        "bone": "raptor_1_2_8",
+        "role": "attack",
+        "chain": [
+          "raptor_1_2_0",
+          "raptor_1_2_1",
+          "raptor_1_2_2",
+          "raptor_1_2_3",
+          "raptor_1_2_4",
+          "raptor_1_2_5",
+          "raptor_1_2_6",
+          "raptor_1_2_7",
+          "raptor_1_2_8"
+        ],
+        "effectorBone": "raptor_1_2_8",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_attack_raptor_-1_0_8",
+        "bone": "raptor_-1_0_8",
+        "role": "attack",
+        "chain": [
+          "raptor_-1_0_0",
+          "raptor_-1_0_1",
+          "raptor_-1_0_2",
+          "raptor_-1_0_3",
+          "raptor_-1_0_4",
+          "raptor_-1_0_5",
+          "raptor_-1_0_6",
+          "raptor_-1_0_7",
+          "raptor_-1_0_8"
+        ],
+        "effectorBone": "raptor_-1_0_8",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_attack_raptor_-1_1_8",
+        "bone": "raptor_-1_1_8",
+        "role": "attack",
+        "chain": [
+          "raptor_-1_1_0",
+          "raptor_-1_1_1",
+          "raptor_-1_1_2",
+          "raptor_-1_1_3",
+          "raptor_-1_1_4",
+          "raptor_-1_1_5",
+          "raptor_-1_1_6",
+          "raptor_-1_1_7",
+          "raptor_-1_1_8"
+        ],
+        "effectorBone": "raptor_-1_1_8",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_attack_raptor_-1_2_8",
+        "bone": "raptor_-1_2_8",
+        "role": "attack",
+        "chain": [
+          "raptor_-1_2_0",
+          "raptor_-1_2_1",
+          "raptor_-1_2_2",
+          "raptor_-1_2_3",
+          "raptor_-1_2_4",
+          "raptor_-1_2_5",
+          "raptor_-1_2_6",
+          "raptor_-1_2_7",
+          "raptor_-1_2_8"
+        ],
+        "effectorBone": "raptor_-1_2_8",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_attack_primary",
+        "bone": "body",
+        "role": "attack",
+        "contactType": "mouth"
+      }
+    ]
+  },
+  {
+    "file": "waptia.lod1.glb",
+    "originalSHA256": "c24abbf61d13857616355a4dbd1f8b174babe8fb0febd722352d1471a4e6c8f6",
+    "updatedSHA256": "d6e9192260c312df00922caa95d7cd3bac27129acd9dd5de6e5330950d2addc8",
+    "bytes": 622656,
+    "changedClips": [],
+    "anchors": [
+      {
+        "name": "anchor_mouth",
+        "bone": "body",
+        "role": "mouth"
+      },
+      {
+        "name": "anchor_mouth_inside",
+        "bone": "body",
+        "role": "swallow"
+      },
+      {
+        "name": "anchor_attack_raptor_1_0_8",
+        "bone": "raptor_1_0_8",
+        "role": "attack",
+        "chain": [
+          "raptor_1_0_0",
+          "raptor_1_0_1",
+          "raptor_1_0_2",
+          "raptor_1_0_3",
+          "raptor_1_0_4",
+          "raptor_1_0_5",
+          "raptor_1_0_6",
+          "raptor_1_0_7",
+          "raptor_1_0_8"
+        ],
+        "effectorBone": "raptor_1_0_8",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_attack_raptor_1_1_8",
+        "bone": "raptor_1_1_8",
+        "role": "attack",
+        "chain": [
+          "raptor_1_1_0",
+          "raptor_1_1_1",
+          "raptor_1_1_2",
+          "raptor_1_1_3",
+          "raptor_1_1_4",
+          "raptor_1_1_5",
+          "raptor_1_1_6",
+          "raptor_1_1_7",
+          "raptor_1_1_8"
+        ],
+        "effectorBone": "raptor_1_1_8",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_attack_raptor_1_2_8",
+        "bone": "raptor_1_2_8",
+        "role": "attack",
+        "chain": [
+          "raptor_1_2_0",
+          "raptor_1_2_1",
+          "raptor_1_2_2",
+          "raptor_1_2_3",
+          "raptor_1_2_4",
+          "raptor_1_2_5",
+          "raptor_1_2_6",
+          "raptor_1_2_7",
+          "raptor_1_2_8"
+        ],
+        "effectorBone": "raptor_1_2_8",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_attack_raptor_-1_0_8",
+        "bone": "raptor_-1_0_8",
+        "role": "attack",
+        "chain": [
+          "raptor_-1_0_0",
+          "raptor_-1_0_1",
+          "raptor_-1_0_2",
+          "raptor_-1_0_3",
+          "raptor_-1_0_4",
+          "raptor_-1_0_5",
+          "raptor_-1_0_6",
+          "raptor_-1_0_7",
+          "raptor_-1_0_8"
+        ],
+        "effectorBone": "raptor_-1_0_8",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_attack_raptor_-1_1_8",
+        "bone": "raptor_-1_1_8",
+        "role": "attack",
+        "chain": [
+          "raptor_-1_1_0",
+          "raptor_-1_1_1",
+          "raptor_-1_1_2",
+          "raptor_-1_1_3",
+          "raptor_-1_1_4",
+          "raptor_-1_1_5",
+          "raptor_-1_1_6",
+          "raptor_-1_1_7",
+          "raptor_-1_1_8"
+        ],
+        "effectorBone": "raptor_-1_1_8",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_attack_raptor_-1_2_8",
+        "bone": "raptor_-1_2_8",
+        "role": "attack",
+        "chain": [
+          "raptor_-1_2_0",
+          "raptor_-1_2_1",
+          "raptor_-1_2_2",
+          "raptor_-1_2_3",
+          "raptor_-1_2_4",
+          "raptor_-1_2_5",
+          "raptor_-1_2_6",
+          "raptor_-1_2_7",
+          "raptor_-1_2_8"
+        ],
+        "effectorBone": "raptor_-1_2_8",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_attack_primary",
+        "bone": "body",
+        "role": "attack",
+        "contactType": "mouth"
+      }
+    ]
+  },
+  {
+    "file": "wiwaxia.glb",
+    "originalSHA256": "7e1fc4daf389d9541ca5e96c729d1e9ca7339886c6ec80eb07c2cbbd9b0c3346",
+    "updatedSHA256": "e5726fb25301d9851feed33f45f8d12961c4d9a133902aac016f3d985d5b9d65",
+    "bytes": 2304820,
+    "changedClips": [],
+    "anchors": [
+      {
+        "name": "anchor_mouth",
+        "bone": "body_01",
+        "role": "mouth"
+      },
+      {
+        "name": "anchor_mouth_inside",
+        "bone": "body_01",
+        "role": "swallow"
+      },
+      {
+        "name": "anchor_attack_primary",
+        "bone": "body_00",
+        "role": "attack",
+        "contactType": "head-or-body"
+      },
+      {
+        "name": "anchor_attack_spines_L",
+        "bone": "body_04",
+        "role": "attack",
+        "contactType": "spine-field",
+        "approximate": true
+      },
+      {
+        "name": "anchor_attack_spines_R",
+        "bone": "body_04",
+        "role": "attack",
+        "contactType": "spine-field",
+        "approximate": true
+      }
+    ]
+  },
+  {
+    "file": "wiwaxia.lod1.glb",
+    "originalSHA256": "030137b666cb441159b1ea6bb0d5ada5152903cce556da4d1a813f4ffaadc7e2",
+    "updatedSHA256": "a295fa3f4f8a492ff2c29405b7f58dea9159ea8d6659a5201ba518944ec06f00",
+    "bytes": 366352,
+    "changedClips": [],
+    "anchors": [
+      {
+        "name": "anchor_mouth",
+        "bone": "body_01",
+        "role": "mouth"
+      },
+      {
+        "name": "anchor_mouth_inside",
+        "bone": "body_01",
+        "role": "swallow"
+      },
+      {
+        "name": "anchor_attack_primary",
+        "bone": "body_00",
+        "role": "attack",
+        "contactType": "head-or-body"
+      },
+      {
+        "name": "anchor_attack_spines_L",
+        "bone": "body_04",
+        "role": "attack",
+        "contactType": "spine-field",
+        "approximate": true
+      },
+      {
+        "name": "anchor_attack_spines_R",
+        "bone": "body_04",
+        "role": "attack",
+        "contactType": "spine-field",
+        "approximate": true
+      }
+    ]
+  }
+]
