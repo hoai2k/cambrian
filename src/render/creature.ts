@@ -163,12 +163,13 @@ export class CreatureView {
         this.loco?.setEffectiveTimeScale(speed > 0.35 ? clamp((speed / cruise) * rateScale, 0.5, 2.6) : 0.75 * rateScale);
       }
       // one-shots
-      const inAttack = a.state === 'attack' || a.state === 'grabbing' || (a.state === 'ability' && !held);
+      const inAttack = a.state === 'attack' || a.state === 'grabbing' || a.state === 'pounce' || (a.state === 'ability' && !held);
       if (inAttack && !this.wasAttack) {
         if (a.state === 'attack' && a.move) {
           const clip = a.moveKind === 'heavy' ? this.pick('Heavy', 'Attack')! : this.pick('Bite', 'Attack')!;
           this.playOnce(clip, Math.max(0.35, a.move.windup + a.move.active + a.move.recovery * 0.6), false);
         } else if (a.state === 'grabbing') this.playOnce(this.pick('Grab', 'Heavy', 'Attack')!, 0.9, false);
+        else if (a.state === 'pounce') this.playOnce(this.pick('Heavy', 'Attack')!, Math.max(0.4, a.stateDur + 0.2), false);
         else this.playOnce(this.pick('Ability', 'Attack')!, Math.max(0.4, a.stateDur), false);
       }
       if (a.state === 'grabbing' && this.wasAttack && this.oneShotT <= 0) this.playOnce(this.pick('Grab', 'Attack')!, 0.9, false);

@@ -20,6 +20,7 @@ export interface PlayerHud {
   abilityName: string; abilityReady: number; abilityActive: boolean; abilityUnlocked: boolean;
   senseReady: number;
   lock?: { name: string; band: Band; hp: number; color: string };
+  aim?: { x: number; y: number; inRange: boolean; name: string; band: Band; color: string; ready: boolean };
   hunted: number; hunterAngle: number | null; hunterName?: string; hunterState: 'none' | 'noticed' | 'hunting'; inCover: boolean; still: boolean;
   hint?: string; respawnIn: number; state: string; kills: number; eats: number; escapes: number; protect: boolean;
   bandMarkers: { x: number; y: number; band: Band; size: number }[];
@@ -37,7 +38,7 @@ export interface EngineCallbacks {
 
 export const PLAYER_COLORS = ['#61f2d5', '#ffb457', '#c7a3ff', '#ff86a4'];
 
-interface CamState { yaw: number; pitch: number; pos: THREE.Vector3; look: THREE.Vector3; shake: number; camera: THREE.PerspectiveCamera; lockBlend: number; lastPos: THREE.Vector3; frustum: THREE.Frustum; projScreen: THREE.Matrix4; }
+interface CamState { yaw: number; pitch: number; zoom: number; pos: THREE.Vector3; look: THREE.Vector3; shake: number; camera: THREE.PerspectiveCamera; lockBlend: number; lastPos: THREE.Vector3; frustum: THREE.Frustum; projScreen: THREE.Matrix4; }
 
 /** Magnification levels (see docs/redesign/01-game-design.md · Magnification). */
 export const MAGNIFICATION = [
@@ -45,7 +46,7 @@ export const MAGNIFICATION = [
 ] as const;
 export const magnificationLevel = (L: number) => MAGNIFICATION.find((m) => L < m.maxLength) ?? MAGNIFICATION[4];
 /** Follow-camera distance for a body length: about two body lengths back plus a floor so larvae are still readable. */
-export const magnificationDistance = (L: number) => L * 2.0 + 2.0 + Math.max(0, 0.8 - L) * 1.5;
+export const magnificationDistance = (L: number) => L * 1.45 + 1.15 + Math.max(0, 0.8 - L) * 0.9;
 
 export function layoutRects(n: number, w: number, h: number): Rect[] {
   if (n <= 1) return [{ x: 0, y: 0, w, h }];
@@ -159,7 +160,7 @@ export class Engine {
     this.cams = setups.map((_, i) => {
       const p = this.game!.players[i];
       const cam = new THREE.PerspectiveCamera(60, 1, 0.08, 420);
-      const cs: CamState = { yaw: p.yaw, pitch: 0.22, pos: new THREE.Vector3(p.pos.x - Math.sin(p.yaw) * 6, p.pos.y + 2.5, p.pos.z - Math.cos(p.yaw) * 6), look: new THREE.Vector3(p.pos.x, p.pos.y, p.pos.z), shake: 0, camera: cam, lockBlend: 0, lastPos: new THREE.Vector3(p.pos.x, p.pos.y, p.pos.z), frustum: new THREE.Frustum(), projScreen: new THREE.Matrix4() };
+      const cs: CamState = { yaw: p.yaw, pitch: 0.2, zoom: 1, pos: new THREE.Vector3(p.pos.x - Math.sin(p.yaw) * 6, p.pos.y + 2.5, p.pos.z - Math.cos(p.yaw) * 6), look: new THREE.Vector3(p.pos.x, p.pos.y, p.pos.z), shake: 0, camera: cam, lockBlend: 0, lastPos: new THREE.Vector3(p.pos.x, p.pos.y, p.pos.z), frustum: new THREE.Frustum(), projScreen: new THREE.Matrix4() };
       cam.position.copy(cs.pos); cam.lookAt(cs.look);
       return cs;
     });
@@ -191,6 +192,7 @@ export class Engine {
     f.camPitch = clamp(-Math.asin(clamp(fwd.y, -1, 1)) * 0.75, -0.7, 0.7);
     f.burst = c.burst; f.rise = c.rise; f.sink = c.sink;
     f.light = c.light; f.heavy = c.heavy; f.ability = c.ability; f.dodge = c.dodge; f.guard = c.guard; f.lock = c.lock; f.sense = c.sense;
+    f.dash = c.dash; f.aim = c.aim;
     void a;
     return f;
   }
@@ -223,9 +225,14 @@ export class Engine {
         // Increasing yaw rotates the view left, so a rightward stick decreases it.
         if (running) {
           const cs = this.cams[i];
-          cs.yaw = wrapAngle(cs.yaw - c.lookX * dt * 2.6 * this.lookSpeed);
-          cs.pitch = clamp(cs.pitch + c.lookY * dt * 1.6 * this.lookSpeed * (this.invertY ? -1 : 1), -0.55, 1.15);
-          if (Math.abs(c.lookY) < 0.05) cs.pitch = damp(cs.pitch, 0.22, 0.6, dt);
+          if (c.rsClick) {
+            // Right stick pressed in: up/down zooms instead of pitching.
+            cs.zoom = clamp(cs.zoom * Math.exp(c.lookY * dt * 1.6), 0.55, 2.2);
+          } else {
+            cs.yaw = wrapAngle(cs.yaw - c.lookX * dt * 2.6 * this.lookSpeed);
+            cs.pitch = clamp(cs.pitch + c.lookY * dt * 1.6 * this.lookSpeed * (this.invertY ? -1 : 1), -0.55, 1.15);
+            if (Math.abs(c.lookY) < 0.05) cs.pitch = damp(cs.pitch, 0.2, 0.6, dt);
+          }
         }
       });
     }
@@ -316,7 +323,7 @@ export class Engine {
     const locked = !!target && isAlive(target);
     cs.lockBlend = damp(cs.lockBlend, locked ? 1 : 0, 5, dt);
     // Magnification: camera distance and framing scale with body length so the world re-reads at every tier.
-    let dist = magnificationDistance(L);
+    let dist = magnificationDistance(L) * cs.zoom;
     if (p.state === 'dead') dist *= 1.5;
     if (p.hunted > 0.5) dist *= 0.85;
     // Snap in behind the creature when it teleports (respawn), otherwise keep the player's framing.
@@ -337,7 +344,7 @@ export class Engine {
     const pitch = cs.pitch + (locked ? 0.1 : 0) + (def.ground ? 0.12 : 0);
     const desired = this.tmpDesired.set(
       lookAt.x - Math.sin(yaw) * Math.cos(pitch) * dist,
-      lookAt.y + Math.sin(pitch) * dist + L * 0.25,
+      lookAt.y + Math.sin(pitch) * dist + L * 0.18,
       lookAt.z - Math.cos(yaw) * Math.cos(pitch) * dist,
     );
     // keep camera out of the ground and boulders, below the surface
@@ -468,6 +475,7 @@ export class Engine {
         case 'escape': { audio.play('escape'); break; }
         case 'noticed': { audio.play('noticed', 0.5); break; }
         case 'sense': { audio.play('sense'); break; }
+        case 'pounce': { this.impacts.spawn(e.pos, '#ffe08a', 1.2 + (e.strength ?? 1) * 0.5, 0.35); this.bubbles.emit(e.pos, 24, 0.9, 4, 0.08); audio.play('hit', 1.3); if (e.player != null && e.player >= 0) { const d = padOf(e.player); if (typeof d === 'number') rumble(d, 0.7, 0.4, 140); this.shake(e.player, 0.6); } break; }
         case 'burst': { audio.play('burst'); break; }
       }
     }
@@ -503,8 +511,13 @@ export class Engine {
           markers.push({ x: (v.x + 1) / 2, y: (1 - v.y) / 2, band, size: clamp(lengthOf(a) / Math.max(d, 1) * 8, 0.4, 1.6) });
         }
       }
+      let aim: PlayerHud['aim'];
+      if (p.aiming && lockA && isAlive(lockA) && cs) {
+        const v = this.tmpProj.set(lockA.pos.x, lockA.pos.y, lockA.pos.z).project(cs.camera);
+        if (v.z < 1) aim = { x: clamp((v.x + 1) / 2, 0.03, 0.97), y: clamp((1 - v.y) / 2, 0.05, 0.95), inRange: p.aimInRange, name: creature(lockA.creature).name, band: bandOf(p, lockA), color: BAND_COLOR[bandOf(p, lockA)], ready: p.pounceCd === 0 && p.stamina >= 12 };
+      }
       return {
-        index: i, creature: p.creature, color: PLAYER_COLORS[i % 4], alive: p.state !== 'dead',
+        index: i, creature: p.creature, color: PLAYER_COLORS[i % 4], alive: p.state !== 'dead', aim,
         hp: p.hp, hpMax: p.hpMax, stamina: p.stamina, staminaMax: p.staminaMax, exhausted: p.exhausted > 0,
         tier: p.tier, tierName: TIER_NAMES[p.tier], progress: p.tier >= 4 ? 1 : clamp(p.nutrition / TIER_NEED[p.tier], 0, 1), scale: p.scale,
         abilityName: def.abilityName, abilityReady: 1 - clamp(p.abilityCd / def.abilityCooldown, 0, 1), abilityActive: p.abilityActive, abilityUnlocked: p.tier >= 2 || game.mode === 'reef' || game.mode === 'hunted',

@@ -148,6 +148,29 @@ export class Game implements AiWorld {
     shadow.brain = makeBrain('giant', sRoute[0], this.rng, { patrol: sRoute });
   }
 
+  /** A school sized to be prey for this player, spawned just out of sight. */
+  private spawnPreyFor(p: Actor) {
+    const L = lengthOf(p);
+    const def = creature(p.creature);
+    const pool: CreatureId[] = def.ground ? ['marrella', 'olenoides', 'hallucigenia', 'waptia', 'canadia'] : ['waptia', 'canadia', 'opabinia', 'marrella', 'olenoides'];
+    const c = pool[Math.floor(this.rng() * pool.length)];
+    const cd = creature(c);
+    const ratio = 0.28 + this.rng() * 0.32;            // snack to small prey relative to the player
+    const s = clamp((L * ratio) / cd.adultLength, 0.06, 2.2);
+    const count = s < 0.2 ? 12 : s < 0.6 ? 8 : 5;
+    const ang = this.rng() * TAU, d = 24 + this.rng() * 18 + L * 2;
+    const home = { x: clamp(p.pos.x + Math.cos(ang) * d, -WORLD_RADIUS + 15, WORLD_RADIUS - 15), y: 0, z: clamp(p.pos.z + Math.sin(ang) * d, -WORLD_RADIUS + 15, WORLD_RADIUS - 15) };
+    const g = sampleHeight(home.x, home.z);
+    home.y = cd.ground ? g : clamp(p.pos.y + (this.rng() - 0.5) * 6, g + 1.5, SURFACE_Y - 3);
+    const schoolId = this.schoolCount++;
+    for (let k = 0; k < count; k++) {
+      const pos = { x: home.x + (this.rng() - 0.5) * 5, y: home.y + (this.rng() - 0.5) * 2, z: home.z + (this.rng() - 0.5) * 5 };
+      if (cd.ground) pos.y = groundHeight(this.world, pos.x, pos.z, this.scratchBoulders) + cd.adultLength * s * 0.13;
+      const a = this.spawn(c, 'swarm', pos, s);
+      a.brain = makeBrain('swarm', home, this.rng, { schoolId });
+    }
+  }
+
   private spawnSchool(c: CreatureId, s: number, count: number, i: number) {
     const def = creature(c);
     let home: Vec3;
@@ -211,7 +234,7 @@ export class Game implements AiWorld {
 
     for (const a of this.actors) {
       if (a.state === 'dead') { this.updateCorpse(a, dt); continue; }
-      const input = a.controller === 'player' ? (inputs.get(a.player) ?? emptyInput()) : think(this, a, dt);
+      const input = a.controller === 'player' ? (inputs.get(a.player) ?? emptyInput()) : a.brain ? think(this, a, dt) : emptyInput();
       this.updateActor(a, input, dt);
     }
     this.resolveActorOverlap();
@@ -277,6 +300,9 @@ export class Game implements AiWorld {
     const justLight = input.light && !a.prev.light, justHeavy = input.heavy && !a.prev.heavy, justAbility = input.ability && !a.prev.ability;
     const justDodge = input.dodge && !a.prev.dodge, justGuard = input.guard && !a.prev.guard, justLock = input.lock && !a.prev.lock;
     const justSense = input.sense && !a.prev.sense, justRise = input.rise && !a.prev.rise;
+    const justDash = input.dash && !a.prev.dash;
+    if (input.dash) a.dashHoldT += dt; else { a.dashHoldT = 0; a.dashUsed = false; }
+    a.pounceCd = Math.max(0, a.pounceCd - dt);
 
     // Timers
     a.stateT += dt;
@@ -298,9 +324,12 @@ export class Game implements AiWorld {
 
     // Stamina
     const speed = len3(a.vel);
-    const bursting = input.burst > 0.1 && a.stamina > 0 && a.state !== 'guard' && a.exhausted === 0;
+    // LB held is a sprint once the tap window has passed (a tap with a stick direction is a sidestep instead).
+    const sprint = input.dash && (a.dashHoldT > 0.22 || a.dashUsed === false && Math.hypot(input.mx, input.my) < 0.3 && !input.worldMove);
+    const burstIn = Math.max(input.burst, sprint ? 1 : 0);
+    const bursting = burstIn > 0.1 && a.stamina > 0 && a.state !== 'guard' && a.exhausted === 0;
     const freeBurst = a.burstT > 0;
-    if (bursting && !freeBurst) a.stamina -= 22 * input.burst * dt;
+    if (bursting && !freeBurst) a.stamina -= 22 * burstIn * dt;
     else if (a.state === 'guard') a.stamina -= 3 * dt;
     else a.stamina = Math.min(a.staminaMax, a.stamina + (speed < 0.4 ? 24 : 14) * dt * (a.state === 'free' ? 1 : 0.5));
     if (a.stamina <= 0) { a.stamina = 0; if (a.exhausted === 0) a.exhausted = 1.6; }
@@ -332,7 +361,7 @@ export class Game implements AiWorld {
     if (def.ground) dir.y = 0;
     const controllable = a.state === 'free' || a.state === 'guard' || (a.state === 'ability' && (def.ability === 'shellUp' || def.ability === 'bristleFlare' || def.ability === 'ambushSurge'));
     const slowMult = a.state === 'guard' ? 0.45 : (a.abilityActive && def.ability === 'shellUp') ? 0.35 : a.exhausted > 0 ? 0.7 : 1;
-    const burstMult = controllable && (bursting || freeBurst) ? (1 + (def.burst - 1) * (freeBurst ? 1.25 : input.burst) * (a.controller === 'swarm' ? 0.55 : giantish ? 0.35 : 1)) : 1;
+    const burstMult = controllable && (bursting || freeBurst) ? (1 + (def.burst - 1) * (freeBurst ? 1.25 : burstIn) * (a.controller === 'swarm' ? 0.55 : giantish ? 0.35 : 1)) : 1;
     const cruise = def.speed * sf * slowMult * (a.controller === 'swarm' ? 0.62 : giantish ? 0.55 : 1);
     const cur = sampleCurrent(v3(), a.pos.x, a.pos.y, a.pos.z, this.time);
     const curK = def.ground ? 0.08 : 0.55;
@@ -350,6 +379,7 @@ export class Game implements AiWorld {
     if (mag === 0 && controllable) rate = def.glide; // glide out
     if (a.state === 'stagger' || a.state === 'grabbed') { desired = v3(); rate = 2.5; }
     if (a.state === 'dodge' || a.state === 'attack' || a.state === 'eating' || a.state === 'moult' || a.state === 'grabbing' || a.state === 'parry') rate = a.state === 'dodge' ? 1.8 : 3;
+    if (a.state === 'pounce') rate = 0;
     if (a.state === 'ability' && (def.ability === 'burrow' || def.ability === 'anchor')) { desired = v3(); rate = 8; }
     if (a.hitStop > 0) rate = 0;
     a.vel.x = damp(a.vel.x, desired.x, rate, dt);
@@ -425,8 +455,14 @@ export class Game implements AiWorld {
 
     // --- Actions ---
     if (a.state === 'free' || a.state === 'guard') {
-      // Lock-on
-      if (justLock) {
+      // Aim (LT held): track the best target while held; release lets go. Bots still toggle lock.
+      if (a.controller === 'player') {
+        const justAim = input.aim && !a.prev.aim;
+        if (justAim || (input.aim && a.lockTarget < 0 && Math.floor(this.time * 4) !== Math.floor((this.time - dt) * 4))) a.lockTarget = this.pickLockTarget(a, 0, -1, true)?.id ?? -1;
+        if (!input.aim && a.lockTarget >= 0) a.lockTarget = -1;
+        a.aiming = input.aim;
+        if (input.aim) this.flag(a, 'lock');
+      } else if (justLock) {
         if (a.lockTarget >= 0) a.lockTarget = -1;
         else a.lockTarget = this.pickLockTarget(a)?.id ?? -1;
       }
@@ -438,11 +474,15 @@ export class Game implements AiWorld {
       if (justSense && a.senseCd === 0) { a.senseT = 2.2; a.senseCd = def.ability === 'burrow' ? 3 : 6; this.flag(a, 'sense'); this.events.push({ kind: 'sense', pos: { ...a.pos }, actor: a.id, player: a.player }); }
       // Ability
       if (justAbility && a.abilityCd === 0 && a.tier >= 2 || (justAbility && a.abilityCd === 0 && a.controller !== 'player')) this.startAbility(a, def);
-      // Dodge
-      else if (justDodge && a.stamina >= 10 && a.exhausted === 0) this.startDodge(a, def, dir, mag, L, sf);
+      // Dash sidestep: LB pressed together with a stick direction
+      else if (justDash && mag > 0.3 && a.stamina >= 10 && a.exhausted === 0) { a.dashUsed = true; this.startDodge(a, def, dir, mag, L, sf); }
+      // Pounce: X while aiming at something in range
+      else if (justHeavy && a.aiming && a.aimInRange && locked && isAlive(locked) && a.pounceCd === 0 && a.stamina >= 12 && a.exhausted === 0) this.startPounce(a, locked, L, sf);
+      // Dodge (B for creatures that cannot guard, bots)
+      else if (justDodge && a.controller !== 'player' && a.stamina >= 10 && a.exhausted === 0) this.startDodge(a, def, dir, mag, L, sf);
       // Guard / parry
       else if (justGuard && def.canGuard && a.stamina > 5) { a.state = 'parry'; a.stateT = 0; a.stateDur = 0.15; this.flag(a, 'guard'); }
-      else if (justGuard && !def.canGuard && a.stamina >= 10) this.startDodge(a, def, dir, mag, L, sf);
+      else if (justGuard && !def.canGuard && a.stamina >= 10 && a.exhausted === 0) this.startDodge(a, def, dir, mag, L, sf);
       else if (input.guard && def.canGuard && a.state === 'free' && a.stamina > 0 && a.stateT > 0.05) { a.state = 'guard'; a.stateT = 0; }
       else if (!input.guard && a.state === 'guard') { a.state = 'free'; a.stateT = 0; }
       // Attacks (also start eating on corpses)
@@ -466,12 +506,29 @@ export class Game implements AiWorld {
       const total = m.windup + m.active + m.recovery;
       if (a.stateT >= m.windup && a.stateT < m.windup + m.active) this.attackHits(a, m, L);
       // cancel recovery into dodge, or chain lights
-      if (a.stateT > m.windup + m.active + m.recovery * 0.45 && justDodge && a.stamina >= 10) this.startDodge(a, def, dir, mag, L, sf);
+      if (a.stateT > m.windup + m.active + m.recovery * 0.45 && (justDodge || (justDash && mag > 0.3)) && a.stamina >= 10) { a.dashUsed = true; this.startDodge(a, def, dir, mag, L, sf); }
       else if (a.stateT >= total) { a.state = 'free'; a.stateT = 0; a.move = undefined; }
       else if (a.moveKind === 'light' && justLight && a.stateT > m.windup + m.active + m.recovery * 0.35 && a.stamina >= 6) {
         const nm = a.combo === 2 ? { ...def.light, damage: def.light.damage * 1.6, poise: def.light.poise * 1.8, knockback: def.light.knockback * 2, recovery: def.light.recovery + 0.12 } : def.light;
         a.stateT = 0; a.move = nm; a.hitDone.clear(); a.stamina -= staminaCost(a, nm.stamina); a.combo = (a.combo + 1) % 3; a.comboT = 0.9;
       }
+    } else if (a.state === 'pounce') {
+      const t = a.lockTarget >= 0 ? this.idMap.get(a.lockTarget) : undefined;
+      if (t && isAlive(t) && a.stateT < a.stateDur) {
+        // home in hard on the target; impact when the mouth reaches it
+        const to = sub(t.pos, a.pos); const d = len3(to);
+        const speed = Math.max(def.speed * sf * 3.2, 9 * Math.sqrt(sf));
+        const dirTo = norm(to);
+        a.vel = vscale(dirTo, speed);
+        a.yaw = yawOf(dirTo); a.pitch = def.ground ? a.pitch : clamp(-Math.asin(clamp(dirTo.y, -1, 1)) * 0.8, -0.9, 0.9);
+        if (d < L * 0.45 + bodyRadius(t) * 1.2) {
+          const band = bandOf(a, t);
+          if (band === 'snack') this.consume(a, t);
+          else { const m = { ...def.heavy, name: 'Pounce', damage: def.heavy.damage * 1.25, poise: def.heavy.poise * 1.2, knockback: def.heavy.knockback * 0.8, lunge: 0 }; applyHit(this.hitCtx, a, t, m, 1.2); }
+          this.events.push({ kind: 'pounce', pos: { ...a.pos }, actor: a.id, other: t.id, player: a.player, strength: L });
+          a.state = 'free'; a.stateT = 0; a.vel = vscale(a.vel, 0.25); a.iframes = 0.1;
+        }
+      } else { a.state = 'free'; a.stateT = 0; a.vel = vscale(a.vel, 0.3); }
     } else if (a.state === 'dodge') {
       if (a.stateT >= a.stateDur) { a.state = 'free'; a.stateT = 0; }
     } else if (a.state === 'stagger') {
@@ -539,6 +596,9 @@ export class Game implements AiWorld {
       if (def.id === 'wiwaxia' && a.stillness > 0.5) { const m = microbialAt(a.pos.x, a.pos.z); if (m > 0.2) this.gainNutrition(a, undefined, dt * 1.6 * m); }
     }
 
+    // Aim range: the crosshair fills when a pounce would connect
+    a.aimInRange = false;
+    if (a.lockTarget >= 0) { const t = this.idMap.get(a.lockTarget); if (t && isAlive(t)) a.aimInRange = dist(a.pos, t.pos) < this.pounceRange(a); }
     // Lock target validity
     if (a.lockTarget >= 0) {
       const t = this.idMap.get(a.lockTarget);
@@ -548,7 +608,7 @@ export class Game implements AiWorld {
     if (a.controller === 'player' || a.controller === 'bot') this.updateHunted(a);
 
     if (bursting && !a.prev.burst && a.controller === 'player') this.events.push({ kind: 'burst', pos: { ...a.pos }, actor: a.id, player: a.player });
-    a.prev = { light: input.light, heavy: input.heavy, ability: input.ability, dodge: input.dodge, guard: input.guard, lock: input.lock, sense: input.sense, rise: input.rise, burst: bursting };
+    a.prev = { light: input.light, heavy: input.heavy, ability: input.ability, dodge: input.dodge, guard: input.guard, lock: input.lock, sense: input.sense, rise: input.rise, burst: bursting, dash: input.dash, aim: input.aim };
     // onboarding flags
     if (a.controller === 'player') {
       if (mag > 0.2) this.flag(a, 'moved');
@@ -570,6 +630,17 @@ export class Game implements AiWorld {
     if (retreat) this.silt.push({ pos: { ...a.pos }, radius: 2.2 + L * 0.7, t: 4 });
     if (a.state === 'dodge') this.events.push({ kind: retreat ? 'silt' : 'dodge', pos: { ...a.pos }, actor: a.id, player: a.player, strength: L });
     this.flag(a, 'dodge');
+  }
+
+  pounceRange(a: Actor) { return lengthOf(a) * 3.2 + 2.5; }
+
+  private startPounce(a: Actor, target: Actor, L: number, sf: number) {
+    a.state = 'pounce'; a.stateT = 0; a.stateDur = clamp(dist(a.pos, target.pos) / Math.max(6, L * 3), 0.25, 0.9) + 0.15;
+    a.stamina -= 12; a.pounceCd = 1.4; a.combo = 0;
+    a.move = { ...creature(a.creature).heavy, name: 'Pounce' }; a.moveKind = 'heavy';
+    this.events.push({ kind: 'dodge', pos: { ...a.pos }, actor: a.id, player: a.player, strength: L });
+    this.flag(a, 'heavy');
+    void sf;
   }
 
   private startAbility(a: Actor, def: ReturnType<typeof creature>) {
@@ -741,18 +812,21 @@ export class Game implements AiWorld {
     }
   }
 
-  private pickLockTarget(a: Actor, cycle = 0, currentId = -1): Actor | undefined {
+  private pickLockTarget(a: Actor, cycle = 0, currentId = -1, aim = false): Actor | undefined {
     const L = lengthOf(a);
     const h = heading(a.yaw);
     const cands: { a: Actor; score: number }[] = [];
-    for (const o of this.nearby(a.pos, 14 + L * 7)) {
-      if (o.id === a.id || !isAlive(o) || isHidden(o) || o.controller === 'swarm') continue;
+    for (const o of this.nearby(a.pos, aim ? 10 + L * 6 : 14 + L * 7)) {
+      if (o.id === a.id || !isAlive(o) || isHidden(o)) continue;
       if (this.mode === 'rise' && o.controller === 'player') continue;
       const to = sub(o.pos, a.pos); const d = len3(to);
       const facing = dot(norm(to), h);
       const band = bandOf(a, o);
-      if (band === 'snack') continue;
-      const score = d * (1.6 - facing) * (band === 'rival' ? 0.6 : 1);
+      if (!aim && (band === 'snack' || o.controller === 'swarm')) continue;
+      if (aim && (band === 'giant' || band === 'threat')) continue;
+      // Aiming is for hunting: prey and snacks in front of you come first, rivals after.
+      const bandW = aim ? (band === 'prey' ? 0.55 : band === 'snack' ? 0.8 : 1.1) : (band === 'rival' ? 0.6 : 1);
+      const score = d * (1.6 - facing) * bandW;
       cands.push({ a: o, score });
     }
     if (!cands.length) return undefined;
@@ -828,7 +902,15 @@ export class Game implements AiWorld {
     }
     const wantAmbient = 26 + this.maxPlayerTier() * 3;
     if (ambient < wantAmbient) this.spawnAmbient(false);
-    if (swarm < 160) {
+    // Every player, at every size, should have plenty of things smaller than them within reach.
+    for (const p of this.players) {
+      if (!isAlive(p)) continue;
+      const L = lengthOf(p);
+      let small = 0;
+      for (const o of this.nearby(p.pos, 45 + L * 4)) { if (o.id !== p.id && isAlive(o)) { const b = bandOf(p, o); if (b === 'snack' || b === 'prey') small++; } }
+      if (small < 14) this.spawnPreyFor(p);
+    }
+    if (swarm < 200) {
       const i = Math.floor(this.rng() * SNACK_SCHOOLS.length);
       const s = SNACK_SCHOOLS[i];
       this.spawnSchool(s.creature, s.scale, s.count, i + Math.floor(this.time));
@@ -888,15 +970,15 @@ export class Game implements AiWorld {
     if (p.hunted >= 0.5) return p.cover > 0.3 ? (len3(p.vel) < 0.3 ? 'Hold still. It is losing you.' : 'You are in cover. Now hold still.') : 'It is coming for you. Get under the sponges, then hold still.';
     if (p.hunted > 0.2) return p.cover > 0.3 ? 'It is looking your way. Stay in cover and freeze.' : 'Something big is looking your way. Stop moving or slip into cover.';
     if (!f.has('moved')) return 'Push the left stick to swim.';
-    if (!f.has('burst')) return 'Hold RT to burst. Catch the school.';
+    if (!f.has('burst')) return 'Hold RT or LB to sprint. Catch the school.';
     if (!f.has('ate')) return 'Swim through the small fry to eat them.';
     if (!f.has('sense') && this.time > 20) return 'Tap D-pad up: sense pulse shows what is near.';
     if (p.tier === 0 && !f.has('tier')) return 'Eat. Grow. The ring fills toward your next moult.';
     if (p.tier >= 1 && !f.has('light')) return 'RB bites. Hunt something your own size.';
-    if (p.tier >= 1 && !f.has('dodge')) return 'B dodges through an attack.';
-    if (p.tier >= 1 && !f.has('guard') && creature(p.creature).canGuard) return 'Hold LB to guard. Tap it as a hit lands to parry.';
+    if (p.tier >= 1 && !f.has('dodge')) return 'LB with a stick direction sidesteps. Hold LB to sprint.';
+    if (p.tier >= 1 && !f.has('guard') && creature(p.creature).canGuard) return 'Hold B to guard. Tap it as a hit lands to parry.';
     if (p.tier >= 2 && !f.has('ability')) return `Y: ${creature(p.creature).abilityName}. Your signature move is unlocked.`;
-    if (p.tier >= 2 && !f.has('lock')) { if (p.lockTarget >= 0) f.add('lock'); else return 'LT locks on. Circle your rival with the stick.'; }
+    if (!f.has('lock') && this.time > 30) return 'Hold LT to aim at prey. When the crosshair fills, X pounces.';
     return undefined;
   }
 }

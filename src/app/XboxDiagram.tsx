@@ -5,7 +5,7 @@ export function XboxDiagram() {
   const line = (x1: number, y1: number, x2: number, y2: number) => <line x1={x1} y1={y1} x2={x2} y2={y2} className="pad-line" />;
   return (
     <svg className="xbox-diagram" viewBox="0 0 860 400" role="img" aria-labelledby="xbox-title">
-      <title id="xbox-title">Xbox controller layout: left stick swims, right stick looks, RT bursts, LT locks on, RB bites, X heavy, Y ability, B dodges, LB guards, A rises, D-pad up senses, Menu pauses.</title>
+      <title id="xbox-title">Xbox controller layout: left stick swims, right stick looks and click-plus-up-or-down zooms, RT bursts, LB dashes or sprints, LT aims, RB bites, X heavy or pounce, Y ability, B guards, A rises, D-pad up senses, Menu pauses.</title>
       <defs>
         <linearGradient id="pad-shell" x2="0" y2="1"><stop stopColor="#2f4d58" /><stop offset="1" stopColor="#13262f" /></linearGradient>
       </defs>
@@ -24,8 +24,9 @@ export function XboxDiagram() {
       <path d="M362 236 h16 v-16 h16 v16 h16 v16 h-16 v16 h-16 v-16 h-16z" fill="#0d1c22" stroke="#7ea4ae" strokeWidth="3" />
       <circle cx="430" cy="178" r="9" fill="#7ea4ae" />
       <circle cx="430" cy="215" r="14" fill="#17313a" stroke="#7ea4ae" strokeWidth="3" />
-      {line(340, 62, 200, 40)}{label(194, 44, 'LT · Lock on', 'end')}
-      {line(340, 92, 200, 90)}{label(194, 94, 'LB · Guard (tap = parry)', 'end')}
+      {line(340, 62, 200, 40)}{label(194, 44, 'LT · Aim (hold)', 'end')}
+      {line(340, 92, 200, 90)}{label(194, 94, 'LB · Dash · +stick = sidestep', 'end')}
+      {label(194, 114, 'hold · Sprint', 'end')}
       {line(320, 180, 200, 170)}{label(194, 174, 'Left stick · Swim', 'end')}
       {label(194, 194, 'click · Sink', 'end')}
       {line(378, 236, 200, 250)}{label(194, 254, 'D-pad ▲ · Sense pulse', 'end')}
@@ -33,12 +34,12 @@ export function XboxDiagram() {
       {line(520, 62, 660, 40)}{label(666, 44, 'RT · Burst (hold)')}
       {line(520, 92, 660, 90)}{label(666, 94, 'RB · Bite (chain ×3)')}
       {line(514, 138, 660, 130)}{label(666, 134, 'Y · Signature ability')}
-      {line(556, 180, 660, 170)}{label(666, 174, 'B · Dodge (×2 = retreat)')}
+      {line(556, 180, 660, 170)}{label(666, 174, 'B · Guard (tap = parry)')}
       {line(472, 180, 472, 120)}{line(472, 120, 660, 108)}
-      {label(666, 210, 'X · Heavy (hold = charge)')}{line(514, 222, 660, 206)}
+      {label(666, 210, 'X · Heavy · Pounce when aiming')}{line(514, 222, 660, 206)}
       {label(666, 250, 'A · Rise / hop · Join')}{line(526, 218, 660, 246)}
       {line(510, 236, 660, 290)}{label(666, 294, 'Right stick · Camera')}
-      {label(666, 314, 'flick · Switch target')}
+      {label(666, 314, 'click + up/down · Zoom')}
       {line(430, 215, 430, 372)}{label(430, 390, 'Menu · Pause / start', 'middle')}
     </svg>
   );

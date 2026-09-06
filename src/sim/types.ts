@@ -16,7 +16,7 @@ export type Controller = 'player' | 'bot' | 'ambient' | 'giant' | 'swarm' | 'sha
 
 export type ActorState =
   | 'free' | 'attack' | 'dodge' | 'guard' | 'parry' | 'stagger'
-  | 'grabbed' | 'grabbing' | 'eating' | 'ability' | 'moult' | 'dead';
+  | 'grabbed' | 'grabbing' | 'eating' | 'ability' | 'moult' | 'dead' | 'pounce';
 
 export interface InputFrame {
   /** Left stick, -1..1, y is forward. */
@@ -29,12 +29,17 @@ export interface InputFrame {
   rise: boolean; sink: boolean;
   light: boolean; heavy: boolean; ability: boolean; dodge: boolean; guard: boolean;
   lock: boolean; sense: boolean;
+  /** LB: tap with a stick direction = sidestep dash, hold = sprint. */
+  dash: boolean;
+  /** LT held: aim at the best prey; X while aiming and in range pounces. */
+  aim: boolean;
   lookX: number; lookY: number;
 }
 
 export const emptyInput = (): InputFrame => ({
   mx: 0, my: 0, camYaw: 0, camPitch: 0, burst: 0, rise: false, sink: false,
   light: false, heavy: false, ability: false, dodge: false, guard: false, lock: false, sense: false,
+  dash: false, aim: false,
   lookX: 0, lookY: 0,
 });
 
@@ -90,9 +95,10 @@ export interface Actor {
   noise: number; cover: number; stillness: number;
   dodgeDir: Vec3; dodgeTapT: number;
   hopVel: number; grounded: boolean;
-  prev: { light: boolean; heavy: boolean; ability: boolean; dodge: boolean; guard: boolean; lock: boolean; sense: boolean; rise: boolean; burst: boolean };
+  prev: { light: boolean; heavy: boolean; ability: boolean; dodge: boolean; guard: boolean; lock: boolean; sense: boolean; rise: boolean; burst: boolean; dash: boolean; aim: boolean };
   brain?: BrainState;
   respawnT: number; hatching: boolean;
+  dashHoldT: number; dashUsed: boolean; pounceCd: number; aimInRange: boolean; aiming: boolean;
   kills: number; eats: number; escapes: number;
   hunted: number;          // 0..1 highest detection score against this actor (HUD)
   hunterId: number;
@@ -113,6 +119,6 @@ export type Mode = 'rise' | 'frenzy' | 'hunted' | 'reef';
 export interface Prompt { text: string; t: number; }
 
 export interface WorldEvent {
-  kind: 'hit' | 'kill' | 'eat' | 'tierUp' | 'parry' | 'guardBreak' | 'burst' | 'escape' | 'noticed' | 'hunted' | 'dodge' | 'ability' | 'grab' | 'moult' | 'death' | 'silt' | 'stagger' | 'sense';
+  kind: 'hit' | 'kill' | 'eat' | 'tierUp' | 'parry' | 'guardBreak' | 'burst' | 'escape' | 'noticed' | 'hunted' | 'dodge' | 'ability' | 'grab' | 'moult' | 'death' | 'silt' | 'stagger' | 'sense' | 'pounce';
   pos: Vec3; actor: number; other?: number; strength?: number; player?: number;
 }
