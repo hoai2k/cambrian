@@ -96,7 +96,7 @@ export function AudioBench() {
           <a className="back" href="../">← Cambrian Explosion</a>
           <h1>Audio workbench</h1>
           <p className="sub">
-            Every sound in the game, played through the real audio module. Hover a sound to read where it fires from.
+            Every sound in the game, played through the real audio module. Pause over the space around a sound’s controls to read where it fires from.
           </p>
         </div>
         {!ready
@@ -208,7 +208,7 @@ function FileChip({ file, info, disabled, onPlay }: { file: string; info: Record
   const missing = i && !i.ok;
   return (
     <button className={`chip${missing ? ' missing' : ''}`} disabled={disabled} onClick={onPlay}
-      title={`Play ${file}.mp3 on its own`}>
+      aria-label={`Play ${file}.mp3 on its own`}>
       {file}.mp3{missing ? ' — missing' : i?.kb ? ` · ${i.kb} KB` : ''}
     </button>
   );

@@ -48,8 +48,10 @@ for (let i = 0; i < 20 && !handover; i++) {
 }
 console.log('music:', opening, '->', handover ?? 'NO HANDOVER');
 
-await page.hover('.sounds .row:nth-child(3) .name');
-await page.waitForTimeout(400);
+const hoverRow = page.locator('.sounds .row').nth(2);
+const hoverBox = await hoverRow.boundingBox();
+await hoverRow.hover({ position: { x: hoverBox.width - 4, y: hoverBox.height / 2 } });
+await page.waitForTimeout(800);
 await page.screenshot({ path: `${S}/workbench-audio.png`, fullPage: false, timeout: 120000 });
 
 console.log('missing files:', await page.$$eval('.chip.missing', (n) => n.map((x) => x.textContent)));
