@@ -7,7 +7,7 @@ export function TitleScreen({ onStart, loaded, padCount }: { onStart: () => void
       <div className="title-inner">
         <p className="title-tag">Eat. Grow. Fight. Run. <em>508 million years ago, everything was hungry.</em></p>
         <p className={`press-start ${loaded ? '' : 'loading'}`}>{loaded ? 'PRESS START' : 'WAKING THE REEF…'}</p>
-        <p className="title-hint">{padCount > 0 ? `${padCount} controller${padCount > 1 ? 's' : ''} connected · any button` : 'Connect an Xbox controller, press any key, or click'}</p>
+        <p className="title-hint">{padCount > 0 ? `${padCount} controller${padCount > 1 ? 's' : ''} connected · any button · others join on the next screen` : 'Connect an Xbox controller, press any key, or click'}</p>
       </div>
     </section>
   );

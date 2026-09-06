@@ -112,7 +112,10 @@ h3 { font-size: 13px; letter-spacing: .12em; color: var(--ember); margin: 14px 0
 .hud { position: absolute; overflow: hidden; font-size: 14px; }
 .hud-quarter { font-size: 11px; }
 .hud-half { font-size: 12.5px; }
-.hunt-vignette { position: absolute; inset: 0; background: radial-gradient(ellipse at center, transparent 48%, rgba(255, 40, 60, .5) 100%); animation: heartbeat 1s ease-in-out infinite; }
+/* Health owns the outer opacity; only the inner layer pulses, so animation cannot reveal it. */
+.health-vignette { position: absolute; inset: 0; pointer-events: none; }
+.health-vignette::before { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse at center, transparent 48%, rgba(255, 40, 60, .5) 100%); animation: heartbeat 1s ease-in-out infinite; }
+@media (prefers-reduced-motion: reduce) { .health-vignette::before { animation: none; } }
 .hud-top { position: absolute; left: 1.4em; top: 1.2em; display: flex; gap: .8em; align-items: center; }
 .tier-ring { position: relative; width: 4.8em; height: 4.8em; }
 .tier-ring svg { width: 100%; height: 100%; }
@@ -352,6 +355,11 @@ input[type='checkbox'] { width: 20px; height: 20px; accent-color: var(--ember); 
 @media (max-width: 700px) { .mode-chip { min-height: 68px; padding: 7px 10px; } .header-logo { width: 140px; } }
 .title > picture { display: contents; }
 .title-art { opacity: 1; filter: brightness(.6); }
+
+/* A controller the game can see but nobody has joined with, and a player whose pad has gone. */
+.join-card.waiting { border-color: var(--ember); box-shadow: 0 0 0 1px rgba(255, 179, 107, .35); }
+.join-card small.dim { color: var(--dim); }
+.crew-card .device .gone { font-style: normal; color: var(--coral); }
 
 /* Illustrated natural-history branding, with enough room for the complete supplied artwork. */
 .title-illustrated, .loading-illustrated { background: #090b09; }
