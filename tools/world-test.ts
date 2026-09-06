@@ -59,10 +59,12 @@ const run = (g: Game, f: InputFrame, steps: number) => { const m = new Map([[0, 
   const startChunks = g.world.chunks.size;
   const inRange = [...g.world.chunks.values()].every((ch) => Math.hypot(ch.x - p.pos.x, ch.z - p.pos.z) < SIM_RADIUS + CHUNK);
   check('the match starts with the nursery region loaded', startChunks >= 20 && inRange, `${startChunks} chunks, all within ${SIM_RADIUS + CHUNK}`);
-  // sprint straight out to sea for a long way
-  p.spawnProtect = 0;
+  // Sprint straight out to sea for a long way. Held invulnerable: this is a test of streaming, and
+  // a player eaten by a giant halfway would respawn at the nursery and measure nothing.
   const z0 = p.pos.z;
-  run(g, { ...emptyInput(), my: 1, burst: 1, camYaw: Math.PI }, 60 * 90);
+  const forward = new Map([[0, { ...emptyInput(), my: 1, burst: 1, camYaw: Math.PI }]]);
+  for (let i = 0; i < 60 * 90; i++) { p.spawnProtect = 1; g.step(1 / 60, forward); g.events.length = 0; }
+  p.spawnProtect = 0;
   const travelled = z0 - p.pos.z;
   check('the player can swim far beyond the old arena', travelled > 300, `${travelled.toFixed(0)} units in 90 s`);
   const nearNow = [...g.world.chunks.values()].filter((ch) => Math.hypot(ch.x - p.pos.x, ch.z - p.pos.z) < SIM_RADIUS).length;

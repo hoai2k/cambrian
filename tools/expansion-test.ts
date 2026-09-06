@@ -29,7 +29,7 @@ for (const d of EXPANSION_CREATURES) {
   if (d.diet === 'grazer' || d.diet === 'deposit') assert(grazeRate(a, d) > 0);
 }
 // Armor piercing matters against armor, and no more than one corral hit per activation.
-const hit = (pierce: number) => { const a = actor(1, 'sidneyia'), v = actor(2, 'olenoides', 1); a.yaw = Math.PI; v.yaw = Math.PI; const before = v.hp; applyHit({events: [], byId: () => undefined, time: 0}, a, v, {...creature('sidneyia').heavy, armorPierce: pierce}, 0); return before - v.hp; };
+const hit = (pierce: number) => { const a = actor(1, 'sidneyia'), v = actor(2, 'olenoides', 1); a.yaw = Math.PI; v.yaw = Math.PI; const before = v.hp; applyHit({events: [], byId: () => undefined, time: 0, rng: Math.random}, a, v, {...creature('sidneyia').heavy, armorPierce: pierce}, 0); return before - v.hp; };
 assert(hit(.75) > hit(0));
 {
   const a = actor(1, 'burgessomedusa'), v = actor(2, 'olenoides', 1); a.state = 'ability'; a.abilityActive = true; a.yaw = 0;
