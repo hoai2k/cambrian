@@ -98,11 +98,16 @@ button.chip:hover:not(:disabled) { background: rgba(255, 179, 107, .2); color: v
   box-shadow: 0 16px 40px rgba(0, 0, 0, .55);
   color: var(--mist); font-size: 13px; line-height: 1.5;
   opacity: 0; visibility: hidden; transform: translateY(-4px);
-  transition: opacity .12s ease, transform .12s ease, visibility .12s;
+  transition: opacity .12s ease, transform .12s ease, visibility 0s;
   pointer-events: none;
 }
-.row:hover .usage, .row:focus-within .usage { opacity: 1; visibility: visible; transform: translateY(0); }
+/* Dwell on the card's free space, never over its playback or filename controls.
+   Leaving that space hides immediately and restarts the delay on the next hover. */
+.row:hover:not(:has(.name:hover, .chip:hover)) .usage {
+  opacity: 1; visibility: visible; transform: translateY(0); transition-delay: .6s;
+}
 
 @media (prefers-reduced-motion: reduce) {
-  .row, .usage, .name, .chip, .primary { transition: none; }
+  .row, .name, .chip, .primary { transition: none; }
+  .usage { transition-property: visibility; transition-duration: 0s; }
 }
