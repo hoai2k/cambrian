@@ -1,13 +1,20 @@
 """Render source GLBs into transparent 1600x1200 roster portraits.
-Run decode-models.mjs first, then Blender -b --python this-file.
+Run decode-models.mjs first, then Blender -b --python this-file -- [IDs...].
+No IDs preserves the original eight. CAMBRIAN_ART_MODELS must match decoding.
 """
-import bpy, math
+import bpy, math, os, sys, json
 from pathlib import Path
 from mathutils import Vector
 ROOT=Path(__file__).resolve().parents[2]
-for id in ['waptia','anomalocaris','canadia','hallucigenia','marrella','olenoides','opabinia','wiwaxia']:
+ORIGINALS=['waptia','anomalocaris','canadia','hallucigenia','marrella','olenoides','opabinia','wiwaxia']
+EXPANSION=['pikaia','nectocaris','burgessomedusa','odaraia','ottoia','cambroraster','sidneyia','leanchoilia','isoxys','odontogriphus','ctenorhabdotus','vetulicola','tamisiocaris']
+requested=sys.argv[sys.argv.index('--')+1:] if '--' in sys.argv else []
+ids=list(dict.fromkeys(requested or ORIGINALS))
+assert all(id in ORIGINALS+EXPANSION for id in ids), 'Unknown creature ID'
+INPUT=Path(os.environ.get('CAMBRIAN_ART_MODELS','/tmp/cambrian-art-models')).resolve()
+for id in ids:
  bpy.ops.wm.read_factory_settings(use_empty=True)
- bpy.ops.import_scene.gltf(filepath=f'/tmp/cambrian-art-models/{id}.glb')
+ bpy.ops.import_scene.gltf(filepath=str(INPUT/f'{id}.glb'))
  scene=bpy.context.scene
  for obj in list(scene.objects):
   if obj.name == 'Icosphere': bpy.data.objects.remove(obj,do_unlink=True)
@@ -23,6 +30,7 @@ for id in ['waptia','anomalocaris','canadia','hallucigenia','marrella','olenoide
  bpy.context.view_layer.update()
  deps=bpy.context.evaluated_depsgraph_get()
  points=[o.matrix_world@Vector(c) for o in scene.objects if o.type=='MESH' for c in o.evaluated_get(deps).bound_box]
+ assert points, f'{id}: no renderable mesh geometry'
  low=Vector(tuple(min(p[i] for p in points) for i in range(3)))
  high=Vector(tuple(max(p[i] for p in points) for i in range(3)))
  center=(low+high)/2; scale=max(high-low)
@@ -44,3 +52,8 @@ for id in ['waptia','anomalocaris','canadia','hallucigenia','marrella','olenoide
  scene.render.image_settings.file_format='PNG';scene.render.image_settings.color_mode='RGBA'
  scene.render.filepath=str(ROOT/f'public/assets/creatures/{id}.select.png')
  bpy.ops.render.render(write_still=True)
+ # Keep the posed studio scene beside decoded inputs for repeatable review.
+ if id in EXPANSION:
+  bpy.ops.wm.save_as_mainfile(filepath=str(INPUT.parent/f'{id}.portrait.blend'))
+  report={'id':id,'source':str(INPUT/f'{id}.glb'),'output':scene.render.filepath,'resolution':[1600,1200],'transparent':True,'frame':17,'action':action.name if action else None,'orthographicScale':cam.data.ortho_scale,'lighting':'existing roster soft-key / teal-fill / coral-rim'}
+  (INPUT.parent/f'{id}.portrait.json').write_text(json.dumps(report,indent=2))

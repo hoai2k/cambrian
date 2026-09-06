@@ -292,3 +292,30 @@ If time is limited, deliver in this order across all eight creatures:
   input; the engine now prefers these clip names automatically.
 - If a clip is missing, the game silently falls back to the old stand-in, so
   a wrong name looks like "nothing changed". Check the name first.
+
+
+## Expansion rigs (13 new animals)
+
+The preservation rules above continue to protect the original eight assets.
+New animals have independent anatomical rigs and the full contract documented
+in [the expansion design](redesign/03-creature-expansion.md#animation-contract).
+Their dedicated actions include defensive, feeding, stagger, death and held
+ability performances, rather than copies of one generic attack. Authoring
+manifests list each exported duration and rig statistics. Nectocaris needs Grab
+because its kit can hold prey; other new species do not.
+
+Performance direction: Pikaia's wave travels through the ribbon; Nectocaris
+fins ripple independently of paired tentacle reaches; medusa bell contraction
+leads the tentacle fringe; Ctenorhabdotus comb bands have phase offsets; Odaraia
+paddles beneath a relatively rigid tube; Ottoia compresses trunk rings and
+extends its introvert; Cambroraster's shield stays stable while the basket
+works; Sidneyia plants/steps its legs and closes gnathobases; Leanchoilia whips
+follow their great appendages; Isoxys streamlines for interception;
+Odontogriphus carries an undulating foot beneath a low mantle; Vetulicola's tail
+leads the propulsion; Tamisiocaris opens combs while maintaining flap waves.
+
+All new models also carry the [shared anchor contract](creature-anchors.md).
+Animate the actual feeding/contact bones so their sockets travel with the
+performance. Feeding-only CCD can adjust those appendages after animation;
+body/root/locomotor bones remain authored. Full and reduced files must retain
+identical anchor names, metadata and anatomical attachment sites.

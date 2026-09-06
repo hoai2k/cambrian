@@ -399,3 +399,15 @@ Rules that fall out of this:
 - **Small creatures beyond fog range are culled**, and swarm members far
   from every camera skip animation, which keeps four viewports at different
   magnifications inside budget.
+
+
+## Expanded roster update
+
+The game now includes 21 selectable mobile species. The original eight retain
+their kits, while [the 13 additions](03-creature-expansion.md) extend movement,
+feeding and combat: axial undulation, bell pulsation, comb-row propulsion,
+burrowing, low-foot grazing, shell crushing, basket capture and suspension
+feeding. This collection spans Cambrian deposits; selection labels provenance.
+The expanded design supersedes earlier eight-creature counts and a strictly
+single-locality interpretation. Filter-feeding and grazing are playable growth
+routes, including after adulthood. Every animal remains actively controllable.

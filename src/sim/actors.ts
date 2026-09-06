@@ -6,8 +6,8 @@ export const lengthOf = (a: Actor) => creature(a.creature).adultLength * a.scale
 export const massOf = (a: Actor) => a.scale ** 3;
 /** Bigger creatures move faster in absolute terms but slower in body lengths. */
 export const speedFactor = (scale: number) => Math.pow(scale, 0.45);
-export const clearanceOf = (a: Actor) => lengthOf(a) * (creature(a.creature).ground ? 0.13 : 0.2);
-export const bodyRadius = (a: Actor) => lengthOf(a) * 0.22;
+export const clearanceOf = (a: Actor) => lengthOf(a) * (creature(a.creature).clearance ?? (creature(a.creature).ground ? 0.13 : 0.2));
+export const bodyRadius = (a: Actor) => lengthOf(a) * (creature(a.creature).bodyRadius ?? .22);
 
 export function bandRatio(r: number): Band {
   if (r < 0.45) return 'snack';
@@ -61,7 +61,7 @@ export function makeActor(id: number, creatureId: CreatureId, controller: Contro
 
 export const isAlive = (a: Actor) => a.state !== 'dead' && a.state !== 'swallowed';
 export const canAct = (a: Actor) => a.state === 'free' || a.state === 'guard';
-export const isHidden = (a: Actor) => a.abilityActive && (creature(a.creature).ability === 'burrow');
+export const isHidden = (a: Actor) => a.abilityActive && a.state === 'ability' && a.seen <= 0 && (creature(a.creature).ability === 'burrow' || (creature(a.creature).ability === 'sedimentDive' && a.stateT < a.stateDur - .3));
 export const isInvulnerable = (a: Actor) =>
   a.iframes > 0 || a.spawnProtect > 0 || a.state === 'moult' ||
   (a.abilityActive && (creature(a.creature).ability === 'enroll' || creature(a.creature).ability === 'shellUp' || creature(a.creature).ability === 'burrow'));

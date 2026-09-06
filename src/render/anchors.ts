@@ -22,7 +22,12 @@ export class CreatureAnchors {
       if (data.role !== 'attack') continue;
       this.attackSockets.push(socket);
       const chain = this.resolveChain(data);
-      if (chain.length) this.articulated.push({ socket, chain });
+      // The required primary contact may alias a named left/right tip. Keep both
+      // public sockets, but spend the two-contact IK budget on distinct tips.
+      const alias = this.articulated.some(a => a.socket.parent === socket.parent &&
+        a.socket.position.distanceToSquared(socket.position) < 1e-12 &&
+        a.chain.length === chain.length && a.chain.every((bone, i) => bone === chain[i]));
+      if (chain.length && !alias) this.articulated.push({ socket, chain });
     }
     this.effector = this.sockets.get('anchor_grasp');
     this.chain = this.resolveChain(this.effector?.userData.cambrianAnchor as AnchorInfo | undefined);

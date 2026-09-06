@@ -118,13 +118,18 @@ export class Attachments {
       }
       if (grasp) {
         pv.anchors.solveGrasp(target);
-        if (carry && pv.anchors.world('anchor_grasp', this.anchorPoint)) fv.group.position.copy(this.anchorPoint).lerp(this.insidePoint, phase.swallow);
+        if (carry && pv.anchors.world('anchor_grasp', this.anchorPoint)) fv.group.position.copy(this.anchorPoint);
       } else {
-        if (carry) fv.group.position.copy(target).lerp(this.insidePoint, phase.swallow);
+        if (carry) fv.group.position.copy(target);
         // No grasp chain: the nearest articulated limbs close on the food instead.
         pv.anchors.solveAttack(carry ? fv.group.position : target, 1, 2);
       }
       if (carry) {
+        // Feeding IK can move the mouth itself (Ottoia's introvert). Read the
+        // final solved socket before swallowing so prey follows its current pose.
+        pv.anchors.world('anchor_mouth', this.mouthPoint);
+        this.insidePoint.copy(this.mouthPoint); pv.anchors.world('anchor_mouth_inside', this.insidePoint);
+        fv.group.position.lerp(this.insidePoint, phase.swallow);
         // A consumed corpse closes down to the aperture, then disappears inside it.
         const aperture = Math.min(1, pv.visibleLength * .04 / Math.max(.001, fv.visibleLength));
         fv.group.scale.multiplyScalar(THREE.MathUtils.lerp(1, aperture, phase.carry) * (1 - phase.swallow));
