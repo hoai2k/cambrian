@@ -3,7 +3,7 @@ import { bandOf, isAlive, isHidden, lengthOf } from './actors';
 import { creature } from './creatures';
 import type { Actor, BrainState, InputFrame, WorldEvent } from './types';
 import { emptyInput } from './types';
-import { biomeAt, LIGHT_WINDOW_Y, nurseryFactor, sampleHeight, SURFACE_Y, WORLD_RADIUS, type Cover, type WorldData } from './world';
+import { biomeAt, LIGHT_WINDOW_Y, nurseryFactor, sampleHeight, shoreDistance, SURFACE_Y, type Cover, type WorldData } from './world';
 
 export interface AiWorld {
   actors: Actor[];
@@ -39,8 +39,11 @@ function steerToward(a: Actor, target: Vec3, out: InputFrame, speedWanted = 1) {
 
 function pickWander(a: Actor, b: BrainState, rng: Rng, radius: number) {
   const ang = rng() * TAU, d = Math.sqrt(rng()) * radius;
-  const x = clamp(b.home.x + Math.cos(ang) * d, -WORLD_RADIUS + 14, WORLD_RADIUS - 14);
-  const z = clamp(b.home.z + Math.sin(ang) * d, -WORLD_RADIUS + 14, WORLD_RADIUS - 14);
+  const x = b.home.x + Math.cos(ang) * d;
+  let z = b.home.z + Math.sin(ang) * d;
+  // the sea has one edge: nothing wanders up the beach
+  const shore = shoreDistance(x, z);
+  if (shore < 28) z -= 28 - shore;
   const ground = sampleHeight(x, z);
   const y = creature(a.creature).ground ? ground : clamp(ground + 1.5 + rng() * (a.scale > 2 ? 12 : 6) * lengthOf(a) * 0.5, ground + 1, SURFACE_Y - 2);
   b.wanderTo = { x, y, z };

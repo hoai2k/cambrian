@@ -109,6 +109,9 @@ export interface Actor {
   seen: number;            // seconds of being visible to a hunter
   bubbles: number;
   spawnProtect: number;
+  /** Where this creature last hatched: the nursery it teleports home to. */
+  home: Vec3;
+  teleportCd: number;
 }
 
 export interface Corpse { id: number; }
@@ -122,6 +125,6 @@ export type Mode = 'rise' | 'frenzy' | 'hunted' | 'reef';
 export interface Prompt { text: string; t: number; }
 
 export interface WorldEvent {
-  kind: 'hit' | 'kill' | 'eat' | 'tierUp' | 'parry' | 'guardBreak' | 'burst' | 'escape' | 'noticed' | 'hunted' | 'dodge' | 'ability' | 'grab' | 'moult' | 'death' | 'silt' | 'stagger' | 'sense' | 'pounce' | 'swallow' | 'routed' | 'disintegrate';
+  kind: 'hit' | 'kill' | 'eat' | 'tierUp' | 'parry' | 'guardBreak' | 'burst' | 'escape' | 'noticed' | 'hunted' | 'dodge' | 'ability' | 'grab' | 'moult' | 'death' | 'silt' | 'stagger' | 'sense' | 'pounce' | 'swallow' | 'routed' | 'disintegrate' | 'teleport';
   pos: Vec3; actor: number; other?: number; strength?: number; player?: number;
 }

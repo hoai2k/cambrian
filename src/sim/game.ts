@@ -6,8 +6,8 @@ import { applyHit, kill, startSwallow, type HitContext } from './combat';
 import { creature, CREATURE_IDS, type CreatureId, type MoveDef } from './creatures';
 import { resolveFlora, stepFlora } from './flora';
 import { SpatialHash } from './spatial';
-import { emptyInput, TIER_NEED, TIER_SCALE, type Actor, type InputFrame, type Mode, type PlayerSetup, type Prompt, type SiltCloud, type Tier, type WorldEvent } from './types';
-import { biomeAt, channelDistance, coverAt, generateWorld, groundHeight, LIGHT_WINDOW_Y, microbialAt, NURSERIES, nurseryFactor, resolveStatic, sampleCurrent, sampleHeight, SURFACE_Y, WORLD_RADIUS, type Boulder, type Cover, type Flora, type WorldData } from './world';
+import { emptyInput, TIER_NAMES, TIER_NEED, TIER_SCALE, type Actor, type InputFrame, type Mode, type PlayerSetup, type Prompt, type SiltCloud, type Tier, type WorldEvent } from './types';
+import { biomeAt, biomeWeights, coverAt, groundHeight, LIGHT_WINDOW_Y, microbialAt, nearestNursery, nurseryAt, nurseryFactor, resolveStatic, sampleCurrent, sampleHeight, shoreDistance, shoreZ, SURFACE_Y, World, type Biome, type Boulder, type Cover, type Flora, type WorldData } from './world';
 
 export interface PlayerProgress {
   prompts: Prompt[];
@@ -23,8 +23,21 @@ export interface GameState {
   message: string;
 }
 
+/** Where a player may teleport: home nursery, or alongside another player. */
+export type TeleportDest = 'home' | number;
+export interface TeleportOption { dest: TeleportDest; label: string; detail: string; distance: number; }
+/** One radar contact, in world offsets from the viewer (the renderer rotates it into the camera frame). */
+export interface RadarBlip {
+  kind: 'player' | 'threat' | 'giant' | 'home' | 'shore';
+  dx: number; dz: number; distance: number;
+  /** Player index for `player` blips, actor id otherwise. */
+  id: number;
+  /** This contact is currently after the viewer. */
+  hunting: boolean;
+}
+
 const SNACK_SCHOOLS: { creature: CreatureId; scale: number; count: number }[] = [
-  // first eight live in the four nurseries: one swimmer school and one ground school each
+  // first eight live in the nursery the players hatch in: swimmer and ground schools
   { creature: 'waptia', scale: 0.085, count: 16 }, { creature: 'canadia', scale: 0.09, count: 12 },
   { creature: 'waptia', scale: 0.09, count: 14 }, { creature: 'opabinia', scale: 0.09, count: 10 },
   { creature: 'marrella', scale: 0.085, count: 14 }, { creature: 'olenoides', scale: 0.075, count: 12 },
@@ -34,6 +47,13 @@ const SNACK_SCHOOLS: { creature: CreatureId; scale: number; count: number }[] = 
   { creature: 'odontogriphus', scale: 0.08, count: 10 }, { creature: 'odaraia', scale: 0.09, count: 12 },
   { creature: 'isoxys', scale: 0.16, count: 8 }, { creature: 'leanchoilia', scale: 0.15, count: 8 },
   { creature: 'vetulicola', scale: 0.17, count: 7 }, { creature: 'ottoia', scale: 0.14, count: 8 },
+];
+
+/** The resident giants and the biomes they lair in. */
+const GIANTS: { creature: CreatureId; scale: number; ground: boolean; biomes: Biome[] }[] = [
+  { creature: 'anomalocaris', scale: 3.5, ground: false, biomes: ['channel', 'basin', 'escarpment'] },
+  { creature: 'olenoides', scale: 3.0, ground: true, biomes: ['boulders', 'escarpment'] },
+  { creature: 'opabinia', scale: 2.8, ground: false, biomes: ['forest', 'shelf'] },
 ];
 
 export class Game implements AiWorld {
@@ -64,13 +84,16 @@ export class Game implements AiWorld {
     this.mode = mode;
     this.setups = setups;
     this.rng = makeRng(seed ^ 0x9e37);
-    this.world = generateWorld(seed);
+    // Everyone hatches in the origin nursery, just off the shore: the one fixed point in an endless sea.
+    this.world = new World(seed);
+    const nursery = nurseryAt(0);
+    this.world.loadAround(nursery);
     this.hitCtx = { events: this.events, byId: (id) => this.idMap.get(id), time: 0 };
     setups.forEach((s, i) => {
       const startScale = mode === 'rise' ? TIER_SCALE[0] : mode === 'hunted' ? (i === 0 ? 3.0 : TIER_SCALE[1]) : mode === 'reef' ? TIER_SCALE[2] : TIER_SCALE[1];
-      const nursery = NURSERIES[i % NURSERIES.length];
       const a = this.spawn(s.creature, 'player', this.spawnPoint(nursery, s.creature, startScale, i), startScale, i);
-      a.yaw = Math.atan2(-nursery.x, -nursery.z);
+      a.home = { ...nursery };
+      a.yaw = Math.PI;                                   // facing out to sea
       this.players.push(a);
       this.progress.push({ prompts: [], flags: new Set(), deaths: 0, apexT: 0, message: '' });
     });
@@ -78,13 +101,24 @@ export class Game implements AiWorld {
       // Fill to 4 with bots
       for (let i = setups.length; i < 4; i++) {
         const c = CREATURE_IDS[Math.floor(this.rng() * CREATURE_IDS.length)];
-        const nursery = NURSERIES[i % NURSERIES.length];
         const bot = this.spawn(c, 'bot', this.spawnPoint(nursery, c, TIER_SCALE[1], i), TIER_SCALE[1]);
+        bot.home = { ...nursery };
         bot.brain = makeBrain('needs', nursery, this.rng, { aggression: 0.9, reaction: 0.2, parrySkill: 0.55 });
       }
     }
     this.populate();
   }
+
+  /** The points the world streams around and the ecosystem is kept alive near: every player and bot. */
+  anchors(): Vec3[] {
+    const out: Vec3[] = [];
+    for (const a of this.actors) if (a.controller === 'player' || a.controller === 'bot') out.push(a.pos);
+    if (!out.length) out.push(nurseryAt(0));
+    return out;
+  }
+  private randomAnchor() { const an = this.anchors(); return an[Math.floor(this.rng() * an.length)]; }
+  /** Distance from the closest player or bot. */
+  private anchorDistance(p: Vec3) { let d = Infinity; for (const a of this.anchors()) d = Math.min(d, distXZ(a, p)); return d; }
 
   byId(id: number) { return this.idMap.get(id); }
   nearby(pos: Vec3, r: number) {
@@ -129,27 +163,43 @@ export class Game implements AiWorld {
     SNACK_SCHOOLS.forEach((s, i) => this.spawnSchool(s.creature, s.scale, s.count, i));
     // Ambient adults
     for (let i = 0; i < 26; i++) this.spawnAmbient(true);
-    // Giants
-    const chanA = Math.atan2(Math.sin(0.62), Math.cos(0.62));
-    const route = (cx: number, cz: number, r: number, n: number, y: number, tilt = 0) =>
-      Array.from({ length: n }, (_, i) => { const a = (i / n) * TAU + tilt; return { x: cx + Math.cos(a) * r, y, z: cz + Math.sin(a) * r }; });
-    const chanRoute = Array.from({ length: 8 }, (_, i) => {
-      const t = (i / 8) * 2 - 1; const along = t * (WORLD_RADIUS - 50);
-      const side = Math.sin(i * 2.4) * 8;
-      return { x: Math.cos(chanA) * along - Math.sin(chanA) * side, y: 22 + Math.abs(Math.sin(i)) * 6, z: Math.sin(chanA) * along + Math.cos(chanA) * side };
+    // Giants: one of each kind lives in the region around the players and moves with them.
+    for (const c of GIANTS) this.placeGiant(this.spawn(c.creature, 'giant', { ...nurseryAt(0) }, c.scale));
+    const shadow = this.spawn('anomalocaris', 'shadow', { ...nurseryAt(0) }, 6.0);
+    this.placeGiant(shadow);
+  }
+
+  /**
+   * Give a giant a home and patrol loop 130–210 units from a player, in the biome it belongs to
+   * (channels and deep water for Anomalocaris, boulders for Olenoides, sponge forest for
+   * Opabinia), never in a nursery and never on the beach. Used at start and whenever a giant has
+   * been left far behind by every player.
+   */
+  private placeGiant(g: Actor) {
+    const def = GIANTS.find((c) => c.creature === g.creature) ?? GIANTS[0];
+    const shadow = g.controller === 'shadow';
+    const anchor = this.randomAnchor();
+    let best: Vec3 = { x: anchor.x, y: 0, z: anchor.z - 160 }, bestScore = -Infinity;
+    for (let i = 0; i < 14; i++) {
+      const ang = this.rng() * TAU, d = shadow ? 60 + this.rng() * 40 : 130 + this.rng() * 80;
+      const x = anchor.x + Math.cos(ang) * d, z = anchor.z + Math.sin(ang) * d;
+      if (shoreDistance(x, z) < 45 || nurseryFactor(x, z) > 0.1) continue;
+      const w = biomeWeights(x, z);
+      let score = this.rng() * 0.3;
+      for (const b of def.biomes) score += w[b];
+      if (score > bestScore) { bestScore = score; best = { x, y: 0, z }; }
+    }
+    const r = shadow ? 70 : 35 + this.rng() * 15;
+    const y = shadow ? SURFACE_Y - 3 : def.ground ? 0 : 22;
+    const n = shadow ? 10 : 6;
+    const route = Array.from({ length: n }, (_, i) => {
+      const a = (i / n) * TAU;
+      const x = best.x + Math.cos(a) * r, z = best.z + Math.sin(a) * r;
+      return { x, y: def.ground ? sampleHeight(x, z) + 1.5 : y + Math.abs(Math.sin(i * 1.7)) * 5, z };
     });
-    const g1 = this.spawn('anomalocaris', 'giant', { ...chanRoute[0] }, 3.5);
-    g1.brain = makeBrain('giant', chanRoute[0], this.rng, { patrol: chanRoute });
-    const bRoute = route(110, 100, 45, 6, 3);
-    const g2 = this.spawn('olenoides', 'giant', { x: 110, y: sampleHeight(110, 55) + 1.5, z: 55 }, 3.0);
-    g2.brain = makeBrain('giant', bRoute[0], this.rng, { patrol: bRoute });
-    const fRoute = route(-100, 100, 40, 6, 24, 1);
-    const g3 = this.spawn('opabinia', 'giant', { ...fRoute[0] }, 2.8);
-    for (const gg of [g1, g3]) gg.pos.y = 24;
-    g3.brain = makeBrain('giant', fRoute[0], this.rng, { patrol: fRoute });
-    const sRoute = route(0, 0, WORLD_RADIUS - 70, 10, SURFACE_Y - 3);
-    const shadow = this.spawn('anomalocaris', 'shadow', { ...sRoute[0] }, 6.0);
-    shadow.brain = makeBrain('giant', sRoute[0], this.rng, { patrol: sRoute });
+    g.pos = { ...route[0] };
+    g.vel = v3();
+    g.brain = makeBrain('giant', route[0], this.rng, { patrol: route });
   }
 
   /** A school sized to be prey for this player, spawned just out of sight. */
@@ -163,7 +213,7 @@ export class Game implements AiWorld {
     const s = clamp((L * ratio) / cd.adultLength, 0.06, 2.2);
     const count = s < 0.2 ? 12 : s < 0.6 ? 8 : 5;
     const ang = this.rng() * TAU, d = 24 + this.rng() * 18 + L * 2;
-    const home = { x: clamp(p.pos.x + Math.cos(ang) * d, -WORLD_RADIUS + 15, WORLD_RADIUS - 15), y: 0, z: clamp(p.pos.z + Math.sin(ang) * d, -WORLD_RADIUS + 15, WORLD_RADIUS - 15) };
+    const home = this.offshore({ x: p.pos.x + Math.cos(ang) * d, y: 0, z: p.pos.z + Math.sin(ang) * d });
     const g = sampleHeight(home.x, home.z);
     home.y = cd.ground ? g : clamp(p.pos.y + (this.rng() - 0.5) * 6, g + 1.5, SURFACE_Y - 3);
     const schoolId = this.schoolCount++;
@@ -175,13 +225,21 @@ export class Game implements AiWorld {
     }
   }
 
+  /** Keep a point in swimmable water: at least 20 units off the beach. */
+  private offshore(p: Vec3): Vec3 {
+    const s = shoreDistance(p.x, p.z);
+    if (s < 20) p.z -= 20 - s;
+    return p;
+  }
+
   private spawnSchool(c: CreatureId, s: number, count: number, i: number) {
     const def = creature(c);
+    const anchor = this.randomAnchor();
     let home: Vec3;
-    if (i < 8) home = { ...NURSERIES[i % NURSERIES.length] };
+    if (i < 8) { const n = nearestNursery(anchor.x, anchor.z).pos; const a = i * 0.8; home = { x: n.x + Math.cos(a) * 8, y: 0, z: n.z + Math.sin(a) * 8 }; }
     else {
-      const a = this.rng() * TAU, d = 30 + Math.sqrt(this.rng()) * (WORLD_RADIUS - 70);
-      home = { x: Math.cos(a) * d, y: 0, z: Math.sin(a) * d };
+      const a = this.rng() * TAU, d = 30 + Math.sqrt(this.rng()) * 90;
+      home = this.offshore({ x: anchor.x + Math.cos(a) * d, y: 0, z: anchor.z + Math.sin(a) * d });
     }
     const g = sampleHeight(home.x, home.z);
     home.y = def.ground ? g : (i % 4 === 1 ? LIGHT_WINDOW_Y : g + 2.5 + this.rng() * 5);
@@ -200,17 +258,19 @@ export class Game implements AiWorld {
     return t;
   }
 
-  private spawnAmbient(initial = false) {
+  private spawnAmbient(initial = false, near?: Vec3) {
     const c = CREATURE_IDS[Math.floor(this.rng() * CREATURE_IDS.length)];
     const def = creature(c);
     const tierBias = this.maxPlayerTier();
     // ambient scale spread widens as the players grow
     const base = 0.28 + this.rng() * (0.5 + tierBias * 0.5);
     const s = clamp(base * (this.rng() < 0.15 ? 1.6 : 1), 0.28, 2.4);
+    const anchor = near ?? this.randomAnchor();
     let pos: Vec3 | undefined;
     for (let tries = 0; tries < 20 && !pos; tries++) {
-      const a = this.rng() * TAU, d = 20 + Math.sqrt(this.rng()) * (WORLD_RADIUS - 45);
-      const x = Math.cos(a) * d, z = Math.sin(a) * d;
+      const a = this.rng() * TAU, d = initial ? 20 + Math.sqrt(this.rng()) * 110 : 60 + Math.sqrt(this.rng()) * 90;
+      const x = anchor.x + Math.cos(a) * d, z = anchor.z + Math.sin(a) * d;
+      if (shoreDistance(x, z) < 20) continue;
       if (!initial && this.players.some((p) => distXZ(p.pos, { x, y: 0, z }) < 55)) continue;
       if (nurseryFactor(x, z) > 0.2 && s > 0.45) continue;
       if (biomeAt(x, z) === 'nursery' && s > 0.6) continue;
@@ -222,9 +282,9 @@ export class Game implements AiWorld {
     a.brain = makeBrain('needs', pos, this.rng);
   }
 
-  /** Cover (0..1) for an actor including temporary silt. */
+  /** Cover (0..1) for an actor including temporary silt. Plants are queried every fourth step (staggered) since cover changes slowly. */
   coverFor(a: Actor): number {
-    let c = coverAt(this.world, a.pos, lengthOf(a), this.scratchCover);
+    let c = ((a.id + this.stepIndex) & 3) === 0 || a.controller === 'player' ? coverAt(this.world, a.pos, lengthOf(a), this.scratchCover) : a.cover;
     for (const s of this.silt) if (dist(s.pos, a.pos) < s.radius) c = Math.max(c, 0.75);
     if (isHidden(a)) c = 1;
     return c;
@@ -235,6 +295,8 @@ export class Game implements AiWorld {
     if (this.state.status !== 'playing') return;
     this.time += dt; this.hitCtx.time = this.time;
     this.stepIndex++;
+    // The sea streams in around whoever is in it, a couple of chunks a step so nothing hitches.
+    this.world.stream(this.anchors(), 2);
     this.hash.rebuild(this.actors);
 
     for (const a of this.actors) {
@@ -323,18 +385,25 @@ export class Game implements AiWorld {
     applyScaleStats(a, false);
     a.eaten = 0;
     a.stamina = a.staminaMax; a.poise = a.poiseMax;
-    let nursery = NURSERIES[0], bd = Infinity;
-    for (const n of NURSERIES) {
-      // prefer a nursery with no giant nearby and not too far
+    // Back to a nursery near another player (the party stays together in an endless sea), or
+    // failing that the nearest one to where you died; never one a giant is loitering in.
+    let ref = a.pos, refD = Infinity;
+    for (const o of this.players) if (o !== a && isAlive(o)) { const d = distXZ(o.pos, a.pos); if (d < refD) { refD = d; ref = o.pos; } }
+    const near = nearestNursery(ref.x, ref.z);
+    let nursery = near.pos, bd = Infinity;
+    for (let i = near.index - 1; i <= near.index + 1; i++) {
+      const n = nurseryAt(i);
       let danger = 0;
       for (const g of this.actors) if ((g.controller === 'giant') && isAlive(g) && distXZ(g.pos, n) < 60) danger += 1;
-      const score = danger * 100 + distXZ(a.pos, n) * 0.2;
+      const score = danger * 100 + distXZ(ref, n) * 0.2;
       if (score < bd) { bd = score; nursery = n; }
     }
+    a.home = { ...nursery };
+    this.world.loadAround(nursery);
     a.pos = this.spawnPoint(nursery, a.creature, a.scale, a.player);
     a.vel = v3(); a.state = 'free'; a.stateT = 0; a.respawnT = 0; a.corpseT = 0; a.eaten = 0;
     a.spawnProtect = 3.5; a.hitFlash = 0; a.abilityActive = false; a.abilityCd = 0; a.lockTarget = -1; a.hunted = 0; a.hunterId = -1; a.wasHunted = false; a.swallowedBy = -1; a.bank = 0; a.pitch = 0;
-    a.yaw = Math.atan2(-nursery.x, -nursery.z);
+    a.yaw = Math.PI;
     // hatch-in: grow from a speck over a second (reuses the moult state with a smaller start scale)
     a.hatching = true; a.state = 'moult'; a.stateT = 0; a.stateDur = 1.0;
     this.events.push({ kind: 'moult', pos: { ...a.pos }, actor: a.id, player: a.player, strength: 0.5 });
@@ -353,6 +422,7 @@ export class Game implements AiWorld {
     if (input.dash) a.dashHoldT += dt; else { a.dashHoldT = 0; a.dashUsed = false; a.dashQueued = false; }
     a.pounceCd = Math.max(0, a.pounceCd - dt);
     a.dashCd = Math.max(0, a.dashCd - dt);
+    a.teleportCd = Math.max(0, a.teleportCd - dt);
     a.holdT = Math.max(0, a.holdT - dt);
     a.sinceHit += dt;
     // Out of the fight for a few seconds and health comes back: run, hide, recover, return.
@@ -1016,8 +1086,21 @@ export class Game implements AiWorld {
       if (a.controller === 'ambient') ambient++;
       if (a.controller === 'swarm') { swarm++; if (a.brain?.schoolId != null) schools.set(a.brain.schoolId, (schools.get(a.brain.schoolId) ?? 0) + 1); }
     }
-    const wantAmbient = 26 + this.maxPlayerTier() * 3;
-    if (ambient < wantAmbient) this.spawnAmbient(false);
+    // The ecosystem lives around the players. Wild things left far behind are dropped, and every
+    // player keeps a local population of adults, prey and something big enough to fear.
+    const anchors = this.anchors();
+    for (const a of this.actors) {
+      if (a.controller !== 'ambient' && a.controller !== 'swarm') continue;
+      let d = Infinity;
+      for (const p of anchors) d = Math.min(d, distXZ(a.pos, p));
+      if (d > (a.controller === 'swarm' ? 240 : 290)) this.remove(a);
+    }
+    for (const p of anchors) {
+      let local = 0;
+      for (const a of this.nearby(p, 170)) if (a.controller === 'ambient' && isAlive(a)) local++;
+      if (local < 12 + this.maxPlayerTier() * 2) { this.spawnAmbient(false, p); break; }
+    }
+    void ambient;
     // Every player, at every size, should have plenty of things smaller than them within reach.
     for (const p of this.players) {
       if (!isAlive(p)) continue;
@@ -1031,15 +1114,83 @@ export class Game implements AiWorld {
       const s = SNACK_SCHOOLS[i];
       this.spawnSchool(s.creature, s.scale, s.count, i + Math.floor(this.time));
     }
-    // giants respawn if somehow killed
-    for (const c of ['anomalocaris', 'olenoides', 'opabinia'] as CreatureId[]) {
-      if (!this.actors.some((a) => a.controller === 'giant' && a.creature === c)) {
-        const home = c === 'anomalocaris' ? { x: 0, y: 5, z: 0 } : c === 'olenoides' ? { x: 110, y: sampleHeight(110, 100) + 1.5, z: 100 } : { x: -100, y: 5, z: 100 };
-        const g = this.spawn(c, 'giant', home, c === 'anomalocaris' ? 3.5 : c === 'olenoides' ? 3 : 2.8);
-        g.brain = makeBrain('giant', home, this.rng, { patrol: [home, { x: home.x + 30, y: home.y, z: home.z + 20 }, { x: home.x - 25, y: home.y, z: home.z + 30 }] });
-      }
+    // Giants follow the players across the sea: one left far behind is moved to a new lair ahead
+    // of them (out of sight), and one that somehow died is replaced.
+    for (const c of GIANTS) {
+      const g = this.actors.find((a) => a.controller === 'giant' && a.creature === c.creature);
+      if (!g) { this.placeGiant(this.spawn(c.creature, 'giant', { ...anchors[0] }, c.scale)); continue; }
+      if (isAlive(g) && g.brain?.goal !== 'hunt' && this.anchorDistance(g.pos) > 420) this.placeGiant(g);
     }
+    const shadow = this.actors.find((a) => a.controller === 'shadow');
+    if (shadow && isAlive(shadow) && shadow.brain?.goal !== 'hunt' && this.anchorDistance(shadow.pos) > 300) this.placeGiant(shadow);
   }
+
+  /** Where this player could teleport right now. */
+  teleportOptions(i: number): TeleportOption[] {
+    const p = this.players[i]; if (!p) return [];
+    const out: TeleportOption[] = [{ dest: 'home', label: 'Your nursery', detail: 'Back to where you hatched', distance: distXZ(p.pos, p.home) }];
+    this.players.forEach((o, j) => {
+      if (j === i) return;
+      out.push({ dest: j, label: `Player ${j + 1} · ${creature(o.creature).name}`, detail: isAlive(o) ? TIER_NAMES[o.tier] : 'respawning', distance: distXZ(p.pos, o.pos) });
+    });
+    return out;
+  }
+
+  /**
+   * Move a player home or alongside another player. The sea is endless, so this is how a party
+   * regroups. Not while dead, mid-move or on cooldown; arrival comes with a few seconds of
+   * protection and a burst of sparkles at both ends.
+   */
+  teleport(i: number, dest: TeleportDest): boolean {
+    const a = this.players[i];
+    if (!a || !isAlive(a) || (a.state !== 'free' && a.state !== 'guard') || a.teleportCd > 0 || a.grabbedBy >= 0) return false;
+    let pos: Vec3, yaw: number;
+    if (dest === 'home') { pos = this.spawnPoint(a.home, a.creature, a.scale, i); yaw = Math.PI; }
+    else {
+      const o = this.players[dest];
+      if (!o || o === a) return false;
+      const h = heading(o.yaw), L = lengthOf(o);
+      pos = { x: o.pos.x - h.x * (L * 2 + 3), y: o.pos.y, z: o.pos.z - h.z * (L * 2 + 3) };
+      yaw = o.yaw;
+    }
+    this.world.loadAround(pos);
+    const g = groundHeight(this.world, pos.x, pos.z, this.scratchBoulders);
+    pos.y = clamp(pos.y, g + clearanceOf(a) + 0.2, SURFACE_Y - 1 - clearanceOf(a));
+    this.events.push({ kind: 'teleport', pos: { ...a.pos }, actor: a.id, player: i, strength: 0 });
+    a.pos = pos; a.vel = v3(); a.yaw = yaw; a.pitch = 0; a.bank = 0;
+    a.lockTarget = -1; a.hunted = 0; a.hunterId = -1; a.wasHunted = false; a.aiming = false;
+    a.spawnProtect = Math.max(a.spawnProtect, 2.5); a.teleportCd = 20; a.hitFlash = 0;
+    this.events.push({ kind: 'teleport', pos: { ...pos }, actor: a.id, player: i, strength: 1 });
+    this.flag(a, 'teleport');
+    return true;
+  }
+
+  /**
+   * Radar contacts for a player: other players wherever they are, anything big enough to be a
+   * threat within about twice the radar's reach (further contacts clamp to the rim), whatever is
+   * hunting them regardless of size, plus home and the shore as bearings.
+   */
+  radarFor(i: number, range: number): RadarBlip[] {
+    const p = this.players[i]; if (!p) return [];
+    const out: RadarBlip[] = [];
+    this.players.forEach((o, j) => { if (j !== i) out.push({ kind: 'player', dx: o.pos.x - p.pos.x, dz: o.pos.z - p.pos.z, distance: distXZ(o.pos, p.pos), id: j, hunting: false }); });
+    for (const a of this.actors) {
+      if (a.controller === 'player' || !isAlive(a) || isHidden(a)) continue;
+      const hunting = !!a.brain && a.brain.target === p.id && (a.brain.goal === 'hunt' || a.brain.goal === 'notice');
+      const band = bandOf(p, a);
+      if (band !== 'threat' && band !== 'giant' && !hunting) continue;
+      const d = distXZ(a.pos, p.pos);
+      if (d > range * 2.2 && !hunting) continue;
+      out.push({ kind: band === 'giant' ? 'giant' : 'threat', dx: a.pos.x - p.pos.x, dz: a.pos.z - p.pos.z, distance: d, id: a.id, hunting });
+    }
+    out.push({ kind: 'home', dx: p.home.x - p.pos.x, dz: p.home.z - p.pos.z, distance: distXZ(p.home, p.pos), id: -1, hunting: false });
+    const sz = shoreZ(p.pos.x);
+    out.push({ kind: 'shore', dx: 0, dz: sz - p.pos.z, distance: Math.abs(sz - p.pos.z), id: -1, hunting: false });
+    return out;
+  }
+
+  /** The dominant biome under a player, for the HUD banner. */
+  biomeOf(i: number): Biome | undefined { const p = this.players[i]; return p ? biomeAt(p.pos.x, p.pos.z) : undefined; }
 
   private updateModes(dt: number) {
     switch (this.mode) {
@@ -1095,8 +1246,9 @@ export class Game implements AiWorld {
     if (p.tier >= 1 && !f.has('guard') && creature(p.creature).canGuard) return 'Hold B to guard. Tap it as a hit lands to parry.';
     if (p.tier >= 2 && !f.has('ability')) return `Y: ${creature(p.creature).abilityName}. Your signature move is unlocked.`;
     if (!f.has('lock') && this.time > 30) return 'Hold LT to aim at prey. When the crosshair fills, RT pounces.';
+    if (!f.has('teleport') && this.time > 60 && (this.players.length > 1 || distXZ(p.pos, p.home) > 150)) return 'D-pad down: teleport home, or to another player.';
     return undefined;
   }
 }
 
-export { channelDistance };
+export { biomeAt };
