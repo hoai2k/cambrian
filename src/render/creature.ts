@@ -8,30 +8,36 @@ import { lengthOf } from '../sim/actors';
 import type { Actor } from '../sim/types';
 
 interface Loaded { gltf: GLTF; unit: number; center: THREE.Vector3; size: THREE.Vector3; }
-const cache = new Map<CreatureId, Promise<Loaded>>();
+export type Lod = 0 | 1;
+const cache = new Map<string, Promise<Loaded>>();
 const loader = new GLTFLoader().setMeshoptDecoder(MeshoptDecoder);
 
-export const creatureUrl = (id: CreatureId) => `${import.meta.env.BASE_URL}assets/creatures/${id}.glb`;
+export const creatureUrl = (id: CreatureId, lod: Lod = 0) =>
+  `${import.meta.env.BASE_URL}assets/creatures/${id}${lod ? '.lod1' : ''}.glb`;
 
-export function loadCreature(id: CreatureId, onProgress?: (loaded: number, total: number) => void): Promise<Loaded> {
-  let p = cache.get(id);
+export function loadCreature(id: CreatureId, onProgress?: (loaded: number, total: number) => void, lod: Lod = 0): Promise<Loaded> {
+  const key = `${id}:${lod}`;
+  let p = cache.get(key);
   if (!p) {
-    p = new Promise<GLTF>((res, rej) => loader.load(creatureUrl(id), res, (e) => onProgress?.(e.loaded, e.total), rej)).then((gltf) => {
+    p = new Promise<GLTF>((res, rej) => loader.load(creatureUrl(id, lod), res, (e) => onProgress?.(e.loaded, e.total), rej)).then((gltf) => {
       const box = new THREE.Box3().setFromObject(gltf.scene);
       const size = box.getSize(new THREE.Vector3());
       const center = box.getCenter(new THREE.Vector3());
       const unit = 1 / Math.max(size.z, size.x, 0.01);
       gltf.scene.traverse((o) => { if (o instanceof THREE.Mesh) { o.frustumCulled = false; } });
       return { gltf, unit, center, size };
-    }).catch((e) => { cache.delete(id); throw new Error(`Could not load ${creature(id).name}: ${e?.message ?? e}`); });
-    cache.set(id, p);
+    }).catch((e) => { cache.delete(key); throw new Error(`Could not load ${creature(id).name}: ${e?.message ?? e}`); });
+    cache.set(key, p);
   }
   return p;
 }
-export const preloadAll = (ids: CreatureId[]) => Promise.all(ids.map((id) => loadCreature(id)));
-export function loadedSync(id: CreatureId): Loaded | undefined { return loadedMap.get(id); }
-const loadedMap = new Map<CreatureId, Loaded>();
-export async function ensureLoaded(id: CreatureId, onProgress?: (loaded: number, total: number) => void) { const l = await loadCreature(id, onProgress); loadedMap.set(id, l); return l; }
+export function loadedSync(id: CreatureId, lod: Lod = 0): Loaded | undefined { return loadedMap.get(`${id}:${lod}`); }
+const loadedMap = new Map<string, Loaded>();
+export async function ensureLoaded(id: CreatureId, onProgress?: (loaded: number, total: number) => void, lod: Lod = 0) {
+  const l = await loadCreature(id, onProgress, lod);
+  loadedMap.set(`${id}:${lod}`, l);
+  return l;
+}
 
 const SPINE_RE = /^(body|segment)_(\d+)$/;
 
@@ -55,12 +61,13 @@ export class CreatureView {
   private highlight = 0;
   private highlightColor = new THREE.Color('#7ef0d8');
   private tmpQ = new THREE.Quaternion(); private tmpQ2 = new THREE.Quaternion(); private up = new THREE.Vector3(0, 1, 0);
+  private tmpE = new THREE.Euler(); private ringQ = new THREE.Quaternion(); private ringE = new THREE.Euler(-Math.PI / 2, 0, 0);
   public lastUpdate = 0;
   public visibleLength = 1;
   readonly def;
   readonly heightUnits: number;
 
-  constructor(readonly creatureId: CreatureId, loaded: Loaded, private shared: { ringGeo: THREE.BufferGeometry }) {
+  constructor(readonly creatureId: CreatureId, loaded: Loaded, private shared: { ringGeo: THREE.BufferGeometry }, readonly lod: Lod = 0) {
     this.def = creature(creatureId);
     this.model = SkeletonUtils.clone(loaded.gltf.scene);
     this.model.scale.setScalar(loaded.unit);
@@ -118,6 +125,14 @@ export class CreatureView {
     this.oneShot = act; this.oneShotT = d;
   }
 
+  /** Distant creatures stop casting shadows; the shadow pass does not frustum-cull these meshes. */
+  setShadow(on: boolean) {
+    if (this.shadowOn === on) return;
+    this.shadowOn = on;
+    this.model.traverse((o) => { if ((o as THREE.Mesh).isMesh) (o as THREE.Mesh).castShadow = on; });
+  }
+  private shadowOn = true;
+
   /** Ring under the creature, coloured per viewer. */
   setRing(color: string | null, opacity: number) {
     if (color) this.ringMat.color.set(color);
@@ -169,12 +184,14 @@ export class CreatureView {
       if (this.oneShotT > 0) { this.oneShotT -= dt; if (this.oneShotT < 0.12 && a.state !== 'dead' && a.state !== 'stagger') this.oneShot?.fadeOut(0.12); }
 
       // additive layers: turn / dive / rise, dodge & guard reuse them
-      const turnRate = a.bank * -6;
+      // Increasing yaw turns the creature to its LEFT, and right = (-cos yaw, 0, sin yaw).
+      const turning = a.bank * -6;                                    // > 0 while turning left
       const dodging = a.state === 'dodge' && !this.has('Dodge') ? 0.9 : 0;
       const guarding = (a.state === 'guard' || a.state === 'parry') && !this.has('Guard') ? 0.45 : 0;
+      const lateral = dodging ? -a.dodgeDir.x * Math.cos(a.yaw) + a.dodgeDir.z * Math.sin(a.yaw) : 0; // + = to its right
       const targets = [
-        Math.max(0, -turnRate) * 0.45 + (dodging && a.dodgeDir.x * Math.cos(a.yaw) - a.dodgeDir.z * Math.sin(a.yaw) < 0 ? dodging : 0),
-        Math.max(0, turnRate) * 0.45 + (dodging && a.dodgeDir.x * Math.cos(a.yaw) - a.dodgeDir.z * Math.sin(a.yaw) >= 0 ? dodging : 0),
+        Math.max(0, turning) * 0.45 + (dodging && lateral < 0 ? dodging : 0),
+        Math.max(0, -turning) * 0.45 + (dodging && lateral >= 0 ? dodging : 0),
         Math.max(0, -a.vel.y) * 0.25 + guarding + (def.ground && a.state === 'guard' ? 0.3 : 0),
         Math.max(0, a.vel.y) * 0.25,
       ];
@@ -192,22 +209,19 @@ export class CreatureView {
       if (this.spine.length > 3 && !def.ground && a.state !== 'dead') {
         const amp = clamp(speed / Math.max(cruise, 0.1), 0, 1.6) * 0.045 + Math.abs(a.bank) * 0.02;
         const freq = 5.5 / Math.pow(Math.max(a.scale, 0.1), 0.35);
+        // Local-space bend: each spine bone yaws slightly about its own up axis. Cheaper than
+        // resolving world quaternions per bone (which walks the whole ancestor chain every time).
         for (let i = 0; i < this.spine.length; i++) {
           const bone = this.spine[i];
           const ang = Math.sin(time * freq - i * 0.55) * amp * (0.3 + i / this.spine.length);
-          if (!bone.parent) continue;
-          bone.parent.getWorldQuaternion(this.tmpQ);
-          this.tmpQ2.setFromAxisAngle(this.up, ang);
-          // rotate about world up expressed in the parent's local frame
-          const inv = this.tmpQ.clone().invert();
-          bone.quaternion.premultiply(inv.multiply(this.tmpQ2).multiply(this.tmpQ));
+          bone.quaternion.multiply(this.tmpQ2.setFromAxisAngle(this.up, ang));
         }
       }
     }
 
     // Transform
     this.group.position.set(a.pos.x, a.pos.y, a.pos.z);
-    this.group.quaternion.setFromEuler(new THREE.Euler(a.pitch, a.yaw, a.bank, 'YXZ'));
+    this.group.quaternion.setFromEuler(this.tmpE.set(a.pitch, a.yaw, a.bank, 'YXZ'));
     let sx = L, sy = L, sz = L, oy = 0;
     if (a.state === 'ability' && a.abilityActive) {
       const t = clamp(a.stateT / 0.5, 0, 1);
@@ -230,7 +244,7 @@ export class CreatureView {
     this.ring.position.set(0, -(this.heightUnits * 0.5 + 0.08), 0);
     const rs = 0.75;
     this.ring.scale.set(rs, rs, rs);
-    this.ring.quaternion.copy(this.group.quaternion).invert().multiply(new THREE.Quaternion().setFromEuler(new THREE.Euler(-Math.PI / 2, 0, 0)));
+    this.ring.quaternion.copy(this.group.quaternion).invert().multiply(this.ringQ.setFromEuler(this.ringE));
 
     // emissive: hit flash, highlight, ability glow
     const flash = a.hitFlash > 0 ? Math.min(1, a.hitFlash * 2.2) : 0;

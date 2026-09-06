@@ -6,7 +6,7 @@
 import { CREATURE_IDS, type CreatureId } from '../sim/creatures';
 import { ensureLoaded } from './creature';
 
-export type AssetKind = 'glb' | 'card' | 'sfx';
+export type AssetKind = 'glb' | 'lod' | 'card' | 'sfx';
 export interface AssetItem { key: string; kind: AssetKind; url: string; size: number; priority: number; status: 'queued' | 'loading' | 'done' | 'failed'; loaded: number; }
 export interface AssetProgress { loaded: number; total: number; fraction: number; done: number; count: number; current?: string; ready: Set<CreatureId>; }
 
@@ -32,6 +32,8 @@ export class AssetQueue {
     CREATURE_IDS.forEach((id, i) => {
       this.items.set(`glb:${id}`, { key: `glb:${id}`, kind: 'glb', url: `${BASE}assets/creatures/${id}.glb`, size: GLB_SIZES[id], priority: 100 + i, status: 'queued', loaded: 0 });
       this.items.set(`card:${id}`, { key: `card:${id}`, kind: 'card', url: `${BASE}assets/creatures/${id}.card.png`, size: CARD_SIZE, priority: 200 + i, status: 'queued', loaded: 0 });
+      // Decimated copies used for anything small on screen. Small files, so they stream early.
+      this.items.set(`lod:${id}`, { key: `lod:${id}`, kind: 'lod', url: `${BASE}assets/creatures/${id}.lod1.glb`, size: 600_000, priority: 90 + i, status: 'queued', loaded: 0 });
     });
     SFX_FILES.forEach((n, i) => this.items.set(`sfx:${n}`, { key: `sfx:${n}`, kind: 'sfx', url: `${BASE}assets/sfx/${n}.mp3`, size: n.startsWith('ambient') ? 265_000 : n.startsWith('giant') ? 145_000 : 12_000, priority: 300 + i, status: 'queued', loaded: 0 }));
   }
@@ -46,7 +48,10 @@ export class AssetQueue {
   prioritize(creatures: CreatureId[], phase: 'boot' | 'title' | 'select' | 'playing') {
     const order = [...creatures, ...CREATURE_IDS.filter((c) => !creatures.includes(c))];
     order.forEach((id, i) => {
-      const glb = this.items.get(`glb:${id}`)!; const card = this.items.get(`card:${id}`)!;
+      const glb = this.items.get(`glb:${id}`)!; const card = this.items.get(`card:${id}`)!; const lod = this.items.get(`lod:${id}`)!;
+      // Small files that cut distant-creature cost dramatically: load them before the models of
+      // creatures nobody picked.
+      lod.priority = (phase === 'playing' ? 15 : 90) + i;
       // On the select screen the visible cards matter as much as the model of the pick itself.
       glb.priority = (i < creatures.length ? 10 : 100) + i;
       card.priority = phase === 'select' ? (i < 3 ? 5 + i : 60 + i) : 50 + i;
@@ -71,6 +76,8 @@ export class AssetQueue {
         const id = item.key.slice(4) as CreatureId;
         await ensureLoaded(id, (loaded, total) => { item.loaded = loaded; if (total > 0) item.size = total; this.emit(item.key); });
         this.ready.add(id);
+      } else if (item.kind === 'lod') {
+        await ensureLoaded(item.key.slice(4) as CreatureId, (loaded, total) => { item.loaded = loaded; if (total > 0) item.size = total; this.emit(item.key); }, 1);
       } else if (item.kind === 'card') {
         await new Promise<void>((res, rej) => { const img = new Image(); img.onload = () => res(); img.onerror = () => rej(new Error('img')); img.src = item.url; });
       } else {

@@ -8,7 +8,7 @@ import { Game } from '../sim/game';
 import { BAND_COLOR, emptyInput, TIER_NAMES, TIER_NEED, type Actor, type Band, type InputFrame, type Mode, type PlayerSetup } from '../sim/types';
 import { groundHeight, NURSERIES, resolveStatic, SURFACE_Y, type Boulder } from '../sim/world';
 import { AssetQueue, type AssetProgress } from './assets';
-import { CreatureView, ensureLoaded, loadedSync } from './creature';
+import { CreatureView, ensureLoaded, loadedSync, type Lod } from './creature';
 import { Bubbles, Impacts, Silt } from './fx';
 import { createSea, type Quality, type SeaEnvironment } from './sea';
 
@@ -37,7 +37,7 @@ export interface EngineCallbacks {
 
 export const PLAYER_COLORS = ['#61f2d5', '#ffb457', '#c7a3ff', '#ff86a4'];
 
-interface CamState { yawOff: number; pitch: number; pos: THREE.Vector3; look: THREE.Vector3; shake: number; camera: THREE.PerspectiveCamera; lockBlend: number; }
+interface CamState { yaw: number; pitch: number; pos: THREE.Vector3; look: THREE.Vector3; shake: number; camera: THREE.PerspectiveCamera; lockBlend: number; lastPos: THREE.Vector3; frustum: THREE.Frustum; projScreen: THREE.Matrix4; }
 
 /** Magnification levels (see docs/redesign/01-game-design.md · Magnification). */
 export const MAGNIFICATION = [
@@ -78,7 +78,8 @@ export class Engine {
   private fps = 60; private fpsFrames = 0; private fpsT = 0;
   private resize: ResizeObserver;
   private scratchBoulders: Boulder[] = [];
-  private tmpV = new THREE.Vector3();
+  private cullSphere = new THREE.Sphere();
+  private tmpV = new THREE.Vector3(); private tmpLook = new THREE.Vector3(); private tmpDesired = new THREE.Vector3(); private tmpProj = new THREE.Vector3();
   private lookSpeed = 1; private invertY = false;
   private attract = true;
   private attractT = 0;
@@ -95,8 +96,11 @@ export class Engine {
     this.renderer.toneMappingExposure = 1.25;
     this.renderer.shadowMap.enabled = quality === 'high';
     this.renderer.shadowMap.type = THREE.PCFShadowMap;
+    // Split-screen renders the scene once per player; without this the shadow map is rebuilt every time.
+    this.renderer.shadowMap.autoUpdate = false;
     container.appendChild(this.renderer.domElement);
     this.scene.add(this.bubbles.points, this.impacts.group, this.silt.group);
+    (window as any).__cambrian = this;
     this.resize = new ResizeObserver(() => this.onResize());
     this.resize.observe(container);
     this.onResize();
@@ -155,7 +159,7 @@ export class Engine {
     this.cams = setups.map((_, i) => {
       const p = this.game!.players[i];
       const cam = new THREE.PerspectiveCamera(60, 1, 0.08, 420);
-      const cs: CamState = { yawOff: 0, pitch: 0.22, pos: new THREE.Vector3(p.pos.x - Math.sin(p.yaw) * 6, p.pos.y + 2.5, p.pos.z - Math.cos(p.yaw) * 6), look: new THREE.Vector3(p.pos.x, p.pos.y, p.pos.z), shake: 0, camera: cam, lockBlend: 0 };
+      const cs: CamState = { yaw: p.yaw, pitch: 0.22, pos: new THREE.Vector3(p.pos.x - Math.sin(p.yaw) * 6, p.pos.y + 2.5, p.pos.z - Math.cos(p.yaw) * 6), look: new THREE.Vector3(p.pos.x, p.pos.y, p.pos.z), shake: 0, camera: cam, lockBlend: 0, lastPos: new THREE.Vector3(p.pos.x, p.pos.y, p.pos.z), frustum: new THREE.Frustum(), projScreen: new THREE.Matrix4() };
       cam.position.copy(cs.pos); cam.lookAt(cs.look);
       return cs;
     });
@@ -214,24 +218,27 @@ export class Engine {
         this.prevMenu.set(key, c.menu);
         const p = game.players[i];
         if (p && running) inputs.set(i, this.toInput(c, this.cams[i], p));
-        // camera orbit
+        // Camera orbit. The right stick is the ONLY thing that turns the camera: yaw is absolute
+        // and never follows the creature's heading, so swimming back does not swing the view.
+        // Increasing yaw rotates the view left, so a rightward stick decreases it.
         if (running) {
           const cs = this.cams[i];
-          cs.yawOff = wrapAngle(cs.yawOff + c.lookX * dt * 2.6 * this.lookSpeed);
+          cs.yaw = wrapAngle(cs.yaw - c.lookX * dt * 2.6 * this.lookSpeed);
           cs.pitch = clamp(cs.pitch + c.lookY * dt * 1.6 * this.lookSpeed * (this.invertY ? -1 : 1), -0.55, 1.15);
-          if (Math.abs(c.lookX) < 0.05 && Math.hypot(c.mx, c.my) > 0.3) cs.yawOff = damp(cs.yawOff, 0, 1.6, dt);
           if (Math.abs(c.lookY) < 0.05) cs.pitch = damp(cs.pitch, 0.22, 0.6, dt);
         }
       });
     }
 
-    // Fixed step
+    // Fixed step. Capped at 3 sub-steps so a slow frame cannot spiral into more simulation work.
+    const tSim = performance.now();
     if (running) {
       this.acc += dt;
       let steps = 0;
-      while (this.acc >= 1 / 60 && steps < 5) { game.step(1 / 60, inputs); this.acc -= 1 / 60; steps++; }
-      if (steps === 5) this.acc = 0;
+      while (this.acc >= 1 / 60 && steps < 3) { game.step(1 / 60, inputs); this.acc -= 1 / 60; steps++; }
+      if (steps === 3) this.acc = 0;
     }
+    this.simMs = this.simMs * 0.9 + (performance.now() - tSim) * 0.1;
     this.keyboard.endFrame();
 
     // Events → fx / audio / rumble
@@ -263,22 +270,28 @@ export class Engine {
     this.silt.sync(game.silt, this.time);
 
     // Render
+    const tRender = performance.now();
     const W = this.container.clientWidth, H = this.container.clientHeight;
     const r = this.renderer;
     r.setScissorTest(false); r.setViewport(0, 0, W, H); r.clear();
+    if (this.quality === 'high') r.shadowMap.needsUpdate = true;   // rebuilt on the first render() below
     if (this.attract) {
-      this.applyRings(-1, undefined);
-      this.sea?.setViewLength(1.2);
+      const density = this.sea?.setViewLength(1.2, this.attractCam.position.x, this.attractCam.position.z) ?? 0.0105;
+      this.attractCam.far = clamp(2.1 / density, 110, 300);
       this.attractCam.aspect = W / H; this.attractCam.updateProjectionMatrix();
+      this.prepareViewport(-1, undefined);
       r.render(this.scene, this.attractCam);
     } else {
       const rects = layoutRects(this.cams.length, W, H);
       r.setScissorTest(true);
       this.cams.forEach((cs, i) => {
         const rc = rects[i];
-        this.applyRings(i, game.players[i]);
-        this.sea?.setViewLength(lengthOf(game.players[i]));
+        const density = this.sea?.setViewLength(lengthOf(game.players[i]), cs.camera.position.x, cs.camera.position.z) ?? 0.0105;
+        // Everything past ~98% fog is invisible: pulling the far plane in there lets the frustum
+        // drop those scenery chunks entirely instead of rendering them into the murk.
+        cs.camera.far = clamp(2.1 / density, 110, 300);
         cs.camera.aspect = rc.w / rc.h; cs.camera.updateProjectionMatrix();
+        this.prepareViewport(i, game.players[i], cs);
         r.setViewport(rc.x, H - rc.y - rc.h, rc.w, rc.h); r.setScissor(rc.x, H - rc.y - rc.h, rc.w, rc.h);
         r.render(this.scene, cs.camera);
       });
@@ -292,6 +305,8 @@ export class Engine {
       audio.setTension(clamp(tension, 0, 1));
       audio.update(dtReal);
     }
+    this.renderMs = this.renderMs * 0.9 + (performance.now() - tRender) * 0.1;
+    this.frameMs = this.frameMs * 0.9 + dtReal * 1000 * 0.1;
   }
 
   private updateCamera(cs: CamState, p: Actor, dt: number) {
@@ -304,18 +319,23 @@ export class Engine {
     let dist = magnificationDistance(L);
     if (p.state === 'dead') dist *= 1.5;
     if (p.hunted > 0.5) dist *= 0.85;
-    let yaw = p.yaw + cs.yawOff;
-    const lookAt = new THREE.Vector3(p.pos.x, p.pos.y + L * 0.15, p.pos.z);
+    // Snap in behind the creature when it teleports (respawn), otherwise keep the player's framing.
+    const jumped = cs.lastPos.distanceTo(this.tmpV.set(p.pos.x, p.pos.y, p.pos.z)) > 20;
+    cs.lastPos.set(p.pos.x, p.pos.y, p.pos.z);
+    if (jumped) cs.yaw = p.yaw;
+    const lookAt = this.tmpLook.set(p.pos.x, p.pos.y + L * 0.15, p.pos.z);
     if (locked && target) {
       const dx = target.pos.x - p.pos.x, dz = target.pos.z - p.pos.z;
       const ty = Math.atan2(dx, dz);
-      yaw = wrapAngle(ty + cs.yawOff * 0.35);
+      // Lock-on eases the camera behind the player relative to the target; the stick still works.
+      cs.yaw = wrapAngle(cs.yaw + wrapAngle(ty - cs.yaw) * (1 - Math.exp(-2.5 * dt)));
       const d = Math.hypot(dx, dz, target.pos.y - p.pos.y);
-      lookAt.lerp(new THREE.Vector3(target.pos.x, target.pos.y, target.pos.z), 0.42 * cs.lockBlend);
+      lookAt.lerp(this.tmpV.set(target.pos.x, target.pos.y, target.pos.z), 0.42 * cs.lockBlend);
       dist += Math.min(d * 0.35, L * 3) * cs.lockBlend;
     }
+    const yaw = cs.yaw;
     const pitch = cs.pitch + (locked ? 0.1 : 0) + (def.ground ? 0.12 : 0);
-    const desired = new THREE.Vector3(
+    const desired = this.tmpDesired.set(
       lookAt.x - Math.sin(yaw) * Math.cos(pitch) * dist,
       lookAt.y + Math.sin(pitch) * dist + L * 0.25,
       lookAt.z - Math.cos(yaw) * Math.cos(pitch) * dist,
@@ -326,12 +346,12 @@ export class Engine {
     const pos = { x: desired.x, y: desired.y, z: desired.z };
     resolveStatic(this.game!.world, pos, 0.7, this.scratchBoulders);
     desired.set(pos.x, pos.y, pos.z);
-    const k = p.state === 'dodge' ? 5 : 7;
-    cs.pos.lerp(desired, 1 - Math.exp(-k * dt));
-    cs.look.lerp(lookAt, 1 - Math.exp(-10 * dt));
+    const k = jumped ? 1 : p.state === 'dodge' ? 5 : 7;
+    if (jumped) { cs.pos.copy(desired); cs.look.copy(lookAt); }
+    else { cs.pos.lerp(desired, 1 - Math.exp(-k * dt)); cs.look.lerp(lookAt, 1 - Math.exp(-10 * dt)); }
     cs.shake = Math.max(0, cs.shake - dt * 2.2);
     const sh = cs.shake * cs.shake * 0.35;
-    cs.camera.position.copy(cs.pos).add(new THREE.Vector3((Math.random() - 0.5) * sh, (Math.random() - 0.5) * sh, (Math.random() - 0.5) * sh));
+    cs.camera.position.copy(cs.pos).add(this.tmpV.set((Math.random() - 0.5) * sh, (Math.random() - 0.5) * sh, (Math.random() - 0.5) * sh));
     cs.camera.lookAt(cs.look);
     const baseFov = 64 - 9 * clamp(Math.log(L + 0.3) / Math.log(11), 0, 1);
     cs.camera.fov = damp(cs.camera.fov, baseFov + (p.burstT > 0 || (Math.hypot(p.vel.x, p.vel.z) > def.speed * Math.pow(p.scale, 0.45) * 1.25) ? 8 : 0) + p.hunted * 4, 4, dt);
@@ -339,43 +359,66 @@ export class Engine {
   }
 
   private syncViews(game: Game, cams: THREE.Vector3[], dt: number) {
+    const players = Math.max(1, this.cams.length);
     const keep = new Set<number>();
     const nearDist = (a: Actor) => { let best = Infinity; for (const c of cams) { const d = Math.hypot(a.pos.x - c.x, a.pos.y - c.y, a.pos.z - c.z); if (d < best) best = d; } return best; };
-    const candidates: { a: Actor; d: number }[] = [];
+    // Rank by apparent size (body length over distance), not distance alone: a giant 80 units away
+    // matters far more than a 0.2-unit snack at 20. Anything under ~8 screen pixels is skipped.
+    const candidates: { a: Actor; d: number; size: number }[] = [];
     for (const a of game.actors) {
-      const d = nearDist(a);
-      if (d < 105 || a.controller === 'player') candidates.push({ a, d });
+      const d = Math.max(0.5, nearDist(a));
+      const size = lengthOf(a) / d;
+      if (a.controller === 'player' || (d < (players > 2 ? 90 : 130) && size > 0.011)) candidates.push({ a, d, size });
     }
-    candidates.sort((x, y) => x.d - y.d);
-    const cap = this.quality === 'high' ? 88 : 56;
+    candidates.sort((x, y) => y.size - x.size);
+    const cap = Math.round((this.quality === 'high' ? 88 : 56) / (0.6 + 0.4 * players));
     let count = 0;
     for (const { a, d } of candidates) {
       if (count >= cap && a.controller !== 'player') break;
+      // Pick a detail level from apparent size, with hysteresis so it cannot flicker at the boundary.
       let v = this.views.get(a.id);
+      const size = lengthOf(a) / d;
+      let wantLod: Lod = a.controller === 'player' ? 0 : v ? (v.lod === 0 ? (size < 0.05 ? 1 : 0) : (size > 0.075 ? 0 : 1)) : (size < 0.06 ? 1 : 0);
+      if (wantLod === 1 && !loadedSync(a.creature, 1)) { void ensureLoaded(a.creature, undefined, 1); wantLod = 0; }
+      if (v && v.lod !== wantLod) { v.dispose(); this.views.delete(a.id); v = undefined; }
       if (!v) {
-        const loaded = loadedSync(a.creature);
-        if (!loaded) { void ensureLoaded(a.creature); continue; }
-        v = new CreatureView(a.creature, loaded, { ringGeo: this.ringGeo });
+        const loaded = loadedSync(a.creature, wantLod);
+        if (!loaded) { void ensureLoaded(a.creature, undefined, wantLod); continue; }
+        v = new CreatureView(a.creature, loaded, { ringGeo: this.ringGeo }, wantLod);
         this.scene.add(v.group);
         this.views.set(a.id, v);
         v.update(a, 0, this.time, true);
       }
       keep.add(a.id); count++;
+      // Only nearby creatures cast shadows: the shadow pass has no frustum culling for these
+      // meshes, so every distant swimmer was being rasterised into the shadow map for nothing.
+      v.setShadow(d < 32 && lengthOf(a) > 0.45);
       // Animate far views less often
       const far = d > 45;
       const animate = !far || ((a.id + Math.floor(this.time * 60)) % 3 === 0);
       v.update(a, animate ? (far ? dt * 3 : dt) : dt, this.time, animate);
-      v.group.visible = !(isHidden(a) && a.stateT > 0.6);
     }
     for (const [id, v] of this.views) if (!keep.has(id)) { v.dispose(); this.views.delete(id); }
   }
 
-  /** Colour the rings for a given viewer before rendering their viewport. */
-  private applyRings(playerIndex: number, viewer?: Actor) {
+  /** Per-viewport pass: cull views outside this camera, then colour the rings for this viewer. */
+  private prepareViewport(playerIndex: number, viewer?: Actor, cs?: CamState) {
     const game = this.game!;
+    if (cs) {
+      cs.camera.updateMatrixWorld();
+      cs.projScreen.multiplyMatrices(cs.camera.projectionMatrix, cs.camera.matrixWorldInverse);
+      cs.frustum.setFromProjectionMatrix(cs.projScreen);
+    }
     for (const [id, v] of this.views) {
       const a = game.byId(id);
       if (!a) continue;
+      // Creature meshes have frustumCulled off (skinned bounds are unreliable), so cull the group here.
+      if (cs) {
+        this.cullSphere.center.set(a.pos.x, a.pos.y, a.pos.z);
+        this.cullSphere.radius = lengthOf(a) * 0.9 + 0.5;
+        v.group.visible = (!isHidden(a) || a.stateT <= 0.6) && cs.frustum.intersectsSphere(this.cullSphere);
+        if (!v.group.visible) continue;
+      }
       if (!viewer || a.state === 'dead') { v.setRing(null, a && a.controller === 'player' && a.state !== 'dead' ? 0.5 : 0); v.setHighlight(0); continue; }
       if (a.id === viewer.id) { v.setRing(PLAYER_COLORS[playerIndex % 4], 0.28); v.setHighlight(0); continue; }
       const band = bandOf(viewer, a);
@@ -441,7 +484,7 @@ export class Engine {
       const hunter = p.hunterId >= 0 ? game.byId(p.hunterId) : undefined;
       let hunterAngle: number | null = null;
       if (hunter && cs && p.hunted > 0.15) {
-        const v = new THREE.Vector3(hunter.pos.x, hunter.pos.y, hunter.pos.z).project(cs.camera);
+        const v = this.tmpProj.set(hunter.pos.x, hunter.pos.y, hunter.pos.z).project(cs.camera);
         const onScreen = v.z < 1 && Math.abs(v.x) < 1 && Math.abs(v.y) < 1;
         if (!onScreen) hunterAngle = Math.atan2(v.y * (v.z > 1 ? -1 : 1), v.x * (v.z > 1 ? -1 : 1));
       }
@@ -454,7 +497,7 @@ export class Engine {
           const band = bandOf(p, a);
           if (band === 'snack' || band === 'prey') continue;
           if (d > 90 && band !== 'giant') continue;
-          const v = new THREE.Vector3(a.pos.x, a.pos.y + lengthOf(a) * 0.4, a.pos.z).project(cs.camera);
+          const v = this.tmpProj.set(a.pos.x, a.pos.y + lengthOf(a) * 0.4, a.pos.z).project(cs.camera);
           if (v.z > 1 || Math.abs(v.x) > 1 || Math.abs(v.y) > 1) continue;
           if (band === 'rival' && d > L * 12 + 10 && p.senseT <= 0) continue;
           markers.push({ x: (v.x + 1) / 2, y: (1 - v.y) / 2, band, size: clamp(lengthOf(a) / Math.max(d, 1) * 8, 0.4, 1.6) });
@@ -475,6 +518,17 @@ export class Engine {
     });
     return { players, rects, time: game.time, status: game.state.status, message: game.state.message, mode: game.mode, winner: game.state.winner, fps: this.fps };
   }
+
+  /** Live render/sim counters, for profiling. */
+  stats() {
+    const info = this.renderer.info;
+    return {
+      players: this.cams.length, views: this.views.size, actors: this.game?.actors.length ?? 0,
+      calls: info.render.calls, triangles: info.render.triangles, programs: info.programs?.length ?? 0,
+      frameMs: +this.frameMs.toFixed(2), simMs: +this.simMs.toFixed(2), renderMs: +this.renderMs.toFixed(2), fps: +this.fps.toFixed(1),
+    };
+  }
+  private frameMs = 0; private simMs = 0; private renderMs = 0;
 
   dispose() {
     this.disposed = true;

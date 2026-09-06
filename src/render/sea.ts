@@ -18,7 +18,8 @@ float ec(vec2 p,float t) {
 
 export interface SeaEnvironment {
   group: THREE.Group;
-  setViewLength(L: number): void;
+  /** Applies the magnification tier for one viewport and returns the fog density it chose. */
+  setViewLength(L: number, camX?: number, camZ?: number): number;
   update(time: number, dt: number, focus: THREE.Vector3): void;
   dispose(): void;
   sun: THREE.DirectionalLight;
@@ -109,7 +110,7 @@ export function createSea(scene: THREE.Scene, world: WorldData, quality: Quality
 
   // Terrain
   const size = WORLD_RADIUS * 2 + 40;
-  const segs = high ? 300 : 180;
+  const segs = high ? 220 : 130;
   const terrainGeo = G(new THREE.PlaneGeometry(size, size, segs, segs));
   terrainGeo.rotateX(-Math.PI / 2);
   const tp = terrainGeo.attributes.position as THREE.BufferAttribute;
@@ -118,6 +119,40 @@ export function createSea(scene: THREE.Scene, world: WorldData, quality: Quality
   const terrain = new THREE.Mesh(terrainGeo, sedimentMat);
   terrain.name = 'seabed'; terrain.receiveShadow = true;
   group.add(terrain);
+
+  // Instanced scenery is bucketed into cells so each bucket has a real bounding sphere and can be
+  // frustum-culled per viewport. One giant InstancedMesh can never be culled: it is always "on screen".
+  const CELL = 64;
+  /** Every chunk carries the range past which it is not worth drawing, and the magnification it stops mattering at. */
+  const chunks: { mesh: THREE.InstancedMesh; cx: number; cz: number; range: number; maxLength: number }[] = [];
+  const chunked = <T extends { pos: { x: number; y: number; z: number } }>(
+    name: string, geo: THREE.BufferGeometry, mat: THREE.Material, items: T[],
+    place: (item: T, d: THREE.Object3D) => void,
+    opts: { castShadow?: boolean; color?: (item: T) => THREE.Color; range?: number; maxLength?: number } = {},
+  ) => {
+    const cells = new Map<number, T[]>();
+    for (const it of items) {
+      const k = (Math.floor(it.pos.x / CELL) + 64) * 256 + (Math.floor(it.pos.z / CELL) + 64);
+      let arr = cells.get(k); if (!arr) cells.set(k, (arr = []));
+      arr.push(it);
+    }
+    const meshes: THREE.InstancedMesh[] = [];
+    for (const [key, arr] of cells) {
+      const im = new THREE.InstancedMesh(geo, mat, arr.length);
+      im.name = name; im.castShadow = !!opts.castShadow && high; im.receiveShadow = true;
+      arr.forEach((it, i) => {
+        place(it, dummy); dummy.updateMatrix(); im.setMatrixAt(i, dummy.matrix);
+        if (opts.color) im.setColorAt(i, opts.color(it));
+      });
+      im.computeBoundingSphere();
+      group.add(im); meshes.push(im);
+      chunks.push({
+        mesh: im, cx: (Math.floor(key / 256) - 64) * CELL + CELL / 2, cz: ((key % 256) - 64) * CELL + CELL / 2,
+        range: opts.range ?? 1e6, maxLength: opts.maxLength ?? Infinity,
+      });
+    }
+    return meshes;
+  };
 
   // Boulders
   const rockGeo = (detail: number) => {
@@ -133,31 +168,24 @@ export function createSea(scene: THREE.Scene, world: WorldData, quality: Quality
   };
   const dummy = new THREE.Object3D();
   const color = new THREE.Color();
-  const boulders = new THREE.InstancedMesh(rockGeo(high ? 3 : 2), rockMat, world.boulders.length);
-  boulders.name = 'boulders'; boulders.castShadow = high; boulders.receiveShadow = true;
-  world.boulders.forEach((b, i) => {
-    dummy.position.set(b.pos.x, b.pos.y, b.pos.z); dummy.rotation.set(0, b.rot, 0); dummy.scale.set(b.sx, b.sy, b.sz); dummy.updateMatrix();
-    boulders.setMatrixAt(i, dummy.matrix);
-    color.setHSL(0.1 + rng() * 0.05, 0.1 + rng() * 0.1, b.shade * 0.55);
-    boulders.setColorAt(i, color);
-  });
-  group.add(boulders);
+  chunked('boulders', rockGeo(high ? 2 : 1), rockMat, world.boulders,
+    (b, d) => { d.position.set(b.pos.x, b.pos.y, b.pos.z); d.rotation.set(0, b.rot, 0); d.scale.set(b.sx, b.sy, b.sz); },
+    { castShadow: true, range: 240, color: (b) => color.setHSL(0.1 + rng() * 0.05, 0.1 + rng() * 0.1, b.shade * 0.55) });
 
   // Rock fragments scattered
-  const fragCount = high ? 1400 : 500;
-  const frags = new THREE.InstancedMesh(rockGeo(1), rockMat, fragCount);
-  for (let i = 0; i < fragCount; i++) {
+  const fragItems: { pos: { x: number; y: number; z: number }; s: number; a: number }[] = [];
+  for (let i = 0; i < (high ? 1400 : 500); i++) {
     const a = rng() * TAU, d = Math.sqrt(rng()) * (WORLD_RADIUS - 8);
-    const x = Math.cos(a) * d, z = Math.sin(a) * d, s = 0.05 + rng() * 0.22;
-    dummy.position.set(x, sampleHeight(x, z) + 0.02, z); dummy.rotation.set(0, a, 0); dummy.scale.set(s * 1.5, s * 0.35, s); dummy.updateMatrix();
-    frags.setMatrixAt(i, dummy.matrix);
-    color.setHSL(0.1, 0.12, 0.42 + rng() * 0.2); frags.setColorAt(i, color);
+    const x = Math.cos(a) * d, z = Math.sin(a) * d;
+    fragItems.push({ pos: { x, y: sampleHeight(x, z) + 0.02, z }, s: 0.05 + rng() * 0.22, a });
   }
-  group.add(frags);
+  chunked('frags', rockGeo(1), rockMat, fragItems,
+    (f, d) => { d.position.set(f.pos.x, f.pos.y, f.pos.z); d.rotation.set(0, f.a, 0); d.scale.set(f.s * 1.5, f.s * 0.35, f.s); },
+    { range: 45, maxLength: 4.5, color: () => color.setHSL(0.1, 0.12, 0.42 + rng() * 0.2) });
 
   // Flora geometries (same reconstructions as the old build)
   const tube = (a: THREE.Vector3, b: THREE.Vector3, r: number, taper = 0.8) => {
-    const g = new THREE.CylinderGeometry(r * taper, r, a.distanceTo(b), 6, 1, true);
+    const g = new THREE.CylinderGeometry(r * taper, r, a.distanceTo(b), 5, 1, true);
     g.applyQuaternion(new THREE.Quaternion().setFromUnitVectors(new THREE.Vector3(0, 1, 0), b.clone().sub(a).normalize()));
     g.translate((a.x + b.x) / 2, (a.y + b.y) / 2, (a.z + b.z) / 2);
     return g;
@@ -168,28 +196,28 @@ export function createSea(scene: THREE.Scene, world: WorldData, quality: Quality
     const end = o.clone().addScaledVector(dir, len);
     vauxiaParts.push(tube(o, end, r));
     if (depth > 0) for (const s of [-1, 1]) branch(end, dir.clone().add(new THREE.Vector3(s * 0.48, 0.1, (rng() - 0.5) * 0.4)).normalize(), len * 0.72, r * 0.67, depth - 1);
-    else { const t = new THREE.TorusGeometry(r * 0.77, r * 0.16, 4, 8); t.applyQuaternion(new THREE.Quaternion().setFromUnitVectors(new THREE.Vector3(0, 0, 1), dir)); t.translate(end.x, end.y, end.z); vauxiaParts.push(t); }
+    else { const t = new THREE.TorusGeometry(r * 0.77, r * 0.16, 3, 5); t.applyQuaternion(new THREE.Quaternion().setFromUnitVectors(new THREE.Vector3(0, 0, 1), dir)); t.translate(end.x, end.y, end.z); vauxiaParts.push(t); }
   };
   branch(new THREE.Vector3(), new THREE.Vector3(0.04, 1, 0).normalize(), 0.7, 0.115, high ? 3 : 2);
   const vauxiaGeo = merged(vauxiaParts);
-  const sacGeo = G(new THREE.LatheGeometry([[0.08, 0], [0.14, 0.15], [0.26, 0.35], [0.35, 0.76], [0.32, 1.07], [0.29, 1.13], [0.245, 1.1], [0.25, 0.91], [0.19, 0.55], [0.09, 0.25]].map(([x, y]) => new THREE.Vector2(x, y)), 12));
+  const sacGeo = G(new THREE.LatheGeometry([[0.08, 0], [0.14, 0.15], [0.26, 0.35], [0.35, 0.76], [0.32, 1.07], [0.29, 1.13], [0.245, 1.1], [0.25, 0.91], [0.19, 0.55], [0.09, 0.25]].map(([x, y]) => new THREE.Vector2(x, y)), 8));
   const choiaParts: THREE.BufferGeometry[] = [];
-  { const c = new THREE.SphereGeometry(0.42, 12, 6); c.scale(1, 0.21, 1); c.translate(0, 0.11, 0); choiaParts.push(c);
-    for (let i = 0; i < 28; i++) { const t = (i / 28) * TAU, n = 0.6 + rng() * 0.25; choiaParts.push(tube(new THREE.Vector3(Math.cos(t) * 0.22, 0.13, Math.sin(t) * 0.22), new THREE.Vector3(Math.cos(t) * n, 0.02, Math.sin(t) * n), 0.012, 0.15)); } }
+  { const c = new THREE.SphereGeometry(0.42, 9, 4); c.scale(1, 0.21, 1); c.translate(0, 0.11, 0); choiaParts.push(c);
+    for (let i = 0; i < 16; i++) { const t = (i / 16) * TAU, n = 0.6 + rng() * 0.25; choiaParts.push(tube(new THREE.Vector3(Math.cos(t) * 0.22, 0.13, Math.sin(t) * 0.22), new THREE.Vector3(Math.cos(t) * n, 0.02, Math.sin(t) * n), 0.012, 0.15)); } }
   const choiaGeo = merged(choiaParts);
-  const curveTube = (pts: number[][], r: number, seg = 10, rad = 6) => new THREE.TubeGeometry(new THREE.CatmullRomCurve3(pts.map((p) => new THREE.Vector3(p[0], p[1], p[2]))), seg, r, rad, false);
+  const curveTube = (pts: number[][], r: number, seg = 5, rad = 4) => new THREE.TubeGeometry(new THREE.CatmullRomCurve3(pts.map((p) => new THREE.Vector3(p[0], p[1], p[2]))), seg, r, rad, false);
   const thalliParts: THREE.BufferGeometry[] = [];
   for (let i = 0; i < 3; i++) {
     const t = (i / 3) * TAU, n = Math.cos(t), r = Math.sin(t);
-    thalliParts.push(curveTube([[0, 0, 0], [n * 0.12, 0.35, r * 0.12], [n * 0.22, 0.8, r * 0.25], [n * 0.18, 1.35, r * 0.32]], 0.045, 10));
+    thalliParts.push(curveTube([[0, 0, 0], [n * 0.12, 0.35, r * 0.12], [n * 0.22, 0.8, r * 0.25], [n * 0.18, 1.35, r * 0.32]], 0.045, 6, 4));
     for (const s of [-1, 1]) {
-      thalliParts.push(curveTube([[n * 0.1, 0.4, r * 0.12], [n * 0.25 + s * 0.2, 0.65, r * 0.2], [n * 0.35 + s * 0.33, 0.95, r * 0.35]], 0.032, 8));
-      thalliParts.push(curveTube([[n * 0.2, 0.8, r * 0.25], [n * 0.4 + s * 0.13, 1, r * 0.3], [n * 0.4 + s * 0.2, 1.28, r * 0.4]], 0.024, 7));
+      thalliParts.push(curveTube([[n * 0.1, 0.4, r * 0.12], [n * 0.25 + s * 0.2, 0.65, r * 0.2], [n * 0.35 + s * 0.33, 0.95, r * 0.35]], 0.032, 4, 3));
+      thalliParts.push(curveTube([[n * 0.2, 0.8, r * 0.25], [n * 0.4 + s * 0.13, 1, r * 0.3], [n * 0.4 + s * 0.2, 1.28, r * 0.4]], 0.024, 3, 3));
     }
   }
   const thalliGeo = merged(thalliParts);
   const tuftParts: THREE.BufferGeometry[] = [];
-  for (let i = 0; i < (high ? 16 : 10); i++) { const a = rng() * TAU, t = 0.13 + rng() * 0.22, n = 0.2 + rng() * 0.4; tuftParts.push(curveTube([[0, 0, 0], [Math.cos(a) * t * 0.4, n * 0.4, Math.sin(a) * t * 0.4], [Math.cos(a) * t, n * 0.8, Math.sin(a) * t], [Math.cos(a + 0.2) * t * 1.2, n, Math.sin(a + 0.2) * t * 1.2]], 0.008, 5, 4)); }
+  for (let i = 0; i < (high ? 9 : 6); i++) { const a = rng() * TAU, t = 0.13 + rng() * 0.22, n = 0.2 + rng() * 0.4; tuftParts.push(curveTube([[0, 0, 0], [Math.cos(a) * t * 0.4, n * 0.4, Math.sin(a) * t * 0.4], [Math.cos(a) * t, n * 0.8, Math.sin(a) * t], [Math.cos(a + 0.2) * t * 1.2, n, Math.sin(a + 0.2) * t * 1.2]], 0.008, 4, 3)); }
   const tuftGeo = merged(tuftParts);
 
   const floraSets: Record<string, { geo: THREE.BufferGeometry; mat: THREE.Material; items: typeof world.flora }> = {
@@ -199,14 +227,12 @@ export function createSea(scene: THREE.Scene, world: WorldData, quality: Quality
   for (const f of world.flora) floraSets[f.kind].items.push(f);
   for (const [kind, set] of Object.entries(floraSets)) {
     if (!set.items.length) continue;
-    const im = new THREE.InstancedMesh(set.geo, set.mat, set.items.length);
-    im.name = `flora-${kind}`; im.castShadow = high && kind !== 'tuft'; im.receiveShadow = true;
-    set.items.forEach((f, i) => {
-      dummy.position.set(f.pos.x, f.pos.y, f.pos.z); dummy.rotation.set(0, f.rot, 0); dummy.scale.set(f.scale, f.sy, f.scale); dummy.updateMatrix();
-      im.setMatrixAt(i, dummy.matrix);
-      color.setHSL(0.095 + rng() * 0.05, 0.14 + rng() * 0.12, f.shade * 0.72); im.setColorAt(i, color);
-    });
-    group.add(im);
+    // Sponges do not cast shadows: the sun is high and diffuse down here, and shadow-casting flora
+    // was by far the most expensive thing in the frame (it is re-rendered for every viewport).
+    const range = kind === 'tuft' ? 58 : kind === 'choia' ? 88 : kind === 'sac' ? 100 : 125;
+    chunked(`flora-${kind}`, set.geo, set.mat, set.items,
+      (f, d) => { d.position.set(f.pos.x, f.pos.y, f.pos.z); d.rotation.set(0, f.rot, 0); d.scale.set(f.scale, f.sy, f.scale); },
+      { range, maxLength: kind === 'tuft' ? 7 : Infinity, color: (f) => color.setHSL(0.095 + rng() * 0.05, 0.14 + rng() * 0.12, f.shade * 0.72) });
   }
 
   // Water surface / light window
@@ -267,19 +293,18 @@ export function createSea(scene: THREE.Scene, world: WorldData, quality: Quality
   const microCount = high ? 9000 : 3500;
   const microGeo = G(new THREE.ConeGeometry(0.012, 0.22, 3, 1, true));
   microGeo.translate(0, 0.11, 0);
-  const micro = new THREE.InstancedMesh(microGeo, tuftMat, microCount);
-  micro.name = 'micro-tufts'; micro.castShadow = false; micro.receiveShadow = true;
+  const microItems: { pos: { x: number; y: number; z: number }; s: number; a: number; rx: number; rz: number; sy: number }[] = [];
   for (let i = 0; i < microCount; i++) {
     // cluster around flora so the nursery floor reads as undergrowth
     const anchor = world.flora[Math.floor(rng() * world.flora.length)];
     const a = rng() * TAU, d = Math.sqrt(rng()) * 2.4;
     const x = anchor.pos.x + Math.cos(a) * d, z = anchor.pos.z + Math.sin(a) * d;
     const s = 0.6 + rng() * 1.4;
-    dummy.position.set(x, sampleHeight(x, z) - 0.02, z); dummy.rotation.set((rng() - 0.5) * 0.5, a, (rng() - 0.5) * 0.5); dummy.scale.set(s, s * (0.8 + rng() * 0.8), s); dummy.updateMatrix();
-    micro.setMatrixAt(i, dummy.matrix);
-    color.setHSL(0.22 + rng() * 0.08, 0.3, 0.3 + rng() * 0.2); micro.setColorAt(i, color);
+    microItems.push({ pos: { x, y: sampleHeight(x, z) - 0.02, z }, s, a, rx: (rng() - 0.5) * 0.5, rz: (rng() - 0.5) * 0.5, sy: s * (0.8 + rng() * 0.8) });
   }
-  group.add(micro);
+  chunked('micro-tufts', microGeo, tuftMat, microItems,
+    (m, d) => { d.position.set(m.pos.x, m.pos.y, m.pos.z); d.rotation.set(m.rx, m.a, m.rz); d.scale.set(m.s, m.sy, m.s); },
+    { range: 32, maxLength: 2.2, color: () => color.setHSL(0.22 + rng() * 0.08, 0.3, 0.3 + rng() * 0.2) });
 
   const baseFog = high ? 0.0105 : 0.0125;
   const cur = { x: 0, y: 0, z: 0 };
@@ -289,14 +314,24 @@ export function createSea(scene: THREE.Scene, world: WorldData, quality: Quality
 
   return {
     group, sun,
-    /** Per-viewport magnification: small creatures live in a denser, closer world with fine detail; big ones see far. */
-    setViewLength(L: number) {
+    /**
+     * Per-viewport magnification: small creatures live in a denser, closer world with fine detail;
+     * big ones see far. Returns the fog density so the camera's far plane can be pulled in to match,
+     * which is what actually lets distant scenery chunks be frustum-culled instead of drawn into fog.
+     */
+    setViewLength(L: number, camX = 0, camZ = 0) {
       const fog = scene.fog as THREE.FogExp2;
-      fog.density = baseFog * THREE.MathUtils.clamp(2.2 / (L + 1.5), 0.5, 1.15);
-      micro.visible = L < 2.2;
-      frags.visible = L < 4.5;
+      fog.density = baseFog * THREE.MathUtils.clamp(2.2 / (L + 1.5), 0.62, 1.15);
+      // Distance-cull scenery chunks: small detail is a few pixels and heavily fogged long before
+      // the far plane, so drawing it is pure cost. Bigger creatures see proportionally further.
+      const reach = THREE.MathUtils.clamp(0.75 + L * 0.14, 0.85, 1.9);
+      for (const c of chunks) {
+        const d = Math.hypot(camX - c.cx, camZ - c.cz) - CELL * 0.75;
+        c.mesh.visible = L < c.maxLength && d < c.range * reach;
+      }
       (particles.material as THREE.ShaderMaterial).opacity = 1;
       particles.scale.setScalar(THREE.MathUtils.clamp(L * 0.6, 0.6, 3));
+      return fog.density;
     },
     update(time, dt, focus) {
       if (disposed) return;
