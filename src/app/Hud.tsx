@@ -66,8 +66,16 @@ function PlayerPanel({ p }: { p: PlayerHud }) {
         </div>
         <div className="tally"><span>{p.eats} eaten</span><span>{p.kills} kills</span><span>{p.escapes} escapes</span></div>
       </div>
-      {p.hint && <p className="hint">{p.hint}</p>}
-      {p.hunted > 0.5 && !p.hint && <p className="hint danger">{p.hunterName} is hunting you.</p>}
+      {p.hunterState !== 'none' && (
+        <div className={`threat ${p.hunterState}`}>
+          <span className="eye"><i style={{ transform: `scaleX(${Math.min(1, p.hunted)})` }} /></span>
+          <div>
+            <b>{p.hunterState === 'hunting' ? `${p.hunterName ?? 'Something huge'} IS HUNTING YOU` : `${p.hunterName ?? 'Something huge'} is looking your way`}</b>
+            <span>{p.hunterState === 'hunting' ? (p.inCover ? (p.still ? 'Hold still. It is losing you.' : 'In cover. Now freeze.') : 'Break line of sight. Get under the sponges.') : (p.still ? 'Stay frozen until it turns away.' : 'Stop moving, or slip into cover.')}</span>
+          </div>
+        </div>
+      )}
+      {p.hint && p.hunterState === 'none' && <p className="hint">{p.hint}</p>}
       {!p.alive && (
         <div className="dead-overlay">
           <b>EATEN</b>

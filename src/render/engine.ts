@@ -20,7 +20,7 @@ export interface PlayerHud {
   abilityName: string; abilityReady: number; abilityActive: boolean; abilityUnlocked: boolean;
   senseReady: number;
   lock?: { name: string; band: Band; hp: number; color: string };
-  hunted: number; hunterAngle: number | null; hunterName?: string;
+  hunted: number; hunterAngle: number | null; hunterName?: string; hunterState: 'none' | 'noticed' | 'hunting'; inCover: boolean; still: boolean;
   hint?: string; respawnIn: number; state: string; kills: number; eats: number; escapes: number; protect: boolean;
   bandMarkers: { x: number; y: number; band: Band; size: number }[];
 }
@@ -386,7 +386,9 @@ export class Engine {
       const near = d < L * 7 + 4;
       const opacity = locked ? 0.95 : sensing ? 0.8 : near ? (band === 'snack' ? 0.18 : 0.42) : 0;
       v.setRing(BAND_COLOR[band], opacity * (a.controller === 'swarm' ? 0.5 : 1));
-      v.setHighlight(sensing ? 0.55 + 0.25 * Math.sin(this.time * 9) : locked ? 0.12 : 0, BAND_COLOR[band]);
+      const huntingMe = a.brain?.target === viewer.id && (a.brain.goal === 'hunt' || a.brain.goal === 'notice');
+      if (huntingMe) { v.setRing(BAND_COLOR[band], 0.95); v.setHighlight(a.brain!.goal === 'hunt' ? 0.45 + 0.3 * Math.sin(this.time * 10) : 0.25 + 0.1 * Math.sin(this.time * 6), '#ff4b5c'); }
+      else v.setHighlight(sensing ? 0.55 + 0.25 * Math.sin(this.time * 9) : locked ? 0.12 : 0, BAND_COLOR[band]);
     }
   }
 
@@ -421,7 +423,7 @@ export class Engine {
         case 'grab': { this.impacts.spawn(e.pos, '#ffb070', 1.4, 0.35); audio.play('grab'); if (e.player != null && e.player >= 0) { const d = padOf(e.player); if (typeof d === 'number') rumble(d, 1, 0.6, 300); } break; }
         case 'hunted': { audio.play('hunted'); if (e.player != null && e.player >= 0) { const d = padOf(e.player); if (typeof d === 'number') rumble(d, 0.6, 0.9, 500); } break; }
         case 'escape': { audio.play('escape'); break; }
-        case 'noticed': { audio.play('noticed'); break; }
+        case 'noticed': { audio.play('noticed', 0.5); break; }
         case 'sense': { audio.play('sense'); break; }
         case 'burst': { audio.play('burst'); break; }
       }
@@ -466,6 +468,7 @@ export class Engine {
         senseReady: 1 - clamp(p.senseCd / 6, 0, 1),
         lock: lockA && isAlive(lockA) ? { name: creature(lockA.creature).name, band: bandOf(p, lockA), hp: lockA.hp / lockA.hpMax, color: BAND_COLOR[bandOf(p, lockA)] } : undefined,
         hunted: p.hunted, hunterAngle, hunterName: hunter ? creature(hunter.creature).name : undefined,
+        hunterState: p.hunted >= 0.5 ? 'hunting' : p.hunted > 0.2 ? 'noticed' : 'none', inCover: p.cover > 0.3, still: Math.hypot(p.vel.x, p.vel.y, p.vel.z) < 0.3,
         hint: game.hintFor(i), respawnIn: p.state === 'dead' ? Math.max(0, 4.5 - p.respawnT) : 0, state: p.state,
         kills: p.kills, eats: p.eats, escapes: p.escapes, protect: p.spawnProtect > 0, bandMarkers: markers.slice(0, 24),
       };

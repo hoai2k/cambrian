@@ -13,10 +13,12 @@ const SAMPLES: Record<string, string[]> = {
   parry: ['parry'], guardBreak: ['guard-break'], stagger: ['stagger'],
   dodge: ['dodge-1', 'dodge-2'], burst: ['burst'], silt: ['silt'], grab: ['grab'],
   kill: ['kill'], death: ['death'], tierUp: ['tier-up'], hunted: ['hunted'], escape: ['escape'],
-  sense: ['sense'], ability: ['ability'], heartbeat: ['heartbeat'], noticed: ['sense'], respawn: ['ui-join'],
+  sense: ['sense'], ability: ['ability'], heartbeat: ['heartbeat'], noticed: ['hunted'], respawn: ['ui-join'],
   'ui-move': ['ui-move'], 'ui-confirm': ['ui-confirm'], 'ui-back': ['ui-back'], 'ui-join': ['ui-join'], 'ui-start': ['ui-start'], won: ['won'],
 };
 const LOOPS = { ambient: 'ambient-reef', drone: 'giant-drone' } as const;
+/** Background music (public/music). Starts with the first user gesture on the title screen and loops. */
+const MUSIC_URL = `${import.meta.env.BASE_URL}music/${encodeURIComponent('Tide of First Bones.mp3')}`;
 
 export class GameAudio {
   private ctx?: AudioContext;
@@ -26,6 +28,10 @@ export class GameAudio {
   private synthAmbGain?: GainNode;
   private tensionGain?: GainNode;
   private synthTensionGain?: GainNode;
+  private musicGain?: GainNode;
+  private musicStarted = false;
+  musicOn = true;
+  private musicLevel = 0.3;
   private buffers = new Map<string, AudioBuffer>();
   private loading = new Set<string>();
   private heartT = 0;
@@ -61,7 +67,19 @@ export class GameAudio {
     this.synthTensionGain = ctx.createGain(); this.synthTensionGain.gain.value = 0; this.synthTensionGain.connect(this.master);
     const td = ctx.createOscillator(); td.type = 'sawtooth'; td.frequency.value = 41; const tf = ctx.createBiquadFilter(); tf.type = 'lowpass'; tf.frequency.value = 160;
     td.connect(tf); tf.connect(this.synthTensionGain); td.start();
+    this.musicGain = ctx.createGain(); this.musicGain.gain.value = 0; this.musicGain.connect(this.master);
+    void this.startMusic();
     void this.preload();
+    // (focus) silence the game when the tab or window is not in front
+    const onVis = () => this.applyGain();
+    document.addEventListener('visibilitychange', onVis);
+    window.addEventListener('blur', onVis); window.addEventListener('focus', onVis);
+  }
+  private focused() { return document.visibilityState === 'visible' && document.hasFocus(); }
+  private applyGain() {
+    if (!this.master || !this.ctx) return;
+    const target = this.muted || !this.focused() ? 0 : this.volume;
+    this.master.gain.setTargetAtTime(target, this.ctx.currentTime, 0.08);
   }
 
   private async preload() {
@@ -85,6 +103,18 @@ export class GameAudio {
       return buf;
     } catch { return undefined; } finally { this.loading.delete(name); }
   }
+
+  private async startMusic() {
+    if (this.musicStarted || !this.ctx || !this.musicGain) return;
+    this.musicStarted = true;
+    try {
+      const res = await fetch(MUSIC_URL); if (!res.ok) throw new Error(String(res.status));
+      const buf = await this.ctx.decodeAudioData(await res.arrayBuffer());
+      const src = this.ctx.createBufferSource(); src.buffer = buf; src.loop = true; src.connect(this.musicGain); src.start();
+      this.musicGain.gain.linearRampToValueAtTime(this.musicOn ? this.musicLevel : 0, this.ctx.currentTime + 4);
+    } catch { this.musicStarted = false; }
+  }
+  setMusic(on: boolean) { this.musicOn = on; if (this.musicGain && this.ctx) this.musicGain.gain.setTargetAtTime(on ? this.musicLevel * (1 - this.tension * 0.45) : 0, this.ctx.currentTime, 0.5); }
 
   private startLoop(name: string, dest: AudioNode) {
     const ctx = this.ctx!; const buf = this.buffers.get(name); if (!buf) return;
@@ -110,7 +140,7 @@ export class GameAudio {
     const d = buf.getChannelData(0); for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1;
     const src = ctx.createBufferSource(); src.buffer = buf; src.loop = true; src.start(); return src;
   }
-  setVolume(v: number) { this.volume = v; if (this.master) this.master.gain.value = this.muted ? 0 : v; }
+  setVolume(v: number) { this.volume = v; this.applyGain(); }
   setMuted(m: boolean) { this.muted = m; this.setVolume(this.volume); }
   setTension(t: number) {
     this.tension = t;
@@ -118,6 +148,7 @@ export class GameAudio {
     const now = this.ctx.currentTime;
     const haveDrone = this.buffers.has(LOOPS.drone);
     this.tensionGain?.gain.setTargetAtTime(haveDrone ? t * 0.7 : 0, now, 0.5);
+    if (this.musicGain && this.musicOn) this.musicGain.gain.setTargetAtTime(this.musicLevel * (1 - t * 0.45), now, 0.8);
     this.synthTensionGain?.gain.setTargetAtTime(haveDrone ? 0 : t * 0.3, now, 0.5);
   }
   update(dt: number) {
@@ -156,7 +187,7 @@ export class GameAudio {
     if (list) {
       const name = list[Math.floor(Math.random() * list.length)];
       const rate = (0.94 + Math.random() * 0.12) * (kind === 'eat' ? 1.15 - Math.min(0.3, s * 0.3) : 1);
-      const vol = kind.startsWith('ui') ? 0.42 : kind === 'eat' ? 0.45 + s * 0.3 : 0.6 + s * 0.35;
+      const vol = kind.startsWith('ui') ? 0.42 : kind === 'noticed' ? 0.3 : kind === 'eat' ? 0.45 + s * 0.3 : 0.6 + s * 0.35;
       if (this.playSample(name, vol, pan, rate)) return;
       void this.load(name);
     }

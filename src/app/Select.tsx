@@ -66,7 +66,7 @@ export function SelectScreen(p: Props) {
                 ))}
               </div>
               <button className="ready-button" aria-pressed={pl.ready} onClick={() => p.onReady(i)}>
-                {pl.ready ? <><CheckIcon width={18} height={18} /> LOCKED IN</> : 'LOCK IN  ·  A'}
+                {pl.ready ? <><CheckIcon width={18} height={18} /> LOCKED IN · A DIVES</> : 'LOCK IN  ·  A'}
               </button>
             </article>
           );
@@ -84,9 +84,9 @@ export function SelectScreen(p: Props) {
       <footer className="select-footer">
         <button className="ghost" onClick={p.onBack}>← Title</button>
         <div className="start-wrap">
-          {!p.allReady && p.loaded && <span className="dim">Everyone locks in, then <b>Menu</b> starts.</span>}
+          {!p.allReady && p.loaded && <span className="dim">Lock in with <b>A</b>. Press <b>A</b> again to dive.</span>}
           {!p.loaded && <span className="mini-progress" aria-label="Loading chosen creatures"><i style={{ width: `${Math.round(p.loadFraction * 100)}%` }} /><span>Waking your creatures · {Math.round(p.loadFraction * 100)}%</span></span>}
-          <button className="start-button" disabled={!p.allReady || !p.loaded} onClick={p.onStart}>{p.loaded ? 'DIVE IN' : 'LOADING…'}</button>
+          <button className={`start-button ${p.allReady && p.loaded ? 'focused' : ''}`} disabled={!p.allReady || !p.loaded} onClick={p.onStart}>{p.loaded ? 'DIVE IN  ·  A' : 'LOADING…'}</button>
         </div>
       </footer>
     </section>

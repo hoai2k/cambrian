@@ -15,12 +15,12 @@ import { Toolbar } from './Toolbar';
 
 export type Screen = 'title' | 'select' | 'playing' | 'results';
 export type DialogKind = null | 'help' | 'settings';
-export interface Settings { quality: Quality; lookSpeed: number; invertY: boolean; volume: number; muted: boolean; }
+export interface Settings { quality: Quality; lookSpeed: number; invertY: boolean; volume: number; muted: boolean; music: boolean; }
 
 const MODES: Mode[] = ['rise', 'frenzy', 'hunted', 'reef'];
 const defaultSettings = (): Settings => {
-  try { const s = localStorage.getItem('cambrian-settings'); if (s) return { ...{ quality: 'high', lookSpeed: 1, invertY: false, volume: 0.8, muted: false }, ...JSON.parse(s) }; } catch { /* ignore */ }
-  return { quality: 'high', lookSpeed: 1, invertY: false, volume: 0.8, muted: false };
+  try { const s = localStorage.getItem('cambrian-settings'); if (s) return { ...{ quality: 'high', lookSpeed: 1, invertY: false, volume: 0.8, muted: false, music: true }, ...JSON.parse(s) }; } catch { /* ignore */ }
+  return { quality: 'high', lookSpeed: 1, invertY: false, volume: 0.8, muted: false, music: true };
 };
 
 export function App() {
@@ -69,7 +69,7 @@ export function App() {
   useEffect(() => {
     engineRef.current?.setQuality(settings.quality);
     engineRef.current?.setLook(settings.lookSpeed, settings.invertY);
-    audio.setVolume(settings.volume); audio.setMuted(settings.muted);
+    audio.setVolume(settings.volume); audio.setMuted(settings.muted); audio.setMusic(settings.music);
     try { localStorage.setItem('cambrian-settings', JSON.stringify(settings)); } catch { /* ignore */ }
   }, [settings]);
 
@@ -198,7 +198,7 @@ export function App() {
             const lastRep = repeat.get(gp.index) ?? 0;
             if (dir) { cycleCreature(idx, dir); repeat.set(gp.index, now); }
             else if (stickX && now - lastRep > 260) { cycleCreature(idx, stickX); repeat.set(gp.index, now); }
-            if (just('confirm')) toggleReady(idx);
+            if (just('confirm')) { if (ps[idx].ready) startMatch(); else toggleReady(idx); }
             if (just('back')) { if (ps[idx].ready) toggleReady(idx); else removePlayer(idx); }
             if (just('menu')) startMatch();
             if (just('lock')) changeMode(MODES[(MODES.indexOf(modeRef.current) + MODES.length - 1) % MODES.length]);
@@ -233,8 +233,7 @@ export function App() {
         if (idx >= 0) {
           if (e.code === 'ArrowRight' || e.code === 'KeyD') cycleCreature(idx, 1);
           if (e.code === 'ArrowLeft' || e.code === 'KeyA') cycleCreature(idx, -1);
-          if (e.code === 'Space') { e.preventDefault(); toggleReady(idx); }
-          if (e.code === 'Enter') { if (ps.every((p) => p.ready)) startMatch(); else toggleReady(idx); }
+          if (e.code === 'Space' || e.code === 'Enter') { e.preventDefault(); if (ps[idx].ready) startMatch(); else toggleReady(idx); }
           if (e.code === 'Escape') { if (ps[idx].ready) toggleReady(idx); else backToTitle(); }
         } else if (e.code === 'Enter' || e.code === 'Space') addKeyboard();
         if (e.code === 'KeyQ') changeMode(MODES[(MODES.indexOf(modeRef.current) + MODES.length - 1) % MODES.length]);

@@ -132,15 +132,16 @@ export class Game implements AiWorld {
     const chanRoute = Array.from({ length: 8 }, (_, i) => {
       const t = (i / 8) * 2 - 1; const along = t * (WORLD_RADIUS - 50);
       const side = Math.sin(i * 2.4) * 8;
-      return { x: Math.cos(chanA) * along - Math.sin(chanA) * side, y: 4 + Math.abs(Math.sin(i)) * 6, z: Math.sin(chanA) * along + Math.cos(chanA) * side };
+      return { x: Math.cos(chanA) * along - Math.sin(chanA) * side, y: 22 + Math.abs(Math.sin(i)) * 6, z: Math.sin(chanA) * along + Math.cos(chanA) * side };
     });
     const g1 = this.spawn('anomalocaris', 'giant', { ...chanRoute[0] }, 3.5);
     g1.brain = makeBrain('giant', chanRoute[0], this.rng, { patrol: chanRoute });
     const bRoute = route(110, 100, 45, 6, 3);
     const g2 = this.spawn('olenoides', 'giant', { x: 110, y: sampleHeight(110, 55) + 1.5, z: 55 }, 3.0);
     g2.brain = makeBrain('giant', bRoute[0], this.rng, { patrol: bRoute });
-    const fRoute = route(-100, 100, 40, 6, 5, 1);
+    const fRoute = route(-100, 100, 40, 6, 24, 1);
     const g3 = this.spawn('opabinia', 'giant', { ...fRoute[0] }, 2.8);
+    for (const gg of [g1, g3]) gg.pos.y = 24;
     g3.brain = makeBrain('giant', fRoute[0], this.rng, { patrol: fRoute });
     const sRoute = route(0, 0, WORLD_RADIUS - 70, 10, SURFACE_Y - 3);
     const shadow = this.spawn('anomalocaris', 'shadow', { ...sRoute[0] }, 6.0);
@@ -233,7 +234,8 @@ export class Game implements AiWorld {
     a.hitFlash = Math.max(0, a.hitFlash - dt);
     if ((a.controller === 'player' || a.controller === 'bot')) {
       a.respawnT += dt;
-      if (a.respawnT > (a.controller === 'player' ? 4.5 : 8)) this.respawn(a);
+      // Just long enough to watch the death or the swallow, then straight back in.
+      if (a.respawnT > (a.controller === 'player' ? 2.2 : 6)) this.respawn(a);
     }
   }
 
@@ -247,6 +249,7 @@ export class Game implements AiWorld {
     } else a.nutrition *= 0.5;
     if (this.mode === 'hunted' && a.player === 0) { a.scale = 3.0; a.tier = 3; }
     applyScaleStats(a, false);
+    a.eaten = 0;
     a.stamina = a.staminaMax; a.poise = a.poiseMax;
     let nursery = NURSERIES[0], bd = Infinity;
     for (const n of NURSERIES) {
@@ -258,8 +261,11 @@ export class Game implements AiWorld {
     }
     a.pos = this.spawnPoint(nursery, a.creature, a.scale, a.player);
     a.vel = v3(); a.state = 'free'; a.stateT = 0; a.respawnT = 0; a.corpseT = 0; a.eaten = 0;
-    a.spawnProtect = 3; a.hitFlash = 0; a.abilityActive = false; a.abilityCd = 0; a.lockTarget = -1; a.hunted = 0; a.hunterId = -1;
+    a.spawnProtect = 3.5; a.hitFlash = 0; a.abilityActive = false; a.abilityCd = 0; a.lockTarget = -1; a.hunted = 0; a.hunterId = -1; a.wasHunted = false;
     a.yaw = Math.atan2(-nursery.x, -nursery.z);
+    // hatch-in: grow from a speck over a second (reuses the moult state with a smaller start scale)
+    a.hatching = true; a.state = 'moult'; a.stateT = 0; a.stateDur = 1.0;
+    this.events.push({ kind: 'moult', pos: { ...a.pos }, actor: a.id, player: a.player, strength: 0.5 });
     void def;
   }
 
@@ -267,6 +273,7 @@ export class Game implements AiWorld {
     const def = creature(a.creature);
     const L = lengthOf(a);
     const sf = speedFactor(a.scale);
+    const giantish = a.controller === 'giant' || a.controller === 'shadow';
     const justLight = input.light && !a.prev.light, justHeavy = input.heavy && !a.prev.heavy, justAbility = input.ability && !a.prev.ability;
     const justDodge = input.dodge && !a.prev.dodge, justGuard = input.guard && !a.prev.guard, justLock = input.lock && !a.prev.lock;
     const justSense = input.sense && !a.prev.sense, justRise = input.rise && !a.prev.rise;
@@ -323,8 +330,8 @@ export class Game implements AiWorld {
     if (def.ground) dir.y = 0;
     const controllable = a.state === 'free' || a.state === 'guard' || (a.state === 'ability' && (def.ability === 'shellUp' || def.ability === 'bristleFlare' || def.ability === 'ambushSurge'));
     const slowMult = a.state === 'guard' ? 0.45 : (a.abilityActive && def.ability === 'shellUp') ? 0.35 : a.exhausted > 0 ? 0.7 : 1;
-    const burstMult = controllable && (bursting || freeBurst) ? (1 + (def.burst - 1) * (freeBurst ? 1.25 : input.burst) * (a.controller === 'swarm' ? 0.55 : 1)) : 1;
-    const cruise = def.speed * sf * slowMult * (a.controller === 'swarm' ? 0.62 : 1);
+    const burstMult = controllable && (bursting || freeBurst) ? (1 + (def.burst - 1) * (freeBurst ? 1.25 : input.burst) * (a.controller === 'swarm' ? 0.55 : giantish ? 0.35 : 1)) : 1;
+    const cruise = def.speed * sf * slowMult * (a.controller === 'swarm' ? 0.62 : giantish ? 0.55 : 1);
     const cur = sampleCurrent(v3(), a.pos.x, a.pos.y, a.pos.z, this.time);
     const curK = def.ground ? 0.08 : 0.55;
     let desired: Vec3 = v3(cur.x * curK, cur.y * curK, cur.z * curK);
@@ -395,7 +402,8 @@ export class Game implements AiWorld {
     if (locked && isAlive(locked) && (a.state === 'free' || a.state === 'guard' || a.state === 'attack')) targetYaw = yawOf(sub(locked.pos, a.pos));
     else if (hv > 0.35 && a.state !== 'grabbed') targetYaw = yawOf(a.vel);
     const dy = wrapAngle(targetYaw - a.yaw);
-    const turn = clamp(dy * 6, -def.turnRate * (a.state === 'attack' ? 0.5 : 1) * (1 + hv * 0.05), def.turnRate * (a.state === 'attack' ? 0.5 : 1) * (1 + hv * 0.05));
+    const tr = def.turnRate * (a.state === 'attack' ? 0.5 : 1) * (1 + hv * 0.05) * (giantish ? 0.45 : 1);
+    const turn = clamp(dy * 6, -tr, tr);
     const prevYaw = a.yaw;
     a.yaw = wrapAngle(a.yaw + turn * dt);
     const turnRate = wrapAngle(a.yaw - prevYaw) / Math.max(dt, 1e-4);
@@ -515,9 +523,10 @@ export class Game implements AiWorld {
       this.updateAbility(a, def, dt, input, L, sf);
     } else if (a.state === 'moult') {
       const t = clamp(a.stateT / a.stateDur, 0, 1);
-      const from = TIER_SCALE[Math.max(0, a.tier - 1) as Tier], to = TIER_SCALE[a.tier];
-      a.scale = lerp(from, to, t * t * (3 - 2 * t));
-      if (a.stateT >= a.stateDur) { a.state = 'free'; a.stateT = 0; a.scale = to; applyScaleStats(a, true); a.hp = a.hpMax; }
+      const to = this.mode === 'hunted' && a.player === 0 ? a.scale : TIER_SCALE[a.tier];
+      const from = a.hatching ? to * 0.3 : TIER_SCALE[Math.max(0, a.tier - 1) as Tier];
+      if (!(this.mode === 'hunted' && a.player === 0)) a.scale = lerp(from, to, t * t * (3 - 2 * t));
+      if (a.stateT >= a.stateDur) { a.state = 'free'; a.stateT = 0; a.scale = to; applyScaleStats(a, true); a.hp = a.hpMax; a.hatching = false; }
     }
 
     // Snacks: swim-through consume
@@ -692,6 +701,7 @@ export class Game implements AiWorld {
     a.hp = Math.min(a.hpMax, a.hp + val * 0.4);
     this.events.push({ kind: 'eat', pos: { ...o.pos }, actor: a.id, other: o.id, strength: lengthOf(o) / lengthOf(a), player: a.player });
     this.flag(a, 'ate');
+    if (o.controller === 'player' || o.controller === 'bot') { o.respawnT = 1.2; return; } // swallowed: corpse logic respawns them
     this.remove(o);
   }
 
@@ -766,7 +776,8 @@ export class Game implements AiWorld {
       const d = dist(a.pos, o.pos);
       const range = Math.min(creature(o.creature).sense * lengthOf(o) + 6, o.brain.kind === 'giant' ? 70 : 40);
       // giants ramp with their detection score; smaller predators ramp with distance while actively chasing
-      const score = clamp(o.brain.kind === 'giant' ? Math.max(v / 2, hunting ? clamp(1.3 - d / range, 0.5, 1) : 0) : hunting ? clamp(1.1 - d / (range * 0.8), 0, 1) : 0, 0, 1);
+      const noticing = o.brain.target === a.id && o.brain.goal === 'notice';
+      const score = clamp(o.brain.kind === 'giant' ? Math.max(noticing ? 0.35 : 0, hunting ? Math.max(0.6, clamp(1.3 - d / range, 0.5, 1)) : Math.min(v / 4, 0.45)) : hunting ? clamp(1.1 - d / (range * 0.8), 0, 1) : 0, 0, 1);
       if (score > best) { best = score; hunter = o.id; }
     }
     const wasHunted = a.hunted >= 0.98 || a.wasHunted;
@@ -872,7 +883,8 @@ export class Game implements AiWorld {
     if (!p || !pr || this.mode === 'reef') return undefined;
     const f = pr.flags;
     if (!isAlive(p)) return undefined;
-    if (p.hunted > 0.5 && !f.has('escaped')) return p.cover > 0.3 ? 'Stay still. Let it pass.' : 'Something big has your scent. Break line of sight. Find cover. Hold still.';
+    if (p.hunted >= 0.5) return p.cover > 0.3 ? (len3(p.vel) < 0.3 ? 'Hold still. It is losing you.' : 'You are in cover. Now hold still.') : 'It is coming for you. Get under the sponges, then hold still.';
+    if (p.hunted > 0.2) return p.cover > 0.3 ? 'It is looking your way. Stay in cover and freeze.' : 'Something big is looking your way. Stop moving or slip into cover.';
     if (!f.has('moved')) return 'Push the left stick to swim.';
     if (!f.has('burst')) return 'Hold RT to burst. Catch the school.';
     if (!f.has('ate')) return 'Swim through the small fry to eat them.';

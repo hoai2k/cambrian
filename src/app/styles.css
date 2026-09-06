@@ -238,3 +238,15 @@ input[type='checkbox'] { width: 20px; height: 20px; accent-color: var(--ember); 
 .mini-progress { position: relative; display: inline-grid; align-items: center; width: 240px; height: 30px; border-radius: 10px; background: rgba(6,22,28,.6); border: 1px solid rgba(238,250,246,.14); overflow: hidden; font-size: 12px; color: var(--mist); }
 .mini-progress i { position: absolute; inset: 0 auto 0 0; background: linear-gradient(90deg, rgba(255,179,107,.35), rgba(255,91,110,.35)); transition: width .25s; }
 .mini-progress span { position: relative; text-align: center; font-weight: 700; letter-spacing: .04em; }
+
+/* ---------- Threat panel ---------- */
+.threat { position: absolute; top: 5.2em; left: 50%; transform: translateX(-50%); display: flex; gap: .8em; align-items: center; padding: .6em 1em; border-radius: 1em; background: rgba(6,22,28,.72); border: 1px solid rgba(255,138,61,.7); color: var(--foam); max-width: 90%; animation: rise-in .3s both; }
+.threat.hunting { border-color: var(--coral); box-shadow: 0 0 24px rgba(255,75,92,.45); animation: rise-in .3s both, heartbeat .9s ease-in-out infinite; }
+.threat b { display: block; font: 700 .85em var(--font-display); letter-spacing: .12em; }
+.threat span:last-child { display: block; font-size: .9em; color: var(--mist); }
+.threat .eye { position: relative; width: 2.6em; height: 1.4em; border-radius: 50% / 50%; border: 2px solid currentColor; overflow: hidden; flex: none; color: var(--ember); }
+.threat.hunting .eye { color: var(--coral); }
+.threat .eye i { position: absolute; inset: 0; background: currentColor; transform-origin: left; transition: transform .2s; opacity: .85; }
+
+.start-button.focused { animation: focus-pulse 1.4s ease-in-out infinite; outline: 2px solid rgba(255,255,255,.65); outline-offset: 3px; }
+@keyframes focus-pulse { 0%, 100% { box-shadow: 0 10px 40px rgba(255, 91, 110, .4); transform: none; } 50% { box-shadow: 0 10px 56px rgba(255, 179, 107, .75); transform: translateY(-2px) scale(1.03); } }
