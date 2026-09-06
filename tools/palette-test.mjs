@@ -6,6 +6,9 @@
  *    quietly moved "Sclerotized tips" out of the accent slot would otherwise only show up as a
  *    creature that recolours wrong.
  * 2. Every scheme must give a colour for all six slots, so no creature can land on undefined.
+ * 3. Every creature's default scheme in CREATURE_SCHEMES must name a scheme that exists, and must
+ *    name a creature that exists — a typo either way would silently fall back to the authored
+ *    colours, which looks exactly like a deliberate "Default (as authored)" choice.
  *
  * Usage: node tools/palette-test.mjs
  */
@@ -85,6 +88,17 @@ for (const [i, blockText] of colorBlocks.entries()) {
 }
 const schemeCount = schemeIds.length;
 
+// --- CREATURE_SCHEMES names real creatures and real schemes ---
+const mapBlock = src.slice(src.indexOf('export const CREATURE_SCHEMES'), src.indexOf('export const DEFAULT_SCHEME'));
+const assigned = [...mapBlock.matchAll(/^\s*([a-z]+): '([a-z-]+)',$/gm)].map((m) => [m[1], m[2]]);
+const knownSchemes = new Set(schemeIds);
+const knownIds = new Set(rosterIds());
+for (const [creatureId, schemeName] of assigned) {
+  if (!knownIds.has(creatureId)) fail(`CREATURE_SCHEMES names "${creatureId}", which is not in the roster`);
+  if (!knownSchemes.has(schemeName)) fail(`CREATURE_SCHEMES gives ${creatureId} the scheme "${schemeName}", which does not exist`);
+  if (schemeName === 'default') fail(`CREATURE_SCHEMES gives ${creatureId} the scheme "default"; leave it out of the map instead`);
+}
+
 // --- every shipped material, on every creature, classifies as expected ---
 const io = new NodeIO().registerExtensions(ALL_EXTENSIONS).registerDependencies({ 'meshopt.decoder': MeshoptDecoder });
 const ids = rosterIds();
@@ -110,5 +124,5 @@ for (const id of ids) {
   if (slotsUsed.size === 1) fail(`${id}: every material lands in the "${[...slotsUsed][0]}" slot, so schemes cannot vary it`);
 }
 
-console.log(`\n${ids.length} creatures · ${schemeCount} schemes · ${materials} materials checked · ${failures} failure(s)`);
+console.log(`\n${ids.length} creatures (${assigned.length} with a scheme, ${ids.length - assigned.length} as authored) · ${schemeCount} schemes · ${materials} materials checked · ${failures} failure(s)`);
 process.exit(failures ? 1 : 0);
