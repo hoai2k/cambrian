@@ -214,7 +214,11 @@ export class GameAudio {
    */
   seekToHandover() {
     const el = this.music?.el;
-    if (el?.duration) el.currentTime = Math.max(0, el.duration - CROSSFADE - 1);
+    if (!el) return;
+    // A stream that has only just started may not know its own length yet; wait for it rather
+    // than silently doing nothing.
+    const seek = () => { if (el.duration) el.currentTime = Math.max(0, el.duration - CROSSFADE - 1); };
+    if (el.duration) seek(); else el.addEventListener('loadedmetadata', seek, { once: true });
   }
 
   /**
