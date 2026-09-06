@@ -313,3 +313,9 @@ works; Sidneyia plants/steps its legs and closes gnathobases; Leanchoilia whips
 follow their great appendages; Isoxys streamlines for interception;
 Odontogriphus carries an undulating foot beneath a low mantle; Vetulicola's tail
 leads the propulsion; Tamisiocaris opens combs while maintaining flap waves.
+
+All new models also carry the [shared anchor contract](creature-anchors.md).
+Animate the actual feeding/contact bones so their sockets travel with the
+performance. Feeding-only CCD can adjust those appendages after animation;
+body/root/locomotor bones remain authored. Full and reduced files must retain
+identical anchor names, metadata and anatomical attachment sites.

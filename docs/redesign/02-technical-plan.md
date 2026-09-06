@@ -329,9 +329,10 @@ pipeline so guard, invulnerability, death and relative-size rules still apply.
 The renderer preserves material opacity/transparency for gelatinous models,
 plays authored Ability loops while moving, and disables its extra spine wave
 when the model owns its locomotion. Assets retain the existing URL convention:
-`<id>.glb`, `<id>.lod1.glb`, `<id>.card.png`. LODs contain genuinely simplified
+`<id>.glb`, `<id>.lod1.glb`, `<id>.card.png`, `<id>.thumb.png`. LODs contain genuinely simplified
 geometry. Streaming still prioritizes selected species; no 21-model boot gate.
-The selector uses labelled, scrollable thumbnails at every player count.
+The selector uses the shared 7-by-3 thumbnail grid and individual player cards.
+Short screens scroll the grid/card area while keeping the start controls available.
 
 Authoring scripts and texture inputs are committed under `tools/creatures/`.
 Original `.blend` files and intermediate renders remain in the user's local
@@ -343,3 +344,11 @@ armor piercing, once-per-target damage and all-tier feeding; asset validation
 for required clips, finite skinned poses, loop endpoints, LOD reduction and
 rendered appearance. Browser review covers the expanded selector and loaded
 models. Physical controller testing is distinct from browser/simulation checks.
+
+All 13 additions share [the v1 attachment contract](../creature-anchors.md).
+There are 150 new named sockets per detail level. Anatomical mouths, internal
+swallow destinations, primary/paired contacts and dedicated feeding-only CCD
+chains are stored on non-deforming child nodes. The final anchor pass preserves
+all mesh, skin, material and animation binary bytes; it is idempotent. Update
+both sizes and the shared anchor registry after this pass. Runtime tests cover
+transformed instances, every articulated chain and attachment behavior.

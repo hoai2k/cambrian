@@ -86,6 +86,22 @@ Per-animal sources, geometry/rig statistics, renders, and clip manifests are
 kept with the authoring delivery. See [technical plan](02-technical-plan.md)
 and [animation brief](../animation-brief.md) for integration and verification.
 
+## Attachment integration and delivery
+
+Every new full/LOD model carries the shared v1 mouth, inner-mouth and primary
+attack sockets. Dedicated feeding appendages also carry grasp/paired contacts
+and CCD chains; body, root and locomotor bones are excluded. The 150 sockets
+per detail level attach existing grabbed/swallowed actors to animated anatomy.
+See [anchor behavior and API](../creature-anchors.md) for the distinction between
+these shared attachments and Opabinia's specialized adaptive corpse transfer.
+
+Editable Blender scenes and intermediate review images stay in
+`cambrian/local/expansion-authoring/`. Committed sources, neutral ImageGen
+cuticle input, tissue normal-map generators, packaging and anchor manifests
+live in `tools/creatures/`. Full models retain all actions/textures; actual
+reduced LODs retain locomotion/death and vertex pigmentation. The preview,
+transparent hero card and small grid thumbnail are generated from each model.
+
 ## Scientific references
 
 - [ROM fossil gallery](https://burgess-shale.rom.on.ca/fossil-gallery/) and its

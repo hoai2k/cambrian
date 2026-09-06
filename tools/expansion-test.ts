@@ -6,6 +6,8 @@ import { applyHit } from '../src/sim/combat';
 import { beginExpansionAbility, stepExpansionAbility, bloomRate, grazeRate } from '../src/sim/expansion-abilities';
 import { emptyInput } from '../src/sim/types';
 import { Game } from '../src/sim/game';
+import { makeBrain } from '../src/sim/ai';
+import { SURFACE_Y } from '../src/sim/world';
 
 assert.equal(CREATURES.length, 21);
 assert.equal(new Set(CREATURES.map(c => c.id)).size, 21);
@@ -52,5 +54,28 @@ for (const def of EXPANSION_CREATURES) {
   assert(!a.abilityActive,`${def.id}: leaked active ability`);
   assert(Math.hypot(a.pos.x-start.x,a.pos.z-start.z)>.2,`${def.id}: cannot move`);
   assert(Object.values(a.pos).every(Number.isFinite));
+}
+// Ribbon slip clears both player locks and the AI's acquired target/detection.
+{
+  const a=actor(1), hunter=actor(2,'anomalocaris');
+  hunter.lockTarget=a.id;hunter.brain=makeBrain('giant',hunter.pos,()=>.5,{target:a.id,goal:'chase'});
+  hunter.brain.detection.set(a.id,1);
+  const ctx={hit:{events:[],byId:()=>undefined,time:0},nearby:()=>[hunter],silt:[],allies:()=>false};
+  beginExpansionAbility(ctx,a,creature(a.creature));
+  assert.equal(hunter.lockTarget,-1);assert.equal(hunter.brain.target,-1);assert(!hunter.brain.detection.has(a.id));
+}
+// An airborne Ottoia cannot dive into imaginary sediment or spend its cooldown.
+{
+  const g=new Game('reef',[{creature:'ottoia',device:'keyboard',ready:true}],77),a=g.players[0];
+  a.grounded=false;a.pos={x:0,y:20,z:0};a.hopVel=1;
+  g.step(1/60,new Map([[0,{...emptyInput(),ability:true}]]));
+  assert.equal(a.abilityCd,0);assert.notEqual(a.state,'ability');
+}
+// Tall radial bodies use their anatomical clearance at the surface too.
+for(const id of ['burgessomedusa','ctenorhabdotus'] as const){
+  const g=new Game('reef',[{creature:id,device:'keyboard',ready:true}],78),a=g.players[0];
+  a.pos={x:0,y:SURFACE_Y+5,z:0};
+  g.step(1/60,new Map([[0,emptyInput()]]));
+  assert(a.pos.y+clearanceOf(a)<=SURFACE_Y-.8+1e-6,`${id}: body crosses surface`);
 }
 console.log('PASS: 21 unique options, 13 abilities, ally safety, finite state, armor piercing, one hit per activation, mobile abilities and all-tier feeding.');

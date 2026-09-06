@@ -2,7 +2,7 @@
 
 ## Included
 
-- All eight specimens have `anchor_mouth`, `anchor_mouth_inside`, `anchor_attack_primary`, plus per-appendage attack sockets where the rig has articulated attack parts. 90 named sockets per complete detail-level set, matched in LOD1.
+- All 21 specimens have `anchor_mouth`, `anchor_mouth_inside`, `anchor_attack_primary`, plus per-appendage attack sockets where the rig has articulated attack parts. 240 named sockets per complete detail-level set, matched in LOD1 (90 original, 150 expansion).
 - Opabinia's `anchor_grasp` is a non-deforming child of `proboscis_11`, at the center of the terminal claw, not at the joint origin. Its metadata lists the full 12-bone IK chain. Mouth sockets follow the head. A world-space target supplied by the game stays separate from the moving grasp point.
 - Opabinia `Attack`, `Bite`, `Heavy`, `Ability`, `Eat`, and `Grab` now use the revised trunk performance. Attack winds upward/back into a pronounced curve and then unfolds forward as the jaws close. Feeding reaches out, grasps, curls beneath the head and presents food at the ventral mouth. `Grab` is added where absent. The two detail levels share this motion.
 - The runtime uses actual consumption progress to pose the feeding clip, solve the grasp point toward prey, transfer the prey beneath the head and shrink it into `anchor_mouth_inside`. Cancelled sessions are cleared. Simulation positions, damage and nutrition rules are unchanged. For other creatures the existing grabbed/swallowed states now follow their available sockets.
@@ -27,4 +27,30 @@ A GLB cannot bind itself to another actor or delete prey. The delivered TypeScri
 
 Run `npm run typecheck`, `npm run build`, `node --experimental-transform-types tools/anchors-test.mjs` and `node --experimental-transform-types tools/feeding-test.mjs` from the repository root (Node 22.7+). The headless tests stub texture decoding and exercise actual GLTF loading, cloned sockets, transformed-instance IK, and the production attachment pass. They do not test visual texture quality or physical controller input.
 
-All 16 GLBs remain below 25 MB. Full-detail Olenoides adds 9,696 triangles; LOD1 adds 2,160. Authoring validation checked all 30 leg roots over nine samples of each of 18 clips and found them enclosed by the new tissue.
+All 42 GLBs remain below 25 MB. The 26 expansion files retain 150 anatomical sockets per detail level. Full-detail Olenoides adds 9,696 triangles; LOD1 adds 2,160. Authoring validation checked all 30 leg roots over nine samples of each of 18 clips and found them enclosed by the new tissue.
+
+## Expansion anatomy and authoring
+
+The 13 new species use the identical v1 socket contract in both full and reduced
+models. [Expansion authoring](../tools/creatures/README.md) documents exact
+Blender-to-parent coordinate conversion, source manifests, append-only
+packaging, and validation. Every full model has at least 18 action clips;
+LOD models retain locomotion/death plus the same skeleton and sockets.
+
+Nectocaris tentacles, Ottoia's introvert, articulated arthropod feeding limbs,
+Burgessomedusa's fringe and radiodont feeding appendages provide bounded CCD
+chains. The chains exclude root/body/locomotor bones. Pikaia, Odaraia,
+Odontogriphus, Ctenorhabdotus and Vetulicola use animated anatomical contact
+points without inventing articulated jaws or prehensile limbs. Optional paired
+and individual sockets expose additional contacts through `solveAnchor`.
+
+The existing generic grabbed/swallowed pass attaches prey to these new sockets;
+Nectocaris's new capture ability uses it directly. Adaptive corpse pickup/carry
+remains Opabinia's specialized interaction. New species retain their authored
+Eat performances and shared consumption rules.
+
+The registry in `creature-anchors-manifest.json` includes all 42 files.
+`tools/update-asset-sizes.mjs` refreshes expansion registry entries and sizes
+after packaging. `tools/asset-audit.ts` tests real browser texture decoding,
+full/LOD animation and skinning, all articulated socket solves, transformed
+instances, clone isolation, and unchanged root/unrelated bones.

@@ -18,7 +18,7 @@
         -2.185,
         -0.1
       ],
-      "role": "mouth_inside"
+      "role": "swallow"
     },
     {
       "name": "anchor_attack_primary",
@@ -51,7 +51,7 @@
         -1.705,
         -0.028
       ],
-      "role": "mouth_inside"
+      "role": "swallow"
     },
     {
       "name": "anchor_attack_tentacle_L",
@@ -165,7 +165,7 @@
         -2.06,
         0
       ],
-      "role": "mouth_inside"
+      "role": "swallow"
     },
     {
       "name": "anchor_attack_primary",
@@ -206,7 +206,7 @@
         -1.72,
         -0.075
       ],
-      "role": "mouth_inside"
+      "role": "swallow"
     },
     {
       "name": "anchor_attack_primary",
@@ -239,7 +239,7 @@
         -1.93,
         -0.045
       ],
-      "role": "mouth_inside"
+      "role": "swallow"
     },
     {
       "name": "anchor_attack_primary",

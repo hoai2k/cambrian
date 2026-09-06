@@ -210,7 +210,7 @@ export class Engine {
   private frame = (now: number) => {
     if (this.disposed) return;
     this.raf = requestAnimationFrame(this.frame);
-    const dtReal = Math.min((now - this.last) / 1000, 0.08);
+    const dtReal = Math.max(0, Math.min((now - this.last) / 1000, 0.08));
     this.last = now;
     this.fpsFrames++; this.fpsT += dtReal; if (this.fpsT > 1) { this.fps = this.fpsFrames / this.fpsT; this.fpsFrames = 0; this.fpsT = 0; }
     const game = this.game;

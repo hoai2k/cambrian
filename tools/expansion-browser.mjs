@@ -1,6 +1,8 @@
 import { chromium } from 'playwright-core';
 import fs from 'node:fs';
 import path from 'node:path';
+const base=(process.env.QA_BASE_URL || 'http://127.0.0.1:5173').replace(/\/$/,'');
+const viewerOnly=Boolean(process.env.QA_VIEWER_ONLY);
 const out=process.env.CAMBRIAN_QA_DIR || '../expansion-authoring/review';fs.mkdirSync(out,{recursive:true});
 const browser=await chromium.launch({executablePath:process.env.CHROME_PATH || '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',args:['--use-gl=angle','--use-angle=swiftshader','--enable-unsafe-swiftshader','--no-sandbox']});
 const page=await browser.newPage({viewport:{width:1440,height:1000}});
@@ -8,10 +10,12 @@ const errors=[];page.on('pageerror',e=>errors.push(e.stack || e.message));page.o
 await page.addInitScript(()=>localStorage.setItem('cambrian-settings',JSON.stringify({quality:'low',muted:true,music:false})));
 try {
 if (!process.env.QA_ONLY_UI) {
-await page.goto('http://127.0.0.1:5173/viewer/',{waitUntil:'networkidle',timeout:120000});
+await page.goto(`${base}/viewer/`,{waitUntil:'networkidle',timeout:120000});
+if(!viewerOnly){
 const audit=await page.evaluate(async()=>{const m=await import('/tools/asset-audit.ts');return m.auditAssets()});
 fs.writeFileSync(path.join(out,'runtime-asset-audit.json'),JSON.stringify(audit,null,2));
 console.log('PASS: runtime loading, textures, skinning, all clips, loops and LOD reduction for',audit.length,'new creatures');
+}
 for(const id of ['pikaia','nectocaris','burgessomedusa','odaraia','ottoia','cambroraster','sidneyia','leanchoilia','isoxys','odontogriphus','ctenorhabdotus','vetulicola','tamisiocaris']) {
  const name=id[0].toUpperCase()+id.slice(1);
  await page.getByRole('button',{name:new RegExp('^'+name+' ')}).click();
@@ -20,7 +24,8 @@ for(const id of ['pikaia','nectocaris','burgessomedusa','odaraia','ottoia','camb
  await page.screenshot({path:path.join(out,`viewer-${id}.png`)});
 }
 }
-await page.goto('http://127.0.0.1:5173/',{waitUntil:'networkidle',timeout:120000});
+if(!viewerOnly){
+await page.goto(`${base}/`,{waitUntil:'networkidle',timeout:120000});
 await page.keyboard.press('Enter');await page.locator('.select').waitFor();
 await page.getByRole('option',{name:'Burgessomedusa',exact:true}).click();
 await page.screenshot({path:path.join(out,'selection.png')});
@@ -45,6 +50,24 @@ for(let i=0;i<2;i++){
 await page.screenshot({path:path.join(out,'selection-four.png')});
 if(await page.locator('.crew-card').count()!==4) throw Error('Four-player selector failed');
 await page.setViewportSize({width:960,height:540});await page.waitForTimeout(500);await page.screenshot({path:path.join(out,'selection-small.png')});
+const lastCard=page.locator('.crew-card').last();
+await lastCard.scrollIntoViewIfNeeded();
+if((await lastCard.boundingBox()).height<150)throw Error('Small-screen player cards collapsed');
+await page.screenshot({path:path.join(out,'selection-small-players.png')});
+await page.setViewportSize({width:1440,height:1000});
+await page.getByRole('tab',{name:/^Reef/}).click();
+await page.locator('.ready-button').nth(0).click();
+await page.getByRole('option',{name:'Nectocaris',exact:true}).click();
+for(let i=1;i<4;i++)await page.locator('.ready-button').nth(i).click();
+await page.getByRole('button',{name:'DIVE IN  ·  A',exact:true}).click();
+await page.locator('.hud').nth(3).waitFor({timeout:60000});
+await page.waitForFunction(()=>!document.body.textContent.includes('Your creature is taking shape'),null,{timeout:60000});
+await page.keyboard.down('w');await page.waitForTimeout(1500);await page.keyboard.up('w');
+await page.keyboard.press('q');await page.keyboard.press('e');
+await page.waitForTimeout(1500);
+await page.screenshot({path:path.join(out,'gameplay-four.png')});
+console.log('PASS: 21-cell roster, four-player join, scrollable short-screen cards, and four-viewport Reef gameplay');
+}
 console.log('Browser errors:',JSON.stringify(errors));
 fs.writeFileSync(path.join(out,'browser-errors.json'),JSON.stringify(errors,null,2));
 if(errors.length)process.exitCode=1;

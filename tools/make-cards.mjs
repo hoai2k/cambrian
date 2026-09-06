@@ -22,16 +22,19 @@ const ids = fs.readdirSync(dir).filter((f) => /^[a-z]+\.png$/.test(f)).map((f) =
 for (const id of ids) {
   const png = PNG.sync.read(fs.readFileSync(`${dir}/${id}.png`));
   const { width: w, height: h, data } = png;
-  // key out the flat studio backdrop (sampled at the corner), soften the fringe
+  // Preserve authored transparent renders, including dark eyes and translucent tissue.
+  // Opaque studio renders still use their sampled backdrop.
+  const hasAlpha = data.some((v, i) => i % 4 === 3 && v < 255);
+  // Key out a flat studio backdrop only when no authored alpha exists.
   const bg = [data[0], data[1], data[2]];
   const alpha = new Float32Array(w * h);
-  for (let i = 0; i < w * h; i++) { const d = Math.hypot(data[i * 4] - bg[0], data[i * 4 + 1] - bg[1], data[i * 4 + 2] - bg[2]); alpha[i] = Math.min(1, Math.max(0, (d - 10) / 26)); }
+  for (let i = 0; i < w * h; i++) { const d = Math.hypot(data[i * 4] - bg[0], data[i * 4 + 1] - bg[1], data[i * 4 + 2] - bg[2]); alpha[i] = hasAlpha ? data[i * 4 + 3] / 255 : Math.min(1, Math.max(0, (d - 10) / 26)); }
   const card = new PNG({ width: w, height: h });
   let minX = w, minY = h, maxX = 0, maxY = 0;
   for (let y = 0; y < h; y++) for (let x = 0; x < w; x++) {
     const i = y * w + x;
     let a = alpha[i];
-    for (let dy = -1; dy <= 1; dy++) for (let dx = -1; dx <= 1; dx++) { const yy = y + dy, xx = x + dx; if (yy >= 0 && yy < h && xx >= 0 && xx < w) a = Math.min(a, Math.max(alpha[yy * w + xx], alpha[i] * 0.85)); }
+    if (!hasAlpha) for (let dy = -1; dy <= 1; dy++) for (let dx = -1; dx <= 1; dx++) { const yy = y + dy, xx = x + dx; if (yy >= 0 && yy < h && xx >= 0 && xx < w) a = Math.min(a, Math.max(alpha[yy * w + xx], alpha[i] * 0.85)); }
     card.data[i * 4] = data[i * 4]; card.data[i * 4 + 1] = data[i * 4 + 1]; card.data[i * 4 + 2] = data[i * 4 + 2]; card.data[i * 4 + 3] = Math.round(a * 255);
     if (a > 0.2) { minX = Math.min(minX, x); minY = Math.min(minY, y); maxX = Math.max(maxX, x); maxY = Math.max(maxY, y); }
   }

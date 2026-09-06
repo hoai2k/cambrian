@@ -8,8 +8,9 @@ import { fingerprint } from './creature-fingerprint.mjs';
 
 const strict = process.argv.includes('--strict');
 const dir = 'public/assets/creatures';
-const src = fs.readFileSync('src/sim/creatures.ts', 'utf8');
-const ids = [...src.matchAll(/^\s*id: '([a-z]+)'/gm)].map((m) => m[1]);
+const src = ['src/sim/creatures.ts', 'src/sim/expansion.ts'].map(p => fs.readFileSync(p, 'utf8')).join('\n');
+const ids = [...src.matchAll(/\bid: '([a-z]+)'/g)].map((m) => m[1]);
+if (ids.length !== new Set(ids).size || ids.length !== 21) throw Error('Creature intake must cover the complete 21-species roster');
 const manifest = fs.existsSync(`${dir}/images.json`) ? JSON.parse(fs.readFileSync(`${dir}/images.json`, 'utf8')) : {};
 let errors = 0, warnings = 0;
 const err = (m) => { console.log('ERROR   ' + m); errors++; };
