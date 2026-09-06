@@ -1,0 +1,16 @@
+Anomalocaris — new animation clips
+30 fps. Frame range 0–N inclusive; N frame intervals.
+
+Bite: 15 frames / 0.500000 s; one-shot; 345 channels.
+Heavy: 33 frames / 1.100000 s; one-shot; 345 channels.
+Guard: 30 frames / 1.000000 s; loop; 345 channels.
+Parry: 10 frames / 0.333333 s; one-shot; 345 channels.
+Dodge: 12 frames / 0.400000 s; one-shot; 345 channels.
+Eat: 24 frames / 0.800000 s; loop; 345 channels.
+Stagger: 36 frames / 1.200000 s; one-shot; 345 channels.
+Moult: 45 frames / 1.500000 s; loop; 345 channels.
+Grab: 27 frames / 0.900000 s; one-shot; 345 channels.
+Ability: 18 frames / 0.600000 s; one-shot; 345 channels.
+
+All nine original clips preserved unchanged. Meshes, materials, textures, nodes, bone names and bind pose preserved.
+No root motion; scale channels are constant. One-shot endpoints match the original Idle start pose.
