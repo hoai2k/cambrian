@@ -22,7 +22,7 @@ export interface PlayerHud {
   lock?: { name: string; band: Band; hp: number; color: string };
   aim?: { hasTarget: boolean; inRange: boolean; name?: string; color: string; ready: boolean };
   hunted: number; hunterAngle: number | null; hunterName?: string; hunterState: 'none' | 'noticed' | 'hunting'; inCover: boolean; still: boolean;
-  hint?: string; respawnIn: number; fade: number; state: string; kills: number; eats: number; escapes: number; protect: boolean;
+  hint?: string; respawnIn: number; fade: number; state: string; modelReady: boolean; kills: number; eats: number; escapes: number; protect: boolean;
   bandMarkers: { x: number; y: number; band: Band; size: number }[];
 }
 export interface HudSnapshot {
@@ -113,12 +113,13 @@ export class Engine {
     // Stream assets by priority: the default pick first so the title can show, everything else on idle time.
     this.assets.onProgress((p) => {
       this.cb.onProgress?.(p);
-      if (!this.bootDone && p.ready.has('anomalocaris') && p.ready.has('waptia')) { this.bootDone = true; this.cb.onLoaded(); }
+      // The title never waits for 3D models; they stream during the title and pick screens.
+      if (!this.bootDone && (this.assets.isCardReady('anomalocaris') || performance.now() - this.bootStart > 4000)) { this.bootDone = true; this.cb.onLoaded(); }
     });
     this.assets.prioritize(['anomalocaris', 'waptia', 'marrella', 'opabinia', 'canadia', 'olenoides', 'hallucigenia', 'wiwaxia'], 'boot');
   }
   readonly assets = new AssetQueue();
-  private bootDone = false;
+  private bootDone = false; private bootStart = performance.now();
   /** Tell the loader which creatures are most likely to be needed next. */
   prioritize(creatures: CreatureId[], phase: 'boot' | 'title' | 'select' | 'playing') { this.assets.prioritize(creatures, phase); }
 
@@ -591,7 +592,7 @@ export class Engine {
         lock: lockA && isAlive(lockA) ? { name: creature(lockA.creature).name, band: bandOf(p, lockA), hp: lockA.hp / lockA.hpMax, color: BAND_COLOR[bandOf(p, lockA)] } : undefined,
         hunted: p.hunted, hunterAngle, hunterName: hunter ? creature(hunter.creature).name : undefined,
         hunterState: p.hunted >= 0.5 ? 'hunting' : p.hunted > 0.2 ? 'noticed' : 'none', inCover: p.cover > 0.3, still: Math.hypot(p.vel.x, p.vel.y, p.vel.z) < 0.3,
-        hint: game.hintFor(i), respawnIn: p.state === 'dead' ? Math.max(0, 3 - p.respawnT) : 0, fade: cs?.fade ?? 0, state: p.state,
+        hint: game.hintFor(i), respawnIn: p.state === 'dead' ? Math.max(0, 3 - p.respawnT) : 0, fade: cs?.fade ?? 0, state: p.state, modelReady: !!loadedSync(p.creature),
         kills: p.kills, eats: p.eats, escapes: p.escapes, protect: p.spawnProtect > 0, bandMarkers: markers.slice(0, 24),
       };
     });

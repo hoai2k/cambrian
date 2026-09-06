@@ -81,7 +81,8 @@ function PlayerPanel({ p }: { p: PlayerHud }) {
           </div>
         </div>
       )}
-      {p.hint && p.hunterState === 'none' && <p className="hint">{p.hint}</p>}
+      {!p.modelReady && p.alive && <p className="hint">Your creature is taking shape…</p>}
+      {p.hint && p.hunterState === 'none' && p.modelReady && <p className="hint">{p.hint}</p>}
       <div className="fade" style={{ opacity: p.fade }} />
       {!p.alive && p.fade < 0.9 && (
         <div className="dead-overlay">
