@@ -1,7 +1,7 @@
 // Headless smoke test for the audio workbench: enables audio, plays a sound by event kind and a
 // raw file, checks the distance falloff reports a quieter sound further out, drives the
-// soundtrack through one track hand-over, and reports any sample file the catalogue lists but
-// the library is missing.
+// soundtrack through one track hand-over, measures every sample, and reports any sample the
+// catalogue lists that is missing or too quiet to read on a small speaker.
 // Usage: node tools/workbench-smoke.mjs <outdir>
 // Requires `npm run build && npx vite preview --port 4173` in another shell.
 import { chromium } from 'playwright-core';
@@ -11,7 +11,7 @@ const page = await browser.newPage({ viewport: { width: 1180, height: 1000 } });
 const errors = [];
 page.on('console', (m) => { if (m.type() === 'error' && !/fonts\.googleapis|ERR_CONNECTION/.test(m.text())) errors.push(`[error] ${m.text().slice(0, 300)}`); });
 page.on('pageerror', (e) => errors.push('[pageerror] ' + e.message));
-const readout = () => page.textContent('.readout');
+const readout = () => page.textContent('.readout span');
 const setSlider = (nth, value) => page.$eval(`.controls .slider:nth-child(${nth}) input`, (el, v) => {
   Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, 'value').set.call(el, v);
   el.dispatchEvent(new Event('input', { bubbles: true }));
@@ -51,6 +51,12 @@ console.log('music:', opening, '->', handover ?? 'NO HANDOVER');
 await page.hover('.sounds .row:nth-child(3) .name');
 await page.waitForTimeout(400);
 await page.screenshot({ path: `${S}/workbench-audio.png`, fullPage: false, timeout: 120000 });
+
+// Measure the library: anything too quiet above 150 Hz will not read on a laptop speaker.
+await page.click('.controls .readout button.chip');
+await page.waitForFunction(() => !/measuring/.test(document.querySelector('.controls .readout button.chip').textContent), null, { timeout: 120000 });
+console.log('levels:', (await page.textContent('.controls .readout span')).trim());
+console.log('too quiet:', await page.$$eval('.chip.quiet', (n) => n.map((x) => x.textContent.trim())));
 
 console.log('missing files:', await page.$$eval('.chip.missing', (n) => n.map((x) => x.textContent)));
 console.log('undocumented kinds:', await page.$$eval('.group.warn .blurb', (n) => n.map((x) => x.textContent.trim())));

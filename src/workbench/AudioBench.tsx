@@ -8,6 +8,7 @@ import { audio, musicUrl, SAMPLES, sfxUrl } from '../audio/audio';
 import { distanceAtten } from '../audio/mix';
 import { MUSIC, OPENING_TRACK } from '../audio/music';
 import { BEDS, GROUPS, type SoundEntry } from './audio-catalogue';
+import { formatLevel, isQuiet, measure, QUIET_MID_PEAK, type Level } from './levels';
 
 /** Every file the catalogue can reach, so we can report on the library as a whole. */
 const filesOf = (kind: string) => SAMPLES[kind] ?? [];
@@ -26,6 +27,8 @@ export function AudioBench() {
   const [info, setInfo] = useState<Record<string, FileInfo>>({});
   const [last, setLast] = useState<string>('');
   const [nowPlaying, setNowPlaying] = useState<string | undefined>();
+  const [levels, setLevels] = useState<Record<string, Level>>({});
+  const [metering, setMetering] = useState(false);
   const stops = useRef<(() => void)[]>([]);
 
   const atten = useMemo(() => distanceAtten(distance, REF_DISTANCE), [distance]);
@@ -49,7 +52,7 @@ export function AudioBench() {
   // Report on the library itself: which files are actually on disk, and how big they are.
   useEffect(() => {
     let live = true;
-    const names = new Set<string>([...Object.values(SAMPLES).flat(), ...BEDS.map((b) => b.file)]);
+    const names = allFiles();
     void (async () => {
       const found: Record<string, FileInfo> = {};
       for (const n of names) {
@@ -67,6 +70,23 @@ export function AudioBench() {
   }, []);
 
   const stopAll = useCallback(() => { for (const s of stops.current) s(); stops.current = []; }, []);
+
+  /**
+   * Measure every sample, and flag the ones that will not read on a small speaker. This is the
+   * check that catches a sound which is "there" but inaudible in play.
+   */
+  const measureAll = useCallback(async () => {
+    if (!ready || metering) return;
+    setMetering(true);
+    const found: Record<string, Level> = {};
+    for (const n of allFiles()) {
+      const l = await measure(sfxUrl(n));
+      if (l) { found[n] = l; setLevels({ ...found }); }
+    }
+    setMetering(false);
+    const quiet = Object.entries(found).filter(([, l]) => isQuiet(l)).map(([n]) => n);
+    setLast(quiet.length ? `too quiet to read on a small speaker: ${quiet.join(', ')}` : 'every sample carries above 150 Hz');
+  }, [ready, metering]);
 
   /** Play a sound the way the game plays it: by event kind, through `audio.play`. */
   const playKind = useCallback((kind: string, spatial: boolean) => {
@@ -111,7 +131,13 @@ export function AudioBench() {
         <Slider label="Distance" value={distance} min={0} max={70} step={0.5} onChange={setDistance} format={(v) => `${v.toFixed(0)} m → ${Math.round(distanceAtten(v, REF_DISTANCE) * 100)}%`}
           hint={`How far from the camera the event happened, for a view framed at ${REF_DISTANCE} m. Applies to world sounds only — the same falloff the game uses, highs rolled off included.`} />
         <Slider label="Pan" value={pan} min={-1} max={1} step={0.05} onChange={setPan} format={(v) => (v === 0 ? 'centre' : v < 0 ? `${Math.round(-v * 100)}% left` : `${Math.round(v * 100)}% right`)} />
-        <p className="readout" aria-live="polite">{last ? `▶ ${last}` : ready ? 'Ready.' : 'Audio is off until you enable it.'}</p>
+        <div className="readout">
+          <button className="chip" disabled={!ready || metering} onClick={() => void measureAll()}
+            title={`Decode every sample and report its peak above 150 Hz — below ${QUIET_MID_PEAK} dB a sound will not read on a laptop speaker.`}>
+            {metering ? 'measuring…' : 'measure levels'}
+          </button>
+          <span aria-live="polite">{last ? `▶ ${last}` : ready ? 'Ready.' : 'Audio is off until you enable it.'}</span>
+        </div>
       </section>
 
       {GROUPS.map((g) => (
@@ -120,7 +146,7 @@ export function AudioBench() {
           <p className="blurb">{g.blurb}</p>
           <ul className="sounds">
             {g.sounds.map((s) => (
-              <SoundRow key={s.kind} sound={s} info={info} disabled={!ready}
+              <SoundRow key={s.kind} sound={s} info={info} levels={levels} disabled={!ready}
                 onPlayKind={() => playKind(s.kind, s.spatial)} onPlayFile={(f) => void playFile(f)} />
             ))}
           </ul>
@@ -136,7 +162,7 @@ export function AudioBench() {
               <button className="name" disabled={!ready} onClick={() => void playFile(b.file)}>
                 <b>{b.label}</b><small>loop</small>
               </button>
-              <FileChip file={b.file} info={info} disabled={!ready} onPlay={() => void playFile(b.file)} />
+              <FileChip file={b.file} info={info} levels={levels} disabled={!ready} onPlay={() => void playFile(b.file)} />
               <p className="usage" role="note">{b.usage}</p>
             </li>
           ))}
@@ -184,8 +210,8 @@ export function AudioBench() {
   );
 }
 
-function SoundRow({ sound, info, disabled, onPlayKind, onPlayFile }: {
-  sound: SoundEntry; info: Record<string, FileInfo>; disabled: boolean;
+function SoundRow({ sound, info, levels, disabled, onPlayKind, onPlayFile }: {
+  sound: SoundEntry; info: Record<string, FileInfo>; levels: Record<string, Level>; disabled: boolean;
   onPlayKind: () => void; onPlayFile: (file: string) => void;
 }) {
   const files = filesOf(sound.kind);
@@ -196,22 +222,44 @@ function SoundRow({ sound, info, disabled, onPlayKind, onPlayFile }: {
         <small>{sound.kind}{sound.spatial ? ' · world' : ' · flat'}</small>
       </button>
       {files.length
-        ? files.map((f) => <FileChip key={f} file={f} info={info} disabled={disabled} onPlay={() => onPlayFile(f)} />)
+        ? files.map((f) => <FileChip key={f} file={f} info={info} levels={levels} disabled={disabled} onPlay={() => onPlayFile(f)} />)
         : <span className="chip missing">no sample — synthesized fallback only</span>}
+      {sound.alts?.map((f) => (
+        <FileChip key={f} file={f} info={info} levels={levels} disabled={disabled} alt onPlay={() => onPlayFile(f)} />
+      ))}
       <p className="usage" role="note">{sound.usage}</p>
     </li>
   );
 }
 
-function FileChip({ file, info, disabled, onPlay }: { file: string; info: Record<string, FileInfo>; disabled: boolean; onPlay: () => void }) {
+function FileChip({ file, info, levels, disabled, alt, onPlay }: {
+  file: string; info: Record<string, FileInfo>; levels: Record<string, Level>;
+  disabled: boolean; alt?: boolean; onPlay: () => void;
+}) {
   const i = info[file];
+  const level = levels[file];
   const missing = i && !i.ok;
+  const quiet = level && isQuiet(level);
+  const cls = `chip${missing ? ' missing' : ''}${quiet ? ' quiet' : ''}${alt ? ' alt' : ''}`;
+  const title = alt ? `Backup take — not wired into the game. Play ${file}.mp3` : `Play ${file}.mp3 on its own`;
   return (
-    <button className={`chip${missing ? ' missing' : ''}`} disabled={disabled} onClick={onPlay}
-      title={`Play ${file}.mp3 on its own`}>
-      {file}.mp3{missing ? ' — missing' : i?.kb ? ` · ${i.kb} KB` : ''}
+    <button className={cls} disabled={disabled} onClick={onPlay}
+      title={level ? `${title}. Peak above 150 Hz: ${level.midPeak.toFixed(1)} dB (full peak ${level.peak.toFixed(1)} dB)` : title}>
+      {file}.mp3
+      {missing ? ' — missing' : i?.kb ? ` · ${i.kb} KB` : ''}
+      {level ? ` · ${formatLevel(level)}` : ''}
+      {alt ? ' · backup' : ''}
     </button>
   );
+}
+
+/** Every file the catalogue can reach: wired samples, backup takes and the loops. */
+function allFiles(): Set<string> {
+  return new Set<string>([
+    ...Object.values(SAMPLES).flat(),
+    ...GROUPS.flatMap((g) => g.sounds.flatMap((s) => s.alts ?? [])),
+    ...BEDS.map((b) => b.file),
+  ]);
 }
 
 function Slider({ label, value, min, max, step, onChange, format, hint }: {

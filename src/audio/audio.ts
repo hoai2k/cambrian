@@ -303,6 +303,19 @@ export class GameAudio {
     return true;
   }
 
+  /** Decode an audio file by URL, cached. Used by `preview` and by the workbench's level meter. */
+  async decode(url: string): Promise<AudioBuffer | undefined> {
+    const ctx = this.ctx; if (!ctx) return undefined;
+    const have = this.previews.get(url);
+    if (have) return have;
+    try {
+      const res = await fetch(url); if (!res.ok) return undefined;
+      const buf = await ctx.decodeAudioData(await res.arrayBuffer());
+      this.previews.set(url, buf);
+      return buf;
+    } catch { return undefined; }
+  }
+
   /**
    * Play one audio file through the sfx bus and hand back a stop handle. The audio workbench
    * uses this to audition the library file by file (loops included); the game goes through
@@ -310,14 +323,7 @@ export class GameAudio {
    */
   async preview(url: string, opts: { vol?: number; pan?: number; atten?: number; loop?: boolean } = {}) {
     const ctx = this.ctx; if (!ctx || !this.sfxBus) return undefined;
-    let buf = this.previews.get(url);
-    if (!buf) {
-      try {
-        const res = await fetch(url); if (!res.ok) return undefined;
-        buf = await ctx.decodeAudioData(await res.arrayBuffer());
-      } catch { return undefined; }
-      this.previews.set(url, buf);
-    }
+    const buf = await this.decode(url); if (!buf) return undefined;
     const atten = opts.atten ?? 1;
     const src = this.voice(buf, (opts.vol ?? 0.8) * atten, opts.pan ?? 0, 1, atten, opts.loop);
     return { duration: buf.duration, stop: () => { try { src.stop(); } catch { /* already ended */ } } };
