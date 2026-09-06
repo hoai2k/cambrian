@@ -73,9 +73,11 @@ two things:
    scale is how tracks get tagged: `theme-calm` for the relaxing end
    (Shallows, Nursery), `theme-danger` for the extreme end (Channels,
    Escarpment, Basin), and the untagged reef tracks rotate everywhere else.
-   Both themes are still outstanding in `image-requests.md`; until they arrive
-   the reef rotation plays throughout. Tension (being hunted) still ducks
-   whatever is playing and brings in the drone and heartbeat.
+   Both tags are live in `MUSIC`, but the two theme files themselves are still
+   outstanding ([audio-requests.md](../audio-requests.md)); a track whose file
+   is missing drops out of the rotation, so until they arrive the reef rotation
+   plays throughout. Tension (being hunted) still ducks whatever is playing and
+   brings in the drone and heartbeat.
 2. **Look.** The calm end and the deadly end get a visual language of their
    own; everything in the middle keeps the standard reef look as it is
    (it looks right and it is not to be touched):

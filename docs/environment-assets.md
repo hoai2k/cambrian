@@ -82,4 +82,4 @@ The environment workbench also demonstrates CSS-mask use at 24 and 8 pixels.
 
 The delivery was reviewed in desktop and mobile workbench layouts and in the
 actual instanced sea renderer. Build, TypeScript and the flora physics suite
-and the streamed-world suite pass. Full briefs are retained in `image-requests-history.md`.
+and the streamed-world suite pass. Full briefs are retained in [image-requests-history.md](image-requests-history.md).

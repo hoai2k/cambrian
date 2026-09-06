@@ -35,5 +35,6 @@ unless the user explicitly asks for a PR. Steps:
 - The renderer interpolates between fixed simulation steps using each actor's `prevT` snapshot,
   so anything that moves an actor by more than it could swim in one step (teleport, respawn)
   must read as a jump. `tools/motion-test.ts` guards this.
-- Design docs live in `docs/redesign/`. Image needs go in `image-requests.md`; move each
-  brief to `image-requests-history.md` once its assets are delivered and integrated.
+- All docs live in `docs/`. Design docs are in `docs/redesign/`. Image, glyph and prop
+  needs go in `docs/image-requests.md` and move to `docs/image-requests-history.md` once
+  delivered and integrated; sound and music needs go in `docs/audio-requests.md`.
