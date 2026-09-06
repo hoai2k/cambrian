@@ -73,9 +73,11 @@ two things:
    scale is how tracks get tagged: `theme-calm` for the relaxing end
    (Shallows, Nursery), `theme-danger` for the extreme end (Channels,
    Escarpment, Basin), and the untagged reef tracks rotate everywhere else.
-   Both themes are requested in `image-requests.md`; until they arrive the
-   reef rotation plays throughout. Tension (being hunted) still ducks
-   whatever is playing and brings in the drone and heartbeat.
+   Both tags are live in `MUSIC`, but the two theme files themselves are still
+   outstanding ([audio-requests.md](../audio-requests.md)); a track whose file
+   is missing drops out of the rotation, so until they arrive the reef rotation
+   plays throughout. Tension (being hunted) still ducks whatever is playing and
+   brings in the drone and heartbeat.
 2. **Look.** The calm end and the deadly end get a visual language of their
    own; everything in the middle keeps the standard reef look as it is
    (it looks right and it is not to be touched):
@@ -89,11 +91,13 @@ two things:
      desaturated colours with cold blue-black fog, low sun. Anything that
      reads as "teeth".
 
-   Today the biomes differ by plant *density*, rock density, terrain and
-   atmosphere (fog colour, density, sky and sun intensity blend per biome in
-   `render/sea.ts`). The dedicated relaxing/extreme props are requested in
-   `image-requests.md` and slot into `generateChunk` as new `FloraKind`s and
-   boulder variants when they arrive.
+   The biomes differ by plant *density*, rock density, terrain and atmosphere
+   (fog colour, density, sky and sun intensity blend per biome in
+   `render/sea.ts`), **and** by dedicated props: the seven relaxing/extreme
+   models were delivered and are placed by `generateChunk` as the `cushion`,
+   `lettuce`, `spine` and `glass` `FloraKind`s and as blade-spire and
+   talus-shard boulder variants. See
+   [environment-assets.md](../environment-assets.md).
 
 ## Streaming
 

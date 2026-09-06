@@ -29,5 +29,6 @@ unless the user explicitly asks for a PR. Steps:
   assume a world bound; anything that places things in the world must go through the biome
   weights and `shoreDistance`. Design and contract: `docs/redesign/04-infinite-ocean.md`;
   `tools/world-test.ts` must pass.
-- Design docs live in `docs/redesign/`. Image needs go in `image-requests.md`; move each
-  brief to `image-requests-history.md` once its assets are delivered and integrated.
+- All docs live in `docs/`. Design docs are in `docs/redesign/`. Image, glyph and prop
+  needs go in `docs/image-requests.md` and move to `docs/image-requests-history.md` once
+  delivered and integrated; sound and music needs go in `docs/audio-requests.md`.

@@ -14,8 +14,9 @@ npm run dev        # http://localhost:5173
 
 Press any button on a connected Xbox controller, any key, or click to start.
 Controls are in the in-game **?** panel (bottom right). Keyboard works too:
-WASD swim, arrows look, PgUp/PgDn zoom, Shift sprint, Space rise, F bite, G pounce,
-R ability, V dash, Q guard, Tab aim, E sense, Esc pause.
+WASD swim, arrows look, PgUp/PgDn zoom, Shift sprint, Space rise, C sink, F bite,
+G pounce, R ability, V dash, Q guard, Tab aim, E sense, T teleport, Esc pause.
+(A second keyboard layout — IJKL, ;'POU/YH — lets two players share one machine.)
 
 ## Build
 
@@ -40,12 +41,25 @@ every push to `main` (set the repository's Pages source to "GitHub Actions").
 | `src/shared/palettes.ts` | Creature colour schemes and the material-name to slot mapping they apply through (`src/render/recolor.ts`). |
 | `public/assets/creatures/` | 21 rigged full models, reduced LODs, anatomical anchors, studio renders, hero cards, thumbnails and transparent `.select.png` portraits. |
 | `docs/redesign/` | Design and technical plan. |
-| `tools/` | Headless sim tests (`harness.ts`, `controls-test.ts`, `hunt-test.ts`, `fight-test.ts`, `corpse-test.ts`, `respawn-test.ts`, `flora-test.ts`, `world-test.ts`), browser smoke tests (`smoke.mjs`, `viewer-smoke.mjs`, `workbench-smoke.mjs`), menu button-binding check (`menu-bindings-test.ts`), creature image intake (`make-cards.mjs`, `check-creature-assets.mjs`), colour-slot check (`palette-test.mjs`), audio density check (`audio-mix-test.ts`), LOD generator (`make-lods.mjs`), SFX generator (`gen-sfx.mjs`). |
+| `tools/` | Headless sim tests (`harness.ts`, `controls-test.ts`, `hunt-test.ts`, `fight-test.ts`, `corpse-test.ts`, `respawn-test.ts`, `flora-test.ts`, `world-test.ts`, `environment-test.ts`, `expansion-test.ts`), asset tests (`anchors-test.mjs`, `feeding-test.mjs`, `hallucigenia-test.mjs`, `asset-audit.ts`, `portrait-test.mjs`), browser smoke tests (`smoke.mjs`, `viewer-smoke.mjs`, `workbench-smoke.mjs`, `biome-tour.mjs`, `expansion-browser.mjs`), menu button-binding check (`menu-bindings-test.ts`), creature image intake (`make-cards.mjs`, `check-creature-assets.mjs`), colour-slot check (`palette-test.mjs`), audio density check (`audio-mix-test.ts`), LOD generator (`make-lods.mjs`), SFX generator (`gen-sfx.mjs`). |
 | `public/assets/brand/`, `public/assets/ui/` | Delivered art: logo and key art, tier and band glyphs, mode panels, loading motif. |
 | `tools/art/` | How that art was made: generation prompts, the Blender portrait render, vector export and review scripts. |
-| `image-requests.md` | Open art requests — currently none; delivered briefs are in `image-requests-history.md`. |
-| `docs/creature-intake.md` | How to add a creature or change its look; `node tools/check-creature-assets.mjs --strict` enforces it. |
-| `docs/audio.md` | The sound library, how to regenerate a sound, the distance falloff, and the audio workbench. |
+| `docs/` | Everything written down. See the index below. |
+
+## Documentation
+
+| Doc | What |
+| --- | --- |
+| [`docs/redesign/`](docs/redesign/) | The design and technical plan, and the implementation status against it: [current-state audit](docs/redesign/00-current-state.md), [game design](docs/redesign/01-game-design.md), [technical plan](docs/redesign/02-technical-plan.md), [creature expansion](docs/redesign/03-creature-expansion.md), [the endless sea](docs/redesign/04-infinite-ocean.md). |
+| [`docs/creature-intake.md`](docs/creature-intake.md) | How to add a creature or change its look; `node tools/check-creature-assets.mjs --strict` enforces it. |
+| [`docs/creature-anchors.md`](docs/creature-anchors.md) | The attachment-socket contract every rig ships with, and the feeding/attack solver that uses it. |
+| [`docs/animation-brief.md`](docs/animation-brief.md) | The clip set, names and timings a rig must deliver; [`docs/animation-delivery/`](docs/animation-delivery/) records the delivery that satisfied it. |
+| [`docs/hallucigenia-motion.md`](docs/hallucigenia-motion.md) | The revised Hallucigenia rig and its baked gait. |
+| [`docs/audio.md`](docs/audio.md) | The sound library, how to regenerate a sound, the distance falloff, the soundtrack director and the audio workbench. |
+| [`docs/environment-assets.md`](docs/environment-assets.md) | The seven biome props, nine biome paintings and five radar glyphs, and how the streamed sea consumes them. |
+| [`docs/art/colour-rendering.md`](docs/art/colour-rendering.md) | Runtime creature palettes and the portrait-variant fallback policy. |
+| [`docs/image-requests.md`](docs/image-requests.md) | Open image, glyph and prop requests — **currently none**. Delivered briefs: [`docs/image-requests-history.md`](docs/image-requests-history.md). |
+| [`docs/audio-requests.md`](docs/audio-requests.md) | Open sound and music requests — **two biome music loops**, the only outstanding asset in the project. |
 
 ## Headless checks
 
@@ -57,9 +71,13 @@ run tools/respawn-test.ts         # a giant eats a larva; it must come back
 run tools/flora-test.ts           # plants: slide around sponges, fold algae, spring back
 run tools/expansion-test.ts       # all new kits, feeding, tracking and body clearance
 run tools/world-test.ts           # the endless sea: shore, biome bands, streaming, teleport, radar
+run tools/environment-test.ts     # biome prop placement, collision bounds, deterministic regeneration
 node --experimental-transform-types tools/anchors-test.mjs
 node --experimental-transform-types tools/feeding-test.mjs
+node tools/hallucigenia-test.mjs  # the revised rig: skinning, loop seams, gait
 node tools/check-creature-assets.mjs --strict
+npm run palettes                  # every material lands in the colour slot its scheme assumes
+npm run portraits                 # palette-aware portraits match their snapshot, or fall back
 run tools/audio-mix-test.ts       # audio density: how much of the reef's noise is in earshot
 run tools/harness.ts all 240      # balance: hunting, growth, escapes per creature
 run tools/harness.ts duel         # rival fights between creature pairs
@@ -81,7 +99,6 @@ nearby ones cast shadows. The shadow map is rendered once per frame rather than 
 split-screen viewport. For expansion changes, use the [anatomical authoring and packaging pipeline](tools/creatures/README.md),
 which preserves limbs, source rigs and matching sockets in reduced models. The
 legacy `tools/make-lods.mjs` remains available for original-roster work.
-
 
 The [expanded creature design](docs/redesign/03-creature-expansion.md) covers the
 13 additions, their feeding routes and abilities, scientific interpretation,
