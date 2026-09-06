@@ -23,3 +23,5 @@ animation clips have not been authored yet, so the combat verbs run on the
 nine shipped clips plus the procedural layers described in the plan. Two
 headless checks exist: `tools/harness.ts` (balance) and `tools/smoke.mjs`
 (browser). Outstanding art is listed in `image-requests.md`.
+
+- [03 · Expanded creature roster](03-creature-expansion.md): 13 additions, feeding routes, abilities, anatomy, animation and source references.

@@ -1,0 +1,256 @@
+{
+  "pikaia": [
+    {
+      "name": "anchor_mouth",
+      "bone": "body",
+      "point": [
+        0,
+        -2.23,
+        -0.1
+      ],
+      "role": "mouth"
+    },
+    {
+      "name": "anchor_mouth_inside",
+      "bone": "body",
+      "point": [
+        0,
+        -2.185,
+        -0.1
+      ],
+      "role": "mouth_inside"
+    },
+    {
+      "name": "anchor_attack_primary",
+      "bone": "body",
+      "point": [
+        0,
+        -2.25,
+        -0.025
+      ],
+      "role": "attack",
+      "contactType": "body_shove"
+    }
+  ],
+  "nectocaris": [
+    {
+      "name": "anchor_mouth",
+      "bone": "body",
+      "point": [
+        0,
+        -1.785,
+        -0.028
+      ],
+      "role": "mouth"
+    },
+    {
+      "name": "anchor_mouth_inside",
+      "bone": "body",
+      "point": [
+        0,
+        -1.705,
+        -0.028
+      ],
+      "role": "mouth_inside"
+    },
+    {
+      "name": "anchor_attack_tentacle_L",
+      "bone": "tentacle_1_07",
+      "point": [
+        0.6112214747707527,
+        -3.46,
+        -0.08079809994790939
+      ],
+      "role": "attack",
+      "chain": [
+        "tentacle_1_00",
+        "tentacle_1_01",
+        "tentacle_1_02",
+        "tentacle_1_03",
+        "tentacle_1_04",
+        "tentacle_1_05",
+        "tentacle_1_06",
+        "tentacle_1_07"
+      ],
+      "effectorBone": "tentacle_1_07",
+      "solver": "CCD",
+      "contactType": "grasp"
+    },
+    {
+      "name": "anchor_attack_primary",
+      "bone": "tentacle_1_07",
+      "point": [
+        0.6112214747707527,
+        -3.46,
+        -0.08079809994790939
+      ],
+      "role": "attack",
+      "chain": [
+        "tentacle_1_00",
+        "tentacle_1_01",
+        "tentacle_1_02",
+        "tentacle_1_03",
+        "tentacle_1_04",
+        "tentacle_1_05",
+        "tentacle_1_06",
+        "tentacle_1_07"
+      ],
+      "effectorBone": "tentacle_1_07",
+      "solver": "CCD",
+      "contactType": "grasp"
+    },
+    {
+      "name": "anchor_grasp",
+      "bone": "tentacle_1_07",
+      "point": [
+        0.6112214747707527,
+        -3.46,
+        -0.08079809994790939
+      ],
+      "role": "grasp",
+      "chain": [
+        "tentacle_1_00",
+        "tentacle_1_01",
+        "tentacle_1_02",
+        "tentacle_1_03",
+        "tentacle_1_04",
+        "tentacle_1_05",
+        "tentacle_1_06",
+        "tentacle_1_07"
+      ],
+      "effectorBone": "tentacle_1_07",
+      "solver": "CCD",
+      "contactType": "grasp"
+    },
+    {
+      "name": "anchor_attack_tentacle_R",
+      "bone": "tentacle_-1_07",
+      "point": [
+        -0.6112214747707527,
+        -3.46,
+        -0.08079809994790939
+      ],
+      "role": "attack",
+      "chain": [
+        "tentacle_-1_00",
+        "tentacle_-1_01",
+        "tentacle_-1_02",
+        "tentacle_-1_03",
+        "tentacle_-1_04",
+        "tentacle_-1_05",
+        "tentacle_-1_06",
+        "tentacle_-1_07"
+      ],
+      "effectorBone": "tentacle_-1_07",
+      "solver": "CCD",
+      "contactType": "grasp"
+    }
+  ],
+  "ottoia": [
+    {
+      "name": "anchor_mouth",
+      "bone": "introvert_03",
+      "point": [
+        0,
+        -2.2,
+        0
+      ],
+      "role": "mouth"
+    },
+    {
+      "name": "anchor_mouth_inside",
+      "bone": "introvert_03",
+      "point": [
+        0,
+        -2.06,
+        0
+      ],
+      "role": "mouth_inside"
+    },
+    {
+      "name": "anchor_attack_primary",
+      "bone": "introvert_03",
+      "point": [
+        0,
+        -2.23,
+        0
+      ],
+      "role": "attack",
+      "chain": [
+        "introvert_00",
+        "introvert_01",
+        "introvert_02",
+        "introvert_03"
+      ],
+      "effectorBone": "introvert_03",
+      "solver": "CCD",
+      "contactType": "bite"
+    }
+  ],
+  "odontogriphus": [
+    {
+      "name": "anchor_mouth",
+      "bone": "radula",
+      "point": [
+        0,
+        -1.77,
+        -0.075
+      ],
+      "role": "mouth"
+    },
+    {
+      "name": "anchor_mouth_inside",
+      "bone": "radula",
+      "point": [
+        0,
+        -1.72,
+        -0.075
+      ],
+      "role": "mouth_inside"
+    },
+    {
+      "name": "anchor_attack_primary",
+      "bone": "radula",
+      "point": [
+        0,
+        -1.815,
+        -0.12
+      ],
+      "role": "attack",
+      "contactType": "rasp"
+    }
+  ],
+  "vetulicola": [
+    {
+      "name": "anchor_mouth",
+      "bone": "body",
+      "point": [
+        0,
+        -2.065,
+        -0.045
+      ],
+      "role": "mouth"
+    },
+    {
+      "name": "anchor_mouth_inside",
+      "bone": "body",
+      "point": [
+        0,
+        -1.93,
+        -0.045
+      ],
+      "role": "mouth_inside"
+    },
+    {
+      "name": "anchor_attack_primary",
+      "bone": "body",
+      "point": [
+        0,
+        -2.08,
+        -0.045
+      ],
+      "role": "attack",
+      "contactType": "body_shove"
+    }
+  ]
+}

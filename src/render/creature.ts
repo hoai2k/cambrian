@@ -54,6 +54,8 @@ export class CreatureView {
   private addW = [0, 0, 0, 0];
   private materials: THREE.MeshStandardMaterial[] = [];
   private baseEmissive: THREE.Color[] = [];
+  private baseOpacity: number[] = [];
+  private baseTransparent: boolean[] = [];
   private spine: THREE.Bone[] = [];
   private wasAttack = false; private wasHit = false; private wasDead = false; private wasStagger = false; private wasDodge = false; private wasParry = false;
   private ring: THREE.Mesh;
@@ -85,7 +87,7 @@ export class CreatureView {
         const mats = Array.isArray(o.material) ? o.material : [o.material];
         const cloned = mats.map((m) => { const c = (m as THREE.MeshStandardMaterial).clone(); return c; });
         o.material = Array.isArray(o.material) ? cloned : cloned[0];
-        for (const c of cloned) if (c instanceof THREE.MeshStandardMaterial) { this.materials.push(c); this.baseEmissive.push(c.emissive.clone()); }
+        for (const c of cloned) if (c instanceof THREE.MeshStandardMaterial) { this.materials.push(c); this.baseEmissive.push(c.emissive.clone()); this.baseOpacity.push(c.opacity); this.baseTransparent.push(c.transparent); }
       }
       if (o instanceof THREE.Bone) { const m = SPINE_RE.exec(o.name); if (m) this.spine.push(o); }
     });
@@ -159,7 +161,7 @@ export class CreatureView {
 
     if (animate) {
       // locomotion layer
-      const held = a.state === 'ability' && a.abilityActive && ['burrow', 'enroll', 'shellUp', 'anchor', 'bristleFlare'].includes(def.ability);
+      const held = a.state === 'ability' && a.abilityActive && (def.abilityLoop || ['burrow', 'enroll', 'shellUp', 'anchor', 'bristleFlare'].includes(def.ability));
       if (a.state === 'dead') { /* handled by one-shot */ }
       else if (a.state === 'eating' || a.holdT > 0) { this.playLoop(this.pick('Eat', 'Grab') ?? (def.ground ? 'Crawl' : 'Swim')); this.loco?.setEffectiveTimeScale(this.has('Eat') ? 1 : 0.55); }
       else if (a.state === 'swallowed') { this.playLoop(this.pick('Stagger', 'Hit') ?? 'Idle'); this.loco?.setEffectiveTimeScale(0.8); }
@@ -231,7 +233,7 @@ export class CreatureView {
         }
       }
       // procedural undulation along the spine for swimmers
-      if (this.spine.length > 3 && !def.ground && a.state !== 'dead') {
+      if (this.spine.length > 3 && def.proceduralUndulation !== false && !def.ground && a.state !== 'dead') {
         const amp = clamp(speed / Math.max(cruise, 0.1), 0, 1.6) * 0.045 + Math.abs(a.bank) * 0.02;
         const freq = 5.5 / Math.pow(Math.max(a.scale, 0.1), 0.35);
         // Local-space bend: each spine bone yaws slightly about its own up axis. Cheaper than
@@ -253,6 +255,7 @@ export class CreatureView {
       const tail = clamp((a.stateDur - a.stateT) / 0.5, 0, 1);
       const k = Math.min(t, tail);
       switch (def.ability) {
+        case 'sedimentDive': oy = -L * .20 * k; break;
         case 'burrow': sy = L * (1 - 0.75 * k); oy = -L * 0.22 * k; break;
         case 'enroll': sz = L * (1 - 0.4 * k); sy = L * (1 + 0.35 * k); this.inner.rotation.x = a.roll; break;
         case 'shellUp': sy = L * (1 - 0.15 * k); break;
@@ -301,8 +304,8 @@ export class CreatureView {
       if (protect > 0) m.emissive.lerp(new THREE.Color('#9be9ff'), protect);
       if (dead) m.emissive.multiplyScalar(0.3);
       m.emissiveIntensity = 1;
-      m.opacity = dead ? clamp(1 - Math.max(0, a.corpseT - 35) / 10, 0, 1) : 1;
-      m.transparent = dead > 0 && m.opacity < 1;
+      m.opacity = this.baseOpacity[i] * (dead ? clamp(1 - Math.max(0, a.corpseT - 35) / 10, 0, 1) : 1);
+      m.transparent = this.baseTransparent[i] || (dead > 0 && m.opacity < 1);
     }
     this.lastUpdate = time;
   }

@@ -162,6 +162,7 @@ export function createViewerScene(canvas: HTMLCanvasElement): ViewerScene {
   let current: THREE.AnimationAction | undefined;
   let currentName = '';
   let restingClip = 'Idle';
+  let abilityLoops = false;
   let speed = 1;
   let frameRadius = 3;
   let token = 0;
@@ -194,9 +195,10 @@ export function createViewerScene(canvas: HTMLCanvasElement): ViewerScene {
     const gltf = await loadCreature(id);
     if (mine !== token) return orderClips(gltf.animations.map((c) => c.name));
     clearModel();
+    abilityLoops = !!creature(id).abilityLoop;
 
     // The GLBs are authored at arbitrary scale; normalise, then blow back up to the creature's
-    // real adult length so relative sizes match the game.
+    // gameplay adult length so relative sizes match the game.
     const src = SkeletonUtils.clone(gltf.scene);
     const box = new THREE.Box3().setFromObject(src);
     const size = box.getSize(new THREE.Vector3());
@@ -227,7 +229,7 @@ export function createViewerScene(canvas: HTMLCanvasElement): ViewerScene {
   function play(name: string, loop: boolean) {
     const act = actions.get(name);
     if (!act) return;
-    const repeat = loop || LOOPING.has(name);
+    const repeat = loop || LOOPING.has(name) || (name === 'Ability' && abilityLoops);
     const prev = current;
     act.reset();
     act.setLoop(repeat ? THREE.LoopRepeat : THREE.LoopOnce, repeat ? Infinity : 1);

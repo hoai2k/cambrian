@@ -270,3 +270,21 @@ input[type='checkbox'] { width: 20px; height: 20px; accent-color: var(--ember); 
 .aim.in-range .aim-label { color: currentColor; }
 
 .fade { position: absolute; inset: 0; background: #020a0d; pointer-events: none; z-index: 6; }
+
+/* The expanded roster is a labelled scrollable gallery, usable at four-player width. */
+.roster { display: grid; grid-template-columns: repeat(auto-fit, minmax(66px, 1fr)); gap: 4px; max-height: 148px; overflow: auto; padding: 4px; scrollbar-width: thin; }
+.roster-dot { display: flex; flex-direction: column; align-items: center; justify-content: center; width: auto; min-height: 52px; height: auto; border-radius: 7px; background: rgba(255,255,255,.025); opacity: .65; padding: 3px; border: 1px solid transparent; }
+.roster-dot img { width: 48px; height: 32px; object-fit: contain; }
+.roster-dot span { max-width: 100%; overflow: hidden; text-overflow: ellipsis; font-size: 9px; }
+.roster-dot.active, .roster-dot:hover { transform: none; border-color: var(--c); background: rgba(255,255,255,.08); }
+.roster-dot:focus-visible { outline: 2px solid var(--foam); outline-offset: -2px; opacity: 1; }
+.provenance { display: block; color: var(--muted); font-size: 10px; line-height: 1.5; }
+.creature-copy { overflow-y: auto; }
+.crew-card { grid-template-rows: auto minmax(80px, 1fr) auto auto auto; }
+@media (max-height: 780px) { .roster { max-height: 94px; } .kit { font-size: 10px; } }
+.crew-card { container-type: inline-size; }
+.creature-copy h2 { font-size: clamp(18px, 7cqw, 32px); overflow-wrap: anywhere; }
+@media (max-width: 1100px) {
+  .crew-4 { grid-auto-flow: row; grid-template-columns: repeat(2, minmax(0, 1fr)); overflow-y: auto; align-content: start; }
+  .crew-4 .crew-card { min-height: 470px; }
+}

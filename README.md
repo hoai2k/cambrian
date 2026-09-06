@@ -1,7 +1,7 @@
 # Cambrian Explosion
 
 Eat. Grow. Fight. Run. A 3D hunting, growing, fighting and escaping game set on a
-Burgess Shale reef 508 million years ago. Play one of eight real Cambrian
+Cambrian sea inspired by the Burgess Shale. Play one of 21 real Cambrian
 animals, start as a larva, and work your way up the food chain in single
 player or 2–4 player split-screen with Xbox controllers.
 
@@ -36,7 +36,7 @@ every push to `main` (set the repository's Pages source to "GitHub Actions").
 | `src/render/` | Three.js: sea environment, creature views and animation layering, effects, cameras, split-screen engine. |
 | `src/app/` | React shell: title, creature select, HUD, pause/results, help and settings. |
 | `src/input/`, `src/audio/` | Gamepad/keyboard reading; fully synthesized audio. |
-| `public/assets/creatures/` | The eight rigged GLB models and card renders (unchanged originals plus `.card.png` cutouts). |
+| `public/assets/creatures/` | The 21 rigged GLB models and card renders (unchanged originals plus `.card.png` cutouts). |
 | `docs/redesign/` | Design and technical plan. |
 | `tools/` | Headless sim harness (`harness.ts`), control-direction test (`controls-test.ts`), respawn test (`respawn-test.ts`), plant collision test (`flora-test.ts`), browser smoke test (`smoke.mjs`), LOD generator (`make-lods.mjs`), SFX generator (`gen-sfx.mjs`), card cutout script. |
 | `image-requests.md` | Art still needed (logo, favicon, key art…). |
@@ -68,3 +68,11 @@ split-screen viewport. Regenerate the LODs after changing a model:
 ```sh
 node tools/make-lods.mjs 0.14
 ```
+
+
+The [expanded creature design](docs/redesign/03-creature-expansion.md) covers the
+13 additions, their feeding routes and abilities, scientific interpretation,
+and animation contract. The selection gallery identifies the two Early
+Cambrian taxa from outside the Burgess Shale. Editable authoring files and
+intermediates are stored locally under `cambrian/local/expansion-authoring/`;
+reproducible generation scripts are in `tools/creatures/`.

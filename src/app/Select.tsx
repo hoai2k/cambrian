@@ -46,6 +46,7 @@ export function SelectScreen(p: Props) {
               <div className="creature-copy">
                 <span className="role">{def.ground ? 'SEAFLOOR' : 'SWIMMER'} · {def.role}</span>
                 <h2>{def.name}</h2>
+                <small className="provenance">{def.species} · {def.provenance ?? 'Burgess Shale'}</small>
                 <p className="tagline">{def.tagline}</p>
                 <div className="stats">
                   <Stat label="Speed" v={stat(def.speed * def.burst, 14.6)} />
@@ -62,7 +63,7 @@ export function SelectScreen(p: Props) {
               </div>
               <div className="roster" role="listbox" aria-label={`Creature roster for player ${i + 1}`}>
                 {CREATURES.map((c) => (
-                  <button key={c.id} role="option" aria-selected={c.id === def.id} className={`roster-dot ${c.id === def.id ? 'active' : ''}`} style={{ ['--c' as string]: c.color }} title={c.name} onClick={() => p.onPick(i, c.id)} />
+                  <button key={c.id} role="option" aria-selected={c.id === def.id} className={`roster-dot ${c.id === def.id ? 'active' : ''}`} style={{ ['--c' as string]: c.color }} title={c.name} aria-label={c.name} onClick={() => p.onPick(i, c.id)}><img src={`${assetBase}assets/creatures/${c.id}.card.png`} alt="" loading="lazy" /><span>{c.name}</span></button>
                 ))}
               </div>
               <button className="ready-button" aria-pressed={pl.ready} onClick={() => p.onReady(i)}>

@@ -63,7 +63,8 @@ export function applyHit(ctx: HitContext, attacker: Actor, victim: Actor, move: 
 
   const sf = sizeFactor(attacker, victim);
   const base = move.damage * (1 + 0.35 * momentum) * dirBonus * sf;
-  let dmg = base * (1 - vdef.defense);
+  let dmg = base * (1 - vdef.defense * (1 - clamp(move.armorPierce ?? 0, 0, 1)));
+  if (victim.abilityActive && victim.state === 'ability' && (vdef.ability === 'adhesiveGlide' || vdef.ability === 'combCruise')) dmg *= vdef.ability === 'adhesiveGlide' ? .55 : .7;
   let result: HitResult = 'hit';
 
   const guarding = victim.state === 'guard' && vdef.canGuard;
@@ -83,7 +84,7 @@ export function applyHit(ctx: HitContext, attacker: Actor, victim: Actor, move: 
   }
 
   // Poise / stagger
-  const anchored = victim.abilityActive && vdef.ability === 'anchor';
+  const anchored = victim.abilityActive && (vdef.ability === 'anchor' || vdef.ability === 'adhesiveGlide');
   if (result === 'hit') {
     victim.poise -= move.poise * sf;
     if (victim.poise <= 0 && victim.state !== 'stagger' && !anchored) {

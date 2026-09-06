@@ -1,0 +1,298 @@
+{
+  "id": "nectocaris",
+  "sourceOrientation": "Blender +Z up, -Y anterior; glTF +Y up, +Z anterior",
+  "boundsBlender": {
+    "min": [
+      -1.125745415687561,
+      -3.4623830318450928,
+      -0.2301878035068512
+    ],
+    "max": [
+      1.125745415687561,
+      1.850000023841858,
+      0.23800000548362732
+    ]
+  },
+  "triangles": 48284,
+  "lodTriangles": 18347,
+  "vertices": 25167,
+  "bones": 56,
+  "durations": {
+    "Idle": 2.4,
+    "Swim": 2.4,
+    "Attack": 1.0,
+    "Hit": 0.6,
+    "Death": 1.6,
+    "TurnLeft": 2.4,
+    "TurnRight": 2.4,
+    "Dive": 2.4,
+    "Rise": 2.4,
+    "Bite": 0.5,
+    "Heavy": 1.1,
+    "Guard": 1.0,
+    "Parry": 0.35,
+    "Dodge": 0.4,
+    "Eat": 0.8,
+    "Stagger": 1.2,
+    "Ability": 1.2,
+    "Moult": 1.5,
+    "Grab": 0.9
+  },
+  "clipFrames": {
+    "Idle": 72.0,
+    "Swim": 72.0,
+    "Attack": 30.0,
+    "Hit": 18.0,
+    "Death": 48.0,
+    "TurnLeft": 72.0,
+    "TurnRight": 72.0,
+    "Dive": 72.0,
+    "Rise": 72.0,
+    "Bite": 15.0,
+    "Heavy": 33.0,
+    "Guard": 30.0,
+    "Parry": 10.5,
+    "Dodge": 12.0,
+    "Eat": 24.0,
+    "Stagger": 36.0,
+    "Ability": 36.0,
+    "Moult": 45.0,
+    "Grab": 27.0
+  },
+  "scientificNotes": [
+    "Broad continuous paired fins with 24 fin-control bones and longitudinal fiber detail; two long tentacles; prominent stalked camera eyes.",
+    "Nectocaridid interpretation follows 2025 chaetognath research. No squid siphon, jet propulsion, suckers, or speculative beak. Capture movements are game interpretation."
+  ],
+  "sources": [
+    "https://www.bristol.ac.uk/news/2025/july/ancient-squid-mystery-solved.html",
+    "https://burgess-shale.rom.on.ca/fossils/nectocaris-pteryx/"
+  ],
+  "validation": {
+    "full": {
+      "bytes": 3866024,
+      "clips": [
+        "Ability",
+        "Attack",
+        "Bite",
+        "Death",
+        "Dive",
+        "Dodge",
+        "Eat",
+        "Grab",
+        "Guard",
+        "Heavy",
+        "Hit",
+        "Idle",
+        "Moult",
+        "Parry",
+        "Rise",
+        "Stagger",
+        "Swim",
+        "TurnLeft",
+        "TurnRight"
+      ],
+      "materials": {
+        "nectocaris Eyes": {
+          "min": 0.009781033035782406,
+          "max": 0.05626001373311971,
+          "mean": 0.025145298171519524
+        },
+        "nectocaris Fin membrane": {
+          "min": 0.05938811322194247,
+          "max": 0.6662088960097657,
+          "mean": 0.23845374108950024
+        },
+        "nectocaris Living integument": {
+          "min": 0.03341725795376516,
+          "max": 0.5561608300907912,
+          "mean": 0.19144207200016464
+        },
+        "nectocaris Marginal tissue": {
+          "min": 0.06585793850614176,
+          "max": 0.3088883802548257,
+          "mean": 0.1692252517089845
+        },
+        "nectocaris Oral cuticle": {
+          "min": 0.012207217517357137,
+          "max": 0.29819180590524147,
+          "mean": 0.09835277961035639
+        }
+      },
+      "rootStatic": true,
+      "noScaleAnimation": true
+    },
+    "lod": {
+      "bytes": 2455616,
+      "clips": [
+        "Ability",
+        "Attack",
+        "Bite",
+        "Death",
+        "Dive",
+        "Dodge",
+        "Eat",
+        "Grab",
+        "Guard",
+        "Heavy",
+        "Hit",
+        "Idle",
+        "Moult",
+        "Parry",
+        "Rise",
+        "Stagger",
+        "Swim",
+        "TurnLeft",
+        "TurnRight"
+      ],
+      "materials": {
+        "nectocaris Eyes": {
+          "min": 0.009781033035782406,
+          "max": 0.05626001373311971,
+          "mean": 0.0253656310460484
+        },
+        "nectocaris Fin membrane": {
+          "min": 0.06883344777599756,
+          "max": 0.6491645685511559,
+          "mean": 0.25826037243699984
+        },
+        "nectocaris Living integument": {
+          "min": 0.04040588998245213,
+          "max": 0.5350118257419699,
+          "mean": 0.20616520250980783
+        },
+        "nectocaris Marginal tissue": {
+          "min": 0.06663614862287327,
+          "max": 0.30814068818188756,
+          "mean": 0.16954718852521553
+        },
+        "nectocaris Oral cuticle": {
+          "min": 0.012207217517357137,
+          "max": 0.2981765468833448,
+          "mean": 0.12292254350940547
+        }
+      },
+      "rootStatic": true,
+      "noScaleAnimation": true
+    },
+    "evaluatedSkin": {
+      "Idle": {
+        "finite": true,
+        "samples": 5,
+        "maxDimension": 5.322052955627441
+      },
+      "Swim": {
+        "finite": true,
+        "samples": 5,
+        "maxDimension": 5.327054142951965
+      },
+      "Attack": {
+        "finite": true,
+        "samples": 5,
+        "maxDimension": 5.3446351289749146
+      },
+      "Hit": {
+        "finite": true,
+        "samples": 5,
+        "maxDimension": 5.3148415088653564
+      },
+      "Death": {
+        "finite": true,
+        "samples": 5,
+        "maxDimension": 5.312383055686951
+      },
+      "TurnLeft": {
+        "finite": true,
+        "samples": 5,
+        "maxDimension": 5.312383055686951
+      },
+      "TurnRight": {
+        "finite": true,
+        "samples": 5,
+        "maxDimension": 5.312383055686951
+      },
+      "Dive": {
+        "finite": true,
+        "samples": 5,
+        "maxDimension": 5.312383055686951
+      },
+      "Rise": {
+        "finite": true,
+        "samples": 5,
+        "maxDimension": 5.312383055686951
+      },
+      "Bite": {
+        "finite": true,
+        "samples": 5,
+        "maxDimension": 5.318347215652466
+      },
+      "Heavy": {
+        "finite": true,
+        "samples": 5,
+        "maxDimension": 5.344590187072754
+      },
+      "Guard": {
+        "finite": true,
+        "samples": 5,
+        "maxDimension": 5.0650094747543335
+      },
+      "Parry": {
+        "finite": true,
+        "samples": 5,
+        "maxDimension": 5.312383055686951
+      },
+      "Dodge": {
+        "finite": true,
+        "samples": 5,
+        "maxDimension": 5.312383055686951
+      },
+      "Eat": {
+        "finite": true,
+        "samples": 5,
+        "maxDimension": 5.314862489700317
+      },
+      "Stagger": {
+        "finite": true,
+        "samples": 5,
+        "maxDimension": 5.312383055686951
+      },
+      "Ability": {
+        "finite": true,
+        "samples": 5,
+        "maxDimension": 5.323562741279602
+      },
+      "Moult": {
+        "finite": true,
+        "samples": 5,
+        "maxDimension": 5.312383055686951
+      },
+      "Grab": {
+        "finite": true,
+        "samples": 5,
+        "maxDimension": 5.312383055686951
+      }
+    },
+    "endpointMaxRadiansOrUnits": {
+      "Idle": 3.4772184792446724e-17,
+      "Swim": 1.2878586715074901e-16,
+      "Attack": 3.4494473975277085e-33,
+      "Hit": 2.8415858607350646e-34,
+      "Death": 0.949999988079071,
+      "TurnLeft": 1.2878586715074901e-16,
+      "TurnRight": 1.2878586715074901e-16,
+      "Dive": 1.2878586715074901e-16,
+      "Rise": 1.2878586715074901e-16,
+      "Bite": 3.4494473975277085e-33,
+      "Heavy": 3.4494473975277085e-33,
+      "Guard": 3.59712269309148e-18,
+      "Parry": 5.2491593706793705e-33,
+      "Dodge": 7.498798786105971e-33,
+      "Eat": 4.2366109788544894e-17,
+      "Stagger": 2.3756195327271252e-33,
+      "Ability": 1.4148682179236183e-16,
+      "Moult": 9.015010700552431e-17,
+      "Grab": 2.849543590148147e-33
+    },
+    "renderInspected": true
+  },
+  "sourceBlend": "cambrian/local/expansion-authoring/soft/nectocaris.blend"
+}
