@@ -207,7 +207,9 @@ export function createViewerScene(canvas: HTMLCanvasElement): ViewerScene {
     src.scale.setScalar(unit);
     src.position.copy(center).multiplyScalar(-unit);
     src.traverse((o) => { if (o instanceof THREE.Mesh) o.frustumCulled = false; });
-    frameRadius = Math.max(size.x, size.y, size.z) * unit * 0.5;
+    // Use the enclosing sphere, not only the longest half-axis. Tall/radial
+    // bodies need room for their full silhouette in the elevated camera view.
+    frameRadius = size.length() * unit * 0.5;
 
     model = src;
     stage.add(model);
