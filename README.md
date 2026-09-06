@@ -40,7 +40,7 @@ every push to `main` (set the repository's Pages source to "GitHub Actions").
 | `src/shared/palettes.ts` | Creature colour schemes and the material-name to slot mapping they apply through (`src/render/recolor.ts`). |
 | `public/assets/creatures/` | 21 rigged full models, reduced LODs, anatomical anchors, studio renders, hero cards, thumbnails and transparent `.select.png` portraits. |
 | `docs/redesign/` | Design and technical plan. |
-| `tools/` | Headless sim tests (`harness.ts`, `controls-test.ts`, `hunt-test.ts`, `fight-test.ts`, `corpse-test.ts`, `respawn-test.ts`, `flora-test.ts`), browser smoke tests (`smoke.mjs`, `viewer-smoke.mjs`, `workbench-smoke.mjs`), menu button-binding check (`menu-bindings-test.ts`), creature image intake (`make-cards.mjs`, `check-creature-assets.mjs`), colour-slot check (`palette-test.mjs`), audio density check (`audio-mix-test.ts`), LOD generator (`make-lods.mjs`), SFX generator (`gen-sfx.mjs`). |
+| `tools/` | Headless sim tests (`harness.ts`, `controls-test.ts`, `hunt-test.ts`, `fight-test.ts`, `corpse-test.ts`, `respawn-test.ts`, `flora-test.ts`, `world-test.ts`), browser smoke tests (`smoke.mjs`, `viewer-smoke.mjs`, `workbench-smoke.mjs`), menu button-binding check (`menu-bindings-test.ts`), creature image intake (`make-cards.mjs`, `check-creature-assets.mjs`), colour-slot check (`palette-test.mjs`), audio density check (`audio-mix-test.ts`), LOD generator (`make-lods.mjs`), SFX generator (`gen-sfx.mjs`). |
 | `public/assets/brand/`, `public/assets/ui/` | Delivered art: logo and key art, tier and band glyphs, mode panels, loading motif. |
 | `tools/art/` | How that art was made: generation prompts, the Blender portrait render, vector export and review scripts. |
 | `image-requests.md` | Open art requests — currently none; delivered briefs are in `image-requests-history.md`. |
@@ -56,6 +56,7 @@ run tools/controls-test.ts        # camera-relative movement directions
 run tools/respawn-test.ts         # a giant eats a larva; it must come back
 run tools/flora-test.ts           # plants: slide around sponges, fold algae, spring back
 run tools/expansion-test.ts       # all new kits, feeding, tracking and body clearance
+run tools/world-test.ts           # the endless sea: shore, biome bands, streaming, teleport, radar
 node --experimental-transform-types tools/anchors-test.mjs
 node --experimental-transform-types tools/feeding-test.mjs
 node tools/check-creature-assets.mjs --strict
@@ -63,6 +64,7 @@ run tools/audio-mix-test.ts       # audio density: how much of the reef's noise 
 run tools/harness.ts all 240      # balance: hunting, growth, escapes per creature
 run tools/harness.ts duel         # rival fights between creature pairs
 npm run preview & node tools/smoke.mjs /tmp   # needs Chromium; writes screenshots
+npm run preview & node tools/biome-tour.mjs /tmp   # drives through every biome band; screenshots and streaming stats
 npm run preview & node tools/workbench-smoke.mjs /tmp   # audio workbench: plays sounds, flags missing samples
 ```
 

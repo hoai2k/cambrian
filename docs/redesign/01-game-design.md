@@ -269,6 +269,12 @@ a risk, which keeps fights short and mobile.
 
 ## The world
 
+> **Superseded.** The bounded shelf below was the first implementation. The
+> sea is now endless and streamed, anchored to one shoreline, with nine biomes
+> banded by distance from it, a teleport menu and a radar: see
+> [04 · The endless sea](04-infinite-ocean.md). The table below is kept for the
+> biome roles it established.
+
 The single 66-unit arena becomes a **~400 × 400 unit shelf** built by the
 same procedural generator with a biome mask, plus a full 40-unit water column.
 Everything is still procedural (seeded), so it costs no new art.

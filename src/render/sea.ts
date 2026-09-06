@@ -1,8 +1,8 @@
 import * as THREE from 'three';
 import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js';
-import { makeRng, TAU } from '../shared/math';
+import { clamp, makeRng, TAU } from '../shared/math';
 import { FLORA_PHYS } from '../sim/flora';
-import { LIGHT_WINDOW_Y, sampleCurrent, sampleHeight, SURFACE_Y, WORLD_RADIUS, type Flora, type WorldData } from '../sim/world';
+import { BIOMES, biomeWeights, CHUNK, chunkCoord, chunkKey, chunkSeed, generateChunk, LIGHT_WINDOW_Y, sampleCurrent, sampleHeight, shoreDistance, SURFACE_Y, type Biome, type BiomeWeights, type Chunk, type Flora, type WorldData } from '../sim/world';
 
 export type Quality = 'high' | 'low';
 
@@ -19,12 +19,34 @@ float ec(vec2 p,float t) {
 
 export interface SeaEnvironment {
   group: THREE.Group;
-  /** Applies the magnification tier for one viewport and returns the fog density it chose. */
+  /** Applies the magnification tier and the local biome's atmosphere for one viewport and returns the fog density it chose. */
   setViewLength(L: number, camX?: number, camZ?: number): number;
-  update(time: number, dt: number, focus: THREE.Vector3): void;
+  /** `cams` are every viewport's camera positions: scenery streams in around all of them. */
+  update(time: number, dt: number, focus: THREE.Vector3, cams?: readonly THREE.Vector3[]): void;
   dispose(): void;
   sun: THREE.DirectionalLight;
+  /** Streaming counters for the profiler. */
+  stats(): { chunks: number; far: number; pending: number };
 }
+
+/** Coarse terrain and big rocks are drawn out to here around every camera (the fog limit is 300). */
+const FAR_RADIUS = 340;
+
+/**
+ * Atmosphere per biome: fog colour, fog density multiplier, sky and sun intensity. Blended by the
+ * biome weights under the camera so travelling between biomes is a slow morph, never a cut.
+ */
+const ATMOS: Record<Biome, { fog: string; density: number; sky: number; sun: number; sand: string }> = {
+  shallows: { fog: '#1f8994', density: 0.82, sky: 2.1, sun: 3.5, sand: '#c8c3a0' },
+  nursery: { fog: '#106572', density: 1.0, sky: 1.8, sun: 3.0, sand: '#a3a682' },
+  shelf: { fog: '#0d5563', density: 1.0, sky: 1.7, sun: 3.0, sand: '#a3a682' },
+  forest: { fog: '#0a4c52', density: 1.12, sky: 1.5, sun: 2.6, sand: '#8d8f6c' },
+  boulders: { fog: '#0f5260', density: 1.0, sky: 1.7, sun: 3.0, sand: '#9a9a86' },
+  flats: { fog: '#146470', density: 0.95, sky: 1.8, sun: 3.1, sand: '#8fa07a' },
+  channel: { fog: '#08404f', density: 1.1, sky: 1.4, sun: 2.4, sand: '#7f8878' },
+  escarpment: { fog: '#093c4b', density: 1.15, sky: 1.3, sun: 2.2, sand: '#7c8078' },
+  basin: { fog: '#041d2b', density: 1.4, sky: 0.9, sun: 1.5, sand: '#5e6a70' },
+};
 
 type SeaKind = 'sediment' | 'rock' | 'sponge' | 'algae';
 
@@ -107,7 +129,8 @@ export function createSea(scene: THREE.Scene, world: WorldData, quality: Quality
     return m;
   }
 
-  const sedimentMat = seaMaterial('#a3a682', 'sediment');
+  const sedimentMat = seaMaterial('#ffffff', 'sediment');
+  sedimentMat.vertexColors = true;                       // biome tint is painted per vertex on each tile
   const rockMat = seaMaterial('#75837a', 'rock');
   const spongeMat = seaMaterial('#c9a468', 'sponge', false, true);
   const spongeMat2 = seaMaterial('#b8a97c', 'sponge', false, true);
@@ -116,59 +139,88 @@ export function createSea(scene: THREE.Scene, world: WorldData, quality: Quality
   // Micro-tufts share the tuft look but are static scatter with no sim state.
   const microMat = seaMaterial('#5d7a43', 'algae', true);
 
-  // Terrain
-  const size = WORLD_RADIUS * 2 + 40;
-  const segs = high ? 220 : 130;
-  const terrainGeo = G(new THREE.PlaneGeometry(size, size, segs, segs));
-  terrainGeo.rotateX(-Math.PI / 2);
-  const tp = terrainGeo.attributes.position as THREE.BufferAttribute;
-  for (let i = 0; i < tp.count; i++) tp.setY(i, sampleHeight(tp.getX(i), tp.getZ(i)));
-  terrainGeo.computeVertexNormals();
-  const terrain = new THREE.Mesh(terrainGeo, sedimentMat);
-  terrain.name = 'seabed'; terrain.receiveShadow = true;
-  group.add(terrain);
+  /**
+   * Scenery is built per 64-unit chunk, mirroring the simulation's streaming: a full view (terrain
+   * tile, rocks, every plant, undergrowth) for the chunks the sim has loaded, and a far view
+   * (coarse tile, big rocks) for the ring out to the fog limit. Each instanced mesh has a real
+   * bounding sphere, so it is frustum-culled per viewport; each carries the range past which it is
+   * not worth drawing and the magnification it stops mattering at.
+   */
+  interface CulledMesh { mesh: THREE.Object3D; range: number; maxLength: number; }
+  interface ChunkView { key: number; x: number; z: number; detail: 'full' | 'far'; meshes: CulledMesh[]; own: THREE.BufferGeometry[]; flora: Flora[]; }
+  const views = new Map<number, ChunkView>();
+  const pending: { cx: number; cz: number; d: number; detail: 'full' | 'far' }[] = [];
+  const dummy = new THREE.Object3D();
+  const color = new THREE.Color();
 
-  // Instanced scenery is bucketed into cells so each bucket has a real bounding sphere and can be
-  // frustum-culled per viewport. One giant InstancedMesh can never be culled: it is always "on screen".
-  const CELL = 64;
-  /** Every chunk carries the range past which it is not worth drawing, and the magnification it stops mattering at. */
-  const chunks: { mesh: THREE.InstancedMesh; cx: number; cz: number; range: number; maxLength: number }[] = [];
-  const chunked = <T extends { pos: { x: number; y: number; z: number } }>(
-    name: string, geo: THREE.BufferGeometry, mat: THREE.Material, items: T[],
+  const instanced = <T extends { pos: { x: number; y: number; z: number } }>(
+    view: ChunkView, name: string, geo: THREE.BufferGeometry, mat: THREE.Material, arr: T[],
     place: (item: T, d: THREE.Object3D) => void,
     opts: { castShadow?: boolean; color?: (item: T) => THREE.Color; range?: number; maxLength?: number; bend?: (item: T, attr: THREE.InstancedBufferAttribute, index: number) => void } = {},
   ) => {
-    const cells = new Map<number, T[]>();
-    for (const it of items) {
-      const k = (Math.floor(it.pos.x / CELL) + 64) * 256 + (Math.floor(it.pos.z / CELL) + 64);
-      let arr = cells.get(k); if (!arr) cells.set(k, (arr = []));
-      arr.push(it);
+    if (!arr.length) return;
+    // Per-instance attributes live on the geometry, so a bendable chunk needs its own copy.
+    let cg = geo, bendAttr: THREE.InstancedBufferAttribute | undefined;
+    if (opts.bend) {
+      cg = geo.clone(); view.own.push(cg);
+      bendAttr = new THREE.InstancedBufferAttribute(new Float32Array(arr.length * 2), 2);
+      bendAttr.setUsage(THREE.DynamicDrawUsage);
+      cg.setAttribute('aBend', bendAttr);
     }
-    const meshes: THREE.InstancedMesh[] = [];
-    for (const [key, arr] of cells) {
-      // Per-instance attributes live on the geometry, so a bendable chunk needs its own copy.
-      let cg = geo, bendAttr: THREE.InstancedBufferAttribute | undefined;
-      if (opts.bend) {
-        cg = G(geo.clone());
-        bendAttr = new THREE.InstancedBufferAttribute(new Float32Array(arr.length * 2), 2);
-        bendAttr.setUsage(THREE.DynamicDrawUsage);
-        cg.setAttribute('aBend', bendAttr);
-      }
-      const im = new THREE.InstancedMesh(cg, mat, arr.length);
-      im.name = name; im.castShadow = !!opts.castShadow && high; im.receiveShadow = true;
-      arr.forEach((it, i) => {
-        place(it, dummy); dummy.updateMatrix(); im.setMatrixAt(i, dummy.matrix);
-        if (opts.color) im.setColorAt(i, opts.color(it));
-        if (bendAttr) opts.bend!(it, bendAttr, i);
-      });
-      im.computeBoundingSphere();
-      group.add(im); meshes.push(im);
-      chunks.push({
-        mesh: im, cx: (Math.floor(key / 256) - 64) * CELL + CELL / 2, cz: ((key % 256) - 64) * CELL + CELL / 2,
-        range: opts.range ?? 1e6, maxLength: opts.maxLength ?? Infinity,
-      });
+    const im = new THREE.InstancedMesh(cg, mat, arr.length);
+    im.name = name; im.castShadow = !!opts.castShadow && high; im.receiveShadow = true;
+    arr.forEach((it, i) => {
+      place(it, dummy); dummy.updateMatrix(); im.setMatrixAt(i, dummy.matrix);
+      if (opts.color) im.setColorAt(i, opts.color(it));
+      if (bendAttr) opts.bend!(it, bendAttr, i);
+    });
+    im.computeBoundingSphere();
+    group.add(im);
+    view.meshes.push({ mesh: im, range: opts.range ?? 1e6, maxLength: opts.maxLength ?? Infinity });
+  };
+
+  /**
+   * One seabed tile. Heights come straight from the sim's field; normals from a one-vertex apron
+   * so tile edges shade seamlessly; the vertex colour is the blended biome tint, with pale sand
+   * where the beach climbs out of the water.
+   */
+  const tileW: BiomeWeights = { shallows: 0, nursery: 0, shelf: 0, forest: 0, boulders: 0, flats: 0, channel: 0, escarpment: 0, basin: 0 };
+  const sandColors = Object.fromEntries(BIOMES.map((b) => [b, new THREE.Color(ATMOS[b].sand)])) as Record<Biome, THREE.Color>;
+  const beach = new THREE.Color('#d9cfa4');
+  const terrainTile = (view: ChunkView, segs: number) => {
+    const x0 = view.x - CHUNK / 2, z0 = view.z - CHUNK / 2, step = CHUNK / segs;
+    const n = segs + 1, ap = n + 2;
+    const hs = new Float32Array(ap * ap);
+    for (let j = 0; j < ap; j++) for (let i = 0; i < ap; i++) hs[j * ap + i] = sampleHeight(x0 + (i - 1) * step, z0 + (j - 1) * step);
+    const pos = new Float32Array(n * n * 3), nor = new Float32Array(n * n * 3), col = new Float32Array(n * n * 3), uv = new Float32Array(n * n * 2);
+    const idx: number[] = [];
+    for (let j = 0; j < n; j++) for (let i = 0; i < n; i++) {
+      const v = j * n + i, h = (j + 1) * ap + (i + 1);
+      const x = x0 + i * step, z = z0 + j * step;
+      pos[v * 3] = x; pos[v * 3 + 1] = hs[h]; pos[v * 3 + 2] = z;
+      const dx = (hs[h + 1] - hs[h - 1]) / (2 * step), dz = (hs[h + ap] - hs[h - ap]) / (2 * step);
+      const l = Math.hypot(dx, 1, dz);
+      nor[v * 3] = -dx / l; nor[v * 3 + 1] = 1 / l; nor[v * 3 + 2] = -dz / l;
+      uv[v * 2] = i / segs; uv[v * 2 + 1] = j / segs;
+      biomeWeights(x, z, tileW);
+      color.setRGB(0, 0, 0);
+      for (const b of BIOMES) { const w = tileW[b]; if (w > 0.001) { const c = sandColors[b]; color.r += c.r * w; color.g += c.g * w; color.b += c.b * w; } }
+      color.lerp(beach, 1 - THREE.MathUtils.smoothstep(shoreDistance(x, z), 8, 40));
+      col[v * 3] = color.r; col[v * 3 + 1] = color.g; col[v * 3 + 2] = color.b;
+      if (i < segs && j < segs) idx.push(v, v + n, v + 1, v + 1, v + n, v + n + 1);
     }
-    return meshes;
+    const g = new THREE.BufferGeometry();
+    g.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+    g.setAttribute('normal', new THREE.BufferAttribute(nor, 3));
+    g.setAttribute('color', new THREE.BufferAttribute(col, 3));
+    g.setAttribute('uv', new THREE.BufferAttribute(uv, 2));
+    g.setIndex(idx);
+    g.computeBoundingSphere();
+    view.own.push(g);
+    const m = new THREE.Mesh(g, sedimentMat);
+    m.name = 'seabed'; m.receiveShadow = true;
+    group.add(m);
+    view.meshes.push({ mesh: m, range: 1e6, maxLength: Infinity });
   };
 
   // Boulders
@@ -183,22 +235,7 @@ export function createSea(scene: THREE.Scene, world: WorldData, quality: Quality
     g.computeVertexNormals();
     return G(g);
   };
-  const dummy = new THREE.Object3D();
-  const color = new THREE.Color();
-  chunked('boulders', rockGeo(high ? 2 : 1), rockMat, world.boulders,
-    (b, d) => { d.position.set(b.pos.x, b.pos.y, b.pos.z); d.rotation.set(0, b.rot, 0); d.scale.set(b.sx, b.sy, b.sz); },
-    { castShadow: true, range: 240, color: (b) => color.setHSL(0.1 + rng() * 0.05, 0.1 + rng() * 0.1, b.shade * 0.55) });
-
-  // Rock fragments scattered
-  const fragItems: { pos: { x: number; y: number; z: number }; s: number; a: number }[] = [];
-  for (let i = 0; i < (high ? 1400 : 500); i++) {
-    const a = rng() * TAU, d = Math.sqrt(rng()) * (WORLD_RADIUS - 8);
-    const x = Math.cos(a) * d, z = Math.sin(a) * d;
-    fragItems.push({ pos: { x, y: sampleHeight(x, z) + 0.02, z }, s: 0.05 + rng() * 0.22, a });
-  }
-  chunked('frags', rockGeo(1), rockMat, fragItems,
-    (f, d) => { d.position.set(f.pos.x, f.pos.y, f.pos.z); d.rotation.set(0, f.a, 0); d.scale.set(f.s * 1.5, f.s * 0.35, f.s); },
-    { range: 45, maxLength: 4.5, color: () => color.setHSL(0.1, 0.12, 0.42 + rng() * 0.2) });
+  const boulderGeo = rockGeo(high ? 2 : 1), fragGeo = rockGeo(1);
 
   // Flora geometries (same reconstructions as the old build)
   const tube = (a: THREE.Vector3, b: THREE.Vector3, r: number, taper = 0.8) => {
@@ -238,21 +275,126 @@ export function createSea(scene: THREE.Scene, world: WorldData, quality: Quality
   const tuftGeo = merged(tuftParts);
 
   const floraSlots = new Map<Flora, { attr: THREE.InstancedBufferAttribute; i: number }>();
-  const floraSets: Record<string, { geo: THREE.BufferGeometry; mat: THREE.Material; items: typeof world.flora }> = {
-    vauxia: { geo: vauxiaGeo, mat: spongeMat, items: [] }, sac: { geo: sacGeo, mat: spongeMat, items: [] },
-    choia: { geo: choiaGeo, mat: spongeMat2, items: [] }, thalli: { geo: thalliGeo, mat: algaeMat, items: [] }, tuft: { geo: tuftGeo, mat: tuftMat, items: [] },
+  const floraSets: Record<string, { geo: THREE.BufferGeometry; mat: THREE.Material }> = {
+    vauxia: { geo: vauxiaGeo, mat: spongeMat }, sac: { geo: sacGeo, mat: spongeMat },
+    choia: { geo: choiaGeo, mat: spongeMat2 }, thalli: { geo: thalliGeo, mat: algaeMat }, tuft: { geo: tuftGeo, mat: tuftMat },
   };
-  for (const f of world.flora) floraSets[f.kind].items.push(f);
-  for (const [kind, set] of Object.entries(floraSets)) {
-    if (!set.items.length) continue;
-    // Sponges do not cast shadows: the sun is high and diffuse down here, and shadow-casting flora
-    // was by far the most expensive thing in the frame (it is re-rendered for every viewport).
-    const range = kind === 'tuft' ? 58 : kind === 'choia' ? 88 : kind === 'sac' ? 100 : 125;
-    chunked(`flora-${kind}`, set.geo, set.mat, set.items,
-      (f, d) => { d.position.set(f.pos.x, f.pos.y, f.pos.z); d.rotation.set(0, f.rot, 0); d.scale.set(f.scale, f.sy, f.scale); },
-      { range, maxLength: kind === 'tuft' ? 7 : Infinity, color: (f) => color.setHSL(0.095 + rng() * 0.05, 0.14 + rng() * 0.12, f.shade * 0.72),
-        bend: (f, attr, i) => floraSlots.set(f, { attr, i }) });
-  }
+  const microGeo = G(new THREE.ConeGeometry(0.012, 0.22, 3, 1, true));
+  microGeo.translate(0, 0.11, 0);
+
+  /** Build the scenery for one chunk. `chunk` is the sim's for full views; far views generate their own coarse copy. */
+  const buildView = (cx: number, cz: number, detail: 'full' | 'far') => {
+    const key = chunkKey(cx, cz);
+    const old = views.get(key); if (old) disposeView(old);
+    const chunk: Chunk = detail === 'full' ? (world.chunks.get(key) ?? generateChunk(world.seed, cx, cz)) : generateChunk(world.seed, cx, cz, 'far');
+    const view: ChunkView = { key, x: chunk.x, z: chunk.z, detail, meshes: [], own: [], flora: chunk.flora };
+    const crng = makeRng(chunkSeed(world.seed + 7, cx, cz, 3));
+    terrainTile(view, detail === 'full' ? (high ? 32 : 20) : 8);
+    instanced(view, 'boulders', boulderGeo, rockMat, chunk.boulders,
+      (b, d) => { d.position.set(b.pos.x, b.pos.y, b.pos.z); d.rotation.set(0, b.rot, 0); d.scale.set(b.sx, b.sy, b.sz); },
+      { castShadow: detail === 'full', range: 400, color: (b) => color.setHSL(0.1 + crng() * 0.05, 0.1 + crng() * 0.1, b.shade * 0.55) });
+    if (detail === 'far') { views.set(key, view); return view; }
+
+    // Rock fragments scattered
+    const fragItems: { pos: { x: number; y: number; z: number }; s: number; a: number }[] = [];
+    for (let i = 0; i < (high ? 50 : 18); i++) {
+      const x = chunk.x - CHUNK / 2 + crng() * CHUNK, z = chunk.z - CHUNK / 2 + crng() * CHUNK;
+      if (shoreDistance(x, z) < 6) continue;
+      fragItems.push({ pos: { x, y: sampleHeight(x, z) + 0.02, z }, s: 0.05 + crng() * 0.22, a: crng() * TAU });
+    }
+    instanced(view, 'frags', fragGeo, rockMat, fragItems,
+      (f, d) => { d.position.set(f.pos.x, f.pos.y, f.pos.z); d.rotation.set(0, f.a, 0); d.scale.set(f.s * 1.5, f.s * 0.35, f.s); },
+      { range: 45, maxLength: 4.5, color: () => color.setHSL(0.1, 0.12, 0.42 + crng() * 0.2) });
+
+    // Flora. Sponges do not cast shadows: the sun is high and diffuse down here, and shadow-casting
+    // flora was by far the most expensive thing in the frame (it is re-rendered for every viewport).
+    for (const [kind, set] of Object.entries(floraSets)) {
+      const items = chunk.flora.filter((f) => f.kind === kind);
+      const range = kind === 'tuft' ? 58 : kind === 'choia' ? 88 : kind === 'sac' ? 100 : kind === 'thalli' ? 100 : 125;
+      instanced(view, `flora-${kind}`, set.geo, set.mat, items,
+        (f, d) => { d.position.set(f.pos.x, f.pos.y, f.pos.z); d.rotation.set(0, f.rot, 0); d.scale.set(f.scale, f.sy, f.scale); },
+        { range, maxLength: kind === 'tuft' ? 7 : Infinity, color: (f) => color.setHSL(0.095 + crng() * 0.05, 0.14 + crng() * 0.12, f.shade * 0.72),
+          bend: (f, attr, i) => floraSlots.set(f, { attr, i }) });
+    }
+
+    // Micro layer: fine filament "grass" clustered around the plants; only matters when you are small.
+    if (chunk.flora.length) {
+      const microCount = Math.min(high ? 700 : 260, Math.round(chunk.flora.length * (high ? 0.7 : 0.3)));
+      const microItems: { pos: { x: number; y: number; z: number }; s: number; a: number; rx: number; rz: number; sy: number }[] = [];
+      for (let i = 0; i < microCount; i++) {
+        const anchor = chunk.flora[Math.floor(crng() * chunk.flora.length)];
+        const a = crng() * TAU, d = Math.sqrt(crng()) * 2.4;
+        const x = anchor.pos.x + Math.cos(a) * d, z = anchor.pos.z + Math.sin(a) * d;
+        const s = 0.6 + crng() * 1.4;
+        microItems.push({ pos: { x, y: sampleHeight(x, z) - 0.02, z }, s, a, rx: (crng() - 0.5) * 0.5, rz: (crng() - 0.5) * 0.5, sy: s * (0.8 + crng() * 0.8) });
+      }
+      instanced(view, 'micro-tufts', microGeo, microMat, microItems,
+        (m, d) => { d.position.set(m.pos.x, m.pos.y, m.pos.z); d.rotation.set(m.rx, m.a, m.rz); d.scale.set(m.s, m.sy, m.s); },
+        { range: 32, maxLength: 2.2, color: () => color.setHSL(0.22 + crng() * 0.08, 0.3, 0.3 + crng() * 0.2) });
+    }
+
+    // Plankton blooms: glowing point clouds in the light window
+    if (chunk.blooms.length) {
+      const pts: number[] = [];
+      for (const b of chunk.blooms) for (let i = 0; i < (high ? 220 : 90); i++) { const a = crng() * TAU, r = Math.sqrt(crng()) * b.radius; pts.push(b.pos.x + Math.cos(a) * r, b.pos.y + (crng() - 0.5) * b.radius * 0.5, b.pos.z + Math.sin(a) * r); }
+      const bg = new THREE.BufferGeometry(); bg.setAttribute('position', new THREE.Float32BufferAttribute(pts, 3)); bg.computeBoundingSphere();
+      view.own.push(bg);
+      const pl = new THREE.Points(bg, bloomMat); pl.name = 'plankton'; group.add(pl);
+      view.meshes.push({ mesh: pl, range: 200, maxLength: Infinity });
+    }
+    views.set(key, view);
+    return view;
+  };
+  const disposeView = (v: ChunkView) => {
+    for (const m of v.meshes) { group.remove(m.mesh); if (m.mesh instanceof THREE.InstancedMesh) m.mesh.dispose(); }
+    for (const g of v.own) g.dispose();
+    for (const f of v.flora) { floraSlots.delete(f); bentSlots.delete(f); }
+    views.delete(v.key);
+  };
+
+  /**
+   * Keep the views in step with the sim's chunks and the cameras: full views for loaded chunks,
+   * far views out to the fog limit, a couple of builds per frame so streaming never hitches.
+   */
+  const scratchKeys = new Set<number>();
+  const syncViews = (cams: readonly THREE.Vector3[]) => {
+    pending.length = 0;
+    scratchKeys.clear();
+    for (const c of world.chunks.values()) {
+      scratchKeys.add(c.key);
+      const v = views.get(c.key);
+      if (!v || v.detail !== 'full') { let d = Infinity; for (const cam of cams) d = Math.min(d, Math.hypot(cam.x - c.x, cam.z - c.z)); pending.push({ cx: c.cx, cz: c.cz, d, detail: 'full' }); }
+    }
+    const span = Math.ceil(FAR_RADIUS / CHUNK) + 1;
+    for (const cam of cams) {
+      const acx = chunkCoord(cam.x), acz = chunkCoord(cam.z);
+      for (let cx = acx - span; cx <= acx + span; cx++) for (let cz = acz - span; cz <= acz + span; cz++) {
+        const k = chunkKey(cx, cz);
+        if (scratchKeys.has(k)) continue;
+        const d = Math.hypot(cam.x - (cx + 0.5) * CHUNK, cam.z - (cz + 0.5) * CHUNK);
+        if (d > FAR_RADIUS) continue;
+        scratchKeys.add(k);
+        if (!views.has(k)) pending.push({ cx, cz, d, detail: 'far' });
+      }
+    }
+    // drop views nobody needs: full views the sim released fall back to far on the next pass
+    for (const v of [...views.values()]) {
+      if (!scratchKeys.has(v.key)) { disposeView(v); continue; }
+      if (v.detail === 'full' && !world.chunks.has(v.key)) disposeView(v);
+    }
+    if (pending.length) {
+      pending.sort((a, b) => (a.detail === b.detail ? a.d - b.d : a.detail === 'full' ? -1 : 1));
+      // Nearest full views first, then far tiles, inside a time budget so a slow machine streams
+      // more slowly rather than stuttering. At least one view is always built, and the budget
+      // opens up when a lot is outstanding (match start, a teleport) so the ground fills in fast.
+      const budget = pending.length > 60 ? 14 : pending.length > 20 ? 9 : 6;
+      const t0 = performance.now();
+      for (const p of pending) {
+        buildView(p.cx, p.cz, p.detail);
+        if (performance.now() - t0 > budget) break;
+      }
+    }
+  };
   /** Write a plant's sim bend into its instance attribute, in local geometry units. */
   const writeBend = (f: Flora, slot: { attr: THREE.InstancedBufferAttribute; i: number }) => {
     // World top displacement -> undo the instance yaw, divide by the xz scale, then by h^1.3 so the
@@ -265,13 +407,13 @@ export function createSea(scene: THREE.Scene, world: WorldData, quality: Quality
     a[slot.i * 2] = lx; a[slot.i * 2 + 1] = lz;
     slot.attr.needsUpdate = true;
   };
-  const bentSlots = new Set<Flora>();
 
   // Water surface / light window
   const surfaceMat = M(new THREE.ShaderMaterial({
     side: THREE.DoubleSide, transparent: true, depthWrite: false,
     uniforms: { uSeaTime: seaTime },
-    vertexShader: `uniform float uSeaTime;varying vec3 vP;void main(){vec3 p=position;p.z+=sin(p.x*.3+uSeaTime*.63)*.18+sin(p.y*.39-uSeaTime*.47)*.12+sin((p.x+p.y)*.17+uSeaTime*.32)*.2;vP=(modelMatrix*vec4(p,1.)).xyz;gl_Position=projectionMatrix*viewMatrix*vec4(vP,1.);}`,
+    // waves in world space so the plane can follow the camera without the pattern sliding
+    vertexShader: `uniform float uSeaTime;varying vec3 vP;void main(){vec4 w=modelMatrix*vec4(position,1.);w.y+=sin(w.x*.3+uSeaTime*.63)*.18+sin(w.z*.39-uSeaTime*.47)*.12+sin((w.x+w.z)*.17+uSeaTime*.32)*.2;vP=w.xyz;gl_Position=projectionMatrix*viewMatrix*w;}`,
     fragmentShader: `uniform float uSeaTime;varying vec3 vP;${SEA_GLSL}
     void main(){vec3 V=normalize(cameraPosition-vP);vec2 q=vP.xz;vec3 N=normalize(vec3(cos(q.x*.3+uSeaTime*.63)*.11+cos((q.x+q.y)*.17+uSeaTime*.32)*.035,-1.,cos(q.y*.39-uSeaTime*.47)*.1));
     float facing=max(.0,dot(N,V));float fresnel=pow(1.-facing,3.);float window=smoothstep(.55,.84,facing);float glow=pow(max(0.,dot(-V,normalize(vec3(-.32,1.,.16)))),40.);float ripple=ec(q*.28,uSeaTime)*.18+ef(q*.55+uSeaTime*.018)*.09;
@@ -280,8 +422,10 @@ export function createSea(scene: THREE.Scene, world: WorldData, quality: Quality
     #include <colorspace_fragment>
     }`,
   }));
-  const surface = new THREE.Mesh(G(new THREE.PlaneGeometry(size + 100, size + 100, high ? 120 : 60, high ? 120 : 60)), surfaceMat);
+  const surfaceSize = FAR_RADIUS * 2 + 80;
+  const surface = new THREE.Mesh(G(new THREE.PlaneGeometry(surfaceSize, surfaceSize, high ? 120 : 60, high ? 120 : 60)), surfaceMat);
   surface.rotation.x = -Math.PI / 2; surface.position.y = SURFACE_Y; surface.renderOrder = 1; surface.name = 'surface';
+  surface.frustumCulled = false;
   group.add(surface);
 
   // Light shafts (follow the focus point)
@@ -313,36 +457,18 @@ export function createSea(scene: THREE.Scene, world: WorldData, quality: Quality
   particles.frustumCulled = false; particles.name = 'particles';
   group.add(particles);
 
-  // Plankton blooms: glowing point clouds in the light window
-  const bloomPts: number[] = [];
-  for (const b of world.blooms) for (let i = 0; i < (high ? 220 : 90); i++) { const a = rng() * TAU, r = Math.sqrt(rng()) * b.radius; bloomPts.push(b.pos.x + Math.cos(a) * r, b.pos.y + (rng() - 0.5) * b.radius * 0.5, b.pos.z + Math.sin(a) * r); }
-  const bloomGeo = G(new THREE.BufferGeometry());
-  bloomGeo.setAttribute('position', new THREE.Float32BufferAttribute(bloomPts, 3));
-  const blooms = new THREE.Points(bloomGeo, M(new THREE.PointsMaterial({ color: '#bdf7c8', size: 0.14, transparent: true, opacity: 0.85, depthWrite: false, sizeAttenuation: true })));
-  blooms.name = 'plankton'; group.add(blooms);
-
-  // Micro layer: fine filament "grass" that only matters when you are small.
-  const microCount = high ? 9000 : 3500;
-  const microGeo = G(new THREE.ConeGeometry(0.012, 0.22, 3, 1, true));
-  microGeo.translate(0, 0.11, 0);
-  const microItems: { pos: { x: number; y: number; z: number }; s: number; a: number; rx: number; rz: number; sy: number }[] = [];
-  for (let i = 0; i < microCount; i++) {
-    // cluster around flora so the nursery floor reads as undergrowth
-    const anchor = world.flora[Math.floor(rng() * world.flora.length)];
-    const a = rng() * TAU, d = Math.sqrt(rng()) * 2.4;
-    const x = anchor.pos.x + Math.cos(a) * d, z = anchor.pos.z + Math.sin(a) * d;
-    const s = 0.6 + rng() * 1.4;
-    microItems.push({ pos: { x, y: sampleHeight(x, z) - 0.02, z }, s, a, rx: (rng() - 0.5) * 0.5, rz: (rng() - 0.5) * 0.5, sy: s * (0.8 + rng() * 0.8) });
-  }
-  chunked('micro-tufts', microGeo, microMat, microItems,
-    (m, d) => { d.position.set(m.pos.x, m.pos.y, m.pos.z); d.rotation.set(m.rx, m.a, m.rz); d.scale.set(m.s, m.sy, m.s); },
-    { range: 32, maxLength: 2.2, color: () => color.setHSL(0.22 + rng() * 0.08, 0.3, 0.3 + rng() * 0.2) });
+  const bloomMat = M(new THREE.PointsMaterial({ color: '#bdf7c8', size: 0.14, transparent: true, opacity: 0.85, depthWrite: false, sizeAttenuation: true }));
 
   const baseFog = high ? 0.0105 : 0.0125;
   const cur = { x: 0, y: 0, z: 0 };
   const shaftDummy = new THREE.Object3D();
   let disposed = false;
   let pOrigin = new THREE.Vector3();
+  const hemi = group.children.find((o): o is THREE.HemisphereLight => o instanceof THREE.HemisphereLight)!;
+  const atmosW: BiomeWeights = { ...tileW };
+  const fogColor = new THREE.Color(), tmpColor = new THREE.Color();
+  const bentSlots = new Set<Flora>();
+  void rng;
 
   return {
     group, sun,
@@ -353,21 +479,37 @@ export function createSea(scene: THREE.Scene, world: WorldData, quality: Quality
      */
     setViewLength(L: number, camX = 0, camZ = 0) {
       const fog = scene.fog as THREE.FogExp2;
-      fog.density = baseFog * THREE.MathUtils.clamp(2.2 / (L + 1.5), 0.62, 1.15);
+      // The biome under the camera colours the water: bright and green over the shallows, near
+      // black in the basin. Weights blend, so crossing a boundary is a slow change of light.
+      biomeWeights(camX, camZ, atmosW);
+      fogColor.setRGB(0, 0, 0);
+      let density = 0, sky = 0, sunI = 0;
+      for (const b of BIOMES) {
+        const w = atmosW[b]; if (w <= 0.001) continue;
+        const a = ATMOS[b];
+        tmpColor.set(a.fog); fogColor.r += tmpColor.r * w; fogColor.g += tmpColor.g * w; fogColor.b += tmpColor.b * w;
+        density += a.density * w; sky += a.sky * w; sunI += a.sun * w;
+      }
+      fog.color.copy(fogColor); (scene.background as THREE.Color).copy(fogColor);
+      hemi.intensity = sky; sun.intensity = sunI;
+      fog.density = baseFog * density * THREE.MathUtils.clamp(2.2 / (L + 1.5), 0.62, 1.15);
+      // The surface plane rides with this viewport's camera; its waves are in world space.
+      surface.position.x = camX; surface.position.z = camZ;
       // Distance-cull scenery chunks: small detail is a few pixels and heavily fogged long before
       // the far plane, so drawing it is pure cost. Bigger creatures see proportionally further.
       const reach = THREE.MathUtils.clamp(0.75 + L * 0.14, 0.85, 1.9);
-      for (const c of chunks) {
-        const d = Math.hypot(camX - c.cx, camZ - c.cz) - CELL * 0.75;
-        c.mesh.visible = L < c.maxLength && d < c.range * reach;
+      for (const v of views.values()) {
+        const d = Math.hypot(camX - v.x, camZ - v.z) - CHUNK * 0.75;
+        for (const c of v.meshes) c.mesh.visible = L < c.maxLength && d < c.range * reach;
       }
       (particles.material as THREE.ShaderMaterial).opacity = 1;
       particles.scale.setScalar(THREE.MathUtils.clamp(L * 0.6, 0.6, 3));
       return fog.density;
     },
-    update(time, dt, focus) {
+    update(time, dt, focus, cams = [focus]) {
       if (disposed) return;
       seaTime.value = time;
+      syncViews(cams);
       // Plants the sim has disturbed lean in the shader; ones that settled get written back to rest once.
       for (const f of world.activeFlora) { const slot = floraSlots.get(f); if (slot) { writeBend(f, slot); bentSlots.add(f); } }
       for (const f of bentSlots) if (!f.active) { const slot = floraSlots.get(f); if (slot) writeBend(f, slot); bentSlots.delete(f); }
@@ -393,11 +535,13 @@ export function createSea(scene: THREE.Scene, world: WorldData, quality: Quality
       }
       particles.position.set(pOrigin.x, 0, pOrigin.z);
       (pGeo.attributes.position as THREE.BufferAttribute).needsUpdate = true;
-      (blooms.material as THREE.PointsMaterial).opacity = 0.65 + 0.25 * Math.sin(time * 1.3);
+      bloomMat.opacity = 0.65 + 0.25 * Math.sin(time * 1.3);
     },
+    stats() { let far = 0; for (const v of views.values()) if (v.detail === 'far') far++; return { chunks: views.size - far, far, pending: pending.length }; },
     dispose() {
       if (disposed) return; disposed = true;
       group.removeFromParent();
+      for (const v of [...views.values()]) disposeView(v);
       group.traverse((o) => { if (o instanceof THREE.InstancedMesh) o.dispose(); });
       geometries.forEach((g) => g.dispose()); materials.forEach((m) => m.dispose());
       sun.shadow.map?.dispose();

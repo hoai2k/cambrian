@@ -24,5 +24,10 @@ unless the user explicitly asks for a PR. Steps:
 - Any change to a creature's model, colours or textures must go through
   `docs/creature-intake.md`: re-render, `npm run cards`, `npm run lods`, and
   `npm run check` must pass. The check flags stale images automatically.
+- The sea is endless and streamed: `src/sim/world.ts` generates 64-unit chunks from the seed
+  around every player, banded into nine biomes by distance from the one shoreline. Nothing may
+  assume a world bound; anything that places things in the world must go through the biome
+  weights and `shoreDistance`. Design and contract: `docs/redesign/04-infinite-ocean.md`;
+  `tools/world-test.ts` must pass.
 - Design docs live in `docs/redesign/`. Image needs go in `image-requests.md`; move each
   brief to `image-requests-history.md` once its assets are delivered and integrated.

@@ -116,7 +116,7 @@ export function AudioBench() {
           <a className="back" href="../">← Cambrian Explosion</a>
           <h1>Audio workbench</h1>
           <p className="sub">
-            Every sound in the game, played through the real audio module. Hover a sound to read where it fires from.
+            Every sound in the game, played through the real audio module. Pause over the space around a sound’s controls to read where it fires from.
           </p>
         </div>
         {!ready
@@ -241,10 +241,11 @@ function FileChip({ file, info, levels, disabled, alt, onPlay }: {
   const missing = i && !i.ok;
   const quiet = level && isQuiet(level);
   const cls = `chip${missing ? ' missing' : ''}${quiet ? ' quiet' : ''}${alt ? ' alt' : ''}`;
-  const title = alt ? `Backup take — not wired into the game. Play ${file}.mp3` : `Play ${file}.mp3 on its own`;
+  // Screen-reader label only — a native tooltip here would fight the row's usage hint.
+  const title = alt ? `Backup take, not wired into the game. Play ${file}.mp3` : `Play ${file}.mp3 on its own`;
   return (
     <button className={cls} disabled={disabled} onClick={onPlay}
-      title={level ? `${title}. Peak above 150 Hz: ${level.midPeak.toFixed(1)} dB (full peak ${level.peak.toFixed(1)} dB)` : title}>
+      aria-label={level ? `${title}. Peak above 150 Hz ${level.midPeak.toFixed(1)} dB, full peak ${level.peak.toFixed(1)} dB` : title}>
       {file}.mp3
       {missing ? ' — missing' : i?.kb ? ` · ${i.kb} KB` : ''}
       {level ? ` · ${formatLevel(level)}` : ''}

@@ -3,7 +3,7 @@
  * synthesized fallback for anything that has not loaded yet, so the game is never silent.
  */
 import { AUDIBLE_FLOOR, MIN_GAP } from './mix';
-import { biomeHasTrack, BIOME_HOLD, CROSSFADE, FIRST_FADE, OPENING_TRACK, pickNext, type MusicTrack } from './music';
+import { biomeHasTrack, BIOME_HOLD, CROSSFADE, FIRST_FADE, MISSING, OPENING_TRACK, pickNext, type MusicTrack } from './music';
 import type { Biome } from '../sim/world';
 
 /** One playing music track: a streaming media element on its own gain, for crossfading. */
@@ -154,6 +154,8 @@ export class GameAudio {
       if (el.duration - el.currentTime <= CROSSFADE) this.nextTrack();
     });
     el.addEventListener('ended', () => { if (this.music === voice) this.nextTrack(); });
+    // A track that is not there (a biome theme not yet delivered) leaves the rotation rather than silencing it.
+    el.addEventListener('error', () => { MISSING.add(track.name); if (this.music === voice) this.nextTrack(); });
     void el.play().catch(() => { /* blocked until a gesture; the next track will try again */ });
     return voice;
   }

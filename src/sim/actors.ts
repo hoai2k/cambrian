@@ -53,6 +53,7 @@ export function makeActor(id: number, creatureId: CreatureId, controller: Contro
     prev: { light: false, heavy: false, ability: false, dodge: false, guard: false, lock: false, sense: false, rise: false, burst: false, dash: false, aim: false },
     respawnT: 0, hatching: false, dashHoldT: 0, dashUsed: false, dashQueued: false, pounceCd: 0, dashCd: 0, sinceHit: 99, lastHitBy: -1, swallowedBy: -1, holdT: 0, deathY: 0, sparkled: false, tumble: v3(), aimInRange: false, aiming: false, kills: 0, eats: 0, escapes: 0, hunted: 0, hunterId: -1, wasHunted: false, seen: 0, bubbles: 0,
     spawnProtect: controller === 'player' ? 3 : 0,
+    home: { ...pos }, teleportCd: 0,
   };
   applyScaleStats(a, false);
   a.stamina = a.staminaMax;

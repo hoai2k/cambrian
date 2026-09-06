@@ -1,4 +1,5 @@
-import type { HudSnapshot, PlayerHud } from '../render/engine';
+import { useEffect, useRef, useState } from 'react';
+import type { HudSnapshot, PlayerHud, RadarBlipHud } from '../render/engine';
 import { creature } from '../sim/creatures';
 import { BAND_COLOR } from '../sim/types';
 
@@ -64,6 +65,22 @@ function PlayerPanel({ p }: { p: PlayerHud }) {
           <div className="bar target"><i style={{ width: `${p.lock.hp * 100}%` }} /></div>
         </div>
       )}
+      <BiomeBanner biome={p.biome} alive={p.alive} />
+      <Radar radar={p.radar} biome={p.biome} />
+      {p.teleport && (
+        <div className="tele-menu">
+          <p className="eyebrow">TELEPORT</p>
+          <ul>
+            {p.teleport.options.map((o, k) => (
+              <li key={k} className={k === p.teleport!.index ? 'sel' : ''}>
+                <b>{o.label}</b>
+                <span>{o.detail} · {fmtDist(o.distance)}</span>
+              </li>
+            ))}
+          </ul>
+          <small>{p.teleport.cooldown > 0 ? `Ready in ${Math.ceil(p.teleport.cooldown)} s` : <><kbd>A</kbd> go · <kbd>B</kbd> back · D-pad ▼ next</>}</small>
+        </div>
+      )}
       <div className="hud-bottom">
         <div className={`chip ability ${p.abilityUnlocked ? '' : 'locked'} ${p.abilityActive ? 'active' : ''}`} title={def.abilityDesc}>
           <span className="btn y">Y</span>
@@ -96,4 +113,62 @@ function PlayerPanel({ p }: { p: PlayerHud }) {
       )}
     </>
   );
+}
+
+const fmtDist = (d: number) => (d < 1000 ? `${Math.round(d)} m` : `${(d / 1000).toFixed(1)} km`);
+
+/**
+ * The radar: other players wherever they are, anything big enough to hurt within reach, whatever
+ * is hunting you, plus home and the shore as bearings. Up is the way the camera looks. Contacts
+ * further than the radar reaches sit on the rim, hollow, pointing the way.
+ */
+function Radar({ radar, biome }: { radar: PlayerHud['radar']; biome: string }) {
+  const R = 44, C = 50;
+  const dot = (b: RadarBlipHud, k: number) => {
+    const x = C + b.x * R * 0.92, y = C + b.y * R * 0.92;
+    const cls = `blip blip-${b.kind} ${b.beyond ? 'beyond' : ''} ${b.hunting ? 'hunting' : ''}`;
+    if (b.kind === 'shore') {
+      // a short arc of coastline on the rim in the shore's direction (the coast runs across it)
+      const a = Math.atan2(b.y, b.x);
+      const x1 = C + Math.cos(a - 0.35) * R, y1 = C + Math.sin(a - 0.35) * R, x2 = C + Math.cos(a + 0.35) * R, y2 = C + Math.sin(a + 0.35) * R;
+      return <path key={k} className="blip blip-shore" d={`M${x1} ${y1} A${R} ${R} 0 0 1 ${x2} ${y2}`} style={{ stroke: b.color }} />;
+    }
+    if (b.kind === 'home') return <path key={k} className={cls} d={`M${x} ${y - 4} l3.5 3.5 v3.5 h-7 v-3.5z`} style={{ fill: b.beyond ? 'none' : b.color, stroke: b.color }} />;
+    if (b.kind === 'player') return <circle key={k} className={cls} cx={x} cy={y} r={3.6} style={{ fill: b.beyond ? 'none' : b.color, stroke: b.color }} />;
+    // threats and giants: a diamond, bigger for giants, blinking when it is after you
+    const s = b.kind === 'giant' ? 4.6 : 3.4;
+    return <path key={k} className={cls} d={`M${x} ${y - s} L${x + s} ${y} L${x} ${y + s} L${x - s} ${y}z`} style={{ fill: b.beyond ? 'none' : b.color, stroke: b.color }} />;
+  };
+  // rim contacts last so they draw over the ring
+  const inside = radar.blips.filter((b) => !b.beyond), rim = radar.blips.filter((b) => b.beyond);
+  return (
+    <div className="radar" aria-label={`Radar, ${Math.round(radar.range)} metre reach. ${biome}.`}>
+      <svg viewBox="0 0 100 100">
+        <circle cx={C} cy={C} r={R} className="radar-bg" />
+        <circle cx={C} cy={C} r={R * 0.5} className="radar-ring" />
+        <line x1={C} y1={C - R} x2={C} y2={C + R} className="radar-ring" />
+        <line x1={C - R} y1={C} x2={C + R} y2={C} className="radar-ring" />
+        <path d={`M${C} ${C - 5} L${C + 3.5} ${C + 3} L${C} ${C + 1.5} L${C - 3.5} ${C + 3}z`} className="radar-you" />
+        {inside.map(dot)}{rim.map(dot)}
+        <circle cx={C} cy={C} r={R} className="radar-rim" />
+      </svg>
+      <span className="radar-range">{Math.round(radar.range)} m</span>
+    </div>
+  );
+}
+
+/** Announces the biome for a few seconds whenever it changes. */
+function BiomeBanner({ biome, alive }: { biome: string; alive: boolean }) {
+  const [shown, setShown] = useState<string | null>(null);
+  const last = useRef<string | null>(null);
+  useEffect(() => {
+    if (biome === last.current) return;
+    const first = last.current === null;
+    last.current = biome;
+    if (first || !alive) return;
+    setShown(biome);
+    const t = setTimeout(() => setShown(null), 3200);
+    return () => clearTimeout(t);
+  }, [biome, alive]);
+  return shown ? <div className="biome-banner" key={shown}><span>ENTERING</span><b>{shown}</b></div> : null;
 }

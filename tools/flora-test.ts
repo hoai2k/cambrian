@@ -10,15 +10,28 @@ let failed = 0;
 const check = (n: string, ok: boolean, d: string) => { console.log(`${ok ? 'PASS' : 'FAIL'}  ${n.padEnd(52)} ${d}`); if (!ok) failed++; };
 const S = process.argv[2] === 'verbose';
 
+/** The flattest 20-unit stretch on the shelf near the origin nursery: the swimmer is held at plant height, so the seabed must not get in the way. */
+function flatSpot() {
+  let best = { x: -10, z: -100 }, bestVar = Infinity;
+  for (let x = -200; x <= 200; x += 9) for (let z = -60; z >= -160; z -= 9) {
+    const h0 = sampleHeight(x, z);
+    let v = 0;
+    for (let d = -10; d <= 10; d += 2.5) v = Math.max(v, Math.abs(sampleHeight(x + d, z) - h0), Math.abs(sampleHeight(x, z + d) - h0));
+    if (v < bestVar) { bestVar = v; best = { x, z }; }
+  }
+  return best;
+}
+
 /** Fresh game with the flora replaced by a single plant at the origin of an empty patch. */
 function scene(kind: FloraKind, scale: number, creatureId: 'anomalocaris' | 'waptia', actorScale: number, offset: number) {
   const g = new Game('reef', [{ creature: creatureId, device: 'keyboard', ready: true }], 11);
   const p = g.players[0];
-  // clear the world of plants and put one down on flat-ish ground away from boulders
-  const x0 = -10, z0 = -100;
+  // clear the world of plants and put one down on flat ground away from boulders
+  const { x: x0, z: z0 } = flatSpot();
   const y = sampleHeight(x0, z0) - 0.03;
   const P = FLORA_PHYS[kind];
   const plant: Flora = { pos: { x: x0, y, z: z0 }, kind, scale, sy: scale, rot: 0.3, shade: 0.8, H: P.h * scale, R: P.r * scale, maxB: P.maxLean * P.h * scale, bx: 0, bz: 0, bvx: 0, bvz: 0, active: false };
+  g.world.frozen = true;                       // hand-built scenery must not be streamed away
   g.world.flora.length = 0; g.world.flora.push(plant);
   g.world.floraHash.rebuild(g.world.flora);
   g.world.floraReach = plant.R + plant.maxB;

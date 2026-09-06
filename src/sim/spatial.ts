@@ -5,9 +5,10 @@ export class SpatialHash<T extends { pos: Vec3 }> {
   private cells = new Map<number, T[]>();
   constructor(private cell = 8) {}
   private key(x: number, z: number) {
-    const cx = Math.floor(x / this.cell) + 4096, cz = Math.floor(z / this.cell) + 4096;
-    return cx * 8192 + cz;
+    return SpatialHash.pack(Math.floor(x / this.cell), Math.floor(z / this.cell));
   }
+  /** Cell coordinates to one safe integer: ±33 million cells, so the streamed world never wraps. */
+  private static pack(cx: number, cz: number) { return (cx + 33554432) * 67108864 + (cz + 33554432); }
   clear() { this.cells.clear(); }
   insert(item: T) {
     const k = this.key(item.pos.x, item.pos.z);
@@ -24,7 +25,7 @@ export class SpatialHash<T extends { pos: Vec3 }> {
     const z0 = Math.floor((z - r) / c), z1 = Math.floor((z + r) / c);
     for (let cx = x0; cx <= x1; cx++)
       for (let cz = z0; cz <= z1; cz++) {
-        const arr = this.cells.get((cx + 4096) * 8192 + (cz + 4096));
+        const arr = this.cells.get(SpatialHash.pack(cx, cz));
         if (arr) for (const it of arr) out.push(it);
       }
     return out;
