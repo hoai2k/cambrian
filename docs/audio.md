@@ -7,6 +7,7 @@ How the game makes noise, where the sounds come from, and how to work on them.
 | Where | What |
 | --- | --- |
 | `src/audio/audio.ts` | The whole WebAudio graph: master → sfx bus, ambience and tension beds, music, the sample library, and the synthesized fallbacks used before a file has loaded. |
+| `src/audio/music.ts` | The soundtrack: the track list, the opener, and what plays next. |
 | `src/audio/mix.ts` | The mix rules: the distance curve for world sounds and the retrigger gaps, shared by the audio module, the renderer, the workbench and the density test. |
 | `src/render/engine.ts` | Turns sim events into sounds: `syncListeners()` and `hearing()` decide how loud and how far to the side each one is, `handleEvents()` picks the sound. |
 | `public/assets/sfx/*.mp3` | The sample library. |
@@ -62,6 +63,34 @@ npx esbuild tools/audio-mix-test.ts --bundle --platform=node --format=esm --outf
 
 It fails if a player would hear more than three one-shots a second, or hears
 anything from more than 60 m away.
+
+## Music
+
+`src/audio/music.ts` holds the track list. One track is the **opener** and plays first every
+session; when a track runs out the game crossfades into a random pick from the rest, never
+repeating the one just played while there is another choice. To add a track, drop
+`<name>.mp3` into `public/music` and add a line to `MUSIC` — nothing else.
+
+A track may also name the biomes it was written for:
+
+```ts
+{ name: 'Channel Deep', biomes: ['channel'] },
+```
+
+Entering a biome that has a track of its own cues that track, rate-limited by `BIOME_HOLD` so a
+player weaving across an edge does not flip the score back and forth. `src/render/engine.ts`
+reports the first player's biome every frame via `audio.setBiome()`. No track names a biome
+today, so the rotation is purely random — but the wiring is live, and tagging a track is all it
+takes to switch a location on.
+
+Tracks are streamed through media elements rather than decoded into AudioBuffers: they run for
+minutes, and a decoded three-minute track costs around 80 MB where a stream costs nothing. The
+hand-over is driven by the element's own clock, so it stays correct in a backgrounded tab where
+timers are throttled.
+
+The workbench's "Soundtrack" row drives the real director — now playing, skip to next, and
+"hear the hand-over", which jumps to six seconds before the end of the current track so a
+transition can be heard without waiting a whole track out.
 
 ## Regenerating a sound
 

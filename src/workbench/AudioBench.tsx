@@ -4,8 +4,9 @@
  * distance falloff.
  */
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { audio, MUSIC_NAME, musicUrl, SAMPLES, sfxUrl } from '../audio/audio';
+import { audio, musicUrl, SAMPLES, sfxUrl } from '../audio/audio';
 import { distanceAtten } from '../audio/mix';
+import { MUSIC, OPENING_TRACK } from '../audio/music';
 import { BEDS, GROUPS, type SoundEntry } from './audio-catalogue';
 
 /** Every file the catalogue can reach, so we can report on the library as a whole. */
@@ -24,6 +25,7 @@ export function AudioBench() {
   const [distance, setDistance] = useState(0);
   const [info, setInfo] = useState<Record<string, FileInfo>>({});
   const [last, setLast] = useState<string>('');
+  const [nowPlaying, setNowPlaying] = useState<string | undefined>();
   const stops = useRef<(() => void)[]>([]);
 
   const atten = useMemo(() => distanceAtten(distance, REF_DISTANCE), [distance]);
@@ -36,6 +38,13 @@ export function AudioBench() {
   }, [volume]);
 
   useEffect(() => { if (ready) audio.setVolume(volume); }, [ready, volume]);
+
+  // Follow the soundtrack so the hand-over from one track to the next is visible as it happens.
+  useEffect(() => {
+    if (!ready) return;
+    const id = window.setInterval(() => setNowPlaying(audio.nowPlaying), 250);
+    return () => window.clearInterval(id);
+  }, [ready]);
 
   // Report on the library itself: which files are actually on disk, and how big they are.
   useEffect(() => {
@@ -120,7 +129,7 @@ export function AudioBench() {
 
       <section className="group">
         <h2>Beds &amp; music</h2>
-        <p className="blurb">Long loops on their own buses. The workbench starts without them so single sounds can be heard clean; play them here to audition.</p>
+        <p className="blurb">The reef beds loop for the whole match; the soundtrack plays one track at a time and rotates at random when one ends. The workbench starts without any of them so single sounds can be heard clean — play them here to audition. Music is streamed, so a track starts a few hundred milliseconds after the click.</p>
         <ul className="sounds">
           {BEDS.map((b) => (
             <li key={b.file} className="row">
@@ -131,13 +140,34 @@ export function AudioBench() {
               <p className="usage" role="note">{b.usage}</p>
             </li>
           ))}
-          <li className="row">
-            <button className="name" disabled={!ready} onClick={() => void playFile(MUSIC_NAME, musicUrl())}>
-              <b>Music</b><small>loop</small>
+          <li className="row soundtrack">
+            <button className="name" disabled={!ready} onClick={() => { audio.startSoundtrack(); setLast('soundtrack started'); }}>
+              <b>Soundtrack</b><small>{nowPlaying ? `now: ${nowPlaying}` : 'stopped'}</small>
             </button>
-            <span className="chip">public/music/Tide of First Bones.mp3</span>
-            <p className="usage" role="note">The title and match music. Fades in over four seconds with the first user gesture and ducks by up to 45% as tension rises.</p>
+            <button className="chip" disabled={!ready || !nowPlaying} onClick={() => { audio.skipTrack(); setLast('skipped to the next track'); }}>skip to next</button>
+            <button className="chip" disabled={!ready || !nowPlaying} onClick={() => { audio.seekToHandover(); setLast('seeking to the hand-over'); }}>hear the hand-over</button>
+            <p className="usage" role="note">
+              Runs the real director: the opening track first, then a random pick from the rotation
+              each time one ends, crossfading over five seconds. “Hear the hand-over” jumps to six
+              seconds before the end of the current track so the transition can be heard without
+              waiting out the whole thing.
+            </p>
           </li>
+          {MUSIC.map((t) => (
+            <li key={t.name} className="row">
+              <button className="name" disabled={!ready} onClick={() => void playFile(t.name, musicUrl(t.name))}>
+                <b>{t.name}</b><small>{t === OPENING_TRACK ? 'opening' : 'rotation'}</small>
+              </button>
+              <span className="chip">public/music/{t.name}.mp3</span>
+              <p className="usage" role="note">
+                {t === OPENING_TRACK
+                  ? 'The opening track. Fades in over four seconds with the first user gesture, and hands over to a random track from the rotation when it ends.'
+                  : 'Part of the random rotation, picked once the opening track finishes. Never repeats back to back while another track is available.'}
+                {t.biomes?.length ? ` Cued on entering: ${t.biomes.join(', ')}.` : ' Not tied to a biome.'}
+                {' '}Ducks by up to 45% as tension rises.
+              </p>
+            </li>
+          ))}
         </ul>
       </section>
 
