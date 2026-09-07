@@ -507,6 +507,39 @@
     ]
   },
   {
+    "id": "walliserops",
+    "name": "Walliserops",
+    "species": "Walliserops trifurcatus",
+    "category": "creature",
+    "modelStatus": "preview",
+    "provenance": "Early Devonian, late Emsian Timrhanrhart Formation, Morocco",
+    "description": "Spiny asteropygine trilobite with an elevated rigid cephalic trident, broad keeled tines, long genal spines and articulated thoracic armour.",
+    "model": "assets/devonian/creatures/walliserops.glb",
+    "lod": "assets/devonian/creatures/walliserops.lod1.glb",
+    "image": "assets/devonian/creatures/walliserops.thumb.png",
+    "lengthMeters": 0.055,
+    "looping": [
+      "Idle",
+      "Crawl",
+      "Swim",
+      "Guard",
+      "Eat"
+    ],
+    "sources": [
+      "https://doi.org/10.1073/pnas.2119970120",
+      "https://doi.org/10.1016/j.asd.2006.08.002",
+      "https://doi.org/10.1002/spp2.1401"
+    ],
+    "notes": [
+      "Trident follows W. trifurcatus topotype UA13447 and HMNS PI1810 specimen figures, with flattened keeled tines and slight bifurcation asymmetry. It stays rigidly attached to cephalon.",
+      "Eleven thoracic tergites and five paired plus one terminal pygidial marginal processes; finer spine arrangement/proportions need specimen-overlay refinement.",
+      "Ventral appendages, oral tissues, 82 lens solids per side and living pigmentation are comparative artistic reconstruction, not measured W. trifurcatus soft anatomy.",
+      "Primary contact anchor is on the trident; actual feeding aperture and swallow anchor are under cephalon. Combat function is a hypothesis, not settled fossil behavior.",
+      "Representative 5.5cm shell length is illustrative, not species maximum; trident extends total model bounds.",
+      "Twenty compatibility actions include unscaled Growth and Moult preparation without a detached shell. Swim is limb-powered compatibility, not evidence of habitual swimming."
+    ]
+  },
+  {
     "id": "jaekelopterus",
     "name": "Jaekelopterus",
     "species": "Jaekelopterus rhenaniae",
@@ -538,6 +571,108 @@
       "Rhenaniae claw and eye evidence is distinguished from comparative Jaekelopterus howelli postcranial material.",
       "Moult is a preparatory articulated extension without shell splitting or body scaling. Precise locomotor cycles are inferred, not fossil-observed.",
       "Full regional pigment is multiplied once by near-neutral UV albedo; LOD bakes that factor once without textures."
+    ]
+  },
+  {
+    "id": "nahecaris",
+    "name": "Nahecaris",
+    "species": "Nahecaris stuertzi",
+    "category": "creature",
+    "modelStatus": "preview",
+    "provenance": "Early Devonian, Hunsrück Slate, Germany",
+    "description": "Bivalved phyllocarid with a rostral plate, branching antennae, eight pairs of biramous basket-forming thoracopods, seven abdominal rings and narrow telson/furcal rami.",
+    "model": "assets/devonian/creatures/nahecaris.glb",
+    "lod": "assets/devonian/creatures/nahecaris.lod1.glb",
+    "image": "assets/devonian/creatures/nahecaris.thumb.png",
+    "lengthMeters": 0.12,
+    "looping": [
+      "Idle",
+      "Swim",
+      "Crawl",
+      "Guard",
+      "Eat"
+    ],
+    "sources": [
+      "https://doi.org/10.1007/BF02985909",
+      "https://doi.org/10.1016/j.asd.2016.01.004",
+      "https://doi.org/10.1080/08912963.2025.2492356",
+      "https://pmc.ncbi.nlm.nih.gov/articles/PMC5378094/"
+    ],
+    "notes": [
+      "Initial preview reconstruction with explicitly uncertain ocular bases, soft tissues and exact appendage proportions.",
+      "Eight biramous thoracopod pairs with finger-like exopod lobes and progressively shorter endopods; no generic decapod claw or tail fan.",
+      "Compact eyes beneath rostral plate are reconstructed; precise eye preservation is not asserted from the accessible species abstract.",
+      "The 0.12 m representative display length is an art assumption, not a measured maximum.",
+      "Historical whole-animal drawing and comparative archaeostracan abdomen/pleopods guide missing proportions.",
+      "Crawl is a restrained antenna-supported substrate gesture; Swim is compatibility locomotion using metachronal limbs. Precise cycles are inferred.",
+      "Moult is preparatory limb/rim extension, without shell splitting, scale channels or whole-model growth.",
+      "Full regional vertex pigment times near-neutral albedo once; texture-free LOD bakes that factor once."
+    ]
+  },
+  {
+    "id": "furcaster",
+    "name": "Furcaster",
+    "species": "Furcaster palaeozoicus",
+    "category": "creature",
+    "modelStatus": "preview",
+    "provenance": "Early Devonian, lower Emsian Hunsrück Slate, Germany",
+    "description": "Five long articulated arms surround a small granular disc. Opposing paired ambulacrals and curved lateral arm ossicles inform arm-powered motion, with delicate lateral and groove spines and a modeled oral underside.",
+    "model": "assets/devonian/creatures/furcaster.glb",
+    "lod": "assets/devonian/creatures/furcaster.lod1.glb",
+    "image": "assets/devonian/creatures/furcaster.thumb.png",
+    "lengthMeters": 0.12,
+    "looping": [
+      "Idle",
+      "Crawl",
+      "Swim",
+      "Guard",
+      "Eat"
+    ],
+    "sources": [
+      "https://doi.org/10.1098/rsos.201380",
+      "https://doi.org/10.1017/jpa.2025.10096"
+    ],
+    "notes": [
+      "Primary fossil arm reference OKL96, Clark et al.2020 Fig3c. Five chains with36 articulated sections each are an authored reconstruction rather than a measured segment count.",
+      "No vertebrate jaw or trilobite moulting action. Five radial mouth-angle structures and a soft oral pump participate in feeding.",
+      "Swim is a compatibility arm-sculling interpretation, not a claim of habitual swimming. Growth is unscaled.",
+      "Representative12cm overall span is illustrative, not a species maximum; modelLength measures +Z bound of initial arm spread.",
+      "Pigmentation is artistic; source and imagegen provenance preserved."
+    ]
+  },
+  {
+    "id": "palaeoisopus",
+    "name": "Palaeoisopus",
+    "species": "Palaeoisopus problematicus",
+    "category": "creature",
+    "modelStatus": "preview",
+    "provenance": "Early Devonian, Early Emsian, Hunsrück Slate, Germany",
+    "description": "Robust fossil sea spider with a long segmented abdomen, massive grasping chelifores and eight flattened swimming limbs.",
+    "model": "assets/devonian/creatures/palaeoisopus.glb",
+    "lod": "assets/devonian/creatures/palaeoisopus.lod1.glb",
+    "image": "assets/devonian/creatures/palaeoisopus.thumb.png",
+    "lengthMeters": 0.3,
+    "looping": [
+      "Idle",
+      "Swim",
+      "Guard",
+      "Eat"
+    ],
+    "sources": [
+      {
+        "title": "Sabroux et al.2024, New insights into the Devonian sea spiders of the Hunsrück Slate",
+        "url": "https://doi.org/10.7717/peerj.17766"
+      }
+    ],
+    "notes": [
+      "Original initial preview based on Sabroux et al.2024; representative adult leg span0.30m, not a maximum-size claim.",
+      "Four walking-leg pairs have flattened distal articles, first pair nine podomeres and remaining pairs ten with metatibia; proximal coxal rings are ornamental divisions within coxa1.",
+      "Long articulated abdomen terminates in a lanceolate fifth element/telson complex; homology of the fifth abdominal element remains debated.",
+      "Chelifores follow the favored two-scape interpretation; oviger segmentation remains incompletely preserved.",
+      "Proboscis is a broad ventral tube shown posteriorly folded at rest, plausibly mobile; action names represent grasping/probing equivalents and do not imply fish-like biting jaws.",
+      "Prominent ocular-region bumps are modeled as cuticular/sensory tubercles, not asserted eye globes. Eye positions are unresolved in the fossil; no differentiated external eyes are invented.",
+      "Pigmentation, exact soft oral margins, appendage thickness, setal density and motion amplitudes are inferred.",
+      "Preview: finer cuticle, joint and animation refinement deferred until the initial roster is complete."
     ]
   },
   {
