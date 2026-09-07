@@ -86,6 +86,18 @@ export interface RadarBlip {
   strength?: number;
 }
 
+/**
+ * How far the radar reaches, in metres, for a body of this length.
+ *
+ * Reach is mostly the animal's own size rather than a fixed sweep, because size is how far it
+ * travels: a hatchling lives inside a few plants and a prime Dunkleosteus crosses biomes, so a
+ * dial that covered the same water for both would be a map for one and a blur for the other.
+ * Across the two eras `lengthOf` runs about 0.6 to 16, giving 30 m to 200 m of reach.
+ */
+export const radarRange = (a: Actor) => RADAR_NEAR + lengthOf(a) * RADAR_PER_LENGTH;
+const RADAR_NEAR = 24;
+const RADAR_PER_LENGTH = 11;
+
 const { schools: SNACK_SCHOOLS, giants: GIANTS } = ACTIVE_ERA.ecology;
 
 // Feeding on a body. How many bites it takes is the body's length against the eater's, so a
@@ -1623,9 +1635,15 @@ export class Game implements AiWorld {
   }
 
   /**
-   * Radar contacts for a player: other players wherever they are, anything big enough to be a
-   * threat within about twice the radar's reach (further contacts clamp to the rim), whatever is
-   * hunting them regardless of size, plus home and the shore as bearings.
+   * Radar contacts for a player: the other players wherever they are, the nearest predator big
+   * enough to be dangerous, anything actually hunting them however big it is, the nearest patch
+   * worth eating, plus home, the shore and landmarks as bearings.
+   *
+   * The dial deliberately does not show every animal in reach. A reef holds dozens, and a small
+   * creature is outsized by most of them, so listing them all turned the radar into noise exactly
+   * when it mattered most — a hatchling's read as a solid ring of threats. One predator arrow and
+   * one food patch is a decision; twenty of each is wallpaper. Same-size rivals (the `rival` band)
+   * never show at all unless they are already coming for you.
    */
   radarFor(i: number, range: number): RadarBlip[] {
     const p = this.players[i]; if (!p) return [];
@@ -1633,15 +1651,21 @@ export class Game implements AiWorld {
     // Only the other players carry off the edge of the dial: they are who you are trying to find.
     // Everything alive is a contact or nothing — a creature outside the reach is simply not there.
     this.players.forEach((o, j) => { if (j !== i) out.push({ kind: 'player', dx: o.pos.x - p.pos.x, dz: o.pos.z - p.pos.z, distance: distXZ(o.pos, p.pos), id: j, hunting: false }); });
+    // Anything on your tail is always shown; of the rest, only the closest one that could eat you.
+    let nearest: RadarBlip | undefined;
     for (const a of this.actors) {
       if (a.controller === 'player' || !isAlive(a) || isHidden(a)) continue;
       const d = distXZ(a.pos, p.pos);
       if (d > range) continue;
       const hunting = !!a.brain && a.brain.target === p.id && (a.brain.goal === 'hunt' || a.brain.goal === 'notice');
       const band = bandOf(p, a);
-      if (band !== 'threat' && band !== 'giant' && !hunting) continue;
-      out.push({ kind: band === 'giant' ? 'giant' : 'threat', dx: a.pos.x - p.pos.x, dz: a.pos.z - p.pos.z, distance: d, id: a.id, hunting });
+      const dangerous = band === 'threat' || band === 'giant';
+      if (!dangerous && !hunting) continue;
+      const blip: RadarBlip = { kind: band === 'giant' ? 'giant' : 'threat', dx: a.pos.x - p.pos.x, dz: a.pos.z - p.pos.z, distance: d, id: a.id, hunting };
+      if (hunting) out.push(blip);
+      else if (!nearest || d < nearest.distance) nearest = blip;
     }
+    if (nearest) out.push(nearest);
     for (const f of this.foodClusters(p, range)) out.push(f);
     // Landmarks are the other thing the radar is for in an endless sea: with the shore and your
     // nursery they are the only fixed points in it. Only within reach — a bearing, not a map.
@@ -1681,11 +1705,12 @@ export class Game implements AiWorld {
   }
 
   /**
-   * The nearest shoals worth eating, as areas rather than contacts: wild snack and prey band
+   * The nearest shoal worth eating, as an area rather than a contact: wild snack and prey band
    * creatures within reach, bucketed into cells so a school reads as one patch of food instead of
-   * a dozen dots. Other players never appear here — hunting one is a decision, not a suggestion.
+   * a dozen dots, and only the closest patch is offered. Other players never appear here — hunting
+   * one is a decision, not a suggestion.
    */
-  private foodClusters(p: Actor, range: number, max = 3): RadarBlip[] {
+  private foodClusters(p: Actor, range: number, max = 1): RadarBlip[] {
     const CELL = 14;
     const cells = new Map<string, { dx: number; dz: number; n: number; food: number; r: number }>();
     for (const a of this.nearby(p.pos, range)) {

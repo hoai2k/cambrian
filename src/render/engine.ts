@@ -7,7 +7,7 @@ import { emptyControls, gamepads, KeyboardInput, readGamepad, rumble, type RawCo
 import { clamp, damp, TAU, wrapAngle } from '../shared/math';
 import { bandOf, isAlive, isHidden, lengthOf } from '../sim/actors';
 import { creature, type CreatureId } from '../sim/creatures';
-import { Game, type ScoreHeader, type ScoreRow, type TeleportDest } from '../sim/game';
+import { Game, radarRange as radarReach, type ScoreHeader, type ScoreRow, type TeleportDest } from '../sim/game';
 import type { Phase } from '../sim/daynight';
 import { BAND_COLOR, emptyInput, TIER_NAMES, TIER_NEED, type Actor, type Band, type InputFrame, type Mode, type PlayerSetup } from '../sim/types';
 import { BIOME_NAMES, biomeAt, groundHeight, nurseryAt, resolveStatic, SURFACE_Y, type Biome, type Boulder, type LandmarkKind } from '../sim/world';
@@ -902,7 +902,7 @@ export class Engine {
         }
       }
       // Radar: reach grows with the creature, contacts rotate into the camera frame (up = camera forward).
-      const radarRange = 55 + lengthOf(p) * 12;
+      const radarRange = radarReach(p);
       const blips: RadarBlipHud[] = [];
       if (cs) {
         const sy = Math.sin(cs.yaw), cy = Math.cos(cs.yaw);

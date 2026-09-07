@@ -1,5 +1,5 @@
 /** The endless sea: shore, biome bands, deterministic streaming, teleport and radar. */
-import { Game } from '../src/sim/game';
+import { Game, radarRange } from '../src/sim/game';
 import { emptyInput, type InputFrame } from '../src/sim/types';
 import { isAlive, lengthOf } from '../src/sim/actors';
 import { distXZ } from '../src/shared/math';
@@ -124,6 +124,27 @@ const run = (g: Game, f: InputFrame, steps: number) => { const m = new Map([[0, 
   const threats = blips.filter((r) => r.kind === 'threat' || r.kind === 'giant');
   check('only bigger things show as contacts', threats.every((r) => { const o = g.byId(r.id)!; return lengthOf(o) > lengthOf(a) * 1.2 || r.hunting; }), `${threats.length} contacts`);
   check('nothing tiny is on the radar', !blips.some((r) => (r.kind === 'threat' || r.kind === 'giant') && lengthOf(g.byId(r.id)!) < lengthOf(a)), '');
+  // The dial carries one predator and one food patch, not the census: only a body already hunting
+  // this player earns a second contact.
+  check('at most one predator that is not hunting you', threats.filter((r) => !r.hunting).length <= 1, `${threats.filter((r) => !r.hunting).length}`);
+  check('at most one food patch', blips.filter((r) => r.kind === 'food').length <= 1, `${blips.filter((r) => r.kind === 'food').length}`);
+  check('the predator shown is the nearest one', threats.filter((r) => !r.hunting).every((r) => {
+    const shown = r.distance;
+    return !g.actors.some((o) => o.controller !== 'player' && o.id !== r.id && distXZ(o.pos, a.pos) < shown
+      && distXZ(o.pos, a.pos) <= 60 && lengthOf(o) / lengthOf(a) >= 1.4 && o.state !== 'dead');
+  }), '');
+}
+
+// --- radar reach follows the body: a small animal reads a small patch of sea ---
+{
+  const g = new Game('reef', [{ creature: 'waptia', device: 'keyboard', ready: true }], 5);
+  const a = g.players[0];
+  const before = a.scale;
+  a.scale = 0.25; const small = radarRange(a);
+  a.scale = 2.6; const big = radarRange(a);
+  a.scale = before;
+  check('reach grows with the creature', big > small * 2.5, `${small.toFixed(0)} m -> ${big.toFixed(0)} m`);
+  check('a hatchling still sees its own neighbourhood', small > 20 && small < 45, `${small.toFixed(0)} m`);
 }
 
 // --- respawn: near another player, in a nursery ---

@@ -193,10 +193,12 @@ const fmtClock = (s: number) => `${Math.floor(s / 60)}:${String(Math.floor(s % 6
 const fmtDist = (d: number) => (d < 1000 ? `${Math.round(d)} m` : `${(d / 1000).toFixed(1)} km`);
 
 /**
- * The radar: anything big enough to hurt within reach, whatever is hunting you, the nearest shoals
+ * The radar: the nearest thing big enough to hurt, whatever is hunting you, the nearest shoal
  * worth eating, plus home and the shore as bearings. Up is the way the camera looks. Only the other
  * players — and the two bearings — carry off the edge, hollow on the rim pointing the way; a
- * creature outside the reach is simply not on the dial.
+ * creature outside the reach is simply not on the dial. Reach itself is the player's own size
+ * (`radarRange` in `src/sim/game.ts`), so a hatchling reads its own thicket and a giant reads the
+ * water it can actually cross.
  */
 function Radar({ radar, biome }: { radar: PlayerHud['radar']; biome: string }) {
   const R = 44, C = 50;
@@ -258,7 +260,7 @@ function Radar({ radar, biome }: { radar: PlayerHud['radar']; biome: string }) {
   const inside = radar.blips.filter((b) => !b.beyond).sort((a2, b2) => rank(a2) - rank(b2));
   const rim = radar.blips.filter((b) => b.beyond);
   return (
-    <div className="radar" aria-label={`Radar, ${Math.round(radar.range)} metre reach. ${biome}. ${radar.blips.filter((b) => b.kind === 'food').length} food shoals nearby.`}>
+    <div className="radar" aria-label={`Radar, ${Math.round(radar.range)} metre reach. ${biome}. ${radar.blips.some((b) => b.kind === 'food') ? 'Food nearby.' : 'No food in reach.'}`}>
       <svg viewBox="0 0 100 100">
         <defs><filter id={outline} colorInterpolationFilters="sRGB">
           <feMorphology in="SourceAlpha" operator="erode" radius=".7" result="inside"/>
