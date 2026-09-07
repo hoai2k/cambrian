@@ -4,6 +4,14 @@ The approved 2026-09-06 mappings are archived in `colour-schemes-2026-09-06.json
 `CREATURE_SCHEMES` in `src/shared/palettes.ts` selects each creature's game scheme; its current six slot colours come from `SCHEMES` in that same file. Game models (including LODs) and fresh viewer sessions use
 these picks. Existing viewer session overrides still take precedence.
 
+Both of those read `ACTIVE_ERA` **at module load**, so they are the active era's pack — the
+Cambrian's on `/`, the Devonian's on `/devonian/`, which selects its era before importing the app.
+The specimen viewer is the exception: it shows both eras' creatures on one page, so it resolves a
+specimen's list and default from its own pack (`paletteFor` in `src/viewer/catalogue.ts`) and
+registers the other pack's schemes with `registerSchemes` so a pick from either resolves in
+`src/render/recolor.ts`. `tools/viewer-smoke.mjs` checks a Devonian specimen is offered the
+Devonian palette.
+
 ## Image matching and fallbacks
 
 - `public/assets/creatures/defaults/` contains byte-identical copies of the original select,

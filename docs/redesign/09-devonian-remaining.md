@@ -107,9 +107,11 @@ special on this roster, played an animation on the spot: every heavy special now
 or nearest body ahead and carries the body through its hit window, like the pounce it replaces. The
 river-mouth reeds were thick enough to halve a giant's speed at spawn and were thinned. Still open:
 
-- A Young rung II animal at the nursery sees a crowded radar: many nearby ambient animals count as
-  threats at 0.6 scale. Either soften the threat band for stage 0 or thin the nursery ecology in
-  Domination.
+- Nurseries are sanctuaries now (`src/sim/devonian/swim.ts`): bots hatch in the next nurseries along
+  the shore, an AI body leaves anything under adult size alone inside the nursery ring unless it
+  started the fight, hatchlings are protected for eight seconds and juveniles five, and hatchlings
+  are placed inside the ring. A hatchling's radar still reads crowded (ambient animals count as
+  threats at hatchling size); softening the threat band for the first two stages is the next step.
 - Range scoring at the nursery is zero for the first minute in the browser run but positive in the
   headless test; the difference is the bots (two fill seats), one of which was probably the same
   rung. Worth a look at `updateRange` so a same-rung bot does not silently cancel a player's range.
