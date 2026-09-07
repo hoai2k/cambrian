@@ -34,5 +34,13 @@ export function distanceAtten(d: number, ref: number): number {
  * sound still gets through the window; see `play()` in audio.ts.
  */
 export const MIN_GAP: Record<string, number> = {
-  eat: 90, crunch: 90, hit: 45, 'hit-heavy': 45, burst: 220, dodge: 120, silt: 200, stagger: 120,
+  eat: 90, crunch: 90, hit: 45, 'hit-heavy': 45, 'hit-huge': 45, 'crunch-huge': 90,
+  burst: 220, 'burst-huge': 220, dodge: 120, 'dodge-huge': 120, silt: 200, stagger: 120,
 };
+
+/**
+ * Body length (metres) at which a creature gets the big-body take of a sound. The Devonian roster
+ * runs 4-11.5 m against the Cambrian's 1-3.9 m, and giants in either era are scaled well past
+ * this, so it marks the top of the roster rather than any one era.
+ */
+export const HUGE_LENGTH = 6;

@@ -127,9 +127,10 @@ function PlayerPanel({ p }: { p: PlayerHud }) {
 const fmtDist = (d: number) => (d < 1000 ? `${Math.round(d)} m` : `${(d / 1000).toFixed(1)} km`);
 
 /**
- * The radar: other players wherever they are, anything big enough to hurt within reach, whatever
- * is hunting you, plus home and the shore as bearings. Up is the way the camera looks. Contacts
- * further than the radar reaches sit on the rim, hollow, pointing the way.
+ * The radar: anything big enough to hurt within reach, whatever is hunting you, the nearest shoals
+ * worth eating, plus home and the shore as bearings. Up is the way the camera looks. Only the other
+ * players — and the two bearings — carry off the edge, hollow on the rim pointing the way; a
+ * creature outside the reach is simply not on the dial.
  */
 function Radar({ radar, biome }: { radar: PlayerHud['radar']; biome: string }) {
   const R = 44, C = 50;
@@ -143,6 +144,16 @@ function Radar({ radar, biome }: { radar: PlayerHud['radar']; biome: string }) {
       return <g key={k} className={cls} style={{ color: b.color }}>
         {b.beyond ? <circle cx={C + b.x * R} cy={C + b.y * R} r={3.5} fill="none" stroke="currentColor" strokeWidth="1.2" strokeDasharray="2 1.5" />
           : <circle cx={x} cy={y} r={rr} fill="currentColor" fillOpacity=".18" stroke="currentColor" strokeWidth=".9" strokeDasharray="2 1.5" />}
+      </g>;
+    }
+    if (b.kind === 'food') {
+      // A shoal is a patch, not a pip: a soft disc the size of the school with a few bodies in it.
+      const rr = Math.max(2.5, Math.min(R * 0.5, (b.r ?? 0.05) * R));
+      return <g key={k} className={cls} style={{ color: b.color }}>
+        <circle cx={x} cy={y} r={rr} fill="currentColor" fillOpacity=".16" stroke="currentColor" strokeWidth=".7" strokeOpacity=".7" />
+        <circle cx={x} cy={y} r={1.3} fill="currentColor" />
+        <circle cx={x - rr * .45} cy={y + rr * .35} r={1} fill="currentColor" />
+        <circle cx={x + rr * .4} cy={y - rr * .4} r={1} fill="currentColor" />
       </g>;
     }
     if (b.kind === 'shore') {
@@ -162,7 +173,7 @@ function Radar({ radar, biome }: { radar: PlayerHud['radar']; biome: string }) {
   // rim contacts last so they draw over the ring
   const inside = radar.blips.filter((b) => !b.beyond), rim = radar.blips.filter((b) => b.beyond);
   return (
-    <div className="radar" aria-label={`Radar, ${Math.round(radar.range)} metre reach. ${biome}.`}>
+    <div className="radar" aria-label={`Radar, ${Math.round(radar.range)} metre reach. ${biome}. ${radar.blips.filter((b) => b.kind === 'food').length} food shoals nearby.`}>
       <svg viewBox="0 0 100 100">
         <defs><filter id={outline} colorInterpolationFilters="sRGB">
           <feMorphology in="SourceAlpha" operator="erode" radius=".7" result="inside"/>

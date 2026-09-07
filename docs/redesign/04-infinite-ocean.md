@@ -162,18 +162,24 @@ The sea is endless, so a party needs a way to regroup.
 
 ## Radar
 
-A small circle at the bottom right of each viewport. Up is the way the camera
-looks. Its reach is `55 + 12 × body length` units, so it grows with you.
+A small circle at the top right of each viewport (the bottom right carries the
+chips and the tally). Up is the way the camera looks. Its reach is
+`55 + 12 × body length` units, so it grows with you.
 
 - **Other players** always, in their player colour, wherever they are.
 - **Threats and giants**: anything in the `threat` or `giant` band relative to
-  you within about twice the radar's reach, as diamonds (bigger for giants).
-  Prey and rivals are deliberately not shown: there are far too many.
-- **Whatever is hunting you**, whatever its size, blinking.
+  you, *inside the reach*, as diamonds (bigger for giants). Prey and rivals are
+  deliberately not shown as contacts: there are far too many.
+- **Whatever is hunting you**, whatever its size, blinking — inside the reach.
+- **Food**: the nearest three shoals worth eating, as discs the size of the
+  school rather than a dot per body. Wild snack and prey band creatures only:
+  another player is never marked as a meal.
 - **Home** (your nursery) as a small house, and the **shore** as an arc of
   sand on the rim in its direction.
 
-Contacts beyond the radar's reach sit hollow on the rim, pointing the way.
+Only the other players and the two bearings carry off the edge: they sit hollow
+on the rim pointing the way. A creature outside the reach is simply not on the
+dial — the radar tells you what is around you, not what exists.
 The biome's name is announced in a banner for three seconds when it changes.
 
 ## Tests

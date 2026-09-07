@@ -33,6 +33,14 @@ the art brief*.
 
 ## Delivered
 
+- **Big-body sounds — 6 files** (`hit-huge-1/-2`, `crunch-huge`, `surge-huge`, `sweep-huge`,
+  `death-huge`) in the shared `public/assets/sfx/`, from `MANIFEST` in `tools/gen-sfx.mjs`.
+  Nothing in the audio path knew how big a creature was: the one escalation (`hit` to
+  `hit-heavy`) keys off damage-relative strength, not size, so an 11.5 m Titanichthys hit exactly
+  as hard as a larva. The consumers are `heavy()` in `src/render/engine.ts` and `HUGE_LENGTH` in
+  `src/audio/mix.ts`; see [audio.md](audio.md) · *Big bodies*. All six pass the midrange rule
+  (mid-band peak 0.0 to −9.9 dBFS).
+
 - **Devonian Shells** — `public/music/Devonian Shells.mp3`, the opening track of Devonian
   Domination (`src/content/devonian/music.ts`). The Cambrian reef tracks fill the rest of the
   rotation until more Devonian music arrives; the two biome themes above are tagged in that file
