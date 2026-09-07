@@ -148,7 +148,7 @@ export function createSea(scene: THREE.Scene, world: WorldData, quality: Quality
   const propMat = (kind: SeaKind, sway = false, bend = false) => {
     const m = seaMaterial('#ffffff', kind, sway, bend); m.vertexColors = true; return m;
   };
-  const propMaterials: Record<PropId, THREE.Material> = {
+  const propMaterials: Partial<Record<PropId, THREE.Material>> = {
     'cushion-sponge': propMat('sponge', false, true), 'lettuce-tuft': propMat('algae', true, true),
     'spine-sponge': propMat('sponge', false, true), 'glass-fan': propMat('sponge', true, true),
     'blade-spire': propMat('rock'), 'talus-shard': propMat('rock'), 'pebble-cluster': propMat('rock'),
@@ -168,7 +168,9 @@ export function createSea(scene: THREE.Scene, world: WorldData, quality: Quality
       const bend = mesh.geometry.getAttribute('aBend');
       const next = bend ? geo.clone() : geo;
       if (bend) { next.setAttribute('aBend', bend); view.own.push(next); }
-      mesh.geometry = next; mesh.material = propMaterials[id]; mesh.computeBoundingSphere();
+      // Props with a material of their own take it; the rest keep the one their flora kind was
+      // built with, which is what the era's own scenery wants.
+      mesh.geometry = next; mesh.material = propMaterials[id] ?? mesh.material; mesh.computeBoundingSphere();
     });
   }
 
@@ -421,7 +423,10 @@ export function createSea(scene: THREE.Scene, world: WorldData, quality: Quality
   const bladeFallback = G(new THREE.ConeGeometry(.6, 4, 5)); bladeFallback.translate(0, 2, 0);
   const talusFallback = G(new THREE.BoxGeometry(1.5, .8, .85)); talusFallback.translate(0, .4, 0);
   const pebbleFallback = G(new THREE.SphereGeometry(.3, 8, 4)); pebbleFallback.scale(1, .25, 1); pebbleFallback.translate(0, .075, 0);
-  const floraProps: Partial<Record<Flora['kind'], PropId>> = { cushion: 'cushion-sponge', lettuce: 'lettuce-tuft', spine: 'spine-sponge', glass: 'glass-fan' };
+  // Authored geometry per kind, from the era pack. Anything not named here — or whose file fails
+  // to load — keeps the procedural stand-in built above.
+  const floraProps: Partial<Record<Flora['kind'], PropId>> = ACTIVE_ERA.environment.floraProps
+    ?? { cushion: 'cushion-sponge', lettuce: 'lettuce-tuft', spine: 'spine-sponge', glass: 'glass-fan' };
   const floraSlots = new Map<Flora, { attr: THREE.InstancedBufferAttribute; i: number }>();
   const floraSets: Record<string, { geo: THREE.BufferGeometry; mat: THREE.Material }> = {
     cushion: { geo: cushionFallback, mat: spongeMat }, lettuce: { geo: lettuceFallback, mat: tuftMat },
