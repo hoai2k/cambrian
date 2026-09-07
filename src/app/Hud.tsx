@@ -124,7 +124,8 @@ function PlayerPanel({ p }: { p: PlayerHud }) {
           {p.downedAllies.map((d) => (
             <p key={d.index} style={{ ['--player' as string]: d.color }}>
               <b>P{d.index + 1} is down</b>
-              <span>{fmtDist(d.distance)} · reach them in {Math.ceil(d.seconds)} s</span>
+              <span>{d.progress > 0 ? 'Hold still — getting them up' : `${fmtDist(d.distance)} · reach them in ${Math.ceil(d.seconds)} s`}</span>
+              <i className="revive-bar" style={{ transform: `scaleX(${d.progress})` }} />
             </p>
           ))}
         </div>
@@ -137,8 +138,9 @@ function PlayerPanel({ p }: { p: PlayerHud }) {
         <div className="dead-overlay">
           <b>{p.downedFor > 0 ? 'DOWN' : 'EATEN'}</b>
           <span>{p.downedFor > 0
-            ? `Hold on — a team-mate can get you up. ${Math.ceil(p.downedFor)} s`
+            ? (p.reviveProgress > 0 ? 'Someone is getting you up…' : `Hold on — a team-mate can get you up. ${Math.ceil(p.downedFor)} s`)
             : 'Back in a moment… you slip down a tier.'}</span>
+          {p.downedFor > 0 && <i className="revive-bar wide" style={{ transform: `scaleX(${p.reviveProgress})` }} />}
         </div>
       )}
     </>

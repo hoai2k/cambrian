@@ -34,7 +34,9 @@ export interface PlayerHud {
    * this player could go and pick up (with the direction to swim, in radar space).
    */
   downedFor: number;
-  downedAllies: { index: number; name: string; color: string; seconds: number; distance: number; x: number; y: number }[];
+  /** 0..1 of the rescue dwell, for the downed player and for whoever is standing over them. */
+  reviveProgress: number;
+  downedAllies: { index: number; name: string; color: string; seconds: number; distance: number; x: number; y: number; progress: number }[];
   /** Versus: whose viewport this one is borrowing while dead. */
   spectating?: { index: number; name: string; color: string; creature: CreatureId };
   bandMarkers: { x: number; y: number; band: Band; size: number }[];
@@ -906,7 +908,7 @@ export class Engine {
         const sy = Math.sin(cs.yaw), cy = Math.cos(cs.yaw);
         const f = dx * sy + dz * cy, r = -dx * cy + dz * sy;
         const l = Math.max(1e-3, Math.hypot(f, r));
-        downed.push({ index: j, name: creature(o.creature).name, color: PLAYER_COLORS[j % 4], seconds, distance: Math.hypot(dx, dz), x: r / l, y: -f / l });
+        downed.push({ index: j, name: creature(o.creature).name, color: PLAYER_COLORS[j % 4], seconds, distance: Math.hypot(dx, dz), x: r / l, y: -f / l, progress: game.reviveProgress(o) });
       }
       // Versus: a dead player watches the leader rather than their own sinking body.
       const watched = this.spectatorTarget(game, i);
@@ -926,7 +928,7 @@ export class Engine {
         hunted: p.hunted, hunterAngle, hunterName: hunter ? creature(hunter.creature).name : undefined,
         hunterState: p.hunted >= 0.5 ? 'hunting' : p.hunted > 0.2 ? 'noticed' : 'none', inCover: p.cover > 0.3, still: Math.hypot(p.vel.x, p.vel.y, p.vel.z) < 0.3,
         hint: game.hintFor(i), respawnIn: p.state === 'dead' ? Math.max(0, (game.reviveWindow(p) || 3) - (game.reviveWindow(p) ? 0 : p.respawnT)) : 0, fade: cs?.fade ?? 0, state: p.state, modelReady: !!loadedSync(p.creature),
-        downedFor: game.reviveWindow(p), downedAllies: downed, spectating: spectate,
+        downedFor: game.reviveWindow(p), reviveProgress: game.reviveProgress(p), downedAllies: downed, spectating: spectate,
         kills: p.kills, eats: p.eats, escapes: p.escapes, protect: p.spawnProtect > 0, bandMarkers: markers.slice(0, 24),
         biome: BIOME_NAMES[game.biomeOf(i) ?? 'shelf'], radar: { range: radarRange, blips }, teleport: tele, era,
       };

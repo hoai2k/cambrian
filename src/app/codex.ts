@@ -36,7 +36,7 @@ export function loadCodex(): Codex {
     // crash a results screen, so anything unrecognised is simply forgotten.
     return {
       biomes: clean<Biome>(v.biomes),
-      landmarks: clean<LandmarkKind>(v.landmarks, ['arch', 'stack', 'carcass']),
+      landmarks: clean<LandmarkKind>(v.landmarks, ['arch', 'stack', 'bones']),
       apex: clean<CreatureId>(v.apex, ACTIVE_ERA.creatures.map((c) => c.id)),
     };
   } catch { return EMPTY; }
@@ -75,10 +75,10 @@ export function saveCodex(codex: Codex) {
 export const LANDMARK_NAMES: Record<LandmarkKind, string> = {
   arch: 'The Arch',
   stack: 'The Stack',
-  carcass: 'A Giant’s Bones',
+  bones: 'A Giant’s Bones',
 };
 export const LANDMARK_BLURBS: Record<LandmarkKind, string> = {
   arch: 'A span of rock with the sea running under it.',
   stack: 'Boulders piled into a tower you can climb.',
-  carcass: 'A dead giant on the floor. Food — and something comes back for it.',
+  bones: 'A dead giant on the floor. Food — and something comes back for it.',
 };

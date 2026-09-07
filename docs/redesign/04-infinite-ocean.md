@@ -126,23 +126,24 @@ seed like everything else.
 | --- | --- | --- |
 | **Arch** | Shelf, forest, shallows | Two piers and a span, about 14 units tall. You swim under it; a crawler can climb over it. Shelter under the span. |
 | **Stack** | Boulders, escarpment, flats | Five to seven boulders piled into a tapering tower. Steps for a crawler, a perch, crevices at the foot. |
-| **Carcass** | Basin and channels (30% of their landmarks), rarer elsewhere | A dead giant: a spine of vertebrae ~24 units long with ribs arching clear of the floor. The best cover in the deep, and the most dangerous place to use it. |
+| **Bones** | Basin and channels (30% of their landmarks), rarer elsewhere | A dead giant: a spine of vertebrae ~24 units long with ribs arching clear of the floor. The best cover in the deep, and the most dangerous place to use it. |
 
-Raised pieces — an arch's lintel, a carcass's ribs — set `Boulder.floor`, a
+Raised pieces — an arch's lintel, a skeleton's ribs — set `Boulder.floor`, a
 collision floor below which they do not block. Without it a span at height would
 wall off the water underneath it, and an arch with no hole in it is a rock.
 
-### The carcass
+### A giant's bones
 
-The one landmark that is also a system. `Game.feedOnCarcass` feeds anything that
+The one landmark that is also a system. `Game.feedOnBones` feeds anything that
 reaches the body, at a rate scaled by the eater's own mass so it is a real meal at
-every tier rather than a banquet for a larva and a trickle for a giant. Each
-carcass has a pool that depletes as it is stripped and restocks over about three
-and a half minutes, so a picked-over one is worth coming back to rather than dead
-for good.
+every tier rather than a banquet for a larva and a trickle for a giant. Each set
+has a pool that depletes as it is stripped and restocks over about three and a
+half minutes, so a picked-over one is worth coming back to rather than dead for
+good. (This is the standing skeleton the world places; unrelated to
+`render/carcass.ts`, which cuts an eaten body out of a creature's own model.)
 
-It is also a magnet. A hungry giant on patrol breaks off its route for a carcass
-within 260 units (`nearestCarcass` in `src/sim/ai.ts`) and settles there. So the
+It is also a magnet. A hungry giant on patrol breaks off its route for one
+within 260 units (`nearestBones` in `src/sim/ai.ts`) and settles there. So the
 richest food in the deep is also where the giant is going, which is the whole
 point: the reward and the reason to be careful are the same object.
 

@@ -33,7 +33,7 @@ export interface Boulder {
   sx: number; sy: number; sz: number; rot: number; shade: number;
   /**
    * Collision floor. A rock sitting on the seabed has none and blocks everything below its top;
-   * a landmark's raised span (an arch's lintel, a carcass rib) sets this so a creature swims
+   * a landmark's raised span (an arch's lintel, a rib of a skeleton) sets this so a creature swims
    * *under* it and only bumps into it from this height up. `groundHeight` still puts its top
    * underfoot, so a raised piece stays something a crawler can climb onto.
    */
@@ -268,13 +268,13 @@ const w2: BiomeWeights = { ...scratchW };
  * The three things in an endless procedural sea that are worth swimming toward. Everything else
  * is scatter; a landmark is a structure you recognise, can navigate by, and can use.
  */
-export type LandmarkKind = 'arch' | 'stack' | 'carcass';
+export type LandmarkKind = 'arch' | 'stack' | 'bones';
 export interface Landmark {
   kind: LandmarkKind;
   /** Stable across loads: derived from the cell, so the same landmark is always the same landmark. */
   id: number;
   pos: Vec3;
-  /** Footprint, for the radar, the discovery check and the carcass's feeding volume. */
+  /** Footprint, for the radar, the discovery check and the bones' feeding volume. */
   radius: number;
   rot: number;
   scale: number;
@@ -310,14 +310,14 @@ export function landmarkAt(seed: number, lx: number, lz: number): Landmark | und
   if (nearestNursery(x, z).d < NURSERY_R + 24) return undefined;
   const biome = biomeAt(x, z);
   // Each kind belongs somewhere: an arch needs standing water and growth, a stack needs rock,
-  // a carcass is what the deep does with the giants that live there.
-  // A carcass is the rare one: it is a whole dead giant, and the deep would stop reading as
-  // dangerous if the floor were paved with them.
+  // a skeleton is what the deep does with the giants that live there.
+  // The bones are the rare one: a whole dead giant on the floor, and the deep would stop reading
+  // as dangerous if it were paved with them.
   const deep = biome === 'basin' || biome === 'channel';
   const kind: LandmarkKind =
-    deep ? (rng() < 0.3 ? 'carcass' : 'stack')
-    : biome === 'boulders' || biome === 'escarpment' ? (rng() < 0.12 ? 'carcass' : 'stack')
-    : biome === 'flats' ? (rng() < 0.15 ? 'carcass' : 'stack')
+    deep ? (rng() < 0.3 ? 'bones' : 'stack')
+    : biome === 'boulders' || biome === 'escarpment' ? (rng() < 0.12 ? 'bones' : 'stack')
+    : biome === 'flats' ? (rng() < 0.15 ? 'bones' : 'stack')
     : 'arch';
   const scale = 0.85 + rng() * 0.7;
   // Big enough to see across open water and to hold a clearing of its own: a landmark that reads
@@ -376,7 +376,7 @@ function buildLandmark(chunk: Chunk, m: Landmark, far: boolean) {
     }
   } else {
     // A dead giant on the floor: a spine of vertebrae with ribs arching off it. Food, and the
-    // reason something bigger keeps coming back (see Game.carcassNear).
+    // reason something bigger keeps coming back (see Game.bonesNear).
     const len = 24 * S;
     const spineN = 9;
     for (let i = 0; i < spineN; i++) {

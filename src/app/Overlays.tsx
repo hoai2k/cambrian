@@ -13,7 +13,7 @@ import { LANDMARK_BLURBS, LANDMARK_NAMES, loadCodex, mergeCodex, saveCodex, type
 import { CloseIcon } from './icons';
 import { XboxDiagram } from './XboxDiagram';
 
-const LANDMARK_KINDS = ['arch', 'stack', 'carcass'] as const;
+const LANDMARK_KINDS = ['arch', 'stack', 'bones'] as const;
 
 export function PauseMenu({ onResume, onChange, onQuit }: { onResume: () => void; onChange: () => void; onQuit: () => void }) {
   return (

@@ -87,6 +87,8 @@ const CORPSE_WINDOW = 3;
  * seconds waiting for somebody who was never coming.
  */
 const REVIVE_REACH = 90;
+/** Seconds a rescuer must hold station beside a downed team-mate. */
+const REVIVE_HOLD = 0.6;
 
 export class Game implements AiWorld {
   world: WorldData;
@@ -109,11 +111,14 @@ export class Game implements AiWorld {
   private scratchFlora: Flora[] = [];
   private ambientTimer = 0;
   /**
-   * How much is left on each carcass landmark, 0..1 by landmark id. A dead giant is the biggest
+   * How much is left on each `bones` landmark, 0..1 by landmark id. A dead giant is the biggest
    * meal in the sea and it does not last: it feeds whoever finds it, runs out, and slowly becomes
    * worth visiting again as the deep delivers another body to the same spot.
+   *
+   * Not to be confused with `render/carcass.ts`, which cuts an eaten body out of its own model.
+   * This is the standing skeleton the world generator places, not a creature that just died.
    */
-  private carcassMeat = new Map<number, number>();
+  private bonesMeat = new Map<number, number>();
   private stepIndex = 0;
   private schoolCount = 0;
   private hitCtx: HitContext;
@@ -378,7 +383,7 @@ export class Game implements AiWorld {
     stepFlora(this.world, dt);
     this.updateSilt(dt);
     this.updatePopulation(dt);
-    this.restockCarcasses(dt);
+    this.restockBones(dt);
     this.updateDiscovery();
     RULES?.step(this, dt);
     this.updateModes(dt);
@@ -448,7 +453,7 @@ export class Game implements AiWorld {
       // three seconds of corpse (or of being digested), a puff of sparkles, then back in — or, for
       // a downed team-mate somebody could still reach, ten, and a revive ends it early.
       const total = downed ? DOWNED_WINDOW : CORPSE_WINDOW;
-      if (downed && this.tryRevive(a)) return;
+      if (downed && this.tryRevive(a, dt)) return;
       if (!a.sparkled && a.respawnT > total - 0.4) {
         a.sparkled = true;
         const pred = inMouth ? this.idMap.get(a.swallowedBy) : undefined;
@@ -470,29 +475,44 @@ export class Game implements AiWorld {
   }
 
   /** Seconds a downed player has left to be reached, or 0 when they are not revivable. */
+  /** How far through the rescue dwell a downed player is, 0..1, for the HUD. */
+  reviveProgress(a: Actor): number { return a.state === 'dead' ? clamp(a.reviveT / REVIVE_HOLD, 0, 1) : 0; }
+
   reviveWindow(a: Actor): number {
     return a.state === 'dead' && this.revivable(a) ? Math.max(0, DOWNED_WINDOW - a.respawnT) : 0;
   }
 
-  /** A living team-mate close enough to a downed player brings them back on the spot. */
-  private tryRevive(a: Actor): boolean {
+  /**
+   * A downed team-mate is brought back by a rescuer who holds station beside them for
+   * `REVIVE_HOLD` seconds. The dwell is what makes it a choice: a body on the floor is also a
+   * meal, and biting it feeds you instead. Swim up and wait and you get your ally back; press the
+   * attack and you get their nutrition. The button you press decides which, and the pause is what
+   * costs you — half a second stationary over a corpse, in the open, is the price of the rescue.
+   */
+  private tryRevive(a: Actor, dt: number): boolean {
     const L = lengthOf(a);
+    let helper: Actor | undefined;
     for (const o of this.players) {
       if (o === a || !isAlive(o) || o.state === 'moult') continue;
-      if (dist(o.pos, a.pos) > lengthOf(o) * 0.8 + L * 0.6 + 2) continue;   // generous: this is an assist, not a precision move
-      // Back up, where you fell, with the tier you had. The cost of dying in co-op is the time
-      // your ally spent coming to get you, and the pair of you standing still in the open to do it.
-      a.state = 'free'; a.stateT = 0; a.respawnT = 0; a.corpseT = 0; a.eaten = 0; a.sparkled = false;
-      a.hp = a.hpMax * 0.45; a.stamina = a.staminaMax * 0.5; a.poise = a.poiseMax;
-      a.vel = v3(); a.bank = 0; a.pitch = 0; a.hitFlash = 0; a.tumble = v3();
-      a.spawnProtect = 2.5; a.hunted = 0; a.hunterId = -1; a.lastHitBy = -1; a.killer = -1;
-      a.pos.y = groundHeight(this.world, a.pos.x, a.pos.z, this.scratchBoulders) + clearanceOf(a) + 0.2;
-      this.events.push({ kind: 'moult', pos: { ...a.pos }, actor: a.id, player: a.player, strength: 0.7 });
-      this.progress[a.player]?.prompts.push({ text: `${creature(o.creature).name} got you up.`, t: 3 });
-      this.flag(o, 'revive');
-      return true;
+      if (dist(o.pos, a.pos) > lengthOf(o) * 0.8 + L * 0.6 + 2) continue;
+      // Somebody eating this body has made the other choice; the dwell does not run for them.
+      if (o.state === 'eating' && o.eatingTarget === a.id) continue;
+      helper = o; break;
     }
-    return false;
+    if (!helper) { a.reviveT = 0; return false; }
+    a.reviveT += dt;
+    if (a.reviveT < REVIVE_HOLD) return false;
+    // Back up, where you fell, with the tier you had. The cost of dying in co-op is the time your
+    // ally spent coming to get you, and the pair of you standing still in the open to do it.
+    a.state = 'free'; a.stateT = 0; a.respawnT = 0; a.corpseT = 0; a.eaten = 0; a.sparkled = false; a.reviveT = 0;
+    a.hp = a.hpMax * 0.45; a.stamina = a.staminaMax * 0.5; a.poise = a.poiseMax;
+    a.vel = v3(); a.bank = 0; a.pitch = 0; a.hitFlash = 0; a.tumble = v3();
+    a.spawnProtect = 2.5; a.hunted = 0; a.hunterId = -1; a.lastHitBy = -1; a.killer = -1;
+    a.pos.y = groundHeight(this.world, a.pos.x, a.pos.z, this.scratchBoulders) + clearanceOf(a) + 0.2;
+    this.events.push({ kind: 'moult', pos: { ...a.pos }, actor: a.id, player: a.player, strength: 0.7 });
+    this.progress[a.player]?.prompts.push({ text: `${creature(helper.creature).name} got you up.`, t: 3 });
+    this.flag(helper, 'revive');
+    return true;
   }
 
   private respawn(a: Actor) {
@@ -972,7 +992,7 @@ export class Game implements AiWorld {
         const m = microbialAt(a.pos.x, a.pos.z);
         if (m > .2) this.gainNutrition(a, undefined, dt * rate * m);
       }
-      this.feedOnCarcass(a, L, dt);
+      this.feedOnBones(a, L, dt);
     }
 
     // Aim range: the crosshair fills when a pounce would connect
@@ -1369,43 +1389,43 @@ export class Game implements AiWorld {
   }
 
   /**
-   * The carcass landmark whose ribcage `pos` is inside, if any. Cheap: there is at most one
+   * The `bones` landmark whose ribcage `pos` is inside, if any. Cheap: there is at most one
    * landmark per 320-unit cell and only loaded chunks are in the list.
    */
-  carcassNear(pos: Vec3, range = 0): Landmark | undefined {
+  bonesNear(pos: Vec3, range = 0): Landmark | undefined {
     let best: Landmark | undefined, bd = Infinity;
     for (const m of this.world.landmarks) {
-      if (m.kind !== 'carcass') continue;
+      if (m.kind !== 'bones') continue;
       const d = distXZ(pos, m.pos);
       if (d < m.radius + range && d < bd) { bd = d; best = m; }
     }
     return best;
   }
 
-  /** How much of a carcass is left, 0..1. Unvisited carcasses are whole. */
-  carcassMeatLeft(id: number) { return this.carcassMeat.get(id) ?? 1; }
+  /** How much of a skeleton is left to strip, 0..1. Unvisited ones are whole. */
+  bonesLeft(id: number) { return this.bonesMeat.get(id) ?? 1; }
 
   /**
-   * Eating at a carcass. Anything that can reach the body gets fed — this is scavenging, not a
-   * kill — at a rate that scales with the eater, so it is a real meal at every tier rather than
-   * a trickle for a giant and a banquet for a larva. The pile depletes as it is eaten.
+   * Eating at a dead giant's bones. Anything that can reach the body gets fed — this is
+   * scavenging, not a kill — at a rate that scales with the eater, so it is a real meal at every
+   * tier rather than a trickle for a giant and a banquet for a larva. It depletes as it is eaten.
    */
-  private feedOnCarcass(a: Actor, L: number, dt: number) {
+  private feedOnBones(a: Actor, L: number, dt: number) {
     if (a.controller === 'swarm' || a.pos.y > sampleHeight(a.pos.x, a.pos.z) + L * 2.5 + 4) return;
-    const m = this.carcassNear(a.pos);
+    const m = this.bonesNear(a.pos);
     if (!m) return;
-    const left = this.carcassMeatLeft(m.id);
+    const left = this.bonesLeft(m.id);
     if (left <= 0.02) return;
     // A whole giant is worth roughly a tier to an adult; the eater's own mass sets the rate.
     const food = Math.min(left, dt * 0.055) * 240 * Math.pow(a.scale, 1.2) * m.scale;
-    this.carcassMeat.set(m.id, Math.max(0, left - dt * 0.055));
+    this.bonesMeat.set(m.id, Math.max(0, left - dt * 0.055));
     this.gainNutrition(a, undefined, food);
     if (a.controller === 'player' && this.rng() < dt * 3) this.events.push({ kind: 'eat', pos: { ...a.pos }, actor: a.id, strength: 0.35, player: a.player });
   }
 
-  /** Carcasses regrow slowly, so a stripped one is worth coming back to rather than dead forever. */
-  private restockCarcasses(dt: number) {
-    for (const [id, left] of this.carcassMeat) if (left < 1) this.carcassMeat.set(id, Math.min(1, left + dt / 210));
+  /** Bones restock slowly, so a stripped one is worth coming back to rather than dead forever. */
+  private restockBones(dt: number) {
+    for (const [id, left] of this.bonesMeat) if (left < 1) this.bonesMeat.set(id, Math.min(1, left + dt / 210));
   }
 
   /** Where this player could teleport right now. */

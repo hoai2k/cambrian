@@ -168,6 +168,8 @@ h3 { font-size: 13px; letter-spacing: .12em; color: var(--ember); margin: 14px 0
 .downed-call p { margin: 0; padding: .45em 1em; border-radius: 1em; background: rgba(6,22,28,.78); border: 1px solid var(--player); display: grid; gap: .1em; }
 .downed-call b { color: var(--player); font-size: .95em; letter-spacing: .04em; }
 .downed-call span { color: var(--mist); font-size: .8em; }
+.revive-bar { display: block; height: 3px; margin-top: .3em; border-radius: 2px; background: var(--player, #61f2d5); transform-origin: left; transition: transform .08s linear; }
+.revive-bar.wide { width: min(40vw, 260px); height: 4px; margin-top: .6em; }
 
 /* Versus: whose game you are watching while you are dead. */
 .spectating { position: absolute; left: 50%; bottom: 2.2em; transform: translateX(-50%); display: grid; justify-items: center; gap: .15em; padding: .5em 1.2em; border-radius: 1em; background: rgba(6,22,28,.7); border: 1px solid rgba(238,250,246,.22); pointer-events: none; }

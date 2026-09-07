@@ -330,11 +330,11 @@ Everything is still procedural (seeded), so it costs no new art.
   per 50-unit chunk within ~120 units of any player. The current build's
   instancing and shaders are reused as-is.
 - **Landmarks** (a few hand-placed by seed): a sponge archway, a boulder
-  stack you can hop, a dead Giant's carcass that is a temporary feast and a
+  stack you can hop, a dead Giant's bones that are a temporary feast and a
   predator magnet. *(Built, and procedural rather than hand-placed: one candidate
   per 320-unit cell, drawn from the seed and gated on the biome, so they are
   spread out and rare without anybody placing them. All three exist —
-  `landmarkAt()` in `src/sim/world.ts` — and the carcass really is both a feast
+  `landmarkAt()` in `src/sim/world.ts` — and the bones really are both a feast
   and a magnet. See* [the endless sea](04-infinite-ocean.md#landmarks).*)*
 - **Time and light**: a slow day cycle (20 min) that changes caustic intensity
   and Giant activity (they hunt more at dusk). Optional; ships after core.

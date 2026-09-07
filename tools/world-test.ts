@@ -186,25 +186,25 @@ const run = (g: Game, f: InputFrame, steps: number) => { const m = new Map([[0, 
   check('landmarks are spread on their own coarse grid', LANDMARK_CELL >= CHUNK * 4 && landmarkCell(LANDMARK_CELL * 2 + 1) === 2, `cell=${LANDMARK_CELL}`);
 }
 
-// --- the carcass: a feast that runs out, and shows up on the radar ---
+// --- the bones: a feast that runs out, and shows up on the radar ---
 {
   const seed = 33;
-  let carcass: ReturnType<typeof landmarkAt>;
-  for (let lz = -14; lz < 0 && !carcass; lz++) for (let lx = -14; lx <= 14 && !carcass; lx++) { const m = landmarkAt(seed, lx, lz); if (m && m.kind === 'carcass') carcass = m; }
-  if (!carcass) { check('the deep has a carcass in it', false, 'none found'); }
+  let bones: ReturnType<typeof landmarkAt>;
+  for (let lz = -14; lz < 0 && !bones; lz++) for (let lx = -14; lx <= 14 && !bones; lx++) { const m = landmarkAt(seed, lx, lz); if (m && m.kind === 'bones') bones = m; }
+  if (!bones) { check('the deep has a bones in it', false, 'none found'); }
   else {
     const g = new Game('reef', [{ creature: 'anomalocaris', device: 'keyboard', ready: true }], seed);
     const a = g.players[0];
-    a.pos = { x: carcass.pos.x, y: sampleHeight(carcass.pos.x, carcass.pos.z) + 2, z: carcass.pos.z };
+    a.pos = { x: bones.pos.x, y: sampleHeight(bones.pos.x, bones.pos.z) + 2, z: bones.pos.z };
     g.world.loadAround(a.pos);
-    check('the carcass is in the loaded world', g.world.landmarks.some((m) => m.kind === 'carcass'), `${g.world.landmarks.length} landmarks loaded`);
+    check('the bones is in the loaded world', g.world.landmarks.some((m) => m.kind === 'bones'), `${g.world.landmarks.length} landmarks loaded`);
     check('...and on the radar as a landmark', g.radarFor(0, 200).some((r) => r.kind === 'landmark'), '');
     const before = a.nutrition + a.tier * 1000;
     run(g, emptyInput(), 60 * 3);
     const after = g.players[0].nutrition + g.players[0].tier * 1000;
-    check('feeding at a carcass grows you', after > before, `+${(after - before).toFixed(0)}`);
-    check('...and strips it', g.carcassMeatLeft(carcass.id) < 0.9, `${(g.carcassMeatLeft(carcass.id) * 100).toFixed(0)}% left`);
-    check('the visit is recorded', g.discovery.landmarks.has('carcass'), [...g.discovery.landmarks].join(','));
+    check('feeding at a bones grows you', after > before, `+${(after - before).toFixed(0)}`);
+    check('...and strips it', g.bonesLeft(bones.id) < 0.9, `${(g.bonesLeft(bones.id) * 100).toFixed(0)}% left`);
+    check('the visit is recorded', g.discovery.landmarks.has('bones'), [...g.discovery.landmarks].join(','));
   }
 }
 
@@ -231,8 +231,10 @@ const run = (g: Game, f: InputFrame, steps: number) => { const m = new Map([[0, 
     // player who did that would float out of reach of the ally swimming down to them.
     check('...and has not drifted away while waiting', distXZ(a.pos, down) < 3 && Math.abs(a.pos.y - down.y) < 3, `drift=${distXZ(a.pos, down).toFixed(2)} dy=${(a.pos.y - down.y).toFixed(2)}`);
     b.pos = { ...down };
-    run(g, emptyInput(), 4);
-    check('...and a team-mate reaching them gets them up', isAlive(a), `state=${a.state}`);
+    run(g, emptyInput(), 2);
+    check('...and the rescue is a dwell, not an instant touch', !isAlive(a) && g.reviveProgress(a) > 0, `progress=${g.reviveProgress(a).toFixed(2)}`);
+    run(g, emptyInput(), 60);
+    check('...and holding station gets them up', isAlive(a), `state=${a.state}`);
     check('...keeping the tier they had', a.tier === 2, `tier=${a.tier}`);
     check('...with the death timer cleared', a.respawnT === 0, `t=${a.respawnT.toFixed(2)}`);
   }
@@ -247,6 +249,18 @@ const run = (g: Game, f: InputFrame, steps: number) => { const m = new Map([[0, 
     check('...so they respawn as usual', isAlive(a), `state=${a.state}`);
     check('...and pay a tier for it', a.tier === 1, `tier=${a.tier}`);
   }
+  // biting the body instead of waiting beside it feeds you: the button decides which you get
+  {
+    const { g, a, b } = mk();
+    a.tier = 2; a.hp = 0; a.state = 'dead'; a.deathY = a.pos.y; a.vel = { x: 0, y: 0, z: 0 };
+    const bite: InputFrame = { ...emptyInput(), light: true };
+    const m = new Map([[1, bite]]);
+    let ate = false;
+    // held right on the body, the way a player nosing into it would be
+    for (let i = 0; i < 180 && !ate && !isAlive(a); i++) { b.pos = { ...a.pos }; g.step(1 / 60, m); g.events.length = 0; if (a.eaten > 0) ate = true; }
+    check('a team-mate who bites the body eats it instead', ate && !isAlive(a), `eaten=${a.eaten.toFixed(2)} state=${a.state}`);
+  }
+
   // versus never opens the window
   {
     const g = new Game('frenzy', [{ creature: 'waptia', device: 'keyboard', ready: true }, { creature: 'marrella', device: 'keyboard2', ready: true }], 7);

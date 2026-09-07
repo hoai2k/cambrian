@@ -58,15 +58,15 @@ Four things the design called for and the first pass skipped are now in
 - **Seeded landmarks.** `landmarkAt()` in `src/sim/world.ts` places one candidate
   per 320-unit cell, purely from the seed, and the chunk containing it builds it:
   an **arch** you swim under, a **stack** of boulders a crawler can climb, and a
-  dead giant's **carcass**. Which kind depends on the biome, and roughly half the
+  dead giant's **bones**. Which kind depends on the biome, and roughly half the
   cells draw a blank, so a landmark stays rare enough to navigate by. They clear
   their own ground of scatter, appear on the radar, and survive into the far
   view. The arch and the ribcage use `Boulder.floor`, a collision floor that lets
   a creature pass under a raised span while a crawler can still climb over it.
-- **The carcass is a feast and a magnet.** `Game.feedOnCarcass` feeds anything
+- **The bones are a feast and a magnet.** `Game.feedOnBones` feeds anything
   that reaches the body at a rate scaled to the eater, depleting a pool that
   restocks over about three and a half minutes; a hungry giant on patrol breaks
-  off and comes to it (`nearestCarcass` in `src/sim/ai.ts`). Standing on the best
+  off and comes to it (`nearestBones` in `src/sim/ai.ts`). Standing on the best
   food in the deep is therefore also standing where the giant is headed.
 - **Co-op revive.** A downed player in Rise stays down for ten seconds instead of
   dissolving after three — but only when a team-mate was within 90 units when
