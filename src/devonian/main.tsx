@@ -1,6 +1,5 @@
 import React from 'react';
 import { createRoot } from 'react-dom/client';
-import { registerSamples } from '../audio/audio';
 import { selectEra } from '../content';
 import { DEVONIAN } from '../content/devonian';
 import { DEVONIAN_SAMPLES } from '../content/devonian/sfx';
@@ -14,8 +13,11 @@ import '../app/styles.css';
  */
 selectEra(DEVONIAN);
 setAppBase(nestedBase());
-registerSamples(DEVONIAN_SAMPLES);
 
+// Everything below is imported dynamically, after the era is chosen: a static import here would be
+// evaluated first, and the audio library and the creature tables read ACTIVE_ERA as they load.
+const { registerSamples } = await import('../audio/audio');
+registerSamples(DEVONIAN_SAMPLES);
 const { App } = await import('../app/App');
 createRoot(document.getElementById('root')!).render(
   <React.StrictMode>

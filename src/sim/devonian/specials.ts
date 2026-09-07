@@ -76,15 +76,49 @@ export function useAbility(g: Game, a: Actor, ctx: ExpansionContext): boolean {
   return true;
 }
 
-/** A heavy special just started (Game.startAbility). */
-export function beginAbility(g: Game, a: Actor): void {
-  const def = creature(a.creature);
-  if (def.ability === 'runThrough' || def.ability === 'tuskLunge') a.dodgeDir = heading(a.yaw);
-  if (def.ability === 'neckSnap' && a.lockTarget >= 0) {
-    // the neck: the bite turns faster than the body can
-    const t = g.byId(a.lockTarget);
-    if (t && isAlive(t)) { a.yaw = yawOf(norm(sub(t.pos, a.pos))); a.prevT.yaw = a.yaw; }
+/**
+ * How far a heavy special carries the body, in body lengths, over its travelling window. In body
+ * lengths rather than a speed multiplier because a strike has to close the gap it is aimed across,
+ * and every hit window below is measured in body lengths too.
+ */
+const LUNGE: Record<string, number> = {
+  runThrough: 3.5, tuskLunge: 2.6, jawShear: 1.8, crushBite: 1.6, neckSnap: 1.5,
+  cheliceraeGrab: 1.6, tridentShove: 1.8, shieldPush: 1.8, armourFlank: 2.0,
+};
+
+/** The thing a lunge should be aimed at: whatever is locked, else the nearest body in front. */
+function lungeTarget(g: Game, a: Actor, ctx: ExpansionContext): Actor | undefined {
+  const locked = a.lockTarget >= 0 ? g.byId(a.lockTarget) : undefined;
+  const L = lengthOf(a), h = heading(a.yaw);
+  if (locked && isAlive(locked) && dist(a.pos, locked.pos) < L * 4) return locked;
+  let best: Actor | undefined, bestD = Infinity;
+  for (const o of ctx.nearby(a.pos, L * 3)) {
+    if (o.id === a.id || !isAlive(o) || isHidden(o) || ctx.allies(a, o) || o.controller === 'swarm') continue;
+    const d = dist(a.pos, o.pos);
+    if (dot(norm(sub(o.pos, a.pos)), h) < 0.5 || d >= bestD) continue;
+    best = o; bestD = d;
   }
+  return best;
+}
+
+/**
+ * A heavy special just started (Game.startAbility). Every one of them is a committed strike that
+ * travels, like the pounce it replaces on this button: it turns onto its target at the windup and
+ * carries the body forward through the hit window (see `stepAbility`). Without that the button
+ * plays an animation on the spot and the hit windows, which are all inside a body length, never
+ * reach anything.
+ */
+export function beginAbility(g: Game, a: Actor, ctx: ExpansionContext): void {
+  const def = creature(a.creature);
+  if (!(HEAVY as readonly string[]).includes(def.ability)) return;
+  const t = lungeTarget(g, a, ctx);
+  if (t) {
+    const to = norm(sub(t.pos, a.pos));
+    // the neck turns faster than the body: Tiktaalik snaps its head all the way round
+    if (def.ability === 'neckSnap' || dot(to, heading(a.yaw)) > 0.35) { a.yaw = yawOf(to); a.prevT.yaw = a.yaw; }
+  }
+  a.dodgeDir = heading(a.yaw);
+  a.lockTarget = t?.id ?? a.lockTarget;
 }
 
 /** Every step of an 'ability' state (heavy specials and the timed Y specials). */
@@ -92,13 +126,13 @@ export function stepAbility(g: Game, a: Actor, ctx: ExpansionContext, dt: number
   const def = creature(a.creature);
   const L = lengthOf(a), h = heading(a.yaw), t = a.stateT;
   const d = devActor(g, a);
+  const lunge = LUNGE[def.ability];
+  if (lunge !== undefined) {
+    // Carry the body through the strike, from just before the hit window to just after it.
+    const dur = a.stateDur || 1, from = dur * 0.15, to = dur * 0.8;
+    if (t > from && t < to) a.vel = scale(a.dodgeDir, (lunge * L) / (to - from));
+  }
   switch (def.ability) {
-    case 'runThrough':                           // the fastest straight line in the sea
-      if (t > 0.15 && t < 0.8) a.vel = scale(a.dodgeDir, def.speed * Math.pow(a.scale, 0.45) * 2.6);
-      break;
-    case 'tuskLunge':                            // long, committed
-      if (t > 0.2 && t < 0.6) a.vel = scale(a.dodgeDir, def.speed * Math.pow(a.scale, 0.45) * 2.2);
-      break;
     case 'shellHover':
       a.vel.x *= 0.9; a.vel.z *= 0.9; a.vel.y = 0; a.seen = Math.min(a.seen, 0.2);
       return;
@@ -117,7 +151,7 @@ export function stepAbility(g: Game, a: Actor, ctx: ExpansionContext, dt: number
       return;
   }
   if (!(HEAVY as readonly string[]).includes(def.ability)) return;
-  for (const o of ctx.nearby(a.pos, L * 1.6)) {
+  for (const o of ctx.nearby(a.pos, L * 2.2)) {
     if (o.id === a.id || !isAlive(o) || isHidden(o) || ctx.allies(a, o) || a.hitDone.has(o.id)) continue;
     const dd = dist(a.pos, o.pos), direction = norm(sub(o.pos, a.pos)), forward = dot(direction, h);
     let damage = 0, poise = 0, kb = 0, grab = false, armorPierce = 0, guardBreak = false, shellCrush = false;

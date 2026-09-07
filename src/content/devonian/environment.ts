@@ -43,7 +43,7 @@ export const FLORA_BASE: Record<string, string> = {
  */
 export const FLORA_DENSITY: Record<Biome, Partial<Record<FloraKind, number>>> = {
   shallows: { reed: 16, crinoid: 1.2, log: 2.5, bryozoan: 0.8, tabulate: 0.6 },
-  nursery: { reed: 55, crinoid: 14, log: 7, bryozoan: 5, rugose: 3 },
+  nursery: { reed: 26, crinoid: 12, log: 6, bryozoan: 5, rugose: 3 },   // thick enough to hide in; a giant still gets through
   shelf: { crinoid: 3, bryozoan: 1.5, rugose: 1.2, tabulate: 0.8, reed: 0.6 },
   forest: { crinoid: 30, bryozoan: 6, rugose: 3, tabulate: 2, stromatoporoid: 1 },
   boulders: { stromatoporoid: 9, tabulate: 6, rugose: 6, bryozoan: 4, crinoid: 2 },

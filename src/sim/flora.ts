@@ -56,7 +56,7 @@ export const FLORA_PHYS: Record<FloraKind, FloraPhys> = {
   // Bryozoan: a flat net fan. Flexes a little at the top and springs back.
   bryozoan: { h: 0.9, r: 0.45, profile: (f) => 0.15 + 0.85 * f, rigidity: 0.8, maxLean: 0.3, k: 28, c: 4.5, drag: 1.0 },
   // Reed: tall thin stems for the river mouth and shallows. Folds right over and sways a lot.
-  reed: { h: 1.8, r: 0.25, profile: (f) => 0.25 + 0.75 * f, rigidity: 0.12, maxLean: 0.9, k: 14, c: 2.0, drag: 2.4 },
+  reed: { h: 1.8, r: 0.25, profile: (f) => 0.25 + 0.75 * f, rigidity: 0.12, maxLean: 0.9, k: 14, c: 2.0, drag: 1.5 },
   // Log: a trunk lying on the sand. Rigid; `r` is half its length, so it reads as a low round obstacle.
   log: { h: 0.5, r: 1.3, profile: () => 1, rigidity: 30, maxLean: 0.02, k: 80, c: 12, drag: 0.2 },
 };

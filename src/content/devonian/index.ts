@@ -51,18 +51,24 @@ export const DEVONIAN = defineEra({
   creatures: DEVONIAN_CREATURES,
   defaults: {
     player: 'coccosteus',
-    boot: ['coccosteus', 'cheirolepis', 'cladoselache', 'eldredgeops', 'tiktaalik', 'dunkleosteus', 'bothriolepis', 'manticoceras'],
-    title: ['dunkleosteus', 'cladoselache', 'tiktaalik', 'eldredgeops'],
+    // Delivered specimens only: these drive card and model preloading, and a creature that is still
+    // borrowing a body has no portrait to load. Add each one here as its own model lands.
+    boot: ['coccosteus', 'cladoselache', 'dunkleosteus', 'bothriolepis', 'gemuendina', 'doryaspis', 'stethacanthus', 'titanichthys'],
+    title: ['dunkleosteus', 'cladoselache', 'coccosteus', 'doryaspis'],
   },
   ecology: { schools: SNACK_SCHOOLS, giants: GIANTS, shadow: { creature: 'titanichthys', scale: 1.0 } },
   environment: { biomeNames: BIOME_NAMES, biomeDanger: BIOME_DANGER, atmosphere: ATMOS, sandColors: SAND_COLORS, floraColors: FLORA_BASE, flora: FLORA_DENSITY },
   assets: {
     creatures: 'assets/devonian/creatures/', defaultPortraits: 'assets/devonian/creatures/',
-    // Scenery is shared with the Cambrian until the Devonian set is delivered; music is the shared folder
+    // Scenery and music are shared with the Cambrian until the Devonian sets are delivered
     // (docs/image-requests.md, docs/audio-requests.md); the biome plates are procedural stand-ins from
     // tools/devonian/biome-plates.mjs (`npm run devonian:plates`) until the painted ones land; the
-    // creatures, SFX and brand are this era's own.
-    props: 'assets/props/', biomes: 'assets/devonian/biomes/', ui: 'assets/ui/', sfx: 'assets/devonian/sfx/', music: 'music/',
+    // creatures and brand are this era's own.
+    // `sfx` names the SHARED library on purpose: bites, hits, parries and the UI are the same sounds
+    // in both eras, and this era's own samples are addressed as 'devonian/<name>' (src/content/
+    // devonian/sfx.ts), which sfxUrl resolves under assets/devonian/sfx/ whatever this path says.
+    // Pointing it at the Devonian folder makes all 39 shared samples 404 and the sea goes silent.
+    props: 'assets/props/', biomes: 'assets/devonian/biomes/', ui: 'assets/ui/', sfx: 'assets/sfx/', music: 'music/',
     ...DEVONIAN_BRAND, modelBytes, standIns: DEVONIAN_STAND_INS,
   },
   audio: { music: MUSIC },

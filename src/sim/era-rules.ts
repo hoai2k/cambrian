@@ -56,7 +56,7 @@ export interface EraRules {
   moultScale(g: Game, a: Actor): { from: number; to: number } | undefined;
   /** Y pressed while free or guarding and not hidden: true when the era's own special took it (the shared hide is skipped). */
   useAbility(g: Game, a: Actor, ctx: ExpansionContext): boolean;
-  /** A heavy special started (after the shared begin). */
+  /** A heavy special started (after the shared begin): the era may aim and commit it. */
   beginAbility(g: Game, a: Actor, ctx: ExpansionContext): void;
   /** Every step in the 'ability' state (after the shared step). */
   stepAbility(g: Game, a: Actor, ctx: ExpansionContext, dt: number): void;
