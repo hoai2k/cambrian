@@ -1,0 +1,70 @@
+{
+  "era": "devonian",
+  "status": "ready-inactive",
+  "provenance": "docs/devonian-brand-assets.md",
+  "assets": [
+    {
+      "path": "assets/devonian/brand/apple-touch-icon.png",
+      "width": 180,
+      "height": 180,
+      "bytes": 65238,
+      "sha256": "f55cc2c88bbfcf750dcc9c79db21bb9a1c4bff3125d6abf0d1e7e8b25eeb0a2a"
+    },
+    {
+      "path": "assets/devonian/brand/emblem.webp",
+      "width": 512,
+      "height": 512,
+      "bytes": 131680,
+      "sha256": "be9aac8aa2ad57a7d43aceb99d642c63cecfb37a95ff816f96cba9cd25c2b999"
+    },
+    {
+      "path": "assets/devonian/brand/favicon-16.png",
+      "width": 16,
+      "height": 16,
+      "bytes": 934,
+      "sha256": "ee0fa937898dfb55b1cf9304920d084aed3dab2d974ee09a35944ceaba083b90"
+    },
+    {
+      "path": "assets/devonian/brand/favicon-192.png",
+      "width": 192,
+      "height": 192,
+      "bytes": 73752,
+      "sha256": "97b549e09f39fe9cb6e050b0b09e71947b6cda3f6471a69cea4eebb8d15c55bf"
+    },
+    {
+      "path": "assets/devonian/brand/favicon-32.png",
+      "width": 32,
+      "height": 32,
+      "bytes": 2862,
+      "sha256": "25de468236aa48b5fc8c110a4fb5765386db5defb6f3927e3e3a49313edc9929"
+    },
+    {
+      "path": "assets/devonian/brand/favicon-512.png",
+      "width": 512,
+      "height": 512,
+      "bytes": 514826,
+      "sha256": "50743bf8e82f0574c16116f7323c8bea9e6abaf619e58ce50a1738f713e6e0cc"
+    },
+    {
+      "path": "assets/devonian/brand/favicon.ico",
+      "width": 48,
+      "height": 48,
+      "bytes": 9522,
+      "sha256": "baec109d095f8959b65d8c7310e320c0691ccc9bb794c3ed16f5ab36164e1047"
+    },
+    {
+      "path": "assets/devonian/brand/title-mobile.webp",
+      "width": 941,
+      "height": 1672,
+      "bytes": 587388,
+      "sha256": "e3665fe1dce62c325deb6855dc03309bad44bf176fad34a580268059fde07518"
+    },
+    {
+      "path": "assets/devonian/brand/title.webp",
+      "width": 1536,
+      "height": 1024,
+      "bytes": 573592,
+      "sha256": "3333e4c25409c745fde9226646c2b680cc7edab9474e1dcb198224bdeeefb76d"
+    }
+  ]
+}
