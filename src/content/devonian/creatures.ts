@@ -27,7 +27,9 @@ const nibble = (name: string): MoveDef => ({ name, windup: 0.2, active: 0.15, re
 export const DEVONIAN_CREATURES: readonly CreatureDef[] = [
   // ---------------------------------------------------------------- Rung IV · Giants
   {
-    id: 'dunkleosteus', name: 'Dunkleosteus', species: 'D. terrelli', locality: 'Late Devonian · Cleveland Shale',
+    id: 'dunkleosteus', name: 'Dunkleosteus', species: 'D. terrelli',
+    kind: 'Placoderm', kindNote: 'Placoderms were armoured jawed fish, head and shoulders sheathed in bony plates; the arthrodires had a hinge between head and trunk armour.',
+    locality: 'Late Devonian · Cleveland Shale',
     tagline: 'The jaws that cut through armour. Everything else is waiting to be eaten.',
     role: 'Apex predator', ground: false, adultLength: 9.5, rung: 4, armour: 0.55, armourPierce: 1, breathing: 'gill',
     speed: 7.5, burst: 3.82, agility: 4.13, turnRate: 2.24, glide: 0.5,
@@ -42,7 +44,9 @@ export const DEVONIAN_CREATURES: readonly CreatureDef[] = [
     canGuard: false,
   },
   {
-    id: 'titanichthys', name: 'Titanichthys', species: 'T. agassizi', locality: 'Late Devonian · Morocco / Ohio',
+    id: 'titanichthys', name: 'Titanichthys', species: 'T. agassizi',
+    kind: 'Placoderm', kindNote: 'An arthrodire placoderm like Dunkleosteus, built the other way round: the same armour, a filter feeder\'s toothless gape.',
+    locality: 'Late Devonian · Morocco / Ohio',
     tagline: 'A mouth like a cave and nothing in it that bites. The sea moves out of its way anyway.',
     role: 'Gentle giant', ground: false, adultLength: 12.08, rung: 4, armour: 0.4, breathing: 'gill', noBite: true, diet: 'filter',
     speed: 9.3, burst: 1.94, agility: 3.5, turnRate: 2.21, glide: 0.5,
@@ -57,7 +61,9 @@ export const DEVONIAN_CREATURES: readonly CreatureDef[] = [
   },
   // ---------------------------------------------------------------- Rung III · Hunters
   {
-    id: 'cladoselache', name: 'Cladoselache', species: 'C. fyleri', locality: 'Late Devonian · Cleveland Shale',
+    id: 'cladoselache', name: 'Cladoselache', species: 'C. fyleri',
+    kind: 'Early shark', kindNote: 'A cartilaginous fish, shark-shaped and usually called an early shark, though the cladoselachids sit with the symmoriiforms on the chimaera side of the family tree rather than with modern sharks.',
+    locality: 'Late Devonian · Cleveland Shale',
     tagline: 'The first shark shape, and still the fastest straight line in the water.',
     role: 'Pursuit hunter', ground: false, adultLength: 5.87, rung: 3, breathing: 'gill',
     speed: 4.8, burst: 4, agility: 5.03, turnRate: 4.11, glide: 0.25,
@@ -72,7 +78,9 @@ export const DEVONIAN_CREATURES: readonly CreatureDef[] = [
     canGuard: false,
   },
   {
-    id: 'stethacanthus', name: 'Stethacanthus', species: 'S. altonensis (Devonian material)', locality: 'Late Devonian representative',
+    id: 'stethacanthus', name: 'Stethacanthus', species: 'S. altonensis (Devonian material)',
+    kind: 'Early shark', kindNote: 'A symmoriiform cartilaginous fish — the same shark-like grade as Cladoselache, carrying the anvil-shaped brush of enlarged denticles over its back.',
+    locality: 'Late Devonian representative',
     tagline: 'The brush on its back is a bluff. Most things fall for it.',
     role: 'Display hunter', ground: false, adultLength: 3.71, rung: 3, breathing: 'gill',
     speed: 3.3, burst: 4, agility: 5.57, turnRate: 4.5, glide: 0.25,
@@ -87,7 +95,9 @@ export const DEVONIAN_CREATURES: readonly CreatureDef[] = [
     canGuard: true,
   },
   {
-    id: 'onychodus', name: 'Onychodus', species: 'O. jandemarrai', locality: 'Late Devonian · Gogo',
+    id: 'onychodus', name: 'Onychodus', species: 'O. jandemarrai',
+    kind: 'Lobe-finned fish', kindNote: 'A sarcopterygian: the fleshy-finned lineage that also holds coelacanths, lungfish and, eventually, us. Onychodonts hinged whorls of tusks inside the lower jaw.',
+    locality: 'Late Devonian · Gogo',
     tagline: 'Two tusks and the patience to use them on something armoured.',
     role: 'Ambush hunter', ground: false, adultLength: 5.87, rung: 3, armour: 0.15, armourPierce: 0.5, breathing: 'gill',
     speed: 5.3, burst: 4, agility: 5.03, turnRate: 4.5, glide: 0.25,
@@ -102,7 +112,9 @@ export const DEVONIAN_CREATURES: readonly CreatureDef[] = [
     canGuard: false,
   },
   {
-    id: 'rhinodipterus', name: 'Rhinodipterus', species: 'R. kimberleyensis', locality: 'Late Devonian · Gogo',
+    id: 'rhinodipterus', name: 'Rhinodipterus', species: 'R. kimberleyensis',
+    kind: 'Lungfish', kindNote: 'A dipnoan — a lobe-finned fish that breathes air and crushes shells on tooth plates, the group whose survivors still live in Africa, South America and Australia.',
+    locality: 'Late Devonian · Gogo',
     tagline: 'It can breathe. That is the whole trick, and it is a good one.',
     role: 'Shell crusher', ground: false, adultLength: 2.65, rung: 2, breathing: 'air',
     speed: 2.5, burst: 4, agility: 5.84, turnRate: 5, glide: 0.5,
@@ -117,7 +129,9 @@ export const DEVONIAN_CREATURES: readonly CreatureDef[] = [
     canGuard: true,
   },
   {
-    id: 'tiktaalik', name: 'Tiktaalik', species: 'T. roseae', locality: 'Late Devonian · Ellesmere Island',
+    id: 'tiktaalik', name: 'Tiktaalik', species: 'T. roseae',
+    kind: 'Lobe-finned fish', kindNote: 'A tetrapodomorph lobe-fin, popularly a \u201cfishapod\u201d: a fish with a neck, ribs and weight-bearing front fins, standing right beside the first four-limbed animals.',
+    locality: 'Late Devonian · Ellesmere Island',
     tagline: 'It can go where you cannot follow. Up.',
     role: 'Shallows ambusher', ground: false, adultLength: 5.87, rung: 3, breathing: 'air', shoreReach: 14, armour: 0.2,
     speed: 4.8, burst: 4, agility: 5.03, turnRate: 4.11, glide: 0.25,
@@ -132,7 +146,9 @@ export const DEVONIAN_CREATURES: readonly CreatureDef[] = [
     canGuard: true,
   },
   {
-    id: 'jaekelopterus', name: 'Jaekelopterus', species: 'J. rhenaniae', locality: 'Early Devonian · Rhineland',
+    id: 'jaekelopterus', name: 'Jaekelopterus', species: 'J. rhenaniae',
+    kind: 'Sea scorpion', kindNote: 'A eurypterid — the aquatic arthropod group nicknamed sea scorpions, and this is the largest one known.',
+    locality: 'Early Devonian · Rhineland',
     tagline: 'Claws first. Questions never.',
     role: 'Floor hunter', ground: true, adultLength: 7.97, rung: 3, armour: 0.3, breathing: 'gill',
     speed: 6.4, burst: 1.6, agility: 3.5, turnRate: 3.99, glide: 0.25,
@@ -148,7 +164,9 @@ export const DEVONIAN_CREATURES: readonly CreatureDef[] = [
   },
   // ---------------------------------------------------------------- Rung II · Shoal
   {
-    id: 'cheirolepis', name: 'Cheirolepis', species: 'C. trailli', locality: 'Middle–Late Devonian · Scotland / Miguasha',
+    id: 'cheirolepis', name: 'Cheirolepis', species: 'C. trailli',
+    kind: 'Ray-finned fish', kindNote: 'An early actinopterygian: fins held on bony rays, the body plan that went on to become almost every fish alive today.',
+    locality: 'Middle–Late Devonian · Scotland / Miguasha',
     tagline: 'Everyfish. Quick, plain, and never alone for long.',
     role: 'Shoaler', ground: false, adultLength: 2.45, rung: 2, breathing: 'gill', shoals: true,
     speed: 5.5, burst: 2.05, agility: 5.89, turnRate: 5, glide: 0.25,
@@ -163,7 +181,9 @@ export const DEVONIAN_CREATURES: readonly CreatureDef[] = [
     canGuard: false,
   },
   {
-    id: 'doryaspis', name: 'Doryaspis', species: 'D. nathorsti', locality: 'Early Devonian · Svalbard',
+    id: 'doryaspis', name: 'Doryaspis', species: 'D. nathorsti',
+    kind: 'Jawless fish', kindNote: 'A heterostracan, an armoured fish with no jaws at all: a bony head shield and a mouth that scooped rather than bit.',
+    locality: 'Early Devonian · Svalbard',
     tagline: 'No jaws. A shield instead. Sweep the floor and keep your head down.',
     role: 'Jawless grazer', ground: false, adultLength: 1.75, rung: 2, armour: 0.5, breathing: 'gill', noBite: true, diet: 'deposit', shoals: true,
     speed: 3.9, burst: 2.25, agility: 6.06, turnRate: 5, glide: 0.5,
@@ -177,7 +197,9 @@ export const DEVONIAN_CREATURES: readonly CreatureDef[] = [
     canGuard: true,
   },
   {
-    id: 'gemuendina', name: 'Gemuendina', species: 'G. stuertzi', locality: 'Early Devonian · Hunsrück',
+    id: 'gemuendina', name: 'Gemuendina', species: 'G. stuertzi',
+    kind: 'Placoderm', kindNote: 'A rhenanid placoderm — the ray-shaped branch, its armour broken into a mosaic of small plates over a flattened body.',
+    locality: 'Early Devonian · Hunsrück',
     tagline: 'Flat as the mud it lies on. Then the mud bites.',
     role: 'Sand ambusher', ground: true, adultLength: 2.23, rung: 2, armour: 0.35, breathing: 'gill', bodyRadius: 0.3, clearance: 0.05,
     speed: 2.7, burst: 3.75, agility: 5.94, turnRate: 5, glide: 0.5,
@@ -192,7 +214,9 @@ export const DEVONIAN_CREATURES: readonly CreatureDef[] = [
     canGuard: true,
   },
   {
-    id: 'bothriolepis', name: 'Bothriolepis', species: 'B. canadensis', locality: 'Late Devonian · Miguasha',
+    id: 'bothriolepis', name: 'Bothriolepis', species: 'B. canadensis',
+    kind: 'Placoderm', kindNote: 'An antiarch placoderm, the branch with jointed, crab-like bony arms on a boxy armoured head.',
+    locality: 'Late Devonian · Miguasha',
     tagline: 'A box with fins. The box is the point.',
     role: 'Armoured grazer', ground: true, adultLength: 2.65, rung: 2, armour: 0.6, breathing: 'gill', shoreReach: 6, diet: 'deposit',
     speed: 2.8, burst: 4, agility: 5.84, turnRate: 3, glide: 0.5,
@@ -207,7 +231,9 @@ export const DEVONIAN_CREATURES: readonly CreatureDef[] = [
     canGuard: true,
   },
   {
-    id: 'coccosteus', name: 'Coccosteus', species: 'C. cuspidatus', locality: 'Middle Devonian · Orcadian Basin',
+    id: 'coccosteus', name: 'Coccosteus', species: 'C. cuspidatus',
+    kind: 'Placoderm', kindNote: 'An arthrodire placoderm: Dunkleosteus\' own group at a tenth of the length, with the same hinged head and shearing jaw plates.',
+    locality: 'Middle Devonian · Orcadian Basin',
     tagline: 'The small one with the big idea: armour at the front, teeth behind it.',
     role: 'Armoured fighter', ground: false, adultLength: 2.45, rung: 2, armour: 0.5, breathing: 'gill',
     speed: 4.4, burst: 2.56, agility: 5.89, turnRate: 5, glide: 0.5,
@@ -222,7 +248,9 @@ export const DEVONIAN_CREATURES: readonly CreatureDef[] = [
     canGuard: true,
   },
   {
-    id: 'michelinoceras', name: 'Michelinoceras', species: 'M. sp. (Devonian)', locality: 'Early Devonian · Sardinia',
+    id: 'michelinoceras', name: 'Michelinoceras', species: 'M. sp. (Devonian)',
+    kind: 'Nautiloid', kindNote: 'A straight-shelled (orthocone) nautiloid cephalopod — the chambered-shell lineage the living nautilus belongs to.',
+    locality: 'Early Devonian · Sardinia',
     tagline: 'A spear that swims backwards.',
     role: 'Jet cephalopod', ground: false, adultLength: 3.03, rung: 2, armour: 0.7, breathing: 'gill', shell: true,
     speed: 2.8, burst: 4, agility: 3, turnRate: 2.61, glide: 0.35,
@@ -237,7 +265,9 @@ export const DEVONIAN_CREATURES: readonly CreatureDef[] = [
     canGuard: true,
   },
   {
-    id: 'acanthostega', name: 'Acanthostega', species: 'A. gunnari', locality: 'Late Devonian · East Greenland',
+    id: 'acanthostega', name: 'Acanthostega', species: 'A. gunnari',
+    kind: 'Early tetrapod', kindNote: 'One of the first four-limbed vertebrates: eight fingers on each hand, gills still working, and legs that were for water rather than land.',
+    locality: 'Late Devonian · East Greenland',
     tagline: 'Eight fingers and nowhere it cannot get to.',
     role: 'Shallows tetrapod', ground: false, adultLength: 3.39, rung: 2, breathing: 'air', shoreReach: 20,
     speed: 3.6, burst: 4, agility: 3.5, turnRate: 5, glide: 0.25,
@@ -253,7 +283,9 @@ export const DEVONIAN_CREATURES: readonly CreatureDef[] = [
   },
   // ---------------------------------------------------------------- Rung I · Floor
   {
-    id: 'eldredgeops', name: 'Eldredgeops', species: 'E. rana', locality: 'Middle Devonian · North American shelf',
+    id: 'eldredgeops', name: 'Eldredgeops', species: 'E. rana',
+    kind: 'Trilobite', kindNote: 'A phacopid trilobite, the classic collector\'s fossil, with big schizochroal compound eyes made of separate lenses.',
+    locality: 'Middle Devonian · North American shelf',
     tagline: 'The eyes see it coming. The shell takes it. Then you moult and do it again.',
     role: 'Armoured grazer', ground: true, adultLength: 0.85, rung: 1, armour: 0.8, breathing: 'gill', moults: true, diet: 'grazer',
     speed: 1.2, burst: 1.6, agility: 3.5, turnRate: 5, glide: 0.7,
@@ -268,7 +300,9 @@ export const DEVONIAN_CREATURES: readonly CreatureDef[] = [
     canGuard: true,
   },
   {
-    id: 'walliserops', name: 'Walliserops', species: 'W. trifurcatus', locality: 'Devonian · Morocco',
+    id: 'walliserops', name: 'Walliserops', species: 'W. trifurcatus',
+    kind: 'Trilobite', kindNote: 'A comurid trilobite carrying a forked trident off its head — the ornament that made it famous.',
+    locality: 'Devonian · Morocco',
     tagline: 'Nobody knows what the trident is for. You are going to find out.',
     role: 'Duelling grazer', ground: true, adultLength: 0.85, rung: 1, armour: 0.75, breathing: 'gill', moults: true, diet: 'grazer',
     speed: 1.2, burst: 1.6, agility: 3.5, turnRate: 5, glide: 0.7,
@@ -283,7 +317,9 @@ export const DEVONIAN_CREATURES: readonly CreatureDef[] = [
     canGuard: true,
   },
   {
-    id: 'nahecaris', name: 'Nahecaris', species: 'N. stuertzi', locality: 'Early Devonian · Hunsrück',
+    id: 'nahecaris', name: 'Nahecaris', species: 'N. stuertzi',
+    kind: 'Crustacean', kindNote: 'A phyllocarid: a shrimp-like crustacean sheltering under a hinged, two-piece carapace.',
+    locality: 'Early Devonian · Hunsrück',
     tagline: 'First to the corpse, gone before the owner comes back.',
     role: 'Scavenger', ground: false, adultLength: 1.29, rung: 1, breathing: 'gill', moults: true,
     speed: 3.9, burst: 1.87, agility: 6.18, turnRate: 5, glide: 0.25,
@@ -298,7 +334,9 @@ export const DEVONIAN_CREATURES: readonly CreatureDef[] = [
     canGuard: false,
   },
   {
-    id: 'furcaster', name: 'Furcaster', species: 'F. palaeozoicus', locality: 'Early Devonian · Hunsrück',
+    id: 'furcaster', name: 'Furcaster', species: 'F. palaeozoicus',
+    kind: 'Brittle star', kindNote: 'An ophiuroid echinoderm — a starfish relative with a small disc and five whip-like arms.',
+    locality: 'Early Devonian · Hunsrück',
     tagline: 'Five arms, no hurry, and a talent for not being there.',
     role: 'Benthic hider', ground: true, adultLength: 1.01, rung: 1, breathing: 'gill', moults: false, bodyRadius: 0.3, clearance: 0.04,
     speed: 1.3, burst: 1.6, agility: 3.5, turnRate: 5, glide: 0.7,
@@ -313,7 +351,9 @@ export const DEVONIAN_CREATURES: readonly CreatureDef[] = [
     canGuard: false,
   },
   {
-    id: 'palaeoisopus', name: 'Palaeoisopus', species: 'P. problematicus', locality: 'Early Devonian · Hunsrück',
+    id: 'palaeoisopus', name: 'Palaeoisopus', species: 'P. problematicus',
+    kind: 'Sea spider', kindNote: 'A pycnogonid, or sea spider: long legs, almost no body, and the first sea spider fossil ever described.',
+    locality: 'Early Devonian · Hunsrück',
     tagline: 'A spider that swims, on legs that were made for it.',
     role: 'Stilt scavenger', ground: false, adultLength: 1.32, rung: 1, breathing: 'gill', moults: true,
     speed: 1.5, burst: 1.6, agility: 3.5, turnRate: 5, glide: 0.7,
@@ -328,7 +368,9 @@ export const DEVONIAN_CREATURES: readonly CreatureDef[] = [
     canGuard: false,
   },
   {
-    id: 'manticoceras', name: 'Manticoceras', species: 'M. intumescens', locality: 'Late Devonian · Frasnian seas',
+    id: 'manticoceras', name: 'Manticoceras', species: 'M. intumescens',
+    kind: 'Ammonoid', kindNote: 'A goniatite — the coiled shelled cephalopods that came before the ammonites, and their ancestors.',
+    locality: 'Late Devonian · Frasnian seas',
     tagline: 'Hang in the water for as long as you like. Nothing else can.',
     role: 'Hovering cephalopod', ground: false, adultLength: 1.16, rung: 1, armour: 0.7, breathing: 'gill', shell: true,
     speed: 1.4, burst: 2.46, agility: 3, turnRate: 5, glide: 0.35,

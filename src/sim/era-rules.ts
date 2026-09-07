@@ -42,6 +42,15 @@ export interface EraRules {
    * The Devonian puts every hatchling inside plant cover, on the floor or up a column.
    */
   spawnPoint(g: Game, center: Vec3, id: CreatureId, scale: number, index: number): Vec3 | undefined;
+  /** The nursery a bot hatches in; undefined puts it with the players. */
+  botNursery(index: number): Vec3 | undefined;
+  /** Seconds of protection a body gets when it hatches or comes back. */
+  spawnProtect(a: Actor): number;
+  /**
+   * True when `hunter` (an AI body) must leave `target` alone unless provoked: the era's nursery
+   * sanctuary. The caller has already established the hunter is not provoked.
+   */
+  sanctuary(hunter: Actor, target: Actor): boolean;
   init(g: Game): void;
   /** After every fixed step, before the events are drained by the renderer. */
   step(g: Game, dt: number): void;
