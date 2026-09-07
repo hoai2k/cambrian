@@ -1,6 +1,6 @@
 # Resume here — creature authoring, 7 September 2026
 
-Main **03e926d** and feature `devonian-assets` are pushed. Repository:
+Last published main and feature revision: **03e926d**. Later local checkpoints may be ahead. Repository:
 `/Users/hoai/Documents/Stuff/Generations/cambrian/local/expansion-repo`.
 Separate main checkout: `../devonian-publish`. Fetch/push via
 `git@github.com:hoai2k/cambrian.git`; remote main changes concurrently, never force push.
@@ -41,11 +41,25 @@ send creative fixes to Terra. Preserve script hashes and candidates between revi
   Root and author rejected it as a completed sculpt: uniform dome, punched oval mouth, flat
   pectoral field, bead-like eyes, scratch-like gill marks, pinched pelvic/tail transition.
   Secondary sculpt corrected those forms; production materials/rigging now proceeds. Preserve clay01/02.
+  Material-01 executed successfully without geometry changes; both actual renders were reviewed by
+  root and author. Palette was rejected as too pale/chalky with cracked-stone tesserae. Material-02
+  is being authored with deeper organic olive/ochre colour and granular detail; rig/action source
+  proceeds independently. Material-01 packed blend SHA:
+  `af0b5ab285fb1d7770c9689aa7671c210adee79209f76b7e3694ac5216310210`.
   Source: `tools/devonian/creatures/gemuendina/rework-v3/`.
   Outputs: `../devonian-authoring/gemuendina/rework-v3/clay-01/`.
   Blend SHA: `05b413fecf7e2fe8b68f06543d4b4beb091220ed52ed925d88cce5339c734883`.
   Frozen first manifest: `37b2372eccf4df0425c6662424d038eaa6137371e211fa75555cef5a6585786c`.
-- `/root/titanichthys_rework_design` — Astra high; clay-02 creative revision in progress.
+- `/root/titanichthys_rework_clay03` — Astra high; resumed creative ownership from the earlier author.
+  Clay-02 executed, but root rejected all four views as a production form. Armour became stepped
+  masonry blocks with crumpled orbital folds, a wedge-like lip and a massive triangular moving
+  jaw wall. Read `root-review-clay02.md`. Clay-03 must correct organic surface/mandible architecture
+  before textures or rigging; preserve the smoother posterior and corrected fin tips.
+  Clay-02 blend SHA: `78a0caee9d8fef38f457b9f376671cefc30080232cf5cc61a3b4867b088f1098`.
+  Handoff: `HANDOFF-clay02.md`; builder SHA
+  `a4142814eb10db533eef2063fb4bfdca147860020a988ab6dedbe3edf1de7955`, renderer SHA
+  `4103d297e3e1aab58924e79f194b716b5026863ca025a38941bfd0d9cffd2a8f`.
+  Four fixed views are under `clay-02/renders/`; execution passed but visual review failed.
   Clay-01 was built/eight views rendered by `/root/titanichthys_clay_execution` (Terra medium).
   Root and author rejected completed form: annular scoop mouth/undifferentiated forehead,
   oversized moving ventral wall, scalloped plate incisions, periodic posterior washboard,
@@ -54,10 +68,15 @@ send creative fixes to Terra. Preserve script hashes and candidates between revi
   Source: `tools/devonian/creatures/titanichthys/rework-v3/`.
   Outputs: `../devonian-authoring/titanichthys/rework-v3/clay-01/` (images in `renders/`).
   Blend SHA: `0ac6cdef7578f0fe7270673a5348a620d1d88a33a1b055a96eb29407fd1ac4bf`.
-- Both Terra executors are idle after successful handoffs. Use them for the next frozen scripts.
+- `/root/devonian_execution_handoff` — Terra medium; completed Gemuendina material-01, now runs
+  Coccosteus frozen clay-01 build, new renders and old backup comparison renders.
+  Use Terra executors for the next frozen scripts.
   Wait for HASH-BOUND handoff from each Astra author, execute with --python-exit-code 1,
   return actual images to the author/root for review. No public replacement yet.
-- Coccosteus has a saved preproduction brief in its `rework-v3/design.md`; no builder yet.
+- `/root/coccosteus_rework_design` — Astra high; first clay source frozen, awaiting actual
+  comparison images from Terra. `rework-v3/HANDOFF.md` binds three groups and ten images.
+  Builder SHA: `7e91fe87c5ae33c67aa4aa747cc74d59e65d31919ccf037e2f8c080011911e3d`.
+  Its preproduction brief is `rework-v3/design.md`.
   TUG 1817-152 identity verified in institutional catalogue, detailed record unavailable.
   Avoid repeating the lookup. Doryaspis/Bothriolepis/Stethacanthus/Odaraia authors not started.
 
