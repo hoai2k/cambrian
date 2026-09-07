@@ -2,11 +2,11 @@
   "doryaspis": [
     {
       "name": "anchor_mouth",
-      "bone": "oral",
+      "bone": "shield",
       "point": [
         0,
-        -1.355,
-        0.08
+        -0.953,
+        0.116
       ],
       "role": "mouth"
     },
@@ -14,9 +14,9 @@
       "name": "anchor_mouth_inside",
       "bone": "shield",
       "point": [
-        0,
-        -1.2,
-        0.015
+        0.0,
+        -0.838583767414093,
+        -0.07190670073032379
       ],
       "role": "swallow"
     },
@@ -25,8 +25,8 @@
       "bone": "shield",
       "point": [
         0,
-        -1.4,
-        -0.03
+        -1.675,
+        0.014
       ],
       "role": "attack"
     }

@@ -1,0 +1,24 @@
+# Gemuendina V2 anatomical decisions
+
+## Primary and specimen evidence
+
+- Johanson & Smith (2005), *Origin and evolution of gnathostome dentitions*, DOI https://doi.org/10.1017/S1464793104006682. The authors' published figure 13 depicts KGM 1983/306, /308 and /307, including denticulated infragnathals. Their comparison records some transverse organization of small lower-jaw denticles; it does not justify adding arthrodire cutting blades. Figure and article context inspected via the coauthor's upload: https://www.researchgate.net/figure/Gemuendina-stuertzi-Rhenanida-A-B-KGM-1983-306-C-KGM-1983-308-D-KGM-1983-307_fig7_7820947 .
+- Südkamp (2021), *Ikonen des Hunsrückschiefers*, Fossilien 5/2021, pp.17–18. The author illustrates a near-complete 304 mm dorsal specimen from Untereschenbach, collection Gregor Beicht, and a newly prepared ventral specimen from Eschenbach, collection Christoph Leins. These direct specimen observations support trunk tubercles and comparatively weak/absent pectoral tubercles. The text describes a tapering finless tail and, following Gross, dorsal branchial exits and an upward mouth. Detailed trunk surfaces remain difficult to interpret because of phosphatic covering. https://www.bundenbach-fossilien.de/Literatur/2021_S%C3%BCdkamp_Ikonen.pdf . Reference PDF and inspected pages remain local, not game textures.
+- Westoll (1967), *Radotina and other tesserate fishes*, DOI https://doi.org/10.1111/j.1096-3642.1967.tb01397.x. His comparative Gemuendina interpretation identifies retained cranial elements amongst tesserae. The historical plate-homology proposals are not treated as an exact species plate map. Accessible abstract and indexed article text were consulted; no claim is made to have inspected unavailable full-resolution plates.
+- Gross (1963), *Gemuendina stuertzi Traquair. Neuuntersuchung*, Notizblatt Hessisches Landesamt für Bodenforschung 91:36–73, is the original detailed redescription cited by these studies. Its full text was not accessible in this session, so specific observations are attributed to the later inspected sources, not represented as direct inspection of Gross.
+
+## Selected reconstruction
+
+The new form has a short rounded cranial wedge, dorsal eyes, an upward/subterminal mouth, fleshy broad pectoral lobes, smaller pelvic lobes and a narrow finless tail. V1's conspicuous second dorsal/caudal fins and external fin spokes are removed. Fine variable tessera relief is integrated into the true continuous head/trunk surface, with quieter fin ornament and a few broad cranial fields. The globes are placed into the head itself, with no decorative pads or orbital hoops. Small lower oral denticles are attached to the mobile jaw; number and exact arrangement are illustrative. A real recessed tissue basin has walls, floor and a posterior throat opening.
+
+Soft tissues, living thickness, pigmentation, exact fin stiffness, tessera spacing and all movements remain artistic inferences. Pectoral motion concentrates in flexible outer margins while the roots remain restrained. No modern-ray sting, ventral mouth, separate ventral gill slots or exaggerated manta-like flapping is imported. Representative display length remains 0.30m, close to the illustrated 304mm specimen, not a species maximum.
+
+## Material art
+
+New imagegen artwork supplies only a warm umber/olive pigment study. Blender bakes regional dorsal/ventral contrast, restrained irregular fin banding, tessera detail and differing roughness into UV albedo/normal/roughness maps. Full GLB uses white vertex multipliers; texture-free LOD receives linear pigment samples. See `material-provenance.md` for the exact built-in prompt and saved source path.
+
+## Parent visual-review corrections
+
+The initial V2 circular aperture was replaced by a wider, shallower transverse jaw arc, with rounded posterior commissures and a small continuous oral-margin contour. This is constrained by the paired infragnathal organization and anterior jaw region seen in the inspected specimen photographs; the exact soft aperture outline is an inference, not a traced fossil lip. The narrow preoral edge, fuller cheek cross-section and gradually tapering thickness preserve the low body plan without extruding a flat slab. Dorsal, ventral and side UV islands share one material and continuous head geometry, preserving independent eye-volume auditing while giving the sidewall appropriate texture density. Pectoral roots are buried farther into the flank and emerge through a smoothly tapering fleshy shoulder; their pigmentation transitions gradually into the outer lobes.
+
+The mobile infragnathal-bearing surface is the anterior lower-jaw arc, moving about a posterior hinge. The posterior oral wall remains associated with the head and throat. This replaces the initial draft’s incorrect posterior-lip motion.

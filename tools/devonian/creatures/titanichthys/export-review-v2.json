@@ -1,0 +1,142 @@
+{
+  "id": "titanichthys",
+  "fullColorPolicy": "White COLOR_0 multiplied by UV albedo; no duplicate pigment darkening.",
+  "lodColorPolicy": "Texture-free, atlas-sampled linear vertex pigment.",
+  "exports": [
+    {
+      "file": "public/assets/devonian/creatures/titanichthys.glb",
+      "sha256": "cf08f08f9e5932b4312ecfb3bbbd619071f81283f1318f3691fabcbc4ba5bb74",
+      "bytes": 22852728,
+      "clips": [
+        "Ability",
+        "Attack",
+        "Bite",
+        "Death",
+        "Dive",
+        "Dodge",
+        "Eat",
+        "Growth",
+        "Guard",
+        "Heavy",
+        "Hit",
+        "Idle",
+        "Parry",
+        "Rise",
+        "Stagger",
+        "Swim",
+        "TurnLeft",
+        "TurnRight"
+      ],
+      "distinctMotions": 18,
+      "materials": [
+        {
+          "material": "titanichthys accent",
+          "rgbRange": [
+            1.0,
+            1.0
+          ],
+          "baseColorTexture": true,
+          "normalizedWeights": true
+        },
+        {
+          "material": "titanichthys body",
+          "rgbRange": [
+            1.0,
+            1.0
+          ],
+          "baseColorTexture": true,
+          "normalizedWeights": true
+        },
+        {
+          "material": "titanichthys eyes",
+          "rgbRange": [
+            1.0,
+            1.0
+          ],
+          "baseColorTexture": false,
+          "normalizedWeights": true
+        },
+        {
+          "material": "titanichthys fins",
+          "rgbRange": [
+            1.0,
+            1.0
+          ],
+          "baseColorTexture": true,
+          "normalizedWeights": true
+        },
+        {
+          "material": "titanichthys oral",
+          "rgbRange": [
+            1.0,
+            1.0
+          ],
+          "baseColorTexture": true,
+          "normalizedWeights": true
+        }
+      ],
+      "rootStable": true,
+      "scaleChannels": false
+    },
+    {
+      "file": "public/assets/devonian/creatures/titanichthys.lod1.glb",
+      "sha256": "906a73ba57c3dd6a151d28555a24a0a81b29857020027c0311c6b92d2b4bbaa8",
+      "bytes": 1670344,
+      "clips": [
+        "Death",
+        "Idle",
+        "Swim"
+      ],
+      "distinctMotions": 3,
+      "materials": [
+        {
+          "material": "titanichthys accent",
+          "rgbRange": [
+            0.002670328831921874,
+            0.08247501335164416
+          ],
+          "baseColorTexture": false,
+          "normalizedWeights": true
+        },
+        {
+          "material": "titanichthys body",
+          "rgbRange": [
+            0.007980468451972228,
+            0.7142748149843595
+          ],
+          "baseColorTexture": false,
+          "normalizedWeights": true
+        },
+        {
+          "material": "titanichthys eyes",
+          "rgbRange": [
+            0.005004959182116427,
+            0.011993591210803388
+          ],
+          "baseColorTexture": false,
+          "normalizedWeights": true
+        },
+        {
+          "material": "titanichthys fins",
+          "rgbRange": [
+            0.02084382391088731,
+            0.12323186083772031
+          ],
+          "baseColorTexture": false,
+          "normalizedWeights": true
+        },
+        {
+          "material": "titanichthys oral",
+          "rgbRange": [
+            0.0026855878538185702,
+            0.08247501335164416
+          ],
+          "baseColorTexture": false,
+          "normalizedWeights": true
+        }
+      ],
+      "rootStable": true,
+      "scaleChannels": false
+    }
+  ]
+}

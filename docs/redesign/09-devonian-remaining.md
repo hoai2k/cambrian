@@ -90,7 +90,14 @@ The swim model (`src/sim/devonian/swim.ts`) makes a fish back up at a third of c
 sharply while slow or reversing, and throw itself forward on the first press of sprint. The water
 column is 64 deep (the Cambrian's is 40), swimmers hatch and wander mid-column, giant sea lilies
 and frond towers reach up into it, and a fish driving hard at the surface leaves the water and
-splashes back in. Rhinodipterus moved to rung II by size (0.4 m).
+splashes back in, throwing a sheet of spray on the way out and a crown of droplets with a foam
+ring on the way in. Rhinodipterus moved to rung II by size (0.4 m).
+
+Growth is five stages (Hatchling, Juvenile, Young, Adult, Prime), geometric: every moult multiplies
+the body by the same factor from a hatchling of at least 0.6 units (a hatchling Dunkleosteus is a
+small fish, shorter than an adult Coccosteus) to full adult size, then Prime a third bigger again.
+Death costs one stage. Every hatchling is placed inside plant cover near the nursery — a floor
+plant, or a lily crown up the column for a swimmer — never in open water.
 
 Fixed after the first Dunkleosteus play-through: the roster's speed, agility and turn were authored
 in Cambrian-sized numbers on Devonian-sized bodies, so the giants crawled (a Young Dunkleosteus at

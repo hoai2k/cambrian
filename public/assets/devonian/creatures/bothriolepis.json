@@ -2,10 +2,10 @@
   "id": "bothriolepis",
   "name": "Bothriolepis",
   "species": "Bothriolepis canadensis",
-  "provenance": "Late Devonian (Frasnian), Escuminac Formation, Miguasha, Qu\u00e9bec, Canada",
-  "description": "Low armoured antiarch with dorsal eyes, a rigid joined head and thoracic cuirass, narrow jointed dermal pectoral fins and a slender heterocercal tail.",
+  "provenance": "Late Devonian (Frasnian), Escuminac Formation, Miguasha, Quebec, Canada",
+  "description": "Angular armoured antiarch with a steep immobile head, inset dorsal eyes, a posterior dorsal crest and jointed dermal pectoral fins. A long flexible posterior carries a small dorsal fin and asymmetrical tail.",
   "lengthMeters": 0.4,
-  "modelLength": 4.079999923706055,
+  "modelLength": 4.5350000858306885,
   "locomotion": "Swim",
   "clips": [
     "Ability",
@@ -40,14 +40,14 @@
   ],
   "sources": [
     "https://www.palaeo-electronica.org/content/2014/647-3d-bothriolepis",
-    "https://www.patrimoine-culturel.gouv.qc.ca/rpcq/detail.do?id=93118&methode=consulter&type=bien"
+    "https://doi.org/10.26879/417"
   ],
   "notes": [
-    "Original artistic reconstruction, not a fossil scan; 0.40 m representative body length, not a maximum.",
-    "Head and thoracic cuirass remain rigidly joined following B\u00e9chard et al. 2014.",
-    "Paired dermal fins use restrained articulation; animations make no claim of terrestrial walking, powerful rowing or substrate anchoring.",
-    "Pigmentation, detailed living plate edges and oral soft tissues are interpretations.",
-    "Attack and Heavy are contact/brace asset gestures; Ability is a paired-fin display, with no gameplay rules.",
-    "Growth is a relaxed maturation gesture, never moulting or scale animation."
+    "Original anatomical reconstruction informed by Bechard et al. 2014 figures 2-3; not a fossil scan. Representative 0.40 m adult.",
+    "Continuous rigid cephalic/thoracic armour, steep head roof and approximately 36% armoured body length; exact living tissue thickness and pigmentation are inferred.",
+    "Dorsal eyes are placed within continuous head tissue, with no separate pads or orbital hoops; volume audit accompanies the delivery.",
+    "Pectoral segments have limited articulation, no toy ball joints, no head hinge and no terrestrial walking or rowing claim.",
+    "UV dermal detail uses an original imagegen swatch with authored anatomical seam relief; distant LOD bakes pigment into vertex colours and removes textures.",
+    "Small ventral oral folds and interior tissues are interpreted; action labels are asset compatibility gestures rather than Devonian gameplay definitions."
   ]
 }

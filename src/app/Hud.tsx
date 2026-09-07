@@ -113,11 +113,34 @@ function PlayerPanel({ p }: { p: PlayerHud }) {
       )}
       {!p.modelReady && p.alive && <p className="hint">Your creature is taking shape…</p>}
       {p.hint && p.hunterState === 'none' && p.modelReady && <p className="hint">{p.hint}</p>}
+      {/* Co-op: where a team-mate went down, and how long is left to reach them. */}
+      {p.downedAllies.map((d) => (
+        <div key={d.index} className="downed-arrow" style={{ color: d.color, transform: `rotate(${Math.atan2(d.x, -d.y) * 180 / Math.PI}deg)` }} aria-hidden>
+          <svg viewBox="0 0 24 24"><path d="M12 3 L18 15 L12 12 L6 15 Z" fill="currentColor" /></svg>
+        </div>
+      ))}
+      {p.downedAllies.length > 0 && (
+        <div className="downed-call">
+          {p.downedAllies.map((d) => (
+            <p key={d.index} style={{ ['--player' as string]: d.color }}>
+              <b>P{d.index + 1} is down</b>
+              <span>{d.progress > 0 ? 'Hold still — getting them up' : `${fmtDist(d.distance)} · reach them in ${Math.ceil(d.seconds)} s`}</span>
+              <i className="revive-bar" style={{ transform: `scaleX(${d.progress})` }} />
+            </p>
+          ))}
+        </div>
+      )}
       <div className="fade" style={{ opacity: p.fade }} />
+      {p.spectating && !p.alive && (
+        <div className="spectating"><b>SPECTATING</b><span style={{ color: p.spectating.color }}>{p.spectating.name} · {creature(p.spectating.creature).name}</span></div>
+      )}
       {!p.alive && p.fade < 0.9 && (
         <div className="dead-overlay">
-          <b>EATEN</b>
-          <span>Back in a moment… you slip down a tier.</span>
+          <b>{p.downedFor > 0 ? 'DOWN' : 'EATEN'}</b>
+          <span>{p.downedFor > 0
+            ? (p.reviveProgress > 0 ? 'Someone is getting you up…' : `Hold on — a team-mate can get you up. ${Math.ceil(p.downedFor)} s`)
+            : 'Back in a moment… you slip down a tier.'}</span>
+          {p.downedFor > 0 && <i className="revive-bar wide" style={{ transform: `scaleX(${p.reviveProgress})` }} />}
         </div>
       )}
     </>
@@ -127,9 +150,10 @@ function PlayerPanel({ p }: { p: PlayerHud }) {
 const fmtDist = (d: number) => (d < 1000 ? `${Math.round(d)} m` : `${(d / 1000).toFixed(1)} km`);
 
 /**
- * The radar: other players wherever they are, anything big enough to hurt within reach, whatever
- * is hunting you, plus home and the shore as bearings. Up is the way the camera looks. Contacts
- * further than the radar reaches sit on the rim, hollow, pointing the way.
+ * The radar: anything big enough to hurt within reach, whatever is hunting you, the nearest shoals
+ * worth eating, plus home and the shore as bearings. Up is the way the camera looks. Only the other
+ * players — and the two bearings — carry off the edge, hollow on the rim pointing the way; a
+ * creature outside the reach is simply not on the dial.
  */
 function Radar({ radar, biome }: { radar: PlayerHud['radar']; biome: string }) {
   const R = 44, C = 50;
@@ -143,6 +167,23 @@ function Radar({ radar, biome }: { radar: PlayerHud['radar']; biome: string }) {
       return <g key={k} className={cls} style={{ color: b.color }}>
         {b.beyond ? <circle cx={C + b.x * R} cy={C + b.y * R} r={3.5} fill="none" stroke="currentColor" strokeWidth="1.2" strokeDasharray="2 1.5" />
           : <circle cx={x} cy={y} r={rr} fill="currentColor" fillOpacity=".18" stroke="currentColor" strokeWidth=".9" strokeDasharray="2 1.5" />}
+      </g>;
+    }
+    if (b.kind === 'landmark') {
+      // A small hollow diamond: a place, not a creature. Drawn inline rather than as a glyph
+      // asset so an era that has no landmark artwork still gets the mark.
+      return <g key={k} className={cls} style={{ color: b.color }}>
+        <path d={`M ${x} ${y - 3.6} L ${x + 3.2} ${y} L ${x} ${y + 3.6} L ${x - 3.2} ${y} Z`} fill="none" stroke="currentColor" strokeWidth="1.3" />
+      </g>;
+    }
+    if (b.kind === 'food') {
+      // A shoal is a patch, not a pip: a soft disc the size of the school with a few bodies in it.
+      const rr = Math.max(2.5, Math.min(R * 0.5, (b.r ?? 0.05) * R));
+      return <g key={k} className={cls} style={{ color: b.color }}>
+        <circle cx={x} cy={y} r={rr} fill="currentColor" fillOpacity=".16" stroke="currentColor" strokeWidth=".7" strokeOpacity=".7" />
+        <circle cx={x} cy={y} r={1.3} fill="currentColor" />
+        <circle cx={x - rr * .45} cy={y + rr * .35} r={1} fill="currentColor" />
+        <circle cx={x + rr * .4} cy={y - rr * .4} r={1} fill="currentColor" />
       </g>;
     }
     if (b.kind === 'shore') {
@@ -162,7 +203,7 @@ function Radar({ radar, biome }: { radar: PlayerHud['radar']; biome: string }) {
   // rim contacts last so they draw over the ring
   const inside = radar.blips.filter((b) => !b.beyond), rim = radar.blips.filter((b) => b.beyond);
   return (
-    <div className="radar" aria-label={`Radar, ${Math.round(radar.range)} metre reach. ${biome}.`}>
+    <div className="radar" aria-label={`Radar, ${Math.round(radar.range)} metre reach. ${biome}. ${radar.blips.filter((b) => b.kind === 'food').length} food shoals nearby.`}>
       <svg viewBox="0 0 100 100">
         <defs><filter id={outline} colorInterpolationFilters="sRGB">
           <feMorphology in="SourceAlpha" operator="erode" radius=".7" result="inside"/>

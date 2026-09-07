@@ -24,7 +24,7 @@ export const DEVONIAN_SHIPPED = Object.keys(SHIPPED_BYTES);
  */
 export const DEVONIAN_STAND_INS: Partial<Record<DevonianCreatureId, DevonianCreatureId>> = Object.fromEntries((
   [
-    ['onychodus', 'cladoselache'], ['rhinodipterus', 'coccosteus'], ['cheirolepis', 'coccosteus'],
+    ['onychodus', 'cladoselache'], ['rhinodipterus', 'coccosteus'],
     ['tiktaalik', 'bothriolepis'], ['acanthostega', 'bothriolepis'], ['jaekelopterus', 'bothriolepis'],
     ['eldredgeops', 'bothriolepis'], ['walliserops', 'bothriolepis'], ['nahecaris', 'bothriolepis'], ['palaeoisopus', 'bothriolepis'],
     ['furcaster', 'gemuendina'], ['manticoceras', 'doryaspis'], ['michelinoceras', 'doryaspis'],
@@ -41,7 +41,7 @@ const authoredCreatures = Object.fromEntries(DEVONIAN_CREATURES.map((c) => {
 export const DEVONIAN = defineEra({
   id: 'devonian',
   title: 'Devonian Domination',
-  copy: { tagline: 'Feed. Escape. Hold your range.', taglineEm: '375 million years ago, the sea had a pecking order.', loading: 'FILLING THE BASIN…', lose: 'THE SEA WINS', settingsKey: 'devonian-settings', mobileIllustration: DEVONIAN_BRAND_EXTRAS.mobileIllustration },
+  copy: { tagline: 'Feed. Escape. Hold your range.', taglineEm: '375 million years ago, the sea had a pecking order.', loading: 'FILLING THE BASIN…', lose: 'THE SEA WINS', settingsKey: 'devonian-settings', mobileIllustration: DEVONIAN_BRAND_EXTRAS.mobileIllustration, sibling: { title: 'Cambrian Explosion', path: '', blurb: '133 million years earlier' } },
   modes: [
     { id: 'domination', name: 'Domination', blurb: 'Pick any animal, own its rung. Feed, escape, drive off rivals, hold your range. First to Dominant standing held for ninety seconds wins. Allies pool standing.', players: '1–4 co-op' },
     { id: 'foodchain', name: 'Food Chain', blurb: 'Everyone picks from a different rung. The hunter needs the prey; the prey scores by surviving the hunter. One scoreboard.', players: '2–4 versus' },
@@ -53,7 +53,7 @@ export const DEVONIAN = defineEra({
     player: 'coccosteus',
     // Delivered specimens only: these drive card and model preloading, and a creature that is still
     // borrowing a body has no portrait to load. Add each one here as its own model lands.
-    boot: ['coccosteus', 'cladoselache', 'dunkleosteus', 'bothriolepis', 'gemuendina', 'doryaspis', 'stethacanthus', 'titanichthys'],
+    boot: ['coccosteus', 'cladoselache', 'dunkleosteus', 'bothriolepis', 'gemuendina', 'doryaspis', 'stethacanthus', 'titanichthys', 'cheirolepis'],
     title: ['dunkleosteus', 'cladoselache', 'coccosteus', 'doryaspis'],
   },
   ecology: { schools: SNACK_SCHOOLS, giants: GIANTS, shadow: { creature: 'titanichthys', scale: 1.0 } },

@@ -109,15 +109,17 @@ export function createViewerScene(canvas: HTMLCanvasElement): ViewerScene {
   const M = <T extends THREE.Material>(m: T) => (materials.add(m), m);
   const seaTime = { value: 0 };
 
-  // ---- lighting: the same three lights the game sea uses, minus shadows (there is no floor) ----
-  scene.add(new THREE.HemisphereLight('#bff2ee', '#243f3b', 1.7));
+  // Balanced inspection light retains the ocean setting while keeping surface colour readable.
+  scene.add(new THREE.HemisphereLight('#e1eeed', '#53534b', 2.0));
   const sun = new THREE.DirectionalLight('#ffe9c4', 3.0);
   sun.position.set(FOCUS.x - 40, 70, FOCUS.z + 20);
   sun.target.position.copy(FOCUS);
   scene.add(sun, sun.target);
-  const fill = new THREE.PointLight('#4fc6d2', 1.2, 120, 1.2);
-  fill.position.set(20, 8, -18);
-  scene.add(fill);
+  // A distant point light contributed almost nothing at the specimen. A soft
+  // camera-side fill lets an orbit reveal the jaw interior and shaded textures.
+  const fill = new THREE.DirectionalLight('#e2eaf2', 3.5);
+  fill.target.position.copy(FOCUS);
+  scene.add(fill, fill.target);
 
   // ---- water surface ----
   const surfaceMat = M(new THREE.ShaderMaterial({
@@ -370,6 +372,8 @@ export function createViewerScene(canvas: HTMLCanvasElement): ViewerScene {
     (pGeo.attributes.position as THREE.BufferAttribute).needsUpdate = true;
 
     controls.update();
+    fill.position.copy(camera.position);
+    fill.position.y += frameRadius * .4;
     renderer.render(scene, camera);
   }
   tick();
