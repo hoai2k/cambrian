@@ -1,0 +1,93 @@
+{
+  "id": "walliserops",
+  "name": "Walliserops",
+  "species": "Walliserops trifurcatus",
+  "provenance": "Early Devonian, late Emsian Timrhanrhart Formation, Morocco",
+  "description": "Spiny asteropygine trilobite with an elevated rigid cephalic trident, broad keeled tines, long genal spines and articulated thoracic armour.",
+  "lengthMeters": 0.055,
+  "modelLength": 6.461777448654175,
+  "locomotion": "Crawl",
+  "clips": [
+    "Ability",
+    "Attack",
+    "Bite",
+    "Crawl",
+    "Death",
+    "Dive",
+    "Dodge",
+    "Eat",
+    "Growth",
+    "Guard",
+    "Heavy",
+    "Hit",
+    "Idle",
+    "Moult",
+    "Parry",
+    "Rise",
+    "Stagger",
+    "Swim",
+    "TurnLeft",
+    "TurnRight"
+  ],
+  "looping": [
+    "Idle",
+    "Crawl",
+    "Swim",
+    "Guard",
+    "Eat"
+  ],
+  "anchors": [
+    "anchor_mouth",
+    "anchor_mouth_inside",
+    "anchor_attack_primary"
+  ],
+  "artVersion": 2,
+  "artStatus": "preview",
+  "refinementNeeded": [
+    "Exact spine-root continuity, shell joint coaptation and complete limb/spine collision review remain refinement work.",
+    "No enrolled Walliserops specimen was available in the primary study; Ability is modest interpretive cephalic/stance display, not verified closed enrollment."
+  ],
+  "sources": [
+    "https://doi.org/10.1073/pnas.2119970120",
+    "https://doi.org/10.1016/j.asd.2006.08.002",
+    "https://doi.org/10.1002/spp2.1401"
+  ],
+  "notes": [
+    "Trident follows W. trifurcatus topotype UA13447 and HMNS PI1810 specimen figures, with flattened keeled tines and slight bifurcation asymmetry. It stays rigidly attached to cephalon.",
+    "Eleven thoracic tergites and five paired plus one terminal pygidial marginal processes; finer spine arrangement/proportions need specimen-overlay refinement.",
+    "Ventral appendages, oral tissues, 82 lens solids per side and living pigmentation are comparative artistic reconstruction, not measured W. trifurcatus soft anatomy.",
+    "Primary contact anchor is on the trident; actual feeding aperture and swallow anchor are under cephalon. Combat function is a hypothesis, not settled fossil behavior.",
+    "Representative 5.5cm shell length is illustrative, not species maximum; trident extends total model bounds.",
+    "Twenty compatibility actions include unscaled Growth and Moult preparation without a detached shell. Swim is limb-powered compatibility, not evidence of habitual swimming."
+  ],
+  "eyes": [
+    {
+      "variant": "full",
+      "assetSha256": "672d7d09cb75c3ca614162719d3b0d5f08780bd4aa00e512653f50a2ff2aae08",
+      "ocularInsidePercent": [
+        100.0,
+        100.0
+      ],
+      "lensCount": 164,
+      "minimumIndividualLensInsidePercent": 73.6740390809534,
+      "minimumConservative95LowerPercent": 72.39000839352624,
+      "allIndividualLensesTarget65": true,
+      "ocularReport": "/Users/hoai/Documents/Stuff/Generations/cambrian/local/devonian-authoring/walliserops/v2/audit-full/report.json",
+      "lensReport": "/Users/hoai/Documents/Stuff/Generations/cambrian/local/devonian-authoring/walliserops/v2/audit-full/lens-report.json"
+    },
+    {
+      "variant": "lod",
+      "assetSha256": "ddb9e6f41dfa1a4fe0e54e8c8bc4e82c0c0b825d9730a01bde3930bdd4d2212d",
+      "ocularInsidePercent": [
+        100.0,
+        100.0
+      ],
+      "lensCount": 164,
+      "minimumIndividualLensInsidePercent": 73.65256602963281,
+      "minimumConservative95LowerPercent": 72.36822215595386,
+      "allIndividualLensesTarget65": true,
+      "ocularReport": "/Users/hoai/Documents/Stuff/Generations/cambrian/local/devonian-authoring/walliserops/v2/audit-lod/report.json",
+      "lensReport": "/Users/hoai/Documents/Stuff/Generations/cambrian/local/devonian-authoring/walliserops/v2/audit-lod/lens-report.json"
+    }
+  ]
+}
