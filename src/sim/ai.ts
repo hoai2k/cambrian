@@ -29,6 +29,15 @@ export function makeBrain(kind: BrainState['kind'], home: Vec3, rng: Rng, opts: 
 
 const scratchDir = v3();
 
+/**
+ * How far past the edge of its patch an animal will take an argument, as a multiple of the patch
+ * radius. A little, so an intruder hovering on the line does not make it flicker between charging
+ * and turning back — and no further, whatever it has left in the tank.
+ */
+const TERRITORY_LEASH = 1.15;
+/** The goals that chase something. Fleeing and feeding are not leashed to the patch. */
+const PURSUITS = new Set<BrainState['goal']>(['defend', 'fight', 'hunt']);
+
 function steerToward(a: Actor, target: Vec3, out: InputFrame, speedWanted = 1) {
   const d = sub(target, a.pos);
   if (!creature(a.creature).ground) {
@@ -277,6 +286,18 @@ export function thinkNeeds(g: AiWorld, a: Actor, b: BrainState, dt: number): Inp
     }
   }
 
+  // Holding ground is a leash on every pursuit, not only on driving an intruder out. An animal
+  // with a patch goes a little past its edge and no further: once the argument leaves the patch it
+  // turns for home whatever its stamina, because an animal that chased across the reef would not
+  // be holding anything. Fleeing is never leashed — running off your own ground is the point.
+  if (b.territory && b.territoryR > 0 && PURSUITS.has(b.goal)) {
+    const leash = b.territoryR * TERRITORY_LEASH;
+    const quarry = b.target >= 0 ? g.byId(b.target) : undefined;
+    if (!quarry || !isAlive(quarry) || distXZ(quarry.pos, b.territory) > leash) {
+      b.goal = 'wander'; b.target = -1; b.goalT = 0; b.wanderTo = { ...b.territory };
+    }
+  }
+
   const t = b.target >= 0 ? g.byId(b.target) : undefined;
   if(a.hideMode === 'burrowed' && b.goal !== 'flee') out.ability = true;
   switch (b.goal) {
@@ -316,14 +337,9 @@ export function thinkNeeds(g: AiWorld, a: Actor, b: BrainState, dt: number): Inp
       // going in is always the player's own decision.
       const home = b.territory;
       if (!t || !isAlive(t) || !home) { b.goal = 'wander'; b.target = -1; b.goalT = 0; break; }
-      const out2 = distXZ(t.pos, home);
-      // A little past the edge before it gives up, so an intruder hovering on the line does not
-      // make it flicker between charging and turning back.
-      if (out2 > b.territoryR * 1.15 || b.goalT > 22) {
-        b.goal = 'wander'; b.target = -1; b.goalT = 0;
-        b.wanderTo = { ...home };
-        break;
-      }
+      // The intruder leaving the patch is handled by the shared leash above; this is the animal
+      // simply running out of patience with one that will not leave.
+      if (b.goalT > 22) { b.goal = 'wander'; b.target = -1; b.goalT = 0; b.wanderTo = { ...home }; break; }
       const d = dist(a.pos, t.pos);
       const reach = L * 0.7 + lengthOf(t) * 0.35;
       const to = norm(sub(t.pos, a.pos));
@@ -442,6 +458,13 @@ export function thinkNeeds(g: AiWorld, a: Actor, b: BrainState, dt: number): Inp
       steerToward(a, b.wanderTo, out, 0.55);
       break;
     }
+  }
+  // ...and the same leash on the steering, so no goal can walk the animal off its ground by
+  // degrees. Past the edge it heads home at a cruise; a sprint is for crossing your own water.
+  if (b.territory && b.territoryR > 0 && PURSUITS.has(b.goal) && distXZ(a.pos, b.territory) > b.territoryR * TERRITORY_LEASH) {
+    const home = norm(sub(b.territory, a.pos));
+    out.worldMove = { x: home.x, y: 0, z: home.z };
+    out.burst = 0;
   }
   return out;
 }

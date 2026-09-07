@@ -106,7 +106,9 @@ function withNeighbour(opts: Parameters<typeof makeBrain>[3], gap: number, seed 
   // it should also still be alive and not have chased across the sea over a long stretch
   let furthest = 0;
   for (let i = 0; i < 60 * 20; i++) { run(g, 1); furthest = Math.max(furthest, distXZ(n.pos, home)); }
-  check('...and stays on its ground for good', isAlive(n) ? furthest < R * 1.6 : true, `furthest ${furthest.toFixed(0)}m over 20 s`);
+  // The leash is the contract, not stamina: it goes a little past the edge of the patch and turns
+  // round, however much it has left to sprint on.
+  check('...and stays on its ground for good', isAlive(n) ? furthest < R * 1.3 : true, `furthest ${furthest.toFixed(0)}m over 20 s, patch is ${R}m`);
 }
 
 // --- appetite: the same reef hunts far more at dusk than at noon ---
