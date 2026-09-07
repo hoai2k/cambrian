@@ -362,7 +362,7 @@ export const DEVONIAN_RULES: EraRules = {
     const p = g.players[i]; if (!p || !isAlive(p)) return undefined;
     const d = devActor(g, p), def = creature(p.creature), rung = rungOf(p);
     if (d.deadZoneIn && def.breathing !== 'air') return 'Dead water. Get out of it, or up to the surface if you can breathe.';
-    if (def.breathing === 'air' && d.air < AIR_LOW) return 'Air is low. RB to the surface and gulp.';
+    if (def.breathing === 'air' && d.air < AIR_LOW) return 'Air is low. {rise} to the surface and gulp.';
     if (g.time < 12) return rung === 1 ? 'Feed, hide, moult. Escaping a hunter is worth more than anything you can eat.' : rung === 2 ? 'Feed and keep your shoal. Losing a hunter scores.' : rung === 3 ? 'Hunt the shoal, drive off your rivals, hold your range.' : 'Stay fed. The sea is hiding from you.';
     if (d.standing > 20 && !d.inRange && rung >= 3) return 'Hold ground with nobody of your rung above you: range scores.';
     if (def.shell && g.time < 40) return 'Sprint jets you backward. Rise and sink are free. Block withdraws into the shell.';
