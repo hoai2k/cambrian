@@ -1,58 +1,78 @@
-# Gemuendina stuertzi
+# Gemuendina stuertzi — V2 source
 
-Dedicated reconstruction for the Devonian specimen collection. This is an art asset with compatibility animation names; it does not prescribe gameplay.
+Dedicated Early Devonian rhenanid reconstruction for the specimen collection. Compatibility action names describe animation gestures; they do not prescribe gameplay. V2 candidates remain in the local authoring directory until visual approval.
 
-## Anatomy and reconstruction
+## Anatomy and evidence
 
-The low head and trunk, broad pectoral fans and narrow posterior silhouette follow the rhenanid body plan. Eyes and the recessed oral aperture face dorsally. Small individual tesserae cover the upper body and fins, with dark flexible seams between them; there is no arthrodire-style cuirass. Orbital rims and oral margins have larger reinforcing elements. Paired posterior fins and small median fins distinguish this from a modern stingray. No ventral ray mouth, spiracles or sting is present.
+This rebuild uses a continuous low cranial wedge and axial trunk, broad fleshy pectoral lobes, smaller paired pelvic lobes, dorsal eyes and an upward, broad shallow oral aperture with a continuous attached margin. The long posterior tapers without a median or caudal fin. There are no external fin spokes, decorative eye pads, orbital hoops, separate ventral gill rows or sting. Small irregular tessera boundaries are integrated into the continuous body surface; cranial fields and fin ornament differ from the trunk rather than repeating identical hexagons everywhere.
 
-The surface uses bespoke lofts, projected tesserae and closed fin surfaces with vertex pigmentation. A reproducible seeded 512-pixel normal map supplies fine skin relief; it is an authored texture rather than fossil colour evidence. Teal and olive mottling, pale ventral skin and dark reflective eyes are artistic decisions. Fin struts, tail details, tessera size regularity, soft oral tissues and movement are reconstructions. The representative length is 0.30 m, not a species maximum.
+The oral basin has actual walls, a floor sloping into a narrow posterior throat, a weighted anterior lower-jaw arc and attached low-relief lower-jaw denticles. Exact soft tissue and denticle arrangement are reconstruction choices. The eyes penetrate the real continuous head; independent exported-geometry volume reports exclude oral lining, branchial lips and ornament from the head enclosure.
 
-Sources consulted:
+Primary and specimen references:
 
-- [Wilkin (2023), The Hunsrück Slate Konservat-Lagerstätte](https://onlinelibrary.wiley.com/doi/full/10.1111/gto.12426), for locality, flattened body, pectoral form and upward eye/oral orientation. Its unrelated general evolutionary statements are not used.
-- [AMNH specimen cast ptc-5860](https://digitalcollections.amnh.org/archive/Gemuendina-stuertzi--rhenanid-placoderm-from-the-Early-Devonian-of-Hunsruck--Budenbach--Germany--cast---about-400-million-years-old-2URM1THI7W9X.html), museum fossil record and occurrence.
+- [Johanson & Smith (2005), Origin and evolution of gnathostome dentitions](https://doi.org/10.1017/S1464793104006682), figure 13 and associated specimen discussion: Gemuendina infragnathals bear small denticles with some transverse organization. No arthrodire cutting blades are added. The coauthor-hosted figure caption/article context was accessible; publisher full text was restricted.
+- [Südkamp (2021), Ikonen des Hunsrückschiefers](https://www.bundenbach-fossilien.de/Literatur/2021_S%C3%BCdkamp_Ikonen.pdf), pp.17–18 and figures 18–19: illustrated dorsal and newly prepared ventral specimens; tapering finless tail, trunk tubercles and comparatively weak/absent pectoral tubercles. The account follows Gross for upward mouth and dorsal branchial exits. Phosphatic coatings limit fine surface interpretation.
+- [Westoll (1967), Radotina and other tesserate fishes](https://doi.org/10.1111/j.1096-3642.1967.tb01397.x), comparative interpretation of retained cranial elements amongst tesserae. Historical homology proposals do not establish an exact armour map here. Accessible abstract/indexed text was read, not unavailable full-resolution plates.
+
+Gross (1963), the original detailed redescription, was not directly accessible and is cited only through the inspected later authors. See `anatomy-notes-v2.md` for specimen identifiers, access limits and inference boundaries. Representative length 0.30 m follows the illustrated 304 mm animal; it is not a claimed species maximum. Living thickness, pigmentation, fin stiffness, oral tissues and all movement remain artistic inference.
+
+## Materials
+
+Original imagegen pigment art supplies warm umber/olive mottling, not anatomical evidence. Bespoke UV maps combine that art with coherent regional colour, fine variable tessera relief, restrained fin pattern and differing roughness. The head/body use planar dorsal/ventral islands and a separate side strip in the same atlas to avoid snout pole streaks and sidewall stretching. No glossy coat is applied to body, fins or mouth; the globes retain a wet reflection. All mapped materials have albedo, normal and roughness textures. Full GLB vertex multipliers are neutral white; the texture-free LOD receives baked linear pigment. This explicitly avoids multiplying pigment twice in Three.js.
+
+`material-provenance.md` preserves the exact prompt and original image location. `integument-source.png` is the saved original; the nine baked PNG maps are reproducible using `materials_v2.py`.
 
 ## Rig and motion
 
-The root remains at identity. A subordinate body bone carries local gestures. Skull, jaw, throat and paired branchial margins move independently. Three longitudinal rows of paired pectoral bones, each with a distal bone, transmit a front-to-rear undulation while the tail's four bones contribute a smaller travelling wave. Pelvic, dorsal and caudal fin bones supply secondary motion. The three exported anchor objects have nested `cambrianAnchor` metadata and anatomical bone parents. Their exact local transforms are patched using inverse exported bind matrices, preserving the binary buffer.
+A stable identity root contains the subordinate body, skull, jaw, throat, four sequential tail bones and the final tail-tip bone (historically named `caudal`, with no caudal fin geometry). Each pectoral has three longitudinal proximal/distal pairs. Pelvic and branchial margins move independently. Pectoral waves travel rearward with delayed tips, while fin roots blend into body weighting. Asymmetric banking, anticipation, contact and recovery distinguish the one-shot clips.
 
-| Clip | Seconds | Intent |
+| Clip | Seconds | Specimen gesture |
 | --- | ---: | --- |
-| Idle | 2.4 | Gentle fin-edge ripple and branchial ventilation |
-| Swim | 2.4 | Travelling pectoral undulation with delayed tail follow-through |
-| TurnLeft / TurnRight | 1.6 | Asymmetric pectoral banking and curved tail |
+| Idle | 2.4 | Gentle pectoral-edge ripple, tail follow-through and ventilation |
+| Swim | 2.4 | Stronger travelling pectoral wave with delayed tail |
+| TurnLeft / TurnRight | 1.6 | Asymmetric pectoral banking and curved posterior |
 | Dive / Rise | 1.4 | Coordinated pitch and fin steering |
-| Attack | 1.0 | Depress, lift toward overhead target, then settle |
-| Bite | 0.5 | Dorsal oral aperture opening and posterior lip closing |
-| Heavy | 1.1 | Stronger anticipatory crouch, upward oral lift and fin recovery |
-| Hit | 0.6 | Single brief recoil |
-| Death | 1.6 | Fin activity fades and the animal settles into a held sideways slump |
-| Guard | 1.0 | Low posture with cupped fin margins and ventilation |
-| Parry | 0.35 | Short bank and lateral deflection |
-| Dodge | 0.4 | Asymmetric fin push and lateral body slip |
+| Attack | 1.0 | Anticipatory lowering, upward oral reach, recovery |
+| Bite | 0.5 | Brief lower-jaw opening and closing |
+| Heavy | 1.1 | Deeper crouch, stronger upward oral lift and fin recovery |
+| Hit | 0.6 | Brief lateral recoil and correction |
+| Death | 1.6 | Activity fades into a held sideways slump |
+| Guard | 1.0 | Low posture, cupped margins and ventilation |
+| Parry | 0.3333 | Short bank and lateral deflection; quantized to 10 frames at 30 fps |
+| Dodge | 0.4 | Asymmetric fin push and lateral slip |
 | Eat | 1.6 | Repeated upward oral and throat cycle |
-| Stagger | 1.2 | Two diminishing corrective body movements |
+| Stagger | 1.2 | Two diminishing corrective movements |
 | Ability | 2.4 | Sustained upward feeding lift with spread fins |
-| Growth | 1.5 | Relaxed fin extension and ventilation, without scaling or moulting |
+| Growth | 1.5 | Fin extension and ventilation without scaling or moulting |
 
-Idle, Swim, Guard and Eat are seamless loops. Other clips recover their starting pose, apart from Death, which holds the terminal pose. No action animates scale.
+Idle, Swim, Guard and Eat loop seamlessly. Other clips recover their start pose except Death, whose terminal pose is held. No scale or root channels are exported. The three bone-parented sockets are `anchor_mouth`, `anchor_mouth_inside`, and `anchor_attack_primary`, with nested versioned `cambrianAnchor` metadata. Full/LOD skeleton and anchor graphs match.
 
-## Reproduce
+## Reproduce and inspect
 
-From the repository root, with Blender installed:
+Run from the repository root:
 
 ```sh
 /Applications/Blender.app/Contents/MacOS/Blender --background --threads 2 --python tools/devonian/creatures/gemuendina/build.py
-/Applications/Blender.app/Contents/MacOS/Blender --background --threads 2 --python tools/devonian/creatures/gemuendina/detail-review.py
-python3 tools/devonian/creatures/gemuendina/review.py
-node tools/devonian/check.mjs gemuendina
+/Applications/Blender.app/Contents/MacOS/Blender --background --threads 2 --python tools/devonian/creatures/gemuendina/review-source.py
+node tools/devonian/creatures/gemuendina/audit-candidate.mjs
+/Applications/Blender.app/Contents/MacOS/Blender --background --threads 2 --python tools/devonian/eye-audit.py -- ../devonian-authoring/gemuendina/eye-audit-full
+/Applications/Blender.app/Contents/MacOS/Blender --background --threads 2 --python tools/devonian/eye-audit.py -- ../devonian-authoring/gemuendina/eye-audit-lod
+python3 tools/devonian/creatures/gemuendina/check-export.py
+node tools/devonian/creatures/gemuendina/review-viewer.mjs
 ```
 
-The builder saves original Blender source and review intermediates to `../devonian-authoring/gemuendina/`; `DEVONIAN_AUTHORING` can override that directory. It exports full and reduced geometry with matching skeletons and sockets, followed by four matching portraits. Its locally included infrastructure is adapted from the Titanichthys authoring utility; it never imports another creature builder or writes another creature's files.
+The builder defaults to `../devonian-authoring/gemuendina/candidate/`; it does not replace public files. Set `GEMUENDINA_OUTPUT` explicitly to change the export destination. `DEVONIAN_AUTHORING` changes the editable-source/review directory. `GEMUENDINA_EXPORT_ONLY=1` skips portrait rendering while iterating. The normal build saves an editable `.blend`, full/LOD GLBs, metadata and four matching PNG portraits. V1 assets and source remain preserved under the local `v1/` directory.
 
-The LOD is decimated by material to 28% before export and retains Idle, Swim and Death. Integration may compress both GLBs losslessly. `validation.json` records geometry counts, finite sampled deformation bounds, root/channel invariants and loop seam differences. `action-review.jpg` presents nine action/angle renders, and the original PNGs remain beside the Blender source.
+The actual Three.js reviewer requires the repository dev server, defaults to port 5173, and intercepts only Gemuendina GLB requests with local candidate bytes. It reviews all 18 clips, extra action phases, neutral front/side/dorsal/eye/oral views and LOD, while invoking the shared runtime socket/rig audit. `QA_BASE_URL` can override the server. `validation.json` reports geometry/weights/seams/bounds. `export-review-v2.json` verifies exported colour multiplication, constant root/scale and distinct animations. Final visual approval is reported separately; structural validity alone is not art approval.
 
-Structural intake passed: 94,320 full triangles, 26,404 LOD triangles (28.0%), 28 matching skeleton joints, 18 unique dynamic clips, three valid matching bone-parented sockets, normalized skin weights, stable root and no animated scale. Portrait dimensions and alpha passed. The intake report was directed to the creature’s local authoring directory to avoid changing the shared integration report.
+## Frozen V2 handoff
 
-Visual review corrected angular fin outlines and narrowed the distal tail tesserae to fit the taper. Additional dorsal, ventral and mouth/armour views are saved with the source; the dorsal review uses a wider frame to include the complete animal.
+The final local candidate contains 137,612 full triangles and 38,525 LOD triangles, 26 matching bones, three matching sockets, 18 full actions and three LOD actions. All four loop seams pass; root and scale remain stable. Full GLB is 15,288,252 bytes; LOD is 2,210,844 bytes before parent packaging.
+
+Independent full-eye penetration is 82.350% / 82.334%, with conservative lower 95% bounds 82.047% / 82.031%. LOD penetration is 82.425% / 82.721%, with lower bounds 82.118% / 82.414%. All four eyes receive unambiguous PASS, valid closed-head topology and positive mouth-cap clearance greater than 0.0204 model units. The final globes were moved laterally 0.03 units for clearance while retaining the same seated cheek contour; no orbital geometry was added.
+
+`final-review-v2.json` and the local `frozen-v2-manifest.json` identify exact asset hashes, audit results, source Blender file and actual-GLB playback. `eye-audit-full-v2.json`, `eye-audit-lod-v2.json`, `runtime-review-v2.json`, and `export-review-v2.json` preserve the independent checks. Eye/oral/side source close-ups are committed with this authoring source. The local `viewer-v2/` folder contains 48 final actual-GLB pose renders and an all 18-action WebM recording. Public V1 assets were hash-verified unchanged at handoff; the parent handles packaging, main-viewer inspection and integration.
+
+## Integrated release review
+
+The parent independently checked the final losslessly packaged full and reduced GLBs; `eye-packaged-review.json` records their exact hashes and containment results. Both specimens passed the shared asset/anchor checks and the built main viewer loaded all eighteen actions without browser errors. Paused action selection, frame stepping, feeding and terminal Death poses were inspected. Final matching portraits and the refreshed specimen catalogue accompany these assets. Editable Blender sources and extended visual recordings remain under `cambrian/local/devonian-authoring/`.

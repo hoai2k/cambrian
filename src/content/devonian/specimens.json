@@ -152,20 +152,26 @@
     ],
     "sources": [
       {
-        "title": "Wilkin (2023), The Hunsrück Slate Konservat-Lagerstätte",
-        "url": "https://onlinelibrary.wiley.com/doi/full/10.1111/gto.12426",
-        "doi": "10.1111/gto.12426"
+        "title": "Johanson and Smith (2005), Origin and evolution of gnathostome dentitions",
+        "url": "https://doi.org/10.1017/S1464793104006682",
+        "doi": "10.1017/S1464793104006682"
       },
       {
-        "title": "American Museum of Natural History, Gemuendina stuertzi specimen cast, ptc-5860",
-        "url": "https://digitalcollections.amnh.org/archive/Gemuendina-stuertzi--rhenanid-placoderm-from-the-Early-Devonian-of-Hunsruck--Budenbach--Germany--cast---about-400-million-years-old-2URM1THI7W9X.html"
+        "title": "Südkamp (2021), Ikonen des Hunsrückschiefers, illustrated specimens pp.17–18",
+        "url": "https://www.bundenbach-fossilien.de/Literatur/2021_S%C3%BCdkamp_Ikonen.pdf"
+      },
+      {
+        "title": "Westoll (1967), Radotina and other tesserate fishes",
+        "url": "https://doi.org/10.1111/j.1096-3642.1967.tb01397.x",
+        "doi": "10.1111/j.1096-3642.1967.tb01397.x"
       }
     ],
     "notes": [
-      "Low body, broad pectoral fins, upward-directed eyes and oral opening reflect fossil morphology; small unfused armouring tesserae are differentiated from arthrodire shield plates.",
-      "Tail outline, fin thickness, pigmentation and exact soft oral tissues are reconstruction choices. No modern-ray sting, ventral mouth or spiracles have been added.",
-      "0.30 m is a representative reconstructed animal, not a claimed species maximum.",
-      "Animations visualize plausible fin undulation and upward feeding; compatibility action names do not define Devonian gameplay. Fine ray struts are inferred support structures, not individually fossil-mapped."
+      "Broad low rhenanid form, upward eye/oral orientation, small lower-jaw denticles and regional differences in dermal ornament follow inspected fossil discussions.",
+      "A finless tapering tail follows the illustrated specimen account; generic shark dorsal/caudal fins, fin spokes, ventral gill rows and sting are omitted.",
+      "Living thickness, soft-tissue cavity, exact denticle/tessera arrangement, fin flexibility, pigmentation and motions are explicit reconstruction choices.",
+      "0.30 m is a representative reconstructed length close to the illustrated 304 mm specimen, not a claimed species maximum.",
+      "All action names are compatibility labels for specimen gestures; no Devonian gameplay rules are prescribed."
     ]
   },
   {
@@ -173,8 +179,8 @@
     "name": "Doryaspis",
     "species": "Doryaspis nathorsti",
     "category": "creature",
-    "provenance": "Early Devonian, Wood Bay Formation, Svalbard; coastal deposits with continental input",
-    "description": "Small jawless fish with a broad ridged shield, fixed lateral cornual extensions, a slender ventral pseudorostrum and a flexible downward-weighted tail.",
+    "provenance": "Early Devonian, Wood Bay Formation, Spitsbergen, Svalbard",
+    "description": "A jawless fish with a flat dorsal headshield, deep ventral armour, short fixed pseudorostrum and laterally extended rigid cornual plates; flexible scaled posterior with a hypocercal tail.",
     "model": "assets/devonian/creatures/doryaspis.glb",
     "lod": "assets/devonian/creatures/doryaspis.lod1.glb",
     "image": "assets/devonian/creatures/doryaspis.thumb.png",
@@ -186,25 +192,15 @@
       "Eat"
     ],
     "sources": [
-      {
-        "title": "Pernègre (2002), genus revision and first complete caudal fin",
-        "url": "https://www.tandfonline.com/doi/abs/10.1671/0272-4634%282002%29022%5B0735%3ATGDWHF%5D2.0.CO%3B2"
-      },
-      {
-        "title": "Botella et al. (2024), Delta wing design in earliest nektonic vertebrates",
-        "url": "https://www.nature.com/articles/s42003-024-06837-8"
-      },
-      {
-        "title": "Purnell (2002), Feeding in extinct jawless heterostracan fishes",
-        "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC1690863/"
-      }
+      "https://doi.org/10.1038/s42003-024-06837-8",
+      "https://doi.org/10.1671/0272-4634(2002)022[0735:TGDWHF]2.0.CO;2",
+      "https://www.app.pan.pl/archive/published/app07/app07-249.pdf"
     ],
     "notes": [
-      "Broad rigid flattened shield with fixed cornual plates, ventral pseudorostrum and hypocercal tail; no invented paired fins or hinged jaws.",
-      "Mouth lies above the pseudorostrum base, not at its tip. Oral soft tissue and opening depth are reconstruction choices.",
-      "Pseudorostrum function and diet remain uncertain. Bite/Eat are small oral pulses; Attack and Heavy are compatibility-labelled contact/withdrawal gestures, not evidence of predatory sword use.",
-      "Pigmentation, scale relief, precise soft tissues and motion are artistic inference. Representative length 0.20 m is an illustrative individual, not a maximum.",
-      "Only the posterior body and caudal fin generate locomotor flexion; fixed shield extensions do not flap. Growth is a relaxed trim and tail extension with no scaling."
+      "Original reconstruction, not a scan; head/projection/tail proportions guided by the D. nathorsti reconstruction in Botella et al. 2024 supplementary figure 1b.",
+      "Living pigmentation, exact soft-tissue lining and action timing are artistic interpretation.",
+      "No jaws, paired fins, hinged cornua, or moving pseudorostrum; action labels retain runtime compatibility.",
+      "Enlarged authoring coordinates; lengthMeters is the representative ecological size and modelLength supports runtime normalization."
     ]
   },
   {
