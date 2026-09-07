@@ -63,3 +63,10 @@ asset namespaces using a test-only alternative path configuration. Existing worl
 audio, palette and portrait tests cover the shared consumers. During this refactor, seeded 300-step
 matches in Rise, Reef, Frenzy and Hunted produced identical serialized actor/progress/state hashes
 before and after the move; the complete creature definitions also matched exactly.
+
+## Devonian design proposal
+
+The [Devonian roster and ecosystem proposal](07-devonian-design.md) suggests 21 mobile animals,
+species-bounded growth and different roles in a persistent food web. It is design only. Its diet,
+progression, interaction geometry and regional-scenario requirements extend beyond the current
+content boundary; adding definitions alone will not implement those mechanics.

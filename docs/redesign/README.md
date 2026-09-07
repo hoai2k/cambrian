@@ -11,8 +11,9 @@ and the procedural environment.
 | [02 · Technical plan](02-technical-plan.md) | Architecture, simulation and combat data model, AI tiers, world streaming, rendering and LOD, input bindings, animation strategy without new art, milestones, testing, risks. |
 | [03 · Expanded creature roster](03-creature-expansion.md) | The 13 additions: feeding routes, abilities, anatomy, animation contract and references. |
 | [04 · The endless sea](04-infinite-ocean.md) | The shoreline, nine biomes banded by distance from it with danger levels and moods, chunk streaming, the teleport menu and the radar. Supersedes the bounded shelf in 01. |
-
 | [05 · Hiding and native combat](05-hiding-and-combat.md) | Current heavy/block mapping, Y burrowing and camouflage, energy costs, idle sinking and verification. |
+| [06 · Era content boundary](06-era-content.md) | Implemented configuration boundary for future content packs; Cambrian remains the only available era. |
+| [07 · Devonian design proposal](07-devonian-design.md) | Proposed 21-animal roster, persistent food-web roles, bounded growth, regional ecosystems and distinct locomotion. Design only. |
 
 Start with the design doc if you want the game; start with the technical plan
 if you want to build it. The audit is the shared set of facts both rely on, and
@@ -66,5 +67,3 @@ holds:
 - The controller layout in the design and technical plans. The shipped bindings
   are different — see the note in each doc, and `readGamepad()` in
   `src/input/input.ts`, which is the authority.
-
-- [Era content boundary](06-era-content.md): implemented internal preparation for additional eras; Cambrian is still the only available content pack.
