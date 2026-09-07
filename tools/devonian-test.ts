@@ -15,7 +15,7 @@ import { createAssetPaths } from '../src/content/asset-paths';
 selectEra(DEVONIAN);
 const { Game } = await import('../src/sim/game');
 const { RULES } = await import('../src/sim/era-rules');
-const { stateFor, devActor, stageScale, ADULT_STAGE, PRIME_STAGE, STAGE_AT } = await import('../src/sim/devonian/state');
+const { stateFor, devActor, stageScale, ADULT_STAGE, PRIME_STAGE, STAGE_AT, HOLD_TO_WIN } = await import('../src/sim/devonian/state');
 const { coverAt } = await import('../src/sim/world');
 const { bandOf, isAlive, lengthOf } = await import('../src/sim/actors');
 const { PLAYABLE } = await import('../src/sim/creatures');
@@ -36,7 +36,7 @@ const ok = (cond: unknown, msg: string) => { assert.ok(cond, msg); passes++; };
 
 // ---- the pack ----
 ok(DEVONIAN.creatures.length === 21, 'roster is the 21 subjects of the brief');
-ok(DEVONIAN.modes.map((m) => m.id).join() === 'domination,foodchain,hunted,reef', 'modes in selection order');
+ok(DEVONIAN.modes.map((m) => m.id).join() === 'rise,domination,foodchain,hunted,reef', 'modes in selection order, Survival first as the default');
 for (const r of [1, 2, 3, 4]) ok(DEVONIAN.creatures.some((c) => c.rung === r), `rung ${r} has at least one animal`);
 const paths = createAssetPaths(DEVONIAN);
 for (const id of DEVONIAN_SHIPPED) {
@@ -505,8 +505,53 @@ ok(RULES !== undefined && !RULES.growthByNutrition, 'Devonian rules active: grow
   d.standing = 100; d.dominantT = 89.99;
   tick(g, new Map([[0, emptyInput()]]));
   ok(g.state.status === 'won' && g.state.winner === 0, `holding Dominant wins (${g.state.message})`);
-  const modes: Mode[] = ['domination', 'foodchain', 'hunted', 'reef'];
+  const modes: Mode[] = ['rise', 'domination', 'foodchain', 'hunted', 'reef'];
   for (const m of modes) { const gm = new Game(m, [{ creature: 'coccosteus', device: 'keyboard', ready: true }, { creature: 'cladoselache', device: 0, ready: true }]); for (let i = 0; i < 120; i++) tick(gm, new Map([[0, emptyInput()], [1, emptyInput()]])); ok(gm.state.status === 'playing', `${m} runs`); }
+}
+
+// ---- survival ----
+// The era's default mode: hatch small, moult up the five stages, hold Prime. The shared `rise`
+// case wins on tier, which the Devonian never advances, so the era hook decides it.
+{
+  const g = new Game('rise', [{ creature: 'coccosteus', device: 'keyboard', ready: true }]);
+  const p = g.players[0];
+  ok(devActor(g, p).stage === 0, 'Survival starts at Hatchling');
+  ok(lengthOf(p) >= 0.6 - 1e-6, `a hatchling is no shorter than 0.6 units (${lengthOf(p).toFixed(2)})`);
+  for (let s = 1; s <= PRIME_STAGE; s++) { devActor(g, p).standing = STAGE_AT[s]; for (let i = 0; i < 180; i++) tick(g, new Map([[0, emptyInput()]])); }
+  ok(devActor(g, p).stage === PRIME_STAGE, 'feeding moults it all the way to Prime');
+  ok(g.state.status === 'playing', 'reaching Prime is not the win on its own');
+  for (let i = 0; i < HOLD_TO_WIN * 60 + 120; i++) tick(g, new Map([[0, emptyInput()]]));
+  ok(g.state.status === 'won' && g.state.winner === 0, `holding Prime wins Survival (${g.state.message})`);
+}
+
+// ---- colour slots ----
+// Every surface of a creature collapsing onto one slot paints it a single flat colour. That is
+// how the roster shipped black: the Devonian art names materials for the slot ("titanichthys
+// fins", "cheirolepis accent") and slotFor only knew the Cambrian convention, so all of it read
+// as `body` — and Dunkleosteus's body is #383a3b.
+{
+  const { slotFor } = await import('../src/shared/palettes');
+  const { SCHEMES: DEV_SCHEMES, CREATURE_SCHEMES: DEV_DEFAULTS } = await import('../src/content/devonian/palettes');
+  const dir = 'public/assets/devonian/creatures';
+  for (const f of fs.readdirSync(dir).filter((n) => n.endsWith('.glb') && !n.includes('.lod'))) {
+    const id = f.replace('.glb', '');
+    const buf = fs.readFileSync(`${dir}/${f}`);
+    const json = JSON.parse(buf.subarray(20, 20 + buf.readUInt32LE(12)).toString());
+    const names: string[] = (json.materials ?? []).map((m: { name?: string }) => m.name ?? '');
+    if (names.length < 2) continue;
+    const slots = new Set(names.map(slotFor));
+    ok(slots.size > 1, `${id} paints from more than one colour slot (${[...slots].join(', ')})`);
+    const sch = DEV_SCHEMES.find((s) => s.id === DEV_DEFAULTS[id]);
+    if (sch?.colors) {
+      // Reflectance of the darkest slot it actually uses, in linear light.
+      const lin = (hex: string) => { const n = parseInt(hex.slice(1), 16);
+        const c = (v: number) => { v /= 255; return v <= 0.04045 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4; };
+        return 0.2126 * c((n >> 16) & 255) + 0.7152 * c((n >> 8) & 255) + 0.0722 * c(n & 255); };
+      const used = [...slots].filter((s) => s !== 'eyes');
+      const mean = used.reduce((a, s) => a + lin(sch.colors![s]), 0) / used.length;
+      ok(mean > 0.06, `${id} is not a silhouette in ${sch.name} (mean albedo ${mean.toFixed(3)})`);
+    }
+  }
 }
 
 console.log(`PASS: ${passes} Devonian checks`);
