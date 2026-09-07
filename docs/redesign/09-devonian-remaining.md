@@ -90,7 +90,14 @@ The swim model (`src/sim/devonian/swim.ts`) makes a fish back up at a third of c
 sharply while slow or reversing, and throw itself forward on the first press of sprint. The water
 column is 64 deep (the Cambrian's is 40), swimmers hatch and wander mid-column, giant sea lilies
 and frond towers reach up into it, and a fish driving hard at the surface leaves the water and
-splashes back in. Rhinodipterus moved to rung II by size (0.4 m).
+splashes back in, throwing a sheet of spray on the way out and a crown of droplets with a foam
+ring on the way in. Rhinodipterus moved to rung II by size (0.4 m).
+
+Growth is five stages (Hatchling, Juvenile, Young, Adult, Prime), geometric: every moult multiplies
+the body by the same factor from a hatchling of at least 0.6 units (a hatchling Dunkleosteus is a
+small fish, shorter than an adult Coccosteus) to full adult size, then Prime a third bigger again.
+Death costs one stage. Every hatchling is placed inside plant cover near the nursery — a floor
+plant, or a lily crown up the column for a swimmer — never in open water.
 
 Fixed after the first Dunkleosteus play-through: the roster's speed, agility and turn were authored
 in Cambrian-sized numbers on Devonian-sized bodies, so the giants crawled (a Young Dunkleosteus at
@@ -100,9 +107,11 @@ special on this roster, played an animation on the spot: every heavy special now
 or nearest body ahead and carries the body through its hit window, like the pounce it replaces. The
 river-mouth reeds were thick enough to halve a giant's speed at spawn and were thinned. Still open:
 
-- A Young rung II animal at the nursery sees a crowded radar: many nearby ambient animals count as
-  threats at 0.6 scale. Either soften the threat band for stage 0 or thin the nursery ecology in
-  Domination.
+- Nurseries are sanctuaries now (`src/sim/devonian/swim.ts`): bots hatch in the next nurseries along
+  the shore, an AI body leaves anything under adult size alone inside the nursery ring unless it
+  started the fight, hatchlings are protected for eight seconds and juveniles five, and hatchlings
+  are placed inside the ring. A hatchling's radar still reads crowded (ambient animals count as
+  threats at hatchling size); softening the threat band for the first two stages is the next step.
 - Range scoring at the nursery is zero for the first minute in the browser run but positive in the
   headless test; the difference is the bots (two fill seats), one of which was probably the same
   rung. Worth a look at `updateRange` so a same-rung bot does not silently cancel a player's range.

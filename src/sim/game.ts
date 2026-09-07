@@ -188,7 +188,7 @@ export class Game implements AiWorld {
     this.huntTurns = mode === 'hunted' ? Math.max(1, setups.length) : 1;
     this.huntScore = setups.map(() => 0);
     setups.forEach((s, i) => {
-      const startScale = RULES ? RULES.startScale(mode, this.eraRoleIndex(i)) : mode === 'rise' ? TIER_SCALE[0] : mode === 'hunted' ? (this.isHunter(i) ? 3.0 : TIER_SCALE[1]) : mode === 'reef' ? TIER_SCALE[2] : TIER_SCALE[1];
+      const startScale = RULES ? RULES.startScale(mode, this.eraRoleIndex(i), s.creature) : mode === 'rise' ? TIER_SCALE[0] : mode === 'hunted' ? (this.isHunter(i) ? 3.0 : TIER_SCALE[1]) : mode === 'reef' ? TIER_SCALE[2] : TIER_SCALE[1];
       const a = this.spawn(s.creature, 'player', this.spawnPoint(nursery, s.creature, startScale, i), startScale, i);
       a.home = { ...nursery };
       a.yaw = Math.PI;                                   // facing out to sea
@@ -199,10 +199,15 @@ export class Game implements AiWorld {
       // Fill to 4 with bots
       for (let i = setups.length; i < 4; i++) {
         const c = this.pickBot(setups.map((s) => s.creature), i);
-        const botScale = RULES ? RULES.startScale(mode, 1) : TIER_SCALE[1];   // bots are never the giant
-        const bot = this.spawn(c, 'bot', this.spawnPoint(nursery, c, botScale, i), botScale);
-        bot.home = { ...nursery };
-        bot.brain = makeBrain('needs', nursery, this.rng, { aggression: 0.9, reaction: 0.2, parrySkill: 0.55 });
+        // Bots are never the giant: the loop starts past the human seats, so `i` is never 0.
+        const botScale = RULES ? RULES.startScale(mode, i, c) : TIER_SCALE[1];
+        // an era may hatch its bots in a different nursery, so the players' one is a quiet start
+        const botHome = RULES?.botNursery(i) ?? nursery;
+        // keep every hatching ground loaded: streaming around one point alone would drop the others
+        if (botHome !== nursery) this.world.stream([nursery, ...this.actors.filter((a) => a.controller === 'bot').map((b) => b.home), botHome], 1e6);
+        const bot = this.spawn(c, 'bot', this.spawnPoint(botHome, c, botScale, i), botScale);
+        bot.home = { ...botHome };
+        bot.brain = makeBrain('needs', botHome, this.rng, { aggression: 0.9, reaction: 0.2, parrySkill: 0.55 });
       }
     }
     this.populate();
@@ -260,6 +265,8 @@ export class Game implements AiWorld {
   }
 
   private spawnPoint(center: Vec3, c: CreatureId, s: number, index = 0): Vec3 {
+    const inCover = RULES?.spawnPoint(this, center, c, s, index);
+    if (inCover) return inCover;
     const def = creature(c);
     const ang = index * 1.7 + this.rng() * 0.8, d = 3 + this.rng() * 6;
     const x = center.x + Math.cos(ang) * d, z = center.z + Math.sin(ang) * d;
@@ -270,6 +277,7 @@ export class Game implements AiWorld {
 
   spawn(c: CreatureId, controller: Actor['controller'], pos: Vec3, scale: number, player = -1): Actor {
     const a = makeActor(this.nextId++, c, controller, pos, scale, player);
+    if (controller === 'player' && RULES) a.spawnProtect = RULES.spawnProtect(a);   // an era may shelter its hatchlings longer
     a.yaw = this.rng() * TAU; a.prevT.yaw = a.yaw;
     this.actors.push(a);
     this.idMap.set(a.id, a);
@@ -572,7 +580,7 @@ export class Game implements AiWorld {
     a.state = 'free'; a.stateT = 0; a.respawnT = 0; a.corpseT = 0; a.eaten = 0; a.sparkled = false; a.reviveT = 0;
     a.hp = a.hpMax * 0.45; a.stamina = a.staminaMax * 0.5; a.poise = a.poiseMax;
     a.vel = v3(); a.bank = 0; a.pitch = 0; a.hitFlash = 0; a.tumble = v3();
-    a.spawnProtect = 2.5; a.hunted = 0; a.hunterId = -1; a.lastHitBy = -1; a.killer = -1;
+    a.spawnProtect = RULES?.spawnProtect(a) ?? 2.5; a.hunted = 0; a.hunterId = -1; a.lastHitBy = -1; a.killer = -1;
     a.pos.y = groundHeight(this.world, a.pos.x, a.pos.z, this.scratchBoulders) + clearanceOf(a) + 0.2;
     this.events.push({ kind: 'moult', pos: { ...a.pos }, actor: a.id, player: a.player, strength: 0.7 });
     this.progress[a.player]?.prompts.push({ text: `${creature(helper.creature).name} got you up.`, t: 3 });
@@ -610,7 +618,7 @@ export class Game implements AiWorld {
     this.world.loadAround(nursery);
     a.pos = this.spawnPoint(nursery, a.creature, a.scale, a.player);
     a.vel = v3(); a.state = 'free'; a.stateT = 0; a.respawnT = 0; a.corpseT = 0; a.eaten = 0; a.eatBites = 0;
-    stopHiding(a); a.camoStrength = 0; a.hideCd = 0; a.emergenceHeavy = false; a.spawnProtect = 3.5; a.hitFlash = 0; a.abilityActive = false; a.abilityCd = 0; a.lockTarget = -1; a.hunted = 0; a.hunterId = -1; a.wasHunted = false; a.swallowedBy = -1; a.bank = 0; a.pitch = 0;
+    stopHiding(a); a.camoStrength = 0; a.hideCd = 0; a.emergenceHeavy = false; a.spawnProtect = RULES?.spawnProtect(a) ?? 3.5; a.hitFlash = 0; a.abilityActive = false; a.abilityCd = 0; a.lockTarget = -1; a.hunted = 0; a.hunterId = -1; a.wasHunted = false; a.swallowedBy = -1; a.bank = 0; a.pitch = 0;
     a.yaw = Math.PI;
     // hatch-in: grow from a speck over a second (reuses the moult state with a smaller start scale)
     a.hatching = true; a.state = 'moult'; a.stateT = 0; a.stateDur = 1.0;
@@ -1758,7 +1766,7 @@ export class Game implements AiWorld {
       if (a.controller !== 'player' && a.controller !== 'bot') continue;
       const hunter = this.isHunter(a.player);
       a.tier = hunter ? 3 : 1;
-      a.scale = RULES ? RULES.startScale('hunted', hunter ? 0 : 1) : hunter ? 3.0 : TIER_SCALE[1];
+      a.scale = RULES ? RULES.startScale('hunted', hunter ? 0 : 1, a.creature) : hunter ? 3.0 : TIER_SCALE[1];
       a.nutrition = 0;
       applyScaleStats(a, true);
       a.hp = a.hpMax; a.stamina = a.staminaMax; a.poise = a.poiseMax;

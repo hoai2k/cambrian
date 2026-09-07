@@ -1,10 +1,10 @@
 import { clamp, dot, heading, type Vec3 } from '../../shared/math';
 import { isAlive, lengthOf } from '../actors';
-import { creature } from '../creatures';
+import { creature, type CreatureId } from '../creatures';
 import type { Game } from '../game';
 import type { Actor } from '../types';
-import { SURFACE_Y } from '../world';
-import { devActor } from './state';
+import { groundHeight, nurseryAt, nurseryFactor, NURSERY_R, SURFACE_Y } from '../world';
+import { ADULT_STAGE, devActor, stageForScale } from './state';
 
 /**
  * How a fish moves, as the shared simulation asks about it through the `swim`, `canBreach`,
@@ -55,7 +55,53 @@ export function canBreach(a: Actor): boolean {
   return !def.ground && !def.shell && a.hideMode === 'none';
 }
 
-/** Where a swimmer hatches: mid-column, with more water over it than under. */
+/**
+ * Where a hatchling is placed: inside plant cover near the nursery centre, never in open water. A
+ * swimmer takes a crown up a column when one is near (a lily's crown, a frond tower's top), else a
+ * floor plant; a crawler always a floor plant. Nothing hatches floating by itself; when there is no
+ * cover at all within reach the shared placement is used. Deterministic: the game's rng picks.
+ */
+export function spawnInCover(g: Game, center: Vec3, id: CreatureId, scale: number, index: number): Vec3 | undefined {
+  const def = creature(id);
+  const L = def.adultLength * scale;
+  const all = g.world.coverHash.query(center.x, center.z, 48, []).filter((c) => !c.temp && c.maxLength >= L * 0.9 && dist2D(c.pos, center) < 48);
+  // inside the nursery proper first, where the sanctuary holds; the fringe only when it has to be
+  const inner = all.filter((c) => dist2D(c.pos, center) < NURSERY_R * 0.85);
+  const options = inner.length ? inner : all;
+  if (!options.length) return undefined;
+  const ground = (c: Vec3) => groundHeight(g.world, c.x, c.z, []);
+  const high = options.filter((c) => c.pos.y > ground(c.pos) + 4);
+  const pool = def.ground ? options.filter((c) => c.pos.y <= ground(c.pos) + 4) : (high.length && g.rng() < 0.6 ? high : options);
+  const from = pool.length ? pool : options;
+  const c = from[(index * 7 + Math.floor(g.rng() * from.length)) % from.length];
+  const ang = g.rng() * Math.PI * 2, r = g.rng() * c.radius * 0.4;
+  const x = c.pos.x + Math.cos(ang) * r, z = c.pos.z + Math.sin(ang) * r;
+  const gr = groundHeight(g.world, x, z, []);
+  const y = def.ground ? gr + L * 0.13 : clamp(c.pos.y, gr + 0.6 + L * 0.3, SURFACE_Y - 3);
+  return { x, y, z };
+}
+const dist2D = (a: Vec3, b: Vec3) => Math.hypot(a.x - b.x, a.z - b.z);
+
+/**
+ * Nurseries are sanctuaries for the young. Bots hatch in the next nurseries along the shore rather
+ * than beside the players; a body that has not reached adult size cannot be hunted or fought
+ * inside a nursery by an AI body unless it started the fight; and a hatchling keeps its spawn
+ * protection for eight seconds, a juvenile five.
+ */
+export function botNursery(index: number): Vec3 { return nurseryAt(1 + (index % 2)); }
+export function spawnProtect(a: Actor): number {
+  const def = creature(a.creature);
+  const stage = stageForScale(def.adultLength, a.scale);
+  return stage === 0 ? 8 : stage === 1 ? 5 : 3.5;
+}
+export function sanctuary(hunter: Actor, target: Actor): boolean {
+  if (target.controller !== 'player' && target.controller !== 'bot') return false;
+  if (nurseryFactor(target.pos.x, target.pos.z) < 0.05) return false;           // anywhere inside the nursery ring
+  const def = creature(target.creature);
+  return stageForScale(def.adultLength, target.scale) < ADULT_STAGE || hunter.controller === 'bot';
+}
+
+/** Where a swimmer hatches when there is no cover to hatch in: mid-column, with more water over it than under. */
 export function spawnY(ground: number, L: number, isGround: boolean): number {
   if (isGround) return ground + L * 0.13;
   return ground + clamp((SURFACE_Y - ground) * 0.45, 1.2 + L * 0.5, SURFACE_Y - ground - 4);

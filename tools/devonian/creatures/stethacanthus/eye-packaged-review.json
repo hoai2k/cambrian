@@ -1,0 +1,206 @@
+{
+  "method": "actual-eye-polyhedron uniform-volume samples against continuous closed head",
+  "losslessPackagingVerified": true,
+  "reports": [
+    {
+      "level": "full",
+      "bytes": 15733048,
+      "id": "stethacanthus",
+      "revision": "working-2026-09-07T17-21-39-596Z",
+      "assetSha256": "e5f9a707e42c2026a6971171968b53d00c319c80cd61e10c6d0a86a54cfb7acc",
+      "headMesh": "head_body_envelope_closed",
+      "headTriangles": 99036,
+      "headTopology": {
+        "valid": true,
+        "nonmanifoldEdges": 0,
+        "cappedBoundaryLoops": []
+      },
+      "eyes": [
+        {
+          "eye": 0,
+          "center": [
+            0.21363702416419983,
+            0.11166121810674667,
+            1.3097304105758667
+          ],
+          "radii": [
+            0.08023309707641602,
+            0.08376828581094742,
+            0.0992058515548706
+          ],
+          "eyeTriangles": 4992,
+          "boundingBoxCandidates": 120000,
+          "volumeSamples": 62278,
+          "inside": 49683,
+          "insidePercent": 79.77616493785928,
+          "wilson95Percent": [
+            79.45886341809104,
+            80.08979321636531
+          ],
+          "conservative95Percent": [
+            79.45886341809104,
+            80.08979321636531
+          ],
+          "rayDisagreements": 0,
+          "insideLowerPercent": 79.77616493785928,
+          "insideUpperPercent": 79.77616493785928,
+          "closureClearanceLowerBounds": [],
+          "criterion50": "PASS",
+          "target65": true,
+          "guidanceOnly70PercentTranslationGlTF": [
+            -2.328966957065859e-06,
+            0.0,
+            0.0
+          ],
+          "guidanceOnly70PercentTranslationBlender": [
+            -2.328966957065859e-06,
+            -0.0,
+            0.0
+          ]
+        },
+        {
+          "eye": 1,
+          "center": [
+            -0.21362846344709396,
+            0.11165688559412956,
+            1.3098037242889404
+          ],
+          "radii": [
+            0.08023310452699661,
+            0.08376826718449593,
+            0.09920597076416016
+          ],
+          "eyeTriangles": 4992,
+          "boundingBoxCandidates": 120000,
+          "volumeSamples": 62472,
+          "inside": 49797,
+          "insidePercent": 79.71091048789857,
+          "wilson95Percent": [
+            79.39373022062112,
+            80.02443694497332
+          ],
+          "conservative95Percent": [
+            79.39373022062112,
+            80.02602829057716
+          ],
+          "rayDisagreements": 1,
+          "insideLowerPercent": 79.71091048789857,
+          "insideUpperPercent": 79.71251120501985,
+          "closureClearanceLowerBounds": [],
+          "criterion50": "PASS",
+          "target65": true,
+          "guidanceOnly70PercentTranslationGlTF": [
+            2.328968093934236e-06,
+            0.0,
+            0.0
+          ],
+          "guidanceOnly70PercentTranslationBlender": [
+            2.328968093934236e-06,
+            -0.0,
+            0.0
+          ]
+        }
+      ]
+    },
+    {
+      "level": "lod1",
+      "bytes": 2352376,
+      "id": "stethacanthus",
+      "revision": "working-2026-09-07T17-21-39-803Z-lod1",
+      "assetSha256": "97ec0320b4ae910f525c9a0304ad936d845805ada7dec7f46ea68b6aedfb9d4f",
+      "headMesh": "head_body_envelope_closed",
+      "headTriangles": 26738,
+      "headTopology": {
+        "valid": true,
+        "nonmanifoldEdges": 0,
+        "cappedBoundaryLoops": []
+      },
+      "eyes": [
+        {
+          "eye": 0,
+          "center": [
+            0.21363702416419983,
+            0.11166121810674667,
+            1.3097304105758667
+          ],
+          "radii": [
+            0.08023309707641602,
+            0.08376828581094742,
+            0.0992058515548706
+          ],
+          "eyeTriangles": 4992,
+          "boundingBoxCandidates": 120000,
+          "volumeSamples": 62278,
+          "inside": 49674,
+          "insidePercent": 79.7617136067311,
+          "wilson95Percent": [
+            79.44432888023222,
+            80.07542687471
+          ],
+          "conservative95Percent": [
+            79.44432888023222,
+            80.07702313801664
+          ],
+          "rayDisagreements": 1,
+          "insideLowerPercent": 79.7617136067311,
+          "insideUpperPercent": 79.7633193101898,
+          "closureClearanceLowerBounds": [],
+          "criterion50": "PASS",
+          "target65": true,
+          "guidanceOnly70PercentTranslationGlTF": [
+            -2.328966957065859e-06,
+            0.0,
+            0.0
+          ],
+          "guidanceOnly70PercentTranslationBlender": [
+            -2.328966957065859e-06,
+            -0.0,
+            0.0
+          ]
+        },
+        {
+          "eye": 1,
+          "center": [
+            -0.21362846344709396,
+            0.11165688559412956,
+            1.3098037242889404
+          ],
+          "radii": [
+            0.08023310452699661,
+            0.08376826718449593,
+            0.09920597076416016
+          ],
+          "eyeTriangles": 4992,
+          "boundingBoxCandidates": 120000,
+          "volumeSamples": 62472,
+          "inside": 49786,
+          "insidePercent": 79.6933025995646,
+          "wilson95Percent": [
+            79.37602146194365,
+            80.0069320923787
+          ],
+          "conservative95Percent": [
+            79.37602146194365,
+            80.01329750412779
+          ],
+          "rayDisagreements": 4,
+          "insideLowerPercent": 79.6933025995646,
+          "insideUpperPercent": 79.69970546804969,
+          "closureClearanceLowerBounds": [],
+          "criterion50": "PASS",
+          "target65": true,
+          "guidanceOnly70PercentTranslationGlTF": [
+            2.328968093934236e-06,
+            0.0,
+            0.0
+          ],
+          "guidanceOnly70PercentTranslationBlender": [
+            2.328968093934236e-06,
+            -0.0,
+            0.0
+          ]
+        }
+      ]
+    }
+  ]
+}

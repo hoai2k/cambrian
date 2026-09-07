@@ -72,6 +72,7 @@ function PlayerPanel({ p }: { p: PlayerHud }) {
         <div className="lock-panel" style={{ color: p.lock.color }}>
           <span className="lock-band">{p.lock.band.toUpperCase()}</span>
           <b>{p.lock.name}</b>
+          {p.lock.kind && <span className="lock-kind">{p.lock.kind}</span>}
           <div className="bar target"><i style={{ width: `${p.lock.hp * 100}%` }} /></div>
         </div>
       )}

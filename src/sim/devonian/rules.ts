@@ -6,9 +6,9 @@ import type { Game } from '../game';
 import type { Actor, Mode, WorldEvent } from '../types';
 import { BIOME_DANGER, biomeAt, groundHeight, sampleCurrent, shoreDistance, SHORE_WALL, SURFACE_Y } from '../world';
 import { bodyRadius } from '../actors';
-import { devActor, DOMINANT, HOLD_TO_WIN, RUNG_NAMES, STAGE_AT, STAGE_SCALE, STAGES, stateFor, type DeadZone, type DevActor } from './state';
+import { ADULT_STAGE, devActor, DOMINANT, HOLD_TO_WIN, PRIME_STAGE, RUNG_NAMES, STAGE_AT, STAGES, stageForScale, stageScale, stateFor, type DeadZone, type DevActor } from './state';
 import { beginAbility, camoDrain, installDevonianSpecials, stepAbility, stepGuardSpecial, useAbility, ySpecial } from './specials';
-import { canBreach, spawnY, swim, wanderY } from './swim';
+import { botNursery, canBreach, sanctuary, spawnInCover, spawnProtect, spawnY, swim, wanderY } from './swim';
 
 /**
  * Devonian Domination (docs/redesign/08-devonian-domination.md). Progress is standing within a
@@ -55,11 +55,11 @@ function gain(g: Game, a: Actor, d: DevActor, amount: number, label: string) {
 
 /** Standing reaches a stage threshold: grow to it with the moult ceremony; arthropods shed a shell. */
 function checkStage(g: Game, a: Actor, d: DevActor) {
-  const next = (d.stage + 1) as 1 | 2;
-  if (d.stage >= 2 || d.standing < STAGE_AT[next] || a.state === 'moult' || !isAlive(a)) return;
+  const next = d.stage + 1;
+  if (d.stage >= PRIME_STAGE || d.standing < STAGE_AT[next] || a.state === 'moult' || !isAlive(a)) return;
   const def = creature(a.creature);
   const prevScale = a.scale;
-  d.stage = next; a.scale = def.adultLength ? STAGE_SCALE[next] : a.scale;
+  d.stage = next; a.scale = stageScale(def.adultLength, next);
   applyScaleStats(a, true);
   a.state = 'moult'; a.stateT = 0; a.stateDur = 1.5; a.lockTarget = -1; a.abilityActive = false;
   g.events.push({ kind: 'tierUp', pos: { ...a.pos }, actor: a.id, strength: next, player: a.player });
@@ -193,10 +193,13 @@ function updateExuvia(g: Game, a: Actor, d: DevActor, dt: number) {
 // ---- the rules object ----
 export const DEVONIAN_RULES: EraRules = {
   growthByNutrition: false,
-  startScale(mode: Mode, index: number) { return mode === 'reef' ? STAGE_SCALE[1] : mode === 'hunted' && index === 0 ? STAGE_SCALE[2] : STAGE_SCALE[0]; },
+  startScale(mode: Mode, index: number, id) {
+    const L = creature(id).adultLength;
+    return stageScale(L, mode === 'reef' ? ADULT_STAGE : mode === 'hunted' && index === 0 ? PRIME_STAGE : 0);
+  },
   install() { installDevonianSpecials(); },
   ySpecial,
-  init(g) { installDevonianSpecials(); for (const a of players(g)) { const d = devActor(g, a); d.stage = a.scale >= STAGE_SCALE[2] - 1e-6 ? 2 : a.scale >= STAGE_SCALE[1] - 1e-6 ? 1 : 0; d.standing = g.mode === 'reef' ? 50 : 0; } },
+  init(g) { installDevonianSpecials(); for (const a of players(g)) { const d = devActor(g, a); d.stage = stageForScale(creature(a.creature).adultLength, a.scale); d.standing = g.mode === 'reef' ? STAGE_AT[ADULT_STAGE] + 5 : STAGE_AT[d.stage]; } },
 
   step(g, dt) {
     const s = stateFor(g);
@@ -283,17 +286,21 @@ export const DEVONIAN_RULES: EraRules = {
 
   useAbility, beginAbility, stepAbility, camoDrain,
   swim, canBreach, spawnY, wanderY,
+  spawnPoint: spawnInCover, botNursery, spawnProtect, sanctuary,
 
   moultScale(g, a) {
     const d = devActor(g, a);
-    return { from: STAGE_SCALE[Math.max(0, d.stage - 1)], to: STAGE_SCALE[d.stage] };
+    const L = creature(a.creature).adultLength;
+    return { from: stageScale(L, Math.max(0, d.stage - 1)), to: stageScale(L, d.stage) };
   },
 
   onRespawn(g, a) {
     const d = devActor(g, a);
     d.standing *= 0.8;
-    if (d.stage === 2) { d.stage = 1; a.scale = STAGE_SCALE[1]; }
-    else if (g.mode !== 'reef' && d.stage === 0) a.scale = STAGE_SCALE[0];
+    // death costs a moult: one stage back (never below hatchling), and the standing to match
+    if (g.mode !== 'reef' && d.stage > 0) d.stage -= 1;
+    a.scale = stageScale(creature(a.creature).adultLength, d.stage);
+    d.standing = Math.min(d.standing, d.stage + 1 <= PRIME_STAGE ? STAGE_AT[d.stage + 1] - 1 : d.standing);
     d.air = 1; d.deadT = 0; d.deadZoneIn = false; d.moultSoft = 0; d.exuvia = -1; d.followers = 0; d.dominantT = 0; d.beached = false;
   },
 

@@ -169,9 +169,11 @@ export function thinkNeeds(g: AiWorld, a: Actor, b: BrainState, dt: number): Inp
         if (d < r && (hunting || d < r * 0.5) && d < worstD) { worst = o; worstD = d; }
       } else if (band === 'snack' || band === 'prey') {
         if (o.controller === 'swarm' && d > senseR * 0.8) continue;
+        if (RULES?.sanctuary(a, o) && a.lastHitBy !== o.id) continue;            // the young in a nursery are left alone
         if (d < preyD) { prey = o; preyD = d; }
       } else if (band === 'rival') {
-        const provoked = o.lockTarget === a.id || (o.state === 'attack' && d < L * 2) || (o.brain?.target === a.id) || a.hitFlash > 0;
+        const provoked = o.lockTarget === a.id || (o.state === 'attack' && d < L * 2) || (o.brain?.target === a.id) || a.hitFlash > 0 || a.lastHitBy === o.id;
+        if (!provoked && RULES?.sanctuary(a, o)) continue;
         const wants = a.controller === 'bot' ? (o.controller === 'player' || o.controller === 'bot') : (b.aggression > 0.55 && d < senseR * 0.5) || provoked;
         if (wants && d < rivalD) { rival = o; rivalD = d; }
       }
@@ -209,7 +211,7 @@ export function thinkNeeds(g: AiWorld, a: Actor, b: BrainState, dt: number): Inp
     }
     case 'hunt': {
       if (!t || !isAlive(t) || isHidden(t)) { b.goal = 'wander'; b.target = -1; break; }
-      if (L > 1.2 && nurseryFactor(t.pos.x, t.pos.z) > 0.35) { b.goal = 'wander'; b.target = -1; b.goalT = 0; pickWander(a, b, g.rng, 30); break; }
+      if ((L > 1.2 && nurseryFactor(t.pos.x, t.pos.z) > 0.35) || (RULES?.sanctuary(a, t) && a.lastHitBy !== t.id)) { b.goal = 'wander'; b.target = -1; b.goalT = 0; pickWander(a, b, g.rng, 30); break; }
       if (b.goalT > 9 || (t.cover > 0.45 && t.stillness > 0.8 && lengthOf(t) < L * 0.7)) { b.goal = 'wander'; b.target = -1; b.goalT = 0; b.hunger = 0; pickWander(a, b, g.rng, 30); break; }
       const d = dist(a.pos, t.pos);
       const predicted = add(t.pos, vscale(t.vel, clamp(d / 8, 0, 0.6)));
@@ -221,6 +223,7 @@ export function thinkNeeds(g: AiWorld, a: Actor, b: BrainState, dt: number): Inp
     }
     case 'fight': {
       if (!t || !isAlive(t) || bandOf(a, t) !== 'rival') { b.goal = 'wander'; b.target = -1; break; }
+      if (RULES?.sanctuary(a, t) && a.lastHitBy !== t.id && a.hitFlash <= 0) { b.goal = 'wander'; b.target = -1; b.goalT = 0; pickWander(a, b, g.rng, 30); break; }
       const d = dist(a.pos, t.pos);
       const reach = L * 0.7 + lengthOf(t) * 0.35;
       out.lock = true;

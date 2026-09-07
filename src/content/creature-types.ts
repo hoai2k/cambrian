@@ -21,6 +21,14 @@ export interface CreatureDef {
   id: CreatureId;
   name: string;
   species: string;
+  /**
+   * The everyday group the animal belongs to — "Placoderm", "Trilobite", "Sea scorpion" — shown
+   * beside the genus so a name nobody has heard of still lands somewhere familiar. Two or three
+   * words, no rank names. `kindNote` is the one plain sentence that says what the group is, for
+   * the places with room for it. See docs/research/devonian-classification.md.
+   */
+  kind?: string;
+  kindNote?: string;
   tagline: string;     // energetic one-liner for the select screen
   role: string;
   ground: boolean;
