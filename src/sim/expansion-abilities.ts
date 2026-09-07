@@ -205,7 +205,8 @@ export const bloomRate = (a: Actor, def: CreatureDef) => {
 };
 
 export const grazeRate = (a: Actor, def: CreatureDef) => {
-  if (def.id === 'wiwaxia') return a.stillness > .5 ? 1.6 : 0;
   if (def.diet !== 'grazer' && def.diet !== 'deposit') return 0;
+  // An animal that has to plant itself to rasp gets nothing while it is moving (Wiwaxia).
+  if (def.grazeStill && a.stillness <= .5) return 0;
   return (def.diet === 'deposit' ? 1.1 : 1.6) * (a.abilityActive && def.ability === 'adhesiveGlide' ? 3 : 1);
 };
