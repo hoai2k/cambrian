@@ -338,6 +338,15 @@ export const DEVONIAN_RULES: EraRules = {
     }
   },
 
+  /**
+   * The Devonian ranks its animals by stage and standing rather than by tier, so the scoreboard
+   * shows those: "Adult · Apex predator" against the standing bar, for bots as well as players.
+   */
+  scoreLine(g, a) {
+    const d = devActor(g, a);
+    return { rank: `${STAGES[d.stage]} · ${RUNG_NAMES[rungOf(a)]}`, progress: Math.max(0, Math.min(1, d.standing / 100)) };
+  },
+
   hud(g, i): EraHud | undefined {
     const p = g.players[i]; if (!p) return undefined;
     const d = devActor(g, p), def = creature(p.creature), s = stateFor(g);

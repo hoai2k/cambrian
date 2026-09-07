@@ -181,6 +181,30 @@ h3 { font-size: 13px; letter-spacing: .12em; color: var(--ember); margin: 14px 0
 .spectating b { font: 900 .8em var(--font-display); letter-spacing: .18em; color: var(--mist); }
 .spectating span { font-weight: 700; }
 
+/* ---------- Scoreboard (hold View) ---------- */
+.scoreboard { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); z-index: 12; width: min(92%, 26em); max-height: 82%; overflow-y: auto; padding: .9em 1em 1em; border-radius: 1em; background: rgba(6,22,28,.9); border: 1px solid rgba(238,250,246,.18); backdrop-filter: blur(6px); box-shadow: 0 1.4em 3em rgba(0,0,0,.5); animation: fade-in .12s both; pointer-events: none; }
+.board-head { display: flex; align-items: baseline; justify-content: space-between; gap: .6em; }
+.board-head .eyebrow { margin: 0; }
+.board-clock { font: 800 1.15em var(--font-display); font-variant-numeric: tabular-nums; color: var(--foam); }
+.board-detail { margin: .15em 0 .7em; font-size: .78em; color: var(--dim); }
+.scoreboard ol { list-style: none; margin: 0; padding: 0; display: grid; gap: .3em; }
+.board-row { display: grid; grid-template-columns: 2.2em 1fr auto auto; align-items: center; gap: .55em; padding: .4em .5em; border-radius: .6em; background: rgba(238,250,246,.05); border-left: 3px solid var(--player); }
+.board-row.you { background: rgba(238,250,246,.13); }
+.board-row.hunting { box-shadow: inset 0 0 0 1px var(--coral); }
+.board-row.down { opacity: .55; }
+.board-who { font: 800 .72em var(--font-display); letter-spacing: .06em; color: var(--player); }
+.board-name { display: grid; gap: .05em; min-width: 0; }
+.board-name b { font-size: .84em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.board-name small { font-size: .68em; color: var(--dim); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.board-bar { display: block; height: 2px; margin-top: .15em; border-radius: 1px; background: var(--player); opacity: .8; transform-origin: left; }
+.board-score { font: 800 1.25em var(--font-display); font-variant-numeric: tabular-nums; color: var(--ember); min-width: 1.1em; text-align: right; }
+.board-tally { display: grid; justify-items: end; gap: .05em; }
+.board-tally small { font-size: .66em; color: var(--dim); font-variant-numeric: tabular-nums; }
+.hud-quarter .scoreboard { width: min(96%, 20em); font-size: .86em; }
+
+/* A line from the simulation: a turn changing over, a team-mate picked up. */
+.notice { position: absolute; z-index: 5; left: 50%; top: 6.5em; transform: translateX(-50%); margin: 0; padding: .5em 1.1em; border-radius: 1em; background: rgba(6,22,28,.8); border: 1px solid var(--ember); color: var(--foam); font-weight: 700; font-size: .92em; white-space: nowrap; max-width: 92%; overflow: hidden; text-overflow: ellipsis; animation: rise-in .3s both; pointer-events: none; }
+
 /* radar */
 .radar { position: absolute; right: 1.4em; top: 1.2em; width: 9.5em; height: 9.5em; }
 .radar svg { width: 100%; height: 100%; overflow: visible; }

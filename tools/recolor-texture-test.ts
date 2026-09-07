@@ -1,0 +1,24 @@
+/** Regression: UV pigment must not be multiplied by a palette using white-vertex luminance. */
+import assert from 'node:assert/strict';
+import * as THREE from 'three';
+import { texturedMeanLuminance } from '../src/render/recolor';
+const geometry = new THREE.BufferGeometry();
+geometry.setAttribute('color', new THREE.Float32BufferAttribute([1,1,1,1,1,1],3));
+geometry.setAttribute('uv', new THREE.Float32BufferAttribute([.1,.5,.1,.5],2));
+const texture = new THREE.DataTexture(new Uint8Array([64,64,64,255,255,255,255,255]),2,1);
+texture.colorSpace=THREE.SRGBColorSpace;
+texture.flipY=false;
+const material=new THREE.MeshStandardMaterial({map:texture});
+const darkLinear=0.05126945837404324;
+assert(Math.abs(texturedMeanLuminance(geometry,material)-darkLinear)<1e-7,'A dark UV region must normalize to its own linear pigment, not white vertex colors or the whole atlas');
+material.color.setRGB(.5,.5,.5);
+assert(Math.abs(texturedMeanLuminance(geometry,material)-darkLinear*.5)<1e-7,'Material factor belongs in the same luminance reference');
+material.color.setRGB(1,1,1);
+texture.offset.x=.6;
+assert(Math.abs(texturedMeanLuminance(geometry,material)-1)<1e-7,'Texture UV transforms must select the actual pigment region');
+texture.offset.x=0;
+geometry.setAttribute('color',new THREE.Float32BufferAttribute([.5,.5,.5,.5,.5,.5],3));
+assert(Math.abs(texturedMeanLuminance(geometry,material)-darkLinear*.5)<1e-7,'Mixed vertex/UV pigment must not apply either factor twice');
+const plain=new THREE.MeshStandardMaterial();
+assert.equal(texturedMeanLuminance(geometry,plain),.5,'Untextured legacy vertex color is unchanged');
+console.log('PASS: textured and vertex palette luminance, linear color, material factors, UV regions and transforms');

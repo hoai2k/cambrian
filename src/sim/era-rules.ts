@@ -95,6 +95,12 @@ export interface EraRules {
   updateModes(g: Game, dt: number): void;
   hud(g: Game, i: number): EraHud | undefined;
   hint(g: Game, i: number): string | undefined;
+  /**
+   * How this contender reads on the scoreboard, when the era ranks its players by something of
+   * its own (the Devonian's stages and standing) rather than by tier. Optional: without it the
+   * shared tier name and nutrition ring are used.
+   */
+  scoreLine?(g: Game, a: Actor): { rank: string; progress: number } | undefined;
 }
 
 export const RULES: EraRules | undefined = ACTIVE_ERA.id === 'devonian' ? DEVONIAN_RULES : undefined;
