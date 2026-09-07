@@ -51,6 +51,12 @@ unless the user explicitly asks for a PR. Steps:
 - Devonian specimens land in batches (`tools/devonian/shipped.json`). When one lands: run
   `node tools/update-asset-sizes.mjs` (refreshes `src/content/devonian/asset-sizes.json`), remove its
   entry from `DEVONIAN_STAND_INS` in `src/content/devonian/index.ts`, and run `npm run devonian`.
+- Devonian sizes and swimming stats are generated: `docs/research/devonian-swimming.json` (sourced lengths
+  and body-lengths-per-second) → `npm run devonian:stats` → the six movement fields in
+  `src/content/devonian/creatures.ts`. Edit the research or the formulas in `tools/devonian/stats.mjs`,
+  never those fields by hand; `npm run devonian` checks they match. The water surface is per era
+  (`environment.surfaceY`), fish leave the water through it (`airborne`), and the swim model (reverse
+  slow, turn sharp when slow, fast-start on sprint) is the `swim` hook in `src/sim/devonian/swim.ts`.
 - Devonian scenery and biome plates are procedural stand-ins: flora kinds and their density table in
   `src/content/devonian/environment.ts` + `src/render/sea.ts`, plates from `npm run devonian:plates`.
   Authored sets replace them without touching placement; see `docs/redesign/09-devonian-remaining.md`.
