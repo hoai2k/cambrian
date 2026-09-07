@@ -24,7 +24,7 @@ export const DEVONIAN_SHIPPED = Object.keys(SHIPPED_BYTES);
  */
 export const DEVONIAN_STAND_INS: Partial<Record<DevonianCreatureId, DevonianCreatureId>> = Object.fromEntries((
   [
-    ['onychodus', 'cladoselache'], ['rhinodipterus', 'coccosteus'], ['cheirolepis', 'coccosteus'],
+    ['onychodus', 'cladoselache'], ['rhinodipterus', 'coccosteus'],
     ['tiktaalik', 'bothriolepis'], ['acanthostega', 'bothriolepis'], ['jaekelopterus', 'bothriolepis'],
     ['eldredgeops', 'bothriolepis'], ['walliserops', 'bothriolepis'], ['nahecaris', 'bothriolepis'], ['palaeoisopus', 'bothriolepis'],
     ['furcaster', 'gemuendina'], ['manticoceras', 'doryaspis'], ['michelinoceras', 'doryaspis'],
@@ -53,7 +53,7 @@ export const DEVONIAN = defineEra({
     player: 'coccosteus',
     // Delivered specimens only: these drive card and model preloading, and a creature that is still
     // borrowing a body has no portrait to load. Add each one here as its own model lands.
-    boot: ['coccosteus', 'cladoselache', 'dunkleosteus', 'bothriolepis', 'gemuendina', 'doryaspis', 'stethacanthus', 'titanichthys'],
+    boot: ['coccosteus', 'cladoselache', 'dunkleosteus', 'bothriolepis', 'gemuendina', 'doryaspis', 'stethacanthus', 'titanichthys', 'cheirolepis'],
     title: ['dunkleosteus', 'cladoselache', 'coccosteus', 'doryaspis'],
   },
   ecology: { schools: SNACK_SCHOOLS, giants: GIANTS, shadow: { creature: 'titanichthys', scale: 1.0 } },

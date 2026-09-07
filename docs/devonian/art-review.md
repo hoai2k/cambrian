@@ -13,6 +13,9 @@ The eight first-release models were integration examples. An independent audit o
 | Gemuendina | Low broad cranial wedge, broad undulating pectoral fins and a slender finless tail; upward-facing mouth with a shallow articulated lower jaw, continuous mottled integument and inset dorsal eyes. | About 82% / 82–83%, both eyes | [Source and motion review](../../tools/devonian/creatures/gemuendina/README.md), [final packaged eye report](../../tools/devonian/creatures/gemuendina/eye-packaged-review.json) |
 | Doryaspis | Flat dorsal and deep ventral headshield, short rigid pseudorostrum and continuous lateral cornual plates; fine denticles, embedded dorsal eyes, toothless oral tissues and a flexible hypocercal posterior. | About 81% / 81%, both eyes | [Source and motion review](../../tools/devonian/creatures/doryaspis/README.md), [final packaged eye report](../../tools/devonian/creatures/doryaspis/eye-packaged-review.json) |
 
+| Coccosteus | Rounded continuous cranial and thoracic armour, compact articulated jaw, recessed oral cavity, seated eyes and independently posed rounded pectorals; subdued UV surface detail and a heterocercal tail. | About 82% / 82%, both eyes | [Source and visual review](../../tools/devonian/creatures/coccosteus/README.md), [final packaged eye report](../../tools/devonian/creatures/coccosteus/eye-packaged-review.json) |
+| Cheirolepis | Scottish C. trailli with a smooth long jaw, real oral tissues, mobile gill covers, fine rhombic scale relief and ray-supported fins; propagated tail bends and asymmetric fin recovery. | About 80% / 80%, both eyes | [Source and visual review](../../tools/devonian/creatures/cheirolepis/README.md), [final packaged eye report](../../tools/devonian/creatures/cheirolepis/eye-packaged-review.json) |
+
 The reports measure actual exported eye solids against the continuous head, excluding decorative orbital pieces. Full and reduced exports are tested separately. Each report identifies the exact packaged GLB hash; source-export reports have different hashes after lossless compression. No geometry, weights or animation samples are quantized during packaging.
 
 Dunkleosteus's widest action gape was inspected with additional light aimed into the mouth. That exposed and led to removal of a skull cap crossing the oral aperture. The mandibular floor follows the jaw completely; local cheek folds blend at the commissures. Jaw excursions range from approximately 37° in Bite to 57° in Heavy, with separate skull elevation. This is real skinned geometry and bone motion. Oral soft tissues and living pigmentation remain interpreted.
@@ -21,7 +24,7 @@ Each revised full model retains the eighteen action clips and three version-1 sp
 
 ## Remaining individual review
 
-Coccosteus, Cladoselache and Stethacanthus are being rebuilt independently. Cheirolepis is undergoing its first release review. Unreleased creatures and scenery remain outside the approved shipment list until their own reviews pass.
+Cladoselache, Stethacanthus and Rhinodipterus are being rebuilt independently. Unreleased creatures and scenery remain outside the approved shipment list until their own reviews pass.
 
 The viewer uses balanced, camera-side inspection light so rotating a specimen reveals shaded texture and oral geometry. This is viewer lighting only.
 
