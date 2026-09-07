@@ -274,6 +274,56 @@ Prey should be **catchable but never free**.
 - **Wounded prey** leaves a faint particle trail (blood in the current) that
   Anomalocaris and Marrella can follow.
 
+## Feeding
+
+Not everything in the Burgess Shale was a hunter, and the roster should not
+pretend otherwise. A creature's `diet` field (`src/content/creature-types.ts`)
+says where its living comes from. It is a **fact about the animal**, not a
+restriction on the person driving it: a player in any shell can bite anything
+they can catch. What the field changes is what *else* that shell can eat, and
+what the ambient copies of it spend their day doing.
+
+| Diet | What it eats | How it feeds |
+| --- | --- | --- |
+| *(none)* | Other animals | Hunts. The default. |
+| `grazer` | Microbial mats on the seabed | Near the floor, over mats, `grazeRate` 1.6 × mat density. |
+| `deposit` | Detritus in the sediment | The same, at 1.1 × — sifting is slower than scraping. |
+| `filter` | Plankton blooms in the water column | Anywhere inside a bloom, at any tier (`bloomRate`). |
+| `scavenger` | Carrion | Feeds on bodies and bone falls; makes none of its own. |
+
+Some mat feeders are anchored: `grazeStill` means the animal only feeds while
+planted (`stillness > 0.5`). Wiwaxia scrapes with a stationary radula-like
+apparatus, so a Wiwaxia on the move earns nothing.
+
+The roster, as researched: **Wiwaxia** and **Odontogriphus** graze mats,
+**Marrella** and **Pikaia** are deposit feeders, **Vetulicola**,
+**Tamisiocaris**, **Ctenorhabdotus** and **Odaraia** strain the water, and
+**Hallucigenia** lives on the dead. Everything else hunts. The Devonian roster
+carries the same field and the same rules.
+
+### What this means for the AI
+
+Ambient animals follow their diet honestly. A `grazer` goes looking for mats
+rather than for you; a `scavenger` crosses open water to a body but will not
+make one. This is most of the reason the reef reads as ecology rather than as
+a pit of predators — roughly a third of the roster is no threat to anybody.
+
+Two deliberate exceptions:
+
+- **Anything standing in for a player hunts too.** A bot in versus, or the
+  balance harness driving a creature, is a competitor, and a competitor that
+  refused to hunt would simply lose. Suspension feeders are the one exception
+  even here: the bloom *is* their living and a chase only loses it, which is
+  how Vetulicola and Tamisiocaris still reach Apex.
+- **Everything fights back.** Diet gates hunting, never retaliation,
+  territory or self-defence. A grazer that is attacked turns around, and a
+  grumpy one still objects to being crowded (see *Temperament*).
+
+Grazing is a real living but a slow one: mats worth eating (density > 0.2)
+cover about 28% of the seabed, so a mat feeder that stays put on a good patch
+takes one to three minutes per tier. It is a floor under a bad hunt, not a
+replacement for hunting.
+
 ## The hours
 
 The reef used to hunt around the clock. Every ambient animal counted as hungry
