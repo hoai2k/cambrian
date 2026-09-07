@@ -8,6 +8,7 @@ import { sampleCurrent, SURFACE_Y } from '../sim/world';
 import { TAU } from '../shared/math';
 import type { ViewerSpecimen } from './catalogue';
 import { cloneMaterials, makeRecolor, type Recolor } from '../render/recolor';
+import { settleTranslucency } from '../render/translucency';
 import { DEFAULT_SCHEME, type Slot } from '../shared/palettes';
 import { appBase } from '../shared/base';
 
@@ -267,7 +268,7 @@ export function createViewerScene(canvas: HTMLCanvasElement): ViewerScene {
     frameSize.copy(size).multiplyScalar(unit);
 
     // Own the materials before recolouring the clone.
-    modelMaterials = cloneMaterials(src);
+    modelMaterials = [...cloneMaterials(src), ...settleTranslucency(src)];
     recolor = makeRecolor(src);
     recolor.setScheme(schemeId);
 
