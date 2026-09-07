@@ -30,57 +30,53 @@ from `DEVONIAN_STAND_INS`, `npm run devonian` (it fails if a stand-in points at 
 shipped model is still listed), then the usual build and merge. Portraits for pending creatures use
 the shared fallback card; nothing to do there until the renders arrive with the model.
 
-## 2. Scenery and biome plates (nothing delivered yet)
+## 2. Scenery and biome plates (procedural stand-ins in place)
 
-- `public/assets/devonian/props/` (manifest + GLBs, 29 scenery families in [07](07-devonian-design.md) §5)
-  does not exist. The era's `assets.props` points at the Cambrian `assets/props/`, so the Devonian
-  coast is dressed with Cambrian sponges and algae. Integration when it lands: point `assets.props`
-  at the new folder, add the Devonian families to the flora/prop tables keyed by biome
-  (`src/sim/flora.ts`, `src/render/props.ts`) through the biome weights and `shoreDistance`
-  exactly as the Cambrian sets are, then the `tools/environment-test.ts` and `tools/flora-test.ts`
-  runs. Crinoid meadows, stromatoporoid heads and the river-mouth wood are the three that change
-  the look most.
-- `public/assets/devonian/biomes/` (the nine banner plates the HUD shows on entering a biome) does
-  not exist; `assets.biomes` points at the Cambrian plates, so a Devonian "Crinoid Meadow" banner
-  shows a Cambrian painting. Integration: drop nine `<biome>.webp` files in and flip the path.
-  These belong in `docs/image-requests.md` if they are not already being produced with the scenery.
+Neither authored set has been delivered, so both are generated for now:
 
-## 3. Per-creature specials
+- **Scenery.** Seven Devonian flora kinds (`crinoid`, `stromatoporoid`, `tabulate`, `rugose`,
+  `bryozoan`, `reed`, `log`) are placed by the era's own density table
+  (`FLORA_DENSITY` in `src/content/devonian/environment.ts`, keyed by biome through the biome
+  weights and `shoreDistance`; logs only within 120 of the shore) and drawn from procedural
+  geometry in `src/render/sea.ts`, with physics and cover in `src/sim/flora.ts` / `world.ts`.
+  When the authored GLBs land (`public/assets/devonian/props/` per the production contract),
+  point `assets.props` at them and map each kind to its prop the way `floraProps` maps the
+  Cambrian sponges; the placement and physics stay. The nursery reed density is thick; halve it
+  if low-quality framerate suffers.
+- **Biome plates.** `npm run devonian:plates` (`tools/devonian/biome-plates.mjs`) writes nine
+  soft procedural banners to `public/assets/devonian/biomes/`, which the era now points at.
+  Painted plates replace them file for file.
 
-Every Devonian creature carries an `ability` id (`jawShear`, `tuskLunge`, `shellJet`, …) and a
-description, but none of those ids reach `src/sim/expansion-abilities.ts`, so Y currently gives
-everyone the shared hide (camouflage or burrow). The rung mechanics that the identity table in
-[08](08-devonian-domination.md) *Grasp, tusks, tridents, brushes* leans on already work through
-`RULES` (armour and pierce, jet and hover, shore reach, shoaling, moult exuvia, scavenger double
-nutrition, benthos open-water standing, Titanichthys no-bite). Still to do, roughly a day:
+## 3. Per-creature specials (done)
 
-- Heavy variants: Onychodus tusk lunge (guard-break, half pierce is already in `armour()`), Walliserops
-  trident shove (displace, low damage), Rhinodipterus crush bite (bonus versus `shell`), Jaekelopterus
-  chelicerae grab (reuse the existing grab), Dunkleosteus already has full pierce.
-- Block variants: Eldredgeops enrol (already full armour while guarding), Stethacanthus brush display
-  (AI rival backs off once per encounter, hunter detection cost up), Doryaspis and Bothriolepis hard
-  shield (already armour while guarding, needs the visual).
-- Y variants: Gemuendina sand ambush (the existing burrow with an emergence bite is close),
-  Doryaspis floor sweep (grazing route), shell withdraw for the two cephalopods (armour already
-  reads `guard` on a `shell` as withdrawn; the `withdraw` SFX is registered but unused).
-- Wire the Devonian ids into the ability dispatcher behind a `RULES` hook rather than branching in
-  `game.ts`, per CLAUDE.md.
+Implemented in `src/sim/devonian/specials.ts` behind the `useAbility` / `beginAbility` /
+`stepAbility` / `camoDrain` hooks in `src/sim/era-rules.ts`, each with its own sample. Heavy
+specials: jaw shear (Dunkleosteus, full pierce, guard-break), run-through (Cladoselache),
+tusk lunge (Onychodus, half pierce), crush bite (Rhinodipterus, double against shells), neck snap
+(Tiktaalik, snaps to the lock target), chelicerae grab (Jaekelopterus), trident shove (Walliserops),
+shield push (Bothriolepis), armour flank (Coccosteus, more from behind). Guard: brush display
+(Stethacanthus bluffs an AI rival once per encounter), enrol (Eldredgeops, the shared enrolment).
+Y: shoal dart (Cheirolepis), shell jet and shell hover (the cephalopods), limb haul (Acanthostega,
+stronger on the sand), floor sweep (Doryaspis) and filter gulp (Titanichthys) feed standing; sand
+ambush is the shared burrow (Gemuendina); camouflage costs a quarter for Furcaster and Palaeoisopus.
+Left for a tuning pass: the numbers were set by feel, not play; the guard visuals for hard shields;
+Michelinoceras' jet versus Manticoceras' hover are the same jet with different Y specials.
 
-## 4. Music
+## 4. Music (optional)
 
-"Devonian Shells" is the opener. The rotation is still filled by the two Cambrian tracks. The two
-biome themes (`theme-rivermouth` for Sandy Shallows / River Mouth, `theme-opensea` for Tidal
-Channels / Reef Front / Open Sea) are tagged in `src/content/devonian/music.ts` and drop out of the
-rotation until the files exist in `public/music/`. Request is open in `docs/audio-requests.md`.
+"Devonian Shells" opens; the Cambrian reef tracks fill the rotation. More Devonian music is a
+nice-to-have, not pending work: the two biome theme tags in `src/content/devonian/music.ts`
+(`theme-rivermouth`, `theme-opensea`) pick up files dropped into `public/music/` and are silent
+otherwise. Nothing waits on them.
 
 ## 5. Sound
 
-Nineteen Devonian samples are generated and registered. Two were flagged at delivery: `withdraw`
-is hissy and `ambient-open-sea` sits about 15 dB under the reef bed. `anoxia-drone` and
-`ambient-open-sea` are loops but the loop table (`LOOPS` in `src/audio/audio.ts`) is shared, so the
-Devonian still plays the Cambrian reef ambience; a per-era loop table is a small change.
-`standing-up` and `shell-crush` are registered but nothing emits them yet (standing ticks and the
-crush bite from §3).
+Thirty-four Devonian samples are generated and registered, including one per special (§3).
+Two were flagged at delivery: `withdraw` is hissy and `ambient-open-sea` sits about 15 dB under
+the reef bed. `anoxia-drone` and `ambient-open-sea` are loops but the loop table (`LOOPS` in
+`src/audio/audio.ts`) is shared, so the Devonian still plays the Cambrian reef ambience; a per-era
+loop table is a small change. `standing-up` and `withdraw` are registered but nothing emits them
+yet (standing ticks; the shells' guard).
 
 ## 6. Balance and feel (from the first play-through)
 

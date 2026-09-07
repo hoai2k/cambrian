@@ -44,6 +44,21 @@ export const FLORA_PHYS: Record<FloraKind, FloraPhys> = {
   thalli: { h: 1.4, r: 0.4, profile: (f) => 0.3 + 0.7 * f, rigidity: 0.3, maxLean: 0.8, k: 15, c: 2.0, drag: 2.2 },
   // Grass tuft. Folds under almost anything, slows small swimmers a little.
   tuft: { h: 0.55, r: 0.32, profile: (f) => 0.3 + 0.7 * f, rigidity: 0.1, maxLean: 0.95, k: 24, c: 3.2, drag: 2.6 },
+  // ---- Devonian stand-ins ----
+  // Crinoid: a thin stalk with a cup and a feathery crown at the top. Soft; sways slowly and wide.
+  crinoid: { h: 2.2, r: 0.36, profile: (f) => 0.12 + 0.88 * f, rigidity: 0.6, maxLean: 0.5, k: 18, c: 2.6, drag: 1.4 },
+  // Stromatoporoid: a calcareous mound. Rigid like a boulder; nothing leans it.
+  stromatoporoid: { h: 0.7, r: 0.65, profile: (f) => Math.sqrt(Math.max(0, 1 - f * f * 0.9)), rigidity: 14, maxLean: 0.03, k: 60, c: 10, drag: 0.3 },
+  // Tabulate coral: a low flat shelf. Rigid; you swim over it.
+  tabulate: { h: 0.3, r: 0.6, profile: () => 1, rigidity: 9, maxLean: 0.04, k: 50, c: 9, drag: 0.3 },
+  // Rugose: a clump of horn corals. Firm; brushing it does little.
+  rugose: { h: 0.55, r: 0.45, profile: (f) => 0.6 + 0.4 * f, rigidity: 5, maxLean: 0.08, k: 45, c: 8, drag: 0.5 },
+  // Bryozoan: a flat net fan. Flexes a little at the top and springs back.
+  bryozoan: { h: 0.9, r: 0.45, profile: (f) => 0.15 + 0.85 * f, rigidity: 0.8, maxLean: 0.3, k: 28, c: 4.5, drag: 1.0 },
+  // Reed: tall thin stems for the river mouth and shallows. Folds right over and sways a lot.
+  reed: { h: 1.8, r: 0.25, profile: (f) => 0.25 + 0.75 * f, rigidity: 0.12, maxLean: 0.9, k: 14, c: 2.0, drag: 2.4 },
+  // Log: a trunk lying on the sand. Rigid; `r` is half its length, so it reads as a low round obstacle.
+  log: { h: 0.5, r: 1.3, profile: () => 1, rigidity: 30, maxLean: 0.02, k: 80, c: 12, drag: 0.2 },
 };
 
 const BEND_EXP = 1.3;

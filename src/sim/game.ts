@@ -480,6 +480,8 @@ export class Game implements AiWorld {
       if (a.hideMode !== 'none') {
         const buried = a.hideMode === 'burrowed'; stopHiding(a);
         if (buried) { a.emergenceHeavy = true; this.emergeStrike(a, def); }
+      } else if (RULES && RULES.useAbility(this, a, this.expansionContext())) {
+        this.flag(a, 'ability');                       // the era's own Y special took the press
       } else if (a.hideCd === 0 && (BURROWERS.has(a.creature) || a.stamina >= 8)) {
         a.state = 'free'; a.abilityActive = false; a.hideT = 0; a.seen = 0;
         if (BURROWERS.has(a.creature)) a.hideMode = 'descending';
@@ -505,7 +507,7 @@ export class Game implements AiWorld {
     }
     a.camoStrength = damp(a.camoStrength, a.hideMode === 'camouflage' ? 1 : 0, 3, dt);
     if (a.hideMode === 'camouflage') {
-      a.stamina = Math.max(0, a.stamina - CAMOUFLAGE_DRAIN * dt);
+      a.stamina = Math.max(0, a.stamina - CAMOUFLAGE_DRAIN * (RULES?.camoDrain(a) ?? 1) * dt);
       if (a.stamina === 0) stopHiding(a);
     }
     if (a.state === 'guard' || a.state === 'parry') a.guardHeld += dt;
@@ -948,6 +950,7 @@ export class Game implements AiWorld {
     a.abilityT = 0; a.abilityActive = true; a.state = 'ability'; a.stateT = 0;
     a.stateDur = def.abilityDuration ?? .55; a.hitDone.clear();
     beginExpansionAbility(this.expansionContext(), a, def);
+    RULES?.beginAbility(this, a, this.expansionContext());
     this.events.push({kind:'ability',pos:{...a.pos},actor:a.id,player:a.player,strength:lengthOf(a)});
     this.flag(a, 'heavy');
   }
@@ -956,6 +959,7 @@ export class Game implements AiWorld {
     a.abilityT += dt;
     const done = a.stateT >= a.stateDur;
     stepExpansionAbility(this.expansionContext(), a, def, dt);
+    RULES?.stepAbility(this, a, this.expansionContext(), dt);
     if (a.state !== 'ability') return;
     switch (def.ability) {
       case 'snatch': {
