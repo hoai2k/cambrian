@@ -2,6 +2,7 @@ import { assetPaths } from '../content/asset-paths';
 import { hideDescription } from '../sim/concealment';
 import { useEffect, useId, useRef, useState } from 'react';
 import type { HudSnapshot, PlayerHud, RadarBlipHud } from '../render/engine';
+import { PLAYER_COLORS } from '../render/engine';
 import type { EraHud } from '../sim/era-rules';
 import { creature } from '../sim/creatures';
 import { BIOME_ART, biomeArtPath, radarGlyphPath } from '../shared/environment-assets';
@@ -75,6 +76,8 @@ function PlayerPanel({ p }: { p: PlayerHud }) {
           <div className="bar target"><i style={{ width: `${p.lock.hp * 100}%` }} /></div>
         </div>
       )}
+      {p.notice && !p.board && <p className="notice">{p.notice}</p>}
+      {p.board && <Scoreboard board={p.board} me={p.index} />}
       <BiomeBanner biome={p.biome} alive={p.alive} />
       <Radar radar={p.radar} biome={p.biome} />
       {p.teleport && (
@@ -147,6 +150,44 @@ function PlayerPanel({ p }: { p: PlayerHud }) {
     </>
   );
 }
+
+/**
+ * The scoreboard, held open with the View button. Everyone in the running, sorted by whatever the
+ * mode is actually about, with the viewer's own row marked. Bots are on it too: in a mode where
+ * they fill the empty seats they are as much of a rival as anyone.
+ */
+function Scoreboard({ board, me }: { board: NonNullable<PlayerHud['board']>; me: number }) {
+  const { header, rows } = board;
+  return (
+    <div className="scoreboard">
+      <div className="board-head">
+        <p className="eyebrow">{header.title}</p>
+        {header.clock != null && <b className="board-clock">{fmtClock(header.clock)}</b>}
+      </div>
+      <p className="board-detail">{header.detail}</p>
+      <ol>
+        {rows.map((r, k) => (
+          <li key={k} className={`board-row ${r.player === me ? 'you' : ''} ${r.hunting ? 'hunting' : ''} ${r.alive ? '' : 'down'}`}
+            style={{ ['--player' as string]: r.player >= 0 ? PLAYER_COLORS[r.player % 4] : '#8fa3a8' }}>
+            <span className="board-who">{r.player >= 0 ? `P${r.player + 1}` : 'BOT'}</span>
+            <span className="board-name">
+              <b>{r.name}</b>
+              <small>{r.rank}{r.hunting ? ' · hunting' : ''}{r.alive ? '' : ' · down'}</small>
+              <i className="board-bar" style={{ transform: `scaleX(${r.progress})` }} />
+            </span>
+            {r.score != null && <span className="board-score" title="caught">{r.score}</span>}
+            <span className="board-tally">
+              <small>{r.kills} k · {r.eats} e</small>
+              <small>{r.player === me ? r.biome : fmtDist(r.distance)}</small>
+            </span>
+          </li>
+        ))}
+      </ol>
+    </div>
+  );
+}
+
+const fmtClock = (s: number) => `${Math.floor(s / 60)}:${String(Math.floor(s % 60)).padStart(2, '0')}`;
 
 const fmtDist = (d: number) => (d < 1000 ? `${Math.round(d)} m` : `${(d / 1000).toFixed(1)} km`);
 
