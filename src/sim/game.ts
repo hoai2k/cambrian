@@ -42,15 +42,26 @@ export type TeleportDest = 'home' | number;
 export interface TeleportOption { dest: TeleportDest; label: string; detail: string; distance: number; }
 /** One radar contact, in world offsets from the viewer (the renderer rotates it into the camera frame). */
 export interface RadarBlip {
-  kind: 'player' | 'threat' | 'giant' | 'home' | 'shore' | 'landmark';
+  kind: 'player' | 'threat' | 'giant' | 'home' | 'shore' | 'food' | 'landmark';
   dx: number; dz: number; distance: number;
   /** Player index for `player` blips, actor id otherwise. */
   id: number;
   /** This contact is currently after the viewer. */
   hunting: boolean;
+  /** World radius for area contacts (food shoals); point contacts leave it undefined. */
+  radius?: number;
+  /** How much there is to eat, for area contacts. */
+  strength?: number;
 }
 
 const { schools: SNACK_SCHOOLS, giants: GIANTS } = ACTIVE_ERA.ecology;
+
+// Feeding on a body. How many bites it takes is the body's length against the eater's, so a
+// snack goes down whole and a giant is a meal you have to stay for; each bite tears off its
+// share of the carcass.
+const BITE_TIME = 0.62;                  // seconds a single bite takes to chew
+const MAX_BITES = 12;
+export const bitesFor = (eater: Actor, food: Actor) => clamp(Math.ceil(3 * lengthOf(food) / Math.max(lengthOf(eater), 1e-3)), 1, MAX_BITES);
 
 // Crawlers off the seabed. They paddle: they keep swimming, slowly, and pay for the climb in
 // stamina (more than they regenerate, so a paddle is a crossing, not a second way to live).
@@ -513,7 +524,7 @@ export class Game implements AiWorld {
     a.home = { ...nursery };
     this.world.loadAround(nursery);
     a.pos = this.spawnPoint(nursery, a.creature, a.scale, a.player);
-    a.vel = v3(); a.state = 'free'; a.stateT = 0; a.respawnT = 0; a.corpseT = 0; a.eaten = 0;
+    a.vel = v3(); a.state = 'free'; a.stateT = 0; a.respawnT = 0; a.corpseT = 0; a.eaten = 0; a.eatBites = 0;
     stopHiding(a); a.camoStrength = 0; a.hideCd = 0; a.emergenceHeavy = false; a.spawnProtect = 3.5; a.hitFlash = 0; a.abilityActive = false; a.abilityCd = 0; a.lockTarget = -1; a.hunted = 0; a.hunterId = -1; a.wasHunted = false; a.swallowedBy = -1; a.bank = 0; a.pitch = 0;
     a.yaw = Math.PI;
     // hatch-in: grow from a speck over a second (reuses the moult state with a smaller start scale)
@@ -910,13 +921,29 @@ export class Game implements AiWorld {
         a.state = 'free'; a.stateT = 0; a.eatingTarget = -1;
       } else {
         const ratio = lengthOf(c) / L;
-        const dur = clamp(6 * ratio * ratio, 0.5, 4.5);
-        const bite = dt / dur;
         const before = c.eaten;
-        c.eaten = Math.min(1, c.eaten + bite);
-        this.gainNutrition(a, c, (c.eaten - before) * this.nutritionValue(a, c));
-        a.hp = Math.min(a.hpMax, a.hp + a.hpMax * (c.eaten - before) * 0.35 * Math.min(1, ratio * 2));
-        if (Math.floor(a.stateT * 3) !== Math.floor((a.stateT - dt) * 3)) this.events.push({ kind: 'eat', pos: { ...c.pos }, actor: a.id, other: c.id, strength: ratio, player: a.player });
+        if (c.eatBites <= 1) {
+          // Small enough to go down whole: one bite, but let it run so the reach-and-swallow
+          // performance has something to scrub against.
+          c.eaten = Math.min(1, c.eaten + dt / clamp(6 * ratio * ratio, 0.5, 4.5));
+        } else {
+          // Torn off in whole mouthfuls, on the chew beat. The first lands a little sooner than
+          // a full beat so biting something reads as immediate.
+          const phase = a.stateT + BITE_TIME * 0.6;
+          if (Math.floor(phase / BITE_TIME) !== Math.floor((phase - dt) / BITE_TIME)) {
+            const step = 1 / c.eatBites;
+            c.eaten = Math.min(1, Math.round((c.eaten + step) / step) * step);
+          }
+        }
+        const taken = c.eaten - before;
+        if (taken > 0) {
+          this.gainNutrition(a, c, taken * this.nutritionValue(a, c));
+          a.hp = Math.min(a.hpMax, a.hp + a.hpMax * taken * 0.35 * Math.min(1, ratio * 2));
+        }
+        // One event per mouthful for a torn body; a steady chewing beat for one swallowed whole.
+        // `strength` is the share of the body that just came off, which is what the renderer tears.
+        if (c.eatBites > 1) { if (taken > 0) this.events.push({ kind: 'eat', pos: { ...c.pos }, actor: a.id, other: c.id, strength: taken, player: a.player }); }
+        else if (Math.floor(a.stateT * 3) !== Math.floor((a.stateT - dt) * 3)) this.events.push({ kind: 'eat', pos: { ...c.pos }, actor: a.id, other: c.id, strength: ratio, player: a.player });
         if (c.eaten >= 1) { a.eats++; a.state = 'free'; a.stateT = 0; a.eatingTarget = -1; this.flag(a, 'ate'); }
       }
     } else if (a.state === 'ability') {
@@ -993,7 +1020,9 @@ export class Game implements AiWorld {
     let best: Actor | undefined, bd = Infinity;
     for (const o of this.nearby(a.pos, this.pounceRange(a))) {
       if (o.id === a.id || !isAlive(o) || isHidden(o)) continue;
-      if (this.mode === 'rise' && o.controller === 'player') continue;
+      // Another player is never chosen for you. Turning on one is deliberate: lock onto them
+      // with the right stick, or simply bite what is in front of your mouth.
+      if (o.controller === 'player' && a.controller === 'player') continue;
       const band = bandOf(a, o); if (band === 'giant') continue;
       const to = sub(o.pos, a.pos); const d = len3(to);
       if (dot(norm(to), h) < 0.6) continue;
@@ -1109,7 +1138,6 @@ export class Game implements AiWorld {
     for (const o of this.nearby(a.pos, L * 1.5 + 4)) {
       if (o.id === a.id || !isAlive(o) || a.hitDone.has(o.id) || isHidden(o)) continue;
       if (o.controller === 'swarm' && a.controller === 'swarm') continue;
-      if (this.mode === 'rise' && a.controller === 'player' && o.controller === 'player') continue; // co-op: allies can't hurt each other
       const d = dist(mouth, o.pos);
       if (d < reach + bodyRadius(o) * 1.1) {
         a.hitDone.add(o.id);
@@ -1128,7 +1156,6 @@ export class Game implements AiWorld {
     let best: Actor | undefined, bd = Infinity;
     for (const o of this.nearby(a.pos, L * 1.2 + 3)) {
       if (o.state !== 'dead' || o.eaten >= 1 || o.id === a.id) continue;
-      if (this.mode === 'rise' && o.controller === 'player') continue;
       const d = dist(a.pos, o.pos);
       if (d < L * 0.7 + lengthOf(o) * 0.5 && d < bd) { bd = d; best = o; }
     }
@@ -1138,6 +1165,9 @@ export class Game implements AiWorld {
   private startEating(a: Actor, c: Actor) {
     a.state = 'eating'; a.stateT = 0; a.eatingTarget = c.id;
     a.lockTarget = -1;
+    // The body's own bite count: whoever takes the first bite sizes it, and a carcass already
+    // half eaten keeps the count it was opened with.
+    if (c.eatBites < 1 || c.eaten <= 0) c.eatBites = bitesFor(a, c);
   }
 
   private consumeSnacks(a: Actor, L: number, def: ReturnType<typeof creature>) {
@@ -1145,7 +1175,6 @@ export class Game implements AiWorld {
     const moving = len3(a.vel) > 0.5 || def.id === 'waptia';
     for (const o of this.nearby(a.pos, L * 0.6 + 1)) {
       if (o.id === a.id || !isAlive(o)) continue;
-      if (o.controller === 'player' && a.controller === 'player' && this.mode === 'rise') continue;
       if (bandOf(a, o) !== 'snack') continue;
       // Only small wild things go down in one gulp. Players and bots always get a fight (three bites from a giant).
       if (o.controller !== 'swarm' && o.controller !== 'ambient') continue;
@@ -1209,7 +1238,8 @@ export class Game implements AiWorld {
     const cands: { a: Actor; score: number }[] = [];
     for (const o of this.nearby(a.pos, aim ? 10 + L * 6 : 14 + L * 7)) {
       if (o.id === a.id || !isAlive(o) || isHidden(o)) continue;
-      if (this.mode === 'rise' && o.controller === 'player') continue;
+      // Another player is only ever picked up by cycling the stick onto them, never by the snap.
+      if (o.controller === 'player' && a.controller === 'player' && cycle === 0) continue;
       const to = sub(o.pos, a.pos); const d = len3(to);
       const facing = dot(norm(to), h);
       const band = bandOf(a, o);
@@ -1426,18 +1456,21 @@ export class Game implements AiWorld {
   radarFor(i: number, range: number): RadarBlip[] {
     const p = this.players[i]; if (!p) return [];
     const out: RadarBlip[] = [];
+    // Only the other players carry off the edge of the dial: they are who you are trying to find.
+    // Everything alive is a contact or nothing — a creature outside the reach is simply not there.
     this.players.forEach((o, j) => { if (j !== i) out.push({ kind: 'player', dx: o.pos.x - p.pos.x, dz: o.pos.z - p.pos.z, distance: distXZ(o.pos, p.pos), id: j, hunting: false }); });
     for (const a of this.actors) {
       if (a.controller === 'player' || !isAlive(a) || isHidden(a)) continue;
+      const d = distXZ(a.pos, p.pos);
+      if (d > range) continue;
       const hunting = !!a.brain && a.brain.target === p.id && (a.brain.goal === 'hunt' || a.brain.goal === 'notice');
       const band = bandOf(p, a);
       if (band !== 'threat' && band !== 'giant' && !hunting) continue;
-      const d = distXZ(a.pos, p.pos);
-      if (d > range * 2.2 && !hunting) continue;
       out.push({ kind: band === 'giant' ? 'giant' : 'threat', dx: a.pos.x - p.pos.x, dz: a.pos.z - p.pos.z, distance: d, id: a.id, hunting });
     }
-    // Landmarks are what the radar is for in an endless sea: they are the only fixed things in it
-    // besides the shore and your nursery. Only within reach — they are a bearing, not a map.
+    for (const f of this.foodClusters(p, range)) out.push(f);
+    // Landmarks are the other thing the radar is for in an endless sea: with the shore and your
+    // nursery they are the only fixed points in it. Only within reach — a bearing, not a map.
     for (const m of this.world.landmarks) {
       const d = distXZ(m.pos, p.pos);
       if (d < range * 1.4) out.push({ kind: 'landmark', dx: m.pos.x - p.pos.x, dz: m.pos.z - p.pos.z, distance: d, id: m.id, hunting: false });
@@ -1461,6 +1494,37 @@ export class Game implements AiWorld {
       // Devonian's standing rungs) records an apex the same way.
       if (p.tier >= 4) this.discovery.apex.add(p.creature);
     }
+  }
+
+  /**
+   * The nearest shoals worth eating, as areas rather than contacts: wild snack and prey band
+   * creatures within reach, bucketed into cells so a school reads as one patch of food instead of
+   * a dozen dots. Other players never appear here — hunting one is a decision, not a suggestion.
+   */
+  private foodClusters(p: Actor, range: number, max = 3): RadarBlip[] {
+    const CELL = 14;
+    const cells = new Map<string, { dx: number; dz: number; n: number; food: number; r: number }>();
+    for (const a of this.nearby(p.pos, range)) {
+      if (a.id === p.id || !isAlive(a) || isHidden(a)) continue;
+      if (a.controller === 'player' || a.controller === 'bot') continue;
+      const band = bandOf(p, a);
+      if (band !== 'snack' && band !== 'prey') continue;
+      const dx = a.pos.x - p.pos.x, dz = a.pos.z - p.pos.z;
+      if (Math.hypot(dx, dz) > range) continue;
+      const key = `${Math.floor(a.pos.x / CELL)},${Math.floor(a.pos.z / CELL)}`;
+      const c = cells.get(key) ?? { dx: 0, dz: 0, n: 0, food: 0, r: 0 };
+      c.dx += dx; c.dz += dz; c.n++; c.food += this.nutritionValue(p, a);
+      cells.set(key, c);
+    }
+    const out: RadarBlip[] = [];
+    for (const c of cells.values()) {
+      c.dx /= c.n; c.dz /= c.n;
+      // One lone snack is not a meal worth steering for; one prey-sized body is.
+      if (c.n < 2 && c.food < 6) continue;
+      c.r = Math.min(CELL, 3 + Math.sqrt(c.n) * 2.2);
+      out.push({ kind: 'food', dx: c.dx, dz: c.dz, distance: Math.hypot(c.dx, c.dz), id: -1, hunting: false, radius: c.r, strength: c.food });
+    }
+    return out.sort((a, b) => a.distance - b.distance).slice(0, max);
   }
 
   /** The dominant biome under a player, for the HUD banner. */

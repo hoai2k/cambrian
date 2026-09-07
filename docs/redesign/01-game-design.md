@@ -148,7 +148,7 @@ expresses them differently so fights are varied.
 | **Parry** | LB (tap, timing) | Guard in the first 0.15 s of an incoming hit: no damage, attacker is staggered 0.8 s and you get a free heavy. Swimmers parry with a body twist, armoured crawlers with a shell clank. |
 | **Lock-on** | LT (toggle) | Camera frames you and the target, movement becomes **orbit/strafe** relative to the target, attacks home. Left stick left/right circles. Flick right stick to switch target. |
 | **Sense pulse** | D-pad ↑ | 2 s highlight of everything within sense range through cover, colour-coded by size band. Cooldown 6 s. |
-| **Eat** | automatic | Biting a dead body or a Snack consumes it. Eating takes 0.6 s per 10% of your mass and can be interrupted, so eating a big kill in the open is a risk. |
+| **Eat** | automatic | Biting a dead body or a Snack consumes it. **Anything can feed on anything**, however much bigger it was: the carcass comes apart in whole bites, `ceil(3 × its length / yours)` of them (1–12), a bite every 0.62 s. A body under a third of your length goes down whole and is carried into your mouth; bigger, it stays where it fell, and each bite tears its share of the meat off the model and flies it into your mouth. Eating can be interrupted, so opening a giant carcass in the open is a long risk. |
 
 > **The shipped bindings are different.** The layout above is the design's first
 > proposal; play settled somewhere else, and `readGamepad()` in
@@ -347,7 +347,7 @@ population.
 
 | Mode | Players | Description |
 | --- | --- | --- |
-| **Rise** (single / co-op) | 1–4 | The main experience. Everyone hatches as a Larva in the nursery. Reach Apex. Co-op shares nutrition from assisted kills, players can revive a downed ally by bumping them within 10 s. Session ends when any player reaches Apex and survives 90 s, or continues in free-play. Escalation: the reef's giant population grows as players grow. |
+| **Rise** (single / co-op) | 1–4 | The main experience. Everyone hatches as a Larva in the nursery. Reach Apex. Co-op shares nutrition from assisted kills, players can revive a downed ally by bumping them within 10 s. Players *can* turn on each other — bites land, and a dead player can be fed on — but nothing aims at another player for you: no aim snap, no auto-pounce, no auto-lock. Area abilities still spare a co-op partner, so nobody kills a friend by accident. Session ends when any player reaches Apex and survives 90 s, or continues in free-play. Escalation: the reef's giant population grows as players grow. |
 | **Feeding frenzy** (versus) | 2–4 | Growth race. Everyone starts Juvenile in separate nurseries. First to Apex wins; killing a player takes a third of their tier progress and gives it to you. Bots fill empty slots. 12-minute cap, biggest wins. |
 | **Hunter & hunted** (versus, asymmetric) | 2–4 | One player is a Giant (× 3) with a shrinking hunger meter; the others are Juveniles who must survive and reach Adult. Giant eats to stay alive; small ones hide, bait, and grow. Rotates who is the Giant. |
 | **Reef** (sandbox) | 1–4 | No win condition, pick any tier, tune giant density. For messing around and screenshots. |

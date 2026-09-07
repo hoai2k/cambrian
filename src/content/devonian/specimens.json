@@ -5,11 +5,11 @@
     "species": "Dunkleosteus terrelli",
     "category": "creature",
     "provenance": "Late Devonian (Famennian), Cleveland Shale, Ohio, USA",
-    "description": "Deep-bodied arthrodire with rigid cranial and thoracic armour, articulated gnathal cutting plates and a muscular posterior body.",
+    "description": "An armoured pelagic arthrodire with a short cranial wedge, articulated cutting jaws and a compact muscular trunk.",
     "model": "assets/devonian/creatures/dunkleosteus.glb",
     "lod": "assets/devonian/creatures/dunkleosteus.lod1.glb",
     "image": "assets/devonian/creatures/dunkleosteus.thumb.png",
-    "lengthMeters": 3.35,
+    "lengthMeters": 3.5,
     "looping": [
       "Idle",
       "Swim",
@@ -17,15 +17,15 @@
       "Eat"
     ],
     "sources": [
-      "https://www.palaeo-electronica.org/content/2024/5307-dunkleosteus-reconstruction",
+      "https://doi.org/10.26879/1343",
       "https://doi.org/10.3390/d15030318"
     ],
     "notes": [
-      "Original reconstruction informed by Engelman 2024, rather than a specimen scan.",
-      "Rear body, caudal outline, oral soft tissues and pigmentation remain interpretations.",
-      "Representative 3.35 m adult, not a genus maximum.",
-      "Growth is a relaxed maturation pose; no scale animation or moulting.",
-      "Armour boundaries are interpreted living plate outlines; detailed sutures should not be used as a research diagram."
+      "V2 reconstructs the profile from Engelman 2024 figures 3–4; not a specimen scan.",
+      "Rear-body proportions, caudal silhouette, living integument and oral soft tissues remain interpretations.",
+      "Representative 3.5 m adult, not a genus maximum.",
+      "PBR UV albedo, normal and roughness; independent vertex pigment bake for LOD.",
+      "Growth is maturation display, no scaling or moulting."
     ]
   },
   {
@@ -50,6 +50,11 @@
         "title": "Coatham et al. (2020), Was the Devonian placoderm Titanichthys a suspension feeder?",
         "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC7277245/",
         "doi": "10.1098/rsos.200272"
+      },
+      {
+        "title": "Boyle and Ryan (2017), New information on Titanichthys from the Cleveland Shale",
+        "url": "https://doi.org/10.1017/jpa.2016.136",
+        "doi": "10.1017/jpa.2016.136"
       }
     ],
     "notes": [
@@ -103,8 +108,8 @@
     "name": "Bothriolepis",
     "species": "Bothriolepis canadensis",
     "category": "creature",
-    "provenance": "Late Devonian (Frasnian), Escuminac Formation, Miguasha, Québec, Canada",
-    "description": "Low armoured antiarch with dorsal eyes, a rigid joined head and thoracic cuirass, narrow jointed dermal pectoral fins and a slender heterocercal tail.",
+    "provenance": "Late Devonian (Frasnian), Escuminac Formation, Miguasha, Quebec, Canada",
+    "description": "Angular armoured antiarch with a steep immobile head, inset dorsal eyes, a posterior dorsal crest and jointed dermal pectoral fins. A long flexible posterior carries a small dorsal fin and asymmetrical tail.",
     "model": "assets/devonian/creatures/bothriolepis.glb",
     "lod": "assets/devonian/creatures/bothriolepis.lod1.glb",
     "image": "assets/devonian/creatures/bothriolepis.thumb.png",
@@ -117,15 +122,15 @@
     ],
     "sources": [
       "https://www.palaeo-electronica.org/content/2014/647-3d-bothriolepis",
-      "https://www.patrimoine-culturel.gouv.qc.ca/rpcq/detail.do?id=93118&methode=consulter&type=bien"
+      "https://doi.org/10.26879/417"
     ],
     "notes": [
-      "Original artistic reconstruction, not a fossil scan; 0.40 m representative body length, not a maximum.",
-      "Head and thoracic cuirass remain rigidly joined following Béchard et al. 2014.",
-      "Paired dermal fins use restrained articulation; animations make no claim of terrestrial walking, powerful rowing or substrate anchoring.",
-      "Pigmentation, detailed living plate edges and oral soft tissues are interpretations.",
-      "Attack and Heavy are contact/brace asset gestures; Ability is a paired-fin display, with no gameplay rules.",
-      "Growth is a relaxed maturation gesture, never moulting or scale animation."
+      "Original anatomical reconstruction informed by Bechard et al. 2014 figures 2-3; not a fossil scan. Representative 0.40 m adult.",
+      "Continuous rigid cephalic/thoracic armour, steep head roof and approximately 36% armoured body length; exact living tissue thickness and pigmentation are inferred.",
+      "Dorsal eyes are placed within continuous head tissue, with no separate pads or orbital hoops; volume audit accompanies the delivery.",
+      "Pectoral segments have limited articulation, no toy ball joints, no head hinge and no terrestrial walking or rowing claim.",
+      "UV dermal detail uses an original imagegen swatch with authored anatomical seam relief; distant LOD bakes pigment into vertex colours and removes textures.",
+      "Small ventral oral folds and interior tissues are interpreted; action labels are asset compatibility gestures rather than Devonian gameplay definitions."
     ]
   },
   {
@@ -147,20 +152,26 @@
     ],
     "sources": [
       {
-        "title": "Wilkin (2023), The Hunsrück Slate Konservat-Lagerstätte",
-        "url": "https://onlinelibrary.wiley.com/doi/full/10.1111/gto.12426",
-        "doi": "10.1111/gto.12426"
+        "title": "Johanson and Smith (2005), Origin and evolution of gnathostome dentitions",
+        "url": "https://doi.org/10.1017/S1464793104006682",
+        "doi": "10.1017/S1464793104006682"
       },
       {
-        "title": "American Museum of Natural History, Gemuendina stuertzi specimen cast, ptc-5860",
-        "url": "https://digitalcollections.amnh.org/archive/Gemuendina-stuertzi--rhenanid-placoderm-from-the-Early-Devonian-of-Hunsruck--Budenbach--Germany--cast---about-400-million-years-old-2URM1THI7W9X.html"
+        "title": "Südkamp (2021), Ikonen des Hunsrückschiefers, illustrated specimens pp.17–18",
+        "url": "https://www.bundenbach-fossilien.de/Literatur/2021_S%C3%BCdkamp_Ikonen.pdf"
+      },
+      {
+        "title": "Westoll (1967), Radotina and other tesserate fishes",
+        "url": "https://doi.org/10.1111/j.1096-3642.1967.tb01397.x",
+        "doi": "10.1111/j.1096-3642.1967.tb01397.x"
       }
     ],
     "notes": [
-      "Low body, broad pectoral fins, upward-directed eyes and oral opening reflect fossil morphology; small unfused armouring tesserae are differentiated from arthrodire shield plates.",
-      "Tail outline, fin thickness, pigmentation and exact soft oral tissues are reconstruction choices. No modern-ray sting, ventral mouth or spiracles have been added.",
-      "0.30 m is a representative reconstructed animal, not a claimed species maximum.",
-      "Animations visualize plausible fin undulation and upward feeding; compatibility action names do not define Devonian gameplay. Fine ray struts are inferred support structures, not individually fossil-mapped."
+      "Broad low rhenanid form, upward eye/oral orientation, small lower-jaw denticles and regional differences in dermal ornament follow inspected fossil discussions.",
+      "A finless tapering tail follows the illustrated specimen account; generic shark dorsal/caudal fins, fin spokes, ventral gill rows and sting are omitted.",
+      "Living thickness, soft-tissue cavity, exact denticle/tessera arrangement, fin flexibility, pigmentation and motions are explicit reconstruction choices.",
+      "0.30 m is a representative reconstructed length close to the illustrated 304 mm specimen, not a claimed species maximum.",
+      "All action names are compatibility labels for specimen gestures; no Devonian gameplay rules are prescribed."
     ]
   },
   {
@@ -168,8 +179,8 @@
     "name": "Doryaspis",
     "species": "Doryaspis nathorsti",
     "category": "creature",
-    "provenance": "Early Devonian, Wood Bay Formation, Svalbard; coastal deposits with continental input",
-    "description": "Small jawless fish with a broad ridged shield, fixed lateral cornual extensions, a slender ventral pseudorostrum and a flexible downward-weighted tail.",
+    "provenance": "Early Devonian, Wood Bay Formation, Spitsbergen, Svalbard",
+    "description": "A jawless fish with a flat dorsal headshield, deep ventral armour, short fixed pseudorostrum and laterally extended rigid cornual plates; flexible scaled posterior with a hypocercal tail.",
     "model": "assets/devonian/creatures/doryaspis.glb",
     "lod": "assets/devonian/creatures/doryaspis.lod1.glb",
     "image": "assets/devonian/creatures/doryaspis.thumb.png",
@@ -181,25 +192,15 @@
       "Eat"
     ],
     "sources": [
-      {
-        "title": "Pernègre (2002), genus revision and first complete caudal fin",
-        "url": "https://www.tandfonline.com/doi/abs/10.1671/0272-4634%282002%29022%5B0735%3ATGDWHF%5D2.0.CO%3B2"
-      },
-      {
-        "title": "Botella et al. (2024), Delta wing design in earliest nektonic vertebrates",
-        "url": "https://www.nature.com/articles/s42003-024-06837-8"
-      },
-      {
-        "title": "Purnell (2002), Feeding in extinct jawless heterostracan fishes",
-        "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC1690863/"
-      }
+      "https://doi.org/10.1038/s42003-024-06837-8",
+      "https://doi.org/10.1671/0272-4634(2002)022[0735:TGDWHF]2.0.CO;2",
+      "https://www.app.pan.pl/archive/published/app07/app07-249.pdf"
     ],
     "notes": [
-      "Broad rigid flattened shield with fixed cornual plates, ventral pseudorostrum and hypocercal tail; no invented paired fins or hinged jaws.",
-      "Mouth lies above the pseudorostrum base, not at its tip. Oral soft tissue and opening depth are reconstruction choices.",
-      "Pseudorostrum function and diet remain uncertain. Bite/Eat are small oral pulses; Attack and Heavy are compatibility-labelled contact/withdrawal gestures, not evidence of predatory sword use.",
-      "Pigmentation, scale relief, precise soft tissues and motion are artistic inference. Representative length 0.20 m is an illustrative individual, not a maximum.",
-      "Only the posterior body and caudal fin generate locomotor flexion; fixed shield extensions do not flap. Growth is a relaxed trim and tail extension with no scaling."
+      "Original reconstruction, not a scan; head/projection/tail proportions guided by the D. nathorsti reconstruction in Botella et al. 2024 supplementary figure 1b.",
+      "Living pigmentation, exact soft-tissue lining and action timing are artistic interpretation.",
+      "No jaws, paired fins, hinged cornua, or moving pseudorostrum; action labels retain runtime compatibility.",
+      "Enlarged authoring coordinates; lengthMeters is the representative ecological size and modelLength supports runtime normalization."
     ]
   },
   {

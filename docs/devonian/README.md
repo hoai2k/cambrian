@@ -16,6 +16,8 @@ The first eight releases at `1e43197` are integration examples undergoing an add
 The [independent eye audit](../../tools/devonian/eye-audit.README.md) found all sixteen published
 eye globes below the required 50% embedding. Their individual head, orbital, mouth, material and
 motion revisions must pass the updated production contract before being described as art-final.
+The subsequent individual revisions and their exported-model evidence are tracked in
+[art review](art-review.md); a passing structural export alone is not an artistic approval.
 
 ## Files and provenance
 

@@ -95,7 +95,9 @@ export interface Actor {
   grabbedBy: number; grabbing: number; grabT: number;
   eatingTarget: number; eatProgress: number;
   corpseT: number;         // seconds since death for corpses
-  eaten: number;           // 0..1 fraction of corpse consumed
+  eaten: number;           // 0..1 fraction of corpse consumed, in whole bites once it is being torn
+  /** Bites this body is taking to finish, set by whoever is eating it; 1 means swallowed whole. */
+  eatBites: number;
   killer: number;
   noise: number; cover: number; stillness: number;
   dodgeDir: Vec3; dodgeTapT: number;

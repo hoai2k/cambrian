@@ -2,30 +2,30 @@
   "id": "doryaspis",
   "name": "Doryaspis",
   "species": "Doryaspis nathorsti",
-  "provenance": "Early Devonian, Wood Bay Formation, Svalbard; coastal deposits with continental input",
-  "description": "Small jawless fish with a broad ridged shield, fixed lateral cornual extensions, a slender ventral pseudorostrum and a flexible downward-weighted tail.",
+  "provenance": "Early Devonian, Wood Bay Formation, Spitsbergen, Svalbard",
+  "description": "A jawless fish with a flat dorsal headshield, deep ventral armour, short fixed pseudorostrum and laterally extended rigid cornual plates; flexible scaled posterior with a hypocercal tail.",
   "lengthMeters": 0.2,
-  "modelLength": 6.159889459609985,
+  "modelLength": 4.398599743843079,
   "locomotion": "Swim",
   "clips": [
-    "Idle",
-    "Swim",
-    "TurnLeft",
-    "TurnRight",
-    "Dive",
-    "Rise",
+    "Ability",
     "Attack",
     "Bite",
-    "Heavy",
-    "Hit",
     "Death",
-    "Guard",
-    "Parry",
+    "Dive",
     "Dodge",
     "Eat",
+    "Growth",
+    "Guard",
+    "Heavy",
+    "Hit",
+    "Idle",
+    "Parry",
+    "Rise",
     "Stagger",
-    "Ability",
-    "Growth"
+    "Swim",
+    "TurnLeft",
+    "TurnRight"
   ],
   "looping": [
     "Idle",
@@ -38,25 +38,68 @@
     "anchor_mouth_inside",
     "anchor_attack_primary"
   ],
-  "sources": [
+  "eyes": [
     {
-      "title": "Pern\u00e8gre (2002), genus revision and first complete caudal fin",
-      "url": "https://www.tandfonline.com/doi/abs/10.1671/0272-4634%282002%29022%5B0735%3ATGDWHF%5D2.0.CO%3B2"
+      "mesh": "eye_globe_R",
+      "surroundingMeshes": [
+        "head_shield_continuous_closed"
+      ],
+      "centerBlender": [
+        -0.23659078776836395,
+        -0.8311688303947449,
+        0.07445751130580902
+      ],
+      "normal": [
+        -0.2608499526977539,
+        -0.1893334984779358,
+        0.9466309547424316
+      ],
+      "radiiNormalUV": [
+        0.026,
+        0.036,
+        0.039
+      ],
+      "centerInset": 0.012,
+      "embeddedFraction": 0.8078990814037167,
+      "sampleCount": 47246,
+      "method": "seeded uniform ellipsoid volume samples against actual closed shield BVH signed nearest surface"
     },
     {
-      "title": "Botella et al. (2024), Delta wing design in earliest nektonic vertebrates",
-      "url": "https://www.nature.com/articles/s42003-024-06837-8"
-    },
-    {
-      "title": "Purnell (2002), Feeding in extinct jawless heterostracan fishes",
-      "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC1690863/"
+      "mesh": "eye_globe_L",
+      "surroundingMeshes": [
+        "head_shield_continuous_closed"
+      ],
+      "centerBlender": [
+        0.23659080266952515,
+        -0.8311687707901001,
+        0.07445751875638962
+      ],
+      "normal": [
+        0.26084983348846436,
+        -0.18933331966400146,
+        0.9466310143470764
+      ],
+      "radiiNormalUV": [
+        0.026,
+        0.036,
+        0.039
+      ],
+      "centerInset": 0.012,
+      "embeddedFraction": 0.8088092113618084,
+      "sampleCount": 47246,
+      "method": "seeded uniform ellipsoid volume samples against actual closed shield BVH signed nearest surface"
     }
   ],
+  "artVersion": 2,
+  "sources": [
+    "https://doi.org/10.1038/s42003-024-06837-8",
+    "https://doi.org/10.1671/0272-4634(2002)022[0735:TGDWHF]2.0.CO;2",
+    "https://www.app.pan.pl/archive/published/app07/app07-249.pdf"
+  ],
   "notes": [
-    "Broad rigid flattened shield with fixed cornual plates, ventral pseudorostrum and hypocercal tail; no invented paired fins or hinged jaws.",
-    "Mouth lies above the pseudorostrum base, not at its tip. Oral soft tissue and opening depth are reconstruction choices.",
-    "Pseudorostrum function and diet remain uncertain. Bite/Eat are small oral pulses; Attack and Heavy are compatibility-labelled contact/withdrawal gestures, not evidence of predatory sword use.",
-    "Pigmentation, scale relief, precise soft tissues and motion are artistic inference. Representative length 0.20 m is an illustrative individual, not a maximum.",
-    "Only the posterior body and caudal fin generate locomotor flexion; fixed shield extensions do not flap. Growth is a relaxed trim and tail extension with no scaling."
+    "Original reconstruction, not a scan; head/projection/tail proportions guided by the D. nathorsti reconstruction in Botella et al. 2024 supplementary figure 1b.",
+    "Living pigmentation, exact soft-tissue lining and action timing are artistic interpretation.",
+    "No jaws, paired fins, hinged cornua, or moving pseudorostrum; action labels retain runtime compatibility.",
+    "Enlarged authoring coordinates; lengthMeters is the representative ecological size and modelLength supports runtime normalization."
   ]
 }

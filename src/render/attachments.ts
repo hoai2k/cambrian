@@ -107,8 +107,9 @@ export class Attachments {
       if (pv.feedingPerformance) pv.poseFeeding(progress);
       pv.anchors.world('anchor_mouth', this.mouthPoint);
       this.insidePoint.copy(this.mouthPoint); pv.anchors.world('anchor_mouth_inside', this.insidePoint);
-      // A corpse much larger than its eater stays where it fell and is reached into rather than carried.
-      const carry = phase.attached && fv.visibleLength <= pv.visibleLength * 1.5;
+      // Only a body that goes down whole is carried. Anything that takes real bites stays where
+      // it fell and is torn into (see carcass.ts), whatever its size.
+      const carry = phase.attached && food.eatBites <= 1 && fv.visibleLength <= pv.visibleLength * 1.5;
       const target = this.target.copy(state.startTip).lerp(state.pickup, phase.pickup);
       if (carry) {
         target.copy(state.pickup).lerp(this.mouthPoint, phase.carry);

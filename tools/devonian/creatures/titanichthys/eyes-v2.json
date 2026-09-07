@@ -1,0 +1,59 @@
+{
+  "id": "titanichthys",
+  "eyes": [
+    {
+      "side": "R",
+      "center": [
+        -1.2865570783615112,
+        -2.012594223022461,
+        0.14655864238739014
+      ],
+      "radius": 0.071,
+      "surface": [
+        -1.3173630237579346,
+        -2.017151117324829,
+        0.1790429651737213
+      ],
+      "normal": [
+        -0.684575617313385,
+        -0.10126449167728424,
+        0.7218737602233887
+      ],
+      "vertexRange": [
+        42328,
+        42872
+      ],
+      "sampleCount": 30000,
+      "insideFraction": 0.8718333333333333,
+      "method": "Uniform volume samples inside true spherical globe; parity rays against continuous torso envelope, front aperture capped away from eyes; eyelids and armour excluded."
+    },
+    {
+      "side": "L",
+      "center": [
+        1.2865570783615112,
+        -2.012594223022461,
+        0.14655864238739014
+      ],
+      "radius": 0.071,
+      "surface": [
+        1.3173630237579346,
+        -2.017151117324829,
+        0.1790429651737213
+      ],
+      "normal": [
+        0.684575617313385,
+        -0.10126449167728424,
+        0.7218737602233887
+      ],
+      "vertexRange": [
+        43178,
+        43722
+      ],
+      "sampleCount": 30000,
+      "insideFraction": 0.8742,
+      "method": "Uniform volume samples inside true spherical globe; parity rays against continuous torso envelope, front aperture capped away from eyes; eyelids and armour excluded."
+    }
+  ],
+  "minimumInsideFraction": 0.8718333333333333,
+  "coordinateSystem": "Blender world bind: Z up, -Y forward"
+}

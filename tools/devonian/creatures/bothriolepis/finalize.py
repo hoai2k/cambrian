@@ -2,7 +2,7 @@
 import json,struct,math,hashlib
 from pathlib import Path
 import numpy as np
-H=Path(__file__).resolve().parent;R=H.parents[3];O=R/'public/assets/devonian/creatures'
+H=Path(__file__).resolve().parent;R=H.parents[3];O=R.parent/'devonian-authoring/bothriolepis/v2-candidate'
 
 def read(p):
  b=p.read_bytes();N=struct.unpack_from('<I',b,12)[0];d=json.loads(b[20:20+N]);start=20+N;size=struct.unpack_from('<I',b,start)[0];return d,b[start+8:start+8+size]
@@ -59,16 +59,10 @@ for suffix in ['','.lod1']:
    if a['name']in ['Idle','Swim','Guard','Eat']:assert np.allclose(v[0],v[-1],atol=1e-5),a['name']
   assert maxdur>0 and movement>0;motions.append({'name':a['name'],'duration':maxdur,'motion':round(movement,3),'digest':signature.hexdigest()})
  assert len(set(m['digest'] for m in motions))==len(motions)
- results.append({'file':p.name,'bytes':p.stat().st_size,'vertices':verts,'triangles':tri,'bounds':span.tolist(),'bones':len(d['skins'][0]['joints']),'sockets':sockets,'clips':motions,'removedIdentityScaleChannels':removed,'sha256':hashlib.sha256(p.read_bytes()).hexdigest()})
+ results.append({'file':p.name,'bytes':p.stat().st_size,'vertices':verts,'triangles':tri,'bounds':span.tolist(),'bones':len(d['skins'][0]['joints']),'boneNames':[d['nodes'][i]['name']for i in d['skins'][0]['joints']],'textures':len(d.get('textures',[])),'sockets':sockets,'clips':motions,'removedIdentityScaleChannels':removed,'sha256':hashlib.sha256(p.read_bytes()).hexdigest()})
 assert results[1]['triangles']/results[0]['triangles']<.4
+assert results[0]['boneNames']==results[1]['boneNames']
+assert results[1]['textures']==0, 'LOD must use baked vertex pigmentation only'
 meta=json.loads((O/'bothriolepis.json').read_text());meta['modelLength']=results[0]['bounds'][2];meta['clips']=[x['name'] for x in results[0]['clips']];(O/'bothriolepis.json').write_text(json.dumps(meta,indent=2)+'\n')
 (H/'validation.json').write_text(json.dumps({'checks':'finite transforms, normalized weights, root stable, identity-scale removal, unique motion, seamless loops, socket bind alignment, true LOD reduction','models':results,'lodTriangleRatio':results[1]['triangles']/results[0]['triangles']},indent=2)+'\n')
 print(json.dumps({'models':[{k:v for k,v in r.items()if k in ['file','bytes','triangles','vertices','bounds','bones']}for r in results],'lodRatio':results[1]['triangles']/results[0]['triangles']}))
-# Compact visual audit board from the final Blender camera renders.
-from PIL import Image, ImageDraw
-local=R.parent/'devonian-authoring/bothriolepis'
-board=Image.new('RGB',(1200,960),(17,25,28));draw=ImageDraw.Draw(board)
-for i,name in enumerate(['Idle','Swim','Bite','Eat','Heavy','Ability','Guard','Dodge','Death']):
- im=Image.open(local/(name+'.png')).convert('RGBA');im.thumbnail((400,292))
- x=(i%3)*400;y=(i//3)*320;board.paste(im,(x,y+24),im);draw.text((x+12,y+7),name,fill=(218,232,225))
-board.save(H/'action-review.jpg',quality=90)
