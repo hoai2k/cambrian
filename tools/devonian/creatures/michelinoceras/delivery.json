@@ -1,0 +1,35 @@
+{
+  "status": "initial-preview",
+  "files": {
+    "michelinoceras.card.png": {
+      "bytes": 67290,
+      "sha256": "77c076197ae90ccfd1f16f11badd2442b8df2e529e4f31f4d088944c48e60a3b"
+    },
+    "michelinoceras.glb": {
+      "bytes": 19581660,
+      "sha256": "f69f1bfaae8e96d775756bb1fdbdc6b4c0971adf88892fd132ed885baaaaa313"
+    },
+    "michelinoceras.json": {
+      "bytes": 2510,
+      "sha256": "932c2c63fb81520a5b4ad6ea82da925e0368b15269ecac7f129388e78267642f"
+    },
+    "michelinoceras.lod1.glb": {
+      "bytes": 4988732,
+      "sha256": "7166c05353811611d978fe202caea234a9a9b70eab359cd4d0e51da6a80be34b"
+    },
+    "michelinoceras.png": {
+      "bytes": 105489,
+      "sha256": "17cba1a169edd66405fba9ffb914dbc15c4f22da0149b2fce7683cca0bc01325"
+    },
+    "michelinoceras.select.png": {
+      "bytes": 450642,
+      "sha256": "8809454e3ff907be10008cc5a24eb1af699ad0fb530e25eb2dd875d42b672f08"
+    },
+    "michelinoceras.thumb.png": {
+      "bytes": 10720,
+      "sha256": "3fb1188b24dd78aee0726b28a2d0e94fa8f06d0f7f8cbab85fe774719a75b641"
+    }
+  },
+  "sourceBlend": "/Users/hoai/Documents/Stuff/Generations/cambrian/local/devonian-authoring/michelinoceras/v1/michelinoceras.blend",
+  "sourceBlendSha256": "dbd8ff9c84e476b69442e8ec340f8ca97e02f9e9d6e49ab8fea72bdaaf09de20"
+}

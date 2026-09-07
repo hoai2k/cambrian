@@ -1,0 +1,396 @@
+{
+  "candidateOnly": true,
+  "stage": "initial-preview",
+  "species": "Manticoceras regulare",
+  "files": {
+    "manticoceras.card.png": {
+      "sha256": "e81e61e00199061834e78ea771cb446c272db66e7c4ec88d5b40ee1fe6047385",
+      "bytes": 140369
+    },
+    "manticoceras.glb": {
+      "sha256": "c21f28f3529ac47860744ed802606e0606e2e41cc4fd8587f32f0d012851dd81",
+      "bytes": 8103064
+    },
+    "manticoceras.json": {
+      "sha256": "8031641a4020e2ea861d9162bc7c7bbbd1adc23fdd2b3376d0c475e7be658fe1",
+      "bytes": 2258
+    },
+    "manticoceras.lod1.glb": {
+      "sha256": "1fbe0959de6df68b4bbe4d67f297b08ac0595893202619311bf1f57f36f1d1ee",
+      "bytes": 1354760
+    },
+    "manticoceras.png": {
+      "sha256": "c423ee0149c4c8b85b3a10ba89d62c03bc159aeee34213dcd7a4610e8278a04d",
+      "bytes": 406651
+    },
+    "manticoceras.select.png": {
+      "sha256": "e0250214bc1f551855e4139f6c77c9d79783baa03b3f3e772f379d29d9537714",
+      "bytes": 927059
+    },
+    "manticoceras.thumb.png": {
+      "sha256": "7cfefaa8c115374df7793a0bc868dca0f0911415d2a5b94566457c364f6c54ef",
+      "bytes": 22045
+    }
+  },
+  "originalBlend": {
+    "path": "/Users/hoai/Documents/Stuff/Generations/cambrian/local/devonian-authoring/manticoceras/manticoceras-initial.blend",
+    "sha256": "7e634cfdb258495f27f632d6a0ff72bba99e61d227d1f59adb379ccf8c70e5a6",
+    "bytes": 5301669
+  },
+  "validation": {
+    "checks": "finite transforms, normalized weights, root stable, identity-scale removal, unique motion, seamless loops, socket bind alignment, true LOD reduction",
+    "models": [
+      {
+        "file": "manticoceras.glb",
+        "bytes": 8103064,
+        "vertices": 63097,
+        "triangles": 122346,
+        "bounds": [
+          0.682177871465683,
+          2.273889899253845,
+          3.253282308578491
+        ],
+        "bones": 49,
+        "boneNames": [
+          "root",
+          "body",
+          "head",
+          "arm0_0",
+          "arm0_1",
+          "arm0_2",
+          "arm0_3",
+          "arm1_0",
+          "arm1_1",
+          "arm1_2",
+          "arm1_3",
+          "arm2_0",
+          "arm2_1",
+          "arm2_2",
+          "arm2_3",
+          "arm3_0",
+          "arm3_1",
+          "arm3_2",
+          "arm3_3",
+          "arm4_0",
+          "arm4_1",
+          "arm4_2",
+          "arm4_3",
+          "arm5_0",
+          "arm5_1",
+          "arm5_2",
+          "arm5_3",
+          "arm6_0",
+          "arm6_1",
+          "arm6_2",
+          "arm6_3",
+          "arm7_0",
+          "arm7_1",
+          "arm7_2",
+          "arm7_3",
+          "arm8_0",
+          "arm8_1",
+          "arm8_2",
+          "arm8_3",
+          "arm9_0",
+          "arm9_1",
+          "arm9_2",
+          "arm9_3",
+          "beak_lower",
+          "beak_upper",
+          "funnel",
+          "funnelTip",
+          "mantleL",
+          "mantleR"
+        ],
+        "textures": 9,
+        "sockets": [
+          {
+            "name": "anchor_attack_primary",
+            "point": [
+              0.0,
+              0.0029999595544016877,
+              1.492999969248487
+            ]
+          },
+          {
+            "name": "anchor_mouth",
+            "point": [
+              0.0,
+              0.005999956286616315,
+              1.4910001143781206
+            ]
+          },
+          {
+            "name": "anchor_mouth_inside",
+            "point": [
+              0.0,
+              0.005999959059135362,
+              1.4099999082959644
+            ]
+          }
+        ],
+        "clips": [
+          {
+            "name": "Ability",
+            "duration": 1.7999999523162842,
+            "motion": 101.24,
+            "digest": "6456b35f3be3847a9fb35e4ef72ad7547bbdc8428d037b0547a30bd3320dadd5"
+          },
+          {
+            "name": "Attack",
+            "duration": 1.0,
+            "motion": 44.223,
+            "digest": "4623b370f4210f454c4d2af9e11539eaec10a1240824f69abcdcb091625ccac5"
+          },
+          {
+            "name": "Bite",
+            "duration": 0.5,
+            "motion": 15.603,
+            "digest": "8d2dc25517df03787df7bd6dd1d866f2ce0b9226ceef3143a7343d04a4824492"
+          },
+          {
+            "name": "Death",
+            "duration": 1.600000023841858,
+            "motion": 202.376,
+            "digest": "9a05b8c9589ebfb8fcbab9ec4c4fff7e370238d7d24765e16b885b77c72ca8b0"
+          },
+          {
+            "name": "Dive",
+            "duration": 1.2000000476837158,
+            "motion": 39.406,
+            "digest": "32f473b9b6b346d9f7150d40a86f3318b1bb07b4150b83e9763c5debc4cd2e9f"
+          },
+          {
+            "name": "Dodge",
+            "duration": 0.4000000059604645,
+            "motion": 42.161,
+            "digest": "70cf55a2080c1083af7801a635dd10975d5130e829bcf3ac90f8933940ba9f1c"
+          },
+          {
+            "name": "Eat",
+            "duration": 1.2000000476837158,
+            "motion": 38.31,
+            "digest": "1c33c27be538a7bc70630075fbcd8960b79f21155cd04d4adb983682bc41b0b5"
+          },
+          {
+            "name": "Grab",
+            "duration": 1.2000000476837158,
+            "motion": 120.736,
+            "digest": "585b1ee3e28cad222d44206d5af8100099e27e30ac90858164e81dd6699d4db8"
+          },
+          {
+            "name": "Growth",
+            "duration": 1.5,
+            "motion": 69.495,
+            "digest": "8c2a1c01ffec3d2e5b034406a0005e11f15474f6ec520d4c1529971fca990362"
+          },
+          {
+            "name": "Guard",
+            "duration": 1.0,
+            "motion": 15.576,
+            "digest": "ff7d532f5ebe257fb39e9a0087ccf492e53e56f7a7f99bc7fa0f20f909afa87e"
+          },
+          {
+            "name": "Heavy",
+            "duration": 1.100000023841858,
+            "motion": 103.661,
+            "digest": "d3b003302a0f47cdf48f8c0db30013e349a55f1de82d13fc47896beea0f4851c"
+          },
+          {
+            "name": "Hit",
+            "duration": 0.6000000238418579,
+            "motion": 45.733,
+            "digest": "965ee64159c27a394d71aee8f396f3a25ae9e5948678a61ae12a423ffa7e9d00"
+          },
+          {
+            "name": "Idle",
+            "duration": 2.4000000953674316,
+            "motion": 74.869,
+            "digest": "9161bfc9b0e9c7a231eded28ed5b83ceedb48ae7b7b4ba8bfa1daff2d39125a4"
+          },
+          {
+            "name": "Parry",
+            "duration": 0.3333333432674408,
+            "motion": 37.106,
+            "digest": "442e07f1f70a614cd9d28f7e6bbe6421988fdace7971da8953dbc1a809e481e8"
+          },
+          {
+            "name": "Rise",
+            "duration": 1.2000000476837158,
+            "motion": 39.406,
+            "digest": "8edd805397a4d434096129c9acd1bf96c3976d0097b881e5d0e34e1602f4734a"
+          },
+          {
+            "name": "Stagger",
+            "duration": 1.2000000476837158,
+            "motion": 55.558,
+            "digest": "8e5ee1bb226c46cbac4d5939fba729473d6c54a8fc48b42353d34ae3ec355bc6"
+          },
+          {
+            "name": "Swim",
+            "duration": 2.4000000953674316,
+            "motion": 104.641,
+            "digest": "224140d81d5b8ac5a678115f549787223a96cec9997b1557a995772a086a65c8"
+          },
+          {
+            "name": "TurnLeft",
+            "duration": 1.600000023841858,
+            "motion": 60.232,
+            "digest": "3b08e3716782278454f3bef0949789b3fd50957beaafae1ce43fd6b84fa1ec44"
+          },
+          {
+            "name": "TurnRight",
+            "duration": 1.600000023841858,
+            "motion": 60.059,
+            "digest": "7596ab2fbb977c31f2d3fda03d1fe22d9aa6927f5612824f57b507e00d8ed54c"
+          }
+        ],
+        "removedIdentityScaleChannels": 931,
+        "sha256": "c21f28f3529ac47860744ed802606e0606e2e41cc4fd8587f32f0d012851dd81"
+      },
+      {
+        "file": "manticoceras.lod1.glb",
+        "bytes": 1354760,
+        "vertices": 15446,
+        "triangles": 29336,
+        "bounds": [
+          0.682022213935852,
+          2.273889899253845,
+          3.2533085346221924
+        ],
+        "bones": 49,
+        "boneNames": [
+          "root",
+          "body",
+          "head",
+          "arm0_0",
+          "arm0_1",
+          "arm0_2",
+          "arm0_3",
+          "arm1_0",
+          "arm1_1",
+          "arm1_2",
+          "arm1_3",
+          "arm2_0",
+          "arm2_1",
+          "arm2_2",
+          "arm2_3",
+          "arm3_0",
+          "arm3_1",
+          "arm3_2",
+          "arm3_3",
+          "arm4_0",
+          "arm4_1",
+          "arm4_2",
+          "arm4_3",
+          "arm5_0",
+          "arm5_1",
+          "arm5_2",
+          "arm5_3",
+          "arm6_0",
+          "arm6_1",
+          "arm6_2",
+          "arm6_3",
+          "arm7_0",
+          "arm7_1",
+          "arm7_2",
+          "arm7_3",
+          "arm8_0",
+          "arm8_1",
+          "arm8_2",
+          "arm8_3",
+          "arm9_0",
+          "arm9_1",
+          "arm9_2",
+          "arm9_3",
+          "beak_lower",
+          "beak_upper",
+          "funnel",
+          "funnelTip",
+          "mantleL",
+          "mantleR"
+        ],
+        "textures": 0,
+        "sockets": [
+          {
+            "name": "anchor_attack_primary",
+            "point": [
+              0.0,
+              0.0029999595544016877,
+              1.492999969248487
+            ]
+          },
+          {
+            "name": "anchor_mouth",
+            "point": [
+              0.0,
+              0.005999956286616315,
+              1.4910001143781206
+            ]
+          },
+          {
+            "name": "anchor_mouth_inside",
+            "point": [
+              0.0,
+              0.005999959059135362,
+              1.4099999082959644
+            ]
+          }
+        ],
+        "clips": [
+          {
+            "name": "Death",
+            "duration": 1.600000023841858,
+            "motion": 202.376,
+            "digest": "9a05b8c9589ebfb8fcbab9ec4c4fff7e370238d7d24765e16b885b77c72ca8b0"
+          },
+          {
+            "name": "Idle",
+            "duration": 2.4000000953674316,
+            "motion": 74.869,
+            "digest": "9161bfc9b0e9c7a231eded28ed5b83ceedb48ae7b7b4ba8bfa1daff2d39125a4"
+          },
+          {
+            "name": "Swim",
+            "duration": 2.4000000953674316,
+            "motion": 104.641,
+            "digest": "224140d81d5b8ac5a678115f549787223a96cec9997b1557a995772a086a65c8"
+          }
+        ],
+        "removedIdentityScaleChannels": 147,
+        "sha256": "1fbe0959de6df68b4bbe4d67f297b08ac0595893202619311bf1f57f36f1d1ee"
+      }
+    ],
+    "lodTriangleRatio": 0.2397789874617887
+  },
+  "reviewReports": {
+    "render-validation.json": "93fd0c780aa10bd80a2cb39e9b60d771e80ef39fa82777fa883befa2631a86df",
+    "playback-validation.json": "852a1dc78451b59e4c6aba2a02abd40efb0f612b283fc7633e9e618563f3d52a",
+    "rigid-shell-validation.json": "168fba8c9642c16d36f31a9c5386033449a56e4d066b1631e8d45f5bafd89b96",
+    "validation.json": "9763b3afaecab881936b1d3a3ecf3b0188bc20844251e3f4106ad666b7108176",
+    "intake-validation.json": "8551b74e32df19ef6f4c56573cd15fd70131ba2caa4057dec755816db96e8181",
+    "render-validation-lod.json": "d0fc7f9f1555ca217fe5e71dbf4d660b99219cafdd8fe0a94150a6ba5c8b81af"
+  },
+  "eyeReports": {
+    "eye-audit-lod.json": "3cd3570ba0d1428e6f2c2cce5ad4a2a2dbad62e310596718368c348cb074ba74",
+    "eye-audit-full.json": "b9fd3b37339a39056e9c87bdd641fcbbc5aa8f911f604975ce39ce857c2f4a22"
+  },
+  "sourceScripts": {
+    "build.py": "218af9363aab7bb5600bdbec522361f8af1d48594e16c6fb30e0da25cdbaf557",
+    "delivery.py": "17ca5dab83eaf0650125747fcc8227ad48a5ac8c460b921eb427c9844016291c",
+    "export.py": "64a0c81151cdba8bc7416016329a7541df8067220af1a7a5949a1e0317bbf14e",
+    "finalize.py": "5d2e30cb30e494fa2648b52832da241384de82a1441fe586dfded3cb2d759c5e",
+    "geometry.py": "39d36db73edc4a4b6a1c848678efdf29f3f761d24b89c99193b529406f875ac6",
+    "materials.py": "d3f190978ba80b6c65062f4ec822e3b928f7af6684e8010c90539bd5e5f62bd9",
+    "motion.py": "76e6fb3f4e5035f4269a00b29c4ced40c3a0c8144663107eabffbc28892a9584",
+    "portraits.py": "01953e325759482f3d087bb3ce0122a8516dce353fe40c171d0487c9e872bf71",
+    "render.py": "8a8fbfe13c3535fa09e13404cba84392cc70118d176ca4c2aa3dc8a9dfc73baa"
+  },
+  "notes": [
+    "Complete initial preview; integration agent owns packaging, viewer review and main commits.",
+    "No pre-existing model existed. Original blend and imagegen source preserved.",
+    "Three anchor nodes are explicitly supported by shared check.mjs; full and LOD metadata match.",
+    "LOD retains Idle, Swim and Death with the full rig.",
+    "Later refinement may improve shell aperture/mantle fit, finer shell growth increments and arm-membrane deformation. Initial eye volume and export validity are mandatory and passed."
+  ]
+}

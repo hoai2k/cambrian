@@ -1,5 +1,7 @@
 # Titanichthys V2 visual and export review
 
+**Reopened as preview, 7 September 2026:** the user requested a total rework toward a deeper armoured fish with substantial jaws and long fins. See `docs/devonian/refinement-queue.md` and the preserved local user reference. The evidence below remains a historical review of the old files, not current final art approval.
+
 V2 replaces the first model's cylindrical head, floating plate overlays and separate fin-ray geometry. The source-constrained broad compressed shield now uses one compound-curved envelope with shallow sculpted sutures. Fins are closed membranes with relief and baked detail. Small eyes sit deeply in the true head surface, with a fitted upper tissue margin instead of an external ring. The original V1 source and published assets remain in the local authoring directory's `v1/` backup.
 
 The mouth has a continuous volumetric palate, cheeks, floor and narrow downturned rear lumen. No teeth or invented filtering structure are modeled. All folds are shallow relief in the oral mesh. The rear tube is open, with no converged end plug; rear UVs remain in the dark pharyngeal atlas region rather than wrapping to the bright front-mouth region. Smooth jaw-to-skull weights round the commissures during wide gapes. Exact soft-tissue form remains an artistic inference.
