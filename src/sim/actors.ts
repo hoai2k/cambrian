@@ -8,6 +8,20 @@ export const massOf = (a: Actor) => a.scale ** 3;
 export const speedFactor = (scale: number) => Math.pow(scale, 0.45);
 export const clearanceOf = (a: Actor) => lengthOf(a) * (creature(a.creature).clearance ?? (creature(a.creature).ground ? 0.13 : 0.2));
 export const bodyRadius = (a: Actor) => lengthOf(a) * (creature(a.creature).bodyRadius ?? .22);
+/**
+ * How close the body may get to the seabed. A crawler rides at its full clearance — that is what
+ * the number is for — but a swimmer is allowed to come most of the way down onto the sand, because
+ * skimming the floor is how you hunt what lives on it. `clearanceOf` stays the resting height the
+ * rest of the sim reasons about (hiding, spawning, the AI's idea of "near the bottom").
+ */
+export const floorClearance = (a: Actor) => clearanceOf(a) * (creature(a.creature).ground ? 1 : 0.45);
+/**
+ * How far a swimming body can be lifted over a rock in one step before the rock reads as a wall.
+ * Rocks are domes: their surface climbs steeply from the rim, so a body that is allowed to ride up
+ * this much per step follows the shape instead of stopping dead against it. Crawlers get nothing —
+ * they walk over the top by way of `groundHeight`, which already includes it.
+ */
+export const climbOver = (a: Actor) => creature(a.creature).ground ? 0 : lengthOf(a) * 0.5 + 0.5;
 
 export function bandRatio(r: number): Band {
   if (r < 0.45) return 'snack';

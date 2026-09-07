@@ -1,9 +1,9 @@
 import { ACTIVE_ERA } from '../content';
 import { RULES } from './era-rules';
 import { BURROWERS, HEAVY_SPECIALS, DEFENSIVE_SPECIALS, CAMOUFLAGE_DRAIN, camouflageMatch, clearPursuit, stopHiding } from './concealment';
-import { abilitySpeed, beginExpansionAbility, stepExpansionAbility, bloomRate, grazeRate } from './expansion-abilities';
+import { abilitySpeed, beginExpansionAbility, beginHeavyStrike, heavyStrikeReach, stepExpansionAbility, stepHeavyStrike, bloomRate, grazeRate } from './expansion-abilities';
 import { add, clamp, damp, dist, distXZ, dot, heading, len3, lerp, makeRng, norm, scale as vscale, sub, TAU, v3, wrapAngle, yawOf, type Rng, type Vec3 } from '../shared/math';
-import { applyScaleStats, bandOf, bodyRadius, canAct, clearanceOf, isAlive, isHidden, isInvulnerable, lengthOf, makeActor, massOf, speedFactor, staminaCost } from './actors';
+import { applyScaleStats, bandOf, bodyRadius, canAct, clearanceOf, climbOver, floorClearance, isAlive, isHidden, isInvulnerable, lengthOf, makeActor, massOf, speedFactor, staminaCost } from './actors';
 import { makeBrain, think, type AiWorld } from './ai';
 import { huntingPressure, phaseAt, untilNextPhase, type Phase } from './daynight';
 import { applyHit, kill, startSwallow, type HitContext } from './combat';
@@ -76,6 +76,12 @@ export interface TeleportOption { dest: TeleportDest; label: string; detail: str
 export interface RadarBlip {
   kind: 'player' | 'threat' | 'giant' | 'home' | 'shore' | 'food' | 'landmark' | 'territory';
   dx: number; dz: number; distance: number;
+  /**
+   * Height of the contact above (positive) or below (negative) the viewer. The dial is read from
+   * overhead, so without this a shoal thirty metres up sits on the same spot as one on the sand and
+   * you swim to the mark and find nothing. Bearings (home, the shore, landmarks) leave it at 0.
+   */
+  dy: number;
   /** Player index for `player` blips, actor id otherwise. */
   id: number;
   /** This contact is currently after the viewer. */
@@ -115,6 +121,12 @@ const PADDLE_SPEED = 0.35;    // fraction of the crawler's cruise while off the 
 const PADDLE_RISE = 2.4;      // climb speed, units/s at scale 1 (a swimmer's rise is 2.6 and faster to reach)
 const PADDLE_SINK = 2.2;      // terminal sink once RB is released — a settle, not a fall
 const PADDLE_STAMINA = 24;    // per second while climbing
+/**
+ * Sprint cost, per second at full trigger. A sprint is meant to be how you cross water and close a
+ * gap, not a two-second window: at this rate a full bar runs for most of a minute, and the swim
+ * back is still paid for out of the same bar.
+ */
+const BURST_STAMINA = 7.5;
 
 /**
  * Co-op revive. A downed player in Rise lies on the floor for this long instead of dissolving
@@ -778,7 +790,7 @@ export class Game implements AiWorld {
     const bursting = burstIn > 0.1 && a.stamina > 0 && a.state !== 'guard' && a.exhausted === 0 && !paddling;
     if (def.ability === 'ambushSurge' && input.burst > .1 && !a.prev.burst && a.abilityCd <= 0) { a.burstT = 2.2; a.abilityCd = 10; }
     const freeBurst = a.burstT > 0;
-    if (bursting && !freeBurst) a.stamina -= 22 * burstIn * dt;
+    if (bursting && !freeBurst) a.stamina -= BURST_STAMINA * burstIn * dt;
     else if (a.state === 'guard') a.stamina -= 3 * dt;
     else if (a.hideMode !== 'camouflage') a.stamina = Math.min(a.staminaMax, a.stamina + (speed < 0.4 ? 24 : 14) * dt * (a.state === 'free' ? 1 : 0.5));
     if (a.stamina <= 0) { a.stamina = 0; if (a.exhausted === 0) a.exhausted = 1.6; }
@@ -895,13 +907,13 @@ export class Game implements AiWorld {
     }
 
     // Static collision
-    const hitWall = resolveStatic(this.world, a.pos, bodyRadius(a), this.scratchBoulders, RULES?.shoreReach(a) ?? 0);
+    const hitWall = resolveStatic(this.world, a.pos, bodyRadius(a), this.scratchBoulders, RULES?.shoreReach(a) ?? 0, climbOver(a));
     if (hitWall && !def.ground) { a.vel.x *= 0.6; a.vel.z *= 0.6; }
     // Plants: swarm snacks are numerous and tiny, so they take turns on alternate steps.
     if (!isHidden(a) && a.state !== 'grabbed') {
       resolveFlora(this.world, a, dt, this.scratchFlora);
     }
-    const floor = groundHeight(this.world, a.pos.x, a.pos.z, this.scratchBoulders) + clearanceOf(a);
+    const floor = groundHeight(this.world, a.pos.x, a.pos.z, this.scratchBoulders) + floorClearance(a);
     if (def.ground) {
       if (a.grounded || a.pos.y <= floor) { a.pos.y = a.grounded ? damp(a.pos.y, floor, 18, dt) : floor; if (!a.grounded && a.hopVel < 0) { a.grounded = true; a.hopVel = 0; } }
       if (a.pos.y < floor) a.pos.y = floor;
@@ -909,6 +921,8 @@ export class Game implements AiWorld {
       const ceiling = SURFACE_Y - 0.8 - clearanceOf(a);
       if (a.pos.y > ceiling) { a.pos.y = ceiling; if (a.vel.y > 0) a.vel.y = 0; if (a.hopVel > 0) a.hopVel = 0; }
     } else {
+      // Riding the floor: a swimmer skims the sand and is carried up and over rocks rather than
+      // stopped by them, so the climb reads as a swim rather than a step.
       if (a.pos.y < floor) { a.pos.y = floor; if (a.vel.y < 0) a.vel.y *= -0.2; }
       const ceiling = SURFACE_Y - 0.8 - clearanceOf(a);
       if (a.airborne) {
@@ -1136,9 +1150,9 @@ export class Game implements AiWorld {
       this.feedOnBones(a, L, dt);
     }
 
-    // Aim range: the crosshair fills when a pounce would connect
+    // Aim range: the crosshair fills when whatever RT does for this creature would connect
     a.aimInRange = false;
-    if (a.lockTarget >= 0) { const t = this.idMap.get(a.lockTarget); if (t && isAlive(t)) a.aimInRange = dist(a.pos, t.pos) < this.pounceRange(a); }
+    if (a.lockTarget >= 0) { const t = this.idMap.get(a.lockTarget); if (t && isAlive(t)) a.aimInRange = dist(a.pos, t.pos) < this.heavyMove(a).reach; }
     // Lock target validity
     if (a.lockTarget >= 0) {
       const t = this.idMap.get(a.lockTarget);
@@ -1174,6 +1188,34 @@ export class Game implements AiWorld {
   }
 
   pounceRange(a: Actor) { return lengthOf(a) * 3.6 + 3; }
+
+  /**
+   * What the heavy button (RT) actually does for this creature right now: its name for the prompt,
+   * how far it reaches, and whether pressing it would do anything at all.
+   *
+   * The HUD used to announce "RT · POUNCE" over any aimed target inside the pounce's reach, for
+   * every creature. That is only true of a creature with no special. A creature with a heavy
+   * special gets the special instead, on its own cooldown and its own much shorter reach, and the
+   * three filter-feeding specials never strike a target at all — so the prompt lit for a button
+   * that would either do nothing or swing at water a body length short. `ready` mirrors the gates
+   * in the action cascade above exactly, `reach` is the move's own reach, and `name` is the move's
+   * own name, the way the choice screen already lists it.
+   */
+  heavyMove(a: Actor): { name: string; reach: number; ready: boolean } {
+    const def = creature(a.creature);
+    // A burrowed ambusher's emergence strike takes the button ahead of everything else.
+    if (a.emergenceHeavy) return { name: 'AMBUSH', reach: this.pounceRange(a), ready: true };
+    const pounce = { name: 'POUNCE', reach: this.pounceRange(a), ready: a.pounceCd === 0 && a.stamina >= 12 && a.exhausted === 0 };
+    if (HEAVY_SPECIALS.has(def.ability)) {
+      if (a.abilityCd <= 0 && a.stamina >= 18) return { name: def.abilityName.toUpperCase(), reach: heavyStrikeReach(a, def), ready: true };
+      // The special is down. A player's press falls through to the pounce rather than being
+      // swallowed, so the prompt follows the button instead of greying out on a move it will not
+      // play. Bots have no fallback, so for them the special is still the whole answer.
+      if (a.controller === 'player') return pounce;
+      return { name: def.abilityName.toUpperCase(), reach: heavyStrikeReach(a, def), ready: false };
+    }
+    return pounce;
+  }
 
   /** Nearest thing in front worth pouncing on when RT is pressed without aiming. */
   private pounceTargetAhead(a: Actor): Actor | undefined {
@@ -1251,8 +1293,9 @@ export class Game implements AiWorld {
     a.abilityCd = Math.max(2, (def.abilityDuration ?? .55) + .6);
     a.abilityT = 0; a.abilityActive = true; a.state = 'ability'; a.stateT = 0;
     a.stateDur = def.abilityDuration ?? .55; a.hitDone.clear();
+    beginHeavyStrike(this.expansionContext(), a, def);
     beginExpansionAbility(this.expansionContext(), a, def);
-    RULES?.beginAbility(this, a, this.expansionContext());
+    RULES?.beginAbility?.(this, a, this.expansionContext());
     this.events.push({kind:'ability',pos:{...a.pos},actor:a.id,player:a.player,strength:lengthOf(a)});
     this.flag(a, 'heavy');
   }
@@ -1260,6 +1303,7 @@ export class Game implements AiWorld {
   private updateAbility(a: Actor, def: ReturnType<typeof creature>, dt: number, input: InputFrame, L: number, sf: number) {
     a.abilityT += dt;
     const done = a.stateT >= a.stateDur;
+    stepHeavyStrike(this.expansionContext(), a, def);
     stepExpansionAbility(this.expansionContext(), a, def, dt);
     RULES?.stepAbility(this, a, this.expansionContext(), dt);
     if (a.state !== 'ability') return;
@@ -1675,7 +1719,7 @@ export class Game implements AiWorld {
     const out: RadarBlip[] = [];
     // Only the other players carry off the edge of the dial: they are who you are trying to find.
     // Everything alive is a contact or nothing — a creature outside the reach is simply not there.
-    this.players.forEach((o, j) => { if (j !== i) out.push({ kind: 'player', dx: o.pos.x - p.pos.x, dz: o.pos.z - p.pos.z, distance: distXZ(o.pos, p.pos), id: j, hunting: false }); });
+    this.players.forEach((o, j) => { if (j !== i) out.push({ kind: 'player', dx: o.pos.x - p.pos.x, dy: o.pos.y - p.pos.y, dz: o.pos.z - p.pos.z, distance: distXZ(o.pos, p.pos), id: j, hunting: false }); });
     // Anything on your tail is always shown; of the rest, only the closest one that could eat you.
     let nearest: RadarBlip | undefined;
     for (const a of this.actors) {
@@ -1686,7 +1730,7 @@ export class Game implements AiWorld {
       const band = bandOf(p, a);
       const dangerous = band === 'threat' || band === 'giant';
       if (!dangerous && !hunting) continue;
-      const blip: RadarBlip = { kind: band === 'giant' ? 'giant' : 'threat', dx: a.pos.x - p.pos.x, dz: a.pos.z - p.pos.z, distance: d, id: a.id, hunting };
+      const blip: RadarBlip = { kind: band === 'giant' ? 'giant' : 'threat', dx: a.pos.x - p.pos.x, dy: a.pos.y - p.pos.y, dz: a.pos.z - p.pos.z, distance: d, id: a.id, hunting };
       if (hunting) out.push(blip);
       else if (!nearest || d < nearest.distance) nearest = blip;
     }
@@ -1696,7 +1740,7 @@ export class Game implements AiWorld {
     // nursery they are the only fixed points in it. Only within reach — a bearing, not a map.
     for (const m of this.world.landmarks) {
       const d = distXZ(m.pos, p.pos);
-      if (d < range * 1.4) out.push({ kind: 'landmark', dx: m.pos.x - p.pos.x, dz: m.pos.z - p.pos.z, distance: d, id: m.id, hunting: false });
+      if (d < range * 1.4) out.push({ kind: 'landmark', dx: m.pos.x - p.pos.x, dy: 0, dz: m.pos.z - p.pos.z, distance: d, id: m.id, hunting: false });
     }
     // Held ground, as an area rather than a contact. Only patches big enough to matter to this
     // player and close enough to walk into: the point is to let them decide before they are in it.
@@ -1706,11 +1750,11 @@ export class Game implements AiWorld {
       if (lengthOf(o) < lengthOf(p) * 0.55) continue;                    // nothing you could not simply eat
       const d = distXZ(b.territory, p.pos);
       if (d > range * 1.6 + b.territoryR) continue;
-      out.push({ kind: 'territory', dx: b.territory.x - p.pos.x, dz: b.territory.z - p.pos.z, distance: d, id: o.id, hunting: false, radius: b.territoryR });
+      out.push({ kind: 'territory', dx: b.territory.x - p.pos.x, dy: 0, dz: b.territory.z - p.pos.z, distance: d, id: o.id, hunting: false, radius: b.territoryR });
     }
-    out.push({ kind: 'home', dx: p.home.x - p.pos.x, dz: p.home.z - p.pos.z, distance: distXZ(p.home, p.pos), id: -1, hunting: false });
+    out.push({ kind: 'home', dx: p.home.x - p.pos.x, dy: 0, dz: p.home.z - p.pos.z, distance: distXZ(p.home, p.pos), id: -1, hunting: false });
     const sz = shoreZ(p.pos.x);
-    out.push({ kind: 'shore', dx: 0, dz: sz - p.pos.z, distance: Math.abs(sz - p.pos.z), id: -1, hunting: false });
+    out.push({ kind: 'shore', dx: 0, dy: 0, dz: sz - p.pos.z, distance: Math.abs(sz - p.pos.z), id: -1, hunting: false });
     return out;
   }
 
@@ -1737,28 +1781,31 @@ export class Game implements AiWorld {
    */
   private foodClusters(p: Actor, range: number, max = 1): RadarBlip[] {
     const CELL = 14;
-    const cells = new Map<string, { dx: number; dz: number; n: number; food: number; r: number }>();
+    const cells = new Map<string, { dx: number; dy: number; dz: number; n: number; food: number; r: number }>();
     for (const a of this.nearby(p.pos, range)) {
       if (a.id === p.id || !isAlive(a) || isHidden(a)) continue;
       if (a.controller === 'player' || a.controller === 'bot') continue;
       const band = bandOf(p, a);
       if (band !== 'snack' && band !== 'prey') continue;
-      const dx = a.pos.x - p.pos.x, dz = a.pos.z - p.pos.z;
-      if (Math.hypot(dx, dz) > range) continue;
+      const dx = a.pos.x - p.pos.x, dy = a.pos.y - p.pos.y, dz = a.pos.z - p.pos.z;
+      // Reach is a sphere, not a column: a shoal a long way overhead is not food within reach of a
+      // body on the floor, and showing it as a mark on the sand is how you send someone nowhere.
+      if (Math.hypot(dx, dy, dz) > range) continue;
       const key = `${Math.floor(a.pos.x / CELL)},${Math.floor(a.pos.z / CELL)}`;
-      const c = cells.get(key) ?? { dx: 0, dz: 0, n: 0, food: 0, r: 0 };
-      c.dx += dx; c.dz += dz; c.n++; c.food += this.nutritionValue(p, a);
+      const c = cells.get(key) ?? { dx: 0, dy: 0, dz: 0, n: 0, food: 0, r: 0 };
+      c.dx += dx; c.dy += dy; c.dz += dz; c.n++; c.food += this.nutritionValue(p, a);
       cells.set(key, c);
     }
     const out: RadarBlip[] = [];
     for (const c of cells.values()) {
-      c.dx /= c.n; c.dz /= c.n;
+      c.dx /= c.n; c.dy /= c.n; c.dz /= c.n;
       // One lone snack is not a meal worth steering for; one prey-sized body is.
       if (c.n < 2 && c.food < 6) continue;
       c.r = Math.min(CELL, 3 + Math.sqrt(c.n) * 2.2);
-      out.push({ kind: 'food', dx: c.dx, dz: c.dz, distance: Math.hypot(c.dx, c.dz), id: -1, hunting: false, radius: c.r, strength: c.food });
+      out.push({ kind: 'food', dx: c.dx, dy: c.dy, dz: c.dz, distance: Math.hypot(c.dx, c.dz), id: -1, hunting: false, radius: c.r, strength: c.food });
     }
-    return out.sort((a, b) => a.distance - b.distance).slice(0, max);
+    // Nearest by the swim it actually takes to get there, which includes the climb or the dive.
+    return out.sort((a, b) => Math.hypot(a.distance, a.dy) - Math.hypot(b.distance, b.dy)).slice(0, max);
   }
 
   /**
