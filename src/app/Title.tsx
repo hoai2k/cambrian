@@ -14,7 +14,7 @@ export function TitleScreen({ onStart, loaded, padCount }: { onStart: () => void
       <div className="title-inner">
         <p className="title-tag">{copy.tagline} <em>{copy.taglineEm}</em></p>
         <p className={`press-start ${loaded ? '' : 'loading'}`}>{loaded ? 'PRESS START' : copy.loading}</p>
-        <p className="title-hint">{padCount > 0 ? `${padCount} controller${padCount > 1 ? 's' : ''} connected · any button · others join on the next screen` : 'Connect an Xbox controller, press any key, or click'}</p>
+        <p className="title-hint">{padCount > 0 ? `${padCount} controller${padCount > 1 ? 's' : ''} connected · any button · others join on the next screen` : 'Press any key or click to play on mouse and keyboard · or connect a controller'}</p>
       </div>
       {sibling && (
         // The other era, one click away and only from the title screen. Clicks and keys are kept

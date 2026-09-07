@@ -53,4 +53,5 @@ export function clearPursuit(a:Actor,actors:Actor[]) {
  }
 }
 export function hideLabel(id:CreatureId){return BURROWERS.has(id)?'Burrow':'Camouflage';}
-export function hideDescription(id:CreatureId){return BURROWERS.has(id)?'Y: descend and bury in sediment without stamina drain. Y or heavy exits with a free emergence strike.':'Y: copy the nearest creature, plant, rock or seafloor colour. Uses stamina; idle creatures slowly sink. Move to counter sinking; attack, block or sprint reveals you.';}
+/** Names the hide button as `{ability}`; the UI fills it in for that player's device. */
+export function hideDescription(id:CreatureId){return BURROWERS.has(id)?'{ability}: descend and bury in sediment without stamina drain. {ability} or heavy exits with a free emergence strike.':'{ability}: copy the nearest creature, plant, rock or seafloor colour. Uses stamina; idle creatures slowly sink. Move to counter sinking; attack, block or sprint reveals you.';}

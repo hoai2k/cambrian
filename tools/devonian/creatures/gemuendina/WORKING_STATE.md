@@ -1,12 +1,12 @@
 # Gemuendina working state
 
-**Current — 2026-09-07T22:39:03+00:00:** material-03 accepted for the animated local candidate.
-Frozen build/check/portrait execution is ready in `rework-v3/HANDOFF-CANDIDATE-01.md`.
-Manifest SHA `68206254ff31837a44e681ade4d687cb7ce397be7801f1ef6b85124d736cdcf0`. Candidate-01 output is fresh/unexecuted.
-See `rework-v3/production-checkpoint.md` and `candidate-design-review-01.md`.
-Exact 18 actions, matching 28-bone full/LOD rig and three nested anchors authored.
-Actual rig/GLB/palette review remains pending. Eye beads still require correction
-and completed-rework containment audit. No final approval/public/Git changes.
+**Current — 2026-09-07T23:37:05+00:00:** individual candidate02 creative rework ACCEPTED.
+Completed actual audit03 PASS (56poses; eye conservative minima86.87%full,
+87.10%LOD; denticle contacts within.010), all54 actual action PNGs now reviewed.
+Read `rework-v3/final-art-verdict.md` and `production-checkpoint.md`.
+No further blocking creative defect identified. Parent owns current UI/default
+palette, intake/build/tests/catalogue/release; child made no public/Git changes.
+Frozen sources/exports and earlier/failed evidence remain preserved.
 
 ## 2026-09-07T21:22:03Z — gemuendina — total rework clay authoring
 

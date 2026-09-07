@@ -2,7 +2,7 @@
 
 Repository `/Users/hoai/Documents/Stuff/Generations/cambrian/local/expansion-repo`, branch
 `devonian-assets`. Separate main worktree `../devonian-publish`. Last verified remote publication
-**bb8e241** (main and devonian-assets pushed), including concurrent remote **f069010**. Preserve
+**e673f0e** (main and devonian-assets pushed), including concurrent remote **f069010**. Preserve
 checkpoints and verify before publication; never force push. Fetch/push `git@github.com:hoai2k/cambrian.git`.
 Other agents change main concurrently. Do not stage active authors' mutable files.
 
@@ -12,12 +12,11 @@ All **21 initial Devonian creatures** and the complete initial non-creature libr
 Non-creature milestone was **f7b5618**; user received the requested separate notification.
 47 props/plants, 11 runtime proxies, 9 biome paintings, 29 scenery boards, 9 regional boards,
 3 lighting concepts, 10 material sets, 2 atmosphere atlases, 2 scale plates. See supporting-assets.md.
-Three Devonian models are final, 18 preview. All pending reworks remain preview in game/viewer.
+Four Devonian models are final, 17 preview. Gemuendina V3 review complete and integrated locally; publication pending below. All pending reworks remain preview in game/viewer.
 Dunkleosteus already has modeled oral interior and independently animated jaws.
 
 Finish seven full reworks before the 12 other individual refinements: **Gemuendina, Titanichthys,
-Coccosteus, Doryaspis, Bothriolepis, Stethacanthus, Cambrian Odaraia**. None of these seven reworks
-is finalized yet. Eye/general audits follow each completed rework, not the old models awaiting
+Coccosteus, Doryaspis, Bothriolepis, Stethacanthus, Cambrian Odaraia**. Gemuendina is the first completed rework (1/7); the other six remain unfinished. Eye/general audits follow each completed rework, not the old models awaiting
 replacement. Preserve originals; do not approve a new version just because it is more complex.
 
 ## Active phases — authoritative scheduling
@@ -28,39 +27,43 @@ exports/renders/checks. Compact explicit model/effort spawns, no broad history f
 agent-workflow.md. Four active slots total, including root. Use frozen hash-bound groups;
 executors stop unexpected failures and preserve output. They do not make creative fixes.
 
-- `/root/gemuendina_rework_design` (Astra high) has completed **candidate02** correction design.
-  Candidate01 completed full/LOD build, structural checks, 18-action Three.js playback/anchors;
-  actual bind audit found ~83% of both eyes inside. Full eye orientation still looked bead-like
-  and LOD fine vertex pigment aliased, so candidate02 reorients orbit/cornea and filters LOD colour.
-  `HANDOFF-CANDIDATE-02.md` and frozen manifest
-  **46694693186ee4a95226d6cd9736951f9a7ef2165e2f8c4cf72d68d57bffaceb** bind all inputs.
-  Terra completed candidate02 build/check/13 renders; full SHA
-  **6d62b356043f443e1842e5bc105e3e551c1d5a7930652bf61553c6a09731c4aa**, LOD
-  **280fc74db17ccc6776ba422fba3e6c9f0695558e0d13952fce9bb79fd39d00f3**.
-  Root and author actual visual gate accepted progression to fresh candidate02 action/eye audit
-  and actual runtime playback. Not final approval. Review glossy eye highlights in game and soft
-  LOD pigment at its actual transition distance. Dispatch handoff phase4 to Terra when slot free.
-  Root owns review-playback-01.mjs (executed for candidate01); create separate version02 evidence.
-  Material03 uses original built-in ImageGen skin swatch, prompt/provenance imagegen-skin-01.json.
-- `/root/titanichthys_rework_clay03` (Astra high), reviewing **clay04 oral views** then materials.
+- `/root/gemuendina_rework_design` (Astra high), completed final individual art review of candidate02.
+  Root copied exact candidate02 public full/LOD+4portraits+metadata; final verdict accepted; status/catalogue/pending queue now updated. Read rework-v3/preview-delivery-02.md. New local seven-file backup has copy hashes.
+  Full6d62b356043f443e1842e5bc105e3e551c1d5a7930652bf61553c6a09731c4aa,
+  LOD280fc74db17ccc6776ba422fba3e6c9f0695558e0d13952fce9bb79fd39d00f3.
+  Quantitative audit03 PASS56poses(full48/LOD8), conservative eye minima86.87/87.096%; contacts
+  max.001858<.010, consistent anchors. Report64e6e112687c0e6e86b2adfedd15f532d1902d53fe231986197d03a4d990804c.
+  Failed audit02 preserved: valid STEP export encountered LINEAR-only checker; new03correct
+  interpolation independently validated against144926Threequeries. No model change to pass.
+  Playback02 PASS18actions/anchors/errors[], all clips video/3phase frames,12transition pairs.
+  Root/author inspected representative actual poses and similar~35px full/LOD switching image.
+  Interactive viewer revealed old automatic Stargazer Ochre washes out new eyes/texture; only
+  Gemu default scheme set to authored default; actual reload confirmed olive pigment/readable eyes.
+  Intake184612/47044triangles,18clips,3sockets PASS; build/typecheck/643Devonian PASS.
+  Astra inspected all54action PNGs and audit03, final-art-verdict.md accepts exact candidate02.
+  Root actual authored-default UI passed; publication and post-main viewer verification remain.
+  Sources/candidate/portraits/input hashes stay immutable.
+- `/root/titanichthys_rework_clay03` (Astra high), authoring **material study01** on accepted clay04.
   Clay04 body/fins are improved over rejected01–03; same frozen blend SHA
   **69ad4e7d1daa7aec64835a198c9b13c4a017cf4aa441cd2e58ae9a4207c404ec**.
   Read HANDOFF-clay04 and HANDOFF-oral-clay04. Terra completed two actual frontal rest/open oral
   views in clay-04/oral-inspection-01; root inspected both, coherent inset lip/floor, no detached
-  rail/panels. Author independently reviewing before advancing anatomy-aware armor/PBR source.
+  rail/panels. Author independently agreed coarse-form gate; authoring anatomy-mapped blue/slate
+  armour PBR, quieter flexible trunk, warm oral/ventral tissue and fin-ray detail. No displacement.
   Keep thin edentulous jaws; user reference is Dunk-like and must not add Dunk teeth to Titan.
-- `/root/coccosteus_rework_design` (Astra high), actively authoring **clay04 exterior refinement**.
+- `/root/coccosteus_rework_design` (Astra high), authoring **material01** on accepted clay04.
   Clay03 fixed verified 1,890 collapsed oral quads/duplicate passage with one closed exterior and
   lining. Actual five views confirm coherent mouth; source checks cover 279 lumen,288 containment,
   120 floor/roof sections. Preserve this oral topology. But head became pointed shallow wedge,
   eyes crowded upward/inward; restore rounded substantial armored anterior, local cheeks/orbits
   and cranial/thorax differentiation per user reference. Preserve improved posterior/fins.
   Clay03 blend SHA **e88eacaeb7c64077430c0e5a322b5e1a21cabb234631a9ff8d32d998de57fc36**.
-  No materials/final eye audits yet. Old named backup remains intact.
-- `/root/devonian_execution_handoff` (Terra medium), idle after successful Gemu candidate02.
-  Next: candidate02 phase4 actual exported full/LOD eye/action/contact audit once a slot is free;
-  root/author visual gate is approved. Then root frozen runtime playback02 or next clay handoff.
-  Preserve frozen groups and output directories; stop unexpected errors, no creative fixes.
+  Clay04 builder804d9932e9f3453aefc0a67b0aecdab4cb36491b2377b4839fbf7fe60605b0d3.
+  Terra clay04 build/five views PASS; root/author accepted coarse form. Author developing anatomy
+  plate relief and bronze anterior/slate-olive posterior; no final eye audits yet.
+  Old named backup remains intact.
+- `/root/devonian_execution_handoff` (Terra medium), idle after audit03 PASS; next frozen Titan/Cocc
+  material handoffs. Current full/LOD candidate and clay execution complete, no retries needed.
 - Doryaspis/Bothriolepis/Stethacanthus/Odaraia authors not started. References and requirements are
   in refinement-queue.md and ../cambrian/refinement-queue.md. The Doryaspis mouth-art/anatomy
   discrepancy was explained to the user earlier; read the saved primary-source notes.

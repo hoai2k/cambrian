@@ -3,7 +3,7 @@ import { BURROWERS, hideLabel } from '../sim/concealment';
 import * as THREE from 'three';
 import { audio, SAMPLES } from '../audio/audio';
 import { distanceAtten, HUGE_LENGTH } from '../audio/mix';
-import { emptyControls, gamepads, KeyboardInput, readGamepad, rumble, type RawControls } from '../input/input';
+import { applyMouse, emptyControls, gamepads, KeyboardInput, MouseLook, readGamepad, rumble, type RawControls } from '../input/input';
 import { clamp, damp, TAU, wrapAngle } from '../shared/math';
 import { bandOf, isAlive, isHidden, lengthOf } from '../sim/actors';
 import { creature, type CreatureId } from '../sim/creatures';
@@ -18,10 +18,13 @@ import { Bubbles, Impacts, Silt, Splash } from './fx';
 import { Mouthfuls } from './carcass';
 import { createSea, type Quality, type SeaEnvironment } from './sea';
 import { RULES, type EraHud } from '../sim/era-rules';
+import { key as controlKey, schemeForDevice, type Scheme } from '../shared/controls';
 
 export interface Rect { x: number; y: number; w: number; h: number; }
 export interface PlayerHud {
   index: number; creature: CreatureId; color: string; alive: boolean;
+  /** What this player is holding, so every prompt on their half of the screen names their buttons. */
+  scheme: Scheme;
   hp: number; hpMax: number; stamina: number; staminaMax: number; exhausted: boolean;
   tier: number; tierName: string; progress: number; scale: number;
   abilityName: string; abilityReady: number; abilityActive: boolean; abilityUnlocked: boolean;
@@ -83,6 +86,8 @@ export interface EngineCallbacks {
   onError(msg: string): void;
   onLoaded(): void;
   onProgress?(p: AssetProgress): void;
+  /** The pointer lock went away on its own (Escape, alt-tab). The match should pause. */
+  onPointerLost?(): void;
 }
 
 export const PLAYER_COLORS = ['#61f2d5', '#ffb457', '#c7a3ff', '#ff86a4'];
@@ -167,6 +172,19 @@ export class Engine {
   private splash = new Splash(SURFACE_Y);
   private silt = new Silt();
   private keyboard = new KeyboardInput();
+  private mouse = new MouseLook();
+  /**
+   * Whether the mouse is steering the camera. Decided once per match, at `startMatch`: with no
+   * controller anywhere the game is a mouse-and-keyboard game, and with even one pad in the
+   * session the pads own it and the mouse stays a pointer.
+   */
+  private mouseLook = false;
+  /**
+   * Whether the match still wants the pointer. Distinct from `mouseLook`, which only says the
+   * match is being played on a mouse: the lock also has to come off while paused, in a dialog and
+   * on the results screen, all of which are places the player needs a cursor back.
+   */
+  private pointerWanted = false;
   private setups: PlayerSetup[] = [];
   private raf = 0;
   private last = performance.now();
@@ -204,6 +222,10 @@ export class Engine {
     // Split-screen renders the scene once per player; without this the shadow map is rebuilt every time.
     this.renderer.shadowMap.autoUpdate = false;
     container.appendChild(this.renderer.domElement);
+    // The mouse is attached to the canvas host, not the canvas: the canvas is torn down and rebuilt
+    // when quality changes, and the pointer lock has to survive that.
+    this.mouse.attach(container);
+    this.mouse.onLost = () => this.cb.onPointerLost?.();
     this.scene.add(this.bubbles.points, this.sparkles.points, this.impacts.group, this.silt.group, this.splash.group, this.mouthfuls.group);
     (window as any).__cambrian = this;
     this.resize = new ResizeObserver(() => this.onResize());
@@ -239,13 +261,23 @@ export class Engine {
     this.onResize();
   }
   setLook(speed: number, invert: boolean) { this.lookSpeed = speed; this.invertY = invert; }
-  setPaused(p: boolean) { this.paused = p; }
+  setPaused(p: boolean) { this.paused = p; this.syncPointer(); }
+  private syncPointer() { this.mouse.want(this.pointerWanted && !this.paused && !this.attract); }
+  /** The match is over but the sea keeps running behind the results: give the cursor back. */
+  releasePointer() { this.pointerWanted = false; this.syncPointer(); }
+  /** Whether this match is being played on mouse and keyboard, so the HUD can name the buttons. */
+  get usingMouse() { return this.mouseLook; }
 
   /**
    * Carry a finished co-op match on rather than restarting it: same world, same bodies, same
    * progress, with the mode's goal no longer watching. Returns whether the match resumed.
    */
-  continueMatch(): boolean { return this.game?.continueMatch() ?? false; }
+  continueMatch(): boolean {
+    const ok = this.game?.continueMatch() ?? false;
+    // Back into the sea, so the pointer comes back with it (the results screen gave it up).
+    if (ok) { this.pointerWanted = this.mouseLook; this.syncPointer(); }
+    return ok;
+  }
   get isAttract() { return this.attract; }
 
   /** Background ecosystem for the title / select screens. */
@@ -253,6 +285,9 @@ export class Engine {
     this.generation++;
     this.clearMatch();
     this.attract = true;
+    this.mouseLook = false;
+    this.pointerWanted = false;
+    this.mouse.want(false);
     this.setups = [];
     this.game = new Game('reef', []);
     this.sea?.dispose();
@@ -281,6 +316,11 @@ export class Engine {
       return cs;
     });
     this.paused = false;
+    // Mouse and keyboard, or pads. Not both: a session with a controller in it is a controller
+    // game, and stealing the pointer there would only take the cursor away from the other player.
+    this.mouseLook = gamepads().length === 0 && !setups.some((s) => typeof s.device === 'number');
+    this.pointerWanted = this.mouseLook;
+    this.syncPointer();
     // The button that started the match is almost certainly still held right now. Seed the menu
     // edge from what each device reads at this instant, or the first frame sees Start down with
     // no previous state, calls it a fresh press, and pauses the match the moment it begins.
@@ -297,7 +337,10 @@ export class Engine {
   }
 
   private controlsFor(setup: PlayerSetup, index: number): RawControls {
-    if (setup.device === 'keyboard') return this.keyboard.read(1);
+    if (setup.device === 'keyboard') {
+      const c = this.keyboard.read(1);
+      return this.mouseLook ? applyMouse(c, this.mouse.read()) : c;
+    }
     if (setup.device === 'keyboard2') return this.keyboard.read(2);
     const gp = navigator.getGamepads?.()[setup.device];
     if (!gp || !gp.connected) return emptyControls();
@@ -354,10 +397,16 @@ export class Engine {
             // Right stick pressed in: up/down zooms instead of pitching.
             cs.zoom = clamp(cs.zoom * Math.exp(c.lookY * dt * 1.6), 0.55, 2.2);
           } else {
-            cs.yaw = wrapAngle(cs.yaw - c.lookX * dt * 2.6 * this.lookSpeed);
-            cs.pitch = clamp(cs.pitch + c.lookY * dt * 1.6 * this.lookSpeed * (this.invertY ? -1 : 1), PITCH_UP, PITCH_DOWN);
-            if (Math.abs(c.lookY) < 0.05) cs.pitch = damp(cs.pitch, 0.2, 0.6, dt);
+            // A stick is a rate and the mouse is a distance, so the stick term is scaled by the
+            // frame time and the mouse term is not; one of the two is always zero.
+            cs.yaw = wrapAngle(cs.yaw - (c.lookX * dt * 2.6 + c.lookDX) * this.lookSpeed);
+            cs.pitch = clamp(cs.pitch + (c.lookY * dt * 1.6 + c.lookDY) * this.lookSpeed * (this.invertY ? -1 : 1), PITCH_UP, PITCH_DOWN);
+            // Pitch drifts back to level when a stick is let go, which is what makes a pad feel
+            // like it is swimming for you. A mouse holds where it was put: the same drift there
+            // would fight the hand every frame.
+            if (!this.mouseLook && Math.abs(c.lookY) < 0.05) cs.pitch = damp(cs.pitch, 0.2, 0.6, dt);
           }
+          if (c.zoomDelta) cs.zoom = clamp(cs.zoom * Math.exp(c.zoomDelta), 0.55, 2.2);
         }
       });
     }
@@ -854,9 +903,11 @@ export class Engine {
         case 'stagger': { world('stagger', e.pos); break; }
         case 'dodge': { this.bubbles.emit(e.pos, 14, 0.8, 2.5, 0.06, 0.7); world(heavy('dodge', e.actor), e.pos); break; }
         case 'silt': { this.bubbles.emit(e.pos, 30, 1.5, 2, 0.08, 1.2); world('silt', e.pos); break; }
-        // A special announces itself with sparkles around the body, not a flash. An impact flash on
-        // your own creature reads as damage or a respawn — the two things it is emphatically not.
-        case 'ability': { const len = e.strength ?? 1; this.sparkles.emit(e.pos, Math.round(16 + len * 7), 0.5 + len * 0.35, 0.6 + len * 0.25, 0.06, 1.1); this.bubbles.emit(e.pos, 20, 1, 3, 0.08); const ab = game.byId(e.actor); const key = ab ? `ability:${creature(ab.creature).ability}` : 'ability'; world(SAMPLES[key] ? key : 'ability', e.pos); break; }
+        // A special is your own action, not something happening to you, so its tell is the quietest
+        // in the game: a few sparkles close to the body that say "this one is not the ordinary
+        // heavy". Deliberately under the shoal-join burst, and well under anything that means
+        // damage — a flash here read as being hit or respawning, which is why it is gone.
+        case 'ability': { const len = e.strength ?? 1; this.sparkles.emit(e.pos, Math.round(5 + len * 2), 0.25 + len * 0.18, 0.25 + len * 0.1, 0.035, 0.5); this.bubbles.emit(e.pos, 20, 1, 3, 0.08); const ab = game.byId(e.actor); const key = ab ? `ability:${creature(ab.creature).ability}` : 'ability'; world(SAMPLES[key] ? key : 'ability', e.pos); break; }
         case 'shellCrush': { this.impacts.spawn(e.pos, '#ffd9a0', 2.2, 0.5); this.bubbles.emit(e.pos, 28, 0.8, 4, 0.1, 1.4); world('shellCrush', e.pos); break; }
         case 'grab': { const at = this.impactPos(e.actor, e.other, e.pos); this.impacts.spawn(at, '#ffb070', 1.4, 0.35); world('grab', at); if (e.player != null && e.player >= 0) { const d = padOf(e.player); if (typeof d === 'number') rumble(d, 1, 0.6, 300); } break; }
         case 'hunted': { personal('hunted'); if (e.player != null && e.player >= 0) { const d = padOf(e.player); if (typeof d === 'number') rumble(d, 0.6, 0.9, 500); } break; }
@@ -927,6 +978,7 @@ export class Engine {
         if (!onScreen) hunterAngle = Math.atan2(v.y * (v.z > 1 ? -1 : 1), v.x * (v.z > 1 ? -1 : 1));
       }
       const era = RULES?.hud(game, i);
+      const scheme = schemeForDevice(this.setups[i]?.device ?? 'keyboard', this.mouseLook);
       const markers: PlayerHud['bandMarkers'] = [];
       if (cs) {
         const L = lengthOf(p);
@@ -1001,9 +1053,10 @@ export class Engine {
       }
       return {
         index: i, creature: p.creature, color: PLAYER_COLORS[i % 4], alive: p.state !== 'dead', aim,
+        scheme,
         hp: p.hp, hpMax: p.hpMax, stamina: p.stamina, staminaMax: p.staminaMax, exhausted: p.exhausted > 0,
         tier: p.tier, tierName: era ? `${era.stage} · ${era.rungName}` : TIER_NAMES[p.tier], progress: era ? era.standing / 100 : p.tier >= 4 ? 1 : clamp(p.nutrition / TIER_NEED[p.tier], 0, 1), scale: p.scale,
-        abilityName: p.hideMode === 'descending' ? 'Sinking to burrow' : p.hideMode === 'burrowed' ? 'Buried · Y emerge' : p.hideMode === 'camouflage' ? `Camo: ${p.camoLabel}` : RULES?.ySpecial(p.creature)?.name ?? hideLabel(p.creature), abilityReady: p.hideMode === 'camouflage' ? p.stamina / p.staminaMax : RULES?.ySpecial(p.creature) ? 1 - clamp(p.abilityCd / Math.max(1, creature(p.creature).abilityCooldown), 0, 1) : 1 - clamp(p.hideCd / 2, 0, 1), abilityActive: p.hideMode !== 'none' || (p.state === 'ability' && !!RULES?.ySpecial(p.creature)), abilityUnlocked: true,
+        abilityName: p.hideMode === 'descending' ? 'Sinking to burrow' : p.hideMode === 'burrowed' ? `Buried · ${controlKey('ability', scheme)} emerge` : p.hideMode === 'camouflage' ? `Camo: ${p.camoLabel}` : RULES?.ySpecial(p.creature)?.name ?? hideLabel(p.creature), abilityReady: p.hideMode === 'camouflage' ? p.stamina / p.staminaMax : RULES?.ySpecial(p.creature) ? 1 - clamp(p.abilityCd / Math.max(1, creature(p.creature).abilityCooldown), 0, 1) : 1 - clamp(p.hideCd / 2, 0, 1), abilityActive: p.hideMode !== 'none' || (p.state === 'ability' && !!RULES?.ySpecial(p.creature)), abilityUnlocked: true,
         senseReady: 1 - clamp(p.senseCd / 6, 0, 1),
         lock: lockA && isAlive(lockA) ? { name: creature(lockA.creature).name, kind: creature(lockA.creature).kind, band: bandOf(p, lockA), hp: lockA.hp / lockA.hpMax, color: BAND_COLOR[bandOf(p, lockA)] } : undefined,
         hunted: p.hunted, hunterAngle, hunterName: hunter ? creature(hunter.creature).name : undefined,
@@ -1039,6 +1092,7 @@ export class Engine {
     cancelAnimationFrame(this.raf);
     this.resize.disconnect();
     this.keyboard.dispose();
+    this.mouse.dispose();
     this.assets.dispose();
     this.clearMatch();
     this.sea?.dispose();

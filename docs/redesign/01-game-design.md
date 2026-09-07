@@ -208,6 +208,22 @@ expresses them differently so fights are varied.
 > with H for teleport and comma for the scoreboard.
 > The in-game **?** panel and `npm run bindings` are generated from the same
 > source, so they never drift from the code.
+>
+> **With no controller connected, the game is a mouse-and-keyboard game.** At the
+> dive, `Engine.startMatch` checks: no pad in the session means pointer lock, the
+> mouse steers the camera, the wheel zooms, and the three buttons take the three
+> controls that have to fire the instant they are wanted — **left click** is the
+> heavy (RT), **right click** dashes (LB), **middle click** aims (LT). G, V and
+> Tab keep working alongside them. One pad anywhere in the session and the pads
+> own the match; the mouse stays a cursor.
+>
+> Every button *name* in the game comes from `src/shared/controls.ts`, per scheme
+> (`pad`, `kbm`, `key1`, `key2`) and per player: the HUD chips, the crosshair
+> prompt, the choice screen's kit list, the pause and results menus, and the help
+> page, which swaps the Xbox diagram for a keyboard-and-mouse one. Onboarding
+> hints come out of `src/sim` naming actions — `{heavy}`, `{dash}` — because the
+> simulation must not know what anyone is holding; `fillControls` resolves them
+> for that player's own device.
 
 ### Rules that make it dynamic
 
