@@ -1,0 +1,810 @@
+{
+  "id": "cladoselache",
+  "revision": "V2",
+  "status": "Author-reviewed local candidate; pending parent packaging and independent main viewer review",
+  "frozenAt": "2026-09-07T17:02:23.189223+00:00",
+  "candidateFiles": {
+    "cladoselache.card.png": {
+      "path": "/Users/hoai/Documents/Stuff/Generations/cambrian/local/devonian-authoring/cladoselache/v2-candidate/cladoselache.card.png",
+      "bytes": 223051,
+      "sha256": "e69ed1ba9a0a3f4acd0d13e0e53d8a20fee8905c697b1a19a3bb095044ff8a7d",
+      "dimensions": [
+        800,
+        600
+      ],
+      "mode": "RGBA",
+      "alphaRange": [
+        0,
+        255
+      ]
+    },
+    "cladoselache.glb": {
+      "path": "/Users/hoai/Documents/Stuff/Generations/cambrian/local/devonian-authoring/cladoselache/v2-candidate/cladoselache.glb",
+      "bytes": 13158548,
+      "sha256": "63d16b3c60cf553cc7ce6788b2efd85d156aeec637d93578cec8ba98e1720272"
+    },
+    "cladoselache.json": {
+      "path": "/Users/hoai/Documents/Stuff/Generations/cambrian/local/devonian-authoring/cladoselache/v2-candidate/cladoselache.json",
+      "bytes": 2749,
+      "sha256": "d5f00ba42b899fe8f5391639db1b2f0b4d3ce16f7f711d41e9fba5e0aaa0acc1"
+    },
+    "cladoselache.lod1.glb": {
+      "path": "/Users/hoai/Documents/Stuff/Generations/cambrian/local/devonian-authoring/cladoselache/v2-candidate/cladoselache.lod1.glb",
+      "bytes": 2191804,
+      "sha256": "93a325d99cc78a2c09a9ecbfaf3a6ea5ccffe5832f8f568f3b104a86a93b4665"
+    },
+    "cladoselache.png": {
+      "path": "/Users/hoai/Documents/Stuff/Generations/cambrian/local/devonian-authoring/cladoselache/v2-candidate/cladoselache.png",
+      "bytes": 990126,
+      "sha256": "fba7ae00a0866751b5b6f52cdf273577f541e75a04d4b3f98da6b1f1015b675e",
+      "dimensions": [
+        1200,
+        900
+      ],
+      "mode": "RGBA",
+      "alphaRange": [
+        255,
+        255
+      ]
+    },
+    "cladoselache.select.png": {
+      "path": "/Users/hoai/Documents/Stuff/Generations/cambrian/local/devonian-authoring/cladoselache/v2-candidate/cladoselache.select.png",
+      "bytes": 801453,
+      "sha256": "2677b1c44d1e57752bb79378d2ab4fbcde54846218d11e1bf121d3a83648b417",
+      "dimensions": [
+        1600,
+        1200
+      ],
+      "mode": "RGBA",
+      "alphaRange": [
+        0,
+        255
+      ]
+    },
+    "cladoselache.thumb.png": {
+      "path": "/Users/hoai/Documents/Stuff/Generations/cambrian/local/devonian-authoring/cladoselache/v2-candidate/cladoselache.thumb.png",
+      "bytes": 30425,
+      "sha256": "a87bb6c885179e2134d90deb9e3d954db7af4f28b2ffa693fd9e26923c0c8a07",
+      "dimensions": [
+        256,
+        192
+      ],
+      "mode": "RGBA",
+      "alphaRange": [
+        0,
+        255
+      ]
+    }
+  },
+  "sourceBlend": {
+    "path": "/Users/hoai/Documents/Stuff/Generations/cambrian/local/devonian-authoring/cladoselache/cladoselache-v2.blend",
+    "sha256": "bc32518ac390a58f50293023a40453b1469ec54a3481812d43daf9b9ca38b40d"
+  },
+  "builderInputs": {
+    "actions_v2.py": "9eec68d4adc590c0cc330df257b0cb81d316e1bb7aa7aa50f9e050153478631b",
+    "anatomy_v2.py": "6d91f57c62f39500bbed55f9212424f32678fad91d0154e68024d96d487f94e4",
+    "body-albedo.png": "0975e7e0b6e72ecb2048c1da1197ea6888f1c9d7480f0f29074ca74c9a436f02",
+    "body-normal.png": "fa145aaba338f43f232b0dd0983d523a2369426b8899180541cffad7886f66a2",
+    "body-roughness.png": "896d401e1c394e3294f4dd5105002cf54028aa329ba5fc7c084bcac55d275753",
+    "build.py": "0ccd47147fcdc084af7c3ed9225f9aed96db00385566daa4f853b51b542e84db",
+    "check-export.py": "bbb18adeb79a7c2b347dbabedae347710708f7815d04b1ac0619f83108437a48",
+    "eye-albedo.png": "fe8afcac1ed836a3d81fdee61e7d2a1e15a0e158c7ebf745e078f780d24cb8bb",
+    "eye-normal.png": "1227c4e97c914f1d5ee1076d002e83b9d27c18ee6de5a8f2c48905e90f50fbd7",
+    "eye-roughness.png": "aebf31c9199ee49870af499294b74aef8f154bcdc3848351ea3a4f42146d07de",
+    "fin-albedo.png": "04c4c4382fd418bbc3faebcf214fd24fe8755fa0206ab04ce6945d801f893726",
+    "fin-normal.png": "a6143cbaba7cebb14c33fe31e3bfa8ec751f41347549ae58f10d0b1e0f9c439f",
+    "fin-roughness.png": "9df6f45cb17dc90a2f006ef6c650e77ae40ec472e8194cd9d744da4d015e1208",
+    "materials_v2.py": "7a918c9f43fae6a29245f2684840ec8888398dbc46f49827cf2e458c33fc8ef3",
+    "render-portraits.py": "ef193094aae41ec36508e28293b314a04f343afed7256bf885433acb2b5b35b9",
+    "review-source.py": "6544e0b328bd0cc12ed950ea2083f80ae7d224bf6b78063871968292ec2ea1b6",
+    "skin-source.png": "b5d471e71b895cd8b6c35da0dbdb7d0cf90421d465fb2871bf83d2924a938ba0"
+  },
+  "geometry": {
+    "vertices": 69696,
+    "fullTriangles": 136556,
+    "lodTriangles": 38232,
+    "reductionRatio": 0.27997305134889716,
+    "bones": 22,
+    "clips": {
+      "Idle": 2.4,
+      "Swim": 2.4,
+      "TurnLeft": 1.6,
+      "TurnRight": 1.6,
+      "Dive": 1.4,
+      "Rise": 1.4,
+      "Attack": 1.0,
+      "Bite": 0.5,
+      "Heavy": 1.1,
+      "Hit": 0.6,
+      "Death": 1.6,
+      "Guard": 1.0,
+      "Parry": 0.35,
+      "Dodge": 0.4,
+      "Eat": 1.6,
+      "Stagger": 1.2,
+      "Ability": 2.4,
+      "Growth": 1.5
+    },
+    "loopSeams": {
+      "Idle": 0.0,
+      "Swim": 0.0,
+      "TurnLeft": 4.518105474907574e-33,
+      "TurnRight": 4.480453288824782e-33,
+      "Dive": 3.4494473975277085e-33,
+      "Rise": 3.4494473975277085e-33,
+      "Attack": 4.8588489611163075e-34,
+      "Bite": 1.1337314242604717e-33,
+      "Heavy": 6.802388361891838e-34,
+      "Hit": 1.1248197995487964e-33,
+      "Death": 0.8500000238418579,
+      "Guard": 0.0,
+      "Parry": 2.6916500869197433e-33,
+      "Dodge": 3.6171430542740314e-33,
+      "Eat": 0.0,
+      "Stagger": 1.7783389144598204e-33,
+      "Ability": 3.7251173531848434e-33,
+      "Growth": 3.0747069616542636e-33
+    },
+    "boundsAtEveryFrame": {
+      "Idle": [
+        [
+          -1.5275428295135498,
+          -2.208796977996826,
+          -1.006237506866455
+        ],
+        [
+          1.5345418453216553,
+          3.4569852352142334,
+          1.1927335262298584
+        ]
+      ],
+      "Swim": [
+        [
+          -1.5398399829864502,
+          -2.208716869354248,
+          -1.0578413009643555
+        ],
+        [
+          1.565180778503418,
+          3.4292917251586914,
+          1.2565927505493164
+        ]
+      ],
+      "TurnLeft": [
+        [
+          -1.523159384727478,
+          -2.208627223968506,
+          -0.9887275099754333
+        ],
+        [
+          1.749374508857727,
+          3.453357696533203,
+          1.2846877574920654
+        ]
+      ],
+      "TurnRight": [
+        [
+          -2.0337462425231934,
+          -2.208627223968506,
+          -0.9891955256462097
+        ],
+        [
+          1.523159384727478,
+          3.4533610343933105,
+          1.3452937602996826
+        ]
+      ],
+      "Dive": [
+        [
+          -1.523159384727478,
+          -2.208627223968506,
+          -0.987500011920929
+        ],
+        [
+          1.523159384727478,
+          3.5671350955963135,
+          1.8518810272216797
+        ]
+      ],
+      "Rise": [
+        [
+          -1.5332849025726318,
+          -2.208709716796875,
+          -1.615557074546814
+        ],
+        [
+          1.5372182130813599,
+          3.62324595451355,
+          1.1731250286102295
+        ]
+      ],
+      "Attack": [
+        [
+          -1.5308476686477661,
+          -2.4960319995880127,
+          -1.1150891780853271
+        ],
+        [
+          1.5263592004776,
+          3.578057289123535,
+          1.3318934440612793
+        ]
+      ],
+      "Bite": [
+        [
+          -1.5253009796142578,
+          -2.2092435359954834,
+          -0.9927228689193726
+        ],
+        [
+          1.5300930738449097,
+          3.456634044647217,
+          1.2047719955444336
+        ]
+      ],
+      "Heavy": [
+        [
+          -1.548944354057312,
+          -2.50980281829834,
+          -1.229981780052185
+        ],
+        [
+          1.5242435932159424,
+          3.5402896404266357,
+          1.3644722700119019
+        ]
+      ],
+      "Hit": [
+        [
+          -1.5243641138076782,
+          -2.208627223968506,
+          -0.9885790348052979
+        ],
+        [
+          1.530468463897705,
+          3.5028159618377686,
+          1.1734001636505127
+        ]
+      ],
+      "Death": [
+        [
+          -1.5749913454055786,
+          -2.208627223968506,
+          -1.5999407768249512
+        ],
+        [
+          1.523159384727478,
+          3.453347682952881,
+          1.3023353815078735
+        ]
+      ],
+      "Guard": [
+        [
+          -1.5362169742584229,
+          -2.2086269855499268,
+          -0.9976853728294373
+        ],
+        [
+          1.5392537117004395,
+          3.5262598991394043,
+          1.3879832029342651
+        ]
+      ],
+      "Parry": [
+        [
+          -1.523159384727478,
+          -2.208627223968506,
+          -0.9898008704185486
+        ],
+        [
+          1.5726072788238525,
+          3.453347682952881,
+          1.1731250286102295
+        ]
+      ],
+      "Dodge": [
+        [
+          -1.523159384727478,
+          -2.208627223968506,
+          -1.219010591506958
+        ],
+        [
+          1.5538517236709595,
+          3.453347682952881,
+          1.8222185373306274
+        ]
+      ],
+      "Eat": [
+        [
+          -1.5265448093414307,
+          -2.209242343902588,
+          -1.001981258392334
+        ],
+        [
+          1.5319552421569824,
+          3.45670223236084,
+          1.1881245374679565
+        ]
+      ],
+      "Stagger": [
+        [
+          -1.551438808441162,
+          -2.208919048309326,
+          -1.0782365798950195
+        ],
+        [
+          1.5718127489089966,
+          3.4540889263153076,
+          1.1731250286102295
+        ]
+      ],
+      "Ability": [
+        [
+          -1.5824888944625854,
+          -2.408982038497925,
+          -1.0892295837402344
+        ],
+        [
+          1.5627682209014893,
+          3.456993341445923,
+          1.272101879119873
+        ]
+      ],
+      "Growth": [
+        [
+          -1.5360159873962402,
+          -2.2087202072143555,
+          -1.089437484741211
+        ],
+        [
+          1.5379626750946045,
+          3.500778913497925,
+          1.1731250286102295
+        ]
+      ]
+    },
+    "actionMetrics": {
+      "Idle": {
+        "maxPoseDelta": 0.09359505772590637,
+        "sampledFrames": 73,
+        "deathHoldDelta": null
+      },
+      "Swim": {
+        "maxPoseDelta": 0.3779800534248352,
+        "sampledFrames": 73,
+        "deathHoldDelta": null
+      },
+      "TurnLeft": {
+        "maxPoseDelta": 0.29874470829963684,
+        "sampledFrames": 49,
+        "deathHoldDelta": null
+      },
+      "TurnRight": {
+        "maxPoseDelta": 0.3012552857398987,
+        "sampledFrames": 49,
+        "deathHoldDelta": null
+      },
+      "Dive": {
+        "maxPoseDelta": 0.23000000417232513,
+        "sampledFrames": 43,
+        "deathHoldDelta": null
+      },
+      "Rise": {
+        "maxPoseDelta": 0.23000000417232513,
+        "sampledFrames": 43,
+        "deathHoldDelta": null
+      },
+      "Attack": {
+        "maxPoseDelta": 0.3841765373945236,
+        "sampledFrames": 31,
+        "deathHoldDelta": null
+      },
+      "Bite": {
+        "maxPoseDelta": 0.4119566082954407,
+        "sampledFrames": 16,
+        "deathHoldDelta": null
+      },
+      "Heavy": {
+        "maxPoseDelta": 0.4798540771007538,
+        "sampledFrames": 34,
+        "deathHoldDelta": null
+      },
+      "Hit": {
+        "maxPoseDelta": 0.17979510128498077,
+        "sampledFrames": 19,
+        "deathHoldDelta": null
+      },
+      "Death": {
+        "maxPoseDelta": 0.8500000238418579,
+        "sampledFrames": 49,
+        "deathHoldDelta": 0.0
+      },
+      "Guard": {
+        "maxPoseDelta": 0.19381551374681294,
+        "sampledFrames": 31,
+        "deathHoldDelta": null
+      },
+      "Parry": {
+        "maxPoseDelta": 0.20052790641784668,
+        "sampledFrames": 11,
+        "deathHoldDelta": null
+      },
+      "Dodge": {
+        "maxPoseDelta": 0.3484865725040436,
+        "sampledFrames": 13,
+        "deathHoldDelta": null
+      },
+      "Eat": {
+        "maxPoseDelta": 0.2361609935760498,
+        "sampledFrames": 49,
+        "deathHoldDelta": null
+      },
+      "Stagger": {
+        "maxPoseDelta": 0.278274267911911,
+        "sampledFrames": 37,
+        "deathHoldDelta": null
+      },
+      "Ability": {
+        "maxPoseDelta": 0.4207947850227356,
+        "sampledFrames": 73,
+        "deathHoldDelta": null
+      },
+      "Growth": {
+        "maxPoseDelta": 0.19598950445652008,
+        "sampledFrames": 46,
+        "deathHoldDelta": null
+      }
+    },
+    "weightNormalization": true,
+    "rootStable": true,
+    "noScaleChannels": true,
+    "anchorCount": 3,
+    "fullBytes": 13158548,
+    "lodBytes": 2191804
+  },
+  "eyeSummary": {
+    "full": {
+      "sha256": "63d16b3c60cf553cc7ce6788b2efd85d156aeec637d93578cec8ba98e1720272",
+      "closedHead": true,
+      "auditCaps": 0,
+      "eyes": [
+        {
+          "insidePercent": 77.0448,
+          "conservative95LowerPercent": 76.71343664245441,
+          "rayDisagreements": 5
+        },
+        {
+          "insidePercent": 76.9921039512407,
+          "conservative95LowerPercent": 76.65478163895726,
+          "rayDisagreements": 3
+        }
+      ]
+    },
+    "lod": {
+      "sha256": "93a325d99cc78a2c09a9ecbfaf3a6ea5ccffe5832f8f568f3b104a86a93b4665",
+      "closedHead": true,
+      "auditCaps": 0,
+      "eyes": [
+        {
+          "insidePercent": 77.06220310694569,
+          "conservative95LowerPercent": 76.7304245941398,
+          "rayDisagreements": 2
+        },
+        {
+          "insidePercent": 76.94095244242904,
+          "conservative95LowerPercent": 76.60764202775025,
+          "rayDisagreements": 9
+        }
+      ]
+    }
+  },
+  "runtimeAudit": [
+    {
+      "id": "cladoselache",
+      "models": [
+        {
+          "level": 0,
+          "bones": 22,
+          "textures": 6,
+          "vertexColoredMeshes": 4,
+          "clips": [
+            {
+              "name": "Ability",
+              "duration": 2.4000000953674316,
+              "animatedTracks": 22,
+              "maxSeam": 0,
+              "maxRadius": 3.0048252235453057
+            },
+            {
+              "name": "Attack",
+              "duration": 1,
+              "animatedTracks": 22,
+              "maxSeam": 0,
+              "maxRadius": 3.032449630037512
+            },
+            {
+              "name": "Bite",
+              "duration": 0.5,
+              "animatedTracks": 22,
+              "maxSeam": 0,
+              "maxRadius": 2.9336485982409304
+            },
+            {
+              "name": "Death",
+              "duration": 1.600000023841858,
+              "animatedTracks": 22,
+              "maxSeam": 0,
+              "maxRadius": 2.933899479289261
+            },
+            {
+              "name": "Dive",
+              "duration": 1.399999976158142,
+              "animatedTracks": 20,
+              "maxSeam": 0,
+              "maxRadius": 2.932005746867302
+            },
+            {
+              "name": "Dodge",
+              "duration": 0.4000000059604645,
+              "animatedTracks": 20,
+              "maxSeam": 0,
+              "maxRadius": 2.933598013201054
+            },
+            {
+              "name": "Eat",
+              "duration": 1.600000023841858,
+              "animatedTracks": 22,
+              "maxSeam": 0,
+              "maxRadius": 2.9357589968595086
+            },
+            {
+              "name": "Growth",
+              "duration": 1.5,
+              "animatedTracks": 22,
+              "maxSeam": 0,
+              "maxRadius": 2.932510870121896
+            },
+            {
+              "name": "Guard",
+              "duration": 1,
+              "animatedTracks": 22,
+              "maxSeam": 0,
+              "maxRadius": 2.9479200794969227
+            },
+            {
+              "name": "Heavy",
+              "duration": 1.100000023841858,
+              "animatedTracks": 22,
+              "maxSeam": 0,
+              "maxRadius": 3.0612327224168228
+            },
+            {
+              "name": "Hit",
+              "duration": 0.6000000238418579,
+              "animatedTracks": 22,
+              "maxSeam": 0,
+              "maxRadius": 3.000833186037245
+            },
+            {
+              "name": "Idle",
+              "duration": 2.4000000953674316,
+              "animatedTracks": 22,
+              "maxSeam": 0,
+              "maxRadius": 2.9362759946309147
+            },
+            {
+              "name": "Parry",
+              "duration": 0.3499999940395355,
+              "animatedTracks": 20,
+              "maxSeam": 0,
+              "maxRadius": 2.933254522031995
+            },
+            {
+              "name": "Rise",
+              "duration": 1.399999976158142,
+              "animatedTracks": 20,
+              "maxSeam": 0,
+              "maxRadius": 2.952006749951046
+            },
+            {
+              "name": "Stagger",
+              "duration": 1.2000000476837158,
+              "animatedTracks": 22,
+              "maxSeam": 0,
+              "maxRadius": 2.958598067294374
+            },
+            {
+              "name": "Swim",
+              "duration": 2.4000000953674316,
+              "animatedTracks": 22,
+              "maxSeam": 0,
+              "maxRadius": 2.9308975749028607
+            },
+            {
+              "name": "TurnLeft",
+              "duration": 1.600000023841858,
+              "animatedTracks": 20,
+              "maxSeam": 0,
+              "maxRadius": 2.972235317061141
+            },
+            {
+              "name": "TurnRight",
+              "duration": 1.600000023841858,
+              "animatedTracks": 20,
+              "maxSeam": 0,
+              "maxRadius": 3.00706894145187
+            }
+          ],
+          "anchors": {
+            "sockets": 3,
+            "metadata": "[[\"anchor_attack_primary\",{\"parentBone\":\"skull\",\"role\":\"attack\",\"version\":1}],[\"anchor_mouth\",{\"parentBone\":\"jaw\",\"role\":\"mouth\",\"version\":1}],[\"anchor_mouth_inside\",{\"parentBone\":\"skull\",\"role\":\"swallow\",\"version\":1}]]",
+            "independentClones": true,
+            "transformedWorldPositions": true,
+            "solutions": []
+          }
+        },
+        {
+          "level": 1,
+          "bones": 22,
+          "textures": 0,
+          "vertexColoredMeshes": 4,
+          "clips": [
+            {
+              "name": "Death",
+              "duration": 1.600000023841858,
+              "animatedTracks": 22,
+              "maxSeam": 0,
+              "maxRadius": 3.008766344940092
+            },
+            {
+              "name": "Idle",
+              "duration": 2.4000000953674316,
+              "animatedTracks": 22,
+              "maxSeam": 0,
+              "maxRadius": 3.010617673406801
+            },
+            {
+              "name": "Swim",
+              "duration": 2.4000000953674316,
+              "animatedTracks": 22,
+              "maxSeam": 0,
+              "maxRadius": 3.009082419310501
+            }
+          ],
+          "anchors": {
+            "sockets": 3,
+            "metadata": "[[\"anchor_attack_primary\",{\"parentBone\":\"skull\",\"role\":\"attack\",\"version\":1}],[\"anchor_mouth\",{\"parentBone\":\"jaw\",\"role\":\"mouth\",\"version\":1}],[\"anchor_mouth_inside\",{\"parentBone\":\"skull\",\"role\":\"swallow\",\"version\":1}]]",
+            "independentClones": true,
+            "transformedWorldPositions": true,
+            "solutions": []
+          }
+        }
+      ]
+    }
+  ],
+  "reviewFiles": {
+    "viewer-v2/Ability-phase-0.2.png": "2643591828c4f331d415e97dacc34c5ccb706f9354e2169d2dc3e8438807378f",
+    "viewer-v2/Ability-phase-0.75.png": "68a851efcfbd283b8084c581b07dde84b183ed2fbd0580cc91e2eda2ac6d30cc",
+    "viewer-v2/Ability.png": "0affd05077acd7190a54f99c2ac2bbbf68c1cb55debf3dc6b5ba9c5b6a834fe1",
+    "viewer-v2/Attack-phase-0.2.png": "839c99aea2ce089435c9148170b8628cf3c9970cbe11d297706510373a9ed4b1",
+    "viewer-v2/Attack-phase-0.75.png": "3d18e02d614918988dc79d434a8db95c97c569cc12f49a6c875675abe23ce8e5",
+    "viewer-v2/Attack.png": "b09d59a2f4ebc5bb8d818513568eebc573b1e3d4da0c1d3f9381d29e8bf36cea",
+    "viewer-v2/Bite-phase-0.2.png": "ef7a9cdf8119708105f5b37de71cae6005db3f7ee38289f901d248e89ed77146",
+    "viewer-v2/Bite-phase-0.75.png": "a416559bbc38146e72f9f4099286aadada439ff570596da94a1cc2cf4d5fc60c",
+    "viewer-v2/Bite.png": "88215f6ef55edca03379cb72f57eb906699413929c159107e4ca452834d99e02",
+    "viewer-v2/Death-phase-0.2.png": "0fc502adda0fd6aa36067cdc87abb91f0a81205129ce3bef3d30c52dc24da29a",
+    "viewer-v2/Death-phase-0.75.png": "cded77c33180981964420beddab7a072dc97256ba11d7df42fb27b25b0369c9a",
+    "viewer-v2/Death.png": "34566fd249ba3abb21f70d2d9a472275b838736bb87aeb5ddf6ea93c7d324db7",
+    "viewer-v2/Dive-phase-0.2.png": "27fa2c144f0994b9c9dc820694ef4903acdc34b460dcecdae42ecc32a0da3930",
+    "viewer-v2/Dive-phase-0.75.png": "c8d9a3b1a97fcb0e91790c5addea6543c4e681c11b5340a785151b933aeb7f57",
+    "viewer-v2/Dive.png": "5cfe52b87c9d3b4a1f99459b02765474f46e26a36b9509a7255b4d19c066a434",
+    "viewer-v2/Dodge-phase-0.2.png": "055e236ff3654710144570d2f663127e09636cda28cb3bc9ead26f73feeb2897",
+    "viewer-v2/Dodge-phase-0.75.png": "9ddcddd384a3c1ff0d2082913d28f6131075f2bb5ff5fe9c90d013c39d96b226",
+    "viewer-v2/Dodge.png": "3b58b12ea055e5db3dc656bd698ed0cba82fa780feed06c224f5e37b611c53ea",
+    "viewer-v2/Eat-phase-0.2.png": "f4e8c38aec9d357807e26308da9a5b51447273db1896489084093d388ef29046",
+    "viewer-v2/Eat-phase-0.75.png": "2a7aff5787eef37c90c2249756ac0d77419f90d191e939694ac9058b914647e5",
+    "viewer-v2/Eat.png": "5bd6fc2d4ba65af79f7844f40d3ef739f37f4dadf6d4c1effc7eab5ff8a449fe",
+    "viewer-v2/Growth-phase-0.2.png": "f6ce522cfc05d84942654e2e549dc7da48a4b34e92ccbdb42cb08eca5baf18f8",
+    "viewer-v2/Growth-phase-0.75.png": "d2ee2ec20f547aa0d97572c4a14da0893913531410800db0bb1b2b9399451961",
+    "viewer-v2/Growth.png": "bf0dc5e20a8b1906283df422ac731f1d3bd210f55f6865227d460fa150a65c1b",
+    "viewer-v2/Guard-phase-0.2.png": "cff182e0bd54400f713934e515cf1bfcadeb93539206f6a6e83905941f8928f2",
+    "viewer-v2/Guard-phase-0.75.png": "9ca5a07176c3319f1cd9928aeb3f28fd807cf847863941ad3a9a6c7d5bfce9e3",
+    "viewer-v2/Guard.png": "18994909af16d65ebc259c5e6b55868ac2f9c3231d37407e06b954342dc1a53f",
+    "viewer-v2/Heavy-phase-0.2.png": "c35479fecf4ba1a414980436dd7fe8ad5a483800c88103714b2940b4620ce7ea",
+    "viewer-v2/Heavy-phase-0.75.png": "f52f53cba47ee036a2f690678b8e8878f246ebf461ffa13ed998013ebdaee268",
+    "viewer-v2/Heavy.png": "407f299cfd103c571ed40116f49d2c97167c41d5f9a0e5112bc08985e2de8772",
+    "viewer-v2/Hit-phase-0.2.png": "2a010144a35a8e4567ad1badbdde863daeb97acc340c115e19d859d028b4e00c",
+    "viewer-v2/Hit-phase-0.75.png": "00bc64562796a9e2a5ac53998a9bd8f16271ada38f282eca6d0a33d853c29ab4",
+    "viewer-v2/Hit.png": "730101fc39ec1cac3f52e2163853f7c706fd2bf4b8bebdd0900552268b2b53e3",
+    "viewer-v2/Idle-phase-0.2.png": "7c0f5728305c207f9a855e8a3ad9c2f1cd9bdcf6cc65bacb8425099d550dae43",
+    "viewer-v2/Idle-phase-0.75.png": "58b532f8146f5ac979962f08464d73fe4d0d533e2a45014857774349b4ed381e",
+    "viewer-v2/Idle.png": "9f4dbf178d39063e36ecd607945134861f7d96635c82f419526838c84b128071",
+    "viewer-v2/LOD-Idle.png": "76b5ad0d705de9aec2353722e9f95242f62150f515445da1f3d8484d316fbf06",
+    "viewer-v2/Parry-phase-0.2.png": "87dad7af3f1e5d3e6f414a29f022d50e1df614e9a967210561e99b67fbb39ee1",
+    "viewer-v2/Parry-phase-0.75.png": "404e732d81f3d34f92f244bf3852ea0781a480b1e6d738cffef9399b7b6d9a39",
+    "viewer-v2/Parry.png": "4f97b1a1978db34c012931f7916daa20d8168843eeb54d8a1b57b40255392ed2",
+    "viewer-v2/Rise-phase-0.2.png": "b6355d7bc92e767a0d6cc5d091d43714ed30b81e991c589c4a5970738c58e999",
+    "viewer-v2/Rise-phase-0.75.png": "e79dce75112952e55f12574a61196ddc745551f5ac8a4a68c0e0418b87be158f",
+    "viewer-v2/Rise.png": "d1c32fbd5ccfeb11531998992dd6dc2b3ba51de594d5f2ef9e477e53b0db2826",
+    "viewer-v2/Stagger-phase-0.2.png": "f1458a0937951c5cf8ae318257c05fe07bad8c2d6d740aa89356b83a29f2de2b",
+    "viewer-v2/Stagger-phase-0.75.png": "99ee2279cf65fa3cd185719407ae0fb46d8cc0e0926bf71fa852fc9baecfff64",
+    "viewer-v2/Stagger.png": "ffcfd3da11030377b3f047d780a1380fd221c855cd5aae1fd196710ee797214f",
+    "viewer-v2/Swim-phase-0.2.png": "7300c85127e2d105528bbb928fdb211965e959f21b8e21564cfa8f3f1d0ae1fb",
+    "viewer-v2/Swim-phase-0.75.png": "1217ea9880fa0773dc8a6330e74f9b73a5d2a8e3799ccbf52ed53e2940fbfa92",
+    "viewer-v2/Swim.png": "eec1c93ad4e83f8fe4c1b0da7c140a59bea76c383b8b127597b7465b38bc39d9",
+    "viewer-v2/TurnLeft-phase-0.2.png": "a53f2b3e7f38e1294f7f2fc9ad863729a43fee68606c5e543064f70bf5f483c2",
+    "viewer-v2/TurnLeft-phase-0.75.png": "f595ee6c804cceec15ff4fae9e832b4e85ed50b28716cc30d6bae8162a0ea99d",
+    "viewer-v2/TurnLeft.png": "3656e8800db4df356fa3c4f49ee1c376d512fa0ab76ff9db82eb812864ba8855",
+    "viewer-v2/TurnRight-phase-0.2.png": "f1e7d9b05a9fae6133a011ce95a136e6d87352121be101c7d1d4a92d0e4d0734",
+    "viewer-v2/TurnRight-phase-0.75.png": "9c3ed04f3989b595b50e9af9cbc0e2675ef2c2b052ae40c7b74da0ee600b6d12",
+    "viewer-v2/TurnRight.png": "dc6e2b3af88e7c5eede2de5a143e51b0499a6e5f35e8ecc8ae8a2bfa83a2b475",
+    "viewer-v2/actions-early.jpg": "b91f7b304b1f215e4b8ded2480bd6e635ffe4649cd6a7fff6c22425c0b6dd594",
+    "viewer-v2/actions-late.jpg": "c876f5e33b8e38d927c5d3c2c1d47e419fc3deba6da10f5f8504b5ce51565aac",
+    "viewer-v2/actions-peak.jpg": "2b76816fa7739e906431e98586b9d680bee0dfe881809957a85631a00ea41da1",
+    "viewer-v2/all-actions.webm": "64bf43139eb3b5891a25d635cf38cf1e1ca28593ac9a8d47c176aa48f7867b41",
+    "viewer-v2/neutral-dorsal.png": "6deddca6760b7a1e00abac3441ada2c7f20921dd3b1329a1190b44a96d04b44b",
+    "viewer-v2/neutral-eye.png": "4cf7e326f35d6289518b57bbfac988061717517cf0b5cae69b3f487f52a405f0",
+    "viewer-v2/neutral-front.png": "fa2c122e06d9ecce6797328d6180996d7819fa521770722684f26463fa3becde",
+    "viewer-v2/neutral-mouth.png": "04272567ed51e89646549979af1252f65eaf16c39bb16a456d167b8e1a997ae4",
+    "viewer-v2/neutral-side.png": "df00e73e8812dd4346433e935ede767cb7e676eebc42a1bc98ec6f8d8c375721",
+    "viewer-v2/review.json": "2954265cc53278ccf83a17784e15bda63dfcf943736a0fee4e79096384a32687"
+  },
+  "visualReview": {
+    "views": [
+      "front",
+      "side",
+      "dorsal",
+      "threequarter",
+      "eyes",
+      "maximum Heavy gape",
+      "reduced Idle"
+    ],
+    "actionPhases": [
+      0.2,
+      0.5,
+      0.75
+    ],
+    "actionsReviewed": [
+      "Idle",
+      "Swim",
+      "TurnLeft",
+      "TurnRight",
+      "Dive",
+      "Rise",
+      "Attack",
+      "Bite",
+      "Heavy",
+      "Hit",
+      "Death",
+      "Guard",
+      "Parry",
+      "Dodge",
+      "Eat",
+      "Stagger",
+      "Ability",
+      "Growth"
+    ],
+    "terminalDeathPhase": 1,
+    "playbackRecording": "/Users/hoai/Documents/Stuff/Generations/cambrian/local/devonian-authoring/cladoselache/viewer-v2/all-actions.webm",
+    "findings": [
+      "Dark seated globes retain uninterrupted head skin without a separate bezel.",
+      "Anterior dorsal spine, two dorsal fins, paired fins and keeled crescent tail remain attached in reviewed extreme poses. No anal fin or posterior spine.",
+      "Tooth rows are seated on the jaw lining; isolated posterior cheek cusps removed. Palate, cheeks, floor and deep curved passage retain volume under gape.",
+      "Tail propagation, banks and delayed fin motion vary between actions. Death final fifth is held.",
+      "Full material uses neutral white COLOR_0 with PBR textures. Reduced material keeps sampled pigment without textures."
+    ],
+    "limitations": [
+      "Colors, soft-tissue volume and motion are artistic inference. Historical original plates were not directly available; anatomical comparison follows the cited primary 2023 study.",
+      "Visual review uses actual exported Three.js frames, source closeups and a sequential playback recording; parent performs independent integrated viewer review."
+    ]
+  },
+  "publishedV1Unchanged": {
+    "cladoselache.png": true,
+    "cladoselache.thumb.png": true,
+    "cladoselache.card.png": true,
+    "cladoselache.lod1.glb": true,
+    "cladoselache.glb": true,
+    "cladoselache.select.png": true,
+    "cladoselache.json": true
+  }
+}

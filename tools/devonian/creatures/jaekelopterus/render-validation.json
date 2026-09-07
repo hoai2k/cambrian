@@ -1,0 +1,74 @@
+{
+  "sourceGlbSha256": "28b6181d6ad13644c5256fc316b5022de45039f2c1ce4d3d44fb0a896de123fb",
+  "renders": [
+    {
+      "file": "lateral.png",
+      "clip": "Idle",
+      "frame": 0,
+      "imageSha256": "65a401fbb271c17ef1dca602597689ca9ac13bd04dabc9c35116af9aaf403694",
+      "sourceGlbSha256": "28b6181d6ad13644c5256fc316b5022de45039f2c1ce4d3d44fb0a896de123fb"
+    },
+    {
+      "file": "oral-Idle.png",
+      "clip": "Idle",
+      "frame": 0,
+      "imageSha256": "fc98115e7ce3f0a3b6016f765b9055fed9857546383a1857e3367e368e69b7ef",
+      "sourceGlbSha256": "28b6181d6ad13644c5256fc316b5022de45039f2c1ce4d3d44fb0a896de123fb"
+    },
+    {
+      "file": "jaekelopterus.select.png",
+      "clip": "Idle",
+      "frame": 0,
+      "imageSha256": "14ebb73e02cee4526dd0421a1e7e0042cd00ac5b8ff2e14842959cd3171b676f",
+      "sourceGlbSha256": "28b6181d6ad13644c5256fc316b5022de45039f2c1ce4d3d44fb0a896de123fb"
+    },
+    {
+      "file": "jaekelopterus.png",
+      "clip": "Idle",
+      "frame": 0,
+      "imageSha256": "6a3f097781ffe96b51197d965d4a1f027b15b4f13d9376e8ae60ba7dc6e0f366",
+      "sourceGlbSha256": "28b6181d6ad13644c5256fc316b5022de45039f2c1ce4d3d44fb0a896de123fb",
+      "derivedFrom": "jaekelopterus.select.png",
+      "method": "Same-camera GLB render; studio alpha composite or Lanczos UI downsample"
+    },
+    {
+      "file": "jaekelopterus.card.png",
+      "clip": "Idle",
+      "frame": 0,
+      "imageSha256": "0b73788376eee940757d9c28fb7a3d1912829166c58a67de22042d01b27084f3",
+      "sourceGlbSha256": "28b6181d6ad13644c5256fc316b5022de45039f2c1ce4d3d44fb0a896de123fb",
+      "derivedFrom": "jaekelopterus.select.png",
+      "method": "Same-camera GLB render; studio alpha composite or Lanczos UI downsample"
+    },
+    {
+      "file": "jaekelopterus.thumb.png",
+      "clip": "Idle",
+      "frame": 0,
+      "imageSha256": "f2cb5750995556ce62508bf0cf1c2c31a302b6807a33b2ab2200d60483aa6a93",
+      "sourceGlbSha256": "28b6181d6ad13644c5256fc316b5022de45039f2c1ce4d3d44fb0a896de123fb",
+      "derivedFrom": "jaekelopterus.select.png",
+      "method": "Same-camera GLB render; studio alpha composite or Lanczos UI downsample"
+    },
+    {
+      "file": "eyes-side.png",
+      "clip": "Idle",
+      "frame": 0,
+      "imageSha256": "a7f09f15d9872e854719ed2e45320ef8b2413e9b5b0ef08e15130eaf45270703",
+      "sourceGlbSha256": "28b6181d6ad13644c5256fc316b5022de45039f2c1ce4d3d44fb0a896de123fb"
+    },
+    {
+      "file": "eyes-dorsal.png",
+      "clip": "Idle",
+      "frame": 0,
+      "imageSha256": "fe81bc4612739caf62a168ab77928aeb7184d145cfa51fb57caac331f13e8c36",
+      "sourceGlbSha256": "28b6181d6ad13644c5256fc316b5022de45039f2c1ce4d3d44fb0a896de123fb"
+    },
+    {
+      "file": "oral-lit-Eat.png",
+      "clip": "Eat",
+      "frame": 18,
+      "imageSha256": "76b0a0f1a853db236d2506c8c63d9e261fa2c56dc197d77806286f52dcb24658",
+      "sourceGlbSha256": "28b6181d6ad13644c5256fc316b5022de45039f2c1ce4d3d44fb0a896de123fb"
+    }
+  ]
+}

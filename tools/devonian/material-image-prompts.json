@@ -1,0 +1,50 @@
+[
+  {
+    "code": "T01",
+    "id": "pale-carbonate",
+    "prompt": "Use case: photorealistic-natural. Create one square seamless tileable ALBEDO texture for an authored 3D game environment material. Pale warm ivory submerged Devonian carbonate rock, fine calcitic granular matrix, irregular very low-contrast beige and grey mineral mottling, a few hairline discontinuous seams, no large cracks, no recognizable fossils. Flat orthographic straight-down cross-polarized diffuse material scan appearance, evenly lit edge to edge with no vignette, no directional light, no highlights, no cast shadows, no water caustics. Restrained natural pigment, low contrast, nonrepeating stochastic detail, material fills entire frame. No object silhouette, text, label, border, symbols or perspective. This is material color data, not a scene painting.",
+    "source": "/Users/hoai/.codex/generated_images/01a0775c-6a4b-74a3-a675-e5223d0a9359/exec-290e19db-781f-4cb2-8867-11072e4592d6.png"
+  },
+  {
+    "code": "T02",
+    "id": "dark-carbonate",
+    "prompt": "Use case: photorealistic-natural. Create one square seamless tileable ALBEDO texture for an authored 3D game environment material. Darker blue-grey to charcoal Devonian carbonate rock interior, subtle irregular calcite mottling and fine microscopic grains, occasional muted grey veins, no carved geometric tiling, no slate sheets or metallic mineral sparkle. Flat orthographic straight-down cross-polarized diffuse material scan appearance, evenly lit edge to edge with no vignette, no directional light, no highlights, no cast shadows, no water caustics. Restrained natural pigment, low contrast, nonrepeating stochastic detail, material fills entire frame. No object silhouette, text, label, border, symbols or perspective. This is material color data, not a scene painting.",
+    "source": "/Users/hoai/.codex/generated_images/01a0775c-6a4b-74a3-a675-e5223d0a9359/exec-e49093cd-3d2c-434c-9d8e-599b5bb4b841.png"
+  },
+  {
+    "code": "T03",
+    "id": "marine-mud",
+    "prompt": "Use case: photorealistic-natural. Create one square seamless tileable ALBEDO texture for an authored 3D game environment material. Fine submerged marine mud, olive-grey silty smooth cohesive sediment with subtly disturbed small patches and fine organic flecks, very subdued grains below one millimetre, no large rocks, shell bodies or ripples. Flat orthographic straight-down cross-polarized diffuse material scan appearance, evenly lit edge to edge with no vignette, no directional light, no highlights, no cast shadows, no water caustics. Restrained natural pigment, low contrast, nonrepeating stochastic detail, material fills entire frame. No object silhouette, text, label, border, symbols or perspective. This is material color data, not a scene painting.",
+    "source": "/Users/hoai/.codex/generated_images/01a0775c-6a4b-74a3-a675-e5223d0a9359/exec-021e979d-7c10-44e1-93a3-51264cee3439.png"
+  },
+  {
+    "code": "T04",
+    "id": "freshwater-sediment",
+    "prompt": "Use case: photorealistic-natural. One original square seamless tileable ALBEDO material source image for a Devonian 3D environment. Fine freshwater sediment for a Devonian wooded river bank under water, warm muted ochre-brown silt with grey mineral particles and slight darker organic stains. Smooth fine material, not drought-cracked mud, not coarse gravel. Flat orthographic straight-down diffuse cross-polarized scan, evenly lit edge to edge. No directional light, highlights, cast shadows, caustics, water surface, vignette, perspective, labels, borders, text, logo or object outline. Low contrast, fine naturally irregular stochastic pigment. This is color data for a material, not a finished scene.",
+    "source": "/Users/hoai/.codex/generated_images/01a0775c-6a4b-74a3-a675-e5223d0a9359/exec-cb2cd41e-59c5-47f1-aad8-ab825f464fd6.png"
+  },
+  {
+    "code": "T05",
+    "id": "ripple-sand",
+    "prompt": "Use case: photorealistic-natural. One original square seamless tileable ALBEDO material source image for a Devonian 3D environment. Fine pale submerged sand with extremely shallow soft sinuous ripple ridges in a coherent roughly horizontal flow pattern. Warm ivory grains, subtle low-contrast pigment variation. Ridges barely apparent in color because actual height is authored separately. No deeply shadowed dunes. Flat orthographic straight-down diffuse cross-polarized scan, evenly lit edge to edge. No directional light, highlights, cast shadows, caustics, water surface, vignette, perspective, labels, borders, text, logo or object outline. Low contrast, fine naturally irregular stochastic pigment. This is color data for a material, not a finished scene.",
+    "source": "/Users/hoai/.codex/generated_images/01a0775c-6a4b-74a3-a675-e5223d0a9359/exec-347d814a-8f6e-4060-84e5-7709fc27f47d.png"
+  },
+  {
+    "code": "T07",
+    "id": "microbial-film",
+    "prompt": "Use case: photorealistic-natural. One original square seamless tileable ALBEDO material source image for a Devonian 3D environment. Restrained microbial and thin algal film on fine sediment, irregular patches of olive, rust-brown and muted ochre coating with softly feathered transitions exposing neutral grey-beige substrate. Thin flat biofilm, no moss, grass, leaves, filaments or identifiable modern organisms. Flat orthographic straight-down diffuse cross-polarized scan, evenly lit edge to edge. No directional light, highlights, cast shadows, caustics, water surface, vignette, perspective, labels, borders, text, logo or object outline. Low contrast, fine naturally irregular stochastic pigment. This is color data for a material, not a finished scene.",
+    "source": "/Users/hoai/.codex/generated_images/01a0775c-6a4b-74a3-a675-e5223d0a9359/exec-10010288-082d-454e-bc22-d347aaefd0c4.png"
+  },
+  {
+    "code": "T08",
+    "id": "submerged-wood",
+    "prompt": "Use case: photorealistic-natural. One original square seamless tileable ALBEDO material source image for a Devonian 3D environment. Submerged weathered wood from a Devonian woody tree, warm dark umber longitudinal fine grain, slightly softened broken fibres and grey-tan silt caught in shallow fissures. Flat broad wood surface, no modern manufactured boards, nails, circular knots, moss, mushrooms or leaves. Vertical fibre direction. Flat orthographic front-on diffuse cross-polarized material scan. Even edge-to-edge light with no highlights, cast shadows, caustics, vignette, perspective, outline, border, writing, label or logo. Fine realistic low-contrast natural pigment rather than deep sculptural relief. This is color data, not an atmospheric painting.",
+    "source": "/Users/hoai/.codex/generated_images/01a0775c-6a4b-74a3-a675-e5223d0a9359/exec-af153d75-2573-43b2-bd14-198aae1859d2.png"
+  },
+  {
+    "code": "T09",
+    "id": "rooted-bank",
+    "prompt": "Use case: photorealistic-natural. One original square seamless tileable ALBEDO material source image for a Devonian 3D environment. Natural fine layered brown rooted river-bank sediment, muted grey-brown clay and silt laminae, localized dark organic staining and a few very thin irregular branching root contact traces. Sediment material fills image, no large protruding 3D roots, no grass, moss or leaves. Subdued fine horizontal stratification with irregular soft edges. Flat orthographic front-on diffuse cross-polarized material scan. Even edge-to-edge light with no highlights, cast shadows, caustics, vignette, perspective, outline, border, writing, label or logo. Fine realistic low-contrast natural pigment rather than deep sculptural relief. This is color data, not an atmospheric painting.",
+    "source": "/Users/hoai/.codex/generated_images/01a0775c-6a4b-74a3-a675-e5223d0a9359/exec-5465e8e3-6d1a-445c-a374-bbfc4368061f.png"
+  }
+]

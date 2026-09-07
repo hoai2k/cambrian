@@ -1,0 +1,36 @@
+{
+  "id": "small-bivalves",
+  "family": "B12",
+  "name": "Small bivalves",
+  "taxon": "Modiomorpha-type comparative valves",
+  "category": "biological-prop",
+  "description": "Elongate paired left/right valves with growth sculpture and open empty-shell variant.",
+  "provenance": "Devonian North American shelf reference",
+  "model": "assets/devonian/props/small-bivalves.glb",
+  "lod": "assets/devonian/props/small-bivalves.lod1.glb",
+  "image": "assets/devonian/props/small-bivalves.png",
+  "lengthMeters": 0.18359999358654022,
+  "dimensionsMeters": {
+    "x": 0.18359999358654022,
+    "y": 0.023723118007183075,
+    "z": 0.028083575889468193
+  },
+  "clips": [],
+  "looping": [],
+  "sources": [
+    "https://devonianatlas.org/species/"
+  ],
+  "notes": [
+    "Original parametric mesh, no downloaded model.",
+    "1 glTF unit = 1 metre. Dimensions describe this art specimen, not a taxon maximum.",
+    "Pigmentation and soft appearance are artistic interpretations.",
+    "Locality tags constrain future placement; library membership does not assert co-occurrence.",
+    "Preview model: initial scenery delivery; further individual material, silhouette and motion refinement is pending."
+  ],
+  "fullTriangles": 24192,
+  "lodTriangles": 7256,
+  "lodRatio": 0.29993386243386244,
+  "sourceBlend": "../devonian-authoring/props/small-bivalves/small-bivalves.blend",
+  "uncertainty": "Modiomorphid comparative outline with offset umbo and concentric growth. No unsupported soft tissue.",
+  "modelStatus": "preview"
+}

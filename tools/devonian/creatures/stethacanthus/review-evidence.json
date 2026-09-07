@@ -1,0 +1,140 @@
+{
+  "anatomicalTarget": "Stethacanthus sp., Devonian CMNH 8988-informed comparative reconstruction",
+  "models": [
+    {
+      "asset": "stethacanthus.glb",
+      "sha256": "1a5db57c8e55a4a1bbdf7f72c52f30b3277e517eb7c3a26a2858aa576b436fab",
+      "headTopology": {
+        "valid": true,
+        "nonmanifoldEdges": 0,
+        "cappedBoundaryLoops": []
+      },
+      "eyes": [
+        {
+          "insidePercent": 79.77616493785928,
+          "conservative95Percent": [
+            79.45886341809104,
+            80.08979321636531
+          ],
+          "samples": 62278,
+          "rayDisagreements": 0
+        },
+        {
+          "insidePercent": 79.71091048789857,
+          "conservative95Percent": [
+            79.39373022062112,
+            80.02602829057716
+          ],
+          "samples": 62472,
+          "rayDisagreements": 1
+        }
+      ]
+    },
+    {
+      "asset": "stethacanthus.lod1.glb",
+      "sha256": "9bfd6fb1a3a7c360e4ef4bd457813764a87ae2450c6b1d9155a2e96226f01ae4",
+      "headTopology": {
+        "valid": true,
+        "nonmanifoldEdges": 0,
+        "cappedBoundaryLoops": []
+      },
+      "eyes": [
+        {
+          "insidePercent": 79.7617136067311,
+          "conservative95Percent": [
+            79.44432888023222,
+            80.07702313801664
+          ],
+          "samples": 62278,
+          "rayDisagreements": 1
+        },
+        {
+          "insidePercent": 79.6933025995646,
+          "conservative95Percent": [
+            79.37602146194365,
+            80.01329750412779
+          ],
+          "samples": 62472,
+          "rayDisagreements": 4
+        }
+      ]
+    }
+  ],
+  "validationFile": "validation.json",
+  "sourcePoseValidationFile": "pose-validation.json",
+  "renderReview": [
+    "front",
+    "side",
+    "dorsal",
+    "threequarter",
+    "eye-oblique",
+    "mouth",
+    "action-Ability",
+    "action-Attack",
+    "action-Bite",
+    "action-Death",
+    "action-Dive",
+    "action-Dodge",
+    "action-Eat",
+    "action-Growth",
+    "action-Guard",
+    "action-Heavy",
+    "action-Hit",
+    "action-Idle",
+    "action-Parry",
+    "action-Rise",
+    "action-Stagger",
+    "action-Swim",
+    "action-TurnLeft",
+    "action-TurnRight"
+  ],
+  "sequentialActionReview": [
+    "Swim",
+    "TurnLeft",
+    "Heavy",
+    "Dodge",
+    "Eat",
+    "Death",
+    "Ability"
+  ],
+  "motionSequenceNote": "Sequence sheets cover the authored action curves; final action extrema and imported LOD confirm corrected fin-root weighting and camber.",
+  "actualExportReview": {
+    "full": "review-export-full/lit-*.png",
+    "lod": "review-export-lod/lod-*.png"
+  },
+  "candidateFiles": {
+    "stethacanthus.select.png": {
+      "bytes": 603142,
+      "sha256": "8649280a3b8a71426195f2599410b9443d87fe4d3d5a0287f3e527455a679d14"
+    },
+    "stethacanthus.glb": {
+      "bytes": 22666540,
+      "sha256": "1a5db57c8e55a4a1bbdf7f72c52f30b3277e517eb7c3a26a2858aa576b436fab"
+    },
+    "stethacanthus.json": {
+      "bytes": 3008,
+      "sha256": "f827f262cc24038479ba71738800e787ff459d1fd4d7340bdccdc6fa3c7e2217"
+    },
+    "stethacanthus.thumb.png": {
+      "bytes": 19159,
+      "sha256": "6aab03748264cecc99e57952a582a79339039915c4b747765fee99d7f6174fe7"
+    },
+    "stethacanthus.card.png": {
+      "bytes": 124304,
+      "sha256": "d6d526fbc0fb8f9b4acdc15006a081ca910de603a18b366f143cf00aa6f59ea8"
+    },
+    "stethacanthus.lod1.glb": {
+      "bytes": 4052520,
+      "sha256": "9bfd6fb1a3a7c360e4ef4bd457813764a87ae2450c6b1d9155a2e96226f01ae4"
+    },
+    "stethacanthus.png": {
+      "bytes": 211732,
+      "sha256": "bacec4dc84fbe238d6ce87b287fc105c0feca2f1d9f2515850f2ee49034d845d"
+    }
+  },
+  "uncertainties": [
+    "Whole-body proportions and crown width reconstructed around an incomplete Devonian specimen.",
+    "Living pigmentation, exact metapterygial extension length, soft oral/branchial tissue and movement timing are artistic interpretation.",
+    "CMNH 8988 species and sex remain unresolved here; no substitution of a complete Carboniferous Akmonistion specimen."
+  ]
+}

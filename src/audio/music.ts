@@ -1,0 +1,64 @@
+import { ACTIVE_ERA } from '../content';
+/**
+ * The soundtrack: which tracks exist, and what plays next.
+ *
+ * One track opens every session; when it runs out the game rotates through the rest at random.
+ * A track can also name the biomes it was written for — entering one of those cues it — which is
+ * how the biome themes work: the calm theme for the shallows and nurseries, the danger theme for
+ * the channels, escarpment and basin. A track whose file is missing drops out of the rotation.
+ *
+ * To add a track: drop `<name>.mp3` into `public/music` and add a line to the selected content pack’s music.ts.
+ */
+import type { Biome } from '../sim/world';
+
+export interface MusicTrack {
+  /** File name in `public/music`, without the extension. Doubles as the display name. */
+  name: string;
+  /** Plays first, before the rotation starts. Exactly one track should be the opener. */
+  opening?: boolean;
+  /** Biomes this track belongs to. Entering one of them cues the track; see `pickNext`. */
+  biomes?: Biome[];
+}
+
+/**
+ * The active era's soundtrack. Resolved per call rather than captured at import: an era entry page
+ * selects its era before it loads the app, and this module is reachable from the audio library,
+ * which loads earlier still. Captured at import it would hand a Devonian session the Cambrian
+ * soundtrack, opener and all.
+ */
+export const music = () => ACTIVE_ERA.audio.music;
+
+/** Tracks whose file failed to load this session. They leave the rotation and stop cueing biomes. */
+export const MISSING = new Set<string>();
+const available = () => music().filter((t) => !MISSING.has(t.name));
+
+/** The track that opens a session. */
+export const openingTrack = (): MusicTrack => music().find((t) => t.opening) ?? music()[0];
+
+/** Seconds of overlap when one track hands over to the next. */
+export const CROSSFADE = 5;
+/** Seconds the music fades up on the very first track of a session. */
+export const FIRST_FADE = 4;
+/**
+ * Shortest time between two biome-driven track changes. Biome edges are jagged and a player can
+ * cross one several times a minute; without this the score would flip back and forth.
+ */
+export const BIOME_HOLD = 90;
+
+/**
+ * The track to play after `current`. A track written for `biome` wins if there is one; otherwise
+ * it is a random pick from the whole soundtrack. The track just played is excluded whenever
+ * there is anything else to choose, so nothing repeats back to back.
+ */
+export function pickNext(current?: MusicTrack, biome?: Biome, rng: () => number = Math.random): MusicTrack {
+  const all = available();
+  const tagged = biome ? all.filter((t) => t.biomes?.includes(biome)) : [];
+  const pool = tagged.length ? tagged : all.length ? all : music();
+  const choices = pool.length > 1 ? pool.filter((t) => t !== current) : pool;
+  return choices[Math.floor(rng() * choices.length)] ?? music()[0];
+}
+
+/** Whether entering `biome` should cue a track change — false while no track names a biome. */
+export function biomeHasTrack(biome: Biome): boolean {
+  return available().some((t) => t.biomes?.includes(biome));
+}

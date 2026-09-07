@@ -1,0 +1,142 @@
+{
+  "id": "gemuendina",
+  "fullColorPolicy": "White COLOR_0 multiplied by UV albedo; no duplicate pigment darkening.",
+  "lodColorPolicy": "Texture-free, atlas-sampled linear vertex pigment.",
+  "exports": [
+    {
+      "file": "/Users/hoai/Documents/Stuff/Generations/cambrian/local/devonian-authoring/gemuendina/candidate/gemuendina.glb",
+      "sha256": "46f1eaf0df524539b3706aae099c4c0a06abfab62a6f36d4db543993dbf04fe2",
+      "bytes": 15288252,
+      "clips": [
+        "Ability",
+        "Attack",
+        "Bite",
+        "Death",
+        "Dive",
+        "Dodge",
+        "Eat",
+        "Growth",
+        "Guard",
+        "Heavy",
+        "Hit",
+        "Idle",
+        "Parry",
+        "Rise",
+        "Stagger",
+        "Swim",
+        "TurnLeft",
+        "TurnRight"
+      ],
+      "distinctMotions": 18,
+      "materials": [
+        {
+          "material": "gemuendina accent",
+          "rgbRange": [
+            1.0,
+            1.0
+          ],
+          "baseColorTexture": false,
+          "normalizedWeights": true
+        },
+        {
+          "material": "gemuendina body",
+          "rgbRange": [
+            1.0,
+            1.0
+          ],
+          "baseColorTexture": true,
+          "normalizedWeights": true
+        },
+        {
+          "material": "gemuendina eyes",
+          "rgbRange": [
+            1.0,
+            1.0
+          ],
+          "baseColorTexture": false,
+          "normalizedWeights": true
+        },
+        {
+          "material": "gemuendina fins",
+          "rgbRange": [
+            1.0,
+            1.0
+          ],
+          "baseColorTexture": true,
+          "normalizedWeights": true
+        },
+        {
+          "material": "gemuendina oral",
+          "rgbRange": [
+            1.0,
+            1.0
+          ],
+          "baseColorTexture": true,
+          "normalizedWeights": true
+        }
+      ],
+      "rootStable": true,
+      "scaleChannels": false
+    },
+    {
+      "file": "/Users/hoai/Documents/Stuff/Generations/cambrian/local/devonian-authoring/gemuendina/candidate/gemuendina.lod1.glb",
+      "sha256": "5074fd092b98dca7e3d233436b5f81aea420e656db67c3ef9fd6950a9158f360",
+      "bytes": 2210844,
+      "clips": [
+        "Death",
+        "Idle",
+        "Swim"
+      ],
+      "distinctMotions": 3,
+      "materials": [
+        {
+          "material": "gemuendina accent",
+          "rgbRange": [
+            0.07800411993591211,
+            0.2500038147554742
+          ],
+          "baseColorTexture": false,
+          "normalizedWeights": true
+        },
+        {
+          "material": "gemuendina body",
+          "rgbRange": [
+            0.007003891050583658,
+            0.36556038757915615
+          ],
+          "baseColorTexture": false,
+          "normalizedWeights": true
+        },
+        {
+          "material": "gemuendina eyes",
+          "rgbRange": [
+            0.003997863736934462,
+            0.009002822919050888
+          ],
+          "baseColorTexture": false,
+          "normalizedWeights": true
+        },
+        {
+          "material": "gemuendina fins",
+          "rgbRange": [
+            0.01739528496223392,
+            0.1501029983978027
+          ],
+          "baseColorTexture": false,
+          "normalizedWeights": true
+        },
+        {
+          "material": "gemuendina oral",
+          "rgbRange": [
+            0.0022583352407110706,
+            0.1031815060654612
+          ],
+          "baseColorTexture": false,
+          "normalizedWeights": true
+        }
+      ],
+      "rootStable": true,
+      "scaleChannels": false
+    }
+  ]
+}

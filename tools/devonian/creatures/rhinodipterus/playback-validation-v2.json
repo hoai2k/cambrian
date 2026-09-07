@@ -1,0 +1,133 @@
+{
+  "sourceGlbSha256": "ad29e4157364b09cf20716d00982d9ae13f4e9566db0f1d72e9fa96230f6c97c",
+  "audit": [
+    {
+      "name": "Ability",
+      "duration": 2.433333396911621,
+      "finite": true,
+      "rootStable": true,
+      "tailTipTravel": 1.174449151790537
+    },
+    {
+      "name": "Attack",
+      "duration": 1.0333333015441895,
+      "finite": true,
+      "rootStable": true,
+      "tailTipTravel": 1.127146469475526
+    },
+    {
+      "name": "Bite",
+      "duration": 0.5333333611488342,
+      "finite": true,
+      "rootStable": true,
+      "tailTipTravel": 0.9722144977408976
+    },
+    {
+      "name": "Death",
+      "duration": 1.6333333253860474,
+      "finite": true,
+      "rootStable": true,
+      "tailTipTravel": 2.2551997331215103
+    },
+    {
+      "name": "Dive",
+      "duration": 1.6333333253860474,
+      "finite": true,
+      "rootStable": true,
+      "tailTipTravel": 1.483987228199653
+    },
+    {
+      "name": "Dodge",
+      "duration": 0.4333333373069763,
+      "finite": true,
+      "rootStable": true,
+      "tailTipTravel": 3.1293767754018647
+    },
+    {
+      "name": "Eat",
+      "duration": 1.6333333253860474,
+      "finite": true,
+      "rootStable": true,
+      "tailTipTravel": 0.37735231217049986
+    },
+    {
+      "name": "Growth",
+      "duration": 1.5333333015441895,
+      "finite": true,
+      "rootStable": true,
+      "tailTipTravel": 0.8324605809742263
+    },
+    {
+      "name": "Guard",
+      "duration": 1.0333333015441895,
+      "finite": true,
+      "rootStable": true,
+      "tailTipTravel": 0.47645705794079096
+    },
+    {
+      "name": "Heavy",
+      "duration": 1.1333333253860474,
+      "finite": true,
+      "rootStable": true,
+      "tailTipTravel": 1.1306358722449097
+    },
+    {
+      "name": "Hit",
+      "duration": 0.6333333253860474,
+      "finite": true,
+      "rootStable": true,
+      "tailTipTravel": 0.47253119985701586
+    },
+    {
+      "name": "Idle",
+      "duration": 2.433333396911621,
+      "finite": true,
+      "rootStable": true,
+      "tailTipTravel": 0.3324662495794998
+    },
+    {
+      "name": "Parry",
+      "duration": 0.36666667461395264,
+      "finite": true,
+      "rootStable": true,
+      "tailTipTravel": 0.6439593304891449
+    },
+    {
+      "name": "Rise",
+      "duration": 1.6333333253860474,
+      "finite": true,
+      "rootStable": true,
+      "tailTipTravel": 1.495002365558849
+    },
+    {
+      "name": "Stagger",
+      "duration": 1.2333333492279053,
+      "finite": true,
+      "rootStable": true,
+      "tailTipTravel": 0.7732090135524495
+    },
+    {
+      "name": "Swim",
+      "duration": 2.433333396911621,
+      "finite": true,
+      "rootStable": true,
+      "tailTipTravel": 3.2466607085943773
+    },
+    {
+      "name": "TurnLeft",
+      "duration": 1.7333333492279053,
+      "finite": true,
+      "rootStable": true,
+      "tailTipTravel": 0.9095778009547418
+    },
+    {
+      "name": "TurnRight",
+      "duration": 1.7333333492279053,
+      "finite": true,
+      "rootStable": true,
+      "tailTipTravel": 0.9095778009547418
+    }
+  ],
+  "errors": [],
+  "videoSha256": "46467f6febe125557f34483c909817927d612904ca2df643b1d965700fbf4370"
+}

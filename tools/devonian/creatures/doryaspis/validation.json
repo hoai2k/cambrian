@@ -1,0 +1,319 @@
+{
+  "checks": "finite transforms, normalized weights, root stable, identity-scale removal, unique motion, seamless loops, socket bind alignment, true LOD reduction",
+  "models": [
+    {
+      "file": "doryaspis.glb",
+      "bytes": 22446244,
+      "vertices": 95473,
+      "triangles": 177248,
+      "bounds": [
+        2.8838579654693604,
+        0.6597360223531723,
+        4.398599743843079
+      ],
+      "bones": 12,
+      "sockets": [
+        {
+          "name": "anchor_attack_primary",
+          "point": [
+            0.0,
+            0.013999940757483655,
+            1.6749998805615172
+          ]
+        },
+        {
+          "name": "anchor_mouth",
+          "point": [
+            0.0,
+            0.11599996007182702,
+            0.9530000251140982
+          ]
+        },
+        {
+          "name": "anchor_mouth_inside",
+          "point": [
+            0.0,
+            -0.07190672697256333,
+            0.8385837809528139
+          ]
+        }
+      ],
+      "clips": [
+        {
+          "name": "Ability",
+          "duration": 2.4000000953674316,
+          "motion": 29.715,
+          "digest": "eea8b9252383b8bf732f4083a296089f2848db8be4c044de41d569df0fa3436d"
+        },
+        {
+          "name": "Attack",
+          "duration": 0.9999999403953552,
+          "motion": 13.747,
+          "digest": "5d34e7616e836e0a933db3f7473d1314b074708c969b2b4ca3fe313e050989d4"
+        },
+        {
+          "name": "Bite",
+          "duration": 0.5,
+          "motion": 2.253,
+          "digest": "c29c941e4aaf90ec1740be6865388745518a40939abd47bb5f40c95767408355"
+        },
+        {
+          "name": "Death",
+          "duration": 1.600000023841858,
+          "motion": 42.616,
+          "digest": "f0df38ec88e53ce7557f5d79759919d26c355e3157c7e21dd6fcb271c1d57be3"
+        },
+        {
+          "name": "Dive",
+          "duration": 1.399999976158142,
+          "motion": 14.439,
+          "digest": "3a8f21c57cb3911abbb51ea1c4633cb525c87bf88e0bf0f22c8e57708d027f88"
+        },
+        {
+          "name": "Dodge",
+          "duration": 0.4000000059604645,
+          "motion": 11.209,
+          "digest": "fa917bbaa3d2fe3184072463a8ba9401a366f86b7700806d95775dad1f1ef21a"
+        },
+        {
+          "name": "Eat",
+          "duration": 1.600000023841858,
+          "motion": 15.886,
+          "digest": "7fc8f376d93a57acda8275b28fa14396100961a0ea9fd2fcb43f6f307223b1b1"
+        },
+        {
+          "name": "Growth",
+          "duration": 1.5,
+          "motion": 8.902,
+          "digest": "1f0eadd6278de5d03afdff873e1e23b0e3b4ddc614845062ad9c042155f92428"
+        },
+        {
+          "name": "Guard",
+          "duration": 0.9999999403953552,
+          "motion": 11.266,
+          "digest": "b3ff1cb3d9a0c42d318239e6afb109842f8226ec84556766d14d2d7651a2ee2d"
+        },
+        {
+          "name": "Heavy",
+          "duration": 1.100000023841858,
+          "motion": 19.204,
+          "digest": "6269bf59d73c682581d64d3b08f72ab3a0eef60c781ae4903c501195c1cd70b0"
+        },
+        {
+          "name": "Hit",
+          "duration": 0.5999999642372131,
+          "motion": 7.478,
+          "digest": "4a3f746596ffcd7083d3da9323d02cedec6306cf1399f6ab0571abb375671c45"
+        },
+        {
+          "name": "Idle",
+          "duration": 2.4000000953674316,
+          "motion": 16.108,
+          "digest": "461390ef1025d34c1c673837d47bc0abb12625c21d53bf08898ee0194923502a"
+        },
+        {
+          "name": "Parry",
+          "duration": 0.36666667461395264,
+          "motion": 5.377,
+          "digest": "1c736804ccc5e373c1b283a389c3faf00431006847a4082118172738a1069ea9"
+        },
+        {
+          "name": "Rise",
+          "duration": 1.399999976158142,
+          "motion": 14.439,
+          "digest": "d188c4081858f37dbb092c9f46fa4389b6bac477e09bfad19d4e4673af92d433"
+        },
+        {
+          "name": "Stagger",
+          "duration": 1.2000000476837158,
+          "motion": 15.014,
+          "digest": "d43b56af1b7d5420135bf8921dd592c6501111e19dd6b66893f8d65f2d8406de"
+        },
+        {
+          "name": "Swim",
+          "duration": 2.4000000953674316,
+          "motion": 40.754,
+          "digest": "6350c97524896e1c0f5831d20c63c7ff50650072b26c2644be1c44aa490cddf1"
+        },
+        {
+          "name": "TurnLeft",
+          "duration": 1.600000023841858,
+          "motion": 27.976,
+          "digest": "26e9a268fefa1f3ab5b6b27d7f0bb41f644c9be5c53527ac92ade69867524681"
+        },
+        {
+          "name": "TurnRight",
+          "duration": 1.600000023841858,
+          "motion": 27.976,
+          "digest": "df2b21bd0c4f657ea999f17cb889945d82661cd2ac8ef2513df072c91d983a8b"
+        }
+      ],
+      "oralSoftTissueArticulation": [
+        {
+          "clip": "Ability",
+          "bone": "oral_L",
+          "maxTranslation": 0.006397232413291931
+        },
+        {
+          "clip": "Ability",
+          "bone": "oral_lower",
+          "maxTranslation": 0.0037719698157161474
+        },
+        {
+          "clip": "Ability",
+          "bone": "oral_R",
+          "maxTranslation": 0.006397217512130737
+        },
+        {
+          "clip": "Ability",
+          "bone": "oral_upper",
+          "maxTranslation": 0.004797972738742828
+        },
+        {
+          "clip": "Attack",
+          "bone": "oral_L",
+          "maxTranslation": 0.006760895252227783
+        },
+        {
+          "clip": "Attack",
+          "bone": "oral_lower",
+          "maxTranslation": 0.003986364230513573
+        },
+        {
+          "clip": "Attack",
+          "bone": "oral_R",
+          "maxTranslation": 0.006760895252227783
+        },
+        {
+          "clip": "Attack",
+          "bone": "oral_upper",
+          "maxTranslation": 0.005070646293461323
+        },
+        {
+          "clip": "Bite",
+          "bone": "oral_L",
+          "maxTranslation": 0.00798323005437851
+        },
+        {
+          "clip": "Bite",
+          "bone": "oral_lower",
+          "maxTranslation": 0.004707050044089556
+        },
+        {
+          "clip": "Bite",
+          "bone": "oral_R",
+          "maxTranslation": 0.007983244955539703
+        },
+        {
+          "clip": "Bite",
+          "bone": "oral_upper",
+          "maxTranslation": 0.005987549666315317
+        },
+        {
+          "clip": "Eat",
+          "bone": "oral_L",
+          "maxTranslation": 0.008000001311302185
+        },
+        {
+          "clip": "Eat",
+          "bone": "oral_lower",
+          "maxTranslation": 0.0047169397585093975
+        },
+        {
+          "clip": "Eat",
+          "bone": "oral_R",
+          "maxTranslation": 0.008000001311302185
+        },
+        {
+          "clip": "Eat",
+          "bone": "oral_upper",
+          "maxTranslation": 0.0060001155361533165
+        },
+        {
+          "clip": "Heavy",
+          "bone": "oral_L",
+          "maxTranslation": 0.005598001182079315
+        },
+        {
+          "clip": "Heavy",
+          "bone": "oral_lower",
+          "maxTranslation": 0.0033007177989929914
+        },
+        {
+          "clip": "Heavy",
+          "bone": "oral_R",
+          "maxTranslation": 0.005598001182079315
+        },
+        {
+          "clip": "Heavy",
+          "bone": "oral_upper",
+          "maxTranslation": 0.00419857120141387
+        }
+      ],
+      "removedIdentityScaleChannels": 0,
+      "sha256": "05040f00aeb2ea29b8e1ada05084fb4f16c9a3d88c4c80005e0911098a86fff4"
+    },
+    {
+      "file": "doryaspis.lod1.glb",
+      "bytes": 3226928,
+      "vertices": 35462,
+      "triangles": 60064,
+      "bounds": [
+        2.883895516395569,
+        0.6598242372274399,
+        4.398561716079712
+      ],
+      "bones": 12,
+      "sockets": [
+        {
+          "name": "anchor_attack_primary",
+          "point": [
+            0.0,
+            0.013999940757483655,
+            1.6749998805615172
+          ]
+        },
+        {
+          "name": "anchor_mouth",
+          "point": [
+            0.0,
+            0.11599996007182702,
+            0.9530000251140982
+          ]
+        },
+        {
+          "name": "anchor_mouth_inside",
+          "point": [
+            0.0,
+            -0.07190672697256333,
+            0.8385837809528139
+          ]
+        }
+      ],
+      "clips": [
+        {
+          "name": "Death",
+          "duration": 1.600000023841858,
+          "motion": 42.616,
+          "digest": "f0df38ec88e53ce7557f5d79759919d26c355e3157c7e21dd6fcb271c1d57be3"
+        },
+        {
+          "name": "Idle",
+          "duration": 2.4000000953674316,
+          "motion": 16.108,
+          "digest": "461390ef1025d34c1c673837d47bc0abb12625c21d53bf08898ee0194923502a"
+        },
+        {
+          "name": "Swim",
+          "duration": 2.4000000953674316,
+          "motion": 40.754,
+          "digest": "6350c97524896e1c0f5831d20c63c7ff50650072b26c2644be1c44aa490cddf1"
+        }
+      ],
+      "oralSoftTissueArticulation": [],
+      "removedIdentityScaleChannels": 36,
+      "sha256": "2d9beb8a32398ad6d0be3146cccf111cb5fa5782a8a41d984b60e23437e075fd"
+    }
+  ],
+  "lodTriangleRatio": 0.338869832099657
+}

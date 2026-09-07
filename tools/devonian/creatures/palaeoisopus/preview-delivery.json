@@ -1,0 +1,19 @@
+{
+  "id": "palaeoisopus",
+  "modelStatus": "preview",
+  "notes": "Basic anatomy, export, animation and anchor checks passed. Eye embedding passes where eyes are modeled; Furcaster has no macroscopic eyes, and Palaeoisopus eye location is unresolved. Further individual visual refinements follow initial library delivery. See README and WORKING_STATE.",
+  "models": {
+    "glb": {
+      "sourceSHA256": "d92995dfb63cd259210f5bf5832229c4f7b46ff7314ef7e78834b91d94d21484",
+      "packagedSHA256": "1d0be96b48d982b583cb92a53c5438a47c4679c01e4c6d53a56fbe07d37c1bdb",
+      "bytes": 11057704,
+      "losslessDecodedRoundTrip": true
+    },
+    "lod1.glb": {
+      "sourceSHA256": "99663fbcecd8dafab46d04ca02245d031d9fa2bc1a4109c82ab968bef0089a2d",
+      "packagedSHA256": "23b10f4ca0a688bc584693ea31243b1c8d43ad36a7745d6cc3700c8ff3c310b4",
+      "bytes": 2718040,
+      "losslessDecodedRoundTrip": true
+    }
+  }
+}

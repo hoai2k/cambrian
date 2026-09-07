@@ -1,0 +1,60 @@
+{
+  "id": "acanthostega",
+  "name": "Acanthostega",
+  "species": "Acanthostega gunnari",
+  "provenance": "Late Devonian, Famennian, East Greenland",
+  "description": "Aquatic early tetrapod with a rounded spade-like head, sutured skull, eight-digit paddle limbs and a deep ray-supported swimming tail.",
+  "lengthMeters": 0.6,
+  "modelLength": 7.200000047683716,
+  "locomotion": "Swim",
+  "clips": [
+    "Idle",
+    "Swim",
+    "TurnLeft",
+    "TurnRight",
+    "Dive",
+    "Rise",
+    "Attack",
+    "Bite",
+    "Heavy",
+    "Hit",
+    "Death",
+    "Guard",
+    "Parry",
+    "Dodge",
+    "Eat",
+    "Stagger",
+    "Ability",
+    "Growth"
+  ],
+  "looping": [
+    "Idle",
+    "Swim",
+    "Guard",
+    "Eat"
+  ],
+  "anchors": [
+    "anchor_mouth",
+    "anchor_mouth_inside",
+    "anchor_attack_primary"
+  ],
+  "sources": [
+    {
+      "title": "Coates1996, Acanthostega postcranial anatomy",
+      "url": "https://doi.org/10.1017/S0263593300006787"
+    },
+    {
+      "title": "Porro, Rayfield & Clack2015, reconstructed skull",
+      "url": "https://doi.org/10.1371/journal.pone.0118882"
+    }
+  ],
+  "notes": [
+    "Original initial preview of Acanthostega gunnari at a representative 0.6 m scale, not a fossil scan or claimed maximum.",
+    "Eight digits on each forelimb and hindlimb follow Coates1996; digits are unequal, unclawed and arranged as aquatic paddles. Soft webbing extent is inferred.",
+    "The deep caudal fin starts farther forward dorsally than ventrally and is supported conceptually by the fossil radials/lepidotrichia; there are no separate shark-like dorsal fins.",
+    "Dorsal skin has no invented fish-scale coat. Subtle ventral chevron relief follows gastralia; pigmentation and soft tissue are artistic reconstructions.",
+    "The skull follows the deeper, longer postorbital reconstruction and anterior mandibular hook described by Porro2015; cheeks remain rigid.",
+    "Animations use aquatic tail propulsion, paddle strokes, fin/digit recovery and biting. Ordinary terrestrial walking is not claimed. Growth does not scale or moult the body.",
+    "Preview: further anatomy, material and animation polishing is deferred until the initial roster is complete."
+  ]
+}

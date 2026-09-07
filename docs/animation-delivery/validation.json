@@ -1,0 +1,916 @@
+{
+  "repositoryCommit": "296a00146baa1ea713bfea27a3659b9e574902c6",
+  "reports": [
+    {
+      "id": "anomalocaris",
+      "originalSHA256": "4a046e4f90b61b9b81ea850137d251040059620e525ad7716fdd00766ea3d1f1",
+      "updatedSHA256": "9810622016d2f3b222dfd11a37cb0b5a6e27d188a357bf7cea9ea1306b151b26",
+      "originalBytes": 5005564,
+      "updatedBytes": 7653264,
+      "originalClips": [
+        "Attack",
+        "Death",
+        "Dive",
+        "Hit",
+        "Idle",
+        "Rise",
+        "Swim",
+        "TurnLeft",
+        "TurnRight"
+      ],
+      "newClips": [
+        {
+          "name": "Bite",
+          "frames": 15,
+          "samples": 16,
+          "duration": 0.5,
+          "loop": false,
+          "channels": 345,
+          "maxComponentChange": 0.20273729963846598
+        },
+        {
+          "name": "Heavy",
+          "frames": 33,
+          "samples": 34,
+          "duration": 1.1,
+          "loop": false,
+          "channels": 345,
+          "maxComponentChange": 1.9182328581809998
+        },
+        {
+          "name": "Guard",
+          "frames": 30,
+          "samples": 31,
+          "duration": 1,
+          "loop": true,
+          "channels": 345,
+          "maxComponentChange": 0.03983123227953911
+        },
+        {
+          "name": "Parry",
+          "frames": 10,
+          "samples": 11,
+          "duration": 0.3333333333333333,
+          "loop": false,
+          "channels": 345,
+          "maxComponentChange": 0.41197842554502095
+        },
+        {
+          "name": "Dodge",
+          "frames": 12,
+          "samples": 13,
+          "duration": 0.4,
+          "loop": false,
+          "channels": 345,
+          "maxComponentChange": 0.4753142511472106
+        },
+        {
+          "name": "Eat",
+          "frames": 24,
+          "samples": 25,
+          "duration": 0.8,
+          "loop": true,
+          "channels": 345,
+          "maxComponentChange": 0.1832101084291935
+        },
+        {
+          "name": "Stagger",
+          "frames": 36,
+          "samples": 37,
+          "duration": 1.2,
+          "loop": false,
+          "channels": 345,
+          "maxComponentChange": 0.34988996581487264
+        },
+        {
+          "name": "Moult",
+          "frames": 45,
+          "samples": 46,
+          "duration": 1.5,
+          "loop": true,
+          "channels": 345,
+          "maxComponentChange": 0.12813573703169823
+        },
+        {
+          "name": "Grab",
+          "frames": 27,
+          "samples": 28,
+          "duration": 0.9,
+          "loop": false,
+          "channels": 345,
+          "maxComponentChange": 0.2769026736790696
+        },
+        {
+          "name": "Ability",
+          "frames": 18,
+          "samples": 19,
+          "duration": 0.6,
+          "loop": false,
+          "channels": 345,
+          "maxComponentChange": 1.9109363555908203
+        }
+      ],
+      "originalDataUnchanged": true,
+      "validation": {
+        "errors": 0,
+        "warnings": 0
+      },
+      "playback": {
+        "poseSamples": 127660,
+        "maxRadius": 4.463230488237638,
+        "restDiagonal": 9.153718758099942,
+        "finite": true,
+        "endpointChecks": true,
+        "noRootMotion": true,
+        "noAnimatedScale": true
+      }
+    },
+    {
+      "id": "opabinia",
+      "originalSHA256": "57934c07c47a3df2a519aeec39e5025d285358c7b505a383384420712c7ce57d",
+      "updatedSHA256": "2dbd465cb9b39769631042294dbe3d1fa7a179a186b733d6b5102168cf625c07",
+      "originalBytes": 3605756,
+      "updatedBytes": 5075332,
+      "originalClips": [
+        "Attack",
+        "Death",
+        "Dive",
+        "Hit",
+        "Idle",
+        "Rise",
+        "Swim",
+        "TurnLeft",
+        "TurnRight"
+      ],
+      "newClips": [
+        {
+          "name": "Bite",
+          "frames": 15,
+          "samples": 16,
+          "duration": 0.5,
+          "loop": false,
+          "channels": 216,
+          "maxComponentChange": 1.988025426864624
+        },
+        {
+          "name": "Heavy",
+          "frames": 33,
+          "samples": 34,
+          "duration": 1.1,
+          "loop": false,
+          "channels": 216,
+          "maxComponentChange": 0.24882769584655762
+        },
+        {
+          "name": "Guard",
+          "frames": 30,
+          "samples": 31,
+          "duration": 1,
+          "loop": true,
+          "channels": 216,
+          "maxComponentChange": 0.03209555149078369
+        },
+        {
+          "name": "Parry",
+          "frames": 10,
+          "samples": 11,
+          "duration": 0.3333333333333333,
+          "loop": false,
+          "channels": 216,
+          "maxComponentChange": 1.987140953540802
+        },
+        {
+          "name": "Dodge",
+          "frames": 12,
+          "samples": 13,
+          "duration": 0.4,
+          "loop": false,
+          "channels": 216,
+          "maxComponentChange": 0.3770379424095154
+        },
+        {
+          "name": "Eat",
+          "frames": 24,
+          "samples": 25,
+          "duration": 0.8,
+          "loop": true,
+          "channels": 216,
+          "maxComponentChange": 1.962945580482483
+        },
+        {
+          "name": "Stagger",
+          "frames": 36,
+          "samples": 37,
+          "duration": 1.2,
+          "loop": false,
+          "channels": 216,
+          "maxComponentChange": 0.3071261942386627
+        },
+        {
+          "name": "Moult",
+          "frames": 45,
+          "samples": 46,
+          "duration": 1.5,
+          "loop": true,
+          "channels": 216,
+          "maxComponentChange": 0.10259560123085976
+        },
+        {
+          "name": "Ability",
+          "frames": 17,
+          "samples": 18,
+          "duration": 0.5666666666666667,
+          "loop": false,
+          "channels": 216,
+          "maxComponentChange": 1.987221121788025
+        }
+      ],
+      "originalDataUnchanged": true,
+      "validation": {
+        "errors": 0,
+        "warnings": 0
+      },
+      "playback": {
+        "poseSamples": 75075,
+        "maxRadius": 4.2110943396487315,
+        "restDiagonal": 7.283429397630543,
+        "finite": true,
+        "endpointChecks": true,
+        "noRootMotion": true,
+        "noAnimatedScale": true
+      }
+    },
+    {
+      "id": "waptia",
+      "originalSHA256": "392f3d787f23b60ffcc4d899da94c6f96474d3d0cd8db88c81fa719e0aa407fe",
+      "updatedSHA256": "536705101c8f510fd7cea17f8fa328ddeee2fbb4691739075c4c8bb837664049",
+      "originalBytes": 2991340,
+      "updatedBytes": 4420232,
+      "originalClips": [
+        "Attack",
+        "Death",
+        "Dive",
+        "Hit",
+        "Idle",
+        "Rise",
+        "Swim",
+        "TurnLeft",
+        "TurnRight"
+      ],
+      "newClips": [
+        {
+          "name": "Bite",
+          "frames": 15,
+          "samples": 16,
+          "duration": 0.5,
+          "loop": false,
+          "channels": 264,
+          "maxComponentChange": 0.13189318747520534
+        },
+        {
+          "name": "Heavy",
+          "frames": 33,
+          "samples": 34,
+          "duration": 1.1,
+          "loop": false,
+          "channels": 264,
+          "maxComponentChange": 0.23406952619552612
+        },
+        {
+          "name": "Dodge",
+          "frames": 12,
+          "samples": 13,
+          "duration": 0.4,
+          "loop": false,
+          "channels": 264,
+          "maxComponentChange": 0.3890146538615227
+        },
+        {
+          "name": "Eat",
+          "frames": 24,
+          "samples": 25,
+          "duration": 0.8,
+          "loop": true,
+          "channels": 264,
+          "maxComponentChange": 0.16610586643218994
+        },
+        {
+          "name": "Stagger",
+          "frames": 36,
+          "samples": 37,
+          "duration": 1.2,
+          "loop": false,
+          "channels": 264,
+          "maxComponentChange": 0.3071261942386627
+        },
+        {
+          "name": "Moult",
+          "frames": 45,
+          "samples": 46,
+          "duration": 1.5,
+          "loop": true,
+          "channels": 264,
+          "maxComponentChange": 0.0698990486562252
+        },
+        {
+          "name": "Ability",
+          "frames": 14,
+          "samples": 15,
+          "duration": 0.4666666666666667,
+          "loop": false,
+          "channels": 264,
+          "maxComponentChange": 0.5797370677595031
+        }
+      ],
+      "originalDataUnchanged": true,
+      "validation": {
+        "errors": 0,
+        "warnings": 0
+      },
+      "playback": {
+        "poseSamples": 76074,
+        "maxRadius": 3.481055858001064,
+        "restDiagonal": 6.2395718491164,
+        "finite": true,
+        "endpointChecks": true,
+        "noRootMotion": true,
+        "noAnimatedScale": true
+      }
+    },
+    {
+      "id": "canadia",
+      "originalSHA256": "379d3f44394a1cc87a30785b9f32d47216c2783eb03dcd585c3ea3ca345ad5b8",
+      "updatedSHA256": "f82bf00f59b5710bdc5a1e69c92867c3d47cbba2a365115a9d5363a20d704016",
+      "originalBytes": 3200744,
+      "updatedBytes": 4655664,
+      "originalClips": [
+        "Attack",
+        "Death",
+        "Dive",
+        "Hit",
+        "Idle",
+        "Rise",
+        "Swim",
+        "TurnLeft",
+        "TurnRight"
+      ],
+      "newClips": [
+        {
+          "name": "Bite",
+          "frames": 15,
+          "samples": 16,
+          "duration": 0.5,
+          "loop": false,
+          "channels": 210,
+          "maxComponentChange": 1.8555071949958801
+        },
+        {
+          "name": "Heavy",
+          "frames": 33,
+          "samples": 34,
+          "duration": 1.1,
+          "loop": false,
+          "channels": 210,
+          "maxComponentChange": 2
+        },
+        {
+          "name": "Guard",
+          "frames": 30,
+          "samples": 31,
+          "duration": 1,
+          "loop": true,
+          "channels": 210,
+          "maxComponentChange": 0.05225101113319397
+        },
+        {
+          "name": "Parry",
+          "frames": 10,
+          "samples": 11,
+          "duration": 0.3333333333333333,
+          "loop": false,
+          "channels": 210,
+          "maxComponentChange": 2
+        },
+        {
+          "name": "Dodge",
+          "frames": 12,
+          "samples": 13,
+          "duration": 0.4,
+          "loop": false,
+          "channels": 210,
+          "maxComponentChange": 2
+        },
+        {
+          "name": "Eat",
+          "frames": 24,
+          "samples": 25,
+          "duration": 0.8,
+          "loop": true,
+          "channels": 210,
+          "maxComponentChange": 1.8912668228149414
+        },
+        {
+          "name": "Stagger",
+          "frames": 36,
+          "samples": 37,
+          "duration": 1.2,
+          "loop": false,
+          "channels": 210,
+          "maxComponentChange": 2
+        },
+        {
+          "name": "Moult",
+          "frames": 45,
+          "samples": 46,
+          "duration": 1.5,
+          "loop": true,
+          "channels": 210,
+          "maxComponentChange": 2
+        },
+        {
+          "name": "Ability",
+          "frames": 30,
+          "samples": 31,
+          "duration": 1,
+          "loop": true,
+          "channels": 210,
+          "maxComponentChange": 0.05004274845123291
+        }
+      ],
+      "originalDataUnchanged": true,
+      "validation": {
+        "errors": 0,
+        "warnings": 0
+      },
+      "playback": {
+        "poseSamples": 59048,
+        "maxRadius": 5.189227452070772,
+        "restDiagonal": 5.362263549791641,
+        "finite": true,
+        "endpointChecks": true,
+        "noRootMotion": true,
+        "noAnimatedScale": true
+      }
+    },
+    {
+      "id": "hallucigenia",
+      "originalSHA256": "3d695a8bfb2e66417b7300fc320f8953aa87f092e2bb649ce9bca85ed59d2a16",
+      "updatedSHA256": "6199dac3fa2b0b6161822ac7f909b2882de2778e543aa3c6ef06efc44273a849",
+      "originalBytes": 1590308,
+      "updatedBytes": 2617276,
+      "originalClips": [
+        "Attack",
+        "Crawl",
+        "Death",
+        "Dive",
+        "Hit",
+        "Idle",
+        "Rise",
+        "TurnLeft",
+        "TurnRight"
+      ],
+      "newClips": [
+        {
+          "name": "Bite",
+          "frames": 15,
+          "samples": 16,
+          "duration": 0.5,
+          "loop": false,
+          "channels": 150,
+          "maxComponentChange": 0.3744806721806526
+        },
+        {
+          "name": "Heavy",
+          "frames": 33,
+          "samples": 34,
+          "duration": 1.1,
+          "loop": false,
+          "channels": 150,
+          "maxComponentChange": 0.3733578324317932
+        },
+        {
+          "name": "Guard",
+          "frames": 30,
+          "samples": 31,
+          "duration": 1,
+          "loop": true,
+          "channels": 150,
+          "maxComponentChange": 0.00941881537437439
+        },
+        {
+          "name": "Parry",
+          "frames": 10,
+          "samples": 11,
+          "duration": 0.3333333333333333,
+          "loop": false,
+          "channels": 150,
+          "maxComponentChange": 0.374480664730072
+        },
+        {
+          "name": "Dodge",
+          "frames": 12,
+          "samples": 13,
+          "duration": 0.4,
+          "loop": false,
+          "channels": 150,
+          "maxComponentChange": 0.2649914622306824
+        },
+        {
+          "name": "Eat",
+          "frames": 24,
+          "samples": 25,
+          "duration": 0.8,
+          "loop": true,
+          "channels": 150,
+          "maxComponentChange": 0.346890602260828
+        },
+        {
+          "name": "Stagger",
+          "frames": 36,
+          "samples": 37,
+          "duration": 1.2,
+          "loop": false,
+          "channels": 150,
+          "maxComponentChange": 0.3071261942386627
+        },
+        {
+          "name": "Moult",
+          "frames": 45,
+          "samples": 46,
+          "duration": 1.5,
+          "loop": true,
+          "channels": 150,
+          "maxComponentChange": 0.06993495300412178
+        },
+        {
+          "name": "Ability",
+          "frames": 30,
+          "samples": 31,
+          "duration": 1,
+          "loop": true,
+          "channels": 150,
+          "maxComponentChange": 0.005651339888572693
+        }
+      ],
+      "originalDataUnchanged": true,
+      "validation": {
+        "errors": 0,
+        "warnings": 0
+      },
+      "playback": {
+        "poseSamples": 78812,
+        "maxRadius": 2.6179691361812862,
+        "restDiagonal": 5.031475827096109,
+        "finite": true,
+        "endpointChecks": true,
+        "noRootMotion": true,
+        "noAnimatedScale": true
+      }
+    },
+    {
+      "id": "wiwaxia",
+      "originalSHA256": "b8098994cd72547fbdc27989ca04c5a785f75c2a3b78cd95bf538709d7afd884",
+      "updatedSHA256": "7e1fc4daf389d9541ca5e96c729d1e9ca7339886c6ec80eb07c2cbbd9b0c3346",
+      "originalBytes": 2106656,
+      "updatedBytes": 2303784,
+      "originalClips": [
+        "Attack",
+        "Crawl",
+        "Death",
+        "Dive",
+        "Hit",
+        "Idle",
+        "Rise",
+        "TurnLeft",
+        "TurnRight"
+      ],
+      "newClips": [
+        {
+          "name": "Bite",
+          "frames": 15,
+          "samples": 16,
+          "duration": 0.5,
+          "loop": false,
+          "channels": 30,
+          "maxComponentChange": 0.18000006675720215
+        },
+        {
+          "name": "Heavy",
+          "frames": 33,
+          "samples": 34,
+          "duration": 1.1,
+          "loop": false,
+          "channels": 30,
+          "maxComponentChange": 0.22310641407966614
+        },
+        {
+          "name": "Guard",
+          "frames": 30,
+          "samples": 31,
+          "duration": 1,
+          "loop": true,
+          "channels": 30,
+          "maxComponentChange": 0.0040000081062316895
+        },
+        {
+          "name": "Parry",
+          "frames": 10,
+          "samples": 11,
+          "duration": 0.3333333333333333,
+          "loop": false,
+          "channels": 30,
+          "maxComponentChange": 0.18000006675720215
+        },
+        {
+          "name": "Dodge",
+          "frames": 12,
+          "samples": 13,
+          "duration": 0.4,
+          "loop": false,
+          "channels": 30,
+          "maxComponentChange": 0.2649914622306824
+        },
+        {
+          "name": "Eat",
+          "frames": 24,
+          "samples": 25,
+          "duration": 0.8,
+          "loop": true,
+          "channels": 30,
+          "maxComponentChange": 0.09000015258789062
+        },
+        {
+          "name": "Stagger",
+          "frames": 36,
+          "samples": 37,
+          "duration": 1.2,
+          "loop": false,
+          "channels": 30,
+          "maxComponentChange": 0.3071261942386627
+        },
+        {
+          "name": "Moult",
+          "frames": 45,
+          "samples": 46,
+          "duration": 1.5,
+          "loop": true,
+          "channels": 30,
+          "maxComponentChange": 0.06991041824221611
+        },
+        {
+          "name": "Ability",
+          "frames": 30,
+          "samples": 31,
+          "duration": 1,
+          "loop": true,
+          "channels": 30,
+          "maxComponentChange": 0.002400040626525879
+        }
+      ],
+      "originalDataUnchanged": true,
+      "validation": {
+        "errors": 0,
+        "warnings": 0
+      },
+      "playback": {
+        "poseSamples": 59780,
+        "maxRadius": 2.85772002662066,
+        "restDiagonal": 5.285627433841718,
+        "finite": true,
+        "endpointChecks": true,
+        "noRootMotion": true,
+        "noAnimatedScale": true
+      }
+    },
+    {
+      "id": "marrella",
+      "originalSHA256": "c45a97a3b9323f11ce75cb67bfcf9cdf73d2814f3ce273ebf752f1cbc95fc413",
+      "updatedSHA256": "679847b84c9c62d02661c4375b4a70f23809285a338927f0f23c9ec69610fb5c",
+      "originalBytes": 2694952,
+      "updatedBytes": 5178312,
+      "originalClips": [
+        "Attack",
+        "Crawl",
+        "Death",
+        "Dive",
+        "Hit",
+        "Idle",
+        "Rise",
+        "TurnLeft",
+        "TurnRight"
+      ],
+      "newClips": [
+        {
+          "name": "Bite",
+          "frames": 15,
+          "samples": 16,
+          "duration": 0.5,
+          "loop": false,
+          "channels": 360,
+          "maxComponentChange": 0.2844734489917755
+        },
+        {
+          "name": "Heavy",
+          "frames": 33,
+          "samples": 34,
+          "duration": 1.1,
+          "loop": false,
+          "channels": 360,
+          "maxComponentChange": 0.2844734787940979
+        },
+        {
+          "name": "Guard",
+          "frames": 30,
+          "samples": 31,
+          "duration": 1,
+          "loop": true,
+          "channels": 360,
+          "maxComponentChange": 0.02808845043182373
+        },
+        {
+          "name": "Parry",
+          "frames": 10,
+          "samples": 11,
+          "duration": 0.3333333333333333,
+          "loop": false,
+          "channels": 360,
+          "maxComponentChange": 0.2844734638929367
+        },
+        {
+          "name": "Dodge",
+          "frames": 12,
+          "samples": 13,
+          "duration": 0.4,
+          "loop": false,
+          "channels": 360,
+          "maxComponentChange": 0.2695319168269634
+        },
+        {
+          "name": "Eat",
+          "frames": 24,
+          "samples": 25,
+          "duration": 0.8,
+          "loop": true,
+          "channels": 360,
+          "maxComponentChange": 0.33269477635622025
+        },
+        {
+          "name": "Stagger",
+          "frames": 36,
+          "samples": 37,
+          "duration": 1.2,
+          "loop": false,
+          "channels": 360,
+          "maxComponentChange": 0.3071261942386627
+        },
+        {
+          "name": "Moult",
+          "frames": 45,
+          "samples": 46,
+          "duration": 1.5,
+          "loop": true,
+          "channels": 360,
+          "maxComponentChange": 0.06993495300412178
+        },
+        {
+          "name": "Ability",
+          "frames": 30,
+          "samples": 31,
+          "duration": 1,
+          "loop": true,
+          "channels": 360,
+          "maxComponentChange": 0.06454046070575714
+        }
+      ],
+      "originalDataUnchanged": true,
+      "validation": {
+        "errors": 0,
+        "warnings": 0
+      },
+      "playback": {
+        "poseSamples": 59536,
+        "maxRadius": 2.8781038198400166,
+        "restDiagonal": 6.048141914596064,
+        "finite": true,
+        "endpointChecks": true,
+        "noRootMotion": true,
+        "noAnimatedScale": true
+      }
+    },
+    {
+      "id": "olenoides",
+      "originalSHA256": "012c86272ee2c775716f0ce5016fa68febe9ef4cddf578a1fed2543312ba68c9",
+      "updatedSHA256": "2a2e35a8961bc4dbe114111f058384f04f454679edf3e84844bcd64a70737f9e",
+      "originalBytes": 2163432,
+      "updatedBytes": 3770468,
+      "originalClips": [
+        "Attack",
+        "Crawl",
+        "Death",
+        "Dive",
+        "Hit",
+        "Idle",
+        "Rise",
+        "TurnLeft",
+        "TurnRight"
+      ],
+      "newClips": [
+        {
+          "name": "Bite",
+          "frames": 15,
+          "samples": 16,
+          "duration": 0.5,
+          "loop": false,
+          "channels": 234,
+          "maxComponentChange": 0.20880600064992905
+        },
+        {
+          "name": "Heavy",
+          "frames": 33,
+          "samples": 34,
+          "duration": 1.1,
+          "loop": false,
+          "channels": 234,
+          "maxComponentChange": 0.22310641407966614
+        },
+        {
+          "name": "Guard",
+          "frames": 30,
+          "samples": 31,
+          "duration": 1,
+          "loop": true,
+          "channels": 234,
+          "maxComponentChange": 0.02700793743133545
+        },
+        {
+          "name": "Parry",
+          "frames": 10,
+          "samples": 11,
+          "duration": 0.3333333333333333,
+          "loop": false,
+          "channels": 234,
+          "maxComponentChange": 0.18000006675720215
+        },
+        {
+          "name": "Dodge",
+          "frames": 12,
+          "samples": 13,
+          "duration": 0.4,
+          "loop": false,
+          "channels": 234,
+          "maxComponentChange": 0.268604826182127
+        },
+        {
+          "name": "Eat",
+          "frames": 24,
+          "samples": 25,
+          "duration": 0.8,
+          "loop": true,
+          "channels": 234,
+          "maxComponentChange": 0.32693205773830414
+        },
+        {
+          "name": "Stagger",
+          "frames": 36,
+          "samples": 37,
+          "duration": 1.2,
+          "loop": false,
+          "channels": 234,
+          "maxComponentChange": 0.3071261942386627
+        },
+        {
+          "name": "Moult",
+          "frames": 45,
+          "samples": 46,
+          "duration": 1.5,
+          "loop": true,
+          "channels": 234,
+          "maxComponentChange": 0.06991041824221611
+        },
+        {
+          "name": "Ability",
+          "frames": 30,
+          "samples": 31,
+          "duration": 1,
+          "loop": true,
+          "channels": 234,
+          "maxComponentChange": 0.028306514024734497
+        }
+      ],
+      "originalDataUnchanged": true,
+      "validation": {
+        "errors": 0,
+        "warnings": 0
+      },
+      "playback": {
+        "poseSamples": 79788,
+        "maxRadius": 3.1106348206946715,
+        "restDiagonal": 6.523023164798785,
+        "finite": true,
+        "endpointChecks": true,
+        "noRootMotion": true,
+        "noAnimatedScale": true
+      }
+    }
+  ]
+}

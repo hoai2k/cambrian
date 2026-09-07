@@ -1,0 +1,38 @@
+[
+  {
+    "name": "eye_globe_R",
+    "closedEnvelope": "head_body_envelope_closed",
+    "centerBlender": [
+      -0.21362847089767456,
+      -1.3098037242889404,
+      0.11165688931941986
+    ],
+    "radii": [
+      0.078,
+      0.1,
+      0.085
+    ],
+    "surfaceInwardDepth": 0.03900000000000001,
+    "sourceVolumeFraction": 0.7963588187529381,
+    "samples": 23399,
+    "method": "Uniform solid ellipsoid samples tested against nearest oriented actual head surface; independent exported polyhedron audit required."
+  },
+  {
+    "name": "eye_globe_L",
+    "closedEnvelope": "head_body_envelope_closed",
+    "centerBlender": [
+      0.21363702416419983,
+      -1.3097304105758667,
+      0.11166121810674667
+    ],
+    "radii": [
+      0.078,
+      0.1,
+      0.085
+    ],
+    "surfaceInwardDepth": 0.03900000000000001,
+    "sourceVolumeFraction": 0.7984529253386897,
+    "samples": 23399,
+    "method": "Uniform solid ellipsoid samples tested against nearest oriented actual head surface; independent exported polyhedron audit required."
+  }
+]

@@ -1,0 +1,42 @@
+{
+  "id": "archaeopteris",
+  "family": "P04",
+  "name": "Archaeopteris",
+  "taxon": "Archaeopteris architectural reconstruction",
+  "category": "plant",
+  "description": "Woody tapering trunk, hierarchical branching roots and lateral boughs bearing divided leafy axes with approximately 2 cm fan-shaped pinnules. Spore-bearing, no flowers.",
+  "provenance": "Middle\u2013Late Devonian forest reference, New York comparative roots",
+  "model": "assets/devonian/props/archaeopteris.glb",
+  "lod": "assets/devonian/props/archaeopteris.lod1.glb",
+  "image": "assets/devonian/props/archaeopteris.png",
+  "lengthMeters": 7.754537105560303,
+  "dimensionsMeters": {
+    "x": 4.753992080688477,
+    "y": 7.754537105560303,
+    "z": 4.362366676330566
+  },
+  "clips": [
+    "Idle"
+  ],
+  "looping": [
+    "Idle"
+  ],
+  "sources": [
+    "https://www.nature.com/articles/19516",
+    "https://pmc.ncbi.nlm.nih.gov/articles/PMC8409631/",
+    "https://orca.cardiff.ac.uk/id/eprint/10078/1/Berry%202000.pdf"
+  ],
+  "notes": [
+    "Original parametric mesh, no downloaded model.",
+    "1 glTF unit = 1 metre. Dimensions describe this art specimen, not a taxon maximum.",
+    "Pigmentation and soft appearance are artistic interpretations.",
+    "Locality tags constrain future placement; library membership does not assert co-occurrence.",
+    "Preview model: initial scenery delivery; further individual material, silhouette and motion refinement is pending."
+  ],
+  "fullTriangles": 168303,
+  "lodTriangles": 50357,
+  "lodRatio": 0.2992044110918997,
+  "sourceBlend": "../devonian-authoring/props/archaeopteris/archaeopteris.blend",
+  "uncertainty": "Branching/foliage/root architecture reconstructed comparatively; size is one art specimen and not a maximum.",
+  "modelStatus": "preview"
+}

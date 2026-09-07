@@ -1,0 +1,324 @@
+{
+  "id": "gemuendina",
+  "version": "V2",
+  "status": "local candidate frozen for parent packaging and main-viewer inspection",
+  "date": "2026-09-07T16:16:20.943351+00:00",
+  "publicV1Unchanged": true,
+  "sourceBlend": "/Users/hoai/Documents/Stuff/Generations/cambrian/local/devonian-authoring/gemuendina/gemuendina.blend",
+  "sourceBlendSha256": "36a8e9d8d5b45d2665dbe89931ad653de7a928778337786d10d7683e4171eaab",
+  "files": {
+    "gemuendina.json": {
+      "sha256": "991a2cfcaf8450f4443438219b3c2639d2a4f6a1a5a1acd1a7cbfe901f8c0913",
+      "bytes": 2194
+    },
+    "gemuendina.card.png": {
+      "sha256": "a9744b3e30767ff097d3f853dc1f67f2f1a10fc35d7015bce1f4ccd947df4efd",
+      "bytes": 274299
+    },
+    "gemuendina.glb": {
+      "sha256": "46f1eaf0df524539b3706aae099c4c0a06abfab62a6f36d4db543993dbf04fe2",
+      "bytes": 15288252
+    },
+    "gemuendina.lod1.glb": {
+      "sha256": "5074fd092b98dca7e3d233436b5f81aea420e656db67c3ef9fd6950a9158f360",
+      "bytes": 2210844
+    },
+    "gemuendina.thumb.png": {
+      "sha256": "f8ff83fbf9e05e8833ed1a4924652ff0122ba2ada83cf13014ce8df258e36500",
+      "bytes": 33956
+    },
+    "gemuendina.select.png": {
+      "sha256": "adf5e666bd33cfe7b2643540ad8e76d17f8201ff529a9476453ffbec6c6ccdb0",
+      "bytes": 1034172
+    },
+    "gemuendina.png": {
+      "sha256": "acdecacf282880f9778f080e8a880c7286c4cb12b9b54c3979a2ad31c7e72f20",
+      "bytes": 1142621
+    }
+  },
+  "geometry": {
+    "vertices": 69369,
+    "fullTriangles": 137612,
+    "lodTriangles": 38525,
+    "reductionRatio": 0.279953783100311,
+    "bones": 26,
+    "anchorCount": 3
+  },
+  "eyeAudits": {
+    "full": {
+      "id": "gemuendina",
+      "revision": "local-v2-full",
+      "assetSha256": "46f1eaf0df524539b3706aae099c4c0a06abfab62a6f36d4db543993dbf04fe2",
+      "headMesh": "gemuendina gemuendina body",
+      "headTriangles": 84220,
+      "headTopology": {
+        "valid": true,
+        "nonmanifoldEdges": 0,
+        "cappedBoundaryLoops": [
+          {
+            "vertices": 72,
+            "centroid": [
+              -5.794896118516135e-09,
+              0.19610442221164703,
+              1.300389289855957
+            ],
+            "radius": 0.274456454041016
+          }
+        ]
+      },
+      "eyes": [
+        {
+          "eye": 0,
+          "center": [
+            -0.45000000298023224,
+            0.14610957726836205,
+            1.100000023841858
+          ],
+          "radii": [
+            0.11400000751018524,
+            0.09099999442696571,
+            0.1369999647140503
+          ],
+          "eyeTriangles": 960,
+          "boundingBoxCandidates": 120000,
+          "volumeSamples": 61722,
+          "inside": 50828,
+          "insidePercent": 82.3498914487541,
+          "wilson95Percent": [
+            82.0471060399517,
+            82.64865016987534
+          ],
+          "conservative95Percent": [
+            82.0471060399517,
+            82.64865016987534
+          ],
+          "rayDisagreements": 0,
+          "insideLowerPercent": 82.3498914487541,
+          "insideUpperPercent": 82.3498914487541,
+          "closureClearanceLowerBounds": [
+            0.020560240397778595
+          ],
+          "criterion50": "PASS",
+          "target65": true,
+          "guidanceOnly70PercentTranslationGlTF": [
+            0.0,
+            -3.053511818507104e-06,
+            0.0
+          ],
+          "guidanceOnly70PercentTranslationBlender": [
+            0.0,
+            -0.0,
+            -3.053511818507104e-06
+          ]
+        },
+        {
+          "eye": 1,
+          "center": [
+            0.45000000298023224,
+            0.14610957726836205,
+            1.100000023841858
+          ],
+          "radii": [
+            0.11400000751018524,
+            0.09099999442696571,
+            0.1369999647140503
+          ],
+          "eyeTriangles": 960,
+          "boundingBoxCandidates": 120000,
+          "volumeSamples": 61762,
+          "inside": 50851,
+          "insidePercent": 82.33379748065153,
+          "wilson95Percent": [
+            82.0310041438162,
+            82.63256873948443
+          ],
+          "conservative95Percent": [
+            82.0310041438162,
+            82.63417693206804
+          ],
+          "rayDisagreements": 1,
+          "insideLowerPercent": 82.33379748065153,
+          "insideUpperPercent": 82.3354165992034,
+          "closureClearanceLowerBounds": [
+            0.020560250931152102
+          ],
+          "criterion50": "PASS",
+          "target65": true,
+          "guidanceOnly70PercentTranslationGlTF": [
+            0.0,
+            -3.053511818507104e-06,
+            0.0
+          ],
+          "guidanceOnly70PercentTranslationBlender": [
+            0.0,
+            -0.0,
+            -3.053511818507104e-06
+          ]
+        }
+      ]
+    },
+    "lod": {
+      "id": "gemuendina",
+      "revision": "local-v2-lod",
+      "assetSha256": "5074fd092b98dca7e3d233436b5f81aea420e656db67c3ef9fd6950a9158f360",
+      "headMesh": "gemuendina gemuendina body",
+      "headTriangles": 23580,
+      "headTopology": {
+        "valid": true,
+        "nonmanifoldEdges": 0,
+        "cappedBoundaryLoops": [
+          {
+            "vertices": 72,
+            "centroid": [
+              -5.794896118516135e-09,
+              0.19610442221164703,
+              1.300389289855957
+            ],
+            "radius": 0.274456454041016
+          }
+        ]
+      },
+      "eyes": [
+        {
+          "eye": 0,
+          "center": [
+            -0.44939762353897095,
+            0.14610957726836205,
+            1.1014588177204132
+          ],
+          "radii": [
+            0.11328881978988647,
+            0.09099999442696571,
+            0.13609465956687927
+          ],
+          "eyeTriangles": 224,
+          "boundingBoxCandidates": 120000,
+          "volumeSamples": 59987,
+          "inside": 49444,
+          "insidePercent": 82.424525313818,
+          "wilson95Percent": [
+            82.11786611363137,
+            82.72703181158793
+          ],
+          "conservative95Percent": [
+            82.11786611363137,
+            82.72703181158793
+          ],
+          "rayDisagreements": 0,
+          "insideLowerPercent": 82.424525313818,
+          "insideUpperPercent": 82.424525313818,
+          "closureClearanceLowerBounds": [
+            0.02044780865459045
+          ],
+          "criterion50": "PASS",
+          "target65": true,
+          "guidanceOnly70PercentTranslationGlTF": [
+            0.0,
+            -3.0378832889255136e-06,
+            0.0
+          ],
+          "guidanceOnly70PercentTranslationBlender": [
+            0.0,
+            -0.0,
+            -3.0378832889255136e-06
+          ]
+        },
+        {
+          "eye": 1,
+          "center": [
+            0.4500998556613922,
+            0.14610957726836205,
+            1.0978004932403564
+          ],
+          "radii": [
+            0.11399105191230774,
+            0.09099999442696571,
+            0.13683545589447021
+          ],
+          "eyeTriangles": 220,
+          "boundingBoxCandidates": 120000,
+          "volumeSamples": 59025,
+          "inside": 48826,
+          "insidePercent": 82.72088098263448,
+          "wilson95Percent": [
+            82.41374935661351,
+            83.02375365547337
+          ],
+          "conservative95Percent": [
+            82.41374935661351,
+            83.03216493842326
+          ],
+          "rayDisagreements": 5,
+          "insideLowerPercent": 82.72088098263448,
+          "insideUpperPercent": 82.72935196950445,
+          "closureClearanceLowerBounds": [
+            0.021662802563025912
+          ],
+          "criterion50": "PASS",
+          "target65": true,
+          "guidanceOnly70PercentTranslationGlTF": [
+            0.0,
+            -3.051715793844778e-06,
+            0.0
+          ],
+          "guidanceOnly70PercentTranslationBlender": [
+            0.0,
+            -0.0,
+            -3.051715793844778e-06
+          ]
+        }
+      ]
+    }
+  },
+  "validation": {
+    "normalizedFourInfluenceWeights": true,
+    "rootStable": true,
+    "noScaleChannels": true,
+    "fullClips": 18,
+    "lodClips": 3,
+    "loopSeams": {
+      "Idle": 6.858022109779144e-18,
+      "Swim": 3.429011054889572e-17,
+      "TurnLeft": 3.5994235789613394e-33,
+      "TurnRight": 3.5994235789613394e-33,
+      "Dive": 3.2994715834360624e-33,
+      "Rise": 3.2994715834360624e-33,
+      "Attack": 6.206540377364598e-33,
+      "Bite": 6.898894795055417e-33,
+      "Heavy": 6.206540377364598e-33,
+      "Hit": 2.3996155968602314e-33,
+      "Death": 0.550000011920929,
+      "Guard": 8.229626531734973e-18,
+      "Parry": 2.54959159462287e-33,
+      "Dodge": 4.1993275700118934e-33,
+      "Eat": 1.3030242008580374e-17,
+      "Stagger": 2.3996155968602314e-33,
+      "Ability": 1.7976043237700782e-23,
+      "Growth": 2.3996155968602314e-33
+    },
+    "fullWhiteColor0": true,
+    "lodBakedLinearPigment": true,
+    "runtimePassed": true,
+    "runtimeErrors": []
+  },
+  "visualReview": {
+    "parentAccepted": "Fin-root colour transition, thinner rounded snout and transverse jaw arc accepted; final eye offset explicitly documented for parent inspection.",
+    "finalEyeOffset": "+/-0.03 lateral model units, seated in same continuous cheek, no rim/pad added",
+    "renderedPoseCount": 48,
+    "allActionPlayback": "/Users/hoai/Documents/Stuff/Generations/cambrian/local/devonian-authoring/gemuendina/viewer-v2/all-actions.webm",
+    "playbackSha256": "7de554f4d57d8c9536cd19a22ac828587511d40816d6a2a4eaa4702d2b626059",
+    "sourceCloseups": [
+      "eye-close-v2.png",
+      "oral-close-v2.png",
+      "side-review-v2.png"
+    ],
+    "observations": [
+      "Full actual-GLB front, side, dorsal, three-quarter, oral and eye views inspected.",
+      "All18 authored action poses inspected, with additional anticipation/recovery phases and a real-time Three.js recording.",
+      "Pectoral roots remain seated under stronger banking/guard/dodge motion; distal lobes and finless tail carry the travelling wave.",
+      "The anterior lower-jaw margin and attached denticles move together; the posterior oral wall and eyes remain seated in the head.",
+      "LOD preserves silhouette, sockets and pigmentation with reduced fine surface detail.",
+      "Four portrait dimensions and alpha checked; source and actual-GLB material appearance compared."
+    ]
+  }
+}

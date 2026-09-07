@@ -1,0 +1,141 @@
+{
+  "id": "palaeoisopus",
+  "status": "preview-ready",
+  "manifest": {
+    "id": "palaeoisopus",
+    "status": "preview",
+    "frozenAt": "2026-09-07T19:21:29.557873+00:00",
+    "files": {
+      "palaeoisopus.glb": {
+        "sha256": "d92995dfb63cd259210f5bf5832229c4f7b46ff7314ef7e78834b91d94d21484",
+        "bytes": 20551704
+      },
+      "palaeoisopus.lod1.glb": {
+        "sha256": "99663fbcecd8dafab46d04ca02245d031d9fa2bc1a4109c82ab968bef0089a2d",
+        "bytes": 6350492
+      },
+      "palaeoisopus.json": {
+        "sha256": "d6fd58e6257740ca80c0011e17a186a41df75b789650fb64b3bb1485b144d16f",
+        "bytes": 2211
+      },
+      "palaeoisopus.png": {
+        "sha256": "973c6176e4ca29229da9d0756c4a297ee3e958b090e8c3608b447cda8f85989f",
+        "bytes": 1090405
+      },
+      "palaeoisopus.select.png": {
+        "sha256": "5bc2f19fc4859a5898fa3bbc31e0597fac19d8d56a59383af01739763f7fe5da",
+        "bytes": 905937
+      },
+      "palaeoisopus.card.png": {
+        "sha256": "138fa6b43c9d097af13e5d8e8f954760fdb39c62066e02cd4968d672623f3f36",
+        "bytes": 258518
+      },
+      "palaeoisopus.thumb.png": {
+        "sha256": "9c91d44e32f224e00f8968ff85f3246b945406d26778d7abc2f607da89701c2b",
+        "bytes": 36202
+      }
+    },
+    "editableSource": {
+      "file": "/Users/hoai/Documents/Stuff/Generations/cambrian/local/devonian-authoring/palaeoisopus/palaeoisopus-v1.blend",
+      "sha256": "bd558fe683772b7d392980e6b5f8fb41b27252b8009c8c247e0ce4476fff4385"
+    }
+  },
+  "geometry": {
+    "fullTriangles": 261744,
+    "lodTriangles": 73285,
+    "reductionRatio": 0.2799873158506021,
+    "bones": 138,
+    "fullBytes": 20551704,
+    "lodBytes": 6350492,
+    "anchorCount": 3
+  },
+  "eyes": {
+    "status": "not-applicable",
+    "reason": "Fossil ocular bumps reinterpreted as cuticular/sensory tubercles by Sabroux2024. Actual lens positions unresolved; no invented eye globes."
+  },
+  "articulation": {
+    "sourceSha256": "bd558fe683772b7d392980e6b5f8fb41b27252b8009c8c247e0ce4476fff4385",
+    "setae": {
+      "fineSetalBases": 558,
+      "maximumSignedDistanceFromCuticle": -0.004756245645694435,
+      "allInsideOrAtSurface": true,
+      "method": "Basal-ring centroids against nearest actual cuticle triangle and oriented normal in bind pose; each bristle shares its supporting cuticle article bone."
+    },
+    "sampledPoses": 76,
+    "walkingLegArticleCounts": {
+      "WL1L": 9,
+      "WL1R": 9,
+      "WL2L": 10,
+      "WL2R": 10,
+      "WL3L": 10,
+      "WL3R": 10,
+      "WL4L": 10,
+      "WL4R": 10
+    },
+    "maximumArticulationGap": 0.0,
+    "oralVertexCount": 440,
+    "oralBones": [
+      "oralTip"
+    ],
+    "eyes": {
+      "status": "not-applicable",
+      "reason": "Fossil ocular bumps reinterpreted as cuticular/sensory tubercles by Sabroux2024. Actual lens positions unresolved; no invented eye globes."
+    },
+    "scope": "Bone-chain joint alignment and oral binding, not a universal mesh-intersection proof. Actual exported visual review also required."
+  },
+  "portraits": {
+    "palaeoisopus.png": {
+      "size": [
+        1200,
+        900
+      ],
+      "mode": "RGBA",
+      "alphaRange": [
+        255,
+        255
+      ]
+    },
+    "palaeoisopus.select.png": {
+      "size": [
+        1600,
+        1200
+      ],
+      "mode": "RGBA",
+      "alphaRange": [
+        0,
+        255
+      ]
+    },
+    "palaeoisopus.card.png": {
+      "size": [
+        800,
+        600
+      ],
+      "mode": "RGBA",
+      "alphaRange": [
+        0,
+        255
+      ]
+    },
+    "palaeoisopus.thumb.png": {
+      "size": [
+        256,
+        192
+      ],
+      "mode": "RGBA",
+      "alphaRange": [
+        0,
+        255
+      ]
+    }
+  },
+  "actualGlbReview": "Final exact-export Idle,Swim,ventral proboscis and cephalic representative views plus LOD. Earlier19-action midpoint/directional review used the same unchanged authored actions before the final setal root/ventral-face correction; all558 roots quantitatively rechecked. Extended repeated screenshot sweep stopped per initial-roster priority. Still-frame review, not a claimed biomechanical playback validation.",
+  "runtimeValidation": "Direct decoded GLB finite normalized weights, 19/3 distinct actions, stable root, no scale channels, matching full/LOD138bone graph and3v1 sockets. Source every-frame finite bounds, loop/one-shot return seams and Death hold. Shared catalogue runtime audit deferred to parent registration.",
+  "knownPreviewLimitations": [
+    "Appendage articles, coxal rings and joints use shaped lofts with overlapping arthrodial tissue; subtle intersections and cuticle smoothing need the later art pass.",
+    "Cuticular ornament, cephalic sensory tubercles, setal density and colours are simplified; the body plan and differentiated limb article counts take priority in the initial roster.",
+    "Proboscis oral margin and lumen are articulated and attached; fine internal anatomy is inferred and deliberately minimal.",
+    "Actual eye positions unresolved; no eye globes are invented and ornamental tubercles are not mislabeled as eyes.",
+    "Exact swimming/probing/grasping movements are inferred from anatomy. Moult is a preparatory flex display, not simulated exuvium separation."
+  ]
+}

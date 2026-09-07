@@ -1,0 +1,36 @@
+{
+  "id": "encrusting-stromatoporoid-v2",
+  "family": "B03",
+  "name": "Encrusting stromatoporoid \u2014 variant 2",
+  "taxon": "Stromatoporoidea indet. encrusting growth",
+  "category": "attached",
+  "description": "Low successive irregular growth margins with living surfaces distinguished from fossil sections.",
+  "provenance": "Devonian carbonate shelf comparative reconstruction",
+  "model": "assets/devonian/props/encrusting-stromatoporoid-v2.glb",
+  "lod": "assets/devonian/props/encrusting-stromatoporoid-v2.lod1.glb",
+  "image": "assets/devonian/props/encrusting-stromatoporoid-v2.png",
+  "lengthMeters": 0.716605007648468,
+  "dimensionsMeters": {
+    "x": 0.716605007648468,
+    "y": 0.1394924521446228,
+    "z": 0.5649250745773315
+  },
+  "clips": [],
+  "looping": [],
+  "sources": [
+    "https://onlinelibrary.wiley.com/doi/full/10.1111/j.1475-4983.2011.01037.x"
+  ],
+  "notes": [
+    "Original parametric mesh, no downloaded model.",
+    "1 glTF unit = 1 metre. Dimensions describe this art specimen, not a taxon maximum.",
+    "Pigmentation and soft appearance are artistic interpretations.",
+    "Locality tags constrain future placement; library membership does not assert co-occurrence.",
+    "Preview model: initial scenery delivery; further individual material, silhouette and motion refinement is pending."
+  ],
+  "fullTriangles": 12960,
+  "lodTriangles": 3888,
+  "lodRatio": 0.3,
+  "sourceBlend": "../devonian-authoring/props/encrusting-stromatoporoid-v2/encrusting-stromatoporoid-v2.blend",
+  "uncertainty": "Conforming thin growth is supported; the precise patch perimeter and soft pigmentation are artistic.",
+  "modelStatus": "preview"
+}
