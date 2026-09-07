@@ -150,12 +150,19 @@ export function createSea(scene: THREE.Scene, world: WorldData, quality: Quality
   const propMat = (kind: SeaKind, sway = false, bend = false) => {
     const m = seaMaterial('#ffffff', kind, sway, bend); m.vertexColors = true; return m;
   };
+  const scenery = ACTIVE_ERA.assets.instancedScenery;
+  const authoredFlora = high || scenery?.minimumFloraQuality !== 'high' ? scenery?.flora : undefined;
   const propMaterials: Partial<Record<PropId, THREE.Material>> = {
     'cushion-sponge': propMat('sponge', false, true), 'lettuce-tuft': propMat('algae', true, true),
     'spine-sponge': propMat('sponge', false, true), 'glass-fan': propMat('sponge', true, true),
     'blade-spire': propMat('rock'), 'talus-shard': propMat('rock'), 'pebble-cluster': propMat('rock'),
   };
   (propMaterials['lettuce-tuft'] as THREE.MeshStandardMaterial).side = THREE.DoubleSide;
+  for (const [id, spec] of Object.entries(scenery?.props ?? {})) {
+    const material = propMat(spec.material, spec.sway, spec.bend);
+    if (spec.doubleSided) material.side = THREE.DoubleSide;
+    propMaterials[id] = material;
+  }
   // One load per prop per sea, shared by all streamed cells. Failed loads retain their fallback.
   const propLoads = new Map<PropId, Promise<THREE.BufferGeometry | undefined>>();
   function useProp(id: PropId, mesh: THREE.InstancedMesh, view: ChunkView) {
@@ -425,10 +432,12 @@ export function createSea(scene: THREE.Scene, world: WorldData, quality: Quality
   const bladeFallback = G(new THREE.ConeGeometry(.6, 4, 5)); bladeFallback.translate(0, 2, 0);
   const talusFallback = G(new THREE.BoxGeometry(1.5, .8, .85)); talusFallback.translate(0, .4, 0);
   const pebbleFallback = G(new THREE.SphereGeometry(.3, 8, 4)); pebbleFallback.scale(1, .25, 1); pebbleFallback.translate(0, .075, 0);
-  // Authored geometry per kind, from the era pack. Anything not named here — or whose file fails
-  // to load — keeps the procedural stand-in built above.
-  const floraProps: Partial<Record<Flora['kind'], PropId>> = ACTIVE_ERA.environment.floraProps
-    ?? { cushion: 'cushion-sponge', lettuce: 'lettuce-tuft', spine: 'spine-sponge', glass: 'glass-fan' };
+  // An explicit proxy collection owns its complete mapping, including intentionally procedural
+  // kinds and its quality gate. Era folder mappings remain the fallback for other collections.
+  const floraProps: Partial<Record<Flora['kind'], PropId>> = scenery
+    ? authoredFlora ?? {}
+    : ACTIVE_ERA.environment.floraProps
+      ?? { cushion: 'cushion-sponge', lettuce: 'lettuce-tuft', spine: 'spine-sponge', glass: 'glass-fan' };
   const floraSlots = new Map<Flora, { attr: THREE.InstancedBufferAttribute; i: number }>();
   const floraSets: Record<string, { geo: THREE.BufferGeometry; mat: THREE.Material }> = {
     cushion: { geo: cushionFallback, mat: spongeMat }, lettuce: { geo: lettuceFallback, mat: tuftMat },
@@ -452,11 +461,11 @@ export function createSea(scene: THREE.Scene, world: WorldData, quality: Quality
     terrainTile(view, detail === 'full' ? (high ? 32 : 20) : 8);
     instanced(view, 'boulders', boulderGeo, rockMat, chunk.boulders,
       (b, d) => { d.position.set(b.pos.x, b.pos.y, b.pos.z); d.rotation.set(0, b.rot, 0); d.scale.set(b.sx, b.sy, b.sz); },
-      { include: b => !b.variant, castShadow: detail === 'full', range: 400, color: (b) => color.fromArray(rockTint(b)) });
+      { prop: scenery?.rocks?.boulder, include: b => !b.variant, castShadow: detail === 'full', range: 400, color: (b) => scenery?.rocks?.boulder ? color.setScalar(b.shade) : color.fromArray(rockTint(b)) });
     for (const id of ['blade-spire', 'talus-shard'] as const) {
       instanced(view, id, id === 'blade-spire' ? bladeFallback : talusFallback, rockMat, chunk.boulders.filter(b => b.variant === id),
         (b, d) => { d.position.set(b.pos.x, b.pos.y, b.pos.z); d.rotation.set(0, b.rot, 0); d.scale.set(b.sx, b.sy, b.sz); },
-        { prop: id, castShadow: detail === 'full', range: 400 });
+        { prop: scenery?.rocks?.[id] ?? id, castShadow: detail === 'full', range: 400 });
     }
     if (detail === 'far') { views.set(key, view); return view; }
 
@@ -473,7 +482,7 @@ export function createSea(scene: THREE.Scene, world: WorldData, quality: Quality
 
     instanced(view, 'pebble-cluster', pebbleFallback, rockMat, fragItems.filter(f => ['shallows', 'nursery'].includes(biomeAt(f.pos.x, f.pos.z))),
       (f, d) => { d.position.set(f.pos.x, f.pos.y, f.pos.z); d.rotation.set(0, f.a, 0); d.scale.setScalar(f.s * 4); },
-      { prop: 'pebble-cluster', range: 45, maxLength: 4.5 });
+      { prop: scenery?.rocks?.['pebble-cluster'] ?? 'pebble-cluster', range: 45, maxLength: 4.5 });
 
     // Flora. Sponges do not cast shadows: the sun is high and diffuse down here, and shadow-casting
     // flora was by far the most expensive thing in the frame (it is re-rendered for every viewport).
@@ -483,7 +492,7 @@ export function createSea(scene: THREE.Scene, world: WorldData, quality: Quality
         : kind === 'reed' ? 70 : kind === 'rugose' ? 80 : kind === 'tabulate' || kind === 'bryozoan' ? 90 : 125;
       instanced(view, `flora-${kind}`, set.geo, set.mat, items,
         (f, d) => { d.position.set(f.pos.x, f.pos.y, f.pos.z); d.rotation.set(0, f.rot, 0); d.scale.set(f.scale, f.sy, f.scale); },
-        { prop: floraProps[kind as Flora['kind']], range, maxLength: kind === 'tuft' || kind === 'lettuce' ? 7 : kind === 'reed' ? 9 : Infinity, color: (f) => color.fromArray(floraTint(f)),
+        { prop: floraProps[kind as Flora['kind']], range, maxLength: kind === 'tuft' || kind === 'lettuce' ? 7 : kind === 'reed' ? 9 : Infinity, color: (f) => authoredFlora?.[f.kind] ? color.setScalar(f.shade) : color.fromArray(floraTint(f)),
           bend: (f, attr, i) => floraSlots.set(f, { attr, i }) });
     }
 

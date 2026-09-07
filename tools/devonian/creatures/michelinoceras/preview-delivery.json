@@ -1,0 +1,19 @@
+{
+  "id": "michelinoceras",
+  "modelStatus": "preview",
+  "notes": "Separate rigid smooth orthocone, true aperture and lined funnel, jaw/oral chamber and ten-arm crown. Basic initial eye/export/animation/anchor checks passed. Original Blender retains all 19 actions. Full living size/soft anatomy inferred; refinements in README and WORKING_STATE.",
+  "models": {
+    "glb": {
+      "sourceSHA256": "f69f1bfaae8e96d775756bb1fdbdc6b4c0971adf88892fd132ed885baaaaa313",
+      "packagedSHA256": "e729b0b470c183944c6ed8bb71c0179204e9a1e88c55e49d043fb8d01c591b25",
+      "bytes": 11990488,
+      "losslessDecodedRoundTrip": true
+    },
+    "lod1.glb": {
+      "sourceSHA256": "7166c05353811611d978fe202caea234a9a9b70eab359cd4d0e51da6a80be34b",
+      "packagedSHA256": "782e5b3b644ec6c593c661e711d8799c8ee116232396294f9f4c75e2bf39467d",
+      "bytes": 3033868,
+      "losslessDecodedRoundTrip": true
+    }
+  }
+}

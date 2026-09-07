@@ -1,0 +1,110 @@
+[
+  {
+    "id": "titanichthys",
+    "status": "pending",
+    "scope": "total-rework",
+    "reason": "User reference directs a complete Blender remodel of silhouette, surfaces, rig and motion."
+  },
+  {
+    "id": "gemuendina",
+    "status": "pending",
+    "scope": "total-rework",
+    "reason": "User reference directs a complete Blender remodel of silhouette, surfaces, rig and motion."
+  },
+  {
+    "id": "doryaspis",
+    "status": "pending",
+    "scope": "total-rework",
+    "reason": "User reference directs a complete Blender remodel of silhouette, surfaces, rig and motion."
+  },
+  {
+    "id": "rhinodipterus",
+    "status": "pending",
+    "scope": "individual-refinement",
+    "reason": "Initial preview: individual anatomy, material, attachment and dynamic action refinements documented in source README/WORKING_STATE."
+  },
+  {
+    "id": "onychodus",
+    "status": "pending",
+    "scope": "individual-refinement",
+    "reason": "Initial preview: individual anatomy, material, attachment and dynamic action refinements documented in source README/WORKING_STATE."
+  },
+  {
+    "id": "tiktaalik",
+    "status": "pending",
+    "scope": "individual-refinement",
+    "reason": "Initial preview: individual anatomy, material, attachment and dynamic action refinements documented in source README/WORKING_STATE."
+  },
+  {
+    "id": "acanthostega",
+    "status": "pending",
+    "scope": "individual-refinement",
+    "reason": "Initial preview: individual anatomy, material, attachment and dynamic action refinements documented in source README/WORKING_STATE."
+  },
+  {
+    "id": "eldredgeops",
+    "status": "pending",
+    "scope": "individual-refinement",
+    "reason": "Initial preview: individual anatomy, material, attachment and dynamic action refinements documented in source README/WORKING_STATE."
+  },
+  {
+    "id": "walliserops",
+    "status": "pending",
+    "scope": "individual-refinement",
+    "reason": "Initial preview: individual anatomy, material, attachment and dynamic action refinements documented in source README/WORKING_STATE."
+  },
+  {
+    "id": "jaekelopterus",
+    "status": "pending",
+    "scope": "individual-refinement",
+    "reason": "Initial preview: individual anatomy, material, attachment and dynamic action refinements documented in source README/WORKING_STATE."
+  },
+  {
+    "id": "nahecaris",
+    "status": "pending",
+    "scope": "individual-refinement",
+    "reason": "Initial preview: individual anatomy, material, attachment and dynamic action refinements documented in source README/WORKING_STATE."
+  },
+  {
+    "id": "furcaster",
+    "status": "pending",
+    "scope": "individual-refinement",
+    "reason": "Initial preview: individual anatomy, material, attachment and dynamic action refinements documented in source README/WORKING_STATE."
+  },
+  {
+    "id": "palaeoisopus",
+    "status": "pending",
+    "scope": "individual-refinement",
+    "reason": "Initial preview: individual anatomy, material, attachment and dynamic action refinements documented in source README/WORKING_STATE."
+  },
+  {
+    "id": "manticoceras",
+    "status": "pending",
+    "scope": "individual-refinement",
+    "reason": "Initial preview: individual anatomy, material, attachment and dynamic action refinements documented in source README/WORKING_STATE."
+  },
+  {
+    "id": "michelinoceras",
+    "status": "pending",
+    "scope": "individual-refinement",
+    "reason": "Initial preview: individual anatomy, material, attachment and dynamic action refinements documented in source README/WORKING_STATE."
+  },
+  {
+    "id": "coccosteus",
+    "status": "pending",
+    "scope": "total-rework",
+    "reason": "User reference: stronger armoured front and angular fish back. Current model preserved as named backup. Run eye/general audits after full rework."
+  },
+  {
+    "id": "bothriolepis",
+    "status": "pending",
+    "scope": "total-rework",
+    "reason": "User reference: bulky sculpted and textured armoured front; long pectoral appendages sweeping outward/backward with curved or slightly downward attitude. Sculpt subtle fish proportions first; audit only after full rework."
+  },
+  {
+    "id": "stethacanthus",
+    "status": "pending",
+    "scope": "total-rework",
+    "reason": "User reference: shark-like form, head/body/fin/tail proportions and dorsal spine-brush in the same colour family as the body. Audit after completed rework."
+  }
+]

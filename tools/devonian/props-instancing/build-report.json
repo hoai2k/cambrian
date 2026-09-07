@@ -1,0 +1,450 @@
+{
+  "props": [
+    {
+      "id": "devonian-crinoid",
+      "source": "stalked-crinoid-v2",
+      "triangles": 2154,
+      "height": 2.2,
+      "radius": 0.36,
+      "sourceBoundsBlenderMeters": [
+        [
+          -0.10475465655326843,
+          -0.11129450798034668,
+          -0.005551165901124477
+        ],
+        [
+          0.11080869287252426,
+          0.11129432916641235,
+          0.5373226404190063
+        ]
+      ],
+      "sourceTriangles": 17992,
+      "ratio": 0.11971987550022233,
+      "boundsBlenderGameUnits": [
+        [
+          -0.33889949321746826,
+          -0.34974199533462524,
+          0.0
+        ],
+        [
+          0.33889949321746826,
+          0.34974199533462524,
+          2.200000047683716
+        ]
+      ],
+      "horizontalRadius": 0.3599999972155522,
+      "bytes": 100972,
+      "sha256": "53c166d88c7fa100be009bdbd1a19e8eec44362d95984ba4832be34f00cb0b8c",
+      "static": true,
+      "vertexPigment": true,
+      "pivot": "ground"
+    },
+    {
+      "id": "devonian-stromatoporoid",
+      "source": "massive-stromatoporoid-v2",
+      "triangles": 1400,
+      "height": 0.7,
+      "radius": 0.65,
+      "sourceBoundsBlenderMeters": [
+        [
+          -0.5790746808052063,
+          -0.48449933528900146,
+          0.0
+        ],
+        [
+          0.6146141886711121,
+          0.4406265616416931,
+          0.5636894702911377
+        ]
+      ],
+      "sourceTriangles": 7086,
+      "ratio": 0.1975726785210274,
+      "boundsBlenderGameUnits": [
+        [
+          -0.6190184354782104,
+          -0.48149973154067993,
+          0.0
+        ],
+        [
+          0.6190184354782104,
+          0.48149973154067993,
+          0.699999988079071
+        ]
+      ],
+      "horizontalRadius": 0.6500000095975819,
+      "bytes": 32072,
+      "sha256": "068be8de17f5ca1dce7c2f4efba530ec2fd656ba732178e9d3a29674e2f076bf",
+      "static": true,
+      "vertexPigment": true,
+      "pivot": "ground"
+    },
+    {
+      "id": "devonian-tabulate",
+      "source": "massive-tabulate-coral-v2",
+      "triangles": 1800,
+      "height": 0.3,
+      "radius": 0.6,
+      "sourceBoundsBlenderMeters": [
+        [
+          -0.13617238402366638,
+          -0.13535918295383453,
+          0.0029399616178125143
+        ],
+        [
+          0.14714035391807556,
+          0.12749548256397247,
+          0.09582630544900894
+        ]
+      ],
+      "sourceTriangles": 12392,
+      "ratio": 0.14525500322788895,
+      "boundsBlenderGameUnits": [
+        [
+          -0.562328577041626,
+          -0.515925407409668,
+          0.0
+        ],
+        [
+          0.562328577041626,
+          0.515925407409668,
+          0.30000001192092896
+        ]
+      ],
+      "horizontalRadius": 0.599999983042193,
+      "bytes": 40860,
+      "sha256": "4af4c33e821883c220b7a527816f99a9a8cf750687b17ff94a379d290c20274e",
+      "static": true,
+      "vertexPigment": true,
+      "pivot": "ground"
+    },
+    {
+      "id": "devonian-rugose",
+      "source": "colonial-rugose-coral",
+      "triangles": 2239,
+      "height": 0.55,
+      "radius": 0.45,
+      "sourceBoundsBlenderMeters": [
+        [
+          -0.04802845045924187,
+          -0.04924147576093674,
+          -5.192440585233271e-05
+        ],
+        [
+          0.047181516885757446,
+          0.04924147576093674,
+          0.045461878180503845
+        ]
+      ],
+      "sourceTriangles": 55291,
+      "ratio": 0.04049483641098913,
+      "boundsBlenderGameUnits": [
+        [
+          -0.4122870862483978,
+          -0.43539896607398987,
+          0.0
+        ],
+        [
+          0.4122870862483978,
+          0.43539896607398987,
+          0.550000011920929
+        ]
+      ],
+      "horizontalRadius": 0.44999999875702157,
+      "bytes": 116688,
+      "sha256": "e31a4e1f1b6e9d437ae3092e08513c87f569db4105c46ef3ee3b4ff176a8ec32",
+      "static": true,
+      "vertexPigment": true,
+      "pivot": "ground"
+    },
+    {
+      "id": "devonian-bryozoan",
+      "source": "bryozoan-colony",
+      "triangles": 1621,
+      "height": 0.9,
+      "radius": 0.45,
+      "sourceBoundsBlenderMeters": [
+        [
+          -0.02556728571653366,
+          -0.0025184289552271366,
+          0.0001855140144471079
+        ],
+        [
+          0.025655623525381088,
+          0.0023473165929317474,
+          0.06007756292819977
+        ]
+      ],
+      "sourceTriangles": 11331,
+      "ratio": 0.14305886506045362,
+      "boundsBlenderGameUnits": [
+        [
+          -0.4490671157836914,
+          -0.04234738275408745,
+          0.0
+        ],
+        [
+          0.4490671157836914,
+          0.04234738275408745,
+          0.8999999761581421
+        ]
+      ],
+      "horizontalRadius": 0.4499999963169142,
+      "bytes": 92244,
+      "sha256": "4dcc51f711358dca46c0418dd34bc0ead1e60d6ff65281b020af31de708095b1",
+      "static": true,
+      "vertexPigment": true,
+      "pivot": "ground"
+    },
+    {
+      "id": "devonian-algal-clump",
+      "source": "marine-algae-v2",
+      "triangles": 1600,
+      "height": 1.8,
+      "radius": 0.25,
+      "sourceBoundsBlenderMeters": [
+        [
+          -0.09800693392753601,
+          -9.27575456444174e-05,
+          -0.0007584851700812578
+        ],
+        [
+          0.10844730585813522,
+          0.02807318978011608,
+          0.14664264023303986
+        ]
+      ],
+      "sourceTriangles": 3726,
+      "ratio": 0.4294149221685454,
+      "boundsBlenderGameUnits": [
+        [
+          -0.2485198825597763,
+          -0.03403615951538086,
+          0.0
+        ],
+        [
+          0.2485198825597763,
+          0.03403615951538086,
+          1.7999999523162842
+        ]
+      ],
+      "horizontalRadius": 0.24999999757580607,
+      "bytes": 49112,
+      "sha256": "b0a10cb2dc3174ed74b2e04c1e8c93482cc3c82f987393981f3da0614414da0d",
+      "static": true,
+      "vertexPigment": true,
+      "pivot": "ground"
+    },
+    {
+      "id": "devonian-log",
+      "source": "submerged-log",
+      "triangles": 1588,
+      "height": 0.5,
+      "radius": 1.3,
+      "sourceBoundsBlenderMeters": [
+        [
+          -1.5280945301055908,
+          -0.6242386698722839,
+          -0.013843941502273083
+        ],
+        [
+          1.7270110845565796,
+          0.6684120893478394,
+          0.6119911074638367
+        ]
+      ],
+      "sourceTriangles": 2642,
+      "ratio": 0.6010598031794095,
+      "boundsBlenderGameUnits": [
+        [
+          -1.2848265171051025,
+          -0.5100748538970947,
+          0.0
+        ],
+        [
+          1.2848265171051025,
+          0.5100748538970947,
+          0.5
+        ]
+      ],
+      "horizontalRadius": 1.3000000082669467,
+      "bytes": 38060,
+      "sha256": "ec572a506ffdb49cc640fcb42e86239feee484b9e8891bc7b66078ffeae7af0d",
+      "static": true,
+      "vertexPigment": true,
+      "pivot": "ground"
+    },
+    {
+      "id": "devonian-boulder",
+      "source": "large-boulder-v2",
+      "triangles": 384,
+      "dimensions": [
+        2,
+        2,
+        2
+      ],
+      "pivot": "center",
+      "sourceBoundsBlenderMeters": [
+        [
+          -0.6607601642608643,
+          -0.4536363184452057,
+          -0.04142472520470619
+        ],
+        [
+          0.5595768094062805,
+          0.586475670337677,
+          0.8918269276618958
+        ]
+      ],
+      "sourceTriangles": 384,
+      "ratio": 1.0,
+      "boundsBlenderGameUnits": [
+        [
+          -1.0,
+          -1.0,
+          -1.0
+        ],
+        [
+          1.0,
+          1.0,
+          1.0
+        ]
+      ],
+      "horizontalRadius": 1.365084272814607,
+      "bytes": 9620,
+      "sha256": "84b4d43e4e4f60e67870706502be2fc44d035e6b555620e43b7c71f9a077965c",
+      "static": true,
+      "vertexPigment": true
+    },
+    {
+      "id": "devonian-outcrop",
+      "source": "carbonate-outcrop-v2",
+      "triangles": 384,
+      "dimensions": [
+        1.2,
+        4,
+        1.2
+      ],
+      "sourceBoundsBlenderMeters": [
+        [
+          -0.9953751564025879,
+          -0.5356947779655457,
+          -0.2442675232887268
+        ],
+        [
+          0.7611419558525085,
+          0.7091894149780273,
+          0.9133612513542175
+        ]
+      ],
+      "sourceTriangles": 384,
+      "ratio": 1.0,
+      "boundsBlenderGameUnits": [
+        [
+          -0.6000000238418579,
+          -0.6000000238418579,
+          0.0
+        ],
+        [
+          0.6000000238418579,
+          0.6000000238418579,
+          4.0
+        ]
+      ],
+      "horizontalRadius": 0.8140721537040877,
+      "bytes": 9684,
+      "sha256": "f0f0da455f1e8f55d070bd588a4cc9d911f0db24a06c1eb29ecdc52015888510",
+      "static": true,
+      "vertexPigment": true,
+      "pivot": "ground"
+    },
+    {
+      "id": "devonian-talus",
+      "source": "carbonate-rubble-v2",
+      "triangles": 1400,
+      "dimensions": [
+        1.5,
+        0.8,
+        0.85
+      ],
+      "sourceBoundsBlenderMeters": [
+        [
+          -0.31380534172058105,
+          -0.36816439032554626,
+          0.0018932606326416135
+        ],
+        [
+          0.4623333811759949,
+          0.37661120295524597,
+          0.08127915859222412
+        ]
+      ],
+      "sourceTriangles": 5376,
+      "ratio": 0.2604166666666667,
+      "boundsBlenderGameUnits": [
+        [
+          -0.75,
+          -0.42500001192092896,
+          0.0
+        ],
+        [
+          0.75,
+          0.42500001192092896,
+          0.800000011920929
+        ]
+      ],
+      "horizontalRadius": 0.7937469169601686,
+      "bytes": 32860,
+      "sha256": "e67c308dfaebd260c87a16c6097dcde26324f9166386ca98cf2a181cd2bdf22c",
+      "static": true,
+      "vertexPigment": true,
+      "pivot": "ground"
+    },
+    {
+      "id": "devonian-pebbles",
+      "source": "sand-pebble-bed-v2",
+      "triangles": 891,
+      "dimensions": [
+        0.6,
+        0.15,
+        0.6
+      ],
+      "sourceBoundsBlenderMeters": [
+        [
+          -1.000016450881958,
+          -1.000151515007019,
+          -0.18000000715255737
+        ],
+        [
+          1.0000956058502197,
+          1.0001167058944702,
+          0.05744948610663414
+        ]
+      ],
+      "sourceTriangles": 6128,
+      "ratio": 0.1453981723237598,
+      "boundsBlenderGameUnits": [
+        [
+          -0.30000001192092896,
+          -0.30000001192092896,
+          0.0
+        ],
+        [
+          0.30000001192092896,
+          0.30000001192092896,
+          0.15000000596046448
+        ]
+      ],
+      "horizontalRadius": 0.4238992762806365,
+      "bytes": 32180,
+      "sha256": "ad9e366cd03f8ca8935f303259e14f14dcb6e4eea21c22dd386c1a96f11ffd1d",
+      "static": true,
+      "vertexPigment": true,
+      "pivot": "ground"
+    }
+  ],
+  "proceduralExceptions": {
+    "lilyColumn": "Existing 9.5-world-unit column/crown retained. Directly enlarging the 0.543 m specimen would distort its crown; a supported rock/framework plus colony composition is deferred.",
+    "frondTower": "Existing 5.5-world-unit marine frond silhouette retained. No terrestrial Rhynia/Archaeopteris/tree substitution or 37\u00d7 stretched fossil thallus. A framework/algae composition is deferred."
+  },
+  "coordinatePolicy": "Derived game-space proxies: glTF +Y up, root at existing placement pivot. Metric specimen sources remain unchanged."
+}
