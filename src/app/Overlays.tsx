@@ -31,7 +31,7 @@ export function PauseMenu({ onResume, onChange, onQuit }: { onResume: () => void
   );
 }
 
-export function Results({ snapshot, players, onAgain, onChange, onTitle }: { snapshot: HudSnapshot; players: PlayerSetup[]; onAgain: () => void; onChange: () => void; onTitle: () => void }) {
+export function Results({ snapshot, players, onAgain, onContinue, onChange, onTitle }: { snapshot: HudSnapshot; players: PlayerSetup[]; onAgain: () => void; onContinue: () => void; onChange: () => void; onTitle: () => void }) {
   // The record as it stood before this match, snapshotted once when the screen appears; the merge
   // against it is pure, so re-rendering never eats the "NEW" marks (see codex.ts).
   const [before] = useState(loadCodex);
@@ -56,6 +56,8 @@ export function Results({ snapshot, players, onAgain, onChange, onTitle }: { sna
         <Discoveries codex={codex} fresh={fresh} />
         <div className="menu-buttons">
           <button className="start-button" onClick={onAgain}>AGAIN <kbd>A</kbd></button>
+          {/* Co-op modes are milestones, not verdicts: the sea is still there to swim in. */}
+          {snapshot.canContinue && <button className="ghost" onClick={onContinue}>Keep playing <kbd>Y</kbd></button>}
           <button className="ghost" onClick={onChange}>Change creatures <kbd>X</kbd></button>
           <button className="ghost" onClick={onTitle}>Title <kbd>B</kbd></button>
         </div>

@@ -4,7 +4,7 @@ Implemented September 2026. This supersedes the original design's Y signature ab
 
 ## Controls and behavior
 
-- **RT / keyboard G (player 2: apostrophe): heavy attack.** Offensive specials become the creature's native heavy. Existing pounce/charge attacks remain on creatures without a dedicated offensive special.
+- **RT / keyboard G (player 2: apostrophe): heavy attack.** Offensive specials become the creature's native heavy. Existing pounce/charge attacks remain on creatures without a dedicated offensive special — and, since September 2026, on creatures *with* one whenever the special is unavailable: a player's RT falls through to the ordinary heavy or pounce while the special is cooling down or stamina is short, so the button always does something. Bots keep the plain split. This matters most for the filter feeders, whose special deals no damage at all: before the fallback, Tamisiocaris had no reachable attack on RT and its `Heavy` animation never played.
 - **B: block/parry**, or evade for creatures without a guard. Defensive specials run through this action. Hallucigenia and Canadia have a 0.28-second parry window; sustained defense is not invulnerability.
 - **Y / keyboard R (player 2: P): hide**, available at every growth tier. Press again to end hiding. Attacking, blocking, sprinting, dodging, taking damage, or being grabbed ends hiding.
 

@@ -8,6 +8,7 @@ import { emptyInput } from '../src/sim/types';
 import { Game } from '../src/sim/game';
 import { makeBrain } from '../src/sim/ai';
 import { SURFACE_Y } from '../src/sim/world';
+import { HEAVY_SPECIALS } from '../src/sim/concealment';
 
 assert.equal(CREATURES.length, 21);
 assert.equal(new Set(CREATURES.map(c => c.id)).size, 21);
@@ -80,4 +81,30 @@ for(const id of ['burgessomedusa','ctenorhabdotus'] as const){
   g.step(1/60,new Map([[0,emptyInput()]]));
   assert(a.pos.y+clearanceOf(a)<=SURFACE_Y-.8+1e-6,`${id}: body crosses surface`);
 }
-console.log('PASS: 21 unique options, 13 abilities, ally safety, finite state, armor piercing, one hit per activation, hide cancellation, movement and all-tier feeding.');
+// --- RT always does something: the special when it is ready, the heavy attack or a pounce when
+// it is not. The eight creatures whose special sits on RT used to swallow the press entirely
+// while the special cooled down, so their `heavy` move was unreachable for a player. ---
+{
+  const HEAVY_SPECIAL_IDS = EXPANSION_CREATURES.filter((d) => HEAVY_SPECIALS.has(d.ability)).map((d) => d.id);
+  assert(HEAVY_SPECIAL_IDS.length > 0, 'no creatures carry a special on RT');
+  for (const id of HEAVY_SPECIAL_IDS) {
+    const g = new Game('reef', [{ creature: id, device: 'keyboard', ready: true }], 91);
+    const p = g.players[0];
+    p.spawnProtect = 0; p.pos = { x: 0, y: 6, z: 0 };
+    const press = (held: boolean) => g.step(1 / 60, new Map([[0, { ...emptyInput(), heavy: held }]]));
+    // first press: the special
+    press(true); press(false);
+    assert.equal(p.state, 'ability', `${id}: RT did not start the special (state=${p.state})`);
+    // run it out, then press again while it is still cooling down
+    for (let i = 0; i < 60 * 6 && (p.state !== 'free' || p.abilityCd <= 0); i++) press(false);
+    assert(p.state === 'free' && p.abilityCd > 0, `${id}: no cooling-down window to test (state=${p.state} cd=${p.abilityCd.toFixed(2)})`);
+    const stamina = p.stamina;
+    press(true); press(false);
+    assert(p.state === 'attack' || p.state === 'pounce',
+      `${id}: RT was swallowed while the special cooled down (state=${p.state})`);
+    assert(p.stamina < stamina, `${id}: RT cost nothing, so nothing happened`);
+    if (p.state === 'attack') assert.equal(p.moveKind, 'heavy', `${id}: RT fell back to something other than the heavy`);
+  }
+}
+
+console.log('PASS: 21 unique options, 13 abilities, ally safety, finite state, armor piercing, one hit per activation, hide cancellation, movement, all-tier feeding and RT fallback.');
