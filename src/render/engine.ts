@@ -27,7 +27,7 @@ export interface PlayerHud {
   abilityName: string; abilityReady: number; abilityActive: boolean; abilityUnlocked: boolean;
   senseReady: number;
   lock?: { name: string; kind?: string; band: Band; hp: number; color: string };
-  aim?: { hasTarget: boolean; inRange: boolean; name?: string; color: string; ready: boolean };
+  aim?: { hasTarget: boolean; inRange: boolean; name?: string; color: string; ready: boolean; /** What RT does for this creature: POUNCE, or the special's own name. */ action: string };
   hunted: number; hunterAngle: number | null; hunterName?: string; hunterState: 'none' | 'noticed' | 'hunting'; inCover: boolean; still: boolean;
   hint?: string; respawnIn: number; fade: number; state: string; modelReady: boolean; kills: number; eats: number; escapes: number; protect: boolean;
   /**
@@ -948,7 +948,8 @@ export class Engine {
       let aim: PlayerHud['aim'];
       if (p.aiming && cs) {
         const t = lockA && isAlive(lockA) ? lockA : undefined;
-        aim = { hasTarget: !!t, inRange: !!t && p.aimInRange, name: t ? creature(t.creature).name : undefined, color: t ? BAND_COLOR[bandOf(p, t)] : '#eefaf6', ready: p.pounceCd === 0 && p.stamina >= 12 };
+        const heavyMove = game.heavyMove(p);
+        aim = { hasTarget: !!t, inRange: !!t && p.aimInRange, name: t ? creature(t.creature).name : undefined, color: t ? BAND_COLOR[bandOf(p, t)] : '#eefaf6', ready: heavyMove.ready, action: heavyMove.name };
       }
       return {
         index: i, creature: p.creature, color: PLAYER_COLORS[i % 4], alive: p.state !== 'dead', aim,
