@@ -30,6 +30,21 @@ export interface EraCopy {
   readonly sibling?: { readonly title: string; readonly path: string; readonly blurb: string };
 }
 
+/** Render-only replacements for existing scenery placements; never changes world generation. */
+export interface InstancedScenery {
+  readonly props: Readonly<Record<string, {
+    readonly path: string;
+    readonly material: 'rock' | 'sponge' | 'algae';
+    readonly sway?: boolean;
+    readonly bend?: boolean;
+    readonly doubleSided?: boolean;
+  }>>;
+  readonly flora: Readonly<Partial<Record<FloraKind, string>>>;
+  /** Dense authored flora can opt into the existing high tier; rocks are independent. */
+  readonly minimumFloraQuality?: 'high';
+  readonly rocks?: Readonly<Partial<Record<'boulder' | 'blade-spire' | 'talus-shard' | 'pebble-cluster', string>>>;
+}
+
 export interface EraDefinition {
   readonly id: string;
   readonly title: string;
@@ -57,6 +72,12 @@ export interface EraDefinition {
      */
     readonly flora?: Record<Biome, Partial<Record<FloraKind, number>>>;
     /**
+     * Authored geometry for a flora kind, by prop id under `assets.props`. A kind without one — or
+     * whose file fails to load — keeps the procedural stand-in `src/render/sea.ts` builds for it,
+     * so this can be filled in a kind at a time as art lands.
+     */
+    readonly floraProps?: Partial<Record<FloraKind, string>>;
+    /**
      * Height of the water surface in world units (the seabed sits around 0 on the shelf). Absent,
      * the Cambrian's 40. A pelagic roster wants more water over the floor than a benthic one.
      */
@@ -69,6 +90,8 @@ export interface EraDefinition {
     readonly creatures: string;
     readonly defaultPortraits: string;
     readonly props: string;
+    /** Optional cheap static meshes; rich specimen assets remain in their own catalogue. */
+    readonly instancedScenery?: InstancedScenery;
     readonly biomes: string;
     readonly ui: string;
     readonly sfx: string;

@@ -5,11 +5,12 @@ import { abilitySpeed, beginExpansionAbility, stepExpansionAbility, bloomRate, g
 import { add, clamp, damp, dist, distXZ, dot, heading, len3, lerp, makeRng, norm, scale as vscale, sub, TAU, v3, wrapAngle, yawOf, type Rng, type Vec3 } from '../shared/math';
 import { applyScaleStats, bandOf, bodyRadius, canAct, clearanceOf, isAlive, isHidden, isInvulnerable, lengthOf, makeActor, massOf, speedFactor, staminaCost } from './actors';
 import { makeBrain, think, type AiWorld } from './ai';
+import { huntingPressure, phaseAt, untilNextPhase, type Phase } from './daynight';
 import { applyHit, kill, startSwallow, type HitContext } from './combat';
 import { creature, CREATURE_IDS, PLAYABLE_IDS, type CreatureId, type MoveDef } from './creatures';
 import { resolveFlora, stepFlora } from './flora';
 import { SpatialHash } from './spatial';
-import { emptyInput, TIER_NAMES, TIER_NEED, TIER_SCALE, type Actor, type InputFrame, type Mode, type PlayerSetup, type Prompt, type SiltCloud, type Tier, type WorldEvent } from './types';
+import { emptyInput, TIER_NAMES, TIER_NEED, TIER_SCALE, type Actor, type BrainState, type InputFrame, type Mode, type PlayerSetup, type Prompt, type SiltCloud, type Tier, type WorldEvent } from './types';
 import { BIOME_NAMES, biomeAt, biomeWeights, coverAt, groundHeight, LIGHT_WINDOW_Y, type Landmark, type LandmarkKind, microbialAt, nearestNursery, nurseryAt, nurseryFactor, resolveStatic, sampleCurrent, sampleHeight, shoreDistance, shoreZ, SURFACE_Y, World, type Biome, type Boulder, type Cover, type Flora, type WorldData } from './world';
 
 export interface PlayerProgress {
@@ -73,7 +74,7 @@ export type TeleportDest = 'home' | number;
 export interface TeleportOption { dest: TeleportDest; label: string; detail: string; distance: number; }
 /** One radar contact, in world offsets from the viewer (the renderer rotates it into the camera frame). */
 export interface RadarBlip {
-  kind: 'player' | 'threat' | 'giant' | 'home' | 'shore' | 'food' | 'landmark';
+  kind: 'player' | 'threat' | 'giant' | 'home' | 'shore' | 'food' | 'landmark' | 'territory';
   dx: number; dz: number; distance: number;
   /** Player index for `player` blips, actor id otherwise. */
   id: number;
@@ -420,7 +421,38 @@ export class Game implements AiWorld {
     }
     if (!pos) return;
     const a = this.spawn(c, 'ambient', pos, s);
-    a.brain = makeBrain('needs', pos, this.rng);
+    a.brain = makeBrain('needs', pos, this.rng, this.temperament(a, pos));
+  }
+
+  /**
+   * What kind of neighbour this animal is.
+   *
+   * Most of the reef is indifferent: it feeds when it is hungry and otherwise leaves you alone.
+   * On top of that two dispositions are dealt out, because a sea where the only question is
+   * "can it eat me" runs out of questions:
+   *
+   * - **Grumpy** ones have a personal space and see off anything their own size that enters it,
+   *   whatever the hour. They are the reason you do not swim straight through a crowd.
+   * - **Territorial** ones hold a patch and drive intruders out of it, then go home. They never
+   *   follow past the edge, so they are a decision rather than a threat: the ground they are
+   *   sitting on is often worth crossing, and you can always choose not to.
+   *
+   * Bigger, better-armed animals hold ground more often — a larva has nothing to hold — and
+   * grazers and filter feeders mostly do not, having somewhere to be rather than something to
+   * defend.
+   */
+  private temperament(a: Actor, pos: Vec3): Partial<BrainState> {
+    const def = creature(a.creature);
+    const grown = a.scale >= TIER_SCALE[2] * 0.8;
+    const settled = !def.diet && grown;
+    const roll = this.rng();
+    // A third of the grown, armed animals hold a patch; a fifth of everything grown is just grumpy.
+    if (settled && roll < 0.34) {
+      const L = lengthOf(a);
+      return { temper: 0.35 + this.rng() * 0.4, territory: { ...pos }, territoryR: 26 + L * 4 + this.rng() * 18 };
+    }
+    if (grown && roll < 0.55) return { temper: 0.4 + this.rng() * 0.5 };
+    return {};
   }
 
   /** Cover (0..1) for an actor including temporary silt. Plants are queried every fourth step (staggered) since cover changes slowly. */
@@ -1617,6 +1649,16 @@ export class Game implements AiWorld {
       const d = distXZ(m.pos, p.pos);
       if (d < range * 1.4) out.push({ kind: 'landmark', dx: m.pos.x - p.pos.x, dz: m.pos.z - p.pos.z, distance: d, id: m.id, hunting: false });
     }
+    // Held ground, as an area rather than a contact. Only patches big enough to matter to this
+    // player and close enough to walk into: the point is to let them decide before they are in it.
+    for (const o of this.nearby(p.pos, range * 1.6)) {
+      const b = o.brain;
+      if (!b?.territory || b.territoryR <= 0 || !isAlive(o) || o.id === p.id) continue;
+      if (lengthOf(o) < lengthOf(p) * 0.55) continue;                    // nothing you could not simply eat
+      const d = distXZ(b.territory, p.pos);
+      if (d > range * 1.6 + b.territoryR) continue;
+      out.push({ kind: 'territory', dx: b.territory.x - p.pos.x, dz: b.territory.z - p.pos.z, distance: d, id: o.id, hunting: false, radius: b.territoryR });
+    }
     out.push({ kind: 'home', dx: p.home.x - p.pos.x, dz: p.home.z - p.pos.z, distance: distXZ(p.home, p.pos), id: -1, hunting: false });
     const sz = shoreZ(p.pos.x);
     out.push({ kind: 'shore', dx: 0, dz: sz - p.pos.z, distance: Math.abs(sz - p.pos.z), id: -1, hunting: false });
@@ -1667,6 +1709,15 @@ export class Game implements AiWorld {
       out.push({ kind: 'food', dx: c.dx, dz: c.dz, distance: Math.hypot(c.dx, c.dz), id: -1, hunting: false, radius: c.r, strength: c.food });
     }
     return out.sort((a, b) => a.distance - b.distance).slice(0, max);
+  }
+
+  /**
+   * The hour of the day, and how much the reef wants to hunt at it. The renderer lights the sea
+   * from this and the HUD shows it, because a player who cannot see dusk coming cannot plan
+   * around it.
+   */
+  dayPhase(): { phase: Phase; until: number; pressure: number } {
+    return { phase: phaseAt(this.time), until: untilNextPhase(this.time), pressure: huntingPressure(this.time) };
   }
 
   /** The dominant biome under a player, for the HUD banner. */

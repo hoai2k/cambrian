@@ -16,6 +16,12 @@ export const ExpandIcon = (p: SVGProps<SVGSVGElement>) => (
 export const ShrinkIcon = (p: SVGProps<SVGSVGElement>) => (
   <svg {...base(p)}><path d="M8 3v3a2 2 0 0 1-2 2H3M21 8h-3a2 2 0 0 1-2-2V3M3 16h3a2 2 0 0 1 2 2v3M16 21v-3a2 2 0 0 1 2-2h3" /></svg>
 );
+export const SoundOnIcon = (p: SVGProps<SVGSVGElement>) => (
+  <svg {...base(p)}><path d="M4 9v6h3.5L12 19V5L7.5 9H4z" /><path d="M15.6 8.6a4.5 4.5 0 0 1 0 6.8M18.3 6a8 8 0 0 1 0 12" /></svg>
+);
+export const SoundOffIcon = (p: SVGProps<SVGSVGElement>) => (
+  <svg {...base(p)}><path d="M4 9v6h3.5L12 19V5L7.5 9H4z" /><path d="m16 9.5 4.5 5M20.5 9.5l-4.5 5" /></svg>
+);
 export const CloseIcon = (p: SVGProps<SVGSVGElement>) => (
   <svg {...base(p)}><path d="M18 6 6 18M6 6l12 12" /></svg>
 );

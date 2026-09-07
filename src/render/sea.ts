@@ -5,6 +5,7 @@ import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js
 import { clamp, makeRng, TAU } from '../shared/math';
 import { loadPropGeometry, type PropId } from './props';
 import { FLORA_PHYS } from '../sim/flora';
+import { daylight } from '../sim/daynight';
 import { BIOMES, biomeAt, biomeWeights, CHUNK, chunkCoord, chunkKey, chunkSeed, generateChunk, LIGHT_WINDOW_Y, sampleCurrent, sampleHeight, shoreDistance, SURFACE_Y, type Biome, type BiomeWeights, type Chunk, type Flora, type WorldData } from '../sim/world';
 
 export type Quality = 'high' | 'low';
@@ -25,7 +26,8 @@ export interface SeaEnvironment {
   /** Applies the magnification tier and the local biome's atmosphere for one viewport and returns the fog density it chose. */
   setViewLength(L: number, camX?: number, camZ?: number, camY?: number): number;
   /** `cams` are every viewport's camera positions: scenery streams in around all of them. */
-  update(time: number, dt: number, focus: THREE.Vector3, cams?: readonly THREE.Vector3[]): void;
+  /** `simTime` is the match clock the day/night cycle runs on; `time` is the render clock the shaders use. */
+  update(time: number, dt: number, focus: THREE.Vector3, cams?: readonly THREE.Vector3[], simTime?: number): void;
   dispose(): void;
   sun: THREE.DirectionalLight;
   /** Build the coarse tiles around a point up front, so a new view is never a hole. */
@@ -148,12 +150,19 @@ export function createSea(scene: THREE.Scene, world: WorldData, quality: Quality
   const propMat = (kind: SeaKind, sway = false, bend = false) => {
     const m = seaMaterial('#ffffff', kind, sway, bend); m.vertexColors = true; return m;
   };
-  const propMaterials: Record<PropId, THREE.Material> = {
+  const scenery = ACTIVE_ERA.assets.instancedScenery;
+  const authoredFlora = high || scenery?.minimumFloraQuality !== 'high' ? scenery?.flora : undefined;
+  const propMaterials: Partial<Record<PropId, THREE.Material>> = {
     'cushion-sponge': propMat('sponge', false, true), 'lettuce-tuft': propMat('algae', true, true),
     'spine-sponge': propMat('sponge', false, true), 'glass-fan': propMat('sponge', true, true),
     'blade-spire': propMat('rock'), 'talus-shard': propMat('rock'), 'pebble-cluster': propMat('rock'),
   };
   (propMaterials['lettuce-tuft'] as THREE.MeshStandardMaterial).side = THREE.DoubleSide;
+  for (const [id, spec] of Object.entries(scenery?.props ?? {})) {
+    const material = propMat(spec.material, spec.sway, spec.bend);
+    if (spec.doubleSided) material.side = THREE.DoubleSide;
+    propMaterials[id] = material;
+  }
   // One load per prop per sea, shared by all streamed cells. Failed loads retain their fallback.
   const propLoads = new Map<PropId, Promise<THREE.BufferGeometry | undefined>>();
   function useProp(id: PropId, mesh: THREE.InstancedMesh, view: ChunkView) {
@@ -168,7 +177,9 @@ export function createSea(scene: THREE.Scene, world: WorldData, quality: Quality
       const bend = mesh.geometry.getAttribute('aBend');
       const next = bend ? geo.clone() : geo;
       if (bend) { next.setAttribute('aBend', bend); view.own.push(next); }
-      mesh.geometry = next; mesh.material = propMaterials[id]; mesh.computeBoundingSphere();
+      // Props with a material of their own take it; the rest keep the one their flora kind was
+      // built with, which is what the era's own scenery wants.
+      mesh.geometry = next; mesh.material = propMaterials[id] ?? mesh.material; mesh.computeBoundingSphere();
     });
   }
 
@@ -421,7 +432,12 @@ export function createSea(scene: THREE.Scene, world: WorldData, quality: Quality
   const bladeFallback = G(new THREE.ConeGeometry(.6, 4, 5)); bladeFallback.translate(0, 2, 0);
   const talusFallback = G(new THREE.BoxGeometry(1.5, .8, .85)); talusFallback.translate(0, .4, 0);
   const pebbleFallback = G(new THREE.SphereGeometry(.3, 8, 4)); pebbleFallback.scale(1, .25, 1); pebbleFallback.translate(0, .075, 0);
-  const floraProps: Partial<Record<Flora['kind'], PropId>> = { cushion: 'cushion-sponge', lettuce: 'lettuce-tuft', spine: 'spine-sponge', glass: 'glass-fan' };
+  // An explicit proxy collection owns its complete mapping, including intentionally procedural
+  // kinds and its quality gate. Era folder mappings remain the fallback for other collections.
+  const floraProps: Partial<Record<Flora['kind'], PropId>> = scenery
+    ? authoredFlora ?? {}
+    : ACTIVE_ERA.environment.floraProps
+      ?? { cushion: 'cushion-sponge', lettuce: 'lettuce-tuft', spine: 'spine-sponge', glass: 'glass-fan' };
   const floraSlots = new Map<Flora, { attr: THREE.InstancedBufferAttribute; i: number }>();
   const floraSets: Record<string, { geo: THREE.BufferGeometry; mat: THREE.Material }> = {
     cushion: { geo: cushionFallback, mat: spongeMat }, lettuce: { geo: lettuceFallback, mat: tuftMat },
@@ -445,11 +461,11 @@ export function createSea(scene: THREE.Scene, world: WorldData, quality: Quality
     terrainTile(view, detail === 'full' ? (high ? 32 : 20) : 8);
     instanced(view, 'boulders', boulderGeo, rockMat, chunk.boulders,
       (b, d) => { d.position.set(b.pos.x, b.pos.y, b.pos.z); d.rotation.set(0, b.rot, 0); d.scale.set(b.sx, b.sy, b.sz); },
-      { include: b => !b.variant, castShadow: detail === 'full', range: 400, color: (b) => color.fromArray(rockTint(b)) });
+      { prop: scenery?.rocks?.boulder, include: b => !b.variant, castShadow: detail === 'full', range: 400, color: (b) => scenery?.rocks?.boulder ? color.setScalar(b.shade) : color.fromArray(rockTint(b)) });
     for (const id of ['blade-spire', 'talus-shard'] as const) {
       instanced(view, id, id === 'blade-spire' ? bladeFallback : talusFallback, rockMat, chunk.boulders.filter(b => b.variant === id),
         (b, d) => { d.position.set(b.pos.x, b.pos.y, b.pos.z); d.rotation.set(0, b.rot, 0); d.scale.set(b.sx, b.sy, b.sz); },
-        { prop: id, castShadow: detail === 'full', range: 400 });
+        { prop: scenery?.rocks?.[id] ?? id, castShadow: detail === 'full', range: 400 });
     }
     if (detail === 'far') { views.set(key, view); return view; }
 
@@ -466,7 +482,7 @@ export function createSea(scene: THREE.Scene, world: WorldData, quality: Quality
 
     instanced(view, 'pebble-cluster', pebbleFallback, rockMat, fragItems.filter(f => ['shallows', 'nursery'].includes(biomeAt(f.pos.x, f.pos.z))),
       (f, d) => { d.position.set(f.pos.x, f.pos.y, f.pos.z); d.rotation.set(0, f.a, 0); d.scale.setScalar(f.s * 4); },
-      { prop: 'pebble-cluster', range: 45, maxLength: 4.5 });
+      { prop: scenery?.rocks?.['pebble-cluster'] ?? 'pebble-cluster', range: 45, maxLength: 4.5 });
 
     // Flora. Sponges do not cast shadows: the sun is high and diffuse down here, and shadow-casting
     // flora was by far the most expensive thing in the frame (it is re-rendered for every viewport).
@@ -476,7 +492,7 @@ export function createSea(scene: THREE.Scene, world: WorldData, quality: Quality
         : kind === 'reed' ? 70 : kind === 'rugose' ? 80 : kind === 'tabulate' || kind === 'bryozoan' ? 90 : 125;
       instanced(view, `flora-${kind}`, set.geo, set.mat, items,
         (f, d) => { d.position.set(f.pos.x, f.pos.y, f.pos.z); d.rotation.set(0, f.rot, 0); d.scale.set(f.scale, f.sy, f.scale); },
-        { prop: floraProps[kind as Flora['kind']], range, maxLength: kind === 'tuft' || kind === 'lettuce' ? 7 : kind === 'reed' ? 9 : Infinity, color: (f) => color.fromArray(floraTint(f)),
+        { prop: floraProps[kind as Flora['kind']], range, maxLength: kind === 'tuft' || kind === 'lettuce' ? 7 : kind === 'reed' ? 9 : Infinity, color: (f) => authoredFlora?.[f.kind] ? color.setScalar(f.shade) : color.fromArray(floraTint(f)),
           bend: (f, attr, i) => floraSlots.set(f, { attr, i }) });
     }
 
@@ -642,6 +658,8 @@ export function createSea(scene: THREE.Scene, world: WorldData, quality: Quality
   const atmosW: BiomeWeights = { ...tileW };
   const fogColor = new THREE.Color(), tmpColor = new THREE.Color();
   const bentSlots = new Set<Flora>();
+  /** 0..1, written every frame by `update` from the simulation clock; read by `setViewLength`. */
+  let daylightNow = 1;
   void rng;
 
   return {
@@ -670,6 +688,20 @@ export function createSea(scene: THREE.Scene, world: WorldData, quality: Quality
         fogColor.lerp(tmpColor.setRGB(0.86, 0.92, 0.96), 0.85);
         density *= 0.12; sky = Math.max(sky, 2.4); sunI = Math.max(sunI, 3.4);
       }
+      // The hour. Twilight pulls the light down and the water toward a cold blue; night takes
+      // most of it away and leaves a thin moonlit cast. The biome's own colour is still what the
+      // water is made of — this darkens and cools it rather than replacing it — so the shallows
+      // at night still read as the shallows.
+      if (daylightNow < 1) {
+        const k = 1 - daylightNow;
+        tmpColor.setRGB(0.055, 0.085, 0.16);                     // deep, moonlit blue-black
+        fogColor.lerp(tmpColor, k * (above ? 0.6 : 0.88));
+        density *= 1 + k * 0.7;                                  // you cannot see as far in the dark
+        // Enough light left to play by — this is a shelf sea under a moon, not a cave — but the
+        // colour is gone and the far water closes in.
+        sky *= 1 - k * 0.82;
+        sunI *= 1 - k * 0.93;
+      }
       fog.color.copy(fogColor); (scene.background as THREE.Color).copy(fogColor);
       hemi.intensity = sky; sun.intensity = sunI;
       fog.density = baseFog * density * THREE.MathUtils.clamp(2.2 / (L + 1.5), 0.62, 1.15);
@@ -686,9 +718,12 @@ export function createSea(scene: THREE.Scene, world: WorldData, quality: Quality
       particles.scale.setScalar(THREE.MathUtils.clamp(L * 0.6, 0.6, 3));
       return fog.density;
     },
-    update(time, dt, focus, cams = [focus]) {
+    update(time, dt, focus, cams = [focus], simTime) {
       if (disposed) return;
       seaTime.value = time;
+      // The light follows the *simulation* clock, not this one, so what the sky is doing always
+      // agrees with the hour the HUD shows and with the appetite the AI is running on.
+      daylightNow = daylight(simTime ?? time);
       syncViews(cams);
       // Plants the sim has disturbed lean in the shader; ones that settled get written back to rest once.
       for (const f of world.activeFlora) { const slot = floraSlots.get(f); if (slot) { writeBend(f, slot); bentSlots.add(f); } }
