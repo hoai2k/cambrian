@@ -12,8 +12,10 @@ Delivered models are listed in `tools/devonian/shipped.json`. Initial versions a
 soon as they pass basic model, animation, anchor, portrait and eye checks, so they can be tested
 in the game before the complete art-refining pass. Only listed assets enter the viewer catalogue.
 
-**Current delivery: 19/21 creatures — seven refined models and twelve previews** (Onychodus,
-Rhinodipterus, Tiktaalik, Acanthostega, Eldredgeops, Jaekelopterus, Walliserops, Nahecaris, Palaeoisopus and Furcaster, plus Doryaspis and Gemuendina reopened for the user-requested refining pass). The explicit lifecycle in `src/content/devonian/model-status.json`
+**Current initial collection: 21/21 creatures — three reviewed models and eighteen previews.**
+The six user-directed full reworks are Titanichthys, Coccosteus, Bothriolepis, Doryaspis,
+Gemuendina and Stethacanthus; all other initial previews retain individual refinement notes. The explicit lifecycle
+in `src/content/devonian/model-status.json`
 drives the **⚠ Preview model** badge on creature choice cards, selected-player cards and viewer
 cards. Promotion to `final` happens individually after the refining pass; the badge never locks
 selection or changes gameplay. Newly authored models default to preview until reviewed.

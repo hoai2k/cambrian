@@ -1,0 +1,19 @@
+{
+  "id": "manticoceras",
+  "modelStatus": "preview",
+  "notes": "Separate rigid narrow goniatite shell, recessed mantle, modeled aperture/funnel/beak and ten-arm crown. Basic eye/export/animation/anchor review passed. Soft anatomy and complete living size are explicitly inferred; further refinements in README and WORKING_STATE.",
+  "models": {
+    "glb": {
+      "sourceSHA256": "c21f28f3529ac47860744ed802606e0606e2e41cc4fd8587f32f0d012851dd81",
+      "packagedSHA256": "245d1c3fc4ae9bbe9411e7fba36dc9c2c6113ad138d05b1a532e03a1c0a1eb7d",
+      "bytes": 5441204,
+      "losslessDecodedRoundTrip": true
+    },
+    "lod1.glb": {
+      "sourceSHA256": "1fbe0959de6df68b4bbe4d67f297b08ac0595893202619311bf1f57f36f1d1ee",
+      "packagedSHA256": "8f4cf751a21191b945ab5d05c456fbde55642c11b1b67a3fbc7b253c4ec8e4ef",
+      "bytes": 788316,
+      "losslessDecodedRoundTrip": true
+    }
+  }
+}

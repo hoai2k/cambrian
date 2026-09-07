@@ -5,11 +5,12 @@ import { abilitySpeed, beginExpansionAbility, stepExpansionAbility, bloomRate, g
 import { add, clamp, damp, dist, distXZ, dot, heading, len3, lerp, makeRng, norm, scale as vscale, sub, TAU, v3, wrapAngle, yawOf, type Rng, type Vec3 } from '../shared/math';
 import { applyScaleStats, bandOf, bodyRadius, canAct, clearanceOf, isAlive, isHidden, isInvulnerable, lengthOf, makeActor, massOf, speedFactor, staminaCost } from './actors';
 import { makeBrain, think, type AiWorld } from './ai';
+import { huntingPressure, phaseAt, untilNextPhase, type Phase } from './daynight';
 import { applyHit, kill, startSwallow, type HitContext } from './combat';
 import { creature, CREATURE_IDS, PLAYABLE_IDS, type CreatureId, type MoveDef } from './creatures';
 import { resolveFlora, stepFlora } from './flora';
 import { SpatialHash } from './spatial';
-import { emptyInput, TIER_NAMES, TIER_NEED, TIER_SCALE, type Actor, type InputFrame, type Mode, type PlayerSetup, type Prompt, type SiltCloud, type Tier, type WorldEvent } from './types';
+import { emptyInput, TIER_NAMES, TIER_NEED, TIER_SCALE, type Actor, type BrainState, type InputFrame, type Mode, type PlayerSetup, type Prompt, type SiltCloud, type Tier, type WorldEvent } from './types';
 import { BIOME_NAMES, biomeAt, biomeWeights, coverAt, groundHeight, LIGHT_WINDOW_Y, type Landmark, type LandmarkKind, microbialAt, nearestNursery, nurseryAt, nurseryFactor, resolveStatic, sampleCurrent, sampleHeight, shoreDistance, shoreZ, SURFACE_Y, World, type Biome, type Boulder, type Cover, type Flora, type WorldData } from './world';
 
 export interface PlayerProgress {
@@ -73,7 +74,7 @@ export type TeleportDest = 'home' | number;
 export interface TeleportOption { dest: TeleportDest; label: string; detail: string; distance: number; }
 /** One radar contact, in world offsets from the viewer (the renderer rotates it into the camera frame). */
 export interface RadarBlip {
-  kind: 'player' | 'threat' | 'giant' | 'home' | 'shore' | 'food' | 'landmark';
+  kind: 'player' | 'threat' | 'giant' | 'home' | 'shore' | 'food' | 'landmark' | 'territory';
   dx: number; dz: number; distance: number;
   /** Player index for `player` blips, actor id otherwise. */
   id: number;
@@ -84,6 +85,18 @@ export interface RadarBlip {
   /** How much there is to eat, for area contacts. */
   strength?: number;
 }
+
+/**
+ * How far the radar reaches, in metres, for a body of this length.
+ *
+ * Reach is mostly the animal's own size rather than a fixed sweep, because size is how far it
+ * travels: a hatchling lives inside a few plants and a prime Dunkleosteus crosses biomes, so a
+ * dial that covered the same water for both would be a map for one and a blur for the other.
+ * Across the two eras `lengthOf` runs about 0.6 to 16, giving 30 m to 200 m of reach.
+ */
+export const radarRange = (a: Actor) => RADAR_NEAR + lengthOf(a) * RADAR_PER_LENGTH;
+const RADAR_NEAR = 24;
+const RADAR_PER_LENGTH = 11;
 
 const { schools: SNACK_SCHOOLS, giants: GIANTS } = ACTIVE_ERA.ecology;
 
@@ -420,7 +433,38 @@ export class Game implements AiWorld {
     }
     if (!pos) return;
     const a = this.spawn(c, 'ambient', pos, s);
-    a.brain = makeBrain('needs', pos, this.rng);
+    a.brain = makeBrain('needs', pos, this.rng, this.temperament(a, pos));
+  }
+
+  /**
+   * What kind of neighbour this animal is.
+   *
+   * Most of the reef is indifferent: it feeds when it is hungry and otherwise leaves you alone.
+   * On top of that two dispositions are dealt out, because a sea where the only question is
+   * "can it eat me" runs out of questions:
+   *
+   * - **Grumpy** ones have a personal space and see off anything their own size that enters it,
+   *   whatever the hour. They are the reason you do not swim straight through a crowd.
+   * - **Territorial** ones hold a patch and drive intruders out of it, then go home. They never
+   *   follow past the edge, so they are a decision rather than a threat: the ground they are
+   *   sitting on is often worth crossing, and you can always choose not to.
+   *
+   * Bigger, better-armed animals hold ground more often — a larva has nothing to hold — and
+   * grazers and filter feeders mostly do not, having somewhere to be rather than something to
+   * defend.
+   */
+  private temperament(a: Actor, pos: Vec3): Partial<BrainState> {
+    const def = creature(a.creature);
+    const grown = a.scale >= TIER_SCALE[2] * 0.8;
+    const settled = !def.diet && grown;
+    const roll = this.rng();
+    // A third of the grown, armed animals hold a patch; a fifth of everything grown is just grumpy.
+    if (settled && roll < 0.34) {
+      const L = lengthOf(a);
+      return { temper: 0.35 + this.rng() * 0.4, territory: { ...pos }, territoryR: 26 + L * 4 + this.rng() * 18 };
+    }
+    if (grown && roll < 0.55) return { temper: 0.4 + this.rng() * 0.5 };
+    return {};
   }
 
   /** Cover (0..1) for an actor including temporary silt. Plants are queried every fourth step (staggered) since cover changes slowly. */
@@ -1591,9 +1635,15 @@ export class Game implements AiWorld {
   }
 
   /**
-   * Radar contacts for a player: other players wherever they are, anything big enough to be a
-   * threat within about twice the radar's reach (further contacts clamp to the rim), whatever is
-   * hunting them regardless of size, plus home and the shore as bearings.
+   * Radar contacts for a player: the other players wherever they are, the nearest predator big
+   * enough to be dangerous, anything actually hunting them however big it is, the nearest patch
+   * worth eating, plus home, the shore and landmarks as bearings.
+   *
+   * The dial deliberately does not show every animal in reach. A reef holds dozens, and a small
+   * creature is outsized by most of them, so listing them all turned the radar into noise exactly
+   * when it mattered most — a hatchling's read as a solid ring of threats. One predator arrow and
+   * one food patch is a decision; twenty of each is wallpaper. Same-size rivals (the `rival` band)
+   * never show at all unless they are already coming for you.
    */
   radarFor(i: number, range: number): RadarBlip[] {
     const p = this.players[i]; if (!p) return [];
@@ -1601,21 +1651,37 @@ export class Game implements AiWorld {
     // Only the other players carry off the edge of the dial: they are who you are trying to find.
     // Everything alive is a contact or nothing — a creature outside the reach is simply not there.
     this.players.forEach((o, j) => { if (j !== i) out.push({ kind: 'player', dx: o.pos.x - p.pos.x, dz: o.pos.z - p.pos.z, distance: distXZ(o.pos, p.pos), id: j, hunting: false }); });
+    // Anything on your tail is always shown; of the rest, only the closest one that could eat you.
+    let nearest: RadarBlip | undefined;
     for (const a of this.actors) {
       if (a.controller === 'player' || !isAlive(a) || isHidden(a)) continue;
       const d = distXZ(a.pos, p.pos);
       if (d > range) continue;
       const hunting = !!a.brain && a.brain.target === p.id && (a.brain.goal === 'hunt' || a.brain.goal === 'notice');
       const band = bandOf(p, a);
-      if (band !== 'threat' && band !== 'giant' && !hunting) continue;
-      out.push({ kind: band === 'giant' ? 'giant' : 'threat', dx: a.pos.x - p.pos.x, dz: a.pos.z - p.pos.z, distance: d, id: a.id, hunting });
+      const dangerous = band === 'threat' || band === 'giant';
+      if (!dangerous && !hunting) continue;
+      const blip: RadarBlip = { kind: band === 'giant' ? 'giant' : 'threat', dx: a.pos.x - p.pos.x, dz: a.pos.z - p.pos.z, distance: d, id: a.id, hunting };
+      if (hunting) out.push(blip);
+      else if (!nearest || d < nearest.distance) nearest = blip;
     }
+    if (nearest) out.push(nearest);
     for (const f of this.foodClusters(p, range)) out.push(f);
     // Landmarks are the other thing the radar is for in an endless sea: with the shore and your
     // nursery they are the only fixed points in it. Only within reach — a bearing, not a map.
     for (const m of this.world.landmarks) {
       const d = distXZ(m.pos, p.pos);
       if (d < range * 1.4) out.push({ kind: 'landmark', dx: m.pos.x - p.pos.x, dz: m.pos.z - p.pos.z, distance: d, id: m.id, hunting: false });
+    }
+    // Held ground, as an area rather than a contact. Only patches big enough to matter to this
+    // player and close enough to walk into: the point is to let them decide before they are in it.
+    for (const o of this.nearby(p.pos, range * 1.6)) {
+      const b = o.brain;
+      if (!b?.territory || b.territoryR <= 0 || !isAlive(o) || o.id === p.id) continue;
+      if (lengthOf(o) < lengthOf(p) * 0.55) continue;                    // nothing you could not simply eat
+      const d = distXZ(b.territory, p.pos);
+      if (d > range * 1.6 + b.territoryR) continue;
+      out.push({ kind: 'territory', dx: b.territory.x - p.pos.x, dz: b.territory.z - p.pos.z, distance: d, id: o.id, hunting: false, radius: b.territoryR });
     }
     out.push({ kind: 'home', dx: p.home.x - p.pos.x, dz: p.home.z - p.pos.z, distance: distXZ(p.home, p.pos), id: -1, hunting: false });
     const sz = shoreZ(p.pos.x);
@@ -1639,11 +1705,12 @@ export class Game implements AiWorld {
   }
 
   /**
-   * The nearest shoals worth eating, as areas rather than contacts: wild snack and prey band
+   * The nearest shoal worth eating, as an area rather than a contact: wild snack and prey band
    * creatures within reach, bucketed into cells so a school reads as one patch of food instead of
-   * a dozen dots. Other players never appear here — hunting one is a decision, not a suggestion.
+   * a dozen dots, and only the closest patch is offered. Other players never appear here — hunting
+   * one is a decision, not a suggestion.
    */
-  private foodClusters(p: Actor, range: number, max = 3): RadarBlip[] {
+  private foodClusters(p: Actor, range: number, max = 1): RadarBlip[] {
     const CELL = 14;
     const cells = new Map<string, { dx: number; dz: number; n: number; food: number; r: number }>();
     for (const a of this.nearby(p.pos, range)) {
@@ -1667,6 +1734,15 @@ export class Game implements AiWorld {
       out.push({ kind: 'food', dx: c.dx, dz: c.dz, distance: Math.hypot(c.dx, c.dz), id: -1, hunting: false, radius: c.r, strength: c.food });
     }
     return out.sort((a, b) => a.distance - b.distance).slice(0, max);
+  }
+
+  /**
+   * The hour of the day, and how much the reef wants to hunt at it. The renderer lights the sea
+   * from this and the HUD shows it, because a player who cannot see dusk coming cannot plan
+   * around it.
+   */
+  dayPhase(): { phase: Phase; until: number; pressure: number } {
+    return { phase: phaseAt(this.time), until: untilNextPhase(this.time), pressure: huntingPressure(this.time) };
   }
 
   /** The dominant biome under a player, for the HUD banner. */

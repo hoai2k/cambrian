@@ -1,0 +1,34 @@
+{
+  "michelinoceras": [
+    {
+      "name": "anchor_mouth",
+      "bone": "head",
+      "point": [
+        0,
+        -1.89,
+        0
+      ],
+      "role": "mouth"
+    },
+    {
+      "name": "anchor_mouth_inside",
+      "bone": "head",
+      "point": [
+        0,
+        -1.72,
+        0
+      ],
+      "role": "swallow"
+    },
+    {
+      "name": "anchor_attack_primary",
+      "bone": "arm_0_12",
+      "point": [
+        0.3178853988647461,
+        -2.5007576942443848,
+        0.11982809007167816
+      ],
+      "role": "attack"
+    }
+  ]
+}

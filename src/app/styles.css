@@ -207,6 +207,20 @@ h3 { font-size: 13px; letter-spacing: .12em; color: var(--ember); margin: 14px 0
 /* A line from the simulation: a turn changing over, a team-mate picked up. */
 .notice { position: absolute; z-index: 5; left: 50%; top: 6.5em; transform: translateX(-50%); margin: 0; padding: .5em 1.1em; border-radius: 1em; background: rgba(6,22,28,.8); border: 1px solid var(--ember); color: var(--foam); font-weight: 700; font-size: .92em; white-space: nowrap; max-width: 92%; overflow: hidden; text-overflow: ellipsis; animation: rise-in .3s both; pointer-events: none; }
 
+/* The hour of the day, sitting above the radar. */
+.day-phase { position: absolute; right: 1.4em; bottom: 15.4em; display: flex; align-items: center; gap: .45em; padding: .35em .7em .35em .5em; border-radius: 1em; background: rgba(6,22,28,.55); border: 1px solid rgba(238,250,246,.16); color: var(--mist); pointer-events: none; transition: color .6s, border-color .6s, background .6s; }
+.hud-quarter .day-phase, .hud-half .day-phase { bottom: 11.6em; font-size: .85em; }
+.hud-half:first-child .day-phase, .hud-quarter:nth-child(3) .day-phase { bottom: 11.6em; }
+.day-mark { font-size: 1.15em; line-height: 1; }
+.day-text { display: grid; gap: 0; line-height: 1.1; }
+.day-text b { font: 800 .68em var(--font-display); letter-spacing: .13em; }
+.day-text small { font-size: .62em; color: var(--dim); font-variant-numeric: tabular-nums; }
+.day-phase.night { color: #9fc4e8; }
+.day-phase.day { color: #ffe9b0; }
+.day-phase.hunting { color: var(--ember); border-color: var(--ember); background: rgba(40,18,6,.62); }
+.day-phase.hunting .day-text small { color: var(--ember); }
+.day-phase.hunting .day-mark { animation: pulse-mark 1.6s ease-in-out infinite; }
+
 /* radar */
 .radar { position: absolute; right: 1.4em; top: 1.2em; width: 9.5em; height: 9.5em; }
 .radar svg { width: 100%; height: 100%; overflow: visible; }

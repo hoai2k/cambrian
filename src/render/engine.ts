@@ -7,7 +7,8 @@ import { emptyControls, gamepads, KeyboardInput, readGamepad, rumble, type RawCo
 import { clamp, damp, TAU, wrapAngle } from '../shared/math';
 import { bandOf, isAlive, isHidden, lengthOf } from '../sim/actors';
 import { creature, type CreatureId } from '../sim/creatures';
-import { Game, type ScoreHeader, type ScoreRow, type TeleportDest } from '../sim/game';
+import { Game, radarRange as radarReach, type ScoreHeader, type ScoreRow, type TeleportDest } from '../sim/game';
+import type { Phase } from '../sim/daynight';
 import { BAND_COLOR, emptyInput, TIER_NAMES, TIER_NEED, type Actor, type Band, type InputFrame, type Mode, type PlayerSetup } from '../sim/types';
 import { BIOME_NAMES, biomeAt, groundHeight, nurseryAt, resolveStatic, SURFACE_Y, type Biome, type Boulder, type LandmarkKind } from '../sim/world';
 import { AssetQueue, type AssetProgress } from './assets';
@@ -42,6 +43,8 @@ export interface PlayerHud {
   bandMarkers: { x: number; y: number; band: Band; size: number }[];
   /** Dominant biome under the player. */
   biome: string;
+  /** The hour of the day, for the dial above the radar. */
+  day: { phase: Phase; until: number; pressure: number };
   /** Radar contacts in radar space (x right, y down, unit circle = the radar's reach); `beyond` contacts are clamped to the rim. */
   radar: { range: number; blips: RadarBlipHud[] };
   /** The teleport menu, while open. */
@@ -53,11 +56,13 @@ export interface PlayerHud {
   /** The era's own meters (Devonian standing, air, range), when the era defines them. */
   era?: EraHud;
 }
-export interface RadarBlipHud { x: number; y: number; kind: 'player' | 'threat' | 'giant' | 'home' | 'shore' | 'deadzone' | 'food' | 'landmark'; color: string; beyond: boolean; hunting: boolean; distance: number; /** Radius in radar units, for area contacts. */ r?: number; }
+export interface RadarBlipHud { x: number; y: number; kind: 'player' | 'threat' | 'giant' | 'home' | 'shore' | 'deadzone' | 'food' | 'landmark' | 'territory'; color: string; beyond: boolean; hunting: boolean; distance: number; /** Radius in radar units, for area contacts. */ r?: number; }
 export interface HudSnapshot {
   players: PlayerHud[]; rects: Rect[]; time: number; status: 'playing' | 'won' | 'lost'; message: string; mode: Mode; winner: number; fps: number;
   /** What this match turned up, for the results screen's record. */
   discovery: { biomes: Biome[]; landmarks: LandmarkKind[]; apex: CreatureId[] };
+  /** The hour of the day: what it is, how long until it turns, and how much the reef is hunting. */
+  day: { phase: Phase; until: number; pressure: number };
 }
 export interface EngineCallbacks {
   onHud(s: HudSnapshot): void;
@@ -363,7 +368,7 @@ export class Engine {
     }
     const focus = camPositions.length ? camPositions[0] : this.lastFocus;
     this.lastFocus.copy(focus);
-    this.sea?.update(this.time, dt, focus, camPositions);
+    this.sea?.update(this.time, dt, focus, camPositions, this.attract ? undefined : game.time);
     // Tell the music where the first player is; a biome with a track of its own cues it.
     const listener = game.players[0];
     if (listener && !this.attract) audio.setBiome(biomeAt(listener.pos.x, listener.pos.z));
@@ -897,7 +902,7 @@ export class Engine {
         }
       }
       // Radar: reach grows with the creature, contacts rotate into the camera frame (up = camera forward).
-      const radarRange = 55 + lengthOf(p) * 12;
+      const radarRange = radarReach(p);
       const blips: RadarBlipHud[] = [];
       if (cs) {
         const sy = Math.sin(cs.yaw), cy = Math.cos(cs.yaw);
@@ -909,7 +914,8 @@ export class Engine {
           const beyond = l > 1;
           if (beyond) { x /= l; y /= l; }
           const color = b.kind === 'player' ? PLAYER_COLORS[b.id % 4] : b.kind === 'giant' ? BAND_COLOR.giant : b.kind === 'threat' ? BAND_COLOR.threat
-            : b.kind === 'food' ? BAND_COLOR.snack : b.kind === 'home' ? '#9be9ff' : b.kind === 'landmark' ? '#ffd9a0' : '#d9cfa4';
+            : b.kind === 'food' ? BAND_COLOR.snack : b.kind === 'home' ? '#9be9ff' : b.kind === 'landmark' ? '#ffd9a0'
+            : b.kind === 'territory' ? BAND_COLOR.rival : '#d9cfa4';
           blips.push({ x, y, kind: b.kind, color, beyond, hunting: b.hunting, distance: b.distance, r: b.radius != null ? b.radius / radarRange : undefined });
         }
         // Dead zones are areas, not contacts: drawn as rings, clamped to the rim like anything else.
@@ -956,12 +962,13 @@ export class Engine {
         hint: game.hintFor(i), respawnIn: p.state === 'dead' ? Math.max(0, (game.reviveWindow(p) || 3) - (game.reviveWindow(p) ? 0 : p.respawnT)) : 0, fade: cs?.fade ?? 0, state: p.state, modelReady: !!loadedSync(p.creature),
         downedFor: game.reviveWindow(p), reviveProgress: game.reviveProgress(p), downedAllies: downed, spectating: spectate,
         kills: p.kills, eats: p.eats, escapes: p.escapes, protect: p.spawnProtect > 0, bandMarkers: markers.slice(0, 24),
-        biome: BIOME_NAMES[game.biomeOf(i) ?? 'shelf'], radar: { range: radarRange, blips }, teleport: tele, board, notice: game.noticeFor(i), era,
+        biome: BIOME_NAMES[game.biomeOf(i) ?? 'shelf'], day: game.dayPhase(), radar: { range: radarRange, blips }, teleport: tele, board, notice: game.noticeFor(i), era,
       };
     });
     return {
       players, rects, time: game.time, status: game.state.status, message: game.state.message, mode: game.mode, winner: game.state.winner, fps: this.fps,
       discovery: { biomes: [...game.discovery.biomes], landmarks: [...game.discovery.landmarks], apex: [...game.discovery.apex] },
+      day: game.dayPhase(),
     };
   }
 

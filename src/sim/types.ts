@@ -45,7 +45,7 @@ export const emptyInput = (): InputFrame => ({
 
 export interface BrainState {
   kind: 'swarm' | 'needs' | 'giant';
-  goal: 'wander' | 'hunt' | 'flee' | 'hide' | 'fight' | 'patrol' | 'search' | 'sleep' | 'graze' | 'notice';
+  goal: 'wander' | 'hunt' | 'flee' | 'hide' | 'fight' | 'patrol' | 'search' | 'sleep' | 'graze' | 'notice' | 'defend';
   target: number;          // actor id or -1
   goalT: number;           // time in goal
   thinkT: number;          // countdown to next decision
@@ -60,6 +60,21 @@ export interface BrainState {
   courage: number;         // drops when hit by something smaller; below zero the creature runs
   cached?: InputFrame;
   aggression: number;      // 0..1
+  /**
+   * How little it takes to start a fight, 0..1. A grumpy animal (high temper) squares up to
+   * anything its own size that comes inside its personal space, whatever the hour and whether or
+   * not it is hungry. A placid one has to be attacked first.
+   */
+  temper: number;
+  /** Personal variation in how soon this animal gets hungry, 0..1, so a shoal does not turn as one. */
+  appetite: number;
+  /**
+   * The patch this animal holds, if it holds one. It drives an intruder of comparable size out of
+   * `territoryR` and then goes home; it never follows beyond the edge, so walking away always
+   * works and the decision to go in is the player's to make.
+   */
+  territory?: Vec3;
+  territoryR: number;
   reaction: number;        // seconds of reaction delay
   reactT: number;
   pendingAction?: 'light' | 'heavy' | 'dodge' | 'guard' | 'ability';

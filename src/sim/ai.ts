@@ -5,6 +5,7 @@ import { creature } from './creatures';
 import type { Actor, BrainState, InputFrame, WorldEvent } from './types';
 import { emptyInput } from './types';
 import { biomeAt, LIGHT_WINDOW_Y, nurseryFactor, sampleHeight, shoreDistance, SURFACE_Y, type Cover, type WorldData } from './world';
+import { huntInterval, huntingPressure } from './daynight';
 
 export interface AiWorld {
   actors: Actor[];
@@ -22,7 +23,7 @@ export function makeBrain(kind: BrainState['kind'], home: Vec3, rng: Rng, opts: 
   return {
     kind, goal: kind === 'giant' ? 'patrol' : 'wander', target: -1, goalT: 0, thinkT: rng() * 0.3,
     wanderTo: { ...home }, home: { ...home }, patrolIndex: 0, detection: new Map(), hunger: 3, lastEats: 0, parrySkill: 0.3, courage: 1,
-    aggression: rng(), reaction: 0.15 + rng() * 0.25, reactT: 0, ...opts,
+    aggression: rng(), temper: 0, appetite: rng(), territoryR: 0, reaction: 0.15 + rng() * 0.25, reactT: 0, ...opts,
   };
 }
 
@@ -150,7 +151,13 @@ export function thinkNeeds(g: AiWorld, a: Actor, b: BrainState, dt: number): Inp
   const def = creature(a.creature);
   const L = lengthOf(a);
   b.goalT += dt; b.thinkT -= dt; b.reactT -= dt; b.hunger += dt;
-  if (a.eats !== b.lastEats) { b.lastEats = a.eats; b.hunger = a.controller === 'bot' ? 2 : 0; }
+  /**
+   * A brain standing in for a player — a versus bot, or the balance harness driving a creature
+   * through a match — is a competitor in a game, not an animal in an ecosystem. The hour governs
+   * what the wildlife does; it must not decide how hard a rival plays.
+   */
+  const competitor = a.controller === 'bot' || a.controller === 'player';
+  if (a.eats !== b.lastEats) { b.lastEats = a.eats; b.hunger = competitor ? 2 : 0; }
 
   if (b.thinkT <= 0) {
     b.thinkT = 0.25 + g.rng() * 0.15;
@@ -158,11 +165,23 @@ export function thinkNeeds(g: AiWorld, a: Actor, b: BrainState, dt: number): Inp
     let worst: Actor | undefined, worstD = Infinity;
     let prey: Actor | undefined, preyD = Infinity;
     let rival: Actor | undefined, rivalD = Infinity;
+    let intruder: Actor | undefined;
     const senseR = Math.min(def.sense * L + 6, 40);
-    for (const o of g.nearby(a.pos, senseR)) {
+    // An animal that holds ground knows its own ground: it notices an intruder anywhere in the
+    // patch, not only within the range it can see prey at. Everything else still works off
+    // `senseR`, so widening the sweep does not make it hunt or pick fights from further away.
+    const scanR = Math.max(senseR, b.territoryR > 0 ? b.territoryR + L : 0);
+    for (const o of g.nearby(a.pos, scanR)) {
       if (o.id === a.id || !isAlive(o) || isHidden(o)) continue;
       const d = dist(a.pos, o.pos);
       const band = bandOf(a, o);
+      if (d > senseR) {
+        // Out of sight: only its own territory is still its business.
+        if (b.territory && b.territoryR > 0 && !intruder && distXZ(o.pos, b.territory) < b.territoryR
+          && (o.controller === 'player' || o.controller === 'bot' || o.controller === 'ambient')
+          && lengthOf(o) > L * 0.5 && band !== 'giant' && band !== 'threat') intruder = o;
+        continue;
+      }
       if (band === 'giant' || band === 'threat') {
         const hunting = o.brain ? (o.brain.detection.get(a.id) ?? 0) > 1 || o.brain.target === a.id : o.controller === 'player' || o.controller === 'bot';
         const r = band === 'giant' ? senseR : senseR * 0.6;
@@ -174,19 +193,51 @@ export function thinkNeeds(g: AiWorld, a: Actor, b: BrainState, dt: number): Inp
       } else if (band === 'rival') {
         const provoked = o.lockTarget === a.id || (o.state === 'attack' && d < L * 2) || (o.brain?.target === a.id) || a.hitFlash > 0 || a.lastHitBy === o.id;
         if (!provoked && RULES?.sanctuary(a, o)) continue;
-        const wants = a.controller === 'bot' ? (o.controller === 'player' || o.controller === 'bot') : (b.aggression > 0.55 && d < senseR * 0.5) || provoked;
+        // A grumpy animal has a personal space and does not like it crossed: anything its own size
+        // that comes inside it gets seen off, hungry or not, dawn or noon.
+        const crowded = b.temper > 0 && d < L * (1.1 + b.temper * 1.3);
+        // Picking a fight for no reason is a twilight thing too. An animal squaring up to a
+        // neighbour at midday, unprovoked and not hungry, is exactly the restlessness that made
+        // the old reef tiring, so the odds of it scale with the hour like everything else.
+        const spoiling = b.aggression > 0.7 && d < senseR * 0.35 && g.rng() < 0.3 * huntingPressure(g.time);
+        const wants = competitor ? (o.controller === 'player' || o.controller === 'bot') : crowded || provoked || spoiling;
         if (wants && d < rivalD) { rival = o; rivalD = d; }
       }
+      // Anything of consequence standing in the patch this animal holds, whatever size it is.
+      if (b.territory && b.territoryR > 0 && !intruder) {
+        const inside = distXZ(o.pos, b.territory) < b.territoryR;
+        const worthChasing = (o.controller === 'player' || o.controller === 'bot' || o.controller === 'ambient') && lengthOf(o) > L * 0.5;
+        if (inside && worthChasing && band !== 'giant' && band !== 'threat') intruder = o;
+      }
     }
-    const hungry = b.hunger > 4 || a.hp < a.hpMax * 0.9 || a.controller === 'bot';
+    // How long this animal will go after a meal before it looks for another. Short through the
+    // twilight, when the whole reef is hunting at once; long through the middle of the day, when
+    // a fed animal simply gets on with its life. Bots are competitors in a versus match rather
+    // than wildlife, so they are always hungry.
+    const hungry = competitor || b.hunger > huntInterval(g.time) * (0.7 + b.appetite * 0.6) || a.hp < a.hpMax * 0.45;
     const attacker = a.lastHitBy >= 0 ? g.byId(a.lastHitBy) : undefined;
     const routed = b.courage <= 0 && attacker && isAlive(attacker);
+    // Whatever else it was doing, something that just hit it has its attention. This is the one
+    // rule the hour never softens: an animal always answers for itself.
+    const struck = !routed && attacker && isAlive(attacker) && a.sinceHit < 4
+      && bandOf(a, attacker) !== 'giant' && a.hp > a.hpMax * 0.3;
     if (routed && a.controller !== 'bot') { if (b.goal !== 'flee') b.goalT = 0; b.goal = 'flee'; b.target = attacker.id; }
     else if (worst) { if (b.goal !== 'flee') b.goalT = 0; b.goal = 'flee'; b.target = worst.id; }
+    else if (struck && attacker) { if (b.goal !== 'fight' || b.target !== attacker.id) b.goalT = 0; b.goal = 'fight'; b.target = attacker.id; }
+    // Its own ground comes before a squabble with a neighbour and before feeding. Without this an
+    // animal would wander off its patch to bicker and leave the intruder standing in it.
+    else if (intruder) { if (b.goal !== 'defend' || b.target !== intruder.id) b.goalT = 0; b.goal = 'defend'; b.target = intruder.id; }
     else if (rival && (a.hp > a.hpMax * 0.35 || a.controller === 'bot')) { if (b.goal !== 'fight') b.goalT = 0; b.goal = 'fight'; b.target = rival.id; }
     else if (prey && hungry && !def.diet) { if (b.goal !== 'hunt') b.goalT = 0; b.goal = 'hunt'; b.target = prey.id; }
     else if ((def.diet || def.id === 'wiwaxia') && (def.diet === 'filter' || biomeAt(a.pos.x, a.pos.z) === 'flats') && g.rng() < .8) { b.goal = 'graze'; b.target = -1; }
-    else if (b.goal !== 'wander' || distXZ(a.pos, b.wanderTo) < 3 || b.goalT > 14) { b.goal = 'wander'; b.target = -1; b.goalT = 0; pickWander(a, b, g.rng, a.controller === 'bot' ? 60 : 32); }
+    else if (b.goal !== 'wander' || distXZ(a.pos, b.wanderTo) < 3 || b.goalT > 14) {
+      b.goal = 'wander'; b.target = -1; b.goalT = 0;
+      // An animal with a patch wanders inside it; everything else roams.
+      if (b.territory && b.territoryR > 0) {
+        const ang = g.rng() * TAU, r = Math.sqrt(g.rng()) * b.territoryR * 0.75;
+        b.wanderTo = { x: b.territory.x + Math.cos(ang) * r, y: a.pos.y, z: b.territory.z + Math.sin(ang) * r };
+      } else pickWander(a, b, g.rng, a.controller === 'bot' ? 60 : 32);
+    }
   }
 
   const t = b.target >= 0 ? g.byId(b.target) : undefined;
@@ -221,8 +272,50 @@ export function thinkNeeds(g: AiWorld, a: Actor, b: BrainState, dt: number): Inp
       if (a.controller === 'bot' && d < L * 3 && def.ability === 'ambushSurge') out.burst = 1;
       break;
     }
+    case 'defend': {
+      // Driving something off its ground. The animal closes, threatens, and fights if the
+      // intruder stays — but the edge of the patch is the edge of the argument. Step outside it
+      // and it turns around and goes home, every time, so walking away is always an answer and
+      // going in is always the player's own decision.
+      const home = b.territory;
+      if (!t || !isAlive(t) || !home) { b.goal = 'wander'; b.target = -1; b.goalT = 0; break; }
+      const out2 = distXZ(t.pos, home);
+      // A little past the edge before it gives up, so an intruder hovering on the line does not
+      // make it flicker between charging and turning back.
+      if (out2 > b.territoryR * 1.15 || b.goalT > 22) {
+        b.goal = 'wander'; b.target = -1; b.goalT = 0;
+        b.wanderTo = { ...home };
+        break;
+      }
+      const d = dist(a.pos, t.pos);
+      const reach = L * 0.7 + lengthOf(t) * 0.35;
+      const to = norm(sub(t.pos, a.pos));
+      out.lock = true;
+      if (d > reach * 1.05) {
+        // Close it down, but never far from the middle of the patch: this is a warning-off, not
+        // a pursuit, and an animal that abandoned its ground to chase would not be holding it.
+        const leash = distXZ(a.pos, home) > b.territoryR ? norm(sub(home, a.pos)) : to;
+        out.worldMove = leash;
+        out.burst = d > L * 3 && a.stamina > 40 ? 1 : 0;
+      } else if (b.reactT <= 0 && a.state === 'free') {
+        // In reach: a real fight, but it opens with a shove rather than a killing blow.
+        out.worldMove = vscale(to, 0.35);
+        out.light = g.rng() < 0.7;
+        out.heavy = !out.light && a.stamina > 30;
+        b.reactT = b.reaction * 1.6;
+      } else out.worldMove = vscale(to, 0.3);
+      if (t.state === 'attack' && d < reach * 1.6 && def.canGuard && g.rng() < 0.5) out.guard = true;
+      // Losing badly on your own ground is still losing.
+      if (a.hp < a.hpMax * 0.3 && a.controller !== 'bot') { b.goal = 'flee'; b.goalT = 0; }
+      break;
+    }
     case 'fight': {
       if (!t || !isAlive(t) || bandOf(a, t) !== 'rival') { b.goal = 'wander'; b.target = -1; break; }
+      // A grumpy animal is defending its personal space, not prosecuting a war. Once whatever
+      // crowded it has backed off — and as long as it has not been hit — it lets the matter drop.
+      // Without this, being approached once turns an animal into a permanent enemy.
+      if (b.temper > 0 && !competitor && a.lastHitBy !== t.id && a.hitFlash <= 0
+        && dist(a.pos, t.pos) > L * (2.2 + b.temper * 2.6)) { b.goal = 'wander'; b.target = -1; b.goalT = 0; break; }
       if (RULES?.sanctuary(a, t) && a.lastHitBy !== t.id && a.hitFlash <= 0) { b.goal = 'wander'; b.target = -1; b.goalT = 0; pickWander(a, b, g.rng, 30); break; }
       const d = dist(a.pos, t.pos);
       const reach = L * 0.7 + lengthOf(t) * 0.35;
@@ -298,9 +391,14 @@ export function thinkGiant(g: AiWorld, a: Actor, b: BrainState, dt: number): Inp
   if (b.thinkT <= 0) { b.thinkT = 0.1; updateDetection(g, a, b, 0.1); }
   const cur = b.target >= 0 ? g.byId(b.target) : undefined;
   const curScore = cur ? (b.detection.get(cur.id) ?? 0) : 0;
-  // Giants cruise high and only come down when hungry (roughly once every 70–100 s) or when
-  // something practically swims into their mouth. Noticing is telegraphed before any dive.
-  const hungry = b.hunger > 70 + (a.id % 30);
+  // Giants cruise high and only come down when hungry, or when something practically swims into
+  // their mouth. Noticing is telegraphed before any dive.
+  //
+  // How often that is follows the hour, like everything else in the reef — and because giants are
+  // what "something is hunting me" actually means to a player, this is the setting that decides
+  // how the day *feels*. Through the middle of the day one comes down about as rarely as it always
+  // did; at dusk and dawn it is every twenty seconds or so, and the whole sea knows it.
+  const hungry = b.hunger > (14 + (a.id % 6)) / Math.max(0.12, huntingPressure(g.time));
   const shadow = a.controller === 'shadow';
 
   // Routed: enough bites from something smaller and even a giant backs off for a while.

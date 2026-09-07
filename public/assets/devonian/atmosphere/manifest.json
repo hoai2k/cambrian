@@ -1,0 +1,644 @@
+[
+  {
+    "id": "particles",
+    "modelStatus": "preview",
+    "image": "assets/devonian/atmosphere/particles.png",
+    "size": [
+      1024,
+      1024
+    ],
+    "grid": [
+      4,
+      4
+    ],
+    "sha256": "6169c8446e74040944686cc88017cea534787ac8fb6a8dd8cbc2b53cdd34b1ca",
+    "cells": [
+      {
+        "id": "fine-silt-1",
+        "cell": [
+          0,
+          0
+        ],
+        "uvRect": [
+          0.0,
+          0.0,
+          0.25,
+          0.25
+        ],
+        "suggestedSpanMeters": [
+          0.002,
+          0.008
+        ],
+        "source": null,
+        "alpha": "straight; transparent padded exterior"
+      },
+      {
+        "id": "fine-silt-2",
+        "cell": [
+          1,
+          0
+        ],
+        "uvRect": [
+          0.25,
+          0.0,
+          0.25,
+          0.25
+        ],
+        "suggestedSpanMeters": [
+          0.002,
+          0.008
+        ],
+        "source": null,
+        "alpha": "straight; transparent padded exterior"
+      },
+      {
+        "id": "fine-silt-3",
+        "cell": [
+          2,
+          0
+        ],
+        "uvRect": [
+          0.5,
+          0.0,
+          0.25,
+          0.25
+        ],
+        "suggestedSpanMeters": [
+          0.002,
+          0.008
+        ],
+        "source": null,
+        "alpha": "straight; transparent padded exterior"
+      },
+      {
+        "id": "fine-silt-4",
+        "cell": [
+          3,
+          0
+        ],
+        "uvRect": [
+          0.75,
+          0.0,
+          0.25,
+          0.25
+        ],
+        "suggestedSpanMeters": [
+          0.002,
+          0.008
+        ],
+        "source": null,
+        "alpha": "straight; transparent padded exterior"
+      },
+      {
+        "id": "marine-snow-fleck-1",
+        "cell": [
+          0,
+          1
+        ],
+        "uvRect": [
+          0.0,
+          0.25,
+          0.25,
+          0.25
+        ],
+        "suggestedSpanMeters": [
+          0.01,
+          0.04
+        ],
+        "source": null,
+        "alpha": "straight; transparent padded exterior"
+      },
+      {
+        "id": "marine-snow-fleck-2",
+        "cell": [
+          1,
+          1
+        ],
+        "uvRect": [
+          0.25,
+          0.25,
+          0.25,
+          0.25
+        ],
+        "suggestedSpanMeters": [
+          0.01,
+          0.04
+        ],
+        "source": null,
+        "alpha": "straight; transparent padded exterior"
+      },
+      {
+        "id": "marine-snow-fleck-3",
+        "cell": [
+          2,
+          1
+        ],
+        "uvRect": [
+          0.5,
+          0.25,
+          0.25,
+          0.25
+        ],
+        "suggestedSpanMeters": [
+          0.01,
+          0.04
+        ],
+        "source": null,
+        "alpha": "straight; transparent padded exterior"
+      },
+      {
+        "id": "marine-snow-fleck-4",
+        "cell": [
+          3,
+          1
+        ],
+        "uvRect": [
+          0.75,
+          0.25,
+          0.25,
+          0.25
+        ],
+        "suggestedSpanMeters": [
+          0.01,
+          0.04
+        ],
+        "source": null,
+        "alpha": "straight; transparent padded exterior"
+      },
+      {
+        "id": "organic-particle-1",
+        "cell": [
+          0,
+          2
+        ],
+        "uvRect": [
+          0.0,
+          0.5,
+          0.25,
+          0.25
+        ],
+        "suggestedSpanMeters": [
+          0.01,
+          0.04
+        ],
+        "source": null,
+        "alpha": "straight; transparent padded exterior"
+      },
+      {
+        "id": "organic-particle-2",
+        "cell": [
+          1,
+          2
+        ],
+        "uvRect": [
+          0.25,
+          0.5,
+          0.25,
+          0.25
+        ],
+        "suggestedSpanMeters": [
+          0.01,
+          0.04
+        ],
+        "source": null,
+        "alpha": "straight; transparent padded exterior"
+      },
+      {
+        "id": "organic-particle-3",
+        "cell": [
+          2,
+          2
+        ],
+        "uvRect": [
+          0.5,
+          0.5,
+          0.25,
+          0.25
+        ],
+        "suggestedSpanMeters": [
+          0.01,
+          0.04
+        ],
+        "source": null,
+        "alpha": "straight; transparent padded exterior"
+      },
+      {
+        "id": "organic-particle-4",
+        "cell": [
+          3,
+          2
+        ],
+        "uvRect": [
+          0.75,
+          0.5,
+          0.25,
+          0.25
+        ],
+        "suggestedSpanMeters": [
+          0.01,
+          0.04
+        ],
+        "source": null,
+        "alpha": "straight; transparent padded exterior"
+      },
+      {
+        "id": "sparse-density-1",
+        "cell": [
+          0,
+          3
+        ],
+        "uvRect": [
+          0.0,
+          0.75,
+          0.25,
+          0.25
+        ],
+        "suggestedSpanMeters": [
+          0.1,
+          0.3
+        ],
+        "source": null,
+        "alpha": "straight; transparent padded exterior"
+      },
+      {
+        "id": "sparse-density-2",
+        "cell": [
+          1,
+          3
+        ],
+        "uvRect": [
+          0.25,
+          0.75,
+          0.25,
+          0.25
+        ],
+        "suggestedSpanMeters": [
+          0.1,
+          0.3
+        ],
+        "source": null,
+        "alpha": "straight; transparent padded exterior"
+      },
+      {
+        "id": "sparse-density-3",
+        "cell": [
+          2,
+          3
+        ],
+        "uvRect": [
+          0.5,
+          0.75,
+          0.25,
+          0.25
+        ],
+        "suggestedSpanMeters": [
+          0.1,
+          0.3
+        ],
+        "source": null,
+        "alpha": "straight; transparent padded exterior"
+      },
+      {
+        "id": "sparse-density-4",
+        "cell": [
+          3,
+          3
+        ],
+        "uvRect": [
+          0.75,
+          0.75,
+          0.25,
+          0.25
+        ],
+        "suggestedSpanMeters": [
+          0.1,
+          0.3
+        ],
+        "source": null,
+        "alpha": "straight; transparent padded exterior"
+      }
+    ],
+    "notes": "Original seeded sprite masks and model-derived fragments. Generic particles carry no taxonomic identity. Scale and density are art settings requiring in-water review; no modern track decals."
+  },
+  {
+    "id": "substrate-decals",
+    "modelStatus": "preview",
+    "image": "assets/devonian/atmosphere/substrate-decals.png",
+    "size": [
+      1024,
+      1024
+    ],
+    "grid": [
+      4,
+      4
+    ],
+    "sha256": "063bd4b48c35fcfcdb03b9939415e6cec64f5e8df98f3c7a08679279115d6d14",
+    "cells": [
+      {
+        "id": "sediment-drape-1",
+        "cell": [
+          0,
+          0
+        ],
+        "uvRect": [
+          0.0,
+          0.0,
+          0.25,
+          0.25
+        ],
+        "suggestedSpanMeters": [
+          0.2,
+          0.8
+        ],
+        "source": null,
+        "alpha": "straight; transparent padded exterior"
+      },
+      {
+        "id": "sediment-drape-2",
+        "cell": [
+          1,
+          0
+        ],
+        "uvRect": [
+          0.25,
+          0.0,
+          0.25,
+          0.25
+        ],
+        "suggestedSpanMeters": [
+          0.2,
+          0.8
+        ],
+        "source": null,
+        "alpha": "straight; transparent padded exterior"
+      },
+      {
+        "id": "sediment-drape-3",
+        "cell": [
+          2,
+          0
+        ],
+        "uvRect": [
+          0.5,
+          0.0,
+          0.25,
+          0.25
+        ],
+        "suggestedSpanMeters": [
+          0.2,
+          0.8
+        ],
+        "source": null,
+        "alpha": "straight; transparent padded exterior"
+      },
+      {
+        "id": "sediment-drape-4",
+        "cell": [
+          3,
+          0
+        ],
+        "uvRect": [
+          0.75,
+          0.0,
+          0.25,
+          0.25
+        ],
+        "suggestedSpanMeters": [
+          0.2,
+          0.8
+        ],
+        "source": null,
+        "alpha": "straight; transparent padded exterior"
+      },
+      {
+        "id": "microbial-patch-1",
+        "cell": [
+          0,
+          1
+        ],
+        "uvRect": [
+          0.0,
+          0.25,
+          0.25,
+          0.25
+        ],
+        "suggestedSpanMeters": [
+          0.2,
+          0.8
+        ],
+        "source": null,
+        "alpha": "straight; transparent padded exterior"
+      },
+      {
+        "id": "microbial-patch-2",
+        "cell": [
+          1,
+          1
+        ],
+        "uvRect": [
+          0.25,
+          0.25,
+          0.25,
+          0.25
+        ],
+        "suggestedSpanMeters": [
+          0.2,
+          0.8
+        ],
+        "source": null,
+        "alpha": "straight; transparent padded exterior"
+      },
+      {
+        "id": "microbial-patch-3",
+        "cell": [
+          2,
+          1
+        ],
+        "uvRect": [
+          0.5,
+          0.25,
+          0.25,
+          0.25
+        ],
+        "suggestedSpanMeters": [
+          0.2,
+          0.8
+        ],
+        "source": null,
+        "alpha": "straight; transparent padded exterior"
+      },
+      {
+        "id": "microbial-patch-4",
+        "cell": [
+          3,
+          1
+        ],
+        "uvRect": [
+          0.75,
+          0.25,
+          0.25,
+          0.25
+        ],
+        "suggestedSpanMeters": [
+          0.2,
+          0.8
+        ],
+        "source": null,
+        "alpha": "straight; transparent padded exterior"
+      },
+      {
+        "id": "shell-fragment-1",
+        "cell": [
+          0,
+          2
+        ],
+        "uvRect": [
+          0.0,
+          0.5,
+          0.25,
+          0.25
+        ],
+        "suggestedSpanMeters": [
+          0.01,
+          0.06
+        ],
+        "source": "assets/devonian/props/shell-hash.glb",
+        "alpha": "straight; transparent padded exterior"
+      },
+      {
+        "id": "shell-fragment-2",
+        "cell": [
+          1,
+          2
+        ],
+        "uvRect": [
+          0.25,
+          0.5,
+          0.25,
+          0.25
+        ],
+        "suggestedSpanMeters": [
+          0.01,
+          0.06
+        ],
+        "source": "assets/devonian/props/shell-hash.glb",
+        "alpha": "straight; transparent padded exterior"
+      },
+      {
+        "id": "shell-fragment-3",
+        "cell": [
+          2,
+          2
+        ],
+        "uvRect": [
+          0.5,
+          0.5,
+          0.25,
+          0.25
+        ],
+        "suggestedSpanMeters": [
+          0.01,
+          0.06
+        ],
+        "source": "assets/devonian/props/shell-hash.glb",
+        "alpha": "straight; transparent padded exterior"
+      },
+      {
+        "id": "shell-fragment-4",
+        "cell": [
+          3,
+          2
+        ],
+        "uvRect": [
+          0.75,
+          0.5,
+          0.25,
+          0.25
+        ],
+        "suggestedSpanMeters": [
+          0.01,
+          0.06
+        ],
+        "source": "assets/devonian/props/shell-hash.glb",
+        "alpha": "straight; transparent padded exterior"
+      },
+      {
+        "id": "wood-fragment-1",
+        "cell": [
+          0,
+          3
+        ],
+        "uvRect": [
+          0.0,
+          0.75,
+          0.25,
+          0.25
+        ],
+        "suggestedSpanMeters": [
+          0.05,
+          0.25
+        ],
+        "source": "assets/devonian/props/submerged-log.glb",
+        "alpha": "straight; transparent padded exterior"
+      },
+      {
+        "id": "wood-fragment-2",
+        "cell": [
+          1,
+          3
+        ],
+        "uvRect": [
+          0.25,
+          0.75,
+          0.25,
+          0.25
+        ],
+        "suggestedSpanMeters": [
+          0.05,
+          0.25
+        ],
+        "source": "assets/devonian/props/submerged-log.glb",
+        "alpha": "straight; transparent padded exterior"
+      },
+      {
+        "id": "wood-fragment-3",
+        "cell": [
+          2,
+          3
+        ],
+        "uvRect": [
+          0.5,
+          0.75,
+          0.25,
+          0.25
+        ],
+        "suggestedSpanMeters": [
+          0.05,
+          0.25
+        ],
+        "source": "assets/devonian/props/submerged-log.glb",
+        "alpha": "straight; transparent padded exterior"
+      },
+      {
+        "id": "wood-fragment-4",
+        "cell": [
+          3,
+          3
+        ],
+        "uvRect": [
+          0.75,
+          0.75,
+          0.25,
+          0.25
+        ],
+        "suggestedSpanMeters": [
+          0.05,
+          0.25
+        ],
+        "source": "assets/devonian/props/submerged-log.glb",
+        "alpha": "straight; transparent padded exterior"
+      }
+    ],
+    "notes": "Original seeded sprite masks and model-derived fragments. Generic particles carry no taxonomic identity. Scale and density are art settings requiring in-water review; no modern track decals."
+  }
+]
