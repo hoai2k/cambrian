@@ -64,6 +64,19 @@ export const GROUPS: SoundGroup[] = [
     ],
   },
   {
+    title: 'Big bodies',
+    blurb: 'The same events again, for a body over HUGE_LENGTH (6 m). The Devonian roster runs 4–11.5 m '
+      + 'against the Cambrian\u2019s 1–3.9 m, and giants in either era are scaled well past it; without these '
+      + 'a Titanichthys lands exactly like a larva. `heavy()` in the engine swaps them in by body length.',
+    sounds: [
+      { kind: 'hit-huge', label: 'Hit (huge)', spatial: true, usage: 'A landed blow where the attacker is over 6 m. Sits above hit-heavy, which is chosen by damage rather than size.' },
+      { kind: 'crunch-huge', label: 'Crunch (huge)', spatial: true, usage: 'A substantial mouthful (strength above 0.5) taken by a body over 6 m — bony jaw plates rather than mouthparts.' },
+      { kind: 'burst-huge', label: 'Surge (huge)', spatial: true, usage: 'A speed burst from a body over 6 m: displaced water rolling past rather than a whoosh.' },
+      { kind: 'dodge-huge', label: 'Tail sweep (huge)', spatial: true, usage: 'A dodge by a body over 6 m — one heavy whump of water instead of a flick.' },
+      { kind: 'death-huge', label: 'Death (huge)', spatial: true, usage: 'A body over 6 m going limp and sinking. Flat and unattenuated when it is your own specimen.' },
+    ],
+  },
+  {
     title: 'Player stings',
     blurb: 'About you specifically. Never attenuated, and never played for an AI creature.',
     sounds: [
@@ -86,6 +99,67 @@ export const GROUPS: SoundGroup[] = [
       { kind: 'won', label: 'Won', spatial: false, usage: 'The victory fanfare on the results screen.' },
     ],
   },
+];
+
+/**
+ * Devonian Domination's own sounds. They live in `public/assets/devonian/sfx/` and are registered
+ * over the shared table by the `/devonian/` entry (`src/content/devonian/sfx.ts`); the workbench
+ * registers them too, so both eras are auditionable here. Everything not listed there — hits,
+ * feeding, the surface, the menus — still comes from the shared library above.
+ */
+export const DEVONIAN_GROUPS: SoundGroup[] = [
+  {
+    title: 'Devonian · Domination',
+    blurb: 'The era\u2019s mechanics: bone armour with a soft side, air breathing, dead water, territory and the standings. See docs/redesign/08-devonian-domination.md.',
+    sounds: [
+      { kind: 'armour', label: 'Armour deflect', spatial: true, usage: 'A bite lands on thick bony plate and does not get through. Replaces the parry sound when the era rules say the hit was turned by armour rather than timing.' },
+      { kind: 'armourPierce', label: 'Armour pierce', spatial: true, usage: 'The same block, but the jaws shear through the plate — the parry event with enough strength behind it.' },
+      { kind: 'gulp', label: 'Air gulp', spatial: false, usage: 'An air breather reaches the surface and refills. Fires the moment air returns to full, and hands the creature a short burst.' },
+      { kind: 'airLow', label: 'Air low', spatial: false, usage: 'The uneasy pulse while an air breather is running out. A warning, so it is deliberately quiet.' },
+      { kind: 'anoxia', label: 'Anoxia warning', spatial: false, usage: 'Dead water has drifted within 160 m of you. Played for each player near it, not placed in the world.' },
+      { kind: 'jet', label: 'Shell jet', spatial: true, usage: 'A chambered-shell creature bursting: it jets rather than swims, so it replaces the burst sound for those bodies.' },
+      { kind: 'withdraw', label: 'Withdraw', spatial: true, usage: 'A soft body pulling back into its shell. Registered but nothing emits it yet — the shells\u2019 guard is still to be wired.' },
+      { kind: 'moult', label: 'Moult', spatial: false, usage: 'An arthropod splitting its shell to grow. Replaces the hatch sound on the moult event when the era rules are active.' },
+      { kind: 'shoalJoin', label: 'Shoal join', spatial: false, usage: 'A small fish falls in beside you and joins your shoal.' },
+      { kind: 'rangeClaim', label: 'Range claimed', spatial: false, usage: 'You take a stretch of water as your territory.' },
+      { kind: 'rangeLost', label: 'Range lost', spatial: false, usage: 'Territory slips back to someone else.' },
+      { kind: 'standingUp', label: 'Standing up', spatial: false, usage: 'A tick as your place in the standings improves. Registered but nothing emits it yet.' },
+      { kind: 'dominant', label: 'Dominant', spatial: false, usage: 'You reach the top of the standings — the era\u2019s win sting.' },
+      { kind: 'beach', label: 'Beach', spatial: false, usage: 'A limbed creature hauls itself into the shallows. Fires on the transition into beached, not out of it.' },
+      { kind: 'shellCrush', label: 'Shell crush', spatial: true, usage: 'A crushing bite cracks a thick shell open.' },
+      { kind: 'breach', label: 'Breach', spatial: true, usage: 'A fish driving hard at the surface leaves the water altogether — `canBreach` in the era rules, above BREACH_MIN_RISE and near full speed. The body then flies on gravity alone until it comes down.' },
+      { kind: 'splash', label: 'Splash', spatial: true, usage: 'The landing at the end of a breach: back through the surface, which takes most of the fall out of the body. Strength follows how hard it came down.' },
+    ],
+  },
+  {
+    title: 'Devonian · Creature specials',
+    blurb: 'One per special in `src/sim/devonian/specials.ts`. The engine plays `ability:<abilityId>` when a sample '
+      + 'is registered for it and falls back to the shared ability sound otherwise, so a new special is silent-safe.',
+    sounds: [
+      { kind: 'ability:jawShear', label: 'Jaw shear', spatial: true, usage: 'Dunkleosteus. Enormous bony jaws slamming shut with a cutting shear.' },
+      { kind: 'ability:runThrough', label: 'Run through', spatial: true, usage: 'Cladoselache. A hard acceleration straight past its target.' },
+      { kind: 'ability:tuskLunge', label: 'Tusk lunge', spatial: true, usage: 'Onychodus. A long committed lunge ending in a jab.' },
+      { kind: 'ability:crushBite', label: 'Crush bite', spatial: true, usage: 'Heavy tooth plates closing on something hard.' },
+      { kind: 'ability:neckSnap', label: 'Neck snap', spatial: true, usage: 'A quick snapping bite with a fast turn of the head.' },
+      { kind: 'ability:cheliceraeGrab', label: 'Chelicerae grab', spatial: true, usage: 'Jaekelopterus. Two large clawed appendages closing on prey.' },
+      { kind: 'ability:tridentShove', label: 'Trident shove', spatial: true, usage: 'A blunt shove with a forked spine.' },
+      { kind: 'ability:shieldPush', label: 'Shield push', spatial: true, usage: 'An armoured head butting forward.' },
+      { kind: 'ability:armourFlank', label: 'Armour flank', spatial: true, usage: 'A small armoured fish biting at a rival\u2019s soft side.' },
+      { kind: 'ability:brushDisplay', label: 'Brush display', spatial: true, usage: 'A bundle of spines snapping open as a threat display.' },
+      { kind: 'ability:shoalDart', label: 'Shoal dart', spatial: true, usage: 'A small fish darting forward with its shoal.' },
+      { kind: 'ability:limbHaul', label: 'Limb haul', spatial: true, usage: 'Tiktaalik. Heaving itself forward on its limbs in the shallows.' },
+      { kind: 'ability:shellHover', label: 'Shell hover', spatial: true, usage: 'Water pushed steadily out of a siphon to hold position.' },
+      { kind: 'ability:floorSweep', label: 'Floor sweep', spatial: true, usage: 'A flat fish sweeping its mouth through sediment.' },
+      { kind: 'ability:filterGulp', label: 'Filter gulp', spatial: true, usage: 'Titanichthys. A huge slow mouth straining the water.' },
+      { kind: 'ability:shellJet', label: 'Shell jet (special)', spatial: true, usage: 'The jet used as a special rather than a burst; shares the burst\u2019s two takes.' },
+    ],
+  },
+];
+
+/** Devonian long-form beds. */
+export const DEVONIAN_BEDS = [
+  { file: 'devonian/ambient-open-sea', label: 'Open sea', usage: 'The era\u2019s ambience: cold open water far from shore. Generated as a 22 s loop, but the loop table in `src/audio/audio.ts` is still shared, so the Devonian currently plays the Cambrian reef bed instead.' },
+  { file: 'devonian/anoxia-drone', label: 'Anoxia drone', usage: 'A 12 s loop for the inside of a dead zone. Same story: generated and registered, not yet on a per-era loop bus.' },
 ];
 
 /** The long-form beds. These are not `play()` kinds — the game runs them as loops on their own bus. */
