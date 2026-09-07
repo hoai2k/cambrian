@@ -2,6 +2,7 @@ import { ACTIVE_ERA } from '../content';
 import type { Vec3 } from '../shared/math';
 import type { Game } from './game';
 import type { Actor, Mode, WorldEvent } from './types';
+import type { CreatureId } from './creatures';
 import type { ExpansionContext } from './expansion-abilities';
 import { DEVONIAN_RULES } from './devonian/rules';
 
@@ -30,6 +31,10 @@ export interface EraHud {
 }
 
 export interface EraRules {
+  /** Once, when the era is chosen: registers its specials with the shared tables. */
+  install(): void;
+  /** The Y button's own special for this creature, when the era gives it one instead of the shared hide. */
+  ySpecial(id: CreatureId): { name: string; desc: string } | undefined;
   /** Starting body scale for the player or bot at `index` in `mode`. */
   startScale(mode: Mode, index: number): number;
   init(g: Game): void;
@@ -66,3 +71,4 @@ export interface EraRules {
 }
 
 export const RULES: EraRules | undefined = ACTIVE_ERA.id === 'devonian' ? DEVONIAN_RULES : undefined;
+RULES?.install();

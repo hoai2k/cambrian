@@ -7,7 +7,7 @@ import type { Actor, Mode, WorldEvent } from '../types';
 import { BIOME_DANGER, biomeAt, groundHeight, sampleCurrent, shoreDistance, SHORE_WALL, SURFACE_Y } from '../world';
 import { bodyRadius } from '../actors';
 import { devActor, DOMINANT, HOLD_TO_WIN, RUNG_NAMES, STAGE_AT, STAGE_SCALE, STAGES, stateFor, type DeadZone, type DevActor } from './state';
-import { beginAbility, camoDrain, installDevonianSpecials, stepAbility, stepGuardSpecial, useAbility } from './specials';
+import { beginAbility, camoDrain, installDevonianSpecials, stepAbility, stepGuardSpecial, useAbility, ySpecial } from './specials';
 
 /**
  * Devonian Domination (docs/redesign/08-devonian-domination.md). Progress is standing within a
@@ -193,6 +193,8 @@ function updateExuvia(g: Game, a: Actor, d: DevActor, dt: number) {
 export const DEVONIAN_RULES: EraRules = {
   growthByNutrition: false,
   startScale(mode: Mode, index: number) { return mode === 'reef' ? STAGE_SCALE[1] : mode === 'hunted' && index === 0 ? STAGE_SCALE[2] : STAGE_SCALE[0]; },
+  install() { installDevonianSpecials(); },
+  ySpecial,
   init(g) { installDevonianSpecials(); for (const a of players(g)) { const d = devActor(g, a); d.stage = a.scale >= STAGE_SCALE[2] - 1e-6 ? 2 : a.scale >= STAGE_SCALE[1] - 1e-6 ? 1 : 0; d.standing = g.mode === 'reef' ? 50 : 0; } },
 
   step(g, dt) {

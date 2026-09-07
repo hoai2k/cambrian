@@ -801,7 +801,7 @@ export class Engine {
         index: i, creature: p.creature, color: PLAYER_COLORS[i % 4], alive: p.state !== 'dead', aim,
         hp: p.hp, hpMax: p.hpMax, stamina: p.stamina, staminaMax: p.staminaMax, exhausted: p.exhausted > 0,
         tier: p.tier, tierName: era ? `${era.stage} · ${era.rungName}` : TIER_NAMES[p.tier], progress: era ? era.standing / 100 : p.tier >= 4 ? 1 : clamp(p.nutrition / TIER_NEED[p.tier], 0, 1), scale: p.scale,
-        abilityName: p.hideMode === 'descending' ? 'Sinking to burrow' : p.hideMode === 'burrowed' ? 'Buried · Y emerge' : p.hideMode === 'camouflage' ? `Camo: ${p.camoLabel}` : hideLabel(p.creature), abilityReady: p.hideMode === 'camouflage' ? p.stamina / p.staminaMax : 1 - clamp(p.hideCd / 2, 0, 1), abilityActive: p.hideMode !== 'none', abilityUnlocked: true,
+        abilityName: p.hideMode === 'descending' ? 'Sinking to burrow' : p.hideMode === 'burrowed' ? 'Buried · Y emerge' : p.hideMode === 'camouflage' ? `Camo: ${p.camoLabel}` : RULES?.ySpecial(p.creature)?.name ?? hideLabel(p.creature), abilityReady: p.hideMode === 'camouflage' ? p.stamina / p.staminaMax : RULES?.ySpecial(p.creature) ? 1 - clamp(p.abilityCd / Math.max(1, creature(p.creature).abilityCooldown), 0, 1) : 1 - clamp(p.hideCd / 2, 0, 1), abilityActive: p.hideMode !== 'none' || (p.state === 'ability' && !!RULES?.ySpecial(p.creature)), abilityUnlocked: true,
         senseReady: 1 - clamp(p.senseCd / 6, 0, 1),
         lock: lockA && isAlive(lockA) ? { name: creature(lockA.creature).name, band: bandOf(p, lockA), hp: lockA.hp / lockA.hpMax, color: BAND_COLOR[bandOf(p, lockA)] } : undefined,
         hunted: p.hunted, hunterAngle, hunterName: hunter ? creature(hunter.creature).name : undefined,

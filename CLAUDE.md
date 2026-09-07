@@ -46,6 +46,9 @@ unless the user explicitly asks for a PR. Steps:
 - Devonian specimens land in batches (`tools/devonian/shipped.json`). When one lands: run
   `node tools/update-asset-sizes.mjs` (refreshes `src/content/devonian/asset-sizes.json`), remove its
   entry from `DEVONIAN_STAND_INS` in `src/content/devonian/index.ts`, and run `npm run devonian`.
+- Devonian scenery and biome plates are procedural stand-ins: flora kinds and their density table in
+  `src/content/devonian/environment.ts` + `src/render/sea.ts`, plates from `npm run devonian:plates`.
+  Authored sets replace them without touching placement; see `docs/redesign/09-devonian-remaining.md`.
 - All docs live in `docs/`. Design docs are in `docs/redesign/`. Image, glyph and prop
   needs go in `docs/image-requests.md` and move to `docs/image-requests-history.md` once
   delivered and integrated; sound and music needs go in `docs/audio-requests.md`.

@@ -30,20 +30,22 @@ from `DEVONIAN_STAND_INS`, `npm run devonian` (it fails if a stand-in points at 
 shipped model is still listed), then the usual build and merge. Portraits for pending creatures use
 the shared fallback card; nothing to do there until the renders arrive with the model.
 
-## 2. Scenery and biome plates (nothing delivered yet)
+## 2. Scenery and biome plates (procedural stand-ins in place)
 
-- `public/assets/devonian/props/` (manifest + GLBs, 29 scenery families in [07](07-devonian-design.md) §5)
-  does not exist. The era's `assets.props` points at the Cambrian `assets/props/`, so the Devonian
-  coast is dressed with Cambrian sponges and algae. Integration when it lands: point `assets.props`
-  at the new folder, add the Devonian families to the flora/prop tables keyed by biome
-  (`src/sim/flora.ts`, `src/render/props.ts`) through the biome weights and `shoreDistance`
-  exactly as the Cambrian sets are, then the `tools/environment-test.ts` and `tools/flora-test.ts`
-  runs. Crinoid meadows, stromatoporoid heads and the river-mouth wood are the three that change
-  the look most.
-- `public/assets/devonian/biomes/` (the nine banner plates the HUD shows on entering a biome) does
-  not exist; `assets.biomes` points at the Cambrian plates, so a Devonian "Crinoid Meadow" banner
-  shows a Cambrian painting. Integration: drop nine `<biome>.webp` files in and flip the path.
-  These belong in `docs/image-requests.md` if they are not already being produced with the scenery.
+Neither authored set has been delivered, so both are generated for now:
+
+- **Scenery.** Seven Devonian flora kinds (`crinoid`, `stromatoporoid`, `tabulate`, `rugose`,
+  `bryozoan`, `reed`, `log`) are placed by the era's own density table
+  (`FLORA_DENSITY` in `src/content/devonian/environment.ts`, keyed by biome through the biome
+  weights and `shoreDistance`; logs only within 120 of the shore) and drawn from procedural
+  geometry in `src/render/sea.ts`, with physics and cover in `src/sim/flora.ts` / `world.ts`.
+  When the authored GLBs land (`public/assets/devonian/props/` per the production contract),
+  point `assets.props` at them and map each kind to its prop the way `floraProps` maps the
+  Cambrian sponges; the placement and physics stay. The nursery reed density is thick; halve it
+  if low-quality framerate suffers.
+- **Biome plates.** `npm run devonian:plates` (`tools/devonian/biome-plates.mjs`) writes nine
+  soft procedural banners to `public/assets/devonian/biomes/`, which the era now points at.
+  Painted plates replace them file for file.
 
 ## 3. Per-creature specials (done)
 

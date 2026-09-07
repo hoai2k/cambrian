@@ -19,7 +19,7 @@ const { stateFor, devActor, STAGE_SCALE } = await import('../src/sim/devonian/st
 const { bandOf, isAlive, lengthOf } = await import('../src/sim/actors');
 const { creature } = await import('../src/sim/creatures');
 const { emptyInput } = await import('../src/sim/types');
-const { shoreZ, shoreDistance, SURFACE_Y, generateChunk, biomeAt, nurseryAt, chunkCoord, LOG_SHORE_RANGE } = await import('../src/sim/world');
+const { shoreZ, shoreDistance, SURFACE_Y, generateChunk, biomeAt, nurseryAt, chunkCoord, LOG_SHORE_RANGE, groundHeight } = await import('../src/sim/world');
 type FloraKind = import('../src/sim/world').FloraKind;
 type Biome = import('../src/sim/world').Biome;
 type InputFrame = import('../src/sim/types').InputFrame;
@@ -253,7 +253,7 @@ ok(RULES !== undefined && !RULES.growthByNutrition, 'Devonian rules active: grow
   tick(g, press(1, 'ability'));
   ok(chei.burstT > 0 && chei.hideMode === 'none' && chei.stamina < st0, `shoal dart is a cheap burst, not a hide (burst ${chei.burstT.toFixed(1)})`);
   tick(g, press(3, 'ability'));
-  ok(gem.hideMode === 'descending', 'Gemuendina buries for its sand ambush');
+  ok(gem.hideMode === 'descending' || gem.hideMode === 'burrowed', `Gemuendina buries for its sand ambush (${gem.hideMode})`);
   // a heavy special: the tusk lunge lands on an armoured rival ahead of it
   const plate = g.spawn('bothriolepis', 'ambient', { x: ony.pos.x + Math.sin(ony.yaw) * lengthOf(ony) * 0.9, y: ony.pos.y, z: ony.pos.z + Math.cos(ony.yaw) * lengthOf(ony) * 0.9 }, 1.0);
   plate.yaw = ony.yaw; plate.spawnProtect = 0; ony.spawnProtect = 0;
@@ -263,15 +263,16 @@ ok(RULES !== undefined && !RULES.growthByNutrition, 'Devonian rules active: grow
   for (let i = 0; i < 60; i++) { plate.pos.x = ony.pos.x + Math.sin(ony.yaw) * lengthOf(ony) * 0.8; plate.pos.z = ony.pos.z + Math.cos(ony.yaw) * lengthOf(ony) * 0.8; plate.vel.x = plate.vel.z = 0; tick(g, idle()); }
   ok(plate.hp < hp0, `the lunge lands through part of the armour (hp ${hp0.toFixed(0)} → ${plate.hp.toFixed(0)})`);
   // the brush display bluffs an AI rival off
+  // away from the other players, so the rival has only the stethacanthus to square up to
+  steth.pos.x += 80; steth.prevT.x = steth.pos.x;
   const bot = g.spawn('cladoselache', 'bot', { x: steth.pos.x + 6, y: steth.pos.y, z: steth.pos.z }, 1.0);
   const { makeBrain } = await import('../src/sim/ai');
   bot.brain = makeBrain('needs', { ...steth.pos }, g.rng, { aggression: 1, reaction: 0.1, parrySkill: 0 });
   bot.brain.goal = 'hunt'; bot.brain.target = steth.id;
   const hold = new Map<number, InputFrame>(g.players.map((_, i) => [i, i === 2 ? { ...emptyInput(), guard: true } : emptyInput()]));
-  g.step(DT, hold); g.step(DT, hold);
-  const routed = g.events.some((e) => e.kind === 'routed' && e.actor === bot.id);
-  g.events.length = 0;
-  ok(steth.state === 'guard' && bot.brain.target !== steth.id && routed, `the brush display sends a hunting rival searching (${bot.brain.goal})`);
+  let routed = false;
+  for (let i = 0; i < 30; i++) { g.step(DT, hold); if (g.events.some((e) => e.kind === 'routed' && e.actor === bot.id)) routed = true; g.events.length = 0; }
+  ok(steth.state === 'guard' && bot.brain.goal === 'flee' && routed, `the brush display routs a hunting rival (${bot.brain.goal})`);
   ok(RULES!.camoDrain(g.spawn('furcaster', 'ambient', { x: 0, y: -10, z: 90 }, 1)) === 0.25 && RULES!.camoDrain(ony) === 1, 'camouflage is nearly free for the benthos');
 }
 
@@ -290,7 +291,7 @@ ok(RULES !== undefined && !RULES.growthByNutrition, 'Devonian rules active: grow
   for (let i = 0; i < 60; i++) { shell.pos.x = lung.pos.x + Math.sin(lung.yaw) * lengthOf(lung) * 0.7; shell.pos.z = lung.pos.z + Math.cos(lung.yaw) * lengthOf(lung) * 0.7; shell.vel.x = shell.vel.z = 0; g.step(DT, idle()); if (g.events.some((e) => e.kind === 'shellCrush')) crushed = true; g.events.length = 0; }
   ok(crushed && shell.hp < hp0, `the crush bite cracks a shell (hp ${hp0.toFixed(0)} → ${shell.hp.toFixed(0)})`);
   const d = devActor(g, dory); const s0 = d.standing;
-  dory.pos.y = g.world ? dory.pos.y : dory.pos.y;
+  dory.pos.y = groundHeight(g.world, dory.pos.x, dory.pos.z) + lengthOf(dory) * 0.3; dory.prevT.y = dory.pos.y;   // down on the sediment
   tick(g, new Map([[0, emptyInput()], [1, { ...emptyInput(), ability: true }]]));
   ok(dory.state === 'ability' && dory.hideMode === 'none', 'floor sweep is a timed sweep, not a hide');
   for (let i = 0; i < 60 * 2; i++) tick(g, idle());

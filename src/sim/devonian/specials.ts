@@ -2,7 +2,7 @@ import { dist, dot, heading, norm, scale, sub, yawOf } from '../../shared/math';
 import { isAlive, isHidden, lengthOf } from '../actors';
 import { applyHit } from '../combat';
 import { BURROWERS, DEFENSIVE_SPECIALS, HEAVY_SPECIALS } from '../concealment';
-import { creature } from '../creatures';
+import { creature, type CreatureId } from '../creatures';
 import type { ExpansionContext } from '../expansion-abilities';
 import type { Game } from '../game';
 import type { Actor } from '../types';
@@ -31,6 +31,13 @@ export function installDevonianSpecials() {
   for (const id of HEAVY) HEAVY_SPECIALS.add(id);
   for (const id of GUARD) DEFENSIVE_SPECIALS.add(id);
   BURROWERS.add('gemuendina');                   // sand ambush: the shared burrow with its emergence strike
+}
+
+/** The Y specials by name, for the HUD and the select card; undefined keeps the shared hide copy. */
+export function ySpecial(id: CreatureId): { name: string; desc: string } | undefined {
+  const def = creature(id);
+  if (!(Y as readonly string[]).includes(def.ability)) return undefined;
+  return { name: def.abilityName, desc: def.abilityDesc };
 }
 
 /** Camouflage is nearly free for the slow benthos; everyone else pays the shared drain. */
@@ -155,7 +162,12 @@ export function stepAbility(g: Game, a: Actor, ctx: ExpansionContext, dt: number
 export function stepGuardSpecial(g: Game, a: Actor, d: DevActor, dt: number): void {
   const def = creature(a.creature);
   if (def.ability !== 'brushDisplay') return;
-  for (const [id, t] of d.bluffed) { if (t + 20 < g.time) d.bluffed.delete(id); }
+  for (const [id, t] of d.bluffed) {
+    if (t + 20 < g.time) { d.bluffed.delete(id); continue; }
+    // the bluff holds for six seconds even on a bot, which the shared brain never lets rout
+    const o = g.byId(id);
+    if (o && o.brain && isAlive(o) && t + 6 > g.time) { o.brain.goal = 'flee'; o.brain.target = a.id; }
+  }
   if (a.state !== 'guard' || !isAlive(a)) return;
   a.seen = Math.max(0, a.seen - 0.6 * dt);
   const L = lengthOf(a);
@@ -163,7 +175,9 @@ export function stepGuardSpecial(g: Game, a: Actor, d: DevActor, dt: number): vo
     if (o.id === a.id || !o.brain || !isAlive(o) || d.bluffed.has(o.id)) continue;
     if (o.brain.target !== a.id || (o.brain.goal !== 'hunt' && o.brain.goal !== 'fight' && o.brain.goal !== 'notice')) continue;
     d.bluffed.set(o.id, g.time);
-    o.brain.target = -1; o.brain.goal = 'search'; o.brain.goalT = 0; o.brain.detection.delete(a.id);
+    // the shared rout: no courage left and a remembered attacker sends an animal running
+    o.brain.courage = 0; o.lastHitBy = a.id; o.brain.detection.delete(a.id);
+    o.brain.goal = 'flee'; o.brain.target = a.id; o.brain.goalT = 0;
     const away = norm(sub(o.pos, a.pos));
     o.vel.x += away.x * 4; o.vel.z += away.z * 4;
     g.events.push({ kind: 'routed', pos: { ...o.pos }, actor: o.id, other: a.id, player: a.player });
