@@ -6,7 +6,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { audio, musicUrl, SAMPLES, sfxUrl } from '../audio/audio';
 import { distanceAtten } from '../audio/mix';
-import { MUSIC, OPENING_TRACK } from '../audio/music';
+import { music, openingTrack } from '../audio/music';
 import { BEDS, GROUPS, type SoundEntry } from './audio-catalogue';
 import { formatLevel, isQuiet, measure, QUIET_MID_PEAK, type Level } from './levels';
 
@@ -179,14 +179,14 @@ export function AudioBench() {
               waiting out the whole thing.
             </p>
           </li>
-          {MUSIC.map((t) => (
+          {music().map((t) => (
             <li key={t.name} className="row">
               <button className="name" disabled={!ready} onClick={() => void playFile(t.name, musicUrl(t.name))}>
-                <b>{t.name}</b><small>{t === OPENING_TRACK ? 'opening' : 'rotation'}</small>
+                <b>{t.name}</b><small>{t === openingTrack() ? 'opening' : 'rotation'}</small>
               </button>
               <span className="chip">public/music/{t.name}.mp3</span>
               <p className="usage" role="note">
-                {t === OPENING_TRACK
+                {t === openingTrack()
                   ? 'The opening track. Fades in over four seconds with the first user gesture, and hands over to a random track from the rotation when it ends.'
                   : 'Part of the random rotation, picked once the opening track finishes. Never repeats back to back while another track is available.'}
                 {t.biomes?.length ? ` Cued on entering: ${t.biomes.join(', ')}.` : ' Not tied to a biome.'}

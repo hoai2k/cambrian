@@ -6,7 +6,7 @@ import { add, clamp, damp, dist, distXZ, dot, heading, len3, lerp, makeRng, norm
 import { applyScaleStats, bandOf, bodyRadius, canAct, clearanceOf, isAlive, isHidden, isInvulnerable, lengthOf, makeActor, massOf, speedFactor, staminaCost } from './actors';
 import { makeBrain, think, type AiWorld } from './ai';
 import { applyHit, kill, startSwallow, type HitContext } from './combat';
-import { creature, CREATURE_IDS, type CreatureId, type MoveDef } from './creatures';
+import { creature, CREATURE_IDS, PLAYABLE_IDS, type CreatureId, type MoveDef } from './creatures';
 import { resolveFlora, stepFlora } from './flora';
 import { SpatialHash } from './spatial';
 import { emptyInput, TIER_NAMES, TIER_NEED, TIER_SCALE, type Actor, type InputFrame, type Mode, type PlayerSetup, type Prompt, type SiltCloud, type Tier, type WorldEvent } from './types';
@@ -105,12 +105,14 @@ export class Game implements AiWorld {
 
   /** A bot's species: anything a player might pick; in Food Chain one from a rung nobody has taken yet. */
   private pickBot(taken: CreatureId[], i: number): CreatureId {
-    const pool = CREATURE_IDS.filter((c) => {
+    // Bots pick from the same list the player chose from, so a rival is always an animal the
+    // player could have been (and always has its own model rather than a borrowed one).
+    const pool = PLAYABLE_IDS.filter((c) => {
       const def = creature(c);
       if (this.mode !== 'foodchain' || def.rung === undefined) return true;
       return !taken.some((t) => creature(t).rung === def.rung) && !this.actors.some((a) => a.controller === 'bot' && creature(a.creature).rung === def.rung);
     });
-    const from = pool.length ? pool : CREATURE_IDS;
+    const from = pool.length ? pool : PLAYABLE_IDS;
     void i;
     return from[Math.floor(this.rng() * from.length)];
   }

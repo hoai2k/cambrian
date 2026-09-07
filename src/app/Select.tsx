@@ -4,7 +4,7 @@ import { hideLabel, hideDescription, HEAVY_SPECIALS, DEFENSIVE_SPECIALS } from '
 import { RULES } from '../sim/era-rules';
 import { CreaturePortrait } from './CreaturePortrait';
 import { PLAYER_COLORS } from '../render/engine';
-import { CREATURES, creature, type CreatureId } from '../sim/creatures';
+import { PLAYABLE as CREATURES, creature, type CreatureId } from '../sim/creatures';
 import type { Mode, PlayerSetup } from '../sim/types';
 import { CheckIcon, Emblem, KeyboardIcon, PadIcon } from './icons';
 import { appBase } from '../shared/base';

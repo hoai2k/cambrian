@@ -17,6 +17,7 @@ const { Game } = await import('../src/sim/game');
 const { RULES } = await import('../src/sim/era-rules');
 const { stateFor, devActor, STAGE_SCALE } = await import('../src/sim/devonian/state');
 const { bandOf, isAlive, lengthOf } = await import('../src/sim/actors');
+const { PLAYABLE } = await import('../src/sim/creatures');
 const { creature } = await import('../src/sim/creatures');
 const { emptyInput } = await import('../src/sim/types');
 const { shoreZ, shoreDistance, SURFACE_Y, generateChunk, biomeAt, nurseryAt, chunkCoord, LOG_SHORE_RANGE, groundHeight } = await import('../src/sim/world');
@@ -130,7 +131,10 @@ ok(RULES !== undefined && !RULES.growthByNutrition, 'Devonian rules active: grow
   ok(Math.abs(reef.players[0].scale - STAGE_SCALE[1]) < 1e-6 && devActor(reef, reef.players[0]).standing === 50, 'Reef starts Adult at half standing');
   const fc = new Game('foodchain', [{ creature: 'coccosteus', device: 'keyboard', ready: true }]);
   const rungs = fc.actors.filter((a) => a.controller === 'player' || a.controller === 'bot').map((a) => creature(a.creature).rung);
-  ok(new Set(rungs).size === rungs.length, `Food Chain bots take rungs nobody holds (${rungs.join(',')})`);
+  // Bots fill every rung that has a delivered model before any rung doubles up, so the chain is
+  // always complete; with the whole roster shipped that is one bot per rung again.
+  const pickableRungs = new Set(PLAYABLE.map((c) => c.rung ?? 0));
+  ok(new Set(rungs).size === Math.min(rungs.length, pickableRungs.size), `Food Chain fills the chain (${rungs.join(',')} over ${pickableRungs.size} pickable rungs)`);
 }
 
 // ---- standing, staging and no tier growth ----
@@ -236,6 +240,55 @@ ok(RULES !== undefined && !RULES.growthByNutrition, 'Devonian rules active: grow
   ok(RULES!.jet(mk('manticoceras')) && !RULES!.jet(shark), 'only shells jet');
 }
 
+// ---- every sound the era asks for exists (the shared library is NOT under assets/devonian/) ----
+{
+  const { SAMPLES, LOOPS, sfxUrl, registerSamples } = await import('../src/audio/audio');
+  const { SFX_FILES } = await import('../src/render/assets');
+  registerSamples(DEVONIAN_SAMPLES);
+  const names = new Set<string>([...Object.values(SAMPLES).flat(), ...Object.values(LOOPS), ...SFX_FILES]);
+  const missing = [...names].filter((n) => !fs.existsSync(`public/${sfxUrl(n).replace(/^\.\//, '')}`));
+  ok(missing.length === 0, `every registered sample resolves to a file (missing: ${missing.slice(0, 6).join(', ')}${missing.length > 6 ? ` +${missing.length - 6}` : ''})`);
+  ok(sfxUrl('bite-1').includes('assets/sfx/'), `shared samples come from the shared library (${sfxUrl('bite-1')})`);
+  ok(sfxUrl('devonian/jaw-shear').includes('assets/devonian/sfx/'), `this era's own samples come from its own folder (${sfxUrl('devonian/jaw-shear')})`);
+  const { openingTrack, music } = await import('../src/audio/music');
+  ok(openingTrack().name === 'Devonian Shells', `the session opens on this era's track, not the other era's (${openingTrack().name})`);
+  ok(music().length === DEVONIAN.audio.music.length, 'the soundtrack in play is this era\'s');
+  const noFile = DEVONIAN.audio.music.filter((t) => !fs.existsSync(`public/${paths.music(t.name).replace(/%20/g, ' ')}`));
+  ok(noFile.length === 0, `every track in the soundtrack has a file (missing: ${noFile.map((t) => t.name).join(', ')})`);
+}
+
+// ---- only delivered creatures can be picked, and they all have portraits ----
+{
+  const { PLAYABLE, PLAYABLE_IDS, CREATURE_IDS } = await import('../src/sim/creatures');
+  ok(PLAYABLE.length === DEVONIAN_SHIPPED.length, `the selection screen offers the ${DEVONIAN_SHIPPED.length} delivered specimens, not all ${CREATURE_IDS.length}`);
+  for (const id of PLAYABLE_IDS) {
+    ok(DEVONIAN_SHIPPED.includes(id), `${id} is pickable and has its own model`);
+    for (const kind of ['select', 'card', 'thumb'] as const) ok(fs.existsSync(`public/${paths.portrait(id, kind)}`), `${id} has a ${kind} portrait for the roster`);
+  }
+  for (const id of [DEVONIAN.defaults.player, ...DEVONIAN.defaults.boot, ...DEVONIAN.defaults.title]) ok(PLAYABLE_IDS.includes(id), `${id} is preloaded and pickable`);
+  const bots = new Game('domination', [{ creature: 'coccosteus', device: 'keyboard', ready: true }]).actors.filter((a) => a.controller === 'bot');
+  ok(bots.length > 0 && bots.every((b) => PLAYABLE_IDS.includes(b.creature)), 'bots are animals the player could have picked');
+}
+
+// ---- movement reads at the same speed as the Cambrian, whatever the body's size ----
+{
+  // The follow camera sits magnificationDistance(L) back, so what the player feels is
+  // speed / that distance: screens per second. The Cambrian band at full size is 0.61–1.30.
+  const mag = (L: number) => L * 1.45 + 1.15 + Math.max(0, 0.8 - L) * 0.9;
+  const { PLAYABLE } = await import('../src/sim/creatures');
+  for (const c of DEVONIAN.creatures) {
+    const adult = c.speed / mag(c.adultLength);
+    const yl = c.adultLength * 0.6, young = (c.speed * Math.pow(0.6, 0.45)) / mag(yl);
+    ok(adult >= 0.45 && adult <= 1.6, `${c.id} moves at a readable speed grown (${adult.toFixed(2)} screens/s)`);
+    ok(young >= 0.55, `${c.id} is not sluggish at its starting size (${young.toFixed(2)} screens/s)`);
+    ok(c.turnRate >= 1.2, `${c.id} can turn (${c.turnRate} rad/s)`);
+    ok(c.agility >= 2.0, `${c.id} accelerates (${c.agility})`);
+  }
+  const dunk = PLAYABLE.find((c) => c.id === 'dunkleosteus')!;
+  const titan = DEVONIAN.creatures.find((c) => c.id === 'titanichthys')!;
+  ok(dunk.speed / mag(dunk.adultLength) > titan.speed / mag(titan.adultLength), 'the hunter still outruns the filter feeder');
+}
+
 // ---- per-creature specials ----
 {
   const { HEAVY_SPECIALS, BURROWERS } = await import('../src/sim/concealment');
@@ -276,19 +329,41 @@ ok(RULES !== undefined && !RULES.growthByNutrition, 'Devonian rules active: grow
   ok(RULES!.camoDrain(g.spawn('furcaster', 'ambient', { x: 0, y: -10, z: 90 }, 1)) === 0.25 && RULES!.camoDrain(ony) === 1, 'camouflage is nearly free for the benthos');
 }
 
+// ---- a heavy special is a committed strike that travels and lands ----
+{
+  for (const [id, target] of [['dunkleosteus', 'cladoselache'], ['cladoselache', 'coccosteus'], ['coccosteus', 'doryaspis']] as const) {
+    const g = new Game('reef', [{ creature: id, device: 'keyboard', ready: true }]);
+    const a = g.players[0];
+    const idle = () => new Map<number, InputFrame>([[0, emptyInput()]]);
+    for (let i = 0; i < 90; i++) tick(g, idle());
+    a.spawnProtect = 0;
+    const L = lengthOf(a);
+    const prey = g.spawn(target, 'ambient', { x: a.pos.x + Math.sin(a.yaw) * L * 1.8, y: a.pos.y, z: a.pos.z + Math.cos(a.yaw) * L * 1.8 }, 1.0);
+    prey.spawnProtect = 0;
+    const hp0 = prey.hp, at = { ...prey.pos }, from = { ...a.pos };
+    tick(g, new Map([[0, { ...emptyInput(), heavy: true }]]));
+    ok(a.state === 'ability', `${id}: the heavy button starts its special (${a.state})`);
+    for (let i = 0; i < 90; i++) { prey.pos.x = at.x; prey.pos.y = at.y; prey.pos.z = at.z; prey.vel.x = prey.vel.y = prey.vel.z = 0; tick(g, idle()); }
+    const travelled = Math.hypot(a.pos.x - from.x, a.pos.z - from.z);
+    ok(travelled > L * 0.8, `${id}: the strike carries the body forward (${(travelled / L).toFixed(2)} body lengths)`);
+    ok(prey.hp < hp0, `${id}: and lands on what it was aimed at (${hp0.toFixed(0)} -> ${prey.hp.toFixed(0)})`);
+  }
+}
+
 // ---- crush bite cracks shells; floor sweep feeds standing ----
 {
   const g = new Game('domination', [{ creature: 'rhinodipterus', device: 'keyboard', ready: true }, { creature: 'doryaspis', device: 0, ready: true }]);
   const [lung, dory] = g.players;
-  for (const p of g.players) p.spawnProtect = 0;
   const idle = () => new Map<number, InputFrame>([[0, emptyInput()], [1, emptyInput()]]);
-  for (let i = 0; i < 90; i++) tick(g, idle());
-  const shell = g.spawn('manticoceras', 'ambient', { x: lung.pos.x + Math.sin(lung.yaw) * lengthOf(lung) * 0.7, y: lung.pos.y, z: lung.pos.z + Math.cos(lung.yaw) * lengthOf(lung) * 0.7 }, 1.0);
+  for (let i = 0; i < 90; i++) tick(g, idle());     // through the hatch-in, still protected
+  for (const p of g.players) p.spawnProtect = 0;
+  ok(lung.state === 'free', `the lungfish is ready to act (${lung.state})`);
+  const shell = g.spawn('manticoceras', 'ambient', { x: lung.pos.x + Math.sin(lung.yaw) * lengthOf(lung) * 1.2, y: lung.pos.y, z: lung.pos.z + Math.cos(lung.yaw) * lengthOf(lung) * 1.2 }, 1.0);
   shell.spawnProtect = 0;
-  const hp0 = shell.hp;
+  const hp0 = shell.hp, at = { ...shell.pos };
   tick(g, new Map([[0, { ...emptyInput(), heavy: true }], [1, emptyInput()]]));
   let crushed = false;
-  for (let i = 0; i < 60; i++) { shell.pos.x = lung.pos.x + Math.sin(lung.yaw) * lengthOf(lung) * 0.7; shell.pos.z = lung.pos.z + Math.cos(lung.yaw) * lengthOf(lung) * 0.7; shell.vel.x = shell.vel.z = 0; g.step(DT, idle()); if (g.events.some((e) => e.kind === 'shellCrush')) crushed = true; g.events.length = 0; }
+  for (let i = 0; i < 60; i++) { shell.pos.x = at.x; shell.pos.y = at.y; shell.pos.z = at.z; shell.vel.x = shell.vel.z = 0; g.step(DT, idle()); if (g.events.some((e) => e.kind === 'shellCrush')) crushed = true; g.events.length = 0; }
   ok(crushed && shell.hp < hp0, `the crush bite cracks a shell (hp ${hp0.toFixed(0)} → ${shell.hp.toFixed(0)})`);
   const d = devActor(g, dory); const s0 = d.standing;
   dory.pos.y = groundHeight(g.world, dory.pos.x, dory.pos.z) + lengthOf(dory) * 0.3; dory.prevT.y = dory.pos.y;   // down on the sediment

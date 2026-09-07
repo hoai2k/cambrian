@@ -78,7 +78,15 @@ the reef bed. `anoxia-drone` and `ambient-open-sea` are loops but the loop table
 loop table is a small change. `standing-up` and `withdraw` are registered but nothing emits them
 yet (standing ticks; the shells' guard).
 
-## 6. Balance and feel (from the first play-through)
+## 6. Balance and feel
+
+Fixed after the first Dunkleosteus play-through: the roster's speed, agility and turn were authored
+in Cambrian-sized numbers on Devonian-sized bodies, so the giants crawled (a Young Dunkleosteus at
+0.39 screens/s against the Cambrian's 0.54–1.19); they are now tuned in screens per second and
+`npm run devonian` holds every creature to that band. The heavy button, which is the creature's
+special on this roster, played an animation on the spot: every heavy special now aims at the locked
+or nearest body ahead and carries the body through its hit window, like the pounce it replaces. The
+river-mouth reeds were thick enough to halve a giant's speed at spawn and were thinned. Still open:
 
 - A Young rung II animal at the nursery sees a crowded radar: many nearby ambient animals count as
   threats at 0.6 scale. Either soften the threat band for stage 0 or thin the nursery ecology in
@@ -96,9 +104,11 @@ yet (standing ticks; the shells' guard).
 
 ## 7. Tests and tooling
 
-- `npm run devonian` (145 checks) covers the pack, bands, standing, air, dead water, shore reach,
-  armour, determinism and the mode endings. It does not yet cover the specials (§3) or the shoal
-  follower behaviour with real swarm schools.
+- `npm run devonian` (337 checks) covers the pack, bands, standing, air, dead water, shore reach,
+  armour, determinism, the mode endings, the specials, the movement band, the pickable roster, and
+  that every sound and track the era asks for resolves to a file (the shared library lives under
+  `assets/sfx/`, not the era folder; pointing the era at its own folder once made all 39 shared
+  samples 404). It does not yet cover the shoal follower behaviour with real swarm schools.
 - The browser smoke script used during integration lives outside the repo; a `tools/devonian-browser.mjs`
   in the style of `tools/hiding-browser.mjs` would make the `/devonian/` page part of the QA set.
 - `tools/asset-audit.ts` and `tools/anchors-test.mjs` fail to run headless independent of this work

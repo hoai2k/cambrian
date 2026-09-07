@@ -38,8 +38,13 @@ unless the user explicitly asks for a PR. Steps:
 - Two eras, one engine. `/` is the Cambrian; `/devonian/` (entry `src/devonian/main.tsx`) calls
   `selectEra(DEVONIAN)` and `setAppBase(nestedBase())` *before* dynamically importing the app, because
   many modules read `ACTIVE_ERA` at module top. Anything new that reads the era at import time must
-  stay behind that import (or resolve lazily like `assetPaths`). Headless tests that need the Devonian
-  do the same: select the era, then `await import(...)` the simulation (`tools/devonian-test.ts`).
+  stay behind that import (or resolve lazily like `assetPaths` and `music()`); the entry page itself
+  must not statically import the audio library or the sim for the same reason. Headless tests that
+  need the Devonian do the same: select the era, then `await import(...)` (`tools/devonian-test.ts`).
+- An era's `assets.sfx` names the shared sound library (`assets/sfx/`): bites, hits and the UI are the
+  same files in both eras. Era-specific samples are addressed as `<era>/<name>` and resolve under
+  `assets/<era>/sfx/` regardless. Only creatures with their own delivered model are pickable
+  (`PLAYABLE` in `src/sim/creatures.ts`); the rest borrow a body in the world but stay off the roster.
 - Devonian gameplay lives in `src/sim/devonian/` and reaches the shared simulation only through the
   `RULES?.` hooks in `src/sim/era-rules.ts`. Do not branch on the era inside `game.ts`/`combat.ts`;
   add a hook. With `RULES` undefined the Cambrian takes exactly its old paths.
