@@ -1,5 +1,6 @@
 import { add, clamp, dist, distXZ, dot, heading, len3, norm, scale as vscale, sub, TAU, v3, type Rng, type Vec3 } from '../shared/math';
 import { bandOf, isAlive, isHidden, lengthOf } from './actors';
+import { RULES } from './era-rules';
 import { creature } from './creatures';
 import type { Actor, BrainState, InputFrame, WorldEvent } from './types';
 import { emptyInput } from './types';
@@ -45,7 +46,7 @@ function pickWander(a: Actor, b: BrainState, rng: Rng, radius: number) {
   const shore = shoreDistance(x, z);
   if (shore < 28) z -= 28 - shore;
   const ground = sampleHeight(x, z);
-  const y = creature(a.creature).ground ? ground : clamp(ground + 1.5 + rng() * (a.scale > 2 ? 12 : 6) * lengthOf(a) * 0.5, ground + 1, SURFACE_Y - 2);
+  const y = RULES ? RULES.wanderY(a, ground, rng) : creature(a.creature).ground ? ground : clamp(ground + 1.5 + rng() * (a.scale > 2 ? 12 : 6) * lengthOf(a) * 0.5, ground + 1, SURFACE_Y - 2);
   b.wanderTo = { x, y, z };
 }
 

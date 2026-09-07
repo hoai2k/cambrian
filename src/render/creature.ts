@@ -6,6 +6,7 @@ import { MeshoptDecoder } from 'three/examples/jsm/libs/meshopt_decoder.module.j
 import * as SkeletonUtils from 'three/examples/jsm/utils/SkeletonUtils.js';
 import { clamp, damp, wrapAngle } from '../shared/math';
 import { makeRecolor, type Recolor } from './recolor';
+import { settleTranslucency } from './translucency';
 import { schemeForCreature } from '../shared/palettes';
 import { creature, type CreatureId } from '../sim/creatures';
 import { lengthOf } from '../sim/actors';
@@ -104,10 +105,14 @@ export class CreatureView {
         const mats = Array.isArray(o.material) ? o.material : [o.material];
         const cloned = mats.map((m) => { const c = (m as THREE.MeshStandardMaterial).clone(); return c; });
         o.material = Array.isArray(o.material) ? cloned : cloned[0];
-        for (const c of cloned) if (c instanceof THREE.MeshStandardMaterial) { this.materials.push(c); this.baseEmissive.push(c.emissive.clone()); this.baseOpacity.push(c.opacity); this.baseTransparent.push(c.transparent); }
+        for (const c of cloned) if (c instanceof THREE.MeshStandardMaterial) this.materials.push(c);
       }
       if (o instanceof THREE.Bone) { const m = SPINE_RE.exec(o.name); if (m) this.spine.push(o); }
     });
+    // Translucent bodies (the jellies) are settled before their base state is recorded, so the
+    // hit flash and the corpse fade restore what is actually drawn.
+    this.extraMats = settleTranslucency(this.model);
+    for (const m of this.materials) { this.baseEmissive.push(m.emissive.clone()); this.baseOpacity.push(m.opacity); this.baseTransparent.push(m.transparent); }
     // All of a creature's colour lives in its vertex colours, so its palette is a shader hook on
     // the materials cloned just above rather than a second set of models. Both LODs share the
     // material names the slots are read from, so a distant creature keeps its colours.
@@ -184,9 +189,11 @@ export class CreatureView {
   setShadow(on: boolean) {
     if (this.shadowOn === on) return;
     this.shadowOn = on;
-    this.model.traverse((o) => { if ((o as THREE.Mesh).isMesh) (o as THREE.Mesh).castShadow = on; });
+    this.model.traverse((o) => { if ((o as THREE.Mesh).isMesh && !o.userData.depthPrepass) (o as THREE.Mesh).castShadow = on; });
   }
   private shadowOn = true;
+  /** Depth pre-pass materials made for translucent bodies; owned here so they are disposed. */
+  private extraMats: THREE.Material[] = [];
 
   setHighlight(intensity: number, color?: string) { this.highlight = intensity; if (color) this.highlightColor.set(color); }
 
@@ -217,6 +224,9 @@ export class CreatureView {
     this.visibleLength = L;
     const speed = Math.hypot(a.vel.x, a.vel.y, a.vel.z);
     const cruise = def.speed * Math.pow(a.scale, 0.45);
+    // Crawlers carry their vertical motion in `hopVel` (hop and paddle), not in `vel.y`.
+    const paddling = def.ground && !a.grounded && a.state !== 'dead';
+    const vy = def.ground ? (paddling ? a.hopVel : 0) : a.vel.y;
 
     if (animate) {
       // locomotion layer
@@ -229,10 +239,14 @@ export class CreatureView {
       else if (held && this.has('Ability')) { this.playLoop('Ability'); this.loco?.setEffectiveTimeScale(1); }
       else if (a.state === 'moult' && this.has('Moult')) { this.playLoop('Moult'); this.loco?.setEffectiveTimeScale(1); }
       else {
-        this.playLoop(speed > 0.35 ? (def.ground ? 'Crawl' : 'Swim') : 'Idle');
+        // A crawler off the seabed is paddling: keep its leg cycle running even when it is
+        // barely translating, so the climb reads as swimming rather than hovering.
+        const moving = speed > 0.35 || paddling;
+        this.playLoop(moving ? (def.ground ? 'Crawl' : 'Swim') : 'Idle');
         // smaller creatures beat faster
         const rateScale = 1 / Math.pow(Math.max(a.scale, 0.1), 0.35);
-        this.loco?.setEffectiveTimeScale(speed > 0.35 ? clamp((speed / cruise) * rateScale, 0.5, 2.6) : 0.75 * rateScale);
+        const beat = Math.max(speed, paddling ? cruise * 0.85 : 0);
+        this.loco?.setEffectiveTimeScale(moving ? clamp((beat / cruise) * rateScale, 0.5, 2.6) : 0.75 * rateScale);
       }
       // one-shots
       const inAttack = a.state === 'attack' || a.state === 'grabbing' || a.state === 'pounce' || (a.state === 'ability' && !held);
@@ -265,8 +279,8 @@ export class CreatureView {
       const targets = [
         Math.max(0, turning) * 0.45 + (dodging && lateral < 0 ? dodging : 0),
         Math.max(0, -turning) * 0.45 + (dodging && lateral >= 0 ? dodging : 0),
-        Math.max(0, -a.vel.y) * 0.25 + guarding + (def.ground && a.state === 'guard' ? 0.3 : 0),
-        Math.max(0, a.vel.y) * 0.25,
+        Math.max(0, -vy) * 0.25 + guarding + (def.ground && a.state === 'guard' ? 0.3 : 0),
+        Math.max(0, vy) * 0.25,
       ];
       this.additive.forEach((act, i) => {
         if (!act) return;
@@ -377,6 +391,7 @@ export class CreatureView {
     this.mixer.stopAllAction();
     this.mixer.uncacheRoot(this.model);
     this.materials.forEach((m) => m.dispose());
+    this.extraMats.forEach((m) => m.dispose());
     this.shieldMat.dispose();
     this.group.removeFromParent();
   }

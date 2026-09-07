@@ -7,6 +7,8 @@ import type { Actor, Mode, WorldEvent } from '../types';
 import { BIOME_DANGER, biomeAt, groundHeight, sampleCurrent, shoreDistance, SHORE_WALL, SURFACE_Y } from '../world';
 import { bodyRadius } from '../actors';
 import { devActor, DOMINANT, HOLD_TO_WIN, RUNG_NAMES, STAGE_AT, STAGE_SCALE, STAGES, stateFor, type DeadZone, type DevActor } from './state';
+import { beginAbility, camoDrain, installDevonianSpecials, stepAbility, stepGuardSpecial, useAbility, ySpecial } from './specials';
+import { canBreach, spawnY, swim, wanderY } from './swim';
 
 /**
  * Devonian Domination (docs/redesign/08-devonian-domination.md). Progress is standing within a
@@ -192,7 +194,9 @@ function updateExuvia(g: Game, a: Actor, d: DevActor, dt: number) {
 export const DEVONIAN_RULES: EraRules = {
   growthByNutrition: false,
   startScale(mode: Mode, index: number) { return mode === 'reef' ? STAGE_SCALE[1] : mode === 'hunted' && index === 0 ? STAGE_SCALE[2] : STAGE_SCALE[0]; },
-  init(g) { for (const a of players(g)) { const d = devActor(g, a); d.stage = a.scale >= STAGE_SCALE[2] - 1e-6 ? 2 : a.scale >= STAGE_SCALE[1] - 1e-6 ? 1 : 0; d.standing = g.mode === 'reef' ? 50 : 0; } },
+  install() { installDevonianSpecials(); },
+  ySpecial,
+  init(g) { installDevonianSpecials(); for (const a of players(g)) { const d = devActor(g, a); d.stage = a.scale >= STAGE_SCALE[2] - 1e-6 ? 2 : a.scale >= STAGE_SCALE[1] - 1e-6 ? 1 : 0; d.standing = g.mode === 'reef' ? 50 : 0; } },
 
   step(g, dt) {
     const s = stateFor(g);
@@ -209,6 +213,7 @@ export const DEVONIAN_RULES: EraRules = {
       updateRange(g, a, d, dt);
       updateShoal(g, a, d, dt);
       updateExuvia(g, a, d, dt);
+      stepGuardSpecial(g, a, d, dt);
       if (second) giveWay(g, a);
       // benthos: being alive in the open is itself an achievement
       if (W.open[rung] && isAlive(a) && !isHidden(a) && a.hideMode === 'none') { d.openT += dt; gain(g, a, d, W.open[rung] * dt, 'alive'); }
@@ -275,6 +280,9 @@ export const DEVONIAN_RULES: EraRules = {
 
   shoreReach(a) { return creature(a.creature).shoreReach ?? 0; },
   jet(a) { return !!creature(a.creature).shell; },
+
+  useAbility, beginAbility, stepAbility, camoDrain,
+  swim, canBreach, spawnY, wanderY,
 
   moultScale(g, a) {
     const d = devActor(g, a);

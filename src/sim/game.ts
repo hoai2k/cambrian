@@ -6,7 +6,7 @@ import { add, clamp, damp, dist, distXZ, dot, heading, len3, lerp, makeRng, norm
 import { applyScaleStats, bandOf, bodyRadius, canAct, clearanceOf, isAlive, isHidden, isInvulnerable, lengthOf, makeActor, massOf, speedFactor, staminaCost } from './actors';
 import { makeBrain, think, type AiWorld } from './ai';
 import { applyHit, kill, startSwallow, type HitContext } from './combat';
-import { creature, CREATURE_IDS, type CreatureId, type MoveDef } from './creatures';
+import { creature, CREATURE_IDS, PLAYABLE_IDS, type CreatureId, type MoveDef } from './creatures';
 import { resolveFlora, stepFlora } from './flora';
 import { SpatialHash } from './spatial';
 import { emptyInput, TIER_NAMES, TIER_NEED, TIER_SCALE, type Actor, type InputFrame, type Mode, type PlayerSetup, type Prompt, type SiltCloud, type Tier, type WorldEvent } from './types';
@@ -40,6 +40,15 @@ export interface RadarBlip {
 }
 
 const { schools: SNACK_SCHOOLS, giants: GIANTS } = ACTIVE_ERA.ecology;
+
+// Crawlers off the seabed. They paddle: they keep swimming, slowly, and pay for the climb in
+// stamina (more than they regenerate, so a paddle is a crossing, not a second way to live).
+/** A leap out of the water: the pull back down, and the least upward speed that gets a fish through the surface. */
+const BREACH_GRAVITY = 14, BREACH_MIN_RISE = 3.2;
+const PADDLE_SPEED = 0.35;    // fraction of the crawler's cruise while off the floor
+const PADDLE_RISE = 2.4;      // climb speed, units/s at scale 1 (a swimmer's rise is 2.6 and faster to reach)
+const PADDLE_SINK = 2.2;      // terminal sink once RB is released — a settle, not a fall
+const PADDLE_STAMINA = 24;    // per second while climbing
 
 export class Game implements AiWorld {
   world: WorldData;
@@ -98,12 +107,14 @@ export class Game implements AiWorld {
 
   /** A bot's species: anything a player might pick; in Food Chain one from a rung nobody has taken yet. */
   private pickBot(taken: CreatureId[], i: number): CreatureId {
-    const pool = CREATURE_IDS.filter((c) => {
+    // Bots pick from the same list the player chose from, so a rival is always an animal the
+    // player could have been (and always has its own model rather than a borrowed one).
+    const pool = PLAYABLE_IDS.filter((c) => {
       const def = creature(c);
       if (this.mode !== 'foodchain' || def.rung === undefined) return true;
       return !taken.some((t) => creature(t).rung === def.rung) && !this.actors.some((a) => a.controller === 'bot' && creature(a.creature).rung === def.rung);
     });
-    const from = pool.length ? pool : CREATURE_IDS;
+    const from = pool.length ? pool : PLAYABLE_IDS;
     void i;
     return from[Math.floor(this.rng() * from.length)];
   }
@@ -140,7 +151,7 @@ export class Game implements AiWorld {
     const x = center.x + Math.cos(ang) * d, z = center.z + Math.sin(ang) * d;
     const g = groundHeight(this.world, x, z, this.scratchBoulders);
     const L = def.adultLength * s;
-    return { x, y: def.ground ? g + L * 0.13 : g + 1.2 + L * 0.5, z };
+    return { x, y: RULES ? RULES.spawnY(g, L, !!def.ground) : def.ground ? g + L * 0.13 : g + 1.2 + L * 0.5, z };
   }
 
   spawn(c: CreatureId, controller: Actor['controller'], pos: Vec3, scale: number, player = -1): Actor {
@@ -202,24 +213,32 @@ export class Game implements AiWorld {
     g.brain = makeBrain('giant', route[0], this.rng, { patrol: route });
   }
 
-  /** A school sized to be prey for this player, spawned just out of sight. */
+  /**
+   * A school sized to be prey for this player, spawned just out of sight. A crawler is fed on
+   * its own level: seafloor species by preference, and anything else planted just above the
+   * sediment rather than left drifting overhead where it cannot be reached.
+   */
   private spawnPreyFor(p: Actor) {
     const L = lengthOf(p);
     const def = creature(p.creature);
-    const pool = CREATURE_IDS.filter((id) => creature(id).ground === def.ground || !creature(id).ground);
+    const crawlers = CREATURE_IDS.filter((id) => creature(id).ground);
+    const pool = def.ground
+      ? (this.rng() < 0.8 && crawlers.length ? crawlers : CREATURE_IDS.slice())
+      : CREATURE_IDS.filter((id) => !creature(id).ground);
     const c = pool[Math.floor(this.rng() * pool.length)];
     const cd = creature(c);
     const ratio = 0.28 + this.rng() * 0.32;            // snack to small prey relative to the player
     const s = clamp((L * ratio) / cd.adultLength, 0.06, 2.2);
-    const count = s < 0.2 ? 12 : s < 0.6 ? 8 : 5;
+    const count = (s < 0.2 ? 12 : s < 0.6 ? 8 : 5) + (def.ground ? 4 : 0);
     const ang = this.rng() * TAU, d = 24 + this.rng() * 18 + L * 2;
     const home = this.offshore({ x: p.pos.x + Math.cos(ang) * d, y: 0, z: p.pos.z + Math.sin(ang) * d });
     const g = sampleHeight(home.x, home.z);
-    home.y = cd.ground ? g : clamp(p.pos.y + (this.rng() - 0.5) * 6, g + 1.5, SURFACE_Y - 3);
+    const onFloor = cd.ground || def.ground;
+    home.y = onFloor ? g : clamp(p.pos.y + (this.rng() - 0.5) * 6, g + 1.5, SURFACE_Y - 3);
     const schoolId = this.schoolCount++;
     for (let k = 0; k < count; k++) {
       const pos = { x: home.x + (this.rng() - 0.5) * 5, y: home.y + (this.rng() - 0.5) * 2, z: home.z + (this.rng() - 0.5) * 5 };
-      if (cd.ground) pos.y = groundHeight(this.world, pos.x, pos.z, this.scratchBoulders) + cd.adultLength * s * 0.13;
+      if (onFloor) pos.y = groundHeight(this.world, pos.x, pos.z, this.scratchBoulders) + (cd.ground ? cd.adultLength * s * 0.13 : 0.6 + this.rng() * 1.2);
       const a = this.spawn(c, 'swarm', pos, s);
       a.brain = makeBrain('swarm', home, this.rng, { schoolId });
     }
@@ -465,6 +484,8 @@ export class Game implements AiWorld {
       if (a.hideMode !== 'none') {
         const buried = a.hideMode === 'burrowed'; stopHiding(a);
         if (buried) { a.emergenceHeavy = true; this.emergeStrike(a, def); }
+      } else if (RULES && RULES.useAbility(this, a, this.expansionContext())) {
+        this.flag(a, 'ability');                       // the era's own Y special took the press
       } else if (a.hideCd === 0 && (BURROWERS.has(a.creature) || a.stamina >= 8)) {
         a.state = 'free'; a.abilityActive = false; a.hideT = 0; a.seen = 0;
         if (BURROWERS.has(a.creature)) a.hideMode = 'descending';
@@ -490,7 +511,7 @@ export class Game implements AiWorld {
     }
     a.camoStrength = damp(a.camoStrength, a.hideMode === 'camouflage' ? 1 : 0, 3, dt);
     if (a.hideMode === 'camouflage') {
-      a.stamina = Math.max(0, a.stamina - CAMOUFLAGE_DRAIN * dt);
+      a.stamina = Math.max(0, a.stamina - CAMOUFLAGE_DRAIN * (RULES?.camoDrain(a) ?? 1) * dt);
       if (a.stamina === 0) stopHiding(a);
     }
     if (a.state === 'guard' || a.state === 'parry') a.guardHeld += dt;
@@ -498,7 +519,10 @@ export class Game implements AiWorld {
     // Stamina
     const speed = len3(a.vel);
     const burstIn = input.burst;
-    const bursting = burstIn > 0.1 && a.stamina > 0 && a.state !== 'guard' && a.exhausted === 0;
+    // A crawler off the seabed is doggy-paddling: it keeps swimming slowly, but it cannot
+    // sprint or dash until its legs are back on the floor.
+    const paddling = def.ground && !a.grounded;
+    const bursting = burstIn > 0.1 && a.stamina > 0 && a.state !== 'guard' && a.exhausted === 0 && !paddling;
     if (def.ability === 'ambushSurge' && input.burst > .1 && !a.prev.burst && a.abilityCd <= 0) { a.burstT = 2.2; a.abilityCd = 10; }
     const freeBurst = a.burstT > 0;
     if (bursting && !freeBurst) a.stamina -= 22 * burstIn * dt;
@@ -534,7 +558,9 @@ export class Game implements AiWorld {
     const controllable = a.holdT === 0 && (a.state === 'free' || a.state === 'guard' || (a.state === 'ability' && (def.mobileAbility || def.ability === 'shellUp' || def.ability === 'bristleFlare' || def.ability === 'ambushSurge')));
     const slowMult = abilitySpeed(a) * (a.state === 'guard' ? (def.ability === 'anchor' ? 0 : def.ability === 'enroll' ? .8 : .45) : (a.abilityActive && def.ability === 'shellUp') ? 0.35 : a.exhausted > 0 ? 0.7 : 1);
     const burstMult = controllable && (bursting || freeBurst) ? (1 + (def.burst - 1) * (freeBurst ? 1.25 : burstIn) * (a.controller === 'swarm' ? 0.55 : giantish ? 0.35 : 1)) : 1;
-    const cruise = def.speed * sf * slowMult * (a.controller === 'swarm' ? 0.62 : giantish ? 0.55 : 1);
+    const baseCruise = def.speed * sf * slowMult * (a.controller === 'swarm' ? 0.62 : giantish ? 0.55 : 1) * (paddling ? PADDLE_SPEED : 1);
+    const sw = RULES && controllable ? RULES.swim(this, a, dir, mag, baseCruise, burstIn > 0.1 && !a.prev.burst) : undefined;
+    const cruise = baseCruise * (sw?.speed ?? 1);
     const cur = sampleCurrent(v3(), a.pos.x, a.pos.y, a.pos.z, this.time);
     const curK = def.ground ? 0.08 : 0.55;
     let desired: Vec3 = v3(cur.x * curK, cur.y * curK, cur.z * curK);
@@ -556,12 +582,15 @@ export class Game implements AiWorld {
     if (a.state === 'stagger' || a.state === 'grabbed') { desired = v3(); rate = 2.5; }
     if (a.state === 'dodge' || a.state === 'attack' || a.state === 'eating' || a.state === 'moult' || a.state === 'grabbing' || a.state === 'parry') rate = a.state === 'dodge' ? 1.4 : 3;
     if (a.state === 'pounce') rate = 0;
+    if (a.airborne) rate = 0;                          // in the air nothing steers; gravity does
     if (a.holdT > 0) { desired = v3(); rate = 5; }
     if (a.state === 'ability' && (def.ability === 'burrow' || def.ability === 'anchor')) { desired = v3(); rate = 8; }
     if (a.hitStop > 0) rate = 0;
     a.vel.x = damp(a.vel.x, desired.x, rate, dt);
     a.vel.y = damp(a.vel.y, desired.y, rate, dt);
     a.vel.z = damp(a.vel.z, desired.z, rate, dt);
+    if (sw && sw.impulse > 0) { const h0 = heading(a.yaw); a.vel.x += h0.x * sw.impulse; a.vel.z += h0.z * sw.impulse; }   // the fast-start
+    if (a.airborne) { a.vel.y -= BREACH_GRAVITY * dt; a.vel.x *= 1 - 0.15 * dt; a.vel.z *= 1 - 0.15 * dt; }
 
     // Lunge during attacks
     if (a.state === 'attack' && a.move) {
@@ -595,10 +624,21 @@ export class Game implements AiWorld {
       a.pos.x += a.vel.x * dt; a.pos.y += a.vel.y * dt; a.pos.z += a.vel.z * dt;
     }
 
-    // Hop (crawlers)
+    // Hop and paddle (crawlers). RB kicks off the floor, and holding it keeps the crawler
+    // climbing at a paddle's pace for as long as its stamina lasts; letting go sinks it back
+    // down at a gentle terminal speed rather than dropping it like a stone.
     if (def.ground) {
-      if (a.hideMode === 'none' && justRise && a.grounded && controllable && a.stamina > 8) { a.hopVel = 5.5 * Math.sqrt(sf); a.grounded = false; a.stamina -= 8; a.iframes = Math.max(a.iframes, 0.12); }
-      if (!a.grounded) { a.pos.y += a.hopVel * dt; a.hopVel -= 16 * dt; }
+      const canPaddle = a.hideMode === 'none' && controllable;
+      if (canPaddle && justRise && a.grounded && a.stamina > 8) { a.hopVel = 5.5 * Math.sqrt(sf); a.grounded = false; a.stamina -= 8; a.iframes = Math.max(a.iframes, 0.12); }
+      const holdingRise = canPaddle && input.rise && a.stamina > 0;
+      if (holdingRise && !a.grounded) {
+        a.hopVel = damp(a.hopVel, PADDLE_RISE * Math.sqrt(sf), 5, dt);
+        a.stamina -= PADDLE_STAMINA * dt;
+      } else if (!a.grounded) {
+        const sink = -PADDLE_SINK * Math.sqrt(sf) * (input.sink ? 2.4 : 1);
+        a.hopVel = Math.max(a.hopVel - 16 * dt, sink);
+      }
+      if (!a.grounded) { a.pos.y += a.hopVel * dt; }
     }
 
     // Static collision
@@ -612,10 +652,27 @@ export class Game implements AiWorld {
     if (def.ground) {
       if (a.grounded || a.pos.y <= floor) { a.pos.y = a.grounded ? damp(a.pos.y, floor, 18, dt) : floor; if (!a.grounded && a.hopVel < 0) { a.grounded = true; a.hopVel = 0; } }
       if (a.pos.y < floor) a.pos.y = floor;
+      // a paddling crawler still cannot climb out of the sea
+      const ceiling = SURFACE_Y - 0.8 - clearanceOf(a);
+      if (a.pos.y > ceiling) { a.pos.y = ceiling; if (a.vel.y > 0) a.vel.y = 0; if (a.hopVel > 0) a.hopVel = 0; }
     } else {
       if (a.pos.y < floor) { a.pos.y = floor; if (a.vel.y < 0) a.vel.y *= -0.2; }
       const ceiling = SURFACE_Y - 0.8 - clearanceOf(a);
-      if (a.pos.y > ceiling) { a.pos.y = ceiling; if (a.vel.y > 0) a.vel.y = 0; }
+      if (a.airborne) {
+        // back through the surface: the splash, and the water takes most of the fall out of it
+        if (a.pos.y <= ceiling && a.vel.y < 0) {
+          a.airborne = false;
+          this.events.push({ kind: 'splash', pos: { x: a.pos.x, y: SURFACE_Y, z: a.pos.z }, actor: a.id, player: a.player, strength: clamp(-a.vel.y / 9, 0.3, 1.6) });
+          a.vel.y *= 0.45;
+        }
+      } else if (a.pos.y > ceiling) {
+        // driving hard at the surface, a fish leaves the water; anything else meets the ceiling
+        const sp = len3(a.vel);
+        if (RULES?.canBreach(a) && isAlive(a) && a.vel.y > BREACH_MIN_RISE && sp > def.speed * sf * 0.85 && a.state === 'free') {
+          a.airborne = true;
+          this.events.push({ kind: 'breach', pos: { x: a.pos.x, y: SURFACE_Y, z: a.pos.z }, actor: a.id, player: a.player, strength: clamp(sp / 12, 0.4, 1.5) });
+        } else { a.pos.y = ceiling; if (a.vel.y > 0) a.vel.y = 0; }
+      }
     }
 
     // Orientation
@@ -625,7 +682,7 @@ export class Game implements AiWorld {
     else if (locked && isAlive(locked) && (a.state === 'free' || a.state === 'guard' || a.state === 'attack')) targetYaw = yawOf(sub(locked.pos, a.pos));
     else if (hv > 0.35 && a.state !== 'grabbed') targetYaw = yawOf(a.vel);
     const dy = wrapAngle(targetYaw - a.yaw);
-    const tr = def.turnRate * (a.state === 'attack' ? 0.5 : 1) * (1 + hv * 0.05) * (giantish ? 0.45 : 1);
+    const tr = def.turnRate * (a.state === 'attack' ? 0.5 : 1) * (1 + hv * 0.05) * (giantish ? 0.45 : 1) * (sw?.turn ?? 1);
     const turn = clamp(dy * 6, -tr, tr);
     const prevYaw = a.yaw;
     a.yaw = wrapAngle(a.yaw + turn * dt);
@@ -670,7 +727,7 @@ export class Game implements AiWorld {
       // Dash (LB): with a stick direction it fires at once; with a neutral stick it is queued for the
       // moment the stick moves. Fast and long enough to clear a predator's bite.
       else if (justDash && mag <= 0.3 && !input.worldMove) { a.dashQueued = true; }
-      else if ((justDash || a.dashQueued) && mag > 0.3 && a.stamina >= 10 && a.exhausted === 0 && a.dashCd === 0 && !a.dashUsed) { a.dashUsed = true; a.dashQueued = false; this.startDash(a, def, dir, L, sf); }
+      else if ((justDash || a.dashQueued) && mag > 0.3 && a.stamina >= 10 && a.exhausted === 0 && a.dashCd === 0 && !a.dashUsed && !paddling) { a.dashUsed = true; a.dashQueued = false; this.startDash(a, def, dir, L, sf); }
       // Pounce (RT): at the aimed target when in range, else at whatever prey is in front, else a forward lunge
       else if (justHeavy && !HEAVY_SPECIALS.has(def.ability) && a.controller === 'player' && a.pounceCd === 0 && a.stamina >= 12 && a.exhausted === 0) {
         const t = a.aiming && locked && isAlive(locked) ? (a.aimInRange ? locked : undefined) : this.pounceTargetAhead(a);
@@ -919,6 +976,7 @@ export class Game implements AiWorld {
     a.abilityT = 0; a.abilityActive = true; a.state = 'ability'; a.stateT = 0;
     a.stateDur = def.abilityDuration ?? .55; a.hitDone.clear();
     beginExpansionAbility(this.expansionContext(), a, def);
+    RULES?.beginAbility(this, a, this.expansionContext());
     this.events.push({kind:'ability',pos:{...a.pos},actor:a.id,player:a.player,strength:lengthOf(a)});
     this.flag(a, 'heavy');
   }
@@ -927,6 +985,7 @@ export class Game implements AiWorld {
     a.abilityT += dt;
     const done = a.stateT >= a.stateDur;
     stepExpansionAbility(this.expansionContext(), a, def, dt);
+    RULES?.stepAbility(this, a, this.expansionContext(), dt);
     if (a.state !== 'ability') return;
     switch (def.ability) {
       case 'snatch': {
@@ -1162,12 +1221,20 @@ export class Game implements AiWorld {
     }
     void ambient;
     // Every player, at every size, should have plenty of things smaller than them within reach.
+    // For a crawler "within reach" means near the seabed: food hanging in open water above it
+    // does not count, so the seafloor keeps being restocked.
     for (const p of this.players) {
       if (!isAlive(p)) continue;
       const L = lengthOf(p);
+      const crawler = creature(p.creature).ground;
+      const reachY = 3 + L * 1.5;
       let small = 0;
-      for (const o of this.nearby(p.pos, 45 + L * 4)) { if (o.id !== p.id && isAlive(o)) { const b = bandOf(p, o); if (b === 'snack' || b === 'prey') small++; } }
-      if (small < 14) this.spawnPreyFor(p);
+      for (const o of this.nearby(p.pos, 45 + L * 4)) {
+        if (o.id === p.id || !isAlive(o)) continue;
+        if (crawler && o.pos.y - p.pos.y > reachY) continue;
+        const b = bandOf(p, o); if (b === 'snack' || b === 'prey') small++;
+      }
+      if (small < (crawler ? 18 : 14)) this.spawnPreyFor(p);
     }
     if (swarm < 200) {
       const i = Math.floor(this.rng() * SNACK_SCHOOLS.length);

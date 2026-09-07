@@ -1,5 +1,5 @@
 import { ACTIVE_ERA } from '../content';
-import { SAND_COLORS, floraTint, rockTint } from '../shared/environment-colors';
+import { FLORA_BASE, SAND_COLORS, floraTint, rockTint } from '../shared/environment-colors';
 import * as THREE from 'three';
 import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js';
 import { clamp, makeRng, TAU } from '../shared/math';
@@ -23,7 +23,7 @@ float ec(vec2 p,float t) {
 export interface SeaEnvironment {
   group: THREE.Group;
   /** Applies the magnification tier and the local biome's atmosphere for one viewport and returns the fog density it chose. */
-  setViewLength(L: number, camX?: number, camZ?: number): number;
+  setViewLength(L: number, camX?: number, camZ?: number, camY?: number): number;
   /** `cams` are every viewport's camera positions: scenery streams in around all of them. */
   update(time: number, dt: number, focus: THREE.Vector3, cams?: readonly THREE.Vector3[]): void;
   dispose(): void;
@@ -134,6 +134,16 @@ export function createSea(scene: THREE.Scene, world: WorldData, quality: Quality
   const tuftMat = seaMaterial('#5d7a43', 'algae', true, true);
   // Micro-tufts share the tuft look but are static scatter with no sim state.
   const microMat = seaMaterial('#5d7a43', 'algae', true);
+
+  // Devonian stand-in materials, coloured from the era's flora table (the Cambrian ones above are its literal colours).
+  const fb = (kind: string, fallback: string) => FLORA_BASE[kind] ?? fallback;
+  const crinoidMat = seaMaterial(fb('crinoid', '#8c9078'), 'algae', true, true);
+  const reedMat = seaMaterial(fb('reed', '#5e8a40'), 'algae', true, true);
+  const fanMat = seaMaterial(fb('bryozoan', '#d4cdb6'), 'sponge', true, true); fanMat.side = THREE.DoubleSide;
+  const coralMat = seaMaterial(fb('rugose', '#9c5c3b'), 'sponge', false, true);
+  const plateMat = seaMaterial(fb('tabulate', '#7d8f7c'), 'rock');
+  const moundMat = seaMaterial(fb('stromatoporoid', '#cbb994'), 'rock');
+  const logMat = seaMaterial(fb('log', '#6a4a2e'), 'rock');
 
   const propMat = (kind: SeaKind, sway = false, bend = false) => {
     const m = seaMaterial('#ffffff', kind, sway, bend); m.vertexColors = true; return m;
@@ -304,6 +314,106 @@ export function createSea(scene: THREE.Scene, world: WorldData, quality: Quality
   for (let i = 0; i < (high ? 9 : 6); i++) { const a = rng() * TAU, t = 0.13 + rng() * 0.22, n = 0.2 + rng() * 0.4; tuftParts.push(curveTube([[0, 0, 0], [Math.cos(a) * t * 0.4, n * 0.4, Math.sin(a) * t * 0.4], [Math.cos(a) * t, n * 0.8, Math.sin(a) * t], [Math.cos(a + 0.2) * t * 1.2, n, Math.sin(a + 0.2) * t * 1.2]], 0.008, 4, 3)); }
   const tuftGeo = merged(tuftParts);
 
+  // Devonian stand-ins, each sized to FLORA_PHYS (h, r) at scale 1.
+  // Crinoid: curved stalk, a small cup, and a crown of arms spreading up and out.
+  const crinoidParts: THREE.BufferGeometry[] = [];
+  { const lean = 0.1;
+    crinoidParts.push(curveTube([[0, 0, 0], [lean * 0.4, 0.6, 0.02], [lean, 1.2, -0.03], [lean * 1.3, 1.65, 0]], 0.035, 6, 5));
+    const cup = new THREE.LatheGeometry([[0.03, 0], [0.09, 0.08], [0.11, 0.18], [0.08, 0.22]].map(([x, y]) => new THREE.Vector2(x, y)), 6);
+    cup.translate(lean * 1.3, 1.62, 0); crinoidParts.push(cup);
+    const arms = high ? 10 : 8;
+    for (let i = 0; i < arms; i++) {
+      const a = (i / arms) * TAU + rng() * 0.3, sp = 0.3 + rng() * 0.08, h = 0.5 + rng() * 0.08;
+      const cx = Math.cos(a), cz = Math.sin(a);
+      crinoidParts.push(curveTube([[lean * 1.3 + cx * 0.06, 1.8, cz * 0.06], [lean * 1.3 + cx * sp * 0.6, 1.8 + h * 0.6, cz * sp * 0.6], [lean * 1.3 + cx * sp, 1.8 + h * 0.85, cz * sp], [lean * 1.3 + cx * sp * 1.15, 1.75 + h, cz * sp * 1.15]], 0.018, 4, 3));
+    } }
+  const crinoidGeo = merged(crinoidParts);
+  // Giant sea lily (FLORA_PHYS lilyColumn: h 9.5, r 0.5): a stem four bodies tall with a wide crown at
+  // the top, so it reads as scenery in the water column rather than on the floor.
+  const lilyParts: THREE.BufferGeometry[] = [];
+  { const lean = 0.35, H = 8.2;
+    lilyParts.push(curveTube([[0, 0, 0], [lean * 0.3, H * 0.35, 0.05], [lean * 0.8, H * 0.7, -0.08], [lean, H, 0]], 0.09, 7, 8));
+    const cup = new THREE.LatheGeometry([[0.06, 0], [0.22, 0.2], [0.3, 0.45], [0.24, 0.6]].map(([x, y]) => new THREE.Vector2(x, y)), 8);
+    cup.translate(lean, H - 0.1, 0); lilyParts.push(cup);
+    const arms = high ? 14 : 10;
+    for (let i = 0; i < arms; i++) {
+      const a = (i / arms) * TAU + rng() * 0.25, sp = 0.9 + rng() * 0.3, h = 1.1 + rng() * 0.3;
+      const cx = Math.cos(a), cz = Math.sin(a);
+      lilyParts.push(curveTube([[lean + cx * 0.15, H + 0.4, cz * 0.15], [lean + cx * sp * 0.55, H + 0.4 + h * 0.55, cz * sp * 0.55], [lean + cx * sp, H + 0.4 + h * 0.85, cz * sp], [lean + cx * sp * 1.2, H + 0.3 + h, cz * sp * 1.2]], 0.035, 5, 4));
+    } }
+  const lilyGeo = merged(lilyParts);
+  // Algal frond tower (frondTower: h 5.5, r 0.7): a sheaf of long fronds fanning out as they rise.
+  const towerParts: THREE.BufferGeometry[] = [];
+  { const n = high ? 9 : 6;
+    for (let i = 0; i < n; i++) {
+      const a = (i / n) * TAU + rng() * 0.5, h = 3.8 + rng() * 1.7, sp = 0.35 + rng() * 0.35;
+      const cx = Math.cos(a), cz = Math.sin(a);
+      towerParts.push(curveTube([[cx * 0.1, 0, cz * 0.1], [cx * sp * 0.4, h * 0.4, cz * sp * 0.4], [cx * sp * 0.8, h * 0.78, cz * sp * 0.8], [cx * sp * 1.1, h, cz * sp * 1.1]], 0.05, 5, 6));
+    } }
+  const towerGeo = merged(towerParts);
+  // Stromatoporoid: a lumpy dome with faint growth ridges.
+  const stromGeo = G(new THREE.SphereGeometry(0.65, 12, 6, 0, TAU, 0, Math.PI / 2));
+  { const p = stromGeo.attributes.position as THREE.BufferAttribute;
+    for (let i = 0; i < p.count; i++) {
+      const x = p.getX(i), y = p.getY(i), z = p.getZ(i);
+      const k = 1 + 0.06 * Math.sin(x * 9 + z * 7) * Math.cos(y * 11) + 0.03 * Math.sin(y * 21);
+      p.setXYZ(i, x * k, y * k * (0.7 / 0.65), z * k * 0.92);
+    }
+    stromGeo.computeVertexNormals(); }
+  // Tabulate: two stacked plates on a short stem.
+  const tabulateParts: THREE.BufferGeometry[] = [];
+  { const stem = new THREE.CylinderGeometry(0.16, 0.22, 0.14, 6); stem.translate(0, 0.07, 0); tabulateParts.push(stem);
+    const lower = new THREE.CylinderGeometry(0.6, 0.5, 0.08, 10); lower.translate(0, 0.16, 0); tabulateParts.push(lower);
+    const upper = new THREE.CylinderGeometry(0.36, 0.28, 0.07, 8); upper.translate(0.1, 0.265, -0.06); tabulateParts.push(upper); }
+  const tabulateGeo = merged(tabulateParts);
+  // Rugose: a clump of horn corals, wide calice up, narrow base down, leaning apart.
+  const rugoseParts: THREE.BufferGeometry[] = [];
+  for (let i = 0; i < 6; i++) {
+    const a = (i / 6) * TAU + rng() * 0.5, d = i === 0 ? 0 : 0.14 + rng() * 0.12, len = 0.38 + rng() * 0.17;
+    const g = new THREE.CylinderGeometry(0.11 + rng() * 0.03, 0.025, len, 6);
+    g.translate(0, len / 2, 0);
+    g.rotateX((rng() - 0.5) * 0.5); g.rotateZ((i === 0 ? 0 : 0.35 + rng() * 0.25) * (Math.cos(a) >= 0 ? -1 : 1));
+    g.translate(Math.cos(a) * d, 0, Math.sin(a) * d);
+    rugoseParts.push(g);
+  }
+  const rugoseGeo = merged(rugoseParts);
+  // Bryozoan: a flat fan in local XY: a thin sector with radial ribs and two cross arcs over it.
+  const bryoParts: THREE.BufferGeometry[] = [];
+  { const a0 = Math.PI * 0.32, a1 = Math.PI * 0.68;
+    const sector = new THREE.CircleGeometry(0.88, 7, a0, a1 - a0); sector.translate(0, 0.05, 0); bryoParts.push(sector);
+    for (let i = 0; i <= 4; i++) {
+      const a = a0 + (a1 - a0) * (i / 4), n = 0.86 + rng() * 0.06;
+      bryoParts.push(curveTube([[0, 0.02, 0], [Math.cos(a) * n * 0.5, 0.05 + Math.sin(a) * n * 0.5, 0.005], [Math.cos(a) * n, 0.05 + Math.sin(a) * n, 0]], 0.012, 3, 3));
+    }
+    for (const r of [0.45, 0.78]) {
+      const pts: number[][] = [];
+      for (let i = 0; i <= 5; i++) { const a = a0 + (a1 - a0) * (i / 5); pts.push([Math.cos(a) * r, 0.05 + Math.sin(a) * r, 0.006]); }
+      bryoParts.push(curveTube(pts, 0.009, 6, 3));
+    } }
+  const bryozoanGeo = merged(bryoParts);
+  // Reed: three stems, each with a few short fronds off the upper half.
+  const reedParts: THREE.BufferGeometry[] = [];
+  for (let i = 0; i < 3; i++) {
+    const a = (i / 3) * TAU + rng() * 0.6, b = 0.05 + rng() * 0.05, h = 1.5 + rng() * 0.3, lx = Math.cos(a), lz = Math.sin(a);
+    reedParts.push(curveTube([[lx * b, 0, lz * b], [lx * b * 2, h * 0.45, lz * b * 2], [lx * 0.14, h * 0.85, lz * 0.14], [lx * 0.2, h, lz * 0.2]], 0.02, 6, 3));
+    for (let j = 0; j < (high ? 3 : 2); j++) {
+      const f = 0.5 + j * 0.18, fa = a + 1.2 + j * 1.9, fl = 0.22 + rng() * 0.08;
+      const x0 = lx * (b * 2 + (0.14 - b * 2) * ((f - 0.45) / 0.4)), z0 = lz * (b * 2 + (0.14 - b * 2) * ((f - 0.45) / 0.4));
+      reedParts.push(curveTube([[x0, h * f, z0], [x0 + Math.cos(fa) * fl * 0.6, h * f + 0.1, z0 + Math.sin(fa) * fl * 0.6], [x0 + Math.cos(fa) * fl, h * f + 0.07, z0 + Math.sin(fa) * fl]], 0.011, 3, 3));
+    }
+  }
+  const reedGeo = merged(reedParts);
+  // Log: a trunk lying along local x with a couple of broken branch stubs.
+  const logParts: THREE.BufferGeometry[] = [];
+  { const trunk = new THREE.CylinderGeometry(0.2, 0.27, 2.6, 7); trunk.rotateZ(Math.PI / 2); trunk.translate(0, 0.24, 0);
+    const p = trunk.attributes.position as THREE.BufferAttribute;
+    for (let i = 0; i < p.count; i++) { const x = p.getX(i), y = p.getY(i), z = p.getZ(i); const k = 1 + 0.05 * Math.sin(x * 6.1 + y * 9) * Math.cos(z * 7.3); p.setXYZ(i, x, 0.24 + (y - 0.24) * k, z * k); }
+    trunk.computeVertexNormals(); logParts.push(trunk);
+    for (const [sx, rz, ry] of [[-0.7, 0.9, 0.3], [0.55, -1.1, -0.5]]) {
+      const stub = new THREE.CylinderGeometry(0.05, 0.09, 0.42, 5); stub.translate(0, 0.2, 0); stub.rotateZ(rz); stub.rotateY(ry); stub.translate(sx, 0.3, 0); logParts.push(stub);
+    } }
+  const logGeo = merged(logParts);
+
   const cushionFallback = G(sacGeo.clone()); cushionFallback.scale(1.28, .6 / 1.13, 1.28);
   const lettuceFallback = G(tuftGeo.clone()); lettuceFallback.scale(.8, .45 / .55, .8);
   const spineFallback = G(sacGeo.clone()); spineFallback.scale(1.14, 2.6 / 1.13, 1.14);
@@ -318,6 +428,9 @@ export function createSea(scene: THREE.Scene, world: WorldData, quality: Quality
     spine: { geo: spineFallback, mat: spongeMat }, glass: { geo: glassFallback, mat: spongeMat },
     vauxia: { geo: vauxiaGeo, mat: spongeMat }, sac: { geo: sacGeo, mat: spongeMat },
     choia: { geo: choiaGeo, mat: spongeMat2 }, thalli: { geo: thalliGeo, mat: algaeMat }, tuft: { geo: tuftGeo, mat: tuftMat },
+    crinoid: { geo: crinoidGeo, mat: crinoidMat }, stromatoporoid: { geo: stromGeo, mat: moundMat }, tabulate: { geo: tabulateGeo, mat: plateMat },
+    rugose: { geo: rugoseGeo, mat: coralMat }, bryozoan: { geo: bryozoanGeo, mat: fanMat }, reed: { geo: reedGeo, mat: reedMat }, log: { geo: logGeo, mat: logMat },
+    lilyColumn: { geo: lilyGeo, mat: crinoidMat }, frondTower: { geo: towerGeo, mat: reedMat },
   };
   const microGeo = G(new THREE.ConeGeometry(0.012, 0.22, 3, 1, true));
   microGeo.translate(0, 0.11, 0);
@@ -359,10 +472,11 @@ export function createSea(scene: THREE.Scene, world: WorldData, quality: Quality
     // flora was by far the most expensive thing in the frame (it is re-rendered for every viewport).
     for (const [kind, set] of Object.entries(floraSets)) {
       const items = chunk.flora.filter((f) => f.kind === kind);
-      const range = kind === 'tuft' ? 58 : kind === 'choia' ? 88 : kind === 'sac' ? 100 : kind === 'thalli' ? 100 : 125;
+      const range = kind === 'tuft' ? 58 : kind === 'choia' ? 88 : kind === 'sac' ? 100 : kind === 'thalli' ? 100
+        : kind === 'reed' ? 70 : kind === 'rugose' ? 80 : kind === 'tabulate' || kind === 'bryozoan' ? 90 : 125;
       instanced(view, `flora-${kind}`, set.geo, set.mat, items,
         (f, d) => { d.position.set(f.pos.x, f.pos.y, f.pos.z); d.rotation.set(0, f.rot, 0); d.scale.set(f.scale, f.sy, f.scale); },
-        { prop: floraProps[kind as Flora['kind']], range, maxLength: kind === 'tuft' || kind === 'lettuce' ? 7 : Infinity, color: (f) => color.fromArray(floraTint(f)),
+        { prop: floraProps[kind as Flora['kind']], range, maxLength: kind === 'tuft' || kind === 'lettuce' ? 7 : kind === 'reed' ? 9 : Infinity, color: (f) => color.fromArray(floraTint(f)),
           bend: (f, attr, i) => floraSlots.set(f, { attr, i }) });
     }
 
@@ -537,8 +651,9 @@ export function createSea(scene: THREE.Scene, world: WorldData, quality: Quality
      * big ones see far. Returns the fog density so the camera's far plane can be pulled in to match,
      * which is what actually lets distant scenery chunks be frustum-culled instead of drawn into fog.
      */
-    setViewLength(L: number, camX = 0, camZ = 0) {
+    setViewLength(L: number, camX = 0, camZ = 0, camY = 0) {
       const fog = scene.fog as THREE.FogExp2;
+      const above = camY > SURFACE_Y;
       // The biome under the camera colours the water: bright and green over the shallows, near
       // black in the basin. Weights blend, so crossing a boundary is a slow change of light.
       biomeWeights(camX, camZ, atmosW);
@@ -549,6 +664,11 @@ export function createSea(scene: THREE.Scene, world: WorldData, quality: Quality
         const a = ATMOS[b];
         tmpColor.set(a.fog); fogColor.r += tmpColor.r * w; fogColor.g += tmpColor.g * w; fogColor.b += tmpColor.b * w;
         density += a.density * w; sky += a.sky * w; sunI += a.sun * w;
+      }
+      if (above) {
+        // A leaping fish's moment above the water: air is clear, the sky is pale, the sun is full.
+        fogColor.lerp(tmpColor.setRGB(0.86, 0.92, 0.96), 0.85);
+        density *= 0.12; sky = Math.max(sky, 2.4); sunI = Math.max(sunI, 3.4);
       }
       fog.color.copy(fogColor); (scene.background as THREE.Color).copy(fogColor);
       hemi.intensity = sky; sun.intensity = sunI;
