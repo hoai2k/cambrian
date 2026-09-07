@@ -64,9 +64,9 @@ audio, palette and portrait tests cover the shared consumers. During this refact
 matches in Rise, Reef, Frenzy and Hunted produced identical serialized actor/progress/state hashes
 before and after the move; the complete creature definitions also matched exactly.
 
-## Devonian design proposal
+## Devonian natural-history and asset brief
 
-The [Devonian roster and ecosystem proposal](07-devonian-design.md) suggests 21 mobile animals,
-species-bounded growth and different roles in a persistent food web. It is design only. Its diet,
-progression, interaction geometry and regional-scenario requirements extend beyond the current
-content boundary; adding definitions alone will not implement those mechanics.
+The [Devonian creature and asset brief](07-devonian-design.md) describes 21 mobile animal subjects,
+regional environments, plants, attached organisms and geological props, together with the proposed
+images and 3D source/export deliverables. It is an art inventory with research notes; it does not
+specify gameplay or begin asset production.

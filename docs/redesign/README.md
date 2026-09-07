@@ -13,7 +13,7 @@ and the procedural environment.
 | [04 · The endless sea](04-infinite-ocean.md) | The shoreline, nine biomes banded by distance from it with danger levels and moods, chunk streaming, the teleport menu and the radar. Supersedes the bounded shelf in 01. |
 | [05 · Hiding and native combat](05-hiding-and-combat.md) | Current heavy/block mapping, Y burrowing and camouflage, energy costs, idle sinking and verification. |
 | [06 · Era content boundary](06-era-content.md) | Implemented configuration boundary for future content packs; Cambrian remains the only available era. |
-| [07 · Devonian design proposal](07-devonian-design.md) | Proposed 21-animal roster, persistent food-web roles, bounded growth, regional ecosystems and distinct locomotion. Design only. |
+| [07 · Devonian natural-history and asset brief](07-devonian-design.md) | Natural-history descriptions for 21 creatures; regional environments, plants, props, and a quantified image/3D asset inventory. No gameplay specification. |
 
 Start with the design doc if you want the game; start with the technical plan
 if you want to build it. The audit is the shared set of facts both rely on, and

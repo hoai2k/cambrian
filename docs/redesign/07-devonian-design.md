@@ -1,439 +1,398 @@
-# 07 · Devonian: a place in the food web
+# 07 · Devonian creatures, environments and asset brief
 
-**Status:** design proposal, 6 September 2026. No Devonian creatures, mechanics, maps or menu options are implemented by this document. Cambrian remains unchanged. This builds on the [era content boundary](06-era-content.md).
+**Status:** proposed natural-history and art inventory, 6 September 2026. This document describes what to depict and which images and 3D models to create. It does not specify gameplay, abilities, objectives, progression, combat or controls. No Devonian assets have been generated or integrated as part of this brief.
 
-## The pitch
+**Scope:** 21 mobile creature subjects, plus regional environments, plants, attached organisms, geological props and supporting textures. Stationary organisms are important environmental subjects, but do not count toward the 21-creature roster. The existing [era content boundary](06-era-content.md) provides a future home for the resulting assets.
 
-You are not becoming the biggest animal in the sea. You are becoming exceptionally good at being your animal.
+## 1. The visual and natural-history identity
 
-A trilobite crosses a shell-strewn clearing, gathers food under a coral ledge and finds somewhere safe to moult. Above it, a small fish escapes a hunter by cutting through a gap in the reef. Farther offshore, Dunkleosteus abandons a costly chase and follows the scent of a substantial meal. All three can have a successful run. The trilobite never graduates into the same size class as the fish overhead.
+The Devonian should read as a collection of richly differentiated aquatic worlds: armoured fishes, early sharks, ray-finned and lobe-finned fishes, shelled cephalopods, trilobites and other invertebrates; reefs with substantial skeletal structure; and, in appropriate later settings, wooded banks and submerged timber.
 
-**Recommended roster: 21 mobile animals, with 13 vertebrates and eight invertebrates.** The selection deliberately spans the Devonian rather than pretending to represent one fossil community. Regional expeditions use compatible subsets; an explicitly composite sandbox can offer the whole roster.
+Relative to the current Cambrian collection, the strongest new visual subjects are **jaws and armoured fish heads, several genuinely different fish silhouettes, chambered shells, varied reef-building organisms, and bodies at the boundary between fins and limbs**. Jawed vertebrates diversified during the Devonian, but jaws originated earlier. This is not a transition from “primitive” animals to superior ones. [NHM fish timeline](https://www.nhm.ac.uk/discover/prehistoric-fish-timeline.html)
 
-The core promise is **different lives in the same living system**. Preserve Cambrian's physical controls, readable danger and couch multiplayer. Change the reasons for moving, feeding, fighting and growing.
+A trilobite and Dunkleosteus are different-sized organisms, not the same animal at different stages. References and scale plates should preserve that distinction: centimetre-scale animals do not become metre-scale giants for visual uniformity. Use camera framing for individual portraits rather than altering anatomical proportions or implying equal real-world length.
 
-## 1. The eras should have different personalities
+Devonian is an interval, not a single place. Early Devonian Hunsrück animals, Middle Devonian lake fishes and Late Devonian Cleveland or Gogo fishes do not all belong in one documentary scene. The regional boards below are separate reference environments. Plant distributions, water chemistry and forest structure must be checked for each locality and interval.
 
-This comparison describes our game's emphasis, not a claim that Cambrian ecosystems lacked complexity or that evolution was progressing toward a superior kind of animal. Jawed vertebrates diversified extensively during the Devonian, and major fish lineages became more conspicuous. Jaws themselves originated earlier. [NHM fish timeline](https://www.nhm.ac.uk/discover/prehistoric-fish-timeline.html)
+### Evidence and interpretation
 
-| Aspect | Cambrian game today | Proposed Devonian emphasis | Consequence for play and scenery |
+- **Supported:** preserved anatomy, specimen provenance and observations directly described in cited research or collection records.
+- **Inferred:** feeding, resting posture, locomotion and soft tissue reconstructed from anatomy or related organisms. Mark these on reference boards.
+- **Artistic:** colours, patterns, lighting and most soft-surface appearance. Aim for coherent naturalistic animals without calling speculative pigmentation fossil evidence.
+
+Every final asset should have a species-level or explicitly genus-level identity, a specimen/reference list, an age/locality, a size rationale and a short uncertainty note. Retain original source files and distinguish reference photographs from newly generated illustrations. Generated images can help explore materials and appearance; they cannot serve as anatomical evidence.
+
+## 2. Creature roster overview
+
+These are **21 subjects**, not 21 already-approved reconstructions. “Occurrence anchor” names a useful starting record, not the entire range of a genus. Approximate scale language is deliberately broad until a representative species and specimen have been chosen; it is not a table of fossil maximum lengths.
+
+| ID | Subject | Occurrence anchor | Characteristic silhouette / surface |
 | --- | --- | --- | --- |
-| Emotional arc | The strange little animal becomes the monster | Learn where you belong, and prosper there | Mastery and ecological success replace a universal Apex finish |
-| Animal identity | Alien body plans and signature appendages | Contrasting propulsion, jaws, armour, shells and limbs | A fish, trilobite, sea spider and shelled cephalopod need different movement models |
-| Threat | Predominantly relative body length | Feeding compatibility, capture geometry, habitat and condition | A huge plankton feeder is not automatically a hunter of small players |
-| Space | A streamed sea organized by distance from shore | Reef architecture, water-column layers, drainage networks and seasonal refuges | Routes branch through crevices, currents, channels and shallow backwaters |
-| Resources | Food mainly drives growth | Food maintains condition and completes a species' life cycle | A safe feeding route can matter more than another kill |
-| Shoreline | A boundary to the sea | A playable interface for selected animals | Submerged timber, flooded roots and shallow channels create another movement problem |
-| Atmosphere | Discovery, pursuit, escalating power | Established abundance, specialization, and intermittent environmental stress | Calm busy reefs alternate with migration, murky water and shrinking refuges |
+| C01 | Dunkleosteus | Late Devonian, Cleveland Shale | Deep-bodied giant fish; head and trunk armour; cutting jaws |
+| C02 | Titanichthys | Late Devonian marine records, Morocco / Ohio | Giant armoured fish with broad opening and slender toothless jaws |
+| C03 | Coccosteus | Middle Devonian, Orcadian Basin | Much smaller arthrodire; armoured front and flexible tail |
+| C04 | Bothriolepis | Late Devonian Miguasha representative | Boxy antiarch armour; jointed armoured pectoral appendages |
+| C05 | Gemuendina | Early Devonian, Hunsrück | Flattened ray-like outline; upward-facing eyes; mosaic armour |
+| C06 | Doryaspis | Early Devonian, Svalbard | Jawless shielded fish; long oral projection and lateral extensions |
+| C07 | Cladoselache | Late Devonian, Cleveland Shale | Streamlined early chondrichthyan with distinctive fins and tail |
+| C08 | Stethacanthus | Late Devonian representative to verify | Spine-brush complex; unusual dorsal silhouette |
+| C09 | Cheirolepis | Middle–Late Devonian Scottish / Miguasha representatives | Early ray-finned fish; small scales, fin rays and relatively large mouth |
+| C10 | Rhinodipterus | Late Devonian, Gogo | Lungfish skull, paired fins and evidence relevant to air breathing |
+| C11 | Onychodus | Late Devonian, Gogo representative | Lobe-finned fish with distinctive paired tusk apparatus |
+| C12 | Tiktaalik | Late Devonian, Ellesmere Island | Broad flattened head, mobile neck and robust paired fins |
+| C13 | Acanthostega | Late Devonian, East Greenland | Aquatic early tetrapod; digit-bearing limbs and swimming tail |
+| C14 | Eldredgeops | Middle Devonian, North American shelf | Prominent eyes, segmented exoskeleton and enrolling body |
+| C15 | Walliserops | Devonian, Moroccan representative | Trident-bearing trilobite with elaborate rigid projections |
+| C16 | Jaekelopterus | Early Devonian, Rhineland | Large eurypterid; grasping chelicerae, walking limbs and paddles |
+| C17 | Nahecaris | Early Devonian, Hunsrück | Carapace-bearing arthropod with antennae and fine ventral appendages |
+| C18 | Furcaster | Early Devonian, Hunsrück | Brittle star with distinct central disc and articulated arms |
+| C19 | Palaeoisopus | Early Devonian, Hunsrück | Sea spider with swimming limbs and a long segmented abdomen |
+| C20 | Manticoceras | Late Devonian, Frasnian marine records | Coiled chambered shell with an incompletely known soft body |
+| C21 | Michelinoceras | Early Devonian Sardinian records | Long straight chambered shell; soft body and resting trim uncertain |
 
-Devonian reefs deserve architecture, not just a different sponge colour. The Gogo record documents a diverse fish fauna associated with an ancient reef complex. Later Devonian forests add rooted banks, woody debris and a land-to-water connection absent from our Cambrian scenery. These developments did not occur uniformly throughout the entire period. [WA Museum: Gogo](https://museum.wa.gov.au/explore/articles/gogo-fish), [Archaeopteris research](https://www.nature.com/articles/19516)
+### Images and models needed for every creature
 
-## 2. Growth ends at your species; progression continues
+The following is the standard deliverable set for **each C01–C21**, with the special anatomy requirements described below:
 
-### Life stages and condition
-
-Use **young → growing → mature**, with species-specific size curves and an adult size envelope. Mature animals continue earning mastery and reproductive success, not unlimited length. Starting age can vary by scenario; do not force every fish through a generic free-swimming larval stage when its life history is uncertain.
-
-Three separate systems replace the common scale ladder:
-
-- **Growth:** nutrition advances development within the chosen species. A trilobite remains centimetre-scale; Dunkleosteus remains metre-scale. Growth cannot change species or trophic guild.
-- **Condition:** a forgiving reserve of energy, health and, where relevant, respiratory capacity. Spending it well creates decisions; watching a hunger meter continually decay should not be the main game.
-- **Life-cycle success:** a short sequence of ecological objectives followed by a safe settlement or spawning opportunity. Exact breeding behaviour is a game abstraction unless evidenced for the selected animal.
-
-Mastery unlocks choices such as better food discrimination, improved burst efficiency, safer feeding posture or faster recovery from a failed grapple. Avoid permanent account-level combat bonuses and damage scaling that eventually lets every animal kill everything.
-
-**Do not make fish moult.** Their size change should be gradual. Arthropod ecdysis becomes a species-specific refuge event, with a brief vulnerable recovery and clear escape choices. Cephalopod shell growth and vertebrate maturation use their own presentation. Existing Cambrian growth remains available through its own rules.
-
-### Success has a comparable value, not a comparable body count
-
-A first prototype should use 8–12 minute expeditions with three objective stages and a final safe finish. Tune difficulty by time, exposure and available routes, rather than calorie totals alone.
-
-| Life | Example objective sequence | What makes it demanding |
+| Deliverable | Quantity for 21 subjects | Description |
 | --- | --- | --- |
-| Trilobite | Feed at three fresh patches → relocate across an exposed seam → complete a sheltered moult | Ground-level navigation, recognizing approaching mouths, timing exposure |
-| Midwater hunter | Find a productive school → capture suitable prey efficiently → return in good condition | Interception, bite alignment, deciding when to abandon pursuit |
-| Dunkleosteus | Locate worthwhile prey or carrion → secure enough food without exhausting reserves → retain access to a feeding area | Committed attacks, handling time, rivals and route width |
-| Titanichthys | Locate a dense plankton front → maintain an efficient feeding pass → reach the next productive water mass | Current reading, feeding speed, oxygen and long turns |
-| Shallow-water specialist | Feed in a refuge → follow a changing water connection → establish in another pool | Depth, substrate and access to breathing or escape routes |
+| Anatomical reference board | 21 boards | Side, dorsal, frontal and ventral views where evidence allows; specimen images with credits, dimensions and uncertainty labels. Missing anatomy is shown as uncertain, not quietly filled in. |
+| Appearance concept | 21 images | One naturalistic three-quarter reconstruction with a proposed material/colour treatment. At least one neutral-lighting view must remain available. |
+| Anatomy detail sheet | 21 sheets | Close-ups of the subject's important structures: jaws, mouth, limbs, eyes, armour, shell aperture or fin attachments. |
+| Original 3D source | 21 model projects | Editable high-quality source models with labelled anatomy, materials and a consistent scale convention. Preserve intermediate files. |
+| Exported creature models | 42 GLBs | One full-detail and one reduced-detail model per subject, following the repository's existing asset standards. |
+| Final specimen images | 84 PNGs | One studio render, one transparent selection portrait, one card image and one thumbnail per subject, rendered from the approved final model. |
+| Material source set | 21 sets | Source texture images and material definitions as needed; these are sets, not a fixed number of maps. Preserve fine scale, cuticle, shell and membrane detail without baking scene lighting into colour. |
 
-Give objectives ecological wording. A trilobite should not be told to slay a boss to finish its run. Optional account rewards are discoveries, appearance choices and natural-history entries, with all body types available for ordinary play.
+The three concept/reference images above may be multi-panel boards; their panels are not separate promised files. Regional colour variants, juvenile reconstructions and additional detail levels are optional additions, not silently included in these totals. Do not fabricate juvenile anatomy just by shrinking an adult.
 
-## 3. A food web instead of a universal size rule
+Rigging should preserve anatomically meaningful joints and retain the established specimen anchor conventions. Natural resting and locomotion studies can help validate the models, but action sets and gameplay animation requirements are outside this brief.
 
-Retain size and mass as physical properties. Replace “small enough means edible” with four checks:
+## 3. Creature characteristics and special asset requirements
 
-1. **Diet:** is this food the animal can use? Plankton, suspended particles, detrital patches, soft prey, shelled prey, fish flesh and carrion are separate resources.
-2. **Access:** can its mouth or appendages physically reach the target in this space?
-3. **Capture and processing:** can it hold, swallow, shear, crush or extract this target? Gape width, prey cross-section, shell shape, armour and handling time matter.
-4. **Motivation:** is the meal worth the pursuit and exposure given current condition? A hungry predator may try something an already-fed one ignores.
+### C01 · Dunkleosteus
 
-Length ratio remains a useful rough UI input, but cannot decide consumption by itself. A long narrow shell, broad armoured fish and compact trilobite with equal length are different mouthfuls.
+**Known characteristics and evidence:** armoured head and trunk, powerful gnathal cutting structures. Body proportions and feeding reconstructions continue to be revised; use a robust, deep-bodied interpretation and do not automatically inherit the familiar 8–10 m reconstruction. A recent length study estimated typical adults around 3.1–3.5 m and its largest example around 4.1 m; that is one reconstruction framework, not a universal genus maximum. [Length study](https://doi.org/10.3390/d15030318), [reconstruction study](https://www.palaeo-electronica.org/content/2024/5307-dunkleosteus-reconstruction)
 
-Example **gameplay food web**, not a claim that all these genera coexisted:
+**Reconstruction focus:** Its presence should come from the depth of the torso, the articulated head armour and the shape of the gnathal cutting structures, rather than a stretched shark silhouette. Unarmoured rear-body reconstruction needs particular care.
 
-| Resource or encounter | Actors that benefit | Players' decision |
+**Additional image/model requirements:** Profile and frontal scale study; open/closed jaw detail; armour-to-skin transition. Build head, jaws and torso with anatomically consistent proportions. Keep a size-comparison plate separate from its portrait.
+
+### C02 · Titanichthys
+
+**Known characteristics and evidence:** giant placoderm with slender, toothless lower jaws. Biomechanical work supports suspension feeding, but a filtering apparatus has not been directly preserved. [Coatham et al.](https://pmc.ncbi.nlm.nih.gov/articles/PMC7277245/)
+
+**Reconstruction focus:** The contrast with Dunkleosteus is anatomical as well as dietary: its jaw form is not a duplicate cutting apparatus. Its gigantic body and broad feeding opening are visually important, while any detailed internal filter reconstruction remains conjectural.
+
+**Additional image/model requirements:** Mouth-aperture and lower-jaw board; full-body proportion alternatives marked by confidence. A source model with a carefully resolved oral cavity; no invented baleen presented as preserved anatomy.
+
+### C03 · Coccosteus
+
+**Known characteristics and evidence:** a smaller arthrodire known from Middle Devonian Scottish fish assemblages. [National Museums Scotland collection review](https://files.nms.ac.uk/production/Documents/Our-Impact/Collections-reviews/Fossil-collections/fossil-review-complete-_review-of-fossil-collections-in-scotland.pdf?dm=1736434705)
+
+**Reconstruction focus:** A smaller arthrodire is valuable as a reference for a more completely understood armoured-fish body plan. It should have its own armour arrangement, head shape and body proportions rather than being a reduced Dunkleosteus model.
+
+**Additional image/model requirements:** Specimen-based side and dorsal views; armour plate boundaries; fin positions and tail outline. A separate model and texture treatment, not a scaled copy of C01.
+
+### C04 · Bothriolepis
+
+**Known characteristics and evidence:** antiarch with a box-like armoured body and jointed armoured pectoral appendages. Bothriolepis canadensis is part of the Miguasha fish collection; detailed diet and locomotion remain reconstruction questions. [Québec collection record](https://www.patrimoine-culturel.gouv.qc.ca/rpcq/detail.do?id=93118&methode=consulter&type=bien)
+
+**Reconstruction focus:** Its enclosed armoured front body and unusual pectoral appendages distinguish it immediately from conventional fish. The appendages are derived fins; describing them as proven terrestrial walking legs would overstate the evidence.
+
+**Additional image/model requirements:** Dorsal and underside armour layouts; joint sequence of both pectoral appendages; small mouth and tail attachment. Model the appendage articulation and shield openings explicitly.
+
+### C05 · Gemuendina
+
+**Known characteristics and evidence:** flattened rhenanid placoderm, superficially ray-like, with upward-facing eyes and a mouth placement that has supported an upward-feeding interpretation. It is not a ray. [Hunsrück review](https://onlinelibrary.wiley.com/doi/full/10.1111/gto.12426)
+
+**Reconstruction focus:** The flattened outline resembles a ray by convergence, but the upward-oriented head features and small armour elements are especially important. Avoid importing a modern ray’s underside mouth or sting.
+
+**Additional image/model requirements:** Top and front views; mosaic armour close-up; mouth/eye orientation; fin-to-body transition. Build a low, broad model with distinguishable armour elements and flexible margins.
+
+### C06 · Doryaspis
+
+**Known characteristics and evidence:** heterostracan with a conspicuous oral projection and laterally extended shield; material from Svalbard includes caudal anatomy. The projection's exact function and diet should remain explicit uncertainties. [Genus revision](https://www.tandfonline.com/doi/abs/10.1671/0272-4634%282002%29022%5B0735%3ATGDWHF%5D2.0.CO%3B2)
+
+**Reconstruction focus:** The shield, lateral extensions and long oral projection form an unusual jawless-fish outline. The projection is not evidence for swordfish-like hunting, and its function should remain unresolved on the board.
+
+**Additional image/model requirements:** Exact projection and mouth relationship; shield cross-section; tail-fin reconstruction. A rigid-front/flexible-tail source model with no fabricated hinged biting jaw.
+
+### C07 · Cladoselache
+
+**Known characteristics and evidence:** early shark-like chondrichthyan from the Cleveland Shale fauna, with unusually informative preservation among the local fishes. [Cleveland Museum ecosystem project](https://www.cmnh.org/science-conservation/areas-of-study/earth-sciences/projects/saving-a-lost-ecosystem), [Case Western specimen collection](https://caslabs.case.edu/hyde-collection/hyde-collection/)
+
+**Reconstruction focus:** Use its own head, fin placements and caudal outline. An extant shark model is useful only for broad comparative context, not as a substitute for the fossil anatomy. Skin coverage and fin details should follow the selected specimen.
+
+**Additional image/model requirements:** Lateral body outline, fin-ray/spine evidence and caudal-fin board; oral detail. A streamlined model with restrained soft-surface detail rather than generic modern shark textures.
+
+### C08 · Stethacanthus
+
+**Known characteristics and evidence:** the distinctive spine-brush complex gives a strong silhouette. The genus spans the Devonian–Carboniferous in the literature; function and reconstruction of the complex require care. Select a demonstrably Devonian specimen before authoring, and do not substitute a Carboniferous Akmonistion model. [Braincase study](https://www.cambridge.org/core/journals/earth-and-environmental-science-transactions-of-the-royal-society-of-edinburgh/article/abs/braincase-of-a-primitive-shark/E11D5DAAAFE25E9196D17BC1C4CCBD9C), [spine-brush anatomy study](https://www.tandfonline.com/doi/abs/10.1080/02724634.1984.10012016)
+
+**Reconstruction focus:** The spine-brush is the central visual feature, but its anatomy, distribution and biological function need to be separated. Do not automatically claim a defensive purpose or apply a sex-specific interpretation beyond what the selected material supports.
+
+**Additional image/model requirements:** Devonian provenance sheet before any concept approval; dorsal complex from several angles; pectoral and pelvic anatomy. No substitution of a better-known Carboniferous Akmonistion reconstruction.
+
+### C09 · Cheirolepis
+
+**Known characteristics and evidence:** early ray-finned fish represented in Devonian Scottish and Miguasha assemblages. [Miguasha nomination dossier](https://whc.unesco.org/uploads/nominations/686rev.pdf)
+
+**Reconstruction focus:** A recognizably early ray-finned fish should show the relationship between its small scales, fin rays, mouth and unequal-lobed tail. The chosen Scottish or Miguasha species should remain consistent across the entire model.
+
+**Additional image/model requirements:** Scale field and ray arrangement; gape/head profile; tail outline. Fine surface breakup must remain readable without making every scale a raised plate.
+
+### C10 · Rhinodipterus
+
+**Known characteristics and evidence:** marine Devonian lungfish from Gogo with anatomical evidence interpreted as air-breathing adaptation. This is a stronger foundation for a respiratory mechanic than assigning modern lungfish abilities to every Devonian lungfish. [Air-breathing study](https://pmc.ncbi.nlm.nih.gov/articles/PMC2936207/)
+
+**Reconstruction focus:** Air-breathing-related cranial evidence makes this a useful lungfish subject, but it does not establish every behaviour of living lungfish. Whole-body and fin reconstructions need their own evidence, particularly where material is mainly cranial.
+
+**Additional image/model requirements:** Skull and palate board; clearly labelled comparative body reconstruction; external mouth/throat study. No mud cocoon, terrestrial posture or assumed aestivation scene in the required assets.
+
+### C11 · Onychodus
+
+**Known characteristics and evidence:** distinctive tusk apparatus and a predatory interpretation supported by a Gogo specimen associated with arthrodire prey. [WA Museum predation paper](https://museum.wa.gov.au/research/records-supplements/records/arthrodire-predation-oncychodus-pisces-crossopterygii-late-devo)
+
+**Reconstruction focus:** The paired tusk apparatus and its relationship to the lower jaw require anatomical reference, not fantasy fang placement. The Gogo representative provides a strong basis for a distinctive lobe-finned fish.
+
+**Additional image/model requirements:** Open/closed mouth study with tusk placement; head proportions; paired fins. The model should make the oral anatomy inspectable and distinguish it from ordinary marginal teeth.
+
+### C12 · Tiktaalik
+
+**Known characteristics and evidence:** flattened head, mobile neck and robust paired-fin skeleton. Recent work supports body support and movement in shallow water; ordinary terrestrial walking should not be assumed. [University of Chicago, 2024](https://biologicalsciences.uchicago.edu/news/how-change-hips-led-evolution-walking)
+
+**Reconstruction focus:** Its broad head, separation of head and shoulder region, scales and robust fins should all remain visible. The fin skeleton is neither a modern fish fin nor a completed digit-bearing limb.
+
+**Additional image/model requirements:** Dorsal skull and neck region; paired-fin skeletal overlay; buoyancy-supported shallow-water reconstruction. Build the fin attachments and body support proportions conservatively.
+
+### C13 · Acanthostega
+
+**Known characteristics and evidence:** early tetrapod with digit-bearing limbs and strongly aquatic anatomy. Histological study indicates a long aquatic juvenile phase; known growth history is incomplete. [Sanchez et al.](https://www.nature.com/articles/nature19354)
+
+**Reconstruction focus:** A tail suited to swimming, splayed limbs and an eight-digit reconstruction distinguish it from Tiktaalik. The known sample’s age structure complicates a confident generic adult depiction.
+
+**Additional image/model requirements:** Digit count and limb proportions; tail-fin outline; representative specimen age note. Source model should avoid a modern salamander body or unsupported upright terrestrial stance.
+
+### C14 · Eldredgeops
+
+**Known characteristics and evidence:** familiar phacopid trilobite, often encountered under the older name Phacops rana, with prominent eyes and an enrolling body. Middle Devonian North American material provides a good recognizable representative. [Devonian Atlas](https://devonianatlas.org/species/eldredgeops-rana/)
+
+**Reconstruction focus:** Prominent compound eyes, a strongly segmented dorsal exoskeleton and the geometry of enrollment are defining subjects. Ventrally preserved anatomy may need comparative reconstruction and should be identified as such.
+
+**Additional image/model requirements:** Eye close-up, dorsal segmentation, underside appendage study and enrolled profile. Create one coherent model that can be inspected in extended and enrolled poses.
+
+### C15 · Walliserops
+
+**Known characteristics and evidence:** trident-bearing trilobite. A study supports intraspecific combat as a possible function, while later modelling has proposed hydrodynamic alternatives. The function is not settled. [Combat hypothesis](https://pmc.ncbi.nlm.nih.gov/articles/PMC9942788/), [alternative hydrodynamic preprint](https://arxiv.org/abs/2506.15922)
+
+**Reconstruction focus:** The long cephalic trident and other projections need exact three-dimensional treatment. Their shape should not be simplified into a generic horn, and the proposed functions should not be baked into the natural-history description as certainty.
+
+**Additional image/model requirements:** Trident front/side/top studies; spine-root attachment detail; underside reconstruction. Provide a source model with intact, physically plausible projections and a silhouette-preserving reduced model.
+
+### C16 · Jaekelopterus
+
+**Known characteristics and evidence:** eurypterid with enlarged prey-catching chelicerae. The famous roughly 2.5 m estimate for J. rhenaniae is extrapolated from an isolated claw, not a complete giant body. Its Early Devonian occurrence must not be silently mixed into a Late Devonian Cleveland ecosystem. [Braddy et al.](https://pmc.ncbi.nlm.nih.gov/articles/PMC2412931/)
+
+**Reconstruction focus:** The large chelicerae, several different limb functions, broad paddles and segmented trunk distinguish this eurypterid from both trilobites and modern scorpions. It should not receive an invented venomous sting.
+
+**Additional image/model requirements:** Scale-estimate board distinguishing the preserved claw from the reconstructed body; cheliceral denticles; walking-limb and paddle anatomy. Articulate paired appendages independently.
+
+### C17 · Nahecaris
+
+**Known characteristics and evidence:** mobile crustacean-grade arthropod from the exceptionally preserved Hunsrück fauna. Fine feeding behaviour needs review rather than a direct copy of modern shrimp. [Hunsrück arthropod ecology review](https://pubmed.ncbi.nlm.nih.gov/26826500/)
+
+**Reconstruction focus:** Its fine appendages and carapace need to remain visible under neutral lighting. A modern decapod shrimp is not a sufficient template; the fossil limb arrangement should determine the reconstruction.
+
+**Additional image/model requirements:** Carapace and abdomen outline; antenna attachment; ventral limb board. Detailed source model with careful handling of fine appendages in the reduced export.
+
+### C18 · Furcaster
+
+**Known characteristics and evidence:** Devonian brittle star; reconstructed arm skeletons provide evidence relevant to locomotion. Fossil arm construction should guide the gait rather than assuming every detail of a living brittle star. [Locomotion study](https://rvc-repository.worktribe.com/output/1549616/three-dimensional-visualization-as-a-tool-for-interpreting-locomotion-strategies-in-ophiuroids-from-the-devonian-hunsruck-slate)
+
+**Reconstruction focus:** The central disc, arm segmentation and associated spines or plates should follow the selected fossil form. Arm arrangement and flexibility should not simply be copied from any living brittle star.
+
+**Additional image/model requirements:** Dorsal and oral-side disc views; arm-joint close-up; neutral spread and curved-arm poses. Keep the disc and arm bases legible in the source and reduced models.
+
+### C19 · Palaeoisopus
+
+**Known characteristics and evidence:** fossil sea spider with a segmented abdomen and swimming-adapted limbs. Predation on crinoids is an interpretation rather than observed behaviour. [Hunsrück review](https://onlinelibrary.wiley.com/doi/full/10.1111/gto.12426)
+
+**Reconstruction focus:** The segmented abdomen and differing swimming-limb proportions separate it from an ordinary modern sea spider. The crinoid-feeding interpretation can be mentioned in notes, but is not a directly observed association to reproduce without qualification.
+
+**Additional image/model requirements:** Complete appendage inventory; abdomen and anterior-body detail; swimming-limb outline. The model must retain the abdomen and fossil limb proportions rather than using a tiny-bodied modern pycnogonid template.
+
+### C20 · Manticoceras
+
+**Known characteristics and evidence:** Devonian ammonoid with a coiled chambered shell. Shells provide much firmer evidence than soft-body details; avoid presenting a modern nautilus' arm count as established ammonoid anatomy. [Museums Victoria specimen](https://collections.museumsvictoria.com.au/specimens/508262)
+
+**Reconstruction focus:** Shell coiling, whorl expansion, aperture and surface sculpture are the strongest reconstruction constraints. Soft appendages are much less securely known. Internal sutures exposed by a fossil should not automatically become painted external markings on a living shell.
+
+**Additional image/model requirements:** Side and aperture views; shell-section reference kept separate from living appearance; labelled soft-body alternatives. One rigid shell and a conservative editable soft-body reconstruction.
+
+### C21 · Michelinoceras
+
+**Known characteristics and evidence:** orthoconic cephalopod representative; Devonian occurrences exist, but this broad genus needs a specific vetted Devonian species and specimen before modelling. A generic shop fossil labelled “Orthoceras” is not an adequate reference. [Devonian cephalopod study](https://www.paleoitalia.it/wp-content/uploads/2023/06/05_Gnoli.pdf)
+
+**Reconstruction focus:** A long orthoconic shell requires a coherent taper, aperture and chambered internal reference. A fragment does not establish total living length or resting orientation. The genus should not be treated as a synonym for any straight fossil cephalopod.
+
+**Additional image/model requirements:** Chosen Devonian specimen/species sheet; shell taper and aperture board; uncertainty-labelled soft-body and trim studies. One straight-shell model with a restrained living reconstruction; optional cutaway belongs in reference art, not the default exterior.
+
+## 4. Regional environment images
+
+Create **nine landscape reference/concept boards**, E01–E09. Each board should show an establishing view, a close view of substrate/vegetation, a light-and-water study and a locality/age label. These are separate environments, not nine neighbouring zones in one historically continuous location. Exact animal lists remain subject to local occurrence checks.
+
+| ID | Environment board | What the image should contain | Model families needed |
+| --- | --- | --- | --- |
+| E01 | Early Devonian Hunsrück marine mud shelf | Fine sediment, scattered living echinoderms and arthropods, crinoid stands, suspended particles; a relatively subdued marine palette | Mud substrate, low outcrops, crinoids, shell debris, restrained algae |
+| E02 | Moroccan Devonian shelf | A researched Walliserops-bearing interval; carbonate substrate, shell accumulations and locally appropriate attached organisms | Carbonate outcrops, shell pavement, selected coral/sponge forms; no automatic Late Devonian fish assemblage |
+| E03 | Middle Devonian Orcadian lake | Lake water, fine sediment and rocky margins; shoreline vegetation based on the selected age/locality | Lake sediment, rock margins, coarse and fine bed material; vegetation only after locality review |
+| E04 | Late Devonian Gogo reef system | Substantial reef framework, open water around its margins, living surfaces and deeper adjacent water | Stromatoporoid growth forms, regionally appropriate corals/algae, carbonate framework and rubble |
+| E05 | Late Devonian Miguasha waterway | Sediment-rich water, shore/bank section and a regionally researched terrestrial backdrop | Fine sediment, bank modules, appropriately sourced plant debris and shoreline vegetation |
+| E06 | Latest Devonian Cleveland offshore sea | Open marine water, distant silhouettes and a subdued soft-bottom view; not a dense tropical coral garden | Fine bottom sediment, sparse local benthos, suspended-particle material and optional organic remains |
+| E07 | Late Devonian Ellesmere waterway | Broad shallow channel, fine sediment, submerged banks and woody material appropriate to the Tiktaalik setting | Channel bed, bank faces, submerged branches and logs; reviewed plants |
+| E08 | Late Devonian East Greenland waterway | Separate Acanthostega-associated floodplain/water-body interpretation, with its own sediment and vegetation board | Shallow-water substrate, banks, woody debris and locally appropriate vegetation |
+| E09 | Early Devonian Svalbard water bodies | A researched Wood Bay Formation setting for Doryaspis; shoreline and sediment treatment distinct from later wooded environments | Fine/coarse substrate, low banks and cautiously selected early vegetation |
+
+The Gogo and Cleveland museum records support very different aquatic settings, even though both contain striking fishes. Hunsrück is especially valuable for invertebrate anatomy and diversity. [WA Museum: Gogo](https://museum.wa.gov.au/explore/articles/gogo-fish), [Cleveland Museum ecosystem project](https://www.cmnh.org/science-conservation/areas-of-study/earth-sciences/projects/saving-a-lost-ecosystem), [Hunsrück ecology review](https://pubmed.ncbi.nlm.nih.gov/26826500/)
+
+A fossil deposit is not a literal living surface. Hunsrück organisms should not be metallic gold because their fossils are pyritized, nor should their seabed consist of quarried slate slabs. Likewise, modern desert exposure of Devonian rocks does not establish a desert shoreline in the original marine setting. Distinguish the living community from its burial environment and its much later preservation.
+
+Titanichthys, Manticoceras and Michelinoceras need a final species/locality assignment before appearing in an environment reconstruction. Occurrence in the Devonian alone does not justify putting them in every marine board.
+
+## 5. Attached organisms and smaller biological props
+
+These are **12 proposed 3D model families**, B01–B12, separate from the mobile creature roster. Each needs a small reference/appearance board and one editable source family. Variant counts below are initial art targets, not claims about the number of species. A named genus is a reference candidate until locality and age are confirmed.
+
+| ID | Model family | Characteristics to depict | Initial variants / companion images |
+| --- | --- | --- | --- |
+| B01 | Massive stromatoporoid sponge | Low-domed to irregular skeletal growth; living surface distinct from a cut fossil section | Three silhouettes: low mound, taller dome, irregular fused-looking mass; surface detail sheet |
+| B02 | Branching stromatoporoid form | Slender branching growth, with Amphipora-type forms considered only where regionally appropriate | Two colony densities; branch close-up |
+| B03 | Encrusting stromatoporoid | Thin to layered growth conforming to an underlying surface | Two patches; edge and living-surface studies |
+| B04 | Massive tabulate coral | Dense small corallites; honeycomb-like Favosites-type architecture after local review | Small and large colonies; close-up separating polyp reconstruction from exposed skeleton |
+| B05 | Branching tabulate coral | Delicate branching skeletal framework, distinct from a modern reef coral template | Two branch patterns; colony silhouette and corallite detail |
+| B06 | Solitary rugose coral | Horn-shaped skeleton and living oral surface; septa belong to the skeletal reference | Upright and inclined forms; living-versus-skeletal comparison |
+| B07 | Colonial rugose coral | Multiple connected corallites in a researched Devonian colony form | Compact and open arrangements; colony section reference |
+| B08 | Stalked crinoid | Jointed stem, attachment, cup and branching feeding arms | Three heights/poses from one vetted anatomical family; crown and stem detail |
+| B09 | Brachiopod bed | Pedicle/brachial valve relationship, shell ribs/folds and an appropriate attachment interpretation | Two researched shell forms, plus sparse/dense arrangements; avoid treating them as generic clams |
+| B10 | Bryozoan colony | Small repeated zooid structures; encrusting or branching form chosen from local fossils | Two growth forms only if supported locally; macro texture reference |
+| B11 | Small gastropod shells | Vetted Devonian shell forms with coherent aperture and coiling | Two shell forms, living soft parts optional and separately labelled; empty-shell variants |
+| B12 | Small bivalves | Paired left/right valves, hinge and locally appropriate shell outlines | Two shell forms and an open empty shell; living tissue only with reviewed reconstruction |
+
+Stromatoporoids are sponge fossils, not stromatolites; the latter are sedimentary structures associated with microbial mats. Keep them distinct in names, source folders and appearance. Devonian brachiopods, corals, molluscs and crinoids provide a substantial reference base, but a locality-specific assemblage still needs curation. [Digital Atlas: stromatoporoids](https://www.digitalatlasofancientlife.org/learn/porifera/stromatoporoidea/), [Humboldt museum Devonian exhibit](https://natmus.humboldt.edu/exhibits/life-through-time/visual-timeline/devonian-period)
+
+Do not cover every colony with modern-looking colourful polyps by default. Living soft surfaces are often less constrained than the skeleton. Produce a neutral anatomical reconstruction first, then colour studies marked as interpretation.
+
+## 6. Plants and algae
+
+Create **five source model families**, P01–P05, each with its own botanical/algal reference board and appearance study. These do not all belong together. Marine algae, early terrestrial vegetation and later forest trees should have separate source collections and regional tags.
+
+| ID | Subject family | Characteristics | Required images and 3D parts |
+| --- | --- | --- | --- |
+| P01 | Rhynia-type early land vegetation | Small leafless branching axes with terminal reproductive structures; an Early Devonian Rhynie reference, not universal shoreline grass | Whole plant and sporangium board; single plant, small cluster and sparse patch. Place only in a justified early terrestrial setting. |
+| P02 | Asteroxylon | Early lycophyte with small leaf-like appendages and a distinctive branching/rooting organization | Reference reconstruction, close-up of shoot appendages and basal system; individual and cluster models. Do not enlarge it into a later giant lycopsid tree. |
+| P03 | Cladoxylopsid tree family | Devonian tree architecture with characteristic trunk/base and a branching crown; not a modern palm or generic tree fern | Whole tree, crown and base studies; two tree proportions, a juvenile/reduced form only if supported, and detached crown/branch material. Select a named regional reconstruction first. |
+| P04 | Archaeopteris | Later Devonian woody tree with fern-like foliage; a spore-bearing plant, not a flowering tree | Whole-tree silhouette, branch/foliage and rooting boards; two tree forms, branch modules and deadwood derived from the same anatomy. |
+| P05 | Marine algal thalli | Conservatively reconstructed sheet, tuft or branching forms tied to marine evidence | Submerged appearance board; two modest thallus forms. No default kelp forest, seagrass blades or rooted aquatic flowering plants. |
+
+Rhynie studies provide unusually detailed early plant anatomy, including life stages that should not be casually combined into one invented plant. Middle Devonian forest reconstructions and later Archaeopteris forests supply different structures and regional contexts. [Rhynie plant anatomy](https://pmc.ncbi.nlm.nih.gov/articles/PMC5745331/), [National Museums Scotland: Asteroxylon reconstruction reference](https://www.nms.ac.uk/profile/dr-sandy-hetherington), [Middle Devonian forest ecosystem](https://pmc.ncbi.nlm.nih.gov/articles/PMC8409631/), [Archaeopteris study](https://www.nature.com/articles/19516)
+
+P01 and P02 are research-backed additions to the broader Devonian asset library, not a claim that Rhynie vegetation grew at each of the nine illustrated sites. If none of the selected regional scenes justifies them, keep their production after the plants required for those scenes.
+
+**Ground-cover images rather than extra tree models:** microbial films, thin algal coatings, sediment trapped around stems and small organic fragments. Treat these as material/decal studies; avoid introducing modern moss lawns or flowering meadow plants without evidence. Fungal-looking structures and Prototaxites-like forms are optional research subjects, not required props or a basis for filling every landscape with mushrooms.
+
+## 7. Geological and organic prop models
+
+Create **12 reusable model families**, G01–G12. Each family needs an appearance/reference board and several shape variants where indicated. Name assets for the material and form rather than for their role in a future game.
+
+| ID | Model family | Needed shapes and detail |
 | --- | --- | --- |
-| Fine particles and detrital patches | Doryaspis, Bothriolepis, Eldredgeops and Furcaster under their proposed diets | Safe slow feeding versus richer exposed patches |
-| Moving plankton fronts | Titanichthys | Follow density and current, not fleeing animals |
-| Small mobile invertebrates | Nahecaris, Gemuendina, small fishes and cephalopods | Search structure, expose a mouth, handle the catch |
-| Small fishes | Cheirolepis, Cladoselache, Onychodus and larger predators | Intercept or ambush instead of vacuuming a school on contact |
-| Large prey or substantial carrion | Dunkleosteus | Spend energy on a meaningful meal; tiny prey cannot sustain it efficiently |
-| Crinoid patches | Palaeoisopus under an explicitly inferred feeding interpretation | Climb exposed structure, feed briefly, move before detection |
-| Carcass fragments | Appropriate scavengers, including several small animals | A large predator's meal creates a timed opportunity for smaller lives |
+| G01 | Carbonate outcrop | Low slab, irregular mound and vertical face; natural fractures and submerged weathering |
+| G02 | Reef framework section | Freestanding buttress, overhanging section and low shelf; texture and structure compatible with the chosen reef builders |
+| G03 | Carbonate rubble | Several angular and rounded fragments; exposed interiors differentiated from living surfaces |
+| G04 | Fine-sediment bed | Low-relief rippled patch, smoother patch and irregular depositional surface; predominantly material-driven detail |
+| G05 | Sand-and-pebble bed | Two grain-size mixes and scattered stones, with scale appropriate to the region |
+| G06 | Eroded bank / channel margin | Sloped bank, shallow undercut and exposed sediment face; rooted and unrooted versions kept separate |
+| G07 | Large rock / boulder | Three locally plausible shapes; mineral/grain texture varies by environment rather than universally using the Cambrian rock material |
+| G08 | Shell-hash cluster | Broken brachiopod, bivalve and cephalopod shell fragments derived from approved shell models |
+| G09 | Crinoid debris | Disarticulated columnals, short stem lengths and occasional cup fragments, anatomically derived from B08 |
+| G10 | Submerged log / woody branch | Intact, broken and partly buried forms; derived from approved later Devonian trees |
+| G11 | Exposed root / root-bearing bank | Roots with plausible attachment and branching, matched to P03 or P04; no generic mangrove prop |
+| G12 | Organic remains | Optional fish remains or an empty arthropod exuvia, derived from approved creature anatomy; fresh, exposed and sediment-covered appearance studies |
 
-No default ambient animal should pursue players forever because it is larger. Titanichthys does not swallow a player just because that player fits inside its open mouth: its feeding interaction samples the configured particle resource. Conversely, shell protection is not immunity to a predator equipped to process it.
+These props should have scale references in their boards: shell hash is not a field of giant bivalve shells, and tiny crinoid columnals should not become boulders. G08, G09 and G12 reuse approved anatomy instead of introducing unrelated generic bones or shells. G10 and G11 belong only in settings with appropriate woody vegetation.
 
-Use threat labels such as **hunting you**, **can crack your shell**, **cannot reach this refuge** and **passing through**. These can accompany a compact colour/icon vocabulary; no spreadsheet should be required during a chase.
+## 8. Texture, material and atmosphere images
 
-## 4. Playing a fish versus playing a trilobite
+These are supporting asset sets, separate from the 21 creature material sets.
 
-| System | Dunkleosteus | Eldredgeops |
+### T01–T10: ten environment material studies and source sets
+
+| ID | Material | Source images needed |
 | --- | --- | --- |
-| World perception | Distant routes, sizeable prey, passing silhouettes | Nearby cracks, foot placement, moving shadows and mouth approaches |
-| Locomotion | Tail-driven acceleration, banking, fin braking and committed turns | Alternating leg waves, traction, ledge transitions and rapid local pivoting |
-| Attack | Place the jaw opening around a target; commit to a bite and process the catch | Small food handling; defensive posture and escape against large fish |
-| Defence | Present armoured surfaces, turn away, avoid a second attacker during recovery | Enrol or wedge under cover; protection buys time but does not defeat a crushing bite |
-| Growth | Gradual fish maturation within a large-bodied species | Intermittent moulting within a small-bodied species |
-| Route cost | Turning space and depth; cannot push its head into every feeding crevice | Exposure and surface continuity; cannot cross open water as if it were a fish |
-| Good five-minute story | Follow a school, reject an unprofitable chase, contest a carcass, recover | Leave cover at the right moment, gather food, survive a pass, find a moult refuge |
-| Bad design to avoid | A fast shark with extra hit points | A miniature tank expected to chip a giant fish to death |
-
-Both remain active and skilful. Small-animal play needs frequent meaningful choices and short travel routes, not real-time hours of crawling. Compress travel time where necessary while preserving relative body sizes and recognizable gait.
-
-Cameras must support the actual size spread. Give each player a body-relative camera, near-plane settings and readable target markers. A tiny teammate can have a world marker without receiving an enlarged physical collision body. Keep micro-refuges collidable at the close player view and ensure they survive scenery LOD changes.
-
-## 5. Suggested roster: 21 distinct lives
-
-**Reading the roster:** the time/locality column is an occurrence anchor, not the complete range of a genus. Size classes are art and gameplay categories, not finalized fossil measurements: **tiny/small** is centimetres to a few decimetres; **medium** is several decimetres to roughly a metre; **large** is metre-scale; **giant** is several metres. Individual species and specimens must be selected before numerical body lengths are committed. Soft tissue, colour, exact locomotor performance and cooldowns are interpretive.
-
-All feeding rules, abilities, benefits and counters below are **proposed game mechanics**. Fossil-backed features and unresolved reconstructions are identified separately. No stationary animals occupy playable slots.
-
-| # | Animal | Occurrence anchor | Size class | Distinct role |
-| --- | --- | --- | --- | --- |
-| 1 | Dunkleosteus | Late Devonian, Cleveland Shale | Giant | Committed large-prey hunter |
-| 2 | Titanichthys | Late Devonian, marine Morocco / Ohio records | Giant | Migrating suspension feeder |
-| 3 | Coccosteus | Middle Devonian, Orcadian Basin | Medium | Armoured close-range fish duelist |
-| 4 | Bothriolepis | Late Devonian, Miguasha representative | Small–medium | Armoured bottom forager |
-| 5 | Gemuendina | Early Devonian, Hunsrück marine basin | Small–medium | Flat-bodied upward ambusher |
-| 6 | Doryaspis | Early Devonian, Svalbard | Small | Jawless current-feeding specialist |
-| 7 | Cladoselache | Late Devonian, Cleveland Shale | Large | Open-water interceptor |
-| 8 | Stethacanthus | Late Devonian representative; specimen gate required | Small–medium | Close-range display and disengagement specialist |
-| 9 | Cheirolepis | Middle–Late Devonian; Scottish / Miguasha representatives | Medium | Precise small-fish hunter |
-| 10 | Rhinodipterus | Late Devonian, Gogo marine lungfish | Medium | Surface-access and respiratory specialist |
-| 11 | Onychodus | Late Devonian, Gogo representative | Medium–large | Tusked ambush and prey retention |
-| 12 | Tiktaalik | Late Devonian, Ellesmere Island waterways | Large | Shallow-water bracing and channel crossing |
-| 13 | Acanthostega | Late Devonian, East Greenland | Medium | Aquatic limb-assisted manoeuvring |
-| 14 | Eldredgeops | Middle Devonian, North American shelf | Tiny–small | Enrolling crevice forager |
-| 15 | Walliserops | Devonian, Moroccan representative | Tiny–small | Trident contests and displacement |
-| 16 | Jaekelopterus | Early Devonian, Rhineland water bodies | Large | Grasping arthropod predator |
-| 17 | Nahecaris | Early Devonian, Hunsrück | Small | Antenna-led scavenger and short swimmer |
-| 18 | Furcaster | Early Devonian, Hunsrück | Small | Radial rubble runner |
-| 19 | Palaeoisopus | Early Devonian, Hunsrück | Small | Swimming sea spider and structure raider |
-| 20 | Manticoceras | Late Devonian, Frasnian marine records | Medium | Coiled-shell jet manoeuvring |
-| 21 | Michelinoceras | Early Devonian Sardinian records; specimen gate required | Medium | Straight-shell trim and retreat specialist |
-
-### 1. Dunkleosteus — commit to the bite
-
-**Basis:** armoured head and trunk, powerful gnathal cutting structures. Body proportions and feeding reconstructions continue to be revised; use a robust, deep-bodied interpretation and do not automatically inherit the familiar 8–10 m reconstruction. A recent length study estimated typical adults around 3.1–3.5 m and its largest example around 4.1 m; that is one reconstruction framework, not a universal genus maximum. [Length study](https://doi.org/10.3390/d15030318), [reconstruction study](https://www.palaeo-electronica.org/content/2024/5307-dunkleosteus-reconstruction)
-
-**Play:** a slow commitment into a very consequential bite, followed by prey handling and recovery. “Shearing bite” processes substantial prey or opens a carcass. Armour protects particular surfaces; turning radius and feeding exposure are its costs. Preserve the terror of its silhouette without giving it effortless pursuit, perfect turning and crushing power simultaneously.
-
-**Art/animation:** heavy tail strokes, visibly coordinated head/jaw motion, fin braking and a clear bite wind-up. Full body and feeding geometry need specimen review; recent work also challenges the familiar strong-suction interpretation, so the prototype should emphasize bite placement. [Jaw-mechanics study](https://doi.org/10.1002/ar.70075) Its mastery is choosing a profitable fight, not grinding small players.
-
-### 2. Titanichthys — enormous without being an apex hunter
-
-**Basis:** giant placoderm with slender, toothless lower jaws. Biomechanical work supports suspension feeding, but a filtering apparatus has not been directly preserved. [Coatham et al.](https://pmc.ncbi.nlm.nih.gov/articles/PMC7277245/)
-
-**Play:** “Open-water sieve” feeds while maintaining an efficient speed through dense particle bands. Turning too sharply or sprinting sacrifices filtration. Migration and locating productive water are its objectives; low-density water is the main pressure. Its mass can displace animals, but offensive predation is unavailable.
-
-**Art/animation:** continuous low-frequency propulsion, broad mouth opening and a restrained particle trail. Do not invent baleen as established anatomy. This slot is essential: it proves that size no longer predicts trophic rank.
-
-### 3. Coccosteus — the armoured duelist
-
-**Basis:** a smaller arthrodire known from Middle Devonian Scottish fish assemblages. [National Museums Scotland collection review](https://files.nms.ac.uk/production/Documents/Our-Impact/Collections-reviews/Fossil-collections/fossil-review-complete-_review-of-fossil-collections-in-scotland.pdf?dm=1736434705)
-
-**Play:** “Brace and snap” briefly presents head armour, then delivers a short counter-bite. It fights appropriate fish close to cover and feeds on smaller prey. It wins by positioning within tight spaces rather than by becoming a scaled-down copy of Dunkleosteus. Exposed flanks and repeated missed counters are punishable.
-
-**Art/animation:** pronounced front-body armour with a flexible tail, tight yaw corrections and short bites. Default controls teach fish combat at a manageable scale. If testing cannot distinguish its defensive rhythm from Dunkleosteus, it is an early roster cut rather than a cosmetic duplicate.
-
-### 4. Bothriolepis — the living bottom shield
-
-**Basis:** antiarch with a box-like armoured body and jointed armoured pectoral appendages. Bothriolepis canadensis is part of the Miguasha fish collection; detailed diet and locomotion remain reconstruction questions. [Québec collection record](https://www.patrimoine-culturel.gouv.qc.ca/rpcq/detail.do?id=93118&methode=consulter&type=bien)
-
-**Play:** “Bottom brace” resists a current while feeding on configured soft bottom resources. Choose a proposed detrital/small-benthic-food niche, labelled as interpretation rather than certain herbivory. Reposition between patches with short swims; do not make it stationary. Limited turning while braced and exposed appendage motions give predators openings.
-
-**Art/animation:** articulated pectoral movement, tail propulsion and a believable transition onto the substrate. No wheeled-tank movement and no assumption that the armoured fins were terrestrial walking legs.
-
-### 5. Gemuendina — danger immediately above the mud
-
-**Basis:** flattened rhenanid placoderm, superficially ray-like, with upward-facing eyes and a mouth placement that has supported an upward-feeding interpretation. It is not a ray. [Hunsrück review](https://onlinelibrary.wiley.com/doi/full/10.1111/gto.12426)
-
-**Play:** “Upward snap” attacks a small vertical zone above the body after quiet repositioning along the floor. This makes altitude a real counter: prey that drops beside the animal or leaves its strike column can escape. Camouflage supports waiting, but food and objectives require relocation.
-
-**Art/animation:** broad pectoral surfaces, mosaic armour and a flexible trailing body. Animate settling, fin adjustments and a short upward strike; avoid copying a modern stingray's underside mouth or adding a venomous barb.
-
-### 6. Doryaspis — the jawless specialist
-
-**Basis:** heterostracan with a conspicuous oral projection and laterally extended shield; material from Svalbard includes caudal anatomy. The projection's exact function and diet should remain explicit uncertainties. [Genus revision](https://www.tandfonline.com/doi/abs/10.1671/0272-4634%282002%29022%5B0735%3ATGDWHF%5D2.0.CO%3B2)
-
-**Play:** assign “Current comb,” a proposed particle-feeding action that rewards positioning along a productive flow seam. It does not become a swordfish: the projection is not a spear attack. Players select between sheltered low-yield routes and exposed richer flow. A rigid shield and poor close combat make routing the skill.
-
-**Art/animation:** tail-powered swimming behind a relatively rigid front body, visible small oral feeding motion, and shield-aware clearance checks. Its niche is precise current use at small scale, distinct from Titanichthys' broad migrations.
-
-### 7. Cladoselache — win the interception
-
-**Basis:** early shark-like chondrichthyan from the Cleveland Shale fauna, with unusually informative preservation among the local fishes. [Cleveland Museum ecosystem project](https://www.cmnh.org/science-conservation/areas-of-study/earth-sciences/projects/saving-a-lost-ecosystem), [Case Western specimen collection](https://caslabs.case.edu/hyde-collection/hyde-collection/)
-
-**Play:** “Intercept burst” commits to a predicted crossing point. Good aim catches a fish in one pass; a miss costs speed and opens a turning window. It is the open-water speed option, vulnerable to structure and armoured prey it cannot process efficiently. Do not build its personality around an unsupported rule that all sharks must swim continuously to breathe.
-
-**Art/animation:** streamlined body, tail-driven acceleration, strong banking and finite braking. Neither hovering like a helicopter nor swimming backwards at full speed should be its optimal tactic.
-
-### 8. Stethacanthus — intimidation with a cost
-
-**Basis:** the distinctive spine-brush complex gives a strong silhouette. The genus spans the Devonian–Carboniferous in the literature; function and reconstruction of the complex require care. Select a demonstrably Devonian specimen before authoring, and do not substitute a Carboniferous Akmonistion model. [Braincase study](https://www.cambridge.org/core/journals/earth-and-environmental-science-transactions-of-the-royal-society-of-edinburgh/article/abs/braincase-of-a-primitive-shark/E11D5DAAAFE25E9196D17BC1C4CCBD9C), [spine-brush anatomy study](https://www.tandfonline.com/doi/abs/10.1080/02724634.1984.10012016)
-
-**Play:** “Broadside display” makes similarly sized AI hesitate briefly while slowing the player. This is an invented use of an uncertain structure, not a proven defensive behaviour. Large predators are unaffected, and human opponents can call the bluff. The animal then pivots toward cover or takes a quick small-prey bite.
-
-**Art/animation:** brush-bearing silhouette and a deliberate lateral presentation. No suction-cup hitchhiking or magical stun. This is a conditional slot: retain it only if the display/disengagement rhythm earns a different playstyle from the other fishes.
-
-### 9. Cheirolepis — the precise small hunter
-
-**Basis:** early ray-finned fish represented in Devonian Scottish and Miguasha assemblages. [Miguasha nomination dossier](https://whc.unesco.org/uploads/nominations/686rev.pdf)
-
-**Play:** “Snap pursuit” chains a short acceleration into a narrow, quick bite. It hunts manageable fish and invertebrates along broken cover rather than racing Cladoselache in open water. A school provides visual distraction and route opportunities, not invulnerability or guaranteed social behaviour attributed to the fossil.
-
-**Art/animation:** fine scale detail, paired-fin corrections and short tail bursts. Its niche is the responsive generalist that remains a small predator throughout the match. A failed capture exposes it to larger hunters; it cannot swallow prey just by touching them.
-
-### 10. Rhinodipterus — access to air is a route decision
-
-**Basis:** marine Devonian lungfish from Gogo with anatomical evidence interpreted as air-breathing adaptation. This is a stronger foundation for a respiratory mechanic than assigning modern lungfish abilities to every Devonian lungfish. [Air-breathing study](https://pmc.ncbi.nlm.nih.gov/articles/PMC2936207/)
-
-**Play:** “Surface gulp” replenishes an air reserve that makes a low-oxygen feeding route temporarily viable. The trip to the surface exposes the player. Normal water should not require repetitive gulping; reserve management matters in specific habitats and events. Feed on appropriate small resources, without giving every lungfish an identical shell-crushing attack.
-
-**Art/animation:** a discrete surface gulp, buccal motion and controlled fin-assisted swimming. No land-running, mud cocoon or aestivation mechanic without separate evidence. This slot creates a different kind of navigation challenge within a marine setting.
-
-### 11. Onychodus — seize, then hold your line
-
-**Basis:** distinctive tusk apparatus and a predatory interpretation supported by a Gogo specimen associated with arthrodire prey. [WA Museum predation paper](https://museum.wa.gov.au/research/records-supplements/records/arthrodire-predation-oncychodus-pisces-crossopterygii-late-devo)
-
-**Play:** “Tusk hold” retains suitable prey after a short ambush. Maintaining alignment sustains the hold; the victim can force release by turning around structure or making the predator lose position. It is a precision grappler, not another sustained chase fish. Large armoured targets remain expensive or inaccessible.
-
-**Art/animation:** anatomically constrained jaw and tusk motion, a clearly visible attachment point, and a release animation. Tusk reconstruction must not become a projectile, extensible spear or detachable weapon. Specialist feeding anchors are a modelling priority.
-
-### 12. Tiktaalik — inhabit the water's edge
-
-**Basis:** flattened head, mobile neck and robust paired-fin skeleton. Recent work supports body support and movement in shallow water; ordinary terrestrial walking should not be assumed. [University of Chicago, 2024](https://biologicalsciences.uchicago.edu/news/how-change-hips-led-evolution-walking)
-
-**Play:** “Plant and pivot” braces against a submerged bank or log so the head can reorient while the body holds position. It accesses shallows where deep-bodied hunters cannot follow. Crossing a barely submerged sill is a slow committed action, not an amphibious sprint shortcut across dry land.
-
-**Art/animation:** body-supported fin planting, neck movement, push-off and tail-led swimming. Keep visible buoyant support and constrained joints. No automatic evolution into Acanthostega: they remain separate animals in different fossil settings.
-
-### 13. Acanthostega — limbs for an aquatic maze
-
-**Basis:** early tetrapod with digit-bearing limbs and strongly aquatic anatomy. Histological study indicates a long aquatic juvenile phase; known growth history is incomplete. [Sanchez et al.](https://www.nature.com/articles/nature19354)
-
-**Play:** “Limb-assisted turn” redirects around submerged branches while the tail provides propulsion. Compared with Tiktaalik's braced ambush, it specializes in weaving through complex flooded structure, gathering small prey and escaping larger fish. Its objective route is underwater, not a land-conquest ladder.
-
-**Art/animation:** eight-digit limb reconstruction where appropriate, splayed paddling and a swimming tail. Avoid a modern salamander walk. Dry exposure is a constraint, and age-specific interpretations must be checked before choosing a representative adult model.
-
-### 14. Eldredgeops — a small life worth mastering
-
-**Basis:** familiar phacopid trilobite, often encountered under the older name Phacops rana, with prominent eyes and an enrolling body. Middle Devonian North American material provides a good recognizable representative. [Devonian Atlas](https://devonianatlas.org/species/eldredgeops-rana/)
-
-**Play:** “Enrol” protects vulnerable undersides and buys a short escape window against suitable attackers. It does not become an invulnerable rolling projectile. Proposed feeding combines soft detrital patches and small accessible food, with exact diet treated cautiously. Crack width, local vision, exposed crossings and moult-site selection matter more than damage output.
-
-**Art/animation:** articulated enrollment with legs and antennae withdrawn, active leg waves while crawling, and unrolling after danger. Enrolled geometry must still be graspable by appropriate predators. Keep it centimetre-scale even at maximum maturity.
-
-### 15. Walliserops — contest space, not hit points
-
-**Basis:** trident-bearing trilobite. A study supports intraspecific combat as a possible function, while later modelling has proposed hydrodynamic alternatives. The function is not settled. [Combat hypothesis](https://pmc.ncbi.nlm.nih.gov/articles/PMC9942788/), [alternative hydrodynamic preprint](https://arxiv.org/abs/2506.15922)
-
-**Play:** “Fork lift” displaces a similar-sized competitor from a feeding patch. Treat it as a playful interpretation of the combat hypothesis: lifting requires approach, contact and leverage. It cannot impale a giant fish or flip anything regardless of mass. Its long front projection makes some narrow routes unusable.
-
-**Art/animation:** an actual rigid trident contact, leg bracing and a short lift, with a recoverable topple for the target. Keep this second trilobite only because positional contests differ from Eldredgeops' enrollment/refuge loop; do not add several more spiny skins.
-
-### 16. Jaekelopterus — the grasping arthropod predator
-
-**Basis:** eurypterid with enlarged prey-catching chelicerae. The famous roughly 2.5 m estimate for J. rhenaniae is extrapolated from an isolated claw, not a complete giant body. Its Early Devonian occurrence must not be silently mixed into a Late Devonian Cleveland ecosystem. [Braddy et al.](https://pmc.ncbi.nlm.nih.gov/articles/PMC2412931/)
-
-**Play:** “Clamp and draw” uses two grasping contacts to restrain suitable prey and bring it toward the mouth. Bracing on the substrate improves the hold; swimming trades grip stability for repositioning. Victims escape by twisting, breaking contact or exploiting cover. Flanks and the moment after a failed grasp are vulnerable.
-
-**Art/animation:** coordinated chelicerae, walking limbs and swimming paddles, with a tail that balances motion. No scorpion sting or invented venom. This demonstrates that fish-versus-arthropod is a movement distinction, not a rule that arthropods must all be tiny.
-
-### 17. Nahecaris — steal the opportunity
-
-**Basis:** mobile crustacean-grade arthropod from the exceptionally preserved Hunsrück fauna. Fine feeding behaviour needs review rather than a direct copy of modern shrimp. [Hunsrück arthropod ecology review](https://pubmed.ncbi.nlm.nih.gov/26826500/)
-
-**Play:** “Snatch scrap” collects a small carcass fragment and carries it to shelter, at a swimming penalty. Antenna-led searching and short escape strokes make it an opportunist between hunters' feeding windows. Proposed scavenging is its game niche; it cannot haul whole fish larger than itself.
-
-**Art/animation:** mobile antennae, ventral food handling, swimming appendage cycles and a short reversal. It needs a cargo anchor and a visible carried piece, with a drop action when threatened. This is a transport-and-risk loop, distinct from a Cambrian Waptia-style combat skirmisher.
-
-### 18. Furcaster — change direction without turning a head
-
-**Basis:** Devonian brittle star; reconstructed arm skeletons provide evidence relevant to locomotion. Fossil arm construction should guide the gait rather than assuming every detail of a living brittle star. [Locomotion study](https://rvc-repository.worktribe.com/output/1549616/three-dimensional-visualization-as-a-tool-for-interpreting-locomotion-strategies-in-ophiuroids-from-the-devonian-hunsruck-slate)
-
-**Play:** “Change lead arm” changes movement direction with little whole-body turning, ideal for branching rubble passages. It reaches small detrital or soft-food patches with an arm while the disc stays sheltered. Its exposed disc is vulnerable, and open-water travel is poor. Do not make arm regeneration an instant heal or invulnerability button.
-
-**Art/animation:** coordinated arm contacts, a stable central disc and radial feeding toward the underside mouth. This is an active low-altitude explorer; arm span and disc size need separate collision treatment.
-
-### 19. Palaeoisopus — raid the vertical garden
-
-**Basis:** fossil sea spider with a segmented abdomen and swimming-adapted limbs. Predation on crinoids is an interpretation rather than observed behaviour. [Hunsrück review](https://onlinelibrary.wiley.com/doi/full/10.1111/gto.12426)
-
-**Play:** “Perch and feed” lands on reef structure, takes a brief feeding opportunity, then pushes off before attracting a hunter. Alternating swimming and attachment is the skill. Crinoid grazing/predation can be represented by a renewable feeding patch; a stationary crinoid remains scenery/NPC ecology rather than a playable slot.
-
-**Art/animation:** paddle-like limbs must contribute to swimming; attachment uses visible limb contacts rather than hovering. Long appendages are vulnerable in open water. Its vertical perching routes distinguish it from Nahecaris' refuge-to-carcass shuttles and Furcaster's floor maze.
-
-### 20. Manticoceras — the turning shell
-
-**Basis:** Devonian ammonoid with a coiled chambered shell. Shells provide much firmer evidence than soft-body details; avoid presenting a modern nautilus' arm count as established ammonoid anatomy. [Museums Victoria specimen](https://collections.museumsvictoria.com.au/specimens/508262)
-
-**Play:** “Jet turn” spends a stored pulse to redirect or escape, followed by recharge and a relatively exposed feeding extension. It takes small suitable prey and can withdraw into shell protection. Broad shell width limits crevice access, while orientation changes which part an attacker can reach.
-
-**Art/animation:** shell stays rigid while soft parts extend, contract and drive a visible jet pulse. Use conservative, labelled soft-body reconstruction. Do not add ink by default. The central feel is pulse-and-coast movement, not a fish swim animation inside a spiral shell.
-
-### 21. Michelinoceras — keep the long shell aligned
-
-**Basis:** orthoconic cephalopod representative; Devonian occurrences exist, but this broad genus needs a specific vetted Devonian species and specimen before modelling. A generic shop fossil labelled “Orthoceras” is not an adequate reference. [Devonian cephalopod study](https://www.paleoitalia.it/wp-content/uploads/2023/06/05_Gnoli.pdf)
-
-**Play:** “Jet retreat” moves away from the exposed feeding end while preserving shell alignment. The animal manages trim and turning clearance through tall gaps or open water. It can retreat through a passage that admits its narrow cross-section but struggles where its long shell cannot rotate. This contrasts directly with Manticoceras' wider but more compact turning envelope.
-
-**Art/animation:** rigid shell, restrained soft-body extension and a conservative jet direction. Resting orientation, buoyancy distribution and soft anatomy are research gates; do not assume it permanently cruised horizontally or carried modern squid tentacles. The ability name describes the chosen game interaction, not a proven species behaviour.
-
-### Keep the roster selective
-
-Do not add another large arthrodire simply to increase the number of predators. Hold Eastmanosteus and similar candidates in reserve unless they introduce a tested new mechanic. Likewise, adding Eusthenopteron, Panderichthys and several close fish-to-tetrapod forms at once would crowd the ambush/shallow-water niches; the proposed Tiktaalik/Acanthostega pair must already justify two different movement experiences.
-
-Mimetaster is visually excellent but risks repeating the Cambrian Marrella identity. Stationary corals, stromatoporoids, brachiopods and attached crinoids belong in the ecosystem, not the playable 21. Exclude later-period favourites such as Helicoprion and Meganeura. If Stethacanthus or Michelinoceras fails its provenance or gameplay gate, replace the slot after research rather than shipping an attractive but misdated substitute.
-
-## 6. Ecosystems: an anthology of waters
-
-### Historical scope
-
-**Recommended default: regional expeditions with a visible locality and interval.** Unlocks operate across the Devonian collection, but individual scenarios expose compatible animals. Marine and freshwater communities are not automatically connected by a swim-through portal. Exact salinity tolerance is seldom recoverable; broad habitat assignments are conservative design constraints, not species-level physiological measurements.
-
-Offer an optional **Devonian mix** sandbox later for friends who want any combination. Label it as a composite. This is also the appropriate place for Dunkleosteus-versus-trilobite demonstrations when the exact selected species do not overlap in time and place.
-
-Suggested research anchors:
-
-| Setting | Fossil anchor and intended roster subset | Distinct experience |
-| --- | --- | --- |
-| Hunsrück mud shelf | Early Devonian; Gemuendina, Nahecaris, Furcaster, Palaeoisopus; other residents vetted locally | Small-scale structure, suspended sediment, short swimming and crawling routes |
-| Moroccan shelf | Devonian interval selected around Walliserops; matching contemporaries required | Trilobite contests, shell pavements, isolated cover and current-exposed feeding |
-| Orcadian lake | Middle Devonian; Coccosteus and a local Cheirolepis species | Shore-to-deep-water gradients, fish competition, fluctuating lake connections |
-| Gogo reef system | Late Devonian; Onychodus and Rhinodipterus, with local fish and invertebrate NPCs | Vertical reef passages, feeding ambushes, contrasting oxygen conditions |
-| Miguasha waterway | Late Devonian; Bothriolepis and Cheirolepis representatives | Bottom foraging versus small-fish pursuit in a sediment-rich setting |
-| Cleveland offshore sea | Latest Devonian; Dunkleosteus, Cladoselache and vetted associated fauna | Big routes, expensive hunts, carcasses and water-column tension |
-| Ellesmere / Greenland waterways | Separate Late Devonian chapters for Tiktaalik and Acanthostega | Shallow support, submerged woody obstacles and changing pool connections |
-| Svalbard water bodies | Early Devonian; Doryaspis and locally researched fauna | Jawless feeding and flow positioning without forcing it into a tropical reef |
-
-Titanichthys, Manticoceras and Michelinoceras receive a specific regional assignment after species selection. They are not automatically residents of every marine chapter. These are research and production candidates, not eight launch maps promised at once.
-
-### Scenery should change decisions
-
-Build reusable habitat features, then assemble appropriate ones for each regional chapter:
-
-| Feature | Art direction | Mechanical purpose |
-| --- | --- | --- |
-| Reef buttresses and overhangs | Massive stromatoporoid forms, tabulate colonies, solitary rugose corals, pale carbonate faces | Mouth-sized entrances, ambush columns, sheltered turns and routes inaccessible to large fish |
-| Crinoid gardens | Fine articulated stems and feeding crowns, suspended particles | Vertical attachment routes, food patches and silhouettes broken by motion |
-| Shell pavements | Brachiopod accumulations, broken shell, shallow sediment ripples | Centimetre-scale refuge networks; noisy exposed crossings; food trapped in lee pockets |
-| Reef edge and open shelf | Stronger shafts of light, visible current lanes, deep blue beyond ledges | School interception and plankton migration without filling every space with obstacles |
-| Quiet muddy basin | Settling flecks, subdued light and distant silhouettes | Carrion events and oxygen gradients; provide advance cues before an unsafe zone |
-| Lake margin | Fine sediment, local early plants and exposed substrate appropriate to the selected interval | Receding-water routes, bottom feeding, water-depth decisions |
-| Later Devonian rooted bank | Woody roots, fallen branches, spore-bearing vegetation and stained runoff | Buoyancy-supported bracing, small refuges, changing shallow connections |
-| Flooded forest edge | Broken canopy reflections and submerged timber, only in suitable later settings | A navigable three-dimensional maze for limb-assisted swimmers |
-
-No modern flowering reeds, grass lawns, mangrove trees, seagrass meadows, modern coral taxonomy or default giant Carboniferous swamp forest. Algae and rooted land plants have different roles; not every underwater green shape is a leafed plant. Forest stature and composition changed through the Devonian. [Middle Devonian forest ecosystem study](https://pmc.ncbi.nlm.nih.gov/articles/PMC8409631/)
-
-Scenery scale is part of balance. A refuge needs an entrance, a protected interior and at least one tactically useful exit. An invulnerable hole next to infinitely renewing food is not a habitat; it is a camping exploit. Food depletion, short foraging circuits and changing local opportunities encourage movement without turning every refuge into a trap.
-
-## 7. New experiences to prototype
-
-### A. The meal becomes a meeting place
-
-A large predator opens a carcass. Small scavengers wait outside its feeding arc, dart in for fragments, then transport food into cover. A rival fish arrives; the first predator must choose between defending its investment and leaving with enough energy. The carcass has finite nutrition and different usable pieces. This is a shared event with different objectives, not a raid in which every player attacks the same health bar.
-
-### B. The moving plankton front
-
-Particles collect along a current seam. Titanichthys follows the seam efficiently; small swimmers use its movement as temporary visual cover, at their own collision risk. Nearby predators hunt the smaller animals rather than treating the giant filter feeder as the event's universal boss. Currents, resource density and turning costs make route planning the main action.
-
-### C. The refuge changes with the water
-
-A slowly falling water level narrows an escape channel. A trilobite has a safe ledge but dwindling food; a fish must leave before its depth margin disappears. A shallow-water animal can take a different submerged route. Telegraph the change with moving shore marks, exposed substrate and animal movement. Do not punish players with an invisible salinity or oxygen timer.
-
-### D. The water column compresses
-
-An oxygen-poor zone grows upward, concentrating animals in remaining habitable water. Air access gives Rhinodipterus an alternative, not total immunity. The event changes routes and encounter rates. Anoxia is a plausible Devonian theme, but this short scenario is a game abstraction; do not compress the entire Late Devonian extinction into a routine instantaneous poison wave or claim one settled cause.
-
-### E. The tiny crossing
-
-At a trilobite's scale, a few body lengths of open sediment form a dangerous journey. Passing fins disturb light and particles; a predator's mouth cannot follow into a correctly sized crack. A second small player can exploit the same distraction without becoming an MMO healer. Success feels like completing a route under pressure.
-
-### F. The shallow ambush
-
-Tiktaalik braces behind a submerged log. The player turns the head toward a prey route, chooses when to push off, and risks losing the favourable position. Acanthostega's separate scenario emphasizes continuous manoeuvring among branches instead. Distinguish these prototypes before committing both expensive limb rigs.
-
-## 8. Modes and cooperative balance
-
-**Life in the reef / waterway** should be the main mode: choose a regional animal, meet ecological objectives, survive an event, and finish in good condition. It supports peaceful and predatory lives equally.
-
-**Food-web co-op** gives compatible species different contributions to a shared expedition. Credit comes from completing role objectives during the same event window, not from dividing kill experience. Avoid mandatory artificial symbioses or an expectation that predators can never threaten smaller creatures in ordinary ecology. In co-op, player predation can be disabled as a clearly identified game rule.
-
-**Asymmetric pursuit** is a separate competitive mode. One hunter tries to intercept prey; the others complete routes and escape. Rotate roles between short rounds. Prey are not expected to kill the hunter. Match suitable movement/habitat combinations, rather than offering unrestricted four-way deathmatch as the default balance target.
-
-**Devonian mix sandbox** permits the deliberate anthology and experimental matchups, with its historical-composite label. It should not be the reference mode for documentary claims or food-web balancing.
-
-Prevent dull extremes: predators need viable prey opportunities without being spoon-fed a kill; small players need exposed but achievable objectives without endless hiding; slow crawlers need dense local decisions; filter feeders need navigational action rather than a “hold mouth open” timer. Shared event timing and nearby parallel routes help couch players stay in the same story even when their bodies differ enormously in scale.
-
-## 9. Animation, senses and interaction contracts
-
-Reuse the anchor and animation infrastructure, not a single movement recipe.
-
-| Body plan | Required distinct motion | Contacts and state that the engine needs |
-| --- | --- | --- |
-| Tail-driven fish | Speed-dependent tail amplitude, banked turns, braking, bite and prey handling | Mouth/gape, throat, jaw attack sweep, feeding hold; authored armour regions |
-| Bottom-associated fish | Swim/settle/brace transitions and substrate-relative posture | Support contacts and clearance; no fake continuous foot cycle |
-| Limb-assisted vertebrate | Buoyant paddling, supported planting, push-off, neck aim where anatomical | Limb end effectors, supported versus swimming state, shallow-water constraints |
-| Trilobite | Leg waves, antenna motion, enrollment or trident bracing, ecdysis | Ground contacts, mouth, body outline in protective posture; trident contact if present |
-| Eurypterid / crustacean | Walk/swim blend, grasp, carry and escape | Paired grasp contacts, mouth, cargo, support contacts |
-| Sea spider | Swimming strokes, landing, perching and departure | Multiple attachment contacts, feeding reach and detachment |
-| Brittle star | Lead-arm changes and coordinated disc movement | Arm contacts, central mouth, separate disc and appendage reach |
-| Shelled cephalopod | Jet pulse, coast, soft-part extension and withdrawal | Feeding end, jet direction, shell collision volume and trim |
-
-Every selected animal needs an authored version of the applicable game actions: idle, locomotion, turning, vertical movement where possible, feeding, primary interaction, defence, escape, hit, stagger and death. Viewer controls should display the supported action set. A no-bite feeder gets a feeding/interaction action instead of a fictional jaw attack. Fish do not need an ecdysis clip just to satisfy a Cambrian name list.
-
-Fish should not all hover, but nor should they all be given identical negative buoyancy. Do not assume universal swim bladders, universal ram ventilation, exact electroreception or modern sensory ranges. Expose sensing profiles only where justified and label speculative capabilities. Use motion trails, occlusion, substrate vibration cues and current direction to produce information differences without pretending their precise fossil sensory physiology is known.
-
-Retain mouth, swallowing and attack anchor compatibility. Add capability-driven optional support, jet, cargo and armour data. A long shell, a broad fish and a radial arm span require more than the current spherical body radius to make the proposed spaces work.
-
-## 10. Implementation sequence and limits
-
-The era refactor already supplies roster, ecology and presentation boundaries. This proposal requires additional engine work; inserting the 21 definitions into the current Cambrian scale-and-diet rules would not realize it.
-
-1. **Prove three lives with inexpensive prototypes:** a small trilobite, a large biting fish and a large suspension feeder. Use an explicitly composite test habitat. Build species-bounded growth, diet-aware consumption, refuge clearance and comparable objective completion. Preserve Cambrian behind its existing progression/interaction policy.
-2. **Prove the other movement families:** jetting shell, radial crawler and substrate-supported fish. Measure input feel, visibility, camera scale and contact accuracy before commissioning all final models.
-3. **Deliver one researched regional expedition:** choose a locality and compatible starter subset, fill its food web with lightweight NPCs, and validate scenery/food/oxygen routes. Do not claim a completed historical ecosystem solely from the playable roster.
-4. **Expand toward all 21:** author reviewed models in groups by rig family, but require a distinct playtest for each animal. Every addition needs provenance, diet uncertainty, body-size rationale, animation coverage and full/LOD anchors.
-5. **Add later systems only after the ordinary life is fun:** changing water levels, hypoxic events, reproductive objectives and asymmetric versus. Defer elaborate persistent genetics, breeding simulations and broad dry-land traversal.
-
-Likely new content concepts are `lifeHistory`, `feedingProfile`, `locomotionProfile`, `habitatAffinity`, `interactionGeometry`, `senseProfile` and `objectiveSet`. These are design concepts, not approved API names. A separate region/scenario definition should select time, locality, compatible roster, terrain and resources. Keep the era-wide catalogue separate from an individual encounter population.
-
-Acceptance criteria for the first prototype:
-
-- A mature trilobite remains small, has a rewarding run and never needs to damage a giant to progress.
-- Titanichthys can complete objectives without hunting animals or exploiting collision consumption.
-- Dunkleosteus has meaningful failed-hunt costs and cannot farm tiny players efficiently.
-- A refuge excludes predators by geometry at every relevant LOD; no invisible invulnerability region substitutes for it.
-- Fish feeding does not trigger arthropod moulting, and unsupported attacks do not appear in the viewer.
-- Two players of very different sizes remain readable and have comparable useful activity, without equalizing physical size.
-- At least one pair with similar size has a different predator/prey outcome because of diet, armour, gape or habitat.
-- Seeded simulation stays reproducible and existing Cambrian regressions remain green.
-
-## 11. Research gates before final art
-
-The references beside entries establish a starting point, not a complete model-authoring bibliography. Before production, select species-level exemplars, inspect actual specimens and obtain reconstruction references for all hidden anatomy. Record date/locality, length estimate and its uncertainty, environmental interpretation and confidence in the feeding/locomotion model.
-
-Prioritize Dunkleosteus proportions and feeding kinematics; Titanichthys' unpreserved filtering anatomy; Doryaspis' feeding interpretation; Devonian provenance for Stethacanthus; species identity and trim for Michelinoceras; cephalopod soft parts; and the actual joint limits of Tiktaalik/Acanthostega. Walliserops' combat hypothesis must remain labelled amid alternatives. Do not use an adult-size estimate from an uncertain specimen as a universal growth endpoint without review.
-
-The strongest initial artistic contrast is already clear: **armoured jaws in open water, small articulated animals inside structural refuges, and supported bodies negotiating the edge of water.** Build those contrasts into movement, food and space before adding more spectacular silhouettes.
+| T01 | Pale submerged carbonate | Tileable colour/albedo source, roughness and normal/height detail |
+| T02 | Darker carbonate / weathered exposed interior | A related but distinct rock treatment; avoid baked directional shading |
+| T03 | Fine marine mud | Smooth and slightly disturbed variants; grain scale appropriate for small animals |
+| T04 | Freshwater fine sediment | Regionally suitable mineral colour and particle-size study |
+| T05 | Fine sand and ripple surface | Neutral-lighting tile; shallow relief; repeat should be hard to detect |
+| T06 | Mixed shell hash | Fragment atlas from B/G models, with matching normal/roughness sources |
+| T07 | Microbial film / thin algal coating | Several restrained surface colours and coverage masks; no assumption of a single universal green layer |
+| T08 | Submerged wood | Wet woody surface, broken end and softened sediment-covered treatment |
+| T09 | Rooted bank / organic sediment | Layered sediment, root contact and localized organic staining |
+| T10 | Living reef-surface reference atlas | Sponge/coral growth surfaces separated by taxon; skeletal texture distinct from speculative soft covering |
+
+Normal, height and roughness maps should be derived or authored as material data. They are not automatically scientifically valid because an image generator produced convincing texture. Avoid baked highlights and shadows that conflict with the scene's lighting.
+
+### Additional image sets
+
+- **Three lighting/colour boards:** clear marine reef water; suspended-sediment marine/lake water; later Devonian shallow wooded waterway. Each should include neutral specimen illumination alongside atmospheric views.
+- **One particle atlas:** fine silt, marine-snow-like flecks, small organic particles and a restrained plankton-density treatment. Any identifiable plankton illustration requires a separately researched taxon; generic specks do not.
+- **One substrate decal atlas:** thin sediment drapes, localized microbial coating, shell fragments and organic fragments. Avoid arbitrary modern animal tracks.
+- **Two scale-comparison plates:** one focused on fishes and one on invertebrates/early tetrapod subjects, with a consistent scale and uncertainty notes. A comparison plate may combine subjects from different places, but must label that explicitly and must not resemble a claim of co-occurrence.
+
+No new interface, ability, progression or mode imagery is required by this brief. Brand/logo direction can be considered separately after the scientific and environmental look is established.
+
+## 9. What is new and what can be reused
+
+**New organism geometry:** all 21 creatures should be independently reconstructed. Do not reuse a Cambrian trilobite model by changing its colour and calling it Eldredgeops. Likewise, a Gemuendina is not a flattened shark and Acanthostega is not Tiktaalik with fingers added.
+
+**Potentially shared production infrastructure:** specimen lighting, render sizes, file packaging, image generation workflow, texture tooling and anchor conventions can follow the existing collection. Shared tools do not imply shared anatomy.
+
+**Potentially reused scene materials:** generic fine sediment or rock sources may be adapted after comparison with the regional boards. Living organisms, plant silhouettes and characteristic reef forms need Devonian-specific reference.
+
+Use the existing card/thumbnail/selection rendering pipeline after final models are approved, so the displayed images match their models. Keep modelling sources, image-generation originals, material sources and intermediary renders in `cambrian/local/` during authoring, with retained provenance and final deliverables packaged according to repository conventions. This document requests an inventory; it does not start that production work.
+
+## 10. Production inventory and order
+
+The proposed baseline consists of:
+
+| Category | Baseline quantity |
+| --- | --- |
+| Mobile creature subjects | 21 |
+| Creature reference / concept / detail images | 63 boards/images |
+| Creature editable source models | 21 projects |
+| Creature full-detail and reduced-detail exports | 42 GLBs |
+| Final creature studio / selection / card / thumbnail images | 84 PNGs |
+| Creature material sources | 21 material sets |
+| Regional environment concept boards | 9 |
+| Attached-organism and biological prop families | 12 |
+| Plant/algal source model families | 5 |
+| Geological/organic prop families | 12 |
+| Reference/appearance boards for the 29 scenery families above | 29 |
+| Environment material studies/source sets | 10 |
+| Lighting/colour boards | 3 |
+| Particle and decal atlases | 2 |
+| Scale-comparison plates | 2 |
+
+The **29 scenery families** contain variants and may share derived components; they are not a promise of only 29 exported mesh files. The exact export and LOD counts should be established after the environment boards choose which variants are needed. These quantities describe the full proposed library, not a requirement to build everything before reviewing the first specimens.
+
+Recommended art sequence:
+
+1. **Resolve references and scope.** Choose the representative species/specimens and regional boards. Identify uncertain anatomy before generating polished concept art.
+2. **Establish visual standards with six subjects:** Dunkleosteus, Bothriolepis, Eldredgeops, Manticoceras, Palaeoisopus and Tiktaalik. Together they sample armour, cuticle, shell, fine appendages and transitional fins. This is an anatomical/art-production sample, not a community reconstruction.
+3. **Approve two contrasting environment boards:** a marine reef and a later Devonian shallow waterway. Use a few representative props and plants to establish scale, surface detail and lighting.
+4. **Complete the remaining creature boards and models**, grouped by useful modelling techniques while retaining separate anatomical reviews.
+5. **Build only the scenery variants supported by approved regional boards**, then render the remaining environment imagery and complete material libraries.
+6. **Produce final specimen images from final models**, and archive source images, source models and provenance together.
+
+Before approving a final organism, verify its identity, age/locality, proportions, appendage count, mouth orientation, shell/armour construction and known-versus-inferred anatomy. Colours and fine soft-tissue appearance should be described as interpretations unless supported directly. A beautiful model with the wrong anatomy should return to reference review rather than become the reference for later work.

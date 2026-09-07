@@ -115,6 +115,6 @@ paths are isolated in `src/content/cambrian/`, selected by `src/content/index.ts
 viewer share that configuration. See [the era content plan](docs/redesign/06-era-content.md) for
 adding Devonian without duplicating the engine. Run `npm run eras` to validate the content contract.
 
-The [Devonian design proposal](docs/redesign/07-devonian-design.md) lays out 21 suggested creatures,
-regional ecosystems and progression through ecological mastery rather than universal giant size.
-This is a future design, not an available game mode.
+The [Devonian natural-history and asset brief](docs/redesign/07-devonian-design.md) describes
+21 proposed creatures, regional environments, plants and props, with a list of images and 3D models
+to create. It does not specify gameplay or add an available era.
