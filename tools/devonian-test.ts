@@ -196,6 +196,7 @@ ok(RULES !== undefined && !RULES.growthByNutrition, 'Devonian rules active: grow
   ok(dt.air < 0.75 && dt.air > 0.5, `Tiktaalik spends air under water (${dt.air.toFixed(2)} after 20 s)`);
   ok(dc.air === 1 && RULES!.hud(g, 1)!.air === undefined, 'gill breathers have no air meter');
   ok(RULES!.hud(g, 0)!.air === dt.air, 'the air meter is on the HUD');
+  tik.pos.y = SURFACE_Y - 12; tik.prevT.y = tik.pos.y;               // the refill is what is under test, not the climb from the floor
   const rise = new Map<number, InputFrame>([[0, { ...emptyInput(), rise: true }], [1, emptyInput()]]);
   for (let i = 0; i < 60 * 30 && dt.air < 0.999; i++) tick(g, rise);
   ok(dt.air > 0.99, `surfacing refills the lungs (${dt.air.toFixed(2)})`);
@@ -445,6 +446,35 @@ ok(RULES !== undefined && !RULES.growthByNutrition, 'Devonian rules active: grow
   let crawlerBreach = false;
   for (let i = 0; i < 120; i++) { g2.step(DT, new Map([[0, { ...emptyInput(), my: 1, camYaw: b.yaw, burst: 1, rise: true }]])); if (g2.events.some((e) => e.kind === 'breach')) crawlerBreach = true; g2.events.length = 0; }
   ok(!crawlerBreach && b.pos.y <= SURFACE_Y, 'a crawler stays in the water');
+}
+
+// ---- nurseries are sanctuaries: quiet at the start, and the young are left alone in them ----
+{
+  const { nurseryAt } = await import('../src/sim/world');
+  const g = new Game('domination', [{ creature: 'coccosteus', device: 'keyboard', ready: true }]);
+  const p = g.players[0];
+  const bots = g.actors.filter((a) => a.controller === 'bot');
+  ok(bots.every((b) => Math.hypot(b.pos.x - p.pos.x, b.pos.z - p.pos.z) > 120), `bots hatch in other nurseries (nearest ${Math.min(...bots.map((b) => Math.hypot(b.pos.x - p.pos.x, b.pos.z - p.pos.z))).toFixed(0)} away)`);
+  ok(p.spawnProtect >= 8 - 1e-6, `a hatchling is protected for eight seconds (${p.spawnProtect})`);
+  // a shark bot put right beside the hatchling in the nursery will not take it
+  const { makeBrain } = await import('../src/sim/ai');
+  const shark = g.spawn('cladoselache', 'bot', { x: p.pos.x + 5, y: p.pos.y, z: p.pos.z }, 1.0);
+  shark.brain = makeBrain('needs', { ...nurseryAt(0) }, g.rng, { aggression: 1, reaction: 0.1, parrySkill: 0 });
+  shark.brain.hunger = 10; shark.spawnProtect = 0; p.spawnProtect = 0;
+  let targeted = false;
+  for (let i = 0; i < 60 * 8; i++) { g.step(DT, new Map([[0, emptyInput()]])); g.events.length = 0; if ((shark.brain.goal === 'hunt' || shark.brain.goal === 'fight') && shark.brain.target === p.id) targeted = true; }
+  ok(!targeted && isAlive(p) && p.hp === p.hpMax, `an unprovoked shark leaves the hatchling alone in the nursery (goal ${shark.brain.goal}, hp ${p.hp}/${p.hpMax})`);
+  // outside a nursery, in open water, the same shark is a shark
+  const g2 = new Game('reef', [{ creature: 'coccosteus', device: 'keyboard', ready: true }]);
+  const q = g2.players[0];
+  q.pos.x = 120; q.pos.z -= 420; q.prevT.x = q.pos.x; q.prevT.z = q.pos.z; g2.world.loadAround(q.pos); q.spawnProtect = 0;
+  for (let i = 0; i < 60; i++) { g2.step(DT, new Map([[0, emptyInput()]])); g2.events.length = 0; }
+  const shark2 = g2.spawn('cladoselache', 'bot', { x: q.pos.x + 6, y: q.pos.y, z: q.pos.z }, 1.0);
+  shark2.brain = makeBrain('needs', { ...q.pos }, g2.rng, { aggression: 1, reaction: 0.1, parrySkill: 0 });
+  shark2.brain.hunger = 10; shark2.spawnProtect = 0;
+  let hunted = false;
+  for (let i = 0; i < 60 * 6; i++) { g2.step(DT, new Map([[0, emptyInput()]])); g2.events.length = 0; if (shark2.brain.target === q.id) hunted = true; }
+  ok(hunted, `in open water the shark hunts it (goal ${shark2.brain.goal})`);
 }
 
 // ---- a full match step is deterministic and stays alive ----
