@@ -1,24 +1,16 @@
-# Gemuendina current production checkpoint — 2026-09-07T22:39:03+00:00
+# Gemuendina current checkpoint — 2026-09-07T23:37:05+00:00
 
-**Ready now:** `HANDOFF-CANDIDATE-01.md`, manifest SHA
-`68206254ff31837a44e681ade4d687cb7ce397be7801f1ef6b85124d736cdcf0`. Terra runs build → structural checks → portraits/targeted poses.
-No candidate Blender execution has been performed by Astra.
+**Creative rework ACCEPTED:** exact candidate02 full/LOD after source views,
+actual runtime/default/LOD-transition review, all54 action stills and completed
+actual-mesh audit03. Read `final-art-verdict.md` for limits and exact hashes.
 
-Material-03's actual oblique/cranial views were independently reviewed and
-accepted by parent and Astra for this animated local candidate. Packed blend
-SHA `810031c3e18a2f9bc5ea820007a460aebdd7e8fdf7c96879ef398a16ab080ada`.
-`candidate-design-review-01.md` records the precise decision and motion design.
-Candidate builder now binds this approved hash and the original metadata hash.
+Audit03 SHA `64e6e112687c0e6e86b2adfedd15f532d1902d53fe231986197d03a4d990804c`: 56poses (48full/8LOD), minimum
+conservative eye containment86.8700%/87.0959%, max denticle contact0.0018583<.010.
+Mouth/attack anchors outside tissue; swallow endpoint internal in every pose.
+No unresolved blocking sculpt/material/rig concern from the inspected evidence.
 
-Frozen sources: candidate_01.py, rig_actions_01.py, sculpt_spec_02.py,
-check_candidate_01.py, render_candidate_01.py. Do not edit after this freeze.
-All output is local under `../devonian-authoring/gemuendina/rework-v3/candidate-01/`.
-Full exact 18 actions; LOD Idle/Swim/Death; matching 28-bone skeleton and three
-nested anchors. White full vertex multipliers and textured UV pigment;
-texture-free LOD linear pigment with matching body/eyes/accent palette slots.
-
-Next gate is actual source-pose and exported GLB/palette playback review.
-Parent owns review-playback-01.mjs; it is untouched and excluded from this
-manifest. Existing eye-bead appearance remains unresolved and needs completed
-rework correction/audit. Final approval/public replacement remains pending.
-All clay01/02 and material01/02/03 evidence and public V2 are preserved.
+Parent reports exact candidate02 public preview packaging and species-only
+default-palette correction to authored appearance. Parent owns current UI,
+intake/build/tests/catalogue/release/main. This child has made no public or Git
+mutations. No additional Blender execution or audit repeat is needed.
+All frozen inputs, earlier candidates and failed-audit evidence are preserved.

@@ -1,0 +1,16 @@
+# Titanichthys material01 — regional armour and living tissues
+
+Author: Astra high. Source is the hash-bound coarse-form-approved clay04. No geometry displacement, eye reshaping, new jaw structures or rig work in this phase.
+
+The reference contributes bulky curved armour, connected cheek/shoulder mass and long full fins. The material should make these regions readable without painting arbitrary scales over a generic fish. Titanichthys remains edentulous. Colour, microscopic texture and exact skin-covered plate tones are artistic interpretations; no reference pixels or old Titanichthys material asset is reused.
+
+- Cranial and thoracic armour: restrained blue/slate-green pigmentation, with broad low-contrast plate tone changes tied to the actual head cage and existing sutures. Narrow suture pigment/roughness follows existing geometry; it adds no second carved border or raised tile. Small irregular puncta and fine surface grain sit well below silhouette scale. No rock cracks, reptile scale lattice or metallic finish.
+- Flexible posterior: related darker olive/slate pigment with larger soft clouds and finer quieter grain. It remains a muscular living continuation of the armour, not a second unrelated colour block. Do not add teleost scale rows where this reconstruction has not established them.
+- Ventral throat and belly: subdued warm grey/olive lightening, with a broad continuous transition. Under-jaw tissues remain softer and less armoured than the skull above them.
+- Lip and oral lining: muted warm grey-brown exterior lip, a darker restrained warm lining and moderate moist roughness. Palate, floor and cheek junctions remain readable. No red gaping monster mouth, painted teeth, baleen or black endcap.
+- Paired fins: body-related slate/green pigment, softer underside, gently darkening distal membrane, subdued anatomically directed ray relief in the local span/chord field. Ray relief stays in the normal map, not free sticks or silhouette corrugation. Tail/dorsal fins use quieter radial fields.
+- Eyes: small dark reflective optical surfaces with a subdued dark olive-brown iris aligned to the existing socket axis. The pupil remains dark; no bright painted eyeball or decorative orbital ring. This phase does not replace the required final eye audit.
+
+The editable source uses region attributes on the accepted outer mesh and physically based procedural materials. A separate baked study carries UV albedo, tangent-space normal and roughness maps. Coordinates, topology, shape keys and object transforms are fingerprinted before and after UV/material/bake operations. Full models will later use mapped colour without duplicate vertex tint; LOD pigment and final export are deferred.
+
+Atlas plan: body/lining 2048²; pectorals 1024², pelvis 512², dorsal 512², caudal 1024², eyes 512² (separate halves for the two socket axes). Mirrored pairs share the left atlas and identical UV correspondence. This first study produces six PBR families and eighteen maps, plus editable procedural and baked blends. The source is reviewed with four neutral studio views: full side, full oblique, cranial/armour close-up and frontal oral-open close-up. No public assets or final action/rig exports.
