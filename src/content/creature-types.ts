@@ -25,7 +25,9 @@ export interface CreatureDef {
    * The everyday group the animal belongs to — "Placoderm", "Trilobite", "Sea scorpion" — shown
    * beside the genus so a name nobody has heard of still lands somewhere familiar. Two or three
    * words, no rank names. `kindNote` is the one plain sentence that says what the group is, for
-   * the places with room for it. See docs/research/devonian-classification.md.
+   * the places with room for it. Both are optional: an animal whose group name is less familiar
+   * than its own carries neither. See docs/research/devonian-classification.md and
+   * docs/research/cambrian-classification.md.
    */
   kind?: string;
   kindNote?: string;

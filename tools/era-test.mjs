@@ -31,4 +31,18 @@ assert.equal(alternative.model('example', 1), 'assets/devonian/creatures/example
 assert.equal(alternative.portrait('example', 'select'), 'assets/devonian/portraits/example.select.png');
 assert.equal(alternative.music('Test Track'), 'assets/devonian/music/Test%20Track.mp3');
 assert.equal(paths.model('pikaia'), 'assets/creatures/pikaia.glb');
-console.log('PASS: era validation, all 21 model/portrait paths and byte sizes, and independent future asset namespaces');
+
+// Every animal shows the everyday group it belongs to beside its genus — unless the group name is
+// the less familiar of the two, or is still unsettled, in which case it shows nothing. That is a
+// judgement per animal, so the omissions are listed here and a new animal has to join one side.
+// See docs/research/cambrian-classification.md.
+const UNLABELLED = ['anomalocaris', 'opabinia', 'nectocaris', 'vetulicola'];
+for (const c of era.creatures) {
+  if (UNLABELLED.includes(c.id)) {
+    assert.ok(!c.kind && !c.kindNote, `${c.id} is deliberately unlabelled; drop it from UNLABELLED to give it a group`);
+    continue;
+  }
+  assert.ok(c.kind && c.kind.length <= 18, `${c.id} needs a short everyday group (got ${c.kind ?? 'none'})`);
+  assert.ok(c.kindNote && c.kindNote.length > 40, `${c.id}'s group needs a sentence explaining it`);
+}
+console.log('PASS: era validation, all 21 model/portrait paths and byte sizes, group labels, and independent future asset namespaces');

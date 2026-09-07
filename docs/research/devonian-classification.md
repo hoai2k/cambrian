@@ -66,7 +66,8 @@ literature are noted here.
 
 ## Cambrian
 
-The `kind` / `kindNote` fields live on the shared `CreatureDef`, so the Cambrian roster can take
-the same treatment (Anomalocaris → "Radiodont", Olenoides → "Trilobite", Hallucigenia →
-"Lobopodian", and so on). It has none of them yet, and every place that shows the label already
-hides it when it is absent.
+The `kind` / `kindNote` fields live on the shared `CreatureDef`, and the Cambrian roster now carries
+them too — with one extra rule, because its famous animals are better known than their groups:
+where the label would be less familiar than the genus, it is omitted (Anomalocaris, Opabinia), as it
+is where the group itself is unsettled (Nectocaris, Vetulicola). See
+`docs/research/cambrian-classification.md`.
