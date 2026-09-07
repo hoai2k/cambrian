@@ -1,0 +1,57 @@
+{
+  "id": "manticoceras",
+  "name": "Manticoceras",
+  "species": "Manticoceras regulare",
+  "provenance": "Late Devonian, Frasnian; Lime Creek Formation / Amana Beds, Iowa",
+  "description": "Compressed coiled ammonoid shell with embracing whorls, a genuine open body chamber and an editable conservative soft-body reconstruction.",
+  "lengthMeters": 0.16,
+  "modelLength": 3.253282308578491,
+  "locomotion": "Swim",
+  "clips": [
+    "Ability",
+    "Attack",
+    "Bite",
+    "Death",
+    "Dive",
+    "Dodge",
+    "Eat",
+    "Grab",
+    "Growth",
+    "Guard",
+    "Heavy",
+    "Hit",
+    "Idle",
+    "Parry",
+    "Rise",
+    "Stagger",
+    "Swim",
+    "TurnLeft",
+    "TurnRight"
+  ],
+  "looping": [
+    "Idle",
+    "Swim",
+    "Guard",
+    "Eat"
+  ],
+  "anchors": [
+    "anchor_mouth",
+    "anchor_mouth_inside",
+    "anchor_attack_primary"
+  ],
+  "sources": [
+    "https://scholarworks.uni.edu/pias/vol93/iss1/4/",
+    "https://igs.iihr.uiowa.edu/igs/publications/uploads/GB-29.pdf",
+    "https://www.app.pan.pl/archive/published/app49/app49-235.pdf",
+    "https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0235180"
+  ],
+  "notes": [
+    "Initial preview; shell is anatomically constrained but exact soft parts and all living pigmentation are uncertain.",
+    "Representative shell diameter 0.11 m follows the Baker et al.1986 material; total living length 0.16 m includes artistically reconstructed soft parts and is not a species maximum. Larger M.regulare shells occur in the 2013 Iowa Survey figures.",
+    "Ten modest arms, small beak and funnel are conservative comparative choices, not directly preserved M.regulare soft anatomy. No hooks, suckers, long squid clubs or Nautilus arm count are asserted.",
+    "Smooth biconvex growth increments replace decorative fossil sutures; the visible fossil septal boundaries are internal structures.",
+    "Shell is rigid on body bone; flexible arms, mantle margins and open funnel interpret jetting and feeding actions. No scale channels or shell deformation.",
+    "Growth is relaxed extension, not a shell moult. Grab is a conservative arm-gathering interpretation.",
+    "Full regional vertex pigment multiplies near-neutral albedo once; texture-free LOD bakes the same factor once."
+  ]
+}

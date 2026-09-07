@@ -5,6 +5,20 @@ Implemented September 2026. This supersedes the original design's Y signature ab
 ## Controls and behavior
 
 - **RT / keyboard G (player 2: apostrophe): heavy attack.** Offensive specials become the creature's native heavy. Existing pounce/charge attacks remain on creatures without a dedicated offensive special.
+
+  A heavy special is a strike that *travels*: at the windup it turns onto the aimed target (or the
+  nearest body ahead) and carries the body forward through its hit window, stopping once it is
+  inside its own reach so it lands on the target rather than through it. `HEAVY_STRIKE` in
+  `src/sim/expansion-abilities.ts` holds the reach and the carry for every one of them, in body
+  lengths, and both eras register into it. Without the carry the button played an animation on the
+  spot and the hit windows, all of them inside a body length or two, never reached what the player
+  aimed at.
+
+  The aim prompt reads the same table. It announces the move's own name — "RT · SNATCH", not
+  "RT · POUNCE" — lights only inside the reach of *that* move rather than the pounce's much longer
+  one, and greys out on the gate the button actually checks (`Game.heavyMove`). The three
+  filter-feeding specials (`collectorWake`, `pharyngealPump`, `planktonComb`) never strike a target
+  at all, so they never offer one.
 - **B: block/parry**, or evade for creatures without a guard. Defensive specials run through this action. Hallucigenia and Canadia have a 0.28-second parry window; sustained defense is not invulnerability.
 - **Y / keyboard R (player 2: P): hide**, available at every growth tier. Press again to end hiding. Attacking, blocking, sprinting, dodging, taking damage, or being grabbed ends hiding.
 

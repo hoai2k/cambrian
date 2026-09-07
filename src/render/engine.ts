@@ -7,7 +7,7 @@ import { emptyControls, gamepads, KeyboardInput, readGamepad, rumble, type RawCo
 import { clamp, damp, TAU, wrapAngle } from '../shared/math';
 import { bandOf, isAlive, isHidden, lengthOf } from '../sim/actors';
 import { creature, type CreatureId } from '../sim/creatures';
-import { Game, type ScoreHeader, type ScoreRow, type TeleportDest } from '../sim/game';
+import { Game, radarRange as radarReach, type ScoreHeader, type ScoreRow, type TeleportDest } from '../sim/game';
 import type { Phase } from '../sim/daynight';
 import { BAND_COLOR, emptyInput, TIER_NAMES, TIER_NEED, type Actor, type Band, type InputFrame, type Mode, type PlayerSetup } from '../sim/types';
 import { BIOME_NAMES, biomeAt, groundHeight, nurseryAt, resolveStatic, SURFACE_Y, type Biome, type Boulder, type LandmarkKind } from '../sim/world';
@@ -27,7 +27,7 @@ export interface PlayerHud {
   abilityName: string; abilityReady: number; abilityActive: boolean; abilityUnlocked: boolean;
   senseReady: number;
   lock?: { name: string; kind?: string; band: Band; hp: number; color: string };
-  aim?: { hasTarget: boolean; inRange: boolean; name?: string; color: string; ready: boolean };
+  aim?: { hasTarget: boolean; inRange: boolean; name?: string; color: string; ready: boolean; /** What RT does for this creature: POUNCE, or the special's own name. */ action: string };
   hunted: number; hunterAngle: number | null; hunterName?: string; hunterState: 'none' | 'noticed' | 'hunting'; inCover: boolean; still: boolean;
   hint?: string; respawnIn: number; fade: number; state: string; modelReady: boolean; kills: number; eats: number; escapes: number; protect: boolean;
   /**
@@ -56,7 +56,18 @@ export interface PlayerHud {
   /** The era's own meters (Devonian standing, air, range), when the era defines them. */
   era?: EraHud;
 }
-export interface RadarBlipHud { x: number; y: number; kind: 'player' | 'threat' | 'giant' | 'home' | 'shore' | 'deadzone' | 'food' | 'landmark' | 'territory'; color: string; beyond: boolean; hunting: boolean; distance: number; /** Radius in radar units, for area contacts. */ r?: number; }
+export interface RadarBlipHud {
+  x: number; y: number; kind: 'player' | 'threat' | 'giant' | 'home' | 'shore' | 'deadzone' | 'food' | 'landmark' | 'territory';
+  color: string; beyond: boolean; hunting: boolean; distance: number;
+  /** Radius in radar units, for area contacts. */
+  r?: number;
+  /**
+   * Whether the contact is well above or below the viewer, for contacts where that is a real
+   * difference (creatures and shoals). A dial seen from overhead cannot show height, so the marks
+   * carry it themselves: what is above you is what you look up for.
+   */
+  level?: 'above' | 'below';
+}
 export interface HudSnapshot {
   players: PlayerHud[]; rects: Rect[]; time: number; status: 'playing' | 'won' | 'lost'; message: string; mode: Mode; winner: number; fps: number;
   /** What this match turned up, for the results screen's record. */
@@ -94,6 +105,9 @@ export const distanceHaze = (d: number, far: number) => THREE.MathUtils.smoothst
 /** Something hunting you keeps most of its presence, however far off: the warning has to read. */
 export const HUNTER_HAZE = 0.4;
 
+/** Radar colour for a shoal in the water above you, against the snack green of one on the floor. */
+export const FOOD_ABOVE = '#9ec2ff';
+
 /** Follow-camera distance for a body length: about two body lengths back plus a floor so larvae are still readable. */
 export const magnificationDistance = (L: number) => L * 1.45 + 1.15 + Math.max(0, 0.8 - L) * 0.9;
 
@@ -107,6 +121,13 @@ export const magnificationDistance = (L: number) => L * 1.45 + 1.15 + Math.max(0
  * camera is being aimed deliberately up or down, so its pitch eases in and takes over completely
  * by FULL_PITCH.
  */
+/**
+ * How far the camera may be aimed. Up is what matters for a swimmer: the water above you is where
+ * the thing that eats you comes from, so the view has to reach it. Down goes almost overhead, which
+ * is how you read the floor for prey while swimming over it.
+ */
+export const PITCH_UP = -0.95;   // ~54° above the horizon
+export const PITCH_DOWN = 1.32;  // ~76° below it, near enough straight down at the seabed
 const FLAT_PITCH = 0.45;   // ~26°, comfortably above a resting follow camera (which sits at ~11-25°)
 const FULL_PITCH = 1.0;    // ~57°, by which the camera is clearly being pointed somewhere
 
@@ -326,7 +347,7 @@ export class Engine {
             cs.zoom = clamp(cs.zoom * Math.exp(c.lookY * dt * 1.6), 0.55, 2.2);
           } else {
             cs.yaw = wrapAngle(cs.yaw - c.lookX * dt * 2.6 * this.lookSpeed);
-            cs.pitch = clamp(cs.pitch + c.lookY * dt * 1.6 * this.lookSpeed * (this.invertY ? -1 : 1), -0.55, 1.15);
+            cs.pitch = clamp(cs.pitch + c.lookY * dt * 1.6 * this.lookSpeed * (this.invertY ? -1 : 1), PITCH_UP, PITCH_DOWN);
             if (Math.abs(c.lookY) < 0.05) cs.pitch = damp(cs.pitch, 0.2, 0.6, dt);
           }
         }
@@ -490,7 +511,7 @@ export class Engine {
       if (cs.aimSnapT > 0) {
         // ease the camera onto the target
         const dx = best.pos.x - cs.camera.position.x, dy = best.pos.y - cs.camera.position.y, dz = best.pos.z - cs.camera.position.z;
-        const ty = Math.atan2(dx, dz), tp = clamp(Math.atan2(-dy, Math.hypot(dx, dz)) + 0.12, -0.55, 1.15);
+        const ty = Math.atan2(dx, dz), tp = clamp(Math.atan2(-dy, Math.hypot(dx, dz)) + 0.12, PITCH_UP, PITCH_DOWN);
         const k = 1 - Math.exp(-14 * dt);
         cs.yaw = wrapAngle(cs.yaw + wrapAngle(ty - cs.yaw) * k);
         cs.pitch += (tp - cs.pitch) * k;
@@ -575,11 +596,21 @@ export class Engine {
       lookAt.y += L * 0.1 * cs.aimBlend;
     }
     const pitch = cs.pitch + (locked ? 0.1 : 0) + (def.ground ? 0.12 : 0);
-    const desired = this.tmpDesired.set(
-      lookAt.x - Math.sin(yaw) * Math.cos(pitch) * dist,
-      lookAt.y + Math.sin(pitch) * dist + L * 0.18,
-      lookAt.z - Math.cos(yaw) * Math.cos(pitch) * dist,
+    const place = (d: number) => this.tmpDesired.set(
+      lookAt.x - Math.sin(yaw) * Math.cos(pitch) * d,
+      lookAt.y + Math.sin(pitch) * d + L * 0.18,
+      lookAt.z - Math.cos(yaw) * Math.cos(pitch) * d,
     );
+    const desired = place(dist);
+    // Looking up from the seabed puts the camera under the sand, and simply lifting it back out
+    // flattens the view — exactly when the player is trying to see what is above them. Pull the
+    // camera in instead: a shorter arm at the same angle clears the floor and keeps the aim.
+    const floorFor = (v: THREE.Vector3) => groundHeight(this.game!.world, v.x, v.z, this.scratchBoulders) + 0.7;
+    const rise = -Math.sin(pitch);
+    if (rise > 0.05) for (let it = 0; it < 3 && desired.y < floorFor(desired); it++) {
+      dist = Math.max(L * 0.55, dist - (floorFor(desired) - desired.y) / rise);
+      place(dist);
+    }
     // keep camera out of the ground and boulders, and below the surface unless the player has left the water
     const g = groundHeight(this.game!.world, desired.x, desired.z, this.scratchBoulders);
     desired.y = clamp(desired.y, g + 0.7, p.airborne ? SURFACE_Y + 40 : SURFACE_Y - 0.4);
@@ -902,10 +933,13 @@ export class Engine {
         }
       }
       // Radar: reach grows with the creature, contacts rotate into the camera frame (up = camera forward).
-      const radarRange = 55 + lengthOf(p) * 12;
+      const radarRange = radarReach(p);
       const blips: RadarBlipHud[] = [];
       if (cs) {
         const sy = Math.sin(cs.yaw), cy = Math.cos(cs.yaw);
+        // Above or below counts once the gap is more than a body or two; inside that the contact is
+        // level with you for all practical purposes and the mark should not keep changing colour.
+        const levelBand = Math.max(2.5, lengthOf(p) * 1.5);
         for (const b of game.radarFor(i, radarRange)) {
           // forward = (sin yaw, cos yaw), right = (-cos yaw, sin yaw)
           const f = (b.dx * sy + b.dz * cy) / radarRange, r = (-b.dx * cy + b.dz * sy) / radarRange;
@@ -913,10 +947,14 @@ export class Engine {
           const l = Math.hypot(x, y);
           const beyond = l > 1;
           if (beyond) { x /= l; y /= l; }
+          const level = b.kind === 'home' || b.kind === 'shore' || b.kind === 'landmark' || b.kind === 'territory' || Math.abs(b.dy) < levelBand
+            ? undefined : b.dy > 0 ? 'above' as const : 'below' as const;
+          // A shoal overhead is a different decision from one on the sand — rise for it, or dive —
+          // so it gets its own colour rather than sitting on the dial as the same green mark.
           const color = b.kind === 'player' ? PLAYER_COLORS[b.id % 4] : b.kind === 'giant' ? BAND_COLOR.giant : b.kind === 'threat' ? BAND_COLOR.threat
-            : b.kind === 'food' ? BAND_COLOR.snack : b.kind === 'home' ? '#9be9ff' : b.kind === 'landmark' ? '#ffd9a0'
+            : b.kind === 'food' ? (level === 'above' ? FOOD_ABOVE : BAND_COLOR.snack) : b.kind === 'home' ? '#9be9ff' : b.kind === 'landmark' ? '#ffd9a0'
             : b.kind === 'territory' ? BAND_COLOR.rival : '#d9cfa4';
-          blips.push({ x, y, kind: b.kind, color, beyond, hunting: b.hunting, distance: b.distance, r: b.radius != null ? b.radius / radarRange : undefined });
+          blips.push({ x, y, kind: b.kind, color, beyond, hunting: b.hunting, distance: b.distance, r: b.radius != null ? b.radius / radarRange : undefined, level });
         }
         // Dead zones are areas, not contacts: drawn as rings, clamped to the rim like anything else.
         if (era) for (const z of era.deadZones) {
@@ -948,7 +986,8 @@ export class Engine {
       let aim: PlayerHud['aim'];
       if (p.aiming && cs) {
         const t = lockA && isAlive(lockA) ? lockA : undefined;
-        aim = { hasTarget: !!t, inRange: !!t && p.aimInRange, name: t ? creature(t.creature).name : undefined, color: t ? BAND_COLOR[bandOf(p, t)] : '#eefaf6', ready: p.pounceCd === 0 && p.stamina >= 12 };
+        const heavyMove = game.heavyMove(p);
+        aim = { hasTarget: !!t, inRange: !!t && p.aimInRange, name: t ? creature(t.creature).name : undefined, color: t ? BAND_COLOR[bandOf(p, t)] : '#eefaf6', ready: heavyMove.ready, action: heavyMove.name };
       }
       return {
         index: i, creature: p.creature, color: PLAYER_COLORS[i % 4], alive: p.state !== 'dead', aim,

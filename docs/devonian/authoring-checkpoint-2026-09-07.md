@@ -1,6 +1,67 @@
 # Devonian authoring checkpoint — 7 September 2026, 18:01 UTC
 
+**Read [current-state.md](current-state.md) first.** It records the current main commit, seven reworks and active clay-02 phases; older sections below are historical.
+
 This is a resumable work checkpoint, not a completion report. The user requested it to preserve context and judge remaining token use. Update the current status as deliveries land; do not infer that drafts are approved from their presence on disk.
+
+## Current execution update — published initial library; phased reworks active
+
+**Verified pushed main: f7b5618**. Complete initial library commit 6cd8de7 and concurrent-main
+integration/workflow commit 69b35a0 are included. All 21 creatures and every initial supporting
+asset set are on main. The separate non-creature completion notification WAS sent to the user.
+There are 3 final / 18 preview creatures, including all six requested total reworks.
+
+User authorized model-specific delegation: **gpt-6-astra / high** for anatomy research,
+sculpting decisions and implementation, rig/animation design, complex merge judgment and visual
+approval; **gpt-5.6-terra / medium** for frozen-script Blender runs, renders, exports, packaging
+and established tests. See `agent-workflow.md`. Batch mechanical work, use compact hash-bound
+handoffs, return unexpected design/failure decisions to Astra. Avoid duplicating full history.
+
+Active new creative authors (each explicitly spawned as Astra high with compact context):
+- `/root/titanichthys_rework_design`: new rework-v3 research/sculpt brief + Blender clay source.
+- `/root/gemuendina_rework_design`: new rework-v3 research/sculpt brief + Blender clay source.
+Both preserve old public/source files and write own WORKING_STATE. First deliverable is a frozen
+script/render handoff, then `/root/devonian_execution_handoff` (Terra medium, currently idle)
+runs it and parent/Astra reviews the resulting form before materials/rig/full actions. Keep one
+execution slot free instead of putting all workers into creative phases. Remaining full reworks:
+Doryaspis, Coccosteus, Bothriolepis and Stethacanthus. Named Coccosteus backup remains preserved.
+
+All integration checks passed: typecheck/build, 644 Devonian checks, 21-creature/47-prop asset
+inventory, era isolation and loader regression. Stale Vite HMR initially failed scenery QA;
+Astra provided fresh isolated 4181 server (session62072) and corrected baseline isolation.
+All three runs pass: low 1,307,304 / high 8,087,473 / baseline 1,211,203 triangles; 104 calls,
+errors[], clean disposal. Astra visually reviewed low/high images. Viewer4176 was rebuilt and
+reloaded; pending labels are present, and Manticoceras rendered with its 19 actions available.
+Logs: `../devonian-authoring/review/workflow-merge-*.log`.
+
+Concurrent main scenery export library (24 files) and environment mappings are preserved.
+The explicit instancing collection owns its mappings, quality threshold and two intentional
+procedural giant exceptions, preventing underwater land-plant fallthrough. Remote day/night,
+UI and ecology changes remain. No original Cambrian creature files changed.
+
+## Latest additional reference — Odaraia and first clay execution
+
+User added **Odaraia (Cambrian) TOTAL REWORK**, preserving original as backup. Queue is
+`docs/cambrian/refinement-queue.md`: many-legged shrimp-like form, prominent compound eyes,
+shaped open wrapping coat-like carapace with partial transparency, not a cylinder. Existing
+Devonian jobs continue. Seven requested total reworks now take priority over general refinements.
+Named local backup `../expansion-authoring/backups/odaraia-pre-rework-2026-09-07/` contains
+23 files / 44,616,856 bytes plus backup-manifest.json. Terra verified all 24 source/copy pairs
+including user reference; reference SHA 01c3449922bf37fb7e00956dc0c05c13650a7bdc3aa1a4d4e19d703cc2ffde7c.
+All original Cambrian public model/portrait bytes remain unchanged. New derived status map
+`src/content/cambrian/model-status.ts` marks pending Odaraia preview in both game and viewer.
+Typecheck/build/era checks pass; actual viewer displays its preview badge. No old geometry audit.
+
+Gemuendina's first new clay source is frozen: `tools/devonian/creatures/gemuendina/rework-v3/HANDOFF.md`,
+manifest SHA 37b2372eccf4df0425c6662424d038eaa6137371e211fa75555cef5a6585786c. Terra executor is running
+its two frozen Blender commands with additional --python-exit-code 1. Outputs only local
+`../devonian-authoring/gemuendina/rework-v3/clay-01/`. Eight fixed clay renders, no final rig/textures
+or public export yet. Parent and author review actual output before next creative phase.
+Titanichthys creative source remains in progress; do not stage its un-frozen folder.
+
+Parent saved Coccosteus preproduction in `tools/devonian/creatures/coccosteus/rework-v3/design.md`.
+TUG 1817-152 identity verified via institutional catalogue; detailed specimen page unavailable.
+No new Coccosteus builder yet. Preserve backup and use the notes to avoid repeated research.
 
 ## Latest priority — supersedes older refinement sequencing below
 
@@ -9,22 +70,34 @@ prop and supporting image first, committed early to main, then full refining pas
 quality and eye requirements remain, but extended repeated art/collision reviews are deferred
 and recorded. Do not block initial delivery on final-art perfection. Mark unfinished models
 **⚠ Preview model** on the game choice cards and viewer. The lifecycle source is
-`src/content/devonian/model-status.json`; seven reviewed models are final; Doryaspis and Gemuendina were reopened as preview following user feedback. All other roster IDs are preview.
+`src/content/devonian/model-status.json`; three reviewed models are final; all pending refinements, including six requested total reworks, are preview.
 
-Current initial delivery: **19/21 creatures available, 7 final + 12 preview**, with 47 scenery
-previews and nine runtime biome paintings. The twelve previews are Doryaspis, Gemuendina, Onychodus, Rhinodipterus,
-Tiktaalik, Acanthostega, Eldredgeops, Jaekelopterus, Walliserops, Nahecaris, Palaeoisopus and Furcaster. Exact raw/packaged hashes are in each
-tracked `preview-delivery.json`. All 47 scenery full models loaded in the actual built viewer;
-full/LOD structural/scale/ambient checks passed. Raw/editable sources stay local.
+Current initial collection: **21/21 creatures integrated; 3 reviewed/final + 18 preview**.
+Initial collection and complete supporting library were pushed as **f7b5618** on main, with feature **69b35a0**. Latest two cephalopods and eleven instancing proxies are integrated and verified.
+A separate main checkout at `../devonian-publish` avoids disturbing active authoring edits.
 
-Walliserops, Nahecaris, Palaeoisopus and Furcaster are integrated, packaged and viewer-verified; batch-19 intake, typecheck, build and 618 Devonian checks passed. Agents now own Manticoceras (eye_audit), runtime scenery instancing (titanichthys), and Michelinoceras (dunkleosteus). Parent owns packaging, creature integration and supporting images. Main and devonian-assets were pushed at **fdabd42**, including the 15-creature / 47-prop / nine-painting library and concurrent Survival/menu/palette work. Refresh Git for newer state.
+Six user-directed TOTAL REWORKS: Titanichthys, Coccosteus, Bothriolepis, Doryaspis, Gemuendina, Stethacanthus.
+All user images are preserved under each local creature/user-reference folder. Coccosteus has a
+named complete published/source/Blender backup under local/devonian-authoring/backups.
+The pending-refinements.json ledger prevents catalogue generation with a pending model marked
+final. Finish initial creature delivery to main, then prioritize total reworks. Run eye/general
+creature audits only AFTER completing each total rework, per latest user instruction. Do not
+repeat audits of superseded geometry. Other individual refinements follow the total reworks.
 
-Outstanding non-creature initial work: dedicated cheap instanced exports / placement mappings,
-ten material source sets, nine regional E01–E09 boards, three lighting boards, particle/decal
-atlases and two scale-comparison plates. Runtime biome paintings are separate from the regional
-boards. Material source images T01–T05, T07–T09 are generated and safely copied to local/devonian-authoring/environment-materials; exact prompts/source paths are in tools/devonian/material-image-prompts.json. Eight matching numerical material map sets and five source-model-derived T06/T10 atlas cells are now generated locally/public but not yet committed; inspect and publish with supporting-image manifest. Nine regional boards are generating in three independent batches; exact prompts persisted in tools/devonian/regional-board-prompts.json.
-Nine biome originals are safely in local/devonian-authoring/environment-images, tracked prompts
-in tools/devonian/environment-image-prompts.json; outputs public/assets/devonian/biomes.
+Initial non-creature outputs prepared: 47 scenery models and 9 runtime paintings already main;
+11 dedicated instancing proxies plus renderer config ready (High uses authored ordinary flora,
+Performance retains procedural flora; 2 giant silhouettes remain procedural exceptions);
+29 scenery appearance boards, 9 regional boards, 3 lighting concepts, 10 material source sets,
+2 RGBA atmosphere atlases prepared. Both scale plates are complete and verified, with all21 models, uniform 600px/metre and explicitly separate 5× inset.
+T01–T05/T07–T09 numerical maps and T06/T10 Blender-derived atlas data were independently
+checked and corrected for normal green convention and inherited denoising; source albedos unchanged.
+Supporting-asset-review.json has evidence. Original imagegen sources and exact prompts are saved.
+All initial sets have been verified on main; the requested separate completion notification has been sent.
+
+Agent handoffs complete: eye_audit delivered scale plates; titanichthys delivered scenery and
+supporting-data QA; dunkleosteus delivered Michelinoceras.
+All initial author handoffs and source projects are saved. New Titanichthys and Gemuendina full reworks are active as described above.
+Manticoceras and Michelinoceras final hashes are in preview-delivery.json after lossless packaging.
 
 The pending local Onychodus palatal-pocket edit is NOT exported: tracked build.py matches the
 shipped GLB; do not run the local assembler without reviewing it. No full-refinement loop should

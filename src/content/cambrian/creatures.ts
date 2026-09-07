@@ -8,8 +8,16 @@ const heavy = (name: string, o: Partial<MoveDef> = {}): MoveDef => ({
   name, windup: 0.42, active: 0.2, recovery: 0.5, damage: 24, poise: 45, knockback: 3.5, stamina: 18, lunge: 0.9, guardBreak: true, ...o,
 });
 
+/**
+ * `kind` / `kindNote` carry the everyday group an animal belongs to, the way the Devonian roster
+ * does. Four animals deliberately have none: the label would be less familiar than the genus it
+ * sits beside (Anomalocaris and Opabinia are better known than "radiodont"), or the group itself
+ * is unsettled (Nectocaris, Vetulicola). See docs/research/cambrian-classification.md;
+ * tools/era-test.mjs holds that list, so a new animal has to make the choice deliberately.
+ */
 export const CAMBRIAN_CREATURES: readonly CreatureDef[] = [
   {
+    // No kind: "radiodont" is the group, and far fewer people have met the word than the animal.
     id: 'anomalocaris', name: 'Anomalocaris', species: 'A. canadensis',
     tagline: 'The reef’s original nightmare. Grab it. Crush it. Keep swimming.',
     role: 'Pursuit predator', ground: false, adultLength: 3.9,
@@ -25,6 +33,7 @@ export const CAMBRIAN_CREATURES: readonly CreatureDef[] = [
     canGuard: true,
   },
   {
+    // No kind, for the same reason: Opabinia is the famous one, "opabiniid" explains nothing.
     id: 'opabinia', name: 'Opabinia', species: 'O. regalis',
     tagline: 'Five eyes, one hose-nozzle claw, zero blind spots.',
     role: 'Reach specialist', ground: false, adultLength: 3.0,
@@ -41,6 +50,7 @@ export const CAMBRIAN_CREATURES: readonly CreatureDef[] = [
   },
   {
     id: 'waptia', name: 'Waptia', species: 'W. fieldensis',
+    kind: 'Bivalved arthropod', kindNote: 'A hymenocarine: one of the shrimp-shaped Cambrian arthropods that folded a two-valved carapace over the body, and the branch that leads on to the mandibulates — crustaceans and insects.',
     tagline: 'Blink and it’s behind you. Blink again and it’s gone.',
     role: 'Skirmisher', ground: false, adultLength: 2.7,
     speed: 6.6, burst: 2.2, agility: 5.0, turnRate: 3.6, glide: 1.6,
@@ -56,6 +66,7 @@ export const CAMBRIAN_CREATURES: readonly CreatureDef[] = [
   },
   {
     id: 'canadia', name: 'Canadia', species: 'C. spinosa',
+    kind: 'Bristle worm', kindNote: 'A polychaete annelid — the bristle-bearing segmented worms, still one of the most abundant animal groups on the sea floor today.',
     tagline: 'A ribbon of knives. Touch it and regret it.',
     role: 'Controller', ground: false, adultLength: 2.8,
     speed: 5.4, burst: 1.7, agility: 4.0, turnRate: 3.2, glide: 0.9,
@@ -71,6 +82,7 @@ export const CAMBRIAN_CREATURES: readonly CreatureDef[] = [
   },
   {
     id: 'hallucigenia', name: 'Hallucigenia', species: 'H. sparsa',
+    kind: 'Velvet worm kin', kindNote: 'A lobopodian: the soft, many-legged worms on the arthropod stem, whose only living descendants are the velvet worms and the water bears.',
     tagline: 'Fourteen spines say no. Politely, then not.',
     role: 'Fortress', ground: true, adultLength: 2.7, diet: 'scavenger',
     speed: 3.3, burst: 1.6, agility: 5.0, turnRate: 2.6, glide: 3.0,
@@ -86,6 +98,7 @@ export const CAMBRIAN_CREATURES: readonly CreatureDef[] = [
   },
   {
     id: 'wiwaxia', name: 'Wiwaxia', species: 'W. corrugata',
+    kind: 'Early mollusc', kindNote: 'A halwaxiid, read by most as an early mollusc — its rows of teeth grow and work like a mollusc’s radula — though some place the group nearer the annelid worms.',
     tagline: 'A walking wall of blades. Good luck.',
     role: 'Tank', ground: true, adultLength: 2.6, diet: 'grazer', grazeStill: true,
     speed: 3.0, burst: 1.5, agility: 4.0, turnRate: 2.2, glide: 3.5,
@@ -101,6 +114,7 @@ export const CAMBRIAN_CREATURES: readonly CreatureDef[] = [
   },
   {
     id: 'marrella', name: 'Marrella', species: 'M. splendens',
+    kind: 'Early arthropod', kindNote: 'A marrellomorph: an early branch of the arthropods, lace-thin and spined, that ran through the Palaeozoic and left no living descendants.',
     tagline: 'Now you see it. Now it’s under the mud.',
     role: 'Scout', ground: true, adultLength: 2.7, diet: 'deposit',
     speed: 5.0, burst: 1.9, agility: 6.0, turnRate: 3.8, glide: 2.5,
@@ -116,6 +130,7 @@ export const CAMBRIAN_CREATURES: readonly CreatureDef[] = [
   },
   {
     id: 'olenoides', name: 'Olenoides', species: 'O. serratus',
+    kind: 'Trilobite', kindNote: 'The three-lobed armoured arthropods that crawled the sea floor for 270 million years and are the classic fossil of the Palaeozoic.',
     tagline: 'Armor, momentum, and a very bad attitude.',
     role: 'Bruiser', ground: true, adultLength: 3.0,
     speed: 3.6, burst: 1.7, agility: 4.5, turnRate: 2.4, glide: 3.0,

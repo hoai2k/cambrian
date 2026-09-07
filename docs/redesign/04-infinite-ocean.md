@@ -210,26 +210,59 @@ The sea is endless, so a party needs a way to regroup.
 
 A small circle at the top right of each viewport (the bottom right carries the
 chips and the tally). Up is the way the camera looks. Its reach is
-`55 + 12 × body length` units, so it grows with you.
+`24 + 11 × body length` units (`radarRange` in `src/sim/game.ts`), so it grows
+with you: about 30 m for a hatchling and 200 m for the largest Devonian prime.
+Size is the proxy for range — a small animal lives inside a few plants and a
+giant crosses biomes, so a fixed sweep would be a map for one and a blur for
+the other.
 
 - **Other players** always, in their player colour, wherever they are.
-- **Threats and giants**: anything in the `threat` or `giant` band relative to
-  you, *inside the reach*, as diamonds (bigger for giants). Prey and rivals are
-  deliberately not shown as contacts: there are far too many.
+- **The nearest predator**: the closest body in the `threat` or `giant` band
+  relative to you, *inside the reach*, as a diamond (bigger for giants). One,
+  not all of them. Same-size rivals, prey and snacks are never contacts.
 - **Whatever is hunting you**, whatever its size, blinking — inside the reach.
-- **Food**: the nearest three shoals worth eating, as discs the size of the
-  school rather than a dot per body. Wild snack and prey band creatures only:
+  This is the only thing that puts a second creature on the dial.
+- **Food**: the nearest shoal worth eating, as a disc the size of the school
+  rather than a dot per body. Wild snack and prey band creatures only:
   another player is never marked as a meal.
+- **Height**, because the dial is read from overhead and a shoal thirty metres
+  up would otherwise sit on the same spot as one on the sand — swim to the
+  mark and there is nothing there. Every creature contact carries `dy`; one
+  more than a body or two above or below you gets a chevron, and a shoal
+  overhead is drawn in its own colour (`FOOD_ABOVE`) rather than the snack
+  green of one on the floor. Reach is a sphere for the same reason: food far
+  above a body on the seabed is not food within reach of it.
 - **Home** (your nursery) as a small house, and the **shore** as an arc of
   sand on the rim in its direction.
+
+One predator and one meal is a decision; twenty of each is wallpaper. Listing
+every animal in reach made the dial useless exactly where it mattered most —
+at hatchling size almost everything alive outranks you, so the radar read as a
+solid ring of threats.
 
 Only the other players and the two bearings carry off the edge: they sit hollow
 on the rim pointing the way. A creature outside the reach is simply not on the
 dial — the radar tells you what is around you, not what exists.
 The biome's name is announced in a banner for three seconds when it changes.
 
+## Rocks
+
+A boulder is drawn as an ellipsoid — `sx` by `sy` by `sz`, turned by `rot` —
+and it collides as the ellipse it is drawn with (`boulderQ` / `boulderAxes`),
+not as the circle around it. The circle stood up to a couple of units out into
+open water on a long rock's narrow side, which is what an invisible wall in a
+gap between a rock and a plant was. The same footprint gives the dome height, so
+what you can see, what you bump into and what you can stand on are one shape. A
+carved prop (a spire, a talus shard) keeps the tuned `radius` it was given; only
+the proportions come from the mesh scale.
+
 ## Tests
 
+- `tools/swim-test.ts`: sprint endurance, how close to the sand a swimmer may
+  ride, rock colliders matching the drawn ellipse (including a rotated rock and
+  a carved prop), riding over a boulder without being pushed back and without a
+  jolt, a tall rock still being a wall, camera reach, and the radar's reading of
+  height.
 - `tools/world-test.ts`: the shore is a wall and swimmable beyond; all nine
   biomes occur with the bands in the right places; chunks are deterministic;
   a player sprinting out to sea for 90 s has chunks, ecosystem and giants

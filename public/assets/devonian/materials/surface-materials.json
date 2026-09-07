@@ -1,0 +1,335 @@
+[
+  {
+    "code": "T01",
+    "id": "pale-carbonate",
+    "modelStatus": "preview",
+    "tileWidthMeters": 0.5,
+    "heightAmplitudeMeters": 0.0006,
+    "sourceSHA256": "6367a74f7e5a13dd85cf25e8ff2395bced7dd1b61219e44c5bd9b551b9fff5f4",
+    "normalConvention": "tangent-space OpenGL +Y (UV up, image rows down); linear data",
+    "heightEncoding": "16-bit unsigned grayscale; zero to heightAmplitudeMeters",
+    "provenance": "Original imagegen albedo plus seeded numerically authored microrelief; not a scan or fossil-validated tissue.",
+    "refinement": "Review albedo edge seams, perceptual scale, wetness and relief alignment in context.",
+    "maps": {
+      "albedo": {
+        "path": "assets/devonian/materials/pale-carbonate/albedo.webp",
+        "bytes": 405838,
+        "sha256": "0210e47281199d0aa0bc3fd8919cea63da5051251cf4b3525fef947e58a166c0"
+      },
+      "height": {
+        "path": "assets/devonian/materials/pale-carbonate/height.png",
+        "bytes": 1662182,
+        "sha256": "352f565e7fc9196c2d587ababee091f77f2e20dc672bf9334b7c45353a8c20be"
+      },
+      "normal": {
+        "path": "assets/devonian/materials/pale-carbonate/normal.png",
+        "bytes": 339066,
+        "sha256": "7acd18ae73741f5310172f18dbf858e41684fc6510bd379971a8113d962c22bc"
+      },
+      "roughness": {
+        "path": "assets/devonian/materials/pale-carbonate/roughness.png",
+        "bytes": 85086,
+        "sha256": "b0e080ee572efe49055f2f06afba909d7e7fd1ee47ee4bc1f067383ef6ad326a"
+      }
+    }
+  },
+  {
+    "code": "T02",
+    "id": "dark-carbonate",
+    "modelStatus": "preview",
+    "tileWidthMeters": 0.5,
+    "heightAmplitudeMeters": 0.0008,
+    "sourceSHA256": "3cd0fbf27335c0bb66deda21740de863033949274080453b72caa4a121a63b8d",
+    "normalConvention": "tangent-space OpenGL +Y (UV up, image rows down); linear data",
+    "heightEncoding": "16-bit unsigned grayscale; zero to heightAmplitudeMeters",
+    "provenance": "Original imagegen albedo plus seeded numerically authored microrelief; not a scan or fossil-validated tissue.",
+    "refinement": "Review albedo edge seams, perceptual scale, wetness and relief alignment in context.",
+    "maps": {
+      "albedo": {
+        "path": "assets/devonian/materials/dark-carbonate/albedo.webp",
+        "bytes": 381572,
+        "sha256": "a5b8d96950aa8179d01e54d2559750a88c2e0caff732fc70bc3ff94ae6fdd3f9"
+      },
+      "height": {
+        "path": "assets/devonian/materials/dark-carbonate/height.png",
+        "bytes": 1620922,
+        "sha256": "d703902933bff066b8c94f530682cba7fd00329f8f33f9dbcaf5e6836841c0d4"
+      },
+      "normal": {
+        "path": "assets/devonian/materials/dark-carbonate/normal.png",
+        "bytes": 331637,
+        "sha256": "ce6e4485246b1665831c0580208ab272f435eac83c21ab2d2c4c1852aa67f764"
+      },
+      "roughness": {
+        "path": "assets/devonian/materials/dark-carbonate/roughness.png",
+        "bytes": 88370,
+        "sha256": "7a4b4410ff5dc950e4a949ffe11479ab9da86bcefb0fe940d2dba32ff30ea689"
+      }
+    }
+  },
+  {
+    "code": "T03",
+    "id": "marine-mud",
+    "modelStatus": "preview",
+    "tileWidthMeters": 0.25,
+    "heightAmplitudeMeters": 0.00015,
+    "sourceSHA256": "507eeeec6eb9f0d248f9f2b306530f3a6f2d25cbc91147ba7a7ff89677437938",
+    "normalConvention": "tangent-space OpenGL +Y (UV up, image rows down); linear data",
+    "heightEncoding": "16-bit unsigned grayscale; zero to heightAmplitudeMeters",
+    "provenance": "Original imagegen albedo plus seeded numerically authored microrelief; not a scan or fossil-validated tissue.",
+    "refinement": "Review albedo edge seams, perceptual scale, wetness and relief alignment in context.",
+    "maps": {
+      "albedo": {
+        "path": "assets/devonian/materials/marine-mud/albedo.webp",
+        "bytes": 308122,
+        "sha256": "e074cc29803fcdbc71fbd78f30fac9e624b10d993163ddd4bc34c5cffb329a92"
+      },
+      "disturbance-mask": {
+        "path": "assets/devonian/materials/marine-mud/disturbance-mask.png",
+        "bytes": 280521,
+        "sha256": "0f154331766a8672276c476ce519533a3650d2c3b5d0566dd78000cdbc6dde87"
+      },
+      "height": {
+        "path": "assets/devonian/materials/marine-mud/height.png",
+        "bytes": 1607298,
+        "sha256": "afd447a3da9a844446eadc09366d930d73cc8406050dca70abb97f9901dd5253"
+      },
+      "normal": {
+        "path": "assets/devonian/materials/marine-mud/normal.png",
+        "bytes": 185057,
+        "sha256": "466a55288e8cbfa63575b3e4757ccd93d8bffdc93e28567bf48fdc02dd7ffd89"
+      },
+      "roughness": {
+        "path": "assets/devonian/materials/marine-mud/roughness.png",
+        "bytes": 86413,
+        "sha256": "941441911941e5776db095d0eded1be0184c27fae03a98a29b04629c02a4eec4"
+      }
+    },
+    "variants": {
+      "smooth": {
+        "normalScale": 0.25
+      },
+      "slightly-disturbed": {
+        "normalScale": 1,
+        "mask": "disturbance-mask.png"
+      }
+    }
+  },
+  {
+    "code": "T04",
+    "id": "freshwater-sediment",
+    "modelStatus": "preview",
+    "tileWidthMeters": 0.25,
+    "heightAmplitudeMeters": 0.00025,
+    "sourceSHA256": "91cadaa9397f39c4ce3669994775f95c658a6592f5ef083e086471ce4b18d1f5",
+    "normalConvention": "tangent-space OpenGL +Y (UV up, image rows down); linear data",
+    "heightEncoding": "16-bit unsigned grayscale; zero to heightAmplitudeMeters",
+    "provenance": "Original imagegen albedo plus seeded numerically authored microrelief; not a scan or fossil-validated tissue.",
+    "refinement": "Review albedo edge seams, perceptual scale, wetness and relief alignment in context.",
+    "maps": {
+      "albedo": {
+        "path": "assets/devonian/materials/freshwater-sediment/albedo.webp",
+        "bytes": 340874,
+        "sha256": "ef9f1f1d32a3eafa1dff2ab0cba7b293c6834e5d882dbcd4baad51b3dde67706"
+      },
+      "height": {
+        "path": "assets/devonian/materials/freshwater-sediment/height.png",
+        "bytes": 1578949,
+        "sha256": "7a9e17b91db54f837633451ddf1bd2b529b6cc1f42140e70fa691ad646a006c1"
+      },
+      "normal": {
+        "path": "assets/devonian/materials/freshwater-sediment/normal.png",
+        "bytes": 219623,
+        "sha256": "4ff3ad7e71b1df6a241f7e2e85012a82bd9042123c2b0397405bbbcaf45d01bf"
+      },
+      "roughness": {
+        "path": "assets/devonian/materials/freshwater-sediment/roughness.png",
+        "bytes": 101138,
+        "sha256": "1bb24f779516f4c38b8c421a5433ae14cc2d0c8f82229380b8315439175c7bfb"
+      }
+    }
+  },
+  {
+    "code": "T05",
+    "id": "ripple-sand",
+    "modelStatus": "preview",
+    "tileWidthMeters": 1.0,
+    "heightAmplitudeMeters": 0.018,
+    "sourceSHA256": "fbcb179fac1bb522d2c0226b7ab0f0549b15047cd5889bcb4539d31eacf3d9f8",
+    "normalConvention": "tangent-space OpenGL +Y (UV up, image rows down); linear data",
+    "heightEncoding": "16-bit unsigned grayscale; zero to heightAmplitudeMeters",
+    "provenance": "Original imagegen albedo plus seeded numerically authored microrelief; not a scan or fossil-validated tissue.",
+    "refinement": "Review albedo edge seams, perceptual scale, wetness and relief alignment in context.",
+    "maps": {
+      "albedo": {
+        "path": "assets/devonian/materials/ripple-sand/albedo.webp",
+        "bytes": 467968,
+        "sha256": "e517cb311951b3d40a2a872595e3674f9fb23c41d7389796ff9a367e0bcccaed"
+      },
+      "height": {
+        "path": "assets/devonian/materials/ripple-sand/height.png",
+        "bytes": 1324759,
+        "sha256": "bc09b264b1afc8abda0e20ff62fbbb3a7f4763fd8fe13c168c64deb17767855e"
+      },
+      "normal": {
+        "path": "assets/devonian/materials/ripple-sand/normal.png",
+        "bytes": 400511,
+        "sha256": "ccd256b9077111b7282680324d6da508fd6eeadd7f3ef500644413cf8a96561d"
+      },
+      "roughness": {
+        "path": "assets/devonian/materials/ripple-sand/roughness.png",
+        "bytes": 76393,
+        "sha256": "49af9a9303051ec06cddf170d23eaeaf99289163580edca19aa3e033397334d5"
+      }
+    }
+  },
+  {
+    "code": "T07",
+    "id": "microbial-film",
+    "modelStatus": "preview",
+    "tileWidthMeters": 0.3,
+    "heightAmplitudeMeters": 0.0002,
+    "sourceSHA256": "879e682ce7af6faddc78f488647eddd755236325ab7bfb249d509ec1bc05e3a5",
+    "normalConvention": "tangent-space OpenGL +Y (UV up, image rows down); linear data",
+    "heightEncoding": "16-bit unsigned grayscale; zero to heightAmplitudeMeters",
+    "provenance": "Original imagegen albedo plus seeded numerically authored microrelief; not a scan or fossil-validated tissue.",
+    "refinement": "Review albedo edge seams, perceptual scale, wetness and relief alignment in context.",
+    "maps": {
+      "albedo": {
+        "path": "assets/devonian/materials/microbial-film/albedo.webp",
+        "bytes": 547136,
+        "sha256": "3c2eb6a1d213d47716cd41a6cda9b4a785730f946c002b2b9ac4d3f4efc7dcbc"
+      },
+      "coverage-broad": {
+        "path": "assets/devonian/materials/microbial-film/coverage-broad.png",
+        "bytes": 210691,
+        "sha256": "8e37daa7136dd8042e16665289d974b1b4fb2f2182965fa8a833e1e8f507c368"
+      },
+      "coverage-patchy": {
+        "path": "assets/devonian/materials/microbial-film/coverage-patchy.png",
+        "bytes": 229947,
+        "sha256": "392d006ce365ae93c580899cb82cd800ab0f36fb9eeb7c17fd74744eb3ec1df2"
+      },
+      "coverage-sparse": {
+        "path": "assets/devonian/materials/microbial-film/coverage-sparse.png",
+        "bytes": 76758,
+        "sha256": "7e6d336b4d3bcff04641971539ed99113fdb64043b4cb9b89dd727e22f7abd3e"
+      },
+      "height": {
+        "path": "assets/devonian/materials/microbial-film/height.png",
+        "bytes": 1649331,
+        "sha256": "a80591e972b4a3e791c83b71f18b5c1b7f014ab73ae816e67c9bbd0e56901cf1"
+      },
+      "normal": {
+        "path": "assets/devonian/materials/microbial-film/normal.png",
+        "bytes": 231902,
+        "sha256": "c174de4b896831e4ff7e524043d3c92950ba8408bf45f0fa929a14a965e1537d"
+      },
+      "roughness": {
+        "path": "assets/devonian/materials/microbial-film/roughness.png",
+        "bytes": 97351,
+        "sha256": "26b05bd38a5c65ce128723392349ed6b10717c68e54096d11bde37d7ecd63993"
+      }
+    },
+    "pigmentVariants": {
+      "olive": [
+        0.46,
+        0.5,
+        0.3
+      ],
+      "umber": [
+        0.45,
+        0.32,
+        0.2
+      ],
+      "grey": [
+        0.43,
+        0.46,
+        0.42
+      ]
+    }
+  },
+  {
+    "code": "T08",
+    "id": "submerged-wood",
+    "modelStatus": "preview",
+    "tileWidthMeters": 0.4,
+    "heightAmplitudeMeters": 0.002,
+    "sourceSHA256": "bf94749455fab99a6b6be34fee189919e6126d16bf4894887fda08242f1c3c95",
+    "normalConvention": "tangent-space OpenGL +Y (UV up, image rows down); linear data",
+    "heightEncoding": "16-bit unsigned grayscale; zero to heightAmplitudeMeters",
+    "provenance": "Original imagegen albedo plus seeded numerically authored microrelief; not a scan or fossil-validated tissue.",
+    "refinement": "Review albedo edge seams, perceptual scale, wetness and relief alignment in context.",
+    "maps": {
+      "albedo": {
+        "path": "assets/devonian/materials/submerged-wood/albedo.webp",
+        "bytes": 453720,
+        "sha256": "ec6455b4a9e8e408384c16130211a027274f09e37aab53f479b1019f46110f10"
+      },
+      "height": {
+        "path": "assets/devonian/materials/submerged-wood/height.png",
+        "bytes": 1328355,
+        "sha256": "d92da5ef72f060511d23520609227e2c1d012005c82101939bcae6e323412043"
+      },
+      "normal": {
+        "path": "assets/devonian/materials/submerged-wood/normal.png",
+        "bytes": 144630,
+        "sha256": "84dd2db5c0d475f41c2fda169d2f261134f4399ee73e00e01a03d3649b351b13"
+      },
+      "roughness": {
+        "path": "assets/devonian/materials/submerged-wood/roughness.png",
+        "bytes": 77740,
+        "sha256": "7306f46b51c721ad482612ddb672e54629729c5808bc93d1244acf04acab8036"
+      },
+      "sediment-mask": {
+        "path": "assets/devonian/materials/submerged-wood/sediment-mask.png",
+        "bytes": 313648,
+        "sha256": "538612118ef1374f3c0605c78921a51c78e523e96a309eaf106a50d7ef8ab8e0"
+      }
+    },
+    "variants": {
+      "clean": {
+        "sedimentCoverage": 0
+      },
+      "softened-silty": {
+        "sedimentCoverage": 0.35,
+        "mask": "sediment-mask.png"
+      }
+    },
+    "brokenEndSource": "assets/devonian/props/submerged-log.glb"
+  },
+  {
+    "code": "T09",
+    "id": "rooted-bank",
+    "modelStatus": "preview",
+    "tileWidthMeters": 1.0,
+    "heightAmplitudeMeters": 0.006,
+    "sourceSHA256": "65a484f20aefd5d178d31c934911cdc258bf20177e8d592877da78c4af4add14",
+    "normalConvention": "tangent-space OpenGL +Y (UV up, image rows down); linear data",
+    "heightEncoding": "16-bit unsigned grayscale; zero to heightAmplitudeMeters",
+    "provenance": "Original imagegen albedo plus seeded numerically authored microrelief; not a scan or fossil-validated tissue.",
+    "refinement": "Review albedo edge seams, perceptual scale, wetness and relief alignment in context.",
+    "maps": {
+      "albedo": {
+        "path": "assets/devonian/materials/rooted-bank/albedo.webp",
+        "bytes": 442816,
+        "sha256": "6feb660c3c84bae219b50cfa680222e5d590e74d778fe84148a181eff9a729d5"
+      },
+      "height": {
+        "path": "assets/devonian/materials/rooted-bank/height.png",
+        "bytes": 1304221,
+        "sha256": "064b707022480660951dcf400aca5861460dcff6842f7bd13eba4f9e2a757d03"
+      },
+      "normal": {
+        "path": "assets/devonian/materials/rooted-bank/normal.png",
+        "bytes": 96845,
+        "sha256": "6149a0928e43486f5fa717808b7732b5353503f7f9efb2e674e7dcbc9b4f9de3"
+      },
+      "roughness": {
+        "path": "assets/devonian/materials/rooted-bank/roughness.png",
+        "bytes": 77111,
+        "sha256": "cf63615b3be91a157fcca7724b59642db77739e9bd690610b39e10ea45305287"
+      }
+    }
+  }
+]
