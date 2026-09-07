@@ -33,6 +33,19 @@ the art brief*.
 
 ## Delivered
 
+- **Big-body and surface sounds — 11 files** (`hit-huge-1/-2`, `crunch-huge`, `surge-huge`,
+  `sweep-huge`, `death-huge`, `breach-1/-2`, `splash-down-1/-2`, `surface-roll`) in the shared
+  `public/assets/sfx/`, from `MANIFEST` in `tools/gen-sfx.mjs`. Two gaps the Devonian roster made
+  obvious: nothing in the audio path knew how big a creature was, so a 11.5 m Titanichthys hit
+  exactly as hard as a larva; and the surface clamp was silent, though air breathers meet it
+  constantly. The consumers are `heavy()` and the `breach`/`splashDown` cases in
+  `src/render/engine.ts`, `HUGE_LENGTH` in `src/audio/mix.ts` and `BREACH_SPEED` in
+  `src/sim/game.ts`; see [audio.md](audio.md) · *Big bodies and the surface*. All eleven pass the
+  midrange rule (mid-band peak −0.0 to −9.9 dBFS).
+
+- **Devonian Tide** — `public/music/Devonian Tide.mp3`, second track in the Devonian rotation
+  (`src/content/devonian/music.ts`), picked at random once the opener finishes.
+
 - **Devonian Shells** — `public/music/Devonian Shells.mp3`, the opening track of Devonian
   Domination (`src/content/devonian/music.ts`). The Cambrian reef tracks fill the rest of the
   rotation until more Devonian music arrives; the two biome themes above are tagged in that file

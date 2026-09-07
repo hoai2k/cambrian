@@ -47,6 +47,12 @@ const PADDLE_SPEED = 0.35;    // fraction of the crawler's cruise while off the 
 const PADDLE_RISE = 2.4;      // climb speed, units/s at scale 1 (a swimmer's rise is 2.6 and faster to reach)
 const PADDLE_SINK = 2.2;      // terminal sink once RB is released — a settle, not a fall
 const PADDLE_STAMINA = 24;    // per second while climbing
+/**
+ * Speed (units/s) at which meeting the surface reads as a breach rather than a roll. Bodies cruise
+ * at about half a unit per second along the surface and reach four to five in a burst, so this
+ * keeps the big sound for a body that arrives under power.
+ */
+const BREACH_SPEED = 3.5;
 
 export class Game implements AiWorld {
   world: WorldData;
@@ -648,7 +654,25 @@ export class Game implements AiWorld {
     } else {
       if (a.pos.y < floor) { a.pos.y = floor; if (a.vel.y < 0) a.vel.y *= -0.2; }
       const ceiling = SURFACE_Y - 0.8 - clearanceOf(a);
-      if (a.pos.y > ceiling) { a.pos.y = ceiling; if (a.vel.y > 0) a.vel.y = 0; }
+      // Bodies are held just under the surface, so "breaching" is a body arriving at that ceiling
+      // from below: fast enough and it throws water, slowly and it just rolls. Falling away again
+      // afterwards is the splash-down. `strength` carries the closing speed for the mix.
+      if (a.pos.y > ceiling) {
+        // Speed is read before the clamp, and it is the whole velocity, not the climb: nothing in
+        // this game rises fast (a metre and a half a second at most), so what tears the surface
+        // open is a body arriving along it at speed, not one shooting up through it.
+        const speed = Math.hypot(a.vel.x, a.vel.y, a.vel.z);
+        a.pos.y = ceiling; if (a.vel.y > 0) a.vel.y = 0;
+        if (!a.atSurface) {
+          a.atSurface = true;
+          this.events.push({ kind: 'breach', pos: { ...a.pos }, actor: a.id, player: a.player, strength: speed / BREACH_SPEED });
+        }
+      } else if (a.atSurface && a.pos.y < ceiling - clearanceOf(a) - 0.5) {
+        // Dropped clear of the surface again. Falling away at speed lands; drifting down does not.
+        a.atSurface = false;
+        const speed = Math.hypot(a.vel.x, a.vel.y, a.vel.z);
+        if (speed > BREACH_SPEED * 0.5) this.events.push({ kind: 'splashDown', pos: { ...a.pos }, actor: a.id, player: a.player, strength: speed / BREACH_SPEED });
+      }
     }
 
     // Orientation

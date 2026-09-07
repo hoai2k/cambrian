@@ -8,6 +8,7 @@ import type { MusicTrack } from '../../audio/music';
  */
 export const MUSIC: readonly MusicTrack[] = [
   { name: 'Devonian Shells', opening: true },
+  { name: 'Devonian Tide' },
   { name: 'Tide of First Bones' },
   { name: 'First Tide' },
   // Biome themes are optional and not written yet. A track belongs in this list only once its file

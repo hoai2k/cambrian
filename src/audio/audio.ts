@@ -28,6 +28,11 @@ export const SAMPLES: Record<string, string[]> = {
   crunch: ['crunch-1', 'crunch-2'],
   hit: ['hit-light-1', 'hit-light-2'],
   'hit-heavy': ['hit-heavy-1', 'hit-heavy-2'],
+  // Big bodies: `heavy()` in the engine swaps these in when the body is over HUGE_LENGTH.
+  'hit-huge': ['hit-huge-1', 'hit-huge-2'], 'crunch-huge': ['crunch-huge'],
+  'burst-huge': ['surge-huge'], 'dodge-huge': ['sweep-huge'], 'death-huge': ['death-huge'],
+  // The surface
+  breach: ['breach-1', 'breach-2'], splashDown: ['splash-down-1', 'splash-down-2'], surfaceRoll: ['surface-roll'],
   parry: ['parry'], guardBreak: ['guard-break'], stagger: ['stagger'],
   dodge: ['dodge-1', 'dodge-2'], burst: ['burst'], silt: ['silt'], grab: ['grab'],
   kill: ['kill'], death: ['death'], tierUp: ['tier-up'], hunted: ['hunted'], escape: ['escape'],
@@ -52,6 +57,8 @@ export class GameAudio {
   private musicGain?: GainNode;
   private musicStarted = false;
   private music?: MusicVoice;
+  /** The last track that actually started playing — see `nextTrack`. */
+  private lastHeard?: MusicTrack;
   private biome?: Biome;
   private biomeCueAt = -BIOME_HOLD;
   private ambience = true;
@@ -155,12 +162,15 @@ export class GameAudio {
     const voice: MusicVoice = { track, el, node, gain };
     el.addEventListener('timeupdate', () => {
       // Hand over before the end so the tracks overlap rather than leaving a hole.
-      if (this.music !== voice || !el.duration) return;
+      if (this.music !== voice || !Number.isFinite(el.duration)) return;
       if (el.duration - el.currentTime <= CROSSFADE) this.nextTrack();
     });
     el.addEventListener('ended', () => { if (this.music === voice) this.nextTrack(); });
-    // A track that is not there (a biome theme not yet delivered) leaves the rotation rather than silencing it.
+    // A track that is not there (a biome theme not yet delivered) leaves the rotation rather than
+    // silencing it. Re-pick against the track it was taking over from: the failed one is already
+    // out via MISSING, and without this the rotation can land straight back on what just played.
     el.addEventListener('error', () => { MISSING.add(track.name); if (this.music === voice) this.nextTrack(); });
+    el.addEventListener('playing', () => { this.lastHeard = track; }, { once: true });
     void el.play().catch(() => { /* blocked until a gesture; the next track will try again */ });
     return voice;
   }
@@ -188,9 +198,14 @@ export class GameAudio {
     if (outgoing) this.endVoice(outgoing, fade);
   }
 
-  /** Move on to whatever `pickNext` chooses. */
+  /**
+   * Move on to whatever `pickNext` chooses. The pick is made against the last track the player
+   * actually heard, not the current one: an undelivered biome theme is only discovered to be
+   * missing once it is chosen, and two of those in a row would otherwise let the rotation land
+   * straight back on the track that had just finished.
+   */
   private nextTrack() {
-    this.playTrack(pickNext(this.music?.track, this.biome));
+    this.playTrack(pickNext(this.lastHeard ?? this.music?.track, this.biome));
   }
 
   /** Begin the soundtrack: the opening track, then the random rotation. */
@@ -220,10 +235,11 @@ export class GameAudio {
   seekToHandover() {
     const el = this.music?.el;
     if (!el) return;
-    // A stream that has only just started may not know its own length yet; wait for it rather
-    // than silently doing nothing.
-    const seek = () => { if (el.duration) el.currentTime = Math.max(0, el.duration - CROSSFADE - 1); };
-    if (el.duration) seek(); else el.addEventListener('loadedmetadata', seek, { once: true });
+    // A stream that has only just started reports its length as Infinity until the real value
+    // arrives, so wait for a finite one rather than seeking to nowhere.
+    const known = () => Number.isFinite(el.duration) && el.duration > 0;
+    const seek = () => { if (known()) el.currentTime = Math.max(0, el.duration - CROSSFADE - 1); };
+    if (known()) seek(); else el.addEventListener('durationchange', seek, { once: true });
   }
 
   /**
@@ -351,7 +367,8 @@ export class GameAudio {
     let key = kind;
     if (kind === 'hit' && s > 1.1) key = 'hit-heavy';
     if (kind === 'eat' && s > 0.5) key = 'crunch';
-    const baseVol = kind.startsWith('ui') ? 0.42 : kind === 'noticed' ? 0.3 : kind === 'eat' ? 0.45 + s * 0.3 : 0.6 + s * 0.35;
+    const feeding = kind === 'eat' || kind === 'crunch-huge';   // same curve either size
+    const baseVol = kind.startsWith('ui') ? 0.42 : kind === 'noticed' ? 0.3 : feeding ? 0.45 + s * 0.3 : 0.6 + s * 0.35;
     const vol = baseVol * atten;
 
     // Rate-limit spammy kinds so a reef full of grazers is not a machine gun. A louder (nearer)
