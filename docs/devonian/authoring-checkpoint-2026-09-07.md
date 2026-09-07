@@ -1,5 +1,7 @@
 # Devonian authoring checkpoint — 7 September 2026, 18:01 UTC
 
+**Read [current-state.md](current-state.md) first.** It records the current main commit, seven reworks and active clay-02 phases; older sections below are historical.
+
 This is a resumable work checkpoint, not a completion report. The user requested it to preserve context and judge remaining token use. Update the current status as deliveries land; do not infer that drafts are approved from their presence on disk.
 
 ## Current execution update — published initial library; phased reworks active
