@@ -1,6 +1,6 @@
 # 07 · Devonian creatures, environments and asset brief
 
-**Status:** proposed natural-history and art inventory, 6 September 2026. This document describes what to depict and which images and 3D models to create. It does not specify gameplay, abilities, objectives, progression, combat or controls. Model production and asset integration are tracked separately in the [Devonian specimen library](../devonian/README.md); this brief remains the natural-history reference.
+**Status:** proposed natural-history and art inventory, 6 September 2026. This document describes what to depict and which images and 3D models to create. It does not specify gameplay, abilities, objectives, progression, combat or controls. The gameplay design that builds on this inventory is [08 · Devonian Domination](08-devonian-domination.md). Model production and asset integration are tracked separately in the [Devonian specimen library](../devonian/README.md); this brief remains the natural-history reference.
 
 **Scope:** 21 mobile creature subjects, plus regional environments, plants, attached organisms, geological props and supporting textures. Stationary organisms are important environmental subjects, but do not count toward the 21-creature roster. The existing [era content boundary](06-era-content.md) provides a future home for the resulting assets.
 
