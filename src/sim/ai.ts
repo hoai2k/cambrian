@@ -354,6 +354,11 @@ export function thinkNeeds(g: AiWorld, a: Actor, b: BrainState, dt: number): Inp
       if (b.temper > 0 && !competitor && a.lastHitBy !== t.id && a.hitFlash <= 0
         && dist(a.pos, t.pos) > L * (2.2 + b.temper * 2.6)) { b.goal = 'wander'; b.target = -1; b.goalT = 0; break; }
       if (RULES?.sanctuary(a, t) && a.lastHitBy !== t.id && a.hitFlash <= 0) { b.goal = 'wander'; b.target = -1; b.goalT = 0; pickWander(a, b, g.rng, 30); break; }
+      // An animal that holds ground stops at the edge of it, whoever the quarrel is with. The
+      // leash was on `defend` only, so a rolling brawl with a neighbour could still walk a
+      // territorial animal clean off its patch — the one thing the whole idea promises it will not do.
+      if (b.territory && b.territoryR > 0 && !competitor
+        && distXZ(a.pos, b.territory) > b.territoryR * 1.05) { b.goal = 'wander'; b.target = -1; b.goalT = 0; pickWander(a, b, g.rng, 20); break; }
       const d = dist(a.pos, t.pos);
       const reach = L * 0.7 + lengthOf(t) * 0.35;
       out.lock = true;
