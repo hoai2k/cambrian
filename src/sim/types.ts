@@ -133,6 +133,7 @@ export interface PlayerSetup { creature: CreatureId; device: number | 'keyboard'
 
 /** Cambrian modes, plus the Devonian ones (`domination`, `foodchain`); an era lists the ones it offers. */
 export type Mode = 'rise' | 'frenzy' | 'hunted' | 'reef' | 'domination' | 'foodchain';
+export const MODE_IDS: readonly Mode[] = ['rise', 'frenzy', 'hunted', 'reef', 'domination', 'foodchain'];
 
 export interface Prompt { text: string; t: number; }
 

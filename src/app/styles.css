@@ -416,3 +416,20 @@ input[type='checkbox'] { width: 20px; height: 20px; accent-color: var(--ember); 
 .biome-banner { isolation: isolate; padding: .65em 1.4em; border-radius: .7em; overflow: hidden; max-width: 95%; text-align: center; }
 .biome-banner img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: .28; z-index: -1; }
 .biome-banner span, .biome-banner b { text-shadow: 0 2px 6px #06161c, 0 0 18px #06161c; }
+
+/* ---- era meters (Devonian) ---- */
+.rung-num { font-size: 1.6em; letter-spacing: .05em; color: var(--foam); text-shadow: 0 0 10px rgba(255,179,107,.6); }
+.range-chip { font-size: .7em; letter-spacing: .14em; color: #ffd27a; border: 1px solid rgba(255,210,122,.5); border-radius: .4em; padding: 0 .4em; }
+.bar.air { height: .4em; }
+.bar.air i { background: linear-gradient(90deg, #9be9ff, #eafcff); }
+.bar.air.low i { background: #ff8f7a; animation: blink .6s infinite; }
+.era-status { position: absolute; left: 1.4em; top: 6.6em; display: grid; gap: .4em; pointer-events: none; }
+.dominant { display: flex; gap: .6em; align-items: baseline; color: #ffd27a; }
+.dominant span { font: 700 .7em var(--font-display); letter-spacing: .3em; }
+.dominant b { font: 900 1.6em var(--font-display); text-shadow: 0 0 14px rgba(255,210,122,.6); }
+.era-warn { font: 700 .75em var(--font-display); letter-spacing: .12em; color: #d6f5a3; animation: blink 1.4s ease-in-out infinite; }
+.era-warn.danger { color: #ff8f7a; animation-duration: .7s; }
+.standing-ticker { display: grid; gap: .1em; font-size: .75em; color: var(--mist); }
+.standing-ticker span { opacity: .55; }
+.standing-ticker span:last-child { opacity: 1; color: var(--foam); }
+.blip-deadzone { filter: none; }

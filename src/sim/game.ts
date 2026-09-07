@@ -781,8 +781,9 @@ export class Game implements AiWorld {
       this.updateAbility(a, def, dt, input, L, sf);
     } else if (a.state === 'moult') {
       const t = clamp(a.stateT / a.stateDur, 0, 1);
-      const to = this.mode === 'hunted' && a.player === 0 ? a.scale : TIER_SCALE[a.tier];
-      const from = a.hatching ? to * 0.3 : TIER_SCALE[Math.max(0, a.tier - 1) as Tier];
+      const era = RULES?.moultScale(this, a);
+      const to = era ? era.to : this.mode === 'hunted' && a.player === 0 ? a.scale : TIER_SCALE[a.tier];
+      const from = a.hatching ? to * 0.3 : era ? era.from : TIER_SCALE[Math.max(0, a.tier - 1) as Tier];
       if (!(this.mode === 'hunted' && a.player === 0)) a.scale = lerp(from, to, t * t * (3 - 2 * t));
       if (a.stateT >= a.stateDur) { a.state = 'free'; a.stateT = 0; a.scale = to; applyScaleStats(a, true); a.hp = a.hpMax; a.hatching = false; }
     }

@@ -5,13 +5,18 @@ import { SNACK_SCHOOLS, GIANTS } from './ecology';
 import { BIOME_NAMES, BIOME_DANGER, ATMOS, SAND_COLORS, FLORA_BASE } from './environment';
 import { MUSIC } from './music';
 import { SCHEMES, CREATURE_SCHEMES } from './palettes';
+import { DEVONIAN_BRAND, DEVONIAN_BRAND_EXTRAS } from './brand';
 
 /**
- * Placeholder model sizes: the Devonian models are pending. Era validation requires a positive size
- * per creature; the streaming loader only uses it for progress estimates. Replace with the real
- * byte counts from the intake tooling when the GLBs land.
+ * Model sizes for the streaming loader's progress estimate. Delivered specimens (tools/devonian/
+ * shipped.json) carry their real byte counts; the rest of the roster is pending and gets a
+ * placeholder so era validation passes. tools/devonian-test.ts checks the shipped sizes.
  */
-const modelBytes = Object.fromEntries(DEVONIAN_CREATURES.map((c) => [c.id, 1]));
+const SHIPPED_BYTES: Record<string, number> = {
+  dunkleosteus: 1350428, titanichthys: 2448352, coccosteus: 2332324, bothriolepis: 1779500, gemuendina: 3199632, doryaspis: 2900876,
+};
+export const DEVONIAN_SHIPPED = Object.keys(SHIPPED_BYTES);
+const modelBytes = Object.fromEntries(DEVONIAN_CREATURES.map((c) => [c.id, SHIPPED_BYTES[c.id] ?? 1]));
 
 /** Camouflage's fallback colours per creature: its default scheme's slots. */
 const authoredCreatures = Object.fromEntries(DEVONIAN_CREATURES.map((c) => {
@@ -22,6 +27,7 @@ const authoredCreatures = Object.fromEntries(DEVONIAN_CREATURES.map((c) => {
 export const DEVONIAN = defineEra({
   id: 'devonian',
   title: 'Devonian Domination',
+  copy: { tagline: 'Feed. Escape. Hold your range.', taglineEm: '375 million years ago, the sea had a pecking order.', loading: 'FILLING THE BASIN…', lose: 'THE SEA WINS', settingsKey: 'devonian-settings', mobileIllustration: DEVONIAN_BRAND_EXTRAS.mobileIllustration },
   modes: [
     { id: 'domination', name: 'Domination', blurb: 'Pick any animal, own its rung. Feed, escape, drive off rivals, hold your range. First to Dominant standing held for ninety seconds wins. Allies pool standing.', players: '1–4 co-op' },
     { id: 'foodchain', name: 'Food Chain', blurb: 'Everyone picks from a different rung. The hunter needs the prey; the prey scores by surviving the hunter. One scoreboard.', players: '2–4 versus' },
@@ -37,10 +43,11 @@ export const DEVONIAN = defineEra({
   ecology: { schools: SNACK_SCHOOLS, giants: GIANTS, shadow: { creature: 'titanichthys', scale: 1.0 } },
   environment: { biomeNames: BIOME_NAMES, biomeDanger: BIOME_DANGER, atmosphere: ATMOS, sandColors: SAND_COLORS, floraColors: FLORA_BASE },
   assets: {
-    creatures: 'assets/devonian/creatures/', defaultPortraits: 'assets/devonian/creatures/defaults/',
-    props: 'assets/devonian/props/', biomes: 'assets/devonian/biomes/', ui: 'assets/ui/', sfx: 'assets/devonian/sfx/', music: 'assets/devonian/music/',
-    logo: 'assets/devonian/brand/logo.webp', illustration: 'assets/devonian/brand/illustration.webp',
-    emblem: 'assets/devonian/brand/emblem.webp', modelBytes,
+    creatures: 'assets/devonian/creatures/', defaultPortraits: 'assets/devonian/creatures/',
+    // Scenery, biome plates and music are shared with the Cambrian until the Devonian sets are delivered
+    // (docs/image-requests.md, docs/audio-requests.md); the creatures, SFX and brand are this era's own.
+    props: 'assets/props/', biomes: 'assets/biomes/', ui: 'assets/ui/', sfx: 'assets/devonian/sfx/', music: 'music/',
+    ...DEVONIAN_BRAND, modelBytes,
   },
   audio: { music: MUSIC },
   presentation: { schemes: SCHEMES, creatureSchemes: CREATURE_SCHEMES, portraits: {}, authoredColors: { creatures: authoredCreatures, props: {} } },

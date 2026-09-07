@@ -14,4 +14,19 @@ export function createAssetPaths(era: EraDefinition) {
     music: (name: string) => `${a.music}${encodeURIComponent(name)}.mp3`,
   };
 }
-export const assetPaths = createAssetPaths(ACTIVE_ERA);
+/**
+ * Paths for the active era. Resolved per call rather than at import, because an era entry page
+ * (see src/devonian/main.tsx) selects its era after modules like the audio library have loaded.
+ */
+type AssetPaths = ReturnType<typeof createAssetPaths>;
+let cachedFor: EraDefinition | undefined, cached: AssetPaths | undefined;
+const current = (): AssetPaths => { if (cachedFor !== ACTIVE_ERA || !cached) { cachedFor = ACTIVE_ERA; cached = createAssetPaths(ACTIVE_ERA); } return cached; };
+export const assetPaths: AssetPaths = {
+  model: (id, lod) => current().model(id, lod),
+  portrait: (id, kind) => current().portrait(id, kind),
+  biome: (id) => current().biome(id),
+  prop: (id) => current().prop(id),
+  ui: (file) => current().ui(file),
+  sfx: (name) => current().sfx(name),
+  music: (name) => current().music(name),
+};

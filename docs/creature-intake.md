@@ -4,6 +4,10 @@ Everything a creature needs to ship, and the check that enforces it. Run `node t
 before merging. CI (`.github/workflows/pages.yml`) runs `npm run check` — the same script without
 `--strict`, so it fails on errors but only warns about stale images; run the strict form yourself.
 
+## Devonian asset-only intake
+
+The [Devonian library](devonian/README.md) has a separate catalogue, authoring and validation workflow. Use it for `public/assets/devonian/`; the legacy card/LOD commands below operate on the active Cambrian roster. Devonian authoring regenerates its own four portraits and records export/animation/socket checks without adding playable stats.
+
 ## Adding a creature
 
 1. **Model.** `public/assets/creatures/<id>.glb`, meshopt-compressed, with the clip set in

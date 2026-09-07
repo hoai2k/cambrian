@@ -46,6 +46,8 @@ export interface EraRules {
   shoreReach(a: Actor): number;
   /** This body sprints as a backward jet and rises/sinks for free. */
   jet(a: Actor): boolean;
+  /** The body scales a moult ceremony grows between; undefined leaves the shared tier scales in charge. */
+  moultScale(g: Game, a: Actor): { from: number; to: number } | undefined;
   /** Replaces the death penalty. */
   onRespawn(g: Game, a: Actor): void;
   /** Win checks for the era's own modes; the shared ones (reef, hunted) run as before. */

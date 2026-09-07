@@ -6,7 +6,7 @@ import type { AssetProgress } from '../render/assets';
 import { Engine, type HudSnapshot } from '../render/engine';
 import type { Quality } from '../render/sea';
 import { CREATURE_IDS, CREATURES, creature, type CreatureId } from '../sim/creatures';
-import type { Mode, PlayerSetup } from '../sim/types';
+import { MODE_IDS, type Mode, type PlayerSetup } from '../sim/types';
 import { Hud } from './Hud';
 import { LoadingScreen } from './Loading';
 import { Dialogs, PauseMenu, Results } from './Overlays';
@@ -18,9 +18,11 @@ export type Screen = 'title' | 'select' | 'playing' | 'results';
 export type DialogKind = null | 'help' | 'settings';
 export interface Settings { quality: Quality; lookSpeed: number; invertY: boolean; volume: number; muted: boolean; music: boolean; }
 
-const MODES: Mode[] = ['rise', 'frenzy', 'hunted', 'reef'];
+/** The active era's modes, in its order; the first is the default selection. */
+const MODES: Mode[] = ACTIVE_ERA.modes.map((m) => m.id);
+const SETTINGS_KEY = ACTIVE_ERA.copy.settingsKey;
 const defaultSettings = (): Settings => {
-  try { const s = localStorage.getItem('cambrian-settings'); if (s) return { ...{ quality: 'high', lookSpeed: 1, invertY: false, volume: 0.8, muted: false, music: true }, ...JSON.parse(s) }; } catch { /* ignore */ }
+  try { const s = localStorage.getItem(SETTINGS_KEY); if (s) return { ...{ quality: 'high', lookSpeed: 1, invertY: false, volume: 0.8, muted: false, music: true }, ...JSON.parse(s) }; } catch { /* ignore */ }
   return { quality: 'high', lookSpeed: 1, invertY: false, volume: 0.8, muted: false, music: true };
 };
 
@@ -31,8 +33,8 @@ export function App() {
   const screenRef = useRef<Screen>('title');
   const [players, setPlayers] = useState<PlayerSetup[]>([]);
   const playersRef = useRef<PlayerSetup[]>([]);
-  const [mode, setMode] = useState<Mode>('rise');
-  const modeRef = useRef<Mode>('rise');
+  const [mode, setMode] = useState<Mode>(MODES[0]);
+  const modeRef = useRef<Mode>(MODES[0]);
   const [hud, setHud] = useState<HudSnapshot | null>(null);
   const [paused, setPaused] = useState(false);
   const pausedRef = useRef(false);
@@ -72,7 +74,7 @@ export function App() {
     engineRef.current?.setQuality(settings.quality);
     engineRef.current?.setLook(settings.lookSpeed, settings.invertY);
     audio.setVolume(settings.volume); audio.setMuted(settings.muted); audio.setMusic(settings.music);
-    try { localStorage.setItem('cambrian-settings', JSON.stringify(settings)); } catch { /* ignore */ }
+    try { localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings)); } catch { /* ignore */ }
   }, [settings]);
 
   // Fullscreen tracking
@@ -108,6 +110,11 @@ export function App() {
   const startMatch = useCallback(() => {
     const ps = playersRef.current;
     if (!ps.length || !ps.every((p) => p.ready) || !engineRef.current) return;
+    if (modeRef.current === 'foodchain') {
+      // Food Chain needs one animal per rung: the hunter must have prey and the prey a hunter.
+      const rungs = ps.map((p) => creature(p.creature).rung ?? 0);
+      if (new Set(rungs).size !== rungs.length) { setNotice('Food Chain: everyone picks from a different rung of the chain.'); audio.play('ui-back'); return; }
+    }
     engineRef.current.startMatch(modeRef.current, ps);
     setPausedBoth(false);
     go('playing');
@@ -332,11 +339,9 @@ export function App() {
   );
 }
 
-export const MODE_INFO: Record<Mode, { name: string; blurb: string; players: string }> = {
-  rise: { name: 'Rise', blurb: 'Hatch as a larva. Eat, grow, fight, hide. Reach Apex and hold it for ninety seconds. Allies share the feast.', players: '1–4 co-op' },
-  frenzy: { name: 'Feeding Frenzy', blurb: 'Growth race. First to Apex wins. Eating a rival steals their progress. Bots fill the empty seats.', players: '1–4 versus' },
-  hunted: { name: 'Hunter & Hunted', blurb: 'Player one is a giant. Everyone else is small, hungry, and trying to grow up before they get eaten.', players: '2–4 asymmetric' },
-  reef: { name: 'Reef', blurb: 'No goal. Start as an adult with every move unlocked and just be an animal in the Cambrian.', players: '1–4 sandbox' },
-};
+/** Mode copy comes from the era pack; modes the era does not offer keep a bare entry so lookups never miss. */
+export const MODE_INFO: Record<Mode, { name: string; blurb: string; players: string }> = Object.fromEntries(
+  MODE_IDS.map((m) => [m, ACTIVE_ERA.modes.find((x) => x.id === m) ?? { name: m, blurb: '', players: '' }]),
+) as Record<Mode, { name: string; blurb: string; players: string }>;
 
 export { creature };

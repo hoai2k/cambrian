@@ -41,7 +41,7 @@ function metadataSignature(anchors: CreatureAnchors) {
 }
 
 /** Exercise sockets on independent, translated/rotated/scaled instance clones. */
-function auditAnchors(label: string, loaded: LoadedAsset) {
+export function auditAnchors(label: string, loaded: LoadedAsset) {
   const template = loaded.gltf.scene;
   const a = SkeletonUtils.clone(template), b = SkeletonUtils.clone(template);
   const anchors = new CreatureAnchors(a), other = new CreatureAnchors(b), original = new CreatureAnchors(template);
@@ -176,7 +176,7 @@ function auditAnchors(label: string, loaded: LoadedAsset) {
   return { sockets: anchors.sockets.size, metadata: metadataSignature(anchors), independentClones: true, transformedWorldPositions: true, solutions };
 }
 
-function auditClips(label: string, loaded: LoadedAsset, isLod = false) {
+export function auditClips(label: string, loaded: LoadedAsset, isLod = false, looping = ['Idle', 'Swim', 'Crawl', 'Guard', 'Eat', 'Ability', 'Moult']) {
   // Exercise a disposable instance, never mutate the loader cache used by socket
   // tests/game instances. Calling pose() on every mesh is not a valid reset for
   // GLBs with shared bones and per-mesh inverse binds (notably Tamisiocaris).
@@ -189,7 +189,7 @@ function auditClips(label: string, loaded: LoadedAsset, isLod = false) {
   const clips = [];
   for (const clip of animations) {
     let maxRadius = 0, animatedTracks = 0, maxSeam = 0;
-    const loop = ['Idle', 'Swim', 'Crawl', 'Guard', 'Eat', 'Ability', 'Moult'].includes(clip.name);
+    const loop = looping.includes(clip.name);
     for (const track of clip.tracks) {
       const n = track.getValueSize(), v = track.values;
       let varied = false;

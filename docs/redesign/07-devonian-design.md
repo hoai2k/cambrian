@@ -1,6 +1,6 @@
 # 07 · Devonian creatures, environments and asset brief
 
-**Status:** proposed natural-history and art inventory, 6 September 2026. This document describes what to depict and which images and 3D models to create. It does not specify gameplay, abilities, objectives, progression, combat or controls. The gameplay design that builds on this inventory is [08 · Devonian Domination](08-devonian-domination.md). No Devonian assets have been generated or integrated as part of this brief.
+**Status:** proposed natural-history and art inventory, 6 September 2026. This document describes what to depict and which images and 3D models to create. It does not specify gameplay, abilities, objectives, progression, combat or controls. The gameplay design that builds on this inventory is [08 · Devonian Domination](08-devonian-domination.md). Model production and asset integration are tracked separately in the [Devonian specimen library](../devonian/README.md); this brief remains the natural-history reference.
 
 **Scope:** 21 mobile creature subjects, plus regional environments, plants, attached organisms, geological props and supporting textures. Stationary organisms are important environmental subjects, but do not count toward the 21-creature roster. The existing [era content boundary](06-era-content.md) provides a future home for the resulting assets.
 
@@ -98,7 +98,7 @@ Rigging should preserve anatomically meaningful joints and retain the establishe
 
 **Known characteristics and evidence:** antiarch with a box-like armoured body and jointed armoured pectoral appendages. Bothriolepis canadensis is part of the Miguasha fish collection; detailed diet and locomotion remain reconstruction questions. [Québec collection record](https://www.patrimoine-culturel.gouv.qc.ca/rpcq/detail.do?id=93118&methode=consulter&type=bien)
 
-**Reconstruction focus:** Its enclosed armoured front body and unusual pectoral appendages distinguish it immediately from conventional fish. The appendages are derived fins; describing them as proven terrestrial walking legs would overstate the evidence.
+**Reconstruction focus:** Its enclosed armoured front body and unusual pectoral appendages distinguish it immediately from conventional fish. The appendages are derived fins; describing them as proven terrestrial walking legs would overstate the evidence. Digital reconstruction found no head–thorax mobility and constrained pectoral articulation, so the authored shield remains rigid and the pectoral joints move conservatively. [Three-dimensional Bothriolepis study](https://www.palaeo-electronica.org/content/2014/647-3d-bothriolepis)
 
 **Additional image/model requirements:** Dorsal and underside armour layouts; joint sequence of both pectoral appendages; small mouth and tail attachment. Model the appendage articulation and shield openings explicitly.
 
@@ -114,7 +114,7 @@ Rigging should preserve anatomically meaningful joints and retain the establishe
 
 **Known characteristics and evidence:** heterostracan with a conspicuous oral projection and laterally extended shield; material from Svalbard includes caudal anatomy. The projection's exact function and diet should remain explicit uncertainties. [Genus revision](https://www.tandfonline.com/doi/abs/10.1671/0272-4634%282002%29022%5B0735%3ATGDWHF%5D2.0.CO%3B2)
 
-**Reconstruction focus:** The shield, lateral extensions and long oral projection form an unusual jawless-fish outline. The projection is not evidence for swordfish-like hunting, and its function should remain unresolved on the board.
+**Reconstruction focus:** The shield, lateral extensions and long oral projection form an unusual jawless-fish outline. The projection is not evidence for swordfish-like hunting, and its function should remain unresolved on the board. The model places the mouth above the pseudorostrum base, keeps the cornual extensions rigid, omits paired fins and uses a hypocercal tail. The fixed shield and flexible posterior should remain visually distinct. [Hydrodynamic reconstruction study](https://www.nature.com/articles/s42003-024-06837-8)
 
 **Additional image/model requirements:** Exact projection and mouth relationship; shield cross-section; tail-fin reconstruction. A rigid-front/flexible-tail source model with no fabricated hinged biting jaw.
 

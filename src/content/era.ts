@@ -9,9 +9,25 @@ import type { PortraitRecord } from '../shared/portrait-match';
 /** A selectable mode and the copy the selection screen shows for it. */
 export interface ModeInfo { readonly id: Mode; readonly name: string; readonly blurb: string; readonly players: string; }
 
+/** The words the shell shows around a match; everything else in the UI is shared. */
+export interface EraCopy {
+  /** Title-screen tagline and its emphasised second half. */
+  readonly tagline: string;
+  readonly taglineEm: string;
+  /** Title-screen "press start" placeholder while assets load. */
+  readonly loading: string;
+  /** Results eyebrow when nobody won. */
+  readonly lose: string;
+  /** localStorage key for the settings panel, so two eras on one origin keep separate settings. */
+  readonly settingsKey: string;
+  /** Portrait-orientation title art, when the era has one. */
+  readonly mobileIllustration?: string;
+}
+
 export interface EraDefinition {
   readonly id: string;
   readonly title: string;
+  readonly copy: EraCopy;
   /** The modes this era offers, in selection order. The simulation's win checks are keyed by id. */
   readonly modes: readonly ModeInfo[];
   readonly creatures: readonly CreatureDef[];

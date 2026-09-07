@@ -1,3 +1,4 @@
+import { ACTIVE_ERA } from '../content';
 import { useEffect, useRef } from 'react';
 import type { HudSnapshot } from '../render/engine';
 import { creature } from '../sim/creatures';
@@ -27,7 +28,7 @@ export function Results({ snapshot, players, onAgain, onChange, onTitle }: { sna
   return (
     <div className="overlay">
       <div className="panel results">
-        <p className="eyebrow">{MODE_INFO[snapshot.mode].name.toUpperCase()} · {snapshot.status === 'won' ? 'VICTORY' : 'THE REEF WINS'}</p>
+        <p className="eyebrow">{MODE_INFO[snapshot.mode].name.toUpperCase()} · {snapshot.status === 'won' ? 'VICTORY' : ACTIVE_ERA.copy.lose}</p>
         <h2>{snapshot.message}</h2>
         <div className="result-grid">
           {snapshot.players.map((p, i) => (

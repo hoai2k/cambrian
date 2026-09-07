@@ -1,0 +1,216 @@
+{
+  "checks": "finite transforms, normalized weights, root stable, identity-scale removal, unique motion, seamless loops, socket bind alignment, true LOD reduction",
+  "models": [
+    {
+      "file": "bothriolepis.glb",
+      "bytes": 2944344,
+      "vertices": 31978,
+      "triangles": 53208,
+      "bounds": [
+        2.2329699993133545,
+        0.9234999716281891,
+        4.079999923706055
+      ],
+      "bones": 12,
+      "sockets": [
+        {
+          "name": "anchor_mouth",
+          "point": [
+            0.0,
+            -0.13900004060213733,
+            1.3669999322393533
+          ]
+        },
+        {
+          "name": "anchor_mouth_inside",
+          "point": [
+            0.0,
+            -0.13200003806568164,
+            1.264999937877613
+          ]
+        },
+        {
+          "name": "anchor_attack_primary",
+          "point": [
+            0.0,
+            -0.015000048440397878,
+            1.4400000074179287
+          ]
+        }
+      ],
+      "clips": [
+        {
+          "name": "Ability",
+          "duration": 1.8000000715255737,
+          "motion": 12.842,
+          "digest": "31b309288666b22130d7e489349ef752557791bcdac2f20711b5292f1144913a"
+        },
+        {
+          "name": "Attack",
+          "duration": 0.9999999403953552,
+          "motion": 6.907,
+          "digest": "176fc798e4abbb26b0fc43354c32185038b0ff02620605b2bd74ca2388d49b7e"
+        },
+        {
+          "name": "Bite",
+          "duration": 0.5,
+          "motion": 3.109,
+          "digest": "5430e7ab70d70f03c65119677655017833a2a42dd52157808b662d3851adcf1d"
+        },
+        {
+          "name": "Death",
+          "duration": 1.600000023841858,
+          "motion": 33.513,
+          "digest": "a3e41c18cc3965c19fcda770340581f179ae8344e04b9881b6dae7e225740471"
+        },
+        {
+          "name": "Dive",
+          "duration": 1.399999976158142,
+          "motion": 8.097,
+          "digest": "30eeed057679a4bebaae07cec19a5100721786829451e70988df942a08b54e40"
+        },
+        {
+          "name": "Dodge",
+          "duration": 0.4000000059604645,
+          "motion": 6.331,
+          "digest": "daf52c900a48e6339bcf2442104cb787a71afd9c6b2f56ba29a244bdf2f0dc1a"
+        },
+        {
+          "name": "Eat",
+          "duration": 1.2000000476837158,
+          "motion": 15.487,
+          "digest": "7da1d489c3323ad790a3bc722a76caf0e08bddd308327975fe203a47c6da7c6d"
+        },
+        {
+          "name": "Growth",
+          "duration": 1.5,
+          "motion": 8.644,
+          "digest": "57d31316a5790201005839118f1b7099c6f882ccffde626aac3da18113f844ee"
+        },
+        {
+          "name": "Guard",
+          "duration": 0.9999999403953552,
+          "motion": 6.502,
+          "digest": "a6d42f44a56e47da6a37f31e24682186b25bd79f9c4ab06826bc37f40a26c876"
+        },
+        {
+          "name": "Heavy",
+          "duration": 1.100000023841858,
+          "motion": 7.856,
+          "digest": "8c2c6cb1414afccf58c24837446f025fd5a64dcfc6f5549db822dd3863f0c438"
+        },
+        {
+          "name": "Hit",
+          "duration": 0.5999999642372131,
+          "motion": 3.852,
+          "digest": "62ac116c4764b3abe46cf5d5d1e4f571df3d394be6e877b92f87c878a87208d8"
+        },
+        {
+          "name": "Idle",
+          "duration": 2.4000000953674316,
+          "motion": 16.057,
+          "digest": "323ae990f9c3626b559f8099190ba6a9fd7ac863502ce0c9e1be8b7c4010d72c"
+        },
+        {
+          "name": "Parry",
+          "duration": 0.3333333432674408,
+          "motion": 3.173,
+          "digest": "5c7d5bb57c19f4a81224db676bd4cd15aaa963e45a24228cff1cc60bb6487e84"
+        },
+        {
+          "name": "Rise",
+          "duration": 1.399999976158142,
+          "motion": 8.097,
+          "digest": "a97cd2e0438ccb7e3f01652a61c800bf0dd0c8ed6c06b171421368bb555c7ef2"
+        },
+        {
+          "name": "Stagger",
+          "duration": 1.2000000476837158,
+          "motion": 7.767,
+          "digest": "21ad359715206e37c1f98245a4ff251bc8987631e8f470264b1644c7077bf5d1"
+        },
+        {
+          "name": "Swim",
+          "duration": 2.4000000953674316,
+          "motion": 40.864,
+          "digest": "5d6913c80f73490c101defcd84438e6de344c96a87f8c73f0406131b34f015fb"
+        },
+        {
+          "name": "TurnLeft",
+          "duration": 1.600000023841858,
+          "motion": 14.179,
+          "digest": "df56720dbb669d4f223d1222fa0da1b809535d4ccdf6dc8646e479fbd1b7a16c"
+        },
+        {
+          "name": "TurnRight",
+          "duration": 1.600000023841858,
+          "motion": 14.179,
+          "digest": "55905ad82eae60c264ddeac18ade336d76042ab6c73a8282f68ab742462d9bb5"
+        }
+      ],
+      "removedIdentityScaleChannels": 0,
+      "sha256": "5261604aa62237655a5c43662e79e7fc61f3aa1f9db555d8b9f4f27856941493"
+    },
+    {
+      "file": "bothriolepis.lod1.glb",
+      "bytes": 1451192,
+      "vertices": 10815,
+      "triangles": 14303,
+      "bounds": [
+        2.2328615188598633,
+        0.9241634905338287,
+        4.080044984817505
+      ],
+      "bones": 12,
+      "sockets": [
+        {
+          "name": "anchor_mouth",
+          "point": [
+            0.0,
+            -0.13900004060213733,
+            1.3669999322393533
+          ]
+        },
+        {
+          "name": "anchor_mouth_inside",
+          "point": [
+            0.0,
+            -0.13200003806568164,
+            1.264999937877613
+          ]
+        },
+        {
+          "name": "anchor_attack_primary",
+          "point": [
+            0.0,
+            -0.015000048440397878,
+            1.4400000074179287
+          ]
+        }
+      ],
+      "clips": [
+        {
+          "name": "Death",
+          "duration": 1.600000023841858,
+          "motion": 33.513,
+          "digest": "a3e41c18cc3965c19fcda770340581f179ae8344e04b9881b6dae7e225740471"
+        },
+        {
+          "name": "Idle",
+          "duration": 2.4000000953674316,
+          "motion": 16.057,
+          "digest": "323ae990f9c3626b559f8099190ba6a9fd7ac863502ce0c9e1be8b7c4010d72c"
+        },
+        {
+          "name": "Swim",
+          "duration": 2.4000000953674316,
+          "motion": 40.864,
+          "digest": "5d6913c80f73490c101defcd84438e6de344c96a87f8c73f0406131b34f015fb"
+        }
+      ],
+      "removedIdentityScaleChannels": 0,
+      "sha256": "8bea64ad5d2e910e917e2ab5fad3670cdbb104aa255c2d5c1b971ea5b244c7a4"
+    }
+  ],
+  "lodTriangleRatio": 0.26881296045707415
+}

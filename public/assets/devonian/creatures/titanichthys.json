@@ -1,0 +1,54 @@
+{
+  "id": "titanichthys",
+  "name": "Titanichthys",
+  "species": "Titanichthys termieri",
+  "provenance": "Late Devonian (Famennian), Southern Ma\u00efder basin, Morocco",
+  "description": "Broad-headed armoured giant with small eyes and slender toothless jaws, reconstructed as a suspension feeder.",
+  "lengthMeters": 5,
+  "modelLength": 6.194000005722046,
+  "locomotion": "Swim",
+  "clips": [
+    "Idle",
+    "Swim",
+    "TurnLeft",
+    "TurnRight",
+    "Dive",
+    "Rise",
+    "Attack",
+    "Bite",
+    "Heavy",
+    "Hit",
+    "Death",
+    "Guard",
+    "Parry",
+    "Dodge",
+    "Eat",
+    "Stagger",
+    "Ability",
+    "Growth"
+  ],
+  "looping": [
+    "Idle",
+    "Swim",
+    "Guard",
+    "Eat"
+  ],
+  "anchors": [
+    "anchor_mouth",
+    "anchor_mouth_inside",
+    "anchor_attack_primary"
+  ],
+  "sources": [
+    {
+      "title": "Coatham et al. (2020), Was the Devonian placoderm Titanichthys a suspension feeder?",
+      "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC7277245/",
+      "doi": "10.1098/rsos.200272"
+    }
+  ],
+  "notes": [
+    "Slender edentulous jaw and small relative orbits supported by fossils; suspension feeding supported biomechanically, actual filtering organs unknown and omitted.",
+    "Complete body outline, tail and fin proportions, soft tissues, pigmentation and all motion are explicitly artistic reconstruction.",
+    "Representative reconstructed display length 5 m; not a measured complete specimen or claimed maximum.",
+    "Attack/Heavy are shield/contact motions, Bite is a gentle oral closing cycle, Ability is a broad ram-feeding gape; names are compatibility labels, not gameplay design."
+  ]
+}

@@ -140,7 +140,7 @@ function updateDeadZoneEffects(g: Game, a: Actor, d: DevActor, dt: number) {
   const def = creature(a.creature);
   if (inside && def.breathing !== 'air') {
     d.deadT += dt;
-    a.stamina = Math.max(0, a.stamina - 6 * dt);                 // no recovery in dead water
+    a.stamina = Math.max(0, a.stamina - 30 * dt);                // outpaces the shared regen (24/s at rest): no recovery in dead water
     if (d.deadT > 6 && isAlive(a)) { a.hp = Math.max(1, a.hp - a.hpMax * 0.02 * dt); a.sinceHit = 0; }
   } else if (d.deadZoneIn && !inside) {
     if (d.deadT >= 5 && isAlive(a)) gain(g, a, d, W.anoxia[rungOf(a)], 'survived');
@@ -216,6 +216,8 @@ export const DEVONIAN_RULES: EraRules = {
       d.sinceGain += dt; d.sinceEat += dt;
       if (isAlive(a) && d.sinceGain > DECAY_AFTER) d.standing = Math.max(0, d.standing - DECAY * dt);
       if (isAlive(a) && rung === 4 && d.sinceEat > GIANT_UNFED_AFTER) d.standing = Math.max(0, d.standing - GIANT_DECAY * dt);
+      // a stage the standing already earned is taken as soon as the last ceremony is over
+      checkStage(g, a, d);
       // dominant clock
       if (isAlive(a) && d.standing >= DOMINANT - 1e-6) { if (d.dominantT === 0 && a.controller === 'player') g.events.push({ kind: 'dominant', pos: { ...a.pos }, actor: a.id, player: a.player }); d.dominantT += dt; } else d.dominantT = 0;
       // a giant with no bite never hunts
@@ -273,6 +275,11 @@ export const DEVONIAN_RULES: EraRules = {
 
   shoreReach(a) { return creature(a.creature).shoreReach ?? 0; },
   jet(a) { return !!creature(a.creature).shell; },
+
+  moultScale(g, a) {
+    const d = devActor(g, a);
+    return { from: STAGE_SCALE[Math.max(0, d.stage - 1)], to: STAGE_SCALE[d.stage] };
+  },
 
   onRespawn(g, a) {
     const d = devActor(g, a);

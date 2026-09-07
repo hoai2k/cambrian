@@ -11,6 +11,7 @@ import portraits from '../../../public/assets/creatures/schemes/manifest.json';
 export const CAMBRIAN = defineEra({
   id: 'cambrian',
   title: 'Cambrian Explosion',
+  copy: { tagline: 'Eat. Grow. Fight. Run.', taglineEm: '508 million years ago, everything was hungry.', loading: 'WAKING THE REEF…', lose: 'THE REEF WINS', settingsKey: 'cambrian-settings' },
   modes: [
     { id: 'rise', name: 'Rise', blurb: 'Hatch as a larva. Eat, grow, fight, hide. Reach Apex and hold it for ninety seconds. Allies share the feast.', players: '1–4 co-op' },
     { id: 'frenzy', name: 'Feeding Frenzy', blurb: 'Growth race. First to Apex wins. Eating a rival steals their progress. Bots fill the empty seats.', players: '1–4 versus' },
