@@ -1,3 +1,4 @@
+import { ACTIVE_ERA } from '../content';
 import { clamp, fbm2, makeRng, noise2, smoothstep, TAU, type Vec3 } from '../shared/math';
 import { floraSize } from './flora';
 import { SpatialHash } from './spatial';
@@ -12,18 +13,8 @@ import { SpatialHash } from './spatial';
  */
 export type Biome = 'shallows' | 'nursery' | 'shelf' | 'forest' | 'boulders' | 'flats' | 'channel' | 'escarpment' | 'basin';
 export const BIOMES: readonly Biome[] = ['shallows', 'nursery', 'shelf', 'forest', 'boulders', 'flats', 'channel', 'escarpment', 'basin'];
-export const BIOME_NAMES: Record<Biome, string> = {
-  shallows: 'Sunlit Shallows', nursery: 'Nursery Reef', shelf: 'Open Shelf', forest: 'Sponge Forest', boulders: 'Boulder Field',
-  flats: 'Microbial Flats', channel: 'The Channels', escarpment: 'The Escarpment', basin: 'Deep Basin',
-};
-/**
- * How dangerous each biome is meant to feel, 0 (relaxing) to 1 (deadly). Drives the music mood and
- * is the brief for the art: the calm end reads small and rounded, the deadly end large and angular;
- * everything in between is the standard reef look. See docs/redesign/04-infinite-ocean.md.
- */
-export const BIOME_DANGER: Record<Biome, number> = {
-  shallows: 0.08, nursery: 0.04, shelf: 0.4, forest: 0.5, boulders: 0.5, flats: 0.32, channel: 0.72, escarpment: 0.8, basin: 0.92,
-};
+export const BIOME_NAMES = ACTIVE_ERA.environment.biomeNames;
+export const BIOME_DANGER = ACTIVE_ERA.environment.biomeDanger;
 export type FloraKind = 'vauxia' | 'sac' | 'choia' | 'thalli' | 'tuft' | 'cushion' | 'lettuce' | 'spine' | 'glass';
 
 export interface Boulder { variant?: 'blade-spire' | 'talus-shard'; pos: Vec3; radius: number; height: number; sx: number; sy: number; sz: number; rot: number; shade: number; }

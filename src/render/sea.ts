@@ -1,3 +1,4 @@
+import { ACTIVE_ERA } from '../content';
 import { SAND_COLORS, floraTint, rockTint } from '../shared/environment-colors';
 import * as THREE from 'three';
 import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js';
@@ -40,17 +41,7 @@ const FAR_RADIUS = 340;
  * Atmosphere per biome: fog colour, fog density multiplier, sky and sun intensity. Blended by the
  * biome weights under the camera so travelling between biomes is a slow morph, never a cut.
  */
-const ATMOS: Record<Biome, { fog: string; density: number; sky: number; sun: number; sand: string }> = {
-  shallows: { fog: '#1f8994', density: 0.82, sky: 2.1, sun: 3.5, sand: '#c8c3a0' },
-  nursery: { fog: '#106572', density: 1.0, sky: 1.8, sun: 3.0, sand: '#a3a682' },
-  shelf: { fog: '#0d5563', density: 1.0, sky: 1.7, sun: 3.0, sand: '#a3a682' },
-  forest: { fog: '#0a4c52', density: 1.12, sky: 1.5, sun: 2.6, sand: '#8d8f6c' },
-  boulders: { fog: '#0f5260', density: 1.0, sky: 1.7, sun: 3.0, sand: '#9a9a86' },
-  flats: { fog: '#146470', density: 0.95, sky: 1.8, sun: 3.1, sand: '#8fa07a' },
-  channel: { fog: '#08404f', density: 1.1, sky: 1.4, sun: 2.4, sand: '#7f8878' },
-  escarpment: { fog: '#093c4b', density: 1.15, sky: 1.3, sun: 2.2, sand: '#7c8078' },
-  basin: { fog: '#041d2b', density: 1.4, sky: 0.9, sun: 1.5, sand: '#5e6a70' },
-};
+const ATMOS = ACTIVE_ERA.environment.atmosphere;
 
 type SeaKind = 'sediment' | 'rock' | 'sponge' | 'algae';
 

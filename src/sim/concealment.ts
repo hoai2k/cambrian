@@ -1,5 +1,6 @@
 import { floorColor, floraColor, rockColor } from '../shared/environment-colors';
-import authored from '../shared/authored-colors.json';
+import { ACTIVE_ERA } from '../content';
+const authored = ACTIVE_ERA.presentation.authoredColors;
 import { clamp, dist } from '../shared/math';
 import { scheme, schemeForCreature, type Slot } from '../shared/palettes';
 import { creature, type CreatureId } from './creatures';
@@ -34,7 +35,7 @@ export function camouflageMatch(a: Actor, world: WorldData, actors: Actor[]): Ca
   if(o.id===a.id||!isAlive(o))continue;
   const d=Math.max(0,dist(a.pos,o.pos)-bodyRadius(o)-bodyRadius(a));
   const palette=scheme(schemeForCreature(o.creature));
-  const colors=palette.colors??authored.creatures[o.creature];
+  const colors=palette.colors??authored.creatures[o.creature]!;
   take(d,o.hideMode==='camouflage'&&o.camoColors?{...o.camoColors}:{...colors},creature(o.creature).name,o.id,palette.id);
  }
  return best;

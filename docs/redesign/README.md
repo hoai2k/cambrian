@@ -66,3 +66,5 @@ holds:
 - The controller layout in the design and technical plans. The shipped bindings
   are different — see the note in each doc, and `readGamepad()` in
   `src/input/input.ts`, which is the authority.
+
+- [Era content boundary](06-era-content.md): implemented internal preparation for additional eras; Cambrian is still the only available content pack.

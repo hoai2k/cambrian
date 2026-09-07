@@ -1,3 +1,4 @@
+import { loadContent } from './load-content.mjs';
 /**
  * Guards the colour-scheme data against the models it has to drive.
  *
@@ -61,12 +62,8 @@ const EXPECTED = {
   'continuous ventral body': 'underside',
 };
 
-/** The whole roster: the base eight in creatures.ts plus the expansion in expansion.ts. */
-function rosterIds() {
-  const text = ['src/sim/creatures.ts', 'src/sim/expansion.ts']
-    .map((f) => fs.readFileSync(f, 'utf8')).join('\n');
-  return [...new Set([...text.matchAll(/\bid: '([a-z]+)'/g)].map((m) => m[1]))];
-}
+const { ACTIVE_ERA, SCHEMES, CREATURE_SCHEMES } = await loadContent();
+const rosterIds = () => ACTIVE_ERA.creatures.map(c => c.id);
 
 const src = fs.readFileSync('src/shared/palettes.ts', 'utf8');
 let failures = 0;
@@ -79,18 +76,15 @@ for (const rule of ['eye', 'ventral|arthrodial', 'sclerotiz|oral|spine', 'membra
 }
 
 // --- every scheme covers every slot ---
-const schemeIds = [...src.matchAll(/^\s*id: '([a-z-]+)',$/gm)].map((m) => m[1]);
-const colorBlocks = [...src.matchAll(/colors: \{ ([^}]+) \}/g)].map((m) => m[1]);
-for (const [i, blockText] of colorBlocks.entries()) {
-  const keys = [...blockText.matchAll(/(\w+):/g)].map((m) => m[1]);
-  const missing = SLOTS.filter((s) => !keys.includes(s));
-  if (missing.length) fail(`scheme #${i + 1} is missing slot(s): ${missing.join(', ')}`);
+const schemeIds = SCHEMES.map(s => s.id);
+for (const scheme of SCHEMES) {
+  if (scheme.colors === null) continue;
+  const missing = SLOTS.filter(slot => !scheme.colors[slot]);
+  if (missing.length) fail(`${scheme.id} is missing slots: ${missing.join(', ')}`);
 }
 const schemeCount = schemeIds.length;
+const assigned = Object.entries(CREATURE_SCHEMES);
 
-// --- CREATURE_SCHEMES names real creatures and real schemes ---
-const mapBlock = src.slice(src.indexOf('export const CREATURE_SCHEMES'), src.indexOf('export const DEFAULT_SCHEME'));
-const assigned = [...mapBlock.matchAll(/^\s*([a-z]+): '([a-z-]+)',$/gm)].map((m) => [m[1], m[2]]);
 const knownSchemes = new Set(schemeIds);
 const knownIds = new Set(rosterIds());
 for (const [creatureId, schemeName] of assigned) {
@@ -106,7 +100,7 @@ let materials = 0;
 for (const id of ids) {
   const slotsUsed = new Set();
   for (const file of [`${id}.glb`, `${id}.lod1.glb`]) {
-    const path = `public/assets/creatures/${file}`;
+    const path = `public/${ACTIVE_ERA.assets.creatures}${file}`;
     if (!fs.existsSync(path)) { fail(`${file} is missing`); continue; }
     const doc = await io.read(path);
     for (const name of doc.getRoot().listMaterials().map((m) => m.getName())) {

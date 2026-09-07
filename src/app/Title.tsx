@@ -1,8 +1,9 @@
+import { ACTIVE_ERA } from '../content';
 
 export function TitleScreen({ onStart, loaded, padCount }: { onStart: () => void; loaded: boolean; padCount: number }) {
   return (
     <section className="title title-illustrated" onClick={onStart} role="button" tabIndex={0} aria-label="Press start">
-      <img className="title-illustration" src={`${import.meta.env.BASE_URL}assets/brand/logo-illustrated.webp`} alt="" />
+      <img className="title-illustration" src={`${import.meta.env.BASE_URL}${ACTIVE_ERA.assets.illustration}`} alt="" />
       <h1 className="sr-only">Cambrian Explosion</h1>
       <div className="title-inner">
         <p className="title-tag">Eat. Grow. Fight. Run. <em>508 million years ago, everything was hungry.</em></p>

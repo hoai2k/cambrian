@@ -1,5 +1,6 @@
+import { assetPaths } from '../content/asset-paths';
 import { creaturePortrait } from '../shared/creature-images';
-import assetSizes from './asset-sizes.json';
+import { ACTIVE_ERA } from '../content';
 /**
  * Priority asset loader. Everything heavy (creature GLBs, card images, sound files) goes through one
  * queue so the title screen can appear as soon as the first creature is in, and idle time on the
@@ -13,7 +14,7 @@ export interface AssetItem { key: string; kind: AssetKind; url: string; size: nu
 export interface AssetProgress { loaded: number; total: number; fraction: number; done: number; count: number; current?: string; ready: Set<CreatureId>; }
 
 /** Known byte sizes so the bar is honest before the first request returns. */
-export const GLB_SIZES: Record<CreatureId, number> = assetSizes;
+export const GLB_SIZES: Readonly<Partial<Record<CreatureId, number>>> = ACTIVE_ERA.assets.modelBytes;
 const CARD_SIZE = 1_010_000;
 export const SFX_FILES = ['ui-start', 'ui-confirm', 'ui-move', 'ui-back', 'ui-join', 'bite-1', 'bite-2', 'bite-3', 'crunch-1', 'crunch-2', 'hit-light-1', 'hit-light-2', 'hit-heavy-1', 'hit-heavy-2', 'ambient-reef', 'giant-drone', 'heartbeat', 'parry', 'guard-break', 'stagger', 'dodge-1', 'dodge-2', 'burst', 'silt', 'grab', 'kill', 'death', 'tier-up', 'hunted', 'escape', 'sense', 'ability', 'won'];
 
@@ -29,12 +30,12 @@ export class AssetQueue {
 
   constructor() {
     CREATURE_IDS.forEach((id, i) => {
-      this.items.set(`glb:${id}`, { key: `glb:${id}`, kind: 'glb', url: `${BASE}assets/creatures/${id}.glb`, size: GLB_SIZES[id], priority: 100 + i, status: 'queued', loaded: 0 });
+      this.items.set(`glb:${id}`, { key: `glb:${id}`, kind: 'glb', url: `${BASE}${assetPaths.model(id)}`, size: GLB_SIZES[id]!, priority: 100 + i, status: 'queued', loaded: 0 });
       this.items.set(`card:${id}`, { key: `card:${id}`, kind: 'card', url: `${BASE}${creaturePortrait(id, 'card').src}`, size: CARD_SIZE, priority: 200 + i, status: 'queued', loaded: 0 });
       // Decimated copies used for anything small on screen. Small files, so they stream early.
-      this.items.set(`lod:${id}`, { key: `lod:${id}`, kind: 'lod', url: `${BASE}assets/creatures/${id}.lod1.glb`, size: 600_000, priority: 90 + i, status: 'queued', loaded: 0 });
+      this.items.set(`lod:${id}`, { key: `lod:${id}`, kind: 'lod', url: `${BASE}${assetPaths.model(id, 1)}`, size: 600_000, priority: 90 + i, status: 'queued', loaded: 0 });
     });
-    SFX_FILES.forEach((n, i) => this.items.set(`sfx:${n}`, { key: `sfx:${n}`, kind: 'sfx', url: `${BASE}assets/sfx/${n}.mp3`, size: n.startsWith('ambient') ? 265_000 : n.startsWith('giant') ? 145_000 : 12_000, priority: 300 + i, status: 'queued', loaded: 0 }));
+    SFX_FILES.forEach((n, i) => this.items.set(`sfx:${n}`, { key: `sfx:${n}`, kind: 'sfx', url: `${BASE}${assetPaths.sfx(n)}`, size: n.startsWith('ambient') ? 265_000 : n.startsWith('giant') ? 145_000 : 12_000, priority: 300 + i, status: 'queued', loaded: 0 }));
   }
 
   onProgress(fn: (p: AssetProgress) => void) { this.listeners.add(fn); fn(this.progress()); return () => this.listeners.delete(fn); }

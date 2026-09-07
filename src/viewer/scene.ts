@@ -1,3 +1,4 @@
+import { assetPaths } from '../content/asset-paths';
 import * as THREE from 'three';
 import { GLTFLoader, type GLTF } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { MeshoptDecoder } from 'three/examples/jsm/libs/meshopt_decoder.module.js';
@@ -57,7 +58,7 @@ const cache = new Map<CreatureId, Promise<GLTF>>();
 function loadCreature(id: CreatureId) {
   let p = cache.get(id);
   if (!p) {
-    p = new Promise<GLTF>((res, rej) => loader.load(`${ASSET_BASE}assets/creatures/${id}.glb`, res, undefined, rej))
+    p = new Promise<GLTF>((res, rej) => loader.load(`${ASSET_BASE}${assetPaths.model(id)}`, res, undefined, rej))
       .catch((e) => { cache.delete(id); throw new Error(`Could not load ${creature(id).name}: ${e?.message ?? e}`); });
     cache.set(id, p);
   }

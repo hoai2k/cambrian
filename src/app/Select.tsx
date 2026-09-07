@@ -1,3 +1,5 @@
+import { ACTIVE_ERA } from '../content';
+import { assetPaths } from '../content/asset-paths';
 import { hideLabel, hideDescription, HEAVY_SPECIALS, DEFENSIVE_SPECIALS } from '../sim/concealment';
 import { CreaturePortrait } from './CreaturePortrait';
 import { PLAYER_COLORS } from '../render/engine';
@@ -28,11 +30,11 @@ export function SelectScreen(p: Props) {
   return (
     <section className="select" aria-label="Choose your creature">
       <header className="select-header">
-        <div className="brand"><Emblem size={34} /><img className="header-logo" src={`${ASSETS}assets/brand/logo-engraved.webp`} alt="Cambrian Explosion" /></div>
+        <div className="brand"><Emblem size={34} /><img className="header-logo" src={`${ASSETS}${ACTIVE_ERA.assets.logo}`} alt={ACTIVE_ERA.title} /></div>
         <div className="mode-picker" role="tablist" aria-label="Game mode">
           {p.modes.map((m) => (
             <button key={m} role="tab" aria-selected={p.mode === m} className={`mode-chip ${p.mode === m ? 'active' : ''}`} onClick={() => p.onMode(m)}>
-              <img className="mode-art" src={`${ASSETS}assets/ui/mode-${m}.webp`} alt="" />
+              <img className="mode-art" src={`${ASSETS}${assetPaths.ui(`mode-${m}.webp`)}`} alt="" />
               <span>{p.modeInfo[m].name}</span><small>{p.modeInfo[m].players}</small>
             </button>
           ))}

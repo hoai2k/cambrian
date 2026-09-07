@@ -1,3 +1,4 @@
+import { assetPaths } from '../content/asset-paths';
 import { SLOTS, type Scheme } from './palettes';
 
 /** Bump when the luminance recolouring formula or material-to-slot rules change. */
@@ -18,6 +19,6 @@ export function portraitMatches(current: Scheme, rendered?: PortraitRecord): boo
     paletteSignature(current) === paletteSignature({ id: rendered.scheme, colors: rendered.colors });
 }
 export function resolvePortrait(id: string, kind: PortraitKind, current: Scheme, rendered?: PortraitRecord) {
-  const fallback = `assets/creatures/defaults/${id}.${kind}.png`;
+  const fallback = assetPaths.portrait(id, kind);
   return { src: portraitMatches(current, rendered) ? rendered!.files[kind] ?? fallback : fallback, fallback };
 }

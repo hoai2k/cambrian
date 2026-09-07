@@ -1,3 +1,4 @@
+import { assetPaths } from '../content/asset-paths';
 import { hideDescription } from '../sim/concealment';
 import { useEffect, useId, useRef, useState } from 'react';
 import type { HudSnapshot, PlayerHud, RadarBlipHud } from '../render/engine';
@@ -33,7 +34,7 @@ function PlayerPanel({ p }: { p: PlayerHud }) {
     <>
       <div className="health-vignette" aria-hidden="true" style={{ opacity: healthWarning }} />
       {p.bandMarkers.map((m, k) => (
-        <span key={k} className={`marker marker-${m.band}`} style={{ left: `${m.x * 100}%`, top: `${m.y * 100}%`, ['--s' as string]: m.size, maskImage: `url(${import.meta.env.BASE_URL}assets/ui/band-${m.band}.svg)`, color: BAND_COLOR[m.band] }} />
+        <span key={k} className={`marker marker-${m.band}`} style={{ left: `${m.x * 100}%`, top: `${m.y * 100}%`, ['--s' as string]: m.size, maskImage: `url(${import.meta.env.BASE_URL}${assetPaths.ui(`band-${m.band}.svg`)})`, color: BAND_COLOR[m.band] }} />
       ))}
       {p.hunterAngle != null && (
         <div className="hunter-arrow" style={{ transform: `translate(-50%,-50%) rotate(${-p.hunterAngle}rad) translate(min(38vh, 34%))`, opacity: 0.4 + p.hunted * 0.6 }}>
@@ -46,7 +47,7 @@ function PlayerPanel({ p }: { p: PlayerHud }) {
             <circle cx="36" cy="36" r={R} className="ring-bg" />
             <circle cx="36" cy="36" r={R} className="ring-fg" strokeDasharray={`${C * p.progress} ${C}`} transform="rotate(-90 36 36)" />
           </svg>
-          <span className="tier-num" role="img" aria-label={`Tier ${p.tier + 1}: ${p.tierName}`}><i className="tier-glyph" style={{ maskImage: `url(${import.meta.env.BASE_URL}assets/ui/tier-${p.tier + 1}.svg)` }} /></span>
+          <span className="tier-num" role="img" aria-label={`Tier ${p.tier + 1}: ${p.tierName}`}><i className="tier-glyph" style={{ maskImage: `url(${import.meta.env.BASE_URL}${assetPaths.ui(`tier-${p.tier + 1}.svg`)})` }} /></span>
         </div>
         <div className="bars">
           <div className="name-row"><b>{def.name}</b><span className="tier-name">{p.tierName}</span>{p.protect && <span className="protect">PROTECTED</span>}</div>
