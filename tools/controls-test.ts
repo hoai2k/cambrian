@@ -39,5 +39,20 @@ for (const camYaw of [0, 0.7, 2.4, -1.9]) {
 const c = drive('olenoides', 1.1, 1, 0, 2);
 check('crawler: stick right -> screen right', c.onRight > 0.5 && c.onRight > Math.abs(c.onFwd), `right=${c.onRight.toFixed(2)} fwd=${c.onFwd.toFixed(2)}`);
 
+// Forward is parallel to the seafloor at the angles a follow camera actually rests at, and only
+// starts to follow the camera once it is deliberately aimed up or down. Rising and sinking have
+// their own buttons, so nothing is lost by ignoring a resting camera's slight downward tilt.
+{
+  const { swimPitch } = await import('../src/render/engine');
+  const deg = (d: number) => (d * Math.PI) / 180;
+  for (const d of [0, 11, 20, 25]) check(`camera ${d}° down: forward stays level`, swimPitch(deg(d)) === 0, `pitch=${swimPitch(deg(d)).toFixed(3)}`);
+  check('camera 40° down: forward tilts, but less than the camera', swimPitch(deg(40)) > 0 && swimPitch(deg(40)) < deg(40), `pitch=${swimPitch(deg(40)).toFixed(3)}`);
+  // Past FULL_PITCH the shaping is out of the way and the long-standing ±0.7 rad clamp is all
+  // that is left, so a steep camera gives the steepest swim the stick has ever been able to ask for.
+  check('camera 57° down: forward follows the camera to the clamp', swimPitch(deg(57)) === 0.7, `pitch=${swimPitch(deg(57)).toFixed(3)}`);
+  check('looking up is symmetric', swimPitch(deg(-40)) === -swimPitch(deg(40)), `pitch=${swimPitch(deg(-40)).toFixed(3)}`);
+  check('steep angles stay clamped', Math.abs(swimPitch(deg(89))) <= 0.7, `pitch=${swimPitch(deg(89)).toFixed(3)}`);
+}
+
 console.log(failed ? `\n${failed} FAILED` : '\nall control-direction tests passed');
 process.exit(failed ? 1 : 0);
