@@ -1,325 +1,424 @@
-"""Bespoke Coccosteus cuspidatus reconstruction; Blender 4.5+ standalone builder."""
-import bpy,bmesh,math,os,sys,json,struct
+"""Coccosteus cuspidatus V2, an independently authored small arthrodire.
+Anatomy: Miles & Westoll 1968; Engelman 2024 figure 7 and associated Coccosteus discussion.
+Blender 5.2 --background --threads 2 --python this_file [-- --preview|--skip-renders].
+"""
+import bpy,bmesh,math,json,sys
 import numpy as np
-from mathutils import Vector,noise
+from pathlib import Path
+from mathutils import Vector,Matrix
+from mathutils.bvhtree import BVHTree
 from math import sin,cos,pi
-HERE=os.path.dirname(os.path.abspath(__file__))
-ROOT=os.path.abspath(os.path.join(HERE,'../../../..'))
-OUT=os.path.join(ROOT,'public/assets/devonian/creatures')
-LOCAL=os.environ.get('DEVONIAN_AUTHORING',os.path.abspath(os.path.join(ROOT,'../devonian-authoring/coccosteus')))
-os.makedirs(LOCAL,exist_ok=True);os.makedirs(OUT,exist_ok=True)
-ID='coccosteus';CLIPS={'Idle':2.4,'Swim':2.4,'TurnLeft':1.6,'TurnRight':1.6,'Dive':1.4,'Rise':1.4,'Attack':1.,'Bite':.5,'Heavy':1.1,'Hit':.6,'Death':1.6,'Guard':1.,'Parry':.35,'Dodge':.4,'Eat':1.6,'Stagger':1.2,'Ability':2.4,'Growth':1.5}
-LOOPS=['Idle','Swim','Guard','Eat']
+HERE=Path(__file__).resolve().parent;REPO=HERE.parents[3];LOCAL=REPO.parent/'devonian-authoring/coccosteus';CAND=LOCAL/'v2-candidate';CAND.mkdir(parents=True,exist_ok=True);PREVIEW='--preview'in sys.argv
 bpy.ops.object.select_all(action='SELECT');bpy.ops.object.delete(use_global=False)
 for a in list(bpy.data.actions):bpy.data.actions.remove(a)
-V=[];C=[];W=[];U=[];F=[];M=[];B={}
-def bone(n,p,parent='body'):
- B[n]=(Vector(p),Vector(p)+Vector((0,.35,0)),parent)
-bone('root',(0,0,0),None);bone('body',(0,0,0),'root');bone('skull',(0,-.77,.08));bone('jaw',(0,-1.0,-.17),'skull');bone('throat',(0,-.92,-.18),'skull')
-for i,y in enumerate([.35,.9,1.45,2.]):bone('tail%d'%i,(0,y,0),'body' if i==0 else 'tail%d'%(i-1))
-for side in [-1,1]:
- s='L' if side==1 else 'R';bone('pectoral'+s,(side*.47,-.22,-.22));bone('pectoralTip'+s,(side*.83,.05,-.26),'pectoral'+s);bone('pelvic'+s,(side*.26,.55,-.24),'tail0');bone('gill'+s,(side*.48,-.68,-.11),'skull')
-bone('dorsal',(0,.67,.32),'tail0');bone('caudal',(0,2.05,.07),'tail3')
-def vertex(p,col,w,uv=(0,0),var=True):
- p=Vector(p);v=.87+.19*noise.noise_vector(p*5)[0]+.10*noise.noise_vector(p*27)[1] if var else 1
- # Irregular small mottling with a faint warm lateral band, not scales pasted on armour.
- v*=1-.12*max(0,noise.noise_vector(p*13)[2])
- V.append(tuple(p));C.append(tuple(max(.001,min(.9,k*v))for k in col)+(1,));W.append({w:1}if isinstance(w,str)else w);U.append(uv);return len(V)-1
-def face(f,m=0):F.append(tuple(f));M.append(m)
-def grid(nr,nc,fn,m=0,wrap=False):
- ids=[[fn(i,j)for j in range(nc)]for i in range(nr)]
- for i in range(nr-1):
-  for j in range(nc if wrap else nc-1):face((ids[i][j],ids[i][(j+1)%nc],ids[i+1][(j+1)%nc],ids[i+1][j]),m)
- return ids
-def tube(pts,radii,col,w,m=0,sides=10):
- pts=list(map(Vector,pts));rows=[]
- for i,p in enumerate(pts):
-  t=(pts[min(len(pts)-1,i+1)]-pts[max(0,i-1)]).normalized();a=t.cross(Vector((0,0,1)))
-  if a.length<.001:a=t.cross(Vector((1,0,0)))
-  a.normalize();b=t.cross(a);wi=w[i]if isinstance(w,list)else w
-  rows.append([vertex(p+float(radii[i])*(a*cos(j*2*pi/sides)+b*sin(j*2*pi/sides)),col,wi,(j/sides,i/max(1,len(pts)-1)))for j in range(sides)])
- for i in range(len(rows)-1):
-  for j in range(sides):face((rows[i][j],rows[i][(j+1)%sides],rows[i+1][(j+1)%sides],rows[i+1][j]),m)
- face(reversed(rows[0]),m);face(rows[-1],m)
-def ell(c,scale,col,w,m=3):
- c=Vector(c)
- grid(17,32,lambda i,j:vertex(c+Vector((scale[0]*sin(pi*i/16)*cos(2*pi*j/32),scale[1]*sin(pi*i/16)*sin(2*pi*j/32),scale[2]*cos(pi*i/16))),col,w,(j/32,i/16),False),m,True)
-# Independent Coccosteus plan: shallow head, compact trunk shield, shortened abdomen,
-# anterior pelvis and deep caudal peduncle following complete-specimen revisions.
-sections=[(-1.70,.255,.055,-.035),(-1.57,.37,.24,.025),(-1.29,.50,.32,.04),(-.95,.535,.37,.045),(-.71,.515,.385,.02),(-.25,.49,.40,0),(.22,.405,.335,-.015),(.68,.31,.275,-.02),(1.15,.22,.215,-.015),(1.65,.13,.17,.02),(2.05,.075,.13,.08),(2.32,.022,.052,.24)]
-def section(y):
- if y<=sections[0][0]:return np.array(sections[0][1:])
- for k in range(len(sections)-1):
-  if sections[k][0]<=y<=sections[k+1][0]:
-   a=np.array(sections[k]);b=np.array(sections[k+1]);t=(y-a[0])/(b[0]-a[0]);pre=np.array(sections[max(0,k-1)]);post=np.array(sections[min(len(sections)-1,k+2)])
-   d0=(b-pre)/(b[0]-pre[0])*(b[0]-a[0]);d1=(post-a)/(post[0]-a[0])*(b[0]-a[0]);return ((2*t**3-3*t*t+1)*a+(t**3-2*t*t+t)*d0+(-2*t**3+3*t*t)*b+(t**3-t*t)*d1)[1:]
- return np.array(sections[-1][1:])
-def surf(y,a,offset=0):
- w,h,z=section(y);return Vector(((w+offset)*cos(a),y,z+(h+offset)*sin(a)))
-def bw(y,a=0):
- if y<-.75:
-  jaw=max(0,min(1,-sin(a)*5))*max(0,min(1,(-y-.80)/.55))
-  return {'jaw':jaw,'skull':1-jaw}if jaw>0 else {'skull':1}
- if y<.35:return {'body':1}
- q=min(3,(y-.35)/.55);i=int(q);f=q-i
- return {'tail%d'%i:1-f,'tail%d'%(i+1):f}if i<3 else {'tail3':1}
-def pigment(y,a):
- top=(sin(a)+1)/2;band=math.exp(-((sin(a)+.12)/.18)**2);saddle=max(0,sin(y*8+.6*cos(a)))**8*top
- return (.28-.155*top+.035*band-.026*saddle,.23-.12*top+.021*band-.029*saddle,.14-.08*top-.018*saddle)
-def torso(i,j):
- y=-1.7+4.02*i/138;a=j*2*pi/80;return vertex(surf(y,a),pigment(y,a),bw(y,a),(j/80,(y+1.7)*.9))
-rows=grid(139,80,torso,0,True);face(rows[-1],0)
-# True recessed oral pocket: short subterminal mouth, flexible lower lip and articulated gnathal.
-def mouth(i,j):
- t=i/18;a=2*pi*j/80;p=Vector((.255*(1-.76*t)*cos(a),-1.701+.61*t,-.035+.055*(1-.65*t)*sin(a)))
- jaw=max(0,min(1,-sin(a)*5))*(1-t);return vertex(p,(.11-.075*t,.049-.030*t,.033-.018*t),{'jaw':jaw,'skull':1-jaw},(j/80,t))
-oral=grid(19,80,mouth,4,True);face(reversed(oral[-1]),4)
-for upper in [False,True]:
- aa=0 if upper else pi;pts=[surf(-1.703,aa+pi*i/60,.008)for i in range(61)]
- tube(pts,[.011]*61,(.27,.20,.10),[bw(-1.70,aa+pi*i/60)for i in range(61)],2,8)
-# Paired short gnathal biting margins carry modest cusps, not exaggerated Dunkleosteus fangs.
-for side in [-1,1]:
- for upper in [False,True]:
-  bn='skull'if upper else'jaw';z=-.018 if upper else-.076
-  pts=[(side*(.205-.057*t),-1.67+.25*t,z+.015*t)for t in np.linspace(0,1,15)]
-  tube(pts,[.012]*15,(.46,.36,.19),bn,2,8)
+scene=bpy.context.scene;scene.render.fps=30
+arm=bpy.data.armatures.new('Coccosteus V2 anatomical skeleton');rig=bpy.data.objects.new('Coccosteus',arm);scene.collection.objects.link(rig);bpy.context.view_layer.objects.active=rig;rig.select_set(True);bpy.ops.object.mode_set(mode='EDIT')
+spec=[('root',(0,0,0),None),('body',(0,-.10,0),'root'),('skull',(0,-.79,.13),'body'),('jaw',(0,-.91,-.15),'skull'),('throat',(0,-.97,-.18),'skull')]
+for i,y in enumerate([.36,.91,1.44,1.96]):spec.append(('tail'+str(i),(0,y,.015),'body'if i==0 else'tail'+str(i-1)))
+for sign in [-1,1]:
+ side='L'if sign>0 else'R';spec.extend([('pectoral'+side,(sign*.38,-.55,-.22),'body'),('pectoralTip'+side,(sign*.72,-.27,-.43),'pectoral'+side),('pelvic'+side,(sign*.24,.39,-.26),'tail0'),('gill'+side,(sign*.42,-.74,-.09),'skull')])
+spec.extend([('dorsal',(0,.87,.24),'tail0'),('caudal',(0,2.04,.025),'tail3')])
+for name,p,parent in spec:
+ b=arm.edit_bones.new(name);b.head=p;b.tail=Vector(p)+Vector((0,0,.18)if name=='root'else(0,.18,0));b.use_deform=name!='root'
+ if parent:b.parent=arm.edit_bones[parent]
+bpy.ops.object.mode_set(mode='OBJECT');rig.select_set(False)
+TX=1024;v,u=np.mgrid[0:TX,0:TX].astype(np.float32)/TX
+im=bpy.data.images.load(str(HERE/'dermal-source-v2.png'));iw,ih=im.size;data=np.array(im.pixels[:],np.float32).reshape(ih,iw,4);sample=data[((v*2.1)%1*(ih-1)).astype(int),((u*2.1)%1*(iw-1)).astype(int),:3];micro=sample.mean(2);micro=(micro-micro.mean())/(micro.std()+1e-8)
+# The angular UV boundary approaches the oral lip: attenuate microdetail there
+# instead of stretching a final texture row into vertical comb-like streaks.
+edge_distance=np.minimum(np.minimum(v,abs(v-.5)),1-v);micro*=np.where(u<.5,np.clip(edge_distance/.055,0,1)*np.clip((u-.02)/.075,0,1),1)
+# Individually authored cranial and trunk suture layouts; shared material atlas U regions.
+HEAD_SEAMS=[[(.03,.18),(.12,.18),(.21,.235),(.35,.25)],[(.03,.32),(.12,.32),(.21,.265),(.35,.25)],[(.21,.235),(.27,.13),(.43,.09)],[(.21,.265),(.27,.37),(.43,.41)],[(.27,.13),(.30,.045),(.445,.025)],[(.27,.37),(.30,.455),(.445,.475)],[(.34,.25),(.43,.215),(.46,.19)],[(.34,.25),(.43,.285),(.46,.31)]]
+BODY_SEAMS=[[(.54,.25),(.65,.16),(.79,.15),(.935,.25)],[(.54,.25),(.65,.34),(.79,.35),(.935,.25)],[(.65,.16),(.66,.055),(.87,.04)],[(.65,.34),(.66,.445),(.87,.46)],[(.79,.15),(.87,.09),(.97,.09)],[(.79,.35),(.87,.41),(.97,.41)],[(.66,.055),(.68,.60),(.83,.65),(.96,.58)],[(.66,.445),(.68,.90),(.83,.85),(.96,.92)]]
+def linedistance(U,V,lines=HEAD_SEAMS+BODY_SEAMS):
+ out=np.full(np.broadcast(U,V).shape,10.,np.float32)
+ for points in lines:
+  for a,b in zip(points,points[1:]):
+   ax,ay=a;dx,dy=b[0]-ax,b[1]-ay;t=np.clip(((U-ax)*dx+(V-ay)*dy)/(dx*dx+dy*dy),0,1);out=np.minimum(out,np.sqrt((U-ax-dx*t)**2+(V-ay-dy*t)**2))
+ return out
+dist=linedistance(u,v);seam=np.exp(-(dist/.0017)**2);relief=.052*micro-.28*seam;factor=np.clip(.86+.040*micro-.16*seam,.48,.98)
+rgba=np.ones((TX,TX,4),np.float32);rgba[:,:,:3]=factor[:,:,None]*np.array([1.0,.98,.945])
+def image_map(name,array,noncolor=False):
+ im=bpy.data.images.new(name,width=TX,height=TX);im.pixels.foreach_set(array.astype(np.float32).ravel());im.filepath_raw=str(HERE/(name+'.png'));im.file_format='PNG';im.save();im.pack()
+ if noncolor:im.colorspace_settings.name='Non-Color'
+ return im
+albedo=image_map('armour-detail-v2',rgba);gx=(np.roll(relief,1,1)-np.roll(relief,-1,1))*.35;gy=(np.roll(relief,1,0)-np.roll(relief,-1,0))*.35;norm=np.ones_like(rgba);length=np.sqrt(gx*gx+gy*gy+1);norm[:,:,0]=.5+.5*gx/length;norm[:,:,1]=.5+.5*gy/length;norm[:,:,2]=.5+.5/length;normalmap=image_map('armour-normal-v2',norm,True)
+rough=np.ones_like(rgba);rough[:,:,:3]=np.clip(.52+.035*micro+.07*seam,.43,.66)[:,:,None];roughmap=image_map('armour-roughness-v2',rough,True)
+finvein=np.exp(-(np.sin(pi*(u*14+.085*np.sin(v*6+u*4)))**2)/.018)*np.clip((v-.10)/.35,0,1)
+finnoise=(np.sin(u*171+v*87+np.sin(u*31)*2)+np.sin(v*149-u*73))/2
+finrgba=np.ones_like(rgba);finfactor=np.clip(.96-.24*finvein+.016*finnoise,.68,.985);finrgba[:,:,:3]=finfactor[:,:,None]
+finimage=image_map('fin-pigment-v2',finrgba);finrough=np.ones_like(rgba);finrough[:,:,:3]=(.61+.055*finvein+.02*finnoise)[:,:,None];finroughimage=image_map('fin-roughness-v2',finrough,True)
+M={}
+for name,col,r in [('armour',(.205,.132,.061),.54),('body',(.147,.123,.055),.47),('fins',(.052,.085,.033),.57),('jaw',(.23,.17,.09),.48),('oral',(.074,.027,.022),.48),('gnathal',(.38,.285,.15),.35),('eyes',(.003,.006,.006),.105),('gill',(.038,.030,.018),.55)]:
+ mat=bpy.data.materials.new(name);mat.diffuse_color=(*col,1);mat.use_nodes=True;n=mat.node_tree.nodes;l=mat.node_tree.links;bs=n.get('Principled BSDF');bs.inputs['Base Color'].default_value=(*col,1);bs.inputs['Roughness'].default_value=r;bs.inputs['Coat Weight'].default_value=.1 if name=='eyes'else 0 if name=='fins'else .035
+ if name=='fins':bs.inputs['Specular IOR Level'].default_value=.17
+ if name!='eyes':vc=n.new('ShaderNodeVertexColor');vc.layer_name='Color';l.new(vc.outputs['Color'],bs.inputs['Base Color'])
+ if name=='armour':
+  t=n.new('ShaderNodeTexImage');t.image=albedo;mix=n.new('ShaderNodeMixRGB');mix.blend_type='MULTIPLY';mix.inputs[0].default_value=1;l.new(vc.outputs['Color'],mix.inputs[1]);l.new(t.outputs['Color'],mix.inputs[2]);l.new(mix.outputs[0],bs.inputs['Base Color'])
+  nt=n.new('ShaderNodeTexImage');nt.image=normalmap;nm=n.new('ShaderNodeNormalMap');nm.inputs['Strength'].default_value=.65;l.new(nt.outputs['Color'],nm.inputs['Color']);l.new(nm.outputs['Normal'],bs.inputs['Normal']);rt=n.new('ShaderNodeTexImage');rt.image=roughmap;l.new(rt.outputs['Color'],bs.inputs['Roughness'])
+ if name=='fins':
+  tx=n.new('ShaderNodeTexImage');tx.image=finimage;mix=n.new('ShaderNodeMixRGB');mix.blend_type='MULTIPLY';mix.inputs[0].default_value=1;l.new(vc.outputs['Color'],mix.inputs[1]);l.new(tx.outputs['Color'],mix.inputs[2]);l.new(mix.outputs[0],bs.inputs['Base Color']);rr=n.new('ShaderNodeTexImage');rr.image=finroughimage;l.new(rr.outputs['Color'],bs.inputs['Roughness'])
+ M[name]=mat
+objects=[]
+def pigment(p,material):
+ x,y,z=p;base=np.array(M[material].diffuse_color[:3]);dorsal=np.clip((z+.1)/.44,0,1)
+ if material in ['armour','body','jaw','fins']:
+  base*=1-.22*dorsal
+  ventral=np.clip((-z-.05)/.30,0,1);strength=.08 if material=='fins'else .6;base=base*(1-strength*ventral)+np.array([.285,.241,.154])*strength*ventral
+  # Regional flank freckling is pigmentation, not a continuous lateral-line cord.
+  stripe=math.exp(-((z-.075)/.065)**2);patch=max(0,sin(y*27+sin(x*29)*1.7+z*11))**5;amount=(.25 if material=='body'else .10)*stripe*patch;base*=1-amount
+ return(*np.clip(base,0,1),1)
+
+def mesh(name,verts,faces,material,bone='body',weights=None,uvs=None):
+ me=bpy.data.meshes.new(name);me.from_pydata(verts,[],faces);me.update();bm=bmesh.new();bm.from_mesh(me);bmesh.ops.recalc_face_normals(bm,faces=list(bm.faces));bm.to_mesh(me);bm.free();o=bpy.data.objects.new(name,me);scene.collection.objects.link(o);me.materials.append(M[material]);objects.append(o)
+ for p in me.polygons:p.use_smooth=True
+ uv=me.uv_layers.new(name='UVMap');col=me.color_attributes.new(name='Color',type='FLOAT_COLOR',domain='POINT')
+ for i,v in enumerate(me.vertices):col.data[i].color=pigment(v.co,material)
+ for p in me.polygons:
+  for li in p.loop_indices:
+   idx=me.loops[li].vertex_index;v=me.vertices[idx].co;uv.data[li].uv=uvs[idx]if uvs else((v.y+1.45)/1.6,(math.atan2(v.z-.03,v.x)/(2*pi))%1)
+ if weights:
+  groups={key:o.vertex_groups.new(name=key)for key in set(k for w in weights for k in w)}
+  for i,w in enumerate(weights):
+   total=sum(w.values())
+   for key,val in w.items():
+    if val>0:groups[key].add([i],val/total,'REPLACE')
+ else:o.vertex_groups.new(name=bone).add(list(range(len(verts))),1,'REPLACE')
+ mod=o.modifiers.new('Anatomical skin','ARMATURE');mod.object=rig;o.parent=rig
+ return o
+
+def ellipse(name,center,basis,radii,material,bone='body',N=64,R=32):
+ center=Vector(center);basis=list(map(Vector,basis));vv=[];ff=[]
+ for j in range(R+1):
+  lat=pi*j/R
+  for k in range(N):
+   a=2*pi*k/N;vv.append(tuple(center+basis[0]*(radii[0]*sin(lat)*cos(a))+basis[1]*(radii[1]*sin(lat)*sin(a))+basis[2]*(radii[2]*cos(lat))))
+ for j in range(R):
+  for k in range(N):a=j*N+k;ff.append((a,j*N+(k+1)%N,(j+1)*N+(k+1)%N,a+N))
+ return mesh(name,vv,ff,material,bone)
+
+def interp(data,t):
+ k=min(len(data)-2,max(0,int(t)));f=t-k;a=np.array(data[max(0,k-1)]);b=np.array(data[k]);c=np.array(data[k+1]);d=np.array(data[min(len(data)-1,k+2)])
+ return .5*(2*b+(-a+c)*f+(2*a-5*b+4*c-d)*f*f+(-a+3*b-3*c+d)*f*f*f)
+# Continuous upper cranial mass. Its ventral surface is the concave palate itself;
+# no complete body cross-section is allowed to close the oral aperture.
+HEAD=[(-1.744,0,.055,.055,0),(-1.70,.204,.118,-.006,.009),(-1.61,.294,.191,-.028,.040),(-1.43,.373,.272,-.073,.094),(-1.20,.424,.342,-.152,.163),(-.96,.445,.391,-.204,.212),(-.77,.433,.352,-.220,.222)]
+verts=[];uvs=[];faces=[];NA=120;NY=127
+for j in range(NY):
+ y,w,top,base,arch=interp(HEAD,j/(NY-1)*(len(HEAD)-1))
+ for k in range(NA+1):
+  a=2*pi*k/NA;sn=sin(a);x=w*cos(a);z=base+(top-base)*max(0,sn)**.78 if sn>=0 else base+arch*(-sn)**.80
+  # Restrained cranial planes / cheek shoulders, not a spherical cranium.
+  if sn>0:z-=.012*sin(a*4)**2*sin(pi*j/(NY-1))
+  vv=k/NA;uu=.02+.445*(y+1.744)/.974;seamdist=float(linedistance(np.array(uu),np.array(vv)));z-=.0017*math.exp(-(seamdist/.0025)**2)*max(0,sn)
+  verts.append((x,y,z));uvs.append((uu,vv))
+for j in range(NY-1):
+ for k in range(NA):a=j*(NA+1)+k;faces.append((a,a+1,a+NA+2,a+NA+1))
+faces.append(tuple((NY-1)*(NA+1)+k for k in range(NA+1)));head=mesh('head_envelope_closed',verts,faces,'armour','skull',uvs=uvs)
+# The underside is real oral palate material, in the SAME continuous closed tissue mesh.
+head.data.materials.append(M['oral']);head.data.materials.append(M['jaw'])
+for p in head.data.polygons:
+ if len(p.vertices)==4:
+  avg=sum(head.data.uv_layers[0].data[li].uv.y for li in p.loop_indices)/4
+  if avg>.5:p.material_index=1
+for p in head.data.polygons:
+ if len(p.vertices)>4:
+  p.material_index=0
+  for li in p.loop_indices:
+   q=head.data.vertices[head.data.loops[li].vertex_index].co;head.data.uv_layers[0].data[li].uv=(.10+.20*(q.x/.45+1)/2,.55+.20*(q.z+.22)/.62)
+# Per-vertex underside colour transitions naturally to upper bony tissue at lip margin.
+for i,p in enumerate(verts):
+ if i//(NA+1)>0 and .5<(i%(NA+1))/NA<1:head.data.color_attributes['Color'].data[i].color=pigment(p,'oral')
+tree=BVHTree.FromPolygons([v.co.copy()for v in head.data.vertices],[list(p.vertices)for p in head.data.polygons])
+eye_specs=[]
+for sign in [-1,1]:
+ side='L'if sign>0 else'R';point,normal,_,_=tree.ray_cast(Vector((sign*2,-1.438,.156)),Vector((-sign,0,0)))
+ normal=normal.normalized()
+ if normal.x*sign<0:normal=-normal
+ uvec=Vector((0,1,0));uvec=(uvec-normal*uvec.dot(normal)).normalized();vvec=normal.cross(uvec).normalized();radii=(.099,.083,.067);center=point-normal*.035
+ ellipse('eye_globe_'+side,center,[uvec,vvec,normal],radii,'eyes','skull',64,36);eye_specs.append({'name':'eye_globe_'+side,'center':list(center),'basis':[list(x)for x in [uvec,vvec,normal]],'radii':radii})
+ # Fitted, thin intersection skin ribbon. It does not add an envelope or conceal a protruding back.
+ vv=[];ff=[];liduv=[];N=96
+ for i in range(N+1):
+  phi=2*pi*i/N;direction=uvec*(radii[0]*cos(phi))+vvec*(radii[1]*sin(phi));lo=0;hi=pi
+  for _ in range(22):
+   theta=(lo+hi)/2;p=center+direction*sin(theta)+normal*radii[2]*cos(theta);q,no,_,_=tree.find_nearest(p)
+   if (p-q).dot(no)>0:lo=theta
+   else:hi=theta
+  p=center+direction*sin((lo+hi)/2)+normal*radii[2]*cos((lo+hi)/2);q,no,_,_=tree.find_nearest(p)
+  tangent=direction.normalized();outer,ono,_,_=tree.find_nearest(q+tangent*.008)
+  for t in [0,.33,.67,1]:
+   p=q.lerp(outer,t)+no*(.0002+.0006*sin(pi*t));vv.append(tuple(p));ring=interp(HEAD,np.interp(p.y,[a[0]for a in HEAD],range(len(HEAD))));liduv.append((.02+.445*(p.y+1.744)/.974,math.acos(max(-1,min(1,p.x/ring[1])))/(2*pi)))
+ for i in range(N):
+  for j in range(3):a=i*4+j;ff.append((a,a+1,a+5,a+4))
+ mesh('Fitted orbital skin '+side,vv,ff,'armour','skull',uvs=liduv)
+(HERE/'eyes-v2.json').write_text(json.dumps(eye_specs,indent=2))
+# Broad, shallow lower jaw forms an articulated cup with an actual dorsal floor.
+JAW=[(-1.716,0,-.12,-.12),(-1.692,.195,-.093,-.156),(-1.565,.284,-.117,-.201),(-1.36,.348,-.166,-.267),(-1.11,.345,-.206,-.294),(-1.00,.23,-.223,-.283),(-.96,0,-.248,-.248)]
+vv=[];ff=[];uv=[];NAJ=88;NYJ=87
+for j in range(NYJ):
+ y,w,top,bottom=interp(JAW,j/(NYJ-1)*(len(JAW)-1))
+ for k in range(NAJ+1):
+  a=2*pi*k/NAJ;z=top+.010*sin(a)if sin(a)>0 else top+(top-bottom)*sin(a);vv.append((w*cos(a),y,z));uv.append((j/(NYJ-1),k/NAJ))
+for j in range(NYJ-1):
+ for k in range(NAJ):a=j*(NAJ+1)+k;ff.append((a,a+1,a+NAJ+2,a+NAJ+1))
+ff.append(tuple((NYJ-1)*(NAJ+1)+k for k in range(NAJ+1)));jaw=mesh('Mandibular cup and oral floor',vv,ff,'jaw','jaw',uvs=uv);jaw.data.materials.append(M['oral'])
+for p in jaw.data.polygons:
+ if len(p.vertices)==4 and sum(jaw.data.uv_layers[0].data[li].uv.y for li in p.loop_indices)/4<.5:p.material_index=1
+for i,p in enumerate(vv):
+ if 0<i//(NAJ+1)<NYJ-1 and 0<(i%(NAJ+1))/NAJ<.5:jaw.data.color_attributes['Color'].data[i].color=pigment(p,'oral')
+# A single lining follows the actual palate, mandibular floor and cheek margins
+# before narrowing into the torso aperture. There is no separate vestibular shelf.
+vv=[];ff=[];ww=[];RN=92;HALF=64;AN=2*(HALF+1)
+for j in range(RN):
+ t=j/(RN-1);y=-1.53+.73*t
+ upper=interp(HEAD,np.interp(y,[p[0]for p in HEAD],range(len(HEAD))));lower=interp(JAW,np.interp(min(y,-1.08),[p[0]for p in JAW],range(len(JAW))))
+ blend=np.clip((y+1.13)/.33,0,1);blend=blend*blend*(3-2*blend)
+ for k in range(AN):
+  top=k<=HALF;a=pi*k/HALF if top else pi+pi*(k-HALF-1)/HALF
+  if top:x=upper[1]*cos(a);z=upper[3]+upper[4]*max(0,sin(a))**.8+.003;weights={'skull':1-blend,'body':blend}
+  else:x=lower[1]*cos(a);z=lower[2]+.010*abs(sin(a))-.004;weights={'jaw':1-blend,'body':blend}
+  # End just within the torso opening so the two lining surfaces overlap inside tissue.
+  x=x*(1-blend)+.345*cos(a)*blend;z=z*(1-blend)+(-.13+.145*sin(a))*blend
+  vv.append((x,y,z));ww.append(weights)
+for j in range(RN-1):
+ for k in range(AN):a=j*AN+k;ff.append((a,j*AN+(k+1)%AN,(j+1)*AN+(k+1)%AN,a+AN))
+mesh('Continuous buccopharyngeal lining',vv,ff,'oral',weights=ww)
+# Dermal exteriors share the exact side-wall boundaries and weights of the lining.
+# Separate old cheek pieces would leave their rear cut edges inside the vestibule.
+for sign,ia,ib in [(1,AN-1,0),(-1,HALF,HALF+1)]:
+ cv=[];cw=[];cf=[]
+ for j in range(RN):
+  for k in [ia,ib]:
+   index=j*AN+k;p=Vector(vv[index]);p.x+=sign*.003;cv.append(tuple(p));cw.append(ww[index])
+ for j in range(RN-1):cf.append((j*2,j*2+1,j*2+3,j*2+2))
+ mesh('Dermal cheek skin '+str(sign),cv,cf,'jaw',weights=cw)
+
+# Small paired gnathal cusps and bony margins, with genus-appropriate scale.
+def tube(name,points,radii,material,bone,sides=10):
+ points=list(map(Vector,points));vv=[];ff=[]
+ for i,p in enumerate(points):
+  tangent=(points[min(i+1,len(points)-1)]-points[max(i-1,0)]).normalized();u=tangent.cross(Vector((0,0,1)))
+  if u.length<1e-6:u=tangent.cross(Vector((0,1,0)))
+  u.normalize();v=tangent.cross(u)
+  for k in range(sides):a=2*pi*k/sides;vv.append(tuple(p+radii[i]*(u*cos(a)+v*sin(a))))
+ for i in range(len(points)-1):
+  for k in range(sides):a=i*sides+k;ff.append((a,i*sides+(k+1)%sides,(i+1)*sides+(k+1)%sides,a+sides))
+ ff.extend([tuple(range(sides-1,-1,-1)),tuple((len(points)-1)*sides+k for k in range(sides))]);return mesh(name,vv,ff,material,bone)
+for sign in [-1,1]:
+ for upper in [True,False]:
+  bone='skull'if upper else'jaw';z=-.020 if upper else-.092;pts=[(sign*(.15+.10*t),-1.66+.26*t,z-.07*t)for t in np.linspace(0,1,18)];tube('Gnathal margin '+bone+str(sign),pts,[.010]*18,'gnathal',bone)
   for i in range(5):
-   t=(i+.4)/5;base=Vector((side*(.205-.057*t),-1.67+.25*t,z+.015*t));tip=base+Vector((-side*.011,-.008,(-1 if upper else 1)*(.030-.003*i)))
-   tube([base,base.lerp(tip,.5),tip],[.013,.008,.001],(.52,.40,.23),bn,2,7)
-# Plates are irregular polygonal shields, independently fitted to the authored body surface.
-# Parametric points are (longitudinal y, circumferential angle), with narrow recessed sutures.
-def plate(poly,bname,shade=1):
- poly=[Vector(p)for p in poly];center=sum(poly,Vector((0,0)))/len(poly);rings=[];n=len(poly)*7
- boundary=[]
- for k,p in enumerate(poly):
-  for j in range(7):boundary.append(p.lerp(poly[(k+1)%len(poly)],j/7))
- for ri in range(11):
-  t=.008+.992*ri/10;row=[]
-  for j,p in enumerate(boundary):
-   q=center.lerp(p,.965*t);y,a=q;bevel=.009+.008*sin(pi*t);co=np.array(pigment(y,a))*np.array((1.14,1.06,.83))*shade
-   row.append(vertex(surf(y,a,bevel),co,bname,(j/n,ri/10)))
-  rings.append(row)
- for i in range(10):
-  for j in range(n):face((rings[i][j],rings[i][(j+1)%n],rings[i+1][(j+1)%n],rings[i+1][j]),1)
- face(reversed(rings[0]),1)
-# Rostral and paired central/paranuchal plates; broad median dorsal trunk plate with angular shoulders.
-plate([(-1.68,1.1),(-1.69,2.04),(-1.43,2.20),(-1.38,1.57),(-1.43,.94)],'skull',1.10)
-for mirrored in [False,True]:
- def pp(poly):return [(y,pi-a if mirrored else a)for y,a in poly]
- for poly,shade in [([(-1.42,.88),(-1.36,1.55),(-.97,1.56),(-.83,.95),(-1.08,.58)],1),([(-1.04,.56),(-.80,.88),(-.755,.40),(-.91,-.05),(-1.22,.05)],.91),([(-1.35,.48),(-1.50,.08),(-1.62,.28),(-1.51,.76)],1.07)]:plate(pp(poly),'skull',shade)
- # Broad anterior and posterior dorsolateral plates, with lower pectoral fenestra.
- for poly,shade in [([(-.72,.91),(-.70,1.52),(-.23,1.57),(.15,.90),(-.03,.53),(-.45,.54)],.97),([(-.69,.51),(-.42,.51),(-.17,.22),(-.24,-.42),(-.52,-.62),(-.72,-.12)],.90),([(-.13,.46),(.17,.86),(.36,.28),(.33,-.44),(-.10,-.55)],1.04)]:plate(pp(poly),'body',shade)
-plate([(-.69,1.57),(-.37,1.27),(.11,1.24),(.32,1.57),(.11,1.90),(-.37,1.87)],'body',1.08)
-# Conspicuous cranio-thoracic articulation: a narrow dark seam below an overlapping nuchal lip.
-for side in [-1,1]:
- pts=[surf(-.738,a,.004)for a in np.linspace(-.12,pi/2,35)]
- if side==-1:pts=[Vector((-p.x,p.y,p.z))for p in pts]
- tube(pts,[.008]*35,(.045,.039,.023),'body',4,6)
-# Fine dermal tubercles are irregular small ornament on armour, not large reptile scales.
-rng=np.random.default_rng(615)
-for i in range(470):
- y=float(rng.uniform(-1.55,.28));a=float(rng.uniform(-.08,pi+.08))
- if -.79<y<-.69:continue
- p=surf(y,a,.022);r=float(rng.uniform(.005,.009));n=Vector((cos(a),0,sin(a)));tangent=Vector((0,1,0));cross=n.cross(tangent);center=vertex(p+n*r*.6,(.23,.16,.068),'skull'if y<-.75 else'body',var=False)
- ring=[vertex(p+(tangent*cos(j*pi/4)+cross*sin(j*pi/4))*r,(.21,.15,.066),'skull'if y<-.75 else'body',var=False)for j in range(8)]
- for j in range(8):face((center,ring[j],ring[(j+1)%8]),1)
-# Dorsolateral eyes are relatively large, black, protected by tailored orbit rims.
-for side in [-1,1]:
- eye=Vector((side*.405,-1.37,.206));ell(eye,(.087,.107,.090),(.002,.005,.006),'skull')
- ring=[eye+Vector((side*.025,.112*cos(i*2*pi/48),.095*sin(i*2*pi/48)))for i in range(49)]
- tube(ring,[.017]*49,(.24,.175,.080),'skull',2,8)
- pts=[surf(-.694+.06*t,-.22-.40*t,.007)for t in np.linspace(0,1,22)]
- if side==-1:pts=[Vector((-p.x,p.y,p.z))for p in pts]
- tube(pts,[.009]*22,(.035,.031,.019),'gill'+('L'if side==1 else'R'),4,7)
-# Closed fin fans with fine sculpted rays. Fin contours are independently authored for Coccosteus.
-def fin(name,origin,boundary,base,tip=None,thickness=.012,rays=9):
- origin=Vector(origin);controls=list(map(Vector,boundary));boundary=[]
- for k in range(len(controls)-1):
-  a,b=controls[k:k+2];pre=controls[max(0,k-1)];post=controls[min(len(controls)-1,k+2)]
-  for t0 in np.linspace(0,1,7,endpoint=False):
-   t=float(t0);boundary.append((2*t**3-3*t*t+1)*a+(t**3-2*t*t+t)*(b-pre)*.35+(-2*t**3+3*t*t)*b+(t**3-t*t)*(post-a)*.35)
- boundary.append(controls[-1]);N=len(boundary);steps=12;normal=Vector((1,0,0))if max(p.x for p in boundary)-min(p.x for p in boundary)<.001 else Vector((0,0,1))
- def point(t,j):return origin.lerp(boundary[j],t)+normal*(thickness*sin(pi*t)*sin(pi*j/(N-1)))
- def weight(t):return {base:1-max(0,(t-.45)/.55),tip:max(0,(t-.45)/.55)}if tip else {base:1}
- rows=[]
- for side in [-1,1]:
-  def fv(i,j):
-   t=i/steps;p=point(t,j)+normal*(side*thickness*.4*(.15+.85*sin(pi*t)));col=(.22-.09*t,.145-.06*t,.063-.014*t);return vertex(p,col,weight(t),(j/(N-1),t))
-  rows.append(grid(steps+1,N,fv,5))
- for j in range(N-1):face((rows[0][-1][j],rows[0][-1][j+1],rows[1][-1][j+1],rows[1][-1][j]),5)
- for j in np.linspace(1,N-2,rays).astype(int):
-  ts=np.linspace(.06,.97,17);pts=[point(t,j)+normal*(thickness*.53)for t in ts]
-  tube(pts,[.0045*(1-t)+.0008 for t in ts],(.27,.19,.086),[weight(t)for t in ts],2,5)
-for side in [-1,1]:
- ss='L'if side==1 else'R'
- fin('pectoral',(side*.45,-.20,-.22),[(side*x,y,z)for x,y,z in[(.45,-.32,-.19),(.79,-.21,-.25),(1.08,.08,-.30),(1.11,.25,-.31),(.87,.30,-.29),(.59,.17,-.23),(.44,-.02,-.22)]],'pectoral'+ss,'pectoralTip'+ss,rays=12)
- fin('pelvic',(side*.26,.62,-.24),[(side*x,y,z)for x,y,z in[(.27,.45,-.24),(.57,.70,-.28),(.62,.93,-.28),(.46,1.02,-.27),(.23,.83,-.24)]],'pelvic'+ss,rays=5)
-fin('dorsal',(0,.77,.27),[(0,.33,.33),(0,.63,.65),(0,.84,.69),(0,1.04,.51),(0,1.22,.25)],'dorsal',rays=10)
-fin('caudal',(0,2.02,.07),[(0,1.91,.17),(0,2.27,.42),(0,2.90,.78),(0,2.93,.69),(0,2.56,.30),(0,2.37,.05),(0,2.53,-.38),(0,2.39,-.41),(0,2.08,-.23),(0,1.96,-.04)],'caudal',thickness=.019,rays=12)
-# Texture is reproducible procedural micro-relief; neither a fossil observation nor scraped imagery.
-normal=bpy.data.images.new('Coccosteus skin microrelief',width=512,height=512);yy,xx=np.mgrid[0:512,0:512]/512.;rng=np.random.default_rng(616);grain=rng.normal(size=(512,512));freq=np.fft.fftfreq(512);kernel=np.exp(-((freq[:,None]**2+freq[None,:]**2)*180));height=np.fft.ifft2(np.fft.fft2(grain)*kernel).real*.14;dy,dx=np.gradient(height);arr=np.stack((.5-dx*9,.5-dy*9,np.ones_like(dx),np.ones_like(dx)),axis=-1).astype(np.float32);normal.pixels.foreach_set(arr.ravel());normal.filepath_raw=os.path.join(HERE,'skin-normal.png');normal.file_format='PNG';normal.save();normal.colorspace_settings.name='Non-Color';normal.pack()
-mats=[]
-for name,rough,strength in [('body',.47,.28),('armour',.50,.4),('accent',.4,.24),('eyes',.12,0),('oral',.49,.10),('fins',.46,.20)]:
- mat=bpy.data.materials.new(ID+' '+name);mat.use_nodes=True;n=mat.node_tree.nodes;links=mat.node_tree.links;bs=n.get('Principled BSDF');bs.inputs['Roughness'].default_value=rough;bs.inputs['Metallic'].default_value=0;bs.inputs['Coat Weight'].default_value=.13 if name=='eyes'else .04
- vc=n.new('ShaderNodeVertexColor');vc.layer_name='Color';links.new(vc.outputs['Color'],bs.inputs['Base Color'])
- if strength:
-  tx=n.new('ShaderNodeTexImage');tx.image=normal;nm=n.new('ShaderNodeNormalMap');nm.inputs['Strength'].default_value=strength;links.new(tx.outputs['Color'],nm.inputs['Color']);links.new(nm.outputs['Normal'],bs.inputs['Normal'])
- mat.use_backface_culling=False;mats.append(mat)
-mesh=bpy.data.meshes.new(ID+' contiguous anatomy');mesh.from_pydata(V,[],F);mesh.update();obj=bpy.data.objects.new(ID,mesh);bpy.context.collection.objects.link(obj)
-for m in mats:mesh.materials.append(m)
-for p,mi in zip(mesh.polygons,M):p.material_index=mi;p.use_smooth=True
-col=mesh.color_attributes.new(name='Color',type='FLOAT_COLOR',domain='POINT');col.data.foreach_set('color',np.array(C,dtype=np.float32).ravel());uv=mesh.uv_layers.new(name='UVMap');uv.data.foreach_set('uv',np.array([U[l.vertex_index]for l in mesh.loops],dtype=np.float32).ravel())
-bpy.context.view_layer.objects.active=obj;obj.select_set(True);bpy.ops.object.mode_set(mode='EDIT');bpy.ops.mesh.select_all(action='SELECT');bpy.ops.mesh.normals_make_consistent(inside=False);bpy.ops.object.mode_set(mode='OBJECT')
-bm=bmesh.new();bm.from_mesh(mesh);bmesh.ops.triangulate(bm,faces=list(bm.faces));bm.to_mesh(mesh);bm.free();mesh.update()
-arm=bpy.data.armatures.new(ID+' skeleton');rig=bpy.data.objects.new(ID+'_rig',arm);bpy.context.collection.objects.link(rig);obj.select_set(False);rig.select_set(True);bpy.context.view_layer.objects.active=rig;bpy.ops.object.mode_set(mode='EDIT')
-for n,(h,t,p)in B.items():
- b=arm.edit_bones.new(n);b.head=h;b.tail=t
- if p:b.parent=arm.edit_bones[p]
-bpy.ops.object.mode_set(mode='OBJECT')
-groups={n:obj.vertex_groups.new(name=n)for n in B}
-for i,w in enumerate(W):
- total=sum(w.values());assert abs(total-1)<1e-6
- for n,value in w.items():
-  if value>0:groups[n].add([i],value,'REPLACE')
-mod=obj.modifiers.new('Anatomical deformation','ARMATURE');mod.object=rig;obj.parent=rig
-scene=bpy.context.scene;scene.render.fps=30;rig.animation_data_create()
-for pb in rig.pose.bones:pb.rotation_mode='XYZ'
-def reset():
- for pb in rig.pose.bones:pb.rotation_euler=(0,0,0);pb.location=(0,0,0);pb.scale=(1,1,1)
-seams={};bounds={}
-for clip,duration in CLIPS.items():
- a=bpy.data.actions.new(clip);a.use_fake_user=True;rig.animation_data.action=a;last=round(duration*30);first=None
- for f in range(last+1):
-  reset();u=f/last;p=2*pi*u;e=sin(pi*u)**2;loop=clip in LOOPS;env=1 if loop else e;pb=rig.pose.bones
-  wave=lambda lag=0,freq=1:(sin(p*freq-lag)-sin(-lag))*env
-  amp={'Idle':.32,'Swim':1.20,'Eat':.24,'Guard':.18,'Dodge':1.65,'Ability':.92}.get(clip,.28)
-  peak=sin(pi*max(0,min(1,(u-.24)/.40)))**2 if .24<u<.64 else 0
-  wind=sin(pi*min(1,u/.28))**2 if u<.28 else 0
-  settle=sin(pi*max(0,min(1,(u-.62)/.38)))**2 if u>.62 else 0
-  dead=u*u*(3-2*u)if clip=='Death'else 0
-  if clip=='Death':amp*=1-dead
-  opening=.022*wave(0,2)if loop else 0
-  if clip=='Eat':opening=.10*(1-cos(p*2))
-  if clip=='Bite':opening=.40*sin(pi*u)**3 # Short gnathal nip, rapid closure and recovery.
-  if clip=='Attack':opening=.34*wind+.12*peak
-  if clip=='Heavy':opening=.46*wind+.13*peak
-  if clip=='Ability':opening=.17*e*(1+.7*sin(p*2))
-  if clip=='Growth':opening=.065*e
-  opening+=.10*dead
-  pb['jaw'].rotation_euler.x=opening;pb['skull'].rotation_euler.x=-opening*.13
-  pb['throat'].rotation_euler.x=opening*.32+.017*wave(.6,2)
-  body=pb['body'];body.rotation_euler.y=.012*amp*wave(.4);body.rotation_euler.x=.012*amp*wave();body.location.z=.012*amp*wave(.2)
-  if clip in ['TurnLeft','TurnRight']:body.rotation_euler.z=(-1 if clip=='TurnLeft'else 1)*.22*e;body.rotation_euler.y=(-1 if clip=='TurnLeft'else 1)*.13*e
-  if clip in ['Dive','Rise']:body.rotation_euler.x=(1 if clip=='Dive'else-1)*.19*e
-  if clip=='Attack':body.location.y=.08*wind-.18*peak;body.rotation_euler.x=.05*wind-.03*peak
-  if clip=='Heavy':body.rotation_euler.z=-.08*wind+.15*peak-.025*settle;body.location.y=.05*wind-.11*peak
-  if clip=='Parry':body.rotation_euler.z=.16*e;body.rotation_euler.y=-.13*e
-  if clip=='Guard':body.rotation_euler.x=.04*(1-cos(p));body.rotation_euler.y=.025*sin(p)
-  if clip=='Dodge':body.rotation_euler.y=.30*e;body.rotation_euler.z=-.27*e;body.location.x=.20*e
-  if clip in ['Hit','Stagger']:
-   body.rotation_euler.z=.11*e*sin(p*(1 if clip=='Hit'else 2));body.rotation_euler.y=.17*e;body.location.y=.08*e
-  if clip=='Ability':body.rotation_euler.z=.11*e*sin(p);body.rotation_euler.x=-.06*e
-  if clip=='Growth':body.rotation_euler.x=-.035*e;body.rotation_euler.y=.045*e
-  body.rotation_euler.y+=.72*dead;body.rotation_euler.x+=.06*dead;body.location.z-=.10*dead
-  for i in range(4):
-   q=pb['tail%d'%i];q.rotation_euler.z=(.07+i*.030)*amp*wave(i*.60)+.06*dead*sin(i*.7)
-   if clip=='Dodge':q.rotation_euler.z+=.17*e*sin(i*.7+.5)
-   if clip=='Heavy':q.rotation_euler.z-=.06*peak
-   if clip in ['TurnLeft','TurnRight']:q.rotation_euler.z+=(-1 if clip=='TurnLeft'else 1)*(.04+i*.008)*e
-  pb['caudal'].rotation_euler.z=.09*amp*wave(2.7)+.05*dead
-  pb['dorsal'].rotation_euler.y=.04*amp*wave(1.6)+.12*dead
-  for s in [-1,1]:
-   suffix='L'if s==1 else'R';q=pb['pectoral'+suffix];q.rotation_euler.y=s*(.035*wave(.8)+.06*opening+.11*dead);q.rotation_euler.z=s*(.022*wave(.3)-.11*dead)
-   if clip=='Guard':q.rotation_euler.y+=s*.10*(1-cos(p))
-   if clip=='Ability':q.rotation_euler.y-=s*.12*e;q.rotation_euler.z-=s*.06*e
-   if clip=='Dodge':q.rotation_euler.y+=s*(.24 if s==1 else-.12)*e
-   if clip=='Heavy':q.rotation_euler.z+=s*(.05*wind-.06*peak)
-   if clip=='Growth':q.rotation_euler.y-=s*.16*e
-   pb['pectoralTip'+suffix].rotation_euler.y=s*(.045*wave(1.3)+.10*dead)
-   pb['pelvic'+suffix].rotation_euler.y=s*(.025*amp*wave(1.9)+.15*dead)
-   pb['gill'+suffix].rotation_euler.z=s*(.035*opening+.012*wave(.4,2))
-  state=np.array([tuple(q.rotation_euler)+tuple(q.location)for q in pb])
-  if f==0:first=state.copy()
-  if f==last:seams[clip]=float(abs(state-first).max())
-  for q in pb:
-   if q.name!='root':q.keyframe_insert('rotation_euler',frame=f)
-   if q.name=='body':q.keyframe_insert('location',frame=f)
- points=[]
- for f in [0,int(last*.25),int(last*.5),int(last*.75),last]:
-  scene.frame_set(f);ev=obj.evaluated_get(bpy.context.evaluated_depsgraph_get());me=ev.to_mesh();co=np.array([v.co[:]for v in me.vertices]);assert np.isfinite(co).all();points.extend([co.min(0),co.max(0)]);ev.to_mesh_clear()
- bounds[clip]=[np.array(points).min(0).tolist(),np.array(points).max(0).tolist()]
- rig.animation_data.action=None
-for c in set(CLIPS)-{'Death'}:assert seams[c]<1e-6,(c,seams[c])
-reset();scene.frame_set(0)
-anchors=[{'name':'anchor_mouth','bone':'jaw','point':[0,-1.70,-.075],'role':'mouth'}, {'name':'anchor_mouth_inside','bone':'skull','point':[0,-1.24,-.02],'role':'swallow'},{'name':'anchor_attack_primary','bone':'skull','point':[0,-1.69,.035],'role':'attack'}]
-open(os.path.join(HERE,'anchors.json'),'w').write(json.dumps({ID:anchors},indent=2))
-# Parent inverse equals inverse bind bone tail transform; matrix_world sets real anatomical world point.
-sockets=[]
-for a in anchors:
- socket=bpy.data.objects.new(a['name'],None);bpy.context.collection.objects.link(socket);socket.parent=rig;socket.parent_type='BONE';socket.parent_bone=a['bone'];socket.matrix_world.translation=Vector(a['point']);socket['cambrianAnchor']={'version':1,'role':a['role'],'parentBone':a['bone']};sockets.append(socket)
-# Split by material before export (avoids Blender multi-material colour-index exporter regression).
-bpy.ops.object.select_all(action='DESELECT');temp=obj.copy();temp.data=obj.data.copy();bpy.context.collection.objects.link(temp);temp.select_set(True);bpy.context.view_layer.objects.active=temp;bpy.ops.object.mode_set(mode='EDIT');bpy.ops.mesh.select_all(action='SELECT');bpy.ops.mesh.separate(type='MATERIAL');bpy.ops.object.mode_set(mode='OBJECT');parts=list(bpy.context.selected_objects)
-for part in parts:bpy.context.view_layer.objects.active=part;bpy.ops.object.material_slot_remove_unused();part.parent=None;part.name=ID+' '+part.data.materials[0].name
-rig.select_set(True)
-for s in sockets:s.select_set(True)
-bpy.context.view_layer.objects.active=rig
-kwargs=dict(export_format='GLB',use_selection=True,export_animations=True,export_animation_mode='ACTIONS',export_force_sampling=True,export_frame_range=False,export_skins=True,export_normals=True,export_tangents=True,export_texcoords=True,export_materials='EXPORT',export_vertex_color='NAME',export_vertex_color_name='Color',export_yup=True,export_extras=True)
-bpy.ops.export_scene.gltf(filepath=os.path.join(OUT,ID+'.glb'),**kwargs)
-fulltris=sum(len(p.vertices)-2 for p in mesh.polygons)
-for part in parts:
- bpy.context.view_layer.objects.active=part;de=part.modifiers.new('Reduced silhouette preserving topology','DECIMATE');de.ratio=.28;bpy.ops.object.modifier_move_up(modifier=de.name);bpy.ops.object.modifier_apply(modifier=de.name)
-lodtris=sum(sum(len(p.vertices)-2 for p in part.data.polygons)for part in parts)
-bpy.ops.export_scene.gltf(filepath=os.path.join(OUT,ID+'.lod1.glb'),**kwargs)
-for part in parts:bpy.data.objects.remove(part,do_unlink=True)
-# Resolve exact socket local transforms post-export from inverse exported parent world bind matrix.
-def patch(path,lod=False):
- raw=open(path,'rb').read();n=struct.unpack_from('<I',raw,12)[0];g=json.loads(raw[20:20+n]);binary=raw[20+n:];nodes=g['nodes'];parent={c:i for i,node in enumerate(nodes)for c in node.get('children',[])}
- from mathutils import Matrix,Quaternion
- def world(i):
-  node=nodes[i]
-  if 'matrix'in node:m=Matrix(np.array(node['matrix']).reshape(4,4).T.tolist())
+   t=(i+.25)/5;base=Vector((sign*(.15+.10*t),-1.66+.26*t,z-.07*t));tip=base+Vector((-sign*.010,-.003,(-1 if upper else 1)*(.029-.002*i)));tube('Small gnathal cusp '+bone+str(sign)+str(i),[base,base.lerp(tip,.7),tip],[.010,.006,.001],'gnathal',bone,8)
+# Compact thoracic shield and muscular posterior are distinct authoring decisions from
+# the much deeper Dunkleosteus trunk. The rear remains deep through the caudal peduncle.
+BODY=[(-.82,.405,.325,.035),(-.72,.436,.359,.020),(-.61,.469,.414,-.016),(-.28,.470,.428,-.003),(.10,.424,.363,-.007),(.48,.350,.281,-.017),(.91,.280,.235,-.024),(1.35,.207,.192,-.028),(1.75,.139,.168,-.026),(2.08,.087,.151,-.003),(2.31,.047,.108,.091),(2.51,.010,.034,.190)]
+def tailweight(y):
+ if y<.31:return {'body':1}
+ pts=[(.31,'body'),(.60,'tail0'),(1.12,'tail1'),(1.65,'tail2'),(2.10,'tail3'),(2.37,'caudal')]
+ if y>=pts[-1][0]:return {'caudal':1}
+ for(a,an),(b,bn)in zip(pts,pts[1:]):
+  if a<=y<=b:t=(y-a)/(b-a);return {an:1-t,bn:t}
+vv=[];ff=[];ww=[];uv=[];NYB=183;NAB=104
+for j in range(NYB):
+ y,w,h,z=interp(BODY,j/(NYB-1)*(len(BODY)-1))
+ for k in range(NAB+1):
+  a=2*pi*k/NAB;sn=sin(a);p=Vector((w*cos(a),y,z+h*sn));uu=.52+.455*(y+.82)/1.25;v=k/NAB
+  if y<.43:
+   p.z-=.002*math.exp(-(float(linedistance(np.array(uu),np.array(v)))/.0023)**2)*max(0,sn)
+  vv.append(tuple(p));ww.append(tailweight(y));uv.append((uu,v))
+for j in range(NYB-1):
+ for k in range(NAB):a=j*(NAB+1)+k;ff.append((a,a+1,a+NAB+2,a+NAB+1))
+ff.append(tuple((NYB-1)*(NAB+1)+k for k in range(NAB+1)))
+# The anterior torso cap has a real aperture and inward passage. Its oral tube
+# continues behind the flexible lining rather than presenting a solid body plug.
+oral_vertex_start=len(vv);oral_face_start=len(ff);NT=42
+for j in range(NT):
+ t=j/(NT-1);factor=(1-.20*(min(1,t/.6)**2)*(3-2*min(1,t/.6)))*max(0,1-max(0,(t-.6)/.4)**2)**.52;y=-.82+.87*t;zc=-.13-.13*t*t
+ for k in range(NAB+1):
+  a=2*pi*k/NAB;vv.append((.345*factor*cos(a),y,zc+.145*factor*sin(a)));ww.append({'body':1});uv.append((t,k/NAB))
+for k in range(NAB):ff.append((k,oral_vertex_start+k,oral_vertex_start+k+1,k+1))
+for j in range(NT-1):
+ for k in range(NAB):
+  a=oral_vertex_start+j*(NAB+1)+k;ff.append((a,a+NAB+1,a+NAB+2,a+1))
+body=mesh('Continuous thorax and muscular posterior',vv,ff,'armour',weights=ww,uvs=uv);body.data.materials.append(M['body']);body.data.materials.append(M['oral'])
+for p in body.data.polygons:
+ if p.index>=oral_face_start:p.material_index=2
+# The aperture's outer ring is also internal oral tissue. Leaving its original
+# armoured vertex pigment made a pale crescent along the far wall at full gape.
+# These shared boundary vertices remain continuous; only their pigment changes.
+for i in list(range(NAB+1))+list(range(oral_vertex_start,len(body.data.vertices))):body.data.color_attributes['Color'].data[i].color=pigment(body.data.vertices[i].co,'oral')
+for p in body.data.polygons:
+ if sum(body.data.vertices[i].co.y for i in p.vertices)/len(p.vertices)>.40:p.material_index=1
+for i,v in enumerate(body.data.vertices):
+ if v.co.y>.40:body.data.color_attributes['Color'].data[i].color=pigment(v.co,'body')
+# Short branchial opening beneath the articulated head-shield edge.
+for sign in [-1,1]:
+ tube('Branchial recess '+str(sign),[(sign*.417,-.775+.035*t,-.04-.14*t)for t in np.linspace(0,1,18)],[.013]*18,'gill','gill'+('L'if sign>0 else'R'),10)
+# Rounded fin fans with thin compliant distal membranes and muted radial pigmentation.
+def fin(name,origin,boundary,bone,tip=None,tail=False):
+ origin=Vector(origin);outline=list(map(Vector,boundary));dense=[]
+ for i in range(len(outline)-1):
+  for j in range(7):dense.append(Vector(interp(outline,i+j/7)))
+ dense.append(outline[-1]);vv=[];ff=[];ww=[];uv=[];R=18;normal=Vector((1,0,0))if all(abs(p.x)<1e-8 for p in dense)else Vector((0,0,1))
+ for i,p in enumerate(dense):
+  for j in range(R+1):
+   t=j/R;q=origin.lerp(p,t)+normal*.010*sin(pi*t)*sin(pi*i/(len(dense)-1));vv.append(tuple(q));uv.append((i/(len(dense)-1),t));mix=max(0,(t-.35)/.65)
+   if bone=='dorsal':
+    profile=interp(BODY,np.interp(q.y,[r[0]for r in BODY],range(len(BODY))));base_z=profile[2]+profile[3];free=np.clip((q.z-base_z-.045)/.25,0,.78);weights={b:w*(1-free)for b,w in tailweight(q.y).items()};weights['dorsal']=float(free);ww.append(weights)
+   else:ww.append(tailweight(q.y)if tail else {bone:1-mix,tip:mix}if tip else {bone:1})
+ for i in range(len(dense)-1):
+  for j in range(R):a=i*(R+1)+j;ff.append((a,a+1,a+R+2,a+R+1))
+ o=mesh(name,vv,ff,'fins',bone,ww,uv);sol=o.modifiers.new('Fin membrane thickness','SOLIDIFY');sol.thickness=.004;bpy.context.view_layer.objects.active=o;bpy.ops.object.modifier_apply(modifier=sol.name)
+ col=o.data.color_attributes['Color'];vertex_uv={l.vertex_index:o.data.uv_layers[0].data[i].uv.copy()for i,l in enumerate(o.data.loops)}
+ for i,p in enumerate(o.data.vertices):
+  t=vertex_uv.get(i,Vector((0,0)));streak=1;edge=1-.18*max(0,(t.y-.72)/.28);c=np.array(pigment(p.co,'fins')[:3]);root=np.array(pigment(p.co,'armour'if p.co.y<.40 else'body')[:3])*.85;blend=np.clip(t.y/.52,0,1);c=root*(1-blend)+c*blend;col.data[i].color=(*[x*streak*edge for x in c],1)
+for sign in [-1,1]:
+ side='L'if sign>0 else'R'
+ fin('Broad pectoral '+side,(sign*.36,-.55,-.22),[(sign*x,y,z)for x,y,z in[(.36,-.69,-.16),(.56,-.63,-.30),(.84,-.46,-.57),(.96,-.16,-.61),(.85,.02,-.53),(.61,-.07,-.40),(.38,-.30,-.22)]],'pectoral'+side,'pectoralTip'+side)
+ fin('Anterior pelvic '+side,(sign*.23,.41,-.24),[(sign*x,y,z)for x,y,z in[(.25,.29,-.22),(.43,.42,-.29),(.59,.65,-.36),(.51,.78,-.34),(.25,.65,-.25)]],'pelvic'+side)
+fin('Low long-based dorsal',(0,.89,.225),[(0,.37,.26),(0,.58,.54),(0,.76,.64),(0,1.02,.57),(0,1.31,.42),(0,1.47,.14)],'dorsal')
+fin('Heterocercal caudal',(0,2.08,.04),[(0,1.83,.13),(0,2.21,.26),(0,2.69,.46),(0,2.87,.54),(0,2.86,.43),(0,2.63,.25),(0,2.45,.08),(0,2.39,-.29),(0,2.26,-.46),(0,2.10,-.35),(0,1.89,-.14),(0,1.80,-.04)],'caudal',tail=True)
+anchors=[('anchor_mouth','jaw',(0,-1.685,-.093),'mouth'),('anchor_mouth_inside','skull',(0,-1.01,-.12),'swallow'),('anchor_attack_primary','skull',(0,-1.744,.055),'attack')]
+for name,bone,p,role in anchors:
+ o=bpy.data.objects.new(name,None);scene.collection.objects.link(o);o.parent=rig;o.parent_type='BONE';o.parent_bone=bone;o['cambrianAnchor']={'version':1,'role':role,'parentBone':bone}
+# Motion is authored in anatomical layers: rigid armour, cranio-mandibular linkage,
+# posterior travelling wave and delayed compliant fin membranes. No root tracks.
+clips={'Idle':2.4,'Swim':2.4,'TurnLeft':1.6,'TurnRight':1.6,'Dive':1.4,'Rise':1.4,'Attack':1.,'Bite':.5,'Heavy':1.1,'Hit':.6,'Death':1.6,'Guard':1.,'Parry':.35,'Dodge':.4,'Eat':1.6,'Stagger':1.2,'Ability':2.4,'Growth':1.5};loops=['Idle','Swim','Guard','Eat']
+def smooth(x):x=max(0,min(1,x));return x*x*(3-2*x)
+def pulse(t,a,b,c):return smooth((t-a)/(b-a)) if t<b else 1-smooth((t-b)/(c-b))
+rig.animation_data_create()
+for name,duration in clips.items():
+ action=bpy.data.actions.new(name);action.use_fake_user=True;rig.animation_data.action=action;frames=round(duration*30)
+ for frame in range(frames+1):
+  t=frame/frames;phase=2*pi*t;env=sin(pi*t)**2
+  for b in rig.pose.bones:b.rotation_mode='XYZ';b.rotation_euler=(0,0,0);b.location=(0,0,0)
+  def rot(b,x=0,y=0,z=0):rig.pose.bones[b].rotation_euler=(x,y,z)
+  def move(x=0,y=0,z=0):rig.pose.bones['body'].location=(x,y,z)
+  def wave(a,cycles=1,phaseadd=0):
+   for i,b in enumerate(['tail0','tail1','tail2','tail3','caudal']):rot(b,z=a*(.32+.18*i)*sin(phase*cycles-.67*i+phaseadd),x=.025*a*sin(phase*cycles-.8*i))
+  def trim(a,cycles=1):
+   for side,s in [('L',1),('R',-1)]:
+    rot('pectoral'+side,x=.052*a*sin(phase*cycles+.4*s),y=s*.09*a*sin(phase*cycles-.2),z=s*.045*a*(1-cos(phase*cycles)))
+    rot('pectoralTip'+side,x=.035*a*sin(phase*cycles-.8),z=s*.055*a*sin(phase*cycles-.65))
+    rot('pelvic'+side,x=.025*a*sin(phase*cycles-.9),z=s*.032*a*sin(phase*cycles-.6))
+   rot('dorsal',z=.042*a*sin(phase*cycles-1.1))
+  def mouth(a):
+   rot('jaw',x=a);rot('skull',x=-.21*a);rot('throat',x=.075*a)
+   rot('gillL',z=.045*a);rot('gillR',z=-.045*a)
+  if name=='Idle':
+   wave(.043);trim(.23);mouth(.019*(1-cos(phase*2)));rot('body',y=.007*sin(phase),z=.007*sin(phase));move(z=.008*sin(phase))
+  elif name=='Swim':
+   wave(.22,3);trim(.65,3);rot('body',z=-.023*sin(phase*3+.2),y=.026*sin(phase*3+.9));move(z=.013*sin(phase*6));mouth(.014*(1-cos(phase*3)))
+  elif name=='Guard':
+   wave(.05);trim(.5);mouth(.045+.025*sin(phase));rot('body',x=-.025+.012*sin(phase),y=.018*sin(phase));
+   for side,s in [('L',1),('R',-1)]:rot('pectoral'+side,y=s*.19,z=s*(.17+.02*sin(phase-.3)),x=.04)
+  elif name=='Eat':
+   wave(.042);trim(.30);chew=.23*pulse(t,.04,.18,.34)+.32*pulse(t,.43,.59,.79);mouth(chew);rot('body',x=.025*(1-cos(phase)));move(z=-.013*(1-cos(phase)))
+  elif name=='Death':
+   fall=smooth((t-.11)/.65);settle=smooth((t-.60)/.28);wave(.18*max(0,1-t/.6)**2,3)
+   rot('body',y=1.10*fall,z=.07*settle,x=.045*fall);move(z=-.18*fall);mouth(.20*fall)
+   for i,b in enumerate(['tail0','tail1','tail2','tail3','caudal']):rot(b,z=(.06+.027*i)*fall+.13*sin(phase*3-i*.7)*max(0,1-t/.64)**2)
+   rot('pectoralL',y=.21*fall,z=.13*fall);rot('pectoralR',y=-.06*fall,z=-.21*fall);rot('pectoralTipR',z=-.17*settle);rot('dorsal',z=-.17*fall)
   else:
-   t=node.get('translation',[0,0,0]);q=node.get('rotation',[0,0,0,1]);s=node.get('scale',[1,1,1]);m=Matrix.LocRotScale(Vector(t),Quaternion((q[3],q[0],q[1],q[2])),Vector(s))
-  return world(parent[i])@m if i in parent else m
- for a in anchors:
-  i=next(i for i,n in enumerate(nodes)if n.get('name')==a['name']);b=next(i for i,n in enumerate(nodes)if n.get('name')==a['bone']);p=Vector((a['point'][0],a['point'][2],-a['point'][1]));local=world(b).inverted()@p
-  if i in parent and i in nodes[parent[i]].get('children',[]):nodes[parent[i]]['children'].remove(i)
-  nodes[b].setdefault('children',[]).append(i);nodes[i]={'name':a['name'],'translation':list(local),'extras':{'cambrianAnchor':{'version':1,'role':a['role'],'parentBone':a['bone']}}}
- for animation in g['animations']:
-  kept=[]
-  for channel in animation['channels']:
-   target=channel['target'];name=nodes[target['node']].get('name');prop=target['path']
-   if prop=='scale' or name=='root':
-    acc=g['accessors'][animation['samplers'][channel['sampler']]['output']];view=g['bufferViews'][acc['bufferView']];count={'VEC3':3,'VEC4':4}[acc['type']];offset=8+view.get('byteOffset',0)+acc.get('byteOffset',0);values=np.frombuffer(binary,dtype='<f4',count=acc['count']*count,offset=offset).reshape(-1,count)
-    expected=np.array(nodes[target['node']].get(prop,[1,1,1]if prop=='scale'else[0,0,0,1]if prop=='rotation'else[0,0,0]));assert np.max(np.abs(values-expected))<1e-5,(name,prop,values)
-   else:kept.append(channel)
-  animation['channels']=kept
- if lod:g['animations']=[a for a in g['animations']if a['name']in ['Idle','Swim','Death']]
- js=json.dumps(g,separators=(',',':')).encode();js+=b' '*((-len(js))%4);out=struct.pack('<III',0x46546c67,2,20+len(js)+len(binary))+struct.pack('<II',len(js),0x4e4f534a)+js+binary;open(path,'wb').write(out);return g
-full=patch(os.path.join(OUT,ID+'.glb'));lod=patch(os.path.join(OUT,ID+'.lod1.glb'),True)
-for g in [full,lod]:
- assert len([n for n in g['nodes']if n.get('name','').startswith('anchor_')])==3
- for a in g['animations']:
-  assert all(c['target']['path']!='scale'for c in a['channels'])
-  assert all(g['nodes'][c['target']['node']].get('name')!='root'for c in a['channels'])
-assert lodtris/fulltris<.4
-sources=[{'title':'Miles and Westoll (1968), The placoderm fish Coccosteus cuspidatus: descriptive morphology','url':'https://www.cambridge.org/core/journals/earth-and-environmental-science-transactions-of-royal-society-of-edinburgh/article/abs/ixthe-placoderm-fish-coccosteus-cuspidatus-miller-ex-agassiz-from-the-middle-old-red-sandstone-of-scotland-part-i-descriptive-morphology/97AA5B04F2B9E00AA1FA5FC3D41627C7'}, {'title':'Engelman (2024), revised Coccosteus reconstruction and complete specimens, Figure 7','url':'https://palaeo-electronica.org/content/2024/5307-dunkleosteus-reconstruction'}, {'title':'National Museums Scotland, review of Scottish fossil collections','url':'https://files.nms.ac.uk/production/Documents/Our-Impact/Collections-reviews/Fossil-collections/fossil-review-complete-_review-of-fossil-collections-in-scotland.pdf'}]
-notes=['Independent small arthrodire body and shield reconstruction; not a resized Dunkleosteus or Titanichthys.','Head/trunk articulation, relatively short abdomen, forward pelvic fins, deep peduncle and heterocercal caudal shape informed by complete Coccosteus material; plate contours remain a visual reconstruction.','Tiny armour ornament and skin microrelief are restrained; large overlapping fish scales are intentionally absent.','Pigmentation, unpreserved soft details and every animation are artistic inference. Representative length 0.35 m is an illustrative individual, not a species maximum.','Growth is relaxed fin extension and breathing. Ability is an alert lateral inspection and fin-bracing display; action labels express asset compatibility without specifying gameplay.']
-meta={'id':ID,'name':'Coccosteus','species':'Coccosteus cuspidatus','provenance':'Middle Devonian, Orcadian Basin freshwater assemblages, Scotland','description':'Compact armoured fish with jointed head and trunk shields, a short biting mouth, conspicuous eyes and a flexible heterocercal tail.','lengthMeters':.35,'modelLength':max(p[1]for p in V)-min(p[1]for p in V),'locomotion':'Swim','clips':list(CLIPS),'looping':LOOPS,'anchors':[a['name']for a in anchors],'sources':sources,'notes':notes}
-open(os.path.join(OUT,ID+'.json'),'w').write(json.dumps(meta,indent=2))
-report={'vertices':len(V),'fullTriangles':fulltris,'lodTriangles':lodtris,'reductionRatio':lodtris/fulltris,'bones':len(B),'clips':CLIPS,'loopSeams':seams,'boundsAtFivePhases':bounds,'weightNormalization':True,'rootStable':True,'noScaleChannels':True,'anchorCount':3,'fullBytes':os.path.getsize(os.path.join(OUT,ID+'.glb')),'lodBytes':os.path.getsize(os.path.join(OUT,ID+'.lod1.glb'))}
-open(os.path.join(HERE,'validation.json'),'w').write(json.dumps(report,indent=2))
-# Studio and prescribed pose review.
-world=bpy.data.worlds.new('Deep neutral studio');scene.world=world;world.use_nodes=True;world.node_tree.nodes['Background'].inputs[0].default_value=(.022,.033,.041,1);world.node_tree.nodes['Background'].inputs[1].default_value=.4
-for name,pos,power,size,color in [('Key',(3,-5,7),1300,5,(1,.89,.72)),('Fill',(-5,-2,3),900,5,(.53,.78,1)),('Rim',(1,5,5),1700,4,(.70,.89,1))]:
- d=bpy.data.lights.new(name,'AREA');d.energy=power;d.shape='DISK';d.size=size;d.color=color;o=bpy.data.objects.new(name,d);bpy.context.collection.objects.link(o);o.location=pos;o.rotation_euler=(Vector((0,.3,0))-o.location).to_track_quat('-Z','Y').to_euler()
-d=bpy.data.cameras.new('Camera');cam=bpy.data.objects.new('Camera',d);bpy.context.collection.objects.link(cam);scene.camera=cam;d.type='ORTHO';d.ortho_scale=5.7
-scene.render.engine='CYCLES';scene.cycles.samples=24;scene.cycles.use_denoising=True;scene.render.resolution_percentage=100;scene.view_settings.view_transform='AgX';scene.view_settings.exposure=0;scene.render.image_settings.file_format='PNG';scene.render.image_settings.color_mode='RGBA';scene.render.film_transparent=True
-cam.location=(7,-6,4.2);cam.rotation_euler=(Vector((0,.5,0))-cam.location).to_track_quat('-Z','Y').to_euler();rig.animation_data.action=bpy.data.actions['Idle'];scene.frame_set(0);scene.frame_start=0;scene.frame_end=72
-bpy.ops.wm.save_as_mainfile(filepath=os.path.join(LOCAL,ID+'.blend'))
-def render(path,w,h,transparent=True):
- scene.render.resolution_x=w;scene.render.resolution_y=h;scene.render.film_transparent=transparent;scene.render.filepath=path;bpy.ops.render.render(write_still=True)
-render(os.path.join(OUT,ID+'.select.png'),1600,1200);render(os.path.join(OUT,ID+'.card.png'),800,600);render(os.path.join(OUT,ID+'.thumb.png'),256,192);render(os.path.join(OUT,ID+'.png'),1200,900,False)
-for clip,phase,view in [('Idle',0,'side'),('Swim',.35,'side'),('Eat',.5,'front'),('Bite',.5,'side'),('Heavy',.45,'threequarter'),('Ability',.5,'front'),('Guard',.5,'threequarter'),('Dodge',.5,'side'),('Death',1,'threequarter')]:
- rig.animation_data.action=bpy.data.actions[clip];scene.frame_set(round(CLIPS[clip]*30*phase));cam.location={'side':(9,0,1.2),'front':(0,-10,1),'threequarter':(7,-6,4.2)}[view];cam.rotation_euler=(Vector((0,.5,0))-cam.location).to_track_quat('-Z','Y').to_euler();render(os.path.join(LOCAL,clip+'-'+view+'.png'),900,675,False)
-print('COCCOSTEUS_COMPLETE',json.dumps(report),flush=True)
+   wave(.11*env,2);trim(.5*env,2)
+   if name in ['TurnLeft','TurnRight']:
+    s=1 if name=='TurnLeft' else -1;load=pulse(t,0,.16,.35);bend=pulse(t,.10,.48,.88);release=pulse(t,.37,.72,1)
+    rot('body',z=s*(.39*bend-.06*load),y=s*.24*bend);move(x=s*.13*bend,z=.018*bend)
+    for i,b in enumerate(['tail0','tail1','tail2','tail3','caudal']):rot(b,z=-s*(.12+.035*i)*pulse(t,.08+i*.06,.36+i*.09,.75+i*.055))
+    rot('pectoralL',y=.16*bend,z=.11*bend+s*.12*bend);rot('pectoralR',y=-.16*bend,z=-.11*bend+s*.12*bend);rot('pectoralTipL',z=s*.15*release);rot('pectoralTipR',z=s*.15*release)
+   elif name in ['Dive','Rise']:
+    s=1 if name=='Dive'else-1;load=pulse(t,0,.18,.4);pitch=pulse(t,.14,.53,.95);late=pulse(t,.33,.74,1)
+    rot('body',x=s*(.27*pitch-.045*load));move(z=-s*.14*pitch);rot('skull',x=-s*.024*late)
+    for side,sgn in [('L',1),('R',-1)]:rot('pectoral'+side,x=s*.18*pitch,z=sgn*.11*pitch);rot('pectoralTip'+side,x=s*.10*late);rot('pelvic'+side,x=-s*.09*late)
+    rot('tail0',x=-s*.06*late,z=.08*sin(phase*2)*env)
+   elif name in ['Attack','Heavy','Bite']:
+    heavy=name=='Heavy';short=name=='Bite';load=pulse(t,0,.20,.42);strike=pulse(t,.29,.53,.80);gape=pulse(t,.09,.37,.62);recover=pulse(t,.58,.81,1)
+    mouth((.64 if heavy else .48 if short else .54)*gape)
+    move(y=(.045 if short else .10)*load-(.055 if short else .22)*strike,z=.024*load-.035*strike)
+    rot('body',x=-.045*load+.06*strike,y=(.075 if heavy else .028)*strike,z=-.04*recover)
+    for i,b in enumerate(['tail0','tail1','tail2','tail3','caudal']):rot(b,z=(.13+.027*i)*load*(-1 if i<2 else 1)+(.18+.035*i)*pulse(t,.23+i*.06,.42+i*.085,.73+i*.06)*(-1 if i%2==0 else 1))
+    for side,s in [('L',1),('R',-1)]:rot('pectoral'+side,y=s*.16*load,z=s*(.13*load-.07*strike),x=-.06*strike);rot('pectoralTip'+side,z=-s*.13*recover)
+   elif name=='Hit':
+    a=pulse(t,0,.16,.44);b=pulse(t,.2,.55,.93);rot('body',y=.22*a-.07*b,z=-.14*a+.06*b);move(x=.06*a,z=-.035*a);mouth(.21*a);rot('tail0',z=.20*a);rot('tail2',z=-.28*b);rot('pectoralR',z=-.26*a)
+   elif name=='Stagger':
+    a=pulse(t,0,.15,.43);b=pulse(t,.25,.48,.76);c=pulse(t,.61,.80,1);rot('body',y=.25*a-.16*b+.055*c,z=-.14*a+.09*b);move(x=.07*a-.04*b,z=-.04*(a+b));mouth(.12*b);rot('tail0',z=.24*a-.25*b);rot('tail2',z=-.25*a+.33*b-.09*c);rot('pectoralL',z=.19*a);rot('pectoralR',z=-.20*b)
+   elif name=='Dodge':
+    coil=pulse(t,0,.20,.40);drive=pulse(t,.16,.51,.85);late=pulse(t,.38,.72,1);rot('body',z=.31*drive-.08*coil,y=-.31*drive);move(x=.24*drive,z=.055*drive)
+    rot('tail0',z=.28*coil-.33*drive);rot('tail1',z=.32*coil-.31*drive);rot('tail2',z=-.30*coil+.37*late);rot('tail3',z=.33*late);rot('caudal',z=-.32*late);rot('pectoralL',z=.19*coil-.11*drive);rot('pectoralR',x=.14*drive);rot('pectoralTipR',z=-.15*late)
+   elif name=='Parry':
+    a=pulse(t,0,.30,.72);b=pulse(t,.36,.69,1);rot('body',y=.29*a,z=-.18*a+.04*b);move(x=.085*a);rot('tail0',z=.24*a);rot('tail2',z=-.29*b);rot('pectoralR',y=-.23*a,z=-.23*a);rot('pectoralTipR',z=-.17*b)
+   elif name=='Ability':
+    watch=pulse(t,.02,.27,.55);scan=pulse(t,.32,.55,.82);release=pulse(t,.61,.82,1);rot('body',z=.11*watch-.14*scan+.04*release,y=.075*scan);move(z=.033*watch);mouth(.25*release);wave(.12*env,3)
+    for side,s in [('L',1),('R',-1)]:rot('pectoral'+side,y=s*.27*watch,z=s*(.19*watch+.05*scan),x=.07*scan);rot('pectoralTip'+side,z=s*.13*pulse(t,.10,.37,.69))
+    rot('gillL',z=.075*watch);rot('gillR',z=-.075*watch);rot('dorsal',z=.05*sin(phase*3)*env)
+   elif name=='Growth':
+    unfurl=pulse(t,0,.42,1);rot('body',x=-.055*unfurl);move(z=.022*unfurl);mouth(.34*pulse(t,.14,.41,.78));rot('dorsal',z=.09*pulse(t,.23,.56,1))
+    for side,s in [('L',1),('R',-1)]:rot('pectoral'+side,z=s*.23*unfurl,y=s*.19*unfurl);rot('pectoralTip'+side,z=s*.15*pulse(t,.2,.58,1))
+  for pb in rig.pose.bones:
+   if pb.name=='root':continue
+   pb.keyframe_insert(data_path='rotation_euler',frame=frame+1,group=pb.name)
+   if pb.name=='body':pb.keyframe_insert(data_path='location',frame=frame+1,group=pb.name)
+rig.animation_data.action=None
+for pb in rig.pose.bones:pb.rotation_euler=(0,0,0);pb.location=(0,0,0)
+scene.frame_set(1);bpy.context.view_layer.update()
+for name,bone,p,role in anchors:bpy.data.objects[name].matrix_world=Matrix.Translation(p)
+bpy.context.view_layer.update();(HERE/'anchors.json').write_text(json.dumps({'coccosteus':[{'name':n,'bone':b,'point':p,'role':r}for n,b,p,r in anchors]},indent=2))
+sourcepath=LOCAL/'coccosteus-v2.blend';bpy.ops.wm.save_as_mainfile(filepath=str(sourcepath))
+def export(path):
+ bpy.ops.object.select_all(action='DESELECT');rig.select_set(True)
+ for o in objects:o.select_set(True)
+ for name,_,_,_ in anchors:bpy.data.objects[name].select_set(True)
+ bpy.context.view_layer.objects.active=rig
+ bpy.ops.export_scene.gltf(filepath=str(path),export_format='GLB',use_selection=True,export_animations=True,export_animation_mode='ACTIONS',export_force_sampling=True,export_frame_range=False,export_skins=True,export_normals=True,export_texcoords=True,export_materials='EXPORT',export_vertex_color='NAME',export_vertex_color_name='Color',export_yup=True,export_extras=True)
+# Blender's exporter currently emits white COLOR_0 for some secondary material
+# primitives. Restore the exact source linear vertex colours in-place in the BIN,
+# preserving topology, accessors, shader factors and matching source appearance.
+def restore_export_colours(path):
+ import struct
+ from mathutils.kdtree import KDTree
+ raw=bytearray(path.read_bytes());size=struct.unpack_from('<I',raw,12)[0];doc=json.loads(raw[20:20+size]);binstart=28+size
+ byname={o.data.name:o for o in objects};byname.update({o.name:o for o in objects})
+ def access(i):
+  a=doc['accessors'][i];v=doc['bufferViews'][a['bufferView']];dt={5126:'<f4',5123:'<u2',5121:'u1'}[a['componentType']];nc={'VEC3':3,'VEC4':4}[a['type']];stride=v.get('byteStride',np.dtype(dt).itemsize*nc)
+  return np.ndarray((a['count'],nc),dtype=dt,buffer=raw,offset=binstart+v.get('byteOffset',0)+a.get('byteOffset',0),strides=(stride,np.dtype(dt).itemsize)),a
+ for m in doc['meshes']:
+  o=byname[m['name']];kd=KDTree(len(o.data.vertices))
+  for v in o.data.vertices:kd.insert(v.co,v.index)
+  kd.balance();colors=o.data.color_attributes['Color']
+  for prim in m['primitives']:
+   if 'COLOR_0'not in prim['attributes']:continue
+   positions,_=access(prim['attributes']['POSITION']);out,accessor=access(prim['attributes']['COLOR_0']);eye=doc['materials'][prim['material']]['name']=='eyes'
+   for i,(x,z,ny) in enumerate(positions):
+    _,vi,dist=kd.find(Vector((float(x),float(-ny),float(z))));assert dist<2e-5,(m['name'],dist)
+    c=np.ones(4)if eye else np.array(colors.data[vi].color);out[i]=np.round(np.clip(c,0,1)*np.iinfo(out.dtype).max)if accessor.get('normalized')else c
+ path.write_bytes(raw)
+_original_export=export
+def export(path):_original_export(path);restore_export_colours(path)
+export(CAND/'coccosteus.glb');full=sum(len(p.vertices)-2 for o in objects for p in o.data.polygons)
+# Only textured material regions receive the albedo factor; oral and posterior
+# regions in the same mesh remain plain vertex pigment. LOD never samples a map.
+for o in objects:
+ for material,array in [('armour',rgba),('fins',finrgba)]:
+  indices={vi for p in o.data.polygons if o.data.materials[p.material_index].name==material for vi in p.vertices}
+  if not indices:continue
+  uv=o.data.uv_layers[0];col=o.data.color_attributes['Color'];byvertex={l.vertex_index:uv.data[i].uv.copy()for i,l in enumerate(o.data.loops)}
+  for i in indices:
+   q=byvertex[i];c=col.data[i].color;detail=array[int((q.y%1)*(array.shape[0]-1)),int((q.x%1)*(array.shape[1]-1)),:3];col.data[i].color=(*[c[k]*float(detail[k])for k in range(3)],1)
+for mat in M.values():
+ nodes=mat.node_tree.nodes;links=mat.node_tree.links;bs=nodes.get('Principled BSDF')
+ for l in list(links):
+  if l.to_node==bs and l.to_socket.name in ['Base Color','Normal','Roughness']:links.remove(l)
+ vc=next((n for n in nodes if n.bl_idname=='ShaderNodeVertexColor'),None)
+ if vc:links.new(vc.outputs['Color'],bs.inputs['Base Color'])
+for o in objects:
+ # Weld authoring UV seam duplicates before simplification so LOD skin remains closed.
+ bm=bmesh.new();bm.from_mesh(o.data);bmesh.ops.remove_doubles(bm,verts=list(bm.verts),dist=1e-7);bmesh.ops.recalc_face_normals(bm,faces=list(bm.faces));bm.to_mesh(o.data);bm.free()
+ if len(o.data.polygons)>40:
+  bpy.context.view_layer.objects.active=o;dec=o.modifiers.new('Physical silhouette LOD','DECIMATE');dec.ratio=.28;bpy.ops.object.modifier_move_up(modifier=dec.name);bpy.ops.object.modifier_apply(modifier=dec.name)
+for a in list(bpy.data.actions):
+ if a.name not in ['Idle','Swim','Death']:bpy.data.actions.remove(a)
+export(CAND/'coccosteus.lod1.glb');lod=sum(len(p.vertices)-2 for o in objects for p in o.data.polygons)
+meta={'id':'coccosteus','name':'Coccosteus','species':'Coccosteus cuspidatus','provenance':'Middle Devonian, Scotland','description':'Compact arthrodire with a broad short jaw, sculpted dermal head and thoracic armour, rounded pectoral fans, anterior pelvic fins, one long low dorsal fin and a sharply heterocercal tail.','lengthMeters':.40,'modelLength':4.57,'locomotion':'Swim','clips':list(clips),'looping':loops,'anchors':[a[0]for a in anchors],'sources':['https://www.cambridge.org/core/journals/earth-and-environmental-science-transactions-of-royal-society-of-edinburgh/article/abs/ixthe-placoderm-fish-coccosteus-cuspidatus-miller-ex-agassiz-from-the-middle-old-red-sandstone-of-scotland-part-i-descriptive-morphology/97AA5B04F2B9E00AA1FA5FC3D41627C7','https://palaeo-electronica.org/content/2024/5307-dunkleosteus-reconstruction','https://palaeo-electronica.org/content/images/1343/figure7.jpg'],'notes':['Original anatomical reconstruction informed by Miles and Westoll 1968, revised body outline following Engelman 2024 figure 7.','Exact pigment, skin thickness, oral soft tissues and behaviour are inferred.','Continuous closed globe and head envelopes; fitted lid intersection does not count as eye-embedding tissue.','Full asset intentionally multiplies regional vertex pigment by a near-neutral UV dermal factor. Texture-free LOD bakes the factor once.','Jaw and cranial articulation coordinated with oral cheeks, palate, mandibular floor and rear throat; action labels are compatibility gestures, not gameplay design.']}
+(CAND/'coccosteus.json').write_text(json.dumps(meta,indent=2));(LOCAL/'build-stats-v2.json').write_text(json.dumps({'fullTriangles':full,'lodTriangles':lod,'ratio':lod/full,'clips':clips,'source':str(sourcepath)},indent=2))
+print('COCCOSTEUS_V2_GEOMETRY_COMPLETE',full,lod,str(CAND),flush=True)

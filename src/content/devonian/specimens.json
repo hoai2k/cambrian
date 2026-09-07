@@ -69,12 +69,12 @@
     "name": "Coccosteus",
     "species": "Coccosteus cuspidatus",
     "category": "creature",
-    "provenance": "Middle Devonian, Orcadian Basin freshwater assemblages, Scotland",
-    "description": "Compact armoured fish with jointed head and trunk shields, a short biting mouth, conspicuous eyes and a flexible heterocercal tail.",
+    "provenance": "Middle Devonian, Scotland",
+    "description": "Compact arthrodire with a broad short jaw, sculpted dermal head and thoracic armour, rounded pectoral fans, anterior pelvic fins, one long low dorsal fin and a sharply heterocercal tail.",
     "model": "assets/devonian/creatures/coccosteus.glb",
     "lod": "assets/devonian/creatures/coccosteus.lod1.glb",
     "image": "assets/devonian/creatures/coccosteus.thumb.png",
-    "lengthMeters": 0.35,
+    "lengthMeters": 0.4,
     "looping": [
       "Idle",
       "Swim",
@@ -82,25 +82,16 @@
       "Eat"
     ],
     "sources": [
-      {
-        "title": "Miles and Westoll (1968), The placoderm fish Coccosteus cuspidatus: descriptive morphology",
-        "url": "https://www.cambridge.org/core/journals/earth-and-environmental-science-transactions-of-royal-society-of-edinburgh/article/abs/ixthe-placoderm-fish-coccosteus-cuspidatus-miller-ex-agassiz-from-the-middle-old-red-sandstone-of-scotland-part-i-descriptive-morphology/97AA5B04F2B9E00AA1FA5FC3D41627C7"
-      },
-      {
-        "title": "Engelman (2024), revised Coccosteus reconstruction and complete specimens, Figure 7",
-        "url": "https://palaeo-electronica.org/content/2024/5307-dunkleosteus-reconstruction"
-      },
-      {
-        "title": "National Museums Scotland, review of Scottish fossil collections",
-        "url": "https://files.nms.ac.uk/production/Documents/Our-Impact/Collections-reviews/Fossil-collections/fossil-review-complete-_review-of-fossil-collections-in-scotland.pdf"
-      }
+      "https://www.cambridge.org/core/journals/earth-and-environmental-science-transactions-of-royal-society-of-edinburgh/article/abs/ixthe-placoderm-fish-coccosteus-cuspidatus-miller-ex-agassiz-from-the-middle-old-red-sandstone-of-scotland-part-i-descriptive-morphology/97AA5B04F2B9E00AA1FA5FC3D41627C7",
+      "https://palaeo-electronica.org/content/2024/5307-dunkleosteus-reconstruction",
+      "https://palaeo-electronica.org/content/images/1343/figure7.jpg"
     ],
     "notes": [
-      "Independent small arthrodire body and shield reconstruction; not a resized Dunkleosteus or Titanichthys.",
-      "Head/trunk articulation, relatively short abdomen, forward pelvic fins, deep peduncle and heterocercal caudal shape informed by complete Coccosteus material; plate contours remain a visual reconstruction.",
-      "Tiny armour ornament and skin microrelief are restrained; large overlapping fish scales are intentionally absent.",
-      "Pigmentation, unpreserved soft details and every animation are artistic inference. Representative length 0.35 m is an illustrative individual, not a species maximum.",
-      "Growth is relaxed fin extension and breathing. Ability is an alert lateral inspection and fin-bracing display; action labels express asset compatibility without specifying gameplay."
+      "Original anatomical reconstruction informed by Miles and Westoll 1968, revised body outline following Engelman 2024 figure 7.",
+      "Exact pigment, skin thickness, oral soft tissues and behaviour are inferred.",
+      "Continuous closed globe and head envelopes; fitted lid intersection does not count as eye-embedding tissue.",
+      "Full asset intentionally multiplies regional vertex pigment by a near-neutral UV dermal factor. Texture-free LOD bakes the factor once.",
+      "Jaw and cranial articulation coordinated with oral cheeks, palate, mandibular floor and rear throat; action labels are compatibility gestures, not gameplay design."
     ]
   },
   {
@@ -287,6 +278,49 @@
       "Oppositely directed enlarged cranial and brush denticles, membranous brush supported by an anterior spine, cladodont five-cusped dentition, long metapterygial pectoral whips and soft epicercal tail distinguish the model. Body proportions, fin whip extent, pigmentation and fine surface detail are reconstructed.",
       "The brush is not hair. Tissue histology and inflation, deterrence or courtship hypotheses do not establish behaviour. This complex-bearing reconstruction does not establish the sex or developmental stage of CMNH 8988, nor claim every individual bore this structure.",
       "Ability is a restrained posture displaying head and brush; only the basal rigid complex rotates. It does not inflate or shed. All animation is artistic compatibility work, not Devonian gameplay specification. Growth is relaxed fin and breathing motion."
+    ]
+  },
+  {
+    "id": "cheirolepis",
+    "name": "Cheirolepis",
+    "species": "Cheirolepis trailli",
+    "category": "creature",
+    "provenance": "Middle Devonian, Scottish Orcadian Basin / Nairnshire assemblages",
+    "description": "Small early ray-finned fish with fine rhombic scales, a large toothed terminal mouth, mobile gill covers, ray-supported fins and a strongly unequal tail with an elongated scaled upper lobe.",
+    "model": "assets/devonian/creatures/cheirolepis.glb",
+    "lod": "assets/devonian/creatures/cheirolepis.lod1.glb",
+    "image": "assets/devonian/creatures/cheirolepis.thumb.png",
+    "lengthMeters": 0.25,
+    "looping": [
+      "Idle",
+      "Swim",
+      "Guard",
+      "Eat"
+    ],
+    "sources": [
+      {
+        "title": "Giles et al. (2015), Endoskeletal structure in Cheirolepis; Scottish C. trailli specimens and pectoral anatomy",
+        "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC4950109/"
+      },
+      {
+        "title": "Igielman et al. (2026), Devonian ray-finned fish lower jaws; C. trailli NHMUK PV P62908b and P1370",
+        "url": "https://anatomypubs.onlinelibrary.wiley.com/doi/10.1002/ar.70005"
+      },
+      {
+        "title": "AMNH Digital Collections, Cheirolepis trailli ptc-5970, 25 cm Middle Devonian Nairnshire specimen",
+        "url": "https://digitalcollections.amnh.org/archive/Cheirolepis-trailli--primitive-ray-finned-fish--approximately-380-million-years-old--L-25-cm--Middle-Devonian-of-Nairnshire--Scotland-2URM1THIF2SU.html"
+      },
+      {
+        "title": "National Museums Scotland, fossil collections review; Scottish Middle Devonian assemblages",
+        "url": "https://files.nms.ac.uk/production/Documents/Our-Impact/Collections-reviews/Fossil-collections/fossil-review-complete-_review-of-fossil-collections-in-scotland.pdf"
+      }
+    ],
+    "notes": [
+      "Consistent Scottish Cheirolepis trailli reconstruction; no mixing with the Late Devonian Canadian species. Representative 0.25 m size follows the AMNH collection record ptc-5970, not an adult maximum.",
+      "Small rhombic enamel windows, posterior short-based dorsal and anal fins, separate opercular covers, large terminal jaw, segmented fin rays and the scaled upper caudal axis distinguish this early ray-finned fish.",
+      "Pigmentation, fin-membrane thickness, three-dimensional soft tissue, individual tooth arrangement and all motion are artistic reconstruction rather than fossil observations.",
+      "Growth is a relaxed ventilation and fin-spreading gesture, without scaling or moulting. Ability is a burst-and-bank display, not a Devonian gameplay rule.",
+      "Original source and review renders are preserved in cambrian/local/devonian-authoring/cheirolepis."
     ]
   }
 ]
