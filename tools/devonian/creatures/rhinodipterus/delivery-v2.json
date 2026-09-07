@@ -1,0 +1,334 @@
+{
+  "candidateOnly": true,
+  "species": "Rhinodipterus kimberleyensis",
+  "files": {
+    "rhinodipterus.card.png": {
+      "sha256": "da6e400f8a0327e61a4fb194f6a3bcb5d46c988154708fa1c3fe1d9c31d43d72",
+      "bytes": 197370
+    },
+    "rhinodipterus.glb": {
+      "sha256": "ad29e4157364b09cf20716d00982d9ae13f4e9566db0f1d72e9fa96230f6c97c",
+      "bytes": 14875052
+    },
+    "rhinodipterus.json": {
+      "sha256": "c125090fe1413241fd2b2c05e51a3f47d1a7ff0b80174bf23e3c32103a703863",
+      "bytes": 1940
+    },
+    "rhinodipterus.lod1.glb": {
+      "sha256": "56d4a9218027ce7ca2440c4cefc36ae4e9262e403a1706d3bfb30a84a76483f9",
+      "bytes": 2295480
+    },
+    "rhinodipterus.png": {
+      "sha256": "9e21d33735756d21b9bee3cae852c38e4ddb4ebcb9726a149b1d305dc1449269",
+      "bytes": 711474
+    },
+    "rhinodipterus.select.png": {
+      "sha256": "dd7c4c3a3e4c0495d55fc2afe9d9d759e6f0977e334cedc9f19b0ae0b65c2969",
+      "bytes": 711474
+    },
+    "rhinodipterus.thumb.png": {
+      "sha256": "00a3e11ad1f3c871580ca124d8d78a7b636a2393222315e09fdbb043180a8107",
+      "bytes": 26984
+    }
+  },
+  "originalBlend": {
+    "path": "/Users/hoai/Documents/Stuff/Generations/cambrian/local/devonian-authoring/rhinodipterus/rhinodipterus-v2.blend",
+    "sha256": "b89773bc803ffafa7a33075ced850fd274e68814bb2e01913384b284ac201a69",
+    "bytes": 11289023
+  },
+  "validation": {
+    "checks": "finite transforms, normalized weights, root stable, identity-scale removal, unique motion, seamless loops, socket bind alignment, true LOD reduction",
+    "models": [
+      {
+        "file": "rhinodipterus.glb",
+        "bytes": 14875052,
+        "vertices": 110756,
+        "triangles": 216511,
+        "bounds": [
+          1.8200000524520874,
+          1.0849003195762634,
+          5.889999866485596
+        ],
+        "bones": 21,
+        "boneNames": [
+          "root",
+          "body",
+          "pectoralL",
+          "pectoralTipL",
+          "pectoralR",
+          "pectoralTipR",
+          "skull",
+          "gillL",
+          "gillR",
+          "jaw",
+          "throat",
+          "tail0",
+          "tail1",
+          "dorsal",
+          "pelvicL",
+          "pelvicR",
+          "tail2",
+          "anal",
+          "dorsal2",
+          "tail3",
+          "caudal"
+        ],
+        "textures": 9,
+        "sockets": [
+          {
+            "name": "anchor_mouth",
+            "point": [
+              0.0,
+              -0.050000076218994535,
+              2.2549999759394823
+            ]
+          },
+          {
+            "name": "anchor_attack_primary",
+            "point": [
+              0.0,
+              0.03199992204124773,
+              2.2899998249603386
+            ]
+          },
+          {
+            "name": "anchor_mouth_inside",
+            "point": [
+              0.0,
+              -0.11000003906921146,
+              1.1599999231511517
+            ]
+          }
+        ],
+        "clips": [
+          {
+            "name": "Ability",
+            "duration": 2.4000000953674316,
+            "motion": 26.217,
+            "digest": "7eb6f8ffc80e685eb4de1ca1dd0a8ad2f65d5499d5991fa8e51669a2ee9a856d"
+          },
+          {
+            "name": "Attack",
+            "duration": 0.9999999403953552,
+            "motion": 8.442,
+            "digest": "6c12a3e7946399c96fdaf7b92cb5758bbf41265f65e47085f62998b8dd1c4355"
+          },
+          {
+            "name": "Bite",
+            "duration": 0.5,
+            "motion": 3.634,
+            "digest": "d38955d7d39f2588eaa0dc09069da09424c1f6c737d157471c0f86704c3d2a81"
+          },
+          {
+            "name": "Death",
+            "duration": 1.600000023841858,
+            "motion": 53.37,
+            "digest": "a1a92e6e446a2d13c07bd667855ad67258e1654fa04d8222a03fb9075fa352a5"
+          },
+          {
+            "name": "Dive",
+            "duration": 1.600000023841858,
+            "motion": 14.503,
+            "digest": "4557ff34293f5762d75d925e6c5987e3673bb839078ba7c01f8e80ec7c7157e7"
+          },
+          {
+            "name": "Dodge",
+            "duration": 0.4000000059604645,
+            "motion": 7.05,
+            "digest": "6c0af976767506500af17933f7b45bc196b27a93843dcdfb1a10e9119dfa4966"
+          },
+          {
+            "name": "Eat",
+            "duration": 1.600000023841858,
+            "motion": 10.159,
+            "digest": "db25306fbcf657006be141dcd5b6baee3c3d7bc7d49c9885f12dd2505213bc1a"
+          },
+          {
+            "name": "Growth",
+            "duration": 1.5,
+            "motion": 20.531,
+            "digest": "5e3fd1161b998de509182577e3160a2add521791b084f2cfab5b9ba9b24f7140"
+          },
+          {
+            "name": "Guard",
+            "duration": 0.9999999403953552,
+            "motion": 6.708,
+            "digest": "79b7320dc9136d67ee093de94963300e40372ab1dede0b65521301499f40f164"
+          },
+          {
+            "name": "Heavy",
+            "duration": 1.100000023841858,
+            "motion": 9.389,
+            "digest": "21a043e3df25c2902e7c52cf0c71391c20fe216d08384195a75557d767eb47d6"
+          },
+          {
+            "name": "Hit",
+            "duration": 0.5999999642372131,
+            "motion": 5.316,
+            "digest": "7e66a39bcac4a3884791a9d58538f50ffe87726d76b514a6adddf7fd5f4e3eaf"
+          },
+          {
+            "name": "Idle",
+            "duration": 2.4000000953674316,
+            "motion": 16.233,
+            "digest": "38c0b449fb87aa7a022b9a7871015cd607bdc6f88886bd60e302eeca262d072f"
+          },
+          {
+            "name": "Parry",
+            "duration": 0.3333333432674408,
+            "motion": 3.647,
+            "digest": "e8a04785ea70850a7bc7f5794e1f1f2d14fb9c5ba996c0f63e856c1bbb995e19"
+          },
+          {
+            "name": "Rise",
+            "duration": 1.600000023841858,
+            "motion": 14.503,
+            "digest": "2e7ae9ba62edc6b3cc04c4d3292236788cf09d53e274fca6bd8db6e5151d33c3"
+          },
+          {
+            "name": "Stagger",
+            "duration": 1.2000000476837158,
+            "motion": 13.298,
+            "digest": "b19f1c4c7b6b8e75dcc72545c80e1841e9eca5c8dc9f045f9b3d21fc504726f6"
+          },
+          {
+            "name": "Swim",
+            "duration": 2.4000000953674316,
+            "motion": 54.83,
+            "digest": "becad1248dfcb7edde8052c3e91415874627b6154468ce607619f3e5cfaa163f"
+          },
+          {
+            "name": "TurnLeft",
+            "duration": 1.7000000476837158,
+            "motion": 23.563,
+            "digest": "d636d59fc56829434008dfcabac87fe7e914a2431601339aff6b519cb9f2be34"
+          },
+          {
+            "name": "TurnRight",
+            "duration": 1.7000000476837158,
+            "motion": 23.563,
+            "digest": "9f1962fc75b66418600c616563343546043a13b913db73bd9e32ae629a0af954"
+          }
+        ],
+        "removedIdentityScaleChannels": 378,
+        "sha256": "ad29e4157364b09cf20716d00982d9ae13f4e9566db0f1d72e9fa96230f6c97c"
+      },
+      {
+        "file": "rhinodipterus.lod1.glb",
+        "bytes": 2295480,
+        "vertices": 30221,
+        "triangles": 57751,
+        "bounds": [
+          1.8200000524520874,
+          1.0848772525787354,
+          5.889930963516235
+        ],
+        "bones": 21,
+        "boneNames": [
+          "root",
+          "body",
+          "pectoralL",
+          "pectoralTipL",
+          "pectoralR",
+          "pectoralTipR",
+          "skull",
+          "gillL",
+          "gillR",
+          "jaw",
+          "throat",
+          "tail0",
+          "tail1",
+          "dorsal",
+          "pelvicL",
+          "pelvicR",
+          "tail2",
+          "anal",
+          "dorsal2",
+          "tail3",
+          "caudal"
+        ],
+        "textures": 0,
+        "sockets": [
+          {
+            "name": "anchor_mouth",
+            "point": [
+              0.0,
+              -0.050000076218994535,
+              2.2549999759394823
+            ]
+          },
+          {
+            "name": "anchor_attack_primary",
+            "point": [
+              0.0,
+              0.03199992204124773,
+              2.2899998249603386
+            ]
+          },
+          {
+            "name": "anchor_mouth_inside",
+            "point": [
+              0.0,
+              -0.11000003906921146,
+              1.1599999231511517
+            ]
+          }
+        ],
+        "clips": [
+          {
+            "name": "Death",
+            "duration": 1.600000023841858,
+            "motion": 53.37,
+            "digest": "a1a92e6e446a2d13c07bd667855ad67258e1654fa04d8222a03fb9075fa352a5"
+          },
+          {
+            "name": "Idle",
+            "duration": 2.4000000953674316,
+            "motion": 16.233,
+            "digest": "38c0b449fb87aa7a022b9a7871015cd607bdc6f88886bd60e302eeca262d072f"
+          },
+          {
+            "name": "Swim",
+            "duration": 2.4000000953674316,
+            "motion": 54.83,
+            "digest": "becad1248dfcb7edde8052c3e91415874627b6154468ce607619f3e5cfaa163f"
+          }
+        ],
+        "removedIdentityScaleChannels": 63,
+        "sha256": "56d4a9218027ce7ca2440c4cefc36ae4e9262e403a1706d3bfb30a84a76483f9"
+      }
+    ],
+    "lodTriangleRatio": 0.26673471555717726
+  },
+  "reviewReports": {
+    "render-validation-v2.json": "f2618330e6fd8569dc88352960f9236fbb50a7f0a314e1edb8be7ac07e78d0be",
+    "attachment-validation-v2.json": "86f81b4b7030457b9b6ea816663d77894c31b3b223f9550d6eec8e0d4b3f2b98",
+    "profile-validation-v2.json": "385fe06179bf37fbd6aeba9612f0672b9b89e6901f24aab9200223cb3aaeb7da",
+    "render-validation-lod-v2.json": "a70151f68047efb0347932c4a8618d7afb87d9f6a3440f10a45ba072e2707209",
+    "validation.json": "0d340de6f25d1c3c197ded090094336930cbd4b469372763a88e81247a92d09d",
+    "playback-validation-v2.json": "93be4c8c9f5f3f48081365cae40b38b2cd61ce378c1b775262ae6a32c84991f8"
+  },
+  "eyeReports": {
+    "eye-audit-lod-v2.json": "6af9d6be76263d68452b20db2a7793f0a40dea394e1af0c5763c925ae2217adf",
+    "eye-audit-full-v2.json": "4afb05cf424a1b4ae4234456ccef431411d653286ec9d9ec3dd45dd00092d08b"
+  },
+  "sourceScripts": {
+    "anatomy-v2.py": "7c6099824dd52958c266d197a6c49a57e040e0f24f881e25a5e4d868842e4054",
+    "attachment-audit-v2.py": "a903387c14d3c654bb088685bdb319e57b3e092e28d240d757f5d57bb916a850",
+    "build.py": "260ba53ebd71419f81a56b1ae2ce8f3abfc73336d561d5eff851c1a0eefd128f",
+    "delivery-v2.py": "f258526a230fe9fbf8ab8543c20c7ef8d509eef170fc87bb78bceb978e434161",
+    "diagnostic-v2.py": "d24a812a0acfe44b9455ba0bba9f037a25d5527e96fb6de4e2a2261e2431aeaf",
+    "export-v2.py": "11cc4d480d49febba54def4e0c965978714a3088cfcb02a1e3bd75a8e4555cec",
+    "finalize.py": "57da51b2aacc7080c61534714d2d55a543c7198f0e5ba2722e79044725f5167d",
+    "materials-v2.py": "9a213f82a042c9b9ed9417b8da177b4de9fa507cc7c70becec5bc96c49031315",
+    "motion-v2.py": "fdd07dccd24fde3fbbb24ebb9cead9ab1b228f229d4680506c85f19d4fb64f63",
+    "render-clay.py": "f6da2f8c68b68b345479096e60b4bcb7a30f5a9c348b765b090d7ac12dff0a7d",
+    "render-lod-v2.py": "75424cf510cc547b32a796223807a395905e489a62077ccb8c6321a6da123f1e",
+    "render-v2.py": "6f8a87760fae2caeb3944a16363dbc21d19f67da95c07da054f7715c2a0fb3dc"
+  },
+  "notes": [
+    "Parent performs independent viewer review and public promotion/commit.",
+    "Source anatomy and pigment frozen before matching final renders, full/LOD eye audits and all-action playback.",
+    "Full source and every original/intermediate remain in the authoring directory; V1 was preserved before editing."
+  ]
+}

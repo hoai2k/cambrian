@@ -5,6 +5,7 @@ export interface DevonianSpecimen {
   name: string;
   species: string;
   category: 'creature' | 'prop';
+  modelStatus: 'preview' | 'final';
   provenance: string;
   description: string;
   model: string;

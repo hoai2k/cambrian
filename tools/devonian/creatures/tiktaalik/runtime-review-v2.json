@@ -1,0 +1,78 @@
+{
+  "audit": [],
+  "clips": [
+    {
+      "name": "Ability",
+      "duration": 2.4000000953674316
+    },
+    {
+      "name": "Attack",
+      "duration": 1
+    },
+    {
+      "name": "Bite",
+      "duration": 0.5
+    },
+    {
+      "name": "Death",
+      "duration": 1.600000023841858
+    },
+    {
+      "name": "Dive",
+      "duration": 1.399999976158142
+    },
+    {
+      "name": "Dodge",
+      "duration": 0.4000000059604645
+    },
+    {
+      "name": "Eat",
+      "duration": 1.600000023841858
+    },
+    {
+      "name": "Growth",
+      "duration": 1.5
+    },
+    {
+      "name": "Guard",
+      "duration": 1
+    },
+    {
+      "name": "Heavy",
+      "duration": 1.100000023841858
+    },
+    {
+      "name": "Hit",
+      "duration": 0.6000000238418579
+    },
+    {
+      "name": "Idle",
+      "duration": 2.4000000953674316
+    },
+    {
+      "name": "Parry",
+      "duration": 0.3499999940395355
+    },
+    {
+      "name": "Rise",
+      "duration": 1.399999976158142
+    },
+    {
+      "name": "Stagger",
+      "duration": 1.2000000476837158
+    },
+    {
+      "name": "Swim",
+      "duration": 2.4000000953674316
+    },
+    {
+      "name": "TurnLeft",
+      "duration": 1.600000023841858
+    },
+    {
+      "name": "TurnRight",
+      "duration": 1.600000023841858
+    }
+  ],
+  "errors": []
+}

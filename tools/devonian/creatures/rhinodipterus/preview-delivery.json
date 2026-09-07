@@ -1,0 +1,21 @@
+{
+  "id": "rhinodipterus",
+  "modelStatus": "preview",
+  "stage": "Initial playable model; extended refining pass follows complete roster and scenery delivery.",
+  "packaging": "Lossless numeric and oriented-topology round-trip passed; original 126 Cambrian files byte-identical.",
+  "models": {
+    "glb": {
+      "sourceSHA256": "ad29e4157364b09cf20716d00982d9ae13f4e9566db0f1d72e9fa96230f6c97c",
+      "packagedSHA256": "5bab67e3cf220ea0f95a81b68f33102f88114cbfe0e4204bfc922c45cd399bf4",
+      "bytes": 9924588
+    },
+    "lod1.glb": {
+      "sourceSHA256": "56d4a9218027ce7ca2440c4cefc36ae4e9262e403a1706d3bfb30a84a76483f9",
+      "packagedSHA256": "bd7d0b0d58a6ab28ce2046efe5e152e5d3384f20a752399555ba8c6ad70669e2",
+      "bytes": 1263448
+    }
+  },
+  "deferredRefinement": [
+    "Further material and motion art polish after complete initial library."
+  ]
+}
