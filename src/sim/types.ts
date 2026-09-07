@@ -107,6 +107,8 @@ export interface Actor {
   prev: { light: boolean; heavy: boolean; ability: boolean; dodge: boolean; guard: boolean; lock: boolean; sense: boolean; rise: boolean; burst: boolean; dash: boolean; aim: boolean };
   brain?: BrainState;
   respawnT: number; hatching: boolean;
+  /** Co-op: how long a team-mate has been holding station beside this downed body. */
+  reviveT: number;
   dashHoldT: number; dashUsed: boolean; dashQueued: boolean; pounceCd: number; aimInRange: boolean; aiming: boolean;
   dashCd: number; sinceHit: number; lastHitBy: number; swallowedBy: number; holdT: number;
   deathY: number; sparkled: boolean; tumble: Vec3;
