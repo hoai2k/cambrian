@@ -47,6 +47,7 @@ export function Results({ snapshot, players, onAgain, onChange, onTitle }: { sna
             <div key={i} className="result-card" style={{ ['--player' as string]: p.color }}>
               <span className="player-chip">P{i + 1}</span>
               <b>{creature(players[i]?.creature ?? p.creature).name}</b>
+              {creature(players[i]?.creature ?? p.creature).kind && <span className="result-kind">{creature(players[i]?.creature ?? p.creature).kind}</span>}
               <span>{p.tierName}</span>
               <small>{p.eats} eaten · {p.kills} kills · {p.escapes} escapes</small>
             </div>

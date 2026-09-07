@@ -85,7 +85,7 @@ export function SelectScreen(p: Props) {
                 <div className="creature-copy">
                   <span className="role">{def.ground ? 'SEAFLOOR' : 'SWIMMER'} · {def.role}</span>
                   <h2>{def.name}</h2>
-                  <small className="provenance">{def.species} · {def.provenance ?? def.locality ?? 'Burgess Shale'}</small>
+                  <small className="provenance">{def.kind && <b className="kind">{def.kind}</b>}{def.species} · {def.provenance ?? def.locality ?? 'Burgess Shale'}</small>
                   <p className="tagline">{def.tagline}</p>
                   {!compact && (
                     <>
@@ -95,6 +95,7 @@ export function SelectScreen(p: Props) {
                         <Stat label="Armor" v={stat(def.hp * (1 + def.defense), 233)} />
                         <Stat label="Agility" v={stat(def.agility + def.turnRate, 8.6)} />
                       </div>
+                      {def.kindNote && <p className="kind-note">{def.kindNote}</p>}
                       <dl className="kit">
                         <div><dt>RT</dt><dd>{HEAVY_SPECIALS.has(def.ability) ? def.abilityName : def.heavy.name}</dd></div>
                         <div><dt>B</dt><dd>{DEFENSIVE_SPECIALS.has(def.ability) ? def.abilityName : def.canGuard ? 'Block / parry' : 'Evade'}</dd></div>

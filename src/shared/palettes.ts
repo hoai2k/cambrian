@@ -76,4 +76,16 @@ export const DEFAULT_SCHEME = SCHEMES[0].id;
 /** The scheme a creature should be drawn in unless something overrides it. */
 export const schemeForCreature = (creatureId: string): string => CREATURE_SCHEMES[creatureId] ?? DEFAULT_SCHEME;
 
-export const scheme = (id: string): Scheme => SCHEMES.find((s) => s.id === id) ?? SCHEMES[0];
+/**
+ * Schemes from an era other than the active one. The game never needs these — it only ever names
+ * ids from its own pack — but the specimen viewer shows both eras' creatures on one page, and a
+ * page is only ever "in" one era, so it registers the other era's list here. Ids are unique
+ * across the packs apart from `default`, which means the same thing in both.
+ */
+const EXTRA: Scheme[] = [];
+export function registerSchemes(list: readonly Scheme[]) {
+  for (const s of list) if (!SCHEMES.some((a) => a.id === s.id) && !EXTRA.some((a) => a.id === s.id)) EXTRA.push(s);
+}
+
+export const scheme = (id: string): Scheme =>
+  SCHEMES.find((s) => s.id === id) ?? EXTRA.find((s) => s.id === id) ?? SCHEMES[0];
