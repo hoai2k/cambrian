@@ -45,7 +45,7 @@ export const emptyInput = (): InputFrame => ({
 
 export interface BrainState {
   kind: 'swarm' | 'needs' | 'giant';
-  goal: 'wander' | 'hunt' | 'flee' | 'hide' | 'fight' | 'patrol' | 'search' | 'sleep' | 'graze' | 'notice' | 'defend';
+  goal: 'wander' | 'hunt' | 'flee' | 'hide' | 'fight' | 'patrol' | 'search' | 'sleep' | 'graze' | 'notice' | 'defend' | 'scavenge';
   target: number;          // actor id or -1
   goalT: number;           // time in goal
   thinkT: number;          // countdown to next decision

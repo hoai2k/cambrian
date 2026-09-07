@@ -468,7 +468,9 @@ export class Game implements AiWorld {
   private temperament(a: Actor, pos: Vec3): Partial<BrainState> {
     const def = creature(a.creature);
     const grown = a.scale >= TIER_SCALE[2] * 0.8;
-    const settled = !def.diet && grown;
+    // Filter feeders, grazers and deposit feeders have somewhere to be rather than something to
+    // defend. A scavenger sitting on a body very much has something to defend.
+    const settled = (!def.diet || def.diet === 'scavenger') && grown;
     const roll = this.rng();
     // A third of the grown, armed animals hold a patch; a fifth of everything grown is just grumpy.
     if (settled && roll < 0.34) {
