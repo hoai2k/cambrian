@@ -12,7 +12,7 @@ atmosphere/scale assets, and runtime placements) to `main` first. Until then,
 unfinished models remain `preview` in
 `src/content/devonian/model-status.json` and in the game.
 
-After that gate, complete the six total reworks — Titanichthys, Coccosteus,
+After that gate, complete the six Devonian total reworks — Titanichthys, Coccosteus,
 Bothriolepis, Doryaspis, Gemuendina, and Stethacanthus — before general
 individual refinements. Separate creature agents may rework distinct creatures
 in parallel; there is no required order among the six. Each rework gets its eye
@@ -99,3 +99,7 @@ Terra ran the established merge validation without model edits:
   errors and reported `{ groupDetached: true, geometryMemory: 12 }` on cleanup.
 - Logs are under
   `/Users/hoai/Documents/Stuff/Generations/cambrian/local/devonian-authoring/review/workflow-merge-*.log`.
+
+Odaraia (Cambrian) joined the total-rework queue on 7 September; see
+`docs/cambrian/refinement-queue.md`. The same per-creature ownership, backup, preview and
+post-rework review rules apply. Preserve era-specific catalogue/status namespaces.

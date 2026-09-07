@@ -1,4 +1,6 @@
 import { CREATURES } from '../sim/creatures';
+import { CAMBRIAN_MODEL_STATUS } from '../content/cambrian/model-status';
+import type { CambrianCreatureId } from '../content/cambrian/ids';
 import { SCHEMES as CAMBRIAN_SCHEMES, CREATURE_SCHEMES as CAMBRIAN_DEFAULTS } from '../content/cambrian/palettes';
 import { SCHEMES as DEVONIAN_SCHEMES, CREATURE_SCHEMES as DEVONIAN_DEFAULTS } from '../content/devonian/palettes';
 import type { Scheme } from '../shared/palettes';
@@ -38,6 +40,7 @@ export const SPECIMENS: readonly ViewerSpecimen[] = [
     key: `cambrian:${c.id}`, id: c.id, collection: 'cambrian' as const,
     name: c.name, species: c.species, kind: c.kind, kindNote: c.kindNote, role: `${c.ground ? 'SEAFLOOR' : 'SWIMMER'} · ${c.role}`,
     provenance: c.provenance ?? 'Burgess Shale', description: '',
+    modelStatus: CAMBRIAN_MODEL_STATUS[c.id as CambrianCreatureId],
     model: assetPaths.model(c.id), lod: assetPaths.model(c.id, 1), displayLength: c.adultLength,
     looping: ['Idle', 'Swim', 'Crawl', 'Guard', 'Eat', 'Moult', ...(c.abilityLoop ? ['Ability'] : [])],
   })),

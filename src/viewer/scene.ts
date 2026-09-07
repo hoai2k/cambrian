@@ -40,6 +40,11 @@ export interface PlaybackState { time: number; duration: number; paused: boolean
 export interface ViewerScene {
   /** Loads a creature and returns its clip names in button order. */
   show(specimen: ViewerSpecimen): Promise<string[]>;
+  /**
+   * Takes the stage down now. Loading the next specimen takes a moment, and the one standing
+   * there must not spend it being recoloured into the next one's palette.
+   */
+  clear(): void;
   /** Plays a clip. One-shots fade back to the resting loop unless `loop` forces a repeat. */
   play(name: string, loop: boolean): void;
   setSpeed(s: number): void;
@@ -380,6 +385,8 @@ export function createViewerScene(canvas: HTMLCanvasElement): ViewerScene {
 
   return {
     show,
+    // Bumping the token first drops anything already in flight; `show` takes a fresh one.
+    clear() { token++; clearModel(); },
     play,
     setSpeed(s) { speed = s; },
     setPaused(value) {
