@@ -1,0 +1,363 @@
+[
+  {
+    "family": "B01",
+    "id": "massive-stromatoporoid",
+    "title": "Massive stromatoporoid",
+    "image": "assets/devonian/reference/scenery/b01-massive-stromatoporoid.jpg",
+    "sourceSHA256": "cc200d12a091efc7e19a1c4484d67ce1c3718f43275abe16afea9105cd76fcc0",
+    "sources": [
+      "https://www.digitalatlasofancientlife.org/learn/porifera/stromatoporoidea/"
+    ],
+    "status": "preview",
+    "notes": "Model-derived original appearance/morphology guide, not a fossil photograph. Refinement limitations are in the scenery manifest."
+  },
+  {
+    "family": "B02",
+    "id": "branching-stromatoporoid",
+    "title": "Branching stromatoporoid",
+    "image": "assets/devonian/reference/scenery/b02-branching-stromatoporoid.jpg",
+    "sourceSHA256": "d344bfe339600723d39723659accaa0be85166114f0283afe93f27c6ad22df75",
+    "sources": [
+      "https://palass.org/publications/palaeontology-journal/archive/40/3/article_pp833-854"
+    ],
+    "status": "preview",
+    "notes": "Model-derived original appearance/morphology guide, not a fossil photograph. Refinement limitations are in the scenery manifest."
+  },
+  {
+    "family": "B03",
+    "id": "encrusting-stromatoporoid",
+    "title": "Encrusting stromatoporoid",
+    "image": "assets/devonian/reference/scenery/b03-encrusting-stromatoporoid.jpg",
+    "sourceSHA256": "0ea46bf7b5a49c1877561cfe8fc48f6a829b3c7938015df536aad51279e0ca36",
+    "sources": [
+      "https://onlinelibrary.wiley.com/doi/full/10.1111/j.1475-4983.2011.01037.x"
+    ],
+    "status": "preview",
+    "notes": "Model-derived original appearance/morphology guide, not a fossil photograph. Refinement limitations are in the scenery manifest."
+  },
+  {
+    "family": "B04",
+    "id": "massive-tabulate-coral",
+    "title": "Massive tabulate coral",
+    "image": "assets/devonian/reference/scenery/b04-massive-tabulate-coral.jpg",
+    "sourceSHA256": "0def8c49ca5c755b204264692c41f412636a4e1df9b4397b8b644e0f7bcbfe1f",
+    "sources": [
+      "https://www.digitalatlasofancientlife.org/vc/cnidaria/anthozoa/tabulata/",
+      "https://collections.geoscienze.unipd.it/favosites"
+    ],
+    "status": "preview",
+    "notes": "Model-derived original appearance/morphology guide, not a fossil photograph. Refinement limitations are in the scenery manifest."
+  },
+  {
+    "family": "B05",
+    "id": "branching-tabulate-coral",
+    "title": "Branching tabulate coral",
+    "image": "assets/devonian/reference/scenery/b05-branching-tabulate-coral.jpg",
+    "sourceSHA256": "fb9ca68551228724575505c76f756ac85056bbbc1879971f69ee7b4fb041cff5",
+    "sources": [
+      "https://devonianatlas.org/species/striatopora-iowensis/"
+    ],
+    "status": "preview",
+    "notes": "Model-derived original appearance/morphology guide, not a fossil photograph. Refinement limitations are in the scenery manifest."
+  },
+  {
+    "family": "B06",
+    "id": "solitary-rugose-coral",
+    "title": "Solitary rugose coral",
+    "image": "assets/devonian/reference/scenery/b06-solitary-rugose-coral.jpg",
+    "sourceSHA256": "a432b84e2641f15bf344744d3a444a594ec4b68f56792c278f96fa5449934ec4",
+    "sources": [
+      "https://devonianatlas.org/species/heliophyllum-halli/"
+    ],
+    "status": "preview",
+    "notes": "Model-derived original appearance/morphology guide, not a fossil photograph. Refinement limitations are in the scenery manifest."
+  },
+  {
+    "family": "B07",
+    "id": "colonial-rugose-coral",
+    "title": "Colonial rugose coral",
+    "image": "assets/devonian/reference/scenery/b07-colonial-rugose-coral.jpg",
+    "sourceSHA256": "f2c43a7c1e794ed66178147eac8b89f2f741c1df9f590e5b10196b65034b2576",
+    "sources": [
+      "https://umorf.ummp.lsa.umich.edu/wp/mi-backyard-fossils-corals/"
+    ],
+    "status": "preview",
+    "notes": "Model-derived original appearance/morphology guide, not a fossil photograph. Refinement limitations are in the scenery manifest."
+  },
+  {
+    "family": "B08",
+    "id": "stalked-crinoid",
+    "title": "Stalked crinoid",
+    "image": "assets/devonian/reference/scenery/b08-stalked-crinoid.jpg",
+    "sourceSHA256": "1f032bda74710b1b2b2701c28ff88f6a1498df665f42d5ee08457a42816cb873",
+    "sources": [
+      "https://www.digitalatlasofancientlife.org/learn/echinodermata/crinoidea/",
+      "https://devonianatlas.org/species/"
+    ],
+    "status": "preview",
+    "notes": "Model-derived original appearance/morphology guide, not a fossil photograph. Refinement limitations are in the scenery manifest."
+  },
+  {
+    "family": "B09",
+    "id": "brachiopod-bed",
+    "title": "Brachiopod bed",
+    "image": "assets/devonian/reference/scenery/b09-brachiopod-bed.jpg",
+    "sourceSHA256": "accfebeecdbb22b46cf829cd98d86fb9803f10f96643480c18268755e9ff64a7",
+    "sources": [
+      "https://devonianatlas.org/species/mucrospirifer-mucronatus/",
+      "https://devonianatlas.org/taxonomic-groups/brachiopods/"
+    ],
+    "status": "preview",
+    "notes": "Model-derived original appearance/morphology guide, not a fossil photograph. Refinement limitations are in the scenery manifest."
+  },
+  {
+    "family": "B10",
+    "id": "bryozoan-colony",
+    "title": "Fenestrate bryozoan",
+    "image": "assets/devonian/reference/scenery/b10-bryozoan-colony.jpg",
+    "sourceSHA256": "d1494c128ee0e522e1cd17e8a727734257c42d699510cfbaf55ec411bfe30ba1",
+    "sources": [
+      "https://www.digitalatlasofancientlife.org/learn/bryozoa/",
+      "https://data.wgnhs.wisc.edu/pubshare/B021.pdf"
+    ],
+    "status": "preview",
+    "notes": "Model-derived original appearance/morphology guide, not a fossil photograph. Refinement limitations are in the scenery manifest."
+  },
+  {
+    "family": "B11",
+    "id": "gastropod-shells",
+    "title": "Small gastropod shells",
+    "image": "assets/devonian/reference/scenery/b11-gastropod-shells.jpg",
+    "sourceSHA256": "d2415facbe7b7ad1dbdd6e9d50bb1e3c6917066a414452c7c9576d78e04d4df5",
+    "sources": [
+      "https://devonianatlas.org/species/"
+    ],
+    "status": "preview",
+    "notes": "Model-derived original appearance/morphology guide, not a fossil photograph. Refinement limitations are in the scenery manifest."
+  },
+  {
+    "family": "B12",
+    "id": "small-bivalves",
+    "title": "Small bivalves",
+    "image": "assets/devonian/reference/scenery/b12-small-bivalves.jpg",
+    "sourceSHA256": "72a9614c6a1a6922a9fe5b482893e7d8f3bb0926675a9a0b49c7a1559f484727",
+    "sources": [
+      "https://devonianatlas.org/species/"
+    ],
+    "status": "preview",
+    "notes": "Model-derived original appearance/morphology guide, not a fossil photograph. Refinement limitations are in the scenery manifest."
+  },
+  {
+    "family": "P01",
+    "id": "rhynia",
+    "title": "Rhynia-type early vegetation",
+    "image": "assets/devonian/reference/scenery/p01-rhynia.jpg",
+    "sourceSHA256": "6c5cf0dbd7f146a8fd6838f8fac316fffabb0b84550c5544b50e1ed80d11466e",
+    "sources": [
+      "https://pmc.ncbi.nlm.nih.gov/articles/PMC5745331/"
+    ],
+    "status": "preview",
+    "notes": "Model-derived original appearance/morphology guide, not a fossil photograph. Refinement limitations are in the scenery manifest."
+  },
+  {
+    "family": "P02",
+    "id": "asteroxylon",
+    "title": "Asteroxylon",
+    "image": "assets/devonian/reference/scenery/p02-asteroxylon.jpg",
+    "sourceSHA256": "9aa1ab249e3a3a81d35dc3232d09135ebde7fb6448a59fec4b9d575bb41a6424",
+    "sources": [
+      "https://pmc.ncbi.nlm.nih.gov/articles/PMC8384418/"
+    ],
+    "status": "preview",
+    "notes": "Model-derived original appearance/morphology guide, not a fossil photograph. Refinement limitations are in the scenery manifest."
+  },
+  {
+    "family": "P03",
+    "id": "cladoxylopsid-tree",
+    "title": "Cladoxylopsid tree",
+    "image": "assets/devonian/reference/scenery/p03-cladoxylopsid-tree.jpg",
+    "sourceSHA256": "2500d927af5925a3af887cd0fbe133fc77ddad5c3ee0c89d20c62a0d16128167",
+    "sources": [
+      "https://pmc.ncbi.nlm.nih.gov/articles/PMC8409631/"
+    ],
+    "status": "preview",
+    "notes": "Model-derived original appearance/morphology guide, not a fossil photograph. Refinement limitations are in the scenery manifest."
+  },
+  {
+    "family": "P04",
+    "id": "archaeopteris",
+    "title": "Archaeopteris",
+    "image": "assets/devonian/reference/scenery/p04-archaeopteris.jpg",
+    "sourceSHA256": "8ea5ec38f42247a84a8715440ba96eaf3f7c20b9e214d292c6e2880f4765c9bc",
+    "sources": [
+      "https://www.nature.com/articles/19516",
+      "https://pmc.ncbi.nlm.nih.gov/articles/PMC8409631/",
+      "https://orca.cardiff.ac.uk/id/eprint/10078/1/Berry%202000.pdf"
+    ],
+    "status": "preview",
+    "notes": "Model-derived original appearance/morphology guide, not a fossil photograph. Refinement limitations are in the scenery manifest."
+  },
+  {
+    "family": "P05",
+    "id": "marine-algae",
+    "title": "Marine algal thalli",
+    "image": "assets/devonian/reference/scenery/p05-marine-algae.jpg",
+    "sourceSHA256": "732f11079d53931ba6634025534e807b22fd43583646b50f85db5d90b70dc8bb",
+    "sources": [
+      "https://doi.org/10.1016/0034-6667(95)00062-3"
+    ],
+    "status": "preview",
+    "notes": "Model-derived original appearance/morphology guide, not a fossil photograph. Refinement limitations are in the scenery manifest."
+  },
+  {
+    "family": "G01",
+    "id": "carbonate-outcrop",
+    "title": "Carbonate outcrop",
+    "image": "assets/devonian/reference/scenery/g01-carbonate-outcrop.jpg",
+    "sourceSHA256": "b9b3563a658833fb5c11ea1c076c8de050d8561bfd9fe4d8b86a510ebec245bc",
+    "sources": [
+      "https://onlinelibrary.wiley.com/doi/full/10.1111/j.1475-4983.2011.01037.x"
+    ],
+    "status": "preview",
+    "notes": "Model-derived original appearance/morphology guide, not a fossil photograph. Refinement limitations are in the scenery manifest."
+  },
+  {
+    "family": "G02",
+    "id": "reef-framework",
+    "title": "Reef framework",
+    "image": "assets/devonian/reference/scenery/g02-reef-framework.jpg",
+    "sourceSHA256": "7d40cf372a3216774cf22ab0af121a8f6eb23436341fb90e61d60821c554d26b",
+    "sources": [
+      "https://onlinelibrary.wiley.com/doi/full/10.1111/j.1475-4983.2011.01037.x"
+    ],
+    "status": "preview",
+    "notes": "Model-derived original appearance/morphology guide, not a fossil photograph. Refinement limitations are in the scenery manifest."
+  },
+  {
+    "family": "G03",
+    "id": "carbonate-rubble",
+    "title": "Carbonate rubble",
+    "image": "assets/devonian/reference/scenery/g03-carbonate-rubble.jpg",
+    "sourceSHA256": "1053bd2b29d6864d6f54ebf8f86939a7b1a239a1f3b431d5d9151109743c430d",
+    "sources": [
+      "https://onlinelibrary.wiley.com/doi/full/10.1111/j.1475-4983.2011.01037.x"
+    ],
+    "status": "preview",
+    "notes": "Model-derived original appearance/morphology guide, not a fossil photograph. Refinement limitations are in the scenery manifest."
+  },
+  {
+    "family": "G04",
+    "id": "fine-sediment-bed",
+    "title": "Fine sediment bed",
+    "image": "assets/devonian/reference/scenery/g04-fine-sediment-bed.jpg",
+    "sourceSHA256": "4cc1111bc84e1ea791a28a147724cae0e426ff05c8adf11aa81ac25c872e5533",
+    "sources": [
+      "https://pmc.ncbi.nlm.nih.gov/articles/PMC8409631/"
+    ],
+    "status": "preview",
+    "notes": "Model-derived original appearance/morphology guide, not a fossil photograph. Refinement limitations are in the scenery manifest."
+  },
+  {
+    "family": "G05",
+    "id": "sand-pebble-bed",
+    "title": "Sand and pebble bed",
+    "image": "assets/devonian/reference/scenery/g05-sand-pebble-bed.jpg",
+    "sourceSHA256": "3e68edc7556b9308dbdcb7ea67311a1e68dbde6d3d25be60abaad3b2bc6e1d27",
+    "sources": [
+      "https://pmc.ncbi.nlm.nih.gov/articles/PMC8409631/"
+    ],
+    "status": "preview",
+    "notes": "Model-derived original appearance/morphology guide, not a fossil photograph. Refinement limitations are in the scenery manifest."
+  },
+  {
+    "family": "G06",
+    "id": "eroded-bank",
+    "title": "Eroded bank",
+    "image": "assets/devonian/reference/scenery/g06-eroded-bank.jpg",
+    "sourceSHA256": "39fcd3606f9777085218924ce820eda084046a53d3ea38351c2988a322eed6cd",
+    "sources": [
+      "https://pmc.ncbi.nlm.nih.gov/articles/PMC8409631/"
+    ],
+    "status": "preview",
+    "notes": "Model-derived original appearance/morphology guide, not a fossil photograph. Refinement limitations are in the scenery manifest."
+  },
+  {
+    "family": "G07",
+    "id": "large-boulder",
+    "title": "Large boulder",
+    "image": "assets/devonian/reference/scenery/g07-large-boulder.jpg",
+    "sourceSHA256": "207a2c958d2ea54af3a31ee9daeb27a3d7ee38af5b91dd53c4ae6746e419df7c",
+    "sources": [
+      "https://pmc.ncbi.nlm.nih.gov/articles/PMC8409631/"
+    ],
+    "status": "preview",
+    "notes": "Model-derived original appearance/morphology guide, not a fossil photograph. Refinement limitations are in the scenery manifest."
+  },
+  {
+    "family": "G08",
+    "id": "shell-hash",
+    "title": "Shell hash",
+    "image": "assets/devonian/reference/scenery/g08-shell-hash.jpg",
+    "sourceSHA256": "20729c7499e42b8d8eccd412beee8ac014240339a480749238ff60f96b82e396",
+    "sources": [
+      "https://devonianatlas.org/species/mucrospirifer-mucronatus/",
+      "https://devonianatlas.org/taxonomic-groups/brachiopods/"
+    ],
+    "status": "preview",
+    "notes": "Model-derived original appearance/morphology guide, not a fossil photograph. Refinement limitations are in the scenery manifest."
+  },
+  {
+    "family": "G09",
+    "id": "crinoid-debris",
+    "title": "Crinoid debris",
+    "image": "assets/devonian/reference/scenery/g09-crinoid-debris.jpg",
+    "sourceSHA256": "d80bf0680be1ba30e4fdd82a4f825439d19ef651724529ecf22f3e6425043bc0",
+    "sources": [
+      "https://www.digitalatlasofancientlife.org/learn/echinodermata/crinoidea/",
+      "https://devonianatlas.org/species/"
+    ],
+    "status": "preview",
+    "notes": "Model-derived original appearance/morphology guide, not a fossil photograph. Refinement limitations are in the scenery manifest."
+  },
+  {
+    "family": "G10",
+    "id": "submerged-log",
+    "title": "Submerged woody log",
+    "image": "assets/devonian/reference/scenery/g10-submerged-log.jpg",
+    "sourceSHA256": "1d84ecba795d79e5e5ce9bc95175264dc7b4a01362fe74351fd8f09319e7669b",
+    "sources": [
+      "https://www.nature.com/articles/19516",
+      "https://pmc.ncbi.nlm.nih.gov/articles/PMC8409631/",
+      "https://orca.cardiff.ac.uk/id/eprint/10078/1/Berry%202000.pdf"
+    ],
+    "status": "preview",
+    "notes": "Model-derived original appearance/morphology guide, not a fossil photograph. Refinement limitations are in the scenery manifest."
+  },
+  {
+    "family": "G11",
+    "id": "root-bearing-bank",
+    "title": "Root-bearing bank",
+    "image": "assets/devonian/reference/scenery/g11-root-bearing-bank.jpg",
+    "sourceSHA256": "f48a62b36a0abede929506ca99d8d84ce630b70d4286e2803146ef2b8fe6d4a6",
+    "sources": [
+      "https://www.nature.com/articles/19516",
+      "https://pmc.ncbi.nlm.nih.gov/articles/PMC8409631/",
+      "https://orca.cardiff.ac.uk/id/eprint/10078/1/Berry%202000.pdf"
+    ],
+    "status": "preview",
+    "notes": "Model-derived original appearance/morphology guide, not a fossil photograph. Refinement limitations are in the scenery manifest."
+  },
+  {
+    "family": "G12",
+    "id": "organic-remains",
+    "title": "Disarticulated gnathal fragments",
+    "image": "assets/devonian/reference/scenery/g12-organic-remains.jpg",
+    "sourceSHA256": "25ca8cb5db60c1721619fdda403758b93a5d3d87dd55e0bbf77a0b5c04d002da",
+    "sources": [
+      "https://www.palaeo-electronica.org/content/2024/5307-dunkleosteus-reconstruction",
+      "https://doi.org/10.3390/d15030318"
+    ],
+    "status": "preview",
+    "notes": "Model-derived original appearance/morphology guide, not a fossil photograph. Refinement limitations are in the scenery manifest."
+  }
+]

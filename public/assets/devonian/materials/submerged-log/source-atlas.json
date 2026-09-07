@@ -1,0 +1,35 @@
+{
+  "code": "T08",
+  "id": "submerged-log",
+  "modelStatus": "preview",
+  "sourceModel": "assets/devonian/props/submerged-log.glb",
+  "sourceBlendSHA256": "eba00f4b6e31676dc065199844446868d2ad298491190283e14ce800e601f602",
+  "projection": "orthographic top; RGBA cells; no lighting baked in colour",
+  "widthMeters": 3.6458538055419925,
+  "heightRangeMeters": [
+    -0.012211576104164124,
+    0.6108471751213074
+  ],
+  "normalConvention": "object/world XYZ encoded in RGB; not tangent-space normals",
+  "notes": "Original model surface study. Living colour is artistic; skeletal morphology and soft coating must remain separate. Transparent exterior is a mask.",
+  "maps": {
+    "albedo": {
+      "path": "assets/devonian/materials/submerged-log/albedo.png",
+      "sha256": "e399739b5b66d965626be0e8580d936881638d57cf99833b64fcd630830007c8"
+    },
+    "normal-object": {
+      "path": "assets/devonian/materials/submerged-log/normal-object.png",
+      "sha256": "681d2c7cf74af87b209ee69060115db012946c0c72ba8007e458dc74e8b7c46a"
+    },
+    "height": {
+      "path": "assets/devonian/materials/submerged-log/height.png",
+      "sha256": "b72a842c94cbeb6937b3224b85cdb29281ecfd4d7d3c7e84c49b7c5a3c769866"
+    },
+    "roughness": {
+      "path": "assets/devonian/materials/submerged-log/roughness.png",
+      "sha256": "7e7d7cb1ef664c2ab4d50eb0c9d2e31024cefe9ed5d6d644f3b4fe29929bbbef"
+    }
+  },
+  "heightEncoding": "8-bit RGBA orthographic reference only; not a 16-bit displacement map",
+  "dataSampling": "One point sample per pixel; denoising/compositor/sequencer disabled; 0.01 px box filter; Raw linear output; no RGB dilation or normal reconstruction across transparent exterior. Alpha is coverage, not a normal component."
+}

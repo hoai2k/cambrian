@@ -34,7 +34,7 @@
     "name": "Titanichthys",
     "species": "Titanichthys termieri",
     "category": "creature",
-    "modelStatus": "final",
+    "modelStatus": "preview",
     "provenance": "Late Devonian (Famennian), Southern Maïder basin, Morocco",
     "description": "Broad-headed armoured giant with small eyes and slender toothless jaws, reconstructed as a suspension feeder.",
     "model": "assets/devonian/creatures/titanichthys.glb",
@@ -71,7 +71,7 @@
     "name": "Coccosteus",
     "species": "Coccosteus cuspidatus",
     "category": "creature",
-    "modelStatus": "final",
+    "modelStatus": "preview",
     "provenance": "Middle Devonian, Scotland",
     "description": "Compact arthrodire with a broad short jaw, sculpted dermal head and thoracic armour, rounded pectoral fans, anterior pelvic fins, one long low dorsal fin and a sharply heterocercal tail.",
     "model": "assets/devonian/creatures/coccosteus.glb",
@@ -102,7 +102,7 @@
     "name": "Bothriolepis",
     "species": "Bothriolepis canadensis",
     "category": "creature",
-    "modelStatus": "final",
+    "modelStatus": "preview",
     "provenance": "Late Devonian (Frasnian), Escuminac Formation, Miguasha, Quebec, Canada",
     "description": "Angular armoured antiarch with a steep immobile head, inset dorsal eyes, a posterior dorsal crest and jointed dermal pectoral fins. A long flexible posterior carries a small dorsal fin and asymmetrical tail.",
     "model": "assets/devonian/creatures/bothriolepis.glb",
@@ -249,7 +249,7 @@
     "name": "Stethacanthus",
     "species": "Stethacanthus sp. (CMNH 8988-informed reconstruction)",
     "category": "creature",
-    "modelStatus": "final",
+    "modelStatus": "preview",
     "provenance": "Late Devonian, upper Famennian Cleveland Shale, Ohio, USA",
     "description": "A short-headed early chondrichthyan with opposing cranial and dorsal crown denticles, a supported spine-brush, slender metapterygial fin extensions, and an epicercal caudal axis.",
     "model": "assets/devonian/creatures/stethacanthus.glb",
@@ -673,6 +673,71 @@
       "Prominent ocular-region bumps are modeled as cuticular/sensory tubercles, not asserted eye globes. Eye positions are unresolved in the fossil; no differentiated external eyes are invented.",
       "Pigmentation, exact soft oral margins, appendage thickness, setal density and motion amplitudes are inferred.",
       "Preview: finer cuticle, joint and animation refinement deferred until the initial roster is complete."
+    ]
+  },
+  {
+    "id": "manticoceras",
+    "name": "Manticoceras",
+    "species": "Manticoceras regulare",
+    "category": "creature",
+    "modelStatus": "preview",
+    "provenance": "Late Devonian, Frasnian; Lime Creek Formation / Amana Beds, Iowa",
+    "description": "Compressed coiled ammonoid shell with embracing whorls, a genuine open body chamber and an editable conservative soft-body reconstruction.",
+    "model": "assets/devonian/creatures/manticoceras.glb",
+    "lod": "assets/devonian/creatures/manticoceras.lod1.glb",
+    "image": "assets/devonian/creatures/manticoceras.thumb.png",
+    "lengthMeters": 0.16,
+    "looping": [
+      "Idle",
+      "Swim",
+      "Guard",
+      "Eat"
+    ],
+    "sources": [
+      "https://scholarworks.uni.edu/pias/vol93/iss1/4/",
+      "https://igs.iihr.uiowa.edu/igs/publications/uploads/GB-29.pdf",
+      "https://www.app.pan.pl/archive/published/app49/app49-235.pdf",
+      "https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0235180"
+    ],
+    "notes": [
+      "Initial preview; shell is anatomically constrained but exact soft parts and all living pigmentation are uncertain.",
+      "Representative shell diameter 0.11 m follows the Baker et al.1986 material; total living length 0.16 m includes artistically reconstructed soft parts and is not a species maximum. Larger M.regulare shells occur in the 2013 Iowa Survey figures.",
+      "Ten modest arms, small beak and funnel are conservative comparative choices, not directly preserved M.regulare soft anatomy. No hooks, suckers, long squid clubs or Nautilus arm count are asserted.",
+      "Smooth biconvex growth increments replace decorative fossil sutures; the visible fossil septal boundaries are internal structures.",
+      "Shell is rigid on body bone; flexible arms, mantle margins and open funnel interpret jetting and feeding actions. No scale channels or shell deformation.",
+      "Growth is relaxed extension, not a shell moult. Grab is a conservative arm-gathering interpretation.",
+      "Full regional vertex pigment multiplies near-neutral albedo once; texture-free LOD bakes the same factor once."
+    ]
+  },
+  {
+    "id": "michelinoceras",
+    "name": "Michelinoceras",
+    "species": "Michelinoceras currens",
+    "category": "creature",
+    "modelStatus": "preview",
+    "provenance": "Lower Devonian, southwestern Sardinia; shell reference Modena19380, Gnoli1982 Plate2Fig1",
+    "description": "Smooth narrow orthoconic shell with simple chambered interior, subcentral siphuncle and an editable conservative cephalopod soft body. Ten tapering arms surround a modeled oral recess; a lined ventral funnel and recessed eyes fit inside the shell aperture.",
+    "model": "assets/devonian/creatures/michelinoceras.glb",
+    "lod": "assets/devonian/creatures/michelinoceras.lod1.glb",
+    "image": "assets/devonian/creatures/michelinoceras.thumb.png",
+    "lengthMeters": 0.5,
+    "looping": [
+      "Idle",
+      "Swim",
+      "Guard",
+      "Eat"
+    ],
+    "sources": [
+      "https://www.paleoitalia.it/wp-content/uploads/2023/06/05_Gnoli.pdf",
+      "https://www.app.pan.pl/archive/published/app50/app50-329.pdf",
+      "https://pmc.ncbi.nlm.nih.gov/articles/PMC8288114/"
+    ],
+    "notes": [
+      "Vetted M.currens shell reference: circular section, near7degree expansion, smooth exterior. Internal septa remain inside intact conch.",
+      "Model .5m representative is a project working value; the best described fragment is28mm, not a complete animal.",
+      "Rigid shell weighted entirely to body; separate head retraction, ten arm chains, two corneous jaw bones and funnel motion.",
+      "Forward-aligned bind pose meets runtime convention and does not claim horizontal living trim. Ability/Dodge interpret shell-stable jet escape; Growth does not scale shell.",
+      "No squid fins, sucker discs, differentiated long capture clubs or invented closure operculum."
     ]
   },
   {
