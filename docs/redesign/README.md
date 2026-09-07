@@ -37,19 +37,39 @@ and **M8 (polish) is complete except for two music files**:
 | Audio | Sound library, distance falloff, tension layer and soundtrack director shipped. **Outstanding:** `theme-calm.mp3` and `theme-danger.mp3` — the biome tags are already live in `music.ts`, the files are not there. See [`docs/audio-requests.md`](../audio-requests.md). |
 | Onboarding, rumble, quality tiers, viewer | Shipped (`hintFor()` in `src/sim/game.ts`, `rumble()` wired to hits, deaths, parries, grabs, tier-ups). |
 | Landmarks, co-op revive, spectating, the discovery record | Shipped; see below. |
+| The View scoreboard, and turns in Hunter & Hunted | Shipped; see below. |
 
 Designed but **not built** (nothing depends on them; listed so they are not
 mistaken for shipped):
 
 - A day/night cycle. `01-game-design.md` marks it optional, after core.
-- The **View** button's scoreboard / map. The button is read (`view` in
-  `src/input/input.ts`) and nothing consumes it.
-- Rotating who plays the giant in Hunter & Hunted — player 1 holds the role for
-  the match.
 - Swarm impostor billboards, from the technical plan's rendering section.
   Superseded: swarm members use the shared `*.lod1.glb` path instead, which met
   the performance targets.
 
+### The scoreboard, and taking turns as the giant
+
+- **View holds the scoreboard open** (`Z`, or comma on the second keyboard),
+  per viewport, so each player can check without stopping. Everyone in the
+  running is on it — the bots filling the empty seats included — sorted by
+  whatever the mode is actually about: catch in Hunter & Hunted, size everywhere
+  else. Each row carries rank, a progress bar, kills and meals, and either the
+  viewer's own biome or the distance to that contender. The header is the mode
+  stating its own terms, with a clock where one applies. An era that ranks its
+  animals by something of its own fills in the rank through the optional
+  `EraRules.scoreLine` — the Devonian shows stage and rung against standing.
+- **Hunter & Hunted takes turns.** Every human gets one 100-second stint as the
+  giant, and is scored on the same job: how many of the small ones they caught
+  while they had the body. Most caught wins; a turn ends early if every small
+  one grows to Adult, which is how prey play keeps a rival's score down. Between
+  turns there is a short pause — nobody is the giant, everyone is invulnerable,
+  and the hand-over is announced in every viewport — then bodies and positions
+  are re-seated for the next one. A single human still plays it as one turn, so
+  the mode is unchanged for them. Both era packs write the rule as "index 0 is
+  the giant"; `Game.eraRoleIndex` presents whoever's turn it is as index 0, so
+  neither pack has to know the role moves.
+
+### Landmarks, spectating, revive and the record
 ### Landmarks, spectating, revive and the record
 
 Four things the design called for and the first pass skipped are now in

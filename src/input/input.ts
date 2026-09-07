@@ -6,7 +6,10 @@ export interface RawControls {
   dash: boolean; aim: boolean; rsClick: boolean;
   /** D-pad down: the in-game teleport menu. */
   teleport: boolean;
-  menu: boolean; view: boolean; confirm: boolean; back: boolean;
+  menu: boolean;
+  /** View / Back (pad button 8), Z and comma on the keyboards: hold for the scoreboard. */
+  view: boolean;
+  confirm: boolean; back: boolean;
   /** Raw shoulder buttons. Menus bind to these rather than to `dodge`/`rise`, which share them. */
   lb: boolean; rb: boolean;
   dleft: boolean; dright: boolean; dup: boolean; ddown: boolean;
@@ -81,14 +84,14 @@ export class KeyboardInput {
       c.burst = k('ShiftLeft') ? 1 : 0; c.rise = k('Space'); c.sink = k('KeyC');
       c.light = k('KeyF'); c.heavy = k('KeyG'); c.ability = k('KeyR'); c.dodge = k('KeyV'); c.dash = k('KeyV'); c.guard = k('KeyQ'); c.lock = k('Tab'); c.aim = k('Tab'); c.sense = k('KeyE');
       if (k('PageUp') || k('PageDown')) { c.rsClick = true; c.lookY = k('PageUp') ? -1 : 1; }
-      c.teleport = k('KeyT');
+      c.teleport = k('KeyT'); c.view = k('KeyZ');
       c.menu = k('Escape'); c.confirm = k('Enter') || k('Space'); c.back = k('Backspace');
       c.dleft = k('ArrowLeft'); c.dright = k('ArrowRight'); c.dup = k('ArrowUp'); c.ddown = k('ArrowDown');
     } else {
       c.mx = Number(k('KeyL')) - Number(k('KeyJ')); c.my = Number(k('KeyI')) - Number(k('KeyK'));
       c.burst = k('ShiftRight') ? 1 : 0; c.rise = k('KeyN'); c.sink = k('KeyM');
       c.light = k('Semicolon'); c.heavy = k('Quote'); c.ability = k('KeyP'); c.dodge = k('Slash'); c.dash = k('Slash'); c.guard = k('KeyU'); c.lock = k('KeyO'); c.aim = k('KeyO'); c.sense = k('KeyY');
-      c.teleport = k('KeyH');
+      c.teleport = k('KeyH'); c.view = k('Comma');
       c.confirm = k('Enter'); c.back = k('Backspace');
       c.dleft = k('KeyJ'); c.dright = k('KeyL'); c.dup = k('KeyI'); c.ddown = k('KeyK');
     }

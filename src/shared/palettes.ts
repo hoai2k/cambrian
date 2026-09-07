@@ -2,11 +2,9 @@ import { ACTIVE_ERA } from '../content';
 /**
  * Creature colour schemes.
  *
- * Nothing in the models is textured for colour: every creature's GLB carries a white
- * baseColorFactor and puts all of its colour in COLOR_0 vertex colours, with the only texture
- * being a normal map. That means a creature can be recoloured at runtime with no new art —
- * see src/render/recolor.ts, which keeps each vertex's luminance (all the mottling and baked
- * shading) and swaps the hue for the scheme colour of whichever slot the material belongs to.
+ * The Cambrian roster uses vertex pigment. Newer Devonian models also carry UV albedo;
+ * the renderer measures the combined texture and vertex pigment before applying a scheme.
+ * Normal maps, roughness and regional luminance remain intact when the hue changes.
  *
  * This file is deliberately free of Three.js so the schemes can be listed, exported and diffed
  * as plain data.

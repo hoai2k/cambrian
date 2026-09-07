@@ -5,7 +5,7 @@ export function XboxDiagram() {
   const line = (x1: number, y1: number, x2: number, y2: number) => <line x1={x1} y1={y1} x2={x2} y2={y2} className="pad-line" />;
   return (
     <svg className="xbox-diagram" viewBox="0 0 860 400" role="img" aria-labelledby="xbox-title">
-      <title id="xbox-title">Xbox controller layout: left stick swims, right stick looks and click-plus-up-or-down zooms, RT heavy attack, LB dashes, LT aims, RB rises, X bites, Y hides, B guards, A sprints, D-pad up senses, D-pad down opens the teleport menu, Menu pauses.</title>
+      <title id="xbox-title">Xbox controller layout: left stick swims, right stick looks and click-plus-up-or-down zooms, RT heavy attack, LB dashes, LT aims, RB rises, X bites, Y hides, B guards, A sprints, D-pad up senses, D-pad down opens the teleport menu, View holds the scoreboard open, Menu pauses.</title>
       <defs>
         <linearGradient id="pad-shell" x2="0" y2="1"><stop stopColor="#2f4d58" /><stop offset="1" stopColor="#13262f" /></linearGradient>
       </defs>
@@ -24,6 +24,7 @@ export function XboxDiagram() {
       <path d="M362 236 h16 v-16 h16 v16 h16 v16 h-16 v16 h-16 v-16 h-16z" fill="#0d1c22" stroke="#7ea4ae" strokeWidth="3" />
       <circle cx="430" cy="178" r="9" fill="#7ea4ae" />
       <circle cx="430" cy="215" r="14" fill="#17313a" stroke="#7ea4ae" strokeWidth="3" />
+      <circle cx="430" cy="178" r="9" fill="#7ea4ae" />
       {line(340, 62, 200, 40)}{label(194, 44, 'LT · Aim (hold) · crosshair', 'end')}
       {line(340, 92, 200, 90)}{label(194, 94, 'LB · Dash (with stick)', 'end')}
       {label(194, 114, 'neutral hold · dash on move', 'end')}
@@ -42,6 +43,7 @@ export function XboxDiagram() {
       {line(510, 236, 660, 290)}{label(666, 294, 'Right stick · Camera')}
       {label(666, 314, 'click + up/down · Zoom')}
       {line(430, 215, 430, 372)}{label(430, 390, 'Menu · Pause / start', 'middle')}
+      {line(430, 178, 194, 330)}{label(194, 334, 'View · Scoreboard (hold)', 'end')}
     </svg>
   );
 }

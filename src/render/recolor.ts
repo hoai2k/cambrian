@@ -4,8 +4,7 @@ import { scheme, slotFor, SLOTS, type Slot } from '../shared/palettes';
 /**
  * Runtime recolouring for creatures, with no new art.
  *
- * Every creature GLB has a white baseColorFactor and keeps all of its colour in COLOR_0 vertex
- * colours, so the only thing standing between a model and a new palette is a shader hook. For
+ * The original roster uses vertex pigment; newer specimens also use UV albedo maps. For
  * each material we take the vertex colour the model would have drawn, reduce it to a luminance,
  * and rebuild it as `slot colour × (luminance / the material's mean luminance)`. Mottling,
  * gradients and baked shading all survive because they live in that ratio; only the hue is
@@ -48,6 +47,64 @@ function meanLuminance(attr: THREE.BufferAttribute | THREE.InterleavedBufferAttr
   const mean = attr.count > 0 ? sum / attr.count : 1;
   lumCache.set(attr, mean);
   return mean;
+}
+
+/** Texture pixels are shared by cloned materials and decoded once, never on a palette change. */
+const pigmentPixels = new WeakMap<THREE.Texture, { data: Float32Array; width: number; height: number }>();
+function texturePigment(map: THREE.Texture) {
+  const cached = pigmentPixels.get(map);
+  if (cached) return cached;
+  const source = map.image as (CanvasImageSource & { width: number; height: number; data?: Uint8Array | Uint8ClampedArray }) | undefined;
+  if (!source?.width || !source?.height) return undefined;
+  let bytes: Uint8ClampedArray | Uint8Array;
+  let width = source.width, height = source.height;
+  if (source.data instanceof Uint8Array || source.data instanceof Uint8ClampedArray) {
+    bytes = source.data;
+  } else {
+    const canvas = document.createElement('canvas');
+    // A small cached image retains regional pigment while keeping model setup inexpensive.
+    const scale = Math.min(1, 256 / Math.max(width, height));
+    width = canvas.width = Math.max(1, Math.round(width * scale));
+    height = canvas.height = Math.max(1, Math.round(height * scale));
+    const context = canvas.getContext('2d', { willReadFrequently: true });
+    if (!context) return undefined;
+    context.drawImage(source, 0, 0, width, height);
+    bytes = context.getImageData(0, 0, width, height).data;
+  }
+  const data = new Float32Array(width * height * 3);
+  const linear = (v: number) => map.colorSpace === THREE.SRGBColorSpace
+    ? (v <= 0.04045 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4)) : v;
+  for (let i = 0; i < width * height; i++) {
+    for (let c = 0; c < 3; c++) data[i * 3 + c] = linear(bytes[i * 4 + c] / 255);
+  }
+  const result = { data, width, height };
+  pigmentPixels.set(map, result);
+  return result;
+}
+
+/** Match the pigment reaching color_fragment: UV albedo × vertex colour × material factor. */
+export function texturedMeanLuminance(geometry: THREE.BufferGeometry, material: THREE.MeshStandardMaterial) {
+  const colors = geometry.getAttribute('color');
+  const map = material.map;
+  const uv = geometry.getAttribute(map?.channel ? `uv${map.channel}` : 'uv');
+  const pixels = map && texturePigment(map);
+  if (!colors || !map || !uv || !pixels) return colors ? meanLuminance(colors) : 1;
+  map.updateMatrix();
+  const point = new THREE.Vector2();
+  const count = Math.min(colors.count, 4096);
+  let sum = 0;
+  for (let sample = 0; sample < count; sample++) {
+    const i = Math.floor(sample * colors.count / count);
+    point.set(uv.getX(i), uv.getY(i));
+    map.transformUv(point);
+    const x = Math.max(0, Math.min(pixels.width - 1, Math.floor(point.x * pixels.width)));
+    const y = Math.max(0, Math.min(pixels.height - 1, Math.floor(point.y * pixels.height)));
+    const p = (y * pixels.width + x) * 3;
+    sum += .2126 * pixels.data[p] * colors.getX(i) * material.color.r
+      + .7152 * pixels.data[p + 1] * colors.getY(i) * material.color.g
+      + .0722 * pixels.data[p + 2] * colors.getZ(i) * material.color.b;
+  }
+  return count ? sum / count : 1;
 }
 
 /**
@@ -93,10 +150,10 @@ export function makeRecolor(root: THREE.Object3D): Recolor {
     if (!(o instanceof THREE.Mesh)) return;
     const colorAttr = o.geometry.getAttribute('color');
     if (!colorAttr) return;
-    const lumRef = meanLuminance(colorAttr);
     const mats = Array.isArray(o.material) ? o.material : [o.material];
     for (const m of mats) {
       if (!(m instanceof THREE.MeshStandardMaterial)) continue;
+      const lumRef = m.map ? texturedMeanLuminance(o.geometry, m) : meanLuminance(colorAttr);
       const slot = slotFor(m.name);
       const target: Target = { slot, tint: { value: new THREE.Color(1, 1, 1) }, amount: { value: 0 } };
       targets.push(target);
