@@ -351,7 +351,10 @@ nobody moves between bands by growing.
 
 ## Implementation notes
 
-**Status (Sept 2026): implemented and playable at `/devonian/`.** The content pack is
+**Status (Sept 2026): implemented and playable at `/devonian/`.** Sizes and speeds are now
+derived from the real animals ([research](../research/devonian-swimming.md), `npm run
+devonian:stats`) rather than the balance lengths proposed below; the rung bands still fall out of
+them, with Rhinodipterus in rung II by size. The content pack is
 `src/content/devonian/`, the rules are `src/sim/devonian/rules.ts` behind the hooks in
 `src/sim/era-rules.ts`, the HUD carries the standing ring (rung numeral), air bar, range chip,
 dead-zone radar rings and the Dominant countdown, and `tools/devonian-test.ts` (`npm run

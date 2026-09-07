@@ -90,7 +90,14 @@ for file in sorted(DIRECTORY.glob('*.geometry.json')):
   selected=m['name'] in selector['eyeMeshes'] if 'eyeMeshes' in selector else m['material'].split()[-1]==selector.get('eyeMaterialSuffix','eyes')
   if selected:eye_comps.extend(components(m))
  if not eye_comps:raise RuntimeError(f'{id}: no eye globes selected; review selectors')
- if 'headMesh' in selector or id in HEAD_NAMES:body_mesh=next(m for m in data['meshes']if m['name']==selector.get('headMesh',HEAD_NAMES.get(id)))
+ if 'headMesh' in selector or id in HEAD_NAMES:
+  # glTF splits one anatomical object into material primitives. Reassemble them
+  # before welding/testing closure (e.g. the inner face of a cranial arch).
+  name=selector.get('headMesh',HEAD_NAMES.get(id));parts=[m for m in data['meshes']if m['name']==name]
+  if not parts:raise RuntimeError(f'{id}: head mesh {name} missing')
+  body_mesh={'name':name,'material':' + '.join(m['material'] for m in parts),'positions':[],'indices':[]}
+  for part in parts:
+   offset=len(body_mesh['positions']);body_mesh['positions'].extend(part['positions']);body_mesh['indices'].extend(i+offset for i in part['indices'])
  else:body_mesh=next(m for m in data['meshes']if m['material'].split()[-1]==selector.get('headMaterialSuffix','body'))
  head=components(body_mesh)[selector.get('headComponent',0)];hp,hf,topology=close_envelope(head)
  if not topology['valid']:raise RuntimeError(f'{id}: invalid head topology {topology}')

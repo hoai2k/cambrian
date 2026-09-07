@@ -50,6 +50,11 @@ export interface EraDefinition {
      * world places; absent, the Cambrian's table in `src/sim/world.ts` is used.
      */
     readonly flora?: Record<Biome, Partial<Record<FloraKind, number>>>;
+    /**
+     * Height of the water surface in world units (the seabed sits around 0 on the shelf). Absent,
+     * the Cambrian's 40. A pelagic roster wants more water over the floor than a benthic one.
+     */
+    readonly surfaceY?: number;
     readonly biomeNames: Record<Biome, string>;
     readonly biomeDanger: Record<Biome, number>;
   };

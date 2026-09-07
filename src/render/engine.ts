@@ -14,6 +14,7 @@ import { AssetQueue, type AssetProgress } from './assets';
 import { CreatureView, ensureLoaded, loadedSync, type Lod } from './creature';
 import { Attachments } from './attachments';
 import { Bubbles, Impacts, Silt } from './fx';
+import { Mouthfuls } from './carcass';
 import { createSea, type Quality, type SeaEnvironment } from './sea';
 import { RULES, type EraHud } from '../sim/era-rules';
 
@@ -38,7 +39,7 @@ export interface PlayerHud {
   /** The era's own meters (Devonian standing, air, range), when the era defines them. */
   era?: EraHud;
 }
-export interface RadarBlipHud { x: number; y: number; kind: 'player' | 'threat' | 'giant' | 'home' | 'shore' | 'deadzone'; color: string; beyond: boolean; hunting: boolean; distance: number; /** Radius in radar units, for area contacts. */ r?: number; }
+export interface RadarBlipHud { x: number; y: number; kind: 'player' | 'threat' | 'giant' | 'home' | 'shore' | 'deadzone' | 'food'; color: string; beyond: boolean; hunting: boolean; distance: number; /** Radius in radar units, for area contacts. */ r?: number; }
 export interface HudSnapshot {
   players: PlayerHud[]; rects: Rect[]; time: number; status: 'playing' | 'won' | 'lost'; message: string; mode: Mode; winner: number; fps: number;
 }
@@ -97,6 +98,7 @@ export class Engine {
   private listeners: { pos: THREE.Vector3; right: THREE.Vector3; ref: number }[] = [];
   private attractCam = new THREE.PerspectiveCamera(55, 1, 0.1, 400);
   private bubbles = new Bubbles();
+  private mouthfuls = new Mouthfuls();
   private sparkles = new Bubbles(400, [1.0, 0.86, 0.5], 0.25);
   private impacts = new Impacts();
   private silt = new Silt();
@@ -129,6 +131,8 @@ export class Engine {
     this.renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: 'high-performance' });
     this.renderer.setPixelRatio(Math.min(devicePixelRatio, quality === 'high' ? 1.5 : 1));
     this.renderer.outputColorSpace = THREE.SRGBColorSpace;
+    // Carcasses are eaten away with per-material clipping planes (see carcass.ts).
+    this.renderer.localClippingEnabled = true;
     this.renderer.toneMapping = THREE.ACESFilmicToneMapping;
     this.renderer.toneMappingExposure = 1.25;
     this.renderer.shadowMap.enabled = quality === 'high';
@@ -136,7 +140,7 @@ export class Engine {
     // Split-screen renders the scene once per player; without this the shadow map is rebuilt every time.
     this.renderer.shadowMap.autoUpdate = false;
     container.appendChild(this.renderer.domElement);
-    this.scene.add(this.bubbles.points, this.sparkles.points, this.impacts.group, this.silt.group);
+    this.scene.add(this.bubbles.points, this.sparkles.points, this.impacts.group, this.silt.group, this.mouthfuls.group);
     (window as any).__cambrian = this;
     this.resize = new ResizeObserver(() => this.onResize());
     this.resize.observe(container);
@@ -329,7 +333,7 @@ export class Engine {
 
     // Views
     this.syncViews(game, camPositions, dt);
-    this.bubbles.update(dt); this.sparkles.update(dt);
+    this.bubbles.update(dt); this.sparkles.update(dt); this.mouthfuls.update(dt);
     this.impacts.update(dt, focus);
     this.silt.sync(game.silt, this.time);
 
@@ -350,7 +354,7 @@ export class Engine {
       r.setScissorTest(true);
       this.cams.forEach((cs, i) => {
         const rc = rects[i];
-        const density = this.sea?.setViewLength(lengthOf(game.players[i]), cs.camera.position.x, cs.camera.position.z) ?? 0.0105;
+        const density = this.sea?.setViewLength(lengthOf(game.players[i]), cs.camera.position.x, cs.camera.position.z, cs.camera.position.y) ?? 0.0105;
         // Everything past ~98% fog is invisible: pulling the far plane in there lets the frustum
         // drop those scenery chunks entirely instead of rendering them into the murk.
         cs.camera.far = clamp(2.1 / density, 110, 300);
@@ -425,13 +429,16 @@ export class Engine {
       if (o.id === p.id || !isAlive(o) || isHidden(o)) continue;
       const band = bandOf(p, o);
       if (band === 'giant' || band === 'threat') continue;
-      if (this.game.mode === 'rise' && o.controller === 'player') continue;
+      // Another player can be aimed at, but never handed to you: the entry snap ignores them and
+      // the crosshair has to be genuinely on one for it to take.
+      const rival = o.controller === 'player';
+      if (rival && !wasAiming) continue;
       const to = this.tmpDesired.set(o.pos.x - cs.camera.position.x, o.pos.y - cs.camera.position.y, o.pos.z - cs.camera.position.z);
       const d = to.length(); if (d < 0.01) continue;
       to.divideScalar(d);
       // angular distance from the crosshair, widened slightly for close/large targets
       const ang = Math.acos(clamp(fwd.dot(to), -1, 1)) - Math.min(0.08, lengthOf(o) * 0.5 / d);
-      const bandW = band === 'prey' ? 0.85 : band === 'snack' ? 1 : 1.25;
+      const bandW = rival ? 2.4 : band === 'prey' ? 0.85 : band === 'snack' ? 1 : 1.25;
       if (ang * bandW < bestAng) { bestAng = ang * bandW; best = o; }
     }
     const cone = cs.aimSnapT > 0 || !wasAiming ? 0.6 : 0.2;   // wide on entry (snap), tight afterwards
@@ -507,9 +514,9 @@ export class Engine {
       lookAt.y + Math.sin(pitch) * dist + L * 0.18,
       lookAt.z - Math.cos(yaw) * Math.cos(pitch) * dist,
     );
-    // keep camera out of the ground and boulders, below the surface
+    // keep camera out of the ground and boulders, and below the surface unless the player has left the water
     const g = groundHeight(this.game!.world, desired.x, desired.z, this.scratchBoulders);
-    desired.y = clamp(desired.y, g + 0.7, SURFACE_Y - 0.4);
+    desired.y = clamp(desired.y, g + 0.7, p.airborne ? SURFACE_Y + 40 : SURFACE_Y - 0.4);
     const pos = { x: desired.x, y: desired.y, z: desired.z };
     resolveStatic(this.game!.world, pos, 0.7, this.scratchBoulders);
     desired.set(pos.x, pos.y, pos.z);
@@ -565,9 +572,36 @@ export class Engine {
       const continuous = a.state === 'eating' || a.holdT > 0;
       const animate = continuous || !far || ((a.id + Math.floor(this.time * 60)) % 3 === 0);
       v.update(a, animate && far && !continuous ? dt * 3 : dt, this.time, animate, this.alpha);
+      // A carcass shows what has been taken out of it, and gets whole again when its owner
+      // respawns into the same view.
+      if (a.state === 'dead' && a.eatBites > 1 && a.eaten > 0) v.carcass.setEaten(a.eaten);
+      else if (a.state !== 'dead' && a.eaten <= 0) v.restoreCarcass();
     }
     this.attachments.sync(game, this.views, dt);
     for (const [id, v] of this.views) if (!keep.has(id)) { v.dispose(); this.views.delete(id); }
+  }
+
+  /**
+   * A mouthful comes off the carcass: the eaten share stops being drawn on the body, and the
+   * slice that just left it is baked out of the pose and flown into the eater's mouth.
+   */
+  private tearOff(corpse: Actor, eaterId: number | undefined, share: number) {
+    const view = this.views.get(corpse.id); if (!view) return;
+    const eater = eaterId != null ? this.views.get(eaterId) : undefined;
+    // Which end goes first is decided by where the mouth was for the opening bite.
+    if (eater?.anchors.world('anchor_mouth', this.tmpV)) view.carcass.faceEater(this.tmpV);
+    const to = corpse.eaten, from = Math.max(0, to - share);
+    const chunk = view.carcass.sliceChunk(from, to);
+    view.carcass.setEaten(to);
+    if (!chunk) return;
+    const mouth = new THREE.Vector3();
+    const id = eaterId;
+    this.mouthfuls.add(chunk, () => {
+      const ev = id != null ? this.views.get(id) : undefined;
+      if (ev?.anchors.world('anchor_mouth', mouth)) return mouth;
+      const a = id != null ? this.game?.byId(id) : undefined;
+      return a ? mouth.set(a.pos.x, a.pos.y, a.pos.z) : undefined;
+    });
   }
 
   /** Impact effects land where the attacker's nearest attack socket is, not at the victim's centre, when the rig has one. */
@@ -691,7 +725,13 @@ export class Engine {
         }
         case 'kill': { this.bubbles.emit(e.pos, 30, 1.2, 4, 0.1, 1.8); this.impacts.spawn(e.pos, '#ff8a6a', 1.5 + (e.strength ?? 1), 0.5); world('kill', e.pos); if (playerActor) this.shake(e.player!, 0.7); break; }
         case 'death': { if (e.player != null && e.player >= 0) audio.play('death'); else world('death', e.pos, 1, 0.7); if (e.player != null && e.player >= 0) { const d = padOf(e.player); if (typeof d === 'number') rumble(d, 1, 1, 400); this.shake(e.player, 1.4); } break; }
-        case 'eat': { this.bubbles.emit(e.pos, 5, 0.3, 1.2, 0.05, 0.8); world('eat', e.pos, e.strength ?? 0.5); break; }
+        case 'eat': {
+          this.bubbles.emit(e.pos, 5, 0.3, 1.2, 0.05, 0.8); world('eat', e.pos, e.strength ?? 0.5);
+          // A body eaten in bites loses that share of itself, and the mouthful flies to the mouth.
+          const corpse = e.other != null ? game.byId(e.other) : undefined;
+          if (corpse && corpse.eatBites > 1 && e.strength) this.tearOff(corpse, e.actor, e.strength);
+          break;
+        }
         case 'tierUp': { this.bubbles.emit(e.pos, 90, 2.5, 5, 0.14, 2.2); this.impacts.spawn(e.pos, '#fff0b0', 4 + (e.strength ?? 1) * 2, 0.9); if (e.player != null && e.player >= 0) audio.play('tierUp'); else world('tierUp', e.pos, 1, 0.6); if (e.player != null && e.player >= 0) { const d = padOf(e.player); if (typeof d === 'number') rumble(d, 0.8, 0.8, 600); this.shake(e.player, 0.8); } break; }
         case 'parry': { const at = this.impactPos(e.other, e.actor, e.pos); this.impacts.spawn(at, '#9ff6ff', 2, 0.4); this.bubbles.emit(at, 20, 0.6, 5, 0.08); world(RULES && e.strength != null && e.strength < 1 ? (e.strength < 0.5 ? 'armour' : 'armourPierce') : 'parry', at); if (e.player != null && e.player >= 0) { const d = padOf(e.player); if (typeof d === 'number') rumble(d, 0.9, 0.2, 90); } break; }
         case 'guardBreak': { const at = this.impactPos(e.other, e.actor, e.pos); this.impacts.spawn(at, '#ff6a5a', 1.8, 0.4); world('guardBreak', at); break; }
@@ -714,6 +754,23 @@ export class Engine {
         case 'moult': { if (e.player != null && e.player >= 0) audio.play(e.strength === 1 && RULES ? 'moult' : 'respawn'); else world('respawn', e.pos, 1, 0.5); break; }
         // Era events (Devonian). Their samples are registered by the era's entry page; an
         // unregistered kind is silent, so the Cambrian build never reaches for a missing file.
+        case 'breach': {
+          // a sheet of water thrown up as the body leaves the sea
+          this.sparkles.emit(e.pos, Math.round(40 * (e.strength ?? 1)), 1.6, 2.2, 0.09, 2.4);
+          this.bubbles.emit(e.pos, 30, 1.2, 4, 0.1, 1.6);
+          this.impacts.spawn(e.pos, '#e8f6ff', 2.5 * (e.strength ?? 1), 0.5);
+          world('breach', e.pos, e.strength ?? 1);
+          break;
+        }
+        case 'splash': {
+          const s = e.strength ?? 1;
+          this.sparkles.emit(e.pos, Math.round(70 * s), 2.2, 2.6, 0.1, 2.6);
+          this.bubbles.emit(e.pos, Math.round(60 * s), 1.4, 6, 0.12, 2.2);
+          this.impacts.spawn(e.pos, '#ffffff', 3.5 * s, 0.6);
+          world('splash', e.pos, s);
+          if (e.player != null && e.player >= 0) { const d = padOf(e.player); if (typeof d === 'number') rumble(d, Math.min(1, 0.5 * s), 0.6, 220); this.shake(e.player, 0.6 * s); }
+          break;
+        }
         case 'gulp': { this.bubbles.emit(e.pos, 24, 1.0, 3, 0.09, 1.4); personal('gulp'); break; }
         case 'anoxia': { personal('anoxia', 0.8); break; }
         case 'beach': { if (e.strength) { this.bubbles.emit(e.pos, 12, 0.5, 2, 0.06, 1); personal('beach', 0.9); } break; }
@@ -779,8 +836,9 @@ export class Engine {
           const l = Math.hypot(x, y);
           const beyond = l > 1;
           if (beyond) { x /= l; y /= l; }
-          const color = b.kind === 'player' ? PLAYER_COLORS[b.id % 4] : b.kind === 'giant' ? BAND_COLOR.giant : b.kind === 'threat' ? BAND_COLOR.threat : b.kind === 'home' ? '#9be9ff' : '#d9cfa4';
-          blips.push({ x, y, kind: b.kind, color, beyond, hunting: b.hunting, distance: b.distance });
+          const color = b.kind === 'player' ? PLAYER_COLORS[b.id % 4] : b.kind === 'giant' ? BAND_COLOR.giant : b.kind === 'threat' ? BAND_COLOR.threat
+            : b.kind === 'food' ? BAND_COLOR.snack : b.kind === 'home' ? '#9be9ff' : '#d9cfa4';
+          blips.push({ x, y, kind: b.kind, color, beyond, hunting: b.hunting, distance: b.distance, r: b.radius != null ? b.radius / radarRange : undefined });
         }
         // Dead zones are areas, not contacts: drawn as rings, clamped to the rim like anything else.
         if (era) for (const z of era.deadZones) {
@@ -836,6 +894,7 @@ export class Engine {
     this.sea?.dispose();
     this.bubbles.dispose(); this.sparkles.dispose(); this.impacts.dispose(); this.silt.dispose();
     this.shieldGeo.dispose();
+    this.mouthfuls.dispose();
     this.renderer.dispose();
     this.renderer.forceContextLoss();
     this.renderer.domElement.remove();

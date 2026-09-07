@@ -88,9 +88,12 @@ export const DEVONIAN_MANIFEST = [
   ['shell-hover', 'LOUD close-miked sound effect: water pushed steadily out of a tube underwater with a strong bubbling gurgle, big rising bubbles popping at the surface, full volume, present, clear midrange, no music', 1.2, 1],
   ['floor-sweep', 'a flat fish sweeps its mouth through soft sediment underwater: a slow gritty scraping shuffle with a muffled sifting of sand and small bubbles, close, no music', 1.4, 1],
   ['filter-gulp', 'a huge slow mouth opens wide and strains the water underwater: a deep slow rush of water drawn in, a long soft gurgle and a swirl of bubbles, big, close, no music', 1.6, 1],
+  // leaving and re-entering the water
+  ['breach', 'a large fish bursts up out of the sea into the air: a heavy sheet of water thrown up and tearing away, a rushing surge, spray hissing and falling back, close, big, no music', 1.2, 1],
+  ['splash', 'a large fish crashes back into the sea from a jump: a deep heavy slap of water, a big splash with a hollow whump and a cloud of bubbles rushing under, close, big, no music', 1.3, 2],
   ['ambient-open-sea', 'underwater recording in cold open water far from shore: a steady current washing close past the hydrophone, slow rolling surges of water, streams of fine bubbles drifting by, very distant low fish grunts and faint far-off clicks, close and present, continuous, no music, seamless loop', 22, 1, true],
 ];
-const DEVONIAN_LOW_INFLUENCE = new Set(['jaw-shear', 'run-through', 'tusk-lunge', 'crush-bite', 'neck-snap', 'chelicerae-grab', 'trident-shove', 'shield-push', 'armour-flank', 'shoal-dart', 'limb-haul', 'floor-sweep', 'filter-gulp', 'armour-clang', 'armour-pierce', 'air-gulp', 'air-low', 'jet', 'withdraw', 'moult-crack', 'shoal-join', 'beach', 'shell-crush']);
+const DEVONIAN_LOW_INFLUENCE = new Set(['breach', 'splash', 'jaw-shear', 'run-through', 'tusk-lunge', 'crush-bite', 'neck-snap', 'chelicerae-grab', 'trident-shove', 'shield-push', 'armour-flank', 'shoal-dart', 'limb-haul', 'floor-sweep', 'filter-gulp', 'armour-clang', 'armour-pierce', 'air-gulp', 'air-low', 'jet', 'withdraw', 'moult-crack', 'shoal-join', 'beach', 'shell-crush']);
 const manifest = SET === 'devonian' ? DEVONIAN_MANIFEST : MANIFEST;
 const lowInfluence = SET === 'devonian' ? DEVONIAN_LOW_INFLUENCE : LOW_INFLUENCE;
 

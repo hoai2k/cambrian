@@ -95,11 +95,15 @@ export interface Actor {
   grabbedBy: number; grabbing: number; grabT: number;
   eatingTarget: number; eatProgress: number;
   corpseT: number;         // seconds since death for corpses
-  eaten: number;           // 0..1 fraction of corpse consumed
+  eaten: number;           // 0..1 fraction of corpse consumed, in whole bites once it is being torn
+  /** Bites this body is taking to finish, set by whoever is eating it; 1 means swallowed whole. */
+  eatBites: number;
   killer: number;
   noise: number; cover: number; stillness: number;
   dodgeDir: Vec3; dodgeTapT: number;
   hopVel: number; grounded: boolean;
+  /** Out of the water: a leap in flight, gravity only, until the splash. */
+  airborne: boolean;
   prev: { light: boolean; heavy: boolean; ability: boolean; dodge: boolean; guard: boolean; lock: boolean; sense: boolean; rise: boolean; burst: boolean; dash: boolean; aim: boolean };
   brain?: BrainState;
   respawnT: number; hatching: boolean;
@@ -138,6 +142,6 @@ export const MODE_IDS: readonly Mode[] = ['rise', 'frenzy', 'hunted', 'reef', 'd
 export interface Prompt { text: string; t: number; }
 
 export interface WorldEvent {
-  kind: 'hit' | 'kill' | 'eat' | 'tierUp' | 'parry' | 'guardBreak' | 'burst' | 'escape' | 'noticed' | 'hunted' | 'dodge' | 'ability' | 'grab' | 'moult' | 'death' | 'silt' | 'stagger' | 'sense' | 'pounce' | 'swallow' | 'routed' | 'disintegrate' | 'teleport' | 'rangeClaim' | 'rangeLost' | 'gulp' | 'anoxia' | 'beach' | 'shoalJoin' | 'dominant' | 'shellCrush';
+  kind: 'hit' | 'kill' | 'eat' | 'tierUp' | 'parry' | 'guardBreak' | 'burst' | 'escape' | 'noticed' | 'hunted' | 'dodge' | 'ability' | 'grab' | 'moult' | 'death' | 'silt' | 'stagger' | 'sense' | 'pounce' | 'swallow' | 'routed' | 'disintegrate' | 'teleport' | 'rangeClaim' | 'rangeLost' | 'gulp' | 'anoxia' | 'beach' | 'shoalJoin' | 'dominant' | 'shellCrush' | 'breach' | 'splash';
   pos: Vec3; actor: number; other?: number; strength?: number; player?: number;
 }
