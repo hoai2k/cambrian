@@ -4,13 +4,17 @@
  */
 import { Game, radarRange } from '../src/sim/game';
 import { emptyInput, type InputFrame } from '../src/sim/types';
-import { bodyRadius, clearanceOf, climbOver, floorClearance, lengthOf } from '../src/sim/actors';
-import { boulderQ, boulderTop, groundHeight, resolveStatic, sampleHeight, type Boulder, type WorldData } from '../src/sim/world';
+import { applyScaleStats, bodyRadius, clearanceOf, climbHeight, climbRise, floorClearance, glideOver, lengthOf } from '../src/sim/actors';
+import { boulderQ, boulderTop, groundHeight, resolveStatic, sampleHeight, type Boulder, type StaticContact, type WorldData } from '../src/sim/world';
+import { floraSize } from '../src/sim/flora';
 import { PITCH_DOWN, PITCH_UP } from '../src/render/engine';
 
 let failed = 0;
 const check = (n: string, ok: boolean, d: string) => { console.log(`${ok ? 'PASS' : 'FAIL'}  ${n.padEnd(58)} ${d}`); if (!ok) failed++; };
 const run = (g: Game, f: InputFrame, steps: number) => { const m = new Map([[0, f]]); for (let i = 0; i < steps; i++) { g.step(1 / 60, m); g.events.length = 0; } };
+let jumped = 0;
+/** The climb only ever offers a height to rise to; nothing here may move a body in one go. */
+const check_no_jump = (gap: number) => { if (gap > 12) jumped++; };
 /** A world holding exactly the rocks given, for testing collision on its own. */
 const rockWorld = (boulders: Boulder[]) => ({
   boulderHash: { query: (_x: number, _z: number, _r: number, out: Boulder[]) => { out.length = 0; for (const b of boulders) out.push(b); return out; } },
@@ -73,35 +77,64 @@ const rockWorld = (boulders: Boulder[]) => ({
 {
   const rock: Boulder = { pos: { x: 0, y: 0, z: 0 }, radius: 3 * 1.02, height: 2.6, sx: 3, sy: 2.2, sz: 3, rot: 0, shade: .7 };
   const world = rockWorld([rock]);
-  const body = { radius: 0.86, climb: 2.4 };                 // an adult Anomalocaris
+  const body = { radius: 0.86, glide: 2.45, climb: 7.8 };    // an adult Anomalocaris
   // Walk a body straight across the rock at the height it would be riding at, resolving each step.
   let blocked = 0, worstLift = 0, y = -0.6, x = -6;
   const stepsAcross = 240;
   for (let i = 0; i < stepsAcross; i++) {
     const p = { x, y, z: 0 };
-    const before = p.x;
-    if (resolveStatic(world, p, body.radius, [], 0, body.climb)) blocked++;
+    if (resolveStatic(world, p, body.radius, [], 0, body.glide, body.climb)) blocked++;
     x = p.x + 0.05;                                           // 3 units/s at 60 Hz
     const floor = Math.max(-1000, boulderTop(rock, p.x, 0) ?? -1000);
     const lift = Math.max(0, floor - y);
     worstLift = Math.max(worstLift, lift);
     if (lift > 0) y = floor;                                  // the floor clamp carries it up
-    void before;
   }
   check('a swimmer crosses a boulder instead of stopping at it', x > 5, `ended at x=${x.toFixed(1)} after ${stepsAcross} steps`);
   check('...and is never pushed back by it', blocked === 0, `${blocked} wall contacts`);
-  check('...riding up in steps small enough to read as a swim', worstLift < body.climb, `worst single lift ${worstLift.toFixed(2)} (budget ${body.climb})`);
-  // A rock that genuinely towers over you is still a wall.
-  const tower: Boulder = { pos: { x: 0, y: 0, z: 0 }, radius: 3, height: 14, sx: 3, sy: 12, sz: 3, rot: 0, shade: .7 };
-  const p = { x: -2.5, y: -6, z: 0 };
-  check('a rock standing far above you still stops you', resolveStatic(rockWorld([tower]), p, body.radius, [], 0, body.climb), `pushed to x=${p.x.toFixed(2)}`);
+  check('...riding up in steps small enough to read as a swim', worstLift < body.glide, `worst single lift ${worstLift.toFixed(2)} (budget ${body.glide})`);
+}
+
+// --- a face too steep to glide up is climbed, if the top is within two bodies ---
+{
+  const out: StaticContact = { hit: false, climbTo: -Infinity };
+  const body = { radius: 0.86, glide: 2.45, climb: 7.8, rise: 2.6 };
+  // A narrow steep rock, shaped the way the world builds one (`y` a quarter up its own height,
+  // top at `y + sy * 1.05`): its flanks are far too steep to be glided up.
+  const wall = (tall: number): Boulder => {
+    const sy = tall / 1.3, y = sy * 0.25;
+    return { pos: { x: 0, y, z: 0 }, radius: 1.6 * 1.02, height: y + sy * 1.05, sx: 1.6, sy, sz: 1.6, rot: 0, shade: .7 };
+  };
+  const surmountable = wall(7), cliff = wall(20);   // 7 is just inside two bodies of an adult Anomalocaris
+  const push = (b: Boulder, y: number) => { const p = { x: 1.2, y, z: 0 }; const hit = resolveStatic(rockWorld([b]), p, body.radius, [], 0, body.glide, body.climb, out); return { hit, moved: p.x - 1.2 }; };
+  const a = push(surmountable, 0);
+  check('a steep rock within two bodies still blocks the way through', a.hit && a.moved > 0, `pushed out ${a.moved.toFixed(2)}`);
+  check('...and offers the height to get over it', out.climbTo > surmountable.height, `climb to ${out.climbTo.toFixed(2)} for a top at ${surmountable.height.toFixed(2)}`);
+  const b = push(cliff, 0);
+  check('a true wall blocks and offers nothing', b.hit && out.climbTo === -Infinity, `top ${cliff.height.toFixed(1)} is over the ${body.climb} budget`);
+  // Climbing it: hold the body against the face and lift it at its swim-up rate. Partway up, the
+  // flank has fallen away enough to be glided, and the floor takes over and carries it across —
+  // the two behaviours are one movement, and at no point is the body moved more than a swim.
+  let y = 0, steps = 0;
+  for (; steps < 60 * 10; steps++) {
+    const p = { x: 1.2, y, z: 0 };
+    const blocked = resolveStatic(rockWorld([surmountable]), p, body.radius, [], 0, body.glide, body.climb, out);
+    if (!blocked) break;
+    check_no_jump(out.climbTo - y);
+    y = Math.min(out.climbTo, y + body.rise / 60);
+  }
+  check('...and the way up is a steady swim that hands over to the glide', steps > 10 && steps < 60 * 5 && y > 0.5,
+    `${(steps / 60).toFixed(1)}s and ${y.toFixed(1)} units up the face before it could be glided`);
+  const over = { x: 1.2, y: surmountable.height + 0.6, z: 0 };
+  check('...and above the top the rock is simply not there', !resolveStatic(rockWorld([surmountable]), over, body.radius, [], 0, body.glide, body.climb, out), 'clear of the top');
 }
 
 // --- and in the real sea, a rock is something the sim can carry you over ---
 {
   const g = new Game('reef', [{ creature: 'anomalocaris', device: 'keyboard', ready: true }], 21);
   const p = g.players[0]; p.spawnProtect = 0;
-  check('a swimmer has a climb budget, a crawler has none', climbOver(p) > 1 && climbOver(g.spawn('olenoides', 'ambient', { ...p.pos }, 1)) === 0, `${climbOver(p).toFixed(2)} units`);
+  check('every body glides over what is gentle and climbs what is twice its size', glideOver(p) > 1 && Math.abs(climbHeight(p) - lengthOf(p) * 2) < 1e-9 && climbRise(p) > 1,
+    `glide ${glideOver(p).toFixed(2)} · climb to ${climbHeight(p).toFixed(1)} above · at ${climbRise(p).toFixed(1)} u/s`);
   let worst = 0;
   const m = new Map([[0, { ...emptyInput(), my: 1, sink: true, burst: 1, camYaw: Math.PI }]]);
   for (let i = 0; i < 60 * 40; i++) {
@@ -113,6 +146,85 @@ const rockWorld = (boulders: Boulder[]) => ({
   const gap = p.pos.y - groundHeight(g.world, p.pos.x, p.pos.z, []);
   check('...and it is still hugging the floor at the end of it', gap < clearanceOf(p) + 0.5, `${gap.toFixed(2)} above the ground`);
   void bodyRadius(p); void sampleHeight(0, 0);
+}
+
+// --- in the running sim, a steep rock is climbed and crossed rather than leaned on ---
+{
+  /** Swim straight at a sheer block of `tall` units and report how high the body got over it. */
+  const intoAWall = (tall: number) => {
+    const g = new Game('reef', [{ creature: 'anomalocaris', device: 'keyboard', ready: true }], 21);
+    const p = g.players[0]; p.spawnProtect = 0;
+    const ground = sampleHeight(p.pos.x, p.pos.z);
+    // A steep-sided block, built the way the world builds a rock so its top and its dome agree.
+    const sy = tall / 1.3, y = ground + sy * 0.25;
+    g.world.boulders.push({ pos: { x: p.pos.x, y, z: p.pos.z - 9 }, radius: 6 * 1.02, height: y + sy * 1.05, sx: 6, sy, sz: 6, rot: 0, shade: .7 });
+    g.world.boulderHash.rebuild(g.world.boulders);
+    p.pos = { x: p.pos.x, y: ground + floorClearance(p), z: p.pos.z };
+    p.yaw = Math.PI;
+    const start = { ...p.pos };
+    let peak = 0;
+    const m = new Map([[0, { ...emptyInput(), my: 1, camYaw: Math.PI }]]);   // camYaw π is -z, where the rock is
+    // Height over the seabed under the body, not over where it started: the floor moves as it goes.
+    for (let i = 0; i < 60 * 8; i++) { g.step(1 / 60, m); g.events.length = 0; peak = Math.max(peak, p.pos.y - sampleHeight(p.pos.x, p.pos.z)); }
+    return { peak, forward: start.z - p.pos.z, tall };
+  };
+  // Two bodies tall (an Anomalocaris is 3.9): over the top and on.
+  const over = intoAWall(7);
+  check('a sheer rock inside two bodies is climbed and crossed', over.peak > over.tall && over.forward > 12,
+    `rose ${over.peak.toFixed(1)} over a ${over.tall}-unit face and carried on ${over.forward.toFixed(0)} units`);
+  // Four times that is a cliff: the body works along the foot of it and never gets up.
+  const wall = intoAWall(28);
+  check('a cliff is still a cliff', wall.peak < 6, `never got above ${wall.peak.toFixed(1)} on a ${wall.tall}-unit face`);
+}
+
+// --- a crawler walks up and over what it is pushed into, whatever it is ---
+{
+  /** Put a rock `tall` units high in front of a crawler and walk into it for `seconds`. */
+  const crawlAt = (tall: number, seconds: number) => {
+    const g = new Game('reef', [{ creature: 'olenoides', device: 'keyboard', ready: true }], 21);
+    const p = g.players[0]; p.spawnProtect = 0;
+    const ground = sampleHeight(p.pos.x, p.pos.z);
+    const sy = tall / 1.3, y = ground + sy * 0.25;
+    g.world.boulders.push({ pos: { x: p.pos.x, y, z: p.pos.z - 6 }, radius: 5 * 1.02, height: y + sy * 1.05, sx: 5, sy, sz: 5, rot: 0, shade: .7 });
+    g.world.boulderHash.rebuild(g.world.boulders);
+    p.pos = { x: p.pos.x, y: ground + floorClearance(p), z: p.pos.z };
+    p.yaw = Math.PI;
+    let peak = 0;
+    const m = new Map([[0, { ...emptyInput(), my: 1, camYaw: Math.PI }]]);
+    for (let i = 0; i < 60 * seconds; i++) { g.step(1 / 60, m); g.events.length = 0; peak = Math.max(peak, p.pos.y - sampleHeight(p.pos.x, p.pos.z)); }
+    return { peak, tall, body: lengthOf(p) };
+  };
+  const low = crawlAt(3, 8);
+  check('a crawler walks up and over a rock in its way', low.peak > low.tall * 0.8, `got ${low.peak.toFixed(1)} up a ${low.tall}-unit rock (body ${low.body.toFixed(1)})`);
+  // A wall many times its own height: legs beat height, as long as it keeps pushing.
+  const wall = crawlAt(14, 16);
+  check('...and gets over a wall too, if it keeps pushing at it', wall.peak > wall.tall * 0.8, `got ${wall.peak.toFixed(1)} up a ${wall.tall}-unit wall`);
+}
+
+// --- a plant is something to go round; you only go over one you drive straight at ---
+{
+  /** Walk a crawler at a stiff plant, `off` units to the side of dead centre. */
+  const atAPlant = (off: number) => {
+    const g = new Game('reef', [{ creature: 'olenoides', device: 'keyboard', ready: true }], 33);
+    const p = g.players[0]; p.spawnProtect = 999; p.scale = 1; applyScaleStats(p, false);
+    const ground = sampleHeight(p.pos.x, p.pos.z);
+    p.pos = { x: p.pos.x, y: ground + floorClearance(p), z: p.pos.z };
+    p.yaw = Math.PI;
+    // A spine sponge big enough to stand up to this body: the plant most worth going round.
+    const at = { x: p.pos.x + off, z: p.pos.z - 5 };
+    const f = { pos: { x: at.x, y: sampleHeight(at.x, at.z), z: at.z }, kind: 'spine' as const, scale: 2.4, sy: 2.4, rot: 0, shade: .8, ...floraSize('spine', 2.4, 2.4), bx: 0, bz: 0, bvx: 0, bvz: 0, active: false };
+    g.world.flora.push(f);
+    g.world.floraHash.rebuild(g.world.flora);
+    g.world.floraReach = Math.max(g.world.floraReach, 8);
+    let peak = 0;
+    const m = new Map([[0, { ...emptyInput(), my: 1, camYaw: Math.PI }]]);
+    for (let i = 0; i < 60 * 8; i++) { g.step(1 / 60, m); g.events.length = 0; peak = Math.max(peak, p.pos.y - sampleHeight(p.pos.x, p.pos.z)); }
+    return { peak, past: f.pos.z - p.pos.z, height: f.H };
+  };
+  const head = atAPlant(0);
+  const edge = atAPlant(1.7);
+  check('driving straight at a plant goes over it', head.peak > 2, `rose ${head.peak.toFixed(1)} against a plant ${head.height.toFixed(1)} tall`);
+  check('...and aiming at its edge goes round it instead', edge.peak < 1 && edge.past > 3, `rose ${edge.peak.toFixed(2)} and carried on ${edge.past.toFixed(0)} units past it`);
 }
 
 // --- the camera can look up for what is hunting you and down for what you are hunting ---
@@ -146,5 +258,6 @@ const rockWorld = (boulders: Boulder[]) => ({
   check('a shoal at your own depth reads as level', level.length === 1 && Math.abs(level[0].dy) < 3, `dy=${level[0]?.dy.toFixed(1)}`);
 }
 
+check('no climb ever asked for a jump', jumped === 0, `${jumped} oversized lifts`);
 console.log(failed ? `FAILED (${failed})` : 'PASS: sprint endurance, floor grazing, rock colliders, ride-over, camera reach, radar height');
 process.exit(failed ? 1 : 0);

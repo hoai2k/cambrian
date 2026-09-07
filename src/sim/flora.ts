@@ -71,14 +71,30 @@ const EPS = 1e-3;
 
 const activate = (world: WorldData, f: Flora) => { if (!f.active) { f.active = true; world.activeFlora.push(f); } };
 
+/** What a body ran into among the plants, for the caller that decides whether to climb. */
+export interface FloraContact {
+  /** A plant resisted this body's way through. */
+  blocked: boolean;
+  /**
+   * ...and it was walked straight into rather than clipped on the way past. A plant is a thin thing
+   * you go around, so only a body aimed at the middle of one is asking to go over it.
+   */
+  headOn: boolean;
+  /** The height to reach to be over the top of it. */
+  top: number;
+}
+/** Within this much of dead-on (about 25°) counts as going at a plant rather than past it. */
+const HEAD_ON = 0.9;
+
 /** Resolve one body against the plants around it. Call after static collision. */
-export function resolveFlora(world: WorldData, a: Actor, dt: number, scratch: Flora[]) {
+export function resolveFlora(world: WorldData, a: Actor, dt: number, scratch: Flora[], out?: FloraContact) {
   const def = creature(a.creature);
   const ra = bodyRadius(a);
   const pos = a.pos, vel = a.vel;
   // Presence in the water, area-ish: bigger bodies win against stiffer plants.
   const actorS = Math.pow(a.scale, 2.2) * (def.ground ? 1.3 : 1);
   const vlen = Math.hypot(vel.x, vel.z);
+  if (out) { out.blocked = false; out.headOn = false; out.top = -Infinity; }
   for (const f of world.floraHash.query(pos.x, pos.z, ra + world.floraReach, scratch)) {
     // Cheap rejects first: most candidates are nowhere near.
     const dx0 = pos.x - f.pos.x, dz0 = pos.z - f.pos.z;
@@ -119,6 +135,15 @@ export function resolveFlora(world: WorldData, a: Actor, dt: number, scratch: Fl
     const resist = (1 - give) * (1 - bendFrac * bendFrac);
     const push = pen * resist;
     pos.x += nx * push; pos.z += nz * push;
+    // Record it for the climb: a plant is something to go round, unless the body is driving at the
+    // middle of it, in which case going over is what was meant.
+    if (out && push > 1e-3) {
+      out.blocked = true;
+      if (vlen > 0.05 && -(vel.x * nx + vel.z * nz) / vlen > HEAD_ON) {
+        out.headOn = true;
+        out.top = Math.max(out.top, f.pos.y + H + ra * 0.6);
+      }
+    }
     // Kill the inward velocity component by the same fraction so you slide rather than judder, and
     // turn part of it sideways, toward whichever side of the stem you are already on, so a near
     // head-on contact steers you around the plant instead of parking you against it.

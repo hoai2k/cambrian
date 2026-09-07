@@ -126,16 +126,30 @@ momentum-based movement**.
   still paid for out of the same bar.
 - **The floor is somewhere you swim, not a surface you hover over.** A swimmer
   may come down to a fraction of its resting clearance (`floorClearance`), so
-  you can graze the sand and take what lives on it. Rocks are ridden over
-  rather than run into: where a boulder's own surface is within a body's climb
-  budget (`climbOver`), it stops blocking and the floor under you carries you
-  up and across it. Only rock that genuinely stands above you is a wall.
+  you can graze the sand and take what lives on it.
+- **Obstacles are things you get over, in three grades.** Anything shallow
+  enough that the floor can carry you across inside a step's worth of lift
+  (`glideOver`) does not block at all — you glide over sand, domes and the
+  flanks of anything rounded. A face too steep for that, whose top is within
+  two bodies of you (`climbHeight`), blocks the way through but offers the way
+  up: you are held out of the rock and lifted up its side at a swim's pace
+  (`climbRise`) until the top is clear, then carry on over it. Higher than
+  that is a wall — for a swimmer. A crawler has legs: it gets over whatever it
+  keeps pushing into, however tall, once it has leaned on it for `CLIMB_PUSH`.
+  A climb is a commitment (`Actor.climbTo`), so a rock falling away underneath
+  you mid-climb does not drop you back to the foot of it, and the camera is
+  never moved by it — the body tilts to the slope, the view stays where you
+  put it.
+- **Plants are things you go round.** A stem is thin, so contact with one
+  steers you past it. Only a body driving at the middle of one — within about
+  25° of dead-on, and held there — is taken to mean *over*, and climbs it.
 - **Currents** are real. The existing current field pushes everyone; a
   larva in the channel current moves at half its burst speed for free. Giants
   patrol *with* the current, so the smart escape is across it.
 - **Seafloor creatures** (Hallucigenia, Marrella, Olenoides, Wiwaxia) stick
-  to terrain and climb boulders and sponges. **RB** is a **hop** (short
-  ballistic arc, a dodge and a way onto a ledge) and, held, a **paddle**:
+  to terrain and climb boulders and sponges. **RB** eases them up off the
+  floor — a gradual rise, the same one a swimmer gets from the same button,
+  never a jump — and, held, is a **paddle**:
   they climb into open water and keep swimming there at roughly a third of
   their crawl, with no sprint and no dash until their legs are back on the
   floor, and the climb costs more stamina than they regain. So open water is
