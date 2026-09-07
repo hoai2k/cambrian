@@ -133,7 +133,7 @@
     "name": "Gemuendina",
     "species": "Gemuendina stuertzi",
     "category": "creature",
-    "modelStatus": "preview",
+    "modelStatus": "final",
     "provenance": "Early Devonian (Emsian), Hunsrück Slate, Germany",
     "description": "Broad, sculpted rhenanid with dorsal eyes and mouth, small mosaic armour and a long finless tail; tail-driven swimming with restrained pectoral trim.",
     "model": "assets/devonian/creatures/gemuendina.glb",

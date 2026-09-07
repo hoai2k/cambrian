@@ -12,12 +12,11 @@ All **21 initial Devonian creatures** and the complete initial non-creature libr
 Non-creature milestone was **f7b5618**; user received the requested separate notification.
 47 props/plants, 11 runtime proxies, 9 biome paintings, 29 scenery boards, 9 regional boards,
 3 lighting concepts, 10 material sets, 2 atmosphere atlases, 2 scale plates. See supporting-assets.md.
-Three Devonian models are final, 18 preview. All pending reworks remain preview in game/viewer.
+Four Devonian models are final, 17 preview. Gemuendina V3 review complete and integrated locally; publication pending below. All pending reworks remain preview in game/viewer.
 Dunkleosteus already has modeled oral interior and independently animated jaws.
 
 Finish seven full reworks before the 12 other individual refinements: **Gemuendina, Titanichthys,
-Coccosteus, Doryaspis, Bothriolepis, Stethacanthus, Cambrian Odaraia**. None of these seven reworks
-is finalized yet. Eye/general audits follow each completed rework, not the old models awaiting
+Coccosteus, Doryaspis, Bothriolepis, Stethacanthus, Cambrian Odaraia**. Gemuendina is the first completed rework (1/7); the other six remain unfinished. Eye/general audits follow each completed rework, not the old models awaiting
 replacement. Preserve originals; do not approve a new version just because it is more complex.
 
 ## Active phases — authoritative scheduling
@@ -28,9 +27,8 @@ exports/renders/checks. Compact explicit model/effort spawns, no broad history f
 agent-workflow.md. Four active slots total, including root. Use frozen hash-bound groups;
 executors stop unexpected failures and preserve output. They do not make creative fixes.
 
-- `/root/gemuendina_rework_design` (Astra high), making final individual art review of candidate02.
-  Root copied exact candidate02 public full/LOD+4portraits+metadata; preview retained pending final
-  verdict. Read rework-v3/preview-delivery-02.md. New local seven-file backup has copy hashes.
+- `/root/gemuendina_rework_design` (Astra high), completed final individual art review of candidate02.
+  Root copied exact candidate02 public full/LOD+4portraits+metadata; final verdict accepted; status/catalogue/pending queue now updated. Read rework-v3/preview-delivery-02.md. New local seven-file backup has copy hashes.
   Full6d62b356043f443e1842e5bc105e3e551c1d5a7930652bf61553c6a09731c4aa,
   LOD280fc74db17ccc6776ba422fba3e6c9f0695558e0d13952fce9bb79fd39d00f3.
   Quantitative audit03 PASS56poses(full48/LOD8), conservative eye minima86.87/87.096%; contacts
@@ -42,7 +40,9 @@ executors stop unexpected failures and preserve output. They do not make creativ
   Interactive viewer revealed old automatic Stargazer Ochre washes out new eyes/texture; only
   Gemu default scheme set to authored default; actual reload confirmed olive pigment/readable eyes.
   Intake184612/47044triangles,18clips,3sockets PASS; build/typecheck/643Devonian PASS.
-  Final art verdict pending; sources/candidate/portraits/input hashes stay immutable.
+  Astra inspected all54action PNGs and audit03, final-art-verdict.md accepts exact candidate02.
+  Root actual authored-default UI passed; publication and post-main viewer verification remain.
+  Sources/candidate/portraits/input hashes stay immutable.
 - `/root/titanichthys_rework_clay03` (Astra high), authoring **material study01** on accepted clay04.
   Clay04 body/fins are improved over rejected01–03; same frozen blend SHA
   **69ad4e7d1daa7aec64835a198c9b13c4a017cf4aa441cd2e58ae9a4207c404ec**.
