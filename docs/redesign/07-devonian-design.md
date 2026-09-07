@@ -122,7 +122,7 @@ Rigging should preserve anatomically meaningful joints and retain the establishe
 
 **Known characteristics and evidence:** early shark-like chondrichthyan from the Cleveland Shale fauna, with unusually informative preservation among the local fishes. [Cleveland Museum ecosystem project](https://www.cmnh.org/science-conservation/areas-of-study/earth-sciences/projects/saving-a-lost-ecosystem), [Case Western specimen collection](https://caslabs.case.edu/hyde-collection/hyde-collection/)
 
-**Reconstruction focus:** Use its own head, fin placements and caudal outline. An extant shark model is useful only for broad comparative context, not as a substitute for the fossil anatomy. Skin coverage and fin details should follow the selected specimen.
+**Reconstruction focus:** Use its own head, fin placements and caudal outline. An extant shark model is useful only for broad comparative context, not as a substitute for the fossil anatomy. Skin coverage and fin details should follow the selected specimen. The authored genus-level synthesis retains an anterior dorsal spine and omits the posterior spine identified as hypothetical in a recent comparison; it also omits an anal fin. [Frey et al. comparison](https://link.springer.com/article/10.1186/s13358-023-00266-6)
 
 **Additional image/model requirements:** Lateral body outline, fin-ray/spine evidence and caudal-fin board; oral detail. A streamlined model with restrained soft-surface detail rather than generic modern shark textures.
 
@@ -130,7 +130,7 @@ Rigging should preserve anatomically meaningful joints and retain the establishe
 
 **Known characteristics and evidence:** the distinctive spine-brush complex gives a strong silhouette. The genus spans the Devonian–Carboniferous in the literature; function and reconstruction of the complex require care. Select a demonstrably Devonian specimen before authoring, and do not substitute a Carboniferous Akmonistion model. [Braincase study](https://www.cambridge.org/core/journals/earth-and-environmental-science-transactions-of-the-royal-society-of-edinburgh/article/abs/braincase-of-a-primitive-shark/E11D5DAAAFE25E9196D17BC1C4CCBD9C), [spine-brush anatomy study](https://www.tandfonline.com/doi/abs/10.1080/02724634.1984.10012016)
 
-**Reconstruction focus:** The spine-brush is the central visual feature, but its anatomy, distribution and biological function need to be separated. Do not automatically claim a defensive purpose or apply a sex-specific interpretation beyond what the selected material supports.
+**Reconstruction focus:** The spine-brush is the central visual feature, but its anatomy, distribution and biological function need to be separated. Do not automatically claim a defensive purpose or apply a sex-specific interpretation beyond what the selected material supports. The asset is labelled **Stethacanthus sp.**, informed by CMNH 8988 from the upper Famennian Cleveland Shale. Its assignment to S. altonensis is disputed; the incomplete Devonian material anchors the occurrence while body and fin details remain an explicitly comparative reconstruction. [Ginter and Sun, p. 710](https://www.app.pan.pl/archive/published/app52/app52-705.pdf)
 
 **Additional image/model requirements:** Devonian provenance sheet before any concept approval; dorsal complex from several angles; pectoral and pelvic anatomy. No substitution of a better-known Carboniferous Akmonistion reconstruction.
 
