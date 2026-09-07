@@ -160,19 +160,18 @@ h3 { font-size: 13px; letter-spacing: .12em; color: var(--ember); margin: 14px 0
 .dead-overlay span { color: var(--mist); }
 
 /* radar */
-.radar { position: absolute; right: 1.4em; bottom: 5.4em; width: 9.5em; height: 9.5em; }
-.hud-quarter .radar, .hud-half .radar { bottom: 1.6em; }
-.hud-half:first-child .radar, .hud-quarter:nth-child(3) .radar { bottom: 1.6em; }
+.radar { position: absolute; right: 1.4em; top: 1.2em; width: 9.5em; height: 9.5em; }
 .radar svg { width: 100%; height: 100%; overflow: visible; }
 .radar-bg { fill: rgba(6,22,28,.55); }
 .radar-ring { fill: none; stroke: rgba(238,250,246,.12); stroke-width: .6; }
 .radar-rim { fill: none; stroke: rgba(238,250,246,.35); stroke-width: 1.2; }
 .radar-you { color: var(--player, #61f2d5); fill: var(--player, #61f2d5); filter: drop-shadow(0 0 3px currentColor); }
-.radar-range { position: absolute; right: .2em; bottom: -1.1em; font-size: .7em; color: var(--dim); letter-spacing: .08em; }
+.radar-range { position: absolute; right: .2em; bottom: -1.2em; font-size: .7em; color: var(--dim); letter-spacing: .08em; }
 .blip { stroke-width: 1.3; filter: drop-shadow(0 0 2px currentColor); }
 .blip.beyond { stroke-dasharray: 2 1.2; opacity: .85; }
 .blip.hunting { animation: blink .6s infinite; }
 .blip-shore { fill: none; stroke-width: 3; opacity: .8; }
+.blip-food { filter: none; opacity: .9; }
 .hud-quarter .radar { width: 7.5em; height: 7.5em; }
 /* biome banner */
 .biome-banner { position: absolute; left: 50%; top: 22%; transform: translateX(-50%); display: grid; justify-items: center; gap: .1em; pointer-events: none; animation: banner 3.2s ease both; }

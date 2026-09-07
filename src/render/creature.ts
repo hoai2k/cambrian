@@ -7,6 +7,7 @@ import * as SkeletonUtils from 'three/examples/jsm/utils/SkeletonUtils.js';
 import { clamp, damp, wrapAngle } from '../shared/math';
 import { makeRecolor, type Recolor } from './recolor';
 import { settleTranslucency } from './translucency';
+import { Carcass } from './carcass';
 import { schemeForCreature } from '../shared/palettes';
 import { creature, type CreatureId } from '../sim/creatures';
 import { lengthOf } from '../sim/actors';
@@ -192,9 +193,15 @@ export class CreatureView {
     this.model.traverse((o) => { if ((o as THREE.Mesh).isMesh && !o.userData.depthPrepass) (o as THREE.Mesh).castShadow = on; });
   }
   private shadowOn = true;
+  /** Takes the body apart as it is eaten; built lazily on the first bite. */
+  private carcassParts?: Carcass;
   /** Depth pre-pass materials made for translucent bodies; owned here so they are disposed. */
   private extraMats: THREE.Material[] = [];
 
+  /** The eaten share of this body, cut out of the model itself. See `carcass.ts`. */
+  get carcass(): Carcass { return (this.carcassParts ??= new Carcass(this.model, [...this.materials, ...this.extraMats])); }
+  /** Whole again — and nothing is built for a body that was never bitten. */
+  restoreCarcass() { this.carcassParts?.reset(); }
   setHighlight(intensity: number, color?: string) { this.highlight = intensity; if (color) this.highlightColor.set(color); }
 
   /**
@@ -346,7 +353,9 @@ export class CreatureView {
       }
     } else this.inner.rotation.x = damp(this.inner.rotation.x, 0, 8, dt);
     if (a.hideMode === 'burrowed') { const k = clamp(a.hideT / .6, 0, 1); oy -= L * .5 * k; sy *= 1 - .35*k; }
-    if (a.state === 'dead') { const e = a.eaten; sx *= 1 - e * 0.6; sy *= 1 - e * 0.6; sz *= 1 - e * 0.6; }
+    // A body eaten in bites loses the meat itself, so it must not also shrink; one swallowed
+    // whole has no bites to show and still closes down as it goes in.
+    if (a.state === 'dead' && a.eatBites <= 1) { const e = a.eaten; sx *= 1 - e * 0.6; sy *= 1 - e * 0.6; sz *= 1 - e * 0.6; }
     this.group.visible = !(a.state === 'dead' && a.eaten >= 1 && (a.controller === 'player' || a.controller === 'bot' || a.swallowedBy >= 0));
     if (a.state === 'swallowed') { const t = clamp(a.stateT / a.stateDur, 0, 1); const k = 1 - t * 0.9; sx *= k; sy *= k * (1 - t * 0.3); sz *= k; }
     // shield
@@ -362,6 +371,8 @@ export class CreatureView {
     }
     if (a.state === 'moult') { const p = Math.sin(a.stateT * 9) * 0.06; sx *= 1 + p; sz *= 1 - p; }
     this.group.scale.set(sx, sy, sz);
+    // The eaten-away plane is in world space; a corpse drifts and rolls under it.
+    if (this.carcassParts?.active) { this.group.updateWorldMatrix(true, true); this.carcassParts.sync(); }
     this.inner.position.y = oy / Math.max(L, 1e-3);
 
     // emissive: hit flash, highlight, ability glow
