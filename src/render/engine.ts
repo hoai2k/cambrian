@@ -9,7 +9,7 @@ import { bandOf, isAlive, isHidden, lengthOf } from '../sim/actors';
 import { creature, type CreatureId } from '../sim/creatures';
 import { Game, radarRange as radarReach, type ScoreHeader, type ScoreRow, type TeleportDest } from '../sim/game';
 import type { Phase } from '../sim/daynight';
-import { BAND_COLOR, emptyInput, TIER_NAMES, TIER_NEED, type Actor, type Band, type InputFrame, type Mode, type PlayerSetup } from '../sim/types';
+import { BAND_COLOR, emptyInput, isCoop, TIER_NAMES, TIER_NEED, type Actor, type Band, type InputFrame, type Mode, type PlayerSetup } from '../sim/types';
 import { BIOME_NAMES, biomeAt, groundHeight, nurseryAt, resolveStatic, SURFACE_Y, type Biome, type Boulder, type LandmarkKind } from '../sim/world';
 import { AssetQueue, type AssetProgress } from './assets';
 import { CreatureView, ensureLoaded, loadedSync, type Lod } from './creature';
@@ -70,6 +70,8 @@ export interface RadarBlipHud {
 }
 export interface HudSnapshot {
   players: PlayerHud[]; rects: Rect[]; time: number; status: 'playing' | 'won' | 'lost'; message: string; mode: Mode; winner: number; fps: number;
+  /** This match is over but its mode is co-op, so the results screen can offer to carry on. */
+  canContinue: boolean;
   /** What this match turned up, for the results screen's record. */
   discovery: { biomes: Biome[]; landmarks: LandmarkKind[]; apex: CreatureId[] };
   /** The hour of the day: what it is, how long until it turns, and how much the reef is hunting. */
@@ -238,6 +240,12 @@ export class Engine {
   }
   setLook(speed: number, invert: boolean) { this.lookSpeed = speed; this.invertY = invert; }
   setPaused(p: boolean) { this.paused = p; }
+
+  /**
+   * Carry a finished co-op match on rather than restarting it: same world, same bodies, same
+   * progress, with the mode's goal no longer watching. Returns whether the match resumed.
+   */
+  continueMatch(): boolean { return this.game?.continueMatch() ?? false; }
   get isAttract() { return this.attract; }
 
   /** Background ecosystem for the title / select screens. */
@@ -1010,6 +1018,7 @@ export class Engine {
     });
     return {
       players, rects, time: game.time, status: game.state.status, message: game.state.message, mode: game.mode, winner: game.state.winner, fps: this.fps,
+      canContinue: game.state.status !== 'playing' && isCoop(game.mode),
       discovery: { biomes: [...game.discovery.biomes], landmarks: [...game.discovery.landmarks], apex: [...game.discovery.apex] },
       day: game.dayPhase(),
     };

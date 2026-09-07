@@ -34,7 +34,17 @@ export interface CreatureDef {
   tagline: string;     // energetic one-liner for the select screen
   role: string;
   ground: boolean;
-  diet?: 'deposit' | 'grazer' | 'filter';
+  /**
+   * What this animal actually eats, where that is something other than live prey it catches.
+   *
+   * A creature with a diet does not go hunting of its own accord (the simulation's AI reads this;
+   * a human player is never gated by it). `grazer` and `deposit` rasp microbial mats and sift the
+   * sediment, `filter` strains plankton blooms, and `scavenger` looks for the dead rather than
+   * making its own. See docs/redesign/01-game-design.md · Feeding.
+   */
+  diet?: 'deposit' | 'grazer' | 'filter' | 'scavenger';
+  /** Grazes only while held still, the way an animal that has to plant itself to rasp does. */
+  grazeStill?: boolean;
   provenance?: string;
   bodyRadius?: number; // collision radius in body lengths
   clearance?: number; // center height above terrain, in body lengths

@@ -519,6 +519,28 @@ ok(RULES !== undefined && !RULES.growthByNutrition, 'Devonian rules active: grow
   ok(g.state.status === 'won' && g.state.winner === 0, `holding Dominant wins (${g.state.message})`);
   const modes: Mode[] = ['rise', 'domination', 'foodchain', 'hunted', 'reef'];
   for (const m of modes) { const gm = new Game(m, [{ creature: 'coccosteus', device: 'keyboard', ready: true }, { creature: 'cladoselache', device: 0, ready: true }]); for (let i = 0; i < 120; i++) tick(gm, new Map([[0, emptyInput()], [1, emptyInput()]])); ok(gm.state.status === 'playing', `${m} runs`); }
+
+  // Domination is co-op, so its result is a milestone: the sea can be carried on into.
+  ok(g.continueMatch() && g.state.status === 'playing' && g.endless, 'Domination carries on after it is won');
+  ok(devActor(g, g.players[0]).dominantT === 0, '...with the hold timer cleared');
+  for (let i = 0; i < 60 * 100; i++) tick(g, new Map([[0, emptyInput()]]));
+  ok(g.state.status === 'playing', '...and it does not win itself again');
+}
+{
+  // Survival is co-op too; Food Chain is a contest between players and stays decided.
+  const surv = new Game('rise', [{ creature: 'coccosteus', device: 'keyboard', ready: true }]);
+  const sd = devActor(surv, surv.players[0]);
+  sd.stage = PRIME_STAGE; sd.primeT = HOLD_TO_WIN - 0.01;
+  tick(surv, new Map([[0, emptyInput()]]));
+  ok(surv.state.status === 'won', `Survival is won by holding Prime (${surv.state.message})`);
+  ok(surv.continueMatch() && surv.state.status === 'playing' && devActor(surv, surv.players[0]).primeT === 0, 'Survival carries on after it is won');
+
+  const fc = new Game('foodchain', [{ creature: 'coccosteus', device: 'keyboard', ready: true }]);
+  const fd = devActor(fc, fc.players[0]);
+  fd.standing = 100; fd.dominantT = HOLD_TO_WIN - 0.01;
+  tick(fc, new Map([[0, emptyInput()]]));
+  ok(fc.state.status !== 'playing', 'Food Chain reaches a verdict');
+  ok(!fc.continueMatch() && fc.state.status !== 'playing', '...and a versus verdict is final');
 }
 
 // ---- survival ----
