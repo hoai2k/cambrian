@@ -20,9 +20,14 @@ To inspect uncommitted models without changing them:
 
 ```sh
 node tools/devonian/eye-audit-export.mjs --working dunkleosteus
+node tools/devonian/eye-audit-export.mjs --working --lod dunkleosteus
 ```
 
 Use the timestamped output directory printed by the exporter as the Blender argument. Explicit IDs also work with committed revisions. A new snapshot must be made after every model change. Never attach an old report to a new GLB; compare asset SHA-256 hashes.
+
+Audit the full and reduced models separately. `--lod` snapshots the actual `.lod1.glb` into a separate
+directory; inspect its mesh names before reusing selectors. Decimation must preserve orbital seating
+and globe closure, not just the skeleton. These bind-space checks still require animated visual review.
 
 ## Reviewed selectors
 

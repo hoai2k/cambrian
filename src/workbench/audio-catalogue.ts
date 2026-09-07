@@ -77,16 +77,6 @@ export const GROUPS: SoundGroup[] = [
     ],
   },
   {
-    title: 'The surface',
-    blurb: 'Bodies are held just under the waterline (SURFACE_Y − 0.8 − clearance), so breaching is a body '
-      + 'arriving at that ceiling from below. Air breathers do it constantly; before this the clamp was silent.',
-    sounds: [
-      { kind: 'breach', label: 'Breach', spatial: true, usage: 'A body meets the surface from below at speed — over BREACH_SPEED (6 units/s) closing. Water opens and throws spray.' },
-      { kind: 'surfaceRoll', label: 'Surface roll', spatial: true, usage: 'The same arrival taken gently: a body rolling up against the surface, water sheeting off it. Keeps the breach for the moments that earn it.' },
-      { kind: 'splashDown', label: 'Splash down', spatial: true, usage: 'Falling away from the surface again after a breach, fast enough to land rather than sink.' },
-    ],
-  },
-  {
     title: 'Player stings',
     blurb: 'About you specifically. Never attenuated, and never played for an AI creature.',
     sounds: [
@@ -137,6 +127,8 @@ export const DEVONIAN_GROUPS: SoundGroup[] = [
       { kind: 'dominant', label: 'Dominant', spatial: false, usage: 'You reach the top of the standings — the era\u2019s win sting.' },
       { kind: 'beach', label: 'Beach', spatial: false, usage: 'A limbed creature hauls itself into the shallows. Fires on the transition into beached, not out of it.' },
       { kind: 'shellCrush', label: 'Shell crush', spatial: true, usage: 'A crushing bite cracks a thick shell open.' },
+      { kind: 'breach', label: 'Breach', spatial: true, usage: 'A fish driving hard at the surface leaves the water altogether — `canBreach` in the era rules, above BREACH_MIN_RISE and near full speed. The body then flies on gravity alone until it comes down.' },
+      { kind: 'splash', label: 'Splash', spatial: true, usage: 'The landing at the end of a breach: back through the surface, which takes most of the fall out of the body. Strength follows how hard it came down.' },
     ],
   },
   {

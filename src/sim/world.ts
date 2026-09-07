@@ -22,7 +22,9 @@ export const BIOME_DANGER = ACTIVE_ERA.environment.biomeDanger;
  * places comes from the era's density table (`EraDefinition.environment.flora`).
  */
 export type FloraKind = 'vauxia' | 'sac' | 'choia' | 'thalli' | 'tuft' | 'cushion' | 'lettuce' | 'spine' | 'glass'
-  | 'crinoid' | 'stromatoporoid' | 'tabulate' | 'rugose' | 'bryozoan' | 'reed' | 'log';
+  | 'crinoid' | 'stromatoporoid' | 'tabulate' | 'rugose' | 'bryozoan' | 'reed' | 'log'
+  // tall Devonian kinds that reach up into the water column: a giant sea lily and an algal frond tower
+  | 'lilyColumn' | 'frondTower';
 /** Driftwood only washes out this far from the shore. */
 export const LOG_SHORE_RANGE = 120;
 
@@ -39,7 +41,8 @@ export interface Flora {
 export interface Cover { pos: Vec3; radius: number; maxLength: number; strength: number; temp?: boolean; t?: number; }
 export interface Bloom { pos: Vec3; radius: number; drift: number; }
 
-export const SURFACE_Y = 40;
+/** The water surface. Era-driven: a pelagic roster (the Devonian) asks for a deeper column. */
+export const SURFACE_Y = ACTIVE_ERA.environment.surfaceY ?? 40;
 export const LIGHT_WINDOW_Y = SURFACE_Y - 9;
 /** Chunk edge in world units. Matches the renderer's scenery cells. */
 export const CHUNK = 64;
@@ -297,7 +300,8 @@ export function generateChunk(seed: number, cx: number, cz: number, detail: 'ful
           if (blocked) continue;
           const s = (kind === 'vauxia' ? 0.6 + rng() * 1.6 : kind === 'tuft' ? 0.35 + rng() * 0.6
             : kind === 'crinoid' ? 0.7 + rng() * 0.65 : kind === 'stromatoporoid' ? 0.5 + rng() * 1.0
-            : kind === 'reed' ? 0.7 + rng() * 0.8 : kind === 'log' ? 0.6 + rng() * 0.8 : 0.45 + rng() * 1.0) * forestF;
+            : kind === 'reed' ? 0.7 + rng() * 0.8 : kind === 'log' ? 0.6 + rng() * 0.8
+            : kind === 'lilyColumn' ? 0.8 + rng() * 0.7 : kind === 'frondTower' ? 0.7 + rng() * 0.8 : 0.45 + rng() * 1.0) * forestF;
           const y = sampleHeight(x, z) - 0.03;
           const sy = s * (0.85 + rng() * 0.4);
           flora.push({ pos: { x, y, z }, kind, scale: s, sy, rot: rng() * TAU, shade: 0.7 + rng() * 0.28, ...floraSize(kind, s, sy), bx: 0, bz: 0, bvx: 0, bvz: 0, active: false });
@@ -309,6 +313,10 @@ export function generateChunk(seed: number, cx: number, cz: number, detail: 'ful
             cover.push({ pos: { x, y: y + sy * 1.1, z }, radius: s * 1.2, maxLength: s * 1.8, strength: 0.65 });
           else if (kind === 'reed')     // thin swaying stems: cover like a tuft for anything that fits between them
             cover.push({ pos: { x, y: y + sy * 0.7, z }, radius: s * 0.9, maxLength: s * 1.6, strength: 0.75 });
+          else if (kind === 'lilyColumn')   // a crown high in the column: shelter for anything mid-water, and a landmark
+            cover.push({ pos: { x, y: y + sy * 8.2, z }, radius: s * 1.8, maxLength: s * 3.2, strength: 0.6 });
+          else if (kind === 'frondTower')   // a soft tower of fronds: cover the whole way up
+            cover.push({ pos: { x, y: y + sy * 2.8, z }, radius: s * 1.3, maxLength: s * 2.6, strength: 0.7 });
           else if (kind === 'stromatoporoid') {
             // a firm mound: the same cover a big boulder of its size gives (radius 1.5x, length 0.9x, strength 0.45)
             const rx = s * 0.65, ry = sy * 0.7;

@@ -31,8 +31,6 @@ export const SAMPLES: Record<string, string[]> = {
   // Big bodies: `heavy()` in the engine swaps these in when the body is over HUGE_LENGTH.
   'hit-huge': ['hit-huge-1', 'hit-huge-2'], 'crunch-huge': ['crunch-huge'],
   'burst-huge': ['surge-huge'], 'dodge-huge': ['sweep-huge'], 'death-huge': ['death-huge'],
-  // The surface
-  breach: ['breach-1', 'breach-2'], splashDown: ['splash-down-1', 'splash-down-2'], surfaceRoll: ['surface-roll'],
   parry: ['parry'], guardBreak: ['guard-break'], stagger: ['stagger'],
   dodge: ['dodge-1', 'dodge-2'], burst: ['burst'], silt: ['silt'], grab: ['grab'],
   kill: ['kill'], death: ['death'], tierUp: ['tier-up'], hunted: ['hunted'], escape: ['escape'],

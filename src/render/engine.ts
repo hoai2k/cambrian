@@ -350,7 +350,7 @@ export class Engine {
       r.setScissorTest(true);
       this.cams.forEach((cs, i) => {
         const rc = rects[i];
-        const density = this.sea?.setViewLength(lengthOf(game.players[i]), cs.camera.position.x, cs.camera.position.z) ?? 0.0105;
+        const density = this.sea?.setViewLength(lengthOf(game.players[i]), cs.camera.position.x, cs.camera.position.z, cs.camera.position.y) ?? 0.0105;
         // Everything past ~98% fog is invisible: pulling the far plane in there lets the frustum
         // drop those scenery chunks entirely instead of rendering them into the murk.
         cs.camera.far = clamp(2.1 / density, 110, 300);
@@ -507,9 +507,9 @@ export class Engine {
       lookAt.y + Math.sin(pitch) * dist + L * 0.18,
       lookAt.z - Math.cos(yaw) * Math.cos(pitch) * dist,
     );
-    // keep camera out of the ground and boulders, below the surface
+    // keep camera out of the ground and boulders, and below the surface unless the player has left the water
     const g = groundHeight(this.game!.world, desired.x, desired.z, this.scratchBoulders);
-    desired.y = clamp(desired.y, g + 0.7, SURFACE_Y - 0.4);
+    desired.y = clamp(desired.y, g + 0.7, p.airborne ? SURFACE_Y + 40 : SURFACE_Y - 0.4);
     const pos = { x: desired.x, y: desired.y, z: desired.z };
     resolveStatic(this.game!.world, pos, 0.7, this.scratchBoulders);
     desired.set(pos.x, pos.y, pos.z);
@@ -719,13 +719,27 @@ export class Engine {
         case 'routed': { world('routed', e.pos, 0.8); this.impacts.spawn(e.pos, '#9ff6ff', 2.5, 0.6); break; }
         case 'pounce': { this.impacts.spawn(e.pos, '#ffe08a', 1.2 + (e.strength ?? 1) * 0.5, 0.35); this.bubbles.emit(e.pos, 24, 0.9, 4, 0.08); world('pounce', e.pos, 1.3); if (e.player != null && e.player >= 0) { const d = padOf(e.player); if (typeof d === 'number') rumble(d, 0.7, 0.4, 140); this.shake(e.player, 0.6); } break; }
         case 'burst': { const b = game.byId(e.actor); world(b && RULES?.jet(b) ? 'jet' : heavy('burst', e.actor), e.pos); if (b && RULES?.jet(b)) this.bubbles.emit(e.pos, 30, 0.9, 3, 0.1, 1.4); break; }
-        // Meeting the surface from below, and dropping away from it again.
-        case 'breach': { const hard = (e.strength ?? 0) >= 1; this.bubbles.emit(e.pos, hard ? 40 : 14, hard ? 1.4 : 0.6, 4, 0.1, 1.6); world(hard ? 'breach' : 'surfaceRoll', e.pos, Math.min(2, e.strength ?? 1)); if (hard && e.player != null && e.player >= 0) { const d = padOf(e.player); if (typeof d === 'number') rumble(d, 0.5, 0.5, 200); } break; }
-        case 'splashDown': { this.bubbles.emit(e.pos, 34, 1.2, 4, 0.1, 1.5); world('splashDown', e.pos, Math.min(2, e.strength ?? 1)); break; }
         // Hatching out of a nursery after a respawn (the moult state is reused for the hatch-in).
         case 'moult': { if (e.player != null && e.player >= 0) audio.play(e.strength === 1 && RULES ? 'moult' : 'respawn'); else world('respawn', e.pos, 1, 0.5); break; }
         // Era events (Devonian). Their samples are registered by the era's entry page; an
         // unregistered kind is silent, so the Cambrian build never reaches for a missing file.
+        case 'breach': {
+          // a sheet of water thrown up as the body leaves the sea
+          this.sparkles.emit(e.pos, Math.round(40 * (e.strength ?? 1)), 1.6, 2.2, 0.09, 2.4);
+          this.bubbles.emit(e.pos, 30, 1.2, 4, 0.1, 1.6);
+          this.impacts.spawn(e.pos, '#e8f6ff', 2.5 * (e.strength ?? 1), 0.5);
+          world('breach', e.pos, e.strength ?? 1);
+          break;
+        }
+        case 'splash': {
+          const s = e.strength ?? 1;
+          this.sparkles.emit(e.pos, Math.round(70 * s), 2.2, 2.6, 0.1, 2.6);
+          this.bubbles.emit(e.pos, Math.round(60 * s), 1.4, 6, 0.12, 2.2);
+          this.impacts.spawn(e.pos, '#ffffff', 3.5 * s, 0.6);
+          world('splash', e.pos, s);
+          if (e.player != null && e.player >= 0) { const d = padOf(e.player); if (typeof d === 'number') rumble(d, Math.min(1, 0.5 * s), 0.6, 220); this.shake(e.player, 0.6 * s); }
+          break;
+        }
         case 'gulp': { this.bubbles.emit(e.pos, 24, 1.0, 3, 0.09, 1.4); personal('gulp'); break; }
         case 'anoxia': { personal('anoxia', 0.8); break; }
         case 'beach': { if (e.strength) { this.bubbles.emit(e.pos, 12, 0.5, 2, 0.06, 1); personal('beach', 0.9); } break; }

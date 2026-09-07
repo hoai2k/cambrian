@@ -65,25 +65,18 @@ npx esbuild tools/audio-mix-test.ts --bundle --platform=node --format=esm --outf
 It fails if a player would hear more than three one-shots a second, or hears
 anything from more than 60 m away.
 
-## Big bodies and the surface
+## Big bodies
 
-Two rules pick a different take of the same event.
+`heavy()` in `src/render/engine.ts` swaps in a `-huge` sample when the body making the sound is
+over `HUGE_LENGTH` (6 m, in `mix.ts`). The Devonian roster runs 4–11.5 m against the Cambrian's
+1–3.9 m, and giants in either era are scaled well past it, so without this a Titanichthys lands
+exactly like a larva. It covers `hit`, `crunch`, `burst`, `dodge` and `death`; add a sample named
+`<kind>-huge` and the rule picks it up, since `heavy()` only swaps when the library has one.
 
-**Size.** `heavy()` in `src/render/engine.ts` swaps in a `-huge` sample when the body making the
-sound is over `HUGE_LENGTH` (6 m, in `mix.ts`). The Devonian roster runs 4–11.5 m against the
-Cambrian's 1–3.9 m, and giants in either era are scaled well past it, so without this a
-Titanichthys lands exactly like a larva. It covers `hit`, `crunch`, `burst`, `dodge` and `death`;
-add a sample named `<kind>-huge` and the rule picks it up, since `heavy()` only swaps when the
-library actually has one.
-
-**The surface.** Bodies are held just under the waterline (`SURFACE_Y − 0.8 − clearance`), so
-breaching is a body arriving at that ceiling from below. `src/sim/game.ts` emits `breach` on
-arrival with the closing speed in `strength`, and `splashDown` when the body drops clear again at
-speed. Speed is the *whole* velocity, not the climb: nothing in this game rises faster than about
-1.5 units/s, so what tears the surface open is a body travelling along it under power. Bodies
-cruise at about 0.5 and reach 4–5 in a burst, which is where `BREACH_SPEED` (3.5) sits. Below it
-the engine plays `surfaceRoll` instead, which keeps the big sound for the moments that earn it —
-about two to five of a dozen surfacings in a minute of deliberate porpoising.
+The surface is a separate mechanic: a fish that `canBreach` and is driving hard at the waterline
+leaves the water altogether and flies on gravity until it lands (`airborne` in `src/sim/game.ts`,
+the `breach` and `splash` events). That is Devonian-only — `RULES` is undefined in the Cambrian —
+and its samples live in the era's own library.
 
 ## Levels
 

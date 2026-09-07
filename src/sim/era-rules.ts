@@ -62,6 +62,19 @@ export interface EraRules {
   stepAbility(g: Game, a: Actor, ctx: ExpansionContext, dt: number): void;
   /** Multiplier on the camouflage stamina drain. */
   camoDrain(a: Actor): number;
+  /**
+   * How this body swims where it wants to go: `speed` scales cruise for the direction asked
+   * (relative to the heading), `turn` scales the turn rate, `impulse` is an instant velocity along
+   * the heading (a fast-start) on the sprint press. `dir` is the unit direction asked for, `mag`
+   * the stick magnitude, `cruise` the speed the shared rules would give.
+   */
+  swim(g: Game, a: Actor, dir: Vec3, mag: number, cruise: number, burstPressed: boolean): { speed: number; turn: number; impulse: number };
+  /** May this body leave the water when it drives hard at the surface? */
+  canBreach(a: Actor): boolean;
+  /** Height a body hatches at, given the floor under it and its length. */
+  spawnY(ground: number, L: number, isGround: boolean): number;
+  /** Height an AI body wanders to, given the floor there. */
+  wanderY(a: Actor, ground: number, rng: () => number): number;
   /** Replaces the death penalty. */
   onRespawn(g: Game, a: Actor): void;
   /** Win checks for the era's own modes; the shared ones (reef, hunted) run as before. */

@@ -47,6 +47,11 @@ export const FLORA_PHYS: Record<FloraKind, FloraPhys> = {
   // ---- Devonian stand-ins ----
   // Crinoid: a thin stalk with a cup and a feathery crown at the top. Soft; sways slowly and wide.
   crinoid: { h: 2.2, r: 0.36, profile: (f) => 0.12 + 0.88 * f, rigidity: 0.6, maxLean: 0.5, k: 18, c: 2.6, drag: 1.4 },
+  // Giant sea lily: a stem several body lengths tall with a crown at the top. Stiff at the base, the
+  // crown sways; a fish swims between the stems rather than through them.
+  lilyColumn: { h: 9.5, r: 0.5, profile: (f) => 0.08 + 0.92 * f, rigidity: 1.4, maxLean: 0.3, k: 12, c: 3.2, drag: 0.7 },
+  // Algal frond tower: soft fronds all the way up. Parts around a body and closes behind it.
+  frondTower: { h: 5.5, r: 0.7, profile: (f) => 0.3 + 0.7 * f, rigidity: 0.25, maxLean: 0.7, k: 12, c: 2.2, drag: 1.5 },
   // Stromatoporoid: a calcareous mound. Rigid like a boulder; nothing leans it.
   stromatoporoid: { h: 0.7, r: 0.65, profile: (f) => Math.sqrt(Math.max(0, 1 - f * f * 0.9)), rigidity: 14, maxLean: 0.03, k: 60, c: 10, drag: 0.3 },
   // Tabulate coral: a low flat shelf. Rigid; you swim over it.

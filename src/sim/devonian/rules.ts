@@ -8,6 +8,7 @@ import { BIOME_DANGER, biomeAt, groundHeight, sampleCurrent, shoreDistance, SHOR
 import { bodyRadius } from '../actors';
 import { devActor, DOMINANT, HOLD_TO_WIN, RUNG_NAMES, STAGE_AT, STAGE_SCALE, STAGES, stateFor, type DeadZone, type DevActor } from './state';
 import { beginAbility, camoDrain, installDevonianSpecials, stepAbility, stepGuardSpecial, useAbility, ySpecial } from './specials';
+import { canBreach, spawnY, swim, wanderY } from './swim';
 
 /**
  * Devonian Domination (docs/redesign/08-devonian-domination.md). Progress is standing within a
@@ -281,6 +282,7 @@ export const DEVONIAN_RULES: EraRules = {
   jet(a) { return !!creature(a.creature).shell; },
 
   useAbility, beginAbility, stepAbility, camoDrain,
+  swim, canBreach, spawnY, wanderY,
 
   moultScale(g, a) {
     const d = devActor(g, a);

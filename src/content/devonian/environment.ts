@@ -33,6 +33,7 @@ export const SAND_COLORS: Record<Biome, string> = Object.fromEntries(Object.entr
  */
 export const FLORA_BASE: Record<string, string> = {
   crinoid: '#8c9078', stromatoporoid: '#cbb994', tabulate: '#7d8f7c', rugose: '#9c5c3b', bryozoan: '#d4cdb6', reed: '#5e8a40', log: '#6a4a2e',
+  lilyColumn: '#9a9a80', frondTower: '#4f7a3c',
   vauxia: '#9c8f72', sac: '#a89a80', choia: '#8f8a6a', thalli: '#6b6a3a', tuft: '#5e7a45',
 };
 /**
@@ -41,14 +42,21 @@ export const FLORA_BASE: Record<string, string> = {
  * the meadow, the reef is stromatoporoids with tabulate plates, horn corals and fans between them,
  * the pavement is bare but for plates, and the reef front is corals and fans on the drop.
  */
+/**
+ * The water surface. The Cambrian's 40 suits a benthic roster; this one is fish, most of them
+ * pelagic, so the column over the shelf is deeper (about six Dunkleosteus lengths) and the tall
+ * kinds below reach up into it. The shore still climbs to the waterline.
+ */
+export const SURFACE_Y = 64;
+
 export const FLORA_DENSITY: Record<Biome, Partial<Record<FloraKind, number>>> = {
-  shallows: { reed: 16, crinoid: 1.2, log: 2.5, bryozoan: 0.8, tabulate: 0.6 },
-  nursery: { reed: 26, crinoid: 12, log: 6, bryozoan: 5, rugose: 3 },   // thick enough to hide in; a giant still gets through
-  shelf: { crinoid: 3, bryozoan: 1.5, rugose: 1.2, tabulate: 0.8, reed: 0.6 },
-  forest: { crinoid: 30, bryozoan: 6, rugose: 3, tabulate: 2, stromatoporoid: 1 },
-  boulders: { stromatoporoid: 9, tabulate: 6, rugose: 6, bryozoan: 4, crinoid: 2 },
-  flats: { tabulate: 2.5, rugose: 0.6, bryozoan: 0.5, crinoid: 0.3 },
-  channel: { reed: 3, log: 1.5, rugose: 1, bryozoan: 0.4 },
-  escarpment: { rugose: 4, bryozoan: 3, crinoid: 1.5, tabulate: 1 },
-  basin: { bryozoan: 0.6, crinoid: 0.1 },
+  shallows: { reed: 16, crinoid: 1.2, log: 2.5, bryozoan: 0.8, tabulate: 0.6, frondTower: 2 },
+  nursery: { reed: 26, crinoid: 12, log: 6, bryozoan: 5, rugose: 3, frondTower: 3 },   // thick enough to hide in; a giant still gets through
+  shelf: { crinoid: 3, bryozoan: 1.5, rugose: 1.2, tabulate: 0.8, reed: 0.6, lilyColumn: 1, frondTower: 0.6 },
+  forest: { crinoid: 30, bryozoan: 6, rugose: 3, tabulate: 2, stromatoporoid: 1, lilyColumn: 3, frondTower: 1.5 },
+  boulders: { stromatoporoid: 9, tabulate: 6, rugose: 6, bryozoan: 4, crinoid: 2, lilyColumn: 1.5 },
+  flats: { tabulate: 2.5, rugose: 0.6, bryozoan: 0.5, crinoid: 0.3, lilyColumn: 0.3 },
+  channel: { reed: 3, log: 1.5, rugose: 1, bryozoan: 0.4, frondTower: 0.8 },
+  escarpment: { rugose: 4, bryozoan: 3, crinoid: 1.5, tabulate: 1, lilyColumn: 2.5, frondTower: 2 },
+  basin: { bryozoan: 0.6, crinoid: 0.1, lilyColumn: 0.3 },
 };

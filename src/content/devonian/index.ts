@@ -3,7 +3,7 @@ import type { DevonianCreatureId } from './ids';
 import type { Slot } from '../../shared/palettes';
 import { DEVONIAN_CREATURES } from './creatures';
 import { SNACK_SCHOOLS, GIANTS } from './ecology';
-import { BIOME_NAMES, BIOME_DANGER, ATMOS, SAND_COLORS, FLORA_BASE, FLORA_DENSITY } from './environment';
+import { BIOME_NAMES, BIOME_DANGER, ATMOS, SAND_COLORS, FLORA_BASE, FLORA_DENSITY, SURFACE_Y } from './environment';
 import { MUSIC } from './music';
 import { SCHEMES, CREATURE_SCHEMES } from './palettes';
 import { DEVONIAN_BRAND, DEVONIAN_BRAND_EXTRAS } from './brand';
@@ -57,7 +57,7 @@ export const DEVONIAN = defineEra({
     title: ['dunkleosteus', 'cladoselache', 'coccosteus', 'doryaspis'],
   },
   ecology: { schools: SNACK_SCHOOLS, giants: GIANTS, shadow: { creature: 'titanichthys', scale: 1.0 } },
-  environment: { biomeNames: BIOME_NAMES, biomeDanger: BIOME_DANGER, atmosphere: ATMOS, sandColors: SAND_COLORS, floraColors: FLORA_BASE, flora: FLORA_DENSITY },
+  environment: { biomeNames: BIOME_NAMES, biomeDanger: BIOME_DANGER, atmosphere: ATMOS, sandColors: SAND_COLORS, floraColors: FLORA_BASE, flora: FLORA_DENSITY, surfaceY: SURFACE_Y },
   assets: {
     creatures: 'assets/devonian/creatures/', defaultPortraits: 'assets/devonian/creatures/',
     // Scenery and music are shared with the Cambrian until the Devonian sets are delivered
