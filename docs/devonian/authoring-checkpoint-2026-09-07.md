@@ -37,6 +37,30 @@ The explicit instancing collection owns its mappings, quality threshold and two 
 procedural giant exceptions, preventing underwater land-plant fallthrough. Remote day/night,
 UI and ecology changes remain. No original Cambrian creature files changed.
 
+## Latest additional reference — Odaraia and first clay execution
+
+User added **Odaraia (Cambrian) TOTAL REWORK**, preserving original as backup. Queue is
+`docs/cambrian/refinement-queue.md`: many-legged shrimp-like form, prominent compound eyes,
+shaped open wrapping coat-like carapace with partial transparency, not a cylinder. Existing
+Devonian jobs continue. Seven requested total reworks now take priority over general refinements.
+Named local backup `../expansion-authoring/backups/odaraia-pre-rework-2026-09-07/` contains
+23 files / 44,616,856 bytes plus backup-manifest.json. Terra verified all 24 source/copy pairs
+including user reference; reference SHA 01c3449922bf37fb7e00956dc0c05c13650a7bdc3aa1a4d4e19d703cc2ffde7c.
+All original Cambrian public model/portrait bytes remain unchanged. New derived status map
+`src/content/cambrian/model-status.ts` marks pending Odaraia preview in both game and viewer.
+Typecheck/build/era checks pass; actual viewer displays its preview badge. No old geometry audit.
+
+Gemuendina's first new clay source is frozen: `tools/devonian/creatures/gemuendina/rework-v3/HANDOFF.md`,
+manifest SHA 37b2372eccf4df0425c6662424d038eaa6137371e211fa75555cef5a6585786c. Terra executor is running
+its two frozen Blender commands with additional --python-exit-code 1. Outputs only local
+`../devonian-authoring/gemuendina/rework-v3/clay-01/`. Eight fixed clay renders, no final rig/textures
+or public export yet. Parent and author review actual output before next creative phase.
+Titanichthys creative source remains in progress; do not stage its un-frozen folder.
+
+Parent saved Coccosteus preproduction in `tools/devonian/creatures/coccosteus/rework-v3/design.md`.
+TUG 1817-152 identity verified via institutional catalogue; detailed specimen page unavailable.
+No new Coccosteus builder yet. Preserve backup and use the notes to avoid repeated research.
+
 ## Latest priority — supersedes older refinement sequencing below
 
 The user now requests carefully authored INITIAL versions of every creature and every plant,
