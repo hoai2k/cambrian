@@ -88,6 +88,25 @@ export const HUNTER_HAZE = 0.4;
 /** Follow-camera distance for a body length: about two body lengths back plus a floor so larvae are still readable. */
 export const magnificationDistance = (L: number) => L * 1.45 + 1.15 + Math.max(0, 0.8 - L) * 0.9;
 
+/**
+ * How much of the camera's pitch the stick's forward should follow.
+ *
+ * A follow camera normally sits a little above the creature looking slightly down, and taking
+ * that pitch literally means "forward" is partly "down" — hold forward from a resting view and
+ * you swim into the seabed. Nothing is lost by ignoring it, because rising and sinking are their
+ * own buttons: within FLAT_PITCH of level, forward is parallel to the seafloor. Past that the
+ * camera is being aimed deliberately up or down, so its pitch eases in and takes over completely
+ * by FULL_PITCH.
+ */
+const FLAT_PITCH = 0.45;   // ~26°, comfortably above a resting follow camera (which sits at ~11-25°)
+const FULL_PITCH = 1.0;    // ~57°, by which the camera is clearly being pointed somewhere
+
+export function swimPitch(pitch: number): number {
+  const mag = Math.abs(pitch);
+  const t = clamp((mag - FLAT_PITCH) / (FULL_PITCH - FLAT_PITCH), 0, 1);
+  return clamp(Math.sign(pitch) * mag * (t * t * (3 - 2 * t)), -0.7, 0.7);
+}
+
 export function layoutRects(n: number, w: number, h: number): Rect[] {
   if (n <= 1) return [{ x: 0, y: 0, w, h }];
   if (n === 2) return [{ x: 0, y: 0, w: w / 2, h }, { x: w / 2, y: 0, w: w / 2, h }];
@@ -253,7 +272,7 @@ export class Engine {
     f.mx = c.mx; f.my = c.my; f.lookX = c.lookX; f.lookY = c.lookY;
     const fwd = this.tmpV.copy(cs.look).sub(cs.camera.position).normalize();
     f.camYaw = Math.atan2(fwd.x, fwd.z);
-    f.camPitch = clamp(-Math.asin(clamp(fwd.y, -1, 1)) * 0.75, -0.7, 0.7);
+    f.camPitch = swimPitch(-Math.asin(clamp(fwd.y, -1, 1)));
     f.burst = c.burst; f.rise = c.rise; f.sink = c.sink;
     f.light = c.light; f.heavy = c.heavy; f.ability = c.ability; f.dodge = c.dodge; f.guard = c.guard; f.lock = c.lock; f.sense = c.sense;
     f.dash = c.dash; f.aim = c.aim; f.aimTarget = c.aim ? cs.aimTarget : -1;

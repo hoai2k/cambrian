@@ -509,4 +509,34 @@ ok(RULES !== undefined && !RULES.growthByNutrition, 'Devonian rules active: grow
   for (const m of modes) { const gm = new Game(m, [{ creature: 'coccosteus', device: 'keyboard', ready: true }, { creature: 'cladoselache', device: 0, ready: true }]); for (let i = 0; i < 120; i++) tick(gm, new Map([[0, emptyInput()], [1, emptyInput()]])); ok(gm.state.status === 'playing', `${m} runs`); }
 }
 
+// ---- colour slots ----
+// Every surface of a creature collapsing onto one slot paints it a single flat colour. That is
+// how the roster shipped black: the Devonian art names materials for the slot ("titanichthys
+// fins", "cheirolepis accent") and slotFor only knew the Cambrian convention, so all of it read
+// as `body` — and Dunkleosteus's body is #383a3b.
+{
+  const { slotFor } = await import('../src/shared/palettes');
+  const { SCHEMES: DEV_SCHEMES, CREATURE_SCHEMES: DEV_DEFAULTS } = await import('../src/content/devonian/palettes');
+  const dir = 'public/assets/devonian/creatures';
+  for (const f of fs.readdirSync(dir).filter((n) => n.endsWith('.glb') && !n.includes('.lod'))) {
+    const id = f.replace('.glb', '');
+    const buf = fs.readFileSync(`${dir}/${f}`);
+    const json = JSON.parse(buf.subarray(20, 20 + buf.readUInt32LE(12)).toString());
+    const names: string[] = (json.materials ?? []).map((m: { name?: string }) => m.name ?? '');
+    if (names.length < 2) continue;
+    const slots = new Set(names.map(slotFor));
+    ok(slots.size > 1, `${id} paints from more than one colour slot (${[...slots].join(', ')})`);
+    const sch = DEV_SCHEMES.find((s) => s.id === DEV_DEFAULTS[id]);
+    if (sch?.colors) {
+      // Reflectance of the darkest slot it actually uses, in linear light.
+      const lin = (hex: string) => { const n = parseInt(hex.slice(1), 16);
+        const c = (v: number) => { v /= 255; return v <= 0.04045 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4; };
+        return 0.2126 * c((n >> 16) & 255) + 0.7152 * c((n >> 8) & 255) + 0.0722 * c(n & 255); };
+      const used = [...slots].filter((s) => s !== 'eyes');
+      const mean = used.reduce((a, s) => a + lin(sch.colors![s]), 0) / used.length;
+      ok(mean > 0.06, `${id} is not a silhouette in ${sch.name} (mean albedo ${mean.toFixed(3)})`);
+    }
+  }
+}
+
 console.log(`PASS: ${passes} Devonian checks`);

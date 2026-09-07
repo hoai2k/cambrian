@@ -47,14 +47,22 @@ export const SLOT_LABEL: Record<Slot, string> = {
  * tests run before the membrane test, which would otherwise claim them, and the oral test runs
  * before the fallback, which would otherwise read "Oral cuticle" as body.
  *
- * tools/palette-test.mjs asserts the shipped materials still land where this file says they do.
+ * The Devonian roster is authored to a second convention: its materials are named for the slot
+ * directly ("titanichthys fins", "cheirolepis accent", "Stethacanthus_brush"). Those plain words
+ * are matched too, which is what stops a whole animal collapsing onto `body` — a Dunkleosteus
+ * whose every surface is the body colour is a black silhouette, because that colour is #383a3b.
+ * Exposed bone joins the underside for the same reason and for the same anatomy: it is the pale
+ * element these schemes countershade against, and no Devonian model names a belly.
+ *
+ * tools/palette-test.mjs asserts the shipped materials still land where this file says they do,
+ * and `npm run devonian` asserts no Devonian creature paints itself from one slot.
  */
 export function slotFor(materialName: string): Slot {
   const n = materialName.toLowerCase();
   if (/eye/.test(n)) return 'eyes';
-  if (/ventral|arthrodial/.test(n)) return 'underside';
-  if (/sclerotiz|oral|spine/.test(n)) return 'accent';
-  if (/membrane|swimming|marginal/.test(n)) return 'fins';
+  if (/ventral|arthrodial|belly|underside|bone/.test(n)) return 'underside';
+  if (/sclerotiz|oral|spine|accent|denticle|tooth|brush/.test(n)) return 'accent';
+  if (/membrane|swimming|marginal|\bfin/.test(n)) return 'fins';
   if (/bristle|appendage|endite|antenna|seta|gill|leg/.test(n)) return 'legs';
   return 'body';
 }
