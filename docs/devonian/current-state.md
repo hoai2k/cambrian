@@ -1,6 +1,6 @@
 # Resume here — creature authoring, 7 September 2026
 
-Last published main and feature revision: **03e926d**. Later local checkpoints may be ahead. Repository:
+Last published main and feature revision: **bd722cc**. Later local checkpoints may be ahead. Repository:
 `/Users/hoai/Documents/Stuff/Generations/cambrian/local/expansion-repo`.
 Separate main checkout: `../devonian-publish`. Fetch/push via
 `git@github.com:hoai2k/cambrian.git`; remote main changes concurrently, never force push.
@@ -43,8 +43,11 @@ send creative fixes to Terra. Preserve script hashes and candidates between revi
   Secondary sculpt corrected those forms; production materials/rigging now proceeds. Preserve clay01/02.
   Material-01 executed successfully without geometry changes; both actual renders were reviewed by
   root and author. Palette was rejected as too pale/chalky with cracked-stone tesserae. Material-02
-  is being authored with deeper organic olive/ochre colour and granular detail; rig/action source
-  proceeds independently. Material-01 packed blend SHA:
+  executed and improved the colour/crackle; root still found the finish too uniform. Material-03
+  is now being authored with an original ImageGen olive/ochre tessera source (prompt/provenance
+  in `imagegen-skin-01.json`, source SHA `6820a68305bfd1265510934d3df653e0e80f2768158722b54684fbab0cdf0210`).
+  Rig/action/export/check scripts have safe drafts but candidate binding remains deliberately
+  pending reviewed material. Read `production-checkpoint.md`. Material-01 packed blend SHA:
   `af0b5ab285fb1d7770c9689aa7671c210adee79209f76b7e3694ac5216310210`.
   Source: `tools/devonian/creatures/gemuendina/rework-v3/`.
   Outputs: `../devonian-authoring/gemuendina/rework-v3/clay-01/`.
@@ -55,6 +58,12 @@ send creative fixes to Terra. Preserve script hashes and candidates between revi
   masonry blocks with crumpled orbital folds, a wedge-like lip and a massive triangular moving
   jaw wall. Read `root-review-clay02.md`. Clay-03 must correct organic surface/mandible architecture
   before textures or rigging; preserve the smoother posterior and corrected fin tips.
+  Clay-03 subsequently executed and all four images were inspected by root. Continuous mass
+  improved, but drooping helmet-like preoral roof, triangular pouch-like floor, detached-looking
+  jaw rail and ribbon/slab pectorals remain concerns. Astra author is independently reviewing
+  and proposing the next bounded correction; no permission to advance to materials.
+  Clay-03 blend SHA: `cef5249afb1dd79e98b86fd3a0d12809c6646717a3639350754ad3076298d00c`.
+  Manifest: `1a7f781d4a6abc4bc624c351f0822db77bbf29779a47e3f5a8e246220f6b81a6`.
   Clay-02 blend SHA: `78a0caee9d8fef38f457b9f376671cefc30080232cf5cc61a3b4867b088f1098`.
   Handoff: `HANDOFF-clay02.md`; builder SHA
   `a4142814eb10db533eef2063fb4bfdca147860020a988ab6dedbe3edf1de7955`, renderer SHA
@@ -68,17 +77,23 @@ send creative fixes to Terra. Preserve script hashes and candidates between revi
   Source: `tools/devonian/creatures/titanichthys/rework-v3/`.
   Outputs: `../devonian-authoring/titanichthys/rework-v3/clay-01/` (images in `renders/`).
   Blend SHA: `0ac6cdef7578f0fe7270673a5348a620d1d88a33a1b055a96eb29407fd1ac4bf`.
-- `/root/devonian_execution_handoff` — Terra medium; completed Gemuendina material-01, now runs
-  Coccosteus frozen clay-01 build, new renders and old backup comparison renders.
+- `/root/devonian_execution_handoff` — Terra medium; idle after completing Gemuendina material01/02,
+  Coccosteus clay01 plus ten comparison images and Titanichthys clay03 plus four views.
   Use Terra executors for the next frozen scripts.
   Wait for HASH-BOUND handoff from each Astra author, execute with --python-exit-code 1,
   return actual images to the author/root for review. No public replacement yet.
 - `/root/coccosteus_rework_design` — Astra high; first clay source frozen, awaiting actual
-  comparison images from Terra. `rework-v3/HANDOFF.md` binds three groups and ten images.
+  comparison images from Terra are complete. Root reviewed all ten and rejected the first
+  production form: boxy helmet/thorax, prism-like soft tail, oral midline hole and squared
+  hinge panels, fin-tip hooks. Read `root-review-clay01.md`. Backup is unchanged. The author
+  is actively authoring a fresh clay02 sculpt before materials.
+  `rework-v3/HANDOFF.md` binds the completed three groups and ten images.
   Builder SHA: `7e91fe87c5ae33c67aa4aa747cc74d59e65d31919ccf037e2f8c080011911e3d`.
   Its preproduction brief is `rework-v3/design.md`.
   TUG 1817-152 identity verified in institutional catalogue, detailed record unavailable.
   Avoid repeating the lookup. Doryaspis/Bothriolepis/Stethacanthus/Odaraia authors not started.
+  Odaraia preproduction brief is `tools/creatures/odaraia/rework-v3/DESIGN.md`; ROM morphology
+  and the 2024 paper abstract were consulted, full primary figures remain unread.
 
 ## Backups and references
 
@@ -94,7 +109,9 @@ No original Cambrian creature model/portrait bytes have changed.
 
 ## Validation and environment
 
-Latest main03e926d typecheck/build/eras/world regressions and all644 Devonian checks passed.
+Main bd722cc typecheck/build/eras passed after preserving concurrent Cambrian classification changes.
+Prior main03e926d world regressions and all644 Devonian checks passed; no runtime changes by
+our newer sculpt-source checkpoints. Logs `../devonian-authoring/review/sculpt-checkpoint-*.log`.
 Logs: `../devonian-authoring/review/odaraia-main-*.log`.
 Odaraia preview UI was checked in the actual viewer. Concurrent main changes include the
 viewer clearing its prior subject during load, UI sizing and simulation/world adjustments.
