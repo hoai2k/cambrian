@@ -8,6 +8,7 @@ import { creature } from '../sim/creatures';
 import { BIOME_ART, biomeArtPath, radarGlyphPath } from '../shared/environment-assets';
 import { BAND_COLOR } from '../sim/types';
 import { appBase } from '../shared/base';
+import { fillControls, key } from '../shared/controls';
 
 export function Hud({ snapshot }: { snapshot: HudSnapshot }) {
   const W = snapshot.rects.reduce((m, r) => Math.max(m, r.x + r.w), 1);
@@ -28,6 +29,8 @@ export function Hud({ snapshot }: { snapshot: HudSnapshot }) {
 
 function PlayerPanel({ p }: { p: PlayerHud }) {
   const def = creature(p.creature);
+  // Every prompt on this half of the screen is written in whatever this player is holding.
+  const s = p.scheme;
   const R = 30, C = 2 * Math.PI * R;
   // Red edges indicate low health only; predator awareness has its own text and arrow.
   const healthWarning = p.alive && p.hpMax > 0
@@ -65,7 +68,7 @@ function PlayerPanel({ p }: { p: PlayerHud }) {
       {p.aim && (
         <div className={`aim ${p.aim.hasTarget ? 'on-target' : ''} ${p.aim.inRange ? 'in-range' : ''} ${p.aim.ready ? '' : 'cooling'}`} style={{ color: p.aim.color }}>
           <i /><i /><i /><i /><b />
-          <span className="aim-label">{p.aim.inRange ? (p.aim.ready ? `RT · ${p.aim.action}` : '…') : p.aim.name ?? ''}</span>
+          <span className="aim-label">{p.aim.inRange ? (p.aim.ready ? `${key('heavy', s)} · ${p.aim.action}` : '…') : p.aim.name ?? ''}</span>
         </div>
       )}
       {p.lock && !p.aim && (
@@ -92,23 +95,23 @@ function PlayerPanel({ p }: { p: PlayerHud }) {
               </li>
             ))}
           </ul>
-          <small>{p.teleport.cooldown > 0 ? `Ready in ${Math.ceil(p.teleport.cooldown)} s` : <><kbd>A</kbd> go · <kbd>B</kbd> back · D-pad ▼ next</>}</small>
+          <small>{p.teleport.cooldown > 0 ? `Ready in ${Math.ceil(p.teleport.cooldown)} s` : <><kbd>{key('confirm', s)}</kbd> go · <kbd>{key('back', s)}</kbd> back · <kbd>{key('teleport', s)}</kbd> next</>}</small>
         </div>
       )}
       <div className="hud-bottom">
-        <div className={`chip ability ${p.abilityUnlocked ? '' : 'locked'} ${p.abilityActive ? 'active' : ''}`} title={hideDescription(def.id)}>
-          <span className="btn y">Y</span>
+        <div className={`chip ability ${p.abilityUnlocked ? '' : 'locked'} ${p.abilityActive ? 'active' : ''}`} title={fillControls(hideDescription(def.id), s)}>
+          <span className="btn y">{key('ability', s)}</span>
           <span className="chip-label">{p.abilityUnlocked ? p.abilityName : 'Hide'}</span>
           <i className="cool" style={{ transform: `scaleX(${p.abilityUnlocked ? p.abilityReady : 0})` }} />
         </div>
         <div className={`chip sense ${p.senseReady >= 1 ? 'ready' : ''}`}>
-          <span className="btn dpad">▲</span><span className="chip-label">Sense</span>
+          <span className="btn dpad">{key('sense', s)}</span><span className="chip-label">Sense</span>
           <i className="cool" style={{ transform: `scaleX(${p.senseReady})` }} />
         </div>
         <div className="tally"><span>{p.eats} eaten</span><span>{p.kills} kills</span><span>{p.escapes} escapes</span></div>
       </div>
       {p.hunterState !== 'none' && (
-        <div className={`threat ${p.hunterState}`}>
+        <div className={`threat-alert ${p.hunterState}`}>
           <span className="eye"><i style={{ transform: `scaleX(${Math.min(1, p.hunted)})` }} /></span>
           <div>
             <b>{p.hunterState === 'hunting' ? `${p.hunterName ?? 'Something huge'} IS HUNTING YOU` : `${p.hunterName ?? 'Something huge'} is looking your way`}</b>
@@ -117,7 +120,7 @@ function PlayerPanel({ p }: { p: PlayerHud }) {
         </div>
       )}
       {!p.modelReady && p.alive && <p className="hint">Your creature is taking shape…</p>}
-      {p.hint && p.hunterState === 'none' && p.modelReady && <p className="hint">{p.hint}</p>}
+      {p.hint && p.hunterState === 'none' && p.modelReady && <p className="hint">{fillControls(p.hint, s)}</p>}
       {/* Co-op: where a team-mate went down, and how long is left to reach them. */}
       {p.downedAllies.map((d) => (
         <div key={d.index} className="downed-arrow" style={{ color: d.color, transform: `rotate(${Math.atan2(d.x, -d.y) * 180 / Math.PI}deg)` }} aria-hidden>

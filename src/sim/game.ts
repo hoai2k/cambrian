@@ -1969,7 +1969,13 @@ export class Game implements AiWorld {
     pr.flags.add(f);
   }
 
-  /** Onboarding: returns the current hint for a player, if any. */
+  /**
+   * Onboarding: returns the current hint for a player, if any.
+   *
+   * Hints name actions, not buttons: `{heavy}`, `{dash}`, `{sense}`. The simulation has no idea
+   * what anyone is holding and must not — the HUD fills them in for that player's own device
+   * (`fillControls` in `src/shared/controls.ts`).
+   */
   hintFor(i: number): string | undefined {
     const p = this.players[i]; const pr = this.progress[i];
     if (!p || !pr || this.mode === 'reef') return undefined;
@@ -1978,17 +1984,17 @@ export class Game implements AiWorld {
     if (!isAlive(p)) return undefined;
     if (p.hunted >= 0.5) return p.cover > 0.3 ? (len3(p.vel) < 0.3 ? 'Hold still. It is losing you.' : 'You are in cover. Now hold still.') : 'It is coming for you. Get under the sponges, then hold still.';
     if (p.hunted > 0.2) return p.cover > 0.3 ? 'It is looking your way. Stay in cover and freeze.' : 'Something big is looking your way. Stop moving or slip into cover.';
-    if (!f.has('moved')) return 'Push the left stick to swim.';
-    if (!f.has('burst')) return 'Hold A to sprint. Catch the school.';
+    if (!f.has('moved')) return '{swim} to swim.';
+    if (!f.has('burst')) return 'Hold {sprint} to sprint. Catch the school.';
     if (!f.has('ate')) return 'Swim through the small fry to eat them.';
-    if (!f.has('sense') && this.time > 20) return 'Tap D-pad up: sense pulse shows what is near.';
+    if (!f.has('sense') && this.time > 20) return 'Tap {sense}: the sense pulse shows what is near.';
     if (p.tier === 0 && !f.has('tier')) return 'Eat. Grow. The ring fills toward your next moult.';
-    if (p.tier >= 1 && !f.has('light')) return 'X bites. RT pounces. Hunt something your own size.';
-    if (p.tier >= 1 && !f.has('dodge')) return 'LB with a stick direction dashes clear of a bite. A sprints.';
-    if (p.tier >= 1 && !f.has('guard') && creature(p.creature).canGuard) return 'Hold B to guard. Tap it as a hit lands to parry.';
-    if (!f.has('ability')) return `Y: hide. Burrowers bury for free; camouflage copies nearby colours and uses stamina.`;
-    if (!f.has('lock') && this.time > 30) return 'Hold LT to aim at prey. When the crosshair fills, RT pounces.';
-    if (!f.has('teleport') && this.time > 60 && (this.players.length > 1 || distXZ(p.pos, p.home) > 150)) return 'D-pad down: teleport home, or to another player.';
+    if (p.tier >= 1 && !f.has('light')) return '{light} bites. {heavy} pounces. Hunt something your own size.';
+    if (p.tier >= 1 && !f.has('dodge')) return '{dash} while you are moving dashes clear of a bite. {sprint} sprints.';
+    if (p.tier >= 1 && !f.has('guard') && creature(p.creature).canGuard) return 'Hold {guard} to guard. Tap it as a hit lands to parry.';
+    if (!f.has('ability')) return '{ability}: hide. Burrowers bury for free; camouflage copies nearby colours and uses stamina.';
+    if (!f.has('lock') && this.time > 30) return 'Hold {aim} to aim at prey. When the crosshair fills, {heavy} pounces.';
+    if (!f.has('teleport') && this.time > 60 && (this.players.length > 1 || distXZ(p.pos, p.home) > 150)) return '{teleport}: teleport home, or to another player.';
     return undefined;
   }
 }
