@@ -1,7 +1,7 @@
 import { ACTIVE_ERA } from '../content';
 import { RULES } from './era-rules';
 import { BURROWERS, HEAVY_SPECIALS, DEFENSIVE_SPECIALS, CAMOUFLAGE_DRAIN, camouflageMatch, clearPursuit, stopHiding } from './concealment';
-import { abilitySpeed, beginExpansionAbility, stepExpansionAbility, bloomRate, grazeRate } from './expansion-abilities';
+import { abilitySpeed, beginExpansionAbility, beginHeavyStrike, heavyStrikeReach, stepExpansionAbility, stepHeavyStrike, bloomRate, grazeRate } from './expansion-abilities';
 import { add, clamp, damp, dist, distXZ, dot, heading, len3, lerp, makeRng, norm, scale as vscale, sub, TAU, v3, wrapAngle, yawOf, type Rng, type Vec3 } from '../shared/math';
 import { applyScaleStats, bandOf, bodyRadius, canAct, clearanceOf, climbOver, floorClearance, isAlive, isHidden, isInvulnerable, lengthOf, makeActor, massOf, speedFactor, staminaCost } from './actors';
 import { makeBrain, think, type AiWorld } from './ai';
@@ -1126,9 +1126,9 @@ export class Game implements AiWorld {
       this.feedOnBones(a, L, dt);
     }
 
-    // Aim range: the crosshair fills when a pounce would connect
+    // Aim range: the crosshair fills when whatever RT does for this creature would connect
     a.aimInRange = false;
-    if (a.lockTarget >= 0) { const t = this.idMap.get(a.lockTarget); if (t && isAlive(t)) a.aimInRange = dist(a.pos, t.pos) < this.pounceRange(a); }
+    if (a.lockTarget >= 0) { const t = this.idMap.get(a.lockTarget); if (t && isAlive(t)) a.aimInRange = dist(a.pos, t.pos) < this.heavyMove(a).reach; }
     // Lock target validity
     if (a.lockTarget >= 0) {
       const t = this.idMap.get(a.lockTarget);
@@ -1164,6 +1164,28 @@ export class Game implements AiWorld {
   }
 
   pounceRange(a: Actor) { return lengthOf(a) * 3.6 + 3; }
+
+  /**
+   * What the heavy button (RT) actually does for this creature right now: its name for the prompt,
+   * how far it reaches, and whether pressing it would do anything at all.
+   *
+   * The HUD used to announce "RT · POUNCE" over any aimed target inside the pounce's reach, for
+   * every creature. That is only true of a creature with no special. A creature with a heavy
+   * special gets the special instead, on its own cooldown and its own much shorter reach, and the
+   * three filter-feeding specials never strike a target at all — so the prompt lit for a button
+   * that would either do nothing or swing at water a body length short. `ready` mirrors the gates
+   * in the action cascade above exactly, `reach` is the move's own reach, and `name` is the move's
+   * own name, the way the choice screen already lists it.
+   */
+  heavyMove(a: Actor): { name: string; reach: number; ready: boolean } {
+    const def = creature(a.creature);
+    // A burrowed ambusher's emergence strike takes the button ahead of everything else.
+    if (a.emergenceHeavy) return { name: 'AMBUSH', reach: this.pounceRange(a), ready: true };
+    if (HEAVY_SPECIALS.has(def.ability)) {
+      return { name: def.abilityName.toUpperCase(), reach: heavyStrikeReach(a, def), ready: a.abilityCd <= 0 && a.stamina >= 18 };
+    }
+    return { name: 'POUNCE', reach: this.pounceRange(a), ready: a.pounceCd === 0 && a.stamina >= 12 && a.exhausted === 0 };
+  }
 
   /** Nearest thing in front worth pouncing on when RT is pressed without aiming. */
   private pounceTargetAhead(a: Actor): Actor | undefined {
@@ -1241,8 +1263,9 @@ export class Game implements AiWorld {
     a.abilityCd = Math.max(2, (def.abilityDuration ?? .55) + .6);
     a.abilityT = 0; a.abilityActive = true; a.state = 'ability'; a.stateT = 0;
     a.stateDur = def.abilityDuration ?? .55; a.hitDone.clear();
+    beginHeavyStrike(this.expansionContext(), a, def);
     beginExpansionAbility(this.expansionContext(), a, def);
-    RULES?.beginAbility(this, a, this.expansionContext());
+    RULES?.beginAbility?.(this, a, this.expansionContext());
     this.events.push({kind:'ability',pos:{...a.pos},actor:a.id,player:a.player,strength:lengthOf(a)});
     this.flag(a, 'heavy');
   }
@@ -1250,6 +1273,7 @@ export class Game implements AiWorld {
   private updateAbility(a: Actor, def: ReturnType<typeof creature>, dt: number, input: InputFrame, L: number, sf: number) {
     a.abilityT += dt;
     const done = a.stateT >= a.stateDur;
+    stepHeavyStrike(this.expansionContext(), a, def);
     stepExpansionAbility(this.expansionContext(), a, def, dt);
     RULES?.stepAbility(this, a, this.expansionContext(), dt);
     if (a.state !== 'ability') return;
