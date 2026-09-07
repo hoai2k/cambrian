@@ -84,7 +84,7 @@ export class Game implements AiWorld {
     this.world.loadAround(nursery);
     this.hitCtx = { events: this.events, byId: (id) => this.idMap.get(id), time: 0, rng: this.rng, armour: RULES ? (att, vic, dir) => RULES!.armour(att, vic, dir) : undefined };
     setups.forEach((s, i) => {
-      const startScale = RULES ? RULES.startScale(mode, i) : mode === 'rise' ? TIER_SCALE[0] : mode === 'hunted' ? (i === 0 ? 3.0 : TIER_SCALE[1]) : mode === 'reef' ? TIER_SCALE[2] : TIER_SCALE[1];
+      const startScale = RULES ? RULES.startScale(mode, i, s.creature) : mode === 'rise' ? TIER_SCALE[0] : mode === 'hunted' ? (i === 0 ? 3.0 : TIER_SCALE[1]) : mode === 'reef' ? TIER_SCALE[2] : TIER_SCALE[1];
       const a = this.spawn(s.creature, 'player', this.spawnPoint(nursery, s.creature, startScale, i), startScale, i);
       a.home = { ...nursery };
       a.yaw = Math.PI;                                   // facing out to sea
@@ -95,7 +95,7 @@ export class Game implements AiWorld {
       // Fill to 4 with bots
       for (let i = setups.length; i < 4; i++) {
         const c = this.pickBot(setups.map((s) => s.creature), i);
-        const botScale = RULES ? RULES.startScale(mode, i) : TIER_SCALE[1];
+        const botScale = RULES ? RULES.startScale(mode, i, c) : TIER_SCALE[1];
         const bot = this.spawn(c, 'bot', this.spawnPoint(nursery, c, botScale, i), botScale);
         bot.home = { ...nursery };
         bot.brain = makeBrain('needs', nursery, this.rng, { aggression: 0.9, reaction: 0.2, parrySkill: 0.55 });
@@ -146,6 +146,8 @@ export class Game implements AiWorld {
   }
 
   private spawnPoint(center: Vec3, c: CreatureId, s: number, index = 0): Vec3 {
+    const inCover = RULES?.spawnPoint(this, center, c, s, index);
+    if (inCover) return inCover;
     const def = creature(c);
     const ang = index * 1.7 + this.rng() * 0.8, d = 3 + this.rng() * 6;
     const x = center.x + Math.cos(ang) * d, z = center.z + Math.sin(ang) * d;

@@ -57,6 +57,8 @@ unless the user explicitly asks for a PR. Steps:
   never those fields by hand; `npm run devonian` checks they match. The water surface is per era
   (`environment.surfaceY`), fish leave the water through it (`airborne`), and the swim model (reverse
   slow, turn sharp when slow, fast-start on sprint) is the `swim` hook in `src/sim/devonian/swim.ts`.
+  Devonian growth is five geometric stages per creature (`stageScale` in `src/sim/devonian/state.ts`,
+  hatchlings no shorter than 0.6 units); hatchlings are placed inside plant cover (`spawnInCover`).
 - Devonian scenery and biome plates are procedural stand-ins: flora kinds and their density table in
   `src/content/devonian/environment.ts` + `src/render/sea.ts`, plates from `npm run devonian:plates`.
   Authored sets replace them without touching placement; see `docs/redesign/09-devonian-remaining.md`.

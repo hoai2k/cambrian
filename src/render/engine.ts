@@ -13,7 +13,7 @@ import { BIOME_NAMES, biomeAt, groundHeight, nurseryAt, resolveStatic, SURFACE_Y
 import { AssetQueue, type AssetProgress } from './assets';
 import { CreatureView, ensureLoaded, loadedSync, type Lod } from './creature';
 import { Attachments } from './attachments';
-import { Bubbles, Impacts, Silt } from './fx';
+import { Bubbles, Impacts, Silt, Splash } from './fx';
 import { createSea, type Quality, type SeaEnvironment } from './sea';
 import { RULES, type EraHud } from '../sim/era-rules';
 
@@ -99,6 +99,7 @@ export class Engine {
   private bubbles = new Bubbles();
   private sparkles = new Bubbles(400, [1.0, 0.86, 0.5], 0.25);
   private impacts = new Impacts();
+  private splash = new Splash(SURFACE_Y);
   private silt = new Silt();
   private keyboard = new KeyboardInput();
   private setups: PlayerSetup[] = [];
@@ -136,7 +137,7 @@ export class Engine {
     // Split-screen renders the scene once per player; without this the shadow map is rebuilt every time.
     this.renderer.shadowMap.autoUpdate = false;
     container.appendChild(this.renderer.domElement);
-    this.scene.add(this.bubbles.points, this.sparkles.points, this.impacts.group, this.silt.group);
+    this.scene.add(this.bubbles.points, this.sparkles.points, this.impacts.group, this.silt.group, this.splash.group);
     (window as any).__cambrian = this;
     this.resize = new ResizeObserver(() => this.onResize());
     this.resize.observe(container);
@@ -329,7 +330,7 @@ export class Engine {
 
     // Views
     this.syncViews(game, camPositions, dt);
-    this.bubbles.update(dt); this.sparkles.update(dt);
+    this.bubbles.update(dt); this.sparkles.update(dt); this.splash.update(dt);
     this.impacts.update(dt, focus);
     this.silt.sync(game.silt, this.time);
 
@@ -715,18 +716,18 @@ export class Engine {
         // Era events (Devonian). Their samples are registered by the era's entry page; an
         // unregistered kind is silent, so the Cambrian build never reaches for a missing file.
         case 'breach': {
-          // a sheet of water thrown up as the body leaves the sea
-          this.sparkles.emit(e.pos, Math.round(40 * (e.strength ?? 1)), 1.6, 2.2, 0.09, 2.4);
+          // a sheet of water dragged up with the body as it leaves the sea, and bubbles under it
+          const b = game.byId(e.actor), bl = b ? lengthOf(b) : 1;
+          this.splash.burst(e.pos, e.strength ?? 1, 'out', bl);
           this.bubbles.emit(e.pos, 30, 1.2, 4, 0.1, 1.6);
-          this.impacts.spawn(e.pos, '#e8f6ff', 2.5 * (e.strength ?? 1), 0.5);
           world('breach', e.pos, e.strength ?? 1);
           break;
         }
         case 'splash': {
-          const s = e.strength ?? 1;
-          this.sparkles.emit(e.pos, Math.round(70 * s), 2.2, 2.6, 0.1, 2.6);
-          this.bubbles.emit(e.pos, Math.round(60 * s), 1.4, 6, 0.12, 2.2);
-          this.impacts.spawn(e.pos, '#ffffff', 3.5 * s, 0.6);
+          // the landing: a crown of droplets, a ring spreading on the surface, a cloud of bubbles below
+          const s = e.strength ?? 1, b = game.byId(e.actor), bl = b ? lengthOf(b) : 1;
+          this.splash.burst(e.pos, s, 'in', bl);
+          this.bubbles.emit(e.pos, Math.round(70 * s), 1.6, 6, 0.12, 2.4);
           world('splash', e.pos, s);
           if (e.player != null && e.player >= 0) { const d = padOf(e.player); if (typeof d === 'number') rumble(d, Math.min(1, 0.5 * s), 0.6, 220); this.shake(e.player, 0.6 * s); }
           break;
@@ -851,7 +852,7 @@ export class Engine {
     this.assets.dispose();
     this.clearMatch();
     this.sea?.dispose();
-    this.bubbles.dispose(); this.sparkles.dispose(); this.impacts.dispose(); this.silt.dispose();
+    this.bubbles.dispose(); this.splash.dispose(); this.sparkles.dispose(); this.impacts.dispose(); this.silt.dispose();
     this.shieldGeo.dispose();
     this.renderer.dispose();
     this.renderer.forceContextLoss();

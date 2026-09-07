@@ -15,7 +15,8 @@ import { createAssetPaths } from '../src/content/asset-paths';
 selectEra(DEVONIAN);
 const { Game } = await import('../src/sim/game');
 const { RULES } = await import('../src/sim/era-rules');
-const { stateFor, devActor, STAGE_SCALE } = await import('../src/sim/devonian/state');
+const { stateFor, devActor, stageScale, ADULT_STAGE, PRIME_STAGE, STAGE_AT } = await import('../src/sim/devonian/state');
+const { coverAt } = await import('../src/sim/world');
 const { bandOf, isAlive, lengthOf } = await import('../src/sim/actors');
 const { PLAYABLE } = await import('../src/sim/creatures');
 const { creature } = await import('../src/sim/creatures');
@@ -123,12 +124,19 @@ ok(RULES !== undefined && !RULES.growthByNutrition, 'Devonian rules active: grow
 // ---- start scales and modes ----
 {
   const dom = new Game('domination', [{ creature: 'eldredgeops', device: 'keyboard', ready: true }, { creature: 'dunkleosteus', device: 0, ready: true }]);
-  for (const p of dom.players) ok(Math.abs(p.scale - STAGE_SCALE[0]) < 1e-6, `${p.creature} starts Young in Domination`);
-  ok(Math.abs(lengthOf(dom.players[1]) / lengthOf(dom.players[0]) - creature('dunkleosteus').adultLength / creature('eldredgeops').adultLength) < 1e-3, 'rungs keep their size ratio at the same stage');
+  for (const p of dom.players) ok(Math.abs(p.scale - stageScale(creature(p.creature).adultLength, 0)) < 1e-6, `${p.creature} starts as a hatchling in Domination`);
+  ok(lengthOf(dom.players[1]) < creature('coccosteus').adultLength, `a hatchling Dunkleosteus (${lengthOf(dom.players[1]).toFixed(2)}) is shorter than an adult Coccosteus`);
+  ok(lengthOf(dom.players[0]) >= 0.6 - 1e-6, `the smallest hatchling is still a playable body (${lengthOf(dom.players[0]).toFixed(2)})`);
+  // growth is geometric: every moult multiplies the body by the same factor, up to adult, then Prime
+  const L = creature('dunkleosteus').adultLength, steps = [0, 1, 2, 3].map((i) => stageScale(L, i + 1) / stageScale(L, i));
+  ok(steps.slice(0, 3).every((r) => Math.abs(r - steps[0]) < 1e-6) && steps[0] > 1.5, `Dunkleosteus grows ×${steps[0].toFixed(2)} at each of its first three moults`);
+  ok(Math.abs(stageScale(L, ADULT_STAGE) - 1) < 1e-9 && stageScale(L, PRIME_STAGE) > 1.3, 'adult is full size and Prime is bigger again');
+  // every hatchling hatches inside plant cover, never in open water
+  for (const p of dom.players) ok(coverAt(dom.world, p.pos, lengthOf(p), []) > 0.2, `${p.creature} hatches hidden in the plants (cover ${coverAt(dom.world, p.pos, lengthOf(p), []).toFixed(2)})`);
   const bots = dom.actors.filter((a) => a.controller === 'bot');
   ok(bots.length === 2, 'Domination fills to four with bots');
   const reef = new Game('reef', [{ creature: 'tiktaalik', device: 'keyboard', ready: true }]);
-  ok(Math.abs(reef.players[0].scale - STAGE_SCALE[1]) < 1e-6 && devActor(reef, reef.players[0]).standing === 50, 'Reef starts Adult at half standing');
+  ok(Math.abs(reef.players[0].scale - stageScale(creature('tiktaalik').adultLength, ADULT_STAGE)) < 1e-6 && devActor(reef, reef.players[0]).standing > STAGE_AT[ADULT_STAGE], 'Reef starts Adult');
   const fc = new Game('foodchain', [{ creature: 'coccosteus', device: 'keyboard', ready: true }]);
   const rungs = fc.actors.filter((a) => a.controller === 'player' || a.controller === 'bot').map((a) => creature(a.creature).rung);
   // Bots fill every rung that has a delivered model before any rung doubles up, so the chain is
@@ -161,13 +169,16 @@ ok(RULES !== undefined && !RULES.growthByNutrition, 'Devonian rules active: grow
   ok(d2.standing < 40 && d2.standing > 30, `standing decays when nothing is done for it (40 → ${d2.standing.toFixed(1)})`);
   // straight to Prime: the stage changes with the moult ceremony, the rung never does
   // one stage per moult ceremony: standing can run ahead, the body catches up after each moult
+  const stage0 = d.stage;
   for (let i = 0; i < 80; i++) RULES!.onNutrition(g, p, 10, undefined);
-  ok(d.stage === 1 && p.state === 'moult', `the first ceremony takes it to Adult (stage ${d.stage}, ${p.state})`);
+  ok(d.stage === stage0 + 1 && p.state === 'moult', `a ceremony takes it up exactly one stage (${stage0} → ${d.stage}, ${p.state})`);
+  const scales = [p.scale];
+  for (let m = 0; m < 4; m++) { for (let i = 0; i < 60 * 3; i++) tick(g, new Map<number, InputFrame>([[0, emptyInput()]])); RULES!.onNutrition(g, p, 1, undefined); scales.push(p.scale); }
   for (let i = 0; i < 60 * 3; i++) tick(g, new Map<number, InputFrame>([[0, emptyInput()]]));
-  RULES!.onNutrition(g, p, 1, undefined);
-  ok(d.stage === 2 && p.state === 'moult', `standing 60+ reaches Prime after the next ceremony (stage ${d.stage}, ${p.state})`);
-  for (let i = 0; i < 60 * 3; i++) tick(g, new Map<number, InputFrame>([[0, emptyInput()]]));
-  ok(Math.abs(p.scale - STAGE_SCALE[2]) < 1e-6, 'Prime is the largest the body gets');
+  ok(d.stage === PRIME_STAGE, `a ceremony per moult all the way to Prime (stage ${d.stage})`);
+  const grew = scales.filter((s, i) => i > 0 && s > scales[i - 1] + 1e-9).length;
+  ok(scales.every((s, i) => i === 0 || s >= scales[i - 1] - 1e-9) && grew >= 2, `each moult makes the body bigger until Prime (${scales.map((s) => s.toFixed(2)).join(' → ')})`);
+  ok(Math.abs(p.scale - stageScale(creature(p.creature).adultLength, PRIME_STAGE)) < 1e-6, 'Prime is the largest the body gets');
   ok(creature(p.creature).rung === 2, 'still rung II');
   const hud = RULES!.hud(g, 0)!;
   ok(hud.rung === 2 && hud.rungName === 'Shoal' && hud.standing === d.standing, 'HUD reports rung, name and standing');
@@ -394,7 +405,7 @@ ok(RULES !== undefined && !RULES.growthByNutrition, 'Devonian rules active: grow
   const g = new Game('domination', [{ creature: 'cladoselache', device: 'keyboard', ready: true }, { creature: 'bothriolepis', device: 0, ready: true }]);
   const [shark, plate] = g.players;
   const floorS = groundHeight(g.world, shark.pos.x, shark.pos.z), floorP = groundHeight(g.world, plate.pos.x, plate.pos.z);
-  ok(shark.pos.y - floorS > (SURFACE_Y - floorS) * 0.3, `a swimmer hatches mid-column (${(shark.pos.y - floorS).toFixed(0)} above a floor with ${(SURFACE_Y - floorS).toFixed(0)} of water)`);
+  ok(coverAt(g.world, shark.pos, lengthOf(shark), []) > 0.2 && shark.pos.y > floorS + 0.3, `a swimmer hatches hidden in the plants, off the floor (cover ${coverAt(g.world, shark.pos, lengthOf(shark), []).toFixed(2)}, ${(shark.pos.y - floorS).toFixed(1)} up, ${(SURFACE_Y - floorS).toFixed(0)} of water)`);
   ok(plate.pos.y - floorP < 2, 'a crawler hatches on the floor');
   // lily crowns give cover high up, where a fish would use it
   const c = g.world.cover.find((cv) => cv.pos.y > floorS + 6);
