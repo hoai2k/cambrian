@@ -2,18 +2,19 @@ import { ACTIVE_ERA } from '../content';
 import { BURROWERS, hideLabel } from '../sim/concealment';
 import * as THREE from 'three';
 import { audio, SAMPLES } from '../audio/audio';
-import { distanceAtten } from '../audio/mix';
+import { distanceAtten, HUGE_LENGTH } from '../audio/mix';
 import { emptyControls, gamepads, KeyboardInput, readGamepad, rumble, type RawControls } from '../input/input';
 import { clamp, damp, TAU, wrapAngle } from '../shared/math';
 import { bandOf, isAlive, isHidden, lengthOf } from '../sim/actors';
 import { creature, type CreatureId } from '../sim/creatures';
 import { Game, type TeleportDest } from '../sim/game';
 import { BAND_COLOR, emptyInput, TIER_NAMES, TIER_NEED, type Actor, type Band, type InputFrame, type Mode, type PlayerSetup } from '../sim/types';
-import { BIOME_NAMES, biomeAt, groundHeight, nurseryAt, resolveStatic, SURFACE_Y, type Boulder } from '../sim/world';
+import { BIOME_NAMES, biomeAt, groundHeight, nurseryAt, resolveStatic, SURFACE_Y, type Biome, type Boulder, type LandmarkKind } from '../sim/world';
 import { AssetQueue, type AssetProgress } from './assets';
 import { CreatureView, ensureLoaded, loadedSync, type Lod } from './creature';
 import { Attachments } from './attachments';
 import { Bubbles, Impacts, Silt, Splash } from './fx';
+import { Mouthfuls } from './carcass';
 import { createSea, type Quality, type SeaEnvironment } from './sea';
 import { RULES, type EraHud } from '../sim/era-rules';
 
@@ -28,6 +29,16 @@ export interface PlayerHud {
   aim?: { hasTarget: boolean; inRange: boolean; name?: string; color: string; ready: boolean };
   hunted: number; hunterAngle: number | null; hunterName?: string; hunterState: 'none' | 'noticed' | 'hunting'; inCover: boolean; still: boolean;
   hint?: string; respawnIn: number; fade: number; state: string; modelReady: boolean; kills: number; eats: number; escapes: number; protect: boolean;
+  /**
+   * Co-op: seconds left for a team-mate to reach this downed player, and the downed team-mates
+   * this player could go and pick up (with the direction to swim, in radar space).
+   */
+  downedFor: number;
+  /** 0..1 of the rescue dwell, for the downed player and for whoever is standing over them. */
+  reviveProgress: number;
+  downedAllies: { index: number; name: string; color: string; seconds: number; distance: number; x: number; y: number; progress: number }[];
+  /** Versus: whose viewport this one is borrowing while dead. */
+  spectating?: { index: number; name: string; color: string; creature: CreatureId };
   bandMarkers: { x: number; y: number; band: Band; size: number }[];
   /** Dominant biome under the player. */
   biome: string;
@@ -38,9 +49,11 @@ export interface PlayerHud {
   /** The era's own meters (Devonian standing, air, range), when the era defines them. */
   era?: EraHud;
 }
-export interface RadarBlipHud { x: number; y: number; kind: 'player' | 'threat' | 'giant' | 'home' | 'shore' | 'deadzone'; color: string; beyond: boolean; hunting: boolean; distance: number; /** Radius in radar units, for area contacts. */ r?: number; }
+export interface RadarBlipHud { x: number; y: number; kind: 'player' | 'threat' | 'giant' | 'home' | 'shore' | 'deadzone' | 'food' | 'landmark'; color: string; beyond: boolean; hunting: boolean; distance: number; /** Radius in radar units, for area contacts. */ r?: number; }
 export interface HudSnapshot {
   players: PlayerHud[]; rects: Rect[]; time: number; status: 'playing' | 'won' | 'lost'; message: string; mode: Mode; winner: number; fps: number;
+  /** What this match turned up, for the results screen's record. */
+  discovery: { biomes: Biome[]; landmarks: LandmarkKind[]; apex: CreatureId[] };
 }
 export interface EngineCallbacks {
   onHud(s: HudSnapshot): void;
@@ -97,6 +110,7 @@ export class Engine {
   private listeners: { pos: THREE.Vector3; right: THREE.Vector3; ref: number }[] = [];
   private attractCam = new THREE.PerspectiveCamera(55, 1, 0.1, 400);
   private bubbles = new Bubbles();
+  private mouthfuls = new Mouthfuls();
   private sparkles = new Bubbles(400, [1.0, 0.86, 0.5], 0.25);
   private impacts = new Impacts();
   private splash = new Splash(SURFACE_Y);
@@ -130,6 +144,8 @@ export class Engine {
     this.renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: 'high-performance' });
     this.renderer.setPixelRatio(Math.min(devicePixelRatio, quality === 'high' ? 1.5 : 1));
     this.renderer.outputColorSpace = THREE.SRGBColorSpace;
+    // Carcasses are eaten away with per-material clipping planes (see carcass.ts).
+    this.renderer.localClippingEnabled = true;
     this.renderer.toneMapping = THREE.ACESFilmicToneMapping;
     this.renderer.toneMappingExposure = 1.25;
     this.renderer.shadowMap.enabled = quality === 'high';
@@ -137,7 +153,7 @@ export class Engine {
     // Split-screen renders the scene once per player; without this the shadow map is rebuilt every time.
     this.renderer.shadowMap.autoUpdate = false;
     container.appendChild(this.renderer.domElement);
-    this.scene.add(this.bubbles.points, this.sparkles.points, this.impacts.group, this.silt.group, this.splash.group);
+    this.scene.add(this.bubbles.points, this.sparkles.points, this.impacts.group, this.silt.group, this.splash.group, this.mouthfuls.group);
     (window as any).__cambrian = this;
     this.resize = new ResizeObserver(() => this.onResize());
     this.resize.observe(container);
@@ -330,7 +346,7 @@ export class Engine {
 
     // Views
     this.syncViews(game, camPositions, dt);
-    this.bubbles.update(dt); this.sparkles.update(dt); this.splash.update(dt);
+    this.bubbles.update(dt); this.sparkles.update(dt); this.splash.update(dt); this.mouthfuls.update(dt);
     this.impacts.update(dt, focus);
     this.silt.sync(game.silt, this.time);
 
@@ -426,13 +442,16 @@ export class Engine {
       if (o.id === p.id || !isAlive(o) || isHidden(o)) continue;
       const band = bandOf(p, o);
       if (band === 'giant' || band === 'threat') continue;
-      if (this.game.mode === 'rise' && o.controller === 'player') continue;
+      // Another player can be aimed at, but never handed to you: the entry snap ignores them and
+      // the crosshair has to be genuinely on one for it to take.
+      const rival = o.controller === 'player';
+      if (rival && !wasAiming) continue;
       const to = this.tmpDesired.set(o.pos.x - cs.camera.position.x, o.pos.y - cs.camera.position.y, o.pos.z - cs.camera.position.z);
       const d = to.length(); if (d < 0.01) continue;
       to.divideScalar(d);
       // angular distance from the crosshair, widened slightly for close/large targets
       const ang = Math.acos(clamp(fwd.dot(to), -1, 1)) - Math.min(0.08, lengthOf(o) * 0.5 / d);
-      const bandW = band === 'prey' ? 0.85 : band === 'snack' ? 1 : 1.25;
+      const bandW = rival ? 2.4 : band === 'prey' ? 0.85 : band === 'snack' ? 1 : 1.25;
       if (ang * bandW < bestAng) { bestAng = ang * bandW; best = o; }
     }
     const cone = cs.aimSnapT > 0 || !wasAiming ? 0.6 : 0.2;   // wide on entry (snap), tight afterwards
@@ -458,7 +477,29 @@ export class Engine {
     return out.set(t.x + (a.pos.x - t.x) * k, t.y + (a.pos.y - t.y) * k, t.z + (a.pos.z - t.z) * k);
   }
 
-  private updateCamera(cs: CamState, p: Actor, dt: number) {
+  /**
+   * Who a dead player's camera follows. Only in the versus modes, where there is a race to watch,
+   * and never when you are inside something — being eaten is its own shot. The leader is whoever
+   * is furthest along, so the viewport shows the thing you are about to respawn behind.
+   */
+  private spectatorTarget(game: Game, i: number): Actor | undefined {
+    const p = game.players[i];
+    if (!p || p.state !== 'dead' || p.swallowedBy >= 0) return undefined;
+    if (game.mode === 'rise' || game.mode === 'reef') return undefined;      // co-op: stay on your own body to be revived
+    let best: Actor | undefined, score = -Infinity;
+    for (const a of game.actors) {
+      if (a === p || a.player < 0 || !isAlive(a)) continue;
+      if (a.controller !== 'player' && a.controller !== 'bot') continue;
+      const s = a.tier + a.nutrition / Math.max(1, TIER_NEED[a.tier]);
+      if (s > score) { score = s; best = a; }
+    }
+    return best;
+  }
+
+  private updateCamera(cs: CamState, p0: Actor, dt: number) {
+    // While spectating, everything below frames the watched player instead. The dead player's own
+    // camera state (yaw, zoom, shake) is reused, so the handover is a cut, not a new rig.
+    const p = this.spectatorTarget(this.game!, p0.player) ?? p0;
     const L = lengthOf(p);
     // Follow where the creature is drawn, not where the simulation last put it.
     const pp = this.renderPos(p, this.tmpPos);
@@ -480,9 +521,11 @@ export class Engine {
       ? this.renderPos(pred, this.tmpLook).setY(this.tmpLook.y + lengthOf(pred) * 0.1)
       : this.tmpLook.set(pp.x, pp.y + L * 0.15, pp.z);
     if (pred) dist = magnificationDistance(lengthOf(pred)) * cs.zoom * 0.85;
-    // Fade to black just before the respawn, and in again just after.
-    const dying = p.state === 'dead' || p.state === 'swallowed';
-    const fadeTarget = dying && (p.state === 'dead' ? p.respawnT : p.stateT) > (p.state === 'dead' ? 2.6 : 99) ? 1 : 0;
+    // Fade to black just before the respawn, and in again just after. Always the real player's
+    // own death, never the spectated one's: this viewport's owner is the one coming back.
+    const dying = p0.state === 'dead' || p0.state === 'swallowed';
+    const respawnAt = this.game!.reviveWindow(p0) ? Infinity : 2.6;   // a downed player waiting on an ally never fades out
+    const fadeTarget = dying && (p0.state === 'dead' ? p0.respawnT : p0.stateT) > (p0.state === 'dead' ? respawnAt : 99) ? 1 : 0;
     cs.fade = damp(cs.fade, fadeTarget, fadeTarget > cs.fade ? 6 : 4, dt);
     if (locked && target) {
       const tp = this.renderPos(target, this.tmpPred);
@@ -566,9 +609,36 @@ export class Engine {
       const continuous = a.state === 'eating' || a.holdT > 0;
       const animate = continuous || !far || ((a.id + Math.floor(this.time * 60)) % 3 === 0);
       v.update(a, animate && far && !continuous ? dt * 3 : dt, this.time, animate, this.alpha);
+      // A carcass shows what has been taken out of it, and gets whole again when its owner
+      // respawns into the same view.
+      if (a.state === 'dead' && a.eatBites > 1 && a.eaten > 0) v.carcass.setEaten(a.eaten);
+      else if (a.state !== 'dead' && a.eaten <= 0) v.restoreCarcass();
     }
     this.attachments.sync(game, this.views, dt);
     for (const [id, v] of this.views) if (!keep.has(id)) { v.dispose(); this.views.delete(id); }
+  }
+
+  /**
+   * A mouthful comes off the carcass: the eaten share stops being drawn on the body, and the
+   * slice that just left it is baked out of the pose and flown into the eater's mouth.
+   */
+  private tearOff(corpse: Actor, eaterId: number | undefined, share: number) {
+    const view = this.views.get(corpse.id); if (!view) return;
+    const eater = eaterId != null ? this.views.get(eaterId) : undefined;
+    // Which end goes first is decided by where the mouth was for the opening bite.
+    if (eater?.anchors.world('anchor_mouth', this.tmpV)) view.carcass.faceEater(this.tmpV);
+    const to = corpse.eaten, from = Math.max(0, to - share);
+    const chunk = view.carcass.sliceChunk(from, to);
+    view.carcass.setEaten(to);
+    if (!chunk) return;
+    const mouth = new THREE.Vector3();
+    const id = eaterId;
+    this.mouthfuls.add(chunk, () => {
+      const ev = id != null ? this.views.get(id) : undefined;
+      if (ev?.anchors.world('anchor_mouth', mouth)) return mouth;
+      const a = id != null ? this.game?.byId(id) : undefined;
+      return a ? mouth.set(a.pos.x, a.pos.y, a.pos.z) : undefined;
+    });
   }
 
   /** Impact effects land where the attacker's nearest attack socket is, not at the victim's centre, when the rig has one. */
@@ -678,26 +748,43 @@ export class Engine {
       };
       /** A sting that is about *you* — only played for a local player, and never attenuated. */
       const personal = (kind: string, strength = 1) => { if (e.player != null && e.player >= 0) audio.play(kind, strength); };
+      /**
+       * Big bodies get their own take of a sound. The Devonian roster runs 4-11.5 m against the
+       * Cambrian's 1-3.9 m, and without this a Titanichthys hits exactly as hard as a larva.
+       */
+      const heavy = (kind: string, id: number | undefined) => {
+        const a = id != null ? game.byId(id) : undefined;
+        const big = `${kind}-huge`;
+        return a && lengthOf(a) >= HUGE_LENGTH && SAMPLES[big] ? big : kind;
+      };
       switch (e.kind) {
         case 'hit': {
           const s = e.strength ?? 1;
           const at = this.impactPos(e.actor, e.other, e.pos);
           this.bubbles.emit(at, Math.round(6 + s * 10), 0.4, 2 + s * 2, 0.07);
           this.impacts.spawn(at, '#ffd0a0', 0.5 + s * 0.8, 0.28);
-          world('hit', at, s);
+          world(heavy('hit', e.actor), at, s);
           if (e.player != null && e.player >= 0) { const d = padOf(e.player); if (typeof d === 'number') rumble(d, Math.min(1, 0.4 + s * 0.4), 0.3, 120); this.shake(e.player, 0.5 + s * 0.5); }
           const attacker = game.byId(e.actor);
           if (attacker?.player != null && attacker.player >= 0) { const d = padOf(attacker.player); if (typeof d === 'number') rumble(d, 0.25, 0.5, 70); }
           break;
         }
         case 'kill': { this.bubbles.emit(e.pos, 30, 1.2, 4, 0.1, 1.8); this.impacts.spawn(e.pos, '#ff8a6a', 1.5 + (e.strength ?? 1), 0.5); world('kill', e.pos); if (playerActor) this.shake(e.player!, 0.7); break; }
-        case 'death': { if (e.player != null && e.player >= 0) audio.play('death'); else world('death', e.pos, 1, 0.7); if (e.player != null && e.player >= 0) { const d = padOf(e.player); if (typeof d === 'number') rumble(d, 1, 1, 400); this.shake(e.player, 1.4); } break; }
-        case 'eat': { this.bubbles.emit(e.pos, 5, 0.3, 1.2, 0.05, 0.8); world('eat', e.pos, e.strength ?? 0.5); break; }
+        case 'death': { const dk = heavy('death', e.actor); if (e.player != null && e.player >= 0) audio.play(dk); else world(dk, e.pos, 1, 0.7); if (e.player != null && e.player >= 0) { const d = padOf(e.player); if (typeof d === 'number') rumble(d, 1, 1, 400); this.shake(e.player, 1.4); } break; }
+        case 'eat': {
+          const s = e.strength ?? 0.5;
+          const big = s > 0.5 && heavy('crunch', e.actor) === 'crunch-huge';
+          this.bubbles.emit(e.pos, 5, 0.3, 1.2, 0.05, 0.8); world(big ? 'crunch-huge' : 'eat', e.pos, s);
+          // A body eaten in bites loses that share of itself, and the mouthful flies to the mouth.
+          const corpse = e.other != null ? game.byId(e.other) : undefined;
+          if (corpse && corpse.eatBites > 1 && e.strength) this.tearOff(corpse, e.actor, e.strength);
+          break;
+        }
         case 'tierUp': { this.bubbles.emit(e.pos, 90, 2.5, 5, 0.14, 2.2); this.impacts.spawn(e.pos, '#fff0b0', 4 + (e.strength ?? 1) * 2, 0.9); if (e.player != null && e.player >= 0) audio.play('tierUp'); else world('tierUp', e.pos, 1, 0.6); if (e.player != null && e.player >= 0) { const d = padOf(e.player); if (typeof d === 'number') rumble(d, 0.8, 0.8, 600); this.shake(e.player, 0.8); } break; }
         case 'parry': { const at = this.impactPos(e.other, e.actor, e.pos); this.impacts.spawn(at, '#9ff6ff', 2, 0.4); this.bubbles.emit(at, 20, 0.6, 5, 0.08); world(RULES && e.strength != null && e.strength < 1 ? (e.strength < 0.5 ? 'armour' : 'armourPierce') : 'parry', at); if (e.player != null && e.player >= 0) { const d = padOf(e.player); if (typeof d === 'number') rumble(d, 0.9, 0.2, 90); } break; }
         case 'guardBreak': { const at = this.impactPos(e.other, e.actor, e.pos); this.impacts.spawn(at, '#ff6a5a', 1.8, 0.4); world('guardBreak', at); break; }
         case 'stagger': { world('stagger', e.pos); break; }
-        case 'dodge': { this.bubbles.emit(e.pos, 14, 0.8, 2.5, 0.06, 0.7); world('dodge', e.pos); break; }
+        case 'dodge': { this.bubbles.emit(e.pos, 14, 0.8, 2.5, 0.06, 0.7); world(heavy('dodge', e.actor), e.pos); break; }
         case 'silt': { this.bubbles.emit(e.pos, 30, 1.5, 2, 0.08, 1.2); world('silt', e.pos); break; }
         case 'ability': { this.impacts.spawn(e.pos, '#c8fff0', 1.2 + (e.strength ?? 1) * 0.4, 0.45); this.bubbles.emit(e.pos, 20, 1, 3, 0.08); const ab = game.byId(e.actor); const key = ab ? `ability:${creature(ab.creature).ability}` : 'ability'; world(SAMPLES[key] ? key : 'ability', e.pos); break; }
         case 'shellCrush': { this.impacts.spawn(e.pos, '#ffd9a0', 2.2, 0.5); this.bubbles.emit(e.pos, 28, 0.8, 4, 0.1, 1.4); world('shellCrush', e.pos); break; }
@@ -710,7 +797,7 @@ export class Engine {
         case 'disintegrate': { this.sparkles.emit(e.pos, Math.round(28 + (e.strength ?? 1) * 10), 0.5 + (e.strength ?? 1) * 0.25, 0.9, 0.06, 2.2); world('disintegrate', e.pos, 0.6); break; }
         case 'routed': { world('routed', e.pos, 0.8); this.impacts.spawn(e.pos, '#9ff6ff', 2.5, 0.6); break; }
         case 'pounce': { this.impacts.spawn(e.pos, '#ffe08a', 1.2 + (e.strength ?? 1) * 0.5, 0.35); this.bubbles.emit(e.pos, 24, 0.9, 4, 0.08); world('pounce', e.pos, 1.3); if (e.player != null && e.player >= 0) { const d = padOf(e.player); if (typeof d === 'number') rumble(d, 0.7, 0.4, 140); this.shake(e.player, 0.6); } break; }
-        case 'burst': { const b = game.byId(e.actor); world(b && RULES?.jet(b) ? 'jet' : 'burst', e.pos); if (b && RULES?.jet(b)) this.bubbles.emit(e.pos, 30, 0.9, 3, 0.1, 1.4); break; }
+        case 'burst': { const b = game.byId(e.actor); world(b && RULES?.jet(b) ? 'jet' : heavy('burst', e.actor), e.pos); if (b && RULES?.jet(b)) this.bubbles.emit(e.pos, 30, 0.9, 3, 0.1, 1.4); break; }
         // Hatching out of a nursery after a respawn (the moult state is reused for the hatch-in).
         case 'moult': { if (e.player != null && e.player >= 0) audio.play(e.strength === 1 && RULES ? 'moult' : 'respawn'); else world('respawn', e.pos, 1, 0.5); break; }
         // Era events (Devonian). Their samples are registered by the era's entry page; an
@@ -797,8 +884,9 @@ export class Engine {
           const l = Math.hypot(x, y);
           const beyond = l > 1;
           if (beyond) { x /= l; y /= l; }
-          const color = b.kind === 'player' ? PLAYER_COLORS[b.id % 4] : b.kind === 'giant' ? BAND_COLOR.giant : b.kind === 'threat' ? BAND_COLOR.threat : b.kind === 'home' ? '#9be9ff' : '#d9cfa4';
-          blips.push({ x, y, kind: b.kind, color, beyond, hunting: b.hunting, distance: b.distance });
+          const color = b.kind === 'player' ? PLAYER_COLORS[b.id % 4] : b.kind === 'giant' ? BAND_COLOR.giant : b.kind === 'threat' ? BAND_COLOR.threat
+            : b.kind === 'food' ? BAND_COLOR.snack : b.kind === 'home' ? '#9be9ff' : b.kind === 'landmark' ? '#ffd9a0' : '#d9cfa4';
+          blips.push({ x, y, kind: b.kind, color, beyond, hunting: b.hunting, distance: b.distance, r: b.radius != null ? b.radius / radarRange : undefined });
         }
         // Dead zones are areas, not contacts: drawn as rings, clamped to the rim like anything else.
         if (era) for (const z of era.deadZones) {
@@ -810,6 +898,22 @@ export class Engine {
         }
       }
       const tele = cs?.tele.open ? { options: game.teleportOptions(i).map((o) => ({ label: o.label, detail: o.detail, distance: o.distance, dest: o.dest })), index: cs.tele.index, cooldown: p.teleportCd } : undefined;
+      // Co-op: team-mates on the floor waiting to be picked up, as a bearing this player can follow.
+      const downed: PlayerHud['downedAllies'] = [];
+      if (cs) for (let j = 0; j < game.players.length; j++) {
+        const o = game.players[j];
+        if (j === i || !o || o.state !== 'dead') continue;
+        const seconds = game.reviveWindow(o);
+        if (seconds <= 0) continue;
+        const dx = o.pos.x - p.pos.x, dz = o.pos.z - p.pos.z;
+        const sy = Math.sin(cs.yaw), cy = Math.cos(cs.yaw);
+        const f = dx * sy + dz * cy, r = -dx * cy + dz * sy;
+        const l = Math.max(1e-3, Math.hypot(f, r));
+        downed.push({ index: j, name: creature(o.creature).name, color: PLAYER_COLORS[j % 4], seconds, distance: Math.hypot(dx, dz), x: r / l, y: -f / l, progress: game.reviveProgress(o) });
+      }
+      // Versus: a dead player watches the leader rather than their own sinking body.
+      const watched = this.spectatorTarget(game, i);
+      const spectate = watched ? { index: watched.player, name: `P${watched.player + 1}`, color: PLAYER_COLORS[watched.player % 4], creature: watched.creature } : undefined;
       let aim: PlayerHud['aim'];
       if (p.aiming && cs) {
         const t = lockA && isAlive(lockA) ? lockA : undefined;
@@ -824,12 +928,16 @@ export class Engine {
         lock: lockA && isAlive(lockA) ? { name: creature(lockA.creature).name, band: bandOf(p, lockA), hp: lockA.hp / lockA.hpMax, color: BAND_COLOR[bandOf(p, lockA)] } : undefined,
         hunted: p.hunted, hunterAngle, hunterName: hunter ? creature(hunter.creature).name : undefined,
         hunterState: p.hunted >= 0.5 ? 'hunting' : p.hunted > 0.2 ? 'noticed' : 'none', inCover: p.cover > 0.3, still: Math.hypot(p.vel.x, p.vel.y, p.vel.z) < 0.3,
-        hint: game.hintFor(i), respawnIn: p.state === 'dead' ? Math.max(0, 3 - p.respawnT) : 0, fade: cs?.fade ?? 0, state: p.state, modelReady: !!loadedSync(p.creature),
+        hint: game.hintFor(i), respawnIn: p.state === 'dead' ? Math.max(0, (game.reviveWindow(p) || 3) - (game.reviveWindow(p) ? 0 : p.respawnT)) : 0, fade: cs?.fade ?? 0, state: p.state, modelReady: !!loadedSync(p.creature),
+        downedFor: game.reviveWindow(p), reviveProgress: game.reviveProgress(p), downedAllies: downed, spectating: spectate,
         kills: p.kills, eats: p.eats, escapes: p.escapes, protect: p.spawnProtect > 0, bandMarkers: markers.slice(0, 24),
         biome: BIOME_NAMES[game.biomeOf(i) ?? 'shelf'], radar: { range: radarRange, blips }, teleport: tele, era,
       };
     });
-    return { players, rects, time: game.time, status: game.state.status, message: game.state.message, mode: game.mode, winner: game.state.winner, fps: this.fps };
+    return {
+      players, rects, time: game.time, status: game.state.status, message: game.state.message, mode: game.mode, winner: game.state.winner, fps: this.fps,
+      discovery: { biomes: [...game.discovery.biomes], landmarks: [...game.discovery.landmarks], apex: [...game.discovery.apex] },
+    };
   }
 
   /** Live render/sim counters, for profiling. */
@@ -854,6 +962,7 @@ export class Engine {
     this.sea?.dispose();
     this.bubbles.dispose(); this.splash.dispose(); this.sparkles.dispose(); this.impacts.dispose(); this.silt.dispose();
     this.shieldGeo.dispose();
+    this.mouthfuls.dispose();
     this.renderer.dispose();
     this.renderer.forceContextLoss();
     this.renderer.domElement.remove();

@@ -1,0 +1,103 @@
+{
+  "method": "actual-eye-polyhedron uniform-volume rejection samples; actual continuous-head triangle parity; three independent ray directions; explicit distant oral boundary closures",
+  "results": [
+    {
+      "id": "coccosteus",
+      "revision": "V2 candidate",
+      "assetSha256": "5d4da5a232fb114e40718a0b88ed88e2dff346f9a88d4935f71cb0fcd4356c47",
+      "headMesh": "head_envelope_closed",
+      "headTriangles": 30238,
+      "headTopology": {
+        "valid": true,
+        "nonmanifoldEdges": 0,
+        "cappedBoundaryLoops": []
+      },
+      "eyes": [
+        {
+          "eye": 0,
+          "center": [
+            0.26846373081207275,
+            0.13479367271065712,
+            1.4280211925506592
+          ],
+          "radii": [
+            0.07552981376647949,
+            0.07808175310492516,
+            0.09676659107208252
+          ],
+          "eyeTriangles": 4480,
+          "boundingBoxCandidates": 120000,
+          "volumeSamples": 60445,
+          "inside": 49806,
+          "insidePercent": 82.39887501033998,
+          "wilson95Percent": [
+            82.0932152135243,
+            82.70041682854942
+          ],
+          "conservative95Percent": [
+            82.0932152135243,
+            82.70041682854942
+          ],
+          "rayDisagreements": 0,
+          "insideLowerPercent": 82.39887501033998,
+          "insideUpperPercent": 82.39887501033998,
+          "closureClearanceLowerBounds": [],
+          "criterion50": "PASS",
+          "target65": true,
+          "guidanceOnly70PercentTranslationGlTF": [
+            -2.219893531218986e-06,
+            0.0,
+            0.0
+          ],
+          "guidanceOnly70PercentTranslationBlender": [
+            -2.219893531218986e-06,
+            -0.0,
+            0.0
+          ]
+        },
+        {
+          "eye": 1,
+          "center": [
+            -0.26848019659519196,
+            0.13479368016123772,
+            1.4280211925506592
+          ],
+          "radii": [
+            0.0755297988653183,
+            0.07808174565434456,
+            0.09676659107208252
+          ],
+          "eyeTriangles": 4480,
+          "boundingBoxCandidates": 120000,
+          "volumeSamples": 60315,
+          "inside": 49565,
+          "insidePercent": 82.17690458426594,
+          "wilson95Percent": [
+            81.86942943368106,
+            82.48028115492546
+          ],
+          "conservative95Percent": [
+            81.86776045381781,
+            82.4901615364572
+          ],
+          "rayDisagreements": 7,
+          "insideLowerPercent": 82.17524662190168,
+          "insideUpperPercent": 82.18685235845146,
+          "closureClearanceLowerBounds": [],
+          "criterion50": "PASS",
+          "target65": true,
+          "guidanceOnly70PercentTranslationGlTF": [
+            2.2198933038453106e-06,
+            0.0,
+            0.0
+          ],
+          "guidanceOnly70PercentTranslationBlender": [
+            2.2198933038453106e-06,
+            -0.0,
+            0.0
+          ]
+        }
+      ]
+    }
+  ]
+}

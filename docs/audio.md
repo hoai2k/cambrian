@@ -65,6 +65,19 @@ npx esbuild tools/audio-mix-test.ts --bundle --platform=node --format=esm --outf
 It fails if a player would hear more than three one-shots a second, or hears
 anything from more than 60 m away.
 
+## Big bodies
+
+`heavy()` in `src/render/engine.ts` swaps in a `-huge` sample when the body making the sound is
+over `HUGE_LENGTH` (6 m, in `mix.ts`). The Devonian roster runs 4–11.5 m against the Cambrian's
+1–3.9 m, and giants in either era are scaled well past it, so without this a Titanichthys lands
+exactly like a larva. It covers `hit`, `crunch`, `burst`, `dodge` and `death`; add a sample named
+`<kind>-huge` and the rule picks it up, since `heavy()` only swaps when the library has one.
+
+The surface is a separate mechanic: a fish that `canBreach` and is driving hard at the waterline
+leaves the water altogether and flies on gravity until it lands (`airborne` in `src/sim/game.ts`,
+the `breach` and `splash` events). That is Devonian-only — `RULES` is undefined in the Cambrian —
+and its samples live in the era's own library.
+
 ## Levels
 
 A sample can measure loud and still be inaudible in play. `ui-start` was: almost all of its
@@ -104,6 +117,12 @@ escarpment, basin). **Neither file exists yet** — they are the one outstanding
 [audio-requests.md](audio-requests.md). A track whose file fails to load joins `MISSING`, leaves
 the rotation and stops cueing its biomes, so until the files land the two untagged reef tracks
 rotate everywhere. Dropping the mp3s into `public/music/` is the whole integration.
+
+A track whose file is not there — a biome theme tagged in `MUSIC` but not yet delivered — leaves
+the rotation on its first load error (`MISSING`). Because that is only discovered once the track
+is *chosen*, the next pick is made against the last track the player actually heard rather than
+the current one: two undelivered themes in a row would otherwise let the rotation land straight
+back on the track that had just finished.
 
 Tracks are streamed through media elements rather than decoded into AudioBuffers: they run for
 minutes, and a decoded three-minute track costs around 80 MB where a stream costs nothing. The
@@ -145,6 +164,11 @@ distance and pan so the falloff can be auditioned. Hover a sound to read where
 in the game it fires from. It starts the audio graph with `ambience: false`, so
 the music and the reef bed stay off and single sounds can be heard clean; play
 them from the "Beds & music" section to hear them.
+
+The **Devonian** sounds are listed too, in their own two categories. The game registers an era's
+samples when that era's entry loads; the workbench is neither era, so it calls `registerSamples`
+for the Devonian table up front and lists both libraries. Their names carry the era prefix
+(`devonian/jet-1`), which is what `sfxUrl` uses to resolve them under `assets/devonian/sfx/`.
 
 A sound can also carry **backup takes** — earlier versions kept in the library but not wired
 into `SAMPLES`, listed in the catalogue's `alts` and shown as dashed chips. `escape` has one.

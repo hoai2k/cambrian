@@ -4,10 +4,17 @@
  * distance falloff.
  */
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { audio, musicUrl, SAMPLES, sfxUrl } from '../audio/audio';
+import { audio, musicUrl, registerSamples, SAMPLES, sfxUrl } from '../audio/audio';
 import { distanceAtten } from '../audio/mix';
 import { music, openingTrack } from '../audio/music';
-import { BEDS, GROUPS, type SoundEntry } from './audio-catalogue';
+import { BEDS, DEVONIAN_BEDS, DEVONIAN_GROUPS, GROUPS, type SoundEntry } from './audio-catalogue';
+import { DEVONIAN_SAMPLES } from '../content/devonian/sfx';
+
+// The game registers an era's samples when that era's entry loads. The workbench is neither era,
+// so it registers them all up front and lists both libraries.
+registerSamples(DEVONIAN_SAMPLES);
+const ALL_GROUPS = [...GROUPS, ...DEVONIAN_GROUPS];
+const ALL_BEDS = [...BEDS, ...DEVONIAN_BEDS];
 import { formatLevel, isQuiet, measure, QUIET_MID_PEAK, type Level } from './levels';
 
 /** Every file the catalogue can reach, so we can report on the library as a whole. */
@@ -105,7 +112,7 @@ export function AudioBench() {
 
   // Anything the audio module can play but the catalogue does not describe.
   const undocumented = useMemo(() => {
-    const listed = new Set(GROUPS.flatMap((g) => g.sounds.map((s) => s.kind)));
+    const listed = new Set(ALL_GROUPS.flatMap((g) => g.sounds.map((s) => s.kind)));
     return Object.keys(SAMPLES).filter((k) => !listed.has(k));
   }, []);
 
@@ -140,7 +147,7 @@ export function AudioBench() {
         </div>
       </section>
 
-      {GROUPS.map((g) => (
+      {ALL_GROUPS.map((g) => (
         <section key={g.title} className="group">
           <h2>{g.title}</h2>
           <p className="blurb">{g.blurb}</p>
@@ -157,7 +164,7 @@ export function AudioBench() {
         <h2>Beds &amp; music</h2>
         <p className="blurb">The reef beds loop for the whole match; the soundtrack plays one track at a time and rotates at random when one ends. The workbench starts without any of them so single sounds can be heard clean — play them here to audition. Music is streamed, so a track starts a few hundred milliseconds after the click.</p>
         <ul className="sounds">
-          {BEDS.map((b) => (
+          {ALL_BEDS.map((b) => (
             <li key={b.file} className="row">
               <button className="name" disabled={!ready} onClick={() => void playFile(b.file)}>
                 <b>{b.label}</b><small>loop</small>
@@ -258,8 +265,8 @@ function FileChip({ file, info, levels, disabled, alt, onPlay }: {
 function allFiles(): Set<string> {
   return new Set<string>([
     ...Object.values(SAMPLES).flat(),
-    ...GROUPS.flatMap((g) => g.sounds.flatMap((s) => s.alts ?? [])),
-    ...BEDS.map((b) => b.file),
+    ...ALL_GROUPS.flatMap((g) => g.sounds.flatMap((s) => s.alts ?? [])),
+    ...ALL_BEDS.map((b) => b.file),
   ]);
 }
 

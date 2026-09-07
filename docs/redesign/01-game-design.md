@@ -148,7 +148,7 @@ expresses them differently so fights are varied.
 | **Parry** | LB (tap, timing) | Guard in the first 0.15 s of an incoming hit: no damage, attacker is staggered 0.8 s and you get a free heavy. Swimmers parry with a body twist, armoured crawlers with a shell clank. |
 | **Lock-on** | LT (toggle) | Camera frames you and the target, movement becomes **orbit/strafe** relative to the target, attacks home. Left stick left/right circles. Flick right stick to switch target. |
 | **Sense pulse** | D-pad ↑ | 2 s highlight of everything within sense range through cover, colour-coded by size band. Cooldown 6 s. |
-| **Eat** | automatic | Biting a dead body or a Snack consumes it. Eating takes 0.6 s per 10% of your mass and can be interrupted, so eating a big kill in the open is a risk. |
+| **Eat** | automatic | Biting a dead body or a Snack consumes it. **Anything can feed on anything**, however much bigger it was: the carcass comes apart in whole bites, `ceil(3 × its length / yours)` of them (1–12), a bite every 0.62 s. A body under a third of your length goes down whole and is carried into your mouth; bigger, it stays where it fell, and each bite tears its share of the meat off the model and flies it into your mouth. Eating can be interrupted, so opening a giant carcass in the open is a long risk. |
 
 > **The shipped bindings are different.** The layout above is the design's first
 > proposal; play settled somewhere else, and `readGamepad()` in
@@ -330,9 +330,12 @@ Everything is still procedural (seeded), so it costs no new art.
   per 50-unit chunk within ~120 units of any player. The current build's
   instancing and shaders are reused as-is.
 - **Landmarks** (a few hand-placed by seed): a sponge archway, a boulder
-  stack you can hop, a dead Giant's carcass that is a temporary feast and a
-  predator magnet. *(Not built. Scenery in the streamed world is entirely
-  procedural; the escarpment is the landmark you navigate by.)*
+  stack you can hop, a dead Giant's bones that are a temporary feast and a
+  predator magnet. *(Built, and procedural rather than hand-placed: one candidate
+  per 320-unit cell, drawn from the seed and gated on the biome, so they are
+  spread out and rare without anybody placing them. All three exist —
+  `landmarkAt()` in `src/sim/world.ts` — and the bones really are both a feast
+  and a magnet. See* [the endless sea](04-infinite-ocean.md#landmarks).*)*
 - **Time and light**: a slow day cycle (20 min) that changes caustic intensity
   and Giant activity (they hunt more at dusk). Optional; ships after core.
   *(Not built.)*
@@ -344,7 +347,7 @@ population.
 
 | Mode | Players | Description |
 | --- | --- | --- |
-| **Rise** (single / co-op) | 1–4 | The main experience. Everyone hatches as a Larva in the nursery. Reach Apex. Co-op shares nutrition from assisted kills, players can revive a downed ally by bumping them within 10 s. Session ends when any player reaches Apex and survives 90 s, or continues in free-play. Escalation: the reef's giant population grows as players grow. |
+| **Rise** (single / co-op) | 1–4 | The main experience. Everyone hatches as a Larva in the nursery. Reach Apex. Co-op shares nutrition from assisted kills, players can revive a downed ally by bumping them within 10 s. Players *can* turn on each other — bites land, and a dead player can be fed on — but nothing aims at another player for you: no aim snap, no auto-pounce, no auto-lock. Area abilities still spare a co-op partner, so nobody kills a friend by accident. Session ends when any player reaches Apex and survives 90 s, or continues in free-play. Escalation: the reef's giant population grows as players grow. |
 | **Feeding frenzy** (versus) | 2–4 | Growth race. Everyone starts Juvenile in separate nurseries. First to Apex wins; killing a player takes a third of their tier progress and gives it to you. Bots fill empty slots. 12-minute cap, biggest wins. |
 | **Hunter & hunted** (versus, asymmetric) | 2–4 | One player is a Giant (× 3) with a shrinking hunger meter; the others are Juveniles who must survive and reach Adult. Giant eats to stay alive; small ones hide, bait, and grow. Rotates who is the Giant. |
 | **Reef** (sandbox) | 1–4 | No win condition, pick any tier, tune giant density. For messing around and screenshots. |
@@ -352,12 +355,13 @@ population.
 Bots (the current "nearest enemy" bots become the needs-based AI above) fill
 every mode, so nothing requires a second controller.
 
-> **As built.** All four modes ship (`updateModes()` in `src/sim/game.ts`).
-> Three details of this table did not: co-op **revive by bumping a downed ally**
-> (co-op does share nutrition from a nearby kill, which is the other half of the
-> paragraph), **spectating** for a dead player in versus, and **rotating** who
-> plays the giant in Hunter & Hunted — player 1 holds the role for the match,
-> which runs to six minutes.
+> **As built.** All four modes ship (`updateModes()` in `src/sim/game.ts`), and
+> so do co-op's shared nutrition and its **revive**: a downed ally stays down for
+> ten seconds (when a team-mate was near enough to matter) and a touch brings
+> them back with their tier intact. **Spectating** works too — a dead player in
+> versus watches whoever is leading. One detail of this table did not ship:
+> **rotating** who plays the giant in Hunter & Hunted. Player 1 holds the role
+> for the match, which runs to six minutes.
 
 ## Local multiplayer specifics
 
@@ -373,7 +377,8 @@ every mode, so nothing requires a second controller.
   Rival amber, Threat orange, Giant red) is also encoded as an outline width
   and a HUD marker shape, so it reads at 480 px wide.
 - **Spectating**: a dead player in versus gets a free camera following the
-  leader until respawn. *(Not built.)*
+  leader until respawn. *(Built. Versus only: in co-op the camera stays on your
+  own body, because a team-mate may be on the way to it.)*
 
 ## Readability, HUD and feedback
 
