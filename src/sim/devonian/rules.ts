@@ -305,6 +305,23 @@ export const DEVONIAN_RULES: EraRules = {
   },
 
   updateModes(g, dt) {
+    // Survival: grow through the five stages on what you can catch, then hold Prime. The shared
+    // `rise` case in game.ts wins on tier, which the Devonian never advances — it grows in stages —
+    // so it never fires there and the era decides this one.
+    if (g.mode === 'rise') {
+      for (const a of players(g)) {
+        const d = devActor(g, a);
+        if (d.stage >= PRIME_STAGE && isAlive(a)) {
+          d.primeT += dt;
+          if (d.primeT >= HOLD_TO_WIN && g.state.status === 'playing') {
+            const name = creature(a.creature).name;
+            g.state = { status: a.player >= 0 ? 'won' : 'lost', winner: a.player,
+              message: a.player >= 0 ? `${name} grew up and held the sea.` : `A rival ${name} grew up first.` };
+          }
+        } else d.primeT = 0;
+      }
+      return;
+    }
     void dt;
     if (g.mode !== 'domination' && g.mode !== 'foodchain') return;
     const contenders = players(g);

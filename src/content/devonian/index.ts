@@ -43,6 +43,7 @@ export const DEVONIAN = defineEra({
   title: 'Devonian Domination',
   copy: { tagline: 'Feed. Escape. Hold your range.', taglineEm: '375 million years ago, the sea had a pecking order.', loading: 'FILLING THE BASIN…', lose: 'THE SEA WINS', settingsKey: 'devonian-settings', mobileIllustration: DEVONIAN_BRAND_EXTRAS.mobileIllustration, sibling: { title: 'Cambrian Explosion', path: '', blurb: '133 million years earlier' } },
   modes: [
+    { id: 'rise', name: 'Survival', blurb: 'Hatch small and stay alive. Feed, escape, moult through five stages and reach Prime, then hold it for ninety seconds. Allies share what they catch.', players: '1–4 co-op' },
     { id: 'domination', name: 'Domination', blurb: 'Pick any animal, own its rung. Feed, escape, drive off rivals, hold your range. First to Dominant standing held for ninety seconds wins. Allies pool standing.', players: '1–4 co-op' },
     { id: 'foodchain', name: 'Food Chain', blurb: 'Everyone picks from a different rung. The hunter needs the prey; the prey scores by surviving the hunter. One scoreboard.', players: '2–4 versus' },
     { id: 'hunted', name: 'Hunter & Hunted', blurb: 'Player one is Dunkleosteus. Everyone else is small, with the river mouth as a refuge, trying to grow up before they get eaten.', players: '2–4 asymmetric' },
