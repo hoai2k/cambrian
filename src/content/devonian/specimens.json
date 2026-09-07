@@ -201,5 +201,91 @@
       "Pigmentation, scale relief, precise soft tissues and motion are artistic inference. Representative length 0.20 m is an illustrative individual, not a maximum.",
       "Only the posterior body and caudal fin generate locomotor flexion; fixed shield extensions do not flap. Growth is a relaxed trim and tail extension with no scaling."
     ]
+  },
+  {
+    "id": "cladoselache",
+    "name": "Cladoselache",
+    "species": "Cladoselache sp. (Cleveland Shale reconstruction)",
+    "category": "creature",
+    "provenance": "Late Devonian, Famennian Cleveland Shale, Ohio, USA",
+    "description": "Streamlined early chondrichthyan with a broad terminal mouth, large eyes, broad paired fins, a curved anterior dorsal spine and a keeled crescent tail.",
+    "model": "assets/devonian/creatures/cladoselache.glb",
+    "lod": "assets/devonian/creatures/cladoselache.lod1.glb",
+    "image": "assets/devonian/creatures/cladoselache.thumb.png",
+    "lengthMeters": 1.5,
+    "looping": [
+      "Idle",
+      "Swim",
+      "Guard",
+      "Eat"
+    ],
+    "sources": [
+      {
+        "title": "Frey et al. (2023), Broad snouted cladoselachian with sensory specialization; Cladoselache comparisons",
+        "url": "https://link.springer.com/article/10.1186/s13358-023-00266-6"
+      },
+      {
+        "title": "The Development of the Chimaeroid Pelvic Skeleton and the Evolution of Chondrichthyan Pelvic Fins (2022), Cladoselache kepleri NHMUK PV P9269",
+        "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC9782884/"
+      },
+      {
+        "title": "Case Western Reserve University Hyde Collection, Cleveland Shale Cladoselache specimens",
+        "url": "https://caslabs.case.edu/hyde-collection/historical-geology/"
+      },
+      {
+        "title": "Cleveland Museum of Natural History casting program: complete Cladoselache CMNH5371",
+        "url": "https://gsa.confex.com/gsa/2006NC/webprogram/Paper103585.html"
+      }
+    ],
+    "notes": [
+      "Genus-level Cladoselache reconstruction of a representative 1.5 m individual, not a specimen scan or a species maximum. Body outline informed by Cleveland Shale material, pelvic anatomy by C. kepleri NHMUK PV P9269.",
+      "Broad triangular paired fins, large lateral eyes, blunt snout, terminal cladodont mouth and strongly forked tail distinguish this animal from a modern great-white shark.",
+      "The anterior dorsal spine follows the 2023 comparative study. A second dorsal spine remains hypothetical and is omitted. Fin radials appear as restrained membrane relief, not exposed bony rays.",
+      "Smooth skin with sparse authored sensory detail; a modern all-over placoid-scale coat is not claimed. Pigmentation, soft-tissue volume and every animation are artistic reconstruction.",
+      "Growth is a relaxed fin-extension/breathing display. Ability is a short acceleration and bank display; compatible clip labels do not define Devonian gameplay."
+    ]
+  },
+  {
+    "id": "stethacanthus",
+    "name": "Stethacanthus",
+    "species": "Stethacanthus sp. (CMNH 8988-informed reconstruction)",
+    "category": "creature",
+    "provenance": "Late Devonian, upper Famennian Cleveland Shale, Ohio, USA",
+    "description": "Small early chondrichthyan with opposed cranial and dorsal denticle fields, a spine-supported brush complex, slender pectoral fin whips and a sweeping epicercal tail.",
+    "model": "assets/devonian/creatures/stethacanthus.glb",
+    "lod": "assets/devonian/creatures/stethacanthus.lod1.glb",
+    "image": "assets/devonian/creatures/stethacanthus.thumb.png",
+    "lengthMeters": 0.7,
+    "looping": [
+      "Idle",
+      "Swim",
+      "Guard",
+      "Eat"
+    ],
+    "sources": [
+      {
+        "title": "Ginter and Sun (2007), p.710: CMNH 8988 spine-brush and teeth, upper Famennian Cleveland Shale; questions S. altonensis assignment",
+        "url": "https://www.app.pan.pl/archive/published/app52/app52-705.pdf"
+      },
+      {
+        "title": "Zangerl (1984), spine-brush anatomy and opposing denticle fields; comparative anatomy, functional interpretation hypothetical",
+        "url": "https://doi.org/10.1080/02724634.1984.10012016"
+      },
+      {
+        "title": "Lund (1984), stethacanthid spine and paired-fin comparisons, not a Devonian specimen substitution",
+        "url": "https://doi.org/10.1016/S0016-6995(84)80095-9"
+      },
+      {
+        "title": "Ginter (2018), Devonian–Permian symmoriiform record and comparative morphology",
+        "url": "https://repozytorium.uw.edu.pl/bitstreams/5cc9e710-1bcb-4353-a08d-f1f56bde31ec/download"
+      }
+    ],
+    "notes": [
+      "Devonian provenance anchor: spine-brush CMNH 8988 and associated teeth from upper Famennian Cleveland Shale. Ginter and Sun (2007, p.710) question its old S. altonensis assignment; consequently labelled Stethacanthus sp., not Akmonistion zangerli.",
+      "A comparative whole-animal reconstruction around partial Devonian material, not a complete specimen scan. The selected 0.7 m presentation length is an illustrative small individual, not a measured CMNH 8988 total length or a species maximum.",
+      "Oppositely directed enlarged cranial and brush denticles, membranous brush supported by an anterior spine, cladodont five-cusped dentition, long metapterygial pectoral whips and soft epicercal tail distinguish the model. Body proportions, fin whip extent, pigmentation and fine surface detail are reconstructed.",
+      "The brush is not hair. Tissue histology and inflation, deterrence or courtship hypotheses do not establish behaviour. This complex-bearing reconstruction does not establish the sex or developmental stage of CMNH 8988, nor claim every individual bore this structure.",
+      "Ability is a restrained posture displaying head and brush; only the basal rigid complex rotates. It does not inflate or shed. All animation is artistic compatibility work, not Devonian gameplay specification. Growth is relaxed fin and breathing motion."
+    ]
   }
 ]
