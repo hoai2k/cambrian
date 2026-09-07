@@ -1,7 +1,7 @@
 import { ACTIVE_ERA } from '../content';
 import { BURROWERS, hideLabel } from '../sim/concealment';
 import * as THREE from 'three';
-import { audio } from '../audio/audio';
+import { audio, SAMPLES } from '../audio/audio';
 import { distanceAtten } from '../audio/mix';
 import { emptyControls, gamepads, KeyboardInput, readGamepad, rumble, type RawControls } from '../input/input';
 import { clamp, damp, TAU, wrapAngle } from '../shared/math';
@@ -350,7 +350,7 @@ export class Engine {
       r.setScissorTest(true);
       this.cams.forEach((cs, i) => {
         const rc = rects[i];
-        const density = this.sea?.setViewLength(lengthOf(game.players[i]), cs.camera.position.x, cs.camera.position.z) ?? 0.0105;
+        const density = this.sea?.setViewLength(lengthOf(game.players[i]), cs.camera.position.x, cs.camera.position.z, cs.camera.position.y) ?? 0.0105;
         // Everything past ~98% fog is invisible: pulling the far plane in there lets the frustum
         // drop those scenery chunks entirely instead of rendering them into the murk.
         cs.camera.far = clamp(2.1 / density, 110, 300);
@@ -507,9 +507,9 @@ export class Engine {
       lookAt.y + Math.sin(pitch) * dist + L * 0.18,
       lookAt.z - Math.cos(yaw) * Math.cos(pitch) * dist,
     );
-    // keep camera out of the ground and boulders, below the surface
+    // keep camera out of the ground and boulders, and below the surface unless the player has left the water
     const g = groundHeight(this.game!.world, desired.x, desired.z, this.scratchBoulders);
-    desired.y = clamp(desired.y, g + 0.7, SURFACE_Y - 0.4);
+    desired.y = clamp(desired.y, g + 0.7, p.airborne ? SURFACE_Y + 40 : SURFACE_Y - 0.4);
     const pos = { x: desired.x, y: desired.y, z: desired.z };
     resolveStatic(this.game!.world, pos, 0.7, this.scratchBoulders);
     desired.set(pos.x, pos.y, pos.z);
@@ -698,7 +698,8 @@ export class Engine {
         case 'stagger': { world('stagger', e.pos); break; }
         case 'dodge': { this.bubbles.emit(e.pos, 14, 0.8, 2.5, 0.06, 0.7); world('dodge', e.pos); break; }
         case 'silt': { this.bubbles.emit(e.pos, 30, 1.5, 2, 0.08, 1.2); world('silt', e.pos); break; }
-        case 'ability': { this.impacts.spawn(e.pos, '#c8fff0', 1.2 + (e.strength ?? 1) * 0.4, 0.45); this.bubbles.emit(e.pos, 20, 1, 3, 0.08); world('ability', e.pos); break; }
+        case 'ability': { this.impacts.spawn(e.pos, '#c8fff0', 1.2 + (e.strength ?? 1) * 0.4, 0.45); this.bubbles.emit(e.pos, 20, 1, 3, 0.08); const ab = game.byId(e.actor); const key = ab ? `ability:${creature(ab.creature).ability}` : 'ability'; world(SAMPLES[key] ? key : 'ability', e.pos); break; }
+        case 'shellCrush': { this.impacts.spawn(e.pos, '#ffd9a0', 2.2, 0.5); this.bubbles.emit(e.pos, 28, 0.8, 4, 0.1, 1.4); world('shellCrush', e.pos); break; }
         case 'grab': { const at = this.impactPos(e.actor, e.other, e.pos); this.impacts.spawn(at, '#ffb070', 1.4, 0.35); world('grab', at); if (e.player != null && e.player >= 0) { const d = padOf(e.player); if (typeof d === 'number') rumble(d, 1, 0.6, 300); } break; }
         case 'hunted': { personal('hunted'); if (e.player != null && e.player >= 0) { const d = padOf(e.player); if (typeof d === 'number') rumble(d, 0.6, 0.9, 500); } break; }
         case 'escape': { personal('escape'); break; }
@@ -713,6 +714,23 @@ export class Engine {
         case 'moult': { if (e.player != null && e.player >= 0) audio.play(e.strength === 1 && RULES ? 'moult' : 'respawn'); else world('respawn', e.pos, 1, 0.5); break; }
         // Era events (Devonian). Their samples are registered by the era's entry page; an
         // unregistered kind is silent, so the Cambrian build never reaches for a missing file.
+        case 'breach': {
+          // a sheet of water thrown up as the body leaves the sea
+          this.sparkles.emit(e.pos, Math.round(40 * (e.strength ?? 1)), 1.6, 2.2, 0.09, 2.4);
+          this.bubbles.emit(e.pos, 30, 1.2, 4, 0.1, 1.6);
+          this.impacts.spawn(e.pos, '#e8f6ff', 2.5 * (e.strength ?? 1), 0.5);
+          world('breach', e.pos, e.strength ?? 1);
+          break;
+        }
+        case 'splash': {
+          const s = e.strength ?? 1;
+          this.sparkles.emit(e.pos, Math.round(70 * s), 2.2, 2.6, 0.1, 2.6);
+          this.bubbles.emit(e.pos, Math.round(60 * s), 1.4, 6, 0.12, 2.2);
+          this.impacts.spawn(e.pos, '#ffffff', 3.5 * s, 0.6);
+          world('splash', e.pos, s);
+          if (e.player != null && e.player >= 0) { const d = padOf(e.player); if (typeof d === 'number') rumble(d, Math.min(1, 0.5 * s), 0.6, 220); this.shake(e.player, 0.6 * s); }
+          break;
+        }
         case 'gulp': { this.bubbles.emit(e.pos, 24, 1.0, 3, 0.09, 1.4); personal('gulp'); break; }
         case 'anoxia': { personal('anoxia', 0.8); break; }
         case 'beach': { if (e.strength) { this.bubbles.emit(e.pos, 12, 0.5, 2, 0.06, 1); personal('beach', 0.9); } break; }
@@ -800,7 +818,7 @@ export class Engine {
         index: i, creature: p.creature, color: PLAYER_COLORS[i % 4], alive: p.state !== 'dead', aim,
         hp: p.hp, hpMax: p.hpMax, stamina: p.stamina, staminaMax: p.staminaMax, exhausted: p.exhausted > 0,
         tier: p.tier, tierName: era ? `${era.stage} · ${era.rungName}` : TIER_NAMES[p.tier], progress: era ? era.standing / 100 : p.tier >= 4 ? 1 : clamp(p.nutrition / TIER_NEED[p.tier], 0, 1), scale: p.scale,
-        abilityName: p.hideMode === 'descending' ? 'Sinking to burrow' : p.hideMode === 'burrowed' ? 'Buried · Y emerge' : p.hideMode === 'camouflage' ? `Camo: ${p.camoLabel}` : hideLabel(p.creature), abilityReady: p.hideMode === 'camouflage' ? p.stamina / p.staminaMax : 1 - clamp(p.hideCd / 2, 0, 1), abilityActive: p.hideMode !== 'none', abilityUnlocked: true,
+        abilityName: p.hideMode === 'descending' ? 'Sinking to burrow' : p.hideMode === 'burrowed' ? 'Buried · Y emerge' : p.hideMode === 'camouflage' ? `Camo: ${p.camoLabel}` : RULES?.ySpecial(p.creature)?.name ?? hideLabel(p.creature), abilityReady: p.hideMode === 'camouflage' ? p.stamina / p.staminaMax : RULES?.ySpecial(p.creature) ? 1 - clamp(p.abilityCd / Math.max(1, creature(p.creature).abilityCooldown), 0, 1) : 1 - clamp(p.hideCd / 2, 0, 1), abilityActive: p.hideMode !== 'none' || (p.state === 'ability' && !!RULES?.ySpecial(p.creature)), abilityUnlocked: true,
         senseReady: 1 - clamp(p.senseCd / 6, 0, 1),
         lock: lockA && isAlive(lockA) ? { name: creature(lockA.creature).name, band: bandOf(p, lockA), hp: lockA.hp / lockA.hpMax, color: BAND_COLOR[bandOf(p, lockA)] } : undefined,
         hunted: p.hunted, hunterAngle, hunterName: hunter ? creature(hunter.creature).name : undefined,

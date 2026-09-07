@@ -1,7 +1,7 @@
 # Devonian model production contract
 
 The 21 subjects and 29 scenery families are in [the natural-history brief](../redesign/07-devonian-design.md).
-This production adds assets and specimen inspection, not Devonian gameplay rules. Cambrian stays the active game era.
+This production owns creature/scenery assets and specimen inspection. The shared engine now also serves Devonian Domination at `/devonian/`; its gameplay rules are maintained separately in the era content and simulation modules. Asset action names and reconstruction notes do not define or change those rules.
 
 ## Ownership and delivery
 

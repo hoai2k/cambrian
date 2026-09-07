@@ -59,7 +59,7 @@ every push to `main` (set the repository's Pages source to "GitHub Actions").
 | [`docs/environment-assets.md`](docs/environment-assets.md) | The seven biome props, nine biome paintings and five radar glyphs, and how the streamed sea consumes them. |
 | [`docs/art/colour-rendering.md`](docs/art/colour-rendering.md) | Runtime creature palettes and the portrait-variant fallback policy. |
 | [`docs/image-requests.md`](docs/image-requests.md) | Open image, glyph and prop requests — **currently none**. Delivered briefs: [`docs/image-requests-history.md`](docs/image-requests-history.md). |
-| [`docs/audio-requests.md`](docs/audio-requests.md) | Open sound and music requests — **two biome music loops**, the only outstanding asset in the project. |
+| [`docs/audio-requests.md`](docs/audio-requests.md) | Sound and music requests, and what has been delivered. Extra music is optional; nothing waits on it. |
 
 ## Headless checks
 

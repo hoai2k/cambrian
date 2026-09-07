@@ -1,6 +1,6 @@
 import type { MusicTrack } from '../audio/music';
 import type { CreatureDef, CreatureId } from './creature-types';
-import type { Biome } from '../sim/world';
+import type { Biome, FloraKind } from '../sim/world';
 import type { Mode } from '../sim/types';
 import type { Slot, Scheme } from '../shared/palettes';
 import type { PortraitRecord } from '../shared/portrait-match';
@@ -45,6 +45,16 @@ export interface EraDefinition {
     readonly atmosphere: Record<Biome, { fog: string; density: number; sky: number; sun: number; sand: string }>;
     readonly sandColors: Record<Biome, string>;
     readonly floraColors: Record<string, string>;
+    /**
+     * Plants per 144 square units of each biome, by kind. The kinds present here are the kinds the
+     * world places; absent, the Cambrian's table in `src/sim/world.ts` is used.
+     */
+    readonly flora?: Record<Biome, Partial<Record<FloraKind, number>>>;
+    /**
+     * Height of the water surface in world units (the seabed sits around 0 on the shelf). Absent,
+     * the Cambrian's 40. A pelagic roster wants more water over the floor than a benthic one.
+     */
+    readonly surfaceY?: number;
     readonly biomeNames: Record<Biome, string>;
     readonly biomeDanger: Record<Biome, number>;
   };

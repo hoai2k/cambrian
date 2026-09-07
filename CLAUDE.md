@@ -38,14 +38,28 @@ unless the user explicitly asks for a PR. Steps:
 - Two eras, one engine. `/` is the Cambrian; `/devonian/` (entry `src/devonian/main.tsx`) calls
   `selectEra(DEVONIAN)` and `setAppBase(nestedBase())` *before* dynamically importing the app, because
   many modules read `ACTIVE_ERA` at module top. Anything new that reads the era at import time must
-  stay behind that import (or resolve lazily like `assetPaths`). Headless tests that need the Devonian
-  do the same: select the era, then `await import(...)` the simulation (`tools/devonian-test.ts`).
+  stay behind that import (or resolve lazily like `assetPaths` and `music()`); the entry page itself
+  must not statically import the audio library or the sim for the same reason. Headless tests that
+  need the Devonian do the same: select the era, then `await import(...)` (`tools/devonian-test.ts`).
+- An era's `assets.sfx` names the shared sound library (`assets/sfx/`): bites, hits and the UI are the
+  same files in both eras. Era-specific samples are addressed as `<era>/<name>` and resolve under
+  `assets/<era>/sfx/` regardless. Only creatures with their own delivered model are pickable
+  (`PLAYABLE` in `src/sim/creatures.ts`); the rest borrow a body in the world but stay off the roster.
 - Devonian gameplay lives in `src/sim/devonian/` and reaches the shared simulation only through the
   `RULES?.` hooks in `src/sim/era-rules.ts`. Do not branch on the era inside `game.ts`/`combat.ts`;
   add a hook. With `RULES` undefined the Cambrian takes exactly its old paths.
 - Devonian specimens land in batches (`tools/devonian/shipped.json`). When one lands: run
   `node tools/update-asset-sizes.mjs` (refreshes `src/content/devonian/asset-sizes.json`), remove its
   entry from `DEVONIAN_STAND_INS` in `src/content/devonian/index.ts`, and run `npm run devonian`.
+- Devonian sizes and swimming stats are generated: `docs/research/devonian-swimming.json` (sourced lengths
+  and body-lengths-per-second) → `npm run devonian:stats` → the six movement fields in
+  `src/content/devonian/creatures.ts`. Edit the research or the formulas in `tools/devonian/stats.mjs`,
+  never those fields by hand; `npm run devonian` checks they match. The water surface is per era
+  (`environment.surfaceY`), fish leave the water through it (`airborne`), and the swim model (reverse
+  slow, turn sharp when slow, fast-start on sprint) is the `swim` hook in `src/sim/devonian/swim.ts`.
+- Devonian scenery and biome plates are procedural stand-ins: flora kinds and their density table in
+  `src/content/devonian/environment.ts` + `src/render/sea.ts`, plates from `npm run devonian:plates`.
+  Authored sets replace them without touching placement; see `docs/redesign/09-devonian-remaining.md`.
 - All docs live in `docs/`. Design docs are in `docs/redesign/`. Image, glyph and prop
   needs go in `docs/image-requests.md` and move to `docs/image-requests-history.md` once
   delivered and integrated; sound and music needs go in `docs/audio-requests.md`.

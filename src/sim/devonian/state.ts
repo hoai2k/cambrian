@@ -32,6 +32,8 @@ export interface DevActor {
   dominantT: number;
   recent: string[];
   openT: number;               // rung I benthos: time alive in the open
+  bluffed: Map<number, number>; // brush display: actor id → time it was last bluffed
+  dartCd: number;              // seconds until the next fast-start
 }
 
 export interface DevGame {
@@ -52,7 +54,7 @@ export function devActor(g: Game, a: Actor): DevActor {
   const s = stateFor(g);
   let d = s.actors.get(a.id);
   if (!d) {
-    d = { standing: 0, stage: 0, air: 1, gulpT: 0, inRange: false, rangeT: 0, beached: false, deadT: 0, deadZoneIn: false, moultSoft: 0, exuvia: -1, exuviaT: 0, followers: 0, sinceGain: 0, sinceEat: 0, dominantT: 0, recent: [], openT: 0 };
+    d = { standing: 0, stage: 0, air: 1, gulpT: 0, inRange: false, rangeT: 0, beached: false, deadT: 0, deadZoneIn: false, moultSoft: 0, exuvia: -1, exuviaT: 0, followers: 0, sinceGain: 0, sinceEat: 0, dominantT: 0, recent: [], openT: 0, bluffed: new Map(), dartCd: 0 };
     s.actors.set(a.id, d);
   }
   return d;

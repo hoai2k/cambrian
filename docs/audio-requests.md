@@ -10,8 +10,9 @@ size budget, a description of the sound, and the code that will consume it.
 
 ## Open
 
-### Biome music themes — 2 loops
+### Biome music themes — 2 loops (optional)
 
+Optional: nothing in either era waits on these; the tags fall silent until the files exist.
 The soundtrack (`src/audio/music.ts`) rotates tracks and cues a track when you
 enter a biome it is tagged for. The two reef tracks exist (*Tide of First
 Bones*, *First Tide*). Two more are wanted, same instrumentation family so the
@@ -37,6 +38,11 @@ the art brief*.
   rotation until more Devonian music arrives; the two biome themes above are tagged in that file
   too, so dropping them in is the whole integration.
 
+- **Devonian special sounds — 15 files** (`jaw-shear`, `run-through`, `tusk-lunge`, `crush-bite`,
+  `neck-snap`, `chelicerae-grab`, `trident-shove`, `shield-push`, `armour-flank`, `brush-display`,
+  `shoal-dart`, `limb-haul`, `shell-hover`, `floor-sweep`, `filter-gulp`), one per creature special in
+  `src/sim/devonian/specials.ts`, generated with `node tools/gen-sfx.mjs --set devonian` from the same
+  manifest and registered under `ability:<abilityId>` in `src/content/devonian/sfx.ts`.
 - **Devonian Domination sound effects — 19 files.** `public/assets/devonian/sfx/*.mp3`,
   generated from `DEVONIAN_MANIFEST` in `tools/gen-sfx.mjs` with
   `node tools/gen-sfx.mjs --set devonian` (the Cambrian `MANIFEST` and default output are

@@ -20,13 +20,20 @@ export interface MusicTrack {
   biomes?: Biome[];
 }
 
-export const MUSIC = ACTIVE_ERA.audio.music;
+/**
+ * The active era's soundtrack. Resolved per call rather than captured at import: an era entry page
+ * selects its era before it loads the app, and this module is reachable from the audio library,
+ * which loads earlier still. Captured at import it would hand a Devonian session the Cambrian
+ * soundtrack, opener and all.
+ */
+export const music = () => ACTIVE_ERA.audio.music;
 
 /** Tracks whose file failed to load this session. They leave the rotation and stop cueing biomes. */
 export const MISSING = new Set<string>();
-const available = () => MUSIC.filter((t) => !MISSING.has(t.name));
+const available = () => music().filter((t) => !MISSING.has(t.name));
 
-export const OPENING_TRACK = MUSIC.find((t) => t.opening) ?? MUSIC[0];
+/** The track that opens a session. */
+export const openingTrack = (): MusicTrack => music().find((t) => t.opening) ?? music()[0];
 
 /** Seconds of overlap when one track hands over to the next. */
 export const CROSSFADE = 5;
@@ -46,9 +53,9 @@ export const BIOME_HOLD = 90;
 export function pickNext(current?: MusicTrack, biome?: Biome, rng: () => number = Math.random): MusicTrack {
   const all = available();
   const tagged = biome ? all.filter((t) => t.biomes?.includes(biome)) : [];
-  const pool = tagged.length ? tagged : all.length ? all : MUSIC;
+  const pool = tagged.length ? tagged : all.length ? all : music();
   const choices = pool.length > 1 ? pool.filter((t) => t !== current) : pool;
-  return choices[Math.floor(rng() * choices.length)] ?? MUSIC[0];
+  return choices[Math.floor(rng() * choices.length)] ?? music()[0];
 }
 
 /** Whether entering `biome` should cue a track change — false while no track names a biome. */

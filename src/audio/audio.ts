@@ -4,7 +4,7 @@ import { assetPaths } from '../content/asset-paths';
  * synthesized fallback for anything that has not loaded yet, so the game is never silent.
  */
 import { AUDIBLE_FLOOR, MIN_GAP } from './mix';
-import { biomeHasTrack, BIOME_HOLD, CROSSFADE, FIRST_FADE, MISSING, OPENING_TRACK, pickNext, type MusicTrack } from './music';
+import { biomeHasTrack, BIOME_HOLD, CROSSFADE, FIRST_FADE, MISSING, openingTrack, pickNext, type MusicTrack } from './music';
 import type { Biome } from '../sim/world';
 import { appBase, setAppBase } from '../shared/base';
 
@@ -198,7 +198,7 @@ export class GameAudio {
     if (this.musicStarted || !this.ctx || !this.musicGain) return;
     this.musicStarted = true;
     this.musicGain.gain.linearRampToValueAtTime(this.musicOn ? this.musicLevel : 0, this.ctx.currentTime + FIRST_FADE);
-    this.playTrack(OPENING_TRACK, FIRST_FADE);
+    this.playTrack(openingTrack(), FIRST_FADE);
   }
 
   setMusic(on: boolean) {
