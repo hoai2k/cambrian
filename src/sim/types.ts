@@ -117,6 +117,19 @@ export interface Actor {
   noise: number; cover: number; stillness: number;
   dodgeDir: Vec3; dodgeTapT: number;
   hopVel: number; grounded: boolean;
+  /**
+   * Seconds spent pushing into something solid that will not simply be glided over (up to a second,
+   * and it drains twice as fast as it fills). A body that keeps leaning on an obstacle means to get
+   * over it; one that brushes it while turning does not, so the climb waits for the press to be
+   * held — and once it is going, a step or two of lost contact does not call it off.
+   */
+  climbPush: number;
+  /**
+   * The height this body is currently climbing to, or -Infinity when it is not climbing. Going over
+   * something is a commitment that outlives the contact that started it: rocks fall away under you
+   * as you rise, and a climb that stopped the moment they did would just bounce at the foot.
+   */
+  climbTo: number;
   /** Out of the water: a leap in flight, gravity only, until the splash. */
   airborne: boolean;
   prev: { light: boolean; heavy: boolean; ability: boolean; dodge: boolean; guard: boolean; lock: boolean; sense: boolean; rise: boolean; burst: boolean; dash: boolean; aim: boolean };

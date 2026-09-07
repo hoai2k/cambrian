@@ -3,15 +3,15 @@ import { RULES } from './era-rules';
 import { BURROWERS, HEAVY_SPECIALS, DEFENSIVE_SPECIALS, CAMOUFLAGE_DRAIN, camouflageMatch, clearPursuit, stopHiding } from './concealment';
 import { abilitySpeed, beginExpansionAbility, stepExpansionAbility, bloomRate, grazeRate } from './expansion-abilities';
 import { add, clamp, damp, dist, distXZ, dot, heading, len3, lerp, makeRng, norm, scale as vscale, sub, TAU, v3, wrapAngle, yawOf, type Rng, type Vec3 } from '../shared/math';
-import { applyScaleStats, bandOf, bodyRadius, canAct, clearanceOf, climbOver, floorClearance, isAlive, isHidden, isInvulnerable, lengthOf, makeActor, massOf, speedFactor, staminaCost } from './actors';
+import { applyScaleStats, bandOf, bodyRadius, canAct, clearanceOf, climbHeight, climbRise, floorClearance, glideOver, isAlive, isHidden, isInvulnerable, lengthOf, makeActor, massOf, speedFactor, staminaCost } from './actors';
 import { makeBrain, think, type AiWorld } from './ai';
 import { huntingPressure, phaseAt, untilNextPhase, type Phase } from './daynight';
 import { applyHit, kill, startSwallow, type HitContext } from './combat';
 import { creature, CREATURE_IDS, PLAYABLE_IDS, type CreatureId, type MoveDef } from './creatures';
-import { resolveFlora, stepFlora } from './flora';
+import { resolveFlora, stepFlora, type FloraContact } from './flora';
 import { SpatialHash } from './spatial';
 import { emptyInput, TIER_NAMES, TIER_NEED, TIER_SCALE, type Actor, type BrainState, type InputFrame, type Mode, type PlayerSetup, type Prompt, type SiltCloud, type Tier, type WorldEvent } from './types';
-import { BIOME_NAMES, biomeAt, biomeWeights, coverAt, groundHeight, LIGHT_WINDOW_Y, type Landmark, type LandmarkKind, microbialAt, nearestNursery, nurseryAt, nurseryFactor, resolveStatic, sampleCurrent, sampleHeight, shoreDistance, shoreZ, SURFACE_Y, World, type Biome, type Boulder, type Cover, type Flora, type WorldData } from './world';
+import { BIOME_NAMES, biomeAt, biomeWeights, coverAt, groundHeight, LIGHT_WINDOW_Y, type Landmark, type LandmarkKind, microbialAt, nearestNursery, nurseryAt, nurseryFactor, resolveStatic, sampleCurrent, sampleHeight, shoreDistance, shoreZ, type StaticContact, SURFACE_Y, World, type Biome, type Boulder, type Cover, type Flora, type WorldData } from './world';
 
 export interface PlayerProgress {
   prompts: Prompt[];
@@ -127,6 +127,12 @@ const PADDLE_STAMINA = 24;    // per second while climbing
  * back is still paid for out of the same bar.
  */
 const BURST_STAMINA = 7.5;
+/**
+ * How long a body has to keep pushing into an obstacle before it starts climbing it. Long enough
+ * that brushing a rock on the way past is not a climb, short enough that meaning to go over one
+ * never feels like an argument with the controls.
+ */
+const CLIMB_PUSH = 0.35;
 
 /**
  * Co-op revive. A downed player in Rise lies on the floor for this long instead of dissolving
@@ -160,6 +166,9 @@ export class Game implements AiWorld {
   actors: Actor[] = [];
   private idMap = new Map<number, Actor>();
   hash = new SpatialHash<Actor>(10);
+  /** Scratch for `resolveStatic` / `resolveFlora`: what the last body pushed out of the scenery ran into. */
+  private contact: StaticContact = { hit: false, climbTo: -Infinity, wallTop: -Infinity };
+  private floraContact: FloraContact = { blocked: false, headOn: false, top: -Infinity };
   events: WorldEvent[] = [];
   silt: SiltCloud[] = [];
   time = 0;
@@ -635,7 +644,7 @@ export class Game implements AiWorld {
     // ally spent coming to get you, and the pair of you standing still in the open to do it.
     a.state = 'free'; a.stateT = 0; a.respawnT = 0; a.corpseT = 0; a.eaten = 0; a.sparkled = false; a.reviveT = 0;
     a.hp = a.hpMax * 0.45; a.stamina = a.staminaMax * 0.5; a.poise = a.poiseMax;
-    a.vel = v3(); a.bank = 0; a.pitch = 0; a.hitFlash = 0; a.tumble = v3();
+    a.vel = v3(); a.bank = 0; a.pitch = 0; a.hitFlash = 0; a.tumble = v3(); a.climbTo = -Infinity; a.climbPush = 0;
     a.spawnProtect = RULES?.spawnProtect(a) ?? 2.5; a.hunted = 0; a.hunterId = -1; a.lastHitBy = -1; a.killer = -1;
     a.pos.y = groundHeight(this.world, a.pos.x, a.pos.z, this.scratchBoulders) + clearanceOf(a) + 0.2;
     this.events.push({ kind: 'moult', pos: { ...a.pos }, actor: a.id, player: a.player, strength: 0.7 });
@@ -674,7 +683,7 @@ export class Game implements AiWorld {
     this.world.loadAround(nursery);
     a.pos = this.spawnPoint(nursery, a.creature, a.scale, a.player);
     a.vel = v3(); a.state = 'free'; a.stateT = 0; a.respawnT = 0; a.corpseT = 0; a.eaten = 0; a.eatBites = 0;
-    stopHiding(a); a.camoStrength = 0; a.hideCd = 0; a.emergenceHeavy = false; a.spawnProtect = RULES?.spawnProtect(a) ?? 3.5; a.hitFlash = 0; a.abilityActive = false; a.abilityCd = 0; a.lockTarget = -1; a.hunted = 0; a.hunterId = -1; a.wasHunted = false; a.swallowedBy = -1; a.bank = 0; a.pitch = 0;
+    stopHiding(a); a.camoStrength = 0; a.hideCd = 0; a.emergenceHeavy = false; a.spawnProtect = RULES?.spawnProtect(a) ?? 3.5; a.hitFlash = 0; a.abilityActive = false; a.abilityCd = 0; a.lockTarget = -1; a.hunted = 0; a.hunterId = -1; a.wasHunted = false; a.swallowedBy = -1; a.bank = 0; a.pitch = 0; a.climbTo = -Infinity; a.climbPush = 0;
     a.yaw = Math.PI;
     // hatch-in: grow from a speck over a second (reuses the moult state with a smaller start scale)
     a.hatching = true; a.state = 'moult'; a.stateT = 0; a.stateDur = 1.0;
@@ -689,7 +698,7 @@ export class Game implements AiWorld {
     const giantish = a.controller === 'giant' || a.controller === 'shadow';
     const justLight = input.light && !a.prev.light, justHeavy = input.heavy && !a.prev.heavy, justAbility = input.ability && !a.prev.ability;
     const justDodge = input.dodge && !a.prev.dodge, justGuard = input.guard && !a.prev.guard, justLock = input.lock && !a.prev.lock;
-    const justSense = input.sense && !a.prev.sense, justRise = input.rise && !a.prev.rise;
+    const justSense = input.sense && !a.prev.sense;
     const justDash = input.dash && !a.prev.dash;
     if (input.dash) a.dashHoldT += dt; else { a.dashHoldT = 0; a.dashUsed = false; a.dashQueued = false; }
     a.pounceCd = Math.max(0, a.pounceCd - dt);
@@ -874,11 +883,18 @@ export class Game implements AiWorld {
     // down at a gentle terminal speed rather than dropping it like a stone.
     if (def.ground) {
       const canPaddle = a.hideMode === 'none' && controllable;
-      if (canPaddle && justRise && a.grounded && a.stamina > 8) { a.hopVel = 5.5 * Math.sqrt(sf); a.grounded = false; a.stamina -= 8; a.iframes = Math.max(a.iframes, 0.12); }
-      const holdingRise = canPaddle && input.rise && a.stamina > 0;
+      // A climb rides the same channel as the paddle, so going up a rock is one steady rise rather
+      // than a fight between the lift and the settle.
+      const climbing = a.climbTo > a.pos.y;
+      const paddleUp = canPaddle && input.rise && a.stamina > 0;
+      const holdingRise = paddleUp || climbing;
+      // Lifting off is a swim, not a jump. Holding RB eases the body up off the floor and it keeps
+      // accelerating to a paddle's pace — the same gradual rise a swimmer gets from the same button
+      // — rather than kicking it into a ballistic arc it has no control over.
+      if (holdingRise && a.grounded) { a.grounded = false; a.hopVel = Math.max(a.hopVel, 0); }
       if (holdingRise && !a.grounded) {
-        a.hopVel = damp(a.hopVel, PADDLE_RISE * Math.sqrt(sf), 5, dt);
-        a.stamina -= PADDLE_STAMINA * dt;
+        a.hopVel = damp(a.hopVel, Math.max(climbing ? climbRise(a) : 0, PADDLE_RISE * Math.sqrt(sf)), 5, dt);
+        if (paddleUp) a.stamina -= PADDLE_STAMINA * dt;
       } else if (!a.grounded) {
         const sink = -PADDLE_SINK * Math.sqrt(sf) * (input.sink ? 2.4 : 1);
         a.hopVel = Math.max(a.hopVel - 16 * dt, sink);
@@ -886,13 +902,32 @@ export class Game implements AiWorld {
       if (!a.grounded) { a.pos.y += a.hopVel * dt; }
     }
 
-    // Static collision
-    const hitWall = resolveStatic(this.world, a.pos, bodyRadius(a), this.scratchBoulders, RULES?.shoreReach(a) ?? 0, climbOver(a));
+    // Static collision. A rock you could get over is not a wall: gentle ones are glided across, and
+    // a face too steep for that is climbed — held out of the rock and lifted up its side until the
+    // top is clear, at the pace the body would swim up. Only what stands more than two bodies above
+    // you stops you.
+    const contact = this.contact, floraHit = this.floraContact;
+    const hitWall = resolveStatic(this.world, a.pos, bodyRadius(a), this.scratchBoulders, RULES?.shoreReach(a) ?? 0, glideOver(a), climbHeight(a), contact);
     if (hitWall && !def.ground) { a.vel.x *= 0.6; a.vel.z *= 0.6; }
     // Plants: swarm snacks are numerous and tiny, so they take turns on alternate steps.
+    floraHit.blocked = false; floraHit.headOn = false; floraHit.top = -Infinity;
     if (!isHidden(a) && a.state !== 'grabbed') {
-      resolveFlora(this.world, a, dt, this.scratchFlora);
+      resolveFlora(this.world, a, dt, this.scratchFlora, floraHit);
     }
+    // What is worth climbing, and what has to be asked for. A rock inside two bodies is taken on
+    // sight. Everything else waits for the body to lean on it: a crawler has legs and gets over
+    // whatever it keeps pushing into, however tall, and a plant is a thin thing to go round unless
+    // the body is aimed straight at the middle of it.
+    const leaning = controllable && mag > 0.35 && (contact.hit || floraHit.blocked);
+    a.climbPush = leaning ? Math.min(1, a.climbPush + dt) : Math.max(0, a.climbPush - dt * 2);
+    let offer = contact.climbTo;
+    if (a.climbPush > CLIMB_PUSH) {
+      if (def.ground) offer = Math.max(offer, contact.wallTop);
+      if (floraHit.headOn) offer = Math.max(offer, floraHit.top);
+    }
+    if (offer > a.pos.y) a.climbTo = Math.max(a.climbTo, offer);
+    if (a.climbTo <= a.pos.y || a.climbPush === 0 || !controllable || a.hitStop > 0 || a.state === 'grabbed' || isHidden(a)) a.climbTo = -Infinity;
+    else if (!def.ground) a.vel.y = Math.max(a.vel.y, climbRise(a));
     const floor = groundHeight(this.world, a.pos.x, a.pos.z, this.scratchBoulders) + floorClearance(a);
     if (def.ground) {
       if (a.grounded || a.pos.y <= floor) { a.pos.y = a.grounded ? damp(a.pos.y, floor, 18, dt) : floor; if (!a.grounded && a.hopVel < 0) { a.grounded = true; a.hopVel = 0; } }
@@ -1640,7 +1675,7 @@ export class Game implements AiWorld {
     const g = groundHeight(this.world, pos.x, pos.z, this.scratchBoulders);
     pos.y = clamp(pos.y, g + clearanceOf(a) + 0.2, SURFACE_Y - 1 - clearanceOf(a));
     this.events.push({ kind: 'teleport', pos: { ...a.pos }, actor: a.id, player: i, strength: 0 });
-    stopHiding(a); a.camoStrength = 0; a.emergenceHeavy = false; a.pos = pos; a.vel = v3(); a.yaw = yaw; a.pitch = 0; a.bank = 0;
+    stopHiding(a); a.camoStrength = 0; a.emergenceHeavy = false; a.pos = pos; a.vel = v3(); a.yaw = yaw; a.pitch = 0; a.bank = 0; a.climbTo = -Infinity; a.climbPush = 0;
     a.lockTarget = -1; a.hunted = 0; a.hunterId = -1; a.wasHunted = false; a.aiming = false;
     a.spawnProtect = Math.max(a.spawnProtect, 2.5); a.teleportCd = 20; a.hitFlash = 0;
     this.events.push({ kind: 'teleport', pos: { ...pos }, actor: a.id, player: i, strength: 1 });

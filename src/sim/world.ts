@@ -686,16 +686,41 @@ export function boulderTop(b: Boulder, x: number, z: number): number | undefined
   return q >= 1 ? undefined : b.pos.y + domeRise(b, q);
 }
 
+/** What a body found when it was pushed out of the scenery. */
+export interface StaticContact {
+  /** Something pushed the body this step. */
+  hit: boolean;
+  /**
+   * The height the body has to reach to get over the tallest rock it is pressed against, or
+   * -Infinity when there is nothing to climb (open water, or a face too tall to be worth trying).
+   */
+  climbTo: number;
+  /**
+   * The top of the tallest rock that actually blocked, however tall it is. A cliff is not offered
+   * as a climb, but a body with legs that keeps pushing into one gets over it in the end.
+   */
+  wallTop: number;
+}
+
 /**
  * Push (x,z) out of boulders and off the beach. Returns whether a collision happened.
  *
- * `climb` is how far a body can be carried upward in one step (see `climbOver`): where the rock's
- * surface at this column is within that, the body is left alone and the floor under it lifts it
- * over the rock instead of stopping it. That is what makes a boulder something you swim over rather
- * than a wall — a rock only blocks where it genuinely stands above you.
+ * Rocks come in three kinds, by how they stand relative to the body:
+ *
+ * - **Shallow enough to glide over.** The rock's surface at this column is within `glide` (see
+ *   `glideOver`), so it does not block at all: the floor under the body carries it up and across.
+ *   Sand-scale bumps, domes and the flanks of anything rounded end up here.
+ * - **Steep, but not a cliff.** The rock's top is within `climb` of the body (see `climbHeight`).
+ *   It blocks the way through — the body never enters the rock — but reports the height to get
+ *   over it in `out.climbTo`, and the caller lifts the body up the face until it is clear. This is
+ *   how a boulder taller than you is still something you go over rather than around.
+ * - **A wall.** Anything standing higher than that above you blocks, and nothing else happens.
+ *
+ * A landmark's raised span (`floor`) is none of these: it is something you swim under.
  */
-export function resolveStatic(world: WorldData, pos: Vec3, radius: number, scratch: Boulder[], reach = 0, climb = 0): boolean {
+export function resolveStatic(world: WorldData, pos: Vec3, radius: number, scratch: Boulder[], reach = 0, glide = 0, climb = 0, out?: StaticContact): boolean {
   let hit = false;
+  if (out) { out.hit = false; out.climbTo = -Infinity; out.wallTop = -Infinity; }
   // The shore is the one wall in the sea. Push straight back along -z; the coast wanders gently
   // enough that the local normal is close to that. `reach` lets a limbed body push that far past it.
   const s = shoreDistance(pos.x, pos.z), wall = Math.max(radius, SHORE_WALL + radius * 3 - reach);
@@ -705,10 +730,16 @@ export function resolveStatic(world: WorldData, pos: Vec3, radius: number, scrat
     if (b.floor !== undefined && pos.y < b.floor - radius * 0.5) continue;   // pass under a raised span
     const q = boulderQ(b, pos.x, pos.z, radius);
     if (q >= 1) continue;
-    // Ride over it: the rock's own surface here is low enough that the floor can carry the body up.
-    if (climb > 0 && b.floor === undefined) {
-      const top = b.pos.y + domeRise(b, boulderQ(b, pos.x, pos.z));
-      if (top <= pos.y + climb) continue;
+    if (b.floor === undefined) {
+      // Angled and low: let the floor carry the body over rather than stopping it here.
+      if (glide > 0 && b.pos.y + domeRise(b, boulderQ(b, pos.x, pos.z)) <= pos.y + glide) continue;
+      // Too steep to glide: block, and say how high the top is. Within `climb` that is an offer to
+      // go over; higher, it is only what it would take, for a body stubborn enough to want it.
+      if (out) {
+        const top = b.height + radius * 0.6;
+        out.wallTop = Math.max(out.wallTop, top);
+        if (climb > 0 && b.height <= pos.y + climb) out.climbTo = Math.max(out.climbTo, top);
+      }
     }
     const dx = pos.x - b.pos.x, dz = pos.z - b.pos.z;
     const c = Math.cos(b.rot), sn = Math.sin(b.rot);
@@ -721,6 +752,7 @@ export function resolveStatic(world: WorldData, pos: Vec3, radius: number, scrat
     pos.z = b.pos.z + sn * lx + c * lz;
     hit = true;
   }
+  if (out) out.hit = hit;
   return hit;
 }
 

@@ -256,13 +256,22 @@ what you can see, what you bump into and what you can stand on are one shape. A
 carved prop (a spire, a talus shard) keeps the tuned `radius` it was given; only
 the proportions come from the mesh scale.
 
+`resolveStatic` reports what it found (`StaticContact`): whether anything
+blocked, the height to reach to get over a rock inside the climbing budget, and
+the top of the tallest thing that blocked at all — which is what a crawler
+leaning on a cliff eventually goes over. `resolveFlora` reports the same for
+plants, plus whether the body was driving at the middle of one or clipping past
+its edge. `Game.updateActor` turns those into `Actor.climbTo`.
+
 ## Tests
 
 - `tools/swim-test.ts`: sprint endurance, how close to the sand a swimmer may
   ride, rock colliders matching the drawn ellipse (including a rotated rock and
   a carved prop), riding over a boulder without being pushed back and without a
-  jolt, a tall rock still being a wall, camera reach, and the radar's reading of
-  height.
+  jolt, climbing a steep face and handing over to the glide, a cliff still being
+  a cliff for a swimmer, a crawler walking up and over both a rock and a wall,
+  a plant climbed head-on and gone round when clipped, camera reach, and the
+  radar's reading of height.
 - `tools/world-test.ts`: the shore is a wall and swimmable beyond; all nine
   biomes occur with the bands in the right places; chunks are deterministic;
   a player sprinting out to sea for 90 s has chunks, ecosystem and giants
