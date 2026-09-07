@@ -1,0 +1,467 @@
+{
+  "candidateOnly": true,
+  "stage": "initial-preview",
+  "species": "Nahecaris stuertzi",
+  "files": {
+    "nahecaris.card.png": {
+      "sha256": "ede19a301c459bc8a1909d4e7450ece9e8d114ae4a101dfc359158469e5f4ade",
+      "bytes": 90160
+    },
+    "nahecaris.glb": {
+      "sha256": "af608947cb933775338f91ddc46861911879a3b465a69ccf02ae3978023ddb6a",
+      "bytes": 11978164
+    },
+    "nahecaris.json": {
+      "sha256": "6fac8f21936bfeb41cd6cb439a19d2e09b1e50dce1699caa687f6ccee908104a",
+      "bytes": 2085
+    },
+    "nahecaris.lod1.glb": {
+      "sha256": "26760efd2f8d09d9a2d00b724dbcba8434df4eaa9b7e7a4913864ea30b444c02",
+      "bytes": 3025320
+    },
+    "nahecaris.png": {
+      "sha256": "11dbbb00c6d1dfdf24cb569223e6b1dfbd7e7b6a5214c87c9d30842c87789097",
+      "bytes": 238743
+    },
+    "nahecaris.select.png": {
+      "sha256": "22428ba44b7d9ffa538f5843fd6593186c9a3bb22d7ff9857a6a7d50a4397079",
+      "bytes": 711456
+    },
+    "nahecaris.thumb.png": {
+      "sha256": "07b78e04408f7430c1e035b06102a54a694dfd1dc5ab4609edd9aaf9970237bd",
+      "bytes": 14609
+    }
+  },
+  "originalBlend": {
+    "path": "/Users/hoai/Documents/Stuff/Generations/cambrian/local/devonian-authoring/nahecaris/nahecaris-initial.blend",
+    "sha256": "58d78703ba9312b51f2b3c39dbd1d2bc3ee97e6b125dc6a8bdb44201a4b358cf",
+    "bytes": 6866370
+  },
+  "validation": {
+    "checks": "finite transforms, normalized weights, root stable, identity-scale removal, unique motion, seamless loops, socket bind alignment, true LOD reduction",
+    "models": [
+      {
+        "file": "nahecaris.glb",
+        "bytes": 11978164,
+        "vertices": 93963,
+        "triangles": 177975,
+        "bounds": [
+          1.5355463027954102,
+          1.223414957523346,
+          5.8709540367126465
+        ],
+        "bones": 82,
+        "boneNames": [
+          "root",
+          "body",
+          "abdomen0",
+          "abdomen1",
+          "abdomen2",
+          "abdomen3",
+          "abdomen4",
+          "abdomen5",
+          "abdomen6",
+          "telson",
+          "furcaL",
+          "furcaR",
+          "pleopodL4",
+          "pleopodR4",
+          "pleopodL3",
+          "pleopodR3",
+          "pleopodL2",
+          "pleopodR2",
+          "pleopodL1",
+          "pleopodR1",
+          "pleopodL0",
+          "pleopodR0",
+          "antenna0L",
+          "antennaTip0L",
+          "antenna0R",
+          "antennaTip0R",
+          "antenna1L",
+          "antennaTip1L",
+          "antenna1R",
+          "antennaTip1R",
+          "mandibleL",
+          "mandibleR",
+          "thoracopodL0",
+          "endopodL0",
+          "exopodL0",
+          "thoracopodL1",
+          "endopodL1",
+          "exopodL1",
+          "thoracopodL2",
+          "endopodL2",
+          "exopodL2",
+          "thoracopodL3",
+          "endopodL3",
+          "exopodL3",
+          "thoracopodL4",
+          "endopodL4",
+          "exopodL4",
+          "thoracopodL5",
+          "endopodL5",
+          "exopodL5",
+          "thoracopodL6",
+          "endopodL6",
+          "exopodL6",
+          "thoracopodL7",
+          "endopodL7",
+          "exopodL7",
+          "thoracopodR0",
+          "endopodR0",
+          "exopodR0",
+          "thoracopodR1",
+          "endopodR1",
+          "exopodR1",
+          "thoracopodR2",
+          "endopodR2",
+          "exopodR2",
+          "thoracopodR3",
+          "endopodR3",
+          "exopodR3",
+          "thoracopodR4",
+          "endopodR4",
+          "exopodR4",
+          "thoracopodR5",
+          "endopodR5",
+          "exopodR5",
+          "thoracopodR6",
+          "endopodR6",
+          "exopodR6",
+          "thoracopodR7",
+          "endopodR7",
+          "exopodR7",
+          "valveL",
+          "valveR"
+        ],
+        "textures": 9,
+        "sockets": [
+          {
+            "name": "anchor_attack_primary",
+            "point": [
+              0.05400000140070915,
+              -0.13500003462981935,
+              1.2899999233459192
+            ]
+          },
+          {
+            "name": "anchor_mouth",
+            "point": [
+              0.0,
+              -0.13500003377410663,
+              1.26499994804349
+            ]
+          },
+          {
+            "name": "anchor_mouth_inside",
+            "point": [
+              0.0,
+              -0.06500002842150099,
+              1.264999950439488
+            ]
+          }
+        ],
+        "clips": [
+          {
+            "name": "Ability",
+            "duration": 1.7999999523162842,
+            "motion": 135.369,
+            "digest": "5b5d97984c33f0bd280b90a14ef9d04ce3eaa89c07ef4a235804020ec0406914"
+          },
+          {
+            "name": "Attack",
+            "duration": 1.0,
+            "motion": 65.591,
+            "digest": "63fe3c8f8e1ad0b9d38580d7afbf16d76c94bdfcf3ada1747c9c24f9883134f4"
+          },
+          {
+            "name": "Bite",
+            "duration": 0.5,
+            "motion": 25.144,
+            "digest": "50b6e02349767f8e5a0763591c325b240140781a0b51e693b9d76e9b7663903a"
+          },
+          {
+            "name": "Crawl",
+            "duration": 2.4000000953674316,
+            "motion": 187.035,
+            "digest": "4eb9589965d31097260be600d2210c5715351a2f2c82bb085069f58c84a1d0c6"
+          },
+          {
+            "name": "Death",
+            "duration": 1.600000023841858,
+            "motion": 108.534,
+            "digest": "cc76a62e181e9aa8babe4a303e76a9a6e948e6cf64c9cab3f082bdfa15fcce29"
+          },
+          {
+            "name": "Dive",
+            "duration": 1.2000000476837158,
+            "motion": 17.643,
+            "digest": "1853b6b850d9f0cbebef6d94f9d4f4b36f6f3a684273ba8ff7dc263c7b69f913"
+          },
+          {
+            "name": "Dodge",
+            "duration": 0.4000000059604645,
+            "motion": 19.503,
+            "digest": "2bc73dca81ac7cd15b6384bd23365f1f18f70206ce72fe25d75561aa52345b33"
+          },
+          {
+            "name": "Eat",
+            "duration": 1.2000000476837158,
+            "motion": 150.93,
+            "digest": "41148c757a5fb93611dfa4f8083d3bc31872d3ce8937686430614c65ddb933d5"
+          },
+          {
+            "name": "Guard",
+            "duration": 1.0,
+            "motion": 29.965,
+            "digest": "8102b891066f04ac63b5341f9efe9cf8d01500115f91bbbe5c4776a3f12fa6e2"
+          },
+          {
+            "name": "Heavy",
+            "duration": 1.100000023841858,
+            "motion": 89.339,
+            "digest": "811338cc3abc601b73f055748a5e445161ec9c29b8fa548c9e41fdd29ad2f262"
+          },
+          {
+            "name": "Hit",
+            "duration": 0.6000000238418579,
+            "motion": 28.664,
+            "digest": "3b1b071a8982407ecb22483de5109654c01ba074b945279027abbdb7390e3e05"
+          },
+          {
+            "name": "Idle",
+            "duration": 2.4000000953674316,
+            "motion": 92.69,
+            "digest": "7b585db1638401d3c1dbacbdebc19c0cc7529ad5a2b340fa2ff1cc1a14b5ce56"
+          },
+          {
+            "name": "Moult",
+            "duration": 1.5,
+            "motion": 33.594,
+            "digest": "884e03d27dfbc6de8c69af824110a3c1d7814467fbab89900cd70a29ad0d493a"
+          },
+          {
+            "name": "Parry",
+            "duration": 0.3333333432674408,
+            "motion": 16.256,
+            "digest": "87020f344eb432dc910830e3bd87685f86feb84f3dfe68bb47de88f206d80016"
+          },
+          {
+            "name": "Rise",
+            "duration": 1.2000000476837158,
+            "motion": 17.643,
+            "digest": "cf556f369b4b35a1bfb024fccebad2c2226f2cbfa7c5273a57a338cfef656d11"
+          },
+          {
+            "name": "Stagger",
+            "duration": 1.2000000476837158,
+            "motion": 57.369,
+            "digest": "f40b09dc54f26e30b1a8bd185f74317de055bf81d104ecb03f46742371306303"
+          },
+          {
+            "name": "Swim",
+            "duration": 2.4000000953674316,
+            "motion": 305.698,
+            "digest": "3db40c134d8f5e132a98a40dda35b1655aba386fca7f6473cb262dba9d96e7e7"
+          },
+          {
+            "name": "TurnLeft",
+            "duration": 1.600000023841858,
+            "motion": 35.015,
+            "digest": "7ae2c0f454604e4bb605a6baa883b3f4250714601edb160b068994dbc1a26ce3"
+          },
+          {
+            "name": "TurnRight",
+            "duration": 1.600000023841858,
+            "motion": 35.015,
+            "digest": "33345aed578a84c3c6ea918dd8c36b5a59d8c0e804ef33307721ffc8db709ece"
+          }
+        ],
+        "removedIdentityScaleChannels": 1558,
+        "sha256": "af608947cb933775338f91ddc46861911879a3b465a69ccf02ae3978023ddb6a"
+      },
+      {
+        "file": "nahecaris.lod1.glb",
+        "bytes": 3025320,
+        "vertices": 29922,
+        "triangles": 54288,
+        "bounds": [
+          1.5355464220046997,
+          1.223621666431427,
+          5.8709540367126465
+        ],
+        "bones": 82,
+        "boneNames": [
+          "root",
+          "body",
+          "abdomen0",
+          "abdomen1",
+          "abdomen2",
+          "abdomen3",
+          "abdomen4",
+          "abdomen5",
+          "abdomen6",
+          "telson",
+          "furcaL",
+          "furcaR",
+          "pleopodL4",
+          "pleopodR4",
+          "pleopodL3",
+          "pleopodR3",
+          "pleopodL2",
+          "pleopodR2",
+          "pleopodL1",
+          "pleopodR1",
+          "pleopodL0",
+          "pleopodR0",
+          "antenna0L",
+          "antennaTip0L",
+          "antenna0R",
+          "antennaTip0R",
+          "antenna1L",
+          "antennaTip1L",
+          "antenna1R",
+          "antennaTip1R",
+          "mandibleL",
+          "mandibleR",
+          "thoracopodL0",
+          "endopodL0",
+          "exopodL0",
+          "thoracopodL1",
+          "endopodL1",
+          "exopodL1",
+          "thoracopodL2",
+          "endopodL2",
+          "exopodL2",
+          "thoracopodL3",
+          "endopodL3",
+          "exopodL3",
+          "thoracopodL4",
+          "endopodL4",
+          "exopodL4",
+          "thoracopodL5",
+          "endopodL5",
+          "exopodL5",
+          "thoracopodL6",
+          "endopodL6",
+          "exopodL6",
+          "thoracopodL7",
+          "endopodL7",
+          "exopodL7",
+          "thoracopodR0",
+          "endopodR0",
+          "exopodR0",
+          "thoracopodR1",
+          "endopodR1",
+          "exopodR1",
+          "thoracopodR2",
+          "endopodR2",
+          "exopodR2",
+          "thoracopodR3",
+          "endopodR3",
+          "exopodR3",
+          "thoracopodR4",
+          "endopodR4",
+          "exopodR4",
+          "thoracopodR5",
+          "endopodR5",
+          "exopodR5",
+          "thoracopodR6",
+          "endopodR6",
+          "exopodR6",
+          "thoracopodR7",
+          "endopodR7",
+          "exopodR7",
+          "valveL",
+          "valveR"
+        ],
+        "textures": 0,
+        "sockets": [
+          {
+            "name": "anchor_attack_primary",
+            "point": [
+              0.05400000140070915,
+              -0.13500003462981935,
+              1.2899999233459192
+            ]
+          },
+          {
+            "name": "anchor_mouth",
+            "point": [
+              0.0,
+              -0.13500003377410663,
+              1.26499994804349
+            ]
+          },
+          {
+            "name": "anchor_mouth_inside",
+            "point": [
+              0.0,
+              -0.06500002842150099,
+              1.264999950439488
+            ]
+          }
+        ],
+        "clips": [
+          {
+            "name": "Crawl",
+            "duration": 2.4000000953674316,
+            "motion": 187.035,
+            "digest": "4eb9589965d31097260be600d2210c5715351a2f2c82bb085069f58c84a1d0c6"
+          },
+          {
+            "name": "Death",
+            "duration": 1.600000023841858,
+            "motion": 108.534,
+            "digest": "cc76a62e181e9aa8babe4a303e76a9a6e948e6cf64c9cab3f082bdfa15fcce29"
+          },
+          {
+            "name": "Idle",
+            "duration": 2.4000000953674316,
+            "motion": 92.69,
+            "digest": "7b585db1638401d3c1dbacbdebc19c0cc7529ad5a2b340fa2ff1cc1a14b5ce56"
+          },
+          {
+            "name": "Swim",
+            "duration": 2.4000000953674316,
+            "motion": 305.698,
+            "digest": "3db40c134d8f5e132a98a40dda35b1655aba386fca7f6473cb262dba9d96e7e7"
+          }
+        ],
+        "removedIdentityScaleChannels": 328,
+        "sha256": "26760efd2f8d09d9a2d00b724dbcba8434df4eaa9b7e7a4913864ea30b444c02"
+      }
+    ],
+    "lodTriangleRatio": 0.305031605562579
+  },
+  "reviewReports": {
+    "render-validation.json": "ed93fd80a60556bda498e927cdf9989bd2201452b870882f2fbbfe0033b87825",
+    "playback-validation.json": "4085f915b896d355510bb63ad862aa84771e2efcf2b02fca97b4c4a5fc2268e0",
+    "validation.json": "033f1a110468ee513d79ce6523c63da0a96bb5c9c0857057a4c6333452800cb7",
+    "intake-validation.json": "3ae238a4e5ed0842d4fa8da199756d6fd15a4050501f4fd27382099e82c30678",
+    "render-validation-lod.json": "4a1bc5873d12aaa6a2c43a73f8c3f83dc764f424684791927f4f199fb4ec58fd"
+  },
+  "eyeReports": {
+    "eye-audit-lod.json": "d72c8b59eabfb9c2dcb6d7219471a4a28e573571121d202b295939568723e01a",
+    "eye-audit-full.json": "5460e4fe7341d515976a3d15f08dcb1ed1fbb27ab2fe62f9b7ae3361c412c415"
+  },
+  "sourceScripts": {
+    "build.py": "1bb28a68b5300b0bb2abc8aa7e52435fb022c5625528bf241de29a40fdda4dde",
+    "delivery.py": "ec7cec9e8c05cf4ef5029003401c34fcf400510c368bbd45e2fca1b95bcd62e0",
+    "export.py": "a075e44f0c97ece34f9ded2779b5e384b2eb57f1682786b54a379c93bba96581",
+    "finalize.py": "6601e211a3657f5f0ce2f2df1eb66a982ce3168a938a23711d59cead12ea3451",
+    "geometry.py": "39d36db73edc4a4b6a1c848678efdf29f3f761d24b89c99193b529406f875ac6",
+    "materials.py": "2e813b74cd3d3683efb2868a35c84cd299741689337db65674f867d1780e355d",
+    "motion.py": "05121e48870869f13d79f7a14ffdc1e7b416fc6fbc16ed3794a3b3d31c5a8d72",
+    "portraits.py": "e0117a2345487ca2fa6b48f6719143f7970c17275b41ef7bf5f037161444cb1e",
+    "render.py": "9b3d6acff75af177b2a7e847529184bc501adf5f78d4ddd064c67ea9d3e68fef"
+  },
+  "notes": [
+    "Complete initial preview; integration agent owns packaging, viewer review and main commits.",
+    "No pre-existing model existed. Original blend and imagegen source preserved.",
+    "Three anchor nodes are explicitly supported by shared check.mjs; full and LOD metadata match.",
+    "LOD retains both Swim and Crawl because the shared intake requires Swim when the full model supplies it.",
+    "Later refinement may add closer fossil-based ocular/appendage proportions, finer filtering setae and improved carapace material readability. Initial eye volume and export validity are mandatory and passed."
+  ]
+}
