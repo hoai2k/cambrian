@@ -63,3 +63,10 @@ asset namespaces using a test-only alternative path configuration. Existing worl
 audio, palette and portrait tests cover the shared consumers. During this refactor, seeded 300-step
 matches in Rise, Reef, Frenzy and Hunted produced identical serialized actor/progress/state hashes
 before and after the move; the complete creature definitions also matched exactly.
+
+## Devonian natural-history and asset brief
+
+The [Devonian creature and asset brief](07-devonian-design.md) describes 21 mobile animal subjects,
+regional environments, plants, attached organisms and geological props, together with the proposed
+images and 3D source/export deliverables. It is an art inventory with research notes; it does not
+specify gameplay or begin asset production.

@@ -144,3 +144,15 @@ Nine biomes now band out from a shoreline. The middle of the danger scale (Open 
 - **Files:** `public/assets/ui/radar-player.svg`, `radar-threat.svg`, `radar-giant.svg`, `radar-home.svg`, `radar-shore.svg`; 24 × 24 viewBox, single colour (`currentColor`), no text.
 - **Replaces:** the inline shapes drawn by `Radar` in `src/app/Hud.tsx` (dot, diamond, big diamond, house, coastline arc).
 - **Brief:** minimal marks that read at 8 px on a dark disc: a dot with a thin ring for a player; a diamond for a threat; a diamond with a small jaw notch for a giant; a sponge-dome silhouette for home; a short wavy coastline for the shore.
+
+
+## 2026-09-06 — Reddish Anomalocaris favicon
+
+Replaced the game, specimen viewer and workbench favicon links with the approved
+reddish Anomalocaris head. Delivered `public/favicon-anomalocaris-{16,32,192,512}.png`,
+`public/apple-touch-icon-anomalocaris.png` (180 px), and `public/favicon.ico`
+(16/32/48 px). Previous engraved icons remain available.
+
+The approved built-in imagegen illustration is downsampled without restyling;
+`tools/art/export-anomalocaris-favicon.py <approved-source.png>` reproduces the
+exports. New filenames ensure browsers request the new version.
