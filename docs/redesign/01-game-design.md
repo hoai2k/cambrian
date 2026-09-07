@@ -274,6 +274,61 @@ Prey should be **catchable but never free**.
 - **Wounded prey** leaves a faint particle trail (blood in the current) that
   Anomalocaris and Marrella can follow.
 
+## The hours
+
+The reef used to hunt around the clock. Every ambient animal counted as hungry
+four seconds after its last meal, so anything that could see you was coming for
+you — which made the sea exhausting, and, less obviously, dull: when everything
+hunts all the time, nothing hunting is information.
+
+The day now turns on an eight-minute cycle (`src/sim/daynight.ts`, a pure
+function of simulation time so both split-screen players and the renderer agree
+on it):
+
+| Phase | Length | What it is |
+| --- | --- | --- |
+| **Dawn** | 48 s | Half light. The reef feeds. |
+| **Day** | 230 s | Full light, long, and quiet. Most animals have eaten and are getting on with their lives. |
+| **Dusk** | 48 s | Half light again, and the busiest hunting of the cycle. |
+| **Night** | 154 s | Dark, shorter than the day, colour drained and the far water closed in. Hunting sits between the two extremes. |
+
+The cycle drives one number, **hunting pressure**, which peaks through both
+twilight bands (≈1), sits low through the middle of the day (0.12) and rests
+above that at night (0.3). Pressure sets how long an animal will go after a meal
+before it looks for another: about sixteen seconds at dusk, over two minutes at
+noon. It changes how *often* things hunt rather than switching hunting on and
+off — a hungry enough animal always eventually goes looking, whatever the hour.
+
+Measured over four full days, the giants — which are what "something is hunting
+me" actually means to a player — come down to hunt 1.3% of the time at midday
+and 6–8% at dawn and dusk. The ambient roster follows the same curve. Both are
+covered by `tools/ecology-test.ts`.
+
+A brain standing in for a player is exempt: versus bots and the balance harness
+are competitors in a game, not animals in an ecosystem, and the hour must not
+decide how hard a rival plays.
+
+## Temperament
+
+On top of the clock, two dispositions are dealt out at spawn, because a sea
+whose only question is *can it eat me* runs out of questions:
+
+- **Grumpy** animals have a personal space and see off anything their own size
+  that enters it, hungry or not, dawn or noon — and drop the matter once you
+  have backed off. They are the reason you do not swim straight through a crowd.
+- **Territorial** animals hold a patch and drive intruders out of it, then go
+  home. They never follow past the edge, so they are a *decision* rather than a
+  threat: the ground one is sitting on is often worth crossing, and you can
+  always choose not to. Held ground is drawn on the radar as a dashed ring, so
+  the choice is made before you are in it rather than after.
+
+About a third of grown, armed animals hold a patch; about a fifth of everything
+grown is simply grumpy; the rest are indifferent. Grazers and filter feeders
+mostly hold nothing, having somewhere to be rather than something to defend.
+
+The one rule none of this softens: **hit something and it fights back**,
+whatever the hour and whatever it was doing.
+
 ## Escaping: how detection and hiding work
 
 Every AI has a **detection score** for each potential target, updated
@@ -339,7 +394,9 @@ Everything is still procedural (seeded), so it costs no new art.
   and a magnet. See* [the endless sea](04-infinite-ocean.md#landmarks).*)*
 - **Time and light**: a slow day cycle (20 min) that changes caustic intensity
   and Giant activity (they hunt more at dusk). Optional; ships after core.
-  *(Not built.)*
+  *(Built, at eight minutes rather than twenty, and it turned out to be the
+  spine of the ecology rather than a lighting effect — see* **The hours**
+  *below.)*
 
 ## Modes
 

@@ -5,6 +5,7 @@ import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js
 import { clamp, makeRng, TAU } from '../shared/math';
 import { loadPropGeometry, type PropId } from './props';
 import { FLORA_PHYS } from '../sim/flora';
+import { daylight } from '../sim/daynight';
 import { BIOMES, biomeAt, biomeWeights, CHUNK, chunkCoord, chunkKey, chunkSeed, generateChunk, LIGHT_WINDOW_Y, sampleCurrent, sampleHeight, shoreDistance, SURFACE_Y, type Biome, type BiomeWeights, type Chunk, type Flora, type WorldData } from '../sim/world';
 
 export type Quality = 'high' | 'low';
@@ -25,7 +26,8 @@ export interface SeaEnvironment {
   /** Applies the magnification tier and the local biome's atmosphere for one viewport and returns the fog density it chose. */
   setViewLength(L: number, camX?: number, camZ?: number, camY?: number): number;
   /** `cams` are every viewport's camera positions: scenery streams in around all of them. */
-  update(time: number, dt: number, focus: THREE.Vector3, cams?: readonly THREE.Vector3[]): void;
+  /** `simTime` is the match clock the day/night cycle runs on; `time` is the render clock the shaders use. */
+  update(time: number, dt: number, focus: THREE.Vector3, cams?: readonly THREE.Vector3[], simTime?: number): void;
   dispose(): void;
   sun: THREE.DirectionalLight;
   /** Build the coarse tiles around a point up front, so a new view is never a hole. */
@@ -642,6 +644,8 @@ export function createSea(scene: THREE.Scene, world: WorldData, quality: Quality
   const atmosW: BiomeWeights = { ...tileW };
   const fogColor = new THREE.Color(), tmpColor = new THREE.Color();
   const bentSlots = new Set<Flora>();
+  /** 0..1, written every frame by `update` from the simulation clock; read by `setViewLength`. */
+  let daylightNow = 1;
   void rng;
 
   return {
@@ -670,6 +674,20 @@ export function createSea(scene: THREE.Scene, world: WorldData, quality: Quality
         fogColor.lerp(tmpColor.setRGB(0.86, 0.92, 0.96), 0.85);
         density *= 0.12; sky = Math.max(sky, 2.4); sunI = Math.max(sunI, 3.4);
       }
+      // The hour. Twilight pulls the light down and the water toward a cold blue; night takes
+      // most of it away and leaves a thin moonlit cast. The biome's own colour is still what the
+      // water is made of — this darkens and cools it rather than replacing it — so the shallows
+      // at night still read as the shallows.
+      if (daylightNow < 1) {
+        const k = 1 - daylightNow;
+        tmpColor.setRGB(0.055, 0.085, 0.16);                     // deep, moonlit blue-black
+        fogColor.lerp(tmpColor, k * (above ? 0.6 : 0.88));
+        density *= 1 + k * 0.7;                                  // you cannot see as far in the dark
+        // Enough light left to play by — this is a shelf sea under a moon, not a cave — but the
+        // colour is gone and the far water closes in.
+        sky *= 1 - k * 0.82;
+        sunI *= 1 - k * 0.93;
+      }
       fog.color.copy(fogColor); (scene.background as THREE.Color).copy(fogColor);
       hemi.intensity = sky; sun.intensity = sunI;
       fog.density = baseFog * density * THREE.MathUtils.clamp(2.2 / (L + 1.5), 0.62, 1.15);
@@ -686,9 +704,12 @@ export function createSea(scene: THREE.Scene, world: WorldData, quality: Quality
       particles.scale.setScalar(THREE.MathUtils.clamp(L * 0.6, 0.6, 3));
       return fog.density;
     },
-    update(time, dt, focus, cams = [focus]) {
+    update(time, dt, focus, cams = [focus], simTime) {
       if (disposed) return;
       seaTime.value = time;
+      // The light follows the *simulation* clock, not this one, so what the sky is doing always
+      // agrees with the hour the HUD shows and with the appetite the AI is running on.
+      daylightNow = daylight(simTime ?? time);
       syncViews(cams);
       // Plants the sim has disturbed lean in the shader; ones that settled get written back to rest once.
       for (const f of world.activeFlora) { const slot = floraSlots.get(f); if (slot) { writeBend(f, slot); bentSlots.add(f); } }

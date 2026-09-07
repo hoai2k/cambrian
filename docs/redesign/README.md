@@ -38,11 +38,11 @@ and **M8 (polish) is complete except for two music files**:
 | Onboarding, rumble, quality tiers, viewer | Shipped (`hintFor()` in `src/sim/game.ts`, `rumble()` wired to hits, deaths, parries, grabs, tier-ups). |
 | Landmarks, co-op revive, spectating, the discovery record | Shipped; see below. |
 | The View scoreboard, and turns in Hunter & Hunted | Shipped; see below. |
+| The day/night cycle, and the temperaments under it | Shipped: [01 · The hours](01-game-design.md#the-hours) and [Temperament](01-game-design.md#temperament). |
 
 Designed but **not built** (nothing depends on them; listed so they are not
 mistaken for shipped):
 
-- A day/night cycle. `01-game-design.md` marks it optional, after core.
 - Swarm impostor billboards, from the technical plan's rendering section.
   Superseded: swarm members use the shared `*.lod1.glb` path instead, which met
   the performance targets.
