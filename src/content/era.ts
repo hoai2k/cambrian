@@ -72,6 +72,12 @@ export interface EraDefinition {
      */
     readonly flora?: Record<Biome, Partial<Record<FloraKind, number>>>;
     /**
+     * Authored geometry for a flora kind, by prop id under `assets.props`. A kind without one — or
+     * whose file fails to load — keeps the procedural stand-in `src/render/sea.ts` builds for it,
+     * so this can be filled in a kind at a time as art lands.
+     */
+    readonly floraProps?: Partial<Record<FloraKind, string>>;
+    /**
      * Height of the water surface in world units (the seabed sits around 0 on the shelf). Absent,
      * the Cambrian's 40. A pelagic roster wants more water over the floor than a benthic one.
      */

@@ -7,7 +7,12 @@ import { MeshoptDecoder } from 'three/examples/jsm/libs/meshopt_decoder.module.j
 import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js';
 import { appBase } from '../shared/base';
 
-/** IDs are content-owned: the renderer does not enumerate geological eras. */
+/**
+ * A file in the active era's props folder, without the extension. This is era data now, not a
+ * closed set: the Cambrian names seven sponges, the Devonian names its instanced scenery exports.
+ * `loadPropGeometry` is what validates one, and a prop that fails to load leaves the caller on
+ * its procedural fallback.
+ */
 export type PropId = string;
 
 /** Caller owns the returned geometry; source materials, textures and rig helpers are released. */

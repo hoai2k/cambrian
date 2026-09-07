@@ -56,9 +56,10 @@ export function SelectScreen(p: Props) {
               <button key={c.id} role="option" aria-selected={hovering.length > 0} className={cls}
                 style={{ ['--c' as string]: hovering.length ? PLAYER_COLORS[hovering[0].i] : c.color }}
                 onClick={() => { const i = p.players.findIndex((pl) => !pl.ready && typeof pl.device === 'string'); p.onPick(i >= 0 ? i : 0, c.id); }}
-                title={`${c.name} · ${c.role}`} aria-label={c.name}>
+                title={`${c.name}${c.kind ? ` · ${c.kind}` : ''} · ${c.role}`} aria-label={c.kind ? `${c.name}, ${c.kind}` : c.name}>
                 <CreaturePortrait creatureId={c.id} kind="thumb" assetBase={ASSETS} alt="" draggable={false} loading="eager" />
                 <span className="cell-name">{c.name}</span>
+                {c.kind && <span className="cell-kind">{c.kind}</span>}
                 <ModelStatusBadge status={ACTIVE_ERA.assets.modelStatus?.[c.id]} compact />
                 <span className="cell-rings">
                   {hovering.map(({ i, pl }) => <i key={i} style={{ ['--c' as string]: PLAYER_COLORS[i], ['--k' as string]: i }} className={pl.ready ? 'ring locked' : 'ring'} />)}

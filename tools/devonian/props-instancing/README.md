@@ -20,7 +20,7 @@ The eleven GLBs total **15,461 triangles / 401,360 bytes**, with one static mesh
 
 ## Runtime integration
 
-`src/content/devonian/scenery.ts` owns the mappings and material/bend/wind choices. An optional `EraDefinition.assets.instancedScenery` field exposes these to the generic renderer. `assets.props` remains the Cambrian fallback path. The renderer retains seed, physics, flora dimensions, instance transforms, stream/culling logic and existing sea-shader wind/bending. New pigmented flora use the existing scalar shade without multiplying the pigment by a second brown flora colour.
+`src/content/devonian/scenery.ts` owns the mappings and material/bend/wind choices. An optional `EraDefinition.assets.instancedScenery` field exposes these to the generic renderer. `assets.props` retains the concurrent Devonian `scenery/` export library as a fallback; explicit `instancedScenery` paths select the validated proxies. An explicit proxy collection owns the whole flora mapping, so Performance and the two giant procedural exceptions do not fall through to unintended land plants. The renderer retains seed, physics, flora dimensions, instance transforms, stream/culling logic and existing sea-shader wind/bending. New pigmented flora use the existing scalar shade without multiplying the pigment by a second brown flora colour.
 
 `loadPropGeometry` installs Meshopt decoding, bakes world transforms for static multi-mesh overrides, normalizes attribute representation and merges indexed geometry. It returns a detached geometry owned by the caller, disposing parsed source geometry, materials, textures and skeleton resources on success or validation failure. Original Cambrian assets preserve their old raw geometry/pivot convention. Failed asynchronous loads keep their procedural fallback; late loads after sea disposal release their geometry.
 
@@ -73,6 +73,13 @@ node tools/devonian/props-instancing/review.mjs --high
 ```
 
 Use a fresh Vite instance after source edits to avoid separate hot-reload module instances when selecting the era. Chrome is headless with SwiftShader. Review output lives under local `review/`: `static-proxy-contact.png`, `devonian-game.png`, `devonian-game-baseline.png`, `devonian-game-high.png`, `review.json`, `baseline.json`, `review-high.json`. The imported branch modules are used directly, with the era selected before the simulation/renderer import. Baseline disables only the optional scenery override. This review is a controlled actual-renderer scene, not a full interactive gameplay session.
+
+If the review targets a fresh Vite instance on another local port, set its
+origin explicitly:
+
+```sh
+DEVONIAN_QA_ORIGIN=http://127.0.0.1:4181 node tools/devonian/props-instancing/review.mjs
+```
 
 ## Verified
 

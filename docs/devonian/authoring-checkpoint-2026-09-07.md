@@ -2,6 +2,23 @@
 
 This is a resumable work checkpoint, not a completion report. The user requested it to preserve context and judge remaining token use. Update the current status as deliveries land; do not infer that drafts are approved from their presence on disk.
 
+## Current execution update — workflow split and integration
+
+User authorized model-specific delegation on 7 September: use **gpt-6-astra / high** for
+anatomy research, sculpting decisions and implementation, rig/animation design, complex merge
+judgment and visual approval. Use **gpt-5.6-terra / medium** for frozen-script Blender runs,
+exports, packaging and established tests. Do not switch a live task mid-phase or assume a tool
+call needs a new agent. Hand off bounded batches with input hashes, exact commands and stopping
+conditions. Return unexpected design/failure decisions to Astra. See `agent-workflow.md`.
+
+Initial complete library is committed as **6cd8de7**. Concurrent remote main **8637d96**
+is being merged; three conflicts were resolved by retaining both export libraries and era
+configuration while making explicit instancing mappings authoritative, including their quality
+threshold and intentional procedural exceptions. Remote day/night, UI and ecology changes remain.
+Terra agent `devonian_execution_handoff` completed the workflow document, typecheck/build, 644 Devonian checks, era and asset checks, and loader regression. A stale Vite HMR instance initially failed the scenery harness; Astra provided an isolated 4181 server and corrected baseline isolation. All three scene runs passed with unchanged expected counts, no errors and clean disposal; Astra visually reviewed low/high outputs. The rebuilt viewer shows all 21 creatures and pending preview labels; Manticoceras rendered successfully. Logs are `../devonian-authoring/review/workflow-merge-*.log`.
+Main has not yet received the last two creatures and complete supporting library; send the user
+an explicit non-creature milestone notification only after push and verification.
+
 ## Latest priority — supersedes older refinement sequencing below
 
 The user now requests carefully authored INITIAL versions of every creature and every plant,
@@ -9,7 +26,7 @@ prop and supporting image first, committed early to main, then full refining pas
 quality and eye requirements remain, but extended repeated art/collision reviews are deferred
 and recorded. Do not block initial delivery on final-art perfection. Mark unfinished models
 **⚠ Preview model** on the game choice cards and viewer. The lifecycle source is
-`src/content/devonian/model-status.json`; seven reviewed models are final; Doryaspis and Gemuendina were reopened as preview following user feedback. All other roster IDs are preview.
+`src/content/devonian/model-status.json`; three reviewed models are final; all pending refinements, including six requested total reworks, are preview.
 
 Current initial collection: **21/21 creatures integrated; 3 reviewed/final + 18 preview**.
 Last verified pushed main: **e54184b** (19 creatures), feature **9c349d4**. Latest two cephalopods

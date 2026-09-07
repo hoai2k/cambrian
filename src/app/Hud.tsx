@@ -79,6 +79,7 @@ function PlayerPanel({ p }: { p: PlayerHud }) {
       {p.notice && !p.board && <p className="notice">{p.notice}</p>}
       {p.board && <Scoreboard board={p.board} me={p.index} />}
       <BiomeBanner biome={p.biome} alive={p.alive} />
+      <DayPhase day={p.day} />
       <Radar radar={p.radar} biome={p.biome} />
       {p.teleport && (
         <div className="tele-menu">
@@ -211,6 +212,16 @@ function Radar({ radar, biome }: { radar: PlayerHud['radar']; biome: string }) {
           : <circle cx={x} cy={y} r={rr} fill="currentColor" fillOpacity=".18" stroke="currentColor" strokeWidth=".9" strokeDasharray="2 1.5" />}
       </g>;
     }
+    if (b.kind === 'territory') {
+      // Held ground: a ring you can see the edge of, so entering it is a choice rather than a
+      // surprise. Drawn under everything else — it is a place, not a contact.
+      const rr = Math.max(4, Math.min(R * 1.4, (b.r ?? 0.1) * R));
+      return <g key={k} className={cls} style={{ color: b.color }}>
+        {b.beyond
+          ? <circle cx={C + b.x * R} cy={C + b.y * R} r={3} fill="none" stroke="currentColor" strokeWidth="1" strokeDasharray="1.5 2" />
+          : <circle cx={x} cy={y} r={rr} fill="currentColor" fillOpacity=".07" stroke="currentColor" strokeWidth=".9" strokeDasharray="3 2.5" />}
+      </g>;
+    }
     if (b.kind === 'landmark') {
       // A small hollow diamond: a place, not a creature. Drawn inline rather than as a glyph
       // asset so an era that has no landmark artwork still gets the mark.
@@ -243,7 +254,9 @@ function Radar({ radar, biome }: { radar: PlayerHud['radar']; biome: string }) {
     </g>;
   };
   // rim contacts last so they draw over the ring
-  const inside = radar.blips.filter((b) => !b.beyond), rim = radar.blips.filter((b) => b.beyond);
+  const rank = (b: RadarBlipHud) => (b.kind === 'territory' || b.kind === 'deadzone' ? 0 : 1);
+  const inside = radar.blips.filter((b) => !b.beyond).sort((a2, b2) => rank(a2) - rank(b2));
+  const rim = radar.blips.filter((b) => b.beyond);
   return (
     <div className="radar" aria-label={`Radar, ${Math.round(radar.range)} metre reach. ${biome}. ${radar.blips.filter((b) => b.kind === 'food').length} food shoals nearby.`}>
       <svg viewBox="0 0 100 100">
@@ -283,6 +296,26 @@ function EraStatus({ era, alive }: { era: EraHud; alive: boolean }) {
 }
 
 /** Announces the biome for a few seconds whenever it changes. */
+/**
+ * The hour, above the radar. A dial that fills as the phase runs out, and the phase's name.
+ *
+ * Dusk and dawn are when the reef hunts, so they are called out plainly and the ring goes warm:
+ * the player needs to be able to see the dangerous part of the day coming and decide whether to
+ * be out in the open for it.
+ */
+function DayPhase({ day }: { day: PlayerHud['day'] }) {
+  const hot = day.phase === 'dusk' || day.phase === 'dawn';
+  return (
+    <div className={`day-phase ${day.phase} ${hot ? 'hunting' : ''}`} aria-label={`${day.phase}, ${Math.ceil(day.until)} seconds left`}>
+      <span className="day-mark" aria-hidden>{day.phase === 'night' ? '☾' : day.phase === 'day' ? '☀' : '◐'}</span>
+      <span className="day-text">
+        <b>{day.phase.toUpperCase()}</b>
+        <small>{hot ? 'the reef is hunting' : `${Math.ceil(day.until)}s`}</small>
+      </span>
+    </div>
+  );
+}
+
 function BiomeBanner({ biome, alive }: { biome: string; alive: boolean }) {
   const [shown, setShown] = useState<string | null>(null);
   const last = useRef<string | null>(null);
