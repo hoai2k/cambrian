@@ -846,9 +846,11 @@ export class Engine {
         case 'stagger': { world('stagger', e.pos); break; }
         case 'dodge': { this.bubbles.emit(e.pos, 14, 0.8, 2.5, 0.06, 0.7); world(heavy('dodge', e.actor), e.pos); break; }
         case 'silt': { this.bubbles.emit(e.pos, 30, 1.5, 2, 0.08, 1.2); world('silt', e.pos); break; }
-        // A special announces itself with sparkles around the body, not a flash. An impact flash on
-        // your own creature reads as damage or a respawn — the two things it is emphatically not.
-        case 'ability': { const len = e.strength ?? 1; this.sparkles.emit(e.pos, Math.round(16 + len * 7), 0.5 + len * 0.35, 0.6 + len * 0.25, 0.06, 1.1); this.bubbles.emit(e.pos, 20, 1, 3, 0.08); const ab = game.byId(e.actor); const key = ab ? `ability:${creature(ab.creature).ability}` : 'ability'; world(SAMPLES[key] ? key : 'ability', e.pos); break; }
+        // A special is your own action, not something happening to you, so its tell is the quietest
+        // in the game: a few sparkles close to the body that say "this one is not the ordinary
+        // heavy". Deliberately under the shoal-join burst, and well under anything that means
+        // damage — a flash here read as being hit or respawning, which is why it is gone.
+        case 'ability': { const len = e.strength ?? 1; this.sparkles.emit(e.pos, Math.round(5 + len * 2), 0.25 + len * 0.18, 0.25 + len * 0.1, 0.035, 0.5); this.bubbles.emit(e.pos, 20, 1, 3, 0.08); const ab = game.byId(e.actor); const key = ab ? `ability:${creature(ab.creature).ability}` : 'ability'; world(SAMPLES[key] ? key : 'ability', e.pos); break; }
         case 'shellCrush': { this.impacts.spawn(e.pos, '#ffd9a0', 2.2, 0.5); this.bubbles.emit(e.pos, 28, 0.8, 4, 0.1, 1.4); world('shellCrush', e.pos); break; }
         case 'grab': { const at = this.impactPos(e.actor, e.other, e.pos); this.impacts.spawn(at, '#ffb070', 1.4, 0.35); world('grab', at); if (e.player != null && e.player >= 0) { const d = padOf(e.player); if (typeof d === 'number') rumble(d, 1, 0.6, 300); } break; }
         case 'hunted': { personal('hunted'); if (e.player != null && e.player >= 0) { const d = padOf(e.player); if (typeof d === 'number') rumble(d, 0.6, 0.9, 500); } break; }
