@@ -46,8 +46,13 @@ send creative fixes to Terra. Preserve script hashes and candidates between revi
   executed and improved the colour/crackle; root still found the finish too uniform. Material-03
   is now being authored with an original ImageGen olive/ochre tessera source (prompt/provenance
   in `imagegen-skin-01.json`, source SHA `6820a68305bfd1265510934d3df653e0e80f2768158722b54684fbab0cdf0210`).
-  Rig/action/export/check scripts have safe drafts but candidate binding remains deliberately
-  pending reviewed material. Read `production-checkpoint.md`. Material-01 packed blend SHA:
+  Material-03 executed without geometry changes; root inspected both images and accepted the
+  finish for the animated local candidate (not final model approval). Packed blend SHA:
+  `810031c3e18a2f9bc5ea820007a460aebdd7e8fdf7c96879ef398a16ab080ada`.
+  Astra is binding that material and freezing rig/action/export/check/portrait/pose groups.
+  Eye seating remains a completed-rework audit issue. Root-owned `review-playback-01.mjs` is
+  syntax-checked only; execute after the completed candidate exists, with frozen model hashes.
+  Read `production-checkpoint.md` for earlier safe draft details. Material-01 packed blend SHA:
   `af0b5ab285fb1d7770c9689aa7671c210adee79209f76b7e3694ac5216310210`.
   Source: `tools/devonian/creatures/gemuendina/rework-v3/`.
   Outputs: `../devonian-authoring/gemuendina/rework-v3/clay-01/`.
@@ -61,7 +66,9 @@ send creative fixes to Terra. Preserve script hashes and candidates between revi
   Clay-03 subsequently executed and all four images were inspected by root. Continuous mass
   improved, but drooping helmet-like preoral roof, triangular pouch-like floor, detached-looking
   jaw rail and ribbon/slab pectorals remain concerns. Astra author is independently reviewing
-  and proposing the next bounded correction; no permission to advance to materials.
+  confirmed the diagnosis and is authoring clay04 under an approved anterior patch/neck/
+  inset-mouth ownership plan with coherent jaw/floor and locally sectioned twisted fins.
+  Read `visual-review-clay03.md`. No permission to advance to materials yet.
   Clay-03 blend SHA: `cef5249afb1dd79e98b86fd3a0d12809c6646717a3639350754ad3076298d00c`.
   Manifest: `1a7f781d4a6abc4bc624c351f0822db77bbf29779a47e3f5a8e246220f6b81a6`.
   Clay-02 blend SHA: `78a0caee9d8fef38f457b9f376671cefc30080232cf5cc61a3b4867b088f1098`.
@@ -77,8 +84,8 @@ send creative fixes to Terra. Preserve script hashes and candidates between revi
   Source: `tools/devonian/creatures/titanichthys/rework-v3/`.
   Outputs: `../devonian-authoring/titanichthys/rework-v3/clay-01/` (images in `renders/`).
   Blend SHA: `0ac6cdef7578f0fe7270673a5348a620d1d88a33a1b055a96eb29407fd1ac4bf`.
-- `/root/devonian_execution_handoff` — Terra medium; idle after completing Gemuendina material01/02,
-  Coccosteus clay01 plus ten comparison images and Titanichthys clay03 plus four views.
+- `/root/devonian_execution_handoff` — Terra medium; idle after completing Gemuendina material01/02/03,
+  Coccosteus clay01/02 plus their comparison images and Titanichthys clay03 plus four views.
   Use Terra executors for the next frozen scripts.
   Wait for HASH-BOUND handoff from each Astra author, execute with --python-exit-code 1,
   return actual images to the author/root for review. No public replacement yet.
@@ -86,7 +93,12 @@ send creative fixes to Terra. Preserve script hashes and candidates between revi
   comparison images from Terra are complete. Root reviewed all ten and rejected the first
   production form: boxy helmet/thorax, prism-like soft tail, oral midline hole and squared
   hinge panels, fin-tip hooks. Read `root-review-clay01.md`. Backup is unchanged. The author
-  is actively authoring a fresh clay02 sculpt before materials.
+  authored clay02, which then built/rendered successfully. Root reviewed its five views: body/
+  fins improved, but mouth has large intersecting panels. Astra verified the lower oral profile
+  clamps to the jaw's zero-width end, collapsing 1,890 quads onto X=0; duplicate tunnel is also
+  present. Its head cap is planar (correcting root's initial hypothesis). Clay03 is now being
+  authored with one connected exterior/inner oral boundary and positive-width pharynx. Read
+  `review-clay02-plan-clay03.md` and `root-review-clay02.md`; no material approval yet.
   `rework-v3/HANDOFF.md` binds the completed three groups and ten images.
   Builder SHA: `7e91fe87c5ae33c67aa4aa747cc74d59e65d31919ccf037e2f8c080011911e3d`.
   Its preproduction brief is `rework-v3/design.md`.
