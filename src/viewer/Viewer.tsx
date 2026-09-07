@@ -138,7 +138,9 @@ export function Viewer() {
       <div className="info">
         <span className="role">{def.role}</span>
         <h2 className={def.name.length > 11 ? 'long-name' : undefined}>{def.name}</h2>
+        {def.kind && <p className="kind-line"><b className="kind">{def.kind}</b>{def.species}</p>}
         <p>{def.provenance ?? 'Burgess Shale'} · {clips.length} clips</p>
+        {def.kindNote && <p className="specimen-description">{def.kindNote}</p>}
         {def.description && <p className="specimen-description">{def.description}</p>}
         {def.lengthMeters != null && <p className="specimen-scale">Representative length: {new Intl.NumberFormat('en', { maximumSignificantDigits: 3 }).format(def.lengthMeters)} m · views individually framed</p>}
         {collection !== 'cambrian' && <p className="specimen-downloads"><a href={`${ASSET_BASE}${def.model}`} download>Full model</a>{def.lod && <a href={`${ASSET_BASE}${def.lod}`} download>Reduced model</a>}</p>}
