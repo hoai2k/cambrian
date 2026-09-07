@@ -61,6 +61,11 @@ export interface EraDefinition {
     readonly illustration: string;
     readonly emblem: string;
     readonly modelBytes: Readonly<Partial<Record<CreatureId, number>>>;
+    /**
+     * Creatures whose own model is still in production borrow another roster member's GLB (and
+     * its LOD), recoloured with their scheme. Removed entry by entry as deliveries land.
+     */
+    readonly standIns?: Readonly<Partial<Record<CreatureId, CreatureId>>>;
   };
   readonly audio: { readonly music: readonly MusicTrack[] };
   readonly presentation: {
@@ -80,6 +85,7 @@ export function defineEra(def: EraDefinition): EraDefinition {
   for (const id of references) if (!ids.has(id)) throw new Error(`${def.id}: creature ${id} is outside the roster`);
   if (!def.ecology.giants.length) throw new Error(`${def.id}: a giant habitat is required for patrol placement`);
   for (const id of ids) if (!((def.assets.modelBytes[id] ?? 0) > 0)) throw new Error(`${def.id}: missing model size for ${id}`);
+  for (const [id, standIn] of Object.entries(def.assets.standIns ?? {})) if (!ids.has(id as CreatureId) || !standIn || !ids.has(standIn) || def.assets.standIns?.[standIn]) throw new Error(`${def.id}: stand-in ${id} → ${standIn} must map a roster member to a delivered one`);
   for (const id of ids) if (!def.presentation.authoredColors.creatures[id]) throw new Error(`${def.id}: missing authored colours for ${id}`);
   if (!def.presentation.schemes.length) throw new Error(`${def.id}: a default colour scheme is required`);
   if (!def.audio.music.length) throw new Error(`${def.id}: a soundtrack is required`);

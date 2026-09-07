@@ -35,6 +35,17 @@ unless the user explicitly asks for a PR. Steps:
 - The renderer interpolates between fixed simulation steps using each actor's `prevT` snapshot,
   so anything that moves an actor by more than it could swim in one step (teleport, respawn)
   must read as a jump. `tools/motion-test.ts` guards this.
+- Two eras, one engine. `/` is the Cambrian; `/devonian/` (entry `src/devonian/main.tsx`) calls
+  `selectEra(DEVONIAN)` and `setAppBase(nestedBase())` *before* dynamically importing the app, because
+  many modules read `ACTIVE_ERA` at module top. Anything new that reads the era at import time must
+  stay behind that import (or resolve lazily like `assetPaths`). Headless tests that need the Devonian
+  do the same: select the era, then `await import(...)` the simulation (`tools/devonian-test.ts`).
+- Devonian gameplay lives in `src/sim/devonian/` and reaches the shared simulation only through the
+  `RULES?.` hooks in `src/sim/era-rules.ts`. Do not branch on the era inside `game.ts`/`combat.ts`;
+  add a hook. With `RULES` undefined the Cambrian takes exactly its old paths.
+- Devonian specimens land in batches (`tools/devonian/shipped.json`). When one lands: run
+  `node tools/update-asset-sizes.mjs` (refreshes `src/content/devonian/asset-sizes.json`), remove its
+  entry from `DEVONIAN_STAND_INS` in `src/content/devonian/index.ts`, and run `npm run devonian`.
 - All docs live in `docs/`. Design docs are in `docs/redesign/`. Image, glyph and prop
   needs go in `docs/image-requests.md` and move to `docs/image-requests-history.md` once
   delivered and integrated; sound and music needs go in `docs/audio-requests.md`.

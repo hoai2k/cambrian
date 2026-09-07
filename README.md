@@ -110,11 +110,18 @@ reproducible generation scripts are in `tools/creatures/`.
 
 ## Era content
 
-Cambrian remains the only available era. Its roster, ecosystem defaults, presentation and asset
-paths are isolated in `src/content/cambrian/`, selected by `src/content/index.ts`. The game and
-viewer share that configuration. See [the era content plan](docs/redesign/06-era-content.md) for
-adding Devonian without duplicating the engine. Run `npm run eras` to validate the content contract.
+Two eras share one engine. The Cambrian pack (`src/content/cambrian/`) is the default at `/`;
+**Devonian Domination** lives at `/devonian/` with its own pack in `src/content/devonian/`. The
+entry page selects its era (`selectEra`) before the app loads, so every module-top read of
+`ACTIVE_ERA` sees the right roster, assets and modes. See [the era content plan](docs/redesign/06-era-content.md)
+for the boundary and run `npm run eras` to validate the content contract.
 
-The [Devonian natural-history and asset brief](docs/redesign/07-devonian-design.md) describes
-21 proposed creatures, regional environments, plants and props, with a list of images and 3D models
-to create. It does not specify gameplay or add an available era.
+Devonian gameplay is designed in [Devonian Domination](docs/redesign/08-devonian-domination.md)
+and implemented in `src/sim/devonian/`, reached from the shared simulation only through the
+`RULES` hooks in `src/sim/era-rules.ts` (undefined in the Cambrian build, so that path is
+unchanged). Rungs of a food chain replace growth: standing (0–100) is earned per rung, three life
+stages within a rung, armour zones and pierce, air for the lunged animals, dead-water zones,
+shore reach for the limbed ones, jetting shells. `npm run devonian` runs its headless checks.
+Models arrive in batches ([specimen library](docs/devonian/README.md)); a creature whose GLB is
+still in production borrows a delivered one, recoloured, via `assets.standIns` in the era pack.
+Colour schemes come from the [palaeoart survey](docs/art/devonian-colour-research.md).

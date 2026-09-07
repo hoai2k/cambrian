@@ -351,8 +351,16 @@ nobody moves between bands by growing.
 
 ## Implementation notes
 
-For whoever builds this, in the order that gives the earliest playable slice.
-The era boundary already anticipates most of it.
+**Status (Sept 2026): implemented and playable at `/devonian/`.** The content pack is
+`src/content/devonian/`, the rules are `src/sim/devonian/rules.ts` behind the hooks in
+`src/sim/era-rules.ts`, the HUD carries the standing ring (rung numeral), air bar, range chip,
+dead-zone radar rings and the Dominant countdown, and `tools/devonian-test.ts` (`npm run
+devonian`) covers the pack, rung bands, standing and staging, air, dead water, shore reach,
+armour, determinism and the mode endings. Eight of the 21 models are delivered; the rest borrow
+a delivered body (`assets.standIns`) until their own lands. Not yet built from the list below:
+the per-creature grasp/tusk/trident/brush specials (they use the shared ability set for now),
+the Devonian scenery and biome plates (Cambrian sets are reused), and the two biome music
+themes. The notes below are kept as the build order that was followed.
 
 1. **Content pack** (`src/content/devonian/`, per [06](06-era-content.md)):
    the 21 `CreatureDef`s with new fields — `rung`, `stages` (the three scales),

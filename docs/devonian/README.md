@@ -2,9 +2,11 @@
 
 The [natural-history brief](../redesign/07-devonian-design.md) defines the 21 mobile subjects and
 29 scenery families. This library supplies models, materials, portraits and articulated action
-clips for those subjects. The game still starts with the Cambrian content pack. Devonian assets
-can be inspected in the viewer's **Devonian creatures** and **Devonian scenery** collections;
-they do not define playable stats, abilities, environments or progression.
+clips for those subjects. Devonian Domination plays at `/devonian/` from the content pack in
+`src/content/devonian/` (stats, rungs and modes live there and in `src/sim/devonian/`, not in
+this library); a subject whose model has not shipped yet borrows a delivered one in play via
+`assets.standIns`. Devonian assets can also be inspected in the viewer's **Devonian creatures**
+and **Devonian scenery** collections.
 
 Approved deliveries are listed in `tools/devonian/shipped.json`. Models are published in reviewed
 batches so other work can use completed examples while the rest of the roster is in production.

@@ -41,6 +41,15 @@ for (const id of DEVONIAN_SHIPPED) {
 }
 for (const files of Object.values(DEVONIAN_SAMPLES)) for (const f of files) ok(fs.existsSync(`public/assets/${f.replace(/^devonian\//, 'devonian/sfx/')}.mp3`), `${f} sample exists`);
 ok(fs.existsSync(`public/${DEVONIAN.assets.illustration}`) && fs.existsSync(`public/${DEVONIAN.assets.emblem}`), 'brand art present');
+const shipped = JSON.parse(fs.readFileSync('tools/devonian/shipped.json', 'utf8')).creatures as string[];
+ok(shipped.every((id) => DEVONIAN_SHIPPED.includes(id)) && DEVONIAN_SHIPPED.length === shipped.length, `asset-sizes.json covers every shipped specimen (${shipped.length}); regenerate it when a delivery lands`);
+for (const c of DEVONIAN.creatures) {
+  const standIn = DEVONIAN.assets.standIns?.[c.id];
+  if (DEVONIAN_SHIPPED.includes(c.id)) ok(!standIn, `${c.id} is delivered and uses its own model`);
+  else ok(!!standIn && DEVONIAN_SHIPPED.includes(standIn) && fs.existsSync(`public/${paths.model(c.id)}`) && fs.existsSync(`public/${paths.model(c.id, 1)}`), `${c.id} is pending and stands in as ${standIn}`);
+}
+const opener = DEVONIAN.audio.music.find((t) => t.opening);
+ok(opener && fs.existsSync(`public/${paths.music(opener.name)}`.replace('%20', ' ')), `the opening track is delivered (${opener?.name})`);
 ok(RULES !== undefined && !RULES.growthByNutrition, 'Devonian rules active: growth is by standing, not nutrition');
 
 // ---- rung bands: same rung fights, one apart hunts, two apart is a snack ----
@@ -132,7 +141,7 @@ ok(RULES !== undefined && !RULES.growthByNutrition, 'Devonian rules active: grow
 {
   const g = new Game('domination', [{ creature: 'coccosteus', device: 'keyboard', ready: true }, { creature: 'tiktaalik', device: 0, ready: true }]);
   const [coc, tik] = g.players;
-  tik.pos.x = coc.pos.x; tik.pos.z = coc.pos.z; tik.pos.y = coc.pos.y; tik.prevT.x = tik.pos.x; tik.prevT.z = tik.pos.z;
+  tik.pos.x = coc.pos.x + 8; tik.pos.z = coc.pos.z; tik.pos.y = coc.pos.y; tik.prevT.x = tik.pos.x; tik.prevT.z = tik.pos.z;
   const s = stateFor(g);
   s.deadZones.push({ pos: { x: coc.pos.x, y: coc.pos.y, z: coc.pos.z }, r: 40, age: 30, life: 120, drift: { x: 0, y: 0, z: 0 } });
   const hp0 = coc.hp, hpT = tik.hp;
@@ -141,7 +150,7 @@ ok(RULES !== undefined && !RULES.growthByNutrition, 'Devonian rules active: grow
   const dc = devActor(g, coc), dt = devActor(g, tik);
   ok(dc.deadZoneIn && dt.deadZoneIn, 'both are inside the zone');
   ok(coc.hp < hp0 && coc.stamina < coc.staminaMax * 0.5, `dead water drains a gill breather (hp ${hp0.toFixed(0)} → ${coc.hp.toFixed(0)}, stamina ${coc.stamina.toFixed(0)})`);
-  ok(tik.hp === hpT, 'an air breather is untouched by anoxia');
+  ok(tik.hp >= hpT - 1e-6 && devActor(g, tik).deadT === 0, `an air breather is untouched by anoxia (hp ${hpT.toFixed(1)} → ${tik.hp.toFixed(1)}, deadT ${devActor(g, tik).deadT})`);
   ok(RULES!.hud(g, 0)!.deadZones.length === 1 && RULES!.hud(g, 0)!.inDeadZone, 'the HUD carries the zone for the radar');
   const before = dc.standing;
   s.deadZones.length = 0;
@@ -153,7 +162,8 @@ ok(RULES !== undefined && !RULES.growthByNutrition, 'Devonian rules active: grow
 {
   const g = new Game('reef', [{ creature: 'tiktaalik', device: 'keyboard', ready: true }, { creature: 'coccosteus', device: 0, ready: true }]);
   const [tik, coc] = g.players;
-  // push both straight at the shore (-z, shore is at low z) for a while
+  // start side by side in open water, then push both straight at the shore (+z) for a while
+  tik.pos.x = coc.pos.x + 6; tik.pos.z = coc.pos.z; tik.pos.y = coc.pos.y = 20; tik.prevT.x = tik.pos.x; tik.prevT.z = tik.pos.z; tik.prevT.y = coc.prevT.y = 20;
   const toShore = (i: number) => { const f = { ...emptyInput(), my: 1, camYaw: 0, camPitch: 0, burst: 1 } as InputFrame; return [i, f] as [number, InputFrame]; };
   const inputs = new Map<number, InputFrame>([toShore(0), toShore(1)]);
   for (let i = 0; i < 60 * 40; i++) tick(g, inputs);

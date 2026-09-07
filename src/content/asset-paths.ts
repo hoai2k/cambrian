@@ -5,7 +5,7 @@ import type { EraDefinition } from './era';
 export function createAssetPaths(era: EraDefinition) {
   const a = era.assets;
   return {
-    model: (id: string, lod = 0) => `${a.creatures}${id}${lod ? '.lod1' : ''}.glb`,
+    model: (id: string, lod = 0) => `${a.creatures}${a.standIns?.[id as keyof typeof a.standIns] ?? id}${lod ? '.lod1' : ''}.glb`,
     portrait: (id: string, kind: 'select' | 'card' | 'thumb') => `${a.defaultPortraits}${id}.${kind}.png`,
     biome: (id: string) => `${a.biomes}${id}.webp`,
     prop: (id: string) => `${a.props}${id}.glb`,

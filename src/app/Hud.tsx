@@ -50,7 +50,7 @@ function PlayerPanel({ p }: { p: PlayerHud }) {
             <circle cx="36" cy="36" r={R} className="ring-fg" strokeDasharray={`${C * p.progress} ${C}`} transform="rotate(-90 36 36)" />
           </svg>
           {p.era
-            ? <span className="tier-num rung-num" role="img" aria-label={`Rung ${p.era.rung}, ${p.era.rungName}. Standing ${Math.round(p.era.standing)}`}>{RUNG_NUMERALS[p.era.rung] ?? p.era.rung}</span>
+            ? <span className="tier-num rung-num" role="img" aria-label={`Rung ${p.era.rung}, ${p.era.rungName}. Standing ${Math.round(p.era.standing)}`}><small>RUNG</small>{RUNG_NUMERALS[p.era.rung] ?? p.era.rung}</span>
             : <span className="tier-num" role="img" aria-label={`Tier ${p.tier + 1}: ${p.tierName}`}><i className="tier-glyph" style={{ maskImage: `url(${appBase()}${assetPaths.ui(`tier-${p.tier + 1}.svg`)})` }} /></span>}
         </div>
         <div className="bars">

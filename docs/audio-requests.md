@@ -32,12 +32,17 @@ the art brief*.
 
 ## Delivered
 
+- **Devonian Shells** — `public/music/Devonian Shells.mp3`, the opening track of Devonian
+  Domination (`src/content/devonian/music.ts`). The Cambrian reef tracks fill the rest of the
+  rotation until more Devonian music arrives; the two biome themes above are tagged in that file
+  too, so dropping them in is the whole integration.
+
 - **Devonian Domination sound effects — 19 files.** `public/assets/devonian/sfx/*.mp3`,
   generated from `DEVONIAN_MANIFEST` in `tools/gen-sfx.mjs` with
   `node tools/gen-sfx.mjs --set devonian` (the Cambrian `MANIFEST` and default output are
   untouched). For the mechanics in
   [redesign/08-devonian-domination.md](redesign/08-devonian-domination.md); the consumer is the
-  sample table under `src/content/devonian/`, not yet written. Files: `armour-clang-1/-2`,
+  sample table `src/content/devonian/sfx.ts`, registered by the `/devonian/` entry. Files: `armour-clang-1/-2`,
   `armour-pierce`, `air-gulp`, `air-low`, `anoxia-warning`, `anoxia-drone` (12 s loop),
   `jet-1/-2`, `withdraw`, `moult-crack`, `shoal-join`, `range-claim`, `range-lost`,
   `standing-up`, `dominant`, `beach`, `shell-crush`, `ambient-open-sea` (22 s loop). Every file

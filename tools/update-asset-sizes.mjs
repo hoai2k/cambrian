@@ -4,6 +4,12 @@ const sizes=Object.fromEntries(fs.readdirSync(dir).filter(f=>f.endsWith('.glb')&
 fs.writeFileSync('src/render/asset-sizes.json',JSON.stringify(sizes,null,2)+'\n');
 console.log('Recorded final GLB sizes for',Object.keys(sizes).length,'creatures');
 
+// The Devonian pack records only its delivered specimens (tools/devonian/shipped.json).
+const shipped=JSON.parse(fs.readFileSync('tools/devonian/shipped.json','utf8')).creatures;
+const devSizes=Object.fromEntries(shipped.map(id=>[id,fs.statSync(`public/assets/devonian/creatures/${id}.glb`).size]));
+fs.writeFileSync('src/content/devonian/asset-sizes.json',JSON.stringify(devSizes,null,2)+'\n');
+console.log('Recorded Devonian GLB sizes for',shipped.length,'shipped specimens');
+
 // Keep the shared anchor registry complete without rewriting the original eight records.
 const anchorPath='docs/creature-anchors-manifest.json';
 const sourceFiles=['soft','arthropods','jellies'].map(group=>`tools/creatures/${group}/anchors.json`);

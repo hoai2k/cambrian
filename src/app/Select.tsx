@@ -84,7 +84,7 @@ export function SelectScreen(p: Props) {
                 <div className="creature-copy">
                   <span className="role">{def.ground ? 'SEAFLOOR' : 'SWIMMER'} · {def.role}</span>
                   <h2>{def.name}</h2>
-                  <small className="provenance">{def.species} · {def.provenance ?? 'Burgess Shale'}</small>
+                  <small className="provenance">{def.species} · {def.provenance ?? def.locality ?? 'Burgess Shale'}</small>
                   <p className="tagline">{def.tagline}</p>
                   {!compact && (
                     <>
