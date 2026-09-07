@@ -14,6 +14,7 @@
     "cards": "node tools/make-cards.mjs",
     "lods": "node tools/make-lods.mjs",
     "portraits": "node tools/portrait-test.mjs",
+    "layout": "node tools/select-layout.mjs",
     "feast": "esbuild tools/feast-test.ts --bundle --platform=node --format=esm --outfile=node_modules/.cache/feast-test.mjs && node node_modules/.cache/feast-test.mjs",
     "paddle": "esbuild tools/paddle-test.ts --bundle --platform=node --format=esm --outfile=node_modules/.cache/paddle-test.mjs && node node_modules/.cache/paddle-test.mjs",
     "hiding": "esbuild tools/hiding-test.ts --bundle --platform=node --format=esm --outfile=node_modules/.cache/hiding-test.mjs && node node_modules/.cache/hiding-test.mjs",

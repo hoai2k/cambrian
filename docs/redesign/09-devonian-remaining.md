@@ -25,19 +25,29 @@ from `DEVONIAN_STAND_INS`, `npm run devonian` (it fails if a stand-in points at 
 shipped model is still listed), then the usual build and merge. Portraits for pending creatures use
 the shared fallback card; nothing to do there until the renders arrive with the model.
 
-## 2. Scenery and biome plates (procedural stand-ins in place)
+## 2. Scenery and biome plates (authored scenery integrated)
 
-The initial library now contains 47 authored scenery previews and nine imagegen biome paintings. All are available for integration and inspection. Dense in-game placements still use procedural geometry pending dedicated instanced exports:
+The library contains 47 authored scenery previews and nine imagegen biome paintings. Twenty-four
+of the previews are now the game's scenery, and the nine flora kinds are drawn from them:
 
-- **Scenery.** Seven Devonian flora kinds (`crinoid`, `stromatoporoid`, `tabulate`, `rugose`,
-  `bryozoan`, `reed`, `log`) are placed by the era's own density table
-  (`FLORA_DENSITY` in `src/content/devonian/environment.ts`, keyed by biome through the biome
-  weights and `shoreDistance`; logs only within 120 of the shore) and drawn from procedural
-  geometry in `src/render/sea.ts`, with physics and cover in `src/sim/flora.ts` / `world.ts`.
-  When the authored GLBs land (`public/assets/devonian/props/` per the production contract),
-  point `assets.props` at them and map each kind to its prop the way `floraProps` maps the
-  Cambrian sponges; the placement and physics stay. The nursery reed density is thick; halve it
-  if low-quality framerate suffers.
+- **Scenery.** The nine Devonian flora kinds (`crinoid`, `lilyColumn`, `stromatoporoid`,
+  `tabulate`, `rugose`, `bryozoan`, `reed`, `frondTower`, `log`) are placed by the era's own
+  density table (`FLORA_DENSITY` in `src/content/devonian/environment.ts`, keyed by biome through
+  the biome weights and `shoreDistance`; logs only within 120 of the shore) with physics and cover
+  in `src/sim/flora.ts` / `world.ts`. `FLORA_PROPS` in the same file names the authored prop each
+  kind is drawn from; a kind left out of it keeps the procedural geometry `src/render/sea.ts`
+  still builds, so this can be revised a kind at a time.
+
+  The previews themselves are not loadable as game scenery — meshopt-compressed, two or three
+  primitives, textured, 9k to 412k triangles, and authored anywhere from 0.06 to 6.6 units tall
+  for kinds whose stand-ins run 0.3 to 9.5. `node tools/devonian/props/instance.mjs` produces the
+  instanced exports in `public/assets/devonian/scenery/` that `assets.props` points at: one
+  primitive, vertex colours, no textures, plain GLB, a few hundred triangles, and normalised to
+  the height of the stand-in each one replaces so the visuals keep matching FLORA_PHYS. Measured
+  against the procedural baseline at the same point in the same world, the swap costs no
+  triangles (5.36M against 5.37M) and 14% more draw calls. The previews are left exactly as
+  delivered; the tool only ever writes to the scenery folder. The nursery reed density is thick;
+  halve it if low-quality framerate suffers.
 - **Biome plates.** Nine individual naturalistic imagegen paintings now replace the procedural banners file for file in `public/assets/devonian/biomes/`. Prompts and source hashes are preserved. Further regional E01–E09 reference boards and material/atmosphere sources remain in production.
 
 ## 3. Per-creature specials (done)

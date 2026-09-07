@@ -1,7 +1,7 @@
 # Devonian Domination brand assets
 
-Prepared 2026-09-06. **Ready but inactive**: no active era, HTML icon links, or
-Cambrian assets have been changed. The namespace uses the repo's `devonian` spelling.
+Prepared 2026-09-06; transparent title added 2026-09-07. The Devonian era now
+consumes the brand paths. Cambrian assets remain unchanged. The namespace uses the repo's `devonian` spelling.
 
 ## Delivered
 
@@ -9,6 +9,7 @@ All runtime files live in `public/assets/devonian/brand/`:
 
 | Asset | Purpose |
 | --- | --- |
+| `logo-engraved.webp` | Transparent two-line title wordmark for overlays |
 | `title.webp` | Full supplied 1536 × 1024 title composition, optimized without cropping |
 | `title-mobile.webp` | Generated 941 × 1672 portrait companion for narrow screens |
 | `emblem.webp` | Transparent 512 × 512 Dunkleosteus head emblem |
@@ -20,10 +21,10 @@ All runtime files live in `public/assets/devonian/brand/`:
 ## Future integration
 
 `src/content/devonian/brand.ts` exports `DEVONIAN_BRAND`, checked against the era
-asset contract, plus `DEVONIAN_BRAND_EXTRAS` for responsive art and icons. Spread
-the brand fields into the future complete Devonian era's `assets` object. Both
-`logo` and `illustration` reference the full title artwork; the lettering is baked
-into the image. Avoid displaying a second title over it. Use the portrait companion
+asset contract, plus `DEVONIAN_BRAND_EXTRAS` for responsive art and icons. The Devonian era spreads
+these brand fields into its `assets` object. `logo` references the transparent
+wordmark; `illustration` references the full title artwork. The full illustration
+already includes lettering; avoid displaying a second title over it. Use the portrait companion
 for narrow layouts, and keep menu controls clear of the illustrated lettering.
 Check framing at the intended viewport sizes before choosing `cover` cropping.
 
@@ -47,3 +48,11 @@ Source masters are kept outside `public` so they are not shipped in the site bui
 
 This delivery covers the supplied title and companion branding only. Creature,
 environment and other game assets in the Devonian design brief remain separate work.
+
+## Transparent title correction — 2026-09-07
+
+`logo-engraved.webp` supplies the missing alpha wordmark. Its PNG master is
+`tools/art/devonian/sources/logo-engraved.png`. Created using built-in imagegen
+with the supplied Devonian illustration and Cambrian alpha logo as references;
+the exact prompt is in `tools/art/devonian/wordmark-prompt.txt`. The exporter
+preserves alpha and checks transparent and opaque pixels before encoding.

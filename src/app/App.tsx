@@ -384,7 +384,7 @@ export function App() {
       {screen === 'playing' && paused && <PauseMenu onResume={() => setPausedBoth(false)} onChange={backToSelect} onQuit={backToTitle} />}
       {screen === 'results' && hud && <Results snapshot={hud} players={players} onAgain={playAgain} onChange={backToSelect} onTitle={backToTitle} />}
 
-      <Toolbar isFs={isFs} onHelp={() => openDialog(dialog === 'help' ? null : 'help')} onSettings={() => openDialog(dialog === 'settings' ? null : 'settings')} onFullscreen={toggleFullscreen} />
+      <Toolbar isFs={isFs} muted={settings.muted} onHelp={() => openDialog(dialog === 'help' ? null : 'help')} onSettings={() => openDialog(dialog === 'settings' ? null : 'settings')} onMute={() => setSettings((s) => ({ ...s, muted: !s.muted }))} onFullscreen={toggleFullscreen} />
       <Dialogs kind={dialog} onClose={() => openDialog(null)} settings={settings} onSettings={setSettings} />
 
       {(notice || error) && (

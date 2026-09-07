@@ -1,6 +1,6 @@
 {
   "era": "devonian",
-  "status": "ready-inactive",
+  "status": "ready",
   "provenance": "docs/devonian-brand-assets.md",
   "assets": [
     {
@@ -51,6 +51,13 @@
       "height": 48,
       "bytes": 9522,
       "sha256": "baec109d095f8959b65d8c7310e320c0691ccc9bb794c3ed16f5ab36164e1047"
+    },
+    {
+      "path": "assets/devonian/brand/logo-engraved.webp",
+      "width": 1536,
+      "height": 640,
+      "bytes": 418454,
+      "sha256": "a6cbfa57ac9ea2cbcd5e63ff1b48d82ec89ef901e511416c581058d92c6771e5"
     },
     {
       "path": "assets/devonian/brand/title-mobile.webp",

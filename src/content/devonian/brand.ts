@@ -1,8 +1,8 @@
 import type { EraDefinition } from '../era';
 
-/** Prepared for the future Devonian era; deliberately not registered as active. */
+/** Brand assets consumed by the Devonian era. */
 export const DEVONIAN_BRAND = {
-  logo: 'assets/devonian/brand/title.webp',
+  logo: 'assets/devonian/brand/logo-engraved.webp',
   illustration: 'assets/devonian/brand/title.webp',
   emblem: 'assets/devonian/brand/emblem.webp',
 } as const satisfies Pick<EraDefinition['assets'], 'logo' | 'illustration' | 'emblem'>;

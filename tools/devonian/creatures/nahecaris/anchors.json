@@ -1,0 +1,34 @@
+{
+  "nahecaris": [
+    {
+      "name": "anchor_mouth",
+      "bone": "body",
+      "point": [
+        0,
+        -1.265,
+        -0.135
+      ],
+      "role": "mouth"
+    },
+    {
+      "name": "anchor_mouth_inside",
+      "bone": "body",
+      "point": [
+        0,
+        -1.265,
+        -0.065
+      ],
+      "role": "swallow"
+    },
+    {
+      "name": "anchor_attack_primary",
+      "bone": "mandibleL",
+      "point": [
+        0.054,
+        -1.29,
+        -0.135
+      ],
+      "role": "attack"
+    }
+  ]
+}

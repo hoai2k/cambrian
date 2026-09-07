@@ -36,6 +36,8 @@ h3 { font-size: 13px; letter-spacing: .12em; color: var(--ember); margin: 14px 0
 .icon-button { width: 44px; height: 44px; border-radius: 14px; border: 1px solid rgba(238,250,246,.18); background: rgba(6, 22, 28, .55); backdrop-filter: blur(14px); color: var(--foam); display: grid; place-items: center; transition: transform .15s, background .15s, border-color .15s; }
 .icon-button:hover { background: rgba(255, 91, 110, .22); border-color: rgba(255, 179, 107, .6); transform: translateY(-2px); }
 .icon-button:active { transform: translateY(0) scale(.96); }
+/* Sound off reads as off at a glance, not just by which glyph is drawn. */
+.icon-button.off { color: var(--dim); border-color: rgba(238,250,246,.1); }
 
 /* ---------- Title ---------- */
 .title { position: absolute; inset: 0; display: grid; place-items: center; cursor: pointer; user-select: none; z-index: 10; background: radial-gradient(ellipse at 50% 60%, rgba(6, 22, 28, .1), rgba(6, 22, 28, .7)); }
@@ -319,6 +321,29 @@ input[type='checkbox'] { width: 20px; height: 20px; accent-color: var(--ember); 
 }
 @media (prefers-reduced-motion: reduce) { * { animation-duration: .01ms !important; } }
 
+/*
+ * The creature card on a laptop screen. Its copy column was overflowing by 150-250 px and
+ * being silently clipped: at 1280 x 800 the stat pips and the whole move list (RT / B / Y /
+ * passive / weakness) were cut off the bottom of the card. Give the copy the room by taking it
+ * from the portrait, tighten the move list, drop the group sentence (the chip beside the name
+ * still says the group), and let anything still too tall scroll rather than disappear.
+ */
+@media (max-height: 1010px) {
+  .crew-1 .crew-card, .crew-card { grid-template-rows: auto minmax(90px, 28%) minmax(0, 1fr) auto; }
+  .kind-note { display: none; }
+  .kit { font-size: 11.5px; gap: 3px; }
+  .kit dd { line-height: 1.35; }
+  .stats { margin-bottom: 5px; }
+}
+@media (max-height: 820px) {
+  .crew-1 .crew-card, .crew-card { grid-template-rows: auto minmax(70px, 21%) minmax(0, 1fr) auto; }
+  .tagline { font-size: 12.5px; margin-bottom: 4px; }
+  .kit { font-size: 11px; gap: 2px; }
+  .kit dt { line-height: 16px; font-size: 10px; }
+  .provenance { margin: 2px 0 5px; }
+}
+.creature-copy { overflow-y: auto; scrollbar-width: thin; scrollbar-color: rgba(238,250,246,.25) transparent; }
+
 @media (max-height: 640px) {
   .select { padding-top: 10px; }
   .select-header { gap: 4px 16px; }
@@ -385,6 +410,9 @@ input[type='checkbox'] { width: 20px; height: 20px; accent-color: var(--ember); 
 .cell { position: relative; display: grid; grid-template-rows: minmax(0, 1fr) auto; gap: 4px; padding: 8px 8px 7px; border-radius: 14px; border: 1px solid rgba(238,250,246,.12); background: linear-gradient(180deg, rgba(6,22,28,.55), rgba(6,22,28,.75)); min-height: 0; overflow: hidden; transition: transform .15s, border-color .15s, background .15s; aspect-ratio: 4 / 3.3; }
 .cell img { width: 100%; height: 100%; object-fit: contain; min-height: 0; filter: drop-shadow(0 6px 10px rgba(0,0,0,.5)); transition: transform .2s; }
 .cell-name { font: 700 11px var(--font-display); letter-spacing: .08em; color: var(--mist); text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+/* The everyday group under the genus, for rosters whose names nobody has heard of. */
+.cell-kind { font: 600 9px var(--font-display); letter-spacing: .1em; text-transform: uppercase; color: var(--dim); text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.cell.hover .cell-kind { color: var(--mist); }
 .cell:hover { transform: translateY(-2px); border-color: rgba(238,250,246,.35); }
 .cell.hover { border-color: var(--c); background: linear-gradient(180deg, color-mix(in oklch, var(--c), transparent 82%), rgba(6,22,28,.8)); }
 .cell.hover img { transform: scale(1.08); }
@@ -417,7 +445,12 @@ input[type='checkbox'] { width: 20px; height: 20px; accent-color: var(--ember); 
 @keyframes lock-burst { 0% { box-shadow: inset 0 0 0 4px var(--player), 0 0 0 0 var(--player); background: color-mix(in oklch, var(--player), transparent 60%); } 100% { box-shadow: inset 0 0 0 0 transparent, 0 0 0 26px transparent; background: transparent; } }
 @keyframes lock-ring { 0% { transform: translate(-50%, -50%) scale(.2); opacity: 1; } 100% { transform: translate(-50%, -50%) scale(14); opacity: 0; } }
 @media (max-width: 1000px) { .pick-layout { grid-template-columns: 1fr; grid-template-rows: auto minmax(0, 1fr); } .crew { grid-auto-flow: column; grid-auto-columns: minmax(0, 1fr); } }
-@media (max-height: 640px) { .cell { padding: 5px; gap: 2px; } .cell-name { font-size: 9px; } .pick-layout { gap: 10px; } }
+@media (max-height: 640px) { .cell { padding: 5px; gap: 2px; } .cell-name { font-size: 9px; } .cell-kind { font-size: 8px; } .pick-layout { gap: 10px; } }
+/* A short window caps the tiles harder still: three rows of them have to fit the track. */
+@media (max-height: 760px) { .roster-grid { max-width: calc(var(--cols) * 150px); } }
+/* Below this the tiles give up their fixed proportion so three rows still fit the track. */
+@media (max-height: 730px) { .cell { aspect-ratio: auto; } .roster-grid { grid-auto-rows: minmax(0, 1fr); min-height: 0; } }
+@media (max-height: 660px) { .cell-kind { display: none; } }
 .roster-grid.dense .cell-name { font-size: 9px; letter-spacing: .04em; }
 .roster-grid.dense .cell { padding: 5px 5px 4px; border-radius: 10px; }
 
@@ -435,7 +468,15 @@ input[type='checkbox'] { width: 20px; height: 20px; accent-color: var(--ember); 
 .creature-copy h2, .crew-2 .creature-copy h2, .crew.compact .creature-copy h2 { font-size: clamp(13px, 7cqw, 32px); }
 .provenance { display: block; color: var(--dim); font-size: 10px; line-height: 1.4; margin: 3px 0 7px; }
 
-.roster-grid { grid-auto-rows: auto; align-self: center; }
+/*
+ * The roster must never grow up into the header. Plain `center` overflows in both directions
+ * when the grid is taller than its track, which is exactly what happened on a wide, short window
+ * (1920 x 760): three rows of tiles, sized by their 4:3.3 aspect ratio off the column width,
+ * came out taller than the space for them and the top row landed on the mode blurb. `safe`
+ * centring falls back to start alignment in that case, and the column cap stops a wide window
+ * from inflating the tiles past the height there is for them in the first place.
+ */
+.roster-grid { grid-auto-rows: auto; align-self: safe center; justify-self: start; width: 100%; max-width: calc(var(--cols) * 190px); }
 @media (max-width: 1000px), (max-height: 700px) {
   .select { grid-template-rows: auto minmax(0, 1fr) auto; gap: 8px; }
   .pick-layout { overflow-y: auto; overscroll-behavior: contain; align-content: start; }
