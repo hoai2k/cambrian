@@ -3,38 +3,53 @@
   "models": [
     {
       "file": "bothriolepis.glb",
-      "bytes": 2944344,
-      "vertices": 31978,
-      "triangles": 53208,
+      "bytes": 8435376,
+      "vertices": 57292,
+      "triangles": 102344,
       "bounds": [
-        2.2329699993133545,
-        0.9234999716281891,
-        4.079999923706055
+        1.3325949907302856,
+        0.7957407534122467,
+        4.5350000858306885
       ],
       "bones": 12,
+      "boneNames": [
+        "root",
+        "body",
+        "oral",
+        "pectoral_L",
+        "pectoral_tip_L",
+        "pectoral_R",
+        "pectoral_tip_R",
+        "tail_base",
+        "tail_mid",
+        "dorsal",
+        "tail_tip",
+        "caudal"
+      ],
+      "textures": 3,
       "sockets": [
         {
           "name": "anchor_mouth",
           "point": [
             0.0,
-            -0.13900004060213733,
-            1.3669999322393533
+            -0.19800003212880543,
+            1.4680000672078892
           ]
         },
         {
           "name": "anchor_mouth_inside",
           "point": [
             0.0,
-            -0.13200003806568164,
-            1.264999937877613
+            -0.18400003003377355,
+            1.3509999686950054
           ]
         },
         {
           "name": "anchor_attack_primary",
           "point": [
             0.0,
-            -0.015000048440397878,
-            1.4400000074179287
+            -0.020000038847330554,
+            1.4679999540912843
           ]
         }
       ],
@@ -42,149 +57,164 @@
         {
           "name": "Ability",
           "duration": 1.8000000715255737,
-          "motion": 12.842,
-          "digest": "31b309288666b22130d7e489349ef752557791bcdac2f20711b5292f1144913a"
+          "motion": 14.567,
+          "digest": "6f22a6e0e55d5fb9aacafb1295d24dcc933156cc92bcfe15a1f0a02f1abffe1b"
         },
         {
           "name": "Attack",
           "duration": 0.9999999403953552,
-          "motion": 6.907,
-          "digest": "176fc798e4abbb26b0fc43354c32185038b0ff02620605b2bd74ca2388d49b7e"
+          "motion": 11.37,
+          "digest": "1cf8c98cfc5dd98127f1a9b5616996c1820f9bdec1da2207afb97f1e3845ad42"
         },
         {
           "name": "Bite",
           "duration": 0.5,
-          "motion": 3.109,
-          "digest": "5430e7ab70d70f03c65119677655017833a2a42dd52157808b662d3851adcf1d"
+          "motion": 2.177,
+          "digest": "da56e26d22379752daf533751a694d14b213e375c46b410153a99b630db3ef30"
         },
         {
           "name": "Death",
           "duration": 1.600000023841858,
-          "motion": 33.513,
-          "digest": "a3e41c18cc3965c19fcda770340581f179ae8344e04b9881b6dae7e225740471"
+          "motion": 40.512,
+          "digest": "f4089aecfeb158afbb083e814ca5324efb70f67853fb6f6b817dea2684e0fd40"
         },
         {
           "name": "Dive",
           "duration": 1.399999976158142,
-          "motion": 8.097,
-          "digest": "30eeed057679a4bebaae07cec19a5100721786829451e70988df942a08b54e40"
+          "motion": 11.572,
+          "digest": "3867c2bcb48575a4b656b9ad52218c7521172cabc7e844c4f5c09f9d8064cd63"
         },
         {
           "name": "Dodge",
           "duration": 0.4000000059604645,
-          "motion": 6.331,
-          "digest": "daf52c900a48e6339bcf2442104cb787a71afd9c6b2f56ba29a244bdf2f0dc1a"
+          "motion": 5.506,
+          "digest": "7941bad4a19d1ab67ae73485610b23c913cdd0e6dc2cd97fc91fb72653579247"
         },
         {
           "name": "Eat",
           "duration": 1.2000000476837158,
-          "motion": 15.487,
-          "digest": "7da1d489c3323ad790a3bc722a76caf0e08bddd308327975fe203a47c6da7c6d"
+          "motion": 6.919,
+          "digest": "5e2ea8baa2d9c6b9f97c42319757c6f43638d7bbea25067d94892efe4a087787"
         },
         {
           "name": "Growth",
           "duration": 1.5,
-          "motion": 8.644,
-          "digest": "57d31316a5790201005839118f1b7099c6f882ccffde626aac3da18113f844ee"
+          "motion": 9.411,
+          "digest": "fc4d3b550761e2abc3adb0da58a32b3f10258e27688b2756cfadd3a3b9411f35"
         },
         {
           "name": "Guard",
           "duration": 0.9999999403953552,
-          "motion": 6.502,
-          "digest": "a6d42f44a56e47da6a37f31e24682186b25bd79f9c4ab06826bc37f40a26c876"
+          "motion": 3.362,
+          "digest": "523c69d703b952b45eaab87d103e85b42e552fcdba928d0b13ec990b08b87edd"
         },
         {
           "name": "Heavy",
           "duration": 1.100000023841858,
-          "motion": 7.856,
-          "digest": "8c2c6cb1414afccf58c24837446f025fd5a64dcfc6f5549db822dd3863f0c438"
+          "motion": 13.734,
+          "digest": "9f2ab6c4dce29f15ea42c75b5334df933f0af52a9f4974f2899db5a223b4a64e"
         },
         {
           "name": "Hit",
           "duration": 0.5999999642372131,
-          "motion": 3.852,
-          "digest": "62ac116c4764b3abe46cf5d5d1e4f571df3d394be6e877b92f87c878a87208d8"
+          "motion": 3.114,
+          "digest": "fcae991af83e158da293a808ffa1176f0ad53cf13f08346af5fbd40bcab746c3"
         },
         {
           "name": "Idle",
           "duration": 2.4000000953674316,
-          "motion": 16.057,
-          "digest": "323ae990f9c3626b559f8099190ba6a9fd7ac863502ce0c9e1be8b7c4010d72c"
+          "motion": 8.618,
+          "digest": "d83cf424f65c03e833d95d349ebba133ffdf105febc8987c7cde5bbb2b2f9662"
         },
         {
           "name": "Parry",
           "duration": 0.3333333432674408,
-          "motion": 3.173,
-          "digest": "5c7d5bb57c19f4a81224db676bd4cd15aaa963e45a24228cff1cc60bb6487e84"
+          "motion": 2.298,
+          "digest": "d4eef27240c9b9e95045f09a3faea92737ec80623e717d47cb324cd49144358e"
         },
         {
           "name": "Rise",
           "duration": 1.399999976158142,
-          "motion": 8.097,
-          "digest": "a97cd2e0438ccb7e3f01652a61c800bf0dd0c8ed6c06b171421368bb555c7ef2"
+          "motion": 11.572,
+          "digest": "d815f674e7f25f14bad3490f6eebd7bdef4a41030cf87283e32c4bf77f62df6a"
         },
         {
           "name": "Stagger",
           "duration": 1.2000000476837158,
-          "motion": 7.767,
-          "digest": "21ad359715206e37c1f98245a4ff251bc8987631e8f470264b1644c7077bf5d1"
+          "motion": 8.486,
+          "digest": "d86a5a45dc02afd98065b0f3964f55c947d87da4fb90b552e2bf75f26d2a2532"
         },
         {
           "name": "Swim",
           "duration": 2.4000000953674316,
-          "motion": 40.864,
-          "digest": "5d6913c80f73490c101defcd84438e6de344c96a87f8c73f0406131b34f015fb"
+          "motion": 35.035,
+          "digest": "bf58d6a7884bdcaecdc7fa8c4213ab902f1dcefe227c6a9d1c05a8428a15895c"
         },
         {
           "name": "TurnLeft",
           "duration": 1.600000023841858,
-          "motion": 14.179,
-          "digest": "df56720dbb669d4f223d1222fa0da1b809535d4ccdf6dc8646e479fbd1b7a16c"
+          "motion": 19.25,
+          "digest": "070db6f3239b5d33d07b020079ccce654dfc40c58dbba53ff337a8fa938bcd7e"
         },
         {
           "name": "TurnRight",
           "duration": 1.600000023841858,
-          "motion": 14.179,
-          "digest": "55905ad82eae60c264ddeac18ade336d76042ab6c73a8282f68ab742462d9bb5"
+          "motion": 19.246,
+          "digest": "b6f9f06f0a9f1aac1b4339ee889829b2bd58ef267b9fc6787a990827c5d60da5"
         }
       ],
-      "removedIdentityScaleChannels": 0,
-      "sha256": "5261604aa62237655a5c43662e79e7fc61f3aa1f9db555d8b9f4f27856941493"
+      "removedIdentityScaleChannels": 216,
+      "sha256": "64ad0f8668a1b8d909a9b790d8408b75569ff74bb221447693f96c58c6eaa53c"
     },
     {
       "file": "bothriolepis.lod1.glb",
-      "bytes": 1451192,
-      "vertices": 10815,
-      "triangles": 14303,
+      "bytes": 1256020,
+      "vertices": 16476,
+      "triangles": 29712,
       "bounds": [
-        2.2328615188598633,
-        0.9241634905338287,
-        4.080044984817505
+        1.3325949907302856,
+        0.7958036661148071,
+        4.535021543502808
       ],
       "bones": 12,
+      "boneNames": [
+        "root",
+        "body",
+        "oral",
+        "pectoral_L",
+        "pectoral_tip_L",
+        "pectoral_R",
+        "pectoral_tip_R",
+        "tail_base",
+        "tail_mid",
+        "dorsal",
+        "tail_tip",
+        "caudal"
+      ],
+      "textures": 0,
       "sockets": [
         {
           "name": "anchor_mouth",
           "point": [
             0.0,
-            -0.13900004060213733,
-            1.3669999322393533
+            -0.19800003212880543,
+            1.4680000672078892
           ]
         },
         {
           "name": "anchor_mouth_inside",
           "point": [
             0.0,
-            -0.13200003806568164,
-            1.264999937877613
+            -0.18400003003377355,
+            1.3509999686950054
           ]
         },
         {
           "name": "anchor_attack_primary",
           "point": [
             0.0,
-            -0.015000048440397878,
-            1.4400000074179287
+            -0.020000038847330554,
+            1.4679999540912843
           ]
         }
       ],
@@ -192,25 +222,25 @@
         {
           "name": "Death",
           "duration": 1.600000023841858,
-          "motion": 33.513,
-          "digest": "a3e41c18cc3965c19fcda770340581f179ae8344e04b9881b6dae7e225740471"
+          "motion": 40.512,
+          "digest": "f4089aecfeb158afbb083e814ca5324efb70f67853fb6f6b817dea2684e0fd40"
         },
         {
           "name": "Idle",
           "duration": 2.4000000953674316,
-          "motion": 16.057,
-          "digest": "323ae990f9c3626b559f8099190ba6a9fd7ac863502ce0c9e1be8b7c4010d72c"
+          "motion": 8.618,
+          "digest": "d83cf424f65c03e833d95d349ebba133ffdf105febc8987c7cde5bbb2b2f9662"
         },
         {
           "name": "Swim",
           "duration": 2.4000000953674316,
-          "motion": 40.864,
-          "digest": "5d6913c80f73490c101defcd84438e6de344c96a87f8c73f0406131b34f015fb"
+          "motion": 35.035,
+          "digest": "bf58d6a7884bdcaecdc7fa8c4213ab902f1dcefe227c6a9d1c05a8428a15895c"
         }
       ],
-      "removedIdentityScaleChannels": 0,
-      "sha256": "8bea64ad5d2e910e917e2ab5fad3670cdbb104aa255c2d5c1b971ea5b244c7a4"
+      "removedIdentityScaleChannels": 36,
+      "sha256": "f0ea439fdacb3dfbfb91ab90628b9338499ff8dc0e0a5d2c52d10348fb3badb2"
     }
   ],
-  "lodTriangleRatio": 0.26881296045707415
+  "lodTriangleRatio": 0.29031501602438836
 }
