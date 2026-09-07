@@ -33,12 +33,18 @@ export const orderClips = (names: string[]) =>
     return a.localeCompare(b);
   });
 
+export interface PlaybackState { time: number; duration: number; paused: boolean }
+
 export interface ViewerScene {
   /** Loads a creature and returns its clip names in button order. */
   show(specimen: ViewerSpecimen): Promise<string[]>;
   /** Plays a clip. One-shots fade back to the resting loop unless `loop` forces a repeat. */
   play(name: string, loop: boolean): void;
   setSpeed(s: number): void;
+  setPaused(paused: boolean): void;
+  /** Isolate and freeze the active clip at a chosen time for deformation inspection. */
+  seek(seconds: number): void;
+  onPlayback(cb: (state: PlaybackState) => void): void;
   /** Applies a colour scheme to the specimen on stage, and to any loaded after it. */
   setScheme(id: string): void;
   /** Which palette slots the specimen on stage actually has materials for. */
@@ -181,9 +187,18 @@ export function createViewerScene(canvas: HTMLCanvasElement): ViewerScene {
   let schemeId = DEFAULT_SCHEME;
   let looping: readonly string[] = [];
   let speed = 1;
+  let paused = false;
   let frameRadius = 3;
+  const frameSize = new THREE.Vector3(4, 2, 4);
   let token = 0;
   let clipCb: (name: string) => void = () => {};
+  let playbackCb: (state: PlaybackState) => void = () => {};
+  let lastPlaybackUpdate = 0;
+
+  function reportPlayback() {
+    playbackCb({ time: current?.time ?? 0, duration: current?.getClip().duration ?? 0,
+      paused: paused || !!current?.paused });
+  }
 
   const setClip = (name: string) => { currentName = name; clipCb(name); };
 
@@ -202,14 +217,26 @@ export function createViewerScene(canvas: HTMLCanvasElement): ViewerScene {
     source = undefined;
     model = undefined; mixer = undefined; current = undefined;
     actions = new Map();
+    paused = false;
+    setClip('');
+    reportPlayback();
   }
 
   function frame() {
-    const d = frameRadius * 3.1;
-    // The canvas occupies its own stage, clear of the specimen and action panels.
-    const target = FOCUS.clone();
-    camera.position.set(FOCUS.x + d * 0.62, FOCUS.y + d * 0.38, FOCUS.z + d * 0.78);
-    controls.target.copy(target);
+    // Fit projected bounds to the actual canvas, including narrow screens.
+    // A sphere-distance approximation makes long fish needlessly tiny.
+    const direction = new THREE.Vector3(.85, .28, .72).normalize();
+    const right = new THREE.Vector3().crossVectors(new THREE.Vector3(0, 1, 0), direction).normalize();
+    const up = new THREE.Vector3().crossVectors(direction, right);
+    const tangent = Math.tan(THREE.MathUtils.degToRad(camera.fov / 2));
+    let distance = 0;
+    for (const x of [-1, 1]) for (const y of [-1, 1]) for (const z of [-1, 1]) {
+      const corner = frameSize.clone().multiply(new THREE.Vector3(x, y, z)).multiplyScalar(.5);
+      distance = Math.max(distance, corner.dot(direction) + Math.max(
+        Math.abs(corner.dot(right)) / (tangent * camera.aspect), Math.abs(corner.dot(up)) / tangent));
+    }
+    camera.position.copy(FOCUS).addScaledVector(direction, distance * 1.2);
+    controls.target.copy(FOCUS);
     controls.minDistance = frameRadius * 0.4;
     controls.maxDistance = frameRadius * 18;
     controls.update();
@@ -236,6 +263,7 @@ export function createViewerScene(canvas: HTMLCanvasElement): ViewerScene {
     // Use the enclosing sphere, not only the longest half-axis. Tall/radial
     // bodies need room for their full silhouette in the elevated camera view.
     frameRadius = size.length() * unit * 0.5;
+    frameSize.copy(size).multiplyScalar(unit);
 
     // Own the materials before recolouring the clone.
     modelMaterials = cloneMaterials(src);
@@ -269,10 +297,29 @@ export function createViewerScene(canvas: HTMLCanvasElement): ViewerScene {
     act.setLoop(repeat ? THREE.LoopRepeat : THREE.LoopOnce, repeat ? Infinity : 1);
     act.clampWhenFinished = !repeat;
     act.setEffectiveTimeScale(1).setEffectiveWeight(1).play();
-    if (prev && prev !== act) prev.crossFadeTo(act, 0.22, false);
+    if (paused) {
+      for (const other of actions.values()) if (other !== act) other.stop();
+      act.stopFading().stopWarping();
+      mixer?.update(0);
+    } else if (prev && prev !== act) prev.crossFadeTo(act, 0.22, false);
     else if (prev === act) prev.setEffectiveWeight(1);
     current = act;
     setClip(name);
+    reportPlayback();
+  }
+
+  function seek(seconds: number) {
+    if (!current || !mixer || !Number.isFinite(seconds)) return;
+    // Remove cross-fades before sampling so a jaw pose is the authored pose,
+    // independent of whichever action happened to precede it.
+    for (const action of actions.values()) if (action !== current) action.stop();
+    current.stopFading().stopWarping().setEffectiveWeight(1);
+    current.enabled = true;
+    current.paused = false;
+    current.time = THREE.MathUtils.clamp(seconds, 0, current.getClip().duration);
+    paused = true;
+    mixer.update(0);
+    reportPlayback();
   }
 
   // ---- loop ----
@@ -295,7 +342,11 @@ export function createViewerScene(canvas: HTMLCanvasElement): ViewerScene {
     const dt = Math.min(clock.getDelta(), 0.05);
     time += dt;
     seaTime.value = time;
-    mixer?.update(dt * speed);
+    mixer?.update(paused ? 0 : dt * speed);
+    if (time - lastPlaybackUpdate >= 0.1) {
+      lastPlaybackUpdate = time;
+      reportPlayback();
+    }
 
     for (let i = 0; i < shaftCount; i++) {
       const a = (i / shaftCount) * TAU + time * 0.01;
@@ -325,6 +376,16 @@ export function createViewerScene(canvas: HTMLCanvasElement): ViewerScene {
     show,
     play,
     setSpeed(s) { speed = s; },
+    setPaused(value) {
+      paused = value;
+      if (!value && current) {
+        if (current.time >= current.getClip().duration) current.time = 0;
+        current.paused = false;
+      }
+      reportPlayback();
+    },
+    seek,
+    onPlayback(cb) { playbackCb = cb; reportPlayback(); },
     setScheme(id) { schemeId = id; recolor?.setScheme(id); },
     activeSlots() { return recolor?.slots ?? []; },
     onClip(cb) { clipCb = cb; cb(currentName); },

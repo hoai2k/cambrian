@@ -88,3 +88,34 @@ Render and inspect at least Idle, locomotion, Bite/Eat, Heavy/Ability, Guard, Do
 including lateral and frontal views. Validate all exported clips have nonzero duration, finite
 transforms, distinct motion, stable root and no scale channels. Check deformation and appendage
 clearance, LOD reduction and socket alignment. Report deficiencies and fix them before delivery.
+
+## Art review required after the initial specimen releases
+
+The first eight published specimens are integration examples undergoing a further art pass.
+A complete file set or structural test pass does not establish finished visual quality.
+Give every subject its own anatomical and material decisions and review time; do not reuse a
+fish outline, eye treatment, armour pattern or action curve merely to increase roster throughput.
+
+For bulging oval eyes, at least **50% of globe volume** must lie inside the continuous surrounding
+head/body envelope. Aim for **65% or more** to leave a practical margin. Report deterministic
+volume sampling against the actual body surface or an equivalent verified geometric calculation;
+counting visible surface vertices is not a volume measurement. Fit lids to the actual skin/globe
+intersection. An exterior hoop or the concave backside of an eye must not remain exposed. Inspect
+front, side, dorsal and three-quarter close-ups; measure both eyes independently.
+
+Refine major silhouettes before surface detail. Head profiles, jaw hinges, muscular body transitions,
+fin roots and armour should form a coherent animal. Additional triangles, protruding patches or
+noise do not compensate for weak anatomy. Use Blender modelling, subdivision, bevels, sculpt-style
+surface refinement, UV work and baking as appropriate. Image-generated concept/material art can help,
+but must follow anatomical constraints and must not be treated as scientific evidence. Full models
+need deliberate natural material structure and roughness; use UV albedo/normal/roughness maps where
+these improve the result, with baked vertex pigmentation for distant LODs.
+
+Model the mouth's palate, walls, floor and throat. Jaw-bearing creatures need actual articulated jaw
+bones used in their feeding/attack clips. Lining and teeth must remain coherent throughout opening,
+maximum gape and closing, without clipping, detached parts, inverted faces or a flat black endcap.
+
+Animations need convincing changes in speed, anticipation, effort, recovery and delayed secondary
+motion. Review actual playback, including turns and transitions, rather than approving a set of
+nearly identical static poses. Preserve rigid bones/armour and stable roots; increase expressiveness
+through anatomically appropriate body, jaw, fin and appendage motion rather than deformation errors.
