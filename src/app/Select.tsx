@@ -6,6 +6,7 @@ import { PLAYER_COLORS } from '../render/engine';
 import { CREATURES, creature, type CreatureId } from '../sim/creatures';
 import type { Mode, PlayerSetup } from '../sim/types';
 import { CheckIcon, Emblem, KeyboardIcon, PadIcon } from './icons';
+import { appBase } from '../shared/base';
 
 interface Props {
   players: PlayerSetup[]; mode: Mode; modes: Mode[]; modeInfo: Record<Mode, { name: string; blurb: string; players: string }>;
@@ -15,7 +16,7 @@ interface Props {
 }
 
 const stat = (v: number, max: number) => Math.round((v / max) * 5);
-const ASSETS = import.meta.env.BASE_URL;
+const ASSETS = appBase();
 
 /** Grid columns: three rows at most, so 21 creatures sit in 7 x 3 and 8 sit in 4 x 2. */
 export const gridColumns = (n: number) => Math.max(4, Math.ceil(n / 3));
@@ -83,7 +84,7 @@ export function SelectScreen(p: Props) {
                 <div className="creature-copy">
                   <span className="role">{def.ground ? 'SEAFLOOR' : 'SWIMMER'} · {def.role}</span>
                   <h2>{def.name}</h2>
-                  <small className="provenance">{def.species} · {def.provenance ?? 'Burgess Shale'}</small>
+                  <small className="provenance">{def.species} · {def.provenance ?? def.locality ?? 'Burgess Shale'}</small>
                   <p className="tagline">{def.tagline}</p>
                   {!compact && (
                     <>

@@ -6,6 +6,7 @@ import { assetPaths } from '../content/asset-paths';
 import { AUDIBLE_FLOOR, MIN_GAP } from './mix';
 import { biomeHasTrack, BIOME_HOLD, CROSSFADE, FIRST_FADE, MISSING, OPENING_TRACK, pickNext, type MusicTrack } from './music';
 import type { Biome } from '../sim/world';
+import { appBase, setAppBase } from '../shared/base';
 
 /** One playing music track: a streaming media element on its own gain, for crossfading. */
 interface MusicVoice { track: MusicTrack; el: HTMLAudioElement; node: MediaElementAudioSourceNode; gain: GainNode }
@@ -15,10 +16,11 @@ interface MusicVoice { track: MusicTrack; el: HTMLAudioElement; node: MediaEleme
  * BASE_URL is './', so a page one directory down (the workbench) would resolve samples to
  * `/workbench/assets/`. Those pages call `setAssetBase('../')` before playing anything.
  */
-let ASSET_BASE = import.meta.env.BASE_URL;
-export function setAssetBase(base: string) { ASSET_BASE = base; }
+/** Kept for the workbench; the game itself steers every path through appBase(). */
+export function setAssetBase(base: string) { setAppBase(base); }
 /** URL of a sample file in the library, by bare name (no extension). */
-export const sfxUrl = (name: string) => `${ASSET_BASE}${assetPaths.sfx(name)}`;
+/** A sample name may carry a directory ('devonian/jet-1'): an era's own library beside the shared one. */
+export const sfxUrl = (name: string) => `${appBase()}${name.includes('/') ? `assets/${name.replace(/^([^/]+)\//, '$1/sfx/')}.mp3` : assetPaths.sfx(name)}`;
 
 /** event kind → sample files (variants are chosen at random) */
 export const SAMPLES: Record<string, string[]> = {
@@ -34,8 +36,10 @@ export const SAMPLES: Record<string, string[]> = {
   'ui-move': ['ui-move'], 'ui-confirm': ['ui-confirm'], 'ui-back': ['ui-back'], 'ui-join': ['ui-join'], 'ui-start': ['ui-start'], won: ['won'],
 };
 export const LOOPS = { ambient: 'ambient-reef', drone: 'giant-drone' } as const;
+/** An era adds its own sounds before the library preloads; the shared table stays as it is. */
+export function registerSamples(extra: Record<string, string[]>) { Object.assign(SAMPLES, extra); }
 /** URL of a music track in public/music, by name (no extension). See `src/audio/music.ts`. */
-export const musicUrl = (name: string) => `${ASSET_BASE}${assetPaths.music(name)}`;
+export const musicUrl = (name: string) => `${appBase()}${assetPaths.music(name)}`;
 
 export class GameAudio {
   private ctx?: AudioContext;

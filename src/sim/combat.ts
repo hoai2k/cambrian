@@ -10,6 +10,8 @@ export interface HitContext {
   time: number;
   /** The game's seeded RNG. Combat must not use Math.random, or a seed stops reproducing a match. */
   rng: () => number;
+  /** An era's damage multiplier for armour plates, enrolment or a withdrawn shell (1 = none). */
+  armour?: (attacker: Actor, victim: Actor, dir: Vec3) => number;
 }
 
 /** Damage multiplier from relative size. Same size = 1. */
@@ -67,6 +69,11 @@ export function applyHit(ctx: HitContext, attacker: Actor, victim: Actor, move: 
   const sf = sizeFactor(attacker, victim);
   const base = move.damage * (1 + 0.35 * momentum) * dirBonus * sf;
   let dmg = base * (1 - vdef.defense * (1 - clamp(move.armorPierce ?? 0, 0, 1)));
+  if (ctx.armour) {
+    const k = ctx.armour(attacker, victim, dir);
+    dmg *= k;
+    if (k < 0.6) ctx.events.push({ kind: 'parry', pos: { ...victim.pos }, actor: victim.id, other: attacker.id, strength: k < 0.35 ? 0.4 : 0.7, player: victim.player });
+  }
   if (victim.abilityActive && (victim.state === 'guard' || victim.state === 'parry') && (vdef.ability === 'adhesiveGlide' || vdef.ability === 'combCruise')) dmg *= vdef.ability === 'adhesiveGlide' ? .55 : .7;
   let result: HitResult = 'hit';
 

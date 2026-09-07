@@ -1,10 +1,16 @@
 // Generates the game's sound effects with the ElevenLabs sound-generation API.
-// Usage: ELEVENLABS_API_KEY=... node tools/gen-sfx.mjs [only-name]
+// Usage: ELEVENLABS_API_KEY=... node tools/gen-sfx.mjs [--set devonian] [only-name]
+// The default set is the Cambrian library in public/assets/sfx; `--set devonian` generates the
+// Devonian Domination sounds from DEVONIAN_MANIFEST into public/assets/devonian/sfx instead.
 import fs from 'node:fs';
 const KEY = process.env.ELEVENLABS_API_KEY;
 if (!KEY) { console.error('ELEVENLABS_API_KEY not set'); process.exit(1); }
-const OUT = 'public/assets/sfx';
-const only = process.argv[2];
+const args = process.argv.slice(2);
+const setAt = args.indexOf('--set');
+const SET = setAt >= 0 ? args.splice(setAt, 2)[1] : 'cambrian';
+if (SET !== 'cambrian' && SET !== 'devonian') { console.error(`unknown set ${SET}`); process.exit(1); }
+const OUT = SET === 'devonian' ? 'public/assets/devonian/sfx' : 'public/assets/sfx';
+const only = args[0];
 // Sounds reworked to be organic rather than metallic were generated at a lower prompt influence,
 // which leaves the model room to make a real recording instead of reciting the adjectives.
 const LOW_INFLUENCE = new Set(['grab', 'guard-break', 'ability', 'disintegrate', 'dodge', 'heartbeat', 'escape', 'ui-start', 'crunch', 'silt']);
@@ -47,11 +53,38 @@ export const MANIFEST = [
   ['giant-drone', 'menacing low underwater drone, the presence of a huge predator nearby, deep slow pulsing rumble with sub bass, dark and tense, seamless loop', 12, 1, true],
 ];
 
+// Devonian Domination (docs/redesign/08-devonian-domination.md). Same conventions: name a midrange
+// sound, say "close and present", forbid metal and chimes where the model reaches for them.
+export const DEVONIAN_MANIFEST = [
+  ['armour-clang', 'a bite deflects off thick bony plate armour underwater: a hard hollow bony knock, like knuckles rapping a thick shell, dry woody thock with a quick damp decay and a tiny bubble, close and present, no metal, no ringing, no bell, no music', 0.6, 2],
+  ['armour-pierce', 'heavy cutting jaws shear through bone armour underwater: a heavy wet crack, then a grinding shear as the plate splits and gives, a burst of bubbles, close and detailed, no metallic ring, no music', 0.9, 1],
+  ['air-gulp', 'a large fish breaks the water surface to gulp air: a wet splash, a sharp short inhaling gulp, then water closing over with a swirl of bubbles, close, no music', 1.2, 1],
+  ['air-low', 'one soft uneasy pulse: a slow rounded thump with a papery snap, then a quiet hiss of fine bubbles through water, quiet and restrained, close but soft, no music', 1.0, 1],
+  ['anoxia-warning', 'a queasy sting as murky sour water drifts in: a slow sinking hollow wooden tone with a thick wet gurgle of sluggish bubbles and a sour detuned swell, close and present, uneasy, slow, no chime, no music', 1.8, 1],
+  ['anoxia-drone', 'the inside of a dead zone underwater: thick airless water moving slowly against the ear, a sour detuned midrange hum, sluggish gurgling bubbles and fine silt hiss, close and present, oppressive and still, no music, seamless loop', 12, 1, true],
+  ['jet', 'a cephalopod jets backward underwater: a hollow squirt of water forced through a siphon, a quick wet pulse with a soft trail of small bubbles, close and present, no music', 0.7, 2],
+  ['withdraw', 'a soft body retracts into a chambered shell underwater: a thick wet squelching suction slide as flesh pulls in over shell, then a small hollow wooden clop as the aperture closes, close and detailed, full and rounded, no hiss, no metal, no music', 0.8, 1],
+  ['moult-crack', 'an arthropod exoskeleton splits open underwater: a crisp crunchy crackle of thin shell parting along a seam, then a soft wet slide as the body slips free, close, present and detailed, no music', 1.2, 1],
+  ['shoal-join', 'a small fish falls in beside you underwater: a gentle soft flutter of fins, a small swish of water and a tiny bubble, quiet, pleasant, close, no music', 0.7, 1],
+  ['range-claim', 'a warm low rounded two-note rising swell on a hollow wooden marimba heard underwater, gentle and mellow, full mid-range, no chime, no metal, no reverb wash', 1.4, 1],
+  ['range-lost', 'a soft falling two-note on a hollow wooden marimba heard underwater, rounded and mellow, full mid-range, close and present, gentle, no chime, no metal, no harsh highs', 1.2, 1],
+  ['standing-up', 'a very soft rounded single marimba tap heard underwater, gentle mellow mid-range tick, no sharp transients, quiet, very short', 0.5, 1],
+  ['dominant', 'a warm resonant swell rising then holding, hollow wooden and bubbly underwater resonance, confident and full, concise, no metallic shimmer, no chime', 3.0, 1],
+  ['beach', 'a limbed animal hauls itself into shallow water: wet scraping of a heavy body dragged over sand and pebbles, small splashes and dripping, close and present, no music', 1.6, 1],
+  ['shell-crush', 'a crushing bite cracks a thick shell underwater: a dense crunch and a wet snap as the shell gives, splinters and a bubble burst, close and detailed, no music', 0.8, 1],
+  ['ambient-open-sea', 'underwater recording in cold open water far from shore: a steady current washing close past the hydrophone, slow rolling surges of water, streams of fine bubbles drifting by, very distant low fish grunts and faint far-off clicks, close and present, continuous, no music, seamless loop', 22, 1, true],
+];
+const DEVONIAN_LOW_INFLUENCE = new Set(['armour-clang', 'armour-pierce', 'air-gulp', 'air-low', 'jet', 'withdraw', 'moult-crack', 'shoal-join', 'beach', 'shell-crush']);
+const manifest = SET === 'devonian' ? DEVONIAN_MANIFEST : MANIFEST;
+const lowInfluence = SET === 'devonian' ? DEVONIAN_LOW_INFLUENCE : LOW_INFLUENCE;
+
 async function gen(text, seconds, loop, influence = 0.45) {
   const body = { text, duration_seconds: seconds, prompt_influence: influence };
   if (loop) body.loop = true;
+  // Devonian loops are encoded at 64 kbps to keep each file under 200 KB; everything else at 96.
+  const format = SET === 'devonian' && loop ? 'mp3_44100_64' : 'mp3_44100_96';
   for (let attempt = 0; attempt < 3; attempt++) {
-    const res = await fetch('https://api.elevenlabs.io/v1/sound-generation?output_format=mp3_44100_96', {
+    const res = await fetch(`https://api.elevenlabs.io/v1/sound-generation?output_format=${format}`, {
       method: 'POST', headers: { 'xi-api-key': KEY, 'Content-Type': 'application/json' }, body: JSON.stringify(body),
     });
     if (res.ok) return Buffer.from(await res.arrayBuffer());
@@ -63,12 +96,13 @@ async function gen(text, seconds, loop, influence = 0.45) {
   return null;
 }
 
-for (const [name, prompt, seconds, variants = 1, loop = false] of MANIFEST) {
+fs.mkdirSync(OUT, { recursive: true });
+for (const [name, prompt, seconds, variants = 1, loop = false] of manifest) {
   if (only && name !== only) continue;
   for (let v = 0; v < variants; v++) {
     const file = `${OUT}/${name}${variants > 1 ? `-${v + 1}` : ''}.mp3`;
     if (fs.existsSync(file) && !only) { console.log('skip', file); continue; }
-    const buf = await gen(prompt, seconds, loop, LOW_INFLUENCE.has(name) ? 0.35 : 0.45);
+    const buf = await gen(prompt, seconds, loop, lowInfluence.has(name) ? 0.35 : 0.45);
     if (!buf) { console.error('FAILED', file); continue; }
     fs.writeFileSync(file, buf);
     console.log('ok', file, buf.length);

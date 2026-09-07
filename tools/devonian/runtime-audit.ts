@@ -3,7 +3,7 @@ import * as THREE from 'three';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { MeshoptDecoder } from 'three/examples/jsm/libs/meshopt_decoder.module.js';
 import { auditAnchors, auditClips } from '../asset-audit';
-import { DEVONIAN_SPECIMENS } from '../../src/content/devonian';
+import { DEVONIAN_SPECIMENS } from '../../src/content/devonian/specimens';
 
 export async function auditDevonian(ids?: string[], category: 'creature' | 'prop' = 'creature') {
   const loader = new GLTFLoader().setMeshoptDecoder(MeshoptDecoder);

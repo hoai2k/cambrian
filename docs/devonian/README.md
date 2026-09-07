@@ -2,13 +2,20 @@
 
 The [natural-history brief](../redesign/07-devonian-design.md) defines the 21 mobile subjects and
 29 scenery families. This library supplies models, materials, portraits and articulated action
-clips for those subjects. The game still starts with the Cambrian content pack. Devonian assets
-can be inspected in the viewer's **Devonian creatures** and **Devonian scenery** collections;
-they do not define playable stats, abilities, environments or progression.
+clips for those subjects. Devonian Domination plays at `/devonian/` from the content pack in
+`src/content/devonian/` (stats, rungs and modes live there and in `src/sim/devonian/`, not in
+this library); a subject whose model has not shipped yet borrows a delivered one in play via
+`assets.standIns`. Devonian assets can also be inspected in the viewer's **Devonian creatures**
+and **Devonian scenery** collections.
 
 Approved deliveries are listed in `tools/devonian/shipped.json`. Models are published in reviewed
 batches so other work can use completed examples while the rest of the roster is in production.
 Only listed assets enter the viewer catalogue or released-asset CI checks.
+
+The first eight releases at `1e43197` are integration examples undergoing an additional art pass.
+The [independent eye audit](../../tools/devonian/eye-audit.README.md) found all sixteen published
+eye globes below the required 50% embedding. Their individual head, orbital, mouth, material and
+motion revisions must pass the updated production contract before being described as art-final.
 
 ## Files and provenance
 
@@ -40,6 +47,11 @@ characteristic gesture awaiting any future game implementation. Jawless animals 
 feeders do not acquire predatory teeth simply because the compatibility set contains `Bite`.
 Arthropods have `Moult`; other animals have a non-scaling `Growth` gesture. Loops are declared
 per specimen, and the viewer holds the final `Death` pose for inspection.
+
+Use **Pause** and the animation timeline to inspect exact poses. Choosing a different action while
+paused keeps it paused. Dragging the timeline isolates that action from cross-fades; arrow keys
+step by 1/30 second, and Home/End show its first/final pose. Orbit and zoom remain available to
+check eye seating, jaw hinges and the mouth interior throughout opening and closing.
 
 Creature models use the existing version-1 `cambrianAnchor` metadata, retained by name for
 compatibility with the shared socket reader. Full and reduced models carry the same skeleton

@@ -32,6 +32,28 @@ the art brief*.
 
 ## Delivered
 
+- **Devonian Shells** — `public/music/Devonian Shells.mp3`, the opening track of Devonian
+  Domination (`src/content/devonian/music.ts`). The Cambrian reef tracks fill the rest of the
+  rotation until more Devonian music arrives; the two biome themes above are tagged in that file
+  too, so dropping them in is the whole integration.
+
+- **Devonian Domination sound effects — 19 files.** `public/assets/devonian/sfx/*.mp3`,
+  generated from `DEVONIAN_MANIFEST` in `tools/gen-sfx.mjs` with
+  `node tools/gen-sfx.mjs --set devonian` (the Cambrian `MANIFEST` and default output are
+  untouched). For the mechanics in
+  [redesign/08-devonian-domination.md](redesign/08-devonian-domination.md); the consumer is the
+  sample table `src/content/devonian/sfx.ts`, registered by the `/devonian/` entry. Files: `armour-clang-1/-2`,
+  `armour-pierce`, `air-gulp`, `air-low`, `anoxia-warning`, `anoxia-drone` (12 s loop),
+  `jet-1/-2`, `withdraw`, `moult-crack`, `shoal-join`, `range-claim`, `range-lost`,
+  `standing-up`, `dominant`, `beach`, `shell-crush`, `ambient-open-sea` (22 s loop). Every file
+  passes the midrange rule in [audio.md](audio.md) (peak above 150 Hz over −18 dBFS, measured
+  with the same decode-and-high-pass as `src/workbench/levels.ts`); the first takes of
+  `anoxia-warning`, `anoxia-drone`, `range-lost`, `moult-crack` and `ambient-open-sea` failed
+  it and were re-prompted with named midrange content, as the doc advises. Loops in this set
+  are encoded at 64 kbps so each file stays under 200 KB (largest: `ambient-open-sea`, 177 KB).
+  Two takes are worth a listen before they are wired in: `withdraw` is audible but splashy
+  (three quarters of its energy above 2.5 kHz), and `ambient-open-sea` sits about 15 dB below
+  `ambient-reef` in RMS — right for cold empty water, but the bed gain may want lifting.
 - **Reef soundtrack — 2 tracks.** *Tide of First Bones* (the session opener) and
   *First Tide*, in `public/music/`. Untagged, so they rotate in every biome.
 - **The sound-effect library.** `public/assets/sfx/*.mp3`, generated from the
