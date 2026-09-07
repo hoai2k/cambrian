@@ -63,3 +63,7 @@ subtle teal fill/coral rim so illumination does not hide the new palettes.
 
 The authored GLB intake workflow (`cards` / `lods`) remains for changes to models themselves;
 these runtime palette variants have their own delivery manifest and do not replace authored art.
+
+## UV-coloured specimens
+
+The revised Devonian specimens use UV albedo maps, often with neutral white vertex colours. Their runtime palette reference includes sampled linear-space albedo at the material's actual UVs, vertex pigment and the material colour factor. Using only white vertex colours as the reference made these models disproportionately dark when a scheme was applied. Texture pixels are cached once per shared texture; palette selection only updates uniforms. UV transforms and material factors are included. Normal maps and roughness remain untouched, and untextured Cambrian materials retain the original formula and portrait version. `tools/recolor-texture-test.ts` covers the texture/vertex mixture, sRGB conversion, atlas-region sampling and UV transforms.
