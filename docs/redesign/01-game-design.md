@@ -120,10 +120,13 @@ momentum-based movement**.
   larva in the channel current moves at half its burst speed for free. Giants
   patrol *with* the current, so the smart escape is across it.
 - **Seafloor creatures** (Hallucigenia, Marrella, Olenoides, Wiwaxia) stick
-  to terrain and climb boulders and sponges. **A** becomes a **hop** (short
-  ballistic arc, a dodge and a way onto a ledge). They cannot enter open
-  water, so their world is the terrain surface, and they get burrow/anchor
-  tools swimmers do not. They are the "ground fighter" archetypes.
+  to terrain and climb boulders and sponges. **RB** is a **hop** (short
+  ballistic arc, a dodge and a way onto a ledge) and, held, a **paddle**:
+  they climb into open water and keep swimming there at roughly a third of
+  their crawl, with no sprint and no dash until their legs are back on the
+  floor, and the climb costs more stamina than they regain. So open water is
+  a crossing, not a second home, and the seabed is where they hunt, are fed
+  and get their burrow/anchor tools. They are the "ground fighter" archetypes.
 - **Ambient body motion**: idle sway, fin/flap frequency tied to speed
   (already in the current animation layer), a small procedural bob so nothing
   is ever perfectly still.
@@ -162,7 +165,7 @@ expresses them differently so fights are varied.
 > | **X** | 2 | **Light bite** |
 > | **Y** | 3 | **Ability** |
 > | **LB** | 4 | **Dodge / dash** |
-> | **RB** | 5 | **Rise / hop** |
+> | **RB** | 5 | **Rise** / **hop**, held to paddle upward (crawlers) |
 > | **LT** (analog) | 6 | **Aim** — the centred crosshair picks the target |
 > | **RT** (analog) | 7 | **Heavy / pounce** |
 > | D-pad ↑ | 12 | Sense pulse |

@@ -14,6 +14,7 @@
     "cards": "node tools/make-cards.mjs",
     "lods": "node tools/make-lods.mjs",
     "portraits": "node tools/portrait-test.mjs",
+    "paddle": "esbuild tools/paddle-test.ts --bundle --platform=node --format=esm --outfile=node_modules/.cache/paddle-test.mjs && node node_modules/.cache/paddle-test.mjs",
     "hiding": "esbuild tools/hiding-test.ts --bundle --platform=node --format=esm --outfile=node_modules/.cache/hiding-test.mjs && node node_modules/.cache/hiding-test.mjs",
     "eras": "node tools/era-test.mjs",
     "devonian": "esbuild tools/devonian-test.ts --bundle --platform=node --format=esm --outfile=node_modules/.cache/devonian-test.mjs && node node_modules/.cache/devonian-test.mjs",

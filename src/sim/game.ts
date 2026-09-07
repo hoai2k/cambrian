@@ -41,6 +41,13 @@ export interface RadarBlip {
 
 const { schools: SNACK_SCHOOLS, giants: GIANTS } = ACTIVE_ERA.ecology;
 
+// Crawlers off the seabed. They paddle: they keep swimming, slowly, and pay for the climb in
+// stamina (more than they regenerate, so a paddle is a crossing, not a second way to live).
+const PADDLE_SPEED = 0.35;    // fraction of the crawler's cruise while off the floor
+const PADDLE_RISE = 2.4;      // climb speed, units/s at scale 1 (a swimmer's rise is 2.6 and faster to reach)
+const PADDLE_SINK = 2.2;      // terminal sink once RB is released — a settle, not a fall
+const PADDLE_STAMINA = 24;    // per second while climbing
+
 export class Game implements AiWorld {
   world: WorldData;
   actors: Actor[] = [];
@@ -202,24 +209,32 @@ export class Game implements AiWorld {
     g.brain = makeBrain('giant', route[0], this.rng, { patrol: route });
   }
 
-  /** A school sized to be prey for this player, spawned just out of sight. */
+  /**
+   * A school sized to be prey for this player, spawned just out of sight. A crawler is fed on
+   * its own level: seafloor species by preference, and anything else planted just above the
+   * sediment rather than left drifting overhead where it cannot be reached.
+   */
   private spawnPreyFor(p: Actor) {
     const L = lengthOf(p);
     const def = creature(p.creature);
-    const pool = CREATURE_IDS.filter((id) => creature(id).ground === def.ground || !creature(id).ground);
+    const crawlers = CREATURE_IDS.filter((id) => creature(id).ground);
+    const pool = def.ground
+      ? (this.rng() < 0.8 && crawlers.length ? crawlers : CREATURE_IDS.slice())
+      : CREATURE_IDS.filter((id) => !creature(id).ground);
     const c = pool[Math.floor(this.rng() * pool.length)];
     const cd = creature(c);
     const ratio = 0.28 + this.rng() * 0.32;            // snack to small prey relative to the player
     const s = clamp((L * ratio) / cd.adultLength, 0.06, 2.2);
-    const count = s < 0.2 ? 12 : s < 0.6 ? 8 : 5;
+    const count = (s < 0.2 ? 12 : s < 0.6 ? 8 : 5) + (def.ground ? 4 : 0);
     const ang = this.rng() * TAU, d = 24 + this.rng() * 18 + L * 2;
     const home = this.offshore({ x: p.pos.x + Math.cos(ang) * d, y: 0, z: p.pos.z + Math.sin(ang) * d });
     const g = sampleHeight(home.x, home.z);
-    home.y = cd.ground ? g : clamp(p.pos.y + (this.rng() - 0.5) * 6, g + 1.5, SURFACE_Y - 3);
+    const onFloor = cd.ground || def.ground;
+    home.y = onFloor ? g : clamp(p.pos.y + (this.rng() - 0.5) * 6, g + 1.5, SURFACE_Y - 3);
     const schoolId = this.schoolCount++;
     for (let k = 0; k < count; k++) {
       const pos = { x: home.x + (this.rng() - 0.5) * 5, y: home.y + (this.rng() - 0.5) * 2, z: home.z + (this.rng() - 0.5) * 5 };
-      if (cd.ground) pos.y = groundHeight(this.world, pos.x, pos.z, this.scratchBoulders) + cd.adultLength * s * 0.13;
+      if (onFloor) pos.y = groundHeight(this.world, pos.x, pos.z, this.scratchBoulders) + (cd.ground ? cd.adultLength * s * 0.13 : 0.6 + this.rng() * 1.2);
       const a = this.spawn(c, 'swarm', pos, s);
       a.brain = makeBrain('swarm', home, this.rng, { schoolId });
     }
@@ -498,7 +513,10 @@ export class Game implements AiWorld {
     // Stamina
     const speed = len3(a.vel);
     const burstIn = input.burst;
-    const bursting = burstIn > 0.1 && a.stamina > 0 && a.state !== 'guard' && a.exhausted === 0;
+    // A crawler off the seabed is doggy-paddling: it keeps swimming slowly, but it cannot
+    // sprint or dash until its legs are back on the floor.
+    const paddling = def.ground && !a.grounded;
+    const bursting = burstIn > 0.1 && a.stamina > 0 && a.state !== 'guard' && a.exhausted === 0 && !paddling;
     if (def.ability === 'ambushSurge' && input.burst > .1 && !a.prev.burst && a.abilityCd <= 0) { a.burstT = 2.2; a.abilityCd = 10; }
     const freeBurst = a.burstT > 0;
     if (bursting && !freeBurst) a.stamina -= 22 * burstIn * dt;
@@ -534,7 +552,7 @@ export class Game implements AiWorld {
     const controllable = a.holdT === 0 && (a.state === 'free' || a.state === 'guard' || (a.state === 'ability' && (def.mobileAbility || def.ability === 'shellUp' || def.ability === 'bristleFlare' || def.ability === 'ambushSurge')));
     const slowMult = abilitySpeed(a) * (a.state === 'guard' ? (def.ability === 'anchor' ? 0 : def.ability === 'enroll' ? .8 : .45) : (a.abilityActive && def.ability === 'shellUp') ? 0.35 : a.exhausted > 0 ? 0.7 : 1);
     const burstMult = controllable && (bursting || freeBurst) ? (1 + (def.burst - 1) * (freeBurst ? 1.25 : burstIn) * (a.controller === 'swarm' ? 0.55 : giantish ? 0.35 : 1)) : 1;
-    const cruise = def.speed * sf * slowMult * (a.controller === 'swarm' ? 0.62 : giantish ? 0.55 : 1);
+    const cruise = def.speed * sf * slowMult * (a.controller === 'swarm' ? 0.62 : giantish ? 0.55 : 1) * (paddling ? PADDLE_SPEED : 1);
     const cur = sampleCurrent(v3(), a.pos.x, a.pos.y, a.pos.z, this.time);
     const curK = def.ground ? 0.08 : 0.55;
     let desired: Vec3 = v3(cur.x * curK, cur.y * curK, cur.z * curK);
@@ -595,10 +613,21 @@ export class Game implements AiWorld {
       a.pos.x += a.vel.x * dt; a.pos.y += a.vel.y * dt; a.pos.z += a.vel.z * dt;
     }
 
-    // Hop (crawlers)
+    // Hop and paddle (crawlers). RB kicks off the floor, and holding it keeps the crawler
+    // climbing at a paddle's pace for as long as its stamina lasts; letting go sinks it back
+    // down at a gentle terminal speed rather than dropping it like a stone.
     if (def.ground) {
-      if (a.hideMode === 'none' && justRise && a.grounded && controllable && a.stamina > 8) { a.hopVel = 5.5 * Math.sqrt(sf); a.grounded = false; a.stamina -= 8; a.iframes = Math.max(a.iframes, 0.12); }
-      if (!a.grounded) { a.pos.y += a.hopVel * dt; a.hopVel -= 16 * dt; }
+      const canPaddle = a.hideMode === 'none' && controllable;
+      if (canPaddle && justRise && a.grounded && a.stamina > 8) { a.hopVel = 5.5 * Math.sqrt(sf); a.grounded = false; a.stamina -= 8; a.iframes = Math.max(a.iframes, 0.12); }
+      const holdingRise = canPaddle && input.rise && a.stamina > 0;
+      if (holdingRise && !a.grounded) {
+        a.hopVel = damp(a.hopVel, PADDLE_RISE * Math.sqrt(sf), 5, dt);
+        a.stamina -= PADDLE_STAMINA * dt;
+      } else if (!a.grounded) {
+        const sink = -PADDLE_SINK * Math.sqrt(sf) * (input.sink ? 2.4 : 1);
+        a.hopVel = Math.max(a.hopVel - 16 * dt, sink);
+      }
+      if (!a.grounded) { a.pos.y += a.hopVel * dt; }
     }
 
     // Static collision
@@ -670,7 +699,7 @@ export class Game implements AiWorld {
       // Dash (LB): with a stick direction it fires at once; with a neutral stick it is queued for the
       // moment the stick moves. Fast and long enough to clear a predator's bite.
       else if (justDash && mag <= 0.3 && !input.worldMove) { a.dashQueued = true; }
-      else if ((justDash || a.dashQueued) && mag > 0.3 && a.stamina >= 10 && a.exhausted === 0 && a.dashCd === 0 && !a.dashUsed) { a.dashUsed = true; a.dashQueued = false; this.startDash(a, def, dir, L, sf); }
+      else if ((justDash || a.dashQueued) && mag > 0.3 && a.stamina >= 10 && a.exhausted === 0 && a.dashCd === 0 && !a.dashUsed && !paddling) { a.dashUsed = true; a.dashQueued = false; this.startDash(a, def, dir, L, sf); }
       // Pounce (RT): at the aimed target when in range, else at whatever prey is in front, else a forward lunge
       else if (justHeavy && !HEAVY_SPECIALS.has(def.ability) && a.controller === 'player' && a.pounceCd === 0 && a.stamina >= 12 && a.exhausted === 0) {
         const t = a.aiming && locked && isAlive(locked) ? (a.aimInRange ? locked : undefined) : this.pounceTargetAhead(a);
@@ -1162,12 +1191,20 @@ export class Game implements AiWorld {
     }
     void ambient;
     // Every player, at every size, should have plenty of things smaller than them within reach.
+    // For a crawler "within reach" means near the seabed: food hanging in open water above it
+    // does not count, so the seafloor keeps being restocked.
     for (const p of this.players) {
       if (!isAlive(p)) continue;
       const L = lengthOf(p);
+      const crawler = creature(p.creature).ground;
+      const reachY = 3 + L * 1.5;
       let small = 0;
-      for (const o of this.nearby(p.pos, 45 + L * 4)) { if (o.id !== p.id && isAlive(o)) { const b = bandOf(p, o); if (b === 'snack' || b === 'prey') small++; } }
-      if (small < 14) this.spawnPreyFor(p);
+      for (const o of this.nearby(p.pos, 45 + L * 4)) {
+        if (o.id === p.id || !isAlive(o)) continue;
+        if (crawler && o.pos.y - p.pos.y > reachY) continue;
+        const b = bandOf(p, o); if (b === 'snack' || b === 'prey') small++;
+      }
+      if (small < (crawler ? 18 : 14)) this.spawnPreyFor(p);
     }
     if (swarm < 200) {
       const i = Math.floor(this.rng() * SNACK_SCHOOLS.length);

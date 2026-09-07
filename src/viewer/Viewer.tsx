@@ -2,7 +2,7 @@ import { CreaturePortrait } from '../app/CreaturePortrait';
 import { useEffect, useRef, useState } from 'react';
 import { COLLECTIONS, SPECIMENS, specimenByKey, type CollectionId } from './catalogue';
 import { SCHEMES, scheme, schemeForCreature, SLOT_LABEL, type Slot } from '../shared/palettes';
-import { ASSET_BASE, createViewerScene, type ViewerScene } from './scene';
+import { ASSET_BASE, createViewerScene, type PlaybackState, type ViewerScene } from './scene';
 
 const SPEEDS = [0.25, 0.5, 1, 2];
 
@@ -38,6 +38,7 @@ export function Viewer() {
   const [active, setActive] = useState('');
   const [loop, setLoop] = useState(false);
   const [speed, setSpeed] = useState(1);
+  const [playback, setPlayback] = useState<PlaybackState>({ time: 0, duration: 0, paused: false });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(true);
   const [loadedId, setLoadedId] = useState('');
@@ -54,6 +55,7 @@ export function Viewer() {
     const s = createViewerScene(canvasRef.current!);
     sceneRef.current = s;
     s.onClip(setActive);
+    s.onPlayback(setPlayback);
     return () => { s.dispose(); sceneRef.current = null; };
   }, []);
 
@@ -133,7 +135,7 @@ export function Viewer() {
         <h2 className={def.name.length > 11 ? 'long-name' : undefined}>{def.name}</h2>
         <p>{def.provenance ?? 'Burgess Shale'} · {clips.length} clips</p>
         {def.description && <p className="specimen-description">{def.description}</p>}
-        {def.lengthMeters != null && <p className="specimen-scale">Representative length: {def.lengthMeters} m · views individually framed</p>}
+        {def.lengthMeters != null && <p className="specimen-scale">Representative length: {new Intl.NumberFormat('en', { maximumSignificantDigits: 3 }).format(def.lengthMeters)} m · views individually framed</p>}
         {collection !== 'cambrian' && <p className="specimen-downloads"><a href={`${ASSET_BASE}${def.model}`} download>Full model</a>{def.lod && <a href={`${ASSET_BASE}${def.lod}`} download>Reduced model</a>}</p>}
         <p className="hint">Drag to orbit · right-drag to pan · scroll to zoom</p>
         <button className="ghost" onClick={() => sceneRef.current?.resetCamera()}>Reset view</button>
@@ -166,7 +168,7 @@ export function Viewer() {
       <section className="clips" aria-label="Animations" data-loaded-specimen={loadedId}>
         <div className="clips-head">
           <h3>Animations</h3>
-          <label className="toggle">
+          {clips.length > 0 && <><label className="toggle">
             <input type="checkbox" checked={loop} onChange={(e) => setLoop(e.target.checked)} />
             <span>Loop one-shots</span>
           </label>
@@ -174,8 +176,26 @@ export function Viewer() {
             {SPEEDS.map((s) => (
               <button key={s} className={`speed ${s === speed ? 'active' : ''}`} aria-pressed={s === speed} onClick={() => setSpeed(s)}>{s}×</button>
             ))}
-          </div>
+          </div></>}
         </div>
+        {!loading && clips.length > 0 && <div className="timeline">
+          <button className="ghost" onClick={() => sceneRef.current?.setPaused(!playback.paused)}>
+            {playback.paused ? 'Resume' : 'Pause'}
+          </button>
+          <label>
+            <span className="sr-only">Animation time</span>
+            <input type="range" min={0} max={playback.duration} step="any" value={playback.time}
+              aria-valuetext={`${active}, ${playback.time.toFixed(2)} of ${playback.duration.toFixed(2)} seconds`}
+              onKeyDown={e => {
+                const target = e.key === 'Home' ? 0 : e.key === 'End' ? playback.duration
+                  : e.key === 'ArrowLeft' || e.key === 'ArrowDown' ? playback.time - 1 / 30
+                  : e.key === 'ArrowRight' || e.key === 'ArrowUp' ? playback.time + 1 / 30 : undefined;
+                if (target != null) { e.preventDefault(); sceneRef.current?.seek(target); }
+              }}
+              onChange={e => sceneRef.current?.seek(Number(e.target.value))} />
+          </label>
+          <output>{playback.time.toFixed(2)} / {playback.duration.toFixed(2)} s</output>
+        </div>}
         {!loading && !clips.length && <p className="hint">Static specimen</p>}
         <div className="clip-grid">
           {clips.map((name) => (
