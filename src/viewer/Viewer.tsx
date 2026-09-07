@@ -1,7 +1,7 @@
 import { CreaturePortrait } from '../app/CreaturePortrait';
 import { useEffect, useRef, useState } from 'react';
-import { COLLECTIONS, SPECIMENS, specimenByKey, type CollectionId } from './catalogue';
-import { SCHEMES, scheme, schemeForCreature, SLOT_LABEL, type Slot } from '../shared/palettes';
+import { COLLECTIONS, paletteFor, SPECIMENS, specimenByKey, type CollectionId } from './catalogue';
+import { scheme, SLOT_LABEL, type Slot } from '../shared/palettes';
 import { ASSET_BASE, createViewerScene, type PlaybackState, type ViewerScene } from './scene';
 
 const SPEEDS = [0.25, 0.5, 1, 2];
@@ -33,7 +33,12 @@ export function Viewer() {
   const [id, setId] = useState(SPECIMENS[0].key);
   const def = specimenByKey.get(id)!;
   const roster = SPECIMENS.filter(c => c.collection === collection);
-  const defaultScheme = (key: string) => { const c = specimenByKey.get(key)!; return c.collection === 'cambrian' ? schemeForCreature(c.id) : 'default'; };
+  // Both eras are on this page, so a specimen's palette comes from its own pack, not ACTIVE_ERA.
+  const defaultScheme = (key: string) => {
+    const c = specimenByKey.get(key)!;
+    const p = paletteFor(c.collection);
+    return p.defaults[c.id] ?? p.schemes[0].id;
+  };
   const [clips, setClips] = useState<string[]>([]);
   const [active, setActive] = useState('');
   const [loop, setLoop] = useState(false);
@@ -147,7 +152,7 @@ export function Viewer() {
           <label className="scheme-pick">
             <span className="sr-only">Colour scheme for {def.name}</span>
             <select value={schemeId} onChange={(e) => setPicks((p) => ({ ...p, [id]: e.target.value }))}>
-              {SCHEMES.map((s) => <option key={s.id} value={s.id}>{s.name}</option>)}
+              {paletteFor(def.collection).schemes.map((s) => <option key={s.id} value={s.id} title={s.note}>{s.name}</option>)}
             </select>
           </label>
           <p className="scheme-note">{activeScheme.note}</p>
