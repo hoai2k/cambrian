@@ -10,7 +10,7 @@ import { creature, CREATURE_IDS, PLAYABLE_IDS, type CreatureId, type MoveDef } f
 import { resolveFlora, stepFlora } from './flora';
 import { SpatialHash } from './spatial';
 import { emptyInput, TIER_NAMES, TIER_NEED, TIER_SCALE, type Actor, type InputFrame, type Mode, type PlayerSetup, type Prompt, type SiltCloud, type Tier, type WorldEvent } from './types';
-import { biomeAt, biomeWeights, coverAt, groundHeight, LIGHT_WINDOW_Y, microbialAt, nearestNursery, nurseryAt, nurseryFactor, resolveStatic, sampleCurrent, sampleHeight, shoreDistance, shoreZ, SURFACE_Y, World, type Biome, type Boulder, type Cover, type Flora, type WorldData } from './world';
+import { biomeAt, biomeWeights, coverAt, groundHeight, LIGHT_WINDOW_Y, type Landmark, type LandmarkKind, microbialAt, nearestNursery, nurseryAt, nurseryFactor, resolveStatic, sampleCurrent, sampleHeight, shoreDistance, shoreZ, SURFACE_Y, World, type Biome, type Boulder, type Cover, type Flora, type WorldData } from './world';
 
 export interface PlayerProgress {
   prompts: Prompt[];
@@ -18,6 +18,17 @@ export interface PlayerProgress {
   deaths: number;
   apexT: number;
   message: string;
+}
+
+/**
+ * What this match turned up: the biomes anybody swam through, the landmarks they found, and the
+ * species that reached Apex. The shell keeps a running record of these across sessions and shows
+ * it on the results screen, so an endless procedural sea accumulates something.
+ */
+export interface Discovery {
+  biomes: Set<Biome>;
+  landmarks: Set<LandmarkKind>;
+  apex: Set<CreatureId>;
 }
 
 export interface GameState {
@@ -31,7 +42,7 @@ export type TeleportDest = 'home' | number;
 export interface TeleportOption { dest: TeleportDest; label: string; detail: string; distance: number; }
 /** One radar contact, in world offsets from the viewer (the renderer rotates it into the camera frame). */
 export interface RadarBlip {
-  kind: 'player' | 'threat' | 'giant' | 'home' | 'shore' | 'food';
+  kind: 'player' | 'threat' | 'giant' | 'home' | 'shore' | 'food' | 'landmark';
   dx: number; dz: number; distance: number;
   /** Player index for `player` blips, actor id otherwise. */
   id: number;
@@ -61,6 +72,24 @@ const PADDLE_RISE = 2.4;      // climb speed, units/s at scale 1 (a swimmer's ri
 const PADDLE_SINK = 2.2;      // terminal sink once RB is released — a settle, not a fall
 const PADDLE_STAMINA = 24;    // per second while climbing
 
+/**
+ * Co-op revive. A downed player in Rise lies on the floor for this long instead of dissolving
+ * after the usual three seconds, and any living team-mate who swims into them brings them back
+ * where they fell with no tier lost. Solo, and in every versus mode, death is unchanged: the
+ * window only opens when there is somebody who could actually reach you.
+ */
+const DOWNED_WINDOW = 10;
+const CORPSE_WINDOW = 3;
+/**
+ * How close a team-mate has to be when you go down for the window to open at all. Roughly what a
+ * sprint covers in the window itself, so a rescue is always a real race and never a formality —
+ * and so a partner on the far side of an endless sea does not leave you lying there for ten
+ * seconds waiting for somebody who was never coming.
+ */
+const REVIVE_REACH = 90;
+/** Seconds a rescuer must hold station beside a downed team-mate. */
+const REVIVE_HOLD = 0.6;
+
 export class Game implements AiWorld {
   world: WorldData;
   actors: Actor[] = [];
@@ -75,11 +104,21 @@ export class Game implements AiWorld {
   players: Actor[] = [];
   progress: PlayerProgress[] = [];
   state: GameState = { status: 'playing', winner: -1, message: '' };
+  readonly discovery: Discovery = { biomes: new Set(), landmarks: new Set(), apex: new Set() };
   private scratchActors: Actor[] = [];
   private scratchBoulders: Boulder[] = [];
   private scratchCover: Cover[] = [];
   private scratchFlora: Flora[] = [];
   private ambientTimer = 0;
+  /**
+   * How much is left on each `bones` landmark, 0..1 by landmark id. A dead giant is the biggest
+   * meal in the sea and it does not last: it feeds whoever finds it, runs out, and slowly becomes
+   * worth visiting again as the deep delivers another body to the same spot.
+   *
+   * Not to be confused with `render/carcass.ts`, which cuts an eaten body out of its own model.
+   * This is the standing skeleton the world generator places, not a creature that just died.
+   */
+  private bonesMeat = new Map<number, number>();
   private stepIndex = 0;
   private schoolCount = 0;
   private hitCtx: HitContext;
@@ -95,7 +134,7 @@ export class Game implements AiWorld {
     this.world.loadAround(nursery);
     this.hitCtx = { events: this.events, byId: (id) => this.idMap.get(id), time: 0, rng: this.rng, armour: RULES ? (att, vic, dir) => RULES!.armour(att, vic, dir) : undefined };
     setups.forEach((s, i) => {
-      const startScale = RULES ? RULES.startScale(mode, i) : mode === 'rise' ? TIER_SCALE[0] : mode === 'hunted' ? (i === 0 ? 3.0 : TIER_SCALE[1]) : mode === 'reef' ? TIER_SCALE[2] : TIER_SCALE[1];
+      const startScale = RULES ? RULES.startScale(mode, i, s.creature) : mode === 'rise' ? TIER_SCALE[0] : mode === 'hunted' ? (i === 0 ? 3.0 : TIER_SCALE[1]) : mode === 'reef' ? TIER_SCALE[2] : TIER_SCALE[1];
       const a = this.spawn(s.creature, 'player', this.spawnPoint(nursery, s.creature, startScale, i), startScale, i);
       a.home = { ...nursery };
       a.yaw = Math.PI;                                   // facing out to sea
@@ -106,7 +145,7 @@ export class Game implements AiWorld {
       // Fill to 4 with bots
       for (let i = setups.length; i < 4; i++) {
         const c = this.pickBot(setups.map((s) => s.creature), i);
-        const botScale = RULES ? RULES.startScale(mode, i) : TIER_SCALE[1];
+        const botScale = RULES ? RULES.startScale(mode, i, c) : TIER_SCALE[1];
         const bot = this.spawn(c, 'bot', this.spawnPoint(nursery, c, botScale, i), botScale);
         bot.home = { ...nursery };
         bot.brain = makeBrain('needs', nursery, this.rng, { aggression: 0.9, reaction: 0.2, parrySkill: 0.55 });
@@ -157,6 +196,8 @@ export class Game implements AiWorld {
   }
 
   private spawnPoint(center: Vec3, c: CreatureId, s: number, index = 0): Vec3 {
+    const inCover = RULES?.spawnPoint(this, center, c, s, index);
+    if (inCover) return inCover;
     const def = creature(c);
     const ang = index * 1.7 + this.rng() * 0.8, d = 3 + this.rng() * 6;
     const x = center.x + Math.cos(ang) * d, z = center.z + Math.sin(ang) * d;
@@ -344,6 +385,8 @@ export class Game implements AiWorld {
     stepFlora(this.world, dt);
     this.updateSilt(dt);
     this.updatePopulation(dt);
+    this.restockBones(dt);
+    this.updateDiscovery();
     RULES?.step(this, dt);
     this.updateModes(dt);
     RULES?.onEvents(this, this.events);
@@ -380,7 +423,19 @@ export class Game implements AiWorld {
     a.corpseT += dt; a.stateT += dt;
     const def = creature(a.creature);
     const inMouth = a.eaten >= 1 && a.swallowedBy >= 0;
-    if (!inMouth) {
+    // A downed team-mate is not a corpse yet: they settle where they fell and stay there. A body
+    // that drifted up with the current the way a dead one does would float out of reach of the
+    // ally swimming down to it, and the rescue would be a matter of luck rather than of speed.
+    const downed = this.revivable(a);
+    if (downed) {
+      const floor = groundHeight(this.world, a.pos.x, a.pos.z, this.scratchBoulders) + clearanceOf(a) * 0.6;
+      a.vel.x = damp(a.vel.x, 0, 3, dt); a.vel.z = damp(a.vel.z, 0, 3, dt);
+      a.pos.x += a.vel.x * dt; a.pos.z += a.vel.z * dt;
+      a.pos.y = Math.max(floor, damp(a.pos.y, floor, 2.5, dt));
+      a.vel.y = 0;
+      a.bank = damp(a.bank, Math.PI * 0.75, 1.6, dt);       // rolled over, but not adrift
+      a.pitch = damp(a.pitch, 0, 2, dt);
+    } else if (!inMouth) {
       const floor = groundHeight(this.world, a.pos.x, a.pos.z, this.scratchBoulders) + clearanceOf(a) * 0.6;
       const cur = sampleCurrent(v3(), a.pos.x, a.pos.y, a.pos.z, this.time);
       const ceiling = Math.min(SURFACE_Y - 2, a.deathY + 4 + lengthOf(a));
@@ -397,8 +452,10 @@ export class Game implements AiWorld {
     a.hitFlash = Math.max(0, a.hitFlash - dt);
     if (a.controller === 'player' || a.controller === 'bot') {
       a.respawnT += dt;
-      // three seconds of corpse (or of being digested), a puff of sparkles, then back in
-      const total = 3.0;
+      // three seconds of corpse (or of being digested), a puff of sparkles, then back in — or, for
+      // a downed team-mate somebody could still reach, ten, and a revive ends it early.
+      const total = downed ? DOWNED_WINDOW : CORPSE_WINDOW;
+      if (downed && this.tryRevive(a, dt)) return;
       if (!a.sparkled && a.respawnT > total - 0.4) {
         a.sparkled = true;
         const pred = inMouth ? this.idMap.get(a.swallowedBy) : undefined;
@@ -408,6 +465,56 @@ export class Game implements AiWorld {
       }
       if (a.respawnT > total) this.respawn(a);
     }
+  }
+
+  /**
+   * Whether this body is a downed team-mate rather than a corpse: co-op only, with at least one
+   * other player alive to come and get them, and still lying where they fell (not in a mouth).
+   */
+  revivable(a: Actor): boolean {
+    if (this.mode !== 'rise' || a.controller !== 'player' || a.swallowedBy >= 0 || a.eaten >= 1) return false;
+    return this.players.some((o) => o !== a && isAlive(o) && distXZ(o.pos, a.pos) < REVIVE_REACH);
+  }
+
+  /** Seconds a downed player has left to be reached, or 0 when they are not revivable. */
+  /** How far through the rescue dwell a downed player is, 0..1, for the HUD. */
+  reviveProgress(a: Actor): number { return a.state === 'dead' ? clamp(a.reviveT / REVIVE_HOLD, 0, 1) : 0; }
+
+  reviveWindow(a: Actor): number {
+    return a.state === 'dead' && this.revivable(a) ? Math.max(0, DOWNED_WINDOW - a.respawnT) : 0;
+  }
+
+  /**
+   * A downed team-mate is brought back by a rescuer who holds station beside them for
+   * `REVIVE_HOLD` seconds. The dwell is what makes it a choice: a body on the floor is also a
+   * meal, and biting it feeds you instead. Swim up and wait and you get your ally back; press the
+   * attack and you get their nutrition. The button you press decides which, and the pause is what
+   * costs you — half a second stationary over a corpse, in the open, is the price of the rescue.
+   */
+  private tryRevive(a: Actor, dt: number): boolean {
+    const L = lengthOf(a);
+    let helper: Actor | undefined;
+    for (const o of this.players) {
+      if (o === a || !isAlive(o) || o.state === 'moult') continue;
+      if (dist(o.pos, a.pos) > lengthOf(o) * 0.8 + L * 0.6 + 2) continue;
+      // Somebody eating this body has made the other choice; the dwell does not run for them.
+      if (o.state === 'eating' && o.eatingTarget === a.id) continue;
+      helper = o; break;
+    }
+    if (!helper) { a.reviveT = 0; return false; }
+    a.reviveT += dt;
+    if (a.reviveT < REVIVE_HOLD) return false;
+    // Back up, where you fell, with the tier you had. The cost of dying in co-op is the time your
+    // ally spent coming to get you, and the pair of you standing still in the open to do it.
+    a.state = 'free'; a.stateT = 0; a.respawnT = 0; a.corpseT = 0; a.eaten = 0; a.sparkled = false; a.reviveT = 0;
+    a.hp = a.hpMax * 0.45; a.stamina = a.staminaMax * 0.5; a.poise = a.poiseMax;
+    a.vel = v3(); a.bank = 0; a.pitch = 0; a.hitFlash = 0; a.tumble = v3();
+    a.spawnProtect = 2.5; a.hunted = 0; a.hunterId = -1; a.lastHitBy = -1; a.killer = -1;
+    a.pos.y = groundHeight(this.world, a.pos.x, a.pos.z, this.scratchBoulders) + clearanceOf(a) + 0.2;
+    this.events.push({ kind: 'moult', pos: { ...a.pos }, actor: a.id, player: a.player, strength: 0.7 });
+    this.progress[a.player]?.prompts.push({ text: `${creature(helper.creature).name} got you up.`, t: 3 });
+    this.flag(helper, 'revive');
+    return true;
   }
 
   private respawn(a: Actor) {
@@ -887,6 +994,7 @@ export class Game implements AiWorld {
         const m = microbialAt(a.pos.x, a.pos.z);
         if (m > .2) this.gainNutrition(a, undefined, dt * rate * m);
       }
+      this.feedOnBones(a, L, dt);
     }
 
     // Aim range: the crosshair fills when a pounce would connect
@@ -1282,6 +1390,46 @@ export class Game implements AiWorld {
     if (shadow && isAlive(shadow) && shadow.brain?.goal !== 'hunt' && this.anchorDistance(shadow.pos) > 300) this.placeGiant(shadow);
   }
 
+  /**
+   * The `bones` landmark whose ribcage `pos` is inside, if any. Cheap: there is at most one
+   * landmark per 320-unit cell and only loaded chunks are in the list.
+   */
+  bonesNear(pos: Vec3, range = 0): Landmark | undefined {
+    let best: Landmark | undefined, bd = Infinity;
+    for (const m of this.world.landmarks) {
+      if (m.kind !== 'bones') continue;
+      const d = distXZ(pos, m.pos);
+      if (d < m.radius + range && d < bd) { bd = d; best = m; }
+    }
+    return best;
+  }
+
+  /** How much of a skeleton is left to strip, 0..1. Unvisited ones are whole. */
+  bonesLeft(id: number) { return this.bonesMeat.get(id) ?? 1; }
+
+  /**
+   * Eating at a dead giant's bones. Anything that can reach the body gets fed — this is
+   * scavenging, not a kill — at a rate that scales with the eater, so it is a real meal at every
+   * tier rather than a trickle for a giant and a banquet for a larva. It depletes as it is eaten.
+   */
+  private feedOnBones(a: Actor, L: number, dt: number) {
+    if (a.controller === 'swarm' || a.pos.y > sampleHeight(a.pos.x, a.pos.z) + L * 2.5 + 4) return;
+    const m = this.bonesNear(a.pos);
+    if (!m) return;
+    const left = this.bonesLeft(m.id);
+    if (left <= 0.02) return;
+    // A whole giant is worth roughly a tier to an adult; the eater's own mass sets the rate.
+    const food = Math.min(left, dt * 0.055) * 240 * Math.pow(a.scale, 1.2) * m.scale;
+    this.bonesMeat.set(m.id, Math.max(0, left - dt * 0.055));
+    this.gainNutrition(a, undefined, food);
+    if (a.controller === 'player' && this.rng() < dt * 3) this.events.push({ kind: 'eat', pos: { ...a.pos }, actor: a.id, strength: 0.35, player: a.player });
+  }
+
+  /** Bones restock slowly, so a stripped one is worth coming back to rather than dead forever. */
+  private restockBones(dt: number) {
+    for (const [id, left] of this.bonesMeat) if (left < 1) this.bonesMeat.set(id, Math.min(1, left + dt / 210));
+  }
+
   /** Where this player could teleport right now. */
   teleportOptions(i: number): TeleportOption[] {
     const p = this.players[i]; if (!p) return [];
@@ -1343,10 +1491,31 @@ export class Game implements AiWorld {
       out.push({ kind: band === 'giant' ? 'giant' : 'threat', dx: a.pos.x - p.pos.x, dz: a.pos.z - p.pos.z, distance: d, id: a.id, hunting });
     }
     for (const f of this.foodClusters(p, range)) out.push(f);
+    // Landmarks are the other thing the radar is for in an endless sea: with the shore and your
+    // nursery they are the only fixed points in it. Only within reach — a bearing, not a map.
+    for (const m of this.world.landmarks) {
+      const d = distXZ(m.pos, p.pos);
+      if (d < range * 1.4) out.push({ kind: 'landmark', dx: m.pos.x - p.pos.x, dz: m.pos.z - p.pos.z, distance: d, id: m.id, hunting: false });
+    }
     out.push({ kind: 'home', dx: p.home.x - p.pos.x, dz: p.home.z - p.pos.z, distance: distXZ(p.home, p.pos), id: -1, hunting: false });
     const sz = shoreZ(p.pos.x);
     out.push({ kind: 'shore', dx: 0, dz: sz - p.pos.z, distance: Math.abs(sz - p.pos.z), id: -1, hunting: false });
     return out;
+  }
+
+  /**
+   * Note where the players have been. Biomes are credited to whoever is standing in one; a
+   * landmark has to be swum up to, close enough that you have actually seen the thing.
+   */
+  private updateDiscovery() {
+    for (const p of this.players) {
+      if (!isAlive(p)) continue;
+      this.discovery.biomes.add(biomeAt(p.pos.x, p.pos.z));
+      for (const m of this.world.landmarks) if (distXZ(p.pos, m.pos) < m.radius + 14) this.discovery.landmarks.add(m.kind);
+      // Read the tier rather than hooking the moult, so an era that owns its own growth (the
+      // Devonian's standing rungs) records an apex the same way.
+      if (p.tier >= 4) this.discovery.apex.add(p.creature);
+    }
   }
 
   /**

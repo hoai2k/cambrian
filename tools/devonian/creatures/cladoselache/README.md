@@ -1,111 +1,55 @@
-# Cladoselache
+# Cladoselache V2
 
-An independently shaped Cleveland Shale early chondrichthyan for the Devonian specimen collection.
-The genus-level reconstruction represents a 1.5 m individual, not a claimed species maximum.
-It has a blunt rounded head, conspicuous lateral eyes, small terminal mouth with cladodont teeth,
-five paired gill slits, broad winglike paired fins, two dorsal fins, one curved anterior dorsal
-spine, a narrow keeled peduncle and a high-aspect-ratio crescent tail. There is no anal fin.
+An individually authored Cleveland Shale early chondrichthyan, rebuilt from the V1 silhouette and anatomical requirements. This is a genus-level reconstruction of a representative 1.5 m animal, not a fossil scan. See [anatomy-notes-v2.md](anatomy-notes-v2.md) for evidence and uncertainty and [material-provenance.md](material-provenance.md) for the original imagegen art.
 
-## Evidence and uncertainties
+## Anatomy and appearance
 
-[Frey et al. (2023)](https://link.springer.com/article/10.1186/s13358-023-00266-6)
-compare Cladoselache with Maghriboselache. Their comparison supports broad paired fins and a
-lunate tail. They explicitly identify the posterior dorsal spine of Cladoselache as hypothetical;
-this model omits it and retains the anterior curved spine. The model does not copy
-Maghriboselache's broad nasal specialisation or its reconstructed tail.
+The continuous body has a blunt compound nasal roof, a narrow V-shaped lower-jaw plan, dark lateral globes seated in the actual head, incised and softly curved gills, broad based paired fins, a narrow keeled peduncle, and a high aspect crescent tail. No orbital hoops, external gill cords, raised lateral cord or exposed fin spokes are used. The head surface and oral lining weld at their common aperture. A weighted palate, cheeks, floor and gradually narrowing deep passage form the interior. Cladodont central cusps have small accessory cusplets; each tooth uses the same weights as its gum attachment, including the mouth corners.
 
-The [2022 pelvic skeleton study](https://pmc.ncbi.nlm.nih.gov/articles/PMC9782884/)
-examines the relatively well-preserved pelvis of Cladoselache kepleri NHMUK PV P9269.
-[Case Western Reserve University's Hyde Collection](https://caslabs.case.edu/hyde-collection/historical-geology/)
-records Cleveland Shale examples, including CMNH5135 and food remains in another specimen.
-The [CMNH casting program](https://gsa.confex.com/gsa/2006NC/webprogram/Paper103585.html)
-describes the skin outline and soft-anatomy preservation of CMNH5371. These establish the
-Cleveland marine context; the asset is a synthesis, not a measurement or scan of any one fossil.
+One stout curved anterior dorsal spine is modeled. A posterior spine and anal fin are omitted. The broad fin roots lie within the body surface; skin-covered fin supports are represented by subtle camber and surface variation. The peduncular keels taper into the body and caudal root. Soft-tissue contours, pigmentation and animation are inferred. No modern shark scale coat or cutting dentition is asserted.
 
-Exact soft-tissue volume, colour and fin thickness are reconstructed. The cool blue-green
-countershading, sparse irregular mottling and subtle sensory line are artistic. Skin has fine
-low-amplitude relief without a fabricated dense covering of large modern shark denticles.
-Fin supports appear as fine covered ridges, not exposed bones. Teeth use small central cusps
-and accessory cusplets rather than serrated cutting blades. The visible details are an
-interpretation for a small rendered model, not a scientific restoration with diagnostic fidelity.
-No externally sourced or generated image is used as anatomical evidence. The packed 512 px
-normal bitmap is deterministically generated from numerical noise by the builder.
+Klug, Coates, Frey et al. (2023), [DOI 10.1186/s13358-023-00266-6](https://link.springer.com/article/10.1186/s13358-023-00266-6), is the accessible primary comparative source. Much of that paper concerns Maghriboselache; its specialized nasal architecture and posterior spine are not imported. Harris (1938) and Dean (1909) are original Cleveland studies cited through that comparison; original plate access was unavailable. The 2024 publisher correction concerns ZooBank registration only.
 
-## Build and assets
+## Authoring and exports
 
-Run from the repository root (tested with the installed Blender 5.2):
+Owned production files are `build.py`, `anatomy_v2.py`, `materials_v2.py`, `actions_v2.py`, the original `skin-source.png`, generated PBR maps, anchor manifest and review helpers/reports. `build.py` always writes locally to `../devonian-authoring/cladoselache/v2-candidate`; it does not publish assets.
+
+The editable Blender source is `../devonian-authoring/cladoselache/cladoselache-v2.blend`, with packed textures, named anatomical bone chains and individually authored actions. V1 source, Blender files and all seven published assets are preserved in `../devonian-authoring/cladoselache/v1/`, including published hashes. Candidate output consists of full and reduced GLBs, JSON metadata and four matching PNG portraits. Parent task packages and publishes after independent review.
+
+Run from the repo root:
 
 ```sh
-/Applications/Blender.app/Contents/MacOS/Blender --background --threads 2 --python tools/devonian/creatures/cladoselache/build.py
-/Applications/Blender.app/Contents/MacOS/Blender --background --threads 2 --python tools/devonian/creatures/cladoselache/render-all.py
-python3 tools/devonian/creatures/cladoselache/review.py
-node tools/devonian/check.mjs cladoselache
+/Applications/Blender.app/Contents/MacOS/Blender -b --threads 2 --python tools/devonian/creatures/cladoselache/build.py
 ```
 
-Only this creature's paths are written. The reusable rig/export/render plumbing is adapted
-from the Coccosteus builder; body cross-sections, fins, mouth, eyes, branchial details, skin,
-spine and caudal silhouette are authored specifically here. The source .blend, build log and
-individual pose renders are preserved in `../devonian-authoring/cladoselache/`; override that
-location with `DEVONIAN_AUTHORING`. Source geometry uses a continuous smooth loft, an oral
-pocket, shaped double-sided membranes, fitted oral rims and detailed covered fin supports.
+`CLADOSELACHE_QUICK=1` produces the same local GLBs plus two quick silhouette renders. `DEVONIAN_AUTHORING` can choose an alternative local authoring directory. No network or imagegen call is required to reproduce the source and runtime model from the committed material swatch.
 
-The full and reduced GLBs share the same 22-bone graph. Six serial posterior bones propagate
-a travelling propulsion wave; the caudal fin, two dorsal fins, paired pectorals and tips,
-pelvic fins, skull, jaw, throat and branchial controls move independently. The LOD is
-geometrically decimated to approximately 28% of the full triangles, retaining colour attributes.
-Parent integration applies lossless GLB compression and final cross-asset checks.
+The full model uses UV albedo, normal and roughness maps and neutral white `COLOR_0`. The original art contributes variation to mapped blue-gray dorsal pigment, warmer pale underside, soft fin color, dark eyes and recessed oral tissue. The reduced model retains atlas-sampled linear vertex pigment and removes all texture inputs. This avoids multiplying baked pigment twice in Three.js and keeps the reduced model colored after packaging.
 
-The three version-1 nested `cambrianAnchor` extras are attached to real bones:
-`anchor_mouth` → jaw, `anchor_mouth_inside` → skull, `anchor_attack_primary` → skull.
-Their points are provided in `anchors.json`. The exporter patch calculates exact bone-local
-coordinates from world bind positions and gives full/LOD the identical socket graph.
-The source uses +Z up, -Y forward and exports glTF +Y up, +Z forward. Root remains fixed.
+## Motion
 
-## Animation vocabulary
+All 18 required actions are separate: Idle, Swim, TurnLeft, TurnRight, Dive, Rise, Attack, Bite, Heavy, Hit, Death, Guard, Parry, Dodge, Eat, Stagger, Ability and Growth. Six sequential tail bones propagate a traveling wave into a distinct caudal fin bone. Pectoral tips follow with a delay; fins bank asymmetrically during turns, parry and dodge. Jaw and throat actions use different preparation, closure and recovery envelopes. Gills move subtly with oral/breathing motion. These are compatibility animations, not a Devonian gameplay specification.
 
-| Clip | Duration | Gesture |
-|---|---:|---|
-| Idle | 2.4 s | Soft caudal drift, breathing and balancing fin motion |
-| Swim | 2.4 s | Two travelling tail beats, delayed caudal response and fin adjustments |
-| TurnLeft / TurnRight | 1.6 s | Directional body bank and progressive tail bend |
-| Dive / Rise | 1.4 s | Smooth pitch with continuing propulsion and fin corrections |
-| Attack | 1.0 s | Preparatory pullback, opening mouth, forward impulse and recovery |
-| Bite | 0.5 s | Quick jaw gape and closure with skull/throat counter-motion |
-| Heavy | 1.1 s | Larger anticipatory gape and lateral strike with tail bracing |
-| Hit | 0.6 s | Short recoil and disturbed balance |
-| Death | 1.6 s | Diminishing undulation, relaxed fins and a held sideways terminal pose |
-| Guard | 1.0 s | Broad pectoral bracing, small pitch and breathing |
-| Parry | 0.35 s | Fast oblique deflection and return |
-| Dodge | 0.4 s | Side slip and strong asymmetric fin/tail correction |
-| Eat | 1.6 s | Repeated small oral cycles with restrained station holding |
-| Stagger | 1.2 s | Two balance disturbances with recovery |
-| Ability | 2.4 s | Acceleration and alternating bank display with spreading fins |
-| Growth | 1.5 s | Relaxed extension and breathing without scaling or moulting |
+Idle, Swim, Guard and Eat loop. One-shots return to their start transform; Death settles into a terminal pose and holds its final fifth. No scale tracks or animated root are exported. Parry's runtime duration is exactly 0.35 seconds; its 30 fps source samples are normalized during export because the endpoint falls between frames. The reduced GLB includes Idle, Swim and Death on the same 22-bone skeleton.
 
-Idle, Swim, Guard and Eat are seamless loops. All other actions return to neutral except Death,
-which holds its terminal pose. Keys are sampled at 30 fps (the 0.35 s action rounds to 10 frames).
-No animated scale or root-motion channels are exported. The vocabulary provides asset
-compatibility; it does not prescribe Devonian gameplay or claim that these behaviours are fossil evidence.
+The exact three version-1 nested anchor roles are retained: `anchor_mouth` on jaw, `anchor_mouth_inside` on skull, and `anchor_attack_primary` on skull. World bind locations in `anchors.json` are converted to actual exported parent-local socket transforms.
 
-## Review
+## Verification
 
-The builder checks normalized weights, finite posed geometry at five phases per clip,
-loop endpoints, constant roots and absence of animated scale. Four final portraits match
-the model, including 1600×1200 RGBA selection art and a 256×192 thumbnail.
-Local renders cover lateral Idle and Swim, frontal Eat, lateral Bite, oblique Heavy,
-frontal Ability, oblique Guard, lateral Dodge and held Death. `review.py` composes those
-renders into the committed `action-review.jpg` contact sheet. See `validation.json` for exact
-triangle counts, rig size and numerical checks. Final visual review results are appended below.
+`validation.json` records finite deformation bounds at every authored frame, action motion and loop seams, terminal Death hold, geometry reduction and asset sizes. `check-export.py` validates actual full/LOD GLB materials, vertex colors, normalized skin weights, distinct actions and root/scale policy. `audit-candidate.mjs` decodes the actual local GLBs for the shared independent `tools/devonian/eye-audit.py`; the head envelope excludes ornamental geometry. Fresh full and reduced eye-volume reports and hashes are included in the final handoff.
 
-The final geometry has **89,336 full triangles / 25,008 LOD triangles** (27.99%), 22 bones,
-18 distinct clips and three sockets. Before integration compression the exports are 5,224,400
-and 2,062,116 bytes. Shared structural intake passes normalized weights, finite geometry and
-poses, matching full/LOD skeletons and socket metadata, distinct motion, loop continuity,
-fixed roots, no animated scale, and portrait sizes/transparency. Review prompted fully closed
-fin membrane edges and a lower studio bounce light so reversed fins remain visible during
-the held terminal roll. Oral reviews sample the actual Eat and Heavy gape peaks.
+`review-viewer.mjs` loads the actual candidate bytes in Three.js while routing only this creature's asset requests locally. It tests independent cloned rigs and sockets using the shared runtime auditor, renders all 18 actions and extreme phases, neutral front/side/dorsal/eye views, a full-gape mouth view, and reduced Idle. It also records sequential all-action WebM playback. `review-source.py` renders matching close inspections from the Blender source. Static passes are accompanied by visual review; remaining reconstruction uncertainty is not a structural test failure.
 
-Final nine-pose contact-sheet inspection passed on 2026-09-06: the continuous mouth and
-cheeks remain attached through the gape, fins retain their silhouettes during banking, and
-the terminal pose holds without root drift. Reverse dorsal surfaces are intact and shaded
-by the body in the rolled pose; the lower bounce preserves their surface detail.
+```sh
+node tools/devonian/creatures/cladoselache/audit-candidate.mjs
+/Applications/Blender.app/Contents/MacOS/Blender -b --threads 2 --python tools/devonian/eye-audit.py -- ../devonian-authoring/cladoselache/eye-audit-full
+/Applications/Blender.app/Contents/MacOS/Blender -b --threads 2 --python tools/devonian/eye-audit.py -- ../devonian-authoring/cladoselache/eye-audit-lod
+python3 tools/devonian/creatures/cladoselache/check-export.py
+node tools/devonian/creatures/cladoselache/review-viewer.mjs
+```
+
+The viewer helper expects the repo's Vite server on port 5173, overridable with `QA_BASE_URL`. Set `CLADOSELACHE_QA_QUICK=1` to omit only the playback recording.
+
+## Published package review
+
+The independently reviewed package is 9,644,796 bytes full and 1,171,792 bytes reduced. Lossless compression preserves every decoded position, skin weight and animation sample. Fresh packaged eye-volume measurements are about 77% in both detail levels, with conservative lower confidence bounds above 76%. See `eye-packaged-review.json` for exact hashes and topology checks. The built viewer loaded all 18 actions; paused selection and one-frame stepping passed for each, the feeding gape was visually inspected, and no browser errors were reported (`main-viewer-review.json`). The Devonian suite passed all 410 checks.

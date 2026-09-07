@@ -36,25 +36,55 @@ and **M8 (polish) is complete except for two music files**:
 | Art | Shipped and integrated: brand, key art, tier and band glyphs, mode panels, loading motif, 21 transparent portraits, nine biome paintings, five radar glyphs, seven biome props. Briefs and paths in [`docs/image-requests-history.md`](../image-requests-history.md). |
 | Audio | Sound library, distance falloff, tension layer and soundtrack director shipped. **Outstanding:** `theme-calm.mp3` and `theme-danger.mp3` — the biome tags are already live in `music.ts`, the files are not there. See [`docs/audio-requests.md`](../audio-requests.md). |
 | Onboarding, rumble, quality tiers, viewer | Shipped (`hintFor()` in `src/sim/game.ts`, `rumble()` wired to hits, deaths, parries, grabs, tier-ups). |
+| Landmarks, co-op revive, spectating, the discovery record | Shipped; see below. |
 
 Designed but **not built** (nothing depends on them; listed so they are not
 mistaken for shipped):
 
 - A day/night cycle. `01-game-design.md` marks it optional, after core.
-- Hand-placed seeded landmarks — the sponge archway, the hoppable boulder stack,
-  the dead giant's carcass. The streamed world places scenery procedurally only.
-- Spectating: a dead player in versus gets no free camera.
-- Co-op revive by bumping a downed ally within 10 s. Co-op *does* share
-  nutrition from nearby kills.
 - The **View** button's scoreboard / map. The button is read (`view` in
   `src/input/input.ts`) and nothing consumes it.
 - Rotating who plays the giant in Hunter & Hunted — player 1 holds the role for
   the match.
-- The "biomes discovered" results page. Its nine paintings are already delivered
-  and are used behind the biome banner.
 - Swarm impostor billboards, from the technical plan's rendering section.
   Superseded: swarm members use the shared `*.lod1.glb` path instead, which met
   the performance targets.
+
+### Landmarks, spectating, revive and the record
+
+Four things the design called for and the first pass skipped are now in
+(`tools/world-test.ts` covers all four):
+
+- **Seeded landmarks.** `landmarkAt()` in `src/sim/world.ts` places one candidate
+  per 320-unit cell, purely from the seed, and the chunk containing it builds it:
+  an **arch** you swim under, a **stack** of boulders a crawler can climb, and a
+  dead giant's **bones**. Which kind depends on the biome, and roughly half the
+  cells draw a blank, so a landmark stays rare enough to navigate by. They clear
+  their own ground of scatter, appear on the radar, and survive into the far
+  view. The arch and the ribcage use `Boulder.floor`, a collision floor that lets
+  a creature pass under a raised span while a crawler can still climb over it.
+- **The bones are a feast and a magnet.** `Game.feedOnBones` feeds anything
+  that reaches the body at a rate scaled to the eater, depleting a pool that
+  restocks over about three and a half minutes; a hungry giant on patrol breaks
+  off and comes to it (`nearestBones` in `src/sim/ai.ts`). Standing on the best
+  food in the deep is therefore also standing where the giant is headed.
+- **Co-op revive.** A downed player in Rise stays down for ten seconds instead of
+  dissolving after three — but only when a team-mate was within 90 units when
+  they fell, so a partner across an endless sea does not leave them waiting for
+  somebody who was never coming. The body settles where it fell rather than
+  drifting up like a corpse, and a team-mate who reaches it brings them back with
+  their tier intact. The rescuer sees an arrow and a countdown; the downed player
+  sees **DOWN** instead of **EATEN**.
+- **Spectating.** A dead player in a versus mode watches the leader — whoever is
+  furthest along — rather than their own sinking body, with a `SPECTATING` label
+  naming them. Co-op deliberately does not: there you stay on your own body,
+  because somebody may be swimming toward it.
+- **The record.** `Game.discovery` notes the biomes the players swam through, the
+  landmarks they found and the species they took to Apex. The results screen
+  folds that into a per-era localStorage record (`src/app/codex.ts`) and shows
+  the whole set — found in full, unfound as silhouettes — with this match's finds
+  tagged NEW. The nine biome paintings, delivered long ago for exactly this page,
+  are finally what it is made of.
 
 ## Superseded sections
 

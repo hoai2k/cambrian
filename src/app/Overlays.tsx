@@ -1,12 +1,19 @@
 import { ACTIVE_ERA } from '../content';
-import { useEffect, useRef } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import type { HudSnapshot } from '../render/engine';
 import { creature } from '../sim/creatures';
 import type { PlayerSetup } from '../sim/types';
+import { BIOMES } from '../sim/world';
+import { biomeArtPath } from '../shared/environment-assets';
+import { appBase } from '../shared/base';
 import type { DialogKind, Settings } from './App';
 import { MODE_INFO } from './App';
+import { CreaturePortrait } from './CreaturePortrait';
+import { LANDMARK_BLURBS, LANDMARK_NAMES, loadCodex, mergeCodex, saveCodex, type Codex } from './codex';
 import { CloseIcon } from './icons';
 import { XboxDiagram } from './XboxDiagram';
+
+const LANDMARK_KINDS = ['arch', 'stack', 'bones'] as const;
 
 export function PauseMenu({ onResume, onChange, onQuit }: { onResume: () => void; onChange: () => void; onQuit: () => void }) {
   return (
@@ -25,6 +32,11 @@ export function PauseMenu({ onResume, onChange, onQuit }: { onResume: () => void
 }
 
 export function Results({ snapshot, players, onAgain, onChange, onTitle }: { snapshot: HudSnapshot; players: PlayerSetup[]; onAgain: () => void; onChange: () => void; onTitle: () => void }) {
+  // The record as it stood before this match, snapshotted once when the screen appears; the merge
+  // against it is pure, so re-rendering never eats the "NEW" marks (see codex.ts).
+  const [before] = useState(loadCodex);
+  const { codex, fresh } = useMemo(() => mergeCodex(before, snapshot.discovery), [before, snapshot.discovery]);
+  useEffect(() => { saveCodex(codex); }, [codex]);
   return (
     <div className="overlay">
       <div className="panel results">
@@ -40,12 +52,74 @@ export function Results({ snapshot, players, onAgain, onChange, onTitle }: { sna
             </div>
           ))}
         </div>
+        <Discoveries codex={codex} fresh={fresh} />
         <div className="menu-buttons">
           <button className="start-button" onClick={onAgain}>AGAIN <kbd>A</kbd></button>
           <button className="ghost" onClick={onChange}>Change creatures <kbd>X</kbd></button>
           <button className="ghost" onClick={onTitle}>Title <kbd>B</kbd></button>
         </div>
       </div>
+    </div>
+  );
+}
+
+/**
+ * The record: every biome in the sea, every kind of landmark, and every species that has been
+ * taken to Apex. What the player has found is shown in full; what they have not is a silhouette,
+ * so the page is a map of what is left rather than a list of what happened. Anything this match
+ * added is called out as new.
+ */
+function Discoveries({ codex, fresh }: { codex: Codex; fresh: Codex }) {
+  const base = appBase();
+  const seenBiome = new Set(codex.biomes), newBiome = new Set(fresh.biomes);
+  const seenMark = new Set(codex.landmarks), newMark = new Set(fresh.landmarks);
+  const newApex = new Set(fresh.apex);
+  const roster = ACTIVE_ERA.creatures;
+  return (
+    <div className="discoveries">
+      <div className="discovery-head">
+        <p className="eyebrow">DISCOVERED</p>
+        <span>{seenBiome.size}/{BIOMES.length} biomes · {seenMark.size}/{LANDMARK_KINDS.length} landmarks · {codex.apex.length}/{roster.length} at Apex</span>
+      </div>
+
+      <ul className="biome-strip">
+        {BIOMES.map((b) => {
+          const seen = seenBiome.has(b);
+          return (
+            <li key={b} className={`biome-card ${seen ? 'found' : 'unfound'} ${newBiome.has(b) ? 'fresh' : ''}`}>
+              {seen && <img src={`${base}${biomeArtPath(b)}`} alt="" loading="lazy" />}
+              <b>{seen ? ACTIVE_ERA.environment.biomeNames[b] : '???'}</b>
+              {newBiome.has(b) && <span className="new-tag">NEW</span>}
+            </li>
+          );
+        })}
+      </ul>
+
+      <ul className="landmark-strip">
+        {LANDMARK_KINDS.map((k) => {
+          const seen = seenMark.has(k);
+          return (
+            <li key={k} className={`landmark-card ${seen ? 'found' : 'unfound'} ${newMark.has(k) ? 'fresh' : ''}`}>
+              <b>{seen ? LANDMARK_NAMES[k] : 'Not found yet'}</b>
+              <small>{seen ? LANDMARK_BLURBS[k] : 'Somewhere out there.'}</small>
+              {newMark.has(k) && <span className="new-tag">NEW</span>}
+            </li>
+          );
+        })}
+      </ul>
+
+      <ul className="apex-strip">
+        {roster.map((c) => {
+          const seen = codex.apex.includes(c.id);
+          return (
+            <li key={c.id} className={`apex-card ${seen ? 'found' : 'unfound'} ${newApex.has(c.id) ? 'fresh' : ''}`} title={seen ? `${c.name} · reached Apex` : `${c.name} · not yet at Apex`}>
+              <CreaturePortrait creatureId={c.id} kind="thumb" assetBase={base} alt={c.name} loading="lazy" />
+              <span>{c.name}</span>
+              {newApex.has(c.id) && <span className="new-tag">NEW</span>}
+            </li>
+          );
+        })}
+      </ul>
     </div>
   );
 }

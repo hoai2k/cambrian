@@ -2,11 +2,30 @@ import type { Vec3 } from '../../shared/math';
 import type { Game } from '../game';
 import type { Actor } from '../types';
 
-/** Life stages. Nobody leaves their rung; Prime is a standing reward, not a size class. */
-export const STAGES = ['Young', 'Adult', 'Prime'] as const;
-export const STAGE_SCALE = [0.6, 1.0, 1.2] as const;
+/**
+ * Life stages. Nobody leaves their rung: a Hatchling Dunkleosteus is a small fish that grows, with
+ * each moult, into the giant; Prime is the standing reward past adult size. Growth is geometric —
+ * every moult multiplies the body by the same factor — from a hatchling no shorter than
+ * MIN_HATCH_LENGTH (the engine's smallest playable body) to the adult, then a third again for Prime.
+ */
+export const STAGES = ['Hatchling', 'Juvenile', 'Young', 'Adult', 'Prime'] as const;
+export const ADULT_STAGE = 3, PRIME_STAGE = 4;
+export const PRIME_SCALE = 1.35;
+export const MIN_HATCH_LENGTH = 0.6, HATCH_FRACTION = 0.2;
 /** Standing at which each stage is reached. */
-export const STAGE_AT = [0, 25, 60] as const;
+export const STAGE_AT = [0, 12, 30, 55, 85] as const;
+/** Body scale (of adult length) at `stage` for a creature of adult length `adultLength`. */
+export function stageScale(adultLength: number, stage: number): number {
+  if (stage >= PRIME_STAGE) return PRIME_SCALE;
+  const s0 = Math.min(0.75, Math.max(HATCH_FRACTION, MIN_HATCH_LENGTH / adultLength));
+  return Math.pow(s0, 1 - Math.max(0, stage) / ADULT_STAGE);          // s0 → 1 over the four moults to adult
+}
+/** The stage a body of `scale` is in (the largest stage whose scale it has reached). */
+export function stageForScale(adultLength: number, scale: number): number {
+  let best = 0;
+  for (let i = 0; i <= PRIME_STAGE; i++) if (scale >= stageScale(adultLength, i) - 1e-6) best = i;
+  return best;
+}
 export const RUNG_NAMES = ['', 'Floor', 'Shoal', 'Hunters', 'Giants'] as const;
 export const DOMINANT = 100;
 export const HOLD_TO_WIN = 90;
@@ -16,7 +35,7 @@ export interface DeadZone { pos: Vec3; r: number; age: number; life: number; dri
 /** Per-actor Devonian state, kept beside the shared Actor rather than on it. */
 export interface DevActor {
   standing: number;
-  stage: 0 | 1 | 2;
+  stage: number;               // index into STAGES
   air: number;                 // 0..1 for air breathers
   gulpT: number;               // seconds since the last gulp
   inRange: boolean; rangeT: number;

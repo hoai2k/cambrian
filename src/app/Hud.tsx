@@ -113,11 +113,34 @@ function PlayerPanel({ p }: { p: PlayerHud }) {
       )}
       {!p.modelReady && p.alive && <p className="hint">Your creature is taking shape…</p>}
       {p.hint && p.hunterState === 'none' && p.modelReady && <p className="hint">{p.hint}</p>}
+      {/* Co-op: where a team-mate went down, and how long is left to reach them. */}
+      {p.downedAllies.map((d) => (
+        <div key={d.index} className="downed-arrow" style={{ color: d.color, transform: `rotate(${Math.atan2(d.x, -d.y) * 180 / Math.PI}deg)` }} aria-hidden>
+          <svg viewBox="0 0 24 24"><path d="M12 3 L18 15 L12 12 L6 15 Z" fill="currentColor" /></svg>
+        </div>
+      ))}
+      {p.downedAllies.length > 0 && (
+        <div className="downed-call">
+          {p.downedAllies.map((d) => (
+            <p key={d.index} style={{ ['--player' as string]: d.color }}>
+              <b>P{d.index + 1} is down</b>
+              <span>{d.progress > 0 ? 'Hold still — getting them up' : `${fmtDist(d.distance)} · reach them in ${Math.ceil(d.seconds)} s`}</span>
+              <i className="revive-bar" style={{ transform: `scaleX(${d.progress})` }} />
+            </p>
+          ))}
+        </div>
+      )}
       <div className="fade" style={{ opacity: p.fade }} />
+      {p.spectating && !p.alive && (
+        <div className="spectating"><b>SPECTATING</b><span style={{ color: p.spectating.color }}>{p.spectating.name} · {creature(p.spectating.creature).name}</span></div>
+      )}
       {!p.alive && p.fade < 0.9 && (
         <div className="dead-overlay">
-          <b>EATEN</b>
-          <span>Back in a moment… you slip down a tier.</span>
+          <b>{p.downedFor > 0 ? 'DOWN' : 'EATEN'}</b>
+          <span>{p.downedFor > 0
+            ? (p.reviveProgress > 0 ? 'Someone is getting you up…' : `Hold on — a team-mate can get you up. ${Math.ceil(p.downedFor)} s`)
+            : 'Back in a moment… you slip down a tier.'}</span>
+          {p.downedFor > 0 && <i className="revive-bar wide" style={{ transform: `scaleX(${p.reviveProgress})` }} />}
         </div>
       )}
     </>
@@ -144,6 +167,13 @@ function Radar({ radar, biome }: { radar: PlayerHud['radar']; biome: string }) {
       return <g key={k} className={cls} style={{ color: b.color }}>
         {b.beyond ? <circle cx={C + b.x * R} cy={C + b.y * R} r={3.5} fill="none" stroke="currentColor" strokeWidth="1.2" strokeDasharray="2 1.5" />
           : <circle cx={x} cy={y} r={rr} fill="currentColor" fillOpacity=".18" stroke="currentColor" strokeWidth=".9" strokeDasharray="2 1.5" />}
+      </g>;
+    }
+    if (b.kind === 'landmark') {
+      // A small hollow diamond: a place, not a creature. Drawn inline rather than as a glyph
+      // asset so an era that has no landmark artwork still gets the mark.
+      return <g key={k} className={cls} style={{ color: b.color }}>
+        <path d={`M ${x} ${y - 3.6} L ${x + 3.2} ${y} L ${x} ${y + 3.6} L ${x - 3.2} ${y} Z`} fill="none" stroke="currentColor" strokeWidth="1.3" />
       </g>;
     }
     if (b.kind === 'food') {

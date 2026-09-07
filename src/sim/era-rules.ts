@@ -35,8 +35,13 @@ export interface EraRules {
   install(): void;
   /** The Y button's own special for this creature, when the era gives it one instead of the shared hide. */
   ySpecial(id: CreatureId): { name: string; desc: string } | undefined;
-  /** Starting body scale for the player or bot at `index` in `mode`. */
-  startScale(mode: Mode, index: number): number;
+  /** Starting body scale for the player or bot at `index` in `mode`, for creature `id`. */
+  startScale(mode: Mode, index: number, id: CreatureId): number;
+  /**
+   * Where a player or bot hatches, given the nursery centre; undefined leaves the shared placement.
+   * The Devonian puts every hatchling inside plant cover, on the floor or up a column.
+   */
+  spawnPoint(g: Game, center: Vec3, id: CreatureId, scale: number, index: number): Vec3 | undefined;
   init(g: Game): void;
   /** After every fixed step, before the events are drained by the renderer. */
   step(g: Game, dt: number): void;

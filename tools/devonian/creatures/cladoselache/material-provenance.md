@@ -1,0 +1,7 @@
+# Original material art
+
+`skin-source.png` was generated specifically for Cladoselache with the built-in imagegen tool on 2026-09-07. Original retained at `/Users/hoai/.codex/generated_images/01a0794c-8e3b-76f1-9b05-e99f98297c86/exec-2e59f1ed-e74f-4638-a3cc-e5c9e97ce697.png`.
+
+Prompt: Create an original seamless flat albedo texture swatch for a high-quality scientifically informed 3D reconstruction of the Devonian early chondrichthyan Cladoselache. MATERIAL ART ONLY, not an anatomical reference. Entire square filled with fine smooth leathery aquatic skin, slate blue-gray and subdued petrol teal with softly irregular warm gray mottling. Fine pigment clouds, tiny subdued speckling, delicate loose marbling. No distinct scales, tiles, hexagons, armor, cracks, recognizable animal, anatomy, text, watermark, lighting highlights, cast shadows, perspective or border. Even diffuse illumination, mostly medium-light desaturated slate blue, not black or metallic.
+
+`materials_v2.py` maps this original art into body countershading and fin pigmentation, adds a distinct oral region and dark globe map, and derives restrained normal/roughness maps. No fossil photograph is used as a texture. Full exports use neutral white vertex color, so the texture is not multiplied by duplicate pigment. Reduced exports sample the final atlas into linear vertex color before texture removal. Pigmentation and soft-tissue roughness remain artistic inference.

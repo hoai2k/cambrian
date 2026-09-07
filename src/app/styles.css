@@ -159,6 +159,23 @@ h3 { font-size: 13px; letter-spacing: .12em; color: var(--ember); margin: 14px 0
 .dead-overlay b { font: 900 3em var(--font-display); letter-spacing: .1em; color: var(--coral); }
 .dead-overlay span { color: var(--mist); }
 
+/* Co-op: a downed team-mate. An arrow pinned to the middle of the viewport pointing the way,
+   and a call-out with the seconds left to reach them. */
+.downed-arrow { position: absolute; left: 50%; top: 50%; width: 3.4em; height: 3.4em; margin: -1.7em 0 0 -1.7em; pointer-events: none; opacity: .9; filter: drop-shadow(0 0 6px currentColor); animation: downed-pulse 1.1s ease-in-out infinite; }
+.downed-arrow svg { width: 100%; height: 100%; transform: translateY(-2.6em); }
+@keyframes downed-pulse { 50% { opacity: .45; } }
+.downed-call { position: absolute; left: 50%; top: 4.2em; transform: translateX(-50%); display: grid; gap: .3em; text-align: center; pointer-events: none; }
+.downed-call p { margin: 0; padding: .45em 1em; border-radius: 1em; background: rgba(6,22,28,.78); border: 1px solid var(--player); display: grid; gap: .1em; }
+.downed-call b { color: var(--player); font-size: .95em; letter-spacing: .04em; }
+.downed-call span { color: var(--mist); font-size: .8em; }
+.revive-bar { display: block; height: 3px; margin-top: .3em; border-radius: 2px; background: var(--player, #61f2d5); transform-origin: left; transition: transform .08s linear; }
+.revive-bar.wide { width: min(40vw, 260px); height: 4px; margin-top: .6em; }
+
+/* Versus: whose game you are watching while you are dead. */
+.spectating { position: absolute; left: 50%; bottom: 2.2em; transform: translateX(-50%); display: grid; justify-items: center; gap: .15em; padding: .5em 1.2em; border-radius: 1em; background: rgba(6,22,28,.7); border: 1px solid rgba(238,250,246,.22); pointer-events: none; }
+.spectating b { font: 900 .8em var(--font-display); letter-spacing: .18em; color: var(--mist); }
+.spectating span { font-weight: 700; }
+
 /* radar */
 .radar { position: absolute; right: 1.4em; top: 1.2em; width: 9.5em; height: 9.5em; }
 .radar svg { width: 100%; height: 100%; overflow: visible; }
@@ -193,12 +210,44 @@ h3 { font-size: 13px; letter-spacing: .12em; color: var(--ember); margin: 14px 0
 /* ---------- Overlays ---------- */
 .overlay { position: absolute; inset: 0; z-index: 20; display: grid; place-items: center; background: rgba(6,22,28,.55); backdrop-filter: blur(6px); animation: fade-in .25s both; }
 .panel { width: min(92vw, 640px); padding: 28px 30px; border-radius: 22px; background: rgba(6,22,28,.8); border: 1px solid rgba(238,250,246,.14); box-shadow: 0 30px 90px rgba(0,0,0,.5); }
-.panel.results { width: min(94vw, 820px); }
+.panel.results { width: min(94vw, 820px); max-height: 92vh; overflow-y: auto; overscroll-behavior: contain; }
 .menu-buttons { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 22px; align-items: center; }
 .result-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 10px; margin-top: 18px; }
 .result-card { display: grid; gap: 4px; padding: 14px; border-radius: 14px; background: rgba(238,250,246,.05); border-top: 3px solid var(--player); }
 .result-card b { font: 700 16px var(--font-display); }
 .result-card small { color: var(--dim); }
+
+/* ---------- The record: biomes, landmarks and species taken to Apex ---------- */
+/* The record can be long; it scrolls inside the panel so AGAIN and Title never leave the screen. */
+.discoveries { margin-top: 20px; padding-top: 16px; border-top: 1px solid rgba(238,250,246,.12); display: grid; gap: 12px; align-content: start; max-height: 42vh; overflow-y: auto; overscroll-behavior: contain; scrollbar-width: thin; padding-right: 4px; }
+.discovery-head { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+.discovery-head .eyebrow { margin: 0; }
+.discovery-head span { color: var(--dim); font-size: 13px; }
+.discoveries ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+.discoveries .new-tag { position: absolute; top: 4px; right: 4px; padding: 1px 5px; border-radius: 6px; background: var(--ember, #ffb36b); color: #06161c; font: 800 9px/1.4 var(--font-display); letter-spacing: .08em; }
+
+.biome-strip { grid-template-columns: repeat(auto-fit, minmax(108px, 1fr)); }
+.biome-card { position: relative; aspect-ratio: 16 / 10; border-radius: 10px; overflow: hidden; background: rgba(238,250,246,.05); border: 1px solid rgba(238,250,246,.1); display: grid; align-items: end; }
+.biome-card img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.biome-card b { position: relative; padding: 4px 6px; font: 700 10px/1.2 var(--font-display); text-shadow: 0 1px 4px rgba(0,0,0,.9); background: linear-gradient(transparent, rgba(6,22,28,.85)); }
+.biome-card.unfound { border-style: dashed; }
+.biome-card.unfound b { color: var(--dim); background: none; }
+.biome-card.fresh, .landmark-card.fresh, .apex-card.fresh { border-color: var(--ember, #ffb36b); box-shadow: 0 0 0 1px var(--ember, #ffb36b); }
+
+.landmark-strip { grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); }
+.landmark-card { position: relative; display: grid; gap: 2px; padding: 10px 12px; border-radius: 10px; background: rgba(238,250,246,.05); border: 1px solid rgba(238,250,246,.1); }
+.landmark-card b { font: 700 13px var(--font-display); }
+.landmark-card small { color: var(--dim); font-size: 11px; }
+.landmark-card.unfound { border-style: dashed; }
+.landmark-card.unfound b { color: var(--dim); }
+
+.apex-strip { grid-template-columns: repeat(auto-fit, minmax(74px, 1fr)); }
+.apex-card { position: relative; display: grid; justify-items: center; gap: 2px; padding: 4px; border-radius: 10px; border: 1px solid transparent; }
+.apex-card img { width: 100%; max-width: 54px; aspect-ratio: 4 / 3; object-fit: contain; }
+.apex-card span { font-size: 9px; color: var(--dim); text-align: center; line-height: 1.2; max-width: 100%; overflow-wrap: anywhere; }
+.apex-card.unfound img { filter: grayscale(1) brightness(.32) contrast(.6); opacity: .5; }
+.apex-card.found { background: rgba(238,250,246,.06); }
+.apex-card.found span { color: var(--foam); }
 
 /* ---------- Dialogs ---------- */
 .tools-dialog { position: fixed; inset: 0; margin: auto; width: min(94vw, 900px); max-height: 92vh; padding: 0; border: 1px solid rgba(238,250,246,.16); border-radius: 24px; background: rgba(6,22,28,.92); color: var(--foam); box-shadow: 0 40px 100px rgba(0,0,0,.6); overflow: auto; }
@@ -399,6 +448,15 @@ input[type='checkbox'] { width: 20px; height: 20px; accent-color: var(--ember); 
 .title-illustrated .title-inner { width: 100%; padding: 24px 24px max(80px, env(safe-area-inset-bottom)); text-shadow: 0 2px 3px #000, 0 0 10px #000, 0 0 22px rgba(0,0,0,.85); }
 .title-illustrated .title-hint { color: #d6ddd7; }
 .title-illustrated .title-tag { margin: 8px 0 18px; }
+
+/* The other era, bottom left of the title screen. Small, out of the way of the artwork, and the
+   one thing on this screen that is not "press start". */
+.era-switch { position: absolute; left: max(18px, env(safe-area-inset-left)); bottom: max(18px, env(safe-area-inset-bottom)); z-index: 3; display: grid; gap: 1px; padding: 10px 14px; border-radius: 14px; text-decoration: none; color: var(--foam); background: rgba(6,22,28,.6); border: 1px solid rgba(238,250,246,.18); backdrop-filter: blur(6px); transition: background .18s, border-color .18s, transform .18s; }
+.era-switch:hover, .era-switch:focus-visible { background: rgba(6,22,28,.82); border-color: var(--ember); transform: translateY(-2px); }
+.era-switch b { font: 800 14px var(--font-display); letter-spacing: .01em; }
+.era-switch-eyebrow { font: 800 9px var(--font-display); letter-spacing: .16em; color: var(--ember); }
+.era-switch-blurb { font-size: 11px; color: var(--dim); }
+@media (max-width: 560px) { .era-switch { padding: 8px 11px; } .era-switch b { font-size: 12px; } .era-switch-blurb { display: none; } }
 .title-illustrated .press-start { margin: 14px 0; }
 .loading-illustrated .loading-inner { width: min(92vw, 780px); }
 .loading-illustrated .title-logo.small .illustrated-logo { width: 100%; max-height: calc(100svh - 220px); object-fit: contain; }
