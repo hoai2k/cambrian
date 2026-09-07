@@ -8,6 +8,7 @@ import { emptyInput } from '../src/sim/types';
 import { Game } from '../src/sim/game';
 import { makeBrain } from '../src/sim/ai';
 import { SURFACE_Y } from '../src/sim/world';
+import { HEAVY_SPECIALS } from '../src/sim/concealment';
 
 assert.equal(CREATURES.length, 21);
 assert.equal(new Set(CREATURES.map(c => c.id)).size, 21);
@@ -111,8 +112,11 @@ for(const id of ['burgessomedusa','ctenorhabdotus'] as const){
   }
   // Cooldown and exhaustion are what the prompt greys out for, not the pounce's timers.
   const g = new Game('reef', [{ creature: 'opabinia', device: 'keyboard', ready: true }], 92), a = g.players[0];
+  // A special on cooldown no longer greys the prompt out: RT falls through to the pounce, so the
+  // prompt has to name that instead of a move the button would not play.
   a.abilityCd = 2; a.stamina = a.staminaMax;
-  assert(!g.heavyMove(a).ready, 'a special on cooldown still advertises itself');
+  assert.equal(g.heavyMove(a).name, 'POUNCE', 'a special on cooldown still advertises itself');
+  assert(g.heavyMove(a).ready, 'the pounce RT falls through to reads as unavailable');
   a.abilityCd = 0; a.stamina = 4;
   assert(!g.heavyMove(a).ready, 'a special with no stamina still advertises itself');
   // A filter feeder's heavy never strikes a target, so the prompt must never offer one.
@@ -124,4 +128,30 @@ for(const id of ['burgessomedusa','ctenorhabdotus'] as const){
   }
 }
 
-console.log('PASS: 21 unique options, 13 abilities, ally safety, finite state, armor piercing, one hit per activation, hide cancellation, movement, all-tier feeding, and the heavy prompt matching the move.');
+// --- RT always does something: the special when it is ready, the heavy attack or a pounce when
+// it is not. The eight creatures whose special sits on RT used to swallow the press entirely
+// while the special cooled down, so their `heavy` move was unreachable for a player. ---
+{
+  const HEAVY_SPECIAL_IDS = EXPANSION_CREATURES.filter((d) => HEAVY_SPECIALS.has(d.ability)).map((d) => d.id);
+  assert(HEAVY_SPECIAL_IDS.length > 0, 'no creatures carry a special on RT');
+  for (const id of HEAVY_SPECIAL_IDS) {
+    const g = new Game('reef', [{ creature: id, device: 'keyboard', ready: true }], 91);
+    const p = g.players[0];
+    p.spawnProtect = 0; p.pos = { x: 0, y: 6, z: 0 };
+    const press = (held: boolean) => g.step(1 / 60, new Map([[0, { ...emptyInput(), heavy: held }]]));
+    // first press: the special
+    press(true); press(false);
+    assert.equal(p.state, 'ability', `${id}: RT did not start the special (state=${p.state})`);
+    // run it out, then press again while it is still cooling down
+    for (let i = 0; i < 60 * 6 && (p.state !== 'free' || p.abilityCd <= 0); i++) press(false);
+    assert(p.state === 'free' && p.abilityCd > 0, `${id}: no cooling-down window to test (state=${p.state} cd=${p.abilityCd.toFixed(2)})`);
+    const stamina = p.stamina;
+    press(true); press(false);
+    assert(p.state === 'attack' || p.state === 'pounce',
+      `${id}: RT was swallowed while the special cooled down (state=${p.state})`);
+    assert(p.stamina < stamina, `${id}: RT cost nothing, so nothing happened`);
+    if (p.state === 'attack') assert.equal(p.moveKind, 'heavy', `${id}: RT fell back to something other than the heavy`);
+  }
+}
+
+console.log('PASS: 21 unique options, 13 abilities, ally safety, finite state, armor piercing, one hit per activation, hide cancellation, movement, all-tier feeding, the heavy prompt matching the move, and the RT fallback.');

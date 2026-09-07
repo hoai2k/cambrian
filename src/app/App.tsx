@@ -179,6 +179,16 @@ export function App() {
     audio.play('ui-back');
   }, [go, setPausedBoth, updatePlayers]);
 
+  /**
+   * Carry the finished match on instead of restarting it. Only the co-op modes offer this: the sea,
+   * the bodies and everything grown in them stay exactly as they were, and the goal stops watching.
+   */
+  const keepPlaying = useCallback(() => {
+    if (!engineRef.current?.continueMatch()) return;
+    setPausedBoth(false);
+    go('playing');
+  }, [go, setPausedBoth]);
+
   const playAgain = useCallback(() => {
     if (!engineRef.current) return;
     engineRef.current.startMatch(modeRef.current, playersRef.current);
@@ -295,6 +305,7 @@ export function App() {
           if (just('ability')) backToTitle();
         } else if (s === 'results') {
           if (just('confirm')) playAgain();
+          if (just('ability')) keepPlaying();
           if (just('heavy')) backToSelect();
           if (just('back')) backToTitle();
         }
@@ -314,7 +325,7 @@ export function App() {
     // padIndices is deliberately not a dependency: it is written from inside this loop, and
     // listing it would tear the loop down and rebuild it every time a pad connects, losing the
     // button edges held in `prev`.
-  }, [addPlayer, backToSelect, backToTitle, changeMode, moveCursor, openDialog, playAgain, removePlayer, setPausedBoth, startFromTitle, startMatch, toggleReady]);
+  }, [addPlayer, backToSelect, backToTitle, changeMode, keepPlaying, moveCursor, openDialog, playAgain, removePlayer, setPausedBoth, startFromTitle, startMatch, toggleReady]);
 
   // ---- Keyboard menu navigation ----
   useEffect(() => {
@@ -351,12 +362,13 @@ export function App() {
       }
       if (s === 'results') {
         if (e.code === 'Enter') playAgain();
+        if (e.code === 'Space') keepPlaying();
         if (e.code === 'Escape') backToSelect();
       }
     };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
-  }, [addKeyboard, backToSelect, backToTitle, changeMode, moveCursor, openDialog, playAgain, setPausedBoth, startFromTitle, startMatch, toggleReady]);
+  }, [addKeyboard, backToSelect, backToTitle, changeMode, keepPlaying, moveCursor, openDialog, playAgain, setPausedBoth, startFromTitle, startMatch, toggleReady]);
 
   // Idle-time preloading: tell the loader what is most likely to be needed next.
   useEffect(() => {
@@ -397,7 +409,7 @@ export function App() {
 
       {(screen === 'playing' || screen === 'results') && hud && <Hud snapshot={hud} />}
       {screen === 'playing' && paused && <PauseMenu scheme={scheme} onResume={() => setPausedBoth(false)} onChange={backToSelect} onQuit={backToTitle} />}
-      {screen === 'results' && hud && <Results snapshot={hud} players={players} scheme={scheme} onAgain={playAgain} onChange={backToSelect} onTitle={backToTitle} />}
+      {screen === 'results' && hud && <Results snapshot={hud} players={players} scheme={scheme} onAgain={playAgain} onContinue={keepPlaying} onChange={backToSelect} onTitle={backToTitle} />}
 
       <Toolbar isFs={isFs} muted={settings.muted} onHelp={() => openDialog(dialog === 'help' ? null : 'help')} onSettings={() => openDialog(dialog === 'settings' ? null : 'settings')} onMute={() => setSettings((s) => ({ ...s, muted: !s.muted }))} onFullscreen={toggleFullscreen} />
       <Dialogs kind={dialog} onClose={() => openDialog(null)} settings={settings} onSettings={setSettings} scheme={scheme} />
