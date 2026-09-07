@@ -135,7 +135,7 @@
     "category": "creature",
     "modelStatus": "preview",
     "provenance": "Early Devonian (Emsian), Hunsrück Slate, Germany",
-    "description": "Low, broad rhenanid placoderm with a mosaic of small armour elements, undulating pectoral margins and upward-looking eyes and mouth.",
+    "description": "Broad, sculpted rhenanid with dorsal eyes and mouth, small mosaic armour and a long finless tail; tail-driven swimming with restrained pectoral trim.",
     "model": "assets/devonian/creatures/gemuendina.glb",
     "lod": "assets/devonian/creatures/gemuendina.lod1.glb",
     "image": "assets/devonian/creatures/gemuendina.thumb.png",
@@ -167,7 +167,9 @@
       "A finless tapering tail follows the illustrated specimen account; generic shark dorsal/caudal fins, fin spokes, ventral gill rows and sting are omitted.",
       "Living thickness, soft-tissue cavity, exact denticle/tessera arrangement, fin flexibility, pigmentation and motions are explicit reconstruction choices.",
       "0.30 m is a representative reconstructed length close to the illustrated 304 mm specimen, not a claimed species maximum.",
-      "All action names are compatibility labels for specimen gestures; no Devonian gameplay rules are prescribed."
+      "All action names are compatibility labels for specimen gestures; no Devonian gameplay rules are prescribed.",
+      "V3 living mass and regional pigmentation follow user art direction as explicit interpretations; accepted clay-02 volume is retained except for the documented continuous orbital integration correction.",
+      "Seven sequential axial tail segments provide locomotor waves; limited pectoral-edge motion steers and trims the body."
     ]
   },
   {
