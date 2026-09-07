@@ -46,6 +46,13 @@ for (const files of Object.values(DEVONIAN_SAMPLES)) for (const f of files) ok(f
 ok(fs.existsSync(`public/${DEVONIAN.assets.illustration}`) && fs.existsSync(`public/${DEVONIAN.assets.emblem}`), 'brand art present');
 const shipped = JSON.parse(fs.readFileSync('tools/devonian/shipped.json', 'utf8')).creatures as string[];
 ok(shipped.every((id) => DEVONIAN_SHIPPED.includes(id)) && DEVONIAN_SHIPPED.length === shipped.length, `asset-sizes.json covers every shipped specimen (${shipped.length}); regenerate it when a delivery lands`);
+// Every animal carries the everyday group it belongs to, plus the sentence that explains the
+// group — that is what the HUD, the select card and the viewer show beside an unfamiliar genus.
+// See docs/research/devonian-classification.md.
+for (const c of DEVONIAN.creatures) {
+  ok(!!c.kind && c.kind.length <= 20, `${c.id} has a short everyday group (${c.kind ?? 'missing'})`);
+  ok(!!c.kindNote && c.kindNote.length > 40, `${c.id}'s group is explained in a sentence`);
+}
 for (const c of DEVONIAN.creatures) {
   const standIn = DEVONIAN.assets.standIns?.[c.id];
   if (DEVONIAN_SHIPPED.includes(c.id)) ok(!standIn, `${c.id} is delivered and uses its own model`);

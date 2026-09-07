@@ -94,6 +94,9 @@ h1, h2, h3 { font-family: var(--font-display); margin: 0; }
 .collection-pick { display: block; margin-top: 10px; }
 .collection-pick select { width: 100%; padding: 7px; border-radius: 7px; background: #102e37; color: var(--foam); border: 1px solid var(--line); font: inherit; font-size: 12px; }
 .specimen-description, .specimen-scale { font-size: 12px; color: var(--mist); }
+/* The everyday group, so an unfamiliar genus still lands somewhere familiar. */
+.kind-line { display: flex; align-items: baseline; gap: .5em; margin: 0 0 4px; font-size: 12px; color: var(--mist); font-style: italic; }
+.kind { padding: 1px 7px; border-radius: 8px; background: rgba(97,242,213,.16); border: 1px solid rgba(97,242,213,.5); color: var(--foam); font: 700 11px var(--font-display); font-style: normal; letter-spacing: .04em; }
 .specimen-downloads { display: flex; gap: 14px; font-size: 12px; }
 .specimen-downloads a { color: var(--lagoon); }
 .info { max-height: calc(100vh - 300px); overflow: auto; }
