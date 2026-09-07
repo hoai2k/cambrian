@@ -2,7 +2,7 @@
 
 Repository `/Users/hoai/Documents/Stuff/Generations/cambrian/local/expansion-repo`, branch
 `devonian-assets`. Separate main worktree `../devonian-publish`. Last verified remote publication
-**e673f0e** (main and devonian-assets pushed), including concurrent remote **f069010**. Preserve
+**7c72eb3** (main and devonian-assets pushed), including concurrent remote **60d7520**. Preserve
 checkpoints and verify before publication; never force push. Fetch/push `git@github.com:hoai2k/cambrian.git`.
 Other agents change main concurrently. Do not stage active authors' mutable files.
 
@@ -12,7 +12,7 @@ All **21 initial Devonian creatures** and the complete initial non-creature libr
 Non-creature milestone was **f7b5618**; user received the requested separate notification.
 47 props/plants, 11 runtime proxies, 9 biome paintings, 29 scenery boards, 9 regional boards,
 3 lighting concepts, 10 material sets, 2 atmosphere atlases, 2 scale plates. See supporting-assets.md.
-Four Devonian models are final, 17 preview. Gemuendina V3 review complete and integrated locally; publication pending below. All pending reworks remain preview in game/viewer.
+Four Devonian models are final, 17 preview. Gemuendina V3 review complete, published and post-main viewer verified. All pending reworks remain preview in game/viewer.
 Dunkleosteus already has modeled oral interior and independently animated jaws.
 
 Finish seven full reworks before the 12 other individual refinements: **Gemuendina, Titanichthys,
@@ -41,15 +41,20 @@ executors stop unexpected failures and preserve output. They do not make creativ
   Gemu default scheme set to authored default; actual reload confirmed olive pigment/readable eyes.
   Intake184612/47044triangles,18clips,3sockets PASS; build/typecheck/643Devonian PASS.
   Astra inspected all54action PNGs and audit03, final-art-verdict.md accepts exact candidate02.
-  Root actual authored-default UI passed; publication and post-main viewer verification remain.
+  Root actual authored-default UI passed. Main7c72eb3 and built viewer4176 verified: new model
+  loaded,18clips,authored default,final card without caution; Heavy control selected and animated.
   Sources/candidate/portraits/input hashes stay immutable.
-- `/root/titanichthys_rework_clay03` (Astra high), authoring **material study01** on accepted clay04.
+- `/root/titanichthys_rework_clay03` (Astra high), authoring **material study02** after actual material01 rejection.
   Clay04 body/fins are improved over rejected01–03; same frozen blend SHA
   **69ad4e7d1daa7aec64835a198c9b13c4a017cf4aa441cd2e58ae9a4207c404ec**.
   Read HANDOFF-clay04 and HANDOFF-oral-clay04. Terra completed two actual frontal rest/open oral
   views in clay-04/oral-inspection-01; root inspected both, coherent inset lip/floor, no detached
   rail/panels. Author independently agreed coarse-form gate; authoring anatomy-mapped blue/slate
   armour PBR, quieter flexible trunk, warm oral/ventral tissue and fin-ray detail. No displacement.
+  Material01 executed18maps/fourviews; root rejected broad cloudy rubber-like finish, poor
+  fine dermal/fin detail and weak armor differentiation. Packed blend
+  766cc89f545e588f56ff929eb3f38a85a1ecf227e4c65b81c44d704cb013c653 preserved. Author independently
+  reviewing then new02 regional/skin material (ImageGen original swatch permitted), same clay.
   Keep thin edentulous jaws; user reference is Dunk-like and must not add Dunk teeth to Titan.
 - `/root/coccosteus_rework_design` (Astra high), authoring **material01** on accepted clay04.
   Clay03 fixed verified 1,890 collapsed oral quads/duplicate passage with one closed exterior and
@@ -60,13 +65,18 @@ executors stop unexpected failures and preserve output. They do not make creativ
   Clay03 blend SHA **e88eacaeb7c64077430c0e5a322b5e1a21cabb234631a9ff8d32d998de57fc36**.
   Clay04 builder804d9932e9f3453aefc0a67b0aecdab4cb36491b2377b4839fbf7fe60605b0d3.
   Terra clay04 build/five views PASS; root/author accepted coarse form. Author developing anatomy
-  plate relief and bronze anterior/slate-olive posterior; no final eye audits yet.
+  plate relief and bronze anterior/slate-olive posterior; frozen HANDOFF-MATERIAL-01.md now
+  executing with Terra (7views). Source52a698a8522ac21b7fbc3439d0a25e82d78f02647f48370b4d5c0b8c0162ef56.
+  No final eye audits yet.
   Old named backup remains intact.
-- `/root/devonian_execution_handoff` (Terra medium), idle after audit03 PASS; next frozen Titan/Cocc
-  material handoffs. Current full/LOD candidate and clay execution complete, no retries needed.
-- Doryaspis/Bothriolepis/Stethacanthus/Odaraia authors not started. References and requirements are
-  in refinement-queue.md and ../cambrian/refinement-queue.md. The Doryaspis mouth-art/anatomy
-  discrepancy was explained to the user earlier; read the saved primary-source notes.
+- `/root/devonian_execution_handoff` (Terra medium), executing Cocc material01 exact handoff.
+  Gemu audit03 and Titan material01 execution complete; no repeats required.
+- `/root/bothriolepis_rework_design` (Astra high), new individual author. Inspected user ref and
+  saved primary2014paper figures2/3; designing wholly new deep antiarch shield, ventral oral
+  aperture/lumen and long jointed pectorals OUT+BACK+DOWN. Source-only clay01/topology/renderer
+  handoff under own rework-v3; no Blender/public/Git. Root dispatches Terra after frozen handoff.
+- Doryaspis/Stethacanthus/Odaraia authors not started. References and requirements in queues.
+  Doryaspis mouth-art/anatomy discrepancy was explained earlier; read saved primary-source notes.
 
 ## Backups / latest Odaraia request
 
@@ -93,10 +103,10 @@ needed on this Mac. Use --python-exit-code 1. Python with Pillow/numpy:
 `/Users/hoai/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/bin/python3`.
 Fresh Vite4181 (session62072) via QA_BASE_URL/DEVONIAN_QA_ORIGIN as appropriate; don't stop unowned
 5173/4177 servers. Built viewer4176 CUA browser2/tab7. Existing harnesses are in tools/devonian.
-Latest merged runtime (remote f069010, merge bb8e241) typecheck/build/world/expansion and
-**644 Devonian** checks PASS: `../devonian-authoring/review/rework-publication-*.log`; expansion
-correct log is rework-publication-expansion-direct.log. No npm expansion script; run bundled
-tools/expansion-test.ts directly. Prior eras/swim passed on fb2e9bd. No new public models replaced.
+Runtime before final remote60d7520 merge passed typecheck/build/expansion and
+**650 Devonian** checks; after merge60d7520 typecheck/build/bindings PASS: `../devonian-authoring/review/rework-final-publication-*.log` and rework-final-sync-*.log.
+Earlier8a25954 ecology passed. No npm expansion script; bundle tools/expansion-test.ts directly.
+Prior eras/swim passed on fb2e9bd. Gemu public family replaced by exact final candidate02.
 Once a rework passes all phases: package full/LOD, regenerate portraits/sizes, preserve required
 clips/anchors, check actual default palette and viewer, run intake/checks, commit/merge/push main.
 Refresh Titan/Cocc-dependent lighting/scale art later. Keep preview until the rework is complete.
