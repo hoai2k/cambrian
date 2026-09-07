@@ -95,6 +95,11 @@ export interface EraRules {
   onRespawn(g: Game, a: Actor): void;
   /** Win checks for the era's own modes; the shared ones (reef, hunted) run as before. */
   updateModes(g: Game, dt: number): void;
+  /**
+   * A finished co-op match is being carried on (`Game.continueMatch`): clear whatever the era was
+   * counting towards its win so the goal is not met again the instant play resumes.
+   */
+  continueMatch(g: Game): void;
   hud(g: Game, i: number): EraHud | undefined;
   hint(g: Game, i: number): string | undefined;
   /**

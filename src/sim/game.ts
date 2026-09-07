@@ -10,7 +10,7 @@ import { applyHit, kill, startSwallow, type HitContext } from './combat';
 import { creature, CREATURE_IDS, PLAYABLE_IDS, type CreatureId, type MoveDef } from './creatures';
 import { resolveFlora, stepFlora } from './flora';
 import { SpatialHash } from './spatial';
-import { emptyInput, TIER_NAMES, TIER_NEED, TIER_SCALE, type Actor, type BrainState, type InputFrame, type Mode, type PlayerSetup, type Prompt, type SiltCloud, type Tier, type WorldEvent } from './types';
+import { emptyInput, isCoop, TIER_NAMES, TIER_NEED, TIER_SCALE, type Actor, type BrainState, type InputFrame, type Mode, type PlayerSetup, type Prompt, type SiltCloud, type Tier, type WorldEvent } from './types';
 import { BIOME_NAMES, biomeAt, biomeWeights, coverAt, groundHeight, LIGHT_WINDOW_Y, type Landmark, type LandmarkKind, microbialAt, nearestNursery, nurseryAt, nurseryFactor, resolveStatic, sampleCurrent, sampleHeight, shoreDistance, shoreZ, SURFACE_Y, World, type Biome, type Boulder, type Cover, type Flora, type WorldData } from './world';
 
 export interface PlayerProgress {
@@ -169,6 +169,11 @@ export class Game implements AiWorld {
   players: Actor[] = [];
   progress: PlayerProgress[] = [];
   state: GameState = { status: 'playing', winner: -1, message: '' };
+  /**
+   * Set once a finished co-op match is carried on past its goal (`continueMatch`). The mode's win
+   * check never fires again, so the sea stays open; nothing else about the match is touched.
+   */
+  endless = false;
   /**
    * Hunter & Hunted: whose turn it is to be the giant, which turn this is, and how many each
    * player has caught on their own turn. `hunterIndex` is -1 during the hand-over pause, when
@@ -487,6 +492,21 @@ export class Game implements AiWorld {
     for (const s of this.silt) if (dist(s.pos, a.pos) < s.radius) c = Math.max(c, 0.75);
     if (isHidden(a)) c = 1;
     return c;
+  }
+
+  /**
+   * Carry a finished co-op match on instead of ending it. The goal has been met and recorded; this
+   * puts the sea back the way it was and stops the mode asking for it again, so the reef stays
+   * playable as a free swim. Versus modes refuse: their result is a verdict between players.
+   * Returns whether the match resumed.
+   */
+  continueMatch(): boolean {
+    if (this.state.status === 'playing' || !isCoop(this.mode)) return false;
+    this.endless = true;
+    this.state = { status: 'playing', winner: -1, message: '' };
+    for (const pr of this.progress) pr.apexT = 0;
+    RULES?.continueMatch(this);
+    return true;
   }
 
   /** Main fixed step. `inputs` maps player index → InputFrame. */
@@ -978,7 +998,9 @@ export class Game implements AiWorld {
       else if (justDash && mag <= 0.3 && !input.worldMove) { a.dashQueued = true; }
       else if ((justDash || a.dashQueued) && mag > 0.3 && a.stamina >= 10 && a.exhausted === 0 && a.dashCd === 0 && !a.dashUsed && !paddling) { a.dashUsed = true; a.dashQueued = false; this.startDash(a, def, dir, L, sf); }
       // Pounce (RT): at the aimed target when in range, else at whatever prey is in front, else a forward lunge
-      else if (justHeavy && !HEAVY_SPECIALS.has(def.ability) && a.controller === 'player' && a.pounceCd === 0 && a.stamina >= 12 && a.exhausted === 0) {
+      // Creatures whose special sits on RT reach this too, but only once the special has been ruled
+      // out just above (cooling down, or too little stamina): RT is never a dead button.
+      else if (justHeavy && a.controller === 'player' && a.pounceCd === 0 && a.stamina >= 12 && a.exhausted === 0) {
         const t = a.aiming && locked && isAlive(locked) ? (a.aimInRange ? locked : undefined) : this.pounceTargetAhead(a);
         if (t) this.startPounce(a, t, L, sf);
         else { const m = { ...def.heavy, lunge: def.heavy.lunge + 1.0 }; a.state = 'attack'; a.stateT = 0; a.move = m; a.moveKind = 'heavy'; a.hitDone.clear(); a.stamina -= staminaCost(a, m.stamina); a.combo = 0; a.pounceCd = 0.8; this.flag(a, 'heavy'); }
@@ -991,6 +1013,8 @@ export class Game implements AiWorld {
       else if (input.guard && def.canGuard && a.state === 'free' && a.stamina > 0 && a.stateT > 0.05) { a.state = 'guard'; a.stateT = 0; }
       else if (!input.guard && a.state === 'guard') { if (def.ability === 'shellUp' && a.guardHeld > .6) this.blockPulse(a, def); a.state = 'free'; a.stateT = 0; a.abilityActive = false; }
       // Attacks (also start eating on corpses)
+      // Bots keep the old split: RT is their special and nothing else, so their behaviour (and every
+      // seeded replay that depends on it) is unchanged by the player-side fallback above.
       else if (justLight || (justHeavy && a.controller !== 'player' && !HEAVY_SPECIALS.has(def.ability))) {
         const corpse = justLight ? this.corpseInReach(a) : undefined;
         if (corpse) this.startEating(a, corpse);
@@ -1183,10 +1207,16 @@ export class Game implements AiWorld {
     const def = creature(a.creature);
     // A burrowed ambusher's emergence strike takes the button ahead of everything else.
     if (a.emergenceHeavy) return { name: 'AMBUSH', reach: this.pounceRange(a), ready: true };
+    const pounce = { name: 'POUNCE', reach: this.pounceRange(a), ready: a.pounceCd === 0 && a.stamina >= 12 && a.exhausted === 0 };
     if (HEAVY_SPECIALS.has(def.ability)) {
-      return { name: def.abilityName.toUpperCase(), reach: heavyStrikeReach(a, def), ready: a.abilityCd <= 0 && a.stamina >= 18 };
+      if (a.abilityCd <= 0 && a.stamina >= 18) return { name: def.abilityName.toUpperCase(), reach: heavyStrikeReach(a, def), ready: true };
+      // The special is down. A player's press falls through to the pounce rather than being
+      // swallowed, so the prompt follows the button instead of greying out on a move it will not
+      // play. Bots have no fallback, so for them the special is still the whole answer.
+      if (a.controller === 'player') return pounce;
+      return { name: def.abilityName.toUpperCase(), reach: heavyStrikeReach(a, def), ready: false };
     }
-    return { name: 'POUNCE', reach: this.pounceRange(a), ready: a.pounceCd === 0 && a.stamina >= 12 && a.exhausted === 0 };
+    return pounce;
   }
 
   /** Nearest thing in front worth pouncing on when RT is pressed without aiming. */
@@ -1625,6 +1655,7 @@ export class Game implements AiWorld {
         };
       }
       case 'rise': {
+        if (this.endless) return { title: 'Rise', detail: 'The reef is yours. Swim on.' };
         const held = Math.max(0, ...this.progress.map((p) => p.apexT));
         return { title: 'Rise', detail: held > 0 ? `Apex held ${Math.floor(held)} s of 90` : 'Reach Apex and hold it for ninety seconds' };
       }
@@ -1797,7 +1828,7 @@ export class Game implements AiWorld {
       case 'rise': {
         this.players.forEach((p, i) => {
           const pr = this.progress[i];
-          if (p.tier >= 4 && isAlive(p)) { pr.apexT += dt; if (pr.apexT > 90 && this.state.status === 'playing') { this.state = { status: 'won', winner: i, message: `${creature(p.creature).name} rules the reef.` }; } }
+          if (p.tier >= 4 && isAlive(p)) { pr.apexT += dt; if (pr.apexT > 90 && this.state.status === 'playing' && !this.endless) { this.state = { status: 'won', winner: i, message: `${creature(p.creature).name} rules the reef.` }; } }
           else pr.apexT = 0;
         });
         break;
