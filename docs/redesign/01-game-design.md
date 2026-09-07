@@ -111,11 +111,25 @@ momentum-based movement**.
   banks and turns to follow with a creature-specific turn rate. Release the
   stick and you **glide**: velocity decays over ~1.5 s, you keep drifting.
 - **Right stick** orbits the camera. **A** kicks you upward, **left stick
-  click** sinks you. These are nudges; most depth change comes from pitch.
+  click** sinks you. These are nudges; most depth change comes from pitch. The
+  view reaches ~54° above the horizon and ~76° below it (`PITCH_UP` /
+  `PITCH_DOWN` in `src/render/engine.ts`): the water above you is where what
+  eats you comes from, and the sand below is where what you eat lives, so both
+  have to be lookable-at. Aiming up from the seabed pulls the camera in on a
+  shorter arm rather than flattening the shot against the floor.
 - **RT (analog) = burst.** Holding it drains stamina and multiplies speed
   (× 1.6–2.2 depending on creature). Tapping it gives a short lunge. Burst is
   how you close on prey and how you outrun a Threat, so stamina management is
-  the heart of the chase.
+  the heart of the chase. The drain (`BURST_STAMINA` in `src/sim/game.ts`) is
+  set so a full bar sprints for the best part of fifteen seconds: long enough
+  that a sprint is a crossing or a chase, short enough that the swim home is
+  still paid for out of the same bar.
+- **The floor is somewhere you swim, not a surface you hover over.** A swimmer
+  may come down to a fraction of its resting clearance (`floorClearance`), so
+  you can graze the sand and take what lives on it. Rocks are ridden over
+  rather than run into: where a boulder's own surface is within a body's climb
+  budget (`climbOver`), it stops blocking and the floor under you carries you
+  up and across it. Only rock that genuinely stands above you is a wall.
 - **Currents** are real. The existing current field pushes everyone; a
   larva in the channel current moves at half its burst speed for free. Giants
   patrol *with* the current, so the smart escape is across it.
