@@ -172,11 +172,12 @@ expresses them differently so fights are varied.
 > | D-pad ↓ | 13 | Teleport menu (added with the endless sea) |
 > | D-pad ←/→ | 14/15 | Menu navigation and creature select |
 > | Menu | 9 | Pause |
-> | View | 8 | Read, but nothing consumes it yet |
+> | View | 8 | Scoreboard (hold) |
 >
 > Keyboard layout 1: WASD swim, arrows look, PgUp/PgDn zoom, Shift sprint,
 > Space rise, C sink, F bite, G pounce, R ability, V dash, Q guard, Tab aim,
-> E sense, T teleport, Esc pause. Layout 2 mirrors it on IJKL.
+> E sense, T teleport, Z scoreboard, Esc pause. Layout 2 mirrors it on IJKL,
+> with H for teleport and comma for the scoreboard.
 > The in-game **?** panel and `npm run bindings` are generated from the same
 > source, so they never drift from the code.
 
@@ -349,19 +350,18 @@ population.
 | --- | --- | --- |
 | **Rise** (single / co-op) | 1–4 | The main experience. Everyone hatches as a Larva in the nursery. Reach Apex. Co-op shares nutrition from assisted kills, players can revive a downed ally by bumping them within 10 s. Players *can* turn on each other — bites land, and a dead player can be fed on — but nothing aims at another player for you: no aim snap, no auto-pounce, no auto-lock. Area abilities still spare a co-op partner, so nobody kills a friend by accident. Session ends when any player reaches Apex and survives 90 s, or continues in free-play. Escalation: the reef's giant population grows as players grow. |
 | **Feeding frenzy** (versus) | 2–4 | Growth race. Everyone starts Juvenile in separate nurseries. First to Apex wins; killing a player takes a third of their tier progress and gives it to you. Bots fill empty slots. 12-minute cap, biggest wins. |
-| **Hunter & hunted** (versus, asymmetric) | 2–4 | One player is a Giant (× 3) with a shrinking hunger meter; the others are Juveniles who must survive and reach Adult. Giant eats to stay alive; small ones hide, bait, and grow. Rotates who is the Giant. |
+| **Hunter & hunted** (versus, asymmetric) | 2–4 | One player is a Giant (× 3) with a shrinking hunger meter; the others are Juveniles who must survive and reach Adult. Giant eats to stay alive; small ones hide, bait, and grow. Rotates who is the Giant. *(As built: one **turn** each, 100 s, and your score is what you caught on your own turn — the same job for everyone, so the winner is the best hunter and prey play is how you keep the others' scores down. A turn ends early if every small one reaches Adult. One human plays it as a single turn, exactly as before.)* |
 | **Reef** (sandbox) | 1–4 | No win condition, pick any tier, tune giant density. For messing around and screenshots. |
 
 Bots (the current "nearest enemy" bots become the needs-based AI above) fill
 every mode, so nothing requires a second controller.
 
-> **As built.** All four modes ship (`updateModes()` in `src/sim/game.ts`), and
-> so do co-op's shared nutrition and its **revive**: a downed ally stays down for
-> ten seconds (when a team-mate was near enough to matter) and a touch brings
-> them back with their tier intact. **Spectating** works too — a dead player in
-> versus watches whoever is leading. One detail of this table did not ship:
-> **rotating** who plays the giant in Hunter & Hunted. Player 1 holds the role
-> for the match, which runs to six minutes.
+> **As built.** All four modes ship (`updateModes()` in `src/sim/game.ts`), with
+> everything this table asks of them: co-op's shared nutrition and its **revive**
+> (a downed ally stays down for ten seconds when a team-mate was near enough to
+> matter, and holding station over them brings them back with their tier
+> intact), **spectating** for a dead player in versus, and **rotation** in
+> Hunter & Hunted — see below.
 
 ## Local multiplayer specifics
 

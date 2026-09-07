@@ -7,7 +7,7 @@ import { emptyControls, gamepads, KeyboardInput, readGamepad, rumble, type RawCo
 import { clamp, damp, TAU, wrapAngle } from '../shared/math';
 import { bandOf, isAlive, isHidden, lengthOf } from '../sim/actors';
 import { creature, type CreatureId } from '../sim/creatures';
-import { Game, type TeleportDest } from '../sim/game';
+import { Game, type ScoreHeader, type ScoreRow, type TeleportDest } from '../sim/game';
 import { BAND_COLOR, emptyInput, TIER_NAMES, TIER_NEED, type Actor, type Band, type InputFrame, type Mode, type PlayerSetup } from '../sim/types';
 import { BIOME_NAMES, biomeAt, groundHeight, nurseryAt, resolveStatic, SURFACE_Y, type Biome, type Boulder, type LandmarkKind } from '../sim/world';
 import { AssetQueue, type AssetProgress } from './assets';
@@ -46,6 +46,10 @@ export interface PlayerHud {
   radar: { range: number; blips: RadarBlipHud[] };
   /** The teleport menu, while open. */
   teleport?: { options: { label: string; detail: string; distance: number; dest: TeleportDest }[]; index: number; cooldown: number };
+  /** The scoreboard, while the View button is held. */
+  board?: { header: ScoreHeader; rows: ScoreRow[] };
+  /** A short line from the simulation: a hand-over, a rescue. Outlives one frame. */
+  notice?: string;
   /** The era's own meters (Devonian standing, air, range), when the era defines them. */
   era?: EraHud;
 }
@@ -65,7 +69,7 @@ export interface EngineCallbacks {
 
 export const PLAYER_COLORS = ['#61f2d5', '#ffb457', '#c7a3ff', '#ff86a4'];
 
-interface CamState { yaw: number; pitch: number; zoom: number; fade: number; aimBlend: number; aimTarget: number; aimSnapT: number; pos: THREE.Vector3; look: THREE.Vector3; shake: number; camera: THREE.PerspectiveCamera; lockBlend: number; lastPos: THREE.Vector3; frustum: THREE.Frustum; projScreen: THREE.Matrix4; tele: TeleMenu; }
+interface CamState { showBoard: boolean; yaw: number; pitch: number; zoom: number; fade: number; aimBlend: number; aimTarget: number; aimSnapT: number; pos: THREE.Vector3; look: THREE.Vector3; shake: number; camera: THREE.PerspectiveCamera; lockBlend: number; lastPos: THREE.Vector3; frustum: THREE.Frustum; projScreen: THREE.Matrix4; tele: TeleMenu; }
 /** Per-player teleport menu state: opened with D-pad down, steered with the D-pad or stick, A confirms, B closes. */
 interface TeleMenu { open: boolean; index: number; prev: { teleport: boolean; up: boolean; down: boolean; confirm: boolean; back: boolean }; }
 const freshTele = (): TeleMenu => ({ open: false, index: 0, prev: { teleport: false, up: false, down: false, confirm: false, back: false } });
@@ -218,7 +222,7 @@ export class Engine {
     this.cams = setups.map((_, i) => {
       const p = this.game!.players[i];
       const cam = new THREE.PerspectiveCamera(60, 1, 0.08, 420);
-      const cs: CamState = { yaw: p.yaw, pitch: 0.2, zoom: 1, fade: 0, aimBlend: 0, aimTarget: -1, aimSnapT: 0, pos: new THREE.Vector3(p.pos.x - Math.sin(p.yaw) * 6, p.pos.y + 2.5, p.pos.z - Math.cos(p.yaw) * 6), look: new THREE.Vector3(p.pos.x, p.pos.y, p.pos.z), shake: 0, camera: cam, lockBlend: 0, lastPos: new THREE.Vector3(p.pos.x, p.pos.y, p.pos.z), frustum: new THREE.Frustum(), projScreen: new THREE.Matrix4(), tele: freshTele() };
+      const cs: CamState = { showBoard: false, yaw: p.yaw, pitch: 0.2, zoom: 1, fade: 0, aimBlend: 0, aimTarget: -1, aimSnapT: 0, pos: new THREE.Vector3(p.pos.x - Math.sin(p.yaw) * 6, p.pos.y + 2.5, p.pos.z - Math.cos(p.yaw) * 6), look: new THREE.Vector3(p.pos.x, p.pos.y, p.pos.z), shake: 0, camera: cam, lockBlend: 0, lastPos: new THREE.Vector3(p.pos.x, p.pos.y, p.pos.z), frustum: new THREE.Frustum(), projScreen: new THREE.Matrix4(), tele: freshTele() };
       cam.position.copy(cs.pos); cam.lookAt(cs.look);
       return cs;
     });
@@ -288,6 +292,7 @@ export class Engine {
         // Camera orbit. The right stick is the ONLY thing that turns the camera: yaw is absolute
         // and never follows the creature's heading, so swimming back does not swing the view.
         // Increasing yaw rotates the view left, so a rightward stick decreases it.
+        if (running) this.cams[i].showBoard = c.view && !menuOpen;
         if (running && !menuOpen) {
           const cs = this.cams[i];
           this.updateAim(cs, game.players[i], c.aim, dt);
@@ -897,6 +902,7 @@ export class Engine {
         }
       }
       const tele = cs?.tele.open ? { options: game.teleportOptions(i).map((o) => ({ label: o.label, detail: o.detail, distance: o.distance, dest: o.dest })), index: cs.tele.index, cooldown: p.teleportCd } : undefined;
+      const board = cs?.showBoard ? game.scoreboard(i) : undefined;
       // Co-op: team-mates on the floor waiting to be picked up, as a bearing this player can follow.
       const downed: PlayerHud['downedAllies'] = [];
       if (cs) for (let j = 0; j < game.players.length; j++) {
@@ -930,7 +936,7 @@ export class Engine {
         hint: game.hintFor(i), respawnIn: p.state === 'dead' ? Math.max(0, (game.reviveWindow(p) || 3) - (game.reviveWindow(p) ? 0 : p.respawnT)) : 0, fade: cs?.fade ?? 0, state: p.state, modelReady: !!loadedSync(p.creature),
         downedFor: game.reviveWindow(p), reviveProgress: game.reviveProgress(p), downedAllies: downed, spectating: spectate,
         kills: p.kills, eats: p.eats, escapes: p.escapes, protect: p.spawnProtect > 0, bandMarkers: markers.slice(0, 24),
-        biome: BIOME_NAMES[game.biomeOf(i) ?? 'shelf'], radar: { range: radarRange, blips }, teleport: tele, era,
+        biome: BIOME_NAMES[game.biomeOf(i) ?? 'shelf'], radar: { range: radarRange, blips }, teleport: tele, board, notice: game.noticeFor(i), era,
       };
     });
     return {

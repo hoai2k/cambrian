@@ -10,7 +10,7 @@ import { creature, CREATURE_IDS, PLAYABLE_IDS, type CreatureId, type MoveDef } f
 import { resolveFlora, stepFlora } from './flora';
 import { SpatialHash } from './spatial';
 import { emptyInput, TIER_NAMES, TIER_NEED, TIER_SCALE, type Actor, type InputFrame, type Mode, type PlayerSetup, type Prompt, type SiltCloud, type Tier, type WorldEvent } from './types';
-import { biomeAt, biomeWeights, coverAt, groundHeight, LIGHT_WINDOW_Y, type Landmark, type LandmarkKind, microbialAt, nearestNursery, nurseryAt, nurseryFactor, resolveStatic, sampleCurrent, sampleHeight, shoreDistance, shoreZ, SURFACE_Y, World, type Biome, type Boulder, type Cover, type Flora, type WorldData } from './world';
+import { BIOME_NAMES, biomeAt, biomeWeights, coverAt, groundHeight, LIGHT_WINDOW_Y, type Landmark, type LandmarkKind, microbialAt, nearestNursery, nurseryAt, nurseryFactor, resolveStatic, sampleCurrent, sampleHeight, shoreDistance, shoreZ, SURFACE_Y, World, type Biome, type Boulder, type Cover, type Flora, type WorldData } from './world';
 
 export interface PlayerProgress {
   prompts: Prompt[];
@@ -36,6 +36,37 @@ export interface GameState {
   winner: number;
   message: string;
 }
+
+/**
+ * One line on the scoreboard (hold View). Everyone who is in the running — the local players and
+ * the bots filling the empty seats — with what they have done and where they are.
+ */
+export interface ScoreRow {
+  /** Player index, or -1 for a bot. */
+  player: number;
+  creature: CreatureId;
+  name: string;
+  /** Tier name, or the era's own stage label. */
+  rank: string;
+  tier: number;
+  /** Progress toward the next rank, 0..1. */
+  progress: number;
+  kills: number;
+  eats: number;
+  escapes: number;
+  deaths: number;
+  alive: boolean;
+  biome: string;
+  /** Metres from this row's creature to the viewer, or 0 for the viewer's own row. */
+  distance: number;
+  /** The mode's own number for this player: catch in Hunter & Hunted, otherwise absent. */
+  score?: number;
+  /** This row is the giant right now. */
+  hunting?: boolean;
+}
+
+/** The heading above the scoreboard: what this mode is asking of everyone. */
+export interface ScoreHeader { title: string; detail: string; clock?: number; }
 
 /** Where a player may teleport: home nursery, or alongside another player. */
 export type TeleportDest = 'home' | number;
@@ -90,6 +121,15 @@ const REVIVE_REACH = 90;
 /** Seconds a rescuer must hold station beside a downed team-mate. */
 const REVIVE_HOLD = 0.6;
 
+/**
+ * Hunter & Hunted takes turns. Every human player gets one stint as the giant, of at most this
+ * long, and is scored on the same job: how many of the small ones they caught. Playing prey is
+ * how you set the others' score down, not a role you are stuck in for the match.
+ */
+const HUNT_TURN = 100;
+/** The pause between turns, so the hand-over reads as a hand-over. */
+const HUNT_BREAK = 3.5;
+
 export class Game implements AiWorld {
   world: WorldData;
   actors: Actor[] = [];
@@ -104,6 +144,17 @@ export class Game implements AiWorld {
   players: Actor[] = [];
   progress: PlayerProgress[] = [];
   state: GameState = { status: 'playing', winner: -1, message: '' };
+  /**
+   * Hunter & Hunted: whose turn it is to be the giant, which turn this is, and how many each
+   * player has caught on their own turn. `hunterIndex` is -1 during the hand-over pause, when
+   * nobody is the giant.
+   */
+  hunterIndex = 0;
+  huntTurn = 0;
+  huntTurns = 1;
+  huntScore: number[] = [];
+  huntTurnT = 0;
+  huntBreakT = 0;
   readonly discovery: Discovery = { biomes: new Set(), landmarks: new Set(), apex: new Set() };
   private scratchActors: Actor[] = [];
   private scratchBoulders: Boulder[] = [];
@@ -133,8 +184,11 @@ export class Game implements AiWorld {
     const nursery = nurseryAt(0);
     this.world.loadAround(nursery);
     this.hitCtx = { events: this.events, byId: (id) => this.idMap.get(id), time: 0, rng: this.rng, armour: RULES ? (att, vic, dir) => RULES!.armour(att, vic, dir) : undefined };
+    // One turn as the giant each. A single human plays the mode exactly as it was before.
+    this.huntTurns = mode === 'hunted' ? Math.max(1, setups.length) : 1;
+    this.huntScore = setups.map(() => 0);
     setups.forEach((s, i) => {
-      const startScale = RULES ? RULES.startScale(mode, i) : mode === 'rise' ? TIER_SCALE[0] : mode === 'hunted' ? (i === 0 ? 3.0 : TIER_SCALE[1]) : mode === 'reef' ? TIER_SCALE[2] : TIER_SCALE[1];
+      const startScale = RULES ? RULES.startScale(mode, this.eraRoleIndex(i)) : mode === 'rise' ? TIER_SCALE[0] : mode === 'hunted' ? (this.isHunter(i) ? 3.0 : TIER_SCALE[1]) : mode === 'reef' ? TIER_SCALE[2] : TIER_SCALE[1];
       const a = this.spawn(s.creature, 'player', this.spawnPoint(nursery, s.creature, startScale, i), startScale, i);
       a.home = { ...nursery };
       a.yaw = Math.PI;                                   // facing out to sea
@@ -145,7 +199,7 @@ export class Game implements AiWorld {
       // Fill to 4 with bots
       for (let i = setups.length; i < 4; i++) {
         const c = this.pickBot(setups.map((s) => s.creature), i);
-        const botScale = RULES ? RULES.startScale(mode, i) : TIER_SCALE[1];
+        const botScale = RULES ? RULES.startScale(mode, 1) : TIER_SCALE[1];   // bots are never the giant
         const bot = this.spawn(c, 'bot', this.spawnPoint(nursery, c, botScale, i), botScale);
         bot.home = { ...nursery };
         bot.brain = makeBrain('needs', nursery, this.rng, { aggression: 0.9, reaction: 0.2, parrySkill: 0.55 });
@@ -154,6 +208,16 @@ export class Game implements AiWorld {
     this.populate();
     RULES?.init(this);
   }
+
+  /** Whether this player index is the giant right now. Only ever true in Hunter & Hunted. */
+  isHunter(index: number) { return this.mode === 'hunted' && index >= 0 && index === this.hunterIndex; }
+
+  /**
+   * Both eras write their Hunter & Hunted rule as "player index 0 is the giant". Turns move that
+   * role around, so the current giant is presented to the era as index 0 and everybody else as
+   * index 1; nothing in the era packs has to know that the role rotates.
+   */
+  private eraRoleIndex(index: number) { return this.mode === 'hunted' ? (this.isHunter(index) ? 0 : 1) : index; }
 
   /** A bot's species: anything a player might pick; in Food Chain one from a rung nobody has taken yet. */
   private pickBot(taken: CreatureId[], i: number): CreatureId {
@@ -384,6 +448,7 @@ export class Game implements AiWorld {
     this.updateSilt(dt);
     this.updatePopulation(dt);
     this.restockBones(dt);
+    this.stepPrompts(dt);
     this.updateDiscovery();
     RULES?.step(this, dt);
     this.updateModes(dt);
@@ -524,7 +589,7 @@ export class Game implements AiWorld {
       a.tier = (a.tier - 1) as Tier; a.scale = TIER_SCALE[a.tier];
       a.nutrition = TIER_NEED[a.tier] * clamp(frac * 0.5 + 0.35, 0, 0.9);
     } else a.nutrition *= 0.5;
-    if (this.mode === 'hunted' && a.player === 0 && !RULES) { a.scale = 3.0; a.tier = 3; }
+    if (this.mode === 'hunted' && this.isHunter(a.player) && !RULES) { a.scale = 3.0; a.tier = 3; }
     applyScaleStats(a, false);
     a.eaten = 0;
     a.stamina = a.staminaMax; a.poise = a.poiseMax;
@@ -971,9 +1036,9 @@ export class Game implements AiWorld {
     } else if (a.state === 'moult') {
       const t = clamp(a.stateT / a.stateDur, 0, 1);
       const era = RULES?.moultScale(this, a);
-      const to = era ? era.to : this.mode === 'hunted' && a.player === 0 ? a.scale : TIER_SCALE[a.tier];
+      const to = era ? era.to : this.mode === 'hunted' && this.isHunter(a.player) ? a.scale : TIER_SCALE[a.tier];
       const from = a.hatching ? to * 0.3 : era ? era.from : TIER_SCALE[Math.max(0, a.tier - 1) as Tier];
-      if (!(this.mode === 'hunted' && a.player === 0)) a.scale = lerp(from, to, t * t * (3 - 2 * t));
+      if (!(this.mode === 'hunted' && this.isHunter(a.player))) a.scale = lerp(from, to, t * t * (3 - 2 * t));
       if (a.stateT >= a.stateDur) { a.state = 'free'; a.stateT = 0; a.scale = to; applyScaleStats(a, true); a.hp = a.hpMax; a.hatching = false; }
     }
 
@@ -1428,6 +1493,55 @@ export class Game implements AiWorld {
     for (const [id, left] of this.bonesMeat) if (left < 1) this.bonesMeat.set(id, Math.min(1, left + dt / 210));
   }
 
+  /**
+   * The scoreboard for one viewport (hold View). Sorted by the thing the mode is about, so the
+   * top line is whoever is winning it: catch in Hunter & Hunted, size everywhere else.
+   */
+  scoreboard(viewer: number): { header: ScoreHeader; rows: ScoreRow[] } {
+    const me = this.players[viewer];
+    const contenders = this.actors.filter((a) => a.controller === 'player' || a.controller === 'bot');
+    const rows: ScoreRow[] = contenders.map((a) => {
+      const era = RULES?.scoreLine?.(this, a);
+      return {
+        player: a.player, creature: a.creature, name: creature(a.creature).name,
+        rank: era?.rank ?? TIER_NAMES[a.tier], tier: a.tier,
+        progress: era?.progress ?? (a.tier >= 4 ? 1 : clamp(a.nutrition / TIER_NEED[a.tier], 0, 1)),
+        kills: a.kills, eats: a.eats, escapes: a.escapes,
+        deaths: a.player >= 0 ? (this.progress[a.player]?.deaths ?? 0) : 0,
+        alive: isAlive(a),
+        biome: BIOME_NAMES[biomeAt(a.pos.x, a.pos.z)],
+        distance: me && a !== me ? distXZ(me.pos, a.pos) : 0,
+        score: this.mode === 'hunted' && a.player >= 0 ? (this.huntScore[a.player] ?? 0) : undefined,
+        hunting: this.isHunter(a.player) || undefined,
+      };
+    });
+    const by = this.mode === 'hunted'
+      ? (r: ScoreRow) => (r.score ?? -1)
+      : (r: ScoreRow) => r.tier + r.progress;
+    rows.sort((x, y) => by(y) - by(x));
+    return { header: this.scoreHeader(), rows };
+  }
+
+  private scoreHeader(): ScoreHeader {
+    switch (this.mode) {
+      case 'hunted': {
+        const giant = this.hunterIndex >= 0 ? this.players[this.hunterIndex] : undefined;
+        return {
+          title: `Turn ${Math.min(this.huntTurn + 1, this.huntTurns)} of ${this.huntTurns}`,
+          detail: giant ? `Player ${this.hunterIndex + 1} is hunting · most caught wins` : 'Changing over…',
+          clock: this.huntBreakT > 0 ? this.huntBreakT : this.huntTurnLeft(),
+        };
+      }
+      case 'rise': {
+        const held = Math.max(0, ...this.progress.map((p) => p.apexT));
+        return { title: 'Rise', detail: held > 0 ? `Apex held ${Math.floor(held)} s of 90` : 'Reach Apex and hold it for ninety seconds' };
+      }
+      case 'frenzy': return { title: 'Feeding Frenzy', detail: 'First to Apex wins', clock: Math.max(0, 12 * 60 - this.time) };
+      case 'reef': return { title: 'Reef', detail: 'No goal. Just the sea.' };
+      default: return { title: ACTIVE_ERA.modes.find((m) => m.id === this.mode)?.name ?? this.mode, detail: '' };
+    }
+  }
+
   /** Where this player could teleport right now. */
   teleportOptions(i: number): TeleportOption[] {
     const p = this.players[i]; if (!p) return [];
@@ -1572,11 +1686,121 @@ export class Game implements AiWorld {
         break;
       }
       case 'hunted': {
-        const smalls = this.actors.filter((a) => (a.controller === 'player' || a.controller === 'bot') && a.player !== 0);
-        if (smalls.length && smalls.every((s) => s.tier >= 2)) this.state = { status: 'won', winner: -2, message: 'The small ones grew up. The giant goes hungry.' };
-        else if (this.time > 6 * 60) this.state = { status: 'won', winner: 0, message: 'The giant kept the reef small.' };
+        this.creditHunt();
+        // Between turns nobody is the giant: everyone drifts while the hand-over is announced.
+        if (this.huntBreakT > 0) {
+          this.huntBreakT -= dt;
+          if (this.huntBreakT <= 0) this.beginHuntTurn();
+          break;
+        }
+        this.huntTurnT += dt;
+        const smalls = this.actors.filter((a) => (a.controller === 'player' || a.controller === 'bot') && !this.isHunter(a.player));
+        // The turn ends when its time is up, or early when every small one has grown out of reach.
+        const grownUp = smalls.length > 0 && smalls.every((s) => s.tier >= 2);
+        if (grownUp || this.huntTurnT >= HUNT_TURN) this.endHuntTurn(grownUp);
         break;
       }
+    }
+  }
+
+  /**
+   * Score the giant's catch as it happens. Every contender the giant kills on its turn is a
+   * point — including one it has already eaten once, because a small one that keeps getting
+   * caught is exactly what the score is measuring.
+   */
+  private creditHunt() {
+    if (this.hunterIndex < 0) return;
+    const giant = this.players[this.hunterIndex];
+    if (!giant) return;
+    for (const e of this.events) {
+      if (e.kind !== 'kill' || e.actor !== giant.id || e.other == null) continue;
+      const victim = this.idMap.get(e.other);
+      if (!victim || (victim.controller !== 'player' && victim.controller !== 'bot')) continue;
+      this.huntScore[this.hunterIndex] = (this.huntScore[this.hunterIndex] ?? 0) + 1;
+    }
+  }
+
+  /** Seconds left in the current giant's turn, for the HUD. */
+  huntTurnLeft() { return this.mode === 'hunted' ? Math.max(0, HUNT_TURN - this.huntTurnT) : 0; }
+
+  /**
+   * A turn is over. The giant's catch is already on the board (`huntScore`, credited as it
+   * happened), so this only has to hand the role on — or, on the last turn, decide the match.
+   */
+  private endHuntTurn(grownUp: boolean) {
+    const giant = this.players[this.hunterIndex];
+    const caught = this.huntScore[this.hunterIndex] ?? 0;
+    const name = giant ? creature(giant.creature).name : 'The giant';
+    this.announce(grownUp
+      ? `The small ones grew up. ${name} caught ${caught}.`
+      : `Time. ${name} caught ${caught}.`);
+    if (this.huntTurn + 1 >= this.huntTurns) { this.finishHunt(); return; }
+    this.huntTurn++;
+    // Nobody is the giant during the pause. The old one keeps its body until the changeover —
+    // popping it down a tier mid-sentence reads as a glitch — but everyone is made invulnerable
+    // for the whole break, so nothing it does in those seconds can count.
+    this.hunterIndex = -1;
+    this.huntBreakT = HUNT_BREAK;
+    for (const p of this.players) if (isAlive(p)) { p.state = 'free'; p.stateT = 0; p.spawnProtect = HUNT_BREAK + 2; }
+  }
+
+  /** Put everyone back where they belong for the next turn and hand the giant's body over. */
+  private beginHuntTurn() {
+    this.hunterIndex = this.huntTurn % Math.max(1, this.players.length);
+    this.huntTurnT = 0;
+    const nursery = nurseryAt(0);
+    this.world.loadAround(nursery);
+    const giant = this.players[this.hunterIndex];
+    this.announce(`Turn ${this.huntTurn + 1} of ${this.huntTurns} — ${giant ? `Player ${this.hunterIndex + 1}` : 'nobody'} hunts.`);
+    // Contenders are re-seated: the new giant at giant size, everybody else back to a juvenile in
+    // a nursery. Scores stay; only the bodies are reset.
+    for (const a of this.actors) {
+      if (a.controller !== 'player' && a.controller !== 'bot') continue;
+      const hunter = this.isHunter(a.player);
+      a.tier = hunter ? 3 : 1;
+      a.scale = RULES ? RULES.startScale('hunted', hunter ? 0 : 1) : hunter ? 3.0 : TIER_SCALE[1];
+      a.nutrition = 0;
+      applyScaleStats(a, true);
+      a.hp = a.hpMax; a.stamina = a.staminaMax; a.poise = a.poiseMax;
+      a.pos = this.spawnPoint(nursery, a.creature, a.scale, Math.max(0, a.player) + (hunter ? 4 : 0));
+      if (hunter) a.pos.z -= 70;                       // the giant starts out to sea, not on top of the nursery
+      a.home = { ...nursery };
+      a.vel = v3(); a.state = 'free'; a.stateT = 0; a.respawnT = 0; a.corpseT = 0; a.eaten = 0; a.reviveT = 0;
+      stopHiding(a); a.camoStrength = 0; a.hideCd = 0; a.emergenceHeavy = false; a.abilityActive = false; a.abilityCd = 0;
+      a.lockTarget = -1; a.hunted = 0; a.hunterId = -1; a.wasHunted = false; a.swallowedBy = -1;
+      a.bank = 0; a.pitch = 0; a.yaw = Math.PI; a.spawnProtect = 3.5; a.hitFlash = 0;
+      this.events.push({ kind: 'moult', pos: { ...a.pos }, actor: a.id, player: a.player, strength: 0.6 });
+    }
+  }
+
+  /** Every turn played: the best hunter takes it. */
+  private finishHunt() {
+    let best = -1, bestScore = -1, tied = false;
+    this.huntScore.forEach((n, i) => {
+      if (n > bestScore) { bestScore = n; best = i; tied = false; }
+      else if (n === bestScore) tied = true;
+    });
+    const line = this.huntScore.map((n, i) => `P${i + 1} ${n}`).join(' · ');
+    if (bestScore <= 0) this.state = { status: 'lost', winner: -2, message: `Nobody caught anything. ${line}` };
+    else if (tied) this.state = { status: 'won', winner: -2, message: `A tie at ${bestScore}. ${line}` };
+    else this.state = { status: 'won', winner: best, message: `Player ${best + 1} hunted best: ${bestScore} caught. ${line}` };
+  }
+
+  /** A short line in every player's viewport. */
+  private announce(text: string, t = 3.5) {
+    for (const pr of this.progress) pr.prompts.push({ text, t });
+  }
+
+  /** The line to show this player right now, if any. Prompts expire; the newest wins. */
+  noticeFor(i: number): string | undefined {
+    const pr = this.progress[i];
+    return pr && pr.prompts.length ? pr.prompts[pr.prompts.length - 1].text : undefined;
+  }
+
+  private stepPrompts(dt: number) {
+    for (const pr of this.progress) {
+      for (const p of pr.prompts) p.t -= dt;
+      if (pr.prompts.some((p) => p.t <= 0)) pr.prompts = pr.prompts.filter((p) => p.t > 0);
     }
   }
 
