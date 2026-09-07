@@ -126,16 +126,30 @@ momentum-based movement**.
   still paid for out of the same bar.
 - **The floor is somewhere you swim, not a surface you hover over.** A swimmer
   may come down to a fraction of its resting clearance (`floorClearance`), so
-  you can graze the sand and take what lives on it. Rocks are ridden over
-  rather than run into: where a boulder's own surface is within a body's climb
-  budget (`climbOver`), it stops blocking and the floor under you carries you
-  up and across it. Only rock that genuinely stands above you is a wall.
+  you can graze the sand and take what lives on it.
+- **Obstacles are things you get over, in three grades.** Anything shallow
+  enough that the floor can carry you across inside a step's worth of lift
+  (`glideOver`) does not block at all — you glide over sand, domes and the
+  flanks of anything rounded. A face too steep for that, whose top is within
+  two bodies of you (`climbHeight`), blocks the way through but offers the way
+  up: you are held out of the rock and lifted up its side at a swim's pace
+  (`climbRise`) until the top is clear, then carry on over it. Higher than
+  that is a wall — for a swimmer. A crawler has legs: it gets over whatever it
+  keeps pushing into, however tall, once it has leaned on it for `CLIMB_PUSH`.
+  A climb is a commitment (`Actor.climbTo`), so a rock falling away underneath
+  you mid-climb does not drop you back to the foot of it, and the camera is
+  never moved by it — the body tilts to the slope, the view stays where you
+  put it.
+- **Plants are things you go round.** A stem is thin, so contact with one
+  steers you past it. Only a body driving at the middle of one — within about
+  25° of dead-on, and held there — is taken to mean *over*, and climbs it.
 - **Currents** are real. The existing current field pushes everyone; a
   larva in the channel current moves at half its burst speed for free. Giants
   patrol *with* the current, so the smart escape is across it.
 - **Seafloor creatures** (Hallucigenia, Marrella, Olenoides, Wiwaxia) stick
-  to terrain and climb boulders and sponges. **RB** is a **hop** (short
-  ballistic arc, a dodge and a way onto a ledge) and, held, a **paddle**:
+  to terrain and climb boulders and sponges. **RB** eases them up off the
+  floor — a gradual rise, the same one a swimmer gets from the same button,
+  never a jump — and, held, is a **paddle**:
   they climb into open water and keep swimming there at roughly a third of
   their crawl, with no sprint and no dash until their legs are back on the
   floor, and the climb costs more stamina than they regain. So open water is
@@ -288,6 +302,56 @@ Prey should be **catchable but never free**.
 - **Wounded prey** leaves a faint particle trail (blood in the current) that
   Anomalocaris and Marrella can follow.
 
+## Feeding
+
+Not everything in the Burgess Shale was a hunter, and the roster should not
+pretend otherwise. A creature's `diet` field (`src/content/creature-types.ts`)
+says where its living comes from. It is a **fact about the animal**, not a
+restriction on the person driving it: a player in any shell can bite anything
+they can catch. What the field changes is what *else* that shell can eat, and
+what the ambient copies of it spend their day doing.
+
+| Diet | What it eats | How it feeds |
+| --- | --- | --- |
+| *(none)* | Other animals | Hunts. The default. |
+| `grazer` | Microbial mats on the seabed | Near the floor, over mats, `grazeRate` 1.6 × mat density. |
+| `deposit` | Detritus in the sediment | The same, at 1.1 × — sifting is slower than scraping. |
+| `filter` | Plankton blooms in the water column | Anywhere inside a bloom, at any tier (`bloomRate`). |
+| `scavenger` | Carrion | Feeds on bodies and bone falls; makes none of its own. |
+
+Some mat feeders are anchored: `grazeStill` means the animal only feeds while
+planted (`stillness > 0.5`). Wiwaxia scrapes with a stationary radula-like
+apparatus, so a Wiwaxia on the move earns nothing.
+
+The roster, as researched: **Wiwaxia** and **Odontogriphus** graze mats,
+**Marrella** and **Pikaia** are deposit feeders, **Vetulicola**,
+**Tamisiocaris**, **Ctenorhabdotus** and **Odaraia** strain the water, and
+**Hallucigenia** lives on the dead. Everything else hunts. The Devonian roster
+carries the same field and the same rules.
+
+### What this means for the AI
+
+Ambient animals follow their diet honestly. A `grazer` goes looking for mats
+rather than for you; a `scavenger` crosses open water to a body but will not
+make one. This is most of the reason the reef reads as ecology rather than as
+a pit of predators — roughly a third of the roster is no threat to anybody.
+
+Two deliberate exceptions:
+
+- **Anything standing in for a player hunts too.** A bot in versus, or the
+  balance harness driving a creature, is a competitor, and a competitor that
+  refused to hunt would simply lose. Suspension feeders are the one exception
+  even here: the bloom *is* their living and a chase only loses it, which is
+  how Vetulicola and Tamisiocaris still reach Apex.
+- **Everything fights back.** Diet gates hunting, never retaliation,
+  territory or self-defence. A grazer that is attacked turns around, and a
+  grumpy one still objects to being crowded (see *Temperament*).
+
+Grazing is a real living but a slow one: mats worth eating (density > 0.2)
+cover about 28% of the seabed, so a mat feeder that stays put on a good patch
+takes one to three minutes per tier. It is a floor under a bad hunt, not a
+replacement for hunting.
+
 ## The hours
 
 The reef used to hunt around the clock. Every ambient animal counted as hungry
@@ -335,6 +399,16 @@ whose only question is *can it eat me* runs out of questions:
   threat: the ground one is sitting on is often worth crossing, and you can
   always choose not to. Held ground is drawn on the radar as a dashed ring, so
   the choice is made before you are in it rather than after.
+
+  "Past the edge" is 1.15 patch radii (`TERRITORY_LEASH` in `src/sim/ai.ts`) — a
+  little slack so an intruder hovering on the line does not make the animal
+  flicker between charging and turning back. The leash applies to *every* goal
+  that chases something, not only to driving an intruder out, and it is a hard
+  limit rather than a stamina one: the animal turns for home whatever it has
+  left in the tank. Both halves matter. A grumpy exchange with a passing
+  neighbour used to escape the leash entirely, and when sprinting got cheaper a
+  territory holder simply chased further on the same behaviour — 94 m off a 40 m
+  patch. `tools/ecology-test.ts` now holds it to 1.3 radii over twenty seconds.
 
 About a third of grown, armed animals hold a patch; about a fifth of everything
 grown is simply grumpy; the rest are indifferent. Grazers and filter feeders

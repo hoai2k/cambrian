@@ -39,3 +39,25 @@ Blender/export/check batches. Review the new body/shell clay first, then build m
 animations. Eye, attachment, clipping and general quality audits follow the completed rework.
 Do not repeatedly audit the archived model while it is queued for replacement. The existing
 Devonian rework authors retain their current ownership; Odaraia joins the full-rework queue.
+
+## Second reference — inverted pose and visible limbs
+
+The user additionally supplied `/Users/hoai/Downloads/Odaraia2.jpeg`, preserved as
+`local/expansion-authoring/odaraia-rework/user-reference/odaraia-user-reference-02-2026-09-07.jpeg`.
+Use both references together. The chosen normal swimming presentation is inverted, with the legs
+pointing upward as in this second image. Establish this in the authored rest pose and validate
+orientation, steering, action directions and anchors in the game rather than applying an
+unreviewed viewer-only rotation.
+
+Sculpt the covering as a real curved shell: organic convex valve surfaces, tapered/flared margins,
+a shaped front opening and variation in thickness and section. Preserve the first image's
+semi-transparent coat impression. Keep the segmented trunk and numerous paired appendages
+legible above/through the shell. Make the articulated limbs more prominent in silhouette and
+motion; coordinate staggered swimming beats with clearly readable attack reaches/sweeps,
+recovery and withdrawal without passing through the shell or hiding inside it. Preserve fine
+filtering branches and avoid replacing the limbs with oversized generic claws. Attack motion
+is a game interpretation, not a claim of fossil evidence for predatory limb use.
+
+Review the inverted silhouette from the game's camera, including reduced-model limb readability,
+shell transparency/depth ordering and action extremes. Keep both references and the original
+model backup; the current model stays preview until replacement acceptance.

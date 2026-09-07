@@ -1,9 +1,9 @@
-import { dist, dot, heading, norm, scale, sub, yawOf } from '../../shared/math';
+import { dist, dot, heading, norm, scale, sub } from '../../shared/math';
 import { isAlive, isHidden, lengthOf } from '../actors';
 import { applyHit } from '../combat';
 import { BURROWERS, DEFENSIVE_SPECIALS, HEAVY_SPECIALS } from '../concealment';
 import { creature, type CreatureId } from '../creatures';
-import type { ExpansionContext } from '../expansion-abilities';
+import { HEAVY_STRIKE, type ExpansionContext, type HeavyStrike } from '../expansion-abilities';
 import type { Game } from '../game';
 import type { Actor } from '../types';
 import { groundHeight } from '../world';
@@ -29,6 +29,7 @@ let installed = false;
 export function installDevonianSpecials() {
   if (installed) return; installed = true;
   for (const id of HEAVY) HEAVY_SPECIALS.add(id);
+  for (const [id, strike] of Object.entries(STRIKES)) HEAVY_STRIKE[id] = strike;
   for (const id of GUARD) DEFENSIVE_SPECIALS.add(id);
   BURROWERS.add('gemuendina');                   // sand ambush: the shared burrow with its emergence strike
 }
@@ -81,57 +82,24 @@ export function useAbility(g: Game, a: Actor, ctx: ExpansionContext): boolean {
  * lengths rather than a speed multiplier because a strike has to close the gap it is aimed across,
  * and every hit window below is measured in body lengths too.
  */
-const LUNGE: Record<string, number> = {
-  runThrough: 3.5, tuskLunge: 2.6, jawShear: 1.8, crushBite: 1.6, neckSnap: 1.5,
-  cheliceraeGrab: 1.6, tridentShove: 1.8, shieldPush: 1.8, armourFlank: 2.0,
-};
-
-/** The thing a lunge should be aimed at: whatever is locked, else the nearest body in front. */
-function lungeTarget(g: Game, a: Actor, ctx: ExpansionContext): Actor | undefined {
-  const locked = a.lockTarget >= 0 ? g.byId(a.lockTarget) : undefined;
-  const L = lengthOf(a), h = heading(a.yaw);
-  if (locked && isAlive(locked) && dist(a.pos, locked.pos) < L * 4) return locked;
-  let best: Actor | undefined, bestD = Infinity;
-  for (const o of ctx.nearby(a.pos, L * 3)) {
-    if (o.id === a.id || !isAlive(o) || isHidden(o) || ctx.allies(a, o) || o.controller === 'swarm') continue;
-    const d = dist(a.pos, o.pos);
-    if (dot(norm(sub(o.pos, a.pos)), h) < 0.5 || d >= bestD) continue;
-    best = o; bestD = d;
-  }
-  return best;
-}
-
 /**
- * A heavy special just started (Game.startAbility). Every one of them is a committed strike that
- * travels, like the pounce it replaces on this button: it turns onto its target at the windup and
- * carries the body forward through the hit window (see `stepAbility`). Without that the button
- * plays an animation on the spot and the hit windows, which are all inside a body length, never
- * reach anything.
+ * The era's heavy strikes, for the shared table: how far each hit window reaches from the body and
+ * how far the strike carries it, both in body lengths. Registered rather than kept here so the
+ * crosshair and the lunge read the same numbers (`HEAVY_STRIKE` in `../expansion-abilities.ts`).
  */
-export function beginAbility(g: Game, a: Actor, ctx: ExpansionContext): void {
-  const def = creature(a.creature);
-  if (!(HEAVY as readonly string[]).includes(def.ability)) return;
-  const t = lungeTarget(g, a, ctx);
-  if (t) {
-    const to = norm(sub(t.pos, a.pos));
-    // the neck turns faster than the body: Tiktaalik snaps its head all the way round
-    if (def.ability === 'neckSnap' || dot(to, heading(a.yaw)) > 0.35) { a.yaw = yawOf(to); a.prevT.yaw = a.yaw; }
-  }
-  a.dodgeDir = heading(a.yaw);
-  a.lockTarget = t?.id ?? a.lockTarget;
-}
+const STRIKES: Record<string, HeavyStrike> = {
+  jawShear: { reach: 0.95, lunge: 1.8 }, runThrough: { reach: 0.9, lunge: 3.5 },
+  tuskLunge: { reach: 1.1, lunge: 2.6 }, crushBite: { reach: 0.9, lunge: 1.6 },
+  neckSnap: { reach: 1.0, lunge: 1.5, snap: true }, cheliceraeGrab: { reach: 1.4, lunge: 1.6 },
+  tridentShove: { reach: 1.2, lunge: 1.8 }, shieldPush: { reach: 1.1, lunge: 1.8 },
+  armourFlank: { reach: 1.0, lunge: 2.0 },
+};
 
 /** Every step of an 'ability' state (heavy specials and the timed Y specials). */
 export function stepAbility(g: Game, a: Actor, ctx: ExpansionContext, dt: number): void {
   const def = creature(a.creature);
   const L = lengthOf(a), h = heading(a.yaw), t = a.stateT;
   const d = devActor(g, a);
-  const lunge = LUNGE[def.ability];
-  if (lunge !== undefined) {
-    // Carry the body through the strike, from just before the hit window to just after it.
-    const dur = a.stateDur || 1, from = dur * 0.15, to = dur * 0.8;
-    if (t > from && t < to) a.vel = scale(a.dodgeDir, (lunge * L) / (to - from));
-  }
   switch (def.ability) {
     case 'shellHover':
       a.vel.x *= 0.9; a.vel.z *= 0.9; a.vel.y = 0; a.seen = Math.min(a.seen, 0.2);

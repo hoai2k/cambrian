@@ -1,4 +1,4 @@
-import { add, clamp, dist, dot, heading, len3, norm, scale, sub, type Vec3 } from '../shared/math';
+import { add, clamp, dist, dot, heading, len3, norm, scale, sub, yawOf, type Vec3 } from '../shared/math';
 import { bandOf, isAlive, isHidden, lengthOf, massOf } from './actors';
 import { applyHit, type HitContext } from './combat';
 import { creature, type CreatureDef } from './creatures';
@@ -24,6 +24,97 @@ export const abilitySpeed = (a: Actor): number => {
   }
 };
 
+/**
+ * Every heavy special that is a strike, by how far its hit window reaches from the body and how far
+ * the strike carries the body, both in body lengths.
+ *
+ * Two things read this. `stepExpansionAbility` moves the body through the hit window: without that
+ * the button plays an animation on the spot, and since every window is inside a body length or two
+ * it never touches anything the player was aiming at. `Game.heavyMove` reads it for the crosshair,
+ * so the aim prompt lights when this creature's own move can connect rather than at the pounce's
+ * much longer reach — the heavy button is a pounce only for creatures that have no special.
+ *
+ * The Cambrian entries live here; the Devonian registers its own (`installDevonianSpecials`), and
+ * abilities absent from the table do not strike at all. `spineIntercept` drives itself the whole
+ * length of the pass, so it carries no extra lunge.
+ */
+export interface HeavyStrike {
+  reach: number; lunge: number;
+  /** The strike turns onto a target behind it (a neck that comes round faster than the body). */
+  snap?: boolean;
+}
+export const HEAVY_STRIKE: Record<string, HeavyStrike> = {
+  snatch: { reach: 2.4, lunge: 1.0 },
+  tentacleSeize: { reach: 1.5, lunge: 1.4 },
+  basketRake: { reach: 2.0, lunge: 1.0 },
+  shellCrush: { reach: 0.95, lunge: 1.8 },
+  spineIntercept: { reach: 4.0, lunge: 0 },
+};
+
+/**
+ * How far a heavy special can hit, in world units. Only part of the lunge counts: the hit window
+ * opens partway into the travel and closes before the end of it, and a benthic creature loses a
+ * little more to the ground it is crossing. Promising the whole distance on the crosshair would
+ * light the prompt for a strike that falls short, which is the failure this reach exists to stop.
+ */
+const LUNGE_USABLE = 0.55;
+export function heavyStrikeReach(a: Actor, def: CreatureDef): number {
+  const s = HEAVY_STRIKE[def.ability];
+  return s ? lengthOf(a) * (s.reach + s.lunge * LUNGE_USABLE) : 0;
+}
+
+/**
+ * A strike commits to a heading: turn onto the target at the windup, then carry the body along that
+ * heading through the hit window. Steering during the strike is deliberately not allowed.
+ *
+ * This runs for every heavy special, including the ones whose effects live outside this module
+ * (`snatch` is in `Game.updateAbility`) and the ones with no `abilityDuration` of their own —
+ * without it the button plays its animation on the spot and the hit window, which is inside a body
+ * length or two, never reaches what the player aimed at.
+ */
+export function beginHeavyStrike(ctx: ExpansionContext, a: Actor, def: CreatureDef): void {
+  const strike = HEAVY_STRIKE[def.ability];
+  if (!strike) return;
+  const t = strikeTarget(ctx, a);
+  if (t) {
+    const to = norm(sub(t.pos, a.pos));
+    if (strike.snap || dot(to, heading(a.yaw)) > 0.35) { a.yaw = yawOf(to); a.prevT.yaw = a.yaw; }
+    a.lockTarget = t.id;
+  }
+  a.dodgeDir = heading(a.yaw);
+}
+
+/**
+ * Carry the body through the strike, from just before the hit window to just after it — but only
+ * as far as the target. The carry stops once the body is inside its own hit reach, so a strike
+ * arrives on what it was aimed at instead of rocketing through it, and an animal defending a patch
+ * of ground does not walk itself off that ground one lunge at a time.
+ */
+export function stepHeavyStrike(ctx: ExpansionContext, a: Actor, def: CreatureDef): void {
+  const strike = HEAVY_STRIKE[def.ability];
+  if (!strike || strike.lunge <= 0) return;
+  const dur = a.stateDur || 1, from = dur * 0.15, to = dur * 0.8;
+  if (a.stateT <= from || a.stateT >= to) return;
+  const t = a.lockTarget >= 0 ? ctx.hit.byId(a.lockTarget) : undefined;
+  if (t && isAlive(t) && dist(a.pos, t.pos) < lengthOf(a) * strike.reach * 0.8) return;
+  a.vel = scale(a.dodgeDir, (strike.lunge * lengthOf(a)) / (to - from));
+}
+
+/** The thing a strike should be aimed at: whatever is locked, else the nearest body in front. */
+function strikeTarget(ctx: ExpansionContext, a: Actor): Actor | undefined {
+  const L = lengthOf(a), h = heading(a.yaw), reach = L * 4;
+  let best: Actor | undefined, bestD = Infinity;
+  for (const o of ctx.nearby(a.pos, reach)) {
+    if (o.id === a.id || !isAlive(o) || isHidden(o) || ctx.allies(a, o)) continue;
+    if (o.id === a.lockTarget) return o;
+    if (o.controller === 'swarm') continue;
+    const d = dist(a.pos, o.pos);
+    if (d >= bestD || dot(norm(sub(o.pos, a.pos)), h) < 0.5) continue;
+    best = o; bestD = d;
+  }
+  return best;
+}
+
 export function beginExpansionAbility(ctx: ExpansionContext, a: Actor, def: CreatureDef): boolean {
   if (!def.abilityDuration) return false;
   a.stateDur = def.abilityDuration;
@@ -41,7 +132,6 @@ export function beginExpansionAbility(ctx: ExpansionContext, a: Actor, def: Crea
     }
     if (def.ability === 'sedimentDive') ctx.silt.push({ pos: { ...a.pos }, radius: lengthOf(a) * .8, t: 3 });
   }
-  if (def.ability === 'spineIntercept') a.dodgeDir = heading(a.yaw);
   if (def.ability === 'whipSearch') { a.senseT = a.stateDur; a.senseCd = Math.max(a.senseCd, 6); }
   return true;
 }
@@ -115,7 +205,8 @@ export const bloomRate = (a: Actor, def: CreatureDef) => {
 };
 
 export const grazeRate = (a: Actor, def: CreatureDef) => {
-  if (def.id === 'wiwaxia') return a.stillness > .5 ? 1.6 : 0;
   if (def.diet !== 'grazer' && def.diet !== 'deposit') return 0;
+  // An animal that has to plant itself to rasp gets nothing while it is moving (Wiwaxia).
+  if (def.grazeStill && a.stillness <= .5) return 0;
   return (def.diet === 'deposit' ? 1.1 : 1.6) * (a.abilityActive && def.ability === 'adhesiveGlide' ? 3 : 1);
 };

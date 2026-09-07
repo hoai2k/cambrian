@@ -7,7 +7,7 @@ import type { Actor, Mode, WorldEvent } from '../types';
 import { BIOME_DANGER, biomeAt, groundHeight, sampleCurrent, shoreDistance, SHORE_WALL, SURFACE_Y } from '../world';
 import { bodyRadius } from '../actors';
 import { ADULT_STAGE, devActor, DOMINANT, HOLD_TO_WIN, PRIME_STAGE, RUNG_NAMES, STAGE_AT, STAGES, stageForScale, stageScale, stateFor, type DeadZone, type DevActor } from './state';
-import { beginAbility, camoDrain, installDevonianSpecials, stepAbility, stepGuardSpecial, useAbility, ySpecial } from './specials';
+import { camoDrain, installDevonianSpecials, stepAbility, stepGuardSpecial, useAbility, ySpecial } from './specials';
 import { botNursery, canBreach, sanctuary, spawnInCover, spawnProtect, spawnY, swim, wanderY } from './swim';
 
 /**
@@ -284,7 +284,7 @@ export const DEVONIAN_RULES: EraRules = {
   shoreReach(a) { return creature(a.creature).shoreReach ?? 0; },
   jet(a) { return !!creature(a.creature).shell; },
 
-  useAbility, beginAbility, stepAbility, camoDrain,
+  useAbility, stepAbility, camoDrain,
   swim, canBreach, spawnY, wanderY,
   spawnPoint: spawnInCover, botNursery, spawnProtect, sanctuary,
 
@@ -313,7 +313,7 @@ export const DEVONIAN_RULES: EraRules = {
         const d = devActor(g, a);
         if (d.stage >= PRIME_STAGE && isAlive(a)) {
           d.primeT += dt;
-          if (d.primeT >= HOLD_TO_WIN && g.state.status === 'playing') {
+          if (d.primeT >= HOLD_TO_WIN && g.state.status === 'playing' && !g.endless) {
             const name = creature(a.creature).name;
             g.state = { status: a.player >= 0 ? 'won' : 'lost', winner: a.player,
               message: a.player >= 0 ? `${name} grew up and held the sea.` : `A rival ${name} grew up first.` };
@@ -327,7 +327,7 @@ export const DEVONIAN_RULES: EraRules = {
     const contenders = players(g);
     for (const a of contenders) {
       const d = devActor(g, a);
-      if (d.dominantT >= HOLD_TO_WIN && g.state.status === 'playing') {
+      if (d.dominantT >= HOLD_TO_WIN && g.state.status === 'playing' && !g.endless) {
         const name = creature(a.creature).name;
         g.state = { status: a.player >= 0 ? 'won' : 'lost', winner: a.player, message: a.player >= 0 ? `${name} dominates the ${RUNG_NAMES[rungOf(a)].toLowerCase()}.` : `A rival ${name} owns its rung.` };
       }
@@ -336,6 +336,11 @@ export const DEVONIAN_RULES: EraRules = {
       const best = [...contenders].sort((x, y) => devActor(g, y).standing - devActor(g, x).standing)[0];
       if (best) g.state = { status: best.player >= 0 ? 'won' : 'lost', winner: best.player, message: best.player >= 0 ? `Player ${best.player + 1} has the highest standing in the chain.` : `A rival ${creature(best.creature).name} out-stood everyone.` };
     }
+  },
+
+  /** Survival and Domination both win on a held timer; zero them so play resumes with the sea open. */
+  continueMatch(g) {
+    for (const a of players(g)) { const d = devActor(g, a); d.primeT = 0; d.dominantT = 0; }
   },
 
   /**

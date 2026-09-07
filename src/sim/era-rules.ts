@@ -71,7 +71,9 @@ export interface EraRules {
   /** Y pressed while free or guarding and not hidden: true when the era's own special took it (the shared hide is skipped). */
   useAbility(g: Game, a: Actor, ctx: ExpansionContext): boolean;
   /** A heavy special started (after the shared begin): the era may aim and commit it. */
-  beginAbility(g: Game, a: Actor, ctx: ExpansionContext): void;
+  /** Optional: the shared code aims and carries every heavy strike (`HEAVY_STRIKE`); this is for
+   *  anything an era needs on top of that. */
+  beginAbility?(g: Game, a: Actor, ctx: ExpansionContext): void;
   /** Every step in the 'ability' state (after the shared step). */
   stepAbility(g: Game, a: Actor, ctx: ExpansionContext, dt: number): void;
   /** Multiplier on the camouflage stamina drain. */
@@ -93,6 +95,11 @@ export interface EraRules {
   onRespawn(g: Game, a: Actor): void;
   /** Win checks for the era's own modes; the shared ones (reef, hunted) run as before. */
   updateModes(g: Game, dt: number): void;
+  /**
+   * A finished co-op match is being carried on (`Game.continueMatch`): clear whatever the era was
+   * counting towards its win so the goal is not met again the instant play resumes.
+   */
+  continueMatch(g: Game): void;
   hud(g: Game, i: number): EraHud | undefined;
   hint(g: Game, i: number): string | undefined;
   /**
