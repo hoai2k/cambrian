@@ -5,6 +5,7 @@ import type { HudSnapshot, PlayerHud, RadarBlipHud } from '../render/engine';
 import { creature } from '../sim/creatures';
 import { BIOME_ART, biomeArtPath, radarGlyphPath } from '../shared/environment-assets';
 import { BAND_COLOR } from '../sim/types';
+import { appBase } from '../shared/base';
 
 export function Hud({ snapshot }: { snapshot: HudSnapshot }) {
   const W = snapshot.rects.reduce((m, r) => Math.max(m, r.x + r.w), 1);
@@ -34,7 +35,7 @@ function PlayerPanel({ p }: { p: PlayerHud }) {
     <>
       <div className="health-vignette" aria-hidden="true" style={{ opacity: healthWarning }} />
       {p.bandMarkers.map((m, k) => (
-        <span key={k} className={`marker marker-${m.band}`} style={{ left: `${m.x * 100}%`, top: `${m.y * 100}%`, ['--s' as string]: m.size, maskImage: `url(${import.meta.env.BASE_URL}${assetPaths.ui(`band-${m.band}.svg`)})`, color: BAND_COLOR[m.band] }} />
+        <span key={k} className={`marker marker-${m.band}`} style={{ left: `${m.x * 100}%`, top: `${m.y * 100}%`, ['--s' as string]: m.size, maskImage: `url(${appBase()}${assetPaths.ui(`band-${m.band}.svg`)})`, color: BAND_COLOR[m.band] }} />
       ))}
       {p.hunterAngle != null && (
         <div className="hunter-arrow" style={{ transform: `translate(-50%,-50%) rotate(${-p.hunterAngle}rad) translate(min(38vh, 34%))`, opacity: 0.4 + p.hunted * 0.6 }}>
@@ -47,7 +48,7 @@ function PlayerPanel({ p }: { p: PlayerHud }) {
             <circle cx="36" cy="36" r={R} className="ring-bg" />
             <circle cx="36" cy="36" r={R} className="ring-fg" strokeDasharray={`${C * p.progress} ${C}`} transform="rotate(-90 36 36)" />
           </svg>
-          <span className="tier-num" role="img" aria-label={`Tier ${p.tier + 1}: ${p.tierName}`}><i className="tier-glyph" style={{ maskImage: `url(${import.meta.env.BASE_URL}${assetPaths.ui(`tier-${p.tier + 1}.svg`)})` }} /></span>
+          <span className="tier-num" role="img" aria-label={`Tier ${p.tier + 1}: ${p.tierName}`}><i className="tier-glyph" style={{ maskImage: `url(${appBase()}${assetPaths.ui(`tier-${p.tier + 1}.svg`)})` }} /></span>
         </div>
         <div className="bars">
           <div className="name-row"><b>{def.name}</b><span className="tier-name">{p.tierName}</span>{p.protect && <span className="protect">PROTECTED</span>}</div>
@@ -135,13 +136,13 @@ function Radar({ radar, biome }: { radar: PlayerHud['radar']; biome: string }) {
       const sx = C + b.x * R, sy = C + b.y * R;
       const angle = Math.atan2(b.y, b.x) * 180 / Math.PI + 90;
       return <g key={k} className={cls} style={{ color: b.color }} transform={`rotate(${angle} ${sx} ${sy})`}>
-        <use href={`${import.meta.env.BASE_URL}${radarGlyphPath('shore')}#glyph`} x={sx - 10} y={sy - 5} width="20" height="10" />
+        <use href={`${appBase()}${radarGlyphPath('shore')}#glyph`} x={sx - 10} y={sy - 5} width="20" height="10" />
       </g>;
     }
     const size = b.kind === 'giant' ? 11 : 9;
     return <g key={k} className={cls} style={{ color: b.color }}>
       <g filter={b.beyond ? `url(#${outline})` : undefined}>
-        <use href={`${import.meta.env.BASE_URL}${radarGlyphPath(b.kind)}#glyph`} x={x - size / 2} y={y - size / 2} width={size} height={size}/>
+        <use href={`${appBase()}${radarGlyphPath(b.kind)}#glyph`} x={x - size / 2} y={y - size / 2} width={size} height={size}/>
       </g>
     </g>;
   };
@@ -158,7 +159,7 @@ function Radar({ radar, biome }: { radar: PlayerHud['radar']; biome: string }) {
         <circle cx={C} cy={C} r={R * 0.5} className="radar-ring" />
         <line x1={C} y1={C - R} x2={C} y2={C + R} className="radar-ring" />
         <line x1={C - R} y1={C} x2={C + R} y2={C} className="radar-ring" />
-        <use href={`${import.meta.env.BASE_URL}${radarGlyphPath('player')}#glyph`} x={C - 5} y={C - 5} width="10" height="10" className="radar-you" />
+        <use href={`${appBase()}${radarGlyphPath('player')}#glyph`} x={C - 5} y={C - 5} width="10" height="10" className="radar-you" />
         {inside.map(dot)}{rim.map(dot)}
         <circle cx={C} cy={C} r={R} className="radar-rim" />
       </svg>
@@ -182,6 +183,6 @@ function BiomeBanner({ biome, alive }: { biome: string; alive: boolean }) {
   }, [biome, alive]);
   const art = BIOME_ART.find(b => b.name === shown);
   return shown ? <div className="biome-banner" key={shown}>
-    {art && <img src={`${import.meta.env.BASE_URL}${biomeArtPath(art.id)}`} alt="" aria-hidden="true" />}
+    {art && <img src={`${appBase()}${biomeArtPath(art.id)}`} alt="" aria-hidden="true" />}
     <span>ENTERING</span><b>{shown}</b></div> : null;
 }

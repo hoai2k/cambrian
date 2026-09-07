@@ -1,4 +1,5 @@
 import { ACTIVE_ERA } from '../content';
+import { RULES } from './era-rules';
 import { BURROWERS, HEAVY_SPECIALS, DEFENSIVE_SPECIALS, CAMOUFLAGE_DRAIN, camouflageMatch, clearPursuit, stopHiding } from './concealment';
 import { abilitySpeed, beginExpansionAbility, stepExpansionAbility, bloomRate, grazeRate } from './expansion-abilities';
 import { add, clamp, damp, dist, distXZ, dot, heading, len3, lerp, makeRng, norm, scale as vscale, sub, TAU, v3, wrapAngle, yawOf, type Rng, type Vec3 } from '../shared/math';
@@ -72,25 +73,39 @@ export class Game implements AiWorld {
     this.world = new World(seed);
     const nursery = nurseryAt(0);
     this.world.loadAround(nursery);
-    this.hitCtx = { events: this.events, byId: (id) => this.idMap.get(id), time: 0, rng: this.rng };
+    this.hitCtx = { events: this.events, byId: (id) => this.idMap.get(id), time: 0, rng: this.rng, armour: RULES ? (att, vic, dir) => RULES!.armour(att, vic, dir) : undefined };
     setups.forEach((s, i) => {
-      const startScale = mode === 'rise' ? TIER_SCALE[0] : mode === 'hunted' ? (i === 0 ? 3.0 : TIER_SCALE[1]) : mode === 'reef' ? TIER_SCALE[2] : TIER_SCALE[1];
+      const startScale = RULES ? RULES.startScale(mode, i) : mode === 'rise' ? TIER_SCALE[0] : mode === 'hunted' ? (i === 0 ? 3.0 : TIER_SCALE[1]) : mode === 'reef' ? TIER_SCALE[2] : TIER_SCALE[1];
       const a = this.spawn(s.creature, 'player', this.spawnPoint(nursery, s.creature, startScale, i), startScale, i);
       a.home = { ...nursery };
       a.yaw = Math.PI;                                   // facing out to sea
       this.players.push(a);
       this.progress.push({ prompts: [], flags: new Set(), deaths: 0, apexT: 0, message: '' });
     });
-    if (mode === 'frenzy' || mode === 'hunted') {
+    if (mode === 'frenzy' || mode === 'hunted' || mode === 'domination' || mode === 'foodchain') {
       // Fill to 4 with bots
       for (let i = setups.length; i < 4; i++) {
-        const c = CREATURE_IDS[Math.floor(this.rng() * CREATURE_IDS.length)];
-        const bot = this.spawn(c, 'bot', this.spawnPoint(nursery, c, TIER_SCALE[1], i), TIER_SCALE[1]);
+        const c = this.pickBot(setups.map((s) => s.creature), i);
+        const botScale = RULES ? RULES.startScale(mode, i) : TIER_SCALE[1];
+        const bot = this.spawn(c, 'bot', this.spawnPoint(nursery, c, botScale, i), botScale);
         bot.home = { ...nursery };
         bot.brain = makeBrain('needs', nursery, this.rng, { aggression: 0.9, reaction: 0.2, parrySkill: 0.55 });
       }
     }
     this.populate();
+    RULES?.init(this);
+  }
+
+  /** A bot's species: anything a player might pick; in Food Chain one from a rung nobody has taken yet. */
+  private pickBot(taken: CreatureId[], i: number): CreatureId {
+    const pool = CREATURE_IDS.filter((c) => {
+      const def = creature(c);
+      if (this.mode !== 'foodchain' || def.rung === undefined) return true;
+      return !taken.some((t) => creature(t).rung === def.rung) && !this.actors.some((a) => a.controller === 'bot' && creature(a.creature).rung === def.rung);
+    });
+    const from = pool.length ? pool : CREATURE_IDS;
+    void i;
+    return from[Math.floor(this.rng() * from.length)];
   }
 
   /** The points the world streams around and the ecosystem is kept alive near: every player and bot. */
@@ -299,7 +314,9 @@ export class Game implements AiWorld {
     stepFlora(this.world, dt);
     this.updateSilt(dt);
     this.updatePopulation(dt);
+    RULES?.step(this, dt);
     this.updateModes(dt);
+    RULES?.onEvents(this, this.events);
     for (const a of this.actors) if (a.state === 'dead' && a.corpseT > 45 && a.controller !== 'player' && a.controller !== 'bot') this.remove(a);
     for (const a of this.actors) if (a.state === 'dead' && a.eaten >= 1 && a.controller !== 'player' && a.controller !== 'bot') this.remove(a);
   }
@@ -365,13 +382,14 @@ export class Game implements AiWorld {
 
   private respawn(a: Actor) {
     const def = creature(a.creature);
-    // death penalty: lose a tier, keep half progress
-    if (a.tier > 0 && this.mode !== 'reef') {
+    // death penalty: lose a tier, keep half progress (an era may own this instead)
+    if (RULES) RULES.onRespawn(this, a);
+    else if (a.tier > 0 && this.mode !== 'reef') {
       const frac = a.nutrition / TIER_NEED[a.tier];
       a.tier = (a.tier - 1) as Tier; a.scale = TIER_SCALE[a.tier];
       a.nutrition = TIER_NEED[a.tier] * clamp(frac * 0.5 + 0.35, 0, 0.9);
     } else a.nutrition *= 0.5;
-    if (this.mode === 'hunted' && a.player === 0) { a.scale = 3.0; a.tier = 3; }
+    if (this.mode === 'hunted' && a.player === 0 && !RULES) { a.scale = 3.0; a.tier = 3; }
     applyScaleStats(a, false);
     a.eaten = 0;
     a.stamina = a.staminaMax; a.poise = a.poiseMax;
@@ -520,14 +538,18 @@ export class Game implements AiWorld {
     const cur = sampleCurrent(v3(), a.pos.x, a.pos.y, a.pos.z, this.time);
     const curK = def.ground ? 0.08 : 0.55;
     let desired: Vec3 = v3(cur.x * curK, cur.y * curK, cur.z * curK);
+    const jets = RULES?.jet(a) ?? false;
     if (controllable && mag > 0) {
-      desired.x += dir.x * mag * cruise * burstMult;
-      desired.y += dir.y * mag * cruise * burstMult;
-      desired.z += dir.z * mag * cruise * burstMult;
+      // A shelled jetter's sprint fires backward out of the funnel: the body goes the other way.
+      const jetK = jets && burstMult > 1 ? -1 : 1;
+      desired.x += dir.x * mag * cruise * burstMult * jetK;
+      desired.y += dir.y * mag * cruise * burstMult * jetK;
+      desired.z += dir.z * mag * cruise * burstMult * jetK;
     }
     if (controllable && !def.ground) {
-      if (input.rise) desired.y += 2.6 * sf;
-      if (input.sink) desired.y -= 2.6 * sf;
+      const hover = jets ? 1.6 : 1;
+      if (input.rise) desired.y += 2.6 * sf * hover;
+      if (input.sink) desired.y -= 2.6 * sf * hover;
     }
     let rate = def.agility;
     if (mag === 0 && controllable) rate = def.glide; // glide out
@@ -580,7 +602,7 @@ export class Game implements AiWorld {
     }
 
     // Static collision
-    const hitWall = resolveStatic(this.world, a.pos, bodyRadius(a), this.scratchBoulders);
+    const hitWall = resolveStatic(this.world, a.pos, bodyRadius(a), this.scratchBoulders, RULES?.shoreReach(a) ?? 0);
     if (hitWall && !def.ground) { a.vel.x *= 0.6; a.vel.z *= 0.6; }
     // Plants: swarm snacks are numerous and tiny, so they take turns on alternate steps.
     if (!isHidden(a) && a.state !== 'grabbed') {
@@ -1015,6 +1037,8 @@ export class Game implements AiWorld {
     // co-op share
     if (this.mode === 'rise' && food && amount > 2) for (const p of this.players) if (p !== a && isAlive(p) && dist(p.pos, a.pos) < 25) p.nutrition += amount * 0.3;
     if (this.mode === 'frenzy' && food && (food.controller === 'player' || food.controller === 'bot')) a.nutrition += 12;
+    RULES?.onNutrition(this, a, amount, food);
+    if (RULES && !RULES.growthByNutrition) return;
     this.checkTierUp(a);
     for (const p of this.players) if (p !== a) this.checkTierUp(p);
   }
@@ -1228,6 +1252,7 @@ export class Game implements AiWorld {
   biomeOf(i: number): Biome | undefined { const p = this.players[i]; return p ? biomeAt(p.pos.x, p.pos.z) : undefined; }
 
   private updateModes(dt: number) {
+    RULES?.updateModes(this, dt);
     switch (this.mode) {
       case 'rise': {
         this.players.forEach((p, i) => {
@@ -1267,6 +1292,7 @@ export class Game implements AiWorld {
   hintFor(i: number): string | undefined {
     const p = this.players[i]; const pr = this.progress[i];
     if (!p || !pr || this.mode === 'reef') return undefined;
+    if (RULES) return RULES.hint(this, i);
     const f = pr.flags;
     if (!isAlive(p)) return undefined;
     if (p.hunted >= 0.5) return p.cover > 0.3 ? (len3(p.vel) < 0.3 ? 'Hold still. It is losing you.' : 'You are in cover. Now hold still.') : 'It is coming for you. Get under the sponges, then hold still.';

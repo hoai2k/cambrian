@@ -1,13 +1,19 @@
 import type { MusicTrack } from '../audio/music';
 import type { CreatureDef, CreatureId } from './creature-types';
 import type { Biome } from '../sim/world';
+import type { Mode } from '../sim/types';
 import type { Slot, Scheme } from '../shared/palettes';
 import type { PortraitRecord } from '../shared/portrait-match';
 
 /** Plain data only: safe to import from the deterministic simulation and Node tooling. */
+/** A selectable mode and the copy the selection screen shows for it. */
+export interface ModeInfo { readonly id: Mode; readonly name: string; readonly blurb: string; readonly players: string; }
+
 export interface EraDefinition {
   readonly id: string;
   readonly title: string;
+  /** The modes this era offers, in selection order. The simulation's win checks are keyed by id. */
+  readonly modes: readonly ModeInfo[];
   readonly creatures: readonly CreatureDef[];
   readonly defaults: {
     readonly player: CreatureId;
@@ -61,5 +67,6 @@ export function defineEra(def: EraDefinition): EraDefinition {
   for (const id of ids) if (!def.presentation.authoredColors.creatures[id]) throw new Error(`${def.id}: missing authored colours for ${id}`);
   if (!def.presentation.schemes.length) throw new Error(`${def.id}: a default colour scheme is required`);
   if (!def.audio.music.length) throw new Error(`${def.id}: a soundtrack is required`);
+  if (!def.modes.length) throw new Error(`${def.id}: at least one mode is required`);
   return def;
 }

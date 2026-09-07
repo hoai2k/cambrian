@@ -11,6 +11,12 @@ import portraits from '../../../public/assets/creatures/schemes/manifest.json';
 export const CAMBRIAN = defineEra({
   id: 'cambrian',
   title: 'Cambrian Explosion',
+  modes: [
+    { id: 'rise', name: 'Rise', blurb: 'Hatch as a larva. Eat, grow, fight, hide. Reach Apex and hold it for ninety seconds. Allies share the feast.', players: '1–4 co-op' },
+    { id: 'frenzy', name: 'Feeding Frenzy', blurb: 'Growth race. First to Apex wins. Eating a rival steals their progress. Bots fill the empty seats.', players: '1–4 versus' },
+    { id: 'hunted', name: 'Hunter & Hunted', blurb: 'Player one is a giant. Everyone else is small, hungry, and trying to grow up before they get eaten.', players: '2–4 asymmetric' },
+    { id: 'reef', name: 'Reef', blurb: 'No goal. Start as an adult with every move unlocked and just be an animal in the Cambrian.', players: '1–4 sandbox' },
+  ],
   creatures: CAMBRIAN_CREATURES,
   defaults: {
     player: 'anomalocaris',

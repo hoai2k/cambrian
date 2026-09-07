@@ -446,11 +446,11 @@ export function coverAt(world: WorldData, pos: Vec3, length: number, scratch: Co
 }
 
 /** Push (x,z) out of boulders and off the beach. Returns whether a collision happened. */
-export function resolveStatic(world: WorldData, pos: Vec3, radius: number, scratch: Boulder[]): boolean {
+export function resolveStatic(world: WorldData, pos: Vec3, radius: number, scratch: Boulder[], reach = 0): boolean {
   let hit = false;
   // The shore is the one wall in the sea. Push straight back along -z; the coast wanders gently
-  // enough that the local normal is close to that.
-  const s = shoreDistance(pos.x, pos.z), wall = SHORE_WALL + radius * 3;
+  // enough that the local normal is close to that. `reach` lets a limbed body push that far past it.
+  const s = shoreDistance(pos.x, pos.z), wall = Math.max(radius, SHORE_WALL + radius * 3 - reach);
   if (s < wall) { pos.z -= wall - s; hit = true; }
   for (const b of world.boulderHash.query(pos.x, pos.z, radius + 8, scratch)) {
     if (pos.y > b.height + radius * 0.5) continue;

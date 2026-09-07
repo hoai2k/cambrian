@@ -8,6 +8,7 @@ import { ACTIVE_ERA } from '../content';
  */
 import { CREATURE_IDS, type CreatureId } from '../sim/creatures';
 import { ensureLoaded } from './creature';
+import { appBase } from '../shared/base';
 
 export type AssetKind = 'glb' | 'lod' | 'card' | 'sfx';
 export interface AssetItem { key: string; kind: AssetKind; url: string; size: number; priority: number; status: 'queued' | 'loading' | 'done' | 'failed'; loaded: number; }
@@ -18,7 +19,7 @@ export const GLB_SIZES: Readonly<Partial<Record<CreatureId, number>>> = ACTIVE_E
 const CARD_SIZE = 1_010_000;
 export const SFX_FILES = ['ui-start', 'ui-confirm', 'ui-move', 'ui-back', 'ui-join', 'bite-1', 'bite-2', 'bite-3', 'crunch-1', 'crunch-2', 'hit-light-1', 'hit-light-2', 'hit-heavy-1', 'hit-heavy-2', 'ambient-reef', 'giant-drone', 'heartbeat', 'parry', 'guard-break', 'stagger', 'dodge-1', 'dodge-2', 'burst', 'silt', 'grab', 'kill', 'death', 'tier-up', 'hunted', 'escape', 'sense', 'ability', 'won'];
 
-const BASE = import.meta.env.BASE_URL;
+const BASE = appBase();
 
 export class AssetQueue {
   private items = new Map<string, AssetItem>();
