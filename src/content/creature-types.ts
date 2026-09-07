@@ -54,5 +54,28 @@ export interface CreatureDef {
   passive: string;
   weakness: string;
   canGuard: boolean;
+
+  // ---- Devonian Domination (docs/redesign/08-devonian-domination.md). All optional; the Cambrian
+  // roster sets none of them and the shared simulation ignores them unless the era's rules ask.
+  /** Place in the food chain, 1 (floor) to 4 (giants). Fixed per creature: nothing changes rung. */
+  rung?: 1 | 2 | 3 | 4;
+  /** Fraction of the body, from the snout back, that is armoured (0 = none). */
+  armour?: number;
+  /** This creature's heavy cuts through armour: 1 ignores it entirely, 0.5 halves it. */
+  armourPierce?: number;
+  /** Air breathers carry an air meter and must surface; everything else breathes water. */
+  breathing?: 'gill' | 'air';
+  /** How far past the shore wall this creature may push (world units). 0 for swimmers. */
+  shoreReach?: number;
+  /** Chambered shell: backward jet sprint, free buoyancy, withdraw on block. */
+  shell?: boolean;
+  /** Arthropod that must moult to reach the next stage, leaving an exuvia. */
+  moults?: boolean;
+  /** Rung II fish that gains standing from conspecifics following it. */
+  shoals?: boolean;
+  /** Cannot bite anything above snack size (Titanichthys, Doryaspis). */
+  noBite?: boolean;
+  /** Locality label for the selection card (the roster mixes places and times, and says so). */
+  locality?: string;
 }
 

@@ -1,4 +1,3 @@
-import { assetPaths } from '../content/asset-paths';
 import * as THREE from 'three';
 import { GLTFLoader, type GLTF } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { MeshoptDecoder } from 'three/examples/jsm/libs/meshopt_decoder.module.js';
@@ -7,26 +6,25 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { SEA_GLSL } from '../render/sea';
 import { sampleCurrent, SURFACE_Y } from '../sim/world';
 import { TAU } from '../shared/math';
-import { creature, type CreatureId } from '../sim/creatures';
+import type { ViewerSpecimen } from './catalogue';
 import { cloneMaterials, makeRecolor, type Recolor } from '../render/recolor';
 import { DEFAULT_SCHEME, type Slot } from '../shared/palettes';
+import { appBase } from '../shared/base';
 
 /**
  * The viewer page lives one directory below the app, so `BASE_URL` ('./' in a built bundle)
  * would resolve creature assets to /viewer/assets/. Step back up a level instead; in dev
  * BASE_URL is an absolute '/' and can be used as-is.
  */
-const base = import.meta.env.BASE_URL;
+const base = appBase();
 export const ASSET_BASE = base.startsWith('/') ? base : '../';
 
-/** Clips that read as a continuous state rather than a single beat. */
-const LOOPING = new Set(['Idle', 'Swim', 'Crawl', 'Guard', 'Eat', 'Moult']);
 /** Buttons are grouped in this order; anything unlisted is appended alphabetically. */
 const CLIP_ORDER = [
   'Idle', 'Swim', 'Crawl', 'TurnLeft', 'TurnRight', 'Dive', 'Rise',
   'Bite', 'Heavy', 'Attack', 'Grab', 'Ability',
   'Guard', 'Parry', 'Dodge', 'Hit', 'Stagger', 'Death',
-  'Eat', 'Moult',
+  'Eat', 'Moult', 'Growth',
 ];
 
 export const orderClips = (names: string[]) =>
@@ -38,7 +36,7 @@ export const orderClips = (names: string[]) =>
 
 export interface ViewerScene {
   /** Loads a creature and returns its clip names in button order. */
-  show(id: CreatureId): Promise<string[]>;
+  show(specimen: ViewerSpecimen): Promise<string[]>;
   /** Plays a clip. One-shots fade back to the resting loop unless `loop` forces a repeat. */
   play(name: string, loop: boolean): void;
   setSpeed(s: number): void;
@@ -53,16 +51,25 @@ export interface ViewerScene {
 }
 
 const loader = new GLTFLoader().setMeshoptDecoder(MeshoptDecoder);
-const cache = new Map<CreatureId, Promise<GLTF>>();
+function loadCreature(specimen: ViewerSpecimen) {
+  return loader.loadAsync(`${ASSET_BASE}${specimen.model}`)
+    .catch((e) => { throw new Error(`Could not load ${specimen.name}: ${e?.message ?? e}`); });
+}
 
-function loadCreature(id: CreatureId) {
-  let p = cache.get(id);
-  if (!p) {
-    p = new Promise<GLTF>((res, rej) => loader.load(`${ASSET_BASE}${assetPaths.model(id)}`, res, undefined, rej))
-      .catch((e) => { cache.delete(id); throw new Error(`Could not load ${creature(id).name}: ${e?.message ?? e}`); });
-    cache.set(id, p);
-  }
-  return p;
+/** Keep only the displayed asset in GPU memory; browser HTTP caching handles revisits. */
+function disposeAsset(gltf: GLTF) {
+  const geometries = new Set<THREE.BufferGeometry>();
+  const materials = new Set<THREE.Material>();
+  const textures = new Set<THREE.Texture>();
+  gltf.scene.traverse(o => {
+    if (!(o instanceof THREE.Mesh)) return;
+    geometries.add(o.geometry);
+    for (const m of Array.isArray(o.material) ? o.material : [o.material]) materials.add(m);
+  });
+  for (const m of materials) for (const v of Object.values(m)) if (v instanceof THREE.Texture) textures.add(v);
+  geometries.forEach(g => g.dispose());
+  materials.forEach(m => m.dispose());
+  textures.forEach(t => { t.dispose(); if (typeof ImageBitmap !== 'undefined' && t.image instanceof ImageBitmap) t.image.close(); });
 }
 
 /** Creature stands here: well clear of the (absent) seabed and under the light window. */
@@ -164,6 +171,7 @@ export function createViewerScene(canvas: HTMLCanvasElement): ViewerScene {
   scene.add(stage);
 
   let model: THREE.Object3D | undefined;
+  let source: GLTF | undefined;
   let mixer: THREE.AnimationMixer | undefined;
   let actions = new Map<string, THREE.AnimationAction>();
   let current: THREE.AnimationAction | undefined;
@@ -172,7 +180,7 @@ export function createViewerScene(canvas: HTMLCanvasElement): ViewerScene {
   let modelMaterials: THREE.Material[] = [];
   let recolor: Recolor | undefined;
   let schemeId = DEFAULT_SCHEME;
-  let abilityLoops = false;
+  let looping: readonly string[] = [];
   let speed = 1;
   let frameRadius = 3;
   let token = 0;
@@ -180,21 +188,27 @@ export function createViewerScene(canvas: HTMLCanvasElement): ViewerScene {
 
   const setClip = (name: string) => { currentName = name; clipCb(name); };
 
-  // Geometry belongs to the cached GLTF and is shared with every clone, so it is only detached
-  // here. The materials are this model's own (see cloneMaterials), so those do get disposed.
+  // The displayed clone owns its materials/skeletons; its source owns geometry/textures.
   function clearModel() {
     mixer?.stopAllAction();
-    if (model) stage.remove(model);
+    if (model) {
+      stage.remove(model);
+      const skeletons = new Set<THREE.Skeleton>();
+      model.traverse(o => { if (o instanceof THREE.SkinnedMesh) skeletons.add(o.skeleton); });
+      skeletons.forEach(s => s.dispose());
+    }
     modelMaterials.forEach((m) => m.dispose());
     modelMaterials = []; recolor = undefined;
+    if (source) disposeAsset(source);
+    source = undefined;
     model = undefined; mixer = undefined; current = undefined;
     actions = new Map();
   }
 
   function frame() {
     const d = frameRadius * 3.1;
-    // Aim a little below the specimen so it sits above the animation panel rather than behind it.
-    const target = FOCUS.clone().setY(FOCUS.y - frameRadius * 0.45);
+    // The canvas occupies its own stage, clear of the specimen and action panels.
+    const target = FOCUS.clone();
     camera.position.set(FOCUS.x + d * 0.62, FOCUS.y + d * 0.38, FOCUS.z + d * 0.78);
     controls.target.copy(target);
     controls.minDistance = frameRadius * 0.4;
@@ -202,20 +216,21 @@ export function createViewerScene(canvas: HTMLCanvasElement): ViewerScene {
     controls.update();
   }
 
-  async function show(id: CreatureId) {
+  async function show(specimen: ViewerSpecimen) {
     const mine = ++token;
-    const gltf = await loadCreature(id);
-    if (mine !== token) return orderClips(gltf.animations.map((c) => c.name));
+    const gltf = await loadCreature(specimen);
+    if (mine !== token || disposed) { disposeAsset(gltf); return []; }
     clearModel();
-    abilityLoops = !!creature(id).abilityLoop;
+    source = gltf;
+    looping = specimen.looping;
 
-    // The GLBs are authored at arbitrary scale; normalise, then blow back up to the creature's
-    // gameplay adult length so relative sizes match the game.
+    // Keep the established Cambrian display scale. Devonian is a specimen collection with
+    // consistent framing; its researched real-world size is labelled separately.
     const src = SkeletonUtils.clone(gltf.scene);
     const box = new THREE.Box3().setFromObject(src);
     const size = box.getSize(new THREE.Vector3());
     const center = box.getCenter(new THREE.Vector3());
-    const unit = creature(id).adultLength / Math.max(size.x, size.y, size.z, 0.01);
+    const unit = specimen.displayLength / Math.max(size.x, size.y, size.z, 0.01);
     src.scale.setScalar(unit);
     src.position.copy(center).multiplyScalar(-unit);
     src.traverse((o) => { if (o instanceof THREE.Mesh) o.frustumCulled = false; });
@@ -223,7 +238,7 @@ export function createViewerScene(canvas: HTMLCanvasElement): ViewerScene {
     // bodies need room for their full silhouette in the elevated camera view.
     frameRadius = size.length() * unit * 0.5;
 
-    // Own the materials before touching them: the clone above shares them with the cached GLTF.
+    // Own the materials before recolouring the clone.
     modelMaterials = cloneMaterials(src);
     recolor = makeRecolor(src);
     recolor.setScheme(schemeId);
@@ -232,9 +247,10 @@ export function createViewerScene(canvas: HTMLCanvasElement): ViewerScene {
     stage.add(model);
     mixer = new THREE.AnimationMixer(model);
     for (const clip of gltf.animations) actions.set(clip.name, mixer.clipAction(clip));
-    mixer.addEventListener('finished', () => {
-      // A one-shot has run its course: settle back into the resting loop.
-      if (actions.has(restingClip)) play(restingClip, false);
+    mixer.addEventListener('finished', (event) => {
+      // Fading-out actions may finish after a new clip starts. Only the active action
+      // can return to rest; Death retains its authored terminal pose for inspection.
+      if (event.action === current && currentName !== 'Death' && actions.has(restingClip)) play(restingClip, false);
     });
 
     const names = orderClips([...actions.keys()]);
@@ -248,7 +264,7 @@ export function createViewerScene(canvas: HTMLCanvasElement): ViewerScene {
   function play(name: string, loop: boolean) {
     const act = actions.get(name);
     if (!act) return;
-    const repeat = loop || LOOPING.has(name) || (name === 'Ability' && abilityLoops);
+    const repeat = loop || looping.includes(name);
     const prev = current;
     act.reset();
     act.setLoop(repeat ? THREE.LoopRepeat : THREE.LoopOnce, repeat ? Infinity : 1);
@@ -317,6 +333,7 @@ export function createViewerScene(canvas: HTMLCanvasElement): ViewerScene {
     dispose() {
       if (disposed) return;
       disposed = true;
+      token++;
       cancelAnimationFrame(raf);
       ro.disconnect();
       controls.dispose();

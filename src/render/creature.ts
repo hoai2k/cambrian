@@ -10,6 +10,7 @@ import { schemeForCreature } from '../shared/palettes';
 import { creature, type CreatureId } from '../sim/creatures';
 import { lengthOf } from '../sim/actors';
 import type { Actor } from '../sim/types';
+import { appBase } from '../shared/base';
 
 interface Loaded { gltf: GLTF; unit: number; center: THREE.Vector3; size: THREE.Vector3; }
 export type Lod = 0 | 1;
@@ -17,7 +18,7 @@ const cache = new Map<string, Promise<Loaded>>();
 const loader = new GLTFLoader().setMeshoptDecoder(MeshoptDecoder);
 
 export const creatureUrl = (id: CreatureId, lod: Lod = 0) =>
-  `${import.meta.env.BASE_URL}${assetPaths.model(id, lod)}`;
+  `${appBase()}${assetPaths.model(id, lod)}`;
 
 export function loadCreature(id: CreatureId, onProgress?: (loaded: number, total: number) => void, lod: Lod = 0): Promise<Loaded> {
   const key = `${id}:${lod}`;

@@ -1,0 +1,62 @@
+{
+  "id": "coccosteus",
+  "name": "Coccosteus",
+  "species": "Coccosteus cuspidatus",
+  "provenance": "Middle Devonian, Orcadian Basin freshwater assemblages, Scotland",
+  "description": "Compact armoured fish with jointed head and trunk shields, a short biting mouth, conspicuous eyes and a flexible heterocercal tail.",
+  "lengthMeters": 0.35,
+  "modelLength": 4.673090696334839,
+  "locomotion": "Swim",
+  "clips": [
+    "Idle",
+    "Swim",
+    "TurnLeft",
+    "TurnRight",
+    "Dive",
+    "Rise",
+    "Attack",
+    "Bite",
+    "Heavy",
+    "Hit",
+    "Death",
+    "Guard",
+    "Parry",
+    "Dodge",
+    "Eat",
+    "Stagger",
+    "Ability",
+    "Growth"
+  ],
+  "looping": [
+    "Idle",
+    "Swim",
+    "Guard",
+    "Eat"
+  ],
+  "anchors": [
+    "anchor_mouth",
+    "anchor_mouth_inside",
+    "anchor_attack_primary"
+  ],
+  "sources": [
+    {
+      "title": "Miles and Westoll (1968), The placoderm fish Coccosteus cuspidatus: descriptive morphology",
+      "url": "https://www.cambridge.org/core/journals/earth-and-environmental-science-transactions-of-royal-society-of-edinburgh/article/abs/ixthe-placoderm-fish-coccosteus-cuspidatus-miller-ex-agassiz-from-the-middle-old-red-sandstone-of-scotland-part-i-descriptive-morphology/97AA5B04F2B9E00AA1FA5FC3D41627C7"
+    },
+    {
+      "title": "Engelman (2024), revised Coccosteus reconstruction and complete specimens, Figure 7",
+      "url": "https://palaeo-electronica.org/content/2024/5307-dunkleosteus-reconstruction"
+    },
+    {
+      "title": "National Museums Scotland, review of Scottish fossil collections",
+      "url": "https://files.nms.ac.uk/production/Documents/Our-Impact/Collections-reviews/Fossil-collections/fossil-review-complete-_review-of-fossil-collections-in-scotland.pdf"
+    }
+  ],
+  "notes": [
+    "Independent small arthrodire body and shield reconstruction; not a resized Dunkleosteus or Titanichthys.",
+    "Head/trunk articulation, relatively short abdomen, forward pelvic fins, deep peduncle and heterocercal caudal shape informed by complete Coccosteus material; plate contours remain a visual reconstruction.",
+    "Tiny armour ornament and skin microrelief are restrained; large overlapping fish scales are intentionally absent.",
+    "Pigmentation, unpreserved soft details and every animation are artistic inference. Representative length 0.35 m is an illustrative individual, not a species maximum.",
+    "Growth is relaxed fin extension and breathing. Ability is an alert lateral inspection and fin-bracing display; action labels express asset compatibility without specifying gameplay."
+  ]
+}

@@ -1,6 +1,6 @@
 # Image and prop requests — Cambrian Explosion
 
-**Nothing is outstanding.** Every requested brand asset, UI glyph, biome painting,
+**Cambrian artwork is complete.** Every requested Cambrian brand asset, UI glyph, biome painting,
 radar mark and 3D prop has been delivered and integrated. Completed briefs and
 their delivered paths are in [image-requests-history.md](image-requests-history.md);
 how the environment art is wired into the game is in
@@ -11,6 +11,10 @@ music brief is still open there.
 
 Keep this document limited to current image, glyph and prop requests. Move each
 brief to the history file once its assets are delivered and integrated.
+
+## Devonian model production
+
+The current request covers 21 individually authored mobile creatures with action animations and the plants, attached organisms and props in the [Devonian brief](redesign/07-devonian-design.md). Deliver to `public/assets/devonian/` under the [separate specimen-library contract](devonian/production-contract.md). The environmental paintings and reference-board inventory in the brief remain future art planning; this model-production request does not activate Devonian gameplay.
 
 ## Requirements for new requests
 

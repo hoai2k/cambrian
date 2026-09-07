@@ -1,6 +1,6 @@
 # 07 · Devonian creatures, environments and asset brief
 
-**Status:** proposed natural-history and art inventory, 6 September 2026. This document describes what to depict and which images and 3D models to create. It does not specify gameplay, abilities, objectives, progression, combat or controls. The gameplay design that builds on this inventory is [08 · Devonian Domination](08-devonian-domination.md). No Devonian assets have been generated or integrated as part of this brief.
+**Status:** proposed natural-history and art inventory, 6 September 2026. This document describes what to depict and which images and 3D models to create. It does not specify gameplay, abilities, objectives, progression, combat or controls. The gameplay design that builds on this inventory is [08 · Devonian Domination](08-devonian-domination.md). Model production and asset integration are tracked separately in the [Devonian specimen library](../devonian/README.md); this brief remains the natural-history reference.
 
 **Scope:** 21 mobile creature subjects, plus regional environments, plants, attached organisms, geological props and supporting textures. Stationary organisms are important environmental subjects, but do not count toward the 21-creature roster. The existing [era content boundary](06-era-content.md) provides a future home for the resulting assets.
 
@@ -98,7 +98,7 @@ Rigging should preserve anatomically meaningful joints and retain the establishe
 
 **Known characteristics and evidence:** antiarch with a box-like armoured body and jointed armoured pectoral appendages. Bothriolepis canadensis is part of the Miguasha fish collection; detailed diet and locomotion remain reconstruction questions. [Québec collection record](https://www.patrimoine-culturel.gouv.qc.ca/rpcq/detail.do?id=93118&methode=consulter&type=bien)
 
-**Reconstruction focus:** Its enclosed armoured front body and unusual pectoral appendages distinguish it immediately from conventional fish. The appendages are derived fins; describing them as proven terrestrial walking legs would overstate the evidence.
+**Reconstruction focus:** Its enclosed armoured front body and unusual pectoral appendages distinguish it immediately from conventional fish. The appendages are derived fins; describing them as proven terrestrial walking legs would overstate the evidence. Digital reconstruction found no head–thorax mobility and constrained pectoral articulation, so the authored shield remains rigid and the pectoral joints move conservatively. [Three-dimensional Bothriolepis study](https://www.palaeo-electronica.org/content/2014/647-3d-bothriolepis)
 
 **Additional image/model requirements:** Dorsal and underside armour layouts; joint sequence of both pectoral appendages; small mouth and tail attachment. Model the appendage articulation and shield openings explicitly.
 
@@ -114,7 +114,7 @@ Rigging should preserve anatomically meaningful joints and retain the establishe
 
 **Known characteristics and evidence:** heterostracan with a conspicuous oral projection and laterally extended shield; material from Svalbard includes caudal anatomy. The projection's exact function and diet should remain explicit uncertainties. [Genus revision](https://www.tandfonline.com/doi/abs/10.1671/0272-4634%282002%29022%5B0735%3ATGDWHF%5D2.0.CO%3B2)
 
-**Reconstruction focus:** The shield, lateral extensions and long oral projection form an unusual jawless-fish outline. The projection is not evidence for swordfish-like hunting, and its function should remain unresolved on the board.
+**Reconstruction focus:** The shield, lateral extensions and long oral projection form an unusual jawless-fish outline. The projection is not evidence for swordfish-like hunting, and its function should remain unresolved on the board. The model places the mouth above the pseudorostrum base, keeps the cornual extensions rigid, omits paired fins and uses a hypocercal tail. The fixed shield and flexible posterior should remain visually distinct. [Hydrodynamic reconstruction study](https://www.nature.com/articles/s42003-024-06837-8)
 
 **Additional image/model requirements:** Exact projection and mouth relationship; shield cross-section; tail-fin reconstruction. A rigid-front/flexible-tail source model with no fabricated hinged biting jaw.
 
@@ -122,7 +122,7 @@ Rigging should preserve anatomically meaningful joints and retain the establishe
 
 **Known characteristics and evidence:** early shark-like chondrichthyan from the Cleveland Shale fauna, with unusually informative preservation among the local fishes. [Cleveland Museum ecosystem project](https://www.cmnh.org/science-conservation/areas-of-study/earth-sciences/projects/saving-a-lost-ecosystem), [Case Western specimen collection](https://caslabs.case.edu/hyde-collection/hyde-collection/)
 
-**Reconstruction focus:** Use its own head, fin placements and caudal outline. An extant shark model is useful only for broad comparative context, not as a substitute for the fossil anatomy. Skin coverage and fin details should follow the selected specimen.
+**Reconstruction focus:** Use its own head, fin placements and caudal outline. An extant shark model is useful only for broad comparative context, not as a substitute for the fossil anatomy. Skin coverage and fin details should follow the selected specimen. The authored genus-level synthesis retains an anterior dorsal spine and omits the posterior spine identified as hypothetical in a recent comparison; it also omits an anal fin. [Frey et al. comparison](https://link.springer.com/article/10.1186/s13358-023-00266-6)
 
 **Additional image/model requirements:** Lateral body outline, fin-ray/spine evidence and caudal-fin board; oral detail. A streamlined model with restrained soft-surface detail rather than generic modern shark textures.
 
@@ -130,7 +130,7 @@ Rigging should preserve anatomically meaningful joints and retain the establishe
 
 **Known characteristics and evidence:** the distinctive spine-brush complex gives a strong silhouette. The genus spans the Devonian–Carboniferous in the literature; function and reconstruction of the complex require care. Select a demonstrably Devonian specimen before authoring, and do not substitute a Carboniferous Akmonistion model. [Braincase study](https://www.cambridge.org/core/journals/earth-and-environmental-science-transactions-of-the-royal-society-of-edinburgh/article/abs/braincase-of-a-primitive-shark/E11D5DAAAFE25E9196D17BC1C4CCBD9C), [spine-brush anatomy study](https://www.tandfonline.com/doi/abs/10.1080/02724634.1984.10012016)
 
-**Reconstruction focus:** The spine-brush is the central visual feature, but its anatomy, distribution and biological function need to be separated. Do not automatically claim a defensive purpose or apply a sex-specific interpretation beyond what the selected material supports.
+**Reconstruction focus:** The spine-brush is the central visual feature, but its anatomy, distribution and biological function need to be separated. Do not automatically claim a defensive purpose or apply a sex-specific interpretation beyond what the selected material supports. The asset is labelled **Stethacanthus sp.**, informed by CMNH 8988 from the upper Famennian Cleveland Shale. Its assignment to S. altonensis is disputed; the incomplete Devonian material anchors the occurrence while body and fin details remain an explicitly comparative reconstruction. [Ginter and Sun, p. 710](https://www.app.pan.pl/archive/published/app52/app52-705.pdf)
 
 **Additional image/model requirements:** Devonian provenance sheet before any concept approval; dorsal complex from several angles; pectoral and pelvic anatomy. No substitution of a better-known Carboniferous Akmonistion reconstruction.
 
