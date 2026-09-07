@@ -23,7 +23,7 @@ float ec(vec2 p,float t) {
 export interface SeaEnvironment {
   group: THREE.Group;
   /** Applies the magnification tier and the local biome's atmosphere for one viewport and returns the fog density it chose. */
-  setViewLength(L: number, camX?: number, camZ?: number): number;
+  setViewLength(L: number, camX?: number, camZ?: number, camY?: number): number;
   /** `cams` are every viewport's camera positions: scenery streams in around all of them. */
   update(time: number, dt: number, focus: THREE.Vector3, cams?: readonly THREE.Vector3[]): void;
   dispose(): void;
@@ -328,6 +328,29 @@ export function createSea(scene: THREE.Scene, world: WorldData, quality: Quality
       crinoidParts.push(curveTube([[lean * 1.3 + cx * 0.06, 1.8, cz * 0.06], [lean * 1.3 + cx * sp * 0.6, 1.8 + h * 0.6, cz * sp * 0.6], [lean * 1.3 + cx * sp, 1.8 + h * 0.85, cz * sp], [lean * 1.3 + cx * sp * 1.15, 1.75 + h, cz * sp * 1.15]], 0.018, 4, 3));
     } }
   const crinoidGeo = merged(crinoidParts);
+  // Giant sea lily (FLORA_PHYS lilyColumn: h 9.5, r 0.5): a stem four bodies tall with a wide crown at
+  // the top, so it reads as scenery in the water column rather than on the floor.
+  const lilyParts: THREE.BufferGeometry[] = [];
+  { const lean = 0.35, H = 8.2;
+    lilyParts.push(curveTube([[0, 0, 0], [lean * 0.3, H * 0.35, 0.05], [lean * 0.8, H * 0.7, -0.08], [lean, H, 0]], 0.09, 7, 8));
+    const cup = new THREE.LatheGeometry([[0.06, 0], [0.22, 0.2], [0.3, 0.45], [0.24, 0.6]].map(([x, y]) => new THREE.Vector2(x, y)), 8);
+    cup.translate(lean, H - 0.1, 0); lilyParts.push(cup);
+    const arms = high ? 14 : 10;
+    for (let i = 0; i < arms; i++) {
+      const a = (i / arms) * TAU + rng() * 0.25, sp = 0.9 + rng() * 0.3, h = 1.1 + rng() * 0.3;
+      const cx = Math.cos(a), cz = Math.sin(a);
+      lilyParts.push(curveTube([[lean + cx * 0.15, H + 0.4, cz * 0.15], [lean + cx * sp * 0.55, H + 0.4 + h * 0.55, cz * sp * 0.55], [lean + cx * sp, H + 0.4 + h * 0.85, cz * sp], [lean + cx * sp * 1.2, H + 0.3 + h, cz * sp * 1.2]], 0.035, 5, 4));
+    } }
+  const lilyGeo = merged(lilyParts);
+  // Algal frond tower (frondTower: h 5.5, r 0.7): a sheaf of long fronds fanning out as they rise.
+  const towerParts: THREE.BufferGeometry[] = [];
+  { const n = high ? 9 : 6;
+    for (let i = 0; i < n; i++) {
+      const a = (i / n) * TAU + rng() * 0.5, h = 3.8 + rng() * 1.7, sp = 0.35 + rng() * 0.35;
+      const cx = Math.cos(a), cz = Math.sin(a);
+      towerParts.push(curveTube([[cx * 0.1, 0, cz * 0.1], [cx * sp * 0.4, h * 0.4, cz * sp * 0.4], [cx * sp * 0.8, h * 0.78, cz * sp * 0.8], [cx * sp * 1.1, h, cz * sp * 1.1]], 0.05, 5, 6));
+    } }
+  const towerGeo = merged(towerParts);
   // Stromatoporoid: a lumpy dome with faint growth ridges.
   const stromGeo = G(new THREE.SphereGeometry(0.65, 12, 6, 0, TAU, 0, Math.PI / 2));
   { const p = stromGeo.attributes.position as THREE.BufferAttribute;
@@ -407,6 +430,7 @@ export function createSea(scene: THREE.Scene, world: WorldData, quality: Quality
     choia: { geo: choiaGeo, mat: spongeMat2 }, thalli: { geo: thalliGeo, mat: algaeMat }, tuft: { geo: tuftGeo, mat: tuftMat },
     crinoid: { geo: crinoidGeo, mat: crinoidMat }, stromatoporoid: { geo: stromGeo, mat: moundMat }, tabulate: { geo: tabulateGeo, mat: plateMat },
     rugose: { geo: rugoseGeo, mat: coralMat }, bryozoan: { geo: bryozoanGeo, mat: fanMat }, reed: { geo: reedGeo, mat: reedMat }, log: { geo: logGeo, mat: logMat },
+    lilyColumn: { geo: lilyGeo, mat: crinoidMat }, frondTower: { geo: towerGeo, mat: reedMat },
   };
   const microGeo = G(new THREE.ConeGeometry(0.012, 0.22, 3, 1, true));
   microGeo.translate(0, 0.11, 0);
@@ -627,8 +651,9 @@ export function createSea(scene: THREE.Scene, world: WorldData, quality: Quality
      * big ones see far. Returns the fog density so the camera's far plane can be pulled in to match,
      * which is what actually lets distant scenery chunks be frustum-culled instead of drawn into fog.
      */
-    setViewLength(L: number, camX = 0, camZ = 0) {
+    setViewLength(L: number, camX = 0, camZ = 0, camY = 0) {
       const fog = scene.fog as THREE.FogExp2;
+      const above = camY > SURFACE_Y;
       // The biome under the camera colours the water: bright and green over the shallows, near
       // black in the basin. Weights blend, so crossing a boundary is a slow change of light.
       biomeWeights(camX, camZ, atmosW);
@@ -639,6 +664,11 @@ export function createSea(scene: THREE.Scene, world: WorldData, quality: Quality
         const a = ATMOS[b];
         tmpColor.set(a.fog); fogColor.r += tmpColor.r * w; fogColor.g += tmpColor.g * w; fogColor.b += tmpColor.b * w;
         density += a.density * w; sky += a.sky * w; sunI += a.sun * w;
+      }
+      if (above) {
+        // A leaping fish's moment above the water: air is clear, the sky is pale, the sun is full.
+        fogColor.lerp(tmpColor.setRGB(0.86, 0.92, 0.96), 0.85);
+        density *= 0.12; sky = Math.max(sky, 2.4); sunI = Math.max(sunI, 3.4);
       }
       fog.color.copy(fogColor); (scene.background as THREE.Color).copy(fogColor);
       hemi.intensity = sky; sun.intensity = sunI;
