@@ -31,7 +31,7 @@ export function PauseMenu({ onResume, onChange, onQuit }: { onResume: () => void
   );
 }
 
-export function Results({ snapshot, players, onAgain, onChange, onTitle }: { snapshot: HudSnapshot; players: PlayerSetup[]; onAgain: () => void; onChange: () => void; onTitle: () => void }) {
+export function Results({ snapshot, players, onAgain, onContinue, onChange, onTitle }: { snapshot: HudSnapshot; players: PlayerSetup[]; onAgain: () => void; onContinue: () => void; onChange: () => void; onTitle: () => void }) {
   // The record as it stood before this match, snapshotted once when the screen appears; the merge
   // against it is pure, so re-rendering never eats the "NEW" marks (see codex.ts).
   const [before] = useState(loadCodex);
@@ -56,6 +56,8 @@ export function Results({ snapshot, players, onAgain, onChange, onTitle }: { sna
         <Discoveries codex={codex} fresh={fresh} />
         <div className="menu-buttons">
           <button className="start-button" onClick={onAgain}>AGAIN <kbd>A</kbd></button>
+          {/* Co-op modes are milestones, not verdicts: the sea is still there to swim in. */}
+          {snapshot.canContinue && <button className="ghost" onClick={onContinue}>Keep playing <kbd>Y</kbd></button>}
           <button className="ghost" onClick={onChange}>Change creatures <kbd>X</kbd></button>
           <button className="ghost" onClick={onTitle}>Title <kbd>B</kbd></button>
         </div>
@@ -148,7 +150,7 @@ export function Dialogs({ kind, onClose, settings, onSettings }: { kind: DialogK
               <h3>The sea</h3>
               <p>It has one edge: the shore you hatch beside. Swim along it and the world stays gentle; swim <b>away</b> from it and the biomes change: shelf, sponge forest, boulder fields, the channels, the escarpment, and the deep basin, where the giants live. The <b>radar</b> at the top right shows anything big enough to hurt you, whatever is hunting you, the nearest shoals worth eating, your nursery and the shore. Creatures show only while they are inside its reach; the other players, your nursery and the shore sit hollow on the rim when they are past it, pointing the way. Press <b>D-pad down</b> for the teleport menu: back to your nursery, or straight to another player. Hold <b>View</b> (the small button left of Menu) for the scoreboard: everyone in the match, what they have done, and what this mode is asking of them.</p>
               <h3>Fighting</h3>
-              <p><b>X</b> chains three bites, the third hits hard. <b>RT</b> is the pounce: a long committed lunge that breaks guard. <b>B</b> held raises a shield; tapped as a hit lands, it parries and staggers them (Waptia cannot guard, so B dodges). Hits from behind or below hurt more. Stamina runs everything: an exhausted creature can't dash. Nothing dies in one bite unless it is far smaller than you: a peer takes a couple of hits, a giant needs about three good bites to kill you, and after six seconds out of the fight your health starts to return. Bite a bigger predator enough and it breaks off and runs.</p>
+              <p><b>X</b> chains three bites, the third hits hard. <b>RT</b> is your heavy: the creature’s special if it has one, otherwise a pounce — either way a long committed lunge that carries you onto what you aimed at. The crosshair names it when it will connect. <b>B</b> held raises a shield; tapped as a hit lands, it parries and staggers them (Waptia cannot guard, so B dodges). Hits from behind or below hurt more. Stamina runs everything: an exhausted creature can't dash. Nothing dies in one bite unless it is far smaller than you: a peer takes a couple of hits, a giant needs about three good bites to kill you, and after six seconds out of the fight your health starts to return. Bite a bigger predator enough and it breaks off and runs.</p>
               </section>
             <section>
               <h3>Giants</h3>
