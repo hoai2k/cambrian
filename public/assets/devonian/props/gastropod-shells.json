@@ -1,0 +1,36 @@
+{
+  "id": "gastropod-shells",
+  "family": "B11",
+  "name": "Small gastropod shells",
+  "taxon": "Platyceratid and loxonematid comparative shell forms",
+  "category": "biological-prop",
+  "description": "Two logarithmically coiled shells, broad low-spired and tall-spired, with open apertures. No uncertain living tissue.",
+  "provenance": "Devonian North American shelly fauna reference",
+  "model": "assets/devonian/props/gastropod-shells.glb",
+  "lod": "assets/devonian/props/gastropod-shells.lod1.glb",
+  "image": "assets/devonian/props/gastropod-shells.png",
+  "lengthMeters": 0.18403416872024536,
+  "dimensionsMeters": {
+    "x": 0.18403416872024536,
+    "y": 0.09371638298034668,
+    "z": 0.09398707747459412
+  },
+  "clips": [],
+  "looping": [],
+  "sources": [
+    "https://devonianatlas.org/species/"
+  ],
+  "notes": [
+    "Original parametric mesh, no downloaded model.",
+    "1 glTF unit = 1 metre. Dimensions describe this art specimen, not a taxon maximum.",
+    "Pigmentation and soft appearance are artistic interpretations.",
+    "Locality tags constrain future placement; library membership does not assert co-occurrence.",
+    "Preview model: initial scenery delivery; further individual material, silhouette and motion refinement is pending."
+  ],
+  "fullTriangles": 24692,
+  "lodTriangles": 7406,
+  "lodRatio": 0.2999352016847562,
+  "sourceBlend": "../devonian-authoring/props/gastropod-shells/gastropod-shells.blend",
+  "uncertainty": "Comparative shell architecture only; the chosen low and high spires are not species diagnoses. No soft parts reconstructed.",
+  "modelStatus": "preview"
+}

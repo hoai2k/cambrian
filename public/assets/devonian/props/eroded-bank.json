@@ -1,0 +1,36 @@
+{
+  "id": "eroded-bank",
+  "family": "G06",
+  "name": "Eroded bank",
+  "taxon": "Unrooted channel margin",
+  "category": "geology",
+  "description": "Sloping eroded sediment face with layered staining and surface irregularity.",
+  "provenance": "Fluvial channel context, age-neutral geology",
+  "model": "assets/devonian/props/eroded-bank.glb",
+  "lod": "assets/devonian/props/eroded-bank.lod1.glb",
+  "image": "assets/devonian/props/eroded-bank.png",
+  "lengthMeters": 3.0,
+  "dimensionsMeters": {
+    "x": 3.0,
+    "y": 1.2909479141235352,
+    "z": 3.0
+  },
+  "clips": [],
+  "looping": [],
+  "sources": [
+    "https://pmc.ncbi.nlm.nih.gov/articles/PMC8409631/"
+  ],
+  "notes": [
+    "Original parametric mesh, no downloaded model.",
+    "1 glTF unit = 1 metre. Dimensions describe this art specimen, not a taxon maximum.",
+    "Pigmentation and soft appearance are artistic interpretations.",
+    "Locality tags constrain future placement; library membership does not assert co-occurrence.",
+    "Preview model: initial scenery delivery; further individual material, silhouette and motion refinement is pending."
+  ],
+  "fullTriangles": 8430,
+  "lodTriangles": 2528,
+  "lodRatio": 0.29988137603795967,
+  "sourceBlend": "../devonian-authoring/props/eroded-bank/eroded-bank.blend",
+  "uncertainty": "Generic geological form; exact regional lithology, hydrodynamics and burial history require scene-specific review.",
+  "modelStatus": "preview"
+}

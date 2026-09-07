@@ -1,0 +1,36 @@
+{
+  "id": "massive-stromatoporoid-v2",
+  "family": "B01",
+  "name": "Massive stromatoporoid \u2014 variant 2",
+  "taxon": "Clathrodictyon-type massive sponge",
+  "category": "attached",
+  "description": "Low irregular skeletal dome with mamelons and astrorhizal surface grooves; living surface colour inferred.",
+  "provenance": "Devonian Columbus Formation, Ontario comparative reference",
+  "model": "assets/devonian/props/massive-stromatoporoid-v2.glb",
+  "lod": "assets/devonian/props/massive-stromatoporoid-v2.lod1.glb",
+  "image": "assets/devonian/props/massive-stromatoporoid-v2.png",
+  "lengthMeters": 1.1936888694763184,
+  "dimensionsMeters": {
+    "x": 1.1936888694763184,
+    "y": 0.5635228157043457,
+    "z": 0.924819827079773
+  },
+  "clips": [],
+  "looping": [],
+  "sources": [
+    "https://www.digitalatlasofancientlife.org/learn/porifera/stromatoporoidea/"
+  ],
+  "notes": [
+    "Original parametric mesh, no downloaded model.",
+    "1 glTF unit = 1 metre. Dimensions describe this art specimen, not a taxon maximum.",
+    "Pigmentation and soft appearance are artistic interpretations.",
+    "Locality tags constrain future placement; library membership does not assert co-occurrence.",
+    "Preview model: initial scenery delivery; further individual material, silhouette and motion refinement is pending."
+  ],
+  "fullTriangles": 24158,
+  "lodTriangles": 7246,
+  "lodRatio": 0.2999420481827966,
+  "sourceBlend": "../devonian-authoring/props/massive-stromatoporoid-v2/massive-stromatoporoid-v2.blend",
+  "uncertainty": "Growth morphology and surface mamelons are comparative; this is not a scanned Clathrodictyon specimen.",
+  "modelStatus": "preview"
+}

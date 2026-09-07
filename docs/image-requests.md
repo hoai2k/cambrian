@@ -56,3 +56,8 @@ other's tree.
   `src/sim/world.ts` and `src/render/sea.ts`.
 - Validate props with `node tools/art/check-environment-assets.mjs`, and creature art with
   `node tools/check-creature-assets.mjs --strict`.
+
+
+## Devonian initial asset delivery — 7 September 2026
+
+Nine original imagegen biome paintings now replace the procedural banners at `public/assets/devonian/biomes/`. The exact separate prompts are in `tools/devonian/environment-image-prompts.json`; original PNGs are preserved in `local/devonian-authoring/environment-images/`, with shipped hashes and preview status in the biome manifest. They depict the game biome categories, not the nine separate regional E01–E09 reference environments. Those regional boards, material studies, lighting, particle/decal atlases and scale plates are still being authored. Current priority is carefully made initial versions of the complete library, then further art refinement. `devonian:plates` preserves painted assets unless explicit fallback replacement is requested.

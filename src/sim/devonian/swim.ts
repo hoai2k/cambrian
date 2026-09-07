@@ -73,7 +73,8 @@ export function spawnInCover(g: Game, center: Vec3, id: CreatureId, scale: numbe
   const high = options.filter((c) => c.pos.y > ground(c.pos) + 4);
   const pool = def.ground ? options.filter((c) => c.pos.y <= ground(c.pos) + 4) : (high.length && g.rng() < 0.6 ? high : options);
   const from = pool.length ? pool : options;
-  const c = from[(index * 7 + Math.floor(g.rng() * from.length)) % from.length];
+  // Bots carry player index -1 when respawning; never use a negative array remainder.
+  const c = from[(Math.max(0, index) * 7 + Math.floor(g.rng() * from.length)) % from.length];
   const ang = g.rng() * Math.PI * 2, r = g.rng() * c.radius * 0.4;
   const x = c.pos.x + Math.cos(ang) * r, z = c.pos.z + Math.sin(ang) * r;
   const gr = groundHeight(g.world, x, z, []);

@@ -1,0 +1,36 @@
+{
+  "id": "carbonate-outcrop",
+  "family": "G01",
+  "name": "Carbonate outcrop",
+  "taxon": "Weathered submerged carbonate",
+  "category": "geology",
+  "description": "Irregular low and high weathered masses with natural relief and granular material.",
+  "provenance": "Carbonate shelf, regional mineral colouring configurable",
+  "model": "assets/devonian/props/carbonate-outcrop.glb",
+  "lod": "assets/devonian/props/carbonate-outcrop.lod1.glb",
+  "image": "assets/devonian/props/carbonate-outcrop.png",
+  "lengthMeters": 1.7594060897827148,
+  "dimensionsMeters": {
+    "x": 1.7594060897827148,
+    "y": 0.5983342528343201,
+    "z": 1.1959784030914307
+  },
+  "clips": [],
+  "looping": [],
+  "sources": [
+    "https://onlinelibrary.wiley.com/doi/full/10.1111/j.1475-4983.2011.01037.x"
+  ],
+  "notes": [
+    "Original parametric mesh, no downloaded model.",
+    "1 glTF unit = 1 metre. Dimensions describe this art specimen, not a taxon maximum.",
+    "Pigmentation and soft appearance are artistic interpretations.",
+    "Locality tags constrain future placement; library membership does not assert co-occurrence.",
+    "Preview model: initial scenery delivery; further individual material, silhouette and motion refinement is pending."
+  ],
+  "fullTriangles": 1280,
+  "lodTriangles": 384,
+  "lodRatio": 0.3,
+  "sourceBlend": "../devonian-authoring/props/carbonate-outcrop/carbonate-outcrop.blend",
+  "uncertainty": "Generic geological form; exact regional lithology, hydrodynamics and burial history require scene-specific review.",
+  "modelStatus": "preview"
+}

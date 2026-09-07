@@ -1,0 +1,19 @@
+{
+  "id": "jaekelopterus",
+  "modelStatus": "preview",
+  "notes": "Basic eye, export, animation and anchor checks passed; further individual visual refinement follows initial library delivery. See README and WORKING_STATE for anatomical limitations.",
+  "models": {
+    "glb": {
+      "sourceSHA256": "28b6181d6ad13644c5256fc316b5022de45039f2c1ce4d3d44fb0a896de123fb",
+      "packagedSHA256": "82e9786bde91c6b39aa5461f631d1f608c7d87bd3aa64f684d1204aa4c69e10b",
+      "bytes": 10107904,
+      "losslessDecodedRoundTrip": true
+    },
+    "lod1.glb": {
+      "sourceSHA256": "c623f3bef04d51bfab96fa8b783b8e8d9aa85f72f0fa908a1d89947e9f420b8a",
+      "packagedSHA256": "05f15f714f504f656fab85029f4cf3c73fce7a5bde6b0fa4733965e9882453c7",
+      "bytes": 1291736,
+      "losslessDecodedRoundTrip": true
+    }
+  }
+}

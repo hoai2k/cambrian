@@ -1,0 +1,41 @@
+{
+  "id": "stalked-crinoid-v2",
+  "family": "B08",
+  "name": "Stalked crinoid \u2014 variant 2",
+  "taxon": "Pinnulate camerate-type crinoid, indeterminate",
+  "category": "attached",
+  "description": "Jointed column with lumen, attachment holdfast, calyx and five bifurcating pinnulate feeding rays.",
+  "provenance": "Devonian marine shelf; comparative crinoid anatomy, not Hunsr\u00fcck species claim",
+  "model": "assets/devonian/props/stalked-crinoid-v2.glb",
+  "lod": "assets/devonian/props/stalked-crinoid-v2.lod1.glb",
+  "image": "assets/devonian/props/stalked-crinoid-v2.png",
+  "lengthMeters": 0.5429062247276306,
+  "dimensionsMeters": {
+    "x": 0.21560043096542358,
+    "y": 0.5429062247276306,
+    "z": 0.22269700467586517
+  },
+  "clips": [
+    "Idle"
+  ],
+  "looping": [
+    "Idle"
+  ],
+  "sources": [
+    "https://www.digitalatlasofancientlife.org/learn/echinodermata/crinoidea/",
+    "https://devonianatlas.org/species/"
+  ],
+  "notes": [
+    "Original parametric mesh, no downloaded model.",
+    "1 glTF unit = 1 metre. Dimensions describe this art specimen, not a taxon maximum.",
+    "Pigmentation and soft appearance are artistic interpretations.",
+    "Locality tags constrain future placement; library membership does not assert co-occurrence.",
+    "Preview model: initial scenery delivery; further individual material, silhouette and motion refinement is pending."
+  ],
+  "fullTriangles": 59976,
+  "lodTriangles": 17992,
+  "lodRatio": 0.29998666133119917,
+  "sourceBlend": "../devonian-authoring/props/stalked-crinoid-v2/stalked-crinoid-v2.blend",
+  "uncertainty": "Generalized pinnulate camerate anatomy; do not identify as Taxocrinus or a Hunsr\u00fcck species. Soft colours and arm pose are inferred.",
+  "modelStatus": "preview"
+}

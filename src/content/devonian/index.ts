@@ -3,7 +3,7 @@ import type { DevonianCreatureId } from './ids';
 import type { Slot } from '../../shared/palettes';
 import { DEVONIAN_CREATURES } from './creatures';
 import { SNACK_SCHOOLS, GIANTS } from './ecology';
-import { BIOME_NAMES, BIOME_DANGER, ATMOS, SAND_COLORS, FLORA_BASE, FLORA_DENSITY, SURFACE_Y } from './environment';
+import { BIOME_NAMES, BIOME_DANGER, ATMOS, SAND_COLORS, FLORA_BASE, FLORA_DENSITY, FLORA_PROPS, SURFACE_Y } from './environment';
 import { MUSIC } from './music';
 import { SCHEMES, CREATURE_SCHEMES } from './palettes';
 import { DEVONIAN_BRAND, DEVONIAN_BRAND_EXTRAS } from './brand';
@@ -25,9 +25,8 @@ export const DEVONIAN_SHIPPED = Object.keys(SHIPPED_BYTES);
  */
 export const DEVONIAN_STAND_INS: Partial<Record<DevonianCreatureId, DevonianCreatureId>> = Object.fromEntries((
   [
-    ['acanthostega', 'bothriolepis'], ['jaekelopterus', 'bothriolepis'],
-    ['eldredgeops', 'bothriolepis'], ['walliserops', 'bothriolepis'], ['nahecaris', 'bothriolepis'], ['palaeoisopus', 'bothriolepis'],
-    ['furcaster', 'gemuendina'], ['manticoceras', 'doryaspis'], ['michelinoceras', 'doryaspis'],
+
+    ['manticoceras', 'doryaspis'], ['michelinoceras', 'doryaspis'],
   ] as [DevonianCreatureId, DevonianCreatureId][]
 ).filter(([id]) => !SHIPPED_BYTES[id]));
 const modelBytes = Object.fromEntries(DEVONIAN_CREATURES.map((c) => [c.id, SHIPPED_BYTES[c.id] ?? SHIPPED_BYTES[DEVONIAN_STAND_INS[c.id as DevonianCreatureId] ?? ''] ?? 1]));
@@ -54,22 +53,23 @@ export const DEVONIAN = defineEra({
     player: 'coccosteus',
     // Delivered specimens only: these drive card and model preloading, and a creature that is still
     // borrowing a body has no portrait to load. Add each one here as its own model lands.
-    boot: ['coccosteus', 'cladoselache', 'dunkleosteus', 'bothriolepis', 'gemuendina', 'doryaspis', 'stethacanthus', 'titanichthys', 'cheirolepis', 'onychodus', 'rhinodipterus', 'tiktaalik'],
+    boot: ['coccosteus', 'cladoselache', 'dunkleosteus', 'bothriolepis', 'gemuendina', 'doryaspis', 'stethacanthus', 'titanichthys', 'cheirolepis', 'onychodus', 'rhinodipterus', 'tiktaalik', 'eldredgeops', 'acanthostega', 'jaekelopterus', 'walliserops', 'nahecaris', 'palaeoisopus', 'furcaster'],
     title: ['dunkleosteus', 'cladoselache', 'coccosteus', 'doryaspis'],
   },
   ecology: { schools: SNACK_SCHOOLS, giants: GIANTS, shadow: { creature: 'titanichthys', scale: 1.0 } },
-  environment: { biomeNames: BIOME_NAMES, biomeDanger: BIOME_DANGER, atmosphere: ATMOS, sandColors: SAND_COLORS, floraColors: FLORA_BASE, flora: FLORA_DENSITY, surfaceY: SURFACE_Y },
+  environment: { biomeNames: BIOME_NAMES, biomeDanger: BIOME_DANGER, atmosphere: ATMOS, sandColors: SAND_COLORS, floraColors: FLORA_BASE, flora: FLORA_DENSITY, floraProps: FLORA_PROPS, surfaceY: SURFACE_Y },
   assets: {
     creatures: 'assets/devonian/creatures/', defaultPortraits: 'assets/devonian/creatures/',
-    // Scenery and music are shared with the Cambrian until the Devonian sets are delivered
-    // (docs/image-requests.md, docs/audio-requests.md); the biome plates are procedural stand-ins from
-    // tools/devonian/biome-plates.mjs (`npm run devonian:plates`) until the painted ones land; the
-    // creatures and brand are this era's own.
+    // Scenery is this era's own: the instanced exports built by tools/devonian/props/instance.mjs
+    // from the authored preview library. Music is shared with the Cambrian until more lands
+    // (docs/audio-requests.md). The biome plates are the delivered paintings, one per biome;
+    // `npm run devonian:plates` still regenerates procedural ones if a painting is ever missing.
+    // The creatures and brand are this era's own.
     // `sfx` names the SHARED library on purpose: bites, hits, parries and the UI are the same sounds
     // in both eras, and this era's own samples are addressed as 'devonian/<name>' (src/content/
     // devonian/sfx.ts), which sfxUrl resolves under assets/devonian/sfx/ whatever this path says.
     // Pointing it at the Devonian folder makes all 39 shared samples 404 and the sea goes silent.
-    props: 'assets/props/', biomes: 'assets/devonian/biomes/', ui: 'assets/ui/', sfx: 'assets/sfx/', music: 'music/',
+    props: 'assets/devonian/scenery/', biomes: 'assets/devonian/biomes/', ui: 'assets/ui/', sfx: 'assets/sfx/', music: 'music/',
     ...DEVONIAN_BRAND, modelStatus: modelStatus as Record<DevonianCreatureId, 'preview' | 'final'>, modelBytes, standIns: DEVONIAN_STAND_INS,
   },
   audio: { music: MUSIC },

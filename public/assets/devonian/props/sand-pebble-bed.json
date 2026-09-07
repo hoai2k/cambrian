@@ -1,0 +1,36 @@
+{
+  "id": "sand-pebble-bed",
+  "family": "G05",
+  "name": "Sand and pebble bed",
+  "taxon": "Rippled sand with dispersed pebbles",
+  "category": "geology",
+  "description": "Natural ripple relief and two pebble density mixes at centimetre scale.",
+  "provenance": "Shallow-water coarse/fine sediment transition",
+  "model": "assets/devonian/props/sand-pebble-bed.glb",
+  "lod": "assets/devonian/props/sand-pebble-bed.lod1.glb",
+  "image": "assets/devonian/props/sand-pebble-bed.png",
+  "lengthMeters": 2.0,
+  "dimensionsMeters": {
+    "x": 2.0,
+    "y": 0.23765280842781067,
+    "z": 2.0
+  },
+  "clips": [],
+  "looping": [],
+  "sources": [
+    "https://pmc.ncbi.nlm.nih.gov/articles/PMC8409631/"
+  ],
+  "notes": [
+    "Original parametric mesh, no downloaded model.",
+    "1 glTF unit = 1 metre. Dimensions describe this art specimen, not a taxon maximum.",
+    "Pigmentation and soft appearance are artistic interpretations.",
+    "Locality tags constrain future placement; library membership does not assert co-occurrence.",
+    "Preview model: initial scenery delivery; further individual material, silhouette and motion refinement is pending."
+  ],
+  "fullTriangles": 15230,
+  "lodTriangles": 4568,
+  "lodRatio": 0.2999343401181878,
+  "sourceBlend": "../devonian-authoring/props/sand-pebble-bed/sand-pebble-bed.blend",
+  "uncertainty": "Generic geological form; exact regional lithology, hydrodynamics and burial history require scene-specific review.",
+  "modelStatus": "preview"
+}
