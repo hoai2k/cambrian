@@ -1,6 +1,6 @@
 import { CREATURES } from '../sim/creatures';
 import { assetPaths } from '../content/asset-paths';
-import { DEVONIAN_SPECIMENS } from '../content/devonian';
+import { DEVONIAN_SPECIMENS } from '../content/devonian/specimens';
 
 export type CollectionId = 'cambrian' | 'devonian' | 'devonian-props';
 export interface ViewerSpecimen {

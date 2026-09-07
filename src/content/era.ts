@@ -1,13 +1,35 @@
 import type { MusicTrack } from '../audio/music';
 import type { CreatureDef, CreatureId } from './creature-types';
 import type { Biome } from '../sim/world';
+import type { Mode } from '../sim/types';
 import type { Slot, Scheme } from '../shared/palettes';
 import type { PortraitRecord } from '../shared/portrait-match';
 
 /** Plain data only: safe to import from the deterministic simulation and Node tooling. */
+/** A selectable mode and the copy the selection screen shows for it. */
+export interface ModeInfo { readonly id: Mode; readonly name: string; readonly blurb: string; readonly players: string; }
+
+/** The words the shell shows around a match; everything else in the UI is shared. */
+export interface EraCopy {
+  /** Title-screen tagline and its emphasised second half. */
+  readonly tagline: string;
+  readonly taglineEm: string;
+  /** Title-screen "press start" placeholder while assets load. */
+  readonly loading: string;
+  /** Results eyebrow when nobody won. */
+  readonly lose: string;
+  /** localStorage key for the settings panel, so two eras on one origin keep separate settings. */
+  readonly settingsKey: string;
+  /** Portrait-orientation title art, when the era has one. */
+  readonly mobileIllustration?: string;
+}
+
 export interface EraDefinition {
   readonly id: string;
   readonly title: string;
+  readonly copy: EraCopy;
+  /** The modes this era offers, in selection order. The simulation's win checks are keyed by id. */
+  readonly modes: readonly ModeInfo[];
   readonly creatures: readonly CreatureDef[];
   readonly defaults: {
     readonly player: CreatureId;
@@ -39,6 +61,11 @@ export interface EraDefinition {
     readonly illustration: string;
     readonly emblem: string;
     readonly modelBytes: Readonly<Partial<Record<CreatureId, number>>>;
+    /**
+     * Creatures whose own model is still in production borrow another roster member's GLB (and
+     * its LOD), recoloured with their scheme. Removed entry by entry as deliveries land.
+     */
+    readonly standIns?: Readonly<Partial<Record<CreatureId, CreatureId>>>;
   };
   readonly audio: { readonly music: readonly MusicTrack[] };
   readonly presentation: {
@@ -58,8 +85,10 @@ export function defineEra(def: EraDefinition): EraDefinition {
   for (const id of references) if (!ids.has(id)) throw new Error(`${def.id}: creature ${id} is outside the roster`);
   if (!def.ecology.giants.length) throw new Error(`${def.id}: a giant habitat is required for patrol placement`);
   for (const id of ids) if (!((def.assets.modelBytes[id] ?? 0) > 0)) throw new Error(`${def.id}: missing model size for ${id}`);
+  for (const [id, standIn] of Object.entries(def.assets.standIns ?? {})) if (!ids.has(id as CreatureId) || !standIn || !ids.has(standIn) || def.assets.standIns?.[standIn]) throw new Error(`${def.id}: stand-in ${id} → ${standIn} must map a roster member to a delivered one`);
   for (const id of ids) if (!def.presentation.authoredColors.creatures[id]) throw new Error(`${def.id}: missing authored colours for ${id}`);
   if (!def.presentation.schemes.length) throw new Error(`${def.id}: a default colour scheme is required`);
   if (!def.audio.music.length) throw new Error(`${def.id}: a soundtrack is required`);
+  if (!def.modes.length) throw new Error(`${def.id}: at least one mode is required`);
   return def;
 }

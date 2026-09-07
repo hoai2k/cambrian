@@ -9,13 +9,14 @@ import { TAU } from '../shared/math';
 import type { ViewerSpecimen } from './catalogue';
 import { cloneMaterials, makeRecolor, type Recolor } from '../render/recolor';
 import { DEFAULT_SCHEME, type Slot } from '../shared/palettes';
+import { appBase } from '../shared/base';
 
 /**
  * The viewer page lives one directory below the app, so `BASE_URL` ('./' in a built bundle)
  * would resolve creature assets to /viewer/assets/. Step back up a level instead; in dev
  * BASE_URL is an absolute '/' and can be used as-is.
  */
-const base = import.meta.env.BASE_URL;
+const base = appBase();
 export const ASSET_BASE = base.startsWith('/') ? base : '../';
 
 /** Buttons are grouped in this order; anything unlisted is appended alphabetically. */

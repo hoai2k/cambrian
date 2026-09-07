@@ -2,6 +2,7 @@ import { ACTIVE_ERA } from '../content';
 import { useEffect, useState } from 'react';
 import type { AssetProgress } from '../render/assets';
 import { creature } from '../sim/creatures';
+import { appBase } from '../shared/base';
 
 const FACTS = [
   'Anomalocaris was the largest animal of its time. About a metre. Terrifying, then.',
@@ -24,7 +25,7 @@ export function LoadingScreen({ progress, fraction }: { progress: AssetProgress 
     <section className="loading loading-illustrated" aria-busy="true" aria-live="polite">
       <div className="loading-inner">
         <h1 className="title-logo small">
-          <img className="brand-logo illustrated-logo" src={`${import.meta.env.BASE_URL}${ACTIVE_ERA.assets.illustration}`} alt={ACTIVE_ERA.title} />
+          <img className="brand-logo illustrated-logo" src={`${appBase()}${ACTIVE_ERA.assets.illustration}`} alt={ACTIVE_ERA.title} />
         </h1>
         <div className="loading-bar" role="progressbar" aria-valuemin={0} aria-valuemax={100} aria-valuenow={pct}>
           <i style={{ width: `${pct}%` }} />
