@@ -19,14 +19,12 @@ full/LOD structural/scale/ambient checks passed. Raw/editable sources stay local
 
 Agents now own Nahecaris (eye_audit), Palaeoisopus (titanichthys) and Walliserops (dunkleosteus,
 then Furcaster). Manticoceras and Michelinoceras still need independent authorship. Parent owns
-packaging, integration, scenery instancing and supporting images. Main was last pushed at
-4a4f54e (first three previews); this next batch is being integrated. Refresh Git for exact state.
+packaging, integration, scenery instancing and supporting images. Main and devonian-assets were pushed at **a111dea**, including the 15-creature / 47-prop / nine-painting library and concurrent Survival/menu/palette work. Refresh Git for newer state.
 
 Outstanding non-creature initial work: dedicated cheap instanced exports / placement mappings,
 ten material source sets, nine regional E01–E09 boards, three lighting boards, particle/decal
 atlases and two scale-comparison plates. Runtime biome paintings are separate from the regional
-boards. First T01–T03 imagegen material calls are running; results/prompt are functions store
-keys material-{result,prompt}-<pale-carbonate,dark-carbonate,marine-mud> (copy outputs locally).
+boards. Material source images T01–T05 and T07 are generated and safely copied to local/devonian-authoring/environment-materials; exact prompts/source paths are in tools/devonian/material-image-prompts.json. Matching material data maps and T06/T08–T10 still pending.
 Nine biome originals are safely in local/devonian-authoring/environment-images, tracked prompts
 in tools/devonian/environment-image-prompts.json; outputs public/assets/devonian/biomes.
 
@@ -34,6 +32,17 @@ The pending local Onychodus palatal-pocket edit is NOT exported: tracked build.p
 shipped GLB; do not run the local assembler without reviewing it. No full-refinement loop should
 restart before the complete initial collection exists. Older sections below retain useful evidence
 but their production order and numerical progress are superseded by this update.
+
+## New user feedback — Doryaspis and milestone notification
+
+See refinement-queue.md. User reference preserved locally, requested lower mouth placement,
+turtle-like dorsal surface pattern and tail appearance/motion. Current dorsal opening is indeed
+modeled mouth; resolve anatomical relationship carefully at refining stage, not during initial
+library production. Doryaspis and Gemuendina reopened as preview (7 reviewed/final, 8 previews among current15).
+Gemuendina user reference preserved locally; requested fuller ray-like sculpt and flowing fin/tail
+contours, not a flat toy. Both requests are explicitly queued AFTER complete initial delivery.
+Give a separate explicit notification when ALL non-creature initial assets, including remaining
+material/reference/atmosphere/scale images and runtime placements, are committed/pushed main.
 
 ## Scope and completion
 
