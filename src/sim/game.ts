@@ -54,6 +54,8 @@ export const bitesFor = (eater: Actor, food: Actor) => clamp(Math.ceil(3 * lengt
 
 // Crawlers off the seabed. They paddle: they keep swimming, slowly, and pay for the climb in
 // stamina (more than they regenerate, so a paddle is a crossing, not a second way to live).
+/** A leap out of the water: the pull back down, and the least upward speed that gets a fish through the surface. */
+const BREACH_GRAVITY = 14, BREACH_MIN_RISE = 3.2;
 const PADDLE_SPEED = 0.35;    // fraction of the crawler's cruise while off the floor
 const PADDLE_RISE = 2.4;      // climb speed, units/s at scale 1 (a swimmer's rise is 2.6 and faster to reach)
 const PADDLE_SINK = 2.2;      // terminal sink once RB is released — a settle, not a fall
@@ -160,7 +162,7 @@ export class Game implements AiWorld {
     const x = center.x + Math.cos(ang) * d, z = center.z + Math.sin(ang) * d;
     const g = groundHeight(this.world, x, z, this.scratchBoulders);
     const L = def.adultLength * s;
-    return { x, y: def.ground ? g + L * 0.13 : g + 1.2 + L * 0.5, z };
+    return { x, y: RULES ? RULES.spawnY(g, L, !!def.ground) : def.ground ? g + L * 0.13 : g + 1.2 + L * 0.5, z };
   }
 
   spawn(c: CreatureId, controller: Actor['controller'], pos: Vec3, scale: number, player = -1): Actor {
@@ -567,7 +569,9 @@ export class Game implements AiWorld {
     const controllable = a.holdT === 0 && (a.state === 'free' || a.state === 'guard' || (a.state === 'ability' && (def.mobileAbility || def.ability === 'shellUp' || def.ability === 'bristleFlare' || def.ability === 'ambushSurge')));
     const slowMult = abilitySpeed(a) * (a.state === 'guard' ? (def.ability === 'anchor' ? 0 : def.ability === 'enroll' ? .8 : .45) : (a.abilityActive && def.ability === 'shellUp') ? 0.35 : a.exhausted > 0 ? 0.7 : 1);
     const burstMult = controllable && (bursting || freeBurst) ? (1 + (def.burst - 1) * (freeBurst ? 1.25 : burstIn) * (a.controller === 'swarm' ? 0.55 : giantish ? 0.35 : 1)) : 1;
-    const cruise = def.speed * sf * slowMult * (a.controller === 'swarm' ? 0.62 : giantish ? 0.55 : 1) * (paddling ? PADDLE_SPEED : 1);
+    const baseCruise = def.speed * sf * slowMult * (a.controller === 'swarm' ? 0.62 : giantish ? 0.55 : 1) * (paddling ? PADDLE_SPEED : 1);
+    const sw = RULES && controllable ? RULES.swim(this, a, dir, mag, baseCruise, burstIn > 0.1 && !a.prev.burst) : undefined;
+    const cruise = baseCruise * (sw?.speed ?? 1);
     const cur = sampleCurrent(v3(), a.pos.x, a.pos.y, a.pos.z, this.time);
     const curK = def.ground ? 0.08 : 0.55;
     let desired: Vec3 = v3(cur.x * curK, cur.y * curK, cur.z * curK);
@@ -589,12 +593,15 @@ export class Game implements AiWorld {
     if (a.state === 'stagger' || a.state === 'grabbed') { desired = v3(); rate = 2.5; }
     if (a.state === 'dodge' || a.state === 'attack' || a.state === 'eating' || a.state === 'moult' || a.state === 'grabbing' || a.state === 'parry') rate = a.state === 'dodge' ? 1.4 : 3;
     if (a.state === 'pounce') rate = 0;
+    if (a.airborne) rate = 0;                          // in the air nothing steers; gravity does
     if (a.holdT > 0) { desired = v3(); rate = 5; }
     if (a.state === 'ability' && (def.ability === 'burrow' || def.ability === 'anchor')) { desired = v3(); rate = 8; }
     if (a.hitStop > 0) rate = 0;
     a.vel.x = damp(a.vel.x, desired.x, rate, dt);
     a.vel.y = damp(a.vel.y, desired.y, rate, dt);
     a.vel.z = damp(a.vel.z, desired.z, rate, dt);
+    if (sw && sw.impulse > 0) { const h0 = heading(a.yaw); a.vel.x += h0.x * sw.impulse; a.vel.z += h0.z * sw.impulse; }   // the fast-start
+    if (a.airborne) { a.vel.y -= BREACH_GRAVITY * dt; a.vel.x *= 1 - 0.15 * dt; a.vel.z *= 1 - 0.15 * dt; }
 
     // Lunge during attacks
     if (a.state === 'attack' && a.move) {
@@ -656,10 +663,27 @@ export class Game implements AiWorld {
     if (def.ground) {
       if (a.grounded || a.pos.y <= floor) { a.pos.y = a.grounded ? damp(a.pos.y, floor, 18, dt) : floor; if (!a.grounded && a.hopVel < 0) { a.grounded = true; a.hopVel = 0; } }
       if (a.pos.y < floor) a.pos.y = floor;
+      // a paddling crawler still cannot climb out of the sea
+      const ceiling = SURFACE_Y - 0.8 - clearanceOf(a);
+      if (a.pos.y > ceiling) { a.pos.y = ceiling; if (a.vel.y > 0) a.vel.y = 0; if (a.hopVel > 0) a.hopVel = 0; }
     } else {
       if (a.pos.y < floor) { a.pos.y = floor; if (a.vel.y < 0) a.vel.y *= -0.2; }
       const ceiling = SURFACE_Y - 0.8 - clearanceOf(a);
-      if (a.pos.y > ceiling) { a.pos.y = ceiling; if (a.vel.y > 0) a.vel.y = 0; }
+      if (a.airborne) {
+        // back through the surface: the splash, and the water takes most of the fall out of it
+        if (a.pos.y <= ceiling && a.vel.y < 0) {
+          a.airborne = false;
+          this.events.push({ kind: 'splash', pos: { x: a.pos.x, y: SURFACE_Y, z: a.pos.z }, actor: a.id, player: a.player, strength: clamp(-a.vel.y / 9, 0.3, 1.6) });
+          a.vel.y *= 0.45;
+        }
+      } else if (a.pos.y > ceiling) {
+        // driving hard at the surface, a fish leaves the water; anything else meets the ceiling
+        const sp = len3(a.vel);
+        if (RULES?.canBreach(a) && isAlive(a) && a.vel.y > BREACH_MIN_RISE && sp > def.speed * sf * 0.85 && a.state === 'free') {
+          a.airborne = true;
+          this.events.push({ kind: 'breach', pos: { x: a.pos.x, y: SURFACE_Y, z: a.pos.z }, actor: a.id, player: a.player, strength: clamp(sp / 12, 0.4, 1.5) });
+        } else { a.pos.y = ceiling; if (a.vel.y > 0) a.vel.y = 0; }
+      }
     }
 
     // Orientation
@@ -669,7 +693,7 @@ export class Game implements AiWorld {
     else if (locked && isAlive(locked) && (a.state === 'free' || a.state === 'guard' || a.state === 'attack')) targetYaw = yawOf(sub(locked.pos, a.pos));
     else if (hv > 0.35 && a.state !== 'grabbed') targetYaw = yawOf(a.vel);
     const dy = wrapAngle(targetYaw - a.yaw);
-    const tr = def.turnRate * (a.state === 'attack' ? 0.5 : 1) * (1 + hv * 0.05) * (giantish ? 0.45 : 1);
+    const tr = def.turnRate * (a.state === 'attack' ? 0.5 : 1) * (1 + hv * 0.05) * (giantish ? 0.45 : 1) * (sw?.turn ?? 1);
     const turn = clamp(dy * 6, -tr, tr);
     const prevYaw = a.yaw;
     a.yaw = wrapAngle(a.yaw + turn * dt);

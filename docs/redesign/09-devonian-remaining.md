@@ -80,6 +80,18 @@ yet (standing ticks; the shells' guard).
 
 ## 6. Balance and feel
 
+Sizes and swimming now follow the animals. `docs/research/devonian-swimming.md` collects
+representative lengths and cruise/burst speeds (measured where they exist, modelled or allometric
+otherwise, sources listed); `tools/devonian/stats.mjs` turns them into game stats (length
+4.6·m^0.6 for a playable 0.85–12 unit range in the real order; cruise from body lengths per second
+with a pace factor and a 0.5 screens/s steering floor; sprint up to 4× cruise for the sharks, as
+the fast-start literature has it; turn from cruise over a turning radius in body lengths).
+The swim model (`src/sim/devonian/swim.ts`) makes a fish back up at a third of cruise, turn
+sharply while slow or reversing, and throw itself forward on the first press of sprint. The water
+column is 64 deep (the Cambrian's is 40), swimmers hatch and wander mid-column, giant sea lilies
+and frond towers reach up into it, and a fish driving hard at the surface leaves the water and
+splashes back in. Rhinodipterus moved to rung II by size (0.4 m).
+
 Fixed after the first Dunkleosteus play-through: the roster's speed, agility and turn were authored
 in Cambrian-sized numbers on Devonian-sized bodies, so the giants crawled (a Young Dunkleosteus at
 0.39 screens/s against the Cambrian's 0.54–1.19); they are now tuned in screens per second and

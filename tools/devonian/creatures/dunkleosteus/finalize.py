@@ -50,16 +50,19 @@ for suffix in ['','.lod1']:
  manifest=json.loads((H/'anchors.json').read_text())['dunkleosteus']
  for s in manifest:
   q=next(q for q in sockets if q['name']==s['name']);x,y,z=s['point'];assert np.allclose(q['point'],[x,z,-y],atol=2e-5),(s,q)
- motions=[]
+ motions=[];jawproof=[]
  for a in d['animations']:
   movement=0;maxdur=0;signature=hashlib.sha256()
   for c in a['channels']:
    target=d['nodes'][c['target']['node']]['name'];assert target!='root';assert c['target']['path']!='scale'
-   sm=a['samplers'][c['sampler']];v=acc(d,bin,sm['output']);t=acc(d,bin,sm['input']);assert np.isfinite(v).all();maxdur=max(maxdur,float(t[-1,0]-t[0,0]));movement+=float(np.abs(v-v[0]).sum());signature.update(v.tobytes())
+   sm=a['samplers'][c['sampler']];v=acc(d,bin,sm['output']);
+   if target in ['jaw','head'] and c['target']['path']=='rotation' and a['name'] in ['Attack','Bite','Heavy','Eat','Ability']:
+    dots=np.clip(np.abs(np.einsum('ij,j->i',v,v[0])),0,1);angle=float(2*np.arccos(dots).max());jawproof.append({'clip':a['name'],'bone':target,'maxDeltaDegrees':round(math.degrees(angle),3)});assert angle>.04
+   t=acc(d,bin,sm['input']);assert np.isfinite(v).all();maxdur=max(maxdur,float(t[-1,0]-t[0,0]));movement+=float(np.abs(v-v[0]).sum());signature.update(v.tobytes())
    if a['name']in ['Idle','Swim','Guard','Eat']:assert np.allclose(v[0],v[-1],atol=1e-5),a['name']
   assert maxdur>0 and movement>0;motions.append({'name':a['name'],'duration':maxdur,'motion':round(movement,3),'digest':signature.hexdigest()})
  assert len(set(m['digest'] for m in motions))==len(motions)
- results.append({'file':p.name,'bytes':p.stat().st_size,'vertices':verts,'triangles':tri,'bounds':span.tolist(),'bones':len(d['skins'][0]['joints']),'sockets':sockets,'clips':motions,'removedIdentityScaleChannels':removed,'sha256':hashlib.sha256(p.read_bytes()).hexdigest()})
+ results.append({'file':p.name,'bytes':p.stat().st_size,'vertices':verts,'triangles':tri,'bounds':span.tolist(),'bones':len(d['skins'][0]['joints']),'sockets':sockets,'clips':motions,'feedingArticulation':jawproof,'removedIdentityScaleChannels':removed,'sha256':hashlib.sha256(p.read_bytes()).hexdigest()})
 assert results[1]['triangles']/results[0]['triangles']<.4
 meta=json.loads((O/'dunkleosteus.json').read_text());meta['modelLength']=results[0]['bounds'][2];meta['clips']=[x['name'] for x in results[0]['clips']];(O/'dunkleosteus.json').write_text(json.dumps(meta,indent=2)+'\n')
 (H/'validation.json').write_text(json.dumps({'checks':'finite transforms, normalized weights, root stable, identity-scale removal, unique motion, seamless loops, socket bind alignment, true LOD reduction','models':results,'lodTriangleRatio':results[1]['triangles']/results[0]['triangles']},indent=2)+'\n')

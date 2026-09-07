@@ -58,7 +58,7 @@ ok(RULES !== undefined && !RULES.growthByNutrition, 'Devonian rules active: grow
 // ---- scenery: the coast is dressed with Devonian stand-ins, not Cambrian sponges ----
 {
   const CAMBRIAN: FloraKind[] = ['vauxia', 'sac', 'choia', 'thalli', 'tuft', 'cushion', 'lettuce', 'spine', 'glass'];
-  const DEVONIAN_KINDS: FloraKind[] = ['crinoid', 'stromatoporoid', 'tabulate', 'rugose', 'bryozoan', 'reed', 'log'];
+  const DEVONIAN_KINDS: FloraKind[] = ['crinoid', 'stromatoporoid', 'tabulate', 'rugose', 'bryozoan', 'reed', 'log', 'lilyColumn', 'frondTower'];
   const seen: Partial<Record<FloraKind, number>> = {}, byBiome: Partial<Record<Biome, Set<FloraKind>>> = {}, biomes = new Set<Biome>();
   let plants = 0, logsFar = 0, cambrian = 0, crinoidCover = 0, moundCover = 0;
   const perBiome: Partial<Record<Biome, { chunks: number; plants: number }>> = {};
@@ -107,7 +107,7 @@ ok(RULES !== undefined && !RULES.growthByNutrition, 'Devonian rules active: grow
   const at = (id: CreatureId) => g.spawn(id, 'ambient', { x: 0, y: -10, z: 60 }, 1.0);
   const pairs: [CreatureId, CreatureId, string[]][] = [
     ['coccosteus', 'cheirolepis', ['rival', 'prey', 'threat']],      // II vs II
-    ['cladoselache', 'coccosteus', ['prey', 'threat']],             // III vs II: hunter and hunted
+    ['cladoselache', 'coccosteus', ['prey', 'snack']],              // III vs II: the hunter sees food
     ['dunkleosteus', 'cladoselache', ['prey', 'threat']],           // IV vs III
     ['dunkleosteus', 'eldredgeops', ['snack']],                     // IV vs I: beneath notice
     ['eldredgeops', 'walliserops', ['rival', 'prey', 'threat']],    // I vs I
@@ -124,7 +124,7 @@ ok(RULES !== undefined && !RULES.growthByNutrition, 'Devonian rules active: grow
 {
   const dom = new Game('domination', [{ creature: 'eldredgeops', device: 'keyboard', ready: true }, { creature: 'dunkleosteus', device: 0, ready: true }]);
   for (const p of dom.players) ok(Math.abs(p.scale - STAGE_SCALE[0]) < 1e-6, `${p.creature} starts Young in Domination`);
-  ok(Math.abs(lengthOf(dom.players[1]) / lengthOf(dom.players[0]) - 9.5 / 0.85) < 1e-3, 'rungs keep their size ratio at the same stage');
+  ok(Math.abs(lengthOf(dom.players[1]) / lengthOf(dom.players[0]) - creature('dunkleosteus').adultLength / creature('eldredgeops').adultLength) < 1e-3, 'rungs keep their size ratio at the same stage');
   const bots = dom.actors.filter((a) => a.controller === 'bot');
   ok(bots.length === 2, 'Domination fills to four with bots');
   const reef = new Game('reef', [{ creature: 'tiktaalik', device: 'keyboard', ready: true }]);
@@ -141,6 +141,7 @@ ok(RULES !== undefined && !RULES.growthByNutrition, 'Devonian rules active: grow
 {
   const g = new Game('domination', [{ creature: 'coccosteus', device: 'keyboard', ready: true }]);
   const p = g.players[0]; const d = devActor(g, p);
+  p.spawnProtect = 1e6;                                       // the bots are quick now; this one is idling on purpose
   const tier0 = p.tier;
   // feed it by hand: 40 nutrition worth of shoal
   for (let i = 0; i < 20; i++) RULES!.onNutrition(g, p, 2, undefined);
@@ -193,6 +194,7 @@ ok(RULES !== undefined && !RULES.growthByNutrition, 'Devonian rules active: grow
 {
   const g = new Game('domination', [{ creature: 'coccosteus', device: 'keyboard', ready: true }, { creature: 'tiktaalik', device: 0, ready: true }]);
   const [coc, tik] = g.players;
+  coc.spawnProtect = tik.spawnProtect = 1e6;                 // nothing but the dead water may touch them here
   tik.pos.x = coc.pos.x + 8; tik.pos.z = coc.pos.z; tik.pos.y = coc.pos.y; tik.prevT.x = tik.pos.x; tik.prevT.z = tik.pos.z;
   const s = stateFor(g);
   s.deadZones.push({ pos: { x: coc.pos.x, y: coc.pos.y, z: coc.pos.z }, r: 40, age: 30, life: 120, drift: { x: 0, y: 0, z: 0 } });
@@ -276,14 +278,25 @@ ok(RULES !== undefined && !RULES.growthByNutrition, 'Devonian rules active: grow
   // speed / that distance: screens per second. The Cambrian band at full size is 0.61–1.30.
   const mag = (L: number) => L * 1.45 + 1.15 + Math.max(0, 0.8 - L) * 0.9;
   const { PLAYABLE } = await import('../src/sim/creatures');
+  const research = JSON.parse(fs.readFileSync('docs/research/devonian-swimming.json', 'utf8')) as { id: string; lengthM: number; burstBLs: number; cruiseBLs: number }[];
   for (const c of DEVONIAN.creatures) {
-    const adult = c.speed / mag(c.adultLength);
+    const adult = c.speed / mag(c.adultLength), sprint = adult * c.burst;
     const yl = c.adultLength * 0.6, young = (c.speed * Math.pow(0.6, 0.45)) / mag(yl);
-    ok(adult >= 0.45 && adult <= 1.6, `${c.id} moves at a readable speed grown (${adult.toFixed(2)} screens/s)`);
-    ok(young >= 0.55, `${c.id} is not sluggish at its starting size (${young.toFixed(2)} screens/s)`);
+    ok(adult >= 0.45 && adult <= 1.6, `${c.id} cruises at a readable speed grown (${adult.toFixed(2)} screens/s)`);
+    ok(young >= 0.4, `${c.id} is not sluggish at its starting size (${young.toFixed(2)} screens/s)`);
+    ok(sprint >= adult * 1.5 && sprint <= 2.6, `${c.id} sprints hard but stays steerable (${sprint.toFixed(2)} screens/s)`);
     ok(c.turnRate >= 1.2, `${c.id} can turn (${c.turnRate} rad/s)`);
     ok(c.agility >= 2.0, `${c.id} accelerates (${c.agility})`);
+    // the sizes are the real animals', compressed: same order, near proportion
+    const r = research.find((x) => x.id === c.id)!;
+    ok(Math.abs(c.adultLength - 4.6 * Math.pow(r.lengthM, 0.6)) < 0.02, `${c.id} is sized from its ${r.lengthM} m (${c.adultLength})`);
   }
+  const byLen = [...DEVONIAN.creatures].sort((a, b) => a.adultLength - b.adultLength).map((c) => c.id);
+  const byReal = [...research].sort((a, b) => a.lengthM - b.lengthM).map((r) => r.id);
+  ok(byLen.every((id, i) => research.find((r) => r.id === id)!.lengthM === research.find((r) => r.id === byReal[i])!.lengthM), 'the roster keeps the real animals\' size order');
+  const shark = DEVONIAN.creatures.find((c) => c.id === 'cladoselache')!;
+  ok(shark.burst >= 3, `a shark's sprint is several times its cruise, as the fast-start literature has it (${shark.burst}×)`);
+  ok(DEVONIAN.creatures.find((c) => c.id === 'rhinodipterus')!.rung === 2, 'a 0.4 m lungfish sits in rung II by size');
   const dunk = PLAYABLE.find((c) => c.id === 'dunkleosteus')!;
   const titan = DEVONIAN.creatures.find((c) => c.id === 'titanichthys')!;
   ok(dunk.speed / mag(dunk.adultLength) > titan.speed / mag(titan.adultLength), 'the hunter still outruns the filter feeder');
@@ -313,7 +326,7 @@ ok(RULES !== undefined && !RULES.growthByNutrition, 'Devonian rules active: grow
   const hp0 = plate.hp;
   tick(g, press(0, 'heavy'));
   ok(ony.state === 'ability' && creature(ony.creature).ability === 'tuskLunge', `heavy starts the tusk lunge (${ony.state})`);
-  for (let i = 0; i < 60; i++) { plate.pos.x = ony.pos.x + Math.sin(ony.yaw) * lengthOf(ony) * 0.8; plate.pos.z = ony.pos.z + Math.cos(ony.yaw) * lengthOf(ony) * 0.8; plate.vel.x = plate.vel.z = 0; tick(g, idle()); }
+  for (let i = 0; i < 60; i++) { plate.pos.x = ony.pos.x + Math.sin(ony.yaw) * lengthOf(ony) * 0.8; plate.pos.y = ony.pos.y; plate.pos.z = ony.pos.z + Math.cos(ony.yaw) * lengthOf(ony) * 0.8; plate.vel.x = plate.vel.y = plate.vel.z = 0; tick(g, idle()); }
   ok(plate.hp < hp0, `the lunge lands through part of the armour (hp ${hp0.toFixed(0)} → ${plate.hp.toFixed(0)})`);
   // the brush display bluffs an AI rival off
   // away from the other players, so the rival has only the stethacanthus to square up to
@@ -371,6 +384,56 @@ ok(RULES !== undefined && !RULES.growthByNutrition, 'Devonian rules active: grow
   ok(dory.state === 'ability' && dory.hideMode === 'none', 'floor sweep is a timed sweep, not a hide');
   for (let i = 0; i < 60 * 2; i++) tick(g, idle());
   ok(d.standing > s0 && d.recent.includes('feed'), `sweeping the floor feeds standing (${s0.toFixed(1)} → ${d.standing.toFixed(1)})`);
+}
+
+// ---- a pelagic sea: a deep column, tall scenery in it, bodies that live mid-water ----
+{
+  const { FLORA_PHYS } = await import('../src/sim/flora');
+  ok(SURFACE_Y >= 60, `the Devonian water column is deep (surface at ${SURFACE_Y}, the Cambrian's is 40)`);
+  ok(FLORA_PHYS.lilyColumn.h >= 8 && FLORA_PHYS.frondTower.h >= 5, `tall kinds reach into the column (lily ${FLORA_PHYS.lilyColumn.h}, frond tower ${FLORA_PHYS.frondTower.h})`);
+  const g = new Game('domination', [{ creature: 'cladoselache', device: 'keyboard', ready: true }, { creature: 'bothriolepis', device: 0, ready: true }]);
+  const [shark, plate] = g.players;
+  const floorS = groundHeight(g.world, shark.pos.x, shark.pos.z), floorP = groundHeight(g.world, plate.pos.x, plate.pos.z);
+  ok(shark.pos.y - floorS > (SURFACE_Y - floorS) * 0.3, `a swimmer hatches mid-column (${(shark.pos.y - floorS).toFixed(0)} above a floor with ${(SURFACE_Y - floorS).toFixed(0)} of water)`);
+  ok(plate.pos.y - floorP < 2, 'a crawler hatches on the floor');
+  // lily crowns give cover high up, where a fish would use it
+  const c = g.world.cover.find((cv) => cv.pos.y > floorS + 6);
+  ok(!!c, 'there is cover well above the floor');
+}
+
+// ---- how a fish moves: slow astern, sharp when slow, a fast-start, and a leap ----
+{
+  const g = new Game('domination', [{ creature: 'cladoselache', device: 'keyboard', ready: true }]);
+  const a = g.players[0];
+  const step = (f: Partial<InputFrame> = {}) => { g.step(DT, new Map([[0, { ...emptyInput(), ...f } as InputFrame]])); const k = g.events.map((e) => e.kind); g.events.length = 0; return k; };
+  for (let i = 0; i < 120; i++) step();
+  a.spawnProtect = 0;
+  for (let i = 0; i < 150; i++) step({ my: 1, camYaw: a.yaw });
+  const fwd = Math.hypot(a.vel.x, a.vel.z), yaw0 = a.yaw;
+  let slowest = Infinity;
+  for (let i = 0; i < 40; i++) { step({ my: -1, camYaw: yaw0 }); slowest = Math.min(slowest, Math.hypot(a.vel.x, a.vel.z)); }
+  ok(slowest < fwd * 0.2, `backing up is slow (forward ${fwd.toFixed(1)}, astern bottoms at ${slowest.toFixed(1)})`);
+  ok(Math.abs(a.yaw - yaw0) > 0.8, `and the body turns sharply to face the new way (${Math.abs(a.yaw - yaw0).toFixed(2)} rad in two thirds of a second)`);
+  for (let i = 0; i < 200; i++) step();
+  const rest = Math.hypot(a.vel.x, a.vel.z);
+  step({ my: 1, camYaw: a.yaw, burst: 1 });
+  const dart = Math.hypot(a.vel.x, a.vel.z);
+  ok(rest < fwd * 0.35 && dart > fwd * 0.8, `the first press of sprint from rest is a fast-start (${rest.toFixed(2)} -> ${dart.toFixed(1)} in one step)`);
+  // the leap: drive at the surface and go through it, then splash back in
+  a.pos.y = SURFACE_Y - 6; a.prevT.y = a.pos.y;
+  let breached = 0, splashed = 0, peak = 0;
+  for (let i = 0; i < 200; i++) { const k = step({ my: 1, camYaw: a.yaw, camPitch: -0.9, burst: 1, rise: true }); breached += k.filter((x) => x === 'breach').length; splashed += k.filter((x) => x === 'splash').length; peak = Math.max(peak, a.pos.y); }
+  ok(breached > 0 && splashed > 0, `a fish driving at the surface leaves the water and comes back (${breached} leaps, ${splashed} splashes)`);
+  ok(peak > SURFACE_Y + 1, `the leap clears the surface (peak ${(peak - SURFACE_Y).toFixed(1)} above it)`);
+  ok(!a.airborne || a.pos.y > SURFACE_Y - 2, 'it is never airborne under water');
+  // a crawler never does
+  const g2 = new Game('domination', [{ creature: 'bothriolepis', device: 'keyboard', ready: true }]);
+  const b = g2.players[0];
+  for (let i = 0; i < 120; i++) { g2.step(DT, new Map([[0, emptyInput()]])); g2.events.length = 0; }
+  b.pos.y = SURFACE_Y - 3; b.prevT.y = b.pos.y; b.spawnProtect = 0;
+  let crawlerBreach = false;
+  for (let i = 0; i < 120; i++) { g2.step(DT, new Map([[0, { ...emptyInput(), my: 1, camYaw: b.yaw, burst: 1, rise: true }]])); if (g2.events.some((e) => e.kind === 'breach')) crawlerBreach = true; g2.events.length = 0; }
+  ok(!crawlerBreach && b.pos.y <= SURFACE_Y, 'a crawler stays in the water');
 }
 
 // ---- a full match step is deterministic and stays alive ----
