@@ -9,22 +9,20 @@ prop and supporting image first, committed early to main, then full refining pas
 quality and eye requirements remain, but extended repeated art/collision reviews are deferred
 and recorded. Do not block initial delivery on final-art perfection. Mark unfinished models
 **⚠ Preview model** on the game choice cards and viewer. The lifecycle source is
-`src/content/devonian/model-status.json`; the first nine are final, all other roster IDs preview.
+`src/content/devonian/model-status.json`; seven reviewed models are final; Doryaspis and Gemuendina were reopened as preview following user feedback. All other roster IDs are preview.
 
-Current initial delivery: **15/21 creatures available, 9 final + 6 preview**, with 47 scenery
-previews and nine runtime biome paintings. The six previews are Onychodus, Rhinodipterus,
-Tiktaalik, Acanthostega, Eldredgeops and Jaekelopterus. Exact raw/packaged hashes are in each
+Current initial delivery: **19/21 creatures available, 7 final + 12 preview**, with 47 scenery
+previews and nine runtime biome paintings. The twelve previews are Doryaspis, Gemuendina, Onychodus, Rhinodipterus,
+Tiktaalik, Acanthostega, Eldredgeops, Jaekelopterus, Walliserops, Nahecaris, Palaeoisopus and Furcaster. Exact raw/packaged hashes are in each
 tracked `preview-delivery.json`. All 47 scenery full models loaded in the actual built viewer;
 full/LOD structural/scale/ambient checks passed. Raw/editable sources stay local.
 
-Agents now own Nahecaris (eye_audit), Palaeoisopus (titanichthys) and Walliserops (dunkleosteus,
-then Furcaster). Manticoceras and Michelinoceras still need independent authorship. Parent owns
-packaging, integration, scenery instancing and supporting images. Main and devonian-assets were pushed at **a111dea**, including the 15-creature / 47-prop / nine-painting library and concurrent Survival/menu/palette work. Refresh Git for newer state.
+Walliserops, Nahecaris, Palaeoisopus and Furcaster are integrated, packaged and viewer-verified; batch-19 intake, typecheck, build and 618 Devonian checks passed. Agents now own Manticoceras (eye_audit), runtime scenery instancing (titanichthys), and Michelinoceras (dunkleosteus). Parent owns packaging, creature integration and supporting images. Main and devonian-assets were pushed at **fdabd42**, including the 15-creature / 47-prop / nine-painting library and concurrent Survival/menu/palette work. Refresh Git for newer state.
 
 Outstanding non-creature initial work: dedicated cheap instanced exports / placement mappings,
 ten material source sets, nine regional E01–E09 boards, three lighting boards, particle/decal
 atlases and two scale-comparison plates. Runtime biome paintings are separate from the regional
-boards. Material source images T01–T05 and T07 are generated and safely copied to local/devonian-authoring/environment-materials; exact prompts/source paths are in tools/devonian/material-image-prompts.json. Matching material data maps and T06/T08–T10 still pending.
+boards. Material source images T01–T05, T07–T09 are generated and safely copied to local/devonian-authoring/environment-materials; exact prompts/source paths are in tools/devonian/material-image-prompts.json. Eight matching numerical material map sets and five source-model-derived T06/T10 atlas cells are now generated locally/public but not yet committed; inspect and publish with supporting-image manifest. Nine regional boards are generating in three independent batches; exact prompts persisted in tools/devonian/regional-board-prompts.json.
 Nine biome originals are safely in local/devonian-authoring/environment-images, tracked prompts
 in tools/devonian/environment-image-prompts.json; outputs public/assets/devonian/biomes.
 
@@ -32,6 +30,8 @@ The pending local Onychodus palatal-pocket edit is NOT exported: tracked build.p
 shipped GLB; do not run the local assembler without reviewing it. No full-refinement loop should
 restart before the complete initial collection exists. Older sections below retain useful evidence
 but their production order and numerical progress are superseded by this update.
+
+Latest post-merge typecheck, build and Devonian test commands completed successfully. No non-creature completion notification has been sent; the outstanding list above is still required. The user repeated the request to save state after every meaningful handoff. Keep this file and local SESSION_CHECKPOINT.md synchronized; each author also maintains WORKING_STATE.md.
 
 ## New user feedback — Doryaspis and milestone notification
 

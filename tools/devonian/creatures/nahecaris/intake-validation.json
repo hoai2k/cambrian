@@ -1,0 +1,56 @@
+[
+  {
+    "id": "nahecaris",
+    "fullTriangles": 177975,
+    "lodTriangles": 54288,
+    "joints": 82,
+    "clips": [
+      "Ability",
+      "Attack",
+      "Bite",
+      "Crawl",
+      "Death",
+      "Dive",
+      "Dodge",
+      "Eat",
+      "Guard",
+      "Heavy",
+      "Hit",
+      "Idle",
+      "Moult",
+      "Parry",
+      "Rise",
+      "Stagger",
+      "Swim",
+      "TurnLeft",
+      "TurnRight"
+    ],
+    "sockets": 3,
+    "files": {
+      "glb": {
+        "bytes": 11978164,
+        "sha256": "af608947cb933775338f91ddc46861911879a3b465a69ccf02ae3978023ddb6a"
+      },
+      "lod1.glb": {
+        "bytes": 3025320,
+        "sha256": "26760efd2f8d09d9a2d00b724dbcba8434df4eaa9b7e7a4913864ea30b444c02"
+      },
+      "png": {
+        "bytes": 238743,
+        "sha256": "11dbbb00c6d1dfdf24cb569223e6b1dfbd7e7b6a5214c87c9d30842c87789097"
+      },
+      "select.png": {
+        "bytes": 711456,
+        "sha256": "22428ba44b7d9ffa538f5843fd6593186c9a3bb22d7ff9857a6a7d50a4397079"
+      },
+      "card.png": {
+        "bytes": 90160,
+        "sha256": "ede19a301c459bc8a1909d4e7450ece9e8d114ae4a101dfc359158469e5f4ade"
+      },
+      "thumb.png": {
+        "bytes": 14609,
+        "sha256": "07b78e04408f7430c1e035b06102a54a694dfd1dc5ab4609edd9aaf9970237bd"
+      }
+    }
+  }
+]
