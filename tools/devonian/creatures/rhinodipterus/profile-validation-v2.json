@@ -1,0 +1,40 @@
+{
+  "sourceGlbSha256": "ad29e4157364b09cf20716d00982d9ae13f4e9566db0f1d72e9fa96230f6c97c",
+  "renders": [
+    {
+      "file": "full-profile-v2.png",
+      "clip": "Idle",
+      "frame": 1,
+      "imageSha256": "0eafa510bbc5a0f3bd95ade1175f32175b65e61d7ce9a58f8bb89b89576fd0d1",
+      "sourceGlbSha256": "ad29e4157364b09cf20716d00982d9ae13f4e9566db0f1d72e9fa96230f6c97c"
+    },
+    {
+      "file": "gape-profile-v2.png",
+      "clip": "Heavy",
+      "frame": 12,
+      "imageSha256": "73fb2d14d226156c7ecbbe0d12ff834885a830b6679c0cacb36c780ff084ef32",
+      "sourceGlbSha256": "ad29e4157364b09cf20716d00982d9ae13f4e9566db0f1d72e9fa96230f6c97c"
+    },
+    {
+      "file": "gape-opposite-v2.png",
+      "clip": "Heavy",
+      "frame": 12,
+      "imageSha256": "c68a0b337ea16ecc2f7d9828e5a480fc74fb90ddb2a2ea3f5847892f53fdfc0c",
+      "sourceGlbSha256": "ad29e4157364b09cf20716d00982d9ae13f4e9566db0f1d72e9fa96230f6c97c"
+    },
+    {
+      "file": "closing-opposite-v2.png",
+      "clip": "Bite",
+      "frame": 10,
+      "imageSha256": "78a66c2096a1fd73572fed1e50fc0ecd1bd7c8fdf79beb2460a55f3627aa9e86",
+      "sourceGlbSha256": "ad29e4157364b09cf20716d00982d9ae13f4e9566db0f1d72e9fa96230f6c97c"
+    },
+    {
+      "file": "mouth-gape-front-v2.png",
+      "clip": "Heavy",
+      "frame": 12,
+      "imageSha256": "92a07136eedc7ccc82ee657813d5bc8948196cddedf6039e6bc0144a88e410d2",
+      "sourceGlbSha256": "ad29e4157364b09cf20716d00982d9ae13f4e9566db0f1d72e9fa96230f6c97c"
+    }
+  ]
+}

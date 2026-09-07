@@ -1,0 +1,22 @@
+{
+  "id": "tiktaalik",
+  "modelStatus": "preview",
+  "stage": "Initial playable model; extended refining pass follows complete roster and scenery delivery.",
+  "packaging": "Lossless numeric and oriented-topology round-trip passed; original 126 Cambrian files byte-identical.",
+  "models": {
+    "glb": {
+      "sourceSHA256": "f79a2a2043c32566de9c498d4e486d3ca87e0dc52b538e12ae36a22582a610fd",
+      "packagedSHA256": "ced4e7ee4bf020c1c258c07975ed62173fbd66fe9f634765997c68302051cbc1",
+      "bytes": 15702556
+    },
+    "lod1.glb": {
+      "sourceSHA256": "cd10c4ec2ec2f761831afc38460288a74310d4849633bf2b62077bc418e5c365",
+      "packagedSHA256": "787a9dd3cbf7c31a1fd6f322ffbdd9fdc7d597dad34d72875c9d2142a474c48d",
+      "bytes": 1224240
+    }
+  },
+  "deferredRefinement": [
+    "Cranial and fin-web detail polish.",
+    "More diagnostic palate illumination and final action art review."
+  ]
+}

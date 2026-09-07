@@ -1,3 +1,4 @@
+import { ModelStatusBadge } from '../shared/ModelStatusBadge';
 import { CreaturePortrait } from '../app/CreaturePortrait';
 import { useEffect, useRef, useState } from 'react';
 import { COLLECTIONS, paletteFor, SPECIMENS, specimenByKey, type CollectionId } from './catalogue';
@@ -128,6 +129,7 @@ export function Viewer() {
                 <span>
                   <b>{c.name}</b>
                   <small>{c.species}</small>
+                  <ModelStatusBadge status={c.modelStatus} compact />
                 </span>
               </button>
             </li>
@@ -138,6 +140,7 @@ export function Viewer() {
       <div className="info">
         <span className="role">{def.role}</span>
         <h2 className={def.name.length > 11 ? 'long-name' : undefined}>{def.name}</h2>
+        <ModelStatusBadge status={def.modelStatus} />
         {def.kind && <p className="kind-line"><b className="kind">{def.kind}</b>{def.species}</p>}
         <p>{def.provenance ?? 'Burgess Shale'} · {clips.length} clips</p>
         {def.kindNote && <p className="specimen-description">{def.kindNote}</p>}

@@ -22,9 +22,17 @@ Dunkleosteus's widest action gape was inspected with additional light aimed into
 
 Each revised full model retains the eighteen action clips and three version-1 specimen anchors. The lower-detail model retains the identical skeleton and anchors with Idle, Swim and Death. Mouth geometry, socket alignment and eye seating are also inspected in posed views; bind-space volume checks cannot establish animated attachment on their own.
 
-## Remaining individual review
+## Initial deliveries awaiting the refining pass
 
-The original eight Devonian specimens now have reviewed replacements. Rhinodipterus, Onychodus and Tiktaalik are in individual authoring and review. Unreleased creatures and scenery remain outside the approved shipment list until their own reviews pass.
+The original eight specimens and Cheirolepis have reviewed models. Three additional models are
+now delivered as **previews**: Onychodus (eyes ~86–87% embedded), Rhinodipterus (~83%) and Tiktaalik
+(~71%). Each was independently authored in Blender, with real oral geometry, eighteen full
+animations, three LOD animations, three anchors and four matching portraits. Exact source and
+packaged hashes and deferred polish are recorded in each builder folder's `preview-delivery.json`.
+
+At the user's request, initial delivery of the remaining nine creatures and all scenery/images
+precedes further full art-refining passes. Preview does not waive the 50% eye minimum or basic
+export/animation validity; it identifies the unfinished visual and detailed motion review.
 
 The viewer uses balanced, camera-side inspection light so rotating a specimen reveals shaded texture and oral geometry. This is viewer lighting only.
 

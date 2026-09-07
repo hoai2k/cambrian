@@ -4,6 +4,7 @@
     "name": "Dunkleosteus",
     "species": "Dunkleosteus terrelli",
     "category": "creature",
+    "modelStatus": "final",
     "provenance": "Late Devonian (Famennian), Cleveland Shale, Ohio, USA",
     "description": "An armoured pelagic arthrodire with a short cranial wedge, articulated cutting jaws and a compact muscular trunk.",
     "model": "assets/devonian/creatures/dunkleosteus.glb",
@@ -33,6 +34,7 @@
     "name": "Titanichthys",
     "species": "Titanichthys termieri",
     "category": "creature",
+    "modelStatus": "final",
     "provenance": "Late Devonian (Famennian), Southern Maïder basin, Morocco",
     "description": "Broad-headed armoured giant with small eyes and slender toothless jaws, reconstructed as a suspension feeder.",
     "model": "assets/devonian/creatures/titanichthys.glb",
@@ -69,6 +71,7 @@
     "name": "Coccosteus",
     "species": "Coccosteus cuspidatus",
     "category": "creature",
+    "modelStatus": "final",
     "provenance": "Middle Devonian, Scotland",
     "description": "Compact arthrodire with a broad short jaw, sculpted dermal head and thoracic armour, rounded pectoral fans, anterior pelvic fins, one long low dorsal fin and a sharply heterocercal tail.",
     "model": "assets/devonian/creatures/coccosteus.glb",
@@ -99,6 +102,7 @@
     "name": "Bothriolepis",
     "species": "Bothriolepis canadensis",
     "category": "creature",
+    "modelStatus": "final",
     "provenance": "Late Devonian (Frasnian), Escuminac Formation, Miguasha, Quebec, Canada",
     "description": "Angular armoured antiarch with a steep immobile head, inset dorsal eyes, a posterior dorsal crest and jointed dermal pectoral fins. A long flexible posterior carries a small dorsal fin and asymmetrical tail.",
     "model": "assets/devonian/creatures/bothriolepis.glb",
@@ -129,6 +133,7 @@
     "name": "Gemuendina",
     "species": "Gemuendina stuertzi",
     "category": "creature",
+    "modelStatus": "final",
     "provenance": "Early Devonian (Emsian), Hunsrück Slate, Germany",
     "description": "Low, broad rhenanid placoderm with a mosaic of small armour elements, undulating pectoral margins and upward-looking eyes and mouth.",
     "model": "assets/devonian/creatures/gemuendina.glb",
@@ -170,6 +175,7 @@
     "name": "Doryaspis",
     "species": "Doryaspis nathorsti",
     "category": "creature",
+    "modelStatus": "final",
     "provenance": "Early Devonian, Wood Bay Formation, Spitsbergen, Svalbard",
     "description": "A jawless fish with a flat dorsal headshield, deep ventral armour, short fixed pseudorostrum and laterally extended rigid cornual plates; flexible scaled posterior with a hypocercal tail.",
     "model": "assets/devonian/creatures/doryaspis.glb",
@@ -199,6 +205,7 @@
     "name": "Cladoselache",
     "species": "Cladoselache sp. (Cleveland Shale reconstruction)",
     "category": "creature",
+    "modelStatus": "final",
     "provenance": "Late Devonian, Famennian Cleveland Shale, Ohio, USA",
     "description": "Streamlined early chondrichthyan with a broad terminal mouth, large eyes, broad paired fins, a curved anterior dorsal spine and a keeled crescent tail.",
     "model": "assets/devonian/creatures/cladoselache.glb",
@@ -242,6 +249,7 @@
     "name": "Stethacanthus",
     "species": "Stethacanthus sp. (CMNH 8988-informed reconstruction)",
     "category": "creature",
+    "modelStatus": "final",
     "provenance": "Late Devonian, upper Famennian Cleveland Shale, Ohio, USA",
     "description": "A short-headed early chondrichthyan with opposing cranial and dorsal crown denticles, a supported spine-brush, slender metapterygial fin extensions, and an epicercal caudal axis.",
     "model": "assets/devonian/creatures/stethacanthus.glb",
@@ -272,6 +280,7 @@
     "name": "Cheirolepis",
     "species": "Cheirolepis trailli",
     "category": "creature",
+    "modelStatus": "final",
     "provenance": "Middle Devonian, Scottish Orcadian Basin / Nairnshire assemblages",
     "description": "Small early ray-finned fish with fine rhombic scales, a large toothed terminal mouth, mobile gill covers, ray-supported fins and a strongly unequal tail with an elongated scaled upper lobe.",
     "model": "assets/devonian/creatures/cheirolepis.glb",
@@ -308,6 +317,122 @@
       "Pigmentation, fin-membrane thickness, three-dimensional soft tissue, individual tooth arrangement and all motion are artistic reconstruction rather than fossil observations.",
       "Growth is a relaxed ventilation and fin-spreading gesture, without scaling or moulting. Ability is a burst-and-bank display, not a Devonian gameplay rule.",
       "Original source and review renders are preserved in cambrian/local/devonian-authoring/cheirolepis."
+    ]
+  },
+  {
+    "id": "rhinodipterus",
+    "name": "Rhinodipterus",
+    "species": "Rhinodipterus kimberleyensis",
+    "category": "creature",
+    "modelStatus": "preview",
+    "provenance": "Late Devonian, Gogo Formation, Western Australia",
+    "description": "Long-snouted marine lungfish with a narrow mandibular symphysis, small lateral eyes, rounded radial tooth plates, cosmine skull roof and comparative lobed fins with two posterior dorsals.",
+    "model": "assets/devonian/creatures/rhinodipterus.glb",
+    "lod": "assets/devonian/creatures/rhinodipterus.lod1.glb",
+    "image": "assets/devonian/creatures/rhinodipterus.thumb.png",
+    "lengthMeters": 0.55,
+    "looping": [
+      "Idle",
+      "Swim",
+      "Guard",
+      "Eat"
+    ],
+    "sources": [
+      "https://doi.org/10.1111/j.1475-4983.2011.01118.x",
+      "https://pmc.ncbi.nlm.nih.gov/articles/PMC2936207/",
+      "https://doi.org/10.1017/S0263593300003588"
+    ],
+    "notes": [
+      "Cranial reconstruction informed by Clement2012; snout tip is inferred from the long symphysis and comparative specimens.",
+      "Body and fin outline follows the explicitly comparative proposal in Clement2012 Fig7G (after R.ulrichi); no complete R.kimberleyensis postcranium is known.",
+      "Seven upper and six lower rounded denticle rows; restrained gape and lateral grinding reflect the species description, not a crushing predator.",
+      "Exact pigment, skin thickness, oral soft tissues and movement are artistic. Representative length is a display assumption, not an observed complete animal or maximum.",
+      "Full uses regional vertex pigment multiplied once by near-neutral UV albedo; texture-free LOD bakes this factor once.",
+      "Air-gulping is a cranial anatomical interpretation; no claimed breathing frequency, terrestrial walk or aestivation."
+    ]
+  },
+  {
+    "id": "onychodus",
+    "name": "Onychodus",
+    "species": "Onychodus jandemarrai",
+    "category": "creature",
+    "modelStatus": "preview",
+    "provenance": "Late Devonian (Frasnian), Gogo Formation, Western Australia",
+    "description": "Robust lobe-finned fish with paired crescent-shaped lower-jaw tusk platforms, interleaved marginal and palatal teeth, oval scales, lobed fins and a nearly symmetrical deep tail.",
+    "model": "assets/devonian/creatures/onychodus.glb",
+    "lod": "assets/devonian/creatures/onychodus.lod1.glb",
+    "image": "assets/devonian/creatures/onychodus.thumb.png",
+    "lengthMeters": 1.5,
+    "looping": [
+      "Idle",
+      "Swim",
+      "Guard",
+      "Eat"
+    ],
+    "sources": [
+      {
+        "title": "Andrews et al. 2006, The structure of Onychodus jandemarrai, Gogo; anatomy and competing functional interpretations",
+        "url": "https://doi.org/10.1017/S0263593300001309"
+      },
+      {
+        "title": "Campbell and Barwick 2006, illustrated Onychodontiform oral anatomy",
+        "url": "https://ijdb.ehu.eus/article/pdf/052125kc"
+      }
+    ],
+    "notes": [
+      "Gogo O. jandemarrai reconstruction; 1.5 m represents the proportional estimate in the original paper from an isolated large tusk, not a measured whole individual.",
+      "Paired anterior tusk platforms are distinct from marginal and palatal teeth. Motion of the whorls during feeding is disputed within Andrews et al.; the slight modeled adjustment is an interpretation, not an established mechanical cycle.",
+      "Incomplete fin outlines are comparative; the caudal is nearly diphycercal without an extended coelacanth filament. Pectoral mobility is deliberately restrained.",
+      "Living pigment, soft tissue thickness and animations are interpreted. Original material swatch is imagegen; surface anatomy is authored in Blender."
+    ]
+  },
+  {
+    "id": "tiktaalik",
+    "name": "Tiktaalik",
+    "species": "Tiktaalik roseae",
+    "category": "creature",
+    "modelStatus": "preview",
+    "provenance": "Late Devonian, early Frasnian Fram Formation, Ellesmere Island, Nunavut, Canada",
+    "description": "Broad-headed finned tetrapodomorph with dorsal eyes, a mobile neck, rib-supported low trunk and robust jointed paired fins retaining fin-ray webs.",
+    "model": "assets/devonian/creatures/tiktaalik.glb",
+    "lod": "assets/devonian/creatures/tiktaalik.lod1.glb",
+    "image": "assets/devonian/creatures/tiktaalik.thumb.png",
+    "lengthMeters": 2,
+    "looping": [
+      "Idle",
+      "Swim",
+      "Guard",
+      "Eat"
+    ],
+    "sources": [
+      {
+        "title": "Daeschler, Shubin & Jenkins 2006, Devonian tetrapod-like fish",
+        "url": "https://doi.org/10.1038/nature04639"
+      },
+      {
+        "title": "Shubin, Daeschler & Jenkins 2006, Tiktaalik pectoral fin",
+        "url": "https://doi.org/10.1038/nature04637"
+      },
+      {
+        "title": "Lemberg, Daeschler & Shubin 2021, feeding system",
+        "url": "https://knowledge.uchicago.edu/records/s34bv-j5m06"
+      },
+      {
+        "title": "Stewart et al. 2024, axial skeleton",
+        "url": "https://knowledge.uchicago.edu/records/mvb59-qth34"
+      },
+      {
+        "title": "Stewart et al. 2020, fin ray patterns",
+        "url": "https://doi.org/10.1073/pnas.1915983117"
+      }
+    ],
+    "notes": [
+      "Original Tiktaalik roseae reconstruction of a representative 2 m animal, not a fossil scan or species maximum.",
+      "Broad flattened skull with posterior dorsal orbits, short mobile neck and no bony opercular cover; the rigid central skull is not stretched during cheek expansion.",
+      "Four robust fins retain continuous lepidotrichial webs; the pectoral skeleton has shoulder, elbow and distal support zones, not tetrapod fingers. Pelvic fins are substantial but restricted hip retraction does not imply normal terrestrial walking.",
+      "Rhombic narrowly overlapping scales and dermal roof texture are fossil-informed. Pigmentation, soft tissues and the low inferred caudal outline remain artistic reconstruction.",
+      "Animations represent aquatic undulation, paddling, bracing, neck aiming, gape and modest cheek expansion. Growth is a relaxed extension display, with no body scaling. Runtime labels do not define Devonian gameplay.",
+      "Initial preview release. Further review may refine soft tissue, fin-web contours, cranial surface detail and oral presentation."
     ]
   }
 ]

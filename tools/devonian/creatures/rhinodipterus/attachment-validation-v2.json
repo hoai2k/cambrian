@@ -1,0 +1,4386 @@
+[
+  {
+    "file": "rhinodipterus.glb",
+    "sourceGlbSha256": "ad29e4157364b09cf20716d00982d9ae13f4e9566db0f1d72e9fa96230f6c97c",
+    "method": "Evaluated actual skin root vertices against evaluated continuous torso BVH; signed nearest distance, review aid rather than eye-volume measurement",
+    "maxRootOutwardDistance": -0.014037025877769338,
+    "clips": [
+      {
+        "clip": "Ability",
+        "poses": [
+          {
+            "fraction": 0,
+            "fins": [
+              {
+                "name": "Fleshy pectoral L",
+                "samples": 53,
+                "maxOutwardDistance": -0.01588757363970217,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pectoral R",
+                "samples": 53,
+                "maxOutwardDistance": -0.015887597402979736,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pelvic L",
+                "samples": 63,
+                "maxOutwardDistance": -0.03408262471202761,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pelvic R",
+                "samples": 63,
+                "maxOutwardDistance": -0.03408432376454584,
+                "insideFraction": 1.0
+              }
+            ]
+          },
+          {
+            "fraction": 0.15,
+            "fins": [
+              {
+                "name": "Fleshy pectoral L",
+                "samples": 53,
+                "maxOutwardDistance": -0.017239407472487756,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pectoral R",
+                "samples": 53,
+                "maxOutwardDistance": -0.017239386559410264,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pelvic L",
+                "samples": 63,
+                "maxOutwardDistance": -0.03440529920044355,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pelvic R",
+                "samples": 63,
+                "maxOutwardDistance": -0.03376307387952693,
+                "insideFraction": 1.0
+              }
+            ]
+          },
+          {
+            "fraction": 0.3,
+            "fins": [
+              {
+                "name": "Fleshy pectoral L",
+                "samples": 53,
+                "maxOutwardDistance": -0.01702033868059516,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pectoral R",
+                "samples": 53,
+                "maxOutwardDistance": -0.017060599755495787,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pelvic L",
+                "samples": 63,
+                "maxOutwardDistance": -0.03473559846133867,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pelvic R",
+                "samples": 63,
+                "maxOutwardDistance": -0.033506000638226396,
+                "insideFraction": 1.0
+              }
+            ]
+          },
+          {
+            "fraction": 0.5,
+            "fins": [
+              {
+                "name": "Fleshy pectoral L",
+                "samples": 53,
+                "maxOutwardDistance": -0.017115159690547443,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pectoral R",
+                "samples": 53,
+                "maxOutwardDistance": -0.01711513814234422,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pelvic L",
+                "samples": 63,
+                "maxOutwardDistance": -0.03259734638413647,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pelvic R",
+                "samples": 63,
+                "maxOutwardDistance": -0.036426090882741846,
+                "insideFraction": 1.0
+              }
+            ]
+          },
+          {
+            "fraction": 0.7,
+            "fins": [
+              {
+                "name": "Fleshy pectoral L",
+                "samples": 53,
+                "maxOutwardDistance": -0.015898423311227816,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pectoral R",
+                "samples": 53,
+                "maxOutwardDistance": -0.015898417057542247,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pelvic L",
+                "samples": 63,
+                "maxOutwardDistance": -0.03636742691742256,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pelvic R",
+                "samples": 63,
+                "maxOutwardDistance": -0.03363227512454614,
+                "insideFraction": 1.0
+              }
+            ]
+          },
+          {
+            "fraction": 0.85,
+            "fins": [
+              {
+                "name": "Fleshy pectoral L",
+                "samples": 53,
+                "maxOutwardDistance": -0.015887577857938595,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pectoral R",
+                "samples": 53,
+                "maxOutwardDistance": -0.015887601530266693,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pelvic L",
+                "samples": 63,
+                "maxOutwardDistance": -0.034053183160722256,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pelvic R",
+                "samples": 63,
+                "maxOutwardDistance": -0.03412964241579175,
+                "insideFraction": 1.0
+              }
+            ]
+          },
+          {
+            "fraction": 1,
+            "fins": [
+              {
+                "name": "Fleshy pectoral L",
+                "samples": 53,
+                "maxOutwardDistance": -0.01588757363970217,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pectoral R",
+                "samples": 53,
+                "maxOutwardDistance": -0.015887597402979736,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pelvic L",
+                "samples": 63,
+                "maxOutwardDistance": -0.03408262471202761,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pelvic R",
+                "samples": 63,
+                "maxOutwardDistance": -0.03408432376454584,
+                "insideFraction": 1.0
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "clip": "Attack",
+        "poses": [
+          {
+            "fraction": 0,
+            "fins": [
+              {
+                "name": "Fleshy pectoral L",
+                "samples": 53,
+                "maxOutwardDistance": -0.01588757363970217,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pectoral R",
+                "samples": 53,
+                "maxOutwardDistance": -0.015887597402979736,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pelvic L",
+                "samples": 63,
+                "maxOutwardDistance": -0.03408262471202761,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pelvic R",
+                "samples": 63,
+                "maxOutwardDistance": -0.03408432376454584,
+                "insideFraction": 1.0
+              }
+            ]
+          },
+          {
+            "fraction": 0.15,
+            "fins": [
+              {
+                "name": "Fleshy pectoral L",
+                "samples": 53,
+                "maxOutwardDistance": -0.016636832617223263,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pectoral R",
+                "samples": 53,
+                "maxOutwardDistance": -0.016663213726133108,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pelvic L",
+                "samples": 63,
+                "maxOutwardDistance": -0.034082642232533544,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pelvic R",
+                "samples": 63,
+                "maxOutwardDistance": -0.034084337909007445,
+                "insideFraction": 1.0
+              }
+            ]
+          },
+          {
+            "fraction": 0.3,
+            "fins": [
+              {
+                "name": "Fleshy pectoral L",
+                "samples": 53,
+                "maxOutwardDistance": -0.017025830689817667,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pectoral R",
+                "samples": 53,
+                "maxOutwardDistance": -0.017048475798219442,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pelvic L",
+                "samples": 63,
+                "maxOutwardDistance": -0.034365453000646085,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pelvic R",
+                "samples": 63,
+                "maxOutwardDistance": -0.03383214870700613,
+                "insideFraction": 1.0
+              }
+            ]
+          },
+          {
+            "fraction": 0.5,
+            "fins": [
+              {
+                "name": "Fleshy pectoral L",
+                "samples": 53,
+                "maxOutwardDistance": -0.015233998110488756,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pectoral R",
+                "samples": 53,
+                "maxOutwardDistance": -0.015233984660881106,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pelvic L",
+                "samples": 63,
+                "maxOutwardDistance": -0.030163225543219596,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pelvic R",
+                "samples": 63,
+                "maxOutwardDistance": -0.03732582356315106,
+                "insideFraction": 1.0
+              }
+            ]
+          },
+          {
+            "fraction": 0.7,
+            "fins": [
+              {
+                "name": "Fleshy pectoral L",
+                "samples": 53,
+                "maxOutwardDistance": -0.01573480075603584,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pectoral R",
+                "samples": 53,
+                "maxOutwardDistance": -0.015734771888674004,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pelvic L",
+                "samples": 63,
+                "maxOutwardDistance": -0.03606225363910198,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pelvic R",
+                "samples": 63,
+                "maxOutwardDistance": -0.034258323576068506,
+                "insideFraction": 1.0
+              }
+            ]
+          },
+          {
+            "fraction": 0.85,
+            "fins": [
+              {
+                "name": "Fleshy pectoral L",
+                "samples": 53,
+                "maxOutwardDistance": -0.0158875799515954,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pectoral R",
+                "samples": 53,
+                "maxOutwardDistance": -0.015887600300629856,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pelvic L",
+                "samples": 63,
+                "maxOutwardDistance": -0.034698858187766746,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pelvic R",
+                "samples": 63,
+                "maxOutwardDistance": -0.034700505435466766,
+                "insideFraction": 1.0
+              }
+            ]
+          },
+          {
+            "fraction": 1,
+            "fins": [
+              {
+                "name": "Fleshy pectoral L",
+                "samples": 53,
+                "maxOutwardDistance": -0.01588757363970217,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pectoral R",
+                "samples": 53,
+                "maxOutwardDistance": -0.015887597402979736,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pelvic L",
+                "samples": 63,
+                "maxOutwardDistance": -0.03408262471202761,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pelvic R",
+                "samples": 63,
+                "maxOutwardDistance": -0.03408432376454584,
+                "insideFraction": 1.0
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "clip": "Bite",
+        "poses": [
+          {
+            "fraction": 0,
+            "fins": [
+              {
+                "name": "Fleshy pectoral L",
+                "samples": 53,
+                "maxOutwardDistance": -0.01588757363970217,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pectoral R",
+                "samples": 53,
+                "maxOutwardDistance": -0.015887597402979736,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pelvic L",
+                "samples": 63,
+                "maxOutwardDistance": -0.03408262471202761,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pelvic R",
+                "samples": 63,
+                "maxOutwardDistance": -0.03408432376454584,
+                "insideFraction": 1.0
+              }
+            ]
+          },
+          {
+            "fraction": 0.15,
+            "fins": [
+              {
+                "name": "Fleshy pectoral L",
+                "samples": 53,
+                "maxOutwardDistance": -0.016776520758867264,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pectoral R",
+                "samples": 53,
+                "maxOutwardDistance": -0.016801733523607254,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pelvic L",
+                "samples": 63,
+                "maxOutwardDistance": -0.0340826254687272,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pelvic R",
+                "samples": 63,
+                "maxOutwardDistance": -0.03408432975993492,
+                "insideFraction": 1.0
+              }
+            ]
+          },
+          {
+            "fraction": 0.3,
+            "fins": [
+              {
+                "name": "Fleshy pectoral L",
+                "samples": 53,
+                "maxOutwardDistance": -0.016570519081142265,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pectoral R",
+                "samples": 53,
+                "maxOutwardDistance": -0.016570517595027923,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pelvic L",
+                "samples": 63,
+                "maxOutwardDistance": -0.034218463813886046,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pelvic R",
+                "samples": 63,
+                "maxOutwardDistance": -0.03399993584025651,
+                "insideFraction": 1.0
+              }
+            ]
+          },
+          {
+            "fraction": 0.5,
+            "fins": [
+              {
+                "name": "Fleshy pectoral L",
+                "samples": 53,
+                "maxOutwardDistance": -0.015262676042766543,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pectoral R",
+                "samples": 53,
+                "maxOutwardDistance": -0.01526270663816831,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pelvic L",
+                "samples": 63,
+                "maxOutwardDistance": -0.029994763433933258,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pelvic R",
+                "samples": 63,
+                "maxOutwardDistance": -0.03751364129129797,
+                "insideFraction": 1.0
+              }
+            ]
+          },
+          {
+            "fraction": 0.7,
+            "fins": [
+              {
+                "name": "Fleshy pectoral L",
+                "samples": 53,
+                "maxOutwardDistance": -0.015820915574295213,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pectoral R",
+                "samples": 53,
+                "maxOutwardDistance": -0.015820934475414106,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pelvic L",
+                "samples": 63,
+                "maxOutwardDistance": -0.03561989823356271,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pelvic R",
+                "samples": 63,
+                "maxOutwardDistance": -0.034835028141969815,
+                "insideFraction": 1.0
+              }
+            ]
+          },
+          {
+            "fraction": 0.85,
+            "fins": [
+              {
+                "name": "Fleshy pectoral L",
+                "samples": 53,
+                "maxOutwardDistance": -0.015887593543084222,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pectoral R",
+                "samples": 53,
+                "maxOutwardDistance": -0.01588757994250045,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pelvic L",
+                "samples": 63,
+                "maxOutwardDistance": -0.03444532980211079,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pelvic R",
+                "samples": 63,
+                "maxOutwardDistance": -0.03444701267289929,
+                "insideFraction": 1.0
+              }
+            ]
+          },
+          {
+            "fraction": 1,
+            "fins": [
+              {
+                "name": "Fleshy pectoral L",
+                "samples": 53,
+                "maxOutwardDistance": -0.01588757363970217,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pectoral R",
+                "samples": 53,
+                "maxOutwardDistance": -0.015887597402979736,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pelvic L",
+                "samples": 63,
+                "maxOutwardDistance": -0.03408262471202761,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pelvic R",
+                "samples": 63,
+                "maxOutwardDistance": -0.03408432376454584,
+                "insideFraction": 1.0
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "clip": "Death",
+        "poses": [
+          {
+            "fraction": 0,
+            "fins": [
+              {
+                "name": "Fleshy pectoral L",
+                "samples": 53,
+                "maxOutwardDistance": -0.01588757363970217,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pectoral R",
+                "samples": 53,
+                "maxOutwardDistance": -0.015887597402979736,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pelvic L",
+                "samples": 63,
+                "maxOutwardDistance": -0.026911623950581998,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pelvic R",
+                "samples": 63,
+                "maxOutwardDistance": -0.0400685821659863,
+                "insideFraction": 1.0
+              }
+            ]
+          },
+          {
+            "fraction": 0.15,
+            "fins": [
+              {
+                "name": "Fleshy pectoral L",
+                "samples": 53,
+                "maxOutwardDistance": -0.015965044072800083,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pectoral R",
+                "samples": 53,
+                "maxOutwardDistance": -0.015934228500555037,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pelvic L",
+                "samples": 63,
+                "maxOutwardDistance": -0.037511016824282706,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pelvic R",
+                "samples": 63,
+                "maxOutwardDistance": -0.030216804560041055,
+                "insideFraction": 1.0
+              }
+            ]
+          },
+          {
+            "fraction": 0.3,
+            "fins": [
+              {
+                "name": "Fleshy pectoral L",
+                "samples": 53,
+                "maxOutwardDistance": -0.016598388323473046,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pectoral R",
+                "samples": 53,
+                "maxOutwardDistance": -0.01630429238502984,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pelvic L",
+                "samples": 63,
+                "maxOutwardDistance": -0.031030042126076296,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pelvic R",
+                "samples": 63,
+                "maxOutwardDistance": -0.036842663248535246,
+                "insideFraction": 1.0
+              }
+            ]
+          },
+          {
+            "fraction": 0.5,
+            "fins": [
+              {
+                "name": "Fleshy pectoral L",
+                "samples": 53,
+                "maxOutwardDistance": -0.016757774086727295,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pectoral R",
+                "samples": 53,
+                "maxOutwardDistance": -0.016361421439796686,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pelvic L",
+                "samples": 63,
+                "maxOutwardDistance": -0.029895804880652577,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pelvic R",
+                "samples": 63,
+                "maxOutwardDistance": -0.037773815067339456,
+                "insideFraction": 1.0
+              }
+            ]
+          },
+          {
+            "fraction": 0.7,
+            "fins": [
+              {
+                "name": "Fleshy pectoral L",
+                "samples": 53,
+                "maxOutwardDistance": -0.01647936797235161,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pectoral R",
+                "samples": 53,
+                "maxOutwardDistance": -0.01584787922911346,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pelvic L",
+                "samples": 63,
+                "maxOutwardDistance": -0.02833838103833841,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pelvic R",
+                "samples": 63,
+                "maxOutwardDistance": -0.03978836943861097,
+                "insideFraction": 1.0
+              }
+            ]
+          },
+          {
+            "fraction": 0.85,
+            "fins": [
+              {
+                "name": "Fleshy pectoral L",
+                "samples": 53,
+                "maxOutwardDistance": -0.016450415831059217,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pectoral R",
+                "samples": 53,
+                "maxOutwardDistance": -0.015792084683198482,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pelvic L",
+                "samples": 63,
+                "maxOutwardDistance": -0.028838446917688998,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pelvic R",
+                "samples": 63,
+                "maxOutwardDistance": -0.03998625569511205,
+                "insideFraction": 1.0
+              }
+            ]
+          },
+          {
+            "fraction": 1,
+            "fins": [
+              {
+                "name": "Fleshy pectoral L",
+                "samples": 53,
+                "maxOutwardDistance": -0.016450459021143615,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pectoral R",
+                "samples": 53,
+                "maxOutwardDistance": -0.0157920730416663,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pelvic L",
+                "samples": 63,
+                "maxOutwardDistance": -0.02886305895026453,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pelvic R",
+                "samples": 63,
+                "maxOutwardDistance": -0.039986310293897986,
+                "insideFraction": 1.0
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "clip": "Dive",
+        "poses": [
+          {
+            "fraction": 0,
+            "fins": [
+              {
+                "name": "Fleshy pectoral L",
+                "samples": 53,
+                "maxOutwardDistance": -0.01588757363970217,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pectoral R",
+                "samples": 53,
+                "maxOutwardDistance": -0.015887597402979736,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pelvic L",
+                "samples": 63,
+                "maxOutwardDistance": -0.03408262471202761,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pelvic R",
+                "samples": 63,
+                "maxOutwardDistance": -0.03408432376454584,
+                "insideFraction": 1.0
+              }
+            ]
+          },
+          {
+            "fraction": 0.15,
+            "fins": [
+              {
+                "name": "Fleshy pectoral L",
+                "samples": 53,
+                "maxOutwardDistance": -0.016667305894770834,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pectoral R",
+                "samples": 53,
+                "maxOutwardDistance": -0.01666730013948836,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pelvic L",
+                "samples": 63,
+                "maxOutwardDistance": -0.034366362931905314,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pelvic R",
+                "samples": 63,
+                "maxOutwardDistance": -0.03379996941657737,
+                "insideFraction": 1.0
+              }
+            ]
+          },
+          {
+            "fraction": 0.3,
+            "fins": [
+              {
+                "name": "Fleshy pectoral L",
+                "samples": 53,
+                "maxOutwardDistance": -0.016593324551649857,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pectoral R",
+                "samples": 53,
+                "maxOutwardDistance": -0.01659332436247496,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pelvic L",
+                "samples": 63,
+                "maxOutwardDistance": -0.03494634135859087,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pelvic R",
+                "samples": 63,
+                "maxOutwardDistance": -0.03329497447703034,
+                "insideFraction": 1.0
+              }
+            ]
+          },
+          {
+            "fraction": 0.5,
+            "fins": [
+              {
+                "name": "Fleshy pectoral L",
+                "samples": 53,
+                "maxOutwardDistance": -0.016083340626209974,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pectoral R",
+                "samples": 53,
+                "maxOutwardDistance": -0.016091302502900362,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pelvic L",
+                "samples": 63,
+                "maxOutwardDistance": -0.03227886441163719,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pelvic R",
+                "samples": 63,
+                "maxOutwardDistance": -0.03634953801520169,
+                "insideFraction": 1.0
+              }
+            ]
+          },
+          {
+            "fraction": 0.7,
+            "fins": [
+              {
+                "name": "Fleshy pectoral L",
+                "samples": 53,
+                "maxOutwardDistance": -0.016555219423025846,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pectoral R",
+                "samples": 53,
+                "maxOutwardDistance": -0.016562209057155997,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pelvic L",
+                "samples": 63,
+                "maxOutwardDistance": -0.03677306941244751,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pelvic R",
+                "samples": 63,
+                "maxOutwardDistance": -0.03394152317196131,
+                "insideFraction": 1.0
+              }
+            ]
+          },
+          {
+            "fraction": 0.85,
+            "fins": [
+              {
+                "name": "Fleshy pectoral L",
+                "samples": 53,
+                "maxOutwardDistance": -0.016010655195714207,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pectoral R",
+                "samples": 53,
+                "maxOutwardDistance": -0.016010641469620168,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pelvic L",
+                "samples": 63,
+                "maxOutwardDistance": -0.0348820143553894,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pelvic R",
+                "samples": 63,
+                "maxOutwardDistance": -0.03503312973771244,
+                "insideFraction": 1.0
+              }
+            ]
+          },
+          {
+            "fraction": 1,
+            "fins": [
+              {
+                "name": "Fleshy pectoral L",
+                "samples": 53,
+                "maxOutwardDistance": -0.01588757363970217,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pectoral R",
+                "samples": 53,
+                "maxOutwardDistance": -0.015887597402979736,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pelvic L",
+                "samples": 63,
+                "maxOutwardDistance": -0.03408262471202761,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pelvic R",
+                "samples": 63,
+                "maxOutwardDistance": -0.03408432376454584,
+                "insideFraction": 1.0
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "clip": "Dodge",
+        "poses": [
+          {
+            "fraction": 0,
+            "fins": [
+              {
+                "name": "Fleshy pectoral L",
+                "samples": 53,
+                "maxOutwardDistance": -0.01588757363970217,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pectoral R",
+                "samples": 53,
+                "maxOutwardDistance": -0.015887597402979736,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pelvic L",
+                "samples": 63,
+                "maxOutwardDistance": -0.03408262471202761,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pelvic R",
+                "samples": 63,
+                "maxOutwardDistance": -0.03408432376454584,
+                "insideFraction": 1.0
+              }
+            ]
+          },
+          {
+            "fraction": 0.15,
+            "fins": [
+              {
+                "name": "Fleshy pectoral L",
+                "samples": 53,
+                "maxOutwardDistance": -0.015887599030975252,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pectoral R",
+                "samples": 53,
+                "maxOutwardDistance": -0.015366978477686644,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pelvic L",
+                "samples": 63,
+                "maxOutwardDistance": -0.04177304939366877,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pelvic R",
+                "samples": 63,
+                "maxOutwardDistance": -0.024474735837429762,
+                "insideFraction": 1.0
+              }
+            ]
+          },
+          {
+            "fraction": 0.3,
+            "fins": [
+              {
+                "name": "Fleshy pectoral L",
+                "samples": 53,
+                "maxOutwardDistance": -0.01699550822377205,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pectoral R",
+                "samples": 53,
+                "maxOutwardDistance": -0.016402812441810966,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pelvic L",
+                "samples": 63,
+                "maxOutwardDistance": -0.036425420054001734,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pelvic R",
+                "samples": 63,
+                "maxOutwardDistance": -0.031429385708179325,
+                "insideFraction": 1.0
+              }
+            ]
+          },
+          {
+            "fraction": 0.5,
+            "fins": [
+              {
+                "name": "Fleshy pectoral L",
+                "samples": 53,
+                "maxOutwardDistance": -0.016582977841608226,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pectoral R",
+                "samples": 53,
+                "maxOutwardDistance": -0.015887580811977386,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pelvic L",
+                "samples": 63,
+                "maxOutwardDistance": -0.030880678445100784,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pelvic R",
+                "samples": 63,
+                "maxOutwardDistance": -0.03713235662871739,
+                "insideFraction": 1.0
+              }
+            ]
+          },
+          {
+            "fraction": 0.7,
+            "fins": [
+              {
+                "name": "Fleshy pectoral L",
+                "samples": 53,
+                "maxOutwardDistance": -0.01697571249678731,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pectoral R",
+                "samples": 53,
+                "maxOutwardDistance": -0.01588759434525855,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pelvic L",
+                "samples": 63,
+                "maxOutwardDistance": -0.0202542245388031,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pelvic R",
+                "samples": 63,
+                "maxOutwardDistance": -0.04446357504639309,
+                "insideFraction": 1.0
+              }
+            ]
+          },
+          {
+            "fraction": 0.85,
+            "fins": [
+              {
+                "name": "Fleshy pectoral L",
+                "samples": 53,
+                "maxOutwardDistance": -0.01588757363970217,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pectoral R",
+                "samples": 53,
+                "maxOutwardDistance": -0.015887597402979736,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pelvic L",
+                "samples": 63,
+                "maxOutwardDistance": -0.02464911568677053,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pelvic R",
+                "samples": 63,
+                "maxOutwardDistance": -0.041643578886578325,
+                "insideFraction": 1.0
+              }
+            ]
+          },
+          {
+            "fraction": 1,
+            "fins": [
+              {
+                "name": "Fleshy pectoral L",
+                "samples": 53,
+                "maxOutwardDistance": -0.01588757363970217,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pectoral R",
+                "samples": 53,
+                "maxOutwardDistance": -0.015887597402979736,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pelvic L",
+                "samples": 63,
+                "maxOutwardDistance": -0.03408262471202761,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pelvic R",
+                "samples": 63,
+                "maxOutwardDistance": -0.03408432376454584,
+                "insideFraction": 1.0
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "clip": "Eat",
+        "poses": [
+          {
+            "fraction": 0,
+            "fins": [
+              {
+                "name": "Fleshy pectoral L",
+                "samples": 53,
+                "maxOutwardDistance": -0.016001723895897157,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pectoral R",
+                "samples": 53,
+                "maxOutwardDistance": -0.015663699517972418,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pelvic L",
+                "samples": 63,
+                "maxOutwardDistance": -0.03329320813645609,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pelvic R",
+                "samples": 63,
+                "maxOutwardDistance": -0.034894513577455655,
+                "insideFraction": 1.0
+              }
+            ]
+          },
+          {
+            "fraction": 0.15,
+            "fins": [
+              {
+                "name": "Fleshy pectoral L",
+                "samples": 53,
+                "maxOutwardDistance": -0.016349569283192977,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pectoral R",
+                "samples": 53,
+                "maxOutwardDistance": -0.0161045440036105,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pelvic L",
+                "samples": 63,
+                "maxOutwardDistance": -0.033889783022459596,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pelvic R",
+                "samples": 63,
+                "maxOutwardDistance": -0.03430380948702805,
+                "insideFraction": 1.0
+              }
+            ]
+          },
+          {
+            "fraction": 0.3,
+            "fins": [
+              {
+                "name": "Fleshy pectoral L",
+                "samples": 53,
+                "maxOutwardDistance": -0.016333955540176248,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pectoral R",
+                "samples": 53,
+                "maxOutwardDistance": -0.01638414205808658,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pelvic L",
+                "samples": 63,
+                "maxOutwardDistance": -0.03463121043751016,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pelvic R",
+                "samples": 63,
+                "maxOutwardDistance": -0.03353420278290287,
+                "insideFraction": 1.0
+              }
+            ]
+          },
+          {
+            "fraction": 0.5,
+            "fins": [
+              {
+                "name": "Fleshy pectoral L",
+                "samples": 53,
+                "maxOutwardDistance": -0.015774706887896173,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pectoral R",
+                "samples": 53,
+                "maxOutwardDistance": -0.016115124490170274,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pelvic L",
+                "samples": 63,
+                "maxOutwardDistance": -0.03486095234984532,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pelvic R",
+                "samples": 63,
+                "maxOutwardDistance": -0.03326691797701642,
+                "insideFraction": 1.0
+              }
+            ]
+          },
+          {
+            "fraction": 0.7,
+            "fins": [
+              {
+                "name": "Fleshy pectoral L",
+                "samples": 53,
+                "maxOutwardDistance": -0.015399307885672897,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pectoral R",
+                "samples": 53,
+                "maxOutwardDistance": -0.01552256618742831,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pelvic L",
+                "samples": 63,
+                "maxOutwardDistance": -0.03393896290799603,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pelvic R",
+                "samples": 63,
+                "maxOutwardDistance": -0.03420972829917446,
+                "insideFraction": 1.0
+              }
+            ]
+          },
+          {
+            "fraction": 0.85,
+            "fins": [
+              {
+                "name": "Fleshy pectoral L",
+                "samples": 53,
+                "maxOutwardDistance": -0.015575480665575014,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pectoral R",
+                "samples": 53,
+                "maxOutwardDistance": -0.015407085378683405,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pelvic L",
+                "samples": 63,
+                "maxOutwardDistance": -0.03331686000456102,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pelvic R",
+                "samples": 63,
+                "maxOutwardDistance": -0.03485096635995433,
+                "insideFraction": 1.0
+              }
+            ]
+          },
+          {
+            "fraction": 1,
+            "fins": [
+              {
+                "name": "Fleshy pectoral L",
+                "samples": 53,
+                "maxOutwardDistance": -0.016001723895897157,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pectoral R",
+                "samples": 53,
+                "maxOutwardDistance": -0.015663699517972418,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pelvic L",
+                "samples": 63,
+                "maxOutwardDistance": -0.03329320813645609,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pelvic R",
+                "samples": 63,
+                "maxOutwardDistance": -0.034894513577455655,
+                "insideFraction": 1.0
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "clip": "Growth",
+        "poses": [
+          {
+            "fraction": 0,
+            "fins": [
+              {
+                "name": "Fleshy pectoral L",
+                "samples": 53,
+                "maxOutwardDistance": -0.01588757363970217,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pectoral R",
+                "samples": 53,
+                "maxOutwardDistance": -0.015887597402979736,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pelvic L",
+                "samples": 63,
+                "maxOutwardDistance": -0.03408262471202761,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pelvic R",
+                "samples": 63,
+                "maxOutwardDistance": -0.03408432376454584,
+                "insideFraction": 1.0
+              }
+            ]
+          },
+          {
+            "fraction": 0.15,
+            "fins": [
+              {
+                "name": "Fleshy pectoral L",
+                "samples": 53,
+                "maxOutwardDistance": -0.016879997643627576,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pectoral R",
+                "samples": 53,
+                "maxOutwardDistance": -0.016879995360795874,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pelvic L",
+                "samples": 63,
+                "maxOutwardDistance": -0.03444843980832957,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pelvic R",
+                "samples": 63,
+                "maxOutwardDistance": -0.03372086101444438,
+                "insideFraction": 1.0
+              }
+            ]
+          },
+          {
+            "fraction": 0.3,
+            "fins": [
+              {
+                "name": "Fleshy pectoral L",
+                "samples": 53,
+                "maxOutwardDistance": -0.016807236708700657,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pectoral R",
+                "samples": 53,
+                "maxOutwardDistance": -0.016831076703965664,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pelvic L",
+                "samples": 63,
+                "maxOutwardDistance": -0.03512148825393524,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pelvic R",
+                "samples": 63,
+                "maxOutwardDistance": -0.033412763819796965,
+                "insideFraction": 1.0
+              }
+            ]
+          },
+          {
+            "fraction": 0.5,
+            "fins": [
+              {
+                "name": "Fleshy pectoral L",
+                "samples": 53,
+                "maxOutwardDistance": -0.016682127490639687,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pectoral R",
+                "samples": 53,
+                "maxOutwardDistance": -0.016706923488527536,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pelvic L",
+                "samples": 63,
+                "maxOutwardDistance": -0.034024213324300945,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pelvic R",
+                "samples": 63,
+                "maxOutwardDistance": -0.037762583277071826,
+                "insideFraction": 1.0
+              }
+            ]
+          },
+          {
+            "fraction": 0.7,
+            "fins": [
+              {
+                "name": "Fleshy pectoral L",
+                "samples": 53,
+                "maxOutwardDistance": -0.01693253079429269,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pectoral R",
+                "samples": 53,
+                "maxOutwardDistance": -0.016955507919192314,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pelvic L",
+                "samples": 63,
+                "maxOutwardDistance": -0.037720021995482966,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pelvic R",
+                "samples": 63,
+                "maxOutwardDistance": -0.03483275376493111,
+                "insideFraction": 1.0
+              }
+            ]
+          },
+          {
+            "fraction": 0.85,
+            "fins": [
+              {
+                "name": "Fleshy pectoral L",
+                "samples": 53,
+                "maxOutwardDistance": -0.016482032695421367,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pectoral R",
+                "samples": 53,
+                "maxOutwardDistance": -0.01648202844808111,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pelvic L",
+                "samples": 63,
+                "maxOutwardDistance": -0.03494789358228445,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pelvic R",
+                "samples": 63,
+                "maxOutwardDistance": -0.034996447910089046,
+                "insideFraction": 1.0
+              }
+            ]
+          },
+          {
+            "fraction": 1,
+            "fins": [
+              {
+                "name": "Fleshy pectoral L",
+                "samples": 53,
+                "maxOutwardDistance": -0.01588757363970217,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pectoral R",
+                "samples": 53,
+                "maxOutwardDistance": -0.015887597402979736,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pelvic L",
+                "samples": 63,
+                "maxOutwardDistance": -0.03408262471202761,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pelvic R",
+                "samples": 63,
+                "maxOutwardDistance": -0.03408432376454584,
+                "insideFraction": 1.0
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "clip": "Guard",
+        "poses": [
+          {
+            "fraction": 0,
+            "fins": [
+              {
+                "name": "Fleshy pectoral L",
+                "samples": 53,
+                "maxOutwardDistance": -0.016437307000160217,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pectoral R",
+                "samples": 53,
+                "maxOutwardDistance": -0.01646614959463477,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pelvic L",
+                "samples": 63,
+                "maxOutwardDistance": -0.032765366486273706,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pelvic R",
+                "samples": 63,
+                "maxOutwardDistance": -0.03539134733728133,
+                "insideFraction": 1.0
+              }
+            ]
+          },
+          {
+            "fraction": 0.15,
+            "fins": [
+              {
+                "name": "Fleshy pectoral L",
+                "samples": 53,
+                "maxOutwardDistance": -0.01653630891814828,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pectoral R",
+                "samples": 53,
+                "maxOutwardDistance": -0.01656349329277873,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pelvic L",
+                "samples": 63,
+                "maxOutwardDistance": -0.033947092859307304,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pelvic R",
+                "samples": 63,
+                "maxOutwardDistance": -0.03425689738651272,
+                "insideFraction": 1.0
+              }
+            ]
+          },
+          {
+            "fraction": 0.3,
+            "fins": [
+              {
+                "name": "Fleshy pectoral L",
+                "samples": 53,
+                "maxOutwardDistance": -0.0165461297146976,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pectoral R",
+                "samples": 53,
+                "maxOutwardDistance": -0.016573169734328985,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pelvic L",
+                "samples": 63,
+                "maxOutwardDistance": -0.03504511542269029,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pelvic R",
+                "samples": 63,
+                "maxOutwardDistance": -0.0331087973609101,
+                "insideFraction": 1.0
+              }
+            ]
+          },
+          {
+            "fraction": 0.5,
+            "fins": [
+              {
+                "name": "Fleshy pectoral L",
+                "samples": 53,
+                "maxOutwardDistance": -0.016437307000160217,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pectoral R",
+                "samples": 53,
+                "maxOutwardDistance": -0.01646614959463477,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pelvic L",
+                "samples": 63,
+                "maxOutwardDistance": -0.03535406547598541,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pelvic R",
+                "samples": 63,
+                "maxOutwardDistance": -0.032728592603234574,
+                "insideFraction": 1.0
+              }
+            ]
+          },
+          {
+            "fraction": 0.7,
+            "fins": [
+              {
+                "name": "Fleshy pectoral L",
+                "samples": 53,
+                "maxOutwardDistance": -0.016332068014889956,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pectoral R",
+                "samples": 53,
+                "maxOutwardDistance": -0.016362673602998257,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pelvic L",
+                "samples": 63,
+                "maxOutwardDistance": -0.03391965615446679,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pelvic R",
+                "samples": 63,
+                "maxOutwardDistance": -0.03421845639240928,
+                "insideFraction": 1.0
+              }
+            ]
+          },
+          {
+            "fraction": 0.85,
+            "fins": [
+              {
+                "name": "Fleshy pectoral L",
+                "samples": 53,
+                "maxOutwardDistance": -0.016341368202120066,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pectoral R",
+                "samples": 53,
+                "maxOutwardDistance": -0.01637182291597128,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pelvic L",
+                "samples": 63,
+                "maxOutwardDistance": -0.03290792369807605,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pelvic R",
+                "samples": 63,
+                "maxOutwardDistance": -0.035235634131822735,
+                "insideFraction": 1.0
+              }
+            ]
+          },
+          {
+            "fraction": 1,
+            "fins": [
+              {
+                "name": "Fleshy pectoral L",
+                "samples": 53,
+                "maxOutwardDistance": -0.016437307000160217,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pectoral R",
+                "samples": 53,
+                "maxOutwardDistance": -0.01646614959463477,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pelvic L",
+                "samples": 63,
+                "maxOutwardDistance": -0.032765366486273706,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pelvic R",
+                "samples": 63,
+                "maxOutwardDistance": -0.03539134733728133,
+                "insideFraction": 1.0
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "clip": "Heavy",
+        "poses": [
+          {
+            "fraction": 0,
+            "fins": [
+              {
+                "name": "Fleshy pectoral L",
+                "samples": 53,
+                "maxOutwardDistance": -0.01588757363970217,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pectoral R",
+                "samples": 53,
+                "maxOutwardDistance": -0.015887597402979736,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pelvic L",
+                "samples": 63,
+                "maxOutwardDistance": -0.03408262471202761,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pelvic R",
+                "samples": 63,
+                "maxOutwardDistance": -0.03408432376454584,
+                "insideFraction": 1.0
+              }
+            ]
+          },
+          {
+            "fraction": 0.15,
+            "fins": [
+              {
+                "name": "Fleshy pectoral L",
+                "samples": 53,
+                "maxOutwardDistance": -0.016691551078110933,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pectoral R",
+                "samples": 53,
+                "maxOutwardDistance": -0.016717436723411083,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pelvic L",
+                "samples": 63,
+                "maxOutwardDistance": -0.03408262933953665,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pelvic R",
+                "samples": 63,
+                "maxOutwardDistance": -0.03408433514414355,
+                "insideFraction": 1.0
+              }
+            ]
+          },
+          {
+            "fraction": 0.3,
+            "fins": [
+              {
+                "name": "Fleshy pectoral L",
+                "samples": 53,
+                "maxOutwardDistance": -0.01705327956005931,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pectoral R",
+                "samples": 53,
+                "maxOutwardDistance": -0.017075642943382263,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pelvic L",
+                "samples": 63,
+                "maxOutwardDistance": -0.03437157432199456,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pelvic R",
+                "samples": 63,
+                "maxOutwardDistance": -0.03382838985999115,
+                "insideFraction": 1.0
+              }
+            ]
+          },
+          {
+            "fraction": 0.5,
+            "fins": [
+              {
+                "name": "Fleshy pectoral L",
+                "samples": 53,
+                "maxOutwardDistance": -0.015238983694871422,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pectoral R",
+                "samples": 53,
+                "maxOutwardDistance": -0.015239020838635042,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pelvic L",
+                "samples": 63,
+                "maxOutwardDistance": -0.030595792806707323,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pelvic R",
+                "samples": 63,
+                "maxOutwardDistance": -0.036965428036637604,
+                "insideFraction": 1.0
+              }
+            ]
+          },
+          {
+            "fraction": 0.7,
+            "fins": [
+              {
+                "name": "Fleshy pectoral L",
+                "samples": 53,
+                "maxOutwardDistance": -0.015725759945780737,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pectoral R",
+                "samples": 53,
+                "maxOutwardDistance": -0.01572577348269988,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pelvic L",
+                "samples": 63,
+                "maxOutwardDistance": -0.03609174792654812,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pelvic R",
+                "samples": 63,
+                "maxOutwardDistance": -0.03419949224917218,
+                "insideFraction": 1.0
+              }
+            ]
+          },
+          {
+            "fraction": 0.85,
+            "fins": [
+              {
+                "name": "Fleshy pectoral L",
+                "samples": 53,
+                "maxOutwardDistance": -0.015887607070908416,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pectoral R",
+                "samples": 53,
+                "maxOutwardDistance": -0.015887609142737347,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pelvic L",
+                "samples": 63,
+                "maxOutwardDistance": -0.034581829444505274,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pelvic R",
+                "samples": 63,
+                "maxOutwardDistance": -0.03458347002742812,
+                "insideFraction": 1.0
+              }
+            ]
+          },
+          {
+            "fraction": 1,
+            "fins": [
+              {
+                "name": "Fleshy pectoral L",
+                "samples": 53,
+                "maxOutwardDistance": -0.01588757363970217,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pectoral R",
+                "samples": 53,
+                "maxOutwardDistance": -0.015887597402979736,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pelvic L",
+                "samples": 63,
+                "maxOutwardDistance": -0.03408262471202761,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pelvic R",
+                "samples": 63,
+                "maxOutwardDistance": -0.03408432376454584,
+                "insideFraction": 1.0
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "clip": "Hit",
+        "poses": [
+          {
+            "fraction": 0,
+            "fins": [
+              {
+                "name": "Fleshy pectoral L",
+                "samples": 53,
+                "maxOutwardDistance": -0.01588757363970217,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pectoral R",
+                "samples": 53,
+                "maxOutwardDistance": -0.015887597402979736,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pelvic L",
+                "samples": 63,
+                "maxOutwardDistance": -0.03408262471202761,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pelvic R",
+                "samples": 63,
+                "maxOutwardDistance": -0.03408432376454584,
+                "insideFraction": 1.0
+              }
+            ]
+          },
+          {
+            "fraction": 0.15,
+            "fins": [
+              {
+                "name": "Fleshy pectoral L",
+                "samples": 53,
+                "maxOutwardDistance": -0.017945854808203876,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pectoral R",
+                "samples": 53,
+                "maxOutwardDistance": -0.016144493656611303,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pelvic L",
+                "samples": 63,
+                "maxOutwardDistance": -0.034069603454554453,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pelvic R",
+                "samples": 63,
+                "maxOutwardDistance": -0.03408685472095385,
+                "insideFraction": 1.0
+              }
+            ]
+          },
+          {
+            "fraction": 0.3,
+            "fins": [
+              {
+                "name": "Fleshy pectoral L",
+                "samples": 53,
+                "maxOutwardDistance": -0.016929935780353844,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pectoral R",
+                "samples": 53,
+                "maxOutwardDistance": -0.015960023310753968,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pelvic L",
+                "samples": 63,
+                "maxOutwardDistance": -0.035571126849390566,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pelvic R",
+                "samples": 63,
+                "maxOutwardDistance": -0.03240927588194609,
+                "insideFraction": 1.0
+              }
+            ]
+          },
+          {
+            "fraction": 0.5,
+            "fins": [
+              {
+                "name": "Fleshy pectoral L",
+                "samples": 53,
+                "maxOutwardDistance": -0.015887602062662154,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pectoral R",
+                "samples": 53,
+                "maxOutwardDistance": -0.01543360241339542,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pelvic L",
+                "samples": 63,
+                "maxOutwardDistance": -0.04244689867473994,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pelvic R",
+                "samples": 63,
+                "maxOutwardDistance": -0.023715588031336665,
+                "insideFraction": 1.0
+              }
+            ]
+          },
+          {
+            "fraction": 0.7,
+            "fins": [
+              {
+                "name": "Fleshy pectoral L",
+                "samples": 53,
+                "maxOutwardDistance": -0.015887607161857886,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pectoral R",
+                "samples": 53,
+                "maxOutwardDistance": -0.016331523584085517,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pelvic L",
+                "samples": 63,
+                "maxOutwardDistance": -0.039298000920098275,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pelvic R",
+                "samples": 63,
+                "maxOutwardDistance": -0.02784767997218296,
+                "insideFraction": 1.0
+              }
+            ]
+          },
+          {
+            "fraction": 0.85,
+            "fins": [
+              {
+                "name": "Fleshy pectoral L",
+                "samples": 53,
+                "maxOutwardDistance": -0.01588758979596605,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pectoral R",
+                "samples": 53,
+                "maxOutwardDistance": -0.01574938165504136,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pelvic L",
+                "samples": 63,
+                "maxOutwardDistance": -0.03597113068099134,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pelvic R",
+                "samples": 63,
+                "maxOutwardDistance": -0.03202217450598255,
+                "insideFraction": 1.0
+              }
+            ]
+          },
+          {
+            "fraction": 1,
+            "fins": [
+              {
+                "name": "Fleshy pectoral L",
+                "samples": 53,
+                "maxOutwardDistance": -0.01588757363970217,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pectoral R",
+                "samples": 53,
+                "maxOutwardDistance": -0.015887597402979736,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pelvic L",
+                "samples": 63,
+                "maxOutwardDistance": -0.03408262471202761,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pelvic R",
+                "samples": 63,
+                "maxOutwardDistance": -0.03408432376454584,
+                "insideFraction": 1.0
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "clip": "Idle",
+        "poses": [
+          {
+            "fraction": 0,
+            "fins": [
+              {
+                "name": "Fleshy pectoral L",
+                "samples": 53,
+                "maxOutwardDistance": -0.01603308308767737,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pectoral R",
+                "samples": 53,
+                "maxOutwardDistance": -0.015603243253281107,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pelvic L",
+                "samples": 63,
+                "maxOutwardDistance": -0.03318591837887652,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pelvic R",
+                "samples": 63,
+                "maxOutwardDistance": -0.035015286557609215,
+                "insideFraction": 1.0
+              }
+            ]
+          },
+          {
+            "fraction": 0.15,
+            "fins": [
+              {
+                "name": "Fleshy pectoral L",
+                "samples": 53,
+                "maxOutwardDistance": -0.0164895384114061,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pectoral R",
+                "samples": 53,
+                "maxOutwardDistance": -0.016189621572266333,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pelvic L",
+                "samples": 63,
+                "maxOutwardDistance": -0.033907590666785836,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pelvic R",
+                "samples": 63,
+                "maxOutwardDistance": -0.034298151411348954,
+                "insideFraction": 1.0
+              }
+            ]
+          },
+          {
+            "fraction": 0.3,
+            "fins": [
+              {
+                "name": "Fleshy pectoral L",
+                "samples": 53,
+                "maxOutwardDistance": -0.016428759634436574,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pectoral R",
+                "samples": 53,
+                "maxOutwardDistance": -0.016532024048501626,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pelvic L",
+                "samples": 63,
+                "maxOutwardDistance": -0.03477053309325129,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pelvic R",
+                "samples": 63,
+                "maxOutwardDistance": -0.03338931218604557,
+                "insideFraction": 1.0
+              }
+            ]
+          },
+          {
+            "fraction": 0.5,
+            "fins": [
+              {
+                "name": "Fleshy pectoral L",
+                "samples": 53,
+                "maxOutwardDistance": -0.01574415015602426,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pectoral R",
+                "samples": 53,
+                "maxOutwardDistance": -0.01617782408175117,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pelvic L",
+                "samples": 63,
+                "maxOutwardDistance": -0.03496540238847956,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pelvic R",
+                "samples": 63,
+                "maxOutwardDistance": -0.033145353925647214,
+                "insideFraction": 1.0
+              }
+            ]
+          },
+          {
+            "fraction": 0.7,
+            "fins": [
+              {
+                "name": "Fleshy pectoral L",
+                "samples": 53,
+                "maxOutwardDistance": -0.015273663821062655,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pectoral R",
+                "samples": 53,
+                "maxOutwardDistance": -0.015462328943613102,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pelvic L",
+                "samples": 63,
+                "maxOutwardDistance": -0.034002252825303,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pelvic R",
+                "samples": 63,
+                "maxOutwardDistance": -0.034135134192183614,
+                "insideFraction": 1.0
+              }
+            ]
+          },
+          {
+            "fraction": 0.85,
+            "fins": [
+              {
+                "name": "Fleshy pectoral L",
+                "samples": 53,
+                "maxOutwardDistance": -0.015471305147002568,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pectoral R",
+                "samples": 53,
+                "maxOutwardDistance": -0.015275130219379207,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pelvic L",
+                "samples": 63,
+                "maxOutwardDistance": -0.033232702320674434,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pelvic R",
+                "samples": 63,
+                "maxOutwardDistance": -0.034937657590489835,
+                "insideFraction": 1.0
+              }
+            ]
+          },
+          {
+            "fraction": 1,
+            "fins": [
+              {
+                "name": "Fleshy pectoral L",
+                "samples": 53,
+                "maxOutwardDistance": -0.01603308308767737,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pectoral R",
+                "samples": 53,
+                "maxOutwardDistance": -0.015603243253281107,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pelvic L",
+                "samples": 63,
+                "maxOutwardDistance": -0.03318591837887652,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pelvic R",
+                "samples": 63,
+                "maxOutwardDistance": -0.035015286557609215,
+                "insideFraction": 1.0
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "clip": "Parry",
+        "poses": [
+          {
+            "fraction": 0,
+            "fins": [
+              {
+                "name": "Fleshy pectoral L",
+                "samples": 53,
+                "maxOutwardDistance": -0.01588757363970217,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pectoral R",
+                "samples": 53,
+                "maxOutwardDistance": -0.015887597402979736,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pelvic L",
+                "samples": 63,
+                "maxOutwardDistance": -0.03408262471202761,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pelvic R",
+                "samples": 63,
+                "maxOutwardDistance": -0.03408432376454584,
+                "insideFraction": 1.0
+              }
+            ]
+          },
+          {
+            "fraction": 0.15,
+            "fins": [
+              {
+                "name": "Fleshy pectoral L",
+                "samples": 53,
+                "maxOutwardDistance": -0.01696038944646716,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pectoral R",
+                "samples": 53,
+                "maxOutwardDistance": -0.01595664847872058,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pelvic L",
+                "samples": 63,
+                "maxOutwardDistance": -0.03408478747587651,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pelvic R",
+                "samples": 63,
+                "maxOutwardDistance": -0.03409171255771071,
+                "insideFraction": 1.0
+              }
+            ]
+          },
+          {
+            "fraction": 0.3,
+            "fins": [
+              {
+                "name": "Fleshy pectoral L",
+                "samples": 53,
+                "maxOutwardDistance": -0.016031918581575155,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pectoral R",
+                "samples": 53,
+                "maxOutwardDistance": -0.015783174174430314,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pelvic L",
+                "samples": 63,
+                "maxOutwardDistance": -0.03403481174609624,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pelvic R",
+                "samples": 63,
+                "maxOutwardDistance": -0.03402362926863134,
+                "insideFraction": 1.0
+              }
+            ]
+          },
+          {
+            "fraction": 0.5,
+            "fins": [
+              {
+                "name": "Fleshy pectoral L",
+                "samples": 53,
+                "maxOutwardDistance": -0.016766322311013937,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pectoral R",
+                "samples": 53,
+                "maxOutwardDistance": -0.015433589660986513,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pelvic L",
+                "samples": 63,
+                "maxOutwardDistance": -0.03803099899960216,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pelvic R",
+                "samples": 63,
+                "maxOutwardDistance": -0.02977468178141862,
+                "insideFraction": 1.0
+              }
+            ]
+          },
+          {
+            "fraction": 0.7,
+            "fins": [
+              {
+                "name": "Fleshy pectoral L",
+                "samples": 53,
+                "maxOutwardDistance": -0.015887570167848253,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pectoral R",
+                "samples": 53,
+                "maxOutwardDistance": -0.01649457226449158,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pelvic L",
+                "samples": 63,
+                "maxOutwardDistance": -0.04256987074404606,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pelvic R",
+                "samples": 63,
+                "maxOutwardDistance": -0.02320592280011624,
+                "insideFraction": 1.0
+              }
+            ]
+          },
+          {
+            "fraction": 0.85,
+            "fins": [
+              {
+                "name": "Fleshy pectoral L",
+                "samples": 53,
+                "maxOutwardDistance": -0.015887612260485184,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pectoral R",
+                "samples": 53,
+                "maxOutwardDistance": -0.01579182686691638,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pelvic L",
+                "samples": 63,
+                "maxOutwardDistance": -0.036548220086842775,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pelvic R",
+                "samples": 63,
+                "maxOutwardDistance": -0.03138000424951315,
+                "insideFraction": 1.0
+              }
+            ]
+          },
+          {
+            "fraction": 1,
+            "fins": [
+              {
+                "name": "Fleshy pectoral L",
+                "samples": 53,
+                "maxOutwardDistance": -0.01588757363970217,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pectoral R",
+                "samples": 53,
+                "maxOutwardDistance": -0.015887597402979736,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pelvic L",
+                "samples": 63,
+                "maxOutwardDistance": -0.03408262471202761,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pelvic R",
+                "samples": 63,
+                "maxOutwardDistance": -0.03408432376454584,
+                "insideFraction": 1.0
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "clip": "Rise",
+        "poses": [
+          {
+            "fraction": 0,
+            "fins": [
+              {
+                "name": "Fleshy pectoral L",
+                "samples": 53,
+                "maxOutwardDistance": -0.01588757363970217,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pectoral R",
+                "samples": 53,
+                "maxOutwardDistance": -0.015887597402979736,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pelvic L",
+                "samples": 63,
+                "maxOutwardDistance": -0.03408262471202761,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pelvic R",
+                "samples": 63,
+                "maxOutwardDistance": -0.03408432376454584,
+                "insideFraction": 1.0
+              }
+            ]
+          },
+          {
+            "fraction": 0.15,
+            "fins": [
+              {
+                "name": "Fleshy pectoral L",
+                "samples": 53,
+                "maxOutwardDistance": -0.01666734516766155,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pectoral R",
+                "samples": 53,
+                "maxOutwardDistance": -0.01666731226578122,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pelvic L",
+                "samples": 63,
+                "maxOutwardDistance": -0.034366365522146225,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pelvic R",
+                "samples": 63,
+                "maxOutwardDistance": -0.03379995480645448,
+                "insideFraction": 1.0
+              }
+            ]
+          },
+          {
+            "fraction": 0.3,
+            "fins": [
+              {
+                "name": "Fleshy pectoral L",
+                "samples": 53,
+                "maxOutwardDistance": -0.015984825205464404,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pectoral R",
+                "samples": 53,
+                "maxOutwardDistance": -0.015984823415692517,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pelvic L",
+                "samples": 63,
+                "maxOutwardDistance": -0.03494633645459544,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pelvic R",
+                "samples": 63,
+                "maxOutwardDistance": -0.03329498757375404,
+                "insideFraction": 1.0
+              }
+            ]
+          },
+          {
+            "fraction": 0.5,
+            "fins": [
+              {
+                "name": "Fleshy pectoral L",
+                "samples": 53,
+                "maxOutwardDistance": -0.014919012552127242,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pectoral R",
+                "samples": 53,
+                "maxOutwardDistance": -0.014918996836058795,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pelvic L",
+                "samples": 63,
+                "maxOutwardDistance": -0.03153554543678183,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pelvic R",
+                "samples": 63,
+                "maxOutwardDistance": -0.03558284853352234,
+                "insideFraction": 1.0
+              }
+            ]
+          },
+          {
+            "fraction": 0.7,
+            "fins": [
+              {
+                "name": "Fleshy pectoral L",
+                "samples": 53,
+                "maxOutwardDistance": -0.015277017175321816,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pectoral R",
+                "samples": 53,
+                "maxOutwardDistance": -0.015277022243026295,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pelvic L",
+                "samples": 63,
+                "maxOutwardDistance": -0.03420476904284442,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pelvic R",
+                "samples": 63,
+                "maxOutwardDistance": -0.03143201416969532,
+                "insideFraction": 1.0
+              }
+            ]
+          },
+          {
+            "fraction": 0.85,
+            "fins": [
+              {
+                "name": "Fleshy pectoral L",
+                "samples": 53,
+                "maxOutwardDistance": -0.015766817414260004,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pectoral R",
+                "samples": 53,
+                "maxOutwardDistance": -0.015766836844704812,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pelvic L",
+                "samples": 63,
+                "maxOutwardDistance": -0.03315843461314216,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pelvic R",
+                "samples": 63,
+                "maxOutwardDistance": -0.03330975957214832,
+                "insideFraction": 1.0
+              }
+            ]
+          },
+          {
+            "fraction": 1,
+            "fins": [
+              {
+                "name": "Fleshy pectoral L",
+                "samples": 53,
+                "maxOutwardDistance": -0.01588757363970217,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pectoral R",
+                "samples": 53,
+                "maxOutwardDistance": -0.015887597402979736,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pelvic L",
+                "samples": 63,
+                "maxOutwardDistance": -0.03408262471202761,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pelvic R",
+                "samples": 63,
+                "maxOutwardDistance": -0.03408432376454584,
+                "insideFraction": 1.0
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "clip": "Stagger",
+        "poses": [
+          {
+            "fraction": 0,
+            "fins": [
+              {
+                "name": "Fleshy pectoral L",
+                "samples": 53,
+                "maxOutwardDistance": -0.01588757363970217,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pectoral R",
+                "samples": 53,
+                "maxOutwardDistance": -0.015887597402979736,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pelvic L",
+                "samples": 63,
+                "maxOutwardDistance": -0.03408262471202761,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pelvic R",
+                "samples": 63,
+                "maxOutwardDistance": -0.03408432376454584,
+                "insideFraction": 1.0
+              }
+            ]
+          },
+          {
+            "fraction": 0.15,
+            "fins": [
+              {
+                "name": "Fleshy pectoral L",
+                "samples": 53,
+                "maxOutwardDistance": -0.017583462584298104,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pectoral R",
+                "samples": 53,
+                "maxOutwardDistance": -0.015887589932390256,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pelvic L",
+                "samples": 63,
+                "maxOutwardDistance": -0.04282337843972073,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pelvic R",
+                "samples": 63,
+                "maxOutwardDistance": -0.022908478509634733,
+                "insideFraction": 1.0
+              }
+            ]
+          },
+          {
+            "fraction": 0.3,
+            "fins": [
+              {
+                "name": "Fleshy pectoral L",
+                "samples": 53,
+                "maxOutwardDistance": -0.016624912052066065,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pectoral R",
+                "samples": 53,
+                "maxOutwardDistance": -0.016017306321060687,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pelvic L",
+                "samples": 63,
+                "maxOutwardDistance": -0.037620089191477746,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pelvic R",
+                "samples": 63,
+                "maxOutwardDistance": -0.02997072844300419,
+                "insideFraction": 1.0
+              }
+            ]
+          },
+          {
+            "fraction": 0.5,
+            "fins": [
+              {
+                "name": "Fleshy pectoral L",
+                "samples": 53,
+                "maxOutwardDistance": -0.01588759507967552,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pectoral R",
+                "samples": 53,
+                "maxOutwardDistance": -0.017208323086379096,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pelvic L",
+                "samples": 63,
+                "maxOutwardDistance": -0.02109583979472518,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pelvic R",
+                "samples": 63,
+                "maxOutwardDistance": -0.044110501250543166,
+                "insideFraction": 1.0
+              }
+            ]
+          },
+          {
+            "fraction": 0.7,
+            "fins": [
+              {
+                "name": "Fleshy pectoral L",
+                "samples": 53,
+                "maxOutwardDistance": -0.015887599292909727,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pectoral R",
+                "samples": 53,
+                "maxOutwardDistance": -0.016204427880438743,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pelvic L",
+                "samples": 63,
+                "maxOutwardDistance": -0.03235352522460744,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pelvic R",
+                "samples": 63,
+                "maxOutwardDistance": -0.035654194274684414,
+                "insideFraction": 1.0
+              }
+            ]
+          },
+          {
+            "fraction": 0.85,
+            "fins": [
+              {
+                "name": "Fleshy pectoral L",
+                "samples": 53,
+                "maxOutwardDistance": -0.015887600313362782,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pectoral R",
+                "samples": 53,
+                "maxOutwardDistance": -0.015887573668806,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pelvic L",
+                "samples": 63,
+                "maxOutwardDistance": -0.03732407893403433,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pelvic R",
+                "samples": 63,
+                "maxOutwardDistance": -0.030432391504291445,
+                "insideFraction": 1.0
+              }
+            ]
+          },
+          {
+            "fraction": 1,
+            "fins": [
+              {
+                "name": "Fleshy pectoral L",
+                "samples": 53,
+                "maxOutwardDistance": -0.01588757363970217,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pectoral R",
+                "samples": 53,
+                "maxOutwardDistance": -0.015887597402979736,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pelvic L",
+                "samples": 63,
+                "maxOutwardDistance": -0.03408262471202761,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pelvic R",
+                "samples": 63,
+                "maxOutwardDistance": -0.03408432376454584,
+                "insideFraction": 1.0
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "clip": "Swim",
+        "poses": [
+          {
+            "fraction": 0,
+            "fins": [
+              {
+                "name": "Fleshy pectoral L",
+                "samples": 53,
+                "maxOutwardDistance": -0.016308613485307433,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pectoral R",
+                "samples": 53,
+                "maxOutwardDistance": -0.015091549652424874,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pelvic L",
+                "samples": 63,
+                "maxOutwardDistance": -0.028947960789082572,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pelvic R",
+                "samples": 63,
+                "maxOutwardDistance": -0.03852403225027956,
+                "insideFraction": 1.0
+              }
+            ]
+          },
+          {
+            "fraction": 0.15,
+            "fins": [
+              {
+                "name": "Fleshy pectoral L",
+                "samples": 53,
+                "maxOutwardDistance": -0.016496813390403986,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pectoral R",
+                "samples": 53,
+                "maxOutwardDistance": -0.016493042930960655,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pelvic L",
+                "samples": 63,
+                "maxOutwardDistance": -0.037542828591540456,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pelvic R",
+                "samples": 63,
+                "maxOutwardDistance": -0.030212994337489363,
+                "insideFraction": 1.0
+              }
+            ]
+          },
+          {
+            "fraction": 0.3,
+            "fins": [
+              {
+                "name": "Fleshy pectoral L",
+                "samples": 53,
+                "maxOutwardDistance": -0.014526116876368178,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pectoral R",
+                "samples": 53,
+                "maxOutwardDistance": -0.015486642874748213,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pelvic L",
+                "samples": 63,
+                "maxOutwardDistance": -0.03630807573790662,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pelvic R",
+                "samples": 63,
+                "maxOutwardDistance": -0.03172195702791214,
+                "insideFraction": 1.0
+              }
+            ]
+          },
+          {
+            "fraction": 0.5,
+            "fins": [
+              {
+                "name": "Fleshy pectoral L",
+                "samples": 53,
+                "maxOutwardDistance": -0.016308613485307433,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pectoral R",
+                "samples": 53,
+                "maxOutwardDistance": -0.015091549652424874,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pelvic L",
+                "samples": 63,
+                "maxOutwardDistance": -0.028947960789082572,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pelvic R",
+                "samples": 63,
+                "maxOutwardDistance": -0.03852403225027956,
+                "insideFraction": 1.0
+              }
+            ]
+          },
+          {
+            "fraction": 0.7,
+            "fins": [
+              {
+                "name": "Fleshy pectoral L",
+                "samples": 53,
+                "maxOutwardDistance": -0.016728606089600362,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pectoral R",
+                "samples": 53,
+                "maxOutwardDistance": -0.016472087241709232,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pelvic L",
+                "samples": 63,
+                "maxOutwardDistance": -0.03876213595503941,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pelvic R",
+                "samples": 63,
+                "maxOutwardDistance": -0.028720163565594703,
+                "insideFraction": 1.0
+              }
+            ]
+          },
+          {
+            "fraction": 0.85,
+            "fins": [
+              {
+                "name": "Fleshy pectoral L",
+                "samples": 53,
+                "maxOutwardDistance": -0.014037025877769338,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pectoral R",
+                "samples": 53,
+                "maxOutwardDistance": -0.014715713227815286,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pelvic L",
+                "samples": 63,
+                "maxOutwardDistance": -0.03369193778780755,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pelvic R",
+                "samples": 63,
+                "maxOutwardDistance": -0.03447880130261183,
+                "insideFraction": 1.0
+              }
+            ]
+          },
+          {
+            "fraction": 1,
+            "fins": [
+              {
+                "name": "Fleshy pectoral L",
+                "samples": 53,
+                "maxOutwardDistance": -0.016308613485307433,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pectoral R",
+                "samples": 53,
+                "maxOutwardDistance": -0.015091549652424874,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pelvic L",
+                "samples": 63,
+                "maxOutwardDistance": -0.028947960789082572,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pelvic R",
+                "samples": 63,
+                "maxOutwardDistance": -0.03852403225027956,
+                "insideFraction": 1.0
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "clip": "TurnLeft",
+        "poses": [
+          {
+            "fraction": 0,
+            "fins": [
+              {
+                "name": "Fleshy pectoral L",
+                "samples": 53,
+                "maxOutwardDistance": -0.01588757363970217,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pectoral R",
+                "samples": 53,
+                "maxOutwardDistance": -0.015887597402979736,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pelvic L",
+                "samples": 63,
+                "maxOutwardDistance": -0.03408262471202761,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pelvic R",
+                "samples": 63,
+                "maxOutwardDistance": -0.03408432376454584,
+                "insideFraction": 1.0
+              }
+            ]
+          },
+          {
+            "fraction": 0.15,
+            "fins": [
+              {
+                "name": "Fleshy pectoral L",
+                "samples": 53,
+                "maxOutwardDistance": -0.01599395287621519,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pectoral R",
+                "samples": 53,
+                "maxOutwardDistance": -0.015895577176706865,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pelvic L",
+                "samples": 63,
+                "maxOutwardDistance": -0.034082618381944485,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pelvic R",
+                "samples": 63,
+                "maxOutwardDistance": -0.0340843343292363,
+                "insideFraction": 1.0
+              }
+            ]
+          },
+          {
+            "fraction": 0.3,
+            "fins": [
+              {
+                "name": "Fleshy pectoral L",
+                "samples": 53,
+                "maxOutwardDistance": -0.016163123538717628,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pectoral R",
+                "samples": 53,
+                "maxOutwardDistance": -0.016060189460404217,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pelvic L",
+                "samples": 63,
+                "maxOutwardDistance": -0.031439857091754675,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pelvic R",
+                "samples": 63,
+                "maxOutwardDistance": -0.03649769973708317,
+                "insideFraction": 1.0
+              }
+            ]
+          },
+          {
+            "fraction": 0.5,
+            "fins": [
+              {
+                "name": "Fleshy pectoral L",
+                "samples": 53,
+                "maxOutwardDistance": -0.015059222001582384,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pectoral R",
+                "samples": 53,
+                "maxOutwardDistance": -0.01632589427754283,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pelvic L",
+                "samples": 63,
+                "maxOutwardDistance": -0.02615844557294622,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pelvic R",
+                "samples": 63,
+                "maxOutwardDistance": -0.04067525103891967,
+                "insideFraction": 1.0
+              }
+            ]
+          },
+          {
+            "fraction": 0.7,
+            "fins": [
+              {
+                "name": "Fleshy pectoral L",
+                "samples": 53,
+                "maxOutwardDistance": -0.01628300966694951,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pectoral R",
+                "samples": 53,
+                "maxOutwardDistance": -0.01603845407953486,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pelvic L",
+                "samples": 63,
+                "maxOutwardDistance": -0.030795763945207,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pelvic R",
+                "samples": 63,
+                "maxOutwardDistance": -0.03719216942818093,
+                "insideFraction": 1.0
+              }
+            ]
+          },
+          {
+            "fraction": 0.85,
+            "fins": [
+              {
+                "name": "Fleshy pectoral L",
+                "samples": 53,
+                "maxOutwardDistance": -0.016102417535876157,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pectoral R",
+                "samples": 53,
+                "maxOutwardDistance": -0.015904043625596387,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pelvic L",
+                "samples": 63,
+                "maxOutwardDistance": -0.033445314096752554,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pelvic R",
+                "samples": 63,
+                "maxOutwardDistance": -0.03472978016361594,
+                "insideFraction": 1.0
+              }
+            ]
+          },
+          {
+            "fraction": 1,
+            "fins": [
+              {
+                "name": "Fleshy pectoral L",
+                "samples": 53,
+                "maxOutwardDistance": -0.01588757363970217,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pectoral R",
+                "samples": 53,
+                "maxOutwardDistance": -0.015887597402979736,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pelvic L",
+                "samples": 63,
+                "maxOutwardDistance": -0.03408262471202761,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pelvic R",
+                "samples": 63,
+                "maxOutwardDistance": -0.03408432376454584,
+                "insideFraction": 1.0
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "clip": "TurnRight",
+        "poses": [
+          {
+            "fraction": 0,
+            "fins": [
+              {
+                "name": "Fleshy pectoral L",
+                "samples": 53,
+                "maxOutwardDistance": -0.01588757363970217,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pectoral R",
+                "samples": 53,
+                "maxOutwardDistance": -0.015887597402979736,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pelvic L",
+                "samples": 63,
+                "maxOutwardDistance": -0.03408262471202761,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pelvic R",
+                "samples": 63,
+                "maxOutwardDistance": -0.03408432376454584,
+                "insideFraction": 1.0
+              }
+            ]
+          },
+          {
+            "fraction": 0.15,
+            "fins": [
+              {
+                "name": "Fleshy pectoral L",
+                "samples": 53,
+                "maxOutwardDistance": -0.01589558560954174,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pectoral R",
+                "samples": 53,
+                "maxOutwardDistance": -0.01599394654704156,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pelvic L",
+                "samples": 63,
+                "maxOutwardDistance": -0.0340826265164651,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pelvic R",
+                "samples": 63,
+                "maxOutwardDistance": -0.034084325714502484,
+                "insideFraction": 1.0
+              }
+            ]
+          },
+          {
+            "fraction": 0.3,
+            "fins": [
+              {
+                "name": "Fleshy pectoral L",
+                "samples": 53,
+                "maxOutwardDistance": -0.016060186229879037,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pectoral R",
+                "samples": 53,
+                "maxOutwardDistance": -0.016198148019611835,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pelvic L",
+                "samples": 63,
+                "maxOutwardDistance": -0.03649572760332376,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pelvic R",
+                "samples": 63,
+                "maxOutwardDistance": -0.03144035676086787,
+                "insideFraction": 1.0
+              }
+            ]
+          },
+          {
+            "fraction": 0.5,
+            "fins": [
+              {
+                "name": "Fleshy pectoral L",
+                "samples": 53,
+                "maxOutwardDistance": -0.016325910459272563,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pectoral R",
+                "samples": 53,
+                "maxOutwardDistance": -0.015108924126252532,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pelvic L",
+                "samples": 63,
+                "maxOutwardDistance": -0.040669410591362976,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pelvic R",
+                "samples": 63,
+                "maxOutwardDistance": -0.0261614813352935,
+                "insideFraction": 1.0
+              }
+            ]
+          },
+          {
+            "fraction": 0.7,
+            "fins": [
+              {
+                "name": "Fleshy pectoral L",
+                "samples": 53,
+                "maxOutwardDistance": -0.016038455061789136,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pectoral R",
+                "samples": 53,
+                "maxOutwardDistance": -0.016316601308062673,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pelvic L",
+                "samples": 63,
+                "maxOutwardDistance": -0.03719019959544312,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pelvic R",
+                "samples": 63,
+                "maxOutwardDistance": -0.030796513543464243,
+                "insideFraction": 1.0
+              }
+            ]
+          },
+          {
+            "fraction": 0.85,
+            "fins": [
+              {
+                "name": "Fleshy pectoral L",
+                "samples": 53,
+                "maxOutwardDistance": -0.015904031442005362,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pectoral R",
+                "samples": 53,
+                "maxOutwardDistance": -0.016102416288049426,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pelvic L",
+                "samples": 63,
+                "maxOutwardDistance": -0.03472814991255291,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pelvic R",
+                "samples": 63,
+                "maxOutwardDistance": -0.033447061490733176,
+                "insideFraction": 1.0
+              }
+            ]
+          },
+          {
+            "fraction": 1,
+            "fins": [
+              {
+                "name": "Fleshy pectoral L",
+                "samples": 53,
+                "maxOutwardDistance": -0.01588757363970217,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pectoral R",
+                "samples": 53,
+                "maxOutwardDistance": -0.015887597402979736,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pelvic L",
+                "samples": 63,
+                "maxOutwardDistance": -0.03408262471202761,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pelvic R",
+                "samples": 63,
+                "maxOutwardDistance": -0.03408432376454584,
+                "insideFraction": 1.0
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "file": "rhinodipterus.lod1.glb",
+    "sourceGlbSha256": "56d4a9218027ce7ca2440c4cefc36ae4e9262e403a1706d3bfb30a84a76483f9",
+    "method": "Evaluated actual skin root vertices against evaluated continuous torso BVH; signed nearest distance, review aid rather than eye-volume measurement",
+    "maxRootOutwardDistance": -0.014297185709438054,
+    "clips": [
+      {
+        "clip": "Death",
+        "poses": [
+          {
+            "fraction": 0,
+            "fins": [
+              {
+                "name": "Fleshy pectoral L",
+                "samples": 24,
+                "maxOutwardDistance": -0.015961405450070743,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pectoral R",
+                "samples": 24,
+                "maxOutwardDistance": -0.015961425810019136,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pelvic L",
+                "samples": 32,
+                "maxOutwardDistance": -0.026196208418696187,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pelvic R",
+                "samples": 32,
+                "maxOutwardDistance": -0.040979985205922276,
+                "insideFraction": 1.0
+              }
+            ]
+          },
+          {
+            "fraction": 0.15,
+            "fins": [
+              {
+                "name": "Fleshy pectoral L",
+                "samples": 24,
+                "maxOutwardDistance": -0.016038531888625585,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pectoral R",
+                "samples": 24,
+                "maxOutwardDistance": -0.016008015441911994,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pelvic L",
+                "samples": 32,
+                "maxOutwardDistance": -0.03797726065386087,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pelvic R",
+                "samples": 32,
+                "maxOutwardDistance": -0.029812941007548943,
+                "insideFraction": 1.0
+              }
+            ]
+          },
+          {
+            "fraction": 0.3,
+            "fins": [
+              {
+                "name": "Fleshy pectoral L",
+                "samples": 24,
+                "maxOutwardDistance": -0.016669189421008923,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pectoral R",
+                "samples": 24,
+                "maxOutwardDistance": -0.0163778366841143,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pelvic L",
+                "samples": 32,
+                "maxOutwardDistance": -0.03070980912161758,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pelvic R",
+                "samples": 32,
+                "maxOutwardDistance": -0.03720831067766994,
+                "insideFraction": 1.0
+              }
+            ]
+          },
+          {
+            "fraction": 0.5,
+            "fins": [
+              {
+                "name": "Fleshy pectoral L",
+                "samples": 24,
+                "maxOutwardDistance": -0.016738537888159044,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pectoral R",
+                "samples": 24,
+                "maxOutwardDistance": -0.016308889753418043,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pelvic L",
+                "samples": 32,
+                "maxOutwardDistance": -0.029466842708643526,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pelvic R",
+                "samples": 32,
+                "maxOutwardDistance": -0.03830764072336024,
+                "insideFraction": 1.0
+              }
+            ]
+          },
+          {
+            "fraction": 0.7,
+            "fins": [
+              {
+                "name": "Fleshy pectoral L",
+                "samples": 24,
+                "maxOutwardDistance": -0.016460498911328614,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pectoral R",
+                "samples": 24,
+                "maxOutwardDistance": -0.01578926673391834,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pelvic L",
+                "samples": 32,
+                "maxOutwardDistance": -0.02766042636903876,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pelvic R",
+                "samples": 32,
+                "maxOutwardDistance": -0.04064910812303424,
+                "insideFraction": 1.0
+              }
+            ]
+          },
+          {
+            "fraction": 0.85,
+            "fins": [
+              {
+                "name": "Fleshy pectoral L",
+                "samples": 24,
+                "maxOutwardDistance": -0.01643160602543503,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pectoral R",
+                "samples": 24,
+                "maxOutwardDistance": -0.01573279924923554,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pelvic L",
+                "samples": 32,
+                "maxOutwardDistance": -0.028137699999767563,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pelvic R",
+                "samples": 32,
+                "maxOutwardDistance": -0.04088048229459673,
+                "insideFraction": 1.0
+              }
+            ]
+          },
+          {
+            "fraction": 1,
+            "fins": [
+              {
+                "name": "Fleshy pectoral L",
+                "samples": 24,
+                "maxOutwardDistance": -0.016431600030045956,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pectoral R",
+                "samples": 24,
+                "maxOutwardDistance": -0.015732860600110143,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pelvic L",
+                "samples": 32,
+                "maxOutwardDistance": -0.028162393954644926,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pelvic R",
+                "samples": 32,
+                "maxOutwardDistance": -0.04088047693949193,
+                "insideFraction": 1.0
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "clip": "Idle",
+        "poses": [
+          {
+            "fraction": 0,
+            "fins": [
+              {
+                "name": "Fleshy pectoral L",
+                "samples": 24,
+                "maxOutwardDistance": -0.016106636527183582,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pectoral R",
+                "samples": 24,
+                "maxOutwardDistance": -0.015677147237511235,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pelvic L",
+                "samples": 32,
+                "maxOutwardDistance": -0.033089734613895416,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pelvic R",
+                "samples": 32,
+                "maxOutwardDistance": -0.03515326353954151,
+                "insideFraction": 1.0
+              }
+            ]
+          },
+          {
+            "fraction": 0.15,
+            "fins": [
+              {
+                "name": "Fleshy pectoral L",
+                "samples": 24,
+                "maxOutwardDistance": -0.016562813021664624,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pectoral R",
+                "samples": 24,
+                "maxOutwardDistance": -0.016263067913314444,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pelvic L",
+                "samples": 32,
+                "maxOutwardDistance": -0.033890618360601366,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pelvic R",
+                "samples": 32,
+                "maxOutwardDistance": -0.034339977020863444,
+                "insideFraction": 1.0
+              }
+            ]
+          },
+          {
+            "fraction": 0.3,
+            "fins": [
+              {
+                "name": "Fleshy pectoral L",
+                "samples": 24,
+                "maxOutwardDistance": -0.016502249522091006,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pectoral R",
+                "samples": 24,
+                "maxOutwardDistance": -0.016605327662546188,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pelvic L",
+                "samples": 32,
+                "maxOutwardDistance": -0.03487048338865861,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pelvic R",
+                "samples": 32,
+                "maxOutwardDistance": -0.03332218684954569,
+                "insideFraction": 1.0
+              }
+            ]
+          },
+          {
+            "fraction": 0.5,
+            "fins": [
+              {
+                "name": "Fleshy pectoral L",
+                "samples": 24,
+                "maxOutwardDistance": -0.015818266023416072,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pectoral R",
+                "samples": 24,
+                "maxOutwardDistance": -0.01625161927586305,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pelvic L",
+                "samples": 32,
+                "maxOutwardDistance": -0.03511149261612445,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pelvic R",
+                "samples": 32,
+                "maxOutwardDistance": -0.03305686288513243,
+                "insideFraction": 1.0
+              }
+            ]
+          },
+          {
+            "fraction": 0.7,
+            "fins": [
+              {
+                "name": "Fleshy pectoral L",
+                "samples": 24,
+                "maxOutwardDistance": -0.015347919914347585,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pectoral R",
+                "samples": 24,
+                "maxOutwardDistance": -0.015536618233454647,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pelvic L",
+                "samples": 32,
+                "maxOutwardDistance": -0.0340163454238791,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pelvic R",
+                "samples": 32,
+                "maxOutwardDistance": -0.034154717635829,
+                "insideFraction": 1.0
+              }
+            ]
+          },
+          {
+            "fraction": 0.85,
+            "fins": [
+              {
+                "name": "Fleshy pectoral L",
+                "samples": 24,
+                "maxOutwardDistance": -0.015545283387837117,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pectoral R",
+                "samples": 24,
+                "maxOutwardDistance": -0.015349360273830825,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pelvic L",
+                "samples": 32,
+                "maxOutwardDistance": -0.03314640506869182,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pelvic R",
+                "samples": 32,
+                "maxOutwardDistance": -0.035060393100138754,
+                "insideFraction": 1.0
+              }
+            ]
+          },
+          {
+            "fraction": 1,
+            "fins": [
+              {
+                "name": "Fleshy pectoral L",
+                "samples": 24,
+                "maxOutwardDistance": -0.016106636527183582,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pectoral R",
+                "samples": 24,
+                "maxOutwardDistance": -0.015677147237511235,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pelvic L",
+                "samples": 32,
+                "maxOutwardDistance": -0.033089734613895416,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pelvic R",
+                "samples": 32,
+                "maxOutwardDistance": -0.03515326353954151,
+                "insideFraction": 1.0
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "clip": "Swim",
+        "poses": [
+          {
+            "fraction": 0,
+            "fins": [
+              {
+                "name": "Fleshy pectoral L",
+                "samples": 24,
+                "maxOutwardDistance": -0.016381636716687353,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pectoral R",
+                "samples": 24,
+                "maxOutwardDistance": -0.015165365961365751,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pelvic L",
+                "samples": 32,
+                "maxOutwardDistance": -0.02841392336995341,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pelvic R",
+                "samples": 32,
+                "maxOutwardDistance": -0.039183541550301015,
+                "insideFraction": 1.0
+              }
+            ]
+          },
+          {
+            "fraction": 0.15,
+            "fins": [
+              {
+                "name": "Fleshy pectoral L",
+                "samples": 24,
+                "maxOutwardDistance": -0.016478195786476135,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pectoral R",
+                "samples": 24,
+                "maxOutwardDistance": -0.016454115975648165,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pelvic L",
+                "samples": 32,
+                "maxOutwardDistance": -0.037998200044967234,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pelvic R",
+                "samples": 32,
+                "maxOutwardDistance": -0.029801403579767793,
+                "insideFraction": 1.0
+              }
+            ]
+          },
+          {
+            "fraction": 0.3,
+            "fins": [
+              {
+                "name": "Fleshy pectoral L",
+                "samples": 24,
+                "maxOutwardDistance": -0.014601085651520407,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pectoral R",
+                "samples": 24,
+                "maxOutwardDistance": -0.015561327758859989,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pelvic L",
+                "samples": 32,
+                "maxOutwardDistance": -0.03671266051242128,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pelvic R",
+                "samples": 32,
+                "maxOutwardDistance": -0.03149623062927276,
+                "insideFraction": 1.0
+              }
+            ]
+          },
+          {
+            "fraction": 0.5,
+            "fins": [
+              {
+                "name": "Fleshy pectoral L",
+                "samples": 24,
+                "maxOutwardDistance": -0.016381636716687353,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pectoral R",
+                "samples": 24,
+                "maxOutwardDistance": -0.015165365961365751,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pelvic L",
+                "samples": 32,
+                "maxOutwardDistance": -0.02841392336995341,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pelvic R",
+                "samples": 32,
+                "maxOutwardDistance": -0.039183541550301015,
+                "insideFraction": 1.0
+              }
+            ]
+          },
+          {
+            "fraction": 0.7,
+            "fins": [
+              {
+                "name": "Fleshy pectoral L",
+                "samples": 24,
+                "maxOutwardDistance": -0.016787230502814054,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pectoral R",
+                "samples": 24,
+                "maxOutwardDistance": -0.01643126318231225,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pelvic L",
+                "samples": 32,
+                "maxOutwardDistance": -0.039456762140616775,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pelvic R",
+                "samples": 32,
+                "maxOutwardDistance": -0.02817576827510493,
+                "insideFraction": 1.0
+              }
+            ]
+          },
+          {
+            "fraction": 0.85,
+            "fins": [
+              {
+                "name": "Fleshy pectoral L",
+                "samples": 24,
+                "maxOutwardDistance": -0.014297185709438054,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pectoral R",
+                "samples": 24,
+                "maxOutwardDistance": -0.014790705260566028,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pelvic L",
+                "samples": 32,
+                "maxOutwardDistance": -0.03365419119654689,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pelvic R",
+                "samples": 32,
+                "maxOutwardDistance": -0.03450306609738618,
+                "insideFraction": 1.0
+              }
+            ]
+          },
+          {
+            "fraction": 1,
+            "fins": [
+              {
+                "name": "Fleshy pectoral L",
+                "samples": 24,
+                "maxOutwardDistance": -0.016381636716687353,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pectoral R",
+                "samples": 24,
+                "maxOutwardDistance": -0.015165365961365751,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pelvic L",
+                "samples": 32,
+                "maxOutwardDistance": -0.02841392336995341,
+                "insideFraction": 1.0
+              },
+              {
+                "name": "Fleshy pelvic R",
+                "samples": 32,
+                "maxOutwardDistance": -0.039183541550301015,
+                "insideFraction": 1.0
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+]

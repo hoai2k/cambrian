@@ -76,6 +76,8 @@ export interface EraDefinition {
     readonly logo: string;
     readonly illustration: string;
     readonly emblem: string;
+    /** Authored previews remain selectable while their art receives further refinement. */
+    readonly modelStatus?: Readonly<Partial<Record<CreatureId, 'preview' | 'final'>>>;
     readonly modelBytes: Readonly<Partial<Record<CreatureId, number>>>;
     /**
      * Creatures whose own model is still in production borrow another roster member's GLB (and
