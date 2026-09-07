@@ -55,3 +55,29 @@ stronger purposeful tail strokes, directional turns and distinct anticipation/st
 curves for actions. Dynamic motion must respect armour rigidity and genuine oral attachment.
 Full/LOD, three anchors, all required actions and fresh portraits remain required. Eye and general
 quality audits follow the completed rework; do not rerun the archived V2 audit as a gate.
+
+## Clay-01 authored 7 September 2026
+
+Actual visual inspection covered the supplied TUG reconstruction, the saved Engelman Figure 7,
+the old source builder and archived portrait. The old model's broad head and rounded pectorals
+are valuable; its nearly elliptical thorax and isolated high dorsal are the main silhouette
+weaknesses this study addresses. No additional reference identity claims were needed.
+
+The new script is independently shaped with Coccosteus-specific axial sections. Filleted
+polygon cross sections give the skull and thorax real planes while preserving smooth corners.
+Monotone axial interpolation prevents repeated ripples. The thoracic rear edge recedes laterally
+to expose a full abdominal shoulder, while the dorsal shield extends farther back. The soft
+posterior has an intentionally rising ventral profile, compressed deep peduncle, and a fleshy
+upturned axial tail lobe. Low long dorsal and thick, cambered paired-fin sections replace the
+old radial flat fan construction. No armour seams or pigment are needed to pass this clay gate.
+
+The cranial mass has its own concave palate. A shallow mandibular cup, connected flexible cheek
+walls and a recessed buccal sleeve make the mouth a space between volumes. The thoracic front
+uses an annular rim and internal passage; it is not capped across the aperture. Rest and open
+shape keys test jaw/skull pivots before a final rig is designed. This is a geometry study and
+not a claim that oral collisions, eyes or deforming topology have passed production audit.
+
+`views.json` fixes side/front/dorsal/oblique framing for old and new, plus identical close cameras
+for new resting/open jaws. All external geometry uses the same clay material so an armour/soft
+body distinction cannot be manufactured by colour. CPU Cycles and fixed seed are explicit.
+`HANDOFF.md` freezes source hashes, exact three-stage commands and review/stop criteria.
