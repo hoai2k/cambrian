@@ -2,22 +2,40 @@
 
 This is a resumable work checkpoint, not a completion report. The user requested it to preserve context and judge remaining token use. Update the current status as deliveries land; do not infer that drafts are approved from their presence on disk.
 
-## Current execution update — workflow split and integration
+## Current execution update — published initial library; phased reworks active
 
-User authorized model-specific delegation on 7 September: use **gpt-6-astra / high** for
-anatomy research, sculpting decisions and implementation, rig/animation design, complex merge
-judgment and visual approval. Use **gpt-5.6-terra / medium** for frozen-script Blender runs,
-exports, packaging and established tests. Do not switch a live task mid-phase or assume a tool
-call needs a new agent. Hand off bounded batches with input hashes, exact commands and stopping
-conditions. Return unexpected design/failure decisions to Astra. See `agent-workflow.md`.
+**Verified pushed main: f7b5618**. Complete initial library commit 6cd8de7 and concurrent-main
+integration/workflow commit 69b35a0 are included. All 21 creatures and every initial supporting
+asset set are on main. The separate non-creature completion notification WAS sent to the user.
+There are 3 final / 18 preview creatures, including all six requested total reworks.
 
-Initial complete library is committed as **6cd8de7**. Concurrent remote main **8637d96**
-is being merged; three conflicts were resolved by retaining both export libraries and era
-configuration while making explicit instancing mappings authoritative, including their quality
-threshold and intentional procedural exceptions. Remote day/night, UI and ecology changes remain.
-Terra agent `devonian_execution_handoff` completed the workflow document, typecheck/build, 644 Devonian checks, era and asset checks, and loader regression. A stale Vite HMR instance initially failed the scenery harness; Astra provided an isolated 4181 server and corrected baseline isolation. All three scene runs passed with unchanged expected counts, no errors and clean disposal; Astra visually reviewed low/high outputs. The rebuilt viewer shows all 21 creatures and pending preview labels; Manticoceras rendered successfully. Logs are `../devonian-authoring/review/workflow-merge-*.log`.
-Main has not yet received the last two creatures and complete supporting library; send the user
-an explicit non-creature milestone notification only after push and verification.
+User authorized model-specific delegation: **gpt-6-astra / high** for anatomy research,
+sculpting decisions and implementation, rig/animation design, complex merge judgment and visual
+approval; **gpt-5.6-terra / medium** for frozen-script Blender runs, renders, exports, packaging
+and established tests. See `agent-workflow.md`. Batch mechanical work, use compact hash-bound
+handoffs, return unexpected design/failure decisions to Astra. Avoid duplicating full history.
+
+Active new creative authors (each explicitly spawned as Astra high with compact context):
+- `/root/titanichthys_rework_design`: new rework-v3 research/sculpt brief + Blender clay source.
+- `/root/gemuendina_rework_design`: new rework-v3 research/sculpt brief + Blender clay source.
+Both preserve old public/source files and write own WORKING_STATE. First deliverable is a frozen
+script/render handoff, then `/root/devonian_execution_handoff` (Terra medium, currently idle)
+runs it and parent/Astra reviews the resulting form before materials/rig/full actions. Keep one
+execution slot free instead of putting all workers into creative phases. Remaining full reworks:
+Doryaspis, Coccosteus, Bothriolepis and Stethacanthus. Named Coccosteus backup remains preserved.
+
+All integration checks passed: typecheck/build, 644 Devonian checks, 21-creature/47-prop asset
+inventory, era isolation and loader regression. Stale Vite HMR initially failed scenery QA;
+Astra provided fresh isolated 4181 server (session62072) and corrected baseline isolation.
+All three runs pass: low 1,307,304 / high 8,087,473 / baseline 1,211,203 triangles; 104 calls,
+errors[], clean disposal. Astra visually reviewed low/high images. Viewer4176 was rebuilt and
+reloaded; pending labels are present, and Manticoceras rendered with its 19 actions available.
+Logs: `../devonian-authoring/review/workflow-merge-*.log`.
+
+Concurrent main scenery export library (24 files) and environment mappings are preserved.
+The explicit instancing collection owns its mappings, quality threshold and two intentional
+procedural giant exceptions, preventing underwater land-plant fallthrough. Remote day/night,
+UI and ecology changes remain. No original Cambrian creature files changed.
 
 ## Latest priority — supersedes older refinement sequencing below
 
@@ -29,8 +47,7 @@ and recorded. Do not block initial delivery on final-art perfection. Mark unfini
 `src/content/devonian/model-status.json`; three reviewed models are final; all pending refinements, including six requested total reworks, are preview.
 
 Current initial collection: **21/21 creatures integrated; 3 reviewed/final + 18 preview**.
-Last verified pushed main: **e54184b** (19 creatures), feature **9c349d4**. Latest two cephalopods
-and eleven instancing proxies are integrated, viewer-verified and pass typecheck/build, 644 Devonian checks and era checks; final complete initial-library commit is being prepared.
+Initial collection and complete supporting library were pushed as **f7b5618** on main, with feature **69b35a0**. Latest two cephalopods and eleven instancing proxies are integrated and verified.
 A separate main checkout at `../devonian-publish` avoids disturbing active authoring edits.
 
 Six user-directed TOTAL REWORKS: Titanichthys, Coccosteus, Bothriolepis, Doryaspis, Gemuendina, Stethacanthus.
@@ -49,11 +66,11 @@ Performance retains procedural flora; 2 giant silhouettes remain procedural exce
 T01–T05/T07–T09 numerical maps and T06/T10 Blender-derived atlas data were independently
 checked and corrected for normal green convention and inherited denoising; source albedos unchanged.
 Supporting-asset-review.json has evidence. Original imagegen sources and exact prompts are saved.
-No non-creature completion notification yet; publish every initial set and check inventory first.
+All initial sets have been verified on main; the requested separate completion notification has been sent.
 
 Agent handoffs complete: eye_audit delivered scale plates; titanichthys delivered scenery and
 supporting-data QA; dunkleosteus delivered Michelinoceras.
-All author handoffs and source projects are saved. No creature full-rework job has begun yet.
+All initial author handoffs and source projects are saved. New Titanichthys and Gemuendina full reworks are active as described above.
 Manticoceras and Michelinoceras final hashes are in preview-delivery.json after lossless packaging.
 
 The pending local Onychodus palatal-pocket edit is NOT exported: tracked build.py matches the
