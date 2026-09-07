@@ -1,0 +1,34 @@
+{
+  "coccosteus": [
+    {
+      "name": "anchor_mouth",
+      "bone": "jaw",
+      "point": [
+        0,
+        -1.7,
+        -0.075
+      ],
+      "role": "mouth"
+    },
+    {
+      "name": "anchor_mouth_inside",
+      "bone": "skull",
+      "point": [
+        0,
+        -1.24,
+        -0.02
+      ],
+      "role": "swallow"
+    },
+    {
+      "name": "anchor_attack_primary",
+      "bone": "skull",
+      "point": [
+        0,
+        -1.69,
+        0.035
+      ],
+      "role": "attack"
+    }
+  ]
+}
