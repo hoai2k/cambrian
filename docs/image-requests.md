@@ -16,6 +16,30 @@ brief to the history file once its assets are delivered and integrated.
 
 The current request covers 21 individually authored mobile creatures with action animations and the plants, attached organisms and props in the [Devonian brief](redesign/07-devonian-design.md). Deliver to `public/assets/devonian/` under the [separate specimen-library contract](devonian/production-contract.md). The environmental paintings and reference-board inventory in the brief remain future art planning; this model-production request does not activate Devonian gameplay.
 
+## Devonian mode panels — 2 WebP
+
+The pick screen draws a painted panel behind each mode it offers (`mode-art` in
+`src/app/Select.tsx`). The Cambrian's four exist; the Devonian shares that folder
+and has two modes of its own with nothing behind them, so those two chips draw
+empty and the loader logs a miss for each.
+
+| File | Mode | Brief |
+| --- | --- | --- |
+| `public/assets/ui/mode-domination.webp` | Domination (1–4 co-op) | 640 × 360, in the style of the existing four. Holding a range: a Dunkleosteus square-on in the middle of its own water, smaller fish keeping to the edges of the frame. Dark green-blue water, bone-white armour, silt. |
+| `public/assets/ui/mode-foodchain.webp` | Food Chain (2–4 versus) | 640 × 360, same style. A vertical stack that reads as a chain — something small low in the frame, something eating it above, something larger again above that — each in silhouette against a lighter shaft of water. |
+
+The delivered panels are `public/assets/ui/mode-{rise,frenzy,hunted,reef}.webp`;
+their original brief is in the history file under *Mode cards*.
+
+## Checking what is outstanding
+
+`run tools/assets-test.ts` walks both eras' own tables — roster, sound library,
+modes, brand art — resolves every path the way the runtime does and checks it
+against `public/`. Anything it reports as **undelivered** should have a brief
+open on this page; `--strict` turns those into failures for the day the list is
+meant to be empty. It also fails outright if either era's paths reach into the
+other's tree.
+
 ## Requirements for new requests
 
 - Include destination path, dimensions, visual brief, and the UI or placeholder it replaces.

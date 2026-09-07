@@ -264,9 +264,10 @@ ok(RULES !== undefined && !RULES.growthByNutrition, 'Devonian rules active: grow
 // ---- every sound the era asks for exists (the shared library is NOT under assets/devonian/) ----
 {
   const { SAMPLES, LOOPS, sfxUrl, registerSamples } = await import('../src/audio/audio');
-  const { SFX_FILES } = await import('../src/render/assets');
   registerSamples(DEVONIAN_SAMPLES);
-  const names = new Set<string>([...Object.values(SAMPLES).flat(), ...Object.values(LOOPS), ...SFX_FILES]);
+  // The preloader takes its list from the library itself, so this is the same set it warms.
+  const { sfxFiles } = await import('../src/render/assets');
+  const names = new Set<string>([...Object.values(SAMPLES).flat(), ...Object.values(LOOPS), ...sfxFiles()]);
   const missing = [...names].filter((n) => !fs.existsSync(`public/${sfxUrl(n).replace(/^\.\//, '')}`));
   ok(missing.length === 0, `every registered sample resolves to a file (missing: ${missing.slice(0, 6).join(', ')}${missing.length > 6 ? ` +${missing.length - 6}` : ''})`);
   ok(sfxUrl('bite-1').includes('assets/sfx/'), `shared samples come from the shared library (${sfxUrl('bite-1')})`);

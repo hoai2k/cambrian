@@ -48,6 +48,8 @@ export function App() {
   const [isFs, setIsFs] = useState(false);
   const [padIndices, setPadIndices] = useState<number[]>([]);
   const padCount = padIndices.length;
+  /** When the player last touched anything. Drives the idle gate on the asset loader. */
+  const lastInputRef = useRef(0);
 
   const updatePlayers = useCallback((p: PlayerSetup[]) => { playersRef.current = p; setPlayers(p); }, []);
   const go = useCallback((s: Screen) => { screenRef.current = s; setScreen(s); }, []);
@@ -88,10 +90,38 @@ export function App() {
       if (document.fullscreenElement) await document.exitFullscreen();
       else await document.documentElement.requestFullscreen({ navigationUI: 'hide' });
       setNotice('');
-    } catch { setNotice('Fullscreen needs a click or key press. Use the corner button.'); }
+    } catch { /* A browser may refuse it (no user gesture, an embedded frame, a policy). It is an
+      optional convenience with an obvious button in the corner, so it fails quietly. */ }
   }, []);
 
-  // Any user gesture: wake audio (browsers require it)
+  /**
+   * Load only while the player is not doing anything.
+   *
+   * Decoding a creature model or an image is main-thread work measured in tens to hundreds of
+   * milliseconds, and while it runs nothing else happens: not a render, not a gamepad poll. That
+   * is what makes a menu feel like it is ignoring you — the press was real, the page was simply
+   * not looking. So the loader is switched off the moment anything is pressed and switched back on
+   * after IDLE_MS of quiet, which is long enough to cover the gaps between presses in a burst of
+   * menu navigation but short enough that a player who pauses to read gets everything streaming
+   * again. Work already in flight is never interrupted.
+   *
+   * The gate does not apply until the boot assets are in: on the loading screen the player is
+   * waiting for exactly this and holding it back would be perverse.
+   */
+  useEffect(() => {
+    const IDLE_MS = 700;
+    const mark = () => { lastInputRef.current = performance.now(); };
+    const events: (keyof WindowEventMap)[] = ['pointerdown', 'pointermove', 'keydown', 'wheel', 'touchstart'];
+    for (const e of events) window.addEventListener(e, mark, { passive: true });
+    const id = setInterval(() => {
+      const q = engineRef.current?.assets;
+      if (!q) return;
+      q.setIdle(!loaded || performance.now() - lastInputRef.current > IDLE_MS);
+    }, 100);
+    return () => { for (const e of events) window.removeEventListener(e, mark); clearInterval(id); };
+  }, [loaded]);
+
+  // Any user gesture: wake audio (browsers require it)  // Any user gesture: wake audio (browsers require it)
   useEffect(() => {
     const wake = () => { audio.init(); audio.resume(); };
     window.addEventListener('pointerdown', wake); window.addEventListener('keydown', wake);
@@ -103,8 +133,10 @@ export function App() {
     audio.init(); audio.resume(); audio.play('ui-start');
     updatePlayers([{ creature: ACTIVE_ERA.defaults.player, device, ready: false }]);
     go('select');
+    // Try for fullscreen on the way in; if the browser will not, say nothing. Starting from a pad
+    // is not a gesture it counts, and a transient refusal is not worth a message either.
     if (viaGesture) void toggleFullscreen();
-    else if (!document.fullscreenElement) void document.documentElement.requestFullscreen().catch(() => setNotice('Press the fullscreen button in the corner (browsers only allow it from a click or key).'));
+    else if (!document.fullscreenElement) void document.documentElement.requestFullscreen({ navigationUI: 'hide' }).catch(() => {});
   }, [go, toggleFullscreen, updatePlayers]);
 
   const startMatch = useCallback(() => {
@@ -151,17 +183,33 @@ export function App() {
   }, [go, setPausedBoth]);
 
   /** Move a player's cursor on the roster grid. Locked players must unlock first (B). */
+  /**
+   * Move the pick cursor around the roster grid.
+   *
+   * The grid is only rectangular when the roster divides by three. An era whose models arrive in
+   * batches has a ragged last row — the Devonian's nine playable species make a 4-wide grid whose
+   * bottom row holds one — and the old maths moved within a row modulo the *column count*, so on
+   * that row every horizontal press landed back on the creature you were already on. The default
+   * pick sat there, which made the first thing a Devonian player ever pressed do nothing.
+   *
+   * So left and right walk the roster itself and always move, wrapping at the ends; up and down
+   * move by a row and clamp into a short one. Both are what a grid of tiles is expected to do,
+   * and neither can be a no-op.
+   */
   const moveCursor = useCallback((index: number, dx: number, dy: number) => {
     const ps = [...playersRef.current];
     const p = ps[index]; if (!p || p.ready) return;
-    const n = CREATURES.length, cols = gridColumns(n);
+    const n = CREATURES.length, cols = gridColumns(n), rows = Math.ceil(n / cols);
     const i = CREATURE_IDS.indexOf(p.creature);
-    let r = Math.floor(i / cols), c = i % cols;
-    const rows = Math.ceil(n / cols);
-    c = (c + dx + cols) % cols; r = (r + dy + rows) % rows;
-    let j = r * cols + c;
-    if (j >= n) j = dy !== 0 ? (dy > 0 ? c : (rows - 2) * cols + c) : n - 1;
-    if (j >= n || j < 0) j = i;
+    if (i < 0 || n === 0) return;
+    let j = i;
+    if (dx) j = (i + dx + n) % n;
+    if (dy) {
+      const r = (Math.floor(j / cols) + dy + rows) % rows;
+      const rowLength = Math.min(cols, n - r * cols);
+      j = r * cols + Math.min(j % cols, rowLength - 1);
+    }
+    if (j === i || j < 0 || j >= n) return;
     ps[index] = { ...p, creature: CREATURE_IDS[j] };
     updatePlayers(ps); audio.play('ui-move');
   }, [updatePlayers]);
@@ -193,11 +241,9 @@ export function App() {
 
   // ---- Gamepad menu navigation ----
   useEffect(() => {
-    let raf = 0;
     const prev = new Map<number, RawControls>();
     const repeat = new Map<number, number>();
     const loop = () => {
-      raf = requestAnimationFrame(loop);
       const pads = gamepads();
       const live = pads.map((g) => g.index);
       setPadIndices((old) => (old.length === live.length && old.every((v, i) => v === live[i]) ? old : live));
@@ -211,6 +257,8 @@ export function App() {
         const p = prev.get(gp.index);
         const just = (k: keyof RawControls) => !!c[k] && !p?.[k];
         const now = performance.now();
+        // A pad counts as input too, so the loader holds off while somebody is steering a menu.
+        if (c.anyButton || Math.hypot(c.mx, c.my) > 0.3) lastInputRef.current = now;
         if (dialogRef.current) {
           if (just('back') || just('menu')) openDialog(null);
         } else if (s === 'title') {
@@ -252,8 +300,13 @@ export function App() {
       // inheriting the buttons that were held when it vanished.
       for (const index of prev.keys()) if (!live.includes(index)) { prev.delete(index); repeat.delete(index); }
     };
-    raf = requestAnimationFrame(loop);
-    return () => cancelAnimationFrame(raf);
+    // Deliberately a timer and not requestAnimationFrame. The Gamepad API is a snapshot: a button
+    // that goes down and up between two polls is never seen at all. Polling on animation frames
+    // ties menu input to how fast the sea happens to be rendering, and a frame that runs long —
+    // parsing a creature model, building chunk geometry — swallows a whole press. At 120 Hz here
+    // a tap has to be shorter than 8 ms to be missed.
+    const id = setInterval(loop, 1000 / 120);
+    return () => clearInterval(id);
     // padIndices is deliberately not a dependency: it is written from inside this loop, and
     // listing it would tear the loop down and rebuild it every time a pad connects, losing the
     // button edges held in `prev`.
