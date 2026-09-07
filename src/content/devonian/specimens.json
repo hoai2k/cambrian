@@ -434,5 +434,1280 @@
       "Animations represent aquatic undulation, paddling, bracing, neck aiming, gape and modest cheek expansion. Growth is a relaxed extension display, with no body scaling. Runtime labels do not define Devonian gameplay.",
       "Initial preview release. Further review may refine soft tissue, fin-web contours, cranial surface detail and oral presentation."
     ]
+  },
+  {
+    "id": "acanthostega",
+    "name": "Acanthostega",
+    "species": "Acanthostega gunnari",
+    "category": "creature",
+    "modelStatus": "preview",
+    "provenance": "Late Devonian, Famennian, East Greenland",
+    "description": "Aquatic early tetrapod with a rounded spade-like head, sutured skull, eight-digit paddle limbs and a deep ray-supported swimming tail.",
+    "model": "assets/devonian/creatures/acanthostega.glb",
+    "lod": "assets/devonian/creatures/acanthostega.lod1.glb",
+    "image": "assets/devonian/creatures/acanthostega.thumb.png",
+    "lengthMeters": 0.6,
+    "looping": [
+      "Idle",
+      "Swim",
+      "Guard",
+      "Eat"
+    ],
+    "sources": [
+      {
+        "title": "Coates1996, Acanthostega postcranial anatomy",
+        "url": "https://doi.org/10.1017/S0263593300006787"
+      },
+      {
+        "title": "Porro, Rayfield & Clack2015, reconstructed skull",
+        "url": "https://doi.org/10.1371/journal.pone.0118882"
+      }
+    ],
+    "notes": [
+      "Original initial preview of Acanthostega gunnari at a representative 0.6 m scale, not a fossil scan or claimed maximum.",
+      "Eight digits on each forelimb and hindlimb follow Coates1996; digits are unequal, unclawed and arranged as aquatic paddles. Soft webbing extent is inferred.",
+      "The deep caudal fin starts farther forward dorsally than ventrally and is supported conceptually by the fossil radials/lepidotrichia; there are no separate shark-like dorsal fins.",
+      "Dorsal skin has no invented fish-scale coat. Subtle ventral chevron relief follows gastralia; pigmentation and soft tissue are artistic reconstructions.",
+      "The skull follows the deeper, longer postorbital reconstruction and anterior mandibular hook described by Porro2015; cheeks remain rigid.",
+      "Animations use aquatic tail propulsion, paddle strokes, fin/digit recovery and biting. Ordinary terrestrial walking is not claimed. Growth does not scale or moult the body.",
+      "Preview: further anatomy, material and animation polishing is deferred until the initial roster is complete."
+    ]
+  },
+  {
+    "id": "eldredgeops",
+    "name": "Eldredgeops",
+    "species": "Eldredgeops rana",
+    "category": "creature",
+    "modelStatus": "preview",
+    "provenance": "Middle Devonian, Givetian Hamilton Group, northeastern North America",
+    "description": "Rounded, tuberculate phacopid trilobite with seventeen-file schizochroal compound eyes, eleven articulated thoracic tergites and a ribbed pygidium. Ventral biramous limbs and antennae are comparative soft-part reconstruction.",
+    "model": "assets/devonian/creatures/eldredgeops.glb",
+    "lod": "assets/devonian/creatures/eldredgeops.lod1.glb",
+    "image": "assets/devonian/creatures/eldredgeops.thumb.png",
+    "lengthMeters": 0.06,
+    "looping": [
+      "Idle",
+      "Crawl",
+      "Swim",
+      "Guard",
+      "Eat"
+    ],
+    "sources": [
+      "https://devonianatlas.org/species/eldredgeops-rana/",
+      "https://doi.org/10.1016/j.asd.2006.08.002",
+      "https://doi.org/10.1111/j.1502-3931.2009.00205.x",
+      "https://doi.org/10.1002/spp2.1401"
+    ],
+    "notes": [
+      "Shell uses E. rana sensu Eldredge1972, not E. milleri or spiny Moroccan phacopids.",
+      "Three cephalic post-antennal pairs, eleven thoracic pairs and four pygidial pairs are a comparative reconstruction; exact E. rana appendage anatomy and living pigmentation are uncertain.",
+      "Individual calcite lens solids are seated in continuous anatomical ocular platforms. Eye volume reports test each lens, not only aggregate eye volume.",
+      "All rigid shells move by joints. Growth is an unscaled compatibility posture; Moult is a separate preparation/withdrawal gesture. Swim is a plausible limb-powered compatibility action, not a claim of habitual pelagic swimming.",
+      "Representative 6cm shell length is illustrative, not a species maximum. Antennae extend the exported bounds."
+    ]
+  },
+  {
+    "id": "jaekelopterus",
+    "name": "Jaekelopterus",
+    "species": "Jaekelopterus rhenaniae",
+    "category": "creature",
+    "modelStatus": "preview",
+    "provenance": "Early Devonian, Rhineland, Germany",
+    "description": "Large pterygotid eurypterid with acute lateral eyes, robust toothed chelicerae, four walking-limb pairs, swimming paddles, twelve trunk rings and a triangular keeled telson.",
+    "model": "assets/devonian/creatures/jaekelopterus.glb",
+    "lod": "assets/devonian/creatures/jaekelopterus.lod1.glb",
+    "image": "assets/devonian/creatures/jaekelopterus.thumb.png",
+    "lengthMeters": 1.8,
+    "looping": [
+      "Idle",
+      "Swim",
+      "Crawl",
+      "Guard",
+      "Eat"
+    ],
+    "sources": [
+      "https://doi.org/10.1098/rsbl.2007.0491",
+      "https://pmc.ncbi.nlm.nih.gov/articles/PMC4571687/",
+      "https://pmc.ncbi.nlm.nih.gov/articles/PMC9745958/",
+      "https://pmc.ncbi.nlm.nih.gov/articles/PMC3679797/"
+    ],
+    "notes": [
+      "Initial preview reconstruction; pigmentation and soft anatomy are artistic.",
+      "1.8 m is a representative display assumption; the famous roughly 2.5 m giant estimate is extrapolated from an isolated chelicera, not a complete giant body.",
+      "Four slender non-chelate walking pairs plus pair VI swimming paddles; enlarged chelicerae are pair I. No invented scorpion sting or venom anatomy.",
+      "Rhenaniae claw and eye evidence is distinguished from comparative Jaekelopterus howelli postcranial material.",
+      "Moult is a preparatory articulated extension without shell splitting or body scaling. Precise locomotor cycles are inferred, not fossil-observed.",
+      "Full regional pigment is multiplied once by near-neutral UV albedo; LOD bakes that factor once without textures."
+    ]
+  },
+  {
+    "id": "massive-stromatoporoid",
+    "name": "Massive stromatoporoid",
+    "species": "attached",
+    "category": "prop",
+    "modelStatus": "preview",
+    "provenance": "Devonian Columbus Formation, Ontario comparative reference",
+    "description": "Low irregular skeletal dome with mamelons and astrorhizal surface grooves; living surface colour inferred.",
+    "model": "assets/devonian/props/massive-stromatoporoid.glb",
+    "lod": "assets/devonian/props/massive-stromatoporoid.lod1.glb",
+    "image": "assets/devonian/props/massive-stromatoporoid.png",
+    "lengthMeters": 1.1936888694763184,
+    "looping": [],
+    "sources": [
+      "https://www.digitalatlasofancientlife.org/learn/porifera/stromatoporoidea/"
+    ],
+    "notes": [
+      "Original parametric mesh, no downloaded model.",
+      "1 glTF unit = 1 metre. Dimensions describe this art specimen, not a taxon maximum.",
+      "Pigmentation and soft appearance are artistic interpretations.",
+      "Locality tags constrain future placement; library membership does not assert co-occurrence.",
+      "Preview model: initial scenery delivery; further individual material, silhouette and motion refinement is pending."
+    ]
+  },
+  {
+    "id": "massive-stromatoporoid-v2",
+    "name": "Massive stromatoporoid — variant 2",
+    "species": "attached",
+    "category": "prop",
+    "modelStatus": "preview",
+    "provenance": "Devonian Columbus Formation, Ontario comparative reference",
+    "description": "Low irregular skeletal dome with mamelons and astrorhizal surface grooves; living surface colour inferred.",
+    "model": "assets/devonian/props/massive-stromatoporoid-v2.glb",
+    "lod": "assets/devonian/props/massive-stromatoporoid-v2.lod1.glb",
+    "image": "assets/devonian/props/massive-stromatoporoid-v2.png",
+    "lengthMeters": 1.1936888694763184,
+    "looping": [],
+    "sources": [
+      "https://www.digitalatlasofancientlife.org/learn/porifera/stromatoporoidea/"
+    ],
+    "notes": [
+      "Original parametric mesh, no downloaded model.",
+      "1 glTF unit = 1 metre. Dimensions describe this art specimen, not a taxon maximum.",
+      "Pigmentation and soft appearance are artistic interpretations.",
+      "Locality tags constrain future placement; library membership does not assert co-occurrence.",
+      "Preview model: initial scenery delivery; further individual material, silhouette and motion refinement is pending."
+    ]
+  },
+  {
+    "id": "branching-stromatoporoid",
+    "name": "Branching stromatoporoid",
+    "species": "attached",
+    "category": "prop",
+    "modelStatus": "preview",
+    "provenance": "Middle–Late Devonian reef-lagoon form; regional placement requires review",
+    "description": "Slender gradually tapering branches; no coral polyps or stromatolite bands.",
+    "model": "assets/devonian/props/branching-stromatoporoid.glb",
+    "lod": "assets/devonian/props/branching-stromatoporoid.lod1.glb",
+    "image": "assets/devonian/props/branching-stromatoporoid.png",
+    "lengthMeters": 0.11899279057979584,
+    "looping": [],
+    "sources": [
+      "https://palass.org/publications/palaeontology-journal/archive/40/3/article_pp833-854"
+    ],
+    "notes": [
+      "Original parametric mesh, no downloaded model.",
+      "1 glTF unit = 1 metre. Dimensions describe this art specimen, not a taxon maximum.",
+      "Pigmentation and soft appearance are artistic interpretations.",
+      "Locality tags constrain future placement; library membership does not assert co-occurrence.",
+      "Preview model: initial scenery delivery; further individual material, silhouette and motion refinement is pending."
+    ]
+  },
+  {
+    "id": "branching-stromatoporoid-v2",
+    "name": "Branching stromatoporoid — variant 2",
+    "species": "attached",
+    "category": "prop",
+    "modelStatus": "preview",
+    "provenance": "Middle–Late Devonian reef-lagoon form; regional placement requires review",
+    "description": "Slender gradually tapering branches; no coral polyps or stromatolite bands.",
+    "model": "assets/devonian/props/branching-stromatoporoid-v2.glb",
+    "lod": "assets/devonian/props/branching-stromatoporoid-v2.lod1.glb",
+    "image": "assets/devonian/props/branching-stromatoporoid-v2.png",
+    "lengthMeters": 0.11899279057979584,
+    "looping": [],
+    "sources": [
+      "https://palass.org/publications/palaeontology-journal/archive/40/3/article_pp833-854"
+    ],
+    "notes": [
+      "Original parametric mesh, no downloaded model.",
+      "1 glTF unit = 1 metre. Dimensions describe this art specimen, not a taxon maximum.",
+      "Pigmentation and soft appearance are artistic interpretations.",
+      "Locality tags constrain future placement; library membership does not assert co-occurrence.",
+      "Preview model: initial scenery delivery; further individual material, silhouette and motion refinement is pending."
+    ]
+  },
+  {
+    "id": "encrusting-stromatoporoid",
+    "name": "Encrusting stromatoporoid",
+    "species": "attached",
+    "category": "prop",
+    "modelStatus": "preview",
+    "provenance": "Devonian carbonate shelf comparative reconstruction",
+    "description": "Low successive irregular growth margins with living surfaces distinguished from fossil sections.",
+    "model": "assets/devonian/props/encrusting-stromatoporoid.glb",
+    "lod": "assets/devonian/props/encrusting-stromatoporoid.lod1.glb",
+    "image": "assets/devonian/props/encrusting-stromatoporoid.png",
+    "lengthMeters": 0.7061992883682251,
+    "looping": [],
+    "sources": [
+      "https://onlinelibrary.wiley.com/doi/full/10.1111/j.1475-4983.2011.01037.x"
+    ],
+    "notes": [
+      "Original parametric mesh, no downloaded model.",
+      "1 glTF unit = 1 metre. Dimensions describe this art specimen, not a taxon maximum.",
+      "Pigmentation and soft appearance are artistic interpretations.",
+      "Locality tags constrain future placement; library membership does not assert co-occurrence.",
+      "Preview model: initial scenery delivery; further individual material, silhouette and motion refinement is pending."
+    ]
+  },
+  {
+    "id": "encrusting-stromatoporoid-v2",
+    "name": "Encrusting stromatoporoid — variant 2",
+    "species": "attached",
+    "category": "prop",
+    "modelStatus": "preview",
+    "provenance": "Devonian carbonate shelf comparative reconstruction",
+    "description": "Low successive irregular growth margins with living surfaces distinguished from fossil sections.",
+    "model": "assets/devonian/props/encrusting-stromatoporoid-v2.glb",
+    "lod": "assets/devonian/props/encrusting-stromatoporoid-v2.lod1.glb",
+    "image": "assets/devonian/props/encrusting-stromatoporoid-v2.png",
+    "lengthMeters": 0.716605007648468,
+    "looping": [],
+    "sources": [
+      "https://onlinelibrary.wiley.com/doi/full/10.1111/j.1475-4983.2011.01037.x"
+    ],
+    "notes": [
+      "Original parametric mesh, no downloaded model.",
+      "1 glTF unit = 1 metre. Dimensions describe this art specimen, not a taxon maximum.",
+      "Pigmentation and soft appearance are artistic interpretations.",
+      "Locality tags constrain future placement; library membership does not assert co-occurrence.",
+      "Preview model: initial scenery delivery; further individual material, silhouette and motion refinement is pending."
+    ]
+  },
+  {
+    "id": "massive-tabulate-coral",
+    "name": "Massive tabulate coral",
+    "species": "attached",
+    "category": "prop",
+    "modelStatus": "preview",
+    "provenance": "Devonian carbonate shelf; genus-level architecture only",
+    "description": "Dense small polygonal corallites form a honeycomb colony; restrained soft covering is artistic.",
+    "model": "assets/devonian/props/massive-tabulate-coral.glb",
+    "lod": "assets/devonian/props/massive-tabulate-coral.lod1.glb",
+    "image": "assets/devonian/props/massive-tabulate-coral.png",
+    "lengthMeters": 0.20773693919181824,
+    "looping": [],
+    "sources": [
+      "https://www.digitalatlasofancientlife.org/vc/cnidaria/anthozoa/tabulata/",
+      "https://collections.geoscienze.unipd.it/favosites"
+    ],
+    "notes": [
+      "Original parametric mesh, no downloaded model.",
+      "1 glTF unit = 1 metre. Dimensions describe this art specimen, not a taxon maximum.",
+      "Pigmentation and soft appearance are artistic interpretations.",
+      "Locality tags constrain future placement; library membership does not assert co-occurrence.",
+      "Preview model: initial scenery delivery; further individual material, silhouette and motion refinement is pending."
+    ]
+  },
+  {
+    "id": "massive-tabulate-coral-v2",
+    "name": "Massive tabulate coral — variant 2",
+    "species": "attached",
+    "category": "prop",
+    "modelStatus": "preview",
+    "provenance": "Devonian carbonate shelf; genus-level architecture only",
+    "description": "Dense small polygonal corallites form a honeycomb colony; restrained soft covering is artistic.",
+    "model": "assets/devonian/props/massive-tabulate-coral-v2.glb",
+    "lod": "assets/devonian/props/massive-tabulate-coral-v2.lod1.glb",
+    "image": "assets/devonian/props/massive-tabulate-coral-v2.png",
+    "lengthMeters": 0.28494659066200256,
+    "looping": [],
+    "sources": [
+      "https://www.digitalatlasofancientlife.org/vc/cnidaria/anthozoa/tabulata/",
+      "https://collections.geoscienze.unipd.it/favosites"
+    ],
+    "notes": [
+      "Original parametric mesh, no downloaded model.",
+      "1 glTF unit = 1 metre. Dimensions describe this art specimen, not a taxon maximum.",
+      "Pigmentation and soft appearance are artistic interpretations.",
+      "Locality tags constrain future placement; library membership does not assert co-occurrence.",
+      "Preview model: initial scenery delivery; further individual material, silhouette and motion refinement is pending."
+    ]
+  },
+  {
+    "id": "branching-tabulate-coral",
+    "name": "Branching tabulate coral",
+    "species": "attached",
+    "category": "prop",
+    "modelStatus": "preview",
+    "provenance": "Middle Devonian Milwaukee Formation, Wisconsin",
+    "description": "Ramose bifurcating branches with tapered distal axes and repeated apertures around branches.",
+    "model": "assets/devonian/props/branching-tabulate-coral.glb",
+    "lod": "assets/devonian/props/branching-tabulate-coral.lod1.glb",
+    "image": "assets/devonian/props/branching-tabulate-coral.png",
+    "lengthMeters": 0.14579147100448608,
+    "looping": [],
+    "sources": [
+      "https://devonianatlas.org/species/striatopora-iowensis/"
+    ],
+    "notes": [
+      "Original parametric mesh, no downloaded model.",
+      "1 glTF unit = 1 metre. Dimensions describe this art specimen, not a taxon maximum.",
+      "Pigmentation and soft appearance are artistic interpretations.",
+      "Locality tags constrain future placement; library membership does not assert co-occurrence.",
+      "Preview model: initial scenery delivery; further individual material, silhouette and motion refinement is pending."
+    ]
+  },
+  {
+    "id": "branching-tabulate-coral-v2",
+    "name": "Branching tabulate coral — variant 2",
+    "species": "attached",
+    "category": "prop",
+    "modelStatus": "preview",
+    "provenance": "Middle Devonian Milwaukee Formation, Wisconsin",
+    "description": "Ramose bifurcating branches with tapered distal axes and repeated apertures around branches.",
+    "model": "assets/devonian/props/branching-tabulate-coral-v2.glb",
+    "lod": "assets/devonian/props/branching-tabulate-coral-v2.lod1.glb",
+    "image": "assets/devonian/props/branching-tabulate-coral-v2.png",
+    "lengthMeters": 0.14481770992279053,
+    "looping": [],
+    "sources": [
+      "https://devonianatlas.org/species/striatopora-iowensis/"
+    ],
+    "notes": [
+      "Original parametric mesh, no downloaded model.",
+      "1 glTF unit = 1 metre. Dimensions describe this art specimen, not a taxon maximum.",
+      "Pigmentation and soft appearance are artistic interpretations.",
+      "Locality tags constrain future placement; library membership does not assert co-occurrence.",
+      "Preview model: initial scenery delivery; further individual material, silhouette and motion refinement is pending."
+    ]
+  },
+  {
+    "id": "solitary-rugose-coral",
+    "name": "Solitary rugose coral",
+    "species": "attached",
+    "category": "prop",
+    "modelStatus": "preview",
+    "provenance": "Middle Devonian Hamilton/Traverse records, North America",
+    "description": "Curved horn with incremental ridges, deep calyx and radial septa. This is an exposed skeleton, not a claim of living polyp anatomy.",
+    "model": "assets/devonian/props/solitary-rugose-coral.glb",
+    "lod": "assets/devonian/props/solitary-rugose-coral.lod1.glb",
+    "image": "assets/devonian/props/solitary-rugose-coral.png",
+    "lengthMeters": 0.10152511298656464,
+    "looping": [],
+    "sources": [
+      "https://devonianatlas.org/species/heliophyllum-halli/"
+    ],
+    "notes": [
+      "Original parametric mesh, no downloaded model.",
+      "1 glTF unit = 1 metre. Dimensions describe this art specimen, not a taxon maximum.",
+      "Pigmentation and soft appearance are artistic interpretations.",
+      "Locality tags constrain future placement; library membership does not assert co-occurrence.",
+      "Preview model: initial scenery delivery; further individual material, silhouette and motion refinement is pending."
+    ]
+  },
+  {
+    "id": "solitary-rugose-coral-v2",
+    "name": "Solitary rugose coral — variant 2",
+    "species": "attached",
+    "category": "prop",
+    "modelStatus": "preview",
+    "provenance": "Middle Devonian Hamilton/Traverse records, North America",
+    "description": "Curved horn with incremental ridges, deep calyx and radial septa. This is an exposed skeleton, not a claim of living polyp anatomy.",
+    "model": "assets/devonian/props/solitary-rugose-coral-v2.glb",
+    "lod": "assets/devonian/props/solitary-rugose-coral-v2.lod1.glb",
+    "image": "assets/devonian/props/solitary-rugose-coral-v2.png",
+    "lengthMeters": 0.1021188274025917,
+    "looping": [],
+    "sources": [
+      "https://devonianatlas.org/species/heliophyllum-halli/"
+    ],
+    "notes": [
+      "Original parametric mesh, no downloaded model.",
+      "1 glTF unit = 1 metre. Dimensions describe this art specimen, not a taxon maximum.",
+      "Pigmentation and soft appearance are artistic interpretations.",
+      "Locality tags constrain future placement; library membership does not assert co-occurrence.",
+      "Preview model: initial scenery delivery; further individual material, silhouette and motion refinement is pending."
+    ]
+  },
+  {
+    "id": "colonial-rugose-coral",
+    "name": "Colonial rugose coral",
+    "species": "attached",
+    "category": "prop",
+    "modelStatus": "preview",
+    "provenance": "Middle Devonian North American shelf reference",
+    "description": "Connected compact corallites with large radial calices, distinct from small tabulate honeycomb.",
+    "model": "assets/devonian/props/colonial-rugose-coral.glb",
+    "lod": "assets/devonian/props/colonial-rugose-coral.lod1.glb",
+    "image": "assets/devonian/props/colonial-rugose-coral.png",
+    "lengthMeters": 0.09848295152187347,
+    "looping": [],
+    "sources": [
+      "https://umorf.ummp.lsa.umich.edu/wp/mi-backyard-fossils-corals/"
+    ],
+    "notes": [
+      "Original parametric mesh, no downloaded model.",
+      "1 glTF unit = 1 metre. Dimensions describe this art specimen, not a taxon maximum.",
+      "Pigmentation and soft appearance are artistic interpretations.",
+      "Locality tags constrain future placement; library membership does not assert co-occurrence.",
+      "Preview model: initial scenery delivery; further individual material, silhouette and motion refinement is pending."
+    ]
+  },
+  {
+    "id": "stalked-crinoid",
+    "name": "Stalked crinoid",
+    "species": "attached",
+    "category": "prop",
+    "modelStatus": "preview",
+    "provenance": "Devonian marine shelf; comparative crinoid anatomy, not Hunsrück species claim",
+    "description": "Jointed column with lumen, attachment holdfast, calyx and five bifurcating pinnulate feeding rays.",
+    "model": "assets/devonian/props/stalked-crinoid.glb",
+    "lod": "assets/devonian/props/stalked-crinoid.lod1.glb",
+    "image": "assets/devonian/props/stalked-crinoid.png",
+    "lengthMeters": 0.6829063296318054,
+    "looping": [
+      "Idle"
+    ],
+    "sources": [
+      "https://www.digitalatlasofancientlife.org/learn/echinodermata/crinoidea/",
+      "https://devonianatlas.org/species/"
+    ],
+    "notes": [
+      "Original parametric mesh, no downloaded model.",
+      "1 glTF unit = 1 metre. Dimensions describe this art specimen, not a taxon maximum.",
+      "Pigmentation and soft appearance are artistic interpretations.",
+      "Locality tags constrain future placement; library membership does not assert co-occurrence.",
+      "Preview model: initial scenery delivery; further individual material, silhouette and motion refinement is pending."
+    ]
+  },
+  {
+    "id": "stalked-crinoid-v2",
+    "name": "Stalked crinoid — variant 2",
+    "species": "attached",
+    "category": "prop",
+    "modelStatus": "preview",
+    "provenance": "Devonian marine shelf; comparative crinoid anatomy, not Hunsrück species claim",
+    "description": "Jointed column with lumen, attachment holdfast, calyx and five bifurcating pinnulate feeding rays.",
+    "model": "assets/devonian/props/stalked-crinoid-v2.glb",
+    "lod": "assets/devonian/props/stalked-crinoid-v2.lod1.glb",
+    "image": "assets/devonian/props/stalked-crinoid-v2.png",
+    "lengthMeters": 0.5429062247276306,
+    "looping": [
+      "Idle"
+    ],
+    "sources": [
+      "https://www.digitalatlasofancientlife.org/learn/echinodermata/crinoidea/",
+      "https://devonianatlas.org/species/"
+    ],
+    "notes": [
+      "Original parametric mesh, no downloaded model.",
+      "1 glTF unit = 1 metre. Dimensions describe this art specimen, not a taxon maximum.",
+      "Pigmentation and soft appearance are artistic interpretations.",
+      "Locality tags constrain future placement; library membership does not assert co-occurrence.",
+      "Preview model: initial scenery delivery; further individual material, silhouette and motion refinement is pending."
+    ]
+  },
+  {
+    "id": "brachiopod-bed",
+    "name": "Brachiopod bed",
+    "species": "attached",
+    "category": "prop",
+    "modelStatus": "preview",
+    "provenance": "Middle Devonian Hamilton fauna, North America",
+    "description": "Paired dorsal/ventral valves with bilateral symmetry, hinge wings, radial ribs and median fold; shell widths about 3–5 cm.",
+    "model": "assets/devonian/props/brachiopod-bed.glb",
+    "lod": "assets/devonian/props/brachiopod-bed.lod1.glb",
+    "image": "assets/devonian/props/brachiopod-bed.png",
+    "lengthMeters": 0.14856132864952087,
+    "looping": [],
+    "sources": [
+      "https://devonianatlas.org/species/mucrospirifer-mucronatus/",
+      "https://devonianatlas.org/taxonomic-groups/brachiopods/"
+    ],
+    "notes": [
+      "Original parametric mesh, no downloaded model.",
+      "1 glTF unit = 1 metre. Dimensions describe this art specimen, not a taxon maximum.",
+      "Pigmentation and soft appearance are artistic interpretations.",
+      "Locality tags constrain future placement; library membership does not assert co-occurrence.",
+      "Preview model: initial scenery delivery; further individual material, silhouette and motion refinement is pending."
+    ]
+  },
+  {
+    "id": "brachiopod-bed-v2",
+    "name": "Brachiopod bed — variant 2",
+    "species": "attached",
+    "category": "prop",
+    "modelStatus": "preview",
+    "provenance": "Middle Devonian Hamilton fauna, North America",
+    "description": "Paired dorsal/ventral valves with bilateral symmetry, hinge wings, radial ribs and median fold; shell widths about 3–5 cm.",
+    "model": "assets/devonian/props/brachiopod-bed-v2.glb",
+    "lod": "assets/devonian/props/brachiopod-bed-v2.lod1.glb",
+    "image": "assets/devonian/props/brachiopod-bed-v2.png",
+    "lengthMeters": 0.25063613057136536,
+    "looping": [],
+    "sources": [
+      "https://devonianatlas.org/species/mucrospirifer-mucronatus/",
+      "https://devonianatlas.org/taxonomic-groups/brachiopods/"
+    ],
+    "notes": [
+      "Original parametric mesh, no downloaded model.",
+      "1 glTF unit = 1 metre. Dimensions describe this art specimen, not a taxon maximum.",
+      "Pigmentation and soft appearance are artistic interpretations.",
+      "Locality tags constrain future placement; library membership does not assert co-occurrence.",
+      "Preview model: initial scenery delivery; further individual material, silhouette and motion refinement is pending."
+    ]
+  },
+  {
+    "id": "bryozoan-colony",
+    "name": "Fenestrate bryozoan",
+    "species": "attached",
+    "category": "prop",
+    "modelStatus": "preview",
+    "provenance": "Devonian marine shelf comparative growth form",
+    "description": "Fine mesh colony with zooid-bearing longitudinal branches and connecting crossbars; not a coral fan.",
+    "model": "assets/devonian/props/bryozoan-colony.glb",
+    "lod": "assets/devonian/props/bryozoan-colony.lod1.glb",
+    "image": "assets/devonian/props/bryozoan-colony.png",
+    "lengthMeters": 0.059891849756240845,
+    "looping": [],
+    "sources": [
+      "https://www.digitalatlasofancientlife.org/learn/bryozoa/",
+      "https://data.wgnhs.wisc.edu/pubshare/B021.pdf"
+    ],
+    "notes": [
+      "Original parametric mesh, no downloaded model.",
+      "1 glTF unit = 1 metre. Dimensions describe this art specimen, not a taxon maximum.",
+      "Pigmentation and soft appearance are artistic interpretations.",
+      "Locality tags constrain future placement; library membership does not assert co-occurrence.",
+      "Preview model: initial scenery delivery; further individual material, silhouette and motion refinement is pending."
+    ]
+  },
+  {
+    "id": "gastropod-shells",
+    "name": "Small gastropod shells",
+    "species": "biological-prop",
+    "category": "prop",
+    "modelStatus": "preview",
+    "provenance": "Devonian North American shelly fauna reference",
+    "description": "Two logarithmically coiled shells, broad low-spired and tall-spired, with open apertures. No uncertain living tissue.",
+    "model": "assets/devonian/props/gastropod-shells.glb",
+    "lod": "assets/devonian/props/gastropod-shells.lod1.glb",
+    "image": "assets/devonian/props/gastropod-shells.png",
+    "lengthMeters": 0.18403416872024536,
+    "looping": [],
+    "sources": [
+      "https://devonianatlas.org/species/"
+    ],
+    "notes": [
+      "Original parametric mesh, no downloaded model.",
+      "1 glTF unit = 1 metre. Dimensions describe this art specimen, not a taxon maximum.",
+      "Pigmentation and soft appearance are artistic interpretations.",
+      "Locality tags constrain future placement; library membership does not assert co-occurrence.",
+      "Preview model: initial scenery delivery; further individual material, silhouette and motion refinement is pending."
+    ]
+  },
+  {
+    "id": "small-bivalves",
+    "name": "Small bivalves",
+    "species": "biological-prop",
+    "category": "prop",
+    "modelStatus": "preview",
+    "provenance": "Devonian North American shelf reference",
+    "description": "Elongate paired left/right valves with growth sculpture and open empty-shell variant.",
+    "model": "assets/devonian/props/small-bivalves.glb",
+    "lod": "assets/devonian/props/small-bivalves.lod1.glb",
+    "image": "assets/devonian/props/small-bivalves.png",
+    "lengthMeters": 0.18359999358654022,
+    "looping": [],
+    "sources": [
+      "https://devonianatlas.org/species/"
+    ],
+    "notes": [
+      "Original parametric mesh, no downloaded model.",
+      "1 glTF unit = 1 metre. Dimensions describe this art specimen, not a taxon maximum.",
+      "Pigmentation and soft appearance are artistic interpretations.",
+      "Locality tags constrain future placement; library membership does not assert co-occurrence.",
+      "Preview model: initial scenery delivery; further individual material, silhouette and motion refinement is pending."
+    ]
+  },
+  {
+    "id": "rhynia",
+    "name": "Rhynia-type early vegetation",
+    "species": "plant",
+    "category": "prop",
+    "modelStatus": "preview",
+    "provenance": "Early Devonian Rhynie chert, Scotland",
+    "description": "Small leafless dichotomizing axes, creeping basal axis and terminal spindle-shaped sporangia. Not grass.",
+    "model": "assets/devonian/props/rhynia.glb",
+    "lod": "assets/devonian/props/rhynia.lod1.glb",
+    "image": "assets/devonian/props/rhynia.png",
+    "lengthMeters": 0.20573298633098602,
+    "looping": [
+      "Idle"
+    ],
+    "sources": [
+      "https://pmc.ncbi.nlm.nih.gov/articles/PMC5745331/"
+    ],
+    "notes": [
+      "Original parametric mesh, no downloaded model.",
+      "1 glTF unit = 1 metre. Dimensions describe this art specimen, not a taxon maximum.",
+      "Pigmentation and soft appearance are artistic interpretations.",
+      "Locality tags constrain future placement; library membership does not assert co-occurrence.",
+      "Preview model: initial scenery delivery; further individual material, silhouette and motion refinement is pending."
+    ]
+  },
+  {
+    "id": "rhynia-v2",
+    "name": "Rhynia-type early vegetation — variant 2",
+    "species": "plant",
+    "category": "prop",
+    "modelStatus": "preview",
+    "provenance": "Early Devonian Rhynie chert, Scotland",
+    "description": "Small leafless dichotomizing axes, creeping basal axis and terminal spindle-shaped sporangia. Not grass.",
+    "model": "assets/devonian/props/rhynia-v2.glb",
+    "lod": "assets/devonian/props/rhynia-v2.lod1.glb",
+    "image": "assets/devonian/props/rhynia-v2.png",
+    "lengthMeters": 0.20573298633098602,
+    "looping": [
+      "Idle"
+    ],
+    "sources": [
+      "https://pmc.ncbi.nlm.nih.gov/articles/PMC5745331/"
+    ],
+    "notes": [
+      "Original parametric mesh, no downloaded model.",
+      "1 glTF unit = 1 metre. Dimensions describe this art specimen, not a taxon maximum.",
+      "Pigmentation and soft appearance are artistic interpretations.",
+      "Locality tags constrain future placement; library membership does not assert co-occurrence.",
+      "Preview model: initial scenery delivery; further individual material, silhouette and motion refinement is pending."
+    ]
+  },
+  {
+    "id": "asteroxylon",
+    "name": "Asteroxylon",
+    "species": "plant",
+    "category": "prop",
+    "modelStatus": "preview",
+    "provenance": "Early Devonian Rhynie chert, Scotland",
+    "description": "Leafy shoot axes bear narrow appendages; separate root-bearing and downward rooting axes. Roots lacked modern root caps.",
+    "model": "assets/devonian/props/asteroxylon.glb",
+    "lod": "assets/devonian/props/asteroxylon.lod1.glb",
+    "image": "assets/devonian/props/asteroxylon.png",
+    "lengthMeters": 0.375704824924469,
+    "looping": [
+      "Idle"
+    ],
+    "sources": [
+      "https://pmc.ncbi.nlm.nih.gov/articles/PMC8384418/"
+    ],
+    "notes": [
+      "Original parametric mesh, no downloaded model.",
+      "1 glTF unit = 1 metre. Dimensions describe this art specimen, not a taxon maximum.",
+      "Pigmentation and soft appearance are artistic interpretations.",
+      "Locality tags constrain future placement; library membership does not assert co-occurrence.",
+      "Preview model: initial scenery delivery; further individual material, silhouette and motion refinement is pending."
+    ]
+  },
+  {
+    "id": "asteroxylon-v2",
+    "name": "Asteroxylon — variant 2",
+    "species": "plant",
+    "category": "prop",
+    "modelStatus": "preview",
+    "provenance": "Early Devonian Rhynie chert, Scotland",
+    "description": "Leafy shoot axes bear narrow appendages; separate root-bearing and downward rooting axes. Roots lacked modern root caps.",
+    "model": "assets/devonian/props/asteroxylon-v2.glb",
+    "lod": "assets/devonian/props/asteroxylon-v2.lod1.glb",
+    "image": "assets/devonian/props/asteroxylon-v2.png",
+    "lengthMeters": 0.375704824924469,
+    "looping": [
+      "Idle"
+    ],
+    "sources": [
+      "https://pmc.ncbi.nlm.nih.gov/articles/PMC8384418/"
+    ],
+    "notes": [
+      "Original parametric mesh, no downloaded model.",
+      "1 glTF unit = 1 metre. Dimensions describe this art specimen, not a taxon maximum.",
+      "Pigmentation and soft appearance are artistic interpretations.",
+      "Locality tags constrain future placement; library membership does not assert co-occurrence.",
+      "Preview model: initial scenery delivery; further individual material, silhouette and motion refinement is pending."
+    ]
+  },
+  {
+    "id": "cladoxylopsid-tree",
+    "name": "Cladoxylopsid tree",
+    "species": "plant",
+    "category": "prop",
+    "modelStatus": "preview",
+    "provenance": "Middle Devonian Gilboa, New York reference",
+    "description": "Bulbous trunk base, numerous small unbranched rootlets and a terminal crown of divided leafless branch systems.",
+    "model": "assets/devonian/props/cladoxylopsid-tree.glb",
+    "lod": "assets/devonian/props/cladoxylopsid-tree.lod1.glb",
+    "image": "assets/devonian/props/cladoxylopsid-tree.png",
+    "lengthMeters": 6.676202297210693,
+    "looping": [
+      "Idle"
+    ],
+    "sources": [
+      "https://pmc.ncbi.nlm.nih.gov/articles/PMC8409631/"
+    ],
+    "notes": [
+      "Original parametric mesh, no downloaded model.",
+      "1 glTF unit = 1 metre. Dimensions describe this art specimen, not a taxon maximum.",
+      "Pigmentation and soft appearance are artistic interpretations.",
+      "Locality tags constrain future placement; library membership does not assert co-occurrence.",
+      "Preview model: initial scenery delivery; further individual material, silhouette and motion refinement is pending."
+    ]
+  },
+  {
+    "id": "cladoxylopsid-tree-v2",
+    "name": "Cladoxylopsid tree — variant 2",
+    "species": "plant",
+    "category": "prop",
+    "modelStatus": "preview",
+    "provenance": "Middle Devonian Gilboa, New York reference",
+    "description": "Bulbous trunk base, numerous small unbranched rootlets and a terminal crown of divided leafless branch systems.",
+    "model": "assets/devonian/props/cladoxylopsid-tree-v2.glb",
+    "lod": "assets/devonian/props/cladoxylopsid-tree-v2.lod1.glb",
+    "image": "assets/devonian/props/cladoxylopsid-tree-v2.png",
+    "lengthMeters": 5.192468643188477,
+    "looping": [
+      "Idle"
+    ],
+    "sources": [
+      "https://pmc.ncbi.nlm.nih.gov/articles/PMC8409631/"
+    ],
+    "notes": [
+      "Original parametric mesh, no downloaded model.",
+      "1 glTF unit = 1 metre. Dimensions describe this art specimen, not a taxon maximum.",
+      "Pigmentation and soft appearance are artistic interpretations.",
+      "Locality tags constrain future placement; library membership does not assert co-occurrence.",
+      "Preview model: initial scenery delivery; further individual material, silhouette and motion refinement is pending."
+    ]
+  },
+  {
+    "id": "archaeopteris",
+    "name": "Archaeopteris",
+    "species": "plant",
+    "category": "prop",
+    "modelStatus": "preview",
+    "provenance": "Middle–Late Devonian forest reference, New York comparative roots",
+    "description": "Woody tapering trunk, hierarchical branching roots and lateral boughs bearing divided leafy axes with approximately 2 cm fan-shaped pinnules. Spore-bearing, no flowers.",
+    "model": "assets/devonian/props/archaeopteris.glb",
+    "lod": "assets/devonian/props/archaeopteris.lod1.glb",
+    "image": "assets/devonian/props/archaeopteris.png",
+    "lengthMeters": 7.754537105560303,
+    "looping": [
+      "Idle"
+    ],
+    "sources": [
+      "https://www.nature.com/articles/19516",
+      "https://pmc.ncbi.nlm.nih.gov/articles/PMC8409631/",
+      "https://orca.cardiff.ac.uk/id/eprint/10078/1/Berry%202000.pdf"
+    ],
+    "notes": [
+      "Original parametric mesh, no downloaded model.",
+      "1 glTF unit = 1 metre. Dimensions describe this art specimen, not a taxon maximum.",
+      "Pigmentation and soft appearance are artistic interpretations.",
+      "Locality tags constrain future placement; library membership does not assert co-occurrence.",
+      "Preview model: initial scenery delivery; further individual material, silhouette and motion refinement is pending."
+    ]
+  },
+  {
+    "id": "archaeopteris-v2",
+    "name": "Archaeopteris — variant 2",
+    "species": "plant",
+    "category": "prop",
+    "modelStatus": "preview",
+    "provenance": "Middle–Late Devonian forest reference, New York comparative roots",
+    "description": "Woody tapering trunk, hierarchical branching roots and lateral boughs bearing divided leafy axes with approximately 2 cm fan-shaped pinnules. Spore-bearing, no flowers.",
+    "model": "assets/devonian/props/archaeopteris-v2.glb",
+    "lod": "assets/devonian/props/archaeopteris-v2.lod1.glb",
+    "image": "assets/devonian/props/archaeopteris-v2.png",
+    "lengthMeters": 5.954842567443848,
+    "looping": [
+      "Idle"
+    ],
+    "sources": [
+      "https://www.nature.com/articles/19516",
+      "https://pmc.ncbi.nlm.nih.gov/articles/PMC8409631/",
+      "https://orca.cardiff.ac.uk/id/eprint/10078/1/Berry%202000.pdf"
+    ],
+    "notes": [
+      "Original parametric mesh, no downloaded model.",
+      "1 glTF unit = 1 metre. Dimensions describe this art specimen, not a taxon maximum.",
+      "Pigmentation and soft appearance are artistic interpretations.",
+      "Locality tags constrain future placement; library membership does not assert co-occurrence.",
+      "Preview model: initial scenery delivery; further individual material, silhouette and motion refinement is pending."
+    ]
+  },
+  {
+    "id": "marine-algae",
+    "name": "Marine algal thalli",
+    "species": "plant",
+    "category": "prop",
+    "modelStatus": "preview",
+    "provenance": "Late Devonian Waterloo Farm, South Africa comparative reference; not assigned to every marine scene",
+    "description": "Flattened dichotomous strap and rounded terminal thallus forms informed by marine algal remains. Attachment, three-dimensional posture and pigmentation remain inferred.",
+    "model": "assets/devonian/props/marine-algae.glb",
+    "lod": "assets/devonian/props/marine-algae.lod1.glb",
+    "image": "assets/devonian/props/marine-algae.png",
+    "lengthMeters": 0.21738462150096893,
+    "looping": [
+      "Idle"
+    ],
+    "sources": [
+      "https://doi.org/10.1016/0034-6667(95)00062-3"
+    ],
+    "notes": [
+      "Original parametric mesh, no downloaded model.",
+      "1 glTF unit = 1 metre. Dimensions describe this art specimen, not a taxon maximum.",
+      "Pigmentation and soft appearance are artistic interpretations.",
+      "Locality tags constrain future placement; library membership does not assert co-occurrence.",
+      "Preview model: initial scenery delivery; further individual material, silhouette and motion refinement is pending."
+    ]
+  },
+  {
+    "id": "marine-algae-v2",
+    "name": "Marine algal thalli — variant 2",
+    "species": "plant",
+    "category": "prop",
+    "modelStatus": "preview",
+    "provenance": "Late Devonian Waterloo Farm, South Africa comparative reference; not assigned to every marine scene",
+    "description": "Flattened dichotomous strap and rounded terminal thallus forms informed by marine algal remains. Attachment, three-dimensional posture and pigmentation remain inferred.",
+    "model": "assets/devonian/props/marine-algae-v2.glb",
+    "lod": "assets/devonian/props/marine-algae-v2.lod1.glb",
+    "image": "assets/devonian/props/marine-algae-v2.png",
+    "lengthMeters": 0.20645423233509064,
+    "looping": [
+      "Idle"
+    ],
+    "sources": [
+      "https://doi.org/10.1016/0034-6667(95)00062-3"
+    ],
+    "notes": [
+      "Original parametric mesh, no downloaded model.",
+      "1 glTF unit = 1 metre. Dimensions describe this art specimen, not a taxon maximum.",
+      "Pigmentation and soft appearance are artistic interpretations.",
+      "Locality tags constrain future placement; library membership does not assert co-occurrence.",
+      "Preview model: initial scenery delivery; further individual material, silhouette and motion refinement is pending."
+    ]
+  },
+  {
+    "id": "carbonate-outcrop",
+    "name": "Carbonate outcrop",
+    "species": "geology",
+    "category": "prop",
+    "modelStatus": "preview",
+    "provenance": "Carbonate shelf, regional mineral colouring configurable",
+    "description": "Irregular low and high weathered masses with natural relief and granular material.",
+    "model": "assets/devonian/props/carbonate-outcrop.glb",
+    "lod": "assets/devonian/props/carbonate-outcrop.lod1.glb",
+    "image": "assets/devonian/props/carbonate-outcrop.png",
+    "lengthMeters": 1.7594060897827148,
+    "looping": [],
+    "sources": [
+      "https://onlinelibrary.wiley.com/doi/full/10.1111/j.1475-4983.2011.01037.x"
+    ],
+    "notes": [
+      "Original parametric mesh, no downloaded model.",
+      "1 glTF unit = 1 metre. Dimensions describe this art specimen, not a taxon maximum.",
+      "Pigmentation and soft appearance are artistic interpretations.",
+      "Locality tags constrain future placement; library membership does not assert co-occurrence.",
+      "Preview model: initial scenery delivery; further individual material, silhouette and motion refinement is pending."
+    ]
+  },
+  {
+    "id": "carbonate-outcrop-v2",
+    "name": "Carbonate outcrop — variant 2",
+    "species": "geology",
+    "category": "prop",
+    "modelStatus": "preview",
+    "provenance": "Carbonate shelf, regional mineral colouring configurable",
+    "description": "Irregular low and high weathered masses with natural relief and granular material.",
+    "model": "assets/devonian/props/carbonate-outcrop-v2.glb",
+    "lod": "assets/devonian/props/carbonate-outcrop-v2.lod1.glb",
+    "image": "assets/devonian/props/carbonate-outcrop-v2.png",
+    "lengthMeters": 1.7571083307266235,
+    "looping": [],
+    "sources": [
+      "https://onlinelibrary.wiley.com/doi/full/10.1111/j.1475-4983.2011.01037.x"
+    ],
+    "notes": [
+      "Original parametric mesh, no downloaded model.",
+      "1 glTF unit = 1 metre. Dimensions describe this art specimen, not a taxon maximum.",
+      "Pigmentation and soft appearance are artistic interpretations.",
+      "Locality tags constrain future placement; library membership does not assert co-occurrence.",
+      "Preview model: initial scenery delivery; further individual material, silhouette and motion refinement is pending."
+    ]
+  },
+  {
+    "id": "reef-framework",
+    "name": "Reef framework",
+    "species": "geology",
+    "category": "prop",
+    "modelStatus": "preview",
+    "provenance": "Devonian stromatoporoid/coral reef context; locality not asserted",
+    "description": "Intergrown mounds and stepped carbonate ledges leave crevices and overhangs.",
+    "model": "assets/devonian/props/reef-framework.glb",
+    "lod": "assets/devonian/props/reef-framework.lod1.glb",
+    "image": "assets/devonian/props/reef-framework.png",
+    "lengthMeters": 1.4295740127563477,
+    "looping": [],
+    "sources": [
+      "https://onlinelibrary.wiley.com/doi/full/10.1111/j.1475-4983.2011.01037.x"
+    ],
+    "notes": [
+      "Original parametric mesh, no downloaded model.",
+      "1 glTF unit = 1 metre. Dimensions describe this art specimen, not a taxon maximum.",
+      "Pigmentation and soft appearance are artistic interpretations.",
+      "Locality tags constrain future placement; library membership does not assert co-occurrence.",
+      "Preview model: initial scenery delivery; further individual material, silhouette and motion refinement is pending."
+    ]
+  },
+  {
+    "id": "carbonate-rubble",
+    "name": "Carbonate rubble",
+    "species": "geology",
+    "category": "prop",
+    "modelStatus": "preview",
+    "provenance": "Marine carbonate substrate",
+    "description": "Assorted centimetre-scale irregular fragments, muted freshly exposed interiors.",
+    "model": "assets/devonian/props/carbonate-rubble.glb",
+    "lod": "assets/devonian/props/carbonate-rubble.lod1.glb",
+    "image": "assets/devonian/props/carbonate-rubble.png",
+    "lengthMeters": 0.7935388088226318,
+    "looping": [],
+    "sources": [
+      "https://onlinelibrary.wiley.com/doi/full/10.1111/j.1475-4983.2011.01037.x"
+    ],
+    "notes": [
+      "Original parametric mesh, no downloaded model.",
+      "1 glTF unit = 1 metre. Dimensions describe this art specimen, not a taxon maximum.",
+      "Pigmentation and soft appearance are artistic interpretations.",
+      "Locality tags constrain future placement; library membership does not assert co-occurrence.",
+      "Preview model: initial scenery delivery; further individual material, silhouette and motion refinement is pending."
+    ]
+  },
+  {
+    "id": "carbonate-rubble-v2",
+    "name": "Carbonate rubble — variant 2",
+    "species": "geology",
+    "category": "prop",
+    "modelStatus": "preview",
+    "provenance": "Marine carbonate substrate",
+    "description": "Assorted centimetre-scale irregular fragments, muted freshly exposed interiors.",
+    "model": "assets/devonian/props/carbonate-rubble-v2.glb",
+    "lod": "assets/devonian/props/carbonate-rubble-v2.lod1.glb",
+    "image": "assets/devonian/props/carbonate-rubble-v2.png",
+    "lengthMeters": 0.7757201790809631,
+    "looping": [],
+    "sources": [
+      "https://onlinelibrary.wiley.com/doi/full/10.1111/j.1475-4983.2011.01037.x"
+    ],
+    "notes": [
+      "Original parametric mesh, no downloaded model.",
+      "1 glTF unit = 1 metre. Dimensions describe this art specimen, not a taxon maximum.",
+      "Pigmentation and soft appearance are artistic interpretations.",
+      "Locality tags constrain future placement; library membership does not assert co-occurrence.",
+      "Preview model: initial scenery delivery; further individual material, silhouette and motion refinement is pending."
+    ]
+  },
+  {
+    "id": "fine-sediment-bed",
+    "name": "Fine sediment bed",
+    "species": "geology",
+    "category": "prop",
+    "modelStatus": "preview",
+    "provenance": "Marine or freshwater fine-bottom context",
+    "description": "Low broad sediment module with shallow ripples, smooth variant and tiny disturbed relief.",
+    "model": "assets/devonian/props/fine-sediment-bed.glb",
+    "lod": "assets/devonian/props/fine-sediment-bed.lod1.glb",
+    "image": "assets/devonian/props/fine-sediment-bed.png",
+    "lengthMeters": 2,
+    "looping": [],
+    "sources": [
+      "https://pmc.ncbi.nlm.nih.gov/articles/PMC8409631/"
+    ],
+    "notes": [
+      "Original parametric mesh, no downloaded model.",
+      "1 glTF unit = 1 metre. Dimensions describe this art specimen, not a taxon maximum.",
+      "Pigmentation and soft appearance are artistic interpretations.",
+      "Locality tags constrain future placement; library membership does not assert co-occurrence.",
+      "Preview model: initial scenery delivery; further individual material, silhouette and motion refinement is pending."
+    ]
+  },
+  {
+    "id": "fine-sediment-bed-v2",
+    "name": "Fine sediment bed — variant 2",
+    "species": "geology",
+    "category": "prop",
+    "modelStatus": "preview",
+    "provenance": "Marine or freshwater fine-bottom context",
+    "description": "Low broad sediment module with shallow ripples, smooth variant and tiny disturbed relief.",
+    "model": "assets/devonian/props/fine-sediment-bed-v2.glb",
+    "lod": "assets/devonian/props/fine-sediment-bed-v2.lod1.glb",
+    "image": "assets/devonian/props/fine-sediment-bed-v2.png",
+    "lengthMeters": 2,
+    "looping": [],
+    "sources": [
+      "https://pmc.ncbi.nlm.nih.gov/articles/PMC8409631/"
+    ],
+    "notes": [
+      "Original parametric mesh, no downloaded model.",
+      "1 glTF unit = 1 metre. Dimensions describe this art specimen, not a taxon maximum.",
+      "Pigmentation and soft appearance are artistic interpretations.",
+      "Locality tags constrain future placement; library membership does not assert co-occurrence.",
+      "Preview model: initial scenery delivery; further individual material, silhouette and motion refinement is pending."
+    ]
+  },
+  {
+    "id": "sand-pebble-bed",
+    "name": "Sand and pebble bed",
+    "species": "geology",
+    "category": "prop",
+    "modelStatus": "preview",
+    "provenance": "Shallow-water coarse/fine sediment transition",
+    "description": "Natural ripple relief and two pebble density mixes at centimetre scale.",
+    "model": "assets/devonian/props/sand-pebble-bed.glb",
+    "lod": "assets/devonian/props/sand-pebble-bed.lod1.glb",
+    "image": "assets/devonian/props/sand-pebble-bed.png",
+    "lengthMeters": 2,
+    "looping": [],
+    "sources": [
+      "https://pmc.ncbi.nlm.nih.gov/articles/PMC8409631/"
+    ],
+    "notes": [
+      "Original parametric mesh, no downloaded model.",
+      "1 glTF unit = 1 metre. Dimensions describe this art specimen, not a taxon maximum.",
+      "Pigmentation and soft appearance are artistic interpretations.",
+      "Locality tags constrain future placement; library membership does not assert co-occurrence.",
+      "Preview model: initial scenery delivery; further individual material, silhouette and motion refinement is pending."
+    ]
+  },
+  {
+    "id": "sand-pebble-bed-v2",
+    "name": "Sand and pebble bed — variant 2",
+    "species": "geology",
+    "category": "prop",
+    "modelStatus": "preview",
+    "provenance": "Shallow-water coarse/fine sediment transition",
+    "description": "Natural ripple relief and two pebble density mixes at centimetre scale.",
+    "model": "assets/devonian/props/sand-pebble-bed-v2.glb",
+    "lod": "assets/devonian/props/sand-pebble-bed-v2.lod1.glb",
+    "image": "assets/devonian/props/sand-pebble-bed-v2.png",
+    "lengthMeters": 2,
+    "looping": [],
+    "sources": [
+      "https://pmc.ncbi.nlm.nih.gov/articles/PMC8409631/"
+    ],
+    "notes": [
+      "Original parametric mesh, no downloaded model.",
+      "1 glTF unit = 1 metre. Dimensions describe this art specimen, not a taxon maximum.",
+      "Pigmentation and soft appearance are artistic interpretations.",
+      "Locality tags constrain future placement; library membership does not assert co-occurrence.",
+      "Preview model: initial scenery delivery; further individual material, silhouette and motion refinement is pending."
+    ]
+  },
+  {
+    "id": "eroded-bank",
+    "name": "Eroded bank",
+    "species": "geology",
+    "category": "prop",
+    "modelStatus": "preview",
+    "provenance": "Fluvial channel context, age-neutral geology",
+    "description": "Sloping eroded sediment face with layered staining and surface irregularity.",
+    "model": "assets/devonian/props/eroded-bank.glb",
+    "lod": "assets/devonian/props/eroded-bank.lod1.glb",
+    "image": "assets/devonian/props/eroded-bank.png",
+    "lengthMeters": 3,
+    "looping": [],
+    "sources": [
+      "https://pmc.ncbi.nlm.nih.gov/articles/PMC8409631/"
+    ],
+    "notes": [
+      "Original parametric mesh, no downloaded model.",
+      "1 glTF unit = 1 metre. Dimensions describe this art specimen, not a taxon maximum.",
+      "Pigmentation and soft appearance are artistic interpretations.",
+      "Locality tags constrain future placement; library membership does not assert co-occurrence.",
+      "Preview model: initial scenery delivery; further individual material, silhouette and motion refinement is pending."
+    ]
+  },
+  {
+    "id": "large-boulder",
+    "name": "Large boulder",
+    "species": "geology",
+    "category": "prop",
+    "modelStatus": "preview",
+    "provenance": "Regional lithology requires placement review",
+    "description": "Coherent uneven rock masses with muted silicate grain pigmentation.",
+    "model": "assets/devonian/props/large-boulder.glb",
+    "lod": "assets/devonian/props/large-boulder.lod1.glb",
+    "image": "assets/devonian/props/large-boulder.png",
+    "lengthMeters": 1.2133581638336182,
+    "looping": [],
+    "sources": [
+      "https://pmc.ncbi.nlm.nih.gov/articles/PMC8409631/"
+    ],
+    "notes": [
+      "Original parametric mesh, no downloaded model.",
+      "1 glTF unit = 1 metre. Dimensions describe this art specimen, not a taxon maximum.",
+      "Pigmentation and soft appearance are artistic interpretations.",
+      "Locality tags constrain future placement; library membership does not assert co-occurrence.",
+      "Preview model: initial scenery delivery; further individual material, silhouette and motion refinement is pending."
+    ]
+  },
+  {
+    "id": "large-boulder-v2",
+    "name": "Large boulder — variant 2",
+    "species": "geology",
+    "category": "prop",
+    "modelStatus": "preview",
+    "provenance": "Regional lithology requires placement review",
+    "description": "Coherent uneven rock masses with muted silicate grain pigmentation.",
+    "model": "assets/devonian/props/large-boulder-v2.glb",
+    "lod": "assets/devonian/props/large-boulder-v2.lod1.glb",
+    "image": "assets/devonian/props/large-boulder-v2.png",
+    "lengthMeters": 1.2133727073669434,
+    "looping": [],
+    "sources": [
+      "https://pmc.ncbi.nlm.nih.gov/articles/PMC8409631/"
+    ],
+    "notes": [
+      "Original parametric mesh, no downloaded model.",
+      "1 glTF unit = 1 metre. Dimensions describe this art specimen, not a taxon maximum.",
+      "Pigmentation and soft appearance are artistic interpretations.",
+      "Locality tags constrain future placement; library membership does not assert co-occurrence.",
+      "Preview model: initial scenery delivery; further individual material, silhouette and motion refinement is pending."
+    ]
+  },
+  {
+    "id": "shell-hash",
+    "name": "Shell hash",
+    "species": "biological-prop",
+    "category": "prop",
+    "modelStatus": "preview",
+    "provenance": "Shelly Devonian sediment context",
+    "description": "Broken ribbed brachiopod and bivalve valves derived from the same shell builders; real centimetre scale.",
+    "model": "assets/devonian/props/shell-hash.glb",
+    "lod": "assets/devonian/props/shell-hash.lod1.glb",
+    "image": "assets/devonian/props/shell-hash.png",
+    "lengthMeters": 0.31874990463256836,
+    "looping": [],
+    "sources": [
+      "https://devonianatlas.org/species/mucrospirifer-mucronatus/",
+      "https://devonianatlas.org/taxonomic-groups/brachiopods/"
+    ],
+    "notes": [
+      "Original parametric mesh, no downloaded model.",
+      "1 glTF unit = 1 metre. Dimensions describe this art specimen, not a taxon maximum.",
+      "Pigmentation and soft appearance are artistic interpretations.",
+      "Locality tags constrain future placement; library membership does not assert co-occurrence.",
+      "Preview model: initial scenery delivery; further individual material, silhouette and motion refinement is pending."
+    ]
+  },
+  {
+    "id": "crinoid-debris",
+    "name": "Crinoid debris",
+    "species": "biological-prop",
+    "category": "prop",
+    "modelStatus": "preview",
+    "provenance": "Crinoid-bearing Devonian sediment context",
+    "description": "Loose perforated columnals and short stacked stem fragments from the B08 anatomy.",
+    "model": "assets/devonian/props/crinoid-debris.glb",
+    "lod": "assets/devonian/props/crinoid-debris.lod1.glb",
+    "image": "assets/devonian/props/crinoid-debris.png",
+    "lengthMeters": 0.19730070233345032,
+    "looping": [],
+    "sources": [
+      "https://www.digitalatlasofancientlife.org/learn/echinodermata/crinoidea/",
+      "https://devonianatlas.org/species/"
+    ],
+    "notes": [
+      "Original parametric mesh, no downloaded model.",
+      "1 glTF unit = 1 metre. Dimensions describe this art specimen, not a taxon maximum.",
+      "Pigmentation and soft appearance are artistic interpretations.",
+      "Locality tags constrain future placement; library membership does not assert co-occurrence.",
+      "Preview model: initial scenery delivery; further individual material, silhouette and motion refinement is pending."
+    ]
+  },
+  {
+    "id": "submerged-log",
+    "name": "Submerged woody log",
+    "species": "organic-prop",
+    "category": "prop",
+    "modelStatus": "preview",
+    "provenance": "Later Devonian wooded waterway only",
+    "description": "Tapered woody trunk and branches with axial bark relief and ragged broken fibres.",
+    "model": "assets/devonian/props/submerged-log.glb",
+    "lod": "assets/devonian/props/submerged-log.lod1.glb",
+    "image": "assets/devonian/props/submerged-log.png",
+    "lengthMeters": 3.2552266120910645,
+    "looping": [],
+    "sources": [
+      "https://www.nature.com/articles/19516",
+      "https://pmc.ncbi.nlm.nih.gov/articles/PMC8409631/",
+      "https://orca.cardiff.ac.uk/id/eprint/10078/1/Berry%202000.pdf"
+    ],
+    "notes": [
+      "Original parametric mesh, no downloaded model.",
+      "1 glTF unit = 1 metre. Dimensions describe this art specimen, not a taxon maximum.",
+      "Pigmentation and soft appearance are artistic interpretations.",
+      "Locality tags constrain future placement; library membership does not assert co-occurrence.",
+      "Preview model: initial scenery delivery; further individual material, silhouette and motion refinement is pending."
+    ]
+  },
+  {
+    "id": "root-bearing-bank",
+    "name": "Root-bearing bank",
+    "species": "organic-prop",
+    "category": "prop",
+    "modelStatus": "preview",
+    "provenance": "Later Devonian wooded waterway only",
+    "description": "Hierarchical lateral roots embedded into a channel bank; no invented mangrove pneumatophores.",
+    "model": "assets/devonian/props/root-bearing-bank.glb",
+    "lod": "assets/devonian/props/root-bearing-bank.lod1.glb",
+    "image": "assets/devonian/props/root-bearing-bank.png",
+    "lengthMeters": 3.409656524658203,
+    "looping": [],
+    "sources": [
+      "https://www.nature.com/articles/19516",
+      "https://pmc.ncbi.nlm.nih.gov/articles/PMC8409631/",
+      "https://orca.cardiff.ac.uk/id/eprint/10078/1/Berry%202000.pdf"
+    ],
+    "notes": [
+      "Original parametric mesh, no downloaded model.",
+      "1 glTF unit = 1 metre. Dimensions describe this art specimen, not a taxon maximum.",
+      "Pigmentation and soft appearance are artistic interpretations.",
+      "Locality tags constrain future placement; library membership does not assert co-occurrence.",
+      "Preview model: initial scenery delivery; further individual material, silhouette and motion refinement is pending."
+    ]
+  },
+  {
+    "id": "organic-remains",
+    "name": "Disarticulated gnathal fragments",
+    "species": "organic-prop",
+    "category": "prop",
+    "modelStatus": "preview",
+    "provenance": "Late Devonian Cleveland Shale reference",
+    "description": "Four paired lower and posterior upper gnathal cutting fragments derived from the reviewed V2 Dunkleosteus asset at its representative scale. These interpreted fragments do not represent complete skeletal bones; no invented long bones or soft carcass.",
+    "model": "assets/devonian/props/organic-remains.glb",
+    "lod": "assets/devonian/props/organic-remains.lod1.glb",
+    "image": "assets/devonian/props/organic-remains.png",
+    "lengthMeters": 1.174147367477417,
+    "looping": [],
+    "sources": [
+      "https://www.palaeo-electronica.org/content/2024/5307-dunkleosteus-reconstruction",
+      "https://doi.org/10.3390/d15030318"
+    ],
+    "notes": [
+      "Original parametric mesh, no downloaded model.",
+      "1 glTF unit = 1 metre. Dimensions describe this art specimen, not a taxon maximum.",
+      "Pigmentation and soft appearance are artistic interpretations.",
+      "Locality tags constrain future placement; library membership does not assert co-occurrence.",
+      "Preview model: initial scenery delivery; further individual material, silhouette and motion refinement is pending."
+    ]
   }
 ]

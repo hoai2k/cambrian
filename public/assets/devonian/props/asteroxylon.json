@@ -1,0 +1,40 @@
+{
+  "id": "asteroxylon",
+  "family": "P02",
+  "name": "Asteroxylon",
+  "taxon": "Asteroxylon mackiei",
+  "category": "plant",
+  "description": "Leafy shoot axes bear narrow appendages; separate root-bearing and downward rooting axes. Roots lacked modern root caps.",
+  "provenance": "Early Devonian Rhynie chert, Scotland",
+  "model": "assets/devonian/props/asteroxylon.glb",
+  "lod": "assets/devonian/props/asteroxylon.lod1.glb",
+  "image": "assets/devonian/props/asteroxylon.png",
+  "lengthMeters": 0.375704824924469,
+  "dimensionsMeters": {
+    "x": 0.22127243876457214,
+    "y": 0.375704824924469,
+    "z": 0.1314232498407364
+  },
+  "clips": [
+    "Idle"
+  ],
+  "looping": [
+    "Idle"
+  ],
+  "sources": [
+    "https://pmc.ncbi.nlm.nih.gov/articles/PMC8384418/"
+  ],
+  "notes": [
+    "Original parametric mesh, no downloaded model.",
+    "1 glTF unit = 1 metre. Dimensions describe this art specimen, not a taxon maximum.",
+    "Pigmentation and soft appearance are artistic interpretations.",
+    "Locality tags constrain future placement; library membership does not assert co-occurrence.",
+    "Preview model: initial scenery delivery; further individual material, silhouette and motion refinement is pending."
+  ],
+  "fullTriangles": 19232,
+  "lodTriangles": 5768,
+  "lodRatio": 0.29991680532445925,
+  "sourceBlend": "../devonian-authoring/props/asteroxylon/asteroxylon.blend",
+  "uncertainty": "Three distinct axis types follow the 2021 reconstruction. Fine cellular/root-tip anatomy is below model resolution.",
+  "modelStatus": "preview"
+}

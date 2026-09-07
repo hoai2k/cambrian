@@ -11,15 +11,29 @@ and recorded. Do not block initial delivery on final-art perfection. Mark unfini
 **⚠ Preview model** on the game choice cards and viewer. The lifecycle source is
 `src/content/devonian/model-status.json`; the first nine are final, all other roster IDs preview.
 
-This batch delivers Onychodus, Rhinodipterus and Tiktaalik: **12/21 available, 9 final + 3 preview**.
-Their frozen source exports are in `<id>/v2-candidate`, package hashes and deferred work in each
-tracked `preview-delivery.json`. The pending local Onychodus palatal-pocket edit is NOT exported:
-tracked `build.py` matches the shipped GLB; do not run the local assembler without reviewing it.
-Rhinodipterus author now owns Jaekelopterus; Tiktaalik author now owns Acanthostega; Eldredgeops
-author is finishing its initial version and will start Walliserops. Parent owns integration,
-UI lifecycle and the 47 scenery prototypes / supporting images. No full-refinement loop should
-restart before the complete initial collection exists. The older detailed sections below retain
-useful evidence but their production order and numerical progress are superseded by this update.
+Current initial delivery: **15/21 creatures available, 9 final + 6 preview**, with 47 scenery
+previews and nine runtime biome paintings. The six previews are Onychodus, Rhinodipterus,
+Tiktaalik, Acanthostega, Eldredgeops and Jaekelopterus. Exact raw/packaged hashes are in each
+tracked `preview-delivery.json`. All 47 scenery full models loaded in the actual built viewer;
+full/LOD structural/scale/ambient checks passed. Raw/editable sources stay local.
+
+Agents now own Nahecaris (eye_audit), Palaeoisopus (titanichthys) and Walliserops (dunkleosteus,
+then Furcaster). Manticoceras and Michelinoceras still need independent authorship. Parent owns
+packaging, integration, scenery instancing and supporting images. Main was last pushed at
+4a4f54e (first three previews); this next batch is being integrated. Refresh Git for exact state.
+
+Outstanding non-creature initial work: dedicated cheap instanced exports / placement mappings,
+ten material source sets, nine regional E01–E09 boards, three lighting boards, particle/decal
+atlases and two scale-comparison plates. Runtime biome paintings are separate from the regional
+boards. First T01–T03 imagegen material calls are running; results/prompt are functions store
+keys material-{result,prompt}-<pale-carbonate,dark-carbonate,marine-mud> (copy outputs locally).
+Nine biome originals are safely in local/devonian-authoring/environment-images, tracked prompts
+in tools/devonian/environment-image-prompts.json; outputs public/assets/devonian/biomes.
+
+The pending local Onychodus palatal-pocket edit is NOT exported: tracked build.py matches the
+shipped GLB; do not run the local assembler without reviewing it. No full-refinement loop should
+restart before the complete initial collection exists. Older sections below retain useful evidence
+but their production order and numerical progress are superseded by this update.
 
 ## Scope and completion
 

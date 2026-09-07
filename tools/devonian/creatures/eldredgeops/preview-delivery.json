@@ -1,0 +1,19 @@
+{
+  "id": "eldredgeops",
+  "modelStatus": "preview",
+  "notes": "Basic eye, export, animation and anchor checks passed; further individual visual refinement follows initial library delivery. See README and WORKING_STATE for anatomical limitations.",
+  "models": {
+    "glb": {
+      "sourceSHA256": "145b07f864510197364b596dde99be9cfab81f7070a43dbe422eac573daaf1e2",
+      "packagedSHA256": "9fc187373801f3081965801af92277f642f36abfc5c2538a02b5200307a59ce0",
+      "bytes": 20673012,
+      "losslessDecodedRoundTrip": true
+    },
+    "lod1.glb": {
+      "sourceSHA256": "466ffd6395bbf12bd495d2ae098c143a03aa304561176bb6c15fbfdd908544b7",
+      "packagedSHA256": "aef017ea2768a46c95b89b788d40fcae562b5fba4cba766fe4224c78ce882f25",
+      "bytes": 5693652,
+      "losslessDecodedRoundTrip": true
+    }
+  }
+}

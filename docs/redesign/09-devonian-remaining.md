@@ -6,21 +6,19 @@ Status as of the last asset check (7 Sept 2026, initial-delivery priority update
 still open, in the order it is worth doing. Nothing here blocks play; each item removes a placeholder
 or a reuse of Cambrian material.
 
-## 1. Models still in production (9 of 21)
+## 1. Models still in production (6 of 21)
 
 Delivered: Dunkleosteus, Titanichthys, Coccosteus, Bothriolepis, Gemuendina, Doryaspis,
-Cladoselache, Stethacanthus, Cheirolepis; plus preview models Onychodus, Rhinodipterus and Tiktaalik (`tools/devonian/shipped.json`). Previews show a caution badge on choice cards. Everything else borrows a delivered
+Cladoselache, Stethacanthus, Cheirolepis; plus preview models Onychodus, Rhinodipterus, Tiktaalik, Acanthostega, Eldredgeops and Jaekelopterus (`tools/devonian/shipped.json`). Previews show a caution badge on choice cards. Everything else borrows a delivered
 body through `DEVONIAN_STAND_INS` in `src/content/devonian/index.ts`, recoloured with its own scheme:
 
 | Rung | Pending | Stands in as | Note |
 | --- | --- | --- | --- |
-| I | Eldredgeops, Walliserops | Bothriolepis | Trilobites read as a flat armoured crawler; `Moult` clip and enrolment pose missing. |
+| I | Walliserops | Bothriolepis | Trilobites read as a flat armoured crawler; `Moult` clip and enrolment pose missing. |
 | I | Nahecaris, Palaeoisopus | Bothriolepis | Arthropod silhouettes are the furthest from their stand-in. |
 | I | Furcaster | Gemuendina | Flat body works; five arms do not. |
 | I | Manticoceras | Doryaspis | The shell has no model of any kind yet; the jet reads as a fish swimming backward. |
 | II | Michelinoceras | Doryaspis | As Manticoceras; the rostrum vaguely suggests the cone. |
-| III | Acanthostega | Bothriolepis | Limbs and the beach crawl are the visible loss; the shore-reach mechanic works. |
-| III | Jaekelopterus | Bothriolepis | Ground creature; chelicerae grab has nothing to grab with. |
 
 When a batch lands: `git fetch origin main`, `node tools/update-asset-sizes.mjs`, delete the ids
 from `DEVONIAN_STAND_INS`, `npm run devonian` (it fails if a stand-in points at a pending model or a
@@ -29,7 +27,7 @@ the shared fallback card; nothing to do there until the renders arrive with the 
 
 ## 2. Scenery and biome plates (procedural stand-ins in place)
 
-Neither authored set has been delivered, so both are generated for now:
+The initial library now contains 47 authored scenery previews and nine imagegen biome paintings. All are available for integration and inspection. Dense in-game placements still use procedural geometry pending dedicated instanced exports:
 
 - **Scenery.** Seven Devonian flora kinds (`crinoid`, `stromatoporoid`, `tabulate`, `rugose`,
   `bryozoan`, `reed`, `log`) are placed by the era's own density table
@@ -40,9 +38,7 @@ Neither authored set has been delivered, so both are generated for now:
   point `assets.props` at them and map each kind to its prop the way `floraProps` maps the
   Cambrian sponges; the placement and physics stay. The nursery reed density is thick; halve it
   if low-quality framerate suffers.
-- **Biome plates.** `npm run devonian:plates` (`tools/devonian/biome-plates.mjs`) writes nine
-  soft procedural banners to `public/assets/devonian/biomes/`, which the era now points at.
-  Painted plates replace them file for file.
+- **Biome plates.** Nine individual naturalistic imagegen paintings now replace the procedural banners file for file in `public/assets/devonian/biomes/`. Prompts and source hashes are preserved. Further regional E01–E09 reference boards and material/atmosphere sources remain in production.
 
 ## 3. Per-creature specials (done)
 
