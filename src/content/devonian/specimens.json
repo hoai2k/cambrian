@@ -5,11 +5,11 @@
     "species": "Dunkleosteus terrelli",
     "category": "creature",
     "provenance": "Late Devonian (Famennian), Cleveland Shale, Ohio, USA",
-    "description": "Deep-bodied arthrodire with rigid cranial and thoracic armour, articulated gnathal cutting plates and a muscular posterior body.",
+    "description": "An armoured pelagic arthrodire with a short cranial wedge, articulated cutting jaws and a compact muscular trunk.",
     "model": "assets/devonian/creatures/dunkleosteus.glb",
     "lod": "assets/devonian/creatures/dunkleosteus.lod1.glb",
     "image": "assets/devonian/creatures/dunkleosteus.thumb.png",
-    "lengthMeters": 3.35,
+    "lengthMeters": 3.5,
     "looping": [
       "Idle",
       "Swim",
@@ -17,15 +17,15 @@
       "Eat"
     ],
     "sources": [
-      "https://www.palaeo-electronica.org/content/2024/5307-dunkleosteus-reconstruction",
+      "https://doi.org/10.26879/1343",
       "https://doi.org/10.3390/d15030318"
     ],
     "notes": [
-      "Original reconstruction informed by Engelman 2024, rather than a specimen scan.",
-      "Rear body, caudal outline, oral soft tissues and pigmentation remain interpretations.",
-      "Representative 3.35 m adult, not a genus maximum.",
-      "Growth is a relaxed maturation pose; no scale animation or moulting.",
-      "Armour boundaries are interpreted living plate outlines; detailed sutures should not be used as a research diagram."
+      "V2 reconstructs the profile from Engelman 2024 figures 3–4; not a specimen scan.",
+      "Rear-body proportions, caudal silhouette, living integument and oral soft tissues remain interpretations.",
+      "Representative 3.5 m adult, not a genus maximum.",
+      "PBR UV albedo, normal and roughness; independent vertex pigment bake for LOD.",
+      "Growth is maturation display, no scaling or moulting."
     ]
   },
   {
@@ -50,6 +50,11 @@
         "title": "Coatham et al. (2020), Was the Devonian placoderm Titanichthys a suspension feeder?",
         "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC7277245/",
         "doi": "10.1098/rsos.200272"
+      },
+      {
+        "title": "Boyle and Ryan (2017), New information on Titanichthys from the Cleveland Shale",
+        "url": "https://doi.org/10.1017/jpa.2016.136",
+        "doi": "10.1017/jpa.2016.136"
       }
     ],
     "notes": [
