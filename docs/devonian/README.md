@@ -1,5 +1,7 @@
 # Devonian specimen library
 
+Resume current work from [current-state.md](current-state.md). It supersedes older historical checkpoint assignments.
+
 The [natural-history brief](../redesign/07-devonian-design.md) defines the 21 mobile subjects and
 29 scenery families. This library supplies models, materials, portraits and articulated action
 clips for those subjects. Devonian Domination plays at `/devonian/` from the content pack in

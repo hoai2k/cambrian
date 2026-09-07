@@ -7,7 +7,7 @@ import type { Actor, Mode, WorldEvent } from '../types';
 import { BIOME_DANGER, biomeAt, groundHeight, sampleCurrent, shoreDistance, SHORE_WALL, SURFACE_Y } from '../world';
 import { bodyRadius } from '../actors';
 import { ADULT_STAGE, devActor, DOMINANT, HOLD_TO_WIN, PRIME_STAGE, RUNG_NAMES, STAGE_AT, STAGES, stageForScale, stageScale, stateFor, type DeadZone, type DevActor } from './state';
-import { beginAbility, camoDrain, installDevonianSpecials, stepAbility, stepGuardSpecial, useAbility, ySpecial } from './specials';
+import { camoDrain, installDevonianSpecials, stepAbility, stepGuardSpecial, useAbility, ySpecial } from './specials';
 import { botNursery, canBreach, sanctuary, spawnInCover, spawnProtect, spawnY, swim, wanderY } from './swim';
 
 /**
@@ -284,7 +284,7 @@ export const DEVONIAN_RULES: EraRules = {
   shoreReach(a) { return creature(a.creature).shoreReach ?? 0; },
   jet(a) { return !!creature(a.creature).shell; },
 
-  useAbility, beginAbility, stepAbility, camoDrain,
+  useAbility, stepAbility, camoDrain,
   swim, canBreach, spawnY, wanderY,
   spawnPoint: spawnInCover, botNursery, spawnProtect, sanctuary,
 

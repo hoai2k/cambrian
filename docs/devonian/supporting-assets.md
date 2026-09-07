@@ -51,5 +51,5 @@ The L01/L02 lighting concepts currently show the old Titanichthys/Coccosteus mod
 and relevant scale projections, after their user-requested complete reworks. Creature eye/general
 audits also follow those completed reworks; do not repeatedly audit geometry queued for replacement.
 
-The user requested a separate notification once **all** initial non-creature sets reach main.
-Do not send that notification until the scale plates are finished and every row is committed and pushed.
+Every initial set above is committed and pushed to main in **f7b5618**. The user received the
+requested separate non-creature completion notification. Subsequent refinements remain pending.

@@ -142,3 +142,10 @@ Do not report that milestone for only the 47 scenery models or nine runtime pain
 includes the promised remaining material sets, regional and lighting boards, particle/decal atlases,
 scale-comparison plates and initial runtime scenery integration. Check the library inventory and
 Git state first. Continued refinement may follow that initial-delivery notification.
+
+## Related Cambrian rework
+
+Odaraia was also reopened by the user on 7 September. See
+[the Cambrian queue](../cambrian/refinement-queue.md). Its named backup, translucent wrapping
+carapace and distinct limb/eye/tail requirements are separate from the Devonian roster.
+It follows the same individual authoring, preview and post-rework audit workflow.
