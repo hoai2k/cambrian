@@ -331,8 +331,11 @@ Everything is still procedural (seeded), so it costs no new art.
   instancing and shaders are reused as-is.
 - **Landmarks** (a few hand-placed by seed): a sponge archway, a boulder
   stack you can hop, a dead Giant's carcass that is a temporary feast and a
-  predator magnet. *(Not built. Scenery in the streamed world is entirely
-  procedural; the escarpment is the landmark you navigate by.)*
+  predator magnet. *(Built, and procedural rather than hand-placed: one candidate
+  per 320-unit cell, drawn from the seed and gated on the biome, so they are
+  spread out and rare without anybody placing them. All three exist —
+  `landmarkAt()` in `src/sim/world.ts` — and the carcass really is both a feast
+  and a magnet. See* [the endless sea](04-infinite-ocean.md#landmarks).*)*
 - **Time and light**: a slow day cycle (20 min) that changes caustic intensity
   and Giant activity (they hunt more at dusk). Optional; ships after core.
   *(Not built.)*
@@ -352,12 +355,13 @@ population.
 Bots (the current "nearest enemy" bots become the needs-based AI above) fill
 every mode, so nothing requires a second controller.
 
-> **As built.** All four modes ship (`updateModes()` in `src/sim/game.ts`).
-> Three details of this table did not: co-op **revive by bumping a downed ally**
-> (co-op does share nutrition from a nearby kill, which is the other half of the
-> paragraph), **spectating** for a dead player in versus, and **rotating** who
-> plays the giant in Hunter & Hunted — player 1 holds the role for the match,
-> which runs to six minutes.
+> **As built.** All four modes ship (`updateModes()` in `src/sim/game.ts`), and
+> so do co-op's shared nutrition and its **revive**: a downed ally stays down for
+> ten seconds (when a team-mate was near enough to matter) and a touch brings
+> them back with their tier intact. **Spectating** works too — a dead player in
+> versus watches whoever is leading. One detail of this table did not ship:
+> **rotating** who plays the giant in Hunter & Hunted. Player 1 holds the role
+> for the match, which runs to six minutes.
 
 ## Local multiplayer specifics
 
@@ -373,7 +377,8 @@ every mode, so nothing requires a second controller.
   Rival amber, Threat orange, Giant red) is also encoded as an outline width
   and a HUD marker shape, so it reads at 480 px wide.
 - **Spectating**: a dead player in versus gets a free camera following the
-  leader until respawn. *(Not built.)*
+  leader until respawn. *(Built. Versus only: in co-op the camera stays on your
+  own body, because a team-mate may be on the way to it.)*
 
 ## Readability, HUD and feedback
 

@@ -9,7 +9,7 @@ import { bandOf, isAlive, isHidden, lengthOf } from '../sim/actors';
 import { creature, type CreatureId } from '../sim/creatures';
 import { Game, type TeleportDest } from '../sim/game';
 import { BAND_COLOR, emptyInput, TIER_NAMES, TIER_NEED, type Actor, type Band, type InputFrame, type Mode, type PlayerSetup } from '../sim/types';
-import { BIOME_NAMES, biomeAt, groundHeight, nurseryAt, resolveStatic, SURFACE_Y, type Boulder } from '../sim/world';
+import { BIOME_NAMES, biomeAt, groundHeight, nurseryAt, resolveStatic, SURFACE_Y, type Biome, type Boulder, type LandmarkKind } from '../sim/world';
 import { AssetQueue, type AssetProgress } from './assets';
 import { CreatureView, ensureLoaded, loadedSync, type Lod } from './creature';
 import { Attachments } from './attachments';
@@ -28,6 +28,14 @@ export interface PlayerHud {
   aim?: { hasTarget: boolean; inRange: boolean; name?: string; color: string; ready: boolean };
   hunted: number; hunterAngle: number | null; hunterName?: string; hunterState: 'none' | 'noticed' | 'hunting'; inCover: boolean; still: boolean;
   hint?: string; respawnIn: number; fade: number; state: string; modelReady: boolean; kills: number; eats: number; escapes: number; protect: boolean;
+  /**
+   * Co-op: seconds left for a team-mate to reach this downed player, and the downed team-mates
+   * this player could go and pick up (with the direction to swim, in radar space).
+   */
+  downedFor: number;
+  downedAllies: { index: number; name: string; color: string; seconds: number; distance: number; x: number; y: number }[];
+  /** Versus: whose viewport this one is borrowing while dead. */
+  spectating?: { index: number; name: string; color: string; creature: CreatureId };
   bandMarkers: { x: number; y: number; band: Band; size: number }[];
   /** Dominant biome under the player. */
   biome: string;
@@ -38,9 +46,11 @@ export interface PlayerHud {
   /** The era's own meters (Devonian standing, air, range), when the era defines them. */
   era?: EraHud;
 }
-export interface RadarBlipHud { x: number; y: number; kind: 'player' | 'threat' | 'giant' | 'home' | 'shore' | 'deadzone'; color: string; beyond: boolean; hunting: boolean; distance: number; /** Radius in radar units, for area contacts. */ r?: number; }
+export interface RadarBlipHud { x: number; y: number; kind: 'player' | 'threat' | 'giant' | 'home' | 'shore' | 'deadzone' | 'landmark'; color: string; beyond: boolean; hunting: boolean; distance: number; /** Radius in radar units, for area contacts. */ r?: number; }
 export interface HudSnapshot {
   players: PlayerHud[]; rects: Rect[]; time: number; status: 'playing' | 'won' | 'lost'; message: string; mode: Mode; winner: number; fps: number;
+  /** What this match turned up, for the results screen's record. */
+  discovery: { biomes: Biome[]; landmarks: LandmarkKind[]; apex: CreatureId[] };
 }
 export interface EngineCallbacks {
   onHud(s: HudSnapshot): void;
@@ -457,7 +467,29 @@ export class Engine {
     return out.set(t.x + (a.pos.x - t.x) * k, t.y + (a.pos.y - t.y) * k, t.z + (a.pos.z - t.z) * k);
   }
 
-  private updateCamera(cs: CamState, p: Actor, dt: number) {
+  /**
+   * Who a dead player's camera follows. Only in the versus modes, where there is a race to watch,
+   * and never when you are inside something — being eaten is its own shot. The leader is whoever
+   * is furthest along, so the viewport shows the thing you are about to respawn behind.
+   */
+  private spectatorTarget(game: Game, i: number): Actor | undefined {
+    const p = game.players[i];
+    if (!p || p.state !== 'dead' || p.swallowedBy >= 0) return undefined;
+    if (game.mode === 'rise' || game.mode === 'reef') return undefined;      // co-op: stay on your own body to be revived
+    let best: Actor | undefined, score = -Infinity;
+    for (const a of game.actors) {
+      if (a === p || a.player < 0 || !isAlive(a)) continue;
+      if (a.controller !== 'player' && a.controller !== 'bot') continue;
+      const s = a.tier + a.nutrition / Math.max(1, TIER_NEED[a.tier]);
+      if (s > score) { score = s; best = a; }
+    }
+    return best;
+  }
+
+  private updateCamera(cs: CamState, p0: Actor, dt: number) {
+    // While spectating, everything below frames the watched player instead. The dead player's own
+    // camera state (yaw, zoom, shake) is reused, so the handover is a cut, not a new rig.
+    const p = this.spectatorTarget(this.game!, p0.player) ?? p0;
     const L = lengthOf(p);
     // Follow where the creature is drawn, not where the simulation last put it.
     const pp = this.renderPos(p, this.tmpPos);
@@ -479,9 +511,11 @@ export class Engine {
       ? this.renderPos(pred, this.tmpLook).setY(this.tmpLook.y + lengthOf(pred) * 0.1)
       : this.tmpLook.set(pp.x, pp.y + L * 0.15, pp.z);
     if (pred) dist = magnificationDistance(lengthOf(pred)) * cs.zoom * 0.85;
-    // Fade to black just before the respawn, and in again just after.
-    const dying = p.state === 'dead' || p.state === 'swallowed';
-    const fadeTarget = dying && (p.state === 'dead' ? p.respawnT : p.stateT) > (p.state === 'dead' ? 2.6 : 99) ? 1 : 0;
+    // Fade to black just before the respawn, and in again just after. Always the real player's
+    // own death, never the spectated one's: this viewport's owner is the one coming back.
+    const dying = p0.state === 'dead' || p0.state === 'swallowed';
+    const respawnAt = this.game!.reviveWindow(p0) ? Infinity : 2.6;   // a downed player waiting on an ally never fades out
+    const fadeTarget = dying && (p0.state === 'dead' ? p0.respawnT : p0.stateT) > (p0.state === 'dead' ? respawnAt : 99) ? 1 : 0;
     cs.fade = damp(cs.fade, fadeTarget, fadeTarget > cs.fade ? 6 : 4, dt);
     if (locked && target) {
       const tp = this.renderPos(target, this.tmpPred);
@@ -796,7 +830,7 @@ export class Engine {
           const l = Math.hypot(x, y);
           const beyond = l > 1;
           if (beyond) { x /= l; y /= l; }
-          const color = b.kind === 'player' ? PLAYER_COLORS[b.id % 4] : b.kind === 'giant' ? BAND_COLOR.giant : b.kind === 'threat' ? BAND_COLOR.threat : b.kind === 'home' ? '#9be9ff' : '#d9cfa4';
+          const color = b.kind === 'player' ? PLAYER_COLORS[b.id % 4] : b.kind === 'giant' ? BAND_COLOR.giant : b.kind === 'threat' ? BAND_COLOR.threat : b.kind === 'home' ? '#9be9ff' : b.kind === 'landmark' ? '#ffd9a0' : '#d9cfa4';
           blips.push({ x, y, kind: b.kind, color, beyond, hunting: b.hunting, distance: b.distance });
         }
         // Dead zones are areas, not contacts: drawn as rings, clamped to the rim like anything else.
@@ -809,6 +843,22 @@ export class Engine {
         }
       }
       const tele = cs?.tele.open ? { options: game.teleportOptions(i).map((o) => ({ label: o.label, detail: o.detail, distance: o.distance, dest: o.dest })), index: cs.tele.index, cooldown: p.teleportCd } : undefined;
+      // Co-op: team-mates on the floor waiting to be picked up, as a bearing this player can follow.
+      const downed: PlayerHud['downedAllies'] = [];
+      if (cs) for (let j = 0; j < game.players.length; j++) {
+        const o = game.players[j];
+        if (j === i || !o || o.state !== 'dead') continue;
+        const seconds = game.reviveWindow(o);
+        if (seconds <= 0) continue;
+        const dx = o.pos.x - p.pos.x, dz = o.pos.z - p.pos.z;
+        const sy = Math.sin(cs.yaw), cy = Math.cos(cs.yaw);
+        const f = dx * sy + dz * cy, r = -dx * cy + dz * sy;
+        const l = Math.max(1e-3, Math.hypot(f, r));
+        downed.push({ index: j, name: creature(o.creature).name, color: PLAYER_COLORS[j % 4], seconds, distance: Math.hypot(dx, dz), x: r / l, y: -f / l });
+      }
+      // Versus: a dead player watches the leader rather than their own sinking body.
+      const watched = this.spectatorTarget(game, i);
+      const spectate = watched ? { index: watched.player, name: `P${watched.player + 1}`, color: PLAYER_COLORS[watched.player % 4], creature: watched.creature } : undefined;
       let aim: PlayerHud['aim'];
       if (p.aiming && cs) {
         const t = lockA && isAlive(lockA) ? lockA : undefined;
@@ -823,12 +873,16 @@ export class Engine {
         lock: lockA && isAlive(lockA) ? { name: creature(lockA.creature).name, band: bandOf(p, lockA), hp: lockA.hp / lockA.hpMax, color: BAND_COLOR[bandOf(p, lockA)] } : undefined,
         hunted: p.hunted, hunterAngle, hunterName: hunter ? creature(hunter.creature).name : undefined,
         hunterState: p.hunted >= 0.5 ? 'hunting' : p.hunted > 0.2 ? 'noticed' : 'none', inCover: p.cover > 0.3, still: Math.hypot(p.vel.x, p.vel.y, p.vel.z) < 0.3,
-        hint: game.hintFor(i), respawnIn: p.state === 'dead' ? Math.max(0, 3 - p.respawnT) : 0, fade: cs?.fade ?? 0, state: p.state, modelReady: !!loadedSync(p.creature),
+        hint: game.hintFor(i), respawnIn: p.state === 'dead' ? Math.max(0, (game.reviveWindow(p) || 3) - (game.reviveWindow(p) ? 0 : p.respawnT)) : 0, fade: cs?.fade ?? 0, state: p.state, modelReady: !!loadedSync(p.creature),
+        downedFor: game.reviveWindow(p), downedAllies: downed, spectating: spectate,
         kills: p.kills, eats: p.eats, escapes: p.escapes, protect: p.spawnProtect > 0, bandMarkers: markers.slice(0, 24),
         biome: BIOME_NAMES[game.biomeOf(i) ?? 'shelf'], radar: { range: radarRange, blips }, teleport: tele, era,
       };
     });
-    return { players, rects, time: game.time, status: game.state.status, message: game.state.message, mode: game.mode, winner: game.state.winner, fps: this.fps };
+    return {
+      players, rects, time: game.time, status: game.state.status, message: game.state.message, mode: game.mode, winner: game.state.winner, fps: this.fps,
+      discovery: { biomes: [...game.discovery.biomes], landmarks: [...game.discovery.landmarks], apex: [...game.discovery.apex] },
+    };
   }
 
   /** Live render/sim counters, for profiling. */

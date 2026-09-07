@@ -3,7 +3,7 @@ import { Game } from '../src/sim/game';
 import { emptyInput, type InputFrame } from '../src/sim/types';
 import { isAlive, lengthOf } from '../src/sim/actors';
 import { distXZ } from '../src/shared/math';
-import { BIOMES, biomeAt, biomeWeights, CHUNK, chunkCoord, generateChunk, nurseryAt, sampleHeight, shoreDistance, shoreZ, SIM_RADIUS, SURFACE_Y, type Biome } from '../src/sim/world';
+import { BIOMES, biomeAt, biomeWeights, CHUNK, chunkCoord, generateChunk, landmarkAt, landmarkCell, LANDMARK_CELL, nurseryAt, resolveStatic, sampleHeight, shoreDistance, shoreZ, SIM_RADIUS, SURFACE_Y, type Biome, type Boulder, type LandmarkKind } from '../src/sim/world';
 
 let failed = 0;
 const check = (n: string, ok: boolean, d: string) => { console.log(`${ok ? 'PASS' : 'FAIL'}  ${n.padEnd(56)} ${d}`); if (!ok) failed++; };
@@ -136,6 +136,142 @@ const run = (g: Game, f: InputFrame, steps: number) => { const m = new Map([[0, 
   run(g, emptyInput(), 60 * 4);
   check('a dead player respawns', isAlive(a), `state=${a.state}`);
   check('...in a nursery near the other player', distXZ(a.pos, b.pos) < 400 && distXZ(a.pos, a.home) < 12, `d(other)=${distXZ(a.pos, b.pos).toFixed(0)} d(home)=${distXZ(a.pos, a.home).toFixed(1)} home=(${a.home.x.toFixed(0)},${a.home.z.toFixed(0)})`);
+}
+
+
+// --- landmarks: seeded, sparse, owned by one chunk, and built as structures ---
+{
+  const seed = 33;
+  const kinds = new Map<LandmarkKind, number>();
+  let cells = 0, placed = 0;
+  for (let lx = -14; lx <= 14; lx++) for (let lz = -14; lz <= 1; lz++) {
+    cells++;
+    const m = landmarkAt(seed, lx, lz);
+    if (!m) continue;
+    placed++;
+    kinds.set(m.kind, (kinds.get(m.kind) ?? 0) + 1);
+  }
+  check('landmarks are sparse, not everywhere', placed > cells * 0.2 && placed < cells * 0.6, `${placed}/${cells} cells`);
+  check('all three kinds occur', kinds.size === 3, [...kinds].map(([k, n]) => `${k}:${n}`).join(' '));
+
+  // the same cell always yields the same landmark, whatever order it is asked for in
+  const one = landmarkAt(seed, 3, -9), two = landmarkAt(seed, 3, -9);
+  check('landmark placement is deterministic', JSON.stringify(one) === JSON.stringify(two), one ? one.kind : 'empty cell');
+  check('a different seed moves them', JSON.stringify(landmarkAt(seed + 1, 3, -9)) !== JSON.stringify(one), '');
+
+  // find one and check the chunk that contains it is the only one that builds it
+  let found: ReturnType<typeof landmarkAt>;
+  for (let lz = -14; lz < 0 && !found; lz++) for (let lx = -14; lx <= 14 && !found; lx++) { const m = landmarkAt(seed, lx, lz); if (m && m.kind === 'arch') found = m; }
+  check('the sea has an arch in it somewhere', !!found, found ? `at (${found.pos.x.toFixed(0)},${found.pos.z.toFixed(0)})` : 'none found');
+  if (found) {
+    const cx = chunkCoord(found.pos.x), cz = chunkCoord(found.pos.z);
+    const own = generateChunk(seed, cx, cz);
+    check('one chunk owns it', own.landmarks.length === 1 && own.landmarks[0].kind === 'arch', `${own.landmarks.length} here`);
+    let neighbours = 0;
+    for (let dx = -1; dx <= 1; dx++) for (let dz = -1; dz <= 1; dz++) if (dx || dz) neighbours += generateChunk(seed, cx + dx, cz + dz).landmarks.length;
+    check('...and no neighbour builds it again', neighbours === 0, `${neighbours} duplicates`);
+    check('the far view keeps its silhouette', generateChunk(seed, cx, cz, 'far').landmarks.length === 1, '');
+    const raised = own.boulders.filter((b) => b.floor !== undefined);
+    check('the arch has a span you can pass under', raised.length >= 3, `${raised.length} raised pieces`);
+    // the span must not block a creature swimming through at seabed level
+    const scratch: Boulder[] = [];
+    const world = { boulderHash: { query: (_x: number, _z: number, _r: number, out: Boulder[]) => { out.length = 0; for (const b of own.boulders) out.push(b); return out; } } };
+    const at = { x: found.pos.x, y: sampleHeight(found.pos.x, found.pos.z) + 1, z: found.pos.z };
+    const before = { ...at };
+    resolveStatic(world as never, at, 0.4, scratch);
+    check('...and the gap is actually open at the floor', Math.hypot(at.x - before.x, at.z - before.z) < 1e-6, `pushed ${Math.hypot(at.x - before.x, at.z - before.z).toFixed(2)}`);
+  }
+
+  // landmark cells are coarser than chunks, so a landmark is a landmark and not scenery
+  check('landmarks are spread on their own coarse grid', LANDMARK_CELL >= CHUNK * 4 && landmarkCell(LANDMARK_CELL * 2 + 1) === 2, `cell=${LANDMARK_CELL}`);
+}
+
+// --- the carcass: a feast that runs out, and shows up on the radar ---
+{
+  const seed = 33;
+  let carcass: ReturnType<typeof landmarkAt>;
+  for (let lz = -14; lz < 0 && !carcass; lz++) for (let lx = -14; lx <= 14 && !carcass; lx++) { const m = landmarkAt(seed, lx, lz); if (m && m.kind === 'carcass') carcass = m; }
+  if (!carcass) { check('the deep has a carcass in it', false, 'none found'); }
+  else {
+    const g = new Game('reef', [{ creature: 'anomalocaris', device: 'keyboard', ready: true }], seed);
+    const a = g.players[0];
+    a.pos = { x: carcass.pos.x, y: sampleHeight(carcass.pos.x, carcass.pos.z) + 2, z: carcass.pos.z };
+    g.world.loadAround(a.pos);
+    check('the carcass is in the loaded world', g.world.landmarks.some((m) => m.kind === 'carcass'), `${g.world.landmarks.length} landmarks loaded`);
+    check('...and on the radar as a landmark', g.radarFor(0, 200).some((r) => r.kind === 'landmark'), '');
+    const before = a.nutrition + a.tier * 1000;
+    run(g, emptyInput(), 60 * 3);
+    const after = g.players[0].nutrition + g.players[0].tier * 1000;
+    check('feeding at a carcass grows you', after > before, `+${(after - before).toFixed(0)}`);
+    check('...and strips it', g.carcassMeatLeft(carcass.id) < 0.9, `${(g.carcassMeatLeft(carcass.id) * 100).toFixed(0)}% left`);
+    check('the visit is recorded', g.discovery.landmarks.has('carcass'), [...g.discovery.landmarks].join(','));
+  }
+}
+
+// --- co-op revive: a team-mate close enough gets you up; alone, you respawn ---
+{
+  const mk = () => {
+    const g = new Game('rise', [{ creature: 'waptia', device: 'keyboard', ready: true }, { creature: 'marrella', device: 'keyboard2', ready: true }], 7);
+    const [a, b] = g.players;
+    b.spawnProtect = 99; a.spawnProtect = 0;
+    return { g, a, b };
+  };
+  // team-mate in reach but not yet there: the window opens and holds them past the usual three
+  // seconds; then the team-mate arrives and the touch brings them back with their tier intact
+  {
+    const { g, a, b } = mk();
+    a.tier = 2; a.hp = 0; a.state = 'dead'; a.deathY = a.pos.y; a.vel = { x: 0, y: 0, z: 0 };
+    b.pos = { x: a.pos.x + 40, y: a.pos.y, z: a.pos.z };
+    const down = { ...a.pos };
+    run(g, emptyInput(), 6);
+    check('a downed team-mate is revivable', g.reviveWindow(a) > 0, `${g.reviveWindow(a).toFixed(1)} s left`);
+    run(g, emptyInput(), 60 * 4);
+    check('...and is still down after the normal respawn would have fired', !isAlive(a) && a.respawnT > 3, `t=${a.respawnT.toFixed(1)} state=${a.state}`);
+    // The body must still be where it fell: a corpse drifts up with the current, and a downed
+    // player who did that would float out of reach of the ally swimming down to them.
+    check('...and has not drifted away while waiting', distXZ(a.pos, down) < 3 && Math.abs(a.pos.y - down.y) < 3, `drift=${distXZ(a.pos, down).toFixed(2)} dy=${(a.pos.y - down.y).toFixed(2)}`);
+    b.pos = { ...down };
+    run(g, emptyInput(), 4);
+    check('...and a team-mate reaching them gets them up', isAlive(a), `state=${a.state}`);
+    check('...keeping the tier they had', a.tier === 2, `tier=${a.tier}`);
+    check('...with the death timer cleared', a.respawnT === 0, `t=${a.respawnT.toFixed(2)}`);
+  }
+  // nobody near: no window, and the ordinary three-second respawn with its tier loss
+  {
+    const { g, a, b } = mk();
+    a.tier = 2; a.hp = 0; a.state = 'dead'; a.deathY = a.pos.y;
+    b.pos = { x: a.pos.x + 600, y: a.pos.y, z: a.pos.z };
+    run(g, emptyInput(), 6);
+    check('nobody in reach means no revive window', g.reviveWindow(a) === 0, '');
+    run(g, emptyInput(), 60 * 4);
+    check('...so they respawn as usual', isAlive(a), `state=${a.state}`);
+    check('...and pay a tier for it', a.tier === 1, `tier=${a.tier}`);
+  }
+  // versus never opens the window
+  {
+    const g = new Game('frenzy', [{ creature: 'waptia', device: 'keyboard', ready: true }, { creature: 'marrella', device: 'keyboard2', ready: true }], 7);
+    const [a, b] = g.players;
+    a.hp = 0; a.state = 'dead'; a.deathY = a.pos.y; a.spawnProtect = 0;
+    b.pos = { x: a.pos.x + 1.5, y: a.pos.y, z: a.pos.z }; b.spawnProtect = 99;
+    run(g, emptyInput(), 6);
+    check('versus has no revive', g.reviveWindow(a) === 0, `mode=${g.mode}`);
+  }
+}
+
+// --- discovery: biomes and Apex species are recorded as they happen ---
+{
+  const g = new Game('reef', [{ creature: 'anomalocaris', device: 'keyboard', ready: true }], 5);
+  const a = g.players[0];
+  run(g, emptyInput(), 4);
+  check('the starting biome is recorded', g.discovery.biomes.size > 0, [...g.discovery.biomes].join(','));
+  const deepZ = shoreZ(0) - 1200;
+  a.pos = { x: 0, y: 4, z: deepZ }; g.world.loadAround(a.pos);
+  run(g, emptyInput(), 4);
+  check('...and so is a biome swum to later', g.discovery.biomes.has(biomeAt(0, deepZ)), [...g.discovery.biomes].join(','));
+  check('nothing is at Apex yet', g.discovery.apex.size === 0, '');
+  a.tier = 4;
+  run(g, emptyInput(), 4);
+  check('reaching Apex records the species', g.discovery.apex.has('anomalocaris'), [...g.discovery.apex].join(','));
 }
 
 console.log(failed ? `\n${failed} FAILED` : '\nall world tests passed');

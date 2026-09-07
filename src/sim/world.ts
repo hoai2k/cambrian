@@ -28,7 +28,17 @@ export type FloraKind = 'vauxia' | 'sac' | 'choia' | 'thalli' | 'tuft' | 'cushio
 /** Driftwood only washes out this far from the shore. */
 export const LOG_SHORE_RANGE = 120;
 
-export interface Boulder { variant?: 'blade-spire' | 'talus-shard'; pos: Vec3; radius: number; height: number; sx: number; sy: number; sz: number; rot: number; shade: number; }
+export interface Boulder {
+  variant?: 'blade-spire' | 'talus-shard'; pos: Vec3; radius: number; height: number;
+  sx: number; sy: number; sz: number; rot: number; shade: number;
+  /**
+   * Collision floor. A rock sitting on the seabed has none and blocks everything below its top;
+   * a landmark's raised span (an arch's lintel, a carcass rib) sets this so a creature swims
+   * *under* it and only bumps into it from this height up. `groundHeight` still puts its top
+   * underfoot, so a raised piece stays something a crawler can climb onto.
+   */
+  floor?: number;
+}
 export interface Flora {
   pos: Vec3; kind: FloraKind; scale: number; sy: number; rot: number; shade: number;
   /** World-space height, base radius, and the furthest the top may be displaced. */
@@ -223,6 +233,8 @@ export interface Chunk {
   /** Chunk centre. */
   x: number; z: number;
   boulders: Boulder[]; flora: Flora[]; cover: Cover[]; blooms: Bloom[];
+  /** The one landmark this chunk owns, if any. */
+  landmarks: Landmark[];
   /** Dominant biome at the centre, for the renderer's decor choices. */
   biome: Biome;
 }
@@ -249,13 +261,161 @@ const KINDS: FloraKind[] = [];
 for (const b of BIOMES) for (const k of Object.keys(density[b]) as FloraKind[]) if (!KINDS.includes(k)) KINDS.push(k);
 const w2: BiomeWeights = { ...scratchW };
 
+// ---------------------------------------------------------------------------------------------
+// Landmarks
+
+/**
+ * The three things in an endless procedural sea that are worth swimming toward. Everything else
+ * is scatter; a landmark is a structure you recognise, can navigate by, and can use.
+ */
+export type LandmarkKind = 'arch' | 'stack' | 'carcass';
+export interface Landmark {
+  kind: LandmarkKind;
+  /** Stable across loads: derived from the cell, so the same landmark is always the same landmark. */
+  id: number;
+  pos: Vec3;
+  /** Footprint, for the radar, the discovery check and the carcass's feeding volume. */
+  radius: number;
+  rot: number;
+  scale: number;
+}
+
+/**
+ * Landmarks are placed on their own coarse grid — one candidate per cell, so they are spread out
+ * rather than clumping — and the chunk that contains the candidate builds it. Like everything else
+ * in the world this is a pure function of the seed and the cell, so both split-screen players and
+ * every reload agree on where they are.
+ */
+export const LANDMARK_CELL = CHUNK * 5;
+/** How much of the sea has one. Below 1 the empty cells are what make the occupied ones read as rare. */
+const LANDMARK_CHANCE = 0.55;
+/** Nothing is built inside this of the shore or of a nursery clearing. */
+const LANDMARK_CLEAR = 70;
+
+export const landmarkCell = (v: number) => Math.floor(v / LANDMARK_CELL);
+
+/**
+ * The landmark for one cell, or undefined where the cell's candidate site is unsuitable (too close
+ * to the shore or a nursery, or the cell simply drew a blank). Pure; call it as often as you like.
+ */
+export function landmarkAt(seed: number, lx: number, lz: number): Landmark | undefined {
+  const rng = makeRng(chunkSeed(seed, lx, lz, 0x1a2d));
+  if (rng() > LANDMARK_CHANCE) return undefined;
+  // Inset from the cell edge so a landmark's own scenery never spills into the next cell.
+  const margin = LANDMARK_CELL * 0.2;
+  const x = lx * LANDMARK_CELL + margin + rng() * (LANDMARK_CELL - margin * 2);
+  const z = lz * LANDMARK_CELL + margin + rng() * (LANDMARK_CELL - margin * 2);
+  const s = shoreDistance(x, z);
+  if (s < LANDMARK_CLEAR) return undefined;
+  if (nearestNursery(x, z).d < NURSERY_R + 24) return undefined;
+  const biome = biomeAt(x, z);
+  // Each kind belongs somewhere: an arch needs standing water and growth, a stack needs rock,
+  // a carcass is what the deep does with the giants that live there.
+  // A carcass is the rare one: it is a whole dead giant, and the deep would stop reading as
+  // dangerous if the floor were paved with them.
+  const deep = biome === 'basin' || biome === 'channel';
+  const kind: LandmarkKind =
+    deep ? (rng() < 0.3 ? 'carcass' : 'stack')
+    : biome === 'boulders' || biome === 'escarpment' ? (rng() < 0.12 ? 'carcass' : 'stack')
+    : biome === 'flats' ? (rng() < 0.15 ? 'carcass' : 'stack')
+    : 'arch';
+  const scale = 0.85 + rng() * 0.7;
+  // Big enough to see across open water and to hold a clearing of its own: a landmark that reads
+  // as one more sponge is not a landmark.
+  const radius = (kind === 'arch' ? 17 : kind === 'stack' ? 12 : 19) * scale;
+  return { kind, id: chunkSeed(seed, lx, lz, 0x1a2d), pos: { x, y: sampleHeight(x, z), z }, radius, rot: rng() * TAU, scale };
+}
+
+/** Build one landmark's scenery into a chunk. `far` keeps the silhouette and drops the detail. */
+function buildLandmark(chunk: Chunk, m: Landmark, far: boolean) {
+  const rng = makeRng(m.id ^ 0x51ed);
+  const { x: cxp, z: czp } = m.pos;
+  const rock = (x: number, z: number, sx: number, sy: number, sz: number, y: number, floor?: number) => {
+    chunk.boulders.push({
+      pos: { x, y, z }, radius: Math.max(sx, sz) * 1.02, height: y + sy * 1.05,
+      sx, sy, sz, rot: rng() * TAU, shade: 0.62 + rng() * 0.22, floor,
+    });
+  };
+  const S = m.scale;
+  const ca = Math.cos(m.rot), sa = Math.sin(m.rot);
+  /** Local (along, across) offsets rotated into the world, so the whole structure faces one way. */
+  const at = (along: number, across: number) => ({ x: cxp + ca * along - sa * across, z: czp + sa * along + ca * across });
+
+  if (m.kind === 'arch') {
+    // Two piers and a span you swim under: the one piece of scenery with a hole in it.
+    const half = 9.5 * S, pierR = 2.9 * S, top = 14 * S;
+    for (const side of [-1, 1]) {
+      const p = at(0, side * half);
+      const g = sampleHeight(p.x, p.z);
+      rock(p.x, p.z, pierR, top * 0.5, pierR * 0.9, g + top * 0.16);
+    }
+    // The lintel: three blocks across the gap, raised so only the top of a jump touches them.
+    const springY = sampleHeight(cxp, czp) + top * 0.62;
+    for (let i = -1; i <= 1; i++) {
+      const p = at(0, i * half * 0.62);
+      rock(p.x, p.z, 3.6 * S, 1.9 * S, 3.2 * S, springY + Math.abs(i) * -0.6 * S, springY - 2.2 * S);
+    }
+    // Under the span is shelter: shaded, enclosed, and big enough for a mid-size animal.
+    chunk.cover.push({ pos: { x: cxp, y: sampleHeight(cxp, czp) + top * 0.3, z: czp }, radius: half * 1.15, maxLength: 5.5 * S, strength: 0.6 });
+    if (!far) for (let i = 0; i < 7; i++) {
+      const p = at((rng() - 0.5) * 11 * S, (rng() - 0.5) * 20 * S);
+      rock(p.x, p.z, (0.4 + rng() * 0.7) * S, (0.3 + rng() * 0.4) * S, (0.4 + rng() * 0.6) * S, sampleHeight(p.x, p.z));
+    }
+  } else if (m.kind === 'stack') {
+    // Boulders piled into a tower: steps for a crawler, a perch, and crevices at the foot.
+    let y = sampleHeight(cxp, czp);
+    let r = 5.6 * S;
+    const n = 5 + Math.floor(rng() * 3);
+    for (let i = 0; i < n; i++) {
+      const p = at((rng() - 0.5) * r * 0.7, (rng() - 0.5) * r * 0.7);
+      const sy = r * (0.45 + rng() * 0.25);
+      rock(p.x, p.z, r, sy, r * (0.8 + rng() * 0.3), y + sy * 0.2);
+      if (i === 0 || i === 1) chunk.cover.push({ pos: { x: p.x, y: y + sy * 0.5, z: p.z }, radius: r * 1.5, maxLength: r * 0.8, strength: 0.5 });
+      y += sy * 1.25;                       // each block sits on the one below
+      r *= 0.76 + rng() * 0.08;             // and is smaller, so the tower tapers
+    }
+  } else {
+    // A dead giant on the floor: a spine of vertebrae with ribs arching off it. Food, and the
+    // reason something bigger keeps coming back (see Game.carcassNear).
+    const len = 24 * S;
+    const spineN = 9;
+    for (let i = 0; i < spineN; i++) {
+      const t = i / (spineN - 1) - 0.5;
+      const p = at(t * len, 0);
+      const g = sampleHeight(p.x, p.z);
+      const w = (2.6 - Math.abs(t) * 2.3) * S;
+      rock(p.x, p.z, w, w * 0.7, w * 0.9, g + w * 0.2);
+    }
+    const ribs = far ? 3 : 6;
+    for (let i = 0; i < ribs; i++) {
+      const t = (i / (ribs - 1) - 0.5) * 0.7;
+      for (const side of [-1, 1]) {
+        const p = at(t * len, side * 5.2 * S);
+        const g = sampleHeight(p.x, p.z);
+        // The ribs arch clear of the floor, so the ribcage is a space you can get inside.
+        rock(p.x, p.z, 1.1 * S, 4.6 * S, 0.9 * S, g + 2.6 * S, g + 1.6 * S);
+      }
+    }
+    // Inside the ribcage is the best cover in the deep, and it is exactly where the danger is.
+    chunk.cover.push({ pos: { x: cxp, y: sampleHeight(cxp, czp) + 2.8 * S, z: czp }, radius: 7.5 * S, maxLength: 5 * S, strength: 0.75 });
+  }
+}
+
+/** The landmark this chunk owns, if the cell's candidate site falls inside it. */
+function chunkLandmark(seed: number, cx: number, cz: number): Landmark | undefined {
+  const m = landmarkAt(seed, landmarkCell(cx * CHUNK), landmarkCell(cz * CHUNK));
+  if (!m) return undefined;
+  return chunkCoord(m.pos.x) === cx && chunkCoord(m.pos.z) === cz ? m : undefined;
+}
+
 /** Everything in one chunk, from the seed alone. `detail: 'far'` skips flora and small rocks (renderer-only distant tiles). */
 export function generateChunk(seed: number, cx: number, cz: number, detail: 'full' | 'far' = 'full'): Chunk {
   const rng = makeRng(chunkSeed(seed, cx, cz));
   const x0 = cx * CHUNK, z0 = cz * CHUNK;
-  const boulders: Boulder[] = [], flora: Flora[] = [], cover: Cover[] = [], blooms: Bloom[] = [];
+  const boulders: Boulder[] = [], flora: Flora[] = [], cover: Cover[] = [], blooms: Bloom[] = [], landmarks: Landmark[] = [];
   const cw = biomeWeights(x0 + CHUNK / 2, z0 + CHUNK / 2, w2);
-  const chunk: Chunk = { cx, cz, key: chunkKey(cx, cz), x: x0 + CHUNK / 2, z: z0 + CHUNK / 2, boulders, flora, cover, blooms, biome: biomeAt(x0 + CHUNK / 2, z0 + CHUNK / 2) };
+  const chunk: Chunk = { cx, cz, key: chunkKey(cx, cz), x: x0 + CHUNK / 2, z: z0 + CHUNK / 2, boulders, flora, cover, blooms, landmarks, biome: biomeAt(x0 + CHUNK / 2, z0 + CHUNK / 2) };
+  const mark = chunkLandmark(seed, cx, cz);
 
   // Boulders: a base scatter everywhere, a dense field in the boulder biome, talus under the escarpment.
   const rockDensity = 0.0035 + cw.boulders * 0.04 + cw.escarpment * 0.012 + cw.basin * 0.002 + cw.shallows * 0.002;
@@ -264,6 +424,7 @@ export function generateChunk(seed: number, cx: number, cz: number, detail: 'ful
     const x = x0 + rng() * CHUNK, z = z0 + rng() * CHUNK;
     const s = shoreDistance(x, z);
     if (s < SHORE_WALL + 4 || channelFactor(x, z, s) > 0.35 || nurseryFactor(x, z) > 0.5) continue;
+    if (mark && Math.hypot(x - mark.pos.x, z - mark.pos.z) < mark.radius) continue;   // the landmark owns its ground
     const big = rng() < 0.18;
     if (detail === 'far' && !big && rng() < 0.6) continue;
     const sx = (big ? 2.4 : 0.8) + rng() * (big ? 4 : 2.4);
@@ -273,7 +434,7 @@ export function generateChunk(seed: number, cx: number, cz: number, detail: 'ful
     boulders.push({ pos: { x, y, z }, radius: Math.max(sx, sz) * 1.02, height: y + sy * 1.05, sx, sy, sz, rot: rng() * TAU, shade: 0.68 + rng() * 0.21 });
     if (big) cover.push({ pos: { x, y: y + sy * 0.4, z }, radius: Math.max(sx, sz) * 1.5, maxLength: sx * 0.9, strength: 0.45 });
   }
-  if (detail === 'far') { applyBiomeProps(chunk); return chunk; }
+  if (detail === 'far') { applyBiomeProps(chunk); addLandmark(chunk, mark, true); return chunk; }
 
   // Flora by blended biome density, per cell (five to a chunk edge), so biomes morph into each other.
   const cellSize = CHUNK / 5;
@@ -294,6 +455,7 @@ export function generateChunk(seed: number, cx: number, cz: number, detail: 'ful
         for (let i = 0; i < n; i++) {
           const x = cxx + rng() * cellSize, z = czz + rng() * cellSize;
           if (shoreDistance(x, z) < SHORE_WALL + 1) continue;
+          if (mark && Math.hypot(x - mark.pos.x, z - mark.pos.z) < mark.radius) continue;
           if (kind === 'log' && shoreDistance(x, z) >= LOG_SHORE_RANGE) continue;
           let blocked = false;
           for (const b of boulders) if (Math.hypot(x - b.pos.x, z - b.pos.z) < b.radius + 0.4) { blocked = true; break; }
@@ -333,7 +495,19 @@ export function generateChunk(seed: number, cx: number, cz: number, detail: 'ful
     if (shoreDistance(x, z) > 30) blooms.push({ pos: { x, y: LIGHT_WINDOW_Y + 2 + rng() * 5, z }, radius: 9 + rng() * 6, drift: rng() * TAU });
   }
   applyBiomeProps(chunk);
+  addLandmark(chunk, mark, false);
   return chunk;
+}
+
+/**
+ * Landmarks are added after `applyBiomeProps` on purpose: the biome prop pass restyles loose rocks
+ * into spires and talus by position, and a structure that has been deliberately shaped must not be
+ * taken apart by it.
+ */
+function addLandmark(chunk: Chunk, mark: Landmark | undefined, far: boolean) {
+  if (!mark) return;
+  chunk.landmarks.push(mark);
+  buildLandmark(chunk, mark, far);
 }
 
 /** Replace the brief's scenery slots after generation, without consuming the placement RNG. */
@@ -379,6 +553,7 @@ export class World {
   flora: Flora[] = [];
   cover: Cover[] = [];
   blooms: Bloom[] = [];
+  landmarks: Landmark[] = [];
   boulderHash = new SpatialHash<Boulder>(12);
   coverHash = new SpatialHash<Cover>(4);
   floraHash = new SpatialHash<Flora>(6);
@@ -442,12 +617,13 @@ export class World {
 
   /** Re-index after the loaded set (or a test's hand edits) changed. */
   rebuild() {
-    this.boulders = []; this.flora = []; this.cover = []; this.blooms = [];
+    this.boulders = []; this.flora = []; this.cover = []; this.blooms = []; this.landmarks = [];
     for (const c of this.chunks.values()) {
       for (const b of c.boulders) this.boulders.push(b);
       for (const f of c.flora) this.flora.push(f);
       for (const v of c.cover) this.cover.push(v);
       for (const b of c.blooms) this.blooms.push(b);
+      for (const m of c.landmarks) this.landmarks.push(m);
     }
     this.boulderHash.rebuild(this.boulders);
     this.coverHash.rebuild(this.cover);
@@ -489,6 +665,7 @@ export function resolveStatic(world: WorldData, pos: Vec3, radius: number, scrat
   if (s < wall) { pos.z -= wall - s; hit = true; }
   for (const b of world.boulderHash.query(pos.x, pos.z, radius + 8, scratch)) {
     if (pos.y > b.height + radius * 0.5) continue;
+    if (b.floor !== undefined && pos.y < b.floor - radius * 0.5) continue;   // pass under a raised span
     const dx = pos.x - b.pos.x, dz = pos.z - b.pos.z;
     const d = Math.hypot(dx, dz), min = b.radius + radius;
     if (d < min) {

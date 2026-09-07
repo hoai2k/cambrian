@@ -275,6 +275,17 @@ export function thinkNeeds(g: AiWorld, a: Actor, b: BrainState, dt: number): Inp
   return out;
 }
 
+/** The carcass a hungry giant would head for: the nearest one it could reach without leaving the area. */
+function nearestCarcass(g: AiWorld, a: Actor) {
+  let best: { pos: Vec3; radius: number } | undefined, bd = 260;
+  for (const m of g.world.landmarks) {
+    if (m.kind !== 'carcass') continue;
+    const d = distXZ(a.pos, m.pos);
+    if (d < bd) { bd = d; best = m; }
+  }
+  return best;
+}
+
 export function thinkGiant(g: AiWorld, a: Actor, b: BrainState, dt: number): InputFrame {
   const out = emptyInput();
   const def = creature(a.creature);
@@ -346,6 +357,14 @@ export function thinkGiant(g: AiWorld, a: Actor, b: BrainState, dt: number): Inp
       break;
     }
     default: {
+      // A dead giant on the floor is the one thing that pulls a live one off its route. It is why
+      // the carcass is worth finding and why standing on it is a bad idea.
+      const carrion = hungry && !shadow ? nearestCarcass(g, a) : undefined;
+      if (carrion) {
+        steerToward(a, { x: carrion.pos.x, y: carrion.pos.y + L * 0.4, z: carrion.pos.z }, out, 0.6);
+        if (distXZ(a.pos, carrion.pos) < carrion.radius + L * 0.5) { b.hunger = 25; b.goal = 'sleep'; b.goalT = 0; }
+        break;
+      }
       const route = b.patrol ?? [b.home];
       const wp = route[b.patrolIndex % route.length];
       steerToward(a, wp, out, 0.45);

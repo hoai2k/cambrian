@@ -104,6 +104,51 @@ two things:
    rock density, terrain, and atmosphere (fog colour, density, sky and sun
    intensity blend per biome in `render/sea.ts`).
 
+## Landmarks
+
+Procedural scenery is even everywhere, which is exactly what makes an endless sea
+hard to navigate and hard to remember. Landmarks are the exception: structures big
+enough to see across open water, rare enough to mean something, and placed by the
+seed like everything else.
+
+- **One candidate per `LANDMARK_CELL` (320 units, five chunks).** `landmarkAt(seed,
+  lx, lz)` is pure — same seed, same cell, same landmark, whatever order chunks
+  load in — and about 45% of cells come back empty. The chunk containing the
+  candidate builds it, so exactly one chunk owns each landmark and no neighbour
+  duplicates it. They are built *after* `applyBiomeProps`, which restyles loose
+  rocks into spires and talus by position: a structure that has been deliberately
+  shaped must not be taken apart by that pass.
+- **Nothing within 70 units of the shore or inside a nursery**, and the landmark
+  clears its own footprint of boulders and plants, so it stands in the open
+  instead of being swallowed by a sponge forest.
+
+| Kind | Where | What it is |
+| --- | --- | --- |
+| **Arch** | Shelf, forest, shallows | Two piers and a span, about 14 units tall. You swim under it; a crawler can climb over it. Shelter under the span. |
+| **Stack** | Boulders, escarpment, flats | Five to seven boulders piled into a tapering tower. Steps for a crawler, a perch, crevices at the foot. |
+| **Carcass** | Basin and channels (30% of their landmarks), rarer elsewhere | A dead giant: a spine of vertebrae ~24 units long with ribs arching clear of the floor. The best cover in the deep, and the most dangerous place to use it. |
+
+Raised pieces — an arch's lintel, a carcass's ribs — set `Boulder.floor`, a
+collision floor below which they do not block. Without it a span at height would
+wall off the water underneath it, and an arch with no hole in it is a rock.
+
+### The carcass
+
+The one landmark that is also a system. `Game.feedOnCarcass` feeds anything that
+reaches the body, at a rate scaled by the eater's own mass so it is a real meal at
+every tier rather than a banquet for a larva and a trickle for a giant. Each
+carcass has a pool that depletes as it is stripped and restocks over about three
+and a half minutes, so a picked-over one is worth coming back to rather than dead
+for good.
+
+It is also a magnet. A hungry giant on patrol breaks off its route for a carcass
+within 260 units (`nearestCarcass` in `src/sim/ai.ts`) and settles there. So the
+richest food in the deep is also where the giant is going, which is the whole
+point: the reward and the reason to be careful are the same object.
+
+Landmarks show on the radar as hollow diamonds within reach, and a player who
+swims up to one has it recorded in `Game.discovery` for the results screen.
+
 ## Streaming
 
 - **Chunks** are 64 units square (`CHUNK`), the same cells the renderer

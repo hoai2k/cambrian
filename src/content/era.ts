@@ -22,6 +22,12 @@ export interface EraCopy {
   readonly settingsKey: string;
   /** Portrait-orientation title art, when the era has one. */
   readonly mobileIllustration?: string;
+  /**
+   * The other era in this build, linked from the bottom of the title screen so the two are one
+   * step apart. `path` is joined to the app base, so it is where that era's page sits relative to
+   * this one's asset root: '' is the build root, 'devonian/' the page one level down.
+   */
+  readonly sibling?: { readonly title: string; readonly path: string; readonly blurb: string };
 }
 
 export interface EraDefinition {

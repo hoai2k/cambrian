@@ -33,7 +33,7 @@ every push to `main` (set the repository's Pages source to "GitHub Actions").
 
 | Path | What |
 | --- | --- |
-| `src/sim/` | Pure TypeScript simulation: world, creatures, movement, combat, growth, AI, modes. No Three.js. |
+| `src/sim/` | Pure TypeScript simulation: world, creatures, movement, combat, growth, AI, modes, seeded landmarks. No Three.js. |
 | `src/render/` | Three.js: sea environment, creature views and animation layering, effects, cameras, split-screen engine. |
 | `src/app/` | React shell: title, creature select, HUD, pause/results, help and settings. |
 | `src/input/`, `src/audio/` | Gamepad/keyboard reading; the WebAudio graph, its sample library and the distance falloff for world sounds. |
@@ -70,7 +70,7 @@ run tools/controls-test.ts        # camera-relative movement directions
 run tools/respawn-test.ts         # a giant eats a larva; it must come back
 run tools/flora-test.ts           # plants: slide around sponges, fold algae, spring back
 run tools/expansion-test.ts       # all new kits, feeding, tracking and body clearance
-run tools/world-test.ts           # the endless sea: shore, biome bands, streaming, teleport, radar
+run tools/world-test.ts           # the endless sea: shore, biome bands, streaming, teleport, radar, landmarks, co-op revive, discovery
 run tools/environment-test.ts     # biome prop placement, collision bounds, deterministic regeneration
 run tools/motion-test.ts          # smooth motion: the interpolation snapshot, no step-to-step oscillation
 node --experimental-transform-types tools/anchors-test.mjs
