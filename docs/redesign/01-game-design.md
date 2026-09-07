@@ -336,6 +336,16 @@ whose only question is *can it eat me* runs out of questions:
   always choose not to. Held ground is drawn on the radar as a dashed ring, so
   the choice is made before you are in it rather than after.
 
+  "Past the edge" is 1.15 patch radii (`TERRITORY_LEASH` in `src/sim/ai.ts`) — a
+  little slack so an intruder hovering on the line does not make the animal
+  flicker between charging and turning back. The leash applies to *every* goal
+  that chases something, not only to driving an intruder out, and it is a hard
+  limit rather than a stamina one: the animal turns for home whatever it has
+  left in the tank. Both halves matter. A grumpy exchange with a passing
+  neighbour used to escape the leash entirely, and when sprinting got cheaper a
+  territory holder simply chased further on the same behaviour — 94 m off a 40 m
+  patch. `tools/ecology-test.ts` now holds it to 1.3 radii over twenty seconds.
+
 About a third of grown, armed animals hold a patch; about a fifth of everything
 grown is simply grumpy; the rest are indifferent. Grazers and filter feeders
 mostly hold nothing, having somewhere to be rather than something to defend.
