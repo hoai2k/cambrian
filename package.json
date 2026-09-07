@@ -19,6 +19,7 @@
     "eras": "node tools/era-test.mjs",
     "devonian": "esbuild tools/devonian-test.ts --bundle --platform=node --format=esm --outfile=node_modules/.cache/devonian-test.mjs && node node_modules/.cache/devonian-test.mjs",
     "devonian:catalogue": "node tools/devonian/catalogue.mjs",
+    "devonian:plates": "node tools/devonian/biome-plates.mjs",
     "devonian:check": "node tools/devonian/check.mjs --shipped && node tools/devonian/check-props.mjs --shipped && node tools/devonian/catalogue.mjs --check",
     "devonian:check-all": "node tools/devonian/check.mjs && node tools/devonian/check-props.mjs && node tools/devonian/catalogue.mjs --check"
   },

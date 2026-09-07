@@ -2,6 +2,7 @@ import { ACTIVE_ERA } from '../content';
 import type { Vec3 } from '../shared/math';
 import type { Game } from './game';
 import type { Actor, Mode, WorldEvent } from './types';
+import type { ExpansionContext } from './expansion-abilities';
 import { DEVONIAN_RULES } from './devonian/rules';
 
 /**
@@ -48,6 +49,14 @@ export interface EraRules {
   jet(a: Actor): boolean;
   /** The body scales a moult ceremony grows between; undefined leaves the shared tier scales in charge. */
   moultScale(g: Game, a: Actor): { from: number; to: number } | undefined;
+  /** Y pressed while free or guarding and not hidden: true when the era's own special took it (the shared hide is skipped). */
+  useAbility(g: Game, a: Actor, ctx: ExpansionContext): boolean;
+  /** A heavy special started (after the shared begin). */
+  beginAbility(g: Game, a: Actor, ctx: ExpansionContext): void;
+  /** Every step in the 'ability' state (after the shared step). */
+  stepAbility(g: Game, a: Actor, ctx: ExpansionContext, dt: number): void;
+  /** Multiplier on the camouflage stamina drain. */
+  camoDrain(a: Actor): number;
   /** Replaces the death penalty. */
   onRespawn(g: Game, a: Actor): void;
   /** Win checks for the era's own modes; the shared ones (reef, hunted) run as before. */

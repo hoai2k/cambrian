@@ -3,7 +3,7 @@ import type { DevonianCreatureId } from './ids';
 import type { Slot } from '../../shared/palettes';
 import { DEVONIAN_CREATURES } from './creatures';
 import { SNACK_SCHOOLS, GIANTS } from './ecology';
-import { BIOME_NAMES, BIOME_DANGER, ATMOS, SAND_COLORS, FLORA_BASE } from './environment';
+import { BIOME_NAMES, BIOME_DANGER, ATMOS, SAND_COLORS, FLORA_BASE, FLORA_DENSITY } from './environment';
 import { MUSIC } from './music';
 import { SCHEMES, CREATURE_SCHEMES } from './palettes';
 import { DEVONIAN_BRAND, DEVONIAN_BRAND_EXTRAS } from './brand';
@@ -55,12 +55,14 @@ export const DEVONIAN = defineEra({
     title: ['dunkleosteus', 'cladoselache', 'tiktaalik', 'eldredgeops'],
   },
   ecology: { schools: SNACK_SCHOOLS, giants: GIANTS, shadow: { creature: 'titanichthys', scale: 1.0 } },
-  environment: { biomeNames: BIOME_NAMES, biomeDanger: BIOME_DANGER, atmosphere: ATMOS, sandColors: SAND_COLORS, floraColors: FLORA_BASE },
+  environment: { biomeNames: BIOME_NAMES, biomeDanger: BIOME_DANGER, atmosphere: ATMOS, sandColors: SAND_COLORS, floraColors: FLORA_BASE, flora: FLORA_DENSITY },
   assets: {
     creatures: 'assets/devonian/creatures/', defaultPortraits: 'assets/devonian/creatures/',
-    // Scenery, biome plates and music are shared with the Cambrian until the Devonian sets are delivered
-    // (docs/image-requests.md, docs/audio-requests.md); the creatures, SFX and brand are this era's own.
-    props: 'assets/props/', biomes: 'assets/biomes/', ui: 'assets/ui/', sfx: 'assets/devonian/sfx/', music: 'music/',
+    // Scenery is shared with the Cambrian until the Devonian set is delivered; music is the shared folder
+    // (docs/image-requests.md, docs/audio-requests.md); the biome plates are procedural stand-ins from
+    // tools/devonian/biome-plates.mjs (`npm run devonian:plates`) until the painted ones land; the
+    // creatures, SFX and brand are this era's own.
+    props: 'assets/props/', biomes: 'assets/devonian/biomes/', ui: 'assets/ui/', sfx: 'assets/devonian/sfx/', music: 'music/',
     ...DEVONIAN_BRAND, modelBytes, standIns: DEVONIAN_STAND_INS,
   },
   audio: { music: MUSIC },

@@ -72,9 +72,25 @@ export const DEVONIAN_MANIFEST = [
   ['dominant', 'a warm resonant swell rising then holding, hollow wooden and bubbly underwater resonance, confident and full, concise, no metallic shimmer, no chime', 3.0, 1],
   ['beach', 'a limbed animal hauls itself into shallow water: wet scraping of a heavy body dragged over sand and pebbles, small splashes and dripping, close and present, no music', 1.6, 1],
   ['shell-crush', 'a crushing bite cracks a thick shell underwater: a dense crunch and a wet snap as the shell gives, splinters and a bubble burst, close and detailed, no music', 0.8, 1],
+  // per-creature specials (docs/redesign/08 "Grasp, tusks, tridents, brushes")
+  ['jaw-shear', 'enormous bony jaws slam shut underwater with a cutting shear: a deep heavy wet clap, a grinding scissor of bone plates, then a burst of bubbles, huge, close, no metal, no music', 0.9, 1],
+  ['run-through', 'a shark accelerates hard past the ear underwater: a fast whoosh of water displaced, a rushing swish with fine bubbles, then it fades, quick, close, no music', 0.9, 1],
+  ['tusk-lunge', 'a long committed lunge underwater ending in a jab: a rushing surge of water, then a hard wet thud and a short crunch, close and present, no music', 1.0, 1],
+  ['crush-bite', 'heavy crushing tooth plates close on something hard underwater: a dull dense wet crunch with a grinding finish and a few bubbles, close, no music', 0.7, 1],
+  ['neck-snap', 'a quick snapping bite underwater with a fast turn of the head: a short swish then a sharp wet snap, quick and close, no music', 0.5, 1],
+  ['chelicerae-grab', 'two large clawed appendages close on prey underwater: a quick double click of hard chitin, then a wet squeeze and struggling bubbles, close, no music', 0.8, 1],
+  ['trident-shove', 'a hard shove with a forked spine underwater: a short scrape of shell on shell, a blunt push with a swirl of water and grit, close, no music', 0.6, 1],
+  ['shield-push', 'a heavy armoured head butts forward underwater: a blunt bony thud with a scrape of sand and a puff of bubbles, close and present, no music', 0.6, 1],
+  ['armour-flank', 'a small armoured fish bites hard at the soft flank of a rival underwater: a quick lunge swish then a sharp wet bite and a tiny crunch, close, no music', 0.6, 1],
+  ['brush-display', 'LOUD close-miked sound effect: a bundle of hard dry spines snaps open with a sharp crackling rattle, like a wooden fan flicked open hard, followed by a quick splash of water, full volume, punchy, clear midrange, no music', 0.7, 1],
+  ['shoal-dart', 'a small fish darts forward underwater: a quick light flick of fins, a tiny whoosh and a bubble, very short, close, no music', 0.5, 1],
+  ['limb-haul', 'a heavy limbed fish hauls itself forward in shallow water: two loud wet slaps of fleshy limbs on wet sand, a coarse gravelly drag of a heavy body and a bright splash, loud, close and present, clear midrange, no music', 0.8, 1],
+  ['shell-hover', 'LOUD close-miked sound effect: water pushed steadily out of a tube underwater with a strong bubbling gurgle, big rising bubbles popping at the surface, full volume, present, clear midrange, no music', 1.2, 1],
+  ['floor-sweep', 'a flat fish sweeps its mouth through soft sediment underwater: a slow gritty scraping shuffle with a muffled sifting of sand and small bubbles, close, no music', 1.4, 1],
+  ['filter-gulp', 'a huge slow mouth opens wide and strains the water underwater: a deep slow rush of water drawn in, a long soft gurgle and a swirl of bubbles, big, close, no music', 1.6, 1],
   ['ambient-open-sea', 'underwater recording in cold open water far from shore: a steady current washing close past the hydrophone, slow rolling surges of water, streams of fine bubbles drifting by, very distant low fish grunts and faint far-off clicks, close and present, continuous, no music, seamless loop', 22, 1, true],
 ];
-const DEVONIAN_LOW_INFLUENCE = new Set(['armour-clang', 'armour-pierce', 'air-gulp', 'air-low', 'jet', 'withdraw', 'moult-crack', 'shoal-join', 'beach', 'shell-crush']);
+const DEVONIAN_LOW_INFLUENCE = new Set(['jaw-shear', 'run-through', 'tusk-lunge', 'crush-bite', 'neck-snap', 'chelicerae-grab', 'trident-shove', 'shield-push', 'armour-flank', 'shoal-dart', 'limb-haul', 'floor-sweep', 'filter-gulp', 'armour-clang', 'armour-pierce', 'air-gulp', 'air-low', 'jet', 'withdraw', 'moult-crack', 'shoal-join', 'beach', 'shell-crush']);
 const manifest = SET === 'devonian' ? DEVONIAN_MANIFEST : MANIFEST;
 const lowInfluence = SET === 'devonian' ? DEVONIAN_LOW_INFLUENCE : LOW_INFLUENCE;
 

@@ -15,7 +15,16 @@ export type Biome = 'shallows' | 'nursery' | 'shelf' | 'forest' | 'boulders' | '
 export const BIOMES: readonly Biome[] = ['shallows', 'nursery', 'shelf', 'forest', 'boulders', 'flats', 'channel', 'escarpment', 'basin'];
 export const BIOME_NAMES = ACTIVE_ERA.environment.biomeNames;
 export const BIOME_DANGER = ACTIVE_ERA.environment.biomeDanger;
-export type FloraKind = 'vauxia' | 'sac' | 'choia' | 'thalli' | 'tuft' | 'cushion' | 'lettuce' | 'spine' | 'glass';
+/**
+ * Plant and colony kinds. The first nine are the Cambrian's; the rest are the Devonian's procedural
+ * stand-ins (crinoid stalks, stromatoporoid mounds, tabulate plates, rugose horn corals, bryozoan
+ * fans, river-mouth reeds and driftwood logs) until its scenery GLBs land. Which kinds a chunk
+ * places comes from the era's density table (`EraDefinition.environment.flora`).
+ */
+export type FloraKind = 'vauxia' | 'sac' | 'choia' | 'thalli' | 'tuft' | 'cushion' | 'lettuce' | 'spine' | 'glass'
+  | 'crinoid' | 'stromatoporoid' | 'tabulate' | 'rugose' | 'bryozoan' | 'reed' | 'log';
+/** Driftwood only washes out this far from the shore. */
+export const LOG_SHORE_RANGE = 120;
 
 export interface Boulder { variant?: 'blade-spire' | 'talus-shard'; pos: Vec3; radius: number; height: number; sx: number; sy: number; sz: number; rot: number; shade: number; }
 export interface Flora {
@@ -219,7 +228,8 @@ export const chunkCoord = (v: number) => Math.floor(v / CHUNK);
 /** Per-chunk RNG seed: every chunk is the same whatever order it is generated in. */
 export const chunkSeed = (seed: number, cx: number, cz: number, salt = 0) => (Math.imul(cx, 73856093) ^ Math.imul(cz, 19349663) ^ Math.imul(seed + salt, 83492791)) >>> 0;
 
-const density: Record<Biome, Partial<Record<FloraKind, number>>> = {
+/** Cambrian plants per 144 square units of each biome: the default when the era pack has no table of its own. */
+const CAMBRIAN_DENSITY: Record<Biome, Partial<Record<FloraKind, number>>> = {
   shallows: { vauxia: 0.6, sac: 1.2, choia: 1.5, thalli: 3, tuft: 22 },
   nursery: { vauxia: 24, sac: 20, choia: 14, thalli: 16, tuft: 40 },
   shelf: { vauxia: 2.2, sac: 2.5, choia: 3, thalli: 2, tuft: 5 },
@@ -230,7 +240,10 @@ const density: Record<Biome, Partial<Record<FloraKind, number>>> = {
   escarpment: { vauxia: 1.5, sac: 3, choia: 3, thalli: 0.5, tuft: 1 },
   basin: { vauxia: 0.9, sac: 0.7, choia: 1.2, thalli: 0.1, tuft: 0.4 },
 };
-const KINDS: FloraKind[] = ['vauxia', 'sac', 'choia', 'thalli', 'tuft'];
+const density: Record<Biome, Partial<Record<FloraKind, number>>> = ACTIVE_ERA.environment.flora ?? CAMBRIAN_DENSITY;
+/** Every kind the table in use places, in first-seen order (the order the placement RNG is consumed in). */
+const KINDS: FloraKind[] = [];
+for (const b of BIOMES) for (const k of Object.keys(density[b]) as FloraKind[]) if (!KINDS.includes(k)) KINDS.push(k);
 const w2: BiomeWeights = { ...scratchW };
 
 /** Everything in one chunk, from the seed alone. `detail: 'far'` skips flora and small rocks (renderer-only distant tiles). */
@@ -278,10 +291,13 @@ export function generateChunk(seed: number, cx: number, cz: number, detail: 'ful
         for (let i = 0; i < n; i++) {
           const x = cxx + rng() * cellSize, z = czz + rng() * cellSize;
           if (shoreDistance(x, z) < SHORE_WALL + 1) continue;
+          if (kind === 'log' && shoreDistance(x, z) >= LOG_SHORE_RANGE) continue;
           let blocked = false;
           for (const b of boulders) if (Math.hypot(x - b.pos.x, z - b.pos.z) < b.radius + 0.4) { blocked = true; break; }
           if (blocked) continue;
-          const s = (kind === 'vauxia' ? 0.6 + rng() * 1.6 : kind === 'tuft' ? 0.35 + rng() * 0.6 : 0.45 + rng() * 1.0) * forestF;
+          const s = (kind === 'vauxia' ? 0.6 + rng() * 1.6 : kind === 'tuft' ? 0.35 + rng() * 0.6
+            : kind === 'crinoid' ? 0.7 + rng() * 0.65 : kind === 'stromatoporoid' ? 0.5 + rng() * 1.0
+            : kind === 'reed' ? 0.7 + rng() * 0.8 : kind === 'log' ? 0.6 + rng() * 0.8 : 0.45 + rng() * 1.0) * forestF;
           const y = sampleHeight(x, z) - 0.03;
           const sy = s * (0.85 + rng() * 0.4);
           flora.push({ pos: { x, y, z }, kind, scale: s, sy, rot: rng() * TAU, shade: 0.7 + rng() * 0.28, ...floraSize(kind, s, sy), bx: 0, bz: 0, bvx: 0, bvz: 0, active: false });
@@ -289,6 +305,15 @@ export function generateChunk(seed: number, cx: number, cz: number, detail: 'ful
             cover.push({ pos: { x, y: y + s * 0.6, z }, radius: s * 1.25, maxLength: s * 1.7, strength: 0.7 });
           else if (kind === 'tuft')
             cover.push({ pos: { x, y: y + s * 0.3, z }, radius: s * 0.9, maxLength: s * 1.4, strength: 0.8 });
+          else if (kind === 'crinoid')  // a tall stalk with a feathery crown: cover like a branching sponge, a little higher up
+            cover.push({ pos: { x, y: y + sy * 1.1, z }, radius: s * 1.2, maxLength: s * 1.8, strength: 0.65 });
+          else if (kind === 'reed')     // thin swaying stems: cover like a tuft for anything that fits between them
+            cover.push({ pos: { x, y: y + sy * 0.7, z }, radius: s * 0.9, maxLength: s * 1.6, strength: 0.75 });
+          else if (kind === 'stromatoporoid') {
+            // a firm mound: the same cover a big boulder of its size gives (radius 1.5x, length 0.9x, strength 0.45)
+            const rx = s * 0.65, ry = sy * 0.7;
+            cover.push({ pos: { x, y: y + ry * 0.4, z }, radius: rx * 1.5, maxLength: rx * 0.9, strength: 0.45 });
+          }
         }
       }
     }
@@ -319,6 +344,8 @@ function applyBiomeProps(chunk: Chunk) {
     b.height = b.pos.y + (blade ? 4 : .8) * scale;
   }
   const flow = { x: 0, y: 0, z: 0 };
+  // These swaps are Cambrian-specific (sac→cushion, tuft→lettuce, vauxia/sac→spine, choia/thalli→glass) and
+  // test the original kind by name, so the Devonian kinds (crinoid, stromatoporoid, ...) pass through untouched.
   for (const f of chunk.flora) {
     const biome = biomeAt(f.pos.x, f.pos.z), original = f.kind;
     if ((biome === 'shallows' || biome === 'nursery') && original === 'sac') f.kind = 'cushion';

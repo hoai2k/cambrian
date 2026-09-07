@@ -138,6 +138,6 @@ export const MODE_IDS: readonly Mode[] = ['rise', 'frenzy', 'hunted', 'reef', 'd
 export interface Prompt { text: string; t: number; }
 
 export interface WorldEvent {
-  kind: 'hit' | 'kill' | 'eat' | 'tierUp' | 'parry' | 'guardBreak' | 'burst' | 'escape' | 'noticed' | 'hunted' | 'dodge' | 'ability' | 'grab' | 'moult' | 'death' | 'silt' | 'stagger' | 'sense' | 'pounce' | 'swallow' | 'routed' | 'disintegrate' | 'teleport' | 'rangeClaim' | 'rangeLost' | 'gulp' | 'anoxia' | 'beach' | 'shoalJoin' | 'dominant';
+  kind: 'hit' | 'kill' | 'eat' | 'tierUp' | 'parry' | 'guardBreak' | 'burst' | 'escape' | 'noticed' | 'hunted' | 'dodge' | 'ability' | 'grab' | 'moult' | 'death' | 'silt' | 'stagger' | 'sense' | 'pounce' | 'swallow' | 'routed' | 'disintegrate' | 'teleport' | 'rangeClaim' | 'rangeLost' | 'gulp' | 'anoxia' | 'beach' | 'shoalJoin' | 'dominant' | 'shellCrush';
   pos: Vec3; actor: number; other?: number; strength?: number; player?: number;
 }

@@ -358,9 +358,8 @@ dead-zone radar rings and the Dominant countdown, and `tools/devonian-test.ts` (
 devonian`) covers the pack, rung bands, standing and staging, air, dead water, shore reach,
 armour, determinism and the mode endings. Eight of the 21 models are delivered; the rest borrow
 a delivered body (`assets.standIns`) until their own lands. Not yet built from the list below:
-the per-creature grasp/tusk/trident/brush specials (they use the shared ability set for now),
-the Devonian scenery and biome plates (Cambrian sets are reused), and the two biome music
-themes. The notes below are kept as the build order that was followed.
+the Devonian scenery and biome plates (procedural stand-ins until the authored sets land). More
+music is optional. The notes below are kept as the build order that was followed.
 
 1. **Content pack** (`src/content/devonian/`, per [06](06-era-content.md)):
    the 21 `CreatureDef`s with new fields — `rung`, `stages` (the three scales),
