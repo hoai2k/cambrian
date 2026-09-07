@@ -3,7 +3,13 @@ import { BufferGeometry, Mesh, Material } from 'three';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { appBase } from '../shared/base';
 
-export type PropId = 'cushion-sponge' | 'lettuce-tuft' | 'pebble-cluster' | 'blade-spire' | 'talus-shard' | 'spine-sponge' | 'glass-fan';
+/**
+ * A file in the active era's props folder, without the extension. This is era data now, not a
+ * closed set: the Cambrian names seven sponges, the Devonian names its instanced scenery exports.
+ * `loadPropGeometry` is what validates one, and a prop that fails to load leaves the caller on
+ * its procedural fallback.
+ */
+export type PropId = string;
 
 /** Caller owns the returned geometry; materials are supplied by the sea shader. */
 export async function loadPropGeometry(id: PropId, base = appBase()): Promise<BufferGeometry> {
