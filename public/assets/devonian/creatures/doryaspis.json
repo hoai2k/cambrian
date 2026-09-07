@@ -1,0 +1,62 @@
+{
+  "id": "doryaspis",
+  "name": "Doryaspis",
+  "species": "Doryaspis nathorsti",
+  "provenance": "Early Devonian, Wood Bay Formation, Svalbard; coastal deposits with continental input",
+  "description": "Small jawless fish with a broad ridged shield, fixed lateral cornual extensions, a slender ventral pseudorostrum and a flexible downward-weighted tail.",
+  "lengthMeters": 0.2,
+  "modelLength": 6.159889459609985,
+  "locomotion": "Swim",
+  "clips": [
+    "Idle",
+    "Swim",
+    "TurnLeft",
+    "TurnRight",
+    "Dive",
+    "Rise",
+    "Attack",
+    "Bite",
+    "Heavy",
+    "Hit",
+    "Death",
+    "Guard",
+    "Parry",
+    "Dodge",
+    "Eat",
+    "Stagger",
+    "Ability",
+    "Growth"
+  ],
+  "looping": [
+    "Idle",
+    "Swim",
+    "Guard",
+    "Eat"
+  ],
+  "anchors": [
+    "anchor_mouth",
+    "anchor_mouth_inside",
+    "anchor_attack_primary"
+  ],
+  "sources": [
+    {
+      "title": "Pern\u00e8gre (2002), genus revision and first complete caudal fin",
+      "url": "https://www.tandfonline.com/doi/abs/10.1671/0272-4634%282002%29022%5B0735%3ATGDWHF%5D2.0.CO%3B2"
+    },
+    {
+      "title": "Botella et al. (2024), Delta wing design in earliest nektonic vertebrates",
+      "url": "https://www.nature.com/articles/s42003-024-06837-8"
+    },
+    {
+      "title": "Purnell (2002), Feeding in extinct jawless heterostracan fishes",
+      "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC1690863/"
+    }
+  ],
+  "notes": [
+    "Broad rigid flattened shield with fixed cornual plates, ventral pseudorostrum and hypocercal tail; no invented paired fins or hinged jaws.",
+    "Mouth lies above the pseudorostrum base, not at its tip. Oral soft tissue and opening depth are reconstruction choices.",
+    "Pseudorostrum function and diet remain uncertain. Bite/Eat are small oral pulses; Attack and Heavy are compatibility-labelled contact/withdrawal gestures, not evidence of predatory sword use.",
+    "Pigmentation, scale relief, precise soft tissues and motion are artistic inference. Representative length 0.20 m is an illustrative individual, not a maximum.",
+    "Only the posterior body and caudal fin generate locomotor flexion; fixed shield extensions do not flap. Growth is a relaxed trim and tail extension with no scaling."
+  ]
+}

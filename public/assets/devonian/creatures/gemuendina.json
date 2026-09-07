@@ -1,0 +1,58 @@
+{
+  "id": "gemuendina",
+  "name": "Gemuendina",
+  "species": "Gemuendina stuertzi",
+  "provenance": "Early Devonian (Emsian), Hunsr\u00fcck Slate, Germany",
+  "description": "Low, broad rhenanid placoderm with a mosaic of small armour elements, undulating pectoral margins and upward-looking eyes and mouth.",
+  "lengthMeters": 0.3,
+  "modelLength": 5.060000061988831,
+  "locomotion": "Swim",
+  "clips": [
+    "Idle",
+    "Swim",
+    "TurnLeft",
+    "TurnRight",
+    "Dive",
+    "Rise",
+    "Attack",
+    "Bite",
+    "Heavy",
+    "Hit",
+    "Death",
+    "Guard",
+    "Parry",
+    "Dodge",
+    "Eat",
+    "Stagger",
+    "Ability",
+    "Growth"
+  ],
+  "looping": [
+    "Idle",
+    "Swim",
+    "Guard",
+    "Eat"
+  ],
+  "anchors": [
+    "anchor_mouth",
+    "anchor_mouth_inside",
+    "anchor_attack_primary"
+  ],
+  "sources": [
+    {
+      "title": "Wilkin (2023), The Hunsr\u00fcck Slate Konservat-Lagerst\u00e4tte",
+      "url": "https://onlinelibrary.wiley.com/doi/full/10.1111/gto.12426",
+      "doi": "10.1111/gto.12426"
+    },
+    {
+      "title": "American Museum of Natural History, Gemuendina stuertzi specimen cast, ptc-5860",
+      "url": "https://digitalcollections.amnh.org/archive/Gemuendina-stuertzi--rhenanid-placoderm-from-the-Early-Devonian-of-Hunsruck--Budenbach--Germany--cast---about-400-million-years-old-2URM1THI7W9X.html"
+    }
+  ],
+  "notes": [
+    "Low body, broad pectoral fins, upward-directed eyes and oral opening reflect fossil morphology; small unfused armouring tesserae are differentiated from arthrodire shield plates.",
+    "Tail outline, fin thickness, pigmentation and exact soft oral tissues are reconstruction choices. No modern-ray sting, ventral mouth or spiracles have been added.",
+    "0.30 m is a representative reconstructed animal, not a claimed species maximum.",
+    "Animations visualize plausible fin undulation and upward feeding; compatibility action names do not define Devonian gameplay. Fine ray struts are inferred support structures, not individually fossil-mapped."
+  ]
+}

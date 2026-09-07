@@ -69,4 +69,4 @@ before and after the move; the complete creature definitions also matched exactl
 The [Devonian creature and asset brief](07-devonian-design.md) describes 21 mobile animal subjects,
 regional environments, plants, attached organisms and geological props, together with the proposed
 images and 3D source/export deliverables. It is an art inventory with research notes; it does not
-specify gameplay or begin asset production.
+specify gameplay. Subsequent asset authoring uses the separate [Devonian specimen library](../devonian/README.md), which the viewer can inspect without activating a playable Devonian pack.

@@ -1,0 +1,52 @@
+{
+  "id": "dunkleosteus",
+  "name": "Dunkleosteus",
+  "species": "Dunkleosteus terrelli",
+  "provenance": "Late Devonian (Famennian), Cleveland Shale, Ohio, USA",
+  "description": "Deep-bodied arthrodire with rigid cranial and thoracic armour, articulated gnathal cutting plates and a muscular posterior body.",
+  "lengthMeters": 3.35,
+  "modelLength": 3.340000033378601,
+  "locomotion": "Swim",
+  "clips": [
+    "Ability",
+    "Attack",
+    "Bite",
+    "Death",
+    "Dive",
+    "Dodge",
+    "Eat",
+    "Growth",
+    "Guard",
+    "Heavy",
+    "Hit",
+    "Idle",
+    "Parry",
+    "Rise",
+    "Stagger",
+    "Swim",
+    "TurnLeft",
+    "TurnRight"
+  ],
+  "looping": [
+    "Idle",
+    "Swim",
+    "Guard",
+    "Eat"
+  ],
+  "anchors": [
+    "anchor_mouth",
+    "anchor_mouth_inside",
+    "anchor_attack_primary"
+  ],
+  "sources": [
+    "https://www.palaeo-electronica.org/content/2024/5307-dunkleosteus-reconstruction",
+    "https://doi.org/10.3390/d15030318"
+  ],
+  "notes": [
+    "Original reconstruction informed by Engelman 2024, rather than a specimen scan.",
+    "Rear body, caudal outline, oral soft tissues and pigmentation remain interpretations.",
+    "Representative 3.35 m adult, not a genus maximum.",
+    "Growth is a relaxed maturation pose; no scale animation or moulting.",
+    "Armour boundaries are interpreted living plate outlines; detailed sutures should not be used as a research diagram."
+  ]
+}
