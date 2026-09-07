@@ -8,16 +8,21 @@ this library); a subject whose model has not shipped yet borrows a delivered one
 `assets.standIns`. Devonian assets can also be inspected in the viewer's **Devonian creatures**
 and **Devonian scenery** collections.
 
-Approved deliveries are listed in `tools/devonian/shipped.json`. Models are published in reviewed
-batches so other work can use completed examples while the rest of the roster is in production.
-Only listed assets enter the viewer catalogue or released-asset CI checks.
+Delivered models are listed in `tools/devonian/shipped.json`. Initial versions are committed as
+soon as they pass basic model, animation, anchor, portrait and eye checks, so they can be tested
+in the game before the complete art-refining pass. Only listed assets enter the viewer catalogue.
 
-The first eight releases at `1e43197` are integration examples undergoing an additional art pass.
-The [independent eye audit](../../tools/devonian/eye-audit.README.md) found all sixteen published
-eye globes below the required 50% embedding. Their individual head, orbital, mouth, material and
-motion revisions must pass the updated production contract before being described as art-final.
-The subsequent individual revisions and their exported-model evidence are tracked in
-[art review](art-review.md); a passing structural export alone is not an artistic approval.
+**Current delivery: 12/21 creatures — nine refined models and three previews** (Onychodus,
+Rhinodipterus and Tiktaalik). The explicit lifecycle in `src/content/devonian/model-status.json`
+drives the **⚠ Preview model** badge on creature choice cards, selected-player cards and viewer
+cards. Promotion to `final` happens individually after the refining pass; the badge never locks
+selection or changes gameplay. Newly authored models default to preview until reviewed.
+
+The first eight releases were rebuilt after the initial eye audit. Those reviewed replacements,
+and Cheirolepis, now satisfy the requested eye containment and individual art reviews. See
+[art review](art-review.md) and the [resumable checkpoint](authoring-checkpoint-2026-09-07.md).
+The current priority is initial delivery of all creatures, plants, props and supporting images,
+followed by the full refining passes. Structural validity alone does not establish final art quality.
 
 ## Files and provenance
 
@@ -81,7 +86,7 @@ The browser check expects the Vite development server at `http://127.0.0.1:5173`
 checking a production preview. It verifies collection selection, action controls, asset loads
 and clear model framing at desktop, tablet and phone sizes.
 
-For each published batch, `npm run devonian:check` checks the approved delivery list.
+For each published batch, `npm run devonian:check` checks the delivery list (including clearly labelled previews).
 For final intake, `npm run devonian:check-all` requires all 21 creatures, while
 `node tools/devonian/check-props.mjs` requires every scenery family. The packager accepts
 `--props` for scenery. Packaging preserves decoded geometry, skeletons, anchors and animation

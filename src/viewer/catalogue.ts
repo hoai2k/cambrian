@@ -19,6 +19,7 @@ export interface ViewerSpecimen {
   role: string;
   provenance: string;
   description: string;
+  modelStatus?: 'preview' | 'final';
   model: string;
   lod?: string;
   image?: string;
@@ -47,7 +48,7 @@ export const SPECIMENS: readonly ViewerSpecimen[] = [
     name: c.name, species: c.species, kind: DEVONIAN_KIND.get(c.id)?.kind, kindNote: DEVONIAN_KIND.get(c.id)?.kindNote,
     role: c.category === 'prop' ? 'DEVONIAN · SCENERY' : 'DEVONIAN · SPECIMEN',
     provenance: c.provenance, description: c.description,
-    model: c.model, lod: c.lod, image: c.image, displayLength: 4,
+    modelStatus: c.modelStatus, model: c.model, lod: c.lod, image: c.image, displayLength: 4,
     lengthMeters: c.lengthMeters, looping: c.looping,
   })),
 ];

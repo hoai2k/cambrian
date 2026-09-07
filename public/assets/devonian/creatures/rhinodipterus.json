@@ -1,0 +1,54 @@
+{
+  "id": "rhinodipterus",
+  "name": "Rhinodipterus",
+  "species": "Rhinodipterus kimberleyensis",
+  "provenance": "Late Devonian, Gogo Formation, Western Australia",
+  "description": "Long-snouted marine lungfish with a narrow mandibular symphysis, small lateral eyes, rounded radial tooth plates, cosmine skull roof and comparative lobed fins with two posterior dorsals.",
+  "lengthMeters": 0.55,
+  "modelLength": 5.889999866485596,
+  "locomotion": "Swim",
+  "clips": [
+    "Ability",
+    "Attack",
+    "Bite",
+    "Death",
+    "Dive",
+    "Dodge",
+    "Eat",
+    "Growth",
+    "Guard",
+    "Heavy",
+    "Hit",
+    "Idle",
+    "Parry",
+    "Rise",
+    "Stagger",
+    "Swim",
+    "TurnLeft",
+    "TurnRight"
+  ],
+  "looping": [
+    "Idle",
+    "Swim",
+    "Guard",
+    "Eat"
+  ],
+  "anchors": [
+    "anchor_mouth",
+    "anchor_mouth_inside",
+    "anchor_attack_primary"
+  ],
+  "sources": [
+    "https://doi.org/10.1111/j.1475-4983.2011.01118.x",
+    "https://pmc.ncbi.nlm.nih.gov/articles/PMC2936207/",
+    "https://doi.org/10.1017/S0263593300003588"
+  ],
+  "notes": [
+    "Cranial reconstruction informed by Clement2012; snout tip is inferred from the long symphysis and comparative specimens.",
+    "Body and fin outline follows the explicitly comparative proposal in Clement2012 Fig7G (after R.ulrichi); no complete R.kimberleyensis postcranium is known.",
+    "Seven upper and six lower rounded denticle rows; restrained gape and lateral grinding reflect the species description, not a crushing predator.",
+    "Exact pigment, skin thickness, oral soft tissues and movement are artistic. Representative length is a display assumption, not an observed complete animal or maximum.",
+    "Full uses regional vertex pigment multiplied once by near-neutral UV albedo; texture-free LOD bakes this factor once.",
+    "Air-gulping is a cranial anatomical interpretation; no claimed breathing frequency, terrestrial walk or aestivation."
+  ]
+}

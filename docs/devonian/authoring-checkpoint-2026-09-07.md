@@ -2,6 +2,25 @@
 
 This is a resumable work checkpoint, not a completion report. The user requested it to preserve context and judge remaining token use. Update the current status as deliveries land; do not infer that drafts are approved from their presence on disk.
 
+## Latest priority — supersedes older refinement sequencing below
+
+The user now requests carefully authored INITIAL versions of every creature and every plant,
+prop and supporting image first, committed early to main, then full refining passes. Existing
+quality and eye requirements remain, but extended repeated art/collision reviews are deferred
+and recorded. Do not block initial delivery on final-art perfection. Mark unfinished models
+**⚠ Preview model** on the game choice cards and viewer. The lifecycle source is
+`src/content/devonian/model-status.json`; the first nine are final, all other roster IDs preview.
+
+This batch delivers Onychodus, Rhinodipterus and Tiktaalik: **12/21 available, 9 final + 3 preview**.
+Their frozen source exports are in `<id>/v2-candidate`, package hashes and deferred work in each
+tracked `preview-delivery.json`. The pending local Onychodus palatal-pocket edit is NOT exported:
+tracked `build.py` matches the shipped GLB; do not run the local assembler without reviewing it.
+Rhinodipterus author now owns Jaekelopterus; Tiktaalik author now owns Acanthostega; Eldredgeops
+author is finishing its initial version and will start Walliserops. Parent owns integration,
+UI lifecycle and the 47 scenery prototypes / supporting images. No full-refinement loop should
+restart before the complete initial collection exists. The older detailed sections below retain
+useful evidence but their production order and numerical progress are superseded by this update.
+
 ## Scope and completion
 
 User wants 21 individually considered Devonian creatures, high-quality Blender geometry and materials, dynamic game-compatible actions, actual modeled oral anatomy where applicable, three specimen anchors, source/intermediates under `cambrian/local`, natural-history/art documentation, viewer integration, and finished work merged/pushed to main. Early approved deliveries are authorized. Eyes must be at least 50% inside the continuous body/head, with a preferred margin above 65%; ornamental rims cannot make an audit pass. Dunkleosteus specifically needs a real oral interior and moving jaw bones used in animation. Those Dunkleosteus requirements are already delivered.

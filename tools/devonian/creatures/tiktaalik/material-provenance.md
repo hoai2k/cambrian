@@ -1,0 +1,10 @@
+# Original Tiktaalik material art
+
+Generated with the built-in imagegen tool on 2026-09-07. Copied into this source directory as `skin-source.png`; original tool output remains `/Users/hoai/.codex/generated_images/01a0794c-8e3b-76f1-9b05-e99f98297c86/exec-6ac2c08c-b6b6-4af0-b931-f81e829d4944.png`.
+
+Prompt:
+> Use case: stylized-concept. Asset type: original diffuse skin material swatch for a carefully reconstructed Tiktaalik 3D game model. Create a square seamless 2048x2048 flat orthographic macro surface texture, edge to edge, with no animal, no eyes, no fins, no illustration, no text. Natural muted olive-brown freshwater fish skin: irregular small rhombic scales only slightly taller than wide, narrowly overlapping in staggered diagonal rows, each surface subtly tuberculated. Scales should vary gently and organically in size and alignment, not a perfect checkerboard or hex grid; narrow shallow boundaries, no black cracks, no armor plates. Low contrast warm moss and earthy ochre mottling at larger scale, delicate pale beige stipples in some scales, varied subtle weathered brown-green regions. Soft evenly diffuse unlit albedo, no baked specular highlights, no strong shadows, no perspective, no large ridges. Color values mostly midrange olive-brown rather than very dark. This is original imaginative pigmentation art, not an anatomical diagram.
+
+The generated bitmap was visually inspected. It supplies irregular scale/tuberculation structure and small pigmentation variation, not fossil evidence. The builder maps it in physical surface coordinates and separately constructs regional olive/ochre countershading, finer cranial sculpture, oral tissue, covered fin-ray relief, normal and roughness maps. The cranial roof does not inherit the trunk's scale coat.
+
+Full glTF uses neutral-white COLOR_0 with embedded UV albedo/normal/roughness. The reduced asset uses atlas-sampled linear vertex pigmentation without textures. No source fossil photograph or published reconstruction is used as a game texture.

@@ -1,15 +1,15 @@
 # Devonian Domination — what remains
 
-Status as of the last asset check (7 Sept 2026, 03:35 UTC). Devonian Domination is playable at
+Status as of the last asset check (7 Sept 2026, initial-delivery priority update). Devonian Domination is playable at
 `/devonian/` from the pack in `src/content/devonian/` and the rules in `src/sim/devonian/`
 ([08](08-devonian-domination.md) has the design and its status note). This is the list of what is
 still open, in the order it is worth doing. Nothing here blocks play; each item removes a placeholder
 or a reuse of Cambrian material.
 
-## 1. Models still in production (13 of 21)
+## 1. Models still in production (9 of 21)
 
 Delivered: Dunkleosteus, Titanichthys, Coccosteus, Bothriolepis, Gemuendina, Doryaspis,
-Cladoselache, Stethacanthus (`tools/devonian/shipped.json`). Everything else borrows a delivered
+Cladoselache, Stethacanthus, Cheirolepis; plus preview models Onychodus, Rhinodipterus and Tiktaalik (`tools/devonian/shipped.json`). Previews show a caution badge on choice cards. Everything else borrows a delivered
 body through `DEVONIAN_STAND_INS` in `src/content/devonian/index.ts`, recoloured with its own scheme:
 
 | Rung | Pending | Stands in as | Note |
@@ -18,11 +18,8 @@ body through `DEVONIAN_STAND_INS` in `src/content/devonian/index.ts`, recoloured
 | I | Nahecaris, Palaeoisopus | Bothriolepis | Arthropod silhouettes are the furthest from their stand-in. |
 | I | Furcaster | Gemuendina | Flat body works; five arms do not. |
 | I | Manticoceras | Doryaspis | The shell has no model of any kind yet; the jet reads as a fish swimming backward. |
-| II | Cheirolepis | Coccosteus | Close enough. |
 | II | Michelinoceras | Doryaspis | As Manticoceras; the rostrum vaguely suggests the cone. |
-| III | Onychodus | Cladoselache | Tusks absent, otherwise a fair hunter body. |
-| III | Rhinodipterus | Coccosteus | Lungfish body pending. |
-| III | Tiktaalik, Acanthostega | Bothriolepis | Limbs and the beach crawl are the visible loss; the shore-reach mechanic works. |
+| III | Acanthostega | Bothriolepis | Limbs and the beach crawl are the visible loss; the shore-reach mechanic works. |
 | III | Jaekelopterus | Bothriolepis | Ground creature; chelicerae grab has nothing to grab with. |
 
 When a batch lands: `git fetch origin main`, `node tools/update-asset-sizes.mjs`, delete the ids
