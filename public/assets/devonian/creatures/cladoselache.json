@@ -1,0 +1,66 @@
+{
+  "id": "cladoselache",
+  "name": "Cladoselache",
+  "species": "Cladoselache sp. (Cleveland Shale reconstruction)",
+  "provenance": "Late Devonian, Famennian Cleveland Shale, Ohio, USA",
+  "description": "Streamlined early chondrichthyan with a broad terminal mouth, large eyes, broad paired fins, a curved anterior dorsal spine and a keeled crescent tail.",
+  "lengthMeters": 1.5,
+  "modelLength": 5.661974906921387,
+  "locomotion": "Swim",
+  "clips": [
+    "Idle",
+    "Swim",
+    "TurnLeft",
+    "TurnRight",
+    "Dive",
+    "Rise",
+    "Attack",
+    "Bite",
+    "Heavy",
+    "Hit",
+    "Death",
+    "Guard",
+    "Parry",
+    "Dodge",
+    "Eat",
+    "Stagger",
+    "Ability",
+    "Growth"
+  ],
+  "looping": [
+    "Idle",
+    "Swim",
+    "Guard",
+    "Eat"
+  ],
+  "anchors": [
+    "anchor_mouth",
+    "anchor_mouth_inside",
+    "anchor_attack_primary"
+  ],
+  "sources": [
+    {
+      "title": "Klug, Coates, Frey et al. (2023), Broad snouted cladoselachian with sensory specialization; Cladoselache comparisons",
+      "url": "https://link.springer.com/article/10.1186/s13358-023-00266-6"
+    },
+    {
+      "title": "The Development of the Chimaeroid Pelvic Skeleton and the Evolution of Chondrichthyan Pelvic Fins (2022), Cladoselache kepleri NHMUK PV P9269",
+      "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC9782884/"
+    },
+    {
+      "title": "Case Western Reserve University Hyde Collection, Cleveland Shale Cladoselache specimens",
+      "url": "https://caslabs.case.edu/hyde-collection/historical-geology/"
+    },
+    {
+      "title": "Cleveland Museum of Natural History casting program: complete Cladoselache CMNH5371",
+      "url": "https://gsa.confex.com/gsa/2006NC/webprogram/Paper103585.html"
+    }
+  ],
+  "notes": [
+    "Genus-level Cladoselache reconstruction of a representative 1.5 m individual, not a specimen scan or a species maximum. Body outline informed by Cleveland Shale material, pelvic anatomy by C. kepleri NHMUK PV P9269.",
+    "Broad triangular paired fins, large lateral eyes, blunt snout, terminal cladodont mouth and strongly forked tail distinguish this animal from a modern great-white shark.",
+    "The anterior dorsal spine follows the 2023 comparative study. A second dorsal spine remains hypothetical and is omitted. Fin radials are covered by skin. No cord meshes or anal fin are present.",
+    "Original imagegen skin swatch with mapped PBR countershading, incised gills and seated eyes;  a modern all-over placoid-scale coat is not claimed. Pigmentation, soft-tissue volume and every animation are artistic reconstruction.",
+    "Growth is a relaxed fin-extension/breathing display. Ability is a short acceleration and bank display; compatible clip labels do not define Devonian gameplay."
+  ]
+}

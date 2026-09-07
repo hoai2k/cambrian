@@ -1,0 +1,37 @@
+{
+  "id": "brachiopod-bed",
+  "family": "B09",
+  "name": "Brachiopod bed",
+  "taxon": "Mucrospirifer mucronatus and atrypide comparative forms",
+  "category": "attached",
+  "description": "Paired dorsal/ventral valves with bilateral symmetry, hinge wings, radial ribs and median fold; shell widths about 3\u20135 cm.",
+  "provenance": "Middle Devonian Hamilton fauna, North America",
+  "model": "assets/devonian/props/brachiopod-bed.glb",
+  "lod": "assets/devonian/props/brachiopod-bed.lod1.glb",
+  "image": "assets/devonian/props/brachiopod-bed.png",
+  "lengthMeters": 0.14856132864952087,
+  "dimensionsMeters": {
+    "x": 0.14856132864952087,
+    "y": 0.012036305852234364,
+    "z": 0.1397639513015747
+  },
+  "clips": [],
+  "looping": [],
+  "sources": [
+    "https://devonianatlas.org/species/mucrospirifer-mucronatus/",
+    "https://devonianatlas.org/taxonomic-groups/brachiopods/"
+  ],
+  "notes": [
+    "Original parametric mesh, no downloaded model.",
+    "1 glTF unit = 1 metre. Dimensions describe this art specimen, not a taxon maximum.",
+    "Pigmentation and soft appearance are artistic interpretations.",
+    "Locality tags constrain future placement; library membership does not assert co-occurrence.",
+    "Preview model: initial scenery delivery; further individual material, silhouette and motion refinement is pending."
+  ],
+  "fullTriangles": 72576,
+  "lodTriangles": 21772,
+  "lodRatio": 0.2999889770723104,
+  "sourceBlend": "../devonian-authoring/props/brachiopod-bed/brachiopod-bed.blend",
+  "uncertainty": "Winged spiriferid and rounded atrypide form studies; attachment and tissue are not depicted.",
+  "modelStatus": "preview"
+}

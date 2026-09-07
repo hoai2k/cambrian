@@ -1,0 +1,28 @@
+{
+  "viewer": "Built /viewer/ at port 4176",
+  "date": "2026-09-07",
+  "assetSha256": "23fad55b12ee44bb652cb9a1f5e09ca6e211f0732d42d591344e14a9cf48b3d8",
+  "actions": [
+    "Idle",
+    "Swim",
+    "TurnLeft",
+    "TurnRight",
+    "Dive",
+    "Rise",
+    "Bite",
+    "Heavy",
+    "Attack",
+    "Ability",
+    "Guard",
+    "Parry",
+    "Dodge",
+    "Hit",
+    "Stagger",
+    "Death",
+    "Eat",
+    "Growth"
+  ],
+  "pausedSelectionAndFrameStep": true,
+  "feedingPoseVisuallyInspected": true,
+  "browserErrors": []
+}

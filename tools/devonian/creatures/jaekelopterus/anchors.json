@@ -1,0 +1,54 @@
+{
+  "jaekelopterus": [
+    {
+      "name": "anchor_mouth",
+      "bone": "body",
+      "point": [
+        0,
+        -0.9,
+        -0.185
+      ],
+      "role": "mouth"
+    },
+    {
+      "name": "anchor_mouth_inside",
+      "bone": "body",
+      "point": [
+        0,
+        -0.9,
+        -0.098
+      ],
+      "role": "swallow"
+    },
+    {
+      "name": "anchor_attack_primary",
+      "bone": "cheliceraL2",
+      "point": [
+        0.75,
+        -3.12,
+        0
+      ],
+      "role": "attack"
+    },
+    {
+      "name": "anchor_grasp_left",
+      "bone": "cheliceraL2",
+      "point": [
+        0.665,
+        -2.83,
+        0.009
+      ],
+      "role": "grasp"
+    },
+    {
+      "name": "anchor_grasp_right",
+      "bone": "cheliceraR2",
+      "point": [
+        -0.665,
+        -2.83,
+        0.009
+      ],
+      "role": "grasp"
+    }
+  ]
+}

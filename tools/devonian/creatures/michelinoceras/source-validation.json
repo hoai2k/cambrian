@@ -1,0 +1,26 @@
+{
+  "sourceBlend": "/Users/hoai/Documents/Stuff/Generations/cambrian/local/devonian-authoring/michelinoceras/v1/michelinoceras.blend",
+  "sha256": "dbd8ff9c84e476b69442e8ec340f8ca97e02f9e9d6e49ab8fea72bdaaf09de20",
+  "persistedActions": {
+    "Ability": true,
+    "Attack": true,
+    "Bite": true,
+    "Death": true,
+    "Dive": true,
+    "Dodge": true,
+    "Eat": true,
+    "Grab": true,
+    "Growth": true,
+    "Guard": true,
+    "Heavy": true,
+    "Hit": true,
+    "Idle": true,
+    "Parry": true,
+    "Rise": true,
+    "Stagger": true,
+    "Swim": true,
+    "TurnLeft": true,
+    "TurnRight": true
+  },
+  "boneCount": 166
+}

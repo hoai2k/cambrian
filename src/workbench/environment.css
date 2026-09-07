@@ -1,0 +1,16 @@
+.environment-bench { max-width: 1300px; }
+.environment-note { max-width: 85ch; color: var(--mist); }
+.environment-bench h2 { margin: 36px 0 16px; }
+.environment-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 1fr)); gap: 18px; }
+.environment-card { border: 1px solid var(--line); border-radius: 12px; overflow: hidden; background: var(--panel); }
+.prop-preview { width: 100%; height: 260px; touch-action: none; }
+.prop-preview canvas { display: block; }
+.environment-copy { padding: 14px 18px 18px; }
+.environment-copy h3 { margin: 0 0 8px; text-transform: capitalize; }
+.environment-copy p { margin: 6px 0; color: var(--mist); font-size: 13px; }
+.environment-bench a { color: var(--lagoon); }
+.biome-painting { display: block; width: 100%; height: auto; }
+.radar-samples { display: flex; flex-wrap: wrap; gap: 22px; padding-bottom: 40px; }
+.radar-samples a { display: flex; align-items: center; gap: 12px; padding: 12px; border: 1px solid var(--line); border-radius: 8px; }
+.radar-glyph { display: inline-block; width: 24px; height: 24px; background: currentColor; mask-size: contain; mask-repeat: no-repeat; }
+.radar-glyph.tiny { width: 8px; height: 8px; }

@@ -1,0 +1,36 @@
+{
+  "id": "branching-tabulate-coral",
+  "family": "B05",
+  "name": "Branching tabulate coral",
+  "taxon": "Striatopora iowensis comparative form",
+  "category": "attached",
+  "description": "Ramose bifurcating branches with tapered distal axes and repeated apertures around branches.",
+  "provenance": "Middle Devonian Milwaukee Formation, Wisconsin",
+  "model": "assets/devonian/props/branching-tabulate-coral.glb",
+  "lod": "assets/devonian/props/branching-tabulate-coral.lod1.glb",
+  "image": "assets/devonian/props/branching-tabulate-coral.png",
+  "lengthMeters": 0.14579147100448608,
+  "dimensionsMeters": {
+    "x": 0.07850798219442368,
+    "y": 0.14579147100448608,
+    "z": 0.13044635951519012
+  },
+  "clips": [],
+  "looping": [],
+  "sources": [
+    "https://devonianatlas.org/species/striatopora-iowensis/"
+  ],
+  "notes": [
+    "Original parametric mesh, no downloaded model.",
+    "1 glTF unit = 1 metre. Dimensions describe this art specimen, not a taxon maximum.",
+    "Pigmentation and soft appearance are artistic interpretations.",
+    "Locality tags constrain future placement; library membership does not assert co-occurrence.",
+    "Preview model: initial scenery delivery; further individual material, silhouette and motion refinement is pending."
+  ],
+  "fullTriangles": 34100,
+  "lodTriangles": 10141,
+  "lodRatio": 0.29739002932551317,
+  "sourceBlend": "../devonian-authoring/props/branching-tabulate-coral/branching-tabulate-coral.blend",
+  "uncertainty": "Branching/aperture arrangement follows the comparative Striatopora record; colony proportions are interpretive.",
+  "modelStatus": "preview"
+}

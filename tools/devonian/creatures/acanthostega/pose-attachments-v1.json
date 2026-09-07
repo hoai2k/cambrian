@@ -1,0 +1,1670 @@
+{
+  "sampledPoses": 72,
+  "toothBases": 84,
+  "finRoots": {
+    "pectoralR": 40,
+    "pectoralL": 40,
+    "pelvicR": 40,
+    "pelvicL": 40
+  },
+  "allFinRootCentroidsBuried": true,
+  "maximumToothBaseToLiningDistance": 0.004288703203201294,
+  "results": [
+    {
+      "clip": "Ability",
+      "phase": 0,
+      "finRoots": {
+        "pectoralR": {
+          "insideContinuousBody": true,
+          "surfaceDistance": 0.1418115198612213
+        },
+        "pectoralL": {
+          "insideContinuousBody": true,
+          "surfaceDistance": 0.1418115198612213
+        },
+        "pelvicR": {
+          "insideContinuousBody": true,
+          "surfaceDistance": 0.08047877997159958
+        },
+        "pelvicL": {
+          "insideContinuousBody": true,
+          "surfaceDistance": 0.08047877997159958
+        }
+      },
+      "maximumToothBaseToLiningDistance": 0.003889501327648759
+    },
+    {
+      "clip": "Ability",
+      "phase": 0.3,
+      "finRoots": {
+        "pectoralR": {
+          "insideContinuousBody": true,
+          "surfaceDistance": 0.1491767168045044
+        },
+        "pectoralL": {
+          "insideContinuousBody": true,
+          "surfaceDistance": 0.1432434767484665
+        },
+        "pelvicR": {
+          "insideContinuousBody": true,
+          "surfaceDistance": 0.0811975821852684
+        },
+        "pelvicL": {
+          "insideContinuousBody": true,
+          "surfaceDistance": 0.07960055768489838
+        }
+      },
+      "maximumToothBaseToLiningDistance": 0.00388952880166471
+    },
+    {
+      "clip": "Ability",
+      "phase": 0.5,
+      "finRoots": {
+        "pectoralR": {
+          "insideContinuousBody": true,
+          "surfaceDistance": 0.14776840806007385
+        },
+        "pectoralL": {
+          "insideContinuousBody": true,
+          "surfaceDistance": 0.14776843786239624
+        },
+        "pelvicR": {
+          "insideContinuousBody": true,
+          "surfaceDistance": 0.07624547183513641
+        },
+        "pelvicL": {
+          "insideContinuousBody": true,
+          "surfaceDistance": 0.08491697162389755
+        }
+      },
+      "maximumToothBaseToLiningDistance": 0.0038894687313586473
+    },
+    {
+      "clip": "Ability",
+      "phase": 1,
+      "finRoots": {
+        "pectoralR": {
+          "insideContinuousBody": true,
+          "surfaceDistance": 0.1418115198612213
+        },
+        "pectoralL": {
+          "insideContinuousBody": true,
+          "surfaceDistance": 0.1418115198612213
+        },
+        "pelvicR": {
+          "insideContinuousBody": true,
+          "surfaceDistance": 0.08047877997159958
+        },
+        "pelvicL": {
+          "insideContinuousBody": true,
+          "surfaceDistance": 0.08047877997159958
+        }
+      },
+      "maximumToothBaseToLiningDistance": 0.003889501327648759
+    },
+    {
+      "clip": "Attack",
+      "phase": 0,
+      "finRoots": {
+        "pectoralR": {
+          "insideContinuousBody": true,
+          "surfaceDistance": 0.1418115198612213
+        },
+        "pectoralL": {
+          "insideContinuousBody": true,
+          "surfaceDistance": 0.1418115198612213
+        },
+        "pelvicR": {
+          "insideContinuousBody": true,
+          "surfaceDistance": 0.08047877997159958
+        },
+        "pelvicL": {
+          "insideContinuousBody": true,
+          "surfaceDistance": 0.08047877997159958
+        }
+      },
+      "maximumToothBaseToLiningDistance": 0.003889501327648759
+    },
+    {
+      "clip": "Attack",
+      "phase": 0.3,
+      "finRoots": {
+        "pectoralR": {
+          "insideContinuousBody": true,
+          "surfaceDistance": 0.14381060004234314
+        },
+        "pectoralL": {
+          "insideContinuousBody": true,
+          "surfaceDistance": 0.14210715889930725
+        },
+        "pelvicR": {
+          "insideContinuousBody": true,
+          "surfaceDistance": 0.08157867193222046
+        },
+        "pelvicL": {
+          "insideContinuousBody": true,
+          "surfaceDistance": 0.07891473174095154
+        }
+      },
+      "maximumToothBaseToLiningDistance": 0.004125233739614487
+    },
+    {
+      "clip": "Attack",
+      "phase": 0.5,
+      "finRoots": {
+        "pectoralR": {
+          "insideContinuousBody": true,
+          "surfaceDistance": 0.14635373651981354
+        },
+        "pectoralL": {
+          "insideContinuousBody": true,
+          "surfaceDistance": 0.14588141441345215
+        },
+        "pelvicR": {
+          "insideContinuousBody": true,
+          "surfaceDistance": 0.07653805613517761
+        },
+        "pelvicL": {
+          "insideContinuousBody": true,
+          "surfaceDistance": 0.08526231348514557
+        }
+      },
+      "maximumToothBaseToLiningDistance": 0.0038895197212696075
+    },
+    {
+      "clip": "Attack",
+      "phase": 1,
+      "finRoots": {
+        "pectoralR": {
+          "insideContinuousBody": true,
+          "surfaceDistance": 0.1418115198612213
+        },
+        "pectoralL": {
+          "insideContinuousBody": true,
+          "surfaceDistance": 0.1418115198612213
+        },
+        "pelvicR": {
+          "insideContinuousBody": true,
+          "surfaceDistance": 0.08047877997159958
+        },
+        "pelvicL": {
+          "insideContinuousBody": true,
+          "surfaceDistance": 0.08047877997159958
+        }
+      },
+      "maximumToothBaseToLiningDistance": 0.003889501327648759
+    },
+    {
+      "clip": "Bite",
+      "phase": 0,
+      "finRoots": {
+        "pectoralR": {
+          "insideContinuousBody": true,
+          "surfaceDistance": 0.1418115198612213
+        },
+        "pectoralL": {
+          "insideContinuousBody": true,
+          "surfaceDistance": 0.1418115198612213
+        },
+        "pelvicR": {
+          "insideContinuousBody": true,
+          "surfaceDistance": 0.08047877997159958
+        },
+        "pelvicL": {
+          "insideContinuousBody": true,
+          "surfaceDistance": 0.08047877997159958
+        }
+      },
+      "maximumToothBaseToLiningDistance": 0.003889501327648759
+    },
+    {
+      "clip": "Bite",
+      "phase": 0.3,
+      "finRoots": {
+        "pectoralR": {
+          "insideContinuousBody": true,
+          "surfaceDistance": 0.14200247824192047
+        },
+        "pectoralL": {
+          "insideContinuousBody": true,
+          "surfaceDistance": 0.14162227511405945
+        },
+        "pelvicR": {
+          "insideContinuousBody": true,
+          "surfaceDistance": 0.08135800063610077
+        },
+        "pelvicL": {
+          "insideContinuousBody": true,
+          "surfaceDistance": 0.07946253567934036
+        }
+      },
+      "maximumToothBaseToLiningDistance": 0.004049657844007015
+    },
+    {
+      "clip": "Bite",
+      "phase": 0.5,
+      "finRoots": {
+        "pectoralR": {
+          "insideContinuousBody": true,
+          "surfaceDistance": 0.1418083757162094
+        },
+        "pectoralL": {
+          "insideContinuousBody": true,
+          "surfaceDistance": 0.14181481301784515
+        },
+        "pelvicR": {
+          "insideContinuousBody": true,
+          "surfaceDistance": 0.07713758945465088
+        },
+        "pelvicL": {
+          "insideContinuousBody": true,
+          "surfaceDistance": 0.08404409885406494
+        }
+      },
+      "maximumToothBaseToLiningDistance": 0.0038895015604794025
+    },
+    {
+      "clip": "Bite",
+      "phase": 1,
+      "finRoots": {
+        "pectoralR": {
+          "insideContinuousBody": true,
+          "surfaceDistance": 0.1418115198612213
+        },
+        "pectoralL": {
+          "insideContinuousBody": true,
+          "surfaceDistance": 0.1418115198612213
+        },
+        "pelvicR": {
+          "insideContinuousBody": true,
+          "surfaceDistance": 0.08047877997159958
+        },
+        "pelvicL": {
+          "insideContinuousBody": true,
+          "surfaceDistance": 0.08047877997159958
+        }
+      },
+      "maximumToothBaseToLiningDistance": 0.003889501327648759
+    },
+    {
+      "clip": "Death",
+      "phase": 0,
+      "finRoots": {
+        "pectoralR": {
+          "insideContinuousBody": true,
+          "surfaceDistance": 0.1418115198612213
+        },
+        "pectoralL": {
+          "insideContinuousBody": true,
+          "surfaceDistance": 0.1418115198612213
+        },
+        "pelvicR": {
+          "insideContinuousBody": true,
+          "surfaceDistance": 0.08047877997159958
+        },
+        "pelvicL": {
+          "insideContinuousBody": true,
+          "surfaceDistance": 0.08047877997159958
+        }
+      },
+      "maximumToothBaseToLiningDistance": 0.003889501327648759
+    },
+    {
+      "clip": "Death",
+      "phase": 0.3,
+      "finRoots": {
+        "pectoralR": {
+          "insideContinuousBody": true,
+          "surfaceDistance": 0.14193592965602875
+        },
+        "pectoralL": {
+          "insideContinuousBody": true,
+          "surfaceDistance": 0.14168791472911835
+        },
+        "pelvicR": {
+          "insideContinuousBody": true,
+          "surfaceDistance": 0.07680162042379379
+        },
+        "pelvicL": {
+          "insideContinuousBody": true,
+          "surfaceDistance": 0.08399046212434769
+        }
+      },
+      "maximumToothBaseToLiningDistance": 0.003889479674398899
+    },
+    {
+      "clip": "Death",
+      "phase": 0.5,
+      "finRoots": {
+        "pectoralR": {
+          "insideContinuousBody": true,
+          "surfaceDistance": 0.14182844758033752
+        },
+        "pectoralL": {
+          "insideContinuousBody": true,
+          "surfaceDistance": 0.14179474115371704
+        },
+        "pelvicR": {
+          "insideContinuousBody": true,
+          "surfaceDistance": 0.07048533856868744
+        },
+        "pelvicL": {
+          "insideContinuousBody": true,
+          "surfaceDistance": 0.08979722857475281
+        }
+      },
+      "maximumToothBaseToLiningDistance": 0.003889487124979496
+    },
+    {
+      "clip": "Death",
+      "phase": 1,
+      "finRoots": {
+        "pectoralR": {
+          "insideContinuousBody": true,
+          "surfaceDistance": 0.14181162416934967
+        },
+        "pectoralL": {
+          "insideContinuousBody": true,
+          "surfaceDistance": 0.14181159436702728
+        },
+        "pelvicR": {
+          "insideContinuousBody": true,
+          "surfaceDistance": 0.06730737537145615
+        },
+        "pelvicL": {
+          "insideContinuousBody": true,
+          "surfaceDistance": 0.0924685001373291
+        }
+      },
+      "maximumToothBaseToLiningDistance": 0.0038895094767212868
+    },
+    {
+      "clip": "Dive",
+      "phase": 0,
+      "finRoots": {
+        "pectoralR": {
+          "insideContinuousBody": true,
+          "surfaceDistance": 0.1418115198612213
+        },
+        "pectoralL": {
+          "insideContinuousBody": true,
+          "surfaceDistance": 0.1418115198612213
+        },
+        "pelvicR": {
+          "insideContinuousBody": true,
+          "surfaceDistance": 0.08047877997159958
+        },
+        "pelvicL": {
+          "insideContinuousBody": true,
+          "surfaceDistance": 0.08047877997159958
+        }
+      },
+      "maximumToothBaseToLiningDistance": 0.003889501327648759
+    },
+    {
+      "clip": "Dive",
+      "phase": 0.3,
+      "finRoots": {
+        "pectoralR": {
+          "insideContinuousBody": true,
+          "surfaceDistance": 0.13924966752529144
+        },
+        "pectoralL": {
+          "insideContinuousBody": true,
+          "surfaceDistance": 0.13809871673583984
+        },
+        "pelvicR": {
+          "insideContinuousBody": true,
+          "surfaceDistance": 0.08172257244586945
+        },
+        "pelvicL": {
+          "insideContinuousBody": true,
+          "surfaceDistance": 0.07893528044223785
+        }
+      },
+      "maximumToothBaseToLiningDistance": 0.003889478510245681
+    },
+    {
+      "clip": "Dive",
+      "phase": 0.5,
+      "finRoots": {
+        "pectoralR": {
+          "insideContinuousBody": true,
+          "surfaceDistance": 0.13735808432102203
+        },
+        "pectoralL": {
+          "insideContinuousBody": true,
+          "surfaceDistance": 0.13703441619873047
+        },
+        "pelvicR": {
+          "insideContinuousBody": true,
+          "surfaceDistance": 0.07228076457977295
+        },
+        "pelvicL": {
+          "insideContinuousBody": true,
+          "surfaceDistance": 0.0888020470738411
+        }
+      },
+      "maximumToothBaseToLiningDistance": 0.0038894866593182087
+    },
+    {
+      "clip": "Dive",
+      "phase": 1,
+      "finRoots": {
+        "pectoralR": {
+          "insideContinuousBody": true,
+          "surfaceDistance": 0.1418115198612213
+        },
+        "pectoralL": {
+          "insideContinuousBody": true,
+          "surfaceDistance": 0.1418115198612213
+        },
+        "pelvicR": {
+          "insideContinuousBody": true,
+          "surfaceDistance": 0.08047877997159958
+        },
+        "pelvicL": {
+          "insideContinuousBody": true,
+          "surfaceDistance": 0.08047877997159958
+        }
+      },
+      "maximumToothBaseToLiningDistance": 0.003889501327648759
+    },
+    {
+      "clip": "Dodge",
+      "phase": 0,
+      "finRoots": {
+        "pectoralR": {
+          "insideContinuousBody": true,
+          "surfaceDistance": 0.1418115198612213
+        },
+        "pectoralL": {
+          "insideContinuousBody": true,
+          "surfaceDistance": 0.1418115198612213
+        },
+        "pelvicR": {
+          "insideContinuousBody": true,
+          "surfaceDistance": 0.08047877997159958
+        },
+        "pelvicL": {
+          "insideContinuousBody": true,
+          "surfaceDistance": 0.08047877997159958
+        }
+      },
+      "maximumToothBaseToLiningDistance": 0.003889501327648759
+    },
+    {
+      "clip": "Dodge",
+      "phase": 0.3,
+      "finRoots": {
+        "pectoralR": {
+          "insideContinuousBody": true,
+          "surfaceDistance": 0.13506200909614563
+        },
+        "pectoralL": {
+          "insideContinuousBody": true,
+          "surfaceDistance": 0.14933402836322784
+        },
+        "pelvicR": {
+          "insideContinuousBody": true,
+          "surfaceDistance": 0.05746317654848099
+        },
+        "pelvicL": {
+          "insideContinuousBody": true,
+          "surfaceDistance": 0.09984204918146133
+        }
+      },
+      "maximumToothBaseToLiningDistance": 0.0038895229808986187
+    },
+    {
+      "clip": "Dodge",
+      "phase": 0.5,
+      "finRoots": {
+        "pectoralR": {
+          "insideContinuousBody": true,
+          "surfaceDistance": 0.13300468027591705
+        },
+        "pectoralL": {
+          "insideContinuousBody": true,
+          "surfaceDistance": 0.1519172489643097
+        },
+        "pelvicR": {
+          "insideContinuousBody": true,
+          "surfaceDistance": 0.02178683690726757
+        },
+        "pelvicL": {
+          "insideContinuousBody": true,
+          "surfaceDistance": 0.123319610953331
+        }
+      },
+      "maximumToothBaseToLiningDistance": 0.0038894235622137785
+    },
+    {
+      "clip": "Dodge",
+      "phase": 1,
+      "finRoots": {
+        "pectoralR": {
+          "insideContinuousBody": true,
+          "surfaceDistance": 0.1418115198612213
+        },
+        "pectoralL": {
+          "insideContinuousBody": true,
+          "surfaceDistance": 0.1418115198612213
+        },
+        "pelvicR": {
+          "insideContinuousBody": true,
+          "surfaceDistance": 0.08047877997159958
+        },
+        "pelvicL": {
+          "insideContinuousBody": true,
+          "surfaceDistance": 0.08047877997159958
+        }
+      },
+      "maximumToothBaseToLiningDistance": 0.003889501327648759
+    },
+    {
+      "clip": "Eat",
+      "phase": 0,
+      "finRoots": {
+        "pectoralR": {
+          "insideContinuousBody": true,
+          "surfaceDistance": 0.14176204800605774
+        },
+        "pectoralL": {
+          "insideContinuousBody": true,
+          "surfaceDistance": 0.14186130464076996
+        },
+        "pelvicR": {
+          "insideContinuousBody": true,
+          "surfaceDistance": 0.08264943957328796
+        },
+        "pelvicL": {
+          "insideContinuousBody": true,
+          "surfaceDistance": 0.07810848951339722
+        }
+      },
+      "maximumToothBaseToLiningDistance": 0.0038894619792699814
+    },
+    {
+      "clip": "Eat",
+      "phase": 0.3,
+      "finRoots": {
+        "pectoralR": {
+          "insideContinuousBody": true,
+          "surfaceDistance": 0.1449454426765442
+        },
+        "pectoralL": {
+          "insideContinuousBody": true,
+          "surfaceDistance": 0.14448226988315582
+        },
+        "pelvicR": {
+          "insideContinuousBody": true,
+          "surfaceDistance": 0.08125320076942444
+        },
+        "pelvicL": {
+          "insideContinuousBody": true,
+          "surfaceDistance": 0.07955995202064514
+        }
+      },
+      "maximumToothBaseToLiningDistance": 0.0039544119499623775
+    },
+    {
+      "clip": "Eat",
+      "phase": 0.5,
+      "finRoots": {
+        "pectoralR": {
+          "insideContinuousBody": true,
+          "surfaceDistance": 0.1462569534778595
+        },
+        "pectoralL": {
+          "insideContinuousBody": true,
+          "surfaceDistance": 0.14616955816745758
+        },
+        "pelvicR": {
+          "insideContinuousBody": true,
+          "surfaceDistance": 0.07828725874423981
+        },
+        "pelvicL": {
+          "insideContinuousBody": true,
+          "surfaceDistance": 0.08282595872879028
+        }
+      },
+      "maximumToothBaseToLiningDistance": 0.0038895029574632645
+    },
+    {
+      "clip": "Eat",
+      "phase": 1,
+      "finRoots": {
+        "pectoralR": {
+          "insideContinuousBody": true,
+          "surfaceDistance": 0.14176204800605774
+        },
+        "pectoralL": {
+          "insideContinuousBody": true,
+          "surfaceDistance": 0.14186130464076996
+        },
+        "pelvicR": {
+          "insideContinuousBody": true,
+          "surfaceDistance": 0.08264943957328796
+        },
+        "pelvicL": {
+          "insideContinuousBody": true,
+          "surfaceDistance": 0.07810848951339722
+        }
+      },
+      "maximumToothBaseToLiningDistance": 0.0038894619792699814
+    },
+    {
+      "clip": "Growth",
+      "phase": 0,
+      "finRoots": {
+        "pectoralR": {
+          "insideContinuousBody": true,
+          "surfaceDistance": 0.1418115198612213
+        },
+        "pectoralL": {
+          "insideContinuousBody": true,
+          "surfaceDistance": 0.1418115198612213
+        },
+        "pelvicR": {
+          "insideContinuousBody": true,
+          "surfaceDistance": 0.08047877997159958
+        },
+        "pelvicL": {
+          "insideContinuousBody": true,
+          "surfaceDistance": 0.08047877997159958
+        }
+      },
+      "maximumToothBaseToLiningDistance": 0.003889501327648759
+    },
+    {
+      "clip": "Growth",
+      "phase": 0.3,
+      "finRoots": {
+        "pectoralR": {
+          "insideContinuousBody": true,
+          "surfaceDistance": 0.14409415423870087
+        },
+        "pectoralL": {
+          "insideContinuousBody": true,
+          "surfaceDistance": 0.14369802176952362
+        },
+        "pelvicR": {
+          "insideContinuousBody": true,
+          "surfaceDistance": 0.08087561279535294
+        },
+        "pelvicL": {
+          "insideContinuousBody": true,
+          "surfaceDistance": 0.07998529076576233
+        }
+      },
+      "maximumToothBaseToLiningDistance": 0.0038894580211490393
+    },
+    {
+      "clip": "Growth",
+      "phase": 0.5,
+      "finRoots": {
+        "pectoralR": {
+          "insideContinuousBody": true,
+          "surfaceDistance": 0.14484286308288574
+        },
+        "pectoralL": {
+          "insideContinuousBody": true,
+          "surfaceDistance": 0.1446911245584488
+        },
+        "pelvicR": {
+          "insideContinuousBody": true,
+          "surfaceDistance": 0.07790878415107727
+        },
+        "pelvicL": {
+          "insideContinuousBody": true,
+          "surfaceDistance": 0.08321981132030487
+        }
+      },
+      "maximumToothBaseToLiningDistance": 0.003889583284035325
+    },
+    {
+      "clip": "Growth",
+      "phase": 1,
+      "finRoots": {
+        "pectoralR": {
+          "insideContinuousBody": true,
+          "surfaceDistance": 0.1418115198612213
+        },
+        "pectoralL": {
+          "insideContinuousBody": true,
+          "surfaceDistance": 0.1418115198612213
+        },
+        "pelvicR": {
+          "insideContinuousBody": true,
+          "surfaceDistance": 0.08047877997159958
+        },
+        "pelvicL": {
+          "insideContinuousBody": true,
+          "surfaceDistance": 0.08047877997159958
+        }
+      },
+      "maximumToothBaseToLiningDistance": 0.003889501327648759
+    },
+    {
+      "clip": "Guard",
+      "phase": 0,
+      "finRoots": {
+        "pectoralR": {
+          "insideContinuousBody": true,
+          "surfaceDistance": 0.14175061881542206
+        },
+        "pectoralL": {
+          "insideContinuousBody": true,
+          "surfaceDistance": 0.14187274873256683
+        },
+        "pelvicR": {
+          "insideContinuousBody": true,
+          "surfaceDistance": 0.08313465863466263
+        },
+        "pelvicL": {
+          "insideContinuousBody": true,
+          "surfaceDistance": 0.077558234333992
+        }
+      },
+      "maximumToothBaseToLiningDistance": 0.0038895979523658752
+    },
+    {
+      "clip": "Guard",
+      "phase": 0.3,
+      "finRoots": {
+        "pectoralR": {
+          "insideContinuousBody": true,
+          "surfaceDistance": 0.1455392837524414
+        },
+        "pectoralL": {
+          "insideContinuousBody": true,
+          "surfaceDistance": 0.14483672380447388
+        },
+        "pelvicR": {
+          "insideContinuousBody": true,
+          "surfaceDistance": 0.08127199858427048
+        },
+        "pelvicL": {
+          "insideContinuousBody": true,
+          "surfaceDistance": 0.07952284812927246
+        }
+      },
+      "maximumToothBaseToLiningDistance": 0.0038895083125680685
+    },
+    {
+      "clip": "Guard",
+      "phase": 0.5,
+      "finRoots": {
+        "pectoralR": {
+          "insideContinuousBody": true,
+          "surfaceDistance": 0.14713233709335327
+        },
+        "pectoralL": {
+          "insideContinuousBody": true,
+          "surfaceDistance": 0.14698241651058197
+        },
+        "pelvicR": {
+          "insideContinuousBody": true,
+          "surfaceDistance": 0.07777851819992065
+        },
+        "pelvicL": {
+          "insideContinuousBody": true,
+          "surfaceDistance": 0.08336426317691803
+        }
+      },
+      "maximumToothBaseToLiningDistance": 0.0038894261233508587
+    },
+    {
+      "clip": "Guard",
+      "phase": 1,
+      "finRoots": {
+        "pectoralR": {
+          "insideContinuousBody": true,
+          "surfaceDistance": 0.14175061881542206
+        },
+        "pectoralL": {
+          "insideContinuousBody": true,
+          "surfaceDistance": 0.14187274873256683
+        },
+        "pelvicR": {
+          "insideContinuousBody": true,
+          "surfaceDistance": 0.08313465863466263
+        },
+        "pelvicL": {
+          "insideContinuousBody": true,
+          "surfaceDistance": 0.077558234333992
+        }
+      },
+      "maximumToothBaseToLiningDistance": 0.0038895979523658752
+    },
+    {
+      "clip": "Heavy",
+      "phase": 0,
+      "finRoots": {
+        "pectoralR": {
+          "insideContinuousBody": true,
+          "surfaceDistance": 0.1418115198612213
+        },
+        "pectoralL": {
+          "insideContinuousBody": true,
+          "surfaceDistance": 0.1418115198612213
+        },
+        "pelvicR": {
+          "insideContinuousBody": true,
+          "surfaceDistance": 0.08047877997159958
+        },
+        "pelvicL": {
+          "insideContinuousBody": true,
+          "surfaceDistance": 0.08047877997159958
+        }
+      },
+      "maximumToothBaseToLiningDistance": 0.003889501327648759
+    },
+    {
+      "clip": "Heavy",
+      "phase": 0.3,
+      "finRoots": {
+        "pectoralR": {
+          "insideContinuousBody": true,
+          "surfaceDistance": 0.14436762034893036
+        },
+        "pectoralL": {
+          "insideContinuousBody": true,
+          "surfaceDistance": 0.14247117936611176
+        },
+        "pelvicR": {
+          "insideContinuousBody": true,
+          "surfaceDistance": 0.08214849978685379
+        },
+        "pelvicL": {
+          "insideContinuousBody": true,
+          "surfaceDistance": 0.07829500734806061
+        }
+      },
+      "maximumToothBaseToLiningDistance": 0.004288703203201294
+    },
+    {
+      "clip": "Heavy",
+      "phase": 0.5,
+      "finRoots": {
+        "pectoralR": {
+          "insideContinuousBody": true,
+          "surfaceDistance": 0.14812952280044556
+        },
+        "pectoralL": {
+          "insideContinuousBody": true,
+          "surfaceDistance": 0.14740851521492004
+        },
+        "pelvicR": {
+          "insideContinuousBody": true,
+          "surfaceDistance": 0.07685185223817825
+        },
+        "pelvicL": {
+          "insideContinuousBody": true,
+          "surfaceDistance": 0.08496522903442383
+        }
+      },
+      "maximumToothBaseToLiningDistance": 0.0038894822355359793
+    },
+    {
+      "clip": "Heavy",
+      "phase": 1,
+      "finRoots": {
+        "pectoralR": {
+          "insideContinuousBody": true,
+          "surfaceDistance": 0.1418115198612213
+        },
+        "pectoralL": {
+          "insideContinuousBody": true,
+          "surfaceDistance": 0.1418115198612213
+        },
+        "pelvicR": {
+          "insideContinuousBody": true,
+          "surfaceDistance": 0.08047877997159958
+        },
+        "pelvicL": {
+          "insideContinuousBody": true,
+          "surfaceDistance": 0.08047877997159958
+        }
+      },
+      "maximumToothBaseToLiningDistance": 0.003889501327648759
+    },
+    {
+      "clip": "Hit",
+      "phase": 0,
+      "finRoots": {
+        "pectoralR": {
+          "insideContinuousBody": true,
+          "surfaceDistance": 0.1418115198612213
+        },
+        "pectoralL": {
+          "insideContinuousBody": true,
+          "surfaceDistance": 0.1418115198612213
+        },
+        "pelvicR": {
+          "insideContinuousBody": true,
+          "surfaceDistance": 0.08047877997159958
+        },
+        "pelvicL": {
+          "insideContinuousBody": true,
+          "surfaceDistance": 0.08047877997159958
+        }
+      },
+      "maximumToothBaseToLiningDistance": 0.003889501327648759
+    },
+    {
+      "clip": "Hit",
+      "phase": 0.3,
+      "finRoots": {
+        "pectoralR": {
+          "insideContinuousBody": true,
+          "surfaceDistance": 0.13926191627979279
+        },
+        "pectoralL": {
+          "insideContinuousBody": true,
+          "surfaceDistance": 0.13863150775432587
+        },
+        "pelvicR": {
+          "insideContinuousBody": true,
+          "surfaceDistance": 0.08181244134902954
+        },
+        "pelvicL": {
+          "insideContinuousBody": true,
+          "surfaceDistance": 0.07891938835382462
+        }
+      },
+      "maximumToothBaseToLiningDistance": 0.0038895264733582735
+    },
+    {
+      "clip": "Hit",
+      "phase": 0.5,
+      "finRoots": {
+        "pectoralR": {
+          "insideContinuousBody": true,
+          "surfaceDistance": 0.13698916137218475
+        },
+        "pectoralL": {
+          "insideContinuousBody": true,
+          "surfaceDistance": 0.13679015636444092
+        },
+        "pelvicR": {
+          "insideContinuousBody": true,
+          "surfaceDistance": 0.07538934797048569
+        },
+        "pelvicL": {
+          "insideContinuousBody": true,
+          "surfaceDistance": 0.08576905727386475
+        }
+      },
+      "maximumToothBaseToLiningDistance": 0.003889502724632621
+    },
+    {
+      "clip": "Hit",
+      "phase": 1,
+      "finRoots": {
+        "pectoralR": {
+          "insideContinuousBody": true,
+          "surfaceDistance": 0.1418115198612213
+        },
+        "pectoralL": {
+          "insideContinuousBody": true,
+          "surfaceDistance": 0.1418115198612213
+        },
+        "pelvicR": {
+          "insideContinuousBody": true,
+          "surfaceDistance": 0.08047877997159958
+        },
+        "pelvicL": {
+          "insideContinuousBody": true,
+          "surfaceDistance": 0.08047877997159958
+        }
+      },
+      "maximumToothBaseToLiningDistance": 0.003889501327648759
+    },
+    {
+      "clip": "Idle",
+      "phase": 0,
+      "finRoots": {
+        "pectoralR": {
+          "insideContinuousBody": true,
+          "surfaceDistance": 0.1417277604341507
+        },
+        "pectoralL": {
+          "insideContinuousBody": true,
+          "surfaceDistance": 0.14189571142196655
+        },
+        "pelvicR": {
+          "insideContinuousBody": true,
+          "surfaceDistance": 0.08408098667860031
+        },
+        "pelvicL": {
+          "insideContinuousBody": true,
+          "surfaceDistance": 0.07645393908023834
+        }
+      },
+      "maximumToothBaseToLiningDistance": 0.0038895325269550085
+    },
+    {
+      "clip": "Idle",
+      "phase": 0.3,
+      "finRoots": {
+        "pectoralR": {
+          "insideContinuousBody": true,
+          "surfaceDistance": 0.1422334909439087
+        },
+        "pectoralL": {
+          "insideContinuousBody": true,
+          "surfaceDistance": 0.14139750599861145
+        },
+        "pelvicR": {
+          "insideContinuousBody": true,
+          "surfaceDistance": 0.08142100274562836
+        },
+        "pelvicL": {
+          "insideContinuousBody": true,
+          "surfaceDistance": 0.0793263390660286
+        }
+      },
+      "maximumToothBaseToLiningDistance": 0.0038894559256732464
+    },
+    {
+      "clip": "Idle",
+      "phase": 0.5,
+      "finRoots": {
+        "pectoralR": {
+          "insideContinuousBody": true,
+          "surfaceDistance": 0.14189566671848297
+        },
+        "pectoralL": {
+          "insideContinuousBody": true,
+          "surfaceDistance": 0.1417277604341507
+        },
+        "pelvicR": {
+          "insideContinuousBody": true,
+          "surfaceDistance": 0.07675762474536896
+        },
+        "pelvicL": {
+          "insideContinuousBody": true,
+          "surfaceDistance": 0.08440360426902771
+        }
+      },
+      "maximumToothBaseToLiningDistance": 0.003889570478349924
+    },
+    {
+      "clip": "Idle",
+      "phase": 1,
+      "finRoots": {
+        "pectoralR": {
+          "insideContinuousBody": true,
+          "surfaceDistance": 0.1417277604341507
+        },
+        "pectoralL": {
+          "insideContinuousBody": true,
+          "surfaceDistance": 0.14189571142196655
+        },
+        "pelvicR": {
+          "insideContinuousBody": true,
+          "surfaceDistance": 0.08408098667860031
+        },
+        "pelvicL": {
+          "insideContinuousBody": true,
+          "surfaceDistance": 0.07645393908023834
+        }
+      },
+      "maximumToothBaseToLiningDistance": 0.0038895325269550085
+    },
+    {
+      "clip": "Parry",
+      "phase": 0,
+      "finRoots": {
+        "pectoralR": {
+          "insideContinuousBody": true,
+          "surfaceDistance": 0.1418115198612213
+        },
+        "pectoralL": {
+          "insideContinuousBody": true,
+          "surfaceDistance": 0.1418115198612213
+        },
+        "pelvicR": {
+          "insideContinuousBody": true,
+          "surfaceDistance": 0.08047877997159958
+        },
+        "pelvicL": {
+          "insideContinuousBody": true,
+          "surfaceDistance": 0.08047877997159958
+        }
+      },
+      "maximumToothBaseToLiningDistance": 0.003889501327648759
+    },
+    {
+      "clip": "Parry",
+      "phase": 0.3,
+      "finRoots": {
+        "pectoralR": {
+          "insideContinuousBody": true,
+          "surfaceDistance": 0.15736621618270874
+        },
+        "pectoralL": {
+          "insideContinuousBody": true,
+          "surfaceDistance": 0.12928631901741028
+        },
+        "pelvicR": {
+          "insideContinuousBody": true,
+          "surfaceDistance": 0.0820336863398552
+        },
+        "pelvicL": {
+          "insideContinuousBody": true,
+          "surfaceDistance": 0.07859818637371063
+        }
+      },
+      "maximumToothBaseToLiningDistance": 0.0038895192556083202
+    },
+    {
+      "clip": "Parry",
+      "phase": 0.5,
+      "finRoots": {
+        "pectoralR": {
+          "insideContinuousBody": true,
+          "surfaceDistance": 0.15452805161476135
+        },
+        "pectoralL": {
+          "insideContinuousBody": true,
+          "surfaceDistance": 0.13111628592014313
+        },
+        "pelvicR": {
+          "insideContinuousBody": true,
+          "surfaceDistance": 0.07228074967861176
+        },
+        "pelvicL": {
+          "insideContinuousBody": true,
+          "surfaceDistance": 0.08880200982093811
+        }
+      },
+      "maximumToothBaseToLiningDistance": 0.003889557207003236
+    },
+    {
+      "clip": "Parry",
+      "phase": 1,
+      "finRoots": {
+        "pectoralR": {
+          "insideContinuousBody": true,
+          "surfaceDistance": 0.1418115198612213
+        },
+        "pectoralL": {
+          "insideContinuousBody": true,
+          "surfaceDistance": 0.1418115198612213
+        },
+        "pelvicR": {
+          "insideContinuousBody": true,
+          "surfaceDistance": 0.08047877997159958
+        },
+        "pelvicL": {
+          "insideContinuousBody": true,
+          "surfaceDistance": 0.08047877997159958
+        }
+      },
+      "maximumToothBaseToLiningDistance": 0.003889501327648759
+    },
+    {
+      "clip": "Rise",
+      "phase": 0,
+      "finRoots": {
+        "pectoralR": {
+          "insideContinuousBody": true,
+          "surfaceDistance": 0.1418115198612213
+        },
+        "pectoralL": {
+          "insideContinuousBody": true,
+          "surfaceDistance": 0.1418115198612213
+        },
+        "pelvicR": {
+          "insideContinuousBody": true,
+          "surfaceDistance": 0.08047877997159958
+        },
+        "pelvicL": {
+          "insideContinuousBody": true,
+          "surfaceDistance": 0.08047877997159958
+        }
+      },
+      "maximumToothBaseToLiningDistance": 0.003889501327648759
+    },
+    {
+      "clip": "Rise",
+      "phase": 0.3,
+      "finRoots": {
+        "pectoralR": {
+          "insideContinuousBody": true,
+          "surfaceDistance": 0.14575228095054626
+        },
+        "pectoralL": {
+          "insideContinuousBody": true,
+          "surfaceDistance": 0.14447811245918274
+        },
+        "pelvicR": {
+          "insideContinuousBody": true,
+          "surfaceDistance": 0.08159337192773819
+        },
+        "pelvicL": {
+          "insideContinuousBody": true,
+          "surfaceDistance": 0.07909654080867767
+        }
+      },
+      "maximumToothBaseToLiningDistance": 0.0038894577883183956
+    },
+    {
+      "clip": "Rise",
+      "phase": 0.5,
+      "finRoots": {
+        "pectoralR": {
+          "insideContinuousBody": true,
+          "surfaceDistance": 0.14691396057605743
+        },
+        "pectoralL": {
+          "insideContinuousBody": true,
+          "surfaceDistance": 0.14651566743850708
+        },
+        "pelvicR": {
+          "insideContinuousBody": true,
+          "surfaceDistance": 0.07314850389957428
+        },
+        "pelvicL": {
+          "insideContinuousBody": true,
+          "surfaceDistance": 0.08796504139900208
+        }
+      },
+      "maximumToothBaseToLiningDistance": 0.0038895041216164827
+    },
+    {
+      "clip": "Rise",
+      "phase": 1,
+      "finRoots": {
+        "pectoralR": {
+          "insideContinuousBody": true,
+          "surfaceDistance": 0.1418115198612213
+        },
+        "pectoralL": {
+          "insideContinuousBody": true,
+          "surfaceDistance": 0.1418115198612213
+        },
+        "pelvicR": {
+          "insideContinuousBody": true,
+          "surfaceDistance": 0.08047877997159958
+        },
+        "pelvicL": {
+          "insideContinuousBody": true,
+          "surfaceDistance": 0.08047877997159958
+        }
+      },
+      "maximumToothBaseToLiningDistance": 0.003889501327648759
+    },
+    {
+      "clip": "Stagger",
+      "phase": 0,
+      "finRoots": {
+        "pectoralR": {
+          "insideContinuousBody": true,
+          "surfaceDistance": 0.1418115198612213
+        },
+        "pectoralL": {
+          "insideContinuousBody": true,
+          "surfaceDistance": 0.1418115198612213
+        },
+        "pelvicR": {
+          "insideContinuousBody": true,
+          "surfaceDistance": 0.08047877997159958
+        },
+        "pelvicL": {
+          "insideContinuousBody": true,
+          "surfaceDistance": 0.08047877997159958
+        }
+      },
+      "maximumToothBaseToLiningDistance": 0.003889501327648759
+    },
+    {
+      "clip": "Stagger",
+      "phase": 0.3,
+      "finRoots": {
+        "pectoralR": {
+          "insideContinuousBody": true,
+          "surfaceDistance": 0.1418212354183197
+        },
+        "pectoralL": {
+          "insideContinuousBody": true,
+          "surfaceDistance": 0.14180193841457367
+        },
+        "pelvicR": {
+          "insideContinuousBody": true,
+          "surfaceDistance": 0.07593999803066254
+        },
+        "pelvicL": {
+          "insideContinuousBody": true,
+          "surfaceDistance": 0.08454234153032303
+        }
+      },
+      "maximumToothBaseToLiningDistance": 0.0038894719909876585
+    },
+    {
+      "clip": "Stagger",
+      "phase": 0.5,
+      "finRoots": {
+        "pectoralR": {
+          "insideContinuousBody": true,
+          "surfaceDistance": 0.13690289855003357
+        },
+        "pectoralL": {
+          "insideContinuousBody": true,
+          "surfaceDistance": 0.14712581038475037
+        },
+        "pelvicR": {
+          "insideContinuousBody": true,
+          "surfaceDistance": 0.08334647119045258
+        },
+        "pelvicL": {
+          "insideContinuousBody": true,
+          "surfaceDistance": 0.07826629281044006
+        }
+      },
+      "maximumToothBaseToLiningDistance": 0.003889463609084487
+    },
+    {
+      "clip": "Stagger",
+      "phase": 1,
+      "finRoots": {
+        "pectoralR": {
+          "insideContinuousBody": true,
+          "surfaceDistance": 0.1418115198612213
+        },
+        "pectoralL": {
+          "insideContinuousBody": true,
+          "surfaceDistance": 0.1418115198612213
+        },
+        "pelvicR": {
+          "insideContinuousBody": true,
+          "surfaceDistance": 0.08047877997159958
+        },
+        "pelvicL": {
+          "insideContinuousBody": true,
+          "surfaceDistance": 0.08047877997159958
+        }
+      },
+      "maximumToothBaseToLiningDistance": 0.003889501327648759
+    },
+    {
+      "clip": "Swim",
+      "phase": 0,
+      "finRoots": {
+        "pectoralR": {
+          "insideContinuousBody": true,
+          "surfaceDistance": 0.1414143443107605
+        },
+        "pectoralL": {
+          "insideContinuousBody": true,
+          "surfaceDistance": 0.1422160267829895
+        },
+        "pelvicR": {
+          "insideContinuousBody": true,
+          "surfaceDistance": 0.09660027921199799
+        },
+        "pelvicL": {
+          "insideContinuousBody": true,
+          "surfaceDistance": 0.06065135449171066
+        }
+      },
+      "maximumToothBaseToLiningDistance": 0.003889460815116763
+    },
+    {
+      "clip": "Swim",
+      "phase": 0.3,
+      "finRoots": {
+        "pectoralR": {
+          "insideContinuousBody": true,
+          "surfaceDistance": 0.14378447830677032
+        },
+        "pectoralL": {
+          "insideContinuousBody": true,
+          "surfaceDistance": 0.1399839222431183
+        },
+        "pelvicR": {
+          "insideContinuousBody": true,
+          "surfaceDistance": 0.08109589666128159
+        },
+        "pelvicL": {
+          "insideContinuousBody": true,
+          "surfaceDistance": 0.07924602180719376
+        }
+      },
+      "maximumToothBaseToLiningDistance": 0.003889501327648759
+    },
+    {
+      "clip": "Swim",
+      "phase": 0.5,
+      "finRoots": {
+        "pectoralR": {
+          "insideContinuousBody": true,
+          "surfaceDistance": 0.14221596717834473
+        },
+        "pectoralL": {
+          "insideContinuousBody": true,
+          "surfaceDistance": 0.14141438901424408
+        },
+        "pelvicR": {
+          "insideContinuousBody": true,
+          "surfaceDistance": 0.06209715083241463
+        },
+        "pelvicL": {
+          "insideContinuousBody": true,
+          "surfaceDistance": 0.0980561152100563
+        }
+      },
+      "maximumToothBaseToLiningDistance": 0.0038895132020115852
+    },
+    {
+      "clip": "Swim",
+      "phase": 1,
+      "finRoots": {
+        "pectoralR": {
+          "insideContinuousBody": true,
+          "surfaceDistance": 0.1414143443107605
+        },
+        "pectoralL": {
+          "insideContinuousBody": true,
+          "surfaceDistance": 0.1422160267829895
+        },
+        "pelvicR": {
+          "insideContinuousBody": true,
+          "surfaceDistance": 0.09660027921199799
+        },
+        "pelvicL": {
+          "insideContinuousBody": true,
+          "surfaceDistance": 0.06065135449171066
+        }
+      },
+      "maximumToothBaseToLiningDistance": 0.003889460815116763
+    },
+    {
+      "clip": "TurnLeft",
+      "phase": 0,
+      "finRoots": {
+        "pectoralR": {
+          "insideContinuousBody": true,
+          "surfaceDistance": 0.1418115198612213
+        },
+        "pectoralL": {
+          "insideContinuousBody": true,
+          "surfaceDistance": 0.1418115198612213
+        },
+        "pelvicR": {
+          "insideContinuousBody": true,
+          "surfaceDistance": 0.08047877997159958
+        },
+        "pelvicL": {
+          "insideContinuousBody": true,
+          "surfaceDistance": 0.08047877997159958
+        }
+      },
+      "maximumToothBaseToLiningDistance": 0.003889501327648759
+    },
+    {
+      "clip": "TurnLeft",
+      "phase": 0.3,
+      "finRoots": {
+        "pectoralR": {
+          "insideContinuousBody": true,
+          "surfaceDistance": 0.1327090859413147
+        },
+        "pectoralL": {
+          "insideContinuousBody": true,
+          "surfaceDistance": 0.14971567690372467
+        },
+        "pelvicR": {
+          "insideContinuousBody": true,
+          "surfaceDistance": 0.09012874215841293
+        },
+        "pelvicL": {
+          "insideContinuousBody": true,
+          "surfaceDistance": 0.06953979283571243
+        }
+      },
+      "maximumToothBaseToLiningDistance": 0.003889495274052024
+    },
+    {
+      "clip": "TurnLeft",
+      "phase": 0.5,
+      "finRoots": {
+        "pectoralR": {
+          "insideContinuousBody": true,
+          "surfaceDistance": 0.12548652291297913
+        },
+        "pectoralL": {
+          "insideContinuousBody": true,
+          "surfaceDistance": 0.15517090260982513
+        },
+        "pelvicR": {
+          "insideContinuousBody": true,
+          "surfaceDistance": 0.08197475224733353
+        },
+        "pelvicL": {
+          "insideContinuousBody": true,
+          "surfaceDistance": 0.07986535876989365
+        }
+      },
+      "maximumToothBaseToLiningDistance": 0.0038894950412213802
+    },
+    {
+      "clip": "TurnLeft",
+      "phase": 1,
+      "finRoots": {
+        "pectoralR": {
+          "insideContinuousBody": true,
+          "surfaceDistance": 0.1418115198612213
+        },
+        "pectoralL": {
+          "insideContinuousBody": true,
+          "surfaceDistance": 0.1418115198612213
+        },
+        "pelvicR": {
+          "insideContinuousBody": true,
+          "surfaceDistance": 0.08047877997159958
+        },
+        "pelvicL": {
+          "insideContinuousBody": true,
+          "surfaceDistance": 0.08047877997159958
+        }
+      },
+      "maximumToothBaseToLiningDistance": 0.003889501327648759
+    },
+    {
+      "clip": "TurnRight",
+      "phase": 0,
+      "finRoots": {
+        "pectoralR": {
+          "insideContinuousBody": true,
+          "surfaceDistance": 0.1418115198612213
+        },
+        "pectoralL": {
+          "insideContinuousBody": true,
+          "surfaceDistance": 0.1418115198612213
+        },
+        "pelvicR": {
+          "insideContinuousBody": true,
+          "surfaceDistance": 0.08047877997159958
+        },
+        "pelvicL": {
+          "insideContinuousBody": true,
+          "surfaceDistance": 0.08047877997159958
+        }
+      },
+      "maximumToothBaseToLiningDistance": 0.003889501327648759
+    },
+    {
+      "clip": "TurnRight",
+      "phase": 0.3,
+      "finRoots": {
+        "pectoralR": {
+          "insideContinuousBody": true,
+          "surfaceDistance": 0.15132750570774078
+        },
+        "pectoralL": {
+          "insideContinuousBody": true,
+          "surfaceDistance": 0.13107076287269592
+        },
+        "pelvicR": {
+          "insideContinuousBody": true,
+          "surfaceDistance": 0.07505235821008682
+        },
+        "pelvicL": {
+          "insideContinuousBody": true,
+          "surfaceDistance": 0.08522491902112961
+        }
+      },
+      "maximumToothBaseToLiningDistance": 0.0038894989993423223
+    },
+    {
+      "clip": "TurnRight",
+      "phase": 0.5,
+      "finRoots": {
+        "pectoralR": {
+          "insideContinuousBody": true,
+          "surfaceDistance": 0.15573301911354065
+        },
+        "pectoralL": {
+          "insideContinuousBody": true,
+          "surfaceDistance": 0.12497375905513763
+        },
+        "pelvicR": {
+          "insideContinuousBody": true,
+          "surfaceDistance": 0.05569327250123024
+        },
+        "pelvicL": {
+          "insideContinuousBody": true,
+          "surfaceDistance": 0.10239952802658081
+        }
+      },
+      "maximumToothBaseToLiningDistance": 0.0038894678000360727
+    },
+    {
+      "clip": "TurnRight",
+      "phase": 1,
+      "finRoots": {
+        "pectoralR": {
+          "insideContinuousBody": true,
+          "surfaceDistance": 0.1418115198612213
+        },
+        "pectoralL": {
+          "insideContinuousBody": true,
+          "surfaceDistance": 0.1418115198612213
+        },
+        "pelvicR": {
+          "insideContinuousBody": true,
+          "surfaceDistance": 0.08047877997159958
+        },
+        "pelvicL": {
+          "insideContinuousBody": true,
+          "surfaceDistance": 0.08047877997159958
+        }
+      },
+      "maximumToothBaseToLiningDistance": 0.003889501327648759
+    }
+  ]
+}

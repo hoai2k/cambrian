@@ -1,0 +1,53 @@
+{
+  "id": "bothriolepis",
+  "name": "Bothriolepis",
+  "species": "Bothriolepis canadensis",
+  "provenance": "Late Devonian (Frasnian), Escuminac Formation, Miguasha, Quebec, Canada",
+  "description": "Angular armoured antiarch with a steep immobile head, inset dorsal eyes, a posterior dorsal crest and jointed dermal pectoral fins. A long flexible posterior carries a small dorsal fin and asymmetrical tail.",
+  "lengthMeters": 0.4,
+  "modelLength": 4.5350000858306885,
+  "locomotion": "Swim",
+  "clips": [
+    "Ability",
+    "Attack",
+    "Bite",
+    "Death",
+    "Dive",
+    "Dodge",
+    "Eat",
+    "Growth",
+    "Guard",
+    "Heavy",
+    "Hit",
+    "Idle",
+    "Parry",
+    "Rise",
+    "Stagger",
+    "Swim",
+    "TurnLeft",
+    "TurnRight"
+  ],
+  "looping": [
+    "Idle",
+    "Swim",
+    "Guard",
+    "Eat"
+  ],
+  "anchors": [
+    "anchor_mouth",
+    "anchor_mouth_inside",
+    "anchor_attack_primary"
+  ],
+  "sources": [
+    "https://www.palaeo-electronica.org/content/2014/647-3d-bothriolepis",
+    "https://doi.org/10.26879/417"
+  ],
+  "notes": [
+    "Original anatomical reconstruction informed by Bechard et al. 2014 figures 2-3; not a fossil scan. Representative 0.40 m adult.",
+    "Continuous rigid cephalic/thoracic armour, steep head roof and approximately 36% armoured body length; exact living tissue thickness and pigmentation are inferred.",
+    "Dorsal eyes are placed within continuous head tissue, with no separate pads or orbital hoops; volume audit accompanies the delivery.",
+    "Pectoral segments have limited articulation, no toy ball joints, no head hinge and no terrestrial walking or rowing claim.",
+    "UV dermal detail uses an original imagegen swatch with authored anatomical seam relief; distant LOD bakes pigment into vertex colours and removes textures.",
+    "Small ventral oral folds and interior tissues are interpreted; action labels are asset compatibility gestures rather than Devonian gameplay definitions."
+  ]
+}

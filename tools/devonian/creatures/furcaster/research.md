@@ -1,0 +1,11 @@
+# Furcaster palaeozoicus research and reconstruction
+
+Clark EG, Hutchinson JR & Briggs DEG2020. Three-dimensional visualization as a tool for interpreting locomotion strategies in ophiuroids from the Devonian Hunsrück Slate. Royal Society Open Science7:201380. https://doi.org/10.1098/rsos.201380 . Original paper retained under local v1/references/locomotion-2020.pdf. Figure3c and section3.5 directly inspected; arm specimen OKL96 is in the Goldfuß Museum, University of Bonn.
+
+Furcaster has opposing paired ambulacrals, with narrower middle sections and joint interfaces. The selected CT shows changing ossicle shape down a slender tapering arm and curved adambulacrals. These support an interpretation of arm-driven movement; they do not fix a unique gait or prove habitual swimming. This model uses separate opposed ossicle halves, articulated chains, flexible connecting tissue and lateral/groove spines. It does not add a generic modern brittle-star dorsal shield row.
+
+Comparative additional primary source: https://doi.org/10.1017/jpa.2025.10096 describes later Carboniferous Furcaster lateral plates. It supports the need to distinguish lateral/groove articulations and tapering variation; specific Carboniferous species' counts are NOT transferred as measured F.palaeozoicus anatomy. Thirty-six visible segments per arm, three lateral spines per side and reconstructed podia are artistic production choices pending finer specimen comparison.
+
+Five arms, small granular disc, central oral opening and fivefold mouth-angle organization are comparative ophiuroid reconstruction. Selected CT concerns an arm; precise disc plate pattern, internal soft lining, podial length, mouth papillae and pigmentation remain uncertain. No visible eyes, fish-jaw hinge or moulting shell are invented. Fine ossicles are covered partly in living tissue, not polished pyritic fossil material.
+
+The primary study's preserved opposed joints suggest mechanical arm motion may have been possible. Crawl consequently coordinates driving and stabilizing pairs with a leading arm; Swim is a compatibility sculling interpretation. Feeding involves limited oral frame motion and arm gathering. These animation labels do not prescribe gameplay.

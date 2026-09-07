@@ -1,0 +1,317 @@
+{
+  "id": "acanthostega",
+  "status": "preview-ready",
+  "manifest": {
+    "id": "acanthostega",
+    "status": "preview",
+    "frozenAt": "2026-09-07T18:37:23.174667+00:00",
+    "files": {
+      "acanthostega.glb": {
+        "sha256": "a97603234afe8661086d944172c73582295070db58f28493e2350a343c894e57",
+        "bytes": 13996232
+      },
+      "acanthostega.lod1.glb": {
+        "sha256": "afdd8354a92feb1a1b73afd90b2eed697ed13610b6f4c370a9dbb67045ba4b1f",
+        "bytes": 2344760
+      },
+      "acanthostega.json": {
+        "sha256": "9b72451451e7f0e7ffaab5d7574193b70d419b34434c7ae9fd5f62c3ba4c1cda",
+        "bytes": 2192
+      },
+      "acanthostega.png": {
+        "sha256": "003ed48f360dd7a23c6f369ebb8dd665e75c6afc7433e393d6a2812a0a058f91",
+        "bytes": 1000375
+      },
+      "acanthostega.select.png": {
+        "sha256": "cd3bca475494bbc3e7af254b98a09de28168caa763e69d7a21e7e818f96d55ba",
+        "bytes": 748778
+      },
+      "acanthostega.card.png": {
+        "sha256": "92eb2796a037bd80965fc2ef862f126eda75db3e16246cfcb82f37ac76091294",
+        "bytes": 202878
+      },
+      "acanthostega.thumb.png": {
+        "sha256": "2be85906251dd302f61b645ccd0e3d58dc3e14b8baf9832c13a6849ade97b657",
+        "bytes": 27605
+      }
+    },
+    "editableSource": {
+      "file": "/Users/hoai/Documents/Stuff/Generations/cambrian/local/devonian-authoring/acanthostega/acanthostega-v1.blend",
+      "sha256": "4b0c29d640e5d07719b40896c602499ee7b9f7c34fb34849d4cbdf6e8737f2f3"
+    }
+  },
+  "geometry": {
+    "fullTriangles": 102108,
+    "lodTriangles": 28586,
+    "reductionRatio": 0.27995847533983625,
+    "bones": 56,
+    "fullBytes": 13996232,
+    "lodBytes": 2344760,
+    "anchorCount": 3
+  },
+  "eyes": {
+    "full": {
+      "id": "acanthostega",
+      "revision": "local-v1-full",
+      "assetSha256": "a97603234afe8661086d944172c73582295070db58f28493e2350a343c894e57",
+      "headMesh": "acanthostega acanthostega body",
+      "headTriangles": 56220,
+      "headTopology": {
+        "valid": true,
+        "nonmanifoldEdges": 0,
+        "cappedBoundaryLoops": []
+      },
+      "eyes": [
+        {
+          "eye": 0,
+          "center": [
+            -0.3050000071525574,
+            0.20200000703334808,
+            1.4199999570846558
+          ],
+          "radii": [
+            0.13199999928474426,
+            0.13300000131130219,
+            0.1669999361038208
+          ],
+          "eyeTriangles": 2784,
+          "boundingBoxCandidates": 120000,
+          "volumeSamples": 62549,
+          "inside": 45721,
+          "insidePercent": 73.09629250667477,
+          "wilson95Percent": [
+            72.74734599261834,
+            73.44240216424237
+          ],
+          "conservative95Percent": [
+            72.67350863023674,
+            73.45354701501991
+          ],
+          "rayDisagreements": 53,
+          "insideLowerPercent": 73.02275016387152,
+          "insideUpperPercent": 73.10748373275352,
+          "closureClearanceLowerBounds": [],
+          "criterion50": "PASS",
+          "target65": true,
+          "guidanceOnly70PercentTranslationGlTF": [
+            3.829985871561803e-06,
+            0.0,
+            0.0
+          ],
+          "guidanceOnly70PercentTranslationBlender": [
+            3.829985871561803e-06,
+            -0.0,
+            0.0
+          ]
+        },
+        {
+          "eye": 1,
+          "center": [
+            0.3050000071525574,
+            0.20200000703334808,
+            1.4199999570846558
+          ],
+          "radii": [
+            0.13199999928474426,
+            0.13300000131130219,
+            0.1669999361038208
+          ],
+          "eyeTriangles": 2784,
+          "boundingBoxCandidates": 120000,
+          "volumeSamples": 62691,
+          "inside": 45729,
+          "insidePercent": 72.94348471072402,
+          "wilson95Percent": [
+            72.5943242453501,
+            73.28983347138302
+          ],
+          "conservative95Percent": [
+            72.5943242453501,
+            73.28983347138302
+          ],
+          "rayDisagreements": 0,
+          "insideLowerPercent": 72.94348471072402,
+          "insideUpperPercent": 72.94348471072402,
+          "closureClearanceLowerBounds": [],
+          "criterion50": "PASS",
+          "target65": true,
+          "guidanceOnly70PercentTranslationGlTF": [
+            -3.829985871561803e-06,
+            0.0,
+            0.0
+          ],
+          "guidanceOnly70PercentTranslationBlender": [
+            -3.829985871561803e-06,
+            -0.0,
+            0.0
+          ]
+        }
+      ]
+    },
+    "lod": {
+      "id": "acanthostega",
+      "revision": "local-v1-lod",
+      "assetSha256": "afdd8354a92feb1a1b73afd90b2eed697ed13610b6f4c370a9dbb67045ba4b1f",
+      "headMesh": "acanthostega acanthostega body",
+      "headTriangles": 15740,
+      "headTopology": {
+        "valid": true,
+        "nonmanifoldEdges": 0,
+        "cappedBoundaryLoops": []
+      },
+      "eyes": [
+        {
+          "eye": 0,
+          "center": [
+            -0.30500001460313797,
+            0.202000442892313,
+            1.420271635055542
+          ],
+          "radii": [
+            0.13196467608213425,
+            0.13298728689551353,
+            0.16717898845672607
+          ],
+          "eyeTriangles": 780,
+          "boundingBoxCandidates": 120000,
+          "volumeSamples": 62231,
+          "inside": 45496,
+          "insidePercent": 73.10825794218316,
+          "wilson95Percent": [
+            72.75846565436296,
+            73.455197400899
+          ],
+          "conservative95Percent": [
+            72.75685225842483,
+            73.46639905070886
+          ],
+          "rayDisagreements": 8,
+          "insideLowerPercent": 73.10665102601597,
+          "insideUpperPercent": 73.11950635535344,
+          "closureClearanceLowerBounds": [],
+          "criterion50": "PASS",
+          "target65": true,
+          "guidanceOnly70PercentTranslationGlTF": [
+            3.831417870969744e-06,
+            0.0,
+            0.0
+          ],
+          "guidanceOnly70PercentTranslationBlender": [
+            3.831417870969744e-06,
+            -0.0,
+            0.0
+          ]
+        },
+        {
+          "eye": 1,
+          "center": [
+            0.30500001460313797,
+            0.202000442892313,
+            1.420271635055542
+          ],
+          "radii": [
+            0.13196467608213425,
+            0.13298728689551353,
+            0.16717898845672607
+          ],
+          "eyeTriangles": 778,
+          "boundingBoxCandidates": 120000,
+          "volumeSamples": 62336,
+          "inside": 45490,
+          "insidePercent": 72.97548767967146,
+          "wilson95Percent": [
+            72.62545831690652,
+            73.32268538193793
+          ],
+          "conservative95Percent": [
+            72.62545831690652,
+            73.32268538193793
+          ],
+          "rayDisagreements": 0,
+          "insideLowerPercent": 72.97548767967146,
+          "insideUpperPercent": 72.97548767967146,
+          "closureClearanceLowerBounds": [],
+          "criterion50": "PASS",
+          "target65": true,
+          "guidanceOnly70PercentTranslationGlTF": [
+            -3.831417870969744e-06,
+            0.0,
+            0.0
+          ],
+          "guidanceOnly70PercentTranslationBlender": [
+            -3.831417870969744e-06,
+            -0.0,
+            0.0
+          ]
+        }
+      ]
+    }
+  },
+  "sourcePoseChecks": {
+    "sampledPoses": 72,
+    "toothBases": 84,
+    "finRoots": {
+      "pectoralR": 40,
+      "pectoralL": 40,
+      "pelvicR": 40,
+      "pelvicL": 40
+    },
+    "allFinRootCentroidsBuried": true,
+    "maximumToothBaseToLiningDistance": 0.004288703203201294
+  },
+  "portraits": {
+    "acanthostega.png": {
+      "size": [
+        1200,
+        900
+      ],
+      "mode": "RGBA",
+      "alphaRange": [
+        255,
+        255
+      ]
+    },
+    "acanthostega.select.png": {
+      "size": [
+        1600,
+        1200
+      ],
+      "mode": "RGBA",
+      "alphaRange": [
+        0,
+        255
+      ]
+    },
+    "acanthostega.card.png": {
+      "size": [
+        800,
+        600
+      ],
+      "mode": "RGBA",
+      "alphaRange": [
+        0,
+        255
+      ]
+    },
+    "acanthostega.thumb.png": {
+      "size": [
+        256,
+        192
+      ],
+      "mode": "RGBA",
+      "alphaRange": [
+        0,
+        255
+      ]
+    }
+  },
+  "reviewedActualGLB": "18 action midpoints, two additional phases per action, neutral front/side/dorsal/orbit, maximum gape from both sides, palate, and LOD Idle; still-frame review, not a claimed continuous biomechanical validation.",
+  "runtimeValidation": "Direct decoded GLB finite/normalized weights, 18/3 distinct action tracks, stable root, no animated scaling, full/LOD identical 56-bone graph and exact 3 version-1 sockets; loop seams and Death hold checked in source at every sampled frame. Shared catalogue runtime audit deferred to parent integration.",
+  "knownPreviewLimitations": [
+    "Wrist/palm skin transitions and proximal web intersections remain simplified and need finer sculpting in the later art pass.",
+    "Oral tissues have real attached depth but broad smooth shading; finer palate relief, marginal teeth and tooth counts need later reconstruction/art review.",
+    "Eyes satisfy actual-volume containment without decorative rims; orbital skin transitions and glossy highlight balance can be refined later.",
+    "Fine tail-ray relief, cranial sutures and individual limb scutes are intentionally understated in this first preview.",
+    "Aquatic movement uses individually articulated unequal digits but exact strokes/webbing extent and soft tissue are inferred; no ordinary terrestrial walking is claimed."
+  ]
+}

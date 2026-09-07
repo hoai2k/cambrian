@@ -1,0 +1,57 @@
+[
+  {
+    "id": "jaekelopterus",
+    "fullTriangles": 159421,
+    "lodTriangles": 42692,
+    "joints": 55,
+    "clips": [
+      "Ability",
+      "Attack",
+      "Bite",
+      "Crawl",
+      "Death",
+      "Dive",
+      "Dodge",
+      "Eat",
+      "Grab",
+      "Guard",
+      "Heavy",
+      "Hit",
+      "Idle",
+      "Moult",
+      "Parry",
+      "Rise",
+      "Stagger",
+      "Swim",
+      "TurnLeft",
+      "TurnRight"
+    ],
+    "sockets": 5,
+    "files": {
+      "glb": {
+        "bytes": 13932372,
+        "sha256": "28b6181d6ad13644c5256fc316b5022de45039f2c1ce4d3d44fb0a896de123fb"
+      },
+      "lod1.glb": {
+        "bytes": 2042088,
+        "sha256": "c623f3bef04d51bfab96fa8b783b8e8d9aa85f72f0fa908a1d89947e9f420b8a"
+      },
+      "png": {
+        "bytes": 367280,
+        "sha256": "6a3f097781ffe96b51197d965d4a1f027b15b4f13d9376e8ae60ba7dc6e0f366"
+      },
+      "select.png": {
+        "bytes": 864548,
+        "sha256": "14ebb73e02cee4526dd0421a1e7e0042cd00ac5b8ff2e14842959cd3171b676f"
+      },
+      "card.png": {
+        "bytes": 135085,
+        "sha256": "0b73788376eee940757d9c28fb7a3d1912829166c58a67de22042d01b27084f3"
+      },
+      "thumb.png": {
+        "bytes": 23319,
+        "sha256": "f2cb5750995556ce62508bf0cf1c2c31a302b6807a33b2ab2200d60483aa6a93"
+      }
+    }
+  }
+]

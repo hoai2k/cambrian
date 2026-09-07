@@ -1,0 +1,5 @@
+.model-preview { display: inline-block; width: fit-content; color: #ffdb91; background: #33281fe8; border: 1px solid #aa7e3d; border-radius: 5px; padding: 2px 5px; font: 600 10px/1.2 sans-serif; letter-spacing: .02em; vertical-align: middle; }
+.model-preview-compact { position: absolute; top: 5px; right: 5px; padding: 2px 4px; font-size: 14px; z-index: 2; pointer-events: none; }
+.hero > .model-preview { position: absolute; top: 0; left: 0; z-index: 2; }
+.specimen { position: relative; }
+.specimen .model-preview-compact { top: 4px; right: 4px; }

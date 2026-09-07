@@ -1,0 +1,35 @@
+{
+  "status": "initial-preview",
+  "files": {
+    "furcaster.card.png": {
+      "bytes": 168130,
+      "sha256": "4bde175ab5612a06623b2c15a5477c835adc7ab9641077889664a5ea15ff6d9e"
+    },
+    "furcaster.glb": {
+      "bytes": 27450768,
+      "sha256": "ef3111da7de76e59a4167f8a07e08c70cad950412a16e7c9c9d5a5284cfd6f0b"
+    },
+    "furcaster.json": {
+      "bytes": 2168,
+      "sha256": "051593155af1dd5fc3b1726a3a23e5e5d86122f2001f589907036d1741cf7c21"
+    },
+    "furcaster.lod1.glb": {
+      "bytes": 5668344,
+      "sha256": "449ed9fd684de4bc349faea55b6629228729a119cc2eeeb18d35387b64d86b79"
+    },
+    "furcaster.png": {
+      "bytes": 250771,
+      "sha256": "616a1e9d97ff15dc1a08f4e5eea3dba38f36457c50d971ea411b9f7583018f32"
+    },
+    "furcaster.select.png": {
+      "bytes": 810369,
+      "sha256": "2844af45df958b427e1ab525a6d0d3eb4d3d14a219a88efe04a7c22934c1a7ba"
+    },
+    "furcaster.thumb.png": {
+      "bytes": 22602,
+      "sha256": "158d00212da0eda1e6268d226a4557e82c69b6a80a76cf3fb810c3b51805fcfb"
+    }
+  },
+  "sourceBlend": "/Users/hoai/Documents/Stuff/Generations/cambrian/local/devonian-authoring/furcaster/v1/furcaster.blend",
+  "sourceBlendSha256": "622a82bda688e4dce830e2cd452e5216e86901daa4d08d9696fc967ef61f0e35"
+}

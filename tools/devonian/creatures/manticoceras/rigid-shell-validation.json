@@ -1,0 +1,54 @@
+[
+  {
+    "file": "manticoceras.glb",
+    "sha256": "c21f28f3529ac47860744ed802606e0606e2e41cc4fd8587f32f0d012851dd81",
+    "shell": [
+      {
+        "name": "Central embryonic shell",
+        "vertices": 412,
+        "soleBone": "body"
+      },
+      {
+        "name": "Hollow body chamber and posterior septum",
+        "vertices": 6460,
+        "soleBone": "body"
+      },
+      {
+        "name": "Rigid living shell outer whorls",
+        "vertices": 28050,
+        "soleBone": "body"
+      },
+      {
+        "name": "Thin rounded shell aperture lip",
+        "vertices": 425,
+        "soleBone": "body"
+      }
+    ]
+  },
+  {
+    "file": "manticoceras.lod1.glb",
+    "sha256": "1fbe0959de6df68b4bbe4d67f297b08ac0595893202619311bf1f57f36f1d1ee",
+    "shell": [
+      {
+        "name": "Central embryonic shell",
+        "vertices": 99,
+        "soleBone": "body"
+      },
+      {
+        "name": "Hollow body chamber and posterior septum",
+        "vertices": 1593,
+        "soleBone": "body"
+      },
+      {
+        "name": "Rigid living shell outer whorls",
+        "vertices": 6902,
+        "soleBone": "body"
+      },
+      {
+        "name": "Thin rounded shell aperture lip",
+        "vertices": 143,
+        "soleBone": "body"
+      }
+    ]
+  }
+]

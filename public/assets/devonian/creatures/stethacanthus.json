@@ -1,0 +1,92 @@
+{
+  "id": "stethacanthus",
+  "name": "Stethacanthus",
+  "species": "Stethacanthus sp. (CMNH 8988-informed reconstruction)",
+  "provenance": "Late Devonian, upper Famennian Cleveland Shale, Ohio, USA",
+  "description": "A short-headed early chondrichthyan with opposing cranial and dorsal crown denticles, a supported spine-brush, slender metapterygial fin extensions, and an epicercal caudal axis.",
+  "lengthMeters": 0.7,
+  "modelLength": 4.899576544761658,
+  "locomotion": "Swim",
+  "clips": [
+    "Ability",
+    "Attack",
+    "Bite",
+    "Death",
+    "Dive",
+    "Dodge",
+    "Eat",
+    "Growth",
+    "Guard",
+    "Heavy",
+    "Hit",
+    "Idle",
+    "Parry",
+    "Rise",
+    "Stagger",
+    "Swim",
+    "TurnLeft",
+    "TurnRight"
+  ],
+  "looping": [
+    "Idle",
+    "Swim",
+    "Guard",
+    "Eat"
+  ],
+  "anchors": [
+    "anchor_mouth",
+    "anchor_mouth_inside",
+    "anchor_attack_primary"
+  ],
+  "artVersion": 2,
+  "eyes": [
+    {
+      "name": "eye_globe_R",
+      "closedEnvelope": "head_body_envelope_closed",
+      "centerBlender": [
+        -0.21362847089767456,
+        -1.3098037242889404,
+        0.11165688931941986
+      ],
+      "radii": [
+        0.078,
+        0.1,
+        0.085
+      ],
+      "surfaceInwardDepth": 0.03900000000000001,
+      "sourceVolumeFraction": 0.7963588187529381,
+      "samples": 23399,
+      "method": "Uniform solid ellipsoid samples tested against nearest oriented actual head surface; independent exported polyhedron audit required."
+    },
+    {
+      "name": "eye_globe_L",
+      "closedEnvelope": "head_body_envelope_closed",
+      "centerBlender": [
+        0.21363702416419983,
+        -1.3097304105758667,
+        0.11166121810674667
+      ],
+      "radii": [
+        0.078,
+        0.1,
+        0.085
+      ],
+      "surfaceInwardDepth": 0.03900000000000001,
+      "sourceVolumeFraction": 0.7984529253386897,
+      "samples": 23399,
+      "method": "Uniform solid ellipsoid samples tested against nearest oriented actual head surface; independent exported polyhedron audit required."
+    }
+  ],
+  "sources": [
+    "https://www.app.pan.pl/archive/published/app52/app52-705.pdf",
+    "https://doi.org/10.1080/02724634.1984.10012016",
+    "https://www.nature.com/articles/25467",
+    "https://repozytorium.uw.edu.pl/bitstreams/5cc9e710-1bcb-4353-a08d-f1f56bde31ec/download"
+  ],
+  "notes": [
+    "Devonian specimen CMNH 8988 preserves spine-brush and associated teeth. Species assignment to S. altonensis is questioned in Ginter & Sun 2007; this is not Akmonistion zangerli.",
+    "Whole-animal proportions, exact brush crown width, fin-whip length, living pigmentation, soft-tissue lining and action timing are comparative artistic reconstruction, not measurements of a complete specimen.",
+    "Complex-bearing male configuration is comparative; the sex of CMNH 8988 is not established here. No brush inflation or mobile denticles.",
+    "Representative 0.7m illustrative individual, not a measured fossil total length or claimed species maximum."
+  ]
+}

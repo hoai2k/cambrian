@@ -1,0 +1,269 @@
+{
+  "checks": "finite transforms, normalized weights, root stable, identity-scale removal, unique motion, seamless loops, socket bind alignment, true LOD reduction",
+  "models": [
+    {
+      "file": "dunkleosteus.glb",
+      "bytes": 15136420,
+      "vertices": 56596,
+      "triangles": 105090,
+      "bounds": [
+        2.2699999809265137,
+        1.4347867965698242,
+        3.4418946504592896
+      ],
+      "bones": 16,
+      "sockets": [
+        {
+          "name": "anchor_attack_primary",
+          "point": [
+            0.0,
+            -0.06500004598074535,
+            1.4779999920080513
+          ]
+        },
+        {
+          "name": "anchor_mouth",
+          "point": [
+            0.0,
+            -0.05500005473023198,
+            1.4450000011092725
+          ]
+        },
+        {
+          "name": "anchor_mouth_inside",
+          "point": [
+            0.0,
+            -0.16000002209512865,
+            0.9099999896015032
+          ]
+        }
+      ],
+      "clips": [
+        {
+          "name": "Ability",
+          "duration": 1.8000000715255737,
+          "motion": 49.008,
+          "digest": "fe8cf8fce9e92f32eb0517b7023fbcf1592c133dfdfd36f485b40f07c621c42f"
+        },
+        {
+          "name": "Attack",
+          "duration": 0.9999999403953552,
+          "motion": 24.949,
+          "digest": "97cdf0ba3b6f2e32be195fff2cefb40de221ef0271b0fccaf5b3a940fcaddd3c"
+        },
+        {
+          "name": "Bite",
+          "duration": 0.5,
+          "motion": 11.989,
+          "digest": "9551584fb986da75b2ad0cb2823c6fca0daebeb500dfd4c709761c846f1089f0"
+        },
+        {
+          "name": "Death",
+          "duration": 1.600000023841858,
+          "motion": 65.212,
+          "digest": "4a2a64cb8ce16e2bac8a4ecd2f43c2df325a5e8de094f24ac5f5958372bb7227"
+        },
+        {
+          "name": "Dive",
+          "duration": 1.399999976158142,
+          "motion": 24.185,
+          "digest": "320a11c04dec92edc1611289b3b9f7924c616bac9ec3c29f812ed9444f39146e"
+        },
+        {
+          "name": "Dodge",
+          "duration": 0.4000000059604645,
+          "motion": 13.835,
+          "digest": "8a4ed9097872698b674f7dbb723d64a450586fab150e7044ca33c35b0c31b814"
+        },
+        {
+          "name": "Eat",
+          "duration": 1.2000000476837158,
+          "motion": 29.405,
+          "digest": "9d03122b894c44d5be3e911fc7993bc227367e7f5754b7c95870639d6ca1554e"
+        },
+        {
+          "name": "Growth",
+          "duration": 1.5,
+          "motion": 21.839,
+          "digest": "7cffe80ffd29c7a2116ac598dfc6789934f356404fbd5557cce716517d321e17"
+        },
+        {
+          "name": "Guard",
+          "duration": 0.9999999403953552,
+          "motion": 23.002,
+          "digest": "947303423bee6e3cc2f114017b7204f0064b52f467b7e61c8418364286639248"
+        },
+        {
+          "name": "Heavy",
+          "duration": 1.100000023841858,
+          "motion": 29.448,
+          "digest": "cb99e244e4107b7f6b7ab0efa44b6903d37a09a12d0dee2f2cdd049fd08f2a93"
+        },
+        {
+          "name": "Hit",
+          "duration": 0.5999999642372131,
+          "motion": 12.82,
+          "digest": "87a96219ac0f8613d9928b95acb813f938eaa29730deb4dc85c5dfe4c3c2fcbd"
+        },
+        {
+          "name": "Idle",
+          "duration": 2.4000000953674316,
+          "motion": 47.228,
+          "digest": "ee9d2235ad2c328703bd18ba970dac7ebb6c50b9302f3763ebb0d2b333cf0764"
+        },
+        {
+          "name": "Parry",
+          "duration": 0.36666667461395264,
+          "motion": 7.818,
+          "digest": "060092bc9baed330d93d47ff1f7b8319a28074952716f4bbefe8ddf96810a18b"
+        },
+        {
+          "name": "Rise",
+          "duration": 1.399999976158142,
+          "motion": 24.44,
+          "digest": "d980fa56de8d3a896e1c5e0441fc526a1d1fc4fa8993b7c379af7955afcbdd7f"
+        },
+        {
+          "name": "Stagger",
+          "duration": 1.2000000476837158,
+          "motion": 25.794,
+          "digest": "0ae3c8046f96e5b67141913d65f1c9bb3fade3efd9d7f6f07ec5056ef7d02c4b"
+        },
+        {
+          "name": "Swim",
+          "duration": 2.4000000953674316,
+          "motion": 80.434,
+          "digest": "6a3328f638954687608226098601e20ef4d14a284718c1b1350c910263270ca5"
+        },
+        {
+          "name": "TurnLeft",
+          "duration": 1.600000023841858,
+          "motion": 41.729,
+          "digest": "a0ec741d0ed94c174693092555f5e94b4469e4a7000a28e45066cbaaf5f426a6"
+        },
+        {
+          "name": "TurnRight",
+          "duration": 1.600000023841858,
+          "motion": 41.729,
+          "digest": "0235bbfac006e485b6d61fec658fc0283acc52f9d49e8160bd9ec8cbfc0b7cae"
+        }
+      ],
+      "feedingArticulation": [
+        {
+          "clip": "Ability",
+          "bone": "head",
+          "maxDeltaDegrees": 9.264
+        },
+        {
+          "clip": "Ability",
+          "bone": "jaw",
+          "maxDeltaDegrees": 49.274
+        },
+        {
+          "clip": "Attack",
+          "bone": "head",
+          "maxDeltaDegrees": 8.95
+        },
+        {
+          "clip": "Attack",
+          "bone": "jaw",
+          "maxDeltaDegrees": 47.494
+        },
+        {
+          "clip": "Bite",
+          "bone": "head",
+          "maxDeltaDegrees": 6.903
+        },
+        {
+          "clip": "Bite",
+          "bone": "jaw",
+          "maxDeltaDegrees": 36.796
+        },
+        {
+          "clip": "Eat",
+          "bone": "head",
+          "maxDeltaDegrees": 5.157
+        },
+        {
+          "clip": "Eat",
+          "bone": "jaw",
+          "maxDeltaDegrees": 27.502
+        },
+        {
+          "clip": "Heavy",
+          "bone": "head",
+          "maxDeltaDegrees": 10.643
+        },
+        {
+          "clip": "Heavy",
+          "bone": "jaw",
+          "maxDeltaDegrees": 56.689
+        }
+      ],
+      "removedIdentityScaleChannels": 288,
+      "sha256": "94cb3f54f0af6c2e2479ecc00bcd8fb0fcb63bd6f0bb5763fe2a44ad9279aa0c"
+    },
+    {
+      "file": "dunkleosteus.lod1.glb",
+      "bytes": 1818076,
+      "vertices": 18135,
+      "triangles": 30872,
+      "bounds": [
+        2.270005702972412,
+        1.434677243232727,
+        3.441958785057068
+      ],
+      "bones": 16,
+      "sockets": [
+        {
+          "name": "anchor_attack_primary",
+          "point": [
+            0.0,
+            -0.06500004598074535,
+            1.4779999920080513
+          ]
+        },
+        {
+          "name": "anchor_mouth",
+          "point": [
+            0.0,
+            -0.05500005473023198,
+            1.4450000011092725
+          ]
+        },
+        {
+          "name": "anchor_mouth_inside",
+          "point": [
+            0.0,
+            -0.16000002209512865,
+            0.9099999896015032
+          ]
+        }
+      ],
+      "clips": [
+        {
+          "name": "Death",
+          "duration": 1.600000023841858,
+          "motion": 65.212,
+          "digest": "4a2a64cb8ce16e2bac8a4ecd2f43c2df325a5e8de094f24ac5f5958372bb7227"
+        },
+        {
+          "name": "Idle",
+          "duration": 2.4000000953674316,
+          "motion": 47.228,
+          "digest": "ee9d2235ad2c328703bd18ba970dac7ebb6c50b9302f3763ebb0d2b333cf0764"
+        },
+        {
+          "name": "Swim",
+          "duration": 2.4000000953674316,
+          "motion": 80.434,
+          "digest": "6a3328f638954687608226098601e20ef4d14a284718c1b1350c910263270ca5"
+        }
+      ],
+      "feedingArticulation": [],
+      "removedIdentityScaleChannels": 48,
+      "sha256": "9d9dadc29ceeded671a9aaab8049207fca4fdcce9111e4a0a415d59be0fa7da1"
+    }
+  ],
+  "lodTriangleRatio": 0.2937672471215149
+}

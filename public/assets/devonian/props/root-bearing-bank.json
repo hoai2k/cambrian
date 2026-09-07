@@ -1,0 +1,38 @@
+{
+  "id": "root-bearing-bank",
+  "family": "G11",
+  "name": "Root-bearing bank",
+  "taxon": "Archaeopteris-type roots in bank",
+  "category": "organic-prop",
+  "description": "Hierarchical lateral roots embedded into a channel bank; no invented mangrove pneumatophores.",
+  "provenance": "Later Devonian wooded waterway only",
+  "model": "assets/devonian/props/root-bearing-bank.glb",
+  "lod": "assets/devonian/props/root-bearing-bank.lod1.glb",
+  "image": "assets/devonian/props/root-bearing-bank.png",
+  "lengthMeters": 3.409656524658203,
+  "dimensionsMeters": {
+    "x": 3.0,
+    "y": 1.3919999599456787,
+    "z": 3.409656524658203
+  },
+  "clips": [],
+  "looping": [],
+  "sources": [
+    "https://www.nature.com/articles/19516",
+    "https://pmc.ncbi.nlm.nih.gov/articles/PMC8409631/",
+    "https://orca.cardiff.ac.uk/id/eprint/10078/1/Berry%202000.pdf"
+  ],
+  "notes": [
+    "Original parametric mesh, no downloaded model.",
+    "1 glTF unit = 1 metre. Dimensions describe this art specimen, not a taxon maximum.",
+    "Pigmentation and soft appearance are artistic interpretations.",
+    "Locality tags constrain future placement; library membership does not assert co-occurrence.",
+    "Preview model: initial scenery delivery; further individual material, silhouette and motion refinement is pending."
+  ],
+  "fullTriangles": 22186,
+  "lodTriangles": 6654,
+  "lodRatio": 0.2999188677544397,
+  "sourceBlend": "../devonian-authoring/props/root-bearing-bank/root-bearing-bank.blend",
+  "uncertainty": "P04-type branching roots, not mangrove pneumatophores. Place only in a researched wooded setting.",
+  "modelStatus": "preview"
+}

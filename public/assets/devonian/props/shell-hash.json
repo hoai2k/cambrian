@@ -1,0 +1,37 @@
+{
+  "id": "shell-hash",
+  "family": "G08",
+  "name": "Shell hash",
+  "taxon": "Derived B09/B12 shell fragments",
+  "category": "biological-prop",
+  "description": "Broken ribbed brachiopod and bivalve valves derived from the same shell builders; real centimetre scale.",
+  "provenance": "Shelly Devonian sediment context",
+  "model": "assets/devonian/props/shell-hash.glb",
+  "lod": "assets/devonian/props/shell-hash.lod1.glb",
+  "image": "assets/devonian/props/shell-hash.png",
+  "lengthMeters": 0.31874990463256836,
+  "dimensionsMeters": {
+    "x": 0.31874990463256836,
+    "y": 0.013624932616949081,
+    "z": 0.29602164030075073
+  },
+  "clips": [],
+  "looping": [],
+  "sources": [
+    "https://devonianatlas.org/species/mucrospirifer-mucronatus/",
+    "https://devonianatlas.org/taxonomic-groups/brachiopods/"
+  ],
+  "notes": [
+    "Original parametric mesh, no downloaded model.",
+    "1 glTF unit = 1 metre. Dimensions describe this art specimen, not a taxon maximum.",
+    "Pigmentation and soft appearance are artistic interpretations.",
+    "Locality tags constrain future placement; library membership does not assert co-occurrence.",
+    "Preview model: initial scenery delivery; further individual material, silhouette and motion refinement is pending."
+  ],
+  "fullTriangles": 195832,
+  "lodTriangles": 58749,
+  "lodRatio": 0.2999969361493525,
+  "sourceBlend": "../devonian-authoring/props/shell-hash/shell-hash.blend",
+  "uncertainty": "Broken shells reuse B09/B12 vertex-generating anatomy, not unrelated stock shells.",
+  "modelStatus": "preview"
+}

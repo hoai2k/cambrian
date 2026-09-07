@@ -1,0 +1,90 @@
+{
+  "status": "reviewed candidate; awaiting parent lossless packaging and viewer intake",
+  "candidateDirectory": "/Users/hoai/Documents/Stuff/Generations/cambrian/local/devonian-authoring/coccosteus/v2-candidate",
+  "sourceBlend": {
+    "path": "/Users/hoai/Documents/Stuff/Generations/cambrian/local/devonian-authoring/coccosteus/coccosteus-v2.blend",
+    "sha256": "251e55dee4cb7f3047e1d25ab9d6979977a201a903a8e992ce7950a22c6da146"
+  },
+  "models": [
+    {
+      "file": "coccosteus.glb",
+      "sha256": "5d4da5a232fb114e40718a0b88ed88e2dff346f9a88d4935f71cb0fcd4356c47",
+      "bytes": 10368824,
+      "triangles": 149269,
+      "joints": 19,
+      "textures": 5
+    },
+    {
+      "file": "coccosteus.lod1.glb",
+      "sha256": "bf79dd22064dbae6da3a3b51d772b44d461d26901bb53c127bd36323a225acda",
+      "bytes": 1726068,
+      "triangles": 42082,
+      "joints": 19,
+      "textures": 0
+    }
+  ],
+  "portraits": [
+    {
+      "file": "coccosteus.png",
+      "dimensions": [
+        1600,
+        1200
+      ],
+      "sha256": "954d983be6bd0da1b9c274ec5b57a1556d643810785365c2785131c8f1f2d262"
+    },
+    {
+      "file": "coccosteus.select.png",
+      "dimensions": [
+        1600,
+        1200
+      ],
+      "sha256": "6926433c8a34b8465392286346555b1482ffa7c5ca69bbbb17a8f0c69e94646f"
+    },
+    {
+      "file": "coccosteus.card.png",
+      "dimensions": [
+        800,
+        600
+      ],
+      "sha256": "c30ca8f0a346315f57b9a88f68ca931bec627ecd21ee73cc80463b85ec35e2ec"
+    },
+    {
+      "file": "coccosteus.thumb.png",
+      "dimensions": [
+        256,
+        192
+      ],
+      "sha256": "51bc7eea0c6b91f6e6ae66a51868438209e2346bc945796eed0d54d9d437eeb3"
+    }
+  ],
+  "metadata": {
+    "file": "coccosteus.json",
+    "sha256": "0f506ad66f491a12e59cf1da0517e278ea4eb66fc841768a3d80495d0f2f2ed1"
+  },
+  "evidence": {
+    "validation.json": "370ad391169b7ba89ee8069f52d46486dbd6a0f68c5f2ab3976049314f23e055",
+    "eye-audit-v2.json": "c0506890b03264e76f00b5b0b64e305a51ab6ab91e2554ab5481e0bb4721a1ff",
+    "eye-audit-lod-v2.json": "f6d87b7820617dcff75a1a2f09a8fc9cebd1ee21d66be85d0c6b6846f317c40f",
+    "playback-validation-v2.json": "09cb69135bff7b50c81a5614d846113144a4c806314957f7be2110d291795c01",
+    "render-validation-v2.json": "6c52c6a54a78b5d46f1c7d53d8794229802560b82185c80de29193c429df98dc",
+    "lod-render-validation-v2.json": "d8d4c72b8f4cd3034f108935f2b9800585a128193f026241952cafe573746bbd",
+    "action-review-v2.jpg": "b09bb0023f27832011e7cb20d902c39aa2e37a0bd85123b2cc6ce1e0c2f84ae1",
+    "eye-review-v2.jpg": "d42c9642700a3efe53adb45d5ba11b20cf5bcdbb563adae6704f3baf793f0b2f",
+    "mouth-review-v2.jpg": "aaff2192e7c27f5ed3585dc2625a5a9aacaa7739950b7d9c4d0337789c7499a7",
+    "playback-review-v2.jpg": "83ee8048323020716b410d9cde16983f21a59f7d8e07ba9d3ef8ecab4e2d9dae"
+  },
+  "visualReview": {
+    "fullPoses": 10,
+    "threePlaybackClips": 18,
+    "eyeAngles": 4,
+    "litMouthAngles": 6,
+    "oppositeDeath": true,
+    "lodPoses": 3
+  },
+  "notes": [
+    "No model shape or animation changed after accepted form; final aperture-rim correction is oral pigmentation only.",
+    "A narrow oral rim highlight is continuous tissue, not a separate blade.",
+    "LOD has matching skin graph and sockets, no textures and 28.19% of full triangles.",
+    "No public assets, shared catalogue, git branches or commits are changed by this script."
+  ]
+}

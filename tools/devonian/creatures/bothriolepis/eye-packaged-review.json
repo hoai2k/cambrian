@@ -1,0 +1,206 @@
+{
+  "method": "actual-eye-polyhedron uniform-volume rejection samples; actual continuous-head triangle parity; three independent ray directions; closed continuous head, no temporary caps",
+  "losslessPackagingVerified": true,
+  "reports": [
+    {
+      "level": "full",
+      "bytes": 6084140,
+      "id": "bothriolepis",
+      "revision": "working-2026-09-07T15-46-38-015Z",
+      "assetSha256": "9079c76a8328e8a846d85d45f36179853120b8c3c6688e0f3a880c3a0ac4e511",
+      "headMesh": "head_envelope_closed",
+      "headTriangles": 44400,
+      "headTopology": {
+        "valid": true,
+        "nonmanifoldEdges": 0,
+        "cappedBoundaryLoops": []
+      },
+      "eyes": [
+        {
+          "eye": 0,
+          "center": [
+            0.06897197663784027,
+            0.24133186787366867,
+            1.278037428855896
+          ],
+          "radii": [
+            0.029703177511692047,
+            0.029145993292331696,
+            0.02796149253845215
+          ],
+          "eyeTriangles": 3968,
+          "boundingBoxCandidates": 120000,
+          "volumeSamples": 58849,
+          "inside": 46310,
+          "insidePercent": 78.692925963058,
+          "wilson95Percent": [
+            78.36021985609072,
+            79.02188622729676
+          ],
+          "conservative95Percent": [
+            78.36021985609072,
+            79.02188622729676
+          ],
+          "rayDisagreements": 0,
+          "insideLowerPercent": 78.692925963058,
+          "insideUpperPercent": 78.692925963058,
+          "closureClearanceLowerBounds": [],
+          "criterion50": "PASS",
+          "target65": true,
+          "guidanceOnly70PercentTranslationGlTF": [
+            0.0,
+            -7.650137945347524e-07,
+            0.0
+          ],
+          "guidanceOnly70PercentTranslationBlender": [
+            0.0,
+            -0.0,
+            -7.650137945347524e-07
+          ]
+        },
+        {
+          "eye": 1,
+          "center": [
+            -0.06897197663784027,
+            0.24133186787366867,
+            1.278037428855896
+          ],
+          "radii": [
+            0.029703177511692047,
+            0.029145993292331696,
+            0.02796149253845215
+          ],
+          "eyeTriangles": 3968,
+          "boundingBoxCandidates": 120000,
+          "volumeSamples": 58494,
+          "inside": 45998,
+          "insidePercent": 78.63712517523165,
+          "wilson95Percent": [
+            78.30309262751581,
+            78.96739647716255
+          ],
+          "conservative95Percent": [
+            78.30309262751581,
+            78.96739647716255
+          ],
+          "rayDisagreements": 0,
+          "insideLowerPercent": 78.63712517523165,
+          "insideUpperPercent": 78.63712517523165,
+          "closureClearanceLowerBounds": [],
+          "criterion50": "PASS",
+          "target65": true,
+          "guidanceOnly70PercentTranslationGlTF": [
+            0.0,
+            -7.650137945347524e-07,
+            0.0
+          ],
+          "guidanceOnly70PercentTranslationBlender": [
+            0.0,
+            -0.0,
+            -7.650137945347524e-07
+          ]
+        }
+      ]
+    },
+    {
+      "level": "lod1",
+      "bytes": 695660,
+      "id": "bothriolepis",
+      "revision": "working-2026-09-07T15-46-38-010Z-lod1",
+      "assetSha256": "90614b2331e75d3b33c91fec03352df07ead400bbbabc7ec9ee96e56c2d341a3",
+      "headMesh": "head_envelope_closed",
+      "headTriangles": 12876,
+      "headTopology": {
+        "valid": true,
+        "nonmanifoldEdges": 0,
+        "cappedBoundaryLoops": []
+      },
+      "eyes": [
+        {
+          "eye": 0,
+          "center": [
+            0.06906249187886715,
+            0.24134746938943863,
+            1.2779925465583801
+          ],
+          "radii": [
+            0.02972896583378315,
+            0.029246114194393158,
+            0.027989327907562256
+          ],
+          "eyeTriangles": 1058,
+          "boundingBoxCandidates": 120000,
+          "volumeSamples": 58273,
+          "inside": 45846,
+          "insidePercent": 78.67451478386216,
+          "wilson95Percent": [
+            78.34005570557815,
+            79.00519342336572
+          ],
+          "conservative95Percent": [
+            78.34005570557815,
+            79.00519342336572
+          ],
+          "rayDisagreements": 0,
+          "insideLowerPercent": 78.67451478386216,
+          "insideUpperPercent": 78.67451478386216,
+          "closureClearanceLowerBounds": [],
+          "criterion50": "PASS",
+          "target65": true,
+          "guidanceOnly70PercentTranslationGlTF": [
+            0.0,
+            -7.663724659323634e-07,
+            0.0
+          ],
+          "guidanceOnly70PercentTranslationBlender": [
+            0.0,
+            -0.0,
+            -7.663724659323634e-07
+          ]
+        },
+        {
+          "eye": 1,
+          "center": [
+            -0.06898453831672668,
+            0.24132001399993896,
+            1.2780016660690308
+          ],
+          "radii": [
+            0.029651015996932983,
+            0.02912268042564392,
+            0.02799844741821289
+          ],
+          "eyeTriangles": 1058,
+          "boundingBoxCandidates": 120000,
+          "volumeSamples": 58301,
+          "inside": 45837,
+          "insidePercent": 78.6212929452325,
+          "wilson95Percent": [
+            78.28661616282845,
+            78.9521981177338
+          ],
+          "conservative95Percent": [
+            78.28661616282845,
+            78.9521981177338
+          ],
+          "rayDisagreements": 0,
+          "insideLowerPercent": 78.6212929452325,
+          "insideUpperPercent": 78.6212929452325,
+          "closureClearanceLowerBounds": [],
+          "criterion50": "PASS",
+          "target65": true,
+          "guidanceOnly70PercentTranslationGlTF": [
+            0.0,
+            -7.64650508244813e-07,
+            0.0
+          ],
+          "guidanceOnly70PercentTranslationBlender": [
+            0.0,
+            -0.0,
+            -7.64650508244813e-07
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,206 @@
+{
+  "method": "actual-eye-polyhedron uniform-volume rejection samples; actual continuous-head triangle parity; three independent ray directions; explicit distant oral boundary closures",
+  "losslessPackagingVerified": true,
+  "reports": [
+    {
+      "level": "full",
+      "bytes": 12038708,
+      "id": "dunkleosteus",
+      "revision": "working-2026-09-07T02-50-51-453Z",
+      "assetSha256": "3d47c129b69890a3399abcad4053d808a914674c3b5f1f24afd4ec74dd794e13",
+      "headMesh": "head_envelope_closed",
+      "headTriangles": 21000,
+      "headTopology": {
+        "valid": true,
+        "nonmanifoldEdges": 0,
+        "cappedBoundaryLoops": []
+      },
+      "eyes": [
+        {
+          "eye": 0,
+          "center": [
+            0.286259226500988,
+            0.128726527094841,
+            1.2123373746871948
+          ],
+          "radii": [
+            0.05426657944917679,
+            0.05315582454204559,
+            0.07110190391540527
+          ],
+          "eyeTriangles": 2976,
+          "boundingBoxCandidates": 120000,
+          "volumeSamples": 61493,
+          "inside": 51842,
+          "insidePercent": 84.30553071081262,
+          "wilson95Percent": [
+            84.01588424070732,
+            84.59089116806425
+          ],
+          "conservative95Percent": [
+            84.01588424070732,
+            84.59089116806425
+          ],
+          "rayDisagreements": 0,
+          "insideLowerPercent": 84.30553071081262,
+          "insideUpperPercent": 84.30553071081262,
+          "closureClearanceLowerBounds": [],
+          "criterion50": "PASS",
+          "target65": true,
+          "guidanceOnly70PercentTranslationGlTF": [
+            -1.5876389625191223e-06,
+            0.0,
+            0.0
+          ],
+          "guidanceOnly70PercentTranslationBlender": [
+            -1.5876389625191223e-06,
+            -0.0,
+            0.0
+          ]
+        },
+        {
+          "eye": 1,
+          "center": [
+            -0.2862592712044716,
+            0.1287265419960022,
+            1.2123372554779053
+          ],
+          "radii": [
+            0.05426662415266037,
+            0.05315582454204559,
+            0.07110190391540527
+          ],
+          "eyeTriangles": 2976,
+          "boundingBoxCandidates": 120000,
+          "volumeSamples": 61006,
+          "inside": 51351,
+          "insidePercent": 84.17368783398354,
+          "wilson95Percent": [
+            83.88190428522853,
+            84.46116776103622
+          ],
+          "conservative95Percent": [
+            83.88190428522853,
+            84.46116776103622
+          ],
+          "rayDisagreements": 0,
+          "insideLowerPercent": 84.17368783398354,
+          "insideUpperPercent": 84.17368783398354,
+          "closureClearanceLowerBounds": [],
+          "criterion50": "PASS",
+          "target65": true,
+          "guidanceOnly70PercentTranslationGlTF": [
+            1.5876393035796355e-06,
+            0.0,
+            0.0
+          ],
+          "guidanceOnly70PercentTranslationBlender": [
+            1.5876393035796355e-06,
+            -0.0,
+            0.0
+          ]
+        }
+      ]
+    },
+    {
+      "level": "lod1",
+      "bytes": 948512,
+      "id": "dunkleosteus",
+      "revision": "working-2026-09-07T02-50-51-461Z-lod1",
+      "assetSha256": "9c6d8b01f5e204e1ab4ccdd8a792834e87cc59febe57de2ff5d304af71fb4246",
+      "headMesh": "head_envelope_closed",
+      "headTriangles": 5250,
+      "headTopology": {
+        "valid": true,
+        "nonmanifoldEdges": 0,
+        "cappedBoundaryLoops": []
+      },
+      "eyes": [
+        {
+          "eye": 0,
+          "center": [
+            0.286259226500988,
+            0.128726527094841,
+            1.2123373746871948
+          ],
+          "radii": [
+            0.05426657944917679,
+            0.05315582454204559,
+            0.07110190391540527
+          ],
+          "eyeTriangles": 2976,
+          "boundingBoxCandidates": 120000,
+          "volumeSamples": 61493,
+          "inside": 51827,
+          "insidePercent": 84.28113769046884,
+          "wilson95Percent": [
+            83.99131105575114,
+            84.56668135991137
+          ],
+          "conservative95Percent": [
+            83.99131105575114,
+            84.56668135991137
+          ],
+          "rayDisagreements": 0,
+          "insideLowerPercent": 84.28113769046884,
+          "insideUpperPercent": 84.28113769046884,
+          "closureClearanceLowerBounds": [],
+          "criterion50": "PASS",
+          "target65": true,
+          "guidanceOnly70PercentTranslationGlTF": [
+            -1.5876389625191223e-06,
+            0.0,
+            0.0
+          ],
+          "guidanceOnly70PercentTranslationBlender": [
+            -1.5876389625191223e-06,
+            -0.0,
+            0.0
+          ]
+        },
+        {
+          "eye": 1,
+          "center": [
+            -0.2862592712044716,
+            0.1287265419960022,
+            1.2123372554779053
+          ],
+          "radii": [
+            0.05426662415266037,
+            0.05315582454204559,
+            0.07110190391540527
+          ],
+          "eyeTriangles": 2976,
+          "boundingBoxCandidates": 120000,
+          "volumeSamples": 61006,
+          "inside": 51283,
+          "insidePercent": 84.06222338786348,
+          "wilson95Percent": [
+            83.76962131484407,
+            84.35053587631967
+          ],
+          "conservative95Percent": [
+            83.76962131484407,
+            84.35053587631967
+          ],
+          "rayDisagreements": 0,
+          "insideLowerPercent": 84.06222338786348,
+          "insideUpperPercent": 84.06222338786348,
+          "closureClearanceLowerBounds": [],
+          "criterion50": "PASS",
+          "target65": true,
+          "guidanceOnly70PercentTranslationGlTF": [
+            1.5876393035796355e-06,
+            0.0,
+            0.0
+          ],
+          "guidanceOnly70PercentTranslationBlender": [
+            1.5876393035796355e-06,
+            -0.0,
+            0.0
+          ]
+        }
+      ]
+    }
+  ]
+}

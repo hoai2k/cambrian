@@ -1,0 +1,382 @@
+{
+  "checks": "finite transforms, normalized weights, root stable, identity-scale removal, unique motion, seamless loops, socket bind alignment, true LOD reduction",
+  "models": [
+    {
+      "file": "jaekelopterus.glb",
+      "bytes": 13932372,
+      "vertices": 82647,
+      "triangles": 159421,
+      "bounds": [
+        3.6552700996398926,
+        0.840997189283371,
+        6.725992441177368
+      ],
+      "bones": 55,
+      "boneNames": [
+        "root",
+        "body",
+        "cheliceraL0",
+        "cheliceraL1",
+        "cheliceraL2",
+        "fingerL",
+        "cheliceraR0",
+        "cheliceraR1",
+        "cheliceraR2",
+        "fingerR",
+        "gnathobaseL",
+        "gnathobaseR",
+        "legL0_0",
+        "legL0_1",
+        "legL0_2",
+        "legL1_0",
+        "legL1_1",
+        "legL1_2",
+        "legL2_0",
+        "legL2_1",
+        "legL2_2",
+        "legL3_0",
+        "legL3_1",
+        "legL3_2",
+        "legR0_0",
+        "legR0_1",
+        "legR0_2",
+        "legR1_0",
+        "legR1_1",
+        "legR1_2",
+        "legR2_0",
+        "legR2_1",
+        "legR2_2",
+        "legR3_0",
+        "legR3_1",
+        "legR3_2",
+        "paddleL0",
+        "paddleL1",
+        "paddleL2",
+        "paddleR0",
+        "paddleR1",
+        "paddleR2",
+        "segment00",
+        "segment01",
+        "segment02",
+        "segment03",
+        "segment04",
+        "segment05",
+        "segment06",
+        "segment07",
+        "segment08",
+        "segment09",
+        "segment10",
+        "segment11",
+        "telson"
+      ],
+      "textures": 12,
+      "sockets": [
+        {
+          "name": "anchor_attack_primary",
+          "point": [
+            0.7499999403953552,
+            -9.310163054561393e-08,
+            3.119999822259774
+          ]
+        },
+        {
+          "name": "anchor_grasp_left",
+          "point": [
+            0.6650000214576721,
+            0.008999916129174532,
+            2.8299993938039374
+          ]
+        },
+        {
+          "name": "anchor_grasp_right",
+          "point": [
+            -0.6650000810623169,
+            0.008999917060488914,
+            2.8299996322225085
+          ]
+        },
+        {
+          "name": "anchor_mouth",
+          "point": [
+            0.0,
+            -0.18500001316617534,
+            0.8999999527115918
+          ]
+        },
+        {
+          "name": "anchor_mouth_inside",
+          "point": [
+            0.0,
+            -0.09800001119687314,
+            0.8999999556894752
+          ]
+        }
+      ],
+      "clips": [
+        {
+          "name": "Ability",
+          "duration": 1.7999999523162842,
+          "motion": 28.43,
+          "digest": "7ffc19c5092cc075b92721d3ef3423d8f8ca9b3e3a1d4f880bd9d34014dc2856"
+        },
+        {
+          "name": "Attack",
+          "duration": 1.0,
+          "motion": 14.613,
+          "digest": "06afc248543c06df651e34286a2b8a5467db1d3058b063cd84011408bd9e46a6"
+        },
+        {
+          "name": "Bite",
+          "duration": 0.5,
+          "motion": 5.843,
+          "digest": "29db6141d8fe8b343cb922ccce09549a9602b9a3f8a0586d3d38154c7930df0c"
+        },
+        {
+          "name": "Crawl",
+          "duration": 2.4000000953674316,
+          "motion": 113.945,
+          "digest": "875bc6154918529347a80b3fcc5486b2cc626b56982db76b95e433e674e51b70"
+        },
+        {
+          "name": "Death",
+          "duration": 1.600000023841858,
+          "motion": 92.354,
+          "digest": "8a6e4a060c0fadb4d045efe26d917dbb7fb99bc6d098d1b4750ffbe94554d49b"
+        },
+        {
+          "name": "Dive",
+          "duration": 1.2000000476837158,
+          "motion": 9.665,
+          "digest": "369b8e4275a34aa656b8a3faed0cac457bcca2bac3334dafa538a759f826e9f4"
+        },
+        {
+          "name": "Dodge",
+          "duration": 0.4000000059604645,
+          "motion": 8.324,
+          "digest": "e927709b0925f5d9e8e47fb81b6d20423fabf7384675196fdb1b625b86dfc62f"
+        },
+        {
+          "name": "Eat",
+          "duration": 1.2000000476837158,
+          "motion": 22.155,
+          "digest": "fb18034d5beac2debb5b6463e360cdea59ae42a0c1cf48becb4cdd12f3161977"
+        },
+        {
+          "name": "Grab",
+          "duration": 1.2000000476837158,
+          "motion": 16.138,
+          "digest": "c9eb037611910b6cc9089ee2ef359e2513e632fcf8a536271ea8d094c36e858d"
+        },
+        {
+          "name": "Guard",
+          "duration": 1.0,
+          "motion": 15.033,
+          "digest": "6b21b057f567f7ae8aeb84ca4ad739a41604ce80ccff743d5a6d44fdaa8f6921"
+        },
+        {
+          "name": "Heavy",
+          "duration": 1.100000023841858,
+          "motion": 17.833,
+          "digest": "ff04ffbb2abaa70f91cd984f14928780ed01734b30bc8fc4b5c393f7a60350cd"
+        },
+        {
+          "name": "Hit",
+          "duration": 0.6000000238418579,
+          "motion": 11.924,
+          "digest": "32970f8aee47be7d390360148ffa9784e32be0e6519651ac01454ed61c82d33d"
+        },
+        {
+          "name": "Idle",
+          "duration": 2.4000000953674316,
+          "motion": 36.138,
+          "digest": "a7b031763b69a37b35ed7f1778116fa5f4f986c6f48e2d838c735f89370c219e"
+        },
+        {
+          "name": "Moult",
+          "duration": 1.5,
+          "motion": 21.62,
+          "digest": "ba160658b2ba6c8b61c6878d7a44de338f0301be3bc822f1e79cb3b32c2572cd"
+        },
+        {
+          "name": "Parry",
+          "duration": 0.3333333432674408,
+          "motion": 7.139,
+          "digest": "879edcd826f7c2da85bf2f4dbe077ac66ddded42dc4f9c69dfaaac9eaeac86e7"
+        },
+        {
+          "name": "Rise",
+          "duration": 1.2000000476837158,
+          "motion": 9.665,
+          "digest": "f63a4bab65b1071ce28b4e61de32fe68d9b4294e9c6a7f28927eaf9fe7d5d3d3"
+        },
+        {
+          "name": "Stagger",
+          "duration": 1.2000000476837158,
+          "motion": 23.921,
+          "digest": "b7460e91e3ced129a90de203bc27521d2c4808c2053d321e1e078642362077b3"
+        },
+        {
+          "name": "Swim",
+          "duration": 2.4000000953674316,
+          "motion": 101.838,
+          "digest": "4c45a9f61ea26e09de7c916559273b5b89db1f311c36d4324f7287aec5df3d7d"
+        },
+        {
+          "name": "TurnLeft",
+          "duration": 1.600000023841858,
+          "motion": 16.273,
+          "digest": "74678525592ecceade5d252017aa967ed9eb31aedb8708a07b94a91ffbd237c4"
+        },
+        {
+          "name": "TurnRight",
+          "duration": 1.600000023841858,
+          "motion": 16.273,
+          "digest": "14ecf759b6061525275508f1fb2d71b476aea682c37aa70ce8e1b81e9447fb09"
+        }
+      ],
+      "removedIdentityScaleChannels": 1100,
+      "sha256": "28b6181d6ad13644c5256fc316b5022de45039f2c1ce4d3d44fb0a896de123fb"
+    },
+    {
+      "file": "jaekelopterus.lod1.glb",
+      "bytes": 2042088,
+      "vertices": 22650,
+      "triangles": 42692,
+      "bounds": [
+        3.655175566673279,
+        0.8411382138729095,
+        6.725993871688843
+      ],
+      "bones": 55,
+      "boneNames": [
+        "root",
+        "body",
+        "cheliceraL0",
+        "cheliceraL1",
+        "cheliceraL2",
+        "fingerL",
+        "cheliceraR0",
+        "cheliceraR1",
+        "cheliceraR2",
+        "fingerR",
+        "gnathobaseL",
+        "gnathobaseR",
+        "legL0_0",
+        "legL0_1",
+        "legL0_2",
+        "legL1_0",
+        "legL1_1",
+        "legL1_2",
+        "legL2_0",
+        "legL2_1",
+        "legL2_2",
+        "legL3_0",
+        "legL3_1",
+        "legL3_2",
+        "legR0_0",
+        "legR0_1",
+        "legR0_2",
+        "legR1_0",
+        "legR1_1",
+        "legR1_2",
+        "legR2_0",
+        "legR2_1",
+        "legR2_2",
+        "legR3_0",
+        "legR3_1",
+        "legR3_2",
+        "paddleL0",
+        "paddleL1",
+        "paddleL2",
+        "paddleR0",
+        "paddleR1",
+        "paddleR2",
+        "segment00",
+        "segment01",
+        "segment02",
+        "segment03",
+        "segment04",
+        "segment05",
+        "segment06",
+        "segment07",
+        "segment08",
+        "segment09",
+        "segment10",
+        "segment11",
+        "telson"
+      ],
+      "textures": 0,
+      "sockets": [
+        {
+          "name": "anchor_attack_primary",
+          "point": [
+            0.7499999403953552,
+            -9.310163054561393e-08,
+            3.119999822259774
+          ]
+        },
+        {
+          "name": "anchor_grasp_left",
+          "point": [
+            0.6650000214576721,
+            0.008999916129174532,
+            2.8299993938039374
+          ]
+        },
+        {
+          "name": "anchor_grasp_right",
+          "point": [
+            -0.6650000810623169,
+            0.008999917060488914,
+            2.8299996322225085
+          ]
+        },
+        {
+          "name": "anchor_mouth",
+          "point": [
+            0.0,
+            -0.18500001316617534,
+            0.8999999527115918
+          ]
+        },
+        {
+          "name": "anchor_mouth_inside",
+          "point": [
+            0.0,
+            -0.09800001119687314,
+            0.8999999556894752
+          ]
+        }
+      ],
+      "clips": [
+        {
+          "name": "Crawl",
+          "duration": 2.4000000953674316,
+          "motion": 113.945,
+          "digest": "875bc6154918529347a80b3fcc5486b2cc626b56982db76b95e433e674e51b70"
+        },
+        {
+          "name": "Death",
+          "duration": 1.600000023841858,
+          "motion": 92.354,
+          "digest": "8a6e4a060c0fadb4d045efe26d917dbb7fb99bc6d098d1b4750ffbe94554d49b"
+        },
+        {
+          "name": "Idle",
+          "duration": 2.4000000953674316,
+          "motion": 36.138,
+          "digest": "a7b031763b69a37b35ed7f1778116fa5f4f986c6f48e2d838c735f89370c219e"
+        },
+        {
+          "name": "Swim",
+          "duration": 2.4000000953674316,
+          "motion": 101.838,
+          "digest": "4c45a9f61ea26e09de7c916559273b5b89db1f311c36d4324f7287aec5df3d7d"
+        }
+      ],
+      "removedIdentityScaleChannels": 220,
+      "sha256": "c623f3bef04d51bfab96fa8b783b8e8d9aa85f72f0fa908a1d89947e9f420b8a"
+    }
+  ],
+  "lodTriangleRatio": 0.26779407982637166
+}

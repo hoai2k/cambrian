@@ -1,0 +1,10 @@
+[
+  {
+    "id": "emblem",
+    "prompt": "Using the supplied Devonian Domination title illustration as a style and subject reference, create a square standalone site emblem/favicon showing ONLY the armored Dunkleosteus head from the large fish at the top. Three-quarter view facing right, heavy blue-black slate head armor with warm ochre engraved highlights, small distinct golden eye and partly open powerful beak-like jaw with broad bony cutting plates. Compact silhouette with head and jaw filling 85% of frame, no body, no decorative plants, no text. Simplify into broad readable shapes for 16 and 32 pixel favicons while retaining subtle antique natural-history engraving character. No fine teeth rows, no monster horns, no added anatomy. Transparent background with true alpha. One icon, no grid, no badge, no frame."
+  },
+  {
+    "id": "mobile",
+    "prompt": "Adapt the supplied Devonian Domination artwork into a polished portrait 9:16 mobile title-screen illustration. Preserve the exact text DEVONIAN DOMINATION in its antique engraved serif lettering, centered and fully readable, two lines, keep all lettering well inside the middle 65% of the width. Preserve the antique natural-history engraving style, parchment gold, blue-black armor, muted rusty fins, dark softly vignetted edges. Recompose the same four subjects: large armored Dunkleosteus above the title, small shark alongside, coiled tentacled cephalopod and armored bottom fish below, framed by the same sea flora. Fit all subjects naturally into the tall composition without stretching. Keep the bottom 15% mostly quiet parchment shading for future menu buttons. This is a responsive companion to the supplied image, no extra words, no new creatures, no UI, no watermark. Full bleed portrait."
+  }
+]
