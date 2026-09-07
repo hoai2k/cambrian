@@ -1,3 +1,4 @@
+import { ACTIVE_ERA } from '../content';
 /**
  * The soundtrack: which tracks exist, and what plays next.
  *
@@ -6,7 +7,7 @@
  * how the biome themes work: the calm theme for the shallows and nurseries, the danger theme for
  * the channels, escarpment and basin. A track whose file is missing drops out of the rotation.
  *
- * To add a track: drop `<name>.mp3` into `public/music` and add a line here. Nothing else.
+ * To add a track: drop `<name>.mp3` into `public/music` and add a line to the selected content pack’s music.ts.
  */
 import type { Biome } from '../sim/world';
 
@@ -19,14 +20,7 @@ export interface MusicTrack {
   biomes?: Biome[];
 }
 
-export const MUSIC: MusicTrack[] = [
-  { name: 'Tide of First Bones', opening: true },
-  { name: 'First Tide' },
-  // The biome themes (see docs/redesign/04-infinite-ocean.md · Danger, mood and the art brief).
-  // Requested in docs/audio-requests.md; until the files land they fail to load and drop out.
-  { name: 'theme-calm', biomes: ['shallows', 'nursery'] },
-  { name: 'theme-danger', biomes: ['channel', 'escarpment', 'basin'] },
-];
+export const MUSIC = ACTIVE_ERA.audio.music;
 
 /** Tracks whose file failed to load this session. They leave the rotation and stop cueing biomes. */
 export const MISSING = new Set<string>();

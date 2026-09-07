@@ -1,3 +1,4 @@
+import { ACTIVE_ERA } from '../content';
 import { BURROWERS, hideLabel } from '../sim/concealment';
 import * as THREE from 'three';
 import { audio } from '../audio/audio';
@@ -143,9 +144,9 @@ export class Engine {
     this.assets.onProgress((p) => {
       this.cb.onProgress?.(p);
       // The title never waits for 3D models; they stream during the title and pick screens.
-      if (!this.bootDone && (this.assets.isCardReady('anomalocaris') || performance.now() - this.bootStart > 4000)) { this.bootDone = true; this.cb.onLoaded(); }
+      if (!this.bootDone && (this.assets.isCardReady(ACTIVE_ERA.defaults.player) || performance.now() - this.bootStart > 4000)) { this.bootDone = true; this.cb.onLoaded(); }
     });
-    this.assets.prioritize(['anomalocaris', 'waptia', 'marrella', 'opabinia', 'canadia', 'olenoides', 'hallucigenia', 'wiwaxia'], 'boot');
+    this.assets.prioritize([...ACTIVE_ERA.defaults.boot], 'boot');
   }
   readonly assets = new AssetQueue();
   private bootDone = false; private bootStart = performance.now();

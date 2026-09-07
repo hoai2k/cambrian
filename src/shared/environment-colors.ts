@@ -1,8 +1,9 @@
 import {biomeWeights, BIOMES, shoreDistance, type Biome, type BiomeWeights, type Flora, type Boulder} from '../sim/world';
 import {clamp, noise2, smoothstep} from './math';
-import authored from './authored-colors.json';
-export const SAND_COLORS:Record<Biome,string>={shallows:'#c8c3a0',nursery:'#a3a682',shelf:'#a3a682',forest:'#8d8f6c',boulders:'#9a9a86',flats:'#8fa07a',channel:'#7f8878',escarpment:'#7c8078',basin:'#5e6a70'};
-export const FLORA_BASE:Record<string,string>={vauxia:'#c9a468',sac:'#c9a468',choia:'#b8a97c',thalli:'#7a6040',tuft:'#5d7a43'};
+import { ACTIVE_ERA } from '../content';
+const authored = ACTIVE_ERA.presentation.authoredColors;
+export const SAND_COLORS = ACTIVE_ERA.environment.sandColors;
+export const FLORA_BASE = ACTIVE_ERA.environment.floraColors;
 const props:Record<string,keyof typeof authored.props>={cushion:'cushion-sponge',lettuce:'lettuce-tuft',spine:'spine-sponge',glass:'glass-fan'};
 export function linear(hex:string):number[]{return [1,3,5].map(i=>{const c=parseInt(hex.slice(i,i+2),16)/255;return c<=.04045?c/12.92:((c+.055)/1.055)**2.4;});}
 export function hex(rgb:number[]){return '#'+rgb.map(c=>Math.round(clamp(c<=.0031308?c*12.92:1.055*c**(1/2.4)-.055,0,1)*255).toString(16).padStart(2,'0')).join('');}

@@ -392,3 +392,11 @@ chains are stored on non-deforming child nodes. The final anchor pass preserves
 all mesh, skin, material and animation binary bytes; it is idempotent. Update
 both sizes and the shared anchor registry after this pass. Runtime tests cover
 transformed instances, every articulated chain and attachment behavior.
+
+## Shared engine and era content
+
+Implemented: `src/content/index.ts` selects one plain-data `EraDefinition`; Cambrian-specific roster,
+ecology, atmosphere, palettes, soundtrack and asset locations live under `src/content/cambrian/`.
+Game, viewer and intake tooling consume the selected pack. No era selector is exposed. See
+[Era content boundary](06-era-content.md) for the Devonian integration sequence and remaining shared
+terrain, styling and ability responsibilities.

@@ -1,3 +1,4 @@
+import { assetPaths } from '../content/asset-paths';
 import { BufferGeometry, Mesh, Material } from 'three';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 
@@ -5,7 +6,7 @@ export type PropId = 'cushion-sponge' | 'lettuce-tuft' | 'pebble-cluster' | 'bla
 
 /** Caller owns the returned geometry; materials are supplied by the sea shader. */
 export async function loadPropGeometry(id: PropId, base = import.meta.env.BASE_URL): Promise<BufferGeometry> {
-  const gltf = await new GLTFLoader().loadAsync(`${base}assets/props/${id}.glb`);
+  const gltf = await new GLTFLoader().loadAsync(`${base}${assetPaths.prop(id)}`);
   const meshes: Mesh[] = [];
   gltf.scene.traverse(o => { if (o instanceof Mesh) meshes.push(o); });
   const mesh = meshes[0];

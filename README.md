@@ -107,3 +107,10 @@ and animation contract. The selection gallery identifies the two Early
 Cambrian taxa from outside the Burgess Shale. Editable authoring files and
 intermediates are stored locally under `cambrian/local/expansion-authoring/`;
 reproducible generation scripts are in `tools/creatures/`.
+
+## Era content
+
+Cambrian remains the only available era. Its roster, ecosystem defaults, presentation and asset
+paths are isolated in `src/content/cambrian/`, selected by `src/content/index.ts`. The game and
+viewer share that configuration. See [the era content plan](docs/redesign/06-era-content.md) for
+adding Devonian without duplicating the engine. Run `npm run eras` to validate the content contract.

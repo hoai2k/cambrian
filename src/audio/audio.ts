@@ -1,3 +1,4 @@
+import { assetPaths } from '../content/asset-paths';
 /**
  * Game audio. Generated sample library (public/assets/sfx, made with tools/gen-sfx.mjs) with a
  * synthesized fallback for anything that has not loaded yet, so the game is never silent.
@@ -17,7 +18,7 @@ interface MusicVoice { track: MusicTrack; el: HTMLAudioElement; node: MediaEleme
 let ASSET_BASE = import.meta.env.BASE_URL;
 export function setAssetBase(base: string) { ASSET_BASE = base; }
 /** URL of a sample file in the library, by bare name (no extension). */
-export const sfxUrl = (name: string) => `${ASSET_BASE}assets/sfx/${name}.mp3`;
+export const sfxUrl = (name: string) => `${ASSET_BASE}${assetPaths.sfx(name)}`;
 
 /** event kind → sample files (variants are chosen at random) */
 export const SAMPLES: Record<string, string[]> = {
@@ -34,7 +35,7 @@ export const SAMPLES: Record<string, string[]> = {
 };
 export const LOOPS = { ambient: 'ambient-reef', drone: 'giant-drone' } as const;
 /** URL of a music track in public/music, by name (no extension). See `src/audio/music.ts`. */
-export const musicUrl = (name: string) => `${ASSET_BASE}music/${encodeURIComponent(name)}.mp3`;
+export const musicUrl = (name: string) => `${ASSET_BASE}${assetPaths.music(name)}`;
 
 export class GameAudio {
   private ctx?: AudioContext;

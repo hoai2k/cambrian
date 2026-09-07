@@ -3,9 +3,8 @@ import fs from 'node:fs';
 import * as THREE from 'three';
 import {GLTFLoader} from 'three/addons/loaders/GLTFLoader.js';
 import {MeshoptDecoder} from 'three/addons/libs/meshopt_decoder.module.js';
-import ts from 'typescript';
-const src=ts.transpileModule(fs.readFileSync('src/shared/palettes.ts','utf8'),{compilerOptions:{module:ts.ModuleKind.ESNext}}).outputText;
-const {slotFor}=await import('data:text/javascript;base64,'+Buffer.from(src).toString('base64'));
+import { loadContent } from './load-content.mjs';
+const { slotFor } = await loadContent();
 globalThis.self=globalThis;globalThis.createImageBitmap=async()=>({width:512,height:512,close(){}});
 const result={creatures:{},props:{}};
 for(const [kind,folder] of [['creatures','creatures'],['props','props']])for(const f of fs.readdirSync(`public/assets/${folder}`).filter(f=>f.endsWith('.glb')&&!f.includes('.lod'))){

@@ -1,5 +1,6 @@
+import { loadContent } from './load-content.mjs';
 /**
- * Intake check for creatures. For every creature in src/sim/creatures.ts it verifies the GLB, LOD,
+ * Intake check for creatures. For every creature in the selected era it verifies the GLB, LOD,
  * hero card, thumbnail and transparent select render exist, and that the images were generated
  * from the current model appearance. Missing files fail; stale images warn (or fail with --strict).
  */
@@ -8,10 +9,9 @@ import crypto from 'node:crypto';
 import { fingerprint } from './creature-fingerprint.mjs';
 
 const strict = process.argv.includes('--strict');
-const dir = 'public/assets/creatures';
-const src = ['src/sim/creatures.ts', 'src/sim/expansion.ts'].map(p => fs.readFileSync(p, 'utf8')).join('\n');
-const ids = [...src.matchAll(/\bid: '([a-z]+)'/g)].map((m) => m[1]);
-if (ids.length !== new Set(ids).size || ids.length !== 21) throw Error('Creature intake must cover the complete 21-species roster');
+const { ACTIVE_ERA } = await loadContent();
+const dir = `public/${ACTIVE_ERA.assets.creatures.replace(/\/$/, '')}`;
+const ids = ACTIVE_ERA.creatures.map(c => c.id);
 const manifest = fs.existsSync(`${dir}/images.json`) ? JSON.parse(fs.readFileSync(`${dir}/images.json`, 'utf8')) : {};
 let errors = 0, warnings = 0;
 const err = (m) => { console.log('ERROR   ' + m); errors++; };

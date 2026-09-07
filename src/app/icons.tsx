@@ -1,3 +1,4 @@
+import { ACTIVE_ERA } from '../content';
 import type { SVGProps } from 'react';
 
 const base = (p: SVGProps<SVGSVGElement>) => ({ width: 22, height: 22, viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', strokeWidth: 2, strokeLinecap: 'round' as const, strokeLinejoin: 'round' as const, ...p });
@@ -29,5 +30,5 @@ export const CheckIcon = (p: SVGProps<SVGSVGElement>) => (<svg {...base(p)}><pat
 
 /** Shared production emblem. */
 export const Emblem = ({ size = 48 }: { size?: number }) => (
-  <img src={`${import.meta.env.BASE_URL}assets/brand/emblem-engraved.webp`} width={size} height={size} alt="" aria-hidden="true" />
+  <img src={`${import.meta.env.BASE_URL}${ACTIVE_ERA.assets.emblem}`} width={size} height={size} alt="" aria-hidden="true" />
 );

@@ -1,3 +1,4 @@
+import { ACTIVE_ERA } from '../content';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { audio } from '../audio/audio';
 import { gamepads, readGamepad, type RawControls } from '../input/input';
@@ -98,7 +99,7 @@ export function App() {
   // ---- Screen transitions ----
   const startFromTitle = useCallback((device: PlayerSetup['device'], viaGesture: boolean) => {
     audio.init(); audio.resume(); audio.play('ui-start');
-    updatePlayers([{ creature: 'anomalocaris', device, ready: false }]);
+    updatePlayers([{ creature: ACTIVE_ERA.defaults.player, device, ready: false }]);
     go('select');
     if (viaGesture) void toggleFullscreen();
     else if (!document.fullscreenElement) void document.documentElement.requestFullscreen().catch(() => setNotice('Press the fullscreen button in the corner (browsers only allow it from a click or key).'));
@@ -285,7 +286,7 @@ export function App() {
   // Idle-time preloading: tell the loader what is most likely to be needed next.
   useEffect(() => {
     const e = engineRef.current; if (!e) return;
-    if (screen === 'title') e.prioritize(['anomalocaris', 'waptia', 'opabinia', 'marrella'], 'title');
+    if (screen === 'title') e.prioritize([...ACTIVE_ERA.defaults.title], 'title');
     else if (screen === 'select') {
       const n = CREATURE_IDS.length, cols = gridColumns(n);
       const committed = players.filter((p) => p.ready).map((p) => p.creature);

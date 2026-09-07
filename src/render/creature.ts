@@ -1,3 +1,4 @@
+import { assetPaths } from '../content/asset-paths';
 import * as THREE from 'three';
 import { CreatureAnchors } from './anchors';
 import { GLTFLoader, type GLTF } from 'three/examples/jsm/loaders/GLTFLoader.js';
@@ -16,7 +17,7 @@ const cache = new Map<string, Promise<Loaded>>();
 const loader = new GLTFLoader().setMeshoptDecoder(MeshoptDecoder);
 
 export const creatureUrl = (id: CreatureId, lod: Lod = 0) =>
-  `${import.meta.env.BASE_URL}assets/creatures/${id}${lod ? '.lod1' : ''}.glb`;
+  `${import.meta.env.BASE_URL}${assetPaths.model(id, lod)}`;
 
 export function loadCreature(id: CreatureId, onProgress?: (loaded: number, total: number) => void, lod: Lod = 0): Promise<Loaded> {
   const key = `${id}:${lod}`;
