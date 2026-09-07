@@ -484,6 +484,17 @@ ok(RULES !== undefined && !RULES.growthByNutrition, 'Devonian rules active: grow
   ok(hunted, `in open water the shark hunts it (goal ${shark2.brain.goal})`);
 }
 
+// ---- bot respawn uses the non-player (-1) index inside nursery cover ----
+{
+  const { spawnInCover } = await import('../src/sim/devonian/swim');
+  const g = new Game('domination', [{ creature: 'coccosteus', device: 'keyboard', ready: true }], 77);
+  g.rng = () => 0; // selects the first shelter; used to produce a negative array index for bots
+  for (const id of ['eldredgeops', 'coccosteus'] as const) {
+    const p = spawnInCover(g, nurseryAt(0), id, 0.3, -1);
+    ok(p != null && [p.x, p.y, p.z].every(Number.isFinite), `${id} bot respawns at finite coordinates in cover`);
+  }
+}
+
 // ---- a full match step is deterministic and stays alive ----
 {
   const run = (seed: number) => {

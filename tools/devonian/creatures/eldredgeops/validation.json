@@ -1,0 +1,257 @@
+{
+  "checks": "finite transforms, normalized weights, root stable, identity-scale removal, unique motion, seamless loops, socket bind alignment, true LOD reduction",
+  "models": [
+    {
+      "file": "eldredgeops.glb",
+      "bytes": 34571900,
+      "vertices": 263746,
+      "triangles": 477662,
+      "bounds": [
+        1.9969910383224487,
+        1.01938134431839,
+        4.644688844680786
+      ],
+      "bones": 313,
+      "sockets": [
+        {
+          "name": "anchor_mouth_inside",
+          "point": [
+            0.0,
+            0.11999997147524209,
+            0.6349999802861385
+          ]
+        },
+        {
+          "name": "anchor_attack_primary",
+          "point": [
+            0.0,
+            -0.16988920820036527,
+            1.3749999247689555
+          ]
+        },
+        {
+          "name": "anchor_mouth",
+          "point": [
+            0.0,
+            0.06699998140563382,
+            0.5249999679320512
+          ]
+        }
+      ],
+      "clips": [
+        {
+          "name": "Ability",
+          "duration": 2.4000000953674316,
+          "motion": 3010.574,
+          "digest": "f55838f72490f63d5aee452cf8a1688cb01d87135ad8984f93f47726ee7532f8"
+        },
+        {
+          "name": "Attack",
+          "duration": 0.9999999403953552,
+          "motion": 185.349,
+          "digest": "292cdac32ca87f75f8e43c51ac0d5dbb90f4c22f39de0ebcb13d985e87a0d44d"
+        },
+        {
+          "name": "Bite",
+          "duration": 0.5,
+          "motion": 53.371,
+          "digest": "0225e021ac244000c3ab2ed71dc6b1ed529ae0fab12067db1c1992f356486d01"
+        },
+        {
+          "name": "Crawl",
+          "duration": 2.4000000953674316,
+          "motion": 936.375,
+          "digest": "9eb322305edb1091131ec1e5cdc8fc5b5eaf48711a732120e0f813560477fadb"
+        },
+        {
+          "name": "Death",
+          "duration": 1.600000023841858,
+          "motion": 1406.412,
+          "digest": "d44377806ecad28892068a609d47c57a759ab844b77be8b0cb91211c039556cd"
+        },
+        {
+          "name": "Dive",
+          "duration": 1.600000023841858,
+          "motion": 281.277,
+          "digest": "cf3eec2616ef1339f212dd09313d4d106d1ecb7552154e9d596cb93c023c542a"
+        },
+        {
+          "name": "Dodge",
+          "duration": 0.4000000059604645,
+          "motion": 82.98,
+          "digest": "b33143352d06c75e849fc24d7f16e884cebc7c0351e7baaf618b0b151afab29f"
+        },
+        {
+          "name": "Eat",
+          "duration": 1.600000023841858,
+          "motion": 197.322,
+          "digest": "c09d72cdef941de2f1cd798b0138d159f724a5a51223b96ecbbf93f3be1ca102"
+        },
+        {
+          "name": "Growth",
+          "duration": 1.5,
+          "motion": 192.066,
+          "digest": "db2f2e7c148ddcf3e00e19dd8f1b515f7c333cab8b773c4bf680a2d30fd45b29"
+        },
+        {
+          "name": "Guard",
+          "duration": 0.9999999403953552,
+          "motion": 496.28,
+          "digest": "9778d63cff5f329086904bc6ddb19dead05ae45bd13973c99003238ada0b2de2"
+        },
+        {
+          "name": "Heavy",
+          "duration": 1.100000023841858,
+          "motion": 234.519,
+          "digest": "f47a7688a7de0487110f4b4d4cb47207bf9b98faea5b6e99ecb17095c933063a"
+        },
+        {
+          "name": "Hit",
+          "duration": 0.5999999642372131,
+          "motion": 91.151,
+          "digest": "595c3eef6d6cb5ffbaeaf5e2c010b60c3eb138fb739a5ef4d1e405295652ca86"
+        },
+        {
+          "name": "Idle",
+          "duration": 2.4000000953674316,
+          "motion": 171.951,
+          "digest": "df8d7078f55efa6b3451fbc12dee3e8bab82543975e5721cfc6b3904715e1f96"
+        },
+        {
+          "name": "Moult",
+          "duration": 1.5,
+          "motion": 237.235,
+          "digest": "3fd1cfdbb933205af9f1ac1ffe047ed6e3e1e6a643326cd04c4db121475d6a9c"
+        },
+        {
+          "name": "Parry",
+          "duration": 0.36666667461395264,
+          "motion": 63.659,
+          "digest": "ac2b3a1a4041f3b37dd3ba8852ffe13ab1211e04cb6b10d0dbc61753932f5908"
+        },
+        {
+          "name": "Rise",
+          "duration": 1.600000023841858,
+          "motion": 209.187,
+          "digest": "97f62c9e74973e6d9fa967c9ea423ef55d4fcec56c21e865c6aa925e72d9f5e3"
+        },
+        {
+          "name": "Stagger",
+          "duration": 1.2000000476837158,
+          "motion": 177.753,
+          "digest": "8f613fae41f1ad51c1ffd7e6379e801eb7894ccfede7419b938a472d9e6b432b"
+        },
+        {
+          "name": "Swim",
+          "duration": 2.4000000953674316,
+          "motion": 819.638,
+          "digest": "04a48440b023b2ba0ec2f9f08ddcf3362d8226ffeb03c314893aa85588757be5"
+        },
+        {
+          "name": "TurnLeft",
+          "duration": 1.600000023841858,
+          "motion": 283.596,
+          "digest": "fdc97062a5e928b70b2c7233ccc4f98bc4880d92f0a8a4c32b10fbae1a76e5c3"
+        },
+        {
+          "name": "TurnRight",
+          "duration": 1.600000023841858,
+          "motion": 283.659,
+          "digest": "994c964c10d6e72981d85e1f37a377313495b97546e46e27e7dee2c8b7fed560"
+        }
+      ],
+      "jawArticulation": [
+        {
+          "clip": "Attack",
+          "bone": "oral_pump",
+          "maxQuaternionDelta": 0.017701517790555954
+        },
+        {
+          "clip": "Bite",
+          "bone": "oral_pump",
+          "maxQuaternionDelta": 0.0274946391582489
+        },
+        {
+          "clip": "Eat",
+          "bone": "oral_pump",
+          "maxQuaternionDelta": 0.027499141171574593
+        },
+        {
+          "clip": "Heavy",
+          "bone": "oral_pump",
+          "maxQuaternionDelta": 0.021784823387861252
+        }
+      ],
+      "removedIdentityScaleChannels": 0,
+      "sha256": "145b07f864510197364b596dde99be9cfab81f7070a43dbe422eac573daaf1e2"
+    },
+    {
+      "file": "eldredgeops.lod1.glb",
+      "bytes": 10440880,
+      "vertices": 105104,
+      "triangles": 167969,
+      "bounds": [
+        1.9969709515571594,
+        1.019141674041748,
+        4.644568920135498
+      ],
+      "bones": 313,
+      "sockets": [
+        {
+          "name": "anchor_mouth_inside",
+          "point": [
+            0.0,
+            0.11999997147524209,
+            0.6349999802861385
+          ]
+        },
+        {
+          "name": "anchor_attack_primary",
+          "point": [
+            0.0,
+            -0.16988920820036527,
+            1.3749999247689555
+          ]
+        },
+        {
+          "name": "anchor_mouth",
+          "point": [
+            0.0,
+            0.06699998140563382,
+            0.5249999679320512
+          ]
+        }
+      ],
+      "clips": [
+        {
+          "name": "Crawl",
+          "duration": 2.4000000953674316,
+          "motion": 936.375,
+          "digest": "9eb322305edb1091131ec1e5cdc8fc5b5eaf48711a732120e0f813560477fadb"
+        },
+        {
+          "name": "Death",
+          "duration": 1.600000023841858,
+          "motion": 1406.412,
+          "digest": "d44377806ecad28892068a609d47c57a759ab844b77be8b0cb91211c039556cd"
+        },
+        {
+          "name": "Idle",
+          "duration": 2.4000000953674316,
+          "motion": 171.951,
+          "digest": "df8d7078f55efa6b3451fbc12dee3e8bab82543975e5721cfc6b3904715e1f96"
+        },
+        {
+          "name": "Swim",
+          "duration": 2.4000000953674316,
+          "motion": 819.638,
+          "digest": "04a48440b023b2ba0ec2f9f08ddcf3362d8226ffeb03c314893aa85588757be5"
+        }
+      ],
+      "jawArticulation": [],
+      "removedIdentityScaleChannels": 1252,
+      "sha256": "466ffd6395bbf12bd495d2ae098c143a03aa304561176bb6c15fbfdd908544b7"
+    }
+  ],
+  "lodTriangleRatio": 0.35164823661919936
+}

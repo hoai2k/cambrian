@@ -1,0 +1,40 @@
+{
+  "id": "cladoxylopsid-tree-v2",
+  "family": "P03",
+  "name": "Cladoxylopsid tree \u2014 variant 2",
+  "taxon": "Eospermatopteris/Wattieza architectural reconstruction",
+  "category": "plant",
+  "description": "Bulbous trunk base, numerous small unbranched rootlets and a terminal crown of divided leafless branch systems.",
+  "provenance": "Middle Devonian Gilboa, New York reference",
+  "model": "assets/devonian/props/cladoxylopsid-tree-v2.glb",
+  "lod": "assets/devonian/props/cladoxylopsid-tree-v2.lod1.glb",
+  "image": "assets/devonian/props/cladoxylopsid-tree-v2.png",
+  "lengthMeters": 5.192468643188477,
+  "dimensionsMeters": {
+    "x": 2.7275500297546387,
+    "y": 5.192468643188477,
+    "z": 2.487088680267334
+  },
+  "clips": [
+    "Idle"
+  ],
+  "looping": [
+    "Idle"
+  ],
+  "sources": [
+    "https://pmc.ncbi.nlm.nih.gov/articles/PMC8409631/"
+  ],
+  "notes": [
+    "Original parametric mesh, no downloaded model.",
+    "1 glTF unit = 1 metre. Dimensions describe this art specimen, not a taxon maximum.",
+    "Pigmentation and soft appearance are artistic interpretations.",
+    "Locality tags constrain future placement; library membership does not assert co-occurrence.",
+    "Preview model: initial scenery delivery; further individual material, silhouette and motion refinement is pending."
+  ],
+  "fullTriangles": 412240,
+  "lodTriangles": 116186,
+  "lodRatio": 0.28184067533475643,
+  "sourceBlend": "../devonian-authoring/props/cladoxylopsid-tree-v2/cladoxylopsid-tree-v2.blend",
+  "uncertainty": "Gilboa architectural reconstruction, not a preserved complete individual; no true leaves, flowers or modern palm crown.",
+  "modelStatus": "preview"
+}

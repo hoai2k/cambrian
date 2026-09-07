@@ -1,0 +1,36 @@
+{
+  "id": "colonial-rugose-coral",
+  "family": "B07",
+  "name": "Colonial rugose coral",
+  "taxon": "Hexagonaria-type colony",
+  "category": "attached",
+  "description": "Connected compact corallites with large radial calices, distinct from small tabulate honeycomb.",
+  "provenance": "Middle Devonian North American shelf reference",
+  "model": "assets/devonian/props/colonial-rugose-coral.glb",
+  "lod": "assets/devonian/props/colonial-rugose-coral.lod1.glb",
+  "image": "assets/devonian/props/colonial-rugose-coral.png",
+  "lengthMeters": 0.09848295152187347,
+  "dimensionsMeters": {
+    "x": 0.09541745483875275,
+    "y": 0.04550187662243843,
+    "z": 0.09848295152187347
+  },
+  "clips": [],
+  "looping": [],
+  "sources": [
+    "https://umorf.ummp.lsa.umich.edu/wp/mi-backyard-fossils-corals/"
+  ],
+  "notes": [
+    "Original parametric mesh, no downloaded model.",
+    "1 glTF unit = 1 metre. Dimensions describe this art specimen, not a taxon maximum.",
+    "Pigmentation and soft appearance are artistic interpretations.",
+    "Locality tags constrain future placement; library membership does not assert co-occurrence.",
+    "Preview model: initial scenery delivery; further individual material, silhouette and motion refinement is pending."
+  ],
+  "fullTriangles": 187344,
+  "lodTriangles": 56203,
+  "lodRatio": 0.29999893244512765,
+  "sourceBlend": "../devonian-authoring/props/colonial-rugose-coral/colonial-rugose-coral.blend",
+  "uncertainty": "Comparative rugose colony architecture; reconstructed calices are not a fossil specimen section.",
+  "modelStatus": "preview"
+}

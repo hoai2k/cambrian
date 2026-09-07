@@ -1,0 +1,41 @@
+{
+  "id": "organic-remains",
+  "family": "G12",
+  "name": "Disarticulated gnathal fragments",
+  "taxon": "Dunkleosteus terrelli reconstructed cutting elements",
+  "category": "organic-prop",
+  "description": "Four paired lower and posterior upper gnathal cutting fragments derived from the reviewed V2 Dunkleosteus asset at its representative scale. These interpreted fragments do not represent complete skeletal bones; no invented long bones or soft carcass.",
+  "provenance": "Late Devonian Cleveland Shale reference",
+  "model": "assets/devonian/props/organic-remains.glb",
+  "lod": "assets/devonian/props/organic-remains.lod1.glb",
+  "image": "assets/devonian/props/organic-remains.png",
+  "lengthMeters": 1.174147367477417,
+  "dimensionsMeters": {
+    "x": 1.174147367477417,
+    "y": 0.09304150193929672,
+    "z": 1.1278356313705444
+  },
+  "clips": [],
+  "looping": [],
+  "sources": [
+    "https://www.palaeo-electronica.org/content/2024/5307-dunkleosteus-reconstruction",
+    "https://doi.org/10.3390/d15030318"
+  ],
+  "notes": [
+    "Original parametric mesh, no downloaded model.",
+    "1 glTF unit = 1 metre. Dimensions describe this art specimen, not a taxon maximum.",
+    "Pigmentation and soft appearance are artistic interpretations.",
+    "Locality tags constrain future placement; library membership does not assert co-occurrence.",
+    "Preview model: initial scenery delivery; further individual material, silhouette and motion refinement is pending."
+  ],
+  "fullTriangles": 2352,
+  "lodTriangles": 705,
+  "lodRatio": 0.2997448979591837,
+  "sourceBlend": "../devonian-authoring/props/organic-remains/organic-remains.blend",
+  "uncertainty": "Directly extracted interpreted armour from the reviewed Dunkleosteus terrelli model. This is an artistic disarticulation, not a scanned fossil assemblage.",
+  "derivedFrom": {
+    "model": "assets/devonian/creatures/dunkleosteus.glb",
+    "sha256": "3d47c129b69890a3399abcad4053d808a914674c3b5f1f24afd4ec74dd794e13"
+  },
+  "modelStatus": "preview"
+}

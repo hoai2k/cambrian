@@ -12,8 +12,8 @@ Delivered models are listed in `tools/devonian/shipped.json`. Initial versions a
 soon as they pass basic model, animation, anchor, portrait and eye checks, so they can be tested
 in the game before the complete art-refining pass. Only listed assets enter the viewer catalogue.
 
-**Current delivery: 12/21 creatures — nine refined models and three previews** (Onychodus,
-Rhinodipterus and Tiktaalik). The explicit lifecycle in `src/content/devonian/model-status.json`
+**Current delivery: 15/21 creatures — nine refined models and six previews** (Onychodus,
+Rhinodipterus, Tiktaalik, Acanthostega, Eldredgeops and Jaekelopterus). The explicit lifecycle in `src/content/devonian/model-status.json`
 drives the **⚠ Preview model** badge on creature choice cards, selected-player cards and viewer
 cards. Promotion to `final` happens individually after the refining pass; the badge never locks
 selection or changes gameplay. Newly authored models default to preview until reviewed.
@@ -64,6 +64,8 @@ Creature models use the existing version-1 `cambrianAnchor` metadata, retained b
 compatibility with the shared socket reader. Full and reduced models carry the same skeleton
 and mouth, swallowing and primary-contact sockets. CCD metadata is reserved for actual feeding
 or grasping chains; stationary sockets do not advertise a fictitious solver chain.
+
+All 47 scenery variants across the 29 families are delivered as previews, with full/reduced models, portraits, source builders and metric metadata. All 47 were loaded successfully in the built viewer. Nine initial imagegen biome paintings are also delivered; their prompts and source provenance are in `tools/devonian/environment-image-prompts.json`.
 
 Living scenery may have restrained ambient motion. Rocks, sediment, dead shells and logs are
 static. These authored scenery specimens are a source library: large trees and detailed reef

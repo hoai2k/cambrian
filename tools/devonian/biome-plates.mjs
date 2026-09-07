@@ -20,6 +20,12 @@ import sharp from 'sharp';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
 const OUT_DIR = path.join(ROOT, 'public', 'assets', 'devonian', 'biomes');
+if (process.argv.includes('--overwrite-painted')) {
+  console.warn('Explicitly regenerating procedural biome plates over the painted set.');
+} else if ((await import('node:fs')).existsSync(path.join(OUT_DIR, 'manifest.json'))) {
+  console.log('Painted biome plates are installed; kept them. Use --overwrite-painted for a deliberate fallback rebuild.');
+  process.exit(0);
+}
 const W = 1024;
 const H = 576;
 

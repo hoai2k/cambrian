@@ -1,0 +1,36 @@
+{
+  "id": "large-boulder",
+  "family": "G07",
+  "name": "Large boulder",
+  "taxon": "Weathered silicate rock",
+  "category": "geology",
+  "description": "Coherent uneven rock masses with muted silicate grain pigmentation.",
+  "provenance": "Regional lithology requires placement review",
+  "model": "assets/devonian/props/large-boulder.glb",
+  "lod": "assets/devonian/props/large-boulder.lod1.glb",
+  "image": "assets/devonian/props/large-boulder.png",
+  "lengthMeters": 1.2133581638336182,
+  "dimensionsMeters": {
+    "x": 1.2133581638336182,
+    "y": 0.9332166910171509,
+    "z": 1.051256775856018
+  },
+  "clips": [],
+  "looping": [],
+  "sources": [
+    "https://pmc.ncbi.nlm.nih.gov/articles/PMC8409631/"
+  ],
+  "notes": [
+    "Original parametric mesh, no downloaded model.",
+    "1 glTF unit = 1 metre. Dimensions describe this art specimen, not a taxon maximum.",
+    "Pigmentation and soft appearance are artistic interpretations.",
+    "Locality tags constrain future placement; library membership does not assert co-occurrence.",
+    "Preview model: initial scenery delivery; further individual material, silhouette and motion refinement is pending."
+  ],
+  "fullTriangles": 1280,
+  "lodTriangles": 384,
+  "lodRatio": 0.3,
+  "sourceBlend": "../devonian-authoring/props/large-boulder/large-boulder.blend",
+  "uncertainty": "Generic geological form; exact regional lithology, hydrodynamics and burial history require scene-specific review.",
+  "modelStatus": "preview"
+}

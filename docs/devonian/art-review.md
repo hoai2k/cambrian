@@ -24,13 +24,13 @@ Each revised full model retains the eighteen action clips and three version-1 sp
 
 ## Initial deliveries awaiting the refining pass
 
-The original eight specimens and Cheirolepis have reviewed models. Three additional models are
+The original eight specimens and Cheirolepis have reviewed models. Six additional models are
 now delivered as **previews**: Onychodus (eyes ~86–87% embedded), Rhinodipterus (~83%) and Tiktaalik
-(~71%). Each was independently authored in Blender, with real oral geometry, eighteen full
-animations, three LOD animations, three anchors and four matching portraits. Exact source and
+(~71%), Acanthostega (~73%), Jaekelopterus (~77%) and Eldredgeops (all individual lenses ~74% or more). Each was independently authored in Blender, with real oral geometry, the full shared
+action set, matching LOD locomotion/death clips, three anchors and four matching portraits. Exact source and
 packaged hashes and deferred polish are recorded in each builder folder's `preview-delivery.json`.
 
-At the user's request, initial delivery of the remaining nine creatures and all scenery/images
+At the user's request, initial delivery of the remaining six creatures and all scenery/images
 precedes further full art-refining passes. Preview does not waive the 50% eye minimum or basic
 export/animation validity; it identifies the unfinished visual and detailed motion review.
 

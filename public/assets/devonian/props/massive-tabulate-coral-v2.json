@@ -1,0 +1,37 @@
+{
+  "id": "massive-tabulate-coral-v2",
+  "family": "B04",
+  "name": "Massive tabulate coral \u2014 variant 2",
+  "taxon": "Favosites-type colony",
+  "category": "attached",
+  "description": "Dense small polygonal corallites form a honeycomb colony; restrained soft covering is artistic.",
+  "provenance": "Devonian carbonate shelf; genus-level architecture only",
+  "model": "assets/devonian/props/massive-tabulate-coral-v2.glb",
+  "lod": "assets/devonian/props/massive-tabulate-coral-v2.lod1.glb",
+  "image": "assets/devonian/props/massive-tabulate-coral-v2.png",
+  "lengthMeters": 0.28494659066200256,
+  "dimensionsMeters": {
+    "x": 0.28494659066200256,
+    "y": 0.09277401864528656,
+    "z": 0.2639843821525574
+  },
+  "clips": [],
+  "looping": [],
+  "sources": [
+    "https://www.digitalatlasofancientlife.org/vc/cnidaria/anthozoa/tabulata/",
+    "https://collections.geoscienze.unipd.it/favosites"
+  ],
+  "notes": [
+    "Original parametric mesh, no downloaded model.",
+    "1 glTF unit = 1 metre. Dimensions describe this art specimen, not a taxon maximum.",
+    "Pigmentation and soft appearance are artistic interpretations.",
+    "Locality tags constrain future placement; library membership does not assert co-occurrence.",
+    "Preview model: initial scenery delivery; further individual material, silhouette and motion refinement is pending."
+  ],
+  "fullTriangles": 41310,
+  "lodTriangles": 12392,
+  "lodRatio": 0.2999757927862503,
+  "sourceBlend": "../devonian-authoring/props/massive-tabulate-coral-v2/massive-tabulate-coral-v2.blend",
+  "uncertainty": "Favosites-type hexagonal architecture is supported; this is not a species-level diagnostic model.",
+  "modelStatus": "preview"
+}
