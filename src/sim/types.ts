@@ -45,7 +45,7 @@ export const emptyInput = (): InputFrame => ({
 
 export interface BrainState {
   kind: 'swarm' | 'needs' | 'giant';
-  goal: 'wander' | 'hunt' | 'flee' | 'hide' | 'fight' | 'patrol' | 'search' | 'sleep' | 'graze' | 'notice' | 'defend';
+  goal: 'wander' | 'hunt' | 'flee' | 'hide' | 'fight' | 'patrol' | 'search' | 'sleep' | 'graze' | 'notice' | 'defend' | 'scavenge';
   target: number;          // actor id or -1
   goalT: number;           // time in goal
   thinkT: number;          // countdown to next decision
@@ -155,6 +155,13 @@ export interface PlayerSetup { creature: CreatureId; device: number | 'keyboard'
 /** Cambrian modes, plus the Devonian ones (`domination`, `foodchain`); an era lists the ones it offers. */
 export type Mode = 'rise' | 'frenzy' | 'hunted' | 'reef' | 'domination' | 'foodchain';
 export const MODE_IDS: readonly Mode[] = ['rise', 'frenzy', 'hunted', 'reef', 'domination', 'foodchain'];
+/**
+ * Modes that are not a contest between players. Their goal is a milestone rather than a win over
+ * somebody, so meeting it need not take the sea away: these matches can carry on afterwards as a
+ * free swim (`Game.continueMatch`). The versus modes — frenzy, hunted, foodchain — end for good.
+ */
+export const COOP_MODES: readonly Mode[] = ['rise', 'domination', 'reef'];
+export const isCoop = (m: Mode) => COOP_MODES.includes(m);
 
 export interface Prompt { text: string; t: number; }
 

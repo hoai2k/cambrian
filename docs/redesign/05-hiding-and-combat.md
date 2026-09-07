@@ -19,6 +19,14 @@ Implemented September 2026. This supersedes the original design's Y signature ab
   one, and greys out on the gate the button actually checks (`Game.heavyMove`). The three
   filter-feeding specials (`collectorWake`, `pharyngealPump`, `planktonComb`) never strike a target
   at all, so they never offer one.
+
+  Since September 2026 the button also has a fallback, so it is never dead. A player's RT takes the
+  special while the special is up; once it is not — cooling down, or too little stamina — the press
+  falls through to the ordinary heavy or pounce instead of being swallowed. `Game.heavyMove` follows
+  it, so the prompt names whichever of the two the button would actually do. Bots keep the plain
+  split, which leaves their behaviour and every seeded replay unchanged. This matters most to the
+  filter feeders, whose special never strikes anything: before the fallback a player Tamisiocaris
+  had no attack on RT at all, and the `Heavy` clip in its model never played.
 - **B: block/parry**, or evade for creatures without a guard. Defensive specials run through this action. Hallucigenia and Canadia have a 0.28-second parry window; sustained defense is not invulnerability.
 - **Y / keyboard R (player 2: P): hide**, available at every growth tier. Press again to end hiding. Attacking, blocking, sprinting, dodging, taking damage, or being grabbed ends hiding.
 

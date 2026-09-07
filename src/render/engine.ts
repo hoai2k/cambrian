@@ -9,7 +9,7 @@ import { bandOf, isAlive, isHidden, lengthOf } from '../sim/actors';
 import { creature, type CreatureId } from '../sim/creatures';
 import { Game, radarRange as radarReach, type ScoreHeader, type ScoreRow, type TeleportDest } from '../sim/game';
 import type { Phase } from '../sim/daynight';
-import { BAND_COLOR, emptyInput, TIER_NAMES, TIER_NEED, type Actor, type Band, type InputFrame, type Mode, type PlayerSetup } from '../sim/types';
+import { BAND_COLOR, emptyInput, isCoop, TIER_NAMES, TIER_NEED, type Actor, type Band, type InputFrame, type Mode, type PlayerSetup } from '../sim/types';
 import { BIOME_NAMES, biomeAt, groundHeight, nurseryAt, resolveStatic, SURFACE_Y, type Biome, type Boulder, type LandmarkKind } from '../sim/world';
 import { AssetQueue, type AssetProgress } from './assets';
 import { CreatureView, ensureLoaded, loadedSync, type Lod } from './creature';
@@ -70,6 +70,8 @@ export interface RadarBlipHud {
 }
 export interface HudSnapshot {
   players: PlayerHud[]; rects: Rect[]; time: number; status: 'playing' | 'won' | 'lost'; message: string; mode: Mode; winner: number; fps: number;
+  /** This match is over but its mode is co-op, so the results screen can offer to carry on. */
+  canContinue: boolean;
   /** What this match turned up, for the results screen's record. */
   discovery: { biomes: Biome[]; landmarks: LandmarkKind[]; apex: CreatureId[] };
   /** The hour of the day: what it is, how long until it turns, and how much the reef is hunting. */
@@ -238,6 +240,12 @@ export class Engine {
   }
   setLook(speed: number, invert: boolean) { this.lookSpeed = speed; this.invertY = invert; }
   setPaused(p: boolean) { this.paused = p; }
+
+  /**
+   * Carry a finished co-op match on rather than restarting it: same world, same bodies, same
+   * progress, with the mode's goal no longer watching. Returns whether the match resumed.
+   */
+  continueMatch(): boolean { return this.game?.continueMatch() ?? false; }
   get isAttract() { return this.attract; }
 
   /** Background ecosystem for the title / select screens. */
@@ -846,9 +854,11 @@ export class Engine {
         case 'stagger': { world('stagger', e.pos); break; }
         case 'dodge': { this.bubbles.emit(e.pos, 14, 0.8, 2.5, 0.06, 0.7); world(heavy('dodge', e.actor), e.pos); break; }
         case 'silt': { this.bubbles.emit(e.pos, 30, 1.5, 2, 0.08, 1.2); world('silt', e.pos); break; }
-        // A special announces itself with sparkles around the body, not a flash. An impact flash on
-        // your own creature reads as damage or a respawn — the two things it is emphatically not.
-        case 'ability': { const len = e.strength ?? 1; this.sparkles.emit(e.pos, Math.round(16 + len * 7), 0.5 + len * 0.35, 0.6 + len * 0.25, 0.06, 1.1); this.bubbles.emit(e.pos, 20, 1, 3, 0.08); const ab = game.byId(e.actor); const key = ab ? `ability:${creature(ab.creature).ability}` : 'ability'; world(SAMPLES[key] ? key : 'ability', e.pos); break; }
+        // A special is your own action, not something happening to you, so its tell is the quietest
+        // in the game: a few sparkles close to the body that say "this one is not the ordinary
+        // heavy". Deliberately under the shoal-join burst, and well under anything that means
+        // damage — a flash here read as being hit or respawning, which is why it is gone.
+        case 'ability': { const len = e.strength ?? 1; this.sparkles.emit(e.pos, Math.round(5 + len * 2), 0.25 + len * 0.18, 0.25 + len * 0.1, 0.035, 0.5); this.bubbles.emit(e.pos, 20, 1, 3, 0.08); const ab = game.byId(e.actor); const key = ab ? `ability:${creature(ab.creature).ability}` : 'ability'; world(SAMPLES[key] ? key : 'ability', e.pos); break; }
         case 'shellCrush': { this.impacts.spawn(e.pos, '#ffd9a0', 2.2, 0.5); this.bubbles.emit(e.pos, 28, 0.8, 4, 0.1, 1.4); world('shellCrush', e.pos); break; }
         case 'grab': { const at = this.impactPos(e.actor, e.other, e.pos); this.impacts.spawn(at, '#ffb070', 1.4, 0.35); world('grab', at); if (e.player != null && e.player >= 0) { const d = padOf(e.player); if (typeof d === 'number') rumble(d, 1, 0.6, 300); } break; }
         case 'hunted': { personal('hunted'); if (e.player != null && e.player >= 0) { const d = padOf(e.player); if (typeof d === 'number') rumble(d, 0.6, 0.9, 500); } break; }
@@ -1008,6 +1018,7 @@ export class Engine {
     });
     return {
       players, rects, time: game.time, status: game.state.status, message: game.state.message, mode: game.mode, winner: game.state.winner, fps: this.fps,
+      canContinue: game.state.status !== 'playing' && isCoop(game.mode),
       discovery: { biomes: [...game.discovery.biomes], landmarks: [...game.discovery.landmarks], apex: [...game.discovery.apex] },
       day: game.dayPhase(),
     };

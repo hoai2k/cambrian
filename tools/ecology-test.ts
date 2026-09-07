@@ -11,6 +11,8 @@ import { Game } from '../src/sim/game';
 import { emptyInput, type InputFrame } from '../src/sim/types';
 import { isAlive, lengthOf } from '../src/sim/actors';
 import { makeBrain } from '../src/sim/ai';
+import { grazeRate } from '../src/sim/expansion-abilities';
+import { creature, type CreatureId } from '../src/sim/creatures';
 import { DAY_LENGTH, dayFraction, daylight, huntInterval, huntingPressure, phaseAt, untilNextPhase } from '../src/sim/daynight';
 import { distXZ } from '../src/shared/math';
 
@@ -111,15 +113,20 @@ function withNeighbour(opts: Parameters<typeof makeBrain>[3], gap: number, seed 
 
 // --- appetite: the same reef hunts far more at dusk than at noon ---
 {
+  // One reef is a couple of dozen animals, so a single wounded straggler that stays on a chase can
+  // be a whole percent on its own. Pool several seeds so the reading is of the clock, not of him.
+  const SEEDS = [33, 7, 91, 404, 12, 555];
   const sample = (startFraction: number) => {
-    const g = new Game('reef', [{ creature: 'waptia', device: 'keyboard', ready: true }], 33);
-    g.players[0].spawnProtect = 1e9;
-    g.time = startFraction * DAY_LENGTH;              // jump the clock to the hour under test
     let hunting = 0, seen = 0;
-    for (let i = 0; i < 60 * 40; i++) {
-      run(g, 1);
-      if (i % 20) continue;
-      for (const a of g.actors) if (a.controller === 'ambient' && a.brain) { seen++; if (a.brain.goal === 'hunt') hunting++; }
+    for (const seed of SEEDS) {
+      const g = new Game('reef', [{ creature: 'waptia', device: 'keyboard', ready: true }], seed);
+      g.players[0].spawnProtect = 1e9;
+      g.time = startFraction * DAY_LENGTH;            // jump the clock to the hour under test
+      for (let i = 0; i < 60 * 40; i++) {
+        run(g, 1);
+        if (i % 20) continue;
+        for (const a of g.actors) if (a.controller === 'ambient' && a.brain) { seen++; if (a.brain.goal === 'hunt') hunting++; }
+      }
     }
     return seen ? hunting / seen : 0;
   };
@@ -156,6 +163,50 @@ function withNeighbour(opts: Parameters<typeof makeBrain>[3], gap: number, seed 
   check('giants come down to hunt far more at dusk than at noon', dusk > noon * 2,
     `${(dusk * 100).toFixed(1)}% at dusk vs ${(noon * 100).toFixed(1)}% at noon`);
   check('...and are mostly just cruising even then', dusk < 0.35, `${(dusk * 100).toFixed(1)}%`);
+}
+
+// --- what each animal actually eats ---
+{
+  // Feeding ecology follows the palaeontology, not the roster's combat role: see
+  // docs/redesign/01-game-design.md · Feeding. A creature with a diet does not go hunting.
+  const diet = (id: string) => creature(id as CreatureId).diet;
+  check('the mat grazers graze', diet('wiwaxia') === 'grazer' && diet('odontogriphus') === 'grazer',
+    `wiwaxia ${diet('wiwaxia')} · odontogriphus ${diet('odontogriphus')}`);
+  check('the deposit feeders sift', diet('marrella') === 'deposit' && diet('pikaia') === 'deposit',
+    `marrella ${diet('marrella')} · pikaia ${diet('pikaia')}`);
+  check('the suspension feeders strain', ['odaraia', 'vetulicola', 'tamisiocaris', 'ctenorhabdotus'].every((c) => diet(c) === 'filter'), '');
+  check('Hallucigenia lives on the dead', diet('hallucigenia') === 'scavenger', String(diet('hallucigenia')));
+  check('the predators still hunt', ['anomalocaris', 'opabinia', 'sidneyia', 'isoxys', 'nectocaris'].every((c) => !diet(c)), '');
+
+  // Wiwaxia's grazing used to be a name check in two files. It is data now, and the behaviour it
+  // encoded — nothing while it is moving — has to survive the move.
+  const wiw = creature('wiwaxia' as CreatureId);
+  check('...and Wiwaxia still only grazes while it is still', wiw.grazeStill === true, `grazeStill=${wiw.grazeStill}`);
+  const still = { stillness: 1, abilityActive: false, scale: 1 } as unknown as Parameters<typeof grazeRate>[0];
+  const moving = { stillness: 0, abilityActive: false, scale: 1 } as unknown as Parameters<typeof grazeRate>[0];
+  check('...worth something when planted, nothing when moving', grazeRate(still, wiw) > 0 && grazeRate(moving, wiw) === 0,
+    `${grazeRate(still, wiw).toFixed(1)} still, ${grazeRate(moving, wiw).toFixed(1)} moving`);
+  check('a scavenger does not graze mats', grazeRate(still, creature('hallucigenia' as CreatureId)) === 0, '');
+}
+
+// --- a scavenger crosses to a body and eats it ---
+{
+  const g = new Game('reef', [{ creature: 'anomalocaris', device: 'keyboard', ready: true }], 8);
+  const p = g.players[0]; p.spawnProtect = 1e9;
+  // An empty stretch of sea, so the observation is about the scavenger and not about the reef.
+  const at = { x: p.pos.x + 60, y: p.pos.y, z: p.pos.z + 60 };
+  for (const a of [...g.actors]) if (a.controller !== 'player') g.remove(a);
+  const h = g.spawn('hallucigenia', 'ambient', at, 1);
+  h.brain = makeBrain('needs', at, g.rng, { hunger: 500 }); h.spawnProtect = 1e9;
+  const body = g.spawn('waptia', 'ambient', { x: at.x + 16, y: at.y, z: at.z }, 0.8);
+  body.state = 'dead'; body.hp = 0; body.deathY = body.pos.y;
+  const start = distXZ(h.pos, body.pos);
+  run(g, 60);
+  check('a scavenger sets off for a body it can see', h.brain!.goal === 'scavenge' && h.brain!.target === body.id, `goal=${h.brain!.goal}`);
+  let ate = false;
+  for (let i = 0; i < 60 * 40 && !ate; i++) { run(g, 1); if (body.eaten >= 1) ate = true; }
+  check('...crosses to it and eats it', ate, `from ${start.toFixed(0)}m away, ${h.eats} meal(s)`);
+  check('...and goes back to wandering afterwards', (run(g, 90), h.brain!.goal !== 'scavenge'), `goal=${h.brain!.goal}`);
 }
 
 console.log(failed ? `\n${failed} FAILED` : '\nall ecology tests passed');
