@@ -68,6 +68,9 @@ export function Viewer() {
   useEffect(() => {
     let cancelled = false;
     setLoading(true); setLoadedId(''); setError(''); setClips([]); setSlots([]);
+    // The specimen on stage leaves before the next one is fetched: watching the last creature
+    // repaint into the new one's colours, then pop out of frame, read as a glitch.
+    sceneRef.current?.clear();
     // Set the scheme before the model is built so it never appears in the wrong palette first.
     sceneRef.current?.setScheme(picksRef.current[id] ?? defaultScheme(id));
     sceneRef.current?.show(def)
@@ -107,7 +110,17 @@ export function Viewer() {
 
   return (
     <div className="viewer">
-      <canvas ref={canvasRef} className="viewer-canvas" />
+      <div className="stage">
+        <canvas ref={canvasRef} className="viewer-canvas" />
+        {/* The notice sits on the stage, over where the specimen will stand. `status` stays in the
+            class list because the QA tools wait on it (tools/devonian/browser.mjs and friends). */}
+        {(loading || error) && (
+          <div className={`status stage-status ${error ? 'error' : ''}`} role="status">
+            {!error && <i className="spinner" aria-hidden="true" />}
+            <span>{error || `Loading ${def.name}…`}</span>
+          </div>
+        )}
+      </div>
 
       <aside className="specimens" aria-label="Specimens">
         <header>
@@ -178,7 +191,7 @@ export function Viewer() {
       <section className="clips" aria-label="Animations" data-loaded-specimen={loadedId}>
         <div className="clips-head">
           <h3>Animations</h3>
-          {clips.length > 0 && <><label className="toggle">
+          {(clips.length > 0 || loading) && <><label className="toggle">
             <input type="checkbox" checked={loop} onChange={(e) => setLoop(e.target.checked)} />
             <span>Loop one-shots</span>
           </label>
@@ -216,9 +229,6 @@ export function Viewer() {
         </div>
       </section>
 
-      {(loading || error) && (
-        <div className={`status ${error ? 'error' : ''}`} role="status">{error || `Loading ${def.name}…`}</div>
-      )}
     </div>
   );
 }
