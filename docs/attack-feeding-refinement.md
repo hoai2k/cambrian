@@ -63,6 +63,51 @@ anatomical replacement before general/eye audits; avoid editing an obsolete moti
    families to main individually, regenerate affected portraits/catalogues/sizes, and verify
    post-main viewer/game placement. Source or an attractive still does not complete this pass.
 
+## Grip and dash clips — 8 September 2026
+
+Two clips the pass now owes, both requested with the grip mechanic that shipped ahead of them
+(`docs/redesign/05-hiding-and-combat.md` · Taking hold). The runtime already plays them the moment
+they exist: nothing here needs a code change to land.
+
+### `Grab`, for the eleven animals that grip
+
+`grasp: true` in the content is the mechanic; the clip is the performance. A grip is *held* — the
+button stays down, the animal keeps hold, and the same pose does double duty as the cling while
+riding something bigger — so it wants a settled hold, not a snatch: close, take the load, and stay
+closed with the body adjusting around it. The renderer plays it as a one-shot on the grab and as a
+slow loop while clinging (`rideHost`), so the pose has to read from any angle and survive being
+looped at 0.4 speed.
+
+Per-animal direction is in `tools/attack-feeding-refinements.json` as `grip`, and it is
+appendage-specific by design. The two that are *not* obvious:
+
+- **Hallucigenia grabs with its feet.** The clawed lobopods clamp in pairs around the held body,
+  or hook into a host's flank while the dorsal spine rows stay clear of it. Not a mouth grab, and
+  not the spines.
+- **Furcaster grabs with its whole body.** The arms wrap and the disc flattens onto the target so
+  the animal *sticks* to it, oral surface against the host. Never one arm poking forward.
+
+Anomalocaris, Nectocaris, Jaekelopterus, Manticoceras, Michelinoceras, Opabinia and Palaeoisopus
+already carry a `Grab` clip; those get reviewed against the held-grip rules rather than authored
+from nothing. Cambroraster, Leanchoilia, Isoxys, Tamisiocaris, Ottoia, Hallucigenia, Walliserops
+and Furcaster need one. Until it lands the runtime falls back to `Heavy`/`Attack`, which reads as
+a swing where a hold belongs — that is the visible gap this closes.
+
+### `Dash`, for every model
+
+Every delivered model has a `Dodge` and the code has been using it for both moves. They are not
+the same thing: the dodge is a short jink out of a bite, 0.32 s, and the dash is a committed drive
+that covers ground, 0.42 s, with a cancel into a charge at the end of it. One clip cannot be both,
+and reusing the jink is why a dash reads as a wiggle.
+
+Author `Dash` as the drive: a compression and a single strong extension along the line of travel,
+the body straight and the appendages swept back rather than paddling, holding the streamlined
+shape through the recovery. Length 0.45 s so it covers the state with a little to spare. Crawlers
+included: their dash is a shove off the substrate, not a swim.
+
+`src/render/creature.ts` already picks `Dash` for the long move and keeps `Dodge` for the short
+one, and falls back either way, so clips can land one model at a time.
+
 ## Assignment and current scope
 
 Astra high authors/reviews each creature; Terra medium runs frozen Blender/export/check groups.

@@ -275,6 +275,8 @@ export class CreatureView {
       else if (a.state === 'swallowed') { this.playLoop(this.pick('Stagger', 'Hit') ?? 'Idle'); this.loco?.setEffectiveTimeScale(0.8); }
       else if ((a.hideMode === 'burrowed' || ((a.state === 'guard' || a.state === 'parry') && ['anchor','enroll','shellUp','bristleFlare'].includes(def.ability))) && this.has('Ability')) { this.playLoop('Ability'); this.loco?.setEffectiveTimeScale(.55); }
       else if ((a.state === 'guard') && this.has('Guard')) { this.playLoop('Guard'); this.loco?.setEffectiveTimeScale(1); }
+      // Clinging to something bigger: the grip is held, so the grab pose is the locomotion.
+      else if (a.rideHost >= 0 && a.state === 'free' && this.has('Grab')) { this.playLoop('Grab'); this.loco?.setEffectiveTimeScale(0.4); }
       else if (held && this.has('Ability')) { this.playLoop('Ability'); this.loco?.setEffectiveTimeScale(1); }
       else if (a.state === 'moult' && this.has('Moult')) { this.playLoop('Moult'); this.loco?.setEffectiveTimeScale(1); }
       else {
@@ -298,7 +300,10 @@ export class CreatureView {
         else this.playOnce(this.pick('Ability', 'Attack')!, Math.max(0.4, a.stateDur), false);
       }
       if (a.state === 'grabbing' && this.wasAttack && this.oneShotT <= 0) this.playOnce(this.pick('Grab', 'Attack')!, 0.9, false);
-      if (a.state === 'dodge' && !this.wasDodge) this.playOnce(this.pick('Dodge') ?? '', a.stateDur + 0.1, false);
+      // A dash and a dodge are different moves — one drives, one jinks — so a model that has been
+      // given its own Dash clip uses it for the long one and keeps Dodge for the short jink. Until
+      // that clip lands (see docs/cambrian/refinement-queue.md) both read as the dodge.
+      if (a.state === 'dodge' && !this.wasDodge) this.playOnce((a.stateDur > 0.36 ? this.pick('Dash', 'Dodge') : this.pick('Dodge', 'Dash')) ?? '', a.stateDur + 0.1, false);
       if (a.state === 'parry' && !this.wasParry && this.has('Parry')) this.playOnce('Parry', 0.35, false);
       const hurt = a.hitFlash > 0.3 && a.state !== 'dead' && a.state !== 'stagger';
       if (hurt && !this.wasHit) this.playOnce('Hit', 0.5, false);
@@ -312,7 +317,7 @@ export class CreatureView {
       // additive layers: turn / dive / rise, dodge & guard reuse them
       // Increasing yaw turns the creature to its LEFT, and right = (-cos yaw, 0, sin yaw).
       const turning = a.bank * -6;                                    // > 0 while turning left
-      const dodging = a.state === 'dodge' && !this.has('Dodge') ? 0.9 : 0;
+      const dodging = a.state === 'dodge' && !this.has('Dodge') && !this.has('Dash') ? 0.9 : 0;
       const guarding = (a.state === 'guard' || a.state === 'parry') && !this.has('Guard') ? 0.45 : 0;
       const lateral = dodging ? -a.dodgeDir.x * Math.cos(a.yaw) + a.dodgeDir.z * Math.sin(a.yaw) : 0; // + = to its right
       const targets = [

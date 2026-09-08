@@ -19,6 +19,7 @@ export const CAMBRIAN_CREATURES: readonly CreatureDef[] = [
   {
     // No kind: "radiodont" is the group, and far fewer people have met the word than the animal.
     id: 'anomalocaris', name: 'Anomalocaris', species: 'A. canadensis',
+    grasp: true,
     tagline: 'The reef’s original nightmare. Grab it. Crush it. Keep swimming.',
     role: 'Pursuit predator', ground: false, adultLength: 3.9,
     speed: 5.6, burst: 1.9, agility: 3.0, turnRate: 2.2, glide: 0.55,
@@ -82,6 +83,7 @@ export const CAMBRIAN_CREATURES: readonly CreatureDef[] = [
   },
   {
     id: 'hallucigenia', name: 'Hallucigenia', species: 'H. sparsa',
+    grasp: true,
     kind: 'Velvet worm kin', kindNote: 'A lobopodian: the soft, many-legged worms on the arthropod stem, whose only living descendants are the velvet worms and the water bears.',
     tagline: 'Fourteen spines say no. Politely, then not.',
     role: 'Fortress', ground: true, adultLength: 2.7, diet: 'scavenger',

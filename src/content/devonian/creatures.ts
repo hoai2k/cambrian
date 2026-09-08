@@ -147,6 +147,7 @@ export const DEVONIAN_CREATURES: readonly CreatureDef[] = [
   },
   {
     id: 'jaekelopterus', name: 'Jaekelopterus', species: 'J. rhenaniae',
+    grasp: true,
     kind: 'Sea scorpion', kindNote: 'A eurypterid — the aquatic arthropod group nicknamed sea scorpions, and this is the largest one known.',
     locality: 'Early Devonian · Rhineland',
     tagline: 'Claws first. Questions never.',
@@ -301,6 +302,7 @@ export const DEVONIAN_CREATURES: readonly CreatureDef[] = [
   },
   {
     id: 'walliserops', name: 'Walliserops', species: 'W. trifurcatus',
+    grasp: true,
     kind: 'Trilobite', kindNote: 'A comurid trilobite carrying a forked trident off its head — the ornament that made it famous.',
     locality: 'Devonian · Morocco',
     tagline: 'Nobody knows what the trident is for. You are going to find out.',
@@ -335,6 +337,7 @@ export const DEVONIAN_CREATURES: readonly CreatureDef[] = [
   },
   {
     id: 'furcaster', name: 'Furcaster', species: 'F. palaeozoicus',
+    grasp: true,
     kind: 'Brittle star', kindNote: 'An ophiuroid echinoderm — a starfish relative with a small disc and five whip-like arms.',
     locality: 'Early Devonian · Hunsrück',
     tagline: 'Five arms, no hurry, and a talent for not being there.',
