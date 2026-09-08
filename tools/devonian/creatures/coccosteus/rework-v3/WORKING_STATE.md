@@ -482,3 +482,24 @@
   AfterLODpasses, freezeoral/eye/motionvalidation. Recipeisnotexecutablecorrectionsource.
 - Stopfor day checkpoint. No newcorrectionsource,heavyjob,Blender,public/shared/Git performed.
   This review doesnotapprove finalcreature, runtime, packaging orintegration.
+
+## 2026-09-08 — resumed structured LOD05 source checkpoint
+
+- Parent resumed; candidate04 full/bake03/rig remain accepted and immutable. LOD05 source uses actual full GLB triangles as the sampled surface, no decimator or full rebake. Original lip/commissure first eight exterior and oral bands retain their exact dense triangles; shared mouth rim remains welded. Fin sampling includes original ray center/shoulder locations but reads actual baked pigment.
+- Pure numeric scratch checks pass manifold topology, finite pigment, normalized four-bone weights and 58,468 triangles (38.486% of full 151,920). Seven interior probes per triangle measure pigment reconstruction and surface deviation; these are diagnostics, not art approval. Build/render source and frozen handoff in progress.
+- Root reports low disk space; no Blender/heavy exports until parent confirms space and assigns execution. No original outputs deleted.
+
+## 2026-09-08 — LOD05 frozen for parent-assigned execution
+
+- Source-only LOD05 handoff ready: HANDOFF-LOD-05.md. Frozen-lod-05.json SHA 09e9869d34ac0d3a1fc4caa3e46c253270f5717f7f4ba9bcc8348081b182ca5f binds159 verified inputs. Six new source hashes and exact CPU2 build15/check5/render25 commands are in handoff. New candidate05 does not exist. No Blender or heavy export was run.
+- Completed pure planner report and mesh-plan.npz in ../devonian-authoring/coccosteus/rework-v3/lod-plan-05. 58,468 triangles,38.486% full, all meshes manifold, valid pigment/four weights. Protected4,096 mouth triangles match dense source exactly (position error0; weight max2.385e-8). Posterior span max.0358722, no span>.20.
+- Seven interior probes show posterior mean/p95 error .005593/.028762 versus old .009254/.048669. Armor mean improves slightly but p95 slightly worsens; no numeric art approval. All fin/error/surface statistics retained in plan-report and plan-validation. Static report validates AST,159inputs, paths, no decimator, imported action_slot/duration/reset usage.
+- Build preserves full GLB/metadata bytes and original rig/actions/anchors; creates only structured LOD. Checker retains previous gates and adds exact18 animation sample agreement. Eleven matched full/LOD images review body, fins, Attack/Eat and neutral surface.
+- Disk-space HOLD from root remains. Execute only when parent confirms headroom and assigns the slot. Preserve all old and partial outputs. Next actual art review determines whether structured markings and mouth edges pass; full oral/eye/motion validation remains pending.
+
+## 2026-09-08 — actual LOD05 HOLD; field isolation frozen
+
+- Actual G1/G2 PASS; full22,931,780B and LOD3,224,664B,18/18clips. Original renderer05 failed with no images on unguarded action_slot=None. Root version06 guards no-action slot and resets frame before import; all11 actual matched-evidence-06 images complete and independently inspected. Review-candidate05-actual.md: full retained, LOD broad armor wrinkles/missing seams, blurred bars and chevron fin rays remain unacceptable. Rim silhouette/Attack/Eat coherent; tiny paired commissure dots still pending.
+- Actual correspondence source diagnose_lod05_attributes_01.py and candidate05/attribute-diagnostic-01.json: POSITION exact float32, RGB max7.633e-6 quantization, UV max4.467e-8. Normal p95<=.0181deg; four split vertices at one ventral mouth-rim point differ72.404deg (separate local issue). Widespread pigment transfer corruption ruled out. Neutral removes most wrinkles, indicating aliasing of sampled grain and incomplete feature-edge correspondence.
+- Frozen six-image field isolation: HANDOFF-LOD05-FIELDS-01.md. Frozen182 inputs SHA c14a5f9634bad5921e35a7856a40e62666829d5770a4ceeb8cfb9ee0c17be973; render_lod05_fields_01.py SHA4973d97eb9ccc89ec6ce71b2f0ea04235f129370015a25c41a53b2067ccd2e7e. CPU2/24samples,10min. Full/LOD emission oblique+finclose and neutral finclose. Exact guards/action_slot/durations retained from executed root06. No GLB/blend output, rebake, count increase, Blender author run or public/Git.
+- Root can assign secondCPU2slot when ready. After6 actualimages, bounded direction is positive footprint filtering for finegrain while explicitly aligning macroplate/ray boundaries, preserving texture-freeLOD contract. Do not interpret scalar source-plan error improvement as art acceptance again. All original versions preserved.

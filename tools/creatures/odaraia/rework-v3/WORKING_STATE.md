@@ -61,3 +61,6 @@
 - Resume: parent assign Terra HASHED_HANDOFF_MATERIAL01.md. After wrapper hash check, exact command from repo root: `python3 /Users/hoai/Documents/Stuff/Generations/cambrian/local/expansion-repo/tools/creatures/odaraia/rework-v3/execute_material01.py`.
 - Budget: one run up to 25 minutes. Stop on input change/existing output/error/design decision; no automatic repair. Return all six actual images and manifests for author review.
 - Original backup, both user references and clay01/02 remain unchanged. Production material export, articulated rig/actions, full/LOD parity, anchors, portraits and completed eye/general audits remain later work.
+
+## 8 September resumed — material02 source ready
+Root re-inspected01 dark/light oblique and frontal images. Reduced shell/eye mirror response, stronger cuticular pigment variation and copper/olive limb contrast in versioned shader-only02. Geometry unchanged by design; six matched images still required. Read HANDOFF-MATERIAL02.md and frozen-material02.json. No execution or approval yet.
