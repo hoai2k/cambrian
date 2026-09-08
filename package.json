@@ -22,6 +22,8 @@
     "motion": "esbuild tools/motion-test.ts --bundle --platform=node --format=esm --outfile=node_modules/.cache/motion-test.mjs && node node_modules/.cache/motion-test.mjs",
     "hiding": "esbuild tools/hiding-test.ts --bundle --platform=node --format=esm --outfile=node_modules/.cache/hiding-test.mjs && node node_modules/.cache/hiding-test.mjs",
     "progress": "esbuild tools/progress-test.ts --bundle --platform=node --format=esm --outfile=node_modules/.cache/progress-test.mjs && node node_modules/.cache/progress-test.mjs cambrian && node node_modules/.cache/progress-test.mjs devonian",
+    "codex": "esbuild tools/codex-test.ts --bundle --platform=node --format=esm --outfile=node_modules/.cache/codex-test.mjs && node node_modules/.cache/codex-test.mjs cambrian && node node_modules/.cache/codex-test.mjs devonian",
+    "debug": "esbuild tools/debug-test.ts --bundle --platform=node --format=esm --outfile=node_modules/.cache/debug-test.mjs && node node_modules/.cache/debug-test.mjs",
     "eras": "node tools/era-test.mjs",
     "merge": "node --experimental-transform-types tools/merge-test.mjs",
     "shapes": "node tools/prop-shapes.mjs",
@@ -31,7 +33,8 @@
     "devonian:plates": "node tools/devonian/biome-plates.mjs",
     "devonian:stats": "node tools/devonian/stats.mjs",
     "devonian:check": "node tools/devonian/check.mjs --shipped && node tools/devonian/check-props.mjs --shipped && node tools/devonian/catalogue.mjs --check",
-    "devonian:check-all": "node tools/devonian/check.mjs && node tools/devonian/check-props.mjs && node tools/devonian/catalogue.mjs --check"
+    "devonian:check-all": "node tools/devonian/check.mjs && node tools/devonian/check-props.mjs && node tools/devonian/catalogue.mjs --check",
+    "menus": "esbuild tools/menu-cursor-test.ts --bundle --platform=node --format=esm --outfile=node_modules/.cache/menu-cursor.mjs && node node_modules/.cache/menu-cursor.mjs"
   },
   "dependencies": {
     "react": "^19.1.0",

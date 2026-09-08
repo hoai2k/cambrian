@@ -70,7 +70,7 @@ export function SelectScreen(p: Props) {
                 <CreaturePortrait creatureId={c.id} kind="thumb" assetBase={ASSETS} alt="" draggable={false} loading="eager" />
                 <span className="cell-name">{c.name}</span>
                 {c.kind && <span className="cell-kind">{c.kind}</span>}
-                <ModelStatusBadge status={ACTIVE_ERA.assets.modelStatus?.[c.id]} compact />
+                <ModelStatusBadge status={ACTIVE_ERA.assets.modelStatus?.[c.id]} note={ACTIVE_ERA.assets.modelNotes?.[c.id]} compact />
                 <span className="cell-rings">
                   {hovering.map(({ i, pl }) => <i key={i} style={{ ['--c' as string]: PLAYER_COLORS[i], ['--k' as string]: i }} className={pl.ready ? 'ring locked' : 'ring'} />)}
                 </span>
@@ -93,7 +93,7 @@ export function SelectScreen(p: Props) {
                   <button className="remove" aria-label={`Remove player ${i + 1}`} onClick={() => p.onRemove(i)}>×</button>
                 </div>
                 <div className="hero">
-                  <ModelStatusBadge status={ACTIVE_ERA.assets.modelStatus?.[def.id]} />
+                  <ModelStatusBadge status={ACTIVE_ERA.assets.modelStatus?.[def.id]} note={ACTIVE_ERA.assets.modelNotes?.[def.id]} />
                   <CreaturePortrait key={def.id} creatureId={def.id} kind="select" assetBase={ASSETS} alt={`${def.name} reconstruction`} draggable={false} />
                 </div>
                 <div className="creature-copy">
@@ -183,7 +183,7 @@ function BestRun({ mark, carrying, rise, scheme, onToggle }: { mark: number | un
       {rise && (
         <button className="carry-toggle" aria-pressed={carrying} onClick={onToggle} title={title}>
           {carrying ? `Continuing as ${name}${part > 0 ? ', part grown' : ''}` : `Starting as ${ladderName(0)}`}
-          <kbd>{scheme === 'pad' ? 'Y' : 'C'}</kbd>
+          <kbd>{scheme === 'pad' ? key('light', scheme) : 'C'}</kbd>
         </button>
       )}
     </div>

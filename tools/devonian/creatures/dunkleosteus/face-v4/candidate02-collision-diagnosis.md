@@ -1,0 +1,19 @@
+# Candidate02 exported contact diagnosis — genuine intersections
+
+Both actual GLBs passed eye containment and retained 18 clips, but failed oral clearance. Each reported 256 opposing-shell failure records and 130 opposing-gnathal failure records over 173 evaluated poses. These counts are records, not numbers of distinct poses. Full report SHA256: `752135e63aab6f47009b834d89f340352313ffa6f811b3fb665cd6cb32f7559f`; LOD report SHA256: `90f9db874f19185e3893aeec1f8c1179bfba931a6f1161556795f788308592e1`.
+
+Three failures are directly confirmed at neutral Attack frame 1, where the relevant bone deltas are identity:
+
+- Anterior upper gnathal enters the lower-jaw shell by about 22.33 mm. The reported right-side point is `(0.15667, -1.44480, -0.13123)` metres in the target rest frame. Direct exported triangles at x=0.16 show the tip inside the closed mandibular contour.
+- Anterior lower gnathal enters the head cheek by about 23.65 mm. A worst left-side point is `(-0.23989, -1.32500, -0.02217)`. At x=0.24, the exported lower cutting contour crosses the head's ventral boundary and lies within its closed volume.
+- Lower and upper anterior gnathals overlap by about 13.57 mm, with lower-in-upper point near `(0.20399, -1.40260, -0.02719)`. A horizontal section at z=-0.027 shows their crossing closed profiles. There are also smaller posterior lower/head clearance concerns in the direct sections, addressed in03's medial posterior path.
+
+Actual sections were generated directly from decoded full-GLB triangles and individually inspected: `candidate02/exports/diagnostic-sections/upper-jaw-x016.png`, `lower-head-x024.png`, and `gnathal-overlap-z0027.png`. The reproducible light Python/Pillow geometry-plot source is `sections_candidate02.py`; these are geometry diagnostics, not painted-over renders. The section evidence JSON binds the input GLB hash. No Blender job was run by this owner.
+
+Failures cluster at closure and recovery, consistent with the lower cusp disappearing into the head in the render. Attack has 16 failing poses out of31 (frames1–3 and19–31), Bite9/16, Heavy14/34, Eat10/37; Ability has18/55 shell failures and16/55 tooth-overlap poses. This is not small numerical disagreement: the depths substantially exceed the unchanged1.5mm opposing-shell and0.5mm tooth tolerances. No audit threshold, direction, sample count or pose was removed to obtain a pass.
+
+Candidate03 starts from the exact candidate02 Blend. The accepted head/brow/eye mesh, body, mandibular envelope, full oral lining and pharynx, rig, all actions, anchors and packed images are preserved and hash-checked. Only the six gnathal meshes change. Upper anterior blades occupy a more medial lane, keep narrow chisel points, and their deepest tip changes from z=-0.142 to-0.094 to clear the measured mandibular top. Lower anterior blades move inside the free palatal corridor; their posterior shoulder descends more sharply before continuing as a shearing blade. The posterior lower path is also moved medially where the old edge ran into the cheek.
+
+Root's additional art concern is included: the upper posterior plate is rebuilt with shorter exposed height, tapered ends, a curved continuous cutting margin, and convex root/shoulder cross sections. This targets its rectangular hanging-sheet appearance without inventing extra conical teeth. It remains a visual hypothesis until the actual candidate03 export is rendered.
+
+A light neutral preflight using un-beveled candidate03 profile vertices against actual candidate02 supporting triangles found no upper/jaw, lower/head, anterior mutual or lower/old-posterior overlaps in the tested vertical sections. That preliminary check does **not** replace the unchanged actual-export audit across173poses, and does not establish candidate03 acceptance. Candidate03 needs build/export, eye/oral audit and full/LOD image review.

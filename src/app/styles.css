@@ -279,8 +279,18 @@ h3 { font-size: 13px; letter-spacing: .12em; color: var(--ember); margin: 14px 0
 /* ---------- Overlays ---------- */
 .overlay { position: absolute; inset: 0; z-index: 20; display: grid; place-items: center; background: rgba(6,22,28,.55); backdrop-filter: blur(6px); animation: fade-in .25s both; }
 .panel { width: min(92vw, 640px); padding: 28px 30px; border-radius: 22px; background: rgba(6,22,28,.8); border: 1px solid rgba(238,250,246,.14); box-shadow: 0 30px 90px rgba(0,0,0,.5); }
-.panel.results { width: min(94vw, 820px); max-height: 92vh; overflow-y: auto; overscroll-behavior: contain; }
-.menu-buttons { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 22px; align-items: center; }
+/* A column with a scrolling middle: the heading and the choices are pinned, only the cards and the
+   record scroll. The buttons were the last thing inside one tall scroller and fell off the bottom
+   of a short window, which is the worst place to hide the only way out of the screen. */
+.panel.results { width: min(94vw, 820px); max-height: 92vh; display: flex; flex-direction: column; overflow: hidden; }
+.results-scroll { flex: 1 1 auto; min-height: 0; overflow-y: auto; overscroll-behavior: contain; padding-right: 4px; }
+.menu-buttons { flex: none; display: grid; gap: 8px; margin-top: 18px; }
+.menu-choices { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+.menu-hint { margin: 0; font-size: 12px; color: var(--dim); }
+/* The highlight, for a menu that is steered rather than button-mapped. Deliberately loud: on the
+   results screen it is the only thing saying which choice a press will take. */
+.menu-choices .selected { outline: 2px solid var(--ember); outline-offset: 3px; }
+.menu-choices button.ghost.selected { border-color: var(--ember); color: var(--foam); background: rgba(255,179,107,.16); }
 .result-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 10px; margin-top: 18px; }
 .result-card { display: grid; gap: 4px; padding: 14px; border-radius: 14px; background: rgba(238,250,246,.05); border-top: 3px solid var(--player); }
 .result-card b { font: 700 16px var(--font-display); }
@@ -288,7 +298,7 @@ h3 { font-size: 13px; letter-spacing: .12em; color: var(--ember); margin: 14px 0
 
 /* ---------- The record: biomes, landmarks and species taken to Apex ---------- */
 /* The record can be long; it scrolls inside the panel so AGAIN and Title never leave the screen. */
-.discoveries { margin-top: 20px; padding-top: 16px; border-top: 1px solid rgba(238,250,246,.12); display: grid; gap: 12px; align-content: start; max-height: 42vh; overflow-y: auto; overscroll-behavior: contain; scrollbar-width: thin; padding-right: 4px; }
+.discoveries { margin-top: 20px; padding-top: 16px; border-top: 1px solid rgba(238,250,246,.12); display: grid; gap: 12px; align-content: start; }
 .discovery-head { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
 .discovery-head .eyebrow { margin: 0; }
 .discovery-head span { color: var(--dim); font-size: 13px; }

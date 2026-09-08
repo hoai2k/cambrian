@@ -1,0 +1,16 @@
+{
+  "candidate": "Bothriolepis V3 MATERIAL02",
+  "owner": "Astra high",
+  "executor": "Terra medium",
+  "inputs": {
+    "/Users/hoai/Documents/Stuff/Generations/cambrian/local/expansion-repo/tools/devonian/creatures/bothriolepis/rework-v3/geometry_clay02.py": "cf5fa0dcecfa3cfd88d4b644785b939596cd0e98027108f057f543a53e169133",
+    "/Users/hoai/Documents/Stuff/Generations/cambrian/local/expansion-repo/tools/devonian/creatures/bothriolepis/rework-v3/material_fields01.py": "83318292f9d2dc238cf2605e5e4de6acdbad6f52097df6755960b6b88b88a36f",
+    "/Users/hoai/Documents/Stuff/Generations/cambrian/local/expansion-repo/tools/devonian/creatures/bothriolepis/rework-v3/material_fields02.py": "02fffe5964ea4e7b2896f91f7ba4b9232d45909ee14a62bc4de31dab17144288",
+    "/Users/hoai/Documents/Stuff/Generations/cambrian/local/expansion-repo/tools/devonian/creatures/bothriolepis/rework-v3/build_material02.py": "f541500e9258d0a01f0c2775c2dbcc65abf39929321b5bec55439a9c94b7d798",
+    "/Users/hoai/Documents/Stuff/Generations/cambrian/local/expansion-repo/tools/devonian/creatures/bothriolepis/rework-v3/execute_material02.py": "382b4f1749bd6ffee981784f22459b1f0eb6828f048b97edf8a01401506eb033",
+    "/Users/hoai/Documents/Stuff/Generations/cambrian/local/expansion-repo/tools/devonian/creatures/bothriolepis/rework-v3/review-material01-material02-handoff.md": "9f741bfe8e10485bec0fc3e800541678f4d53ae9389b19df7dfb0be778a7e66f",
+    "/Users/hoai/Documents/Stuff/Generations/cambrian/local/expansion-repo/tools/devonian/creatures/bothriolepis/rework-v3/material01-inputs/dermal-source-material01.png": "28cfb67e462ee26668ad68f3d21b1560aed98da1fc7fbb3d6c05d91fee84c127",
+    "/Users/hoai/Documents/Stuff/Generations/cambrian/local/devonian-authoring/bothriolepis/rework-v3/material01/bothriolepis-material01.blend": "d25049d96a664ed359597daa8fbb9d44f4c0ca14c5922c7308437abaae52ffaf",
+    "/Users/hoai/Documents/Stuff/Generations/cambrian/local/devonian-authoring/bothriolepis/rework-v3/material01/outputs-sha256.json": "35b997ea6ccdd489af32d83f2d0a492ae7c49f2a33301f47b28af68586b0cacb"
+  }
+}

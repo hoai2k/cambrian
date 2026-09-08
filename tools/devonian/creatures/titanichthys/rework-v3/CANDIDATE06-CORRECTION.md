@@ -1,0 +1,15 @@
+# Candidate06 — measured primitive-material correspondence
+
+The focused ambiguity diagnostic exited0. Its result SHA-256 is9155d587013a52539294ef88ca4a9d5c07f1c9b4038750473172d54e5d956ad6; all139 frozen inputs were independently reverified. All old candidates, partial artifacts/logs and source files remain immutable.
+
+The original lookup produces326 genuine ambiguities: body165, underside152, oral9. At the first body primitive vertex50, oral loop18592 and body loop30960 have exactly the same position/UV and the same source normal but intended RGB differs by.0202038512. Maximum cross-region spread reaches.0605253875. The body filter deliberately treats regions separately, so merging their corners or choosing by normal would erase intended palette identity.
+
+Filtering source candidates to the exported primitive's material resolves every ambiguity across all11 primitives: zero missing buckets/materials, zero matches beyond the original2e−6 bound, zero ambiguities above5e−5, zero within-match colour spread. Maximum coordinate/UV residual remains2.9802322388e−8. This is a missing part of primitive identity; no tolerance change is justified or needed.
+
+`atlas_pigment_04.py` adds the exact material name to the source/query lookup key. It requires unique source material names, a valid material for every source corner and a matching source material for each exported primitive. World transform/float32/Y-up, rounded coordinate buckets,2e−6 correspondence,5e−5 ambiguity, pigment/quantization and unchanged-non-colour-byte guards remain unchanged. The report records source material per primitive. No normal selector, averaging, clipping or fallback was introduced.
+
+Candidate06 is otherwise a retargeted05. Geometry, rig/actions, materials, maps, weights, anchors, texture dimensions, LOD ratios and final pigment sampling/filtering remain unchanged. Full/LOD retain18/18 actions and their matching contract checks; renderer retains23 views including imported LOD Attack and Eat.
+
+Source-only validation parsed4 scripts and replayed the new helper against a temporary exact copy of failed05 LOD using all actual recorded source corners/materials. All11 primitives and38,937 exported vertices transfer successfully; maximum quantization error7.6294070370e−6 stays below half a16-bit step. The helper's non-colour-byte assertion passes, and original05 GLB hash remains unchanged. The fixture uses already measured world coordinates;05 separately verified the transform pathway. Host NumPy issued floating-point status warnings during some identity transforms; independent finite and exact-equality checks passed for every mesh. These are host-library status warnings with verified finite outputs; production source does not suppress warnings.
+
+No Blender, candidate06 export/render or visual approval occurred in Astra. Actual G1/G2/G3, final runtime, completed-candidate eye/oral/general/visual review and packaging remain required. See candidate06-source-validation.json for full per-primitive evidence.

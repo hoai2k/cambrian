@@ -1,0 +1,42 @@
+{
+  "phase": "actual candidate07 bounded surface PASS; paused before final creature audits",
+  "files": [
+    {
+      "path": "/Users/hoai/Documents/Stuff/Generations/cambrian/local/devonian-authoring/coccosteus/rework-v3/candidate-07-actual-review.json",
+      "bytes": 7881,
+      "sha256": "2c1f0076591ec28421a5a7874a9a653de973e1367ec73a8e7d6ff141b2a94669"
+    },
+    {
+      "path": "/Users/hoai/Documents/Stuff/Generations/cambrian/local/expansion-repo/tools/devonian/creatures/coccosteus/rework-v3/review-candidate07-actual.md",
+      "bytes": 3465,
+      "sha256": "e2a31ca1396567ba32106800e3b92846418db729706ddd7579dee2748fcc00c7"
+    },
+    {
+      "path": "/Users/hoai/Documents/Stuff/Generations/cambrian/local/expansion-repo/tools/devonian/creatures/coccosteus/rework-v3/HANDOFF-CANDIDATE07-PAUSE.md",
+      "bytes": 2718,
+      "sha256": "9086afcdd06a4cb1ba79899c1c325cdb64a3479a824e98235d71439c1d8e57a8"
+    }
+  ],
+  "evidence": [
+    {
+      "path": "/Users/hoai/Documents/Stuff/Generations/cambrian/local/devonian-authoring/coccosteus/rework-v3/candidate-07/matched-evidence/manifest.json",
+      "bytes": 13640,
+      "sha256": "3084d54004baa4c46f160beafb6c0604809d900d23de2b75154e3eb3389020ca"
+    },
+    {
+      "path": "/Users/hoai/Documents/Stuff/Generations/cambrian/local/expansion-repo/tools/devonian/creatures/coccosteus/rework-v3/frozen-lod-07.json",
+      "bytes": 54780,
+      "sha256": "58a67b430259bd10a73e0079101318b6e83d81b8b827818b4744fbecc8247b56"
+    },
+    {
+      "path": "/Users/hoai/Documents/Stuff/Generations/cambrian/local/devonian-authoring/coccosteus/rework-v3/candidate-07/coccosteus.glb",
+      "bytes": 22931780,
+      "sha256": "b7b929b9978f51f89e0cb1e687dec10d95b90edd3e2b2ba27b12432f58474655"
+    },
+    {
+      "path": "/Users/hoai/Documents/Stuff/Generations/cambrian/local/devonian-authoring/coccosteus/rework-v3/candidate-07/coccosteus.lod1.glb",
+      "bytes": 3236312,
+      "sha256": "eec740e92fcf2187c54eacb2418fc7335cd584fe57b2792e64e8e4f1bbd31756"
+    }
+  ]
+}

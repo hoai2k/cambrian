@@ -1,5 +1,10 @@
 # Devonian refining pass queue
 
+## Eye-audit scope — user clarification
+
+The quantitative 50% eye-globe embedding/containment audit applies only to fish-like creatures. Do not apply it to arthropods, cephalopods or other creatures with naturally exposed or stalked eyes; in particular, do not force Odaraia or nautiloid eyes into their bodies to meet this threshold. Their eyes should follow the creature-specific anatomy and references. Ordinary visual checks for unintended gaps, attachment errors and animation defects still apply. This clarification supersedes broader eye-audit wording in older plans and handoffs. Work remains paused.
+
+
 Complete the carefully authored initial creature and non-creature library first. Commit and push
 those previews to main promptly. Then address this queue individually; preserve sources and rerender
 portraits whenever appearance changes. Preview status remains visible until each review is complete.
@@ -14,9 +19,9 @@ files. Basic build/export checks during authoring are not a substitute for the p
 
 ## Full reworks requested by the user
 
-Titanichthys, Doryaspis, Gemuendina, Coccosteus, Bothriolepis and Stethacanthus require total model reworks, not cosmetic edits to the current geometry. Reconsider reference-based proportions and continuous volumes, sculpt new Blender geometry where needed, rebuild materials and rig deformation, then author dynamic actions and matching portraits. Preserve existing versions locally. Each remains a playable preview until its individual rework review passes. Gemuendina V3 has now passed; the other five remain pending.
+Titanichthys, Doryaspis, Gemuendina, Coccosteus, Bothriolepis and Stethacanthus require total model reworks, not cosmetic edits to the current geometry. Reconsider reference-based proportions and continuous volumes, sculpt new Blender geometry where needed, rebuild materials and rig deformation, then author dynamic actions and matching portraits. Preserve existing versions locally. Each remains a playable preview until its individual rework review passes. Gemuendina V3 has passed its structural review. Titanichthys V3 candidate08 has also passed its focused structural/art review and is published on mainbc5a2d0; broader polish remains pending. The other four total reworks remain pending.
 
-The machine-readable pending queue is `tools/devonian/pending-refinements.json`. Catalogue validation requires every pending creature to remain `preview`; remove a pending entry only after its actual work and review are complete.
+The machine-readable pending queue is `src/content/devonian/pending-refinements.json`. Catalogue validation requires every pending creature to remain `preview`; remove a pending entry only after its actual work and review are complete.
 
 ## New reference-led redesign briefs — 8 September 2026
 
@@ -179,8 +184,7 @@ feeding reconstruction. Do not turn it into a toothed Dunkleosteus. Complete bod
 colour remain interpretations. Model the oral interior and jaw mechanism anew as needed, and
 repeat eyes, sockets, animation and full/LOD visual checks.
 
-Titanichthys is reopened as preview. Historical V2 review evidence describes the unchanged old
-files and no longer signifies final visual approval. The L01 lighting concept currently depicts
+Titanichthys V3 candidate08 is published on mainbc5a2d0 as a refined **preview**: deep armored form, long fins, continuous articulated oral interior, inset eyes,18 actions in both full/LOD and five anchors. Final combined render review passed; actual full/LOD eye containment lower bounds exceed60%, and58 oral poses pass. Full package21,955,988 bytes, LOD2,365,892 bytes. See `tools/devonian/creatures/titanichthys/rework-v3/RELEASE-CANDIDATE08-EXECUTION.md` and `RELEASE08-ART-VERDICT.md`. LOD surface/eye-rim polish and broader controller review remain pending. Historical V2 approval does not cover the replacement. The L01 lighting concept currently depicts
 that old preview silhouette and must be refreshed after the full rework. User art stays local.
 
 ## Doryaspis — user reference, 7 September 2026
@@ -288,6 +292,19 @@ and production Blend: `../devonian-authoring/backups/gemuendina-final-pre-face-r
 After new sculpt: mouth/skull/jaw/anchor alignment, closed and open oral continuity, supported
 bulging eyes with at least 50% globe volume inside, full/LOD action poses and fresh portraits.
 
+Historical focused face preview main0b639d0 (8 September), subsequently rejected by user: two supported
+anterior globes, preserved posterior,18/18actions and refreshed portraits. Ten actual exported
+pose audits exceed50%; minimum conservative interior77.04%. All11 full/LOD face views
+inspected and built viewer verified. Remaining broad final art/LOD cleanup and controller
+playtest keep the caution badge. See face-v4/WORKING_STATE.md and release-review-02.json.
+
+Latest clarification supersedes that mouth interpretation: the FRONT FLAP itself is the
+mouth, upper and lower terminal lips define the leading snout; no preoral apron or dorsal
+opening. Eyes closer together above it, near nostril positions. Root study03/04 failed
+ventral-fold review. Dedicated Astra terminal-snout author now preparing study05+; previous
+interior audits apply only to their preserved meshes. New face must pass side-profile review
+before production export.
+
 ### Dunkleosteus
 
 New reference `/Users/hoai/Downloads/Dunkleosteus-1.jpg` copied with hash/provenance to
@@ -303,3 +320,23 @@ Reopened to **preview**. Backup includes public family, full authoring source an
 `../devonian-authoring/backups/dunkleosteus-final-pre-face-refinement-2026-09-08/`. Recheck eye
 containment after brow/head edits, mouth contacts across jaw poses, actual anchors and full/LOD
 parity; regenerate portraits before publishing the revised face.
+
+
+8 September focused Dunkleosteus face preview: V4 candidate03 with pigment04
+LOD binding correction preserves the jaw rig, mouth lining and all18full/LODclips.
+Actual173feeding-pose checks show zero opposing-shell/gnathal failures, eyes pass.
+Full face/portraits and correctedLODposes individually reviewed; selectedintake,
+build/typecheck and viewerIdle/Heavy pass. Remaining broadpreview: LOD is paler
+and smoother; investigate albedo-to-vertex colourspace and materialpolish.
+
+
+Closing Gemuendina correction: candidate05 replaces the rejected candidate02 face.
+The front upper/lower lips form the terminal snout and the smaller eyes are close
+together above it; body and pigmentation remain. All12 actual export poses plus
+4portraits pass focused review,18full/LODactions retained;10pose eye/oral checks
+pass and builtviewer Idle/Heavy verified. This focused correction is delivered as
+a preview; small LOD crease/pigment and broader controller/art polish remain.
+
+## Closing checkpoint — 8 September 2026
+
+Titanichthys V3 is on mainbc5a2d0 and Dunkleosteus linear-color LOD05 on mainff9a853, both retained as previews. Coccosteus candidate07 passes its full/reduced surface review but awaits final oral/eye/motion/runtime/package checks before replacement. Bothriolepis M04 remains held for nuchal/rostral shading and coarse relief after the mouth improvement. Odaraia material02 direction is accepted and production-plan03 is saved; rig/baking/game transparency/actions/export remain. No general audit of an obsolete model should precede its complete rework. Resume details and exact evidence are in `docs/devonian/current-state.md`. Work paused at the user's request.

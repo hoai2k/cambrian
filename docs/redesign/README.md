@@ -42,6 +42,18 @@ and **M8 (polish) is complete except for two music files**:
 | Feeding: who hunts, who grazes, who lives on the dead | Shipped: [01 · Feeding](01-game-design.md#feeding). |
 | Carrying a Rise run on, and the record it leaves | Shipped: [01 · Carrying Rise on](01-game-design.md#carrying-rise-on) and [The growth ladder](01-game-design.md#the-growth-ladder). One implementation for both eras; `npm run progress` runs the same assertions against each. |
 
+### Debug entry points
+
+`?debug=local` on either era's page — `/?debug=local`, `/devonian/?debug=local` — opens an editor
+for everything that era keeps in this browser: the biomes, landmarks and species in the codex, the
+per-creature Rise record, and the settings. Controls match how each value is actually stored, a
+number that stands for an option says what the number means, and every record has a raw-JSON
+escape hatch for anything the page does not model. The game is never started behind it.
+
+Nothing links to it and nothing advertises it; it exists so a save can be put into whatever state
+a bug needs without hand-editing JSON in devtools. `src/shared/debug.ts` is the whole gate and
+`npm run debug` guards it: only that parameter opens it, and every ordinary URL is the game.
+
 Designed but **not built** (nothing depends on them; listed so they are not
 mistaken for shipped):
 

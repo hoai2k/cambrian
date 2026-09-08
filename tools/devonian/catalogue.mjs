@@ -8,7 +8,7 @@ assert.equal(new Set(shipped.props).size, shipped.props.length);
 for (const id of shipped.creatures) assert(roster.includes(id), `Unknown released creature ${id}`);
 const status = JSON.parse(fs.readFileSync('src/content/devonian/model-status.json'));
 for (const id of roster) assert(['preview', 'final'].includes(status[id]), `${id}: missing model production status`);
-const pending = JSON.parse(fs.readFileSync('tools/devonian/pending-refinements.json'));
+const pending = JSON.parse(fs.readFileSync('src/content/devonian/pending-refinements.json'));
 assert.equal(new Set(pending.map(p => p.id)).size, pending.length, 'Duplicate pending refinement');
 for (const item of pending) {
   assert(roster.includes(item.id), `Unknown pending refinement ${item.id}`);

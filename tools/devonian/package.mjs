@@ -12,7 +12,8 @@ import assert from 'node:assert/strict';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
 const props = process.argv.includes('--props');
-const ASSETS = path.join(ROOT, 'public/assets/devonian', props ? 'props' : 'creatures');
+// Candidate packaging can be reviewed without replacing the public asset family.
+const ASSETS = process.env.DEVONIAN_ASSETS ? path.resolve(process.env.DEVONIAN_ASSETS) : path.join(ROOT, 'public/assets/devonian', props ? 'props' : 'creatures');
 const CAMBRIAN_ASSETS = path.join(ROOT, 'public/assets/creatures');
 const LOCAL = process.env.DEVONIAN_PACKAGING || path.resolve(ROOT, '../devonian-authoring/packaging');
 const STATS = path.join(LOCAL, props ? 'packaging-props.json' : 'packaging.json');
@@ -151,10 +152,19 @@ function counts(doc) {
     textures: root.listTextures().length,
   };
 }
-function stripLod(doc) {
+function lodClips(doc) {
+  const feeding = doc.getRoot().getDefaultScene()?.getExtras().cambrianFeeding;
+  // Match the runtime's asset-level opt-in. Historical LOD policy is unchanged
+  // for older assets, including older revisions of the same creature.
+  const optedIn = feeding?.version === 1 && feeding.mode === 'authored-grasp' && feeding.clip === 'Eat' &&
+    Number.isFinite(feeding.apertureDiameter) && feeding.apertureDiameter > 0 &&
+    Number.isFinite(feeding.pickupOffsetLimit) && feeding.pickupOffsetLimit > 0;
+  return optedIn ? new Set([...KEEP_LOD, 'Attack', 'Bite', 'Heavy', 'Eat']) : KEEP_LOD;
+}
+function stripLod(doc, keep) {
   const root = doc.getRoot();
   for (const a of root.listAnimations()) {
-    if (KEEP_LOD.has(a.getName())) continue;
+    if (keep.has(a.getName())) continue;
     for (const channel of a.listChannels()) channel.dispose();
     for (const sampler of a.listSamplers()) sampler.dispose();
     a.dispose();
@@ -181,7 +191,8 @@ for (const id of ids) {
     catch (e) { if (e.code !== 'EEXIST') throw e; }
     const doc = await io.readBinary(new Uint8Array(beforeBytes));
     const before = counts(doc);
-    if (suffix) stripLod(doc);
+    const keepLod = lodClips(doc);
+    if (suffix) stripLod(doc, keepLod);
     const expected = snapshot(doc);
     // Constrain dedup/prune to resources; never merge meshes or skins, remove
     // nodes, discard attributes, resample animation, simplify or quantize.
@@ -206,7 +217,7 @@ for (const id of ids) {
     assert.equal(after.triangles, before.triangles);
     if (suffix) {
       assert.equal(after.textures, 0);
-      assert(after.clips.every((a) => KEEP_LOD.has(a.name)));
+      assert(after.clips.every((a) => keepLod.has(a.name)));
     } else assert.deepEqual(after.clips, before.clips);
     const temp = path.join(LOCAL, `${name}.pending`);
     await writeFile(temp, bytes);
