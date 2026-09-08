@@ -200,18 +200,34 @@ expresses them differently so fights are varied.
 > | Left stick | axes 0–1 | Camera-relative swim |
 > | Right stick | axes 2–3 | Orbit the camera |
 > | RS click + stick up/down | 11 | Zoom |
-> | LS click | 10 | Sink |
+> | LS click | 10 | **Sink**, alongside LB |
 > | **A** | 0 | **Sprint / burst** (analog-free, held) |
 > | **B** | 1 | **Guard** (hold) / **parry** (tap) |
-> | **X** | 2 | **Light bite** |
-> | **Y** | 3 | **Ability** · on the select screen: hatch, or carry a Rise run on · on the results screen: keep playing |
-> | **LB** | 4 | **Dodge / dash** |
+> | **X** | 2 | **Dodge / dash** |
+> | **Y** | 3 | **Light bite** · on the select screen: hatch, or carry a Rise run on · on the results screen: keep playing |
+> | **LB** | 4 | **Sink** |
 > | **RB** | 5 | **Rise** / **hop**, held to paddle upward (crawlers) |
 > | **LT** (analog) | 6 | **Aim** — the centred crosshair picks the target |
 > | **RT** (analog) | 7 | **Heavy / pounce** |
 > | D-pad ↑ | 12 | Sense pulse |
 > | D-pad ↓ | 13 | Teleport menu (added with the endless sea) |
+> | D-pad → | 15 | **Hide / camouflage** |
 > | D-pad ←/→ | 14/15 | Menu navigation and creature select |
+>
+> The pad layout is arranged around two pairs. **LB and RB are the vertical
+> axis** — sink and rise — and **A and X are the horizontal one**, sprint and
+> dash, adjacent under the thumb. Hiding went to D-pad right, next to the other
+> two D-pad tools, and the left stick click keeps sinking so the old reflex
+> still works.
+>
+> Sharing a button between gameplay and a menu is fine and always has been — A
+> is sprint and confirm, B is guard and back — because they are different
+> screens. Two *menu* actions on one button is the bug. Hiding on D-pad right
+> made `ability` collide with the select screen's creature cursor, so the
+> carry-on toggle moved off `ability` and onto `light`: it stays on Y, exactly
+> where players already press it. `tools/menu-bindings-test.ts` holds that line
+> — it walks every button through `readGamepad` and fails if two menu actions
+> land on one of them.
 > | Menu | 9 | Pause |
 > | View | 8 | Scoreboard (hold) |
 >
@@ -226,7 +242,7 @@ expresses them differently so fights are varied.
 > dive, `Engine.startMatch` checks: no pad in the session means pointer lock, the
 > mouse steers the camera, the wheel zooms, and the three buttons take the three
 > controls that have to fire the instant they are wanted — **left click** is the
-> heavy (RT), **right click** dashes (LB), **middle click** aims (LT). G, V and
+> heavy (RT), **right click** dashes (X), **middle click** aims (LT). G, V and
 > Tab keep working alongside them. One pad anywhere in the session and the pads
 > own the match; the mouse stays a cursor.
 >

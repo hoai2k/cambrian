@@ -1,5 +1,10 @@
 # Devonian refining pass queue
 
+## Eye-audit scope — user clarification
+
+The quantitative 50% eye-globe embedding/containment audit applies only to fish-like creatures. Do not apply it to arthropods, cephalopods or other creatures with naturally exposed or stalked eyes; in particular, do not force Odaraia or nautiloid eyes into their bodies to meet this threshold. Their eyes should follow the creature-specific anatomy and references. Ordinary visual checks for unintended gaps, attachment errors and animation defects still apply. This clarification supersedes broader eye-audit wording in older plans and handoffs. Work remains paused.
+
+
 Complete the carefully authored initial creature and non-creature library first. Commit and push
 those previews to main promptly. Then address this queue individually; preserve sources and rerender
 portraits whenever appearance changes. Preview status remains visible until each review is complete.
@@ -331,3 +336,7 @@ together above it; body and pigmentation remain. All12 actual export poses plus
 4portraits pass focused review,18full/LODactions retained;10pose eye/oral checks
 pass and builtviewer Idle/Heavy verified. This focused correction is delivered as
 a preview; small LOD crease/pigment and broader controller/art polish remain.
+
+## Closing checkpoint — 8 September 2026
+
+Titanichthys V3 is on mainbc5a2d0 and Dunkleosteus linear-color LOD05 on mainff9a853, both retained as previews. Coccosteus candidate07 passes its full/reduced surface review but awaits final oral/eye/motion/runtime/package checks before replacement. Bothriolepis M04 remains held for nuchal/rostral shading and coarse relief after the mouth improvement. Odaraia material02 direction is accepted and production-plan03 is saved; rig/baking/game transparency/actions/export remain. No general audit of an obsolete model should precede its complete rework. Resume details and exact evidence are in `docs/devonian/current-state.md`. Work paused at the user's request.

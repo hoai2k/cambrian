@@ -52,10 +52,18 @@ export function readGamepad(gp: Gamepad): RawControls {
   const v = (i: number) => gp.buttons[i]?.value ?? 0;
   const c: RawControls = {
     mx, my: -my, lookX: lx, lookY: ly, lookDX: 0, lookDY: 0, zoomDelta: 0,
-    // A sprint · RB rise · LS click sink · X bite · RT pounce · Y hide · LB dash · B guard · LT aim
-    burst: b(0) ? 1 : 0, rise: b(5), sink: b(10),
-    light: b(2), heavy: v(7) > 0.5, ability: b(3), dodge: b(4), guard: b(1), lock: v(6) > 0.4, sense: b(12),
-    dash: b(4), aim: v(6) > 0.4, rsClick: b(11), teleport: b(13),
+    // A sprint · X dash · LB sink · RB rise · Y bite · RT pounce · B guard · LT aim · D-pad ▶ hide
+    //
+    // The two things that move you up and down are the two shoulders; the two things that move you
+    // along are the two buttons under your thumb. Sharing a button with a menu is fine and always
+    // has been — A is sprint and confirm, B is guard and back — because they are different screens.
+    // What is not fine is two *menu* actions on one button, which is why the select screen's
+    // carry-on toggle moved off `ability` and onto `light`: it stays on Y, where it has always
+    // been, while D-pad right is free for hiding. `tools/menu-bindings-test.ts` holds that line.
+    // The left stick click keeps sinking as well, so the old reflex still works.
+    burst: b(0) ? 1 : 0, rise: b(5), sink: b(4) || b(10),
+    light: b(3), heavy: v(7) > 0.5, ability: b(15), dodge: b(2), guard: b(1), lock: v(6) > 0.4, sense: b(12),
+    dash: b(2), aim: v(6) > 0.4, rsClick: b(11), teleport: b(13),
     menu: b(9), view: b(8), confirm: b(0), back: b(1), lb: b(4), rb: b(5),
     dleft: b(14), dright: b(15), dup: b(12), ddown: b(13),
     any: false, anyButton: false,

@@ -363,8 +363,9 @@ export function App() {
             if (just('confirm')) { if (ps[idx].ready) startMatch(); else toggleReady(idx); }
             if (just('back')) { if (ps[idx].ready) toggleReady(idx); else removePlayer(idx); }
             if (just('menu')) startMatch();
-            // Y: hatch, or carry on from your record. Free on this screen in both eras.
-            if (just('ability')) toggleCarry(idx);
+            // Y: hatch, or carry on from your record. Bound to `light` rather than to `ability`,
+            // which is D-pad right in play and so would fire on every rightward cursor move here.
+            if (just('light')) toggleCarry(idx);
             // LB and RB cycle the mode. Bind to the raw shoulder buttons, never to a gameplay
             // control: this used to read `burst`, which is button 0 — the same button as confirm —
             // so every A press locked the player in and then changed mode, and changeMode
@@ -375,10 +376,10 @@ export function App() {
         } else if (s === 'playing' && pausedRef.current) {
           if (just('confirm')) setPausedBoth(false);
           if (just('heavy')) backToSelect();
-          if (just('ability')) backToTitle();
+          if (just('light')) backToTitle();
         } else if (s === 'results') {
           if (just('confirm')) playAgain();
-          if (just('ability')) keepPlaying();
+          if (just('light')) keepPlaying();
           if (just('heavy')) backToSelect();
           if (just('back')) backToTitle();
         }
