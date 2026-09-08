@@ -58,7 +58,7 @@ function PlayerPanel({ p }: { p: PlayerHud }) {
             : <span className="tier-num" role="img" aria-label={`Tier ${p.tier + 1}: ${p.tierName}`}><i className="tier-glyph" style={{ maskImage: `url(${appBase()}${assetPaths.ui(`tier-${p.tier + 1}.svg`)})` }} /></span>}
         </div>
         <div className="bars">
-          <div className="name-row"><b>{def.name}</b><span className="tier-name">{p.tierName}</span>{p.protect && <span className="protect">PROTECTED</span>}{p.era?.inRange && <span className="range-chip">RANGE</span>}</div>
+          <div className="name-row"><b>{def.name}</b><span className="tier-name">{p.tierName}</span>{p.protect && <span className="protect">PROTECTED</span>}</div>
           <div className="bar hp"><i style={{ width: `${(p.hp / p.hpMax) * 100}%` }} /></div>
           <div className={`bar stamina ${p.exhausted ? 'exhausted' : ''}`}><i style={{ width: `${(p.stamina / p.staminaMax) * 100}%` }} /></div>
           {p.era?.air != null && <div className={`bar air ${p.era.air < 0.25 ? 'low' : ''}`} aria-label={`Air ${Math.round(p.era.air * 100)}%`}><i style={{ width: `${p.era.air * 100}%` }} /></div>}
@@ -313,9 +313,8 @@ function EraStatus({ era, alive }: { era: EraHud; alive: boolean }) {
   const warn = era.inDeadZone ? (era.air != null ? 'DEAD WATER · your gills are fine, theirs are not' : 'DEAD WATER · no oxygen, get out') : era.beached ? 'ON THE SAND · nothing with gills can follow' : era.air != null && era.air < 0.25 ? 'AIR LOW · surface and gulp' : '';
   return (
     <div className="era-status">
-      {era.dominantT > 0 && <div className="dominant"><span>DOMINANT</span><b>{Math.max(0, Math.ceil(90 - era.dominantT))}</b></div>}
+      {era.primeT > 0 && <div className="dominant"><span>PRIME</span><b>{Math.max(0, Math.ceil(90 - era.primeT))}</b></div>}
       {warn && <div className={`era-warn ${era.inDeadZone && era.air == null ? 'danger' : ''}`}>{warn}</div>}
-      {era.recent.length > 0 && <div className="standing-ticker">{era.recent.slice(-3).map((r, k) => <span key={`${r}-${k}`}>{r}</span>)}</div>}
     </div>
   );
 }

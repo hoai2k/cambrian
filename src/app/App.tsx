@@ -146,16 +146,6 @@ export function App() {
   const startMatch = useCallback(() => {
     const ps = playersRef.current;
     if (!ps.length || !ps.every((p) => p.ready) || !engineRef.current) return;
-    if (modeRef.current === 'foodchain') {
-      // Food Chain wants the chain spread out: the hunter must have prey and the prey a hunter.
-      // Where fewer rungs are pickable than there are players (an era whose models are still
-      // arriving), every rung has to be used before anyone doubles up.
-      const rungs = ps.map((p) => creature(p.creature).rung ?? 0);
-      const available = new Set(CREATURES.map((c) => c.rung ?? 0)).size;
-      const perRung = Math.ceil(ps.length / Math.max(1, available));
-      const crowded = [...new Set(rungs)].some((r) => rungs.filter((x) => x === r).length > perRung);
-      if (crowded) { setNotice(`Food Chain: spread out across the chain — at most ${perRung} of you per rung.`); audio.play('ui-back'); return; }
-    }
     engineRef.current.startMatch(modeRef.current, ps);
     setPausedBoth(false);
     go('playing');

@@ -7,6 +7,7 @@ import * as SkeletonUtils from 'three/examples/jsm/utils/SkeletonUtils.js';
 import { clamp, damp, wrapAngle } from '../shared/math';
 import { makeRecolor, type Recolor } from './recolor';
 import { settleTranslucency } from './translucency';
+import { mergeSkinnedParts } from './merge-skins';
 import { Carcass } from './carcass';
 import { schemeForCreature } from '../shared/palettes';
 import { creature, type CreatureId } from '../sim/creatures';
@@ -14,7 +15,7 @@ import { lengthOf } from '../sim/actors';
 import type { Actor } from '../sim/types';
 import { appBase } from '../shared/base';
 
-interface Loaded { gltf: GLTF; unit: number; center: THREE.Vector3; size: THREE.Vector3; }
+interface Loaded { gltf: GLTF; unit: number; center: THREE.Vector3; size: THREE.Vector3; /** Triangles in one instance of this body, for the renderer's detail budget. */ tris: number; }
 export type Lod = 0 | 1;
 const cache = new Map<string, Promise<Loaded>>();
 const loader = new GLTFLoader().setMeshoptDecoder(MeshoptDecoder);
@@ -27,12 +28,21 @@ export function loadCreature(id: CreatureId, onProgress?: (loaded: number, total
   let p = cache.get(key);
   if (!p) {
     p = new Promise<GLTF>((res, rej) => loader.load(creatureUrl(id, lod), res, (e) => onProgress?.(e.loaded, e.total), rej)).then((gltf) => {
+      // Part-by-part rigs cost one draw call per part; merge what shares a material before the
+      // first instance is cloned from this scene.
+      mergeSkinnedParts(gltf.scene, gltf.animations);
       const box = new THREE.Box3().setFromObject(gltf.scene);
       const size = box.getSize(new THREE.Vector3());
       const center = box.getCenter(new THREE.Vector3());
       const unit = 1 / Math.max(size.z, size.x, 0.01);
-      gltf.scene.traverse((o) => { if (o instanceof THREE.Mesh) { o.frustumCulled = false; } });
-      return { gltf, unit, center, size };
+      let tris = 0;
+      gltf.scene.traverse((o) => {
+        if (!(o instanceof THREE.Mesh)) return;
+        o.frustumCulled = false;
+        const g = o.geometry;
+        tris += (g.index ? g.index.count : g.getAttribute('position')?.count ?? 0) / 3;
+      });
+      return { gltf, unit, center, size, tris: Math.round(tris) };
     }).catch((e) => { cache.delete(key); throw new Error(`Could not load ${creature(id).name}: ${e?.message ?? e}`); });
     cache.set(key, p);
   }

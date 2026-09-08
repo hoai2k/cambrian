@@ -120,7 +120,6 @@ river-mouth reeds were thick enough to halve a giant's speed at spawn and were t
 - Stand-in bodies are recoloured but keep the stand-in's size ratios; a Manticoceras that jets
   backward as a Doryaspis looks wrong enough that the shell mechanics are best judged after the
   cephalopod models land.
-- Food Chain has not been played with four humans; the distinct-rung rule is enforced at start.
 
 ## 7. Tests and tooling
 
