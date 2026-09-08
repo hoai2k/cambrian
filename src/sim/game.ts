@@ -786,7 +786,6 @@ export class Game implements AiWorld {
     a.hitFlash = Math.max(0, a.hitFlash - dt);
     a.hitStop = Math.max(0, a.hitStop - dt);
     a.abilityCd = Math.max(0, a.abilityCd - dt);
-    a.senseCd = Math.max(0, a.senseCd - dt);
     a.senseT = Math.max(0, a.senseT - dt);
     if (def.ability === 'whipSearch' && a.senseT > 0) stepExpansionAbility(this.expansionContext(), a, def, dt);
     a.burstT = Math.max(0, a.burstT - dt);
@@ -1079,8 +1078,15 @@ export class Game implements AiWorld {
         const nt = this.pickLockTarget(a, input.lookX > 0 ? 1 : -1, a.lockTarget);
         if (nt) { a.lockTarget = nt.id; a.comboT = 0.4; }
       }
-      // Sense
-      if (justSense && a.senseCd === 0) { a.senseT = def.ability === 'whipSearch' ? 3.6 : 2.2; a.senseCd = def.ability === 'burrow' ? 3 : 6; this.flag(a, 'sense'); this.events.push({ kind: 'sense', pos: { ...a.pos }, actor: a.id, player: a.player }); }
+      // Sense: a display mode, held on or off. On, the band glyphs and the radar are drawn; off,
+      // nothing is drawn over the sea but the HUD. It costs nothing and never runs out — turning
+      // it off is for the look of the thing, not a trade.
+      if (justSense) {
+        a.senseMode = !a.senseMode;
+        // The ping is the toggle's own sound, both ways: it is how you know the button took.
+        this.flag(a, 'sense');
+        this.events.push({ kind: 'sense', pos: { ...a.pos }, actor: a.id, player: a.player });
+      }
       // Heavy (RT): the emergence strike, the creature's special, or the pounce — all of it in one
       // place, so a charge out of a sprint (below) or out of a dash reaches exactly the same move.
       // Sprinting makes it a charge: it aims along the line of travel and costs extra stamina.

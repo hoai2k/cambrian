@@ -31,7 +31,7 @@ export function XboxDiagram() {
       {label(194, 114, 'hold it · dash on move', 'end')}
       {line(320, 180, 200, 170)}{label(194, 174, 'Left stick · Swim', 'end')}
       {label(194, 194, 'click · Sink', 'end')}
-      {line(378, 236, 200, 250)}{label(194, 254, 'D-pad ▲ · Sense pulse', 'end')}
+      {line(378, 236, 200, 250)}{label(194, 254, 'D-pad ▲ · Sense on/off', 'end')}
       {label(194, 274, 'D-pad ▼ · Teleport menu', 'end')}
       {label(194, 294, 'D-pad ◀▶ · Pick creature', 'end')}
       {line(520, 62, 660, 40)}{label(666, 44, 'RT · Heavy attack / lunge')}

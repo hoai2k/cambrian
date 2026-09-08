@@ -188,7 +188,7 @@ expresses them differently so fights are varied.
 | **Guard** | LB (hold) | Halves damage, prevents knockback, drains stamina on each hit. A guard-broken creature is **staggered** for 1.2 s. |
 | **Parry** | LB (tap, timing) | Guard in the first 0.15 s of an incoming hit: no damage, attacker is staggered 0.8 s and you get a free heavy. Swimmers parry with a body twist, armoured crawlers with a shell clank. |
 | **Lock-on** | LT (toggle) | Camera frames you and the target, movement becomes **orbit/strafe** relative to the target, attacks home. Left stick left/right circles. Flick right stick to switch target. |
-| **Sense pulse** | D-pad ↑ | 2 s highlight of everything within sense range through cover, colour-coded by size band. Cooldown 6 s. |
+| **Sense** | D-pad ↑ | Toggles the read-out: the size-band marks over creatures and the radar. On by default, free, and it never runs out — off is the immersive view, with nothing drawn over the sea but the HUD bar. |
 | **Eat** | automatic | Biting a dead body or a Snack consumes it. **Anything can feed on anything**, however much bigger it was: the carcass comes apart in whole bites, `ceil(3 × its length / yours)` of them (1–12), a bite every 0.62 s. A body under a third of your length goes down whole and is carried into your mouth; bigger, it stays where it fell, and each bite tears its share of the meat off the model and flies it into your mouth. Eating can be interrupted, so opening a giant carcass in the open is a long risk. |
 
 > **The shipped bindings are different.** The layout above is the design's first
@@ -209,7 +209,7 @@ expresses them differently so fights are varied.
 > | **RB** | 5 | **Rise** / **hop**, held to paddle upward (crawlers) |
 > | **LT** (analog) | 6 | **Aim** — the centred crosshair picks the target |
 > | **RT** (analog) | 7 | **Heavy / pounce** |
-> | D-pad ↑ | 12 | Sense pulse |
+> | D-pad ↑ | 12 | Sense on/off |
 > | D-pad ↓ | 13 | Teleport menu (added with the endless sea) |
 > | D-pad ←/→ | 14/15 | Menu navigation and creature select |
 > | Menu | 9 | Pause |

@@ -28,9 +28,10 @@ export interface PlayerHud {
   hp: number; hpMax: number; stamina: number; staminaMax: number; exhausted: boolean;
   tier: number; tierName: string; progress: number; scale: number;
   abilityName: string; abilityReady: number; abilityActive: boolean; abilityUnlocked: boolean;
-  senseReady: number;
   lock?: { name: string; kind?: string; band: Band; hp: number; color: string };
   aim?: { hasTarget: boolean; inRange: boolean; name?: string; color: string; ready: boolean; /** What RT does for this creature: POUNCE, or the special's own name. */ action: string };
+  /** Sense is on: the band glyphs and the radar are drawn. */
+  senseOn: boolean;
   hunted: number; hunterAngle: number | null; hunterName?: string; hunterState: 'none' | 'noticed' | 'hunting'; inCover: boolean; still: boolean;
   hint?: string; respawnIn: number; fade: number; state: string; modelReady: boolean; kills: number; eats: number; escapes: number; protect: boolean;
   /**
@@ -1031,8 +1032,9 @@ export class Engine {
       }
       const era = RULES?.hud(game, i);
       const scheme = schemeForDevice(this.setups[i]?.device ?? 'keyboard', this.mouseLook);
+      // Sense off: nothing is drawn over the sea, so there is nothing to work out either.
       const markers: PlayerHud['bandMarkers'] = [];
-      if (cs) {
+      if (cs && p.senseMode) {
         const L = lengthOf(p);
         for (const a of game.actors) {
           if (a.id === p.id || !isAlive(a) || isHidden(a) || a.controller === 'swarm') continue;
@@ -1049,7 +1051,7 @@ export class Engine {
       // Radar: reach grows with the creature, contacts rotate into the camera frame (up = camera forward).
       const radarRange = radarReach(p);
       const blips: RadarBlipHud[] = [];
-      if (cs) {
+      if (cs && p.senseMode) {
         const sy = Math.sin(cs.yaw), cy = Math.cos(cs.yaw);
         // Above or below counts once the gap is more than a body or two; inside that the contact is
         // level with you for all practical purposes and the mark should not keep changing colour.
@@ -1115,7 +1117,7 @@ export class Engine {
         tier: p.tier, tierName: era ? `${era.stage} · ${era.rungName}` : TIER_NAMES[p.tier], // The ring means the same thing in both eras: how close the next moult is, full when it lands.
         progress: era ? era.stageProgress : p.tier >= 4 ? 1 : clamp(p.nutrition / TIER_NEED[p.tier], 0, 1), scale: p.scale,
         abilityName: p.hideMode === 'descending' ? 'Sinking to burrow' : p.hideMode === 'burrowed' ? `Buried · ${controlKey('ability', scheme)} emerge` : p.hideMode === 'camouflage' ? `Camo: ${p.camoLabel}` : RULES?.ySpecial(p.creature)?.name ?? hideLabel(p.creature), abilityReady: p.hideMode === 'camouflage' ? p.stamina / p.staminaMax : RULES?.ySpecial(p.creature) ? 1 - clamp(p.abilityCd / Math.max(1, creature(p.creature).abilityCooldown), 0, 1) : 1 - clamp(p.hideCd / 2, 0, 1), abilityActive: p.hideMode !== 'none' || (p.state === 'ability' && !!RULES?.ySpecial(p.creature)), abilityUnlocked: true,
-        senseReady: 1 - clamp(p.senseCd / 6, 0, 1),
+        senseOn: p.senseMode,
         lock: lockA && isAlive(lockA) ? { name: creature(lockA.creature).name, kind: creature(lockA.creature).kind, band: bandOf(p, lockA), hp: lockA.hp / lockA.hpMax, color: BAND_COLOR[bandOf(p, lockA)] } : undefined,
         hunted: p.hunted, hunterAngle, hunterName: hunter ? creature(hunter.creature).name : undefined,
         hunterState: p.hunted >= 0.5 ? 'hunting' : p.hunted > 0.2 ? 'noticed' : 'none', inCover: p.cover > 0.3, still: Math.hypot(p.vel.x, p.vel.y, p.vel.z) < 0.3,
