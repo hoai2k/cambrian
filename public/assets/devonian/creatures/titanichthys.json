@@ -5,7 +5,7 @@
   "provenance": "Late Devonian (Famennian), Southern Ma\u00efder basin, Morocco",
   "description": "Broad-headed armoured giant with small eyes and slender toothless jaws, reconstructed as a suspension feeder.",
   "lengthMeters": 5,
-  "modelLength": 6.367000102996826,
+  "modelLength": 7.211911916732788,
   "locomotion": "Swim",
   "clips": [
     "Idle",
@@ -36,7 +36,9 @@
   "anchors": [
     "anchor_mouth",
     "anchor_mouth_inside",
-    "anchor_attack_primary"
+    "anchor_attack_primary",
+    "anchor_support_left",
+    "anchor_support_right"
   ],
   "sources": [
     {
@@ -54,6 +56,10 @@
     "Slender edentulous jaw and small relative orbits supported by fossils; suspension feeding supported biomechanically, actual filtering organs unknown and omitted.",
     "Complete body outline, tail and fin proportions, soft tissues, pigmentation and all motion are explicitly artistic reconstruction.",
     "Representative reconstructed display length 5 m; not a measured complete specimen or claimed maximum.",
-    "Attack/Heavy are shield/contact motions, Bite is a gentle oral closing cycle, Ability is a broad ram-feeding gape; names are compatibility labels, not gameplay design."
+    "Attack/Heavy are shield/contact motions, Bite is a gentle oral closing cycle, Ability is a broad ram-feeding gape; names are compatibility labels, not gameplay design.",
+    "Deep armored cranial and thoracic volume, a lined edentulous mouth, separate upper-cranial and lower-jaw bones, a deforming oral floor, six muscular tail sections and articulated long-fin trim.",
+    "The revised oral skinning retains the broad feeding gape. Both globes are seated deeper along their original socket axes; orbital rim, eye size and skull attachment are preserved.",
+    "Regional full-model PBR retains the 4096-pixel body albedo, with a reviewed vector-filtered 2048-pixel body normal. The reduced model retains vertex pigmentation and all 18 authored actions.",
+    "Refined preview model: close-up reduced-model surface polish, broader controller playtesting and dependent environment illustration updates remain pending."
   ]
 }
