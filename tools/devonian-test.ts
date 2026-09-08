@@ -193,6 +193,27 @@ ok(RULES !== undefined && !RULES.growthByNutrition, 'Devonian rules active: grow
   ok(creature(p.creature).rung === 2, 'still rung II');
   const hud = RULES!.hud(g, 0)!;
   ok(hud.rung === 2 && hud.rungName === 'Shoal' && hud.standing === d.standing, 'HUD reports rung, name and standing');
+  // The ring is the same instrument in both eras: it fills toward the next moult, not across the
+  // whole of growth, so a full ring means the body is about to change and nothing else.
+  ok(hud.stageProgress === 1, `at Prime the ring is full (${hud.stageProgress})`);
+  {
+    const fresh = new Game('rise', [{ creature: 'coccosteus', device: 'keyboard', ready: true }]);
+    const q = fresh.players[0]; q.spawnProtect = 1e6;
+    const dq = devActor(fresh, q);
+    const seen: number[] = [];
+    let moults = 0, wasFull = 0;
+    for (let i = 0; i < 400 && dq.stage < PRIME_STAGE; i++) {
+      const before = dq.stage;
+      RULES!.onNutrition(fresh, q, 1, undefined);
+      const ring = RULES!.hud(fresh, 0)!.stageProgress;
+      seen.push(ring);
+      if (dq.stage > before) { moults++; if (seen[seen.length - 2] > 0.9) wasFull++; }
+      for (let k = 0; k < 4; k++) tick(fresh, new Map<number, InputFrame>([[0, emptyInput()]]));
+    }
+    ok(moults >= 3 && wasFull === moults, `every moult arrived with the ring full (${wasFull}/${moults})`);
+    ok(seen.every((v) => v >= 0 && v <= 1), 'the ring never leaves 0..1');
+    ok(seen.some((v) => v < 0.5), 'and it starts again after a moult rather than sitting near full');
+  }
   ok(RULES!.hint(g, 0) === undefined || typeof RULES!.hint(g, 0) === 'string', 'hint is optional text');
 }
 

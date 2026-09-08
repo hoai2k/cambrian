@@ -115,8 +115,17 @@ momentum-based movement**.
   view reaches ~54° above the horizon and ~76° below it (`PITCH_UP` /
   `PITCH_DOWN` in `src/render/engine.ts`): the water above you is where what
   eats you comes from, and the sand below is where what you eat lives, so both
-  have to be lookable-at. Aiming up from the seabed pulls the camera in on a
-  shorter arm rather than flattening the shot against the floor.
+  have to be lookable-at.
+- **The seabed is the only thing the camera cannot be inside** (`fitCameraArm`).
+  Aiming up from the floor asks for a camera under the sand, and the answer is,
+  in order: shorten the arm — same angle, creature just closer — and then, when
+  the shortest arm is still buried, lift the whole rig, look point and all, so
+  the shot keeps the angle it was given and you see *past* your own creature
+  into the water above rather than being levelled off into the floor. Rocks are
+  not in that list: a camera shoved sideways out of a boulder, or lifted onto
+  one, throws the shot away for scenery. It passes through instead, and a
+  camera inside a rock sees straight out of it, because the far side of a
+  closed mesh is not drawn.
 - **RT (analog) = burst.** Holding it drains stamina and multiplies speed
   (× 1.6–2.2 depending on creature). Tapping it gives a short lunge. Burst is
   how you close on prey and how you outrun a Threat, so stamina management is
@@ -155,6 +164,10 @@ momentum-based movement**.
   floor, and the climb costs more stamina than they regain. So open water is
   a crossing, not a second home, and the seabed is where they hunt, are fed
   and get their burrow/anchor tools. They are the "ground fighter" archetypes.
+- **The growth ring means one thing in both eras**: how close the next moult
+  is, full when the body grows. The Cambrian reads nutrition against the tier's
+  need; the Devonian reads `stageProgress`, the run up to the next of its five
+  life stages, rather than the whole 0–100 standing meter it used to show.
 - **Ambient body motion**: idle sway, fin/flap frequency tied to speed
   (already in the current animation layer), a small procedural bob so nothing
   is ever perfectly still.
@@ -541,6 +554,17 @@ seats in Hunter & Hunted; Rise and Reef are whoever turned up.
 - **Spectating**: a dead player in versus gets a free camera following the
   leader until respawn. *(Built. Versus only: in co-op the camera stays on your
   own body, because a team-mate may be on the way to it.)*
+- **Dying is a shot, not a dialog.** Death used to drop a red panel over the
+  middle of the viewport the instant it happened, which hid the one thing worth
+  seeing. The camera now pulls onto whatever killed you — what swallowed you, or
+  failing that what landed the kill — and holds there for the whole death watch
+  (`CORPSE_WINDOW`, seven seconds) while you watch it finish. The only UI is a
+  line low on the screen, "You've been eaten by P2", over an unobstructed view.
+  The screen fades to black over the last 1.2 s of the watch and then fades
+  slowly back in on the new body, so the respawn is a dissolve rather than a cut.
+  A downed team-mate never fades out at all — their window is a race somebody
+  else is running, so they keep the picture and get the rescue meter under the
+  same low line.
 
 ## Readability, HUD and feedback
 
