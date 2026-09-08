@@ -1,7 +1,7 @@
 import { ACTIVE_ERA } from '../content';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import type { HudSnapshot } from '../render/engine';
-import { creature } from '../sim/creatures';
+import { creature, type CreatureId } from '../sim/creatures';
 import type { PlayerSetup } from '../sim/types';
 import { BIOMES } from '../sim/world';
 import { biomeArtPath } from '../shared/environment-assets';
@@ -36,7 +36,7 @@ export function PauseMenu({ onResume, onChange, onQuit, scheme }: { onResume: ()
   );
 }
 
-export function Results({ snapshot, players, onAgain, onContinue, onChange, onTitle, scheme }: { snapshot: HudSnapshot; players: PlayerSetup[]; onAgain: () => void; onContinue: () => void; onChange: () => void; onTitle: () => void; scheme: Scheme }) {
+export function Results({ snapshot, players, beaten, onAgain, onContinue, onChange, onTitle, scheme }: { snapshot: HudSnapshot; players: PlayerSetup[]; beaten: CreatureId[]; onAgain: () => void; onContinue: () => void; onChange: () => void; onTitle: () => void; scheme: Scheme }) {
   // The record as it stood before this match, snapshotted once when the screen appears; the merge
   // against it is pure, so re-rendering never eats the "NEW" marks (see codex.ts).
   const [before] = useState(loadCodex);
@@ -55,10 +55,9 @@ export function Results({ snapshot, players, onAgain, onContinue, onChange, onTi
               {creature(players[i]?.creature ?? p.creature).kind && <span className="result-kind">{creature(players[i]?.creature ?? p.creature).kind}</span>}
               <span>{p.tierName}</span>
               <small>{p.eats} eaten · {p.kills} kills · {p.escapes} escapes</small>
-              {/* Rise keeps a high-water mark per creature; say so when this match moved one. */}
-              {fresh.best[players[i]?.creature ?? p.creature] !== undefined && (
-                <span className="new-tag best-tag">NEW BEST</span>
-              )}
+              {/* Rise keeps a high-water mark per creature; say so when this match moved one. The
+                  shell hands us the list, because the stored record already has this match in it. */}
+              {beaten.includes(players[i]?.creature ?? p.creature) && <span className="new-tag best-tag">NEW BEST</span>}
             </div>
           ))}
         </div>

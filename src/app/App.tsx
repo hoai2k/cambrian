@@ -69,6 +69,17 @@ export function App() {
    */
   const [carry, setCarry] = useState<boolean[]>([]);
   const carryRef = useRef<boolean[]>([]);
+  /**
+   * Which creatures this match has beaten the record for, so the results screen can say so.
+   *
+   * It has to be tracked as it happens rather than worked out at the end. The record is written
+   * live — that is the whole point of it, so quitting to the title keeps what you grew — which
+   * means by the time the results screen loads the stored record, this match's marks are already
+   * in it and there is nothing left to compare against.
+   */
+  const [beaten, setBeaten] = useState<CreatureId[]>([]);
+  const beatenRef = useRef<CreatureId[]>([]);
+  const clearBeaten = useCallback(() => { beatenRef.current = []; setBeaten([]); }, []);
   const setCarryBoth = useCallback((c: boolean[]) => { carryRef.current = c; setCarry(c); }, []);
 
   const updatePlayers = useCallback((p: PlayerSetup[]) => { playersRef.current = p; setPlayers(p); }, []);
@@ -85,8 +96,12 @@ export function App() {
     for (const [k, n] of Object.entries(found) as [CreatureId, number][]) if (n > (bestRef.current[k] ?? -1)) { moved = true; break; }
     if (!moved) return;
     const next = { ...bestRef.current };
-    for (const [k, n] of Object.entries(found) as [CreatureId, number][]) if (n > (next[k] ?? -1)) next[k] = n;
-    bestRef.current = next; setBest(next); recordBest(found);
+    const beat: CreatureId[] = [];
+    for (const [k, n] of Object.entries(found) as [CreatureId, number][]) if (n > (next[k] ?? -1)) { next[k] = n; beat.push(k); }
+    bestRef.current = next; setBest(next);
+    const marks = beat.filter((k) => !beatenRef.current.includes(k));
+    if (marks.length) { beatenRef.current = [...beatenRef.current, ...marks]; setBeaten(beatenRef.current); }
+    recordBest(found);
   }, []);
   const go = useCallback((s: Screen) => { screenRef.current = s; setScreen(s); }, []);
   const setPausedBoth = useCallback((p: boolean) => { pausedRef.current = p; setPaused(p); engineRef.current?.setPaused(p || dialogRef.current !== null); }, []);
@@ -195,10 +210,11 @@ export function App() {
   const startMatch = useCallback(() => {
     const ps = playersRef.current;
     if (!ps.length || !ps.every((p) => p.ready) || !engineRef.current) return;
+    clearBeaten();
     engineRef.current.startMatch(modeRef.current, withCarry(ps));
     setPausedBoth(false);
     go('playing');
-  }, [go, loaded, setPausedBoth, withCarry]);
+  }, [clearBeaten, go, loaded, setPausedBoth, withCarry]);
 
   const backToSelect = useCallback(() => {
     engineRef.current?.startAttract();
@@ -230,10 +246,11 @@ export function App() {
 
   const playAgain = useCallback(() => {
     if (!engineRef.current) return;
+    clearBeaten();
     engineRef.current.startMatch(modeRef.current, withCarry(playersRef.current));
     setPausedBoth(false);
     go('playing');
-  }, [go, setPausedBoth, withCarry]);
+  }, [clearBeaten, go, setPausedBoth, withCarry]);
 
   /** Move a player's cursor on the roster grid. Locked players must unlock first (B). */
   /**
@@ -469,7 +486,7 @@ export function App() {
 
       {(screen === 'playing' || screen === 'results') && hud && <Hud snapshot={hud} />}
       {screen === 'playing' && paused && <PauseMenu scheme={scheme} onResume={() => setPausedBoth(false)} onChange={backToSelect} onQuit={backToTitle} />}
-      {screen === 'results' && hud && <Results snapshot={hud} players={players} scheme={scheme} onAgain={playAgain} onContinue={keepPlaying} onChange={backToSelect} onTitle={backToTitle} />}
+      {screen === 'results' && hud && <Results snapshot={hud} players={players} beaten={beaten} scheme={scheme} onAgain={playAgain} onContinue={keepPlaying} onChange={backToSelect} onTitle={backToTitle} />}
 
       <Toolbar isFs={isFs} muted={settings.muted} onHelp={() => openDialog(dialog === 'help' ? null : 'help')} onSettings={() => openDialog(dialog === 'settings' ? null : 'settings')} onMute={() => setSettings((s) => ({ ...s, muted: !s.muted }))} onFullscreen={toggleFullscreen} />
       <Dialogs kind={dialog} onClose={() => openDialog(null)} settings={settings} onSettings={setSettings} scheme={scheme} />
