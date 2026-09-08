@@ -12,8 +12,11 @@ Working branch fast-forwarded to main885a08a at resume; no new public model yet.
 - Astra high Titanichthys author: candidate07 weights-only oral repair with shared
   physical coordinates across paired floor layers; preserve24-degree gape and18
   clips. Candidate07 was built and structural contract passed; actual sweep failed at full
-  Ability0.5 because underside-first rays remain. G4 was not run. Author is now
-  diagnosing actual07 evidence and will freeze a bounded correction; preserve07.
+  Ability0.5 because underside-first rays remain. G4 was not run. Independent diagnosis now finds46 candidate06 underside-first hits inside the
+  actual oral-material boundary versus0 in07; remaining38 hits lie outside that
+  boundary. The rectangular gate includes legitimate lip/chin. Author is freezing
+  a topology-derived mouth-boundary checker with unchanged section tolerances;
+  rerun remains required. No08 geometry change is warranted by current evidence.
 - Root: independent Titan eye measurement and texture-size work. The original
   eye-ray failure is now reproduced as a float32 repeated-hit loop:64hits refer to
   only2 triangles; float64 direct tests find2 forward/0 reverse intersections.
@@ -37,6 +40,26 @@ Working branch fast-forwarded to main885a08a at resume; no new public model yet.
   values and all18 clips. Mean discarded normal angle0.697deg,p953.17deg, with a
   tiny preexisting short-vector patch; six matched head/body/oral renders running.
   This requires actual visual approval before production adoption.
+
+## Temporary storage constraint —18:48 UTC
+
+Disk fell to roughly300MiB free. Root asked the user to free5–10GB or give an
+external authoring destination; response pending. Heavy exports/renders paused;
+source planning/review continues. Originals and failed candidates remain preserved.
+Normal study wrote five of six images; final normal2048-oral save failed. Preserve
+those files and log; render_normal_resume_03.py prepares only the missing oral view
+in a new directory once storage is available. Head and body pairs visually retain armor edges, pigment and grain; final paired
+oral review still required.
+
+Eye study02 numerical results are valid, but its eight initial orbit renders are
+NOT valid pose evidence: renderer omitted explicit Bind pose reset and used1.0s
+instead of the actual2.4s Ability duration. Root caught identical LOD Bind/Ability
+poses. Terra is saving a corrected source recipe, with explicit local paths,
+pose-basis reset and actual imported action slots/duration; fresh images pending
+storage. Do not accept those old images as a maximum-gape comparison.
+
+Root committed eye/texture study sources and checkpoint as b5ae6ea on feature.
+Publication to main and remaining source commits are still pending.
 
 ## Delivered today
 
