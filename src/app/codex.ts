@@ -1,7 +1,7 @@
 import { ACTIVE_ERA } from '../content';
 import type { CreatureId } from '../sim/creatures';
 import type { Biome, LandmarkKind } from '../sim/world';
-import { LADDER_TOP } from '../sim/ladder';
+import { clampMark } from '../sim/ladder';
 
 /**
  * The record of everything the player has found in this era, kept across sessions on this device.
@@ -16,9 +16,13 @@ export interface Codex {
   landmarks: LandmarkKind[];
   apex: CreatureId[];
   /**
-   * Furthest rung of the growth ladder each creature has been taken to in Rise, by creature id
+   * Furthest mark on the growth ladder each creature has been taken to in Rise, by creature id
    * (see src/sim/ladder.ts). Rise is the mode about growing up, so it is the one worth a record:
    * the select screen badges it on the creature's card and offers to start there again.
+   *
+   * A mark is fractional: the whole part is the rung, the fraction is how far through it. The top
+   * rung is only ever written by finishing a run, so reaching it and stopping stores 3.5 — the
+   * rung below, half grown — and coming back leaves you a short swim from the top.
    *
    * Kept per era like everything else here, and in the era's own numbering — rung 3 is a Giant in
    * the Cambrian and an Adult in the Devonian — because the record is never read across eras.
@@ -38,18 +42,19 @@ const clean = <T extends string>(v: unknown, allowed?: readonly T[]): T[] => {
 };
 
 /**
- * A stored rung table, sanitised. Ids the roster no longer has are dropped and anything that is
- * not a rung index is ignored: a hand-edited or stale record must not be able to hatch a body at
- * an impossible size, so this is the only door the numbers come through.
+ * A stored mark table, sanitised. Ids the roster no longer has are dropped and anything that is
+ * not a mark is ignored: a hand-edited or stale record must not be able to hatch a body at an
+ * impossible size, so this is the only door the numbers come through. Fractions are kept — they
+ * are how a half-grown rung is written — but nothing below the first rung is worth storing.
  */
 const cleanBest = (v: unknown): Partial<Record<CreatureId, number>> => {
   const out: Partial<Record<CreatureId, number>> = {};
   if (!v || typeof v !== 'object') return out;
   const ids = new Set<string>(ACTIVE_ERA.creatures.map((c) => c.id));
   for (const [k, n] of Object.entries(v as Record<string, unknown>)) {
-    if (!ids.has(k) || typeof n !== 'number' || !Number.isFinite(n)) continue;
-    const r = Math.max(0, Math.min(LADDER_TOP, Math.floor(n)));
-    if (r > 0) out[k as CreatureId] = r;
+    if (!ids.has(k) || typeof n !== 'number') continue;
+    const m = clampMark(n);
+    if (m >= 1) out[k as CreatureId] = m;
   }
   return out;
 };

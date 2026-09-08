@@ -51,6 +51,12 @@ export interface EraRules {
   /** The body scale a creature of `id` has on `rung`. */
   ladderScale(id: CreatureId, rung: number): number;
   /**
+   * Put this body `fraction` (0..1) of the way from the rung it is on to the next. Each era keeps
+   * growth in its own currency — nutrition in the Cambrian, standing here — so the era fills its
+   * own meter and the shared code only says how full.
+   */
+  ladderFill(g: Game, a: Actor, fraction: number): void;
+  /**
    * Where a player or bot hatches, given the nursery centre; undefined leaves the shared placement.
    * The Devonian puts every hatchling inside plant cover, on the floor or up a column.
    */
