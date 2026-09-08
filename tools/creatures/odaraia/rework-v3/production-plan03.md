@@ -122,3 +122,7 @@ First production candidate must provide real GLB evidence for Attack .00/.18/.42
 Then validate all eighteen clips, held Death, positive scales, normalized ≤4 weights, material/pigment ranges, alpha sorting, clone isolation, transformed anchors, post-CCD behavior and progress-driven Eat (pause/resume, consumption speed changes, interruption/release). Test both raw exports and final packaged assets in the current runtime. Run final actual eye support/volume and creature audits on the new completed candidate, followed by portraits/intake only after explicit art approval. Parent owns runtime integration, shared manifests, public assets and Git.
 
 **Next action:** parent/Astra reviews this plan, then separately author a bounded kinematic rig source with frozen execution inputs. This document supplies no Blender execution command and does not authorize a production rebuild. Return attention to the waiting Bothriolepis M04 actual art review.
+
+## Subsequent user clarification: eye audit
+
+Odaraia is exempt from the fish-only 50% eye-globe embedding audit. Preserve its naturally exposed compound eyes and stalk/cup anatomy. Review attachment and animation visually; do not recess its eyes to satisfy a fish containment threshold. This clarification supersedes any broader audit requirement above.
