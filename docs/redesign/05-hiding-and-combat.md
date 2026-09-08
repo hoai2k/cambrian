@@ -60,7 +60,7 @@ Implemented September 2026. This supersedes the original design's Y signature ab
   range reads as the game ignoring the press. The cap is what keeps it a nudge rather than an
   auto-aim, and it never picks another player: who you attack stays your decision.
 - **B: block/parry**, or evade for creatures without a guard. Defensive specials run through this action. Hallucigenia and Canadia have a 0.28-second parry window; sustained defense is not invulnerability.
-- **Y / keyboard R (player 2: P): hide**, available at every growth tier. Press again to end hiding. Attacking, blocking, sprinting, dodging, taking damage, or being grabbed ends hiding.
+- **D-pad right / keyboard R (player 2: P): hide**, available at every growth tier. Press again to end hiding. Attacking, blocking, sprinting, dodging, taking damage, or being grabbed ends hiding.
 
 ### Burrowing
 
