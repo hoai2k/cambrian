@@ -194,6 +194,27 @@ ok(RULES !== undefined && !RULES.growthByNutrition, 'Devonian rules active: grow
   ok(creature(p.creature).rung === 2, 'still rung II');
   const hud = RULES!.hud(g, 0)!;
   ok(hud.rung === 2 && hud.rungName === 'Shoal' && hud.standing === d.standing, 'HUD reports rung, name and standing');
+  // The ring is the same instrument in both eras: it fills toward the next moult, not across the
+  // whole of growth, so a full ring means the body is about to change and nothing else.
+  ok(hud.stageProgress === 1, `at Prime the ring is full (${hud.stageProgress})`);
+  {
+    const fresh = new Game('rise', [{ creature: 'coccosteus', device: 'keyboard', ready: true }]);
+    const q = fresh.players[0]; q.spawnProtect = 1e6;
+    const dq = devActor(fresh, q);
+    const seen: number[] = [];
+    let moults = 0, wasFull = 0;
+    for (let i = 0; i < 400 && dq.stage < PRIME_STAGE; i++) {
+      const before = dq.stage;
+      RULES!.onNutrition(fresh, q, 1, undefined);
+      const ring = RULES!.hud(fresh, 0)!.stageProgress;
+      seen.push(ring);
+      if (dq.stage > before) { moults++; if (seen[seen.length - 2] > 0.9) wasFull++; }
+      for (let k = 0; k < 4; k++) tick(fresh, new Map<number, InputFrame>([[0, emptyInput()]]));
+    }
+    ok(moults >= 3 && wasFull === moults, `every moult arrived with the ring full (${wasFull}/${moults})`);
+    ok(seen.every((v) => v >= 0 && v <= 1), 'the ring never leaves 0..1');
+    ok(seen.some((v) => v < 0.5), 'and it starts again after a moult rather than sitting near full');
+  }
   ok(RULES!.hint(g, 0) === undefined || typeof RULES!.hint(g, 0) === 'string', 'hint is optional text');
 }
 
@@ -355,6 +376,17 @@ ok(RULES !== undefined && !RULES.growthByNutrition, 'Devonian rules active: grow
     { creature: 'stethacanthus', device: 1, ready: true }, { creature: 'gemuendina', device: 2, ready: true },
   ]);
   ok(HEAVY_SPECIALS.has('tuskLunge') && HEAVY_SPECIALS.has('jawShear') && BURROWERS.has('gemuendina'), 'Devonian specials are installed with the game');
+  // A heavy special replaces the heavy bite rather than adding to it, so it must never hit softer
+  // than the bite it displaced. Every one of them was, before the floor in `specialHit`: the jaw
+  // shear did 40 against Dunkleosteus' own heavy of 70.
+  {
+    const { specialHit } = await import('../src/sim/expansion-abilities');
+    for (const def of DEVONIAN.creatures.filter((c) => HEAVY_SPECIALS.has(c.ability))) {
+      const floored = specialHit(def, { damage: 0, poise: 0 });
+      ok(floored.damage >= def.heavy.damage, `${def.id}: ${def.abilityName} hits at least as hard as its own heavy (${floored.damage} vs ${def.heavy.damage})`);
+      ok(floored.poise >= def.heavy.poise, `${def.id}: ${def.abilityName} staggers at least as much as its own heavy`);
+    }
+  }
   const [ony, chei, steth, gem] = g.players;
   const idle = () => new Map<number, InputFrame>(g.players.map((_, i) => [i, emptyInput()]));
   const press = (i: number, key: 'heavy' | 'ability' | 'guard') => { const m = idle(); m.set(i, { ...emptyInput(), [key]: true }); return m; };

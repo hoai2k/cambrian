@@ -1,7 +1,8 @@
 import { add, clamp, dist, dot, heading, len3, norm, scale, sub, yawOf, type Vec3 } from '../shared/math';
 import { bandOf, isAlive, isHidden, lengthOf, massOf } from './actors';
 import { applyHit, type HitContext } from './combat';
-import { creature, type CreatureDef } from './creatures';
+import { HEAVY_SPECIALS } from './concealment';
+import { creature, type CreatureDef, type MoveDef } from './creatures';
 import type { Actor, SiltCloud } from './types';
 
 export interface ExpansionContext {
@@ -49,6 +50,10 @@ export const HEAVY_STRIKE: Record<string, HeavyStrike> = {
   basketRake: { reach: 2.0, lunge: 1.0 },
   shellCrush: { reach: 0.95, lunge: 1.8 },
   spineIntercept: { reach: 4.0, lunge: 0 },
+  // The sweeps stay where they are — a filter feeder does not lunge — but they do hit.
+  collectorWake: { reach: 1.2, lunge: 0 },
+  pharyngealPump: { reach: 1.2, lunge: 0 },
+  planktonComb: { reach: 1.2, lunge: 0 },
 };
 
 /**
@@ -98,6 +103,34 @@ export function stepHeavyStrike(ctx: ExpansionContext, a: Actor, def: CreatureDe
   const t = a.lockTarget >= 0 ? ctx.hit.byId(a.lockTarget) : undefined;
   if (t && isAlive(t) && dist(a.pos, t.pos) < lengthOf(a) * strike.reach * 0.8) return;
   a.vel = scale(a.dodgeDir, (strike.lunge * lengthOf(a)) / (to - from));
+}
+
+/**
+ * The hit a special lands, floored against the ordinary move whose button it took.
+ *
+ * A special replaces an action rather than adding to it: pressing RT on a Dunkleosteus gives you
+ * its jaw shear *instead of* its heavy bite, not as well. So a special that hits softer than the
+ * move it displaced makes the button worse to own — the whole roster was in that state, every
+ * Devonian heavy special included (the jaw shear did 40 against its own heavy's 70). Damage and
+ * poise are therefore never below the displaced move's, and armour piercing and guard breaking are
+ * kept if either side has them; everything else is the special's own, because a special that
+ * knocks back less than a bite usually does something better with the body instead — a snatch
+ * pulls it in, a grab holds it.
+ *
+ * Only the heavy specials are floored. A special on the guard button (`bellCorral`) or on hide
+ * (`sedimentDive`) is a bonus on top of an action that still happens, so it displaces nothing.
+ */
+export function specialHit(def: CreatureDef, over: Partial<MoveDef>): MoveDef {
+  const heavy = HEAVY_SPECIALS.has(def.ability);
+  const base = heavy ? def.heavy : def.light;
+  const pierce = Math.max(over.armorPierce ?? 0, heavy ? def.heavy.armorPierce ?? 0 : 0);
+  return {
+    ...base, ...over,
+    damage: heavy ? Math.max(base.damage, over.damage ?? 0) : over.damage ?? base.damage,
+    poise: heavy ? Math.max(base.poise, over.poise ?? 0) : over.poise ?? base.poise,
+    armorPierce: pierce > 0 ? pierce : undefined,
+    guardBreak: over.guardBreak || (heavy && def.heavy.guardBreak),
+  };
 }
 
 /** The thing a strike should be aimed at: whatever is locked, else the nearest body in front. */
@@ -182,10 +215,16 @@ export function stepExpansionAbility(ctx: ExpansionContext, a: Actor, def: Creat
       case 'spineIntercept':
         if (t >= .2 && t <= .85 && forward > .3 && d < L * .9) { damage = 20; poise = 36; kb = 5; }
         break;
+      // The filter feeders' sweep is on the heavy button, so it has to be a heavy as well as a
+      // meal: without this, RT on these three was the only attack button in the game that did no
+      // damage at all. `specialHit` supplies the creature's own heavy numbers.
+      case 'collectorWake': case 'pharyngealPump': case 'planktonComb':
+        if (t >= .25 && t <= .6 && forward > .25 && d < L * 1.2) { damage = 1; poise = 1; }
+        break;
     }
     if (damage > 0) {
       a.hitDone.add(o.id);
-      const result = applyHit(ctx.hit, a, o, { ...def.light, damage, poise, knockback: kb, grab, armorPierce, guardBreak: def.ability === 'shellCrush' }, 0);
+      const result = applyHit(ctx.hit, a, o, specialHit(def, { damage, poise, knockback: kb, grab, armorPierce, guardBreak: def.ability === 'shellCrush' }), 0);
       if (result === 'hit' && isAlive(o) && (def.ability === 'basketRake' || def.ability === 'tentacleSeize') && massOf(o) < massOf(a) * 1.3) o.vel = scale(direction, -7);
       if (a.state !== 'ability') { a.abilityActive = false; break; }
     }

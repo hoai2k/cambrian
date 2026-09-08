@@ -163,9 +163,15 @@ h3 { font-size: 13px; letter-spacing: .12em; color: var(--ember); margin: 14px 0
 .marker-giant { animation: blink .8s infinite; }
 .hunter-arrow { position: absolute; left: 50%; top: 50%; color: var(--coral); font-size: 2.2em; text-shadow: 0 0 14px var(--coral); }
 .hunter-arrow span { display: inline-block; transform: rotate(90deg); }
-.dead-overlay { position: absolute; inset: 0; display: grid; place-items: center; align-content: center; gap: .4em; background: rgba(40, 6, 10, .45); backdrop-filter: blur(2px) saturate(.6); }
-.dead-overlay b { font: 900 3em var(--font-display); letter-spacing: .1em; color: var(--coral); }
-.dead-overlay span { color: var(--mist); }
+/* Death: a line low on the viewport, not a panel over it. You watch what got you finish the job;
+   the screen fades out at the end of the watch, so nothing here needs to cover the picture. */
+.death-note { position: absolute; left: 50%; bottom: 3.6em; transform: translateX(-50%); display: grid; justify-items: center; gap: .15em; text-align: center; pointer-events: none; animation: fade-in .5s both; text-shadow: 0 .08em .5em rgba(0,0,0,.85), 0 0 1.2em rgba(0,0,0,.6); }
+.death-note b { font: 800 1.35em var(--font-display); letter-spacing: .06em; color: var(--coral); }
+.death-note b i { font-style: normal; font-weight: 600; color: var(--mist); opacity: .85; }
+.death-note span { font-size: .85em; color: var(--mist); opacity: .75; }
+.death-note.downed b { color: var(--player, #61f2d5); }
+/* In versus the spectator chip already owns the bottom of the viewport; sit above it. */
+.death-note.spectating-too { bottom: 6em; }
 
 /* Co-op: a downed team-mate. An arrow pinned to the middle of the viewport pointing the way,
    and a call-out with the seconds left to reach them. */

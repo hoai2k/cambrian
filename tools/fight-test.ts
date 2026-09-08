@@ -1,5 +1,5 @@
 /** Fight balance: peers take a couple of hits, giants take three to kill you, you can rout a giant, and being killed by a giant swallows you. */
-import { Game } from '../src/sim/game';
+import { CORPSE_WINDOW, Game } from '../src/sim/game';
 import { emptyInput, type InputFrame } from '../src/sim/types';
 import { isAlive, lengthOf, bandOf } from '../src/sim/actors';
 import { makeBrain } from '../src/sim/ai';
@@ -22,7 +22,7 @@ const fresh = (seed = 5) => { const g = new Game('reef', [{ creature: 'anomaloca
   }
   check('giant kills an adult in about 3 bites', bites >= 2 && bites <= 4, `bites=${bites} hp0=${hp0} hpMax=${p.hpMax} state=${p.state}`);
   check('killed by a giant = swallowed, not a plain corpse', p.state === 'swallowed' || (p.state === 'dead' && p.eaten >= 1) || p.hatching, `state=${p.state}`);
-  run(g, emptyInput(), 60 * 4);
+  run(g, emptyInput(), 60 * (CORPSE_WINDOW + 2));
   check('...and the player respawns afterwards', isAlive(p) && g.actors.includes(p), `state=${p.state}`);
 }
 // --- peer prey: a couple of hits ---
