@@ -10,6 +10,7 @@ import { applyHit, kill, startSwallow, type HitContext } from './combat';
 import { creature, CREATURE_IDS, PLAYABLE_IDS, type CreatureId, type MoveDef } from './creatures';
 import { resolveFlora, stepFlora, type FloraContact } from './flora';
 import { SpatialHash } from './spatial';
+import { clampRung, ladderRung, ladderScale, LADDER_TOP } from './ladder';
 import { emptyInput, isCoop, TIER_NAMES, TIER_NEED, TIER_SCALE, type Actor, type BrainState, type InputFrame, type Mode, type PlayerSetup, type Prompt, type SiltCloud, type Tier, type WorldEvent } from './types';
 import { BIOME_NAMES, biomeAt, biomeWeights, coverAt, groundHeight, LIGHT_WINDOW_Y, type Landmark, type LandmarkKind, microbialAt, nearestNursery, nurseryAt, nurseryFactor, resolveStatic, sampleCurrent, sampleHeight, shoreDistance, shoreZ, type StaticContact, SURFACE_Y, World, type Biome, type Boulder, type Cover, type Flora, type WorldData } from './world';
 
@@ -30,6 +31,13 @@ export interface Discovery {
   biomes: Set<Biome>;
   landmarks: Set<LandmarkKind>;
   apex: Set<CreatureId>;
+  /**
+   * The furthest rung of the growth ladder each creature has been taken to in Rise this match
+   * (see src/sim/ladder.ts). Rise is the mode that is *about* growing up, so it is the one whose
+   * high-water mark is worth keeping: the shell folds this into its stored record, shows it on
+   * the creature's card, and offers to start there next time instead of as a hatchling.
+   */
+  best: Map<CreatureId, number>;
 }
 
 export interface GameState {
@@ -205,7 +213,7 @@ export class Game implements AiWorld {
   huntScore: number[] = [];
   huntTurnT = 0;
   huntBreakT = 0;
-  readonly discovery: Discovery = { biomes: new Set(), landmarks: new Set(), apex: new Set() };
+  readonly discovery: Discovery = { biomes: new Set(), landmarks: new Set(), apex: new Set(), best: new Map() };
   private scratchActors: Actor[] = [];
   private scratchBoulders: Boulder[] = [];
   private scratchCover: Cover[] = [];
@@ -238,7 +246,12 @@ export class Game implements AiWorld {
     this.huntTurns = mode === 'hunted' ? Math.max(1, setups.length) : 1;
     this.huntScore = setups.map(() => 0);
     setups.forEach((s, i) => {
-      const startScale = RULES ? RULES.startScale(mode, this.eraRoleIndex(i), s.creature) : mode === 'rise' ? TIER_SCALE[0] : mode === 'hunted' ? (this.isHunter(i) ? 3.0 : TIER_SCALE[1]) : mode === 'reef' ? TIER_SCALE[2] : TIER_SCALE[1];
+      // Rise can start you part-grown, at the furthest rung you have taken this creature to before.
+      // Both eras derive everything else from the body scale — the Cambrian's tier through
+      // `tierForScale`, the Devonian's stage through `stageForScale` — so one number does it.
+      const carry = mode === 'rise' ? clampRung(s.startRung ?? 0) : 0;
+      const startScale = carry > 0 ? ladderScale(s.creature, carry)
+        : RULES ? RULES.startScale(mode, this.eraRoleIndex(i), s.creature) : mode === 'rise' ? TIER_SCALE[0] : mode === 'hunted' ? (this.isHunter(i) ? 3.0 : TIER_SCALE[1]) : mode === 'reef' ? TIER_SCALE[2] : TIER_SCALE[1];
       const a = this.spawn(s.creature, 'player', this.spawnPoint(nursery, s.creature, startScale, i), startScale, i);
       a.home = { ...nursery };
       a.yaw = Math.PI;                                   // facing out to sea
@@ -846,9 +859,11 @@ export class Game implements AiWorld {
     const curK = def.ground ? 0.08 : 0.55;
     let desired: Vec3 = v3(cur.x * curK, cur.y * curK, cur.z * curK);
     const jets = RULES?.jet(a) ?? false;
+    /** This step the body is travelling backward out of its funnel, aimed the other way. */
+    const jetBack = jets && controllable && mag > 0 && burstMult > 1;
     if (controllable && mag > 0) {
       // A shelled jetter's sprint fires backward out of the funnel: the body goes the other way.
-      const jetK = jets && burstMult > 1 ? -1 : 1;
+      const jetK = jetBack ? -1 : 1;
       desired.x += dir.x * mag * cruise * burstMult * jetK;
       desired.y += dir.y * mag * cruise * burstMult * jetK;
       desired.z += dir.z * mag * cruise * burstMult * jetK;
@@ -984,12 +999,15 @@ export class Game implements AiWorld {
       }
     }
 
-    // Orientation
-    const hv = Math.hypot(a.vel.x, a.vel.z);
+    // Orientation. A jetting shell keeps pointing where it is aimed while the funnel throws it
+    // the other way — orienting to the velocity would spin it round to face the camera and turn
+    // the backward jet into an ordinary sprint.
+    const facing = jetBack ? v3(-a.vel.x, -a.vel.y, -a.vel.z) : a.vel;
+    const hv = Math.hypot(facing.x, facing.z);
     let targetYaw = a.yaw;
-    if (a.aiming && a.controller === 'player' && (a.state === 'free' || a.state === 'guard')) targetYaw = hv > 0.35 ? yawOf(a.vel) : input.camYaw;
+    if (a.aiming && a.controller === 'player' && (a.state === 'free' || a.state === 'guard')) targetYaw = hv > 0.35 ? yawOf(facing) : input.camYaw;
     else if (locked && isAlive(locked) && (a.state === 'free' || a.state === 'guard' || a.state === 'attack')) targetYaw = yawOf(sub(locked.pos, a.pos));
-    else if (hv > 0.35 && a.state !== 'grabbed') targetYaw = yawOf(a.vel);
+    else if (hv > 0.35 && a.state !== 'grabbed') targetYaw = yawOf(facing);
     const dy = wrapAngle(targetYaw - a.yaw);
     const tr = def.turnRate * (a.state === 'attack' ? 0.5 : 1) * (1 + hv * 0.05) * (giantish ? 0.45 : 1) * (sw?.turn ?? 1);
     const turn = clamp(dy * 6, -tr, tr);
@@ -1003,8 +1021,8 @@ export class Game implements AiWorld {
       const behind = groundHeight(this.world, a.pos.x - Math.sin(a.yaw) * L * 0.4, a.pos.z - Math.cos(a.yaw) * L * 0.4, this.scratchBoulders);
       a.pitch = damp(a.pitch, -Math.atan2(ahead - behind, L * 0.8), 8, dt);
     } else {
-      const sp = Math.max(len3(a.vel), 0.5);
-      a.pitch = damp(a.pitch, clamp(-Math.asin(clamp(a.vel.y / sp, -1, 1)) * 0.8, -0.9, 0.9), 4, dt);
+      const sp = Math.max(len3(facing), 0.5);
+      a.pitch = damp(a.pitch, clamp(-Math.asin(clamp(facing.y / sp, -1, 1)) * 0.8, -0.9, 0.9), 4, dt);
     }
 
     // Noise / stillness
@@ -1807,9 +1825,15 @@ export class Game implements AiWorld {
       if (!isAlive(p)) continue;
       this.discovery.biomes.add(biomeAt(p.pos.x, p.pos.z));
       for (const m of this.world.landmarks) if (distXZ(p.pos, m.pos) < m.radius + 14) this.discovery.landmarks.add(m.kind);
-      // Read the tier rather than hooking the moult, so an era that owns its own growth (the
-      // Devonian's standing rungs) records an apex the same way.
-      if (p.tier >= 4) this.discovery.apex.add(p.creature);
+      // Ask the ladder rather than reading `tier`, so an era that owns its own growth records the
+      // same way. The Devonian never advances `tier` — it moults through stages — so reading the
+      // field directly meant no Devonian animal was ever credited with reaching the top.
+      const rung = ladderRung(this, p);
+      if (rung >= LADDER_TOP) this.discovery.apex.add(p.creature);
+      // Rise only: the other modes hand you a body rather than growing you one, so their rung
+      // says nothing about how far you got. Rung 0 is where everyone starts, so it is not a mark
+      // worth keeping — recording it would put a row in every player's record that says nothing.
+      if (this.mode === 'rise' && rung > 0 && rung > (this.discovery.best.get(p.creature) ?? 0)) this.discovery.best.set(p.creature, rung);
     }
   }
 

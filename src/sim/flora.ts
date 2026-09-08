@@ -1,4 +1,6 @@
 import { clamp } from '../shared/math';
+import { floraPropId, propShape } from '../content/prop-shapes';
+import { fpMax, fpReachAt, FOOTPRINT_BANDS, ROUND, type Footprint, type Reach } from './footprint';
 import { bodyRadius } from './actors';
 import { creature } from './creatures';
 import type { Actor } from './types';
@@ -7,6 +9,12 @@ import type { Flora, FloraKind, WorldData } from './world';
 /**
  * Plant physics. Every plant is a column anchored to the seabed whose top can be displaced
  * sideways (`bx`, `bz`, world units) by things swimming into it; a damped spring drifts it back.
+ *
+ * A plant blocks the shape it is drawn with. Where the era draws a kind with an authored prop, the
+ * footprint and the height profile are that prop's own (`src/content/prop-shapes.json`), so a
+ * driftwood log is a long low obstacle you swim past the ends of rather than a disc as wide as the
+ * log is long, and a bryozoan fan is a sheet rather than a pillar. `FloraPhys` keeps the numbers
+ * for the procedural stand-ins, which are round.
  *
  * When a body overlaps a plant, the penetration is split: the plant bends by its share and the
  * body is nudged out by the rest. How the split falls depends on how rigid the plant is (a
@@ -66,8 +74,30 @@ export const FLORA_PHYS: Record<FloraKind, FloraPhys> = {
   log: { h: 0.5, r: 1.3, profile: () => 1, rigidity: 30, maxLean: 0.02, k: 80, c: 12, drag: 0.2 },
 };
 
+/**
+ * The footprint and height profile each kind actually blocks with. A kind the era draws with an
+ * authored prop takes that prop's measured silhouette; the rest are the round stand-ins `FLORA_PHYS`
+ * describes. `unit` is what one point of `scale` is worth: a prop's radii are already in its own
+ * units, a round kind's come from `P.r`.
+ */
+interface KindShape { bands: readonly Footprint[]; unit: number; widest: number }
+const KIND_SHAPE = Object.fromEntries((Object.keys(FLORA_PHYS) as FloraKind[]).map((kind) => {
+  const shape = propShape(floraPropId(kind));
+  const P = FLORA_PHYS[kind];
+  // A round stand-in is one band of unit circle, scaled by its own radius and tapered by `profile`.
+  const bands: readonly Footprint[] = shape
+    ? shape.bands
+    : Array.from({ length: FOOTPRINT_BANDS }, (_, i) =>
+      ROUND.map((r) => r * P.profile((i + 0.5) / FOOTPRINT_BANDS)));
+  return [kind, { bands, unit: shape ? 1 : P.r, widest: Math.max(...bands.map((b) => fpMax(b))) }] as const;
+})) as Record<FloraKind, KindShape>;
+
+/** The widest a kind gets, per point of scale. */
+export const floraReachOf = (kind: FloraKind) => KIND_SHAPE[kind].widest * KIND_SHAPE[kind].unit;
+
 const BEND_EXP = 1.3;
 const EPS = 1e-3;
+const floraReachScratch: Reach = { d: 0, reach: 0, nx: 0, nz: 1 };
 
 const activate = (world: WorldData, f: Flora) => { if (!f.active) { f.active = true; world.activeFlora.push(f); } };
 
@@ -106,14 +136,15 @@ export function resolveFlora(world: WorldData, a: Actor, dt: number, scratch: Fl
     const fr = clamp((pos.y - f.pos.y) / H, 0.08, 1);
     const lean = Math.pow(fr, BEND_EXP);
     const cx = f.pos.x + f.bx * lean, cz = f.pos.z + f.bz * lean;
-    const rp = f.R * P.profile(fr);
-    const dx = pos.x - cx, dz = pos.z - cz;
-    const d = Math.hypot(dx, dz);
+    // The plant's own silhouette at this height, turned the way it is drawn.
+    const S = KIND_SHAPE[f.kind];
+    const u = f.scale * S.unit;
+    const rr = fpReachAt(S.bands, fr, cx, cz, f.rot, u, u, pos.x, pos.z, floraReachScratch);
+    const rp = rr.reach;
+    const d = rr.d;
     const pen = rp + ra - d;
     if (pen <= 0) continue;
-    let nx: number, nz: number;
-    if (d > EPS) { nx = dx / d; nz = dz / d; }
-    else { nx = Math.sin(f.rot); nz = Math.cos(f.rot); }
+    const nx = d > EPS ? rr.nx : Math.sin(f.rot), nz = d > EPS ? rr.nz : Math.cos(f.rot);
 
     const plantS = P.rigidity * f.scale * f.scale;
     const give = actorS / (actorS + plantS * 0.55);
@@ -197,6 +228,6 @@ export function stepFlora(world: WorldData, dt: number) {
 export function floraSize(kind: FloraKind, scale: number, sy: number) {
   const P = FLORA_PHYS[kind];
   const H = P.h * sy;
-  return { H, R: P.r * scale, maxB: P.maxLean * H };
+  return { H, R: floraReachOf(kind) * scale, maxB: P.maxLean * H };
 }
 
