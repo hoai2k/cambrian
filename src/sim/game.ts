@@ -858,15 +858,15 @@ export class Game implements AiWorld {
     const cur = sampleCurrent(v3(), a.pos.x, a.pos.y, a.pos.z, this.time);
     const curK = def.ground ? 0.08 : 0.55;
     let desired: Vec3 = v3(cur.x * curK, cur.y * curK, cur.z * curK);
+    // A shelled jetter's funnel is what makes it fast and what makes rising and sinking free, but
+    // the stick is the direction of travel for every body in the sea: swimming, sprinting and
+    // dashing all go where they are aimed. Firing the sprint backward out of the funnel read as
+    // the animal spinning round rather than as a jet, so the shells keep only the free hover.
     const jets = RULES?.jet(a) ?? false;
-    /** This step the body is travelling backward out of its funnel, aimed the other way. */
-    const jetBack = jets && controllable && mag > 0 && burstMult > 1;
     if (controllable && mag > 0) {
-      // A shelled jetter's sprint fires backward out of the funnel: the body goes the other way.
-      const jetK = jetBack ? -1 : 1;
-      desired.x += dir.x * mag * cruise * burstMult * jetK;
-      desired.y += dir.y * mag * cruise * burstMult * jetK;
-      desired.z += dir.z * mag * cruise * burstMult * jetK;
+      desired.x += dir.x * mag * cruise * burstMult;
+      desired.y += dir.y * mag * cruise * burstMult;
+      desired.z += dir.z * mag * cruise * burstMult;
     }
     if (controllable && !def.ground) {
       const hover = jets ? 1.6 : 1;
@@ -999,10 +999,8 @@ export class Game implements AiWorld {
       }
     }
 
-    // Orientation. A jetting shell keeps pointing where it is aimed while the funnel throws it
-    // the other way — orienting to the velocity would spin it round to face the camera and turn
-    // the backward jet into an ordinary sprint.
-    const facing = jetBack ? v3(-a.vel.x, -a.vel.y, -a.vel.z) : a.vel;
+    // Orientation
+    const facing = a.vel;
     const hv = Math.hypot(facing.x, facing.z);
     let targetYaw = a.yaw;
     if (a.aiming && a.controller === 'player' && (a.state === 'free' || a.state === 'guard')) targetYaw = hv > 0.35 ? yawOf(facing) : input.camYaw;

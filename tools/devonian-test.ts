@@ -26,7 +26,6 @@ type FloraKind = import('../src/sim/world').FloraKind;
 type Biome = import('../src/sim/world').Biome;
 type InputFrame = import('../src/sim/types').InputFrame;
 type Mode = import('../src/sim/types').Mode;
-import { wrapAngle } from '../src/shared/math';
 import { isCoop } from '../src/sim/types';
 type CreatureId = import('../src/sim/creatures').CreatureId;
 
@@ -287,24 +286,29 @@ ok(RULES !== undefined && !RULES.growthByNutrition, 'Devonian rules active: grow
   ok(RULES!.jet(mk('manticoceras')) && !RULES!.jet(shark), 'only shells jet');
 }
 
-// ---- a jetting shell travels backward without turning round ----
-// Sprint fires out of the funnel, so the body goes the other way. It must keep pointing where the
-// player aimed it: orienting to the velocity instead spins it to face the camera and the backward
-// jet becomes an ordinary sprint.
+// ---- a shell goes where the stick points, in every gear ----
+// The funnel buys a nautiloid free rise and sink and takes the slow direction away from it. It does
+// not reverse the controls: swimming, sprinting and dashing all travel the way they are aimed, and
+// a sprint that fired backward out of the funnel read as the animal spinning to face the camera.
 {
-  const run = (id: CreatureId, burst: number) => {
+  const run = (id: CreatureId, gear: 'swim' | 'sprint' | 'dash', stick: 1 | -1 = 1) => {
     const g = new Game('reef', [{ creature: id, device: 'keyboard', ready: true }]);
     const p = g.players[0];
-    p.pos = { x: 0, y: -14, z: 0 }; p.vel = { x: 0, y: 0, z: 0 }; p.yaw = 0; p.spawnProtect = 0;
-    const push = (): InputFrame => ({ ...emptyInput(), my: 1, burst });
-    for (let i = 0; i < 90; i++) tick(g, new Map<number, InputFrame>([[0, push()]]));
-    return { z: p.pos.z, yaw: Math.abs(wrapAngle(p.yaw)) };
+    p.pos = { x: 0, y: -14, z: 0 }; p.vel = { x: 0, y: 0, z: 0 }; p.yaw = 0; p.spawnProtect = 999;
+    const push = (): InputFrame => ({ ...emptyInput(), my: stick, burst: gear === 'sprint' ? 1 : 0, dash: gear === 'dash' });
+    for (let i = 0; i < 90; i++) { tick(g, new Map<number, InputFrame>([[0, push()]])); p.spawnProtect = 999; }
+    // The stick is camera-relative with camYaw 0, so +my is +z: travel and stick agree when z > 0.
+    return { z: p.pos.z, speed: Math.hypot(p.pos.x, p.pos.z) };
   };
-  const cruise = run('michelinoceras', 0), jet = run('michelinoceras', 1), fish = run('cladoselache', 1);
-  ok(cruise.z > 1 && cruise.yaw < 0.3, `a shell cruises forward, facing forward (z ${cruise.z.toFixed(1)}, yaw ${cruise.yaw.toFixed(2)})`);
-  ok(jet.z < -1, `sprint jets the shell backward (z ${jet.z.toFixed(1)})`);
-  ok(jet.yaw < 0.3, `...still facing where it was aimed, not spun round (yaw ${jet.yaw.toFixed(2)})`);
-  ok(fish.z > cruise.z, `a finned body sprints forward as before (z ${fish.z.toFixed(1)})`);
+  for (const id of ['michelinoceras', 'manticoceras'] as CreatureId[]) {
+    const swim = run(id, 'swim'), sprint = run(id, 'sprint'), dash = run(id, 'dash'), astern = run(id, 'swim', -1);
+    ok(swim.z > 1, `${id} swims where the stick points (z ${swim.z.toFixed(1)})`);
+    ok(sprint.z > swim.z, `...sprints further the same way, never backward out of it (z ${sprint.z.toFixed(1)})`);
+    ok(dash.z > 1, `...and dashes the same way too (z ${dash.z.toFixed(1)})`);
+    ok(astern.z < -1, `...and pulling the stick back takes it back (z ${astern.z.toFixed(1)})`);
+  }
+  const fish = run('cladoselache', 'sprint');
+  ok(fish.z > 1, `a finned body sprints forward as before (z ${fish.z.toFixed(1)})`);
 }
 
 // ---- every sound the era asks for exists (the shared library is NOT under assets/devonian/) ----

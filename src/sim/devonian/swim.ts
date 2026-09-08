@@ -15,8 +15,9 @@ import { ADULT_STAGE, devActor, stageForScale } from './state';
  *   dart: reverse is slow, the turn while slow or reversing is sharp, and the first press of
  *   sprint from rest is a fast-start (a C-start) that throws the body forward before the tail
  *   has built up speed.
- * - Shells jet: their fast direction is backward (the shared sprint already inverts for them),
- *   so they get no reverse penalty and a smaller fast-start.
+ * - Shells jet, so no direction is the slow one for them: no reverse penalty, and a smaller
+ *   fast-start. Their sprint still goes where the stick points, like every other body's — the
+ *   funnel buys them free rise and sink, not a reversed control.
  * - Crawlers (ground bodies) keep the shared rules.
  * - A fish can leave the water if it is driving hard at the surface: the sim lets it through the
  *   ceiling into a ballistic arc and it splashes back in. Crawlers and shells stay under.
