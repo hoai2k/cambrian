@@ -1,0 +1,303 @@
+{
+  "dorsal_height_field_continuity": {
+    "material03": {
+      "samples": [
+        0.11839145168692342,
+        0.048733904947769954,
+        0.3060123155431641,
+        0.09107143771942437,
+        0.1564070298259307,
+        0.11287668671564262
+      ],
+      "maximum_height_derivative_jump": 0.3060123155431641
+    },
+    "material04": {
+      "samples": [
+        0.00011833522074559955,
+        1.697340336857811e-05,
+        1.1177734085543456e-07,
+        3.79344450816832e-07,
+        6.260680992728473e-07,
+        1.6008748526027267e-05
+      ],
+      "maximum_height_derivative_jump": 0.00011833522074559955
+    }
+  },
+  "status": "SOURCE_ONLY_PASS",
+  "scope": "No Blender, rendered art, actual M04 mesh relief, rig, runtime or final eye approval. Actual loaded M03 preservation and 5 oral pose checks repeated in build.",
+  "bounded_geometry": {
+    "ventral_shield_transition_vertices": 108,
+    "maximum_ventral_shield_delta": 0.016440415861364133,
+    "oral_annulus_vertices": 432,
+    "changed_nonaperture_annulus_vertices": 324,
+    "cephalic_vertices_changed": 465,
+    "maximum_oral_z_delta": 0.012727579258233868,
+    "maximum_cephalic_z_delta": 0.0043041259765625
+  },
+  "oral_construction_boundary_before": {
+    "edge_count": 108,
+    "median_degrees": 14.505005656696978,
+    "p90_degrees": 32.06207747588874,
+    "maximum_degrees": 46.67070628020494
+  },
+  "oral_construction_boundary_after": {
+    "edge_count": 108,
+    "median_degrees": 2.69315633355636,
+    "p90_degrees": 9.415326219933908,
+    "maximum_degrees": 20.671396373766353
+  },
+  "pose_topology": [
+    {
+      "oral_key": 0.0,
+      "status": "PASS",
+      "vertices": 55802,
+      "faces": 56104,
+      "triangles": 111600,
+      "connected_components": 1,
+      "edge_use_counts": {
+        "2": 111904
+      },
+      "euler_characteristic": 2,
+      "minimum_triangle_area": 3.1893201553718905e-08,
+      "bounds": [
+        [
+          -1.0649975863449217,
+          1.064997587691912
+        ],
+        [
+          -1.62,
+          3.38
+        ],
+        [
+          -0.3928482261137036,
+          0.5992127386624111
+        ]
+      ],
+      "oral_aperture_width": 0.286,
+      "oral_aperture_length": 0.18199999999999994,
+      "rigid_shield_fraction_total_length": 0.355,
+      "pectoral_centerline_design_length": 1.52,
+      "scope": "Numerical source check only; rendered sculpture/attachment review remains required.",
+      "root_transition_minimum_quad_triangle_normal_dot": 0.7886552910197144,
+      "root_transition_quads": 1856
+    },
+    {
+      "oral_key": 0.25,
+      "status": "PASS",
+      "vertices": 55802,
+      "faces": 56104,
+      "triangles": 111600,
+      "connected_components": 1,
+      "edge_use_counts": {
+        "2": 111904
+      },
+      "euler_characteristic": 2,
+      "minimum_triangle_area": 3.1893201553718905e-08,
+      "bounds": [
+        [
+          -1.0649975863449217,
+          1.064997587691912
+        ],
+        [
+          -1.62,
+          3.38
+        ],
+        [
+          -0.3928482261137036,
+          0.5992127386624111
+        ]
+      ],
+      "oral_aperture_width": 0.286,
+      "oral_aperture_length": 0.18499999999999983,
+      "rigid_shield_fraction_total_length": 0.355,
+      "pectoral_centerline_design_length": 1.52,
+      "scope": "Numerical source check only; rendered sculpture/attachment review remains required.",
+      "root_transition_minimum_quad_triangle_normal_dot": 0.7886552910197144,
+      "root_transition_quads": 1856
+    },
+    {
+      "oral_key": 0.5,
+      "status": "PASS",
+      "vertices": 55802,
+      "faces": 56104,
+      "triangles": 111600,
+      "connected_components": 1,
+      "edge_use_counts": {
+        "2": 111904
+      },
+      "euler_characteristic": 2,
+      "minimum_triangle_area": 3.1893201553718905e-08,
+      "bounds": [
+        [
+          -1.0649975863449217,
+          1.064997587691912
+        ],
+        [
+          -1.62,
+          3.38
+        ],
+        [
+          -0.3928482261137036,
+          0.5992127386624111
+        ]
+      ],
+      "oral_aperture_width": 0.286,
+      "oral_aperture_length": 0.18799999999999994,
+      "rigid_shield_fraction_total_length": 0.355,
+      "pectoral_centerline_design_length": 1.52,
+      "scope": "Numerical source check only; rendered sculpture/attachment review remains required.",
+      "root_transition_minimum_quad_triangle_normal_dot": 0.7886552910197144,
+      "root_transition_quads": 1856
+    },
+    {
+      "oral_key": 0.75,
+      "status": "PASS",
+      "vertices": 55802,
+      "faces": 56104,
+      "triangles": 111600,
+      "connected_components": 1,
+      "edge_use_counts": {
+        "2": 111904
+      },
+      "euler_characteristic": 2,
+      "minimum_triangle_area": 3.1893201553718905e-08,
+      "bounds": [
+        [
+          -1.0649975863449217,
+          1.064997587691912
+        ],
+        [
+          -1.62,
+          3.38
+        ],
+        [
+          -0.3928482261137036,
+          0.5992127386624111
+        ]
+      ],
+      "oral_aperture_width": 0.286,
+      "oral_aperture_length": 0.19099999999999984,
+      "rigid_shield_fraction_total_length": 0.355,
+      "pectoral_centerline_design_length": 1.52,
+      "scope": "Numerical source check only; rendered sculpture/attachment review remains required.",
+      "root_transition_minimum_quad_triangle_normal_dot": 0.7886552910197144,
+      "root_transition_quads": 1856
+    },
+    {
+      "oral_key": 1.0,
+      "status": "PASS",
+      "vertices": 55802,
+      "faces": 56104,
+      "triangles": 111600,
+      "connected_components": 1,
+      "edge_use_counts": {
+        "2": 111904
+      },
+      "euler_characteristic": 2,
+      "minimum_triangle_area": 3.1893201553718905e-08,
+      "bounds": [
+        [
+          -1.0649975863449217,
+          1.064997587691912
+        ],
+        [
+          -1.62,
+          3.38
+        ],
+        [
+          -0.3928482261137036,
+          0.5992127386624111
+        ]
+      ],
+      "oral_aperture_width": 0.286,
+      "oral_aperture_length": 0.19399999999999995,
+      "rigid_shield_fraction_total_length": 0.355,
+      "pectoral_centerline_design_length": 1.52,
+      "scope": "Numerical source check only; rendered sculpture/attachment review remains required.",
+      "root_transition_minimum_quad_triangle_normal_dot": 0.7886552910197144,
+      "root_transition_quads": 1856
+    }
+  ],
+  "materials": {
+    "shield": {
+      "linear_rgb_min": [
+        0.01911213208842405,
+        0.01660078048624206,
+        0.007770578099943091
+      ],
+      "linear_rgb_max": [
+        0.1140211747883845,
+        0.08588832386070847,
+        0.049783809197697454
+      ],
+      "roughness_range": [
+        0.43,
+        0.6891454673251383
+      ],
+      "height_range": [
+        -0.0006499835856478576,
+        0.002010029446674793
+      ],
+      "maximum_srgb_roundtrip_error": 0.0012100042040595338
+    },
+    "pectoral": {
+      "linear_rgb_min": [
+        0.015640657835989603,
+        0.01884899790491055,
+        0.009562162449623898
+      ],
+      "linear_rgb_max": [
+        0.11536488282750017,
+        0.08377687919616082,
+        0.038454960942500054
+      ],
+      "roughness_range": [
+        0.4814693176508926,
+        0.6599508997962892
+      ],
+      "height_range": [
+        -0.0014999999937634985,
+        0.0006999999956848024
+      ],
+      "maximum_srgb_roundtrip_error": 0.001251751019829328
+    },
+    "posterior": {
+      "linear_rgb_min": [
+        0.03007572570512727,
+        0.026914066613646783,
+        0.012367038924076111
+      ],
+      "linear_rgb_max": [
+        0.08725704903938396,
+        0.0784809447149652,
+        0.04753014961599308
+      ],
+      "roughness_range": [
+        0.5409230067836107,
+        0.5587296020358249
+      ],
+      "height_range": [
+        0.0,
+        0.0
+      ],
+      "maximum_srgb_roundtrip_error": 0.0010012486403674359
+    }
+  },
+  "plate_paths": [
+    "cephalic-thoracic margin",
+    "anterior median dorsal boundary",
+    "posterior median dorsal boundary",
+    "anterior dorsolateral / mixilateral",
+    "mixilateral longitudinal",
+    "posterior dorsolateral branch",
+    "ventrolateral floor boundary",
+    "median ventral anterior half",
+    "median ventral anterior seam",
+    "median ventral posterior seam",
+    "posterior ventral plate margin",
+    "cephalic premedian-lateral",
+    "cephalic lateral-submarginal",
+    "cephalic nuchal branches"
+  ],
+  "protected_source_vertices": 38796
+}

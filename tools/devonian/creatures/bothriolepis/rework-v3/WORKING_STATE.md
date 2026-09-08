@@ -1,3 +1,15 @@
+## 2026-09-08 20:03 UTC — MATERIAL04 source frozen; M03 art HOLD
+
+- Owner/model: Astra high. Status: candidate-ready, **source only**. New Bothriolepis ownership accepted after Titan08 completion.
+- Reviewed preserved reference + all eight actual M03 images. M03 blend `6521d66e5ed42a8706dbfe6329db230bad75cbed43694ac57d85e782c6b2d751` and inventory `6601fd8dd8a0c6cd6faa397a6760ccc9517abde3ad446d72acd093b79fc9ad25` verified; all ten original inputs and inventory members preserved.
+- Targeted change: physical elliptic oral transition across 324 annulus +108 surrounding ventral vertices, shared shield UV/PBR across old rectangular boundary, completed rostral tangent correction, continuous roof normal field, richer umber/ochre armor with stronger authored bone relief. Existing 14 plate paths, bulky outline, bowed pectorals, posterior, aperture/cavity, eye bytes and study-key motion preserved.
+- Source checks PASS: five oral poses, one closed manifold, 55,802 vertices; old oral-boundary median normal jump 14.5050°→2.6932°, p90 32.0621°→9.4153°. No actual M04 blend/render exists yet. Source atlas preview inspected; actual appearance remains HOLD until nine views.
+- Frozen manifest `7d3e1e8cb9922bc81295cecb8c9df6b5520d85bddea55a3f35e13aac65f00743` (44 exact input files). Builder `1090492feb75c37892402efe2e8242f76f1e4ee7f460adf09532e1fc0f53d0db`; geometry delta `3f757317cdff2e28aa98c3ad2ff69b8b87315ca976e3db181f367263c2ce48c1`; material fields `76aa6b91456ef863d32f6d4bce81bf77d75010eaefc0fc5522b4d33242613e86`; final source report `863b1bc7e494efc98a889e92184dd17d9abc6f5e8ae94bf0a4c23702e9991c0e`.
+- Handoff: `review-material03-material04-handoff.md` SHA `a4a01ce8c1004fa36e31a39d94ac2ee79e599ac97120fa5c23d4a207efb4ce73`. All paths/hashes and stop conditions are recorded there and in the manifest. Earlier source preview/report are preserved with -01 suffix; -02 is current.
+- Execution CWD `/Users/hoai/Documents/Stuff/Generations/cambrian/local/expansion-repo`; exact next command `/usr/bin/python3 /Users/hoai/Documents/Stuff/Generations/cambrian/local/expansion-repo/tools/devonian/creatures/bothriolepis/rework-v3/execute_material04.py --run-frozen-material04`. CPU2,32 samples,nine views; parent schedules. Output only `../devonian-authoring/bothriolepis/rework-v3/material04/`. Pre/post input verification; refuse existing output directory. Stop on any error, retain evidence.
+- Production clarification: V3 currently has semantic groups and an oral study key, **no production rig/18 actions/export yet**. Eighteen dynamic actions and anchors on full/LOD remain required after material gate, followed by final new-candidate actual eye/general audits and intake. No old audit applies.
+- No Blender, public, Git or shared checkpoint/catalogue changes by author. Resume from frozen execution, then independently inspect all nine actual images before production authoring.
+
 # Bothriolepis V3 working state
 
 ## 2026-09-08 14:17 UTC — MATERIAL02 rejected; MATERIAL03 source frozen
