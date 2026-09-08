@@ -156,3 +156,7 @@ h1, h2, h3 { font-family: var(--font-display); margin: 0; }
   .toggle { font-size: 10px; }
   .speed { padding: 3px 7px; }
 }
+/* Replaced clips: the predecessor of a re-authored clip, kept in the file for comparison. */
+.clips-replaced-head { font-size: 11px; letter-spacing: .2em; color: var(--mist); margin: 14px 0 8px; text-transform: uppercase; }
+.clip-replaced { opacity: .7; border-style: dashed; font-weight: 500; }
+.clip-replaced.active { opacity: 1; }

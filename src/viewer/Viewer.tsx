@@ -3,7 +3,7 @@ import { CreaturePortrait } from '../app/CreaturePortrait';
 import { useEffect, useRef, useState } from 'react';
 import { COLLECTIONS, paletteFor, SPECIMENS, specimenByKey, type CollectionId } from './catalogue';
 import { scheme, SLOT_LABEL, type Slot } from '../shared/palettes';
-import { ASSET_BASE, createViewerScene, type PlaybackState, type ViewerScene } from './scene';
+import { ASSET_BASE, createViewerScene, isReplaced, replacedName, type PlaybackState, type ViewerScene } from './scene';
 
 const SPEEDS = [0.25, 0.5, 1, 2];
 
@@ -221,7 +221,7 @@ export function Viewer() {
         </div>}
         {!loading && !clips.length && <p className="hint">Static specimen</p>}
         <div className="clip-grid">
-          {clips.map((name) => {
+          {clips.filter((n) => !isReplaced(n)).map((name) => {
             // A clip queued for rework is flagged on its own button rather than on the creature:
             // the body is finished, this motion is not, and that is what a viewer wants to know.
             const queued = def.clipNotes?.[name];
@@ -234,6 +234,20 @@ export function Viewer() {
             );
           })}
         </div>
+        {clips.some(isReplaced) && <>
+          {/* A re-authored clip keeps its predecessor in the file as replaced/<Name>, so the two
+              can be played side by side and the old one restored if the new one is worse. The
+              game never asks for these names; only this page shows them. */}
+          <h4 className="clips-replaced-head">Replaced</h4>
+          <div className="clip-grid clip-grid-replaced">
+            {clips.filter(isReplaced).map((name) => (
+              <button key={name} className={`clip clip-replaced ${name === active ? 'active' : ''}`} aria-pressed={name === active}
+                title={`The clip ${replacedName(name)} superseded; kept for comparison`} onClick={() => sceneRef.current?.play(name, loop)}>
+                {replacedName(name)}
+              </button>
+            ))}
+          </div>
+        </>}
       </section>
 
     </div>
