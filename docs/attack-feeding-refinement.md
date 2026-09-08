@@ -75,3 +75,16 @@ Cambrian queue: Anomalocaris, Opabinia, Waptia, Marrella, Olenoides, Odaraia, Ca
 Sidneyia, Leanchoilia, Isoxys, Tamisiocaris, Nectocaris. The last is a motion-scope inclusion,
 not a taxonomic claim. Devonian queue: Eldredgeops, Walliserops, Jaekelopterus, Nahecaris,
 Palaeoisopus, Manticoceras, Michelinoceras, Furcaster. All remain or become preview pending review.
+
+## Delivered — 8 September 2026
+
+- **Leanchoilia** (Cambrian): Bite, Attack, Heavy and Eat re-authored as a preview with the
+  code-authored pipeline in `tools/creatures/motion/` (its README explains the contract). The
+  great appendages now lead proximal-to-distal, the three claws close on contact, the flagella lag
+  and ring down, and Eat is a reach → grasp → fold-under → present-at-the-mouth performance that
+  the engine scrubs by consumption progress (`FEEDING_PERFORMANCE`). The shipped clips are kept in
+  the GLB as `replaced/<Name>` and shown under *Replaced* in the viewer so the two can be compared
+  and the old one restored. Queue entry: `tools/attack-feeding-refinements.json` status `review`;
+  its clip badge in `src/content/cambrian/pending-refinements.json` now says it awaits review.
+  Not yet done: a controller playtest, and the LOD still carries no attack clips at all.
+

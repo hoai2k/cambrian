@@ -28,9 +28,14 @@ const CLIP_ORDER = [
   'Eat', 'Moult', 'Growth',
 ];
 
+/** A clip kept for comparison after being re-authored: `replaced/<Name>` (tools/creatures/motion). */
+export const REPLACED_PREFIX = 'replaced/';
+export const isReplaced = (name: string) => name.startsWith(REPLACED_PREFIX);
+/** The name a replaced clip had, and that its replacement now carries. */
+export const replacedName = (name: string) => (isReplaced(name) ? name.slice(REPLACED_PREFIX.length) : name);
 export const orderClips = (names: string[]) =>
   [...names].sort((a, b) => {
-    const ia = CLIP_ORDER.indexOf(a), ib = CLIP_ORDER.indexOf(b);
+    const ia = CLIP_ORDER.indexOf(replacedName(a)), ib = CLIP_ORDER.indexOf(replacedName(b));
     if (ia !== ib) return (ia < 0 ? 1e3 : ia) - (ib < 0 ? 1e3 : ib);
     return a.localeCompare(b);
   });
@@ -300,7 +305,7 @@ export function createViewerScene(canvas: HTMLCanvasElement): ViewerScene {
   function play(name: string, loop: boolean) {
     const act = actions.get(name);
     if (!act) return;
-    const repeat = loop || looping.includes(name);
+    const repeat = loop || looping.includes(replacedName(name));
     const prev = current;
     act.reset();
     act.setLoop(repeat ? THREE.LoopRepeat : THREE.LoopOnce, repeat ? Infinity : 1);
