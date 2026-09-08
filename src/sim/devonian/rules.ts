@@ -162,6 +162,10 @@ export const DEVONIAN_RULES: EraRules = {
     const L = creature(id).adultLength;
     return stageScale(L, mode === 'reef' ? ADULT_STAGE : mode === 'hunted' && index === 0 ? PRIME_STAGE : 0);
   },
+  // The Devonian grows in five life stages, which is the shared ladder under its own names.
+  ladderNames: STAGES,
+  ladderRung: (g, a) => devActor(g, a).stage,
+  ladderScale: (id, rung) => stageScale(creature(id).adultLength, rung),
   install() { installDevonianSpecials(); },
   ySpecial,
   init(g) { installDevonianSpecials(); for (const a of players(g)) { const d = devActor(g, a); d.stage = stageForScale(creature(a.creature).adultLength, a.scale); d.standing = g.mode === 'reef' ? STAGE_AT[ADULT_STAGE] + 5 : STAGE_AT[d.stage]; } },

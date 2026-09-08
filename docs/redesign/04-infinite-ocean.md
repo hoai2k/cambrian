@@ -245,16 +245,38 @@ on the rim pointing the way. A creature outside the reach is simply not on the
 dial — the radar tells you what is around you, not what exists.
 The biome's name is announced in a banner for three seconds when it changes.
 
-## Rocks
+## Rocks, plants and the shapes they block
 
-A boulder is drawn as an ellipsoid — `sx` by `sy` by `sz`, turned by `rot` —
-and it collides as the ellipse it is drawn with (`boulderQ` / `boulderAxes`),
-not as the circle around it. The circle stood up to a couple of units out into
-open water on a long rock's narrow side, which is what an invisible wall in a
-gap between a rock and a plant was. The same footprint gives the dome height, so
-what you can see, what you bump into and what you can stand on are one shape. A
-carved prop (a spire, a talus shard) keeps the tuned `radius` it was given; only
-the proportions come from the mesh scale.
+Everything on the seabed collides as the shape it is drawn with, and the shape
+comes off the mesh: `npm run shapes` measures every instanced prop and writes
+`src/content/prop-shapes.json`, which is what `src/sim` reads (it is
+deterministic and never loads a GLB). A **footprint**
+(`src/sim/footprint.ts`) is sixteen radii around the compass, starting at the
+prop's local +z and turning toward +x, measured again in each of five height
+bands. It turns with `rot` and scales the way the mesh is drawn.
+
+That replaced two approximations that were fine for a big animal and
+impassable for a small one, which is the size everything starts at now:
+
+- A circle around a plant. A driftwood log two and a half units long and one
+  wide blocked a disc two and a half units *across*, so there was an arm's
+  length of invisible wall off each side of it. Bryozoan fans, glass fans and
+  reed clumps — sheets, all of them — did the same.
+- An ellipse fitted to a rock's drawing scale. That is right for the Cambrian's
+  procedural boulder, which is a unit sphere; the Devonian's boulder puts its
+  corners a third further out than its axes, so it could be swum straight
+  through, and a blade spire or talus shard is a flat rock inside a round
+  collider a third to twice too wide.
+
+A rock uses the whole silhouette (`boulderQ`, `boulderReach`), and the same
+footprint gives the dome height, so what you can see, what you bump into and
+what you can stand on are one shape. `radius` is now only the furthest that
+footprint reaches: a broad-phase bound and the size of the cover the rock gives.
+A plant reads the band at the height it is touched (`fpReachAt`), so a crinoid
+is a thin stalk under a wide crown and a spine sponge is a stalk down at the
+sand — a floor-walker slips past its foot instead of climbing a pillar that is
+not there. Kinds with no authored prop keep the round profile `FLORA_PHYS`
+describes.
 
 `resolveStatic` reports what it found (`StaticContact`): whether anything
 blocked, the height to reach to get over a rock inside the climbing budget, and
@@ -265,13 +287,19 @@ its edge. `Game.updateActor` turns those into `Actor.climbTo`.
 
 ## Tests
 
+- `tools/prop-collider-test.ts` (`npm run props`): the seabed audit. The
+  checked-in shapes are the meshes on disk; every prop's collider contains its
+  mesh at every height, so nothing can be swum through; and the long, flat props
+  block their own shape rather than a disc around it (a log gets three quarters
+  of that disc back as open water, a glass fan almost all of it).
 - `tools/swim-test.ts`: sprint endurance, how close to the sand a swimmer may
-  ride, rock colliders matching the drawn ellipse (including a rotated rock and
-  a carved prop), riding over a boulder without being pushed back and without a
-  jolt, climbing a steep face and handing over to the glide, a cliff still being
-  a cliff for a swimmer, a crawler walking up and over both a rock and a wall,
-  a plant climbed head-on and gone round when clipped, camera reach, and the
-  radar's reading of height.
+  ride, rock colliders matching the drawn silhouette (including a rotated rock
+  and a carved prop that is twice as long as it is wide), riding over a boulder
+  without being pushed back and without a jolt, climbing a steep face and
+  handing over to the glide, a cliff still being a cliff for a swimmer, a
+  crawler walking up and over both a rock and a wall, a plant climbed head-on,
+  gone round when clipped and passed at the floor when it stands on a stalk,
+  camera reach, and the radar's reading of height.
 - `tools/world-test.ts`: the shore is a wall and swimmable beyond; all nine
   biomes occur with the bands in the right places; chunks are deterministic;
   a player sprinting out to sea for 90 s has chunks, ecosystem and giants
