@@ -13,7 +13,7 @@ All 21 creatures have their own models, LODs, animations, anchors and portraits 
 18 remain clearly labelled previews. Six user-reference total reworks take priority:
 Titanichthys, Doryaspis, Gemuendina, Coccosteus, Bothriolepis and Stethacanthus.
 Complete each rework before its eye/general quality audit. Preserve existing source backups.
-See `docs/devonian/refinement-queue.md` and the enforced `tools/devonian/pending-refinements.json`.
+See `docs/devonian/refinement-queue.md` and the enforced `src/content/devonian/pending-refinements.json`.
 
 ## 2. Initial scenery and supporting images delivered; refinement remains
 

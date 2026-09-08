@@ -1,5 +1,5 @@
 import { CREATURES } from '../sim/creatures';
-import { CAMBRIAN_MODEL_STATUS } from '../content/cambrian/model-status';
+import { CAMBRIAN_MODEL_NOTES, CAMBRIAN_MODEL_STATUS } from '../content/cambrian/model-status';
 import type { CambrianCreatureId } from '../content/cambrian/ids';
 import { SCHEMES as CAMBRIAN_SCHEMES, CREATURE_SCHEMES as CAMBRIAN_DEFAULTS } from '../content/cambrian/palettes';
 import { SCHEMES as DEVONIAN_SCHEMES, CREATURE_SCHEMES as DEVONIAN_DEFAULTS } from '../content/devonian/palettes';
@@ -7,6 +7,10 @@ import type { Scheme } from '../shared/palettes';
 import { assetPaths } from '../content/asset-paths';
 import { DEVONIAN_SPECIMENS } from '../content/devonian/specimens';
 import { DEVONIAN_CREATURES } from '../content/devonian/creatures';
+import devonianPending from '../content/devonian/pending-refinements.json';
+
+/** Both eras keep one queue of what is outstanding per model; the viewer shows its reason. */
+const DEVONIAN_MODEL_NOTES: Record<string, string> = Object.fromEntries(devonianPending.map((p) => [p.id, p.reason]));
 
 export type CollectionId = 'cambrian' | 'devonian' | 'devonian-props';
 export interface ViewerSpecimen {
@@ -22,6 +26,8 @@ export interface ViewerSpecimen {
   provenance: string;
   description: string;
   modelStatus?: 'preview' | 'final';
+  /** What remains for a preview model — the badge shows it on hover. */
+  modelNote?: string;
   model: string;
   lod?: string;
   image?: string;
@@ -40,7 +46,7 @@ export const SPECIMENS: readonly ViewerSpecimen[] = [
     key: `cambrian:${c.id}`, id: c.id, collection: 'cambrian' as const,
     name: c.name, species: c.species, kind: c.kind, kindNote: c.kindNote, role: `${c.ground ? 'SEAFLOOR' : 'SWIMMER'} · ${c.role}`,
     provenance: c.provenance ?? 'Burgess Shale', description: '',
-    modelStatus: CAMBRIAN_MODEL_STATUS[c.id as CambrianCreatureId],
+    modelStatus: CAMBRIAN_MODEL_STATUS[c.id as CambrianCreatureId], modelNote: CAMBRIAN_MODEL_NOTES[c.id as CambrianCreatureId],
     model: assetPaths.model(c.id), lod: assetPaths.model(c.id, 1), displayLength: c.adultLength,
     looping: ['Idle', 'Swim', 'Crawl', 'Guard', 'Eat', 'Moult', ...(c.abilityLoop ? ['Ability'] : [])],
   })),
@@ -51,7 +57,7 @@ export const SPECIMENS: readonly ViewerSpecimen[] = [
     name: c.name, species: c.species, kind: DEVONIAN_KIND.get(c.id)?.kind, kindNote: DEVONIAN_KIND.get(c.id)?.kindNote,
     role: c.category === 'prop' ? 'DEVONIAN · SCENERY' : 'DEVONIAN · SPECIMEN',
     provenance: c.provenance, description: c.description,
-    modelStatus: c.modelStatus, model: c.model, lod: c.lod, image: c.image, displayLength: 4,
+    modelStatus: c.modelStatus, modelNote: DEVONIAN_MODEL_NOTES[c.id], model: c.model, lod: c.lod, image: c.image, displayLength: 4,
     lengthMeters: c.lengthMeters, looping: c.looping,
   })),
 ];

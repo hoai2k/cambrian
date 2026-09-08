@@ -3,10 +3,10 @@ import fs from 'node:fs';
 import { build } from 'esbuild';
 
 const result = await build({
-  stdin: { contents: "export * from './src/content'; export * from './src/content/era'; export * from './src/content/asset-paths';", resolveDir: process.cwd() },
+  stdin: { contents: "export * from './src/content'; export * from './src/content/era'; export * from './src/content/asset-paths'; export { CAMBRIAN } from './src/content/cambrian'; export { DEVONIAN } from './src/content/devonian';", resolveDir: process.cwd() },
   bundle: true, platform: 'node', format: 'esm', write: false,
 });
-const { ACTIVE_ERA: era, defineEra, createAssetPaths } = await import(`data:text/javascript;base64,${Buffer.from(result.outputFiles[0].text).toString('base64')}`);
+const { ACTIVE_ERA: era, defineEra, createAssetPaths, CAMBRIAN, DEVONIAN } = await import(`data:text/javascript;base64,${Buffer.from(result.outputFiles[0].text).toString('base64')}`);
 assert.equal(era.id, 'cambrian');
 assert.equal(era.creatures.length, 21);
 assert.equal(era.defaults.player, 'anomalocaris');
@@ -45,4 +45,25 @@ for (const c of era.creatures) {
   assert.ok(c.kind && c.kind.length <= 18, `${c.id} needs a short everyday group (got ${c.kind ?? 'none'})`);
   assert.ok(c.kindNote && c.kindNote.length > 40, `${c.id}'s group needs a sentence explaining it`);
 }
-console.log('PASS: era validation, all 21 model/portrait paths and byte sizes, group labels, and independent future asset namespaces');
+// A preview badge has to say what it is waiting for. Both eras derive `modelStatus` and
+// `modelNotes` from one pending-refinements queue, so this checks the derivation held: every
+// preview carries a reason, every reason belongs to a preview, and no reason is a stub. Without
+// it a model could sit flagged for weeks with nothing anywhere saying why — which is exactly what
+// happened to eleven Cambrian animals.
+for (const { name, era: e } of [{ name: 'Cambrian', era: CAMBRIAN }, { name: 'Devonian', era: DEVONIAN }]) {
+  const status = e.assets.modelStatus ?? {};
+  const notes = e.assets.modelNotes ?? {};
+  const previews = Object.entries(status).filter(([, v]) => v === 'preview').map(([id]) => id);
+  assert.ok(previews.length, `${name}: expected some preview models`);
+  for (const id of previews) {
+    const note = notes[id];
+    assert.ok(note, `${name}/${id} is a preview model with no note saying what remains`);
+    assert.ok(note.length > 60, `${name}/${id}'s note is too short to explain anything: "${note}"`);
+  }
+  for (const id of Object.keys(notes)) {
+    assert.equal(status[id], 'preview', `${name}/${id} has a "what remains" note but is not a preview`);
+    assert.ok(e.creatures.some((c) => c.id === id), `${name}/${id} has a note but is not on the roster`);
+  }
+}
+
+console.log('PASS: era validation, all 21 model/portrait paths and byte sizes, group labels, preview-model reasons, and independent future asset namespaces');
