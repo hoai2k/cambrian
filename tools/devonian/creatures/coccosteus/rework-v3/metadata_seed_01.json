@@ -1,0 +1,53 @@
+{
+  "id": "coccosteus",
+  "name": "Coccosteus",
+  "species": "Coccosteus cuspidatus",
+  "provenance": "Middle Devonian, Scotland",
+  "description": "Compact arthrodire with sculpted cranial and thoracic plates, a coherent articulated oral passage, fine dermal pigment, a short flexible posterior, anterior pelvic fins and a sharply heterocercal tail.",
+  "lengthMeters": 0.4,
+  "modelLength": 4.634553670883179,
+  "locomotion": "Swim",
+  "clips": [
+    "Ability",
+    "Attack",
+    "Bite",
+    "Death",
+    "Dive",
+    "Dodge",
+    "Eat",
+    "Growth",
+    "Guard",
+    "Heavy",
+    "Hit",
+    "Idle",
+    "Parry",
+    "Rise",
+    "Stagger",
+    "Swim",
+    "TurnLeft",
+    "TurnRight"
+  ],
+  "looping": [
+    "Idle",
+    "Swim",
+    "Guard",
+    "Eat"
+  ],
+  "anchors": [
+    "anchor_mouth",
+    "anchor_mouth_inside",
+    "anchor_attack_primary"
+  ],
+  "sources": [
+    "https://www.cambridge.org/core/journals/earth-and-environmental-science-transactions-of-royal-society-of-edinburgh/article/abs/ixthe-placoderm-fish-coccosteus-cuspidatus-miller-ex-agassiz-from-the-middle-old-red-sandstone-of-scotland-part-i-descriptive-morphology/97AA5B04F2B9E00AA1FA5FC3D41627C7",
+    "https://palaeo-electronica.org/content/2024/5307-dunkleosteus-reconstruction",
+    "https://palaeo-electronica.org/content/images/1343/figure7.jpg"
+  ],
+  "notes": [
+    "Original rework uses the accepted clay04 continuous surface and material04 dermal finish; complete source and prior models preserved.",
+    "Cranial, jaw and body LBS ownership reproduces the validated gape; a six-stage tail and segmented paired fins provide bespoke motion.",
+    "Pigmentation, soft-tissue thickness, fin compliance and behaviour are artistic reconstruction. Action names are compatibility gestures.",
+    "Full glTF embeds baked albedo, roughness and normal fields; texture-free LOD uses explicitly sampled linear pigment with verified export correspondence.",
+    "Candidate only: full/LOD exported appearance, playback, oral and eye audits and general quality review must pass before public replacement."
+  ]
+}

@@ -1,0 +1,105 @@
+{
+  "renderEvidenceSHA256": "88f2539b7b8e134f4e4a9d7e49f8c805fadf43a4ba070d77ac33edca8bb5b043",
+  "inspectedImages": [
+    {
+      "path": "/Users/hoai/Documents/Stuff/Generations/cambrian/local/devonian-authoring/dunkleosteus/face-v4/candidate03/exports/review-full/rest-side.png",
+      "sha256": "c0e3afcb0beba575372c4dc9d39f424d388ecfef8bf8a98f6d1a3a9959a7917d",
+      "assetSHA256": "0ace6026c6b46d9d560528677ffdaf31769d74bea51065b884214c8b1037950d"
+    },
+    {
+      "path": "/Users/hoai/Documents/Stuff/Generations/cambrian/local/devonian-authoring/dunkleosteus/face-v4/candidate03/exports/review-full/rest-oblique.png",
+      "sha256": "2fbe8e77d111c880e41af21cede293e3b0d1407af29d0ac22a43700ca10bc5c3",
+      "assetSHA256": "0ace6026c6b46d9d560528677ffdaf31769d74bea51065b884214c8b1037950d"
+    },
+    {
+      "path": "/Users/hoai/Documents/Stuff/Generations/cambrian/local/devonian-authoring/dunkleosteus/face-v4/candidate03/exports/review-full/rest-front.png",
+      "sha256": "1efcf5254636107781f26621849c19b172386088b6f1d6c8ce7735ab5a69e031",
+      "assetSHA256": "0ace6026c6b46d9d560528677ffdaf31769d74bea51065b884214c8b1037950d"
+    },
+    {
+      "path": "/Users/hoai/Documents/Stuff/Generations/cambrian/local/devonian-authoring/dunkleosteus/face-v4/candidate03/exports/review-full/max-oblique.png",
+      "sha256": "2112c89a729e3bf9593b5ef3e2371ca8672bd484fd535e9e660ea3784a8f2dd5",
+      "assetSHA256": "0ace6026c6b46d9d560528677ffdaf31769d74bea51065b884214c8b1037950d"
+    },
+    {
+      "path": "/Users/hoai/Documents/Stuff/Generations/cambrian/local/devonian-authoring/dunkleosteus/face-v4/candidate03/exports/review-full/max-front.png",
+      "sha256": "41b1221b1ad9e4f96cebfb4d4a4f9559b3ae248ae857c7cf145eec632df4c8d5",
+      "assetSHA256": "0ace6026c6b46d9d560528677ffdaf31769d74bea51065b884214c8b1037950d"
+    },
+    {
+      "path": "/Users/hoai/Documents/Stuff/Generations/cambrian/local/devonian-authoring/dunkleosteus/face-v4/candidate03/exports/review-full/mid-bite-side.png",
+      "sha256": "b709bec14e3ed66264908b859410b6ecf7cd664749f9db5d4ea7ede5eff6df1b",
+      "assetSHA256": "0ace6026c6b46d9d560528677ffdaf31769d74bea51065b884214c8b1037950d"
+    },
+    {
+      "path": "/Users/hoai/Documents/Stuff/Generations/cambrian/local/devonian-authoring/dunkleosteus/face-v4/candidate03/exports/review-full/eat-oblique.png",
+      "sha256": "09839a2dfbda41ce5b18a957ab2d186b7324ba6d1b982fecbebb27e20a8a5262",
+      "assetSHA256": "0ace6026c6b46d9d560528677ffdaf31769d74bea51065b884214c8b1037950d"
+    },
+    {
+      "path": "/Users/hoai/Documents/Stuff/Generations/cambrian/local/devonian-authoring/dunkleosteus/face-v4/candidate03/exports/review-full/recovery-oblique.png",
+      "sha256": "429b7e38fc6a04056c137f862221ecfe2f811a9cf08487f377e31b9931f04f57",
+      "assetSHA256": "0ace6026c6b46d9d560528677ffdaf31769d74bea51065b884214c8b1037950d"
+    },
+    {
+      "path": "/Users/hoai/Documents/Stuff/Generations/cambrian/local/devonian-authoring/dunkleosteus/face-v4/candidate03/exports/dunkleosteus.png",
+      "sha256": "397b2d5b03a95008716d2d6b2ae7fcc97622e124d603e3a52aae82ab54ae143e",
+      "assetSHA256": "0ace6026c6b46d9d560528677ffdaf31769d74bea51065b884214c8b1037950d"
+    },
+    {
+      "path": "/Users/hoai/Documents/Stuff/Generations/cambrian/local/devonian-authoring/dunkleosteus/face-v4/candidate03/exports/dunkleosteus.select.png",
+      "sha256": "2539f1eca1c5d536f78794ab8afb3504b0f8fdc3d54303bef19f2563515eecf0",
+      "assetSHA256": "0ace6026c6b46d9d560528677ffdaf31769d74bea51065b884214c8b1037950d"
+    },
+    {
+      "path": "/Users/hoai/Documents/Stuff/Generations/cambrian/local/devonian-authoring/dunkleosteus/face-v4/candidate03/exports/dunkleosteus.card.png",
+      "sha256": "893cbe4f86f249b126c1fed0e0837c14bbaed2ec10fac5c85758411974eb199c",
+      "assetSHA256": "0ace6026c6b46d9d560528677ffdaf31769d74bea51065b884214c8b1037950d"
+    },
+    {
+      "path": "/Users/hoai/Documents/Stuff/Generations/cambrian/local/devonian-authoring/dunkleosteus/face-v4/candidate03/exports/dunkleosteus.thumb.png",
+      "sha256": "c141be280dfb5e3d7e6a9f6e095a79c75ca7204129c45d6df3ff0e48f3b0e04d",
+      "assetSHA256": "0ace6026c6b46d9d560528677ffdaf31769d74bea51065b884214c8b1037950d"
+    },
+    {
+      "path": "/Users/hoai/Documents/Stuff/Generations/cambrian/local/devonian-authoring/dunkleosteus/face-v4/candidate03/exports/review-lod/rest-side.png",
+      "sha256": "50b3ca818910ef215ee2bedd247a3a5fdb9b35db01495ae8fa2bb7c3ec83f6e8",
+      "assetSHA256": "d34ec130e45a4540c89aade61e8ae3cc1c48f25fbf337e67296416b0bec0b4ea"
+    },
+    {
+      "path": "/Users/hoai/Documents/Stuff/Generations/cambrian/local/devonian-authoring/dunkleosteus/face-v4/candidate03/exports/review-lod/rest-oblique.png",
+      "sha256": "546bb6a3e3646512448f943b6024dcb8ae0f5ca5a8fa6b0cfe2626a68bd6d378",
+      "assetSHA256": "d34ec130e45a4540c89aade61e8ae3cc1c48f25fbf337e67296416b0bec0b4ea"
+    },
+    {
+      "path": "/Users/hoai/Documents/Stuff/Generations/cambrian/local/devonian-authoring/dunkleosteus/face-v4/candidate03/exports/review-lod/rest-front.png",
+      "sha256": "c17483f86ffa4ac3f8cfee5df612664d1b38d7b7b4d1ea1c9caf7247c9a9df70",
+      "assetSHA256": "d34ec130e45a4540c89aade61e8ae3cc1c48f25fbf337e67296416b0bec0b4ea"
+    },
+    {
+      "path": "/Users/hoai/Documents/Stuff/Generations/cambrian/local/devonian-authoring/dunkleosteus/face-v4/candidate03/exports/review-lod/max-oblique.png",
+      "sha256": "c7ceac682fa4a13b3250109fe01ebbf3a8f09e3af94a43a434bb7442045bb819",
+      "assetSHA256": "d34ec130e45a4540c89aade61e8ae3cc1c48f25fbf337e67296416b0bec0b4ea"
+    },
+    {
+      "path": "/Users/hoai/Documents/Stuff/Generations/cambrian/local/devonian-authoring/dunkleosteus/face-v4/candidate03/exports/review-lod/max-front.png",
+      "sha256": "c32172d8f5cebb406e3e7353bdb992830938af4abdd1a1d2ada5fd85beeac6f4",
+      "assetSHA256": "d34ec130e45a4540c89aade61e8ae3cc1c48f25fbf337e67296416b0bec0b4ea"
+    },
+    {
+      "path": "/Users/hoai/Documents/Stuff/Generations/cambrian/local/devonian-authoring/dunkleosteus/face-v4/candidate03/exports/review-lod/mid-bite-side.png",
+      "sha256": "fcd768a4a2e9015379013619d9aa8ad61dbc36ad842d7b0190993f6248cc3c2d",
+      "assetSHA256": "d34ec130e45a4540c89aade61e8ae3cc1c48f25fbf337e67296416b0bec0b4ea"
+    },
+    {
+      "path": "/Users/hoai/Documents/Stuff/Generations/cambrian/local/devonian-authoring/dunkleosteus/face-v4/candidate03/exports/review-lod/eat-oblique.png",
+      "sha256": "55c03cae2735de8caa09f8abeb864e1a7995d0819fc4300b2bacc075304bce13",
+      "assetSHA256": "d34ec130e45a4540c89aade61e8ae3cc1c48f25fbf337e67296416b0bec0b4ea"
+    },
+    {
+      "path": "/Users/hoai/Documents/Stuff/Generations/cambrian/local/devonian-authoring/dunkleosteus/face-v4/candidate03/exports/review-lod/recovery-oblique.png",
+      "sha256": "d47a8d6c8d117a3535fc6f55f20e7d8271a01617172a2e667651926963f2e1ad",
+      "assetSHA256": "d34ec130e45a4540c89aade61e8ae3cc1c48f25fbf337e67296416b0bec0b4ea"
+    }
+  ]
+}

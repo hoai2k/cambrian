@@ -117,12 +117,12 @@
     "id": "gemuendina",
     "status": "pending",
     "scope": "individual-refinement",
-    "reason": "8 September user reopens V3 for focused face correction: mouth at the leading front, bulging eyes just above the mouth; dorsal reference motifs are markings, not eyes. Preserve accepted body/materials and backup. Reconcile reconstruction evidence explicitly, then rerun affected eye/oral/motion checks."
+    "reason": "Corrected terminal snout and close-set anterior eyes delivered as candidate05 preview: front upper/lower lips form the leading body edge;18full/LODactions and new eye/oral checks pass. Broader final art, small LOD chin/cheek creases, pigmentation polish and controller playtest remain."
   },
   {
     "id": "dunkleosteus",
     "status": "pending",
     "scope": "individual-refinement",
-    "reason": "8 September additional face reference: sculpt cranial silhouette, cheek/brow plates and sharp shaped gnathal cutting plates. Preserve working articulated jaws and oral interior, prior final backup; review closing clearance, action poses and eyes after face change."
+    "reason": "Focused V4 head and sharp sculpted gnathals accepted with working jaws/interior,18full/LODclips and173pose zero-contact checks. Broader preview remains: reduced-model color-space/material polish (paler than full) and controller/art review. Preserved V2 and all face studies."
   }
 ]

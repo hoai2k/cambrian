@@ -215,3 +215,300 @@
 - Remaining art concerns: ink/sticker boundaries, false piping, weak grain, uniform mustard or insufficient regional reading. Actual material gate required before rig/motions/bake/runtime audits.
 - Resume: parent assigns Terra medium, HANDOFF-MATERIAL-03.md prepare then seven renders, CPU 2 and --python-exit-code 1, 20 + 25 minute group budget. Return actual PNGs/hashes to Astra.
 - No Blender/public/shared/Git work by Astra.
+
+## 2026-09-08 13:09 UTC — material-03 actual review / material-04 frozen
+
+- Owner/model: Astra high. Status: candidate-ready source; material-04 NOT prepared/rendered/approved.
+- Independently inspected the user Coccosteus.jpg and all seven actual material-03 PNGs. Verified
+  every old manifest image hash/byte count. Retain plate legibility, accepted geometry, oral
+  passage, posterior bars and rays; reject the uniformly smooth ochre finish. Detailed actual
+  view-by-view verdict and criteria: review-material03-plan-material04.md. No rig gate passed.
+- Actual evidence: material-03 blend `e936eaf3284147d8906c9319652670138f9646436d10b229807e0e9251682a00`;
+  report `894dc335cb2c7d50fdf8a5ca661a5e0bdc5e0fd1f9ab69235a403c7e45ec76ca`;
+  seven-image manifest `73b8fc122d1f8c240e31912f256dec1ed43f39e18524e77c343e4ac348ea34ae`.
+- Decision: small procedural pigment/roughness splice into copied actual material-03 shader.
+  Preserve all existing nodes; replace exactly two links before the old suture responses.
+  Add fine domain-warped dark pigment, smaller breakup, independent roughness; reduce both near
+  anatomy-defined exclusions/sutures. No broad colour clouds, bright dots, new maps or bump edits.
+  Original colour inference, no photo pixels/ImageGen needed. Geometry and oral topology exact.
+- Frozen inputs (absolute path + SHA-256):
+  - `/Users/hoai/Documents/Stuff/Generations/cambrian/local/expansion-repo/tools/devonian/creatures/coccosteus/rework-v3/materials-04.py`: `cb1b0338f825a014aacfebfb21b3eeb8ae5392a2d584b9e92ad934886290e102`.
+  - `/Users/hoai/Documents/Stuff/Generations/cambrian/local/expansion-repo/tools/devonian/creatures/coccosteus/rework-v3/material-views-04.json`: `6899a98892eac311e79cab2c991ae3a22f6d5e59e6c571015e5e2d09b29303da`.
+  - `/Users/hoai/Documents/Stuff/Generations/cambrian/local/expansion-repo/tools/devonian/creatures/coccosteus/rework-v3/materials-03.py`: `43a7045aa0e880615a413335ff99eea04f04f13cb3ecb7deaad4408eda846896`.
+  - `/Users/hoai/Documents/Stuff/Generations/cambrian/local/devonian-authoring/coccosteus/rework-v3/material-03/coccosteus-material-03.blend`: `e936eaf3284147d8906c9319652670138f9646436d10b229807e0e9251682a00`.
+  - `/Users/hoai/Documents/Stuff/Generations/cambrian/local/devonian-authoring/coccosteus/rework-v3/material-03/material-report.json`: `894dc335cb2c7d50fdf8a5ca661a5e0bdc5e0fd1f9ab69235a403c7e45ec76ca`.
+- Source-only PASS: Python AST; JSON and identical seven cameras/matched close pair; actual old
+  render evidence hashes; analytical added colour multiplier bounds .6976515–1.037252 and
+  roughness delta bounds +/- .08. No bpy import/Blender/API/visual material-04 pass claimed.
+  Record `/Users/hoai/Documents/Stuff/Generations/cambrian/local/devonian-authoring/coccosteus/rework-v3/material-04-static-report.json`.
+- Expected runtime invariants: same complete mesh/shape-key/face/weight/transform digest and oral
+  digest; ten existing image buffers, seven pigment/plate attributes and other material slots
+  unchanged; exact two-link shader splice and original normal/posterior/suture branches retained.
+- Execution: parent assigns Terra medium, HANDOFF-MATERIAL-04.md Group 1 prepare then Group 2
+  render; exact absolute commands supplied there. CWD `/Users/hoai/Documents/Stuff/Generations/cambrian/local/expansion-repo`.
+  CPU Cycles 2 threads, --python-exit-code 1, seven unchanged 1280x960/48-sample views.
+- Outputs planned only under `/Users/hoai/Documents/Stuff/Generations/cambrian/local/devonian-authoring/coccosteus/rework-v3/material-04`:
+  new blend/report; seven actual PNGs/manifest/logs. None yet. No prior output/source overwritten.
+- Resource: one bounded source/review pass complete. Terra allowance 20 minutes prepare + 25
+  render, one state entry per group. Stop on hash/API/digest/output error or art decision.
+- Resume: verify the five frozen hashes, then execute HANDOFF-MATERIAL-04.md Group 1 exactly;
+  continue Group 2 only on expected success. Return actual images and blend/report/manifest
+  hashes for Astra acceptance. Rig, motions, baking, GLB, final eye/oral/general audits and
+  production integration remain later gates. No Blender/public/shared/Git work by this author.
+
+## 2026-09-08 — material-04 actual gate / production authoring underway
+
+- Owner/model: Astra high. Independently inspected all seven material-04 images and user reference;
+  verified every evidence hash and byte count. ACCEPT surface for production rig/bake candidate
+  authoring only. review-material04-gate.md records actual verdict; final rework remains preview.
+- Accepted blend `2bd0d3da5ed2ad73801e200325b51f3c776989e027d01020e196838f10e633c9`,
+  report `d01c4be81cc558584fbf2bfe18508fa8b32ef1c16f6e5cbb7e55bf68d1becfad`,
+  manifest `a7165aa26944f98deac59ad760914ed79699f86e7bc8621f3215ba2436639481`.
+- Small irregular dark dermal pigment is visible while plate hierarchy leads. Front highlights,
+  side/oblique/dorsal, oral passage, posterior bars/rays hold. Neutral clay retains visible relief;
+  no byte/pixel identity claimed. All geometry/oral/maps/plate-attribute equalities PASS.
+- Next source-only phase: dedicated PBR bake, bespoke real skull/jaw rig preserving accepted LBS,
+  18 differentiated actions, full/LOD with explicit linear pigment transfer checks, anchors and
+  actual exported four portraits/review images. Earlier candidates remain immutable.
+- No Blender/public/shared/Git work by author. Root independently reviews this same gate.
+
+## 2026-09-08 — production candidate-01 source frozen
+
+- Owner/model: Astra high. Status: candidate-ready SOURCE ONLY; no bake/rig/export/render executed.
+  Material-04 is accepted for this candidate phase by author and root; final rework remains preview.
+- Frozen author choices: actual material04 PBR bake, 20-bone compact custom rig, 18 distinct sampled
+  actions, three skeletal mouth/swallow/contact anchors, full PBR GLB plus texture-free reduced
+  GLB, and four portraits/17 review images from actual imported GLBs. No geometry redesign.
+- Oral ownership retained exactly: same skull/jaw/body weights, shared lip/collar/lumen,
+  real jaw/skull pivots and .34/-.041 rad full-gape rotations. Source rotational-LBS checks
+  passed five gapes, 465 centreline, 480 wall-containment and 200 vertical sections. The candidate
+  additionally requires actual Blender armature-vs-GapeStudy agreement before action generation.
+- Surface bake uses original shader fields, dedicated UVs, 4096 body albedo/2048 normal/1024
+  roughness plus per-fin/per-eye maps. Body/underside/oral roles share exact field values.
+  Explicit independently decoded PNG sampling checks orientation/linear colour conversion.
+- LOD decision incorporates measured Titan decimation failure (-.042 red overshoot): reduce
+  neutral-white export copies, then sample final LOD UVs with positive linear-light filter.
+  Do not run authored pigment through decimation; no negative-colour clamp or weakened pigment
+  gate. Record neutral pre/post and final sampled statistics; verify actual exported COLOR_0
+  by exact POSITION+UV correspondence. Other creature utility is not claimed fully proven.
+- Runtime sources under `/Users/hoai/Documents/Stuff/Generations/cambrian/local/expansion-repo/tools/devonian/creatures/coccosteus/rework-v3`:
+  production_common_01.py, bake_01.py, atlas_pigment_01.py, rig_actions_01.py, candidate_01.py,
+  export_patch_01.py, render_candidate_01.py, check_candidate_01.py, metadata_seed_01.json.
+  Static checker: check_production_source_01.py. Existing local utility conventions were reused;
+  Coccosteus proportions/weights/motion are authored for this specimen. Prior files are immutable.
+- Frozen manifest `/Users/hoai/Documents/Stuff/Generations/cambrian/local/expansion-repo/tools/devonian/creatures/coccosteus/rework-v3/frozen-candidate-01.json` SHA `136479902de636c03a4807bc755bef638f67aaebc20568012e4c15328df1439d`
+  binds 15 absolute input paths with bytes/SHA (runtime/static sources, prior oral checker/clay04,
+  and accepted material04 blend/report/render-manifest). All input and handoff hashes rechecked.
+- Exact commands, outputs, stop criteria: `/Users/hoai/Documents/Stuff/Generations/cambrian/local/expansion-repo/tools/devonian/creatures/coccosteus/rework-v3/HANDOFF-CANDIDATE-01.md`
+  SHA `dc762ce297a01350c34849d474bbb57716ea692367507184c6720988894b6ab0`. CWD `/Users/hoai/Documents/Stuff/Generations/cambrian/local/expansion-repo`.
+- SOURCE-ONLY PASS: AST/JSON, 20 bones, 18 distinct dynamic signatures at 101 phases, stable root,
+  no scale authored, closed loops/recoveries and held death; 300 normalized axial weights;
+  independent PNG comparison, all five PNG filter modes, bilinear/linear conversion and positive
+  LOD-filter bounds. No bpy import or Blender execution. Static evidence:
+  `/Users/hoai/Documents/Stuff/Generations/cambrian/local/devonian-authoring/coccosteus/rework-v3/production-01-static-report.json` SHA `0482bec92d389dfc086808931a80fa64dbf6b5c6900c7da335ce11919cc4fbb6`.
+- Planned outputs only `/Users/hoai/Documents/Stuff/Generations/cambrian/local/devonian-authoring/coccosteus/rework-v3/baked-01` (27 PNG maps/blend/report), then
+  `/Users/hoai/Documents/Stuff/Generations/cambrian/local/devonian-authoring/coccosteus/rework-v3/candidate-01` (production blend, full/LOD GLB, metadata, reports,
+  four portraits, 17 actual exported review views/manifests). Both directories are absent now.
+- Resource: bounded authoring complete. Parent assigns Terra medium; five groups budgeted at
+  40/30/5/20/35 minutes (130 total), CPU2 Blender, --python-exit-code 1. One state entry per group.
+- Stop: errors, changed inputs, failed bake/pigment/geometry/gape/GLB check, unexpected output or
+  art decision return to Astra with exact evidence. No source/threshold/camera fixes by executor.
+- Resume: verify manifest SHA and all 15 input hashes, then HANDOFF-CANDIDATE-01.md Group 1 bake.
+  Continue only after expected group success and recorded generated hashes. Return all actual
+  exported images to Astra. Browser playback, final eye/oral/general audits, palette/packaging/
+  public integration are later gates. No Blender/public/shared/Git work by this author.
+
+## 2026-09-08 — candidate-02 all-actions LOD amendment frozen
+
+- Owner/model: Astra high. Status: candidate-ready source-only amendment, not executed.
+- Parent clarified that all 18 required dynamic game actions must remain meaningful at both
+  detail levels. Original candidate-01 sources, frozen manifest and handoff remain byte-for-byte
+  unchanged. New version removes LOD clip pruning; no geometry/material/rig/weight/motion edits.
+- New sources: production_common_02.py, candidate_02.py, export_patch_02.py,
+  check_candidate_02.py, render_candidate_02.py. Full and LOD now require all 18 clip names,
+  durations and dynamic action checks; jaw/skull checks apply to Bite/Eat/Ability in both.
+  Added actual LOD Attack/Eat views (19 total review images) to expose distant-action regressions.
+- Unchanged bake_01.py / baked-01 remains usable with the exact original frozen dependencies.
+  Verified versioned common helper accepts an original-source bake report without rewriting it.
+  If bake already succeeded, verify its recorded hashes and skip Group 1; do not rerun it.
+- Manifest `/Users/hoai/Documents/Stuff/Generations/cambrian/local/expansion-repo/tools/devonian/creatures/coccosteus/rework-v3/frozen-candidate-02.json` SHA `a2cf3f2ff14f2124032882b885d46db5c05e1a3c5a47f1aef5f5ac9d71772bfd`
+  binds 22 absolute inputs: all original 15, five versioned sources and both original frozen
+  documents. All verified. Original manifest remains `136479902de636c03a4807bc755bef638f67aaebc20568012e4c15328df1439d`.
+- Exact handoff `/Users/hoai/Documents/Stuff/Generations/cambrian/local/expansion-repo/tools/devonian/creatures/coccosteus/rework-v3/HANDOFF-CANDIDATE-02.md` SHA `1f961fd25bcb96425928bc52c15e86d13ff8e55aa392821841451ba0fb4e4caa`.
+  New output directory `/Users/hoai/Documents/Stuff/Generations/cambrian/local/devonian-authoring/coccosteus/rework-v3/candidate-02` is absent. Candidate-01 is not reused.
+- Static PASS: new Python AST; pure minimal-GLB policy test preserves all 18 ordered actions for
+  both full/LOD branches; complete frozen-input validation and original bake-report compatibility.
+  Record `/Users/hoai/Documents/Stuff/Generations/cambrian/local/devonian-authoring/coccosteus/rework-v3/production-02-static-report.json` SHA `c72e967285bd56ead248af030e374e712f0ece54a660bd8ee1bae931df06a5b6`.
+  No Blender/API/export/render execution by author. Original production static checks still apply
+  to the unchanged rig, anatomy, atlas sampler and motion source.
+- Resume: use HANDOFF-CANDIDATE-02.md. Group 1 is unchanged bake if not completed; then candidate_02,
+  structural checker02, renderer02 portraits/review. CPU2, prior group budgets unchanged; all output
+  hashes and actual images still require Astra review. No final approval/public/shared/Git edits.
+
+## 2026-09-08 — actual candidate02 hold; shading diagnostic frozen
+
+- Owner Astra high. Independently inspected all four actual portraits and all 19 pose/LOD views.
+  Verified all 23 image hashes against complete manifests. Parent independently agrees new white
+  cranial/thoracic suture quads/triangles are absent in accepted material04. Actual candidate02
+  execution/structural PASS and all18/all18 actions do not override this appearance HOLD.
+- Detailed actual verdict: review-candidate02-actual-01.md. Full new seam tiles and secondary oral
+  lip/corner pixels remain unresolved. LOD bars/rays are substantially weakened and not accepted.
+- Pure actual-GLB atlas audit ran via inspect_atlas_01.py without Blender: 404 nearest triangle
+  centroids sample roughness below .2 including zero; exterior median UV area .616 roughness pixels.
+  No white albedo samples; exterior normal blue >=.980, with 13 suspect oral samples. Source exterior
+  roughness ~.46–.79 makes empty atlas sampling a concrete suspect; causal render proof pending.
+  Immutable authoring result candidate-02-atlas-audit-01.json SHA
+  9b6859c923e777ee519a865823ad66063b2977d57f98b5f99986e692b2c8365f.
+- Frozen new diagnostic_shading_01.py SHA
+  57d934d7fa63d13f66b4b0f2c84775251a714e12b9a8ef67e73e0f307672c34d.
+  frozen-diagnostic-shading-01.json SHA
+  5e7212133be66854eaf517e46a4be88642ec9d7090760d40bbe1a55e84ba987f binds 14 inputs, all reverified.
+  Exact CPU2/20-minute handoff HANDOFF-DIAGNOSTIC-SHADING-01.md. Twelve actual images isolate normal,
+  roughness, albedo and pre-export bake vs accepted material at fixed close cameras. Destination
+  ../devonian-authoring/coccosteus/rework-v3/diagnostic-shading-01 is absent and exclusive.
+- Static AST and frozen hash PASS. No Blender executed by author. No original source, candidate,
+  bake, GLB, public/shared doc or Git edit. No production repair frozen until ablation evidence.
+- Resume: parent assigns Terra execution; return all 12 diagnostic images and complete result.json.
+  Astra/root identifies causal issue, authors smallest versioned UV/map repair, then rechecks actual
+  full/LOD finish and oral/eye evidence. Material04 anatomy/sutures remain accepted and immutable.
+
+## 2026-09-08 — actual shading cause confirmed; candidate03 repair frozen
+
+- Owner Astra high. Independently inspected all12 actual diagnostic images and verified hashes.
+  White/brown seam tiles persist without normals, disappear with fixed roughness, do not appear
+  in albedo, and already exist in baked01 before export. Accepted material04 remains clean.
+  Causal verdict: inadequate roughness coverage in fragmented smart-projected body atlas.
+  Exact visual review is review-diagnostic-shading-01.md. Candidate02 remains HOLD.
+- New body_uv_02.py creates two continuous padded exterior/oral strips from the exact immutable
+  clay04 ring topology, with ventral angular seam and per-face pole UVs. No geometry/weight/oral
+  topology change. bake_02.py rebakes original material04 fields; body roughness2048, normal2048,
+  albedo4096. No constant production roughness, pixel clamp/fill or added texture/noise.
+- Complete-strip plus bilinear-border bake coverage gates reject uncovered pixels and require
+  exterior roughness variation. New check_export_atlas_03.py independently verifies actual GLB
+  map pixel equality and coverage. Equality convention was also measured on all9 old actual
+  candidate02 body map uses: exact decoded equality PASS.
+- candidate_03.py preserves same20 bones/all18 full+LOD actions/anchors and deform checks. LOD
+  broad9-tap pigment filter removed; final UV samples after neutral decimation remain strict.
+  Body25%/eyes70% unchanged; fin retention rises24%->45% for ray sample density. Predicted ratio
+  .3223; actual marking fidelity still requires all23 final images.
+- Source-only PASS report ../devonian-authoring/coccosteus/rework-v3/production-03-static-report.json
+  SHA31b4f64fc1bab7e9982b792767428fa1cce48d53b410656be509f694dbf8c64c. Verified original22 inputs,
+  all12 diagnostic image hashes, AST, immutable48514 vertices/48640 faces,194304 UVloops, every
+  body roughness triangle>=32.77 pixels, alteredrole and singlemissingroughnesstexel rejection.
+- Frozen-candidate-03.json binds60 exact input paths/SHA/bytes; SHA
+  1f21e13cd943a74c9837c2951c4992edaa37b9043aa3bc3805e7c2f406412bf5. All reverified.
+  Exact HANDOFF-CANDIDATE-03.md defines CPU2 groups40/30/5/20/35 minutes (130 total): freshbake02,
+  buildcandidate03, structural+actualatlaschecks, fourportraits,19reviewimages. New baked-02 and
+  candidate-03 authoring destinations are absent/exclusive.
+- No Blender executed by author; no original source/candidate/bake/diagnostic/public/shared/Git
+  mutation. Only new versioned sources/review/handoff and this own state entry.
+- Resume: parent assigns Terra with frozen manifest+handoff; stop on any mismatch/failure, no
+  executor tuning. Author/root review actualall23 for clean seams, livingroughness, full/LOD
+  markings, oral lip/corner and eye appearance before acceptance. Runtime/finalaudits later.
+
+## 2026-09-08 — baked02 coverage stop preserved; bake03 recovery frozen
+
+- Parent/Terra actual group1 STOP: bake_02.py55 -> body_uv_02.py71, uncovered/invalid
+  albedo strip min0/max.5529412031. Only three00-fins maps in baked-02; candidate03 absent.
+  Original coverage gate worked. No failed body image was saved because check preceded save.
+  Exact missing pixel locations therefore remain unknown; scalar error is insufficient for
+  precise raster diagnosis. Preserved partial maps are bound by new freeze.
+- Bounded new bake_03.py retains unchanged UV/helper/thresholds and original material fields.
+  First saves paired bodyalbedo reproduction using inherited margin type/16, then rebakes
+  body with explicit EXTEND32. Fin/eye inherited/16 unchanged. Saves every bodymap and
+  coordinate/count/RGB diagnostic before unchanged coverage check, so failures retain evidence.
+  No manual pixel fill, constant production roughness, clamp or gate weakening.
+- Static radius bound <=14.94px at4096 and10.03px at2048 supports EXTEND32 without crossing
+  exterior/oral gap or wrap edge. This is a repair hypothesis pending actual paired bake;
+  inherited margin type and exact baseline zeros will be recorded. No runtime fix claimed.
+- check_bake_source_03.py PASS: original60 inputs, unchanged helperSHA, AST, saved-map-first,
+  radius/gap and partial-preservation checks. Report ../devonian-authoring/coccosteus/rework-v3/
+  bake-03-static-report.json SHA f45c6fad993916573fa7235b03418d782e216aa44a08ba3b08ce72ce612cd904.
+- Frozen-bake-03.json68inputs SHA a19d8f30d9b9d13b8560c84ef1a34823c2ae190f0080a543844ca7cfb9f15191.
+  bake_03.py SHA9d848be9199ded29481efcde061c9c1b9a53a945e93a37b9f94de47eec9bd812.
+  Exact new HANDOFF-BAKE-03.md: one parent-assigned CPU2group/40minute budget, exclusive new
+  baked-03 directory (absent). Expected27maps+blend/report+pairedbaselinePNG+4probes.
+- Stop on failed originalgate; preserve map/probe/log, no executor tuning. After success return
+  paired evidence to Astra/root; do NOT run candidate_03.py because it still points to failed
+  baked-02. Author will freeze minimal downstream version only after actual coverage accepted.
+- No Blender/heavy execution by author. All old sources/partialoutput/public/shared/Git preserved.
+
+## 2026-09-08 — actual bake03 coverage accepted; downstream candidate04 frozen
+
+- Owner Astra high. Inspected paired bodyalbedo +actualroughness/normal maps, fourprobes and
+  complete bake report. Verified27texture+6blend/diagnostic output hashes and prior68inputs.
+  Baseline ADJACENT_FACES16 reproduces1311 invalid pixels, all exterior tail-pole-border
+  x80..4016/y4012..4016 bottom-up4096 coords. EXTEND32 yields zero in bothrectangles. Interior
+  x100:3995/y1080:3995 byte-identical. Bodyalbedo min.1843137; exteriorrough .4588236..7882354;
+  oral authoredconstant .5411765. Exact paired cause/policy verdict review-bake03-actual.md.
+- Accept bounded bakecoverage for downstream stage, not final material/creature. New five
+  source copies production_common_04.py/candidate_04.py/render_candidate_04.py/check_candidate_04.py/
+  check_export_atlas_04.py change only version/path imports and input successfulbaked03. Same
+  candidate03 intended20bones/all18full+LODclips/anchors, ratios25%body70%eyes45%fins/directUV
+  pigment and all gates. Originalcandidate03/partialbaked02 remain immutable.
+- Actual baked03 report SHA fd63824840f5839198ea2c805a17193b34460d5fbafa2641da53594ed58b4545.
+  New static report ../devonian-authoring/coccosteus/rework-v3/production-04-static-report.json
+  SHA44a073d782e890d39a97b24aea43167ab21f6f236de9717b108eb9cc8a76ceed. AST/path-onlydifferences,
+  prior68inputs and33generatedbakefiles PASS. Newcommon verifies actualold-sourcebakereport.
+- Frozen-candidate-04.json111inputs SHA8c78e16bafb72c157f5bc54eebf1802c4d56dbbfca07ee2252680169c46a4d2e.
+  All reverified. Exact HANDOFF-CANDIDATE-04.md: no rebake, parentassignedCPU2 groups30/5/20/35
+  minutes (90total): build04, structural+actualmapchecks,4portraits,19pose/LODviews.
+  Exclusive newcandidate-04 output absent. Ready for root's next queue slot.
+- No Blender/public/shared/Git work by author. Actualcandidate04/23images/runtime stillpending.
+  Resume parentassignedexecution; stop onfailure, preserveevidence. Author/root inspect actual
+  cleanseams/livingfinish/LODmarkings/oraleye before finalacceptance.
+
+## 2026-09-08 — final bounded day review: full surface PASS, overall HOLD for LOD
+
+- Owner Astra high. Independently inspected all4actualcandidate04 portraits and19actualpose/LOD
+  PNGs; verified all23 hashes, complete manifests,111frozen inputs andcandidate output hashes.
+  Full PBR cranial/thoracic white/brown tiles are gone. Readableplates/finegrain/livingroughness/
+  posteriorbars/finrays retained. Full-surface boundedartgate PASS; no fullremodel/rebake needed.
+- OverallHOLD: LOD-oblique/LOD-Swim transversebars still become longitudinalsmears; rays become
+  disconnectedblotches; armor pigmentpatchy.45%fin retention/no broadfilter did not resolve it.
+  All18LODclips remain andAttack/Eat articulate. Tinyfullcommissure dots andLODdarkslits/pale
+  jaggedlip remain pendingoral audit; temporal motion/eye audit not completed from stills.
+- Read-onlyactualGLB axialspan audit: posteriorfull29312triangles span~.017936;LOD4111triangles
+  median.077077/q90.180967/q99.254278/max.310194,222span>.20. Supports marking-aware LOD topology
+  correction insteadof blindgeometrydecimation. All23concrete observations:review-candidate04-actual.md.
+- Frozenreviewmanifest45inputs SHA a94f1729ceac1414355e127ac06effaf188baef94163adc670c62584b4ecd90f.
+  Exactresume HANDOFF-CANDIDATE04-HOLD.md SHA1220d9fc250fa60e18fdc58c4c137440a7322bad1a49779026e84140f91eb772.
+  Authoring candidate-04-actual-review.json records gateverdict,evidencehashes andspanmeasurements.
+  FullGLB b7b929b9978f51f89e0cb1e687dec10d95b90edd3e2b2ba27b12432f58474655;
+  LOD b06eec2de4dfe0aa4dfe814c9e8a203ff050fd74bacf83d07abf75efbdb83f10.
+- Tomorrow's bounded direction: preserve acceptedfull,bake03,allrig/actions/anchors; author
+  deterministic ring/structuredfin LODsampling with axial/marking density and interiorcolor
+  reconstruction checks. Freeze smallactualcomparisonhandoff before parentassignedCPU2run.
+  AfterLODpasses, freezeoral/eye/motionvalidation. Recipeisnotexecutablecorrectionsource.
+- Stopfor day checkpoint. No newcorrectionsource,heavyjob,Blender,public/shared/Git performed.
+  This review doesnotapprove finalcreature, runtime, packaging orintegration.
+
+## 2026-09-08 — resumed structured LOD05 source checkpoint
+
+- Parent resumed; candidate04 full/bake03/rig remain accepted and immutable. LOD05 source uses actual full GLB triangles as the sampled surface, no decimator or full rebake. Original lip/commissure first eight exterior and oral bands retain their exact dense triangles; shared mouth rim remains welded. Fin sampling includes original ray center/shoulder locations but reads actual baked pigment.
+- Pure numeric scratch checks pass manifold topology, finite pigment, normalized four-bone weights and 58,468 triangles (38.486% of full 151,920). Seven interior probes per triangle measure pigment reconstruction and surface deviation; these are diagnostics, not art approval. Build/render source and frozen handoff in progress.
+- Root reports low disk space; no Blender/heavy exports until parent confirms space and assigns execution. No original outputs deleted.
+
+## 2026-09-08 — LOD05 frozen for parent-assigned execution
+
+- Source-only LOD05 handoff ready: HANDOFF-LOD-05.md. Frozen-lod-05.json SHA 09e9869d34ac0d3a1fc4caa3e46c253270f5717f7f4ba9bcc8348081b182ca5f binds159 verified inputs. Six new source hashes and exact CPU2 build15/check5/render25 commands are in handoff. New candidate05 does not exist. No Blender or heavy export was run.
+- Completed pure planner report and mesh-plan.npz in ../devonian-authoring/coccosteus/rework-v3/lod-plan-05. 58,468 triangles,38.486% full, all meshes manifold, valid pigment/four weights. Protected4,096 mouth triangles match dense source exactly (position error0; weight max2.385e-8). Posterior span max.0358722, no span>.20.
+- Seven interior probes show posterior mean/p95 error .005593/.028762 versus old .009254/.048669. Armor mean improves slightly but p95 slightly worsens; no numeric art approval. All fin/error/surface statistics retained in plan-report and plan-validation. Static report validates AST,159inputs, paths, no decimator, imported action_slot/duration/reset usage.
+- Build preserves full GLB/metadata bytes and original rig/actions/anchors; creates only structured LOD. Checker retains previous gates and adds exact18 animation sample agreement. Eleven matched full/LOD images review body, fins, Attack/Eat and neutral surface.
+- Disk-space HOLD from root remains. Execute only when parent confirms headroom and assigns the slot. Preserve all old and partial outputs. Next actual art review determines whether structured markings and mouth edges pass; full oral/eye/motion validation remains pending.
+
+## 2026-09-08 — actual LOD05 HOLD; field isolation frozen
+
+- Actual G1/G2 PASS; full22,931,780B and LOD3,224,664B,18/18clips. Original renderer05 failed with no images on unguarded action_slot=None. Root version06 guards no-action slot and resets frame before import; all11 actual matched-evidence-06 images complete and independently inspected. Review-candidate05-actual.md: full retained, LOD broad armor wrinkles/missing seams, blurred bars and chevron fin rays remain unacceptable. Rim silhouette/Attack/Eat coherent; tiny paired commissure dots still pending.
+- Actual correspondence source diagnose_lod05_attributes_01.py and candidate05/attribute-diagnostic-01.json: POSITION exact float32, RGB max7.633e-6 quantization, UV max4.467e-8. Normal p95<=.0181deg; four split vertices at one ventral mouth-rim point differ72.404deg (separate local issue). Widespread pigment transfer corruption ruled out. Neutral removes most wrinkles, indicating aliasing of sampled grain and incomplete feature-edge correspondence.
+- Frozen six-image field isolation: HANDOFF-LOD05-FIELDS-01.md. Frozen182 inputs SHA c14a5f9634bad5921e35a7856a40e62666829d5770a4ceeb8cfb9ee0c17be973; render_lod05_fields_01.py SHA4973d97eb9ccc89ec6ce71b2f0ea04235f129370015a25c41a53b2067ccd2e7e. CPU2/24samples,10min. Full/LOD emission oblique+finclose and neutral finclose. Exact guards/action_slot/durations retained from executed root06. No GLB/blend output, rebake, count increase, Blender author run or public/Git.
+- Root can assign secondCPU2slot when ready. After6 actualimages, bounded direction is positive footprint filtering for finegrain while explicitly aligning macroplate/ray boundaries, preserving texture-freeLOD contract. Do not interpret scalar source-plan error improvement as art acceptance again. All original versions preserved.
+
+## 2026-09-08 — actual field isolation reviewed; bounded LOD07 frozen
+
+- All6 actual field views independently inspected: broad wrinkles/chevrons survive in emission; common neutral fins smooth. Pigment aliasing and feature interpolation confirmed. Existing05/field/review sources remain stable for root checkpoint; new correction is version07, separate from root's renderer06.
+- Frozen-lod-07.json207inputs SHA58a67b430259bd10a73e0079101318b6e83d81b8b827818b4744fbecc8247b56. HANDOFF-LOD-07.md holds seven new source hashes and exactCPU2 build15/check5/render18 commands. Exclusive candidate07 absent. No author Blender/heavy export/public/Git action.
+- Completed pure lod-plan-07:59,194triangles38.964%full; no decimator or full rebake. Positive49-tap armor footprint with narrow across/long along accepted seams, actual source pigment, explicit matching plate/ray/bar edges. Fin matches limited to A/32 angular shift to avoid shape distortion. Exact4,096mouth triangles, positionerror0/weightmax2.385e-8; full eyes retained. Every tested surface deviation<.010; all meshes manifold and pigment/weights valid.
+- Corrected parameter plots field-plots-08 and plan-validation-08 show quiet armor with retained plate seams and connected main posterior bars. Small lower flecks still lose detail. Earlier field-plots invalid due unhandled wrapped UV in2D rasterizer; preserved with FIELD-PLOT-NOTE. Neither plotting script changes plan colors. Actual3D gate remains pending.
+- Shared ventral UV cause located: old reader folds k128 to0. Build restores512 right-edge UV loop values from .02 to .98, no shape/color edits. Accepted full gives identical coherent normals at all4 protected ventral rim splits; actual05 has(0,1,0). lip_basis_07 readonly fixture copies only those4 full NORMAL/TANGENT rows, proves every other byte unchanged. New actual checker verifies exact basis.
+- Group3 renders6 new actual LOD images (lit side/oblique/finclose/Attack; emission oblique/finclose), matched in manifest to6 immutable existing full references. Renderer retains executed root06 action_slot guard/import reset/duration checks. Root schedules execution after other frozen jobs. Preserve all earlier attempts; no art acceptance until actual views.
