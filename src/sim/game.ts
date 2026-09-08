@@ -3,14 +3,14 @@ import { RULES } from './era-rules';
 import { BURROWERS, HEAVY_SPECIALS, DEFENSIVE_SPECIALS, CAMOUFLAGE_DRAIN, camouflageMatch, clearPursuit, stopHiding } from './concealment';
 import { abilitySpeed, beginExpansionAbility, beginHeavyStrike, heavyStrikeReach, specialHit, stepExpansionAbility, stepHeavyStrike, bloomRate, grazeRate } from './expansion-abilities';
 import { add, clamp, damp, dist, distXZ, dot, heading, len3, lerp, makeRng, norm, scale as vscale, sub, TAU, v3, wrapAngle, yawOf, type Rng, type Vec3 } from '../shared/math';
-import { applyScaleStats, bandOf, bodyRadius, canAct, clearanceOf, climbHeight, climbRise, floorClearance, glideOver, isAlive, isHidden, isInvulnerable, lengthOf, makeActor, massOf, speedFactor, staminaCost } from './actors';
+import { applyScaleStats, bandOf, bodyRadius, canAct, clearanceOf, climbHeight, climbRise, floorClearance, glideOver, isAlive, isHidden, isInvulnerable, lengthOf, makeActor, massOf, speedFactor, staminaCost, tierForScale } from './actors';
 import { makeBrain, think, type AiWorld } from './ai';
 import { huntingPressure, phaseAt, untilNextPhase, type Phase } from './daynight';
 import { applyHit, kill, startSwallow, type HitContext } from './combat';
 import { creature, CREATURE_IDS, PLAYABLE_IDS, type CreatureId, type MoveDef } from './creatures';
 import { resolveFlora, stepFlora, type FloraContact } from './flora';
 import { SpatialHash } from './spatial';
-import { clampMark, fillOf, ladderFill, ladderRung, ladderScale, LADDER_TOP, MARK_NEAR_TOP } from './ladder';
+import { clampMark, fillOf, ladderFill, ladderMark, ladderRung, ladderScale, LADDER_TOP, MARK_NEAR_TOP } from './ladder';
 import { emptyInput, isCoop, TIER_NAMES, TIER_NEED, TIER_SCALE, type Actor, type BrainState, type InputFrame, type Mode, type PlayerSetup, type Prompt, type SiltCloud, type Tier, type WorldEvent } from './types';
 import { BIOME_NAMES, biomeAt, biomeWeights, coverAt, groundHeight, LIGHT_WINDOW_Y, type Landmark, type LandmarkKind, microbialAt, nearestNursery, nurseryAt, nurseryFactor, resolveStatic, sampleCurrent, sampleHeight, shoreDistance, shoreZ, type StaticContact, SURFACE_Y, World, type Biome, type Boulder, type Cover, type Flora, type WorldData } from './world';
 
@@ -80,6 +80,15 @@ export interface ScoreHeader { title: string; detail: string; clock?: number; }
 /** Where a player may teleport: home nursery, or alongside another player. */
 export type TeleportDest = 'home' | number;
 export interface TeleportOption { dest: TeleportDest; label: string; detail: string; distance: number; }
+/**
+ * One creature a player could change into, and what they would be if they did.
+ *
+ * `mark` is where they would arrive on the growth ladder; `kept` says that mark is theirs from an
+ * earlier turn in this body rather than a fresh start, which is what makes it worth going back to.
+ */
+export interface SwapOption { id: CreatureId; name: string; mark: number; kept: boolean; current: boolean }
+/** What a body that has been put away keeps until its owner comes back to it. */
+interface KeptBody { scale: number; mark: number }
 /** One radar contact, in world offsets from the viewer (the renderer rotates it into the camera frame). */
 export interface RadarBlip {
   kind: 'player' | 'threat' | 'giant' | 'home' | 'shore' | 'food' | 'landmark' | 'territory';
@@ -214,6 +223,14 @@ export class Game implements AiWorld {
   nextId = 1;
   mode: Mode;
   players: Actor[] = [];
+  /**
+   * Every creature each player has worn this match, and how far it had grown when they left it.
+   *
+   * Changing body is not a restart: the animal you put down keeps its size and its meter, and is
+   * exactly where you left it when you pick it up again. That is what lets one session raise
+   * several creatures instead of one — the sea is the same sea, and the growing is per animal.
+   */
+  private kept: Map<CreatureId, KeptBody>[] = [];
   progress: PlayerProgress[] = [];
   state: GameState = { status: 'playing', winner: -1, message: '' };
   /**
@@ -277,6 +294,7 @@ export class Game implements AiWorld {
       a.home = { ...nursery };
       a.yaw = Math.PI;                                   // facing out to sea
       this.players.push(a);
+      this.kept.push(new Map());
       this.progress.push({ prompts: [], flags: new Set(), deaths: 0, apexT: 0, message: '' });
     });
     if (mode === 'hunted') {
@@ -786,7 +804,6 @@ export class Game implements AiWorld {
     a.hitFlash = Math.max(0, a.hitFlash - dt);
     a.hitStop = Math.max(0, a.hitStop - dt);
     a.abilityCd = Math.max(0, a.abilityCd - dt);
-    a.senseCd = Math.max(0, a.senseCd - dt);
     a.senseT = Math.max(0, a.senseT - dt);
     if (def.ability === 'whipSearch' && a.senseT > 0) stepExpansionAbility(this.expansionContext(), a, def, dt);
     a.burstT = Math.max(0, a.burstT - dt);
@@ -887,8 +904,8 @@ export class Game implements AiWorld {
     let desired: Vec3 = v3(cur.x * curK, cur.y * curK, cur.z * curK);
     // A shelled jetter's funnel is what makes it fast and what makes rising and sinking free, but
     // the stick is the direction of travel for every body in the sea: swimming, sprinting and
-    // dashing all go where they are aimed. Firing the sprint backward out of the funnel read as
-    // the animal spinning round rather than as a jet, so the shells keep only the free hover.
+    // dashing all go where they are aimed, and the nose goes with them. The funnel shows up in
+    // the free hover and in the backward dash, not in a sprint that turns the animal round.
     const jets = RULES?.jet(a) ?? false;
     if (controllable && mag > 0) {
       desired.x += dir.x * mag * cruise * burstMult;
@@ -1031,18 +1048,23 @@ export class Game implements AiWorld {
       }
     }
 
-    // Orientation. A shell jets: under way at speed — a sprint, a dash — it travels shell-first
-    // with its head trailing, which is how a nautiloid escapes, and it swings round to face what
-    // it is doing when it slows, aims or strikes. This is the body's heading only; the stick is
-    // still the direction of travel.
+    // Orientation. Every body, shells included, faces where it is going: a sprint and an aimed
+    // dash point the nose along the stick, because turning the animal round to travel shell-first
+    // read as a spin rather than as a jet.
+    //
+    // The one exception is a dash with no direction, which fires along the body's own axis — out
+    // behind a jetting shell (see the dash below). The body holds the heading it already had
+    // through it, so the shell leaves backwards while the head stays pointed at whatever it is
+    // backing away from, which is both what a nautiloid does and what the player is still aiming
+    // the camera at. Turning to follow that velocity would spin it through 180° at the worst
+    // possible moment.
     const hv = Math.hypot(a.vel.x, a.vel.z);
-    const backward = jets && hv > 0.35 && a.state !== 'attack' && !a.aiming
-      && (bursting || freeBurst || a.state === 'dodge');
-    const facing = backward ? v3(-a.vel.x, -a.vel.y, -a.vel.z) : a.vel;
+    const backingOff = a.state === 'dodge' && dot(a.dodgeDir, heading(a.yaw)) < -0.3;
     let targetYaw = a.yaw;
-    if (a.aiming && a.controller === 'player' && (a.state === 'free' || a.state === 'guard')) targetYaw = hv > 0.35 ? yawOf(facing) : input.camYaw;
+    if (backingOff) { /* hold the heading through a backward dash */ }
+    else if (a.aiming && a.controller === 'player' && (a.state === 'free' || a.state === 'guard')) targetYaw = hv > 0.35 ? yawOf(a.vel) : input.camYaw;
     else if (locked && isAlive(locked) && (a.state === 'free' || a.state === 'guard' || a.state === 'attack')) targetYaw = yawOf(sub(locked.pos, a.pos));
-    else if (hv > 0.35 && a.state !== 'grabbed') targetYaw = yawOf(facing);
+    else if (hv > 0.35 && a.state !== 'grabbed') targetYaw = yawOf(a.vel);
     const dy = wrapAngle(targetYaw - a.yaw);
     const tr = def.turnRate * (a.state === 'attack' ? 0.5 : 1) * (1 + hv * 0.05) * (giantish ? 0.45 : 1) * (sw?.turn ?? 1);
     const turn = clamp(dy * 6, -tr, tr);
@@ -1056,8 +1078,10 @@ export class Game implements AiWorld {
       const behind = groundHeight(this.world, a.pos.x - Math.sin(a.yaw) * L * 0.4, a.pos.z - Math.cos(a.yaw) * L * 0.4, this.scratchBoulders);
       a.pitch = damp(a.pitch, -Math.atan2(ahead - behind, L * 0.8), 8, dt);
     } else {
-      const sp = Math.max(len3(facing), 0.5);
-      a.pitch = damp(a.pitch, clamp(-Math.asin(clamp(facing.y / sp, -1, 1)) * 0.8, -0.9, 0.9), 4, dt);
+      // Pitch follows the travel too, except through a backward dash, where the body holds the
+      // attitude it had rather than tipping to point down its own wake.
+      const sp = Math.max(len3(a.vel), 0.5);
+      if (!backingOff) a.pitch = damp(a.pitch, clamp(-Math.asin(clamp(a.vel.y / sp, -1, 1)) * 0.8, -0.9, 0.9), 4, dt);
     }
 
     // Noise / stillness
@@ -1079,8 +1103,15 @@ export class Game implements AiWorld {
         const nt = this.pickLockTarget(a, input.lookX > 0 ? 1 : -1, a.lockTarget);
         if (nt) { a.lockTarget = nt.id; a.comboT = 0.4; }
       }
-      // Sense
-      if (justSense && a.senseCd === 0) { a.senseT = def.ability === 'whipSearch' ? 3.6 : 2.2; a.senseCd = def.ability === 'burrow' ? 3 : 6; this.flag(a, 'sense'); this.events.push({ kind: 'sense', pos: { ...a.pos }, actor: a.id, player: a.player }); }
+      // Sense: a display mode, held on or off. On, the band glyphs and the radar are drawn; off,
+      // nothing is drawn over the sea but the HUD. It costs nothing and never runs out — turning
+      // it off is for the look of the thing, not a trade.
+      if (justSense) {
+        a.senseMode = !a.senseMode;
+        // The ping is the toggle's own sound, both ways: it is how you know the button took.
+        this.flag(a, 'sense');
+        this.events.push({ kind: 'sense', pos: { ...a.pos }, actor: a.id, player: a.player });
+      }
       // Heavy (RT): the emergence strike, the creature's special, or the pounce — all of it in one
       // place, so a charge out of a sprint (below) or out of a dash reaches exactly the same move.
       // Sprinting makes it a charge: it aims along the line of travel and costs extra stamina.
@@ -1860,6 +1891,68 @@ export class Game implements AiWorld {
       out.push({ dest: j, label: `Player ${j + 1} · ${creature(o.creature).name}`, detail: isAlive(o) ? TIER_NAMES[o.tier] : 'respawning', distance: distXZ(p.pos, o.pos) });
     });
     return out;
+  }
+
+  /**
+   * Every creature this player could change into, in roster order, starting on the one they are.
+   *
+   * A creature they have worn before comes back at the mark it was left on; anything new starts at
+   * whichever end of the ladder they asked for. Nothing is filtered out — the point is to be able
+   * to raise the whole roster in one session if that is what you want to do.
+   */
+  swapOptions(i: number, grown: boolean): SwapOption[] {
+    const p = this.players[i]; if (!p) return [];
+    const mine = this.kept[i] ?? new Map<CreatureId, KeptBody>();
+    const order = [...PLAYABLE_IDS];
+    const at = order.indexOf(p.creature);
+    // Start the cycle on the body they are in, so left and right walk away from where they are.
+    const cycle = at >= 0 ? [...order.slice(at), ...order.slice(0, at)] : order;
+    return cycle.map((id) => {
+      const current = id === p.creature;
+      const kept = mine.get(id);
+      const mark = current ? ladderMark(this, p) : kept ? kept.mark : grown ? LADDER_TOP : 0;
+      return { id, name: creature(id).name, mark, kept: current || !!kept, current };
+    });
+  }
+
+  /**
+   * Change a player's body for another creature's, without moving them or restarting anything.
+   *
+   * The body they leave is written down at the size and mark it had, and the one they take up is
+   * either handed back exactly as they left it or hatched fresh — grown or newborn, as asked. The
+   * animal is the only thing that changes: the sea, the hour, the mode's clock and everything
+   * anyone else has grown carry straight on.
+   */
+  changeCreature(i: number, id: CreatureId, grown: boolean): boolean {
+    const a = this.players[i];
+    if (!a || !isAlive(a) || (a.state !== 'free' && a.state !== 'guard') || a.teleportCd > 0 || a.grabbedBy >= 0) return false;
+    if (!PLAYABLE_IDS.includes(id)) return false;
+    const mine = this.kept[i] ?? (this.kept[i] = new Map());
+    if (id !== a.creature) mine.set(a.creature, { scale: a.scale, mark: ladderMark(this, a) });
+    const back = mine.get(id);
+    const mark = back ? back.mark : grown ? LADDER_TOP : 0;
+    const scale = back ? back.scale : ladderScale(id, mark);
+
+    this.events.push({ kind: 'teleport', pos: { ...a.pos }, actor: a.id, player: i, strength: 0 });
+    // Nothing may keep hunting the body that just stopped existing.
+    stopHiding(a); clearPursuit(a, this.actors);
+    a.creature = id; a.scale = scale;
+    applyScaleStats(a, false);
+    a.tier = tierForScale(a.scale);
+    // The era resyncs whatever it keeps outside the actor before the meter is filled, or the fill
+    // would be measured against the stage the *old* animal was on.
+    RULES?.onSwap?.(this, a);
+    ladderFill(this, a, fillOf(mark));
+    a.state = 'free'; a.stateT = 0; a.move = undefined; a.hitDone.clear();
+    a.combo = 0; a.comboT = 0; a.abilityCd = 0; a.abilityActive = false; a.emergenceHeavy = false;
+    a.lockTarget = -1; a.hunted = 0; a.hunterId = -1; a.wasHunted = false; a.grabbing = -1;
+    a.vel = v3(); a.bank = 0; a.hitFlash = 0;
+    a.spawnProtect = Math.max(a.spawnProtect, 2.5); a.teleportCd = 20;
+    // The body it is drawn with changed, so the step it is interpolated from has to be this one.
+    a.prevT = { x: a.pos.x, y: a.pos.y, z: a.pos.z, yaw: a.yaw, pitch: a.pitch, bank: a.bank };
+    this.events.push({ kind: 'teleport', pos: { ...a.pos }, actor: a.id, player: i, strength: 1 });
+    this.flag(a, 'teleport');
+    return true;
   }
 
   /**

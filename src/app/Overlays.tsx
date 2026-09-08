@@ -13,39 +13,62 @@ import { LANDMARK_BLURBS, LANDMARK_NAMES, type Codex } from './codex';
 import { CloseIcon } from './icons';
 import { XboxDiagram } from './XboxDiagram';
 import { KeyboardDiagram } from './KeyboardDiagram';
-import { btn, key, type Scheme } from '../shared/controls';
+import { btn, type Scheme } from '../shared/controls';
 
 const LANDMARK_KINDS = ['arch', 'stack', 'bones'] as const;
 
-export function PauseMenu({ onResume, onChange, onQuit, scheme }: { onResume: () => void; onChange: () => void; onQuit: () => void; scheme: Scheme }) {
-  // Only the pad has a shortcut for the two lower buttons; on mouse and keyboard they are simply
-  // clicked, and a <kbd> for a key that does nothing would be worse than none at all.
-  const pad = scheme === 'pad';
+/**
+ * One choice on an in-game menu.
+ *
+ * Both menus used to give every choice its own button — A resumed, RT went back to select, Y quit
+ * — which meant three live shortcuts on a screen that appears the instant a match ends, while the
+ * player is still holding whatever they were fighting with. A pad has no idea it has stopped being
+ * a fight. So the menus are navigated and confirmed instead: one cursor, one button that acts, and
+ * the cursor starts on the choice that costs least if it is hit by accident.
+ */
+export interface MenuItem { label: string; run: () => void; primary?: boolean }
+
+export function MenuButtons({ items, sel, shown, onHover, scheme }: { items: MenuItem[]; sel: number; shown: boolean; onHover: (i: number) => void; scheme: Scheme }) {
+  return (
+    <div className="menu-buttons">
+      <div className="menu-choices" role="menu">
+        {items.map((it, i) => (
+          <button key={it.label} role="menuitem" aria-current={shown && sel === i}
+            className={`${it.primary ? 'start-button' : 'ghost'} ${shown && sel === i ? 'selected' : ''}`}
+            onMouseEnter={() => onHover(i)} onFocus={() => onHover(i)} onClick={it.run}>{it.label}</button>
+        ))}
+      </div>
+      <p className="menu-hint">{btn('pick', scheme)} chooses · {btn('confirm', scheme)} confirms</p>
+    </div>
+  );
+}
+
+export function PauseMenu({ items, sel, shown, onHover, scheme }: { items: MenuItem[]; sel: number; shown: boolean; onHover: (i: number) => void; scheme: Scheme }) {
   return (
     <div className="overlay">
       <div className="panel">
         <p className="eyebrow">PAUSED</p>
         <h2>Catch your breath.</h2>
-        <div className="menu-buttons">
-          <button className="start-button" onClick={onResume}>RESUME <kbd>{key('confirm', scheme)}</kbd></button>
-          <button className="ghost" onClick={onChange}>Change creatures {pad && <kbd>X</kbd>}</button>
-          <button className="ghost" onClick={onQuit}>Quit to title {pad && <kbd>Y</kbd>}</button>
-        </div>
+        <MenuButtons items={items} sel={sel} shown={shown} onHover={onHover} scheme={scheme} />
       </div>
     </div>
   );
 }
 
-export function Results({ snapshot, players, record, fresh, onAgain, onContinue, onChange, onTitle, scheme }: { snapshot: HudSnapshot; players: PlayerSetup[]; record: Codex; fresh: Codex; onAgain: () => void; onContinue: () => void; onChange: () => void; onTitle: () => void; scheme: Scheme }) {
+export function Results({ snapshot, players, record, fresh, items, sel, shown, onHover, scheme }: { snapshot: HudSnapshot; players: PlayerSetup[]; record: Codex; fresh: Codex; items: MenuItem[]; sel: number; shown: boolean; onHover: (i: number) => void; scheme: Scheme }) {
   // Both come from the shell, which writes finds to the record as the match makes them and keeps a
   // running list of what this one added. This screen no longer works out what is new by comparing
   // the store against the match: the store already contains the match by the time it gets here.
   const codex = record;
   return (
     <div className="overlay">
+      {/* A column, not a scrolling block: the header and the choices are pinned and only the middle
+          scrolls, so the buttons are on screen whatever the window is doing. They used to be the
+          last thing inside one tall scroller and simply fell off the bottom of a short screen. */}
       <div className="panel results">
         <p className="eyebrow">{MODE_INFO[snapshot.mode].name.toUpperCase()} · {snapshot.status === 'won' ? 'VICTORY' : ACTIVE_ERA.copy.lose}</p>
         <h2>{snapshot.message}</h2>
+        <div className="results-scroll">
         <div className="result-grid">
           {snapshot.players.map((p, i) => (
             <div key={i} className="result-card" style={{ ['--player' as string]: p.color }}>
@@ -61,13 +84,8 @@ export function Results({ snapshot, players, record, fresh, onAgain, onContinue,
           ))}
         </div>
         <Discoveries codex={codex} fresh={fresh} />
-        <div className="menu-buttons">
-          <button className="start-button" onClick={onAgain}>AGAIN <kbd>{key('confirm', scheme)}</kbd></button>
-          {/* Co-op modes are milestones, not verdicts: the sea is still there to swim in. */}
-          {snapshot.canContinue && <button className="ghost" onClick={onContinue}>Keep playing {scheme === 'pad' && <kbd>Y</kbd>}</button>}
-          <button className="ghost" onClick={onChange}>Change creatures {scheme === 'pad' && <kbd>X</kbd>}</button>
-          <button className="ghost" onClick={onTitle}><kbd>{key('back', scheme)}</kbd> Title</button>
         </div>
+        <MenuButtons items={items} sel={sel} shown={shown} onHover={onHover} scheme={scheme} />
       </div>
     </div>
   );
@@ -153,7 +171,7 @@ export function Dialogs({ kind, onClose, settings, onSettings, scheme }: { kind:
           <div className="help-columns">
             <section>
               <h3>Hunting</h3>
-              <p>Hold <b>{btn('aim', scheme)}</b> to aim: the view moves over your shoulder and a crosshair sits at the centre of the screen. It snaps to nearby prey as you enter aim; after that, steer it with the {scheme === 'pad' ? 'right stick' : 'mouse'}. <b>{btn('heavy', scheme)}</b> performs your creature’s heavy move: snatch, seize, rake, crush, charge or feeding sweep. Creatures without a special heavy pounce toward aimed prey or lunge forward. <b>{btn('guard', scheme)}</b> blocks with the creature’s natural defense; tap for a parry. Hallucigenia braces, Canadia flares its bristles, Olenoides rolls while blocking, and Wiwaxia releases a shove after holding block. <b>{btn('dash', scheme)}</b> dashes: press it with a direction held to burst that way with a moment of invulnerability, far enough to clear a giant's bite — and it scales with your body, so a grown creature covers real ground. Press it with no direction and you dash along your own axis: ahead for most animals, and out behind for a shelled jetter, which is how it escapes. <b>{btn('sprint', scheme)}</b> sprints, <b>{btn('rise', scheme)}</b> rises — seafloor creatures hop with it, and holding it paddles them up into open water, where they swim slowly and cannot sprint or dash until they are back on the bottom. <b>{btn('zoom', scheme)}</b> pulls the camera in and out.</p>
+              <p>Hold <b>{btn('aim', scheme)}</b> to aim: the view moves over your shoulder and a crosshair sits at the centre of the screen. It snaps to nearby prey as you enter aim; after that, steer it with the {scheme === 'pad' ? 'right stick' : 'mouse'}. <b>{btn('heavy', scheme)}</b> performs your creature’s heavy move: snatch, seize, rake, crush, charge or feeding sweep. Creatures without a special heavy pounce toward aimed prey or lunge forward. <b>{btn('guard', scheme)}</b> blocks with the creature’s natural defense; tap for a parry. Hallucigenia braces, Canadia flares its bristles, Olenoides rolls while blocking, and Wiwaxia releases a shove after holding block. <b>{btn('dash', scheme)}</b> dashes: press it with a direction held to burst that way with a moment of invulnerability, far enough to clear a giant's bite — and it scales with your body, so a grown creature covers real ground. Press it with no direction and you dash along your own axis: ahead for most animals, and out behind for a shelled jetter, which is how it escapes. <b>{btn('sprint', scheme)}</b> sprints, <b>{btn('rise', scheme)}</b> rises — seafloor creatures hop with it, and holding it paddles them up into open water, where they swim slowly and cannot sprint or dash until they are back on the bottom. <b>{btn('zoom', scheme)}</b> pulls the camera in and out. <b>{btn('sense', scheme)}</b> turns Sense on and off: on, the size-band marks over creatures and the radar are drawn; off, nothing is drawn over the sea but the bar at the bottom. It is on to begin with, costs nothing and never runs out — turning it off is for the look of the thing.</p>
               <h3>The sea</h3>
               <p>It has one edge: the shore you hatch beside. Swim along it and the world stays gentle; swim <b>away</b> from it and the biomes change: shelf, sponge forest, boulder fields, the channels, the escarpment, and the deep basin, where the giants live. The <b>radar</b> at the top right shows anything big enough to hurt you, whatever is hunting you, the nearest shoals worth eating, your nursery and the shore. Creatures show only while they are inside its reach; the other players, your nursery and the shore sit hollow on the rim when they are past it, pointing the way. Press <b>{btn('teleport', scheme)}</b> for the teleport menu: back to your nursery, or straight to another player. Hold <b>{btn('view', scheme)}</b> for the scoreboard: everyone in the match, what they have done, and what this mode is asking of them.</p>
               <h3>Fighting</h3>

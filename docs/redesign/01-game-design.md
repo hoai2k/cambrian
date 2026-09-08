@@ -188,7 +188,7 @@ expresses them differently so fights are varied.
 | **Guard** | LB (hold) | Halves damage, prevents knockback, drains stamina on each hit. A guard-broken creature is **staggered** for 1.2 s. |
 | **Parry** | LB (tap, timing) | Guard in the first 0.15 s of an incoming hit: no damage, attacker is staggered 0.8 s and you get a free heavy. Swimmers parry with a body twist, armoured crawlers with a shell clank. |
 | **Lock-on** | LT (toggle) | Camera frames you and the target, movement becomes **orbit/strafe** relative to the target, attacks home. Left stick left/right circles. Flick right stick to switch target. |
-| **Sense pulse** | D-pad ↑ | 2 s highlight of everything within sense range through cover, colour-coded by size band. Cooldown 6 s. |
+| **Sense** | D-pad ↑ | Toggles the read-out: the size-band marks over creatures and the radar. On by default, free, and it never runs out — off is the immersive view, with nothing drawn over the sea but the HUD bar. |
 | **Eat** | automatic | Biting a dead body or a Snack consumes it. **Anything can feed on anything**, however much bigger it was: the carcass comes apart in whole bites, `ceil(3 × its length / yours)` of them (1–12), a bite every 0.62 s. A body under a third of your length goes down whole and is carried into your mouth; bigger, it stays where it fell, and each bite tears its share of the meat off the model and flies it into your mouth. Eating can be interrupted, so opening a giant carcass in the open is a long risk. |
 
 > **The shipped bindings are different.** The layout above is the design's first
@@ -209,7 +209,7 @@ expresses them differently so fights are varied.
 > | **RB** | 5 | **Rise** / **hop**, held to paddle upward (crawlers) |
 > | **LT** (analog) | 6 | **Aim** — the centred crosshair picks the target |
 > | **RT** (analog) | 7 | **Heavy / pounce** |
-> | D-pad ↑ | 12 | Sense pulse |
+> | D-pad ↑ | 12 | Sense on/off |
 > | D-pad ↓ | 13 | Teleport menu (added with the endless sea) |
 > | D-pad → | 15 | **Hide / camouflage** |
 > | D-pad ←/→ | 14/15 | Menu navigation and creature select |
@@ -219,6 +219,31 @@ expresses them differently so fights are varied.
 > dash, adjacent under the thumb. Hiding went to D-pad right, next to the other
 > two D-pad tools, and the left stick click keeps sinking so the old reflex
 > still works.
+>
+> **The in-game menus are steered, not button-mapped.** The pause menu and the
+> results screen used to give every choice its own pad button — A resumed, RT
+> went back to select, Y quit — which is three live shortcuts on a screen that
+> can appear on its own, the instant a match ends, while a hand is still
+> fighting. Three rules now stand between the end of a fight and an answer
+> (`src/app/menu-cursor.ts`, covered by `npm run menus`):
+>
+> 1. **A lockout.** Nothing is read for `MENU_LOCKOUT` (0.7 s) after the menu
+>    opens, and a button held across it is not an edge afterwards either.
+> 2. **A cursor that has to be woken.** The results screen starts with nothing
+>    highlighted; the first press or nudge only makes the cursor appear.
+> 3. **A harmless default.** It wakes on the first choice, which each menu makes
+>    the one that costs least: *Resume* on pause, *Continue* on the results
+>    screen (*Play again* in the versus modes, which have nothing to continue).
+>
+> Both menus end at *Quit*, which leaves the match for the choice screen — where
+> you go to play as something else, and where the way back to the title already
+> is. A separate "quit to title" button sat one careless press from the end of a
+> session for no gain.
+>
+> Afterwards it is one cursor and one button: up and down move, A confirms. The
+> results panel is a flex column with a scrolling middle, so the choices stay
+> pinned on screen — they used to be the last thing inside one tall scroller and
+> fell off the bottom of a short window.
 >
 > Sharing a button between gameplay and a menu is fine and always has been — A
 > is sprint and confirm, B is guard and back — because they are different
