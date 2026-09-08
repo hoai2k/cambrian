@@ -1,5 +1,65 @@
 # Bothriolepis V3 working state
 
+## 2026-09-08 00:31:04 UTC — bothriolepis — MATERIAL01 frozen; user pause
+
+- Owner/model: Astra high. Status: candidate-ready source, execution deferred
+  because the user asked to save current refinements for later. **Do not run
+  Blender or start another phase now.** Root owns the source commit/pause.
+- Coarse verdict: independently inspected all seven clay02 images and accepted
+  the bounded geometry gate on blend SHA-256
+  `55ca3b38a1de698a9e788ca9f76ab576476aa28785c84380754d27ebcbecc84b` and inventory
+  `3d1f7511578f67e4ab1e0bbab5f766e77416f6bc7db0dad9549b9481dfca84e2`.
+  Full silhouettes, root attachment and actual oral recess improved sufficiently.
+  This is not final appearance/rig/export or general-audit approval.
+- Decision: MATERIAL01 opens that exact blend. Fourteen explicit anatomical
+  suture paths drive bounded physical relief, pigment and packed normal/roughness
+  maps. Warm brown-olive armor, quiet scaleless posterior, square rayless dorsal,
+  lateral broad pectorals, protected root/oral/eye boundaries. One inspected
+  original ImageGen dermal source contributes only +/-2.5% color and 0.00075
+  height; original file and exact prompt saved under `material01-inputs/`.
+- Frozen manifest:
+  `/Users/hoai/Documents/Stuff/Generations/cambrian/local/expansion-repo/tools/devonian/creatures/bothriolepis/rework-v3/frozen-inputs-material01.json`
+  SHA-256 `bcc10b7f9d4082a89735b5624cedd7248ff80f1353ed012149d009daa919b0d4`.
+  Ten input hashes cover accepted clay/source, new builder/fields/executor,
+  verdict, original texture/provenance, clay inventory and primary PDF.
+- Builder SHA-256 `13f43ff595ffb1cd03de6858bb86d87dd8563493a03bf904e88055815887da80`.
+  Field-source SHA-256 `83318292f9d2dc238cf2605e5e4de6acdbad6f52097df6755960b6b88b88a36f`.
+- Actual preflight: all three Python sources AST-parse; sampled material fields
+  finite; 14 paths; max sampled actual-relief field 0.004143 units; ImageGen
+  color contribution <=2.5%; roughness 0.5300–0.6340 before microdetail variation.
+  Accepted clay blend hash verified. Report:
+  `/Users/hoai/Documents/Stuff/Generations/cambrian/local/devonian-authoring/bothriolepis/rework-v3/material01-source-preflight.json`.
+  Blender execution/render has **not** run; this is a source-only PASS.
+- Resume only after user resumes: Terra medium, CWD
+  `/Users/hoai/Documents/Stuff/Generations/cambrian/local/expansion-repo`, run once:
+
+  ```sh
+  /usr/bin/python3 /Users/hoai/Documents/Stuff/Generations/cambrian/local/expansion-repo/tools/devonian/creatures/bothriolepis/rework-v3/execute_material01.py --run-frozen-material01
+  ```
+
+- Expected new local outputs: `rework-v3/material01/bothriolepis-material01.blend`,
+  eight review PNGs, six 1536x1024 packed/standalone PBR maps, source report,
+  SHA-256 inventory and execution log. Two CPU threads; 32 samples per render.
+- Dependencies: Blender at `/Applications/Blender.app/Contents/MacOS/Blender`
+  with its NumPy; `/usr/bin/python3` executor; the ten existing frozen inputs.
+  No ImageGen regeneration, additional research, rig or package step is needed
+  before this exact deferred render group.
+- Remaining art criteria: visible anatomy-bound plate structure at normal size;
+  convincing shallow bony relief in `08-armour-detail`; subtle tuberculation
+  that does not become gravel or hide sutures; brown-olive armor and quiet
+  scaleless posterior; unchanged square dorsal/pectoral silhouette; no mouth
+  mask, UV streaks, bright unrelated joint bands or changed eye/root relationship.
+  Inspect all eight actual images, then issue a hash-bound material verdict.
+- Further dependencies after MATERIAL01 acceptance: fine pectoral marginal
+  denticle silhouette review, production rig (approximately 28 appropriate joints),
+  18 authored actions/anchors, full/LOD/portraits, then new geometry-specific eye,
+  attachment, motion and export audits. None is begun or approved by this gate.
+- Stop condition after resumption: mismatch/existing material01 blend/error or
+  missing inventory; preserve evidence and return without changing source,
+  threshold or candidate directory. Existing models remain preserved/playable
+  previews; no public, shared-state or Git edit was made by this author.
+- Detailed verdict and handoff: `clay02-verdict-material01-handoff.md`.
+
 ## 2026-09-08 00:03:16 UTC — bothriolepis — clay01 reviewed, clay02 frozen
 
 - Owner/model: Astra high; Terra medium executes the new group through root.

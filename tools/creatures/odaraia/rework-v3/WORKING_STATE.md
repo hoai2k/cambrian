@@ -30,3 +30,19 @@
 - Resource: one frozen run, up to 20 minutes; no automatic repair or repeated audit loops.
 - Stop condition: any changed hash, existing output/log, unexpected error, visual/design choice; preserve evidence and return to author.
 - Resume: parent assigns Terra to HASHED_HANDOFF.md. Author must inspect all six real render outputs before production. Uncertain maxilla insertion, paragnath association and soft tissue/head surface are documented interpretation. Transparency/game sorting, rig/actions/LOD/anchors/portraits and full audits remain later work.
+
+
+## 2026-09-07 — clay01 reviewed; clay02 source saved; user pause
+- Owner: Astra creative author. Status: source-ready, PAUSED at user request, no clay02 execution.
+- Independently reviewed all six clay01 renders and user reference 2. Rejected clay01 camera/framing and uniform comb-wall limb presentation; preserved all old outputs.
+- Bound clay01 review: manifest `97288757eb541cb67aade38ed6be1e55b52700e662bedf826d69118edb2cc1d7`, blend `5dfb9ac4c4544dd22f08db8b70d84c96513d24022057193037040497b5f30122`.
+- New source: explicit projected world+Y camera-up, Blender-native frame fit/margins, narrower backswept ovate paddles, raised/phased bent endopods, continuous eye cups. 32 pairs/20 intervals and original geometry coordinates retained. Shell geometry retained for fair correctly-oriented review.
+- Inputs:
+  - `/Users/hoai/Documents/Stuff/Generations/cambrian/local/expansion-repo/tools/creatures/odaraia/rework-v3/build_clay02.py`: `29b486d476b4de9dd661d6f0a7e8dc62f747b61d211616b6ad09f75b7d302c0b`
+  - `/Users/hoai/Documents/Stuff/Generations/cambrian/local/expansion-repo/tools/creatures/odaraia/rework-v3/execute_clay02.py`: `bc01cf399aaea992caff53612edbf3b26f2ad0872fc44964934017815929e703`
+  - `/Users/hoai/Documents/Stuff/Generations/cambrian/local/expansion-repo/tools/creatures/odaraia/rework-v3/AUTHOR_REVIEW_CLAY01_AND_CLAY02_PLAN.md`: `4d558bd689b02e273a8c3d5971b660d5bba1f24a8947bb34cb9c2db356ecf8c5`
+- Validation: both new scripts syntax PASS only; no Blender/run/render/export, public changes or Git actions.
+- Exact remaining criteria: in AUTHOR_REVIEW_CLAY01_AND_CLAY02_PLAN.md; all six actual views required after resumed execution. Camera bounds do not prove shape/attachment/limb quality.
+- Stop condition: USER PAUSE. Do not execute until resumed. Parent may checkpoint sources.
+- Resume after user request: assign Terra to HASHED_HANDOFF_CLAY02.md; hash-check executor then `python3 /Users/hoai/Documents/Stuff/Generations/cambrian/local/expansion-repo/tools/creatures/odaraia/rework-v3/execute_clay02.py` from repo root. One run, 20-minute bound, return evidence to author.
+- No production gate passed. Transparency/game sorting, 18 actions with Moult, full/LOD rig, anchors, portraits and post-rework audits all remain later.
