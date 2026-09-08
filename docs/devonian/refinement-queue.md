@@ -16,7 +16,7 @@ files. Basic build/export checks during authoring are not a substitute for the p
 
 Titanichthys, Doryaspis, Gemuendina, Coccosteus, Bothriolepis and Stethacanthus require total model reworks, not cosmetic edits to the current geometry. Reconsider reference-based proportions and continuous volumes, sculpt new Blender geometry where needed, rebuild materials and rig deformation, then author dynamic actions and matching portraits. Preserve existing versions locally. Each remains a playable preview until its individual rework review passes. Gemuendina V3 has passed its structural review. Titanichthys V3 candidate08 has also passed its focused structural/art review and is published on mainbc5a2d0; broader polish remains pending. The other four total reworks remain pending.
 
-The machine-readable pending queue is `tools/devonian/pending-refinements.json`. Catalogue validation requires every pending creature to remain `preview`; remove a pending entry only after its actual work and review are complete.
+The machine-readable pending queue is `src/content/devonian/pending-refinements.json`. Catalogue validation requires every pending creature to remain `preview`; remove a pending entry only after its actual work and review are complete.
 
 ## New reference-led redesign briefs — 8 September 2026
 

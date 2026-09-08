@@ -71,6 +71,10 @@ unless the user explicitly asks for a PR. Steps:
   the results screen: a player who quits mid-match keeps what they found. The results screen marks
   finds new from a list the shell accumulates, because the store already holds them by then.
   `npm run codex` guards both halves.
+- A creature shows a "preview" badge when its era's `pending-refinements.json` has an entry for it
+  (`src/content/<era>/`), and that entry's `reason` is what the badge shows on hover in the game and
+  the viewer. One file drives both, so a model cannot be flagged without saying what remains;
+  `npm run eras` checks every preview has a reason and every reason a preview.
 - `?debug=local` on either page (`/?debug=local`, `/devonian/?debug=local`) opens an editor for that
   era's saved state — `src/app/DebugLocal.tsx`, gated by `src/shared/debug.ts`, mounted by
   `src/app/Root.tsx` so both entry points get it without knowing about it. A new thing kept in

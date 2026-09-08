@@ -142,7 +142,7 @@ export function Viewer() {
                 <span>
                   <b>{c.name}</b>
                   <small>{c.species}</small>
-                  <ModelStatusBadge status={c.modelStatus} compact />
+                  <ModelStatusBadge status={c.modelStatus} note={c.modelNote} compact />
                 </span>
               </button>
             </li>
@@ -153,7 +153,7 @@ export function Viewer() {
       <div className="info">
         <span className="role">{def.role}</span>
         <h2 className={def.name.length > 11 ? 'long-name' : undefined}>{def.name}</h2>
-        <ModelStatusBadge status={def.modelStatus} />
+        <ModelStatusBadge status={def.modelStatus} note={def.modelNote} />
         {def.kind && <p className="kind-line"><b className="kind">{def.kind}</b>{def.species}</p>}
         <p>{def.provenance ?? 'Burgess Shale'} · {clips.length} clips</p>
         {def.kindNote && <p className="specimen-description">{def.kindNote}</p>}
