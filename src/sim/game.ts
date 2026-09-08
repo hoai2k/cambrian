@@ -885,7 +885,12 @@ export class Game implements AiWorld {
     a.vel.x = damp(a.vel.x, desired.x, rate, dt);
     a.vel.y = damp(a.vel.y, desired.y, rate, dt);
     a.vel.z = damp(a.vel.z, desired.z, rate, dt);
-    if (sw && sw.impulse > 0) { const h0 = heading(a.yaw); a.vel.x += h0.x * sw.impulse; a.vel.z += h0.z * sw.impulse; }   // the fast-start
+    // The fast-start, thrown along the body's heading — except for a shell, whose heading is its
+    // funnel: it goes where it is steered, not where it happens to be pointing.
+    if (sw && sw.impulse > 0) {
+      const h0 = jets && mag > 0 ? dir : heading(a.yaw);
+      a.vel.x += h0.x * sw.impulse; a.vel.z += h0.z * sw.impulse;
+    }
     if (a.airborne) { a.vel.y -= BREACH_GRAVITY * dt; a.vel.x *= 1 - 0.15 * dt; a.vel.z *= 1 - 0.15 * dt; }
 
     // Lunge during attacks
@@ -999,9 +1004,13 @@ export class Game implements AiWorld {
       }
     }
 
-    // Orientation
-    const facing = a.vel;
-    const hv = Math.hypot(facing.x, facing.z);
+    // Orientation. A shell jets: under way at speed — a sprint, a dash — it goes funnel-first and
+    // trails its shell, and it swings round to face what it is doing when it slows, aims or
+    // strikes. This is the body's heading only; the stick is still the direction of travel.
+    const hv = Math.hypot(a.vel.x, a.vel.z);
+    const backward = jets && hv > 0.35 && a.state !== 'attack' && !a.aiming
+      && (bursting || freeBurst || a.state === 'dodge');
+    const facing = backward ? v3(-a.vel.x, -a.vel.y, -a.vel.z) : a.vel;
     let targetYaw = a.yaw;
     if (a.aiming && a.controller === 'player' && (a.state === 'free' || a.state === 'guard')) targetYaw = hv > 0.35 ? yawOf(facing) : input.camYaw;
     else if (locked && isAlive(locked) && (a.state === 'free' || a.state === 'guard' || a.state === 'attack')) targetYaw = yawOf(sub(locked.pos, a.pos));
