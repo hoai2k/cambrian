@@ -76,7 +76,7 @@ export interface HudSnapshot {
   /** This match is over but its mode is co-op, so the results screen can offer to carry on. */
   canContinue: boolean;
   /** What this match turned up, for the results screen's record. */
-  discovery: { biomes: Biome[]; landmarks: LandmarkKind[]; apex: CreatureId[] };
+  discovery: { biomes: Biome[]; landmarks: LandmarkKind[]; apex: CreatureId[]; best: Partial<Record<CreatureId, number>> };
   /** The hour of the day: what it is, how long until it turns, and how much the reef is hunting. */
   day: { phase: Phase; until: number; pressure: number };
 }
@@ -1081,7 +1081,7 @@ export class Engine {
     return {
       players, rects, time: game.time, status: game.state.status, message: game.state.message, mode: game.mode, winner: game.state.winner, fps: this.fps,
       canContinue: game.state.status !== 'playing' && isCoop(game.mode),
-      discovery: { biomes: [...game.discovery.biomes], landmarks: [...game.discovery.landmarks], apex: [...game.discovery.apex] },
+      discovery: { biomes: [...game.discovery.biomes], landmarks: [...game.discovery.landmarks], apex: [...game.discovery.apex], best: Object.fromEntries(game.discovery.best) },
       day: game.dayPhase(),
     };
   }

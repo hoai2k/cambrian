@@ -55,6 +55,10 @@ export function Results({ snapshot, players, onAgain, onContinue, onChange, onTi
               {creature(players[i]?.creature ?? p.creature).kind && <span className="result-kind">{creature(players[i]?.creature ?? p.creature).kind}</span>}
               <span>{p.tierName}</span>
               <small>{p.eats} eaten · {p.kills} kills · {p.escapes} escapes</small>
+              {/* Rise keeps a high-water mark per creature; say so when this match moved one. */}
+              {fresh.best[players[i]?.creature ?? p.creature] !== undefined && (
+                <span className="new-tag best-tag">NEW BEST</span>
+              )}
             </div>
           ))}
         </div>

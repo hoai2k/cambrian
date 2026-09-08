@@ -39,6 +39,8 @@ and **M8 (polish) is complete except for two music files**:
 | Landmarks, co-op revive, spectating, the discovery record | Shipped; see below. |
 | The View scoreboard, and turns in Hunter & Hunted | Shipped; see below. |
 | The day/night cycle, and the temperaments under it | Shipped: [01 · The hours](01-game-design.md#the-hours) and [Temperament](01-game-design.md#temperament). |
+| Feeding: who hunts, who grazes, who lives on the dead | Shipped: [01 · Feeding](01-game-design.md#feeding). |
+| Carrying a Rise run on, and the record it leaves | Shipped: [01 · Carrying Rise on](01-game-design.md#carrying-rise-on) and [The growth ladder](01-game-design.md#the-growth-ladder). One implementation for both eras; `npm run progress` runs the same assertions against each. |
 
 Designed but **not built** (nothing depends on them; listed so they are not
 mistaken for shipped):

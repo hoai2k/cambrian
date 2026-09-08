@@ -191,7 +191,7 @@ expresses them differently so fights are varied.
 > | **A** | 0 | **Sprint / burst** (analog-free, held) |
 > | **B** | 1 | **Guard** (hold) / **parry** (tap) |
 > | **X** | 2 | **Light bite** |
-> | **Y** | 3 | **Ability** |
+> | **Y** | 3 | **Ability** · on the select screen: hatch, or carry a Rise run on · on the results screen: keep playing |
 > | **LB** | 4 | **Dodge / dash** |
 > | **RB** | 5 | **Rise** / **hop**, held to paddle upward (crawlers) |
 > | **LT** (analog) | 6 | **Aim** — the centred crosshair picks the target |
@@ -509,7 +509,7 @@ population.
 
 | Mode | Players | Description |
 | --- | --- | --- |
-| **Rise** (single / co-op) | 1–4 | The main experience. Everyone hatches as a Larva in the nursery. Reach Apex. Co-op shares nutrition from assisted kills, players can revive a downed ally by bumping them within 10 s. Players *can* turn on each other — bites land, and a dead player can be fed on — but nothing aims at another player for you: no aim snap, no auto-pounce, no auto-lock. Area abilities still spare a co-op partner, so nobody kills a friend by accident. Session ends when any player reaches Apex and survives 90 s, or continues in free-play. Escalation: the reef's giant population grows as players grow. |
+| **Rise** (single / co-op) | 1–4 | The main experience. Everyone hatches as a Larva in the nursery — or, having grown this creature before, at the stage they reached (see *Carrying Rise on*). Reach Apex. Co-op shares nutrition from assisted kills, players can revive a downed ally by bumping them within 10 s. Players *can* turn on each other — bites land, and a dead player can be fed on — but nothing aims at another player for you: no aim snap, no auto-pounce, no auto-lock. Area abilities still spare a co-op partner, so nobody kills a friend by accident. Session ends when any player reaches Apex and survives 90 s, or continues in free-play. Escalation: the reef's giant population grows as players grow. |
 | **Hunter & hunted** (versus, asymmetric) | 2–4 | One player is a Giant (× 3) with a shrinking hunger meter; the others are Juveniles who must survive and reach Adult. Giant eats to stay alive; small ones hide, bait, and grow. Rotates who is the Giant. *(As built: one **turn** each, 100 s, and your score is what you caught on your own turn — the same job for everyone, so the winner is the best hunter and prey play is how you keep the others' scores down. A turn ends early if every small one reaches Adult. One human plays it as a single turn, exactly as before.)* |
 | **Reef** (sandbox) | 1–4 | No win condition, pick any tier, tune giant density. For messing around and screenshots. |
 
@@ -524,6 +524,47 @@ seats in Hunter & Hunted; Rise and Reef are whoever turned up.
 > matter, and holding station over them brings them back with their tier
 > intact), **spectating** for a dead player in versus, and **rotation** in
 > Hunter & Hunted — see below.
+
+### Carrying Rise on
+
+Rise is the mode about growing up, so it is the one that keeps a record. Two
+things follow from that, and both are written once for both eras.
+
+**A finished run does not take the sea away.** Rise and Reef are co-op — a
+milestone rather than a verdict — so their results screen offers *Keep playing*
+(Y on a pad, Space on a keyboard). The match resumes exactly where it stood,
+with everything grown in it intact, and the goal stops watching so it cannot be
+met twice. Hunter & Hunted refuses: its result is a judgement between players.
+
+**The furthest you have taken each creature is kept.** The record is per era and
+per creature, stored on the device beside the rest of the codex, and it is a
+high-water mark: it never falls, however the run ended, and it is written as the
+run happens rather than at the results screen, so quitting to the title does not
+throw away what you grew. A creature with a record wears it as a badge on its
+expanded card on the select screen, and in Rise the card offers to hatch you at
+that stage instead of at the bottom — **Y** on a pad, **C** on a keyboard. The
+offer only appears where it is real: in Rise, for a creature you have actually
+grown. Everything else hands out its own body and ignores the choice.
+
+### The growth ladder
+
+Both eras grow a player through five rungs, and they do it in different state:
+the Cambrian moults **Larva → Juvenile → Adult → Giant → Apex** on nutrition and
+keeps the rung on the actor's `tier`; the Devonian moults **Hatchling →
+Juvenile → Young → Adult → Prime** on standing and keeps it in its own side
+table. `src/sim/ladder.ts` is the one place that difference is reconciled —
+`ladderRung`, `ladderName`, `ladderScale` — and an era answers through the
+`ladder*` hooks in `EraRules`.
+
+Everything that reports or restores progress goes through it, so the record, its
+badge, the carry-on option and the codex's *reached the top* mark are each
+written once and behave identically in both eras. `tools/progress-test.ts` is
+the contract: one set of assertions, run against both eras, with no branch on
+which era is in play.
+
+Both eras derive the rest of a body from its **scale** — the Cambrian's tier
+through `tierForScale`, the Devonian's stage through `stageForScale` — which is
+why hatching a player part-grown is a single number handed to `spawn`.
 
 ## Local multiplayer specifics
 

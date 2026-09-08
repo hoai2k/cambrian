@@ -7,6 +7,8 @@ import { Engine, type HudSnapshot } from '../render/engine';
 import type { Quality } from '../render/sea';
 import { PLAYABLE_IDS as CREATURE_IDS, PLAYABLE as CREATURES, creature, type CreatureId } from '../sim/creatures';
 import { MODE_IDS, type Mode, type PlayerSetup } from '../sim/types';
+import { clampRung, ladderName } from '../sim/ladder';
+import { loadCodex, recordBest } from './codex';
 import { Hud } from './Hud';
 import { LoadingScreen } from './Loading';
 import { Dialogs, PauseMenu, Results } from './Overlays';
@@ -51,8 +53,41 @@ export function App() {
   const padCount = padIndices.length;
   /** When the player last touched anything. Drives the idle gate on the asset loader. */
   const lastInputRef = useRef(0);
+  /**
+   * The furthest rung of the growth ladder each creature has reached in Rise on this device, kept
+   * per era. Held in state as well as in storage because the select screen badges it and offers to
+   * start there, and both have to change the moment a match improves on it.
+   */
+  const [best, setBest] = useState<Partial<Record<CreatureId, number>>>(() => loadCodex().best);
+  const bestRef = useRef(best);
+  /**
+   * Per player: whether they have asked to carry on from their record rather than hatch.
+   *
+   * Kept as the intent rather than as a rung, so that walking the cursor across a creature with no
+   * record and back again does not quietly switch the choice off. It is resolved against the
+   * record — and against the mode, since only Rise grows you — at the moment a match starts.
+   */
+  const [carry, setCarry] = useState<boolean[]>([]);
+  const carryRef = useRef<boolean[]>([]);
+  const setCarryBoth = useCallback((c: boolean[]) => { carryRef.current = c; setCarry(c); }, []);
 
   const updatePlayers = useCallback((p: PlayerSetup[]) => { playersRef.current = p; setPlayers(p); }, []);
+  /**
+   * Fold a match's Rise high-water marks into the record as they happen.
+   *
+   * The HUD snapshot arrives every frame, so this compares against what we already hold and does
+   * nothing — no parse, no write, no re-render — until a mark actually moves. Recording live
+   * rather than at the results screen is deliberate: growing a creature two stages and then
+   * quitting to the title still grew it two stages, and that should be in the record.
+   */
+  const keepBest = useCallback((found: Partial<Record<CreatureId, number>>) => {
+    let moved = false;
+    for (const [k, n] of Object.entries(found) as [CreatureId, number][]) if (n > (bestRef.current[k] ?? -1)) { moved = true; break; }
+    if (!moved) return;
+    const next = { ...bestRef.current };
+    for (const [k, n] of Object.entries(found) as [CreatureId, number][]) if (n > (next[k] ?? -1)) next[k] = n;
+    bestRef.current = next; setBest(next); recordBest(found);
+  }, []);
   const go = useCallback((s: Screen) => { screenRef.current = s; setScreen(s); }, []);
   const setPausedBoth = useCallback((p: boolean) => { pausedRef.current = p; setPaused(p); engineRef.current?.setPaused(p || dialogRef.current !== null); }, []);
   const openDialog = useCallback((d: DialogKind) => { dialogRef.current = d; setDialog(d); engineRef.current?.setPaused(pausedRef.current || d !== null); if (d) audio.play('ui-confirm'); else audio.play('ui-back'); }, []);
@@ -61,7 +96,11 @@ export function App() {
   useEffect(() => {
     if (!canvasRef.current) return;
     const engine = new Engine(canvasRef.current, settings.quality, {
-      onHud: (s) => { setHud(s); if (s.status !== 'playing' && screenRef.current === 'playing') { go('results'); engineRef.current?.releasePointer(); audio.play(s.status === 'won' ? 'won' : 'death'); } },
+      onHud: (s) => {
+        setHud(s);
+        keepBest(s.discovery.best);
+        if (s.status !== 'playing' && screenRef.current === 'playing') { go('results'); engineRef.current?.releasePointer(); audio.play(s.status === 'won' ? 'won' : 'death'); }
+      },
       onMenu: () => { if (screenRef.current === 'playing') { setPausedBoth(!pausedRef.current); audio.play('ui-confirm'); } },
       onError: (m) => setError(m),
       // The pointer lock went away on its own — Escape, or the window lost focus. Nothing good
@@ -143,13 +182,23 @@ export function App() {
     else if (!document.fullscreenElement) void document.documentElement.requestFullscreen({ navigationUI: 'hide' }).catch(() => {});
   }, [go, toggleFullscreen, updatePlayers]);
 
+  /**
+   * The setups as the simulation wants them: the roster plus, for anyone who asked and has a record
+   * to draw on, the rung to hatch at. Only Rise grows a player through the ladder, so only Rise
+   * carries anything on; every other mode hands out its own body and the field is left off.
+   */
+  const withCarry = useCallback((ps: PlayerSetup[]) => ps.map((p, i) => {
+    const rung = modeRef.current === 'rise' && carryRef.current[i] ? clampRung(bestRef.current[p.creature] ?? 0) : 0;
+    return rung > 0 ? { ...p, startRung: rung } : { ...p, startRung: 0 };
+  }), []);
+
   const startMatch = useCallback(() => {
     const ps = playersRef.current;
     if (!ps.length || !ps.every((p) => p.ready) || !engineRef.current) return;
-    engineRef.current.startMatch(modeRef.current, ps);
+    engineRef.current.startMatch(modeRef.current, withCarry(ps));
     setPausedBoth(false);
     go('playing');
-  }, [go, loaded, setPausedBoth]);
+  }, [go, loaded, setPausedBoth, withCarry]);
 
   const backToSelect = useCallback(() => {
     engineRef.current?.startAttract();
@@ -181,10 +230,10 @@ export function App() {
 
   const playAgain = useCallback(() => {
     if (!engineRef.current) return;
-    engineRef.current.startMatch(modeRef.current, playersRef.current);
+    engineRef.current.startMatch(modeRef.current, withCarry(playersRef.current));
     setPausedBoth(false);
     go('playing');
-  }, [go, setPausedBoth]);
+  }, [go, setPausedBoth, withCarry]);
 
   /** Move a player's cursor on the roster grid. Locked players must unlock first (B). */
   /**
@@ -226,11 +275,27 @@ export function App() {
     const ps = [...playersRef.current]; if (!ps[index]) return;
     ps[index] = { ...ps[index], ready: !ps[index].ready }; updatePlayers(ps); audio.play(ps[index].ready ? 'ui-confirm' : 'ui-back');
   }, [updatePlayers]);
+  /**
+   * Start as a hatchling, or carry on from the furthest this creature has been taken in Rise.
+   *
+   * Silently does nothing outside Rise, or for a creature with no record: there is nothing to
+   * carry on from, and a control that appeared to do something and did not would be worse than one
+   * that is plainly unavailable — so the card only offers it when it is real.
+   */
+  const toggleCarry = useCallback((index: number) => {
+    const p = playersRef.current[index];
+    if (!p || modeRef.current !== 'rise' || !(bestRef.current[p.creature] ?? 0)) return;
+    const next = [...carryRef.current];
+    next[index] = !next[index];
+    setCarryBoth(next); audio.play(next[index] ? 'ui-confirm' : 'ui-back');
+  }, [setCarryBoth]);
   const removePlayer = useCallback((index: number) => {
     const ps = playersRef.current.filter((_, i) => i !== index);
     if (!ps.length) { backToTitle(); return; }
+    // The choice is indexed by seat, so it has to shuffle down with the seats.
+    setCarryBoth(carryRef.current.filter((_, i) => i !== index));
     updatePlayers(ps); audio.play('ui-back');
-  }, [backToTitle, updatePlayers]);
+  }, [backToTitle, setCarryBoth, updatePlayers]);
   const addPlayer = useCallback((device: PlayerSetup['device']) => {
     const ps = playersRef.current;
     if (ps.length >= 4 || ps.some((p) => p.device === device)) return;
@@ -282,6 +347,8 @@ export function App() {
             if (just('confirm')) { if (ps[idx].ready) startMatch(); else toggleReady(idx); }
             if (just('back')) { if (ps[idx].ready) toggleReady(idx); else removePlayer(idx); }
             if (just('menu')) startMatch();
+            // Y: hatch, or carry on from your record. Free on this screen in both eras.
+            if (just('ability')) toggleCarry(idx);
             // LB and RB cycle the mode. Bind to the raw shoulder buttons, never to a gameplay
             // control: this used to read `burst`, which is button 0 — the same button as confirm —
             // so every A press locked the player in and then changed mode, and changeMode
@@ -315,7 +382,7 @@ export function App() {
     // padIndices is deliberately not a dependency: it is written from inside this loop, and
     // listing it would tear the loop down and rebuild it every time a pad connects, losing the
     // button edges held in `prev`.
-  }, [addPlayer, backToSelect, backToTitle, changeMode, keepPlaying, moveCursor, openDialog, playAgain, removePlayer, setPausedBoth, startFromTitle, startMatch, toggleReady]);
+  }, [addPlayer, backToSelect, backToTitle, changeMode, keepPlaying, moveCursor, openDialog, playAgain, removePlayer, setPausedBoth, startFromTitle, startMatch, toggleCarry, toggleReady]);
 
   // ---- Keyboard menu navigation ----
   useEffect(() => {
@@ -334,6 +401,8 @@ export function App() {
           if (e.code === 'ArrowUp' || e.code === 'KeyW') moveCursor(idx, 0, -1);
           if (e.code === 'Space' || e.code === 'Enter') { e.preventDefault(); if (ps[idx].ready) startMatch(); else toggleReady(idx); }
           if (e.code === 'Escape') { if (ps[idx].ready) toggleReady(idx); else backToTitle(); }
+          // The keyboard's own way to the same choice the pad makes with Y.
+          if (e.code === 'KeyC') toggleCarry(idx);
         } else if (e.code === 'Enter' || e.code === 'Space') addKeyboard();
         if (e.code === 'KeyQ') changeMode(MODES[(MODES.indexOf(modeRef.current) + MODES.length - 1) % MODES.length]);
         if (e.code === 'KeyE') changeMode(MODES[(MODES.indexOf(modeRef.current) + 1) % MODES.length]);
@@ -358,7 +427,7 @@ export function App() {
     };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
-  }, [addKeyboard, backToSelect, backToTitle, changeMode, keepPlaying, moveCursor, openDialog, playAgain, setPausedBoth, startFromTitle, startMatch, toggleReady]);
+  }, [addKeyboard, backToSelect, backToTitle, changeMode, keepPlaying, moveCursor, openDialog, playAgain, setPausedBoth, startFromTitle, startMatch, toggleCarry, toggleReady]);
 
   // Idle-time preloading: tell the loader what is most likely to be needed next.
   useEffect(() => {
@@ -392,8 +461,9 @@ export function App() {
         <SelectScreen
           players={players} mode={mode} modes={MODES} modeInfo={modeInfo} allReady={allReady} padIndices={padIndices}
           scheme={scheme}
+          best={best} carry={carry}
           onPick={setCreature} onReady={toggleReady} onRemove={removePlayer} onAddKeyboard={addKeyboard}
-          onMode={changeMode} onStart={startMatch} onBack={backToTitle}
+          onMode={changeMode} onStart={startMatch} onBack={backToTitle} onCarry={toggleCarry}
         />
       )}
 

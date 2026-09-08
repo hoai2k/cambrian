@@ -21,6 +21,7 @@
     "world": "esbuild tools/world-test.ts --bundle --platform=node --format=esm --outfile=node_modules/.cache/world-test.mjs && node node_modules/.cache/world-test.mjs",
     "motion": "esbuild tools/motion-test.ts --bundle --platform=node --format=esm --outfile=node_modules/.cache/motion-test.mjs && node node_modules/.cache/motion-test.mjs",
     "hiding": "esbuild tools/hiding-test.ts --bundle --platform=node --format=esm --outfile=node_modules/.cache/hiding-test.mjs && node node_modules/.cache/hiding-test.mjs",
+    "progress": "esbuild tools/progress-test.ts --bundle --platform=node --format=esm --outfile=node_modules/.cache/progress-test.mjs && node node_modules/.cache/progress-test.mjs cambrian && node node_modules/.cache/progress-test.mjs devonian",
     "eras": "node tools/era-test.mjs",
     "merge": "node --experimental-transform-types tools/merge-test.mjs",
     "devonian": "esbuild tools/devonian-test.ts --bundle --platform=node --format=esm --outfile=node_modules/.cache/devonian-test.mjs && node node_modules/.cache/devonian-test.mjs",
