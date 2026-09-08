@@ -206,6 +206,39 @@ The sea is endless, so a party needs a way to regroup.
   with a fade, 2.5 s of spawn protection, and a 20 s cooldown. Not while
   dead, swallowed, grabbed or mid-move.
 
+## Changing creature
+
+The last entry on the teleport menu is not a destination: it opens the roster.
+Left and right cycle through every playable creature starting on the one you
+are, **Y** flips whether an animal you have never worn would arrive fully grown
+or as a hatchling, **A** takes it and **B** backs out.
+
+The point is that a body you put down is not thrown away. `Game.changeCreature`
+writes the animal you are leaving into a per-player table at the size and the
+ladder mark it had, and hands the one you pick up back exactly as you left it —
+or hatches it fresh if it is new to you. So the toggle only decides how a
+*stranger* arrives; a creature of your own comes back at its own progress
+whichever way it is set, and the menu says which of the two you are looking at.
+One session can therefore raise several animals rather than one.
+
+Nothing else changes: the sea, the hour, the mode's clock and everything anyone
+else has grown carry straight on, and the swap costs the same 20 s cooldown as a
+teleport, from the same menu. It is refused while dead, mid-move, or grabbed.
+
+That last part is why the swap is done **in place on the actor** rather than by
+restarting anything. On a sofa with four people on it, one of them going off to
+raise something new must not cost the other three their afternoon: the body is
+edited, its player index keeps its own wardrobe of put-down creatures, and no
+other actor, table or timer is touched. `npm run swap` asserts it — a second
+player's species, size, mark, position, health and state all come through a
+neighbour's swap untouched, and the two players' wardrobes stay separate, so
+taking up the body somebody else grew still starts you at the bottom of it.
+
+The era resyncs whatever it keeps outside the actor through the `onSwap` hook —
+the Devonian stores the life stage in a side table rather than deriving it, so
+without that the new animal would wear the old one's stage. `npm run swap`
+covers the keeping and the refusals; `npm run devonian` covers the resync.
+
 ## Radar
 
 A small circle at the top right of each viewport (the bottom right carries the

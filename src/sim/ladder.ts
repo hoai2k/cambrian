@@ -75,5 +75,17 @@ export const ladderFill = (g: Game, a: Actor, fraction: number) => {
   a.nutrition = (TIER_NEED[a.tier] ?? 0) * f;
 };
 
+/**
+ * Where this body stands on the ladder right now, as a mark: the rung plus how full its meter is.
+ *
+ * The inverse of `ladderScale` + `ladderFill`, so a body's position can be written down and handed
+ * back later — which is what swapping creature mid-match does with the one you put away.
+ */
+export const ladderMark = (g: Game, a: Actor): number => {
+  const rung = ladderRung(g, a);
+  const fill = RULES ? RULES.ladderFillOf(g, a) : (a.nutrition / Math.max(1e-6, TIER_NEED[a.tier] ?? 1));
+  return clampMark(rung + Math.max(0, Math.min(0.999, fill)));
+};
+
 /** Adult length is era content, not ladder logic; re-exported so callers need one import. */
 export const adultLength = (id: CreatureId) => creature(id).adultLength;

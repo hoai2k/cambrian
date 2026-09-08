@@ -171,6 +171,9 @@ export const DEVONIAN_RULES: EraRules = {
     const from = STAGE_AT[d.stage] ?? 0, to = STAGE_AT[d.stage + 1] ?? GROWN;
     d.standing = from + (to - from) * fraction;
   },
+  ladderFillOf: (g, a) => stageProgress(devActor(g, a)),
+  // The stage is stored, not derived per step, so a body that changed species has to be told.
+  onSwap: (g, a) => { const d = devActor(g, a); d.stage = stageForScale(creature(a.creature).adultLength, a.scale); d.standing = STAGE_AT[d.stage] ?? 0; },
   install() { installDevonianSpecials(); },
   ySpecial,
   init(g) { installDevonianSpecials(); for (const a of players(g)) { const d = devActor(g, a); d.stage = stageForScale(creature(a.creature).adultLength, a.scale); d.standing = g.mode === 'reef' ? STAGE_AT[ADULT_STAGE] + 5 : STAGE_AT[d.stage]; } },

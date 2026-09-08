@@ -202,6 +202,18 @@ h3 { font-size: 13px; letter-spacing: .12em; color: var(--ember); margin: 14px 0
 .revive-bar { display: block; height: 3px; margin-top: .3em; border-radius: 2px; background: var(--player, #61f2d5); transform-origin: left; transition: transform .08s linear; }
 .revive-bar.wide { width: min(40vw, 260px); height: 4px; margin-top: .6em; }
 
+/* The change-creature page of the teleport menu: one animal at a time, cycled left and right, with
+   what you would arrive as written under it. */
+.swap-menu { min-width: 15em; }
+.swap-body { display: flex; gap: .7em; align-items: center; margin: .4em 0 .5em; }
+.swap-body img { width: 3.4em; height: 3.4em; object-fit: contain; flex: none; }
+.swap-body > div { display: grid; gap: .1em; min-width: 0; }
+.swap-body b { font: 800 1em var(--font-display); }
+.swap-kind { font-size: .74em; color: var(--dim); }
+.swap-rung { font-size: .8em; color: var(--ember); }
+.swap-fill { display: block; height: 3px; margin-top: .25em; border-radius: 2px; background: rgba(238,250,246,.16); }
+.swap-fill b { display: block; height: 100%; border-radius: 2px; background: var(--ember); transform-origin: left; }
+
 /* Versus: whose game you are watching while you are dead. */
 .spectating { position: absolute; left: 50%; bottom: 2.2em; transform: translateX(-50%); display: grid; justify-items: center; gap: .15em; padding: .5em 1.2em; border-radius: 1em; background: rgba(6,22,28,.7); border: 1px solid rgba(238,250,246,.22); pointer-events: none; }
 .spectating b { font: 900 .8em var(--font-display); letter-spacing: .18em; color: var(--mist); }

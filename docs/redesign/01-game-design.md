@@ -235,6 +235,11 @@ expresses them differently so fights are varied.
 >    the one that costs least: *Resume* on pause, *Continue* on the results
 >    screen (*Play again* in the versus modes, which have nothing to continue).
 >
+> Both menus end at *Quit*, which leaves the match for the choice screen — where
+> you go to play as something else, and where the way back to the title already
+> is. A separate "quit to title" button sat one careless press from the end of a
+> session for no gain.
+>
 > Afterwards it is one cursor and one button: up and down move, A confirms. The
 > results panel is a flex column with a scrolling middle, so the choices stay
 > pinned on screen — they used to be the last thing inside one tall scroller and
