@@ -1,0 +1,67 @@
+{
+  "method": "Non-Blender scipy FK/CCD sanity probe using actual v1 GLB rest transforms and motion-v3 timing. Not visual or export acceptance.",
+  "maxLeadGraspErrorAfterPickup": 0.0018469249900526588,
+  "maxErrorAfterPickup": 0.0198564091399637,
+  "worst": [
+    {
+      "progress": 0.23809523809523808,
+      "arm": 2,
+      "error": 0.0198564091399637
+    },
+    {
+      "progress": 0.21428571428571427,
+      "arm": 2,
+      "error": 0.019253438778423372
+    },
+    {
+      "progress": 0.2619047619047619,
+      "arm": 2,
+      "error": 0.01745141119078469
+    },
+    {
+      "progress": 0.21428571428571427,
+      "arm": 7,
+      "error": 0.014901576206157152
+    },
+    {
+      "progress": 0.23809523809523808,
+      "arm": 7,
+      "error": 0.014341553453114964
+    },
+    {
+      "progress": 0.2857142857142857,
+      "arm": 2,
+      "error": 0.013442575525401929
+    },
+    {
+      "progress": 0.19047619047619047,
+      "arm": 7,
+      "error": 0.011597761986805802
+    },
+    {
+      "progress": 0.2619047619047619,
+      "arm": 7,
+      "error": 0.011532808162657029
+    },
+    {
+      "progress": 0.19047619047619047,
+      "arm": 2,
+      "error": 0.011409234314698055
+    },
+    {
+      "progress": 0.30952380952380953,
+      "arm": 2,
+      "error": 0.00872467619291188
+    },
+    {
+      "progress": 0.23809523809523808,
+      "arm": 1,
+      "error": 0.008321825531895876
+    },
+    {
+      "progress": 0.21428571428571427,
+      "arm": 1,
+      "error": 0.008177001072504317
+    }
+  ]
+}

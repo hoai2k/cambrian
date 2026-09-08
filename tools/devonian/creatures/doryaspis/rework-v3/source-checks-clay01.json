@@ -1,0 +1,144 @@
+{
+  "status": "PASS source geometry only; Blender Booleans, construction and art unexecuted/unreviewed",
+  "longitudinalSamples": 2001,
+  "meshes": [
+    {
+      "name": "body",
+      "vertices": 15794,
+      "faces": 15904,
+      "finite": true,
+      "nonmanifoldEdgeIncidence": 0,
+      "degenerateFaces": 0,
+      "bounds": [
+        [
+          -0.648,
+          0.648
+        ],
+        [
+          -0.365,
+          0.27914293815857627
+        ],
+        [
+          -3.2,
+          0.9740000000000005
+        ]
+      ]
+    },
+    {
+      "name": "cornual_left",
+      "vertices": 3082,
+      "faces": 3136,
+      "finite": true,
+      "nonmanifoldEdgeIncidence": 0,
+      "degenerateFaces": 0,
+      "bounds": [
+        [
+          0.44,
+          1.681
+        ],
+        [
+          -0.20357701487465385,
+          0.06
+        ],
+        [
+          -0.91,
+          0.272
+        ]
+      ]
+    },
+    {
+      "name": "cornual_right",
+      "vertices": 3082,
+      "faces": 3136,
+      "finite": true,
+      "nonmanifoldEdgeIncidence": 0,
+      "degenerateFaces": 0,
+      "bounds": [
+        [
+          -1.681,
+          -0.44
+        ],
+        [
+          -0.20357701487465385,
+          0.06
+        ],
+        [
+          -0.91,
+          0.272
+        ]
+      ]
+    },
+    {
+      "name": "pseudorostrum",
+      "vertices": 9642,
+      "faces": 9680,
+      "finite": true,
+      "nonmanifoldEdgeIncidence": 0,
+      "degenerateFaces": 0,
+      "bounds": [
+        [
+          -0.119,
+          0.119
+        ],
+        [
+          -0.026070656923076925,
+          0.047
+        ],
+        [
+          0.82,
+          1.670000000000001
+        ]
+      ]
+    },
+    {
+      "name": "caudal_membrane",
+      "vertices": 3082,
+      "faces": 3136,
+      "finite": true,
+      "nonmanifoldEdgeIncidence": 0,
+      "degenerateFaces": 0,
+      "bounds": [
+        [
+          -0.18846253756691259,
+          -0.096
+        ],
+        [
+          -0.273,
+          0.33500000000000046
+        ],
+        [
+          -3.2460000000000004,
+          -2.6499999999999995
+        ]
+      ]
+    },
+    {
+      "name": "oral_cutter",
+      "vertices": 2370,
+      "faces": 2432,
+      "finite": true,
+      "nonmanifoldEdgeIncidence": 0,
+      "degenerateFaces": 0,
+      "bounds": [
+        [
+          -0.108,
+          0.108
+        ],
+        [
+          -0.042816254130377124,
+          0.176425723132
+        ],
+        [
+          0.6699360159164,
+          1.074803856704
+        ]
+      ]
+    }
+  ],
+  "inputHashes": {
+    "/Users/hoai/Documents/Stuff/Generations/cambrian/local/expansion-repo/tools/devonian/creatures/doryaspis/rework-v3/geometry_clay01.py": "181983f576c5ce4e0f767df639ac244a7471175cf3169d962c529245119ab7bd",
+    "/Users/hoai/Documents/Stuff/Generations/cambrian/local/expansion-repo/tools/devonian/creatures/doryaspis/rework-v3/build_clay01.py": "4de2eee03863cd2ea26e850e2cc2615820d214bd28933d7858b2ef150bcf2194",
+    "/Users/hoai/Documents/Stuff/Generations/cambrian/local/expansion-repo/tools/devonian/creatures/doryaspis/rework-v3/render_clay01.py": "1d1991f398a250b2e7fcee6847cc6891003cffdb473ef9c53263c1351da7aab8",
+    "/Users/hoai/Documents/Stuff/Generations/cambrian/local/expansion-repo/tools/devonian/creatures/doryaspis/rework-v3/check_source_clay01.py": "3d667a4cc0e962aaf57dfe0be666943199344b255c6f73315a408c1f4edcb416"
+  }
+}

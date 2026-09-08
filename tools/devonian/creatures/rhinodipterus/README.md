@@ -158,3 +158,12 @@ The complete frozen candidate family is handed off in `delivery-v2.json`. All25 
 render records, five profile records and three LOD poses completed before the user
 switched production priority to initial versions. Parent controls preview labeling,
 viewer integration and publication; further refinements are deferred to later review.
+
+## Reference-led redesign reopened — 8 September 2026
+
+The user supplied a new appearance reference. This model remains a preview pending that
+redesign; previous evidence applies only to the preserved old files. See the species section
+in `docs/devonian/refinement-queue.md` for concrete sculpt, eye, fin and material targets.
+The image and copy/hash-verified model/source backup are under local/devonian-authoring.
+Do not rerun the old builder into an existing candidate or treat old eye audits as approval
+for future geometry. Finish the redesign before fresh general quality audits.

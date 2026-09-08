@@ -44,3 +44,12 @@ The original source image and editable project are preserved in `cambrian/local/
 ## Final integration
 
 Final full/LOD packaging preserved all geometry, numeric samples, weights, materials and sockets exactly. `eye-packaged-review.json` identifies the packaged hashes and fresh independent measurements. Both detail levels passed structural intake. The built main viewer loaded the specimen, all eighteen action selections retained paused state and accepted frame stepping, feeding poses were inspected, and no browser errors were recorded. The era integration checks and type/build checks passed; original Cambrian assets remain unchanged.
+
+## Reference-led redesign reopened — 8 September 2026
+
+The user supplied a new appearance reference. This model remains a preview pending that
+redesign; previous evidence applies only to the preserved old files. See the species section
+in `docs/devonian/refinement-queue.md` for concrete sculpt, eye, fin and material targets.
+The image and copy/hash-verified model/source backup are under local/devonian-authoring.
+Do not rerun the old builder into an existing candidate or treat old eye audits as approval
+for future geometry. Finish the redesign before fresh general quality audits.

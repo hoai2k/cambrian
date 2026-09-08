@@ -61,3 +61,11 @@ is a game interpretation, not a claim of fossil evidence for predatory limb use.
 Review the inverted silhouette from the game's camera, including reduced-model limb readability,
 shell transparency/depth ordering and action extremes. Keep both references and the original
 model backup; the current model stays preview until replacement acceptance.
+
+## Attack and feeding pass — 8 September 2026
+
+The separately requested articulated motion pass also reopens the Cambrian specimens listed
+in `src/content/cambrian/model-status.ts`. See `docs/attack-feeding-refinement.md` and
+`tools/attack-feeding-refinements.json` for individual scope, backups and acceptance requirements.
+Odaraia incorporates this in its full rework; other models retain current anatomy until their
+individual review determines changes. Keep preview status until every pending task is complete.
