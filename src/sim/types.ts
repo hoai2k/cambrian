@@ -104,7 +104,14 @@ export interface Actor {
   hideT: number; hideCd: number; camoStrength: number;
   camoColors?: import('./concealment').CamoColors; camoScheme: string; camoLabel: string; camoSource: number;
   emergenceHeavy: boolean;
-  senseCd: number; senseT: number;
+  /**
+   * Sense: a display mode the player holds on or off, not a pulse. On (the default) the band
+   * glyphs and the radar are drawn; off, the screen carries nothing but the animal and the HUD,
+   * which is the immersive way to play. Display only — nothing in the simulation reads it.
+   */
+  senseMode: boolean;
+  /** How long this body still reads as revealed: the whip search, and a hidden body found by one. */
+  senseT: number;
   burstT: number;          // free burst timer (ambush surge)
   hitFlash: number; hitDir: Vec3; hitStop: number;
   grabbedBy: number; grabbing: number; grabT: number;

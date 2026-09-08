@@ -84,7 +84,7 @@ function PlayerPanel({ p }: { p: PlayerHud }) {
       {p.board && <Scoreboard board={p.board} me={p.index} />}
       <BiomeBanner biome={p.biome} alive={p.alive} />
       <DayPhase day={p.day} />
-      <Radar radar={p.radar} biome={p.biome} />
+      {p.senseOn && <Radar radar={p.radar} biome={p.biome} />}
       {p.teleport && (
         <div className="tele-menu">
           <p className="eyebrow">TELEPORT</p>
@@ -120,9 +120,9 @@ function PlayerPanel({ p }: { p: PlayerHud }) {
           <span className="chip-label">{p.abilityUnlocked ? p.abilityName : 'Hide'}</span>
           <i className="cool" style={{ transform: `scaleX(${p.abilityUnlocked ? p.abilityReady : 0})` }} />
         </div>
-        <div className={`chip sense ${p.senseReady >= 1 ? 'ready' : ''}`}>
-          <span className="btn dpad">{key('sense', s)}</span><span className="chip-label">Sense</span>
-          <i className="cool" style={{ transform: `scaleX(${p.senseReady})` }} />
+        <div className={`chip sense ${p.senseOn ? 'ready active' : ''}`} title="Band marks and the radar. Off is the immersive view: nothing over the sea but this bar.">
+          <span className="btn dpad">{key('sense', s)}</span><span className="chip-label">Sense{p.senseOn ? '' : ' off'}</span>
+          <i className="cool" style={{ transform: `scaleX(${p.senseOn ? 1 : 0})` }} />
         </div>
         <div className="tally"><span>{p.eats} eaten</span><span>{p.kills} kills</span><span>{p.escapes} escapes</span></div>
       </div>
