@@ -3,11 +3,12 @@ import { CREATURES, creature } from '../src/sim/creatures';
 import { EXPANSION_CREATURES } from '../src/sim/expansion';
 import { makeActor, bodyRadius, clearanceOf, isHidden } from '../src/sim/actors';
 import { applyHit } from '../src/sim/combat';
-import { beginExpansionAbility, stepExpansionAbility, bloomRate, grazeRate } from '../src/sim/expansion-abilities';
+import { beginExpansionAbility, stepExpansionAbility, bloomRate, grazeRate, HEAVY_STRIKE } from '../src/sim/expansion-abilities';
 import { emptyInput } from '../src/sim/types';
 import { Game } from '../src/sim/game';
 import { makeBrain } from '../src/sim/ai';
 import { SURFACE_Y } from '../src/sim/world';
+import { HEAVY_SPECIALS } from '../src/sim/concealment';
 
 assert.equal(CREATURES.length, 21);
 assert.equal(new Set(CREATURES.map(c => c.id)).size, 21);
@@ -80,4 +81,77 @@ for(const id of ['burgessomedusa','ctenorhabdotus'] as const){
   g.step(1/60,new Map([[0,emptyInput()]]));
   assert(a.pos.y+clearanceOf(a)<=SURFACE_Y-.8+1e-6,`${id}: body crosses surface`);
 }
-console.log('PASS: 21 unique options, 13 abilities, ally safety, finite state, armor piercing, one hit per activation, hide cancellation, movement and all-tier feeding.');
+/**
+ * The heavy button and the crosshair have to agree. The HUD lights "RT · <move>" when the aimed
+ * target is inside `heavyMove().reach`; pressing it there has to land, and the prompt must not
+ * light at all when the button would do nothing (special on cooldown, or a filter feeder that
+ * never strikes a target).
+ */
+{
+  const strikers = CREATURES.filter((c) => HEAVY_STRIKE[c.ability]);
+  assert(strikers.length >= 4, 'no heavy strikes to check');
+  for (const def of strikers) {
+    const g = new Game('reef', [{ creature: def.id, device: 'keyboard', ready: true }], 91);
+    const a = g.players[0];
+    a.pos = { x: 0, y: 12, z: 0 }; a.yaw = 0;
+    // Let a benthic creature settle onto the seabed first, so the target sits at its own depth.
+    for (let i = 0; i < 60; i++) g.step(1 / 60, new Map([[0, emptyInput()]]));
+    a.yaw = 0; a.vel = { x: 0, y: 0, z: 0 }; a.stamina = a.staminaMax; a.abilityCd = 0; a.exhausted = 0;
+    const move = g.heavyMove(a);
+    assert.equal(move.name, def.abilityName.toUpperCase(), `${def.id}: prompt names the wrong move`);
+    assert(move.ready, `${def.id}: rested creature reads as not ready`);
+    assert(move.reach > 0, `${def.id}: a strike with no reach`);
+    // A body at the far edge of what the crosshair promises, dead ahead and at the same depth.
+    const prey = g.spawn('waptia', 'ambient', { x: a.pos.x, y: a.pos.y, z: a.pos.z + move.reach * 0.95 }, 1);
+    prey.scale = a.scale; prey.hp = prey.hpMax = 400; prey.iframes = 0;
+    a.lockTarget = prey.id; a.aiming = true;
+    const before = prey.hp;
+    const input = { ...emptyInput(), heavy: true, aim: true, aimTarget: prey.id };
+    for (let i = 0; i < 90; i++) g.step(1 / 60, new Map([[0, i < 2 ? input : { ...input, heavy: false }]]));
+    assert(prey.hp < before, `${def.id}: RT at a target the crosshair called in range never connected`);
+  }
+  // Cooldown and exhaustion are what the prompt greys out for, not the pounce's timers.
+  const g = new Game('reef', [{ creature: 'opabinia', device: 'keyboard', ready: true }], 92), a = g.players[0];
+  // A special on cooldown no longer greys the prompt out: RT falls through to the pounce, so the
+  // prompt has to name that instead of a move the button would not play.
+  a.abilityCd = 2; a.stamina = a.staminaMax;
+  assert.equal(g.heavyMove(a).name, 'POUNCE', 'a special on cooldown still advertises itself');
+  assert(g.heavyMove(a).ready, 'the pounce RT falls through to reads as unavailable');
+  a.abilityCd = 0; a.stamina = 4;
+  assert(!g.heavyMove(a).ready, 'a special with no stamina still advertises itself');
+  // A filter feeder's heavy never strikes a target, so the prompt must never offer one.
+  for (const id of ['collectorWake', 'pharyngealPump', 'planktonComb']) {
+    const def = CREATURES.find((c) => c.ability === id);
+    if (!def) continue;
+    const fg = new Game('reef', [{ creature: def.id, device: 'keyboard', ready: true }], 93);
+    assert.equal(fg.heavyMove(fg.players[0]).reach, 0, `${def.id}: crosshair offers a strike it does not have`);
+  }
+}
+
+// --- RT always does something: the special when it is ready, the heavy attack or a pounce when
+// it is not. The eight creatures whose special sits on RT used to swallow the press entirely
+// while the special cooled down, so their `heavy` move was unreachable for a player. ---
+{
+  const HEAVY_SPECIAL_IDS = EXPANSION_CREATURES.filter((d) => HEAVY_SPECIALS.has(d.ability)).map((d) => d.id);
+  assert(HEAVY_SPECIAL_IDS.length > 0, 'no creatures carry a special on RT');
+  for (const id of HEAVY_SPECIAL_IDS) {
+    const g = new Game('reef', [{ creature: id, device: 'keyboard', ready: true }], 91);
+    const p = g.players[0];
+    p.spawnProtect = 0; p.pos = { x: 0, y: 6, z: 0 };
+    const press = (held: boolean) => g.step(1 / 60, new Map([[0, { ...emptyInput(), heavy: held }]]));
+    // first press: the special
+    press(true); press(false);
+    assert.equal(p.state, 'ability', `${id}: RT did not start the special (state=${p.state})`);
+    // run it out, then press again while it is still cooling down
+    for (let i = 0; i < 60 * 6 && (p.state !== 'free' || p.abilityCd <= 0); i++) press(false);
+    assert(p.state === 'free' && p.abilityCd > 0, `${id}: no cooling-down window to test (state=${p.state} cd=${p.abilityCd.toFixed(2)})`);
+    const stamina = p.stamina;
+    press(true); press(false);
+    assert(p.state === 'attack' || p.state === 'pounce',
+      `${id}: RT was swallowed while the special cooled down (state=${p.state})`);
+    assert(p.stamina < stamina, `${id}: RT cost nothing, so nothing happened`);
+    if (p.state === 'attack') assert.equal(p.moveKind, 'heavy', `${id}: RT fell back to something other than the heavy`);
+  }
+}
+
+console.log('PASS: 21 unique options, 13 abilities, ally safety, finite state, armor piercing, one hit per activation, hide cancellation, movement, all-tier feeding, the heavy prompt matching the move, and the RT fallback.');

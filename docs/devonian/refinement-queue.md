@@ -14,7 +14,7 @@ files. Basic build/export checks during authoring are not a substitute for the p
 
 ## Full reworks requested by the user
 
-Titanichthys, Doryaspis, Gemuendina, Coccosteus, Bothriolepis and Stethacanthus require total model reworks, not cosmetic edits to the current geometry. Reconsider reference-based proportions and continuous volumes, sculpt new Blender geometry where needed, rebuild materials and rig deformation, then author dynamic actions and matching portraits. Preserve existing versions locally. All six remain playable previews until their individual rework review passes.
+Titanichthys, Doryaspis, Gemuendina, Coccosteus, Bothriolepis and Stethacanthus require total model reworks, not cosmetic edits to the current geometry. Reconsider reference-based proportions and continuous volumes, sculpt new Blender geometry where needed, rebuild materials and rig deformation, then author dynamic actions and matching portraits. Preserve existing versions locally. Each remains a playable preview until its individual rework review passes. Gemuendina V3 has now passed; the other five remain pending.
 
 The machine-readable pending queue is `tools/devonian/pending-refinements.json`. Catalogue validation requires every pending creature to remain `preview`; remove a pending entry only after its actual work and review are complete.
 
@@ -124,7 +124,17 @@ use manta-like flow as a sculpting/animation direction, not as a replacement ana
 Inspect front, side and oblique contours in Blender, then flowing pectoral waves and tail curves
 through the full required actions. Repeat eye containment/socket checks after changing the head.
 
-Gemuendina is reopened as **preview** until this user-requested sculpting pass is reviewed.
+Gemuendina V3 candidate02 completed this rework and its individual review on 7 September 2026.
+The new continuous sculpt, original ImageGen-supported PBR pigment, articulated oral interior,
+28-bone rig,18actions,full/LOD and four portraits are integrated. All54sampled action frames
+were independently inspected;56measured full/LOD poses passed the conservative eye-volume
+and denticle-contact checks. Smallest eye containment bound86.87% exceeds the requested50%.
+Three.js playback/anchors, apparent-size LOD comparisons, structural intake and interactive
+viewer review passed. Default uses the authored olive material; selectable schemes remain.
+See `tools/devonian/creatures/gemuendina/rework-v3/final-art-verdict.md` and
+`preview-delivery-02.md` for exact evidence, version hashes and earlier integration checkpoint.
+Old public family is preserved in the named local pre-rework-v3 backup. Status is now **final**;
+this closes Gemuendina's queue entry and does not approve any other queued model.
 
 ## Other initial-model refinement
 

@@ -8,6 +8,7 @@ import { creature } from '../sim/creatures';
 import { BIOME_ART, biomeArtPath, radarGlyphPath } from '../shared/environment-assets';
 import { BAND_COLOR } from '../sim/types';
 import { appBase } from '../shared/base';
+import { fillControls, key } from '../shared/controls';
 
 export function Hud({ snapshot }: { snapshot: HudSnapshot }) {
   const W = snapshot.rects.reduce((m, r) => Math.max(m, r.x + r.w), 1);
@@ -28,6 +29,8 @@ export function Hud({ snapshot }: { snapshot: HudSnapshot }) {
 
 function PlayerPanel({ p }: { p: PlayerHud }) {
   const def = creature(p.creature);
+  // Every prompt on this half of the screen is written in whatever this player is holding.
+  const s = p.scheme;
   const R = 30, C = 2 * Math.PI * R;
   // Red edges indicate low health only; predator awareness has its own text and arrow.
   const healthWarning = p.alive && p.hpMax > 0
@@ -65,7 +68,7 @@ function PlayerPanel({ p }: { p: PlayerHud }) {
       {p.aim && (
         <div className={`aim ${p.aim.hasTarget ? 'on-target' : ''} ${p.aim.inRange ? 'in-range' : ''} ${p.aim.ready ? '' : 'cooling'}`} style={{ color: p.aim.color }}>
           <i /><i /><i /><i /><b />
-          <span className="aim-label">{p.aim.inRange ? (p.aim.ready ? 'RT · POUNCE' : '…') : p.aim.name ?? ''}</span>
+          <span className="aim-label">{p.aim.inRange ? (p.aim.ready ? `${key('heavy', s)} · ${p.aim.action}` : '…') : p.aim.name ?? ''}</span>
         </div>
       )}
       {p.lock && !p.aim && (
@@ -92,23 +95,23 @@ function PlayerPanel({ p }: { p: PlayerHud }) {
               </li>
             ))}
           </ul>
-          <small>{p.teleport.cooldown > 0 ? `Ready in ${Math.ceil(p.teleport.cooldown)} s` : <><kbd>A</kbd> go · <kbd>B</kbd> back · D-pad ▼ next</>}</small>
+          <small>{p.teleport.cooldown > 0 ? `Ready in ${Math.ceil(p.teleport.cooldown)} s` : <><kbd>{key('confirm', s)}</kbd> go · <kbd>{key('back', s)}</kbd> back · <kbd>{key('teleport', s)}</kbd> next</>}</small>
         </div>
       )}
       <div className="hud-bottom">
-        <div className={`chip ability ${p.abilityUnlocked ? '' : 'locked'} ${p.abilityActive ? 'active' : ''}`} title={hideDescription(def.id)}>
-          <span className="btn y">Y</span>
+        <div className={`chip ability ${p.abilityUnlocked ? '' : 'locked'} ${p.abilityActive ? 'active' : ''}`} title={fillControls(hideDescription(def.id), s)}>
+          <span className="btn y">{key('ability', s)}</span>
           <span className="chip-label">{p.abilityUnlocked ? p.abilityName : 'Hide'}</span>
           <i className="cool" style={{ transform: `scaleX(${p.abilityUnlocked ? p.abilityReady : 0})` }} />
         </div>
         <div className={`chip sense ${p.senseReady >= 1 ? 'ready' : ''}`}>
-          <span className="btn dpad">▲</span><span className="chip-label">Sense</span>
+          <span className="btn dpad">{key('sense', s)}</span><span className="chip-label">Sense</span>
           <i className="cool" style={{ transform: `scaleX(${p.senseReady})` }} />
         </div>
         <div className="tally"><span>{p.eats} eaten</span><span>{p.kills} kills</span><span>{p.escapes} escapes</span></div>
       </div>
       {p.hunterState !== 'none' && (
-        <div className={`threat ${p.hunterState}`}>
+        <div className={`threat-alert ${p.hunterState}`}>
           <span className="eye"><i style={{ transform: `scaleX(${Math.min(1, p.hunted)})` }} /></span>
           <div>
             <b>{p.hunterState === 'hunting' ? `${p.hunterName ?? 'Something huge'} IS HUNTING YOU` : `${p.hunterName ?? 'Something huge'} is looking your way`}</b>
@@ -117,7 +120,7 @@ function PlayerPanel({ p }: { p: PlayerHud }) {
         </div>
       )}
       {!p.modelReady && p.alive && <p className="hint">Your creature is taking shape…</p>}
-      {p.hint && p.hunterState === 'none' && p.modelReady && <p className="hint">{p.hint}</p>}
+      {p.hint && p.hunterState === 'none' && p.modelReady && <p className="hint">{fillControls(p.hint, s)}</p>}
       {/* Co-op: where a team-mate went down, and how long is left to reach them. */}
       {p.downedAllies.map((d) => (
         <div key={d.index} className="downed-arrow" style={{ color: d.color, transform: `rotate(${Math.atan2(d.x, -d.y) * 180 / Math.PI}deg)` }} aria-hidden>
@@ -200,12 +203,30 @@ const fmtDist = (d: number) => (d < 1000 ? `${Math.round(d)} m` : `${(d / 1000).
  * (`radarRange` in `src/sim/game.ts`), so a hatchling reads its own thicket and a giant reads the
  * water it can actually cross.
  */
+/** Spoken form of the food contacts, including whether they are over your head. */
+function foodLabel(blips: readonly RadarBlipHud[]): string {
+  const food = blips.filter((b) => b.kind === 'food');
+  if (!food.length) return 'No food in reach.';
+  const l = food[0].level;
+  return l === 'above' ? 'Food above you.' : l === 'below' ? 'Food below you.' : 'Food nearby.';
+}
+
 function Radar({ radar, biome }: { radar: PlayerHud['radar']; biome: string }) {
   const R = 44, C = 50;
   const outline = useId().replaceAll(':', '');
+  /**
+   * A dial drawn from overhead cannot show depth, so a contact that is well above or below carries a
+   * chevron: pointing up for water above you, down for the floor below. Shoals also change colour
+   * (see `FOOD_ABOVE`), because whether the food is over your head decides what you do about it.
+   */
+  const chevron = (b: RadarBlipHud, x: number, y: number, off: number) => b.level && (
+    b.level === 'above'
+      ? <path d={`M ${x - 2.6} ${y - off} L ${x} ${y - off - 2.4} L ${x + 2.6} ${y - off}`} fill="none" stroke="currentColor" strokeWidth="1.1" strokeLinecap="round" strokeLinejoin="round" />
+      : <path d={`M ${x - 2.6} ${y + off} L ${x} ${y + off + 2.4} L ${x + 2.6} ${y + off}`} fill="none" stroke="currentColor" strokeWidth="1.1" strokeLinecap="round" strokeLinejoin="round" />
+  );
   const dot = (b: RadarBlipHud, k: number) => {
     const x = C + b.x * R * 0.92, y = C + b.y * R * 0.92;
-    const cls = `blip blip-${b.kind} ${b.beyond ? 'beyond' : ''} ${b.hunting ? 'hunting' : ''}`;
+    const cls = `blip blip-${b.kind} ${b.beyond ? 'beyond' : ''} ${b.hunting ? 'hunting' : ''} ${b.level ? `blip-${b.level}` : ''}`;
     if (b.kind === 'deadzone') {
       // an area, not a contact: a ring the size of the zone, or a dashed marker on the rim when out of reach
       const rr = Math.max(3, Math.min(R, (b.r ?? 0.1) * R));
@@ -239,6 +260,7 @@ function Radar({ radar, biome }: { radar: PlayerHud['radar']; biome: string }) {
         <circle cx={x} cy={y} r={1.3} fill="currentColor" />
         <circle cx={x - rr * .45} cy={y + rr * .35} r={1} fill="currentColor" />
         <circle cx={x + rr * .4} cy={y - rr * .4} r={1} fill="currentColor" />
+        {chevron(b, x, y, rr + 1.6)}
       </g>;
     }
     if (b.kind === 'shore') {
@@ -253,6 +275,7 @@ function Radar({ radar, biome }: { radar: PlayerHud['radar']; biome: string }) {
       <g filter={b.beyond ? `url(#${outline})` : undefined}>
         <use href={`${appBase()}${radarGlyphPath(b.kind)}#glyph`} x={x - size / 2} y={y - size / 2} width={size} height={size}/>
       </g>
+      {chevron(b, x, y, size / 2 + 1)}
     </g>;
   };
   // rim contacts last so they draw over the ring
@@ -260,7 +283,7 @@ function Radar({ radar, biome }: { radar: PlayerHud['radar']; biome: string }) {
   const inside = radar.blips.filter((b) => !b.beyond).sort((a2, b2) => rank(a2) - rank(b2));
   const rim = radar.blips.filter((b) => b.beyond);
   return (
-    <div className="radar" aria-label={`Radar, ${Math.round(radar.range)} metre reach. ${biome}. ${radar.blips.some((b) => b.kind === 'food') ? 'Food nearby.' : 'No food in reach.'}`}>
+    <div className="radar" aria-label={`Radar, ${Math.round(radar.range)} metre reach. ${biome}. ${foodLabel(radar.blips)}`}>
       <svg viewBox="0 0 100 100">
         <defs><filter id={outline} colorInterpolationFilters="sRGB">
           <feMorphology in="SourceAlpha" operator="erode" radius=".7" result="inside"/>

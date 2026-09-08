@@ -73,7 +73,7 @@ export const SCHEME_PROPOSALS: Record<string, string> = {
   titanichthys: 'shoal-sea-green',
   coccosteus: 'orcadie-leaf',
   bothriolepis: 'miguasha-sand',
-  gemuendina: 'stargazer-ochre',
+  gemuendina: 'default',
   doryaspis: 'svalbard-shingle',
   cladoselache: 'cleveland-countershade',
   stethacanthus: 'lavender-brush',

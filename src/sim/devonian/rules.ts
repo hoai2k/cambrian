@@ -7,7 +7,7 @@ import type { Actor, Mode, WorldEvent } from '../types';
 import { BIOME_DANGER, biomeAt, groundHeight, sampleCurrent, shoreDistance, SHORE_WALL, SURFACE_Y } from '../world';
 import { bodyRadius } from '../actors';
 import { ADULT_STAGE, devActor, GROWN, HOLD_TO_WIN, PRIME_STAGE, RUNG_NAMES, STAGE_AT, STAGES, stageForScale, stageProgress, stageScale, stateFor, type DeadZone, type DevActor } from './state';
-import { beginAbility, camoDrain, installDevonianSpecials, stepAbility, stepGuardSpecial, useAbility, ySpecial } from './specials';
+import { camoDrain, installDevonianSpecials, stepAbility, stepGuardSpecial, useAbility, ySpecial } from './specials';
 import { botNursery, canBreach, sanctuary, spawnInCover, spawnProtect, spawnY, swim, wanderY } from './swim';
 
 /**
@@ -223,7 +223,7 @@ export const DEVONIAN_RULES: EraRules = {
   shoreReach(a) { return creature(a.creature).shoreReach ?? 0; },
   jet(a) { return !!creature(a.creature).shell; },
 
-  useAbility, beginAbility, stepAbility, camoDrain,
+  useAbility, stepAbility, camoDrain,
   swim, canBreach, spawnY, wanderY,
   spawnPoint: spawnInCover, botNursery, spawnProtect, sanctuary,
 
@@ -252,13 +252,18 @@ export const DEVONIAN_RULES: EraRules = {
       const d = devActor(g, a);
       if (d.stage >= PRIME_STAGE && isAlive(a)) {
         d.primeT += dt;
-        if (d.primeT >= HOLD_TO_WIN && g.state.status === 'playing') {
+        if (d.primeT >= HOLD_TO_WIN && g.state.status === 'playing' && !g.endless) {
           const name = creature(a.creature).name;
           g.state = { status: a.player >= 0 ? 'won' : 'lost', winner: a.player,
             message: a.player >= 0 ? `${name} grew up and held the sea.` : `A rival ${name} grew up first.` };
         }
       } else d.primeT = 0;
     }
+  },
+
+  /** Rise wins on a held timer; zero it so play resumes with the sea open. */
+  continueMatch(g) {
+    for (const a of players(g)) devActor(g, a).primeT = 0;
   },
 
   /**
@@ -285,7 +290,7 @@ export const DEVONIAN_RULES: EraRules = {
     const p = g.players[i]; if (!p || !isAlive(p)) return undefined;
     const d = devActor(g, p), def = creature(p.creature), rung = rungOf(p);
     if (d.deadZoneIn && def.breathing !== 'air') return 'Dead water. Get out of it, or up to the surface if you can breathe.';
-    if (def.breathing === 'air' && d.air < AIR_LOW) return 'Air is low. RB to the surface and gulp.';
+    if (def.breathing === 'air' && d.air < AIR_LOW) return 'Air is low. {rise} to the surface and gulp.';
     if (g.time < 12) return rung === 1 ? 'Feed, hide, moult. Everything out there is bigger than you are today.' : rung === 2 ? 'Feed and keep your shoal. You grow on what you catch.' : rung === 3 ? 'Hunt the shoals. Five stages between you and Prime.' : 'Stay fed. The sea is hiding from you.';
     if (def.shell && g.time < 40) return 'Sprint jets you backward. Rise and sink are free. Block withdraws into the shell.';
     if ((def.shoreReach ?? 0) > 0 && g.time < 40) return 'You can push into water nothing with gills can follow you into.';

@@ -1,5 +1,5 @@
 /**
- * Crawlers off the seabed. RB hops and then paddles: a crawler can climb into open water and
+ * Crawlers off the seabed. RB lifts them off and paddles: a crawler can climb into open water and
  * keep swimming there, slowly, but it cannot sprint or dash until its legs are back down.
  * It also has to be able to get back — the descent is a settle, not a fall — and the seafloor
  * has to keep enough small food on it for a crawler that never leaves the bottom.
@@ -28,6 +28,22 @@ function run(g: Game, p: ReturnType<typeof start>['p'], f: Partial<InputFrame>, 
   for (let i = 0; i < seconds * 60; i++) { g.step(1 / 60, inputs); g.events.length = 0; }
   const above = p.pos.y - floor();
   return { above, climbed: above - from.above, travelled: Math.hypot(p.pos.x - from.pos.x, p.pos.z - from.pos.z) };
+}
+
+// --- leaving the floor is a gradual rise, not a jump ---------------------------------------
+{
+  const { g, p } = start('olenoides');
+  const floor = () => groundHeight(g.world, p.pos.x, p.pos.z, []);
+  const y0 = p.pos.y - floor();
+  const first = run(g, p, { rise: true }, 0.25).above - y0;
+  const later = run(g, p, { rise: true }, 0.25).climbed;
+  // A kick off the floor would put most of its height on in the first quarter-second and then slow
+  // down; easing up off the floor does the opposite — it is still gathering pace.
+  check('leaving the floor eases up rather than kicking', first < later, `+${first.toFixed(2)} u in the first 0.25 s, +${later.toFixed(2)} u in the next`);
+  check('...and the first moments are gentle', first < 0.5, `+${first.toFixed(2)} u`);
+  const stamina = p.stamina;
+  run(g, p, {}, 4);                                            // back on the floor
+  check('...and lifting off costs no lump of stamina', p.stamina >= stamina - 1, `${stamina.toFixed(0)} -> ${p.stamina.toFixed(0)} on the way down`);
 }
 
 // --- a crawler climbs while RB is held, and stays up there swimming -------------------------

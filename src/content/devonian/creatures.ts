@@ -208,7 +208,7 @@ export const DEVONIAN_CREATURES: readonly CreatureDef[] = [
     light: light('Bite', { damage: 9 }),
     heavy: heavy('Sand ambush', { damage: 24, lunge: 0.7, windup: 0.25 }),
     ability: 'sandAmbush', abilityName: 'Sand ambush', abilityCooldown: 10,
-    abilityDesc: 'Y buries it in the sand; emerging is a free upward bite.',
+    abilityDesc: '{ability} buries it in the sand; emerging is a free upward bite.',
     passive: 'Near-immune to hits from above while buried.',
     weakness: 'Slow to turn over once caught.',
     canGuard: true,

@@ -26,6 +26,7 @@ type FloraKind = import('../src/sim/world').FloraKind;
 type Biome = import('../src/sim/world').Biome;
 type InputFrame = import('../src/sim/types').InputFrame;
 type Mode = import('../src/sim/types').Mode;
+import { isCoop } from '../src/sim/types';
 type CreatureId = import('../src/sim/creatures').CreatureId;
 
 const DT = 1 / 60;
@@ -524,6 +525,19 @@ ok(RULES !== undefined && !RULES.growthByNutrition, 'Devonian rules active: grow
   ok(g.state.status === 'won' && g.state.winner === 0, `holding Prime wins (${g.state.message})`);
   const modes: Mode[] = ['rise', 'hunted', 'reef'];
   for (const m of modes) { const gm = new Game(m, [{ creature: 'coccosteus', device: 'keyboard', ready: true }, { creature: 'cladoselache', device: 0, ready: true }]); for (let i = 0; i < 120; i++) tick(gm, new Map([[0, emptyInput()], [1, emptyInput()]])); ok(gm.state.status === 'playing', `${m} runs`); }
+
+  // Rise is co-op, so its result is a milestone: the sea can be carried on into.
+  ok(g.continueMatch() && g.state.status === 'playing' && g.endless, 'Rise carries on after it is won');
+  ok(devActor(g, g.players[0]).primeT === 0, '...with the hold timer cleared');
+  for (let i = 0; i < 60 * 100; i++) tick(g, new Map([[0, emptyInput()]]));
+  ok(g.state.status === 'playing', '...and it does not win itself again');
+}
+{
+  // Reef is co-op too; Hunter & Hunted is a contest between players and stays decided.
+  ok(isCoop('rise') && isCoop('reef') && !isCoop('hunted'), 'rise and reef are co-op, hunted is versus');
+  const hh = new Game('hunted', [{ creature: 'coccosteus', device: 'keyboard', ready: true }, { creature: 'cladoselache', device: 0, ready: true }]);
+  hh.state = { status: 'won', winner: 0, message: 'done' };
+  ok(!hh.continueMatch() && hh.state.status === 'won', 'a versus verdict is final');
 }
 
 // ---- rise ----
