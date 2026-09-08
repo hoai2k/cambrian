@@ -26,6 +26,7 @@ type FloraKind = import('../src/sim/world').FloraKind;
 type Biome = import('../src/sim/world').Biome;
 type InputFrame = import('../src/sim/types').InputFrame;
 type Mode = import('../src/sim/types').Mode;
+import { wrapAngle } from '../src/shared/math';
 import { isCoop } from '../src/sim/types';
 type CreatureId = import('../src/sim/creatures').CreatureId;
 
@@ -193,6 +194,27 @@ ok(RULES !== undefined && !RULES.growthByNutrition, 'Devonian rules active: grow
   ok(creature(p.creature).rung === 2, 'still rung II');
   const hud = RULES!.hud(g, 0)!;
   ok(hud.rung === 2 && hud.rungName === 'Shoal' && hud.standing === d.standing, 'HUD reports rung, name and standing');
+  // The ring is the same instrument in both eras: it fills toward the next moult, not across the
+  // whole of growth, so a full ring means the body is about to change and nothing else.
+  ok(hud.stageProgress === 1, `at Prime the ring is full (${hud.stageProgress})`);
+  {
+    const fresh = new Game('rise', [{ creature: 'coccosteus', device: 'keyboard', ready: true }]);
+    const q = fresh.players[0]; q.spawnProtect = 1e6;
+    const dq = devActor(fresh, q);
+    const seen: number[] = [];
+    let moults = 0, wasFull = 0;
+    for (let i = 0; i < 400 && dq.stage < PRIME_STAGE; i++) {
+      const before = dq.stage;
+      RULES!.onNutrition(fresh, q, 1, undefined);
+      const ring = RULES!.hud(fresh, 0)!.stageProgress;
+      seen.push(ring);
+      if (dq.stage > before) { moults++; if (seen[seen.length - 2] > 0.9) wasFull++; }
+      for (let k = 0; k < 4; k++) tick(fresh, new Map<number, InputFrame>([[0, emptyInput()]]));
+    }
+    ok(moults >= 3 && wasFull === moults, `every moult arrived with the ring full (${wasFull}/${moults})`);
+    ok(seen.every((v) => v >= 0 && v <= 1), 'the ring never leaves 0..1');
+    ok(seen.some((v) => v < 0.5), 'and it starts again after a moult rather than sitting near full');
+  }
   ok(RULES!.hint(g, 0) === undefined || typeof RULES!.hint(g, 0) === 'string', 'hint is optional text');
 }
 
@@ -263,6 +285,26 @@ ok(RULES !== undefined && !RULES.growthByNutrition, 'Devonian rules active: grow
   ok(kDunkPlate === 1, 'Dunkleosteus cuts straight through armour');
   ok(kTuskPlate > kSharkPlate && kTuskPlate < kDunkPlate, `Onychodus gets part way through (${kTuskPlate.toFixed(2)})`);
   ok(RULES!.jet(mk('manticoceras')) && !RULES!.jet(shark), 'only shells jet');
+}
+
+// ---- a jetting shell travels backward without turning round ----
+// Sprint fires out of the funnel, so the body goes the other way. It must keep pointing where the
+// player aimed it: orienting to the velocity instead spins it to face the camera and the backward
+// jet becomes an ordinary sprint.
+{
+  const run = (id: CreatureId, burst: number) => {
+    const g = new Game('reef', [{ creature: id, device: 'keyboard', ready: true }]);
+    const p = g.players[0];
+    p.pos = { x: 0, y: -14, z: 0 }; p.vel = { x: 0, y: 0, z: 0 }; p.yaw = 0; p.spawnProtect = 0;
+    const push = (): InputFrame => ({ ...emptyInput(), my: 1, burst });
+    for (let i = 0; i < 90; i++) tick(g, new Map<number, InputFrame>([[0, push()]]));
+    return { z: p.pos.z, yaw: Math.abs(wrapAngle(p.yaw)) };
+  };
+  const cruise = run('michelinoceras', 0), jet = run('michelinoceras', 1), fish = run('cladoselache', 1);
+  ok(cruise.z > 1 && cruise.yaw < 0.3, `a shell cruises forward, facing forward (z ${cruise.z.toFixed(1)}, yaw ${cruise.yaw.toFixed(2)})`);
+  ok(jet.z < -1, `sprint jets the shell backward (z ${jet.z.toFixed(1)})`);
+  ok(jet.yaw < 0.3, `...still facing where it was aimed, not spun round (yaw ${jet.yaw.toFixed(2)})`);
+  ok(fish.z > cruise.z, `a finned body sprints forward as before (z ${fish.z.toFixed(1)})`);
 }
 
 // ---- every sound the era asks for exists (the shared library is NOT under assets/devonian/) ----
@@ -444,14 +486,16 @@ ok(RULES !== undefined && !RULES.growthByNutrition, 'Devonian rules active: grow
   const a = g.players[0];
   const step = (f: Partial<InputFrame> = {}) => { g.step(DT, new Map([[0, { ...emptyInput(), ...f } as InputFrame]])); const k = g.events.map((e) => e.kind); g.events.length = 0; return k; };
   for (let i = 0; i < 120; i++) step();
-  a.spawnProtect = 0;
-  for (let i = 0; i < 150; i++) step({ my: 1, camYaw: a.yaw });
+  // Left alone for the whole run: this measures how a fish swims, not what finds it while it does.
+  const undisturbed = () => { a.spawnProtect = 999; a.hitStop = 0; };
+  undisturbed();
+  for (let i = 0; i < 150; i++) { step({ my: 1, camYaw: a.yaw }); undisturbed(); }
   const fwd = Math.hypot(a.vel.x, a.vel.z), yaw0 = a.yaw;
   let slowest = Infinity;
-  for (let i = 0; i < 40; i++) { step({ my: -1, camYaw: yaw0 }); slowest = Math.min(slowest, Math.hypot(a.vel.x, a.vel.z)); }
+  for (let i = 0; i < 40; i++) { step({ my: -1, camYaw: yaw0 }); undisturbed(); slowest = Math.min(slowest, Math.hypot(a.vel.x, a.vel.z)); }
   ok(slowest < fwd * 0.2, `backing up is slow (forward ${fwd.toFixed(1)}, astern bottoms at ${slowest.toFixed(1)})`);
   ok(Math.abs(a.yaw - yaw0) > 0.8, `and the body turns sharply to face the new way (${Math.abs(a.yaw - yaw0).toFixed(2)} rad in two thirds of a second)`);
-  for (let i = 0; i < 200; i++) step();
+  for (let i = 0; i < 200; i++) { step(); undisturbed(); }
   const rest = Math.hypot(a.vel.x, a.vel.z);
   step({ my: 1, camYaw: a.yaw, burst: 1 });
   const dart = Math.hypot(a.vel.x, a.vel.z);

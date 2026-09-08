@@ -15,6 +15,12 @@ import { DEVONIAN_RULES } from './devonian/rules';
 export interface EraHud {
   /** 0..100 growth meter: what this animal has eaten, which is what moults it up a stage. */
   standing: number;
+  /**
+   * 0..1 toward the *next* moult, which is what the HUD ring reads. The whole meter would answer a
+   * different question ("how grown am I overall") and leave the ring nowhere near full at the
+   * moment the body moults — in both eras a full ring means the next stage, and nothing else.
+   */
+  stageProgress: number;
   rung: number; rungName: string; stage: string;
   /** 0..1 air remaining, for air breathers only. */
   air?: number;
