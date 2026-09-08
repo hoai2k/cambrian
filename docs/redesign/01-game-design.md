@@ -220,6 +220,26 @@ expresses them differently so fights are varied.
 > two D-pad tools, and the left stick click keeps sinking so the old reflex
 > still works.
 >
+> **The in-game menus are steered, not button-mapped.** The pause menu and the
+> results screen used to give every choice its own pad button — A resumed, RT
+> went back to select, Y quit — which is three live shortcuts on a screen that
+> can appear on its own, the instant a match ends, while a hand is still
+> fighting. Three rules now stand between the end of a fight and an answer
+> (`src/app/menu-cursor.ts`, covered by `npm run menus`):
+>
+> 1. **A lockout.** Nothing is read for `MENU_LOCKOUT` (0.7 s) after the menu
+>    opens, and a button held across it is not an edge afterwards either.
+> 2. **A cursor that has to be woken.** The results screen starts with nothing
+>    highlighted; the first press or nudge only makes the cursor appear.
+> 3. **A harmless default.** It wakes on the first choice, which each menu makes
+>    the one that costs least: *Resume* on pause, *Continue* on the results
+>    screen (*Play again* in the versus modes, which have nothing to continue).
+>
+> Afterwards it is one cursor and one button: up and down move, A confirms. The
+> results panel is a flex column with a scrolling middle, so the choices stay
+> pinned on screen — they used to be the last thing inside one tall scroller and
+> fell off the bottom of a short window.
+>
 > Sharing a button between gameplay and a menu is fine and always has been — A
 > is sprint and confirm, B is guard and back — because they are different
 > screens. Two *menu* actions on one button is the bug. Hiding on D-pad right
