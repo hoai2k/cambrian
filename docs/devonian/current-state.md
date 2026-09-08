@@ -2,7 +2,7 @@
 
 Repository `/Users/hoai/Documents/Stuff/Generations/cambrian/local/expansion-repo`, branch
 `devonian-assets`. Separate main worktree `../devonian-publish`. Last verified remote publication
-**c74b71f** (main and devonian-assets pushed), including concurrent remote **a759b5a**. Preserve
+**dd1b509** (main and devonian-assets pushed), including concurrent remote **a759b5a**. Preserve
 checkpoints and verify before publication; never force push. Fetch/push `git@github.com:hoai2k/cambrian.git`.
 Other agents change main concurrently. Do not stage active authors' mutable files.
 
@@ -74,10 +74,10 @@ executors stop unexpected failures and preserve output. They do not make creativ
   sampling had aliased signals), richer bronze/umber grain and sharper irregular bars/flecks.
   Preserve frozen material01 geometry/relief and unchanged oral topology. Material02 now frozen:
   HANDOFF-MATERIAL-02.md, script4e79fe40644145efdda272699b7418dffab21a425cdc4c014429abb5b0be65b2.
-  Material02 executed; blendfb5d6149ca60af5109362d9080204c914b5a2f5e2003893a6cb0a6af76e35a49, reportb94af6882e191e55feea273444d54eff36bee86347091e6a9a6fccabf3ddae1f. Root inspected all7: bars/rays improved but pervasive gold dots/clouds erase armor sutures visible in clay-close. NOT accepted for rig. Author independent review/material03: calmer grain subordinate to anatomical plate-boundary color/roughness/relief; preserve oral geometry/improved bars.
+  Material02 executed; blendfb5d6149ca60af5109362d9080204c914b5a2f5e2003893a6cb0a6af76e35a49, reportb94af6882e191e55feea273444d54eff36bee86347091e6a9a6fccabf3ddae1f. Root inspected all7: bars/rays improved but pervasive gold dots/clouds erase armor sutures visible in clay-close. NOT accepted for rig. Author independent review agrees; material03 frozen in HANDOFF-MATERIAL-03.md, source43a7045aa0e880615a413335ff99eea04f04f13cb3ecb7deaad4408eda846896; Terra executing7views. Exact accepted sutures resolve through new response maps, grain/bump reduced, all geometry/oral/posterior maps retained.
   No final eye audits yet.
   Old named backup remains intact.
-- `/root/devonian_execution_handoff` (Terra medium), executing Odaraia clay01; Titan/Cocc material02 and Bothrio clay02 complete.
+- `/root/devonian_execution_handoff` (Terra medium), executing Cocc material03; Odaraia clay01, Titan/Cocc material02 and Bothrio clay02 complete.
   Bothrio clay01, Gemu audit03, Cocc/Titan material01 complete; no repeats required.
 - `/root/bothriolepis_rework_design` (Astra high), new individual author. Inspected user ref and
   saved primary2014paper figures2/3; designing wholly new deep antiarch shield, ventral oral
@@ -89,11 +89,11 @@ executors stop unexpected failures and preserve output. They do not make creativ
   deeper posterior-bending vestibule, no rectangular mask, auto-fit camera and extra oral depth view.
   Preserve clay01 blend880c1268ca2a02079bab14288fc4d163e640c1ea10034d0f1cf1aaaf548c3b22. Primary figures2/3/5/7: square rayless dorsal, scaleless trunk/caudal,
   laterally broad proximal pectoral blade (thin in dorsal view),30.5%TL appendage length. Do not
-  carry over old generic dorsal rays/scales/horizontal blade assumptions. Clay02 executed PASS; blend55ca3b38a1de698a9e788ca9f76ab576476aa28785c84380754d27ebcbecc84b, inventory3d1f7511578f67e4ab1e0bbab5f766e77416f6bc7db0dad9549b9481dfca84e2. Root inspected all7: full views fit, root pinch fixed and recessed mouth clearer. Author independent coarse gate/material source queued when slot available. No rig/material yet.
+  carry over old generic dorsal rays/scales/horizontal blade assumptions. Clay02 executed PASS; blend55ca3b38a1de698a9e788ca9f76ab576476aa28785c84380754d27ebcbecc84b, inventory3d1f7511578f67e4ab1e0bbab5f766e77416f6bc7db0dad9549b9481dfca84e2. Root inspected all7: full views fit, root pinch fixed and recessed mouth clearer. Author active independent coarse gate/material source. No rig yet.
 - `/root/odaraia_rework_design` (Astra high), new bounded Cambrian author. Read both preserved
   references and own DESIGN.md/queue; focused2024primary figure review then new custom clay source,
   coat-like semitransparent valves, numerous prominent articulated legs UP in normal swimming,
-  supported large eyes/three-blade tail. Primary2024 figures1–4,6 reviewed; use32 pairs within revised30–35 segments (supersedes older47),20 endopod intervals, ovate exopods/endites; tentative maxilla insertion documented. Clay01 source frozen HASHED_HANDOFF.md, builder0572cc205c7ce3c6854bb6c305a21dd31f9604af21f387854dd871e20045ffa0; Terra executing six views now. Author awaiting actual review. Own sources tools/creatures/odaraia/rework-v3 and local
+  supported large eyes/three-blade tail. Primary2024 figures1–4,6 reviewed; use32 pairs within revised30–35 segments (supersedes older47),20 endopod intervals, ovate exopods/endites; tentative maxilla insertion documented. Clay01 source frozen HASHED_HANDOFF.md, builder0572cc205c7ce3c6854bb6c305a21dd31f9604af21f387854dd871e20045ffa0; Terra completed six views; manifest97288757eb541cb67aade38ed6be1e55b52700e662bedf826d69118edb2cc1d7. Root inspected all6, NOT accepted: camera basis makes +Z vertical/crops ends; dense uniform limb-comb walls need meaningful leg articulation/visibility in correct legs-up pose. root-review-clay01.md records bounded next task. Resume original author when slot available; no production materials/rig. Own sources tools/creatures/odaraia/rework-v3 and local
   ../expansion-authoring/odaraia-rework. No old shared builder, Blender/public/Git or general audit yet.
 - Doryaspis/Stethacanthus authors not started. References/requirements in queues. Doryaspis
   mouth-art/anatomy discrepancy explained earlier; read saved primary-source notes.
@@ -113,6 +113,7 @@ Original Cambrian GLB/portrait bytes remain unchanged. New brief:
 visible many-limbed segmented trunk, prominent supported eyes and three tail blades. ROM account
 and 2024 primary full paper/figures reviewed by author; updated ANATOMY_SHAPE_BRIEF.md records32 paired limbs and uncertainties. Source reference:
 `../expansion-authoring/odaraia-rework/user-reference/`. Preserve the old model as fallback.
+New future-rework backups also verified: doryaspis-pre-rework-v3-2026-09-07 (49 files/36,737,046 bytes) and stethacanthus-pre-rework-v3-2026-09-07 (56 files/31,390,630 bytes), under ../devonian-authoring/backups. Exact seven public assets plus current per-creature sources/maps; manifests, old local Blends untouched.
 Coccosteus named backup `../devonian-authoring/backups/coccosteus-pre-rework-2026-09-07/` verified
 unchanged after paired comparison renders. All other originals/intermediates stay under local.
 
