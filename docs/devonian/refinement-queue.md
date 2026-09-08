@@ -14,7 +14,7 @@ files. Basic build/export checks during authoring are not a substitute for the p
 
 ## Full reworks requested by the user
 
-Titanichthys, Doryaspis, Gemuendina, Coccosteus, Bothriolepis and Stethacanthus require total model reworks, not cosmetic edits to the current geometry. Reconsider reference-based proportions and continuous volumes, sculpt new Blender geometry where needed, rebuild materials and rig deformation, then author dynamic actions and matching portraits. Preserve existing versions locally. Each remains a playable preview until its individual rework review passes. Gemuendina V3 has now passed; the other five remain pending.
+Titanichthys, Doryaspis, Gemuendina, Coccosteus, Bothriolepis and Stethacanthus require total model reworks, not cosmetic edits to the current geometry. Reconsider reference-based proportions and continuous volumes, sculpt new Blender geometry where needed, rebuild materials and rig deformation, then author dynamic actions and matching portraits. Preserve existing versions locally. Each remains a playable preview until its individual rework review passes. Gemuendina V3 has passed its structural review. Titanichthys V3 candidate08 has also passed its focused structural/art review and is in release preparation; broader polish remains pending. The other four total reworks remain pending.
 
 The machine-readable pending queue is `tools/devonian/pending-refinements.json`. Catalogue validation requires every pending creature to remain `preview`; remove a pending entry only after its actual work and review are complete.
 
@@ -179,8 +179,7 @@ feeding reconstruction. Do not turn it into a toothed Dunkleosteus. Complete bod
 colour remain interpretations. Model the oral interior and jaw mechanism anew as needed, and
 repeat eyes, sockets, animation and full/LOD visual checks.
 
-Titanichthys is reopened as preview. Historical V2 review evidence describes the unchanged old
-files and no longer signifies final visual approval. The L01 lighting concept currently depicts
+Titanichthys V3 candidate08 is accepted for release as a refined **preview**: deep armored form, long fins, continuous articulated oral interior, inset eyes,18 actions in both full/LOD and five anchors. Final combined render review passed; actual full/LOD eye containment lower bounds exceed60%, and58 oral poses pass. Full package21,955,988 bytes, LOD2,365,892 bytes. See `tools/devonian/creatures/titanichthys/rework-v3/RELEASE-CANDIDATE08-EXECUTION.md` and `RELEASE08-ART-VERDICT.md`. LOD surface/eye-rim polish and broader controller review remain pending. Historical V2 approval does not cover the replacement. The L01 lighting concept currently depicts
 that old preview silhouette and must be refreshed after the full rework. User art stays local.
 
 ## Doryaspis — user reference, 7 September 2026
