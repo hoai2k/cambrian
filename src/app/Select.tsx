@@ -183,7 +183,7 @@ function BestRun({ mark, carrying, rise, scheme, onToggle }: { mark: number | un
       {rise && (
         <button className="carry-toggle" aria-pressed={carrying} onClick={onToggle} title={title}>
           {carrying ? `Continuing as ${name}${part > 0 ? ', part grown' : ''}` : `Starting as ${ladderName(0)}`}
-          <kbd>{scheme === 'pad' ? 'Y' : 'C'}</kbd>
+          <kbd>{scheme === 'pad' ? key('light', scheme) : 'C'}</kbd>
         </button>
       )}
     </div>
