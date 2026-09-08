@@ -52,54 +52,58 @@ Nahe reference SHAd5640abf84805adf6b4f6df335dc5b3bceda09931d426b2039089391ffb85c
 
 ## Exact current work
 
-### Gemuendina — latest face request
+### Gemuendina — newest terminal-snout correction
 
-Root authored face-v4 studies01/02 and rigged candidates01/02. Accepted V3 body/materials
-preserved posterior to Y=-1.04; mouth now leading-front, eyes adjacent above it, original
-dorsal eye objects relocated. Candidate01 actual eye containment met50% but missed65%
-margin in Heavy; candidate02 inset eyes another .010, preserving candidate01.
-Candidate02 full16,412,444B /LOD2,862,364B:18/18actions,28bones,3anchors. Actual exported
-10pose eye/oral audit PASS; per-pose conservative margins are in face-v4/audit-candidate-02-03/audit.json.
-11 actual full/LOD face/action views individually inspected by root; four portraits regenerated.
-Minimum measured eye interior77.7953%, conservative95% lower77.0443%. Selected intake,
-build/typecheck PASS. Built viewer4176 shows new face,18clips and preview badge; Idle/Heavy
-observed. Face-v4 WORKING_STATE and release-review-02.json hold evidence. Main merge next.
-Keep preview: far LOD intentionally loses fine tessera pigment and still needs broader final art review.
+User rejected published main0b639d0 mouth interpretation: front flap itself IS
+terminal mouth, not an opening set back on the top. Eyes closer together like
+nostrils immediately above snout. Prior candidate02 audits only apply to preserved
+candidate02 and are not acceptance of this new requirement. All remain preview.
+Root study03/04 shifted the mouth but produced a folded ventral apron; rejected.
+New dedicated Astra high /root/gemuendina_terminal_snout owns study05: separate
+upper/lower/ventral profiles and oral cavity from terminal lip ring, eyes±.125,
+smaller .55, smoothly removes old orbital ridges. Terra executing CPU2, side first.
+Read face-v4/TERMINAL_SNOUT_STATE.md for hashes/recipe. All6 actualimages specialistaccepted, root side/oblique/dorsalaccepted. Production05
+transfer/structural/fullLODeye+oralchecksPASS. Actual12viewexportreview running,
+portraitsqueued. Specialistmustreviewcurrentriggedmouthbeforepublic/main.
+Accepted V3 posterior/materials and original94file backup preserved.
 
-### Dunkleosteus — latest face request
+### Dunkleosteus — face V4 delivery close
 
-Dedicated Astra high /root/dunkleosteus_face_v4 inspected reference and existing final V2.
-Candidate01 actual8views rejected: brow triangular artifacts, exposed gnathal root slabs.
-Candidate02 actual8views author reviewed and root inspected four key views: continuous brow,
-stronger cheek, shaped sharp gnathals with supported roots. Advances to dedicated eye/oral
-checks, not final. Terra executed frozen export02/audit02: full18.27MB/LOD2.35MB,18/18clips.
-Eyes PASS but oral reports256 opposing-shell and130 opposing-gnathal failures per asset across
-173poses. Dedicated artist diagnosing exact failures before correction; no face public release.
-Audit final SHA0d8231a8aa9b8c8a39861f92b928901f762f6606fd2fa6f1dfc2c000f3a52f6b.
-Same working jaws, source textures, interior and anchors retained. Both detail levels must keep18clips.
+Candidate03 full/LOD export and173feeding poses PASS both eyes and zero opposing
+shell/gnathal failures. Six sculpted gnathals adjusted for receiving lanes; posterior
+upper plate has rounded shoulders/tapered curved edge. Source/rig/body/interior
+preserved. Author reviewed all20actual full/LOD/portraitimages; full art accepted,
+butLODwhiteCOLOR0 masked correctCOLOR1. Pigment04 exact shader-binding derivative
+preserves all non-colour JSON and BIN, geometric audits explicitly carried forward
+via equality proof. Eight correctedLODposes complete, root reviewed key3+fullEat
+andselect; owneracceptedall8focusedfacepreview with explicitcolourlimitation. LOD visibly losesfinepigment/looks paler; broad
+material/LODpolish remains preview. Finalizer04 andselectedintake/build/typecheckPASS;
+publicfamilycopied, builtviewerIdle/Heavy.4667verified18clips. Maincommitnext.
+Commands/hashes in face-v4/WORKING_STATE.md. Neveruseoldfinalizer03/whiteLOD.
 
-### Titanichthys
+### Titanichthys — candidate06 held at specific diagnostic gates
 
-Candidate05 material ambiguity diagnosed by Terra:326 conflicting POSITION+UV corners,
-zero after exact material identity separation. Candidate06 minimal repair frozen manifest
-669f6ad4970160f85a6c133e9aaaf4b673d3b8161269ce77225f95d67a5d698c. Terra G1+G2 now PASS:
-43,409,408B full/3,878,132B LOD,18/18actions. G3 actual23views complete and author inspected
-all23: HOLD for two pale oral-floor patches in Ability maximum gape; targeted diagnosis and
-actual eye containment pending. Pose manifest507de45a64ed53697dcbb138452990752a5fdf490551b8246e9f3feb9f16f48b.
-All prior failures preserved. Raw full still over25MB; lossless packaging and post-rework
-oral/eye/actual runtime reviews remain. Accepted clay04/material02 remain the art target.
+Candidate06 all23images reviewed byauthor, rootAbility/oblique: improvedform/material
+survives butpairedpaleoralpatches inAbility. RootfrozenV1 actualtriangleprobe confirms
+undersidefirst80full/94LOD vs0inBite/Eat; authorverifiedpairedsectioncrossings: real
+localdeformationinversion. V2eyeaudit failed excessrayintersections onclosedfullbind
+(no boundarycaps); NOcontainmentPASS. Authorfreezingdiagnostic withoutweakeninglimits.
+P1lossless exactequality/all18clips PASS butsizebudgetFAIL:full36,046,104B/LOD2,343,984B.
+Embeddedimages30,324,633B; nonimage5,721,471B meansgeometryalonecannotreach25MiB.
+Raw06outputs/artifacts and allfailureevidence preserved. No publicreplacement.
+Astra /root/titanichthys_rework_clay03 owns nextdiagnostic/correctionhandoff.
 
-### Coccosteus
+### Coccosteus — candidate04 actual export/portraits done, art review next
 
-Candidate02 all23views inspected: white cranial polygon patches and weak LOD bars/rays.
-Root+author actual12-view shading ablation confirms roughness atlas holes (no-normal leaves
-patches, fixed roughness removes them; baked-before-export already affected). Candidate03
-frozen: two continuous body UV strips,2048roughness minimum32.77pixels/triangle, original
-living material fields retained, narrower LOD filtering and45% fin retention (body25%).
-HANDOFF-CANDIDATE-03.md,60-input manifest1f21e13cd943a74c9837c2951c4992edaa37b9043aa3bc3805e7c2f406412bf5.
-Terra attempted Group1 and stopped at body_uv_02.py:71 uncovered/invalid albedo strip
-(0.0,0.5529412031173706). Partial baked-02 preserved; candidate-03 absent, Groups2–5 not run.
-Owning Astra author now diagnosing coverage and preparing a new frozen correction. All23 actual views still required. No public replacement.
+Candidate02 whitecranialpatches diagnosed as roughness UVbakeholes. Candidate03
+bake02stopuncoveredalbedo preserved. Bake03 pairedtest provesinheritedmargin
+ADJACENT_FACES16 had1311invalidborderpixels; explicitEXTEND32 haszero withidentical
+broadinteriorpigment. Candidate04 downstreamonlyfromacceptedbake03 now TerraPASS
+all4groups, full/LOD18/18clips, atlascomplete,4portraits+19reviewviews. No publicrelease.
+Manifest8c78e16bafb72c157f5bc54eebf1802c4d56dbbfca07ee2252680169c46a4d2e verified111inputs.
+OwningAstra inspectedall23: fullPBRseamrepairPASS, butHOLDforLODlongitudinal
+smears/losttransversebars,finrayblotches,patchyarmourandjaggedoralrim. Explicit
+topology-awareLODdirectionbeingfrozen, thenstopfortoday; nofurtherexecutions.
 
 ### Bothriolepis
 
@@ -149,10 +153,10 @@ request explicitly; dorsal markings must not be construed as eyes.
 ## Repo / validation / execution
 
 Repo /Users/hoai/Documents/Stuff/Generations/cambrian/local/expansion-repo, devonian-assets.
-Separate main worktree ../devonian-publish. Latest own checkpointac16d82; merged concurrent c08e039.
-Main8730c96 and feature5d9534e pushed to same GitHub repository over SSH. HTTPS fetch works; HTTPS push lacks credentials. Use explicit git@github.com:hoai2k/cambrian.git for push. Fetch/merge concurrent main; never force.
+Separate main worktree ../devonian-publish. Latest own checkpointbc79286; concurrent c08e039 included.
+Main0b639d0 and feature84ea9bc pushed to same GitHub repository over SSH. HTTPS fetch works; HTTPS push lacks credentials. Use explicit git@github.com:hoai2k/cambrian.git for push. Fetch/merge concurrent main; never force.
 Commit finished frozen source/docs/status independently of mutable agent work. No broad add.
-Do not stage __pycache__. Michelinoceras motion delivery is published; Gemu face candidate02 is staged for next publication.
+Do not stage __pycache__. Michelinoceras motion delivery is published; Gemu face candidate02 is published too.
 
 User-authorized workflow: Astra high creative research/sculpt/material/rig/visual judgment;
 Terra medium deterministic Blender/export/render/check execution. Four active slots. Earlier executor spawn hit a temporary agent-thread limit. New /root/frozen_blender_execution

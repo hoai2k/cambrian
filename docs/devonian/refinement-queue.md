@@ -288,6 +288,19 @@ and production Blend: `../devonian-authoring/backups/gemuendina-final-pre-face-r
 After new sculpt: mouth/skull/jaw/anchor alignment, closed and open oral continuity, supported
 bulging eyes with at least 50% globe volume inside, full/LOD action poses and fresh portraits.
 
+Historical focused face preview main0b639d0 (8 September), subsequently rejected by user: two supported
+anterior globes, preserved posterior,18/18actions and refreshed portraits. Ten actual exported
+pose audits exceed50%; minimum conservative interior77.04%. All11 full/LOD face views
+inspected and built viewer verified. Remaining broad final art/LOD cleanup and controller
+playtest keep the caution badge. See face-v4/WORKING_STATE.md and release-review-02.json.
+
+Latest clarification supersedes that mouth interpretation: the FRONT FLAP itself is the
+mouth, upper and lower terminal lips define the leading snout; no preoral apron or dorsal
+opening. Eyes closer together above it, near nostril positions. Root study03/04 failed
+ventral-fold review. Dedicated Astra terminal-snout author now preparing study05+; previous
+interior audits apply only to their preserved meshes. New face must pass side-profile review
+before production export.
+
 ### Dunkleosteus
 
 New reference `/Users/hoai/Downloads/Dunkleosteus-1.jpg` copied with hash/provenance to
@@ -303,3 +316,11 @@ Reopened to **preview**. Backup includes public family, full authoring source an
 `../devonian-authoring/backups/dunkleosteus-final-pre-face-refinement-2026-09-08/`. Recheck eye
 containment after brow/head edits, mouth contacts across jaw poses, actual anchors and full/LOD
 parity; regenerate portraits before publishing the revised face.
+
+
+8 September focused Dunkleosteus face preview: V4 candidate03 with pigment04
+LOD binding correction preserves the jaw rig, mouth lining and all18full/LODclips.
+Actual173feeding-pose checks show zero opposing-shell/gnathal failures, eyes pass.
+Full face/portraits and correctedLODposes individually reviewed; selectedintake,
+build/typecheck and viewerIdle/Heavy pass. Remaining broadpreview: LOD is paler
+and smoother; investigate albedo-to-vertex colourspace and materialpolish.
