@@ -1,5 +1,10 @@
 # Devonian refining pass queue
 
+## Eye-audit scope — user clarification
+
+The quantitative 50% eye-globe embedding/containment audit applies only to fish-like creatures. Do not apply it to arthropods, cephalopods or other creatures with naturally exposed or stalked eyes; in particular, do not force Odaraia or nautiloid eyes into their bodies to meet this threshold. Their eyes should follow the creature-specific anatomy and references. Ordinary visual checks for unintended gaps, attachment errors and animation defects still apply. This clarification supersedes broader eye-audit wording in older plans and handoffs. Work remains paused.
+
+
 Complete the carefully authored initial creature and non-creature library first. Commit and push
 those previews to main promptly. Then address this queue individually; preserve sources and rerender
 portraits whenever appearance changes. Preview status remains visible until each review is complete.

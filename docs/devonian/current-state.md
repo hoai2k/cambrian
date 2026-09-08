@@ -1,5 +1,10 @@
 # Paused refinement checkpoint — 8 September 2026
 
+## Eye-audit scope — user clarification
+
+The quantitative 50% eye-globe embedding/containment audit applies only to fish-like creatures. Do not apply it to arthropods, cephalopods or other creatures with naturally exposed or stalked eyes; in particular, do not force Odaraia or nautiloid eyes into their bodies to meet this threshold. Their eyes should follow the creature-specific anatomy and references. Ordinary visual checks for unintended gaps, attachment errors and animation defects still apply. This clarification supersedes broader eye-audit wording in older plans and handoffs. Work remains paused.
+
+
 **USER PAUSE.** The user asked to finish current jobs and small parallel work, then pause for the day. All assigned jobs and reviews have finished. Do not start further execution until the user resumes. No active Blender render/export or worker PTY remains. The local review server may remain listening on4176; user5173 was untouched.
 
 ## Delivered during the latest resumed block
