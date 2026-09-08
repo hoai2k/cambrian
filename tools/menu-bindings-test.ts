@@ -28,7 +28,7 @@ const MENU_ACTIONS: { key: keyof RawControls; used: string }[] = [
   { key: 'dup', used: 'select: move cursor' },
   { key: 'ddown', used: 'select: move cursor' },
   { key: 'heavy', used: 'pause and results: back to select' },
-  { key: 'ability', used: 'pause: quit to title · results: keep playing (co-op modes)' },
+  { key: 'ability', used: 'select: hatch or carry on · pause: quit to title · results: keep playing (co-op modes)' },
 ];
 
 const BUTTONS = 17;

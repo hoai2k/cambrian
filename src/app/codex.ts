@@ -1,6 +1,7 @@
 import { ACTIVE_ERA } from '../content';
 import type { CreatureId } from '../sim/creatures';
 import type { Biome, LandmarkKind } from '../sim/world';
+import { clampMark } from '../sim/ladder';
 
 /**
  * The record of everything the player has found in this era, kept across sessions on this device.
@@ -14,17 +15,48 @@ export interface Codex {
   biomes: Biome[];
   landmarks: LandmarkKind[];
   apex: CreatureId[];
+  /**
+   * Furthest mark on the growth ladder each creature has been taken to in Rise, by creature id
+   * (see src/sim/ladder.ts). Rise is the mode about growing up, so it is the one worth a record:
+   * the select screen badges it on the creature's card and offers to start there again.
+   *
+   * A mark is fractional: the whole part is the rung, the fraction is how far through it. The top
+   * rung is only ever written by finishing a run, so reaching it and stopping stores 3.5 — the
+   * rung below, half grown — and coming back leaves you a short swim from the top.
+   *
+   * Kept per era like everything else here, and in the era's own numbering — rung 3 is a Giant in
+   * the Cambrian and an Adult in the Devonian — because the record is never read across eras.
+   */
+  best: Partial<Record<CreatureId, number>>;
 }
 
 /** Per-era, so the Cambrian and Devonian records on one device never mix. */
 const key = () => `${ACTIVE_ERA.copy.settingsKey}-codex`;
-const EMPTY: Codex = { biomes: [], landmarks: [], apex: [] };
+const EMPTY: Codex = { biomes: [], landmarks: [], apex: [], best: {} };
 
 const clean = <T extends string>(v: unknown, allowed?: readonly T[]): T[] => {
   if (!Array.isArray(v)) return [];
   const seen = new Set<T>();
   for (const x of v) if (typeof x === 'string' && (!allowed || (allowed as readonly string[]).includes(x))) seen.add(x as T);
   return [...seen];
+};
+
+/**
+ * A stored mark table, sanitised. Ids the roster no longer has are dropped and anything that is
+ * not a mark is ignored: a hand-edited or stale record must not be able to hatch a body at an
+ * impossible size, so this is the only door the numbers come through. Fractions are kept — they
+ * are how a half-grown rung is written — but nothing below the first rung is worth storing.
+ */
+const cleanBest = (v: unknown): Partial<Record<CreatureId, number>> => {
+  const out: Partial<Record<CreatureId, number>> = {};
+  if (!v || typeof v !== 'object') return out;
+  const ids = new Set<string>(ACTIVE_ERA.creatures.map((c) => c.id));
+  for (const [k, n] of Object.entries(v as Record<string, unknown>)) {
+    if (!ids.has(k) || typeof n !== 'number') continue;
+    const m = clampMark(n);
+    if (m >= 1) out[k as CreatureId] = m;
+  }
+  return out;
 };
 
 export function loadCodex(): Codex {
@@ -38,6 +70,7 @@ export function loadCodex(): Codex {
       biomes: clean<Biome>(v.biomes),
       landmarks: clean<LandmarkKind>(v.landmarks, ['arch', 'stack', 'bones']),
       apex: clean<CreatureId>(v.apex, ACTIVE_ERA.creatures.map((c) => c.id)),
+      best: cleanBest(v.best),
     };
   } catch { return EMPTY; }
 }
@@ -60,10 +93,35 @@ export function mergeCodex(before: Codex, found: Codex): { codex: Codex; fresh: 
   const biomes = merge(before.biomes, found.biomes);
   const landmarks = merge(before.landmarks, found.landmarks);
   const apex = merge(before.apex, found.apex);
+  // A record of high-water marks merges by taking the higher one, and "fresh" means beaten.
+  const best = { ...before.best }, freshBest: Partial<Record<CreatureId, number>> = {};
+  for (const [k, n] of Object.entries(found.best) as [CreatureId, number][]) {
+    if (n > (best[k] ?? -1)) { best[k] = n; freshBest[k] = n; }
+  }
   return {
-    codex: { biomes: biomes.all, landmarks: landmarks.all, apex: apex.all },
-    fresh: { biomes: biomes.fresh, landmarks: landmarks.fresh, apex: apex.fresh },
+    codex: { biomes: biomes.all, landmarks: landmarks.all, apex: apex.all, best },
+    fresh: { biomes: biomes.fresh, landmarks: landmarks.fresh, apex: apex.fresh, best: freshBest },
   };
+}
+
+/**
+ * Fold this match's Rise high-water marks into the stored record, and say whether anything moved.
+ *
+ * This runs *while the match is being played*, not when it ends, because a player who grows a
+ * Dunkleosteus to Adult and then quits to the title has still grown one to Adult. It touches only
+ * `best` for the same reason the results screen snapshots before it merges: writing the biomes and
+ * landmarks live would mean the results screen loaded a record that already contained this match's
+ * finds and could never mark any of them new.
+ */
+export function recordBest(found: Partial<Record<CreatureId, number>>): boolean {
+  const stored = loadCodex();
+  const best = { ...stored.best };
+  let moved = false;
+  for (const [k, n] of Object.entries(found) as [CreatureId, number][]) {
+    if (n > (best[k] ?? -1)) { best[k] = n; moved = true; }
+  }
+  if (moved) saveCodex({ ...stored, best });
+  return moved;
 }
 
 export function saveCodex(codex: Codex) {

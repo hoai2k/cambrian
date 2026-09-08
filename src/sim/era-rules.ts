@@ -15,6 +15,12 @@ import { DEVONIAN_RULES } from './devonian/rules';
 export interface EraHud {
   /** 0..100 growth meter: what this animal has eaten, which is what moults it up a stage. */
   standing: number;
+  /**
+   * 0..1 toward the *next* moult, which is what the HUD ring reads. The whole meter would answer a
+   * different question ("how grown am I overall") and leave the ring nowhere near full at the
+   * moment the body moults — in both eras a full ring means the next stage, and nothing else.
+   */
+  stageProgress: number;
   rung: number; rungName: string; stage: string;
   /** 0..1 air remaining, for air breathers only. */
   air?: number;
@@ -33,6 +39,23 @@ export interface EraRules {
   ySpecial(id: CreatureId): { name: string; desc: string } | undefined;
   /** Starting body scale for the player or bot at `index` in `mode`, for creature `id`. */
   startScale(mode: Mode, index: number, id: CreatureId): number;
+  /**
+   * The growth ladder, in this era's own terms (see src/sim/ladder.ts). Five rungs either way:
+   * the Cambrian's tiers and the Devonian's life stages are the same ladder under two names, and
+   * everything that reports or restores a player's progress goes through these rather than
+   * branching on the era.
+   */
+  ladderNames: readonly string[];
+  /** How far up the ladder this body is: its tier, its stage, whatever the era grows. */
+  ladderRung(g: Game, a: Actor): number;
+  /** The body scale a creature of `id` has on `rung`. */
+  ladderScale(id: CreatureId, rung: number): number;
+  /**
+   * Put this body `fraction` (0..1) of the way from the rung it is on to the next. Each era keeps
+   * growth in its own currency — nutrition in the Cambrian, standing here — so the era fills its
+   * own meter and the shared code only says how full.
+   */
+  ladderFill(g: Game, a: Actor, fraction: number): void;
   /**
    * Where a player or bot hatches, given the nursery centre; undefined leaves the shared placement.
    * The Devonian puts every hatchling inside plant cover, on the floor or up a column.

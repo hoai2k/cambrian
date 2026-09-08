@@ -7,10 +7,10 @@ import { applyMouse, emptyControls, gamepads, KeyboardInput, MouseLook, readGame
 import { clamp, damp, TAU, wrapAngle } from '../shared/math';
 import { bandOf, isAlive, isHidden, lengthOf } from '../sim/actors';
 import { creature, type CreatureId } from '../sim/creatures';
-import { Game, radarRange as radarReach, type ScoreHeader, type ScoreRow, type TeleportDest } from '../sim/game';
+import { CORPSE_WINDOW, DEATH_FADE, Game, radarRange as radarReach, type ScoreHeader, type ScoreRow, type TeleportDest } from '../sim/game';
 import type { Phase } from '../sim/daynight';
 import { BAND_COLOR, emptyInput, isCoop, TIER_NAMES, TIER_NEED, type Actor, type Band, type InputFrame, type Mode, type PlayerSetup } from '../sim/types';
-import { BIOME_NAMES, biomeAt, groundHeight, nurseryAt, resolveStatic, SURFACE_Y, type Biome, type Boulder, type LandmarkKind } from '../sim/world';
+import { BIOME_NAMES, biomeAt, groundHeight, nurseryAt, sampleHeight, SURFACE_Y, type Biome, type Boulder, type LandmarkKind } from '../sim/world';
 import { AssetQueue, type AssetProgress } from './assets';
 import { CreatureView, ensureLoaded, loadedSync, type Lod } from './creature';
 import { Attachments } from './attachments';
@@ -43,6 +43,11 @@ export interface PlayerHud {
   downedAllies: { index: number; name: string; color: string; seconds: number; distance: number; x: number; y: number; progress: number }[];
   /** Versus: whose viewport this one is borrowing while dead. */
   spectating?: { index: number; name: string; color: string; creature: CreatureId };
+  /**
+   * What happened, while this player is dead: whether they were swallowed or simply killed, and
+   * who by, for the line of text that plays over the watch.
+   */
+  death?: { eaten: boolean; by?: string };
   bandMarkers: { x: number; y: number; band: Band; size: number }[];
   /** Dominant biome under the player. */
   biome: string;
@@ -76,7 +81,7 @@ export interface HudSnapshot {
   /** This match is over but its mode is co-op, so the results screen can offer to carry on. */
   canContinue: boolean;
   /** What this match turned up, for the results screen's record. */
-  discovery: { biomes: Biome[]; landmarks: LandmarkKind[]; apex: CreatureId[] };
+  discovery: { biomes: Biome[]; landmarks: LandmarkKind[]; apex: CreatureId[]; best: Partial<Record<CreatureId, number>> };
   /** The hour of the day: what it is, how long until it turns, and how much the reef is hunting. */
   day: { phase: Phase; until: number; pressure: number };
 }
@@ -133,6 +138,37 @@ export const magnificationDistance = (L: number) => L * 1.45 + 1.15 + Math.max(0
  * the thing that eats you comes from, so the view has to reach it. Down goes almost overhead, which
  * is how you read the floor for prey while swimming over it.
  */
+/**
+ * How close to the sand the camera may sit, and the shortest arm it will pull in to, in body
+ * lengths — short enough to clear the floor at a steep angle, long enough to stay outside the
+ * animal rather than inside its own ribs.
+ */
+const CAMERA_SAND = 0.45, CAMERA_CLOSE = 0.9;
+
+/**
+ * Fit the camera onto its arm with the seabed in the way.
+ *
+ * Aiming up from the floor asks for a camera below the creature, which is under the sand. Two
+ * answers, in order: shorten the arm, which clears the floor at the same angle and only brings the
+ * creature closer; and, when even the shortest arm is still buried, lift the whole rig. `lift` is
+ * how far it had to go, and the caller moves the look point by the same amount, so the view keeps
+ * the angle the player gave it instead of being levelled off into the seabed.
+ *
+ * `sandAt` returns the height the camera may not go below for an arm of that length (it moves the
+ * camera as a side effect in the renderer, which is why the fit is written against a callback).
+ */
+export function fitCameraArm(baseY: number, pitch: number, dist: number, minDist: number, sandAt: (d: number) => number, ceiling: number): { dist: number; y: number; lift: number } {
+  const rise = -Math.sin(pitch);
+  let d = dist, y = baseY + Math.sin(pitch) * d;
+  if (rise > 0.05) for (let i = 0; i < 4; i++) {
+    const floor = sandAt(d);
+    if (y >= floor) break;
+    d = Math.max(minDist, d - (floor - y) / rise);
+    y = baseY + Math.sin(pitch) * d;
+  }
+  const clamped = clamp(y, sandAt(d), ceiling);
+  return { dist: d, y: clamped, lift: clamped - y };
+}
 export const PITCH_UP = -0.95;   // ~54° above the horizon
 export const PITCH_DOWN = 1.32;  // ~76° below it, near enough straight down at the seabed
 const FLAT_PITCH = 0.45;   // ~26°, comfortably above a resting follow camera (which sits at ~11-25°)
@@ -622,18 +658,24 @@ export class Engine {
     const jumped = cs.lastPos.distanceTo(pp) > 20;
     cs.lastPos.copy(pp);
     if (jumped) { cs.yaw = p.yaw; cs.fade = 1; }
-    // Eaten: ride along with the predator from the same angle until the respawn.
-    const pred = (p.state === 'swallowed' || (p.state === 'dead' && p.swallowedBy >= 0)) ? this.game!.byId(p.swallowedBy) : undefined;
+    // Eaten: ride along with the predator, from the same angle, until the respawn — you are inside
+    // it, so it is where you are. Killed any other way, the shot stays on your own body drifting
+    // up: whatever landed the blow has moved on, and following it would be a camera nobody asked
+    // for. The line of text still names it either way.
+    const pred = p.state === 'swallowed' || (p.state === 'dead' && p.swallowedBy >= 0) ? this.game!.byId(p.swallowedBy) : undefined;
     const lookAt = pred
       ? this.renderPos(pred, this.tmpLook).setY(this.tmpLook.y + lengthOf(pred) * 0.1)
       : this.tmpLook.set(pp.x, pp.y + L * 0.15, pp.z);
     if (pred) dist = magnificationDistance(lengthOf(pred)) * cs.zoom * 0.85;
     // Fade to black just before the respawn, and in again just after. Always the real player's
     // own death, never the spectated one's: this viewport's owner is the one coming back.
+    // Fade to black over the last moment before the respawn, and in again slowly on the new body:
+    // the watch is the point, so the black is a curtain at the end of it rather than a cut. Always
+    // the real player's own death, never the spectated one's: this viewport's owner is coming back.
     const dying = p0.state === 'dead' || p0.state === 'swallowed';
-    const respawnAt = this.game!.reviveWindow(p0) ? Infinity : 2.6;   // a downed player waiting on an ally never fades out
+    const respawnAt = this.game!.reviveWindow(p0) ? Infinity : CORPSE_WINDOW - DEATH_FADE;   // a downed player waiting on an ally never fades out
     const fadeTarget = dying && (p0.state === 'dead' ? p0.respawnT : p0.stateT) > (p0.state === 'dead' ? respawnAt : 99) ? 1 : 0;
-    cs.fade = damp(cs.fade, fadeTarget, fadeTarget > cs.fade ? 6 : 4, dt);
+    cs.fade = damp(cs.fade, fadeTarget, fadeTarget > cs.fade ? 4 : 1.5, dt);
     if (locked && target) {
       const tp = this.renderPos(target, this.tmpPred);
       const dx = tp.x - pp.x, dz = tp.z - pp.z;
@@ -659,21 +701,20 @@ export class Engine {
       lookAt.z - Math.cos(yaw) * Math.cos(pitch) * d,
     );
     const desired = place(dist);
-    // Looking up from the seabed puts the camera under the sand, and simply lifting it back out
-    // flattens the view — exactly when the player is trying to see what is above them. Pull the
-    // camera in instead: a shorter arm at the same angle clears the floor and keeps the aim.
-    const floorFor = (v: THREE.Vector3) => groundHeight(this.game!.world, v.x, v.z, this.scratchBoulders) + 0.7;
-    const rise = -Math.sin(pitch);
-    if (rise > 0.05) for (let it = 0; it < 3 && desired.y < floorFor(desired); it++) {
-      dist = Math.max(L * 0.55, dist - (floorFor(desired) - desired.y) / rise);
-      place(dist);
-    }
-    // keep camera out of the ground and boulders, and below the surface unless the player has left the water
-    const g = groundHeight(this.game!.world, desired.x, desired.z, this.scratchBoulders);
-    desired.y = clamp(desired.y, g + 0.7, p.airborne ? SURFACE_Y + 40 : SURFACE_Y - 0.4);
-    const pos = { x: desired.x, y: desired.y, z: desired.z };
-    resolveStatic(this.game!.world, pos, 0.7, this.scratchBoulders);
-    desired.set(pos.x, pos.y, pos.z);
+    // The sand is the only thing the camera cannot be inside. A rock is not: shoving the camera
+    // sideways out of a boulder, or lifting it onto one, throws the shot away for scenery, and a
+    // camera *inside* a rock simply sees out of it — the far side of a closed mesh is not drawn —
+    // so it passes through and keeps looking at the creature. Hence the sand itself here, and not
+    // `groundHeight`, which counts boulder tops as floor.
+    const fit = fitCameraArm(lookAt.y + L * 0.18, pitch, dist, L * CAMERA_CLOSE,
+      (d) => { place(d); return sampleHeight(desired.x, desired.z) + CAMERA_SAND; },
+      p.airborne ? SURFACE_Y + 40 : SURFACE_Y - 0.4);
+    place(fit.dist);
+    desired.y = fit.y;
+    // The rig had to be lifted off its arm, so the look point goes with it rather than the view
+    // tipping flat: you see *past* your own creature into the water above, which is the whole point
+    // of aiming up from the floor. Not while locked on — there the target is the shot.
+    if (!locked) lookAt.y += clamp(fit.lift, -L * 1.5, L * 1.5);
     const k = jumped ? 1 : p.state === 'dodge' ? 5 : 7;
     if (jumped) { cs.pos.copy(desired); cs.look.copy(lookAt); }
     else { cs.pos.lerp(desired, 1 - Math.exp(-k * dt)); cs.look.lerp(lookAt, 1 - Math.exp(-10 * dt)); }
@@ -1054,6 +1095,11 @@ export class Engine {
         downed.push({ index: j, name: creature(o.creature).name, color: PLAYER_COLORS[j % 4], seconds, distance: Math.hypot(dx, dz), x: r / l, y: -f / l, progress: game.reviveProgress(o) });
       }
       // Versus: a dead player watches the leader rather than their own sinking body.
+      // Who killed this player, named the way the rest of the HUD names bodies: another player by
+      // their seat, anything else by its species.
+      const killerId = p.swallowedBy >= 0 ? p.swallowedBy : p.killer;
+      const killer = killerId >= 0 ? game.byId(killerId) : undefined;
+      const nameOf = (a: Actor | undefined) => (a ? (a.player >= 0 ? `P${a.player + 1}` : creature(a.creature).name) : undefined);
       const watched = this.spectatorTarget(game, i);
       const spectate = watched ? { index: watched.player, name: `P${watched.player + 1}`, color: PLAYER_COLORS[watched.player % 4], creature: watched.creature } : undefined;
       let aim: PlayerHud['aim'];
@@ -1066,14 +1112,16 @@ export class Engine {
         index: i, creature: p.creature, color: PLAYER_COLORS[i % 4], alive: p.state !== 'dead', aim,
         scheme,
         hp: p.hp, hpMax: p.hpMax, stamina: p.stamina, staminaMax: p.staminaMax, exhausted: p.exhausted > 0,
-        tier: p.tier, tierName: era ? `${era.stage} · ${era.rungName}` : TIER_NAMES[p.tier], progress: era ? era.standing / 100 : p.tier >= 4 ? 1 : clamp(p.nutrition / TIER_NEED[p.tier], 0, 1), scale: p.scale,
+        tier: p.tier, tierName: era ? `${era.stage} · ${era.rungName}` : TIER_NAMES[p.tier], // The ring means the same thing in both eras: how close the next moult is, full when it lands.
+        progress: era ? era.stageProgress : p.tier >= 4 ? 1 : clamp(p.nutrition / TIER_NEED[p.tier], 0, 1), scale: p.scale,
         abilityName: p.hideMode === 'descending' ? 'Sinking to burrow' : p.hideMode === 'burrowed' ? `Buried · ${controlKey('ability', scheme)} emerge` : p.hideMode === 'camouflage' ? `Camo: ${p.camoLabel}` : RULES?.ySpecial(p.creature)?.name ?? hideLabel(p.creature), abilityReady: p.hideMode === 'camouflage' ? p.stamina / p.staminaMax : RULES?.ySpecial(p.creature) ? 1 - clamp(p.abilityCd / Math.max(1, creature(p.creature).abilityCooldown), 0, 1) : 1 - clamp(p.hideCd / 2, 0, 1), abilityActive: p.hideMode !== 'none' || (p.state === 'ability' && !!RULES?.ySpecial(p.creature)), abilityUnlocked: true,
         senseReady: 1 - clamp(p.senseCd / 6, 0, 1),
         lock: lockA && isAlive(lockA) ? { name: creature(lockA.creature).name, kind: creature(lockA.creature).kind, band: bandOf(p, lockA), hp: lockA.hp / lockA.hpMax, color: BAND_COLOR[bandOf(p, lockA)] } : undefined,
         hunted: p.hunted, hunterAngle, hunterName: hunter ? creature(hunter.creature).name : undefined,
         hunterState: p.hunted >= 0.5 ? 'hunting' : p.hunted > 0.2 ? 'noticed' : 'none', inCover: p.cover > 0.3, still: Math.hypot(p.vel.x, p.vel.y, p.vel.z) < 0.3,
-        hint: game.hintFor(i), respawnIn: p.state === 'dead' ? Math.max(0, (game.reviveWindow(p) || 3) - (game.reviveWindow(p) ? 0 : p.respawnT)) : 0, fade: cs?.fade ?? 0, state: p.state, modelReady: !!loadedSync(p.creature),
+        hint: game.hintFor(i), respawnIn: p.state === 'dead' ? Math.max(0, (game.reviveWindow(p) || CORPSE_WINDOW) - (game.reviveWindow(p) ? 0 : p.respawnT)) : 0, fade: cs?.fade ?? 0, state: p.state, modelReady: !!loadedSync(p.creature),
         downedFor: game.reviveWindow(p), reviveProgress: game.reviveProgress(p), downedAllies: downed, spectating: spectate,
+        death: p.state === 'dead' || p.state === 'swallowed' ? { eaten: p.swallowedBy >= 0 || p.eaten > 0, by: nameOf(killer) } : undefined,
         kills: p.kills, eats: p.eats, escapes: p.escapes, protect: p.spawnProtect > 0, bandMarkers: markers.slice(0, 24),
         biome: BIOME_NAMES[game.biomeOf(i) ?? 'shelf'], day: game.dayPhase(), radar: { range: radarRange, blips }, teleport: tele, board, notice: game.noticeFor(i), era,
       };
@@ -1081,7 +1129,7 @@ export class Engine {
     return {
       players, rects, time: game.time, status: game.state.status, message: game.state.message, mode: game.mode, winner: game.state.winner, fps: this.fps,
       canContinue: game.state.status !== 'playing' && isCoop(game.mode),
-      discovery: { biomes: [...game.discovery.biomes], landmarks: [...game.discovery.landmarks], apex: [...game.discovery.apex] },
+      discovery: { biomes: [...game.discovery.biomes], landmarks: [...game.discovery.landmarks], apex: [...game.discovery.apex], best: Object.fromEntries(game.discovery.best) },
       day: game.dayPhase(),
     };
   }

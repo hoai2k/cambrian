@@ -1,7 +1,7 @@
 import { ACTIVE_ERA } from '../content';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import type { HudSnapshot } from '../render/engine';
-import { creature } from '../sim/creatures';
+import { creature, type CreatureId } from '../sim/creatures';
 import type { PlayerSetup } from '../sim/types';
 import { BIOMES } from '../sim/world';
 import { biomeArtPath } from '../shared/environment-assets';
@@ -36,7 +36,7 @@ export function PauseMenu({ onResume, onChange, onQuit, scheme }: { onResume: ()
   );
 }
 
-export function Results({ snapshot, players, onAgain, onContinue, onChange, onTitle, scheme }: { snapshot: HudSnapshot; players: PlayerSetup[]; onAgain: () => void; onContinue: () => void; onChange: () => void; onTitle: () => void; scheme: Scheme }) {
+export function Results({ snapshot, players, beaten, onAgain, onContinue, onChange, onTitle, scheme }: { snapshot: HudSnapshot; players: PlayerSetup[]; beaten: CreatureId[]; onAgain: () => void; onContinue: () => void; onChange: () => void; onTitle: () => void; scheme: Scheme }) {
   // The record as it stood before this match, snapshotted once when the screen appears; the merge
   // against it is pure, so re-rendering never eats the "NEW" marks (see codex.ts).
   const [before] = useState(loadCodex);
@@ -55,6 +55,9 @@ export function Results({ snapshot, players, onAgain, onContinue, onChange, onTi
               {creature(players[i]?.creature ?? p.creature).kind && <span className="result-kind">{creature(players[i]?.creature ?? p.creature).kind}</span>}
               <span>{p.tierName}</span>
               <small>{p.eats} eaten · {p.kills} kills · {p.escapes} escapes</small>
+              {/* Rise keeps a high-water mark per creature; say so when this match moved one. The
+                  shell hands us the list, because the stored record already has this match in it. */}
+              {beaten.includes(players[i]?.creature ?? p.creature) && <span className="new-tag best-tag">NEW BEST</span>}
             </div>
           ))}
         </div>
@@ -155,7 +158,7 @@ export function Dialogs({ kind, onClose, settings, onSettings, scheme }: { kind:
               <h3>The sea</h3>
               <p>It has one edge: the shore you hatch beside. Swim along it and the world stays gentle; swim <b>away</b> from it and the biomes change: shelf, sponge forest, boulder fields, the channels, the escarpment, and the deep basin, where the giants live. The <b>radar</b> at the top right shows anything big enough to hurt you, whatever is hunting you, the nearest shoals worth eating, your nursery and the shore. Creatures show only while they are inside its reach; the other players, your nursery and the shore sit hollow on the rim when they are past it, pointing the way. Press <b>{btn('teleport', scheme)}</b> for the teleport menu: back to your nursery, or straight to another player. Hold <b>{btn('view', scheme)}</b> for the scoreboard: everyone in the match, what they have done, and what this mode is asking of them.</p>
               <h3>Fighting</h3>
-              <p><b>{btn('light', scheme)}</b> chains three bites, the third hits hard. <b>{btn('heavy', scheme)}</b> is your heavy: the creature’s special if it has one, otherwise a pounce — either way a long committed lunge that carries you onto what you aimed at. The crosshair names it when it will connect. <b>{btn('guard', scheme)}</b> held raises a shield; tapped as a hit lands, it parries and staggers them (Waptia cannot guard, so it dodges instead). Hits from behind or below hurt more. Stamina runs everything: an exhausted creature can't dash. Nothing dies in one bite unless it is far smaller than you: a peer takes a couple of hits, a giant needs about three good bites to kill you, and after six seconds out of the fight your health starts to return. Bite a bigger predator enough and it breaks off and runs.</p>
+              <p><b>{btn('light', scheme)}</b> chains three bites, the third hits hard. <b>{btn('heavy', scheme)}</b> is your heavy: the creature’s special if it has one, otherwise a pounce — either way a long committed lunge that carries you onto what you aimed at. The crosshair names it when it will connect. Press it while sprinting or mid-dash and it becomes a charge: it takes whatever is nearest the line you are travelling along, for extra stamina. <b>{btn('guard', scheme)}</b> held raises a shield; tapped as a hit lands, it parries and staggers them (Waptia cannot guard, so it dodges instead). Hits from behind or below hurt more. Stamina runs everything: an exhausted creature can't dash. Nothing dies in one bite unless it is far smaller than you: a peer takes a couple of hits, a giant needs about three good bites to kill you, and after six seconds out of the fight your health starts to return. Bite a bigger predator enough and it breaks off and runs.</p>
               </section>
             <section>
               <h3>Giants</h3>

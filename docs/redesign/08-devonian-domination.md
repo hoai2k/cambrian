@@ -335,10 +335,14 @@ newborn Dunkleosteus is food for a grown trilobite.
 
 Keep everything the Cambrian HUD does and change the meaning of one element:
 
-- The **tier ring becomes the standing ring**, with the rung glyph (I–IV) at
-  its centre instead of the tier glyph. Filling it to the top is the win. Small
-  ticks on the ring show the last few sources ("+escape", "+range") so the
-  player learns what their rung scores from.
+- The **ring keeps the meaning it has in the Cambrian** — how close the next
+  moult is, full when the body grows — and only the glyph at its centre
+  changes, to the rung (I–IV) instead of the tier. It reads `stageProgress`,
+  the run up to the next of the five stages, rather than the whole 0–100
+  growth meter: a ring that crept up across all of growth would be nowhere
+  near full at the moment the body actually moulted, and the two eras would
+  not feel like the same game. Small ticks under it show the last few standing
+  sources so the player learns what feeds them.
 - The **radar** gains the range arc (yours and others'), and the hollow ring of
   a dead zone. The shore mark already exists; for air breathers a small surface
   mark shows the nearest good gulping spot when air is low.
