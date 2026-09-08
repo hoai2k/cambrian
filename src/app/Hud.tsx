@@ -54,8 +54,8 @@ function PlayerPanel({ p }: { p: PlayerHud }) {
             <circle cx="36" cy="36" r={R} className="ring-fg" strokeDasharray={`${C * p.progress} ${C}`} transform="rotate(-90 36 36)" />
           </svg>
           {p.era
-            ? <span className="tier-num rung-num" role="img" aria-label={`Rung ${p.era.rung}, ${p.era.rungName}. Standing ${Math.round(p.era.standing)}`}><small>RUNG</small>{RUNG_NUMERALS[p.era.rung] ?? p.era.rung}</span>
-            : <span className="tier-num" role="img" aria-label={`Tier ${p.tier + 1}: ${p.tierName}`}><i className="tier-glyph" style={{ maskImage: `url(${appBase()}${assetPaths.ui(`tier-${p.tier + 1}.svg`)})` }} /></span>}
+            ? <span className="tier-num rung-num" role="img" aria-label={`Rung ${p.era.rung}, ${p.era.rungName}. ${p.era.stage}, ${moultLabel(p.progress)}`}><small>RUNG</small>{RUNG_NUMERALS[p.era.rung] ?? p.era.rung}</span>
+            : <span className="tier-num" role="img" aria-label={`Tier ${p.tier + 1}: ${p.tierName}, ${moultLabel(p.progress)}`}><i className="tier-glyph" style={{ maskImage: `url(${appBase()}${assetPaths.ui(`tier-${p.tier + 1}.svg`)})` }} /></span>}
         </div>
         <div className="bars">
           <div className="name-row"><b>{def.name}</b><span className="tier-name">{p.tierName}</span>{p.protect && <span className="protect">PROTECTED</span>}</div>
@@ -206,6 +206,11 @@ function Scoreboard({ board, me }: { board: NonNullable<PlayerHud['board']>; me:
   );
 }
 
+/**
+ * The ring reads the same in both eras: how close the next moult is. Full means the body grows —
+ * a tier in the Cambrian, a life stage in the Devonian — so it is spoken as one thing.
+ */
+const moultLabel = (progress: number) => progress >= 1 ? 'fully grown' : `${Math.round(progress * 100)}% to the next moult`;
 const fmtClock = (s: number) => `${Math.floor(s / 60)}:${String(Math.floor(s % 60)).padStart(2, '0')}`;
 
 const fmtDist = (d: number) => (d < 1000 ? `${Math.round(d)} m` : `${(d / 1000).toFixed(1)} km`);
