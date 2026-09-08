@@ -311,15 +311,25 @@ the river mouths and shallows for the creatures that are allowed to.
 
 ## Modes
 
+**Superseded (September 2026).** The era ran its own two modes — Domination (a
+standing race inside your rung) and Food Chain (one player per rung, one
+scoreboard) — and they are gone. Both eras now offer the same three modes,
+because an era is a change of sea and cast, not a change of what a match is:
+
 | Mode | Players | What it is |
 | --- | --- | --- |
-| **Domination** | 1–4, co-op or solo | The main mode. Pick any creature from any rung. First to Dominant standing and 90 s holding it wins; co-op shares standing from assists and ends when the party's combined standing crosses the line. Escalation: dead zones come more often and giants roam wider as standing rises. |
-| **Food Chain** | 2–4 versus | Each player must pick from a *different rung*. Everyone's standing is on the board. The hunter needs the prey; the prey scores by surviving the hunter. The purest expression of the era, and the mode the name promises. |
+| **Rise** | 1–4 | Hatch tiny, eat, grow through the five stages, hold Prime for ninety seconds. Share the feast with the others or eat them: co-op and versus are how it is played, not two modes. |
 | **Hunter & Hunted** | 2–4 versus | Carries over unchanged with Dunkleosteus as the giant; the small ones are rung II picks with the river mouth as their refuge. |
-| **Reef** | 1–4 | Sandbox: any creature, any stage, any biome, dead zones on or off. |
+| **Reef** | 1–4 | Sandbox: any creature, adult, any biome, dead zones on or off. |
 
-Frenzy (the growth race) does not carry over: without growth it has nothing to
-race. Food Chain replaces it.
+What that took out of `src/sim/devonian/`: the range/territory game and its
+give-way behaviour, standing from escapes, rivals, shoals, anoxia and time
+alive in the open, the standing decay and the giant's starvation clock, and the
+Dominant hold. **Standing is now what the animal has eaten** — the one meter
+behind the five stages — which is the Cambrian's nutrition under another name,
+and the rungs stay as what they always were: a description of where an animal
+sits in the chain, never a rule about who may eat whom. Size decides that, so a
+newborn Dunkleosteus is food for a grown trilobite.
 
 ## Readability, HUD and feedback
 
@@ -396,8 +406,9 @@ music is optional. The notes below are kept as the build order that was followed
    static `Corpse`-like decoy that AI detection scores as a target.
 9. **Shoaling**: the swarm brain already follows a `home`; point a school's
    home at a player of its species when they are near and calm.
-10. **Modes**: Domination and Food Chain in `updateModes`; Frenzy removed for
-    this era; selection screen enforces distinct rungs in Food Chain and shows
+10. **Modes**: superseded — see the Modes section above. Originally Domination
+    and Food Chain in `updateModes`; the selection screen enforced distinct rungs
+    in Food Chain and showed
     the locality label.
 
 Tests to add, in the spirit of the existing suite: a `rung-test` that every

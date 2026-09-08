@@ -152,13 +152,13 @@ export interface SiltCloud { pos: Vec3; radius: number; t: number; }
 
 export interface PlayerSetup { creature: CreatureId; device: number | 'keyboard' | 'keyboard2'; ready: boolean; }
 
-/** Cambrian modes, plus the Devonian ones (`domination`, `foodchain`); an era lists the ones it offers. */
-export type Mode = 'rise' | 'frenzy' | 'hunted' | 'reef' | 'domination' | 'foodchain';
-export const MODE_IDS: readonly Mode[] = ['rise', 'frenzy', 'hunted', 'reef', 'domination', 'foodchain'];
+/** The three modes, shared by both eras: an era changes the sea and the animals, not the match. */
+export type Mode = 'rise' | 'hunted' | 'reef';
+export const MODE_IDS: readonly Mode[] = ['rise', 'hunted', 'reef'];
 
 export interface Prompt { text: string; t: number; }
 
 export interface WorldEvent {
-  kind: 'hit' | 'kill' | 'eat' | 'tierUp' | 'parry' | 'guardBreak' | 'burst' | 'escape' | 'noticed' | 'hunted' | 'dodge' | 'ability' | 'grab' | 'moult' | 'death' | 'silt' | 'stagger' | 'sense' | 'pounce' | 'swallow' | 'routed' | 'disintegrate' | 'teleport' | 'rangeClaim' | 'rangeLost' | 'gulp' | 'anoxia' | 'beach' | 'shoalJoin' | 'dominant' | 'shellCrush' | 'breach' | 'splash';
+  kind: 'hit' | 'kill' | 'eat' | 'tierUp' | 'parry' | 'guardBreak' | 'burst' | 'escape' | 'noticed' | 'hunted' | 'dodge' | 'ability' | 'grab' | 'moult' | 'death' | 'silt' | 'stagger' | 'sense' | 'pounce' | 'swallow' | 'routed' | 'disintegrate' | 'teleport' | 'gulp' | 'anoxia' | 'beach' | 'shoalJoin' | 'shellCrush' | 'breach' | 'splash';
   pos: Vec3; actor: number; other?: number; strength?: number; player?: number;
 }

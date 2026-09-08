@@ -612,13 +612,27 @@ export class Engine {
     }
     candidates.sort((x, y) => y.size - x.size);
     const cap = Math.round((this.quality === 'high' ? 88 : 56) / (0.6 + 0.4 * players));
-    let count = 0;
+    // Full-detail bodies are the most expensive thing in the frame — they are skinned on the CPU
+    // and drawn again into the shadow map, once per viewport — and how expensive depends entirely
+    // on the era: a Devonian placoderm is 105k triangles where a Cambrian arthropod is 55k, and
+    // one of its trilobites is 516k. Apparent size alone therefore buys wildly different frame
+    // costs in the two eras, which is why the Devonian ran heavy. So spend a triangle budget
+    // instead: biggest-on-screen first, everything past it takes the decimated copy.
+    const budget = (this.quality === 'high' ? 700_000 : 320_000) / (0.6 + 0.4 * players);
+    let spent = 0, count = 0;
     for (const { a, d } of candidates) {
       if (count >= cap && a.controller !== 'player') break;
       // Pick a detail level from apparent size, with hysteresis so it cannot flicker at the boundary.
       let v = this.views.get(a.id);
       const size = lengthOf(a) / d;
       let wantLod: Lod = a.controller === 'player' ? 0 : v ? (v.lod === 0 ? (size < 0.05 ? 1 : 0) : (size > 0.075 ? 0 : 1)) : (size < 0.06 ? 1 : 0);
+      // The budget only ever demotes: your own body, and anything already at full detail whose
+      // share is still affordable, keep it.
+      const full = loadedSync(a.creature, 0);
+      if (wantLod === 0 && a.controller !== 'player') {
+        if (full && spent + full.tris > budget) wantLod = 1;
+      }
+      if (wantLod === 0) spent += full?.tris ?? 0;
       if (wantLod === 1 && !loadedSync(a.creature, 1)) { void ensureLoaded(a.creature, undefined, 1); wantLod = 0; }
       if (v && v.lod !== wantLod) { v.dispose(); this.views.delete(a.id); v = undefined; }
       if (!v) {
@@ -852,9 +866,6 @@ export class Engine {
         case 'anoxia': { personal('anoxia', 0.8); break; }
         case 'beach': { if (e.strength) { this.bubbles.emit(e.pos, 12, 0.5, 2, 0.06, 1); personal('beach', 0.9); } break; }
         case 'shoalJoin': { this.sparkles.emit(e.pos, 16, 0.6, 1.2, 0.05, 1.2); personal('shoalJoin', 0.7); break; }
-        case 'rangeClaim': { personal('rangeClaim'); break; }
-        case 'rangeLost': { personal('rangeLost'); break; }
-        case 'dominant': { this.sparkles.emit(e.pos, 60, 1.2, 1.8, 0.08, 2.2); personal('dominant'); if (e.player != null && e.player >= 0) { const d = padOf(e.player); if (typeof d === 'number') rumble(d, 0.6, 0.6, 500); } break; }
         case 'teleport': {
           // sparkles where they left and where they arrived; the camera snaps behind them on arrival
           this.sparkles.emit(e.pos, e.strength ? 50 : 30, 0.9, 1.4, 0.07, 1.8);

@@ -19,6 +19,7 @@
     "paddle": "esbuild tools/paddle-test.ts --bundle --platform=node --format=esm --outfile=node_modules/.cache/paddle-test.mjs && node node_modules/.cache/paddle-test.mjs",
     "hiding": "esbuild tools/hiding-test.ts --bundle --platform=node --format=esm --outfile=node_modules/.cache/hiding-test.mjs && node node_modules/.cache/hiding-test.mjs",
     "eras": "node tools/era-test.mjs",
+    "merge": "node --experimental-transform-types tools/merge-test.mjs",
     "devonian": "esbuild tools/devonian-test.ts --bundle --platform=node --format=esm --outfile=node_modules/.cache/devonian-test.mjs && node node_modules/.cache/devonian-test.mjs",
     "devonian:catalogue": "node tools/devonian/catalogue.mjs",
     "devonian:plates": "node tools/devonian/biome-plates.mjs",

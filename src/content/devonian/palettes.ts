@@ -56,8 +56,19 @@ export const SCHEMES: readonly Scheme[] = [
     colors: { body: '#6a8ad0', eyes: '#101828', fins: '#c8e0e8', legs: '#b0d0d8', accent: '#2a3a80', underside: '#a0b8e0' } },
 ];
 
-/** Each creature's default scheme: the treatment that recurs across its published restorations. */
-export const CREATURE_SCHEMES: Record<string, string> = {
+/**
+ * Which scheme each creature is *proposed* in, for the viewer's dropdown.
+ *
+ * Nothing here is applied in play. Every shipped portrait — the select card, the roster thumbnail,
+ * the results tile — is a studio render of the model's own authored vertex colours, and a match
+ * that repainted the animal into one of these would no longer look like the card the player just
+ * picked (Dunkleosteus was the loud case: Cleveland Charcoal is near-black, its card is pale
+ * grey-green). Until the palette renders exist for this era the way they do for the Cambrian
+ * (tools/art/prepare-palette-renders.mjs and a Blender pass), the game draws what the card shows
+ * and these stay a proposal you can try on in the viewer.
+ */
+export const SCHEME_PROPOSALS: Record<string, string> = {
+
   dunkleosteus: 'cleveland-charcoal',
   titanichthys: 'shoal-sea-green',
   coccosteus: 'orcadie-leaf',
@@ -80,3 +91,6 @@ export const CREATURE_SCHEMES: Record<string, string> = {
   manticoceras: 'goniatite-band',
   michelinoceras: 'orthocone-zigzag',
 };
+
+/** In play: the authored colours, which is what every portrait was rendered from. */
+export const CREATURE_SCHEMES: Record<string, string> = {};
