@@ -12,6 +12,7 @@ import type { Phase } from '../sim/daynight';
 import { BAND_COLOR, emptyInput, isCoop, TIER_NAMES, TIER_NEED, type Actor, type Band, type InputFrame, type Mode, type PlayerSetup } from '../sim/types';
 import { BIOME_NAMES, biomeAt, groundHeight, nurseryAt, sampleHeight, SURFACE_Y, type Biome, type Boulder, type LandmarkKind } from '../sim/world';
 import { AssetQueue, type AssetProgress } from './assets';
+import { fillOf, ladderName } from '../sim/ladder';
 import { CreatureView, ensureLoaded, loadedSync, type Lod } from './creature';
 import { Attachments } from './attachments';
 import { Bubbles, Impacts, Silt, Splash } from './fx';
@@ -28,9 +29,10 @@ export interface PlayerHud {
   hp: number; hpMax: number; stamina: number; staminaMax: number; exhausted: boolean;
   tier: number; tierName: string; progress: number; scale: number;
   abilityName: string; abilityReady: number; abilityActive: boolean; abilityUnlocked: boolean;
-  senseReady: number;
   lock?: { name: string; kind?: string; band: Band; hp: number; color: string };
   aim?: { hasTarget: boolean; inRange: boolean; name?: string; color: string; ready: boolean; /** What RT does for this creature: POUNCE, or the special's own name. */ action: string };
+  /** Sense is on: the band glyphs and the radar are drawn. */
+  senseOn: boolean;
   hunted: number; hunterAngle: number | null; hunterName?: string; hunterState: 'none' | 'noticed' | 'hunting'; inCover: boolean; still: boolean;
   hint?: string; respawnIn: number; fade: number; state: string; modelReady: boolean; kills: number; eats: number; escapes: number; protect: boolean;
   /**
@@ -57,6 +59,8 @@ export interface PlayerHud {
   radar: { range: number; blips: RadarBlipHud[] };
   /** The teleport menu, while open. */
   teleport?: { options: { label: string; detail: string; distance: number; dest: TeleportDest }[]; index: number; cooldown: number };
+  /** The change-creature page of that menu, while it is open. */
+  swap?: { name: string; kind?: string; creature: CreatureId; rung: string; fill: number; kept: boolean; grown: boolean; count: number; index: number };
   /** The scoreboard, while the View button is held. */
   board?: { header: ScoreHeader; rows: ScoreRow[] };
   /** A short line from the simulation: a hand-over, a rescue. Outlives one frame. */
@@ -99,8 +103,21 @@ export const PLAYER_COLORS = ['#61f2d5', '#ffb457', '#c7a3ff', '#ff86a4'];
 
 interface CamState { showBoard: boolean; yaw: number; pitch: number; zoom: number; fade: number; aimBlend: number; aimTarget: number; aimSnapT: number; pos: THREE.Vector3; look: THREE.Vector3; shake: number; camera: THREE.PerspectiveCamera; lockBlend: number; lastPos: THREE.Vector3; frustum: THREE.Frustum; projScreen: THREE.Matrix4; tele: TeleMenu; }
 /** Per-player teleport menu state: opened with D-pad down, steered with the D-pad or stick, A confirms, B closes. */
-interface TeleMenu { open: boolean; index: number; prev: { teleport: boolean; up: boolean; down: boolean; confirm: boolean; back: boolean }; }
-const freshTele = (): TeleMenu => ({ open: false, index: 0, prev: { teleport: false, up: false, down: false, confirm: false, back: false } });
+/**
+ * The D-pad-down menu. A list of places to go, plus one entry that opens a second page: the roster,
+ * to change which animal you are. `swap` is that page — the index into `Game.swapOptions` and
+ * whether a creature you have never worn would hatch grown or newborn.
+ */
+interface TeleMenu {
+  open: boolean; index: number;
+  swap: { open: boolean; index: number; grown: boolean };
+  prev: { teleport: boolean; up: boolean; down: boolean; left: boolean; right: boolean; confirm: boolean; back: boolean; ability: boolean };
+}
+const freshTele = (): TeleMenu => ({
+  open: false, index: 0,
+  swap: { open: false, index: 0, grown: false },
+  prev: { teleport: false, up: false, down: false, left: false, right: false, confirm: false, back: false, ability: false },
+});
 
 /** Magnification levels (see docs/redesign/01-game-design.md · Magnification). */
 export const MAGNIFICATION = [
@@ -544,21 +561,56 @@ export class Engine {
     const p = game.players[i];
     const justTele = c.teleport && !prev.teleport;
     const up = c.dup || c.my > 0.6, down = c.ddown || c.my < -0.6;
+    const left = c.dleft || c.mx < -0.6, right = c.dright || c.mx > 0.6;
     const justUp = up && !prev.up, justDown = down && !prev.down;
+    const justLeft = left && !prev.left, justRight = right && !prev.right;
     const justConfirm = c.confirm && !prev.confirm, justBack = c.back && !prev.back;
-    prev.teleport = c.teleport; prev.up = up; prev.down = down; prev.confirm = c.confirm; prev.back = c.back;
+    const justAbility = c.ability && !prev.ability;
+    prev.teleport = c.teleport; prev.up = up; prev.down = down; prev.left = left; prev.right = right;
+    prev.confirm = c.confirm; prev.back = c.back; prev.ability = c.ability;
     if (justTele && !t.open) {
       // D-pad down opens it; once open the same button steps down the list
-      if (isAlive(p) && (p.state === 'free' || p.state === 'guard')) { t.open = true; t.index = 0; prev.confirm = true; prev.down = true; audio.play('ui-confirm'); }
+      if (isAlive(p) && (p.state === 'free' || p.state === 'guard')) { t.open = true; t.index = 0; t.swap.open = false; prev.confirm = true; prev.down = true; audio.play('ui-confirm'); }
       return t.open;
     }
     if (!t.open) return false;
-    if (!isAlive(p)) { t.open = false; return false; }
+    if (!isAlive(p)) { t.open = false; t.swap.open = false; return false; }
+
+    // ---- the change-creature page ----
+    if (t.swap.open) {
+      const roster = game.swapOptions(i, t.swap.grown);
+      if (!roster.length) { t.swap.open = false; return true; }
+      const step = (d: number) => { t.swap.index = (t.swap.index + d + roster.length) % roster.length; audio.play('ui-move'); };
+      if (justRight) step(1);
+      if (justLeft) step(-1);
+      // Y flips how an animal you have never worn would arrive. One you have is handed back as you
+      // left it either way, so the flip is a preview of a fresh start, not of your own progress.
+      if (justAbility) { t.swap.grown = !t.swap.grown; audio.play('ui-move'); }
+      if (justBack) { t.swap.open = false; audio.play('ui-back'); return true; }
+      if (justConfirm) {
+        const pick = roster[t.swap.index];
+        if (pick && !pick.current && game.changeCreature(i, pick.id, t.swap.grown)) { t.open = false; t.swap.open = false; audio.play('ui-start'); return false; }
+        audio.play('ui-back');
+        return true;
+      }
+      // Browsing loads the body you are looking at, so committing to it is not a wait.
+      const ahead = roster[t.swap.index];
+      if (ahead) void ensureLoaded(ahead.id, undefined, 0);
+      return true;
+    }
+
     const options = game.teleportOptions(i);
-    if (justUp) { t.index = (t.index + options.length - 1) % options.length; audio.play('ui-move'); }
-    if (justDown || justTele) { t.index = (t.index + 1) % options.length; audio.play('ui-move'); }
+    // One entry past the destinations opens the roster instead of going anywhere.
+    const count = options.length + 1;
+    if (justUp) { t.index = (t.index + count - 1) % count; audio.play('ui-move'); }
+    if (justDown || justTele) { t.index = (t.index + 1) % count; audio.play('ui-move'); }
     if (justBack) { t.open = false; audio.play('ui-back'); return false; }
     if (justConfirm) {
+      if (t.index >= options.length) {
+        t.swap.open = true; t.swap.index = 0; t.swap.grown = false;
+        audio.play('ui-confirm');
+        return true;
+      }
       const opt = options[t.index];
       if (opt && game.teleport(i, opt.dest)) { t.open = false; audio.play('ui-start'); }
       else audio.play('ui-back');
@@ -763,7 +815,9 @@ export class Engine {
       }
       if (wantLod === 0) spent += full?.tris ?? 0;
       if (wantLod === 1 && !loadedSync(a.creature, 1)) { void ensureLoaded(a.creature, undefined, 1); wantLod = 0; }
-      if (v && v.lod !== wantLod) { v.dispose(); this.views.delete(a.id); v = undefined; }
+      // A view is built for one creature at one detail level. Both can change under it: the level
+      // with distance, and the creature itself when a player changes body mid-match.
+      if (v && (v.lod !== wantLod || v.creatureId !== a.creature)) { v.dispose(); this.views.delete(a.id); v = undefined; }
       if (!v) {
         const loaded = loadedSync(a.creature, wantLod);
         if (!loaded) { void ensureLoaded(a.creature, undefined, wantLod); continue; }
@@ -1031,8 +1085,9 @@ export class Engine {
       }
       const era = RULES?.hud(game, i);
       const scheme = schemeForDevice(this.setups[i]?.device ?? 'keyboard', this.mouseLook);
+      // Sense off: nothing is drawn over the sea, so there is nothing to work out either.
       const markers: PlayerHud['bandMarkers'] = [];
-      if (cs) {
+      if (cs && p.senseMode) {
         const L = lengthOf(p);
         for (const a of game.actors) {
           if (a.id === p.id || !isAlive(a) || isHidden(a) || a.controller === 'swarm') continue;
@@ -1049,7 +1104,7 @@ export class Engine {
       // Radar: reach grows with the creature, contacts rotate into the camera frame (up = camera forward).
       const radarRange = radarReach(p);
       const blips: RadarBlipHud[] = [];
-      if (cs) {
+      if (cs && p.senseMode) {
         const sy = Math.sin(cs.yaw), cy = Math.cos(cs.yaw);
         // Above or below counts once the gap is more than a body or two; inside that the contact is
         // level with you for all practical purposes and the mark should not keep changing colour.
@@ -1079,7 +1134,20 @@ export class Engine {
           blips.push({ x, y, kind: 'deadzone', color: '#8fd66a', beyond, hunting: false, distance: Math.hypot(z.dx, z.dz), r: z.r / radarRange });
         }
       }
-      const tele = cs?.tele.open ? { options: game.teleportOptions(i).map((o) => ({ label: o.label, detail: o.detail, distance: o.distance, dest: o.dest })), index: cs.tele.index, cooldown: p.teleportCd } : undefined;
+      const tele = cs?.tele.open && !cs.tele.swap.open
+        ? { options: [...game.teleportOptions(i).map((o) => ({ label: o.label, detail: o.detail, distance: o.distance, dest: o.dest })),
+                      { label: 'Change creature', detail: 'Swap bodies · each keeps what it has grown', distance: 0, dest: 'home' as TeleportDest }],
+            index: cs.tele.index, cooldown: p.teleportCd }
+        : undefined;
+      let swap: PlayerHud['swap'];
+      if (cs?.tele.open && cs.tele.swap.open) {
+        const roster = game.swapOptions(i, cs.tele.swap.grown);
+        const pick = roster[cs.tele.swap.index % Math.max(1, roster.length)];
+        if (pick) {
+          const def = creature(pick.id);
+          swap = { name: def.name, kind: def.kind, creature: pick.id, rung: ladderName(pick.mark), fill: fillOf(pick.mark), kept: pick.kept, grown: cs.tele.swap.grown, count: roster.length, index: cs.tele.swap.index };
+        }
+      }
       const board = cs?.showBoard ? game.scoreboard(i) : undefined;
       // Co-op: team-mates on the floor waiting to be picked up, as a bearing this player can follow.
       const downed: PlayerHud['downedAllies'] = [];
@@ -1115,7 +1183,7 @@ export class Engine {
         tier: p.tier, tierName: era ? `${era.stage} · ${era.rungName}` : TIER_NAMES[p.tier], // The ring means the same thing in both eras: how close the next moult is, full when it lands.
         progress: era ? era.stageProgress : p.tier >= 4 ? 1 : clamp(p.nutrition / TIER_NEED[p.tier], 0, 1), scale: p.scale,
         abilityName: p.hideMode === 'descending' ? 'Sinking to burrow' : p.hideMode === 'burrowed' ? `Buried · ${controlKey('ability', scheme)} emerge` : p.hideMode === 'camouflage' ? `Camo: ${p.camoLabel}` : RULES?.ySpecial(p.creature)?.name ?? hideLabel(p.creature), abilityReady: p.hideMode === 'camouflage' ? p.stamina / p.staminaMax : RULES?.ySpecial(p.creature) ? 1 - clamp(p.abilityCd / Math.max(1, creature(p.creature).abilityCooldown), 0, 1) : 1 - clamp(p.hideCd / 2, 0, 1), abilityActive: p.hideMode !== 'none' || (p.state === 'ability' && !!RULES?.ySpecial(p.creature)), abilityUnlocked: true,
-        senseReady: 1 - clamp(p.senseCd / 6, 0, 1),
+        senseOn: p.senseMode,
         lock: lockA && isAlive(lockA) ? { name: creature(lockA.creature).name, kind: creature(lockA.creature).kind, band: bandOf(p, lockA), hp: lockA.hp / lockA.hpMax, color: BAND_COLOR[bandOf(p, lockA)] } : undefined,
         hunted: p.hunted, hunterAngle, hunterName: hunter ? creature(hunter.creature).name : undefined,
         hunterState: p.hunted >= 0.5 ? 'hunting' : p.hunted > 0.2 ? 'noticed' : 'none', inCover: p.cover > 0.3, still: Math.hypot(p.vel.x, p.vel.y, p.vel.z) < 0.3,
@@ -1123,7 +1191,7 @@ export class Engine {
         downedFor: game.reviveWindow(p), reviveProgress: game.reviveProgress(p), downedAllies: downed, spectating: spectate,
         death: p.state === 'dead' || p.state === 'swallowed' ? { eaten: p.swallowedBy >= 0 || p.eaten > 0, by: nameOf(killer) } : undefined,
         kills: p.kills, eats: p.eats, escapes: p.escapes, protect: p.spawnProtect > 0, bandMarkers: markers.slice(0, 24),
-        biome: BIOME_NAMES[game.biomeOf(i) ?? 'shelf'], day: game.dayPhase(), radar: { range: radarRange, blips }, teleport: tele, board, notice: game.noticeFor(i), era,
+        biome: BIOME_NAMES[game.biomeOf(i) ?? 'shelf'], day: game.dayPhase(), radar: { range: radarRange, blips }, teleport: tele, swap, board, notice: game.noticeFor(i), era,
       };
     });
     return {

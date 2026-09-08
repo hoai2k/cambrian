@@ -29,7 +29,7 @@ export function XboxDiagram() {
       {line(340, 92, 200, 90)}{label(194, 94, 'LB · Sink', 'end')}
       {line(320, 180, 200, 170)}{label(194, 174, 'Left stick · Swim', 'end')}
       {label(194, 194, 'click · Sink (as LB)', 'end')}
-      {line(378, 236, 200, 250)}{label(194, 254, 'D-pad ▲ · Sense pulse', 'end')}
+      {line(378, 236, 200, 250)}{label(194, 254, 'D-pad ▲ · Sense on/off', 'end')}
       {label(194, 274, 'D-pad ▼ · Teleport menu', 'end')}
       {label(194, 294, 'D-pad ▶ · Hide / camouflage', 'end')}
       {label(194, 314, 'D-pad ◀▶ · Pick creature (menus)', 'end')}

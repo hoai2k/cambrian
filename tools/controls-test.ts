@@ -54,5 +54,22 @@ check('crawler: stick right -> screen right', c.onRight > 0.5 && c.onRight > Mat
   check('steep angles stay clamped', Math.abs(swimPitch(deg(89))) <= 0.7, `pitch=${swimPitch(deg(89)).toFixed(3)}`);
 }
 
+// --- Sense is a mode, not a pulse: on by default, toggled by the button, and it never runs out ---
+{
+  const g = new Game('reef', [{ creature: 'anomalocaris', device: 'keyboard', ready: true }], 42);
+  const p = g.players[0];
+  const hold = (sense: boolean, steps: number) => {
+    const inputs = new Map<number, InputFrame>([[0, { ...emptyInput(), sense }]]);
+    for (let i = 0; i < steps; i++) { g.step(1 / 60, inputs); g.events.length = 0; }
+  };
+  check('sense starts on', p.senseMode, `senseMode=${p.senseMode}`);
+  hold(true, 2); hold(false, 2);
+  check('...the button turns it off', !p.senseMode, `senseMode=${p.senseMode}`);
+  hold(true, 120); hold(false, 2);
+  check('...holding it does not toggle again, and it is not on a timer', p.senseMode, `senseMode=${p.senseMode}`);
+  hold(true, 2); hold(false, 600);
+  check('...and off stays off however long you swim', !p.senseMode, `after 10 s: senseMode=${p.senseMode}`);
+}
+
 console.log(failed ? `\n${failed} FAILED` : '\nall control-direction tests passed');
 process.exit(failed ? 1 : 0);

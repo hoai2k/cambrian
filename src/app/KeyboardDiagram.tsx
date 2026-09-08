@@ -27,7 +27,7 @@ const ROWS: [string, string][] = [
   [btn('light', 'kbm'), 'Bite (chain ×3)'],
   [btn('guard', 'kbm'), 'Shield (tap = parry)'],
   [btn('ability', 'kbm'), 'Hide / camouflage'],
-  [btn('sense', 'kbm'), 'Sense pulse'],
+  [btn('sense', 'kbm'), 'Sense: marks and radar on/off'],
   [btn('sprint', 'kbm'), 'Sprint (hold)'],
   [btn('rise', 'kbm'), 'Rise / hop'],
   [btn('sink', 'kbm'), 'Sink'],
