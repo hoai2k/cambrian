@@ -55,8 +55,8 @@
     "generatedAt": "2026-09-06T16:24:28.675Z"
   },
   "hallucigenia": {
-    "glbSha256": "a17e87a46c89df96b1946c933d4709654c5fb32996fd6f802102cf9d457c8341",
-    "appearanceSha256": "ed9685038b61bcbb8c87098304066c3989f14f2d981d9aaddd7c51e68fd9cf61",
+    "glbSha256": "6f8e6557601e62e4adeedc2377c33cba01afebe8e7d22192de778ccdd93beea1",
+    "appearanceSha256": "3db69ba54ef5dd5751959516e60a4094e875bafed912ab804d0668508880a73c",
     "clips": [
       "Ability",
       "Attack",
@@ -75,11 +75,13 @@
       "Rise",
       "Stagger",
       "TurnLeft",
-      "TurnRight"
+      "TurnRight",
+      "Grab",
+      "Dash"
     ],
     "renderSha256": "2b4f476f2fe0e496b836fdcad41af9c14a671692e1622c8be9508567e7369990",
     "selectSha256": "f423874e5bdb1cada2a9e7eee2b88e7ff917dc492df7b7e5a329765c8eeb2707",
-    "generatedAt": "2026-09-06T16:57:10.829Z"
+    "generatedAt": "2026-09-08T22:25:33.583Z"
   },
   "marrella": {
     "glbSha256": "d63f401218409ad32e73a192114b2203e17f30b001943df8779801ef39327cce",

@@ -118,7 +118,7 @@
   {
     "era": "cambrian",
     "id": "leanchoilia",
-    "status": "pending",
+    "status": "review",
     "scope": "attack-feeding-animation",
     "reviewClips": [
       "Bite",
@@ -128,7 +128,7 @@
       "Grab",
       "Dash"
     ],
-    "note": "If this creature has a pending structural redesign, coordinate motion with its replacement; review each resulting animation individually.",
+    "note": "Delivered 2026-09-08 by tools/creatures/motion/apply.mjs (performance in performances/leanchoilia.mjs); shipped clips kept as replaced/<name>. Eat is a scrubbed feeding performance (FEEDING_PERFORMANCE). Pending the user's review in the viewer and a controller playtest.",
     "grip": "The three whip flagella of each great appendage wrap and hold; the shorter podomeres take the load. Riding wraps a flank with the whips."
   },
   {
@@ -300,17 +300,13 @@
   {
     "era": "cambrian",
     "id": "hallucigenia",
-    "status": "pending",
+    "status": "review",
     "scope": "attack-feeding-animation",
     "reviewClips": [
-      "Bite",
-      "Attack",
-      "Heavy",
-      "Eat",
       "Grab",
       "Dash"
     ],
-    "note": "Joins the pass for its grip: it grabs with its feet, which no existing clip does.",
+    "note": "Grab and Dash delivered 2026-09-08 by tools/creatures/motion/apply.mjs (performance in performances/hallucigenia.mjs); both are clips the rig never had, so nothing was replaced. Verified by the pipeline's contract checks, socket geometry (feet clamp to the midline under the trunk, spines untouched; the dash sweep stays under the body) and the built viewer. Pending the user's review and a controller playtest. Bite/Attack/Heavy/Eat remain unqueued for this animal.",
     "grip": "Grabs with its FEET — the clawed lobopods, in pairs, clamped around the held body or hooked into the host while the dorsal spines stay clear. Never a mouth grab."
   },
   {

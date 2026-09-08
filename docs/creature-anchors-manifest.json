@@ -2674,8 +2674,8 @@
     "file": "leanchoilia.glb",
     "source": "tools/creatures/arthropods/anchors.json",
     "newSpecimen": true,
-    "updatedSHA256": "eb68d9496abb20f6a2aaeb8597bfc60c58832d5df8a6d0521fc8628b96d55519",
-    "bytes": 8256828,
+    "updatedSHA256": "ae68306ea20ecb3920e4ed9c4f10f9076457d876840ad3c442f4a828d0ea6a38",
+    "bytes": 8705200,
     "changedClips": [],
     "anchors": [
       {

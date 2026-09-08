@@ -10,7 +10,7 @@
       "Heavy",
       "Eat"
     ],
-    "clipReason": "Queued for the articulated attack and feeding pass: re-authored so the animal's real appendages, joint chains and mouth placement drive the motion \u2014 deliberate preparation, a directed reach, then recovery \u2014 instead of rigid whole-part rotations. Reviewed clip by clip.",
+    "clipReason": "Queued for the articulated attack and feeding pass: re-authored so the animal's real appendages, joint chains and mouth placement drive the motion — deliberate preparation, a directed reach, then recovery — instead of rigid whole-part rotations. Reviewed clip by clip.",
     "reason": "Full rebuild from the user's references: a many-legged shrimp-like body inside a real curved semi-transparent shell, inverted swimming pose, and staggered metachronal limb motion. The articulated attack and feeding pass is folded into the new rig. Current model stays playable until the replacement is reviewed."
   },
   {
@@ -24,7 +24,7 @@
       "Heavy",
       "Eat"
     ],
-    "clipReason": "Articulated attack and feeding pass \u2014 Bite, Attack, Heavy and Eat re-authored so the frontal appendages and mouth work as jointed limbs with real preparation, reach and recovery instead of rigid rotations. Anatomy is not changing; each clip is reviewed on its own."
+    "clipReason": "Articulated attack and feeding pass — Bite, Attack, Heavy and Eat re-authored so the frontal appendages and mouth work as jointed limbs with real preparation, reach and recovery instead of rigid rotations. Anatomy is not changing; each clip is reviewed on its own."
   },
   {
     "id": "opabinia",
@@ -37,7 +37,7 @@
       "Heavy",
       "Eat"
     ],
-    "clipReason": "Articulated attack and feeding pass \u2014 Bite, Attack, Heavy and Eat re-authored so the proboscis reaches, grasps and carries food back to the mouth rather than swinging as one piece. Anatomy is not changing; each clip is reviewed on its own."
+    "clipReason": "Articulated attack and feeding pass — Bite, Attack, Heavy and Eat re-authored so the proboscis reaches, grasps and carries food back to the mouth rather than swinging as one piece. Anatomy is not changing; each clip is reviewed on its own."
   },
   {
     "id": "waptia",
@@ -50,7 +50,7 @@
       "Heavy",
       "Eat"
     ],
-    "clipReason": "Articulated attack and feeding pass \u2014 Bite, Attack, Heavy and Eat mapped onto the real appendage roles, joint chains and mouth placement. Anatomy is not changing; each clip is reviewed on its own."
+    "clipReason": "Articulated attack and feeding pass — Bite, Attack, Heavy and Eat mapped onto the real appendage roles, joint chains and mouth placement. Anatomy is not changing; each clip is reviewed on its own."
   },
   {
     "id": "marrella",
@@ -63,7 +63,7 @@
       "Heavy",
       "Eat"
     ],
-    "clipReason": "Articulated attack and feeding pass \u2014 Bite, Attack, Heavy and Eat mapped onto the real appendage roles, joint chains and mouth placement, with the fine sediment-sifting limbs kept legible. Anatomy is not changing; each clip is reviewed on its own."
+    "clipReason": "Articulated attack and feeding pass — Bite, Attack, Heavy and Eat mapped onto the real appendage roles, joint chains and mouth placement, with the fine sediment-sifting limbs kept legible. Anatomy is not changing; each clip is reviewed on its own."
   },
   {
     "id": "olenoides",
@@ -76,7 +76,7 @@
       "Heavy",
       "Eat"
     ],
-    "clipReason": "Articulated attack and feeding pass \u2014 Bite, Attack, Heavy and Eat mapped onto the real appendage roles, joint chains and mouth placement. Anatomy is not changing; each clip is reviewed on its own."
+    "clipReason": "Articulated attack and feeding pass — Bite, Attack, Heavy and Eat mapped onto the real appendage roles, joint chains and mouth placement. Anatomy is not changing; each clip is reviewed on its own."
   },
   {
     "id": "cambroraster",
@@ -89,7 +89,7 @@
       "Heavy",
       "Eat"
     ],
-    "clipReason": "Articulated attack and feeding pass \u2014 Bite, Attack, Heavy and Eat mapped onto the rakes and mouth rather than the whole body turning. Anatomy is not changing; each clip is reviewed on its own."
+    "clipReason": "Articulated attack and feeding pass — Bite, Attack, Heavy and Eat mapped onto the rakes and mouth rather than the whole body turning. Anatomy is not changing; each clip is reviewed on its own."
   },
   {
     "id": "sidneyia",
@@ -102,7 +102,7 @@
       "Heavy",
       "Eat"
     ],
-    "clipReason": "Articulated attack and feeding pass \u2014 Bite, Attack, Heavy and Eat mapped onto the real appendage roles, joint chains and mouth placement. Anatomy is not changing; each clip is reviewed on its own."
+    "clipReason": "Articulated attack and feeding pass — Bite, Attack, Heavy and Eat mapped onto the real appendage roles, joint chains and mouth placement. Anatomy is not changing; each clip is reviewed on its own."
   },
   {
     "id": "leanchoilia",
@@ -115,7 +115,7 @@
       "Heavy",
       "Eat"
     ],
-    "clipReason": "Articulated attack and feeding pass \u2014 Bite, Attack, Heavy and Eat re-authored so the long whip-tipped great appendages reach and fold as jointed limbs. Anatomy is not changing; each clip is reviewed on its own."
+    "clipReason": "Re-authored 8 September 2026 in the articulated attack and feeding pass (tools/creatures/motion): the great appendages reach, close and fold as jointed limbs, the flagella lag behind them, and Eat carries food to the ventral mouth. Awaiting review; the previous clip is kept as replaced/<name> in the viewer for comparison."
   },
   {
     "id": "isoxys",
@@ -128,7 +128,7 @@
       "Heavy",
       "Eat"
     ],
-    "clipReason": "Articulated attack and feeding pass \u2014 Bite, Attack, Heavy and Eat mapped onto the limbs under the carapace and the real mouth placement. Anatomy is not changing; each clip is reviewed on its own."
+    "clipReason": "Articulated attack and feeding pass — Bite, Attack, Heavy and Eat mapped onto the limbs under the carapace and the real mouth placement. Anatomy is not changing; each clip is reviewed on its own."
   },
   {
     "id": "tamisiocaris",
@@ -141,7 +141,7 @@
       "Heavy",
       "Eat"
     ],
-    "clipReason": "Articulated attack and feeding pass \u2014 its feeding appendages animated as the filtering apparatus they are, with no invented claws and no turning filter-feeding evidence into a predatory strike. Anatomy is not changing; each clip is reviewed on its own."
+    "clipReason": "Articulated attack and feeding pass — its feeding appendages animated as the filtering apparatus they are, with no invented claws and no turning filter-feeding evidence into a predatory strike. Anatomy is not changing; each clip is reviewed on its own."
   },
   {
     "id": "nectocaris",
@@ -154,6 +154,17 @@
       "Heavy",
       "Eat"
     ],
-    "clipReason": "Articulated attack and feeding pass \u2014 the paired grasping appendages given a proximal-to-distal lash, a coherent hold and a carry to the mouth. Included for the grasping appendages the game gives it, which is not a claim that it was a cephalopod. Anatomy is not changing; each clip is reviewed on its own."
+    "clipReason": "Articulated attack and feeding pass — the paired grasping appendages given a proximal-to-distal lash, a coherent hold and a carry to the mouth. Included for the grasping appendages the game gives it, which is not a claim that it was a cephalopod. Anatomy is not changing; each clip is reviewed on its own."
+  },
+  {
+    "id": "hallucigenia",
+    "status": "pending",
+    "scope": "grip-and-dash-animation",
+    "model": false,
+    "clips": [
+      "Grab",
+      "Dash"
+    ],
+    "clipReason": "Newly authored for the grip mechanic and awaiting review: Grab is the animal taking hold with its feet — the clawed lobopods clamp in pairs and the dorsal spines stay clear — and doubles as the pose it holds while clinging to something bigger. Dash is the shove the engine had been borrowing the dodge for. Both are held for a contact-sheet review and a controller playtest; the clips they replace nothing, so the old fallbacks are one deletion away."
   }
 ]
