@@ -556,10 +556,12 @@ seats in Hunter & Hunted; Rise and Reef are whoever turned up.
   own body, because a team-mate may be on the way to it.)*
 - **Dying is a shot, not a dialog.** Death used to drop a red panel over the
   middle of the viewport the instant it happened, which hid the one thing worth
-  seeing. The camera now pulls onto whatever killed you — what swallowed you, or
-  failing that what landed the kill — and holds there for the whole death watch
-  (`CORPSE_WINDOW`, seven seconds) while you watch it finish. The only UI is a
-  line low on the screen, "You've been eaten by P2", over an unobstructed view.
+  seeing. The whole death watch (`CORPSE_WINDOW`, seven seconds) is now spent
+  watching what actually happened: eaten, the camera rides with the predator,
+  because that is where you are; killed any other way, it stays on your own body
+  drifting up, since whatever landed the blow has already moved on. The only UI
+  is a line low on the screen, "You've been eaten by P2", over an unobstructed
+  view.
   The screen fades to black over the last 1.2 s of the watch and then fades
   slowly back in on the new body, so the respawn is a dissolve rather than a cut.
   A downed team-mate never fades out at all — their window is a race somebody

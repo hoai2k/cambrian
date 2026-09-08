@@ -639,14 +639,6 @@ export class Engine {
     return best;
   }
 
-  /** Whatever killed this body and is still around to be watched: what ate it, else what killed it. */
-  private killerOf(p: Actor): Actor | undefined {
-    const id = p.swallowedBy >= 0 ? p.swallowedBy : p.killer;
-    if (id < 0) return undefined;
-    const k = this.game!.byId(id);
-    return k && isAlive(k) ? k : undefined;
-  }
-
   private updateCamera(cs: CamState, p0: Actor, dt: number) {
     // While spectating, everything below frames the watched player instead. The dead player's own
     // camera state (yaw, zoom, shake) is reused, so the handover is a cut, not a new rig.
@@ -666,10 +658,11 @@ export class Engine {
     const jumped = cs.lastPos.distanceTo(pp) > 20;
     cs.lastPos.copy(pp);
     if (jumped) { cs.yaw = p.yaw; cs.fade = 1; }
-    // Killed: ride along with whatever did it, from the same angle, until the respawn. Being
-    // swallowed is the clearest case, but a body that was simply bitten to death wants the same
-    // shot — you watch the thing that got you rather than your own drifting corpse.
-    const pred = p.state === 'swallowed' || p.state === 'dead' ? this.killerOf(p) : undefined;
+    // Eaten: ride along with the predator, from the same angle, until the respawn — you are inside
+    // it, so it is where you are. Killed any other way, the shot stays on your own body drifting
+    // up: whatever landed the blow has moved on, and following it would be a camera nobody asked
+    // for. The line of text still names it either way.
+    const pred = p.state === 'swallowed' || (p.state === 'dead' && p.swallowedBy >= 0) ? this.game!.byId(p.swallowedBy) : undefined;
     const lookAt = pred
       ? this.renderPos(pred, this.tmpLook).setY(this.tmpLook.y + lengthOf(pred) * 0.1)
       : this.tmpLook.set(pp.x, pp.y + L * 0.15, pp.z);
