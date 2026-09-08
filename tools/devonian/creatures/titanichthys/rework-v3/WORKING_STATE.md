@@ -207,3 +207,38 @@
 ## User pause — resume later from the frozen candidate01 handoff
 
 Current refinements are tied off as source only. Parent received the final frozen manifest digest `409b98c91c1eca91cc2af051a53cc1685aa4305af82953796a977a3f3722f3e6`; no Terra candidate build, export, render or final audit has run. Do not begin another phase during this pause. On explicit resumption, verify that manifest and continue with HANDOFF-CANDIDATE-01.md group1. The parent owns checkpoint/push and overall pause state.
+
+## 2026-09-08T13:21Z — resumed candidate01 failure / candidate02 correction freeze
+
+- Owner/model: Astra high. Status: candidate-ready corrective SOURCE ONLY. User resumed; prior pause superseded.
+- Actual diagnosis: candidate01 G1 completed, G2 failed legitimate LOD pigment gate, G3 did not run. Decoded all11 LOD primitives: COLOR_0 entirely white including eyes; COLOR_1 is construction metadata. Source/candidate albedos are byte-identical and nonwhite. Exact first whitening stage is not proven; details/hashes in `candidate01-pigment-diagnosis.json` and `CANDIDATE02-CORRECTION.md`.
+- Correction: direct validated UV-albedo sampling with explicit sRGB→linear conversion, unchanged dense body filter, staged pigment assertions, LOD Color shader, removal of export-only construction colours and verified COLOR_0-only byte transfer from actual post-decimation source corners. Correct precise oral/pectoral roughness classification. Original >.005 test retained and strengthened.
+- Frozen manifest `frozen-candidate-02.sha256`: `fd30c4df4bccb7ffa9fd45222b3af612fa35dd04ce4670a83b9372265a0564b5`. New local output candidate-02 only; all candidate01 outputs and original frozen inputs independently reverified unchanged. Rig/actions/geometry/material resolutions/decimation ratios preserved.
+- Validation actually run: source ASTs; independent PNG control values; synthetic export-colour correspondence/quantization/non-colour-byte test. No Blender or final audits by Astra. Parent/Terra must execute frozen handoff then actual images/runtime and completed-candidate eye/oral/general audits. Raw44MB size remains a packaging gate, not silently reduced.
+- Resume: HANDOFF-CANDIDATE-02.md group1build, then group2structural, then group3render only after success. Stop any mismatch/decoding/correspondence/pigment failure; preserve all evidence and return to Astra. No public/Git/shared-state changes.
+
+- Frozen corrective handoff now saved: `HANDOFF-CANDIDATE-02.md`, SHA-256 `c57632bc34182dd676c709429565a1f218a1bbeca2048ff815c1ed5ff5b21d89`. Entire new manifest reverified after handoff creation. Parent has exact group1/2/3 continuation; all actual execution remains pending.
+
+## 2026-09-08T13:35Z — candidate02 decimation failure / frozen measurement handoff
+
+- Owner/model: Astra high. Status: diagnostic-source-ready; repair withheld pending actual values.
+- Parent/Terra G1 evidence:9pigment+18action markers and full GLB succeeded, then body post-decimation validity failed at candidate_02.py247 / atlas_pigment_02.py39. NoG2/G3. Only full GLB and18maps persisted, inventoried in `candidate02-decimation-failure.json`; exact failing RGBA channel/range is unavailable.
+- Decision: do not assume a harmless extrapolation or weaken/clamp thresholds. Focused replay of the same body sampling/filter/bind and one exact0.26 decimator measures all channel ranges/nonfinite/negative/overshoot counts, materials/UVs/positions and unmodified arrays. No actions, exports, renders or blend save.
+- Frozen diagnostic `diagnose_decimation_01.py` SHA `be458ea76211dbb8a49dcac678a89dba1d08760b67519e6c4642ba43f9a7f831`; manifest `frozen-diagnostic-decimation-01.sha256` SHA `27054cffcccd36cd41444a1840693ee7af8e143d349d82bb6e6867f0b6c16acc`. One exact Terra command in `HANDOFF-DIAGNOSTIC-DECIMATION-01.md`; new local diagnostic-decimation-01 only.
+- Author validation: AST/scope PASS; both prior manifests and every frozen01/02 input reverified unchanged; new target absent. No Blender or final audits run by Astra. No production repair or threshold change yet.
+- Resume: parent dispatches only the diagnostic command; return result.json channel summaries and .npz hash. Then author a new bounded repair only if quantified actual data support it. If failure does not reproduce, retain that uncertainty. Public/Git/shared state untouched.
+
+## 2026-09-08 — candidate03 — bounded post-decimation pigment authoring
+
+- Owner: Astra high; source authoring only, no Blender. Reverified all48 focused diagnostic manifest entries. Actual NPZ independently read: 20 negative-red loops across4 shared head/oral vertices;10 exterior and10 oral, minimum −0.04200587049. Result SHA05ac5a359b241c2838e05f912e183bfa43dd8ff9298c14f4dc4c1151636bcfb0; NPZ67623b7af8b8f786fafeea4446885788c4c0660387a7a7996fd80d472c931047.
+- Decision: neutral Color during decimation; final fin/eye UV atlas sampling. Body preserves its existing dense area/normal/semantic filter via nearest source triangle within each material role and nonnegative barycentric pigment interpolation. No physical-colour clipping or checker weakening. Shared approach communicated with Cocc author.
+- New candidate03 source parses; pure closest-triangle/convex-colour tests pass. Body LOD position, loop mapping, UV and material indices must exactly reproduce measured diagnostic arrays; geometry/rig/actions/material maps/ratios unchanged. Final source manifest/handoff being frozen; do not execute until that freeze is complete.
+
+## 2026-09-08 — candidate03 — frozen Terra handoff
+
+- Owner/model: Astra high. Status: candidate-ready source only. Bounded colour assignment repair; no new sculpt/material/rig/action edits.
+- Freeze: manifest `/Users/hoai/Documents/Stuff/Generations/cambrian/local/expansion-repo/tools/devonian/creatures/titanichthys/rework-v3/frozen-candidate-03.sha256` SHA-256 `4dd07f1f9e3c95fdb58d8327abc2e4724041d37b7789871c34b53fd2625853fb`;68 entries verified. Handoff `/Users/hoai/Documents/Stuff/Generations/cambrian/local/expansion-repo/tools/devonian/creatures/titanichthys/rework-v3/HANDOFF-CANDIDATE-03.md` SHA-256 `95631b00121865ee80c6654e7f9698734c4425844124f8ca041cc932c61e18ea`.
+- Candidate03 source SHA-256 `95515b71286ca9120f095ddc4ebdd2391ec6dc3147c19015fdd3636d91a75332`; helper `12d8136067ca0a8f8b34223a1ef243cfc4c193a697c39c427e2cc93e920520bb`. Source-only tests in candidate03-source-validation.json; actual Blender/BVH/export/render unexecuted. Candidate03 target absent at freeze.
+- Execution CWD: `/Users/hoai/Documents/Stuff/Generations/cambrian/local/expansion-repo`. Verify the manifest first. Exact next command: `/Applications/Blender.app/Contents/MacOS/Blender --background --threads 2 --python-exit-code 1 --python /Users/hoai/Documents/Stuff/Generations/cambrian/local/expansion-repo/tools/devonian/creatures/titanichthys/rework-v3/candidate_03.py`.
+- G1/G2/G3 order and stop criteria are frozen in handoff. G2 assertions unchanged except target path; body LOD must exactly reproduce measured diagnostic positions/UV/loop mapping/materials. Preserve any partial output and return on first error.
+- All prior candidates/failures retained. No public/Git/shared state modifications or Blender by Astra. Final runtime playback, actual completed-candidate eye-volume/orbital/oral/general review and raw-size packaging gate remain outstanding. Resume with Terra results, not further blind source edits.

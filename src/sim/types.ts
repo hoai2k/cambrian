@@ -29,7 +29,7 @@ export interface InputFrame {
   rise: boolean; sink: boolean;
   light: boolean; heavy: boolean; ability: boolean; dodge: boolean; guard: boolean;
   lock: boolean; sense: boolean;
-  /** LB: tap with a stick direction = sidestep dash, hold = sprint. */
+  /** LB: a sidestep dash in the stick direction, or along the body's own axis with a neutral stick. */
   dash: boolean;
   /** LT held: aim mode. The renderer decides what the centred crosshair is over and passes it here. */
   aim: boolean; aimTarget: number;
@@ -146,7 +146,7 @@ export interface Actor {
    * game who is still growing keeps their clock and can still win it.
    */
   carriedTop: boolean;
-  dashHoldT: number; dashUsed: boolean; dashQueued: boolean; pounceCd: number; aimInRange: boolean; aiming: boolean;
+  dashHoldT: number; dashUsed: boolean; pounceCd: number; aimInRange: boolean; aiming: boolean;
   dashCd: number; sinceHit: number; lastHitBy: number; swallowedBy: number; holdT: number;
   deathY: number; sparkled: boolean; tumble: Vec3;
   kills: number; eats: number; escapes: number;

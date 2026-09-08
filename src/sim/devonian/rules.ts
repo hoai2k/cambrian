@@ -306,7 +306,7 @@ export const DEVONIAN_RULES: EraRules = {
     if (d.deadZoneIn && def.breathing !== 'air') return 'Dead water. Get out of it, or up to the surface if you can breathe.';
     if (def.breathing === 'air' && d.air < AIR_LOW) return 'Air is low. {rise} to the surface and gulp.';
     if (g.time < 12) return rung === 1 ? 'Feed, hide, moult. Everything out there is bigger than you are today.' : rung === 2 ? 'Feed and keep your shoal. You grow on what you catch.' : rung === 3 ? 'Hunt the shoals. Five stages between you and Prime.' : 'Stay fed. The sea is hiding from you.';
-    if (def.shell && g.time < 40) return 'Sprint jets you backward. Rise and sink are free. Block withdraws into the shell.';
+    if (def.shell && g.time < 40) return 'Your funnel makes rise and sink free, and no direction is slow. Block withdraws into the shell.';
     if ((def.shoreReach ?? 0) > 0 && g.time < 40) return 'You can push into water nothing with gills can follow you into.';
     return undefined;
   },

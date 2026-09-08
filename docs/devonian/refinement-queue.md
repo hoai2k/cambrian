@@ -18,6 +18,107 @@ Titanichthys, Doryaspis, Gemuendina, Coccosteus, Bothriolepis and Stethacanthus 
 
 The machine-readable pending queue is `tools/devonian/pending-refinements.json`. Catalogue validation requires every pending creature to remain `preview`; remove a pending entry only after its actual work and review are complete.
 
+## New reference-led redesign briefs — 8 September 2026
+
+The three existing individual refinements below now have specific structural redesign targets.
+Keep their current models as preview, preserve their originals, and finish the earlier six
+remaining full reworks first. Do not spend general/eye audits on geometry about to be replaced.
+User images are locally preserved appearance references, not instructions or fossil proof.
+
+### Tiktaalik
+
+Reference: `../devonian-authoring/tiktaalik/user-reference/tiktaalik-user-reference-2026-09-08.jpg`
+(SHA256 `813d181bb875abb63c349659ca94b62ead15c685d87f14f08e30f9746dde19ed`).
+The current model is too flat. Sculpt a fuller, rounded rib-supported trunk with convincing
+shoulder and pelvic volumes, a shallow broad head distinct from that fuller body, and a rounded
+arrow-shaped snout rather than a thin spear point. Preserve a substantial rounded anterior tip,
+cheek width and three-dimensional jaw/throat depth, using side/dorsal/front/oblique comparisons.
+Reconcile the illustrated outline with the primary anatomy in `tools/devonian/creatures/tiktaalik/anatomy-notes.md`;
+not every illustrated fin or detail is automatically a sourced anatomical feature. Refit oral
+lining and jointed fins to the new volumes; maintain mobile neck and nuanced aquatic actions.
+
+### Onychodus
+
+Reference: `../devonian-authoring/onychodus/user-reference/onychodus-user-reference-2026-09-08.jpg`
+(SHA256 `8ff998cb69c01f6bab2a81f3eadba82e60fe3399c71fa4221102c12d9d2bdae1`).
+Make the distinctive lower tooth apparatus conspicuous in the head silhouette and open-mouth
+poses, separately from ordinary marginal teeth. Sculpt readable dermal cranial bone boundaries,
+cheek/gill-cover volumes, supported fish eyes and fine surface relief, avoiding an undifferentiated
+head. Verify the paired tusk-whorl arrangement, its bony base and palatal clearance from primary
+oral anatomy rather than copying the illustration's visible tooth count or assuming a known
+retraction mechanism. Model the interior, lower jaw and tooth supports together for coherent rest,
+gape and feeding poses. Brief: `tools/devonian/creatures/onychodus/rework-v3/ANATOMY_REFERENCE_BRIEF.md`.
+
+### Rhinodipterus
+
+Reference: `../devonian-authoring/rhinodipterus/user-reference/rhinodipterus-user-reference-2026-09-08.webp`
+(SHA256 `9e3c0b35890e53f71616be7d4ea6edfdeb34727b1b3097b5a365758122aca1d8`).
+Use the supplied long-head profile and fuller cheek region as redesign targets. Eyes should read
+as natural fish eyes seated in cranial volume. Give the face readable anatomical bone boundaries
+and the body individually legible overlapping scales with subtle relief and a continuous flexible
+surface. Avoid smooth featureless skin, detached armor tiles or rows of floating scales.
+Check illustration/species correspondence against the saved primary description before treating
+its full body and fins as established anatomy: the existing README explicitly distinguishes
+preserved Gogo head material from comparative body reconstruction. Preserve the lungfish oral
+tooth-plate design rather than borrowing Onychodus fangs. Animate scale-bearing skin smoothly,
+with a coherent jaw/throat and restrained fin and tail motion appropriate to the revised shape.
+
+All three original public families and current source/maps are copy/hash-verified in
+`../devonian-authoring/backups/<id>-pre-reference-rework-2026-09-08/`. Old editable sources stay
+local and untouched. These directives refine the existing pending entries, not final approval.
+
+### Cheirolepis — reopened from final
+
+User supplied `/Users/hoai/Downloads/Cheirolepis.jpg`; preserved locally under
+`../devonian-authoring/cheirolepis/user-reference/cheirolepis-user-reference-2026-09-08.jpg`.
+Reference SHA256: `3f8db7eab698bfbd7bbaebdd329a9a1ddffe1c203783f6f44a271656ed0fed78`.
+Redesign the specific face shape: skull-to-snout transition, rounded anterior tip, oblique
+cheek/gill-cover region and long jaw contour. Reassess the eye's anterior/lateral placement
+relative to the snout, roof and jaw; seat it in actual cranial volume. Rebuild fin base positions,
+swept leading/trailing edges and angular outlines from side, front and oblique views, with
+credible three-dimensional incidence rather than flat generic paddles. Preserve coherent
+heterocercal tail/axial motion and supported fin attachment while checking proportions against
+primary anatomy in the existing source README. Do not transplant every illustrated detail
+without that check. Sculpt first, then update jaw/fin actions and full/LOD portraits, and audit
+only the completed new geometry. Previous final approval applies only to the backed-up model.
+
+Reopened as **preview** and added to the machine-readable pending queue. The original final
+public family and source/maps are copy/hash-verified under
+`../devonian-authoring/backups/cheirolepis-final-pre-reference-rework-2026-09-08/`.
+This adds one individual redesign after the earlier full-rework priorities.
+
+### Cladoselache — reopened from final
+
+User supplied `/Users/hoai/Downloads/Chondrichthyes.webp` explicitly for **Cladoselache**.
+Preserved at `../devonian-authoring/cladoselache/user-reference/cladoselache-user-reference-2026-09-08.webp`,
+SHA256 `21dea136c93722f5a6c997a6724d05b144a6f0ae2fcb1128e68edda868753b2c`. The image credits Encyclopaedia Britannica2012; keep it local for study.
+Reassess the distinctive fin system: broad swept pectoral outline and attachment/incidence,
+separated angular dorsal fins, posterior fin profiles and asymmetrical tail outline. Show the
+whole arrangement in side/front/dorsal/oblique views instead of copying a single flat silhouette.
+Use the subtle dark dorsal/light ventral pattern and fin-edge regional variation as appearance
+targets, with restrained original pigment and anatomically authored surface response. Verify
+fine fin proportions, tail skeleton and dentition with the existing primary sources before
+locking the new geometry; the image alone is not anatomical proof.
+
+Reopened as preview and pending; preserve the old finalized family/source under
+`../devonian-authoring/backups/cladoselache-final-pre-reference-rework-2026-09-08/` (hash manifest).
+Fin/jaw animations, full/LOD/portraits and new audits follow completed redesign.
+
+### Nahecaris — shrimp-like body and appendage proportions
+
+User reference `/Users/hoai/Downloads/Nahecaris.jpg` preserved at
+`../devonian-authoring/nahecaris/user-reference/nahecaris-user-reference-2026-09-08.jpg`,
+SHA256 `d5640abf84805adf6b4f6df335dc5b3bceda09931d426b2039089391ffb85cb3`. Rework the natural shrimp-like curves and relations of the body,
+shell and leg positions: curved layered valve profile with thin shaped margin, articulated
+posterior arch/taper, legs folding/reaching from appropriate positions beneath the shell,
+and proportionate eyes/antennal bases/long slender antennae. Avoid a rigid cylinder, straight
+stack of body segments, uniformly splayed legs or oversized eyes and feelers. Compare reference
+angle, side/dorsal/front views and reconcile phyllocarid anatomy with the existing primary
+sources before locking geometry. Preserve originals, model/source backup and reference.
+Coordinate this structural redesign with the separately requested attack/feeding pass in
+`docs/attack-feeding-refinement.md`; limb motion must follow the new anatomy, and audits follow
+the completed replacement. Existing model remains preview.
+
 ## Stethacanthus — user reference, 7 September 2026
 
 User supplied `/Users/hoai/Downloads/Stethacanthus.jpg`, preserved as
@@ -159,3 +260,46 @@ Odaraia was also reopened by the user on 7 September. See
 [the Cambrian queue](../cambrian/refinement-queue.md). Its named backup, translucent wrapping
 carapace and distinct limb/eye/tail requirements are separate from the Devonian roster.
 It follows the same individual authoring, preview and post-rework audit workflow.
+
+## Separate articulated attack and feeding pass
+
+See `docs/attack-feeding-refinement.md`: nautiloid/cephalopod tentacle flare and whipping,
+articulated sea-scorpion/spider strikes, and multi-arm grasp-to-underside-mouth feeding for
+Furcaster. Coordinate with pending body redesigns, including Nahecaris; audit only completed
+new geometry. This overlaps eight current individual refinements, not eight new creature IDs.
+
+## Reopened face refinements — 8 September 2026
+
+### Gemuendina
+
+User likes the improved V3 but requests a focused correction against the existing
+Gemuendina.webp reference: mouth at the leading front, visibly bulging eyes immediately
+above it (near what could be mistaken for nostrils), and dorsal motifs treated as markings,
+not additional eyes. Preserve the accepted body, broad pectoral volumes, tapering tail and
+materials. Inspect the actual reference and V3 front/side/oblique views before changing the
+cranial mesh; do not move whole eye objects without reshaping their support and orbital skin.
+The previous research describes an upward mouth/dorsal eyes, so the new author must explicitly
+reconcile position versus opening direction and separate the user's visual target from fossil
+certainty. Do not silently claim a disputed reconstruction is settled.
+
+V3 is reopened to **preview**; its previous final art/eye reports remain historical evidence
+for the preserved version, not approval of a modified face. Backup with public family, source
+and production Blend: `../devonian-authoring/backups/gemuendina-final-pre-face-refinement-2026-09-08/`.
+After new sculpt: mouth/skull/jaw/anchor alignment, closed and open oral continuity, supported
+bulging eyes with at least 50% globe volume inside, full/LOD action poses and fresh portraits.
+
+### Dunkleosteus
+
+New reference `/Users/hoai/Downloads/Dunkleosteus-1.jpg` copied with hash/provenance to
+`../devonian-authoring/dunkleosteus/user-reference/dunkleosteus-face-user-reference-2026-09-08.jpg`.
+Focus on the strong facial profile, sculpted brow, large angular cheek plates and sharp shaped
+cutting structures. The target is a distinctive head and gnathal silhouette, not rows of generic
+cone teeth. Use the reference as art direction; confirm cutting-plate anatomy independently
+rather than copying every illustrated cusp. Preserve modeled throat, mouth lining and independently
+movable jaws. Sculpt coherent plate roots, tapered edges and receiving clearance, then examine
+closed rest, mid bite, maximal gape, eating and recovery from front/side/three-quarter views.
+
+Reopened to **preview**. Backup includes public family, full authoring source and V2 Blend at
+`../devonian-authoring/backups/dunkleosteus-final-pre-face-refinement-2026-09-08/`. Recheck eye
+containment after brow/head edits, mouth contacts across jaw poses, actual anchors and full/LOD
+parity; regenerate portraits before publishing the revised face.

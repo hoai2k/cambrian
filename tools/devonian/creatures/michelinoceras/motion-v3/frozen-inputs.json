@@ -1,0 +1,47 @@
+{
+  "id": "michelinoceras",
+  "revision": "motion-v3-candidate-01",
+  "status": "source-frozen-pending-export-review",
+  "inputs": [
+    {
+      "path": "/Users/hoai/Documents/Stuff/Generations/cambrian/local/devonian-authoring/michelinoceras/v1/michelinoceras.blend",
+      "bytes": 11968438,
+      "sha256": "dbd8ff9c84e476b69442e8ec340f8ca97e02f9e9d6e49ab8fea72bdaaf09de20"
+    },
+    {
+      "path": "/Users/hoai/Documents/Stuff/Generations/cambrian/local/devonian-authoring/michelinoceras/v1/candidate/michelinoceras.json",
+      "bytes": 2510,
+      "sha256": "932c2c63fb81520a5b4ad6ea82da925e0368b15269ecac7f129388e78267642f"
+    },
+    {
+      "path": "/Users/hoai/Documents/Stuff/Generations/cambrian/local/devonian-authoring/michelinoceras/v1/candidate/michelinoceras.glb",
+      "bytes": 19581660,
+      "sha256": "f69f1bfaae8e96d775756bb1fdbdc6b4c0971adf88892fd132ed885baaaaa313"
+    },
+    {
+      "path": "/Users/hoai/Documents/Stuff/Generations/cambrian/local/expansion-repo/tools/devonian/creatures/michelinoceras/motion-v3/build_candidate.py",
+      "bytes": 13231,
+      "sha256": "bf6eaddfecfc112f8c226fb43537867b712852991978de2d493d918d2b0f9b7c"
+    },
+    {
+      "path": "/Users/hoai/Documents/Stuff/Generations/cambrian/local/expansion-repo/tools/devonian/creatures/michelinoceras/motion-v3/performance.py",
+      "bytes": 3469,
+      "sha256": "9862da311761748636d739190fcf7c48749f953e326647513de54c552c07cae2"
+    },
+    {
+      "path": "/Users/hoai/Documents/Stuff/Generations/cambrian/local/expansion-repo/tools/devonian/creatures/michelinoceras/motion-v3/preflight_probe.py",
+      "bytes": 2873,
+      "sha256": "6aef01715904bf5fb205c8f4a341c6d3d8e2c4973dc5c5fe9809cd1a4f1017e0"
+    },
+    {
+      "path": "/Users/hoai/Documents/Stuff/Generations/cambrian/local/expansion-repo/tools/devonian/creatures/michelinoceras/motion-v3/render_candidate.py",
+      "bytes": 4788,
+      "sha256": "8b8680304657dba7cf2f74f96be2a39f10ceb9155de7effec0c2a7c76edb90d9"
+    },
+    {
+      "path": "/Users/hoai/Documents/Stuff/Generations/cambrian/local/expansion-repo/tools/devonian/creatures/michelinoceras/motion-v3/validate_candidate.py",
+      "bytes": 4767,
+      "sha256": "07dd267202988cb0b74f5730374caa7f4ee236e0c2f01b53cab202b78f3c5ffe"
+    }
+  ]
+}
