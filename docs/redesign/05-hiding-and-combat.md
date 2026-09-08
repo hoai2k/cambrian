@@ -59,6 +59,15 @@ Implemented September 2026. This supersedes the original design's Y signature ab
   tenths of a body length has no tolerance at all otherwise, and missing by a few degrees at that
   range reads as the game ignoring the press. The cap is what keeps it a nudge rather than an
   auto-aim, and it never picks another player: who you attack stays your decision.
+- **A shell faces where it is going.** The nautiloids' funnel makes them fast and makes rising
+  and sinking free, but it does not turn them round: swimming, sprinting and an aimed dash all go
+  where the stick points with the nose leading, because travelling shell-first under power read as
+  the animal spinning rather than as a jet. The funnel shows up in two places instead — the free
+  hover, and a dash with **no stick direction**, which fires out behind the body. Through that one
+  the body holds the heading it already had, so the shell leaves backwards with its head still
+  pointed at whatever it is backing away from. Turning to follow that velocity would spin the
+  animal, and the camera with it, through 180° at the one moment it wants to keep its eyes on the
+  thing it is escaping.
 - **B: block/parry**, or evade for creatures without a guard. Defensive specials run through this action. Hallucigenia and Canadia have a 0.28-second parry window; sustained defense is not invulnerability.
 - **D-pad right / keyboard R (player 2: P): hide**, available at every growth tier. Press again to end hiding. Attacking, blocking, sprinting, dodging, taking damage, or being grabbed ends hiding.
 

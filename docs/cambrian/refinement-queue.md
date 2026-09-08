@@ -65,10 +65,19 @@ model backup; the current model stays preview until replacement acceptance.
 ## The machine-readable queue
 
 `src/content/cambrian/pending-refinements.json` is the source of truth, in the same shape as the
-Devonian's. An entry there *is* the creature's preview status, and its `reason` is the sentence the
-preview badge shows when hovered in the game and the viewer — so a model cannot be flagged without
-saying what it is waiting for, and the flag cannot be dropped without deleting that sentence.
-`npm run eras` checks both directions.
+Devonian's, and it separates the two kinds of outstanding work:
+
+- **`model: true`** — the 3D body itself: geometry, materials, rig, LOD art. This is what puts the
+  ⚠ preview badge on the creature, in the game and in the viewer, and `reason` is the sentence it
+  shows on hover. Only Odaraia is in this state in the Cambrian.
+- **`clips`** — animation clips queued for rework on a body that is already finished. Badging the
+  whole animal for these said the wrong thing: Anomalocaris' and Opabinia's models are done. The
+  warning goes on those clip buttons in the viewer instead, carrying `clipReason`, and the creature
+  shows nothing.
+
+An entry must claim at least one of the two and whichever it claims must carry its reason, so
+nothing can be flagged without saying what it is waiting for and no flag can be dropped without
+deleting that sentence. `npm run eras` enforces all of it.
 
 ## Attack and feeding pass — 8 September 2026
 

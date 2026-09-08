@@ -1,5 +1,5 @@
 import { MUSIC } from './music';
-import { CAMBRIAN_MODEL_NOTES, CAMBRIAN_MODEL_STATUS } from './model-status';
+import { CAMBRIAN_CLIP_NOTES, CAMBRIAN_MODEL_NOTES, CAMBRIAN_MODEL_STATUS } from './model-status';
 import { defineEra } from '../era';
 import { CAMBRIAN_CREATURES } from './creatures';
 import { SNACK_SCHOOLS, GIANTS } from './ecology';
@@ -30,7 +30,7 @@ export const CAMBRIAN = defineEra({
     creatures: 'assets/creatures/', defaultPortraits: 'assets/creatures/defaults/',
     props: 'assets/props/', biomes: 'assets/biomes/', ui: 'assets/ui/', sfx: 'assets/sfx/', music: 'music/',
     logo: 'assets/brand/logo-engraved.webp', illustration: 'assets/brand/logo-illustrated.webp',
-    emblem: 'assets/brand/emblem-engraved.webp', modelBytes, modelStatus: CAMBRIAN_MODEL_STATUS, modelNotes: CAMBRIAN_MODEL_NOTES,
+    emblem: 'assets/brand/emblem-engraved.webp', modelBytes, modelStatus: CAMBRIAN_MODEL_STATUS, modelNotes: CAMBRIAN_MODEL_NOTES, clipNotes: CAMBRIAN_CLIP_NOTES,
   },
   audio: { music: MUSIC },
   presentation: { schemes: SCHEMES, creatureSchemes: CREATURE_SCHEMES, portraits, authoredColors },

@@ -304,11 +304,11 @@ ok(RULES !== undefined && !RULES.growthByNutrition, 'Devonian rules active: grow
   ok(RULES!.jet(mk('manticoceras')) && !RULES!.jet(shark), 'only shells jet');
 }
 
-// ---- a shell goes where the stick points, and jets shell-first while it does ----
-// The stick is the direction of travel for every body in the sea: swimming, sprinting and dashing
-// all go where they are aimed. A shell's heading is the one thing the funnel changes — under way at
-// speed it travels shell-first with its head trailing — how a nautiloid escapes — and swings round
-// to face what it is doing when it slows, aims or strikes.
+// ---- a shell goes where the stick points, and faces that way while it does ----
+// The stick is the direction of travel for every body in the sea, and the nose goes with it:
+// swimming, sprinting and dashing all go where they are aimed, shells included. Turning the animal
+// round to travel shell-first read as a spin rather than as a jet, so the funnel shows up only in
+// the free hover and in the backward dash below.
 {
   const run = (id: CreatureId, gear: 'swim' | 'sprint' | 'dash', stick: 1 | -1 = 1) => {
     const g = new Game('reef', [{ creature: id, device: 'keyboard', ready: true }]);
@@ -328,7 +328,8 @@ ok(RULES !== undefined && !RULES.growthByNutrition, 'Devonian rules active: grow
     ok(dash.z > 1, `...and dashes the same way too (z ${dash.z.toFixed(1)})`);
     ok(astern.z < -1, `...and pulling the stick back takes it back (z ${astern.z.toFixed(1)})`);
     ok(swim.astern < -0.8, `...facing its way at a cruise (${swim.astern.toFixed(2)}, -1 is nose-first)`);
-    ok(sprint.astern > 0.8, `...and shell-first once it is jetting (${sprint.astern.toFixed(2)}, 1 is astern)`);
+    ok(sprint.astern < -0.8, `...and still facing it at a sprint, never spun round (${sprint.astern.toFixed(2)}, -1 is nose-first)`);
+    ok(dash.astern < -0.8, `...and through an aimed dash (${dash.astern.toFixed(2)}, -1 is nose-first)`);
   }
   const fish = run('cladoselache', 'sprint');
   ok(fish.z > 1 && fish.astern < -0.8, `a finned body sprints forward, facing forward (z ${fish.z.toFixed(1)}, ${fish.astern.toFixed(2)})`);
@@ -341,15 +342,41 @@ ok(RULES !== undefined && !RULES.growthByNutrition, 'Devonian rules active: grow
     p.pos = { x: 0, y: -14, z: 0 }; p.vel = { x: 0, y: 0, z: 0 }; p.yaw = 0; p.spawnProtect = 999;
     const step = (f: Partial<InputFrame> = {}) => { tick(g, new Map<number, InputFrame>([[0, { ...emptyInput(), ...f } as InputFrame]])); p.spawnProtect = 999; };
     for (let i = 0; i < 20; i++) step();
-    const from = { ...p.pos };
+    const from = { ...p.pos }, fromYaw = p.yaw;
     step({ dash: true });
     for (let i = 0; i < 20; i++) step();
     const h = heading(p.yaw), dx = p.pos.x - from.x, dz = p.pos.z - from.z;
-    return { moved: Math.hypot(dx, dz), alongAxis: (h.x * dx + h.z * dz) / Math.max(Math.hypot(dx, dz), 1e-6) };
+    return { moved: Math.hypot(dx, dz), alongAxis: (h.x * dx + h.z * dz) / Math.max(Math.hypot(dx, dz), 1e-6), turned: Math.atan2(Math.sin(p.yaw - fromYaw), Math.cos(p.yaw - fromYaw)) };
   };
   const shell = neutral('michelinoceras'), finned = neutral('cladoselache');
   ok(finned.moved > 1 && finned.alongAxis > 0.9, `a neutral-stick dash sends a fish the way it faces (${finned.moved.toFixed(1)} units, ${finned.alongAxis.toFixed(2)})`);
   ok(shell.moved > 1 && shell.alongAxis < -0.9, `...and a shell out behind itself, shell-first (${shell.moved.toFixed(1)} units, ${shell.alongAxis.toFixed(2)})`);
+  // ...and it comes out of that still pointing where it started. Holding the heading is what makes
+  // a dash *backward*: following the velocity round would spin the animal, and the camera with it,
+  // through 180° at the one moment it wants its eyes on the thing it is escaping. A dash that goes
+  // where the body already points has nothing to hold, so this is the shell's rule, not the fish's.
+  ok(Math.abs(shell.turned) < 0.2, `a backward dash leaves the shell facing where it was (turned ${shell.turned.toFixed(2)} rad)`);
+}
+
+// ---- changing creature keeps the era's own growth in step ----
+// The Devonian keeps the life stage in a side table rather than deriving it per step, so a body
+// that changed species has to be told (`onSwap`). Without it the new animal would keep the old
+// one's stage and the meter would be filled against the wrong thresholds.
+{
+  const { ladderMark, rungOf } = await import('../src/sim/ladder');
+  const { devActor, stageForScale } = await import('../src/sim/devonian/state');
+  const g = new Game('rise', [{ creature: 'coccosteus', device: 'keyboard', ready: true }]);
+  const p = g.players[0];
+  for (let i = 0; i < 30; i++) tick(g, new Map<number, InputFrame>([[0, emptyInput()]]));
+  p.spawnProtect = 0; p.teleportCd = 0; p.state = 'free';
+  const target: CreatureId = 'dunkleosteus';
+  ok(g.changeCreature(0, target, true), 'a Devonian player can change creature');
+  ok(p.creature === target, `...and is the new animal (${p.creature})`);
+  const d = devActor(g, p);
+  ok(d.stage === stageForScale(creature(target).adultLength, p.scale), `...with the era's stage resynced to the new body (stage ${d.stage})`);
+  ok(rungOf(ladderMark(g, p)) === 4, `...arriving fully grown when asked (rung ${rungOf(ladderMark(g, p))})`);
+  p.teleportCd = 0;
+  ok(g.changeCreature(0, 'coccosteus', false) && rungOf(ladderMark(g, p)) === 0, 'and the body it left is handed back where it was');
 }
 
 // ---- every sound the era asks for exists (the shared library is NOT under assets/devonian/) ----

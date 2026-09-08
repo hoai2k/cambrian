@@ -7,6 +7,7 @@ import type { EraHud } from '../sim/era-rules';
 import { creature } from '../sim/creatures';
 import { BIOME_ART, biomeArtPath, radarGlyphPath } from '../shared/environment-assets';
 import { BAND_COLOR } from '../sim/types';
+import { CreaturePortrait } from './CreaturePortrait';
 import { appBase } from '../shared/base';
 import { fillControls, key } from '../shared/controls';
 
@@ -96,6 +97,21 @@ function PlayerPanel({ p }: { p: PlayerHud }) {
             ))}
           </ul>
           <small>{p.teleport.cooldown > 0 ? `Ready in ${Math.ceil(p.teleport.cooldown)} s` : <><kbd>{key('confirm', s)}</kbd> go · <kbd>{key('back', s)}</kbd> back · <kbd>{key('teleport', s)}</kbd> next</>}</small>
+        </div>
+      )}
+      {p.swap && (
+        <div className="tele-menu swap-menu">
+          <p className="eyebrow">CHANGE CREATURE</p>
+          <div className="swap-body">
+            <CreaturePortrait creatureId={p.swap.creature} kind="thumb" assetBase={appBase()} alt="" draggable={false} loading="eager" />
+            <div>
+              <b>{p.swap.name}</b>
+              {p.swap.kind && <span className="swap-kind">{p.swap.kind}</span>}
+              <span className="swap-rung">{p.swap.rung}{p.swap.kept ? ' · your progress' : p.swap.grown ? ' · fully grown' : ' · hatchling'}</span>
+              <i className="swap-fill"><b style={{ transform: `scaleX(${p.swap.fill})` }} /></i>
+            </div>
+          </div>
+          <small><kbd>◀▶</kbd> {p.swap.index + 1}/{p.swap.count} · <kbd>{key('ability', s)}</kbd> {p.swap.grown ? 'grown' : 'hatchling'} · <kbd>{key('confirm', s)}</kbd> take it · <kbd>{key('back', s)}</kbd> back</small>
         </div>
       )}
       <div className="hud-bottom">

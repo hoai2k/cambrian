@@ -1,5 +1,5 @@
 import { CREATURES } from '../sim/creatures';
-import { CAMBRIAN_MODEL_NOTES, CAMBRIAN_MODEL_STATUS } from '../content/cambrian/model-status';
+import { CAMBRIAN_CLIP_NOTES, CAMBRIAN_MODEL_NOTES, CAMBRIAN_MODEL_STATUS } from '../content/cambrian/model-status';
 import type { CambrianCreatureId } from '../content/cambrian/ids';
 import { SCHEMES as CAMBRIAN_SCHEMES, CREATURE_SCHEMES as CAMBRIAN_DEFAULTS } from '../content/cambrian/palettes';
 import { SCHEMES as DEVONIAN_SCHEMES, CREATURE_SCHEMES as DEVONIAN_DEFAULTS } from '../content/devonian/palettes';
@@ -8,9 +8,18 @@ import { assetPaths } from '../content/asset-paths';
 import { DEVONIAN_SPECIMENS } from '../content/devonian/specimens';
 import { DEVONIAN_CREATURES } from '../content/devonian/creatures';
 import devonianPending from '../content/devonian/pending-refinements.json';
+import { refinementTables, type PendingRefinement } from '../content/pending-refinements';
 
-/** Both eras keep one queue of what is outstanding per model; the viewer shows its reason. */
-const DEVONIAN_MODEL_NOTES: Record<string, string> = Object.fromEntries(devonianPending.map((p) => [p.id, p.reason]));
+/**
+ * Both eras keep one queue of what is outstanding, and the viewer shows it in two places: a
+ * preview badge on a creature whose *model* is unfinished, and a warning on the individual
+ * animation buttons whose clips are queued for rework.
+ */
+const DEVONIAN_REFINEMENTS = refinementTables(devonianPending as PendingRefinement[]) as {
+  modelStatus: Record<string, 'preview' | 'final' | undefined>;
+  modelNotes: Record<string, string | undefined>;
+  clipNotes: Record<string, Partial<Record<string, string>> | undefined>;
+};
 
 export type CollectionId = 'cambrian' | 'devonian' | 'devonian-props';
 export interface ViewerSpecimen {
@@ -28,6 +37,8 @@ export interface ViewerSpecimen {
   modelStatus?: 'preview' | 'final';
   /** What remains for a preview model — the badge shows it on hover. */
   modelNote?: string;
+  /** Animation clips queued for rework, by clip name, with the reason each button shows. */
+  clipNotes?: Partial<Record<string, string>>;
   model: string;
   lod?: string;
   image?: string;
@@ -47,6 +58,7 @@ export const SPECIMENS: readonly ViewerSpecimen[] = [
     name: c.name, species: c.species, kind: c.kind, kindNote: c.kindNote, role: `${c.ground ? 'SEAFLOOR' : 'SWIMMER'} · ${c.role}`,
     provenance: c.provenance ?? 'Burgess Shale', description: '',
     modelStatus: CAMBRIAN_MODEL_STATUS[c.id as CambrianCreatureId], modelNote: CAMBRIAN_MODEL_NOTES[c.id as CambrianCreatureId],
+    clipNotes: CAMBRIAN_CLIP_NOTES[c.id as CambrianCreatureId],
     model: assetPaths.model(c.id), lod: assetPaths.model(c.id, 1), displayLength: c.adultLength,
     looping: ['Idle', 'Swim', 'Crawl', 'Guard', 'Eat', 'Moult', ...(c.abilityLoop ? ['Ability'] : [])],
   })),
@@ -57,7 +69,8 @@ export const SPECIMENS: readonly ViewerSpecimen[] = [
     name: c.name, species: c.species, kind: DEVONIAN_KIND.get(c.id)?.kind, kindNote: DEVONIAN_KIND.get(c.id)?.kindNote,
     role: c.category === 'prop' ? 'DEVONIAN · SCENERY' : 'DEVONIAN · SPECIMEN',
     provenance: c.provenance, description: c.description,
-    modelStatus: c.modelStatus, modelNote: DEVONIAN_MODEL_NOTES[c.id], model: c.model, lod: c.lod, image: c.image, displayLength: 4,
+    modelStatus: DEVONIAN_REFINEMENTS.modelStatus[c.id], modelNote: DEVONIAN_REFINEMENTS.modelNotes[c.id],
+    clipNotes: DEVONIAN_REFINEMENTS.clipNotes[c.id], model: c.model, lod: c.lod, image: c.image, displayLength: 4,
     lengthMeters: c.lengthMeters, looping: c.looping,
   })),
 ];

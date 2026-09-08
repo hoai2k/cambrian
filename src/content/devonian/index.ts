@@ -9,11 +9,15 @@ import { DEVONIAN_SCENERY } from './scenery';
 import { SCHEMES, CREATURE_SCHEMES } from './palettes';
 import { DEVONIAN_BRAND, DEVONIAN_BRAND_EXTRAS } from './brand';
 import shippedBytes from './asset-sizes.json';
-import modelStatus from './model-status.json';
 import pendingRefinements from './pending-refinements.json';
+import { refinementTables, type PendingRefinement } from '../pending-refinements';
 
-/** What remains for each preview model, keyed by id — the reason its badge shows on hover. */
-const modelNotes = Object.fromEntries(pendingRefinements.map((p) => [p.id, p.reason])) as Record<DevonianCreatureId, string>;
+/**
+ * The badges, derived from the one refinement queue: a creature is a preview when its *model* is
+ * outstanding, and queued animation work is carried by the clips it affects instead.
+ * `model-status.json` is no longer read here — it duplicated this and could disagree with it.
+ */
+const { modelStatus, modelNotes, clipNotes } = refinementTables(pendingRefinements as PendingRefinement[]);
 
 /**
  * Model sizes for the streaming loader's progress estimate. Delivered specimens (tools/devonian/
@@ -80,7 +84,7 @@ export const DEVONIAN = defineEra({
     // devonian/sfx.ts), which sfxUrl resolves under assets/devonian/sfx/ whatever this path says.
     // Pointing it at the Devonian folder makes all 39 shared samples 404 and the sea goes silent.
     props: 'assets/devonian/scenery/', instancedScenery: DEVONIAN_SCENERY, biomes: 'assets/devonian/biomes/', ui: 'assets/ui/', sfx: 'assets/sfx/', music: 'music/',
-    ...DEVONIAN_BRAND, modelStatus: modelStatus as Record<DevonianCreatureId, 'preview' | 'final'>, modelNotes, modelBytes, standIns: DEVONIAN_STAND_INS,
+    ...DEVONIAN_BRAND, modelStatus, modelNotes, clipNotes, modelBytes, standIns: DEVONIAN_STAND_INS,
   },
   audio: { music: MUSIC },
   presentation: { schemes: SCHEMES, creatureSchemes: CREATURE_SCHEMES, portraits: {}, authoredColors: { creatures: authoredCreatures, props: {} } },
