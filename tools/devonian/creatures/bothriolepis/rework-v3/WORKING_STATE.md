@@ -1,3 +1,13 @@
+## 2026-09-08 20:19 UTC — MATERIAL04 actual review HOLD; USER PAUSE
+
+- Astra high independently inspected all nine actual M04 views plus M03/reference comparison. All44 frozen inputs and all20 output members verified unchanged. Overall appearance HOLD; no production rig/export authorization.
+- Actual blend `5d839ec10a030595c9ab2c66405b97379e0d319f1fbe8c7966c5bae26f626c9b`; output inventory `7e4ff7012491f2a083342b42be40059276713601871e319cef7f8c9f5007d715`. Local output `../devonian-authoring/bothriolepis/rework-v3/material04/`.
+- Preserve successful oval oral transition and accepted bulky shield/curved pectorals/posterior. Residual HOLD: rear cephalic/nuchal sharp facets, overly intense wrinkled/row-like microstructure, conspicuous flat rostral triangular material region. Eyes remain pending completed-candidate review/audit.
+- Actual source checks PASS five oral poses, declared geometry scope, protected38904vertices, eye bytes, key-delta roundoff2.9802322387695312e-08. These did not certify appearance; actual image verdict governs.
+- Per-image review and focused restart direction: `review-material04-and-next-direction.md`, SHA `93ce76a278d3be53a6137a8670be4987ccfe5c43c09936af4d3557ca68fd5c49`. No M05 source or execution handoff authored. Do not repeat the frozen M04 job.
+- Next after user resumes: verify M04 inventory, then author a small read-only forehead shader/neutral-normal/section diagnostic to distinguish accumulated local relief from shader artifacts; retain oral correction. Only bounded local repair after that evidence. No new large material or production phase before art acceptance.
+- Status PAUSED at user's request. No new Blender/public/Git/shared changes by author. Parent checkpoints files; all previous candidates preserved.
+
 ## 2026-09-08 20:03 UTC — MATERIAL04 source frozen; M03 art HOLD
 
 - Owner/model: Astra high. Status: candidate-ready, **source only**. New Bothriolepis ownership accepted after Titan08 completion.
@@ -9,6 +19,13 @@
 - Execution CWD `/Users/hoai/Documents/Stuff/Generations/cambrian/local/expansion-repo`; exact next command `/usr/bin/python3 /Users/hoai/Documents/Stuff/Generations/cambrian/local/expansion-repo/tools/devonian/creatures/bothriolepis/rework-v3/execute_material04.py --run-frozen-material04`. CPU2,32 samples,nine views; parent schedules. Output only `../devonian-authoring/bothriolepis/rework-v3/material04/`. Pre/post input verification; refuse existing output directory. Stop on any error, retain evidence.
 - Production clarification: V3 currently has semantic groups and an oral study key, **no production rig/18 actions/export yet**. Eighteen dynamic actions and anchors on full/LOD remain required after material gate, followed by final new-candidate actual eye/general audits and intake. No old audit applies.
 - No Blender, public, Git or shared checkpoint/catalogue changes by author. Resume from frozen execution, then independently inspect all nine actual images before production authoring.
+
+## 2026-09-08 — MATERIAL04 frozen execution complete; Astra art review pending
+
+- Terra ran the exact frozen executor once: `/usr/bin/python3 .../execute_material04.py --run-frozen-material04`. It produced the editable blend, nine maps, nine CPU2 32-sample review views, source check and output inventory in `/Users/hoai/Documents/Stuff/Generations/cambrian/local/devonian-authoring/bothriolepis/rework-v3/material04/`.
+- Frozen manifest SHA `7d3e1e8cb9922bc81295cecb8c9df6b5520d85bddea55a3f35e13aac65f00743` matched all 44 inputs before and after execution. The output inventory SHA is `7e4ff7012491f2a083342b42be40059276713601871e319cef7f8c9f5007d715`; execution log SHA `180d9a39029052a8ed0d99acc3344bbeff622dcc24b5c9ad91e6dd731a3687de`.
+- Editable blend: `bothriolepis-material04.blend`, 26,295,085 bytes, SHA `5d839ec10a030595c9ab2c66405b97379e0d319f1fbe8c7966c5bae26f626c9b`. Actual source check SHA `f862eaf5f56ef1bc34c4fb7b4c2dd967562c68686a4821b28677f116d43bdf62` reports all five oral study poses PASS and unchanged eye meshes.
+- Nine output images are recorded in the inventory for Astra's individual appearance review. Completion is numerical/execution evidence only; it is not final art approval and does not authorize a rig, export, publication or Git action.
 
 # Bothriolepis V3 working state
 
