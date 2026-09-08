@@ -162,6 +162,15 @@ export const DEVONIAN_RULES: EraRules = {
     const L = creature(id).adultLength;
     return stageScale(L, mode === 'reef' ? ADULT_STAGE : mode === 'hunted' && index === 0 ? PRIME_STAGE : 0);
   },
+  // The Devonian grows in five life stages, which is the shared ladder under its own names.
+  ladderNames: STAGES,
+  ladderRung: (g, a) => devActor(g, a).stage,
+  ladderScale: (id, rung) => stageScale(creature(id).adultLength, rung),
+  ladderFill: (g, a, fraction) => {
+    const d = devActor(g, a);
+    const from = STAGE_AT[d.stage] ?? 0, to = STAGE_AT[d.stage + 1] ?? GROWN;
+    d.standing = from + (to - from) * fraction;
+  },
   install() { installDevonianSpecials(); },
   ySpecial,
   init(g) { installDevonianSpecials(); for (const a of players(g)) { const d = devActor(g, a); d.stage = stageForScale(creature(a.creature).adultLength, a.scale); d.standing = g.mode === 'reef' ? STAGE_AT[ADULT_STAGE] + 5 : STAGE_AT[d.stage]; } },
@@ -250,10 +259,15 @@ export const DEVONIAN_RULES: EraRules = {
     if (g.mode !== 'rise') return;
     for (const a of players(g)) {
       const d = devActor(g, a);
+      // Somebody who came in on the top rung has already done this; the clock is not theirs to
+      // run. Everyone else in the same sea keeps theirs and can still win it.
+      if (a.carriedTop) { d.primeT = 0; continue; }
       if (d.stage >= PRIME_STAGE && isAlive(a)) {
         d.primeT += dt;
         if (d.primeT >= HOLD_TO_WIN && g.state.status === 'playing' && !g.endless) {
           const name = creature(a.creature).name;
+          // The top rung of the record is banked by finishing, never by arriving.
+          g.bankLadderTop(a);
           g.state = { status: a.player >= 0 ? 'won' : 'lost', winner: a.player,
             message: a.player >= 0 ? `${name} grew up and held the sea.` : `A rival ${name} grew up first.` };
         }
@@ -292,7 +306,7 @@ export const DEVONIAN_RULES: EraRules = {
     if (d.deadZoneIn && def.breathing !== 'air') return 'Dead water. Get out of it, or up to the surface if you can breathe.';
     if (def.breathing === 'air' && d.air < AIR_LOW) return 'Air is low. {rise} to the surface and gulp.';
     if (g.time < 12) return rung === 1 ? 'Feed, hide, moult. Everything out there is bigger than you are today.' : rung === 2 ? 'Feed and keep your shoal. You grow on what you catch.' : rung === 3 ? 'Hunt the shoals. Five stages between you and Prime.' : 'Stay fed. The sea is hiding from you.';
-    if (def.shell && g.time < 40) return 'Sprint jets you backward. Rise and sink are free. Block withdraws into the shell.';
+    if (def.shell && g.time < 40) return 'Your funnel makes rise and sink free, and no direction is slow. Block withdraws into the shell.';
     if ((def.shoreReach ?? 0) > 0 && g.time < 40) return 'You can push into water nothing with gills can follow you into.';
     return undefined;
   },

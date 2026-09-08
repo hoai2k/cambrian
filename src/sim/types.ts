@@ -137,6 +137,15 @@ export interface Actor {
   respawnT: number; hatching: boolean;
   /** Co-op: how long a team-mate has been holding station beside this downed body. */
   reviveT: number;
+  /**
+   * This player hatched on the top rung of the growth ladder, by carrying a finished run in.
+   *
+   * Rise's goal is to reach the top and hold it, and they arrived there — so the goal is already
+   * behind them and its clock never runs for them: the sea is simply open, exactly as it is after
+   * pressing "keep playing". It is per player, not per match, so somebody else in the same co-op
+   * game who is still growing keeps their clock and can still win it.
+   */
+  carriedTop: boolean;
   dashHoldT: number; dashUsed: boolean; dashQueued: boolean; pounceCd: number; aimInRange: boolean; aiming: boolean;
   dashCd: number; sinceHit: number; lastHitBy: number; swallowedBy: number; holdT: number;
   deathY: number; sparkled: boolean; tumble: Vec3;
@@ -163,7 +172,18 @@ export interface Corpse { id: number; }
 
 export interface SiltCloud { pos: Vec3; radius: number; t: number; }
 
-export interface PlayerSetup { creature: CreatureId; device: number | 'keyboard' | 'keyboard2'; ready: boolean; }
+export interface PlayerSetup {
+  creature: CreatureId;
+  device: number | 'keyboard' | 'keyboard2';
+  ready: boolean;
+  /**
+   * Rise only: the rung of the growth ladder to hatch on, instead of rung 0. This is how a player
+   * carries on from the furthest they have taken this creature before rather than starting again
+   * as a hatchling. Absent or 0 means the usual start; the other modes hand out their own bodies
+   * and ignore it. See src/sim/ladder.ts.
+   */
+  startRung?: number;
+}
 
 /** The three modes, shared by both eras: an era changes the sea and the animals, not the match. */
 export type Mode = 'rise' | 'hunted' | 'reef';
