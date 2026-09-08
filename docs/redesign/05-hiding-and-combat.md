@@ -48,7 +48,10 @@ Implemented September 2026. This supersedes the original design's Y signature ab
   animal you are about to swim straight past; `chargeTarget` measures how far along the line a body
   sits and how far off it instead, and takes the nearest thing inside that corridor. Out of a dash
   it cancels the dash, which costs the invulnerability that was left — you have chosen to commit
-  rather than to escape. The whole heavy button lives in one place (`Game.heavyAction`), so the
+  rather than to escape. It costs the rest of the dash's travel too: a charge that finds something
+  halfway through leaves the dash covering only the ground it had crossed by then, and if that
+  lands on a body the creature stops there and eats. That is the trade working, not the dash being
+  cut short by a bug — the distance is what you spend to turn the escape into an attack. The whole heavy button lives in one place (`Game.heavyAction`), so the
   charge reaches the creature's special, its pounce and the burrow emergence exactly as a standing
   press does.
 - **Close attacks nudge onto their target.** A light attack turns up to `AIM_NUDGE` (23°) onto the

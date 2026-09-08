@@ -1145,7 +1145,10 @@ export class Game implements AiWorld {
     } else if (a.state === 'dodge') {
       // A charge out of a dash: RT cancels the dash into the creature's heavy, thrown at whatever
       // is nearest the line it was travelling along. It costs the dash's remaining invulnerability
-      // as well as the extra stamina — you have chosen to commit instead of to escape.
+      // as well as the extra stamina — you have chosen to commit instead of to escape. It costs
+      // the rest of the dash's travel too, since the cancel is immediate: a charge that finds
+      // something halfway through leaves the dash covering only the ground it had crossed by then.
+      // That is the trade, not a dash cut short by accident.
       if (justHeavy && this.heavyAction(a, def, L, sf, locked, true)) a.iframes = 0;
       else if (a.stateT >= a.stateDur) { a.state = 'free'; a.stateT = 0; }
     } else if (a.state === 'stagger') {
