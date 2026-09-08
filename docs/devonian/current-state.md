@@ -1,11 +1,42 @@
-# End-of-day restart — 8 September 2026
+# Active refinement checkpoint — 8 September 2026
 
-The user requested one additional bounded work block, then a pause with saved state.
-That block covers Dunkleosteus face delivery, Gemuendina terminal-snout delivery,
-and Coccosteus replacement review. Do not start further refinement jobs until resumed.
-This file supersedes earlier running-task summaries. Exact per-creature evidence and
-commands remain in the source handoffs listed below. Original models and failed
-candidates are preserved; never rebuild into an existing candidate directory.
+The user resumed work again and will say when to tie up. The earlier end-of-day
+pause is superseded. Continue from these priorities; save sources and checkpoints.
+Working branch fast-forwarded to main885a08a at resume; no new public model yet.
+
+## Current assignments
+
+- Astra high Coccosteus author: LOD-only structured body/fin sampling from accepted
+  candidate04, protecting oral bands and measuring interior pigment error. Full
+  model, bake03 and rig remain unchanged. Await frozen execution handoff.
+- Astra high Titanichthys author: candidate07 weights-only oral repair with shared
+  physical coordinates across paired floor layers; preserve24-degree gape and18
+  clips. Candidate07 was built and structural contract passed; actual sweep failed at full
+  Ability0.5 because underside-first rays remain. G4 was not run. Author is now
+  diagnosing actual07 evidence and will freeze a bounded correction; preserve07.
+- Root: independent Titan eye measurement and texture-size work. The original
+  eye-ray failure is now reproduced as a float32 repeated-hit loop:64hits refer to
+  only2 triangles; float64 direct tests find2 forward/0 reverse intersections.
+  This diagnoses the checker, not eye containment. New asset-local float64
+  projected classifier leaves the shared checker and50% criterion unchanged.
+  Analytical cube/hollow120,000 cases and the actual failing ray pass; boundary
+  uncertainty remains conservative. The immutable06
+  full/LOD Bind/Ability audit completed: every eye FAILS at40.9–42.1% interior,
+  zero uncertain/disagreeing rays. Root's actual-geometry seating study gives
+  about61.8% at0.030 inward along each original socket normal. Terra medium is
+  producing an isolated eyes-only derivative and actual pose audit/closeups.
+  The actual eyes-only derivative study02 PASSES full/LOD Bind/Ability: conservative
+  bounds60.32–61.68%, no uncertain/disagreeing rays. Closeup art review is running;
+  do not call it released or whole-creature approved. Failed study01 wrote through
+  a copied buffer (zero position changes), preserved and excluded from validation.
+  No socket envelope inflation.
+- Lossless PNG study: exact decoded RGB preserved for18 maps, estimated full GLB
+  29,365,861B (still over25MiB). Root is testing only the4096 body normal map at2048
+  with linear vector filtering/renormalization;4096 albedo and all other maps stay
+  intact. Vector-filtered body normal2048 yields a21,853,112B package, exact other scene
+  values and all18 clips. Mean discarded normal angle0.697deg,p953.17deg, with a
+  tiny preexisting short-vector patch; six matched head/body/oral renders running.
+  This requires actual visual approval before production adoption.
 
 ## Delivered today
 
@@ -69,8 +100,8 @@ Titanichthys/Coccosteus replacements are accepted.
    Ability exposes underside through oral lining: actual triangle rays/sections
    confirm80 full/94 LOD underside-first hits versus zero in Bite/Eat. Fix this
    local deformation. Eye audit failed excessive ray intersections on the closed
-   full bind body, with no caps involved; NO eye containment pass exists. Run the
-   frozen diagnostic rather than weakening parity thresholds. Entry:
+   full bind body, with no caps involved; NO eye containment pass exists. The frozen diagnostic reproduced a numerical repeated-hit loop; the new
+   independent float64 measurement is running without weakening thresholds. Entry:
    `tools/devonian/creatures/titanichthys/rework-v3/HANDOFF-DIAGNOSTIC-EYE-RAY06-01.md`.
    Manifest f5d21ee5618ddcb187826566b9de09498976a421adc32dd0f152928a37652a81.
    Exact lossless packaging preserves18/18 but full remains36.05MB: textures alone
@@ -121,5 +152,6 @@ Use Astra high for anatomy/research/sculpt/material/rig judgment; Terra medium f
 frozen build/export/render/validation jobs. Root sometimes executes an exact frozen
 command directly and does not claim its model changed. Blender5.2 CPU2 executable:
 `/Applications/Blender.app/Contents/MacOS/Blender`; Mac startup may need escalation.
-No new Blender/refinement jobs should remain running after the closing checkpoint.
+Work is active again. Before the next user-requested pause, finish or explicitly
+checkpoint every running job and record exact outputs.
 This file is mirrored at `../devonian-authoring/CURRENT_STATE.md`.
