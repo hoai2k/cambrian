@@ -59,6 +59,10 @@ unless the user explicitly asks for a PR. Steps:
   slow, turn sharp when slow, fast-start on sprint) is the `swim` hook in `src/sim/devonian/swim.ts`.
   Devonian growth is five geometric stages per creature (`stageScale` in `src/sim/devonian/state.ts`,
   hatchlings no shorter than 0.6 units); hatchlings are placed inside plant cover (`spawnInCover`).
+- Seabed scenery collides as the shape it is drawn with: `src/content/prop-shapes.json` is measured
+  off the prop GLBs by `npm run shapes` and is what `src/sim` collides against (footprints in
+  `src/sim/footprint.ts`). Any new or changed instanced prop must re-run `npm run shapes`, and
+  `npm run props` checks the table against the meshes and audits collider against geometry.
 - Devonian scenery and biome plates are procedural stand-ins: flora kinds and their density table in
   `src/content/devonian/environment.ts` + `src/render/sea.ts`, plates from `npm run devonian:plates`.
   Authored sets replace them without touching placement; see `docs/redesign/09-devonian-remaining.md`.

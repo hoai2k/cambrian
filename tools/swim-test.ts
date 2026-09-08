@@ -5,7 +5,7 @@
 import { Game, radarRange } from '../src/sim/game';
 import { emptyInput, type InputFrame } from '../src/sim/types';
 import { applyScaleStats, bodyRadius, clearanceOf, climbHeight, climbRise, floorClearance, glideOver, lengthOf } from '../src/sim/actors';
-import { boulderQ, boulderTop, groundHeight, resolveStatic, sampleHeight, type Boulder, type StaticContact, type WorldData } from '../src/sim/world';
+import { boulderQ, boulderTop, groundHeight, resolveStatic, rockRadius, sampleHeight, type Boulder, type StaticContact, type WorldData } from '../src/sim/world';
 import { floraSize } from '../src/sim/flora';
 import { PITCH_DOWN, PITCH_UP } from '../src/render/engine';
 
@@ -66,11 +66,17 @@ const rockWorld = (boulders: Boulder[]) => ({
   })(), 'the ellipse follows the mesh rotation');
   check('the dome is only over the rock itself', boulderTop(rock, 0, 0) !== undefined && boulderTop(rock, 0, 2) === undefined,
     `top=${boulderTop(rock, 0, 0)?.toFixed(2)} at the centre, nothing 2 units off the narrow side`);
-  check('q is 1 at the rim on both axes', Math.abs(boulderQ(rock, 4.08, 0) - 1) < 1e-9 && Math.abs(boulderQ(rock, 0, 1.02) - 1) < 1e-9, '');
-  // A carved prop (a spire, a talus shard) carries its own tuned radius; the ellipse must not widen it.
-  const spire: Boulder = { variant: 'blade-spire', pos: { x: 0, y: 0, z: 0 }, radius: 0.624 * 2, height: 8, sx: 2, sy: 2, sz: 2, rot: 0.7, shade: .7 };
-  check('a carved prop keeps the radius it was given', Math.abs(boulderQ(spire, spire.radius, 0) - 1) < 1e-9 && boulderQ(spire, spire.radius * 1.2, 0) > 1,
-    `radius ${spire.radius.toFixed(2)} for a mesh scaled ${spire.sx}`);
+  check('q is 1 at the rim on both axes', Math.abs(boulderQ(rock, 4, 0) - 1) < 1e-6 && Math.abs(boulderQ(rock, 0, 1) - 1) < 1e-6,
+    'the rim is where the mesh ends, on the long axis and the short one');
+  // A carved prop collides as its own silhouette, not as a circle around it. A talus shard is close
+  // to twice as long as it is wide; blocking a disc as wide as it is long put an arm's length of
+  // invisible wall off each of its sides.
+  const shard: Boulder = { variant: 'talus-shard', pos: { x: 0, y: 0, z: 0 }, radius: rockRadius('talus-shard', 2, 2), height: 1.6, sx: 2, sy: 2, sz: 2, rot: 0, shade: .7 };
+  /** World distance from the centre to the footprint's edge in a direction. */
+  const edge = (x: number, z: number) => Math.hypot(x, z) / boulderQ(shard, x, z);
+  const along = edge(1, 0), across = edge(0, 1);
+  check('a carved prop collides as its own silhouette', along > across * 1.4 && along <= shard.radius + 1e-6,
+    `${along.toFixed(2)} along the shard, ${across.toFixed(2)} across it, radius ${shard.radius.toFixed(2)}`);
 }
 
 // --- swimming into a boulder rides over it ---
@@ -203,16 +209,15 @@ const rockWorld = (boulders: Boulder[]) => ({
 
 // --- a plant is something to go round; you only go over one you drive straight at ---
 {
-  /** Walk a crawler at a stiff plant, `off` units to the side of dead centre. */
-  const atAPlant = (off: number) => {
+  /** Walk a crawler at a plant, `off` units to the side of dead centre. */
+  const atAPlant = (kind: 'sac' | 'spine', scale: number, off: number) => {
     const g = new Game('reef', [{ creature: 'olenoides', device: 'keyboard', ready: true }], 33);
     const p = g.players[0]; p.spawnProtect = 999; p.scale = 1; applyScaleStats(p, false);
     const ground = sampleHeight(p.pos.x, p.pos.z);
     p.pos = { x: p.pos.x, y: ground + floorClearance(p), z: p.pos.z };
     p.yaw = Math.PI;
-    // A spine sponge big enough to stand up to this body: the plant most worth going round.
     const at = { x: p.pos.x + off, z: p.pos.z - 5 };
-    const f = { pos: { x: at.x, y: sampleHeight(at.x, at.z), z: at.z }, kind: 'spine' as const, scale: 2.4, sy: 2.4, rot: 0, shade: .8, ...floraSize('spine', 2.4, 2.4), bx: 0, bz: 0, bvx: 0, bvz: 0, active: false };
+    const f = { pos: { x: at.x, y: sampleHeight(at.x, at.z), z: at.z }, kind, scale, sy: scale, rot: 0, shade: .8, ...floraSize(kind, scale, scale), bx: 0, bz: 0, bvx: 0, bvz: 0, active: false };
     g.world.flora.push(f);
     g.world.floraHash.rebuild(g.world.flora);
     g.world.floraReach = Math.max(g.world.floraReach, 8);
@@ -221,10 +226,16 @@ const rockWorld = (boulders: Boulder[]) => ({
     for (let i = 0; i < 60 * 8; i++) { g.step(1 / 60, m); g.events.length = 0; peak = Math.max(peak, p.pos.y - sampleHeight(p.pos.x, p.pos.z)); }
     return { peak, past: f.pos.z - p.pos.z, height: f.H };
   };
-  const head = atAPlant(0);
-  const edge = atAPlant(1.7);
+  // A sac sponge big enough to stand up to this body: a firm bulb, broad right down at the sand.
+  const head = atAPlant('sac', 3, 0);
+  const edge = atAPlant('sac', 3, 1.7);
   check('driving straight at a plant goes over it', head.peak > 2, `rose ${head.peak.toFixed(1)} against a plant ${head.height.toFixed(1)} tall`);
   check('...and aiming at its edge goes round it instead', edge.peak < 1 && edge.past > 3, `rose ${edge.peak.toFixed(2)} and carried on ${edge.past.toFixed(0)} units past it`);
+  // A spine sponge is a tall stalk on a narrow foot. A body down on the sand meets the foot, so it
+  // slips past rather than climbing a pillar that is not there — the collider is the mesh now.
+  const stalk = atAPlant('spine', 2.4, 0);
+  check('...and a plant on a thin stalk is passed at the floor, not climbed', stalk.peak < 1 && stalk.past > 3,
+    `rose ${stalk.peak.toFixed(2)} and carried on ${stalk.past.toFixed(0)} units past a ${stalk.height.toFixed(1)}-unit sponge`);
 }
 
 // --- the camera can look up for what is hunting you and down for what you are hunting ---

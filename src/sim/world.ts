@@ -1,6 +1,8 @@
 import { ACTIVE_ERA } from '../content';
 import { clamp, fbm2, makeRng, noise2, smoothstep, TAU, type Vec3 } from '../shared/math';
 import { floraSize } from './flora';
+import { footprintOf, propShape, rockPropId } from '../content/prop-shapes';
+import { fpMax, fpReach, ROUND, type Footprint, type Reach } from './footprint';
 import { SpatialHash } from './spatial';
 
 /**
@@ -332,7 +334,7 @@ function buildLandmark(chunk: Chunk, m: Landmark, far: boolean) {
   const { x: cxp, z: czp } = m.pos;
   const rock = (x: number, z: number, sx: number, sy: number, sz: number, y: number, floor?: number) => {
     chunk.boulders.push({
-      pos: { x, y, z }, radius: Math.max(sx, sz) * 1.02, height: y + sy * 1.05,
+      pos: { x, y, z }, radius: rockRadius(undefined, sx, sz), height: y + rockRise(undefined, sy) * 1.05,
       sx, sy, sz, rot: rng() * TAU, shade: 0.62 + rng() * 0.22, floor,
     });
   };
@@ -431,7 +433,7 @@ export function generateChunk(seed: number, cx: number, cz: number, detail: 'ful
     const sy = sx * (0.3 + rng() * 0.5);
     const sz = sx * (0.65 + rng() * 0.4);
     const y = sampleHeight(x, z) + sy * 0.25;
-    boulders.push({ pos: { x, y, z }, radius: Math.max(sx, sz) * 1.02, height: y + sy * 1.05, sx, sy, sz, rot: rng() * TAU, shade: 0.68 + rng() * 0.21 });
+    boulders.push({ pos: { x, y, z }, radius: rockRadius(undefined, sx, sz), height: y + rockRise(undefined, sy) * 1.05, sx, sy, sz, rot: rng() * TAU, shade: 0.68 + rng() * 0.21 });
     if (big) cover.push({ pos: { x, y: y + sy * 0.4, z }, radius: Math.max(sx, sz) * 1.5, maxLength: sx * 0.9, strength: 0.45 });
   }
   if (detail === 'far') { applyBiomeProps(chunk); addLandmark(chunk, mark, true); return chunk; }
@@ -522,8 +524,8 @@ function applyBiomeProps(chunk: Chunk) {
     const scale = blade && biome === 'basin' ? 2 + b.shade : clamp(b.sx * (blade ? .55 : .9), .6, 2.5);
     b.pos.y = sampleHeight(b.pos.x, b.pos.z);
     b.sx = b.sy = b.sz = scale;
-    b.radius = (blade ? .624 : .864) * scale;
-    b.height = b.pos.y + (blade ? 4 : .8) * scale;
+    b.radius = rockRadius(b.variant, scale, scale);
+    b.height = b.pos.y + rockRise(b.variant, scale);
   }
   const flow = { x: 0, y: 0, z: 0 };
   // These swaps are Cambrian-specific (sac→cushion, tuft→lettuce, vauxia/sac→spine, choia/thalli→glass) and
@@ -657,29 +659,43 @@ export function coverAt(world: WorldData, pos: Vec3, length: number, scratch: Co
 }
 
 /**
- * A rock's footprint is the ellipse its mesh is drawn with — `sx` by `sz`, turned by `rot` — rather
- * than the circle around it, which on a long rock stands a couple of units out into open water on
- * the narrow side and reads as an invisible wall. `radius` stays the footprint's overall size (a
- * carved prop's is tuned to its silhouette), and the axes keep the mesh's proportions inside it.
+ * A rock collides as the shape it is drawn with.
  *
- * `q` is the distance to the centre in that ellipse's own units: below 1 is inside the rock, and
- * the same number gives the height of its dome, so what you can see is what you collide with and
- * what you can stand on.
+ * Its footprint is the prop's own silhouette (`src/sim/footprint.ts`), turned by `rot` and scaled
+ * the way the mesh is — not the circle around it, which on a long rock stands a couple of units
+ * out into open water on the narrow side and reads as an invisible wall, and not an ellipse fitted
+ * to that circle, which a blocky boulder pokes its corners straight out of. `radius` is the
+ * furthest that footprint reaches, for the broad phase and for the cover a rock gives.
+ *
+ * `q` is the distance to the centre in units of the footprint: below 1 is inside the rock, and the
+ * same number gives the height of its dome, so what you can see is what you collide with and what
+ * you can stand on.
  */
-export function boulderAxes(b: Boulder): { ax: number; az: number } {
-  const m = Math.max(b.sx, b.sz, 1e-6);
-  return { ax: b.radius * (b.sx / m), az: b.radius * (b.sz / m) };
+const ROCK_SHAPE = {
+  boulder: { fp: footprintOf(rockPropId()), top: propShape(rockPropId())?.y1 ?? 1 },
+  'blade-spire': { fp: footprintOf(rockPropId('blade-spire')), top: propShape(rockPropId('blade-spire'))?.y1 ?? 4 },
+  'talus-shard': { fp: footprintOf(rockPropId('talus-shard')), top: propShape(rockPropId('talus-shard'))?.y1 ?? 0.8 },
+} as const;
+const rockShape = (b: Boulder) => ROCK_SHAPE[b.variant ?? 'boulder'];
+/** The radius a rock of this shape and scale needs around it. */
+export const rockRadius = (variant: Boulder['variant'], sx: number, sz: number) =>
+  fpMax(ROCK_SHAPE[variant ?? 'boulder'].fp, sx, sz) * 1.02;
+/** The top of a rock of this shape above the point it is placed at. */
+export const rockRise = (variant: Boulder['variant'], sy: number) => ROCK_SHAPE[variant ?? 'boulder'].top * sy;
+
+export function boulderFootprint(b: Boulder): Footprint { return rockShape(b).fp; }
+const scratchReach: Reach = { d: 0, reach: 0, nx: 0, nz: 1 };
+const staticReach: Reach = { d: 0, reach: 0, nx: 0, nz: 1 };
+export function boulderReach(b: Boulder, x: number, z: number, out: Reach = scratchReach): Reach {
+  return fpReach(rockShape(b).fp, b.pos.x, b.pos.z, b.rot, b.sx, b.sz, x, z, out);
 }
 export function boulderQ(b: Boulder, x: number, z: number, pad = 0): number {
-  const dx = x - b.pos.x, dz = z - b.pos.z;
-  const c = Math.cos(b.rot), s = Math.sin(b.rot);
-  const lx = c * dx + s * dz, lz = -s * dx + c * dz;
-  const { ax, az } = boulderAxes(b);
-  return Math.hypot(lx / (ax + pad), lz / (az + pad));
+  const r = boulderReach(b, x, z, scratchReach);
+  return r.d / Math.max(r.reach + pad, 1e-6);
 }
 /** Height of a rock's dome above its own centre at `q` (0 outside it). */
 const domeRise = (b: Boulder, q: number) =>
-  q >= 1 ? 0 : b.sy * (b.variant === 'blade-spire' ? 4 : b.variant === 'talus-shard' ? .8 : 1) * Math.sqrt(Math.max(0, 1 - q * q)) * .95;
+  q >= 1 ? 0 : rockRise(b.variant, b.sy) * Math.sqrt(Math.max(0, 1 - q * q)) * .95;
 /** The top of a rock directly above (x,z), or undefined where the rock is not underneath. */
 export function boulderTop(b: Boulder, x: number, z: number): number | undefined {
   const q = boulderQ(b, x, z);
@@ -728,11 +744,11 @@ export function resolveStatic(world: WorldData, pos: Vec3, radius: number, scrat
   for (const b of world.boulderHash.query(pos.x, pos.z, radius + 8, scratch)) {
     if (pos.y > b.height + radius * 0.5) continue;
     if (b.floor !== undefined && pos.y < b.floor - radius * 0.5) continue;   // pass under a raised span
-    const q = boulderQ(b, pos.x, pos.z, radius);
-    if (q >= 1) continue;
+    const rr = boulderReach(b, pos.x, pos.z, staticReach);
+    if (rr.d >= rr.reach + radius) continue;
     if (b.floor === undefined) {
       // Angled and low: let the floor carry the body over rather than stopping it here.
-      if (glide > 0 && b.pos.y + domeRise(b, boulderQ(b, pos.x, pos.z)) <= pos.y + glide) continue;
+      if (glide > 0 && b.pos.y + domeRise(b, rr.d / Math.max(rr.reach, 1e-6)) <= pos.y + glide) continue;
       // Too steep to glide: block, and say how high the top is. Within `climb` that is an offer to
       // go over; higher, it is only what it would take, for a body stubborn enough to want it.
       if (out) {
@@ -741,15 +757,10 @@ export function resolveStatic(world: WorldData, pos: Vec3, radius: number, scrat
         if (climb > 0 && b.height <= pos.y + climb) out.climbTo = Math.max(out.climbTo, top);
       }
     }
-    const dx = pos.x - b.pos.x, dz = pos.z - b.pos.z;
-    const c = Math.cos(b.rot), sn = Math.sin(b.rot);
-    // Out along the ray from the centre, to where the padded ellipse crosses it. Dead centre has no
-    // ray, so pick the short axis and leave that way.
-    const k = 1 / Math.max(q, 1e-4);
-    const lx = q < 1e-4 ? boulderAxes(b).ax + radius : (c * dx + sn * dz) * k;
-    const lz = q < 1e-4 ? 0 : (-sn * dx + c * dz) * k;
-    pos.x = b.pos.x + c * lx - sn * lz;
-    pos.z = b.pos.z + sn * lx + c * lz;
+    // Straight out along the ray from the centre, to where the footprint crosses it.
+    const want = rr.reach + radius;
+    pos.x = b.pos.x + rr.nx * want;
+    pos.z = b.pos.z + rr.nz * want;
     hit = true;
   }
   if (out) out.hit = hit;
