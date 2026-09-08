@@ -14,6 +14,7 @@ import { creature, type CreatureId } from '../sim/creatures';
 import { lengthOf } from '../sim/actors';
 import type { Actor } from '../sim/types';
 import { appBase } from '../shared/base';
+import type { AuthoredFeeding } from './attachments';
 
 interface Loaded { gltf: GLTF; unit: number; center: THREE.Vector3; size: THREE.Vector3; /** Triangles in one instance of this body, for the renderer's detail budget. */ tris: number; }
 export type Lod = 0 | 1;
@@ -99,6 +100,7 @@ export class CreatureView {
   readonly heightUnits: number;
   /** The Eat clip is a progress-driven performance rather than a loop. */
   readonly feedingPerformance: boolean;
+  readonly authoredFeeding?: AuthoredFeeding;
 
   constructor(readonly creatureId: CreatureId, loaded: Loaded, private shared: { shieldGeo: THREE.BufferGeometry }, readonly lod: Lod = 0) {
     this.def = creature(creatureId);
@@ -107,7 +109,15 @@ export class CreatureView {
     this.model.position.copy(loaded.center).multiplyScalar(-loaded.unit);
     this.heightUnits = loaded.size.y * loaded.unit;
     this.anchors = new CreatureAnchors(this.model);
-    this.feedingPerformance = FEEDING_PERFORMANCE.has(creatureId) && loaded.gltf.animations.some((c) => c.name === 'Eat');
+    const feeding = this.model.userData.cambrianFeeding;
+    const hasEat = loaded.gltf.animations.some((c) => c.name === 'Eat');
+    if (hasEat && this.anchors.canGrasp && this.anchors.has('anchor_mouth_inside') &&
+        feeding?.version === 1 && feeding.mode === 'authored-grasp' && feeding.clip === 'Eat' &&
+        Number.isFinite(feeding.apertureDiameter) && feeding.apertureDiameter > 0 &&
+        Number.isFinite(feeding.pickupOffsetLimit) && feeding.pickupOffsetLimit > 0) {
+      this.authoredFeeding = { apertureDiameter: feeding.apertureDiameter * loaded.unit, pickupOffsetLimit: feeding.pickupOffsetLimit * loaded.unit };
+    }
+    this.feedingPerformance = hasEat && (FEEDING_PERFORMANCE.has(creatureId) || !!this.authoredFeeding);
     this.inner.add(this.model);
     this.group.add(this.inner);
     this.model.traverse((o) => {
@@ -191,6 +201,18 @@ export class CreatureView {
   poseFeeding(progress: number) {
     const eat = this.actions.get('Eat'); if (!eat) return;
     this.playLoop('Eat');
+    if (this.authoredFeeding) {
+      // This asset owns the whole cupping pose. A fading locomotion/attack or
+      // additive turn must not flatten its arms while the clip is scrubbed.
+      for (const action of this.actions.values()) if (action !== eat) action.stop();
+      this.oneShot = undefined; this.oneShotT = 0;
+      this.additive.forEach(a => a?.setEffectiveWeight(0)); this.addW.fill(0);
+      eat.stopFading().stopWarping().setEffectiveWeight(1).setLoop(THREE.LoopOnce, 1).play();
+      eat.clampWhenFinished = true; eat.paused = true;
+      eat.time = THREE.MathUtils.clamp(progress, 0, 1) * eat.getClip().duration;
+      this.mixer.update(0); this.group.updateWorldMatrix(true, true);
+      return;
+    }
     this.oneShot?.setEffectiveWeight(0);
     eat.setEffectiveWeight(1); eat.time = THREE.MathUtils.clamp(progress, 0, .99999) * eat.getClip().duration;
     this.mixer.update(0); this.group.updateWorldMatrix(true, true);
@@ -249,7 +271,7 @@ export class CreatureView {
       // locomotion layer
       const held = a.state === 'ability' && a.abilityActive && ['collectorWake','pharyngealPump','planktonComb','whipSearch'].includes(def.ability);
       if (a.state === 'dead') { /* handled by one-shot */ }
-      else if (a.state === 'eating' || a.holdT > 0) { this.playLoop(this.pick('Eat', 'Grab') ?? (def.ground ? 'Crawl' : 'Swim')); this.loco?.setEffectiveTimeScale(this.has('Eat') ? 1 : 0.55); }
+      else if (a.state === 'eating' || a.holdT > 0) { this.playLoop((this.authoredFeeding && a.state !== 'eating' ? this.pick('Grab', 'Idle') : this.pick('Eat', 'Grab')) ?? (def.ground ? 'Crawl' : 'Swim')); this.loco?.setEffectiveTimeScale(this.has('Eat') ? 1 : 0.55); }
       else if (a.state === 'swallowed') { this.playLoop(this.pick('Stagger', 'Hit') ?? 'Idle'); this.loco?.setEffectiveTimeScale(0.8); }
       else if ((a.hideMode === 'burrowed' || ((a.state === 'guard' || a.state === 'parry') && ['anchor','enroll','shellUp','bristleFlare'].includes(def.ability))) && this.has('Ability')) { this.playLoop('Ability'); this.loco?.setEffectiveTimeScale(.55); }
       else if ((a.state === 'guard') && this.has('Guard')) { this.playLoop('Guard'); this.loco?.setEffectiveTimeScale(1); }

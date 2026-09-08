@@ -31,13 +31,22 @@
   "looping": [
     "Idle",
     "Swim",
-    "Guard",
-    "Eat"
+    "Guard"
   ],
   "anchors": [
+    "anchor_attack_arm_01",
+    "anchor_attack_arm_02",
+    "anchor_attack_arm_03",
+    "anchor_attack_arm_04",
+    "anchor_attack_arm_05",
+    "anchor_attack_arm_06",
+    "anchor_attack_arm_07",
+    "anchor_attack_arm_08",
+    "anchor_attack_arm_09",
+    "anchor_attack_primary",
+    "anchor_grasp",
     "anchor_mouth",
-    "anchor_mouth_inside",
-    "anchor_attack_primary"
+    "anchor_mouth_inside"
   ],
   "artVersion": 1,
   "artStatus": "preview",
@@ -63,6 +72,33 @@
     "Model .5m representative is a project working value; the best described fragment is28mm, not a complete animal.",
     "Rigid shell weighted entirely to body; separate head retraction, ten arm chains, two corneous jaw bones and funnel motion.",
     "Forward-aligned bind pose meets runtime convention and does not claim horizontal living trim. Ability/Dodge interpret shell-stable jet escape; Growth does not scale shell.",
-    "No squid fins, sucker discs, differentiated long capture clubs or invented closure operculum."
-  ]
+    "No squid fins, sucker discs, differentiated long capture clubs or invented closure operculum.",
+    "Motion-v3 retains original ten-arm anatomy and every other full action. Distinct sectional anticipation, whip, contact and recovery; Eat is consumption-progress driven. Comparative soft-part movement is uncertain."
+  ],
+  "motionVersion": 3,
+  "motionStatus": "candidate-awaiting-visual-review",
+  "feedingPerformance": {
+    "clip": "Eat",
+    "progressDriven": true,
+    "pickup": [
+      0,
+      0.22
+    ],
+    "carry": [
+      0.22,
+      0.78
+    ],
+    "swallow": [
+      0.78,
+      1
+    ],
+    "socket": "anchor_grasp"
+  },
+  "cambrianFeeding": {
+    "version": 1,
+    "mode": "authored-grasp",
+    "clip": "Eat",
+    "apertureDiameter": 0.14,
+    "pickupOffsetLimit": 0.24
+  }
 }

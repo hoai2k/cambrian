@@ -767,7 +767,7 @@ export class Game implements AiWorld {
     const justDodge = input.dodge && !a.prev.dodge, justGuard = input.guard && !a.prev.guard, justLock = input.lock && !a.prev.lock;
     const justSense = input.sense && !a.prev.sense;
     const justDash = input.dash && !a.prev.dash;
-    if (input.dash) a.dashHoldT += dt; else { a.dashHoldT = 0; a.dashUsed = false; a.dashQueued = false; }
+    if (input.dash) a.dashHoldT += dt; else { a.dashHoldT = 0; a.dashUsed = false; }
     a.pounceCd = Math.max(0, a.pounceCd - dt);
     a.dashCd = Math.max(0, a.dashCd - dt);
     a.teleportCd = Math.max(0, a.teleportCd - dt);
@@ -1031,9 +1031,10 @@ export class Game implements AiWorld {
       }
     }
 
-    // Orientation. A shell jets: under way at speed — a sprint, a dash — it goes funnel-first and
-    // trails its shell, and it swings round to face what it is doing when it slows, aims or
-    // strikes. This is the body's heading only; the stick is still the direction of travel.
+    // Orientation. A shell jets: under way at speed — a sprint, a dash — it travels shell-first
+    // with its head trailing, which is how a nautiloid escapes, and it swings round to face what
+    // it is doing when it slows, aims or strikes. This is the body's heading only; the stick is
+    // still the direction of travel.
     const hv = Math.hypot(a.vel.x, a.vel.z);
     const backward = jets && hv > 0.35 && a.state !== 'attack' && !a.aiming
       && (bursting || freeBurst || a.state === 'dodge');
@@ -1084,10 +1085,14 @@ export class Game implements AiWorld {
       // place, so a charge out of a sprint (below) or out of a dash reaches exactly the same move.
       // Sprinting makes it a charge: it aims along the line of travel and costs extra stamina.
       if (justHeavy && this.heavyAction(a, def, L, sf, locked, bursting)) { /* the button was taken */ }
-      // Dash (LB): with a stick direction it fires at once; with a neutral stick it is queued for the
-      // moment the stick moves. Fast and long enough to clear a predator's bite.
-      else if (justDash && mag <= 0.3 && !input.worldMove) { a.dashQueued = true; }
-      else if ((justDash || a.dashQueued) && mag > 0.3 && a.stamina >= 10 && a.exhausted === 0 && a.dashCd === 0 && !a.dashUsed && !paddling) { a.dashUsed = true; a.dashQueued = false; this.startDash(a, def, dir, L, sf); }
+      // Dash (LB): fast and long enough to clear a predator's bite. A stick direction fires it that
+      // way. A neutral stick fires it along the body's own axis — ahead of a finned body, and out
+      // behind a jetting shell, which is the way a nautiloid escapes and the way it is already
+      // pointing while it does, so it leaves without turning first.
+      else if (justDash && a.stamina >= 10 && a.exhausted === 0 && a.dashCd === 0 && !a.dashUsed && !paddling) {
+        a.dashUsed = true;
+        this.startDash(a, def, mag > 0.3 ? dir : vscale(heading(a.yaw), jets ? -1 : 1), L, sf);
+      }
       // Dodge (B for creatures that cannot guard, bots)
       else if (justDodge && a.controller !== 'player' && a.stamina >= 10 && a.exhausted === 0) this.startDodge(a, def, dir, mag, L, sf);
       // Guard / parry

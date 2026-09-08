@@ -1,0 +1,859 @@
+{
+  "scope": "Existing COLOR_0 accessor bytes only; geometry, UV, weights, joints, animations, graph, materials untouched",
+  "before_sha256": "32d4437702212d68f46f92a65efd8c7530f103e82cafa25eef2bcf7c613469a2",
+  "after_sha256": "3a817e3ed95c51dbca979d9872dc56651135a7e2d957c4ece7fc21e05838324c",
+  "primitives": [
+    {
+      "mesh": "Long pectoral L.mesh.001",
+      "primitive": 0,
+      "before": {
+        "count": 1613,
+        "min": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "max": [
+          0.11953917753871977,
+          0.165468833447776,
+          0.16327153429465172
+        ],
+        "mean": [
+          0.08083735041511439,
+          0.12807293452985713,
+          0.13941840044110326
+        ],
+        "max_white_distance": 1.0,
+        "range": 0.165468833447776
+      },
+      "expected": {
+        "count": 1613,
+        "min": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "max": [
+          0.11953844875097275,
+          0.16547130048274994,
+          0.1632736772298813
+        ],
+        "mean": [
+          0.08083758911063638,
+          0.12807292760490116,
+          0.1394186271868429
+        ],
+        "max_white_distance": 1.0,
+        "range": 0.16547130048274994
+      },
+      "after": {
+        "count": 1613,
+        "min": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "max": [
+          0.11953917753871977,
+          0.165468833447776,
+          0.16327153429465172
+        ],
+        "mean": [
+          0.08083735041511439,
+          0.12807293452985713,
+          0.13941840044110326
+        ],
+        "max_white_distance": 1.0,
+        "range": 0.165468833447776
+      },
+      "quantization_max_error": 7.6289484172847866e-06,
+      "coordinate_uv_max_error": 2.9802322387695312e-08,
+      "source_material": "Titanichthys fins Long pectoral L LOD",
+      "coordinate_convention": "matrix_world then float32 then glTF Y-up; exact primitive material plus original round6/2e-6/5e-5 checks retained"
+    },
+    {
+      "mesh": "Long pectoral R.mesh.001",
+      "primitive": 0,
+      "before": {
+        "count": 1614,
+        "min": [
+          0.03825436789501793,
+          0.07620355535210194,
+          0.08223086900129702
+        ],
+        "max": [
+          0.11953917753871977,
+          0.16513313496604867,
+          0.162050812542916
+        ],
+        "mean": [
+          0.08061397047596845,
+          0.12791171020262326,
+          0.13933002494292396
+        ],
+        "max_white_distance": 0.9617456321049821,
+        "range": 0.12687876707103074
+      },
+      "expected": {
+        "count": 1614,
+        "min": [
+          0.0382600873708725,
+          0.07620978355407715,
+          0.08222977817058563
+        ],
+        "max": [
+          0.11953844875097275,
+          0.16513222455978394,
+          0.1620536595582962
+        ],
+        "mean": [
+          0.080614028302341,
+          0.12791153894278048,
+          0.13933015942499688
+        ],
+        "max_white_distance": 0.9617399126291275,
+        "range": 0.12687213718891144
+      },
+      "after": {
+        "count": 1614,
+        "min": [
+          0.03825436789501793,
+          0.07620355535210194,
+          0.08223086900129702
+        ],
+        "max": [
+          0.11953917753871977,
+          0.16513313496604867,
+          0.162050812542916
+        ],
+        "mean": [
+          0.08061397047596845,
+          0.12791171020262326,
+          0.1393300154887592
+        ],
+        "max_white_distance": 0.9617456321049821,
+        "range": 0.12687876707103074
+      },
+      "quantization_max_error": 7.628429542633208e-06,
+      "coordinate_uv_max_error": 2.9802322387695312e-08,
+      "source_material": "Titanichthys fins Long pectoral R LOD",
+      "coordinate_convention": "matrix_world then float32 then glTF Y-up; exact primitive material plus original round6/2e-6/5e-5 checks retained"
+    },
+    {
+      "mesh": "Modest swept dorsal.mesh.001",
+      "primitive": 0,
+      "before": {
+        "count": 1690,
+        "min": [
+          0.057160296025024794,
+          0.09990081635767148,
+          0.11697566186007477
+        ],
+        "max": [
+          0.09553673609521629,
+          0.14850080109864958,
+          0.1585564965285725
+        ],
+        "mean": [
+          0.07153182973279212,
+          0.11772495206726043,
+          0.13215168912406586
+        ],
+        "max_white_distance": 0.9428397039749752,
+        "range": 0.10139620050354772
+      },
+      "expected": {
+        "count": 1690,
+        "min": [
+          0.057154614478349686,
+          0.09989873319864273,
+          0.11697069555521011
+        ],
+        "max": [
+          0.09552983939647675,
+          0.14849644899368286,
+          0.15855532884597778
+        ],
+        "mean": [
+          0.0715320073553091,
+          0.11772453795523333,
+          0.13215210301988928
+        ],
+        "max_white_distance": 0.9428453855216503,
+        "range": 0.1014007143676281
+      },
+      "after": {
+        "count": 1690,
+        "min": [
+          0.057160296025024794,
+          0.09990081635767148,
+          0.11697566186007477
+        ],
+        "max": [
+          0.09553673609521629,
+          0.14850080109864958,
+          0.1585564965285725
+        ],
+        "mean": [
+          0.07153182973279212,
+          0.11772495206726043,
+          0.13215168912406586
+        ],
+        "max_white_distance": 0.9428397039749752,
+        "range": 0.10139620050354772
+      },
+      "quantization_max_error": 7.627780494581793e-06,
+      "coordinate_uv_max_error": 2.9802322387695312e-08,
+      "source_material": "Titanichthys fins Modest swept dorsal LOD",
+      "coordinate_convention": "matrix_world then float32 then glTF Y-up; exact primitive material plus original round6/2e-6/5e-5 checks retained"
+    },
+    {
+      "mesh": "Pelvic L.mesh.001",
+      "primitive": 0,
+      "before": {
+        "count": 1595,
+        "min": [
+          0.0024414435034714275,
+          0.003356984817273213,
+          0.00392156862745098
+        ],
+        "max": [
+          0.11953917753871977,
+          0.16606393530174715,
+          0.1637140459296559
+        ],
+        "mean": [
+          0.07892317225976905,
+          0.1260211430729431,
+          0.13799216623819516
+        ],
+        "max_white_distance": 0.9975585564965286,
+        "range": 0.16362249179827573
+      },
+      "expected": {
+        "count": 1595,
+        "min": [
+          0.0024482246953994036,
+          0.0033513333182781935,
+          0.0039255665615201
+        ],
+        "max": [
+          0.11953844875097275,
+          0.1660713106393814,
+          0.16371925175189972
+        ],
+        "mean": [
+          0.07892315067353783,
+          0.1260214292766894,
+          0.1379924737810388
+        ],
+        "max_white_distance": 0.9975517753046006,
+        "range": 0.163623085943982
+      },
+      "after": {
+        "count": 1595,
+        "min": [
+          0.0024414435034714275,
+          0.003356984817273213,
+          0.00392156862745098
+        ],
+        "max": [
+          0.11953917753871977,
+          0.16606393530174715,
+          0.1637140459296559
+        ],
+        "mean": [
+          0.07892317225976905,
+          0.1260211430729431,
+          0.13799216623819516
+        ],
+        "max_white_distance": 0.9975585564965286,
+        "range": 0.16362249179827573
+      },
+      "quantization_max_error": 7.629185685337214e-06,
+      "coordinate_uv_max_error": 2.9802322387695312e-08,
+      "source_material": "Titanichthys fins Pelvic L LOD",
+      "coordinate_convention": "matrix_world then float32 then glTF Y-up; exact primitive material plus original round6/2e-6/5e-5 checks retained"
+    },
+    {
+      "mesh": "Pelvic R.mesh.001",
+      "primitive": 0,
+      "before": {
+        "count": 1598,
+        "min": [
+          0.0024414435034714275,
+          0.003356984817273213,
+          0.00392156862745098
+        ],
+        "max": [
+          0.11953917753871977,
+          0.16533150225070573,
+          0.16223392080567636
+        ],
+        "mean": [
+          0.07880470294895514,
+          0.12585007218434127,
+          0.13779898444429706
+        ],
+        "max_white_distance": 0.9975585564965286,
+        "range": 0.1628900587472343
+      },
+      "expected": {
+        "count": 1598,
+        "min": [
+          0.0024482246953994036,
+          0.0033513333182781935,
+          0.0039255665615201
+        ],
+        "max": [
+          0.11953844875097275,
+          0.16533143818378448,
+          0.16222642362117767
+        ],
+        "mean": [
+          0.07880475095666138,
+          0.12585037446115166,
+          0.13779928986372447
+        ],
+        "max_white_distance": 0.9975517753046006,
+        "range": 0.16288321348838508
+      },
+      "after": {
+        "count": 1598,
+        "min": [
+          0.0024414435034714275,
+          0.003356984817273213,
+          0.00392156862745098
+        ],
+        "max": [
+          0.11953917753871977,
+          0.16533150225070573,
+          0.16223392080567636
+        ],
+        "mean": [
+          0.07880470294895514,
+          0.12585007218434127,
+          0.13779898444429706
+        ],
+        "max_white_distance": 0.9975585564965286,
+        "range": 0.1628900587472343
+      },
+      "quantization_max_error": 7.626171914965063e-06,
+      "coordinate_uv_max_error": 2.9802322387695312e-08,
+      "source_material": "Titanichthys fins Pelvic R LOD",
+      "coordinate_convention": "matrix_world then float32 then glTF Y-up; exact primitive material plus original round6/2e-6/5e-5 checks retained"
+    },
+    {
+      "mesh": "Sphere.002",
+      "primitive": 0,
+      "before": {
+        "count": 644,
+        "min": [
+          0.0015106431677729458,
+          0.003036545357442588,
+          0.004028381780727856
+        ],
+        "max": [
+          0.044541084916456856,
+          0.04156557564660105,
+          0.023147936217288473
+        ],
+        "mean": [
+          0.006280366993693084,
+          0.010565806427460142,
+          0.011755631029268378
+        ],
+        "max_white_distance": 0.9984893568322271,
+        "range": 0.04303044174868391
+      },
+      "expected": {
+        "count": 644,
+        "min": [
+          0.0015176349552348256,
+          0.0030352699104696512,
+          0.0040247174911201
+        ],
+        "max": [
+          0.044534988701343536,
+          0.04156342148780823,
+          0.02315336838364601
+        ],
+        "mean": [
+          0.006279356138649113,
+          0.01056317769761793,
+          0.011759092152749206
+        ],
+        "max_white_distance": 0.9984823650447652,
+        "range": 0.04301735374610871
+      },
+      "after": {
+        "count": 644,
+        "min": [
+          0.0015106431677729458,
+          0.003036545357442588,
+          0.004028381780727856
+        ],
+        "max": [
+          0.044541084916456856,
+          0.04156557564660105,
+          0.023147936217288473
+        ],
+        "mean": [
+          0.006280366993693084,
+          0.010565806427460142,
+          0.011755631029268378
+        ],
+        "max_white_distance": 0.9984893568322271,
+        "range": 0.04303044174868391
+      },
+      "quantization_max_error": 7.550931936626225e-06,
+      "coordinate_uv_max_error": 2.9802322387695312e-08,
+      "source_material": "Titanichthys eyes LOD",
+      "coordinate_convention": "matrix_world then float32 then glTF Y-up; exact primitive material plus original round6/2e-6/5e-5 checks retained"
+    },
+    {
+      "mesh": "Sphere.003",
+      "primitive": 0,
+      "before": {
+        "count": 644,
+        "min": [
+          0.0015106431677729458,
+          0.003036545357442588,
+          0.004028381780727856
+        ],
+        "max": [
+          0.04757763027389944,
+          0.043335622186617836,
+          0.023956664377813384
+        ],
+        "mean": [
+          0.006581756370286213,
+          0.010798316958317717,
+          0.011839745202767248
+        ],
+        "max_white_distance": 0.9984893568322271,
+        "range": 0.04606698710612649
+      },
+      "expected": {
+        "count": 644,
+        "min": [
+          0.0015176349552348256,
+          0.0030352699104696512,
+          0.0040247174911201
+        ],
+        "max": [
+          0.04758397489786148,
+          0.04333687573671341,
+          0.02395949698984623
+        ],
+        "mean": [
+          0.006580874911525362,
+          0.010795609957917437,
+          0.011843099698470616
+        ],
+        "max_white_distance": 0.9984823650447652,
+        "range": 0.046066339942626655
+      },
+      "after": {
+        "count": 644,
+        "min": [
+          0.0015106431677729458,
+          0.003036545357442588,
+          0.004028381780727856
+        ],
+        "max": [
+          0.04757763027389944,
+          0.043335622186617836,
+          0.023956664377813384
+        ],
+        "mean": [
+          0.006581756370286213,
+          0.010798316958317717,
+          0.011839745202767248
+        ],
+        "max_white_distance": 0.9984893568322271,
+        "range": 0.04606698710612649
+      },
+      "quantization_max_error": 7.61589316060525e-06,
+      "coordinate_uv_max_error": 2.9802322387695312e-08,
+      "source_material": "Titanichthys eyes.001 LOD",
+      "coordinate_convention": "matrix_world then float32 then glTF Y-up; exact primitive material plus original round6/2e-6/5e-5 checks retained"
+    },
+    {
+      "mesh": "Strong heterocercal caudal.mesh.001",
+      "primitive": 0,
+      "before": {
+        "count": 2760,
+        "min": [
+          0.057816433966582745,
+          0.10005340657663844,
+          0.11697566186007477
+        ],
+        "max": [
+          0.09530785076676584,
+          0.1496757457846952,
+          0.15872434576943617
+        ],
+        "mean": [
+          0.07138220753817892,
+          0.11743592040098184,
+          0.13188526874123138
+        ],
+        "max_white_distance": 0.9421835660334172,
+        "range": 0.10090791180285343
+      },
+      "expected": {
+        "count": 2760,
+        "min": [
+          0.0578194260597229,
+          0.10005472600460052,
+          0.11698124557733536
+        ],
+        "max": [
+          0.09530746936798096,
+          0.14967887103557587,
+          0.15872503817081451
+        ],
+        "mean": [
+          0.07138232225282252,
+          0.11743567892606707,
+          0.13188555230912954
+        ],
+        "max_white_distance": 0.9421805739402771,
+        "range": 0.10090561211109161
+      },
+      "after": {
+        "count": 2760,
+        "min": [
+          0.057816433966582745,
+          0.10005340657663844,
+          0.11697566186007477
+        ],
+        "max": [
+          0.09530785076676584,
+          0.1496757457846952,
+          0.15872434576943617
+        ],
+        "mean": [
+          0.07138220753817892,
+          0.11743592040098184,
+          0.13188526321260025
+        ],
+        "max_white_distance": 0.9421835660334172,
+        "range": 0.10090791180285343
+      },
+      "quantization_max_error": 7.627736497109461e-06,
+      "coordinate_uv_max_error": 2.9802322387695312e-08,
+      "source_material": "Titanichthys fins Strong heterocercal caudal LOD",
+      "coordinate_convention": "matrix_world then float32 then glTF Y-up; exact primitive material plus original round6/2e-6/5e-5 checks retained"
+    },
+    {
+      "mesh": "Titanichthys_new_continuous_sculpt.mesh.001",
+      "primitive": 0,
+      "before": {
+        "count": 11546,
+        "min": [
+          0.03048752574959945,
+          0.060028992141603725,
+          0.08949416342412451
+        ],
+        "max": [
+          0.15832761120012206,
+          0.18435950255588618,
+          0.2162966353856718
+        ],
+        "mean": [
+          0.06701526117608202,
+          0.1034263442480024,
+          0.13169107085941778
+        ],
+        "max_white_distance": 0.9695124742504005,
+        "range": 0.18580910963607233
+      },
+      "expected": {
+        "count": 11546,
+        "min": [
+          0.030489223077893257,
+          0.0600317120552063,
+          0.08948833495378494
+        ],
+        "max": [
+          0.1583276242017746,
+          0.18435363471508026,
+          0.21629683673381805
+        ],
+        "mean": [
+          0.06701520948336703,
+          0.10342635009157096,
+          0.13169104845769458
+        ],
+        "max_white_distance": 0.9695107769221067,
+        "range": 0.1858076136559248
+      },
+      "after": {
+        "count": 11546,
+        "min": [
+          0.03048752574959945,
+          0.060028992141603725,
+          0.08949416342412451
+        ],
+        "max": [
+          0.15832761120012206,
+          0.18435950255588618,
+          0.2162966353856718
+        ],
+        "mean": [
+          0.06701525721132663,
+          0.10342633896166188,
+          0.13169106425149216
+        ],
+        "max_white_distance": 0.9695124742504005,
+        "range": 0.18580910963607233
+      },
+      "quantization_max_error": 7.629362925837269e-06,
+      "coordinate_uv_max_error": 2.9802322387695312e-08,
+      "source_material": "Titanichthys body LOD",
+      "coordinate_convention": "matrix_world then float32 then glTF Y-up; exact primitive material plus original round6/2e-6/5e-5 checks retained"
+    },
+    {
+      "mesh": "Titanichthys_new_continuous_sculpt.mesh.001",
+      "primitive": 1,
+      "before": {
+        "count": 5169,
+        "min": [
+          1.0,
+          1.0,
+          1.0
+        ],
+        "max": [
+          1.0,
+          1.0,
+          1.0
+        ],
+        "mean": [
+          1.0,
+          1.0,
+          1.0
+        ],
+        "max_white_distance": 0.0,
+        "range": 0.0
+      },
+      "expected": {
+        "count": 5169,
+        "min": [
+          0.055659979581832886,
+          0.09075513482093811,
+          0.11178869754076004
+        ],
+        "max": [
+          0.15830227732658386,
+          0.18448182940483093,
+          0.16436611115932465
+        ],
+        "mean": [
+          0.1555666881837751,
+          0.18205225555895374,
+          0.16209943953618294
+        ],
+        "max_white_distance": 0.9443400204181671,
+        "range": 0.12882184982299805
+      },
+      "after": {
+        "count": 5169,
+        "min": [
+          0.05566491187914855,
+          0.09076066224155031,
+          0.11178759441519799
+        ],
+        "max": [
+          0.15829709315632867,
+          0.18448157473105975,
+          0.16437018387121385
+        ],
+        "mean": [
+          0.1555666374607998,
+          0.18205222862974288,
+          0.16210006119107226
+        ],
+        "max_white_distance": 0.9443350881208514,
+        "range": 0.1288166628519112
+      },
+      "quantization_max_error": 7.6289666074702556e-06,
+      "coordinate_uv_max_error": 2.9802322387695312e-08,
+      "source_material": "Titanichthys underside LOD",
+      "coordinate_convention": "matrix_world then float32 then glTF Y-up; exact primitive material plus original round6/2e-6/5e-5 checks retained"
+    },
+    {
+      "mesh": "Titanichthys_new_continuous_sculpt.mesh.001",
+      "primitive": 2,
+      "before": {
+        "count": 10064,
+        "min": [
+          1.0,
+          1.0,
+          1.0
+        ],
+        "max": [
+          1.0,
+          1.0,
+          1.0
+        ],
+        "mean": [
+          1.0,
+          1.0,
+          1.0
+        ],
+        "max_white_distance": 0.0,
+        "range": 0.0
+      },
+      "expected": {
+        "count": 10064,
+        "min": [
+          0.06134779751300812,
+          0.04504463076591492,
+          0.03904050588607788
+        ],
+        "max": [
+          0.1507996767759323,
+          0.16683025658130646,
+          0.1377883404493332
+        ],
+        "mean": [
+          0.10174064229158107,
+          0.0657936472675966,
+          0.057974309426923366
+        ],
+        "max_white_distance": 0.9609594941139221,
+        "range": 0.12778975069522858
+      },
+      "after": {
+        "count": 10064,
+        "min": [
+          0.06134126802471961,
+          0.04504463263904784,
+          0.03904783703364614
+        ],
+        "max": [
+          0.15080491340505073,
+          0.16682688639658197,
+          0.1377889677271687
+        ],
+        "mean": [
+          0.10174060348097502,
+          0.06579358952479189,
+          0.05797427478102306
+        ],
+        "max_white_distance": 0.9609521629663539,
+        "range": 0.12777904936293583
+      },
+      "quantization_max_error": 7.629407036996438e-06,
+      "coordinate_uv_max_error": 2.9802322387695312e-08,
+      "source_material": "Titanichthys oral accent LOD",
+      "coordinate_convention": "matrix_world then float32 then glTF Y-up; exact primitive material plus original round6/2e-6/5e-5 checks retained"
+    }
+  ],
+  "actual_export_vertices": 38937,
+  "scope_note": "Pure-Python replay on a temporary exact copy of failed candidate05 LOD with every actual diagnostic source corner/material. Identity fixture objects use already measured world coordinates; transform pathway separately validated in05. All11 primitives transfer and internal non-colour-byte assertion passes. No Blender, production export or visual approval.",
+  "host_numpy_identity_transform_audit": [
+    {
+      "mesh": "Long pectoral L.mesh.001",
+      "identity_transform_exact": true,
+      "all_finite": true,
+      "max_absolute_source_coordinate": 3.380000114440918,
+      "host_numpy_warnings": [
+        "divide by zero encountered in matmul",
+        "overflow encountered in matmul",
+        "invalid value encountered in matmul"
+      ]
+    },
+    {
+      "mesh": "Long pectoral R.mesh.001",
+      "identity_transform_exact": true,
+      "all_finite": true,
+      "max_absolute_source_coordinate": 3.3800008296966553,
+      "host_numpy_warnings": [
+        "divide by zero encountered in matmul",
+        "overflow encountered in matmul",
+        "invalid value encountered in matmul"
+      ]
+    },
+    {
+      "mesh": "Modest swept dorsal.mesh.001",
+      "identity_transform_exact": true,
+      "all_finite": true,
+      "max_absolute_source_coordinate": 1.7289814949035645,
+      "host_numpy_warnings": [
+        "divide by zero encountered in matmul",
+        "overflow encountered in matmul",
+        "invalid value encountered in matmul"
+      ]
+    },
+    {
+      "mesh": "Pelvic L.mesh.001",
+      "identity_transform_exact": true,
+      "all_finite": true,
+      "max_absolute_source_coordinate": 2.1699957847595215,
+      "host_numpy_warnings": [
+        "divide by zero encountered in matmul",
+        "overflow encountered in matmul",
+        "invalid value encountered in matmul"
+      ]
+    },
+    {
+      "mesh": "Pelvic R.mesh.001",
+      "identity_transform_exact": true,
+      "all_finite": true,
+      "max_absolute_source_coordinate": 2.1700000762939453,
+      "host_numpy_warnings": [
+        "divide by zero encountered in matmul",
+        "overflow encountered in matmul",
+        "invalid value encountered in matmul"
+      ]
+    },
+    {
+      "mesh": "Sphere.002",
+      "identity_transform_exact": true,
+      "all_finite": true,
+      "max_absolute_source_coordinate": 2.146389961242676,
+      "host_numpy_warnings": [
+        "divide by zero encountered in matmul",
+        "overflow encountered in matmul",
+        "invalid value encountered in matmul"
+      ]
+    },
+    {
+      "mesh": "Sphere.003",
+      "identity_transform_exact": true,
+      "all_finite": true,
+      "max_absolute_source_coordinate": 2.146389961242676,
+      "host_numpy_warnings": [
+        "divide by zero encountered in matmul",
+        "overflow encountered in matmul",
+        "invalid value encountered in matmul"
+      ]
+    },
+    {
+      "mesh": "Strong heterocercal caudal.mesh.001",
+      "identity_transform_exact": true,
+      "all_finite": true,
+      "max_absolute_source_coordinate": 4.476250171661377,
+      "host_numpy_warnings": [
+        "divide by zero encountered in matmul",
+        "overflow encountered in matmul",
+        "invalid value encountered in matmul"
+      ]
+    },
+    {
+      "mesh": "Titanichthys_new_continuous_sculpt.mesh.001",
+      "identity_transform_exact": true,
+      "all_finite": true,
+      "max_absolute_source_coordinate": 3.744999885559082,
+      "host_numpy_warnings": [
+        "divide by zero encountered in matmul",
+        "overflow encountered in matmul",
+        "invalid value encountered in matmul"
+      ]
+    }
+  ],
+  "validation_note": "Host NumPy emitted floating-point status warnings during some identity matrix multiplies; independent exact-equality/finite checks confirm every output equals its finite input. No warnings are suppressed in production source."
+}

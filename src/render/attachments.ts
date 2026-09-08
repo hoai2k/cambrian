@@ -4,6 +4,9 @@ import { bodyRadius, isAlive, isHidden, lengthOf } from '../sim/actors';
 import type { Actor } from '../sim/types';
 import { feedingPhase, type CreatureAnchors } from './anchors';
 
+/** Asset opt-in dimensions, normalized to the view's unscaled body length. */
+export interface AuthoredFeeding { apertureDiameter: number; pickupOffsetLimit: number; }
+
 /** The slice of a CreatureView the attachment pass needs; kept narrow so it runs headless in tools/. */
 export interface AttachView {
   group: THREE.Object3D;
@@ -12,10 +15,16 @@ export interface AttachView {
   visibleLength: number;
   /** True when the Eat clip is an authored reach/grasp/carry performance that should be scrubbed by consumption progress. */
   feedingPerformance: boolean;
+  /** Carry along the Eat clip's grasp path, with a short correction for actual pickup. */
+  authoredFeeding?: AuthoredFeeding;
   poseFeeding(progress: number): void;
 }
 export interface AttachWorld { actors: Actor[]; byId(id: number): Actor | undefined; }
-interface FeedingState { target: number; initialEaten: number; pickup: THREE.Vector3; startTip: THREE.Vector3; lastStateT: number; }
+interface FeedingState {
+  target: number; initialEaten: number; pickup: THREE.Vector3; startTip: THREE.Vector3; lastStateT: number;
+  view: AttachView; authoredContact?: THREE.Vector3; carryAllowed?: boolean;
+  correction?: THREE.Vector3; contactError?: THREE.Vector3;
+}
 interface AimState { weight: number; target: THREE.Vector3; }
 
 /**
@@ -73,6 +82,7 @@ export class Attachments {
     for (const [id, v] of views) {
       const a = world.byId(id);
       if (!a || !v.anchors.canAim) continue;
+      if (a.state === 'eating' && v.authoredFeeding) { this.aim.delete(id); continue; }
       const victim = this.strikeTarget(a, world, views);
       let s = this.aim.get(id);
       if (!s) { if (!victim) continue; s = { weight: 0, target: new THREE.Vector3() }; this.aim.set(id, s); }
@@ -97,13 +107,17 @@ export class Attachments {
       if (!grasp && !pv.anchors.nearestAttack(fv.group.position, this.anchorPoint)) this.anchorPoint.copy(this.mouthPoint);
       active.add(predator.id); claimed.add(food.id);
       let state = this.feeding.get(predator.id);
-      if (!state || state.target !== food.id || predator.stateT < state.lastStateT) {
-        state = { target: food.id, initialEaten: food.eaten, pickup: fv.group.position.clone(), startTip: this.anchorPoint.clone(), lastStateT: predator.stateT };
+      if (!state || state.target !== food.id || predator.stateT < state.lastStateT || (pv.authoredFeeding && state.view !== pv)) {
+        state = { target: food.id, initialEaten: food.eaten, pickup: fv.group.position.clone(), startTip: this.anchorPoint.clone(), lastStateT: predator.stateT, view: pv };
         this.feeding.set(predator.id, state);
       }
       state.lastStateT = predator.stateT;
       const progress = THREE.MathUtils.clamp((food.eaten - state.initialEaten) / Math.max(.001, 1 - state.initialEaten), 0, 1);
       const phase = feedingPhase(progress);
+      if (pv.authoredFeeding && pv.feedingPerformance && grasp) {
+        this.feedAuthored(state, pv, fv, food, progress);
+        continue;
+      }
       if (pv.feedingPerformance) pv.poseFeeding(progress);
       pv.anchors.world('anchor_mouth', this.mouthPoint);
       this.insidePoint.copy(this.mouthPoint); pv.anchors.world('anchor_mouth_inside', this.insidePoint);
@@ -139,6 +153,70 @@ export class Attachments {
     }
     for (const id of this.feeding.keys()) if (!active.has(id)) this.feeding.delete(id);
     return claimed;
+  }
+
+  /** Preserve the authored basket/cupping; only the real pickup offset needs IK. */
+  private feedAuthored(state: FeedingState, pv: AttachView, fv: AttachView, food: Actor, progress: number) {
+    const config = pv.authoredFeeding!, phase = feedingPhase(progress);
+    const scale = pv.group.getWorldScale(new THREE.Vector3());
+    const unit = Math.min(Math.abs(scale.x), Math.abs(scale.y), Math.abs(scale.z));
+    const limit = config.pickupOffsetLimit * unit;
+    const fits = food.eatBites <= 1 && fv.visibleLength <= pv.visibleLength * 1.5;
+    if (!state.authoredContact) {
+      pv.poseFeeding(.22);
+      pv.anchors.world('anchor_grasp', this.anchorPoint);
+      state.authoredContact = pv.group.worldToLocal(this.anchorPoint.clone());
+    }
+    // Large carcasses and unreachable food stay where they fell, with a reach
+    // pose rather than an empty-handed carry into the mouth.
+    pv.poseFeeding(fits && state.carryAllowed !== false ? progress : Math.min(progress, .22));
+    pv.anchors.world('anchor_grasp', this.anchorPoint);
+    const contact = pv.group.localToWorld(state.authoredContact.clone());
+    if (phase.attached && state.carryAllowed === undefined) {
+      state.carryAllowed = fits && contact.distanceTo(state.pickup) <= limit;
+      state.correction = pv.group.worldToLocal(state.pickup.clone()).sub(state.authoredContact);
+    }
+    const offset = new THREE.Vector3();
+    if (phase.attached && state.carryAllowed) {
+      // Capture the correction in the predator's frame at pickup. It follows
+      // rotation/translation thereafter and disappears by the oral carry phase.
+      offset.copy(state.correction!).multiplyScalar(1 - phase.carry);
+      offset.applyMatrix3(new THREE.Matrix3().setFromMatrix4(pv.group.matrixWorld));
+    } else offset.copy(state.pickup).sub(this.anchorPoint).multiplyScalar(phase.pickup).clampLength(0, limit);
+    this.target.copy(this.anchorPoint).add(offset);
+    if (offset.lengthSq() > 1e-14) {
+      const grasp = pv.anchors.sockets.get('anchor_grasp')!;
+      // Preserve each arm's authored relative contact instead of collapsing
+      // every tip onto one target. Skip the attack alias on the grasp's chain.
+      for (const socket of pv.anchors.attackSockets) {
+        if (socket.parent === grasp.parent) continue;
+        socket.getWorldPosition(this.target).add(offset);
+        pv.anchors.solveAnchor(socket.name, this.target, 1, 10);
+      }
+      this.target.copy(this.anchorPoint).add(offset);
+      pv.anchors.solveGrasp(this.target, 1, 24);
+    }
+    if (!phase.attached || !state.carryAllowed) return;
+    pv.anchors.world('anchor_grasp', this.anchorPoint);
+    if (!state.contactError) {
+      // A small permitted offset can still point beyond a nearly extended arm.
+      // Confirm actual contact before carrying; never teleport food to failed IK.
+      if (this.anchorPoint.distanceTo(this.target) > config.apertureDiameter * unit * .25) {
+        state.carryAllowed = false;
+        return;
+      }
+      // Keep food continuous at attachment even when bounded IK leaves a tiny
+      // residual, then settle that contact offset during the first carry frames.
+      state.contactError = pv.group.worldToLocal(state.pickup.clone()).sub(pv.group.worldToLocal(this.anchorPoint.clone()));
+    }
+    this.tmp.copy(state.contactError).multiplyScalar(1 - THREE.MathUtils.smoothstep(progress, .22, .32));
+    this.tmp.applyMatrix3(new THREE.Matrix3().setFromMatrix4(pv.group.matrixWorld));
+    fv.group.position.copy(this.anchorPoint).add(this.tmp);
+    pv.anchors.world('anchor_mouth_inside', this.insidePoint);
+    fv.group.position.lerp(this.insidePoint, phase.swallow);
+    const aperture = Math.min(1, config.apertureDiameter * unit / Math.max(.001, fv.visibleLength));
+    fv.group.scale.multiplyScalar(THREE.MathUtils.lerp(1, aperture, phase.carry) * (1 - phase.swallow));
+    fv.group.updateWorldMatrix(true, true);
   }
 
   /** Grabbed prey rides the grasp (or primary attack) socket; swallowed prey sinks from the mouth to the inside socket. */

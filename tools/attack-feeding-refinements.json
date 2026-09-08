@@ -244,7 +244,7 @@
       "Heavy",
       "Eat"
     ],
-    "note": "If this creature has a pending structural redesign, coordinate motion with its replacement; review each resulting animation individually."
+    "note": "Motion-v3 refined Attack/Bite/Heavy/Eat and authored-grasp runtime integrated as preview; full19/LOD7 actions. Actual 60-view art and 12 production rig/prey scenarios pass. Interactive game/controller playtest and broader individual quality review remain."
   },
   {
     "era": "devonian",

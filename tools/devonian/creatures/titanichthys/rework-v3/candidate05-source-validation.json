@@ -1,0 +1,143 @@
+{
+  "scope": "Existing COLOR_0 accessor bytes only; geometry, UV, weights, joints, animations, graph, materials untouched",
+  "before_sha256": "b9e2b42cb27be39282b7a7f7d06b5a6ae54a1992c37517014e9428aa5a023756",
+  "after_sha256": "b9e2b42cb27be39282b7a7f7d06b5a6ae54a1992c37517014e9428aa5a023756",
+  "primitives": [
+    {
+      "mesh": "Sphere.002",
+      "primitive": 0,
+      "before": {
+        "count": 644,
+        "min": [
+          0.0015106431677729458,
+          0.003036545357442588,
+          0.004028381780727856
+        ],
+        "max": [
+          0.044541084916456856,
+          0.04156557564660105,
+          0.023147936217288473
+        ],
+        "mean": [
+          0.006280366993693084,
+          0.010565806427460142,
+          0.011755631029268378
+        ],
+        "max_white_distance": 0.9984893568322271,
+        "range": 0.04303044174868391
+      },
+      "expected": {
+        "count": 644,
+        "min": [
+          0.0015176349552348256,
+          0.0030352699104696512,
+          0.0040247174911201
+        ],
+        "max": [
+          0.044534988701343536,
+          0.04156342148780823,
+          0.02315336838364601
+        ],
+        "mean": [
+          0.006279373075813055,
+          0.010563218034803867,
+          0.011759098619222641
+        ],
+        "max_white_distance": 0.998482346534729,
+        "range": 0.04301735386252403
+      },
+      "after": {
+        "count": 644,
+        "min": [
+          0.0015106431677729458,
+          0.003036545357442588,
+          0.004028381780727856
+        ],
+        "max": [
+          0.044541084916456856,
+          0.04156557564660105,
+          0.023147936217288473
+        ],
+        "mean": [
+          0.006280366993693084,
+          0.010565806427460142,
+          0.011755631029268378
+        ],
+        "max_white_distance": 0.9984893568322271,
+        "range": 0.04303044174868391
+      },
+      "quantization_max_error": 7.550931936626225e-06,
+      "coordinate_uv_max_error": 2.9802322387695312e-08,
+      "coordinate_convention": "matrix_world then float32 then glTF Y-up; original round6/2e-6/5e-5 checks retained"
+    },
+    {
+      "mesh": "Sphere.003",
+      "primitive": 0,
+      "before": {
+        "count": 644,
+        "min": [
+          0.0015106431677729458,
+          0.003036545357442588,
+          0.004028381780727856
+        ],
+        "max": [
+          0.04757763027389944,
+          0.043335622186617836,
+          0.023956664377813384
+        ],
+        "mean": [
+          0.006581756370286213,
+          0.010798316958317717,
+          0.011839745202767248
+        ],
+        "max_white_distance": 0.9984893568322271,
+        "range": 0.04606698710612649
+      },
+      "expected": {
+        "count": 644,
+        "min": [
+          0.0015176349552348256,
+          0.0030352699104696512,
+          0.0040247174911201
+        ],
+        "max": [
+          0.04758397489786148,
+          0.04333687573671341,
+          0.02395949698984623
+        ],
+        "mean": [
+          0.006580851972103119,
+          0.010795630514621735,
+          0.011843104846775532
+        ],
+        "max_white_distance": 0.998482346534729,
+        "range": 0.04606634005904198
+      },
+      "after": {
+        "count": 644,
+        "min": [
+          0.0015106431677729458,
+          0.003036545357442588,
+          0.004028381780727856
+        ],
+        "max": [
+          0.04757763027389944,
+          0.043335622186617836,
+          0.023956664377813384
+        ],
+        "mean": [
+          0.006581756370286213,
+          0.010798316958317717,
+          0.011839745202767248
+        ],
+        "max_white_distance": 0.9984893568322271,
+        "range": 0.04606698710612649
+      },
+      "quantization_max_error": 7.61589316060525e-06,
+      "coordinate_uv_max_error": 2.9802322387695312e-08,
+      "coordinate_convention": "matrix_world then float32 then glTF Y-up; original round6/2e-6/5e-5 checks retained"
+    }
+  ],
+  "actual_measured_eye_vertices": 1288,
+  "scope_note": "Pure-Python actual two-eye accessor/corner replay on a temporary subset fixture. New helper transfer executed; its internal unchanged-non-colour-byte assertion passed. No Blender or production export; original candidate04 untouched."
+}

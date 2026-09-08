@@ -46,3 +46,18 @@
 - Stop condition: USER PAUSE. Do not execute until resumed. Parent may checkpoint sources.
 - Resume after user request: assign Terra to HASHED_HANDOFF_CLAY02.md; hash-check executor then `python3 /Users/hoai/Documents/Stuff/Generations/cambrian/local/expansion-repo/tools/creatures/odaraia/rework-v3/execute_clay02.py` from repo root. One run, 20-minute bound, return evidence to author.
 - No production gate passed. Transparency/game sorting, 18 actions with Moult, full/LOD rig, anchors, portraits and post-rework audits all remain later.
+
+
+## 2026-09-08 — resumed; clay02 coarse gate accepted; material01 source frozen
+- Owner/model: Astra high creative author; Terra medium execution pending parent assignment.
+- Independently inspected ALL six actual clay02 images. Accept coarse shape/framing only, bound to blend `d5ec458053d58f45e5a0def15721485365449d1abee24ad75844fa9d38d9182c` and manifest `0222be3b7981649de1aa22028cbc7a00e4d54782f619957449bfcb452cec54a1`.
+- Status: material01 SOURCE candidate-ready, no material candidate built or reviewed yet. Previous user pause was explicitly resumed on 8 September.
+- Source: `/Users/hoai/Documents/Stuff/Generations/cambrian/local/expansion-repo/tools/creatures/odaraia/rework-v3/material_study01.py`: `c91290a75a03e619598a1de62240deaad34330892576dcf7bf79d12655f7c13e`.
+- Wrapper: `/Users/hoai/Documents/Stuff/Generations/cambrian/local/expansion-repo/tools/creatures/odaraia/rework-v3/execute_material01.py`: `fa4f9c9837d39289b05273db49846747e18e0940ae47599984cd61d4bcaf2f99`.
+- Decision: load accepted clay02 unchanged; olive/amber semitransparent rigid shell with more opaque true margins, copper/ochre appendages, teal eyes. Six whole-animal dark/light environment views; hash geometry before/after.
+- Validation: both Python syntax PASS; author performed no Blender/render, rig/export, public edits or Git actions.
+- Scope limits: Cycles coverage study, not glTF material export or Three.js depth sorting. Full material gate in AUTHOR_REVIEW_CLAY02_MATERIAL01.md.
+- User Attack/Eat request carried forward in ATTACK_EAT_RIG_DIRECTION.md: sequential joint flexion, front-pair reach/secure/carry-to-mouth/recover; original exact 18 clip names retained including Moult. Existing runtime only progress-scrubs Opabinia Eat; parent must integrate Odaraia when accepted rig/anchors exist.
+- Resume: parent assign Terra HASHED_HANDOFF_MATERIAL01.md. After wrapper hash check, exact command from repo root: `python3 /Users/hoai/Documents/Stuff/Generations/cambrian/local/expansion-repo/tools/creatures/odaraia/rework-v3/execute_material01.py`.
+- Budget: one run up to 25 minutes. Stop on input change/existing output/error/design decision; no automatic repair. Return all six actual images and manifests for author review.
+- Original backup, both user references and clay01/02 remain unchanged. Production material export, articulated rig/actions, full/LOD parity, anchors, portraits and completed eye/general audits remain later work.
