@@ -159,6 +159,25 @@ const DOWNED_WINDOW = 10;
  * times from this constant (`CORPSE_WINDOW`), so the two never drift apart.
  */
 export const CORPSE_WINDOW = 7;
+/**
+ * The heavy button pressed while sprinting or mid-dash is a **charge**: the same move RT always
+ * plays, but thrown at whatever is nearest the line the body is actually travelling along rather
+ * than at what it happens to be pointing at, and paid for with this much stamina on top of the
+ * move's own cost. Committing your momentum should cost more than standing still and swinging.
+ */
+const CHARGE_STAMINA = 8;
+/**
+ * How far off the line of travel a charge will reach to find something, in body lengths plus a
+ * fixed margin so a larva is not left threading a needle, and how much further along that line it
+ * looks than a standing pounce would.
+ */
+const CHARGE_LATERAL = 1.2, CHARGE_REACH = 1.3;
+/**
+ * Close attacks turn onto what they are nearly pointing at. A bite that misses by five degrees is
+ * the player's aim being read too literally, not a decision they made — but the turn is capped so
+ * it stays a nudge and never swings the body round onto something behind you.
+ */
+const AIM_NUDGE = 0.4, AIM_NUDGE_CONE = 0.45;
 /** Seconds of that window spent fading out at the end of it. */
 export const DEATH_FADE = 1.2;
 /**
@@ -748,7 +767,7 @@ export class Game implements AiWorld {
     const justDodge = input.dodge && !a.prev.dodge, justGuard = input.guard && !a.prev.guard, justLock = input.lock && !a.prev.lock;
     const justSense = input.sense && !a.prev.sense;
     const justDash = input.dash && !a.prev.dash;
-    if (input.dash) a.dashHoldT += dt; else { a.dashHoldT = 0; a.dashUsed = false; a.dashQueued = false; }
+    if (input.dash) a.dashHoldT += dt; else { a.dashHoldT = 0; a.dashUsed = false; }
     a.pounceCd = Math.max(0, a.pounceCd - dt);
     a.dashCd = Math.max(0, a.dashCd - dt);
     a.teleportCd = Math.max(0, a.teleportCd - dt);
@@ -1012,9 +1031,10 @@ export class Game implements AiWorld {
       }
     }
 
-    // Orientation. A shell jets: under way at speed — a sprint, a dash — it goes funnel-first and
-    // trails its shell, and it swings round to face what it is doing when it slows, aims or
-    // strikes. This is the body's heading only; the stick is still the direction of travel.
+    // Orientation. A shell jets: under way at speed — a sprint, a dash — it travels shell-first
+    // with its head trailing, which is how a nautiloid escapes, and it swings round to face what
+    // it is doing when it slows, aims or strikes. This is the body's heading only; the stick is
+    // still the direction of travel.
     const hv = Math.hypot(a.vel.x, a.vel.z);
     const backward = jets && hv > 0.35 && a.state !== 'attack' && !a.aiming
       && (bursting || freeBurst || a.state === 'dodge');
@@ -1061,22 +1081,17 @@ export class Game implements AiWorld {
       }
       // Sense
       if (justSense && a.senseCd === 0) { a.senseT = def.ability === 'whipSearch' ? 3.6 : 2.2; a.senseCd = def.ability === 'burrow' ? 3 : 6; this.flag(a, 'sense'); this.events.push({ kind: 'sense', pos: { ...a.pos }, actor: a.id, player: a.player }); }
-      // Ability
-      if (justHeavy && a.emergenceHeavy) this.emergeStrike(a, def);
-      else if (justHeavy && HEAVY_SPECIALS.has(def.ability) && a.abilityCd <= 0 && a.stamina >= 18) {
-        a.stamina -= 18; this.startAbility(a, def); a.abilityCd = Math.max(2, a.stateDur + .6); this.flag(a, 'heavy');
-      }
-      // Dash (LB): with a stick direction it fires at once; with a neutral stick it is queued for the
-      // moment the stick moves. Fast and long enough to clear a predator's bite.
-      else if (justDash && mag <= 0.3 && !input.worldMove) { a.dashQueued = true; }
-      else if ((justDash || a.dashQueued) && mag > 0.3 && a.stamina >= 10 && a.exhausted === 0 && a.dashCd === 0 && !a.dashUsed && !paddling) { a.dashUsed = true; a.dashQueued = false; this.startDash(a, def, dir, L, sf); }
-      // Pounce (RT): at the aimed target when in range, else at whatever prey is in front, else a forward lunge
-      // Creatures whose special sits on RT reach this too, but only once the special has been ruled
-      // out just above (cooling down, or too little stamina): RT is never a dead button.
-      else if (justHeavy && a.controller === 'player' && a.pounceCd === 0 && a.stamina >= 12 && a.exhausted === 0) {
-        const t = a.aiming && locked && isAlive(locked) ? (a.aimInRange ? locked : undefined) : this.pounceTargetAhead(a);
-        if (t) this.startPounce(a, t, L, sf);
-        else { const m = { ...def.heavy, lunge: def.heavy.lunge + 1.0 }; a.state = 'attack'; a.stateT = 0; a.move = m; a.moveKind = 'heavy'; a.hitDone.clear(); a.stamina -= staminaCost(a, m.stamina); a.combo = 0; a.pounceCd = 0.8; this.flag(a, 'heavy'); }
+      // Heavy (RT): the emergence strike, the creature's special, or the pounce — all of it in one
+      // place, so a charge out of a sprint (below) or out of a dash reaches exactly the same move.
+      // Sprinting makes it a charge: it aims along the line of travel and costs extra stamina.
+      if (justHeavy && this.heavyAction(a, def, L, sf, locked, bursting)) { /* the button was taken */ }
+      // Dash (LB): fast and long enough to clear a predator's bite. A stick direction fires it that
+      // way. A neutral stick fires it along the body's own axis — ahead of a finned body, and out
+      // behind a jetting shell, which is the way a nautiloid escapes and the way it is already
+      // pointing while it does, so it leaves without turning first.
+      else if (justDash && a.stamina >= 10 && a.exhausted === 0 && a.dashCd === 0 && !a.dashUsed && !paddling) {
+        a.dashUsed = true;
+        this.startDash(a, def, mag > 0.3 ? dir : vscale(heading(a.yaw), jets ? -1 : 1), L, sf);
       }
       // Dodge (B for creatures that cannot guard, bots)
       else if (justDodge && a.controller !== 'player' && a.stamina >= 10 && a.exhausted === 0) this.startDodge(a, def, dir, mag, L, sf);
@@ -1094,6 +1109,7 @@ export class Game implements AiWorld {
         else {
           const m = justHeavy ? def.heavy : (a.combo === 2 ? { ...def.light, damage: def.light.damage * 1.6, poise: def.light.poise * 1.8, knockback: def.light.knockback * 2, recovery: def.light.recovery + 0.12 } : def.light);
           if (a.stamina >= staminaCost(a, m.stamina) * 0.5 && a.exhausted === 0) {
+            if (a.controller === 'player') this.aimNudge(a, L * 1.8 + 2);
             a.state = 'attack'; a.stateT = 0; a.move = m; a.moveKind = justHeavy ? 'heavy' : 'light'; a.hitDone.clear();
             a.stamina -= staminaCost(a, m.stamina);
             if (!justHeavy) { a.combo = (a.combo + 1) % 3; a.comboT = 0.9; } else a.combo = 0;
@@ -1132,7 +1148,14 @@ export class Game implements AiWorld {
         }
       } else { a.state = 'free'; a.stateT = 0; a.vel = vscale(a.vel, 0.3); }
     } else if (a.state === 'dodge') {
-      if (a.stateT >= a.stateDur) { a.state = 'free'; a.stateT = 0; }
+      // A charge out of a dash: RT cancels the dash into the creature's heavy, thrown at whatever
+      // is nearest the line it was travelling along. It costs the dash's remaining invulnerability
+      // as well as the extra stamina — you have chosen to commit instead of to escape. It costs
+      // the rest of the dash's travel too, since the cancel is immediate: a charge that finds
+      // something halfway through leaves the dash covering only the ground it had crossed by then.
+      // That is the trade, not a dash cut short by accident.
+      if (justHeavy && this.heavyAction(a, def, L, sf, locked, true)) a.iframes = 0;
+      else if (a.stateT >= a.stateDur) { a.state = 'free'; a.stateT = 0; }
     } else if (a.state === 'stagger') {
       if (a.stateT >= a.stateDur) { a.state = 'free'; a.stateT = 0; a.poise = a.poiseMax * 0.6; }
     } else if (a.state === 'grabbed') {
@@ -1292,6 +1315,89 @@ export class Game implements AiWorld {
     return pounce;
   }
 
+  /**
+   * The heavy button, wherever it is pressed from: standing, sprinting, or out of a dash.
+   *
+   * Returns whether the press was taken, so the action cascade can fall through to the dash and
+   * the plain attacks when it was not — a bot without a special, or a move on cooldown. `charge`
+   * is a press made with the body already committed to a direction: it aims along the line of
+   * travel rather than the nose, reaches a little further along it, and costs `CHARGE_STAMINA`
+   * on top of the move's own price.
+   */
+  private heavyAction(a: Actor, def: ReturnType<typeof creature>, L: number, sf: number, locked: Actor | undefined, charge: boolean): boolean {
+    const extra = charge ? CHARGE_STAMINA : 0;
+    // A burrowed ambusher's emergence strike takes the button ahead of everything else, and is free.
+    if (a.emergenceHeavy) { this.emergeStrike(a, def); return true; }
+    if (HEAVY_SPECIALS.has(def.ability) && a.abilityCd <= 0 && a.stamina >= 18 + extra) {
+      a.stamina -= 18 + extra; this.startAbility(a, def); a.abilityCd = Math.max(2, a.stateDur + .6); this.flag(a, 'heavy');
+      return true;
+    }
+    // The pounce. Creatures whose special sits on RT reach it too, but only once the special has
+    // been ruled out just above (cooling down, or too little stamina): RT is never a dead button.
+    // Bots keep the old split — RT is their special and nothing else — so every seeded replay that
+    // depends on their behaviour is unchanged.
+    if (a.controller !== 'player' || a.pounceCd !== 0 || a.stamina < 12 + extra || a.exhausted > 0) return false;
+    a.stamina -= extra;
+    const t = a.aiming && locked && isAlive(locked) ? (a.aimInRange ? locked : undefined)
+      : charge ? this.chargeTarget(a) ?? this.pounceTargetAhead(a) : this.pounceTargetAhead(a);
+    if (t) this.startPounce(a, t, L, sf);
+    else { const m = { ...def.heavy, lunge: def.heavy.lunge + 1.0 }; a.state = 'attack'; a.stateT = 0; a.move = m; a.moveKind = 'heavy'; a.hitDone.clear(); a.stamina -= staminaCost(a, m.stamina); a.combo = 0; a.pounceCd = 0.8; this.flag(a, 'heavy'); }
+    return true;
+  }
+
+  /**
+   * What a charge snaps onto: the body nearest the line the creature is actually travelling along.
+   *
+   * A sprint or a dash has already chosen a direction, and at that speed the nose swings around
+   * far more slowly than the body crosses ground — so a cone measured off the heading, which is
+   * what the standing pounce uses, misses the animal you are about to swim straight past. This
+   * measures how far along the line a body sits and how far off it, and takes the nearest thing
+   * inside a corridor rather than a wedge.
+   */
+  private chargeTarget(a: Actor): Actor | undefined {
+    const L = lengthOf(a);
+    const line = len3(a.vel) > 1 ? norm(a.vel) : heading(a.yaw);
+    const reach = this.pounceRange(a) * CHARGE_REACH, lateral = L * CHARGE_LATERAL + 2;
+    let best: Actor | undefined, bd = Infinity;
+    for (const o of this.nearby(a.pos, reach)) {
+      if (o.id === a.id || !isAlive(o) || isHidden(o)) continue;
+      // Another player is never chosen for you, charging or not: turning on one stays deliberate.
+      if (o.controller === 'player' && a.controller === 'player') continue;
+      if (bandOf(a, o) === 'giant') continue;
+      const to = sub(o.pos, a.pos), along = dot(to, line);
+      if (along < 0 || along > reach) continue;
+      const off = len3(sub(to, vscale(line, along)));
+      if (off > lateral + bodyRadius(o)) continue;
+      // Prefer what is straight ahead over what is off to the side at the same distance.
+      const score = along + off * 2;
+      if (score < bd) { bd = score; best = o; }
+    }
+    return best;
+  }
+
+  /**
+   * Turn a close attack onto what it is nearly pointing at, by at most `AIM_NUDGE`.
+   *
+   * A bite whose mouth reaches four tenths of a body length has no tolerance at all: missing by a
+   * few degrees at that range reads as the game ignoring the press rather than as the player's
+   * mistake. The cap is what keeps it honest — it will not turn you round, and it never picks
+   * another player, so who you attack is still your decision.
+   */
+  private aimNudge(a: Actor, reach: number): void {
+    const h = heading(a.yaw);
+    let best: Actor | undefined, bd = Infinity;
+    for (const o of this.nearby(a.pos, reach)) {
+      if (o.id === a.id || !isAlive(o) || isHidden(o)) continue;
+      if (o.controller === 'player' && a.controller === 'player') continue;
+      const to = sub(o.pos, a.pos), d = len3(to);
+      if (d > reach || dot(norm(to), h) < AIM_NUDGE_CONE) continue;
+      if (d < bd) { bd = d; best = o; }
+    }
+    if (!best) return;
+    const turn = clamp(wrapAngle(yawOf(sub(best.pos, a.pos)) - a.yaw), -AIM_NUDGE, AIM_NUDGE);
+    a.yaw = wrapAngle(a.yaw + turn); a.prevT.yaw = a.yaw;
+  }
+
   /** Nearest thing in front worth pouncing on when RT is pressed without aiming. */
   private pounceTargetAhead(a: Actor): Actor | undefined {
     const L = lengthOf(a); const h = heading(a.yaw);
@@ -1349,6 +1455,12 @@ export class Game implements AiWorld {
   }
 
   private startPounce(a: Actor, target: Actor, L: number, sf: number) {
+    // The pounce homes on `lockTarget`, so a pounce that picked its own target has to record it.
+    // Without this an unaimed press — the common case, since it means not holding LT — entered the
+    // state, found nothing to home on and dropped straight back out, having spent the stamina and
+    // the cooldown on nothing at all. Safe to write: the block that clears a player's lock runs
+    // only while free or guarding, so it cannot reach in and clear this mid-pounce.
+    a.lockTarget = target.id;
     a.state = 'pounce'; a.stateT = 0; a.stateDur = clamp(dist(a.pos, target.pos) / Math.max(6, L * 3), 0.25, 0.9) + 0.15;
     a.stamina -= 12; a.pounceCd = 1.4; a.combo = 0;
     a.move = { ...creature(a.creature).heavy, name: 'Pounce' }; a.moveKind = 'heavy';
