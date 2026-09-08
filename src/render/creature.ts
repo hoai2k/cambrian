@@ -63,7 +63,7 @@ const SPINE_RE = /^(body|segment)_(\d+)$/;
  * (see `changedClips` in docs/creature-anchors-manifest.json). Every other rig loops its Eat clip while
  * the attachment pass moves the food through its sockets.
  */
-const FEEDING_PERFORMANCE: ReadonlySet<CreatureId> = new Set<CreatureId>(['opabinia']);
+const FEEDING_PERFORMANCE: ReadonlySet<CreatureId> = new Set<CreatureId>(['opabinia', 'leanchoilia']);
 
 export class CreatureView {
   readonly group = new THREE.Group();

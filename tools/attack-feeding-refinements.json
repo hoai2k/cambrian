@@ -106,7 +106,7 @@
   {
     "era": "cambrian",
     "id": "leanchoilia",
-    "status": "pending",
+    "status": "review",
     "scope": "attack-feeding-animation",
     "reviewClips": [
       "Bite",
@@ -114,7 +114,7 @@
       "Heavy",
       "Eat"
     ],
-    "note": "If this creature has a pending structural redesign, coordinate motion with its replacement; review each resulting animation individually."
+    "note": "Delivered 2026-09-08 by tools/creatures/motion/apply.mjs (performance in performances/leanchoilia.mjs); shipped clips kept as replaced/<name>. Eat is a scrubbed feeding performance (FEEDING_PERFORMANCE). Pending the user's review in the viewer and a controller playtest."
   },
   {
     "era": "cambrian",
