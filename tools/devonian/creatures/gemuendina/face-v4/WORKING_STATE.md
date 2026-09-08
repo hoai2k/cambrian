@@ -1,3 +1,22 @@
+## Latest correction — user rejected candidate02 mouth placement
+
+The user explicitly clarified that the front flap/leading edge IS the mouth,
+not a dorsal or set-back aperture. The anterior body is a snout with closer-set
+nostril-position eyes. Published main0b639d0 is therefore a preserved preview,
+NOT acceptance of this correction. Root acknowledged misinterpretation.
+
+New shape_03.py/study_03.py remaps the anterior envelope: upper and lower skin
+recede behind terminal lips, former preoral apron wraps under jaw; eyes move
+from X±.28 to±.14. Preserves accepted posterior/material topology. Actual six
+study renders now running; inspect side first for any flap ahead of opening,
+then front/oblique for eye spacing and snout. No rig/export/audit yet for03.
+An initial import-path error produced no geometry; preserved under local
+study-03-import-failure.log/directory. Corrected source adds HERE to sys.path.
+Do not reuse previous audit/portraits for a03delivery. Root owns this pass.
+
+
+## Previous delivered candidate02 (rejected mouth interpretation)
+
 # Gemuendina face V4 — candidate02 delivery checkpoint, 8 September 2026
 
 Root completed the requested front-mouth/anterior-eye refinement in Blender5.2.
@@ -31,7 +50,8 @@ itself to the actual eye-audited GLB hashes. Local release-02.json records hashe
 Selected Devonian intake PASS. Catalogue/sizes regenerated. Build/typecheck PASS.
 Built viewer4176 loaded the new face, all18clips and preview badge; root observed
 Idle and Heavy.495s jaw opening. No interactive prey/controller test claimed.
-Main publication is the next step; consult docs/devonian/current-state.md / Git.
+Published/pushed main0b639d0, ownbc79286; feature84ea9bc. Viewer checked against
+the identical built asset family; no viewer code change was needed.
 
 Restart paths: local ../devonian-authoring/gemuendina/face-v4/candidate-02 has the
 editable production Blend, exported family, reports and pose-evidence/. Audit is
