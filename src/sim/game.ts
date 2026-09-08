@@ -141,7 +141,18 @@ const CLIMB_PUSH = 0.35;
  * window only opens when there is somebody who could actually reach you.
  */
 const DOWNED_WINDOW = 10;
-const CORPSE_WINDOW = 3;
+/**
+ * How long a killed player stays dead before hatching again, and so how long they spend watching.
+ *
+ * Death used to cut to a dialog after three seconds, which is barely long enough to register what
+ * ate you. The camera rides with whatever killed you for this window instead — you watch it finish
+ * the meal, told what happened by a line of text rather than a panel over the action — and only
+ * then does the screen fade out and slowly back in on the new body. The renderer takes its fade
+ * times from this constant (`CORPSE_WINDOW`), so the two never drift apart.
+ */
+export const CORPSE_WINDOW = 7;
+/** Seconds of that window spent fading out at the end of it. */
+export const DEATH_FADE = 1.2;
 /**
  * How close a team-mate has to be when you go down for the window to open at all. Roughly what a
  * sprint covers in the window itself, so a rescue is always a real race and never a formality —

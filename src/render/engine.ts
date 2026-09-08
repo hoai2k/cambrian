@@ -7,7 +7,7 @@ import { applyMouse, emptyControls, gamepads, KeyboardInput, MouseLook, readGame
 import { clamp, damp, TAU, wrapAngle } from '../shared/math';
 import { bandOf, isAlive, isHidden, lengthOf } from '../sim/actors';
 import { creature, type CreatureId } from '../sim/creatures';
-import { Game, radarRange as radarReach, type ScoreHeader, type ScoreRow, type TeleportDest } from '../sim/game';
+import { CORPSE_WINDOW, DEATH_FADE, Game, radarRange as radarReach, type ScoreHeader, type ScoreRow, type TeleportDest } from '../sim/game';
 import type { Phase } from '../sim/daynight';
 import { BAND_COLOR, emptyInput, isCoop, TIER_NAMES, TIER_NEED, type Actor, type Band, type InputFrame, type Mode, type PlayerSetup } from '../sim/types';
 import { BIOME_NAMES, biomeAt, groundHeight, nurseryAt, resolveStatic, SURFACE_Y, type Biome, type Boulder, type LandmarkKind } from '../sim/world';
@@ -43,6 +43,11 @@ export interface PlayerHud {
   downedAllies: { index: number; name: string; color: string; seconds: number; distance: number; x: number; y: number; progress: number }[];
   /** Versus: whose viewport this one is borrowing while dead. */
   spectating?: { index: number; name: string; color: string; creature: CreatureId };
+  /**
+   * What happened, while this player is dead: whether they were swallowed or simply killed, and
+   * who by, for the line of text that plays over the watch.
+   */
+  death?: { eaten: boolean; by?: string };
   bandMarkers: { x: number; y: number; band: Band; size: number }[];
   /** Dominant biome under the player. */
   biome: string;
@@ -603,6 +608,14 @@ export class Engine {
     return best;
   }
 
+  /** Whatever killed this body and is still around to be watched: what ate it, else what killed it. */
+  private killerOf(p: Actor): Actor | undefined {
+    const id = p.swallowedBy >= 0 ? p.swallowedBy : p.killer;
+    if (id < 0) return undefined;
+    const k = this.game!.byId(id);
+    return k && isAlive(k) ? k : undefined;
+  }
+
   private updateCamera(cs: CamState, p0: Actor, dt: number) {
     // While spectating, everything below frames the watched player instead. The dead player's own
     // camera state (yaw, zoom, shake) is reused, so the handover is a cut, not a new rig.
@@ -622,18 +635,23 @@ export class Engine {
     const jumped = cs.lastPos.distanceTo(pp) > 20;
     cs.lastPos.copy(pp);
     if (jumped) { cs.yaw = p.yaw; cs.fade = 1; }
-    // Eaten: ride along with the predator from the same angle until the respawn.
-    const pred = (p.state === 'swallowed' || (p.state === 'dead' && p.swallowedBy >= 0)) ? this.game!.byId(p.swallowedBy) : undefined;
+    // Killed: ride along with whatever did it, from the same angle, until the respawn. Being
+    // swallowed is the clearest case, but a body that was simply bitten to death wants the same
+    // shot — you watch the thing that got you rather than your own drifting corpse.
+    const pred = p.state === 'swallowed' || p.state === 'dead' ? this.killerOf(p) : undefined;
     const lookAt = pred
       ? this.renderPos(pred, this.tmpLook).setY(this.tmpLook.y + lengthOf(pred) * 0.1)
       : this.tmpLook.set(pp.x, pp.y + L * 0.15, pp.z);
     if (pred) dist = magnificationDistance(lengthOf(pred)) * cs.zoom * 0.85;
     // Fade to black just before the respawn, and in again just after. Always the real player's
     // own death, never the spectated one's: this viewport's owner is the one coming back.
+    // Fade to black over the last moment before the respawn, and in again slowly on the new body:
+    // the watch is the point, so the black is a curtain at the end of it rather than a cut. Always
+    // the real player's own death, never the spectated one's: this viewport's owner is coming back.
     const dying = p0.state === 'dead' || p0.state === 'swallowed';
-    const respawnAt = this.game!.reviveWindow(p0) ? Infinity : 2.6;   // a downed player waiting on an ally never fades out
+    const respawnAt = this.game!.reviveWindow(p0) ? Infinity : CORPSE_WINDOW - DEATH_FADE;   // a downed player waiting on an ally never fades out
     const fadeTarget = dying && (p0.state === 'dead' ? p0.respawnT : p0.stateT) > (p0.state === 'dead' ? respawnAt : 99) ? 1 : 0;
-    cs.fade = damp(cs.fade, fadeTarget, fadeTarget > cs.fade ? 6 : 4, dt);
+    cs.fade = damp(cs.fade, fadeTarget, fadeTarget > cs.fade ? 4 : 1.5, dt);
     if (locked && target) {
       const tp = this.renderPos(target, this.tmpPred);
       const dx = tp.x - pp.x, dz = tp.z - pp.z;
@@ -1054,6 +1072,11 @@ export class Engine {
         downed.push({ index: j, name: creature(o.creature).name, color: PLAYER_COLORS[j % 4], seconds, distance: Math.hypot(dx, dz), x: r / l, y: -f / l, progress: game.reviveProgress(o) });
       }
       // Versus: a dead player watches the leader rather than their own sinking body.
+      // Who killed this player, named the way the rest of the HUD names bodies: another player by
+      // their seat, anything else by its species.
+      const killerId = p.swallowedBy >= 0 ? p.swallowedBy : p.killer;
+      const killer = killerId >= 0 ? game.byId(killerId) : undefined;
+      const nameOf = (a: Actor | undefined) => (a ? (a.player >= 0 ? `P${a.player + 1}` : creature(a.creature).name) : undefined);
       const watched = this.spectatorTarget(game, i);
       const spectate = watched ? { index: watched.player, name: `P${watched.player + 1}`, color: PLAYER_COLORS[watched.player % 4], creature: watched.creature } : undefined;
       let aim: PlayerHud['aim'];
@@ -1072,8 +1095,9 @@ export class Engine {
         lock: lockA && isAlive(lockA) ? { name: creature(lockA.creature).name, kind: creature(lockA.creature).kind, band: bandOf(p, lockA), hp: lockA.hp / lockA.hpMax, color: BAND_COLOR[bandOf(p, lockA)] } : undefined,
         hunted: p.hunted, hunterAngle, hunterName: hunter ? creature(hunter.creature).name : undefined,
         hunterState: p.hunted >= 0.5 ? 'hunting' : p.hunted > 0.2 ? 'noticed' : 'none', inCover: p.cover > 0.3, still: Math.hypot(p.vel.x, p.vel.y, p.vel.z) < 0.3,
-        hint: game.hintFor(i), respawnIn: p.state === 'dead' ? Math.max(0, (game.reviveWindow(p) || 3) - (game.reviveWindow(p) ? 0 : p.respawnT)) : 0, fade: cs?.fade ?? 0, state: p.state, modelReady: !!loadedSync(p.creature),
+        hint: game.hintFor(i), respawnIn: p.state === 'dead' ? Math.max(0, (game.reviveWindow(p) || CORPSE_WINDOW) - (game.reviveWindow(p) ? 0 : p.respawnT)) : 0, fade: cs?.fade ?? 0, state: p.state, modelReady: !!loadedSync(p.creature),
         downedFor: game.reviveWindow(p), reviveProgress: game.reviveProgress(p), downedAllies: downed, spectating: spectate,
+        death: p.state === 'dead' || p.state === 'swallowed' ? { eaten: p.swallowedBy >= 0 || p.eaten > 0, by: nameOf(killer) } : undefined,
         kills: p.kills, eats: p.eats, escapes: p.escapes, protect: p.spawnProtect > 0, bandMarkers: markers.slice(0, 24),
         biome: BIOME_NAMES[game.biomeOf(i) ?? 'shelf'], day: game.dayPhase(), radar: { range: radarRange, blips }, teleport: tele, board, notice: game.noticeFor(i), era,
       };

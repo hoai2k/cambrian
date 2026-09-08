@@ -1,5 +1,5 @@
 /** The endless sea: shore, biome bands, deterministic streaming, teleport and radar. */
-import { Game, radarRange } from '../src/sim/game';
+import { CORPSE_WINDOW, Game, radarRange } from '../src/sim/game';
 import { emptyInput, type InputFrame } from '../src/sim/types';
 import { isAlive, lengthOf } from '../src/sim/actors';
 import { distXZ } from '../src/shared/math';
@@ -157,7 +157,7 @@ const run = (g: Game, f: InputFrame, steps: number) => { const m = new Map([[0, 
   b.pos = { x: 1560, y: 6, z: shoreZ(1560) - 200 }; b.vel = { x: 0, y: 0, z: 0 }; b.spawnProtect = 99;
   g.world.loadAround(b.pos);
   a.pos = { x: -900, y: 6, z: shoreZ(-900) - 300 }; a.spawnProtect = 0; a.hp = 0; a.state = 'dead'; a.deathY = 6;
-  run(g, emptyInput(), 60 * 4);
+  run(g, emptyInput(), 60 * (CORPSE_WINDOW + 2));
   check('a dead player respawns', isAlive(a), `state=${a.state}`);
   check('...in a nursery near the other player', distXZ(a.pos, b.pos) < 400 && distXZ(a.pos, a.home) < 12, `d(other)=${distXZ(a.pos, b.pos).toFixed(0)} d(home)=${distXZ(a.pos, a.home).toFixed(1)} home=(${a.home.x.toFixed(0)},${a.home.z.toFixed(0)})`);
 }
@@ -269,7 +269,7 @@ const run = (g: Game, f: InputFrame, steps: number) => { const m = new Map([[0, 
     b.pos = { x: a.pos.x + 600, y: a.pos.y, z: a.pos.z };
     run(g, emptyInput(), 6);
     check('nobody in reach means no revive window', g.reviveWindow(a) === 0, '');
-    run(g, emptyInput(), 60 * 4);
+    run(g, emptyInput(), 60 * (CORPSE_WINDOW + 2));
     check('...so they respawn as usual', isAlive(a), `state=${a.state}`);
     check('...and pay a tier for it', a.tier === 1, `tier=${a.tier}`);
   }
