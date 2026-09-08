@@ -1,62 +1,31 @@
-## Latest correction — user rejected candidate02 mouth placement
+# Gemuendina face V4 — closing candidate05 checkpoint
 
-The user explicitly clarified that the front flap/leading edge IS the mouth,
-not a dorsal or set-back aperture. The anterior body is a snout with closer-set
-nostril-position eyes. Published main0b639d0 is therefore a preserved preview,
-NOT acceptance of this correction. Root acknowledged misinterpretation.
+Candidate05 is the current accepted focused face preview, included in the closing
+publication. See TERMINAL_SNOUT_STATE.md for exact authoring and validation commands,
+author-review-05.json for all12 actual full/LOD views plus4portraits, and
+release-review-05.json for public hashes, selected intake/build/typecheck and viewer.
 
-New shape_03.py/study_03.py remaps the anterior envelope: upper and lower skin
-recede behind terminal lips, former preoral apron wraps under jaw; eyes move
-from X±.28 to±.14. Preserves accepted posterior/material topology. Actual six
-study renders now running; inspect side first for any flap ahead of opening,
-then front/oblique for eye spacing and snout. No rig/export/audit yet for03.
-An initial import-path error produced no geometry; preserved under local
-study-03-import-failure.log/directory. Corrected source adds HERE to sys.path.
-Do not reuse previous audit/portraits for a03delivery. Root owns this pass.
+The user rejected published candidate02/main0b639d0: the front flap itself must
+form the terminal mouth, with close eyes above it. Root studies03/04 also failed
+because their underside folded into an apron. Dedicated Astra study05 separately
+reconstructed upper/lower/ventral profiles and the oral bowl. Candidate05 transfers
+that shape into the28-bone,3-anchor rig, preserves18 actions at both detail levels
+and all accepted posterior/material character. The mouth is the leading edge,
+not a dorsal or set-back opening. Eyes are smaller and close together.
 
+Actual10pose full/LOD eye and oral checks passed: minimum measured interior75.13%,
+conservative95% lower74.35%; supported eyes, continuous lining, open mouth-to-swallow
+corridor and attached denticles. Artist reviewed all16images; root keyviews and
+builtviewer Idle/Heavy0.495s passed. Keep PREVIEW: small LOD chin/cheek creases,
+pigmentation detail and broader controller/art polish remain.
 
-## Previous delivered candidate02 (rejected mouth interpretation)
+Local editable source: ../devonian-authoring/gemuendina/face-v4/candidate-05/
+gemuendina-face-production-05.blend. Full16,412,316B; LOD2,868,160B.
+Original94-file backup and every earlier study/candidate remain preserved. Earlier
+reports apply only to their exact hashes. production-handoff-05.json is the frozen
+source manifest from before execution; its pending wording is historical.
 
-# Gemuendina face V4 — candidate02 delivery checkpoint, 8 September 2026
-
-Root completed the requested front-mouth/anterior-eye refinement in Blender5.2.
-The accepted V3 posterior body (Y >= -1.04), material textures, topology and UVs
-are preserved. Only two actual eye meshes exist, positioned above the leading
-mouth. Dorsal eye-like motifs are skin markings. Jaw/throat pivots, denticles and
-three nested anchors follow the continuous anterior deformation.
-
-Study01 was rejected for oversized globes; study02 accepted. Candidate01 met the
-user's 50% containment requirement but missed the additional65% safety margin
-in Heavy. Candidate02 moves the globes another .010 inward. All prior versions
-and the94-file original backup are preserved under local devonian-authoring.
-
-Actual full/LOD candidate02 exports:16,412,444/2,862,364bytes,184,612/47,044triangles,
-28bones,3anchors,18actions on BOTH detail levels. No default LOD clip stripping.
-check_candidate_02.py passed. audit-candidate-02-03/audit.json independently
-sampled Bind, Heavy.45, Bite.45, Eat.25 and Swim.25 in full AND LOD. Closed body,
-no boundary caps; minimum measured eye interior77.7953%, conservative95% lower
-bound77.0443%, exceeding50%. This is bounded pose evidence, not every frame.
-
-Root inspected all11 actual exported pose renders: front, oblique, side, Heavy
-front/side, Bite front, Eat oblique, oral-low, LODfront/Heavy/Eat. Front mouth
-and supported eyes read clearly, oral tissue follows opening. Full/LOD shape
-is coherent; far LOD loses fine pigment and a diagonal cheek crease remains.
-Four actual exported-model portraits regenerated; select and thumbnail inspected.
-Keep PREVIEW: broad final art/LOD cleanup and controller playtest still remain.
-
-release_02.py copies the six unchanged binary/image assets and writes a metadata
-copy that removes obsolete upward-orientation text and duplicate notes. It binds
-itself to the actual eye-audited GLB hashes. Local release-02.json records hashes.
-Selected Devonian intake PASS. Catalogue/sizes regenerated. Build/typecheck PASS.
-Built viewer4176 loaded the new face, all18clips and preview badge; root observed
-Idle and Heavy.495s jaw opening. No interactive prey/controller test claimed.
-Published/pushed main0b639d0, ownbc79286; feature84ea9bc. Viewer checked against
-the identical built asset family; no viewer code change was needed.
-
-Restart paths: local ../devonian-authoring/gemuendina/face-v4/candidate-02 has the
-editable production Blend, exported family, reports and pose-evidence/. Audit is
-sibling audit-candidate-02-03. release-{intake,build,typecheck}-02 logs prove checks.
-Frozen candidate builder reads old metadata SHA27ad05fc...9cb3 from public;
-for a clean reproduction restore that INPUT from the preserved backup public/
-to a separate reproduction checkout (never overwrite current production).
-The original immutable candidate02 directory must not be reused for a new run.
+release_05.py creates a metadata derivative removing obsolete upward-mouth wording
+and duplicate notes; it copies binary/image assets unchanged after matching actual
+audit hashes. It preserves all18LODactions; do not run default3clipLODpackaging.
+No more creative/export jobs are required for this focused correction today.

@@ -5,7 +5,7 @@
   "provenance": "Early Devonian (Emsian), Hunsr\u00fcck Slate, Germany",
   "description": "Broad rhenanid with a leading mouth, paired anterior eyes, small mosaic armour and a long finless tail; tail-driven swimming with restrained pectoral trim.",
   "lengthMeters": 0.3,
-  "modelLength": 6.134066343307495,
+  "modelLength": 6.185060739517212,
   "locomotion": "Swim",
   "clips": [
     "Idle",
@@ -61,7 +61,7 @@
     "All action names are compatibility labels for specimen gestures; no Devonian gameplay rules are prescribed.",
     "V3 living mass and regional pigmentation follow user art direction as explicit interpretations; accepted clay-02 volume is retained except for the documented continuous orbital integration correction.",
     "Seven sequential axial tail segments provide locomotor waves; limited pectoral-edge motion steers and trims the body.",
-    "V4 user-directed face refinement moves the oral recess and paired eyes to the leading front. Accepted V3 posterior silhouette and regional pigmentation retained; living orientation is interpretive.",
+    "V4 study05 forms a true terminal snout: the front upper and lower lips are the leading body edge, with closely paired eyes immediately above them. The oral lining connects continuously into an internal throat; accepted V3 posterior silhouette and pigmentation remain.",
     "Paired anterior eyes above the leading mouth follow the user reference direction; dorsal eye-like motifs are skin markings, not additional eyes. This living orientation is an artistic reconstruction rather than a fossil certainty."
   ]
 }
