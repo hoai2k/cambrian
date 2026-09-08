@@ -75,3 +75,13 @@ is a game interpretation, not a claim of fossil evidence for predatory limb use.
 Review the inverted silhouette from the game's camera, including reduced-model limb readability,
 shell transparency/depth ordering and action extremes. Keep both references and the original
 model backup; the current model stays preview until replacement acceptance.
+
+## Superseding clay01 source freeze — 7 September 2026
+
+The later focused primary review is now complete: actual Figures 1,2,3,4,6 and both user images
+were inspected. See `ANATOMY_SHAPE_BRIEF.md` for updated decisions; the older evidence-status
+paragraphs above are historical. The 2024 count of 30–35 segments supersedes the older ROM ~47
+for this proposal: clay01 has 32 paired biramous limbs. `HASHED_HANDOFF.md` freezes a new custom
+geometry/render source. It is not executed, visually reviewed or approved yet. Original fallback
+assets remain untouched; production transparency, actions, rig/LOD, anchors and audits follow
+the actual six-view clay gate.

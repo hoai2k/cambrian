@@ -2,7 +2,7 @@
 
 Repository `/Users/hoai/Documents/Stuff/Generations/cambrian/local/expansion-repo`, branch
 `devonian-assets`. Separate main worktree `../devonian-publish`. Last verified remote publication
-**fb09dc5** (main and devonian-assets pushed), including concurrent remote **a759b5a**. Preserve
+**c74b71f** (main and devonian-assets pushed), including concurrent remote **a759b5a**. Preserve
 checkpoints and verify before publication; never force push. Fetch/push `git@github.com:hoai2k/cambrian.git`.
 Other agents change main concurrently. Do not stage active authors' mutable files.
 
@@ -44,7 +44,7 @@ executors stop unexpected failures and preserve output. They do not make creativ
   Root actual authored-default UI passed. Main7c72eb3 and built viewer4176 verified: new model
   loaded,18clips,authored default,final card without caution; Heavy control selected and animated.
   Sources/candidate/portraits/input hashes stay immutable.
-- `/root/titanichthys_rework_clay03` (Astra high), authoring **material study02** after actual material01 rejection.
+- `/root/titanichthys_rework_clay03` (Astra high), authoring **complete animated candidate01** after independent material02 acceptance.
   Clay04 body/fins are improved over rejected01–03; same frozen blend SHA
   **69ad4e7d1daa7aec64835a198c9b13c4a017cf4aa441cd2e58ae9a4207c404ec**.
   Read HANDOFF-clay04 and HANDOFF-oral-clay04. Terra completed two actual frontal rest/open oral
@@ -56,9 +56,9 @@ executors stop unexpected failures and preserve output. They do not make creativ
   766cc89f545e588f56ff929eb3f38a85a1ecf227e4c65b81c44d704cb013c653 preserved. Author independently
   reviewing then froze HANDOFF-MATERIAL-02.md; Terra executes now. Original ImageGen slate dermal
   colour swatch02 accepted (first pebbly swatch rejected/preserved). Builder302905617819ca475c43607b3791524b308036ba7c3d3da378f4e5681e83198a.
-  Same clay geometry,18maps including4096body; actual material02 four-view review pending.
+  Same clay geometry,18maps including4096body. Material02 executed; root/author independently inspected all4 actual views and accept for animated candidate only. Packed blend59754793e889e1d17b66c6bbce1b29e9502d4f57441db01dac1d4021a67ce34d; reportfdd0d63af70324a298ccc7d9dcc7a680e8db15f193ede4ae71cb1a8750162583. Eyes conspicuous, explicitly unaudited until completed candidate. Source maps exceed37MB; retain original, candidate keeps4096body albedo but reduced normal/rough maps, exact export material portraits required. Full/LOD,18actions,oral bones,anchors next.
   Keep thin edentulous jaws; user reference is Dunk-like and must not add Dunk teeth to Titan.
-- `/root/coccosteus_rework_design` (Astra high), authoring **material02** after material01 finish review.
+- `/root/coccosteus_rework_design` (Astra high), authoring **material03** after actual material02 rejection.
   Clay03 fixed verified 1,890 collapsed oral quads/duplicate passage with one closed exterior and
   lining. Actual five views confirm coherent mouth; source checks cover 279 lumen,288 containment,
   120 floor/roof sections. Preserve this oral topology. But head became pointed shallow wedge,
@@ -74,10 +74,10 @@ executors stop unexpected failures and preserve output. They do not make creativ
   sampling had aliased signals), richer bronze/umber grain and sharper irregular bars/flecks.
   Preserve frozen material01 geometry/relief and unchanged oral topology. Material02 now frozen:
   HANDOFF-MATERIAL-02.md, script4e79fe40644145efdda272699b7418dffab21a425cdc4c014429abb5b0be65b2.
-  Terra authorized to execute after Titan02; same7views and no geometry changes.
+  Material02 executed; blendfb5d6149ca60af5109362d9080204c914b5a2f5e2003893a6cb0a6af76e35a49, reportb94af6882e191e55feea273444d54eff36bee86347091e6a9a6fccabf3ddae1f. Root inspected all7: bars/rays improved but pervasive gold dots/clouds erase armor sutures visible in clay-close. NOT accepted for rig. Author independent review/material03: calmer grain subordinate to anatomical plate-boundary color/roughness/relief; preserve oral geometry/improved bars.
   No final eye audits yet.
   Old named backup remains intact.
-- `/root/devonian_execution_handoff` (Terra medium), executing Titan material02 then Cocc material02.
+- `/root/devonian_execution_handoff` (Terra medium), executing Odaraia clay01; Titan/Cocc material02 and Bothrio clay02 complete.
   Bothrio clay01, Gemu audit03, Cocc/Titan material01 complete; no repeats required.
 - `/root/bothriolepis_rework_design` (Astra high), new individual author. Inspected user ref and
   saved primary2014paper figures2/3; designing wholly new deep antiarch shield, ventral oral
@@ -89,11 +89,11 @@ executors stop unexpected failures and preserve output. They do not make creativ
   deeper posterior-bending vestibule, no rectangular mask, auto-fit camera and extra oral depth view.
   Preserve clay01 blend880c1268ca2a02079bab14288fc4d163e640c1ea10034d0f1cf1aaaf548c3b22. Primary figures2/3/5/7: square rayless dorsal, scaleless trunk/caudal,
   laterally broad proximal pectoral blade (thin in dorsal view),30.5%TL appendage length. Do not
-  carry over old generic dorsal rays/scales/horizontal blade assumptions. No rig/material yet.
+  carry over old generic dorsal rays/scales/horizontal blade assumptions. Clay02 executed PASS; blend55ca3b38a1de698a9e788ca9f76ab576476aa28785c84380754d27ebcbecc84b, inventory3d1f7511578f67e4ab1e0bbab5f766e77416f6bc7db0dad9549b9481dfca84e2. Root inspected all7: full views fit, root pinch fixed and recessed mouth clearer. Author independent coarse gate/material source queued when slot available. No rig/material yet.
 - `/root/odaraia_rework_design` (Astra high), new bounded Cambrian author. Read both preserved
   references and own DESIGN.md/queue; focused2024primary figure review then new custom clay source,
   coat-like semitransparent valves, numerous prominent articulated legs UP in normal swimming,
-  supported large eyes/three-blade tail. Own sources tools/creatures/odaraia/rework-v3 and local
+  supported large eyes/three-blade tail. Primary2024 figures1–4,6 reviewed; use32 pairs within revised30–35 segments (supersedes older47),20 endopod intervals, ovate exopods/endites; tentative maxilla insertion documented. Clay01 source frozen HASHED_HANDOFF.md, builder0572cc205c7ce3c6854bb6c305a21dd31f9604af21f387854dd871e20045ffa0; Terra executing six views now. Author awaiting actual review. Own sources tools/creatures/odaraia/rework-v3 and local
   ../expansion-authoring/odaraia-rework. No old shared builder, Blender/public/Git or general audit yet.
 - Doryaspis/Stethacanthus authors not started. References/requirements in queues. Doryaspis
   mouth-art/anatomy discrepancy explained earlier; read saved primary-source notes.
@@ -111,7 +111,7 @@ Queue/design updated; anatomical feeding evidence is distinct from gameplay atta
 Original Cambrian GLB/portrait bytes remain unchanged. New brief:
 `tools/creatures/odaraia/rework-v3/DESIGN.md`. Coat-like shaped wrapping valves, semitransparency,
 visible many-limbed segmented trunk, prominent supported eyes and three tail blades. ROM account
-and 2024 primary abstract consulted; primary full figures still need review. Source reference:
+and 2024 primary full paper/figures reviewed by author; updated ANATOMY_SHAPE_BRIEF.md records32 paired limbs and uncertainties. Source reference:
 `../expansion-authoring/odaraia-rework/user-reference/`. Preserve the old model as fallback.
 Coccosteus named backup `../devonian-authoring/backups/coccosteus-pre-rework-2026-09-07/` verified
 unchanged after paired comparison renders. All other originals/intermediates stay under local.
