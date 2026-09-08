@@ -13,20 +13,16 @@ import { DEVONIAN_RULES } from './devonian/rules';
  * these calls, so the two eras never share gameplay code paths they do not both want.
  */
 export interface EraHud {
-  /** 0..100 standing, the era's progress meter. */
+  /** 0..100 growth meter: what this animal has eaten, which is what moults it up a stage. */
   standing: number;
   rung: number; rungName: string; stage: string;
   /** 0..1 air remaining, for air breathers only. */
   air?: number;
-  /** This player currently holds range here. */
-  inRange: boolean;
   beached: boolean;
   /** Dead zones as world offsets from the player and radii, for the radar. */
   deadZones: { dx: number; dz: number; r: number }[];
-  /** Seconds this player has been Dominant (standing at 100), for the win countdown. */
-  dominantT: number;
-  /** The last few standing sources, newest last, for the ring's ticks. */
-  recent: string[];
+  /** Seconds this player has held Prime, for Rise's win countdown. */
+  primeT: number;
   inDeadZone: boolean;
 }
 
@@ -54,8 +50,6 @@ export interface EraRules {
   init(g: Game): void;
   /** After every fixed step, before the events are drained by the renderer. */
   step(g: Game, dt: number): void;
-  /** Every event this step produced (the renderer drains them afterwards). */
-  onEvents(g: Game, events: readonly WorldEvent[]): void;
   /** Nutrition a player or bot just gained; `food` is the eaten actor when there is one. */
   onNutrition(g: Game, a: Actor, amount: number, food: Actor | undefined): void;
   /** When true the shared nutrition → tier growth runs; when false the era owns growth. */
@@ -71,7 +65,9 @@ export interface EraRules {
   /** Y pressed while free or guarding and not hidden: true when the era's own special took it (the shared hide is skipped). */
   useAbility(g: Game, a: Actor, ctx: ExpansionContext): boolean;
   /** A heavy special started (after the shared begin): the era may aim and commit it. */
-  beginAbility(g: Game, a: Actor, ctx: ExpansionContext): void;
+  /** Optional: the shared code aims and carries every heavy strike (`HEAVY_STRIKE`); this is for
+   *  anything an era needs on top of that. */
+  beginAbility?(g: Game, a: Actor, ctx: ExpansionContext): void;
   /** Every step in the 'ability' state (after the shared step). */
   stepAbility(g: Game, a: Actor, ctx: ExpansionContext, dt: number): void;
   /** Multiplier on the camouflage stamina drain. */
@@ -93,6 +89,11 @@ export interface EraRules {
   onRespawn(g: Game, a: Actor): void;
   /** Win checks for the era's own modes; the shared ones (reef, hunted) run as before. */
   updateModes(g: Game, dt: number): void;
+  /**
+   * A finished co-op match is being carried on (`Game.continueMatch`): clear whatever the era was
+   * counting towards its win so the goal is not met again the instant play resumes.
+   */
+  continueMatch(g: Game): void;
   hud(g: Game, i: number): EraHud | undefined;
   hint(g: Game, i: number): string | undefined;
   /**

@@ -9,10 +9,13 @@ import { PLAYABLE as CREATURES, creature, type CreatureId } from '../sim/creatur
 import type { Mode, PlayerSetup } from '../sim/types';
 import { CheckIcon, Emblem, KeyboardIcon, PadIcon } from './icons';
 import { appBase } from '../shared/base';
+import { btn, fillControls, key, type Scheme } from '../shared/controls';
 
 interface Props {
   players: PlayerSetup[]; mode: Mode; modes: Mode[]; modeInfo: Record<Mode, { name: string; blurb: string; players: string }>;
   allReady: boolean; padIndices: number[];
+  /** Whatever everyone at this screen is holding: pad if any is connected, mouse and keyboard if not. */
+  scheme: Scheme;
   onPick: (i: number, c: CreatureId) => void; onReady: (i: number) => void; onRemove: (i: number) => void;
   onAddKeyboard: () => void; onMode: (m: Mode) => void; onStart: () => void; onBack: () => void;
 }
@@ -24,6 +27,7 @@ const ASSETS = appBase();
 export const gridColumns = (n: number) => Math.max(4, Math.ceil(n / 3));
 
 export function SelectScreen(p: Props) {
+  const s = p.scheme;
   const cols = gridColumns(CREATURES.length);
   const compact = p.players.length >= 3;
   // Controllers the game can see that have not joined yet, and joined players whose controller
@@ -42,7 +46,7 @@ export function SelectScreen(p: Props) {
             </button>
           ))}
         </div>
-        <p className="mode-blurb">{p.modeInfo[p.mode].blurb} <span className="dim">LB / RB switch modes.</span></p>
+        <p className="mode-blurb">{p.modeInfo[p.mode].blurb} <span className="dim">{btn('modePrev', s)} / {btn('modeNext', s)} switch modes.</span></p>
       </header>
 
       <div className="pick-layout">
@@ -101,9 +105,9 @@ export function SelectScreen(p: Props) {
                       </div>
                       {def.kindNote && <p className="kind-note">{def.kindNote}</p>}
                       <dl className="kit">
-                        <div><dt>RT</dt><dd>{HEAVY_SPECIALS.has(def.ability) ? def.abilityName : def.heavy.name}</dd></div>
-                        <div><dt>B</dt><dd>{DEFENSIVE_SPECIALS.has(def.ability) ? def.abilityName : def.canGuard ? 'Block / parry' : 'Evade'}</dd></div>
-                        <div><dt>Y</dt><dd><b>{RULES?.ySpecial(def.id)?.name ?? hideLabel(def.id)}.</b> {RULES?.ySpecial(def.id)?.desc ?? hideDescription(def.id)}</dd></div>
+                        <div><dt>{key('heavy', s)}</dt><dd>{HEAVY_SPECIALS.has(def.ability) ? def.abilityName : def.heavy.name}</dd></div>
+                        <div><dt>{key('guard', s)}</dt><dd>{DEFENSIVE_SPECIALS.has(def.ability) ? def.abilityName : def.canGuard ? 'Block / parry' : 'Evade'}</dd></div>
+                        <div><dt>{key('ability', s)}</dt><dd><b>{RULES?.ySpecial(def.id)?.name ?? hideLabel(def.id)}.</b> {fillControls(RULES?.ySpecial(def.id)?.desc ?? hideDescription(def.id), s)}</dd></div>
                         <div><dt>+</dt><dd>{def.passive}</dd></div>
                         <div><dt>−</dt><dd>{def.weakness}</dd></div>
                       </dl>
@@ -111,15 +115,19 @@ export function SelectScreen(p: Props) {
                   )}
                 </div>
                 <button className="ready-button" aria-pressed={pl.ready} onClick={() => p.onReady(i)}>
-                  {pl.ready ? <><CheckIcon width={18} height={18} /> LOCKED IN · A DIVES</> : 'LOCK IN  ·  A'}
+                  {pl.ready ? <><CheckIcon width={18} height={18} /> LOCKED IN · {key('confirm', s).toUpperCase()} DIVES</> : `LOCK IN  ·  ${key('confirm', s).toUpperCase()}`}
                 </button>
               </article>
             );
           })}
           {p.players.length < 4 && (
             <div className={`join-card ${waiting.length ? 'waiting' : ''}`}>
-              <PadIcon width={32} height={32} />
-              <p><b>Press any button</b> on another controller to join.</p>
+              {/* With no pad in the room the card leads with the thing that actually works here —
+                  a second player on the same keyboard — and mentions controllers second. */}
+              {p.padIndices.length > 0 ? <PadIcon width={32} height={32} /> : <KeyboardIcon width={32} height={32} />}
+              {p.padIndices.length > 0
+                ? <p><b>Press any button</b> on another controller to join.</p>
+                : <p><b>Plug in a controller</b> and press any button to join — or share this keyboard.</p>}
               <button className="ghost" onClick={p.onAddKeyboard}>Add a keyboard player</button>
               <small>
                 {p.padIndices.length} controller{p.padIndices.length === 1 ? '' : 's'} connected
@@ -136,8 +144,8 @@ export function SelectScreen(p: Props) {
       <footer className="select-footer">
         <button className="ghost" onClick={p.onBack}>← Title</button>
         <div className="start-wrap">
-          {!p.allReady && <span className="dim">Move on the grid, <b>A</b> locks in, <b>A</b> again dives.</span>}
-          <button className={`start-button ${p.allReady ? 'focused' : ''}`} disabled={!p.allReady} onClick={p.onStart}>DIVE IN  ·  A</button>
+          {!p.allReady && <span className="dim">Move on the grid with {btn('pick', s)}, <b>{key('confirm', s)}</b> locks in, <b>{key('confirm', s)}</b> again dives.</span>}
+          <button className={`start-button ${p.allReady ? 'focused' : ''}`} disabled={!p.allReady} onClick={p.onStart}>DIVE IN  ·  {key('confirm', s).toUpperCase()}</button>
         </div>
       </footer>
     </section>

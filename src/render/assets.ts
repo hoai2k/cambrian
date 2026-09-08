@@ -89,6 +89,7 @@ export class AssetQueue {
    * sounds trail everything but stay ahead of unlikely models once the UI ones are in.
    */
   prioritize(creatures: CreatureId[], phase: 'boot' | 'title' | 'select' | 'playing') {
+    for (const id of creatures) this.wanted.add(id);
     const order = [...creatures, ...CREATURE_IDS.filter((c) => !creatures.includes(c))];
     order.forEach((id, i) => {
       const glb = this.items.get(`glb:${id}`)!, lod = this.items.get(`lod:${id}`)!;
@@ -113,10 +114,25 @@ export class AssetQueue {
     this.pump();
   }
 
+  /**
+   * Creatures whose full-detail model the queue may fetch in the background: the ones the era
+   * boots with, plus whatever the players have picked. Everything else stays on its decimated
+   * copy until something actually needs the full body, at which point the renderer asks for it
+   * directly (`ensureLoaded`) and the loader fetches it then.
+   *
+   * This is the difference between a menu that streams a handful of models and one that streams
+   * the whole roster: the Devonian ships 302 MB of creature models against the Cambrian's 113 MB,
+   * and hoovering all of it up behind the title screen is felt as lag on every frame that has to
+   * share the main thread with a meshopt decode.
+   */
+  private wanted = new Set<CreatureId>(ACTIVE_ERA.defaults.boot);
+
   private pump() {
     if (this.disposed || !this.idle) return;
     while (this.active < this.concurrency) {
-      const next = [...this.items.values()].filter((i) => i.status === 'queued').sort((a, b) => a.priority - b.priority)[0];
+      const next = [...this.items.values()]
+        .filter((i) => i.status === 'queued' && (i.kind !== 'glb' || this.wanted.has(i.key.slice(4) as CreatureId)))
+        .sort((a, b) => a.priority - b.priority)[0];
       if (!next) break;
       void this.run(next);
     }

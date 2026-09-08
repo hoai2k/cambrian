@@ -8,6 +8,28 @@ export const massOf = (a: Actor) => a.scale ** 3;
 export const speedFactor = (scale: number) => Math.pow(scale, 0.45);
 export const clearanceOf = (a: Actor) => lengthOf(a) * (creature(a.creature).clearance ?? (creature(a.creature).ground ? 0.13 : 0.2));
 export const bodyRadius = (a: Actor) => lengthOf(a) * (creature(a.creature).bodyRadius ?? .22);
+/**
+ * How close the body may get to the seabed. A crawler rides at its full clearance — that is what
+ * the number is for — but a swimmer is allowed to come most of the way down onto the sand, because
+ * skimming the floor is how you hunt what lives on it. `clearanceOf` stays the resting height the
+ * rest of the sim reasons about (hiding, spawning, the AI's idea of "near the bottom").
+ */
+export const floorClearance = (a: Actor) => clearanceOf(a) * (creature(a.creature).ground ? 1 : 0.45);
+/**
+ * How far a body can be lifted in one step and still read as swimming rather than stepping. Rocks
+ * are domes: anything shallow enough to be carried over inside this budget is simply not collided
+ * with, and the floor under the body takes it up and across.
+ */
+export const glideOver = (a: Actor) => lengthOf(a) * 0.5 + 0.5;
+/**
+ * How far above the body a rock's top may stand and still be something to get over rather than a
+ * wall: twice the body. Under that, a face too steep to glide up is climbed — the body is held out
+ * of the rock and lifted up its side until the top is clear, then swims on over it. Above it, the
+ * rock is a cliff and behaves like one.
+ */
+export const climbHeight = (a: Actor) => lengthOf(a) * 2;
+/** How fast that climb goes: a swimmer's own rise, so going over a rock is paced like swimming up. */
+export const climbRise = (a: Actor) => 2.6 * speedFactor(a.scale);
 
 export function bandRatio(r: number): Band {
   if (r < 0.45) return 'snack';
@@ -52,7 +74,7 @@ export function makeActor(id: number, creatureId: CreatureId, controller: Contro
     hitFlash: 0, hitDir: v3(), hitStop: 0,
     grabbedBy: -1, grabbing: -1, grabT: 0, eatingTarget: -1, eatProgress: 0,
     corpseT: 0, eaten: 0, eatBites: 0, killer: -1, noise: 0.5, cover: 0, stillness: 0,
-    dodgeDir: v3(0, 0, 1), dodgeTapT: 0, hopVel: 0, grounded: true, airborne: false,
+    dodgeDir: v3(0, 0, 1), dodgeTapT: 0, hopVel: 0, grounded: true, climbPush: 0, climbTo: -Infinity, airborne: false,
     prev: { light: false, heavy: false, ability: false, dodge: false, guard: false, lock: false, sense: false, rise: false, burst: false, dash: false, aim: false },
     respawnT: 0, reviveT: 0, hatching: false, dashHoldT: 0, dashUsed: false, dashQueued: false, pounceCd: 0, dashCd: 0, sinceHit: 99, lastHitBy: -1, swallowedBy: -1, holdT: 0, deathY: 0, sparkled: false, tumble: v3(), aimInRange: false, aiming: false, kills: 0, eats: 0, escapes: 0, hunted: 0, hunterId: -1, wasHunted: false, seen: 0, bubbles: 0,
     spawnProtect: controller === 'player' ? 3 : 0,

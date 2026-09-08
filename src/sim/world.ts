@@ -656,9 +656,71 @@ export function coverAt(world: WorldData, pos: Vec3, length: number, scratch: Co
   return best;
 }
 
-/** Push (x,z) out of boulders and off the beach. Returns whether a collision happened. */
-export function resolveStatic(world: WorldData, pos: Vec3, radius: number, scratch: Boulder[], reach = 0): boolean {
+/**
+ * A rock's footprint is the ellipse its mesh is drawn with — `sx` by `sz`, turned by `rot` — rather
+ * than the circle around it, which on a long rock stands a couple of units out into open water on
+ * the narrow side and reads as an invisible wall. `radius` stays the footprint's overall size (a
+ * carved prop's is tuned to its silhouette), and the axes keep the mesh's proportions inside it.
+ *
+ * `q` is the distance to the centre in that ellipse's own units: below 1 is inside the rock, and
+ * the same number gives the height of its dome, so what you can see is what you collide with and
+ * what you can stand on.
+ */
+export function boulderAxes(b: Boulder): { ax: number; az: number } {
+  const m = Math.max(b.sx, b.sz, 1e-6);
+  return { ax: b.radius * (b.sx / m), az: b.radius * (b.sz / m) };
+}
+export function boulderQ(b: Boulder, x: number, z: number, pad = 0): number {
+  const dx = x - b.pos.x, dz = z - b.pos.z;
+  const c = Math.cos(b.rot), s = Math.sin(b.rot);
+  const lx = c * dx + s * dz, lz = -s * dx + c * dz;
+  const { ax, az } = boulderAxes(b);
+  return Math.hypot(lx / (ax + pad), lz / (az + pad));
+}
+/** Height of a rock's dome above its own centre at `q` (0 outside it). */
+const domeRise = (b: Boulder, q: number) =>
+  q >= 1 ? 0 : b.sy * (b.variant === 'blade-spire' ? 4 : b.variant === 'talus-shard' ? .8 : 1) * Math.sqrt(Math.max(0, 1 - q * q)) * .95;
+/** The top of a rock directly above (x,z), or undefined where the rock is not underneath. */
+export function boulderTop(b: Boulder, x: number, z: number): number | undefined {
+  const q = boulderQ(b, x, z);
+  return q >= 1 ? undefined : b.pos.y + domeRise(b, q);
+}
+
+/** What a body found when it was pushed out of the scenery. */
+export interface StaticContact {
+  /** Something pushed the body this step. */
+  hit: boolean;
+  /**
+   * The height the body has to reach to get over the tallest rock it is pressed against, or
+   * -Infinity when there is nothing to climb (open water, or a face too tall to be worth trying).
+   */
+  climbTo: number;
+  /**
+   * The top of the tallest rock that actually blocked, however tall it is. A cliff is not offered
+   * as a climb, but a body with legs that keeps pushing into one gets over it in the end.
+   */
+  wallTop: number;
+}
+
+/**
+ * Push (x,z) out of boulders and off the beach. Returns whether a collision happened.
+ *
+ * Rocks come in three kinds, by how they stand relative to the body:
+ *
+ * - **Shallow enough to glide over.** The rock's surface at this column is within `glide` (see
+ *   `glideOver`), so it does not block at all: the floor under the body carries it up and across.
+ *   Sand-scale bumps, domes and the flanks of anything rounded end up here.
+ * - **Steep, but not a cliff.** The rock's top is within `climb` of the body (see `climbHeight`).
+ *   It blocks the way through — the body never enters the rock — but reports the height to get
+ *   over it in `out.climbTo`, and the caller lifts the body up the face until it is clear. This is
+ *   how a boulder taller than you is still something you go over rather than around.
+ * - **A wall.** Anything standing higher than that above you blocks, and nothing else happens.
+ *
+ * A landmark's raised span (`floor`) is none of these: it is something you swim under.
+ */
+export function resolveStatic(world: WorldData, pos: Vec3, radius: number, scratch: Boulder[], reach = 0, glide = 0, climb = 0, out?: StaticContact): boolean {
   let hit = false;
+  if (out) { out.hit = false; out.climbTo = -Infinity; out.wallTop = -Infinity; }
   // The shore is the one wall in the sea. Push straight back along -z; the coast wanders gently
   // enough that the local normal is close to that. `reach` lets a limbed body push that far past it.
   const s = shoreDistance(pos.x, pos.z), wall = Math.max(radius, SHORE_WALL + radius * 3 - reach);
@@ -666,26 +728,40 @@ export function resolveStatic(world: WorldData, pos: Vec3, radius: number, scrat
   for (const b of world.boulderHash.query(pos.x, pos.z, radius + 8, scratch)) {
     if (pos.y > b.height + radius * 0.5) continue;
     if (b.floor !== undefined && pos.y < b.floor - radius * 0.5) continue;   // pass under a raised span
-    const dx = pos.x - b.pos.x, dz = pos.z - b.pos.z;
-    const d = Math.hypot(dx, dz), min = b.radius + radius;
-    if (d < min) {
-      const nx = d > 1e-3 ? dx / d : 1, nz = d > 1e-3 ? dz / d : 0;
-      pos.x = b.pos.x + nx * min; pos.z = b.pos.z + nz * min; hit = true;
+    const q = boulderQ(b, pos.x, pos.z, radius);
+    if (q >= 1) continue;
+    if (b.floor === undefined) {
+      // Angled and low: let the floor carry the body over rather than stopping it here.
+      if (glide > 0 && b.pos.y + domeRise(b, boulderQ(b, pos.x, pos.z)) <= pos.y + glide) continue;
+      // Too steep to glide: block, and say how high the top is. Within `climb` that is an offer to
+      // go over; higher, it is only what it would take, for a body stubborn enough to want it.
+      if (out) {
+        const top = b.height + radius * 0.6;
+        out.wallTop = Math.max(out.wallTop, top);
+        if (climb > 0 && b.height <= pos.y + climb) out.climbTo = Math.max(out.climbTo, top);
+      }
     }
+    const dx = pos.x - b.pos.x, dz = pos.z - b.pos.z;
+    const c = Math.cos(b.rot), sn = Math.sin(b.rot);
+    // Out along the ray from the centre, to where the padded ellipse crosses it. Dead centre has no
+    // ray, so pick the short axis and leave that way.
+    const k = 1 / Math.max(q, 1e-4);
+    const lx = q < 1e-4 ? boulderAxes(b).ax + radius : (c * dx + sn * dz) * k;
+    const lz = q < 1e-4 ? 0 : (-sn * dx + c * dz) * k;
+    pos.x = b.pos.x + c * lx - sn * lz;
+    pos.z = b.pos.z + sn * lx + c * lz;
+    hit = true;
   }
+  if (out) out.hit = hit;
   return hit;
 }
 
-/** Ground height including boulder tops, for crawlers. */
+/** Ground height including boulder tops. Only where a rock actually is: its drawn ellipse, not a circle around it. */
 export function groundHeight(world: WorldData, x: number, z: number, scratch: Boulder[]): number {
   let h = sampleHeight(x, z);
   for (const b of world.boulderHash.query(x, z, 8, scratch)) {
-    const dx = x - b.pos.x, dz = z - b.pos.z;
-    const d = Math.hypot(dx, dz);
-    if (d < b.radius) {
-      const dome = Math.sqrt(Math.max(0, 1 - (d / b.radius) ** 2));
-      h = Math.max(h, b.pos.y + b.sy * (b.variant === 'blade-spire' ? 4 : b.variant === 'talus-shard' ? .8 : 1) * dome * .95);
-    }
+    const top = boulderTop(b, x, z);
+    if (top !== undefined && top > h) h = top;
   }
   return h;
 }

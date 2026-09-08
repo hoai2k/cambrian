@@ -78,8 +78,11 @@ const run = (g: Game, f: InputFrame, steps: number) => { const m = new Map([[0, 
   check('the ecosystem followed the player', near > 25, `${near} creatures within 200 of a player ${travelled.toFixed(0)} units from home (${alive.length} alive in all)`);
   const giants = alive.filter((a) => a.controller === 'giant' || a.controller === 'shadow');
   check('the giants came too', giants.length === 4 && giants.every((gg) => distXZ(gg.pos, p.pos) < 600), giants.map((gg) => `${gg.creature}@${distXZ(gg.pos, p.pos).toFixed(0)}`).join(' '));
-  const far = alive.filter((a) => (a.controller === 'ambient' || a.controller === 'swarm') && distXZ(a.pos, p.pos) > 320).length;
-  check('wild creatures left far behind were dropped', far === 0, `${far} far wild creatures`);
+  // The cull runs every 1.5 s at 290 (240 for swarms), so a sprinting player is always a little
+  // further from the last thing dropped than the cull distance itself.
+  const wild = alive.filter((a) => a.controller === 'ambient' || a.controller === 'swarm');
+  const furthest = Math.max(0, ...wild.map((a) => distXZ(a.pos, p.pos)));
+  check('wild creatures left far behind were dropped', furthest < 360, `furthest wild creature ${furthest.toFixed(0)} away`);
 }
 
 // --- the shore stops you; nothing climbs the beach ---
@@ -282,9 +285,9 @@ const run = (g: Game, f: InputFrame, steps: number) => { const m = new Map([[0, 
     check('a team-mate who bites the body eats it instead', ate && !isAlive(a), `eaten=${a.eaten.toFixed(2)} state=${a.state}`);
   }
 
-  // versus never opens the window
+  // the versus mode never opens the window
   {
-    const g = new Game('frenzy', [{ creature: 'waptia', device: 'keyboard', ready: true }, { creature: 'marrella', device: 'keyboard2', ready: true }], 7);
+    const g = new Game('hunted', [{ creature: 'waptia', device: 'keyboard', ready: true }, { creature: 'marrella', device: 'keyboard2', ready: true }], 7);
     const [a, b] = g.players;
     a.hp = 0; a.state = 'dead'; a.deathY = a.pos.y; a.spawnProtect = 0;
     b.pos = { x: a.pos.x + 1.5, y: a.pos.y, z: a.pos.z }; b.spawnProtect = 99;

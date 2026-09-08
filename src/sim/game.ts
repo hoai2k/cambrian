@@ -1,17 +1,17 @@
 import { ACTIVE_ERA } from '../content';
 import { RULES } from './era-rules';
 import { BURROWERS, HEAVY_SPECIALS, DEFENSIVE_SPECIALS, CAMOUFLAGE_DRAIN, camouflageMatch, clearPursuit, stopHiding } from './concealment';
-import { abilitySpeed, beginExpansionAbility, stepExpansionAbility, bloomRate, grazeRate } from './expansion-abilities';
+import { abilitySpeed, beginExpansionAbility, beginHeavyStrike, heavyStrikeReach, stepExpansionAbility, stepHeavyStrike, bloomRate, grazeRate } from './expansion-abilities';
 import { add, clamp, damp, dist, distXZ, dot, heading, len3, lerp, makeRng, norm, scale as vscale, sub, TAU, v3, wrapAngle, yawOf, type Rng, type Vec3 } from '../shared/math';
-import { applyScaleStats, bandOf, bodyRadius, canAct, clearanceOf, isAlive, isHidden, isInvulnerable, lengthOf, makeActor, massOf, speedFactor, staminaCost } from './actors';
+import { applyScaleStats, bandOf, bodyRadius, canAct, clearanceOf, climbHeight, climbRise, floorClearance, glideOver, isAlive, isHidden, isInvulnerable, lengthOf, makeActor, massOf, speedFactor, staminaCost } from './actors';
 import { makeBrain, think, type AiWorld } from './ai';
 import { huntingPressure, phaseAt, untilNextPhase, type Phase } from './daynight';
 import { applyHit, kill, startSwallow, type HitContext } from './combat';
 import { creature, CREATURE_IDS, PLAYABLE_IDS, type CreatureId, type MoveDef } from './creatures';
-import { resolveFlora, stepFlora } from './flora';
+import { resolveFlora, stepFlora, type FloraContact } from './flora';
 import { SpatialHash } from './spatial';
-import { emptyInput, TIER_NAMES, TIER_NEED, TIER_SCALE, type Actor, type BrainState, type InputFrame, type Mode, type PlayerSetup, type Prompt, type SiltCloud, type Tier, type WorldEvent } from './types';
-import { BIOME_NAMES, biomeAt, biomeWeights, coverAt, groundHeight, LIGHT_WINDOW_Y, type Landmark, type LandmarkKind, microbialAt, nearestNursery, nurseryAt, nurseryFactor, resolveStatic, sampleCurrent, sampleHeight, shoreDistance, shoreZ, SURFACE_Y, World, type Biome, type Boulder, type Cover, type Flora, type WorldData } from './world';
+import { emptyInput, isCoop, TIER_NAMES, TIER_NEED, TIER_SCALE, type Actor, type BrainState, type InputFrame, type Mode, type PlayerSetup, type Prompt, type SiltCloud, type Tier, type WorldEvent } from './types';
+import { BIOME_NAMES, biomeAt, biomeWeights, coverAt, groundHeight, LIGHT_WINDOW_Y, type Landmark, type LandmarkKind, microbialAt, nearestNursery, nurseryAt, nurseryFactor, resolveStatic, sampleCurrent, sampleHeight, shoreDistance, shoreZ, type StaticContact, SURFACE_Y, World, type Biome, type Boulder, type Cover, type Flora, type WorldData } from './world';
 
 export interface PlayerProgress {
   prompts: Prompt[];
@@ -76,6 +76,12 @@ export interface TeleportOption { dest: TeleportDest; label: string; detail: str
 export interface RadarBlip {
   kind: 'player' | 'threat' | 'giant' | 'home' | 'shore' | 'food' | 'landmark' | 'territory';
   dx: number; dz: number; distance: number;
+  /**
+   * Height of the contact above (positive) or below (negative) the viewer. The dial is read from
+   * overhead, so without this a shoal thirty metres up sits on the same spot as one on the sand and
+   * you swim to the mark and find nothing. Bearings (home, the shore, landmarks) leave it at 0.
+   */
+  dy: number;
   /** Player index for `player` blips, actor id otherwise. */
   id: number;
   /** This contact is currently after the viewer. */
@@ -115,6 +121,18 @@ const PADDLE_SPEED = 0.35;    // fraction of the crawler's cruise while off the 
 const PADDLE_RISE = 2.4;      // climb speed, units/s at scale 1 (a swimmer's rise is 2.6 and faster to reach)
 const PADDLE_SINK = 2.2;      // terminal sink once RB is released — a settle, not a fall
 const PADDLE_STAMINA = 24;    // per second while climbing
+/**
+ * Sprint cost, per second at full trigger. A sprint is meant to be how you cross water and close a
+ * gap, not a two-second window: at this rate a full bar runs for most of a minute, and the swim
+ * back is still paid for out of the same bar.
+ */
+const BURST_STAMINA = 7.5;
+/**
+ * How long a body has to keep pushing into an obstacle before it starts climbing it. Long enough
+ * that brushing a rock on the way past is not a climb, short enough that meaning to go over one
+ * never feels like an argument with the controls.
+ */
+const CLIMB_PUSH = 0.35;
 
 /**
  * Co-op revive. A downed player in Rise lies on the floor for this long instead of dissolving
@@ -148,6 +166,9 @@ export class Game implements AiWorld {
   actors: Actor[] = [];
   private idMap = new Map<number, Actor>();
   hash = new SpatialHash<Actor>(10);
+  /** Scratch for `resolveStatic` / `resolveFlora`: what the last body pushed out of the scenery ran into. */
+  private contact: StaticContact = { hit: false, climbTo: -Infinity, wallTop: -Infinity };
+  private floraContact: FloraContact = { blocked: false, headOn: false, top: -Infinity };
   events: WorldEvent[] = [];
   silt: SiltCloud[] = [];
   time = 0;
@@ -157,6 +178,11 @@ export class Game implements AiWorld {
   players: Actor[] = [];
   progress: PlayerProgress[] = [];
   state: GameState = { status: 'playing', winner: -1, message: '' };
+  /**
+   * Set once a finished co-op match is carried on past its goal (`continueMatch`). The mode's win
+   * check never fires again, so the sea stays open; nothing else about the match is touched.
+   */
+  endless = false;
   /**
    * Hunter & Hunted: whose turn it is to be the giant, which turn this is, and how many each
    * player has caught on their own turn. `hunterIndex` is -1 during the hand-over pause, when
@@ -208,7 +234,7 @@ export class Game implements AiWorld {
       this.players.push(a);
       this.progress.push({ prompts: [], flags: new Set(), deaths: 0, apexT: 0, message: '' });
     });
-    if (mode === 'frenzy' || mode === 'hunted' || mode === 'domination' || mode === 'foodchain') {
+    if (mode === 'hunted') {
       // Fill to 4 with bots
       for (let i = setups.length; i < 4; i++) {
         const c = this.pickBot(setups.map((s) => s.creature), i);
@@ -237,16 +263,11 @@ export class Game implements AiWorld {
    */
   private eraRoleIndex(index: number) { return this.mode === 'hunted' ? (this.isHunter(index) ? 0 : 1) : index; }
 
-  /** A bot's species: anything a player might pick; in Food Chain one from a rung nobody has taken yet. */
+  /** A bot's species: anything a player might pick. */
   private pickBot(taken: CreatureId[], i: number): CreatureId {
     // Bots pick from the same list the player chose from, so a rival is always an animal the
     // player could have been (and always has its own model rather than a borrowed one).
-    const pool = PLAYABLE_IDS.filter((c) => {
-      const def = creature(c);
-      if (this.mode !== 'foodchain' || def.rung === undefined) return true;
-      return !taken.some((t) => creature(t).rung === def.rung) && !this.actors.some((a) => a.controller === 'bot' && creature(a.creature).rung === def.rung);
-    });
-    const from = pool.length ? pool : PLAYABLE_IDS;
+    const from = PLAYABLE_IDS;
     void i;
     return from[Math.floor(this.rng() * from.length)];
   }
@@ -456,7 +477,9 @@ export class Game implements AiWorld {
   private temperament(a: Actor, pos: Vec3): Partial<BrainState> {
     const def = creature(a.creature);
     const grown = a.scale >= TIER_SCALE[2] * 0.8;
-    const settled = !def.diet && grown;
+    // Filter feeders, grazers and deposit feeders have somewhere to be rather than something to
+    // defend. A scavenger sitting on a body very much has something to defend.
+    const settled = (!def.diet || def.diet === 'scavenger') && grown;
     const roll = this.rng();
     // A third of the grown, armed animals hold a patch; a fifth of everything grown is just grumpy.
     if (settled && roll < 0.34) {
@@ -473,6 +496,21 @@ export class Game implements AiWorld {
     for (const s of this.silt) if (dist(s.pos, a.pos) < s.radius) c = Math.max(c, 0.75);
     if (isHidden(a)) c = 1;
     return c;
+  }
+
+  /**
+   * Carry a finished co-op match on instead of ending it. The goal has been met and recorded; this
+   * puts the sea back the way it was and stops the mode asking for it again, so the reef stays
+   * playable as a free swim. Versus modes refuse: their result is a verdict between players.
+   * Returns whether the match resumed.
+   */
+  continueMatch(): boolean {
+    if (this.state.status === 'playing' || !isCoop(this.mode)) return false;
+    this.endless = true;
+    this.state = { status: 'playing', winner: -1, message: '' };
+    for (const pr of this.progress) pr.apexT = 0;
+    RULES?.continueMatch(this);
+    return true;
   }
 
   /** Main fixed step. `inputs` maps player index → InputFrame. */
@@ -504,7 +542,6 @@ export class Game implements AiWorld {
     this.updateDiscovery();
     RULES?.step(this, dt);
     this.updateModes(dt);
-    RULES?.onEvents(this, this.events);
     for (const a of this.actors) if (a.state === 'dead' && a.corpseT > 45 && a.controller !== 'player' && a.controller !== 'bot') this.remove(a);
     for (const a of this.actors) if (a.state === 'dead' && a.eaten >= 1 && a.controller !== 'player' && a.controller !== 'bot') this.remove(a);
   }
@@ -623,7 +660,7 @@ export class Game implements AiWorld {
     // ally spent coming to get you, and the pair of you standing still in the open to do it.
     a.state = 'free'; a.stateT = 0; a.respawnT = 0; a.corpseT = 0; a.eaten = 0; a.sparkled = false; a.reviveT = 0;
     a.hp = a.hpMax * 0.45; a.stamina = a.staminaMax * 0.5; a.poise = a.poiseMax;
-    a.vel = v3(); a.bank = 0; a.pitch = 0; a.hitFlash = 0; a.tumble = v3();
+    a.vel = v3(); a.bank = 0; a.pitch = 0; a.hitFlash = 0; a.tumble = v3(); a.climbTo = -Infinity; a.climbPush = 0;
     a.spawnProtect = RULES?.spawnProtect(a) ?? 2.5; a.hunted = 0; a.hunterId = -1; a.lastHitBy = -1; a.killer = -1;
     a.pos.y = groundHeight(this.world, a.pos.x, a.pos.z, this.scratchBoulders) + clearanceOf(a) + 0.2;
     this.events.push({ kind: 'moult', pos: { ...a.pos }, actor: a.id, player: a.player, strength: 0.7 });
@@ -662,7 +699,7 @@ export class Game implements AiWorld {
     this.world.loadAround(nursery);
     a.pos = this.spawnPoint(nursery, a.creature, a.scale, a.player);
     a.vel = v3(); a.state = 'free'; a.stateT = 0; a.respawnT = 0; a.corpseT = 0; a.eaten = 0; a.eatBites = 0;
-    stopHiding(a); a.camoStrength = 0; a.hideCd = 0; a.emergenceHeavy = false; a.spawnProtect = RULES?.spawnProtect(a) ?? 3.5; a.hitFlash = 0; a.abilityActive = false; a.abilityCd = 0; a.lockTarget = -1; a.hunted = 0; a.hunterId = -1; a.wasHunted = false; a.swallowedBy = -1; a.bank = 0; a.pitch = 0;
+    stopHiding(a); a.camoStrength = 0; a.hideCd = 0; a.emergenceHeavy = false; a.spawnProtect = RULES?.spawnProtect(a) ?? 3.5; a.hitFlash = 0; a.abilityActive = false; a.abilityCd = 0; a.lockTarget = -1; a.hunted = 0; a.hunterId = -1; a.wasHunted = false; a.swallowedBy = -1; a.bank = 0; a.pitch = 0; a.climbTo = -Infinity; a.climbPush = 0;
     a.yaw = Math.PI;
     // hatch-in: grow from a speck over a second (reuses the moult state with a smaller start scale)
     a.hatching = true; a.state = 'moult'; a.stateT = 0; a.stateDur = 1.0;
@@ -677,7 +714,7 @@ export class Game implements AiWorld {
     const giantish = a.controller === 'giant' || a.controller === 'shadow';
     const justLight = input.light && !a.prev.light, justHeavy = input.heavy && !a.prev.heavy, justAbility = input.ability && !a.prev.ability;
     const justDodge = input.dodge && !a.prev.dodge, justGuard = input.guard && !a.prev.guard, justLock = input.lock && !a.prev.lock;
-    const justSense = input.sense && !a.prev.sense, justRise = input.rise && !a.prev.rise;
+    const justSense = input.sense && !a.prev.sense;
     const justDash = input.dash && !a.prev.dash;
     if (input.dash) a.dashHoldT += dt; else { a.dashHoldT = 0; a.dashUsed = false; a.dashQueued = false; }
     a.pounceCd = Math.max(0, a.pounceCd - dt);
@@ -758,7 +795,7 @@ export class Game implements AiWorld {
     const bursting = burstIn > 0.1 && a.stamina > 0 && a.state !== 'guard' && a.exhausted === 0 && !paddling;
     if (def.ability === 'ambushSurge' && input.burst > .1 && !a.prev.burst && a.abilityCd <= 0) { a.burstT = 2.2; a.abilityCd = 10; }
     const freeBurst = a.burstT > 0;
-    if (bursting && !freeBurst) a.stamina -= 22 * burstIn * dt;
+    if (bursting && !freeBurst) a.stamina -= BURST_STAMINA * burstIn * dt;
     else if (a.state === 'guard') a.stamina -= 3 * dt;
     else if (a.hideMode !== 'camouflage') a.stamina = Math.min(a.staminaMax, a.stamina + (speed < 0.4 ? 24 : 14) * dt * (a.state === 'free' ? 1 : 0.5));
     if (a.stamina <= 0) { a.stamina = 0; if (a.exhausted === 0) a.exhausted = 1.6; }
@@ -862,11 +899,18 @@ export class Game implements AiWorld {
     // down at a gentle terminal speed rather than dropping it like a stone.
     if (def.ground) {
       const canPaddle = a.hideMode === 'none' && controllable;
-      if (canPaddle && justRise && a.grounded && a.stamina > 8) { a.hopVel = 5.5 * Math.sqrt(sf); a.grounded = false; a.stamina -= 8; a.iframes = Math.max(a.iframes, 0.12); }
-      const holdingRise = canPaddle && input.rise && a.stamina > 0;
+      // A climb rides the same channel as the paddle, so going up a rock is one steady rise rather
+      // than a fight between the lift and the settle.
+      const climbing = a.climbTo > a.pos.y;
+      const paddleUp = canPaddle && input.rise && a.stamina > 0;
+      const holdingRise = paddleUp || climbing;
+      // Lifting off is a swim, not a jump. Holding RB eases the body up off the floor and it keeps
+      // accelerating to a paddle's pace — the same gradual rise a swimmer gets from the same button
+      // — rather than kicking it into a ballistic arc it has no control over.
+      if (holdingRise && a.grounded) { a.grounded = false; a.hopVel = Math.max(a.hopVel, 0); }
       if (holdingRise && !a.grounded) {
-        a.hopVel = damp(a.hopVel, PADDLE_RISE * Math.sqrt(sf), 5, dt);
-        a.stamina -= PADDLE_STAMINA * dt;
+        a.hopVel = damp(a.hopVel, Math.max(climbing ? climbRise(a) : 0, PADDLE_RISE * Math.sqrt(sf)), 5, dt);
+        if (paddleUp) a.stamina -= PADDLE_STAMINA * dt;
       } else if (!a.grounded) {
         const sink = -PADDLE_SINK * Math.sqrt(sf) * (input.sink ? 2.4 : 1);
         a.hopVel = Math.max(a.hopVel - 16 * dt, sink);
@@ -874,14 +918,33 @@ export class Game implements AiWorld {
       if (!a.grounded) { a.pos.y += a.hopVel * dt; }
     }
 
-    // Static collision
-    const hitWall = resolveStatic(this.world, a.pos, bodyRadius(a), this.scratchBoulders, RULES?.shoreReach(a) ?? 0);
+    // Static collision. A rock you could get over is not a wall: gentle ones are glided across, and
+    // a face too steep for that is climbed — held out of the rock and lifted up its side until the
+    // top is clear, at the pace the body would swim up. Only what stands more than two bodies above
+    // you stops you.
+    const contact = this.contact, floraHit = this.floraContact;
+    const hitWall = resolveStatic(this.world, a.pos, bodyRadius(a), this.scratchBoulders, RULES?.shoreReach(a) ?? 0, glideOver(a), climbHeight(a), contact);
     if (hitWall && !def.ground) { a.vel.x *= 0.6; a.vel.z *= 0.6; }
     // Plants: swarm snacks are numerous and tiny, so they take turns on alternate steps.
+    floraHit.blocked = false; floraHit.headOn = false; floraHit.top = -Infinity;
     if (!isHidden(a) && a.state !== 'grabbed') {
-      resolveFlora(this.world, a, dt, this.scratchFlora);
+      resolveFlora(this.world, a, dt, this.scratchFlora, floraHit);
     }
-    const floor = groundHeight(this.world, a.pos.x, a.pos.z, this.scratchBoulders) + clearanceOf(a);
+    // What is worth climbing, and what has to be asked for. A rock inside two bodies is taken on
+    // sight. Everything else waits for the body to lean on it: a crawler has legs and gets over
+    // whatever it keeps pushing into, however tall, and a plant is a thin thing to go round unless
+    // the body is aimed straight at the middle of it.
+    const leaning = controllable && mag > 0.35 && (contact.hit || floraHit.blocked);
+    a.climbPush = leaning ? Math.min(1, a.climbPush + dt) : Math.max(0, a.climbPush - dt * 2);
+    let offer = contact.climbTo;
+    if (a.climbPush > CLIMB_PUSH) {
+      if (def.ground) offer = Math.max(offer, contact.wallTop);
+      if (floraHit.headOn) offer = Math.max(offer, floraHit.top);
+    }
+    if (offer > a.pos.y) a.climbTo = Math.max(a.climbTo, offer);
+    if (a.climbTo <= a.pos.y || a.climbPush === 0 || !controllable || a.hitStop > 0 || a.state === 'grabbed' || isHidden(a)) a.climbTo = -Infinity;
+    else if (!def.ground) a.vel.y = Math.max(a.vel.y, climbRise(a));
+    const floor = groundHeight(this.world, a.pos.x, a.pos.z, this.scratchBoulders) + floorClearance(a);
     if (def.ground) {
       if (a.grounded || a.pos.y <= floor) { a.pos.y = a.grounded ? damp(a.pos.y, floor, 18, dt) : floor; if (!a.grounded && a.hopVel < 0) { a.grounded = true; a.hopVel = 0; } }
       if (a.pos.y < floor) a.pos.y = floor;
@@ -889,6 +952,8 @@ export class Game implements AiWorld {
       const ceiling = SURFACE_Y - 0.8 - clearanceOf(a);
       if (a.pos.y > ceiling) { a.pos.y = ceiling; if (a.vel.y > 0) a.vel.y = 0; if (a.hopVel > 0) a.hopVel = 0; }
     } else {
+      // Riding the floor: a swimmer skims the sand and is carried up and over rocks rather than
+      // stopped by them, so the climb reads as a swim rather than a step.
       if (a.pos.y < floor) { a.pos.y = floor; if (a.vel.y < 0) a.vel.y *= -0.2; }
       const ceiling = SURFACE_Y - 0.8 - clearanceOf(a);
       if (a.airborne) {
@@ -962,7 +1027,9 @@ export class Game implements AiWorld {
       else if (justDash && mag <= 0.3 && !input.worldMove) { a.dashQueued = true; }
       else if ((justDash || a.dashQueued) && mag > 0.3 && a.stamina >= 10 && a.exhausted === 0 && a.dashCd === 0 && !a.dashUsed && !paddling) { a.dashUsed = true; a.dashQueued = false; this.startDash(a, def, dir, L, sf); }
       // Pounce (RT): at the aimed target when in range, else at whatever prey is in front, else a forward lunge
-      else if (justHeavy && !HEAVY_SPECIALS.has(def.ability) && a.controller === 'player' && a.pounceCd === 0 && a.stamina >= 12 && a.exhausted === 0) {
+      // Creatures whose special sits on RT reach this too, but only once the special has been ruled
+      // out just above (cooling down, or too little stamina): RT is never a dead button.
+      else if (justHeavy && a.controller === 'player' && a.pounceCd === 0 && a.stamina >= 12 && a.exhausted === 0) {
         const t = a.aiming && locked && isAlive(locked) ? (a.aimInRange ? locked : undefined) : this.pounceTargetAhead(a);
         if (t) this.startPounce(a, t, L, sf);
         else { const m = { ...def.heavy, lunge: def.heavy.lunge + 1.0 }; a.state = 'attack'; a.stateT = 0; a.move = m; a.moveKind = 'heavy'; a.hitDone.clear(); a.stamina -= staminaCost(a, m.stamina); a.combo = 0; a.pounceCd = 0.8; this.flag(a, 'heavy'); }
@@ -975,6 +1042,8 @@ export class Game implements AiWorld {
       else if (input.guard && def.canGuard && a.state === 'free' && a.stamina > 0 && a.stateT > 0.05) { a.state = 'guard'; a.stateT = 0; }
       else if (!input.guard && a.state === 'guard') { if (def.ability === 'shellUp' && a.guardHeld > .6) this.blockPulse(a, def); a.state = 'free'; a.stateT = 0; a.abilityActive = false; }
       // Attacks (also start eating on corpses)
+      // Bots keep the old split: RT is their special and nothing else, so their behaviour (and every
+      // seeded replay that depends on it) is unchanged by the player-side fallback above.
       else if (justLight || (justHeavy && a.controller !== 'player' && !HEAVY_SPECIALS.has(def.ability))) {
         const corpse = justLight ? this.corpseInReach(a) : undefined;
         if (corpse) this.startEating(a, corpse);
@@ -1112,9 +1181,9 @@ export class Game implements AiWorld {
       this.feedOnBones(a, L, dt);
     }
 
-    // Aim range: the crosshair fills when a pounce would connect
+    // Aim range: the crosshair fills when whatever RT does for this creature would connect
     a.aimInRange = false;
-    if (a.lockTarget >= 0) { const t = this.idMap.get(a.lockTarget); if (t && isAlive(t)) a.aimInRange = dist(a.pos, t.pos) < this.pounceRange(a); }
+    if (a.lockTarget >= 0) { const t = this.idMap.get(a.lockTarget); if (t && isAlive(t)) a.aimInRange = dist(a.pos, t.pos) < this.heavyMove(a).reach; }
     // Lock target validity
     if (a.lockTarget >= 0) {
       const t = this.idMap.get(a.lockTarget);
@@ -1150,6 +1219,34 @@ export class Game implements AiWorld {
   }
 
   pounceRange(a: Actor) { return lengthOf(a) * 3.6 + 3; }
+
+  /**
+   * What the heavy button (RT) actually does for this creature right now: its name for the prompt,
+   * how far it reaches, and whether pressing it would do anything at all.
+   *
+   * The HUD used to announce "RT · POUNCE" over any aimed target inside the pounce's reach, for
+   * every creature. That is only true of a creature with no special. A creature with a heavy
+   * special gets the special instead, on its own cooldown and its own much shorter reach, and the
+   * three filter-feeding specials never strike a target at all — so the prompt lit for a button
+   * that would either do nothing or swing at water a body length short. `ready` mirrors the gates
+   * in the action cascade above exactly, `reach` is the move's own reach, and `name` is the move's
+   * own name, the way the choice screen already lists it.
+   */
+  heavyMove(a: Actor): { name: string; reach: number; ready: boolean } {
+    const def = creature(a.creature);
+    // A burrowed ambusher's emergence strike takes the button ahead of everything else.
+    if (a.emergenceHeavy) return { name: 'AMBUSH', reach: this.pounceRange(a), ready: true };
+    const pounce = { name: 'POUNCE', reach: this.pounceRange(a), ready: a.pounceCd === 0 && a.stamina >= 12 && a.exhausted === 0 };
+    if (HEAVY_SPECIALS.has(def.ability)) {
+      if (a.abilityCd <= 0 && a.stamina >= 18) return { name: def.abilityName.toUpperCase(), reach: heavyStrikeReach(a, def), ready: true };
+      // The special is down. A player's press falls through to the pounce rather than being
+      // swallowed, so the prompt follows the button instead of greying out on a move it will not
+      // play. Bots have no fallback, so for them the special is still the whole answer.
+      if (a.controller === 'player') return pounce;
+      return { name: def.abilityName.toUpperCase(), reach: heavyStrikeReach(a, def), ready: false };
+    }
+    return pounce;
+  }
 
   /** Nearest thing in front worth pouncing on when RT is pressed without aiming. */
   private pounceTargetAhead(a: Actor): Actor | undefined {
@@ -1227,8 +1324,9 @@ export class Game implements AiWorld {
     a.abilityCd = Math.max(2, (def.abilityDuration ?? .55) + .6);
     a.abilityT = 0; a.abilityActive = true; a.state = 'ability'; a.stateT = 0;
     a.stateDur = def.abilityDuration ?? .55; a.hitDone.clear();
+    beginHeavyStrike(this.expansionContext(), a, def);
     beginExpansionAbility(this.expansionContext(), a, def);
-    RULES?.beginAbility(this, a, this.expansionContext());
+    RULES?.beginAbility?.(this, a, this.expansionContext());
     this.events.push({kind:'ability',pos:{...a.pos},actor:a.id,player:a.player,strength:lengthOf(a)});
     this.flag(a, 'heavy');
   }
@@ -1236,6 +1334,7 @@ export class Game implements AiWorld {
   private updateAbility(a: Actor, def: ReturnType<typeof creature>, dt: number, input: InputFrame, L: number, sf: number) {
     a.abilityT += dt;
     const done = a.stateT >= a.stateDur;
+    stepHeavyStrike(this.expansionContext(), a, def);
     stepExpansionAbility(this.expansionContext(), a, def, dt);
     RULES?.stepAbility(this, a, this.expansionContext(), dt);
     if (a.state !== 'ability') return;
@@ -1348,7 +1447,6 @@ export class Game implements AiWorld {
     a.nutrition += amount;
     // co-op share
     if (this.mode === 'rise' && food && amount > 2) for (const p of this.players) if (p !== a && isAlive(p) && dist(p.pos, a.pos) < 25) p.nutrition += amount * 0.3;
-    if (this.mode === 'frenzy' && food && (food.controller === 'player' || food.controller === 'bot')) a.nutrition += 12;
     RULES?.onNutrition(this, a, amount, food);
     if (RULES && !RULES.growthByNutrition) return;
     this.checkTierUp(a);
@@ -1585,10 +1683,10 @@ export class Game implements AiWorld {
         };
       }
       case 'rise': {
+        if (this.endless) return { title: 'Rise', detail: 'The reef is yours. Swim on.' };
         const held = Math.max(0, ...this.progress.map((p) => p.apexT));
         return { title: 'Rise', detail: held > 0 ? `Apex held ${Math.floor(held)} s of 90` : 'Reach Apex and hold it for ninety seconds' };
       }
-      case 'frenzy': return { title: 'Feeding Frenzy', detail: 'First to Apex wins', clock: Math.max(0, 12 * 60 - this.time) };
       case 'reef': return { title: 'Reef', detail: 'No goal. Just the sea.' };
       default: return { title: ACTIVE_ERA.modes.find((m) => m.id === this.mode)?.name ?? this.mode, detail: '' };
     }
@@ -1626,7 +1724,7 @@ export class Game implements AiWorld {
     const g = groundHeight(this.world, pos.x, pos.z, this.scratchBoulders);
     pos.y = clamp(pos.y, g + clearanceOf(a) + 0.2, SURFACE_Y - 1 - clearanceOf(a));
     this.events.push({ kind: 'teleport', pos: { ...a.pos }, actor: a.id, player: i, strength: 0 });
-    stopHiding(a); a.camoStrength = 0; a.emergenceHeavy = false; a.pos = pos; a.vel = v3(); a.yaw = yaw; a.pitch = 0; a.bank = 0;
+    stopHiding(a); a.camoStrength = 0; a.emergenceHeavy = false; a.pos = pos; a.vel = v3(); a.yaw = yaw; a.pitch = 0; a.bank = 0; a.climbTo = -Infinity; a.climbPush = 0;
     a.lockTarget = -1; a.hunted = 0; a.hunterId = -1; a.wasHunted = false; a.aiming = false;
     a.spawnProtect = Math.max(a.spawnProtect, 2.5); a.teleportCd = 20; a.hitFlash = 0;
     this.events.push({ kind: 'teleport', pos: { ...pos }, actor: a.id, player: i, strength: 1 });
@@ -1650,7 +1748,7 @@ export class Game implements AiWorld {
     const out: RadarBlip[] = [];
     // Only the other players carry off the edge of the dial: they are who you are trying to find.
     // Everything alive is a contact or nothing — a creature outside the reach is simply not there.
-    this.players.forEach((o, j) => { if (j !== i) out.push({ kind: 'player', dx: o.pos.x - p.pos.x, dz: o.pos.z - p.pos.z, distance: distXZ(o.pos, p.pos), id: j, hunting: false }); });
+    this.players.forEach((o, j) => { if (j !== i) out.push({ kind: 'player', dx: o.pos.x - p.pos.x, dy: o.pos.y - p.pos.y, dz: o.pos.z - p.pos.z, distance: distXZ(o.pos, p.pos), id: j, hunting: false }); });
     // Anything on your tail is always shown; of the rest, only the closest one that could eat you.
     let nearest: RadarBlip | undefined;
     for (const a of this.actors) {
@@ -1661,7 +1759,7 @@ export class Game implements AiWorld {
       const band = bandOf(p, a);
       const dangerous = band === 'threat' || band === 'giant';
       if (!dangerous && !hunting) continue;
-      const blip: RadarBlip = { kind: band === 'giant' ? 'giant' : 'threat', dx: a.pos.x - p.pos.x, dz: a.pos.z - p.pos.z, distance: d, id: a.id, hunting };
+      const blip: RadarBlip = { kind: band === 'giant' ? 'giant' : 'threat', dx: a.pos.x - p.pos.x, dy: a.pos.y - p.pos.y, dz: a.pos.z - p.pos.z, distance: d, id: a.id, hunting };
       if (hunting) out.push(blip);
       else if (!nearest || d < nearest.distance) nearest = blip;
     }
@@ -1671,7 +1769,7 @@ export class Game implements AiWorld {
     // nursery they are the only fixed points in it. Only within reach — a bearing, not a map.
     for (const m of this.world.landmarks) {
       const d = distXZ(m.pos, p.pos);
-      if (d < range * 1.4) out.push({ kind: 'landmark', dx: m.pos.x - p.pos.x, dz: m.pos.z - p.pos.z, distance: d, id: m.id, hunting: false });
+      if (d < range * 1.4) out.push({ kind: 'landmark', dx: m.pos.x - p.pos.x, dy: 0, dz: m.pos.z - p.pos.z, distance: d, id: m.id, hunting: false });
     }
     // Held ground, as an area rather than a contact. Only patches big enough to matter to this
     // player and close enough to walk into: the point is to let them decide before they are in it.
@@ -1681,11 +1779,11 @@ export class Game implements AiWorld {
       if (lengthOf(o) < lengthOf(p) * 0.55) continue;                    // nothing you could not simply eat
       const d = distXZ(b.territory, p.pos);
       if (d > range * 1.6 + b.territoryR) continue;
-      out.push({ kind: 'territory', dx: b.territory.x - p.pos.x, dz: b.territory.z - p.pos.z, distance: d, id: o.id, hunting: false, radius: b.territoryR });
+      out.push({ kind: 'territory', dx: b.territory.x - p.pos.x, dy: 0, dz: b.territory.z - p.pos.z, distance: d, id: o.id, hunting: false, radius: b.territoryR });
     }
-    out.push({ kind: 'home', dx: p.home.x - p.pos.x, dz: p.home.z - p.pos.z, distance: distXZ(p.home, p.pos), id: -1, hunting: false });
+    out.push({ kind: 'home', dx: p.home.x - p.pos.x, dy: 0, dz: p.home.z - p.pos.z, distance: distXZ(p.home, p.pos), id: -1, hunting: false });
     const sz = shoreZ(p.pos.x);
-    out.push({ kind: 'shore', dx: 0, dz: sz - p.pos.z, distance: Math.abs(sz - p.pos.z), id: -1, hunting: false });
+    out.push({ kind: 'shore', dx: 0, dy: 0, dz: sz - p.pos.z, distance: Math.abs(sz - p.pos.z), id: -1, hunting: false });
     return out;
   }
 
@@ -1712,28 +1810,31 @@ export class Game implements AiWorld {
    */
   private foodClusters(p: Actor, range: number, max = 1): RadarBlip[] {
     const CELL = 14;
-    const cells = new Map<string, { dx: number; dz: number; n: number; food: number; r: number }>();
+    const cells = new Map<string, { dx: number; dy: number; dz: number; n: number; food: number; r: number }>();
     for (const a of this.nearby(p.pos, range)) {
       if (a.id === p.id || !isAlive(a) || isHidden(a)) continue;
       if (a.controller === 'player' || a.controller === 'bot') continue;
       const band = bandOf(p, a);
       if (band !== 'snack' && band !== 'prey') continue;
-      const dx = a.pos.x - p.pos.x, dz = a.pos.z - p.pos.z;
-      if (Math.hypot(dx, dz) > range) continue;
+      const dx = a.pos.x - p.pos.x, dy = a.pos.y - p.pos.y, dz = a.pos.z - p.pos.z;
+      // Reach is a sphere, not a column: a shoal a long way overhead is not food within reach of a
+      // body on the floor, and showing it as a mark on the sand is how you send someone nowhere.
+      if (Math.hypot(dx, dy, dz) > range) continue;
       const key = `${Math.floor(a.pos.x / CELL)},${Math.floor(a.pos.z / CELL)}`;
-      const c = cells.get(key) ?? { dx: 0, dz: 0, n: 0, food: 0, r: 0 };
-      c.dx += dx; c.dz += dz; c.n++; c.food += this.nutritionValue(p, a);
+      const c = cells.get(key) ?? { dx: 0, dy: 0, dz: 0, n: 0, food: 0, r: 0 };
+      c.dx += dx; c.dy += dy; c.dz += dz; c.n++; c.food += this.nutritionValue(p, a);
       cells.set(key, c);
     }
     const out: RadarBlip[] = [];
     for (const c of cells.values()) {
-      c.dx /= c.n; c.dz /= c.n;
+      c.dx /= c.n; c.dy /= c.n; c.dz /= c.n;
       // One lone snack is not a meal worth steering for; one prey-sized body is.
       if (c.n < 2 && c.food < 6) continue;
       c.r = Math.min(CELL, 3 + Math.sqrt(c.n) * 2.2);
-      out.push({ kind: 'food', dx: c.dx, dz: c.dz, distance: Math.hypot(c.dx, c.dz), id: -1, hunting: false, radius: c.r, strength: c.food });
+      out.push({ kind: 'food', dx: c.dx, dy: c.dy, dz: c.dz, distance: Math.hypot(c.dx, c.dz), id: -1, hunting: false, radius: c.r, strength: c.food });
     }
-    return out.sort((a, b) => a.distance - b.distance).slice(0, max);
+    // Nearest by the swim it actually takes to get there, which includes the climb or the dive.
+    return out.sort((a, b) => Math.hypot(a.distance, a.dy) - Math.hypot(b.distance, b.dy)).slice(0, max);
   }
 
   /**
@@ -1754,19 +1855,9 @@ export class Game implements AiWorld {
       case 'rise': {
         this.players.forEach((p, i) => {
           const pr = this.progress[i];
-          if (p.tier >= 4 && isAlive(p)) { pr.apexT += dt; if (pr.apexT > 90 && this.state.status === 'playing') { this.state = { status: 'won', winner: i, message: `${creature(p.creature).name} rules the reef.` }; } }
+          if (p.tier >= 4 && isAlive(p)) { pr.apexT += dt; if (pr.apexT > 90 && this.state.status === 'playing' && !this.endless) { this.state = { status: 'won', winner: i, message: `${creature(p.creature).name} rules the reef.` }; } }
           else pr.apexT = 0;
         });
-        break;
-      }
-      case 'frenzy': {
-        const contenders = this.actors.filter((a) => a.controller === 'player' || a.controller === 'bot');
-        const apex = contenders.find((a) => a.tier >= 4 && isAlive(a));
-        if (apex) this.state = { status: 'won', winner: apex.player, message: apex.player >= 0 ? `Player ${apex.player + 1} hits Apex first.` : `A rival ${creature(apex.creature).name} hits Apex first.` };
-        else if (this.time > 12 * 60) {
-          const best = [...contenders].sort((a, b) => (b.tier + b.nutrition / TIER_NEED[b.tier]) - (a.tier + a.nutrition / TIER_NEED[a.tier]))[0];
-          this.state = { status: best.player >= 0 ? 'won' : 'lost', winner: best.player, message: best.player >= 0 ? `Player ${best.player + 1} is the biggest thing in the sea.` : `A rival ${creature(best.creature).name} outgrew everyone.` };
-        }
         break;
       }
       case 'hunted': {
@@ -1895,7 +1986,13 @@ export class Game implements AiWorld {
     pr.flags.add(f);
   }
 
-  /** Onboarding: returns the current hint for a player, if any. */
+  /**
+   * Onboarding: returns the current hint for a player, if any.
+   *
+   * Hints name actions, not buttons: `{heavy}`, `{dash}`, `{sense}`. The simulation has no idea
+   * what anyone is holding and must not — the HUD fills them in for that player's own device
+   * (`fillControls` in `src/shared/controls.ts`).
+   */
   hintFor(i: number): string | undefined {
     const p = this.players[i]; const pr = this.progress[i];
     if (!p || !pr || this.mode === 'reef') return undefined;
@@ -1904,17 +2001,17 @@ export class Game implements AiWorld {
     if (!isAlive(p)) return undefined;
     if (p.hunted >= 0.5) return p.cover > 0.3 ? (len3(p.vel) < 0.3 ? 'Hold still. It is losing you.' : 'You are in cover. Now hold still.') : 'It is coming for you. Get under the sponges, then hold still.';
     if (p.hunted > 0.2) return p.cover > 0.3 ? 'It is looking your way. Stay in cover and freeze.' : 'Something big is looking your way. Stop moving or slip into cover.';
-    if (!f.has('moved')) return 'Push the left stick to swim.';
-    if (!f.has('burst')) return 'Hold A to sprint. Catch the school.';
+    if (!f.has('moved')) return '{swim} to swim.';
+    if (!f.has('burst')) return 'Hold {sprint} to sprint. Catch the school.';
     if (!f.has('ate')) return 'Swim through the small fry to eat them.';
-    if (!f.has('sense') && this.time > 20) return 'Tap D-pad up: sense pulse shows what is near.';
+    if (!f.has('sense') && this.time > 20) return 'Tap {sense}: the sense pulse shows what is near.';
     if (p.tier === 0 && !f.has('tier')) return 'Eat. Grow. The ring fills toward your next moult.';
-    if (p.tier >= 1 && !f.has('light')) return 'X bites. RT pounces. Hunt something your own size.';
-    if (p.tier >= 1 && !f.has('dodge')) return 'LB with a stick direction dashes clear of a bite. A sprints.';
-    if (p.tier >= 1 && !f.has('guard') && creature(p.creature).canGuard) return 'Hold B to guard. Tap it as a hit lands to parry.';
-    if (!f.has('ability')) return `Y: hide. Burrowers bury for free; camouflage copies nearby colours and uses stamina.`;
-    if (!f.has('lock') && this.time > 30) return 'Hold LT to aim at prey. When the crosshair fills, RT pounces.';
-    if (!f.has('teleport') && this.time > 60 && (this.players.length > 1 || distXZ(p.pos, p.home) > 150)) return 'D-pad down: teleport home, or to another player.';
+    if (p.tier >= 1 && !f.has('light')) return '{light} bites. {heavy} pounces. Hunt something your own size.';
+    if (p.tier >= 1 && !f.has('dodge')) return '{dash} while you are moving dashes clear of a bite. {sprint} sprints.';
+    if (p.tier >= 1 && !f.has('guard') && creature(p.creature).canGuard) return 'Hold {guard} to guard. Tap it as a hit lands to parry.';
+    if (!f.has('ability')) return '{ability}: hide. Burrowers bury for free; camouflage copies nearby colours and uses stamina.';
+    if (!f.has('lock') && this.time > 30) return 'Hold {aim} to aim at prey. When the crosshair fills, {heavy} pounces.';
+    if (!f.has('teleport') && this.time > 60 && (this.players.length > 1 || distXZ(p.pos, p.home) > 150)) return '{teleport}: teleport home, or to another player.';
     return undefined;
   }
 }

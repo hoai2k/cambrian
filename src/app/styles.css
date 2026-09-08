@@ -96,8 +96,9 @@ h3 { font-size: 13px; letter-spacing: .12em; color: var(--ember); margin: 14px 0
 .stat b { width: 14px; height: 6px; border-radius: 3px; background: rgba(238,250,246,.12); }
 .stat b.on { background: var(--player); box-shadow: 0 0 8px color-mix(in oklch, var(--player), transparent 40%); }
 .kit { margin: 0; display: grid; gap: 4px; font-size: 12.5px; color: var(--mist); }
-.kit div { display: grid; grid-template-columns: 22px 1fr; gap: 8px; align-items: start; }
-.kit dt { font: 700 11px var(--font-display); color: var(--ink); background: var(--foam); border-radius: 6px; text-align: center; line-height: 18px; }
+/* The button column sizes to its label: a pad says "RT", a mouse says "LMB". */
+.kit div { display: grid; grid-template-columns: minmax(22px, max-content) 1fr; gap: 8px; align-items: start; }
+.kit dt { font: 700 11px var(--font-display); color: var(--ink); background: var(--foam); border-radius: 6px; text-align: center; line-height: 18px; padding: 0 4px; }
 .kit dd { margin: 0; }
 .kit b { color: var(--foam); }
 .ready-button { padding: 12px; border-radius: 12px; border: 1px solid var(--player); background: transparent; font: 700 13px var(--font-display); letter-spacing: .14em; color: var(--player); display: inline-flex; gap: 8px; justify-content: center; align-items: center; transition: all .15s; }
@@ -147,7 +148,7 @@ h3 { font-size: 13px; letter-spacing: .12em; color: var(--ember); margin: 14px 0
 .lock-panel .bar { width: 100%; height: .4em; }
 .hud-bottom { position: absolute; left: 1.4em; bottom: 1.4em; display: flex; gap: .6em; align-items: flex-end; }
 .chip { position: relative; display: flex; align-items: center; gap: .5em; padding: .45em .8em .45em .5em; border-radius: .9em; background: rgba(6,22,28,.6); border: 1px solid rgba(238,250,246,.14); overflow: hidden; }
-.chip .btn { width: 1.6em; height: 1.6em; border-radius: 50%; display: grid; place-items: center; font: 700 .8em var(--font-display); color: var(--ink); background: var(--foam); }
+.chip .btn { min-width: 1.6em; height: 1.6em; padding: 0 .35em; border-radius: .8em; display: grid; place-items: center; font: 700 .8em var(--font-display); color: var(--ink); background: var(--foam); }
 .chip .btn.y { background: #f2c94c; }
 .chip .btn.dpad { background: #9be9ff; font-size: .7em; }
 .chip-label { font-weight: 700; font-size: .9em; letter-spacing: .04em; }
@@ -305,6 +306,9 @@ h3 { font-size: 13px; letter-spacing: .12em; color: var(--ember); margin: 14px 0
 .xbox-diagram { width: 100%; max-height: 40vh; margin: 12px 0; }
 .pad-label { fill: var(--foam); font: 600 15px var(--font-body); }
 .pad-line { stroke: rgba(238,250,246,.35); stroke-width: 1.5; }
+.kbm-diagram .key-cap { fill: var(--foam); font: 700 15px var(--font-body); }
+.kbm-diagram .key-name { fill: var(--ember); font-weight: 700; }
+.kbm-diagram .dim-label { fill: var(--dim); font-size: 13px; }
 .help-columns { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
 .help-columns p { font-size: 13.5px; }
 .settings .setting-row { display: grid; grid-template-columns: 1fr auto; align-items: center; gap: 16px; padding: 12px 0; border-bottom: 1px solid rgba(238,250,246,.08); }
@@ -388,13 +392,16 @@ input[type='checkbox'] { width: 20px; height: 20px; accent-color: var(--ember); 
 .mini-progress span { position: relative; text-align: center; font-weight: 700; letter-spacing: .04em; }
 
 /* ---------- Threat panel ---------- */
-.threat { position: absolute; top: 5.2em; left: 50%; transform: translateX(-50%); display: flex; gap: .8em; align-items: center; padding: .6em 1em; border-radius: 1em; background: rgba(6,22,28,.72); border: 1px solid rgba(255,138,61,.7); color: var(--foam); max-width: 90%; animation: rise-in .3s both; }
-.threat.hunting { border-color: var(--coral); box-shadow: 0 0 24px rgba(255,75,92,.45); animation: rise-in .3s both, heartbeat .9s ease-in-out infinite; }
-.threat b { display: block; font: 700 .85em var(--font-display); letter-spacing: .12em; }
-.threat span:last-child { display: block; font-size: .9em; color: var(--mist); }
-.threat .eye { position: relative; width: 2.6em; height: 1.4em; border-radius: 50% / 50%; border: 2px solid currentColor; overflow: hidden; flex: none; color: var(--ember); }
-.threat.hunting .eye { color: var(--coral); }
-.threat .eye i { position: absolute; inset: 0; background: currentColor; transform-origin: left; transition: transform .2s; opacity: .85; }
+/* The hunter warning. Named `threat-alert`, not `threat`: the help page's size bands are
+   `.band.threat` and friends, and a bare `.threat` rule here absolutely-positioned the word
+   "Orange" out of its sentence and dropped it on top of the paragraph above. */
+.threat-alert { position: absolute; top: 5.2em; left: 50%; transform: translateX(-50%); display: flex; gap: .8em; align-items: center; padding: .6em 1em; border-radius: 1em; background: rgba(6,22,28,.72); border: 1px solid rgba(255,138,61,.7); color: var(--foam); max-width: 90%; animation: rise-in .3s both; }
+.threat-alert.hunting { border-color: var(--coral); box-shadow: 0 0 24px rgba(255,75,92,.45); animation: rise-in .3s both, heartbeat .9s ease-in-out infinite; }
+.threat-alert b { display: block; font: 700 .85em var(--font-display); letter-spacing: .12em; }
+.threat-alert span:last-child { display: block; font-size: .9em; color: var(--mist); }
+.threat-alert .eye { position: relative; width: 2.6em; height: 1.4em; border-radius: 50% / 50%; border: 2px solid currentColor; overflow: hidden; flex: none; color: var(--ember); }
+.threat-alert.hunting .eye { color: var(--coral); }
+.threat-alert .eye i { position: absolute; inset: 0; background: currentColor; transform-origin: left; transition: transform .2s; opacity: .85; }
 
 .start-button.focused { animation: focus-pulse 1.4s ease-in-out infinite; outline: 2px solid rgba(255,255,255,.65); outline-offset: 3px; }
 @keyframes focus-pulse { 0%, 100% { box-shadow: 0 10px 40px rgba(255, 91, 110, .4); transform: none; } 50% { box-shadow: 0 10px 56px rgba(255, 179, 107, .75); transform: translateY(-2px) scale(1.03); } }

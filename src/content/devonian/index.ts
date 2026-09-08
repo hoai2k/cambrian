@@ -34,27 +34,32 @@ const modelBytes = Object.fromEntries(DEVONIAN_CREATURES.map((c) => [c.id, SHIPP
 
 /** Camouflage's fallback colours per creature: its default scheme's slots. */
 const authoredCreatures = Object.fromEntries(DEVONIAN_CREATURES.map((c) => {
-  const scheme = SCHEMES.find((s) => s.id === CREATURE_SCHEMES[c.id]) ?? SCHEMES.find((s) => s.colors);
+  // No scheme in play means the authored colours, so camouflage falls back to the creature's own.
+  const scheme = SCHEMES.find((s) => s.id === CREATURE_SCHEMES[c.id]);
   return [c.id, scheme?.colors ?? ({ body: c.color, eyes: '#101010', fins: c.accent, legs: c.color, accent: c.accent, underside: c.color } as Record<Slot, string>)];
 }));
 
 export const DEVONIAN = defineEra({
   id: 'devonian',
   title: 'Devonian Domination',
-  copy: { tagline: 'Feed. Escape. Hold your range.', taglineEm: '375 million years ago, the sea had a pecking order.', loading: 'FILLING THE BASIN…', lose: 'THE SEA WINS', settingsKey: 'devonian-settings', mobileIllustration: DEVONIAN_BRAND_EXTRAS.mobileIllustration, sibling: { title: 'Cambrian Explosion', path: '', blurb: '133 million years earlier' } },
+  copy: { tagline: 'Feed. Grow. Fight. Escape.', taglineEm: '375 million years ago, the sea had a pecking order.', loading: 'FILLING THE BASIN…', lose: 'THE SEA WINS', settingsKey: 'devonian-settings', mobileIllustration: DEVONIAN_BRAND_EXTRAS.mobileIllustration, sibling: { title: 'Cambrian Explosion', path: '', blurb: '133 million years earlier' } },
   modes: [
-    { id: 'rise', name: 'Survival', blurb: 'Hatch small and stay alive. Feed, escape, moult through five stages and reach Prime, then hold it for ninety seconds. Allies share what they catch.', players: '1–4 co-op' },
-    { id: 'domination', name: 'Domination', blurb: 'Pick any animal, own its rung. Feed, escape, drive off rivals, hold your range. First to Dominant standing held for ninety seconds wins. Allies pool standing.', players: '1–4 co-op' },
-    { id: 'foodchain', name: 'Food Chain', blurb: 'Everyone picks from a different rung. The hunter needs the prey; the prey scores by surviving the hunter. One scoreboard.', players: '2–4 versus' },
+    // The same three modes as the Cambrian, in the same order: this era changes the sea and the
+    // animals in it, not what a match is.
+    { id: 'rise', name: 'Rise', blurb: 'Hatch as a hatchling. Eat, grow, fight, hide. Reach Prime and hold it for ninety seconds. Share the feast with the others, or eat them.', players: '1–4' },
     { id: 'hunted', name: 'Hunter & Hunted', blurb: 'Everyone takes a turn as the big one, with the river mouth as the small ones\u2019 refuge. On your turn, catch as many as you can; on theirs, grow out of reach. Most caught wins.', players: '2–4 asymmetric' },
     { id: 'reef', name: 'Reef', blurb: 'No goal. Any animal, fully grown, and the Devonian coast to swim in.', players: '1–4 sandbox' },
   ],
+
   creatures: DEVONIAN_CREATURES,
   defaults: {
     player: 'coccosteus',
     // Delivered specimens only: these drive card and model preloading, and a creature that is still
     // borrowing a body has no portrait to load. Add each one here as its own model lands.
-    boot: ['coccosteus', 'cladoselache', 'dunkleosteus', 'bothriolepis', 'gemuendina', 'doryaspis', 'stethacanthus', 'titanichthys', 'cheirolepis', 'onychodus', 'rhinodipterus', 'tiktaalik', 'eldredgeops', 'acanthostega', 'jaekelopterus', 'walliserops', 'nahecaris', 'palaeoisopus', 'furcaster', 'manticoceras', 'michelinoceras'],
+    // What the title screen swims and what the player is most likely to pick. The rest of the
+    // roster streams its decimated copy and only fetches a full body when one is needed: these
+    // models are three times the size of the Cambrian's, and the whole set is 302 MB.
+    boot: ['coccosteus', 'dunkleosteus', 'cladoselache', 'doryaspis', 'bothriolepis'],
     title: ['dunkleosteus', 'cladoselache', 'coccosteus', 'doryaspis'],
   },
   ecology: { schools: SNACK_SCHOOLS, giants: GIANTS, shadow: { creature: 'titanichthys', scale: 1.0 } },

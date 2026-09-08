@@ -13,6 +13,7 @@ import { Dialogs, PauseMenu, Results } from './Overlays';
 import { gridColumns, SelectScreen } from './Select';
 import { TitleScreen } from './Title';
 import { Toolbar } from './Toolbar';
+import { menuScheme } from '../shared/controls';
 
 export type Screen = 'title' | 'select' | 'playing' | 'results';
 export type DialogKind = null | 'help' | 'settings';
@@ -60,9 +61,12 @@ export function App() {
   useEffect(() => {
     if (!canvasRef.current) return;
     const engine = new Engine(canvasRef.current, settings.quality, {
-      onHud: (s) => { setHud(s); if (s.status !== 'playing' && screenRef.current === 'playing') { go('results'); audio.play(s.status === 'won' ? 'won' : 'death'); } },
+      onHud: (s) => { setHud(s); if (s.status !== 'playing' && screenRef.current === 'playing') { go('results'); engineRef.current?.releasePointer(); audio.play(s.status === 'won' ? 'won' : 'death'); } },
       onMenu: () => { if (screenRef.current === 'playing') { setPausedBoth(!pausedRef.current); audio.play('ui-confirm'); } },
       onError: (m) => setError(m),
+      // The pointer lock went away on its own — Escape, or the window lost focus. Nothing good
+      // happens if the match keeps running behind a cursor the player cannot see, so it pauses.
+      onPointerLost: () => { if (screenRef.current === 'playing' && !pausedRef.current && !dialogRef.current) { setPausedBoth(true); audio.play('ui-back'); } },
       onLoaded: () => setLoaded(true),
       onProgress: (p) => setProgress(p),
     });
@@ -142,16 +146,6 @@ export function App() {
   const startMatch = useCallback(() => {
     const ps = playersRef.current;
     if (!ps.length || !ps.every((p) => p.ready) || !engineRef.current) return;
-    if (modeRef.current === 'foodchain') {
-      // Food Chain wants the chain spread out: the hunter must have prey and the prey a hunter.
-      // Where fewer rungs are pickable than there are players (an era whose models are still
-      // arriving), every rung has to be used before anyone doubles up.
-      const rungs = ps.map((p) => creature(p.creature).rung ?? 0);
-      const available = new Set(CREATURES.map((c) => c.rung ?? 0)).size;
-      const perRung = Math.ceil(ps.length / Math.max(1, available));
-      const crowded = [...new Set(rungs)].some((r) => rungs.filter((x) => x === r).length > perRung);
-      if (crowded) { setNotice(`Food Chain: spread out across the chain — at most ${perRung} of you per rung.`); audio.play('ui-back'); return; }
-    }
     engineRef.current.startMatch(modeRef.current, ps);
     setPausedBoth(false);
     go('playing');
@@ -174,6 +168,16 @@ export function App() {
     go('title');
     audio.play('ui-back');
   }, [go, setPausedBoth, updatePlayers]);
+
+  /**
+   * Carry the finished match on instead of restarting it. Only the co-op modes offer this: the sea,
+   * the bodies and everything grown in them stay exactly as they were, and the goal stops watching.
+   */
+  const keepPlaying = useCallback(() => {
+    if (!engineRef.current?.continueMatch()) return;
+    setPausedBoth(false);
+    go('playing');
+  }, [go, setPausedBoth]);
 
   const playAgain = useCallback(() => {
     if (!engineRef.current) return;
@@ -291,6 +295,7 @@ export function App() {
           if (just('ability')) backToTitle();
         } else if (s === 'results') {
           if (just('confirm')) playAgain();
+          if (just('ability')) keepPlaying();
           if (just('heavy')) backToSelect();
           if (just('back')) backToTitle();
         }
@@ -310,7 +315,7 @@ export function App() {
     // padIndices is deliberately not a dependency: it is written from inside this loop, and
     // listing it would tear the loop down and rebuild it every time a pad connects, losing the
     // button edges held in `prev`.
-  }, [addPlayer, backToSelect, backToTitle, changeMode, moveCursor, openDialog, playAgain, removePlayer, setPausedBoth, startFromTitle, startMatch, toggleReady]);
+  }, [addPlayer, backToSelect, backToTitle, changeMode, keepPlaying, moveCursor, openDialog, playAgain, removePlayer, setPausedBoth, startFromTitle, startMatch, toggleReady]);
 
   // ---- Keyboard menu navigation ----
   useEffect(() => {
@@ -335,18 +340,25 @@ export function App() {
         return;
       }
       if (s === 'playing') {
-        if (e.code === 'Escape') { setPausedBoth(!pausedRef.current); audio.play('ui-confirm'); }
+        // Escape is `menu` on both keyboard layouts, so for a match with a keyboard player in it
+        // the engine already turns it into a pause (`onMenu`). Toggling here as well would flip
+        // the pause twice in the same press and leave it exactly where it started — which is what
+        // used to happen, and is why Escape appeared to do nothing on a keyboard. Only a match
+        // made entirely of controllers needs this path.
+        const onKeyboard = playersRef.current.some((pl) => typeof pl.device === 'string');
+        if (e.code === 'Escape' && !onKeyboard) { setPausedBoth(!pausedRef.current); audio.play('ui-confirm'); }
         if (pausedRef.current && e.code === 'Enter') setPausedBoth(false);
         return;
       }
       if (s === 'results') {
         if (e.code === 'Enter') playAgain();
+        if (e.code === 'Space') keepPlaying();
         if (e.code === 'Escape') backToSelect();
       }
     };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
-  }, [addKeyboard, backToSelect, backToTitle, changeMode, moveCursor, openDialog, playAgain, setPausedBoth, startFromTitle, startMatch, toggleReady]);
+  }, [addKeyboard, backToSelect, backToTitle, changeMode, keepPlaying, moveCursor, openDialog, playAgain, setPausedBoth, startFromTitle, startMatch, toggleReady]);
 
   // Idle-time preloading: tell the loader what is most likely to be needed next.
   useEffect(() => {
@@ -362,6 +374,10 @@ export function App() {
   }, [screen, players, loaded]);
 
   const allReady = players.length > 0 && players.every((p) => p.ready);
+  // Menus are shared, so they speak whichever device is in the room. A pad the browser has not
+  // seen a button from yet does not count — it cannot, the Gamepad API hides it until then — which
+  // is why the title screen keeps its own copy about connecting one.
+  const scheme = menuScheme(padCount);
   const modeInfo = useMemo(() => MODE_INFO, []);
 
   return (
@@ -375,17 +391,18 @@ export function App() {
       {screen === 'select' && (
         <SelectScreen
           players={players} mode={mode} modes={MODES} modeInfo={modeInfo} allReady={allReady} padIndices={padIndices}
+          scheme={scheme}
           onPick={setCreature} onReady={toggleReady} onRemove={removePlayer} onAddKeyboard={addKeyboard}
           onMode={changeMode} onStart={startMatch} onBack={backToTitle}
         />
       )}
 
       {(screen === 'playing' || screen === 'results') && hud && <Hud snapshot={hud} />}
-      {screen === 'playing' && paused && <PauseMenu onResume={() => setPausedBoth(false)} onChange={backToSelect} onQuit={backToTitle} />}
-      {screen === 'results' && hud && <Results snapshot={hud} players={players} onAgain={playAgain} onChange={backToSelect} onTitle={backToTitle} />}
+      {screen === 'playing' && paused && <PauseMenu scheme={scheme} onResume={() => setPausedBoth(false)} onChange={backToSelect} onQuit={backToTitle} />}
+      {screen === 'results' && hud && <Results snapshot={hud} players={players} scheme={scheme} onAgain={playAgain} onContinue={keepPlaying} onChange={backToSelect} onTitle={backToTitle} />}
 
       <Toolbar isFs={isFs} muted={settings.muted} onHelp={() => openDialog(dialog === 'help' ? null : 'help')} onSettings={() => openDialog(dialog === 'settings' ? null : 'settings')} onMute={() => setSettings((s) => ({ ...s, muted: !s.muted }))} onFullscreen={toggleFullscreen} />
-      <Dialogs kind={dialog} onClose={() => openDialog(null)} settings={settings} onSettings={setSettings} />
+      <Dialogs kind={dialog} onClose={() => openDialog(null)} settings={settings} onSettings={setSettings} scheme={scheme} />
 
       {(notice || error) && (
         <div className={`notice ${error ? 'notice-error' : ''}`} role="status">
