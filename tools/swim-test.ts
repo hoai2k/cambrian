@@ -7,7 +7,7 @@ import { emptyInput, type InputFrame } from '../src/sim/types';
 import { applyScaleStats, bodyRadius, clearanceOf, climbHeight, climbRise, floorClearance, glideOver, lengthOf } from '../src/sim/actors';
 import { boulderQ, boulderTop, groundHeight, resolveStatic, sampleHeight, type Boulder, type StaticContact, type WorldData } from '../src/sim/world';
 import { floraSize } from '../src/sim/flora';
-import { PITCH_DOWN, PITCH_UP } from '../src/render/engine';
+import { fitCameraArm, PITCH_DOWN, PITCH_UP } from '../src/render/engine';
 
 let failed = 0;
 const check = (n: string, ok: boolean, d: string) => { console.log(`${ok ? 'PASS' : 'FAIL'}  ${n.padEnd(58)} ${d}`); if (!ok) failed++; };
@@ -231,6 +231,22 @@ const rockWorld = (boulders: Boulder[]) => ({
 {
   check('the view reaches well above the horizon', PITCH_UP < -0.9, `${(PITCH_UP * 180 / Math.PI).toFixed(0)}°`);
   check('...and nearly straight down', PITCH_DOWN > 1.25, `${(PITCH_DOWN * 180 / Math.PI).toFixed(0)}°`);
+  // Fitting the arm with the seabed in the way: shorten first, lift only when that runs out, and
+  // report the lift so the look point can go with it and keep the angle.
+  const sand = (h: number) => () => h;
+  const level = fitCameraArm(6, 0.2, 5, 1.2, sand(0.45), 39);
+  check('in open water the arm is left alone', Math.abs(level.dist - 5) < 1e-9 && level.lift === 0, `arm ${level.dist.toFixed(2)}, lift ${level.lift}`);
+  const shortened = fitCameraArm(2, -0.5, 5, 1.2, sand(0.45), 39);
+  check('aiming up pulls the camera in rather than tipping it flat', shortened.dist < 4 && shortened.dist > 1.2 && Math.abs(shortened.lift) < 0.01,
+    `arm 5 → ${shortened.dist.toFixed(2)}, lift ${shortened.lift.toFixed(3)}`);
+  check('...and the camera ends up out of the sand', shortened.y >= 0.45 - 1e-9, `y=${shortened.y.toFixed(2)} against sand at 0.45`);
+  const lifted = fitCameraArm(0.8, -0.95, 5, 1.2, sand(0.45), 39);   // 1.2 is the shortest arm for a 1.3-unit body
+  check('aiming up from the floor lifts the rig once the arm runs out', lifted.dist <= 1.2 + 1e-9 && lifted.lift > 0.2,
+    `arm ${lifted.dist.toFixed(2)}, lift ${lifted.lift.toFixed(2)}`);
+  check('...by exactly what it took to clear the sand, which the look point follows', Math.abs(lifted.y - 0.45) < 1e-9 && Math.abs(lifted.lift - (0.45 - (0.8 + Math.sin(-0.95) * 1.2))) < 1e-9,
+    `y=${lifted.y.toFixed(2)}, lift ${lifted.lift.toFixed(2)}`);
+  const under = fitCameraArm(38.5, 1.3, 5, 1.2, sand(0), 39);
+  check('and aiming down at the surface tips the same way, not through it', under.y <= 39 + 1e-9 && under.lift < 0, `y=${under.y.toFixed(2)}, lift ${under.lift.toFixed(2)}`);
 }
 
 // --- the radar says how far above or below a contact is ---
