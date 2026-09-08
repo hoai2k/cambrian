@@ -3,7 +3,7 @@ import { isAlive, isHidden, lengthOf } from '../actors';
 import { applyHit } from '../combat';
 import { BURROWERS, DEFENSIVE_SPECIALS, HEAVY_SPECIALS } from '../concealment';
 import { creature, type CreatureId } from '../creatures';
-import { HEAVY_STRIKE, type ExpansionContext, type HeavyStrike } from '../expansion-abilities';
+import { HEAVY_STRIKE, specialHit, type ExpansionContext, type HeavyStrike } from '../expansion-abilities';
 import type { Game } from '../game';
 import type { Actor } from '../types';
 import { groundHeight } from '../world';
@@ -129,8 +129,11 @@ export function stepAbility(g: Game, a: Actor, ctx: ExpansionContext, dt: number
       case 'tuskLunge':     if (t >= 0.3 && t <= 0.7 && forward > 0.5 && dd < L * 1.1) { damage = 26; poise = 55; guardBreak = true; armorPierce = 0.5; } break;
       case 'crushBite': {
         if (t >= 0.3 && t <= 0.55 && forward > 0.5 && dd < L * 0.9) {
+          // The floor in `specialHit` lifts the plain bite to this creature's own heavy, so the
+          // shell numbers are taken from that too: crushing a shell stays worth twice a bite.
           const shell = !!creature(o.creature).shell;
-          damage = shell ? 40 : 20; poise = shell ? 80 : 45; shellCrush = shell;
+          damage = shell ? Math.max(40, def.heavy.damage * 2) : 20;
+          poise = shell ? Math.max(80, def.heavy.poise * 2) : 45; shellCrush = shell;
         }
         break;
       }
@@ -149,7 +152,7 @@ export function stepAbility(g: Game, a: Actor, ctx: ExpansionContext, dt: number
     }
     if (damage <= 0) continue;
     a.hitDone.add(o.id);
-    const result = applyHit(ctx.hit, a, o, { ...def.light, damage, poise, knockback: kb, grab, armorPierce, guardBreak }, 0);
+    const result = applyHit(ctx.hit, a, o, specialHit(def, { damage, poise, knockback: kb, grab, armorPierce, guardBreak }), 0);
     if (result === 'hit' && shellCrush) g.events.push({ kind: 'shellCrush', pos: { ...o.pos }, actor: a.id, other: o.id, player: a.player });
     if (result === 'hit' && grab && isAlive(o) && def.ground) o.vel.y -= 3;   // dragged toward the floor
     if (a.state !== 'ability') { a.abilityActive = false; break; }
