@@ -60,8 +60,10 @@ dorsal eye objects relocated. Candidate01 actual eye containment met50% but miss
 margin in Heavy; candidate02 inset eyes another .010, preserving candidate01.
 Candidate02 full16,412,444B /LOD2,862,364B:18/18actions,28bones,3anchors. Actual exported
 10pose eye/oral audit PASS; per-pose conservative margins are in face-v4/audit-candidate-02-03/audit.json.
-11 actual full/LOD face/action views rendered; root reviewed primary seven. Four portraits
-rendering. Local face-v4 WORKING_STATE holds source/paths. Viewer/intake/main still pending.
+11 actual full/LOD face/action views individually inspected by root; four portraits regenerated.
+Minimum measured eye interior77.7953%, conservative95% lower77.0443%. Selected intake,
+build/typecheck PASS. Built viewer4176 shows new face,18clips and preview badge; Idle/Heavy
+observed. Face-v4 WORKING_STATE and release-review-02.json hold evidence. Main merge next.
 Keep preview: far LOD intentionally loses fine tessera pigment and still needs broader final art review.
 
 ### Dunkleosteus — latest face request
@@ -70,8 +72,10 @@ Dedicated Astra high /root/dunkleosteus_face_v4 inspected reference and existing
 Candidate01 actual8views rejected: brow triangular artifacts, exposed gnathal root slabs.
 Candidate02 actual8views author reviewed and root inspected four key views: continuous brow,
 stronger cheek, shaped sharp gnathals with supported roots. Advances to dedicated eye/oral
-checks, not final. Frozen export_02.py and audit_exports_02.py ready; local candidate02/exports
-not executed. Audit final SHA0d8231a8aa9b8c8a39861f92b928901f762f6606fd2fa6f1dfc2c000f3a52f6b.
+checks, not final. Terra executed frozen export02/audit02: full18.27MB/LOD2.35MB,18/18clips.
+Eyes PASS but oral reports256 opposing-shell and130 opposing-gnathal failures per asset across
+173poses. Dedicated artist diagnosing exact failures before correction; no face public release.
+Audit final SHA0d8231a8aa9b8c8a39861f92b928901f762f6606fd2fa6f1dfc2c000f3a52f6b.
 Same working jaws, source textures, interior and anchors retained. Both detail levels must keep18clips.
 
 ### Titanichthys
@@ -79,7 +83,9 @@ Same working jaws, source textures, interior and anchors retained. Both detail l
 Candidate05 material ambiguity diagnosed by Terra:326 conflicting POSITION+UV corners,
 zero after exact material identity separation. Candidate06 minimal repair frozen manifest
 669f6ad4970160f85a6c133e9aaaf4b673d3b8161269ce77225f95d67a5d698c. Terra G1+G2 now PASS:
-43,409,408B full/3,878,132B LOD,18/18actions. G3 actual23views currently executing.
+43,409,408B full/3,878,132B LOD,18/18actions. G3 actual23views complete and author inspected
+all23: HOLD for two pale oral-floor patches in Ability maximum gape; targeted diagnosis and
+actual eye containment pending. Pose manifest507de45a64ed53697dcbb138452990752a5fdf490551b8246e9f3feb9f16f48b.
 All prior failures preserved. Raw full still over25MB; lossless packaging and post-rework
 oral/eye/actual runtime reviews remain. Accepted clay04/material02 remain the art target.
 
@@ -91,7 +97,9 @@ patches, fixed roughness removes them; baked-before-export already affected). Ca
 frozen: two continuous body UV strips,2048roughness minimum32.77pixels/triangle, original
 living material fields retained, narrower LOD filtering and45% fin retention (body25%).
 HANDOFF-CANDIDATE-03.md,60-input manifest1f21e13cd943a74c9837c2951c4992edaa37b9043aa3bc3805e7c2f406412bf5.
-New baked-02/candidate-03 not executed. All23 actual views still required. No public replacement.
+Terra attempted Group1 and stopped at body_uv_02.py:71 uncovered/invalid albedo strip
+(0.0,0.5529412031173706). Partial baked-02 preserved; candidate-03 absent, Groups2–5 not run.
+Owning Astra author now diagnosing coverage and preparing a new frozen correction. All23 actual views still required. No public replacement.
 
 ### Bothriolepis
 
@@ -126,7 +134,7 @@ in separate hash-bound derivative (max posed displacement4.957e-7). Original evi
 See motion-v3/RUNTIME_HANDOFF.md and immutable48input handoff in local authoring.
 Fresh built browser4176 viewer loads19clips; root inspected Eat reach .25s, basket .70s,
 closed crown1.30s. This verifies viewer GPU poses; real-prey scenarios were production headless
-runtime, not interactive controller play. Main publication checkpoint underway. Model stays
+runtime, not interactive controller play. Published on main8730c96 (ownac16d82), pushed. Model stays
 preview because broader individual quality refinement and controller playtest remain.
 
 ### Other reference briefs
@@ -141,10 +149,10 @@ request explicitly; dorsal markings must not be construed as eyes.
 ## Repo / validation / execution
 
 Repo /Users/hoai/Documents/Stuff/Generations/cambrian/local/expansion-repo, devonian-assets.
-Separate main worktree ../devonian-publish. Latest own checkpoint34964ec; merged concurrent c43ea00.
-Main254a273 and feature757d9c8 pushed to same GitHub repository over SSH. HTTPS fetch works; HTTPS push lacks credentials. Use explicit git@github.com:hoai2k/cambrian.git for push. Fetch/merge concurrent main; never force.
+Separate main worktree ../devonian-publish. Latest own checkpointac16d82; merged concurrent c08e039.
+Main8730c96 and feature5d9534e pushed to same GitHub repository over SSH. HTTPS fetch works; HTTPS push lacks credentials. Use explicit git@github.com:hoai2k/cambrian.git for push. Fetch/merge concurrent main; never force.
 Commit finished frozen source/docs/status independently of mutable agent work. No broad add.
-Do not stage __pycache__. Michelinoceras motion delivery is the first new production candidate staged on8Sept; verify latest Git main merge before claiming publication.
+Do not stage __pycache__. Michelinoceras motion delivery is published; Gemu face candidate02 is staged for next publication.
 
 User-authorized workflow: Astra high creative research/sculpt/material/rig/visual judgment;
 Terra medium deterministic Blender/export/render/check execution. Four active slots. Earlier executor spawn hit a temporary agent-thread limit. New /root/frozen_blender_execution
@@ -153,7 +161,7 @@ its Gemu frozen execution directly without claiming a model switch. Reuse availa
 for their existing individual authorship; keep execution/output terse. No usage reset/schedule.
 Blender5.2 /Applications/Blender.app/Contents/MacOS/Blender, CPU2, Mac startup needs escalation.
 
-Latest before final status changes: typecheck/build and686 Devonian checks PASS. New
+After concurrent c08e039 merge: typecheck/build,688 Devonian checks and23debug checks PASS. New
 all-preview build/typecheck and686 Devonian checks PASS: ../devonian-authoring/review/resume-2026-09-08-preview-*.log.
 Catalogue regenerated after Gemu/Dunk reopening. Fresh built viewer tab8 verified all21 Devonian and12 Cambrian preview labels;
 recheck after main merge only if runtime files change. Original old4176 tab7 server had died;
