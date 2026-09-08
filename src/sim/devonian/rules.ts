@@ -166,6 +166,11 @@ export const DEVONIAN_RULES: EraRules = {
   ladderNames: STAGES,
   ladderRung: (g, a) => devActor(g, a).stage,
   ladderScale: (id, rung) => stageScale(creature(id).adultLength, rung),
+  ladderFill: (g, a, fraction) => {
+    const d = devActor(g, a);
+    const from = STAGE_AT[d.stage] ?? 0, to = STAGE_AT[d.stage + 1] ?? GROWN;
+    d.standing = from + (to - from) * fraction;
+  },
   install() { installDevonianSpecials(); },
   ySpecial,
   init(g) { installDevonianSpecials(); for (const a of players(g)) { const d = devActor(g, a); d.stage = stageForScale(creature(a.creature).adultLength, a.scale); d.standing = g.mode === 'reef' ? STAGE_AT[ADULT_STAGE] + 5 : STAGE_AT[d.stage]; } },
@@ -254,10 +259,15 @@ export const DEVONIAN_RULES: EraRules = {
     if (g.mode !== 'rise') return;
     for (const a of players(g)) {
       const d = devActor(g, a);
+      // Somebody who came in on the top rung has already done this; the clock is not theirs to
+      // run. Everyone else in the same sea keeps theirs and can still win it.
+      if (a.carriedTop) { d.primeT = 0; continue; }
       if (d.stage >= PRIME_STAGE && isAlive(a)) {
         d.primeT += dt;
         if (d.primeT >= HOLD_TO_WIN && g.state.status === 'playing' && !g.endless) {
           const name = creature(a.creature).name;
+          // The top rung of the record is banked by finishing, never by arriving.
+          g.bankLadderTop(a);
           g.state = { status: a.player >= 0 ? 'won' : 'lost', winner: a.player,
             message: a.player >= 0 ? `${name} grew up and held the sea.` : `A rival ${name} grew up first.` };
         }

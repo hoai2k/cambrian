@@ -10,14 +10,14 @@ import type { Mode, PlayerSetup } from '../sim/types';
 import { CheckIcon, Emblem, KeyboardIcon, PadIcon } from './icons';
 import { appBase } from '../shared/base';
 import { btn, fillControls, key, type Scheme } from '../shared/controls';
-import { ladderName } from '../sim/ladder';
+import { fillOf, ladderName, rungOf } from '../sim/ladder';
 
 interface Props {
   players: PlayerSetup[]; mode: Mode; modes: Mode[]; modeInfo: Record<Mode, { name: string; blurb: string; players: string }>;
   allReady: boolean; padIndices: number[];
   /** Whatever everyone at this screen is holding: pad if any is connected, mouse and keyboard if not. */
   scheme: Scheme;
-  /** Furthest rung of the growth ladder each creature has reached in Rise on this device. */
+  /** Furthest mark on the growth ladder each creature has reached in Rise on this device. */
   best: Partial<Record<CreatureId, number>>;
   /** Per seat: whether that player has asked to carry on from their record rather than hatch. */
   carry: boolean[];
@@ -101,7 +101,7 @@ export function SelectScreen(p: Props) {
                   <h2>{def.name}</h2>
                   <small className="provenance">{def.kind && <b className="kind">{def.kind}</b>}{def.species} · {def.provenance ?? def.locality ?? 'Burgess Shale'}</small>
                   <p className="tagline">{def.tagline}</p>
-                  <BestRun rung={p.best[def.id]} carrying={!!p.carry[i]} rise={p.mode === 'rise'} scheme={s} onToggle={() => p.onCarry(i)} />
+                  <BestRun mark={p.best[def.id]} carrying={!!p.carry[i]} rise={p.mode === 'rise'} scheme={s} onToggle={() => p.onCarry(i)} />
                   {!compact && (
                     <>
                       <div className="stats">
@@ -167,17 +167,22 @@ export function SelectScreen(p: Props) {
  * it is a fact about the creature and worth seeing while you choose — but the offer only appears
  * where it can be taken, and only once there is something to carry on from.
  */
-function BestRun({ rung, carrying, rise, scheme, onToggle }: { rung: number | undefined; carrying: boolean; rise: boolean; scheme: Scheme; onToggle: () => void }) {
-  if (!rung) return null;
-  const canCarry = rise;
+function BestRun({ mark, carrying, rise, scheme, onToggle }: { mark: number | undefined; carrying: boolean; rise: boolean; scheme: Scheme; onToggle: () => void }) {
+  if (!mark) return null;
+  const part = fillOf(mark), name = ladderName(mark);
+  const next = ladderName(rungOf(mark) + 1);
+  // A part-grown mark is worth saying out loud: it is the difference between starting over and
+  // starting a short swim from where you stopped.
+  const badge = part > 0 ? `${name.toUpperCase()} · PART GROWN` : name.toUpperCase();
+  const title = part > 0
+    ? `Furthest grown in ${MODE_NAME}: reached ${next}, but did not hold it. You start as a ${name} already ${Math.round(part * 100)}% of the way back.`
+    : `Furthest grown in ${MODE_NAME}: ${name}.`;
   return (
     <div className={`best-run ${carrying ? 'carrying' : ''}`}>
-      <span className="best-badge" title={`Furthest grown in ${MODE_NAME}: ${ladderName(rung)}`}>
-        <b>BEST</b> {ladderName(rung).toUpperCase()}
-      </span>
-      {canCarry && (
-        <button className="carry-toggle" aria-pressed={carrying} onClick={onToggle}>
-          {carrying ? `Continuing as ${ladderName(rung)}` : `Starting as ${ladderName(0)}`}
+      <span className="best-badge" title={title}><b>BEST</b> {badge}</span>
+      {rise && (
+        <button className="carry-toggle" aria-pressed={carrying} onClick={onToggle} title={title}>
+          {carrying ? `Continuing as ${name}${part > 0 ? ', part grown' : ''}` : `Starting as ${ladderName(0)}`}
           <kbd>{scheme === 'pad' ? 'Y' : 'C'}</kbd>
         </button>
       )}

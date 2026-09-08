@@ -7,7 +7,7 @@ import { Engine, type HudSnapshot } from '../render/engine';
 import type { Quality } from '../render/sea';
 import { PLAYABLE_IDS as CREATURE_IDS, PLAYABLE as CREATURES, creature, type CreatureId } from '../sim/creatures';
 import { MODE_IDS, type Mode, type PlayerSetup } from '../sim/types';
-import { clampRung, ladderName } from '../sim/ladder';
+import { clampMark } from '../sim/ladder';
 import { loadCodex, recordBest } from './codex';
 import { Hud } from './Hud';
 import { LoadingScreen } from './Loading';
@@ -203,8 +203,8 @@ export function App() {
    * carries anything on; every other mode hands out its own body and the field is left off.
    */
   const withCarry = useCallback((ps: PlayerSetup[]) => ps.map((p, i) => {
-    const rung = modeRef.current === 'rise' && carryRef.current[i] ? clampRung(bestRef.current[p.creature] ?? 0) : 0;
-    return rung > 0 ? { ...p, startRung: rung } : { ...p, startRung: 0 };
+    const mark = modeRef.current === 'rise' && carryRef.current[i] ? clampMark(bestRef.current[p.creature] ?? 0) : 0;
+    return { ...p, startRung: mark > 0 ? mark : 0 };
   }), []);
 
   const startMatch = useCallback(() => {
