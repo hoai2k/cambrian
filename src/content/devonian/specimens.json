@@ -28,7 +28,7 @@
       "PBR UV albedo, normal and roughness; independent vertex pigment bake for LOD.",
       "Growth is maturation display, no scaling or moulting.",
       "V4 focused cranial and gnathal refinement; preserved V2 body, oral lining, rig, eye globes and anchors. Actual full/LOD eye-volume and 173 feeding-pose checks passed before an exact-geometry COLOR binding repair; audit transfer is hash-proven. Root completed individual visual review including corrected LOD pigment.",
-      "Focused V4 head and gnathal pass accepted. Broader refinement remains pending: reduced model appears paler and smoother, with a suspected albedo-to-vertex color-space mismatch; no full material-parity or whole-creature final approval is claimed."
+      "Focused V4 head and gnathal pass accepted; LOD05 corrects encoded sRGB pigment to linear vertex colors. Matched full/LOD rest and Heavy views reviewed. Reduced surface detail and normal/roughness parity plus broader controller/art polish remain pending; model stays preview."
     ]
   },
   {

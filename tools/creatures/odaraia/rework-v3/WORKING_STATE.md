@@ -64,3 +64,6 @@
 
 ## 8 September resumed — material02 source ready
 Root re-inspected01 dark/light oblique and frontal images. Reduced shell/eye mirror response, stronger cuticular pigment variation and copper/olive limb contrast in versioned shader-only02. Geometry unchanged by design; six matched images still required. Read HANDOFF-MATERIAL02.md and frozen-material02.json. No execution or approval yet.
+
+## 8 September — material02 coarse appearance accepted
+Six actual dark/light renders complete and root-inspected. Cuticle glare/pigment direction accepted for production development, not final model. Output manifest eabb28c993294e62c3bbdf47a122caf2116a56acd97ba59fc60e19848a5a3139; geometry b4086bbddf3bfb5a6551964df927f3a69fa8bbf79a2a1f405f23053a0df0023f unchanged. root-review-material02.md records residual eye-edge highlight and rigid limb-fan concern. Next production rig/18actions/baking/fullLOD/anchors/real alpha sorting, then eye/geometry audits. No new public assets.
