@@ -14,6 +14,10 @@ node tools/creatures/motion/pose-check.mjs <id> <Clip> [u ...]  # where the sock
 
 ## What `apply.mjs` guarantees
 
+- **A clip the model never had is simply added.** `Grab` and `Dash` (see
+  `docs/attack-feeding-refinement.md`) do not exist on most rigs, so there is nothing to keep
+  beside them; the game falls back to `Heavy` and `Dodge` until they land, and picks them up the
+  moment they do.
 - **The old clip stays in the file as `replaced/<Name>`.** The game only ever asks for the
   canonical name, so it plays the new clip; the viewer lists the replaced ones in their own
   *Replaced* section so the two can be compared and the old one restored by renaming.

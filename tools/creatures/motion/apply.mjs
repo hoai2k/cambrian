@@ -41,13 +41,32 @@ const { clips } = await import(`./performances/${id}.mjs`);
 
 const hash = (b) => createHash('sha256').update(b).digest('hex');
 const digest = (a) => a ? hash(new Uint8Array(new Float64Array(a.getArray()).buffer)) + ':' + a.getType() + ':' + a.getNormalized() : null;
+/**
+ * A triangle list's indices, with each triangle rotated to start at its lowest index. The meshopt
+ * index codec canonicalizes triangles that way, so a file whose indices were not already in that
+ * form (the original eight were packaged by an earlier tool) comes back rotated: the same
+ * triangles wound the same way, in the same order, written differently. Everything else about the
+ * index buffer — a changed vertex, a reordered or dropped triangle, a flipped winding — still
+ * fails the comparison, because rotation is the only thing normalized away.
+ */
+function indexDigest(prim) {
+  const a = prim.getIndices();
+  if (!a || prim.getMode() !== 4) return digest(a);
+  const src = a.getArray(), out = new Float64Array(src.length);
+  for (let i = 0; i + 2 < src.length; i += 3) {
+    const t = [src[i], src[i + 1], src[i + 2]];
+    const m = t[0] <= t[1] && t[0] <= t[2] ? 0 : t[1] <= t[2] ? 1 : 2;
+    out[i] = t[m]; out[i + 1] = t[(m + 1) % 3]; out[i + 2] = t[(m + 2) % 3];
+  }
+  return hash(new Uint8Array(out.buffer)) + ':' + a.getType() + ':' + a.getNormalized() + ':rot';
+}
 /** Everything that is not an animation, as a comparable snapshot. */
 function snapshot(d) {
   const r = d.getRoot();
   return {
     nodes: r.listNodes().map((n) => [n.getName(), n.getTranslation(), n.getRotation(), n.getScale(), n.listChildren().map((c) => c.getName()), n.getExtras()]),
     skins: r.listSkins().map((s) => [s.listJoints().map((j) => j.getName()), s.getSkeleton()?.getName(), digest(s.getInverseBindMatrices())]),
-    meshes: r.listMeshes().map((m) => [m.getName(), m.listPrimitives().map((p) => [p.listSemantics(), p.listSemantics().map((s) => digest(p.getAttribute(s))), digest(p.getIndices()), p.getMaterial()?.getName(), p.getMode()])]),
+    meshes: r.listMeshes().map((m) => [m.getName(), m.listPrimitives().map((p) => [p.listSemantics(), p.listSemantics().map((s) => digest(p.getAttribute(s))), indexDigest(p), p.getMaterial()?.getName(), p.getMode()])]),
     materials: r.listMaterials().map((m) => [m.getName(), JSON.stringify(m.toJSON?.() ?? {}), m.getBaseColorFactor(), m.getBaseColorTexture()?.getName(), m.getNormalTexture()?.getName(), m.getMetallicRoughnessTexture()?.getName(), m.getAlphaMode(), m.getDoubleSided()]),
     textures: r.listTextures().map((t) => [t.getName(), t.getMimeType(), hash(t.getImage())]),
     kept: r.listAnimations().filter((a) => !clips.some((c) => c.name === a.getName())).map((a) => [a.getName(), a.listChannels().map((c) => [c.getTargetNode().getName(), c.getTargetPath(), digest(c.getSampler().getInput()), digest(c.getSampler().getOutput()), c.getSampler().getInterpolation()])]),
@@ -58,8 +77,10 @@ const expected = snapshot(doc);
 // Swap the clips. The first run keeps the shipped clip as replaced/<Name>; later runs keep that.
 const byName = new Map(root.listAnimations().map((a) => [a.getName(), a]));
 const log = [];
+const added = new Set();
 for (const def of clips) {
   const old = byName.get(def.name), kept = byName.get(`replaced/${def.name}`);
+  if (!old && !kept) added.add(def.name);        // a clip the model never had: nothing to keep beside it
   if (old && !kept) {
     old.setName(`replaced/${def.name}`);
     old.setExtras({ ...old.getExtras(), cambrianClip: { version: 1, replaced: def.name, replacedOn: authoredOn, by: PASS } });
@@ -86,7 +107,11 @@ const actual = snapshot(check);
 actual.kept = actual.kept.filter(([n]) => !clips.some((c) => c.name === n));
 assert.deepEqual(actual, expected, 'round trip changed something other than the replaced clips');
 const names = check.getRoot().listAnimations().map((a) => a.getName());
-for (const def of clips) { assert(names.includes(def.name), def.name); assert(names.includes(`replaced/${def.name}`), `replaced/${def.name}`); }
+for (const def of clips) {
+  assert(names.includes(def.name), def.name);
+  // A clip that is new to the model has no shipped version to keep; everything else must keep one.
+  if (!added.has(def.name)) assert(names.includes(`replaced/${def.name}`), `replaced/${def.name}`);
+}
 assert.equal(new Set(names).size, names.length, 'duplicate clip names');
 
 await mkdir(outDir, { recursive: true });

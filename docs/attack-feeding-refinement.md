@@ -89,9 +89,16 @@ appendage-specific by design. The two that are *not* obvious:
 
 Anomalocaris, Nectocaris, Jaekelopterus, Manticoceras, Michelinoceras, Opabinia and Palaeoisopus
 already carry a `Grab` clip; those get reviewed against the held-grip rules rather than authored
-from nothing. Cambroraster, Leanchoilia, Isoxys, Tamisiocaris, Ottoia, Hallucigenia, Walliserops
-and Furcaster need one. Until it lands the runtime falls back to `Heavy`/`Attack`, which reads as
-a swing where a hold belongs — that is the visible gap this closes.
+from nothing. Cambroraster, Leanchoilia, Isoxys, Tamisiocaris, Ottoia, Walliserops and Furcaster
+need one. Until it lands the runtime falls back to `Heavy`/`Attack`, which reads as a swing where
+a hold belongs — that is the visible gap this closes.
+
+**Hallucigenia is done, as the first of them** (`performances/hallucigenia.mjs`, delivered
+8 September): the feet clamp in pairs toward the midline under the trunk, the spines are not
+touched at all, and the same held pose is what the animal wears while clinging. It also has the
+first `Dash`. Both are new clip names, so nothing was replaced and the old fallbacks are one
+deletion away; they are flagged on their own buttons in the viewer
+(`src/content/cambrian/pending-refinements.json`) until they have been reviewed and played.
 
 ### `Dash`, for every model
 
@@ -106,7 +113,15 @@ shape through the recovery. Length 0.45 s so it covers the state with a little t
 included: their dash is a shove off the substrate, not a swim.
 
 `src/render/creature.ts` already picks `Dash` for the long move and keeps `Dodge` for the short
-one, and falls back either way, so clips can land one model at a time.
+one, and falls back either way, so clips can land one model at a time. Hallucigenia's is
+authored; the amplitude lesson from it is worth carrying: a stubby limb swung by the angle a fin
+would use folds over the animal's own back, and the socket check (`pose-check.mjs`, or a scratch
+script printing tip positions) is what catches that before a render does.
+
+Both clips are additive, so `apply.mjs` now allows a clip the rig never had — there is no
+`replaced/<Name>` to keep beside it — and its round-trip guard normalizes triangle rotation,
+which the meshopt index codec canonicalizes on the models that were packaged by the earlier
+tool. Nothing else about that guard is relaxed.
 
 ## Assignment and current scope
 
