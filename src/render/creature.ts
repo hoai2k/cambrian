@@ -14,6 +14,7 @@ import { creature, type CreatureId } from '../sim/creatures';
 import { lengthOf } from '../sim/actors';
 import type { Actor } from '../sim/types';
 import { appBase } from '../shared/base';
+import type { AuthoredFeeding } from './attachments';
 
 interface Loaded { gltf: GLTF; unit: number; center: THREE.Vector3; size: THREE.Vector3; /** Triangles in one instance of this body, for the renderer's detail budget. */ tris: number; }
 export type Lod = 0 | 1;
@@ -99,6 +100,7 @@ export class CreatureView {
   readonly heightUnits: number;
   /** The Eat clip is a progress-driven performance rather than a loop. */
   readonly feedingPerformance: boolean;
+  readonly authoredFeeding?: AuthoredFeeding;
 
   constructor(readonly creatureId: CreatureId, loaded: Loaded, private shared: { shieldGeo: THREE.BufferGeometry }, readonly lod: Lod = 0) {
     this.def = creature(creatureId);
@@ -107,7 +109,15 @@ export class CreatureView {
     this.model.position.copy(loaded.center).multiplyScalar(-loaded.unit);
     this.heightUnits = loaded.size.y * loaded.unit;
     this.anchors = new CreatureAnchors(this.model);
-    this.feedingPerformance = FEEDING_PERFORMANCE.has(creatureId) && loaded.gltf.animations.some((c) => c.name === 'Eat');
+    const feeding = this.model.userData.cambrianFeeding;
+    const hasEat = loaded.gltf.animations.some((c) => c.name === 'Eat');
+    if (hasEat && this.anchors.canGrasp && this.anchors.has('anchor_mouth_inside') &&
+        feeding?.version === 1 && feeding.mode === 'authored-grasp' && feeding.clip === 'Eat' &&
+        Number.isFinite(feeding.apertureDiameter) && feeding.apertureDiameter > 0 &&
+        Number.isFinite(feeding.pickupOffsetLimit) && feeding.pickupOffsetLimit > 0) {
+      this.authoredFeeding = { apertureDiameter: feeding.apertureDiameter * loaded.unit, pickupOffsetLimit: feeding.pickupOffsetLimit * loaded.unit };
+    }
+    this.feedingPerformance = hasEat && (FEEDING_PERFORMANCE.has(creatureId) || !!this.authoredFeeding);
     this.inner.add(this.model);
     this.group.add(this.inner);
     this.model.traverse((o) => {
@@ -191,6 +201,18 @@ export class CreatureView {
   poseFeeding(progress: number) {
     const eat = this.actions.get('Eat'); if (!eat) return;
     this.playLoop('Eat');
+    if (this.authoredFeeding) {
+      // This asset owns the whole cupping pose. A fading locomotion/attack or
+      // additive turn must not flatten its arms while the clip is scrubbed.
+      for (const action of this.actions.values()) if (action !== eat) action.stop();
+      this.oneShot = undefined; this.oneShotT = 0;
+      this.additive.forEach(a => a?.setEffectiveWeight(0)); this.addW.fill(0);
+      eat.stopFading().stopWarping().setEffectiveWeight(1).setLoop(THREE.LoopOnce, 1).play();
+      eat.clampWhenFinished = true; eat.paused = true;
+      eat.time = THREE.MathUtils.clamp(progress, 0, 1) * eat.getClip().duration;
+      this.mixer.update(0); this.group.updateWorldMatrix(true, true);
+      return;
+    }
     this.oneShot?.setEffectiveWeight(0);
     eat.setEffectiveWeight(1); eat.time = THREE.MathUtils.clamp(progress, 0, .99999) * eat.getClip().duration;
     this.mixer.update(0); this.group.updateWorldMatrix(true, true);
@@ -249,10 +271,12 @@ export class CreatureView {
       // locomotion layer
       const held = a.state === 'ability' && a.abilityActive && ['collectorWake','pharyngealPump','planktonComb','whipSearch'].includes(def.ability);
       if (a.state === 'dead') { /* handled by one-shot */ }
-      else if (a.state === 'eating' || a.holdT > 0) { this.playLoop(this.pick('Eat', 'Grab') ?? (def.ground ? 'Crawl' : 'Swim')); this.loco?.setEffectiveTimeScale(this.has('Eat') ? 1 : 0.55); }
+      else if (a.state === 'eating' || a.holdT > 0) { this.playLoop((this.authoredFeeding && a.state !== 'eating' ? this.pick('Grab', 'Idle') : this.pick('Eat', 'Grab')) ?? (def.ground ? 'Crawl' : 'Swim')); this.loco?.setEffectiveTimeScale(this.has('Eat') ? 1 : 0.55); }
       else if (a.state === 'swallowed') { this.playLoop(this.pick('Stagger', 'Hit') ?? 'Idle'); this.loco?.setEffectiveTimeScale(0.8); }
       else if ((a.hideMode === 'burrowed' || ((a.state === 'guard' || a.state === 'parry') && ['anchor','enroll','shellUp','bristleFlare'].includes(def.ability))) && this.has('Ability')) { this.playLoop('Ability'); this.loco?.setEffectiveTimeScale(.55); }
       else if ((a.state === 'guard') && this.has('Guard')) { this.playLoop('Guard'); this.loco?.setEffectiveTimeScale(1); }
+      // Clinging to something bigger: the grip is held, so the grab pose is the locomotion.
+      else if (a.rideHost >= 0 && a.state === 'free' && this.has('Grab')) { this.playLoop('Grab'); this.loco?.setEffectiveTimeScale(0.4); }
       else if (held && this.has('Ability')) { this.playLoop('Ability'); this.loco?.setEffectiveTimeScale(1); }
       else if (a.state === 'moult' && this.has('Moult')) { this.playLoop('Moult'); this.loco?.setEffectiveTimeScale(1); }
       else {
@@ -276,7 +300,10 @@ export class CreatureView {
         else this.playOnce(this.pick('Ability', 'Attack')!, Math.max(0.4, a.stateDur), false);
       }
       if (a.state === 'grabbing' && this.wasAttack && this.oneShotT <= 0) this.playOnce(this.pick('Grab', 'Attack')!, 0.9, false);
-      if (a.state === 'dodge' && !this.wasDodge) this.playOnce(this.pick('Dodge') ?? '', a.stateDur + 0.1, false);
+      // A dash and a dodge are different moves — one drives, one jinks — so a model that has been
+      // given its own Dash clip uses it for the long one and keeps Dodge for the short jink. Until
+      // that clip lands (see docs/cambrian/refinement-queue.md) both read as the dodge.
+      if (a.state === 'dodge' && !this.wasDodge) this.playOnce((a.stateDur > 0.36 ? this.pick('Dash', 'Dodge') : this.pick('Dodge', 'Dash')) ?? '', a.stateDur + 0.1, false);
       if (a.state === 'parry' && !this.wasParry && this.has('Parry')) this.playOnce('Parry', 0.35, false);
       const hurt = a.hitFlash > 0.3 && a.state !== 'dead' && a.state !== 'stagger';
       if (hurt && !this.wasHit) this.playOnce('Hit', 0.5, false);
@@ -290,7 +317,7 @@ export class CreatureView {
       // additive layers: turn / dive / rise, dodge & guard reuse them
       // Increasing yaw turns the creature to its LEFT, and right = (-cos yaw, 0, sin yaw).
       const turning = a.bank * -6;                                    // > 0 while turning left
-      const dodging = a.state === 'dodge' && !this.has('Dodge') ? 0.9 : 0;
+      const dodging = a.state === 'dodge' && !this.has('Dodge') && !this.has('Dash') ? 0.9 : 0;
       const guarding = (a.state === 'guard' || a.state === 'parry') && !this.has('Guard') ? 0.45 : 0;
       const lateral = dodging ? -a.dodgeDir.x * Math.cos(a.yaw) + a.dodgeDir.z * Math.sin(a.yaw) : 0; // + = to its right
       const targets = [

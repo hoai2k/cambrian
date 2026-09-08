@@ -1,0 +1,332 @@
+[
+  {
+    "era": "cambrian",
+    "id": "anomalocaris",
+    "status": "pending",
+    "scope": "attack-feeding-animation",
+    "reviewClips": [
+      "Bite",
+      "Attack",
+      "Heavy",
+      "Eat",
+      "Grab",
+      "Dash"
+    ],
+    "note": "If this creature has a pending structural redesign, coordinate motion with its replacement; review each resulting animation individually.",
+    "grip": "Already has a Grab clip: review it against the new held-grip rules (a grip held for as long as the button is down, and the same grip used to cling to something bigger)."
+  },
+  {
+    "era": "cambrian",
+    "id": "opabinia",
+    "status": "pending",
+    "scope": "attack-feeding-animation",
+    "reviewClips": [
+      "Bite",
+      "Attack",
+      "Heavy",
+      "Eat",
+      "Dash"
+    ],
+    "note": "If this creature has a pending structural redesign, coordinate motion with its replacement; review each resulting animation individually."
+  },
+  {
+    "era": "cambrian",
+    "id": "waptia",
+    "status": "pending",
+    "scope": "attack-feeding-animation",
+    "reviewClips": [
+      "Bite",
+      "Attack",
+      "Heavy",
+      "Eat",
+      "Dash"
+    ],
+    "note": "If this creature has a pending structural redesign, coordinate motion with its replacement; review each resulting animation individually."
+  },
+  {
+    "era": "cambrian",
+    "id": "marrella",
+    "status": "pending",
+    "scope": "attack-feeding-animation",
+    "reviewClips": [
+      "Bite",
+      "Attack",
+      "Heavy",
+      "Eat",
+      "Dash"
+    ],
+    "note": "If this creature has a pending structural redesign, coordinate motion with its replacement; review each resulting animation individually."
+  },
+  {
+    "era": "cambrian",
+    "id": "olenoides",
+    "status": "pending",
+    "scope": "attack-feeding-animation",
+    "reviewClips": [
+      "Bite",
+      "Attack",
+      "Heavy",
+      "Eat",
+      "Dash"
+    ],
+    "note": "If this creature has a pending structural redesign, coordinate motion with its replacement; review each resulting animation individually."
+  },
+  {
+    "era": "cambrian",
+    "id": "odaraia",
+    "status": "pending",
+    "scope": "attack-feeding-animation",
+    "reviewClips": [
+      "Bite",
+      "Attack",
+      "Heavy",
+      "Eat",
+      "Dash"
+    ],
+    "note": "If this creature has a pending structural redesign, coordinate motion with its replacement; review each resulting animation individually."
+  },
+  {
+    "era": "cambrian",
+    "id": "cambroraster",
+    "status": "pending",
+    "scope": "attack-feeding-animation",
+    "reviewClips": [
+      "Bite",
+      "Attack",
+      "Heavy",
+      "Eat",
+      "Grab",
+      "Dash"
+    ],
+    "note": "If this creature has a pending structural redesign, coordinate motion with its replacement; review each resulting animation individually.",
+    "grip": "The rake spines close as a basket around the held body; the head shield stays level. Riding grips with the frontal appendages under the shield."
+  },
+  {
+    "era": "cambrian",
+    "id": "sidneyia",
+    "status": "pending",
+    "scope": "attack-feeding-animation",
+    "reviewClips": [
+      "Bite",
+      "Attack",
+      "Heavy",
+      "Eat",
+      "Dash"
+    ],
+    "note": "If this creature has a pending structural redesign, coordinate motion with its replacement; review each resulting animation individually."
+  },
+  {
+    "era": "cambrian",
+    "id": "leanchoilia",
+    "status": "pending",
+    "scope": "attack-feeding-animation",
+    "reviewClips": [
+      "Bite",
+      "Attack",
+      "Heavy",
+      "Eat",
+      "Grab",
+      "Dash"
+    ],
+    "note": "If this creature has a pending structural redesign, coordinate motion with its replacement; review each resulting animation individually.",
+    "grip": "The three whip flagella of each great appendage wrap and hold; the shorter podomeres take the load. Riding wraps a flank with the whips."
+  },
+  {
+    "era": "cambrian",
+    "id": "isoxys",
+    "status": "pending",
+    "scope": "attack-feeding-animation",
+    "reviewClips": [
+      "Bite",
+      "Attack",
+      "Heavy",
+      "Eat",
+      "Grab",
+      "Dash"
+    ],
+    "note": "If this creature has a pending structural redesign, coordinate motion with its replacement; review each resulting animation individually.",
+    "grip": "The raptorial frontal appendages fold in and hold against the carapace opening; riding hooks them over an edge with the body tucked along the host."
+  },
+  {
+    "era": "cambrian",
+    "id": "tamisiocaris",
+    "status": "pending",
+    "scope": "attack-feeding-animation",
+    "reviewClips": [
+      "Bite",
+      "Attack",
+      "Heavy",
+      "Eat",
+      "Grab",
+      "Dash"
+    ],
+    "note": "If this creature has a pending structural redesign, coordinate motion with its replacement; review each resulting animation individually.",
+    "grip": "The filtering combs are not claws: the grip closes the whole appendage pair around the body, spines interlocking, and riding hangs the animal beneath the host."
+  },
+  {
+    "era": "cambrian",
+    "id": "nectocaris",
+    "status": "pending",
+    "scope": "attack-feeding-animation",
+    "reviewClips": [
+      "Bite",
+      "Attack",
+      "Heavy",
+      "Eat",
+      "Grab",
+      "Dash"
+    ],
+    "note": "If this creature has a pending structural redesign, coordinate motion with its replacement; review each resulting animation individually.",
+    "grip": "Both tentacles close and stay closed on the held body; the same pair takes hold of a flank when riding something larger."
+  },
+  {
+    "era": "devonian",
+    "id": "eldredgeops",
+    "status": "pending",
+    "scope": "attack-feeding-animation",
+    "reviewClips": [
+      "Bite",
+      "Attack",
+      "Heavy",
+      "Eat",
+      "Dash"
+    ],
+    "note": "If this creature has a pending structural redesign, coordinate motion with its replacement; review each resulting animation individually."
+  },
+  {
+    "era": "devonian",
+    "id": "walliserops",
+    "status": "pending",
+    "scope": "attack-feeding-animation",
+    "reviewClips": [
+      "Bite",
+      "Attack",
+      "Heavy",
+      "Eat",
+      "Grab",
+      "Dash"
+    ],
+    "note": "If this creature has a pending structural redesign, coordinate motion with its replacement; review each resulting animation individually.",
+    "grip": "The trident is a lever, not a pincer: the fork sets across the held body and the thoracic legs close under it; riding hooks the trident over a flank."
+  },
+  {
+    "era": "devonian",
+    "id": "jaekelopterus",
+    "status": "pending",
+    "scope": "attack-feeding-animation",
+    "reviewClips": [
+      "Bite",
+      "Attack",
+      "Heavy",
+      "Eat",
+      "Grab",
+      "Dash"
+    ],
+    "note": "If this creature has a pending structural redesign, coordinate motion with its replacement; review each resulting animation individually.",
+    "grip": "The chelicerae close and hold — coordinated joints, not a rigid rotation — and the walking legs brace. Riding sets the pincers into a flank with the legs gripping."
+  },
+  {
+    "era": "devonian",
+    "id": "nahecaris",
+    "status": "pending",
+    "scope": "attack-feeding-animation",
+    "reviewClips": [
+      "Bite",
+      "Attack",
+      "Heavy",
+      "Eat",
+      "Dash"
+    ],
+    "note": "If this creature has a pending structural redesign, coordinate motion with its replacement; review each resulting animation individually."
+  },
+  {
+    "era": "devonian",
+    "id": "palaeoisopus",
+    "status": "pending",
+    "scope": "attack-feeding-animation",
+    "reviewClips": [
+      "Bite",
+      "Attack",
+      "Heavy",
+      "Eat",
+      "Dash"
+    ],
+    "note": "If this creature has a pending structural redesign, coordinate motion with its replacement; review each resulting animation individually."
+  },
+  {
+    "era": "devonian",
+    "id": "manticoceras",
+    "status": "pending",
+    "scope": "attack-feeding-animation",
+    "reviewClips": [
+      "Bite",
+      "Attack",
+      "Heavy",
+      "Eat",
+      "Dash"
+    ],
+    "note": "If this creature has a pending structural redesign, coordinate motion with its replacement; review each resulting animation individually."
+  },
+  {
+    "era": "devonian",
+    "id": "michelinoceras",
+    "status": "pending",
+    "scope": "attack-feeding-animation",
+    "reviewClips": [
+      "Bite",
+      "Attack",
+      "Heavy",
+      "Eat",
+      "Dash"
+    ],
+    "note": "Motion-v3 refined Attack/Bite/Heavy/Eat and authored-grasp runtime integrated as preview; full19/LOD7 actions. Actual 60-view art and 12 production rig/prey scenarios pass. Interactive game/controller playtest and broader individual quality review remain."
+  },
+  {
+    "era": "devonian",
+    "id": "furcaster",
+    "status": "pending",
+    "scope": "attack-feeding-animation",
+    "reviewClips": [
+      "Bite",
+      "Attack",
+      "Heavy",
+      "Eat",
+      "Grab",
+      "Dash"
+    ],
+    "note": "If this creature has a pending structural redesign, coordinate motion with its replacement; review each resulting animation individually.",
+    "grip": "Grabs with its WHOLE BODY: the arms wrap and the disc flattens onto the target so it sticks on. Riding is the same pose, held, with the oral surface against the host. Never a single arm poking forward."
+  },
+  {
+    "era": "cambrian",
+    "id": "hallucigenia",
+    "status": "pending",
+    "scope": "attack-feeding-animation",
+    "reviewClips": [
+      "Bite",
+      "Attack",
+      "Heavy",
+      "Eat",
+      "Grab",
+      "Dash"
+    ],
+    "note": "Joins the pass for its grip: it grabs with its feet, which no existing clip does.",
+    "grip": "Grabs with its FEET — the clawed lobopods, in pairs, clamped around the held body or hooked into the host while the dorsal spines stay clear. Never a mouth grab."
+  },
+  {
+    "era": "cambrian",
+    "id": "ottoia",
+    "status": "pending",
+    "scope": "attack-feeding-animation",
+    "reviewClips": [
+      "Bite",
+      "Attack",
+      "Heavy",
+      "Eat",
+      "Grab",
+      "Dash"
+    ],
+    "note": "Joins the pass for its grip: the everted pharynx takes hold.",
+    "grip": "The eversible pharynx everts and its hooks set into the held body; riding means the introvert anchored into a flank, the trunk trailing."
+  }
+]

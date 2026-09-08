@@ -188,7 +188,7 @@ expresses them differently so fights are varied.
 | **Guard** | LB (hold) | Halves damage, prevents knockback, drains stamina on each hit. A guard-broken creature is **staggered** for 1.2 s. |
 | **Parry** | LB (tap, timing) | Guard in the first 0.15 s of an incoming hit: no damage, attacker is staggered 0.8 s and you get a free heavy. Swimmers parry with a body twist, armoured crawlers with a shell clank. |
 | **Lock-on** | LT (toggle) | Camera frames you and the target, movement becomes **orbit/strafe** relative to the target, attacks home. Left stick left/right circles. Flick right stick to switch target. |
-| **Sense pulse** | D-pad ↑ | 2 s highlight of everything within sense range through cover, colour-coded by size band. Cooldown 6 s. |
+| **Sense** | D-pad ↑ | Toggles the read-out: the size-band marks over creatures and the radar. On by default, free, and it never runs out — off is the immersive view, with nothing drawn over the sea but the HUD bar. |
 | **Eat** | automatic | Biting a dead body or a Snack consumes it. **Anything can feed on anything**, however much bigger it was: the carcass comes apart in whole bites, `ceil(3 × its length / yours)` of them (1–12), a bite every 0.62 s. A body under a third of your length goes down whole and is carried into your mouth; bigger, it stays where it fell, and each bite tears its share of the meat off the model and flies it into your mouth. Eating can be interrupted, so opening a giant carcass in the open is a long risk. |
 
 > **The shipped bindings are different.** The layout above is the design's first
@@ -200,18 +200,59 @@ expresses them differently so fights are varied.
 > | Left stick | axes 0–1 | Camera-relative swim |
 > | Right stick | axes 2–3 | Orbit the camera |
 > | RS click + stick up/down | 11 | Zoom |
-> | LS click | 10 | Sink |
+> | LS click | 10 | **Sink**, alongside LB |
 > | **A** | 0 | **Sprint / burst** (analog-free, held) |
 > | **B** | 1 | **Guard** (hold) / **parry** (tap) |
-> | **X** | 2 | **Light bite** |
-> | **Y** | 3 | **Ability** |
-> | **LB** | 4 | **Dodge / dash** |
+> | **X** | 2 | **Dodge / dash** |
+> | **Y** | 3 | **Light bite** · on the select screen: hatch, or carry a Rise run on · on the results screen: keep playing |
+> | **LB** | 4 | **Sink** |
 > | **RB** | 5 | **Rise** / **hop**, held to paddle upward (crawlers) |
 > | **LT** (analog) | 6 | **Aim** — the centred crosshair picks the target |
 > | **RT** (analog) | 7 | **Heavy / pounce** |
-> | D-pad ↑ | 12 | Sense pulse |
+> | D-pad ↑ | 12 | Sense on/off |
 > | D-pad ↓ | 13 | Teleport menu (added with the endless sea) |
+> | D-pad → | 15 | **Hide / camouflage** |
 > | D-pad ←/→ | 14/15 | Menu navigation and creature select |
+>
+> The pad layout is arranged around two pairs. **LB and RB are the vertical
+> axis** — sink and rise — and **A and X are the horizontal one**, sprint and
+> dash, adjacent under the thumb. Hiding went to D-pad right, next to the other
+> two D-pad tools, and the left stick click keeps sinking so the old reflex
+> still works.
+>
+> **The in-game menus are steered, not button-mapped.** The pause menu and the
+> results screen used to give every choice its own pad button — A resumed, RT
+> went back to select, Y quit — which is three live shortcuts on a screen that
+> can appear on its own, the instant a match ends, while a hand is still
+> fighting. Three rules now stand between the end of a fight and an answer
+> (`src/app/menu-cursor.ts`, covered by `npm run menus`):
+>
+> 1. **A lockout.** Nothing is read for `MENU_LOCKOUT` (0.7 s) after the menu
+>    opens, and a button held across it is not an edge afterwards either.
+> 2. **A cursor that has to be woken.** The results screen starts with nothing
+>    highlighted; the first press or nudge only makes the cursor appear.
+> 3. **A harmless default.** It wakes on the first choice, which each menu makes
+>    the one that costs least: *Resume* on pause, *Continue* on the results
+>    screen (*Play again* in the versus modes, which have nothing to continue).
+>
+> Both menus end at *Quit*, which leaves the match for the choice screen — where
+> you go to play as something else, and where the way back to the title already
+> is. A separate "quit to title" button sat one careless press from the end of a
+> session for no gain.
+>
+> Afterwards it is one cursor and one button: up and down move, A confirms. The
+> results panel is a flex column with a scrolling middle, so the choices stay
+> pinned on screen — they used to be the last thing inside one tall scroller and
+> fell off the bottom of a short window.
+>
+> Sharing a button between gameplay and a menu is fine and always has been — A
+> is sprint and confirm, B is guard and back — because they are different
+> screens. Two *menu* actions on one button is the bug. Hiding on D-pad right
+> made `ability` collide with the select screen's creature cursor, so the
+> carry-on toggle moved off `ability` and onto `light`: it stays on Y, exactly
+> where players already press it. `tools/menu-bindings-test.ts` holds that line
+> — it walks every button through `readGamepad` and fails if two menu actions
+> land on one of them.
 > | Menu | 9 | Pause |
 > | View | 8 | Scoreboard (hold) |
 >
@@ -226,7 +267,7 @@ expresses them differently so fights are varied.
 > dive, `Engine.startMatch` checks: no pad in the session means pointer lock, the
 > mouse steers the camera, the wheel zooms, and the three buttons take the three
 > controls that have to fire the instant they are wanted — **left click** is the
-> heavy (RT), **right click** dashes (LB), **middle click** aims (LT). G, V and
+> heavy (RT), **right click** dashes (X), **middle click** aims (LT). G, V and
 > Tab keep working alongside them. One pad anywhere in the session and the pads
 > own the match; the mouse stays a cursor.
 >
@@ -522,7 +563,7 @@ population.
 
 | Mode | Players | Description |
 | --- | --- | --- |
-| **Rise** (single / co-op) | 1–4 | The main experience. Everyone hatches as a Larva in the nursery. Reach Apex. Co-op shares nutrition from assisted kills, players can revive a downed ally by bumping them within 10 s. Players *can* turn on each other — bites land, and a dead player can be fed on — but nothing aims at another player for you: no aim snap, no auto-pounce, no auto-lock. Area abilities still spare a co-op partner, so nobody kills a friend by accident. Session ends when any player reaches Apex and survives 90 s, or continues in free-play. Escalation: the reef's giant population grows as players grow. |
+| **Rise** (single / co-op) | 1–4 | The main experience. Everyone hatches as a Larva in the nursery — or, having grown this creature before, at the stage they reached (see *Carrying Rise on*). Reach Apex. Co-op shares nutrition from assisted kills, players can revive a downed ally by bumping them within 10 s. Players *can* turn on each other — bites land, and a dead player can be fed on — but nothing aims at another player for you: no aim snap, no auto-pounce, no auto-lock. Area abilities still spare a co-op partner, so nobody kills a friend by accident. Session ends when any player reaches Apex and survives 90 s, or continues in free-play (a player who *started* at Apex has no clock — see *Carrying Rise on*). Escalation: the reef's giant population grows as players grow. |
 | **Hunter & hunted** (versus, asymmetric) | 2–4 | One player is a Giant (× 3) with a shrinking hunger meter; the others are Juveniles who must survive and reach Adult. Giant eats to stay alive; small ones hide, bait, and grow. Rotates who is the Giant. *(As built: one **turn** each, 100 s, and your score is what you caught on your own turn — the same job for everyone, so the winner is the best hunter and prey play is how you keep the others' scores down. A turn ends early if every small one reaches Adult. One human plays it as a single turn, exactly as before.)* |
 | **Reef** (sandbox) | 1–4 | No win condition, pick any tier, tune giant density. For messing around and screenshots. |
 
@@ -537,6 +578,80 @@ seats in Hunter & Hunted; Rise and Reef are whoever turned up.
 > matter, and holding station over them brings them back with their tier
 > intact), **spectating** for a dead player in versus, and **rotation** in
 > Hunter & Hunted — see below.
+
+### Carrying Rise on
+
+Rise is the mode about growing up, so it is the one that keeps a record. Two
+things follow from that, and both are written once for both eras.
+
+**A finished run does not take the sea away.** Rise and Reef are co-op — a
+milestone rather than a verdict — so their results screen offers *Keep playing*
+(Y on a pad, Space on a keyboard). The match resumes exactly where it stood,
+with everything grown in it intact, and the goal stops watching so it cannot be
+met twice. Hunter & Hunted refuses: its result is a judgement between players.
+
+**Everything is written as it is found, not when a match ends.** Biomes swum
+through, landmarks come across, species taken to the top and growth marks all
+go into the record the moment they happen. This used to be the results screen's
+job alone, which meant a player who swam through half the sea and then quit to
+the title had nothing to show for it. Writing live costs the results screen the
+trick it used to mark finds new — comparing the store against the match no
+longer works, because the store already contains the match — so the shell
+accumulates what each match added and the screen renders that instead.
+
+**The furthest you have taken each creature is kept.** The record is per era and
+per creature, stored on the device beside the rest of the codex, and it is a
+high-water mark: it never falls, however the run ended, and like every other
+find it is written as the run happens, so dying, quitting to the title or
+closing the tab never throws away what you grew. A
+creature with a record wears it as a badge on its expanded card on the select
+screen, and in Rise the card offers to hatch you at that stage instead of at the
+bottom — **Y** on a pad, **C** on a keyboard. The offer only appears where it is
+real: in Rise, for a creature you have actually grown. Everything else hands out
+its own body and ignores the choice.
+
+**The top rung is the one you cannot bank by standing on it.** Rise asks you to
+reach the top *and hold it for ninety seconds*, so that is what the record
+listens for. Reach Apex and then die, or quit, and what is stored is the rung
+below with its **growth meter half full** — a mark of 3.5. Coming back on that
+puts you a short swim from the top rather than at the bottom of the sea, which
+is the honest reading of how far you actually got. Only finishing the run writes
+the top itself.
+
+**Arriving at the top is a victory lap, not a second win.** Because the top can
+only be stored by finishing, carrying it back in means the goal is already
+behind you: the ninety-second clock never starts for that player and the sea is
+simply open, exactly as it is after pressing *Keep playing*. The exemption is
+**per player, not per match** — a friend in the same co-op game who is still
+growing keeps their clock, reaches the top on their own, and wins it. A player
+on a victory lap banks nothing, because their record already says everything it
+can.
+
+### The growth ladder
+
+Both eras grow a player through five rungs, and they do it in different state:
+the Cambrian moults **Larva → Juvenile → Adult → Giant → Apex** on nutrition and
+keeps the rung on the actor's `tier`; the Devonian moults **Hatchling →
+Juvenile → Young → Adult → Prime** on standing and keeps it in its own side
+table. `src/sim/ladder.ts` is the one place that difference is reconciled —
+`ladderRung`, `ladderName`, `ladderScale` — and an era answers through the
+`ladder*` hooks in `EraRules`.
+
+Everything that reports or restores progress goes through it, so the record, its
+badge, the carry-on option and the codex's *reached the top* mark are each
+written once and behave identically in both eras. `tools/progress-test.ts` is
+the contract: one set of assertions, run against both eras, with no branch on
+which era is in play.
+
+Both eras derive the rest of a body from its **scale** — the Cambrian's tier
+through `tierForScale`, the Devonian's stage through `stageForScale` — which is
+why hatching a player part-grown is a single number handed to `spawn`.
+
+A position on the ladder is a **mark**, not an index: the whole part is the rung,
+the fraction is how far through it. A mark's fraction is never size — there is no
+animal between two rungs, and the size rule has no name for one — it is meter, so
+`ladderScale` reads the rung and `ladderFill` fills the era's own currency
+(nutrition here, standing in the Devonian) to the fraction.
 
 ## Local multiplayer specifics
 
@@ -554,6 +669,19 @@ seats in Hunter & Hunted; Rise and Reef are whoever turned up.
 - **Spectating**: a dead player in versus gets a free camera following the
   leader until respawn. *(Built. Versus only: in co-op the camera stays on your
   own body, because a team-mate may be on the way to it.)*
+- **Dying is a shot, not a dialog.** Death used to drop a red panel over the
+  middle of the viewport the instant it happened, which hid the one thing worth
+  seeing. The whole death watch (`CORPSE_WINDOW`, seven seconds) is now spent
+  watching what actually happened: eaten, the camera rides with the predator,
+  because that is where you are; killed any other way, it stays on your own body
+  drifting up, since whatever landed the blow has already moved on. The only UI
+  is a line low on the screen, "You've been eaten by P2", over an unobstructed
+  view.
+  The screen fades to black over the last 1.2 s of the watch and then fades
+  slowly back in on the new body, so the respawn is a dissolve rather than a cut.
+  A downed team-mate never fades out at all — their window is a race somebody
+  else is running, so they keep the picture and get the rescue meter under the
+  same low line.
 
 ## Readability, HUD and feedback
 

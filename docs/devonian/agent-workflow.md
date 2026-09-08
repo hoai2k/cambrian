@@ -1,5 +1,10 @@
 # Devonian authoring and execution workflow
 
+## Eye-audit scope — user clarification
+
+The quantitative 50% eye-globe embedding/containment audit applies only to fish-like creatures. Do not apply it to arthropods, cephalopods or other creatures with naturally exposed or stalked eyes; in particular, do not force Odaraia or nautiloid eyes into their bodies to meet this threshold. Their eyes should follow the creature-specific anatomy and references. Ordinary visual checks for unintended gaps, attachment errors and animation defects still apply. This clarification supersedes broader eye-audit wording in older plans and handoffs. Work remains paused.
+
+
 This is the boundary between visual/anatomical authorship and deterministic
 execution. It does not authorize an executor to replace a creative decision
 with an automated fix.

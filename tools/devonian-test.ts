@@ -26,6 +26,7 @@ type FloraKind = import('../src/sim/world').FloraKind;
 type Biome = import('../src/sim/world').Biome;
 type InputFrame = import('../src/sim/types').InputFrame;
 type Mode = import('../src/sim/types').Mode;
+import { heading } from '../src/shared/math';
 import { isCoop } from '../src/sim/types';
 type CreatureId = import('../src/sim/creatures').CreatureId;
 
@@ -63,6 +64,23 @@ for (const c of DEVONIAN.creatures) {
 const opener = DEVONIAN.audio.music.find((t) => t.opening);
 ok(opener && fs.existsSync(`public/${paths.music(opener.name)}`.replace('%20', ' ')), `the opening track is delivered (${opener?.name})`);
 ok(RULES !== undefined && !RULES.growthByNutrition, 'Devonian rules active: growth is by standing, not nutrition');
+
+// ---- the animals that take hold, and the clips their grip is owed ----
+{
+  const graspers = DEVONIAN.creatures.filter((c) => c.grasp).map((c) => c.id as string);
+  ok(['jaekelopterus', 'walliserops', 'furcaster'].every((id) => graspers.includes(id)) && graspers.length === 3,
+    `the Devonian graspers are the three the design names (${graspers.join(', ')})`);
+  const queue = JSON.parse(fs.readFileSync('tools/attack-feeding-refinements.json', 'utf8')) as { id: string; reviewClips: string[]; grip?: string }[];
+  for (const id of graspers) {
+    const glb = `public/assets/devonian/creatures/${id}.glb`;
+    if (!fs.existsSync(glb)) continue;                        // borrows a body: no clips of its own to owe
+    const buf = fs.readFileSync(glb);
+    const clips = (JSON.parse(buf.subarray(20, 20 + buf.readUInt32LE(12)).toString('utf8')).animations ?? []).map((a: { name: string }) => a.name) as string[];
+    const q = queue.find((e) => e.id === id);
+    ok(clips.includes('Grab') || (!!q && q.reviewClips.includes('Grab') && !!q.grip),
+      `${id} either grabs on screen or is queued for the clip with its brief`);
+  }
+}
 
 // ---- scenery: the coast is dressed with Devonian stand-ins, not Cambrian sponges ----
 {
@@ -286,6 +304,81 @@ ok(RULES !== undefined && !RULES.growthByNutrition, 'Devonian rules active: grow
   ok(RULES!.jet(mk('manticoceras')) && !RULES!.jet(shark), 'only shells jet');
 }
 
+// ---- a shell goes where the stick points, and faces that way while it does ----
+// The stick is the direction of travel for every body in the sea, and the nose goes with it:
+// swimming, sprinting and dashing all go where they are aimed, shells included. Turning the animal
+// round to travel shell-first read as a spin rather than as a jet, so the funnel shows up only in
+// the free hover and in the backward dash below.
+{
+  const run = (id: CreatureId, gear: 'swim' | 'sprint' | 'dash', stick: 1 | -1 = 1) => {
+    const g = new Game('reef', [{ creature: id, device: 'keyboard', ready: true }]);
+    const p = g.players[0];
+    p.pos = { x: 0, y: -14, z: 0 }; p.vel = { x: 0, y: 0, z: 0 }; p.yaw = 0; p.spawnProtect = 999;
+    const push = (): InputFrame => ({ ...emptyInput(), my: stick, burst: gear === 'sprint' ? 1 : 0, dash: gear === 'dash' });
+    for (let i = 0; i < 90; i++) { tick(g, new Map<number, InputFrame>([[0, push()]])); p.spawnProtect = 999; }
+    // The stick is camera-relative with camYaw 0, so +my is +z: travel and stick agree when z > 0.
+    // `astern` is how far the body points against its own travel: 1 is shell-first, -1 is head-first.
+    const h = heading(p.yaw), v = Math.hypot(p.vel.x, p.vel.z);
+    return { z: p.pos.z, astern: v > 0.35 ? -(h.x * p.vel.x + h.z * p.vel.z) / v : 0 };
+  };
+  for (const id of ['michelinoceras', 'manticoceras'] as CreatureId[]) {
+    const swim = run(id, 'swim'), sprint = run(id, 'sprint'), dash = run(id, 'dash'), astern = run(id, 'swim', -1);
+    ok(swim.z > 1, `${id} swims where the stick points (z ${swim.z.toFixed(1)})`);
+    ok(sprint.z > swim.z, `...sprints further the same way, never backward out of it (z ${sprint.z.toFixed(1)})`);
+    ok(dash.z > 1, `...and dashes the same way too (z ${dash.z.toFixed(1)})`);
+    ok(astern.z < -1, `...and pulling the stick back takes it back (z ${astern.z.toFixed(1)})`);
+    ok(swim.astern < -0.8, `...facing its way at a cruise (${swim.astern.toFixed(2)}, -1 is nose-first)`);
+    ok(sprint.astern < -0.8, `...and still facing it at a sprint, never spun round (${sprint.astern.toFixed(2)}, -1 is nose-first)`);
+    ok(dash.astern < -0.8, `...and through an aimed dash (${dash.astern.toFixed(2)}, -1 is nose-first)`);
+  }
+  const fish = run('cladoselache', 'sprint');
+  ok(fish.z > 1 && fish.astern < -0.8, `a finned body sprints forward, facing forward (z ${fish.z.toFixed(1)}, ${fish.astern.toFixed(2)})`);
+
+  // A neutral stick has no direction to give, so the dash takes the body's own axis: ahead of a
+  // finned body, and out behind a shell, which is the way it is already pointing to jet.
+  const neutral = (id: CreatureId) => {
+    const g = new Game('reef', [{ creature: id, device: 'keyboard', ready: true }]);
+    const p = g.players[0];
+    p.pos = { x: 0, y: -14, z: 0 }; p.vel = { x: 0, y: 0, z: 0 }; p.yaw = 0; p.spawnProtect = 999;
+    const step = (f: Partial<InputFrame> = {}) => { tick(g, new Map<number, InputFrame>([[0, { ...emptyInput(), ...f } as InputFrame]])); p.spawnProtect = 999; };
+    for (let i = 0; i < 20; i++) step();
+    const from = { ...p.pos }, fromYaw = p.yaw;
+    step({ dash: true });
+    for (let i = 0; i < 20; i++) step();
+    const h = heading(p.yaw), dx = p.pos.x - from.x, dz = p.pos.z - from.z;
+    return { moved: Math.hypot(dx, dz), alongAxis: (h.x * dx + h.z * dz) / Math.max(Math.hypot(dx, dz), 1e-6), turned: Math.atan2(Math.sin(p.yaw - fromYaw), Math.cos(p.yaw - fromYaw)) };
+  };
+  const shell = neutral('michelinoceras'), finned = neutral('cladoselache');
+  ok(finned.moved > 1 && finned.alongAxis > 0.9, `a neutral-stick dash sends a fish the way it faces (${finned.moved.toFixed(1)} units, ${finned.alongAxis.toFixed(2)})`);
+  ok(shell.moved > 1 && shell.alongAxis < -0.9, `...and a shell out behind itself, shell-first (${shell.moved.toFixed(1)} units, ${shell.alongAxis.toFixed(2)})`);
+  // ...and it comes out of that still pointing where it started. Holding the heading is what makes
+  // a dash *backward*: following the velocity round would spin the animal, and the camera with it,
+  // through 180° at the one moment it wants its eyes on the thing it is escaping. A dash that goes
+  // where the body already points has nothing to hold, so this is the shell's rule, not the fish's.
+  ok(Math.abs(shell.turned) < 0.2, `a backward dash leaves the shell facing where it was (turned ${shell.turned.toFixed(2)} rad)`);
+}
+
+// ---- changing creature keeps the era's own growth in step ----
+// The Devonian keeps the life stage in a side table rather than deriving it per step, so a body
+// that changed species has to be told (`onSwap`). Without it the new animal would keep the old
+// one's stage and the meter would be filled against the wrong thresholds.
+{
+  const { ladderMark, rungOf } = await import('../src/sim/ladder');
+  const { devActor, stageForScale } = await import('../src/sim/devonian/state');
+  const g = new Game('rise', [{ creature: 'coccosteus', device: 'keyboard', ready: true }]);
+  const p = g.players[0];
+  for (let i = 0; i < 30; i++) tick(g, new Map<number, InputFrame>([[0, emptyInput()]]));
+  p.spawnProtect = 0; p.teleportCd = 0; p.state = 'free';
+  const target: CreatureId = 'dunkleosteus';
+  ok(g.changeCreature(0, target, true), 'a Devonian player can change creature');
+  ok(p.creature === target, `...and is the new animal (${p.creature})`);
+  const d = devActor(g, p);
+  ok(d.stage === stageForScale(creature(target).adultLength, p.scale), `...with the era's stage resynced to the new body (stage ${d.stage})`);
+  ok(rungOf(ladderMark(g, p)) === 4, `...arriving fully grown when asked (rung ${rungOf(ladderMark(g, p))})`);
+  p.teleportCd = 0;
+  ok(g.changeCreature(0, 'coccosteus', false) && rungOf(ladderMark(g, p)) === 0, 'and the body it left is handed back where it was');
+}
+
 // ---- every sound the era asks for exists (the shared library is NOT under assets/devonian/) ----
 {
   const { SAMPLES, LOOPS, sfxUrl, registerSamples } = await import('../src/audio/audio');
@@ -465,14 +558,16 @@ ok(RULES !== undefined && !RULES.growthByNutrition, 'Devonian rules active: grow
   const a = g.players[0];
   const step = (f: Partial<InputFrame> = {}) => { g.step(DT, new Map([[0, { ...emptyInput(), ...f } as InputFrame]])); const k = g.events.map((e) => e.kind); g.events.length = 0; return k; };
   for (let i = 0; i < 120; i++) step();
-  a.spawnProtect = 0;
-  for (let i = 0; i < 150; i++) step({ my: 1, camYaw: a.yaw });
+  // Left alone for the whole run: this measures how a fish swims, not what finds it while it does.
+  const undisturbed = () => { a.spawnProtect = 999; a.hitStop = 0; };
+  undisturbed();
+  for (let i = 0; i < 150; i++) { step({ my: 1, camYaw: a.yaw }); undisturbed(); }
   const fwd = Math.hypot(a.vel.x, a.vel.z), yaw0 = a.yaw;
   let slowest = Infinity;
-  for (let i = 0; i < 40; i++) { step({ my: -1, camYaw: yaw0 }); slowest = Math.min(slowest, Math.hypot(a.vel.x, a.vel.z)); }
+  for (let i = 0; i < 40; i++) { step({ my: -1, camYaw: yaw0 }); undisturbed(); slowest = Math.min(slowest, Math.hypot(a.vel.x, a.vel.z)); }
   ok(slowest < fwd * 0.2, `backing up is slow (forward ${fwd.toFixed(1)}, astern bottoms at ${slowest.toFixed(1)})`);
   ok(Math.abs(a.yaw - yaw0) > 0.8, `and the body turns sharply to face the new way (${Math.abs(a.yaw - yaw0).toFixed(2)} rad in two thirds of a second)`);
-  for (let i = 0; i < 200; i++) step();
+  for (let i = 0; i < 200; i++) { step(); undisturbed(); }
   const rest = Math.hypot(a.vel.x, a.vel.z);
   step({ my: 1, camYaw: a.yaw, burst: 1 });
   const dart = Math.hypot(a.vel.x, a.vel.z);

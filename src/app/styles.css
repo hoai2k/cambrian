@@ -89,6 +89,23 @@ h3 { font-size: 13px; letter-spacing: .12em; color: var(--ember); margin: 14px 0
 .result-kind { color: var(--mist); font-size: .85em; letter-spacing: .06em; }
 .kind-note { margin: .3em 0 .5em; color: var(--mist); font-size: .9em; line-height: 1.4; }
 .tagline { margin: 0 0 8px; color: var(--mist); font-weight: 600; }
+
+/* The Rise record, on the expanded creature card: how far this creature has been grown before,
+   and — in Rise, where it can be taken up — the offer to start there instead of as a hatchling. */
+.best-run { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin: 0 0 8px; }
+.best-badge { display: inline-flex; align-items: baseline; gap: 5px; padding: 3px 8px; border-radius: 999px;
+  background: color-mix(in srgb, var(--ember, #ffb36b) 18%, transparent);
+  border: 1px solid color-mix(in srgb, var(--ember, #ffb36b) 55%, transparent);
+  color: var(--ember, #ffb36b); font: 700 11px/1.3 var(--font-display); letter-spacing: .06em; white-space: nowrap; }
+.best-badge b { font-size: 9px; letter-spacing: .12em; opacity: .75; }
+.carry-toggle { display: inline-flex; align-items: center; gap: 6px; padding: 3px 8px; border-radius: 999px;
+  background: transparent; border: 1px solid color-mix(in srgb, var(--mist) 35%, transparent);
+  color: var(--mist); font: 600 11px/1.3 var(--font-body, inherit); cursor: pointer; white-space: nowrap; }
+.carry-toggle:hover { border-color: var(--mist); color: var(--ink, #eaf6f8); }
+.best-run.carrying .carry-toggle { border-color: var(--player); color: var(--player); background: color-mix(in srgb, var(--player) 14%, transparent); }
+.carry-toggle kbd { font: 700 10px var(--font-display); padding: 0 4px; border-radius: 4px; border: 1px solid currentColor; opacity: .8; }
+.crew.compact .best-run { margin-bottom: 4px; }
+.crew.compact .best-badge, .crew.compact .carry-toggle { font-size: 10px; padding: 2px 6px; }
 .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 8px; }
 .stat { display: flex; flex-direction: column; gap: 4px; }
 .stat small { color: var(--dim); font-size: 11px; letter-spacing: .06em; }
@@ -163,9 +180,15 @@ h3 { font-size: 13px; letter-spacing: .12em; color: var(--ember); margin: 14px 0
 .marker-giant { animation: blink .8s infinite; }
 .hunter-arrow { position: absolute; left: 50%; top: 50%; color: var(--coral); font-size: 2.2em; text-shadow: 0 0 14px var(--coral); }
 .hunter-arrow span { display: inline-block; transform: rotate(90deg); }
-.dead-overlay { position: absolute; inset: 0; display: grid; place-items: center; align-content: center; gap: .4em; background: rgba(40, 6, 10, .45); backdrop-filter: blur(2px) saturate(.6); }
-.dead-overlay b { font: 900 3em var(--font-display); letter-spacing: .1em; color: var(--coral); }
-.dead-overlay span { color: var(--mist); }
+/* Death: a line low on the viewport, not a panel over it. You watch what got you finish the job;
+   the screen fades out at the end of the watch, so nothing here needs to cover the picture. */
+.death-note { position: absolute; left: 50%; bottom: 3.6em; transform: translateX(-50%); display: grid; justify-items: center; gap: .15em; text-align: center; pointer-events: none; animation: fade-in .5s both; text-shadow: 0 .08em .5em rgba(0,0,0,.85), 0 0 1.2em rgba(0,0,0,.6); }
+.death-note b { font: 800 1.35em var(--font-display); letter-spacing: .06em; color: var(--coral); }
+.death-note b i { font-style: normal; font-weight: 600; color: var(--mist); opacity: .85; }
+.death-note span { font-size: .85em; color: var(--mist); opacity: .75; }
+.death-note.downed b { color: var(--player, #61f2d5); }
+/* In versus the spectator chip already owns the bottom of the viewport; sit above it. */
+.death-note.spectating-too { bottom: 6em; }
 
 /* Co-op: a downed team-mate. An arrow pinned to the middle of the viewport pointing the way,
    and a call-out with the seconds left to reach them. */
@@ -178,6 +201,18 @@ h3 { font-size: 13px; letter-spacing: .12em; color: var(--ember); margin: 14px 0
 .downed-call span { color: var(--mist); font-size: .8em; }
 .revive-bar { display: block; height: 3px; margin-top: .3em; border-radius: 2px; background: var(--player, #61f2d5); transform-origin: left; transition: transform .08s linear; }
 .revive-bar.wide { width: min(40vw, 260px); height: 4px; margin-top: .6em; }
+
+/* The change-creature page of the teleport menu: one animal at a time, cycled left and right, with
+   what you would arrive as written under it. */
+.swap-menu { min-width: 15em; }
+.swap-body { display: flex; gap: .7em; align-items: center; margin: .4em 0 .5em; }
+.swap-body img { width: 3.4em; height: 3.4em; object-fit: contain; flex: none; }
+.swap-body > div { display: grid; gap: .1em; min-width: 0; }
+.swap-body b { font: 800 1em var(--font-display); }
+.swap-kind { font-size: .74em; color: var(--dim); }
+.swap-rung { font-size: .8em; color: var(--ember); }
+.swap-fill { display: block; height: 3px; margin-top: .25em; border-radius: 2px; background: rgba(238,250,246,.16); }
+.swap-fill b { display: block; height: 100%; border-radius: 2px; background: var(--ember); transform-origin: left; }
 
 /* Versus: whose game you are watching while you are dead. */
 .spectating { position: absolute; left: 50%; bottom: 2.2em; transform: translateX(-50%); display: grid; justify-items: center; gap: .15em; padding: .5em 1.2em; border-radius: 1em; background: rgba(6,22,28,.7); border: 1px solid rgba(238,250,246,.22); pointer-events: none; }
@@ -256,8 +291,18 @@ h3 { font-size: 13px; letter-spacing: .12em; color: var(--ember); margin: 14px 0
 /* ---------- Overlays ---------- */
 .overlay { position: absolute; inset: 0; z-index: 20; display: grid; place-items: center; background: rgba(6,22,28,.55); backdrop-filter: blur(6px); animation: fade-in .25s both; }
 .panel { width: min(92vw, 640px); padding: 28px 30px; border-radius: 22px; background: rgba(6,22,28,.8); border: 1px solid rgba(238,250,246,.14); box-shadow: 0 30px 90px rgba(0,0,0,.5); }
-.panel.results { width: min(94vw, 820px); max-height: 92vh; overflow-y: auto; overscroll-behavior: contain; }
-.menu-buttons { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 22px; align-items: center; }
+/* A column with a scrolling middle: the heading and the choices are pinned, only the cards and the
+   record scroll. The buttons were the last thing inside one tall scroller and fell off the bottom
+   of a short window, which is the worst place to hide the only way out of the screen. */
+.panel.results { width: min(94vw, 820px); max-height: 92vh; display: flex; flex-direction: column; overflow: hidden; }
+.results-scroll { flex: 1 1 auto; min-height: 0; overflow-y: auto; overscroll-behavior: contain; padding-right: 4px; }
+.menu-buttons { flex: none; display: grid; gap: 8px; margin-top: 18px; }
+.menu-choices { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+.menu-hint { margin: 0; font-size: 12px; color: var(--dim); }
+/* The highlight, for a menu that is steered rather than button-mapped. Deliberately loud: on the
+   results screen it is the only thing saying which choice a press will take. */
+.menu-choices .selected { outline: 2px solid var(--ember); outline-offset: 3px; }
+.menu-choices button.ghost.selected { border-color: var(--ember); color: var(--foam); background: rgba(255,179,107,.16); }
 .result-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 10px; margin-top: 18px; }
 .result-card { display: grid; gap: 4px; padding: 14px; border-radius: 14px; background: rgba(238,250,246,.05); border-top: 3px solid var(--player); }
 .result-card b { font: 700 16px var(--font-display); }
@@ -265,11 +310,14 @@ h3 { font-size: 13px; letter-spacing: .12em; color: var(--ember); margin: 14px 0
 
 /* ---------- The record: biomes, landmarks and species taken to Apex ---------- */
 /* The record can be long; it scrolls inside the panel so AGAIN and Title never leave the screen. */
-.discoveries { margin-top: 20px; padding-top: 16px; border-top: 1px solid rgba(238,250,246,.12); display: grid; gap: 12px; align-content: start; max-height: 42vh; overflow-y: auto; overscroll-behavior: contain; scrollbar-width: thin; padding-right: 4px; }
+.discoveries { margin-top: 20px; padding-top: 16px; border-top: 1px solid rgba(238,250,246,.12); display: grid; gap: 12px; align-content: start; }
 .discovery-head { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
 .discovery-head .eyebrow { margin: 0; }
 .discovery-head span { color: var(--dim); font-size: 13px; }
 .discoveries ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+/* On a result card the mark sits in the corner the same way it does in the record strips. */
+.result-card { position: relative; }
+.result-card .best-tag { position: absolute; top: 6px; right: 6px; padding: 1px 5px; border-radius: 6px; background: var(--ember, #ffb36b); color: #06161c; font: 800 9px/1.4 var(--font-display); letter-spacing: .08em; }
 .discoveries .new-tag { position: absolute; top: 4px; right: 4px; padding: 1px 5px; border-radius: 6px; background: var(--ember, #ffb36b); color: #06161c; font: 800 9px/1.4 var(--font-display); letter-spacing: .08em; }
 
 .biome-strip { grid-template-columns: repeat(auto-fit, minmax(108px, 1fr)); }

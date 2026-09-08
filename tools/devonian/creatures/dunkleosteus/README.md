@@ -91,3 +91,8 @@ Reviewed sequential frame strips spanning Swim, Heavy, Dodge, Eat, TurnLeft and 
 `validation.json` measures jaw/head excursions in every feeding action: Bite 36.80° / 6.90°, Attack 47.49° / 8.95°, Heavy 56.69° / 10.64°, Eat 27.50° / 5.16°, and Ability 49.27° / 9.26°. Bone rotations, rather than object scaling or an unrigged mouth swap, drive these motions.
 
 All four portraits are derived from the final source. `action-review.jpg` is the compact nine-action sheet. Full-resolution closeups, six motion GIFs and their frame strips are retained locally in `v2/final-review/`. Anatomical uncertainty remains in the posterior reconstruction, living integument, pigmentation and oral soft tissue, as described above; these artistic interpretations are not fossil measurements.
+
+## Reopened 8 September 2026
+
+Current shipped version is preview pending the focused face pass in
+`docs/devonian/refinement-queue.md`. Previous final reports apply only to the preserved backup.

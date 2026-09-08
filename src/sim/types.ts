@@ -29,7 +29,7 @@ export interface InputFrame {
   rise: boolean; sink: boolean;
   light: boolean; heavy: boolean; ability: boolean; dodge: boolean; guard: boolean;
   lock: boolean; sense: boolean;
-  /** LB: tap with a stick direction = sidestep dash, hold = sprint. */
+  /** LB: a sidestep dash in the stick direction, or along the body's own axis with a neutral stick. */
   dash: boolean;
   /** LT held: aim mode. The renderer decides what the centred crosshair is over and passes it here. */
   aim: boolean; aimTarget: number;
@@ -104,7 +104,14 @@ export interface Actor {
   hideT: number; hideCd: number; camoStrength: number;
   camoColors?: import('./concealment').CamoColors; camoScheme: string; camoLabel: string; camoSource: number;
   emergenceHeavy: boolean;
-  senseCd: number; senseT: number;
+  /**
+   * Sense: a display mode the player holds on or off, not a pulse. On (the default) the band
+   * glyphs and the radar are drawn; off, the screen carries nothing but the animal and the HUD,
+   * which is the immersive way to play. Display only — nothing in the simulation reads it.
+   */
+  senseMode: boolean;
+  /** How long this body still reads as revealed: the whip search, and a hidden body found by one. */
+  senseT: number;
   burstT: number;          // free burst timer (ambush surge)
   hitFlash: number; hitDir: Vec3; hitStop: number;
   grabbedBy: number; grabbing: number; grabT: number;
@@ -137,8 +144,31 @@ export interface Actor {
   respawnT: number; hatching: boolean;
   /** Co-op: how long a team-mate has been holding station beside this downed body. */
   reviveT: number;
-  dashHoldT: number; dashUsed: boolean; dashQueued: boolean; pounceCd: number; aimInRange: boolean; aiming: boolean;
+  /**
+   * This player hatched on the top rung of the growth ladder, by carrying a finished run in.
+   *
+   * Rise's goal is to reach the top and hold it, and they arrived there — so the goal is already
+   * behind them and its clock never runs for them: the sea is simply open, exactly as it is after
+   * pressing "keep playing". It is per player, not per match, so somebody else in the same co-op
+   * game who is still growing keeps their clock and can still win it.
+   */
+  carriedTop: boolean;
+  dashHoldT: number; dashUsed: boolean; pounceCd: number; aimInRange: boolean; aiming: boolean;
   dashCd: number; sinceHit: number; lastHitBy: number; swallowedBy: number; holdT: number;
+  /**
+   * A grasping creature is holding its attack button down, so what lands takes hold instead of
+   * striking through. Set from the input every step; false for anything that cannot grasp.
+   */
+  graspHold: boolean;
+  /**
+   * Riding: the animal this one is clinging to (-1 when not riding), how long it has held on, and
+   * where it took hold in the host's own frame — sideways, up and forward, in host body lengths —
+   * so the grip follows the host as it turns. `riddenBy` is the same hold from the host's side.
+   *
+   * A ride is a field rather than a state on purpose: the rider keeps its own state machine, which
+   * is what lets it bite the thing it is holding on to.
+   */
+  rideHost: number; rideT: number; rideOff: Vec3; riddenBy: number;
   deathY: number; sparkled: boolean; tumble: Vec3;
   kills: number; eats: number; escapes: number;
   hunted: number;          // 0..1 highest detection score against this actor (HUD)
@@ -163,7 +193,18 @@ export interface Corpse { id: number; }
 
 export interface SiltCloud { pos: Vec3; radius: number; t: number; }
 
-export interface PlayerSetup { creature: CreatureId; device: number | 'keyboard' | 'keyboard2'; ready: boolean; }
+export interface PlayerSetup {
+  creature: CreatureId;
+  device: number | 'keyboard' | 'keyboard2';
+  ready: boolean;
+  /**
+   * Rise only: the rung of the growth ladder to hatch on, instead of rung 0. This is how a player
+   * carries on from the furthest they have taken this creature before rather than starting again
+   * as a hatchling. Absent or 0 means the usual start; the other modes hand out their own bodies
+   * and ignore it. See src/sim/ladder.ts.
+   */
+  startRung?: number;
+}
 
 /** The three modes, shared by both eras: an era changes the sea and the animals, not the match. */
 export type Mode = 'rise' | 'hunted' | 'reef';

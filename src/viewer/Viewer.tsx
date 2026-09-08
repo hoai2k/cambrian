@@ -1,4 +1,4 @@
-import { ModelStatusBadge } from '../shared/ModelStatusBadge';
+import { ClipQueuedBadge, ModelStatusBadge } from '../shared/ModelStatusBadge';
 import { CreaturePortrait } from '../app/CreaturePortrait';
 import { useEffect, useRef, useState } from 'react';
 import { COLLECTIONS, paletteFor, SPECIMENS, specimenByKey, type CollectionId } from './catalogue';
@@ -142,7 +142,7 @@ export function Viewer() {
                 <span>
                   <b>{c.name}</b>
                   <small>{c.species}</small>
-                  <ModelStatusBadge status={c.modelStatus} compact />
+                  <ModelStatusBadge status={c.modelStatus} note={c.modelNote} compact />
                 </span>
               </button>
             </li>
@@ -153,7 +153,7 @@ export function Viewer() {
       <div className="info">
         <span className="role">{def.role}</span>
         <h2 className={def.name.length > 11 ? 'long-name' : undefined}>{def.name}</h2>
-        <ModelStatusBadge status={def.modelStatus} />
+        <ModelStatusBadge status={def.modelStatus} note={def.modelNote} />
         {def.kind && <p className="kind-line"><b className="kind">{def.kind}</b>{def.species}</p>}
         <p>{def.provenance ?? 'Burgess Shale'} · {clips.length} clips</p>
         {def.kindNote && <p className="specimen-description">{def.kindNote}</p>}
@@ -221,11 +221,18 @@ export function Viewer() {
         </div>}
         {!loading && !clips.length && <p className="hint">Static specimen</p>}
         <div className="clip-grid">
-          {clips.map((name) => (
-            <button key={name} className={`clip ${name === active ? 'active' : ''}`} aria-pressed={name === active} onClick={() => sceneRef.current?.play(name, loop)}>
-              {name}
-            </button>
-          ))}
+          {clips.map((name) => {
+            // A clip queued for rework is flagged on its own button rather than on the creature:
+            // the body is finished, this motion is not, and that is what a viewer wants to know.
+            const queued = def.clipNotes?.[name];
+            return (
+              <button key={name} className={`clip ${name === active ? 'active' : ''}${queued ? ' clip-queued' : ''}`}
+                aria-pressed={name === active} onClick={() => sceneRef.current?.play(name, loop)}>
+                {name}
+                {queued && <ClipQueuedBadge name={name} note={queued} />}
+              </button>
+            );
+          })}
         </div>
       </section>
 

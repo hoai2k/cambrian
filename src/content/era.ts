@@ -101,6 +101,19 @@ export interface EraDefinition {
     readonly emblem: string;
     /** Authored previews remain selectable while their art receives further refinement. */
     readonly modelStatus?: Readonly<Partial<Record<CreatureId, 'preview' | 'final'>>>;
+    /**
+     * What remains for each preview model, in a sentence: the badge shows it on hover, so a player
+     * who wonders why a finished-looking animal is flagged can find out. Both eras derive this and
+     * `modelStatus` from the same pending-refinements queue, so a model cannot be a preview
+     * without saying why.
+     */
+    readonly modelNotes?: Readonly<Partial<Record<CreatureId, string>>>;
+    /**
+     * Animation clips still queued for rework, per creature and clip name, with the reason. A body
+     * that is already right does not get a preview badge for pending motion work — the warning goes
+     * on the clip buttons that will actually change.
+     */
+    readonly clipNotes?: Readonly<Partial<Record<CreatureId, Partial<Record<string, string>>>>>;
     readonly modelBytes: Readonly<Partial<Record<CreatureId, number>>>;
     /**
      * Creatures whose own model is still in production borrow another roster member's GLB (and

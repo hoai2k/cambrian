@@ -2,3 +2,7 @@ node_modules
 dist
 .vite
 *.log
+# Headless test captures: tools/smoke.mjs and tools/viewer-smoke.mjs write these into the
+# working directory, and they have twice been committed by accident.
+/shot-*.png
+/viewer-*.png

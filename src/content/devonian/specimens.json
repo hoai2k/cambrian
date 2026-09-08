@@ -4,7 +4,7 @@
     "name": "Dunkleosteus",
     "species": "Dunkleosteus terrelli",
     "category": "creature",
-    "modelStatus": "final",
+    "modelStatus": "preview",
     "provenance": "Late Devonian (Famennian), Cleveland Shale, Ohio, USA",
     "description": "An armoured pelagic arthrodire with a short cranial wedge, articulated cutting jaws and a compact muscular trunk.",
     "model": "assets/devonian/creatures/dunkleosteus.glb",
@@ -26,7 +26,9 @@
       "Rear-body proportions, caudal silhouette, living integument and oral soft tissues remain interpretations.",
       "Representative 3.5 m adult, not a genus maximum.",
       "PBR UV albedo, normal and roughness; independent vertex pigment bake for LOD.",
-      "Growth is maturation display, no scaling or moulting."
+      "Growth is maturation display, no scaling or moulting.",
+      "V4 focused cranial and gnathal refinement; preserved V2 body, oral lining, rig, eye globes and anchors. Actual full/LOD eye-volume and 173 feeding-pose checks passed before an exact-geometry COLOR binding repair; audit transfer is hash-proven. Root completed individual visual review including corrected LOD pigment.",
+      "Focused V4 head and gnathal pass accepted; LOD05 corrects encoded sRGB pigment to linear vertex colors. Matched full/LOD rest and Heavy views reviewed. Reduced surface detail and normal/roughness parity plus broader controller/art polish remain pending; model stays preview."
     ]
   },
   {
@@ -63,7 +65,11 @@
       "Slender edentulous jaw and small relative orbits supported by fossils; suspension feeding supported biomechanically, actual filtering organs unknown and omitted.",
       "Complete body outline, tail and fin proportions, soft tissues, pigmentation and all motion are explicitly artistic reconstruction.",
       "Representative reconstructed display length 5 m; not a measured complete specimen or claimed maximum.",
-      "Attack/Heavy are shield/contact motions, Bite is a gentle oral closing cycle, Ability is a broad ram-feeding gape; names are compatibility labels, not gameplay design."
+      "Attack/Heavy are shield/contact motions, Bite is a gentle oral closing cycle, Ability is a broad ram-feeding gape; names are compatibility labels, not gameplay design.",
+      "Deep armored cranial and thoracic volume, a lined edentulous mouth, separate upper-cranial and lower-jaw bones, a deforming oral floor, six muscular tail sections and articulated long-fin trim.",
+      "The revised oral skinning retains the broad feeding gape. Both globes are seated deeper along their original socket axes; orbital rim, eye size and skull attachment are preserved.",
+      "Regional full-model PBR retains the 4096-pixel body albedo, with a reviewed vector-filtered 2048-pixel body normal. The reduced model retains vertex pigmentation and all 18 authored actions.",
+      "Refined preview model: close-up reduced-model surface polish, broader controller playtesting and dependent environment illustration updates remain pending."
     ]
   },
   {
@@ -133,9 +139,9 @@
     "name": "Gemuendina",
     "species": "Gemuendina stuertzi",
     "category": "creature",
-    "modelStatus": "final",
+    "modelStatus": "preview",
     "provenance": "Early Devonian (Emsian), Hunsrück Slate, Germany",
-    "description": "Broad, sculpted rhenanid with dorsal eyes and mouth, small mosaic armour and a long finless tail; tail-driven swimming with restrained pectoral trim.",
+    "description": "Broad rhenanid with a leading mouth, paired anterior eyes, small mosaic armour and a long finless tail; tail-driven swimming with restrained pectoral trim.",
     "model": "assets/devonian/creatures/gemuendina.glb",
     "lod": "assets/devonian/creatures/gemuendina.lod1.glb",
     "image": "assets/devonian/creatures/gemuendina.thumb.png",
@@ -163,13 +169,14 @@
       }
     ],
     "notes": [
-      "Broad low rhenanid form, upward eye/oral orientation, small lower-jaw denticles and regional differences in dermal ornament follow inspected fossil discussions.",
       "A finless tapering tail follows the illustrated specimen account; generic shark dorsal/caudal fins, fin spokes, ventral gill rows and sting are omitted.",
       "Living thickness, soft-tissue cavity, exact denticle/tessera arrangement, fin flexibility, pigmentation and motions are explicit reconstruction choices.",
       "0.30 m is a representative reconstructed length close to the illustrated 304 mm specimen, not a claimed species maximum.",
       "All action names are compatibility labels for specimen gestures; no Devonian gameplay rules are prescribed.",
       "V3 living mass and regional pigmentation follow user art direction as explicit interpretations; accepted clay-02 volume is retained except for the documented continuous orbital integration correction.",
-      "Seven sequential axial tail segments provide locomotor waves; limited pectoral-edge motion steers and trims the body."
+      "Seven sequential axial tail segments provide locomotor waves; limited pectoral-edge motion steers and trims the body.",
+      "V4 study05 forms a true terminal snout: the front upper and lower lips are the leading body edge, with closely paired eyes immediately above them. The oral lining connects continuously into an internal throat; accepted V3 posterior silhouette and pigmentation remain.",
+      "Paired anterior eyes above the leading mouth follow the user reference direction; dorsal eye-like motifs are skin markings, not additional eyes. This living orientation is an artistic reconstruction rather than a fossil certainty."
     ]
   },
   {
@@ -207,7 +214,7 @@
     "name": "Cladoselache",
     "species": "Cladoselache sp. (Cleveland Shale reconstruction)",
     "category": "creature",
-    "modelStatus": "final",
+    "modelStatus": "preview",
     "provenance": "Late Devonian, Famennian Cleveland Shale, Ohio, USA",
     "description": "Streamlined early chondrichthyan with a broad terminal mouth, large eyes, broad paired fins, a curved anterior dorsal spine and a keeled crescent tail.",
     "model": "assets/devonian/creatures/cladoselache.glb",
@@ -282,7 +289,7 @@
     "name": "Cheirolepis",
     "species": "Cheirolepis trailli",
     "category": "creature",
-    "modelStatus": "final",
+    "modelStatus": "preview",
     "provenance": "Middle Devonian, Scottish Orcadian Basin / Nairnshire assemblages",
     "description": "Small early ray-finned fish with fine rhombic scales, a large toothed terminal mouth, mobile gill covers, ray-supported fins and a strongly unequal tail with an elongated scaled upper lobe.",
     "model": "assets/devonian/creatures/cheirolepis.glb",
@@ -726,8 +733,7 @@
     "looping": [
       "Idle",
       "Swim",
-      "Guard",
-      "Eat"
+      "Guard"
     ],
     "sources": [
       "https://www.paleoitalia.it/wp-content/uploads/2023/06/05_Gnoli.pdf",
@@ -739,7 +745,8 @@
       "Model .5m representative is a project working value; the best described fragment is28mm, not a complete animal.",
       "Rigid shell weighted entirely to body; separate head retraction, ten arm chains, two corneous jaw bones and funnel motion.",
       "Forward-aligned bind pose meets runtime convention and does not claim horizontal living trim. Ability/Dodge interpret shell-stable jet escape; Growth does not scale shell.",
-      "No squid fins, sucker discs, differentiated long capture clubs or invented closure operculum."
+      "No squid fins, sucker discs, differentiated long capture clubs or invented closure operculum.",
+      "Motion-v3 retains original ten-arm anatomy and every other full action. Distinct sectional anticipation, whip, contact and recovery; Eat is consumption-progress driven. Comparative soft-part movement is uncertain."
     ]
   },
   {

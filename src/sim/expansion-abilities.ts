@@ -165,7 +165,7 @@ export function beginExpansionAbility(ctx: ExpansionContext, a: Actor, def: Crea
     }
     if (def.ability === 'sedimentDive') ctx.silt.push({ pos: { ...a.pos }, radius: lengthOf(a) * .8, t: 3 });
   }
-  if (def.ability === 'whipSearch') { a.senseT = a.stateDur; a.senseCd = Math.max(a.senseCd, 6); }
+  if (def.ability === 'whipSearch') a.senseT = a.stateDur;
   return true;
 }
 

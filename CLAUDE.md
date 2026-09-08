@@ -59,9 +59,30 @@ unless the user explicitly asks for a PR. Steps:
   slow, turn sharp when slow, fast-start on sprint) is the `swim` hook in `src/sim/devonian/swim.ts`.
   Devonian growth is five geometric stages per creature (`stageScale` in `src/sim/devonian/state.ts`,
   hatchlings no shorter than 0.6 units); hatchlings are placed inside plant cover (`spawnInCover`).
+- Seabed scenery collides as the shape it is drawn with: `src/content/prop-shapes.json` is measured
+  off the prop GLBs by `npm run shapes` and is what `src/sim` collides against (footprints in
+  `src/sim/footprint.ts`). Any new or changed instanced prop must re-run `npm run shapes`, and
+  `npm run props` checks the table against the meshes and audits collider against geometry.
 - Devonian scenery and biome plates are procedural stand-ins: flora kinds and their density table in
   `src/content/devonian/environment.ts` + `src/render/sea.ts`, plates from `npm run devonian:plates`.
   Authored sets replace them without touching placement; see `docs/redesign/09-devonian-remaining.md`.
+- What a player has found — biomes, landmarks, species taken to the top, the Rise record — is
+  written to `localStorage` as the match finds it (`recordFinds` in `src/app/codex.ts`), never at
+  the results screen: a player who quits mid-match keeps what they found. The results screen marks
+  finds new from a list the shell accumulates, because the store already holds them by then.
+  `npm run codex` guards both halves.
+- `src/content/<era>/pending-refinements.json` is the one queue of outstanding creature art, and it
+  separates the two kinds: `model: true` (geometry, materials, rig, LOD art) is what shows the
+  creature's ⚠ preview badge in the game and the viewer, with `reason` on hover; `clips` are
+  animation clips queued for rework on a body that is already right, flagged on those clip buttons
+  in the viewer with `clipReason` and never on the creature. `src/content/pending-refinements.ts`
+  derives both eras' tables and `npm run eras` enforces the split — an entry must claim model or
+  clip work, whichever it claims must carry its reason, and animation-only work must not badge the
+  animal.
+- `?debug=local` on either page (`/?debug=local`, `/devonian/?debug=local`) opens an editor for that
+  era's saved state — `src/app/DebugLocal.tsx`, gated by `src/shared/debug.ts`, mounted by
+  `src/app/Root.tsx` so both entry points get it without knowing about it. A new thing kept in
+  `localStorage` should get a control there; `npm run debug` checks the gate.
 - All docs live in `docs/`. Design docs are in `docs/redesign/`. Image, glyph and prop
   needs go in `docs/image-requests.md` and move to `docs/image-requests-history.md` once
   delivered and integrated; sound and music needs go in `docs/audio-requests.md`.

@@ -6,13 +6,23 @@ const shipped = JSON.parse(fs.readFileSync('tools/devonian/shipped.json'));
 assert.equal(new Set(shipped.creatures).size, shipped.creatures.length);
 assert.equal(new Set(shipped.props).size, shipped.props.length);
 for (const id of shipped.creatures) assert(roster.includes(id), `Unknown released creature ${id}`);
-const status = JSON.parse(fs.readFileSync('src/content/devonian/model-status.json'));
-for (const id of roster) assert(['preview', 'final'].includes(status[id]), `${id}: missing model production status`);
-const pending = JSON.parse(fs.readFileSync('tools/devonian/pending-refinements.json'));
+// The refinement queue is the one source: an entry with outstanding *model* work is what makes a
+// creature a preview. Queued animation work rides on the clips it affects and is not a preview.
+// model-status.json is kept as a mirror for anything downstream, and checked against the queue so
+// the two can never quietly disagree.
+const pending = JSON.parse(fs.readFileSync('src/content/devonian/pending-refinements.json'));
 assert.equal(new Set(pending.map(p => p.id)).size, pending.length, 'Duplicate pending refinement');
+const status = JSON.parse(fs.readFileSync('src/content/devonian/model-status.json'));
 for (const item of pending) {
   assert(roster.includes(item.id), `Unknown pending refinement ${item.id}`);
-  assert.equal(status[item.id], 'preview', `${item.id}: pending refinement must show as a preview model`);
+  assert(item.model || item.clips?.length, `${item.id}: a queue entry must have model or animation work`);
+  if (item.model) assert(item.reason, `${item.id}: model work needs a reason for its badge`);
+  if (item.clips?.length) assert(item.clipReason, `${item.id}: queued clips need a reason for their badge`);
+}
+const derived = Object.fromEntries(roster.map(id => [id, pending.some(p => p.id === id && p.model) ? 'preview' : 'final']));
+for (const id of roster) {
+  assert(['preview', 'final'].includes(status[id]), `${id}: missing model production status`);
+  assert.equal(status[id], derived[id], `${id}: model-status.json says ${status[id]} but the refinement queue says ${derived[id]}`);
 }
 const root = 'public/assets/devonian';
 const all = [];

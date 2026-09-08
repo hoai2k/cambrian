@@ -10,14 +10,20 @@ import type { Mode, PlayerSetup } from '../sim/types';
 import { CheckIcon, Emblem, KeyboardIcon, PadIcon } from './icons';
 import { appBase } from '../shared/base';
 import { btn, fillControls, key, type Scheme } from '../shared/controls';
+import { fillOf, ladderName, rungOf } from '../sim/ladder';
 
 interface Props {
   players: PlayerSetup[]; mode: Mode; modes: Mode[]; modeInfo: Record<Mode, { name: string; blurb: string; players: string }>;
   allReady: boolean; padIndices: number[];
   /** Whatever everyone at this screen is holding: pad if any is connected, mouse and keyboard if not. */
   scheme: Scheme;
+  /** Furthest mark on the growth ladder each creature has reached in Rise on this device. */
+  best: Partial<Record<CreatureId, number>>;
+  /** Per seat: whether that player has asked to carry on from their record rather than hatch. */
+  carry: boolean[];
   onPick: (i: number, c: CreatureId) => void; onReady: (i: number) => void; onRemove: (i: number) => void;
   onAddKeyboard: () => void; onMode: (m: Mode) => void; onStart: () => void; onBack: () => void;
+  onCarry: (i: number) => void;
 }
 
 const stat = (v: number, max: number) => Math.round((v / max) * 5);
@@ -64,7 +70,7 @@ export function SelectScreen(p: Props) {
                 <CreaturePortrait creatureId={c.id} kind="thumb" assetBase={ASSETS} alt="" draggable={false} loading="eager" />
                 <span className="cell-name">{c.name}</span>
                 {c.kind && <span className="cell-kind">{c.kind}</span>}
-                <ModelStatusBadge status={ACTIVE_ERA.assets.modelStatus?.[c.id]} compact />
+                <ModelStatusBadge status={ACTIVE_ERA.assets.modelStatus?.[c.id]} note={ACTIVE_ERA.assets.modelNotes?.[c.id]} compact />
                 <span className="cell-rings">
                   {hovering.map(({ i, pl }) => <i key={i} style={{ ['--c' as string]: PLAYER_COLORS[i], ['--k' as string]: i }} className={pl.ready ? 'ring locked' : 'ring'} />)}
                 </span>
@@ -87,7 +93,7 @@ export function SelectScreen(p: Props) {
                   <button className="remove" aria-label={`Remove player ${i + 1}`} onClick={() => p.onRemove(i)}>×</button>
                 </div>
                 <div className="hero">
-                  <ModelStatusBadge status={ACTIVE_ERA.assets.modelStatus?.[def.id]} />
+                  <ModelStatusBadge status={ACTIVE_ERA.assets.modelStatus?.[def.id]} note={ACTIVE_ERA.assets.modelNotes?.[def.id]} />
                   <CreaturePortrait key={def.id} creatureId={def.id} kind="select" assetBase={ASSETS} alt={`${def.name} reconstruction`} draggable={false} />
                 </div>
                 <div className="creature-copy">
@@ -95,6 +101,7 @@ export function SelectScreen(p: Props) {
                   <h2>{def.name}</h2>
                   <small className="provenance">{def.kind && <b className="kind">{def.kind}</b>}{def.species} · {def.provenance ?? def.locality ?? 'Burgess Shale'}</small>
                   <p className="tagline">{def.tagline}</p>
+                  <BestRun mark={p.best[def.id]} carrying={!!p.carry[i]} rise={p.mode === 'rise'} scheme={s} onToggle={() => p.onCarry(i)} />
                   {!compact && (
                     <>
                       <div className="stats">
@@ -151,6 +158,39 @@ export function SelectScreen(p: Props) {
     </section>
   );
 }
+
+/**
+ * What this creature has grown into before, and the offer to pick up there.
+ *
+ * The record is kept for Rise alone, because Rise is the mode that grows you: the others hand out
+ * a body at a fixed size, so how far you got in one says nothing. The badge shows in every mode —
+ * it is a fact about the creature and worth seeing while you choose — but the offer only appears
+ * where it can be taken, and only once there is something to carry on from.
+ */
+function BestRun({ mark, carrying, rise, scheme, onToggle }: { mark: number | undefined; carrying: boolean; rise: boolean; scheme: Scheme; onToggle: () => void }) {
+  if (!mark) return null;
+  const part = fillOf(mark), name = ladderName(mark);
+  const next = ladderName(rungOf(mark) + 1);
+  // A part-grown mark is worth saying out loud: it is the difference between starting over and
+  // starting a short swim from where you stopped.
+  const badge = part > 0 ? `${name.toUpperCase()} · PART GROWN` : name.toUpperCase();
+  const title = part > 0
+    ? `Furthest grown in ${MODE_NAME}: reached ${next}, but did not hold it. You start as a ${name} already ${Math.round(part * 100)}% of the way back.`
+    : `Furthest grown in ${MODE_NAME}: ${name}.`;
+  return (
+    <div className={`best-run ${carrying ? 'carrying' : ''}`}>
+      <span className="best-badge" title={title}><b>BEST</b> {badge}</span>
+      {rise && (
+        <button className="carry-toggle" aria-pressed={carrying} onClick={onToggle} title={title}>
+          {carrying ? `Continuing as ${name}${part > 0 ? ', part grown' : ''}` : `Starting as ${ladderName(0)}`}
+          <kbd>{scheme === 'pad' ? key('light', scheme) : 'C'}</kbd>
+        </button>
+      )}
+    </div>
+  );
+}
+/** The mode the record belongs to, in the era's own words. */
+const MODE_NAME = ACTIVE_ERA.modes.find((m) => m.id === 'rise')?.name ?? 'Rise';
 
 function Stat({ label, v }: { label: string; v: number }) {
   return (

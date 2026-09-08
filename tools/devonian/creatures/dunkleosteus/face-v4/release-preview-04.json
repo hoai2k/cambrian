@@ -1,0 +1,38 @@
+{
+  "phase": "focused face preview delivery",
+  "family": {
+    "dunkleosteus.select.png": {
+      "sha256": "2539f1eca1c5d536f78794ab8afb3504b0f8fdc3d54303bef19f2563515eecf0",
+      "bytes": 852866
+    },
+    "dunkleosteus.png": {
+      "sha256": "397b2d5b03a95008716d2d6b2ae7fcc97622e124d603e3a52aae82ab54ae143e",
+      "bytes": 845202
+    },
+    "dunkleosteus.lod1.glb": {
+      "sha256": "2d57904f0a8a2c858f597730e38927b1f38126a51a9f87011b2f3f78d7c52bca",
+      "bytes": 2371052
+    },
+    "dunkleosteus.card.png": {
+      "sha256": "893cbe4f86f249b126c1fed0e0837c14bbaed2ec10fac5c85758411974eb199c",
+      "bytes": 240863
+    },
+    "dunkleosteus.glb": {
+      "sha256": "0ace6026c6b46d9d560528677ffdaf31769d74bea51065b884214c8b1037950d",
+      "bytes": 18293228
+    },
+    "dunkleosteus.thumb.png": {
+      "sha256": "c141be280dfb5e3d7e6a9f6e095a79c75ca7204129c45d6df3ff0e48f3b0e04d",
+      "bytes": 33122
+    },
+    "dunkleosteus.json": {
+      "sha256": "fcb4c71309ad2869d6c558ab7f8b85329250bf5d66b30d277311bd048d84dfc2",
+      "bytes": 8810
+    }
+  },
+  "candidate": "/Users/hoai/Documents/Stuff/Generations/cambrian/local/devonian-authoring/dunkleosteus/face-v4/candidate03/exports-pigment04",
+  "localManifestSHA256": "431a304579cb882f84db0f32dd4ee8e817ee20d718e0af5d090dd82253f0c9ff",
+  "remaining": "LOD colour-space/material polish and broader controller/art review",
+  "intake": "PASS selected Devonian intake, typecheck and build",
+  "viewer": "Built4176 loads new face/18clips/preview; root inspected Idle and Heavy0.4667s articulated open mouth"
+}

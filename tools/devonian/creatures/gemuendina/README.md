@@ -76,3 +76,8 @@ Independent full-eye penetration is 82.350% / 82.334%, with conservative lower 9
 ## Integrated release review
 
 The parent independently checked the final losslessly packaged full and reduced GLBs; `eye-packaged-review.json` records their exact hashes and containment results. Both specimens passed the shared asset/anchor checks and the built main viewer loaded all eighteen actions without browser errors. Paused action selection, frame stepping, feeding and terminal Death poses were inspected. Final matching portraits and the refreshed specimen catalogue accompany these assets. Editable Blender sources and extended visual recordings remain under `cambrian/local/devonian-authoring/`.
+
+## Reopened 8 September 2026
+
+Current shipped version is preview pending the focused face pass in
+`docs/devonian/refinement-queue.md`. Previous final reports apply only to the preserved backup.

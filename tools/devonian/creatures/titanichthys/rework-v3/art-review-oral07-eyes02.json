@@ -1,0 +1,256 @@
+{
+  "status": "ACCEPTED_COMPONENTS_FOR_COMPOSITION",
+  "reviewer": "Astra high creature source author",
+  "actual_images_independently_inspected": 13,
+  "manifest_hashes": {
+    "/Users/hoai/Documents/Stuff/Generations/cambrian/local/devonian-authoring/titanichthys/rework-v3/eye-seating-study-02/orbit-renders04/orbit-render-manifest.json": "3d26f671a4b8a331df6dd4c620d1122c750b44b38371c435e53198b890606851",
+    "/Users/hoai/Documents/Stuff/Generations/cambrian/local/devonian-authoring/titanichthys/rework-v3/candidate-07/oral-renders-02/manifest.json": "f2b700a9c7779b157f443564ab16c78737f6a8bba633f62ffdb426cb05f53012"
+  },
+  "reviewed_images": [
+    {
+      "path": "/Users/hoai/Documents/Stuff/Generations/cambrian/local/devonian-authoring/titanichthys/rework-v3/eye-seating-study-02/orbit-renders04/titanichthys-Orbit-side-Bind.png",
+      "sha256": "21eb383aa985cfef067dc9307eb2067a1a78cadc724e3e094b200899f136836d",
+      "asset": "titanichthys.glb",
+      "clip": "Bind",
+      "phase": 0.0,
+      "camera": "Orbit-side",
+      "frame": 0,
+      "action": null,
+      "action_slot": null,
+      "strip": null
+    },
+    {
+      "path": "/Users/hoai/Documents/Stuff/Generations/cambrian/local/devonian-authoring/titanichthys/rework-v3/eye-seating-study-02/orbit-renders04/titanichthys-Orbit-oblique-Bind.png",
+      "sha256": "c2c5304f99ee4be48a46bdb1654007604713362dad2fd4c5bf695cda04458ecc",
+      "asset": "titanichthys.glb",
+      "clip": "Bind",
+      "phase": 0.0,
+      "camera": "Orbit-oblique",
+      "frame": 0,
+      "action": null,
+      "action_slot": null,
+      "strip": null
+    },
+    {
+      "path": "/Users/hoai/Documents/Stuff/Generations/cambrian/local/devonian-authoring/titanichthys/rework-v3/eye-seating-study-02/orbit-renders04/titanichthys-Orbit-side-Ability.png",
+      "sha256": "1916a9747cf578054810cc0f6cc9e1c8ffa5db95e460e6928f06481b414ba099",
+      "asset": "titanichthys.glb",
+      "clip": "Ability",
+      "phase": 0.5,
+      "camera": "Orbit-side",
+      "frame": 36,
+      "action": "Ability.001",
+      "action_slot": "OBtitanichthys_rig",
+      "strip": "Ability.001"
+    },
+    {
+      "path": "/Users/hoai/Documents/Stuff/Generations/cambrian/local/devonian-authoring/titanichthys/rework-v3/eye-seating-study-02/orbit-renders04/titanichthys-Orbit-oblique-Ability.png",
+      "sha256": "51cceca2d02758212d18f4c7b995e6e16f72d99e5310aa92d87e319ced9dc60c",
+      "asset": "titanichthys.glb",
+      "clip": "Ability",
+      "phase": 0.5,
+      "camera": "Orbit-oblique",
+      "frame": 36,
+      "action": "Ability.001",
+      "action_slot": "OBtitanichthys_rig",
+      "strip": "Ability.001"
+    },
+    {
+      "path": "/Users/hoai/Documents/Stuff/Generations/cambrian/local/devonian-authoring/titanichthys/rework-v3/eye-seating-study-02/orbit-renders04/titanichthys.lod1-Orbit-side-Bind.png",
+      "sha256": "b0ecb7544284bb554f11c2144eca29a303f7f8f6cfbfda4a7c07149b4296f707",
+      "asset": "titanichthys.lod1.glb",
+      "clip": "Bind",
+      "phase": 0.0,
+      "camera": "Orbit-side",
+      "frame": 0,
+      "action": null,
+      "action_slot": null,
+      "strip": null
+    },
+    {
+      "path": "/Users/hoai/Documents/Stuff/Generations/cambrian/local/devonian-authoring/titanichthys/rework-v3/eye-seating-study-02/orbit-renders04/titanichthys.lod1-Orbit-oblique-Bind.png",
+      "sha256": "551510118cc47f2232d9d0260e44649fc9e15a1a3a1d55be7ad60201ee9d8c62",
+      "asset": "titanichthys.lod1.glb",
+      "clip": "Bind",
+      "phase": 0.0,
+      "camera": "Orbit-oblique",
+      "frame": 0,
+      "action": null,
+      "action_slot": null,
+      "strip": null
+    },
+    {
+      "path": "/Users/hoai/Documents/Stuff/Generations/cambrian/local/devonian-authoring/titanichthys/rework-v3/eye-seating-study-02/orbit-renders04/titanichthys.lod1-Orbit-side-Ability.png",
+      "sha256": "f605907c0f72a8e5cbd5e3f66c20026e0f4a321227a6e449fb09f39096d727d7",
+      "asset": "titanichthys.lod1.glb",
+      "clip": "Ability",
+      "phase": 0.5,
+      "camera": "Orbit-side",
+      "frame": 36,
+      "action": "Ability.002",
+      "action_slot": "OBtitanichthys_rig",
+      "strip": "Ability.002"
+    },
+    {
+      "path": "/Users/hoai/Documents/Stuff/Generations/cambrian/local/devonian-authoring/titanichthys/rework-v3/eye-seating-study-02/orbit-renders04/titanichthys.lod1-Orbit-oblique-Ability.png",
+      "sha256": "83d46a4632774606b68ad820f59f98c14c3841473bd9ecd5f24ad333b4416111",
+      "asset": "titanichthys.lod1.glb",
+      "clip": "Ability",
+      "phase": 0.5,
+      "camera": "Orbit-oblique",
+      "frame": 36,
+      "action": "Ability.002",
+      "action_slot": "OBtitanichthys_rig",
+      "strip": "Ability.002"
+    },
+    {
+      "path": "/Users/hoai/Documents/Stuff/Generations/cambrian/local/devonian-authoring/titanichthys/rework-v3/candidate-07/oral-renders-02/01-full-ability-front.png",
+      "sha256": "432c03790ecd9a782a6de5d2004cf34ed6c0ea0d37eab4d2c151de1714847931",
+      "bytes": 2221495,
+      "asset": "titanichthys.glb",
+      "asset_sha256": "036df0da40265036decad16322e57694bc7a581156446cc556557b9370245e3a",
+      "clip": "Ability",
+      "phase": 0.5,
+      "frame": 36,
+      "imported_action": "Ability.001",
+      "imported_slot": "OBtitanichthys_rig",
+      "camera": [
+        0,
+        -8,
+        -0.16
+      ],
+      "target": [
+        0,
+        -1.65,
+        -0.16
+      ],
+      "ortho_scale": 2.8
+    },
+    {
+      "path": "/Users/hoai/Documents/Stuff/Generations/cambrian/local/devonian-authoring/titanichthys/rework-v3/candidate-07/oral-renders-02/02-full-eat-front.png",
+      "sha256": "3a33451eaad1067f5c56d9a52225a6a1fce5f69314d48e0d1dad465f5935ce00",
+      "bytes": 2228075,
+      "asset": "titanichthys.glb",
+      "asset_sha256": "036df0da40265036decad16322e57694bc7a581156446cc556557b9370245e3a",
+      "clip": "Eat",
+      "phase": 0.5,
+      "frame": 24,
+      "imported_action": "Eat.001",
+      "imported_slot": "OBtitanichthys_rig",
+      "camera": [
+        0,
+        -8,
+        -0.16
+      ],
+      "target": [
+        0,
+        -1.65,
+        -0.16
+      ],
+      "ortho_scale": 2.8
+    },
+    {
+      "path": "/Users/hoai/Documents/Stuff/Generations/cambrian/local/devonian-authoring/titanichthys/rework-v3/candidate-07/oral-renders-02/03-full-ability-oblique.png",
+      "sha256": "1ac88a3b973fa98112b2569a38423d0cce121a9a41324c808ed70a7479e40a60",
+      "bytes": 2113630,
+      "asset": "titanichthys.glb",
+      "asset_sha256": "036df0da40265036decad16322e57694bc7a581156446cc556557b9370245e3a",
+      "clip": "Ability",
+      "phase": 0.5,
+      "frame": 36,
+      "imported_action": "Ability.001",
+      "imported_slot": "OBtitanichthys_rig",
+      "camera": [
+        2.5,
+        -7,
+        0.45
+      ],
+      "target": [
+        0,
+        -1.95,
+        -0.2
+      ],
+      "ortho_scale": 3.0
+    },
+    {
+      "path": "/Users/hoai/Documents/Stuff/Generations/cambrian/local/devonian-authoring/titanichthys/rework-v3/candidate-07/oral-renders-02/04-lod-ability-front.png",
+      "sha256": "8295b0d1c83f837ea6ec054f79bf17cf284efcc64d64fa8b184750035822098b",
+      "bytes": 2119838,
+      "asset": "titanichthys.lod1.glb",
+      "asset_sha256": "f1251881583a6eb1ff559d55804ba5123eaccc805529d858644930dc60c49522",
+      "clip": "Ability",
+      "phase": 0.5,
+      "frame": 36,
+      "imported_action": "Ability.002",
+      "imported_slot": "OBtitanichthys_rig",
+      "camera": [
+        0,
+        -8,
+        -0.16
+      ],
+      "target": [
+        0,
+        -1.65,
+        -0.16
+      ],
+      "ortho_scale": 2.8
+    },
+    {
+      "path": "/Users/hoai/Documents/Stuff/Generations/cambrian/local/devonian-authoring/titanichthys/rework-v3/candidate-07/oral-renders-02/05-lod-eat-front.png",
+      "sha256": "6b3bd82c3bc9f088d3dea0c24abe839bdfc111d1fe1fced6cfb9d503daa61956",
+      "bytes": 2112525,
+      "asset": "titanichthys.lod1.glb",
+      "asset_sha256": "f1251881583a6eb1ff559d55804ba5123eaccc805529d858644930dc60c49522",
+      "clip": "Eat",
+      "phase": 0.5,
+      "frame": 24,
+      "imported_action": "Eat.002",
+      "imported_slot": "OBtitanichthys_rig",
+      "camera": [
+        0,
+        -8,
+        -0.16
+      ],
+      "target": [
+        0,
+        -1.65,
+        -0.16
+      ],
+      "ortho_scale": 2.8
+    }
+  ],
+  "eye_decision": "Accept inward 0.030 placement; visible continuous globe/socket relationship in full/LOD Bind/Ability. Minor close-up LOD annular faceting acceptable for intended distance.",
+  "eye_volume_evidence": {
+    "path": "/Users/hoai/Documents/Stuff/Generations/cambrian/local/devonian-authoring/titanichthys/rework-v3/eye-seating-study-02/audit-float64-02-rerun/eye-volume.json",
+    "sha256": "cf9062b56c00f4d39ffc73558db2ad185f54e4c78099b6909e03c54a17235408",
+    "minimum_lower95": 60.32021392351526,
+    "maximum_lower95": 61.6838250550356,
+    "minimum50_pass": true,
+    "target65_achieved": false
+  },
+  "oral_decision": "Accept07 shared physical floor weights; no pale interior patches or detached wall/rail in five actual full/LOD views.",
+  "oral_sweep": {
+    "path": "/Users/hoai/Documents/Stuff/Generations/cambrian/local/devonian-authoring/titanichthys/rework-v3/candidate-07/oral-sweep-02/result.json",
+    "sha256": "4d44defd9df2bc288cb2fd504ff21ac6ba7fd942d313c4432c054ff79b0eb75f",
+    "all58_pass": true
+  },
+  "normal_approval_owner": "Root; separately accepted in normal-study-review-02.json",
+  "normal_review_sha256": "7d106480f4a34ab38014f55b63983360462d7243286e65f29e32d68d1a28f569",
+  "accepted_assembly_inputs": {
+    "/Users/hoai/Documents/Stuff/Generations/cambrian/local/devonian-authoring/titanichthys/rework-v3/candidate-07/titanichthys.glb": "036df0da40265036decad16322e57694bc7a581156446cc556557b9370245e3a",
+    "/Users/hoai/Documents/Stuff/Generations/cambrian/local/devonian-authoring/titanichthys/rework-v3/candidate-07/titanichthys.lod1.glb": "f1251881583a6eb1ff559d55804ba5123eaccc805529d858644930dc60c49522",
+    "/Users/hoai/Documents/Stuff/Generations/cambrian/local/devonian-authoring/titanichthys/rework-v3/candidate-07/titanichthys-production-07.blend": "e64023a65ad8be237c811f421a95bd9f1a4a5fa70c8220446100311d20115b1e",
+    "/Users/hoai/Documents/Stuff/Generations/cambrian/local/devonian-authoring/titanichthys/rework-v3/eye-seating-study-02/titanichthys.glb": "73cdb8d610d2f6cbdec750127d406d51dda4d288ac6218f616c4f6560b1e1bee",
+    "/Users/hoai/Documents/Stuff/Generations/cambrian/local/devonian-authoring/titanichthys/rework-v3/eye-seating-study-02/titanichthys.lod1.glb": "d19e670f2b2c2b8ff0c5a56709a020708bbee4c4f302c5670cae53f960ab1a1f",
+    "/Users/hoai/Documents/Stuff/Generations/cambrian/local/devonian-authoring/titanichthys/rework-v3/packaging-normal-study-02/titanichthys.glb": "36358bbc82c1249a3c97f71d819929eaeb64544868596c160e7c8e4ef6042aa0",
+    "/Users/hoai/Documents/Stuff/Generations/cambrian/local/devonian-authoring/titanichthys/rework-v3/body-normal-study-02/body-normal-2048.png": "7ff7c15e6bbb2ff0d48eaefe888bd36b7237e934dbc79a2999d4c7561570c6a0"
+  },
+  "verdict_source_sha256": "30c7c305e9d3a143dec5ec07d62fb5c7eb6c8f95489234b6b27b4b02648c48c7",
+  "assembly_spec_sha256": "dbf12ed291fb292a11d777db7efe54a4580462ea34a266867e9881796db45132",
+  "limitations": [
+    "Component approval only; combined package not yet built or reviewed.",
+    "Eye-only study retains06 oral defect; oral-only07 retains shallow eyes; approval is scoped to the respective component.",
+    "Root owns final assembled numerical/structural, runtime palette/animation/LOD and portrait evidence.",
+    "No Blender, heavy jobs, public or Git changes by author during review."
+  ]
+}

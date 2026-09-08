@@ -61,3 +61,28 @@ is a game interpretation, not a claim of fossil evidence for predatory limb use.
 Review the inverted silhouette from the game's camera, including reduced-model limb readability,
 shell transparency/depth ordering and action extremes. Keep both references and the original
 model backup; the current model stays preview until replacement acceptance.
+
+## The machine-readable queue
+
+`src/content/cambrian/pending-refinements.json` is the source of truth, in the same shape as the
+Devonian's, and it separates the two kinds of outstanding work:
+
+- **`model: true`** — the 3D body itself: geometry, materials, rig, LOD art. This is what puts the
+  ⚠ preview badge on the creature, in the game and in the viewer, and `reason` is the sentence it
+  shows on hover. Only Odaraia is in this state in the Cambrian.
+- **`clips`** — animation clips queued for rework on a body that is already finished. Badging the
+  whole animal for these said the wrong thing: Anomalocaris' and Opabinia's models are done. The
+  warning goes on those clip buttons in the viewer instead, carrying `clipReason`, and the creature
+  shows nothing.
+
+An entry must claim at least one of the two and whichever it claims must carry its reason, so
+nothing can be flagged without saying what it is waiting for and no flag can be dropped without
+deleting that sentence. `npm run eras` enforces all of it.
+
+## Attack and feeding pass — 8 September 2026
+
+The separately requested articulated motion pass also reopens the Cambrian specimens listed
+in `src/content/cambrian/pending-refinements.json`. See `docs/attack-feeding-refinement.md` and
+`tools/attack-feeding-refinements.json` for individual scope, backups and acceptance requirements.
+Odaraia incorporates this in its full rework; other models retain current anatomy until their
+individual review determines changes. Keep preview status until every pending task is complete.

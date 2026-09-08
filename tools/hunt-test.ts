@@ -10,20 +10,21 @@ let failed = 0;
 const check = (n: string, ok: boolean, d: string) => { console.log(`${ok ? 'PASS' : 'FAIL'}  ${n.padEnd(44)} ${d}`); if (!ok) failed++; };
 const run = (g: Game, f: InputFrame, steps: number) => { const m = new Map([[0, f]]); for (let i = 0; i < steps; i++) { g.step(1 / 60, m); g.events.length = 0; } };
 
-// --- LB tap with a stick direction = sidestep dodge; LB held = sprint ---
+// --- LB dashes: the stick direction if there is one, the body's own axis if there is not ---
 {
   const g = new Game('reef', [{ creature: 'anomalocaris', device: 'keyboard', ready: true }], 7);
   const p = g.players[0]; p.pos = { ...OPEN }; p.spawnProtect = 0;
   run(g, emptyInput(), 5);
   run(g, { ...emptyInput(), dash: true, mx: 1, camYaw: 0 }, 2);
   check('LB + stick right dashes at once', p.state === 'dodge', `state=${p.state} iframes=${p.iframes.toFixed(2)}`);
-  // queued: hold LB with a neutral stick, then move
+  // a neutral stick has no direction to give, so the dash takes the body's own axis
   const g3 = new Game('reef', [{ creature: 'anomalocaris', device: 'keyboard', ready: true }], 7);
-  const r = g3.players[0]; r.pos = { ...OPEN }; r.spawnProtect = 0;
-  run(g3, { ...emptyInput(), dash: true }, 30);
-  check('LB held with neutral stick does not dash or sprint', r.state === 'free' && Math.hypot(r.vel.x, r.vel.z) < 0.8, `state=${r.state} speed=${Math.hypot(r.vel.x, r.vel.z).toFixed(2)}`);
-  run(g3, { ...emptyInput(), dash: true, my: 1 }, 2);
-  check('...then dashes the moment the stick moves', r.state === 'dodge', `state=${r.state}`);
+  const r = g3.players[0]; r.pos = { ...OPEN }; r.spawnProtect = 0; r.yaw = 0;
+  const from = { ...r.pos };
+  run(g3, { ...emptyInput(), dash: true }, 2);
+  check('LB with a neutral stick dashes along the body axis', r.state === 'dodge', `state=${r.state}`);
+  run(g3, { ...emptyInput(), dash: true }, 20);
+  check('...the way it was facing', r.pos.z - from.z > 1, `${(r.pos.z - from.z).toFixed(1)} units along its own +z`);
   run(g3, { ...emptyInput(), dash: true, my: 1 }, 90);
   check('...and does not dash again while still held', r.state === 'free' && r.dashUsed, `state=${r.state}`);
   const g2 = new Game('reef', [{ creature: 'anomalocaris', device: 'keyboard', ready: true }], 7);

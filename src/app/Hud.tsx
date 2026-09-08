@@ -7,6 +7,7 @@ import type { EraHud } from '../sim/era-rules';
 import { creature } from '../sim/creatures';
 import { BIOME_ART, biomeArtPath, radarGlyphPath } from '../shared/environment-assets';
 import { BAND_COLOR } from '../sim/types';
+import { CreaturePortrait } from './CreaturePortrait';
 import { appBase } from '../shared/base';
 import { fillControls, key } from '../shared/controls';
 
@@ -83,7 +84,7 @@ function PlayerPanel({ p }: { p: PlayerHud }) {
       {p.board && <Scoreboard board={p.board} me={p.index} />}
       <BiomeBanner biome={p.biome} alive={p.alive} />
       <DayPhase day={p.day} />
-      <Radar radar={p.radar} biome={p.biome} />
+      {p.senseOn && <Radar radar={p.radar} biome={p.biome} />}
       {p.teleport && (
         <div className="tele-menu">
           <p className="eyebrow">TELEPORT</p>
@@ -98,15 +99,30 @@ function PlayerPanel({ p }: { p: PlayerHud }) {
           <small>{p.teleport.cooldown > 0 ? `Ready in ${Math.ceil(p.teleport.cooldown)} s` : <><kbd>{key('confirm', s)}</kbd> go · <kbd>{key('back', s)}</kbd> back · <kbd>{key('teleport', s)}</kbd> next</>}</small>
         </div>
       )}
+      {p.swap && (
+        <div className="tele-menu swap-menu">
+          <p className="eyebrow">CHANGE CREATURE</p>
+          <div className="swap-body">
+            <CreaturePortrait creatureId={p.swap.creature} kind="thumb" assetBase={appBase()} alt="" draggable={false} loading="eager" />
+            <div>
+              <b>{p.swap.name}</b>
+              {p.swap.kind && <span className="swap-kind">{p.swap.kind}</span>}
+              <span className="swap-rung">{p.swap.rung}{p.swap.kept ? ' · your progress' : p.swap.grown ? ' · fully grown' : ' · hatchling'}</span>
+              <i className="swap-fill"><b style={{ transform: `scaleX(${p.swap.fill})` }} /></i>
+            </div>
+          </div>
+          <small><kbd>◀▶</kbd> {p.swap.index + 1}/{p.swap.count} · <kbd>{key('ability', s)}</kbd> {p.swap.grown ? 'grown' : 'hatchling'} · <kbd>{key('confirm', s)}</kbd> take it · <kbd>{key('back', s)}</kbd> back</small>
+        </div>
+      )}
       <div className="hud-bottom">
         <div className={`chip ability ${p.abilityUnlocked ? '' : 'locked'} ${p.abilityActive ? 'active' : ''}`} title={fillControls(hideDescription(def.id), s)}>
           <span className="btn y">{key('ability', s)}</span>
           <span className="chip-label">{p.abilityUnlocked ? p.abilityName : 'Hide'}</span>
           <i className="cool" style={{ transform: `scaleX(${p.abilityUnlocked ? p.abilityReady : 0})` }} />
         </div>
-        <div className={`chip sense ${p.senseReady >= 1 ? 'ready' : ''}`}>
-          <span className="btn dpad">{key('sense', s)}</span><span className="chip-label">Sense</span>
-          <i className="cool" style={{ transform: `scaleX(${p.senseReady})` }} />
+        <div className={`chip sense ${p.senseOn ? 'ready active' : ''}`} title="Band marks and the radar. Off is the immersive view: nothing over the sea but this bar.">
+          <span className="btn dpad">{key('sense', s)}</span><span className="chip-label">Sense{p.senseOn ? '' : ' off'}</span>
+          <i className="cool" style={{ transform: `scaleX(${p.senseOn ? 1 : 0})` }} />
         </div>
         <div className="tally"><span>{p.eats} eaten</span><span>{p.kills} kills</span><span>{p.escapes} escapes</span></div>
       </div>
@@ -142,16 +158,31 @@ function PlayerPanel({ p }: { p: PlayerHud }) {
       {p.spectating && !p.alive && (
         <div className="spectating"><b>SPECTATING</b><span style={{ color: p.spectating.color }}>{p.spectating.name} · {creature(p.spectating.creature).name}</span></div>
       )}
-      {!p.alive && p.fade < 0.9 && (
-        <div className="dead-overlay">
-          <b>{p.downedFor > 0 ? 'DOWN' : 'EATEN'}</b>
-          <span>{p.downedFor > 0
-            ? (p.reviveProgress > 0 ? 'Someone is getting you up…' : `Hold on — a team-mate can get you up. ${Math.ceil(p.downedFor)} s`)
-            : 'Back in a moment… you slip down a tier.'}</span>
-          {p.downedFor > 0 && <i className="revive-bar wide" style={{ transform: `scaleX(${p.reviveProgress})` }} />}
-        </div>
-      )}
+      {!p.alive && p.fade < 0.9 && <DeathNote p={p} />}
     </>
+  );
+}
+
+/**
+ * What happened to you, while you watch it happen. Deliberately not a dialog: death used to put a
+ * red panel over the middle of the screen the instant you died, which hid the one thing worth
+ * seeing — the animal that got you, finishing the job. This is a line of text low on the viewport,
+ * over an unobstructed view, until the screen fades out for the respawn.
+ *
+ * A downed team-mate is the exception that still needs a meter, because their seconds are a race
+ * somebody else is running; it gets the same low, quiet treatment with the rescue bar under it.
+ */
+function DeathNote({ p }: { p: PlayerHud }) {
+  const downed = p.downedFor > 0;
+  return (
+    <div className={`death-note ${downed ? 'downed' : ''} ${p.spectating ? 'spectating-too' : ''}`}>
+      <b>{downed ? 'You are down' : p.death?.eaten ? 'You\u2019ve been eaten' : 'You\u2019ve been killed'}
+        {!downed && p.death?.by && <i> by {p.death.by}</i>}</b>
+      <span>{downed
+        ? (p.reviveProgress > 0 ? 'Someone is getting you up\u2026' : `A team-mate can still reach you \u00b7 ${Math.ceil(p.downedFor)} s`)
+        : 'You slip down a tier.'}</span>
+      {downed && <i className="revive-bar wide" style={{ transform: `scaleX(${p.reviveProgress})` }} />}
+    </div>
   );
 }
 
