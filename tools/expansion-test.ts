@@ -3,7 +3,8 @@ import { CREATURES, creature } from '../src/sim/creatures';
 import { EXPANSION_CREATURES } from '../src/sim/expansion';
 import { makeActor, bodyRadius, clearanceOf, isHidden } from '../src/sim/actors';
 import { applyHit } from '../src/sim/combat';
-import { beginExpansionAbility, stepExpansionAbility, bloomRate, grazeRate, HEAVY_STRIKE } from '../src/sim/expansion-abilities';
+import { beginExpansionAbility, stepExpansionAbility, bloomRate, grazeRate, HEAVY_STRIKE, specialHit } from '../src/sim/expansion-abilities';
+import { HEAVY_SPECIALS } from '../src/sim/concealment';
 import { emptyInput } from '../src/sim/types';
 import { Game } from '../src/sim/game';
 import { makeBrain } from '../src/sim/ai';
@@ -88,9 +89,10 @@ for(const id of ['burgessomedusa','ctenorhabdotus'] as const){
  * never strikes a target).
  */
 {
-  const strikers = CREATURES.filter((c) => HEAVY_STRIKE[c.ability]);
-  assert(strikers.length >= 4, 'no heavy strikes to check');
+  const strikers = CREATURES.filter((c) => HEAVY_SPECIALS.has(c.ability));
+  assert(strikers.length >= 8, 'no heavy strikes to check');
   for (const def of strikers) {
+    assert(HEAVY_STRIKE[def.ability], `${def.id}: a heavy special with no reach at all`);
     const g = new Game('reef', [{ creature: def.id, device: 'keyboard', ready: true }], 91);
     const a = g.players[0];
     a.pos = { x: 0, y: 12, z: 0 }; a.yaw = 0;
@@ -108,7 +110,22 @@ for(const id of ['burgessomedusa','ctenorhabdotus'] as const){
     const before = prey.hp;
     const input = { ...emptyInput(), heavy: true, aim: true, aimTarget: prey.id };
     for (let i = 0; i < 90; i++) g.step(1 / 60, new Map([[0, i < 2 ? input : { ...input, heavy: false }]]));
-    assert(prey.hp < before, `${def.id}: RT at a target the crosshair called in range never connected`);
+    assert(before > prey.hp, `${def.id}: RT at a target the crosshair called in range never connected`);
+    // A special takes the heavy button's place, so whatever numbers it was authored with, it must
+    // not land softer than the heavy it displaced — the button would be worse to own. Every heavy
+    // special's hit goes through `specialHit`, so flooring the weakest possible authored values
+    // proves it for all of them.
+    const floored = specialHit(def, { damage: 0, poise: 0 });
+    assert(floored.damage >= def.heavy.damage, `${def.id}: ${def.abilityName} can hit softer than its own heavy`);
+    assert(floored.poise >= def.heavy.poise, `${def.id}: ${def.abilityName} can stagger less than its own heavy`);
+    if (def.heavy.guardBreak) assert(floored.guardBreak, `${def.id}: ${def.abilityName} loses the heavy's guard break`);
+    if (def.heavy.armorPierce) assert((floored.armorPierce ?? 0) >= def.heavy.armorPierce, `${def.id}: ${def.abilityName} loses the heavy's armour piercing`);
+  }
+  // A special on a button whose action still happens (the guard specials, the hide specials) is a
+  // bonus, not a replacement, so it is deliberately not floored.
+  {
+    const bell = CREATURES.find((c) => c.ability === 'bellCorral')!;
+    assert(specialHit(bell, { damage: 7 }).damage === 7, 'a guard special should keep its own numbers');
   }
   // Cooldown and exhaustion are what the prompt greys out for, not the pounce's timers.
   const g = new Game('reef', [{ creature: 'opabinia', device: 'keyboard', ready: true }], 92), a = g.players[0];
@@ -119,12 +136,12 @@ for(const id of ['burgessomedusa','ctenorhabdotus'] as const){
   assert(g.heavyMove(a).ready, 'the pounce RT falls through to reads as unavailable');
   a.abilityCd = 0; a.stamina = 4;
   assert(!g.heavyMove(a).ready, 'a special with no stamina still advertises itself');
-  // A filter feeder's heavy never strikes a target, so the prompt must never offer one.
+  // The filter feeders sweep on the heavy button, so the sweep has to be a heavy too: their reach
+  // is short and they do not lunge, but RT must never be an attack button that does no damage.
   for (const id of ['collectorWake', 'pharyngealPump', 'planktonComb']) {
     const def = CREATURES.find((c) => c.ability === id);
     if (!def) continue;
-    const fg = new Game('reef', [{ creature: def.id, device: 'keyboard', ready: true }], 93);
-    assert.equal(fg.heavyMove(fg.players[0]).reach, 0, `${def.id}: crosshair offers a strike it does not have`);
+    assert(HEAVY_STRIKE[id].reach > 0 && HEAVY_STRIKE[id].lunge === 0, `${def.id}: a filter feeder should reach without lunging`);
   }
 }
 

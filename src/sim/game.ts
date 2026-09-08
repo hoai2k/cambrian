@@ -1,7 +1,7 @@
 import { ACTIVE_ERA } from '../content';
 import { RULES } from './era-rules';
 import { BURROWERS, HEAVY_SPECIALS, DEFENSIVE_SPECIALS, CAMOUFLAGE_DRAIN, camouflageMatch, clearPursuit, stopHiding } from './concealment';
-import { abilitySpeed, beginExpansionAbility, beginHeavyStrike, heavyStrikeReach, stepExpansionAbility, stepHeavyStrike, bloomRate, grazeRate } from './expansion-abilities';
+import { abilitySpeed, beginExpansionAbility, beginHeavyStrike, heavyStrikeReach, specialHit, stepExpansionAbility, stepHeavyStrike, bloomRate, grazeRate } from './expansion-abilities';
 import { add, clamp, damp, dist, distXZ, dot, heading, len3, lerp, makeRng, norm, scale as vscale, sub, TAU, v3, wrapAngle, yawOf, type Rng, type Vec3 } from '../shared/math';
 import { applyScaleStats, bandOf, bodyRadius, canAct, clearanceOf, climbHeight, climbRise, floorClearance, glideOver, isAlive, isHidden, isInvulnerable, lengthOf, makeActor, massOf, speedFactor, staminaCost } from './actors';
 import { makeBrain, think, type AiWorld } from './ai';
@@ -1355,7 +1355,7 @@ export class Game implements AiWorld {
             const pull = norm(sub(heavier ? best.pos : a.pos, heavier ? a.pos : best.pos));
             if (heavier) { a.vel = vscale(pull, 14); }
             else { best.vel = vscale(pull, 16); best.iframes = 0; }
-            applyHit(this.hitCtx, a, best, { ...def.light, damage: 12, poise: 30, knockback: 0 }, 0);
+            applyHit(this.hitCtx, a, best, specialHit(def, { damage: 12, poise: 30, knockback: 0 }), 0);
             this.events.push({ kind: 'grab', pos: { ...best.pos }, actor: a.id, other: best.id, player: a.player });
           }
         }

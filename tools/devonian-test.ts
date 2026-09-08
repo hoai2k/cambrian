@@ -334,6 +334,17 @@ ok(RULES !== undefined && !RULES.growthByNutrition, 'Devonian rules active: grow
     { creature: 'stethacanthus', device: 1, ready: true }, { creature: 'gemuendina', device: 2, ready: true },
   ]);
   ok(HEAVY_SPECIALS.has('tuskLunge') && HEAVY_SPECIALS.has('jawShear') && BURROWERS.has('gemuendina'), 'Devonian specials are installed with the game');
+  // A heavy special replaces the heavy bite rather than adding to it, so it must never hit softer
+  // than the bite it displaced. Every one of them was, before the floor in `specialHit`: the jaw
+  // shear did 40 against Dunkleosteus' own heavy of 70.
+  {
+    const { specialHit } = await import('../src/sim/expansion-abilities');
+    for (const def of DEVONIAN.creatures.filter((c) => HEAVY_SPECIALS.has(c.ability))) {
+      const floored = specialHit(def, { damage: 0, poise: 0 });
+      ok(floored.damage >= def.heavy.damage, `${def.id}: ${def.abilityName} hits at least as hard as its own heavy (${floored.damage} vs ${def.heavy.damage})`);
+      ok(floored.poise >= def.heavy.poise, `${def.id}: ${def.abilityName} staggers at least as much as its own heavy`);
+    }
+  }
   const [ony, chei, steth, gem] = g.players;
   const idle = () => new Map<number, InputFrame>(g.players.map((_, i) => [i, emptyInput()]));
   const press = (i: number, key: 'heavy' | 'ability' | 'guard') => { const m = idle(); m.set(i, { ...emptyInput(), [key]: true }); return m; };
