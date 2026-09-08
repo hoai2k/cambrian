@@ -66,6 +66,11 @@ unless the user explicitly asks for a PR. Steps:
 - Devonian scenery and biome plates are procedural stand-ins: flora kinds and their density table in
   `src/content/devonian/environment.ts` + `src/render/sea.ts`, plates from `npm run devonian:plates`.
   Authored sets replace them without touching placement; see `docs/redesign/09-devonian-remaining.md`.
+- What a player has found — biomes, landmarks, species taken to the top, the Rise record — is
+  written to `localStorage` as the match finds it (`recordFinds` in `src/app/codex.ts`), never at
+  the results screen: a player who quits mid-match keeps what they found. The results screen marks
+  finds new from a list the shell accumulates, because the store already holds them by then.
+  `npm run codex` guards both halves.
 - `?debug=local` on either page (`/?debug=local`, `/devonian/?debug=local`) opens an editor for that
   era's saved state — `src/app/DebugLocal.tsx`, gated by `src/shared/debug.ts`, mounted by
   `src/app/Root.tsx` so both entry points get it without knowing about it. A new thing kept in

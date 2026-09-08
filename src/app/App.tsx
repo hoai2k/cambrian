@@ -8,7 +8,7 @@ import type { Quality } from '../render/sea';
 import { PLAYABLE_IDS as CREATURE_IDS, PLAYABLE as CREATURES, creature, type CreatureId } from '../sim/creatures';
 import { MODE_IDS, type Mode, type PlayerSetup } from '../sim/types';
 import { clampMark } from '../sim/ladder';
-import { loadCodex, recordBest } from './codex';
+import { emptyCodex, hasNewFinds, loadCodex, mergeCodex, recordFinds, type Codex } from './codex';
 import { Hud } from './Hud';
 import { LoadingScreen } from './Loading';
 import { Dialogs, PauseMenu, Results } from './Overlays';
@@ -54,12 +54,14 @@ export function App() {
   /** When the player last touched anything. Drives the idle gate on the asset loader. */
   const lastInputRef = useRef(0);
   /**
-   * The furthest rung of the growth ladder each creature has reached in Rise on this device, kept
-   * per era. Held in state as well as in storage because the select screen badges it and offers to
-   * start there, and both have to change the moment a match improves on it.
+   * The record as this device holds it: biomes, landmarks, species taken to the top, and the
+   * furthest rung each creature has reached in Rise. Held in state as well as in storage because
+   * the select screen badges the growth record and offers to start from it, and both have to
+   * change the moment a match improves on them.
    */
-  const [best, setBest] = useState<Partial<Record<CreatureId, number>>>(() => loadCodex().best);
-  const bestRef = useRef(best);
+  const [record, setRecord] = useState<Codex>(loadCodex);
+  const recordRef = useRef(record);
+  const best = record.best;
   /**
    * Per player: whether they have asked to carry on from their record rather than hatch.
    *
@@ -70,38 +72,35 @@ export function App() {
   const [carry, setCarry] = useState<boolean[]>([]);
   const carryRef = useRef<boolean[]>([]);
   /**
-   * Which creatures this match has beaten the record for, so the results screen can say so.
+   * What this match has added to the record, so the results screen can mark it new.
    *
-   * It has to be tracked as it happens rather than worked out at the end. The record is written
-   * live — that is the whole point of it, so quitting to the title keeps what you grew — which
-   * means by the time the results screen loads the stored record, this match's marks are already
-   * in it and there is nothing left to compare against.
+   * It has to be accumulated as it happens rather than worked out at the end. The record is
+   * written live — that is the whole point of it, so leaving keeps what you found — which means
+   * by the time the results screen loads the stored record, this match's finds are already in it
+   * and there is nothing left to compare against.
    */
-  const [beaten, setBeaten] = useState<CreatureId[]>([]);
-  const beatenRef = useRef<CreatureId[]>([]);
-  const clearBeaten = useCallback(() => { beatenRef.current = []; setBeaten([]); }, []);
+  const [fresh, setFresh] = useState<Codex>(emptyCodex);
+  const freshRef = useRef<Codex>(fresh);
+  const clearFresh = useCallback(() => { freshRef.current = emptyCodex(); setFresh(freshRef.current); }, []);
   const setCarryBoth = useCallback((c: boolean[]) => { carryRef.current = c; setCarry(c); }, []);
 
   const updatePlayers = useCallback((p: PlayerSetup[]) => { playersRef.current = p; setPlayers(p); }, []);
   /**
-   * Fold a match's Rise high-water marks into the record as they happen.
+   * Fold what a match finds into the record as it finds it — biomes swum through, landmarks come
+   * across, species taken to the top, growth marks moved.
    *
-   * The HUD snapshot arrives every frame, so this compares against what we already hold and does
-   * nothing — no parse, no write, no re-render — until a mark actually moves. Recording live
-   * rather than at the results screen is deliberate: growing a creature two stages and then
-   * quitting to the title still grew it two stages, and that should be in the record.
+   * The HUD snapshot arrives every frame, so this asks the cheap question first and does nothing
+   * — no merge, no parse, no write, no re-render — until something is actually new. Recording live
+   * rather than at the results screen is the whole point: a player who swims through four biomes
+   * and then quits to the title has still seen four biomes.
    */
-  const keepBest = useCallback((found: Partial<Record<CreatureId, number>>) => {
-    let moved = false;
-    for (const [k, n] of Object.entries(found) as [CreatureId, number][]) if (n > (bestRef.current[k] ?? -1)) { moved = true; break; }
-    if (!moved) return;
-    const next = { ...bestRef.current };
-    const beat: CreatureId[] = [];
-    for (const [k, n] of Object.entries(found) as [CreatureId, number][]) if (n > (next[k] ?? -1)) { next[k] = n; beat.push(k); }
-    bestRef.current = next; setBest(next);
-    const marks = beat.filter((k) => !beatenRef.current.includes(k));
-    if (marks.length) { beatenRef.current = [...beatenRef.current, ...marks]; setBeaten(beatenRef.current); }
-    recordBest(found);
+  const keepFinds = useCallback((found: Codex) => {
+    if (!hasNewFinds(recordRef.current, found)) return;
+    const { codex, fresh: added } = mergeCodex(recordRef.current, found);
+    recordRef.current = codex; setRecord(codex);
+    freshRef.current = mergeCodex(freshRef.current, added).codex;
+    setFresh(freshRef.current);
+    recordFinds(found);
   }, []);
   const go = useCallback((s: Screen) => { screenRef.current = s; setScreen(s); }, []);
   const setPausedBoth = useCallback((p: boolean) => { pausedRef.current = p; setPaused(p); engineRef.current?.setPaused(p || dialogRef.current !== null); }, []);
@@ -113,7 +112,7 @@ export function App() {
     const engine = new Engine(canvasRef.current, settings.quality, {
       onHud: (s) => {
         setHud(s);
-        keepBest(s.discovery.best);
+        keepFinds(s.discovery);
         if (s.status !== 'playing' && screenRef.current === 'playing') { go('results'); engineRef.current?.releasePointer(); audio.play(s.status === 'won' ? 'won' : 'death'); }
       },
       onMenu: () => { if (screenRef.current === 'playing') { setPausedBoth(!pausedRef.current); audio.play('ui-confirm'); } },
@@ -203,18 +202,18 @@ export function App() {
    * carries anything on; every other mode hands out its own body and the field is left off.
    */
   const withCarry = useCallback((ps: PlayerSetup[]) => ps.map((p, i) => {
-    const mark = modeRef.current === 'rise' && carryRef.current[i] ? clampMark(bestRef.current[p.creature] ?? 0) : 0;
+    const mark = modeRef.current === 'rise' && carryRef.current[i] ? clampMark(recordRef.current.best[p.creature] ?? 0) : 0;
     return { ...p, startRung: mark > 0 ? mark : 0 };
   }), []);
 
   const startMatch = useCallback(() => {
     const ps = playersRef.current;
     if (!ps.length || !ps.every((p) => p.ready) || !engineRef.current) return;
-    clearBeaten();
+    clearFresh();
     engineRef.current.startMatch(modeRef.current, withCarry(ps));
     setPausedBoth(false);
     go('playing');
-  }, [clearBeaten, go, loaded, setPausedBoth, withCarry]);
+  }, [clearFresh, go, loaded, setPausedBoth, withCarry]);
 
   const backToSelect = useCallback(() => {
     engineRef.current?.startAttract();
@@ -246,11 +245,11 @@ export function App() {
 
   const playAgain = useCallback(() => {
     if (!engineRef.current) return;
-    clearBeaten();
+    clearFresh();
     engineRef.current.startMatch(modeRef.current, withCarry(playersRef.current));
     setPausedBoth(false);
     go('playing');
-  }, [clearBeaten, go, setPausedBoth, withCarry]);
+  }, [clearFresh, go, setPausedBoth, withCarry]);
 
   /** Move a player's cursor on the roster grid. Locked players must unlock first (B). */
   /**
@@ -301,7 +300,7 @@ export function App() {
    */
   const toggleCarry = useCallback((index: number) => {
     const p = playersRef.current[index];
-    if (!p || modeRef.current !== 'rise' || !(bestRef.current[p.creature] ?? 0)) return;
+    if (!p || modeRef.current !== 'rise' || !(recordRef.current.best[p.creature] ?? 0)) return;
     const next = [...carryRef.current];
     next[index] = !next[index];
     setCarryBoth(next); audio.play(next[index] ? 'ui-confirm' : 'ui-back');
@@ -487,7 +486,7 @@ export function App() {
 
       {(screen === 'playing' || screen === 'results') && hud && <Hud snapshot={hud} />}
       {screen === 'playing' && paused && <PauseMenu scheme={scheme} onResume={() => setPausedBoth(false)} onChange={backToSelect} onQuit={backToTitle} />}
-      {screen === 'results' && hud && <Results snapshot={hud} players={players} beaten={beaten} scheme={scheme} onAgain={playAgain} onContinue={keepPlaying} onChange={backToSelect} onTitle={backToTitle} />}
+      {screen === 'results' && hud && <Results snapshot={hud} players={players} record={record} fresh={fresh} scheme={scheme} onAgain={playAgain} onContinue={keepPlaying} onChange={backToSelect} onTitle={backToTitle} />}
 
       <Toolbar isFs={isFs} muted={settings.muted} onHelp={() => openDialog(dialog === 'help' ? null : 'help')} onSettings={() => openDialog(dialog === 'settings' ? null : 'settings')} onMute={() => setSettings((s) => ({ ...s, muted: !s.muted }))} onFullscreen={toggleFullscreen} />
       <Dialogs kind={dialog} onClose={() => openDialog(null)} settings={settings} onSettings={setSettings} scheme={scheme} />

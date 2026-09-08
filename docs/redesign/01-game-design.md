@@ -565,11 +565,20 @@ milestone rather than a verdict — so their results screen offers *Keep playing
 with everything grown in it intact, and the goal stops watching so it cannot be
 met twice. Hunter & Hunted refuses: its result is a judgement between players.
 
+**Everything is written as it is found, not when a match ends.** Biomes swum
+through, landmarks come across, species taken to the top and growth marks all
+go into the record the moment they happen. This used to be the results screen's
+job alone, which meant a player who swam through half the sea and then quit to
+the title had nothing to show for it. Writing live costs the results screen the
+trick it used to mark finds new — comparing the store against the match no
+longer works, because the store already contains the match — so the shell
+accumulates what each match added and the screen renders that instead.
+
 **The furthest you have taken each creature is kept.** The record is per era and
 per creature, stored on the device beside the rest of the codex, and it is a
-high-water mark: it never falls, however the run ended, and it is written *as the
-run happens* — the moment a moult lands, not at the results screen — so dying,
-quitting to the title, or closing the tab never throws away what you grew. A
+high-water mark: it never falls, however the run ended, and like every other
+find it is written as the run happens, so dying, quitting to the title or
+closing the tab never throws away what you grew. A
 creature with a record wears it as a badge on its expanded card on the select
 screen, and in Rise the card offers to hatch you at that stage instead of at the
 bottom — **Y** on a pad, **C** on a keyboard. The offer only appears where it is
