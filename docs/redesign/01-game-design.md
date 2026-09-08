@@ -522,7 +522,7 @@ population.
 
 | Mode | Players | Description |
 | --- | --- | --- |
-| **Rise** (single / co-op) | 1–4 | The main experience. Everyone hatches as a Larva in the nursery — or, having grown this creature before, at the stage they reached (see *Carrying Rise on*). Reach Apex. Co-op shares nutrition from assisted kills, players can revive a downed ally by bumping them within 10 s. Players *can* turn on each other — bites land, and a dead player can be fed on — but nothing aims at another player for you: no aim snap, no auto-pounce, no auto-lock. Area abilities still spare a co-op partner, so nobody kills a friend by accident. Session ends when any player reaches Apex and survives 90 s, or continues in free-play. Escalation: the reef's giant population grows as players grow. |
+| **Rise** (single / co-op) | 1–4 | The main experience. Everyone hatches as a Larva in the nursery — or, having grown this creature before, at the stage they reached (see *Carrying Rise on*). Reach Apex. Co-op shares nutrition from assisted kills, players can revive a downed ally by bumping them within 10 s. Players *can* turn on each other — bites land, and a dead player can be fed on — but nothing aims at another player for you: no aim snap, no auto-pounce, no auto-lock. Area abilities still spare a co-op partner, so nobody kills a friend by accident. Session ends when any player reaches Apex and survives 90 s, or continues in free-play (a player who *started* at Apex has no clock — see *Carrying Rise on*). Escalation: the reef's giant population grows as players grow. |
 | **Hunter & hunted** (versus, asymmetric) | 2–4 | One player is a Giant (× 3) with a shrinking hunger meter; the others are Juveniles who must survive and reach Adult. Giant eats to stay alive; small ones hide, bait, and grow. Rotates who is the Giant. *(As built: one **turn** each, 100 s, and your score is what you caught on your own turn — the same job for everyone, so the winner is the best hunter and prey play is how you keep the others' scores down. A turn ends early if every small one reaches Adult. One human plays it as a single turn, exactly as before.)* |
 | **Reef** (sandbox) | 1–4 | No win condition, pick any tier, tune giant density. For messing around and screenshots. |
 
@@ -551,13 +551,31 @@ met twice. Hunter & Hunted refuses: its result is a judgement between players.
 
 **The furthest you have taken each creature is kept.** The record is per era and
 per creature, stored on the device beside the rest of the codex, and it is a
-high-water mark: it never falls, however the run ended, and it is written as the
-run happens rather than at the results screen, so quitting to the title does not
-throw away what you grew. A creature with a record wears it as a badge on its
-expanded card on the select screen, and in Rise the card offers to hatch you at
-that stage instead of at the bottom — **Y** on a pad, **C** on a keyboard. The
-offer only appears where it is real: in Rise, for a creature you have actually
-grown. Everything else hands out its own body and ignores the choice.
+high-water mark: it never falls, however the run ended, and it is written *as the
+run happens* — the moment a moult lands, not at the results screen — so dying,
+quitting to the title, or closing the tab never throws away what you grew. A
+creature with a record wears it as a badge on its expanded card on the select
+screen, and in Rise the card offers to hatch you at that stage instead of at the
+bottom — **Y** on a pad, **C** on a keyboard. The offer only appears where it is
+real: in Rise, for a creature you have actually grown. Everything else hands out
+its own body and ignores the choice.
+
+**The top rung is the one you cannot bank by standing on it.** Rise asks you to
+reach the top *and hold it for ninety seconds*, so that is what the record
+listens for. Reach Apex and then die, or quit, and what is stored is the rung
+below with its **growth meter half full** — a mark of 3.5. Coming back on that
+puts you a short swim from the top rather than at the bottom of the sea, which
+is the honest reading of how far you actually got. Only finishing the run writes
+the top itself.
+
+**Arriving at the top is a victory lap, not a second win.** Because the top can
+only be stored by finishing, carrying it back in means the goal is already
+behind you: the ninety-second clock never starts for that player and the sea is
+simply open, exactly as it is after pressing *Keep playing*. The exemption is
+**per player, not per match** — a friend in the same co-op game who is still
+growing keeps their clock, reaches the top on their own, and wins it. A player
+on a victory lap banks nothing, because their record already says everything it
+can.
 
 ### The growth ladder
 
@@ -578,6 +596,12 @@ which era is in play.
 Both eras derive the rest of a body from its **scale** — the Cambrian's tier
 through `tierForScale`, the Devonian's stage through `stageForScale` — which is
 why hatching a player part-grown is a single number handed to `spawn`.
+
+A position on the ladder is a **mark**, not an index: the whole part is the rung,
+the fraction is how far through it. A mark's fraction is never size — there is no
+animal between two rungs, and the size rule has no name for one — it is meter, so
+`ladderScale` reads the rung and `ladderFill` fills the era's own currency
+(nutrition here, standing in the Devonian) to the fraction.
 
 ## Local multiplayer specifics
 

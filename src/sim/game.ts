@@ -10,7 +10,7 @@ import { applyHit, kill, startSwallow, type HitContext } from './combat';
 import { creature, CREATURE_IDS, PLAYABLE_IDS, type CreatureId, type MoveDef } from './creatures';
 import { resolveFlora, stepFlora, type FloraContact } from './flora';
 import { SpatialHash } from './spatial';
-import { clampRung, ladderRung, ladderScale, LADDER_TOP } from './ladder';
+import { clampMark, fillOf, ladderFill, ladderRung, ladderScale, LADDER_TOP, MARK_NEAR_TOP } from './ladder';
 import { emptyInput, isCoop, TIER_NAMES, TIER_NEED, TIER_SCALE, type Actor, type BrainState, type InputFrame, type Mode, type PlayerSetup, type Prompt, type SiltCloud, type Tier, type WorldEvent } from './types';
 import { BIOME_NAMES, biomeAt, biomeWeights, coverAt, groundHeight, LIGHT_WINDOW_Y, type Landmark, type LandmarkKind, microbialAt, nearestNursery, nurseryAt, nurseryFactor, resolveStatic, sampleCurrent, sampleHeight, shoreDistance, shoreZ, type StaticContact, SURFACE_Y, World, type Biome, type Boulder, type Cover, type Flora, type WorldData } from './world';
 
@@ -249,10 +249,12 @@ export class Game implements AiWorld {
       // Rise can start you part-grown, at the furthest rung you have taken this creature to before.
       // Both eras derive everything else from the body scale — the Cambrian's tier through
       // `tierForScale`, the Devonian's stage through `stageForScale` — so one number does it.
-      const carry = mode === 'rise' ? clampRung(s.startRung ?? 0) : 0;
+      const carry = mode === 'rise' ? clampMark(s.startRung ?? 0) : 0;
       const startScale = carry > 0 ? ladderScale(s.creature, carry)
         : RULES ? RULES.startScale(mode, this.eraRoleIndex(i), s.creature) : mode === 'rise' ? TIER_SCALE[0] : mode === 'hunted' ? (this.isHunter(i) ? 3.0 : TIER_SCALE[1]) : mode === 'reef' ? TIER_SCALE[2] : TIER_SCALE[1];
       const a = this.spawn(s.creature, 'player', this.spawnPoint(nursery, s.creature, startScale, i), startScale, i);
+      // Arriving on the top rung means the goal is already behind you: no clock, just the sea.
+      a.carriedTop = carry >= LADDER_TOP;
       a.home = { ...nursery };
       a.yaw = Math.PI;                                   // facing out to sea
       this.players.push(a);
@@ -275,6 +277,12 @@ export class Game implements AiWorld {
     }
     this.populate();
     RULES?.init(this);
+    // Last, because an era's init sets its own growth state from the body it finds: a mark that
+    // carries a part-filled meter has to be applied on top of that, not before it.
+    setups.forEach((s, i) => {
+      const fill = mode === 'rise' ? fillOf(s.startRung ?? 0) : 0;
+      if (fill > 0) ladderFill(this, this.players[i], fill);
+    });
   }
 
   /** Whether this player index is the giant right now. Only ever true in Hunter & Hunted. */
@@ -1712,8 +1720,11 @@ export class Game implements AiWorld {
         };
       }
       case 'rise': {
-        if (this.endless) return { title: 'Rise', detail: 'The reef is yours. Swim on.' };
-        const held = Math.max(0, ...this.progress.map((p) => p.apexT));
+        // Nobody left with a clock running — everyone here carried a finished run in — reads the
+        // same as carrying on after a win, because that is exactly what it is.
+        const chasing = this.players.filter((p) => !p.carriedTop);
+        if (this.endless || !chasing.length) return { title: 'Rise', detail: 'The reef is yours. Swim on.' };
+        const held = Math.max(0, ...this.players.map((p, i) => (p.carriedTop ? 0 : this.progress[i].apexT)));
         return { title: 'Rise', detail: held > 0 ? `Apex held ${Math.floor(held)} s of 90` : 'Reach Apex and hold it for ninety seconds' };
       }
       case 'reef': return { title: 'Reef', detail: 'No goal. Just the sea.' };
@@ -1833,8 +1844,31 @@ export class Game implements AiWorld {
       // Rise only: the other modes hand you a body rather than growing you one, so their rung
       // says nothing about how far you got. Rung 0 is where everyone starts, so it is not a mark
       // worth keeping — recording it would put a row in every player's record that says nothing.
-      if (this.mode === 'rise' && rung > 0 && rung > (this.discovery.best.get(p.creature) ?? 0)) this.discovery.best.set(p.creature, rung);
+      //
+      // The top rung is the exception: Rise asks you to reach it *and hold it*, so standing on it
+      // banks the rung below with a half-full meter and nothing more. The top itself is written
+      // by `bankLadderTop`, when the run is actually finished.
+      // A victory lap banks nothing. Somebody who came in on the top rung is revisiting a run they
+      // already finished, not making progress, and their record already says so.
+      if (this.mode === 'rise' && !p.carriedTop) this.markLadder(p, rung >= LADDER_TOP ? MARK_NEAR_TOP : rung);
     }
+  }
+
+  /** Raise this creature's Rise record to `mark`, if it is worth more than what is already there. */
+  private markLadder(p: Actor, mark: number) {
+    if (mark > 0 && mark > (this.discovery.best.get(p.creature) ?? 0)) this.discovery.best.set(p.creature, mark);
+  }
+
+  /**
+   * The Rise goal has been met by this player: bank the top of the ladder for their creature.
+   *
+   * This is the only door the top rung comes through, which is why both eras call it from their
+   * own win check — the Cambrian holds Apex, the Devonian holds Prime, and neither is something
+   * the shared code can see for itself.
+   */
+  bankLadderTop(p: Actor) {
+    if (this.mode !== 'rise') return;
+    this.discovery.best.set(p.creature, LADDER_TOP);
   }
 
   /**
@@ -1890,8 +1924,16 @@ export class Game implements AiWorld {
       case 'rise': {
         this.players.forEach((p, i) => {
           const pr = this.progress[i];
-          if (p.tier >= 4 && isAlive(p)) { pr.apexT += dt; if (pr.apexT > 90 && this.state.status === 'playing' && !this.endless) { this.state = { status: 'won', winner: i, message: `${creature(p.creature).name} rules the reef.` }; } }
-          else pr.apexT = 0;
+          // Somebody who came in on the top rung has already done this; the clock is not theirs to
+          // run. Everyone else in the same sea keeps theirs and can still win it.
+          if (p.carriedTop) { pr.apexT = 0; return; }
+          if (p.tier >= 4 && isAlive(p)) {
+            pr.apexT += dt;
+            if (pr.apexT > 90 && this.state.status === 'playing' && !this.endless) {
+              this.bankLadderTop(p);
+              this.state = { status: 'won', winner: i, message: `${creature(p.creature).name} rules the reef.` };
+            }
+          } else pr.apexT = 0;
         });
         break;
       }

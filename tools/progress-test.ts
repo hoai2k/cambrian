@@ -20,9 +20,9 @@ const which = process.argv[2] === 'devonian' ? 'devonian' : 'cambrian';
 selectEra(which === 'devonian' ? DEVONIAN : CAMBRIAN);
 
 const { Game } = await import('../src/sim/game');
-const { ladderName, ladderNames, ladderRung, ladderScale, clampRung, LADDER_RUNGS, LADDER_TOP } = await import('../src/sim/ladder');
+const { ladderName, ladderNames, ladderRung, ladderScale, clampMark, fillOf, rungOf, MARK_NEAR_TOP, LADDER_RUNGS, LADDER_TOP } = await import('../src/sim/ladder');
 const { PLAYABLE } = await import('../src/sim/creatures');
-const { emptyInput, isCoop, MODE_IDS } = await import('../src/sim/types');
+const { emptyInput, isCoop, MODE_IDS, TIER_NEED } = await import('../src/sim/types');
 type InputFrame = import('../src/sim/types').InputFrame;
 type Mode = import('../src/sim/types').Mode;
 type CreatureId = import('../src/sim/creatures').CreatureId;
@@ -35,6 +35,33 @@ const ok = (cond: unknown, msg: string) => { assert.ok(cond, `[${which}] ${msg}`
 
 const HERO = PLAYABLE[0].id as CreatureId;
 const setup = (creature: CreatureId, startRung = 0) => [{ creature, device: 'keyboard' as const, ready: true, startRung }];
+/** Two seats in the same sea, for the rules that are per player rather than per match. */
+const pair = (a: CreatureId, aRung: number, b: CreatureId, bRung = 0) => [
+  { creature: a, device: 'keyboard' as const, ready: true, startRung: aRung },
+  { creature: b, device: 'keyboard2' as const, ready: true, startRung: bRung },
+];
+/** Put a player on the top rung the way growing there would, whichever era this is. */
+const raiseToTop = (g: InstanceType<typeof Game>, i: number) => {
+  const p = g.players[i];
+  p.scale = ladderScale(p.creature as CreatureId, LADDER_TOP);
+  p.tier = LADDER_TOP as typeof p.tier;
+  DEV?.setStage(g, p, LADDER_TOP);
+};
+// The Devonian keeps growth in its own side table, so a test that wants a body *put* on a rung
+// has to reach it. Nothing in the game does this — it moults — but a test must not have to run
+// twenty minutes of feeding to reach the case it is checking.
+const DEV = which === 'devonian'
+  ? await import('../src/sim/devonian/state').then((m) => ({
+      setStage: (g: InstanceType<typeof Game>, a: import('../src/sim/types').Actor, stage: number) => {
+        const d = m.devActor(g, a); d.stage = stage; d.standing = m.STAGE_AT[stage];
+      },
+      standing: (g: InstanceType<typeof Game>, a: import('../src/sim/types').Actor) => m.devActor(g, a).standing,
+      fill: (g: InstanceType<typeof Game>, a: import('../src/sim/types').Actor) => m.stageProgress(m.devActor(g, a)),
+    }))
+  : undefined;
+/** How full this body's growth meter is, in whichever currency the era counts. */
+const meterFill = (g: InstanceType<typeof Game>, a: import('../src/sim/types').Actor) =>
+  DEV ? DEV.fill(g, a) : a.nutrition / TIER_NEED[a.tier];
 
 // ---- the ladder itself ----
 {
@@ -43,10 +70,12 @@ const setup = (creature: CreatureId, startRung = 0) => [{ creature, device: 'key
   ok(ladderName(0) !== ladderName(LADDER_TOP), 'the bottom and the top are not the same word');
   // Anything stored can be hand-edited or left over from an older build, so the ladder has to be
   // total: no index may throw or produce a body of an impossible size.
-  for (const bad of [-3, -1, 99, 4.7, NaN]) {
-    const r = clampRung(bad);
-    ok(r >= 0 && r <= LADDER_TOP, `rung ${bad} clamps into range (${r})`);
-    ok(Number.isFinite(ladderScale(HERO, bad)) && ladderScale(HERO, bad) > 0, `rung ${bad} still gives a real body scale`);
+  for (const bad of [-3, -1, 99, 4.7, NaN, Infinity]) {
+    const m = clampMark(bad);
+    ok(m >= 0 && m <= LADDER_TOP, `mark ${bad} clamps into range (${m})`);
+    ok(rungOf(bad) >= 0 && rungOf(bad) <= LADDER_TOP, `and stands on a real rung (${rungOf(bad)})`);
+    ok(fillOf(bad) >= 0 && fillOf(bad) < 1, `with a sane fill (${fillOf(bad)})`);
+    ok(Number.isFinite(ladderScale(HERO, bad)) && ladderScale(HERO, bad) > 0, `mark ${bad} still gives a real body scale`);
   }
   for (const c of PLAYABLE) {
     let last = 0;
@@ -117,7 +146,72 @@ const setup = (creature: CreatureId, startRung = 0) => [{ creature, device: 'key
   const top = new Game('rise', setup(HERO, LADDER_TOP), 21);
   run(top, 1);
   ok(top.discovery.apex.has(HERO), 'a player at the top of the ladder is recorded as having reached it');
-  ok(top.discovery.best.get(HERO) === LADDER_TOP, 'and the record says so too');
+}
+
+// ---- a part-grown mark hatches a part-grown meter ----
+{
+  // 3.5 means "the rung below the top, half way through it". The body is the whole rung's size —
+  // there is no animal between two rungs — and the meter carries the fraction.
+  const half = new Game('rise', setup(HERO, MARK_NEAR_TOP), 31);
+  const plain = new Game('rise', setup(HERO, rungOf(MARK_NEAR_TOP)), 31);
+  const a = half.players[0];
+  ok(rungOf(MARK_NEAR_TOP) === LADDER_TOP - 1, `the near-top mark stands on ${ladderName(MARK_NEAR_TOP)}`);
+  ok(fillOf(MARK_NEAR_TOP) === 0.5, 'half way through it');
+  ok(Math.abs(a.scale - plain.players[0].scale) < 1e-6, 'a part-grown body is the size of the rung it is on');
+  ok(ladderRung(half, a) === rungOf(MARK_NEAR_TOP), 'and reads as that rung');
+  ok(Math.abs(meterFill(half, a) - 0.5) < 0.02, `with its growth meter half full (${(meterFill(half, a) * 100).toFixed(0)}%)`);
+  ok(meterFill(plain, plain.players[0]) < 0.02, 'where a whole mark starts the meter empty');
+  // A quarter and three quarters, so the fraction is carried rather than special-cased at a half.
+  for (const f of [0.25, 0.75]) {
+    const g = new Game('rise', setup(HERO, 2 + f), 31);
+    ok(Math.abs(meterFill(g, g.players[0]) - f) < 0.02, `a mark of 2.${f * 100} fills the meter ${f * 100}%`);
+  }
+  // The top rung has nothing above it, so it can never be partial.
+  ok(fillOf(LADDER_TOP) === 0, 'the top rung is never part grown');
+  ok(fillOf(LADDER_TOP + 3) === 0, '...however the stored number was mangled');
+}
+
+// ---- the top rung is banked by finishing, never by arriving ----
+{
+  const g = new Game('rise', setup(HERO), 41);
+  raiseToTop(g, 0);
+  run(g, 2);
+  ok(g.discovery.best.get(HERO) === MARK_NEAR_TOP,
+    `standing on ${ladderName(LADDER_TOP)} banks ${ladderName(MARK_NEAR_TOP)}, part grown — not the top`);
+  ok(g.discovery.apex.has(HERO), 'though the codex still credits having been there');
+  // Hold it out and the run finishes; that is what writes the top.
+  run(g, 95);
+  ok(g.state.status === 'won', 'holding the top for ninety seconds wins the run');
+  ok(g.discovery.best.get(HERO) === LADDER_TOP, `and only then is ${ladderName(LADDER_TOP)} banked`);
+}
+
+// ---- arriving on the top rung is a victory lap, not a second win ----
+{
+  const g = new Game('rise', setup(HERO, LADDER_TOP), 43);
+  const a = g.players[0];
+  ok(a.carriedTop, 'a player who came in on the top rung is marked as having done so');
+  ok(ladderRung(g, a) === LADDER_TOP, 'and is standing on it');
+  run(g, 130);
+  ok(g.state.status === 'playing', 'the clock never runs for them: the sea just stays open');
+  ok(!g.discovery.best.has(HERO), 'and nothing is banked by arriving');
+  // Someone who grew there normally is not marked, and does get the clock.
+  const grew = new Game('rise', setup(HERO), 43);
+  ok(!grew.players[0].carriedTop, 'a player who hatched at the bottom is not');
+  // A near-top mark is a head start, not a free pass: it still has to grow the last rung.
+  const nearly = new Game('rise', setup(HERO, MARK_NEAR_TOP), 43);
+  ok(!nearly.players[0].carriedTop, 'and neither is one who came in part grown below the top');
+}
+
+// ---- one player's victory lap does not take the goal away from the other ----
+{
+  const g = new Game('rise', pair(HERO, LADDER_TOP, HERO, 0), 47);
+  const [lap, racer] = g.players;
+  ok(lap.carriedTop && !racer.carriedTop, 'one seat carried a finished run in, the other did not');
+  raiseToTop(g, 1);
+  run(g, 95);
+  ok(g.state.status === 'won', 'the player who grew to the top still wins it');
+  ok(g.state.winner === racer.player, `and it is credited to them (seat ${g.state.winner})`);
+  ok(g.discovery.best.get(racer.creature as CreatureId) === LADDER_TOP, 'their record banks the top');
 }
 
 // ---- Rise can be carried on after it is finished ----
