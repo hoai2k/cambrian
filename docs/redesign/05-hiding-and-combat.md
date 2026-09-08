@@ -41,6 +41,24 @@ Implemented September 2026. This supersedes the original design's Y signature ab
   split, which leaves their behaviour and every seeded replay unchanged. This matters most to the
   filter feeders, whose special never strikes anything: before the fallback a player Tamisiocaris
   had no attack on RT at all, and the `Heavy` clip in its model never played.
+- **The charge.** RT pressed while sprinting or mid-dash is the same move, thrown along the line
+  the body is actually travelling rather than along the nose, for `CHARGE_STAMINA` on top of the
+  move's own cost. A sprint has already chosen a direction and the nose swings round far more
+  slowly than the body crosses ground, so the standing pounce's cone off the heading misses the
+  animal you are about to swim straight past; `chargeTarget` measures how far along the line a body
+  sits and how far off it instead, and takes the nearest thing inside that corridor. Out of a dash
+  it cancels the dash, which costs the invulnerability that was left — you have chosen to commit
+  rather than to escape. It costs the rest of the dash's travel too: a charge that finds something
+  halfway through leaves the dash covering only the ground it had crossed by then, and if that
+  lands on a body the creature stops there and eats. That is the trade working, not the dash being
+  cut short by a bug — the distance is what you spend to turn the escape into an attack. The whole heavy button lives in one place (`Game.heavyAction`), so the
+  charge reaches the creature's special, its pounce and the burrow emergence exactly as a standing
+  press does.
+- **Close attacks nudge onto their target.** A light attack turns up to `AIM_NUDGE` (23°) onto the
+  nearest body inside a 63° cone within about two body lengths. A bite whose mouth reaches four
+  tenths of a body length has no tolerance at all otherwise, and missing by a few degrees at that
+  range reads as the game ignoring the press. The cap is what keeps it a nudge rather than an
+  auto-aim, and it never picks another player: who you attack stays your decision.
 - **B: block/parry**, or evade for creatures without a guard. Defensive specials run through this action. Hallucigenia and Canadia have a 0.28-second parry window; sustained defense is not invulnerability.
 - **Y / keyboard R (player 2: P): hide**, available at every growth tier. Press again to end hiding. Attacking, blocking, sprinting, dodging, taking damage, or being grabbed ends hiding.
 
