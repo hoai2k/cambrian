@@ -1,0 +1,80 @@
+{
+  "candidate": "Coccosteus production candidate-01 SOURCE ONLY",
+  "inputs": [
+    {
+      "path": "/Users/hoai/Documents/Stuff/Generations/cambrian/local/expansion-repo/tools/devonian/creatures/coccosteus/rework-v3/production_common_01.py",
+      "bytes": 2159,
+      "sha256": "a034b809c683bcc974864f7fd19b51176552d45c9497f9b45d7fd6bc9370b9f1"
+    },
+    {
+      "path": "/Users/hoai/Documents/Stuff/Generations/cambrian/local/expansion-repo/tools/devonian/creatures/coccosteus/rework-v3/bake_01.py",
+      "bytes": 6768,
+      "sha256": "73b063d0bb112ee9a0175923bf75dddb9ae744d1f7f01319125245ea34ceb098"
+    },
+    {
+      "path": "/Users/hoai/Documents/Stuff/Generations/cambrian/local/expansion-repo/tools/devonian/creatures/coccosteus/rework-v3/atlas_pigment_01.py",
+      "bytes": 10191,
+      "sha256": "278a0597dd491309f8a0c5a1dd5c6bc89e29754425ec3dc4374fbc160eeb012f"
+    },
+    {
+      "path": "/Users/hoai/Documents/Stuff/Generations/cambrian/local/expansion-repo/tools/devonian/creatures/coccosteus/rework-v3/rig_actions_01.py",
+      "bytes": 6693,
+      "sha256": "ca1d7bec10dfaa3a40bdb48974cd88f8f105eca85a686a6d544436c2f2c0320b"
+    },
+    {
+      "path": "/Users/hoai/Documents/Stuff/Generations/cambrian/local/expansion-repo/tools/devonian/creatures/coccosteus/rework-v3/candidate_01.py",
+      "bytes": 12958,
+      "sha256": "b88c0fc4f2b9bf7566fc5bcc2568de8ce2166d95237d0cb32e8a3ca4ca975f92"
+    },
+    {
+      "path": "/Users/hoai/Documents/Stuff/Generations/cambrian/local/expansion-repo/tools/devonian/creatures/coccosteus/rework-v3/export_patch_01.py",
+      "bytes": 2921,
+      "sha256": "dc226b724856caeba0ddaaf6f5ef573bd0f4c93f1ecb36016aea80e80a20dc1f"
+    },
+    {
+      "path": "/Users/hoai/Documents/Stuff/Generations/cambrian/local/expansion-repo/tools/devonian/creatures/coccosteus/rework-v3/render_candidate_01.py",
+      "bytes": 5884,
+      "sha256": "60709269fe3b6ee763c5cd36b97429455110702a14ec94b99ba6121310d17574"
+    },
+    {
+      "path": "/Users/hoai/Documents/Stuff/Generations/cambrian/local/expansion-repo/tools/devonian/creatures/coccosteus/rework-v3/check_candidate_01.py",
+      "bytes": 10017,
+      "sha256": "bf4052460efa39489964986b8a872fafe8094c5e2f35ee8625aea8d2e716b19f"
+    },
+    {
+      "path": "/Users/hoai/Documents/Stuff/Generations/cambrian/local/expansion-repo/tools/devonian/creatures/coccosteus/rework-v3/metadata_seed_01.json",
+      "bytes": 2080,
+      "sha256": "142a66a0d5c26d030fa3144a2dcb6b7e1ef8f9dbff4e399392661db6f0aa2262"
+    },
+    {
+      "path": "/Users/hoai/Documents/Stuff/Generations/cambrian/local/expansion-repo/tools/devonian/creatures/coccosteus/rework-v3/check_production_source_01.py",
+      "bytes": 4206,
+      "sha256": "00294546065a2fabf9bf4d8f19debe2b5f7e4434ee2aac873e7e86b78dd910f2"
+    },
+    {
+      "path": "/Users/hoai/Documents/Stuff/Generations/cambrian/local/expansion-repo/tools/devonian/creatures/coccosteus/rework-v3/clay-04.py",
+      "bytes": 21950,
+      "sha256": "804d9932e9f3453aefc0a67b0aecdab4cb36491b2377b4839fbf7fe60605b0d3"
+    },
+    {
+      "path": "/Users/hoai/Documents/Stuff/Generations/cambrian/local/expansion-repo/tools/devonian/creatures/coccosteus/rework-v3/check-clay04-source.py",
+      "bytes": 5214,
+      "sha256": "bfa02e5d2bf3ad3fd8ca652c5849fe344b1c60e4627aab6d8533754bf401a8be"
+    },
+    {
+      "path": "/Users/hoai/Documents/Stuff/Generations/cambrian/local/devonian-authoring/coccosteus/rework-v3/material-04/coccosteus-material-04.blend",
+      "bytes": 5824475,
+      "sha256": "2bd0d3da5ed2ad73801e200325b51f3c776989e027d01020e196838f10e633c9"
+    },
+    {
+      "path": "/Users/hoai/Documents/Stuff/Generations/cambrian/local/devonian-authoring/coccosteus/rework-v3/material-04/material-report.json",
+      "bytes": 2772,
+      "sha256": "d01c4be81cc558584fbf2bfe18508fa8b32ef1c16f6e5cbb7e55bf68d1becfad"
+    },
+    {
+      "path": "/Users/hoai/Documents/Stuff/Generations/cambrian/local/devonian-authoring/coccosteus/rework-v3/material-04/render-manifest.json",
+      "bytes": 3912,
+      "sha256": "a7165aa26944f98deac59ad760914ed79699f86e7bc8621f3215ba2436639481"
+    }
+  ]
+}

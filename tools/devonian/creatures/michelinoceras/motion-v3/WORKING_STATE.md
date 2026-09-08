@@ -75,3 +75,82 @@
   flare-before-whip, travelling bend with unequal arm timing, smooth contact
   basket, distal wrapping and real oral transfer without arm/head intersections.
   Reject rather than infer approval from numeric contact or original eye audits.
+
+
+## 2026-09-08 14:02 UTC — candidate-01 — scoped exported motion-art approval
+
+- Owner/model: Astra high. Status: **APPROVED FOR RUNTIME INTEGRATION REVIEW**,
+  limited to reviewed motion art; not shipping, gameplay or general anatomy.
+- Reviewed all 60 actual exported pose images in 13 labelled sheets plus ten
+  native-size critical closeups. Flare → sectional curl/hook → recovery reads
+  clearly. Eat .22 contact, .48 curved basket and .78–1 oral cupping are credible
+  in both detail levels. No blocking deformation found in these views.
+- Full/LOD Attack/Bite/Heavy/Eat have exact channel/time/value parity, 498
+  semantic tracks per clip. Small jaw visibility and dense late mouth cupping
+  are recorded limits, not new anatomy proposals.
+- Hash-bound verdict and complete image inventory: `/Users/hoai/Documents/Stuff/Generations/cambrian/local/devonian-authoring/michelinoceras/motion-v3/visual-review-01`.
+  Verdict SHA-256 `993ef6fbf43e27cb2615aebc2f3b4b951bf3b95efad09beee3ffa07e86369e61`.
+- Source/candidate correction: none justified. Preserve the frozen inputs and
+  candidate-01. No Blender, public asset, Git or shared-doc mutation by reviewer.
+- Next: parent integrates progress-driven Eat and a crown-reachable carry path
+  in isolated runtime review, then validates actual prey attachment, oral
+  transfer, swallow, cancellation and full/LOD continuous clip transitions.
+  The cyan proxy starts attached; it does not approve real pickup/swallow.
+- Remaining resource scope: no further authoring loop requested unless runtime
+  evidence or parent review demonstrates a specific defect.
+
+
+## 2026-09-08T14:32:45.707655+00:00 — bounded runtime and isolated packaging
+
+- Owner/model: Astra high, explicitly assigned runtime files and packaging by
+  parent. `creature.ts` reads asset-scene authored-grasp metadata only; old
+  Michelin remains opted out and Opabinia retains its existing route.
+- `attachments.ts` follows authored grasp carry with bounded per-arm pickup
+  correction, zero correction by .78, oral-dimension aperture, actual-contact
+  gate, and safe cancellation/target/view reset. Large or unreachable bodies
+  remain at simulation position. No source art/action changes.
+- New extras-only assets: `runtime-candidate-01`; original approved binary
+  chunks and every non-extra document property were verified unchanged.
+- Production full/LOD + actual Furcaster prey checks PASS at 12 scale/orientation
+  combinations, including moving predator, 40,560 skinned vertex samples, exact
+  late pose vs independent raw mixer, mid-feed interruption, target/LOD swap,
+  unreachable/extension-limit/multi-bite/oversize safety, and old Michelin /
+  actual Opabinia regression. Repeated on compressed derivatives: PASS.
+- Real isolated package outputs `runtime-packaged-01`: 19 full and 7 LOD clips;
+  exact meshopt round-trip, 13 sockets and scene metadata survive. Opt-out
+  control retains old 3-clip LOD rule. Public Michelin + 126 Cambrian assets
+  unchanged. `package.mjs` now supports DEVONIAN_ASSETS candidate root and
+  keeps four performances only for asset metadata opt-in.
+- Typecheck/build PASS; existing Toolbar/App circular-chunk warning unchanged.
+- Parent additionally authorizes strict intake handling of static identity
+  scale channels plus adversarial regression. That bounded distinction is next;
+  no actual scale motion will be allowed. Browser/gameplay visual review and
+  publication remain parent-owned. No Blender, public or Git mutation.
+
+
+## 2026-09-08T14:46:23.244319+00:00 — final canonical compressed runtime handoff
+
+- Owner/model: Astra high. Status: bounded runtime/package/intake work complete;
+  parent browser/controller review and publication remain outstanding.
+- Strict identity intake first rejected non-root Blender scale noise; original
+  runtime-intake-01 and candidates preserved. Parent authorized hash-bound
+  exporter-noise canonicalization, not a checker tolerance. New runtime-canonical-01
+  changes only scale values within 5e-7; each changed sample/bind is recorded.
+  Original binary prefix, geometry, rotation/location channels and materials
+  unchanged. 127,605 real skinned vertex probes show maximum posed displacement
+  4.956867291381293e-7 model units; local rotations/translations exactly equal.
+- Actual canonical package runtime-packaged-02 PASS: full 19 / LOD 7 clips,
+  13 sockets and opt-in metadata retained; opt-out policy stays 3 LOD clips.
+  Public Michelinoceras and 126 Cambrian assets unchanged.
+- Strict real intake runtime-intake-02 PASS: 4,316 exact identity scale channels;
+  ten adversarial nonidentity/nonfinite/cubic curves rejected. No scale-motion
+  tolerance in check.mjs. Final family is runtime-intake-02/family; original
+  Idle portraits are explicitly reused, not new feeding renders.
+- Actual canonical compressed runtime-review-packaged-02 PASS: 12 full/LOD
+  scale/orientation scenarios, 40,560 skinned vertex probes, real prey, pickup/
+  carry/swallow, interruption/target/LOD reset, unreachable/large bodies, exact
+  late authored cupping, and old Michelinoceras/Opabinia regressions.
+- Final full SHA 646fe1ec885296d6195783fb9fc591d49e5c7212d0d11a0214ed5aecb0495cc1;
+  LOD SHA c1005758eee00eaca5b1e73ace492a5fcc5fda3ec60f5cb21c880e00e5fabf82.
+- Frozen current source/evidence handoff: runtime-handoff-01, with exact source
+  snapshots and manifest. See RUNTIME_HANDOFF.md. No Blender/public/Git writes.

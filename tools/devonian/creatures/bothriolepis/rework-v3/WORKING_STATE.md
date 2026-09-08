@@ -1,5 +1,104 @@
 # Bothriolepis V3 working state
 
+## 2026-09-08 14:17 UTC — MATERIAL02 rejected; MATERIAL03 source frozen
+
+- Owner: Astra high. Execution slot: Terra medium assigned by root. No Blender,
+  rig, export, public edits or Git performed by author.
+- All eight actual MATERIAL02 views reviewed against user/primary reference.
+  Pale construction patches improved, but uniformly olive toy-like armor and
+  sharp cephalic median value split fail the bounded appearance gate.
+  Blend SHA `2ad2da4be7ce0e72d4804ded167ef0767087daa18e1494632df83caaf4ecb900`;
+  output inventory SHA `ca009f15561f69eaade8acb983688e449eeb09a3acaf583031c130aea9c4373c`.
+- Isolated geometric cause: clamped Hermite endpoint tangent at mirrored
+  cephalic roof. M03 cancels only this Z tangent, max .004317 local displacement;
+  keeps median height, oral deformation deltas, pectoral roots, thoracic crest,
+  topology and primary proportions. Analytic opposing-normal jump at y=-1.41
+  falls .357521 to .00000729; thoracic ridge remains unchanged.
+- Appearance correction: restrained brown/moss pigment and roughness variation,
+  growth-oriented ornament within fourteen preserved plate boundaries; subdued
+  scaleless posterior. Retains correct sRGB, boundary color continuation and
+  small common pore response. See review-material02-material03-handoff.md.
+- Checks: AST/import PASS, finite 384x256 field probe, max color roundtrip
+  error .001519, roughness .498324–.659758. UV preview inspected; no actual M03
+  images exist yet. Source checks are not an art approval.
+- Frozen manifest `frozen-inputs-material03.json` SHA
+  `aa816ef89162004a7848acc5fa5f99c50944ea4ed6244d2d587413834a12a6ae`
+  binds ten absolute inputs, including exact M02 blend/inventory and all source.
+  Builder SHA `81fc8e0abd95b1ffa42087e216a6e0d390c877d3b0c689e106f67c1c1f473be8`;
+  fields SHA `a79e4988150d06b900c4fcb24e6bac4c9fda3570b8d12df25174010abbe737c4`.
+- Next exact command (one CPU2/32-sample execution and eight views):
+
+  ```sh
+  /usr/bin/python3 /Users/hoai/Documents/Stuff/Generations/cambrian/local/expansion-repo/tools/devonian/creatures/bothriolepis/rework-v3/execute_material03.py --run-frozen-material03
+  ```
+
+- Output: sibling authoring bothriolepis/rework-v3/material03/. Stop on hashes,
+  existing blend, runtime failure or missing inventory; preserve log and return.
+- Pending art criteria: front split removal without crest flattening or eye
+  burial; living armor character at game distance; no printed fingerprint
+  ornament, toy patches, bright collars, rectangular oral surround or UV joins;
+  preserved oral recess, pectoral blade orientation, scaleless posterior and
+  square rayless dorsal. Inspect all eight actual images before any next phase.
+- Future dependencies after accepted art gate: bake common shader pore normal
+  into export maps, anatomy-aware rig, all eighteen dynamic clips and anchors,
+  full LOD family/export/portraits; none authored in this phase.
+
+## 2026-09-08 13:51:42 UTC — bothriolepis — MATERIAL01 rejected; MATERIAL02 frozen
+
+- Owner/model: Astra high. Status: candidate-ready SOURCE; execution assigned
+  by root to Terra medium. User resumed; this supersedes the earlier pause.
+- Reviewed all eight actual MATERIAL01 images, root review and user reference.
+  Rejected on blend `d25049d96a664ed359597daa8fbb9d44f4c0ca14c5922c7308437abaae52ffaf`,
+  inventory `35b997ea6ccdd489af32d83f2d0a492ae7c49f2a33301f47b28af68586b0cacb`.
+  Pale collars/nose/oral construction patch, smooth pale posterior and sharp
+  forehead divide fail the appearance gate. Plate layout/grain and accepted
+  sculpt/pectoral roots/oral recess remain useful and are preserved.
+- Diagnosis: actual PNG probes show intended linear colors were stored directly
+  as sRGB bytes. Shield flank decodes to 9–13% of the intended linear channels;
+  native vertex colors did not undergo that darkening. The wrapped normal map
+  also had mismatched one-sided edge derivatives on the forehead UV seam.
+- Correction: explicit linear-to-sRGB PNG encoding; common linear pigment
+  family; color continuation through the actual exterior patch boundaries;
+  shared tiny pore response; ventral UV wrap with periodic normal derivatives;
+  subtle scaleless posterior maps and proximal pigment transition. Fourteen
+  suture paths unchanged. All mesh, polygon and shape-key coordinates are
+  hash-checked unchanged at runtime. No physical relief is applied a second time.
+- Frozen manifest:
+  `/Users/hoai/Documents/Stuff/Generations/cambrian/local/expansion-repo/tools/devonian/creatures/bothriolepis/rework-v3/frozen-inputs-material02.json`
+  SHA-256 `4738725e9c277d2c5bf2ed591946b45c4ec9163018f7719d8e6600aa94978bda`.
+  Nine inputs include both exact prior geometry/material dependencies, new
+  fields/builder/executor/review, original swatch and reviewed blend/inventory.
+- Builder SHA-256 `f541500e9258d0a01f0c2775c2dbcc65abf39929321b5bec55439a9c94b7d798`.
+  Field source SHA-256 `02fffe5964ea4e7b2896f91f7ba4b9232d45909ee14a62bc4de31dab17144288`.
+- Source preflight PASS: AST parse; finite fields; color encoding max sampled
+  linear round-trip error 0.001601; analytic forehead color/height continuity
+  below 1e-14. Actual 55,802-vertex topology pigment block evaluated: 2,822
+  patch vertices receive boundary continuation, fixed anchors remain exact,
+  final iterative residual 1.643e-5. No Blender or render was launched.
+  Report: local `rework-v3/material02-source-preflight.json`.
+- Next exact Terra command, CWD
+  `/Users/hoai/Documents/Stuff/Generations/cambrian/local/expansion-repo`:
+
+  ```sh
+  /usr/bin/python3 /Users/hoai/Documents/Stuff/Generations/cambrian/local/expansion-repo/tools/devonian/creatures/bothriolepis/rework-v3/execute_material02.py --run-frozen-material02
+  ```
+
+- Expected new local `rework-v3/material02/` outputs: blend, eight matching
+  review PNGs, nine standalone/packed maps, source report, inventory and log.
+  CPU2 / 32 samples. Existing material01 and earlier files remain intact.
+- Remaining art gate: no conspicuous pale collar/nose/oral patch; actual oral
+  recess with mucosa only inside; continuous forehead; quiet living scaleless
+  posterior; brown-olive plate hierarchy and subordinate grain; preserved
+  square dorsal and broad lateral pectoral anatomy. Inspect all eight actual
+  views and bind the next verdict to blend/inventory hashes.
+- Stop condition: input mismatch, existing material02 blend, unexpected error,
+  geometry/shape-key hash change or missing inventory. Preserve evidence and
+  return; no source/threshold/directory edits by executor.
+- Downstream dependency: the common tiny Object-space pore Bump must be baked
+  into final GLB normal maps. Rig/actions/anchors, fine marginal denticle review,
+  exports and new eye/attachment/action audits remain later. No public/Git step.
+- Detailed source handoff: `review-material01-material02-handoff.md`.
+
 ## 2026-09-08 00:31:04 UTC — bothriolepis — MATERIAL01 frozen; user pause
 
 - Owner/model: Astra high. Status: candidate-ready source, execution deferred

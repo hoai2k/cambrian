@@ -52,99 +52,104 @@ Nahe reference SHAd5640abf84805adf6b4f6df335dc5b3bceda09931d426b2039089391ffb85c
 
 ## Exact current work
 
+### Gemuendina — latest face request
+
+Root authored face-v4 studies01/02 and rigged candidates01/02. Accepted V3 body/materials
+preserved posterior to Y=-1.04; mouth now leading-front, eyes adjacent above it, original
+dorsal eye objects relocated. Candidate01 actual eye containment met50% but missed65%
+margin in Heavy; candidate02 inset eyes another .010, preserving candidate01.
+Candidate02 full16,412,444B /LOD2,862,364B:18/18actions,28bones,3anchors. Actual exported
+10pose eye/oral audit PASS; per-pose conservative margins are in face-v4/audit-candidate-02-03/audit.json.
+11 actual full/LOD face/action views rendered; root reviewed primary seven. Four portraits
+rendering. Local face-v4 WORKING_STATE holds source/paths. Viewer/intake/main still pending.
+Keep preview: far LOD intentionally loses fine tessera pigment and still needs broader final art review.
+
+### Dunkleosteus — latest face request
+
+Dedicated Astra high /root/dunkleosteus_face_v4 inspected reference and existing final V2.
+Candidate01 actual8views rejected: brow triangular artifacts, exposed gnathal root slabs.
+Candidate02 actual8views author reviewed and root inspected four key views: continuous brow,
+stronger cheek, shaped sharp gnathals with supported roots. Advances to dedicated eye/oral
+checks, not final. Frozen export_02.py and audit_exports_02.py ready; local candidate02/exports
+not executed. Audit final SHA0d8231a8aa9b8c8a39861f92b928901f762f6606fd2fa6f1dfc2c000f3a52f6b.
+Same working jaws, source textures, interior and anchors retained. Both detail levels must keep18clips.
+
 ### Titanichthys
 
-Astra author /root/titanichthys_rework_clay03 finished candidate03 SOURCE. Accepted clay04/material02, not final.
-Candidate01 full+LOD built but LOD all-white pigment failed. Candidate02 explicit sampled
-colour failed after decimation; partial full GLB/maps preserved, no successful LOD or art review.
-Focused diagnostic ran successfully, exact handoff HANDOFF-DIAGNOSTIC-DECIMATION-01.md;
-result ../devonian-authoring/titanichthys/rework-v3/diagnostic-decimation-01/result.json.
-All114340 loops finite,20 red values negative to -.04200587 after decimation; source positive.
-Alpha7 tiny overshoots1.192e-7. No clamping/correction applied. Candidate03 frozen: final-UV atlas sampling for fins/eyes and convex same-region transfer
-of accepted filtered body pigment after neutral-colour decimation. HANDOFF-CANDIDATE-03.md,
-manifest4dd07f1f9e3c95fdb58d8327abc2e4724041d37b7789871c34b53fd2625853fb. Not executed. Cocc author informed. Reverify frozen diagnostic manifest.
-Raw full44.56MB also needs final lossless packaging check; no silent quality reduction.
-Next valid candidate needs full/LOD21poses,18 actual clips, anchors, oral and eye/general
-checks, portraits, actual viewer and intake. Accepted sculpt/textures preserved.
+Candidate05 material ambiguity diagnosed by Terra:326 conflicting POSITION+UV corners,
+zero after exact material identity separation. Candidate06 minimal repair frozen manifest
+669f6ad4970160f85a6c133e9aaaf4b673d3b8161269ce77225f95d67a5d698c. Terra G1+G2 now PASS:
+43,409,408B full/3,878,132B LOD,18/18actions. G3 actual23views currently executing.
+All prior failures preserved. Raw full still over25MB; lossless packaging and post-rework
+oral/eye/actual runtime reviews remain. Accepted clay04/material02 remain the art target.
 
 ### Coccosteus
 
-Astra /root/coccosteus_material04_review active production source. Root+author actually
-reviewed all7 material04 views and accepted this bounded material gate. Subtle irregular
-pigment retains plate readability after prior overly smooth/overly noisy failures.
-material-04 Blend2bd0d3da5ed2ad73801e200325b51f3c776989e027d01020e196838f10e633c9.
-Reportd01c4be81cc558584fbf2bfe18508fa8b32ef1c16f6e5cbb7e55bf68d1becfad.
-Author prepares PBR bake,20-bone skeleton,18 actions, real jaws/anchors/fullLOD/portraits.
-No production Blender execution yet. Candidate source must be frozen before execution.
-Original Cocc backup retained. Eye/general QA follows completed replacement.
+Candidate02 all23views inspected: white cranial polygon patches and weak LOD bars/rays.
+Root+author actual12-view shading ablation confirms roughness atlas holes (no-normal leaves
+patches, fixed roughness removes them; baked-before-export already affected). Candidate03
+frozen: two continuous body UV strips,2048roughness minimum32.77pixels/triangle, original
+living material fields retained, narrower LOD filtering and45% fin retention (body25%).
+HANDOFF-CANDIDATE-03.md,60-input manifest1f21e13cd943a74c9837c2951c4992edaa37b9043aa3bc3805e7c2f406412bf5.
+New baked-02/candidate-03 not executed. All23 actual views still required. No public replacement.
 
 ### Bothriolepis
 
-Astra /root/bothriolepis_rework_design active material02 SOURCE. Material01 actually rendered
-all8 views and rejected by root+author. See root-review-material01.md. Pale collars/nose/oral
-patch and hard forehead tone seam spoil finish. Author traced atlas linear values incorrectly
-stored as sRGB bytes, plus nonperiodic normal seam; correct encoding and exterior transitions,
-keep accepted clay02 geometry, pectoral roots, oral recess and suture paths. No rig stage yet.
-material01 Blendd25049d96a664ed359597daa8fbb9d44f4c0ca14c5922c7308437abaae52ffaf.
+Material03 executed8views and root reviewed all: HOLD. Uniform pale olive shield,
+visible forehead midline difference and four-sided oral transition persist. See
+root-review-material03.md. Avoid another full rig/export on this finish. Original author
+independent review/substantial targeted correction pending. Materials01/02/03 preserved.
 
 ### Cambrian Odaraia
 
-Original Astra /root/odaraia_rework_design active material01 source. Frozen clay02 was executed:6 images and
-framing/geometry reports PASS at ../expansion-authoring/odaraia-rework/clay02.
-Root and original author independently inspected all6 and accept coarse gate.
-Author is preparing geometry-preserving semitransparent shell material with dark/light views. Read new root-review-clay02.md.
-Blendd5ec458053d58f45e5a0def15721485365449d1abee24ad75844fa9d38d9182c.
-LegsUP/+Yup pose; curved wrapping valves,32 paired biramous limbs/20 intervals, supported
-large eyes and three tail blades. Preserve2 references and original23-file backup.
-Cambrian actions use Moult, not Growth. Incorporate articulated attacking/eating direction.
+Material01 executed6 dark/light views. Root inspectedall6: HOLD glass-like shell glare,
+marble-like eyes and uniform tan limbs/tail. See root-review-material01.md. Keep translucent
+wrapping coat geometry; next study needs cuticular finish. Rig/action source direction saved
+in ATTACK_EAT_RIG_DIRECTION.md. Author next material review pending; no public replacement.
 
-### Doryaspis
+### Doryaspis / Stethacanthus
 
-New source tools/devonian/creatures/doryaspis/rework-v3, clay01 actually rendered7 views.
-Blend92977b2ea198748759e718fd994abada2ad79d56455602b4a4384c3a8d822ca8.
-Root inspected all7, holds acceptance: conspicuous mouth above pseudorostrum remains visibly
-contrary to user art direction; cranial/plate silhouette still smooth, appendage roots need
-review. Read root-review-clay01.md. Existing primary reconstruction puts oral opening above
-ventral pseudorostrum; don't silently invent jaw or claim user request satisfied. Resolve
-shape/opening presentation explicitly. No material/rig/final eye audit authorized by clay pass.
-Stethacanthus full rework still queued, existing source/public backup preserved.
+Dory clay01 actually rendered7views; root HOLD mouth presentation above snout contrary user
+art direction, jagged rim and abrupt roots. Read root-review-clay01.md for anatomical evidence
+versus requested presentation. Steth full rework remains queued. Backups intact.
 
 ### Michelinoceras
 
-Astra /root/michelinoceras_attack_feeding_design SOURCE frozen motion-v3. Existing166-bone
-rig has10 arms×16 sections; geometry/materials retained. Attack/Bite/Heavy/Eat independently
-rewritten with flared travelling curvature and grasp/carry. Full19clips,LOD7,13 sockets planned.
-Manifest0bc51090fbf5c5137aaf6dfd5fbd91738d44df83994ade7f74e3b8214794aad9.
-Exact build_candidate.py passed, full19/LOD7clips exported. Original contract checker
-rejected static root channels; independent v2 verifies every emitted sample equals original
-bind exactly and PASS, no actual root motion. Original checker/manifest preserved.
-Read validation-review-01/contract-validation-v2.json. Full45pose rendering now running;
-LOD15poses follows, then original author art review. Not visually approved. Source preflight is not actual export QA.
-Runtime Attachments.feed currently scales carry arc to TOTAL shell length, exceeding crown
-reach. Must use soft-part/rig reach and progress-driven Eat after actual candidate approval;
-adding FEEDING_PERFORMANCE alone is insufficient. See motion-v3 README/WORKING_STATE.
+Completed motion art60views, runtime actual full/LOD/prey12scenarios, strict intake and
+lossless packaging. Final family runtime-intake-02/family copied to public for viewer check:
+full SHA646fe1ec885296d6195783fb9fc591d49e5c7212d0d11a0214ed5aecb0495cc1,
+LOD SHAc1005758eee00eaca5b1e73ace492a5fcc5fda3ec60f5cb21c880e00e5fabf82.
+19/7clips,166bones,13anchors. Runtime follows authored grasp with bounded pickup correction,
+rig-scaled aperture and progress Eat; old models/Opabinia retain previous route.
+Exact identity scale channels accepted; measured sub-ppm exporter noise canonicalized only
+in separate hash-bound derivative (max posed displacement4.957e-7). Original evidence preserved.
+See motion-v3/RUNTIME_HANDOFF.md and immutable48input handoff in local authoring.
+Fresh built browser4176 viewer loads19clips; root inspected Eat reach .25s, basket .70s,
+closed crown1.30s. This verifies viewer GPU poses; real-prey scenarios were production headless
+runtime, not interactive controller play. Main publication checkpoint underway. Model stays
+preview because broader individual quality refinement and controller playtest remain.
 
 ### Other reference briefs
 
 Onychodus rework-v3 ANATOMY_REFERENCE_BRIEF.md frozen: paired bony parasymphyseal bases,
 adult tusk interpretation, dermal cranial fields; Andrews figure4 still needs actual retrieval
 before clay. No new model. Nahecaris and other refs queued with concrete shape targets.
-Gemu/Dunk new face passes are queued; no facial mesh change yet. Preserve their working rigs.
+Gemu and Dunk face passes are in progress as detailed above, not merely queued. Preserve working rigs and backups.
 Gemu previous research describes upward oral/dorsal eye anatomy: reconcile with latest visual
 request explicitly; dorsal markings must not be construed as eyes.
 
 ## Repo / validation / execution
 
 Repo /Users/hoai/Documents/Stuff/Generations/cambrian/local/expansion-repo, devonian-assets.
-Separate main worktree ../devonian-publish. Last previous own checkpoint a6008e8; resumed
-feature fast-forwarded to concurrent main eb23dcc. Fetch/merge concurrent main; never force.
+Separate main worktree ../devonian-publish. Latest own checkpoint34964ec; merged concurrent c43ea00.
+Main254a273 and feature757d9c8 pushed to same GitHub repository over SSH. HTTPS fetch works; HTTPS push lacks credentials. Use explicit git@github.com:hoai2k/cambrian.git for push. Fetch/merge concurrent main; never force.
 Commit finished frozen source/docs/status independently of mutable agent work. No broad add.
-Do not stage __pycache__. No new production model was published on8Sept yet.
+Do not stage __pycache__. Michelinoceras motion delivery is the first new production candidate staged on8Sept; verify latest Git main merge before claiming publication.
 
 User-authorized workflow: Astra high creative research/sculpt/material/rig/visual judgment;
-Terra medium deterministic Blender/export/render/check execution. Four active slots. Attempt
-to spawn new Terra executor hit environment agent-thread limit (not user approval). Root ran
-exact frozen commands directly; no claim that model setting changed. Reuse available agents
+Terra medium deterministic Blender/export/render/check execution. Four active slots. Earlier executor spawn hit a temporary agent-thread limit. New /root/frozen_blender_execution
+Terra medium is now working, plus dedicated Astra high /root/dunkleosteus_face_v4. Root ran
+its Gemu frozen execution directly without claiming a model switch. Reuse available agents
 for their existing individual authorship; keep execution/output terse. No usage reset/schedule.
 Blender5.2 /Applications/Blender.app/Contents/MacOS/Blender, CPU2, Mac startup needs escalation.
 

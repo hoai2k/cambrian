@@ -1,0 +1,17 @@
+[
+  {
+    "path": "/Users/hoai/Documents/Stuff/Generations/cambrian/local/expansion-repo/tools/devonian/creatures/dunkleosteus/face-v4/export_02.py",
+    "sha256": "7f2c33224624656c73b8559524f557fcfc7371bad6c482853ecdc0efcf53e337",
+    "bytes": 6334
+  },
+  {
+    "path": "/Users/hoai/Documents/Stuff/Generations/cambrian/local/expansion-repo/tools/devonian/creatures/dunkleosteus/face-v4/audit_exports_02.py",
+    "sha256": "0d8231a8aa9b8c8a39861f92b928901f762f6606fd2fa6f1dfc2c000f3a52f6b",
+    "bytes": 9796
+  },
+  {
+    "path": "/Users/hoai/Documents/Stuff/Generations/cambrian/local/devonian-authoring/dunkleosteus/face-v4/candidate02/dunkleosteus-face-v4-candidate02.blend",
+    "sha256": "9a686211386b44ca42b264b1f8c5c17bdf04d7b2b81d14ca2d6e702f87d78c83",
+    "bytes": 12605969
+  }
+]
