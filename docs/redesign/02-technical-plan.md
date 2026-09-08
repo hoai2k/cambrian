@@ -273,9 +273,10 @@ target) pair within sense range using the spatial hash, at 10 Hz.
 > **Superseded by what shipped.** The table above is the plan; the bindings the
 > game reads are in `readGamepad()` in `src/input/input.ts` and are listed in
 > [01 · Combat](01-game-design.md#verbs). The differences that matter: **A** is
-> sprint (not rise), **RB** is rise (not light), **X** is light (not heavy),
-> **RT** is heavy/pounce (not burst), **LB** is dodge (not guard), **B** is
-> guard/parry (not dodge), **LT** is aim rather than a lock-on toggle, and
+> sprint (not rise), **RB** is rise (not light), **X** is dash (not heavy),
+> **Y** is the light bite (not the ability), **RT** is heavy/pounce (not burst),
+> **LB** is sink (not guard), **B** is guard/parry (not dodge), **D-pad →** is
+> hide, **LT** is aim rather than a lock-on toggle, and
 > **D-pad ↓** opens the teleport menu, which this plan predates.
 
 - Rumble via `gamepad.vibrationActuator` on hits taken, Giant proximity

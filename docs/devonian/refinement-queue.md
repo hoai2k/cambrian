@@ -331,3 +331,7 @@ together above it; body and pigmentation remain. All12 actual export poses plus
 4portraits pass focused review,18full/LODactions retained;10pose eye/oral checks
 pass and builtviewer Idle/Heavy verified. This focused correction is delivered as
 a preview; small LOD crease/pigment and broader controller/art polish remain.
+
+## Closing checkpoint — 8 September 2026
+
+Titanichthys V3 is on mainbc5a2d0 and Dunkleosteus linear-color LOD05 on mainff9a853, both retained as previews. Coccosteus candidate07 passes its full/reduced surface review but awaits final oral/eye/motion/runtime/package checks before replacement. Bothriolepis M04 remains held for nuchal/rostral shading and coarse relief after the mouth improvement. Odaraia material02 direction is accepted and production-plan03 is saved; rig/baking/game transparency/actions/export remain. No general audit of an obsolete model should precede its complete rework. Resume details and exact evidence are in `docs/devonian/current-state.md`. Work paused at the user's request.
