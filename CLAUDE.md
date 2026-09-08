@@ -66,6 +66,10 @@ unless the user explicitly asks for a PR. Steps:
 - Devonian scenery and biome plates are procedural stand-ins: flora kinds and their density table in
   `src/content/devonian/environment.ts` + `src/render/sea.ts`, plates from `npm run devonian:plates`.
   Authored sets replace them without touching placement; see `docs/redesign/09-devonian-remaining.md`.
+- `?debug=local` on either page (`/?debug=local`, `/devonian/?debug=local`) opens an editor for that
+  era's saved state — `src/app/DebugLocal.tsx`, gated by `src/shared/debug.ts`, mounted by
+  `src/app/Root.tsx` so both entry points get it without knowing about it. A new thing kept in
+  `localStorage` should get a control there; `npm run debug` checks the gate.
 - All docs live in `docs/`. Design docs are in `docs/redesign/`. Image, glyph and prop
   needs go in `docs/image-requests.md` and move to `docs/image-requests-history.md` once
   delivered and integrated; sound and music needs go in `docs/audio-requests.md`.
