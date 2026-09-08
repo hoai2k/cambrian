@@ -11,11 +11,12 @@ import { clampMark } from '../sim/ladder';
 import { emptyCodex, hasNewFinds, loadCodex, mergeCodex, recordFinds, type Codex } from './codex';
 import { Hud } from './Hud';
 import { LoadingScreen } from './Loading';
-import { Dialogs, PauseMenu, Results } from './Overlays';
+import { Dialogs, PauseMenu, Results, type MenuItem } from './Overlays';
 import { gridColumns, SelectScreen } from './Select';
 import { TitleScreen } from './Title';
 import { Toolbar } from './Toolbar';
 import { menuScheme } from '../shared/controls';
+import { freshCursor, menuPress, MENU_LOCKOUT, type MenuCursor, type MenuEvent } from './menu-cursor';
 
 export type Screen = 'title' | 'select' | 'playing' | 'results';
 export type DialogKind = null | 'help' | 'settings';
@@ -41,6 +42,17 @@ export function App() {
   const [hud, setHud] = useState<HudSnapshot | null>(null);
   const [paused, setPaused] = useState(false);
   const pausedRef = useRef(false);
+  /**
+   * The in-game menus (pause, results) are navigated rather than button-mapped: `menuSel` is the
+   * highlighted choice and `menuShown` whether the highlight is drawn at all. The results screen
+   * arrives on its own, in the middle of a fight, so it starts with nothing highlighted — the
+   * first press only makes the cursor appear, on the choice that costs least. `menuAt` is when the
+   * menu opened; presses within `MENU_LOCKOUT` of that are the tail of the fight, not answers.
+   */
+  const [menuCursor, setMenuCursor] = useState<MenuCursor>(freshCursor(true));
+  const menuCursorRef = useRef<MenuCursor>(freshCursor(true));
+  const menuAtRef = useRef(0);
+  const menuItemsRef = useRef<MenuItem[]>([]);
   const [dialog, setDialog] = useState<DialogKind>(null);
   const dialogRef = useRef<DialogKind>(null);
   const [settings, setSettings] = useState<Settings>(defaultSettings);
@@ -243,6 +255,24 @@ export function App() {
     go('playing');
   }, [go, setPausedBoth]);
 
+  /**
+   * One input into the open menu. `menu-cursor.ts` holds the rules — the lockout, the cursor that
+   * has to be woken before it will act, the wrap — and this wires them to the sound and the run.
+   */
+  const menuInput = useCallback((ev: MenuEvent) => {
+    const before = menuCursorRef.current;
+    const items = menuItemsRef.current;
+    const locked = performance.now() - menuAtRef.current < MENU_LOCKOUT;
+    const { cursor, act } = menuPress(before, items.length, ev, locked);
+    if (cursor !== before) { menuCursorRef.current = cursor; setMenuCursor(cursor); audio.play('ui-move'); }
+    if (act) { const it = items[cursor.sel]; if (it) { audio.play('ui-confirm'); it.run(); } }
+  }, []);
+
+  const menuHover = useCallback((i: number) => {
+    const cursor = { sel: i, shown: true };
+    menuCursorRef.current = cursor; setMenuCursor(cursor);
+  }, []);
+
   const playAgain = useCallback(() => {
     if (!engineRef.current) return;
     clearFresh();
@@ -373,15 +403,23 @@ export function App() {
             if (just('lb')) changeMode(MODES[(MODES.indexOf(modeRef.current) + MODES.length - 1) % MODES.length]);
             if (just('rb')) changeMode(MODES[(MODES.indexOf(modeRef.current) + 1) % MODES.length]);
           }
-        } else if (s === 'playing' && pausedRef.current) {
-          if (just('confirm')) setPausedBoth(false);
-          if (just('heavy')) backToSelect();
-          if (just('light')) backToTitle();
-        } else if (s === 'results') {
-          if (just('confirm')) playAgain();
-          if (just('light')) keepPlaying();
-          if (just('heavy')) backToSelect();
-          if (just('back')) backToTitle();
+        } else if ((s === 'playing' && pausedRef.current) || s === 'results') {
+          // Deaf for a moment after the menu opens. The results screen arrives on its own, with a
+          // hand still working the pad, and a button that was part of the fight must not answer a
+          // question it never saw. A button held across the lockout is not an edge afterwards
+          // either, so it stays silent until it is released and pressed again.
+          const stickY = Math.abs(c.my) > 0.6 ? -Math.sign(c.my) : 0;
+          const lastRep = repeat.get(gp.index) ?? 0;
+          const dpad = just('ddown') ? 1 : just('dup') ? -1 : 0;
+          const step = dpad || (stickY && now - lastRep > 240 ? stickY : 0);
+          const awake = menuCursorRef.current.shown;
+          if (step) { menuInput({ step }); repeat.set(gp.index, now); }
+          else if (just('confirm')) menuInput({ confirm: true });
+          // Any other button wakes a sleeping cursor, and only that.
+          else if (!awake && just('anyButton')) menuInput({ other: true });
+          // The pause menu was opened deliberately, so the button that opened it closes it —
+          // but never during the lockout, and never before the cursor is awake.
+          else if (awake && s === 'playing' && (just('menu') || just('back')) && now - menuAtRef.current >= MENU_LOCKOUT) setPausedBoth(false);
         }
         prev.set(gp.index, c);
       }
@@ -399,7 +437,7 @@ export function App() {
     // padIndices is deliberately not a dependency: it is written from inside this loop, and
     // listing it would tear the loop down and rebuild it every time a pad connects, losing the
     // button edges held in `prev`.
-  }, [addPlayer, backToSelect, backToTitle, changeMode, keepPlaying, moveCursor, openDialog, playAgain, removePlayer, setPausedBoth, startFromTitle, startMatch, toggleCarry, toggleReady]);
+  }, [addPlayer, changeMode, menuInput, moveCursor, openDialog, removePlayer, setPausedBoth, startFromTitle, startMatch, toggleCarry, toggleReady]);
 
   // ---- Keyboard menu navigation ----
   useEffect(() => {
@@ -425,6 +463,16 @@ export function App() {
         if (e.code === 'KeyE') changeMode(MODES[(MODES.indexOf(modeRef.current) + 1) % MODES.length]);
         return;
       }
+      if (s === 'results' || (s === 'playing' && pausedRef.current)) {
+        // The same rules for the keyboard: a lockout, a cursor, and one key that acts.
+        const awake = menuCursorRef.current.shown;
+        if (e.code === 'ArrowDown' || e.code === 'KeyS') { e.preventDefault(); menuInput({ step: 1 }); return; }
+        if (e.code === 'ArrowUp' || e.code === 'KeyW') { e.preventDefault(); menuInput({ step: -1 }); return; }
+        if (e.code === 'Enter' || e.code === 'Space') { e.preventDefault(); menuInput({ confirm: true }); return; }
+        if (e.code === 'Escape' && s === 'playing' && awake && performance.now() - menuAtRef.current >= MENU_LOCKOUT) { setPausedBoth(false); return; }
+        menuInput({ other: true });
+        return;
+      }
       if (s === 'playing') {
         // Escape is `menu` on both keyboard layouts, so for a match with a keyboard player in it
         // the engine already turns it into a pause (`onMenu`). Toggling here as well would flip
@@ -436,15 +484,11 @@ export function App() {
         if (pausedRef.current && e.code === 'Enter') setPausedBoth(false);
         return;
       }
-      if (s === 'results') {
-        if (e.code === 'Enter') playAgain();
-        if (e.code === 'Space') keepPlaying();
-        if (e.code === 'Escape') backToSelect();
-      }
+
     };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
-  }, [addKeyboard, backToSelect, backToTitle, changeMode, keepPlaying, moveCursor, openDialog, playAgain, setPausedBoth, startFromTitle, startMatch, toggleCarry, toggleReady]);
+  }, [addKeyboard, backToTitle, changeMode, menuInput, moveCursor, openDialog, setPausedBoth, startFromTitle, startMatch, toggleCarry, toggleReady]);
 
   // Idle-time preloading: tell the loader what is most likely to be needed next.
   useEffect(() => {
@@ -466,6 +510,42 @@ export function App() {
   const scheme = menuScheme(padCount);
   const modeInfo = useMemo(() => MODE_INFO, []);
 
+  /**
+   * What the open in-game menu offers, in order. The first entry is the default highlight and is
+   * deliberately the least invasive thing on the screen: resuming loses nothing, and carrying a
+   * finished co-op run on keeps the sea and everything grown in it. Restarting and quitting sit
+   * below, where a stray press cannot reach them.
+   */
+  const menuItems = useMemo<MenuItem[]>(() => {
+    if (screen === 'results') {
+      const items: MenuItem[] = [];
+      // Co-op modes are milestones, not verdicts: the sea is still there to swim in.
+      if (hud?.canContinue) items.push({ label: 'Continue', run: keepPlaying, primary: true });
+      items.push({ label: 'Play again', run: playAgain, primary: !hud?.canContinue });
+      items.push({ label: 'Change creatures', run: backToSelect });
+      items.push({ label: 'Quit to title', run: backToTitle });
+      return items;
+    }
+    if (screen === 'playing' && paused) return [
+      { label: 'Resume', run: () => setPausedBoth(false), primary: true },
+      { label: 'Change creatures', run: backToSelect },
+      { label: 'Quit to title', run: backToTitle },
+    ];
+    return [];
+  }, [screen, paused, hud?.canContinue, keepPlaying, playAgain, backToSelect, backToTitle, setPausedBoth]);
+  useEffect(() => { menuItemsRef.current = menuItems; }, [menuItems]);
+
+  // A menu opening resets the cursor. The pause menu was asked for, so its highlight is there at
+  // once; the results screen was not, so it shows none until the player touches something.
+  const menuOpen = screen === 'results' || (screen === 'playing' && paused);
+  useEffect(() => {
+    if (!menuOpen) return;
+    // The pause menu was asked for, so its cursor is awake at once; the results screen was not.
+    const cursor = freshCursor(screen !== 'results');
+    menuCursorRef.current = cursor; setMenuCursor(cursor);
+    menuAtRef.current = performance.now();
+  }, [menuOpen, screen]);
+
   return (
     <main className={`shell screen-${screen}`}>
       <div className="sea-canvas" ref={canvasRef} aria-label="Cambrian sea" />
@@ -485,8 +565,8 @@ export function App() {
       )}
 
       {(screen === 'playing' || screen === 'results') && hud && <Hud snapshot={hud} />}
-      {screen === 'playing' && paused && <PauseMenu scheme={scheme} onResume={() => setPausedBoth(false)} onChange={backToSelect} onQuit={backToTitle} />}
-      {screen === 'results' && hud && <Results snapshot={hud} players={players} record={record} fresh={fresh} scheme={scheme} onAgain={playAgain} onContinue={keepPlaying} onChange={backToSelect} onTitle={backToTitle} />}
+      {screen === 'playing' && paused && <PauseMenu scheme={scheme} items={menuItems} sel={menuCursor.sel} shown={menuCursor.shown} onHover={menuHover} />}
+      {screen === 'results' && hud && <Results snapshot={hud} players={players} record={record} fresh={fresh} scheme={scheme} items={menuItems} sel={menuCursor.sel} shown={menuCursor.shown} onHover={menuHover} />}
 
       <Toolbar isFs={isFs} muted={settings.muted} onHelp={() => openDialog(dialog === 'help' ? null : 'help')} onSettings={() => openDialog(dialog === 'settings' ? null : 'settings')} onMute={() => setSettings((s) => ({ ...s, muted: !s.muted }))} onFullscreen={toggleFullscreen} />
       <Dialogs kind={dialog} onClose={() => openDialog(null)} settings={settings} onSettings={setSettings} scheme={scheme} />

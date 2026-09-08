@@ -62,10 +62,18 @@ Review the inverted silhouette from the game's camera, including reduced-model l
 shell transparency/depth ordering and action extremes. Keep both references and the original
 model backup; the current model stays preview until replacement acceptance.
 
+## The machine-readable queue
+
+`src/content/cambrian/pending-refinements.json` is the source of truth, in the same shape as the
+Devonian's. An entry there *is* the creature's preview status, and its `reason` is the sentence the
+preview badge shows when hovered in the game and the viewer — so a model cannot be flagged without
+saying what it is waiting for, and the flag cannot be dropped without deleting that sentence.
+`npm run eras` checks both directions.
+
 ## Attack and feeding pass — 8 September 2026
 
 The separately requested articulated motion pass also reopens the Cambrian specimens listed
-in `src/content/cambrian/model-status.ts`. See `docs/attack-feeding-refinement.md` and
+in `src/content/cambrian/pending-refinements.json`. See `docs/attack-feeding-refinement.md` and
 `tools/attack-feeding-refinements.json` for individual scope, backups and acceptance requirements.
 Odaraia incorporates this in its full rework; other models retain current anatomy until their
 individual review determines changes. Keep preview status until every pending task is complete.
