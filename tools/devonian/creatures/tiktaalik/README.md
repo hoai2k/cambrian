@@ -57,3 +57,12 @@ The full GLB has original UV albedo/normal/roughness and neutral-white COLOR_0 t
 Final candidate hashes and validation results are recorded in the final review report only after the complete visual and deformation review. Intermediate reports are not a publication approval.
 
 Preview handoff metrics and exact hashes are in `final-review-v2.json` and the local `v2-candidate/candidate-manifest.json`. Current full/LOD eyes have conservative lower bounds above70.4%; both audited head meshes are closed without temporary caps. All126 sampled poses retain buried fin roots and attached tooth bases. The oral overlap is fixed. Further cranial/fin-web polish and oral diagnostic lighting remain deferred.
+
+## Reference-led redesign reopened — 8 September 2026
+
+The user supplied a new appearance reference. This model remains a preview pending that
+redesign; previous evidence applies only to the preserved old files. See the species section
+in `docs/devonian/refinement-queue.md` for concrete sculpt, eye, fin and material targets.
+The image and copy/hash-verified model/source backup are under local/devonian-authoring.
+Do not rerun the old builder into an existing candidate or treat old eye audits as approval
+for future geometry. Finish the redesign before fresh general quality audits.

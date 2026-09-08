@@ -15,19 +15,19 @@
     "id": "rhinodipterus",
     "status": "pending",
     "scope": "individual-refinement",
-    "reason": "Initial preview: individual anatomy, material, attachment and dynamic action refinements documented in source README/WORKING_STATE."
+    "reason": "8 September user reference: long head with fuller cheek, inset fish-style eyes, mapped cranial bones and overlapping relief scales; reconcile comparative body with Gogo head evidence. Preserved backup; redesign before audits."
   },
   {
     "id": "onychodus",
     "status": "pending",
     "scope": "individual-refinement",
-    "reason": "Initial preview: individual anatomy, material, attachment and dynamic action refinements documented in source README/WORKING_STATE."
+    "reason": "8 September user reference: distinctive paired lower tusk apparatus, mapped dermal cranial bones and modeled coherent oral/jaw motion; verify primary tooth-whorl anatomy. Preserved backup; redesign before audits."
   },
   {
     "id": "tiktaalik",
     "status": "pending",
     "scope": "individual-refinement",
-    "reason": "Initial preview: individual anatomy, material, attachment and dynamic action refinements documented in source README/WORKING_STATE."
+    "reason": "8 September user reference: fuller rounded trunk and shoulder/pelvis volumes; broad rounded-arrow snout rather than flat spear shape. Structural redesign before new eye/general audits; preserved backup."
   },
   {
     "id": "acanthostega",
@@ -57,7 +57,7 @@
     "id": "nahecaris",
     "status": "pending",
     "scope": "individual-refinement",
-    "reason": "Initial preview: individual anatomy, material, attachment and dynamic action refinements documented in source README/WORKING_STATE."
+    "reason": "8 September user reference: shrimp-like curved body/shell, positioned jointed legs and proportionate eyes/antennae. Coordinate redesign with attack/Eat articulation; preserve original; audit new geometry afterward."
   },
   {
     "id": "furcaster",
@@ -100,5 +100,29 @@
     "status": "pending",
     "scope": "total-rework",
     "reason": "User reference: shark-like form, head/body/fin/tail proportions and dorsal spine-brush in the same colour family as the body. Audit after completed rework."
+  },
+  {
+    "id": "cheirolepis",
+    "status": "pending",
+    "scope": "individual-refinement",
+    "reason": "8 September user reference reopens final model: distinctive face/jaw contour, anterior eye position and swept/angled fin geometry. Preserve prior final family as backup; redesign before fresh audits."
+  },
+  {
+    "id": "cladoselache",
+    "status": "pending",
+    "scope": "individual-refinement",
+    "reason": "8 September user reference reopens final model: distinctive fin outlines/angles and body/fin patterning. Preserve prior final family; redesign before new audits."
+  },
+  {
+    "id": "gemuendina",
+    "status": "pending",
+    "scope": "individual-refinement",
+    "reason": "8 September user reopens V3 for focused face correction: mouth at the leading front, bulging eyes just above the mouth; dorsal reference motifs are markings, not eyes. Preserve accepted body/materials and backup. Reconcile reconstruction evidence explicitly, then rerun affected eye/oral/motion checks."
+  },
+  {
+    "id": "dunkleosteus",
+    "status": "pending",
+    "scope": "individual-refinement",
+    "reason": "8 September additional face reference: sculpt cranial silhouette, cheek/brow plates and sharp shaped gnathal cutting plates. Preserve working articulated jaws and oral interior, prior final backup; review closing clearance, action poses and eyes after face change."
   }
 ]
