@@ -104,24 +104,38 @@ export function mergeCodex(before: Codex, found: Codex): { codex: Codex; fresh: 
   };
 }
 
+export const emptyCodex = (): Codex => ({ biomes: [], landmarks: [], apex: [], best: {} });
+/** Whether a record holds anything at all — what "this match found something" means. */
+export const anyFinds = (c: Codex) => !!(c.biomes.length || c.landmarks.length || c.apex.length || Object.keys(c.best).length);
+
 /**
- * Fold this match's Rise high-water marks into the stored record, and say whether anything moved.
- *
- * This runs *while the match is being played*, not when it ends, because a player who grows a
- * Dunkleosteus to Adult and then quits to the title has still grown one to Adult. It touches only
- * `best` for the same reason the results screen snapshots before it merges: writing the biomes and
- * landmarks live would mean the results screen loaded a record that already contained this match's
- * finds and could never mark any of them new.
+ * Does `found` hold anything `seen` does not? Cheap on purpose: the shell asks this of every HUD
+ * frame, and the answer is no almost every time, so the merge and the write stay off the hot path.
  */
-export function recordBest(found: Partial<Record<CreatureId, number>>): boolean {
-  const stored = loadCodex();
-  const best = { ...stored.best };
-  let moved = false;
-  for (const [k, n] of Object.entries(found) as [CreatureId, number][]) {
-    if (n > (best[k] ?? -1)) { best[k] = n; moved = true; }
-  }
-  if (moved) saveCodex({ ...stored, best });
-  return moved;
+export function hasNewFinds(seen: Codex, found: Codex): boolean {
+  const missing = <T extends string>(old: T[], now: T[]) => { const set = new Set(old); return now.some((x) => !set.has(x)); };
+  if (missing(seen.biomes, found.biomes) || missing(seen.landmarks, found.landmarks) || missing(seen.apex, found.apex)) return true;
+  for (const [k, n] of Object.entries(found.best) as [CreatureId, number][]) if (n > (seen.best[k] ?? -1)) return true;
+  return false;
+}
+
+/**
+ * Fold what a match has found into the stored record, and return what was actually new.
+ *
+ * This runs *while the match is being played*, not when it ends. A player who swims through four
+ * biomes and then quits to the title has still seen four biomes, and a record that only wrote
+ * itself on the results screen threw all of that away — which it did, for biomes, landmarks and
+ * apex, until this existed.
+ *
+ * Writing live means the results screen can no longer work out what is new by comparing the store
+ * against the match: by the time it loads, the store already contains the match. So it does not
+ * try. The shell keeps a running list of what each match added, at the moment it adds it, and the
+ * screen renders that.
+ */
+export function recordFinds(found: Codex): Codex {
+  const { codex, fresh } = mergeCodex(loadCodex(), found);
+  if (anyFinds(fresh)) saveCodex(codex);
+  return fresh;
 }
 
 export function saveCodex(codex: Codex) {

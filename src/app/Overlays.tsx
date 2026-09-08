@@ -1,7 +1,7 @@
 import { ACTIVE_ERA } from '../content';
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useRef } from 'react';
 import type { HudSnapshot } from '../render/engine';
-import { creature, type CreatureId } from '../sim/creatures';
+import { creature } from '../sim/creatures';
 import type { PlayerSetup } from '../sim/types';
 import { BIOMES } from '../sim/world';
 import { biomeArtPath } from '../shared/environment-assets';
@@ -9,7 +9,7 @@ import { appBase } from '../shared/base';
 import type { DialogKind, Settings } from './App';
 import { MODE_INFO } from './App';
 import { CreaturePortrait } from './CreaturePortrait';
-import { LANDMARK_BLURBS, LANDMARK_NAMES, loadCodex, mergeCodex, saveCodex, type Codex } from './codex';
+import { LANDMARK_BLURBS, LANDMARK_NAMES, type Codex } from './codex';
 import { CloseIcon } from './icons';
 import { XboxDiagram } from './XboxDiagram';
 import { KeyboardDiagram } from './KeyboardDiagram';
@@ -36,12 +36,11 @@ export function PauseMenu({ onResume, onChange, onQuit, scheme }: { onResume: ()
   );
 }
 
-export function Results({ snapshot, players, beaten, onAgain, onContinue, onChange, onTitle, scheme }: { snapshot: HudSnapshot; players: PlayerSetup[]; beaten: CreatureId[]; onAgain: () => void; onContinue: () => void; onChange: () => void; onTitle: () => void; scheme: Scheme }) {
-  // The record as it stood before this match, snapshotted once when the screen appears; the merge
-  // against it is pure, so re-rendering never eats the "NEW" marks (see codex.ts).
-  const [before] = useState(loadCodex);
-  const { codex, fresh } = useMemo(() => mergeCodex(before, snapshot.discovery), [before, snapshot.discovery]);
-  useEffect(() => { saveCodex(codex); }, [codex]);
+export function Results({ snapshot, players, record, fresh, onAgain, onContinue, onChange, onTitle, scheme }: { snapshot: HudSnapshot; players: PlayerSetup[]; record: Codex; fresh: Codex; onAgain: () => void; onContinue: () => void; onChange: () => void; onTitle: () => void; scheme: Scheme }) {
+  // Both come from the shell, which writes finds to the record as the match makes them and keeps a
+  // running list of what this one added. This screen no longer works out what is new by comparing
+  // the store against the match: the store already contains the match by the time it gets here.
+  const codex = record;
   return (
     <div className="overlay">
       <div className="panel results">
@@ -57,7 +56,7 @@ export function Results({ snapshot, players, beaten, onAgain, onContinue, onChan
               <small>{p.eats} eaten · {p.kills} kills · {p.escapes} escapes</small>
               {/* Rise keeps a high-water mark per creature; say so when this match moved one. The
                   shell hands us the list, because the stored record already has this match in it. */}
-              {beaten.includes(players[i]?.creature ?? p.creature) && <span className="new-tag best-tag">NEW BEST</span>}
+              {fresh.best[players[i]?.creature ?? p.creature] !== undefined && <span className="new-tag best-tag">NEW BEST</span>}
             </div>
           ))}
         </div>
