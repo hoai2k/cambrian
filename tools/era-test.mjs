@@ -3,10 +3,10 @@ import fs from 'node:fs';
 import { build } from 'esbuild';
 
 const result = await build({
-  stdin: { contents: "export * from './src/content'; export * from './src/content/era'; export * from './src/content/asset-paths'; export { CAMBRIAN } from './src/content/cambrian'; export { DEVONIAN } from './src/content/devonian';", resolveDir: process.cwd() },
+  stdin: { contents: "export * from './src/content'; export * from './src/content/era'; export * from './src/content/asset-paths'; export { CAMBRIAN } from './src/content/cambrian'; export { DEVONIAN } from './src/content/devonian'; export { CAMBRIAN_PENDING } from './src/content/cambrian/model-status'; export { default as DEVONIAN_PENDING } from './src/content/devonian/pending-refinements.json';", resolveDir: process.cwd() },
   bundle: true, platform: 'node', format: 'esm', write: false,
 });
-const { ACTIVE_ERA: era, defineEra, createAssetPaths, CAMBRIAN, DEVONIAN } = await import(`data:text/javascript;base64,${Buffer.from(result.outputFiles[0].text).toString('base64')}`);
+const { ACTIVE_ERA: era, defineEra, createAssetPaths, CAMBRIAN, DEVONIAN, CAMBRIAN_PENDING, DEVONIAN_PENDING } = await import(`data:text/javascript;base64,${Buffer.from(result.outputFiles[0].text).toString('base64')}`);
 assert.equal(era.id, 'cambrian');
 assert.equal(era.creatures.length, 21);
 assert.equal(era.defaults.player, 'anomalocaris');
@@ -45,25 +45,50 @@ for (const c of era.creatures) {
   assert.ok(c.kind && c.kind.length <= 18, `${c.id} needs a short everyday group (got ${c.kind ?? 'none'})`);
   assert.ok(c.kindNote && c.kindNote.length > 40, `${c.id}'s group needs a sentence explaining it`);
 }
-// A preview badge has to say what it is waiting for. Both eras derive `modelStatus` and
-// `modelNotes` from one pending-refinements queue, so this checks the derivation held: every
-// preview carries a reason, every reason belongs to a preview, and no reason is a stub. Without
-// it a model could sit flagged for weeks with nothing anywhere saying why — which is exactly what
-// happened to eleven Cambrian animals.
-for (const { name, era: e } of [{ name: 'Cambrian', era: CAMBRIAN }, { name: 'Devonian', era: DEVONIAN }]) {
+// A badge has to say what it is waiting for, and has to be the right badge. Both eras derive
+// everything below from one pending-refinements queue, so this checks the derivation held.
+//
+// The split matters: the creature's preview badge means the *3D model* is unfinished. A finished
+// body whose animation clips are queued carries no badge at all — the warning goes on those clips.
+// Flagging the whole animal for pending motion work is what made Anomalocaris and Opabinia look
+// unfinished when their models were done.
+for (const { name, era: e, pending } of [
+  { name: 'Cambrian', era: CAMBRIAN, pending: CAMBRIAN_PENDING },
+  { name: 'Devonian', era: DEVONIAN, pending: DEVONIAN_PENDING },
+]) {
   const status = e.assets.modelStatus ?? {};
   const notes = e.assets.modelNotes ?? {};
+  const clipNotes = e.assets.clipNotes ?? {};
+  const roster = new Set(e.creatures.map((c) => c.id));
+
+  assert.equal(new Set(pending.map((p) => p.id)).size, pending.length, `${name}: duplicate queue entry`);
+  for (const p of pending) {
+    assert.ok(roster.has(p.id), `${name}/${p.id} is queued but not on the roster`);
+    assert.ok(p.model || p.clips?.length, `${name}/${p.id} is queued with neither model nor animation work`);
+    if (p.model) assert.ok(p.reason?.length > 60, `${name}/${p.id}: model work needs a reason for its badge`);
+    if (p.clips?.length) assert.ok(p.clipReason?.length > 60, `${name}/${p.id}: queued clips need a reason for their badge`);
+  }
+
   const previews = Object.entries(status).filter(([, v]) => v === 'preview').map(([id]) => id);
   assert.ok(previews.length, `${name}: expected some preview models`);
   for (const id of previews) {
-    const note = notes[id];
-    assert.ok(note, `${name}/${id} is a preview model with no note saying what remains`);
-    assert.ok(note.length > 60, `${name}/${id}'s note is too short to explain anything: "${note}"`);
+    assert.ok(notes[id]?.length > 60, `${name}/${id} is a preview model with no note saying what remains`);
+    assert.ok(pending.some((p) => p.id === id && p.model), `${name}/${id} shows a preview badge with no outstanding model work`);
   }
   for (const id of Object.keys(notes)) {
     assert.equal(status[id], 'preview', `${name}/${id} has a "what remains" note but is not a preview`);
-    assert.ok(e.creatures.some((c) => c.id === id), `${name}/${id} has a note but is not on the roster`);
+    assert.ok(roster.has(id), `${name}/${id} has a note but is not on the roster`);
+  }
+  // Animation work never shows the creature's badge on its own.
+  for (const p of pending.filter((p) => !p.model)) {
+    assert.ok(!status[p.id], `${name}/${p.id} has only animation work queued, so it must not be flagged as a preview model`);
+    assert.ok(clipNotes[p.id], `${name}/${p.id} has queued clips but no note for their buttons`);
+  }
+  for (const [id, clips] of Object.entries(clipNotes)) {
+    assert.ok(roster.has(id), `${name}/${id} has clip notes but is not on the roster`);
+    const queued = pending.find((p) => p.id === id)?.clips ?? [];
+    assert.deepEqual(Object.keys(clips).sort(), [...queued].sort(), `${name}/${id}: clip notes disagree with the queue`);
   }
 }
 
-console.log('PASS: era validation, all 21 model/portrait paths and byte sizes, group labels, preview-model reasons, and independent future asset namespaces');
+console.log('PASS: era validation, all 21 model/portrait paths and byte sizes, group labels, model/animation badge split with reasons, and independent future asset namespaces');

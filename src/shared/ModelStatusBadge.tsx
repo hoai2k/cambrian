@@ -1,4 +1,4 @@
-import { useCallback, useId, useRef, useState } from 'react';
+import { useCallback, useId, useRef, useState, type ReactNode } from 'react';
 import { createPortal } from 'react-dom';
 import './model-status.css';
 
@@ -6,19 +6,17 @@ import './model-status.css';
 const NOTE_W = 340, NOTE_H = 150, EDGE = 8;
 
 /**
- * A production-status label, never a lock or a change to creature capabilities.
+ * A marker that opens a note on hover or keyboard focus.
  *
- * A preview model is fully playable; the badge only says its art or animation is still queued for
- * work. `note` is that queue's own sentence about what remains, so a player looking at a creature
- * that seems finished — the model may well be — can find out what is actually outstanding. It
- * opens on hover and on keyboard focus.
- *
- * The note is measured against the viewport and rendered into `document.body`, because every panel
- * this badge sits in is narrow, scrolls, or both: anchored normally it was cut off by the viewer's
- * 260px info column, and `position: fixed` alone does not escape it either — that column declares
- * `container-type`, which makes it the containing block for fixed descendants. A portal does.
+ * The note is measured against the viewport and rendered into `document.body`, because the panels
+ * these markers sit in are narrow, scroll, or both: anchored normally it was cut off by the
+ * viewer's 260px info column, and `position: fixed` does not escape that either — the column
+ * declares `container-type`, which makes it the containing block for fixed descendants. A portal
+ * does.
  */
-export function ModelStatusBadge({ status, note, compact = false }: { status?: 'preview' | 'final'; note?: string; compact?: boolean }) {
+export function RefinementNote({ note, heading, label, className, children }: {
+  note: string; heading: string; label: string; className?: string; children: ReactNode;
+}) {
   const id = useId();
   const ref = useRef<HTMLSpanElement>(null);
   const [at, setAt] = useState<{ top: number; left: number } | null>(null);
@@ -27,30 +25,54 @@ export function ModelStatusBadge({ status, note, compact = false }: { status?: '
     if (!r) return;
     const below = r.bottom + 6, above = r.top - 6 - NOTE_H;
     setAt({
-      // Below the badge normally; above it when there is no room, which is what a badge low on a
-      // tall roster grid gets.
+      // Below the marker normally; above it when there is no room, which is what a button low on
+      // the animation grid gets.
       top: below + NOTE_H + EDGE > window.innerHeight && above > EDGE ? above : below,
       left: Math.max(EDGE, Math.min(r.left, window.innerWidth - NOTE_W - EDGE)),
     });
   }, []);
   const hide = useCallback(() => setAt(null), []);
-
-  if (status !== 'preview') return null;
-  const label = note ? `Preview model. ${note}` : 'Preview model — refinement in progress';
-  const cls = `model-preview${compact ? ' model-preview-compact' : ''}${note ? ' model-preview-asks' : ''}`;
   return (
     <>
-      <span ref={ref} className={cls} role="img" aria-label={label}
-        aria-describedby={note && at ? id : undefined} tabIndex={note ? 0 : undefined}
-        title={note ? undefined : label}
-        onMouseEnter={note ? show : undefined} onMouseLeave={note ? hide : undefined}
-        onFocus={note ? show : undefined} onBlur={note ? hide : undefined}>
-        <span aria-hidden="true">⚠{!compact && ' Preview model'}</span>
+      <span ref={ref} className={className} role="img" aria-label={label} aria-describedby={at ? id : undefined}
+        tabIndex={0} onMouseEnter={show} onMouseLeave={hide} onFocus={show} onBlur={hide}>
+        {children}
       </span>
-      {note && at && createPortal(
+      {at && createPortal(
         <span className="model-preview-note" id={id} role="tooltip" style={{ top: at.top, left: at.left }}>
-          <b>Still to come</b>{note}
+          <b>{heading}</b>{note}
         </span>, document.body)}
     </>
+  );
+}
+
+/**
+ * A production-status label on a creature, never a lock or a change to its capabilities.
+ *
+ * It means the **3D model** is unfinished — geometry, materials, rig or LOD art. It deliberately
+ * does *not* appear for a finished body whose animation clips are queued for rework: flagging the
+ * whole animal for that said the wrong thing about a model that is actually done. That warning
+ * lives on the clip buttons instead (`ClipQueuedBadge`), where it names what will change.
+ */
+export function ModelStatusBadge({ status, note, compact = false }: { status?: 'preview' | 'final'; note?: string; compact?: boolean }) {
+  if (status !== 'preview') return null;
+  const cls = `model-preview${compact ? ' model-preview-compact' : ''}`;
+  const mark = <span aria-hidden="true">⚠{!compact && ' Preview model'}</span>;
+  if (!note) {
+    return <span className={cls} role="img" aria-label="Preview model — refinement in progress" title="Preview model — refinement in progress">{mark}</span>;
+  }
+  return (
+    <RefinementNote note={note} heading="Still to come" label={`Preview model. ${note}`} className={`${cls} model-preview-asks`}>
+      {mark}
+    </RefinementNote>
+  );
+}
+
+/** The same warning, on one animation clip whose motion is queued for rework. */
+export function ClipQueuedBadge({ name, note }: { name: string; note: string }) {
+  return (
+    <RefinementNote note={note} heading={`${name} — queued for rework`} label={`${name} is queued for rework. ${note}`} className="clip-queued-mark">
+      <span aria-hidden="true">⚠</span>
+    </RefinementNote>
   );
 }
