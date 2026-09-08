@@ -3,7 +3,7 @@ import { isAlive, lengthOf } from '../actors';
 import { creature, type CreatureId } from '../creatures';
 import type { Game } from '../game';
 import type { Actor } from '../types';
-import { groundHeight, nurseryAt, nurseryFactor, NURSERY_R, SURFACE_Y } from '../world';
+import { coverAt, groundHeight, nurseryAt, nurseryFactor, NURSERY_R, SURFACE_Y } from '../world';
 import { ADULT_STAGE, devActor, stageForScale } from './state';
 
 /**
@@ -71,15 +71,27 @@ export function spawnInCover(g: Game, center: Vec3, id: CreatureId, scale: numbe
   if (!options.length) return undefined;
   const ground = (c: Vec3) => groundHeight(g.world, c.x, c.z, []);
   const high = options.filter((c) => c.pos.y > ground(c.pos) + 4);
-  const pool = def.ground ? options.filter((c) => c.pos.y <= ground(c.pos) + 4) : (high.length && g.rng() < 0.6 ? high : options);
+  // A crawler hatches down on the sand, so the patch has to reach the sand: a crinoid crown three
+  // units up is cover for a swimmer and open floor for a trilobite.
+  const pool = def.ground ? options.filter((c) => c.pos.y - ground(c.pos) <= c.radius * 0.8) : (high.length && g.rng() < 0.6 ? high : options);
   const from = pool.length ? pool : options;
   // Bots carry player index -1 when respawning; never use a negative array remainder.
   const c = from[(Math.max(0, index) * 7 + Math.floor(g.rng() * from.length)) % from.length];
-  const ang = g.rng() * Math.PI * 2, r = g.rng() * c.radius * 0.4;
-  const x = c.pos.x + Math.cos(ang) * r, z = c.pos.z + Math.sin(ang) * r;
-  const gr = groundHeight(g.world, x, z, []);
-  const y = def.ground ? gr + L * 0.13 : clamp(c.pos.y, gr + 0.6 + L * 0.3, SURFACE_Y - 3);
-  return { x, y, z };
+  // Four draws inside the patch, keeping the one that actually hides the body. A crawler sits down
+  // on the sand while the cover offered to it may be centred a body-length above, so the first
+  // point in the disc is not reliably inside the thing that was meant to hide it. Always four
+  // draws, whatever the answer, so the match still replays from the seed.
+  let best: Vec3 | undefined, bestCover = -1;
+  for (let i = 0; i < 4; i++) {
+    const ang = g.rng() * Math.PI * 2, r = g.rng() * c.radius * 0.4;
+    const x = c.pos.x + Math.cos(ang) * r, z = c.pos.z + Math.sin(ang) * r;
+    const gr = groundHeight(g.world, x, z, []);
+    const y = def.ground ? gr + L * 0.13 : clamp(c.pos.y, gr + 0.6 + L * 0.3, SURFACE_Y - 3);
+    const at = { x, y, z };
+    const hidden = coverAt(g.world, at, L, []);
+    if (hidden > bestCover) { bestCover = hidden; best = at; }
+  }
+  return best;
 }
 const dist2D = (a: Vec3, b: Vec3) => Math.hypot(a.x - b.x, a.z - b.z);
 

@@ -54,8 +54,8 @@ function PlayerPanel({ p }: { p: PlayerHud }) {
             <circle cx="36" cy="36" r={R} className="ring-fg" strokeDasharray={`${C * p.progress} ${C}`} transform="rotate(-90 36 36)" />
           </svg>
           {p.era
-            ? <span className="tier-num rung-num" role="img" aria-label={`Rung ${p.era.rung}, ${p.era.rungName}. Standing ${Math.round(p.era.standing)}`}><small>RUNG</small>{RUNG_NUMERALS[p.era.rung] ?? p.era.rung}</span>
-            : <span className="tier-num" role="img" aria-label={`Tier ${p.tier + 1}: ${p.tierName}`}><i className="tier-glyph" style={{ maskImage: `url(${appBase()}${assetPaths.ui(`tier-${p.tier + 1}.svg`)})` }} /></span>}
+            ? <span className="tier-num rung-num" role="img" aria-label={`Rung ${p.era.rung}, ${p.era.rungName}. ${p.era.stage}, ${moultLabel(p.progress)}`}><small>RUNG</small>{RUNG_NUMERALS[p.era.rung] ?? p.era.rung}</span>
+            : <span className="tier-num" role="img" aria-label={`Tier ${p.tier + 1}: ${p.tierName}, ${moultLabel(p.progress)}`}><i className="tier-glyph" style={{ maskImage: `url(${appBase()}${assetPaths.ui(`tier-${p.tier + 1}.svg`)})` }} /></span>}
         </div>
         <div className="bars">
           <div className="name-row"><b>{def.name}</b><span className="tier-name">{p.tierName}</span>{p.protect && <span className="protect">PROTECTED</span>}</div>
@@ -142,16 +142,31 @@ function PlayerPanel({ p }: { p: PlayerHud }) {
       {p.spectating && !p.alive && (
         <div className="spectating"><b>SPECTATING</b><span style={{ color: p.spectating.color }}>{p.spectating.name} · {creature(p.spectating.creature).name}</span></div>
       )}
-      {!p.alive && p.fade < 0.9 && (
-        <div className="dead-overlay">
-          <b>{p.downedFor > 0 ? 'DOWN' : 'EATEN'}</b>
-          <span>{p.downedFor > 0
-            ? (p.reviveProgress > 0 ? 'Someone is getting you up…' : `Hold on — a team-mate can get you up. ${Math.ceil(p.downedFor)} s`)
-            : 'Back in a moment… you slip down a tier.'}</span>
-          {p.downedFor > 0 && <i className="revive-bar wide" style={{ transform: `scaleX(${p.reviveProgress})` }} />}
-        </div>
-      )}
+      {!p.alive && p.fade < 0.9 && <DeathNote p={p} />}
     </>
+  );
+}
+
+/**
+ * What happened to you, while you watch it happen. Deliberately not a dialog: death used to put a
+ * red panel over the middle of the screen the instant you died, which hid the one thing worth
+ * seeing — the animal that got you, finishing the job. This is a line of text low on the viewport,
+ * over an unobstructed view, until the screen fades out for the respawn.
+ *
+ * A downed team-mate is the exception that still needs a meter, because their seconds are a race
+ * somebody else is running; it gets the same low, quiet treatment with the rescue bar under it.
+ */
+function DeathNote({ p }: { p: PlayerHud }) {
+  const downed = p.downedFor > 0;
+  return (
+    <div className={`death-note ${downed ? 'downed' : ''} ${p.spectating ? 'spectating-too' : ''}`}>
+      <b>{downed ? 'You are down' : p.death?.eaten ? 'You\u2019ve been eaten' : 'You\u2019ve been killed'}
+        {!downed && p.death?.by && <i> by {p.death.by}</i>}</b>
+      <span>{downed
+        ? (p.reviveProgress > 0 ? 'Someone is getting you up\u2026' : `A team-mate can still reach you \u00b7 ${Math.ceil(p.downedFor)} s`)
+        : 'You slip down a tier.'}</span>
+      {downed && <i className="revive-bar wide" style={{ transform: `scaleX(${p.reviveProgress})` }} />}
+    </div>
   );
 }
 
@@ -191,6 +206,11 @@ function Scoreboard({ board, me }: { board: NonNullable<PlayerHud['board']>; me:
   );
 }
 
+/**
+ * The ring reads the same in both eras: how close the next moult is. Full means the body grows —
+ * a tier in the Cambrian, a life stage in the Devonian — so it is spoken as one thing.
+ */
+const moultLabel = (progress: number) => progress >= 1 ? 'fully grown' : `${Math.round(progress * 100)}% to the next moult`;
 const fmtClock = (s: number) => `${Math.floor(s / 60)}:${String(Math.floor(s % 60)).padStart(2, '0')}`;
 
 const fmtDist = (d: number) => (d < 1000 ? `${Math.round(d)} m` : `${(d / 1000).toFixed(1)} km`);

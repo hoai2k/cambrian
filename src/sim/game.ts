@@ -1,7 +1,7 @@
 import { ACTIVE_ERA } from '../content';
 import { RULES } from './era-rules';
 import { BURROWERS, HEAVY_SPECIALS, DEFENSIVE_SPECIALS, CAMOUFLAGE_DRAIN, camouflageMatch, clearPursuit, stopHiding } from './concealment';
-import { abilitySpeed, beginExpansionAbility, beginHeavyStrike, heavyStrikeReach, stepExpansionAbility, stepHeavyStrike, bloomRate, grazeRate } from './expansion-abilities';
+import { abilitySpeed, beginExpansionAbility, beginHeavyStrike, heavyStrikeReach, specialHit, stepExpansionAbility, stepHeavyStrike, bloomRate, grazeRate } from './expansion-abilities';
 import { add, clamp, damp, dist, distXZ, dot, heading, len3, lerp, makeRng, norm, scale as vscale, sub, TAU, v3, wrapAngle, yawOf, type Rng, type Vec3 } from '../shared/math';
 import { applyScaleStats, bandOf, bodyRadius, canAct, clearanceOf, climbHeight, climbRise, floorClearance, glideOver, isAlive, isHidden, isInvulnerable, lengthOf, makeActor, massOf, speedFactor, staminaCost } from './actors';
 import { makeBrain, think, type AiWorld } from './ai';
@@ -141,7 +141,18 @@ const CLIMB_PUSH = 0.35;
  * window only opens when there is somebody who could actually reach you.
  */
 const DOWNED_WINDOW = 10;
-const CORPSE_WINDOW = 3;
+/**
+ * How long a killed player stays dead before hatching again, and so how long they spend watching.
+ *
+ * Death used to cut to a dialog after three seconds, which is barely long enough to register what
+ * ate you. The camera rides with whatever killed you for this window instead — you watch it finish
+ * the meal, told what happened by a line of text rather than a panel over the action — and only
+ * then does the screen fade out and slowly back in on the new body. The renderer takes its fade
+ * times from this constant (`CORPSE_WINDOW`), so the two never drift apart.
+ */
+export const CORPSE_WINDOW = 7;
+/** Seconds of that window spent fading out at the end of it. */
+export const DEATH_FADE = 1.2;
 /**
  * How close a team-mate has to be when you go down for the window to open at all. Roughly what a
  * sprint covers in the window itself, so a rescue is always a real race and never a formality —
@@ -835,9 +846,11 @@ export class Game implements AiWorld {
     const curK = def.ground ? 0.08 : 0.55;
     let desired: Vec3 = v3(cur.x * curK, cur.y * curK, cur.z * curK);
     const jets = RULES?.jet(a) ?? false;
+    /** This step the body is travelling backward out of its funnel, aimed the other way. */
+    const jetBack = jets && controllable && mag > 0 && burstMult > 1;
     if (controllable && mag > 0) {
       // A shelled jetter's sprint fires backward out of the funnel: the body goes the other way.
-      const jetK = jets && burstMult > 1 ? -1 : 1;
+      const jetK = jetBack ? -1 : 1;
       desired.x += dir.x * mag * cruise * burstMult * jetK;
       desired.y += dir.y * mag * cruise * burstMult * jetK;
       desired.z += dir.z * mag * cruise * burstMult * jetK;
@@ -973,12 +986,15 @@ export class Game implements AiWorld {
       }
     }
 
-    // Orientation
-    const hv = Math.hypot(a.vel.x, a.vel.z);
+    // Orientation. A jetting shell keeps pointing where it is aimed while the funnel throws it
+    // the other way — orienting to the velocity would spin it round to face the camera and turn
+    // the backward jet into an ordinary sprint.
+    const facing = jetBack ? v3(-a.vel.x, -a.vel.y, -a.vel.z) : a.vel;
+    const hv = Math.hypot(facing.x, facing.z);
     let targetYaw = a.yaw;
-    if (a.aiming && a.controller === 'player' && (a.state === 'free' || a.state === 'guard')) targetYaw = hv > 0.35 ? yawOf(a.vel) : input.camYaw;
+    if (a.aiming && a.controller === 'player' && (a.state === 'free' || a.state === 'guard')) targetYaw = hv > 0.35 ? yawOf(facing) : input.camYaw;
     else if (locked && isAlive(locked) && (a.state === 'free' || a.state === 'guard' || a.state === 'attack')) targetYaw = yawOf(sub(locked.pos, a.pos));
-    else if (hv > 0.35 && a.state !== 'grabbed') targetYaw = yawOf(a.vel);
+    else if (hv > 0.35 && a.state !== 'grabbed') targetYaw = yawOf(facing);
     const dy = wrapAngle(targetYaw - a.yaw);
     const tr = def.turnRate * (a.state === 'attack' ? 0.5 : 1) * (1 + hv * 0.05) * (giantish ? 0.45 : 1) * (sw?.turn ?? 1);
     const turn = clamp(dy * 6, -tr, tr);
@@ -992,8 +1008,8 @@ export class Game implements AiWorld {
       const behind = groundHeight(this.world, a.pos.x - Math.sin(a.yaw) * L * 0.4, a.pos.z - Math.cos(a.yaw) * L * 0.4, this.scratchBoulders);
       a.pitch = damp(a.pitch, -Math.atan2(ahead - behind, L * 0.8), 8, dt);
     } else {
-      const sp = Math.max(len3(a.vel), 0.5);
-      a.pitch = damp(a.pitch, clamp(-Math.asin(clamp(a.vel.y / sp, -1, 1)) * 0.8, -0.9, 0.9), 4, dt);
+      const sp = Math.max(len3(facing), 0.5);
+      a.pitch = damp(a.pitch, clamp(-Math.asin(clamp(facing.y / sp, -1, 1)) * 0.8, -0.9, 0.9), 4, dt);
     }
 
     // Noise / stillness
@@ -1355,7 +1371,7 @@ export class Game implements AiWorld {
             const pull = norm(sub(heavier ? best.pos : a.pos, heavier ? a.pos : best.pos));
             if (heavier) { a.vel = vscale(pull, 14); }
             else { best.vel = vscale(pull, 16); best.iframes = 0; }
-            applyHit(this.hitCtx, a, best, { ...def.light, damage: 12, poise: 30, knockback: 0 }, 0);
+            applyHit(this.hitCtx, a, best, specialHit(def, { damage: 12, poise: 30, knockback: 0 }), 0);
             this.events.push({ kind: 'grab', pos: { ...best.pos }, actor: a.id, other: best.id, player: a.player });
           }
         }

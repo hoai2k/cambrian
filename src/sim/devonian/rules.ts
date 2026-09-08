@@ -279,7 +279,7 @@ export const DEVONIAN_RULES: EraRules = {
     const p = g.players[i]; if (!p) return undefined;
     const d = devActor(g, p), def = creature(p.creature), s = stateFor(g);
     return {
-      standing: d.standing, rung: rungOf(p), rungName: RUNG_NAMES[rungOf(p)], stage: STAGES[d.stage],
+      standing: d.standing, stageProgress: stageProgress(d), rung: rungOf(p), rungName: RUNG_NAMES[rungOf(p)], stage: STAGES[d.stage],
       air: def.breathing === 'air' ? d.air : undefined,
       beached: d.beached, primeT: d.primeT, inDeadZone: d.deadZoneIn,
       deadZones: s.deadZones.filter((z) => distXZ(z.pos, p.pos) < 400).map((z) => ({ dx: z.pos.x - p.pos.x, dz: z.pos.z - p.pos.z, r: z.r })),
