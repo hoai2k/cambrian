@@ -1,0 +1,47 @@
+{
+  "status": "preview",
+  "candidate": "candidate-05",
+  "files": {
+    "gemuendina.glb": {
+      "sha256": "0fa8b42cccf502e3f62c26f3402b860a35198cf790cdb4dc46baa8b2bf4b773d",
+      "bytes": 16412316
+    },
+    "gemuendina.lod1.glb": {
+      "sha256": "44d56d05811711fe2a205a77d4178dc724620a98135124a70151d15b36f1faea",
+      "bytes": 2868160
+    },
+    "gemuendina.png": {
+      "sha256": "df3f6c3cd23898b30cfe41ae473662f37c416659c3375f5e1338fb6857ac3e2c",
+      "bytes": 2050217
+    },
+    "gemuendina.select.png": {
+      "sha256": "3bd7930bd29907f0bb88fc454a2d5fb4b80986c1f5ef361f99df12054a2ed9a9",
+      "bytes": 919261
+    },
+    "gemuendina.card.png": {
+      "sha256": "d13cdd8af000ecb57e74d2fc921d7ad48f498ca9249f02767e96063f50c5c679",
+      "bytes": 245901
+    },
+    "gemuendina.thumb.png": {
+      "sha256": "209b95c757adf3e3239828b6a824671a990b5e29a5f27503aa6aff70459f4e1e",
+      "bytes": 30334
+    },
+    "gemuendina.json": {
+      "sha256": "65661ad7f200f460fe2b3be1900758fba6d1ea4b25ebd0c27a6f1591f76b7e7d",
+      "bytes": 2896
+    }
+  },
+  "metadata_source_sha256": "513d29c0a9cf3cf346835663859620a7a4b57826300762a3ef994ae137daf204",
+  "eye_audit_sha256": "0d3c3430ed46077035347b5ede3a70621ff4cc7d1a69b59b708a7fc73819263a",
+  "remaining": "Terminal-snout face preview; broader final art review, small LOD chin creases/pigment cleanup and controller playtest remain.",
+  "author_review_sha256": "bb361a16c9a3a7b8596d67a5ed523852e479c71b62033aaef40bc51eae606946",
+  "root_review": "Accepted focused terminal-snout preview: actual side, Heavy front, LOD Heavy side and select portrait inspected; author individually reviewed all12poses+4portraits. Broader polish remains.",
+  "minimum_eye_inside_percent": 75.13351134846462,
+  "minimum_conservative95_percent": 74.35164918513743,
+  "validation": [
+    "selected Devonian intake PASS",
+    "typecheck PASS",
+    "build PASS"
+  ],
+  "viewer": "Built4176 Idle and Heavy0.495s inspected; terminal mouth opens, close-set eyes remain above it,18clips and preview badge; no controller/prey playtest claimed."
+}

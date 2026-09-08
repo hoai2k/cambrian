@@ -324,3 +324,11 @@ Actual173feeding-pose checks show zero opposing-shell/gnathal failures, eyes pas
 Full face/portraits and correctedLODposes individually reviewed; selectedintake,
 build/typecheck and viewerIdle/Heavy pass. Remaining broadpreview: LOD is paler
 and smoother; investigate albedo-to-vertex colourspace and materialpolish.
+
+
+Closing Gemuendina correction: candidate05 replaces the rejected candidate02 face.
+The front upper/lower lips form the terminal snout and the smaller eyes are close
+together above it; body and pigmentation remain. All12 actual export poses plus
+4portraits pass focused review,18full/LODactions retained;10pose eye/oral checks
+pass and builtviewer Idle/Heavy verified. This focused correction is delivered as
+a preview; small LOD crease/pigment and broader controller/art polish remain.

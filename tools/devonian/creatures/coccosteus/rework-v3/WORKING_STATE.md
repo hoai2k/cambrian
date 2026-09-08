@@ -405,3 +405,80 @@
 - Resume: parent assigns Terra with frozen manifest+handoff; stop on any mismatch/failure, no
   executor tuning. Author/root review actualall23 for clean seams, livingroughness, full/LOD
   markings, oral lip/corner and eye appearance before acceptance. Runtime/finalaudits later.
+
+## 2026-09-08 — baked02 coverage stop preserved; bake03 recovery frozen
+
+- Parent/Terra actual group1 STOP: bake_02.py55 -> body_uv_02.py71, uncovered/invalid
+  albedo strip min0/max.5529412031. Only three00-fins maps in baked-02; candidate03 absent.
+  Original coverage gate worked. No failed body image was saved because check preceded save.
+  Exact missing pixel locations therefore remain unknown; scalar error is insufficient for
+  precise raster diagnosis. Preserved partial maps are bound by new freeze.
+- Bounded new bake_03.py retains unchanged UV/helper/thresholds and original material fields.
+  First saves paired bodyalbedo reproduction using inherited margin type/16, then rebakes
+  body with explicit EXTEND32. Fin/eye inherited/16 unchanged. Saves every bodymap and
+  coordinate/count/RGB diagnostic before unchanged coverage check, so failures retain evidence.
+  No manual pixel fill, constant production roughness, clamp or gate weakening.
+- Static radius bound <=14.94px at4096 and10.03px at2048 supports EXTEND32 without crossing
+  exterior/oral gap or wrap edge. This is a repair hypothesis pending actual paired bake;
+  inherited margin type and exact baseline zeros will be recorded. No runtime fix claimed.
+- check_bake_source_03.py PASS: original60 inputs, unchanged helperSHA, AST, saved-map-first,
+  radius/gap and partial-preservation checks. Report ../devonian-authoring/coccosteus/rework-v3/
+  bake-03-static-report.json SHA f45c6fad993916573fa7235b03418d782e216aa44a08ba3b08ce72ce612cd904.
+- Frozen-bake-03.json68inputs SHA a19d8f30d9b9d13b8560c84ef1a34823c2ae190f0080a543844ca7cfb9f15191.
+  bake_03.py SHA9d848be9199ded29481efcde061c9c1b9a53a945e93a37b9f94de47eec9bd812.
+  Exact new HANDOFF-BAKE-03.md: one parent-assigned CPU2group/40minute budget, exclusive new
+  baked-03 directory (absent). Expected27maps+blend/report+pairedbaselinePNG+4probes.
+- Stop on failed originalgate; preserve map/probe/log, no executor tuning. After success return
+  paired evidence to Astra/root; do NOT run candidate_03.py because it still points to failed
+  baked-02. Author will freeze minimal downstream version only after actual coverage accepted.
+- No Blender/heavy execution by author. All old sources/partialoutput/public/shared/Git preserved.
+
+## 2026-09-08 — actual bake03 coverage accepted; downstream candidate04 frozen
+
+- Owner Astra high. Inspected paired bodyalbedo +actualroughness/normal maps, fourprobes and
+  complete bake report. Verified27texture+6blend/diagnostic output hashes and prior68inputs.
+  Baseline ADJACENT_FACES16 reproduces1311 invalid pixels, all exterior tail-pole-border
+  x80..4016/y4012..4016 bottom-up4096 coords. EXTEND32 yields zero in bothrectangles. Interior
+  x100:3995/y1080:3995 byte-identical. Bodyalbedo min.1843137; exteriorrough .4588236..7882354;
+  oral authoredconstant .5411765. Exact paired cause/policy verdict review-bake03-actual.md.
+- Accept bounded bakecoverage for downstream stage, not final material/creature. New five
+  source copies production_common_04.py/candidate_04.py/render_candidate_04.py/check_candidate_04.py/
+  check_export_atlas_04.py change only version/path imports and input successfulbaked03. Same
+  candidate03 intended20bones/all18full+LODclips/anchors, ratios25%body70%eyes45%fins/directUV
+  pigment and all gates. Originalcandidate03/partialbaked02 remain immutable.
+- Actual baked03 report SHA fd63824840f5839198ea2c805a17193b34460d5fbafa2641da53594ed58b4545.
+  New static report ../devonian-authoring/coccosteus/rework-v3/production-04-static-report.json
+  SHA44a073d782e890d39a97b24aea43167ab21f6f236de9717b108eb9cc8a76ceed. AST/path-onlydifferences,
+  prior68inputs and33generatedbakefiles PASS. Newcommon verifies actualold-sourcebakereport.
+- Frozen-candidate-04.json111inputs SHA8c78e16bafb72c157f5bc54eebf1802c4d56dbbfca07ee2252680169c46a4d2e.
+  All reverified. Exact HANDOFF-CANDIDATE-04.md: no rebake, parentassignedCPU2 groups30/5/20/35
+  minutes (90total): build04, structural+actualmapchecks,4portraits,19pose/LODviews.
+  Exclusive newcandidate-04 output absent. Ready for root's next queue slot.
+- No Blender/public/shared/Git work by author. Actualcandidate04/23images/runtime stillpending.
+  Resume parentassignedexecution; stop onfailure, preserveevidence. Author/root inspect actual
+  cleanseams/livingfinish/LODmarkings/oraleye before finalacceptance.
+
+## 2026-09-08 — final bounded day review: full surface PASS, overall HOLD for LOD
+
+- Owner Astra high. Independently inspected all4actualcandidate04 portraits and19actualpose/LOD
+  PNGs; verified all23 hashes, complete manifests,111frozen inputs andcandidate output hashes.
+  Full PBR cranial/thoracic white/brown tiles are gone. Readableplates/finegrain/livingroughness/
+  posteriorbars/finrays retained. Full-surface boundedartgate PASS; no fullremodel/rebake needed.
+- OverallHOLD: LOD-oblique/LOD-Swim transversebars still become longitudinalsmears; rays become
+  disconnectedblotches; armor pigmentpatchy.45%fin retention/no broadfilter did not resolve it.
+  All18LODclips remain andAttack/Eat articulate. Tinyfullcommissure dots andLODdarkslits/pale
+  jaggedlip remain pendingoral audit; temporal motion/eye audit not completed from stills.
+- Read-onlyactualGLB axialspan audit: posteriorfull29312triangles span~.017936;LOD4111triangles
+  median.077077/q90.180967/q99.254278/max.310194,222span>.20. Supports marking-aware LOD topology
+  correction insteadof blindgeometrydecimation. All23concrete observations:review-candidate04-actual.md.
+- Frozenreviewmanifest45inputs SHA a94f1729ceac1414355e127ac06effaf188baef94163adc670c62584b4ecd90f.
+  Exactresume HANDOFF-CANDIDATE04-HOLD.md SHA1220d9fc250fa60e18fdc58c4c137440a7322bad1a49779026e84140f91eb772.
+  Authoring candidate-04-actual-review.json records gateverdict,evidencehashes andspanmeasurements.
+  FullGLB b7b929b9978f51f89e0cb1e687dec10d95b90edd3e2b2ba27b12432f58474655;
+  LOD b06eec2de4dfe0aa4dfe814c9e8a203ff050fd74bacf83d07abf75efbdb83f10.
+- Tomorrow's bounded direction: preserve acceptedfull,bake03,allrig/actions/anchors; author
+  deterministic ring/structuredfin LODsampling with axial/marking density and interiorcolor
+  reconstruction checks. Freeze smallactualcomparisonhandoff before parentassignedCPU2run.
+  AfterLODpasses, freezeoral/eye/motionvalidation. Recipeisnotexecutablecorrectionsource.
+- Stopfor day checkpoint. No newcorrectionsource,heavyjob,Blender,public/shared/Git performed.
+  This review doesnotapprove finalcreature, runtime, packaging orintegration.

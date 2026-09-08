@@ -83,3 +83,34 @@ with six outside-tissue samples and positive clearance>.001. This proves the
 sampled terminal passage remains open, not absence of every remote intersection.
 New actual full/LOD jaw views and portraits MUST be inspected before delivery.
 No new export, eye audit, pose render, public release or deployment is claimed yet.
+
+## Final focused delivery handoff — candidate05 actual evidence PASS
+
+Terra completed the frozen export, structural check,10-pose actual full/LOD audit,
+12 actual exported-model review views and4 actual exported-model portraits. The
+creative author individually inspected ALL16 images and verified each image,
+source and source-GLB hash against both completed manifests. author-review-05.json
+SHA bb361a16c9a3a7b8596d67a5ed523852e479c71b62033aaef40bc51eae606946
+records the focused PASS and exact evidence.
+
+Full GLB SHA0fa8b42cccf502e3f62c26f3402b860a35198cf790cdb4dc46baa8b2bf4b773d,
+16,412,316bytes; LOD SHA44d56d05811711fe2a205a77d4178dc724620a98135124a70151d15b36f1faea,
+2,868,160bytes.18/18clips retained. Both share28bones and3 nested anchors.
+Minimum measured eye interior75.133511%; conservative95% lower74.351649%, above
+user50% and target65%. All10 closed-envelope/no-cap and terminal corridor checks
+pass: minimum sampled clearance .007287326, maximum denticle contact .003786290.
+
+Actual Heavy/Bite/Eat views show connected lower-jaw floor and oral sidewalls,
+without exposed lining inversion, visible oral shell intersection or detached
+tissue. The leading body edge is the mouth; no dorsal aperture, preoral ledge or
+hanging belly apron remains. Close eyes remain supported above it. All4 portraits
+are uncropped and carry accepted V3 posterior/material quality into the new face.
+Small LOD chin/cheek creases and reduced pigment detail remain broader PREVIEW
+polish. This is bounded actual-pose evidence, not an all-frame/all-creature final
+art audit or interactive prey/controller playtest.
+
+Root has independently reviewed selected actual images and owns release05
+metadata cleanup, copying, intake/catalogue/build/typecheck, git/main publication.
+No public asset or publication was changed by this creative author. No further
+creative job is required for this focused correction today. Keep previous
+candidate02 and study01–05 sources/evidence, immutable backups and editable Blend.
