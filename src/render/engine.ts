@@ -10,7 +10,7 @@ import { creature, type CreatureId } from '../sim/creatures';
 import { Game, radarRange as radarReach, type ScoreHeader, type ScoreRow, type TeleportDest } from '../sim/game';
 import type { Phase } from '../sim/daynight';
 import { BAND_COLOR, emptyInput, isCoop, TIER_NAMES, TIER_NEED, type Actor, type Band, type InputFrame, type Mode, type PlayerSetup } from '../sim/types';
-import { BIOME_NAMES, biomeAt, groundHeight, nurseryAt, resolveStatic, SURFACE_Y, type Biome, type Boulder, type LandmarkKind } from '../sim/world';
+import { BIOME_NAMES, biomeAt, groundHeight, nurseryAt, sampleHeight, SURFACE_Y, type Biome, type Boulder, type LandmarkKind } from '../sim/world';
 import { AssetQueue, type AssetProgress } from './assets';
 import { CreatureView, ensureLoaded, loadedSync, type Lod } from './creature';
 import { Attachments } from './attachments';
@@ -133,6 +133,37 @@ export const magnificationDistance = (L: number) => L * 1.45 + 1.15 + Math.max(0
  * the thing that eats you comes from, so the view has to reach it. Down goes almost overhead, which
  * is how you read the floor for prey while swimming over it.
  */
+/**
+ * How close to the sand the camera may sit, and the shortest arm it will pull in to, in body
+ * lengths — short enough to clear the floor at a steep angle, long enough to stay outside the
+ * animal rather than inside its own ribs.
+ */
+const CAMERA_SAND = 0.45, CAMERA_CLOSE = 0.9;
+
+/**
+ * Fit the camera onto its arm with the seabed in the way.
+ *
+ * Aiming up from the floor asks for a camera below the creature, which is under the sand. Two
+ * answers, in order: shorten the arm, which clears the floor at the same angle and only brings the
+ * creature closer; and, when even the shortest arm is still buried, lift the whole rig. `lift` is
+ * how far it had to go, and the caller moves the look point by the same amount, so the view keeps
+ * the angle the player gave it instead of being levelled off into the seabed.
+ *
+ * `sandAt` returns the height the camera may not go below for an arm of that length (it moves the
+ * camera as a side effect in the renderer, which is why the fit is written against a callback).
+ */
+export function fitCameraArm(baseY: number, pitch: number, dist: number, minDist: number, sandAt: (d: number) => number, ceiling: number): { dist: number; y: number; lift: number } {
+  const rise = -Math.sin(pitch);
+  let d = dist, y = baseY + Math.sin(pitch) * d;
+  if (rise > 0.05) for (let i = 0; i < 4; i++) {
+    const floor = sandAt(d);
+    if (y >= floor) break;
+    d = Math.max(minDist, d - (floor - y) / rise);
+    y = baseY + Math.sin(pitch) * d;
+  }
+  const clamped = clamp(y, sandAt(d), ceiling);
+  return { dist: d, y: clamped, lift: clamped - y };
+}
 export const PITCH_UP = -0.95;   // ~54° above the horizon
 export const PITCH_DOWN = 1.32;  // ~76° below it, near enough straight down at the seabed
 const FLAT_PITCH = 0.45;   // ~26°, comfortably above a resting follow camera (which sits at ~11-25°)
@@ -659,21 +690,20 @@ export class Engine {
       lookAt.z - Math.cos(yaw) * Math.cos(pitch) * d,
     );
     const desired = place(dist);
-    // Looking up from the seabed puts the camera under the sand, and simply lifting it back out
-    // flattens the view — exactly when the player is trying to see what is above them. Pull the
-    // camera in instead: a shorter arm at the same angle clears the floor and keeps the aim.
-    const floorFor = (v: THREE.Vector3) => groundHeight(this.game!.world, v.x, v.z, this.scratchBoulders) + 0.7;
-    const rise = -Math.sin(pitch);
-    if (rise > 0.05) for (let it = 0; it < 3 && desired.y < floorFor(desired); it++) {
-      dist = Math.max(L * 0.55, dist - (floorFor(desired) - desired.y) / rise);
-      place(dist);
-    }
-    // keep camera out of the ground and boulders, and below the surface unless the player has left the water
-    const g = groundHeight(this.game!.world, desired.x, desired.z, this.scratchBoulders);
-    desired.y = clamp(desired.y, g + 0.7, p.airborne ? SURFACE_Y + 40 : SURFACE_Y - 0.4);
-    const pos = { x: desired.x, y: desired.y, z: desired.z };
-    resolveStatic(this.game!.world, pos, 0.7, this.scratchBoulders);
-    desired.set(pos.x, pos.y, pos.z);
+    // The sand is the only thing the camera cannot be inside. A rock is not: shoving the camera
+    // sideways out of a boulder, or lifting it onto one, throws the shot away for scenery, and a
+    // camera *inside* a rock simply sees out of it — the far side of a closed mesh is not drawn —
+    // so it passes through and keeps looking at the creature. Hence the sand itself here, and not
+    // `groundHeight`, which counts boulder tops as floor.
+    const fit = fitCameraArm(lookAt.y + L * 0.18, pitch, dist, L * CAMERA_CLOSE,
+      (d) => { place(d); return sampleHeight(desired.x, desired.z) + CAMERA_SAND; },
+      p.airborne ? SURFACE_Y + 40 : SURFACE_Y - 0.4);
+    place(fit.dist);
+    desired.y = fit.y;
+    // The rig had to be lifted off its arm, so the look point goes with it rather than the view
+    // tipping flat: you see *past* your own creature into the water above, which is the whole point
+    // of aiming up from the floor. Not while locked on — there the target is the shot.
+    if (!locked) lookAt.y += clamp(fit.lift, -L * 1.5, L * 1.5);
     const k = jumped ? 1 : p.state === 'dodge' ? 5 : 7;
     if (jumped) { cs.pos.copy(desired); cs.look.copy(lookAt); }
     else { cs.pos.lerp(desired, 1 - Math.exp(-k * dt)); cs.look.lerp(lookAt, 1 - Math.exp(-10 * dt)); }
@@ -700,13 +730,27 @@ export class Engine {
     }
     candidates.sort((x, y) => y.size - x.size);
     const cap = Math.round((this.quality === 'high' ? 88 : 56) / (0.6 + 0.4 * players));
-    let count = 0;
+    // Full-detail bodies are the most expensive thing in the frame — they are skinned on the CPU
+    // and drawn again into the shadow map, once per viewport — and how expensive depends entirely
+    // on the era: a Devonian placoderm is 105k triangles where a Cambrian arthropod is 55k, and
+    // one of its trilobites is 516k. Apparent size alone therefore buys wildly different frame
+    // costs in the two eras, which is why the Devonian ran heavy. So spend a triangle budget
+    // instead: biggest-on-screen first, everything past it takes the decimated copy.
+    const budget = (this.quality === 'high' ? 700_000 : 320_000) / (0.6 + 0.4 * players);
+    let spent = 0, count = 0;
     for (const { a, d } of candidates) {
       if (count >= cap && a.controller !== 'player') break;
       // Pick a detail level from apparent size, with hysteresis so it cannot flicker at the boundary.
       let v = this.views.get(a.id);
       const size = lengthOf(a) / d;
       let wantLod: Lod = a.controller === 'player' ? 0 : v ? (v.lod === 0 ? (size < 0.05 ? 1 : 0) : (size > 0.075 ? 0 : 1)) : (size < 0.06 ? 1 : 0);
+      // The budget only ever demotes: your own body, and anything already at full detail whose
+      // share is still affordable, keep it.
+      const full = loadedSync(a.creature, 0);
+      if (wantLod === 0 && a.controller !== 'player') {
+        if (full && spent + full.tris > budget) wantLod = 1;
+      }
+      if (wantLod === 0) spent += full?.tris ?? 0;
       if (wantLod === 1 && !loadedSync(a.creature, 1)) { void ensureLoaded(a.creature, undefined, 1); wantLod = 0; }
       if (v && v.lod !== wantLod) { v.dispose(); this.views.delete(a.id); v = undefined; }
       if (!v) {
@@ -944,9 +988,6 @@ export class Engine {
         case 'anoxia': { personal('anoxia', 0.8); break; }
         case 'beach': { if (e.strength) { this.bubbles.emit(e.pos, 12, 0.5, 2, 0.06, 1); personal('beach', 0.9); } break; }
         case 'shoalJoin': { this.sparkles.emit(e.pos, 16, 0.6, 1.2, 0.05, 1.2); personal('shoalJoin', 0.7); break; }
-        case 'rangeClaim': { personal('rangeClaim'); break; }
-        case 'rangeLost': { personal('rangeLost'); break; }
-        case 'dominant': { this.sparkles.emit(e.pos, 60, 1.2, 1.8, 0.08, 2.2); personal('dominant'); if (e.player != null && e.player >= 0) { const d = padOf(e.player); if (typeof d === 'number') rumble(d, 0.6, 0.6, 500); } break; }
         case 'teleport': {
           // sparkles where they left and where they arrived; the camera snaps behind them on arrival
           this.sparkles.emit(e.pos, e.strength ? 50 : 30, 0.9, 1.4, 0.07, 1.8);
@@ -1055,7 +1096,8 @@ export class Engine {
         index: i, creature: p.creature, color: PLAYER_COLORS[i % 4], alive: p.state !== 'dead', aim,
         scheme,
         hp: p.hp, hpMax: p.hpMax, stamina: p.stamina, staminaMax: p.staminaMax, exhausted: p.exhausted > 0,
-        tier: p.tier, tierName: era ? `${era.stage} · ${era.rungName}` : TIER_NAMES[p.tier], progress: era ? era.standing / 100 : p.tier >= 4 ? 1 : clamp(p.nutrition / TIER_NEED[p.tier], 0, 1), scale: p.scale,
+        tier: p.tier, tierName: era ? `${era.stage} · ${era.rungName}` : TIER_NAMES[p.tier], // The ring means the same thing in both eras: how close the next moult is, full when it lands.
+        progress: era ? era.stageProgress : p.tier >= 4 ? 1 : clamp(p.nutrition / TIER_NEED[p.tier], 0, 1), scale: p.scale,
         abilityName: p.hideMode === 'descending' ? 'Sinking to burrow' : p.hideMode === 'burrowed' ? `Buried · ${controlKey('ability', scheme)} emerge` : p.hideMode === 'camouflage' ? `Camo: ${p.camoLabel}` : RULES?.ySpecial(p.creature)?.name ?? hideLabel(p.creature), abilityReady: p.hideMode === 'camouflage' ? p.stamina / p.staminaMax : RULES?.ySpecial(p.creature) ? 1 - clamp(p.abilityCd / Math.max(1, creature(p.creature).abilityCooldown), 0, 1) : 1 - clamp(p.hideCd / 2, 0, 1), abilityActive: p.hideMode !== 'none' || (p.state === 'ability' && !!RULES?.ySpecial(p.creature)), abilityUnlocked: true,
         senseReady: 1 - clamp(p.senseCd / 6, 0, 1),
         lock: lockA && isAlive(lockA) ? { name: creature(lockA.creature).name, kind: creature(lockA.creature).kind, band: bandOf(p, lockA), hp: lockA.hp / lockA.hpMax, color: BAND_COLOR[bandOf(p, lockA)] } : undefined,

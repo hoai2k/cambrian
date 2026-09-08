@@ -14,10 +14,6 @@ export const DEVONIAN_SAMPLES: Record<string, string[]> = {
   withdraw: ['devonian/withdraw'],
   moult: ['devonian/moult-crack'],
   shoalJoin: ['devonian/shoal-join'],
-  rangeClaim: ['devonian/range-claim'],
-  rangeLost: ['devonian/range-lost'],
-  standingUp: ['devonian/standing-up'],
-  dominant: ['devonian/dominant'],
   beach: ['devonian/beach'],
   shellCrush: ['devonian/shell-crush'],
   // per-creature specials: the engine plays `ability:<abilityId>` when a sample is registered for it

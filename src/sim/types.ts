@@ -165,20 +165,20 @@ export interface SiltCloud { pos: Vec3; radius: number; t: number; }
 
 export interface PlayerSetup { creature: CreatureId; device: number | 'keyboard' | 'keyboard2'; ready: boolean; }
 
-/** Cambrian modes, plus the Devonian ones (`domination`, `foodchain`); an era lists the ones it offers. */
-export type Mode = 'rise' | 'frenzy' | 'hunted' | 'reef' | 'domination' | 'foodchain';
-export const MODE_IDS: readonly Mode[] = ['rise', 'frenzy', 'hunted', 'reef', 'domination', 'foodchain'];
+/** The three modes, shared by both eras: an era changes the sea and the animals, not the match. */
+export type Mode = 'rise' | 'hunted' | 'reef';
+export const MODE_IDS: readonly Mode[] = ['rise', 'hunted', 'reef'];
 /**
  * Modes that are not a contest between players. Their goal is a milestone rather than a win over
  * somebody, so meeting it need not take the sea away: these matches can carry on afterwards as a
- * free swim (`Game.continueMatch`). The versus modes — frenzy, hunted, foodchain — end for good.
+ * free swim (`Game.continueMatch`). The versus mode — hunted — ends for good.
  */
-export const COOP_MODES: readonly Mode[] = ['rise', 'domination', 'reef'];
+export const COOP_MODES: readonly Mode[] = ['rise', 'reef'];
 export const isCoop = (m: Mode) => COOP_MODES.includes(m);
 
 export interface Prompt { text: string; t: number; }
 
 export interface WorldEvent {
-  kind: 'hit' | 'kill' | 'eat' | 'tierUp' | 'parry' | 'guardBreak' | 'burst' | 'escape' | 'noticed' | 'hunted' | 'dodge' | 'ability' | 'grab' | 'moult' | 'death' | 'silt' | 'stagger' | 'sense' | 'pounce' | 'swallow' | 'routed' | 'disintegrate' | 'teleport' | 'rangeClaim' | 'rangeLost' | 'gulp' | 'anoxia' | 'beach' | 'shoalJoin' | 'dominant' | 'shellCrush' | 'breach' | 'splash';
+  kind: 'hit' | 'kill' | 'eat' | 'tierUp' | 'parry' | 'guardBreak' | 'burst' | 'escape' | 'noticed' | 'hunted' | 'dodge' | 'ability' | 'grab' | 'moult' | 'death' | 'silt' | 'stagger' | 'sense' | 'pounce' | 'swallow' | 'routed' | 'disintegrate' | 'teleport' | 'gulp' | 'anoxia' | 'beach' | 'shoalJoin' | 'shellCrush' | 'breach' | 'splash';
   pos: Vec3; actor: number; other?: number; strength?: number; player?: number;
 }

@@ -54,11 +54,11 @@ function PlayerPanel({ p }: { p: PlayerHud }) {
             <circle cx="36" cy="36" r={R} className="ring-fg" strokeDasharray={`${C * p.progress} ${C}`} transform="rotate(-90 36 36)" />
           </svg>
           {p.era
-            ? <span className="tier-num rung-num" role="img" aria-label={`Rung ${p.era.rung}, ${p.era.rungName}. Standing ${Math.round(p.era.standing)}`}><small>RUNG</small>{RUNG_NUMERALS[p.era.rung] ?? p.era.rung}</span>
-            : <span className="tier-num" role="img" aria-label={`Tier ${p.tier + 1}: ${p.tierName}`}><i className="tier-glyph" style={{ maskImage: `url(${appBase()}${assetPaths.ui(`tier-${p.tier + 1}.svg`)})` }} /></span>}
+            ? <span className="tier-num rung-num" role="img" aria-label={`Rung ${p.era.rung}, ${p.era.rungName}. ${p.era.stage}, ${moultLabel(p.progress)}`}><small>RUNG</small>{RUNG_NUMERALS[p.era.rung] ?? p.era.rung}</span>
+            : <span className="tier-num" role="img" aria-label={`Tier ${p.tier + 1}: ${p.tierName}, ${moultLabel(p.progress)}`}><i className="tier-glyph" style={{ maskImage: `url(${appBase()}${assetPaths.ui(`tier-${p.tier + 1}.svg`)})` }} /></span>}
         </div>
         <div className="bars">
-          <div className="name-row"><b>{def.name}</b><span className="tier-name">{p.tierName}</span>{p.protect && <span className="protect">PROTECTED</span>}{p.era?.inRange && <span className="range-chip">RANGE</span>}</div>
+          <div className="name-row"><b>{def.name}</b><span className="tier-name">{p.tierName}</span>{p.protect && <span className="protect">PROTECTED</span>}</div>
           <div className="bar hp"><i style={{ width: `${(p.hp / p.hpMax) * 100}%` }} /></div>
           <div className={`bar stamina ${p.exhausted ? 'exhausted' : ''}`}><i style={{ width: `${(p.stamina / p.staminaMax) * 100}%` }} /></div>
           {p.era?.air != null && <div className={`bar air ${p.era.air < 0.25 ? 'low' : ''}`} aria-label={`Air ${Math.round(p.era.air * 100)}%`}><i style={{ width: `${p.era.air * 100}%` }} /></div>}
@@ -191,6 +191,11 @@ function Scoreboard({ board, me }: { board: NonNullable<PlayerHud['board']>; me:
   );
 }
 
+/**
+ * The ring reads the same in both eras: how close the next moult is. Full means the body grows —
+ * a tier in the Cambrian, a life stage in the Devonian — so it is spoken as one thing.
+ */
+const moultLabel = (progress: number) => progress >= 1 ? 'fully grown' : `${Math.round(progress * 100)}% to the next moult`;
 const fmtClock = (s: number) => `${Math.floor(s / 60)}:${String(Math.floor(s % 60)).padStart(2, '0')}`;
 
 const fmtDist = (d: number) => (d < 1000 ? `${Math.round(d)} m` : `${(d / 1000).toFixed(1)} km`);
@@ -313,9 +318,8 @@ function EraStatus({ era, alive }: { era: EraHud; alive: boolean }) {
   const warn = era.inDeadZone ? (era.air != null ? 'DEAD WATER · your gills are fine, theirs are not' : 'DEAD WATER · no oxygen, get out') : era.beached ? 'ON THE SAND · nothing with gills can follow' : era.air != null && era.air < 0.25 ? 'AIR LOW · surface and gulp' : '';
   return (
     <div className="era-status">
-      {era.dominantT > 0 && <div className="dominant"><span>DOMINANT</span><b>{Math.max(0, Math.ceil(90 - era.dominantT))}</b></div>}
+      {era.primeT > 0 && <div className="dominant"><span>PRIME</span><b>{Math.max(0, Math.ceil(90 - era.primeT))}</b></div>}
       {warn && <div className={`era-warn ${era.inDeadZone && era.air == null ? 'danger' : ''}`}>{warn}</div>}
-      {era.recent.length > 0 && <div className="standing-ticker">{era.recent.slice(-3).map((r, k) => <span key={`${r}-${k}`}>{r}</span>)}</div>}
     </div>
   );
 }

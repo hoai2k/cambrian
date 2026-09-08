@@ -81,3 +81,23 @@ not a claim that oral collisions, eyes or deforming topology have passed product
 for new resting/open jaws. All external geometry uses the same clay material so an armour/soft
 body distinction cannot be manufactured by colour. CPU Cycles and fixed seed are explicit.
 `HANDOFF.md` freezes source hashes, exact three-stage commands and review/stop criteria.
+
+## Clay-01 actual review and clay-02 correction — 7 September 2026
+
+All ten actual clay-01 PNGs were inspected by this creature author after root review.
+**Clay-01 rejected as production form**, blend SHA
+`4d728133a968e80707495ce3e2bb0f8699bdf471af41a342c2542cbe7c6b3b7a`.
+The universal filleted polygon section imposed a helmet on the head and a ridged prism on soft
+muscle. The separate shield formed a sleeve and notched joint. Nonplanar small end caps and
+mismatched oral surfaces broke the lip line; the ruled cheek margin became a rectangular panel.
+The last upward fin control points produced actual hooks. Those are construction defects,
+not features to hide with texture. The old model still has better organic appeal.
+
+Clay-02 replaces each failed construction: rounded cranial/palatal volume and shallow jaw cup
+with unique closed poles; a single continuous shield/abdomen mesh with local shield curvature
+and smooth elliptical muscle; shared palate/floor equations for the posterior lining; swept
+curved cheek leading edges; smaller, thick-root fins with a rounded half-ellipse span map and
+monotone downward height. The rising posterior and low dorsal intentions remain. The dorsal
+camera gains adequate vertical coverage. Only five new renders are requested; the old evidence
+is preserved without repeating known comparisons. Actual imagery is still required before
+acceptance. See HANDOFF-02.md for immutable inputs and execution.

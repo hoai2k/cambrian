@@ -1,0 +1,12 @@
+{
+  "resolution":[1280,960],"samples":48,
+  "views":[
+    {"name":"side","camera":[7,0.40,0.1],"target":[0,0.40,0.1],"scale":5.1},
+    {"name":"front","camera":[0,-7,0.03],"target":[0,-0.4,0.03],"scale":2.4},
+    {"name":"dorsal","camera":[0,0.40,7],"target":[0,0.40,0],"scale":6.65},
+    {"name":"oblique","camera":[4.6,-5.2,2.7],"target":[0,0.30,0],"scale":4.85},
+    {"name":"mouth-open","camera":[1.65,-4.7,-0.35],"target":[0,-1.34,-0.11],"scale":1.55,"gape":1},
+    {"name":"armour-material-close","camera":[3.3,-4.2,2.5],"target":[0,-0.91,0.04],"scale":2.28},
+    {"name":"armour-clay-close","camera":[3.3,-4.2,2.5],"target":[0,-0.91,0.04],"scale":2.28,"mode":"clay"}
+  ]
+}

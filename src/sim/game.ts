@@ -1,7 +1,7 @@
 import { ACTIVE_ERA } from '../content';
 import { RULES } from './era-rules';
 import { BURROWERS, HEAVY_SPECIALS, DEFENSIVE_SPECIALS, CAMOUFLAGE_DRAIN, camouflageMatch, clearPursuit, stopHiding } from './concealment';
-import { abilitySpeed, beginExpansionAbility, beginHeavyStrike, heavyStrikeReach, stepExpansionAbility, stepHeavyStrike, bloomRate, grazeRate } from './expansion-abilities';
+import { abilitySpeed, beginExpansionAbility, beginHeavyStrike, heavyStrikeReach, specialHit, stepExpansionAbility, stepHeavyStrike, bloomRate, grazeRate } from './expansion-abilities';
 import { add, clamp, damp, dist, distXZ, dot, heading, len3, lerp, makeRng, norm, scale as vscale, sub, TAU, v3, wrapAngle, yawOf, type Rng, type Vec3 } from '../shared/math';
 import { applyScaleStats, bandOf, bodyRadius, canAct, clearanceOf, climbHeight, climbRise, floorClearance, glideOver, isAlive, isHidden, isInvulnerable, lengthOf, makeActor, massOf, speedFactor, staminaCost } from './actors';
 import { makeBrain, think, type AiWorld } from './ai';
@@ -234,7 +234,7 @@ export class Game implements AiWorld {
       this.players.push(a);
       this.progress.push({ prompts: [], flags: new Set(), deaths: 0, apexT: 0, message: '' });
     });
-    if (mode === 'frenzy' || mode === 'hunted' || mode === 'domination' || mode === 'foodchain') {
+    if (mode === 'hunted') {
       // Fill to 4 with bots
       for (let i = setups.length; i < 4; i++) {
         const c = this.pickBot(setups.map((s) => s.creature), i);
@@ -263,16 +263,11 @@ export class Game implements AiWorld {
    */
   private eraRoleIndex(index: number) { return this.mode === 'hunted' ? (this.isHunter(index) ? 0 : 1) : index; }
 
-  /** A bot's species: anything a player might pick; in Food Chain one from a rung nobody has taken yet. */
+  /** A bot's species: anything a player might pick. */
   private pickBot(taken: CreatureId[], i: number): CreatureId {
     // Bots pick from the same list the player chose from, so a rival is always an animal the
     // player could have been (and always has its own model rather than a borrowed one).
-    const pool = PLAYABLE_IDS.filter((c) => {
-      const def = creature(c);
-      if (this.mode !== 'foodchain' || def.rung === undefined) return true;
-      return !taken.some((t) => creature(t).rung === def.rung) && !this.actors.some((a) => a.controller === 'bot' && creature(a.creature).rung === def.rung);
-    });
-    const from = pool.length ? pool : PLAYABLE_IDS;
+    const from = PLAYABLE_IDS;
     void i;
     return from[Math.floor(this.rng() * from.length)];
   }
@@ -547,7 +542,6 @@ export class Game implements AiWorld {
     this.updateDiscovery();
     RULES?.step(this, dt);
     this.updateModes(dt);
-    RULES?.onEvents(this, this.events);
     for (const a of this.actors) if (a.state === 'dead' && a.corpseT > 45 && a.controller !== 'player' && a.controller !== 'bot') this.remove(a);
     for (const a of this.actors) if (a.state === 'dead' && a.eaten >= 1 && a.controller !== 'player' && a.controller !== 'bot') this.remove(a);
   }
@@ -1361,7 +1355,7 @@ export class Game implements AiWorld {
             const pull = norm(sub(heavier ? best.pos : a.pos, heavier ? a.pos : best.pos));
             if (heavier) { a.vel = vscale(pull, 14); }
             else { best.vel = vscale(pull, 16); best.iframes = 0; }
-            applyHit(this.hitCtx, a, best, { ...def.light, damage: 12, poise: 30, knockback: 0 }, 0);
+            applyHit(this.hitCtx, a, best, specialHit(def, { damage: 12, poise: 30, knockback: 0 }), 0);
             this.events.push({ kind: 'grab', pos: { ...best.pos }, actor: a.id, other: best.id, player: a.player });
           }
         }
@@ -1453,7 +1447,6 @@ export class Game implements AiWorld {
     a.nutrition += amount;
     // co-op share
     if (this.mode === 'rise' && food && amount > 2) for (const p of this.players) if (p !== a && isAlive(p) && dist(p.pos, a.pos) < 25) p.nutrition += amount * 0.3;
-    if (this.mode === 'frenzy' && food && (food.controller === 'player' || food.controller === 'bot')) a.nutrition += 12;
     RULES?.onNutrition(this, a, amount, food);
     if (RULES && !RULES.growthByNutrition) return;
     this.checkTierUp(a);
@@ -1694,7 +1687,6 @@ export class Game implements AiWorld {
         const held = Math.max(0, ...this.progress.map((p) => p.apexT));
         return { title: 'Rise', detail: held > 0 ? `Apex held ${Math.floor(held)} s of 90` : 'Reach Apex and hold it for ninety seconds' };
       }
-      case 'frenzy': return { title: 'Feeding Frenzy', detail: 'First to Apex wins', clock: Math.max(0, 12 * 60 - this.time) };
       case 'reef': return { title: 'Reef', detail: 'No goal. Just the sea.' };
       default: return { title: ACTIVE_ERA.modes.find((m) => m.id === this.mode)?.name ?? this.mode, detail: '' };
     }
@@ -1866,16 +1858,6 @@ export class Game implements AiWorld {
           if (p.tier >= 4 && isAlive(p)) { pr.apexT += dt; if (pr.apexT > 90 && this.state.status === 'playing' && !this.endless) { this.state = { status: 'won', winner: i, message: `${creature(p.creature).name} rules the reef.` }; } }
           else pr.apexT = 0;
         });
-        break;
-      }
-      case 'frenzy': {
-        const contenders = this.actors.filter((a) => a.controller === 'player' || a.controller === 'bot');
-        const apex = contenders.find((a) => a.tier >= 4 && isAlive(a));
-        if (apex) this.state = { status: 'won', winner: apex.player, message: apex.player >= 0 ? `Player ${apex.player + 1} hits Apex first.` : `A rival ${creature(apex.creature).name} hits Apex first.` };
-        else if (this.time > 12 * 60) {
-          const best = [...contenders].sort((a, b) => (b.tier + b.nutrition / TIER_NEED[b.tier]) - (a.tier + a.nutrition / TIER_NEED[a.tier]))[0];
-          this.state = { status: best.player >= 0 ? 'won' : 'lost', winner: best.player, message: best.player >= 0 ? `Player ${best.player + 1} is the biggest thing in the sea.` : `A rival ${creature(best.creature).name} outgrew everyone.` };
-        }
         break;
       }
       case 'hunted': {

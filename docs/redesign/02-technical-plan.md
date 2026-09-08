@@ -235,6 +235,18 @@ target) pair within sense range using the spatial hash, at 10 Hz.
 - Performance targets: ≤ 400 draw calls per viewport at `high`; ≤ 1.2 M
   triangles total for 4 viewports; GPU skinning for all creatures; swarm
   members instanced per creature type with per-instance animation phase.
+- Part merge (`render/merge-skins.ts`): a rig is one draw call per material,
+  not per authored part. The Devonian bodies are modelled part by part —
+  Nahecaris arrives as 415 skinned meshes, Michelinoceras as 328, against a
+  Cambrian body's four or five — and each one is a draw call per animal on
+  screen. Every part is skinned to the same skeleton, sits at identity under
+  the root, and no clip animates a mesh node, so the parts sharing a material
+  merge into one geometry when the GLB is first loaded, before any instance is
+  cloned from it. The merge is skipped for anything that would make it lossy
+  (an animated node, a morph target, a multi-material mesh, a non-identity
+  transform, mismatched attributes), so a rig that does not fit is left alone.
+  Every Devonian rig lands at 4–10 meshes; `npm run merge` proves the posed
+  surface is unchanged, vertex for vertex, under every clip in both eras.
 
 ## Input
 

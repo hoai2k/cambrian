@@ -115,8 +115,17 @@ momentum-based movement**.
   view reaches ~54° above the horizon and ~76° below it (`PITCH_UP` /
   `PITCH_DOWN` in `src/render/engine.ts`): the water above you is where what
   eats you comes from, and the sand below is where what you eat lives, so both
-  have to be lookable-at. Aiming up from the seabed pulls the camera in on a
-  shorter arm rather than flattening the shot against the floor.
+  have to be lookable-at.
+- **The seabed is the only thing the camera cannot be inside** (`fitCameraArm`).
+  Aiming up from the floor asks for a camera under the sand, and the answer is,
+  in order: shorten the arm — same angle, creature just closer — and then, when
+  the shortest arm is still buried, lift the whole rig, look point and all, so
+  the shot keeps the angle it was given and you see *past* your own creature
+  into the water above rather than being levelled off into the floor. Rocks are
+  not in that list: a camera shoved sideways out of a boulder, or lifted onto
+  one, throws the shot away for scenery. It passes through instead, and a
+  camera inside a rock sees straight out of it, because the far side of a
+  closed mesh is not drawn.
 - **RT (analog) = burst.** Holding it drains stamina and multiplies speed
   (× 1.6–2.2 depending on creature). Tapping it gives a short lunge. Burst is
   how you close on prey and how you outrun a Threat, so stamina management is
@@ -155,6 +164,10 @@ momentum-based movement**.
   floor, and the climb costs more stamina than they regain. So open water is
   a crossing, not a second home, and the seabed is where they hunt, are fed
   and get their burrow/anchor tools. They are the "ground fighter" archetypes.
+- **The growth ring means one thing in both eras**: how close the next moult
+  is, full when the body grows. The Cambrian reads nutrition against the tier's
+  need; the Devonian reads `stageProgress`, the run up to the next of its five
+  life stages, rather than the whole 0–100 standing meter it used to show.
 - **Ambient body motion**: idle sway, fin/flap frequency tied to speed
   (already in the current animation layer), a small procedural bob so nothing
   is ever perfectly still.
@@ -510,14 +523,15 @@ population.
 | Mode | Players | Description |
 | --- | --- | --- |
 | **Rise** (single / co-op) | 1–4 | The main experience. Everyone hatches as a Larva in the nursery. Reach Apex. Co-op shares nutrition from assisted kills, players can revive a downed ally by bumping them within 10 s. Players *can* turn on each other — bites land, and a dead player can be fed on — but nothing aims at another player for you: no aim snap, no auto-pounce, no auto-lock. Area abilities still spare a co-op partner, so nobody kills a friend by accident. Session ends when any player reaches Apex and survives 90 s, or continues in free-play. Escalation: the reef's giant population grows as players grow. |
-| **Feeding frenzy** (versus) | 2–4 | Growth race. Everyone starts Juvenile in separate nurseries. First to Apex wins; killing a player takes a third of their tier progress and gives it to you. Bots fill empty slots. 12-minute cap, biggest wins. |
 | **Hunter & hunted** (versus, asymmetric) | 2–4 | One player is a Giant (× 3) with a shrinking hunger meter; the others are Juveniles who must survive and reach Adult. Giant eats to stay alive; small ones hide, bait, and grow. Rotates who is the Giant. *(As built: one **turn** each, 100 s, and your score is what you caught on your own turn — the same job for everyone, so the winner is the best hunter and prey play is how you keep the others' scores down. A turn ends early if every small one reaches Adult. One human plays it as a single turn, exactly as before.)* |
 | **Reef** (sandbox) | 1–4 | No win condition, pick any tier, tune giant density. For messing around and screenshots. |
 
-Bots (the current "nearest enemy" bots become the needs-based AI above) fill
-every mode, so nothing requires a second controller.
+Bots (the current "nearest enemy" bots become the needs-based AI above) fill the
+seats in Hunter & Hunted; Rise and Reef are whoever turned up.
 
-> **As built.** All four modes ship (`updateModes()` in `src/sim/game.ts`), with
+> **As built.** Three modes ship (`updateModes()` in `src/sim/game.ts`) — Feeding
+> Frenzy is gone, folded into Rise, which is co-op or versus depending on how the
+> people playing it behave — with
 > everything this table asks of them: co-op's shared nutrition and its **revive**
 > (a downed ally stays down for ten seconds when a team-mate was near enough to
 > matter, and holding station over them brings them back with their tier

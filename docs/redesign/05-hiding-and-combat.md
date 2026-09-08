@@ -14,6 +14,20 @@ Implemented September 2026. This supersedes the original design's Y signature ab
   spot and the hit windows, all of them inside a body length or two, never reached what the player
   aimed at.
 
+  A special is never a downgrade of the button it took. Because it *replaces* the heavy rather
+  than adding to it, `specialHit` (same file) floors its damage and poise against the creature's
+  own heavy and keeps the heavy's armour piercing and guard break, so the special's own numbers
+  only ever raise them. Every heavy special on both rosters was under that floor before it existed
+  — Dunkleosteus' jaw shear landed 40 where its plain bite lands 70 — which made owning a special
+  a straight downgrade of RT. The three Cambrian filter-feeding sweeps were the extreme case: they
+  did no damage at all, so RT on those three was an attack button that could not attack. They now
+  land the creature's own heavy through the same floor while they feed.
+
+  Specials on a button whose action still happens are deliberately *not* floored: the guard
+  specials parry and then do their extra (`bellCorral`, `shellUp`, `anchor`, `bristleFlare`,
+  `enroll`, `adhesiveGlide`, `brushDisplay`), and the hide specials hide and then do theirs. Those
+  are bonuses, so their own smaller numbers are the point.
+
   The aim prompt reads the same table. It announces the move's own name — "RT · SNATCH", not
   "RT · POUNCE" — lights only inside the reach of *that* move rather than the pounce's much longer
   one, and greys out on the gate the button actually checks (`Game.heavyMove`). The three

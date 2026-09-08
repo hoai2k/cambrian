@@ -13,20 +13,22 @@ import { DEVONIAN_RULES } from './devonian/rules';
  * these calls, so the two eras never share gameplay code paths they do not both want.
  */
 export interface EraHud {
-  /** 0..100 standing, the era's progress meter. */
+  /** 0..100 growth meter: what this animal has eaten, which is what moults it up a stage. */
   standing: number;
+  /**
+   * 0..1 toward the *next* moult, which is what the HUD ring reads. The whole meter would answer a
+   * different question ("how grown am I overall") and leave the ring nowhere near full at the
+   * moment the body moults — in both eras a full ring means the next stage, and nothing else.
+   */
+  stageProgress: number;
   rung: number; rungName: string; stage: string;
   /** 0..1 air remaining, for air breathers only. */
   air?: number;
-  /** This player currently holds range here. */
-  inRange: boolean;
   beached: boolean;
   /** Dead zones as world offsets from the player and radii, for the radar. */
   deadZones: { dx: number; dz: number; r: number }[];
-  /** Seconds this player has been Dominant (standing at 100), for the win countdown. */
-  dominantT: number;
-  /** The last few standing sources, newest last, for the ring's ticks. */
-  recent: string[];
+  /** Seconds this player has held Prime, for Rise's win countdown. */
+  primeT: number;
   inDeadZone: boolean;
 }
 
@@ -54,8 +56,6 @@ export interface EraRules {
   init(g: Game): void;
   /** After every fixed step, before the events are drained by the renderer. */
   step(g: Game, dt: number): void;
-  /** Every event this step produced (the renderer drains them afterwards). */
-  onEvents(g: Game, events: readonly WorldEvent[]): void;
   /** Nutrition a player or bot just gained; `food` is the eaten actor when there is one. */
   onNutrition(g: Game, a: Actor, amount: number, food: Actor | undefined): void;
   /** When true the shared nutrition → tier growth runs; when false the era owns growth. */

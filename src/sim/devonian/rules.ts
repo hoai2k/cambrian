@@ -6,32 +6,28 @@ import type { Game } from '../game';
 import type { Actor, Mode, WorldEvent } from '../types';
 import { BIOME_DANGER, biomeAt, groundHeight, sampleCurrent, shoreDistance, SHORE_WALL, SURFACE_Y } from '../world';
 import { bodyRadius } from '../actors';
-import { ADULT_STAGE, devActor, DOMINANT, HOLD_TO_WIN, PRIME_STAGE, RUNG_NAMES, STAGE_AT, STAGES, stageForScale, stageScale, stateFor, type DeadZone, type DevActor } from './state';
+import { ADULT_STAGE, devActor, GROWN, HOLD_TO_WIN, PRIME_STAGE, RUNG_NAMES, STAGE_AT, STAGES, stageForScale, stageProgress, stageScale, stateFor, type DeadZone, type DevActor } from './state';
 import { camoDrain, installDevonianSpecials, stepAbility, stepGuardSpecial, useAbility, ySpecial } from './specials';
 import { botNursery, canBreach, sanctuary, spawnInCover, spawnProtect, spawnY, swim, wanderY } from './swim';
 
 /**
- * Devonian Domination (docs/redesign/08-devonian-domination.md). Progress is standing within a
- * rung, not growth; range is a soft territory; armour has a soft side; air breathers must surface
- * and dead zones punish gills; the limbed animals can climb the shore; shells jet and hover; the
- * arthropods moult and leave a decoy; rung II fish lead shoals. All of it hangs off the flags on
- * the creature definitions and the hooks in src/sim/era-rules.ts; nothing here runs in the
- * Cambrian build.
+ * The Devonian era rules (docs/redesign/08-devonian-domination.md).
+ *
+ * The era plays the same three modes as the Cambrian; what it changes is the sea and the animals
+ * in it. You grow on what you eat, as everywhere else — the meter behind the five stages is fed
+ * by feeding and nothing else — and around that: armour has a soft side; air breathers must
+ * surface and dead zones punish gills; the limbed animals can climb the shore; shells jet and
+ * hover; the arthropods moult and leave a decoy behind; the rung II fish lead shoals. All of it
+ * hangs off the flags on the creature definitions and the hooks in src/sim/era-rules.ts; nothing
+ * here runs in the Cambrian build.
  */
 
-// ---- standing sources, weighted per rung so every rung fills at about the same pace ----
-const W = {
-  feed:   [0, 0.55, 0.28, 0.14, 0.09],   // per unit of nutrition
-  escape: [0, 9, 6, 3, 0],
-  rival:  [0, 6, 6, 12, 5],
-  range:  [0, 0.26, 0.4, 0.6, 0.9],      // per second holding range
-  shoal:  [0, 0, 0.05, 0, 0],            // per follower per second
-  moult:  [0, 6, 0, 0, 0],
-  anoxia: [0, 4, 4, 4, 4],
-  open:   [0, 0.15, 0, 0, 0],            // benthos: per second alive in the open
-} as const;
-const RANGE_R = 60;
-const DECAY_AFTER = 20, DECAY = 0.15, GIANT_UNFED_AFTER = 40, GIANT_DECAY = 0.35;
+/**
+ * What a meal is worth, per rung, so a hatchling of every rung fills its five stages at about the
+ * same pace on the food its size can actually catch. This is the era's whole growth economy: a
+ * Cambrian larva grows on nutrition and so does a Devonian hatchling.
+ */
+const FEED = [0, 0.55, 0.28, 0.14, 0.09] as const;   // standing per unit of nutrition
 const AIR_SECONDS = 60, AIR_LOW = 0.25;
 const ZONE_R = 35, ZONE_LIFE = 120, ZONE_EVERY = 150;
 const EXUVIA_COVER = 8;
@@ -40,15 +36,14 @@ const rungOf = (a: Actor) => creature(a.creature).rung ?? 2;
 const isPlayerish = (a: Actor) => a.controller === 'player' || a.controller === 'bot';
 const players = (g: Game) => g.actors.filter(isPlayerish);
 
-function gain(g: Game, a: Actor, d: DevActor, amount: number, label: string) {
+/** Feeding is the only thing that grows an animal here, exactly as nutrition is in the Cambrian. */
+function gain(g: Game, a: Actor, d: DevActor, amount: number) {
   if (amount <= 0 || !isAlive(a) || d.beached) return;
   const before = d.standing;
-  d.standing = clamp(d.standing + amount, 0, DOMINANT);
+  d.standing = clamp(d.standing + amount, 0, GROWN);
   if (d.standing > before) {
-    d.sinceGain = 0;
-    if (d.recent[d.recent.length - 1] !== label) { d.recent.push(label); if (d.recent.length > 4) d.recent.shift(); }
-    // allies near a scoring player share a little of it (co-op)
-    if (g.mode === 'domination' && amount > 0.5) for (const p of g.players) if (p !== a && isAlive(p) && dist(p.pos, a.pos) < 30) { const pd = devActor(g, p); pd.standing = clamp(pd.standing + amount * 0.3, 0, DOMINANT); pd.sinceGain = 0; }
+    // Rise shares the feast: anyone close by gets a little of a decent meal, as in the Cambrian.
+    if (g.mode === 'rise' && amount > 0.5) for (const p of g.players) if (p !== a && isAlive(p) && dist(p.pos, a.pos) < 30) { const pd = devActor(g, p); pd.standing = clamp(pd.standing + amount * 0.3, 0, GROWN); }
     checkStage(g, a, d);
   }
 }
@@ -71,35 +66,6 @@ function checkStage(g: Game, a: Actor, d: DevActor) {
     ex.state = 'dead'; ex.hp = 0; ex.corpseT = 0; ex.eaten = 0.85; ex.deathY = ex.pos.y; ex.sparkled = true;
     d.exuvia = ex.id; d.exuviaT = 0;
     g.events.push({ kind: 'moult', pos: { ...a.pos }, actor: a.id, player: a.player, strength: 1 });
-    gain(g, a, d, W.moult[rungOf(a)], 'moult');
-  }
-}
-
-// ---- range ----
-function updateRange(g: Game, a: Actor, d: DevActor, dt: number) {
-  if (!isAlive(a) || d.beached) { d.inRange = false; return; }
-  const rung = rungOf(a);
-  let dominant = true;
-  for (const o of players(g)) {
-    if (o === a || !isAlive(o) || rungOf(o) !== rung || distXZ(o.pos, a.pos) > RANGE_R) continue;
-    if (devActor(g, o).standing >= d.standing) { dominant = false; break; }
-  }
-  const was = d.inRange;
-  d.inRange = dominant;
-  if (dominant) { d.rangeT += dt; gain(g, a, d, W.range[rung] * dt, 'range'); }
-  else d.rangeT = 0;
-  if (was !== d.inRange && a.controller === 'player') g.events.push({ kind: d.inRange ? 'rangeClaim' : 'rangeLost', pos: { ...a.pos }, actor: a.id, player: a.player });
-}
-/** Wild animals of your rung give way inside your range. Once a second. */
-function giveWay(g: Game, a: Actor) {
-  const rung = rungOf(a);
-  for (const o of g.nearby(a.pos, RANGE_R)) {
-    if (o.controller !== 'ambient' || !o.brain || rungOf(o) !== rung) continue;
-    if (o.brain.goal === 'wander' || o.brain.goal === 'graze') {
-      const dx = o.pos.x - a.pos.x, dz = o.pos.z - a.pos.z, l = Math.hypot(dx, dz) || 1;
-      o.brain.wanderTo = { x: a.pos.x + dx / l * (RANGE_R + 20), y: o.pos.y, z: a.pos.z + dz / l * (RANGE_R + 20) };
-      o.brain.goal = 'wander'; o.brain.goalT = 0;
-    }
   }
 }
 
@@ -145,7 +111,6 @@ function updateDeadZoneEffects(g: Game, a: Actor, d: DevActor, dt: number) {
     a.stamina = Math.max(0, a.stamina - 30 * dt);                // outpaces the shared regen (24/s at rest): no recovery in dead water
     if (d.deadT > 6 && isAlive(a)) { a.hp = Math.max(1, a.hp - a.hpMax * 0.02 * dt); a.sinceHit = 0; }
   } else if (d.deadZoneIn && !inside) {
-    if (d.deadT >= 5 && isAlive(a)) gain(g, a, d, W.anoxia[rungOf(a)], 'survived');
     d.deadT = 0;
   }
   d.deadZoneIn = inside;
@@ -178,7 +143,7 @@ function updateShoal(g: Game, a: Actor, d: DevActor, dt: number) {
   }
   if (n > d.followers && a.controller === 'player') g.events.push({ kind: 'shoalJoin', pos: { ...a.pos }, actor: a.id, player: a.player });
   d.followers = n;
-  if (n) gain(g, a, d, W.shoal[rungOf(a)] * n * dt, 'shoal');
+  void dt;
 }
 function updateExuvia(g: Game, a: Actor, d: DevActor, dt: number) {
   if (d.moultSoft > 0) d.moultSoft = Math.max(0, d.moultSoft - dt);
@@ -213,21 +178,12 @@ export const DEVONIAN_RULES: EraRules = {
       updateShore(g, a, d);
       updateAir(g, a, d, dt);
       updateDeadZoneEffects(g, a, d, dt);
-      updateRange(g, a, d, dt);
       updateShoal(g, a, d, dt);
       updateExuvia(g, a, d, dt);
       stepGuardSpecial(g, a, d, dt);
-      if (second) giveWay(g, a);
-      // benthos: being alive in the open is itself an achievement
-      if (W.open[rung] && isAlive(a) && !isHidden(a) && a.hideMode === 'none') { d.openT += dt; gain(g, a, d, W.open[rung] * dt, 'alive'); }
-      // decay: a standing you do nothing for slips; a giant that does not eat starves
-      d.sinceGain += dt; d.sinceEat += dt;
-      if (isAlive(a) && d.sinceGain > DECAY_AFTER) d.standing = Math.max(0, d.standing - DECAY * dt);
-      if (isAlive(a) && rung === 4 && d.sinceEat > GIANT_UNFED_AFTER) d.standing = Math.max(0, d.standing - GIANT_DECAY * dt);
-      // a stage the standing already earned is taken as soon as the last ceremony is over
+      d.sinceEat += dt;
+      // a stage the food already paid for is taken as soon as the last ceremony is over
       checkStage(g, a, d);
-      // dominant clock
-      if (isAlive(a) && d.standing >= DOMINANT - 1e-6) { if (d.dominantT === 0 && a.controller === 'player') g.events.push({ kind: 'dominant', pos: { ...a.pos }, actor: a.id, player: a.player }); d.dominantT += dt; } else d.dominantT = 0;
       // a giant with no bite never hunts
       if (def.noBite && a.brain && (a.brain.goal === 'hunt' || a.brain.goal === 'notice')) { a.brain.goal = 'patrol'; a.brain.target = -1; }
     }
@@ -237,30 +193,13 @@ export const DEVONIAN_RULES: EraRules = {
     for (const a of g.actors) if (a.state === 'dead' && a.corpseT < dt * 2 && a.eaten < 1) for (const z of s.deadZones) if (distXZ(a.pos, z.pos) < z.r) a.eaten = 1;
   },
 
-  onEvents(g, events) {
-    for (const e of events) {
-      const actor = e.actor >= 0 ? g.byId(e.actor) : undefined;
-      if (!actor || !isPlayerish(actor)) continue;
-      const d = devActor(g, actor), rung = rungOf(actor);
-      switch (e.kind) {
-        case 'escape': gain(g, actor, d, W.escape[rung], 'escape'); break;
-        case 'kill': { const v = e.other != null ? g.byId(e.other) : undefined; if (v && rungOf(v) === rung && bandOf(actor, v) === 'rival') gain(g, actor, d, W.rival[rung], 'rival'); break; }
-        case 'routed': { // actor is the one routed; `other` drove it off
-          const winner = e.other != null ? g.byId(e.other) : undefined;
-          if (winner && isPlayerish(winner) && rungOf(winner) === rung) gain(g, winner, devActor(g, winner), W.rival[rungOf(winner)] * 0.6, 'rival');
-          break;
-        }
-      }
-    }
-  },
-
   onNutrition(g, a, amount, food) {
     const d = devActor(g, a);
     d.sinceEat = 0;
     const def = creature(a.creature);
-    let k = W.feed[rungOf(a)] * amount;
+    let k = FEED[rungOf(a)] * amount;
     if (food && food.state === 'dead' && def.ability === 'scavenge') k *= 2;
-    gain(g, a, d, k, 'feed');
+    gain(g, a, d, k);
   },
 
   armour(attacker, victim, dir) {
@@ -301,46 +240,30 @@ export const DEVONIAN_RULES: EraRules = {
     if (g.mode !== 'reef' && d.stage > 0) d.stage -= 1;
     a.scale = stageScale(creature(a.creature).adultLength, d.stage);
     d.standing = Math.min(d.standing, d.stage + 1 <= PRIME_STAGE ? STAGE_AT[d.stage + 1] - 1 : d.standing);
-    d.air = 1; d.deadT = 0; d.deadZoneIn = false; d.moultSoft = 0; d.exuvia = -1; d.followers = 0; d.dominantT = 0; d.beached = false;
+    d.air = 1; d.deadT = 0; d.deadZoneIn = false; d.moultSoft = 0; d.exuvia = -1; d.followers = 0; d.primeT = 0; d.beached = false;
   },
 
   updateModes(g, dt) {
-    // Survival: grow through the five stages on what you can catch, then hold Prime. The shared
-    // `rise` case in game.ts wins on tier, which the Devonian never advances — it grows in stages —
-    // so it never fires there and the era decides this one.
-    if (g.mode === 'rise') {
-      for (const a of players(g)) {
-        const d = devActor(g, a);
-        if (d.stage >= PRIME_STAGE && isAlive(a)) {
-          d.primeT += dt;
-          if (d.primeT >= HOLD_TO_WIN && g.state.status === 'playing' && !g.endless) {
-            const name = creature(a.creature).name;
-            g.state = { status: a.player >= 0 ? 'won' : 'lost', winner: a.player,
-              message: a.player >= 0 ? `${name} grew up and held the sea.` : `A rival ${name} grew up first.` };
-          }
-        } else d.primeT = 0;
-      }
-      return;
-    }
-    void dt;
-    if (g.mode !== 'domination' && g.mode !== 'foodchain') return;
-    const contenders = players(g);
-    for (const a of contenders) {
+    // Rise: grow through the five stages on what you catch, then hold Prime. The shared `rise`
+    // case in game.ts wins on tier, which the Devonian never advances — it grows in stages — so
+    // it never fires there and the era decides this one.
+    if (g.mode !== 'rise') return;
+    for (const a of players(g)) {
       const d = devActor(g, a);
-      if (d.dominantT >= HOLD_TO_WIN && g.state.status === 'playing' && !g.endless) {
-        const name = creature(a.creature).name;
-        g.state = { status: a.player >= 0 ? 'won' : 'lost', winner: a.player, message: a.player >= 0 ? `${name} dominates the ${RUNG_NAMES[rungOf(a)].toLowerCase()}.` : `A rival ${name} owns its rung.` };
-      }
-    }
-    if (g.mode === 'foodchain' && g.time > 12 * 60 && g.state.status === 'playing') {
-      const best = [...contenders].sort((x, y) => devActor(g, y).standing - devActor(g, x).standing)[0];
-      if (best) g.state = { status: best.player >= 0 ? 'won' : 'lost', winner: best.player, message: best.player >= 0 ? `Player ${best.player + 1} has the highest standing in the chain.` : `A rival ${creature(best.creature).name} out-stood everyone.` };
+      if (d.stage >= PRIME_STAGE && isAlive(a)) {
+        d.primeT += dt;
+        if (d.primeT >= HOLD_TO_WIN && g.state.status === 'playing' && !g.endless) {
+          const name = creature(a.creature).name;
+          g.state = { status: a.player >= 0 ? 'won' : 'lost', winner: a.player,
+            message: a.player >= 0 ? `${name} grew up and held the sea.` : `A rival ${name} grew up first.` };
+        }
+      } else d.primeT = 0;
     }
   },
 
-  /** Survival and Domination both win on a held timer; zero them so play resumes with the sea open. */
+  /** Rise wins on a held timer; zero it so play resumes with the sea open. */
   continueMatch(g) {
-    for (const a of players(g)) { const d = devActor(g, a); d.primeT = 0; d.dominantT = 0; }
+    for (const a of players(g)) devActor(g, a).primeT = 0;
   },
 
   /**
@@ -349,16 +272,16 @@ export const DEVONIAN_RULES: EraRules = {
    */
   scoreLine(g, a) {
     const d = devActor(g, a);
-    return { rank: `${STAGES[d.stage]} · ${RUNG_NAMES[rungOf(a)]}`, progress: Math.max(0, Math.min(1, d.standing / 100)) };
+    return { rank: `${STAGES[d.stage]} · ${RUNG_NAMES[rungOf(a)]}`, progress: stageProgress(d) };
   },
 
   hud(g, i): EraHud | undefined {
     const p = g.players[i]; if (!p) return undefined;
     const d = devActor(g, p), def = creature(p.creature), s = stateFor(g);
     return {
-      standing: d.standing, rung: rungOf(p), rungName: RUNG_NAMES[rungOf(p)], stage: STAGES[d.stage],
+      standing: d.standing, stageProgress: stageProgress(d), rung: rungOf(p), rungName: RUNG_NAMES[rungOf(p)], stage: STAGES[d.stage],
       air: def.breathing === 'air' ? d.air : undefined,
-      inRange: d.inRange, beached: d.beached, dominantT: d.dominantT, recent: [...d.recent], inDeadZone: d.deadZoneIn,
+      beached: d.beached, primeT: d.primeT, inDeadZone: d.deadZoneIn,
       deadZones: s.deadZones.filter((z) => distXZ(z.pos, p.pos) < 400).map((z) => ({ dx: z.pos.x - p.pos.x, dz: z.pos.z - p.pos.z, r: z.r })),
     };
   },
@@ -368,8 +291,7 @@ export const DEVONIAN_RULES: EraRules = {
     const d = devActor(g, p), def = creature(p.creature), rung = rungOf(p);
     if (d.deadZoneIn && def.breathing !== 'air') return 'Dead water. Get out of it, or up to the surface if you can breathe.';
     if (def.breathing === 'air' && d.air < AIR_LOW) return 'Air is low. {rise} to the surface and gulp.';
-    if (g.time < 12) return rung === 1 ? 'Feed, hide, moult. Escaping a hunter is worth more than anything you can eat.' : rung === 2 ? 'Feed and keep your shoal. Losing a hunter scores.' : rung === 3 ? 'Hunt the shoal, drive off your rivals, hold your range.' : 'Stay fed. The sea is hiding from you.';
-    if (d.standing > 20 && !d.inRange && rung >= 3) return 'Hold ground with nobody of your rung above you: range scores.';
+    if (g.time < 12) return rung === 1 ? 'Feed, hide, moult. Everything out there is bigger than you are today.' : rung === 2 ? 'Feed and keep your shoal. You grow on what you catch.' : rung === 3 ? 'Hunt the shoals. Five stages between you and Prime.' : 'Stay fed. The sea is hiding from you.';
     if (def.shell && g.time < 40) return 'Sprint jets you backward. Rise and sink are free. Block withdraws into the shell.';
     if ((def.shoreReach ?? 0) > 0 && g.time < 40) return 'You can push into water nothing with gills can follow you into.';
     return undefined;
@@ -377,5 +299,5 @@ export const DEVONIAN_RULES: EraRules = {
 };
 
 /** Exposed for tests. */
-export { W as STANDING_WEIGHTS, RANGE_R, AIR_SECONDS, ZONE_R };
+export { FEED as FEED_WEIGHTS, AIR_SECONDS, ZONE_R };
 export type { DeadZone };
