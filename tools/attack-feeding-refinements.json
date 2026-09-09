@@ -25,9 +25,11 @@
       "Attack",
       "Heavy",
       "Eat",
-      "Dash"
+      "Dash",
+      "Grab"
     ],
-    "note": "If this creature has a pending structural redesign, coordinate motion with its replacement; review each resulting animation individually."
+    "note": "If this creature has a pending structural redesign, coordinate motion with its replacement; review each resulting animation individually.",
+    "grip": "Has a Grab clip; review it as a *held* grip. The proboscis closes on what it caught and keeps hold of it — the same pose carries the animal while it clings to something bigger — rather than snatching and letting go. Snatch (Y) is now a grab when the button is held, so the clip has to sit under a held press as well as a tap."
   },
   {
     "era": "cambrian",
@@ -249,9 +251,11 @@
       "Attack",
       "Heavy",
       "Eat",
-      "Dash"
+      "Dash",
+      "Grab"
     ],
-    "note": "If this creature has a pending structural redesign, coordinate motion with its replacement; review each resulting animation individually."
+    "note": "If this creature has a pending structural redesign, coordinate motion with its replacement; review each resulting animation individually.",
+    "grip": "Has a Grab clip; review it as a held grip. The long legs fold around and brace — a spider's hold, not a poke — and the same bracing pose is what it wears clinging to a flank."
   },
   {
     "era": "devonian",
@@ -263,9 +267,11 @@
       "Attack",
       "Heavy",
       "Eat",
-      "Dash"
+      "Dash",
+      "Grab"
     ],
-    "note": "If this creature has a pending structural redesign, coordinate motion with its replacement; review each resulting animation individually."
+    "note": "If this creature has a pending structural redesign, coordinate motion with its replacement; review each resulting animation individually.",
+    "grip": "Has a Grab clip; review it as a held grip. Several arms close on the body and *stay* closed, the others adjusting around it, and the same hold reads as the shell hanging off a flank while clinging. Its own interpretation, not a copy of the orthocone's waveform."
   },
   {
     "era": "devonian",
@@ -277,9 +283,11 @@
       "Attack",
       "Heavy",
       "Eat",
-      "Dash"
+      "Dash",
+      "Grab"
     ],
-    "note": "Motion-v3 refined Attack/Bite/Heavy/Eat and authored-grasp runtime integrated as preview; full19/LOD7 actions. Actual 60-view art and 12 production rig/prey scenarios pass. Interactive game/controller playtest and broader individual quality review remain."
+    "note": "Motion-v3 refined Attack/Bite/Heavy/Eat and authored-grasp runtime integrated as preview; full19/LOD7 actions. Actual 60-view art and 12 production rig/prey scenarios pass. Interactive game/controller playtest and broader individual quality review remain.",
+    "grip": "Has a Grab clip; review it as a held grip. The crown closes proximal-to-distal and holds, tips still working; clinging is that hold with the shell trailing behind the arms rather than a lash."
   },
   {
     "era": "devonian",

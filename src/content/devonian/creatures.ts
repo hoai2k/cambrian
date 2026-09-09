@@ -250,6 +250,7 @@ export const DEVONIAN_CREATURES: readonly CreatureDef[] = [
   },
   {
     id: 'michelinoceras', name: 'Michelinoceras', species: 'M. sp. (Devonian)',
+    grasp: true,
     kind: 'Nautiloid', kindNote: 'A straight-shelled (orthocone) nautiloid cephalopod — the chambered-shell lineage the living nautilus belongs to.',
     locality: 'Early Devonian · Sardinia',
     tagline: 'A spear that swims backwards.',
@@ -355,6 +356,7 @@ export const DEVONIAN_CREATURES: readonly CreatureDef[] = [
   },
   {
     id: 'palaeoisopus', name: 'Palaeoisopus', species: 'P. problematicus',
+    grasp: true,
     kind: 'Sea spider', kindNote: 'A pycnogonid, or sea spider: long legs, almost no body, and the first sea spider fossil ever described.',
     locality: 'Early Devonian · Hunsrück',
     tagline: 'A spider that swims, on legs that were made for it.',
@@ -372,6 +374,7 @@ export const DEVONIAN_CREATURES: readonly CreatureDef[] = [
   },
   {
     id: 'manticoceras', name: 'Manticoceras', species: 'M. intumescens',
+    grasp: true,
     kind: 'Ammonoid', kindNote: 'A goniatite — the coiled shelled cephalopods that came before the ammonites, and their ancestors.',
     locality: 'Late Devonian · Frasnian seas',
     tagline: 'Hang in the water for as long as you like. Nothing else can.',

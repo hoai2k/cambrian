@@ -69,7 +69,7 @@ Two clips the pass now owes, both requested with the grip mechanic that shipped 
 (`docs/redesign/05-hiding-and-combat.md` · Taking hold). The runtime already plays them the moment
 they exist: nothing here needs a code change to land.
 
-### `Grab`, for the eleven animals that grip
+### `Grab`, for the fifteen animals that grip
 
 `grasp: true` in the content is the mechanic; the clip is the performance. A grip is *held* — the
 button stays down, the animal keeps hold, and the same pose does double duty as the cling while
@@ -87,10 +87,11 @@ appendage-specific by design. The two that are *not* obvious:
 - **Furcaster grabs with its whole body.** The arms wrap and the disc flattens onto the target so
   the animal *sticks* to it, oral surface against the host. Never one arm poking forward.
 
-Anomalocaris, Nectocaris, Jaekelopterus, Manticoceras, Michelinoceras, Opabinia and Palaeoisopus
-already carry a `Grab` clip; those get reviewed against the held-grip rules rather than authored
-from nothing. Cambroraster, Leanchoilia, Isoxys, Tamisiocaris, Ottoia, Walliserops and Furcaster
-need one. Until it lands the runtime falls back to `Heavy`/`Attack`, which reads as a swing where
+Anomalocaris, Opabinia, Nectocaris, Jaekelopterus, Manticoceras, Michelinoceras and Palaeoisopus
+already carry a `Grab` clip — all seven of them now grasp, so those clips are live rather than
+idle, and each is reviewed against the held-grip rules rather than authored from nothing: the
+question for them is whether the grip *stays closed* and reads as a cling, not whether it exists.
+Cambroraster, Leanchoilia, Isoxys, Tamisiocaris, Ottoia, Walliserops and Furcaster need one. Until it lands the runtime falls back to `Heavy`/`Attack`, which reads as a swing where
 a hold belongs — that is the visible gap this closes.
 
 **Hallucigenia is done, as the first of them** (`performances/hallucigenia.mjs`, delivered
