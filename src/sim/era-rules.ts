@@ -1,7 +1,7 @@
 import { ACTIVE_ERA } from '../content';
 import type { Vec3 } from '../shared/math';
 import type { Game } from './game';
-import type { Actor, Mode, WorldEvent } from './types';
+import type { Actor, InputFrame, Mode, WorldEvent } from './types';
 import type { CreatureId } from './creatures';
 import type { ExpansionContext } from './expansion-abilities';
 import { DEVONIAN_RULES } from './devonian/rules';
@@ -112,6 +112,15 @@ export interface EraRules {
    * the stick magnitude, `cruise` the speed the shared rules would give.
    */
   swim(g: Game, a: Actor, dir: Vec3, mag: number, cruise: number, burstPressed: boolean): { speed: number; turn: number; impulse: number };
+  /**
+   * The vertical assist for this body this step, in units/s, positive up: what the rise and sink
+   * buttons are worth to it and anything it does for itself. `base` is the rate the shared rules
+   * would give (RISE_RATE for its size, already carrying a jetter's free hover) and `burst` the
+   * sprint multiplier the same press is buying horizontally, so an era can decide whether a sprint
+   * carries into a climb. With no rules the shared behaviour is exactly `rise ? base : sink ? -base
+   * : 0`, which is what the Cambrian keeps.
+   */
+  rise(g: Game, a: Actor, input: InputFrame, base: number, burst: number): number;
   /** May this body leave the water when it drives hard at the surface? */
   canBreach(a: Actor): boolean;
   /** Height a body hatches at, given the floor under it and its length. */
