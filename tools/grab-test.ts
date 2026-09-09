@@ -41,11 +41,24 @@ function inFront(p: Actor, o: Actor) {
 
 // --- every animal the design calls a grasper is one ---
 {
-  const want = ['anomalocaris', 'hallucigenia', 'nectocaris', 'ottoia', 'cambroraster', 'leanchoilia', 'isoxys', 'tamisiocaris'];
+  const want = ['anomalocaris', 'opabinia', 'hallucigenia', 'nectocaris', 'ottoia', 'cambroraster', 'leanchoilia', 'isoxys', 'tamisiocaris'];
   const missing = want.filter((id) => !creature(id as never).grasp);
   check('the Cambrian graspers can grasp', missing.length === 0, missing.length ? `missing: ${missing.join(', ')}` : want.join(', '));
   const graspers = CREATURES.filter((c) => c.grasp).map((c) => c.id);
   check('...and nothing else claims to', graspers.every((id) => want.includes(id as string)), graspers.join(', '));
+}
+
+// --- either attack button arms the grip, and only for an animal that has one ---
+{
+  const g = new Game('reef', [{ creature: 'opabinia', device: 'keyboard', ready: true }], 4);
+  const p = g.players[0]; p.spawnProtect = 1e6;
+  const step = (f: Partial<InputFrame>) => { g.step(1 / 60, new Map([[0, { ...emptyInput(), ...f }]])); g.events.length = 0; return p.graspHold; };
+  check('the ability button arms the grip as well as the heavy', step({ ability: true }) && step({ heavy: true }), 'Y and RT both');
+  check('...and letting both go disarms it', !step({}), `${p.graspHold}`);
+  const w = new Game('reef', [{ creature: 'waptia', device: 'keyboard', ready: true }], 4);
+  const q = w.players[0]; q.spawnProtect = 1e6;
+  w.step(1 / 60, new Map([[0, { ...emptyInput(), heavy: true, ability: true }]])); w.events.length = 0;
+  check('an animal with no grip never arms one', !q.graspHold, `${q.graspHold}`);
 }
 
 // --- a held attack takes hold of prey, and letting go is a mouthful ---
