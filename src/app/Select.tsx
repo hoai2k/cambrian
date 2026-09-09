@@ -1,5 +1,4 @@
 import { useEffect, useLayoutEffect, useRef, useState, type ReactNode } from 'react';
-import { ModelStatusBadge } from '../shared/ModelStatusBadge';
 import { ACTIVE_ERA } from '../content';
 import { assetPaths } from '../content/asset-paths';
 import { hideLabel, hideDescription, HEAVY_SPECIALS, DEFENSIVE_SPECIALS } from '../sim/concealment';
@@ -210,7 +209,6 @@ export function SelectScreen(p: Props) {
                 <CreaturePortrait creatureId={c.id} kind="thumb" assetBase={ASSETS} alt="" draggable={false} loading="eager" />
                 <FitName name={c.name} />
                 {c.kind && <span className="cell-kind">{c.kind}</span>}
-                <ModelStatusBadge status={ACTIVE_ERA.assets.modelStatus?.[c.id]} note={ACTIVE_ERA.assets.modelNotes?.[c.id]} compact />
                 <span className="cell-rings">
                   {hovering.map(({ i, pl }) => <i key={i} style={{ ['--c' as string]: PLAYER_COLORS[i], ['--k' as string]: i }} className={pl.ready ? 'ring locked' : 'ring'} />)}
                 </span>
@@ -233,7 +231,6 @@ export function SelectScreen(p: Props) {
                   <button className="remove" aria-label={`Remove player ${i + 1}`} onClick={() => p.onRemove(i)}>×</button>
                 </div>
                 <div className="hero">
-                  <ModelStatusBadge status={ACTIVE_ERA.assets.modelStatus?.[def.id]} note={ACTIVE_ERA.assets.modelNotes?.[def.id]} />
                   <CreaturePortrait key={def.id} creatureId={def.id} kind="select" assetBase={ASSETS} alt={`${def.name} reconstruction`} draggable={false} />
                 </div>
                 <CopyBox>
