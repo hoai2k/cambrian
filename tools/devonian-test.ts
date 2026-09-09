@@ -1,5 +1,5 @@
 /**
- * Devonian Domination: the era pack, its rung bands, standing, air, dead water, shore reach,
+ * Devonian Domination: the era pack, its rung bands, standing, breathing, dead water, shore reach,
  * armour and determinism, all headless. Run: npm run devonian
  *
  * The era is selected before the simulation modules are imported, because those read ACTIVE_ERA
@@ -17,7 +17,7 @@ const { Game } = await import('../src/sim/game');
 const { RULES } = await import('../src/sim/era-rules');
 const { stateFor, devActor, stageScale, ADULT_STAGE, PRIME_STAGE, STAGE_AT, HOLD_TO_WIN } = await import('../src/sim/devonian/state');
 const { coverAt } = await import('../src/sim/world');
-const { bandOf, isAlive, lengthOf } = await import('../src/sim/actors');
+const { applyScaleStats, bandOf, isAlive, lengthOf } = await import('../src/sim/actors');
 const { PLAYABLE } = await import('../src/sim/creatures');
 const { creature } = await import('../src/sim/creatures');
 const { emptyInput } = await import('../src/sim/types');
@@ -27,6 +27,7 @@ type Biome = import('../src/sim/world').Biome;
 type InputFrame = import('../src/sim/types').InputFrame;
 type Mode = import('../src/sim/types').Mode;
 import { heading } from '../src/shared/math';
+import { wrapAngle } from '../src/shared/math';
 import { isCoop } from '../src/sim/types';
 type CreatureId = import('../src/sim/creatures').CreatureId;
 
@@ -68,8 +69,9 @@ ok(RULES !== undefined && !RULES.growthByNutrition, 'Devonian rules active: grow
 // ---- the animals that take hold, and the clips their grip is owed ----
 {
   const graspers = DEVONIAN.creatures.filter((c) => c.grasp).map((c) => c.id as string);
-  ok(['jaekelopterus', 'walliserops', 'furcaster'].every((id) => graspers.includes(id)) && graspers.length === 3,
-    `the Devonian graspers are the three the design names (${graspers.join(', ')})`);
+  const named = ['jaekelopterus', 'walliserops', 'furcaster', 'manticoceras', 'michelinoceras', 'palaeoisopus'];
+  ok(named.every((id) => graspers.includes(id)) && graspers.length === named.length,
+    `the Devonian graspers are the six the design names (${graspers.join(', ')})`);
   const queue = JSON.parse(fs.readFileSync('tools/attack-feeding-refinements.json', 'utf8')) as { id: string; reviewClips: string[]; grip?: string }[];
   for (const id of graspers) {
     const glb = `public/assets/devonian/creatures/${id}.glb`;
@@ -235,21 +237,109 @@ ok(RULES !== undefined && !RULES.growthByNutrition, 'Devonian rules active: grow
   ok(RULES!.hint(g, 0) === undefined || typeof RULES!.hint(g, 0) === 'string', 'hint is optional text');
 }
 
-// ---- air: lungs need the surface ----
+// ---- breathing both ways: a stamina economy, not a countdown ----
+/**
+ * Nothing on this roster is lung-only, so nothing here can drown and nothing carries a meter that
+ * runs out (see `breathing` in src/content/creature-types.ts). What lungs buy is a place to go: a
+ * quarter of the usual stamina recovery under water, and the whole bar back on touching the surface.
+ */
 {
   const g = new Game('reef', [{ creature: 'tiktaalik', device: 'keyboard', ready: true }, { creature: 'coccosteus', device: 0, ready: true }]);
   const [tik, coc] = g.players;
-  const dt = devActor(g, tik), dc = devActor(g, coc);
-  tik.pos.y = SURFACE_Y - 20; coc.pos.y = SURFACE_Y - 20;
-  const inputs = new Map<number, InputFrame>([[0, { ...emptyInput(), sink: true }], [1, { ...emptyInput(), sink: true }]]);
-  for (let i = 0; i < 60 * 20; i++) tick(g, inputs);
-  ok(dt.air < 0.75 && dt.air > 0.5, `Tiktaalik spends air under water (${dt.air.toFixed(2)} after 20 s)`);
-  ok(dc.air === 1 && RULES!.hud(g, 1)!.air === undefined, 'gill breathers have no air meter');
-  ok(RULES!.hud(g, 0)!.air === dt.air, 'the air meter is on the HUD');
-  tik.pos.y = SURFACE_Y - 12; tik.prevT.y = tik.pos.y;               // the refill is what is under test, not the climb from the floor
-  const rise = new Map<number, InputFrame>([[0, { ...emptyInput(), rise: true }], [1, emptyInput()]]);
-  for (let i = 0; i < 60 * 30 && dt.air < 0.999; i++) tick(g, rise);
-  ok(dt.air > 0.99, `surfacing refills the lungs (${dt.air.toFixed(2)})`);
+  for (const p of [tik, coc]) { p.hatching = false; p.state = 'free'; p.stateT = 0; p.stateDur = 0; p.spawnProtect = 0; p.pos.y = 20; p.prevT.y = 20; p.stamina = 0; }
+  ok(RULES!.hud(g, 0)!.bimodal && !RULES!.hud(g, 1)!.bimodal, 'the HUD knows which bodies breathe both ways');
+  const sink = new Map<number, InputFrame>([[0, { ...emptyInput(), sink: true }], [1, { ...emptyInput(), sink: true }]]);
+  for (let i = 0; i < 60 * 5; i++) { tik.pos.y = 20; coc.pos.y = 20; tick(g, sink); }
+  const lung = tik.stamina / tik.staminaMax, gill = coc.stamina / coc.staminaMax;
+  ok(gill > 0.5, `gills recover at the shared rate (${(gill * 100).toFixed(0)}% in 5 s)`);
+  ok(lung > 0 && lung < gill * 0.4, `lungs recover far slower under water (${(lung * 100).toFixed(0)}% against ${(gill * 100).toFixed(0)}%)`);
+  // ...and the whole bar is waiting at the surface.
+  let gulps = 0;
+  tik.pos.y = SURFACE_Y - 2; tik.prevT.y = tik.pos.y;
+  g.step(1 / 60, new Map([[0, emptyInput()], [1, emptyInput()]]));
+  for (const e of g.events) if (e.kind === 'gulp') gulps++;
+  g.events.length = 0;
+  ok(tik.stamina === tik.staminaMax && gulps === 1, `one touch of the surface hands the whole bar back (${gulps} gulp)`);
+}
+
+/**
+ * The climb is free, and free enough that an empty bar cannot strand anything down there: a sprint
+ * or a dash upward costs nothing, still fires on nothing, and on nothing drives only the climb.
+ */
+{
+  const climb = (id: CreatureId, up: boolean, stamina: number) => {
+    const g = new Game('reef', [{ creature: id, device: 'keyboard', ready: true }]);
+    const p = g.players[0];
+    p.hatching = false; p.state = 'free'; p.stateT = 0; p.stateDur = 0; p.spawnProtect = 0;
+    p.pos.y = 20; p.prevT.y = 20; p.stamina = stamina; p.exhausted = 0;
+    const y0 = p.pos.y, x0 = p.pos.x, z0 = p.pos.z;
+    const f: InputFrame = up
+      ? { ...emptyInput(), my: 1, camPitch: -0.7, camYaw: p.yaw, burst: 1, rise: true }
+      : { ...emptyInput(), my: 1, camPitch: 0, camYaw: p.yaw, burst: 1 };
+    for (let i = 0; i < 60 * 3; i++) tick(g, new Map([[0, f]]));
+    return { spent: stamina - p.stamina, climbed: p.pos.y - y0, along: Math.hypot(p.pos.x - x0, p.pos.z - z0) };
+  };
+  const upFull = climb('tiktaalik', true, 100), alongFull = climb('tiktaalik', false, 100);
+  ok(upFull.spent < 1, `sprinting upward costs a lung nothing (${upFull.spent.toFixed(1)} stamina in 3 s)`);
+  ok(alongFull.spent > 15, `sprinting along still costs it (${alongFull.spent.toFixed(1)} stamina)`);
+  ok(climb('cheirolepis', true, 100).spent > 15, 'gills pay for the climb like everything else');
+  const empty = climb('tiktaalik', true, 0), emptyAlong = climb('tiktaalik', false, 0);
+  ok(empty.climbed > 8, `an empty bar still climbs (${empty.climbed.toFixed(1)} units in 3 s)`);
+  ok(emptyAlong.along < alongFull.along * 0.8, `but an empty sprint buys no ground (${emptyAlong.along.toFixed(1)} against ${alongFull.along.toFixed(1)} units)`);
+}
+
+/**
+ * Out of the water, at any size. The breach gate compared vertical speed against a flat 3.2 u/s
+ * and only let a body through from `free`, so a hatchling met a hard invisible wall a body's length
+ * under the surface however it came at it, and a dash — the hardest a body can drive at anything —
+ * was excluded from the one move most likely to launch it. Both are relative to the body now: a
+ * lung leaves the water on rise alone because that is what its body is for, and everything else
+ * still has to drive at the surface, at every size rather than only when grown.
+ */
+{
+  const leaves = (id: CreatureId, scale: number, how: 'rise' | 'swim') => {
+    const g = new Game('reef', [{ creature: id, device: 'keyboard', ready: true }]);
+    const p = g.players[0];
+    p.hatching = false; p.state = 'free'; p.stateT = 0; p.stateDur = 0; p.spawnProtect = 0;
+    p.pos.y = SURFACE_Y - 14; p.prevT.y = p.pos.y;
+    for (let i = 0; i < 60 * 10; i++) {
+      p.scale = scale; applyScaleStats(p, false);
+      const f: InputFrame = how === 'rise'
+        ? { ...emptyInput(), rise: true }
+        : { ...emptyInput(), my: 1, camPitch: -0.7, camYaw: p.yaw, burst: 1 };
+      tick(g, new Map([[0, f]]));
+      if (p.airborne) return true;
+    }
+    return false;
+  };
+  for (const scale of [0.13, 0.3, 1]) {
+    ok(leaves('tiktaalik', scale, 'rise'), `a Tiktaalik at scale ${scale} rises clear of the water — no invisible ceiling`);
+    ok(leaves('cheirolepis', scale, 'swim'), `a Cheirolepis at scale ${scale} breaches when it drives at the surface`);
+  }
+  ok(!leaves('cheirolepis', 1, 'rise'), 'gills still do not step out of the sea on the rise button alone');
+  ok(!leaves('michelinoceras', 1, 'swim'), 'and a shell never leaves the water at all');
+}
+
+/** The winded heartbeat: a nudge toward the surface while the bar is low, and silence once it is not. */
+{
+  const g = new Game('reef', [{ creature: 'tiktaalik', device: 'keyboard', ready: true }]);
+  const p = g.players[0];
+  p.hatching = false; p.state = 'free'; p.stateT = 0; p.stateDur = 0; p.spawnProtect = 0;
+  const count = (stamina: number, seconds: number, y: number) => {
+    let n = 0;
+    for (let i = 0; i < 60 * seconds; i++) {
+      p.stamina = stamina * p.staminaMax; p.pos.y = y; p.prevT.y = y;
+      g.step(1 / 60, new Map([[0, { ...emptyInput(), sink: true }]]));
+      for (const e of g.events) if (e.kind === 'winded') n++;
+      g.events.length = 0;
+    }
+    return n;
+  };
+  const low = count(0.2, 12, 20), spent = count(0.0, 12, 20);
+  ok(low > 0 && spent > low, `the winded pulse quickens as the bar empties (${low} beats then ${spent} over 12 s)`);
+  ok(count(0.3, 12, 20) === 0, 'and nothing above a quarter bar, which is where it starts');
+  ok(count(1, 12, 20) === 0, 'nor on a full bar');
+  ok(count(0, 6, SURFACE_Y - 2) === 0, 'nor at the surface, where the bar is already back');
 }
 
 // ---- dead water: gills suffer, lungs do not, leaving scores ----
@@ -266,7 +356,7 @@ ok(RULES !== undefined && !RULES.growthByNutrition, 'Devonian rules active: grow
   const dc = devActor(g, coc), dt = devActor(g, tik);
   ok(dc.deadZoneIn && dt.deadZoneIn, 'both are inside the zone');
   ok(coc.hp < hp0 && coc.stamina < coc.staminaMax * 0.5, `dead water drains a gill breather (hp ${hp0.toFixed(0)} → ${coc.hp.toFixed(0)}, stamina ${coc.stamina.toFixed(0)})`);
-  ok(tik.hp >= hpT - 1e-6 && devActor(g, tik).deadT === 0, `an air breather is untouched by anoxia (hp ${hpT.toFixed(1)} → ${tik.hp.toFixed(1)}, deadT ${devActor(g, tik).deadT})`);
+  ok(tik.hp >= hpT - 1e-6 && devActor(g, tik).deadT === 0, `a bimodal breather is untouched by anoxia (hp ${hpT.toFixed(1)} → ${tik.hp.toFixed(1)}, deadT ${devActor(g, tik).deadT})`);
   ok(RULES!.hud(g, 0)!.deadZones.length === 1 && RULES!.hud(g, 0)!.inDeadZone, 'the HUD carries the zone for the radar');
   const before = dc.standing;
   s.deadZones.length = 0;
@@ -304,35 +394,50 @@ ok(RULES !== undefined && !RULES.growthByNutrition, 'Devonian rules active: grow
   ok(RULES!.jet(mk('manticoceras')) && !RULES!.jet(shark), 'only shells jet');
 }
 
-// ---- a shell goes where the stick points, and faces that way while it does ----
-// The stick is the direction of travel for every body in the sea, and the nose goes with it:
-// swimming, sprinting and dashing all go where they are aimed, shells included. Turning the animal
-// round to travel shell-first read as a spin rather than as a jet, so the funnel shows up only in
-// the free hover and in the backward dash below.
+// ---- a shell goes where the stick points, and swims both ways round ----
+// The stick is the direction of travel for every body in the sea: swimming, sprinting and dashing
+// all go where they are aimed. A shell's heading is the one thing the funnel changes, and a
+// nautiloid jets either side of its shell — it leads with whichever end it is already pointing and
+// turns through the shorter arc, so travel that is more behind it than ahead leaves it going
+// shell-first, head trailing, instead of spinning round to chase its own heading.
 {
-  const run = (id: CreatureId, gear: 'swim' | 'sprint' | 'dash', stick: 1 | -1 = 1) => {
+  /** `astern` is how far the body points against its own travel: 1 is shell-first, -1 is head-first. */
+  const astern = (p: { yaw: number; vel: { x: number; z: number } }) => {
+    const h = heading(p.yaw), v = Math.hypot(p.vel.x, p.vel.z);
+    return v > 0.35 ? -(h.x * p.vel.x + h.z * p.vel.z) / v : 0;
+  };
+  const run = (id: CreatureId, gear: 'swim' | 'sprint' | 'dash', stick: 1 | -1 = 1, reverseAfter = false) => {
     const g = new Game('reef', [{ creature: id, device: 'keyboard', ready: true }]);
     const p = g.players[0];
     p.pos = { x: 0, y: -14, z: 0 }; p.vel = { x: 0, y: 0, z: 0 }; p.yaw = 0; p.spawnProtect = 999;
-    const push = (): InputFrame => ({ ...emptyInput(), my: stick, burst: gear === 'sprint' ? 1 : 0, dash: gear === 'dash' });
-    for (let i = 0; i < 90; i++) { tick(g, new Map<number, InputFrame>([[0, push()]])); p.spawnProtect = 999; }
-    // The stick is camera-relative with camYaw 0, so +my is +z: travel and stick agree when z > 0.
-    // `astern` is how far the body points against its own travel: 1 is shell-first, -1 is head-first.
-    const h = heading(p.yaw), v = Math.hypot(p.vel.x, p.vel.z);
-    return { z: p.pos.z, astern: v > 0.35 ? -(h.x * p.vel.x + h.z * p.vel.z) / v : 0 };
+    const push = (my: number): InputFrame => ({ ...emptyInput(), my, burst: gear === 'sprint' ? 1 : 0, dash: gear === 'dash' });
+    for (let i = 0; i < 90; i++) { tick(g, new Map<number, InputFrame>([[0, push(stick)]])); p.spawnProtect = 999; }
+    const turned = { z: p.pos.z, astern: astern(p), yaw: p.yaw };
+    if (!reverseAfter) return turned;
+    // Same camera, stick pulled the other way: the shell should back off the way it came without
+    // turning round, because half a turn is further than no turn at all.
+    const wasZ = p.pos.z, wasYaw = p.yaw;
+    for (let i = 0; i < 150; i++) { tick(g, new Map<number, InputFrame>([[0, push(-stick)]])); p.spawnProtect = 999; }
+    return { z: p.pos.z - wasZ, astern: astern(p), yaw: Math.abs(wrapAngle(p.yaw - wasYaw)) };
   };
   for (const id of ['michelinoceras', 'manticoceras'] as CreatureId[]) {
-    const swim = run(id, 'swim'), sprint = run(id, 'sprint'), dash = run(id, 'dash'), astern = run(id, 'swim', -1);
+    const swim = run(id, 'swim'), sprint = run(id, 'sprint'), dash = run(id, 'dash'), back = run(id, 'swim', -1);
     ok(swim.z > 1, `${id} swims where the stick points (z ${swim.z.toFixed(1)})`);
     ok(sprint.z > swim.z, `...sprints further the same way, never backward out of it (z ${sprint.z.toFixed(1)})`);
     ok(dash.z > 1, `...and dashes the same way too (z ${dash.z.toFixed(1)})`);
-    ok(astern.z < -1, `...and pulling the stick back takes it back (z ${astern.z.toFixed(1)})`);
-    ok(swim.astern < -0.8, `...facing its way at a cruise (${swim.astern.toFixed(2)}, -1 is nose-first)`);
-    ok(sprint.astern < -0.8, `...and still facing it at a sprint, never spun round (${sprint.astern.toFixed(2)}, -1 is nose-first)`);
-    ok(dash.astern < -0.8, `...and through an aimed dash (${dash.astern.toFixed(2)}, -1 is nose-first)`);
+    ok(back.z < -1, `...and pulling the stick back takes it back (z ${back.z.toFixed(1)})`);
+    ok(swim.astern < -0.8, `...leading with its head when that is the way it set off (${swim.astern.toFixed(2)}, -1 is head-first)`);
+    ok(sprint.astern < -0.8, `...and a sprint does not turn it round (${sprint.astern.toFixed(2)})`);
+    const rev = run(id, 'swim', 1, true);
+    ok(rev.z < -1, `...reversing carries it back the way it came (z ${rev.z.toFixed(1)})`);
+    ok(rev.astern > 0.8, `...shell-first, head trailing (${rev.astern.toFixed(2)}, 1 is astern)`);
+    ok(rev.yaw < 0.4, `...without turning round to do it (${rev.yaw.toFixed(2)} rad of turn)`);
+    ok(dash.astern < -0.8, `...and an aimed dash does not turn it round either (${dash.astern.toFixed(2)})`);
   }
   const fish = run('cladoselache', 'sprint');
   ok(fish.z > 1 && fish.astern < -0.8, `a finned body sprints forward, facing forward (z ${fish.z.toFixed(1)}, ${fish.astern.toFixed(2)})`);
+  const fishBack = run('cladoselache', 'swim', 1, true);
+  ok(fishBack.yaw > 1.2 && fishBack.astern < -0.5, `a finned body turns round to swim the other way (${fishBack.yaw.toFixed(2)} rad, astern ${fishBack.astern.toFixed(2)})`);
 
   // A neutral stick has no direction to give, so the dash takes the body's own axis: ahead of a
   // finned body, and out behind a shell, which is the way it is already pointing to jet.

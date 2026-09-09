@@ -21,8 +21,26 @@ await shot('play-larva');
 await page.keyboard.up('KeyW');
 console.log('hud larva:', await page.evaluate(() => document.querySelector('.hud')?.textContent));
 // Hunted mode: player one is a giant → large magnification
-await page.keyboard.press('Escape'); await page.waitForTimeout(400);
-await page.click('text=Change creatures'); await page.waitForTimeout(800);
+/**
+ * Open the pause menu.
+ *
+ * The engine polls the keyboard once a frame, and a frame under swiftshader can take seconds — so
+ * a tap, which Playwright sends as a keydown and keyup in the same tick, usually falls between two
+ * samples and is never seen at all. Holding the key spans a frame, and re-pressing covers the case
+ * where even that lands in a gap. This was a coin flip before, not a broken pause.
+ */
+const pause = async () => {
+  for (let i = 0; i < 6; i++) {
+    await page.keyboard.down('Escape'); await page.waitForTimeout(300); await page.keyboard.up('Escape');
+    try { await page.waitForSelector('.overlay .menu-buttons', { timeout: 4000 }); return; } catch { /* frame gap: press again */ }
+  }
+  throw new Error('pause menu never opened');
+};
+await pause();
+// Leave the match. Scoped to the menu rather than matched on the label anywhere on the page: the
+// in-game menus are steered now and their wording has changed once already, so a bare `text=`
+// match here failed as a silent thirty-second timeout.
+await page.click('.overlay .menu-buttons button:has-text("Quit")'); await page.waitForTimeout(800);
 await page.click('text=Hunter & Hunted'); await page.waitForTimeout(300);
 await page.keyboard.press('Space'); await page.waitForTimeout(300);
 await page.keyboard.press('Enter'); await page.waitForTimeout(3500);

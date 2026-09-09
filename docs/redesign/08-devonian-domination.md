@@ -172,17 +172,42 @@ the lock-on panel as a small silhouette with the soft region lit.
 - A trilobite's enrolment (Eldredgeops, Olenoides-style) is all armour for as
   long as the block is held.
 
-### Air
+### Breathing both ways
 
-Rhinodipterus, Tiktaalik and Acanthostega are **air breathers**. They have an
-air meter under stamina. It drains slowly; when it is low their stamina
-regeneration halves and sprint is disabled until they surface. Surfacing is
-**RB held at the light window**: a gulp refills the meter and grants a short
-"second wind" (a free sprint), but the surface is where the water is
-brightest and every rung IV shadow is watching it.
+Rhinodipterus, Tiktaalik and Acanthostega have **lungs as well as gills**, and
+the literature is clear that all three kept the gills: Acanthostega's fish-like
+internal gills are the whole point of Coates & Clack 1991; Tiktaalik retained
+gills and ventilated them by buccal pumping after losing the bony operculum,
+with spiracles on the skull roof for supplementary air; and Rhinodipterus is a
+*marine* Devonian dipnoan carrying the buccal-pump kit for air breathing —
+obligate air breathing with reduced gills is a modern Protopterus trait, not a
+Devonian marine one. **Nothing on this roster is lung-only**, so there is no
+air meter, no countdown and no drowning, and deliberately no `breathing` value
+for an obligate air breather: one would need its own mechanic (a meter, a
+warning, a death) and should arrive with it.
 
-Everyone else is a gill breather and has no meter. The difference matters in
-one place:
+What lungs buy is a **place to go**. Under water these three recover stamina at
+a quarter of everyone else's rate, which makes them poor at long chases and
+grinding fights; break the surface and the whole bar comes back at once, with a
+short "second wind" (a free sprint) on top. Their game is the round trip — and
+the surface is where the water is brightest and every rung IV shadow is
+watching it.
+
+So everything about them points up. They climb half again as fast as the shared
+rise rate, a sprint carries into the climb rather than only into the swim, and
+they are the one thing here that leaves the water on the rise button alone
+(everything else must drive hard at the surface to breach). Above all the climb
+is **free**: driving upward costs no stamina, and on an empty bar a sprint or a
+dash still fires with only its upward part, so nothing can ever be stranded on
+the bottom with no way back. Going to breathe is never taxed.
+
+A quiet heartbeat (`winded`) starts at a quarter bar under water and quickens
+as the rest goes — a nudge toward the surface rather than a warning, since nothing bad
+happens if it is ignored. And the effort shows: what a lung lets go of the
+mouth is the stamina it just spent, so a sprint streams bubbles, a dash coughs a
+handful, and hanging still or climbing releases none.
+
+Everyone else breathes water only. The difference matters in one place:
 
 ### Anoxia events
 
@@ -261,8 +286,8 @@ from [05](05-hiding-and-combat.md) without new systems:
 | Gemuendina | Y: sand burial (the existing burrow) with an upward ambush emergence bite; flat body makes it near-immune to hits from above while buried. |
 | Bothriolepis | Ground creature; block is armour; can enter the shallows further than swimmers (see *The shore*). |
 | Coccosteus | The small arthrodire: a full armour zone and an ordinary bite. Rung II's fighter. |
-| Rhinodipterus | Air breather; heavy is a crushing bite that does extra damage to shells (Manticoceras, Michelinoceras, snails). |
-| Tiktaalik / Acanthostega | Air breathers with the shore refuge; Tiktaalik has the stronger bite and a neck (its lock-on turn is faster than its body's); Acanthostega is smaller, quicker, and can push further up the beach. |
+| Rhinodipterus | Lungs as well as gills; heavy is a crushing bite that does extra damage to shells (Manticoceras, Michelinoceras, snails). |
+| Tiktaalik / Acanthostega | Lungs as well as gills, plus the shore refuge; Tiktaalik has the stronger bite and a neck (its lock-on turn is faster than its body's); Acanthostega is smaller, quicker, and can push further up the beach. |
 | Eldredgeops | Block: enroll. Excellent eyes: its sense pulse has the longest reach in rung I. |
 | Walliserops | Heavy: trident shove — a low-damage push that displaces a rival, meant for rival duels over grazing patches; the brief notes the function is unsettled, and the game says so. |
 | Nahecaris | The scavenger: corpses give it double nutrition; fast and fragile. |
@@ -344,9 +369,8 @@ Keep everything the Cambrian HUD does and change the meaning of one element:
   not feel like the same game. Small ticks under it show the last few standing
   sources so the player learns what feeds them.
 - The **radar** gains the range arc (yours and others'), and the hollow ring of
-  a dead zone. The shore mark already exists; for air breathers a small surface
-  mark shows the nearest good gulping spot when air is low.
-- **Air meter** under stamina for the three air breathers only.
+  a dead zone. The shore mark already exists; for the bimodal breathers a small
+  surface mark shows the nearest good gulping spot when the bar is low.
 - The **lock-on panel** shows the target's armour silhouette with its soft
   region lit, for armoured targets.
 - The biome banner reads "Your range" inside it, and the dead-zone warning is
@@ -398,7 +422,7 @@ music is optional. The notes below are kept as the build order that was followed
 4. **Armour zones** in `combat.ts`: a per-hit test of the contact angle
    against the victim's armour fraction, with a `pierce` bypass. The existing
    direction bonus is the hook.
-5. **Air and anoxia**: an `air` field and drain on air breathers; a
+5. **Breathing and anoxia**: the bimodal stamina economy; a
    `DeadZone` list on the game (position, radius, drift, age) stepped like
    silt clouds; stamina and health effects in `updateActor`; a renderer fog
    tint and radar ring.
