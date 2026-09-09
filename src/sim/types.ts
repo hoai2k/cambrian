@@ -110,6 +110,8 @@ export interface Actor {
    * which is the immersive way to play. Display only — nothing in the simulation reads it.
    */
   senseMode: boolean;
+  /** Where a pulse swimmer's bell is in its cycle, seconds. Unused by everything else. */
+  pulseT: number;
   /** How long this body still reads as revealed: the whip search, and a hidden body found by one. */
   senseT: number;
   burstT: number;          // free burst timer (ambush surge)

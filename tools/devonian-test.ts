@@ -519,6 +519,85 @@ ok(RULES !== undefined && !RULES.growthByNutrition, 'Devonian rules active: grow
   ok(g.changeCreature(0, 'coccosteus', false) && rungOf(ladderMark(g, p)) === 0, 'and the body it left is handed back where it was');
 }
 
+// ---- the era's own ways of getting about (docs/research/locomotion-ideas.md) ----
+{
+  const solo = (id: CreatureId, at?: { x: number; z: number }) => {
+    const g = new Game('reef', [{ creature: id, device: 'keyboard', ready: true }], 17);
+    const p = g.players[0];
+    const x = at?.x ?? 20, z = at?.z ?? -140;
+    p.pos = { x, y: groundHeight(g.world, x, z, []) + 8, z };
+    p.vel = { x: 0, y: 0, z: 0 }; p.yaw = 0; p.spawnProtect = 999;
+    const step = (f: Partial<InputFrame> = {}) => { tick(g, new Map<number, InputFrame>([[0, { ...emptyInput(), ...f } as InputFrame]])); p.spawnProtect = 999; };
+    return { g, p, step };
+  };
+
+  // A punt needs the floor to push off: out in the water the same button barely moves the animal.
+  // Acanthostega is the one that shows it — a swimmer that shoves off the bottom, not a walker
+  // that never leaves it.
+  const punt = (down: boolean) => {
+    const { g, p, step } = solo('acanthostega');
+    const floor = groundHeight(g.world, p.pos.x, p.pos.z, []);
+    p.pos.y = down ? floor + lengthOf(p) * 0.2 : floor + 14;
+    for (let i = 0; i < 20; i++) step();
+    const from = { ...p.pos };
+    step({ my: 1, dash: true });
+    for (let i = 0; i < 24; i++) step();
+    return Math.hypot(p.pos.x - from.x, p.pos.z - from.z);
+  };
+  const onFloor = punt(true), inWater = punt(false);
+  ok(onFloor > inWater * 1.8, `a punt has its legs with the bottom in reach (${onFloor.toFixed(1)} units against ${inWater.toFixed(1)} up in the water)`);
+
+  // Two gaits, told apart by the water. Out in the channel, where the flow is real, a eurypterid
+  // that has lifted off its legs and is rowing goes where the water goes; the same animal walking
+  // on the bottom barely feels it.
+  const carried = (rowing: boolean) => {
+    const { p, step } = solo('jaekelopterus', { x: 50, z: -350 });
+    for (let i = 0; i < 60; i++) step(rowing ? { rise: true } : {});
+    const from = { ...p.pos };
+    for (let i = 0; i < 420; i++) step(rowing ? { rise: true } : {});
+    return { moved: Math.hypot(p.pos.x - from.x, p.pos.z - from.z), grounded: p.grounded };
+  };
+  const walking = carried(false), rowing = carried(true);
+  ok(!rowing.grounded && walking.grounded, `the paddles take it off the floor and the legs keep it on (rowing grounded=${rowing.grounded}, walking grounded=${walking.grounded})`);
+  ok(walking.moved < rowing.moved * 0.6, `walking holds station where rowing drifts (${walking.moved.toFixed(1)} against ${rowing.moved.toFixed(1)} units in the channel)`);
+
+  // A rigid shield with no paired fins behind it cannot tip quickly.
+  const pitchIn = (id: CreatureId) => {
+    const { p, step } = solo(id);
+    for (let i = 0; i < 30; i++) step({ my: 1 });
+    const from = p.pitch;
+    let fastest = 0;
+    for (let i = 0; i < 45; i++) { const was = p.pitch; step({ my: 1, sink: true }); fastest = Math.max(fastest, Math.abs(p.pitch - was) * 60); }
+    return { turned: Math.abs(p.pitch - from), fastest };
+  };
+  const rigid = pitchIn('doryaspis'), finned = pitchIn('cheirolepis');
+  ok(rigid.fastest <= creature('doryaspis').pitchRate! + 1e-6, `a rigid body cannot tip faster than its shield allows (${rigid.fastest.toFixed(2)} of ${creature('doryaspis').pitchRate} rad/s)`);
+  ok(finned.fastest > rigid.fastest * 1.5, `...where a finned body tips as fast as it likes (${finned.fastest.toFixed(2)} rad/s)`);
+  ok(rigid.turned < finned.turned, `...so it takes longer to commit to a dive (${rigid.turned.toFixed(2)} rad against ${finned.turned.toFixed(2)})`);
+
+  // The era's own tail-flip and its one body with no front.
+  const flip = (() => {
+    const { p, step } = solo('nahecaris');
+    for (let i = 0; i < 20; i++) step();
+    const from = { ...p.pos }, h = heading(p.yaw);
+    step({ my: 1, dash: true });
+    for (let i = 0; i < 24; i++) step({ my: 1 });
+    return h.x * (p.pos.x - from.x) + h.z * (p.pos.z - from.z);
+  })();
+  ok(flip < -2, `Nahecaris flips away from what touched it (${flip.toFixed(1)} units astern)`);
+  const star = (() => {
+    const { p, step } = solo('furcaster');
+    for (let i = 0; i < 10; i++) step();
+    const yaw0 = p.yaw;
+    for (let i = 0; i < 90; i++) step({ mx: 1 });
+    return Math.abs(wrapAngle(p.yaw - yaw0));
+  })();
+  ok(star < 0.2, `a brittle star rows sideways without turning its disc (${star.toFixed(2)} rad)`);
+
+  // Titanichthys strains what it swims through, and nothing at all while it is stopped.
+  ok(!!creature('titanichthys').ramFeed && creature('titanichthys').diet === 'filter', 'the gentle giant is a ram feeder');
+}
+
 // ---- every sound the era asks for exists (the shared library is NOT under assets/devonian/) ----
 {
   const { SAMPLES, LOOPS, sfxUrl, registerSamples } = await import('../src/audio/audio');

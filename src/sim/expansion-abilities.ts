@@ -1,5 +1,5 @@
 import { add, clamp, dist, dot, heading, len3, norm, scale, sub, yawOf, type Vec3 } from '../shared/math';
-import { bandOf, isAlive, isHidden, lengthOf, massOf } from './actors';
+import { bandOf, isAlive, isHidden, lengthOf, massOf, speedFactor } from './actors';
 import { applyHit, type HitContext } from './combat';
 import { HEAVY_SPECIALS } from './concealment';
 import { creature, type CreatureDef, type MoveDef } from './creatures';
@@ -233,6 +233,12 @@ export function stepExpansionAbility(ctx: ExpansionContext, a: Actor, def: Creat
 
 export const bloomRate = (a: Actor, def: CreatureDef) => {
   if (def.diet !== 'filter') return 2.2 * clamp(1 - lengthOf(a) / 2.4, 0, 1);
+  // A ram feeder's mouth is a net, and a net only works with water going through it. Below a
+  // walking pace it strains nothing at all; at cruise it is doing what the animal is for.
+  if (def.ramFeed) {
+    const way = Math.hypot(a.vel.x, a.vel.y, a.vel.z) / Math.max(0.1, def.speed * speedFactor(a.scale));
+    if (way < 0.25) return 0;
+  }
   let rate = 1.3;
   if (a.abilityActive && a.state === 'ability') {
     if (def.ability === 'collectorWake') rate *= 3;
