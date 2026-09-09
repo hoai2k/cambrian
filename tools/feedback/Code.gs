@@ -1,5 +1,5 @@
 /**
- * The feedback inbox, as a Google Apps Script web app.
+ * The feedback inbox, as a Google Apps Script web app. v2
  *
  * This is not part of the build. It is pasted into the Apps Script project bound to one Google
  * Sheet and deployed as a web app; the deployment URL becomes the FEEDBACK_ENDPOINT the games are
