@@ -15,7 +15,8 @@
  * project needs no change there at all: send a new string.
  *
  * NOTHING HERE IS A SECRET. The endpoint ships in the bundle, as the gate's does; anyone who opens
- * the site can read it. What stops it being abused is on the far side — see `tools/feedback/Code.gs`.
+ * the site can read it. What stops it being abused is on the far side — see the Apps Script at
+ * hoai2k.github.io/tools/feedback/, which is where every game's back end lives.
  */
 
 /**
