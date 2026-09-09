@@ -18,11 +18,11 @@ const CLAWS = [0, 1, 2];
 const FLAG = [0, 1, 2, 3, 4, 5, 6];
 
 /** Low-amplitude locomotor ripple so the trunk never freezes behind a one-shot. */
-function ripple(P, u, t, env, amp = 0.16) {
-  const ph = 2 * Math.PI * t / 1.2;
+function ripple(P, u, t, env, amp = 0.16, loopU) {
+  const ph = loopU === undefined ? 2 * Math.PI * t / 1.2 : 2 * Math.PI * loopU;
   for (let i = 0; i < 11; i++) {
     const seg = `segment_${String(i).padStart(2, '0')}`;
-    P.bend(seg, [1, 0, 0], .009 * amp * env * Math.sin(ph / 2 - i * .39)).bend(seg, UP, .008 * amp * env * Math.sin(ph / 2 - i * .32));
+    P.bend(seg, [1, 0, 0], .009 * amp * env * Math.sin((loopU === undefined ? ph / 2 : ph) - i * .39)).bend(seg, UP, .008 * amp * env * Math.sin((loopU === undefined ? ph / 2 : ph) - i * .32));
     for (const s of SIDES) {
       const phase = ph - i * .75 + (s < 0 ? Math.PI : 0);
       for (let k = 0; k < 3; k++) {
@@ -32,7 +32,7 @@ function ripple(P, u, t, env, amp = 0.16) {
       P.bend(`paddle_${s}_${String(i).padStart(2, '0')}`, FWD, .06 * amp * env * Math.sin(phase + .4));
     }
   }
-  P.bend('tail', UP, .05 * amp * env * Math.sin(ph / 2 - 4.4));
+  P.bend('tail', UP, .05 * amp * env * Math.sin((loopU === undefined ? ph / 2 : ph) - 4.4));
 }
 
 function eyes(P, k) { for (const s of SIDES) for (const j of [0, 1]) P.bend(`eye_${s}_${j}`, FWD, .06 * k); }
@@ -161,7 +161,22 @@ export const clips = [
       });
       body(P, { noseDown: .06 * Cy + .015 * chew * pulse, fwd: .02 * R - .03 * Cy });
       eyes(P, R * (1 - Cy) * .5);
-      ripple(P, u, t, 1, .12);
+      ripple(P, u, t, 1, .12, u);
+    },
+  },
+  {
+    name: 'Grab', duration: 1.2, loop: true,
+    // The hold: claws closed on the catch under the head, arms folded as at the end of the
+    // carry, flagella trailing; breathes but never opens.
+    pose(u, P, t) {
+      const ph = 2 * Math.PI * u;
+      for (const s of SIDES) arm(P, s, {
+        baseFwd: -.9, baseDown: -.25, baseIn: -.7, handFwd: -1.9, handIn: .7 + .05 * Math.sin(ph), handDown: .05,
+        claw: .7 + .06 * Math.sin(ph - .7), whipOut: (k) => (.1 + .02 * k) * (1 - k / 12),
+        undulate: .03, undulateT: ph, settle: 1,
+      });
+      body(P, { noseDown: .05 + .008 * Math.sin(ph) });
+      ripple(P, u, u * 1.2, 1, .12, u);
     },
   },
 ];

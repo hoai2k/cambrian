@@ -137,15 +137,52 @@ Sidneyia, Leanchoilia, Isoxys, Tamisiocaris, Nectocaris. The last is a motion-sc
 not a taxonomic claim. Devonian queue: Eldredgeops, Walliserops, Jaekelopterus, Nahecaris,
 Palaeoisopus, Manticoceras, Michelinoceras, Furcaster. All remain or become preview pending review.
 
-## Delivered — 8 September 2026
+## Delivered — 8 and 9 September 2026
 
-- **Leanchoilia** (Cambrian): Bite, Attack, Heavy and Eat re-authored as a preview with the
-  code-authored pipeline in `tools/creatures/motion/` (its README explains the contract). The
-  great appendages now lead proximal-to-distal, the three claws close on contact, the flagella lag
-  and ring down, and Eat is a reach → grasp → fold-under → present-at-the-mouth performance that
-  the engine scrubs by consumption progress (`FEEDING_PERFORMANCE`). The shipped clips are kept in
-  the GLB as `replaced/<Name>` and shown under *Replaced* in the viewer so the two can be compared
-  and the old one restored. Queue entry: `tools/attack-feeding-refinements.json` status `review`;
-  its clip badge in `src/content/cambrian/pending-refinements.json` now says it awaits review.
-  Not yet done: a controller playtest, and the LOD still carries no attack clips at all.
+All of it came through the code-authored pipeline in `tools/creatures/motion/` (its README is the
+contract): a performance file per creature written against the shipped rig's real bones and
+sockets, sampled straight into the GLB by `apply.mjs`, with every replaced clip kept in the file as
+`replaced/<Name>` and listed under *Replaced* in the viewer so old and new can be compared and the
+old one restored by renaming. Each delivery is a **preview awaiting the user's review**; the clip
+badges in both eras' `pending-refinements.json` say so, and `tools/attack-feeding-refinements.json`
+marks each as `review`.
+
+| Creature | Bite / Attack / Heavy / Eat | Grab | Notes |
+| --- | --- | --- | --- |
+| Leanchoilia | re-authored | added | great appendages lead proximal → distal, flagella lag; Eat folds under to the mouth |
+| Anomalocaris | re-authored | kept | 14-segment appendages curl under to the mouth; Heavy winds up over the head |
+| Nectocaris | re-authored | kept | tentacles lash base-first and coil the catch home |
+| Cambroraster | re-authored | added | rakes close into a basket and draw under the shield |
+| Tamisiocaris | re-authored | added | comb strokes only, no predatory snap; Heavy is a flap sweep |
+| Isoxys | re-authored | added | raptorial hooks open, thrust and close; fold under to the mouth |
+| Waptia | re-authored | — | three raptorial pairs in sequence, mantis-style forearms |
+| Sidneyia | re-authored | — | gnathobase clamps at the leg roots, body presses down |
+| Marrella | re-authored | — | paddle sweeps, three-pulse scuttle rush, paddles rake to the mouth |
+| Olenoides | re-authored | — | cephalon head-butt and shield charge; front legs work food |
+| Opabinia | unchanged | kept | already articulated by the anchor pass; queued for review only |
+| Ottoia | — | added | hold with the introvert curled over the catch |
+| Jaekelopterus | re-authored | kept | pincers draw back, open, reach and clamp; gnathobases work the catch |
+| Palaeoisopus | re-authored | kept | chelifores fold at the scapes; proboscis swings forward to meet the food |
+| Eldredgeops / Walliserops | re-authored | added (Walliserops) | head-butt, shield charge, limb bases pass food forward to the hypostome |
+| Manticoceras | re-authored | kept | crown flares then closes base-first, its own interpretation not the nautiloid wave |
+| Furcaster | re-authored | added | several arms cup the target under the disc to the central mouth |
+
+Skipped on purpose: **Odaraia** and **Nahecaris** (their bodies are being rebuilt; the new rigs get
+their motion with the rebuild) and **Michelinoceras** (delivered separately on 8 September).
+
+Runtime: the Cambrian creatures above are in `FEEDING_PERFORMANCE`, so their Eat clips are scrubbed
+by consumption progress on the `feedingPhase` timeline; the Devonian ones loop their Eat as a
+feeding cycle, because the Devonian rigs have no `anchor_grasp` for the carry solver. Review
+contact sheets (old against new, from above and from below the mouth) were rendered with
+`review.py` for every creature. Not done: a controller playtest, and the LODs still carry no
+attack clips at all.
+
+### Rigs that are about to change
+
+The user's rule for this pass: do not invest heavily in the motion of a creature whose model is
+queued to change, because a new body means a new rig. That is why Odaraia and Nahecaris were skipped
+outright. The six Devonian deliveries above are on rigs flagged for *individual refinement* rather
+than total rework, so they were done, but as light previews: if a refinement touches their bones,
+the performance file is re-applied with `apply.mjs` (or dropped) rather than polished first. Polish
+the Cambrian set, whose bodies are final, before any of those.
 

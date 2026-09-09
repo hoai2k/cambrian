@@ -31,6 +31,10 @@ node tools/creatures/motion/pose-check.mjs <id> <Clip> [u ...]  # where the sock
 - **Contract checks** from `docs/animation-brief.md`: root never moves, loops close on
   themselves, one-shots start and end at rest, 30 fps linear keys, no animated scale.
 
+Both eras: an id that is not in `public/assets/creatures/` is looked up in
+`public/assets/devonian/creatures/`, and `tools/devonian/check.mjs <id>` validates the result
+(it checks every clip in the file, the replaced ones included).
+
 LODs are not touched: the distant models only carry Idle/Swim/Crawl/Death, none of which this
 pass replaces. `npm run check` may still say the LOD is older than the model; that is the mtime
 rule, not a stale LOD.
@@ -61,3 +65,18 @@ Review is by contact sheet: `review.py` renders the replaced and new clip from a
 view above and a view from below and ahead where the mouth is, eight frames each, in Cycles on
 the CPU. Look at the whole path, not only the extremes — a fold that ends in the right place can
 still pass over the head on the way.
+
+## Bone directions
+
+`P.bend` needs to know which way a bone runs. Cambrian rigs export each bone's local +Y along
+the bone, but several Devonian rigs give every bone the same local axis, so `Rig.restDir` takes
+the direction from the joint positions instead: toward the child of the same family (or the only
+child), away from the parent for a leaf. For a hub bone with unrelated children (a cephalon, a
+cephalopod head) that guess is meaningless — pitch those with `P.spin(name, [1, 0, 0], angle)`
+(positive is nose down) rather than `bend`.
+
+## Grab
+
+Rigs whose kit has `grasp: true` (`docs/redesign/05-hiding-and-combat.md`) need a `Grab` clip: the
+game plays it once as the grip closes and loops it while the animal clings to something bigger.
+Author it as a **held loop** that starts in the held pose and breathes, never one that opens.
