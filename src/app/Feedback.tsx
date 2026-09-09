@@ -4,7 +4,7 @@ import { CloseIcon } from './icons';
 import { feedbackEnabled, MIN_COMPOSE_MS, sendFeedback, TURNSTILE_KEY } from '../shared/feedback';
 
 /**
- * "Have Feedback?" — the corner of the choose-your-creature screen, and the dialog behind it.
+ * "Send Feedback" — the corner of the choose-your-creature screen, and the dialog behind it.
  *
  * WHY HERE. It is the one screen every player passes through, sits at for a few seconds, and comes
  * back to between matches — so it is where somebody who has just been annoyed by something is
@@ -35,7 +35,7 @@ export function FeedbackButton() {
   if (!feedbackEnabled()) return null;
   return (
     <>
-      <button className="feedback-button" onClick={() => setOpen(true)}>Have Feedback?</button>
+      <button className="feedback-button" onClick={() => setOpen(true)}>Send Feedback</button>
       {open && <FeedbackDialog onClose={() => setOpen(false)} />}
     </>
   );
@@ -107,7 +107,7 @@ function FeedbackDialog({ onClose }: { onClose: () => void }) {
               <input type="email" required value={email} autoComplete="email"
                 placeholder="you@example.com" disabled={state === 'sending'}
                 onChange={(e) => setEmail(e.target.value)} />
-              <small className="dim">So we can reply. It is used for nothing else.</small>
+              <small className="dim">Only so we can reply, if needed</small>
             </label>
 
             <label className="feedback-field">

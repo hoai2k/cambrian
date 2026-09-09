@@ -1,6 +1,13 @@
 # Feedback: a way for players to write back
 
-A **Have Feedback?** button in the bottom-left corner of the choose-your-creature screen, in both
+> **The Apps Script lives in the library repository now.**
+> `Code.gs` moved to
+> [`hoai2k.github.io/tools/feedback/`](https://github.com/hoai2k/hoai2k.github.io/tree/main/tools),
+> beside the invite gate's, so that no single game looks like the owner of a
+> back end every game shares. This document stayed here: it is written for
+> whoever is wiring a game up, and it is versioned alongside a game that uses it.
+
+A **Send Feedback** button in the bottom-left corner of the choose-your-creature screen, in both
 games. It opens a short form — email and a message — and the message lands as a row in a private
 Google Sheet, with an email to say it arrived.
 
@@ -40,7 +47,9 @@ first time each is used.
 ### 2. The endpoint
 
 1. In the Sheet: **Extensions ▸ Apps Script**.
-2. Delete the placeholder and paste all of [`tools/feedback/Code.gs`](../tools/feedback/Code.gs).
+2. Delete the placeholder and paste all of
+   [`feedback/Code.gs`](https://github.com/hoai2k/hoai2k.github.io/blob/main/tools/feedback/Code.gs), which lives in the
+   **library** repository — see the note at the top of this document.
 3. Leave `SHEET_ID` as `''` — the script is bound to this Sheet already.
 4. Set `NOTIFY_EMAIL` near the top to the address that should hear about new feedback. Leaving it
    empty is allowed: the rows still land, you just have to go and look.
@@ -189,7 +198,7 @@ key refuses everybody.
 
 | | |
 |---|---|
-| `tools/feedback/Code.gs` | the Apps Script. Not part of the build — it is pasted into the Sheet |
+| [`hoai2k.github.io/tools/feedback/Code.gs`](https://github.com/hoai2k/hoai2k.github.io/blob/main/tools/feedback/Code.gs) | the Apps Script. Not in this repository, and not part of any build — it is pasted into the Sheet |
 | `src/shared/feedback.ts` | the endpoint, the payload, and the send. Draws nothing |
 | `src/app/Feedback.tsx` | the button and the dialog |
 | `src/app/Select.tsx` | mounts `<FeedbackButton />` in the footer, shared by both eras |
