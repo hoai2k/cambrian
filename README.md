@@ -66,6 +66,7 @@ every push to `main` (set the repository's Pages source to "GitHub Actions").
 ```sh
 run() { npx esbuild "$1" --bundle --platform=node --format=esm --outfile=/tmp/t.mjs && node /tmp/t.mjs "${@:2}"; }
 npm run bindings                  # no two menu actions share a controller button
+npm run edges                     # rising-edge detection: a press fires once, a hold never repeats
 run tools/controls-test.ts        # camera-relative movement directions
 run tools/respawn-test.ts         # a giant eats a larva; it must come back
 run tools/flora-test.ts           # plants: slide around sponges, fold algae, spring back
