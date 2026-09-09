@@ -15,6 +15,12 @@ How the game makes noise, where the sounds come from, and how to work on them.
 | `public/music/*.mp3` | The soundtrack. Open music requests are in [audio-requests.md](audio-requests.md). |
 | `src/workbench/` | The audio workbench at `/workbench/?edit=audio`. |
 
+## The two beds
+
+The ambient loop and the giant's drone are named by the era (`audio.loops` in its content pack),
+not by a shared constant: the Cambrian's bed is `ambient-reef`, the Devonian's is its own
+`devonian/ambient-open-sea`. Both go through the preload queue like any other sound.
+
 ## Event kinds and files
 
 The sim pushes events; `handleEvents()` plays a **kind** for each, and
@@ -102,27 +108,44 @@ session; when a track runs out the game crossfades into a random pick from the r
 repeating the one just played while there is another choice. To add a track, drop
 `<name>.mp3` into `public/music` and add a line to `MUSIC` — nothing else.
 
-A track may also name the biomes it was written for:
+A track may also name the biomes it was written for, which reserves it for them:
 
 ```ts
-{ name: 'Channel Deep', biomes: ['channel'] },
+{ name: 'Cambrian Abyss', biomes: ['channel', 'escarpment', 'basin'] },
 ```
 
-Entering a biome that has a track of its own cues that track, rate-limited by `BIOME_HOLD` so a
-player weaving across an edge does not flip the score back and forth. `src/render/engine.ts`
-reports the first player's biome every frame via `audio.setBiome()`.
+### The area score
 
-Two tracks are tagged today: `theme-calm` (shallows, nursery) and `theme-danger` (channels,
-escarpment, basin). **Neither file exists yet** — they are the one outstanding asset request, in
-[audio-requests.md](audio-requests.md). A track whose file fails to load joins `MISSING`, leaves
-the rotation and stops cueing its biomes, so until the files land the two untagged reef tracks
-rotate everywhere. Dropping the mp3s into `public/music/` is the whole integration.
+An **area theme** is never shuffled into the rotation — the rotation is the tracks that belong
+nowhere in particular. Instead the score follows the player: `src/render/engine.ts` reports the
+first player's biome every frame through `audio.setBiome()`, and `stepArea` decides what that
+should mean. This is horizontal re-sequencing with hysteresis, the ordinary approach when the music
+is finished tracks rather than stems.
 
-A track whose file is not there — a biome theme tagged in `MUSIC` but not yet delivered — leaves
-the rotation on its first load error (`MISSING`). Because that is only discovered once the track
-is *chosen*, the next pick is made against the last track the player actually heard rather than
-the current one: two undelivered themes in a row would otherwise let the rotation land straight
-back on the track that had just finished.
+| | | |
+| --- | --- | --- |
+| `AREA_FADE` | 7 s | The crossfade, long enough that the change reads as the water changing rather than as a track ending. |
+| `AREA_ENTER` | 3 s | How long you must be somewhere before it counts. Biome edges are jagged and a player can cross one several times a minute; without this, clipping a corner of the basin starts a fade nobody asked for. |
+| `AREA_LEAVE` | 5 s | And how long you must be *away* before the score gives the area up. Longer than the entry on purpose: that asymmetry is what stops the music oscillating along a boundary you happen to be working. |
+
+Two things make a short excursion sound like part of the piece rather than a mistake. The fade
+**reverses** — turn round while it is still running and the same two voices ramp back the other way
+instead of restarting — and every track **remembers where it had got to** (`resumeAt`), so coming
+back to one resumes it rather than replaying its opening. An area theme also loops while it is the
+one playing, since the rotation is not where it goes next.
+
+`npm run music` drives the real state machine headlessly against a stubbed WebAudio: entering,
+dipping out under the dwell, coming back, staying away, and turning round inside a fade.
+
+Four themes are tagged: `Cambrian Drifting` and `Devonian Calm` for the shallows and the nursery,
+`Cambrian Abyss` and `Devonian Ritual` for the channels, escarpment and basin — the two safest
+bands of `BIOME_DANGER` against the three worst.
+
+A track whose file is not there — one tagged in `MUSIC` but not yet delivered — leaves the rotation
+on its first load error (`MISSING`) and stops cueing its biomes. Because that is only discovered
+once the track is *chosen*, the next pick is made against the last track the player actually heard
+rather than the current one: two undelivered tracks in a row would otherwise let the rotation land
+straight back on the track that had just finished.
 
 Tracks are streamed through media elements rather than decoded into AudioBuffers: they run for
 minutes, and a decoded three-minute track costs around 80 MB where a stream costs nothing. The

@@ -46,7 +46,12 @@ unless the user explicitly asks for a PR. Steps:
   need the Devonian do the same: select the era, then `await import(...)` (`tools/devonian-test.ts`).
 - An era's `assets.sfx` names the shared sound library (`assets/sfx/`): bites, hits and the UI are the
   same files in both eras. Era-specific samples are addressed as `<era>/<name>` and resolve under
-  `assets/<era>/sfx/` regardless. Only creatures with their own delivered model are pickable
+  `assets/<era>/sfx/` regardless. The two always-on beds are named per era in `audio.loops`, and a
+  music track that names biomes is an *area theme*: reserved for them, never shuffled into the
+  rotation, crossfaded to on a dwell and back again on a longer one, resuming where it left off
+  (`stepArea` in `src/audio/audio.ts`, the constants in `src/audio/music.ts`, `npm run music`).
+  Nothing synthesises a stand-in for a sound that has not loaded — it stays quiet and the file is
+  fetched; anything genuinely missing goes in `docs/audio-requests.md`. Only creatures with their own delivered model are pickable
   (`PLAYABLE` in `src/sim/creatures.ts`); the rest borrow a body in the world but stay off the roster.
 - Devonian gameplay lives in `src/sim/devonian/` and reaches the shared simulation only through the
   `RULES?.` hooks in `src/sim/era-rules.ts`. Do not branch on the era inside `game.ts`/`combat.ts`;
