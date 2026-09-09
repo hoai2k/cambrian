@@ -133,7 +133,9 @@ export const bitesFor = (eater: Actor, food: Actor) => clamp(Math.ceil(3 * lengt
 // Crawlers off the seabed. They paddle: they keep swimming, slowly, and pay for the climb in
 // stamina (more than they regenerate, so a paddle is a crossing, not a second way to live).
 /** A leap out of the water: the pull back down, and the least upward speed that gets a fish through the surface. */
-const BREACH_GRAVITY = 14, BREACH_MIN_RISE = 3.2;
+const BREACH_GRAVITY = 14;
+/** The least upward speed that gets a fish through the surface, at scale 1: bigger bodies need more. */
+const BREACH_MIN_RISE = 3.2;
 const PADDLE_SPEED = 0.35;    // fraction of the crawler's cruise while off the floor
 const PADDLE_RISE = 2.4;      // climb speed, units/s at scale 1 (a swimmer's rise is RISE_RATE, and faster to reach)
 const PADDLE_SINK = 2.2;      // terminal sink once RB is released — a settle, not a fall
@@ -920,8 +922,11 @@ export class Game implements AiWorld {
     }
     if (controllable && !def.ground) {
       const hover = jets ? 1.6 : 1;
-      if (input.rise) desired.y += RISE_RATE * sf * hover;
-      if (input.sink) desired.y -= RISE_RATE * sf * hover;
+      const base = RISE_RATE * sf * hover;
+      // What the rise and sink buttons are worth here, and anything the body does for itself: an
+      // era may climb faster than the shared rate, carry a sprint into the climb, or head for the
+      // surface unasked (a lung that needs air). Holding sink is always the way to stay down.
+      desired.y += RULES ? RULES.rise(this, a, input, base, burstMult) : input.rise ? base : input.sink ? -base : 0;
     }
     let rate = def.agility;
     if (mag === 0 && controllable) rate = def.glide; // glide out
@@ -1045,9 +1050,17 @@ export class Game implements AiWorld {
           a.vel.y *= 0.45;
         }
       } else if (a.pos.y > ceiling) {
-        // driving hard at the surface, a fish leaves the water; anything else meets the ceiling
+        // Driving hard at the surface, a fish leaves the water; anything else meets the ceiling.
+        //
+        // What counts as "hard" is relative to the body. BREACH_MIN_RISE was an absolute speed, so
+        // a hatchling — which cannot reach it by any means available to it — met a hard, invisible
+        // wall a body's length under the surface however it came at it. It scales with size now, as
+        // the speeds it is being compared against already do. A dash is allowed through for the
+        // same reason: it is the hardest a body can drive at anything, and excluding every state
+        // but `free` shut out the one move most likely to launch a fish clear of the water.
         const sp = len3(a.vel);
-        if (RULES?.canBreach(a) && isAlive(a) && a.vel.y > BREACH_MIN_RISE && sp > def.speed * sf * 0.85 && a.state === 'free') {
+        const launching = a.state === 'free' || a.state === 'dodge';
+        if (RULES?.canBreach(a) && isAlive(a) && a.vel.y > BREACH_MIN_RISE * sf && sp > def.speed * sf * 0.85 && launching) {
           a.airborne = true;
           this.events.push({ kind: 'breach', pos: { x: a.pos.x, y: SURFACE_Y, z: a.pos.z }, actor: a.id, player: a.player, strength: clamp(sp / 12, 0.4, 1.5) });
         } else { a.pos.y = ceiling; if (a.vel.y > 0) a.vel.y = 0; }

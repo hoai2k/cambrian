@@ -1050,6 +1050,14 @@ export class Engine {
           break;
         }
         case 'gulp': { this.bubbles.emit(e.pos, 24, 1.0, 3, 0.09, 1.4); personal('gulp'); break; }
+        // The low-air heartbeat, and a thin trickle of bubbles escaping with it. Quiet at the
+        // warning and firmer on the last of the meter — `strength` is how far gone the air is.
+        case 'airLow': {
+          const s = e.strength ?? 0;
+          this.bubbles.emit(e.pos, 2 + Math.round(4 * s), 0.5, 2, 0.05, 1);
+          personal('airLow', 0.35 + 0.45 * s);
+          break;
+        }
         case 'anoxia': { personal('anoxia', 0.8); break; }
         case 'beach': { if (e.strength) { this.bubbles.emit(e.pos, 12, 0.5, 2, 0.06, 1); personal('beach', 0.9); } break; }
         case 'shoalJoin': { this.sparkles.emit(e.pos, 16, 0.6, 1.2, 0.05, 1.2); personal('shoalJoin', 0.7); break; }

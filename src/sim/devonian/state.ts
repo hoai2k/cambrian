@@ -46,7 +46,7 @@ export interface DevActor {
   standing: number;
   stage: number;               // index into STAGES
   air: number;                 // 0..1 for air breathers
-  gulpT: number;               // seconds since the last gulp
+  airPulseT: number;           // seconds since the last low-air heartbeat (reset by a gulp)
   beached: boolean;
   deadT: number;               // seconds spent inside a dead zone this visit
   deadZoneIn: boolean;
@@ -86,7 +86,7 @@ export function devActor(g: Game, a: Actor): DevActor {
   const s = stateFor(g);
   let d = s.actors.get(a.id);
   if (!d) {
-    d = { standing: 0, stage: 0, air: 1, gulpT: 0, beached: false, deadT: 0, deadZoneIn: false, moultSoft: 0, exuvia: -1, exuviaT: 0, followers: 0, sinceEat: 0, primeT: 0, bluffed: new Map(), dartCd: 0 };
+    d = { standing: 0, stage: 0, air: 1, airPulseT: 0, beached: false, deadT: 0, deadZoneIn: false, moultSoft: 0, exuvia: -1, exuviaT: 0, followers: 0, sinceEat: 0, primeT: 0, bluffed: new Map(), dartCd: 0 };
     s.actors.set(a.id, d);
   }
   return d;

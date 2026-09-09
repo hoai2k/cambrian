@@ -288,6 +288,94 @@ ok(RULES !== undefined && !RULES.growthByNutrition, 'Devonian rules active: grow
   }
 }
 
+/**
+ * Out of the water, at any size. The breach gate compared vertical speed against a flat 3.2 u/s
+ * and only let a body through from `free`, so a hatchling met a hard invisible wall a body's length
+ * under the surface however it came at it, and a dash — the hardest a body can drive at anything —
+ * was excluded from the one move most likely to launch it. Both are relative to the body now: a
+ * lung leaves the water on rise alone because that is what its body is for, and everything else
+ * still has to drive at the surface, at every size rather than only when grown.
+ */
+{
+  const leaves = (id: CreatureId, scale: number, how: 'rise' | 'swim') => {
+    const g = new Game('reef', [{ creature: id, device: 'keyboard', ready: true }]);
+    const p = g.players[0];
+    p.hatching = false; p.state = 'free'; p.stateT = 0; p.stateDur = 0; p.spawnProtect = 0;
+    p.pos.y = SURFACE_Y - 14; p.prevT.y = p.pos.y;
+    devActor(g, p).air = 1;
+    for (let i = 0; i < 60 * 10; i++) {
+      p.scale = scale; applyScaleStats(p, false);
+      const f: InputFrame = how === 'rise'
+        ? { ...emptyInput(), rise: true }
+        : { ...emptyInput(), my: 1, camPitch: -0.7, camYaw: p.yaw, burst: 1 };
+      tick(g, new Map([[0, f]]));
+      if (p.airborne) return true;
+    }
+    return false;
+  };
+  for (const scale of [0.13, 0.3, 1]) {
+    ok(leaves('tiktaalik', scale, 'rise'), `a Tiktaalik at scale ${scale} rises clear of the water — no invisible ceiling`);
+    ok(leaves('cheirolepis', scale, 'swim'), `a Cheirolepis at scale ${scale} breaches when it drives at the surface`);
+  }
+  ok(!leaves('cheirolepis', 1, 'rise'), 'gills still do not step out of the sea on the rise button alone');
+  ok(!leaves('michelinoceras', 1, 'swim'), 'and a shell never leaves the water at all');
+}
+
+/**
+ * A lung surfaces for itself. Air is not a thing to be reminded about and then micromanaged: once
+ * the meter is low the animal heads up on its own, and staying down is a decision you hold the
+ * sink button to make.
+ */
+{
+  const drift = (sink: boolean, air: number) => {
+    const g = new Game('reef', [{ creature: 'rhinodipterus', device: 'keyboard', ready: true }]);
+    const p = g.players[0];
+    p.hatching = false; p.state = 'free'; p.stateT = 0; p.stateDur = 0; p.spawnProtect = 0;
+    p.pos.y = 20; p.prevT.y = 20;
+    const d = devActor(g, p);
+    const y0 = p.pos.y;
+    const f = new Map<number, InputFrame>([[0, sink ? { ...emptyInput(), sink: true } : emptyInput()]]);
+    for (let i = 0; i < 60 * 6; i++) { d.air = air; tick(g, f); }
+    return p.pos.y - y0;
+  };
+  const up = drift(false, 0.15), down = drift(true, 0.15);
+  ok(up > 8, `low on air and hands off, a lungfish climbs by itself (${up.toFixed(1)} units in 6 s)`);
+  ok(Math.abs(drift(false, 1)) < 3, 'with a full breath it stays where it is put');
+  ok(down < -5, `holding sink overrides the urge and takes it back down (${down.toFixed(1)} units)`);
+}
+
+/** The low-air heartbeat: a pulse while it lasts, quickening, and silence once the lungs are full. */
+{
+  const g = new Game('reef', [{ creature: 'tiktaalik', device: 'keyboard', ready: true }]);
+  const p = g.players[0];
+  p.hatching = false; p.state = 'free'; p.stateT = 0; p.stateDur = 0; p.spawnProtect = 0;
+  p.pos.y = 20; p.prevT.y = 20;
+  const d = devActor(g, p);
+  const count = (air: number, seconds: number, sink = true) => {
+    let n = 0;
+    const f = new Map<number, InputFrame>([[0, sink ? { ...emptyInput(), sink: true } : emptyInput()]]);
+    for (let i = 0; i < 60 * seconds; i++) {
+      d.air = air; p.pos.y = 20; p.prevT.y = 20;
+      g.step(1 / 60, f);
+      for (const e of g.events) if (e.kind === 'airLow') n++;
+      g.events.length = 0;
+    }
+    return n;
+  };
+  const easy = count(0.18, 12), hard = count(0.05, 12);
+  ok(easy > 0 && hard > easy, `the low-air pulse quickens as the meter empties (${easy} beats then ${hard} over 12 s)`);
+  ok(count(1, 12) === 0, 'and there is no pulse on a full breath');
+  p.pos.y = SURFACE_Y - 2; p.prevT.y = p.pos.y;
+  let atSurface = 0;
+  for (let i = 0; i < 60 * 6; i++) {
+    d.air = 0.05; p.pos.y = SURFACE_Y - 2; p.prevT.y = p.pos.y;
+    g.step(1 / 60, new Map([[0, emptyInput()]]));
+    for (const e of g.events) if (e.kind === 'airLow') atSurface++;
+    g.events.length = 0;
+  }
+  ok(atSurface === 0, 'nor at the surface, where the answer is already in reach');
+}
+
 // ---- dead water: gills suffer, lungs do not, leaving scores ----
 {
   const g = new Game('rise', [{ creature: 'coccosteus', device: 'keyboard', ready: true }, { creature: 'tiktaalik', device: 0, ready: true }]);
