@@ -61,7 +61,10 @@ function FeedbackDialog({ onClose }: { onClose: () => void }) {
   }, []);
 
   const early = Date.now() - opened.current < MIN_COMPOSE_MS;
-  const ready = email.trim() !== '' && message.trim() !== '' && !early && state === 'writing';
+  // `failed` is offerable again on purpose: the error says to try again, and a Send that stays
+  // grey after telling somebody to press it is the same as losing what they wrote.
+  const ready = email.trim() !== '' && message.trim() !== '' && !early
+    && (state === 'writing' || state === 'failed');
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();

@@ -37,7 +37,7 @@ jobs:
       # how the deployment changes without a commit.
       - run: npm run build
         env:
-          VITE_FEEDBACK_ENDPOINT: ${{ vars.FEEDBACK_ENDPOINT }}
+          VITE_FEEDBACK_ENDPOINT: ${{ vars.FEEDBACK_ENDPOINT || 'https://script.google.com/macros/s/AKfycbyu8lINxYMmtqFhFarxqqIwHbGupWWoWjmeN_OW-kNSPW6Hgh6-KdkQuZAaWOcamTFF/exec' }}
           VITE_TURNSTILE_KEY: ${{ vars.TURNSTILE_KEY }}
           # Stamped onto every piece of feedback, so a report can be placed against the build it
           # came from rather than against whatever is live by the time it is read.
