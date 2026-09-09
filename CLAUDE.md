@@ -92,7 +92,8 @@ unless the user explicitly asks for a PR. Steps:
   `npm run codex` guards both halves.
 - `src/content/<era>/pending-refinements.json` is the one queue of outstanding creature art, and it
   separates the two kinds: `model: true` (geometry, materials, rig, LOD art) is what shows the
-  creature's ⚠ preview badge in the game and the viewer, with `reason` on hover; `clips` are
+  creature's ⚠ preview badge in the specimen viewer, with `reason` on hover (the game itself shows
+  no badge for now — see `src/shared/ModelStatusBadge.tsx`); `clips` are
   animation clips queued for rework on a body that is already right, flagged on those clip buttons
   in the viewer with `clipReason` and never on the creature. `src/content/pending-refinements.ts`
   derives both eras' tables and `npm run eras` enforces the split — an entry must claim model or
