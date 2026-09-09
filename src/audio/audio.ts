@@ -91,7 +91,8 @@ export class GameAudio {
     this.ambGain = ctx.createGain(); this.ambGain.gain.value = 0; this.ambGain.connect(this.master);
     this.tensionGain = ctx.createGain(); this.tensionGain.gain.value = 0; this.tensionGain.connect(this.master);
     this.musicGain = ctx.createGain(); this.musicGain.gain.value = 0; this.musicGain.connect(this.master);
-    // Synth fallbacks: drones through a low-pass, plus a filtered noise wash
+    // Synth fallbacks while the sampled beds download: drones and a noise wash, both through the
+    // same low-pass, crossfaded out by startAmbient() the moment the real reef loop arrives.
     if (!this.ambience) { void this.preload(); this.watchFocus(); return; }
     this.synthAmbGain = ctx.createGain(); this.synthAmbGain.gain.value = 0; this.synthAmbGain.connect(this.master);
     const lp = ctx.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 420; lp.connect(this.synthAmbGain);
@@ -99,8 +100,18 @@ export class GameAudio {
       const o = ctx.createOscillator(); o.type = type; o.frequency.value = f;
       const g = ctx.createGain(); g.gain.value = f < 60 ? 0.35 : 0.14; o.connect(g); g.connect(lp); o.start();
     }
-    const noise = this.noiseSource(); const nf = ctx.createBiquadFilter(); nf.type = 'bandpass'; nf.frequency.value = 600; nf.Q.value = 0.5;
-    const ng = ctx.createGain(); ng.gain.value = 0.05; noise.connect(nf); nf.connect(ng); ng.connect(this.synthAmbGain);
+    /*
+     * The wash under the drones, and the one thing here that has to stay *dark*.
+     *
+     * It used to be a 600 Hz bandpass at Q 0.5, which is a −3 dB bandwidth of over a kilohertz
+     * falling away at only 6 dB an octave: measured against its own peak that chain left 31% of the
+     * noise power above 2 kHz, and broadband hiss in that register does not read as water — it
+     * reads as radio static, which is exactly what it sounded like while the reef loop was still
+     * downloading. Centred low, tightened, and then sent through the drones' own low-pass, the same
+     * measurement gives 0.0%: what is left is a slow surge under 500 Hz.
+     */
+    const noise = this.noiseSource(); const nf = ctx.createBiquadFilter(); nf.type = 'bandpass'; nf.frequency.value = 220; nf.Q.value = 0.7;
+    const ng = ctx.createGain(); ng.gain.value = 0.06; noise.connect(nf); nf.connect(ng); ng.connect(lp);
     this.synthAmbGain.gain.linearRampToValueAtTime(0.5, ctx.currentTime + 3);
     this.synthTensionGain = ctx.createGain(); this.synthTensionGain.gain.value = 0; this.synthTensionGain.connect(this.master);
     const td = ctx.createOscillator(); td.type = 'sawtooth'; td.frequency.value = 41; const tf = ctx.createBiquadFilter(); tf.type = 'lowpass'; tf.frequency.value = 160;

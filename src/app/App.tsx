@@ -30,11 +30,24 @@ const defaultSettings = (): Settings => {
   return { quality: 'high', lookSpeed: 1, invertY: false, volume: 0.8, muted: false, music: true };
 };
 
+/**
+ * `?screen=select` opens straight on the roster instead of the title.
+ *
+ * It is how the other era's picker links across: switching game is a page load, and landing the
+ * player back on PRESS START would undo the choice they just made. Read once and then wiped from
+ * the address bar, so a refresh — or the emblem taking them back to the title — behaves like any
+ * other visit. Not a module-level constant: `location` has to be read inside the app, not while
+ * this module is being evaluated.
+ */
+function deepLinkedToSelect(): boolean {
+  try { return new URLSearchParams(location.search).get('screen') === 'select'; } catch { return false; }
+}
+
 export function App() {
   const canvasRef = useRef<HTMLDivElement>(null);
   const engineRef = useRef<Engine | null>(null);
-  const [screen, setScreen] = useState<Screen>('title');
-  const screenRef = useRef<Screen>('title');
+  const [screen, setScreen] = useState<Screen>(() => (deepLinkedToSelect() ? 'select' : 'title'));
+  const screenRef = useRef<Screen>(deepLinkedToSelect() ? 'select' : 'title');
   const [players, setPlayers] = useState<PlayerSetup[]>([]);
   const playersRef = useRef<PlayerSetup[]>([]);
   const [mode, setMode] = useState<Mode>(MODES[0]);
@@ -190,7 +203,16 @@ export function App() {
     return () => { for (const e of events) window.removeEventListener(e, mark); clearInterval(id); };
   }, [loaded]);
 
-  // Any user gesture: wake audio (browsers require it)  // Any user gesture: wake audio (browsers require it)
+  // Arriving on the roster from the other game's picker: the seat the title screen would have
+  // opened. Audio needs no help — any gesture wakes it below — and the parameter is cleared so the
+  // address bar stops claiming a screen the player may since have left.
+  useEffect(() => {
+    if (!deepLinkedToSelect()) return;
+    updatePlayers([{ creature: ACTIVE_ERA.defaults.player, device: 'keyboard', ready: false }]);
+    try { history.replaceState(null, '', location.pathname + location.hash); } catch { /* a file:// page has no history to rewrite */ }
+  }, [updatePlayers]);
+
+  // Any user gesture: wake audio (browsers require it)
   useEffect(() => {
     const wake = () => { audio.init(); audio.resume(); };
     window.addEventListener('pointerdown', wake); window.addEventListener('keydown', wake);
