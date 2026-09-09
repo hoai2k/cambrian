@@ -14,7 +14,9 @@
  * - The **illustrated plate** is a full rectangle — the title screen's background and the loading
  *   screen's logo — so it only changes format.
  *
- * Originals stay in `intake/` in git history; this writes derived files and never edits in place.
+ * `intake/` is a handoff inbox: sources are dropped in, converted, and then deleted from it in the
+ * same commit — see intake/README.md. This tool never edits or removes its inputs, so a run can be
+ * repeated freely; the removal is a deliberate step once the result has been checked in place.
  */
 import { createRequire } from 'node:module';
 import fs from 'node:fs';
@@ -98,3 +100,5 @@ for (const job of JOBS) {
   done++;
 }
 console.log(`brand intake: ${done} asset(s) written`);
+// The directory is an inbox, so a processed source left in it reads as work still outstanding.
+if (done) console.log('  once the result looks right in the game, git rm the sources from intake/ in the same commit');
