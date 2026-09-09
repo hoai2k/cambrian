@@ -2,6 +2,7 @@ import { clamp } from '../shared/math';
 import { floraPropId, propShape } from '../content/prop-shapes';
 import { fpMax, fpReachAt, FOOTPRINT_BANDS, ROUND, type Footprint, type Reach } from './footprint';
 import { bodyRadius } from './actors';
+import { WEED_LEVERAGE, WEED_PULL } from './locomotion';
 import { creature } from './creatures';
 import type { Actor } from './types';
 import type { Flora, FloraKind, WorldData } from './world';
@@ -124,6 +125,8 @@ export function resolveFlora(world: WorldData, a: Actor, dt: number, scratch: Fl
   // Presence in the water, area-ish: bigger bodies win against stiffer plants.
   const actorS = Math.pow(a.scale, 2.2) * (def.ground ? 1.3 : 1);
   const vlen = Math.hypot(vel.x, vel.z);
+  /** How deep into the growth a body that hauls itself through it is, for the pull applied below. */
+  let weed = 0;
   if (out) { out.blocked = false; out.headOn = false; out.top = -Infinity; }
   for (const f of world.floraHash.query(pos.x, pos.z, ra + world.floraReach, scratch)) {
     // Cheap rejects first: most candidates are nowhere near.
@@ -147,7 +150,12 @@ export function resolveFlora(world: WorldData, a: Actor, dt: number, scratch: Fl
     const nx = d > EPS ? rr.nx : Math.sin(f.rot), nz = d > EPS ? rr.nz : Math.cos(f.rot);
 
     const plantS = P.rigidity * f.scale * f.scale;
-    const give = actorS / (actorS + plantS * 0.55);
+    // A body built to haul through the plants has the leverage of something several times its size
+    // against them: stems and fronds bend out of its way instead of pushing it out, and it pulls
+    // itself along on them. A big rigid sponge is still a big rigid sponge, and still has to be
+    // gone over or round — leverage is not immunity.
+    const pull = def.weedWalk ? actorS * WEED_LEVERAGE : actorS;
+    const give = pull / (pull + plantS * 0.55);
     const maxB = f.maxB;
 
     // Bend the plant away from the body by its share. Near the base a small bend moves the contact
@@ -190,10 +198,21 @@ export function resolveFlora(world: WorldData, a: Actor, dt: number, scratch: Fl
         vel.x += px * s * slide; vel.z += pz * s * slide;
       }
     }
-    // Fronds drag on you, more the deeper in you are and the softer the plant.
+    // Fronds drag on you, more the deeper in you are and the softer the plant — unless you are
+    // built to haul yourself through them. A limbed body has the stems to pull on, so cover carries
+    // it along instead of holding it back, and the thicket is its ground rather than its problem.
     const overlap = clamp(pen / (rp + ra), 0, 1);
-    const drag = Math.exp(-P.drag * overlap * give * dt);
-    vel.x *= drag; vel.y *= drag; vel.z *= drag;
+    // Taken once, after the loop: the deepest plant the body is in is what it has to pull on, and
+    // being in three of them at once must not multiply into a launch.
+    if (def.weedWalk) weed = Math.max(weed, overlap);
+    else {
+      const drag = Math.exp(-P.drag * overlap * give * dt);
+      vel.x *= drag; vel.y *= drag; vel.z *= drag;
+    }
+  }
+  if (weed > 0) {
+    const along = Math.hypot(vel.x, vel.z);
+    if (along > 0.05) { const k = (WEED_PULL * weed * dt) / along; vel.x += vel.x * k; vel.z += vel.z * k; }
   }
 }
 

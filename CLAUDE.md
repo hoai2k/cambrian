@@ -62,6 +62,17 @@ unless the user explicitly asks for a PR. Steps:
   slow, turn sharp when slow, fast-start on sprint) is the `swim` hook in `src/sim/devonian/swim.ts`.
   Devonian growth is five geometric stages per creature (`stageScale` in `src/sim/devonian/state.ts`,
   hatchlings no shorter than 0.6 units); hatchlings are placed inside plant cover (`spawnInCover`).
+- How a body gets about, where that is something other than swimming forward, is a set of traits on
+  `CreatureDef` — the tail-flip, a body with no front, a medusa's pulse, hauling through weed,
+  punting, the row/walk gait, a rate-limited pitch, ram feeding, drifting and clinging. The
+  mechanics live in `src/sim/locomotion.ts` and are keyed off the creature, never the era, because
+  the same trait turns up in both: `npm run locomotion` covers the Cambrian bodies and
+  `npm run devonian` the Devonian ones. Which animal has what, and how well each is actually
+  attested, is `docs/research/locomotion-ideas.md`.
+- A body may shape itself to what it is on: `conformArms` bends a radial rig's arms onto the ground
+  under them, or around a creature it is holding, after the mixer has written the pose
+  (`src/render/conform.ts`, `npm run conform`). Presentation only, and asked for by name rather than
+  read off the rig, because a nautiloid's tentacles carry the same `arm_<i>_<nn>` bone names.
 - Seabed scenery collides as the shape it is drawn with: `src/content/prop-shapes.json` is measured
   off the prop GLBs by `npm run shapes` and is what `src/sim` collides against (footprints in
   `src/sim/footprint.ts`). Any new or changed instanced prop must re-run `npm run shapes`, and
