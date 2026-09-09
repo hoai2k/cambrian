@@ -1,0 +1,279 @@
+{
+  "id": "dunkleosteus",
+  "name": "Dunkleosteus",
+  "species": "Dunkleosteus terrelli",
+  "provenance": "Late Devonian (Famennian), Cleveland Shale, Ohio, USA",
+  "description": "An armoured pelagic arthrodire with a short cranial wedge, articulated cutting jaws and a compact muscular trunk.",
+  "lengthMeters": 3.5,
+  "modelLength": 3.4418946504592896,
+  "locomotion": "Swim",
+  "clips": [
+    "Ability",
+    "Attack",
+    "Bite",
+    "Death",
+    "Dive",
+    "Dodge",
+    "Eat",
+    "Growth",
+    "Guard",
+    "Heavy",
+    "Hit",
+    "Idle",
+    "Parry",
+    "Rise",
+    "Stagger",
+    "Swim",
+    "TurnLeft",
+    "TurnRight"
+  ],
+  "looping": [
+    "Idle",
+    "Swim",
+    "Guard",
+    "Eat"
+  ],
+  "anchors": [
+    "anchor_mouth",
+    "anchor_mouth_inside",
+    "anchor_attack_primary"
+  ],
+  "sources": [
+    "https://doi.org/10.26879/1343",
+    "https://doi.org/10.3390/d15030318"
+  ],
+  "notes": [
+    "V2 reconstructs the profile from Engelman 2024 figures 3\u20134; not a specimen scan.",
+    "Rear-body proportions, caudal silhouette, living integument and oral soft tissues remain interpretations.",
+    "Representative 3.5 m adult, not a genus maximum.",
+    "PBR UV albedo, normal and roughness; independent vertex pigment bake for LOD.",
+    "Growth is maturation display, no scaling or moulting.",
+    "V4 focused cranial and gnathal refinement; preserved V2 body, oral lining, rig, eye globes and anchors. Actual full/LOD eye-volume and 173 feeding-pose checks passed before an exact-geometry COLOR binding repair; audit transfer is hash-proven. Root completed individual visual review including corrected LOD pigment.",
+    "Focused V4 head and gnathal pass accepted; LOD05 corrects encoded sRGB pigment to linear vertex colors. Matched full/LOD rest and Heavy views reviewed. Reduced surface detail and normal/roughness parity plus broader controller/art polish remain pending; model stays preview."
+  ],
+  "eyes": [
+    {
+      "mesh": "eye_globe_R",
+      "surroundingMeshes": [
+        "head_envelope_closed"
+      ],
+      "bone": "head",
+      "centerBlender": [
+        -0.286259263753891,
+        -1.2123372554779053,
+        0.1287265419960022
+      ],
+      "normal": [
+        -0.8715881109237671,
+        -0.318354070186615,
+        0.372806578874588
+      ],
+      "tangentU": [
+        -0.2927023768424988,
+        0.9479718804359436,
+        0.12519831955432892
+      ],
+      "tangentV": [
+        -0.39326760172843933,
+        -7.450581485102248e-09,
+        -0.9194241166114807
+      ],
+      "radii": [
+        0.052,
+        0.073,
+        0.053
+      ],
+      "sampleCount": 15309,
+      "embeddedFraction": 0.865503951923705,
+      "centerInsetMeters": 0.027,
+      "method": "V4 actual exported closed eye polyhedron volume with three-direction head parity; conservative95LowerFraction=0.86000745200171"
+    },
+    {
+      "mesh": "eye_globe_L",
+      "surroundingMeshes": [
+        "head_envelope_closed"
+      ],
+      "bone": "head",
+      "centerBlender": [
+        0.2862592339515686,
+        -1.2123373746871948,
+        0.128726527094841
+      ],
+      "normal": [
+        0.871588945388794,
+        -0.31835150718688965,
+        0.37280693650245667
+      ],
+      "tangentU": [
+        0.29270005226135254,
+        0.9479727149009705,
+        0.12519732117652893
+      ],
+      "tangentV": [
+        -0.39326757192611694,
+        7.450580596923828e-09,
+        0.9194240570068359
+      ],
+      "radii": [
+        0.052,
+        0.073,
+        0.053
+      ],
+      "sampleCount": 15441,
+      "embeddedFraction": 0.8690499319992229,
+      "centerInsetMeters": 0.027,
+      "method": "V4 actual exported closed eye polyhedron volume with three-direction head parity; conservative95LowerFraction=0.863637004027067"
+    }
+  ],
+  "artVersion": 4,
+  "artCandidate": "face-v4-candidate03-linear05",
+  "status": "preview",
+  "lodClips": [
+    "Ability",
+    "Attack",
+    "Bite",
+    "Death",
+    "Dive",
+    "Dodge",
+    "Eat",
+    "Growth",
+    "Guard",
+    "Heavy",
+    "Hit",
+    "Idle",
+    "Parry",
+    "Rise",
+    "Stagger",
+    "Swim",
+    "TurnLeft",
+    "TurnRight"
+  ],
+  "faceRefinementEvidence": {
+    "assets": [
+      {
+        "path": "/Users/hoai/Documents/Stuff/Generations/cambrian/local/devonian-authoring/dunkleosteus/face-v4/candidate03/exports-pigment04/dunkleosteus.glb",
+        "sha256": "0ace6026c6b46d9d560528677ffdaf31769d74bea51065b884214c8b1037950d",
+        "triangles": 171878,
+        "bytes": 18293228
+      },
+      {
+        "path": "/Users/hoai/Documents/Stuff/Generations/cambrian/local/devonian-authoring/dunkleosteus/face-v4/candidate03/exports-linear05/dunkleosteus.lod1.glb",
+        "sha256": "c639770bd1b612cb7747856d38cd5b748d2671b10fdf6998dda4450db223c5f5",
+        "triangles": 39226,
+        "bytes": 2371052
+      }
+    ],
+    "eyes": [
+      {
+        "eye_globe_L": {
+          "boundingBoxSamples": 30000,
+          "actualEyeVolumeSamples": 15441,
+          "insideLowerFraction": 0.8690499319992229,
+          "insideUpperFraction": 0.8690499319992229,
+          "conservative95LowerFraction": 0.863637004027067,
+          "headRayDisagreements": 0,
+          "criterionHalfGlobe": true,
+          "eyeTopology": {
+            "boundaryEdges": 0,
+            "nonmanifoldEdges": 0,
+            "triangles": 2976
+          },
+          "headTopology": {
+            "boundaryEdges": 0,
+            "nonmanifoldEdges": 0,
+            "triangles": 84000
+          }
+        },
+        "eye_globe_R": {
+          "boundingBoxSamples": 30000,
+          "actualEyeVolumeSamples": 15309,
+          "insideLowerFraction": 0.865503951923705,
+          "insideUpperFraction": 0.8656999150826311,
+          "conservative95LowerFraction": 0.86000745200171,
+          "headRayDisagreements": 3,
+          "criterionHalfGlobe": true,
+          "eyeTopology": {
+            "boundaryEdges": 0,
+            "nonmanifoldEdges": 0,
+            "triangles": 2976
+          },
+          "headTopology": {
+            "boundaryEdges": 0,
+            "nonmanifoldEdges": 0,
+            "triangles": 84000
+          }
+        }
+      },
+      {
+        "eye_globe_L": {
+          "boundingBoxSamples": 30000,
+          "actualEyeVolumeSamples": 15441,
+          "insideLowerFraction": 0.8687261187746907,
+          "insideUpperFraction": 0.8687261187746907,
+          "conservative95LowerFraction": 0.8633076920671806,
+          "headRayDisagreements": 0,
+          "criterionHalfGlobe": true,
+          "eyeTopology": {
+            "boundaryEdges": 0,
+            "nonmanifoldEdges": 0,
+            "triangles": 2976
+          },
+          "headTopology": {
+            "boundaryEdges": 0,
+            "nonmanifoldEdges": 0,
+            "triangles": 10080
+          }
+        },
+        "eye_globe_R": {
+          "boundingBoxSamples": 30000,
+          "actualEyeVolumeSamples": 15309,
+          "insideLowerFraction": 0.8659611992945326,
+          "insideUpperFraction": 0.8659611992945326,
+          "conservative95LowerFraction": 0.8604723506073517,
+          "headRayDisagreements": 0,
+          "criterionHalfGlobe": true,
+          "eyeTopology": {
+            "boundaryEdges": 0,
+            "nonmanifoldEdges": 0,
+            "triangles": 2976
+          },
+          "headTopology": {
+            "boundaryEdges": 0,
+            "nonmanifoldEdges": 0,
+            "triangles": 10080
+          }
+        }
+      }
+    ],
+    "oralPoseCount": [
+      173,
+      173
+    ],
+    "auditReports": [
+      {
+        "path": "/Users/hoai/Documents/Stuff/Generations/cambrian/local/devonian-authoring/dunkleosteus/face-v4/candidate03/exports-pigment04/dunkleosteus-eye-oral-audit.json",
+        "sha256": "16515d31858a63178f62d0bfb26227cd07179640da560f6e5f2bd22702b046c4",
+        "kind": "carried-forward exact-geometry audit"
+      },
+      {
+        "path": "/Users/hoai/Documents/Stuff/Generations/cambrian/local/devonian-authoring/dunkleosteus/face-v4/candidate03/exports-pigment04/dunkleosteus.lod1-eye-oral-audit.json",
+        "sha256": "a11fb8f184c1c98dcc2748ac6754355e83d175a6bf57cf5822413fdd0d61f36c",
+        "kind": "carried-forward exact-geometry audit"
+      }
+    ],
+    "pigmentRepairProofSHA256": "46d02096994e37a94b910cca6e7525e832896344c666288d2f6b7be314f642ad",
+    "portraits": {
+      "dunkleosteus.png": "397b2d5b03a95008716d2d6b2ae7fcc97622e124d603e3a52aae82ab54ae143e",
+      "dunkleosteus.select.png": "2539f1eca1c5d536f78794ab8afb3504b0f8fdc3d54303bef19f2563515eecf0",
+      "dunkleosteus.card.png": "893cbe4f86f249b126c1fed0e0837c14bbaed2ec10fac5c85758411974eb199c",
+      "dunkleosteus.thumb.png": "c141be280dfb5e3d7e6a9f6e095a79c75ca7204129c45d6df3ff0e48f3b0e04d"
+    },
+    "visualReview": "Root explicitly accepted actual exported full/LOD views and portraits; motion/contact review remains a human-reviewed requirement.",
+    "colorSpaceCorrection": {
+      "sourceLOD": "2d57904f0a8a2c858f597730e38927b1f38126a51a9f87011b2f3f78d7c52bca",
+      "proofSHA256": "589d2a942a464741931468dc5e45f43db8d69938fa5c48638c46f7d69f65b2ad",
+      "renderEvidenceSHA256": "da86b1a7df03ef145d6bf42c394c2b0b7b831189a7f876bea55fc8d4d985b3e4",
+      "geometryAuditTransfer": "Only COLOR_0 RGB bytes changed; alpha, geometry, rig, animations, anchors and all other bytes unchanged. Earlier geometric audit results remain applicable by exact byte proof; no new geometry audit execution claimed."
+    }
+  }
+}

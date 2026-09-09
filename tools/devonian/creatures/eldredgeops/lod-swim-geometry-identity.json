@@ -1,0 +1,6 @@
+{
+  "method": "Exact equality of every decoded world-space mesh primitive name, positions and indices before/after adding Swim. Existing BVH volume measurements therefore remain valid for identical geometry.",
+  "oldSha256": "0c446e71ffdc81a0937a74ea698a765ea488eeab235220a5af2848c8c90be193",
+  "newSha256": "466ffd6395bbf12bd495d2ae098c143a03aa304561176bb6c15fbfdd908544b7",
+  "allDecodedMeshPrimitivesExactlyEqual": true
+}

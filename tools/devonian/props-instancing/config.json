@@ -1,0 +1,100 @@
+{
+  "version": 1,
+  "coordinatePolicy": "Derived game-space proxies: glTF +Y up, root at existing placement pivot. Metric specimen sources remain unchanged.",
+  "props": [
+    {
+      "id": "devonian-crinoid",
+      "source": "stalked-crinoid-v2",
+      "triangles": 2800,
+      "height": 2.2,
+      "radius": 0.36
+    },
+    {
+      "id": "devonian-stromatoporoid",
+      "source": "massive-stromatoporoid-v2",
+      "triangles": 1400,
+      "height": 0.7,
+      "radius": 0.65
+    },
+    {
+      "id": "devonian-tabulate",
+      "source": "massive-tabulate-coral-v2",
+      "triangles": 1800,
+      "height": 0.3,
+      "radius": 0.6
+    },
+    {
+      "id": "devonian-rugose",
+      "source": "colonial-rugose-coral",
+      "triangles": 3000,
+      "height": 0.55,
+      "radius": 0.45
+    },
+    {
+      "id": "devonian-bryozoan",
+      "source": "bryozoan-colony",
+      "triangles": 2200,
+      "height": 0.9,
+      "radius": 0.45
+    },
+    {
+      "id": "devonian-algal-clump",
+      "source": "marine-algae-v2",
+      "triangles": 1600,
+      "height": 1.8,
+      "radius": 0.25
+    },
+    {
+      "id": "devonian-log",
+      "source": "submerged-log",
+      "triangles": 1600,
+      "height": 0.5,
+      "radius": 1.3
+    },
+    {
+      "id": "devonian-boulder",
+      "source": "large-boulder-v2",
+      "triangles": 1000,
+      "dimensions": [
+        2,
+        2,
+        2
+      ],
+      "pivot": "center"
+    },
+    {
+      "id": "devonian-outcrop",
+      "source": "carbonate-outcrop-v2",
+      "triangles": 1000,
+      "dimensions": [
+        1.2,
+        4,
+        1.2
+      ]
+    },
+    {
+      "id": "devonian-talus",
+      "source": "carbonate-rubble-v2",
+      "triangles": 1400,
+      "dimensions": [
+        1.5,
+        0.8,
+        0.85
+      ]
+    },
+    {
+      "id": "devonian-pebbles",
+      "source": "sand-pebble-bed-v2",
+      "triangles": 1000,
+      "dimensions": [
+        0.6,
+        0.15,
+        0.6
+      ]
+    }
+  ],
+  "proceduralExceptions": {
+    "lilyColumn": "Existing 9.5-world-unit column/crown retained. Directly enlarging the 0.543 m specimen would distort its crown; a supported rock/framework plus colony composition is deferred.",
+    "frondTower": "Existing 5.5-world-unit marine frond silhouette retained. No terrestrial Rhynia/Archaeopteris/tree substitution or 37\u00d7 stretched fossil thallus. A framework/algae composition is deferred."
+  }
+}

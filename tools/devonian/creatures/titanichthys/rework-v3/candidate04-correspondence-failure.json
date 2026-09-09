@@ -1,0 +1,116 @@
+{
+  "status": "G1 failed after full/LOD export at correspondence lookup; no GLB colour transfer write occurred (writes only at successful function end); no G2/G3",
+  "error": "Export colour correspondence missing Sphere.002 [1.10687625 0.59076643 2.07138991 0.01990001 0.02499998]",
+  "files": [
+    {
+      "path": "/Users/hoai/Documents/Stuff/Generations/cambrian/local/devonian-authoring/titanichthys/rework-v3/candidate-04/export-textures/body-albedo.png",
+      "bytes": 7133674,
+      "sha256": "d6db6a5b94a61ca5a886e2a559a159ac4ea742a5691322f2ee5d64926b04d09a"
+    },
+    {
+      "path": "/Users/hoai/Documents/Stuff/Generations/cambrian/local/devonian-authoring/titanichthys/rework-v3/candidate-04/export-textures/body-normal.png",
+      "bytes": 2630326,
+      "sha256": "45dbba341369a7d84de70c97fc8d954314f8cbc40a3665521cc61f513d20e138"
+    },
+    {
+      "path": "/Users/hoai/Documents/Stuff/Generations/cambrian/local/devonian-authoring/titanichthys/rework-v3/candidate-04/export-textures/body-roughness.png",
+      "bytes": 426622,
+      "sha256": "cb5b423e9e5931e6139b8a0284f1008014047c0f71f0a535b5166d9a8a02cd64"
+    },
+    {
+      "path": "/Users/hoai/Documents/Stuff/Generations/cambrian/local/devonian-authoring/titanichthys/rework-v3/candidate-04/export-textures/eyes-albedo.png",
+      "bytes": 43373,
+      "sha256": "e26adc3b7de1e8c1f90667ebe901a7ed7291857275cda29dfed03a7bfbf4b669"
+    },
+    {
+      "path": "/Users/hoai/Documents/Stuff/Generations/cambrian/local/devonian-authoring/titanichthys/rework-v3/candidate-04/export-textures/eyes-normal.png",
+      "bytes": 4588,
+      "sha256": "3b8dfb8c3b14effa2ec38e69ef1a4882de1fa69c367859e73cbedef159afbe90"
+    },
+    {
+      "path": "/Users/hoai/Documents/Stuff/Generations/cambrian/local/devonian-authoring/titanichthys/rework-v3/candidate-04/export-textures/eyes-roughness.png",
+      "bytes": 103472,
+      "sha256": "af4652a02ca6b2b1d2ae1672bb86cd06bf428455285890356bc330a147aeacdb"
+    },
+    {
+      "path": "/Users/hoai/Documents/Stuff/Generations/cambrian/local/devonian-authoring/titanichthys/rework-v3/candidate-04/export-textures/fins-caudal-albedo.png",
+      "bytes": 1085185,
+      "sha256": "ae7b864902a3407f1a3bd8cf81fec6be28ffba097f2a8a470fe2e49986c2962a"
+    },
+    {
+      "path": "/Users/hoai/Documents/Stuff/Generations/cambrian/local/devonian-authoring/titanichthys/rework-v3/candidate-04/export-textures/fins-caudal-normal.png",
+      "bytes": 405177,
+      "sha256": "da00139216ea47f80d47993aa401cbb3a8d2e7048926ec4a1b1028ac371c42b0"
+    },
+    {
+      "path": "/Users/hoai/Documents/Stuff/Generations/cambrian/local/devonian-authoring/titanichthys/rework-v3/candidate-04/export-textures/fins-caudal-roughness.png",
+      "bytes": 76987,
+      "sha256": "4aa88a9aa6974b74f705a70f11c2ccf5d586c13da690337441072917a70589c1"
+    },
+    {
+      "path": "/Users/hoai/Documents/Stuff/Generations/cambrian/local/devonian-authoring/titanichthys/rework-v3/candidate-04/export-textures/fins-dorsal-albedo.png",
+      "bytes": 389919,
+      "sha256": "2962a659c7a11366daeae66febb44133751b97c0acd68d0c74f54495365e3edc"
+    },
+    {
+      "path": "/Users/hoai/Documents/Stuff/Generations/cambrian/local/devonian-authoring/titanichthys/rework-v3/candidate-04/export-textures/fins-dorsal-normal.png",
+      "bytes": 576329,
+      "sha256": "0480d070822b88d515faaf2106de789bb435f062bbe89a3313316b51e29645b5"
+    },
+    {
+      "path": "/Users/hoai/Documents/Stuff/Generations/cambrian/local/devonian-authoring/titanichthys/rework-v3/candidate-04/export-textures/fins-dorsal-roughness.png",
+      "bytes": 89019,
+      "sha256": "c3990aed0925d27254279fb3d440af8c3e0601977025b7eed3fbdbc0f0e38761"
+    },
+    {
+      "path": "/Users/hoai/Documents/Stuff/Generations/cambrian/local/devonian-authoring/titanichthys/rework-v3/candidate-04/export-textures/fins-pectoral-albedo.png",
+      "bytes": 1897391,
+      "sha256": "0950b265af89376f073dd2742bfbf367b88ccf3f7e81863dc9a7251f95a5eff4"
+    },
+    {
+      "path": "/Users/hoai/Documents/Stuff/Generations/cambrian/local/devonian-authoring/titanichthys/rework-v3/candidate-04/export-textures/fins-pectoral-normal.png",
+      "bytes": 781889,
+      "sha256": "3200926cbd8f7f013fbd3a8561860c907fe4e2e8f30b36d0dbe0cbd06cfa31bf"
+    },
+    {
+      "path": "/Users/hoai/Documents/Stuff/Generations/cambrian/local/devonian-authoring/titanichthys/rework-v3/candidate-04/export-textures/fins-pectoral-roughness.png",
+      "bytes": 133207,
+      "sha256": "994b3657089307d71268f61238615916f1a388bbddb00dda5824b6d74cb5aa84"
+    },
+    {
+      "path": "/Users/hoai/Documents/Stuff/Generations/cambrian/local/devonian-authoring/titanichthys/rework-v3/candidate-04/export-textures/fins-pelvic-albedo.png",
+      "bytes": 475763,
+      "sha256": "48f06d95d49a62288143a0f023a54263ec477cdc1f8966bb0599d02f3da265fb"
+    },
+    {
+      "path": "/Users/hoai/Documents/Stuff/Generations/cambrian/local/devonian-authoring/titanichthys/rework-v3/candidate-04/export-textures/fins-pelvic-normal.png",
+      "bytes": 761458,
+      "sha256": "b092e8f641c143262e1eb9995cecd24abe64f13ab4fae6907273242378856a1c"
+    },
+    {
+      "path": "/Users/hoai/Documents/Stuff/Generations/cambrian/local/devonian-authoring/titanichthys/rework-v3/candidate-04/export-textures/fins-pelvic-roughness.png",
+      "bytes": 117980,
+      "sha256": "fbe1333b460f31d79cc817a24bde02ae507b33e3669421256e2288d6a87ef933"
+    },
+    {
+      "path": "/Users/hoai/Documents/Stuff/Generations/cambrian/local/devonian-authoring/titanichthys/rework-v3/candidate-04/lod-pigment-stages.json",
+      "bytes": 21065,
+      "sha256": "8e83cc402797089ecb325d88192801138c34b3e1a3fbb750c739d656865c3458"
+    },
+    {
+      "path": "/Users/hoai/Documents/Stuff/Generations/cambrian/local/devonian-authoring/titanichthys/rework-v3/candidate-04/titanichthys.glb",
+      "bytes": 43434408,
+      "sha256": "118086cb7cb023a5f99a481434a515f29fb30d8f5430ab20a1f7c86a806e89b1"
+    },
+    {
+      "path": "/Users/hoai/Documents/Stuff/Generations/cambrian/local/devonian-authoring/titanichthys/rework-v3/candidate-04/titanichthys.lod1.glb",
+      "bytes": 3903132,
+      "sha256": "32d4437702212d68f46f92a65efd8c7530f103e82cafa25eef2bcf7c613469a2"
+    },
+    {
+      "path": "/Users/hoai/Documents/Stuff/Generations/cambrian/local/devonian-authoring/titanichthys/rework-v3/build-candidate-04.log",
+      "bytes": 5416,
+      "sha256": "3c148716e3dd35d10e6bd8854d54f84fc6149336b0c7647ae4b6aa9afbc5ff4e"
+    }
+  ]
+}

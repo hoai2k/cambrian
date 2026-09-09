@@ -1,0 +1,278 @@
+{
+  "id": "odontogriphus",
+  "sourceOrientation": "Blender +Z up, -Y anterior; glTF +Y up, +Z anterior",
+  "boundsBlender": {
+    "min": [
+      -0.7200000286102295,
+      -1.850000023841858,
+      -0.18799999356269836
+    ],
+    "max": [
+      0.7200000286102295,
+      1.850000023841858,
+      0.17499999701976776
+    ]
+  },
+  "triangles": 38972,
+  "lodTriangles": 14809,
+  "vertices": 20413,
+  "bones": 109,
+  "durations": {
+    "Idle": 2.0,
+    "Attack": 1.0,
+    "Hit": 0.6,
+    "Death": 1.6,
+    "TurnLeft": 2.4,
+    "TurnRight": 2.4,
+    "Dive": 2.4,
+    "Rise": 2.4,
+    "Bite": 0.5,
+    "Heavy": 1.1,
+    "Guard": 1.0,
+    "Parry": 0.35,
+    "Dodge": 0.4,
+    "Eat": 0.8,
+    "Stagger": 1.2,
+    "Ability": 1.2,
+    "Moult": 1.5,
+    "Crawl": 2.0
+  },
+  "clipFrames": {
+    "Idle": 60.0,
+    "Attack": 30.0,
+    "Hit": 18.0,
+    "Death": 48.0,
+    "TurnLeft": 72.0,
+    "TurnRight": 72.0,
+    "Dive": 72.0,
+    "Rise": 72.0,
+    "Bite": 15.0,
+    "Heavy": 33.0,
+    "Guard": 30.0,
+    "Parry": 10.5,
+    "Dodge": 12.0,
+    "Eat": 24.0,
+    "Stagger": 36.0,
+    "Ability": 36.0,
+    "Moult": 45.0,
+    "Crawl": 60.0
+  },
+  "scientificNotes": [
+    "Unarmored, smooth dorsum; flattened oval outline; muscular crawling foot; fine marginal gills; small ventral radula with two tooth rows. No invented eyes, tentacles, spikes, or dorsal plates.",
+    "Foot peristalsis and traveling mantle bends supply motion. Surface pigmentation and combat shoves are reconstructed for readable gameplay."
+  ],
+  "sources": [
+    "https://burgess-shale.rom.on.ca/fossils/odontogriphus-omalus/",
+    "https://pmc.ncbi.nlm.nih.gov/articles/PMC3441091/"
+  ],
+  "validation": {
+    "full": {
+      "bytes": 4679076,
+      "clips": [
+        "Ability",
+        "Attack",
+        "Bite",
+        "Crawl",
+        "Death",
+        "Dive",
+        "Dodge",
+        "Eat",
+        "Guard",
+        "Heavy",
+        "Hit",
+        "Idle",
+        "Moult",
+        "Parry",
+        "Rise",
+        "Stagger",
+        "TurnLeft",
+        "TurnRight"
+      ],
+      "materials": {
+        "odontogriphus Gill filaments": {
+          "min": 0.09143205920500495,
+          "max": 0.6398870832379644,
+          "mean": 0.3220632296808817
+        },
+        "odontogriphus Living integument": {
+          "min": 0.06796368352788586,
+          "max": 0.5413443198290989,
+          "mean": 0.233070438076642
+        },
+        "odontogriphus Marginal tissue": {
+          "min": 0.08172732127870604,
+          "max": 0.42485694666971846,
+          "mean": 0.2446830411080703
+        },
+        "odontogriphus Oral cuticle": {
+          "min": 0.01692225528343633,
+          "max": 0.7615625238422217,
+          "mean": 0.286541203840639
+        }
+      },
+      "rootStatic": true,
+      "noScaleAnimation": true
+    },
+    "lod": {
+      "bytes": 3591512,
+      "clips": [
+        "Ability",
+        "Attack",
+        "Bite",
+        "Crawl",
+        "Death",
+        "Dive",
+        "Dodge",
+        "Eat",
+        "Guard",
+        "Heavy",
+        "Hit",
+        "Idle",
+        "Moult",
+        "Parry",
+        "Rise",
+        "Stagger",
+        "TurnLeft",
+        "TurnRight"
+      ],
+      "materials": {
+        "odontogriphus Gill filaments": {
+          "min": 0.09143205920500495,
+          "max": 0.6397802700846875,
+          "mean": 0.32048354651225097
+        },
+        "odontogriphus Living integument": {
+          "min": 0.07598992904554817,
+          "max": 0.5215838864728771,
+          "mean": 0.23598545996685702
+        },
+        "odontogriphus Marginal tissue": {
+          "min": 0.08516060120546273,
+          "max": 0.42485694666971846,
+          "mean": 0.24620644703094285
+        },
+        "odontogriphus Oral cuticle": {
+          "min": 0.01692225528343633,
+          "max": 0.7615625238422217,
+          "mean": 0.45849046602217214
+        }
+      },
+      "rootStatic": true,
+      "noScaleAnimation": true
+    },
+    "evaluatedSkin": {
+      "Idle": {
+        "finite": true,
+        "samples": 5,
+        "maxDimension": 3.7076456546783447
+      },
+      "Attack": {
+        "finite": true,
+        "samples": 5,
+        "maxDimension": 3.700000047683716
+      },
+      "Hit": {
+        "finite": true,
+        "samples": 5,
+        "maxDimension": 3.700000047683716
+      },
+      "Death": {
+        "finite": true,
+        "samples": 5,
+        "maxDimension": 3.700000047683716
+      },
+      "TurnLeft": {
+        "finite": true,
+        "samples": 5,
+        "maxDimension": 3.700000047683716
+      },
+      "TurnRight": {
+        "finite": true,
+        "samples": 5,
+        "maxDimension": 3.700000047683716
+      },
+      "Dive": {
+        "finite": true,
+        "samples": 5,
+        "maxDimension": 3.700000047683716
+      },
+      "Rise": {
+        "finite": true,
+        "samples": 5,
+        "maxDimension": 3.700000047683716
+      },
+      "Bite": {
+        "finite": true,
+        "samples": 5,
+        "maxDimension": 3.7036526203155518
+      },
+      "Heavy": {
+        "finite": true,
+        "samples": 5,
+        "maxDimension": 3.700000047683716
+      },
+      "Guard": {
+        "finite": true,
+        "samples": 5,
+        "maxDimension": 3.640612244606018
+      },
+      "Parry": {
+        "finite": true,
+        "samples": 5,
+        "maxDimension": 3.700000047683716
+      },
+      "Dodge": {
+        "finite": true,
+        "samples": 5,
+        "maxDimension": 3.700000047683716
+      },
+      "Eat": {
+        "finite": true,
+        "samples": 5,
+        "maxDimension": 3.697605013847351
+      },
+      "Stagger": {
+        "finite": true,
+        "samples": 5,
+        "maxDimension": 3.700000047683716
+      },
+      "Ability": {
+        "finite": true,
+        "samples": 5,
+        "maxDimension": 3.745849370956421
+      },
+      "Moult": {
+        "finite": true,
+        "samples": 5,
+        "maxDimension": 3.700000047683716
+      },
+      "Crawl": {
+        "finite": true,
+        "samples": 5,
+        "maxDimension": 3.724218249320984
+      }
+    },
+    "endpointMaxRadiansOrUnits": {
+      "Idle": 5.2904743171411414e-18,
+      "Attack": 1.7997117894806697e-33,
+      "Hit": 2.8415858607350646e-34,
+      "Death": 0.949999988079071,
+      "TurnLeft": 1.959434864874595e-17,
+      "TurnRight": 1.959434864874595e-17,
+      "Dive": 1.959434864874595e-17,
+      "Rise": 1.959434864874595e-17,
+      "Bite": 1.7997117894806697e-33,
+      "Heavy": 1.7997117894806697e-33,
+      "Guard": 3.526982740230659e-18,
+      "Parry": 2.9995195879107854e-33,
+      "Dodge": 3.2994715834360624e-33,
+      "Eat": 1.2246467698671066e-17,
+      "Stagger": 2.3756195327271252e-33,
+      "Ability": 7.70343510652182e-17,
+      "Moult": 4.6629365578418697e-17,
+      "Crawl": 1.959434864874595e-17
+    },
+    "renderInspected": true
+  },
+  "sourceBlend": "cambrian/local/expansion-authoring/soft/odontogriphus.blend"
+}

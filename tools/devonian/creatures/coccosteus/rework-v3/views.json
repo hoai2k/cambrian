@@ -1,0 +1,14 @@
+{
+  "resolution": [1280, 960],
+  "samples": 32,
+  "body": [
+    {"name": "side", "camera": [7.0, 0.45, 0.12], "target": [0.0, 0.45, 0.12], "scale": 5.1},
+    {"name": "front", "camera": [0.0, -7.0, 0.06], "target": [0.0, -0.4, 0.06], "scale": 2.55},
+    {"name": "dorsal", "camera": [0.0, 0.45, 7.0], "target": [0.0, 0.45, 0.0], "scale": 5.1},
+    {"name": "oblique", "camera": [4.6, -5.2, 2.7], "target": [0.0, 0.30, 0.0], "scale": 4.85}
+  ],
+  "mouth": [
+    {"name": "mouth-rest", "camera": [1.75, -4.6, -0.52], "target": [0.0, -1.30, -0.12], "scale": 1.48, "gape": 0.0},
+    {"name": "mouth-open", "camera": [1.75, -4.6, -0.52], "target": [0.0, -1.30, -0.12], "scale": 1.48, "gape": 1.0}
+  ]
+}

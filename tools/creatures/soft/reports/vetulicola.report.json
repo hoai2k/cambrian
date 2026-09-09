@@ -1,0 +1,278 @@
+{
+  "id": "vetulicola",
+  "sourceOrientation": "Blender +Z up, -Y anterior; glTF +Y up, +Z anterior",
+  "boundsBlender": {
+    "min": [
+      -0.44172409176826477,
+      -2.0829999446868896,
+      -0.800000011920929
+    ],
+    "max": [
+      0.44172409176826477,
+      2.799999952316284,
+      0.8083414435386658
+    ]
+  },
+  "triangles": 40490,
+  "lodTriangles": 15386,
+  "vertices": 20564,
+  "bones": 19,
+  "durations": {
+    "Idle": 2.4,
+    "Swim": 2.4,
+    "Attack": 1.0,
+    "Hit": 0.6,
+    "Death": 1.6,
+    "TurnLeft": 2.4,
+    "TurnRight": 2.4,
+    "Dive": 2.4,
+    "Rise": 2.4,
+    "Bite": 0.5,
+    "Heavy": 1.1,
+    "Guard": 1.0,
+    "Parry": 0.35,
+    "Dodge": 0.4,
+    "Eat": 0.8,
+    "Stagger": 1.2,
+    "Ability": 1.2,
+    "Moult": 1.5
+  },
+  "clipFrames": {
+    "Idle": 72.0,
+    "Swim": 72.0,
+    "Attack": 30.0,
+    "Hit": 18.0,
+    "Death": 48.0,
+    "TurnLeft": 72.0,
+    "TurnRight": 72.0,
+    "Dive": 72.0,
+    "Rise": 72.0,
+    "Bite": 15.0,
+    "Heavy": 33.0,
+    "Guard": 30.0,
+    "Parry": 10.5,
+    "Dodge": 12.0,
+    "Eat": 24.0,
+    "Stagger": 36.0,
+    "Ability": 36.0,
+    "Moult": 45.0
+  },
+  "scientificNotes": [
+    "Bipartite body: laterally compressed angular anterior chamber with dorsal point and ventral keel, five paired recessed pharyngeal openings, seven-segment swimming tail. No eyes, limbs, or antennae.",
+    "Gill pumping is shown as small lappet motions; chamber remains firm. Filter feeding and body-shove combat are game interpretations."
+  ],
+  "sources": [
+    "https://pmc.ncbi.nlm.nih.gov/articles/PMC3517509/",
+    "https://www.mdpi.com/2076-3263/9/8/354"
+  ],
+  "validation": {
+    "full": {
+      "bytes": 2644248,
+      "clips": [
+        "Ability",
+        "Attack",
+        "Bite",
+        "Death",
+        "Dive",
+        "Dodge",
+        "Eat",
+        "Guard",
+        "Heavy",
+        "Hit",
+        "Idle",
+        "Moult",
+        "Parry",
+        "Rise",
+        "Stagger",
+        "Swim",
+        "TurnLeft",
+        "TurnRight"
+      ],
+      "materials": {
+        "vetulicola Gill filaments": {
+          "min": 0.09558251316090638,
+          "max": 0.5775387197680628,
+          "mean": 0.2991140926755484
+        },
+        "vetulicola Living integument": {
+          "min": 0.020080872816052493,
+          "max": 0.518425268940261,
+          "mean": 0.2267785727383775
+        },
+        "vetulicola Marginal tissue": {
+          "min": 0.07518120088502327,
+          "max": 0.5615625238422217,
+          "mean": 0.28145418243963816
+        },
+        "vetulicola Oral cuticle": {
+          "min": 0.016311894407568476,
+          "max": 0.4745708400091554,
+          "mean": 0.14052334854747575
+        }
+      },
+      "rootStatic": true,
+      "noScaleAnimation": true
+    },
+    "lod": {
+      "bytes": 1463032,
+      "clips": [
+        "Ability",
+        "Attack",
+        "Bite",
+        "Death",
+        "Dive",
+        "Dodge",
+        "Eat",
+        "Guard",
+        "Heavy",
+        "Hit",
+        "Idle",
+        "Moult",
+        "Parry",
+        "Rise",
+        "Stagger",
+        "Swim",
+        "TurnLeft",
+        "TurnRight"
+      ],
+      "materials": {
+        "vetulicola Gill filaments": {
+          "min": 0.09558251316090638,
+          "max": 0.5775387197680628,
+          "mean": 0.3001700382708398
+        },
+        "vetulicola Living integument": {
+          "min": 0.020080872816052493,
+          "max": 0.508369573510338,
+          "mean": 0.2141371864473241
+        },
+        "vetulicola Marginal tissue": {
+          "min": 0.07901121538109407,
+          "max": 0.5374837872892347,
+          "mean": 0.2815339459955525
+        },
+        "vetulicola Oral cuticle": {
+          "min": 0.016311894407568476,
+          "max": 0.4745708400091554,
+          "mean": 0.1316785014913877
+        }
+      },
+      "rootStatic": true,
+      "noScaleAnimation": true
+    },
+    "evaluatedSkin": {
+      "Idle": {
+        "finite": true,
+        "samples": 5,
+        "maxDimension": 4.8852622509002686
+      },
+      "Swim": {
+        "finite": true,
+        "samples": 5,
+        "maxDimension": 4.882999897003174
+      },
+      "Attack": {
+        "finite": true,
+        "samples": 5,
+        "maxDimension": 4.891573190689087
+      },
+      "Hit": {
+        "finite": true,
+        "samples": 5,
+        "maxDimension": 4.882999897003174
+      },
+      "Death": {
+        "finite": true,
+        "samples": 5,
+        "maxDimension": 4.882999897003174
+      },
+      "TurnLeft": {
+        "finite": true,
+        "samples": 5,
+        "maxDimension": 4.882999897003174
+      },
+      "TurnRight": {
+        "finite": true,
+        "samples": 5,
+        "maxDimension": 4.882999897003174
+      },
+      "Dive": {
+        "finite": true,
+        "samples": 5,
+        "maxDimension": 4.882999897003174
+      },
+      "Rise": {
+        "finite": true,
+        "samples": 5,
+        "maxDimension": 4.882999897003174
+      },
+      "Bite": {
+        "finite": true,
+        "samples": 5,
+        "maxDimension": 4.884991884231567
+      },
+      "Heavy": {
+        "finite": true,
+        "samples": 5,
+        "maxDimension": 4.891568660736084
+      },
+      "Guard": {
+        "finite": true,
+        "samples": 5,
+        "maxDimension": 4.881345510482788
+      },
+      "Parry": {
+        "finite": true,
+        "samples": 5,
+        "maxDimension": 4.882999897003174
+      },
+      "Dodge": {
+        "finite": true,
+        "samples": 5,
+        "maxDimension": 4.882999897003174
+      },
+      "Eat": {
+        "finite": true,
+        "samples": 5,
+        "maxDimension": 4.889343023300171
+      },
+      "Stagger": {
+        "finite": true,
+        "samples": 5,
+        "maxDimension": 4.882999897003174
+      },
+      "Ability": {
+        "finite": true,
+        "samples": 5,
+        "maxDimension": 4.882999897003174
+      },
+      "Moult": {
+        "finite": true,
+        "samples": 5,
+        "maxDimension": 4.882999897003174
+      }
+    },
+    "endpointMaxRadiansOrUnits": {
+      "Idle": 6.251874083067636e-18,
+      "Swim": 2.3155088216184592e-17,
+      "Attack": 1.1248197995487964e-33,
+      "Hit": 2.8415858607350646e-34,
+      "Death": 0.949999988079071,
+      "TurnLeft": 2.3155088216184592e-17,
+      "TurnRight": 2.3155088216184592e-17,
+      "Dive": 2.3155088216184592e-17,
+      "Rise": 2.3155088216184592e-17,
+      "Bite": 1.1248197995487964e-33,
+      "Heavy": 1.1248197995487964e-33,
+      "Guard": 4.1442046473927206e-18,
+      "Parry": 2.9995195879107854e-33,
+      "Dodge": 3.2994715834360624e-33,
+      "Eat": 2.3554492374955822e-17,
+      "Stagger": 2.3756195327271252e-33,
+      "Ability": 6.339484421337822e-17,
+      "Moult": 4.6629365578418697e-17
+    },
+    "renderInspected": true
+  },
+  "sourceBlend": "cambrian/local/expansion-authoring/soft/vetulicola.blend"
+}

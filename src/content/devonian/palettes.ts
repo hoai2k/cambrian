@@ -1,0 +1,96 @@
+import type { Scheme } from '../../shared/palettes';
+
+/**
+ * Devonian colour schemes, distilled from the palaeoart survey in docs/art/devonian-colour-research.md
+ * (source list, per-creature treatments and what was discarded). Ordered grounded → naturalistic →
+ * bright, the way they are browsed; the first entry is always the untouched model. Regenerate from
+ * docs/art/devonian-schemes.json when the survey changes.
+ */
+export const SCHEMES: readonly Scheme[] = [
+  { id: 'default', name: 'Default (as authored)', note: 'The vertex colours baked into the model. No recolouring.', colors: null },
+  { id: 'cleveland-charcoal', name: 'Cleveland Charcoal', note: 'Engelman\'s Dunkleosteus: near-black armour over bone-cream belly, with a pale eye-patch the only light on the head.',
+    colors: { body: '#383a3b', eyes: '#c9c08e', fins: '#2c2e2f', legs: '#55534a', accent: '#1e1f20', underside: '#e0dbbf' } },
+  { id: 'orcadian-mud', name: 'Orcadian Mud', note: 'Dark brown mottle over a lighter belly — the lake-bottom placoderm and modern lungfish both end up here.',
+    colors: { body: '#4b3f35', eyes: '#0e0b09', fins: '#6a5b4e', legs: '#5a4c40', accent: '#2f2620', underside: '#7d6f61' } },
+  { id: 'miguasha-sand', name: 'Miguasha Sand', note: 'Sandy tan armour, the colour Gess and Ahlberg gave Bothriolepis; nothing on it would show against a sandbar.',
+    colors: { body: '#c2a06c', eyes: '#1a140c', fins: '#d3b98a', legs: '#b8975f', accent: '#8a6a44', underside: '#d8c39c' } },
+  { id: 'svalbard-shingle', name: 'Svalbard Shingle', note: 'Pale grey shield with dark-grey speckle and a darker scaled tail, the way Tamura paints heterostracans.',
+    colors: { body: '#a29a90', eyes: '#111010', fins: '#7a716a', legs: '#8c847c', accent: '#4a4440', underside: '#bdb6ad' } },
+  { id: 'slate-and-bone', name: 'Slate and Bone', note: 'Damstra\'s living phacopid: slate blue-grey exoskeleton, lilac sheen, red-brown freckles, indigo lenses.',
+    colors: { body: '#6d7a92', eyes: '#262a52', fins: '#8c98ae', legs: '#5a6480', accent: '#7a3a30', underside: '#b8bcc8' } },
+  { id: 'cleveland-countershade', name: 'Cleveland Countershade', note: 'Blue-grey back, pale belly: the shark countershade every Cladoselache wears.',
+    colors: { body: '#5f7a90', eyes: '#0c1014', fins: '#4d6578', legs: '#7d93a4', accent: '#3a4f60', underside: '#c6d1d8' } },
+  { id: 'ellesmere-olive', name: 'Ellesmere Olive', note: 'Olive-bronze with dark dorsal banding — the near-unanimous Tiktaalik.',
+    colors: { body: '#6e6238', eyes: '#12100a', fins: '#8a7c4a', legs: '#5a5030', accent: '#3a3222', underside: '#a89c70' } },
+  { id: 'lavender-brush', name: 'Lavender Brush', note: 'Bogdanov\'s Stethacanthus: grey-lavender body, pink-white belly, and a rust-brown spine-brush that has to read as a different material.',
+    colors: { body: '#857a92', eyes: '#14100c', fins: '#6a5c78', legs: '#9a8ea4', accent: '#7a4a3a', underside: '#dcd0d8' } },
+  { id: 'greenland-leopard', name: 'Greenland Leopard', note: 'Tan with dark leopard spots and a coral-and-moss tail fringe, straight off Tamura\'s Acanthostega.',
+    colors: { body: '#a8907a', eyes: '#c8a040', fins: '#c86040', legs: '#8a7660', accent: '#4a3a2a', underside: '#cfc0a8' } },
+  { id: 'orcadie-leaf', name: 'Orcadie Leaf', note: 'Leaf green over cream with a yellow eye — Coccosteus as a lake fish, not a sea monster.',
+    colors: { body: '#4e8a2c', eyes: '#d7c62a', fins: '#3d6f22', legs: '#66a03a', accent: '#2c4d17', underside: '#d8d6b4' } },
+  { id: 'stargazer-ochre', name: 'Stargazer Ochre', note: 'Ochre-yellow with grey-blue mottling and white-ringed tubercles: a flatfish disguise for an upward-looking placoderm.',
+    colors: { body: '#b3a04a', eyes: '#e8d020', fins: '#a0905a', legs: '#8a7a44', accent: '#e6e4d0', underside: '#cbbd82' } },
+  { id: 'shoal-sea-green', name: 'Shoal Sea-Green', note: 'Witton\'s Titanichthys shoal: sea-green skin with white lichen flecks, the whale-shark reading of a filter feeder.',
+    colors: { body: '#7ea89a', eyes: '#101a18', fins: '#5e8a7e', legs: '#6f9a8c', accent: '#d6ece4', underside: '#c8e0d6' } },
+  { id: 'gogo-silver', name: 'Gogo Silver', note: 'Silver-grey with a blue sheen and white tusks — the barracuda take on Onychodus.',
+    colors: { body: '#8c98a4', eyes: '#0e1216', fins: '#74828e', legs: '#98a4b0', accent: '#e6e6dc', underside: '#c4ccd2' } },
+  { id: 'ganoine-teal', name: 'Ganoine Teal', note: 'Teal-grey with pale saddle bands and sand-coloured fins, the palaeoniscoid silver of early ray-fins.',
+    colors: { body: '#6f8a80', eyes: '#c8b040', fins: '#c8bc98', legs: '#86a094', accent: '#b0c0b0', underside: '#b8c6bc' } },
+  { id: 'orthocone-zigzag', name: 'Orthocone Zigzag', note: 'Pale grey shell with red-brown dorsal zigzags — the one cephalopod pattern with actual fossil colour behind it.',
+    colors: { body: '#c8c4bc', eyes: '#1a1412', fins: '#a89080', legs: '#9a8078', accent: '#5a1a14', underside: '#d8d4cc' } },
+  { id: 'goniatite-band', name: 'Goniatite Band', note: 'Cream shell with red-brown radial bands and pink-grey soft parts, the conventional ammonoid.',
+    colors: { body: '#d2c09c', eyes: '#16100c', fins: '#b09a80', legs: '#a08070', accent: '#8a3a24', underside: '#e0d4b8' } },
+  { id: 'hunsruck-glass', name: 'Hunsrück Glass', note: 'Translucent tan-orange cuticle with brighter membranes — what a phyllocarid or sea spider looks like before the pyrite gets it.',
+    colors: { body: '#c2a070', eyes: '#1a0e08', fins: '#e0c090', legs: '#d0a86a', accent: '#e88a3a', underside: '#d8c4a0' } },
+  { id: 'brittle-star-band', name: 'Brittle-star Band', note: 'Banded brown arms and a darker disc with a rust edge, borrowed from living ophiuroids since no one has painted Furcaster.',
+    colors: { body: '#6a4a30', eyes: '#1a100a', fins: '#a08060', legs: '#8a6a48', accent: '#c86a3a', underside: '#b09070' } },
+  { id: 'rhineland-rust', name: 'Rhineland Rust', note: 'Red-brown eurypterid cuticle with yellow segment margins and a blue compound eye.',
+    colors: { body: '#8a4a3a', eyes: '#2a3a6a', fins: '#a06a5a', legs: '#7a4030', accent: '#d8a030', underside: '#b07a68' } },
+  { id: 'trident-ember', name: 'Trident Ember', note: 'Nix\'s Walliserops: rust-orange body with teal-to-cream spines, so the trident reads from across the reef.',
+    colors: { body: '#c05a2a', eyes: '#5a4a48', fins: '#d07a48', legs: '#a09080', accent: '#3a9ab0', underside: '#e0a870' } },
+  { id: 'gogo-carnival', name: 'Gogo Carnival', note: 'Bogdanov\'s reef-wrasse Onychodus: teal head, copper flank bands, violet fins. No evidence, all fun.',
+    colors: { body: '#3f8a6a', eyes: '#101a14', fins: '#7a4aa8', legs: '#4a9a7a', accent: '#c46a2a', underside: '#d8b040' } },
+  { id: 'cladoselachid-violet', name: 'Cladoselachid Violet', note: 'Lavender-violet shark with a green eye, the one loud Cladoselache anyone has painted.',
+    colors: { body: '#7b6fb0', eyes: '#30d040', fins: '#a89ad0', legs: '#8a7ec0', accent: '#d0d060', underside: '#c8c0e0' } },
+  { id: 'hunsruck-bluestripe', name: 'Hunsrück Blue-stripe', note: 'Blue shell with dark bands and pale arms, from the brighter Devonian cephalopod scenes.',
+    colors: { body: '#6a8ad0', eyes: '#101828', fins: '#c8e0e8', legs: '#b0d0d8', accent: '#2a3a80', underside: '#a0b8e0' } },
+];
+
+/**
+ * Which scheme each creature is *proposed* in, for the viewer's dropdown.
+ *
+ * Nothing here is applied in play. Every shipped portrait — the select card, the roster thumbnail,
+ * the results tile — is a studio render of the model's own authored vertex colours, and a match
+ * that repainted the animal into one of these would no longer look like the card the player just
+ * picked (Dunkleosteus was the loud case: Cleveland Charcoal is near-black, its card is pale
+ * grey-green). Until the palette renders exist for this era the way they do for the Cambrian
+ * (tools/art/prepare-palette-renders.mjs and a Blender pass), the game draws what the card shows
+ * and these stay a proposal you can try on in the viewer.
+ */
+export const SCHEME_PROPOSALS: Record<string, string> = {
+
+  dunkleosteus: 'cleveland-charcoal',
+  titanichthys: 'shoal-sea-green',
+  coccosteus: 'orcadie-leaf',
+  bothriolepis: 'miguasha-sand',
+  gemuendina: 'default',
+  doryaspis: 'svalbard-shingle',
+  cladoselache: 'cleveland-countershade',
+  stethacanthus: 'lavender-brush',
+  cheirolepis: 'ganoine-teal',
+  rhinodipterus: 'orcadian-mud',
+  onychodus: 'gogo-silver',
+  tiktaalik: 'ellesmere-olive',
+  acanthostega: 'greenland-leopard',
+  eldredgeops: 'slate-and-bone',
+  walliserops: 'trident-ember',
+  jaekelopterus: 'rhineland-rust',
+  nahecaris: 'hunsruck-glass',
+  furcaster: 'brittle-star-band',
+  palaeoisopus: 'hunsruck-glass',
+  manticoceras: 'goniatite-band',
+  michelinoceras: 'orthocone-zigzag',
+};
+
+/** In play: the authored colours, which is what every portrait was rendered from. */
+export const CREATURE_SCHEMES: Record<string, string> = {};

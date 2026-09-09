@@ -1,0 +1,74 @@
+[
+  {
+    "mesh": "eye_globe_R",
+    "surroundingMeshes": [
+      "head_envelope_closed"
+    ],
+    "bone": "head",
+    "centerBlender": [
+      -0.286259263753891,
+      -1.2123372554779053,
+      0.1287265419960022
+    ],
+    "normal": [
+      -0.8715881109237671,
+      -0.318354070186615,
+      0.372806578874588
+    ],
+    "tangentU": [
+      -0.2927023768424988,
+      0.9479718804359436,
+      0.12519831955432892
+    ],
+    "tangentV": [
+      -0.39326760172843933,
+      -7.450581485102248e-09,
+      -0.9194241166114807
+    ],
+    "radii": [
+      0.052,
+      0.073,
+      0.053
+    ],
+    "sampleCount": 36560,
+    "embeddedFraction": 0.8416028446389496,
+    "centerInsetMeters": 0.027,
+    "method": "Seeded uniform ellipsoid volume samples tested against the actual closed subdivided head BVH signed nearest surface."
+  },
+  {
+    "mesh": "eye_globe_L",
+    "surroundingMeshes": [
+      "head_envelope_closed"
+    ],
+    "bone": "head",
+    "centerBlender": [
+      0.2862592339515686,
+      -1.2123373746871948,
+      0.128726527094841
+    ],
+    "normal": [
+      0.871588945388794,
+      -0.31835150718688965,
+      0.37280693650245667
+    ],
+    "tangentU": [
+      0.29270005226135254,
+      0.9479727149009705,
+      0.12519732117652893
+    ],
+    "tangentV": [
+      -0.39326757192611694,
+      7.450580596923828e-09,
+      0.9194240570068359
+    ],
+    "radii": [
+      0.052,
+      0.073,
+      0.053
+    ],
+    "sampleCount": 36560,
+    "embeddedFraction": 0.8431892778993435,
+    "centerInsetMeters": 0.027,
+    "method": "Seeded uniform ellipsoid volume samples tested against the actual closed subdivided head BVH signed nearest surface."
+  }
+]

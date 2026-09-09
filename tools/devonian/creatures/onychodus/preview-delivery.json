@@ -1,0 +1,22 @@
+{
+  "id": "onychodus",
+  "modelStatus": "preview",
+  "stage": "Initial playable model; extended refining pass follows complete roster and scenery delivery.",
+  "packaging": "Lossless numeric and oriented-topology round-trip passed; original 126 Cambrian files byte-identical.",
+  "models": {
+    "glb": {
+      "sourceSHA256": "536a42c3c21e3e7eaddc9271df8fc70110323a0c8c550d36c965ec02699b4dc7",
+      "packagedSHA256": "6808c32d9c7f778c7ae101b1b12e27f6fd0aa54e785053dbeea9a83252a6c476",
+      "bytes": 6299404
+    },
+    "lod1.glb": {
+      "sourceSHA256": "092669867094e4f9498f0963af582a942b980255f2b80178492158762ba3d07c",
+      "packagedSHA256": "77a118126ac8fab68402fb47c2de815a98e1c155fc8040b0a8e7748693b349df",
+      "bytes": 1200872
+    }
+  },
+  "deferredRefinement": [
+    "Review tusk-to-palatal-pocket clearance across full closing sequence; local geometry-draft.py contains an unexported proposed pocket change. Shipped build.py matches shipped GLB.",
+    "Final cross-angle oral and action art polish."
+  ]
+}

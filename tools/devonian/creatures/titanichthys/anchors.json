@@ -1,0 +1,54 @@
+{
+  "titanichthys": [
+    {
+      "name": "anchor_mouth",
+      "bone": "jaw",
+      "point": [
+        0,
+        -2.6,
+        -0.158
+      ],
+      "role": "mouth"
+    },
+    {
+      "name": "anchor_mouth_inside",
+      "bone": "oral_floor",
+      "point": [
+        0,
+        -2.2,
+        -0.205
+      ],
+      "role": "swallow"
+    },
+    {
+      "name": "anchor_attack_primary",
+      "bone": "skull",
+      "point": [
+        0,
+        -2.78,
+        0.32
+      ],
+      "role": "attack"
+    },
+    {
+      "name": "anchor_support_left",
+      "bone": "pectoral0L",
+      "point": [
+        1.0186170625,
+        -0.5010431249999999,
+        -0.5151856249999999
+      ],
+      "role": "support"
+    },
+    {
+      "name": "anchor_support_right",
+      "bone": "pectoral0R",
+      "point": [
+        -1.0186170625,
+        -0.5010431249999999,
+        -0.5151856249999999
+      ],
+      "role": "support"
+    }
+  ]
+}

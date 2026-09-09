@@ -1,0 +1,36 @@
+{
+  "id": "solitary-rugose-coral-v2",
+  "family": "B06",
+  "name": "Solitary rugose coral \u2014 variant 2",
+  "taxon": "Heliophyllum halli comparative skeleton",
+  "category": "attached",
+  "description": "Curved horn with incremental ridges, deep calyx and radial septa. This is an exposed skeleton, not a claim of living polyp anatomy.",
+  "provenance": "Middle Devonian Hamilton/Traverse records, North America",
+  "model": "assets/devonian/props/solitary-rugose-coral-v2.glb",
+  "lod": "assets/devonian/props/solitary-rugose-coral-v2.lod1.glb",
+  "image": "assets/devonian/props/solitary-rugose-coral-v2.png",
+  "lengthMeters": 0.1021188274025917,
+  "dimensionsMeters": {
+    "x": 0.07129500061273575,
+    "y": 0.1021188274025917,
+    "z": 0.07129500061273575
+  },
+  "clips": [],
+  "looping": [],
+  "sources": [
+    "https://devonianatlas.org/species/heliophyllum-halli/"
+  ],
+  "notes": [
+    "Original parametric mesh, no downloaded model.",
+    "1 glTF unit = 1 metre. Dimensions describe this art specimen, not a taxon maximum.",
+    "Pigmentation and soft appearance are artistic interpretations.",
+    "Locality tags constrain future placement; library membership does not assert co-occurrence.",
+    "Preview model: initial scenery delivery; further individual material, silhouette and motion refinement is pending."
+  ],
+  "fullTriangles": 9792,
+  "lodTriangles": 2937,
+  "lodRatio": 0.29993872549019607,
+  "sourceBlend": "../devonian-authoring/props/solitary-rugose-coral-v2/solitary-rugose-coral-v2.blend",
+  "uncertainty": "Exposed skeletal calyx/septa, with living tissue deliberately absent; ridges are not species-diagnostic detail.",
+  "modelStatus": "preview"
+}

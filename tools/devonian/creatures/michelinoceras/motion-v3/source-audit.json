@@ -1,0 +1,214 @@
+{
+  "inputs": [
+    {
+      "path": "/Users/hoai/Documents/Stuff/Generations/cambrian/local/devonian-authoring/michelinoceras/v1/michelinoceras.blend",
+      "bytes": 11968438,
+      "sha256": "dbd8ff9c84e476b69442e8ec340f8ca97e02f9e9d6e49ab8fea72bdaaf09de20"
+    },
+    {
+      "path": "/Users/hoai/Documents/Stuff/Generations/cambrian/local/devonian-authoring/michelinoceras/v1/candidate/michelinoceras.glb",
+      "bytes": 19581660,
+      "sha256": "f69f1bfaae8e96d775756bb1fdbdc6b4c0971adf88892fd132ed885baaaaa313",
+      "clips": [
+        "Ability",
+        "Attack",
+        "Bite",
+        "Death",
+        "Dive",
+        "Dodge",
+        "Eat",
+        "Grab",
+        "Growth",
+        "Guard",
+        "Heavy",
+        "Hit",
+        "Idle",
+        "Parry",
+        "Rise",
+        "Stagger",
+        "Swim",
+        "TurnLeft",
+        "TurnRight"
+      ],
+      "joints": 166,
+      "anchors": [
+        {
+          "name": "anchor_attack_primary",
+          "extras": {
+            "cambrianAnchor": {
+              "version": 1,
+              "role": "attack",
+              "parentBone": "arm_0_12"
+            }
+          }
+        },
+        {
+          "name": "anchor_mouth",
+          "extras": {
+            "cambrianAnchor": {
+              "version": 1,
+              "role": "mouth",
+              "parentBone": "head"
+            }
+          }
+        },
+        {
+          "name": "anchor_mouth_inside",
+          "extras": {
+            "cambrianAnchor": {
+              "version": 1,
+              "role": "swallow",
+              "parentBone": "head"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "path": "/Users/hoai/Documents/Stuff/Generations/cambrian/local/devonian-authoring/michelinoceras/v1/candidate/michelinoceras.lod1.glb",
+      "bytes": 4988732,
+      "sha256": "7166c05353811611d978fe202caea234a9a9b70eab359cd4d0e51da6a80be34b",
+      "clips": [
+        "Death",
+        "Idle",
+        "Swim"
+      ],
+      "joints": 166,
+      "anchors": [
+        {
+          "name": "anchor_attack_primary",
+          "extras": {
+            "cambrianAnchor": {
+              "version": 1,
+              "role": "attack",
+              "parentBone": "arm_0_12"
+            }
+          }
+        },
+        {
+          "name": "anchor_mouth",
+          "extras": {
+            "cambrianAnchor": {
+              "version": 1,
+              "role": "mouth",
+              "parentBone": "head"
+            }
+          }
+        },
+        {
+          "name": "anchor_mouth_inside",
+          "extras": {
+            "cambrianAnchor": {
+              "version": 1,
+              "role": "swallow",
+              "parentBone": "head"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "path": "/Users/hoai/Documents/Stuff/Generations/cambrian/local/expansion-repo/public/assets/devonian/creatures/michelinoceras.glb",
+      "bytes": 11990488,
+      "sha256": "e729b0b470c183944c6ed8bb71c0179204e9a1e88c55e49d043fb8d01c591b25",
+      "clips": [
+        "Ability",
+        "Attack",
+        "Bite",
+        "Death",
+        "Dive",
+        "Dodge",
+        "Eat",
+        "Grab",
+        "Growth",
+        "Guard",
+        "Heavy",
+        "Hit",
+        "Idle",
+        "Parry",
+        "Rise",
+        "Stagger",
+        "Swim",
+        "TurnLeft",
+        "TurnRight"
+      ],
+      "joints": 166,
+      "anchors": [
+        {
+          "name": "anchor_attack_primary",
+          "extras": {
+            "cambrianAnchor": {
+              "version": 1,
+              "role": "attack",
+              "parentBone": "arm_0_12"
+            }
+          }
+        },
+        {
+          "name": "anchor_mouth",
+          "extras": {
+            "cambrianAnchor": {
+              "version": 1,
+              "role": "mouth",
+              "parentBone": "head"
+            }
+          }
+        },
+        {
+          "name": "anchor_mouth_inside",
+          "extras": {
+            "cambrianAnchor": {
+              "version": 1,
+              "role": "swallow",
+              "parentBone": "head"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "path": "/Users/hoai/Documents/Stuff/Generations/cambrian/local/expansion-repo/public/assets/devonian/creatures/michelinoceras.lod1.glb",
+      "bytes": 3033868,
+      "sha256": "782e5b3b644ec6c593c661e711d8799c8ee116232396294f9f4c75e2bf39467d",
+      "clips": [
+        "Death",
+        "Idle",
+        "Swim"
+      ],
+      "joints": 166,
+      "anchors": [
+        {
+          "name": "anchor_attack_primary",
+          "extras": {
+            "cambrianAnchor": {
+              "version": 1,
+              "role": "attack",
+              "parentBone": "arm_0_12"
+            }
+          }
+        },
+        {
+          "name": "anchor_mouth",
+          "extras": {
+            "cambrianAnchor": {
+              "version": 1,
+              "role": "mouth",
+              "parentBone": "head"
+            }
+          }
+        },
+        {
+          "name": "anchor_mouth_inside",
+          "extras": {
+            "cambrianAnchor": {
+              "version": 1,
+              "role": "swallow",
+              "parentBone": "head"
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "decision": "Preserve all ten existing 16-section arm chains, meshes, bind pose and materials. Change only Attack/Bite/Heavy/Eat plus explicit limb-following grasp and attack socket metadata."
+}

@@ -1,0 +1,37 @@
+{
+  "id": "crinoid-debris",
+  "family": "G09",
+  "name": "Crinoid debris",
+  "taxon": "Derived B08 columnals",
+  "category": "biological-prop",
+  "description": "Loose perforated columnals and short stacked stem fragments from the B08 anatomy.",
+  "provenance": "Crinoid-bearing Devonian sediment context",
+  "model": "assets/devonian/props/crinoid-debris.glb",
+  "lod": "assets/devonian/props/crinoid-debris.lod1.glb",
+  "image": "assets/devonian/props/crinoid-debris.png",
+  "lengthMeters": 0.19730070233345032,
+  "dimensionsMeters": {
+    "x": 0.19730070233345032,
+    "y": 0.023799998685717583,
+    "z": 0.19230379164218903
+  },
+  "clips": [],
+  "looping": [],
+  "sources": [
+    "https://www.digitalatlasofancientlife.org/learn/echinodermata/crinoidea/",
+    "https://devonianatlas.org/species/"
+  ],
+  "notes": [
+    "Original parametric mesh, no downloaded model.",
+    "1 glTF unit = 1 metre. Dimensions describe this art specimen, not a taxon maximum.",
+    "Pigmentation and soft appearance are artistic interpretations.",
+    "Locality tags constrain future placement; library membership does not assert co-occurrence.",
+    "Preview model: initial scenery delivery; further individual material, silhouette and motion refinement is pending."
+  ],
+  "fullTriangles": 18432,
+  "lodTriangles": 5528,
+  "lodRatio": 0.2999131944444444,
+  "sourceBlend": "../devonian-authoring/props/crinoid-debris/crinoid-debris.blend",
+  "uncertainty": "Columnals and stem pieces reuse B08 geometry and preserve their lumen.",
+  "modelStatus": "preview"
+}

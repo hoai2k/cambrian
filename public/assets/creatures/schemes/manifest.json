@@ -1,0 +1,290 @@
+{
+  "anomalocaris": {
+    "scheme": "coral-flare",
+    "colors": {
+      "body": "#b52f45",
+      "eyes": "#1a070c",
+      "fins": "#ff5b6e",
+      "legs": "#d63f56",
+      "accent": "#ff9ac2",
+      "underside": "#e8687d"
+    },
+    "recolorVersion": 1,
+    "sourceGlbSha256": "6d0065058f8f4958e34b35eed550221e1ba4f8bd5c1c27f8fe13e202736ce775",
+    "sourceAppearanceSha256": "25432d3d6ec2047127402b5ff35d420aeac3b9e4b390931fbe045b48c0391388",
+    "files": {
+      "select": "assets/creatures/schemes/anomalocaris.coral-flare.13e1816a1ae7.select.png",
+      "card": "assets/creatures/schemes/anomalocaris.coral-flare.13e1816a1ae7.card.png",
+      "thumb": "assets/creatures/schemes/anomalocaris.coral-flare.13e1816a1ae7.thumb.png"
+    },
+    "sha256": {
+      "select": "0daa5ff500d247ab1b5ba51ba45863452be323f5d05249e9de5c91d61575cce9",
+      "card": "79173e104f3370dc6a2664c6f35d4b54299197d491c013d58a4b551945bc32b1",
+      "thumb": "a66203d08b03f734e8a6ccef016cb5abab6afeebd523797012338e4bf6626e4d"
+    }
+  },
+  "opabinia": {
+    "scheme": "seagrass-teal",
+    "colors": {
+      "body": "#235e58",
+      "eyes": "#0a1614",
+      "fins": "#3a827a",
+      "legs": "#2c6d66",
+      "accent": "#12403c",
+      "underside": "#468f86"
+    },
+    "recolorVersion": 1,
+    "sourceGlbSha256": "894891eb756db62d3895865fb9a1c26399d05e4d57d07724975d5e5f3c109c1f",
+    "sourceAppearanceSha256": "abf95465892ce8a7443b817caaf7630621210336c44aeabdb71eec907e620209",
+    "files": {
+      "select": "assets/creatures/schemes/opabinia.seagrass-teal.66e30fea1a48.select.png",
+      "card": "assets/creatures/schemes/opabinia.seagrass-teal.66e30fea1a48.card.png",
+      "thumb": "assets/creatures/schemes/opabinia.seagrass-teal.66e30fea1a48.thumb.png"
+    },
+    "sha256": {
+      "select": "1d8846ec4b33cf684700b2c7e5a2af6308687281be606054ead615e8c04d2807",
+      "card": "ee0d2911199729f73edb9e1c4dba5a704773712dfbba6ddf90ac53392e62ed97",
+      "thumb": "8e9acb26dba1064442a26dbe6dbfb321aa5e51c5e8da50a52ef58ccd4f4abce5"
+    }
+  },
+  "waptia": {
+    "scheme": "sandflat-tan",
+    "colors": {
+      "body": "#8a7350",
+      "eyes": "#16120c",
+      "fins": "#a08a63",
+      "legs": "#937c57",
+      "accent": "#55442c",
+      "underside": "#a1906d"
+    },
+    "recolorVersion": 1,
+    "sourceGlbSha256": "c48261c91f745139d4f8395818452f986d7130f4165a5c6c14944dd49de077ed",
+    "sourceAppearanceSha256": "b9cdc4e1696eeffce34aa3b8dbdee7636a851925f13a12d7cc826cca0649b498",
+    "files": {
+      "select": "assets/creatures/schemes/waptia.sandflat-tan.10e52270551e.select.png",
+      "card": "assets/creatures/schemes/waptia.sandflat-tan.10e52270551e.card.png",
+      "thumb": "assets/creatures/schemes/waptia.sandflat-tan.10e52270551e.thumb.png"
+    },
+    "sha256": {
+      "select": "5c9693ff6c80e79e149c611733ba7011560cea8bf5dac7aa38d6dd6375f87a98",
+      "card": "1c0d9da4620ad76d9959814703c3e1cda0f6280ff46a9279fff59e2569ca714f",
+      "thumb": "51213c35d92c8cf404f53e56672ee9bbb13cde2657807197de4b35f0b7df4e6f"
+    }
+  },
+  "canadia": {
+    "scheme": "kelp-olive",
+    "colors": {
+      "body": "#4c4f2a",
+      "eyes": "#101208",
+      "fins": "#67693a",
+      "legs": "#565932",
+      "accent": "#2c2e17",
+      "underside": "#5d6038"
+    },
+    "recolorVersion": 1,
+    "sourceGlbSha256": "50550cee4234961203da8bb2bd430e50cd6f19a6137e4001c73d33074134ba4a",
+    "sourceAppearanceSha256": "4032da11902bcdb5fa24299ea451bb420c209859a009318e794e83f158f67380",
+    "files": {
+      "select": "assets/creatures/schemes/canadia.kelp-olive.c297148e3381.select.png",
+      "card": "assets/creatures/schemes/canadia.kelp-olive.c297148e3381.card.png",
+      "thumb": "assets/creatures/schemes/canadia.kelp-olive.c297148e3381.thumb.png"
+    },
+    "sha256": {
+      "select": "8830621b740cc0b9749662b9d9cc3c23b5d663f426c8f085723e9c0d93d32351",
+      "card": "cbfef9436572ecdc85d7afea6cbf8e538cda14a52aea2a7cc823d0ff93ccb50c",
+      "thumb": "3e1e802a52a45aebb494ce464b82db4e2dd55f2988423ed13d35ae8cad1bbe62"
+    }
+  },
+  "hallucigenia": {
+    "scheme": "sandflat-tan",
+    "colors": {
+      "body": "#8a7350",
+      "eyes": "#16120c",
+      "fins": "#a08a63",
+      "legs": "#937c57",
+      "accent": "#55442c",
+      "underside": "#a1906d"
+    },
+    "recolorVersion": 1,
+    "sourceGlbSha256": "a17e87a46c89df96b1946c933d4709654c5fb32996fd6f802102cf9d457c8341",
+    "sourceAppearanceSha256": "3db69ba54ef5dd5751959516e60a4094e875bafed912ab804d0668508880a73c",
+    "files": {
+      "select": "assets/creatures/schemes/hallucigenia.sandflat-tan.10e52270551e.select.png",
+      "card": "assets/creatures/schemes/hallucigenia.sandflat-tan.10e52270551e.card.png",
+      "thumb": "assets/creatures/schemes/hallucigenia.sandflat-tan.10e52270551e.thumb.png"
+    },
+    "sha256": {
+      "select": "cb222b3b5f7cf7540106bda6c9507f9cb06c40881189aca86046ee2ecdd171f7",
+      "card": "5dd50ee4305757a67d9d0524473d912f6affb02dc1873930ab4987300062f0a8",
+      "thumb": "983638addb92b867f29e57a05bc10c7370ce120bd9b6813110e3c1c6aa54ecda"
+    }
+  },
+  "wiwaxia": {
+    "scheme": "wiwaxia-nacre",
+    "colors": {
+      "body": "#6d7b86",
+      "eyes": "#14181c",
+      "fins": "#93a3ad",
+      "legs": "#7d8c97",
+      "accent": "#cdb9d6",
+      "underside": "#9fadb6"
+    },
+    "recolorVersion": 1,
+    "sourceGlbSha256": "e5726fb25301d9851feed33f45f8d12961c4d9a133902aac016f3d985d5b9d65",
+    "sourceAppearanceSha256": "2b2be03bd0bacf45961049101b069419274070885152b6d7c8c9e5959c0efccd",
+    "files": {
+      "select": "assets/creatures/schemes/wiwaxia.wiwaxia-nacre.49dbe9a97b3a.select.png",
+      "card": "assets/creatures/schemes/wiwaxia.wiwaxia-nacre.49dbe9a97b3a.card.png",
+      "thumb": "assets/creatures/schemes/wiwaxia.wiwaxia-nacre.49dbe9a97b3a.thumb.png"
+    },
+    "sha256": {
+      "select": "8dfd2e481a6f1997e5c0428ff07b2af79d8fd62c296732bf1bead10be1b00d1a",
+      "card": "0c3172bfed028707e60c7d59de9b8205751939e7d4d5a0bc6bb0233ca3233a95",
+      "thumb": "cd92b139fa2baea42a4dc9c526702294a96faa8686704c1771c67775aa2eedae"
+    }
+  },
+  "marrella": {
+    "scheme": "countershade",
+    "colors": {
+      "body": "#2f3a3d",
+      "eyes": "#0b0d0e",
+      "fins": "#8f9c99",
+      "legs": "#55635f",
+      "accent": "#1c2426",
+      "underside": "#b3bfba"
+    },
+    "recolorVersion": 1,
+    "sourceGlbSha256": "d63f401218409ad32e73a192114b2203e17f30b001943df8779801ef39327cce",
+    "sourceAppearanceSha256": "48ae598c5997657a4b629a2f2399db76bda733ef0c7f7ff15e4d90837ff46f7a",
+    "files": {
+      "select": "assets/creatures/schemes/marrella.countershade.102399ead86b.select.png",
+      "card": "assets/creatures/schemes/marrella.countershade.102399ead86b.card.png",
+      "thumb": "assets/creatures/schemes/marrella.countershade.102399ead86b.thumb.png"
+    },
+    "sha256": {
+      "select": "3d7c9c930f2b4676a83d0f23e6980a661e9579eecc55ff492abf04b222d00082",
+      "card": "606399318ca7d19ab0106f2a403f4e106000abb6ec0dacfa8b279fca6a3b2001",
+      "thumb": "f9dba15d85a0b39847c039f680703e930c2386684f5a9610cb25e84fbffc6549"
+    }
+  },
+  "olenoides": {
+    "scheme": "sandflat-tan",
+    "colors": {
+      "body": "#8a7350",
+      "eyes": "#16120c",
+      "fins": "#a08a63",
+      "legs": "#937c57",
+      "accent": "#55442c",
+      "underside": "#a1906d"
+    },
+    "recolorVersion": 1,
+    "sourceGlbSha256": "09e5c0237325f7ac00ef27b5c8ab0b6fd57486cf7fe9f8ccc569165c1fd273dd",
+    "sourceAppearanceSha256": "56203f97840802a9db4682e979e8be3a7ee7726a5d36b288bc6bbe14c4db61fb",
+    "files": {
+      "select": "assets/creatures/schemes/olenoides.sandflat-tan.10e52270551e.select.png",
+      "card": "assets/creatures/schemes/olenoides.sandflat-tan.10e52270551e.card.png",
+      "thumb": "assets/creatures/schemes/olenoides.sandflat-tan.10e52270551e.thumb.png"
+    },
+    "sha256": {
+      "select": "390b684a3f6ad113a1e99498015df58d4338b3f6662c75a9ebff5e224b55b306",
+      "card": "2a1f8d96617749ce98007edfe497bc8765b3b7a0d41e1da95d0a5a27c37a5ba0",
+      "thumb": "22cd4c5cfef6daea318bec7fa91a6865718c68b0377f8581d303c947efd1b656"
+    }
+  },
+  "nectocaris": {
+    "scheme": "canadia-iridium",
+    "colors": {
+      "body": "#37453a",
+      "eyes": "#0d120e",
+      "fins": "#5f7a5c",
+      "legs": "#b5924a",
+      "accent": "#7fb08a",
+      "underside": "#4c5c4d"
+    },
+    "recolorVersion": 1,
+    "sourceGlbSha256": "90ea973c4220c70155dd7ea109717e9b536969420dbf38ecc45152afbee1a76f",
+    "sourceAppearanceSha256": "32ad7cbe73e1a27367c43f09465210d4fdaa9dc7f964151cb71bf995bd695a29",
+    "files": {
+      "select": "assets/creatures/schemes/nectocaris.canadia-iridium.0a583acec5b4.select.png",
+      "card": "assets/creatures/schemes/nectocaris.canadia-iridium.0a583acec5b4.card.png",
+      "thumb": "assets/creatures/schemes/nectocaris.canadia-iridium.0a583acec5b4.thumb.png"
+    },
+    "sha256": {
+      "select": "3cdde7a1df1be15b41cf78ae30a9636447e129eba44cae50c0427f2e3afde8f9",
+      "card": "22def3d440f78bd1b7524a895f169877a0f9e0a9abd3daab5a2366ef7f681d2e",
+      "thumb": "a7c6e2221fc68f4f6a90e34d22d74c239d54c4725634a25d1b314926f168537e"
+    }
+  },
+  "ottoia": {
+    "scheme": "countershade",
+    "colors": {
+      "body": "#2f3a3d",
+      "eyes": "#0b0d0e",
+      "fins": "#8f9c99",
+      "legs": "#55635f",
+      "accent": "#1c2426",
+      "underside": "#b3bfba"
+    },
+    "recolorVersion": 1,
+    "sourceGlbSha256": "aa7b0b3999bdbe13d2cab8593e6ae2ef8deef4e45b97af3e18be991895f6a221",
+    "sourceAppearanceSha256": "ddce34bb59896b7d980de2a08ad69f026dc957a99fe368da62642c0959862559",
+    "files": {
+      "select": "assets/creatures/schemes/ottoia.countershade.102399ead86b.select.png",
+      "card": "assets/creatures/schemes/ottoia.countershade.102399ead86b.card.png",
+      "thumb": "assets/creatures/schemes/ottoia.countershade.102399ead86b.thumb.png"
+    },
+    "sha256": {
+      "select": "71f85e4f90a4921003b1dfb57ab3688e4d097e96fd7310a75b50219b7bbc87d2",
+      "card": "7b3fb97b8ed4dcd52deb8c86f0d6fd07748a2e159e45dfbdee095a685903e1aa",
+      "thumb": "ecfc82535276b4d74db3ea1234caee8951e8f501fb1ebc88e8036917ba26950b"
+    }
+  },
+  "cambroraster": {
+    "scheme": "lagoon-neon",
+    "colors": {
+      "body": "#175d5a",
+      "eyes": "#061114",
+      "fins": "#61f2d5",
+      "legs": "#2a8f83",
+      "accent": "#ffb36b",
+      "underside": "#3fb5a4"
+    },
+    "recolorVersion": 1,
+    "sourceGlbSha256": "8481c903b5bd3cdb3f4925d62e7a7999f66fa31743915f88bef3398090cc5d4e",
+    "sourceAppearanceSha256": "06ab6eb5ec5988c289fe8ec020a407d96ad860f85e5637a88f7009b139ffc002",
+    "files": {
+      "select": "assets/creatures/schemes/cambroraster.lagoon-neon.dee88daf00fa.select.png",
+      "card": "assets/creatures/schemes/cambroraster.lagoon-neon.dee88daf00fa.card.png",
+      "thumb": "assets/creatures/schemes/cambroraster.lagoon-neon.dee88daf00fa.thumb.png"
+    },
+    "sha256": {
+      "select": "f16736c0c85035bbf7548ef5a96287da8b8cc20cc544f66b922cebf2607f7ecf",
+      "card": "f402a01002a24dc17a115b397f1e70c4c540dd1df1a71a88805b22dd4f91e1da",
+      "thumb": "b5ae0f59f69181047e2ad23393d7b764f0d5e6694665c8488e446e88a9292816"
+    }
+  },
+  "odontogriphus": {
+    "scheme": "sandflat-tan",
+    "colors": {
+      "body": "#8a7350",
+      "eyes": "#16120c",
+      "fins": "#a08a63",
+      "legs": "#937c57",
+      "accent": "#55442c",
+      "underside": "#a1906d"
+    },
+    "recolorVersion": 1,
+    "sourceGlbSha256": "d8b773d65c0a817d23ee5fbd27184ac0cf9fb26540ca4031d9873bd9f36fb1ef",
+    "sourceAppearanceSha256": "325810e1332b16c9928ae86ff62f04bf78e529777abcb949abe9b854e0c48133",
+    "files": {
+      "select": "assets/creatures/schemes/odontogriphus.sandflat-tan.10e52270551e.select.png",
+      "card": "assets/creatures/schemes/odontogriphus.sandflat-tan.10e52270551e.card.png",
+      "thumb": "assets/creatures/schemes/odontogriphus.sandflat-tan.10e52270551e.thumb.png"
+    },
+    "sha256": {
+      "select": "5ecf57f5aaacffe1a4a59de879a699b5c758ba31dee234ef09bc6216e0ef44be",
+      "card": "d854bea6e1f966118cc573738c2b1cc7af43eab33cc767249f24d61ce57f1bf1",
+      "thumb": "9ecfd5a861c8a4d9faff42adce52bc44ca13d1ba321771aab983aa0163ad298a"
+    }
+  }
+}

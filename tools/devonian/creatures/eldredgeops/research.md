@@ -1,0 +1,19 @@
+# Eldredgeops reconstruction research
+
+Working taxon: Eldredgeops rana (Green, 1832), the North American Hamilton Group/Givetian form corresponding to Phacops rana rana in Eldredge (1972). This is not an amalgam of E. milleri and Moroccan phacopids.
+
+## Evidence and decisions
+
+- Eldredge (1972), Systematics and evolution of Phacops rana and Phacops iowensis, Bulletin AMNH147:45–114. Primary diagnosis quoted by the museum-curated Devonian Atlas: 17 dorsoventral lens files in typical adult; densely tuberculate glabella; transverse elongation of tubercles increases toward the anterior slope; blunt genal angles; tuberculate axial rings; gently rounded pygidial pleurae with weak interpleural furrows. The original monograph is catalogued at https://www.biodiversitylibrary.org/bibliography/89226 ; diagnosis and accessioned specimens at https://devonianatlas.org/species/eldredgeops-rana/ . Shell proportions and eleven thoracic segments are cross-checked against accessioned specimen imagery, not a modern horseshoe crab.
+- Clarkson, Levi-Setti & Horváth (2006), The eyes of trilobites: The oldest preserved visual system. Arthropod Structure & Development35:247–259. https://doi.org/10.1016/j.asd.2006.08.002 . Schizochroal lenses are discrete lenses separated by sclera; each has its own corneal surface. A living-eye colour and exact optical substrate are interpretations. Do not use a single projecting fish eyeball or a corneal sheet covering the whole eye.
+- Esteve et al. (2010), Sphaeroidal enrolment in middle Cambrian solenopleuropsine trilobites. https://doi.org/10.1111/j.1502-3931.2009.00205.x . Primary analysis compares directly with Phacops rana: progressive articulation from the occipital/first-thoracic joint to pygidium; articulating half-rings, pleural facets and ventral cephalic vincular structures guide closure. Our animation is an authored plausible sequence, not measured muscle kinetics.
+- Siveter et al. (2021), The first Silurian trilobite with three-dimensionally preserved soft parts reveals novel appendage morphology. https://doi.org/10.1002/spp2.1401 . OUMNH C.29611 Dalmanites provides explicit comparative phacopid evidence for flattened endopods, coxal gnathobases, lamellar exopods and three cephalic post-antennal pairs. Not direct E. rana soft-part preservation. Relative appendage numbers beneath the pygidium and their exact geometry are uncertain.
+- Bruton & Haas (1997), Functional morphology of Phacopinae and the mechanics of enrolment, PalaeontographicaA245:1–43; Bruton & Haas (1999), Anatomy and functional morphology of Phacops from the Hunsrück Slate, PalaeontographicaA253:29–75. Located through primary comparative papers, originals not yet inspected; do not claim original plates were consulted.
+
+## Eye-volume audit adaptation
+
+The eyes are compound cuticular organs, not vertebrate globes. The model has paired closed crescent ocular volumes embedded in the single continuous cephalon and distinct small closed lens solids, one per lens. Both ocular organ volume and every individual lens volume must pass the geometric embedding threshold; no aggregate hides an exposed individual lens. The cephalon includes continuous anatomical ocular platforms. Separate rims, cosmetic tubercles and unrelated appendages are excluded from the body envelope. Actual exported full and LOD topology is the test subject. Per-lens deterministic volume samples and confidence bounds are retained, in addition to the shared ocular-organ BVH audit.
+
+## Interpretation limits
+
+Living pigmentation, exact antenna length, branchial lamella spacing, postcephalic appendage pair counts under the pygidium, oral soft-tissue colours and motion timings are artistic comparative reconstruction. Growth is a compatibility posture with no scaling; Moult is a distinct loosening/withdrawal preparation, not a second floating shell. Swim is a restrained limb-powered movement, not fish-like body undulation.

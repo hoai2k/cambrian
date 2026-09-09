@@ -1,0 +1,34 @@
+{
+  "walliserops": [
+    {
+      "name": "anchor_mouth",
+      "bone": "cephalon",
+      "point": [
+        0,
+        -0.525,
+        0.067
+      ],
+      "role": "mouth"
+    },
+    {
+      "name": "anchor_mouth_inside",
+      "bone": "oral_pump",
+      "point": [
+        0,
+        -0.635,
+        0.12
+      ],
+      "role": "swallow"
+    },
+    {
+      "name": "anchor_attack_primary",
+      "bone": "cephalon",
+      "point": [
+        0.018,
+        -3.73,
+        0.67
+      ],
+      "role": "attack"
+    }
+  ]
+}

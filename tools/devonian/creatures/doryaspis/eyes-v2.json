@@ -1,0 +1,52 @@
+[
+  {
+    "mesh": "eye_globe_R",
+    "surroundingMeshes": [
+      "head_shield_continuous_closed"
+    ],
+    "centerBlender": [
+      -0.23659078776836395,
+      -0.8311688303947449,
+      0.07445751130580902
+    ],
+    "normal": [
+      -0.2608499526977539,
+      -0.1893334984779358,
+      0.9466309547424316
+    ],
+    "radiiNormalUV": [
+      0.026,
+      0.036,
+      0.039
+    ],
+    "centerInset": 0.012,
+    "embeddedFraction": 0.8078990814037167,
+    "sampleCount": 47246,
+    "method": "seeded uniform ellipsoid volume samples against actual closed shield BVH signed nearest surface"
+  },
+  {
+    "mesh": "eye_globe_L",
+    "surroundingMeshes": [
+      "head_shield_continuous_closed"
+    ],
+    "centerBlender": [
+      0.23659080266952515,
+      -0.8311687707901001,
+      0.07445751875638962
+    ],
+    "normal": [
+      0.26084983348846436,
+      -0.18933331966400146,
+      0.9466310143470764
+    ],
+    "radiiNormalUV": [
+      0.026,
+      0.036,
+      0.039
+    ],
+    "centerInset": 0.012,
+    "embeddedFraction": 0.8088092113618084,
+    "sampleCount": 47246,
+    "method": "seeded uniform ellipsoid volume samples against actual closed shield BVH signed nearest surface"
+  }
+]

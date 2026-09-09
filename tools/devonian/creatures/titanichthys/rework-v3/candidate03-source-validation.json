@@ -1,0 +1,8 @@
+{
+  "validation": "Pure geometry coefficient tests only; no Blender, BVH execution or candidate export",
+  "fixed_cases": 6,
+  "random_plane_projection_cases": 3000,
+  "degenerate_cases": 2,
+  "max_coefficient_error": 6.613587455461811e-11,
+  "convex_pigment_range_pass": true
+}

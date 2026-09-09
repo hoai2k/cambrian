@@ -1,0 +1,7 @@
+{
+  "tool": "imagegen",
+  "original": "/Users/hoai/.codex/generated_images/01a07987-3084-72c2-88e4-5387ed08fc3a/exec-ee3cf487-c130-4bbb-86af-9786a0dcedce.png",
+  "source": "cosmine-source-v2.png",
+  "use": "Subdued microtexture only; authored anatomical maps determine cranial sutures, sensory pores and scale distribution. Generated microdetail will be normalized and attenuated; it is not anatomy evidence.",
+  "prompt": "Use case: stylized-concept. Asset type: original seamless square diffuse microtexture swatch for the living cosmine-covered dermal surface of a Devonian lungfish reconstruction. Orthographic flat material tile only; no fish drawing, no anatomy, no text, no objects, no plate or scale outlines. Fine nearly smooth organic surface with many extremely small rounded pores, occasional subdued clusters of pinprick pits and faint short curving growth marks. Quiet grey-olive, olive-brown and muted warm green pigmentation with softly irregular tiny mottling; no bright cream regions, no high-contrast camouflage spots. Museum natural-history reconstruction quality. Uniform diffuse illumination without baked lighting, highlights or cast shadows. No reptile scales, no cracks, no leather, no bark, no metal, no deep channels, no large nodules, no coarse grain. The surface should read as subtle smooth wet biological enamel-like tissue at a distance, with delicate microstructure visible only at close range. Seamless on all four edges."
+}

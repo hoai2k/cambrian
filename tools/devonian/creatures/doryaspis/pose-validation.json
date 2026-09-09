@@ -1,0 +1,115 @@
+{
+  "allSourceVerticesHaveNormalizedNamedBoneWeights": true,
+  "rigidShieldVertices": 60238,
+  "oralBlendVertices": 1132,
+  "clips": [
+    {
+      "clip": "Ability",
+      "sampledPoses": 9,
+      "maxRigidShieldError": 2.388837865275353e-07,
+      "maxOralDeviation": 0.004618740998828759
+    },
+    {
+      "clip": "Attack",
+      "sampledPoses": 9,
+      "maxRigidShieldError": 1.3328003749250113e-07,
+      "maxOralDeviation": 0.004694186157095645
+    },
+    {
+      "clip": "Bite",
+      "sampledPoses": 9,
+      "maxRigidShieldError": 2.384476811558792e-07,
+      "maxOralDeviation": 0.005802182323043985
+    },
+    {
+      "clip": "Death",
+      "sampledPoses": 9,
+      "maxRigidShieldError": 2.4755668231600746e-07,
+      "maxOralDeviation": 0.0013173329976578917
+    },
+    {
+      "clip": "Dive",
+      "sampledPoses": 9,
+      "maxRigidShieldError": 1.3328003749250113e-07,
+      "maxOralDeviation": 0.0010778009924472622
+    },
+    {
+      "clip": "Dodge",
+      "sampledPoses": 9,
+      "maxRigidShieldError": 2.403894931808364e-07,
+      "maxOralDeviation": 0.001077861115812163
+    },
+    {
+      "clip": "Eat",
+      "sampledPoses": 9,
+      "maxRigidShieldError": 2.3842585494815777e-07,
+      "maxOralDeviation": 0.005987793207469877
+    },
+    {
+      "clip": "Growth",
+      "sampledPoses": 9,
+      "maxRigidShieldError": 1.3657139822709083e-07,
+      "maxOralDeviation": 0.0017897933732436517
+    },
+    {
+      "clip": "Guard",
+      "sampledPoses": 9,
+      "maxRigidShieldError": 1.341104507446289e-07,
+      "maxOralDeviation": 0.0032334029680109637
+    },
+    {
+      "clip": "Heavy",
+      "sampledPoses": 9,
+      "maxRigidShieldError": 1.3657139822709083e-07,
+      "maxOralDeviation": 0.004108173979026095
+    },
+    {
+      "clip": "Hit",
+      "sampledPoses": 9,
+      "maxRigidShieldError": 1.6884444202935092e-07,
+      "maxOralDeviation": 0.002395148888073919
+    },
+    {
+      "clip": "Idle",
+      "sampledPoses": 9,
+      "maxRigidShieldError": 1.341104507446289e-07,
+      "maxOralDeviation": 0.002395127180090076
+    },
+    {
+      "clip": "Parry",
+      "sampledPoses": 9,
+      "maxRigidShieldError": 2.3888560196770133e-07,
+      "maxOralDeviation": 0.0010559867900698685
+    },
+    {
+      "clip": "Rise",
+      "sampledPoses": 9,
+      "maxRigidShieldError": 1.3328003749250113e-07,
+      "maxOralDeviation": 0.0010778009961555561
+    },
+    {
+      "clip": "Stagger",
+      "sampledPoses": 9,
+      "maxRigidShieldError": 1.7120130796843852e-07,
+      "maxOralDeviation": 0.0023951630744088476
+    },
+    {
+      "clip": "Swim",
+      "sampledPoses": 9,
+      "maxRigidShieldError": 2.385349660155493e-07,
+      "maxOralDeviation": 0.002634640606970768
+    },
+    {
+      "clip": "TurnLeft",
+      "sampledPoses": 9,
+      "maxRigidShieldError": 1.7881393432617188e-07,
+      "maxOralDeviation": 0.0010778534991941144
+    },
+    {
+      "clip": "TurnRight",
+      "sampledPoses": 9,
+      "maxRigidShieldError": 1.7881393432617188e-07,
+      "maxOralDeviation": 0.0010778534991941144
+    }
+  ]
+}

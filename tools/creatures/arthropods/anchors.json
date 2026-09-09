@@ -1,0 +1,407 @@
+{
+  "odaraia": [
+    {
+      "name": "anchor_mouth",
+      "bone": "body",
+      "point": [
+        0,
+        -1.57,
+        0.205
+      ],
+      "role": "mouth"
+    },
+    {
+      "name": "anchor_mouth_inside",
+      "bone": "body",
+      "point": [
+        0,
+        -1.54,
+        0.11
+      ],
+      "role": "swallow"
+    },
+    {
+      "name": "anchor_attack_primary",
+      "bone": "filter_1_00",
+      "point": [
+        0.26,
+        -1.48,
+        0.36
+      ],
+      "role": "attack",
+      "contactType": "filter"
+    },
+    {
+      "name": "anchor_attack_left",
+      "bone": "filter_1_00",
+      "point": [
+        0.26,
+        -1.48,
+        0.36
+      ],
+      "role": "attack",
+      "contactType": "filter"
+    },
+    {
+      "name": "anchor_attack_right",
+      "bone": "filter_-1_00",
+      "point": [
+        -0.26,
+        -1.48,
+        0.36
+      ],
+      "role": "attack",
+      "contactType": "filter"
+    },
+    {
+      "name": "anchor_grasp",
+      "bone": "segment_00",
+      "point": [
+        0,
+        -1.48,
+        0.24
+      ],
+      "role": "grasp",
+      "contactType": "filter"
+    }
+  ],
+  "sidneyia": [
+    {
+      "name": "anchor_mouth",
+      "bone": "body",
+      "point": [
+        0,
+        -1.52,
+        -0.168
+      ],
+      "role": "mouth"
+    },
+    {
+      "name": "anchor_mouth_inside",
+      "bone": "body",
+      "point": [
+        0,
+        -1.48,
+        -0.07
+      ],
+      "role": "swallow"
+    },
+    {
+      "name": "anchor_attack_primary",
+      "bone": "leg_1_00_0",
+      "point": [
+        0.21087405,
+        -1.165,
+        -0.18
+      ],
+      "role": "attack",
+      "chain": [
+        "leg_1_00_0"
+      ],
+      "effectorBone": "leg_1_00_0",
+      "solver": "CCD",
+      "contactType": "gnathobase"
+    },
+    {
+      "name": "anchor_attack_left",
+      "bone": "leg_1_00_0",
+      "point": [
+        0.21087405,
+        -1.165,
+        -0.18
+      ],
+      "role": "attack",
+      "chain": [
+        "leg_1_00_0"
+      ],
+      "effectorBone": "leg_1_00_0",
+      "solver": "CCD",
+      "contactType": "gnathobase"
+    },
+    {
+      "name": "anchor_attack_right",
+      "bone": "leg_-1_00_0",
+      "point": [
+        -0.21087405,
+        -1.165,
+        -0.18
+      ],
+      "role": "attack",
+      "chain": [
+        "leg_-1_00_0"
+      ],
+      "effectorBone": "leg_-1_00_0",
+      "solver": "CCD",
+      "contactType": "gnathobase"
+    },
+    {
+      "name": "anchor_grasp",
+      "bone": "leg_1_00_2",
+      "point": [
+        0.730443,
+        -1.24,
+        -0.65
+      ],
+      "role": "grasp",
+      "chain": [
+        "leg_1_00_0",
+        "leg_1_00_1",
+        "leg_1_00_2"
+      ],
+      "effectorBone": "leg_1_00_2",
+      "solver": "CCD",
+      "contactType": "claw"
+    },
+    {
+      "name": "anchor_grasp_right",
+      "bone": "leg_-1_00_2",
+      "point": [
+        -0.730443,
+        -1.24,
+        -0.65
+      ],
+      "role": "grasp",
+      "chain": [
+        "leg_-1_00_0",
+        "leg_-1_00_1",
+        "leg_-1_00_2"
+      ],
+      "effectorBone": "leg_-1_00_2",
+      "solver": "CCD",
+      "contactType": "claw"
+    }
+  ],
+  "leanchoilia": [
+    {
+      "name": "anchor_mouth",
+      "bone": "body",
+      "point": [
+        0,
+        -1.32,
+        -0.176
+      ],
+      "role": "mouth"
+    },
+    {
+      "name": "anchor_mouth_inside",
+      "bone": "body",
+      "point": [
+        0,
+        -1.26,
+        -0.07
+      ],
+      "role": "swallow"
+    },
+    {
+      "name": "anchor_attack_primary",
+      "bone": "claw_1_1_01",
+      "point": [
+        0.7936,
+        -2.537,
+        0.3514
+      ],
+      "role": "attack",
+      "chain": [
+        "great_base_1",
+        "great_hand_1",
+        "claw_1_1_00",
+        "claw_1_1_01"
+      ],
+      "effectorBone": "claw_1_1_01",
+      "solver": "CCD",
+      "contactType": "claw"
+    },
+    {
+      "name": "anchor_attack_left",
+      "bone": "claw_1_1_01",
+      "point": [
+        0.7936,
+        -2.537,
+        0.3514
+      ],
+      "role": "attack",
+      "chain": [
+        "great_base_1",
+        "great_hand_1",
+        "claw_1_1_00",
+        "claw_1_1_01"
+      ],
+      "effectorBone": "claw_1_1_01",
+      "solver": "CCD",
+      "contactType": "claw"
+    },
+    {
+      "name": "anchor_attack_right",
+      "bone": "claw_-1_1_01",
+      "point": [
+        -0.7936,
+        -2.537,
+        0.3514
+      ],
+      "role": "attack",
+      "chain": [
+        "great_base_-1",
+        "great_hand_-1",
+        "claw_-1_1_00",
+        "claw_-1_1_01"
+      ],
+      "effectorBone": "claw_-1_1_01",
+      "solver": "CCD",
+      "contactType": "claw"
+    },
+    {
+      "name": "anchor_grasp",
+      "bone": "claw_1_1_00",
+      "point": [
+        0.6736,
+        -2.277,
+        0.3114
+      ],
+      "role": "grasp",
+      "chain": [
+        "great_base_1",
+        "great_hand_1",
+        "claw_1_1_00"
+      ],
+      "effectorBone": "claw_1_1_00",
+      "solver": "CCD",
+      "contactType": "claw"
+    },
+    {
+      "name": "anchor_grasp_right",
+      "bone": "claw_-1_1_00",
+      "point": [
+        -0.6736,
+        -2.277,
+        0.3114
+      ],
+      "role": "grasp",
+      "chain": [
+        "great_base_-1",
+        "great_hand_-1",
+        "claw_-1_1_00"
+      ],
+      "effectorBone": "claw_-1_1_00",
+      "solver": "CCD",
+      "contactType": "claw"
+    }
+  ],
+  "isoxys": [
+    {
+      "name": "anchor_mouth",
+      "bone": "segment_00",
+      "point": [
+        0,
+        -1.29,
+        -0.221
+      ],
+      "role": "mouth"
+    },
+    {
+      "name": "anchor_mouth_inside",
+      "bone": "segment_00",
+      "point": [
+        0,
+        -1.26,
+        -0.13
+      ],
+      "role": "swallow"
+    },
+    {
+      "name": "anchor_attack_primary",
+      "bone": "raptor_1_4",
+      "point": [
+        0.19,
+        -2.16,
+        -0.02
+      ],
+      "role": "attack",
+      "chain": [
+        "raptor_1_0",
+        "raptor_1_1",
+        "raptor_1_2",
+        "raptor_1_3",
+        "raptor_1_4"
+      ],
+      "effectorBone": "raptor_1_4",
+      "solver": "CCD",
+      "contactType": "claw"
+    },
+    {
+      "name": "anchor_attack_left",
+      "bone": "raptor_1_4",
+      "point": [
+        0.19,
+        -2.16,
+        -0.02
+      ],
+      "role": "attack",
+      "chain": [
+        "raptor_1_0",
+        "raptor_1_1",
+        "raptor_1_2",
+        "raptor_1_3",
+        "raptor_1_4"
+      ],
+      "effectorBone": "raptor_1_4",
+      "solver": "CCD",
+      "contactType": "claw"
+    },
+    {
+      "name": "anchor_attack_right",
+      "bone": "raptor_-1_4",
+      "point": [
+        -0.19,
+        -2.16,
+        -0.02
+      ],
+      "role": "attack",
+      "chain": [
+        "raptor_-1_0",
+        "raptor_-1_1",
+        "raptor_-1_2",
+        "raptor_-1_3",
+        "raptor_-1_4"
+      ],
+      "effectorBone": "raptor_-1_4",
+      "solver": "CCD",
+      "contactType": "claw"
+    },
+    {
+      "name": "anchor_grasp",
+      "bone": "raptor_1_2",
+      "point": [
+        0.298,
+        -1.9315,
+        -0.234
+      ],
+      "role": "grasp",
+      "chain": [
+        "raptor_1_0",
+        "raptor_1_1",
+        "raptor_1_2"
+      ],
+      "effectorBone": "raptor_1_2",
+      "solver": "CCD",
+      "contactType": "endite"
+    },
+    {
+      "name": "anchor_grasp_right",
+      "bone": "raptor_-1_2",
+      "point": [
+        -0.298,
+        -1.9315,
+        -0.234
+      ],
+      "role": "grasp",
+      "chain": [
+        "raptor_-1_0",
+        "raptor_-1_1",
+        "raptor_-1_2"
+      ],
+      "effectorBone": "raptor_-1_2",
+      "solver": "CCD",
+      "contactType": "endite"
+    }
+  ]
+}

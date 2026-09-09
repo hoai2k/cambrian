@@ -1,0 +1,6 @@
+# Walliserops original cuticle artwork
+Built-in imagegen, 2026-09-07. Original saved as imagegen-cuticle-source.png in this source folder and preserved in local source snapshot. Generated original `/Users/hoai/.codex/generated_images/01a0794c-58af-7450-b605-70b764aae915/exec-a927545e-8727-4cf5-b0df-a7d19cfd27b5.png`.
+
+Prompt: Create a seamless square unlit PBR base-color texture swatch for a living marine arthropod cuticle, scientifically neutral artistic pigmentation. Muted slate blue gray ground with restrained irregular warm umber and desaturated ochre mottles, fine sparse pale speckling, soft organic region variation; low contrast. No anatomy, no eyes, no legs, no segmentation, no ridges or scales, no stones, no cracks, no metal, no cast shadows, no highlights, no text. Flat albedo only, natural slightly translucent living exoskeleton pigment. Fine texture appropriate for a tiny Devonian trilobite. Full image filled edge to edge.
+
+Inspected original; restrained contrast and blended with slate ground in materials.py. UV roughness/normal maps are derived original procedural material detail. Full uses neutral vertex colors with UV maps; LOD retains linear pigment. Fossil images were only anatomical references and are not textures.
