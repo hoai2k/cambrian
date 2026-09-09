@@ -115,7 +115,7 @@ export const DEVONIAN_GROUPS: SoundGroup[] = [
       { kind: 'armour', label: 'Armour deflect', spatial: true, usage: 'A bite lands on thick bony plate and does not get through. Replaces the parry sound when the era rules say the hit was turned by armour rather than timing.' },
       { kind: 'armourPierce', label: 'Armour pierce', spatial: true, usage: 'The same block, but the jaws shear through the plate — the parry event with enough strength behind it.' },
       { kind: 'gulp', label: 'Air gulp', spatial: false, usage: 'A lunged animal breaks the surface: the whole stamina bar comes back at once and it gets a short free sprint with it.' },
-      { kind: 'winded', label: 'Winded', spatial: false, usage: 'The uneasy pulse while a lunged animal runs low on stamina under water, where it recovers at a quarter rate. A nudge toward the surface, so it is deliberately quiet.' },
+      { kind: 'winded', label: 'Winded', spatial: false, usage: 'The uneasy pulse once a lunged animal is under a quarter bar of stamina under water, where it recovers at a quarter rate. Quickens as the rest goes. A nudge toward the surface, so it is deliberately quiet.' },
       { kind: 'anoxia', label: 'Anoxia warning', spatial: false, usage: 'Dead water has drifted within 160 m of you. Played for each player near it, not placed in the world.' },
       { kind: 'jet', label: 'Shell jet', spatial: true, usage: 'A chambered-shell creature bursting: it jets rather than swims, so it replaces the burst sound for those bodies.' },
       { kind: 'withdraw', label: 'Withdraw', spatial: true, usage: 'A soft body pulling back into its shell. Registered but nothing emits it yet — the shells\u2019 guard is still to be wired.' },

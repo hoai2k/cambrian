@@ -47,8 +47,8 @@ const EXUVIA_COVER = 8;
  * back to the surface, however spent you are. Nothing here can be taxed for going to breathe.
  */
 const WATER_REGEN = 0.25, AIR_CLIMB = 1.5;
-/** How far down the stamina bar has to be, under water, before the body starts to sound winded. */
-const WINDED_AT = 0.6;
+/** The stamina left, under water, at which the body starts to sound winded — a quarter bar. */
+const WINDED_BELOW = 0.25;
 
 /** The vertical assist: rise and sink, with a lung's better climb and its sprint carried into it. */
 function riseDrive(g: Game, a: Actor, input: InputFrame, base: number, burst: number): number {
@@ -133,12 +133,12 @@ function updateBreath(g: Game, a: Actor, d: DevActor, dt: number) {
   if (up) a.stamina = a.staminaMax;
   d.atSurface = up;
   // Winded: down here the bar comes back at a quarter rate, and the whole of it is waiting at the
-  // surface. A quiet heartbeat says so once the bar is low, quickening as it empties. It is a nudge
+  // surface. A quiet heartbeat starts at a quarter bar and quickens as the rest goes. It is a nudge
   // rather than a warning — nothing bad happens if it is ignored — so it stays under the HUD.
   d.windT += dt;
-  const spent = 1 - clamp(a.stamina / Math.max(1, a.staminaMax), 0, 1);
-  if (!up && a.controller === 'player' && isAlive(a) && spent > WINDED_AT) {
-    const hard = clamp((spent - WINDED_AT) / (1 - WINDED_AT), 0, 1);
+  const left = clamp(a.stamina / Math.max(1, a.staminaMax), 0, 1);
+  if (!up && a.controller === 'player' && isAlive(a) && left < WINDED_BELOW) {
+    const hard = clamp(1 - left / WINDED_BELOW, 0, 1);
     if (d.windT >= 3 - 2 * hard) { d.windT = 0; g.events.push({ kind: 'winded', pos: { ...a.pos }, actor: a.id, player: a.player, strength: hard }); }
   } else if (up) d.windT = 0;
 }
