@@ -14,6 +14,7 @@ import { BIOME_NAMES, biomeAt, groundHeight, nurseryAt, sampleHeight, SURFACE_Y,
 import { AssetQueue, type AssetProgress } from './assets';
 import { fillOf, ladderName } from '../sim/ladder';
 import { CreatureView, ensureLoaded, loadedSync, type Lod } from './creature';
+import { Edges } from '../shared/edges';
 import { Attachments } from './attachments';
 import { Bubbles, Impacts, Silt, Splash } from './fx';
 import { Mouthfuls } from './carcass';
@@ -111,13 +112,9 @@ interface CamState { showBoard: boolean; yaw: number; pitch: number; zoom: numbe
 interface TeleMenu {
   open: boolean; index: number;
   swap: { open: boolean; index: number; grown: boolean };
-  prev: { teleport: boolean; up: boolean; down: boolean; left: boolean; right: boolean; confirm: boolean; back: boolean; ability: boolean };
+  edges: Edges;
 }
-const freshTele = (): TeleMenu => ({
-  open: false, index: 0,
-  swap: { open: false, index: 0, grown: false },
-  prev: { teleport: false, up: false, down: false, left: false, right: false, confirm: false, back: false, ability: false },
-});
+const freshTele = (): TeleMenu => ({ open: false, index: 0, swap: { open: false, index: 0, grown: false }, edges: new Edges() });
 
 /** Magnification levels (see docs/redesign/01-game-design.md · Magnification). */
 export const MAGNIFICATION = [
@@ -246,7 +243,8 @@ export class Engine {
   private disposed = false;
   private paused = false;
   private hudT = 0;
-  private prevMenu = new Map<string, boolean>();
+  /** The pause button, per device: `onMenu` fires on the press, never on the hold. */
+  private menuEdges = new Map<string, Edges>();
   private fps = 60; private fpsFrames = 0; private fpsT = 0;
   private resize: ResizeObserver;
   private scratchBoulders: Boulder[] = [];
@@ -377,8 +375,10 @@ export class Engine {
     // The button that started the match is almost certainly still held right now. Seed the menu
     // edge from what each device reads at this instant, or the first frame sees Start down with
     // no previous state, calls it a fresh press, and pauses the match the moment it begins.
-    this.prevMenu.clear();
-    for (const s of setups) this.prevMenu.set(String(s.device), this.controlsFor(s, 0).menu);
+    // Seed each device with whatever it is holding right now, so the button that started the match
+    // is not read as a press to pause it.
+    this.menuEdges.clear();
+    for (const s of setups) { const e = new Edges(); e.step({ menu: this.controlsFor(s, 0).menu }); this.menuEdges.set(String(s.device), e); }
     audio.play('ui-start');
   }
 
@@ -432,9 +432,9 @@ export class Engine {
       this.setups.forEach((s, i) => {
         const c = this.controlsFor(s, i);
         const key = String(s.device);
-        const prevMenu = this.prevMenu.get(key) ?? false;
-        if (c.menu && !prevMenu) this.cb.onMenu(i);
-        this.prevMenu.set(key, c.menu);
+        let edges = this.menuEdges.get(key);
+        if (!edges) this.menuEdges.set(key, (edges = new Edges()));
+        if (edges.step({ menu: c.menu }).menu) this.cb.onMenu(i);
         const p = game.players[i];
         const menuOpen = running && p ? this.updateTeleMenu(game, i, c) : false;
         // While the teleport menu is up the creature drifts: A and B belong to the menu.
@@ -557,20 +557,20 @@ export class Engine {
    */
   private updateTeleMenu(game: Game, i: number, c: RawControls): boolean {
     const cs = this.cams[i]; if (!cs) return false;
-    const t = cs.tele, prev = t.prev;
+    const t = cs.tele, edges = t.edges;
     const p = game.players[i];
-    const justTele = c.teleport && !prev.teleport;
-    const up = c.dup || c.my > 0.6, down = c.ddown || c.my < -0.6;
-    const left = c.dleft || c.mx < -0.6, right = c.dright || c.mx > 0.6;
-    const justUp = up && !prev.up, justDown = down && !prev.down;
-    const justLeft = left && !prev.left, justRight = right && !prev.right;
-    const justConfirm = c.confirm && !prev.confirm, justBack = c.back && !prev.back;
-    const justAbility = c.ability && !prev.ability;
-    prev.teleport = c.teleport; prev.up = up; prev.down = down; prev.left = left; prev.right = right;
-    prev.confirm = c.confirm; prev.back = c.back; prev.ability = c.ability;
+    // One list, not two: `Edges` remembers what it was handed, so a control cannot be added to the
+    // reading and forgotten in the remembering — which used to leave that button held forever.
+    const { teleport: justTele, up: justUp, down: justDown, left: justLeft, right: justRight,
+            confirm: justConfirm, back: justBack, ability: justAbility } = edges.step({
+      teleport: c.teleport,
+      up: c.dup || c.my > 0.6, down: c.ddown || c.my < -0.6,
+      left: c.dleft || c.mx < -0.6, right: c.dright || c.mx > 0.6,
+      confirm: c.confirm, back: c.back, ability: c.ability,
+    });
     if (justTele && !t.open) {
       // D-pad down opens it; once open the same button steps down the list
-      if (isAlive(p) && (p.state === 'free' || p.state === 'guard')) { t.open = true; t.index = 0; t.swap.open = false; prev.confirm = true; prev.down = true; audio.play('ui-confirm'); }
+      if (isAlive(p) && (p.state === 'free' || p.state === 'guard')) { t.open = true; t.index = 0; t.swap.open = false; edges.hold('confirm', 'down'); audio.play('ui-confirm'); }
       return t.open;
     }
     if (!t.open) return false;
@@ -841,8 +841,44 @@ export class Engine {
       else if (a.state !== 'dead' && a.eaten <= 0) v.restoreCarcass();
     }
     this.attachments.sync(game, this.views, dt);
+    this.breathe(game, keep);
     for (const [id, v] of this.views) if (!keep.has(id)) { v.dispose(); this.views.delete(id); }
   }
+
+  /**
+   * Lungs leak when they work. A bag of air inside a body under water shows every time the body
+   * spends itself: what a bimodal animal lets go of the mouth is the effort it just made, so the
+   * bubbles are the stamina bar draining, seen from outside. A sprint streams them, a dash coughs a
+   * handful, and hanging still or climbing — which costs nothing — releases none at all.
+   *
+   * Purely a look, so it lives in the renderer with its own randomness and reads the one creature
+   * flag it needs; nothing in the Cambrian roster breathes both ways, so nothing there emits. Run
+   * after `attachments.sync` so the mouth socket is posed, and skipped at the surface, where the
+   * animal is breathing rather than holding it.
+   */
+  private breathe(game: Game, keep: Set<number>) {
+    for (const [id, v] of this.views) {
+      const a = keep.has(id) ? game.byId(id) : undefined;
+      if (!a || !isAlive(a) || isHidden(a) || creature(a.creature).breathing !== 'bimodal') { this.breath.delete(id); continue; }
+      const L = lengthOf(a);
+      const prev = this.breath.get(id);
+      this.breath.set(id, { stamina: a.stamina, owed: prev?.owed ?? 0 });
+      // First sight of a body, or a bar that went up (regen, a breath, a respawn): nothing was spent.
+      if (prev == null || a.stamina >= prev.stamina) continue;
+      if (a.pos.y > SURFACE_Y - 3 - L * 0.3) continue;
+      const entry = this.breath.get(id)!;
+      entry.owed = prev.owed + (prev.stamina - a.stamina);
+      // One bubble per few points of effort, so a whole bar vented is a couple of dozen of them.
+      const n = Math.floor(entry.owed / 3.5);
+      if (n < 1) continue;
+      entry.owed -= n * 3.5;
+      const at = v.anchors.world('anchor_mouth', this.tmpV)
+        ? { x: this.tmpV.x, y: this.tmpV.y, z: this.tmpV.z }
+        : { x: a.pos.x + Math.sin(a.yaw) * L * 0.45, y: a.pos.y + L * 0.05, z: a.pos.z + Math.cos(a.yaw) * L * 0.45 };
+      this.bubbles.emit(at, Math.min(12, n), L * 0.1, 0.35, Math.min(0.18, 0.035 + L * 0.03), 1.6 + L * 0.2);
+    }
+  }
+  private breath = new Map<number, { stamina: number; owed: number }>();
 
   /**
    * A mouthful comes off the carcass: the eaten share stops being drawn on the body, and the
@@ -1050,12 +1086,13 @@ export class Engine {
           break;
         }
         case 'gulp': { this.bubbles.emit(e.pos, 24, 1.0, 3, 0.09, 1.4); personal('gulp'); break; }
-        // The low-air heartbeat, and a thin trickle of bubbles escaping with it. Quiet at the
-        // warning and firmer on the last of the meter — `strength` is how far gone the air is.
-        case 'airLow': {
+        // The winded heartbeat, and a thin trickle of bubbles escaping with it: a body that
+        // recovers badly under water, running low on stamina and a long way from the surface that
+        // would hand it all back. `strength` is how spent it is.
+        case 'winded': {
           const s = e.strength ?? 0;
           this.bubbles.emit(e.pos, 2 + Math.round(4 * s), 0.5, 2, 0.05, 1);
-          personal('airLow', 0.35 + 0.45 * s);
+          personal('winded', 0.35 + 0.45 * s);
           break;
         }
         case 'anoxia': { personal('anoxia', 0.8); break; }

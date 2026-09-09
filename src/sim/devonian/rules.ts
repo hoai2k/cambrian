@@ -15,8 +15,8 @@ import { botNursery, canBreach, sanctuary, spawnInCover, spawnProtect, spawnY, s
  *
  * The era plays the same three modes as the Cambrian; what it changes is the sea and the animals
  * in it. You grow on what you eat, as everywhere else — the meter behind the five stages is fed
- * by feeding and nothing else — and around that: armour has a soft side; air breathers must
- * surface and dead zones punish gills; the limbed animals can climb the shore; shells jet and
+ * by feeding and nothing else — and around that: armour has a soft side; lungs trade recovery
+ * under water for a full bar at the surface and dead water cannot touch them; the limbed animals can climb the shore; shells jet and
  * hover; the arthropods moult and leave a decoy behind; the rung II fish lead shoals. All of it
  * hangs off the flags on the creature definitions and the hooks in src/sim/era-rules.ts; nothing
  * here runs in the Cambrian build.
@@ -28,48 +28,55 @@ import { botNursery, canBreach, sanctuary, spawnInCover, spawnProtect, spawnY, s
  * Cambrian larva grows on nutrition and so does a Devonian hatchling.
  */
 const FEED = [0, 0.55, 0.28, 0.14, 0.09] as const;   // standing per unit of nutrition
-const AIR_SECONDS = 60, AIR_LOW = 0.25;
-/** The least warning worth giving, in seconds, however near the surface the animal already is. */
-const AIR_WARN_FLOOR = 12;
-
 const ZONE_R = 35, ZONE_LIFE = 120, ZONE_EVERY = 150;
 const EXUVIA_COVER = 8;
 
 /**
- * When the HUD says the air is low.
+ * Breathing both ways, as a stamina economy rather than a countdown.
  *
- * AIR_LOW is where the *body* suffers — no sprint to speak of, slow recovery — and is a fixed
- * fraction of the meter. When to *say so* is a different question, and it cannot be a fixed
- * fraction: the answer depends on how far down you are. This sea is sixty-four units deep and a
- * hatchling on rise alone climbs it at under two units a second, so a quarter of a bar — fifteen
- * seconds — was a warning about a thirty-second climb, which is no warning at all. So the warning
- * is the climb: it arrives when the air left would not comfortably cover swimming up from here,
- * and near the surface it stays quiet until the meter is genuinely low.
+ * Nothing on this roster is lung-only (see `breathing` in src/content/creature-types.ts): the three
+ * animals with lungs kept their gills, so none of them can drown and none of them carries a meter
+ * that runs out. What lungs buy them is a *place to go*. Under water they recover stamina at a
+ * quarter of everyone else's rate, which makes them poor at long chases and grinding fights; break
+ * the surface and the whole bar comes back at once, along with a free sprint. Their game is the
+ * round trip.
+ *
+ * Everything about them therefore points up. They climb half again as fast as anything else, a
+ * sprint carries into the climb, and the climb is free: driving upward costs no stamina at all, and
+ * on an empty bar a sprint or a dash still fires with only its upward part — there is always a way
+ * back to the surface, however spent you are. Nothing here can be taxed for going to breathe.
  */
-function airLow(a: Actor, d: DevActor): boolean {
-  const climb = Math.max(0, SURFACE_Y - 3 - lengthOf(a) * 0.3 - a.pos.y);
-  const seconds = climb / Math.max(0.3, RISE_RATE * AIR_CLIMB * speedFactor(a.scale)) * 1.4;
-  return d.air * AIR_SECONDS < Math.max(AIR_WARN_FLOOR, seconds);
+const WATER_REGEN = 0.25, AIR_CLIMB = 1.5;
+/** How far down the stamina bar has to be, under water, before the body starts to sound winded. */
+const WINDED_AT = 0.6;
+
+/** The vertical assist: rise and sink, with a lung's better climb and its sprint carried into it. */
+function riseDrive(g: Game, a: Actor, input: InputFrame, base: number, burst: number): number {
+  void g;
+  if (creature(a.creature).breathing !== 'bimodal') return input.rise ? base : input.sink ? -base : 0;
+  if (input.rise) return base * AIR_CLIMB * Math.max(1, burst);
+  if (input.sink) return -base;                       // diving is nobody's speciality; only the climb is
+  return 0;
+}
+
+/** Stamina regeneration, as a multiple of the shared rate: a lung recovers badly under water. */
+function staminaRegen(g: Game, a: Actor): number {
+  if (creature(a.creature).breathing !== 'bimodal') return 1;
+  return devActor(g, a).atSurface ? 1 : WATER_REGEN;
 }
 
 /**
- * How an animal here climbs, and when it climbs without being asked.
- *
- * A lungfish, a Tiktaalik and an Acanthostega live by the surface: going up is the thing their
- * bodies are for, so they climb half again as fast as anything else in the sea and a sprint carries
- * into the climb rather than only into the swim — the sea is sixty-four units deep, and a breath is
- * worth spending stamina on. On top of that they surface *for themselves* once the air is low, the
- * way an animal would: the button is for going up sooner or faster, and the way to stay down is to
- * hold sink and mean it. Everything with gills keeps exactly the shared behaviour.
+ * How much of a sprint's or dash's stamina this effort is given for nothing, 0..1 — the share of it
+ * that is climb. Straight up is free; straight along costs what it always did; a diagonal splits
+ * the difference. Gills pay for everything.
  */
-const AIR_CLIMB = 1.5, AIR_URGE = 0.8;
-function riseDrive(g: Game, a: Actor, input: InputFrame, base: number, burst: number): number {
+function climbRelief(a: Actor, input: InputFrame, dir: Vec3, mag: number): number {
   const def = creature(a.creature);
-  if (def.breathing !== 'air') return input.rise ? base : input.sink ? -base : 0;
-  const rate = base * AIR_CLIMB * Math.max(1, burst);
-  if (input.rise) return rate;
-  if (input.sink) return -base;                       // diving is nobody's speciality; only the climb is
-  return airLow(a, devActor(g, a)) ? rate * AIR_URGE : 0;
+  if (def.breathing !== 'bimodal') return 0;
+  const sf = speedFactor(a.scale), cruise = def.speed * sf;
+  const up = Math.max(0, dir.y) * mag * cruise + (input.rise ? RISE_RATE * AIR_CLIMB * sf : 0);
+  const along = Math.hypot(dir.x, dir.z) * mag * cruise + (input.sink ? RISE_RATE * sf : 0);
+  return up <= 0 ? 0 : clamp(up / (up + along), 0, 1);
 }
 
 const rungOf = (a: Actor) => creature(a.creature).rung ?? 2;
@@ -109,25 +116,31 @@ function checkStage(g: Game, a: Actor, d: DevActor) {
   }
 }
 
-// ---- air and dead zones ----
-function updateAir(g: Game, a: Actor, d: DevActor, dt: number) {
-  const def = creature(a.creature);
-  if (def.breathing !== 'air') return;
-  d.airPulseT += dt;
-  const atSurface = a.pos.y > SURFACE_Y - 3 - lengthOf(a) * 0.3 || d.beached;
-  if (atSurface) {
-    if (d.air < 0.999 && d.air + dt / 1.5 >= 0.999 && a.controller === 'player') { g.events.push({ kind: 'gulp', pos: { ...a.pos }, actor: a.id, player: a.player }); a.burstT = Math.max(a.burstT, 1.5); }
-    d.air = Math.min(1, d.air + dt / 1.5);
-  } else d.air = Math.max(0, d.air - dt / AIR_SECONDS);
-  // low air: no sprint to speak of, and slow recovery
-  if (d.air < AIR_LOW) a.stamina = Math.min(a.stamina, a.staminaMax * 0.35);
-  // The uneasy pulse while the air runs out: a heartbeat that quickens as the meter empties, from
-  // one beat every three seconds at the warning down to one a second on the last of it. Deliberately
-  // quiet — the HUD says the words, this is only the feeling of needing to be somewhere else.
-  if (!atSurface && a.controller === 'player' && isAlive(a) && airLow(a, d)) {
-    const every = 1 + 2 * clamp(d.air / AIR_LOW, 0, 1);
-    if (d.airPulseT >= every) { d.airPulseT = 0; g.events.push({ kind: 'airLow', pos: { ...a.pos }, actor: a.id, player: a.player, strength: 1 - clamp(d.air / AIR_LOW, 0, 1) }); }
-  } else if (atSurface) d.airPulseT = 0;
+// ---- breath and dead zones ----
+/**
+ * A breath at the surface. Nothing counts down to it — a bimodal animal is in no trouble under
+ * water, it is simply slow to recover there — so surfacing is an opportunity rather than a rescue:
+ * the bar comes back whole, and a gulp buys a short free sprint on top. Being up on the sand counts
+ * as surfacing, which is the point of having limbs.
+ */
+function updateBreath(g: Game, a: Actor, d: DevActor, dt: number) {
+  if (creature(a.creature).breathing !== 'bimodal') return;
+  const up = a.pos.y > SURFACE_Y - 3 - lengthOf(a) * 0.3 || d.beached;
+  if (up && !d.atSurface && a.controller === 'player') {
+    g.events.push({ kind: 'gulp', pos: { ...a.pos }, actor: a.id, player: a.player });
+    a.burstT = Math.max(a.burstT, 1.5);
+  }
+  if (up) a.stamina = a.staminaMax;
+  d.atSurface = up;
+  // Winded: down here the bar comes back at a quarter rate, and the whole of it is waiting at the
+  // surface. A quiet heartbeat says so once the bar is low, quickening as it empties. It is a nudge
+  // rather than a warning — nothing bad happens if it is ignored — so it stays under the HUD.
+  d.windT += dt;
+  const spent = 1 - clamp(a.stamina / Math.max(1, a.staminaMax), 0, 1);
+  if (!up && a.controller === 'player' && isAlive(a) && spent > WINDED_AT) {
+    const hard = clamp((spent - WINDED_AT) / (1 - WINDED_AT), 0, 1);
+    if (d.windT >= 3 - 2 * hard) { d.windT = 0; g.events.push({ kind: 'winded', pos: { ...a.pos }, actor: a.id, player: a.player, strength: hard }); }
+  } else if (up) d.windT = 0;
 }
 function stepDeadZones(g: Game, s: ReturnType<typeof stateFor>, dt: number) {
   s.nextZoneT -= dt;
@@ -153,7 +166,7 @@ function updateDeadZoneEffects(g: Game, a: Actor, d: DevActor, dt: number) {
   let inside = false;
   for (const z of s.deadZones) if (distXZ(a.pos, z.pos) < z.r * (z.age < 6 ? z.age / 6 : 1) * (z.age > z.life - 10 ? (z.life - z.age) / 10 : 1)) { inside = true; break; }
   const def = creature(a.creature);
-  if (inside && def.breathing !== 'air') {
+  if (inside && def.breathing !== 'bimodal') {
     d.deadT += dt;
     a.stamina = Math.max(0, a.stamina - 30 * dt);                // outpaces the shared regen (24/s at rest): no recovery in dead water
     if (d.deadT > 6 && isAlive(a)) { a.hp = Math.max(1, a.hp - a.hpMax * 0.02 * dt); a.sinceHit = 0; }
@@ -235,7 +248,7 @@ export const DEVONIAN_RULES: EraRules = {
       const d = devActor(g, a);
       const rung = rungOf(a), def = creature(a.creature);
       updateShore(g, a, d);
-      updateAir(g, a, d, dt);
+      updateBreath(g, a, d, dt);
       updateDeadZoneEffects(g, a, d, dt);
       updateShoal(g, a, d, dt);
       updateExuvia(g, a, d, dt);
@@ -283,7 +296,7 @@ export const DEVONIAN_RULES: EraRules = {
   jet(a) { return !!creature(a.creature).shell; },
 
   useAbility, stepAbility, camoDrain,
-  swim, rise: riseDrive, canBreach, spawnY, wanderY,
+  swim, rise: riseDrive, staminaRegen, climbRelief, canBreach, spawnY, wanderY,
   spawnPoint: spawnInCover, botNursery, spawnProtect, sanctuary,
 
   moultScale(g, a) {
@@ -299,7 +312,7 @@ export const DEVONIAN_RULES: EraRules = {
     if (g.mode !== 'reef' && d.stage > 0) d.stage -= 1;
     a.scale = stageScale(creature(a.creature).adultLength, d.stage);
     d.standing = Math.min(d.standing, d.stage + 1 <= PRIME_STAGE ? STAGE_AT[d.stage + 1] - 1 : d.standing);
-    d.air = 1; d.deadT = 0; d.deadZoneIn = false; d.moultSoft = 0; d.exuvia = -1; d.followers = 0; d.primeT = 0; d.beached = false;
+    d.atSurface = false; d.windT = 0; d.deadT = 0; d.deadZoneIn = false; d.moultSoft = 0; d.exuvia = -1; d.followers = 0; d.primeT = 0; d.beached = false;
   },
 
   updateModes(g, dt) {
@@ -344,8 +357,7 @@ export const DEVONIAN_RULES: EraRules = {
     const d = devActor(g, p), def = creature(p.creature), s = stateFor(g);
     return {
       standing: d.standing, stageProgress: stageProgress(d), rung: rungOf(p), rungName: RUNG_NAMES[rungOf(p)], stage: STAGES[d.stage],
-      air: def.breathing === 'air' ? d.air : undefined,
-      airLow: def.breathing === 'air' && airLow(p, d),
+      bimodal: def.breathing === 'bimodal',
       beached: d.beached, primeT: d.primeT, inDeadZone: d.deadZoneIn,
       deadZones: s.deadZones.filter((z) => distXZ(z.pos, p.pos) < 400).map((z) => ({ dx: z.pos.x - p.pos.x, dz: z.pos.z - p.pos.z, r: z.r })),
     };
@@ -354,8 +366,7 @@ export const DEVONIAN_RULES: EraRules = {
   hint(g, i) {
     const p = g.players[i]; if (!p || !isAlive(p)) return undefined;
     const d = devActor(g, p), def = creature(p.creature), rung = rungOf(p);
-    if (d.deadZoneIn && def.breathing !== 'air') return 'Dead water. Get out of it, or up to the surface if you can breathe.';
-    if (def.breathing === 'air' && airLow(p, d)) return 'Air is low — you are already heading up. {rise} to climb faster, {sink} to stay down.';
+    if (d.deadZoneIn && def.breathing !== 'bimodal') return 'Dead water. Get out of it, or up to the surface if you can breathe.';
     if (g.time < 12) return rung === 1 ? 'Feed, hide, moult. Everything out there is bigger than you are today.' : rung === 2 ? 'Feed and keep your shoal. You grow on what you catch.' : rung === 3 ? 'Hunt the shoals. Five stages between you and Prime.' : 'Stay fed. The sea is hiding from you.';
     if (def.shell && g.time < 40) return 'Your funnel makes rise and sink free, and no direction is slow. Block withdraws into the shell.';
     if ((def.shoreReach ?? 0) > 0 && g.time < 40) return 'You can push into water nothing with gills can follow you into.';
@@ -364,5 +375,5 @@ export const DEVONIAN_RULES: EraRules = {
 };
 
 /** Exposed for tests. */
-export { FEED as FEED_WEIGHTS, AIR_SECONDS, AIR_LOW, ZONE_R };
+export { FEED as FEED_WEIGHTS, WATER_REGEN, AIR_CLIMB, ZONE_R };
 export type { DeadZone };

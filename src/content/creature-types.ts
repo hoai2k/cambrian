@@ -90,8 +90,21 @@ export interface CreatureDef {
   armour?: number;
   /** This creature's heavy cuts through armour: 1 ignores it entirely, 0.5 halves it. */
   armourPierce?: number;
-  /** Air breathers carry an air meter and must surface; everything else breathes water. */
-  breathing?: 'gill' | 'air';
+  /**
+   * How this animal gets its oxygen. `gill` is water and nothing else. `bimodal` is lungs *as well
+   * as* gills — it can stay under indefinitely, and going up for a breath is worth something rather
+   * than being the thing that keeps it alive.
+   *
+   * The three the Devonian roster marks bimodal are all bimodal in the literature: Acanthostega's
+   * fish-like internal gills are the whole point of Coates & Clack 1991; Tiktaalik kept its gills
+   * and ventilated them by buccal pumping after losing the bony operculum, with spiracles for
+   * supplementary air; and Rhinodipterus is a *marine* Devonian dipnoan with the buccal-pump kit for
+   * air breathing — obligate air breathing with reduced gills is a modern Protopterus trait, not a
+   * Devonian marine one. So nothing on this roster is lung-only, and there is deliberately no value
+   * for one: an obligate air breather would drown without the surface, which is a different mechanic
+   * (a meter, a warning, a death) and should be added with that mechanic rather than in advance.
+   */
+  breathing?: 'gill' | 'bimodal';
   /** How far past the shore wall this creature may push (world units). 0 for swimmers. */
   shoreReach?: number;
   /** Chambered shell: backward jet sprint, free buoyancy, withdraw on block. */
