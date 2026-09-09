@@ -1,4 +1,4 @@
-# Cambrian Explosion — project notes for Claude
+# Cambrian Conquest — project notes for Claude
 
 ## Policy: finish on `main`
 
@@ -91,6 +91,11 @@ unless the user explicitly asks for a PR. Steps:
   `public/fonts/fonts.css`, which each entry page links. Both are OFL, and the licences ship
   beside them. Going through Google cost a render-blocking third-party request and failed outright
   on any network that does not allow it, our own headless browser included.
+- Delivered brand art lands in `intake/` as the original PNG and is converted by `npm run brand`
+  (`tools/brand-intake.mjs`) into `public/assets/brand/`. The wordmark's white page is knocked out
+  by how *colourless* a bright pixel is, not how bright — the gold has highlights as bright as the
+  paper — and edge pixels are un-blended from that white so no pale fringe shows over the sea.
+  Keep the originals: the conversion is meant to be re-runnable.
 - All docs live in `docs/`. Design docs are in `docs/redesign/`. Image, glyph and prop
   needs go in `docs/image-requests.md` and move to `docs/image-requests-history.md` once
   delivered and integrated; sound and music needs go in `docs/audio-requests.md`.
