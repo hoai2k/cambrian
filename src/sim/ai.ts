@@ -253,9 +253,17 @@ export function thinkNeeds(g: AiWorld, a: Actor, b: BrainState, dt: number): Inp
     const routed = b.courage <= 0 && attacker && isAlive(attacker);
     // Whatever else it was doing, something that just hit it has its attention. This is the one
     // rule the hour never softens: an animal always answers for itself.
-    const struck = !routed && attacker && isAlive(attacker) && a.sinceHit < 4
+    const struck = attacker && isAlive(attacker) && a.sinceHit < 4
       && bandOf(a, attacker) !== 'giant' && a.hp > a.hpMax * 0.3;
-    if (routed && a.controller !== 'bot') { if (b.goal !== 'flee') b.goalT = 0; b.goal = 'flee'; b.target = attacker.id; }
+    // Running away is only an answer if it works. An animal that has been swimming from something
+    // for a couple of seconds and is *still* being bitten by it has not got away, and nothing in
+    // the sea keeps holding its line while something chews on it: it turns and fights. Without
+    // this a routed animal swims in a straight line and takes the whole beating without once
+    // answering, which is the one thing a real animal never does.
+    const cornered = !!struck && b.goal === 'flee' && b.target === (attacker?.id ?? -1) && b.goalT > 2
+      && dist(a.pos, attacker!.pos) < L * 1.6 + lengthOf(attacker!) * 0.6;
+    if (cornered && attacker) { if (b.goal !== 'fight' || b.target !== attacker.id) b.goalT = 0; b.goal = 'fight'; b.target = attacker.id; }
+    else if (routed && a.controller !== 'bot') { if (b.goal !== 'flee') b.goalT = 0; b.goal = 'flee'; b.target = attacker.id; }
     else if (worst) { if (b.goal !== 'flee') b.goalT = 0; b.goal = 'flee'; b.target = worst.id; }
     else if (struck && attacker) { if (b.goal !== 'fight' || b.target !== attacker.id) b.goalT = 0; b.goal = 'fight'; b.target = attacker.id; }
     // Its own ground comes before a squabble with a neighbour and before feeding. Without this an
@@ -309,7 +317,9 @@ export function thinkNeeds(g: AiWorld, a: Actor, b: BrainState, dt: number): Inp
       if (cover && dot(norm(sub(cover.pos, a.pos)), away) > -0.3) {
         const tc = norm(sub(cover.pos, a.pos));
         dir = norm({ x: away.x + tc.x * 1.4, y: away.y * 0.4 + tc.y, z: away.z + tc.z * 1.4 });
-        if (dist(a.pos, cover.pos) < cover.radius * 0.5) { out.worldMove = v3(); out.burst = 0; return out; } // hide, hold still
+        // Hide and hold still — but only while hiding is still worth anything. Sitting motionless
+        // in a plant with something already biting you is not cover, it is standing there taking it.
+        if (dist(a.pos, cover.pos) < cover.radius * 0.5 && a.sinceHit > 2) { out.worldMove = v3(); out.burst = 0; return out; }
       }
       out.worldMove = dir; out.burst = a.stamina > 25 ? 1 : 0;
       if (a.hideMode === 'none' && a.hideCd <= 0 && a.stamina > 10 && (def.ability === 'tailFlick' || def.ability === 'burrow' || def.ability === 'enroll' || def.ability === 'shellUp' || ['ribbonSlip', 'sedimentDive', 'combCruise', 'adhesiveGlide', 'bellCorral'].includes(def.ability)) && dist(a.pos, t.pos) < L * 3) out.ability = true;
@@ -363,7 +373,12 @@ export function thinkNeeds(g: AiWorld, a: Actor, b: BrainState, dt: number): Inp
       break;
     }
     case 'fight': {
-      if (!t || !isAlive(t) || bandOf(a, t) !== 'rival') { b.goal = 'wander'; b.target = -1; break; }
+      // A squabble is between peers, but answering for yourself is not: whatever has its teeth in
+      // you is worth biting whether or not it is your own size. Without the second clause an
+      // animal struck by something far smaller picked `fight`, failed the band test on the very
+      // next tick and went back to wandering — which is what "it just let me hit it" looks like.
+      const answering = !!t && a.lastHitBy === t.id && a.sinceHit < 4;
+      if (!t || !isAlive(t) || (bandOf(a, t) !== 'rival' && !answering)) { b.goal = 'wander'; b.target = -1; break; }
       // A grumpy animal is defending its personal space, not prosecuting a war. Once whatever
       // crowded it has backed off — and as long as it has not been hit — it lets the matter drop.
       // Without this, being approached once turns an animal into a permanent enemy.
