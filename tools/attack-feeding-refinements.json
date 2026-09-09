@@ -2,67 +2,76 @@
   {
     "era": "cambrian",
     "id": "anomalocaris",
-    "status": "pending",
+    "status": "review",
     "scope": "attack-feeding-animation",
     "reviewClips": [
       "Bite",
       "Attack",
       "Heavy",
-      "Eat"
+      "Eat",
+      "Grab",
+      "Dash"
     ],
-    "note": "If this creature has a pending structural redesign, coordinate motion with its replacement; review each resulting animation individually."
+    "note": "Delivered 2026-09-09 by tools/creatures/motion/apply.mjs (performances/anomalocaris.mjs); shipped clips kept as replaced/<name>. Pending the user's review in the viewer and a controller playtest.",
+    "grip": "Already has a Grab clip: review it against the new held-grip rules (a grip held for as long as the button is down, and the same grip used to cling to something bigger)."
   },
   {
     "era": "cambrian",
     "id": "opabinia",
-    "status": "pending",
+    "status": "review",
     "scope": "attack-feeding-animation",
     "reviewClips": [
       "Bite",
       "Attack",
       "Heavy",
-      "Eat"
+      "Eat",
+      "Dash",
+      "Grab"
     ],
-    "note": "If this creature has a pending structural redesign, coordinate motion with its replacement; review each resulting animation individually."
+    "note": "Already articulated by the anchor pass (proboscis wind-up, jaw close, carry to the mouth); nothing replaced. Pending the user's review.",
+    "grip": "Has a Grab clip; review it as a *held* grip. The proboscis closes on what it caught and keeps hold of it — the same pose carries the animal while it clings to something bigger — rather than snatching and letting go. Snatch (Y) is now a grab when the button is held, so the clip has to sit under a held press as well as a tap."
   },
   {
     "era": "cambrian",
     "id": "waptia",
-    "status": "pending",
+    "status": "review",
     "scope": "attack-feeding-animation",
     "reviewClips": [
       "Bite",
       "Attack",
       "Heavy",
-      "Eat"
+      "Eat",
+      "Dash"
     ],
-    "note": "If this creature has a pending structural redesign, coordinate motion with its replacement; review each resulting animation individually."
+    "note": "Delivered 2026-09-09 by tools/creatures/motion/apply.mjs (performances/waptia.mjs); shipped clips kept as replaced/<name>. Pending the user's review in the viewer and a controller playtest."
   },
   {
     "era": "cambrian",
     "id": "marrella",
-    "status": "pending",
+    "status": "review",
     "scope": "attack-feeding-animation",
     "reviewClips": [
       "Bite",
       "Attack",
       "Heavy",
-      "Eat"
+      "Eat",
+      "Dash"
     ],
-    "note": "If this creature has a pending structural redesign, coordinate motion with its replacement; review each resulting animation individually."
+    "note": "Delivered 2026-09-09 by tools/creatures/motion/apply.mjs (performances/marrella.mjs); shipped clips kept as replaced/<name>. Pending the user's review in the viewer and a controller playtest."
   },
   {
     "era": "cambrian",
     "id": "olenoides",
-    "status": "pending",
+    "status": "review",
     "scope": "attack-feeding-animation",
     "reviewClips": [
       "Bite",
       "Attack",
       "Heavy",
-      "Eat"
+      "Eat",
+      "Dash"
     ],
-    "note": "If this creature has a pending structural redesign, coordinate motion with its replacement; review each resulting animation individually."
+    "note": "Delivered 2026-09-09 by tools/creatures/motion/apply.mjs (performances/olenoides.mjs); shipped clips kept as replaced/<name>. Pending the user's review in the viewer and a controller playtest."
   },
   {
     "era": "cambrian",
@@ -73,126 +82,150 @@
       "Bite",
       "Attack",
       "Heavy",
-      "Eat"
+      "Eat",
+      "Dash"
     ],
-    "note": "If this creature has a pending structural redesign, coordinate motion with its replacement; review each resulting animation individually."
+    "note": "If this creature has a pending structural redesign, coordinate motion with its replacement; review each resulting animation individually. Skipped by the 9 September pass on purpose: the body is being rebuilt, and the new rig gets its motion with the rebuild."
   },
   {
     "era": "cambrian",
     "id": "cambroraster",
-    "status": "pending",
+    "status": "review",
     "scope": "attack-feeding-animation",
     "reviewClips": [
       "Bite",
       "Attack",
       "Heavy",
-      "Eat"
+      "Eat",
+      "Grab",
+      "Dash"
     ],
-    "note": "If this creature has a pending structural redesign, coordinate motion with its replacement; review each resulting animation individually."
+    "note": "Delivered 2026-09-09 by tools/creatures/motion/apply.mjs (performances/cambroraster.mjs); shipped clips kept as replaced/<name>. Grab loop added for the hold. Pending the user's review in the viewer and a controller playtest.",
+    "grip": "The rake spines close as a basket around the held body; the head shield stays level. Riding grips with the frontal appendages under the shield."
   },
   {
     "era": "cambrian",
     "id": "sidneyia",
-    "status": "pending",
+    "status": "review",
     "scope": "attack-feeding-animation",
     "reviewClips": [
       "Bite",
       "Attack",
       "Heavy",
-      "Eat"
+      "Eat",
+      "Dash"
     ],
-    "note": "If this creature has a pending structural redesign, coordinate motion with its replacement; review each resulting animation individually."
+    "note": "Delivered 2026-09-09 by tools/creatures/motion/apply.mjs (performances/sidneyia.mjs); shipped clips kept as replaced/<name>. Pending the user's review in the viewer and a controller playtest."
   },
   {
     "era": "cambrian",
     "id": "leanchoilia",
-    "status": "pending",
+    "status": "review",
     "scope": "attack-feeding-animation",
     "reviewClips": [
       "Bite",
       "Attack",
       "Heavy",
-      "Eat"
+      "Eat",
+      "Grab",
+      "Dash"
     ],
-    "note": "If this creature has a pending structural redesign, coordinate motion with its replacement; review each resulting animation individually."
+    "note": "Delivered 2026-09-09 by tools/creatures/motion/apply.mjs (performances/leanchoilia.mjs); shipped clips kept as replaced/<name>. Grab loop added for the hold. Pending the user's review in the viewer and a controller playtest.",
+    "grip": "The three whip flagella of each great appendage wrap and hold; the shorter podomeres take the load. Riding wraps a flank with the whips."
   },
   {
     "era": "cambrian",
     "id": "isoxys",
-    "status": "pending",
+    "status": "review",
     "scope": "attack-feeding-animation",
     "reviewClips": [
       "Bite",
       "Attack",
       "Heavy",
-      "Eat"
+      "Eat",
+      "Grab",
+      "Dash"
     ],
-    "note": "If this creature has a pending structural redesign, coordinate motion with its replacement; review each resulting animation individually."
+    "note": "Delivered 2026-09-09 by tools/creatures/motion/apply.mjs (performances/isoxys.mjs); shipped clips kept as replaced/<name>. Grab loop added for the hold. Pending the user's review in the viewer and a controller playtest.",
+    "grip": "The raptorial frontal appendages fold in and hold against the carapace opening; riding hooks them over an edge with the body tucked along the host."
   },
   {
     "era": "cambrian",
     "id": "tamisiocaris",
-    "status": "pending",
+    "status": "review",
     "scope": "attack-feeding-animation",
     "reviewClips": [
       "Bite",
       "Attack",
       "Heavy",
-      "Eat"
+      "Eat",
+      "Grab",
+      "Dash"
     ],
-    "note": "If this creature has a pending structural redesign, coordinate motion with its replacement; review each resulting animation individually."
+    "note": "Delivered 2026-09-09 by tools/creatures/motion/apply.mjs (performances/tamisiocaris.mjs); shipped clips kept as replaced/<name>. Grab loop added for the hold. Pending the user's review in the viewer and a controller playtest.",
+    "grip": "The filtering combs are not claws: the grip closes the whole appendage pair around the body, spines interlocking, and riding hangs the animal beneath the host."
   },
   {
     "era": "cambrian",
     "id": "nectocaris",
-    "status": "pending",
+    "status": "review",
     "scope": "attack-feeding-animation",
     "reviewClips": [
       "Bite",
       "Attack",
       "Heavy",
-      "Eat"
+      "Eat",
+      "Grab",
+      "Dash"
     ],
-    "note": "If this creature has a pending structural redesign, coordinate motion with its replacement; review each resulting animation individually."
+    "note": "Delivered 2026-09-09 by tools/creatures/motion/apply.mjs (performances/nectocaris.mjs); shipped clips kept as replaced/<name>. Pending the user's review in the viewer and a controller playtest.",
+    "grip": "Both tentacles close and stay closed on the held body; the same pair takes hold of a flank when riding something larger."
   },
   {
     "era": "devonian",
     "id": "eldredgeops",
-    "status": "pending",
+    "status": "review",
     "scope": "attack-feeding-animation",
     "reviewClips": [
       "Bite",
       "Attack",
       "Heavy",
-      "Eat"
+      "Eat",
+      "Dash"
     ],
-    "note": "If this creature has a pending structural redesign, coordinate motion with its replacement; review each resulting animation individually."
+    "note": "Delivered 2026-09-09 by tools/creatures/motion/apply.mjs (performances/eldredgeops.mjs); shipped clips kept as replaced/<name>. Pending the user's review in the viewer and a controller playtest."
   },
   {
     "era": "devonian",
     "id": "walliserops",
-    "status": "pending",
+    "status": "review",
     "scope": "attack-feeding-animation",
     "reviewClips": [
       "Bite",
       "Attack",
       "Heavy",
-      "Eat"
+      "Eat",
+      "Grab",
+      "Dash"
     ],
-    "note": "If this creature has a pending structural redesign, coordinate motion with its replacement; review each resulting animation individually."
+    "note": "Delivered 2026-09-09 by tools/creatures/motion/apply.mjs (performances/walliserops.mjs); shipped clips kept as replaced/<name>. Grab loop added for the hold. Pending the user's review in the viewer and a controller playtest.",
+    "grip": "The trident is a lever, not a pincer: the fork sets across the held body and the thoracic legs close under it; riding hooks the trident over a flank."
   },
   {
     "era": "devonian",
     "id": "jaekelopterus",
-    "status": "pending",
+    "status": "review",
     "scope": "attack-feeding-animation",
     "reviewClips": [
       "Bite",
       "Attack",
       "Heavy",
-      "Eat"
+      "Eat",
+      "Grab",
+      "Dash"
     ],
-    "note": "If this creature has a pending structural redesign, coordinate motion with its replacement; review each resulting animation individually."
+    "note": "Delivered 2026-09-09 by tools/creatures/motion/apply.mjs (performances/jaekelopterus.mjs); shipped clips kept as replaced/<name>. Pending the user's review in the viewer and a controller playtest.",
+    "grip": "The chelicerae close and hold — coordinated joints, not a rigid rotation — and the walking legs brace. Riding sets the pincers into a flank with the legs gripping."
   },
   {
     "era": "devonian",
@@ -203,35 +236,42 @@
       "Bite",
       "Attack",
       "Heavy",
-      "Eat"
+      "Eat",
+      "Dash"
     ],
-    "note": "If this creature has a pending structural redesign, coordinate motion with its replacement; review each resulting animation individually."
+    "note": "If this creature has a pending structural redesign, coordinate motion with its replacement; review each resulting animation individually. Skipped by the 9 September pass on purpose: the body is being rebuilt, and the new rig gets its motion with the rebuild."
   },
   {
     "era": "devonian",
     "id": "palaeoisopus",
-    "status": "pending",
+    "status": "review",
     "scope": "attack-feeding-animation",
     "reviewClips": [
       "Bite",
       "Attack",
       "Heavy",
-      "Eat"
+      "Eat",
+      "Dash",
+      "Grab"
     ],
-    "note": "If this creature has a pending structural redesign, coordinate motion with its replacement; review each resulting animation individually."
+    "note": "Delivered 2026-09-09 by tools/creatures/motion/apply.mjs (performances/palaeoisopus.mjs); shipped clips kept as replaced/<name>. Pending the user's review in the viewer and a controller playtest.",
+    "grip": "Has a Grab clip; review it as a held grip. The long legs fold around and brace — a spider's hold, not a poke — and the same bracing pose is what it wears clinging to a flank."
   },
   {
     "era": "devonian",
     "id": "manticoceras",
-    "status": "pending",
+    "status": "review",
     "scope": "attack-feeding-animation",
     "reviewClips": [
       "Bite",
       "Attack",
       "Heavy",
-      "Eat"
+      "Eat",
+      "Dash",
+      "Grab"
     ],
-    "note": "If this creature has a pending structural redesign, coordinate motion with its replacement; review each resulting animation individually."
+    "note": "Delivered 2026-09-09 by tools/creatures/motion/apply.mjs (performances/manticoceras.mjs); shipped clips kept as replaced/<name>. Pending the user's review in the viewer and a controller playtest.",
+    "grip": "Has a Grab clip; review it as a held grip. Several arms close on the body and *stay* closed, the others adjusting around it, and the same hold reads as the shell hanging off a flank while clinging. Its own interpretation, not a copy of the orthocone's waveform."
   },
   {
     "era": "devonian",
@@ -242,21 +282,50 @@
       "Bite",
       "Attack",
       "Heavy",
-      "Eat"
+      "Eat",
+      "Dash",
+      "Grab"
     ],
-    "note": "Motion-v3 refined Attack/Bite/Heavy/Eat and authored-grasp runtime integrated as preview; full19/LOD7 actions. Actual 60-view art and 12 production rig/prey scenarios pass. Interactive game/controller playtest and broader individual quality review remain."
+    "note": "Motion-v3 refined Attack/Bite/Heavy/Eat and authored-grasp runtime integrated as preview; full19/LOD7 actions. Actual 60-view art and 12 production rig/prey scenarios pass. Interactive game/controller playtest and broader individual quality review remain.",
+    "grip": "Has a Grab clip; review it as a held grip. The crown closes proximal-to-distal and holds, tips still working; clinging is that hold with the shell trailing behind the arms rather than a lash."
   },
   {
     "era": "devonian",
     "id": "furcaster",
-    "status": "pending",
+    "status": "review",
     "scope": "attack-feeding-animation",
     "reviewClips": [
       "Bite",
       "Attack",
       "Heavy",
-      "Eat"
+      "Eat",
+      "Grab",
+      "Dash"
     ],
-    "note": "If this creature has a pending structural redesign, coordinate motion with its replacement; review each resulting animation individually."
+    "note": "Delivered 2026-09-09 by tools/creatures/motion/apply.mjs (performances/furcaster.mjs); shipped clips kept as replaced/<name>. Grab loop added for the hold. Pending the user's review in the viewer and a controller playtest.",
+    "grip": "Grabs with its WHOLE BODY: the arms wrap and the disc flattens onto the target so it sticks on. Riding is the same pose, held, with the oral surface against the host. Never a single arm poking forward."
+  },
+  {
+    "era": "cambrian",
+    "id": "hallucigenia",
+    "status": "review",
+    "scope": "attack-feeding-animation",
+    "reviewClips": [
+      "Grab",
+      "Dash"
+    ],
+    "note": "Grab and Dash delivered 2026-09-08 by tools/creatures/motion/apply.mjs (performance in performances/hallucigenia.mjs); both are clips the rig never had, so nothing was replaced. Verified by the pipeline's contract checks, socket geometry (feet clamp to the midline under the trunk, spines untouched; the dash sweep stays under the body) and the built viewer. Pending the user's review and a controller playtest. Bite/Attack/Heavy/Eat remain unqueued for this animal.",
+    "grip": "Grabs with its FEET — the clawed lobopods, in pairs, clamped around the held body or hooked into the host while the dorsal spines stay clear. Never a mouth grab."
+  },
+  {
+    "era": "cambrian",
+    "id": "ottoia",
+    "status": "review",
+    "scope": "attack-feeding-animation",
+    "reviewClips": [
+      "Grab"
+    ],
+    "note": "Grab delivered 2026-09-09 by tools/creatures/motion/apply.mjs (performances/ottoia.mjs) — the everted introvert curled over the catch, a clip the rig never had, so nothing was replaced. Its other clips are not queued. Pending the user's review in the viewer and a controller playtest.",
+    "grip": "The eversible pharynx everts and its hooks set into the held body; riding means the introvert anchored into a flank, the trunk trailing."
   }
 ]

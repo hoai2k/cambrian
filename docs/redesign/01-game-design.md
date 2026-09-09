@@ -235,6 +235,11 @@ expresses them differently so fights are varied.
 >    the one that costs least: *Resume* on pause, *Continue* on the results
 >    screen (*Play again* in the versus modes, which have nothing to continue).
 >
+> Both menus end at *Quit*, which leaves the match for the choice screen — where
+> you go to play as something else, and where the way back to the title already
+> is. A separate "quit to title" button sat one careless press from the end of a
+> session for no gain.
+>
 > Afterwards it is one cursor and one button: up and down move, A confirms. The
 > results panel is a flex column with a scrolling middle, so the choices stay
 > pinned on screen — they used to be the last thing inside one tall scroller and
@@ -580,8 +585,8 @@ Rise is the mode about growing up, so it is the one that keeps a record. Two
 things follow from that, and both are written once for both eras.
 
 **A finished run does not take the sea away.** Rise and Reef are co-op — a
-milestone rather than a verdict — so their results screen offers *Keep playing*
-(Y on a pad, Space on a keyboard). The match resumes exactly where it stood,
+milestone rather than a verdict — so their results screen offers *Continue*,
+which is also the choice its cursor wakes on. The match resumes exactly where it stood,
 with everything grown in it intact, and the goal stops watching so it cannot be
 met twice. Hunter & Hunted refuses: its result is a judgement between players.
 
@@ -616,7 +621,7 @@ the top itself.
 **Arriving at the top is a victory lap, not a second win.** Because the top can
 only be stored by finishing, carrying it back in means the goal is already
 behind you: the ninety-second clock never starts for that player and the sea is
-simply open, exactly as it is after pressing *Keep playing*. The exemption is
+simply open, exactly as it is after pressing *Continue*. The exemption is
 **per player, not per match** — a friend in the same co-op game who is still
 growing keeps their clock, reaches the top on their own, and wins it. A player
 on a victory lap banks nothing, because their record already says everything it

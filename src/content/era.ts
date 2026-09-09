@@ -108,6 +108,12 @@ export interface EraDefinition {
      * without saying why.
      */
     readonly modelNotes?: Readonly<Partial<Record<CreatureId, string>>>;
+    /**
+     * Animation clips still queued for rework, per creature and clip name, with the reason. A body
+     * that is already right does not get a preview badge for pending motion work — the warning goes
+     * on the clip buttons that will actually change.
+     */
+    readonly clipNotes?: Readonly<Partial<Record<CreatureId, Partial<Record<string, string>>>>>;
     readonly modelBytes: Readonly<Partial<Record<CreatureId, number>>>;
     /**
      * Creatures whose own model is still in production borrow another roster member's GLB (and

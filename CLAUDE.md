@@ -20,7 +20,10 @@ unless the user explicitly asks for a PR. Steps:
 - `src/sim` is pure TypeScript with no Three.js imports: a deterministic
   fixed-step simulation. `src/render` draws it. `src/app` is the React shell.
 - Creature GLBs and card renders live in `public/assets/creatures/` and must
-  not be modified in place; new animation clips are added, never replaced.
+  not be modified in place; new animation clips are added, never replaced. The one sanctioned way
+  to re-author a clip is `tools/creatures/motion/apply.mjs`, which keeps the shipped clip in the
+  file as `replaced/<Name>` (shown under *Replaced* in the viewer) and is re-runnable on top of
+  whatever else lands in the GLB; the performance is code in `performances/<id>.mjs`.
 - Any change to a creature's model, colours or textures must go through
   `docs/creature-intake.md`: re-render, `npm run cards`, `npm run lods`, and
   `npm run check` must pass. The check flags stale images automatically.
@@ -71,10 +74,14 @@ unless the user explicitly asks for a PR. Steps:
   the results screen: a player who quits mid-match keeps what they found. The results screen marks
   finds new from a list the shell accumulates, because the store already holds them by then.
   `npm run codex` guards both halves.
-- A creature shows a "preview" badge when its era's `pending-refinements.json` has an entry for it
-  (`src/content/<era>/`), and that entry's `reason` is what the badge shows on hover in the game and
-  the viewer. One file drives both, so a model cannot be flagged without saying what remains;
-  `npm run eras` checks every preview has a reason and every reason a preview.
+- `src/content/<era>/pending-refinements.json` is the one queue of outstanding creature art, and it
+  separates the two kinds: `model: true` (geometry, materials, rig, LOD art) is what shows the
+  creature's ⚠ preview badge in the game and the viewer, with `reason` on hover; `clips` are
+  animation clips queued for rework on a body that is already right, flagged on those clip buttons
+  in the viewer with `clipReason` and never on the creature. `src/content/pending-refinements.ts`
+  derives both eras' tables and `npm run eras` enforces the split — an entry must claim model or
+  clip work, whichever it claims must carry its reason, and animation-only work must not badge the
+  animal.
 - `?debug=local` on either page (`/?debug=local`, `/devonian/?debug=local`) opens an editor for that
   era's saved state — `src/app/DebugLocal.tsx`, gated by `src/shared/debug.ts`, mounted by
   `src/app/Root.tsx` so both entry points get it without knowing about it. A new thing kept in

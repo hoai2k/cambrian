@@ -17,7 +17,7 @@ const { Game } = await import('../src/sim/game');
 const { RULES } = await import('../src/sim/era-rules');
 const { stateFor, devActor, stageScale, ADULT_STAGE, PRIME_STAGE, STAGE_AT, HOLD_TO_WIN } = await import('../src/sim/devonian/state');
 const { coverAt } = await import('../src/sim/world');
-const { bandOf, isAlive, lengthOf } = await import('../src/sim/actors');
+const { applyScaleStats, bandOf, isAlive, lengthOf } = await import('../src/sim/actors');
 const { PLAYABLE } = await import('../src/sim/creatures');
 const { creature } = await import('../src/sim/creatures');
 const { emptyInput } = await import('../src/sim/types');
@@ -65,6 +65,24 @@ for (const c of DEVONIAN.creatures) {
 const opener = DEVONIAN.audio.music.find((t) => t.opening);
 ok(opener && fs.existsSync(`public/${paths.music(opener.name)}`.replace('%20', ' ')), `the opening track is delivered (${opener?.name})`);
 ok(RULES !== undefined && !RULES.growthByNutrition, 'Devonian rules active: growth is by standing, not nutrition');
+
+// ---- the animals that take hold, and the clips their grip is owed ----
+{
+  const graspers = DEVONIAN.creatures.filter((c) => c.grasp).map((c) => c.id as string);
+  const named = ['jaekelopterus', 'walliserops', 'furcaster', 'manticoceras', 'michelinoceras', 'palaeoisopus'];
+  ok(named.every((id) => graspers.includes(id)) && graspers.length === named.length,
+    `the Devonian graspers are the six the design names (${graspers.join(', ')})`);
+  const queue = JSON.parse(fs.readFileSync('tools/attack-feeding-refinements.json', 'utf8')) as { id: string; reviewClips: string[]; grip?: string }[];
+  for (const id of graspers) {
+    const glb = `public/assets/devonian/creatures/${id}.glb`;
+    if (!fs.existsSync(glb)) continue;                        // borrows a body: no clips of its own to owe
+    const buf = fs.readFileSync(glb);
+    const clips = (JSON.parse(buf.subarray(20, 20 + buf.readUInt32LE(12)).toString('utf8')).animations ?? []).map((a: { name: string }) => a.name) as string[];
+    const q = queue.find((e) => e.id === id);
+    ok(clips.includes('Grab') || (!!q && q.reviewClips.includes('Grab') && !!q.grip),
+      `${id} either grabs on screen or is queued for the clip with its brief`);
+  }
+}
 
 // ---- scenery: the coast is dressed with Devonian stand-ins, not Cambrian sponges ----
 {
@@ -236,6 +254,41 @@ ok(RULES !== undefined && !RULES.growthByNutrition, 'Devonian rules active: grow
   ok(dt.air > 0.99, `surfacing refills the lungs (${dt.air.toFixed(2)})`);
 }
 
+/**
+ * The warning has to be one you can act on. "Air is low, rise to the surface" is worth nothing if
+ * holding rise from the seabed cannot reach the surface before the meter empties — and in a sea
+ * sixty-four units deep with a warning at a quarter of a bar, it could not, at any size. So: from
+ * the floor, at the moment the HUD first says so, holding nothing but rise gets a hatchling up.
+ */
+{
+  for (const [id, scale] of [['tiktaalik', 0.13], ['rhinodipterus', 0.28], ['acanthostega', 0.22], ['tiktaalik', 1]] as const) {
+    const g = new Game('reef', [{ creature: id, device: 'keyboard', ready: true }]);
+    const p = g.players[0];
+    p.hatching = false; p.state = 'free'; p.stateT = 0; p.stateDur = 0; p.spawnProtect = 0;
+    p.pos.y = groundHeight(g.world, p.pos.x, p.pos.z, []) + 1; p.prevT.y = p.pos.y;
+    const floorY = p.pos.y;
+    const d = devActor(g, p);
+    const rise = new Map<number, InputFrame>([[0, { ...emptyInput(), rise: true }]]);
+    const idle = new Map<number, InputFrame>([[0, emptyInput()]]);
+    // Sit on the sand until the HUD says the air is low, then hold nothing but rise. The body is
+    // pinned at the size under test each step: the moult ceremony would otherwise lerp it back.
+    let warnedAt = -1, warnedAir = 1, refilled = -1;
+    for (let i = 0; i < 60 * 200; i++) {
+      p.scale = scale; applyScaleStats(p, false);
+      if (warnedAt < 0) {
+        p.pos.y = floorY; p.prevT.y = floorY;
+        tick(g, idle);
+        if (RULES!.hud(g, 0)!.airLow) { warnedAt = i; warnedAir = d.air; }
+        continue;
+      }
+      tick(g, rise);
+      if (d.air >= 0.999) { refilled = i - warnedAt; break; }
+      if (d.air <= 0) break;
+    }
+    ok(refilled > 0, `${id} at scale ${scale} climbs ${(SURFACE_Y - floorY).toFixed(0)} units on rise alone inside the air its warning leaves it (warned at ${(warnedAir * 60).toFixed(0)} s of air, took ${refilled < 0 ? 'more — ran out' : (refilled / 60).toFixed(1) + ' s'})`);
+  }
+}
+
 // ---- dead water: gills suffer, lungs do not, leaving scores ----
 {
   const g = new Game('rise', [{ creature: 'coccosteus', device: 'keyboard', ready: true }, { creature: 'tiktaalik', device: 0, ready: true }]);
@@ -326,6 +379,7 @@ ok(RULES !== undefined && !RULES.growthByNutrition, 'Devonian rules active: grow
     ok(rev.z < -1, `...reversing carries it back the way it came (z ${rev.z.toFixed(1)})`);
     ok(rev.astern > 0.8, `...shell-first, head trailing (${rev.astern.toFixed(2)}, 1 is astern)`);
     ok(rev.yaw < 0.4, `...without turning round to do it (${rev.yaw.toFixed(2)} rad of turn)`);
+    ok(dash.astern < -0.8, `...and an aimed dash does not turn it round either (${dash.astern.toFixed(2)})`);
   }
   const fish = run('cladoselache', 'sprint');
   ok(fish.z > 1 && fish.astern < -0.8, `a finned body sprints forward, facing forward (z ${fish.z.toFixed(1)}, ${fish.astern.toFixed(2)})`);
@@ -340,15 +394,41 @@ ok(RULES !== undefined && !RULES.growthByNutrition, 'Devonian rules active: grow
     p.pos = { x: 0, y: -14, z: 0 }; p.vel = { x: 0, y: 0, z: 0 }; p.yaw = 0; p.spawnProtect = 999;
     const step = (f: Partial<InputFrame> = {}) => { tick(g, new Map<number, InputFrame>([[0, { ...emptyInput(), ...f } as InputFrame]])); p.spawnProtect = 999; };
     for (let i = 0; i < 20; i++) step();
-    const from = { ...p.pos };
+    const from = { ...p.pos }, fromYaw = p.yaw;
     step({ dash: true });
     for (let i = 0; i < 20; i++) step();
     const h = heading(p.yaw), dx = p.pos.x - from.x, dz = p.pos.z - from.z;
-    return { moved: Math.hypot(dx, dz), alongAxis: (h.x * dx + h.z * dz) / Math.max(Math.hypot(dx, dz), 1e-6) };
+    return { moved: Math.hypot(dx, dz), alongAxis: (h.x * dx + h.z * dz) / Math.max(Math.hypot(dx, dz), 1e-6), turned: Math.atan2(Math.sin(p.yaw - fromYaw), Math.cos(p.yaw - fromYaw)) };
   };
   const shell = neutral('michelinoceras'), finned = neutral('cladoselache');
   ok(finned.moved > 1 && finned.alongAxis > 0.9, `a neutral-stick dash sends a fish the way it faces (${finned.moved.toFixed(1)} units, ${finned.alongAxis.toFixed(2)})`);
   ok(shell.moved > 1 && shell.alongAxis < -0.9, `...and a shell out behind itself, shell-first (${shell.moved.toFixed(1)} units, ${shell.alongAxis.toFixed(2)})`);
+  // ...and it comes out of that still pointing where it started. Holding the heading is what makes
+  // a dash *backward*: following the velocity round would spin the animal, and the camera with it,
+  // through 180° at the one moment it wants its eyes on the thing it is escaping. A dash that goes
+  // where the body already points has nothing to hold, so this is the shell's rule, not the fish's.
+  ok(Math.abs(shell.turned) < 0.2, `a backward dash leaves the shell facing where it was (turned ${shell.turned.toFixed(2)} rad)`);
+}
+
+// ---- changing creature keeps the era's own growth in step ----
+// The Devonian keeps the life stage in a side table rather than deriving it per step, so a body
+// that changed species has to be told (`onSwap`). Without it the new animal would keep the old
+// one's stage and the meter would be filled against the wrong thresholds.
+{
+  const { ladderMark, rungOf } = await import('../src/sim/ladder');
+  const { devActor, stageForScale } = await import('../src/sim/devonian/state');
+  const g = new Game('rise', [{ creature: 'coccosteus', device: 'keyboard', ready: true }]);
+  const p = g.players[0];
+  for (let i = 0; i < 30; i++) tick(g, new Map<number, InputFrame>([[0, emptyInput()]]));
+  p.spawnProtect = 0; p.teleportCd = 0; p.state = 'free';
+  const target: CreatureId = 'dunkleosteus';
+  ok(g.changeCreature(0, target, true), 'a Devonian player can change creature');
+  ok(p.creature === target, `...and is the new animal (${p.creature})`);
+  const d = devActor(g, p);
+  ok(d.stage === stageForScale(creature(target).adultLength, p.scale), `...with the era's stage resynced to the new body (stage ${d.stage})`);
+  ok(rungOf(ladderMark(g, p)) === 4, `...arriving fully grown when asked (rung ${rungOf(ladderMark(g, p))})`);
+  p.teleportCd = 0;
+  ok(g.changeCreature(0, 'coccosteus', false) && rungOf(ladderMark(g, p)) === 0, 'and the body it left is handed back where it was');
 }
 
 // ---- every sound the era asks for exists (the shared library is NOT under assets/devonian/) ----

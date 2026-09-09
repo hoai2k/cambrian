@@ -31,6 +31,13 @@ export interface CreatureDef {
    */
   kind?: string;
   kindNote?: string;
+  /**
+   * This animal takes hold of things. Holding the heavy or ability button turns whatever it lands
+   * into a grab rather than a strike: prey is held and eaten when the button comes up, and anything
+   * bigger than the `rival` band is ridden — grabbed anywhere but the business end of its head and
+   * carried along until it shakes you off. See `docs/redesign/05-hiding-and-combat.md`.
+   */
+  grasp?: boolean;
   tagline: string;     // energetic one-liner for the select screen
   role: string;
   ground: boolean;

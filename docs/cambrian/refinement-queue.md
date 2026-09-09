@@ -65,10 +65,19 @@ model backup; the current model stays preview until replacement acceptance.
 ## The machine-readable queue
 
 `src/content/cambrian/pending-refinements.json` is the source of truth, in the same shape as the
-Devonian's. An entry there *is* the creature's preview status, and its `reason` is the sentence the
-preview badge shows when hovered in the game and the viewer — so a model cannot be flagged without
-saying what it is waiting for, and the flag cannot be dropped without deleting that sentence.
-`npm run eras` checks both directions.
+Devonian's, and it separates the two kinds of outstanding work:
+
+- **`model: true`** — the 3D body itself: geometry, materials, rig, LOD art. This is what puts the
+  ⚠ preview badge on the creature, in the game and in the viewer, and `reason` is the sentence it
+  shows on hover. Only Odaraia is in this state in the Cambrian.
+- **`clips`** — animation clips queued for rework on a body that is already finished. Badging the
+  whole animal for these said the wrong thing: Anomalocaris' and Opabinia's models are done. The
+  warning goes on those clip buttons in the viewer instead, carrying `clipReason`, and the creature
+  shows nothing.
+
+An entry must claim at least one of the two and whichever it claims must carry its reason, so
+nothing can be flagged without saying what it is waiting for and no flag can be dropped without
+deleting that sentence. `npm run eras` enforces all of it.
 
 ## Attack and feeding pass — 8 September 2026
 
@@ -77,3 +86,14 @@ in `src/content/cambrian/pending-refinements.json`. See `docs/attack-feeding-ref
 `tools/attack-feeding-refinements.json` for individual scope, backups and acceptance requirements.
 Odaraia incorporates this in its full rework; other models retain current anatomy until their
 individual review determines changes. Keep preview status until every pending task is complete.
+
+## Attack and feeding pass — delivered 9 September 2026
+
+Every Cambrian entry of the pass except Odaraia (rebuilding) is delivered as a preview: Anomalocaris,
+Nectocaris, Cambroraster, Tamisiocaris, Isoxys, Waptia, Sidneyia, Marrella, Olenoides and
+Leanchoilia have re-authored Bite, Attack, Heavy and Eat; Cambroraster, Tamisiocaris, Isoxys,
+Leanchoilia and Ottoia gained the Grab loop the hold needs; Opabinia was already articulated and
+was left alone. The record, per-creature notes and what remains are in
+`docs/attack-feeding-refinement.md`; the clip badges stay until the user has reviewed each animal in
+the viewer, where the previous clips sit under *Replaced* for comparison.
+

@@ -21,7 +21,14 @@ files. Basic build/export checks during authoring are not a substitute for the p
 
 Titanichthys, Doryaspis, Gemuendina, Coccosteus, Bothriolepis and Stethacanthus require total model reworks, not cosmetic edits to the current geometry. Reconsider reference-based proportions and continuous volumes, sculpt new Blender geometry where needed, rebuild materials and rig deformation, then author dynamic actions and matching portraits. Preserve existing versions locally. Each remains a playable preview until its individual rework review passes. Gemuendina V3 has passed its structural review. Titanichthys V3 candidate08 has also passed its focused structural/art review and is published on mainbc5a2d0; broader polish remains pending. The other four total reworks remain pending.
 
-The machine-readable pending queue is `src/content/devonian/pending-refinements.json`. Catalogue validation requires every pending creature to remain `preview`; remove a pending entry only after its actual work and review are complete.
+The machine-readable pending queue is `src/content/devonian/pending-refinements.json`, and it
+separates the two kinds of outstanding work: `model: true` (geometry, materials, rig, LOD art) puts
+the ⚠ preview badge on the creature with `reason` on hover, while `clips` are animation clips queued
+for rework on an otherwise-finished body and are flagged on those clip buttons in the viewer with
+`clipReason`. Every Devonian entry currently has model work, so all 21 stay previews; eight also
+carry the attack/feeding motion pass. `npm run eras` and the catalogue check enforce the split, and
+`model-status.json` is kept only as a mirror the catalogue verifies against the queue. Remove a
+pending entry only after its actual work and review are complete.
 
 ## New reference-led redesign briefs — 8 September 2026
 
@@ -267,10 +274,12 @@ It follows the same individual authoring, preview and post-rework audit workflow
 
 ## Separate articulated attack and feeding pass
 
-See `docs/attack-feeding-refinement.md`: nautiloid/cephalopod tentacle flare and whipping,
-articulated sea-scorpion/spider strikes, and multi-arm grasp-to-underside-mouth feeding for
-Furcaster. Coordinate with pending body redesigns, including Nahecaris; audit only completed
-new geometry. This overlaps eight current individual refinements, not eight new creature IDs.
+See `docs/attack-feeding-refinement.md`. **Delivered 9 September 2026 as previews** for
+Jaekelopterus, Palaeoisopus, Eldredgeops, Walliserops, Manticoceras and Furcaster (Michelinoceras
+was delivered on 8 September); Walliserops and Furcaster also gained the Grab loop the hold needs.
+The previous clips are kept as `replaced/<name>` and shown under *Replaced* in the viewer. Nahecaris
+is skipped until its body redesign lands. Each remains a preview until the user has reviewed its
+clips; the model-side items in this queue are unchanged by the pass.
 
 ## Reopened face refinements — 8 September 2026
 

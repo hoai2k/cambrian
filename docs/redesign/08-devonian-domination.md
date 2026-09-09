@@ -175,11 +175,23 @@ the lock-on panel as a small silhouette with the soft region lit.
 ### Air
 
 Rhinodipterus, Tiktaalik and Acanthostega are **air breathers**. They have an
-air meter under stamina. It drains slowly; when it is low their stamina
-regeneration halves and sprint is disabled until they surface. Surfacing is
-**RB held at the light window**: a gulp refills the meter and grants a short
-"second wind" (a free sprint), but the surface is where the water is
-brightest and every rung IV shadow is watching it.
+air meter under stamina (a full minute of it). It drains slowly; when it is low
+their stamina regeneration halves and sprint is disabled until they surface.
+Surfacing is **RB held at the light window**: a gulp refills the meter and
+grants a short "second wind" (a free sprint), but the surface is where the
+water is brightest and every rung IV shadow is watching it.
+
+Two thresholds, because they answer different questions. The *body* suffers
+below a quarter of the meter — that is where the sprint goes. The *warning* is
+the climb: the HUD says the air is low when what is left would not comfortably
+cover swimming up from where the animal actually is, so it always arrives with
+time to act on it and stays quiet in the shallows. It has to be that way round.
+This sea is sixty-four units deep, and a hatchling holding rise off the seabed
+needs the better part of half a minute to reach the surface — a warning at a
+fixed quarter-bar was fifteen seconds' notice of a thirty-second climb, which
+is no warning at all. For the same reason the rise button is a property of the
+column rather than a constant (`RISE_RATE` in `src/sim/world.ts`): it climbs
+this sea at the pace the Cambrian's number climbed a forty-unit one.
 
 Everyone else is a gill breather and has no meter. The difference matters in
 one place:

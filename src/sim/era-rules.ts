@@ -24,6 +24,8 @@ export interface EraHud {
   rung: number; rungName: string; stage: string;
   /** 0..1 air remaining, for air breathers only. */
   air?: number;
+  /** True while that meter is low enough that the HUD should say so and the player should climb. */
+  airLow?: boolean;
   beached: boolean;
   /** Dead zones as world offsets from the player and radii, for the radar. */
   deadZones: { dx: number; dz: number; r: number }[];
@@ -56,6 +58,14 @@ export interface EraRules {
    * own meter and the shared code only says how full.
    */
   ladderFill(g: Game, a: Actor, fraction: number): void;
+  /** The other direction: how full this body's growth meter is, 0..1, for reading a mark back. */
+  ladderFillOf(g: Game, a: Actor): number;
+  /**
+   * Optional: a player has just changed which creature they are, in place. The shared code has
+   * already set the new body and its scale; an era that keeps growth in a side table of its own
+   * has to resync that table here, because nothing else derives it per step.
+   */
+  onSwap?(g: Game, a: Actor): void;
   /**
    * Where a player or bot hatches, given the nursery centre; undefined leaves the shared placement.
    * The Devonian puts every hatchling inside plant cover, on the floor or up a column.

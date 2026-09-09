@@ -1,9 +1,9 @@
-import { ModelStatusBadge } from '../shared/ModelStatusBadge';
+import { ClipQueuedBadge, ModelStatusBadge } from '../shared/ModelStatusBadge';
 import { CreaturePortrait } from '../app/CreaturePortrait';
 import { useEffect, useRef, useState } from 'react';
 import { COLLECTIONS, paletteFor, SPECIMENS, specimenByKey, type CollectionId } from './catalogue';
 import { scheme, SLOT_LABEL, type Slot } from '../shared/palettes';
-import { ASSET_BASE, createViewerScene, type PlaybackState, type ViewerScene } from './scene';
+import { ASSET_BASE, createViewerScene, isReplaced, replacedName, type PlaybackState, type ViewerScene } from './scene';
 
 const SPEEDS = [0.25, 0.5, 1, 2];
 
@@ -32,7 +32,10 @@ export function Viewer() {
   const sceneRef = useRef<ViewerScene | null>(null);
   const [collection, setCollection] = useState<CollectionId>('cambrian');
   const [id, setId] = useState(SPECIMENS[0].key);
+  const [detail, setDetail] = useState<'full' | 'reduced'>('full');
+  const requestedId = useRef('');
   const def = specimenByKey.get(id)!;
+  const modelPath = detail === 'reduced' && def.lod ? def.lod : def.model;
   const roster = SPECIMENS.filter(c => c.collection === collection);
   // Both eras are on this page, so a specimen's palette comes from its own pack, not ACTIVE_ERA.
   const defaultScheme = (key: string) => {
@@ -70,17 +73,18 @@ export function Viewer() {
     setLoading(true); setLoadedId(''); setError(''); setClips([]); setSlots([]);
     // The specimen on stage leaves before the next one is fetched: watching the last creature
     // repaint into the new one's colours, then pop out of frame, read as a glitch.
-    sceneRef.current?.clear();
+    if (requestedId.current !== id) sceneRef.current?.clear();
+    requestedId.current = id;
     // Set the scheme before the model is built so it never appears in the wrong palette first.
     sceneRef.current?.setScheme(picksRef.current[id] ?? defaultScheme(id));
-    sceneRef.current?.show(def)
+    sceneRef.current?.show({ ...def, model: modelPath }, { preserveView: true })
       .then((names) => {
         if (cancelled) return;
         setClips(names); setSlots(sceneRef.current?.activeSlots() ?? []); setLoading(false); setLoadedId(id);
       })
       .catch((e: Error) => { if (!cancelled) { setError(e.message); setLoading(false); } });
     return () => { cancelled = true; };
-  }, [id]);
+  }, [id, modelPath]);
 
   useEffect(() => { sceneRef.current?.setSpeed(speed); }, [speed]);
   useEffect(() => { sceneRef.current?.setScheme(schemeId); }, [schemeId]);
@@ -160,6 +164,14 @@ export function Viewer() {
         {def.description && <p className="specimen-description">{def.description}</p>}
         {def.lengthMeters != null && <p className="specimen-scale">Representative length: {new Intl.NumberFormat('en', { maximumSignificantDigits: 3 }).format(def.lengthMeters)} m · views individually framed</p>}
         {collection !== 'cambrian' && <p className="specimen-downloads"><a href={`${ASSET_BASE}${def.model}`} download>Full model</a>{def.lod && <a href={`${ASSET_BASE}${def.lod}`} download>Reduced model</a>}</p>}
+        {def.lod && <label className="scheme-pick">
+          <span>Model detail</span>
+          <select aria-label="Model detail" value={detail} disabled={loading} onChange={e => setDetail(e.target.value as 'full' | 'reduced')}>
+            <option value="full">Full model</option>
+            <option value="reduced">Reduced model</option>
+          </select>
+        </label>}
+        {def.lod && <p className="hint">Switch detail to compare at the same view and animation time. Missing clips return to rest.</p>}
         <p className="hint">Drag to orbit · right-drag to pan · scroll to zoom</p>
         <button className="ghost" onClick={() => sceneRef.current?.resetCamera()}>Reset view</button>
 
@@ -188,7 +200,7 @@ export function Viewer() {
         </section>}
       </div>
 
-      <section className="clips" aria-label="Animations" data-loaded-specimen={loadedId}>
+      <section className="clips" aria-label="Animations" data-loaded-specimen={loadedId} data-loaded-model={loadedId ? modelPath : ''}>
         <div className="clips-head">
           <h3>Animations</h3>
           {(clips.length > 0 || loading) && <><label className="toggle">
@@ -221,12 +233,33 @@ export function Viewer() {
         </div>}
         {!loading && !clips.length && <p className="hint">Static specimen</p>}
         <div className="clip-grid">
-          {clips.map((name) => (
-            <button key={name} className={`clip ${name === active ? 'active' : ''}`} aria-pressed={name === active} onClick={() => sceneRef.current?.play(name, loop)}>
-              {name}
-            </button>
-          ))}
+          {clips.filter((n) => !isReplaced(n)).map((name) => {
+            // A clip queued for rework is flagged on its own button rather than on the creature:
+            // the body is finished, this motion is not, and that is what a viewer wants to know.
+            const queued = def.clipNotes?.[name];
+            return (
+              <button key={name} className={`clip ${name === active ? 'active' : ''}${queued ? ' clip-queued' : ''}`}
+                aria-pressed={name === active} onClick={() => sceneRef.current?.play(name, loop)}>
+                {name}
+                {queued && <ClipQueuedBadge name={name} note={queued} />}
+              </button>
+            );
+          })}
         </div>
+        {clips.some(isReplaced) && <>
+          {/* A re-authored clip keeps its predecessor in the file as replaced/<Name>, so the two
+              can be played side by side and the old one restored if the new one is worse. The
+              game never asks for these names; only this page shows them. */}
+          <h4 className="clips-replaced-head">Replaced</h4>
+          <div className="clip-grid clip-grid-replaced">
+            {clips.filter(isReplaced).map((name) => (
+              <button key={name} className={`clip clip-replaced ${name === active ? 'active' : ''}`} aria-pressed={name === active}
+                title={`The clip ${replacedName(name)} superseded; kept for comparison`} onClick={() => sceneRef.current?.play(name, loop)}>
+                {replacedName(name)}
+              </button>
+            ))}
+          </div>
+        </>}
       </section>
 
     </div>

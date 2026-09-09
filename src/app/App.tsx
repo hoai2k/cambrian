@@ -522,17 +522,18 @@ export function App() {
       // Co-op modes are milestones, not verdicts: the sea is still there to swim in.
       if (hud?.canContinue) items.push({ label: 'Continue', run: keepPlaying, primary: true });
       items.push({ label: 'Play again', run: playAgain, primary: !hud?.canContinue });
-      items.push({ label: 'Change creatures', run: backToSelect });
-      items.push({ label: 'Quit to title', run: backToTitle });
+      // Quitting the match lands on the choice screen, which is where you go to play again with
+      // something else and where the way back to the title already is. A second button that left
+      // the game altogether sat one careless press from the end of a session.
+      items.push({ label: 'Quit', run: backToSelect });
       return items;
     }
     if (screen === 'playing' && paused) return [
       { label: 'Resume', run: () => setPausedBoth(false), primary: true },
-      { label: 'Change creatures', run: backToSelect },
-      { label: 'Quit to title', run: backToTitle },
+      { label: 'Quit', run: backToSelect },
     ];
     return [];
-  }, [screen, paused, hud?.canContinue, keepPlaying, playAgain, backToSelect, backToTitle, setPausedBoth]);
+  }, [screen, paused, hud?.canContinue, keepPlaying, playAgain, backToSelect]);
   useEffect(() => { menuItemsRef.current = menuItems; }, [menuItems]);
 
   // A menu opening resets the cursor. The pause menu was asked for, so its highlight is there at
