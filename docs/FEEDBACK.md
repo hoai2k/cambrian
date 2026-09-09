@@ -1,6 +1,6 @@
 # Feedback: a way for players to write back
 
-A **Have Feedback?** button in the bottom-left corner of the choose-your-creature screen, in both
+A **Send Feedback** button in the bottom-left corner of the choose-your-creature screen, in both
 games. It opens a short form — email and a message — and the message lands as a row in a private
 Google Sheet, with an email to say it arrived.
 
