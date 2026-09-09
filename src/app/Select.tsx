@@ -5,6 +5,7 @@ import { assetPaths } from '../content/asset-paths';
 import { hideLabel, hideDescription, HEAVY_SPECIALS, DEFENSIVE_SPECIALS } from '../sim/concealment';
 import { RULES } from '../sim/era-rules';
 import { CreaturePortrait } from './CreaturePortrait';
+import { FeedbackButton } from './Feedback';
 import { PLAYER_COLORS } from '../render/engine';
 import { PLAYABLE as CREATURES, creature, type CreatureId } from '../sim/creatures';
 import type { Mode, PlayerSetup } from '../sim/types';
@@ -261,6 +262,10 @@ export function SelectScreen(p: Props) {
       </div>
 
       <footer className="select-footer">
+        {/* Bottom left, opposite the dive button: the quiet corner of the screen, where something
+            worth offering but never worth pressing by accident belongs. Renders nothing at all
+            unless a feedback endpoint was compiled in — see src/shared/feedback.ts. */}
+        <FeedbackButton />
         <div className="start-wrap">
           {!p.allReady && <span className="dim">Move on the grid with {btn('pick', s)}, <b>{key('confirm', s)}</b> locks in, <b>{key('confirm', s)}</b> again dives.</span>}
           <button className={`start-button ${p.allReady ? 'focused' : ''}`} disabled={!p.allReady} onClick={p.onStart}>DIVE IN  ·  {key('confirm', s).toUpperCase()}</button>
