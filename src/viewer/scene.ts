@@ -44,7 +44,7 @@ export interface PlaybackState { time: number; duration: number; paused: boolean
 
 export interface ViewerScene {
   /** Loads a creature and returns its clip names in button order. */
-  show(specimen: ViewerSpecimen): Promise<string[]>;
+  show(specimen: ViewerSpecimen, options?: { preserveView?: boolean }): Promise<string[]>;
   /**
    * Takes the stage down now. Loading the next specimen takes a moment, and the one standing
    * there must not spend it being recoloured into the next one's palette.
@@ -256,10 +256,16 @@ export function createViewerScene(canvas: HTMLCanvasElement): ViewerScene {
     controls.update();
   }
 
-  async function show(specimen: ViewerSpecimen) {
+  async function show(specimen: ViewerSpecimen, options: { preserveView?: boolean } = {}) {
     const mine = ++token;
     const gltf = await loadCreature(specimen);
     if (mine !== token || disposed) { disposeAsset(gltf); return []; }
+    // Detail swaps retain the orbit and authored pose for direct full/LOD comparison.
+    // A different specimen is cleared by the caller and starts with its own framing.
+    const retained = options.preserveView && model ? {
+      name: currentName, time: current?.time ?? 0,
+      paused: paused || !!current?.paused, loop: current?.loop === THREE.LoopRepeat,
+    } : undefined;
     clearModel();
     source = gltf;
     looping = specimen.looping;
@@ -297,8 +303,20 @@ export function createViewerScene(canvas: HTMLCanvasElement): ViewerScene {
     const names = orderClips([...actions.keys()]);
     restingClip = actions.has('Idle') ? 'Idle' : names[0] ?? '';
     current = undefined; currentName = '';
-    if (restingClip) play(restingClip, false);
-    frame();
+    if (retained && actions.has(retained.name)) {
+      play(retained.name, retained.loop);
+      seek(retained.time);
+      paused = retained.paused;
+      reportPlayback();
+    } else if (restingClip) {
+      paused = retained?.paused ?? false;
+      play(restingClip, false);
+    }
+    if (!retained) frame();
+    else {
+      controls.minDistance = frameRadius * 0.4;
+      controls.maxDistance = frameRadius * 18;
+    }
     return names;
   }
 
