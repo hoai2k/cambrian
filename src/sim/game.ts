@@ -863,19 +863,6 @@ export class Game implements AiWorld {
     if (a.state === 'guard' || a.state === 'parry') a.guardHeld += dt;
     else a.guardHeld = 0;
     // Stamina
-    const speed = len3(a.vel);
-    const burstIn = input.burst;
-    // A crawler off the seabed is doggy-paddling: it keeps swimming slowly, but it cannot
-    // sprint or dash until its legs are back on the floor.
-    const paddling = def.ground && !a.grounded;
-    const bursting = burstIn > 0.1 && a.stamina > 0 && a.state !== 'guard' && a.exhausted === 0 && !paddling;
-    if (def.ability === 'ambushSurge' && input.burst > .1 && !a.prev.burst && a.abilityCd <= 0) { a.burstT = 2.2; a.abilityCd = 10; }
-    const freeBurst = a.burstT > 0;
-    if (bursting && !freeBurst) a.stamina -= BURST_STAMINA * burstIn * dt;
-    else if (a.state === 'guard') a.stamina -= 3 * dt;
-    else if (a.hideMode !== 'camouflage') a.stamina = Math.min(a.staminaMax, a.stamina + (speed < 0.4 ? 24 : 14) * dt * (a.state === 'free' ? 1 : 0.5));
-    if (a.stamina <= 0) { a.stamina = 0; if (a.exhausted === 0) a.exhausted = 1.6; }
-
     // Movement: desired direction
     let dir: Vec3 = v3();
     let mag = 0;
@@ -901,6 +888,25 @@ export class Game implements AiWorld {
       }
     }
     if (def.ground) dir.y = 0;
+
+    const speed = len3(a.vel);
+    const burstIn = input.burst;
+    // A crawler off the seabed is doggy-paddling: it keeps swimming slowly, but it cannot
+    // sprint or dash until its legs are back on the floor.
+    const paddling = def.ground && !a.grounded;
+    // How much of this effort is climb, and so given away: an era may hand a body the vertical for
+    // nothing. At full relief an empty bar is no longer a reason not to drive — see `emptyClimb`,
+    // which keeps that sprint out of the horizontal, where it was never paid for.
+    const relief = RULES ? RULES.climbRelief(a, input, dir, mag) : 0;
+    const freeClimb = relief > 0.5;
+    const bursting = burstIn > 0.1 && (a.stamina > 0 || freeClimb) && a.state !== 'guard' && (a.exhausted === 0 || freeClimb) && !paddling;
+    const emptyClimb = bursting && a.stamina <= 0;
+    if (def.ability === 'ambushSurge' && input.burst > .1 && !a.prev.burst && a.abilityCd <= 0) { a.burstT = 2.2; a.abilityCd = 10; }
+    const freeBurst = a.burstT > 0;
+    if (bursting && !freeBurst) a.stamina = Math.max(0, a.stamina - BURST_STAMINA * burstIn * dt * (1 - relief));
+    else if (a.state === 'guard') a.stamina -= 3 * dt;
+    else if (a.hideMode !== 'camouflage') a.stamina = Math.min(a.staminaMax, a.stamina + (speed < 0.4 ? 24 : 14) * dt * (a.state === 'free' ? 1 : 0.5) * (RULES?.staminaRegen(this, a) ?? 1));
+    if (a.stamina <= 0) { a.stamina = 0; if (a.exhausted === 0 && !freeClimb) a.exhausted = 1.6; }
     const controllable = a.holdT === 0 && (a.state === 'free' || a.state === 'guard' || (a.state === 'ability' && (def.mobileAbility || def.ability === 'shellUp' || def.ability === 'bristleFlare' || def.ability === 'ambushSurge')));
     const slowMult = abilitySpeed(a) * (a.state === 'guard' ? (def.ability === 'anchor' ? 0 : def.ability === 'enroll' ? .8 : .45) : (a.abilityActive && def.ability === 'shellUp') ? 0.35 : a.exhausted > 0 ? 0.7 : 1);
     const burstMult = controllable && (bursting || freeBurst) ? (1 + (def.burst - 1) * (freeBurst ? 1.25 : burstIn) * (a.controller === 'swarm' ? 0.55 : giantish ? 0.35 : 1)) : 1;
@@ -916,9 +922,12 @@ export class Game implements AiWorld {
     // the free hover and in the backward dash, not in a sprint that turns the animal round.
     const jets = RULES?.jet(a) ?? false;
     if (controllable && mag > 0) {
-      desired.x += dir.x * mag * cruise * burstMult;
-      desired.y += dir.y * mag * cruise * burstMult;
-      desired.z += dir.z * mag * cruise * burstMult;
+      // On an empty bar a sprint that is only running because the climb is free must buy the climb
+      // and nothing else: the vertical takes the sprint, the horizontal swims at its own pace.
+      const along = emptyClimb ? 1 : burstMult;
+      desired.x += dir.x * mag * cruise * along;
+      desired.y += dir.y * mag * cruise * (emptyClimb && dir.y <= 0 ? 1 : burstMult);
+      desired.z += dir.z * mag * cruise * along;
     }
     if (controllable && !def.ground) {
       const hover = jets ? 1.6 : 1;
@@ -1144,9 +1153,12 @@ export class Game implements AiWorld {
       // way. A neutral stick fires it along the body's own axis — ahead of a finned body, and out
       // behind a jetting shell, which is the way a nautiloid escapes and the way it is already
       // pointing while it does, so it leaves without turning first.
-      else if (justDash && a.stamina >= 10 && a.exhausted === 0 && a.dashCd === 0 && !a.dashUsed && !paddling) {
+      // A dash that is mostly climb is on the same terms as a sprint that is: it costs what is
+      // left of it after the relief, and an empty bar does not refuse it — the body just goes up
+      // rather than along (see `startDash`). There is always a way back to the surface.
+      else if (justDash && (a.stamina >= 10 || freeClimb) && (a.exhausted === 0 || freeClimb) && a.dashCd === 0 && !a.dashUsed && !paddling) {
         a.dashUsed = true;
-        this.startDash(a, def, mag > 0.3 ? dir : vscale(heading(a.yaw), jets ? -1 : 1), L, sf);
+        this.startDash(a, def, mag > 0.3 ? dir : vscale(heading(a.yaw), jets ? -1 : 1), L, sf, relief);
       }
       // Dodge (B for creatures that cannot guard, bots)
       else if (justDodge && a.controller !== 'player' && a.stamina >= 10 && a.exhausted === 0) this.startDodge(a, def, dir, mag, L, sf);
@@ -1556,12 +1568,16 @@ export class Game implements AiWorld {
     if (def.ability === 'combCruise') { a.burstT = 1; a.stamina = Math.min(a.staminaMax,a.stamina+4); }
   }
 
-  private startDash(a: Actor, def: ReturnType<typeof creature>, dir: Vec3, L: number, sf: number) {
+  private startDash(a: Actor, def: ReturnType<typeof creature>, dir: Vec3, L: number, sf: number, relief = 0) {
     let d: Vec3 = { ...dir }; if (def.ground) d.y = 0; d = norm(d);
     a.state = 'dodge'; a.stateT = 0; a.stateDur = 0.42;
-    a.iframes = 0.42; a.stamina -= 12; a.dashCd = 0.55;
+    // A body dashing on nothing but free climb gets the climb and not the ground: the horizontal
+    // half of the burst is what the stamina was for, and it has none.
+    const empty = a.stamina < 12 * (1 - relief);
+    a.iframes = 0.42; a.stamina = Math.max(0, a.stamina - 12 * (1 - relief)); a.dashCd = 0.55;
     const power = (L * 9.5 + 7) * (def.id === 'waptia' ? 1.2 : 1);
-    a.vel.x = d.x * power; a.vel.y = def.ground ? a.vel.y : d.y * power * 0.7; a.vel.z = d.z * power;
+    const along = empty ? 0 : 1;
+    a.vel.x = d.x * power * along; a.vel.y = def.ground ? a.vel.y : d.y * power * 0.7; a.vel.z = d.z * power * along;
     a.dodgeDir = d;
     this.evadeSpecial(a, def, L);
     this.events.push({ kind: 'dodge', pos: { ...a.pos }, actor: a.id, player: a.player, strength: L });
