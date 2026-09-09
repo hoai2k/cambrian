@@ -1,4 +1,4 @@
-# Image request history — Cambrian Explosion
+# Image request history — Cambrian Conquest
 
 Completed image, glyph and prop briefs are archived here, newest first. Open requests
 belong in [image-requests.md](image-requests.md); audio requests are in

@@ -1,4 +1,4 @@
-# Audio requests — Cambrian Explosion
+# Audio requests — Cambrian Conquest
 
 Open sound and music requests. Image, glyph and prop requests live in
 [image-requests.md](image-requests.md). How the audio system consumes what is
