@@ -114,8 +114,9 @@ shape through the recovery. Length 0.45 s so it covers the state with a little t
 included: their dash is a shove off the substrate, not a swim.
 
 `src/render/creature.ts` already picks `Dash` for the long move and keeps `Dodge` for the short
-one, and falls back either way, so clips can land one model at a time. Hallucigenia's is
-authored; the amplitude lesson from it is worth carrying: a stubby limb swung by the angle a fin
+one, and falls back either way, so clips can land one model at a time. Hallucigenia's is the only
+one authored so far, so this is what the pass still owes on every other model; the amplitude
+lesson from it is worth carrying: a stubby limb swung by the angle a fin
 would use folds over the animal's own back, and the socket check (`pose-check.mjs`, or a scratch
 script printing tip positions) is what catches that before a render does.
 

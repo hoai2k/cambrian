@@ -320,17 +320,12 @@
   {
     "era": "cambrian",
     "id": "ottoia",
-    "status": "pending",
+    "status": "review",
     "scope": "attack-feeding-animation",
     "reviewClips": [
-      "Bite",
-      "Attack",
-      "Heavy",
-      "Eat",
-      "Grab",
-      "Dash"
+      "Grab"
     ],
-    "note": "Joins the pass for its grip: the everted pharynx takes hold.",
+    "note": "Grab delivered 2026-09-09 by tools/creatures/motion/apply.mjs (performances/ottoia.mjs) — the everted introvert curled over the catch, a clip the rig never had, so nothing was replaced. Its other clips are not queued. Pending the user's review in the viewer and a controller playtest.",
     "grip": "The eversible pharynx everts and its hooks set into the held body; riding means the introvert anchored into a flank, the trunk trailing."
   }
 ]
