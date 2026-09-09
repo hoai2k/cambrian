@@ -62,7 +62,6 @@ function PlayerPanel({ p }: { p: PlayerHud }) {
           <div className="name-row"><b>{def.name}</b><span className="tier-name">{p.tierName}</span>{p.protect && <span className="protect">PROTECTED</span>}</div>
           <div className="bar hp"><i style={{ width: `${(p.hp / p.hpMax) * 100}%` }} /></div>
           <div className={`bar stamina ${p.exhausted ? 'exhausted' : ''}`}><i style={{ width: `${(p.stamina / p.staminaMax) * 100}%` }} /></div>
-          {p.era?.air != null && <div className={`bar air ${p.era.air < 0.25 ? 'low' : ''}`} aria-label={`Air ${Math.round(p.era.air * 100)}%`}><i style={{ width: `${p.era.air * 100}%` }} /></div>}
         </div>
       </div>
       {p.era && <EraStatus era={p.era} alive={p.alive} />}
@@ -346,11 +345,11 @@ const RUNG_NUMERALS = ['', 'I', 'II', 'III', 'IV'];
  */
 function EraStatus({ era, alive }: { era: EraHud; alive: boolean }) {
   if (!alive) return null;
-  const warn = era.inDeadZone ? (era.air != null ? 'DEAD WATER · your gills are fine, theirs are not' : 'DEAD WATER · no oxygen, get out') : era.beached ? 'ON THE SAND · nothing with gills can follow' : era.air != null && era.air < 0.25 ? 'AIR LOW · surface and gulp' : '';
+  const warn = era.inDeadZone ? (era.bimodal ? 'DEAD WATER · your lungs are fine, their gills are not' : 'DEAD WATER · no oxygen, get out') : era.beached ? 'ON THE SAND · nothing with gills can follow' : '';
   return (
     <div className="era-status">
       {era.primeT > 0 && <div className="dominant"><span>PRIME</span><b>{Math.max(0, Math.ceil(90 - era.primeT))}</b></div>}
-      {warn && <div className={`era-warn ${era.inDeadZone && era.air == null ? 'danger' : ''}`}>{warn}</div>}
+      {warn && <div className={`era-warn ${era.inDeadZone && !era.bimodal ? 'danger' : ''}`}>{warn}</div>}
     </div>
   );
 }

@@ -1,6 +1,7 @@
 /** Bake the viewer's linear-space recolour into temporary GLBs; shipped models stay untouched. */
 import fs from 'node:fs';
 import crypto from 'node:crypto';
+import { fingerprint } from '../creature-fingerprint.mjs';
 import { build } from 'esbuild';
 import { NodeIO, Accessor } from '@gltf-transform/core';
 import { ALL_EXTENSIONS } from '@gltf-transform/extensions';
@@ -39,7 +40,7 @@ for(const id of Object.keys(source)) {
  for(const ext of doc.getRoot().listExtensionsUsed())if(ext.extensionName==='EXT_meshopt_compression')ext.dispose();
  await io.write(`${dir}/${id}.glb`,doc);
  const revision=crypto.createHash('sha256').update(paletteSignature(selected)+':'+PORTRAIT_RECOLOR_VERSION).digest('hex').slice(0,12);
- manifest[id]={scheme:selected.id,colors:selected.colors,recolorVersion:PORTRAIT_RECOLOR_VERSION,sourceGlbSha256:crypto.createHash('sha256').update(fs.readFileSync(path)).digest('hex'),files:Object.fromEntries(['select','card','thumb'].map(kind=>[kind,`assets/creatures/schemes/${id}.${selected.id}.${revision}.${kind}.png`]))};
+ manifest[id]={scheme:selected.id,colors:selected.colors,recolorVersion:PORTRAIT_RECOLOR_VERSION,sourceGlbSha256:crypto.createHash('sha256').update(fs.readFileSync(path)).digest('hex'),sourceAppearanceSha256:fingerprint(path).appearanceSha256,files:Object.fromEntries(['select','card','thumb'].map(kind=>[kind,`assets/creatures/schemes/${id}.${selected.id}.${revision}.${kind}.png`]))};
  console.log(id,selected.id);
 }
 fs.writeFileSync(`${dir}/manifest.json`,JSON.stringify(manifest,null,2)+'\n');

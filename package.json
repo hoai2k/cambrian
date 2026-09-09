@@ -18,6 +18,7 @@
     "feast": "esbuild tools/feast-test.ts --bundle --platform=node --format=esm --outfile=node_modules/.cache/feast-test.mjs && node node_modules/.cache/feast-test.mjs",
     "paddle": "esbuild tools/paddle-test.ts --bundle --platform=node --format=esm --outfile=node_modules/.cache/paddle-test.mjs && node node_modules/.cache/paddle-test.mjs",
     "grab": "esbuild tools/grab-test.ts --bundle --platform=node --format=esm --outfile=node_modules/.cache/grab-test.mjs && node node_modules/.cache/grab-test.mjs",
+    "fight": "esbuild tools/fight-test.ts --bundle --platform=node --format=esm --outfile=node_modules/.cache/fight-test.mjs && node node_modules/.cache/fight-test.mjs",
     "swim": "esbuild tools/swim-test.ts --bundle --platform=node --format=esm --outfile=node_modules/.cache/swim-test.mjs && node node_modules/.cache/swim-test.mjs",
     "world": "esbuild tools/world-test.ts --bundle --platform=node --format=esm --outfile=node_modules/.cache/world-test.mjs && node node_modules/.cache/world-test.mjs",
     "motion": "esbuild tools/motion-test.ts --bundle --platform=node --format=esm --outfile=node_modules/.cache/motion-test.mjs && node node_modules/.cache/motion-test.mjs",
@@ -36,7 +37,8 @@
     "devonian:check": "node tools/devonian/check.mjs --shipped && node tools/devonian/check-props.mjs --shipped && node tools/devonian/catalogue.mjs --check",
     "devonian:check-all": "node tools/devonian/check.mjs && node tools/devonian/check-props.mjs && node tools/devonian/catalogue.mjs --check",
     "menus": "esbuild tools/menu-cursor-test.ts --bundle --platform=node --format=esm --outfile=node_modules/.cache/menu-cursor.mjs && node node_modules/.cache/menu-cursor.mjs",
-    "swap": "esbuild tools/swap-test.ts --bundle --platform=node --format=esm --outfile=node_modules/.cache/swap.mjs && node node_modules/.cache/swap.mjs"
+    "swap": "esbuild tools/swap-test.ts --bundle --platform=node --format=esm --outfile=node_modules/.cache/swap.mjs && node node_modules/.cache/swap.mjs",
+    "edges": "esbuild tools/edges-test.ts --bundle --platform=node --format=esm --outfile=node_modules/.cache/edges.mjs && node node_modules/.cache/edges.mjs"
   },
   "dependencies": {
     "react": "^19.1.0",
