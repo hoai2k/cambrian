@@ -86,6 +86,11 @@ unless the user explicitly asks for a PR. Steps:
   era's saved state — `src/app/DebugLocal.tsx`, gated by `src/shared/debug.ts`, mounted by
   `src/app/Root.tsx` so both entry points get it without knowing about it. A new thing kept in
   `localStorage` should get a control there; `npm run debug` checks the gate.
+- The two typefaces are served from `public/fonts/`, not from fonts.googleapis.com: four
+  variable WOFF2 files (one per family per Latin subset) declared over a weight range in
+  `public/fonts/fonts.css`, which each entry page links. Both are OFL, and the licences ship
+  beside them. Going through Google cost a render-blocking third-party request and failed outright
+  on any network that does not allow it, our own headless browser included.
 - All docs live in `docs/`. Design docs are in `docs/redesign/`. Image, glyph and prop
   needs go in `docs/image-requests.md` and move to `docs/image-requests-history.md` once
   delivered and integrated; sound and music needs go in `docs/audio-requests.md`.
