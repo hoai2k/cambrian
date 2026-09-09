@@ -32,6 +32,6 @@ export const CAMBRIAN = defineEra({
     logo: 'assets/brand/logo-engraved.webp', illustration: 'assets/brand/logo-illustrated.webp',
     emblem: 'assets/brand/emblem.webp', modelBytes, modelStatus: CAMBRIAN_MODEL_STATUS, modelNotes: CAMBRIAN_MODEL_NOTES, clipNotes: CAMBRIAN_CLIP_NOTES,
   },
-  audio: { music: MUSIC },
+  audio: { music: MUSIC, loops: { ambient: 'ambient-reef', drone: 'giant-drone' } },
   presentation: { schemes: SCHEMES, creatureSchemes: CREATURE_SCHEMES, portraits, authoredColors },
 });

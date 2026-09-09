@@ -15,7 +15,7 @@ import { ACTIVE_ERA } from '../content';
  */
 import { CREATURE_IDS, type CreatureId } from '../sim/creatures';
 import { ensureLoaded } from './creature';
-import { LOOPS, SAMPLES, sfxUrl } from '../audio/audio';
+import { loops, SAMPLES, sfxUrl } from '../audio/audio';
 import { appBase } from '../shared/base';
 
 export type AssetKind = 'glb' | 'lod' | 'thumb' | 'select' | 'ui' | 'sfx';
@@ -34,17 +34,17 @@ const THUMB_SIZE = 60_000, SELECT_SIZE = 700_000;
  * `sfxUrl` is the audio module's own resolver, which knows an era's sounds live in a directory of
  * their own.
  *
- * The two `LOOPS` — the reef bed and the giant's drone — belong here as much as any one-shot, and
+ * The two loops — the era's ambient bed and the giant's drone — belong here as much as any one-shot, and
  * were the only sounds the queue never asked for: this list was built from `SAMPLES` alone, which
  * does not contain them. They are also the heaviest of them by an order of magnitude (259 KB and
  * 141 KB against 12 KB for a bite) and the longest missed, since the bed runs for the whole match
  * and nothing stands in for it any more.
  */
-export const sfxFiles = () => [...new Set([...Object.values(SAMPLES).flat(), ...Object.values(LOOPS)])];
+export const sfxFiles = () => [...new Set([...Object.values(SAMPLES).flat(), ...Object.values(loops())])];
 /** Sounds the menus use, which are worth having before anything a match needs. */
 const UI_SFX = ['ui-start', 'ui-confirm', 'ui-move', 'ui-back', 'ui-join'];
 /** The beds. Behind the menu sounds, ahead of the rest: one file covers the whole session. */
-const isLoop = (n: string) => (Object.values(LOOPS) as string[]).includes(n);
+const isLoop = (n: string) => (Object.values(loops()) as string[]).includes(n);
 
 /** Never cached at module level: an era entry page sets the base after this module is imported. */
 const base = () => appBase();
