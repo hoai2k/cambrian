@@ -335,9 +335,10 @@ ok(RULES !== undefined && !RULES.growthByNutrition, 'Devonian rules active: grow
     }
     return n;
   };
-  const low = count(0.3, 12, 20), spent = count(0.0, 12, 20);
+  const low = count(0.2, 12, 20), spent = count(0.0, 12, 20);
   ok(low > 0 && spent > low, `the winded pulse quickens as the bar empties (${low} beats then ${spent} over 12 s)`);
-  ok(count(1, 12, 20) === 0, 'and there is none on a full bar');
+  ok(count(0.3, 12, 20) === 0, 'and nothing above a quarter bar, which is where it starts');
+  ok(count(1, 12, 20) === 0, 'nor on a full bar');
   ok(count(0, 6, SURFACE_Y - 2) === 0, 'nor at the surface, where the bar is already back');
 }
 

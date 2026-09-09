@@ -201,8 +201,8 @@ is **free**: driving upward costs no stamina, and on an empty bar a sprint or a
 dash still fires with only its upward part, so nothing can ever be stranded on
 the bottom with no way back. Going to breathe is never taxed.
 
-A quiet heartbeat (`winded`) marks a low bar under water, quickening as it
-empties — a nudge toward the surface rather than a warning, since nothing bad
+A quiet heartbeat (`winded`) starts at a quarter bar under water and quickens
+as the rest goes — a nudge toward the surface rather than a warning, since nothing bad
 happens if it is ignored. And the effort shows: what a lung lets go of the
 mouth is the stamina it just spent, so a sprint streams bubbles, a dash coughs a
 handful, and hanging still or climbing releases none.
