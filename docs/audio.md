@@ -6,7 +6,7 @@ How the game makes noise, where the sounds come from, and how to work on them.
 
 | Where | What |
 | --- | --- |
-| `src/audio/audio.ts` | The whole WebAudio graph: master → sfx bus, ambience and tension beds, music, the sample library, and the synthesized fallbacks used before a file has loaded. |
+| `src/audio/audio.ts` | The whole WebAudio graph: master → sfx bus, ambience and tension beds, music, and the sample library. Samples only — a cue whose file has not decoded yet asks for it and stays quiet rather than playing a synthesised stand-in. |
 | `src/audio/music.ts` | The soundtrack: the track list, the opener, and what plays next. |
 | `src/audio/mix.ts` | The mix rules: the distance curve for world sounds and the retrigger gaps, shared by the audio module, the renderer, the workbench and the density test. |
 | `src/render/engine.ts` | Turns sim events into sounds: `syncListeners()` and `hearing()` decide how loud and how far to the side each one is, `handleEvents()` picks the sound. |
