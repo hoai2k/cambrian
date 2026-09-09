@@ -10,7 +10,7 @@ import { MODE_IDS, type Mode, type PlayerSetup } from '../sim/types';
 import { clampMark } from '../sim/ladder';
 import { emptyCodex, hasNewFinds, loadCodex, mergeCodex, recordFinds, type Codex } from './codex';
 import { Hud } from './Hud';
-import { LoadingScreen } from './Loading';
+import { LoadingScreen, useSlow } from './Loading';
 import { Dialogs, PauseMenu, Results, type MenuItem } from './Overlays';
 import { gridColumns, SelectScreen } from './Select';
 import { TitleScreen } from './Title';
@@ -370,9 +370,10 @@ export function App() {
     updatePlayers([...ps, { creature: CREATURE_IDS[ps.length % CREATURE_IDS.length], device, ready: false }]);
     audio.play('ui-join');
   }, [updatePlayers]);
+  /** The keyboard joins once and only once: two players never share one. */
   const addKeyboard = useCallback(() => {
-    const used = playersRef.current.map((p) => p.device);
-    addPlayer(used.includes('keyboard') ? 'keyboard2' : 'keyboard');
+    if (playersRef.current.some((p) => typeof p.device === 'string')) return;
+    addPlayer('keyboard');
   }, [addPlayer]);
   const changeMode = useCallback((m: Mode) => { modeRef.current = m; setMode(m); audio.play('ui-move'); updatePlayers(playersRef.current.map((p) => ({ ...p, ready: false }))); }, [updatePlayers]);
 
@@ -560,6 +561,13 @@ export function App() {
 
   // A menu opening resets the cursor. The pause menu was asked for, so its highlight is there at
   // once; the results screen was not, so it shows none until the player touches something.
+  /**
+   * The boot screen waits to be needed. Switching era from the choice page is a page load, and on a
+   * warm one the assets are already in cache: a loading screen shown for two frames on the way
+   * through is a flicker, not information.
+   */
+  const bootSlow = useSlow(!loaded);
+
   const menuOpen = screen === 'results' || (screen === 'playing' && paused);
   useEffect(() => {
     if (!menuOpen) return;
@@ -574,7 +582,7 @@ export function App() {
       <div className="sea-canvas" ref={canvasRef} aria-label="Cambrian sea" />
       <div className="vignette" />
 
-      {!loaded && <LoadingScreen progress={progress} fraction={progress ? Math.min(1, progress.fraction * 4) : 0} />}
+      {!loaded && bootSlow && <LoadingScreen progress={progress} fraction={progress ? Math.min(1, progress.fraction * 4) : 0} />}
       {screen === 'title' && loaded && <TitleScreen loaded={loaded} onStart={() => startFromTitle('keyboard', true)} padCount={padCount} />}
 
       {screen === 'select' && (
@@ -582,7 +590,7 @@ export function App() {
           players={players} mode={mode} modes={MODES} modeInfo={modeInfo} allReady={allReady} padIndices={padIndices}
           scheme={scheme}
           best={best} carry={carry}
-          onPick={setCreature} onReady={toggleReady} onRemove={removePlayer} onAddKeyboard={addKeyboard}
+          onPick={setCreature} onReady={toggleReady} onRemove={removePlayer}
           onMode={changeMode} onStart={startMatch} onBack={backToTitle} onCarry={toggleCarry}
         />
       )}

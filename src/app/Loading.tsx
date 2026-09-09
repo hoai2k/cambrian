@@ -36,3 +36,22 @@ export function LoadingScreen({ progress, fraction }: { progress: AssetProgress 
     </section>
   );
 }
+
+/**
+ * True once `active` has been true for `ms` without letting up.
+ *
+ * A loading indicator that appears the instant something is asked for reads as a stutter when the
+ * thing was already in cache — switching era on the choice page is usually a warm page load, and a
+ * boot screen flashed for two frames is worse than no boot screen at all. So nothing is drawn until
+ * the wait is longer than a player would put down to the game being quick.
+ */
+export const WAIT_HINT = 700;
+export function useSlow(active: boolean, ms = WAIT_HINT): boolean {
+  const [slow, setSlow] = useState(false);
+  useEffect(() => {
+    if (!active) { setSlow(false); return; }
+    const t = setTimeout(() => setSlow(true), ms);
+    return () => clearTimeout(t);
+  }, [active, ms]);
+  return slow;
+}

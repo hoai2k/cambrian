@@ -89,7 +89,10 @@ h3 { font-size: 13px; letter-spacing: .12em; color: var(--ember); margin: 14px 0
 .mode-chip.active { background: linear-gradient(120deg, rgba(255,91,110,.35), rgba(255,179,107,.25)); border-color: var(--ember); }
 .mode-blurb { grid-area: blurb; margin: 0; color: var(--mist); font-size: 14px; }
 
-.pick-layout { display: grid; grid-template-columns: minmax(0, 1.5fr) minmax(320px, 0.8fr); gap: 16px; min-height: 0; padding: 8px 0; }
+/* The single row is `minmax(0, 1fr)`, not `auto`: an auto row takes the crew cards' max-content
+   height and then overflows the picker, which clips it — the cards have to be told how much room
+   there actually is so the copy inside them can scroll instead of being cut off. */
+.pick-layout { display: grid; grid-template-columns: minmax(0, 1.5fr) minmax(320px, 0.8fr); grid-template-rows: minmax(0, 1fr); gap: 16px; min-height: 0; padding: 8px 0; }
 .crew { display: grid; gap: 10px; align-content: stretch; grid-auto-flow: row; grid-auto-rows: minmax(0, 1fr); min-height: 0; }
 .crew-1 { grid-template-rows: minmax(0, 1fr) auto; }
 .crew-1 .join-card { min-height: 0; padding: 12px 14px; gap: 6px; grid-auto-flow: column; align-items: center; justify-content: space-between; text-align: left; }
@@ -97,15 +100,33 @@ h3 { font-size: 13px; letter-spacing: .12em; color: var(--ember); margin: 14px 0
 .crew-2 { grid-template-rows: minmax(0, 1fr) minmax(0, 1fr); }
 .crew-2 .join-card, .crew.compact .join-card { display: none; }
 .crew.compact { grid-template-columns: 1fr 1fr; grid-auto-flow: row; }
-.crew-card { position: relative; display: grid; grid-template-rows: auto minmax(110px, 42%) minmax(0, 1fr) auto; gap: 8px; padding: 14px 16px 16px; border-radius: var(--radius); background: rgba(6, 22, 28, .62); backdrop-filter: blur(16px); border: 1px solid rgba(238,250,246,.14); box-shadow: inset 0 0 0 1px rgba(255,255,255,.03), 0 20px 60px rgba(0,0,0,.35); transition: border-color .2s, box-shadow .2s; overflow: hidden; min-height: 0; max-height: 100%; }
+/*
+ * The card, and where its Lock In went. It used to be the last row of a four-row stack, which cost
+ * the copy a button's height at exactly the sizes where the copy had none to spare — at 1280x800
+ * four of the five kit lines were being cut off, in a box that does not scroll. It sits beside the
+ * portrait now: the portrait is a wide picture of a centred animal with room to either side, so
+ * the button costs nothing there and hands the whole of its old row back to the text.
+ */
+.crew-card { position: relative; container-type: inline-size; display: grid; grid-template-columns: minmax(0, 1fr) auto; grid-template-areas: 'top top' 'hero btn' 'copy copy'; grid-template-rows: auto minmax(110px, 42%) minmax(0, 1fr); gap: 8px 12px; padding: 14px 16px 16px; border-radius: var(--radius); background: rgba(6, 22, 28, .62); backdrop-filter: blur(16px); border: 1px solid rgba(238,250,246,.14); box-shadow: inset 0 0 0 1px rgba(255,255,255,.03), 0 20px 60px rgba(0,0,0,.35); transition: border-color .2s, box-shadow .2s; overflow: hidden; min-height: 0; max-height: 100%; }
 .crew-card::before { content: ''; position: absolute; inset: 0 0 auto 0; height: 4px; background: var(--player); }
 .crew-card.ready { border-color: var(--player); box-shadow: 0 0 0 1px var(--player), 0 0 48px color-mix(in oklch, var(--player), transparent 65%); }
-.crew-top { display: flex; align-items: center; gap: 10px; font-size: 12px; color: var(--dim); }
+.crew-top { grid-area: top; display: flex; align-items: center; gap: 10px; font-size: 12px; color: var(--dim); }
 .crew-top .device { display: inline-flex; align-items: center; gap: 6px; }
 .player-chip { font: 700 11px var(--font-display); letter-spacing: .1em; background: var(--player); color: var(--ink); border-radius: 8px; padding: 4px 8px; }
 .remove { margin-left: auto; width: 28px; height: 28px; border-radius: 8px; border: 1px solid rgba(238,250,246,.16); background: transparent; color: var(--dim); }
 .remove:hover { color: var(--coral); border-color: var(--coral); }
-.creature-copy { min-height: 0; overflow: hidden; }
+/*
+ * Never cut a line off. The card's job is to say what the animal does, and this box used to hide
+ * what would not fit: `overflow: hidden` was declared twice, the second copy quietly overriding the
+ * `overflow-y: auto` further down that was meant to let it scroll, and a media rule dropped the
+ * last three kit entries outright below 640px of window — the ability, the passive and the
+ * weakness, which is most of what there is to know. Now the content is made to fit (the Lock In
+ * button left the vertical stack, and the kit goes to two columns when it is short), and the box
+ * scrolls as a last resort rather than swallowing anything.
+ */
+.creature-copy { grid-area: copy; min-height: 0; overflow-x: hidden; overflow-y: auto; scrollbar-width: thin; scrollbar-color: rgba(238,250,246,.45) rgba(238,250,246,.09); }
+/* `data-more` is set by `CopyBox` while there is copy below the fold — see src/app/Select.tsx. */
+.creature-copy[data-more] { -webkit-mask-image: linear-gradient(180deg, #000 calc(100% - 34px), transparent); mask-image: linear-gradient(180deg, #000 calc(100% - 34px), transparent); }
 .creature-copy .role { font: 600 11px var(--font-display); letter-spacing: .18em; color: var(--ember); }
 .creature-copy h2 { font-size: clamp(20px, 2.4vw, 32px); margin: 2px 0 2px; line-height: 1; }
 /* The everyday group the animal belongs to, so an unfamiliar genus still lands somewhere. */
@@ -136,13 +157,36 @@ h3 { font-size: 13px; letter-spacing: .12em; color: var(--ember); margin: 14px 0
 .stat i { display: flex; gap: 3px; }
 .stat b { width: 14px; height: 6px; border-radius: 3px; background: rgba(238,250,246,.12); }
 .stat b.on { background: var(--player); box-shadow: 0 0 8px color-mix(in oklch, var(--player), transparent 40%); }
+/*
+ * The kit is a list until the card is too short for one, and then it is two columns. Nothing here
+ * scrolls, so a line that does not fit is a line the player never sees — and these are the five
+ * lines that say what the animal actually does. Column-flow rather than a grid of cells so the
+ * split lands where the content wants it, and `break-inside` so no entry is torn across the gap.
+ */
 .kit { margin: 0; display: grid; gap: 4px; font-size: 12.5px; color: var(--mist); }
+/* Two columns rather than CSS multicol: inside a clipped, height-constrained box multicol adds
+   columns *sideways* and the overflow is cut off horizontally, which is the same bug wearing a
+   different hat. A grid grows downward, which is the axis that has room. */
+@media (max-height: 820px) { .kit { grid-template-columns: 1fr 1fr; gap: 4px 12px; } }
+/*
+ * A short window has no vertical slack to spare, so the copy tightens instead of falling back to a
+ * scrollbar — the box does scroll as a last resort, but a pad cannot reach it, so anything that can
+ * be made to fit should fit.
+ */
+@media (max-height: 760px) {
+  .creature-copy h2 { font-size: clamp(18px, 2vw, 24px); }
+  .creature-copy .tagline { font-size: 12.5px; margin-bottom: 5px; }
+  .creature-copy .best-run { margin-bottom: 5px; }
+  .creature-copy .stats { gap: 4px 8px; margin-bottom: 5px; }
+  .creature-copy .stat small { font-size: 10px; }
+  .creature-copy .kit { font-size: 11.5px; gap: 3px 12px; }
+}
 /* The button column sizes to its label: a pad says "RT", a mouse says "LMB". */
-.kit div { display: grid; grid-template-columns: minmax(22px, max-content) 1fr; gap: 8px; align-items: start; }
+.kit > div { display: grid; grid-template-columns: minmax(22px, max-content) 1fr; gap: 8px; align-items: start; break-inside: avoid; }
 .kit dt { font: 700 11px var(--font-display); color: var(--ink); background: var(--foam); border-radius: 6px; text-align: center; line-height: 18px; padding: 0 4px; }
 .kit dd { margin: 0; }
 .kit b { color: var(--foam); }
-.ready-button { padding: 12px; border-radius: 12px; border: 1px solid var(--player); background: transparent; font: 700 13px var(--font-display); letter-spacing: .14em; color: var(--player); display: inline-flex; gap: 8px; justify-content: center; align-items: center; transition: all .15s; }
+.ready-button { grid-area: btn; align-self: center; max-width: min(190px, 34cqw); padding: 12px 14px; border-radius: 12px; text-align: center; border: 1px solid var(--player); background: transparent; font: 700 13px/1.25 var(--font-display); letter-spacing: .14em; color: var(--player); display: inline-flex; flex-wrap: wrap; gap: 4px 8px; justify-content: center; align-items: center; transition: all .15s; }
 .ready-button[aria-pressed='true'] { background: var(--player); color: var(--ink); }
 .join-card { display: grid; place-items: center; align-content: center; gap: 10px; padding: 24px; border-radius: var(--radius); border: 1px dashed rgba(238,250,246,.25); color: var(--mist); text-align: center; min-height: 220px; }
 .join-card p { margin: 0; }
@@ -233,7 +277,7 @@ h3 { font-size: 13px; letter-spacing: .12em; color: var(--ember); margin: 14px 0
 /* The change-creature page of the teleport menu: one animal at a time, cycled left and right, with
    what you would arrive as written under it. */
 .swap-menu { min-width: 15em; }
-.swap-body { display: flex; gap: .7em; align-items: center; margin: .4em 0 .5em; }
+.swap-body { position: relative; display: flex; gap: .7em; align-items: center; margin: .4em 0 .5em; }
 .swap-body img { width: 3.4em; height: 3.4em; object-fit: contain; flex: none; }
 .swap-body > div { display: grid; gap: .1em; min-width: 0; }
 .swap-body b { font: 800 1em var(--font-display); }
@@ -417,6 +461,10 @@ input[type='checkbox'] { width: 20px; height: 20px; accent-color: var(--ember); 
 
 @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: .35; } }
 @keyframes fade-in { from { opacity: 0; } to { opacity: 1; } }
+
+/* Shown over a portrait only once it has kept us waiting (`useSlow`): a warm cache never sees it. */
+.portrait-wait { position: absolute; inset: 0; margin: auto; width: 26px; height: 26px; border-radius: 50%; border: 2px solid rgba(238,250,246,.18); border-top-color: var(--foam); animation: portrait-spin .9s linear infinite, fade-in .2s ease both; pointer-events: none; }
+@keyframes portrait-spin { to { transform: rotate(1turn); } }
 @keyframes rise-in { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
 @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
 @keyframes pulse-mark { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.06); } }
@@ -451,7 +499,6 @@ input[type='checkbox'] { width: 20px; height: 20px; accent-color: var(--ember); 
   .kit dt { line-height: 16px; font-size: 10px; }
   .provenance { margin: 2px 0 5px; }
 }
-.creature-copy { overflow-y: auto; scrollbar-width: thin; scrollbar-color: rgba(238,250,246,.25) transparent; }
 
 @media (max-height: 640px) {
   .select { padding-top: 10px; }
@@ -461,7 +508,6 @@ input[type='checkbox'] { width: 20px; height: 20px; accent-color: var(--ember); 
   .creature-copy h2 { font-size: 20px; }
   .tagline { font-size: 12.5px; margin-bottom: 4px; }
   .kit { font-size: 11.5px; gap: 2px; }
-  .kit div:nth-child(n+3) { display: none; }
   .stats { margin-bottom: 4px; }
   .ready-button { padding: 8px; }
   .join-card { min-height: 0; padding: 14px; gap: 6px; }
@@ -572,14 +618,13 @@ input[type='checkbox'] { width: 20px; height: 20px; accent-color: var(--ember); 
 @keyframes cell-lock { 0% { box-shadow: 0 0 0 0 var(--c); } 100% { box-shadow: 0 0 0 18px transparent; } }
 
 /* ---------- Hero card ---------- */
-.hero { position: relative; min-height: 0; overflow: visible; }
+.hero { grid-area: hero; position: relative; min-height: 0; overflow: visible; }
 .hero img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; filter: drop-shadow(0 18px 30px rgba(0,0,0,.55)); animation: hero-in .35s cubic-bezier(.2,.9,.3,1.2) both, float 4s ease-in-out .35s infinite; }
 .hero::before { content: ''; position: absolute; inset: 15% 20%; border-radius: 50%; background: radial-gradient(circle, color-mix(in oklch, var(--player), transparent 70%), transparent 70%); filter: blur(12px); }
 @keyframes hero-in { from { opacity: 0; transform: translateY(12px) scale(.9); } to { opacity: 1; transform: none; } }
 .crew.compact .crew-card { grid-template-rows: auto minmax(60px, 40%) minmax(0, 1fr) auto; gap: 5px; padding: 10px 12px 12px; }
 .crew-2 .kit { display: none; }
 .crew-2 .creature-copy h2 { font-size: 22px; }
-.creature-copy { min-height: 0; overflow: hidden; }
 .crew.compact .creature-copy h2 { font-size: 18px; }
 .crew.compact .tagline { font-size: 12px; margin-bottom: 2px; }
 .crew.compact .ready-button { padding: 8px; font-size: 11px; }
@@ -602,7 +647,7 @@ input[type='checkbox'] { width: 20px; height: 20px; accent-color: var(--ember); 
 .crew-2 .crew-card, .crew.compact .crew-card { grid-template-columns: 38% minmax(0, 1fr); grid-template-rows: auto minmax(0, 1fr) auto; grid-template-areas: 'top top' 'hero copy' 'btn btn'; column-gap: 12px; }
 .crew-2 .crew-top, .crew.compact .crew-top { grid-area: top; }
 .crew-2 .hero, .crew.compact .hero { grid-area: hero; }
-.crew-2 .creature-copy, .crew.compact .creature-copy { grid-area: copy; align-self: stretch; overflow: hidden; }
+.crew-2 .creature-copy, .crew.compact .creature-copy { grid-area: copy; align-self: stretch; }
 .crew-2 .ready-button, .crew.compact .ready-button { grid-area: btn; }
 .crew-2 .stats { grid-template-columns: repeat(2, 1fr); gap: 2px 10px; }
 .crew-2 .tagline { font-size: 13px; margin-bottom: 4px; }
@@ -625,6 +670,15 @@ input[type='checkbox'] { width: 20px; height: 20px; accent-color: var(--ember); 
   .select { grid-template-rows: auto minmax(0, 1fr) auto; gap: 8px; }
   .pick-layout { overflow-y: auto; overscroll-behavior: contain; align-content: start; }
   .roster-grid { align-self: start; }
+}
+/*
+ * Narrow windows stack the picker into a column and scroll it, so the cards get a floor to stand on.
+ * A window that is merely *short* does not: there the crew is beside the roster and a floor taller
+ * than the room available pushes the card's foot below the fold, where it reads as text sliced off
+ * rather than as something to scroll to. The card takes the height there is and `.creature-copy`
+ * scrolls inside it instead.
+ */
+@media (max-width: 1000px) {
   .crew { min-height: 440px; }
   .crew-1 { min-height: 540px; }
 }

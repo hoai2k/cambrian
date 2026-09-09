@@ -1,4 +1,4 @@
-import { useEffect, useLayoutEffect, useRef, useState } from 'react';
+import { useEffect, useLayoutEffect, useRef, useState, type ReactNode } from 'react';
 import { ModelStatusBadge } from '../shared/ModelStatusBadge';
 import { ACTIVE_ERA } from '../content';
 import { assetPaths } from '../content/asset-paths';
@@ -24,7 +24,7 @@ interface Props {
   /** Per seat: whether that player has asked to carry on from their record rather than hatch. */
   carry: boolean[];
   onPick: (i: number, c: CreatureId) => void; onReady: (i: number) => void; onRemove: (i: number) => void;
-  onAddKeyboard: () => void; onMode: (m: Mode) => void; onStart: () => void; onBack: () => void;
+  onMode: (m: Mode) => void; onStart: () => void; onBack: () => void;
   onCarry: (i: number) => void;
 }
 
@@ -112,6 +112,31 @@ const MIN_NAME_FIT = 0.68;
  * re-runs when the tile changes width, and once more when the display face has finished loading,
  * because a name measured in the fallback face is measured against the wrong letters.
  */
+/**
+ * The creature copy, with a fade at its foot while there is more of it below the fold.
+ *
+ * The box scrolls when the window is too short to hold everything (see `.creature-copy`), and a
+ * scrollbar is not an affordance you can count on — overlay scrollbars are invisible until touched,
+ * so a description that runs past the bottom edge reads as text sliced off rather than text to
+ * scroll to. The fade says which it is, and goes away once you reach the end.
+ */
+function CopyBox({ children }: { children: ReactNode }) {
+  const ref = useRef<HTMLDivElement>(null);
+  const [more, setMore] = useState(false);
+  useLayoutEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const check = () => setMore(el.scrollHeight - el.clientHeight - el.scrollTop > 2);
+    check();
+    const ro = new ResizeObserver(check);
+    ro.observe(el);
+    for (const kid of el.children) ro.observe(kid);
+    el.addEventListener('scroll', check, { passive: true });
+    return () => { ro.disconnect(); el.removeEventListener('scroll', check); };
+  });
+  return <div className="creature-copy" data-more={more || undefined} ref={ref}>{children}</div>;
+}
+
 function FitName({ name }: { name: string }) {
   const ref = useRef<HTMLSpanElement>(null);
   useLayoutEffect(() => {
@@ -153,6 +178,8 @@ export function SelectScreen(p: Props) {
   // has since gone away (an Xbox pad that went to sleep looks exactly like an unplugged one).
   const joined = new Set(p.players.map((pl) => pl.device));
   const waiting = p.padIndices.filter((i) => !joined.has(i));
+  /** Nobody is on the keyboard yet, so it is still a way in. Only ever one player deep. */
+  const keyboardFree = !p.players.some((pl) => typeof pl.device === 'string');
   return (
     <section className="select" aria-label="Choose your creature">
       <header className="select-header">
@@ -209,7 +236,7 @@ export function SelectScreen(p: Props) {
                   <ModelStatusBadge status={ACTIVE_ERA.assets.modelStatus?.[def.id]} note={ACTIVE_ERA.assets.modelNotes?.[def.id]} />
                   <CreaturePortrait key={def.id} creatureId={def.id} kind="select" assetBase={ASSETS} alt={`${def.name} reconstruction`} draggable={false} />
                 </div>
-                <div className="creature-copy">
+                <CopyBox>
                   <span className="role">{def.ground ? 'SEAFLOOR' : 'SWIMMER'} · {def.role}</span>
                   <h2>{def.name}</h2>
                   <small className="provenance">{def.kind && <b className="kind">{def.kind}</b>}{def.species} · {def.provenance ?? def.locality ?? 'Burgess Shale'}</small>
@@ -233,7 +260,7 @@ export function SelectScreen(p: Props) {
                       </dl>
                     </>
                   )}
-                </div>
+                </CopyBox>
                 <button className="ready-button" aria-pressed={pl.ready} onClick={() => p.onReady(i)}>
                   {pl.ready ? <><CheckIcon width={18} height={18} /> LOCKED IN · {key('confirm', s).toUpperCase()} DIVES</> : `LOCK IN  ·  ${key('confirm', s).toUpperCase()}`}
                 </button>
@@ -241,21 +268,14 @@ export function SelectScreen(p: Props) {
             );
           })}
           {p.players.length < 4 && (
+            /*
+             * One line, and only the line that is true. There is never more than one keyboard
+             * player, so the keyboard is only an offer while nobody has taken it — which is the
+             * case where the first player came in on a pad.
+             */
             <div className={`join-card ${waiting.length ? 'waiting' : ''}`}>
-              {/* With no pad in the room the card leads with the thing that actually works here —
-                  a second player on the same keyboard — and mentions controllers second. */}
-              {p.padIndices.length > 0 ? <PadIcon width={32} height={32} /> : <KeyboardIcon width={32} height={32} />}
-              {p.padIndices.length > 0
-                ? <p><b>Press any button</b> on another controller to join.</p>
-                : <p><b>Plug in a controller</b> and press any button to join — or share this keyboard.</p>}
-              <button className="ghost" onClick={p.onAddKeyboard}>Add a keyboard player</button>
-              <small>
-                {p.padIndices.length} controller{p.padIndices.length === 1 ? '' : 's'} connected
-                {waiting.length > 0 && <> · <b>{waiting.map((i) => `Controller ${i + 1}`).join(', ')}</b> {waiting.length === 1 ? 'has' : 'have'} not joined</>}
-              </small>
-              {p.padIndices.length <= p.players.length && (
-                <small className="dim">A controller only shows up here once you press a button on it.</small>
-              )}
+              <PadIcon width={32} height={32} />
+              <p>Press <b>{btn('confirm', 'pad')}</b>{keyboardFree && <> or <b>{btn('confirm', 'kbm')}</b></>} to join</p>
             </div>
           )}
         </div>
@@ -267,7 +287,6 @@ export function SelectScreen(p: Props) {
             unless a feedback endpoint was compiled in — see src/shared/feedback.ts. */}
         <FeedbackButton />
         <div className="start-wrap">
-          {!p.allReady && <span className="dim">Move on the grid with {btn('pick', s)}, <b>{key('confirm', s)}</b> locks in, <b>{key('confirm', s)}</b> again dives.</span>}
           <button className={`start-button ${p.allReady ? 'focused' : ''}`} disabled={!p.allReady} onClick={p.onStart}>DIVE IN  ·  {key('confirm', s).toUpperCase()}</button>
         </div>
       </footer>
