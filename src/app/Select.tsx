@@ -1,4 +1,4 @@
-import { useLayoutEffect, useRef } from 'react';
+import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { ModelStatusBadge } from '../shared/ModelStatusBadge';
 import { ACTIVE_ERA } from '../content';
 import { assetPaths } from '../content/asset-paths';
@@ -8,7 +8,7 @@ import { CreaturePortrait } from './CreaturePortrait';
 import { PLAYER_COLORS } from '../render/engine';
 import { PLAYABLE as CREATURES, creature, type CreatureId } from '../sim/creatures';
 import type { Mode, PlayerSetup } from '../sim/types';
-import { CheckIcon, Emblem, KeyboardIcon, PadIcon } from './icons';
+import { CheckIcon, ChevronDown, Emblem, KeyboardIcon, PadIcon } from './icons';
 import { appBase } from '../shared/base';
 import { btn, fillControls, key, type Scheme } from '../shared/controls';
 import { fillOf, ladderName, rungOf } from '../sim/ladder';
@@ -25,6 +25,68 @@ interface Props {
   onPick: (i: number, c: CreatureId) => void; onReady: (i: number) => void; onRemove: (i: number) => void;
   onAddKeyboard: () => void; onMode: (m: Mode) => void; onStart: () => void; onBack: () => void;
   onCarry: (i: number) => void;
+}
+
+/**
+ * The mark in the corner: the emblem goes back, the title opens the other game.
+ *
+ * The *emblem* is the way home. A mark in the corner of a screen you arrived at from the title is
+ * the affordance every site has taught, so it needs no arrow and no label of its own — the
+ * accessible name carries what a sighted player reads from the position, and Escape does the same
+ * on a keyboard. That is why there is no longer a "Title" button in the footer.
+ *
+ * The *title* beside it is the era picker, with a chevron after it saying so. Open, the other
+ * game's wordmark drops in directly under this one, aligned to it and the same width: one list of
+ * engraved titles with the one you are playing at the top of it, rather than a panel that repeats
+ * itself. Switching is a page load and not a state change, deliberately — a live match's
+ * simulation, queues and caches are built for one era and there is no runtime swap (see
+ * src/content/index.ts) — so what drops down is a link, and it shows the game rather than naming it.
+ */
+function BrandHeader({ onBack }: { onBack: () => void }) {
+  const [open, setOpen] = useState(false);
+  const wrap = useRef<HTMLDivElement>(null);
+  const sibling = ACTIVE_ERA.copy.sibling;
+  useEffect(() => {
+    if (!open) return;
+    const away = (e: MouseEvent) => { if (!wrap.current?.contains(e.target as Node)) setOpen(false); };
+    // Escape closes the list and stops there: on this screen the app's own Escape goes back to the
+    // title, and shutting a menu should never also leave the screen it was opened on.
+    const key = (e: KeyboardEvent) => { if (e.key === 'Escape') { e.stopPropagation(); setOpen(false); } };
+    document.addEventListener('pointerdown', away);
+    document.addEventListener('keydown', key, true);
+    return () => { document.removeEventListener('pointerdown', away); document.removeEventListener('keydown', key, true); };
+  }, [open]);
+  const toggle = () => setOpen((o) => !o);
+  return (
+    <div className="brand">
+      <button className="brand-home" onClick={onBack} aria-label={`Back to the ${ACTIVE_ERA.title} title screen`}>
+        <Emblem size={34} />
+      </button>
+      <div className={`brand-titles ${open ? 'open' : ''}`} ref={wrap}>
+        {/* The list hangs off the title's own box, not off the row, so what drops down starts at
+            the same left edge and comes out the same width as the wordmark above it. */}
+        <div className="brand-title-anchor">
+          <button className="brand-title" onClick={sibling ? toggle : undefined} disabled={!sibling}
+            aria-expanded={sibling ? open : undefined} aria-haspopup={sibling ? 'true' : undefined}>
+            <img className="header-logo" src={`${ASSETS}${ACTIVE_ERA.assets.logo}`} alt={ACTIVE_ERA.title} />
+          </button>
+          {open && sibling && (
+            <nav className="era-menu" aria-label="Choose a game">
+              <a className="era-item" href={`${ASSETS}${sibling.path}`}>
+                <img src={`${ASSETS}${sibling.logo}`} alt={sibling.title} />
+              </a>
+            </nav>
+          )}
+        </div>
+        {sibling && (
+          <button className="brand-switch" onClick={toggle} aria-expanded={open} aria-haspopup="true"
+            aria-label="Choose which game to play">
+            <ChevronDown width={18} height={18} />
+          </button>
+        )}
+      </div>
+    </div>
+  );
 }
 
 /**
@@ -93,7 +155,7 @@ export function SelectScreen(p: Props) {
   return (
     <section className="select" aria-label="Choose your creature">
       <header className="select-header">
-        <div className="brand"><Emblem size={34} /><img className="header-logo" src={`${ASSETS}${ACTIVE_ERA.assets.logo}`} alt={ACTIVE_ERA.title} /></div>
+        <BrandHeader onBack={p.onBack} />
         <div className="mode-picker" role="tablist" aria-label="Game mode">
           {p.modes.map((m) => (
             <button key={m} role="tab" aria-selected={p.mode === m} className={`mode-chip ${p.mode === m ? 'active' : ''}`} onClick={() => p.onMode(m)}>
@@ -199,7 +261,6 @@ export function SelectScreen(p: Props) {
       </div>
 
       <footer className="select-footer">
-        <button className="ghost" onClick={p.onBack}>← Title</button>
         <div className="start-wrap">
           {!p.allReady && <span className="dim">Move on the grid with {btn('pick', s)}, <b>{key('confirm', s)}</b> locks in, <b>{key('confirm', s)}</b> again dives.</span>}
           <button className={`start-button ${p.allReady ? 'focused' : ''}`} disabled={!p.allReady} onClick={p.onStart}>DIVE IN  ·  {key('confirm', s).toUpperCase()}</button>

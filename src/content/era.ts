@@ -27,7 +27,12 @@ export interface EraCopy {
    * step apart. `path` is joined to the app base, so it is where that era's page sits relative to
    * this one's asset root: '' is the build root, 'devonian/' the page one level down.
    */
-  readonly sibling?: { readonly title: string; readonly path: string; readonly blurb: string };
+  /**
+   * The other era's page. `logo` is its wordmark, so a switcher can *show* the other game rather
+   * than spell it: a plain path, because reaching into the other era's content module would pull
+   * its whole roster into this page's bundle and read ACTIVE_ERA at import time.
+   */
+  readonly sibling?: { readonly title: string; readonly path: string; readonly blurb: string; readonly logo: string };
 }
 
 /** Render-only replacements for existing scenery placements; never changes world generation. */
