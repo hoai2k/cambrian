@@ -64,20 +64,20 @@ h3 { font-size: 13px; letter-spacing: .12em; color: var(--ember); margin: 14px 0
  */
 .brand { grid-area: brand; display: flex; align-items: center; gap: 10px; }
 .brand-home { display: block; padding: 4px; margin: -4px; border: 0; border-radius: 12px; background: none; color: inherit; cursor: pointer; transition: background .15s, transform .15s; }
-.brand-title { display: block; padding: 4px; border: 0; border-radius: 12px; background: none; color: inherit; font: inherit; cursor: pointer; transition: background .15s; }
+.brand-title { display: flex; align-items: center; gap: 2px; padding: 4px; border: 0; border-radius: 12px; background: none; color: inherit; font: inherit; cursor: pointer; transition: background .15s; }
+.brand-title svg { color: var(--ember); opacity: .7; transition: opacity .15s, transform .18s; }
+.brand-title:enabled:hover svg, .brand-title:focus-visible svg, .brand-titles.open svg { opacity: 1; }
+.brand-titles.open svg { transform: rotate(180deg); }
 .brand-home:hover, .brand-home:focus-visible, .brand-title:enabled:hover, .brand-title:focus-visible { background: rgba(238,250,246,.08); }
 .brand-home:hover, .brand-home:focus-visible { transform: translateY(-1px); }
 .brand-title:disabled { cursor: default; }
-.brand-titles { display: flex; align-items: center; gap: 2px; }
-.brand-title-anchor { position: relative; }
-.brand-switch { display: grid; place-items: center; padding: 6px; border: 0; border-radius: 10px; background: none; color: var(--ember); opacity: .7; transition: background .15s, opacity .15s, transform .18s; }
-.brand-switch:hover, .brand-switch:focus-visible, .brand-titles.open .brand-switch { background: rgba(238,250,246,.08); opacity: 1; }
-.brand-titles.open .brand-switch { transform: rotate(180deg); }
-/* Stretched to the title's box and padded to match its inset, so the wordmark that drops in starts
-   on the same left edge and comes out the same width as the one above it. */
-.era-menu { position: absolute; top: calc(100% + 4px); left: 0; right: 0; z-index: 12; padding: 4px; border-radius: 12px; border: 1px solid rgba(238,250,246,.18); background: rgba(6,22,28,.92); backdrop-filter: blur(8px); box-shadow: 0 18px 40px rgba(0,0,0,.5); animation: era-menu-in .16s ease-out both; }
+.brand-titles { position: relative; display: flex; align-items: center; }
+/* Hung off the title's own box and padded so that its border plus padding equal the button's inset:
+   the wordmark that drops in starts on exactly the left edge of the one above it, and is the same
+   width because both are `.header-logo`. */
+.era-menu { position: absolute; top: calc(100% + 4px); left: 0; z-index: 12; width: max-content; padding: 3px; border-radius: 12px; border: 1px solid rgba(238,250,246,.18); background: rgba(6,22,28,.92); backdrop-filter: blur(8px); box-shadow: 0 18px 40px rgba(0,0,0,.5); animation: era-menu-in .16s ease-out both; }
 .era-item { display: block; border-radius: 9px; text-decoration: none; transition: background .15s, filter .15s; filter: saturate(.75) brightness(.85); }
-.era-item img { display: block; width: 100%; height: auto; }
+.era-item img { display: block; }
 .era-item:hover, .era-item:focus-visible { filter: none; }
 @keyframes era-menu-in { from { opacity: 0; transform: translateY(-6px); } to { opacity: 1; transform: none; } }
 .brand-name { font: 500 13px var(--font-display); letter-spacing: .18em; }

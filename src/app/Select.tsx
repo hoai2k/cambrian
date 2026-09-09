@@ -35,12 +35,14 @@ interface Props {
  * accessible name carries what a sighted player reads from the position, and Escape does the same
  * on a keyboard. That is why there is no longer a "Title" button in the footer.
  *
- * The *title* beside it is the era picker, with a chevron after it saying so. Open, the other
- * game's wordmark drops in directly under this one, aligned to it and the same width: one list of
- * engraved titles with the one you are playing at the top of it, rather than a panel that repeats
- * itself. Switching is a page load and not a state change, deliberately — a live match's
+ * The *title* beside it is the era picker — one button, wordmark and chevron together. Open, the
+ * other game's wordmark drops in directly under this one, aligned to it and the same width: one
+ * list of engraved titles with the one you are playing at the top of it, rather than a panel that
+ * repeats itself. Switching is a page load and not a state change, deliberately — a live match's
  * simulation, queues and caches are built for one era and there is no runtime swap (see
- * src/content/index.ts) — so what drops down is a link, and it shows the game rather than naming it.
+ * src/content/index.ts) — so what drops down is a link, and it shows the game rather than naming
+ * it. It lands on the other roster rather than the other title screen: this is a picker, and
+ * arriving at PRESS START would undo the choice the player just made.
  */
 function BrandHeader({ onBack }: { onBack: () => void }) {
   const [open, setOpen] = useState(false);
@@ -62,27 +64,25 @@ function BrandHeader({ onBack }: { onBack: () => void }) {
       <button className="brand-home" onClick={onBack} aria-label={`Back to the ${ACTIVE_ERA.title} title screen`}>
         <Emblem size={34} />
       </button>
+      {/* Title and chevron are one control, so they light up together: the chevron is a mark on the
+          button saying it opens, not a button of its own beside it. The list hangs off that button,
+          so what drops down starts on the same left edge and comes out the same width — both
+          wordmarks are `.header-logo`, sized by one rule. */}
       <div className={`brand-titles ${open ? 'open' : ''}`} ref={wrap}>
-        {/* The list hangs off the title's own box, not off the row, so what drops down starts at
-            the same left edge and comes out the same width as the wordmark above it. */}
-        <div className="brand-title-anchor">
-          <button className="brand-title" onClick={sibling ? toggle : undefined} disabled={!sibling}
-            aria-expanded={sibling ? open : undefined} aria-haspopup={sibling ? 'true' : undefined}>
-            <img className="header-logo" src={`${ASSETS}${ACTIVE_ERA.assets.logo}`} alt={ACTIVE_ERA.title} />
-          </button>
-          {open && sibling && (
-            <nav className="era-menu" aria-label="Choose a game">
-              <a className="era-item" href={`${ASSETS}${sibling.path}`}>
-                <img src={`${ASSETS}${sibling.logo}`} alt={sibling.title} />
-              </a>
-            </nav>
-          )}
-        </div>
-        {sibling && (
-          <button className="brand-switch" onClick={toggle} aria-expanded={open} aria-haspopup="true"
-            aria-label="Choose which game to play">
-            <ChevronDown width={18} height={18} />
-          </button>
+        <button className="brand-title" onClick={sibling ? toggle : undefined} disabled={!sibling}
+          aria-expanded={sibling ? open : undefined} aria-haspopup={sibling ? 'true' : undefined}
+          aria-label={sibling ? `${ACTIVE_ERA.title} — choose which game to play` : ACTIVE_ERA.title}>
+          <img className="header-logo" src={`${ASSETS}${ACTIVE_ERA.assets.logo}`} alt="" />
+          {sibling && <ChevronDown width={18} height={18} aria-hidden="true" />}
+        </button>
+        {open && sibling && (
+          <nav className="era-menu" aria-label="Choose a game">
+            {/* Straight to the other game's roster, not its title screen: this is a picker, and
+                landing back on PRESS START would undo the choice the player just made. */}
+            <a className="era-item" href={`${ASSETS}${sibling.path}?screen=select`}>
+              <img className="header-logo" src={`${ASSETS}${sibling.logo}`} alt={sibling.title} />
+            </a>
+          </nav>
         )}
       </div>
     </div>
