@@ -20,7 +20,10 @@ unless the user explicitly asks for a PR. Steps:
 - `src/sim` is pure TypeScript with no Three.js imports: a deterministic
   fixed-step simulation. `src/render` draws it. `src/app` is the React shell.
 - Creature GLBs and card renders live in `public/assets/creatures/` and must
-  not be modified in place; new animation clips are added, never replaced.
+  not be modified in place; new animation clips are added, never replaced. The one sanctioned way
+  to re-author a clip is `tools/creatures/motion/apply.mjs`, which keeps the shipped clip in the
+  file as `replaced/<Name>` (shown under *Replaced* in the viewer) and is re-runnable on top of
+  whatever else lands in the GLB; the performance is code in `performances/<id>.mjs`.
 - Any change to a creature's model, colours or textures must go through
   `docs/creature-intake.md`: re-render, `npm run cards`, `npm run lods`, and
   `npm run check` must pass. The check flags stale images automatically.

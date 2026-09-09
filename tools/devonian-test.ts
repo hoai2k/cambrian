@@ -65,6 +65,23 @@ const opener = DEVONIAN.audio.music.find((t) => t.opening);
 ok(opener && fs.existsSync(`public/${paths.music(opener.name)}`.replace('%20', ' ')), `the opening track is delivered (${opener?.name})`);
 ok(RULES !== undefined && !RULES.growthByNutrition, 'Devonian rules active: growth is by standing, not nutrition');
 
+// ---- the animals that take hold, and the clips their grip is owed ----
+{
+  const graspers = DEVONIAN.creatures.filter((c) => c.grasp).map((c) => c.id as string);
+  ok(['jaekelopterus', 'walliserops', 'furcaster'].every((id) => graspers.includes(id)) && graspers.length === 3,
+    `the Devonian graspers are the three the design names (${graspers.join(', ')})`);
+  const queue = JSON.parse(fs.readFileSync('tools/attack-feeding-refinements.json', 'utf8')) as { id: string; reviewClips: string[]; grip?: string }[];
+  for (const id of graspers) {
+    const glb = `public/assets/devonian/creatures/${id}.glb`;
+    if (!fs.existsSync(glb)) continue;                        // borrows a body: no clips of its own to owe
+    const buf = fs.readFileSync(glb);
+    const clips = (JSON.parse(buf.subarray(20, 20 + buf.readUInt32LE(12)).toString('utf8')).animations ?? []).map((a: { name: string }) => a.name) as string[];
+    const q = queue.find((e) => e.id === id);
+    ok(clips.includes('Grab') || (!!q && q.reviewClips.includes('Grab') && !!q.grip),
+      `${id} either grabs on screen or is queued for the clip with its brief`);
+  }
+}
+
 // ---- scenery: the coast is dressed with Devonian stand-ins, not Cambrian sponges ----
 {
   const CAMBRIAN: FloraKind[] = ['vauxia', 'sac', 'choia', 'thalli', 'tuft', 'cushion', 'lettuce', 'spine', 'glass'];

@@ -131,11 +131,16 @@ export function applyHit(ctx: HitContext, attacker: Actor, victim: Actor, move: 
   if (vdef.ability === 'bristleFlare' && !move.sweep) { attacker.hp -= dmg * 0.25 * sizeFactor(victim, attacker); attacker.hitFlash = 0.3; }
   ctx.events.push({ kind: 'hit', pos: { ...victim.pos }, actor: attacker.id, other: victim.id, strength: clamp(dmg / Math.max(20, victim.hpMax * 0.25), 0.2, 2), player: victim.player });
 
-  // Grab
-  if (move.grab && result === 'hit' && bandOf(attacker, victim) !== 'giant' && bandOf(attacker, victim) !== 'threat' && !anchored) {
-    attacker.state = 'grabbing'; attacker.stateT = 0; attacker.stateDur = 1.6; attacker.grabbing = victim.id;
-    victim.state = 'grabbed'; victim.stateT = 0; victim.grabbedBy = attacker.id; victim.grabT = 1.6;
-    ctx.events.push({ kind: 'grab', pos: { ...victim.pos }, actor: attacker.id, other: victim.id, player: victim.player });
+  // Grab. A move can grab by itself (Anomalocaris' Grasp), and a grasping animal grabs with
+  // whatever it lands while it holds the button down — that is what `graspHold` is.
+  if (result === 'hit' && !anchored && (move.grab || (attacker.graspHold && adef.grasp))) {
+    const band = bandOf(attacker, victim);
+    if (band === 'threat' || band === 'giant') takeRide(ctx, attacker, victim);
+    else if (victim.state !== 'grabbed' && attacker.grabbing < 0) {
+      attacker.state = 'grabbing'; attacker.stateT = 0; attacker.stateDur = 1.6; attacker.grabbing = victim.id;
+      victim.state = 'grabbed'; victim.stateT = 0; victim.grabbedBy = attacker.id; victim.grabT = 1.6;
+      ctx.events.push({ kind: 'grab', pos: { ...victim.pos }, actor: attacker.id, other: victim.id, player: victim.player });
+    }
   }
 
   if (victim.hp <= 0) {
@@ -145,6 +150,54 @@ export function applyHit(ctx: HitContext, attacker: Actor, victim: Actor, move: 
   }
   if (attacker.hp <= 0) kill(ctx, attacker, victim);
   return result;
+}
+
+/**
+ * How far round the head is out of bounds for a grip: past this, dead ahead of the host, is the end
+ * that bites, and nothing gets a hold there.
+ */
+const MOUTH_CONE = 0.55;
+/** How long a rider may hang on, and what the grip costs it per second. */
+export const RIDE_MAX = 9, RIDE_STAMINA = 4;
+
+/**
+ * Take hold of something bigger than you and ride it.
+ *
+ * Anything over the `rival` band cannot be held in the mouth — it is not a mouthful — but it can be
+ * held *on to*, anywhere except the business end of its head: come at the face and there is nothing
+ * to grab but jaws. The grip records where it took hold in the host's own frame, so it follows the
+ * host around as it turns, and the rider keeps its own state machine, which is how it can bite the
+ * thing it is clinging to. Riding does no damage by itself; that is the whole point of it.
+ */
+export function takeRide(ctx: HitContext, rider: Actor, host: Actor): boolean {
+  // Only the animals somebody is steering hold on. The reef's own predators have no use for it —
+  // a wild Anomalocaris clinging to a giant for nine seconds is a bug, not behaviour.
+  if (rider.controller !== 'player' && rider.controller !== 'bot') return false;
+  if (rider.rideHost >= 0 || host.riddenBy >= 0 || rider.riddenBy >= 0 || host.rideHost >= 0) return false;
+  if (host.state === 'dead' || host.state === 'grabbed' || rider.state === 'grabbed') return false;
+  const h = heading(host.yaw);
+  const to = norm(sub(rider.pos, host.pos));
+  if (dot(to, h) > MOUTH_CONE) return false;                        // the head end: jaws, not handholds
+  const hl = lengthOf(host);
+  const right: Vec3 = { x: -h.z, y: 0, z: h.x };
+  const d = sub(rider.pos, host.pos);
+  rider.rideHost = host.id; rider.rideT = 0;
+  rider.rideOff = {
+    x: clamp(dot(d, right) / hl, -0.5, 0.5),
+    y: clamp((rider.pos.y - host.pos.y) / hl, -0.35, 0.35),
+    z: clamp(dot(d, h) / hl, -0.55, MOUTH_CONE * 0.5),
+  };
+  host.riddenBy = rider.id;
+  if (rider.state === 'attack' || rider.state === 'pounce') { rider.state = 'free'; rider.stateT = 0; }
+  ctx.events.push({ kind: 'grab', pos: { ...rider.pos }, actor: rider.id, other: host.id, player: rider.player });
+  return true;
+}
+
+/** Let go, from either side. `shaken` staggers the rider: it did not choose to come off. */
+export function endRide(rider: Actor, host: Actor | undefined, shaken = false) {
+  if (host && host.riddenBy === rider.id) host.riddenBy = -1;
+  rider.rideHost = -1; rider.rideT = 0;
+  if (shaken && rider.state !== 'dead') { rider.state = 'stagger'; rider.stateT = 0; rider.stateDur = 0.5; rider.iframes = Math.max(rider.iframes, 0.2); }
 }
 
 /** The victim is taken into the predator's mouth and gulped down over ~1.5 s, then it is gone. */
@@ -169,6 +222,9 @@ export function kill(ctx: HitContext, victim: Actor, killer?: Actor) {
   stopHiding(victim); victim.lockTarget = -1; victim.abilityActive = false;
   if (victim.grabbing >= 0) { const g = ctx.byId(victim.grabbing); if (g && g.state === 'grabbed') { g.state = 'free'; g.grabbedBy = -1; } victim.grabbing = -1; }
   if (victim.grabbedBy >= 0) { const g = ctx.byId(victim.grabbedBy); if (g && g.state === 'grabbing') { g.state = 'free'; g.grabbing = -1; } victim.grabbedBy = -1; }
+  // A ride ends with whichever of the two died: the rider is thrown clear, the host loses its passenger.
+  if (victim.rideHost >= 0) endRide(victim, ctx.byId(victim.rideHost));
+  if (victim.riddenBy >= 0) { const r = ctx.byId(victim.riddenBy); if (r) endRide(r, victim, true); else victim.riddenBy = -1; }
   if (killer) {
     killer.kills++;
     if (killer.lockTarget === victim.id) killer.lockTarget = -1;
