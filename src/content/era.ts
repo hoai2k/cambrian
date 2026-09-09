@@ -126,7 +126,15 @@ export interface EraDefinition {
      */
     readonly standIns?: Readonly<Partial<Record<CreatureId, CreatureId>>>;
   };
-  readonly audio: { readonly music: readonly MusicTrack[] };
+  readonly audio: {
+    readonly music: readonly MusicTrack[];
+    /**
+     * The two always-on loops, by sample name: the ambient bed and the drone a giant brings with
+     * it. Era-specific ones are addressed like any other era sample (`<era>/<name>`). These used
+     * to be one shared constant, which is why the Devonian played the Cambrian reef.
+     */
+    readonly loops: { readonly ambient: string; readonly drone: string };
+  };
   readonly presentation: {
     readonly schemes: readonly Scheme[];
     readonly creatureSchemes: Readonly<Record<string, string>>;
@@ -148,6 +156,7 @@ export function defineEra(def: EraDefinition): EraDefinition {
   for (const id of ids) if (!def.presentation.authoredColors.creatures[id]) throw new Error(`${def.id}: missing authored colours for ${id}`);
   if (!def.presentation.schemes.length) throw new Error(`${def.id}: a default colour scheme is required`);
   if (!def.audio.music.length) throw new Error(`${def.id}: a soundtrack is required`);
+  if (!def.audio.loops.ambient || !def.audio.loops.drone) throw new Error(`${def.id}: both loops are required`);
   if (!def.modes.length) throw new Error(`${def.id}: at least one mode is required`);
   return def;
 }

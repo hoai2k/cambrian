@@ -86,6 +86,8 @@ export const DEVONIAN = defineEra({
     props: 'assets/devonian/scenery/', instancedScenery: DEVONIAN_SCENERY, biomes: 'assets/devonian/biomes/', ui: 'assets/ui/', sfx: 'assets/sfx/', music: 'music/',
     ...DEVONIAN_BRAND, modelStatus, modelNotes, clipNotes, modelBytes, standIns: DEVONIAN_STAND_INS,
   },
-  audio: { music: MUSIC },
+  // Its own ambience — cold open water, not the Cambrian reef. The giant's drone is shared:
+  // this era has no bed of its own for it.
+  audio: { music: MUSIC, loops: { ambient: 'devonian/ambient-open-sea', drone: 'giant-drone' } },
   presentation: { schemes: SCHEMES, creatureSchemes: CREATURE_SCHEMES, portraits: {}, authoredColors: { creatures: authoredCreatures, props: {} } },
 });

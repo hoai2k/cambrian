@@ -28,9 +28,19 @@ export interface MusicTrack {
  */
 export const music = () => ACTIVE_ERA.audio.music;
 
-/** Tracks whose file failed to load this session. They leave the rotation and stop cueing biomes. */
+/** Tracks whose file failed to load this session. They leave the rotation and stop cueing areas. */
 export const MISSING = new Set<string>();
 const available = () => music().filter((t) => !MISSING.has(t.name));
+/**
+ * The rotation is the tracks that belong nowhere in particular. A track that names biomes is
+ * *reserved* for them: shuffling an area theme in at random would undo the point of having one,
+ * and would strand the player hearing the abyss out in the sunlit shallows.
+ */
+const roaming = () => available().filter((t) => !t.biomes?.length);
+
+/** The track written for `biome`, if one is loaded. */
+export const themeFor = (biome: Biome | undefined): MusicTrack | undefined =>
+  biome ? available().find((t) => t.biomes?.includes(biome)) : undefined;
 
 /** The track that opens a session. */
 export const openingTrack = (): MusicTrack => music().find((t) => t.opening) ?? music()[0];
@@ -39,26 +49,37 @@ export const openingTrack = (): MusicTrack => music().find((t) => t.opening) ?? 
 export const CROSSFADE = 5;
 /** Seconds the music fades up on the very first track of a session. */
 export const FIRST_FADE = 4;
-/**
- * Shortest time between two biome-driven track changes. Biome edges are jagged and a player can
- * cross one several times a minute; without this the score would flip back and forth.
- */
-export const BIOME_HOLD = 90;
 
 /**
- * The track to play after `current`. A track written for `biome` wins if there is one; otherwise
- * it is a random pick from the whole soundtrack. The track just played is excluded whenever
- * there is anything else to choose, so nothing repeats back to back.
+ * How the score follows the player around.
+ *
+ * This is horizontal re-sequencing with hysteresis — the ordinary way to score areas when the music
+ * is finished tracks rather than stems, and what an exploration game normally does. Three numbers
+ * do the work:
+ *
+ * - `AREA_FADE`: a long crossfade, so the change reads as the water changing rather than as a track
+ *   ending. Slow enough that neither track is ever the obvious event.
+ * - `AREA_ENTER`: how long you have to be somewhere before it counts. Biome edges here are jagged
+ *   and a player can cross one several times a minute, so without this, clipping the corner of the
+ *   basin would start a fade nobody asked for.
+ * - `AREA_LEAVE`: and how long you have to be *away* before the score gives the area up. Longer
+ *   than the entry on purpose — dipping out and back is common, and that asymmetry is what stops
+ *   the music oscillating along a boundary you happen to be working.
+ *
+ * The fade reverses: leave and come back while it is still running and the same two voices ramp
+ * back the other way instead of restarting. Every track also remembers where it had got to, so
+ * coming back to one resumes it rather than replaying its opening — which is what makes a short
+ * excursion sound like a passage rather than a mistake.
  */
-export function pickNext(current?: MusicTrack, biome?: Biome, rng: () => number = Math.random): MusicTrack {
-  const all = available();
-  const tagged = biome ? all.filter((t) => t.biomes?.includes(biome)) : [];
-  const pool = tagged.length ? tagged : all.length ? all : music();
+export const AREA_FADE = 7, AREA_ENTER = 3, AREA_LEAVE = 5;
+
+/**
+ * The track to play after `current`: a random pick from the rotation, with the one that has just
+ * played excluded whenever there is anything else to choose, so nothing repeats back to back. Area
+ * themes are not in this pool — the area system plays those, and takes them back when you leave.
+ */
+export function pickNext(current?: MusicTrack, rng: () => number = Math.random): MusicTrack {
+  const pool = roaming();
   const choices = pool.length > 1 ? pool.filter((t) => t !== current) : pool;
-  return choices[Math.floor(rng() * choices.length)] ?? music()[0];
-}
-
-/** Whether entering `biome` should cue a track change — false while no track names a biome. */
-export function biomeHasTrack(biome: Biome): boolean {
-  return available().some((t) => t.biomes?.includes(biome));
+  return choices[Math.floor(rng() * choices.length)] ?? pool[0] ?? music()[0];
 }

