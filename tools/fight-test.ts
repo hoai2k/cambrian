@@ -57,6 +57,44 @@ const fresh = (seed = 5) => { const g = new Game('reef', [{ creature: 'anomaloca
   }
   check('a giant breaks off after 4-10 bites', giant.brain!.goal === 'flee' && routedAt >= 4 && routedAt <= 10, `routed after ${routedAt} bites, goal=${giant.brain!.goal}, giant hp ${Math.round(giant.hp)}/${giant.hpMax}`);
 }
+// --- animals answer for themselves ---
+{
+  /**
+   * Bite something and it fights you or it runs; what it must never do is neither. Two ways that
+   * used to happen: an animal struck by something much smaller picked `fight`, failed the fight
+   * case's "is this a peer" test on the next tick and wandered off; and the courage rule, which
+   * costs a fixed fraction of health however small the thing biting you is, routed a big animal
+   * in three bites from a minnow — and a routed animal never answers at all.
+   */
+  const bite = (npcScale: number, playerScale: number, seconds: number) => {
+    const { g, p } = fresh(17);
+    p.scale = playerScale; p.stamina = p.staminaMax;
+    const npc = g.spawn('anomalocaris', 'ambient', { x: p.pos.x, y: p.pos.y, z: p.pos.z + lengthOf(p) * 0.45 }, npcScale);
+    npc.brain = makeBrain('needs', { ...npc.pos }, g.rng);
+    let bitBack = 0, swung = 0, fought = 0, frames = 0;
+    let wasAttacking = false;
+    for (let i = 0; i < 60 * seconds && isAlive(npc); i++) {
+      p.pos = { x: npc.pos.x, y: npc.pos.y, z: npc.pos.z - lengthOf(p) * 0.45 };
+      p.vel = { x: 0, y: 0, z: 0 }; p.yaw = 0; p.hp = p.hpMax; p.stamina = p.staminaMax;
+      npc.hp = Math.max(npc.hp, npc.hpMax * 0.6);      // keep it on its feet: what it *decides* is the test
+      g.step(1 / 60, new Map([[0, { ...emptyInput(), light: i % 40 < 2 }]]));
+      for (const e of g.events) if (e.kind === 'hit' && e.actor === npc.id && e.other === p.id) bitBack++;
+      g.events.length = 0;
+      // Whether the bite connects depends on where the rig pins the player; whether the animal
+      // swings at all is the behaviour under test.
+      const attacking = npc.state === 'attack' || npc.state === 'pounce';
+      if (attacking && !wasAttacking) swung++;
+      wasAttacking = attacking;
+      frames++; if (npc.brain!.goal === 'fight') fought++;
+    }
+    return { bitBack, swung, fight: fought / Math.max(1, frames), band: bandOf(npc, p) };
+  };
+  const tiny = bite(3.5, 0.5, 12);
+  check('something far smaller biting you is answered, not ignored', tiny.band === 'snack' && tiny.fight > 0.4 && tiny.swung > 0, `player reads as ${tiny.band}; fighting ${(tiny.fight * 100).toFixed(0)}% of the time, swung ${tiny.swung}×`);
+  const peer = bite(1, 1, 12);
+  check('...and so is a peer', peer.fight > 0.4 && peer.swung > 0 && peer.bitBack > 0, `fighting ${(peer.fight * 100).toFixed(0)}% of the time, swung ${peer.swung}×, bit back ${peer.bitBack}×`);
+}
+
 // --- regen ---
 {
   const { g, p } = fresh(2);

@@ -155,6 +155,20 @@ export interface Actor {
   carriedTop: boolean;
   dashHoldT: number; dashUsed: boolean; pounceCd: number; aimInRange: boolean; aiming: boolean;
   dashCd: number; sinceHit: number; lastHitBy: number; swallowedBy: number; holdT: number;
+  /**
+   * A grasping creature is holding its attack button down, so what lands takes hold instead of
+   * striking through. Set from the input every step; false for anything that cannot grasp.
+   */
+  graspHold: boolean;
+  /**
+   * Riding: the animal this one is clinging to (-1 when not riding), how long it has held on, and
+   * where it took hold in the host's own frame — sideways, up and forward, in host body lengths —
+   * so the grip follows the host as it turns. `riddenBy` is the same hold from the host's side.
+   *
+   * A ride is a field rather than a state on purpose: the rider keeps its own state machine, which
+   * is what lets it bite the thing it is holding on to.
+   */
+  rideHost: number; rideT: number; rideOff: Vec3; riddenBy: number;
   deathY: number; sparkled: boolean; tumble: Vec3;
   kills: number; eats: number; escapes: number;
   hunted: number;          // 0..1 highest detection score against this actor (HUD)

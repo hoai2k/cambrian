@@ -59,6 +59,15 @@ Implemented September 2026. This supersedes the original design's Y signature ab
   tenths of a body length has no tolerance at all otherwise, and missing by a few degrees at that
   range reads as the game ignoring the press. The cap is what keeps it a nudge rather than an
   auto-aim, and it never picks another player: who you attack stays your decision.
+- **A shell faces where it is going.** The nautiloids' funnel makes them fast and makes rising
+  and sinking free, but it does not turn them round: swimming, sprinting and an aimed dash all go
+  where the stick points with the nose leading, because travelling shell-first under power read as
+  the animal spinning rather than as a jet. The funnel shows up in two places instead — the free
+  hover, and a dash with **no stick direction**, which fires out behind the body. Through that one
+  the body holds the heading it already had, so the shell leaves backwards with its head still
+  pointed at whatever it is backing away from. Turning to follow that velocity would spin the
+  animal, and the camera with it, through 180° at the one moment it wants to keep its eyes on the
+  thing it is escaping.
 - **B: block/parry**, or evade for creatures without a guard. Defensive specials run through this action. Hallucigenia and Canadia have a 0.28-second parry window; sustained defense is not invulnerability.
 - **D-pad right / keyboard R (player 2: P): hide**, available at every growth tier. Press again to end hiding. Attacking, blocking, sprinting, dodging, taking damage, or being grabbed ends hiding.
 
@@ -106,6 +115,54 @@ Camouflage reduces visual acquisition, particularly while still, and disrupts AI
 
 Dedicated offensive specials cost 18 stamina. Defensive pulses have their own cost/cooldown; ordinary sustained block continues draining stamina. These are gameplay mechanics, not claims about fossil behavior.
 
+## Taking hold
+
+Fifteen animals have `grasp: true` in the content — Anomalocaris, Opabinia, Hallucigenia,
+Nectocaris, Ottoia, Cambroraster, Leanchoilia, Isoxys and Tamisiocaris in the Cambrian;
+Jaekelopterus, Walliserops, Furcaster, Manticoceras, Michelinoceras and Palaeoisopus in the
+Devonian — and for them the attack buttons have a second reading: **held, they
+take hold instead of striking through.** `Actor.graspHold` is the button being down, and it turns
+whatever the animal lands into a grab. A move can still grab on its own (Anomalocaris' Grasp,
+Nectocaris' Paired seize, Jaekelopterus' Chelicerae grab) whoever is pressing it, bots included;
+the hold is the player's version of the same thing.
+
+What the grip does depends on the size of what it caught.
+
+- **A mouthful** (`snack`, `prey`) is *held*, not crushed: the grip's clock stops while the button
+  is down, so you can carry it, and letting go is the meal — the body goes straight into a swallow.
+  What is in the grip can still struggle out the way it always could, by mashing.
+- **A peer** (`rival`) is the old grab unchanged: crush ticks while you squeeze, then a throw.
+- **Anything bigger** (`threat`, `giant`) cannot be held in the mouth — it is not a mouthful — but
+  it can be held *on to*. That is a **ride**.
+
+### Riding
+
+`takeRide` attaches the rider to the host anywhere but the business end of its head: come at the
+face inside `MOUTH_CONE` and there is nothing to grab but jaws, and the grab simply does not take.
+The grip records where it took hold in the host's own frame, so it follows the animal round as it
+turns, and `Game.updateRide` pins the rider there after collision — the host tows its passenger
+through whatever it swims through.
+
+A ride is a *field* (`rideHost` / `riddenBy`), not a state, and that is the point: the rider keeps
+its own state machine, so it can bite the thing it is clinging to. **Riding does no damage by
+itself.** Letting go of a giant does nothing to it either — to hurt it you bite it, deliberately,
+while you are on it. That is the whole shape of the fight: get on, hold on, and pay for every hit
+with a press.
+
+It ends when the player lets go, when the grip runs out (`RIDE_MAX`, nine seconds) or the arms
+tire (`RIDE_STAMINA`, four a second), when either animal dies, or when **the host throws itself
+sideways** — a dash or a dodge shakes a rider off and staggers it. That is the host's answer, and
+it is the same button it already had.
+
+One rider per host, and a rider is not itself something to ride: no chains, no stacks.
+
+`npm run grab` covers the roster, the held grab, the swallow on release, the mouth cone, the tow,
+biting while clinging, the shake-off and the grip limits. Seven of the fifteen already carry a
+`Grab` clip and are reviewed against these rules; the clips the mechanic is still owed — a `Grab`
+for the seven animals that have none, and a `Dash` distinct from `Dodge` for every model — are
+queued in `docs/attack-feeding-refinement.md`; the runtime already plays both the
+moment they land, and the same test checks the queue still says so.
+
 ## Maintenance and verification
 
 - `src/sim/concealment.ts`: hiding classification, nearest match, AI pursuit disruption.
@@ -113,6 +170,7 @@ Dedicated offensive specials cost 18 stamina. Defensive pulses have their own co
 - `src/shared/environment-colors.ts`: shared dominant environment colors.
 - `src/render/recolor.ts`, `creature.ts`: per-instance morphing and burial animation.
 - After model/material updates, run `node tools/update-camouflage-colors.mjs` to regenerate `src/shared/authored-colors.json`. This only samples colors; it does not modify models.
+- `npm run grab` covers taking hold: the grasper roster, held grabs, prey swallowed on release, the mouth cone, riding, biting while ridden, shake-off and grip limits.
 - `npm run hiding` covers lifecycle, stamina, idle sinking, steering, emergence, native combat dispatch, source matching, and detection. Existing expansion, world, fight, controls, palette, and binding tests also apply.
 - `QA_BASE_URL=http://127.0.0.1:4181 node tools/hiding-browser.mjs` checks real keyboard input, rendered camouflage, HUD and heavy dispatch in Chrome. Screenshots go to `../hiding-work/` (create that local directory first).
 

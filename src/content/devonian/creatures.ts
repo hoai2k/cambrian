@@ -147,6 +147,7 @@ export const DEVONIAN_CREATURES: readonly CreatureDef[] = [
   },
   {
     id: 'jaekelopterus', name: 'Jaekelopterus', species: 'J. rhenaniae',
+    grasp: true,
     kind: 'Sea scorpion', kindNote: 'A eurypterid — the aquatic arthropod group nicknamed sea scorpions, and this is the largest one known.',
     locality: 'Early Devonian · Rhineland',
     tagline: 'Claws first. Questions never.',
@@ -249,6 +250,7 @@ export const DEVONIAN_CREATURES: readonly CreatureDef[] = [
   },
   {
     id: 'michelinoceras', name: 'Michelinoceras', species: 'M. sp. (Devonian)',
+    grasp: true,
     kind: 'Nautiloid', kindNote: 'A straight-shelled (orthocone) nautiloid cephalopod — the chambered-shell lineage the living nautilus belongs to.',
     locality: 'Early Devonian · Sardinia',
     tagline: 'A spear that swims backwards.',
@@ -301,6 +303,7 @@ export const DEVONIAN_CREATURES: readonly CreatureDef[] = [
   },
   {
     id: 'walliserops', name: 'Walliserops', species: 'W. trifurcatus',
+    grasp: true,
     kind: 'Trilobite', kindNote: 'A comurid trilobite carrying a forked trident off its head — the ornament that made it famous.',
     locality: 'Devonian · Morocco',
     tagline: 'Nobody knows what the trident is for. You are going to find out.',
@@ -335,6 +338,7 @@ export const DEVONIAN_CREATURES: readonly CreatureDef[] = [
   },
   {
     id: 'furcaster', name: 'Furcaster', species: 'F. palaeozoicus',
+    grasp: true,
     kind: 'Brittle star', kindNote: 'An ophiuroid echinoderm — a starfish relative with a small disc and five whip-like arms.',
     locality: 'Early Devonian · Hunsrück',
     tagline: 'Five arms, no hurry, and a talent for not being there.',
@@ -352,6 +356,7 @@ export const DEVONIAN_CREATURES: readonly CreatureDef[] = [
   },
   {
     id: 'palaeoisopus', name: 'Palaeoisopus', species: 'P. problematicus',
+    grasp: true,
     kind: 'Sea spider', kindNote: 'A pycnogonid, or sea spider: long legs, almost no body, and the first sea spider fossil ever described.',
     locality: 'Early Devonian · Hunsrück',
     tagline: 'A spider that swims, on legs that were made for it.',
@@ -369,6 +374,7 @@ export const DEVONIAN_CREATURES: readonly CreatureDef[] = [
   },
   {
     id: 'manticoceras', name: 'Manticoceras', species: 'M. intumescens',
+    grasp: true,
     kind: 'Ammonoid', kindNote: 'A goniatite — the coiled shelled cephalopods that came before the ammonites, and their ancestors.',
     locality: 'Late Devonian · Frasnian seas',
     tagline: 'Hang in the water for as long as you like. Nothing else can.',

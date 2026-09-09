@@ -7,6 +7,7 @@ import type { EraHud } from '../sim/era-rules';
 import { creature } from '../sim/creatures';
 import { BIOME_ART, biomeArtPath, radarGlyphPath } from '../shared/environment-assets';
 import { BAND_COLOR } from '../sim/types';
+import { CreaturePortrait } from './CreaturePortrait';
 import { appBase } from '../shared/base';
 import { fillControls, key } from '../shared/controls';
 
@@ -61,7 +62,7 @@ function PlayerPanel({ p }: { p: PlayerHud }) {
           <div className="name-row"><b>{def.name}</b><span className="tier-name">{p.tierName}</span>{p.protect && <span className="protect">PROTECTED</span>}</div>
           <div className="bar hp"><i style={{ width: `${(p.hp / p.hpMax) * 100}%` }} /></div>
           <div className={`bar stamina ${p.exhausted ? 'exhausted' : ''}`}><i style={{ width: `${(p.stamina / p.staminaMax) * 100}%` }} /></div>
-          {p.era?.air != null && <div className={`bar air ${p.era.air < 0.25 ? 'low' : ''}`} aria-label={`Air ${Math.round(p.era.air * 100)}%`}><i style={{ width: `${p.era.air * 100}%` }} /></div>}
+          {p.era?.air != null && <div className={`bar air ${p.era.airLow ? 'low' : ''}`} aria-label={`Air ${Math.round(p.era.air * 100)}%`}><i style={{ width: `${p.era.air * 100}%` }} /></div>}
         </div>
       </div>
       {p.era && <EraStatus era={p.era} alive={p.alive} />}
@@ -96,6 +97,21 @@ function PlayerPanel({ p }: { p: PlayerHud }) {
             ))}
           </ul>
           <small>{p.teleport.cooldown > 0 ? `Ready in ${Math.ceil(p.teleport.cooldown)} s` : <><kbd>{key('confirm', s)}</kbd> go · <kbd>{key('back', s)}</kbd> back · <kbd>{key('teleport', s)}</kbd> next</>}</small>
+        </div>
+      )}
+      {p.swap && (
+        <div className="tele-menu swap-menu">
+          <p className="eyebrow">CHANGE CREATURE</p>
+          <div className="swap-body">
+            <CreaturePortrait creatureId={p.swap.creature} kind="thumb" assetBase={appBase()} alt="" draggable={false} loading="eager" />
+            <div>
+              <b>{p.swap.name}</b>
+              {p.swap.kind && <span className="swap-kind">{p.swap.kind}</span>}
+              <span className="swap-rung">{p.swap.rung}{p.swap.kept ? ' · your progress' : p.swap.grown ? ' · fully grown' : ' · hatchling'}</span>
+              <i className="swap-fill"><b style={{ transform: `scaleX(${p.swap.fill})` }} /></i>
+            </div>
+          </div>
+          <small><kbd>◀▶</kbd> {p.swap.index + 1}/{p.swap.count} · <kbd>{key('ability', s)}</kbd> {p.swap.grown ? 'grown' : 'hatchling'} · <kbd>{key('confirm', s)}</kbd> take it · <kbd>{key('back', s)}</kbd> back</small>
         </div>
       )}
       <div className="hud-bottom">
@@ -330,7 +346,7 @@ const RUNG_NUMERALS = ['', 'I', 'II', 'III', 'IV'];
  */
 function EraStatus({ era, alive }: { era: EraHud; alive: boolean }) {
   if (!alive) return null;
-  const warn = era.inDeadZone ? (era.air != null ? 'DEAD WATER · your gills are fine, theirs are not' : 'DEAD WATER · no oxygen, get out') : era.beached ? 'ON THE SAND · nothing with gills can follow' : era.air != null && era.air < 0.25 ? 'AIR LOW · surface and gulp' : '';
+  const warn = era.inDeadZone ? (era.air != null ? 'DEAD WATER · your gills are fine, theirs are not' : 'DEAD WATER · no oxygen, get out') : era.beached ? 'ON THE SAND · nothing with gills can follow' : era.airLow ? 'AIR LOW · surface and gulp' : '';
   return (
     <div className="era-status">
       {era.primeT > 0 && <div className="dominant"><span>PRIME</span><b>{Math.max(0, Math.ceil(90 - era.primeT))}</b></div>}
