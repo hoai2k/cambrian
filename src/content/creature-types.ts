@@ -117,5 +117,43 @@ export interface CreatureDef {
   noBite?: boolean;
   /** Locality label for the selection card (the roster mixes places and times, and says so). */
   locality?: string;
+
+  // ---- How this body gets about (docs/research/locomotion-ideas.md). Shared by both eras: a
+  // creature that sets none of these swims, walks and dashes exactly as it always did.
+  /**
+   * `omnidirectional`: no front. A brittle star picks a lead arm and rows, and a ctenophore's comb
+   * rows beat any way at all, so neither turns to travel — the heading is decoupled from the stick
+   * and only aiming points the body. `pulse`: a medusa's bell. Thrust arrives in contractions with
+   * a long free coast between them, so the animal surges rather than cruises; it is cheap to swim
+   * and slow to answer the stick.
+   */
+  swimStyle?: 'omnidirectional' | 'pulse';
+  /**
+   * The caridoid escape reaction: the abdomen snaps under the body and throws it backwards, away
+   * from whatever touched it, with no steering and a heavy stamina cost. Replaces this animal's
+   * dash and dodge.
+   */
+  tailFlip?: boolean;
+  /** Hauls through the plants rather than swimming past them: cover carries this body instead of dragging on it. */
+  weedWalk?: boolean;
+  /** Pushes off the bottom for a long glide. The dash only has its legs with the floor in reach. */
+  punt?: boolean;
+  /** Paddles in open water, walks on the floor: down there the current barely moves it. */
+  rowWalk?: boolean;
+  /** A rigid body with no paired fins behind the shield: the most it can change its pitch, rad/s. */
+  pitchRate?: number;
+  /** The mouth is a net, and a net only works with water going through it: filtering needs way on. */
+  ramFeed?: boolean;
+  /** Holds a depth and lets the sea carry it: full drift on a neutral stick, and it rises at night. */
+  drift?: boolean;
+  /** Holds onto rock. No face is a cliff to this body, however steep or however far above it. */
+  cling?: boolean;
+  /**
+   * Its arms lie along what they are on: draped over a boulder, dipped into the hollow behind it,
+   * curled round anything it takes hold of (`src/render/conform.ts`). Presentation only, and asked
+   * for by name rather than read off the rig, because a nautiloid's tentacles carry the same bone
+   * names and should not be laid out on the seabed.
+   */
+  conformArms?: boolean;
 }
 
