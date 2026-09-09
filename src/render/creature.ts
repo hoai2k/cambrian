@@ -60,10 +60,13 @@ export async function ensureLoaded(id: CreatureId, onProgress?: (loaded: number,
 const SPINE_RE = /^(body|segment)_(\d+)$/;
 /**
  * Rigs whose Eat clip is an authored reach/grasp/carry performance, scrubbed by consumption progress
- * (see `changedClips` in docs/creature-anchors-manifest.json). Every other rig loops its Eat clip while
+ * (the articulated attack and feeding pass, tools/creatures/motion, authors Eat on the feedingPhase
+ * timeline: reach, grasp, carry, hold at the mouth). Every other rig loops its Eat clip while
  * the attachment pass moves the food through its sockets.
  */
-const FEEDING_PERFORMANCE: ReadonlySet<CreatureId> = new Set<CreatureId>(['opabinia', 'leanchoilia']);
+const FEEDING_PERFORMANCE: ReadonlySet<CreatureId> = new Set<CreatureId>([
+  'opabinia', 'leanchoilia', 'anomalocaris', 'nectocaris', 'cambroraster', 'tamisiocaris', 'isoxys', 'waptia', 'sidneyia', 'marrella', 'olenoides',
+]);
 
 export class CreatureView {
   readonly group = new THREE.Group();

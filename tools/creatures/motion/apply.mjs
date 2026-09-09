@@ -17,7 +17,7 @@
  */
 import { PropertyType } from '@gltf-transform/core';
 import { EXTMeshoptCompression } from '@gltf-transform/extensions';
-import { dedup } from '@gltf-transform/functions';
+import { dedup, prune } from '@gltf-transform/functions';
 import { readFile, writeFile, mkdir } from 'node:fs/promises';
 import { createHash } from 'node:crypto';
 import path from 'node:path';
@@ -26,14 +26,17 @@ import { makeIO, loadRig, sampleClip, Rig } from './rig.mjs';
 
 const args = process.argv.slice(2);
 const id = args.find((a) => !a.startsWith('--'));
-const outDir = args.includes('--out') ? args[args.indexOf('--out') + 1] : 'public/assets/creatures';
+const outDir = args.includes('--out') ? args[args.indexOf('--out') + 1] : null;
 const review = args.includes('--review');
 assert(id, 'usage: apply.mjs <id> [--out dir] [--review]');
 const PASS = 'attack-feeding';
 const authoredOn = new Date().toISOString().slice(0, 10);
 
 const io = await makeIO();
-const file = `public/assets/creatures/${id}.glb`;
+// Both eras: a Cambrian id lives in creatures/, a Devonian one in devonian/creatures/.
+const { existsSync } = await import('node:fs');
+const assetDir = existsSync(`public/assets/creatures/${id}.glb`) ? 'public/assets/creatures' : 'public/assets/devonian/creatures';
+const file = `${assetDir}/${id}.glb`;
 const before = await readFile(file);
 const rig = await loadRig(io, file);
 const doc = rig.doc, root = doc.getRoot();
@@ -78,19 +81,23 @@ const expected = snapshot(doc);
 const byName = new Map(root.listAnimations().map((a) => [a.getName(), a]));
 const log = [];
 const added = new Set();
+const ours = (a) => a?.getExtras()?.cambrianClip?.pass === PASS;
+const drop = (a) => { for (const ch of a.listChannels()) ch.dispose(); for (const sm of a.listSamplers()) sm.dispose(); a.dispose(); };
 for (const def of clips) {
-  const old = byName.get(def.name), kept = byName.get(`replaced/${def.name}`);
+  let old = byName.get(def.name), kept = byName.get(`replaced/${def.name}`);
+  // A clip this tool authored is never the shipped one: an earlier run's output is dropped, and
+  // an earlier run's output that a later run mistook for shipped (renamed to replaced/) likewise.
+  if (kept && ours(kept)) { drop(kept); kept = undefined; log.push(`${def.name}: dropped a replaced/ copy that was this tool's own output`); }
+  if (old && ours(old)) { drop(old); old = undefined; log.push(`${def.name}: previous ${PASS} clip dropped`); }
   if (!old && !kept) added.add(def.name);        // a clip the model never had: nothing to keep beside it
   if (old && !kept) {
     old.setName(`replaced/${def.name}`);
-    old.setExtras({ ...old.getExtras(), cambrianClip: { version: 1, replaced: def.name, replacedOn: authoredOn, by: PASS } });
+    old.setExtras({ ...old.getExtras(), cambrianClip: { ...(old.getExtras()?.cambrianClip ?? {}), version: 1, replaced: def.name, replacedOn: authoredOn, by: PASS } });
     log.push(`${def.name}: shipped clip kept as replaced/${def.name}`);
   } else if (old) {
-    for (const ch of old.listChannels()) ch.dispose();
-    for (const s of old.listSamplers()) s.dispose();
-    old.dispose();
-    log.push(`${def.name}: previous ${PASS} clip dropped (replaced/${def.name} already kept)`);
-  } else log.push(`${def.name}: new clip`);
+    drop(old);
+    log.push(`${def.name}: shipped clip dropped (replaced/${def.name} already kept)`);
+  } else log.push(`${def.name}: ${kept ? 'new clip beside the kept original' : 'new clip'}`);
   const { frames } = sampleClip(rig, def, { authoredOn, pass: PASS });
   log.push(`${def.name}: ${frames} frames, ${def.duration}s, ${def.loop ? 'loop' : 'one-shot'}`);
 }
@@ -98,6 +105,8 @@ for (const def of clips) {
 expected.kept = snapshot(new Rig(doc).doc).kept.filter(([n]) => !clips.some((c) => c.name === n));
 
 await doc.transform(dedup({ propertyTypes: [PropertyType.ACCESSOR, PropertyType.TEXTURE], keepUniqueNames: true }));
+// A dropped clip leaves its samplers' accessors behind; without this every re-run grows the file.
+await doc.transform(prune({ propertyTypes: [PropertyType.ACCESSOR, PropertyType.BUFFER], keepLeaves: true, keepAttributes: true, keepExtras: true, keepSolidTextures: true }));
 doc.createExtension(EXTMeshoptCompression).setRequired(true).setEncoderOptions({ method: EXTMeshoptCompression.EncoderMethod.QUANTIZE });
 let bytes = preserveNodeTransforms(await io.writeBinary(doc), doc);
 
@@ -114,12 +123,13 @@ for (const def of clips) {
 }
 assert.equal(new Set(names).size, names.length, 'duplicate clip names');
 
-await mkdir(outDir, { recursive: true });
-const out = path.join(outDir, `${id}.glb`);
+const dest = outDir ?? assetDir;
+await mkdir(dest, { recursive: true });
+const out = path.join(dest, `${id}.glb`);
 await writeFile(out, bytes);
 if (review) {
   for (const ext of check.getRoot().listExtensionsUsed()) if (ext.extensionName === 'EXT_meshopt_compression') ext.dispose();
-  await writeFile(path.join(outDir, `${id}.review.glb`), await io.writeBinary(check));
+  await writeFile(path.join(dest, `${id}.review.glb`), await io.writeBinary(check));
 }
 console.log(`${id}: ${before.length.toLocaleString()} -> ${bytes.length.toLocaleString()} bytes -> ${out}`);
 for (const l of log) console.log('  ' + l);

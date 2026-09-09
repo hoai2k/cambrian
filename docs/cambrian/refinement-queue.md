@@ -86,3 +86,14 @@ in `src/content/cambrian/pending-refinements.json`. See `docs/attack-feeding-ref
 `tools/attack-feeding-refinements.json` for individual scope, backups and acceptance requirements.
 Odaraia incorporates this in its full rework; other models retain current anatomy until their
 individual review determines changes. Keep preview status until every pending task is complete.
+
+## Attack and feeding pass — delivered 9 September 2026
+
+Every Cambrian entry of the pass except Odaraia (rebuilding) is delivered as a preview: Anomalocaris,
+Nectocaris, Cambroraster, Tamisiocaris, Isoxys, Waptia, Sidneyia, Marrella, Olenoides and
+Leanchoilia have re-authored Bite, Attack, Heavy and Eat; Cambroraster, Tamisiocaris, Isoxys,
+Leanchoilia and Ottoia gained the Grab loop the hold needs; Opabinia was already articulated and
+was left alone. The record, per-creature notes and what remains are in
+`docs/attack-feeding-refinement.md`; the clip badges stay until the user has reviewed each animal in
+the viewer, where the previous clips sit under *Replaced* for comparison.
+

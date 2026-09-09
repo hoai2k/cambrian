@@ -54,8 +54,26 @@ export class Rig {
   names(re) { return this.joints.map((j) => j.getName()).filter((n) => re.test(n)); }
   restWorldRot(node) { return new Quaternion().setFromRotationMatrix(this.restWorld.get(node)); }
   restWorldPos(node) { return new Vector3().setFromMatrixPosition(this.restWorld.get(node)); }
-  /** World direction of the bone's own axis (local +Y) in the rest pose. */
-  restDir(node) { return new Vector3(0, 1, 0).applyQuaternion(this.restWorldRot(node)).normalize(); }
+  /**
+   * World direction of the bone in the rest pose: toward its child joint of the same family
+   * (or its only child), else away from its parent for a leaf. Cambrian rigs export bone local
+   * +Y along the bone so both agree; several Devonian rigs give every bone the same local axis,
+   * where only the joint positions say which way a limb runs.
+   */
+  restDir(node) {
+    if (!this.dirCache) this.dirCache = new Map();
+    if (this.dirCache.has(node)) return this.dirCache.get(node).clone();
+    const fam = (n) => n.replace(/[-\d]+(?=(_|$))/g, '#').replace(/[LR](?=\d*$)/, '');
+    const kids = node.listChildren().filter((c) => this.byName.get(c.getName()) === c);
+    const me = this.restWorldPos(node);
+    let target = kids.length === 1 ? kids[0] : kids.find((c) => fam(c.getName()) === fam(node.getName())) ?? kids[0];
+    let d;
+    if (target) d = this.restWorldPos(target).sub(me);
+    else if (this.parentOf.get(node) && this.byName.has(this.parentOf.get(node).getName())) d = me.clone().sub(this.restWorldPos(this.parentOf.get(node)));
+    if (!d || d.lengthSq() < 1e-8) d = new Vector3(0, 1, 0).applyQuaternion(this.restWorldRot(node));
+    d.normalize(); this.dirCache.set(node, d);
+    return d.clone();
+  }
 
   /** World matrices for a pose (anything the pose does not touch stays at rest). */
   worldOf(pose) {
@@ -155,7 +173,8 @@ export function sampleClip(rig, def, { authoredOn, pass } = {}) {
     } else {
       channel(j, AnimationChannel.TargetPath.TRANSLATION, doc.createAccessor().setType(Accessor.Type.VEC3).setArray(new Float32Array([...rest.t.toArray(), ...rest.t.toArray()])).setBuffer(buffer), endTimes);
     }
-    channel(j, AnimationChannel.TargetPath.SCALE, doc.createAccessor().setType(Accessor.Type.VEC3).setArray(new Float32Array([...rest.s.toArray(), ...rest.s.toArray()])).setBuffer(buffer), endTimes);
+    // No scale channel: nothing here animates scale, and a constant one would only restate the
+    // bind scale (which the Devonian check refuses unless it is exactly identity).
   }
   // Contract checks: loops close on themselves, one-shots start and end at rest, root never moves.
   const root = rig.joints[0];
