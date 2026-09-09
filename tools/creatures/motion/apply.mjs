@@ -22,7 +22,7 @@ import { readFile, writeFile, mkdir } from 'node:fs/promises';
 import { createHash } from 'node:crypto';
 import path from 'node:path';
 import assert from 'node:assert/strict';
-import { makeIO, loadRig, sampleClip, Rig } from './rig.mjs';
+import { makeIO, loadRig, sampleClip, rebaseAnimation, Rig } from './rig.mjs';
 
 const args = process.argv.slice(2);
 const id = args.find((a) => !a.startsWith('--'));
@@ -40,7 +40,7 @@ const file = `${assetDir}/${id}.glb`;
 const before = await readFile(file);
 const rig = await loadRig(io, file);
 const doc = rig.doc, root = doc.getRoot();
-const { clips } = await import(`./performances/${id}.mjs`);
+const { clips, basePose, rebase } = await import(`./performances/${id}.mjs`);
 
 const hash = (b) => createHash('sha256').update(b).digest('hex');
 const digest = (a) => a ? hash(new Uint8Array(new Float64Array(a.getArray()).buffer)) + ':' + a.getType() + ':' + a.getNormalized() : null;
@@ -98,8 +98,25 @@ for (const def of clips) {
     drop(old);
     log.push(`${def.name}: shipped clip dropped (replaced/${def.name} already kept)`);
   } else log.push(`${def.name}: ${kept ? 'new clip beside the kept original' : 'new clip'}`);
-  const { frames } = sampleClip(rig, def, { authoredOn, pass: PASS });
+  const { frames } = sampleClip(rig, def, { authoredOn, pass: PASS, basePose });
   log.push(`${def.name}: ${frames} frames, ${def.duration}s, ${def.loop ? 'loop' : 'one-shot'}`);
+}
+// A base pose re-poses every other clip in the file onto the new resting shape; the shipped
+// version of each is kept as replaced/<Name> exactly like an authored replacement.
+if (basePose) {
+  const names = [...new Set(root.listAnimations().map((a) => a.getName().replace(/^replaced\//, '')))].filter((n) => !clips.some((c) => c.name === n));
+  for (const name of names) {
+    let old = byName.get(name), kept = byName.get(`replaced/${name}`);
+    if (kept && ours(kept)) { drop(kept); kept = undefined; }
+    if (old && ours(old)) { drop(old); old = undefined; }          // an earlier run's re-posed copy
+    let source = kept;
+    if (!source && old) { old.setName(`replaced/${name}`); old.setExtras({ ...old.getExtras(), cambrianClip: { version: 1, replaced: name, replacedOn: authoredOn, by: PASS } }); source = old; }
+    else if (source && old) drop(old);
+    if (!source) continue;
+    rebaseAnimation(rig, source, name, basePose, { ...rebase, pass: PASS, authoredOn });
+    log.push(`${name}: re-posed onto the base pose (shipped clip kept as replaced/${name})`);
+    clips.push({ name });                        // so the checks below expect it beside its replaced/ copy
+  }
 }
 // Fresh Rig over the same doc so the kept-animation snapshot sees the renamed clips.
 expected.kept = snapshot(new Rig(doc).doc).kept.filter(([n]) => !clips.some((c) => c.name === n));

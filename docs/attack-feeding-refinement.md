@@ -158,7 +158,7 @@ marks each as `review`.
 | Sidneyia | re-authored | — | gnathobase clamps at the leg roots, body presses down |
 | Marrella | re-authored | — | paddle sweeps, three-pulse scuttle rush, paddles rake to the mouth |
 | Olenoides | re-authored | — | cephalon head-butt and shield charge; front legs work food |
-| Opabinia | unchanged | kept | already articulated by the anchor pass; queued for review only |
+| Opabinia | re-authored (Bite, Attack, Heavy) | kept | trunk-like: coils (under, to the side, over the head) then shoots out straight into a snapping grab; resting shape re-posed to hang down, curve up and reach forward, so *every* clip has a `replaced/` copy |
 | Ottoia | — | added | hold with the introvert curled over the catch |
 | Jaekelopterus | re-authored | kept | pincers draw back, open, reach and clamp; gnathobases work the catch |
 | Palaeoisopus | re-authored | kept | chelifores fold at the scapes; proboscis swings forward to meet the food |
@@ -168,6 +168,8 @@ marks each as `review`.
 
 Skipped on purpose: **Odaraia** and **Nahecaris** (their bodies are being rebuilt; the new rigs get
 their motion with the rebuild) and **Michelinoceras** (delivered separately on 8 September).
+
+Opabinia's resting proboscis is a **base pose** (`basePose` in its performance file): `apply.mjs` re-poses every other clip in the file onto it, fading the curve out where a clip's own motion already takes the trunk far from bind (the Snatch and the feeding reach still arrive straight), and the attacks coil from it and straighten fully as they shoot. The bind pose itself is untouched, so no model intake was needed.
 
 Runtime: the Cambrian creatures above are in `FEEDING_PERFORMANCE`, so their Eat clips are scrubbed
 by consumption progress on the `feedingPhase` timeline; the Devonian ones loop their Eat as a
