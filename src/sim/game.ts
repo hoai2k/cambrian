@@ -153,6 +153,12 @@ const BURST_STAMINA = 7.5;
  * never feels like an argument with the controls.
  */
 const CLIMB_PUSH = 0.35;
+/**
+ * How little of a step's travel has to survive the climb (see `followFloor`) before the face
+ * counts as something to be climbed rather than walked up: at a twentieth, the body has stopped
+ * making headway and is going straight up the side of it.
+ */
+const STALL = 0.05;
 
 /**
  * Co-op revive. A downed player in Rise lies on the floor for this long instead of dissolving
@@ -1141,6 +1147,57 @@ export class Game implements AiWorld {
   }
 
   /**
+   * Follow the floor up instead of being snapped to the top of it.
+   *
+   * A rock the body is allowed to be carried over (`glideOver`) does not block, and the floor under
+   * the body simply takes it up. That is right for the pace of it and wrong for the shape: a dome
+   * is `sqrt(1 - q^2)` tall, so its flank is near-vertical at the rim. A body crossing that rim
+   * gained a couple of its own lengths of height in one step while it moved a tenth of a unit
+   * forward — an anomalocaris pressing toward a boulder went up its side at twenty times its own
+   * swimming speed and arrived on top, which reads as jetting rather than as swimming over.
+   *
+   * So the climb is paid for out of the travel. The body may rise what it could swim up in this
+   * step for nothing (`climbRise`); beyond that it gives back the horizontal it was going to cover,
+   * one for one along the hypotenuse, so what it actually travels is the distance it was always
+   * going to travel and only the direction of it tilts up the face. A gentle dome barely slows
+   * anything; a steep one turns most of the step into height and the body climbs it on the diagonal
+   * at its own pace. Nothing here moves a body further or faster than it was already moving.
+   *
+   * The trade is solved by bisection along this step's own path, and only when there is a rise to
+   * pay for — the common cases (open water, resting on the sand, going downhill) return at once.
+   * `face` is the floor where the body ended up and `clear` how far above it the body rides, both
+   * measured by the caller, which needs them anyway. Returns the face if the body is pressed
+   * against one rather than walking up it, and -Infinity otherwise.
+   */
+  private followFloor(a: Actor, dt: number, face: number, clear: number): number {
+    const free = climbRise(a) * dt;
+    if (face - a.pos.y <= free) return -Infinity;
+    const dx = a.pos.x - a.prevT.x, dz = a.pos.z - a.prevT.z;
+    const d = Math.hypot(dx, dz);
+    if (d < 1e-6) return -Infinity;   // standing still: there is no travel to trade for the height
+    const at = (x: number, z: number) => groundHeight(this.world, x, z, this.scratchBoulders) + clear;
+    // How much rise a fraction `t` of the step may buy: the free swim up, plus the horizontal
+    // given back, taken as the other side of a right angle so the total stays this step's own.
+    const budget = (t: number) => free + Math.sqrt(Math.max(0, d * d - (t * d) ** 2));
+    let lo = 0, hi = 1;
+    for (let i = 0; i < 6; i++) {
+      const t = (lo + hi) / 2;
+      if (at(a.prevT.x + dx * t, a.prevT.z + dz * t) - a.pos.y <= budget(t)) lo = t; else hi = t;
+    }
+    a.pos.x = a.prevT.x + dx * lo;
+    a.pos.z = a.prevT.z + dz * lo;
+    // The travel that was not spent going forward is spent going up the face instead, as far as
+    // the face itself. On a gentle slope almost all of it is still forward; on a sheer one almost
+    // none is, and the body comes up the side at the speed it was swimming at. Either way the
+    // floor it now stands on is under it, so the clamp below has nothing left to snap.
+    a.pos.y = Math.min(face, a.pos.y + budget(lo));
+    // Almost none of it left over means the body is pressed against a face rather than walking up
+    // a slope, which is a contact like any other: report it, and the climb the caller already
+    // knows how to do takes the body up the side of it.
+    return lo < STALL ? face : -Infinity;
+  }
+
+  /**
    * The body against the world: the seabed, boulders, plants, what is worth climbing, and the ride
    * that outranks all of it. Runs after the body has moved and before it is turned, because what
    * it is standing on decides where it can point.
@@ -1163,9 +1220,15 @@ export class Game implements AiWorld {
     // sight. Everything else waits for the body to lean on it: a crawler has legs and gets over
     // whatever it keeps pushing into, however tall, and a plant is a thin thing to go round unless
     // the body is aimed straight at the middle of it.
-    const leaning = controllable && mag > 0.35 && (contact.hit || floraHit.blocked);
+    // A rock is a slope, not a step: come up its flank at the speed the body is actually going.
+    // A face too steep to make any headway on is a contact as much as a wall is, and is climbed.
+    const clear = floorClearance(a), px = a.pos.x, pz = a.pos.z;
+    let floor = groundHeight(this.world, a.pos.x, a.pos.z, this.scratchBoulders) + clear;
+    const stalled = this.followFloor(a, dt, floor, clear);
+    if (a.pos.x !== px || a.pos.z !== pz) floor = groundHeight(this.world, a.pos.x, a.pos.z, this.scratchBoulders) + clear;
+    const leaning = controllable && mag > 0.35 && (contact.hit || floraHit.blocked || Number.isFinite(stalled));
     a.climbPush = leaning ? Math.min(1, a.climbPush + dt) : Math.max(0, a.climbPush - dt * 2);
-    let offer = contact.climbTo;
+    let offer = Math.max(contact.climbTo, stalled);
     if (a.climbPush > CLIMB_PUSH) {
       if (def.ground) offer = Math.max(offer, contact.wallTop);
       if (floraHit.headOn) offer = Math.max(offer, floraHit.top);
@@ -1173,7 +1236,6 @@ export class Game implements AiWorld {
     if (offer > a.pos.y) a.climbTo = Math.max(a.climbTo, offer);
     if (a.climbTo <= a.pos.y || a.climbPush === 0 || !controllable || a.hitStop > 0 || a.state === 'grabbed' || isHidden(a)) a.climbTo = -Infinity;
     else if (!def.ground) a.vel.y = Math.max(a.vel.y, climbRise(a));
-    const floor = groundHeight(this.world, a.pos.x, a.pos.z, this.scratchBoulders) + floorClearance(a);
     if (def.ground) {
       if (a.grounded || a.pos.y <= floor) { a.pos.y = a.grounded ? damp(a.pos.y, floor, 18, dt) : floor; if (!a.grounded && a.hopVel < 0) { a.grounded = true; a.hopVel = 0; } }
       if (a.pos.y < floor) a.pos.y = floor;

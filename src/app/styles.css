@@ -55,7 +55,31 @@ h3 { font-size: 13px; letter-spacing: .12em; color: var(--ember); margin: 14px 0
 /* ---------- Select ---------- */
 .select { position: absolute; inset: 0; display: grid; grid-template-rows: auto 1fr auto; z-index: 10; padding: 18px 22px 80px; background: linear-gradient(180deg, rgba(6,22,28,.78), rgba(6,22,28,.35) 40%, rgba(6,22,28,.78)); animation: fade-in .4s both; }
 .select-header { display: grid; grid-template-columns: auto 1fr; grid-template-areas: 'brand modes' 'blurb blurb'; gap: 8px 24px; align-items: center; }
+/*
+ * The mark in the corner does two jobs: the emblem goes back to the title (which is why there is
+ * no longer a "Title" button in the footer), and the wordmark — or the chevron after it — drops the
+ * other game's wordmark in underneath, aligned to this one and the same width, so the two read as
+ * one list of engraved titles with the one you are playing at the top. Both controls are styled as
+ * nothing at all until pointed at: the whole point is that it stays a logo.
+ */
 .brand { grid-area: brand; display: flex; align-items: center; gap: 10px; }
+.brand-home { display: block; padding: 4px; margin: -4px; border: 0; border-radius: 12px; background: none; color: inherit; cursor: pointer; transition: background .15s, transform .15s; }
+.brand-title { display: block; padding: 4px; border: 0; border-radius: 12px; background: none; color: inherit; font: inherit; cursor: pointer; transition: background .15s; }
+.brand-home:hover, .brand-home:focus-visible, .brand-title:enabled:hover, .brand-title:focus-visible { background: rgba(238,250,246,.08); }
+.brand-home:hover, .brand-home:focus-visible { transform: translateY(-1px); }
+.brand-title:disabled { cursor: default; }
+.brand-titles { display: flex; align-items: center; gap: 2px; }
+.brand-title-anchor { position: relative; }
+.brand-switch { display: grid; place-items: center; padding: 6px; border: 0; border-radius: 10px; background: none; color: var(--ember); opacity: .7; transition: background .15s, opacity .15s, transform .18s; }
+.brand-switch:hover, .brand-switch:focus-visible, .brand-titles.open .brand-switch { background: rgba(238,250,246,.08); opacity: 1; }
+.brand-titles.open .brand-switch { transform: rotate(180deg); }
+/* Stretched to the title's box and padded to match its inset, so the wordmark that drops in starts
+   on the same left edge and comes out the same width as the one above it. */
+.era-menu { position: absolute; top: calc(100% + 4px); left: 0; right: 0; z-index: 12; padding: 4px; border-radius: 12px; border: 1px solid rgba(238,250,246,.18); background: rgba(6,22,28,.92); backdrop-filter: blur(8px); box-shadow: 0 18px 40px rgba(0,0,0,.5); animation: era-menu-in .16s ease-out both; }
+.era-item { display: block; border-radius: 9px; text-decoration: none; transition: background .15s, filter .15s; filter: saturate(.75) brightness(.85); }
+.era-item img { display: block; width: 100%; height: auto; }
+.era-item:hover, .era-item:focus-visible { filter: none; }
+@keyframes era-menu-in { from { opacity: 0; transform: translateY(-6px); } to { opacity: 1; transform: none; } }
 .brand-name { font: 500 13px var(--font-display); letter-spacing: .18em; }
 .brand-name b { color: var(--coral); }
 .mode-picker { grid-area: modes; display: flex; gap: 8px; justify-content: flex-end; flex-wrap: wrap; }
@@ -125,7 +149,7 @@ h3 { font-size: 13px; letter-spacing: .12em; color: var(--ember); margin: 14px 0
 .join-card small { color: var(--dim); }
 .ghost { padding: 10px 16px; border-radius: 12px; border: 1px solid rgba(238,250,246,.2); background: rgba(6,22,28,.4); color: var(--foam); transition: all .15s; }
 .ghost:hover { border-color: var(--ember); color: var(--ember); }
-.select-footer { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+.select-footer { display: flex; align-items: center; justify-content: flex-end; gap: 16px; }
 .start-wrap { display: flex; align-items: center; gap: 16px; }
 .start-button { padding: 14px 30px; border-radius: 14px; border: none; background: linear-gradient(95deg, var(--ember), var(--coral)); color: var(--ink); font: 900 15px var(--font-display); letter-spacing: .18em; box-shadow: 0 10px 40px rgba(255, 91, 110, .4); transition: transform .15s, filter .15s; }
 .start-button:hover:not(:disabled) { transform: translateY(-2px) scale(1.02); filter: brightness(1.08); }

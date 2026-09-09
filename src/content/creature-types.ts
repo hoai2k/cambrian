@@ -148,5 +148,12 @@ export interface CreatureDef {
   drift?: boolean;
   /** Holds onto rock. No face is a cliff to this body, however steep or however far above it. */
   cling?: boolean;
+  /**
+   * Its arms lie along what they are on: draped over a boulder, dipped into the hollow behind it,
+   * curled round anything it takes hold of (`src/render/conform.ts`). Presentation only, and asked
+   * for by name rather than read off the rig, because a nautiloid's tentacles carry the same bone
+   * names and should not be laid out on the seabed.
+   */
+  conformArms?: boolean;
 }
 

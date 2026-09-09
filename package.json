@@ -30,6 +30,7 @@
     "eras": "node tools/era-test.mjs",
     "merge": "node --experimental-transform-types tools/merge-test.mjs",
     "shapes": "node tools/prop-shapes.mjs",
+    "conform": "node --experimental-transform-types tools/conform-test.mjs",
     "locomotion": "esbuild tools/locomotion-test.ts --bundle --platform=node --format=esm --outfile=node_modules/.cache/locomotion-test.mjs --log-level=error && node node_modules/.cache/locomotion-test.mjs",
     "props": "esbuild tools/prop-collider-test.ts --bundle --platform=node --format=esm --outfile=node_modules/.cache/prop-collider-test.mjs --log-level=error && node node_modules/.cache/prop-collider-test.mjs",
     "devonian": "esbuild tools/devonian-test.ts --bundle --platform=node --format=esm --outfile=node_modules/.cache/devonian-test.mjs && node node_modules/.cache/devonian-test.mjs",
