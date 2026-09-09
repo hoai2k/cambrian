@@ -835,6 +835,20 @@ export class Engine {
       const continuous = a.state === 'eating' || a.holdT > 0;
       const animate = continuous || !far || ((a.id + Math.floor(this.time * 60)) % 3 === 0);
       v.update(a, animate && far && !continuous ? dt * 3 : dt, this.time, animate, this.alpha);
+      // Arms that lie along what they are on. Near views only: it is a per-segment solve, and at
+      // any distance the shape it makes is smaller than a pixel.
+      if (v.conforms && d < 26 && animate) {
+        const host = a.rideHost >= 0 ? game.byId(a.rideHost) : undefined;
+        const L = lengthOf(a);
+        const gap = a.pos.y - groundHeight(game.world, a.pos.x, a.pos.z, this.scratchBoulders);
+        // Fade out as it leaves the floor: an arm in open water has nothing to lie on.
+        const weight = host ? 1 : clamp(1 - (gap - L * 0.35) / Math.max(L, 0.4), 0, 1);
+        v.conform({
+          groundAt: (x, z) => groundHeight(game.world, x, z, this.scratchBoulders),
+          clearance: L * 0.06,
+          host: host ? { x: host.pos.x, y: host.pos.y, z: host.pos.z, radius: lengthOf(host) * 0.32 } : undefined,
+        }, weight, dt);
+      }
       // A carcass shows what has been taken out of it, and gets whole again when its owner
       // respawns into the same view.
       if (a.state === 'dead' && a.eatBites > 1 && a.eaten > 0) v.carcass.setEaten(a.eaten);

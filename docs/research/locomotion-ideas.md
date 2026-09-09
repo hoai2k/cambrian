@@ -76,6 +76,9 @@ faster", and it reads instantly — the animal snaps away from you rather than t
 ### 3. Bodies that never turn to move
 > **Built** as `swimStyle: 'omnidirectional'`: Ctenorhabdotus and Furcaster. The heading is cut
 > loose from the stick entirely — they translate without rotating, and only aiming points them.
+> Furcaster also shapes itself to what it is on (`conformArms`, `src/render/conform.ts`): the arms
+> drape over a boulder, dip into the hollow behind it, and curl round anything the animal takes
+> hold of. That part is presentation, bent onto the authored clip after the mixer has run.
 
 *Furcaster (brittle star), Ctenorhabdotus (ctenophore), and arguably Burgessomedusa.* **Observed**:
 a brittle star picks one arm as the leader and rows with the two beside it, so it changes direction by

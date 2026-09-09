@@ -9,6 +9,7 @@ import { makeRecolor, type Recolor } from './recolor';
 import { settleTranslucency } from './translucency';
 import { mergeSkinnedParts } from './merge-skins';
 import { Carcass } from './carcass';
+import { ArmConform, type Surface } from './conform';
 import { schemeForCreature } from '../shared/palettes';
 import { creature, type CreatureId } from '../sim/creatures';
 import { lengthOf } from '../sim/actors';
@@ -101,6 +102,8 @@ export class CreatureView {
   public visibleLength = 1;
   readonly def;
   readonly heightUnits: number;
+  /** Arms that lie along what they are on, where the creature asks for it. */
+  private armConform?: ArmConform;
   /** The Eat clip is a progress-driven performance rather than a loop. */
   readonly feedingPerformance: boolean;
   readonly authoredFeeding?: AuthoredFeeding;
@@ -140,6 +143,7 @@ export class CreatureView {
     // All of a creature's colour lives in its vertex colours, so its palette is a shader hook on
     // the materials cloned just above rather than a second set of models. Both LODs share the
     // material names the slots are read from, so a distant creature keeps its colours.
+    if (this.def.conformArms) { const c = new ArmConform(this.model); if (c.active) this.armConform = c; }
     this.recolor = makeRecolor(this.model); this.recolor.setScheme(schemeForCreature(creatureId));
     // Distance haze, chained after the palette hook (which owns onBeforeCompile). Mixing the
     // finished pixel toward the water it is seen through is the only correct way to fade a body
@@ -237,6 +241,14 @@ export class CreatureView {
   get carcass(): Carcass { return (this.carcassParts ??= new Carcass(this.model, [...this.materials, ...this.extraMats])); }
   /** Whole again — and nothing is built for a body that was never bitten. */
   restoreCarcass() { this.carcassParts?.reset(); }
+  /**
+   * Lay the arms along the ground under them, or around whatever the animal is holding. Called
+   * after `update`, because it bends the pose the mixer has just written.
+   */
+  conform(surface: Surface, weight = 1, dt = 1 / 60) { this.armConform?.apply(this.model, surface, weight, dt); }
+  /** This body shapes itself to what it is on. */
+  get conforms() { return !!this.armConform; }
+
   setHighlight(intensity: number, color?: string) { this.highlight = intensity; if (color) this.highlightColor.set(color); }
 
   /**
