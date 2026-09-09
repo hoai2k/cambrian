@@ -841,8 +841,44 @@ export class Engine {
       else if (a.state !== 'dead' && a.eaten <= 0) v.restoreCarcass();
     }
     this.attachments.sync(game, this.views, dt);
+    this.breathe(game, keep);
     for (const [id, v] of this.views) if (!keep.has(id)) { v.dispose(); this.views.delete(id); }
   }
+
+  /**
+   * Lungs leak when they work. A bag of air inside a body under water shows every time the body
+   * spends itself: what a bimodal animal lets go of the mouth is the effort it just made, so the
+   * bubbles are the stamina bar draining, seen from outside. A sprint streams them, a dash coughs a
+   * handful, and hanging still or climbing — which costs nothing — releases none at all.
+   *
+   * Purely a look, so it lives in the renderer with its own randomness and reads the one creature
+   * flag it needs; nothing in the Cambrian roster breathes both ways, so nothing there emits. Run
+   * after `attachments.sync` so the mouth socket is posed, and skipped at the surface, where the
+   * animal is breathing rather than holding it.
+   */
+  private breathe(game: Game, keep: Set<number>) {
+    for (const [id, v] of this.views) {
+      const a = keep.has(id) ? game.byId(id) : undefined;
+      if (!a || !isAlive(a) || isHidden(a) || creature(a.creature).breathing !== 'bimodal') { this.breath.delete(id); continue; }
+      const L = lengthOf(a);
+      const prev = this.breath.get(id);
+      this.breath.set(id, { stamina: a.stamina, owed: prev?.owed ?? 0 });
+      // First sight of a body, or a bar that went up (regen, a breath, a respawn): nothing was spent.
+      if (prev == null || a.stamina >= prev.stamina) continue;
+      if (a.pos.y > SURFACE_Y - 3 - L * 0.3) continue;
+      const entry = this.breath.get(id)!;
+      entry.owed = prev.owed + (prev.stamina - a.stamina);
+      // One bubble per few points of effort, so a whole bar vented is a couple of dozen of them.
+      const n = Math.floor(entry.owed / 3.5);
+      if (n < 1) continue;
+      entry.owed -= n * 3.5;
+      const at = v.anchors.world('anchor_mouth', this.tmpV)
+        ? { x: this.tmpV.x, y: this.tmpV.y, z: this.tmpV.z }
+        : { x: a.pos.x + Math.sin(a.yaw) * L * 0.45, y: a.pos.y + L * 0.05, z: a.pos.z + Math.cos(a.yaw) * L * 0.45 };
+      this.bubbles.emit(at, Math.min(12, n), L * 0.1, 0.35, Math.min(0.18, 0.035 + L * 0.03), 1.6 + L * 0.2);
+    }
+  }
+  private breath = new Map<number, { stamina: number; owed: number }>();
 
   /**
    * A mouthful comes off the carcass: the eaten share stops being drawn on the body, and the
@@ -1050,12 +1086,13 @@ export class Engine {
           break;
         }
         case 'gulp': { this.bubbles.emit(e.pos, 24, 1.0, 3, 0.09, 1.4); personal('gulp'); break; }
-        // The low-air heartbeat, and a thin trickle of bubbles escaping with it. Quiet at the
-        // warning and firmer on the last of the meter — `strength` is how far gone the air is.
-        case 'airLow': {
+        // The winded heartbeat, and a thin trickle of bubbles escaping with it: a body that
+        // recovers badly under water, running low on stamina and a long way from the surface that
+        // would hand it all back. `strength` is how spent it is.
+        case 'winded': {
           const s = e.strength ?? 0;
           this.bubbles.emit(e.pos, 2 + Math.round(4 * s), 0.5, 2, 0.05, 1);
-          personal('airLow', 0.35 + 0.45 * s);
+          personal('winded', 0.35 + 0.45 * s);
           break;
         }
         case 'anoxia': { personal('anoxia', 0.8); break; }

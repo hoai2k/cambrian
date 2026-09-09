@@ -45,8 +45,10 @@ export interface DeadZone { pos: Vec3; r: number; age: number; life: number; dri
 export interface DevActor {
   standing: number;
   stage: number;               // index into STAGES
-  air: number;                 // 0..1 for air breathers
-  airPulseT: number;           // seconds since the last low-air heartbeat (reset by a gulp)
+  /** Bimodal breathers only: whether the last step found this body at the surface (or on the sand). */
+  atSurface: boolean;
+  /** Seconds since the last winded heartbeat, reset by a breath. */
+  windT: number;
   beached: boolean;
   deadT: number;               // seconds spent inside a dead zone this visit
   deadZoneIn: boolean;
@@ -86,7 +88,7 @@ export function devActor(g: Game, a: Actor): DevActor {
   const s = stateFor(g);
   let d = s.actors.get(a.id);
   if (!d) {
-    d = { standing: 0, stage: 0, air: 1, airPulseT: 0, beached: false, deadT: 0, deadZoneIn: false, moultSoft: 0, exuvia: -1, exuviaT: 0, followers: 0, sinceEat: 0, primeT: 0, bluffed: new Map(), dartCd: 0 };
+    d = { standing: 0, stage: 0, atSurface: false, windT: 0, beached: false, deadT: 0, deadZoneIn: false, moultSoft: 0, exuvia: -1, exuviaT: 0, followers: 0, sinceEat: 0, primeT: 0, bluffed: new Map(), dartCd: 0 };
     s.actors.set(a.id, d);
   }
   return d;

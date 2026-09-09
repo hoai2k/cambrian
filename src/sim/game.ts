@@ -236,6 +236,11 @@ interface Step {
   dir: Vec3; mag: number;
   /** The lock target, if it is still alive, and whether this body jets rather than swims. */
   locked: Actor | undefined; jets: boolean;
+  /**
+   * How much of this frame's sprint or dash is climb, and so given to the body for nothing (0..1),
+   * and whether that is enough that an empty bar cannot refuse it. Always 0 without era rules.
+   */
+  relief: number; freeClimb: boolean;
 }
 
 export class Game implements AiWorld {
@@ -833,10 +838,6 @@ export class Game implements AiWorld {
 
     if (a.state !== 'ability') a.abilityActive = (a.state === 'guard' || a.state === 'parry') && DEFENSIVE_SPECIALS.has(def.ability);
 
-    // Cooldowns, healing, hiding and the stamina bar: everything that ticks whether or not the
-    // animal does anything this frame. It settles what the rest of the frame can afford.
-    const { speed, burstIn, paddling, bursting, freeBurst } = this.stepUpkeep(a, input, dt, def, L, justLight, justHeavy, justAbility, justDash);
-
     // Movement: desired direction
     let dir: Vec3 = v3();
     let mag = 0;
@@ -862,6 +863,13 @@ export class Game implements AiWorld {
       }
     }
     if (def.ground) dir.y = 0;
+
+    // Cooldowns, healing, hiding and the stamina bar: everything that ticks whether or not the
+    // animal does anything this frame. It settles what the rest of the frame can afford. The
+    // direction is settled first because the bar's price depends on it: an era may give a body the
+    // climb for nothing, and what counts as climb is where this frame is pointed.
+    const { speed, burstIn, paddling, bursting, freeBurst, relief, emptyClimb, freeClimb } = this.stepUpkeep(a, input, dt, def, L, dir, mag, justLight, justHeavy, justAbility, justDash);
+
     const controllable = a.holdT === 0 && (a.state === 'free' || a.state === 'guard' || (a.state === 'ability' && (def.mobileAbility || def.ability === 'shellUp' || def.ability === 'bristleFlare' || def.ability === 'ambushSurge')));
     const slowMult = abilitySpeed(a) * (a.state === 'guard' ? (def.ability === 'anchor' ? 0 : def.ability === 'enroll' ? .8 : .45) : (a.abilityActive && def.ability === 'shellUp') ? 0.35 : a.exhausted > 0 ? 0.7 : 1);
     const burstMult = controllable && (bursting || freeBurst) ? (1 + (def.burst - 1) * (freeBurst ? 1.25 : burstIn) * (a.controller === 'swarm' ? 0.55 : giantish ? 0.35 : 1)) : 1;
@@ -891,9 +899,12 @@ export class Game implements AiWorld {
       } else a.pulseT = 0;
     }
     if (controllable && mag > 0) {
-      desired.x += dir.x * mag * cruise * burstMult * pulse;
-      desired.y += dir.y * mag * cruise * burstMult * pulse;
-      desired.z += dir.z * mag * cruise * burstMult * pulse;
+      // On an empty bar a sprint that is only running because the climb is free must buy the climb
+      // and nothing else: the vertical takes the sprint, the horizontal swims at its own pace.
+      const along = emptyClimb ? 1 : burstMult;
+      desired.x += dir.x * mag * cruise * along * pulse;
+      desired.y += dir.y * mag * cruise * (emptyClimb && dir.y <= 0 ? 1 : burstMult) * pulse;
+      desired.z += dir.z * mag * cruise * along * pulse;
     }
     if (controllable && !def.ground) {
       const hover = jets ? 1.6 : 1;
@@ -1039,7 +1050,7 @@ export class Game implements AiWorld {
 
     // Everything the animal *decides* — aim, sense, the heavy button, the dash, the guard, the
     // attacks, and the state machine that runs each of them to its end.
-    this.stepActions(a, input, dt, { def, L, sf, justLight, justHeavy, justAbility, justDodge, justGuard, justLock, justSense, justDash, paddling, bursting, dir, mag, locked, jets });
+    this.stepActions(a, input, dt, { def, L, sf, justLight, justHeavy, justAbility, justDodge, justGuard, justLock, justSense, justDash, paddling, bursting, dir, mag, locked, jets, relief, freeClimb });
   }
 
   /**
@@ -1047,7 +1058,7 @@ export class Game implements AiWorld {
    * stamina bar. Runs before anything else in the frame because it settles what the rest of it can
    * afford — whether this body is sprinting, paddling, or out of breath altogether.
    */
-  private stepUpkeep(a: Actor, input: InputFrame, dt: number, def: ReturnType<typeof creature>, L: number, justLight: boolean, justHeavy: boolean, justAbility: boolean, justDash: boolean) {
+  private stepUpkeep(a: Actor, input: InputFrame, dt: number, def: ReturnType<typeof creature>, L: number, dir: Vec3, mag: number, justLight: boolean, justHeavy: boolean, justAbility: boolean, justDash: boolean) {
     // Timers
     a.stateT += dt;
     a.iframes = Math.max(0, a.iframes - dt);
@@ -1113,14 +1124,20 @@ export class Game implements AiWorld {
     // A rower is not doggy-paddling when it leaves the floor: the paddles are what it swims with,
     // so it keeps its sprint and its dash out in the water and only the walkers lose them.
     const paddling = def.ground && !a.grounded && !def.rowWalk;
-    const bursting = burstIn > 0.1 && a.stamina > 0 && a.state !== 'guard' && a.exhausted === 0 && !paddling;
+    // How much of this effort is climb, and so given away: an era may hand a body the vertical for
+    // nothing. At full relief an empty bar is no longer a reason not to drive — see `emptyClimb`,
+    // which keeps that sprint out of the horizontal, where it was never paid for.
+    const relief = RULES ? RULES.climbRelief(a, input, dir, mag) : 0;
+    const freeClimb = relief > 0.5;
+    const bursting = burstIn > 0.1 && (a.stamina > 0 || freeClimb) && a.state !== 'guard' && (a.exhausted === 0 || freeClimb) && !paddling;
+    const emptyClimb = bursting && a.stamina <= 0;
     if (def.ability === 'ambushSurge' && input.burst > .1 && !a.prev.burst && a.abilityCd <= 0) { a.burstT = 2.2; a.abilityCd = 10; }
     const freeBurst = a.burstT > 0;
-    if (bursting && !freeBurst) a.stamina -= BURST_STAMINA * burstIn * dt;
+    if (bursting && !freeBurst) a.stamina = Math.max(0, a.stamina - BURST_STAMINA * burstIn * dt * (1 - relief));
     else if (a.state === 'guard') a.stamina -= 3 * dt;
-    else if (a.hideMode !== 'camouflage') a.stamina = Math.min(a.staminaMax, a.stamina + (speed < 0.4 ? 24 : 14) * dt * (a.state === 'free' ? 1 : 0.5));
-    if (a.stamina <= 0) { a.stamina = 0; if (a.exhausted === 0) a.exhausted = 1.6; }
-    return { speed, burstIn, paddling, bursting, freeBurst };
+    else if (a.hideMode !== 'camouflage') a.stamina = Math.min(a.staminaMax, a.stamina + (speed < 0.4 ? 24 : 14) * dt * (a.state === 'free' ? 1 : 0.5) * (RULES?.staminaRegen(this, a) ?? 1));
+    if (a.stamina <= 0) { a.stamina = 0; if (a.exhausted === 0 && !freeClimb) a.exhausted = 1.6; }
+    return { speed, burstIn, paddling, bursting, freeBurst, relief, emptyClimb, freeClimb };
   }
 
   /**
@@ -1208,7 +1225,7 @@ export class Game implements AiWorld {
    * `Step` is what the earlier passes worked out about this frame; nothing here writes back to it.
    */
   private stepActions(a: Actor, input: InputFrame, dt: number, s: Step) {
-    const { def, L, sf, justLight, justHeavy, justAbility, justDodge, justGuard, justLock, justSense, justDash, paddling, bursting, dir, mag, locked, jets } = s;
+    const { def, L, sf, justLight, justHeavy, justAbility, justDodge, justGuard, justLock, justSense, justDash, paddling, bursting, dir, mag, locked, jets, relief, freeClimb } = s;
     // --- Actions ---
     if ((a.state === 'free' || a.state === 'guard') && a.hideMode !== 'burrowed' && a.hideMode !== 'descending') {
       // Aim (LT held): the camera owns the crosshair; whatever it reports is the target. Bots toggle lock.
@@ -1241,9 +1258,12 @@ export class Game implements AiWorld {
       // way. A neutral stick fires it along the body's own axis — ahead of a finned body, and out
       // behind a jetting shell, which is the way a nautiloid escapes and the way it is already
       // pointing while it does, so it leaves without turning first.
-      else if (justDash && a.stamina >= 10 && a.exhausted === 0 && a.dashCd === 0 && !a.dashUsed && !paddling) {
+      // A dash that is mostly climb is on the same terms as a sprint that is: it costs what is
+      // left of it after the relief, and an empty bar does not refuse it — the body just goes up
+      // rather than along (see `startDash`). There is always a way back to the surface.
+      else if (justDash && (a.stamina >= 10 || freeClimb) && (a.exhausted === 0 || freeClimb) && a.dashCd === 0 && !a.dashUsed && !paddling) {
         a.dashUsed = true;
-        this.startDash(a, def, mag > 0.3 ? dir : vscale(heading(a.yaw), jets ? -1 : 1), L, sf);
+        this.startDash(a, def, mag > 0.3 ? dir : vscale(heading(a.yaw), jets ? -1 : 1), L, sf, relief);
       }
       // Dodge (B for creatures that cannot guard, bots)
       else if (justDodge && a.controller !== 'player' && a.stamina >= 10 && a.exhausted === 0) this.startDodge(a, def, dir, mag, L, sf);
@@ -1655,7 +1675,7 @@ export class Game implements AiWorld {
     if (def.ability === 'combCruise') { a.burstT = 1; a.stamina = Math.min(a.staminaMax,a.stamina+4); }
   }
 
-  private startDash(a: Actor, def: ReturnType<typeof creature>, dir: Vec3, L: number, sf: number) {
+  private startDash(a: Actor, def: ReturnType<typeof creature>, dir: Vec3, L: number, sf: number, relief = 0) {
     // The tail-flip fires before the animal has decided anything: it goes straight back along its
     // own axis whatever the stick was asking for, and it costs the tail rather than a fin beat.
     const flip = !!def.tailFlip;
@@ -1663,11 +1683,17 @@ export class Game implements AiWorld {
     if (def.ground) d.y = 0;
     d = norm(d);
     a.state = 'dodge'; a.stateT = 0; a.stateDur = flip ? 0.5 : 0.42;
-    a.iframes = flip ? 0.5 : 0.42; a.stamina -= flip ? FLIP_STAMINA : 12; a.dashCd = flip ? 0.7 : 0.55;
+    // A body dashing on nothing but free climb gets the climb and not the ground: the horizontal
+    // half of the burst is what the stamina was for, and it has none. A flip is the exception —
+    // the reflex fires whatever is left, it just fires weakly (`flipLaunch`).
+    const cost = (flip ? FLIP_STAMINA : 12) * (1 - relief);
+    const empty = a.stamina < cost;
+    a.iframes = flip ? 0.5 : 0.42; a.stamina = Math.max(0, a.stamina - cost); a.dashCd = flip ? 0.7 : 0.55;
     // A punt needs the floor under it; out in the water there is nothing to push off.
     const gap = a.pos.y - groundHeight(this.world, a.pos.x, a.pos.z, []);   // own scratch: called mid-update
     const power = flip ? flipLaunch(a) : (L * 9.5 + 7) * (def.id === 'waptia' ? 1.2 : 1) * punting(a, gap);
-    a.vel.x = d.x * power; a.vel.y = def.ground ? a.vel.y : d.y * power * 0.7; a.vel.z = d.z * power;
+    const along = empty && !flip ? 0 : 1;
+    a.vel.x = d.x * power * along; a.vel.y = def.ground ? a.vel.y : d.y * power * 0.7; a.vel.z = d.z * power * along;
     a.dodgeDir = d;
     this.evadeSpecial(a, def, L);
     this.events.push({ kind: 'dodge', pos: { ...a.pos }, actor: a.id, player: a.player, strength: L });
