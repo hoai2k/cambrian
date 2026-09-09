@@ -36,6 +36,7 @@ export const CAMBRIAN_CREATURES: readonly CreatureDef[] = [
   {
     // No kind, for the same reason: Opabinia is the famous one, "opabiniid" explains nothing.
     id: 'opabinia', name: 'Opabinia', species: 'O. regalis',
+    grasp: true,
     tagline: 'Five eyes, one hose-nozzle claw, zero blind spots.',
     role: 'Reach specialist', ground: false, adultLength: 3.0,
     speed: 4.7, burst: 1.7, agility: 3.6, turnRate: 2.8, glide: 0.8,

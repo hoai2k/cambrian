@@ -25,9 +25,11 @@
       "Attack",
       "Heavy",
       "Eat",
-      "Dash"
+      "Dash",
+      "Grab"
     ],
-    "note": "Already articulated by the anchor pass (proboscis wind-up, jaw close, carry to the mouth); nothing replaced. Pending the user's review."
+    "note": "Already articulated by the anchor pass (proboscis wind-up, jaw close, carry to the mouth); nothing replaced. Pending the user's review.",
+    "grip": "Has a Grab clip; review it as a *held* grip. The proboscis closes on what it caught and keeps hold of it — the same pose carries the animal while it clings to something bigger — rather than snatching and letting go. Snatch (Y) is now a grab when the button is held, so the clip has to sit under a held press as well as a tap."
   },
   {
     "era": "cambrian",
@@ -223,7 +225,7 @@
       "Dash"
     ],
     "note": "Delivered 2026-09-09 by tools/creatures/motion/apply.mjs (performances/jaekelopterus.mjs); shipped clips kept as replaced/<name>. Pending the user's review in the viewer and a controller playtest.",
-    "grip": "The chelicerae close and hold \u2014 coordinated joints, not a rigid rotation \u2014 and the walking legs brace. Riding sets the pincers into a flank with the legs gripping."
+    "grip": "The chelicerae close and hold — coordinated joints, not a rigid rotation — and the walking legs brace. Riding sets the pincers into a flank with the legs gripping."
   },
   {
     "era": "devonian",
@@ -249,9 +251,11 @@
       "Attack",
       "Heavy",
       "Eat",
-      "Dash"
+      "Dash",
+      "Grab"
     ],
-    "note": "Delivered 2026-09-09 by tools/creatures/motion/apply.mjs (performances/palaeoisopus.mjs); shipped clips kept as replaced/<name>. Pending the user's review in the viewer and a controller playtest."
+    "note": "Delivered 2026-09-09 by tools/creatures/motion/apply.mjs (performances/palaeoisopus.mjs); shipped clips kept as replaced/<name>. Pending the user's review in the viewer and a controller playtest.",
+    "grip": "Has a Grab clip; review it as a held grip. The long legs fold around and brace — a spider's hold, not a poke — and the same bracing pose is what it wears clinging to a flank."
   },
   {
     "era": "devonian",
@@ -263,9 +267,11 @@
       "Attack",
       "Heavy",
       "Eat",
-      "Dash"
+      "Dash",
+      "Grab"
     ],
-    "note": "Delivered 2026-09-09 by tools/creatures/motion/apply.mjs (performances/manticoceras.mjs); shipped clips kept as replaced/<name>. Pending the user's review in the viewer and a controller playtest."
+    "note": "Delivered 2026-09-09 by tools/creatures/motion/apply.mjs (performances/manticoceras.mjs); shipped clips kept as replaced/<name>. Pending the user's review in the viewer and a controller playtest.",
+    "grip": "Has a Grab clip; review it as a held grip. Several arms close on the body and *stay* closed, the others adjusting around it, and the same hold reads as the shell hanging off a flank while clinging. Its own interpretation, not a copy of the orthocone's waveform."
   },
   {
     "era": "devonian",
@@ -277,9 +283,11 @@
       "Attack",
       "Heavy",
       "Eat",
-      "Dash"
+      "Dash",
+      "Grab"
     ],
-    "note": "Motion-v3 refined Attack/Bite/Heavy/Eat and authored-grasp runtime integrated as preview; full19/LOD7 actions. Actual 60-view art and 12 production rig/prey scenarios pass. Interactive game/controller playtest and broader individual quality review remain."
+    "note": "Motion-v3 refined Attack/Bite/Heavy/Eat and authored-grasp runtime integrated as preview; full19/LOD7 actions. Actual 60-view art and 12 production rig/prey scenarios pass. Interactive game/controller playtest and broader individual quality review remain.",
+    "grip": "Has a Grab clip; review it as a held grip. The crown closes proximal-to-distal and holds, tips still working; clinging is that hold with the shell trailing behind the arms rather than a lash."
   },
   {
     "era": "devonian",
@@ -307,22 +315,17 @@
       "Dash"
     ],
     "note": "Grab and Dash delivered 2026-09-08 by tools/creatures/motion/apply.mjs (performance in performances/hallucigenia.mjs); both are clips the rig never had, so nothing was replaced. Verified by the pipeline's contract checks, socket geometry (feet clamp to the midline under the trunk, spines untouched; the dash sweep stays under the body) and the built viewer. Pending the user's review and a controller playtest. Bite/Attack/Heavy/Eat remain unqueued for this animal.",
-    "grip": "Grabs with its FEET \u2014 the clawed lobopods, in pairs, clamped around the held body or hooked into the host while the dorsal spines stay clear. Never a mouth grab."
+    "grip": "Grabs with its FEET — the clawed lobopods, in pairs, clamped around the held body or hooked into the host while the dorsal spines stay clear. Never a mouth grab."
   },
   {
     "era": "cambrian",
     "id": "ottoia",
-    "status": "pending",
+    "status": "review",
     "scope": "attack-feeding-animation",
     "reviewClips": [
-      "Bite",
-      "Attack",
-      "Heavy",
-      "Eat",
-      "Grab",
-      "Dash"
+      "Grab"
     ],
-    "note": "Joins the pass for its grip: the everted pharynx takes hold.",
+    "note": "Grab delivered 2026-09-09 by tools/creatures/motion/apply.mjs (performances/ottoia.mjs) — the everted introvert curled over the catch, a clip the rig never had, so nothing was replaced. Its other clips are not queued. Pending the user's review in the viewer and a controller playtest.",
     "grip": "The eversible pharynx everts and its hooks set into the held body; riding means the introvert anchored into a flank, the trunk trailing."
   }
 ]
