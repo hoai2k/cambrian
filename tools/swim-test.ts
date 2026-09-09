@@ -209,7 +209,11 @@ const rockWorld = (boulders: Boulder[]) => ({
 
 // --- a plant is something to go round; you only go over one you drive straight at ---
 {
-  /** Walk a crawler at a plant, `off` units to the side of dead centre. */
+  /**
+   * Walk a crawler at a plant, `off` units to the side of dead centre. A body that hauls itself
+   * through weed has the leverage to bend the soft growth aside, but a sponge this size is still
+   * something to get over — that a thicket carries the same animal along is in locomotion-test.
+   */
   const atAPlant = (kind: 'sac' | 'spine', scale: number, off: number) => {
     const g = new Game('reef', [{ creature: 'olenoides', device: 'keyboard', ready: true }], 33);
     const p = g.players[0]; p.spawnProtect = 999; p.scale = 1; applyScaleStats(p, false);

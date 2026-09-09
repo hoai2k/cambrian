@@ -1,5 +1,5 @@
 /**
- * Devonian Domination: the era pack, its rung bands, standing, air, dead water, shore reach,
+ * Devonian Domination: the era pack, its rung bands, standing, breathing, dead water, shore reach,
  * armour and determinism, all headless. Run: npm run devonian
  *
  * The era is selected before the simulation modules are imported, because those read ACTIVE_ERA
@@ -237,56 +237,55 @@ ok(RULES !== undefined && !RULES.growthByNutrition, 'Devonian rules active: grow
   ok(RULES!.hint(g, 0) === undefined || typeof RULES!.hint(g, 0) === 'string', 'hint is optional text');
 }
 
-// ---- air: lungs need the surface ----
+// ---- breathing both ways: a stamina economy, not a countdown ----
+/**
+ * Nothing on this roster is lung-only, so nothing here can drown and nothing carries a meter that
+ * runs out (see `breathing` in src/content/creature-types.ts). What lungs buy is a place to go: a
+ * quarter of the usual stamina recovery under water, and the whole bar back on touching the surface.
+ */
 {
   const g = new Game('reef', [{ creature: 'tiktaalik', device: 'keyboard', ready: true }, { creature: 'coccosteus', device: 0, ready: true }]);
   const [tik, coc] = g.players;
-  const dt = devActor(g, tik), dc = devActor(g, coc);
-  tik.pos.y = SURFACE_Y - 20; coc.pos.y = SURFACE_Y - 20;
-  const inputs = new Map<number, InputFrame>([[0, { ...emptyInput(), sink: true }], [1, { ...emptyInput(), sink: true }]]);
-  for (let i = 0; i < 60 * 20; i++) tick(g, inputs);
-  ok(dt.air < 0.75 && dt.air > 0.5, `Tiktaalik spends air under water (${dt.air.toFixed(2)} after 20 s)`);
-  ok(dc.air === 1 && RULES!.hud(g, 1)!.air === undefined, 'gill breathers have no air meter');
-  ok(RULES!.hud(g, 0)!.air === dt.air, 'the air meter is on the HUD');
-  tik.pos.y = SURFACE_Y - 12; tik.prevT.y = tik.pos.y;               // the refill is what is under test, not the climb from the floor
-  const rise = new Map<number, InputFrame>([[0, { ...emptyInput(), rise: true }], [1, emptyInput()]]);
-  for (let i = 0; i < 60 * 30 && dt.air < 0.999; i++) tick(g, rise);
-  ok(dt.air > 0.99, `surfacing refills the lungs (${dt.air.toFixed(2)})`);
+  for (const p of [tik, coc]) { p.hatching = false; p.state = 'free'; p.stateT = 0; p.stateDur = 0; p.spawnProtect = 0; p.pos.y = 20; p.prevT.y = 20; p.stamina = 0; }
+  ok(RULES!.hud(g, 0)!.bimodal && !RULES!.hud(g, 1)!.bimodal, 'the HUD knows which bodies breathe both ways');
+  const sink = new Map<number, InputFrame>([[0, { ...emptyInput(), sink: true }], [1, { ...emptyInput(), sink: true }]]);
+  for (let i = 0; i < 60 * 5; i++) { tik.pos.y = 20; coc.pos.y = 20; tick(g, sink); }
+  const lung = tik.stamina / tik.staminaMax, gill = coc.stamina / coc.staminaMax;
+  ok(gill > 0.5, `gills recover at the shared rate (${(gill * 100).toFixed(0)}% in 5 s)`);
+  ok(lung > 0 && lung < gill * 0.4, `lungs recover far slower under water (${(lung * 100).toFixed(0)}% against ${(gill * 100).toFixed(0)}%)`);
+  // ...and the whole bar is waiting at the surface.
+  let gulps = 0;
+  tik.pos.y = SURFACE_Y - 2; tik.prevT.y = tik.pos.y;
+  g.step(1 / 60, new Map([[0, emptyInput()], [1, emptyInput()]]));
+  for (const e of g.events) if (e.kind === 'gulp') gulps++;
+  g.events.length = 0;
+  ok(tik.stamina === tik.staminaMax && gulps === 1, `one touch of the surface hands the whole bar back (${gulps} gulp)`);
 }
 
 /**
- * The warning has to be one you can act on. "Air is low, rise to the surface" is worth nothing if
- * holding rise from the seabed cannot reach the surface before the meter empties — and in a sea
- * sixty-four units deep with a warning at a quarter of a bar, it could not, at any size. So: from
- * the floor, at the moment the HUD first says so, holding nothing but rise gets a hatchling up.
+ * The climb is free, and free enough that an empty bar cannot strand anything down there: a sprint
+ * or a dash upward costs nothing, still fires on nothing, and on nothing drives only the climb.
  */
 {
-  for (const [id, scale] of [['tiktaalik', 0.13], ['rhinodipterus', 0.28], ['acanthostega', 0.22], ['tiktaalik', 1]] as const) {
+  const climb = (id: CreatureId, up: boolean, stamina: number) => {
     const g = new Game('reef', [{ creature: id, device: 'keyboard', ready: true }]);
     const p = g.players[0];
     p.hatching = false; p.state = 'free'; p.stateT = 0; p.stateDur = 0; p.spawnProtect = 0;
-    p.pos.y = groundHeight(g.world, p.pos.x, p.pos.z, []) + 1; p.prevT.y = p.pos.y;
-    const floorY = p.pos.y;
-    const d = devActor(g, p);
-    const rise = new Map<number, InputFrame>([[0, { ...emptyInput(), rise: true }]]);
-    const idle = new Map<number, InputFrame>([[0, emptyInput()]]);
-    // Sit on the sand until the HUD says the air is low, then hold nothing but rise. The body is
-    // pinned at the size under test each step: the moult ceremony would otherwise lerp it back.
-    let warnedAt = -1, warnedAir = 1, refilled = -1;
-    for (let i = 0; i < 60 * 200; i++) {
-      p.scale = scale; applyScaleStats(p, false);
-      if (warnedAt < 0) {
-        p.pos.y = floorY; p.prevT.y = floorY;
-        tick(g, idle);
-        if (RULES!.hud(g, 0)!.airLow) { warnedAt = i; warnedAir = d.air; }
-        continue;
-      }
-      tick(g, rise);
-      if (d.air >= 0.999) { refilled = i - warnedAt; break; }
-      if (d.air <= 0) break;
-    }
-    ok(refilled > 0, `${id} at scale ${scale} climbs ${(SURFACE_Y - floorY).toFixed(0)} units on rise alone inside the air its warning leaves it (warned at ${(warnedAir * 60).toFixed(0)} s of air, took ${refilled < 0 ? 'more — ran out' : (refilled / 60).toFixed(1) + ' s'})`);
-  }
+    p.pos.y = 20; p.prevT.y = 20; p.stamina = stamina; p.exhausted = 0;
+    const y0 = p.pos.y, x0 = p.pos.x, z0 = p.pos.z;
+    const f: InputFrame = up
+      ? { ...emptyInput(), my: 1, camPitch: -0.7, camYaw: p.yaw, burst: 1, rise: true }
+      : { ...emptyInput(), my: 1, camPitch: 0, camYaw: p.yaw, burst: 1 };
+    for (let i = 0; i < 60 * 3; i++) tick(g, new Map([[0, f]]));
+    return { spent: stamina - p.stamina, climbed: p.pos.y - y0, along: Math.hypot(p.pos.x - x0, p.pos.z - z0) };
+  };
+  const upFull = climb('tiktaalik', true, 100), alongFull = climb('tiktaalik', false, 100);
+  ok(upFull.spent < 1, `sprinting upward costs a lung nothing (${upFull.spent.toFixed(1)} stamina in 3 s)`);
+  ok(alongFull.spent > 15, `sprinting along still costs it (${alongFull.spent.toFixed(1)} stamina)`);
+  ok(climb('cheirolepis', true, 100).spent > 15, 'gills pay for the climb like everything else');
+  const empty = climb('tiktaalik', true, 0), emptyAlong = climb('tiktaalik', false, 0);
+  ok(empty.climbed > 8, `an empty bar still climbs (${empty.climbed.toFixed(1)} units in 3 s)`);
+  ok(emptyAlong.along < alongFull.along * 0.8, `but an empty sprint buys no ground (${emptyAlong.along.toFixed(1)} against ${alongFull.along.toFixed(1)} units)`);
 }
 
 /**
@@ -303,7 +302,6 @@ ok(RULES !== undefined && !RULES.growthByNutrition, 'Devonian rules active: grow
     const p = g.players[0];
     p.hatching = false; p.state = 'free'; p.stateT = 0; p.stateDur = 0; p.spawnProtect = 0;
     p.pos.y = SURFACE_Y - 14; p.prevT.y = p.pos.y;
-    devActor(g, p).air = 1;
     for (let i = 0; i < 60 * 10; i++) {
       p.scale = scale; applyScaleStats(p, false);
       const f: InputFrame = how === 'rise'
@@ -322,59 +320,26 @@ ok(RULES !== undefined && !RULES.growthByNutrition, 'Devonian rules active: grow
   ok(!leaves('michelinoceras', 1, 'swim'), 'and a shell never leaves the water at all');
 }
 
-/**
- * A lung surfaces for itself. Air is not a thing to be reminded about and then micromanaged: once
- * the meter is low the animal heads up on its own, and staying down is a decision you hold the
- * sink button to make.
- */
-{
-  const drift = (sink: boolean, air: number) => {
-    const g = new Game('reef', [{ creature: 'rhinodipterus', device: 'keyboard', ready: true }]);
-    const p = g.players[0];
-    p.hatching = false; p.state = 'free'; p.stateT = 0; p.stateDur = 0; p.spawnProtect = 0;
-    p.pos.y = 20; p.prevT.y = 20;
-    const d = devActor(g, p);
-    const y0 = p.pos.y;
-    const f = new Map<number, InputFrame>([[0, sink ? { ...emptyInput(), sink: true } : emptyInput()]]);
-    for (let i = 0; i < 60 * 6; i++) { d.air = air; tick(g, f); }
-    return p.pos.y - y0;
-  };
-  const up = drift(false, 0.15), down = drift(true, 0.15);
-  ok(up > 8, `low on air and hands off, a lungfish climbs by itself (${up.toFixed(1)} units in 6 s)`);
-  ok(Math.abs(drift(false, 1)) < 3, 'with a full breath it stays where it is put');
-  ok(down < -5, `holding sink overrides the urge and takes it back down (${down.toFixed(1)} units)`);
-}
-
-/** The low-air heartbeat: a pulse while it lasts, quickening, and silence once the lungs are full. */
+/** The winded heartbeat: a nudge toward the surface while the bar is low, and silence once it is not. */
 {
   const g = new Game('reef', [{ creature: 'tiktaalik', device: 'keyboard', ready: true }]);
   const p = g.players[0];
   p.hatching = false; p.state = 'free'; p.stateT = 0; p.stateDur = 0; p.spawnProtect = 0;
-  p.pos.y = 20; p.prevT.y = 20;
-  const d = devActor(g, p);
-  const count = (air: number, seconds: number, sink = true) => {
+  const count = (stamina: number, seconds: number, y: number) => {
     let n = 0;
-    const f = new Map<number, InputFrame>([[0, sink ? { ...emptyInput(), sink: true } : emptyInput()]]);
     for (let i = 0; i < 60 * seconds; i++) {
-      d.air = air; p.pos.y = 20; p.prevT.y = 20;
-      g.step(1 / 60, f);
-      for (const e of g.events) if (e.kind === 'airLow') n++;
+      p.stamina = stamina * p.staminaMax; p.pos.y = y; p.prevT.y = y;
+      g.step(1 / 60, new Map([[0, { ...emptyInput(), sink: true }]]));
+      for (const e of g.events) if (e.kind === 'winded') n++;
       g.events.length = 0;
     }
     return n;
   };
-  const easy = count(0.18, 12), hard = count(0.05, 12);
-  ok(easy > 0 && hard > easy, `the low-air pulse quickens as the meter empties (${easy} beats then ${hard} over 12 s)`);
-  ok(count(1, 12) === 0, 'and there is no pulse on a full breath');
-  p.pos.y = SURFACE_Y - 2; p.prevT.y = p.pos.y;
-  let atSurface = 0;
-  for (let i = 0; i < 60 * 6; i++) {
-    d.air = 0.05; p.pos.y = SURFACE_Y - 2; p.prevT.y = p.pos.y;
-    g.step(1 / 60, new Map([[0, emptyInput()]]));
-    for (const e of g.events) if (e.kind === 'airLow') atSurface++;
-    g.events.length = 0;
-  }
-  ok(atSurface === 0, 'nor at the surface, where the answer is already in reach');
+  const low = count(0.2, 12, 20), spent = count(0.0, 12, 20);
+  ok(low > 0 && spent > low, `the winded pulse quickens as the bar empties (${low} beats then ${spent} over 12 s)`);
+  ok(count(0.3, 12, 20) === 0, 'and nothing above a quarter bar, which is where it starts');
+  ok(count(1, 12, 20) === 0, 'nor on a full bar');
+  ok(count(0, 6, SURFACE_Y - 2) === 0, 'nor at the surface, where the bar is already back');
 }
 
 // ---- dead water: gills suffer, lungs do not, leaving scores ----
@@ -391,7 +356,7 @@ ok(RULES !== undefined && !RULES.growthByNutrition, 'Devonian rules active: grow
   const dc = devActor(g, coc), dt = devActor(g, tik);
   ok(dc.deadZoneIn && dt.deadZoneIn, 'both are inside the zone');
   ok(coc.hp < hp0 && coc.stamina < coc.staminaMax * 0.5, `dead water drains a gill breather (hp ${hp0.toFixed(0)} → ${coc.hp.toFixed(0)}, stamina ${coc.stamina.toFixed(0)})`);
-  ok(tik.hp >= hpT - 1e-6 && devActor(g, tik).deadT === 0, `an air breather is untouched by anoxia (hp ${hpT.toFixed(1)} → ${tik.hp.toFixed(1)}, deadT ${devActor(g, tik).deadT})`);
+  ok(tik.hp >= hpT - 1e-6 && devActor(g, tik).deadT === 0, `a bimodal breather is untouched by anoxia (hp ${hpT.toFixed(1)} → ${tik.hp.toFixed(1)}, deadT ${devActor(g, tik).deadT})`);
   ok(RULES!.hud(g, 0)!.deadZones.length === 1 && RULES!.hud(g, 0)!.inDeadZone, 'the HUD carries the zone for the radar');
   const before = dc.standing;
   s.deadZones.length = 0;
@@ -517,6 +482,85 @@ ok(RULES !== undefined && !RULES.growthByNutrition, 'Devonian rules active: grow
   ok(rungOf(ladderMark(g, p)) === 4, `...arriving fully grown when asked (rung ${rungOf(ladderMark(g, p))})`);
   p.teleportCd = 0;
   ok(g.changeCreature(0, 'coccosteus', false) && rungOf(ladderMark(g, p)) === 0, 'and the body it left is handed back where it was');
+}
+
+// ---- the era's own ways of getting about (docs/research/locomotion-ideas.md) ----
+{
+  const solo = (id: CreatureId, at?: { x: number; z: number }) => {
+    const g = new Game('reef', [{ creature: id, device: 'keyboard', ready: true }], 17);
+    const p = g.players[0];
+    const x = at?.x ?? 20, z = at?.z ?? -140;
+    p.pos = { x, y: groundHeight(g.world, x, z, []) + 8, z };
+    p.vel = { x: 0, y: 0, z: 0 }; p.yaw = 0; p.spawnProtect = 999;
+    const step = (f: Partial<InputFrame> = {}) => { tick(g, new Map<number, InputFrame>([[0, { ...emptyInput(), ...f } as InputFrame]])); p.spawnProtect = 999; };
+    return { g, p, step };
+  };
+
+  // A punt needs the floor to push off: out in the water the same button barely moves the animal.
+  // Acanthostega is the one that shows it — a swimmer that shoves off the bottom, not a walker
+  // that never leaves it.
+  const punt = (down: boolean) => {
+    const { g, p, step } = solo('acanthostega');
+    const floor = groundHeight(g.world, p.pos.x, p.pos.z, []);
+    p.pos.y = down ? floor + lengthOf(p) * 0.2 : floor + 14;
+    for (let i = 0; i < 20; i++) step();
+    const from = { ...p.pos };
+    step({ my: 1, dash: true });
+    for (let i = 0; i < 24; i++) step();
+    return Math.hypot(p.pos.x - from.x, p.pos.z - from.z);
+  };
+  const onFloor = punt(true), inWater = punt(false);
+  ok(onFloor > inWater * 1.8, `a punt has its legs with the bottom in reach (${onFloor.toFixed(1)} units against ${inWater.toFixed(1)} up in the water)`);
+
+  // Two gaits, told apart by the water. Out in the channel, where the flow is real, a eurypterid
+  // that has lifted off its legs and is rowing goes where the water goes; the same animal walking
+  // on the bottom barely feels it.
+  const carried = (rowing: boolean) => {
+    const { p, step } = solo('jaekelopterus', { x: 50, z: -350 });
+    for (let i = 0; i < 60; i++) step(rowing ? { rise: true } : {});
+    const from = { ...p.pos };
+    for (let i = 0; i < 420; i++) step(rowing ? { rise: true } : {});
+    return { moved: Math.hypot(p.pos.x - from.x, p.pos.z - from.z), grounded: p.grounded };
+  };
+  const walking = carried(false), rowing = carried(true);
+  ok(!rowing.grounded && walking.grounded, `the paddles take it off the floor and the legs keep it on (rowing grounded=${rowing.grounded}, walking grounded=${walking.grounded})`);
+  ok(walking.moved < rowing.moved * 0.6, `walking holds station where rowing drifts (${walking.moved.toFixed(1)} against ${rowing.moved.toFixed(1)} units in the channel)`);
+
+  // A rigid shield with no paired fins behind it cannot tip quickly.
+  const pitchIn = (id: CreatureId) => {
+    const { p, step } = solo(id);
+    for (let i = 0; i < 30; i++) step({ my: 1 });
+    const from = p.pitch;
+    let fastest = 0;
+    for (let i = 0; i < 45; i++) { const was = p.pitch; step({ my: 1, sink: true }); fastest = Math.max(fastest, Math.abs(p.pitch - was) * 60); }
+    return { turned: Math.abs(p.pitch - from), fastest };
+  };
+  const rigid = pitchIn('doryaspis'), finned = pitchIn('cheirolepis');
+  ok(rigid.fastest <= creature('doryaspis').pitchRate! + 1e-6, `a rigid body cannot tip faster than its shield allows (${rigid.fastest.toFixed(2)} of ${creature('doryaspis').pitchRate} rad/s)`);
+  ok(finned.fastest > rigid.fastest * 1.5, `...where a finned body tips as fast as it likes (${finned.fastest.toFixed(2)} rad/s)`);
+  ok(rigid.turned < finned.turned, `...so it takes longer to commit to a dive (${rigid.turned.toFixed(2)} rad against ${finned.turned.toFixed(2)})`);
+
+  // The era's own tail-flip and its one body with no front.
+  const flip = (() => {
+    const { p, step } = solo('nahecaris');
+    for (let i = 0; i < 20; i++) step();
+    const from = { ...p.pos }, h = heading(p.yaw);
+    step({ my: 1, dash: true });
+    for (let i = 0; i < 24; i++) step({ my: 1 });
+    return h.x * (p.pos.x - from.x) + h.z * (p.pos.z - from.z);
+  })();
+  ok(flip < -2, `Nahecaris flips away from what touched it (${flip.toFixed(1)} units astern)`);
+  const star = (() => {
+    const { p, step } = solo('furcaster');
+    for (let i = 0; i < 10; i++) step();
+    const yaw0 = p.yaw;
+    for (let i = 0; i < 90; i++) step({ mx: 1 });
+    return Math.abs(wrapAngle(p.yaw - yaw0));
+  })();
+  ok(star < 0.2, `a brittle star rows sideways without turning its disc (${star.toFixed(2)} rad)`);
+
+  // Titanichthys strains what it swims through, and nothing at all while it is stopped.
+  ok(!!creature('titanichthys').ramFeed && creature('titanichthys').diet === 'filter', 'the gentle giant is a ram feeder');
 }
 
 // ---- every sound the era asks for exists (the shared library is NOT under assets/devonian/) ----

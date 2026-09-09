@@ -11,7 +11,7 @@ import portraits from '../../../public/assets/creatures/schemes/manifest.json';
 
 export const CAMBRIAN = defineEra({
   id: 'cambrian',
-  title: 'Cambrian Explosion',
+  title: 'Cambrian Conquest',
   copy: { tagline: 'Eat. Grow. Fight. Run.', taglineEm: '508 million years ago, everything was hungry.', loading: 'WAKING THE REEF…', lose: 'THE REEF WINS', settingsKey: 'cambrian-settings', sibling: { title: 'Devonian Domination', path: 'devonian/', blurb: '133 million years later' } },
   modes: [
     { id: 'rise', name: 'Rise', blurb: 'Hatch as a larva. Eat, grow, fight, hide. Reach Apex and hold it for ninety seconds. Share the feast with the others, or eat them.', players: '1–4' },

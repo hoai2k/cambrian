@@ -110,6 +110,8 @@ export interface Actor {
    * which is the immersive way to play. Display only — nothing in the simulation reads it.
    */
   senseMode: boolean;
+  /** Where a pulse swimmer's bell is in its cycle, seconds. Unused by everything else. */
+  pulseT: number;
   /** How long this body still reads as revealed: the whip search, and a hidden body found by one. */
   senseT: number;
   burstT: number;          // free burst timer (ambush surge)
@@ -220,6 +222,6 @@ export const isCoop = (m: Mode) => COOP_MODES.includes(m);
 export interface Prompt { text: string; t: number; }
 
 export interface WorldEvent {
-  kind: 'hit' | 'kill' | 'eat' | 'tierUp' | 'parry' | 'guardBreak' | 'burst' | 'escape' | 'noticed' | 'hunted' | 'dodge' | 'ability' | 'grab' | 'moult' | 'death' | 'silt' | 'stagger' | 'sense' | 'pounce' | 'swallow' | 'routed' | 'disintegrate' | 'teleport' | 'gulp' | 'airLow' | 'anoxia' | 'beach' | 'shoalJoin' | 'shellCrush' | 'breach' | 'splash';
+  kind: 'hit' | 'kill' | 'eat' | 'tierUp' | 'parry' | 'guardBreak' | 'burst' | 'escape' | 'noticed' | 'hunted' | 'dodge' | 'ability' | 'grab' | 'moult' | 'death' | 'silt' | 'stagger' | 'sense' | 'pounce' | 'swallow' | 'routed' | 'disintegrate' | 'teleport' | 'gulp' | 'winded' | 'anoxia' | 'beach' | 'shoalJoin' | 'shellCrush' | 'breach' | 'splash';
   pos: Vec3; actor: number; other?: number; strength?: number; player?: number;
 }

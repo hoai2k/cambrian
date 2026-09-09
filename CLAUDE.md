@@ -1,4 +1,4 @@
-# Cambrian Explosion — project notes for Claude
+# Cambrian Conquest — project notes for Claude
 
 ## Policy: finish on `main`
 
@@ -62,6 +62,13 @@ unless the user explicitly asks for a PR. Steps:
   slow, turn sharp when slow, fast-start on sprint) is the `swim` hook in `src/sim/devonian/swim.ts`.
   Devonian growth is five geometric stages per creature (`stageScale` in `src/sim/devonian/state.ts`,
   hatchlings no shorter than 0.6 units); hatchlings are placed inside plant cover (`spawnInCover`).
+- How a body gets about, where that is something other than swimming forward, is a set of traits on
+  `CreatureDef` — the tail-flip, a body with no front, a medusa's pulse, hauling through weed,
+  punting, the row/walk gait, a rate-limited pitch, ram feeding, drifting and clinging. The
+  mechanics live in `src/sim/locomotion.ts` and are keyed off the creature, never the era, because
+  the same trait turns up in both: `npm run locomotion` covers the Cambrian bodies and
+  `npm run devonian` the Devonian ones. Which animal has what, and how well each is actually
+  attested, is `docs/research/locomotion-ideas.md`.
 - Seabed scenery collides as the shape it is drawn with: `src/content/prop-shapes.json` is measured
   off the prop GLBs by `npm run shapes` and is what `src/sim` collides against (footprints in
   `src/sim/footprint.ts`). Any new or changed instanced prop must re-run `npm run shapes`, and
@@ -91,6 +98,15 @@ unless the user explicitly asks for a PR. Steps:
   `public/fonts/fonts.css`, which each entry page links. Both are OFL, and the licences ship
   beside them. Going through Google cost a render-blocking third-party request and failed outright
   on any network that does not allow it, our own headless browser included.
+- Delivered brand art lands in `intake/` as the original PNG and is converted by `npm run brand`
+  (`tools/brand-intake.mjs`) into `public/assets/brand/`. The wordmark's white page is knocked out
+  by how *colourless* a bright pixel is, not how bright — the gold has highlights as bright as the
+  paper — and edge pixels are un-blended from that white so no pale fringe shows over the sea.
+  `intake/` is a handoff inbox, not an archive: convert, check the result where it is actually used,
+  then delete the sources from it in the same commit, so anything left sitting there means art has
+  been handed over and not yet integrated. Nothing is lost — the originals stay in git history and
+  the conversion is deterministic, so a recovered source reproduces the shipped asset exactly.
+  See `intake/README.md`.
 - All docs live in `docs/`. Design docs are in `docs/redesign/`. Image, glyph and prop
   needs go in `docs/image-requests.md` and move to `docs/image-requests-history.md` once
   delivered and integrated; sound and music needs go in `docs/audio-requests.md`.

@@ -90,8 +90,21 @@ export interface CreatureDef {
   armour?: number;
   /** This creature's heavy cuts through armour: 1 ignores it entirely, 0.5 halves it. */
   armourPierce?: number;
-  /** Air breathers carry an air meter and must surface; everything else breathes water. */
-  breathing?: 'gill' | 'air';
+  /**
+   * How this animal gets its oxygen. `gill` is water and nothing else. `bimodal` is lungs *as well
+   * as* gills — it can stay under indefinitely, and going up for a breath is worth something rather
+   * than being the thing that keeps it alive.
+   *
+   * The three the Devonian roster marks bimodal are all bimodal in the literature: Acanthostega's
+   * fish-like internal gills are the whole point of Coates & Clack 1991; Tiktaalik kept its gills
+   * and ventilated them by buccal pumping after losing the bony operculum, with spiracles for
+   * supplementary air; and Rhinodipterus is a *marine* Devonian dipnoan with the buccal-pump kit for
+   * air breathing — obligate air breathing with reduced gills is a modern Protopterus trait, not a
+   * Devonian marine one. So nothing on this roster is lung-only, and there is deliberately no value
+   * for one: an obligate air breather would drown without the surface, which is a different mechanic
+   * (a meter, a warning, a death) and should be added with that mechanic rather than in advance.
+   */
+  breathing?: 'gill' | 'bimodal';
   /** How far past the shore wall this creature may push (world units). 0 for swimmers. */
   shoreReach?: number;
   /** Chambered shell: backward jet sprint, free buoyancy, withdraw on block. */
@@ -104,5 +117,36 @@ export interface CreatureDef {
   noBite?: boolean;
   /** Locality label for the selection card (the roster mixes places and times, and says so). */
   locality?: string;
+
+  // ---- How this body gets about (docs/research/locomotion-ideas.md). Shared by both eras: a
+  // creature that sets none of these swims, walks and dashes exactly as it always did.
+  /**
+   * `omnidirectional`: no front. A brittle star picks a lead arm and rows, and a ctenophore's comb
+   * rows beat any way at all, so neither turns to travel — the heading is decoupled from the stick
+   * and only aiming points the body. `pulse`: a medusa's bell. Thrust arrives in contractions with
+   * a long free coast between them, so the animal surges rather than cruises; it is cheap to swim
+   * and slow to answer the stick.
+   */
+  swimStyle?: 'omnidirectional' | 'pulse';
+  /**
+   * The caridoid escape reaction: the abdomen snaps under the body and throws it backwards, away
+   * from whatever touched it, with no steering and a heavy stamina cost. Replaces this animal's
+   * dash and dodge.
+   */
+  tailFlip?: boolean;
+  /** Hauls through the plants rather than swimming past them: cover carries this body instead of dragging on it. */
+  weedWalk?: boolean;
+  /** Pushes off the bottom for a long glide. The dash only has its legs with the floor in reach. */
+  punt?: boolean;
+  /** Paddles in open water, walks on the floor: down there the current barely moves it. */
+  rowWalk?: boolean;
+  /** A rigid body with no paired fins behind the shield: the most it can change its pitch, rad/s. */
+  pitchRate?: number;
+  /** The mouth is a net, and a net only works with water going through it: filtering needs way on. */
+  ramFeed?: boolean;
+  /** Holds a depth and lets the sea carry it: full drift on a neutral stick, and it rises at night. */
+  drift?: boolean;
+  /** Holds onto rock. No face is a cliff to this body, however steep or however far above it. */
+  cling?: boolean;
 }
 

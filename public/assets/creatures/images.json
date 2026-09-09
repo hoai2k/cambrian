@@ -1,7 +1,7 @@
 {
   "anomalocaris": {
     "glbSha256": "065903bc6b0c4ec80162890474b55f506a85914d959dd0d548d580306ee13039",
-    "appearanceSha256": "25432d3d6ec2047127402b5ff35d420aeac3b9e4b390931fbe045b48c0391388",
+    "appearanceSha256": "649cd4e96cdd528d9807f6c86c69f0a86f395f2b87d3ff6caab1453dedbe9f2c",
     "clips": [
       "replaced/Attack",
       "Death",
@@ -33,7 +33,7 @@
   },
   "canadia": {
     "glbSha256": "50550cee4234961203da8bb2bd430e50cd6f19a6137e4001c73d33074134ba4a",
-    "appearanceSha256": "4032da11902bcdb5fa24299ea451bb420c209859a009318e794e83f158f67380",
+    "appearanceSha256": "3f02727694631ca5978822bcd959acbc59c126482c77a0f07706255d3a1034ea",
     "clips": [
       "Attack",
       "Death",
@@ -60,7 +60,7 @@
   },
   "hallucigenia": {
     "glbSha256": "6f8e6557601e62e4adeedc2377c33cba01afebe8e7d22192de778ccdd93beea1",
-    "appearanceSha256": "3db69ba54ef5dd5751959516e60a4094e875bafed912ab804d0668508880a73c",
+    "appearanceSha256": "abf7f8379eb77d9d89f8f4228c58c935f8598d72ef5abc93e65edb0413f5dc4f",
     "clips": [
       "Ability",
       "Attack",
@@ -89,7 +89,7 @@
   },
   "marrella": {
     "glbSha256": "a29c42b7fba3811eecec7e6f64c78ad8b546d9f81349946cfe92c495a76a4ce3",
-    "appearanceSha256": "48ae598c5997657a4b629a2f2399db76bda733ef0c7f7ff15e4d90837ff46f7a",
+    "appearanceSha256": "34977730534ecf2717f6cf292aaf252dc338c1838aa950c259b67acb9de52194",
     "clips": [
       "replaced/Attack",
       "Crawl",
@@ -120,7 +120,7 @@
   },
   "olenoides": {
     "glbSha256": "e11d37abc66c6fc174554d7a874cb1a4bed49fff9b7da291c36f2a266fb65155",
-    "appearanceSha256": "56203f97840802a9db4682e979e8be3a7ee7726a5d36b288bc6bbe14c4db61fb",
+    "appearanceSha256": "2043dff4ea8da80b4def115d74af14658475eabd78634cc58ab365d71098361a",
     "clips": [
       "replaced/Attack",
       "Crawl",
@@ -151,7 +151,7 @@
   },
   "opabinia": {
     "glbSha256": "894891eb756db62d3895865fb9a1c26399d05e4d57d07724975d5e5f3c109c1f",
-    "appearanceSha256": "abf95465892ce8a7443b817caaf7630621210336c44aeabdb71eec907e620209",
+    "appearanceSha256": "0ad74ebda3cf983886857cb0313319a76cb351a06064e1cc05ecd81bb70d32ae",
     "clips": [
       "Attack",
       "Death",
@@ -179,7 +179,7 @@
   },
   "waptia": {
     "glbSha256": "9dcd299cb1f5246c731f93347498346c3481d0c59abf002c02c2607a4d5a479c",
-    "appearanceSha256": "b9cdc4e1696eeffce34aa3b8dbdee7636a851925f13a12d7cc826cca0649b498",
+    "appearanceSha256": "4f6614d39adb5d662debfa7f6890ffdb5b162efb7b6be4a7189b56e3e404a956",
     "clips": [
       "replaced/Attack",
       "Death",
@@ -208,7 +208,7 @@
   },
   "wiwaxia": {
     "glbSha256": "e5726fb25301d9851feed33f45f8d12961c4d9a133902aac016f3d985d5b9d65",
-    "appearanceSha256": "2b2be03bd0bacf45961049101b069419274070885152b6d7c8c9e5959c0efccd",
+    "appearanceSha256": "1ffd5b7261d8d7f910eb89d402fb78ad3efc1c14beba5222089dc6efb1823eed",
     "clips": [
       "Attack",
       "Crawl",
@@ -235,7 +235,7 @@
   },
   "burgessomedusa": {
     "glbSha256": "a02ce57f3ae03f734ec920538bc3d76187273aab2403a4bf12e3e03fed6b2076",
-    "appearanceSha256": "cc79243cfce1bfaf36fec448891df4cd0ce080bd34e44b75ba84072e3970db23",
+    "appearanceSha256": "9e0667c6f345c4520fed11731aaec7ea10de5ba7f320cb9fd437505c4be459ae",
     "clips": [
       "Ability",
       "Attack",
@@ -262,7 +262,7 @@
   },
   "cambroraster": {
     "glbSha256": "8481c903b5bd3cdb3f4925d62e7a7999f66fa31743915f88bef3398090cc5d4e",
-    "appearanceSha256": "06ab6eb5ec5988c289fe8ec020a407d96ad860f85e5637a88f7009b139ffc002",
+    "appearanceSha256": "197909d46071e4608dfad4e2df4d6aca84f9a9088481c0103e6fa3c274f70375",
     "clips": [
       "Ability",
       "Attack",
@@ -289,7 +289,7 @@
   },
   "ctenorhabdotus": {
     "glbSha256": "53dc1eff94165e36b7d163b7748a2e701581c76ac571c403a6ab53101f43b3e8",
-    "appearanceSha256": "23432a1cf5e7cb5b6d6ddd277a971bbad92fa8b96cb45c379eb7ab9b02eb79bd",
+    "appearanceSha256": "744790884dc2b02f18746e6dfc6871ea42d213bb1e8dee415d15322282abbfe9",
     "clips": [
       "Ability",
       "Attack",
@@ -316,7 +316,7 @@
   },
   "isoxys": {
     "glbSha256": "69427575d8bf033d87f0015940917e9079bc9e27ba97c5bea7e892ec3cb73c05",
-    "appearanceSha256": "6d7933f03afa2b579fbb1e7d7dceb7d3122f035adadd0438fd57c96bee9a25a4",
+    "appearanceSha256": "fe5c743af1ab8731e1003d8d0f3f56251e120e459b2678ae11bee83f3511123b",
     "clips": [
       "Ability",
       "Attack",
@@ -343,7 +343,7 @@
   },
   "leanchoilia": {
     "glbSha256": "eb68d9496abb20f6a2aaeb8597bfc60c58832d5df8a6d0521fc8628b96d55519",
-    "appearanceSha256": "8e89abfacb6b520c1a8e1c30e4a438323c8960f8813c4a9a085b87ada4e051b4",
+    "appearanceSha256": "de1533d479f2d1804de76b9a9163e7e94ba32f862d80dcb4f1297c44ab08e66c",
     "clips": [
       "Ability",
       "Attack",
@@ -370,7 +370,7 @@
   },
   "nectocaris": {
     "glbSha256": "90ea973c4220c70155dd7ea109717e9b536969420dbf38ecc45152afbee1a76f",
-    "appearanceSha256": "32ad7cbe73e1a27367c43f09465210d4fdaa9dc7f964151cb71bf995bd695a29",
+    "appearanceSha256": "fff7635ed133937fec35e607eb61f272c955ba761edc5adc23798b2da8808e8b",
     "clips": [
       "Ability",
       "Attack",
@@ -398,7 +398,7 @@
   },
   "odaraia": {
     "glbSha256": "bf21bc96020a30ba6b210461e78ecf85ae0e6cbc33f1980157c40eea41bf2a04",
-    "appearanceSha256": "4212729ba299472da09e05644db45d52d129fc36254a04d3bb372c33a823a44e",
+    "appearanceSha256": "7ccf832ca354836785f16da879ff9da18b0d28f618f2dc2d6d370abae340462b",
     "clips": [
       "Ability",
       "Attack",
@@ -425,7 +425,7 @@
   },
   "odontogriphus": {
     "glbSha256": "d8b773d65c0a817d23ee5fbd27184ac0cf9fb26540ca4031d9873bd9f36fb1ef",
-    "appearanceSha256": "325810e1332b16c9928ae86ff62f04bf78e529777abcb949abe9b854e0c48133",
+    "appearanceSha256": "e01ac1261bbe14d7de90b0ce17f80d070a0a406223011525da4160113f117fbe",
     "clips": [
       "Ability",
       "Attack",
@@ -452,7 +452,7 @@
   },
   "ottoia": {
     "glbSha256": "aa7b0b3999bdbe13d2cab8593e6ae2ef8deef4e45b97af3e18be991895f6a221",
-    "appearanceSha256": "ddce34bb59896b7d980de2a08ad69f026dc957a99fe368da62642c0959862559",
+    "appearanceSha256": "301e2940fbd10972184ab1ab2dff48298bae3b32acbe92ef6769a421085be2f0",
     "clips": [
       "Ability",
       "Attack",
@@ -479,7 +479,7 @@
   },
   "pikaia": {
     "glbSha256": "d8680d9842f11d370c80124e372883888126848878efe79bd8ca353138265d73",
-    "appearanceSha256": "9030de1acc986802df7525ac9d5733c625cb6bd49133e245635d208ff116c9a8",
+    "appearanceSha256": "2ed56a226674c56214f1892e52a9bba39caa88179f7901e2fc27cec3fee9dc70",
     "clips": [
       "Ability",
       "Attack",
@@ -506,7 +506,7 @@
   },
   "sidneyia": {
     "glbSha256": "7c7fbfe40085b6fee003a476152526a0e05d03cbf351c0432ce61b02166ff1a3",
-    "appearanceSha256": "d0320fc71739b3c8b45bab8752e07a292f9867992559cd2e16726007e4c0eac6",
+    "appearanceSha256": "d3c8936a6af7468f031d7dd64cc6781352fce9046080f4bdf635316ff62fe176",
     "clips": [
       "Ability",
       "Attack",
@@ -534,7 +534,7 @@
   },
   "tamisiocaris": {
     "glbSha256": "56855bd30d6bdf7a558a1c1850c327b5c71621df3d2ec3aa23762371b12a4484",
-    "appearanceSha256": "e9aff9ba275cbb17e29d9ffdb6b471375f7d3e6c5ca0557fe8962dd76ecf461e",
+    "appearanceSha256": "2d7c7b3a9bc4d108b232c7a9379c7363cc90d6a69a827560b75d453cc1641ba3",
     "clips": [
       "Ability",
       "Attack",
@@ -561,7 +561,7 @@
   },
   "vetulicola": {
     "glbSha256": "7ec986872f47b3599c497bcb0e6a30daca1b9654575ed7a33873c70b817f7f5c",
-    "appearanceSha256": "ad21f0db805c4023f0825e0649df664543d4d8b3c1460e4e8ceda0984e9f23d9",
+    "appearanceSha256": "ddad921a98241f3d1ddfa544b35ec8d138b20423b6e0b6584d4361287e332e81",
     "clips": [
       "Ability",
       "Attack",

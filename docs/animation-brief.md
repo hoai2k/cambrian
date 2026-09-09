@@ -1,4 +1,4 @@
-# Animation brief — new clips for Cambrian Explosion
+# Animation brief — new clips for Cambrian Conquest
 
 > **Delivered.** The 71 clips this brief asked for were authored and appended
 > to the original eight GLBs; the delivery record is in
