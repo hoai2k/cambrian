@@ -2048,8 +2048,8 @@
     "file": "nectocaris.glb",
     "source": "tools/creatures/soft/anchors.json",
     "newSpecimen": true,
-    "updatedSHA256": "90ea973c4220c70155dd7ea109717e9b536969420dbf38ecc45152afbee1a76f",
-    "bytes": 2461956,
+    "updatedSHA256": "c50871c3eb78bf98fe5c19874f8201731b8791d8b4785819d982f55247ef707f",
+    "bytes": 2596792,
     "changedClips": [],
     "anchors": [
       {
@@ -2236,8 +2236,8 @@
     "file": "ottoia.glb",
     "source": "tools/creatures/soft/anchors.json",
     "newSpecimen": true,
-    "updatedSHA256": "aa7b0b3999bdbe13d2cab8593e6ae2ef8deef4e45b97af3e18be991895f6a221",
-    "bytes": 2307764,
+    "updatedSHA256": "2a26b121394df1bb2d7c2005c6b8b1ff47a39297356aef73dc112c1d7919aba6",
+    "bytes": 2319740,
     "changedClips": [],
     "anchors": [
       {
@@ -2512,8 +2512,8 @@
     "file": "sidneyia.glb",
     "source": "tools/creatures/arthropods/anchors.json",
     "newSpecimen": true,
-    "updatedSHA256": "7c7fbfe40085b6fee003a476152526a0e05d03cbf351c0432ce61b02166ff1a3",
-    "bytes": 6823956,
+    "updatedSHA256": "b54b24595e601c3f97c356c532958088e6cfdacd17cd0c43f4b1a4b42802712c",
+    "bytes": 7091500,
     "changedClips": [],
     "anchors": [
       {
@@ -2674,8 +2674,8 @@
     "file": "leanchoilia.glb",
     "source": "tools/creatures/arthropods/anchors.json",
     "newSpecimen": true,
-    "updatedSHA256": "ae68306ea20ecb3920e4ed9c4f10f9076457d876840ad3c442f4a828d0ea6a38",
-    "bytes": 8705200,
+    "updatedSHA256": "09ccb273ded360b114468fc601c60a9d9fbb604d9b9651bd95cfb9a3fbb3416c",
+    "bytes": 8749240,
     "changedClips": [],
     "anchors": [
       {
@@ -2854,8 +2854,8 @@
     "file": "isoxys.glb",
     "source": "tools/creatures/arthropods/anchors.json",
     "newSpecimen": true,
-    "updatedSHA256": "69427575d8bf033d87f0015940917e9079bc9e27ba97c5bea7e892ec3cb73c05",
-    "bytes": 7747356,
+    "updatedSHA256": "614fdfeea8aaa937f74adfb7297b87ea218858f638060fdca6e1342b4537de6a",
+    "bytes": 8165256,
     "changedClips": [],
     "anchors": [
       {
@@ -4484,8 +4484,8 @@
     "file": "cambroraster.glb",
     "source": "tools/creatures/jellies/anchors.json",
     "newSpecimen": true,
-    "updatedSHA256": "8481c903b5bd3cdb3f4925d62e7a7999f66fa31743915f88bef3398090cc5d4e",
-    "bytes": 5542800,
+    "updatedSHA256": "5fe3875ba3388e644398eea64878bac4d216f35967b2915f0e78914ee0ee02d6",
+    "bytes": 5703936,
     "changedClips": [],
     "anchors": [
       {
@@ -4968,8 +4968,8 @@
     "file": "tamisiocaris.glb",
     "source": "tools/creatures/jellies/anchors.json",
     "newSpecimen": true,
-    "updatedSHA256": "56855bd30d6bdf7a558a1c1850c327b5c71621df3d2ec3aa23762371b12a4484",
-    "bytes": 5939112,
+    "updatedSHA256": "df7505f4b64eadc8d1c53e44e005b1604a3c969bebecf556baf75cbae2880a88",
+    "bytes": 6156508,
     "changedClips": [],
     "anchors": [
       {

@@ -274,10 +274,12 @@ It follows the same individual authoring, preview and post-rework audit workflow
 
 ## Separate articulated attack and feeding pass
 
-See `docs/attack-feeding-refinement.md`: nautiloid/cephalopod tentacle flare and whipping,
-articulated sea-scorpion/spider strikes, and multi-arm grasp-to-underside-mouth feeding for
-Furcaster. Coordinate with pending body redesigns, including Nahecaris; audit only completed
-new geometry. This overlaps eight current individual refinements, not eight new creature IDs.
+See `docs/attack-feeding-refinement.md`. **Delivered 9 September 2026 as previews** for
+Jaekelopterus, Palaeoisopus, Eldredgeops, Walliserops, Manticoceras and Furcaster (Michelinoceras
+was delivered on 8 September); Walliserops and Furcaster also gained the Grab loop the hold needs.
+The previous clips are kept as `replaced/<name>` and shown under *Replaced* in the viewer. Nahecaris
+is skipped until its body redesign lands. Each remains a preview until the user has reviewed its
+clips; the model-side items in this queue are unchanged by the pass.
 
 ## Reopened face refinements — 8 September 2026
 

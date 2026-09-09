@@ -11,6 +11,7 @@ from mathutils import Vector
 argv = sys.argv[sys.argv.index('--') + 1:] if '--' in sys.argv else sys.argv[1:]
 glb, out = argv[0], argv[1]
 frames_n = int(argv[argv.index('--frames') + 1]) if '--frames' in argv else 8
+new_only = '--new-only' in argv
 clips = [a for a in argv[2:] if not a.startswith('--') and not a.isdigit()]
 os.makedirs(out, exist_ok=True)
 
@@ -45,7 +46,9 @@ def aim(pos, target):
 def bone_head(name):
     pb = arm.pose.bones.get(name)
     return arm.matrix_world @ pb.head if pb else centre
-focus = (bone_head('body') if 'body' in arm.pose.bones else centre) + front * size * .12
+# Every rig carries anchor_mouth (an empty after import); the feeding end is what we frame.
+mouth = bpy.data.objects.get('anchor_mouth')
+focus = (mouth.matrix_world.translation if mouth else (bone_head('body') if 'body' in arm.pose.bones else centre)) + front * size * .1
 views = {
     'above': lambda: aim(focus + Vector((size * .38, -size * .32, size * .26)), focus),
     'below': lambda: aim(focus + Vector((size * .22, -size * .42, -size * .24)), focus),
@@ -55,10 +58,10 @@ def action_for(name):
         if a.name == name or a.name.startswith(name + '_'): return a
     return None
 from PIL import Image, ImageDraw
-for clip in clips:
+def rows_for(clip):
     rows = []
     for view, place in views.items():
-        for label in ('replaced/' + clip, clip):
+        for label in ((clip,) if new_only else ('replaced/' + clip, clip)):
             act = action_for(label)
             if act is None: print('missing', label); continue
             arm.animation_data.action = act
@@ -72,6 +75,8 @@ for clip in clips:
                 sc.render.filepath = p; bpy.ops.render.render(write_still=True)
                 tiles.append((p, fr / 30))
             rows.append((label + ' · ' + view, tiles))
+    return rows
+def save_sheet(rows, name):
     w, h = sc.render.resolution_x, sc.render.resolution_y
     sheet = Image.new('RGB', (w * frames_n, (h + 18) * len(rows)), (20, 24, 28)); draw = ImageDraw.Draw(sheet)
     for r, (label, tiles) in enumerate(rows):
@@ -79,5 +84,11 @@ for clip in clips:
         for i, (p, t) in enumerate(tiles):
             sheet.paste(Image.open(p).convert('RGB'), (i * w, y + 18)); draw.text((i * w + 6, y + h + 4), f'{t:.2f}s', fill=(200, 200, 190))
             os.remove(p)
-    sheet.save(os.path.join(out, f'{clip}.png'))
-    print('sheet', clip)
+    sheet.save(os.path.join(out, name))
+    print('sheet', name)
+if new_only:
+    rows = []
+    for clip in clips: rows += rows_for(clip)
+    save_sheet(rows, os.path.basename(glb).split('.')[0] + '.png')
+else:
+    for clip in clips: save_sheet(rows_for(clip), f'{clip}.png')

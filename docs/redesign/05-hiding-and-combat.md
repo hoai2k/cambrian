@@ -117,9 +117,10 @@ Dedicated offensive specials cost 18 stamina. Defensive pulses have their own co
 
 ## Taking hold
 
-Eleven animals have `grasp: true` in the content — Anomalocaris, Hallucigenia, Nectocaris, Ottoia,
-Cambroraster, Leanchoilia, Isoxys and Tamisiocaris in the Cambrian; Jaekelopterus, Walliserops and
-Furcaster in the Devonian — and for them the attack buttons have a second reading: **held, they
+Fifteen animals have `grasp: true` in the content — Anomalocaris, Opabinia, Hallucigenia,
+Nectocaris, Ottoia, Cambroraster, Leanchoilia, Isoxys and Tamisiocaris in the Cambrian;
+Jaekelopterus, Walliserops, Furcaster, Manticoceras, Michelinoceras and Palaeoisopus in the
+Devonian — and for them the attack buttons have a second reading: **held, they
 take hold instead of striking through.** `Actor.graspHold` is the button being down, and it turns
 whatever the animal lands into a grab. A move can still grab on its own (Anomalocaris' Grasp,
 Nectocaris' Paired seize, Jaekelopterus' Chelicerae grab) whoever is pressing it, bots included;
@@ -156,9 +157,10 @@ it is the same button it already had.
 One rider per host, and a rider is not itself something to ride: no chains, no stacks.
 
 `npm run grab` covers the roster, the held grab, the swallow on release, the mouth cone, the tow,
-biting while clinging, the shake-off and the grip limits. The clips this mechanic is owed — a
-`Grab` for the eight animals that do not have one, and a `Dash` distinct from `Dodge` for every
-model — are queued in `docs/attack-feeding-refinement.md`; the runtime already plays both the
+biting while clinging, the shake-off and the grip limits. Seven of the fifteen already carry a
+`Grab` clip and are reviewed against these rules; the clips the mechanic is still owed — a `Grab`
+for the seven animals that have none, and a `Dash` distinct from `Dodge` for every model — are
+queued in `docs/attack-feeding-refinement.md`; the runtime already plays both the
 moment they land, and the same test checks the queue still says so.
 
 ## Maintenance and verification

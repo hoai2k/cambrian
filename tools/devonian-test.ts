@@ -68,8 +68,9 @@ ok(RULES !== undefined && !RULES.growthByNutrition, 'Devonian rules active: grow
 // ---- the animals that take hold, and the clips their grip is owed ----
 {
   const graspers = DEVONIAN.creatures.filter((c) => c.grasp).map((c) => c.id as string);
-  ok(['jaekelopterus', 'walliserops', 'furcaster'].every((id) => graspers.includes(id)) && graspers.length === 3,
-    `the Devonian graspers are the three the design names (${graspers.join(', ')})`);
+  const named = ['jaekelopterus', 'walliserops', 'furcaster', 'manticoceras', 'michelinoceras', 'palaeoisopus'];
+  ok(named.every((id) => graspers.includes(id)) && graspers.length === named.length,
+    `the Devonian graspers are the six the design names (${graspers.join(', ')})`);
   const queue = JSON.parse(fs.readFileSync('tools/attack-feeding-refinements.json', 'utf8')) as { id: string; reviewClips: string[]; grip?: string }[];
   for (const id of graspers) {
     const glb = `public/assets/devonian/creatures/${id}.glb`;
