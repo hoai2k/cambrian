@@ -119,8 +119,15 @@ export function applyHit(ctx: HitContext, attacker: Actor, victim: Actor, move: 
   victim.hitFlash = 0.42;
   victim.sinceHit = 0; victim.lastHitBy = attacker.id;
   // Courage: being bitten by something smaller than you is alarming. Enough of it and you run.
+  //
+  // How alarming depends on how big the thing biting you is. The cost used to be the fraction of
+  // health lost and nothing else, so a hatchling could rout a fish seven times its length in three
+  // bites — and a routed animal never answers back, so the whole sea read as indifferent to being
+  // attacked. Scaled by the attacker's share of your body length and normalised at a third, so the
+  // case the rule was written for — a player routing a giant several times its length — is unchanged.
   if (victim.brain && lengthOf(attacker) < lengthOf(victim)) {
-    victim.brain.courage -= dmg / (victim.hpMax * 0.08) + 0.05;
+    const menace = clamp(lengthOf(attacker) / lengthOf(victim) / 0.3, 0.15, 1);
+    victim.brain.courage = Math.max(-1, victim.brain.courage - (dmg / (victim.hpMax * 0.08) + 0.05) * menace);
     if (victim.brain.courage <= 0 && victim.brain.goal !== 'flee') ctx.events.push({ kind: 'routed', pos: { ...victim.pos }, actor: victim.id, other: attacker.id, player: attacker.player });
   }
   victim.hitDir = { x: -dir.x, y: -dir.y, z: -dir.z };

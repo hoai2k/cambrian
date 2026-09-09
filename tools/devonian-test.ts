@@ -17,7 +17,7 @@ const { Game } = await import('../src/sim/game');
 const { RULES } = await import('../src/sim/era-rules');
 const { stateFor, devActor, stageScale, ADULT_STAGE, PRIME_STAGE, STAGE_AT, HOLD_TO_WIN } = await import('../src/sim/devonian/state');
 const { coverAt } = await import('../src/sim/world');
-const { bandOf, isAlive, lengthOf } = await import('../src/sim/actors');
+const { applyScaleStats, bandOf, isAlive, lengthOf } = await import('../src/sim/actors');
 const { PLAYABLE } = await import('../src/sim/creatures');
 const { creature } = await import('../src/sim/creatures');
 const { emptyInput } = await import('../src/sim/types');
@@ -251,6 +251,41 @@ ok(RULES !== undefined && !RULES.growthByNutrition, 'Devonian rules active: grow
   const rise = new Map<number, InputFrame>([[0, { ...emptyInput(), rise: true }], [1, emptyInput()]]);
   for (let i = 0; i < 60 * 30 && dt.air < 0.999; i++) tick(g, rise);
   ok(dt.air > 0.99, `surfacing refills the lungs (${dt.air.toFixed(2)})`);
+}
+
+/**
+ * The warning has to be one you can act on. "Air is low, rise to the surface" is worth nothing if
+ * holding rise from the seabed cannot reach the surface before the meter empties — and in a sea
+ * sixty-four units deep with a warning at a quarter of a bar, it could not, at any size. So: from
+ * the floor, at the moment the HUD first says so, holding nothing but rise gets a hatchling up.
+ */
+{
+  for (const [id, scale] of [['tiktaalik', 0.13], ['rhinodipterus', 0.28], ['acanthostega', 0.22], ['tiktaalik', 1]] as const) {
+    const g = new Game('reef', [{ creature: id, device: 'keyboard', ready: true }]);
+    const p = g.players[0];
+    p.hatching = false; p.state = 'free'; p.stateT = 0; p.stateDur = 0; p.spawnProtect = 0;
+    p.pos.y = groundHeight(g.world, p.pos.x, p.pos.z, []) + 1; p.prevT.y = p.pos.y;
+    const floorY = p.pos.y;
+    const d = devActor(g, p);
+    const rise = new Map<number, InputFrame>([[0, { ...emptyInput(), rise: true }]]);
+    const idle = new Map<number, InputFrame>([[0, emptyInput()]]);
+    // Sit on the sand until the HUD says the air is low, then hold nothing but rise. The body is
+    // pinned at the size under test each step: the moult ceremony would otherwise lerp it back.
+    let warnedAt = -1, warnedAir = 1, refilled = -1;
+    for (let i = 0; i < 60 * 200; i++) {
+      p.scale = scale; applyScaleStats(p, false);
+      if (warnedAt < 0) {
+        p.pos.y = floorY; p.prevT.y = floorY;
+        tick(g, idle);
+        if (RULES!.hud(g, 0)!.airLow) { warnedAt = i; warnedAir = d.air; }
+        continue;
+      }
+      tick(g, rise);
+      if (d.air >= 0.999) { refilled = i - warnedAt; break; }
+      if (d.air <= 0) break;
+    }
+    ok(refilled > 0, `${id} at scale ${scale} climbs ${(SURFACE_Y - floorY).toFixed(0)} units on rise alone inside the air its warning leaves it (warned at ${(warnedAir * 60).toFixed(0)} s of air, took ${refilled < 0 ? 'more — ran out' : (refilled / 60).toFixed(1) + ' s'})`);
+  }
 }
 
 // ---- dead water: gills suffer, lungs do not, leaving scores ----

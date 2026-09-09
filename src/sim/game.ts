@@ -12,7 +12,7 @@ import { resolveFlora, stepFlora, type FloraContact } from './flora';
 import { SpatialHash } from './spatial';
 import { clampMark, fillOf, ladderFill, ladderMark, ladderRung, ladderScale, LADDER_TOP, MARK_NEAR_TOP } from './ladder';
 import { emptyInput, isCoop, TIER_NAMES, TIER_NEED, TIER_SCALE, type Actor, type BrainState, type InputFrame, type Mode, type PlayerSetup, type Prompt, type SiltCloud, type Tier, type WorldEvent } from './types';
-import { BIOME_NAMES, biomeAt, biomeWeights, coverAt, groundHeight, LIGHT_WINDOW_Y, type Landmark, type LandmarkKind, microbialAt, nearestNursery, nurseryAt, nurseryFactor, resolveStatic, sampleCurrent, sampleHeight, shoreDistance, shoreZ, type StaticContact, SURFACE_Y, World, type Biome, type Boulder, type Cover, type Flora, type WorldData } from './world';
+import { BIOME_NAMES, biomeAt, biomeWeights, coverAt, groundHeight, LIGHT_WINDOW_Y, type Landmark, type LandmarkKind, microbialAt, nearestNursery, nurseryAt, nurseryFactor, resolveStatic, RISE_RATE, sampleCurrent, sampleHeight, shoreDistance, shoreZ, type StaticContact, SURFACE_Y, World, type Biome, type Boulder, type Cover, type Flora, type WorldData } from './world';
 
 export interface PlayerProgress {
   prompts: Prompt[];
@@ -135,7 +135,7 @@ export const bitesFor = (eater: Actor, food: Actor) => clamp(Math.ceil(3 * lengt
 /** A leap out of the water: the pull back down, and the least upward speed that gets a fish through the surface. */
 const BREACH_GRAVITY = 14, BREACH_MIN_RISE = 3.2;
 const PADDLE_SPEED = 0.35;    // fraction of the crawler's cruise while off the floor
-const PADDLE_RISE = 2.4;      // climb speed, units/s at scale 1 (a swimmer's rise is 2.6 and faster to reach)
+const PADDLE_RISE = 2.4;      // climb speed, units/s at scale 1 (a swimmer's rise is RISE_RATE, and faster to reach)
 const PADDLE_SINK = 2.2;      // terminal sink once RB is released — a settle, not a fall
 const PADDLE_STAMINA = 24;    // per second while climbing
 /**
@@ -920,8 +920,8 @@ export class Game implements AiWorld {
     }
     if (controllable && !def.ground) {
       const hover = jets ? 1.6 : 1;
-      if (input.rise) desired.y += 2.6 * sf * hover;
-      if (input.sink) desired.y -= 2.6 * sf * hover;
+      if (input.rise) desired.y += RISE_RATE * sf * hover;
+      if (input.sink) desired.y -= RISE_RATE * sf * hover;
     }
     let rate = def.agility;
     if (mag === 0 && controllable) rate = def.glide; // glide out

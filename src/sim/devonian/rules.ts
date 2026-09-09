@@ -1,10 +1,10 @@
 import { clamp, dist, distXZ, heading, type Vec3 } from '../../shared/math';
 import type { EraHud, EraRules } from '../era-rules';
-import { applyScaleStats, bandOf, isAlive, isHidden, lengthOf } from '../actors';
+import { applyScaleStats, bandOf, isAlive, isHidden, lengthOf, speedFactor } from '../actors';
 import { creature } from '../creatures';
 import type { Game } from '../game';
 import type { Actor, Mode, WorldEvent } from '../types';
-import { BIOME_DANGER, biomeAt, groundHeight, sampleCurrent, shoreDistance, SHORE_WALL, SURFACE_Y } from '../world';
+import { BIOME_DANGER, biomeAt, groundHeight, RISE_RATE, sampleCurrent, shoreDistance, SHORE_WALL, SURFACE_Y } from '../world';
 import { bodyRadius } from '../actors';
 import { ADULT_STAGE, devActor, GROWN, HOLD_TO_WIN, PRIME_STAGE, RUNG_NAMES, STAGE_AT, STAGES, stageForScale, stageProgress, stageScale, stateFor, type DeadZone, type DevActor } from './state';
 import { camoDrain, installDevonianSpecials, stepAbility, stepGuardSpecial, useAbility, ySpecial } from './specials';
@@ -29,8 +29,28 @@ import { botNursery, canBreach, sanctuary, spawnInCover, spawnProtect, spawnY, s
  */
 const FEED = [0, 0.55, 0.28, 0.14, 0.09] as const;   // standing per unit of nutrition
 const AIR_SECONDS = 60, AIR_LOW = 0.25;
+/** The least warning worth giving, in seconds, however near the surface the animal already is. */
+const AIR_WARN_FLOOR = 12;
+
 const ZONE_R = 35, ZONE_LIFE = 120, ZONE_EVERY = 150;
 const EXUVIA_COVER = 8;
+
+/**
+ * When the HUD says the air is low.
+ *
+ * AIR_LOW is where the *body* suffers — no sprint to speak of, slow recovery — and is a fixed
+ * fraction of the meter. When to *say so* is a different question, and it cannot be a fixed
+ * fraction: the answer depends on how far down you are. This sea is sixty-four units deep and a
+ * hatchling on rise alone climbs it at under two units a second, so a quarter of a bar — fifteen
+ * seconds — was a warning about a thirty-second climb, which is no warning at all. So the warning
+ * is the climb: it arrives when the air left would not comfortably cover swimming up from here,
+ * and near the surface it stays quiet until the meter is genuinely low.
+ */
+function airLow(a: Actor, d: DevActor): boolean {
+  const climb = Math.max(0, SURFACE_Y - 3 - lengthOf(a) * 0.3 - a.pos.y);
+  const seconds = climb / Math.max(0.3, RISE_RATE * speedFactor(a.scale)) * 1.4;
+  return d.air * AIR_SECONDS < Math.max(AIR_WARN_FLOOR, seconds);
+}
 
 const rungOf = (a: Actor) => creature(a.creature).rung ?? 2;
 const isPlayerish = (a: Actor) => a.controller === 'player' || a.controller === 'bot';
@@ -298,6 +318,7 @@ export const DEVONIAN_RULES: EraRules = {
     return {
       standing: d.standing, stageProgress: stageProgress(d), rung: rungOf(p), rungName: RUNG_NAMES[rungOf(p)], stage: STAGES[d.stage],
       air: def.breathing === 'air' ? d.air : undefined,
+      airLow: def.breathing === 'air' && airLow(p, d),
       beached: d.beached, primeT: d.primeT, inDeadZone: d.deadZoneIn,
       deadZones: s.deadZones.filter((z) => distXZ(z.pos, p.pos) < 400).map((z) => ({ dx: z.pos.x - p.pos.x, dz: z.pos.z - p.pos.z, r: z.r })),
     };
@@ -307,7 +328,7 @@ export const DEVONIAN_RULES: EraRules = {
     const p = g.players[i]; if (!p || !isAlive(p)) return undefined;
     const d = devActor(g, p), def = creature(p.creature), rung = rungOf(p);
     if (d.deadZoneIn && def.breathing !== 'air') return 'Dead water. Get out of it, or up to the surface if you can breathe.';
-    if (def.breathing === 'air' && d.air < AIR_LOW) return 'Air is low. {rise} to the surface and gulp.';
+    if (def.breathing === 'air' && airLow(p, d)) return 'Air is low. {rise} to the surface and gulp.';
     if (g.time < 12) return rung === 1 ? 'Feed, hide, moult. Everything out there is bigger than you are today.' : rung === 2 ? 'Feed and keep your shoal. You grow on what you catch.' : rung === 3 ? 'Hunt the shoals. Five stages between you and Prime.' : 'Stay fed. The sea is hiding from you.';
     if (def.shell && g.time < 40) return 'Your funnel makes rise and sink free, and no direction is slow. Block withdraws into the shell.';
     if ((def.shoreReach ?? 0) > 0 && g.time < 40) return 'You can push into water nothing with gills can follow you into.';
@@ -316,5 +337,5 @@ export const DEVONIAN_RULES: EraRules = {
 };
 
 /** Exposed for tests. */
-export { FEED as FEED_WEIGHTS, AIR_SECONDS, ZONE_R };
+export { FEED as FEED_WEIGHTS, AIR_SECONDS, AIR_LOW, ZONE_R };
 export type { DeadZone };

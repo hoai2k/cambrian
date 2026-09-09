@@ -24,6 +24,8 @@ export interface EraHud {
   rung: number; rungName: string; stage: string;
   /** 0..1 air remaining, for air breathers only. */
   air?: number;
+  /** True while that meter is low enough that the HUD should say so and the player should climb. */
+  airLow?: boolean;
   beached: boolean;
   /** Dead zones as world offsets from the player and radii, for the radar. */
   deadZones: { dx: number; dz: number; r: number }[];
