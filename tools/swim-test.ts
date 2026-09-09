@@ -4,8 +4,9 @@
  */
 import { Game, radarRange } from '../src/sim/game';
 import { emptyInput, type InputFrame } from '../src/sim/types';
-import { applyScaleStats, bodyRadius, clearanceOf, climbHeight, climbRise, floorClearance, glideOver, lengthOf } from '../src/sim/actors';
+import { applyScaleStats, bodyRadius, clearanceOf, climbHeight, climbRise, floorClearance, glideOver, lengthOf, speedFactor } from '../src/sim/actors';
 import { boulderQ, boulderTop, groundHeight, resolveStatic, rockRadius, sampleHeight, type Boulder, type StaticContact, type WorldData } from '../src/sim/world';
+import { creature } from '../src/sim/creatures';
 import { floraSize } from '../src/sim/flora';
 import { fitCameraArm, PITCH_DOWN, PITCH_UP } from '../src/render/engine';
 
@@ -181,6 +182,46 @@ const rockWorld = (boulders: Boulder[]) => ({
   // Four times that is a cliff: the body works along the foot of it and never gets up.
   const wall = intoAWall(28);
   check('a cliff is still a cliff', wall.peak < 6, `never got above ${wall.peak.toFixed(1)} on a ${wall.tall}-unit face`);
+}
+
+// --- and it is climbed at swimming pace, not jumped ---
+{
+  /**
+   * A rock's dome is `sqrt(1 - q^2)` tall, so its flank is near-vertical at the rim: the floor
+   * under a body crossing that rim used to rise a couple of the body's own lengths in a single
+   * step while it moved a tenth of a unit forward, which read as jetting to the top of the rock
+   * rather than swimming over it. The climb is paid for out of the travel now, so what changes is
+   * the direction of the motion and not the speed of it.
+   */
+  const overARock = (tall: number, seconds = 10) => {
+    const g = new Game('reef', [{ creature: 'anomalocaris', device: 'keyboard', ready: true }], 21);
+    const p = g.players[0]; p.spawnProtect = 0;
+    const ground = sampleHeight(p.pos.x, p.pos.z);
+    const sy = tall / 1.3, y = ground + sy * 0.25;
+    g.world.boulders.push({ pos: { x: p.pos.x, y, z: p.pos.z - 12 }, radius: 8 * 1.02, height: y + sy * 1.05, sx: 8, sy, sz: 8, rot: 0, shade: .7 });
+    g.world.boulderHash.rebuild(g.world.boulders);
+    p.pos = { x: p.pos.x, y: ground + floorClearance(p), z: p.pos.z };
+    p.yaw = Math.PI;
+    const m = new Map([[0, { ...emptyInput(), my: 1, camYaw: Math.PI }]]);
+    let rate = 0, peak = 0;
+    for (let i = 0; i < 60 * seconds; i++) {
+      const y0 = p.pos.y;
+      g.step(1 / 60, m); g.events.length = 0;
+      rate = Math.max(rate, (p.pos.y - y0) * 60);
+      peak = Math.max(peak, p.pos.y - sampleHeight(p.pos.x, p.pos.z));
+    }
+    // Against the body's own swimming speed: a climb is allowed to be brisk — it is its travel
+    // pointed upward, plus the rise it can swim — and nothing like the twentyfold it used to be.
+    return { rate, peak, swim: creature(p.creature).speed * speedFactor(p.scale), tall };
+  };
+  const r = overARock(7);
+  check('a rock is climbed at swimming pace, not jumped', r.rate < r.swim * 4,
+    `rose at most ${r.rate.toFixed(0)} u/s against a ${r.swim.toFixed(1)} u/s swim (${(r.rate / r.swim).toFixed(1)}x)`);
+  check('...and the body still gets over it', r.peak > r.tall, `reached ${r.peak.toFixed(1)} over a ${r.tall}-unit rock`);
+  // A cliff is where the pacing matters most: there is no height a body may be handed for free.
+  const c = overARock(12);
+  check('...and a cliff is not vaulted either', c.rate < c.swim * 4 && c.peak < c.tall,
+    `rose at most ${c.rate.toFixed(0)} u/s and reached ${c.peak.toFixed(1)} of ${c.tall}`);
 }
 
 // --- a crawler walks up and over what it is pushed into, whatever it is ---
