@@ -342,7 +342,7 @@ export const DEVONIAN_CREATURES: readonly CreatureDef[] = [
     kind: 'Brittle star', kindNote: 'An ophiuroid echinoderm — a starfish relative with a small disc and five whip-like arms.',
     locality: 'Early Devonian · Hunsrück',
     tagline: 'Five arms, no hurry, and a talent for not being there.',
-    role: 'Benthic hider', swimStyle: 'omnidirectional', weedWalk: true, ground: true, adultLength: 1.01, rung: 1, breathing: 'gill', moults: false, bodyRadius: 0.3, clearance: 0.04,
+    role: 'Benthic hider', swimStyle: 'omnidirectional', weedWalk: true, conformArms: true, ground: true, adultLength: 1.01, rung: 1, breathing: 'gill', moults: false, bodyRadius: 0.3, clearance: 0.04,
     speed: 1.3, burst: 1.6, agility: 3.5, turnRate: 5, glide: 0.7,
     hp: 40, poise: 30, stamina: 110, defense: 0.05, sense: 8,
     color: '#7a6a5a', accent: '#c7b59a',

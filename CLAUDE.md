@@ -69,6 +69,10 @@ unless the user explicitly asks for a PR. Steps:
   the same trait turns up in both: `npm run locomotion` covers the Cambrian bodies and
   `npm run devonian` the Devonian ones. Which animal has what, and how well each is actually
   attested, is `docs/research/locomotion-ideas.md`.
+- A body may shape itself to what it is on: `conformArms` bends a radial rig's arms onto the ground
+  under them, or around a creature it is holding, after the mixer has written the pose
+  (`src/render/conform.ts`, `npm run conform`). Presentation only, and asked for by name rather than
+  read off the rig, because a nautiloid's tentacles carry the same `arm_<i>_<nn>` bone names.
 - Seabed scenery collides as the shape it is drawn with: `src/content/prop-shapes.json` is measured
   off the prop GLBs by `npm run shapes` and is what `src/sim` collides against (footprints in
   `src/sim/footprint.ts`). Any new or changed instanced prop must re-run `npm run shapes`, and
