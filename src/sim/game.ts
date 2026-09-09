@@ -1030,13 +1030,16 @@ export class Game implements AiWorld {
       }
     }
 
-    // Orientation. A shell jets: under way at speed — a sprint, a dash — it travels shell-first
-    // with its head trailing, which is how a nautiloid escapes, and it swings round to face what
-    // it is doing when it slows, aims or strikes. This is the body's heading only; the stick is
-    // still the direction of travel.
+    // Orientation. A shell swims both ways: a nautiloid jets its funnel either side of the shell,
+    // so it leads with whichever end it is already pointing and only turns through the shorter of
+    // the two arcs. Travel that is more behind it than ahead leaves it going shell-first with its
+    // head trailing — the escape jet — and it never spins round to chase its own heading. Aiming
+    // and striking are the exception: those face what they are aimed at. Heading only; the stick
+    // is still the direction of travel.
     const hv = Math.hypot(a.vel.x, a.vel.z);
+    const h = heading(a.yaw);
     const backward = jets && hv > 0.35 && a.state !== 'attack' && !a.aiming
-      && (bursting || freeBurst || a.state === 'dodge');
+      && h.x * a.vel.x + h.z * a.vel.z < 0;
     const facing = backward ? v3(-a.vel.x, -a.vel.y, -a.vel.z) : a.vel;
     let targetYaw = a.yaw;
     if (a.aiming && a.controller === 'player' && (a.state === 'free' || a.state === 'guard')) targetYaw = hv > 0.35 ? yawOf(facing) : input.camYaw;

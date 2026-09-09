@@ -27,6 +27,7 @@ type Biome = import('../src/sim/world').Biome;
 type InputFrame = import('../src/sim/types').InputFrame;
 type Mode = import('../src/sim/types').Mode;
 import { heading } from '../src/shared/math';
+import { wrapAngle } from '../src/shared/math';
 import { isCoop } from '../src/sim/types';
 type CreatureId = import('../src/sim/creatures').CreatureId;
 
@@ -287,34 +288,49 @@ ok(RULES !== undefined && !RULES.growthByNutrition, 'Devonian rules active: grow
   ok(RULES!.jet(mk('manticoceras')) && !RULES!.jet(shark), 'only shells jet');
 }
 
-// ---- a shell goes where the stick points, and jets shell-first while it does ----
+// ---- a shell goes where the stick points, and swims both ways round ----
 // The stick is the direction of travel for every body in the sea: swimming, sprinting and dashing
-// all go where they are aimed. A shell's heading is the one thing the funnel changes — under way at
-// speed it travels shell-first with its head trailing — how a nautiloid escapes — and swings round
-// to face what it is doing when it slows, aims or strikes.
+// all go where they are aimed. A shell's heading is the one thing the funnel changes, and a
+// nautiloid jets either side of its shell — it leads with whichever end it is already pointing and
+// turns through the shorter arc, so travel that is more behind it than ahead leaves it going
+// shell-first, head trailing, instead of spinning round to chase its own heading.
 {
-  const run = (id: CreatureId, gear: 'swim' | 'sprint' | 'dash', stick: 1 | -1 = 1) => {
+  /** `astern` is how far the body points against its own travel: 1 is shell-first, -1 is head-first. */
+  const astern = (p: { yaw: number; vel: { x: number; z: number } }) => {
+    const h = heading(p.yaw), v = Math.hypot(p.vel.x, p.vel.z);
+    return v > 0.35 ? -(h.x * p.vel.x + h.z * p.vel.z) / v : 0;
+  };
+  const run = (id: CreatureId, gear: 'swim' | 'sprint' | 'dash', stick: 1 | -1 = 1, reverseAfter = false) => {
     const g = new Game('reef', [{ creature: id, device: 'keyboard', ready: true }]);
     const p = g.players[0];
     p.pos = { x: 0, y: -14, z: 0 }; p.vel = { x: 0, y: 0, z: 0 }; p.yaw = 0; p.spawnProtect = 999;
-    const push = (): InputFrame => ({ ...emptyInput(), my: stick, burst: gear === 'sprint' ? 1 : 0, dash: gear === 'dash' });
-    for (let i = 0; i < 90; i++) { tick(g, new Map<number, InputFrame>([[0, push()]])); p.spawnProtect = 999; }
-    // The stick is camera-relative with camYaw 0, so +my is +z: travel and stick agree when z > 0.
-    // `astern` is how far the body points against its own travel: 1 is shell-first, -1 is head-first.
-    const h = heading(p.yaw), v = Math.hypot(p.vel.x, p.vel.z);
-    return { z: p.pos.z, astern: v > 0.35 ? -(h.x * p.vel.x + h.z * p.vel.z) / v : 0 };
+    const push = (my: number): InputFrame => ({ ...emptyInput(), my, burst: gear === 'sprint' ? 1 : 0, dash: gear === 'dash' });
+    for (let i = 0; i < 90; i++) { tick(g, new Map<number, InputFrame>([[0, push(stick)]])); p.spawnProtect = 999; }
+    const turned = { z: p.pos.z, astern: astern(p), yaw: p.yaw };
+    if (!reverseAfter) return turned;
+    // Same camera, stick pulled the other way: the shell should back off the way it came without
+    // turning round, because half a turn is further than no turn at all.
+    const wasZ = p.pos.z, wasYaw = p.yaw;
+    for (let i = 0; i < 150; i++) { tick(g, new Map<number, InputFrame>([[0, push(-stick)]])); p.spawnProtect = 999; }
+    return { z: p.pos.z - wasZ, astern: astern(p), yaw: Math.abs(wrapAngle(p.yaw - wasYaw)) };
   };
   for (const id of ['michelinoceras', 'manticoceras'] as CreatureId[]) {
-    const swim = run(id, 'swim'), sprint = run(id, 'sprint'), dash = run(id, 'dash'), astern = run(id, 'swim', -1);
+    const swim = run(id, 'swim'), sprint = run(id, 'sprint'), dash = run(id, 'dash'), back = run(id, 'swim', -1);
     ok(swim.z > 1, `${id} swims where the stick points (z ${swim.z.toFixed(1)})`);
     ok(sprint.z > swim.z, `...sprints further the same way, never backward out of it (z ${sprint.z.toFixed(1)})`);
     ok(dash.z > 1, `...and dashes the same way too (z ${dash.z.toFixed(1)})`);
-    ok(astern.z < -1, `...and pulling the stick back takes it back (z ${astern.z.toFixed(1)})`);
-    ok(swim.astern < -0.8, `...facing its way at a cruise (${swim.astern.toFixed(2)}, -1 is nose-first)`);
-    ok(sprint.astern > 0.8, `...and shell-first once it is jetting (${sprint.astern.toFixed(2)}, 1 is astern)`);
+    ok(back.z < -1, `...and pulling the stick back takes it back (z ${back.z.toFixed(1)})`);
+    ok(swim.astern < -0.8, `...leading with its head when that is the way it set off (${swim.astern.toFixed(2)}, -1 is head-first)`);
+    ok(sprint.astern < -0.8, `...and a sprint does not turn it round (${sprint.astern.toFixed(2)})`);
+    const rev = run(id, 'swim', 1, true);
+    ok(rev.z < -1, `...reversing carries it back the way it came (z ${rev.z.toFixed(1)})`);
+    ok(rev.astern > 0.8, `...shell-first, head trailing (${rev.astern.toFixed(2)}, 1 is astern)`);
+    ok(rev.yaw < 0.4, `...without turning round to do it (${rev.yaw.toFixed(2)} rad of turn)`);
   }
   const fish = run('cladoselache', 'sprint');
   ok(fish.z > 1 && fish.astern < -0.8, `a finned body sprints forward, facing forward (z ${fish.z.toFixed(1)}, ${fish.astern.toFixed(2)})`);
+  const fishBack = run('cladoselache', 'swim', 1, true);
+  ok(fishBack.yaw > 1.2 && fishBack.astern < -0.5, `a finned body turns round to swim the other way (${fishBack.yaw.toFixed(2)} rad, astern ${fishBack.astern.toFixed(2)})`);
 
   // A neutral stick has no direction to give, so the dash takes the body's own axis: ahead of a
   // finned body, and out behind a shell, which is the way it is already pointing to jet.

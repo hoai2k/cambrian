@@ -17,7 +17,9 @@ import { ADULT_STAGE, devActor, stageForScale } from './state';
  *   has built up speed.
  * - Shells jet, so no direction is the slow one for them: no reverse penalty, and a smaller
  *   fast-start. Their sprint still goes where the stick points, like every other body's — the
- *   funnel buys them free rise and sink, not a reversed control.
+ *   funnel buys them free rise and sink, not a reversed control. A shell also swims both ways
+ *   round: it leads with whichever end it is already pointing rather than turning round first
+ *   (the heading rule is in `Game.updateActor`).
  * - Crawlers (ground bodies) keep the shared rules.
  * - A fish can leave the water if it is driving hard at the surface: the sim lets it through the
  *   ceiling into a ballistic arc and it splashes back in. Crawlers and shells stay under.
