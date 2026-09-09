@@ -1,4 +1,4 @@
-# Cambrian Explosion
+# Cambrian Conquest
 
 Eat. Grow. Fight. Run. A 3D hunting, growing, fighting and escaping game set on a
 Cambrian sea inspired by the Burgess Shale. Play one of 21 real Cambrian

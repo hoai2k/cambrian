@@ -128,7 +128,7 @@ export function Viewer() {
 
       <aside className="specimens" aria-label="Specimens">
         <header>
-          <a className="back" href="../">← Cambrian Explosion</a>
+          <a className="back" href="../">← Cambrian Conquest</a>
           <h1>Specimens</h1>
           <label className="collection-pick"><span className="sr-only">Specimen collection</span>
             <select aria-label="Specimen collection" value={collection} onChange={e => {

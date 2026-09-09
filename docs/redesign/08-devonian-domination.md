@@ -10,7 +10,7 @@ about what these animals did.
 
 ## The pitch
 
-*Cambrian Explosion* is a growth story: hatch tiny, eat, moult, become the
+*Cambrian Conquest* is a growth story: hatch tiny, eat, moult, become the
 thing that frightened you. That story cannot be told in the Devonian. A
 trilobite is never going to be a Dunkleosteus, and pretending otherwise would
 throw away the most interesting fact about the period: it is the first sea
