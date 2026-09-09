@@ -135,11 +135,15 @@ export class Pose {
 }
 
 /** Sample a clip definition into an Animation on the document, keyed at 30 fps, linear. */
-export function sampleClip(rig, def, { authoredOn, pass } = {}) {
+export function sampleClip(rig, def, { authoredOn, pass, basePose } = {}) {
   const frames = Math.round(def.duration * FPS);
   const poses = [];
+  // A performance may declare a base pose (a resting shape the bind pose lacks); it underlies
+  // every clip unless the clip says `base: false` and handles that shape itself.
+  const withBase = basePose && def.base !== false;
   for (let f = 0; f <= frames; f++) {
     const u = f / frames, pose = new Pose(rig);
+    if (withBase) basePose(pose);
     def.pose(u, pose, f / FPS);
     poses.push(pose);
   }
@@ -179,7 +183,7 @@ export function sampleClip(rig, def, { authoredOn, pass } = {}) {
   // Contract checks: loops close on themselves, one-shots start and end at rest, root never moves.
   const root = rig.joints[0];
   const dist = (a, b) => Math.max(...rig.joints.map((j) => { const x = a.local(rig, j), y = b.local(rig, j); return Math.max(Math.abs(1 - Math.abs(x.r.dot(y.r))) * 4, x.t.distanceTo(y.t)); }));
-  const restPose = new Pose(rig);
+  const restPose = new Pose(rig); if (basePose) basePose(restPose);   // a base:false clip still starts and ends in the base shape
   const seam = def.loop ? dist(poses[0], poses[frames]) : Math.max(dist(poses[0], restPose), dist(poses[frames], restPose));
   if (seam > 1e-4) throw new Error(`${def.name}: ${def.loop ? 'loop seam' : 'does not start/end at rest'} (${seam.toExponential(2)})`);
   for (const p of poses) if (p.delta.has(root) || p.shiftV.has(root)) throw new Error(`${def.name}: root must not move`);
@@ -189,4 +193,62 @@ export function sampleClip(rig, def, { authoredOn, pass } = {}) {
 export async function loadRig(io, file) {
   const doc = await io.readBinary(new Uint8Array(await readFile(file)));
   return new Rig(doc);
+}
+
+/**
+ * Re-pose an existing animation onto a base pose: every rotation key of a joint the base moves
+ * is post-multiplied by the base delta, so the authored motion rides on the new resting shape.
+ * The base fades out where the clip's own pose already departs strongly from the bind pose
+ * (`fade` = [from, to] in radians over the affected joints), so a reach that was authored from a
+ * straight trunk still arrives straight.
+ */
+export function rebaseAnimation(rig, source, name, basePose, { fade = [.15, .6], pass, authoredOn } = {}) {
+  const base = new Pose(rig); basePose(base);
+  const doc = rig.doc, buffer = doc.getRoot().listBuffers()[0];
+  const anim = doc.createAnimation(name);
+  anim.setExtras({ ...source.getExtras(), cambrianClip: { version: 1, pass, authoredOn, rebased: true } });
+  const affected = new Set(base.delta.keys());
+  // The clip's deviation from bind per key time, over the affected joints.
+  const rotChannels = source.listChannels().filter((c) => c.getTargetPath() === 'rotation' && affected.has(c.getTargetNode()));
+  const deviation = (t) => {
+    let d = 0;
+    for (const c of rotChannels) {
+      const q = sampleQuat(c.getSampler(), t), r = rig.rest.get(c.getTargetNode()).r;
+      d = Math.max(d, 2 * Math.acos(Math.min(1, Math.abs(q.dot(r)))));
+    }
+    return d;
+  };
+  const weightAt = (t) => { const d = deviation(t), x = Math.min(1, Math.max(0, (d - fade[0]) / (fade[1] - fade[0]))); return 1 - x * x * (3 - 2 * x); };
+  const samplers = new Map();
+  for (const ch of source.listChannels()) {
+    const node = ch.getTargetNode(), path = ch.getTargetPath(), sm = ch.getSampler();
+    let out = sm.getOutput();
+    if (path === 'rotation' && affected.has(node)) {
+      const times = sm.getInput().getArray(), src = sm.getOutput().getArray(), dst = new Float32Array(src.length);
+      const B = base.delta.get(node);
+      let prev = null;
+      for (let k = 0; k < times.length; k++) {
+        const q = new Quaternion(src[k * 4], src[k * 4 + 1], src[k * 4 + 2], src[k * 4 + 3]);
+        const w = weightAt(times[k]);
+        const b = new Quaternion().slerp(B, w); // identity → B by weight
+        q.multiply(b);
+        if (prev && prev.dot(q) < 0) q.set(-q.x, -q.y, -q.z, -q.w);
+        dst.set([q.x, q.y, q.z, q.w], k * 4); prev = q;
+      }
+      out = doc.createAccessor().setType(Accessor.Type.VEC4).setArray(dst).setBuffer(buffer);
+    }
+    const key = sm; let ns = samplers.get(key);
+    if (!ns || out !== sm.getOutput()) { ns = doc.createAnimationSampler().setInput(sm.getInput()).setOutput(out).setInterpolation(sm.getInterpolation()); samplers.set(key, ns); anim.addSampler(ns); }
+    anim.addChannel(doc.createAnimationChannel().setTargetNode(node).setTargetPath(path).setSampler(ns));
+  }
+  return anim;
+}
+function sampleQuat(sampler, t) {
+  const times = sampler.getInput().getArray(), v = sampler.getOutput().getArray();
+  const q = (k) => new Quaternion(v[k * 4], v[k * 4 + 1], v[k * 4 + 2], v[k * 4 + 3]);
+  if (t <= times[0]) return q(0);
+  if (t >= times[times.length - 1]) return q(times.length - 1);
+  let k = 0; while (times[k + 1] < t) k++;
+  const a = q(k), b = q(k + 1), f = (t - times[k]) / (times[k + 1] - times[k]);
+  return sampler.getInterpolation() === 'STEP' ? a : a.slerp(b, f);
 }
