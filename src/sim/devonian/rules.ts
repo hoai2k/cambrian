@@ -1,10 +1,10 @@
 import { clamp, dist, distXZ, heading, type Vec3 } from '../../shared/math';
 import type { EraHud, EraRules } from '../era-rules';
-import { applyScaleStats, bandOf, isAlive, isHidden, lengthOf } from '../actors';
+import { applyScaleStats, bandOf, isAlive, isHidden, lengthOf, speedFactor } from '../actors';
 import { creature } from '../creatures';
 import type { Game } from '../game';
-import type { Actor, Mode, WorldEvent } from '../types';
-import { BIOME_DANGER, biomeAt, groundHeight, sampleCurrent, shoreDistance, SHORE_WALL, SURFACE_Y } from '../world';
+import type { Actor, InputFrame, Mode, WorldEvent } from '../types';
+import { BIOME_DANGER, biomeAt, groundHeight, RISE_RATE, sampleCurrent, shoreDistance, SHORE_WALL, SURFACE_Y } from '../world';
 import { bodyRadius } from '../actors';
 import { ADULT_STAGE, devActor, GROWN, HOLD_TO_WIN, PRIME_STAGE, RUNG_NAMES, STAGE_AT, STAGES, stageForScale, stageProgress, stageScale, stateFor, type DeadZone, type DevActor } from './state';
 import { camoDrain, installDevonianSpecials, stepAbility, stepGuardSpecial, useAbility, ySpecial } from './specials';
@@ -29,8 +29,48 @@ import { botNursery, canBreach, sanctuary, spawnInCover, spawnProtect, spawnY, s
  */
 const FEED = [0, 0.55, 0.28, 0.14, 0.09] as const;   // standing per unit of nutrition
 const AIR_SECONDS = 60, AIR_LOW = 0.25;
+/** The least warning worth giving, in seconds, however near the surface the animal already is. */
+const AIR_WARN_FLOOR = 12;
+
 const ZONE_R = 35, ZONE_LIFE = 120, ZONE_EVERY = 150;
 const EXUVIA_COVER = 8;
+
+/**
+ * When the HUD says the air is low.
+ *
+ * AIR_LOW is where the *body* suffers — no sprint to speak of, slow recovery — and is a fixed
+ * fraction of the meter. When to *say so* is a different question, and it cannot be a fixed
+ * fraction: the answer depends on how far down you are. This sea is sixty-four units deep and a
+ * hatchling on rise alone climbs it at under two units a second, so a quarter of a bar — fifteen
+ * seconds — was a warning about a thirty-second climb, which is no warning at all. So the warning
+ * is the climb: it arrives when the air left would not comfortably cover swimming up from here,
+ * and near the surface it stays quiet until the meter is genuinely low.
+ */
+function airLow(a: Actor, d: DevActor): boolean {
+  const climb = Math.max(0, SURFACE_Y - 3 - lengthOf(a) * 0.3 - a.pos.y);
+  const seconds = climb / Math.max(0.3, RISE_RATE * AIR_CLIMB * speedFactor(a.scale)) * 1.4;
+  return d.air * AIR_SECONDS < Math.max(AIR_WARN_FLOOR, seconds);
+}
+
+/**
+ * How an animal here climbs, and when it climbs without being asked.
+ *
+ * A lungfish, a Tiktaalik and an Acanthostega live by the surface: going up is the thing their
+ * bodies are for, so they climb half again as fast as anything else in the sea and a sprint carries
+ * into the climb rather than only into the swim — the sea is sixty-four units deep, and a breath is
+ * worth spending stamina on. On top of that they surface *for themselves* once the air is low, the
+ * way an animal would: the button is for going up sooner or faster, and the way to stay down is to
+ * hold sink and mean it. Everything with gills keeps exactly the shared behaviour.
+ */
+const AIR_CLIMB = 1.5, AIR_URGE = 0.8;
+function riseDrive(g: Game, a: Actor, input: InputFrame, base: number, burst: number): number {
+  const def = creature(a.creature);
+  if (def.breathing !== 'air') return input.rise ? base : input.sink ? -base : 0;
+  const rate = base * AIR_CLIMB * Math.max(1, burst);
+  if (input.rise) return rate;
+  if (input.sink) return -base;                       // diving is nobody's speciality; only the climb is
+  return airLow(a, devActor(g, a)) ? rate * AIR_URGE : 0;
+}
 
 const rungOf = (a: Actor) => creature(a.creature).rung ?? 2;
 const isPlayerish = (a: Actor) => a.controller === 'player' || a.controller === 'bot';
@@ -73,7 +113,7 @@ function checkStage(g: Game, a: Actor, d: DevActor) {
 function updateAir(g: Game, a: Actor, d: DevActor, dt: number) {
   const def = creature(a.creature);
   if (def.breathing !== 'air') return;
-  d.gulpT += dt;
+  d.airPulseT += dt;
   const atSurface = a.pos.y > SURFACE_Y - 3 - lengthOf(a) * 0.3 || d.beached;
   if (atSurface) {
     if (d.air < 0.999 && d.air + dt / 1.5 >= 0.999 && a.controller === 'player') { g.events.push({ kind: 'gulp', pos: { ...a.pos }, actor: a.id, player: a.player }); a.burstT = Math.max(a.burstT, 1.5); }
@@ -81,6 +121,13 @@ function updateAir(g: Game, a: Actor, d: DevActor, dt: number) {
   } else d.air = Math.max(0, d.air - dt / AIR_SECONDS);
   // low air: no sprint to speak of, and slow recovery
   if (d.air < AIR_LOW) a.stamina = Math.min(a.stamina, a.staminaMax * 0.35);
+  // The uneasy pulse while the air runs out: a heartbeat that quickens as the meter empties, from
+  // one beat every three seconds at the warning down to one a second on the last of it. Deliberately
+  // quiet — the HUD says the words, this is only the feeling of needing to be somewhere else.
+  if (!atSurface && a.controller === 'player' && isAlive(a) && airLow(a, d)) {
+    const every = 1 + 2 * clamp(d.air / AIR_LOW, 0, 1);
+    if (d.airPulseT >= every) { d.airPulseT = 0; g.events.push({ kind: 'airLow', pos: { ...a.pos }, actor: a.id, player: a.player, strength: 1 - clamp(d.air / AIR_LOW, 0, 1) }); }
+  } else if (atSurface) d.airPulseT = 0;
 }
 function stepDeadZones(g: Game, s: ReturnType<typeof stateFor>, dt: number) {
   s.nextZoneT -= dt;
@@ -236,7 +283,7 @@ export const DEVONIAN_RULES: EraRules = {
   jet(a) { return !!creature(a.creature).shell; },
 
   useAbility, stepAbility, camoDrain,
-  swim, canBreach, spawnY, wanderY,
+  swim, rise: riseDrive, canBreach, spawnY, wanderY,
   spawnPoint: spawnInCover, botNursery, spawnProtect, sanctuary,
 
   moultScale(g, a) {
@@ -298,6 +345,7 @@ export const DEVONIAN_RULES: EraRules = {
     return {
       standing: d.standing, stageProgress: stageProgress(d), rung: rungOf(p), rungName: RUNG_NAMES[rungOf(p)], stage: STAGES[d.stage],
       air: def.breathing === 'air' ? d.air : undefined,
+      airLow: def.breathing === 'air' && airLow(p, d),
       beached: d.beached, primeT: d.primeT, inDeadZone: d.deadZoneIn,
       deadZones: s.deadZones.filter((z) => distXZ(z.pos, p.pos) < 400).map((z) => ({ dx: z.pos.x - p.pos.x, dz: z.pos.z - p.pos.z, r: z.r })),
     };
@@ -307,7 +355,7 @@ export const DEVONIAN_RULES: EraRules = {
     const p = g.players[i]; if (!p || !isAlive(p)) return undefined;
     const d = devActor(g, p), def = creature(p.creature), rung = rungOf(p);
     if (d.deadZoneIn && def.breathing !== 'air') return 'Dead water. Get out of it, or up to the surface if you can breathe.';
-    if (def.breathing === 'air' && d.air < AIR_LOW) return 'Air is low. {rise} to the surface and gulp.';
+    if (def.breathing === 'air' && airLow(p, d)) return 'Air is low — you are already heading up. {rise} to climb faster, {sink} to stay down.';
     if (g.time < 12) return rung === 1 ? 'Feed, hide, moult. Everything out there is bigger than you are today.' : rung === 2 ? 'Feed and keep your shoal. You grow on what you catch.' : rung === 3 ? 'Hunt the shoals. Five stages between you and Prime.' : 'Stay fed. The sea is hiding from you.';
     if (def.shell && g.time < 40) return 'Your funnel makes rise and sink free, and no direction is slow. Block withdraws into the shell.';
     if ((def.shoreReach ?? 0) > 0 && g.time < 40) return 'You can push into water nothing with gills can follow you into.';
@@ -316,5 +364,5 @@ export const DEVONIAN_RULES: EraRules = {
 };
 
 /** Exposed for tests. */
-export { FEED as FEED_WEIGHTS, AIR_SECONDS, ZONE_R };
+export { FEED as FEED_WEIGHTS, AIR_SECONDS, AIR_LOW, ZONE_R };
 export type { DeadZone };

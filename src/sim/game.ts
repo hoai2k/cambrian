@@ -12,7 +12,7 @@ import { resolveFlora, stepFlora, type FloraContact } from './flora';
 import { SpatialHash } from './spatial';
 import { clampMark, fillOf, ladderFill, ladderMark, ladderRung, ladderScale, LADDER_TOP, MARK_NEAR_TOP } from './ladder';
 import { emptyInput, isCoop, TIER_NAMES, TIER_NEED, TIER_SCALE, type Actor, type BrainState, type InputFrame, type Mode, type PlayerSetup, type Prompt, type SiltCloud, type Tier, type WorldEvent } from './types';
-import { BIOME_NAMES, biomeAt, biomeWeights, coverAt, groundHeight, LIGHT_WINDOW_Y, type Landmark, type LandmarkKind, microbialAt, nearestNursery, nurseryAt, nurseryFactor, resolveStatic, sampleCurrent, sampleHeight, shoreDistance, shoreZ, type StaticContact, SURFACE_Y, World, type Biome, type Boulder, type Cover, type Flora, type WorldData } from './world';
+import { BIOME_NAMES, biomeAt, biomeWeights, coverAt, groundHeight, LIGHT_WINDOW_Y, type Landmark, type LandmarkKind, microbialAt, nearestNursery, nurseryAt, nurseryFactor, resolveStatic, RISE_RATE, sampleCurrent, sampleHeight, shoreDistance, shoreZ, type StaticContact, SURFACE_Y, World, type Biome, type Boulder, type Cover, type Flora, type WorldData } from './world';
 
 export interface PlayerProgress {
   prompts: Prompt[];
@@ -133,9 +133,11 @@ export const bitesFor = (eater: Actor, food: Actor) => clamp(Math.ceil(3 * lengt
 // Crawlers off the seabed. They paddle: they keep swimming, slowly, and pay for the climb in
 // stamina (more than they regenerate, so a paddle is a crossing, not a second way to live).
 /** A leap out of the water: the pull back down, and the least upward speed that gets a fish through the surface. */
-const BREACH_GRAVITY = 14, BREACH_MIN_RISE = 3.2;
+const BREACH_GRAVITY = 14;
+/** The least upward speed that gets a fish through the surface, at scale 1: bigger bodies need more. */
+const BREACH_MIN_RISE = 3.2;
 const PADDLE_SPEED = 0.35;    // fraction of the crawler's cruise while off the floor
-const PADDLE_RISE = 2.4;      // climb speed, units/s at scale 1 (a swimmer's rise is 2.6 and faster to reach)
+const PADDLE_RISE = 2.4;      // climb speed, units/s at scale 1 (a swimmer's rise is RISE_RATE, and faster to reach)
 const PADDLE_SINK = 2.2;      // terminal sink once RB is released — a settle, not a fall
 const PADDLE_STAMINA = 24;    // per second while climbing
 /**
@@ -880,8 +882,11 @@ export class Game implements AiWorld {
     }
     if (controllable && !def.ground) {
       const hover = jets ? 1.6 : 1;
-      if (input.rise) desired.y += 2.6 * sf * hover;
-      if (input.sink) desired.y -= 2.6 * sf * hover;
+      const base = RISE_RATE * sf * hover;
+      // What the rise and sink buttons are worth here, and anything the body does for itself: an
+      // era may climb faster than the shared rate, carry a sprint into the climb, or head for the
+      // surface unasked (a lung that needs air). Holding sink is always the way to stay down.
+      desired.y += RULES ? RULES.rise(this, a, input, base, burstMult) : input.rise ? base : input.sink ? -base : 0;
     }
     let rate = def.agility;
     if (mag === 0 && controllable) rate = def.glide; // glide out
@@ -962,24 +967,29 @@ export class Game implements AiWorld {
     // The seabed and everything standing on it: rocks, plants, what is climbed, what is ridden.
     this.stepScenery(a, input, dt, { def, sf, speed, paddling, mag, controllable });
 
-    // Orientation. Every body, shells included, faces where it is going: a sprint and an aimed
-    // dash point the nose along the stick, because turning the animal round to travel shell-first
-    // read as a spin rather than as a jet.
+    // Orientation. Most bodies face where they are going. A shell is the exception, because it
+    // jets its funnel either side of itself and so has no wrong end to lead with: it keeps
+    // whichever end it is already pointing and turns through the shorter of the two arcs, so
+    // travel more behind it than ahead leaves it going shell-first with its head trailing — the
+    // escape jet — and it never spins round to chase its own heading. Aiming and striking are the
+    // exception to the exception: those face what they are aimed at. Heading only; the stick is
+    // the direction of travel for every body, in every gear.
     //
-    // The one exception is a dash with no direction, which fires along the body's own axis — out
-    // behind a jetting shell (see the dash below). The body holds the heading it already had
-    // through it, so the shell leaves backwards while the head stays pointed at whatever it is
-    // backing away from, which is both what a nautiloid does and what the player is still aiming
-    // the camera at. Turning to follow that velocity would spin it through 180° at the worst
-    // possible moment.
+    // A dash with no direction fires along the body's own axis — out behind a jetting shell (see
+    // the dash above) — and `backingOff` holds the heading through it for every body, so nothing
+    // spins through 180° at the worst possible moment.
     const hv = Math.hypot(a.vel.x, a.vel.z);
-    const backingOff = a.state === 'dodge' && dot(a.dodgeDir, heading(a.yaw)) < -0.3;
+    const h = heading(a.yaw);
+    const backward = jets && hv > 0.35 && a.state !== 'attack' && !a.aiming
+      && h.x * a.vel.x + h.z * a.vel.z < 0;
+    const facing = backward ? v3(-a.vel.x, -a.vel.y, -a.vel.z) : a.vel;
+    const backingOff = a.state === 'dodge' && dot(a.dodgeDir, h) < -0.3;
     let targetYaw = a.yaw;
     if (backingOff) { /* hold the heading through a backward dash */ }
-    else if (a.aiming && a.controller === 'player' && (a.state === 'free' || a.state === 'guard')) targetYaw = hv > 0.35 ? yawOf(a.vel) : input.camYaw;
+    else if (a.aiming && a.controller === 'player' && (a.state === 'free' || a.state === 'guard')) targetYaw = hv > 0.35 ? yawOf(facing) : input.camYaw;
     else if (locked && isAlive(locked) && (a.state === 'free' || a.state === 'guard' || a.state === 'attack')) targetYaw = yawOf(sub(locked.pos, a.pos));
     else if (a.rideHost >= 0) targetYaw = this.idMap.get(a.rideHost)?.yaw ?? a.yaw;   // clinging: lie along the host
-    else if (hv > 0.35 && a.state !== 'grabbed') targetYaw = yawOf(a.vel);
+    else if (hv > 0.35 && a.state !== 'grabbed') targetYaw = yawOf(facing);
     const dy = wrapAngle(targetYaw - a.yaw);
     const tr = def.turnRate * (a.state === 'attack' ? 0.5 : 1) * (1 + hv * 0.05) * (giantish ? 0.45 : 1) * (sw?.turn ?? 1);
     const turn = clamp(dy * 6, -tr, tr);
@@ -996,7 +1006,7 @@ export class Game implements AiWorld {
       // Pitch follows the travel too, except through a backward dash, where the body holds the
       // attitude it had rather than tipping to point down its own wake.
       const sp = Math.max(len3(a.vel), 0.5);
-      if (!backingOff) a.pitch = damp(a.pitch, clamp(-Math.asin(clamp(a.vel.y / sp, -1, 1)) * 0.8, -0.9, 0.9), 4, dt);
+      if (!backingOff) a.pitch = damp(a.pitch, clamp(-Math.asin(clamp(facing.y / sp, -1, 1)) * 0.8, -0.9, 0.9), 4, dt);
     }
 
     // Noise / stillness
@@ -1140,9 +1150,17 @@ export class Game implements AiWorld {
           a.vel.y *= 0.45;
         }
       } else if (a.pos.y > ceiling) {
-        // driving hard at the surface, a fish leaves the water; anything else meets the ceiling
+        // Driving hard at the surface, a fish leaves the water; anything else meets the ceiling.
+        //
+        // What counts as "hard" is relative to the body. BREACH_MIN_RISE was an absolute speed, so
+        // a hatchling — which cannot reach it by any means available to it — met a hard, invisible
+        // wall a body's length under the surface however it came at it. It scales with size now, as
+        // the speeds it is being compared against already do. A dash is allowed through for the
+        // same reason: it is the hardest a body can drive at anything, and excluding every state
+        // but `free` shut out the one move most likely to launch a fish clear of the water.
         const sp = len3(a.vel);
-        if (RULES?.canBreach(a) && isAlive(a) && a.vel.y > BREACH_MIN_RISE && sp > def.speed * sf * 0.85 && a.state === 'free') {
+        const launching = a.state === 'free' || a.state === 'dodge';
+        if (RULES?.canBreach(a) && isAlive(a) && a.vel.y > BREACH_MIN_RISE * sf && sp > def.speed * sf * 0.85 && launching) {
           a.airborne = true;
           this.events.push({ kind: 'breach', pos: { x: a.pos.x, y: SURFACE_Y, z: a.pos.z }, actor: a.id, player: a.player, strength: clamp(sp / 12, 0.4, 1.5) });
         } else { a.pos.y = ceiling; if (a.vel.y > 0) a.vel.y = 0; }
