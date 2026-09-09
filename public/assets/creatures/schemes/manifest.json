@@ -11,6 +11,7 @@
     },
     "recolorVersion": 1,
     "sourceGlbSha256": "6d0065058f8f4958e34b35eed550221e1ba4f8bd5c1c27f8fe13e202736ce775",
+    "sourceAppearanceSha256": "25432d3d6ec2047127402b5ff35d420aeac3b9e4b390931fbe045b48c0391388",
     "files": {
       "select": "assets/creatures/schemes/anomalocaris.coral-flare.13e1816a1ae7.select.png",
       "card": "assets/creatures/schemes/anomalocaris.coral-flare.13e1816a1ae7.card.png",
@@ -34,6 +35,7 @@
     },
     "recolorVersion": 1,
     "sourceGlbSha256": "894891eb756db62d3895865fb9a1c26399d05e4d57d07724975d5e5f3c109c1f",
+    "sourceAppearanceSha256": "abf95465892ce8a7443b817caaf7630621210336c44aeabdb71eec907e620209",
     "files": {
       "select": "assets/creatures/schemes/opabinia.seagrass-teal.66e30fea1a48.select.png",
       "card": "assets/creatures/schemes/opabinia.seagrass-teal.66e30fea1a48.card.png",
@@ -57,6 +59,7 @@
     },
     "recolorVersion": 1,
     "sourceGlbSha256": "c48261c91f745139d4f8395818452f986d7130f4165a5c6c14944dd49de077ed",
+    "sourceAppearanceSha256": "b9cdc4e1696eeffce34aa3b8dbdee7636a851925f13a12d7cc826cca0649b498",
     "files": {
       "select": "assets/creatures/schemes/waptia.sandflat-tan.10e52270551e.select.png",
       "card": "assets/creatures/schemes/waptia.sandflat-tan.10e52270551e.card.png",
@@ -80,6 +83,7 @@
     },
     "recolorVersion": 1,
     "sourceGlbSha256": "50550cee4234961203da8bb2bd430e50cd6f19a6137e4001c73d33074134ba4a",
+    "sourceAppearanceSha256": "4032da11902bcdb5fa24299ea451bb420c209859a009318e794e83f158f67380",
     "files": {
       "select": "assets/creatures/schemes/canadia.kelp-olive.c297148e3381.select.png",
       "card": "assets/creatures/schemes/canadia.kelp-olive.c297148e3381.card.png",
@@ -103,6 +107,7 @@
     },
     "recolorVersion": 1,
     "sourceGlbSha256": "a17e87a46c89df96b1946c933d4709654c5fb32996fd6f802102cf9d457c8341",
+    "sourceAppearanceSha256": "3db69ba54ef5dd5751959516e60a4094e875bafed912ab804d0668508880a73c",
     "files": {
       "select": "assets/creatures/schemes/hallucigenia.sandflat-tan.10e52270551e.select.png",
       "card": "assets/creatures/schemes/hallucigenia.sandflat-tan.10e52270551e.card.png",
@@ -126,6 +131,7 @@
     },
     "recolorVersion": 1,
     "sourceGlbSha256": "e5726fb25301d9851feed33f45f8d12961c4d9a133902aac016f3d985d5b9d65",
+    "sourceAppearanceSha256": "2b2be03bd0bacf45961049101b069419274070885152b6d7c8c9e5959c0efccd",
     "files": {
       "select": "assets/creatures/schemes/wiwaxia.wiwaxia-nacre.49dbe9a97b3a.select.png",
       "card": "assets/creatures/schemes/wiwaxia.wiwaxia-nacre.49dbe9a97b3a.card.png",
@@ -149,6 +155,7 @@
     },
     "recolorVersion": 1,
     "sourceGlbSha256": "d63f401218409ad32e73a192114b2203e17f30b001943df8779801ef39327cce",
+    "sourceAppearanceSha256": "48ae598c5997657a4b629a2f2399db76bda733ef0c7f7ff15e4d90837ff46f7a",
     "files": {
       "select": "assets/creatures/schemes/marrella.countershade.102399ead86b.select.png",
       "card": "assets/creatures/schemes/marrella.countershade.102399ead86b.card.png",
@@ -172,6 +179,7 @@
     },
     "recolorVersion": 1,
     "sourceGlbSha256": "09e5c0237325f7ac00ef27b5c8ab0b6fd57486cf7fe9f8ccc569165c1fd273dd",
+    "sourceAppearanceSha256": "56203f97840802a9db4682e979e8be3a7ee7726a5d36b288bc6bbe14c4db61fb",
     "files": {
       "select": "assets/creatures/schemes/olenoides.sandflat-tan.10e52270551e.select.png",
       "card": "assets/creatures/schemes/olenoides.sandflat-tan.10e52270551e.card.png",
@@ -195,6 +203,7 @@
     },
     "recolorVersion": 1,
     "sourceGlbSha256": "90ea973c4220c70155dd7ea109717e9b536969420dbf38ecc45152afbee1a76f",
+    "sourceAppearanceSha256": "32ad7cbe73e1a27367c43f09465210d4fdaa9dc7f964151cb71bf995bd695a29",
     "files": {
       "select": "assets/creatures/schemes/nectocaris.canadia-iridium.0a583acec5b4.select.png",
       "card": "assets/creatures/schemes/nectocaris.canadia-iridium.0a583acec5b4.card.png",
@@ -218,6 +227,7 @@
     },
     "recolorVersion": 1,
     "sourceGlbSha256": "aa7b0b3999bdbe13d2cab8593e6ae2ef8deef4e45b97af3e18be991895f6a221",
+    "sourceAppearanceSha256": "ddce34bb59896b7d980de2a08ad69f026dc957a99fe368da62642c0959862559",
     "files": {
       "select": "assets/creatures/schemes/ottoia.countershade.102399ead86b.select.png",
       "card": "assets/creatures/schemes/ottoia.countershade.102399ead86b.card.png",
@@ -241,6 +251,7 @@
     },
     "recolorVersion": 1,
     "sourceGlbSha256": "8481c903b5bd3cdb3f4925d62e7a7999f66fa31743915f88bef3398090cc5d4e",
+    "sourceAppearanceSha256": "06ab6eb5ec5988c289fe8ec020a407d96ad860f85e5637a88f7009b139ffc002",
     "files": {
       "select": "assets/creatures/schemes/cambroraster.lagoon-neon.dee88daf00fa.select.png",
       "card": "assets/creatures/schemes/cambroraster.lagoon-neon.dee88daf00fa.card.png",
@@ -264,6 +275,7 @@
     },
     "recolorVersion": 1,
     "sourceGlbSha256": "d8b773d65c0a817d23ee5fbd27184ac0cf9fb26540ca4031d9873bd9f36fb1ef",
+    "sourceAppearanceSha256": "325810e1332b16c9928ae86ff62f04bf78e529777abcb949abe9b854e0c48133",
     "files": {
       "select": "assets/creatures/schemes/odontogriphus.sandflat-tan.10e52270551e.select.png",
       "card": "assets/creatures/schemes/odontogriphus.sandflat-tan.10e52270551e.card.png",
