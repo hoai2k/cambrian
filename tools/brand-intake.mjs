@@ -13,6 +13,10 @@
  *   dark water.
  * - The **illustrated plate** is a full rectangle — the title screen's background and the loading
  *   screen's logo — so it only changes format.
+ * - The **emblem** is the small mark beside the title on the pick screen, and it is the favicon
+ *   art: the same animal in the browser tab and in the corner of the game. Its source is therefore
+ *   the shipped favicon master rather than the inbox, which is why that one job has a `public/`
+ *   input — it is a derivation of something already delivered, not a handoff.
  *
  * `intake/` is a handoff inbox: sources are dropped in, converted, and then deleted from it in the
  * same commit — see intake/README.md. This tool never edits or removes its inputs, so a run can be
@@ -64,6 +68,16 @@ const report = async (label, file) => {
 };
 
 const JOBS = [
+  {
+    // Trimmed to the ink and shipped at 128, four times the 34 px it is drawn at, which is enough
+    // for any display density and a twelfth of the bytes of the 512 master.
+    label: 'emblem', from: 'public/favicon-anomalocaris-512.png', to: 'public/assets/brand/emblem.webp',
+    async run(from, to) {
+      const trimmed = await sharp(from).trim({ threshold: 1 }).png().toBuffer();
+      await sharp(trimmed).resize({ width: 128, height: 128, fit: 'contain', background: { r: 0, g: 0, b: 0, alpha: 0 } })
+        .webp({ quality: 92, alphaQuality: 100, effort: 6 }).toFile(to);
+    },
+  },
   {
     label: 'wordmark', from: 'intake/cambrian-logo-engraved.png', to: 'public/assets/brand/logo-engraved.webp',
     // Wide enough to stay crisp on a dense display; it is only ever drawn small.
