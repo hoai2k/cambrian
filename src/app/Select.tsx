@@ -1,3 +1,4 @@
+import { useLayoutEffect, useRef } from 'react';
 import { ModelStatusBadge } from '../shared/ModelStatusBadge';
 import { ACTIVE_ERA } from '../content';
 import { assetPaths } from '../content/asset-paths';
@@ -24,6 +25,55 @@ interface Props {
   onPick: (i: number, c: CreatureId) => void; onReady: (i: number) => void; onRemove: (i: number) => void;
   onAddKeyboard: () => void; onMode: (m: Mode) => void; onStart: () => void; onBack: () => void;
   onCarry: (i: number) => void;
+}
+
+/**
+ * The smallest a name may be squeezed, as a share of the size the tile would otherwise give it.
+ * Below this it stops being a label, so anything still too long past here is cut off as before —
+ * nothing on either roster reaches that, but a future twenty-letter genus would.
+ */
+const MIN_NAME_FIT = 0.68;
+
+/**
+ * A specimen's name, shrunk to fit rather than cut off.
+ *
+ * The tiles size their type off their own width already, but that sets one size for the whole
+ * roster, and a roster is not one length of word: "Ctenorhabdotus" is twice "Ottoia" and used to
+ * come out as "Ctenorhabdo…", which tells the player less than the animal's actual name does. So
+ * the type scale stays as it is — it is what keeps the grid looking like a grid — and the few names
+ * that overrun it are scaled down by exactly the amount they overrun by.
+ *
+ * `--fit` is a plain multiplier on the CSS font size, so the tile keeps ownership of what the name
+ * is *normally* worth and this only ever takes away. The measurement is one pass: letter-spacing is
+ * in em and so scales with the type, which makes text width very nearly linear in font size. It
+ * re-runs when the tile changes width, and once more when the display face has finished loading,
+ * because a name measured in the fallback face is measured against the wrong letters.
+ */
+function FitName({ name }: { name: string }) {
+  const ref = useRef<HTMLSpanElement>(null);
+  useLayoutEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    let lastWidth = -1;
+    const fit = () => {
+      lastWidth = el.clientWidth;
+      el.style.setProperty('--fit', '1');
+      const room = el.clientWidth, wanted = el.scrollWidth;
+      if (!room || !wanted || wanted <= room) return;
+      // A pixel in hand. Both measurements are integers while the text itself is not, so a name
+      // scaled to exactly the room it has can still round a hair over and get an ellipsis for it —
+      // which is the whole thing this is here to prevent.
+      el.style.setProperty('--fit', String(Math.max(MIN_NAME_FIT, (room - 1) / wanted)));
+    };
+    fit();
+    // Shrinking the name changes its height, which the observer also reports: only a change of
+    // width is a reason to measure again, or the correction feeds itself.
+    const ro = new ResizeObserver(() => { if (el.clientWidth !== lastWidth) fit(); });
+    ro.observe(el);
+    document.fonts?.ready.then(fit).catch(() => undefined);
+    return () => ro.disconnect();
+  }, [name]);
+  return <span className="cell-name" ref={ref}>{name}</span>;
 }
 
 const stat = (v: number, max: number) => Math.round((v / max) * 5);
@@ -68,7 +118,7 @@ export function SelectScreen(p: Props) {
                 onClick={() => { const i = p.players.findIndex((pl) => !pl.ready && typeof pl.device === 'string'); p.onPick(i >= 0 ? i : 0, c.id); }}
                 title={`${c.name}${c.kind ? ` · ${c.kind}` : ''} · ${c.role}`} aria-label={c.kind ? `${c.name}, ${c.kind}` : c.name}>
                 <CreaturePortrait creatureId={c.id} kind="thumb" assetBase={ASSETS} alt="" draggable={false} loading="eager" />
-                <span className="cell-name">{c.name}</span>
+                <FitName name={c.name} />
                 {c.kind && <span className="cell-kind">{c.kind}</span>}
                 <ModelStatusBadge status={ACTIVE_ERA.assets.modelStatus?.[c.id]} note={ACTIVE_ERA.assets.modelNotes?.[c.id]} compact />
                 <span className="cell-rings">
