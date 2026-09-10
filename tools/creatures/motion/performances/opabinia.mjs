@@ -76,6 +76,12 @@ function strike(u, { amount, dir, c0, c1, l0, l1, delay, snap, release, quiver =
   return { dir, coil, launch, open, recoil, held, straighten };
 }
 
+/**
+ * Bones this performance authors. The trunk and its claw are the performance; the lobes, tail fans and body keep the shipped motion
+ * (re-posed onto the new resting curve like every other clip).
+ */
+export const authored = (n) => /^(proboscis_|jaw_)/.test(n);
+
 export const clips = [
   {
     name: 'Bite', base: false, duration: 0.5, loop: false,

@@ -189,3 +189,26 @@ than total rework, so they were done, but as light previews: if a refinement tou
 the performance file is re-applied with `apply.mjs` (or dropped) rather than polished first. Polish
 the Cambrian set, whose bodies are final, before any of those.
 
+## Revision — 10 September 2026: the body keeps its own performance
+
+The first pass made a mistake worth recording: it damped each rig's locomotor wave during the
+strike (`× (1 - k · strike)`) on the theory that the appendages should carry the moment. The
+result read as *less* dynamic than the clips it replaced, because on the original eight the
+shipped attacks have real authored body motion — Marrella rears up, Anomalocaris rolls and
+arches — and that was being flattened to make room for appendage detail.
+
+Fixed in both directions:
+
+- **Carried body motion.** Every performance now declares `authored(name)`, the bones it owns —
+  the attack appendages and mouthparts. Every other bone keeps the shipped clip's motion,
+  composed with whatever the performance still does to it. So the body's original performance
+  survives verbatim and the appendage work is added on top rather than in place of it.
+- **The wave drives the strike.** Locomotor waves run at full amplitude across the whole clip
+  (`alive`), and a strike raises the stroke and pushes extra cycles through the train
+  (`power`, `beats`) instead of quieting it. Sensory appendages sweep through the strike too.
+
+Applied to all sixteen re-authored creatures. The Cambrian set also got the amplified wave; the
+six Devonian rigs, which are queued for model refinement, got the carried body motion only —
+they are not worth polishing until their bodies settle. Every clip still keeps its `replaced/`
+copy, so the comparison in the viewer is now three-way in spirit: the shipped clip, the first
+pass (in git), and this one.
