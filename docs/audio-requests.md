@@ -1,4 +1,4 @@
-# Audio requests — Cambrian Explosion
+# Audio requests — Cambrian Conquest
 
 Open sound and music requests. Image, glyph and prop requests live in
 [image-requests.md](image-requests.md). How the audio system consumes what is
@@ -10,28 +10,17 @@ size budget, a description of the sound, and the code that will consume it.
 
 ## Open
 
-### Biome music themes — 2 loops (optional)
-
-Optional: nothing in either era waits on these; the tags fall silent until the files exist.
-The soundtrack (`src/audio/music.ts`) rotates tracks and cues a track when you
-enter a biome it is tagged for. The two reef tracks exist (*Tide of First
-Bones*, *First Tide*). Two more are wanted, same instrumentation family so the
-crossfades feel like one score. **Both tags are already live in `MUSIC`, so
-dropping the files into `public/music/` is the whole integration**; until then
-each one fails to load and drops out of the rotation (`MISSING` in `music.ts`),
-and the reef tracks play everywhere.
-
-| File | Biomes | Brief |
-| --- | --- | --- |
-| `public/music/theme-calm.mp3` | Sunlit Shallows, Nursery Reef | The shallows and nurseries. 2–3 minutes, seamless loop, slow (60–70 bpm), major or lydian, warm pads, soft mallets, gentle water-like arpeggios, no percussion beyond a soft pulse. Should sit under sunlit caustics and let the player relax; it also plays over most of the early game. −16 LUFS integrated, under 6 MB. |
-| `public/music/theme-danger.mp3` | The Channels, The Escarpment, Deep Basin | 2–3 minutes, seamless loop, slow and low (50–60 bpm), minor or phrygian, sub bass, bowed metal, distant slow drums, long dissonant swells; tense but not a chase (the giant drone and heartbeat layer on top when one is actually hunting you). −16 LUFS, under 6 MB. |
-
-Both are optional: the rotation plays the reef tracks while a file is missing.
-The danger scale that decides the tagging is `BIOME_DANGER` in `src/sim/world.ts`;
-see [redesign/04-infinite-ocean.md](redesign/04-infinite-ocean.md) · *Danger, mood and
-the art brief*.
+Nothing outstanding: every sound and track the game asks for is delivered.
 
 ## Delivered
+
+- **Area music themes — 4 tracks** (`Cambrian Drifting`, `Cambrian Abyss`, `Devonian Calm`,
+  `Devonian Ritual`) in `public/music/`, replacing the placeholder `theme-calm` / `theme-danger`
+  tags. Calm for the shallows and the nursery, dangerous for the channels, escarpment and basin —
+  the two safest bands of `BIOME_DANGER` against the three worst, one pair per era. Consumed by the
+  area score in `src/audio/audio.ts` (`stepArea`) and tagged in each era's `music.ts`; see
+  [audio.md](audio.md) · *The area score* for the crossfade and dwell rules, and `npm run music`
+  for the test that drives them.
 
 - **Big-body sounds — 6 files** (`hit-huge-1/-2`, `crunch-huge`, `surge-huge`, `sweep-huge`,
   `death-huge`) in the shared `public/assets/sfx/`, from `MANIFEST` in `tools/gen-sfx.mjs`.

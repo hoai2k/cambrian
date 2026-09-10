@@ -60,6 +60,14 @@ function pickWander(a: Actor, b: BrainState, rng: Rng, radius: number) {
   b.wanderTo = { x, y, z };
 }
 
+/**
+ * The nurseries keep the young alive by keeping the peace, not by keeping the animals small. An
+ * animal standing in one starts nothing there and nothing there is hunted — whatever size either
+ * of them is — but a nursery is not a spell: anything that gets bitten still answers, because
+ * nothing in the sea does otherwise.
+ */
+const peaceful = (p: Vec3) => nurseryFactor(p.x, p.z) > 0.35;
+
 /** Detection score update for hunters (giants, predators). 10 Hz. */
 export function updateDetection(g: AiWorld, hunter: Actor, b: BrainState, dt: number) {
   const def = creature(hunter.creature);
@@ -83,7 +91,7 @@ export function updateDetection(g: AiWorld, hunter: Actor, b: BrainState, dt: nu
     const speed = len3(t.vel);
     const motion = t.state === 'attack' ? 1.5 : speed > 0.3 ? (t.burstT > 0 || t.noise > 2 ? 2.5 : 1) : 0.5;
     const camo = t.hideMode === 'camouflage' ? 1 - t.camoStrength * (speed < .4 ? .88 : .70) : 1;
-    const coverF = camo * (isHidden(t) ? 0.03 : 1 - t.cover * 0.95) * (L > 1.2 && nurseryFactor(t.pos.x, t.pos.z) > 0.35 ? 0.12 : 1);
+    const coverF = camo * (isHidden(t) ? 0.03 : 1 - t.cover * 0.95) * (peaceful(t.pos) ? 0.12 : 1);
     const distF = clamp(1.6 - d / range, 0.2, 1.6);
     // Only clear signals grow the score: a still or covered target decays out of attention.
     const rate = sight * sizeF * motion * coverF * distF * 1.1 - 0.35;
@@ -129,6 +137,17 @@ export function thinkSwarm(g: AiWorld, a: Actor, b: BrainState, dt: number): Inp
         threat = Math.max(threat, clamp(1 - d / alarm, 0, 1));
       }
     }
+  }
+  // Something has just bitten it. A school does not fight back, but it does not carry on schooling
+  // either: whatever the size of the thing, being bitten scatters the fish away from it at once.
+  // The alarm above only sees bodies nearly twice their length, so a predator their own size — a
+  // hatchling player, most often — could eat through a school without any of it reacting.
+  const biter = a.sinceHit < 1.5 && a.lastHitBy >= 0 ? g.byId(a.lastHitBy) : undefined;
+  if (biter && isAlive(biter)) {
+    const d = Math.max(dist(a.pos, biter.pos), 1e-3);
+    const k = 6 / d;
+    flee.x += (a.pos.x - biter.pos.x) * k; flee.y += (a.pos.y - biter.pos.y) * k * 0.5; flee.z += (a.pos.z - biter.pos.z) * k;
+    threat = 1;
   }
   const move = v3();
   if (n > 0) {
@@ -222,10 +241,11 @@ export function thinkNeeds(g: AiWorld, a: Actor, b: BrainState, dt: number): Inp
       } else if (band === 'snack' || band === 'prey') {
         if (o.controller === 'swarm' && d > senseR * 0.8) continue;
         if (RULES?.sanctuary(a, o) && a.lastHitBy !== o.id) continue;            // the young in a nursery are left alone
+        if (peaceful(o.pos) && a.lastHitBy !== o.id) continue;                   // and so is anything else in one
         if (d < preyD) { prey = o; preyD = d; }
       } else if (band === 'rival') {
         const provoked = o.lockTarget === a.id || (o.state === 'attack' && d < L * 2) || (o.brain?.target === a.id) || a.hitFlash > 0 || a.lastHitBy === o.id;
-        if (!provoked && RULES?.sanctuary(a, o)) continue;
+        if (!provoked && (RULES?.sanctuary(a, o) || peaceful(o.pos) || peaceful(a.pos))) continue;
         // A grumpy animal has a personal space and does not like it crossed: anything its own size
         // that comes inside it gets seen off, hungry or not, dawn or noon.
         const crowded = b.temper > 0 && d < L * (1.1 + b.temper * 1.3);
@@ -250,22 +270,25 @@ export function thinkNeeds(g: AiWorld, a: Actor, b: BrainState, dt: number): Inp
     const hungry = competitor || b.hunger > huntInterval(g.time) * (0.7 + b.appetite * 0.6) || a.hp < a.hpMax * 0.45;
     const predatory = !def.diet || (competitor && def.diet !== 'filter');
     const attacker = a.lastHitBy >= 0 ? g.byId(a.lastHitBy) : undefined;
-    const routed = b.courage <= 0 && attacker && isAlive(attacker);
-    // Whatever else it was doing, something that just hit it has its attention. This is the one
-    // rule the hour never softens: an animal always answers for itself.
-    const struck = attacker && isAlive(attacker) && a.sinceHit < 4
-      && bandOf(a, attacker) !== 'giant' && a.hp > a.hpMax * 0.3;
+    // Whatever else it was doing, something that just bit it has its attention — whatever size it
+    // is, and however badly hurt the animal already is. Fight or flight, always one of the two:
+    // there is nothing in the sea that carries on grazing while something eats it. This is the one
+    // rule the hour never softens.
+    const struck = !!attacker && isAlive(attacker) && a.sinceHit < 4;
+    // Which of the two it picks. Anything much bigger is run from, and so is anything at all once
+    // the animal has been beaten down or has no fight left in it.
+    const outmatched = struck && (bandOf(a, attacker!) === 'giant' || a.hp <= a.hpMax * 0.3 || b.courage <= 0);
     // Running away is only an answer if it works. An animal that has been swimming from something
     // for a couple of seconds and is *still* being bitten by it has not got away, and nothing in
-    // the sea keeps holding its line while something chews on it: it turns and fights. Without
-    // this a routed animal swims in a straight line and takes the whole beating without once
-    // answering, which is the one thing a real animal never does.
-    const cornered = !!struck && b.goal === 'flee' && b.target === (attacker?.id ?? -1) && b.goalT > 2
+    // the sea keeps holding its line while something chews on it: it turns and fights, whatever
+    // the thing is. Without this a routed animal swims in a straight line and takes the whole
+    // beating without once answering, which is the one thing a real animal never does.
+    const cornered = struck && b.goal === 'flee' && b.target === attacker!.id && b.goalT > 2
       && dist(a.pos, attacker!.pos) < L * 1.6 + lengthOf(attacker!) * 0.6;
-    if (cornered && attacker) { if (b.goal !== 'fight' || b.target !== attacker.id) b.goalT = 0; b.goal = 'fight'; b.target = attacker.id; }
-    else if (routed && a.controller !== 'bot') { if (b.goal !== 'flee') b.goalT = 0; b.goal = 'flee'; b.target = attacker.id; }
+    if (cornered) { if (b.goal !== 'fight' || b.target !== attacker!.id) b.goalT = 0; b.goal = 'fight'; b.target = attacker!.id; }
+    else if (outmatched && a.controller !== 'bot') { if (b.goal !== 'flee' || b.target !== attacker!.id) b.goalT = 0; b.goal = 'flee'; b.target = attacker!.id; }
+    else if (struck) { if (b.goal !== 'fight' || b.target !== attacker!.id) b.goalT = 0; b.goal = 'fight'; b.target = attacker!.id; }
     else if (worst) { if (b.goal !== 'flee') b.goalT = 0; b.goal = 'flee'; b.target = worst.id; }
-    else if (struck && attacker) { if (b.goal !== 'fight' || b.target !== attacker.id) b.goalT = 0; b.goal = 'fight'; b.target = attacker.id; }
     // Its own ground comes before a squabble with a neighbour and before feeding. Without this an
     // animal would wander off its patch to bicker and leave the intruder standing in it.
     else if (intruder) { if (b.goal !== 'defend' || b.target !== intruder.id) b.goalT = 0; b.goal = 'defend'; b.target = intruder.id; }
@@ -330,7 +353,7 @@ export function thinkNeeds(g: AiWorld, a: Actor, b: BrainState, dt: number): Inp
     }
     case 'hunt': {
       if (!t || !isAlive(t) || isHidden(t)) { b.goal = 'wander'; b.target = -1; break; }
-      if ((L > 1.2 && nurseryFactor(t.pos.x, t.pos.z) > 0.35) || (RULES?.sanctuary(a, t) && a.lastHitBy !== t.id)) { b.goal = 'wander'; b.target = -1; b.goalT = 0; pickWander(a, b, g.rng, 30); break; }
+      if ((peaceful(t.pos) && a.lastHitBy !== t.id) || (RULES?.sanctuary(a, t) && a.lastHitBy !== t.id)) { b.goal = 'wander'; b.target = -1; b.goalT = 0; pickWander(a, b, g.rng, 30); break; }
       if (b.goalT > 9 || (t.cover > 0.45 && t.stillness > 0.8 && lengthOf(t) < L * 0.7)) { b.goal = 'wander'; b.target = -1; b.goalT = 0; b.hunger = 0; pickWander(a, b, g.rng, 30); break; }
       const d = dist(a.pos, t.pos);
       const predicted = add(t.pos, vscale(t.vel, clamp(d / 8, 0, 0.6)));
@@ -384,7 +407,7 @@ export function thinkNeeds(g: AiWorld, a: Actor, b: BrainState, dt: number): Inp
       // Without this, being approached once turns an animal into a permanent enemy.
       if (b.temper > 0 && !competitor && a.lastHitBy !== t.id && a.hitFlash <= 0
         && dist(a.pos, t.pos) > L * (2.2 + b.temper * 2.6)) { b.goal = 'wander'; b.target = -1; b.goalT = 0; break; }
-      if (RULES?.sanctuary(a, t) && a.lastHitBy !== t.id && a.hitFlash <= 0) { b.goal = 'wander'; b.target = -1; b.goalT = 0; pickWander(a, b, g.rng, 30); break; }
+      if ((RULES?.sanctuary(a, t) || peaceful(t.pos) || peaceful(a.pos)) && a.lastHitBy !== t.id && a.hitFlash <= 0) { b.goal = 'wander'; b.target = -1; b.goalT = 0; pickWander(a, b, g.rng, 30); break; }
       // An animal that holds ground stops at the edge of it, whoever the quarrel is with. The
       // leash was on `defend` only, so a rolling brawl with a neighbour could still walk a
       // territorial animal clean off its patch — the one thing the whole idea promises it will not do.
@@ -536,7 +559,7 @@ export function thinkGiant(g: AiWorld, a: Actor, b: BrainState, dt: number): Inp
       break;
     }
     case 'hunt': {
-      if (!cur || !isAlive(cur) || curScore < 0.5 || isHidden(cur) || (nurseryFactor(cur.pos.x, cur.pos.z) > 0.35 && !shadow)) {
+      if (!cur || !isAlive(cur) || curScore < 0.5 || isHidden(cur) || (peaceful(cur.pos) && !shadow)) {
         b.goal = 'search'; b.goalT = 0; b.target = -1; if (cur) b.detection.set(cur.id, Math.min(curScore, 0.4)); break;
       }
       b.lastSeen = { ...cur.pos };

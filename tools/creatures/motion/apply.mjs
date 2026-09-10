@@ -22,7 +22,7 @@ import { readFile, writeFile, mkdir } from 'node:fs/promises';
 import { createHash } from 'node:crypto';
 import path from 'node:path';
 import assert from 'node:assert/strict';
-import { makeIO, loadRig, sampleClip, rebaseAnimation, Rig } from './rig.mjs';
+import { makeIO, loadRig, sampleClip, rebaseAnimation, clipReader, Rig } from './rig.mjs';
 
 const args = process.argv.slice(2);
 const id = args.find((a) => !a.startsWith('--'));
@@ -40,7 +40,7 @@ const file = `${assetDir}/${id}.glb`;
 const before = await readFile(file);
 const rig = await loadRig(io, file);
 const doc = rig.doc, root = doc.getRoot();
-const { clips, basePose, rebase } = await import(`./performances/${id}.mjs`);
+const { clips, basePose, rebase, authored } = await import(`./performances/${id}.mjs`);
 
 const hash = (b) => createHash('sha256').update(b).digest('hex');
 const digest = (a) => a ? hash(new Uint8Array(new Float64Array(a.getArray()).buffer)) + ':' + a.getType() + ':' + a.getNormalized() : null;
@@ -90,15 +90,20 @@ for (const def of clips) {
   if (kept && ours(kept)) { drop(kept); kept = undefined; log.push(`${def.name}: dropped a replaced/ copy that was this tool's own output`); }
   if (old && ours(old)) { drop(old); old = undefined; log.push(`${def.name}: previous ${PASS} clip dropped`); }
   if (!old && !kept) added.add(def.name);        // a clip the model never had: nothing to keep beside it
+  let source = kept;
   if (old && !kept) {
     old.setName(`replaced/${def.name}`);
     old.setExtras({ ...old.getExtras(), cambrianClip: { ...(old.getExtras()?.cambrianClip ?? {}), version: 1, replaced: def.name, replacedOn: authoredOn, by: PASS } });
     log.push(`${def.name}: shipped clip kept as replaced/${def.name}`);
+    source = old;
   } else if (old) {
     drop(old);
     log.push(`${def.name}: shipped clip dropped (replaced/${def.name} already kept)`);
   } else log.push(`${def.name}: ${kept ? 'new clip beside the kept original' : 'new clip'}`);
-  const { frames } = sampleClip(rig, def, { authoredOn, pass: PASS, basePose });
+  // Everything the performance does not claim keeps the shipped clip's motion.
+  const carry = authored && source ? clipReader(rig, source) : undefined;
+  const { frames } = sampleClip(rig, def, { authoredOn, pass: PASS, basePose, carry, authored });
+  if (carry) log.push(`${def.name}: body motion carried from replaced/${def.name}`);
   log.push(`${def.name}: ${frames} frames, ${def.duration}s, ${def.loop ? 'loop' : 'one-shot'}`);
 }
 // A base pose re-poses every other clip in the file onto the new resting shape; the shipped

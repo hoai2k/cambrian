@@ -1,8 +1,11 @@
 /**
- * Crawlers off the seabed. RB lifts them off and paddles: a crawler can climb into open water and
- * keep swimming there, slowly, but it cannot sprint or dash until its legs are back down.
- * It also has to be able to get back — the descent is a settle, not a fall — and the seafloor
- * has to keep enough small food on it for a crawler that never leaves the bottom.
+ * Crawlers off the seabed. RB lifts them off and they swim: out in open water a walker goes where
+ * it is aimed, sprints and dashes like anything else, and holds its own depth for as long as it is
+ * working at it. Stop asking for anything and it settles back to the bottom — the descent is a
+ * settle, not a fall — which is what keeps it a walker that visits the water rather than a swimmer.
+ * Height is the part that is paid for, at one price per second whether the button or the camera
+ * asked for it — RB is the dedicated paddle and climbs faster for the same money.
+ * The seafloor also has to keep enough small food on it for a crawler that never leaves the bottom.
  */
 import { Game } from '../src/sim/game';
 import { emptyInput, type InputFrame } from '../src/sim/types';
@@ -68,7 +71,7 @@ function run(g: Game, p: ReturnType<typeof start>['p'], f: Partial<InputFrame>, 
   check('...and is grounded again', p.grounded, `grounded=${p.grounded}`);
 }
 
-// --- no sprint and no dash while off the floor ---------------------------------------------
+// --- out in the water a walker swims: sprint, dash, and depth of its own -------------------
 {
   const flat = (rise: boolean, burst: number) => {
     const { g, p } = start('olenoides');
@@ -78,15 +81,52 @@ function run(g: Game, p: ReturnType<typeof start>['p'], f: Partial<InputFrame>, 
   const groundCruise = flat(false, 0), groundSprint = flat(false, 1);
   const paddleCruise = flat(true, 0), paddleSprint = flat(true, 1);
   check('sprint speeds a crawler up on the floor', groundSprint > groundCruise * 1.15, `${groundCruise.toFixed(1)} -> ${groundSprint.toFixed(1)} u`);
-  check('sprint does nothing while paddling', paddleSprint < paddleCruise * 1.05, `${paddleCruise.toFixed(1)} -> ${paddleSprint.toFixed(1)} u`);
-  check('paddling is slower than crawling', paddleCruise < groundCruise * 0.8, `${paddleCruise.toFixed(1)} vs ${groundCruise.toFixed(1)} u`);
+  check('...and off it too', paddleSprint > paddleCruise * 1.15, `${paddleCruise.toFixed(1)} -> ${paddleSprint.toFixed(1)} u`);
+  check('paddling is still slower than crawling', paddleCruise < groundCruise * 0.8, `${paddleCruise.toFixed(1)} vs ${groundCruise.toFixed(1)} u`);
 
-  const { g, p } = start('olenoides');
-  run(g, p, { rise: true }, 2.5);
-  const before = { ...p.pos };
-  run(g, p, { rise: true, my: 1, dash: true }, 0.5);
-  const moved = Math.hypot(p.pos.x - before.x, p.pos.z - before.z);
-  check('dash is refused while paddling', p.state !== 'dodge' && moved < 4, `state=${p.state} moved=${moved.toFixed(1)} u`);
+  {
+    const { g, p } = start('olenoides');
+    run(g, p, { rise: true }, 2.5);
+    const before = { ...p.pos };
+    run(g, p, { rise: true, my: 1, dash: true }, 0.5);
+    const moved = Math.hypot(p.pos.x - before.x, p.pos.z - before.z);
+    check('a dash fires off the floor as well as on it', moved > 5, `moved ${moved.toFixed(1)} u`);
+  }
+  // Swimming holds its depth; only a body that has stopped asking for anything settles home.
+  {
+    const { g, p } = start('olenoides');
+    run(g, p, { rise: true }, 3);
+    const high = p.pos.y - groundHeight(g.world, p.pos.x, p.pos.z, []);
+    const swum = run(g, p, { my: 1, camYaw: Math.PI }, 2);
+    check('swimming forward holds its depth', swum.above > high * 0.75 && swum.travelled > 3,
+      `${high.toFixed(1)} -> ${swum.above.toFixed(1)} above, ${swum.travelled.toFixed(1)} u along`);
+    const let_go = run(g, p, {}, 2);
+    check('...and letting go puts it back down', let_go.above < swum.above * 0.6, `${swum.above.toFixed(1)} -> ${let_go.above.toFixed(1)} above`);
+  }
+  // The camera's pitch is what a walker climbs with once it is up, and the climb is what costs.
+  {
+    const { g, p } = start('olenoides');
+    run(g, p, { rise: true }, 2);
+    const from = p.pos.y - groundHeight(g.world, p.pos.x, p.pos.z, []);
+    const stamina = p.stamina;
+    const up = run(g, p, { my: 1, camYaw: Math.PI, camPitch: -0.5 }, 2);
+    check('aiming up climbs, without the button', up.above > from + 1, `${from.toFixed(1)} -> ${up.above.toFixed(1)} above the floor`);
+    check('...and is paid for like the button', p.stamina < stamina - 5, `${stamina.toFixed(0)} -> ${p.stamina.toFixed(0)}`);
+    // Both routes up cost the same per second, so aiming up is not a way round RB's price; the
+    // button is still the stronger climb, which is what keeps it worth pressing.
+    const { g: g2, p: p2 } = start('olenoides');
+    run(g2, p2, { rise: true }, 2);
+    const s2 = p2.stamina;
+    const button = run(g2, p2, { my: 1, camYaw: Math.PI, rise: true }, 2);
+    check('the button and the camera climb at one price', Math.abs((s2 - p2.stamina) - (stamina - p.stamina)) < 6,
+      `RB ${(s2 - p2.stamina).toFixed(0)} stamina, camera ${(stamina - p.stamina).toFixed(0)}`);
+    check('...and RB is still the stronger climb', button.climbed > up.climbed,
+      `RB +${button.climbed.toFixed(1)} u, camera +${up.climbed.toFixed(1)} u`);
+    // An empty bar climbs on whatever trickles back in and no more: a tired walker sinks home.
+    p.stamina = 0;
+    const empty = run(g, p, { my: 1, camYaw: Math.PI, camPitch: -0.5 }, 2);
+    check('...and an empty bar buys far less of it', empty.climbed < up.climbed * 0.8, `${empty.climbed.toFixed(2)} u against ${up.climbed.toFixed(2)} on a full bar`);
+  }
 }
 
 // --- the seabed keeps its food ---------------------------------------------------------------

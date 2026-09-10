@@ -192,6 +192,38 @@ const fresh = (seed = 5) => { const g = new Game('reef', [{ creature: 'anomaloca
     g.step(1 / 60, m);
     check('a bite never turns onto another player', Math.abs(p.yaw) < 0.02, `yaw=${p.yaw.toFixed(3)}`);
   }
+  // --- and it aims up and down, not only round ---
+  // The nudge only ever moved yaw, so a bite lined up perfectly in the horizontal was still off
+  // by the whole elevation: prey a body length above sat 45° off the aim after the nudge had run.
+  const upDown = (elev: number) => {
+    const { g, p } = fresh(24);
+    p.yaw = 0; p.pitch = 0; p.vel = { x: 0, y: 0, z: 0 }; p.stamina = p.staminaMax;
+    const d = lengthOf(p) * 1.2, yawTo = 0.18;
+    const prey = g.spawn('waptia', 'ambient', {
+      x: p.pos.x + Math.sin(yawTo) * d * Math.cos(elev),
+      y: p.pos.y + d * Math.sin(elev),
+      z: p.pos.z + Math.cos(yawTo) * d * Math.cos(elev),
+    }, 1);
+    prey.hp = prey.hpMax = 400; prey.vel = { x: 0, y: 0, z: 0 };
+    g.hash.rebuild(g.actors);
+    run(g, { ...emptyInput(), light: true }, 1);
+    // How far off the body's own aim the prey ended up.
+    const cp = Math.cos(p.pitch);
+    const aim = { x: Math.sin(p.yaw) * cp, y: -Math.sin(p.pitch), z: Math.cos(p.yaw) * cp };
+    const to = { x: prey.pos.x - p.pos.x, y: prey.pos.y - p.pos.y, z: prey.pos.z - p.pos.z };
+    const tl = Math.hypot(to.x, to.y, to.z);
+    return Math.acos(Math.max(-1, Math.min(1, (aim.x * to.x + aim.y * to.y + aim.z * to.z) / tl)));
+  };
+  const deg = (r: number) => ((r * 180) / Math.PI).toFixed(0);
+  for (const e of [-0.8, -0.5, 0.5]) {
+    const err = upDown(e);
+    check(`a bite aims at prey ${deg(-e)}\u00b0 above it`, err < 0.2, `${deg(err)}\u00b0 off the aim (was ${deg(Math.abs(e))}\u00b0)`);
+  }
+  {
+    // Capped like the yaw is: it will not fold the animal in half to reach something overhead.
+    const steep = upDown(-1.5);
+    check('...but the nose only goes so far up', steep > 0.2, `${deg(steep)}\u00b0 off the aim at 86\u00b0 overhead`);
+  }
 }
 
 console.log(failed ? `\n${failed} FAILED` : '\nall fight tests passed'); process.exit(failed ? 1 : 0);

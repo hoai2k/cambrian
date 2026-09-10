@@ -1,4 +1,4 @@
-# Cambrian Explosion — project notes for Claude
+# Cambrian Conquest — project notes for Claude
 
 ## Policy: finish on `main`
 
@@ -46,7 +46,12 @@ unless the user explicitly asks for a PR. Steps:
   need the Devonian do the same: select the era, then `await import(...)` (`tools/devonian-test.ts`).
 - An era's `assets.sfx` names the shared sound library (`assets/sfx/`): bites, hits and the UI are the
   same files in both eras. Era-specific samples are addressed as `<era>/<name>` and resolve under
-  `assets/<era>/sfx/` regardless. Only creatures with their own delivered model are pickable
+  `assets/<era>/sfx/` regardless. The two always-on beds are named per era in `audio.loops`, and a
+  music track that names biomes is an *area theme*: reserved for them, never shuffled into the
+  rotation, crossfaded to on a dwell and back again on a longer one, resuming where it left off
+  (`stepArea` in `src/audio/audio.ts`, the constants in `src/audio/music.ts`, `npm run music`).
+  Nothing synthesises a stand-in for a sound that has not loaded — it stays quiet and the file is
+  fetched; anything genuinely missing goes in `docs/audio-requests.md`. Only creatures with their own delivered model are pickable
   (`PLAYABLE` in `src/sim/creatures.ts`); the rest borrow a body in the world but stay off the roster.
 - Devonian gameplay lives in `src/sim/devonian/` and reaches the shared simulation only through the
   `RULES?.` hooks in `src/sim/era-rules.ts`. Do not branch on the era inside `game.ts`/`combat.ts`;
@@ -62,6 +67,17 @@ unless the user explicitly asks for a PR. Steps:
   slow, turn sharp when slow, fast-start on sprint) is the `swim` hook in `src/sim/devonian/swim.ts`.
   Devonian growth is five geometric stages per creature (`stageScale` in `src/sim/devonian/state.ts`,
   hatchlings no shorter than 0.6 units); hatchlings are placed inside plant cover (`spawnInCover`).
+- How a body gets about, where that is something other than swimming forward, is a set of traits on
+  `CreatureDef` — the tail-flip, a body with no front, a medusa's pulse, hauling through weed,
+  punting, the row/walk gait, a rate-limited pitch, ram feeding, drifting and clinging. The
+  mechanics live in `src/sim/locomotion.ts` and are keyed off the creature, never the era, because
+  the same trait turns up in both: `npm run locomotion` covers the Cambrian bodies and
+  `npm run devonian` the Devonian ones. Which animal has what, and how well each is actually
+  attested, is `docs/research/locomotion-ideas.md`.
+- A body may shape itself to what it is on: `conformArms` bends a radial rig's arms onto the ground
+  under them, or around a creature it is holding, after the mixer has written the pose
+  (`src/render/conform.ts`, `npm run conform`). Presentation only, and asked for by name rather than
+  read off the rig, because a nautiloid's tentacles carry the same `arm_<i>_<nn>` bone names.
 - Seabed scenery collides as the shape it is drawn with: `src/content/prop-shapes.json` is measured
   off the prop GLBs by `npm run shapes` and is what `src/sim` collides against (footprints in
   `src/sim/footprint.ts`). Any new or changed instanced prop must re-run `npm run shapes`, and
@@ -69,6 +85,13 @@ unless the user explicitly asks for a PR. Steps:
 - Devonian scenery and biome plates are procedural stand-ins: flora kinds and their density table in
   `src/content/devonian/environment.ts` + `src/render/sea.ts`, plates from `npm run devonian:plates`.
   Authored sets replace them without touching placement; see `docs/redesign/09-devonian-remaining.md`.
+- Every animal answers what bites it: `thinkNeeds` in `src/sim/ai.ts` turns any hit into fight or
+  flight whatever the attacker's size and however hurt the animal is, and an animal that has been
+  fleeing the same attacker for two seconds and is still in its reach turns and fights (cornered).
+  Nurseries are safe by non-aggression, not by size — `peaceful()` drops prey and rivals inside the
+  ring from an animal's reckoning but never its answer to being bitten — and ambient size is rolled
+  from the sea's own ages rather than the biggest player's tier, so something full grown passes by
+  from the first minute. `npm run reactions` guards all of it.
 - What a player has found — biomes, landmarks, species taken to the top, the Rise record — is
   written to `localStorage` as the match finds it (`recordFinds` in `src/app/codex.ts`), never at
   the results screen: a player who quits mid-match keeps what they found. The results screen marks
@@ -76,7 +99,8 @@ unless the user explicitly asks for a PR. Steps:
   `npm run codex` guards both halves.
 - `src/content/<era>/pending-refinements.json` is the one queue of outstanding creature art, and it
   separates the two kinds: `model: true` (geometry, materials, rig, LOD art) is what shows the
-  creature's ⚠ preview badge in the game and the viewer, with `reason` on hover; `clips` are
+  creature's ⚠ preview badge in the specimen viewer, with `reason` on hover (the game itself shows
+  no badge for now — see `src/shared/ModelStatusBadge.tsx`); `clips` are
   animation clips queued for rework on a body that is already right, flagged on those clip buttons
   in the viewer with `clipReason` and never on the creature. `src/content/pending-refinements.ts`
   derives both eras' tables and `npm run eras` enforces the split — an entry must claim model or
@@ -91,6 +115,15 @@ unless the user explicitly asks for a PR. Steps:
   `public/fonts/fonts.css`, which each entry page links. Both are OFL, and the licences ship
   beside them. Going through Google cost a render-blocking third-party request and failed outright
   on any network that does not allow it, our own headless browser included.
+- Delivered brand art lands in `intake/` as the original PNG and is converted by `npm run brand`
+  (`tools/brand-intake.mjs`) into `public/assets/brand/`. The wordmark's white page is knocked out
+  by how *colourless* a bright pixel is, not how bright — the gold has highlights as bright as the
+  paper — and edge pixels are un-blended from that white so no pale fringe shows over the sea.
+  `intake/` is a handoff inbox, not an archive: convert, check the result where it is actually used,
+  then delete the sources from it in the same commit, so anything left sitting there means art has
+  been handed over and not yet integrated. Nothing is lost — the originals stay in git history and
+  the conversion is deterministic, so a recovered source reproduces the shipped asset exactly.
+  See `intake/README.md`.
 - All docs live in `docs/`. Design docs are in `docs/redesign/`. Image, glyph and prop
   needs go in `docs/image-requests.md` and move to `docs/image-requests-history.md` once
   delivered and integrated; sound and music needs go in `docs/audio-requests.md`.

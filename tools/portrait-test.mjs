@@ -21,6 +21,41 @@ assert.equal(creaturePortrait('anomalocaris','select','unknown-scheme').src,'ass
 assert.equal(creaturePortrait('anomalocaris','select','kelp-olive').src,'assets/creatures/defaults/anomalocaris.select.png');
 assert.equal(resolvePortrait('anomalocaris','thumb',coral,undefined).src,'assets/creatures/defaults/anomalocaris.thumb.png');
 assert.equal(paletteSignature(coral),paletteSignature({...coral,colors:Object.fromEntries(Object.entries(coral.colors).reverse().map(([k,v])=>[k,v.toUpperCase()]))}));
+// The appearance fingerprint has to survive a GLB being re-saved, or every clip delivery breaks
+// the deploy: the re-authoring pass reopens these files and writes them out its own way. Rebuild
+// one the three ways a glTF writer legitimately differs — keys in another order, identical
+// textures collapsed to one entry with the materials renumbered, sampler defaults spelled out —
+// and the hash must not move. This is what caught Opabinia's trunk work, which changed nothing
+// anyone could see.
+{
+ const path='public/assets/creatures/opabinia.glb';
+ const buf=fs.readFileSync(path),jsonLen=buf.readUInt32LE(12);
+ const j=JSON.parse(buf.subarray(20,20+jsonLen).toString('utf8'));
+ const before=fingerprint(path).appearanceSha256;
+ // 1. reverse every object's keys  2. give each material its own copy of the texture it uses
+ // 3. drop the sampler defaults the writer had spelled out
+ const flip=(v)=>Array.isArray(v)?v.map(flip):v&&typeof v==='object'?Object.fromEntries(Object.entries(v).reverse().map(([k,x])=>[k,flip(x)])):v;
+ const j2=flip(JSON.parse(JSON.stringify(j)));
+ j2.textures=[];
+ const dupe=(node,key='')=>{
+  if(Array.isArray(node))return node.map(n=>dupe(n,key));
+  if(!node||typeof node!=='object')return node;
+  if(/Texture$/.test(key)&&typeof node.index==='number'){const t=j.textures[node.index];j2.textures.push({...t});return {...node,index:j2.textures.length-1};}
+  return Object.fromEntries(Object.entries(node).map(([k,v])=>[k,dupe(v,k)]));
+ };
+ j2.materials=(j2.materials??[]).map(m=>dupe(m));
+ j2.samplers=(j2.samplers??[]).map(({wrapS,wrapT,...rest})=>rest);
+ const enc=new TextEncoder().encode(JSON.stringify(j2));
+ const pad=(4-(enc.length%4))%4;
+ const json=Buffer.concat([Buffer.from(enc),Buffer.alloc(pad,0x20)]);
+ const rest=buf.subarray(20+jsonLen);
+ const out=Buffer.concat([buf.subarray(0,12),Buffer.alloc(8),json,rest]);
+ out.writeUInt32LE(json.length,12);out.write('JSON',16);out.writeUInt32LE(out.length,8);
+ const tmp='/tmp/cambrian-reserialised.glb';fs.writeFileSync(tmp,out);
+ assert.equal(fingerprint(tmp).appearanceSha256,before,'appearance fingerprint moved when the file was merely re-saved');
+ assert.notEqual(fingerprint(tmp).glbSha256,fingerprint(path).glbSha256,'the re-serialised file should differ byte for byte, or this proves nothing');
+}
+
 let variants=0;
 for(const id of Object.keys(defaults)) {
  for(const kind of ['select','card','thumb']) {

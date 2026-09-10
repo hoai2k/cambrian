@@ -27,6 +27,7 @@ export const CloseIcon = (p: SVGProps<SVGSVGElement>) => (
 );
 export const ChevronLeft = (p: SVGProps<SVGSVGElement>) => (<svg {...base(p)}><path d="m15 18-6-6 6-6" /></svg>);
 export const ChevronRight = (p: SVGProps<SVGSVGElement>) => (<svg {...base(p)}><path d="m9 18 6-6-6-6" /></svg>);
+export const ChevronDown = (p: SVGProps<SVGSVGElement>) => (<svg {...base(p)}><path d="m6 9 6 6 6-6" /></svg>);
 export const PadIcon = (p: SVGProps<SVGSVGElement>) => (
   <svg {...base(p)}><path d="M6 11h4M8 9v4M15 12h.01M18 10h.01M17.32 5H6.68a4 4 0 0 0-3.98 3.6 60 60 0 0 0-.3 7.4c.1 1.2 1.2 2 2.4 2 .9 0 1.7-.5 2.2-1.3L8 15h8l1 1.7c.5.8 1.3 1.3 2.2 1.3 1.2 0 2.3-.8 2.4-2a60 60 0 0 0-.3-7.4A4 4 0 0 0 17.32 5z" /></svg>
 );

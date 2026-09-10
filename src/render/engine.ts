@@ -185,13 +185,31 @@ export function fitCameraArm(baseY: number, pitch: number, dist: number, minDist
 }
 export const PITCH_UP = -0.95;   // ~54° above the horizon
 export const PITCH_DOWN = 1.32;  // ~76° below it, near enough straight down at the seabed
-const FLAT_PITCH = 0.45;   // ~26°, comfortably above a resting follow camera (which sits at ~11-25°)
-const FULL_PITCH = 1.0;    // ~57°, by which the camera is clearly being pointed somewhere
+/**
+ * How much of the camera's tilt the body swims along.
+ *
+ * The camera is not a joystick. A follow camera at rest already sits 11-25° below the horizon, so
+ * reading its pitch straight off would have every body drifting at the seabed whenever the player
+ * did nothing but hold forward. That is what the flat slice around level is for.
+ *
+ * It only ever needed to be on the *downward* side, though: nobody's camera rests above the
+ * horizon, so looking up is always deliberate. Ignoring 26° of it in both directions and then
+ * squashing what was left through a smoothstep that clamped at 40° meant aiming up at something
+ * and swimming went almost nowhere — 26° of camera bought 0°, 34° bought 6° — and the top of the
+ * camera's own travel could not be reached at any tilt. Past its own slice each side is linear
+ * onto the camera's real angle now, so the end of the camera's travel is the angle you are looking
+ * along, and pointing at prey and swimming goes at it.
+ */
+const FLAT_DOWN = 0.45;   // ~26°, comfortably below a resting follow camera (which sits at ~11-25°)
+const FLAT_UP = 0.10;     // ~6°: nothing rests above the horizon, so only the noise comes out
 
 export function swimPitch(pitch: number): number {
+  const up = pitch < 0;
+  const flat = up ? FLAT_UP : FLAT_DOWN;
   const mag = Math.abs(pitch);
-  const t = clamp((mag - FLAT_PITCH) / (FULL_PITCH - FLAT_PITCH), 0, 1);
-  return clamp(Math.sign(pitch) * mag * (t * t * (3 - 2 * t)), -0.7, 0.7);
+  if (mag <= flat) return 0;
+  const limit = up ? -PITCH_UP : PITCH_DOWN;
+  return Math.sign(pitch) * limit * Math.min(1, (mag - flat) / (limit - flat));
 }
 
 export function layoutRects(n: number, w: number, h: number): Rect[] {
@@ -624,6 +642,16 @@ export class Engine {
    * forward ray, inside range) becomes the target. Entering aim snaps the camera onto the best
    * candidate once, the way a console aim-assist does; after that the right stick steers freely.
    */
+  /**
+   * Who the aim button is pointing at: whatever sits closest to the camera's forward axis, inside a
+   * cone that is wide on entry (the snap) and tight afterwards.
+   *
+   * The axis *is* the middle of the viewport, and the crosshair is drawn there (`.aim`, at
+   * left/top 50%). That equivalence is the contract that lets sense off take the crosshair away
+   * with nothing lost: with no reticle drawn, the centre of the camera is the implied aim point,
+   * and it is the real one. Anything that moves the crosshair off centre, or picks a target from
+   * somewhere other than `fwd`, breaks the immersive view as well as the readout.
+   */
   private updateAim(cs: CamState, p: Actor | undefined, aiming: boolean, dt: number) {
     if (!p || !this.game) { cs.aimBlend = 0; cs.aimTarget = -1; return; }
     const wasAiming = cs.aimBlend > 0.5 || cs.aimSnapT > 0;
@@ -835,6 +863,20 @@ export class Engine {
       const continuous = a.state === 'eating' || a.holdT > 0;
       const animate = continuous || !far || ((a.id + Math.floor(this.time * 60)) % 3 === 0);
       v.update(a, animate && far && !continuous ? dt * 3 : dt, this.time, animate, this.alpha);
+      // Arms that lie along what they are on. Near views only: it is a per-segment solve, and at
+      // any distance the shape it makes is smaller than a pixel.
+      if (v.conforms && d < 26 && animate) {
+        const host = a.rideHost >= 0 ? game.byId(a.rideHost) : undefined;
+        const L = lengthOf(a);
+        const gap = a.pos.y - groundHeight(game.world, a.pos.x, a.pos.z, this.scratchBoulders);
+        // Fade out as it leaves the floor: an arm in open water has nothing to lie on.
+        const weight = host ? 1 : clamp(1 - (gap - L * 0.35) / Math.max(L, 0.4), 0, 1);
+        v.conform({
+          groundAt: (x, z) => groundHeight(game.world, x, z, this.scratchBoulders),
+          clearance: L * 0.06,
+          host: host ? { x: host.pos.x, y: host.pos.y, z: host.pos.z, radius: lengthOf(host) * 0.32 } : undefined,
+        }, weight, dt);
+      }
       // A carcass shows what has been taken out of it, and gets whole again when its owner
       // respawns into the same view.
       if (a.state === 'dead' && a.eatBites > 1 && a.eaten > 0) v.carcass.setEaten(a.eaten);

@@ -27,7 +27,7 @@ export const glideOver = (a: Actor) => lengthOf(a) * 0.5 + 0.5;
  * of the rock and lifted up its side until the top is clear, then swims on over it. Above it, the
  * rock is a cliff and behaves like one.
  */
-export const climbHeight = (a: Actor) => lengthOf(a) * 2;
+export const climbHeight = (a: Actor) => creature(a.creature).cling ? Infinity : lengthOf(a) * 2;
 /** How fast that climb goes: a swimmer's own rise, so going over a rock is paced like swimming up. */
 export const climbRise = (a: Actor) => 2.6 * speedFactor(a.scale);
 
@@ -70,7 +70,7 @@ export function makeActor(id: number, creatureId: CreatureId, controller: Contro
     state: 'free', stateT: 0, stateDur: 0, combo: 0, comboT: 0, hitDone: new Set(),
     iframes: 0, lockTarget: -1, guardHeld: 0,
     hideMode: 'none', hideT: 0, hideCd: 0, camoStrength: 0, camoScheme: 'default', camoLabel: '', camoSource: -1, emergenceHeavy: false,
-    abilityCd: 0, abilityT: 0, abilityActive: false, senseMode: true, senseT: 0, burstT: 0,
+    abilityCd: 0, abilityT: 0, abilityActive: false, senseMode: true, senseT: 0, pulseT: 0, burstT: 0,
     hitFlash: 0, hitDir: v3(), hitStop: 0,
     grabbedBy: -1, grabbing: -1, grabT: 0, eatingTarget: -1, eatProgress: 0,
     corpseT: 0, eaten: 0, eatBites: 0, killer: -1, noise: 0.5, cover: 0, stillness: 0,
