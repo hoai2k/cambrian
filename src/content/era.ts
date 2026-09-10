@@ -57,6 +57,19 @@ export interface EraDefinition {
   /** The modes this era offers, in selection order. The simulation's win checks are keyed by id. */
   readonly modes: readonly ModeInfo[];
   readonly creatures: readonly CreatureDef[];
+  /**
+   * An alternative set of body lengths for this roster, offered as a setting rather than shipped.
+   *
+   * The Cambrian roster is authored at one size — every animal grows to within a third of every
+   * other — and `equivalentSizing` swaps in lengths taken from what the animals actually measured
+   * (`docs/research/cambrian-sizes.md`), so that size means something in a game where size decides
+   * who eats whom. `speed`, `hp` and `poise` come with the length so the simulation is unchanged at
+   * any given body size; everything else on the def is already counted in body lengths.
+   *
+   * An era that does not offer it — the Devonian, whose roster is already generated from real
+   * lengths — leaves it out, and the setting has nothing to do there.
+   */
+  readonly equivalentSizing?: Readonly<Record<string, { adultLength: number; speed: number; hp: number; poise: number; realCm: number }>>;
   readonly defaults: {
     readonly player: CreatureId;
     readonly boot: readonly CreatureId[];

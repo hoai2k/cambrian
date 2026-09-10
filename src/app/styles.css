@@ -137,6 +137,9 @@ h3 { font-size: 13px; letter-spacing: .12em; color: var(--ember); margin: 14px 0
 .creature-copy .role { font: 600 11px var(--font-display); letter-spacing: .18em; color: var(--ember); }
 .creature-copy h2 { font-size: clamp(20px, 2.4vw, 32px); margin: 2px 0 2px; line-height: 1; }
 /* The everyday group the animal belongs to, so an unfamiliar genus still lands somewhere. */
+/* The animal's own length, on the card, while Settings → Equivalent sizing is on: it is the one
+   thing that option changes about the creature, so it says so where the specimen line already is. */
+.real-size { color: var(--ember); font-style: normal; letter-spacing: .02em; }
 .kind { display: inline-block; margin-right: .55em; padding: .05em .5em; border-radius: .6em; background: color-mix(in srgb, var(--player, #61f2d5) 22%, transparent); border: 1px solid color-mix(in srgb, var(--player, #61f2d5) 55%, transparent); color: var(--foam); font: 700 .92em var(--font-display); letter-spacing: .04em; }
 .result-kind { color: var(--mist); font-size: .85em; letter-spacing: .06em; }
 .kind-note { margin: .3em 0 .5em; color: var(--mist); font-size: .9em; line-height: 1.4; }
