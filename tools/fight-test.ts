@@ -6,7 +6,10 @@ import { makeBrain } from '../src/sim/ai';
 let failed = 0;
 const check = (n: string, ok: boolean, d: string) => { console.log(`${ok ? 'PASS' : 'FAIL'}  ${n.padEnd(46)} ${d}`); if (!ok) failed++; };
 const run = (g: Game, f: InputFrame, steps: number, extra?: (i: number) => void) => { const m = new Map([[0, f]]); for (let i = 0; i < steps; i++) { extra?.(i); g.step(1 / 60, m); g.events.length = 0; } };
-const fresh = (seed = 5) => { const g = new Game('reef', [{ creature: 'anomalocaris', device: 'keyboard', ready: true }], seed); const p = g.players[0]; p.pos = { x: 60, y: 6, z: -30 }; p.spawnProtect = 0; p.yaw = 0; return { g, p }; };
+// Balance is measured between two animals, so the reef's own residents are cleared out first:
+// with a dozen of them around the giant, some of the damage routing it is theirs and the counts
+// here stop meaning what they say.
+const fresh = (seed = 5) => { const g = new Game('reef', [{ creature: 'anomalocaris', device: 'keyboard', ready: true }], seed); const p = g.players[0]; for (const o of [...g.actors]) if (o.controller !== 'player') g.remove(o); p.pos = { x: 60, y: 6, z: -30 }; p.spawnProtect = 0; p.yaw = 0; return { g, p }; };
 
 // --- giant bites needed to kill an adult ---
 {

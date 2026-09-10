@@ -8,7 +8,7 @@ import { emptyInput, type InputFrame } from '../src/sim/types';
 import { applyScaleStats, bandOf, isAlive, lengthOf } from '../src/sim/actors';
 import { makeBrain } from '../src/sim/ai';
 import { dist } from '../src/shared/math';
-import { nurseryAt, nurseryFactor, sampleHeight } from '../src/sim/world';
+import { nurseryAt, nurseryFactor, sampleHeight, SURFACE_Y } from '../src/sim/world';
 import { creature } from '../src/sim/creatures';
 import type { CreatureId } from '../src/sim/creatures';
 
@@ -150,22 +150,30 @@ function harass(preyId: CreatureId, preyScale: number, playerScale: number, seco
 
 // --- and the big ones are up in the water, not lying on the sand ---
 {
-  const g = new Game('reef', [{ creature: 'waptia', device: 'keyboard', ready: true }], 3);
-  const m = new Map([[0, emptyInput()]]);
-  let bigLow = 0, bigSeen = 0, smallLow = 0, smallSeen = 0;
-  for (let i = 0; i < 60 * 150; i++) {
-    g.step(DT, m); g.events.length = 0;
-    if (i % 30) continue;
-    for (const a of g.actors) {
-      if (a.controller !== 'ambient' || !isAlive(a) || creature(a.creature).ground) continue;
-      const up = a.pos.y - sampleHeight(a.pos.x, a.pos.z);
-      if (lengthOf(a) > 4) { bigSeen++; if (up < 3) bigLow++; } else { smallSeen++; if (up < 3) smallLow++; }
+  const { keepClear } = await import('../src/sim/locomotion');
+  let low = 0, seen = 0, smallLow = 0, smallSeen = 0;
+  // Three seas rather than one: at any moment there are only a handful of grown animals about, and
+  // one of them in a squabble on the floor swings a single run either way.
+  for (const seed of [3, 21, 57]) {
+    const g = new Game('reef', [{ creature: 'waptia', device: 'keyboard', ready: true }], seed);
+    const m = new Map([[0, emptyInput()]]);
+    for (let i = 0; i < 60 * 90; i++) {
+      g.step(DT, m); g.events.length = 0;
+      if (i % 30) continue;
+      for (const a of g.actors) {
+        if (a.controller !== 'ambient' || !isAlive(a) || creature(a.creature).ground) continue;
+        const floor = sampleHeight(a.pos.x, a.pos.z);
+        if (SURFACE_Y - floor < 14) continue;      // no room to be up in: says nothing either way
+        const up = a.pos.y - floor;
+        const keep = keepClear(lengthOf(a));
+        if (keep > 0) { seen++; if (up < keep * 0.6) low++; } else { smallSeen++; if (up < 4) smallLow++; }
+      }
     }
   }
-  check('the big swimmers are up in the water', bigSeen > 40 && bigLow / bigSeen < 0.3,
-    `${((bigLow / Math.max(bigSeen, 1)) * 100).toFixed(0)}% of ${bigSeen} sightings on the bottom`);
-  check('...where the small ones are all over it', smallLow / smallSeen > bigLow / bigSeen,
-    `${((smallLow / Math.max(smallSeen, 1)) * 100).toFixed(0)}% of ${smallSeen} small sightings on the bottom`);
+  check('a grown animal keeps water under it', seen > 60 && low / seen < 0.3,
+    `${((low / Math.max(seen, 1)) * 100).toFixed(0)}% of ${seen} sightings were down on the floor`);
+  check('...where the small ones are all over the bottom', smallLow / Math.max(smallSeen, 1) > 0.15,
+    `${((smallLow / Math.max(smallSeen, 1)) * 100).toFixed(0)}% of ${smallSeen} small sightings within 4 units of the sand`);
 }
 
 // --- a nursery is safe because nothing in it starts anything, not because nothing big fits ---
@@ -184,12 +192,16 @@ function harass(preyId: CreatureId, preyScale: number, playerScale: number, seco
   check('a nursery holds animals of any size', nurseryFactor(hunter.pos.x, hunter.pos.z) > 0.35 && lengthOf(hunter) > 6,
     `${lengthOf(hunter).toFixed(1)} m predator inside one`);
   const goals = new Set<string>();
+  let onSmall = false;
   const m = new Map([[0, emptyInput()]]);
   for (let i = 0; i < 60 * 30 && isAlive(small); i++) {
     small.pos = { ...held }; small.vel = { x: 0, y: 0, z: 0 };
     g.step(DT, m); g.events.length = 0; goals.add(hunter.brain!.goal);
+    if (hunter.brain!.target === small.id && (hunter.brain!.goal === 'hunt' || hunter.brain!.goal === 'fight')) onSmall = true;
   }
-  check('...and the big one never starts on the small one there', !goals.has('hunt') && !goals.has('fight'),
+  // Other animals wander into the area over half a minute and it may well hunt one of those: what
+  // it must never do is start on the hatchling standing in the ring beside it.
+  check('...and the big one never starts on the small one there', !onSmall,
     `goals ${[...goals].join(',')}`);
   check('...so the small one lives', isAlive(small), `hp ${(small.hp / small.hpMax).toFixed(2)}`);
 }

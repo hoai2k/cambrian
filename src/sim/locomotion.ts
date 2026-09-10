@@ -124,5 +124,19 @@ export function columnY(ground: number, surface: number, L: number, rng: () => n
   const floor = ground + 1.5;
   const column = Math.max(surface - 2 - floor, 0.5);
   const lo = dip ? 0 : clamp(((L - 2.5) * 1.8) / column, 0, 0.55);
-  return clamp(floor + column * (lo + rng() * (1 - lo) * 0.9), ground + 1, surface - 2);
+  // A small body is drawn towards the bottom of whatever is left to it: the floor, the weed and
+  // the cover are where it lives, at every age. A big one spreads evenly through the water above
+  // its own floor, which is most of the column by the time it is grown.
+  const r = rng();
+  return clamp(floor + column * (lo + (lo > 0.05 ? r : r * r) * (1 - lo) * 0.9), ground + 1, surface - 2);
 }
+
+/**
+ * How much water a swimming body of length `L` keeps under it when it can. Nothing for a small
+ * animal — the sand is where most of the reef lives — and a body length or so for a big one, which
+ * is what keeps the largest animals reading as things that pass overhead. It is a preference the
+ * body acts on while it is getting on with something else, not a floor it cannot cross: a hunt, a
+ * carcass or a bolt for cover all take it down, and `columnY` sends it down there on its own
+ * account now and then.
+ */
+export const keepClear = (L: number) => Math.max(0, (L - 2.5) * 1.1);

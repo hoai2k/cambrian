@@ -93,9 +93,21 @@ unless the user explicitly asks for a PR. Steps:
   being bitten — and ambient size is rolled from the sea's own ages rather than the biggest player's
   tier, so something full grown passes by from the first minute. Where in the water a swimmer keeps
   itself follows its length: `columnY` in `src/sim/locomotion.ts` raises the floor of a big body's
-  range so the largest animals pass overhead rather than lying on the sand, with about one wander in
-  six (`DIP_CHANCE`) a run down over the bottom. `npm run reactions` and `npm run locomotion` guard
+  range and pulls small ones down towards the sand, and `keepOffTheFloor` in `src/sim/ai.ts` bends a
+  large body's travel up whatever its goal asked for (`keepClear`), so the largest animals pass
+  overhead rather than lying on the bottom — with about one wander in six (`DIP_CHANCE`) a run down
+  over it. `npm run reactions` and `npm run locomotion` guard
   all of it.
+- What lives where is the place's own business, not the player's: `src/sim/population.ts` gives every
+  210-unit area a size profile and a density from a hash bent by the biome (hatcheries inshore, grown
+  animals in the deep), pure in the place and the world seed so an area is the same when you return.
+  `spawnAmbient` draws from it; `spawnPreyFor` still keeps food of your own size within reach, and
+  `PASSER_BY` sends a large animal through the upper water whatever the seabed holds. Ambient brains
+  wander within ~32 units of where they spawned, so a population stays in its biome.
+- Every player hatches out of an egg on the bottom rung: `HATCH_TIME` in `src/sim/game.ts` holds the
+  body still for five seconds (`skipHatch()` ends it for headless harnesses) and `src/render/eggs.ts`
+  draws the shell — pokes from inside, the split, the wriggle out. A moult above that rung is the
+  old one-second swell.
 - What a player has found — biomes, landmarks, species taken to the top, the Rise record — is
   written to `localStorage` as the match finds it (`recordFinds` in `src/app/codex.ts`), never at
   the results screen: a player who quits mid-match keeps what they found. The results screen marks

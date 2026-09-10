@@ -19,6 +19,7 @@ const check = (name: string, ok: boolean, detail: string) => { console.log(`${ok
 
 function twoPlayers(a: CreatureId, b: CreatureId, seed = 9) {
   const g = new Game('rise', [{ creature: a, device: 'keyboard', ready: true }, { creature: b, device: 'keyboard2', ready: true }], seed);
+  g.skipHatch();   // these are questions about grown animals, not about the five seconds in the egg
   const [p, q] = g.players;
   p.spawnProtect = 0; q.spawnProtect = 0;
   return { g, p, q };

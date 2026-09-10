@@ -13,6 +13,7 @@ import { SpatialHash } from './spatial';
 import { clampMark, fillOf, ladderFill, ladderMark, ladderRung, ladderScale, LADDER_TOP, MARK_NEAR_TOP } from './ladder';
 import { emptyInput, isCoop, TIER_NAMES, TIER_NEED, TIER_SCALE, type Actor, type BrainState, type InputFrame, type Mode, type PlayerSetup, type Prompt, type SiltCloud, type Tier, type WorldEvent } from './types';
 import { BIOME_NAMES, biomeAt, biomeWeights, coverAt, groundHeight, LIGHT_WINDOW_Y, type Landmark, type LandmarkKind, microbialAt, nearestNursery, nurseryAt, nurseryFactor, resolveStatic, RISE_RATE, sampleCurrent, sampleHeight, shoreDistance, shoreZ, type StaticContact, SURFACE_Y, World, type Biome, type Boulder, type Cover, type Flora, type WorldData } from './world';
+import { areaProfile, bandScale, drawBand, headroom, PASSER_BY } from './population';
 import { columnY, DIP_CHANCE, DRIFT_CURRENT, driftRise, flipLaunch, FLIP_STAMINA, PULSE_CYCLE, pulseRefilling, pulseThrust, punting, rowWalkCurrent } from './locomotion';
 
 export interface PlayerProgress {
@@ -265,6 +266,16 @@ interface Step {
   relief: number; freeClimb: boolean;
 }
 
+/**
+ * How long a hatchling spends coming out of its egg. The bottom rung only: everything above it is
+ * a moult, which is the same second-long swell it always was. Five seconds is a long time to hold
+ * a player still, and it is the point — you hatch once a life, and the first thing the sea shows
+ * you is that you are the smallest thing in it.
+ */
+export const HATCH_TIME = 5;
+/** How far through the hatch the body is out of the shell and free to swim. */
+export const HATCH_FREE = 0.72;
+
 /** The scale a body of this creature starts a mode on: its own tier ladder, not a flat multiple. */
 const tierStart = (id: CreatureId, tier: number) => tierScale(creature(id).adultLength, tier);
 
@@ -357,6 +368,9 @@ export class Game implements AiWorld {
       this.players.push(a);
       this.kept.push(new Map());
       this.progress.push({ prompts: [], flags: new Set(), deaths: 0, apexT: 0, message: '' });
+      // A run that starts on the bottom rung starts in an egg, the same as every hatch after it.
+      // Carrying a creature on part-grown does not: that animal has already been through this.
+      if (carry === 0 && ladderRung(this, a) === 0) this.beginHatch(a);
     });
     if (mode === 'hunted') {
       // Fill to 4 with bots
@@ -569,18 +583,13 @@ export class Game implements AiWorld {
   private spawnAmbient(initial = false, near?: Vec3) {
     const c = CREATURE_IDS[Math.floor(this.rng() * CREATURE_IDS.length)];
     const def = creature(c);
-    // The sea has its own ages in it, and they are not the player's. Ambient size used to widen
-    // with the biggest player, so a small animal met nothing but other small animals — a mirror
-    // rather than a sea. Now most of what passes is young, a third of it half grown, and one in
-    // eight a full adult on its way somewhere, rarer the larger it is. Meeting something enormous
-    // is meant to happen from the first minute; whether it is dangerous is the nursery's business,
-    // not its size's.
-    const roll = this.rng();
-    const s = clamp(roll < 0.55 ? 0.28 + this.rng() * 0.42
-      : roll < 0.88 ? 0.7 + this.rng() * 0.6
-      : 1.3 + this.rng() * this.rng() * 1.5, 0.28, 2.4);
     const anchor = near ?? this.randomAnchor();
+    // One spawn in five is simply something big going past, up in the water and regardless of what
+    // the seabed under it holds: swimming up is always a way to find a larger animal, whatever
+    // shelf of fingerlings you happen to be over.
+    const passing = !initial && !def.ground && this.rng() < PASSER_BY;
     let pos: Vec3 | undefined;
+    let s = 0.5;
     for (let tries = 0; tries < 20 && !pos; tries++) {
       const a = this.rng() * TAU, d = initial ? 20 + Math.sqrt(this.rng()) * 110 : 60 + Math.sqrt(this.rng()) * 90;
       const x = anchor.x + Math.cos(a) * d, z = anchor.z + Math.sin(a) * d;
@@ -589,18 +598,28 @@ export class Game implements AiWorld {
       // Nothing here turns big animals away from the nurseries any more: they are safe because
       // nothing in one picks a fight (`peaceful` in ai.ts), not because only small things fit.
       const g = groundHeight(this.world, x, z, this.scratchBoulders);
+      // What lives *here*: the area's own character rather than one distribution for the whole
+      // sea (`src/sim/population.ts`). A shelf of fingerlings and a channel of grown animals are
+      // both places you can end up in, which is what makes moving on worth doing.
+      let band = passing && headroom(g) > 0.35 ? 'large' : drawBand(this.rng, areaProfile(x, z, this.world.seed));
+      // A grown animal needs water over it. In the shallows there is nowhere for one to be except
+      // lying on the sand, which is exactly what a big fish does not do, so the area's adults are
+      // out where the bottom drops away and what is inshore is half grown at most.
+      if (band === 'large' && headroom(g) < 0.45) band = 'mid';
+      s = bandScale(this.rng, band);
       // A crawler goes on the sand. A swimmer goes where a body its size belongs: small animals
       // anywhere in the column including the bottom, a big one up in the water where it can be
       // seen passing (`columnY`), with the occasional pass down over the floor.
       const bodyL = def.adultLength * s;
       pos = { x, y: RULES ? RULES.spawnY(g, bodyL, !!def.ground)
         : def.ground ? g + bodyL * 0.13
-        : columnY(g, SURFACE_Y, bodyL, this.rng, bodyL > 2.5 && this.rng() < DIP_CHANCE), z };
+        : columnY(g, SURFACE_Y, bodyL, this.rng, !passing && bodyL > 2.5 && this.rng() < DIP_CHANCE), z };
     }
     if (!pos) return;
     const a = this.spawn(c, 'ambient', pos, s);
     a.brain = makeBrain('needs', pos, this.rng, this.temperament(a, pos));
   }
+
 
   /**
    * What kind of neighbour this animal is.
@@ -846,13 +865,47 @@ export class Game implements AiWorld {
     a.vel = v3(); a.state = 'free'; a.stateT = 0; a.respawnT = 0; a.corpseT = 0; a.eaten = 0; a.eatBites = 0;
     stopHiding(a); a.camoStrength = 0; a.hideCd = 0; a.emergenceHeavy = false; a.spawnProtect = RULES?.spawnProtect(a) ?? 3.5; a.hitFlash = 0; a.abilityActive = false; a.abilityCd = 0; a.lockTarget = -1; a.hunted = 0; a.hunterId = -1; a.wasHunted = false; a.swallowedBy = -1; a.bank = 0; a.pitch = 0; a.climbTo = -Infinity; a.climbPush = 0; this.clearRide(a);
     a.yaw = Math.PI;
-    // hatch-in: grow from a speck over a second (reuses the moult state with a smaller start scale)
-    a.hatching = true; a.state = 'moult'; a.stateT = 0; a.stateDur = 1.0;
-    this.events.push({ kind: 'moult', pos: { ...a.pos }, actor: a.id, player: a.player, strength: 0.5 });
+    this.beginHatch(a);
     void def;
   }
 
+  /**
+   * Hatch this body in. On the bottom rung that is the egg: five seconds of the shell taking a
+   * poke from inside, splitting, and the animal wriggling out of it (the shell itself is drawn by
+   * `src/render/eggs.ts`, which reads `hatching` and the state clock). Anything already grown is
+   * the old second-long swell out of nothing, because it did not come from an egg.
+   */
+  private beginHatch(a: Actor) {
+    const egg = ladderRung(this, a) === 0;
+    a.hatching = true; a.state = 'moult'; a.stateT = 0; a.stateDur = egg ? HATCH_TIME : 1.0;
+    a.vel = v3();
+    // Nothing may eat a body that cannot yet move: the shell is protection until it is out of it.
+    if (egg) a.spawnProtect = Math.max(a.spawnProtect, HATCH_TIME + 1.5);
+    this.events.push({ kind: egg ? 'hatch' : 'moult', pos: { ...a.pos }, actor: a.id, player: a.player, strength: egg ? 1 : 0.5 });
+  }
+
+  /**
+   * End any hatch in progress, as if the shell had already been left behind. Headless harnesses
+   * that set up a situation and drive it use this: five seconds of egg at the top of every match
+   * is the experience, not something each test wants to sit through.
+   */
+  skipHatch() {
+    for (const a of this.players) {
+      if (!a.hatching || a.state !== 'moult') continue;
+      const era = RULES?.moultScale(this, a);
+      a.scale = era ? era.to : tierScale(creature(a.creature).adultLength, a.tier);
+      a.state = 'free'; a.stateT = 0; a.stateDur = 0; a.hatching = false;
+      applyScaleStats(a, true); a.hp = a.hpMax;
+    }
+  }
+
+  /** True while the body is still inside its shell: it cannot swim and nothing it presses counts. */
+  private inShell(a: Actor) { return a.hatching && a.state === 'moult' && a.stateDur > 2 && a.stateT < a.stateDur * HATCH_FREE; }
+
   private updateActor(a: Actor, input: InputFrame, dt: number) {
+    // Inside the egg nothing the player presses reaches the water: the body is held where it
+    // hatched until it has wriggled out of the shell.
+    if (this.inShell(a)) input = { ...emptyInput(), camYaw: input.camYaw, camPitch: input.camPitch };
     const def = creature(a.creature);
     const L = lengthOf(a);
     const sf = speedFactor(a.scale);
@@ -1522,8 +1575,17 @@ export class Game implements AiWorld {
       const t = clamp(a.stateT / a.stateDur, 0, 1);
       const era = RULES?.moultScale(this, a);
       const to = era ? era.to : this.mode === 'hunted' && this.isHunter(a.player) ? a.scale : tierScale(def.adultLength, a.tier);
-      const from = a.hatching ? to * 0.3 : era ? era.from : tierScale(def.adultLength, Math.max(0, a.tier - 1));
-      if (!(this.mode === 'hunted' && this.isHunter(a.player))) a.scale = lerp(from, to, t * t * (3 - 2 * t));
+      // In an egg the animal is already most of the size it will be when it comes out — an egg is
+      // not a seed. A moult out of nothing (a respawn above the bottom rung) still swells from a
+      // speck, which is what that second was always for.
+      const inEgg = a.hatching && a.stateDur > 2;
+      const from = a.hatching ? to * (inEgg ? 0.62 : 0.3) : era ? era.from : tierScale(def.adultLength, Math.max(0, a.tier - 1));
+      // Coming out of an egg, the animal is the size of what was in the egg until it is out: the
+      // growth is the last third of the hatch, not the whole of it.
+      const k = inEgg ? clamp((t - 0.45) / 0.5, 0, 1) : t;
+      if (!(this.mode === 'hunted' && this.isHunter(a.player))) a.scale = lerp(from, to, k * k * (3 - 2 * k));
+      // Held where it hatched, working at the shell: the wriggle is the animal, not the water.
+      if (this.inShell(a)) { a.vel = v3(); a.yaw += Math.sin(a.stateT * 11) * 0.9 * dt; a.pitch = Math.sin(a.stateT * 7) * 0.12; }
       if (a.stateT >= a.stateDur) { a.state = 'free'; a.stateT = 0; a.scale = to; applyScaleStats(a, true); a.hp = a.hpMax; a.hatching = false; }
     }
 
@@ -2078,7 +2140,7 @@ export class Game implements AiWorld {
   private updatePopulation(dt: number) {
     this.ambientTimer -= dt;
     if (this.ambientTimer > 0) return;
-    this.ambientTimer = 1.5;
+    this.ambientTimer = 2.2;
     let ambient = 0, swarm = 0;
     const schools = new Map<number, number>();
     for (const a of this.actors) {
@@ -2095,10 +2157,19 @@ export class Game implements AiWorld {
       for (const p of anchors) d = Math.min(d, distXZ(a.pos, p));
       if (d > (a.controller === 'swarm' ? 240 : 290)) this.remove(a);
     }
+    // How many wild animals an area carries is the area's own business (`areaProfile`): a rich
+    // shelf holds half again what a thin one does, and the thin one is never empty. Refilling is
+    // deliberately unhurried — a stretch you have eaten through stays eaten through for a while,
+    // which is what makes swimming somewhere else the answer rather than waiting where you are.
     for (const p of anchors) {
       let local = 0;
       for (const a of this.nearby(p, 170)) if (a.controller === 'ambient' && isAlive(a)) local++;
-      if (local < 12 + this.maxPlayerTier() * 2) { this.spawnAmbient(false, p); break; }
+      const want = clamp(Math.round((15 + this.maxPlayerTier() * 2) * areaProfile(p.x, p.z, this.world.seed).density), 9, 34);
+      if (local >= want) continue;
+      // One at a time when it is nearly full, a few at once when a whole area is bare — arriving
+      // one animal every two seconds forever reads as a trickle following the player about.
+      for (let k = 0; k < (local < want * 0.5 ? 3 : 1); k++) this.spawnAmbient(false, p);
+      break;
     }
     void ambient;
     // Every player, at every size, should have plenty of things smaller than them within reach.

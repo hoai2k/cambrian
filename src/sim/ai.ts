@@ -1,7 +1,7 @@
 import { add, clamp, dist, distXZ, dot, heading, len3, norm, scale as vscale, sub, TAU, v3, type Rng, type Vec3 } from '../shared/math';
 import { bandOf, isAlive, isHidden, lengthOf } from './actors';
 import { RULES } from './era-rules';
-import { columnY, DIP_CHANCE } from './locomotion';
+import { columnY, DIP_CHANCE, keepClear } from './locomotion';
 import { creature } from './creatures';
 import type { Actor, BrainState, InputFrame, WorldEvent } from './types';
 import { emptyInput } from './types';
@@ -243,13 +243,15 @@ export function thinkNeeds(g: AiWorld, a: Actor, b: BrainState, dt: number): Inp
         const r = band === 'giant' ? senseR : senseR * 0.6;
         if (d < r && (hunting || d < r * 0.5) && d < worstD) { worst = o; worstD = d; }
       } else if (band === 'snack' || band === 'prey') {
-        if (o.controller === 'swarm' && d > senseR * 0.8) continue;
-        if (RULES?.sanctuary(a, o) && a.lastHitBy !== o.id) continue;            // the young in a nursery are left alone
-        if (peaceful(o.pos) && a.lastHitBy !== o.id) continue;                   // and so is anything else in one
-        if (d < preyD) { prey = o; preyD = d; }
+        // The young in a nursery are left alone, and so is anything else standing in one. These
+        // only bar it from being *food*: holding ground against it is further down, because an
+        // animal that will not eat you may still be moved off the patch you are sitting on.
+        const spared = (RULES?.sanctuary(a, o) || peaceful(o.pos)) && a.lastHitBy !== o.id;
+        const tooFar = o.controller === 'swarm' && d > senseR * 0.8;
+        if (!spared && !tooFar && d < preyD) { prey = o; preyD = d; }
       } else if (band === 'rival') {
         const provoked = o.lockTarget === a.id || (o.state === 'attack' && d < L * 2) || (o.brain?.target === a.id) || a.hitFlash > 0 || a.lastHitBy === o.id;
-        if (!provoked && (RULES?.sanctuary(a, o) || peaceful(o.pos) || peaceful(a.pos))) continue;
+        const peace = !provoked && (RULES?.sanctuary(a, o) || peaceful(o.pos) || peaceful(a.pos));
         // A grumpy animal has a personal space and does not like it crossed: anything its own size
         // that comes inside it gets seen off, hungry or not, dawn or noon.
         const crowded = b.temper > 0 && d < L * (1.1 + b.temper * 1.3);
@@ -258,7 +260,7 @@ export function thinkNeeds(g: AiWorld, a: Actor, b: BrainState, dt: number): Inp
         // the old reef tiring, so the odds of it scale with the hour like everything else.
         const spoiling = b.aggression > 0.7 && d < senseR * 0.35 && g.rng() < 0.3 * huntingPressure(g.time);
         const wants = competitor ? (o.controller === 'player' || o.controller === 'bot') : crowded || provoked || spoiling;
-        if (wants && d < rivalD) { rival = o; rivalD = d; }
+        if (wants && !peace && d < rivalD) { rival = o; rivalD = d; }
       }
       // Anything of consequence standing in the patch this animal holds, whatever size it is.
       if (b.territory && b.territoryR > 0 && !intruder) {
@@ -617,6 +619,31 @@ export function thinkGiant(g: AiWorld, a: Actor, b: BrainState, dt: number): Inp
   return out;
 }
 
+/**
+ * A big body does not lie on the sand.
+ *
+ * Where it *aims* is decided by whatever it is doing, and half of what an animal does — running
+ * for cover, squabbling with a neighbour, following a carcass down — points at the seabed. Left at
+ * that, the grown animals spent their lives on the floor, which is the one place a large fish is
+ * not. So whatever the goal picked, a body keeps a little water under it (`keepClear`, a body
+ * length or so, nothing at all for a small animal) by bending its travel upwards as it runs out of
+ * clearance. It is a lean, not a lid: it never stops the body going down, and a hunt or a meal on
+ * the bottom still wins. Wildlife only — the three giants are placed by hand and keep their own
+ * counsel.
+ */
+function keepOffTheFloor(g: AiWorld, a: Actor, out: InputFrame) {
+  const keep = creature(a.creature).ground ? 0 : keepClear(lengthOf(a));
+  if (keep <= 0 || !out.worldMove) return out;
+  const gap = a.pos.y - sampleHeight(a.pos.x, a.pos.z);
+  if (gap >= keep) return out;
+  const mv = out.worldMove;
+  const speed = len3(mv);
+  if (speed < 1e-3) return out;
+  const lift = clamp((keep - gap) / keep, 0, 1);
+  out.worldMove = vscale(norm({ x: mv.x, y: mv.y + speed * lift * 1.3, z: mv.z }), speed);
+  return out;
+}
+
 export function think(g: AiWorld, a: Actor, dt: number): InputFrame {
   const b = a.brain!;
   scratchDir.x = 0;
@@ -626,10 +653,12 @@ export function think(g: AiWorld, a: Actor, dt: number): InputFrame {
       b.thinkT -= dt;
       if (b.cached && b.thinkT > 0) return b.cached;
       b.thinkT = 1 / 12;
-      b.cached = thinkSwarm(g, a, b, dt);
+      b.cached = keepOffTheFloor(g, a, thinkSwarm(g, a, b, dt));
       return b.cached;
     }
+    // The three giants keep their own counsel: their lairs, routes and hunts are placed for them
+    // (`placeGiant`), and lifting them off the seabed would be overruling that.
     case 'giant': return thinkGiant(g, a, b, dt);
-    default: return thinkNeeds(g, a, b, dt);
+    default: return keepOffTheFloor(g, a, thinkNeeds(g, a, b, dt));
   }
 }

@@ -193,17 +193,37 @@ swims up to one has it recorded in `Game.discovery` for the results screen.
   is given a new lair 130–210 units from a player, in the biome it belongs to
   (Anomalocaris in channels, escarpment and basin; Olenoides in boulders;
   Opabinia in the forest), never in a nursery.
+- **Areas have a character.** `src/sim/population.ts` gives every 210-unit cell
+  a size profile and a density, from a hash of where it is bent by the biome:
+  the nursery and the shallows are hatcheries, the channel, escarpment and basin
+  hold the grown animals, and the shelf between them is whatever its own roll
+  says. Neighbouring cells draw independently, so a shelf with nothing on it but
+  fingerlings always has somewhere gentler — or somewhere richer — a few hundred
+  units away, and the density floor is a third of the usual rather than nothing.
+  It is a pure function of the place and the world seed: an area is the same area
+  every time you swim back to it. Two things override it — `spawnPreyFor` keeps
+  something of your own food size within reach of every player, and about one
+  spawn in five (`PASSER_BY`) is simply a large animal up in the water, so
+  swimming up is always a way to find something bigger than the seabed holds.
 - **Ambient ages** are the sea's own, not the player's: 55% of what spawns is
   young (scale 0.28–0.7), a third half grown (0.7–1.3) and one in eight a full
   adult (up to 2.4), rarer the larger it is. It used to be rolled against the
   biggest player's tier, so a small animal met nothing bigger than itself,
   which is a mirror rather than a sea (`spawnAmbient` in `src/sim/game.ts`).
   Depth follows length: `columnY` in `src/sim/locomotion.ts` raises the floor of
-  a swimmer's range with its size, so small animals of every age use the whole
-  column including the sand and the big ones keep to the higher water — about
-  one wander in six (`DIP_CHANCE`) brings one down over the bottom. Crawlers are
-  on the floor whatever their size, and the Devonian's `wanderY` carries the same
-  bias with its own benthic exceptions.
+  a swimmer's range with its size and draws small bodies towards the bottom of
+  what is left, so the sand and the weed belong to the small animals of every age
+  and the grown ones keep to the higher water — about one wander in six
+  (`DIP_CHANCE`) brings one down over the bottom. Placement alone was not enough:
+  half of what an animal *does* points at the seabed (cover, a squabble, a
+  carcass), so `keepOffTheFloor` in `src/sim/ai.ts` bends any large body's travel
+  upwards as it runs out of clearance — `keepClear`, about a body length, nothing
+  at all for a small animal. It is a lean and not a lid: a hunt or a meal on the
+  bottom still wins. A grown animal is found on the floor about 5% of the time
+  against a small one's 22% (`npm run reactions`). Crawlers are on the floor
+  whatever their size, big bodies are not spawned where there is no water over
+  them, and the Devonian's `wanderY` carries the same bias with its own benthic
+  exceptions.
 - **Precision.** Positions are doubles in the sim; the renderer's floats are
   good to a centimetre out to about 50 000 units from the origin, which is a
   couple of hours of sprinting in a straight line. A floating origin is the
