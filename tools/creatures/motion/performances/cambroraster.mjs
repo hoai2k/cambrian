@@ -9,18 +9,19 @@
  * head. Nothing here turns the whole body; the shield stays put and the rakes do the work.
  */
 import { ss, arc, hold, UP, DOWN, FWD, BACK } from '../lib.mjs';
-import { chain, wave, whip, pad, range, distal, proximal } from '../common.mjs';
+import { chain, wave, whip, pad, range, distal, proximal, alive, beatPhase } from '../common.mjs';
 
 const SIDES = [1, -1];
 const rake = (s) => range(6).map((i) => `rake_${s}_${i}`);
 const inward = (s) => [-s, 0, 0], outward = (s) => [s, 0, 0];
 const SEG = range(10).map((i) => `segment_${pad(i)}`);
 
-function trunk(P, t, env, { beat = 0, amp = .16, loopU } = {}) {
-  const ph = loopU === undefined ? 2 * Math.PI * t / 1.2 : 2 * Math.PI * loopU;
-  for (const s of SIDES) for (let i = 0; i < 10; i++) P.bend(`flap_${s}_${pad(i)}`, DOWN, .2 * amp * env * Math.sin(ph - i * .55) + .5 * beat);
-  for (const s of SIDES) for (let i = 0; i < 3; i++) P.bend(`tail_${s}_${i}`, UP, .05 * amp * env * Math.sin(ph - 5));
-  wave(P, SEG, UP, .01 * amp * env, (loopU === undefined ? ph / 2 : ph), .5);
+function trunk(P, t, env, { power = 0, beats = 0, ramp = 0, beat = 0, amp = .16, loopU } = {}) {
+  const ph = beatPhase(t, { period: 1.2, beats, ramp, loopU });
+  const A = amp * env * (1 + power);
+  for (const s of SIDES) for (let i = 0; i < 10; i++) P.bend(`flap_${s}_${pad(i)}`, DOWN, .3 * A * Math.sin(ph - i * .55) + .5 * beat);
+  for (const s of SIDES) for (let i = 0; i < 3; i++) P.bend(`tail_${s}_${i}`, UP, .12 * A * Math.sin(ph - 5));
+  wave(P, SEG, UP, .03 * A, (loopU === undefined ? ph / 2 : ph), .5);
 }
 /**
  * `spread` opens the rakes out and up, `sweep` swings them forward (the rake stroke), `close`
@@ -42,6 +43,11 @@ function rakes(P, s, a, u) {
 }
 const head = (P, { noseDown = 0, fwd = 0 }) => { P.bend('body', UP, noseDown); if (fwd) P.shift('body', [0, 0, fwd]); };
 
+/**
+ * Bones this performance authors. The rakes are the performance; the flap train, tail and shield keep the shipped motion.
+ */
+export const authored = (n) => /^rake_/.test(n);
+
 export const clips = [
   {
     name: 'Bite', duration: 0.5, loop: false,
@@ -50,7 +56,7 @@ export const clips = [
       const A = arc(0, .26, u), env = (x) => hold(.14, .32, .42, .86, x), S = env(u);
       for (const s of SIDES) rakes(P, s, { spread: .5 * A * (1 - S), sweep: .4 * S, close: 1.2 * S, scoop: .6 * S, whip: { env, amp: .25, kill: 1 - ss(.86, 1, u) } }, u);
       head(P, { noseDown: .04 * S, fwd: .03 * S });
-      trunk(P, t, Math.sin(Math.PI * u) ** 2 * (1 - .7 * S));
+      trunk(P, t, alive(u), { amp: .8, power: .9 * S, beats: 1.4, ramp: ss(.1, .55, u) });
     },
   },
   {
@@ -61,7 +67,7 @@ export const clips = [
       const W = hold(0, .3, .36, .5, u), env = (x) => hold(.36, .48, .6, .95, x), S = env(u), C = hold(.45, .54, .66, .92, u);
       for (const s of SIDES) rakes(P, s, { spread: 1.5 * W + .2 * S * (1 - C), sweep: 1.4 * S, close: 1.3 * C, scoop: 1.0 * C, whip: { env, amp: .45, kill: 1 - ss(.86, 1, u) } }, u);
       head(P, { noseDown: -.04 * W + .1 * S, fwd: -.04 * W + .08 * S });
-      trunk(P, t, Math.sin(Math.PI * u) ** 2 * (1 - .6 * S), { beat: hold(.36, .46, .58, .8, u) });
+      trunk(P, t, alive(u), { amp: .9, power: .3 * W + 1.2 * S, beats: 1.9, ramp: ss(.28, .66, u), beat: hold(.36, .46, .58, .8, u) });
     },
   },
   {
@@ -71,7 +77,7 @@ export const clips = [
       const env = (x) => hold(.05, .3, .55, .9, x), R = env(u), C = hold(.3, .4, .64, .9, u), D = hold(.42, .58, .68, .92, u);
       for (const s of SIDES) rakes(P, s, { spread: .5 * hold(.05, .2, .28, .4, u), sweep: 1.0 * R, close: 1.2 * C, scoop: .8 * C, draw: .9 * D, whip: { env, amp: .3, kill: 1 - ss(.86, 1, u) } }, u);
       head(P, { noseDown: .05 * R, fwd: .04 * R - .02 * D });
-      trunk(P, t, Math.sin(Math.PI * u) ** 2 * (1 - .5 * R));
+      trunk(P, t, alive(u), { amp: .8, power: .8 * R + .5 * D, beats: 1.6, ramp: ss(.1, .62, u) });
     },
   },
   {
@@ -84,7 +90,7 @@ export const clips = [
       const chew = hold(.66, .74, .86, .94, u) * rel, pulse = Math.sin(2 * Math.PI * 4 * (u - .66));
       for (const s of SIDES) rakes(P, s, { spread: .5 * hold(0, .12, .16, .26, u) * rel, sweep: 1.0 * R - .3 * Cy, close: 1.2 * G + .15 * chew * pulse, scoop: .9 * G + .1 * chew * pulse, draw: 1.5 * Cy, whip: { env: (x) => ss(0, .18, x), amp: .2, kill: rel } }, u);
       head(P, { noseDown: .08 * Cy + .015 * chew * pulse, fwd: .03 * R - .02 * Cy });
-      trunk(P, t, 1, { amp: .12, loopU: u });
+      trunk(P, t, 1, { amp: .45, loopU: u });
     },
   },
   {
@@ -96,7 +102,7 @@ export const clips = [
       const ph = 2 * Math.PI * u;
       for (const s of SIDES) rakes(P, s, { sweep: .3, close: 1.2 + .05 * Math.sin(ph), scoop: .9 + .06 * Math.sin(ph - .7), draw: .8 }, u);
       head(P, { noseDown: .06 + .008 * Math.sin(ph) });
-      trunk(P, t, 1, { amp: .12, loopU: u });
+      trunk(P, t, 1, { amp: .45, loopU: u });
     },
   },
 ];
