@@ -397,6 +397,7 @@ export class Game implements AiWorld {
     // One turn as the giant each. A single human plays the mode exactly as it was before.
     this.huntTurns = mode === 'hunted' ? Math.max(1, setups.length) : 1;
     this.huntScore = setups.map(() => 0);
+    const hatchers: Actor[] = [];
     setups.forEach((s, i) => {
       // Rise can start you part-grown, at the furthest rung you have taken this creature to before.
       // Both eras derive everything else from the body scale — the Cambrian's tier through
@@ -412,9 +413,8 @@ export class Game implements AiWorld {
       this.players.push(a);
       this.kept.push(new Map());
       this.progress.push({ prompts: [], flags: new Set(), deaths: 0, apexT: 0, message: '' });
-      // A run that starts on the bottom rung starts in an egg, the same as every hatch after it.
-      // Carrying a creature on part-grown does not: that animal has already been through this.
-      if (carry === 0 && ladderRung(this, a) === 0) this.beginHatch(a);
+      // Carrying a creature on part-grown skips the egg: that animal has already been through this.
+      if (carry === 0) hatchers.push(a);
     });
     if (mode === 'hunted') {
       // Fill to 4 with bots
@@ -433,6 +433,11 @@ export class Game implements AiWorld {
     }
     this.populate();
     RULES?.init(this);
+    // A run that starts on the bottom rung starts in an egg, the same as every hatch after it.
+    // After the era's init, because the rung a body stands on is the era's own bookkeeping and
+    // does not read right until that has run — before it, every Devonian player looked like a
+    // hatchling and a grown one was buried in an egg on the seabed.
+    for (const a of hatchers) if (ladderRung(this, a) === 0) this.beginHatch(a);
     // Last, because an era's init sets its own growth state from the body it finds: a mark that
     // carries a part-filled meter has to be applied on top of that, not before it.
     setups.forEach((s, i) => {
@@ -923,9 +928,7 @@ export class Game implements AiWorld {
     const egg = ladderRung(this, a) === 0;
     a.hatching = true; a.state = 'moult'; a.stateT = 0; a.stateDur = egg ? HATCH_TIME : 1.0;
     a.vel = v3();
-    // An era that places its own hatchlings (the Devonian's `spawnInCover`) has already laid the
-    // egg where it wants it; the Cambrian's spawn point is a point in the water, so lay it here.
-    if (egg && !RULES) this.layEgg(a);
+    if (egg) this.layEgg(a);
     // Nothing may eat a body that cannot yet move: the shell is protection until it is out of it.
     if (egg) a.spawnProtect = Math.max(a.spawnProtect, HATCH_TIME + 1.5);
     this.events.push({ kind: egg ? 'hatch' : 'moult', pos: { ...a.pos }, actor: a.id, player: a.player, strength: egg ? 1 : 0.5 });
@@ -953,24 +956,37 @@ export class Game implements AiWorld {
    * not been drawn yet). With nothing to lean on it still goes down onto the floor.
    */
   private layEgg(a: Actor) {
-    const L = lengthOf(a) / 0.62;                       // what it will measure when it is out
+    const L = lengthOf(a);                              // full hatched length: the moult has not started
     let best: Cover | undefined, bd = Infinity;
     for (const c of this.world.coverHash.query(a.pos.x, a.pos.z, 16, this.scratchCover)) {
       const d = distXZ(a.pos, c.pos);
       if (d < bd) { bd = d; best = c; }
     }
     let x = a.pos.x, z = a.pos.z;
-    if (best) {
-      const dx = a.pos.x - best.pos.x, dz = a.pos.z - best.pos.z;
+    // An era that picks the patch itself (the Devonian hatches inside plant cover, `spawnInCover`)
+    // has already chosen better than this can: keep where it put the body and only settle it onto
+    // the sand. Everything else is handed a point in open water and has to be laid against
+    // something.
+    const hidden = coverAt(this.world, a.pos, L, this.scratchCover) > 0.2;
+    if (best && !hidden) {
+      // On the open side of it — the clearing at the heart of the nursery, where nothing grows —
+      // rather than the side that happens to face the spawn point, which in a ring of sponges is
+      // usually deeper into the ring.
+      let dx = a.home.x - best.pos.x, dz = a.home.z - best.pos.z;
+      if (Math.hypot(dx, dz) < 0.5) { dx = a.pos.x - best.pos.x; dz = a.pos.z - best.pos.z; }
       const d = Math.max(Math.hypot(dx, dz), 1e-3);
-      const off = best.radius * 0.7 + L * 0.3;          // against its side, not inside it
+      const off = best.radius + L * 0.7;                // beside it, clear of the growth itself
       x = best.pos.x + (dx / d) * off; z = best.pos.z + (dz / d) * off;
-      // Nose to the rock: the camera hangs behind the body, so this puts the open water behind
-      // the camera and the cover behind the egg, rather than a plant between the two.
+      // Nose to the rock: the camera hangs behind the body, so the growth stands behind the egg
+      // and the camera has the clearing to sit in.
       a.yaw = Math.atan2(-dx, -dz);
     }
     const g = groundHeight(this.world, x, z, this.scratchBoulders);
-    a.pos = { x, y: g + L * 0.22, z };                  // the shell's own radius off the sand
+    // Down on the sand — but never so far down that it drops out of the patch that was hiding it.
+    // A plant's cover is a ball centred over its own base, so the last few inches to the floor can
+    // cost a hatchling the growth it was laid in.
+    const rest = g + L * 0.22;                          // the shell's own radius off the sand
+    a.pos = { x, y: best && hidden ? Math.max(rest, best.pos.y - best.radius * 0.75) : rest, z };
     a.prevT = { ...a.pos, yaw: a.yaw, pitch: a.pitch, bank: a.bank };
   }
 
