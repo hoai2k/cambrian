@@ -561,6 +561,9 @@ input[type='checkbox'] { width: 20px; height: 20px; accent-color: var(--ember); 
 @keyframes focus-pulse { 0%, 100% { box-shadow: 0 10px 40px rgba(255, 91, 110, .4); transform: none; } 50% { box-shadow: 0 10px 56px rgba(255, 179, 107, .75); transform: translateY(-2px) scale(1.03); } }
 
 /* ---------- Aim crosshair (fixed at screen centre; steer the camera onto prey) ---------- */
+/* Dead centre, and it has to stay dead centre: `updateAim` picks its target by angular distance
+   from the camera's forward axis, so this reticle is a drawing of that axis rather than a thing of
+   its own. Sense off hides it and leaves the centre of the view to imply it. */
 .aim { position: absolute; left: 50%; top: 50%; width: 3.6em; height: 3.6em; transform: translate(-50%, -50%); transition: width .12s, height .12s; animation: fade-in .15s both; }
 .aim i { position: absolute; width: 1em; height: 1em; border: 2px solid currentColor; opacity: .55; transition: opacity .15s; }
 .aim i:nth-child(1) { left: 0; top: 0; border-right: 0; border-bottom: 0; }
