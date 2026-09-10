@@ -131,16 +131,24 @@ const BITE_TIME = 0.62;                  // seconds a single bite takes to chew
 const MAX_BITES = 12;
 export const bitesFor = (eater: Actor, food: Actor) => clamp(Math.ceil(3 * lengthOf(food) / Math.max(lengthOf(eater), 1e-3)), 1, MAX_BITES);
 
-// Crawlers off the seabed. They paddle: they keep swimming, slowly, and pay for the climb in
-// stamina (more than they regenerate, so a paddle is a crossing, not a second way to live).
+// Crawlers off the seabed. Up there they swim: they go where they are aimed, sprint and dash like
+// anything else, and hold their own depth for as long as they are working at it. What separates a
+// walker from a swimmer is the two ends of that — height costs stamina (more than they regenerate,
+// so open water stays a crossing rather than a second way to live), and a body that stops asking
+// for anything settles back to the bottom, where it belongs.
 /** A leap out of the water: the pull back down, and the least upward speed that gets a fish through the surface. */
 const BREACH_GRAVITY = 14;
 /** The least upward speed that gets a fish through the surface, at scale 1: bigger bodies need more. */
 const BREACH_MIN_RISE = 3.2;
-const PADDLE_SPEED = 0.35;    // fraction of the crawler's cruise while off the floor
+const PADDLE_SPEED = 0.7;     // fraction of the crawler's cruise while off the floor: a swim, if a laboured one
 const PADDLE_RISE = 2.4;      // climb speed, units/s at scale 1 (a swimmer's rise is RISE_RATE, and faster to reach)
-const PADDLE_SINK = 2.2;      // terminal sink once RB is released — a settle, not a fall
-const PADDLE_STAMINA = 24;    // per second while climbing
+const PADDLE_SINK = 2.2;      // terminal sink once the body stops asking to go anywhere — a settle, not a fall
+/**
+ * Per second while a walker is gaining height, however the height was asked for. Above the 14/s a
+ * moving body regenerates, so a climb is a real cost and not a rounding error — which is what
+ * keeps open water somewhere a walker crosses rather than somewhere it lives.
+ */
+const PADDLE_STAMINA = 24;
 /**
  * Sprint cost, per second at full trigger. A sprint is meant to be how you cross water and close a
  * gap, not a two-second window: at this rate a full bar runs for most of a minute, and the swim
@@ -196,6 +204,14 @@ const CHARGE_LATERAL = 1.2, CHARGE_REACH = 1.3;
  * it stays a nudge and never swings the body round onto something behind you.
  */
 const AIM_NUDGE = 0.4, AIM_NUDGE_CONE = 0.45;
+/**
+ * How far the same nudge may tip the nose up or down. Larger than the yaw allowance because the
+ * two are not aimed with the same instrument: yaw is the stick, which a player points precisely,
+ * while elevation comes off the camera's pitch, which is coarse and spends part of its travel on
+ * the follow angle. Prey a body length above you sat forty-five degrees off the aim even after
+ * the nudge had lined the bite up perfectly in the horizontal.
+ */
+const AIM_NUDGE_PITCH = 0.7;
 /** Seconds of that window spent fading out at the end of it. */
 export const DEATH_FADE = 1.2;
 /**
@@ -861,14 +877,18 @@ export class Game implements AiWorld {
           fwd = def.ground ? norm({ x: to.x, y: 0, z: to.z }) : to;
           right = norm({ x: -fwd.z, y: 0, z: fwd.x });
         } else {
-          const cy = input.camYaw, cp = def.ground ? 0 : input.camPitch;
+          const cy = input.camYaw, cp = def.ground && a.grounded ? 0 : input.camPitch;
           fwd = { x: Math.sin(cy) * Math.cos(cp), y: -Math.sin(cp), z: Math.cos(cy) * Math.cos(cp) };
           right = { x: -Math.cos(cy), y: 0, z: Math.sin(cy) };
         }
         dir = norm({ x: fwd.x * sy + right.x * sx, y: fwd.y * sy, z: fwd.z * sy + right.z * sx });
       }
     }
-    if (def.ground) dir.y = 0;
+    // A walker's stick is flat while its legs are on the floor. Off it, the camera's pitch steers
+    // it like any swimmer's — that is what makes the water somewhere it can go rather than only
+    // somewhere it can bob. Height is bought with stamina below, so an empty bar keeps the level
+    // and the descent and loses only the climb.
+    if (def.ground && (a.grounded || (dir.y > 0 && a.stamina <= 0))) dir.y = 0;
 
     // Cooldowns, healing, hiding and the stamina bar: everything that ticks whether or not the
     // animal does anything this frame. It settles what the rest of the frame can afford. The
@@ -983,17 +1003,27 @@ export class Game implements AiWorld {
       const climbing = a.climbTo > a.pos.y;
       const paddleUp = canPaddle && input.rise && a.stamina > 0;
       const holdingRise = paddleUp || climbing;
+      // A walker swims while it is working at it, and comes home when it stops. Off the floor and
+      // still asking to go somewhere, the settle is switched off and the body holds its own depth:
+      // the stick, through the camera's pitch, is what takes it up or down from there, exactly as
+      // it does for anything else in the sea. Ask for nothing and the sink comes back and puts it
+      // on the bottom, which is the whole character of the animal — at home down there, a visitor
+      // up here. Height is the part that is paid for, at the same price per second however it was
+      // asked for, so aiming up is not a way round the button's price — RB is still the dedicated
+      // paddle and climbs faster for it, the camera is a steer that happens to point upward.
+      const swimming = canPaddle && !a.grounded && mag > 0.08 && !input.sink;
+      const lifting = swimming && dir.y > 0.1 && a.stamina > 0;
       // Lifting off is a swim, not a jump. Holding RB eases the body up off the floor and it keeps
       // accelerating to a paddle's pace — the same gradual rise a swimmer gets from the same button
       // — rather than kicking it into a ballistic arc it has no control over.
       if (holdingRise && a.grounded) { a.grounded = false; a.hopVel = Math.max(a.hopVel, 0); }
       if (holdingRise && !a.grounded) {
         a.hopVel = damp(a.hopVel, Math.max(climbing ? climbRise(a) : 0, PADDLE_RISE * Math.sqrt(sf)), 5, dt);
-        if (paddleUp) a.stamina -= PADDLE_STAMINA * dt;
       } else if (!a.grounded) {
-        const sink = -PADDLE_SINK * Math.sqrt(sf) * (input.sink ? 2.4 : 1);
+        const sink = swimming ? 0 : -PADDLE_SINK * Math.sqrt(sf) * (input.sink ? 2.4 : 1);
         a.hopVel = Math.max(a.hopVel - 16 * dt, sink);
       }
+      if (paddleUp || lifting) a.stamina = Math.max(0, a.stamina - PADDLE_STAMINA * dt);
       if (!a.grounded) { a.pos.y += a.hopVel * dt; }
     }
 
@@ -1135,7 +1165,7 @@ export class Game implements AiWorld {
     // which keeps that sprint out of the horizontal, where it was never paid for.
     const relief = RULES ? RULES.climbRelief(a, input, dir, mag) : 0;
     const freeClimb = relief > 0.5;
-    const bursting = burstIn > 0.1 && (a.stamina > 0 || freeClimb) && a.state !== 'guard' && (a.exhausted === 0 || freeClimb) && !paddling;
+    const bursting = burstIn > 0.1 && (a.stamina > 0 || freeClimb) && a.state !== 'guard' && (a.exhausted === 0 || freeClimb);
     const emptyClimb = bursting && a.stamina <= 0;
     if (def.ability === 'ambushSurge' && input.burst > .1 && !a.prev.burst && a.abilityCd <= 0) { a.burstT = 2.2; a.abilityCd = 10; }
     const freeBurst = a.burstT > 0;
@@ -1323,7 +1353,7 @@ export class Game implements AiWorld {
       // A dash that is mostly climb is on the same terms as a sprint that is: it costs what is
       // left of it after the relief, and an empty bar does not refuse it — the body just goes up
       // rather than along (see `startDash`). There is always a way back to the surface.
-      else if (justDash && (a.stamina >= 10 || freeClimb) && (a.exhausted === 0 || freeClimb) && a.dashCd === 0 && !a.dashUsed && !paddling) {
+      else if (justDash && (a.stamina >= 10 || freeClimb) && (a.exhausted === 0 || freeClimb) && a.dashCd === 0 && !a.dashUsed) {
         a.dashUsed = true;
         this.startDash(a, def, mag > 0.3 ? dir : vscale(heading(a.yaw), jets ? -1 : 1), L, sf, relief);
       }
@@ -1685,12 +1715,26 @@ export class Game implements AiWorld {
       if (o.id === a.id || !isAlive(o) || isHidden(o)) continue;
       if (o.controller === 'player' && a.controller === 'player') continue;
       const to = sub(o.pos, a.pos), d = len3(to);
-      if (d > reach || dot(norm(to), h) < AIM_NUDGE_CONE) continue;
+      if (d > reach) continue;
+      // The cone is measured in the yaw plane. Against the full 3-D heading it narrowed with
+      // height — a fish directly above the mouth scored zero and was rejected as "behind" — when
+      // something overhead is as much in front of you as something level with you is. What it
+      // takes to reach up at it is the pitch below, not a wider cone.
+      const flat = Math.hypot(to.x, to.z);
+      if (flat > 1e-6 && (to.x * h.x + to.z * h.z) / flat < AIM_NUDGE_CONE) continue;
       if (d < bd) { bd = d; best = o; }
     }
     if (!best) return;
-    const turn = clamp(wrapAngle(yawOf(sub(best.pos, a.pos)) - a.yaw), -AIM_NUDGE, AIM_NUDGE);
+    const to = sub(best.pos, a.pos);
+    const turn = clamp(wrapAngle(yawOf(to) - a.yaw), -AIM_NUDGE, AIM_NUDGE);
     a.yaw = wrapAngle(a.yaw + turn); a.prevT.yaw = a.yaw;
+    // A walker's pitch is the slope it is standing on and is rewritten from the ground every step,
+    // so there is nothing to aim with; a swimmer tips its nose at what it is biting.
+    if (!creature(a.creature).ground) {
+      const want = clamp(-Math.atan2(to.y, Math.hypot(to.x, to.z)), -0.9, 0.9);
+      a.pitch += clamp(want - a.pitch, -AIM_NUDGE_PITCH, AIM_NUDGE_PITCH);
+      a.prevT.pitch = a.pitch;
+    }
   }
 
   /** Nearest thing in front worth pouncing on when RT is pressed without aiming. */
@@ -1755,7 +1799,10 @@ export class Game implements AiWorld {
     const gap = a.pos.y - groundHeight(this.world, a.pos.x, a.pos.z, []);   // own scratch: called mid-update
     const power = flip ? flipLaunch(a) : (L * 9.5 + 7) * (def.id === 'waptia' ? 1.2 : 1) * punting(a, gap);
     const along = empty && !flip ? 0 : 1;
-    a.vel.x = d.x * power * along; a.vel.y = def.ground ? a.vel.y : d.y * power * 0.7; a.vel.z = d.z * power * along;
+    // The vertical used to be cut to seven tenths, which tipped every aimed dash flatter than it
+    // was pointed — about ten degrees of it — and made lining one up on prey above or below you
+    // harder than lining it up on prey alongside. A dash goes where it was aimed, in all three.
+    a.vel.x = d.x * power * along; a.vel.y = def.ground ? a.vel.y : d.y * power; a.vel.z = d.z * power * along;
     a.dodgeDir = d;
     this.evadeSpecial(a, def, L);
     this.events.push({ kind: 'dodge', pos: { ...a.pos }, actor: a.id, player: a.player, strength: L });
