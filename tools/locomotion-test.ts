@@ -10,6 +10,7 @@ import { emptyInput, type InputFrame } from '../src/sim/types';
 import { creature, type CreatureId } from '../src/sim/creatures';
 import { climbHeight, lengthOf } from '../src/sim/actors';
 import { heading, wrapAngle } from '../src/shared/math';
+import { columnY, DIP_CHANCE } from '../src/sim/locomotion';
 import { floraSize } from '../src/sim/flora';
 import { chunkCoord, chunkKey, sampleHeight } from '../src/sim/world';
 
@@ -177,6 +178,28 @@ const flat = (v: { x: number; z: number }) => Math.hypot(v.x, v.z);
   };
   const night = climb(480 * 0.84), day = climb(480 * 0.34);
   check('...and rises through the night, sinks through the day', night > day, `night ${night.toFixed(2)}, day ${day.toFixed(2)}`);
+}
+
+// --- how high in the water a body keeps itself ---
+{
+  const seq = (n: number) => { let i = 0; return () => ((i = (i * 1103515245 + 12345) % 2147483648), (i + n) % 2147483648 / 2147483648); };
+  const heights = (L: number, dip = false) => {
+    const rng = seq(7);
+    const hs: number[] = [];
+    for (let i = 0; i < 400; i++) hs.push(columnY(-30, 0, L, rng, dip) + 30);
+    return { mean: hs.reduce((s, v) => s + v, 0) / hs.length, min: Math.min(...hs), max: Math.max(...hs) };
+  };
+  const small = heights(1), big = heights(9);
+  check('a small body uses the whole column, sand included', small.min < 3 && small.max > 15,
+    `${small.min.toFixed(1)}–${small.max.toFixed(1)} above the floor`);
+  check('a big one keeps to the higher water', big.min > 10 && big.mean > small.mean * 1.35,
+    `${big.min.toFixed(1)}–${big.max.toFixed(1)}, mean ${big.mean.toFixed(1)} against ${small.mean.toFixed(1)}`);
+  const swept = heights(9, true);
+  check('...but comes down over the floor when it does', swept.min < 4, `${swept.min.toFixed(1)} above the floor on a dip`);
+  check('...which is a minority of the time', DIP_CHANCE > 0.05 && DIP_CHANCE < 0.3, `${(DIP_CHANCE * 100).toFixed(0)}% of wanders`);
+  // Shallow water has no higher water to keep to, and nothing may end up in the air over it.
+  const shallow = columnY(-4, 0, 9, seq(3), false);
+  check('...and shallow water is still water', shallow > -4 && shallow < -2, `${shallow.toFixed(2)} in 4 units of depth`);
 }
 
 console.log(failed ? `\n${failed} FAILED` : '\nall locomotion tests passed');

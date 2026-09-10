@@ -61,34 +61,36 @@ roster runs 0.85 to 12 units for an 80:1 range of real animals — so what the C
 
 ## 3. The mapping
 
-`game units = K · metres^EXP`, with `K = 5.75` and `EXP = 0.4`. `npm run cambrian:sizes` writes
+`game units = K · metres^EXP`, with `K = 8.4` and `EXP = 0.4`. `npm run cambrian:sizes` writes
 `src/content/cambrian/equivalent-sizing.json` from it; nothing else is generated, and the shipped
 roster in `creatures.ts` is untouched.
 
-The two constants say the same thing from either end. **K is set so the largest animal lands exactly
-where the largest animal is today** — Anomalocaris at 3.9 units, an Apex Anomalocaris at 10.1 — so
-the Cambrian sea stays the size it is and the rest of the roster comes down to meet it rather than
-everything growing to meet Anomalocaris. **EXP is set so the smallest still has a body worth
-swimming**: the roster comes out 1.09–3.90 against today's 2.6–3.9, which is real variance inside
-the scale the game already has.
+**K is set so the roster's *average* adult comes out at the average it has today** — 3.05 units —
+rather than so its largest matches today's largest. The average is what says how big this sea's
+animals are; pinning the top instead would have meant the only way to give Anomalocaris its lead was
+to shrink everything else underneath it, and the point is that the biggest animal in the Cambrian
+should read as the biggest animal in the Cambrian. So it grows: 5.69 units at Adult and **14.8 at
+Apex**, against 3.9 and 10.1. That is still inside what the engine is known to carry — the Devonian
+puts a 16.3-unit Prime Titanichthys in the water.
 
-This is deliberately *not* the Devonian's exponent. That sea is built at a different scale for an
-80:1 roster; the thing worth sharing between the two is that adults differ at all, not the number
-they differ by.
+**EXP is set so the smallest animal still has a body worth swimming.** The roster comes out
+1.59–5.69 against today's 2.6–3.9. This is deliberately *not* the Devonian's exponent: that sea is
+built at a different scale for an 80:1 roster, and the thing worth sharing between the two is that
+adults differ at all, not the number they differ by.
 
 | | real | adult | larva | apex | shipped |
 | --- | --- | --- | --- | --- | --- |
-| Anomalocaris | 37.8 cm | 3.90 | 0.75 | 10.1 | 3.9 |
-| Cambroraster | 25 cm | 3.30 | 0.75 | 8.6 | 3.8 |
-| Odaraia | 15 cm | 2.69 | 0.75 | 7.0 | 3.0 |
-| Olenoides | 7 cm | 1.98 | 0.75 | 5.1 | 3.0 |
-| Opabinia | 5.5 cm | 1.80 | 0.75 | 4.7 | 3.0 |
-| Hallucigenia | 2.5 cm | 1.31 | 0.75 | 3.4 | 2.7 |
-| Marrella | 1.55 cm | 1.09 | 0.75 | 2.8 | 2.7 |
+| Anomalocaris | 37.8 cm | 5.69 | 0.75 | 14.8 | 3.9 |
+| Cambroraster | 25 cm | 4.82 | 0.75 | 12.5 | 3.8 |
+| Odaraia | 15 cm | 3.93 | 0.75 | 10.2 | 3.0 |
+| Olenoides | 7 cm | 2.90 | 0.75 | 7.5 | 3.0 |
+| Opabinia | 5.5 cm | 2.63 | 0.75 | 6.8 | 3.0 |
+| Hallucigenia | 2.5 cm | 1.92 | 0.75 | 5.0 | 2.7 |
+| Marrella | 1.55 cm | 1.59 | 0.75 | 4.1 | 2.7 |
 
 **Everything hatches at the same length** (0.75 units), and growth to Adult is geometric from there,
-so the animals with further to go grow faster per moult — Anomalocaris doubles at each of its two
-moults, Marrella gains a fifth. Giant and Apex keep their old multiples of the adult body, because
+so the animals with further to go grow faster per moult — Anomalocaris nearly triples at each of its
+two moults, Marrella gains half again. Giant and Apex keep their old multiples of the adult body, because
 those two rungs were never biology in the first place. That is `tierScale` in `src/sim/tiers.ts`,
 the Devonian's `stageScale` rule on the Cambrian's five rungs.
 
@@ -118,9 +120,9 @@ Four things move with the lengths, and the fourth is why this is a setting rathe
    would report the size a second time and say Marrella had become slow, when what it has become is
    small.
 4. **The reef does not resize with it.** A sac sponge is 3.4 units tall and stays there. Today every
-   animal is about that size and drives over it; with the option on, most of the roster is shorter
-   than the sponge and goes *round* it instead — an adult Marrella lives among the stalks with the
-   reef standing over it. That may well be the better game, and it is certainly the more honest one,
+   animal is about that size and drives over it; with the option on the roster straddles it — the
+   big half drives over it as before and the small half goes *round* it instead, an adult Marrella
+   living among the stalks with the reef standing over it. That may well be the better game, and it is certainly the more honest one,
    but it changes how most of the roster reads against the scenery at every tier, and it is the
    thing to actually look at before deciding whether this becomes the default.
 
