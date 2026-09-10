@@ -58,18 +58,19 @@ export interface EraDefinition {
   readonly modes: readonly ModeInfo[];
   readonly creatures: readonly CreatureDef[];
   /**
-   * An alternative set of body lengths for this roster, offered as a setting rather than shipped.
+   * This roster's body lengths taken from what the animals actually measured, which is what the era
+   * plays at. `Settings → Equivalent sizing` puts the flat authored lengths in `creatures` back.
    *
-   * The Cambrian roster is authored at one size — every animal grows to within a third of every
-   * other — and `equivalentSizing` swaps in lengths taken from what the animals actually measured
-   * (`docs/research/cambrian-sizes.md`), so that size means something in a game where size decides
-   * who eats whom. `speed`, `hp` and `poise` come with the length so the simulation is unchanged at
-   * any given body size; everything else on the def is already counted in body lengths.
+   * The Cambrian roster was authored at one size — every animal growing to within a third of every
+   * other — which is no use in a game where size decides who eats whom, so it now plays at the
+   * lengths in `docs/research/cambrian-sizes.md`. `speed`, `hp` and `poise` come with the length so
+   * the simulation is unchanged at any given body size; everything else on the def is already
+   * counted in body lengths. `realCm` is the animal itself, for the selection card.
    *
-   * An era that does not offer it — the Devonian, whose roster is already generated from real
-   * lengths — leaves it out, and the setting has nothing to do there.
+   * An era that leaves this out — the Devonian, whose roster is already generated from real
+   * lengths — plays at the lengths in `creatures` and has nothing for the setting to do.
    */
-  readonly equivalentSizing?: Readonly<Record<string, { adultLength: number; speed: number; hp: number; poise: number; realCm: number }>>;
+  readonly naturalSizes?: Readonly<Record<string, { adultLength: number; speed: number; hp: number; poise: number; realCm: number }>>;
   readonly defaults: {
     readonly player: CreatureId;
     readonly boot: readonly CreatureId[];

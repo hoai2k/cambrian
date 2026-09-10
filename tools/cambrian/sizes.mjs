@@ -1,21 +1,29 @@
-// Generate src/content/cambrian/equivalent-sizing.json from the size research: what each Cambrian
-// animal would be if the roster carried its real relative size. Run `npm run cambrian:sizes` after
-// editing docs/research/cambrian-sizes.json or the constants here, and commit both; `--check` is
-// what `npm run eras` runs, and fails if the committed table has drifted from the research.
+// Generate src/content/cambrian/natural-sizes.json from the size research: the length each Cambrian
+// animal plays at, taken from what it actually measured. Run `npm run cambrian:sizes` after editing
+// docs/research/cambrian-sizes.json or the constants here, and commit both; `--check` is what
+// `npm run eras` runs, and fails if the committed table has drifted from the research.
 //
-// This is an *option*, off by default (Settings → Equivalent sizing). Nothing here touches
-// creatures.ts: the shipped roster is unchanged and the simulation merges this table over it only
-// when the setting is on (`setEquivalentSizing` in src/sim/creatures.ts).
+// This is what the roster plays at. Nothing here touches creatures.ts, whose authored lengths stay
+// as the *Equivalent sizing* option — the flat roster, every animal within a third of every other,
+// kept for comparison (`setEquivalentSizing` in src/sim/creatures.ts).
 //
 // Length. The real animals span 1.55-37.8 cm, 24:1, against a roster that spans 1.5:1 — every
 // Cambrian animal grows to within a third of every other, so an Apex Marrella finishes a match the
 // size of an Apex Anomalocaris. Game length = K * metres^EXP puts them back in the real order and
-// in something like real proportion, without changing how big the Cambrian sea is: K is set so the
-// largest animal lands exactly on today's largest (Anomalocaris at 3.9 units, an Apex at 10.1), and
-// EXP so the smallest still has a body worth swimming — the roster comes out 1.09-3.90 rather than
-// 2.6-3.9, which is variance inside the scale the game already has. This is deliberately *not* the
-// Devonian's exponent: that sea is built at a different scale for an 80:1 roster, and the thing
-// worth sharing between the two is that adults differ at all, not the number they differ by.
+// in something like real proportion.
+//
+// K is set so the roster's *average* adult comes out at the average it has today (3.05 units), not
+// so its largest matches today's largest. The average is what says how big the sea's animals are;
+// pinning the top instead would have meant the only way to give Anomalocaris its lead was to shrink
+// everything else under it, and the point of the option is that the biggest animal in the Cambrian
+// should read as the biggest animal in the Cambrian. So it grows: 5.69 units at Adult and 14.8 at
+// Apex, against 3.9 and 10.1 — still inside what the engine is known to carry, since the Devonian
+// puts a 16.3-unit Titanichthys in the water.
+//
+// EXP is set so the smallest animal still has a body worth swimming. The roster comes out 1.59-5.69
+// against today's 2.6-3.9. This is deliberately *not* the Devonian's exponent: that sea is built at
+// a different scale for an 80:1 roster, and the thing worth sharing between the two is that adults
+// differ at all, not the number they differ by.
 //
 // Speed, health and poise come along with the length so the sim is unchanged at any given body
 // size. Nothing here is new tuning: it is the shipped tuning re-expressed for a body that is now a
@@ -32,14 +40,14 @@
 // sense, clearance and body radius are all counted in body lengths already.
 import fs from 'node:fs';
 
-const K = 5.75, EXP = 0.4;
+const K = 8.4, EXP = 0.4;
 /** Everything hatches this long: src/sim/tiers.ts owns the same number. */
 const LARVA_LENGTH = 0.75, APEX = 2.6;
 const mag = (L) => L * 1.45 + 1.15 + Math.max(0, 0.8 - L) * 0.9;   // magnificationDistance, src/render/engine.ts
 const r2 = (v) => Math.round(v * 100) / 100;
 
 const research = JSON.parse(fs.readFileSync('docs/research/cambrian-sizes.json', 'utf8'));
-const OUT = 'src/content/cambrian/equivalent-sizing.json';
+const OUT = 'src/content/cambrian/natural-sizes.json';
 const source = ['src/content/cambrian/creatures.ts', 'src/content/cambrian/expansion.ts']
   .map((f) => fs.readFileSync(f, 'utf8')).join('\n');
 const check = process.argv.includes('--check');
@@ -80,14 +88,14 @@ const text = JSON.stringify(body, null, 2) + '\n';
 
 if (check) {
   const have = fs.existsSync(OUT) ? fs.readFileSync(OUT, 'utf8') : '';
-  if (have === text) { console.log(`PASS: ${rows.length} equivalent-sizing entries match the size research`); process.exit(0); }
+  if (have === text) { console.log(`PASS: ${rows.length} natural body lengths match the size research`); process.exit(0); }
   console.error(`FAIL: ${OUT} is out of step with docs/research/cambrian-sizes.json — run npm run cambrian:sizes`);
   process.exit(1);
 }
 fs.writeFileSync(OUT, text);
 
 console.log(`${OUT}: ${rows.length} animals\n`);
-console.log('id                 real_m  adult   larva    apex  |  shipped   speed  (was)     hp  poise   screens/s (was)');
+console.log('id                 real_m  adult   larva    apex  | authored   speed  (was)     hp  poise   screens/s (was)');
 for (const r of rows.sort((a, b) => b.adultLength - a.adultLength)) {
   const larva = r2(Math.min(r.adultLength * 0.8, LARVA_LENGTH));
   console.log(`${r.id.padEnd(16)} ${r.m.toFixed(4)}  ${r.adultLength.toFixed(2).padStart(5)}   ${larva.toFixed(2)}  ${(r.adultLength * APEX).toFixed(1).padStart(5)}  |   ${r.was.adultLength.toFixed(2).padStart(5)}  ${r.speed.toFixed(2).padStart(5)}  ${r.was.speed.toFixed(1).padStart(5)}  ${String(r.hp).padStart(5)}  ${String(r.poise).padStart(5)}   ${(r.speed / mag(r.adultLength)).toFixed(2)}  (${(r.was.speed / mag(r.was.adultLength)).toFixed(2)})`);
