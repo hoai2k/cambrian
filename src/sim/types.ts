@@ -185,6 +185,12 @@ export interface Actor {
    */
   graspT: number;
   /**
+   * A grip that ended on its own — the ride ran out, or the arms gave — stays ended until the
+   * button comes up. Without it a hold that had just expired was retaken on the very next frame by
+   * the button still being held, so nothing could ever run out.
+   */
+  graspSpent: boolean;
+  /**
    * Riding: the animal this one is clinging to (-1 when not riding), how long it has held on, and
    * where it took hold in the host's own frame — sideways, up and forward, in host body lengths —
    * so the grip follows the host as it turns. `riddenBy` is the same hold from the host's side.
