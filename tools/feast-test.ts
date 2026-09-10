@@ -10,6 +10,7 @@
  * player on its own.
  */
 import { Game, bitesFor } from '../src/sim/game';
+import { tierScale } from '../src/sim/tiers';
 import { emptyInput, TIER_NEED, type InputFrame, type WorldEvent } from '../src/sim/types';
 import { isAlive, lengthOf } from '../src/sim/actors';
 import { creature, type CreatureId } from '../src/sim/creatures';
@@ -138,20 +139,25 @@ function feast(eaterId: CreatureId, foodId: CreatureId, foodScale: number, secon
   const g = new Game('rise', [{ creature: 'anomalocaris', device: 'keyboard', ready: true }], 12);
   const p = g.players[0];
   const at = { ...p.pos };
-  const meal = (eaterScale: number, preyScale: number) => {
-    p.scale = eaterScale;
-    const food = g.spawn('waptia', 'ambient', at, preyScale);
+  // Sizes are asked for as rungs rather than as raw scales: what a mouthful is worth is a question
+  // about the two bodies' lengths, and the roster's animals are their own lengths now
+  // (docs/research/cambrian-sizes.md), so scale 0.25 stopped meaning "a hatchling" to all of them.
+  const meal = (eaterRung: number, preyRung: number, preyId: 'waptia' | 'anomalocaris' = 'waptia') => {
+    p.scale = tierScale(p.creature, eaterRung);
+    const food = g.spawn(preyId, 'ambient', at, tierScale(preyId, preyRung));
     const v = g.nutritionValue(p, food);
     g.remove(food);
     return v;
   };
   // The same mouthful, to two sizes of animal.
-  const toSmall = meal(0.25, 0.25), toBig = meal(2.6, 0.25);
+  const toSmall = meal(0, 0), toBig = meal(4, 0);
   check('a hatchling is fed by a hatchling-sized meal', toSmall > TIER_NEED[0] * 0.25,
     `${toSmall.toFixed(1)} nutrition, against ${TIER_NEED[0]} to grow`);
   check('...and the same meal is nothing to a giant', toBig < toSmall * 0.1, `${toBig.toFixed(1)} against ${toSmall.toFixed(1)}`);
-  // What the giant does need is something its own size.
-  const toBigProper = meal(2.6, 2.6);
+  // What the giant does need is something its own size — and with the roster at its natural sizes
+  // (docs/research/cambrian-sizes.md) a grown Waptia is not that however far it grows: it is a 7 cm
+  // shrimp beside a 38 cm radiodont. Only one of its own is the same body.
+  const toBigProper = meal(4, 4, 'anomalocaris');
   check('...which has to eat its own size to gain the same', toBigProper > toSmall * 0.8,
     `${toBigProper.toFixed(1)} nutrition from a meal its own size`);
   // And the ladder asks for more at every rung, so growth is never a matter of more small bites.

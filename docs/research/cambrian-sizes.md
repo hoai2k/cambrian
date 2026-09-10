@@ -5,9 +5,9 @@ every field filled. Companion to `devonian-swimming.md`, which did the same job 
 and whose §1 method this follows. Nothing in this file is game tuning; it is the biological envelope
 the numbers in `src/content/cambrian/` should be checked against.
 
-**The roster ships as it always did.** These lengths are an option — Settings → *Equivalent sizing*,
-off by default — so the two can be played against each other. §3 is the mapping, §4 what turning it
-on actually does.
+**This is what the roster plays at.** The flat lengths it was authored with are still there behind
+Settings → *Equivalent sizing* — off by default — so the two can be played against each other. §3 is
+the mapping, §4 what it changes.
 
 ## 1. What the fossils say
 
@@ -43,13 +43,14 @@ and `basis` in the JSON says, for each animal, what is being measured and what i
 
 **The span is 24:1** — Marrella to Anomalocaris — against a roster that currently spans 1.5:1.
 
-## 2. What the game has
+## 2. What the roster was authored as
 
-Every Cambrian animal is between 2.6 and 3.9 units long at Adult, and the growth ladder is one set
-of multipliers for all of them (`TIER_SCALE`, 0.25 → 2.6). So a Larva is a quarter of *its own*
-adult size, whatever that is, and an Apex Marrella — an animal you could rest on a fingernail —
-finishes a match seven units long, within a third of an Apex Anomalocaris. Size is the one thing
-that decides who eats whom in this game, and on this roster it decides almost nothing.
+Every Cambrian animal between 2.6 and 3.9 units long at Adult, with one set of growth multipliers
+for all of them (`TIER_SCALE`, 0.25 → 2.6). So a Larva is a quarter of *its own* adult size,
+whatever that is, and an Apex Marrella — an animal you could rest on a fingernail — finishes a match
+seven units long, within a third of an Apex Anomalocaris. Size is the one thing that decides who
+eats whom in this game, and on that roster it decided almost nothing. It is still there, as
+*Equivalent sizing*: every animal the same size as every other, which is what the name says.
 
 The Devonian does not work this way. There, `docs/research/devonian-swimming.json` → `npm run
 devonian:stats` sets each animal's length from its real one, and `stageScale` (`src/sim/devonian/
@@ -104,21 +105,21 @@ body of every animal on the roster comes out within 2% either way. Damage, knock
 nothing: combat's `sizeFactor` is a ratio of lengths, and lunge, sense, clearance and body radius are
 counted in body lengths already.
 
-## 4. What turning it on does
+## 4. What the lengths change
 
-Four things move with the lengths, and the fourth is why this is a setting rather than the roster.
+Four things move with them. The fourth is why the flat roster is kept as a setting rather than
+thrown away.
 
-1. **The growth ladder becomes per-creature.** Everything hatches at one length instead of one
-   fraction of itself, so the roster starts level and size is earned rather than picked. Off, the
-   ladder is the shipped `TIER_SCALE` for every animal, unchanged.
-2. **Mass becomes cubed length rather than cubed scale.** Every use of it is a ratio between two
-   animals; scale stands in for mass only while the roster is all one size. Off, it is cubed scale,
-   exactly as shipped.
-3. **The selection card gains the animal's real length** beside its locality, and nothing else: the
-   four stat bars are drawn from the shipped numbers in both modes, deliberately. The option changes
+1. **The growth ladder is per-creature.** Everything hatches at one length instead of one fraction
+   of itself, so the roster starts level and size is earned rather than picked. Under *Equivalent
+   sizing* the ladder is the authored `TIER_SCALE` for every animal again.
+2. **Mass is cubed length rather than cubed scale.** Every use of it is a ratio between two animals;
+   scale stands in for mass only while the roster is all one size, which is the one case where
+   *Equivalent sizing* puts cubed scale back.
+3. **The selection card carries the animal's real length** beside its locality, and nothing else:
+   the four stat bars are drawn from the authored numbers either way, deliberately. Sizing changes
    how big an animal is, not how it fights at a given size, so a bar drawn from the resized figures
-   would report the size a second time and say Marrella had become slow, when what it has become is
-   small.
+   would report the size a second time and say Marrella was slow, when what it is is small.
 4. **The reef does not resize with it.** A sac sponge is 3.4 units tall and stays there. Today every
    animal is about that size and drives over it; with the option on the roster straddles it — the
    big half drives over it as before and the small half goes *round* it instead, an adult Marrella
@@ -126,8 +127,11 @@ Four things move with the lengths, and the fourth is why this is a setting rathe
    but it changes how most of the roster reads against the scenery at every tier, and it is the
    thing to actually look at before deciding whether this becomes the default.
 
-`npm run sizing` covers both halves: that off is the shipped game exactly, and that on does what §3
-says. Every other test in the suite runs with the option off and is untouched by it.
+`npm run sizing` covers both halves: that the roster does what §3 says, and that turning the option
+on is the authored roster exactly, ladder and mass included. The rest of the suite runs at the
+natural sizes; several of its fixtures had the flat roster written into them as absolute numbers —
+a scale of 0.25 meaning "a hatchling", a 12-unit rock meaning "a cliff" — and now ask in rungs,
+ratios and body lengths instead.
 
 ## 5. Sources
 
