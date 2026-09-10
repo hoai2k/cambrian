@@ -59,7 +59,7 @@ const SETTINGS_FIELDS: Field[] = [
   { kind: 'range', key: 'volume', label: 'Volume', min: 0, max: 1, step: 0.05 },
   { kind: 'toggle', key: 'muted', label: 'Muted' },
   { kind: 'toggle', key: 'music', label: 'Music' },
-  { kind: 'toggle', key: 'equivalentSizing', label: 'Equivalent sizing', note: 'The roster at the animals\u2019 real relative sizes (docs/research/cambrian-sizes.md). Cambrian only, and read when a match starts.' },
+  { kind: 'toggle', key: 'equivalentSizing', label: 'Equivalent sizing', note: 'Flattens the roster back to one size for every animal, instead of the natural lengths it plays at (docs/research/cambrian-sizes.md). Cambrian only, and read when a match starts.' },
 ];
 
 const codexFields = (): Field[] => [

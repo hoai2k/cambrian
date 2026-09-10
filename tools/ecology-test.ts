@@ -13,8 +13,12 @@ import { isAlive, lengthOf } from '../src/sim/actors';
 import { makeBrain } from '../src/sim/ai';
 import { grazeRate } from '../src/sim/expansion-abilities';
 import { creature, type CreatureId } from '../src/sim/creatures';
-import { DAY_LENGTH, dayFraction, daylight, huntInterval, huntingPressure, phaseAt, untilNextPhase } from '../src/sim/daynight';
-import { distXZ } from '../src/shared/math';
+import { DAY_LENGTH, dayFraction, daylight, huntInterval, huntingPressure, phaseAt, placeAppetite, untilNextPhase } from '../src/sim/daynight';
+import { dangerAt } from '../src/sim/world';
+import { distXZ, makeRng } from '../src/shared/math';
+
+/** Ordinary open water: what an hour means where nobody says where. */
+const SHELF = 0.4;
 
 let failed = 0;
 const check = (n: string, ok: boolean, d = '') => { console.log(`${ok ? 'PASS' : 'FAIL'}  ${n.padEnd(60)} ${d}`); if (!ok) failed++; };
@@ -42,10 +46,22 @@ const run = (g: Game, steps: number, f: InputFrame = emptyInput()) => { const m 
   for (const k of Object.keys(pressures)) pressures[k] /= counts[k];
   check('hunting peaks at dawn and dusk', pressures.dawn > pressures.day * 2 && pressures.dusk > pressures.day * 2,
     Object.entries(pressures).map(([k, v]) => `${k} ${v.toFixed(2)}`).join(' · '));
-  check('...and the middle of the day is quiet', pressures.day < 0.2, pressures.day.toFixed(2));
+  check('...and the middle of the day is quiet', pressures.day < pressures.dusk * 0.4, pressures.day.toFixed(2));
+  // Quiet, not shut. At the old floor an animal went over two minutes between meals, which over
+  // any stretch a player actually watched came to nothing hunting at all.
+  check('...but never stops entirely', pressures.day > 0.1 && huntInterval(at('day'), SHELF) < 100,
+    `${huntInterval(at('day'), SHELF).toFixed(0)}s between meals on the shelf at noon`);
   check('night sits between the two', pressures.night > pressures.day && pressures.night < pressures.dusk, pressures.night.toFixed(2));
-  check('an animal goes far longer between meals by day', huntInterval(at('day')) > huntInterval(duskStart + 24) * 3,
-    `${huntInterval(at('day')).toFixed(0)}s by day vs ${huntInterval(duskStart + 24).toFixed(0)}s at dusk`);
+  check('an animal goes far longer between meals by day', huntInterval(at('day'), SHELF) > huntInterval(duskStart + 24, SHELF) * 3,
+    `${huntInterval(at('day'), SHELF).toFixed(0)}s by day vs ${huntInterval(duskStart + 24, SHELF).toFixed(0)}s at dusk`);
+  // Where, as well as when. The same hour is a different sea in a nursery and in the basin.
+  const noon = at('day');
+  check('dangerous water is hungrier than safe water', huntInterval(noon, 0.9) < huntInterval(noon, 0.05) * 0.45,
+    `${huntInterval(noon, 0.9).toFixed(0)}s in the basin vs ${huntInterval(noon, 0.05).toFixed(0)}s in a nursery, at the same hour`);
+  check('...and the hour still tells on top of it', huntInterval(duskStart + 24, 0.05) < huntInterval(noon, 0.05),
+    `safe water at dusk ${huntInterval(duskStart + 24, 0.05).toFixed(0)}s against ${huntInterval(noon, 0.05).toFixed(0)}s at noon`);
+  check('...both ways round', placeAppetite(0.9) > placeAppetite(0.4) && placeAppetite(0.4) > placeAppetite(0.05),
+    `nursery ${placeAppetite(0.05).toFixed(2)} · shelf ${placeAppetite(0.4).toFixed(2)} · basin ${placeAppetite(0.9).toFixed(2)}`);
   check('the phase countdown never exceeds the phase', untilNextPhase(0) <= DAY_LENGTH && untilNextPhase(0) > 0, `${untilNextPhase(0).toFixed(0)}s`);
 }
 
@@ -239,6 +255,28 @@ function withNeighbour(opts: Parameters<typeof makeBrain>[3], gap: number, seed 
   }
   check('the deep water holds the grown animals', deepLarge > shelfLarge * 1.4,
     `large ${(deepLarge / 12).toFixed(2)} deep against ${(shelfLarge / 12).toFixed(2)} on the shelf`);
+
+  // Size and menace are one statement about a stretch of sea, made from one number: what a place
+  // holds is read straight off how dangerous it is. Sampled over real water rather than over
+  // chosen points, so an area's own roll averages out and only the biome is left.
+  {
+    const rng = makeRng(7);
+    const bands = [
+      { name: 'safe', lo: 0, hi: 0.2, n: 0, sum: 0 },
+      { name: 'middling', lo: 0.45, hi: 0.65, n: 0, sum: 0 },
+      { name: 'deadly', lo: 0.8, hi: 1.01, n: 0, sum: 0 },
+    ];
+    for (let i = 0; i < 24000; i++) {
+      const x = (rng() - 0.5) * 6000, z = -(rng() * 1400);
+      const d = dangerAt(x, z);
+      const band = bands.find((b) => d >= b.lo && d < b.hi);
+      if (!band) continue;
+      band.n++; band.sum += bandScale(rng, drawBand(rng, areaProfile(x, z, 12345)));
+    }
+    const mean = (i: number) => bands[i].n ? bands[i].sum / bands[i].n : 0;
+    check('dangerous water holds bigger animals than safe water', mean(2) > mean(0) * 1.6 && mean(1) > mean(0) && mean(2) > mean(1),
+      bands.map((b, i) => `${b.name} ${mean(i).toFixed(2)}`).join(' · '));
+  }
 
   // Nowhere is empty, and nowhere is stranded: whatever one area is, a neighbour is something else.
   let thinnest = Infinity, spread = 0, cells = 0;

@@ -19,6 +19,10 @@ const { stateFor, devActor, stageScale, ADULT_STAGE, PRIME_STAGE, STAGE_AT, HOLD
 const { coverAt } = await import('../src/sim/world');
 const { applyScaleStats, bandOf, isAlive, lengthOf } = await import('../src/sim/actors');
 const { PLAYABLE } = await import('../src/sim/creatures');
+const { hasEquivalentSizing, naturalSizing, setEquivalentSizing } = await import('../src/sim/creatures');
+const { massOf } = await import('../src/sim/actors');
+const { tierScale } = await import('../src/sim/tiers');
+const { TIER_SCALE } = await import('../src/sim/types');
 const { creature } = await import('../src/sim/creatures');
 const { emptyInput } = await import('../src/sim/types');
 const { shoreZ, shoreDistance, SURFACE_Y, generateChunk, biomeAt, nurseryAt, chunkCoord, LOG_SHORE_RANGE, groundHeight } = await import('../src/sim/world');
@@ -623,6 +627,10 @@ ok(RULES !== undefined && !RULES.growthByNutrition, 'Devonian rules active: grow
   // speed / that distance: screens per second. The Cambrian band at full size is 0.61–1.30.
   const mag = (L: number) => L * 1.45 + 1.15 + Math.max(0, 0.8 - L) * 0.9;
   const { PLAYABLE } = await import('../src/sim/creatures');
+const { hasEquivalentSizing, naturalSizing, setEquivalentSizing } = await import('../src/sim/creatures');
+const { massOf } = await import('../src/sim/actors');
+const { tierScale } = await import('../src/sim/tiers');
+const { TIER_SCALE } = await import('../src/sim/types');
   const research = JSON.parse(fs.readFileSync('docs/research/devonian-swimming.json', 'utf8')) as { id: string; lengthM: number; burstBLs: number; cruiseBLs: number }[];
   for (const c of DEVONIAN.creatures) {
     const adult = c.speed / mag(c.adultLength), sprint = adult * c.burst;
@@ -948,6 +956,25 @@ ok(RULES !== undefined && !RULES.growthByNutrition, 'Devonian rules active: grow
       ok(mean > 0.06, `${id} is not a silhouette in ${sch.name} (mean albedo ${mean.toFixed(3)})`);
     }
   }
+}
+
+// --- the Cambrian's sizing option does nothing here ---
+// The Devonian's lengths are already generated from the real animals (npm run devonian:stats), so
+// it carries no table to swap and must be untouched whichever way the setting is left. Everything
+// keyed off sizing asks `naturalSizing`, which is false here for exactly that reason.
+{
+  ok(!hasEquivalentSizing(), 'the Devonian offers no sizing option');
+  for (const on of [true, false]) {
+    setEquivalentSizing(on);
+    ok(!naturalSizing(), `the sizing option is inert with it ${on ? 'on' : 'off'}`);
+    for (const c of PLAYABLE) {
+      ok(TIER_SCALE.every((v, t) => Math.abs(tierScale(c.id, t) - v) < 1e-9), `${c.id} keeps the authored ladder`);
+    }
+    const g = new Game('rise', [{ creature: PLAYABLE[0].id, device: 'keyboard', ready: true }], 4);
+    const p = g.players[0];
+    ok(Math.abs(massOf(p) - p.scale ** 3) < 1e-9, `mass is cubed scale, as it always was (${massOf(p).toFixed(4)})`);
+  }
+  setEquivalentSizing(false);
 }
 
 console.log(`PASS: ${passes} Devonian checks`);

@@ -22,10 +22,11 @@ import { freshCursor, menuPress, MENU_LOCKOUT, type MenuCursor, type MenuEvent }
 export type Screen = 'title' | 'select' | 'playing' | 'results';
 export type DialogKind = null | 'help' | 'settings';
 /**
- * `equivalentSizing` is the roster at the animals' real relative sizes — see
- * `setEquivalentSizing` in src/sim/creatures.ts. Off by default, and applied between matches
- * rather than during one: body length is an input to almost everything in the simulation, and
- * `src/sim` has to replay the same way from the same inputs.
+ * `equivalentSizing` flattens the roster back to one size, the way it was authored — see
+ * `setEquivalentSizing` in src/sim/creatures.ts. Off by default, so the roster plays at the
+ * animals' natural sizes, and applied between matches rather than during one: body length is an
+ * input to almost everything in the simulation, and `src/sim` has to replay the same way from the
+ * same inputs.
  */
 export interface Settings { quality: Quality; lookSpeed: number; invertY: boolean; volume: number; muted: boolean; music: boolean; equivalentSizing: boolean; }
 

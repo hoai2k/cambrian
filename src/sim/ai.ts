@@ -5,8 +5,8 @@ import { columnY, DIP_CHANCE, keepClear } from './locomotion';
 import { creature } from './creatures';
 import type { Actor, BrainState, InputFrame, WorldEvent } from './types';
 import { emptyInput } from './types';
-import { biomeAt, LIGHT_WINDOW_Y, microbialAt, nurseryFactor, sampleHeight, shoreDistance, SURFACE_Y, type Cover, type WorldData } from './world';
-import { huntInterval, huntingPressure } from './daynight';
+import { biomeAt, dangerAt, LIGHT_WINDOW_Y, microbialAt, nurseryFactor, sampleHeight, shoreDistance, SURFACE_Y, type Cover, type WorldData } from './world';
+import { appetiteAt, huntInterval } from './daynight';
 
 export interface AiWorld {
   actors: Actor[];
@@ -212,6 +212,10 @@ export function thinkNeeds(g: AiWorld, a: Actor, b: BrainState, dt: number): Inp
     /** The nearest body worth eating: scavengers live on these, opportunists take them when offered. */
     let carrion: Actor | undefined, carrionD = Infinity;
     const senseR = Math.min(def.sense * L + 6, 40);
+    // How dangerous the water this animal is standing in is, for the appetite below. Read once a
+    // think rather than per candidate: it is a noise field, and it does not change over an animal's
+    // own length.
+    const here = dangerAt(a.pos.x, a.pos.z);
     // An animal that holds ground knows its own ground: it notices an intruder anywhere in the
     // patch, not only within the range it can see prey at. Everything else still works off
     // `senseR`, so widening the sweep does not make it hunt or pick fights from further away.
@@ -258,7 +262,7 @@ export function thinkNeeds(g: AiWorld, a: Actor, b: BrainState, dt: number): Inp
         // Picking a fight for no reason is a twilight thing too. An animal squaring up to a
         // neighbour at midday, unprovoked and not hungry, is exactly the restlessness that made
         // the old reef tiring, so the odds of it scale with the hour like everything else.
-        const spoiling = b.aggression > 0.7 && d < senseR * 0.35 && g.rng() < 0.3 * huntingPressure(g.time);
+        const spoiling = b.aggression > 0.7 && d < senseR * 0.35 && g.rng() < 0.3 * appetiteAt(g.time, here);
         const wants = competitor ? (o.controller === 'player' || o.controller === 'bot') : crowded || provoked || spoiling;
         if (wants && !peace && d < rivalD) { rival = o; rivalD = d; }
       }
@@ -271,9 +275,10 @@ export function thinkNeeds(g: AiWorld, a: Actor, b: BrainState, dt: number): Inp
     }
     // How long this animal will go after a meal before it looks for another. Short through the
     // twilight, when the whole reef is hunting at once; long through the middle of the day, when
-    // a fed animal simply gets on with its life. Bots are competitors in a versus match rather
-    // than wildlife, so they are always hungry.
-    const hungry = competitor || b.hunger > huntInterval(g.time) * (0.7 + b.appetite * 0.6) || a.hp < a.hpMax * 0.45;
+    // a fed animal simply gets on with its life — and shorter or longer again for the water it is
+    // in, so the channel and the basin are hungry places and a flat of sunlit sand is not. Bots
+    // are competitors in a versus match rather than wildlife, so they are always hungry.
+    const hungry = competitor || b.hunger > huntInterval(g.time, here) * (0.7 + b.appetite * 0.6) || a.hp < a.hpMax * 0.45;
     const predatory = !def.diet || (competitor && def.diet !== 'filter');
     const attacker = a.lastHitBy >= 0 ? g.byId(a.lastHitBy) : undefined;
     // Whatever else it was doing, something that just bit it has its attention — whatever size it
@@ -540,7 +545,9 @@ export function thinkGiant(g: AiWorld, a: Actor, b: BrainState, dt: number): Inp
   // what "something is hunting me" actually means to a player, this is the setting that decides
   // how the day *feels*. Through the middle of the day one comes down about as rarely as it always
   // did; at dusk and dawn it is every twenty seconds or so, and the whole sea knows it.
-  const hungry = b.hunger > (14 + (a.id % 6)) / Math.max(0.12, huntingPressure(g.time));
+  // ...and where it is doing it. A giant cruising over the basin comes down far oftener than one
+  // over a sunlit flat, which is what makes the deep water read as the deep water.
+  const hungry = b.hunger > (14 + (a.id % 6)) / Math.max(0.12, appetiteAt(g.time, dangerAt(a.pos.x, a.pos.z)));
   const shadow = a.controller === 'shadow';
 
   // Routed: enough bites from something smaller and even a giant backs off for a while.
