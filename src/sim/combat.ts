@@ -1,7 +1,7 @@
 import { stopHiding } from './concealment';
 import { clamp, dot, heading, norm, sub, type Vec3 } from '../shared/math';
 import { creature, type MoveDef } from './creatures';
-import { bandOf, isInvulnerable, lengthOf, massOf } from './actors';
+import { bandOf, bodyRadius, isInvulnerable, lengthOf, massOf } from './actors';
 import type { Actor, WorldEvent } from './types';
 
 export interface HitContext {
@@ -143,11 +143,7 @@ export function applyHit(ctx: HitContext, attacker: Actor, victim: Actor, move: 
   if (result === 'hit' && !anchored && (move.grab || (attacker.graspHold && adef.grasp))) {
     const band = bandOf(attacker, victim);
     if (band === 'threat' || band === 'giant') takeRide(ctx, attacker, victim);
-    else if (victim.state !== 'grabbed' && attacker.grabbing < 0) {
-      attacker.state = 'grabbing'; attacker.stateT = 0; attacker.stateDur = 1.6; attacker.grabbing = victim.id;
-      victim.state = 'grabbed'; victim.stateT = 0; victim.grabbedBy = attacker.id; victim.grabT = 1.6;
-      ctx.events.push({ kind: 'grab', pos: { ...victim.pos }, actor: attacker.id, other: victim.id, player: victim.player });
-    }
+    else takeHold(ctx, attacker, victim);
   }
 
   if (victim.hp <= 0) {
@@ -157,6 +153,31 @@ export function applyHit(ctx: HitContext, attacker: Actor, victim: Actor, move: 
   }
   if (attacker.hp <= 0) kill(ctx, attacker, victim);
   return result;
+}
+
+/**
+ * Close a grip on something small enough to hold, and remember where on it the grip landed.
+ *
+ * The hold point is a unit direction in the victim's own frame, so it turns with the victim and the
+ * pair stay joined however either of them moves. Held prey used to be parked at a fixed distance off
+ * the grabber's nose, scaled by the *grabber's* length: a big mouthful ended up half inside its
+ * captor and a small one hung in the water in front of it, joined to nothing.
+ */
+export function takeHold(ctx: HitContext, attacker: Actor, victim: Actor): boolean {
+  if (victim.state === 'grabbed' || attacker.grabbing >= 0 || victim.rideHost >= 0 || victim.riddenBy >= 0) return false;
+  attacker.state = 'grabbing'; attacker.stateT = 0; attacker.stateDur = 1.6; attacker.grabbing = victim.id;
+  victim.state = 'grabbed'; victim.stateT = 0; victim.grabbedBy = attacker.id; victim.grabT = 1.6;
+  // Which way the grabber lies from the victim, in the victim's own frame: that is the side the
+  // grip has, and the side that has to stay against the grabber's mouth.
+  const vh = heading(victim.yaw);
+  const d = sub(attacker.pos, victim.pos);
+  const dl = Math.hypot(d.x, d.y, d.z);
+  if (dl > 1e-6) {
+    const right: Vec3 = { x: -vh.z, y: 0, z: vh.x };
+    victim.grabOff = { x: dot(d, right) / dl, y: d.y / dl, z: dot(d, vh) / dl };
+  } else victim.grabOff = { x: 0, y: 0, z: 1 };
+  ctx.events.push({ kind: 'grab', pos: { ...victim.pos }, actor: attacker.id, other: victim.id, player: victim.player });
+  return true;
 }
 
 /**
@@ -188,16 +209,35 @@ export function takeRide(ctx: HitContext, rider: Actor, host: Actor): boolean {
   const hl = lengthOf(host);
   const right: Vec3 = { x: -h.z, y: 0, z: h.x };
   const d = sub(rider.pos, host.pos);
+  // Sideways and up, the hold has to be somewhere on the host, so it is bounded by how wide the
+  // host actually is. Half a body length either way let the grip sit out in open water off the
+  // flank of anything long, which is what made a ride read as floating alongside rather than
+  // clinging on. Along the body it may be anywhere behind the jaws.
+  const flank = bodyRadius(host) / hl;
   rider.rideHost = host.id; rider.rideT = 0;
   rider.rideOff = {
-    x: clamp(dot(d, right) / hl, -0.5, 0.5),
-    y: clamp((rider.pos.y - host.pos.y) / hl, -0.35, 0.35),
+    x: clamp(dot(d, right) / hl, -flank, flank),
+    y: clamp((rider.pos.y - host.pos.y) / hl, -flank, flank),
     z: clamp(dot(d, h) / hl, -0.55, MOUTH_CONE * 0.5),
   };
   host.riddenBy = rider.id;
   if (rider.state === 'attack' || rider.state === 'pounce') { rider.state = 'free'; rider.stateT = 0; }
   ctx.events.push({ kind: 'grab', pos: { ...rider.pos }, actor: rider.id, other: host.id, player: rider.player });
   return true;
+}
+
+/**
+ * Where a rider's grip sits on its host, in world space. The one definition of it: the simulation
+ * puts the rider's body against this point, and the renderer puts the rider's own grasp socket on
+ * it, so what is drawn is the animal actually holding on there rather than floating near it.
+ */
+export function rideHold(rider: Actor, host: Actor): Vec3 {
+  const hl = lengthOf(host), h = heading(host.yaw), o = rider.rideOff;
+  return {
+    x: host.pos.x + -h.z * o.x * hl + h.x * o.z * hl,
+    y: host.pos.y + o.y * hl,
+    z: host.pos.z + h.x * o.x * hl + h.z * o.z * hl,
+  };
 }
 
 /** Let go, from either side. `shaken` staggers the rider: it did not choose to come off. */

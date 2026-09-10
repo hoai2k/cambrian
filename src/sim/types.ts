@@ -117,6 +117,14 @@ export interface Actor {
   burstT: number;          // free burst timer (ambush surge)
   hitFlash: number; hitDir: Vec3; hitStop: number;
   grabbedBy: number; grabbing: number; grabT: number;
+  /**
+   * Where the grip landed on this body, as a unit direction in its own frame (right, up, forward).
+   * Held prey used to be parked at a fixed point off the grabber's nose, sized by the *grabber*,
+   * so a big mouthful sat half inside its captor and a small one hung in front of it; this is the
+   * spot on the victim that the grip actually has, so the two stay joined whatever their sizes.
+   * Meaningless unless `grabbedBy >= 0`.
+   */
+  grabOff: Vec3;
   eatingTarget: number; eatProgress: number;
   corpseT: number;         // seconds since death for corpses
   eaten: number;           // 0..1 fraction of corpse consumed, in whole bites once it is being torn
@@ -162,6 +170,14 @@ export interface Actor {
    * striking through. Set from the input every step; false for anything that cannot grasp.
    */
   graspHold: boolean;
+  /**
+   * How long the grip has been armed, seconds. A grip closes on something too big to bite the
+   * moment the button is down — there is nothing else that press could usefully mean, and the
+   * point of it is to get hold without bothering the animal — but on a mouthful it waits for
+   * `GRASP_HOLD`, so a tap is still the bite it has always been and only a deliberate hold takes
+   * hold. Reset whenever the button comes up.
+   */
+  graspT: number;
   /**
    * Riding: the animal this one is clinging to (-1 when not riding), how long it has held on, and
    * where it took hold in the host's own frame — sideways, up and forward, in host body lengths —
