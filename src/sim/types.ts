@@ -3,6 +3,12 @@ import type { CreatureId, MoveDef } from './creatures';
 
 export type Tier = 0 | 1 | 2 | 3 | 4;
 export const TIER_NAMES = ['Larva', 'Juvenile', 'Adult', 'Giant', 'Apex'] as const;
+/**
+ * The rungs' scales, as multiples of the creature's adult length. Ask `tierScale` in
+ * src/sim/tiers.ts rather than indexing this: with equivalent sizing on the two rungs below Adult
+ * are per-creature, because everything hatches the same *length* rather than the same fraction of
+ * its eventual self, and an Anomalocaris then has far further to grow than a Marrella.
+ */
 export const TIER_SCALE = [0.25, 0.5, 1.0, 1.7, 2.6] as const;
 /** Nutrition needed to leave each tier. */
 export const TIER_NEED = [30, 60, 85, 120, Infinity] as const;

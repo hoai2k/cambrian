@@ -28,7 +28,7 @@
     "progress": "esbuild tools/progress-test.ts --bundle --platform=node --format=esm --outfile=node_modules/.cache/progress-test.mjs && node node_modules/.cache/progress-test.mjs cambrian && node node_modules/.cache/progress-test.mjs devonian",
     "codex": "esbuild tools/codex-test.ts --bundle --platform=node --format=esm --outfile=node_modules/.cache/codex-test.mjs && node node_modules/.cache/codex-test.mjs cambrian && node node_modules/.cache/codex-test.mjs devonian",
     "debug": "esbuild tools/debug-test.ts --bundle --platform=node --format=esm --outfile=node_modules/.cache/debug-test.mjs && node node_modules/.cache/debug-test.mjs",
-    "eras": "node tools/era-test.mjs",
+    "eras": "node tools/era-test.mjs && node tools/cambrian/sizes.mjs --check",
     "merge": "node --experimental-transform-types tools/merge-test.mjs",
     "shapes": "node tools/prop-shapes.mjs",
     "reactions": "esbuild tools/reaction-test.ts --bundle --platform=node --format=esm --outfile=node_modules/.cache/reaction-test.mjs --log-level=error && node node_modules/.cache/reaction-test.mjs",
@@ -44,6 +44,7 @@
     "music": "esbuild tools/music-test.ts --bundle --platform=node --format=esm --outfile=node_modules/.cache/music-test.mjs && node node_modules/.cache/music-test.mjs",
     "immersive": "esbuild tools/immersive-test.ts --bundle --platform=node --format=esm --outfile=node_modules/.cache/immersive.mjs --log-level=error && node node_modules/.cache/immersive.mjs",
     "menus": "esbuild tools/menu-cursor-test.ts --bundle --platform=node --format=esm --outfile=node_modules/.cache/menu-cursor.mjs && node node_modules/.cache/menu-cursor.mjs",
+    "sizing": "esbuild tools/sizing-test.ts --bundle --platform=node --format=esm --outfile=node_modules/.cache/sizing.mjs --log-level=error && node node_modules/.cache/sizing.mjs",
     "swap": "esbuild tools/swap-test.ts --bundle --platform=node --format=esm --outfile=node_modules/.cache/swap.mjs && node node_modules/.cache/swap.mjs",
     "edges": "esbuild tools/edges-test.ts --bundle --platform=node --format=esm --outfile=node_modules/.cache/edges.mjs && node node_modules/.cache/edges.mjs"
   },

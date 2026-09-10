@@ -5,9 +5,9 @@ every field filled. Companion to `devonian-swimming.md`, which did the same job 
 and whose §1 method this follows. Nothing in this file is game tuning; it is the biological envelope
 the numbers in `src/content/cambrian/` should be checked against.
 
-**The roster does not use these lengths yet.** `npm run cambrian:sizes` prints the mapping and
-changes nothing. §4 says what adopting it would cost, and why that is a decision rather than a
-patch.
+**The roster ships as it always did.** These lengths are an option — Settings → *Equivalent sizing*,
+off by default — so the two can be played against each other. §3 is the mapping, §4 what turning it
+on actually does.
 
 ## 1. What the fossils say
 
@@ -55,77 +55,77 @@ The Devonian does not work this way. There, `docs/research/devonian-swimming.jso
 devonian:stats` sets each animal's length from its real one, and `stageScale` (`src/sim/devonian/
 state.ts`) hatches everything at the same *length* rather than the same fraction of itself. A
 newborn Dunkleosteus is three quarters of a unit long and a meal for a grown trilobite; the same
-trilobite is a snack to it three moults later. That is the design this brief is asking whether the
-Cambrian can have.
+trilobite is a snack to it three moults later. That sea is built at its own scale, though — its
+roster runs 0.85 to 12 units for an 80:1 range of real animals — so what the Cambrian borrows is the
+*idea* that adults differ, not the numbers.
 
 ## 3. The mapping
 
-`game units = K · metres^EXP`, with `EXP = 0.6` — the Devonian's exponent, so the two seas compress
-size the same way — and `K = 11.2`, set so the largest body the Cambrian could put in the water (an
-Apex Anomalocaris at 2.6× adult) lands on the largest the Devonian already does (a Prime
-Titanichthys at 16.3 units), which is the biggest animal the engine is known to handle.
+`game units = K · metres^EXP`, with `K = 5.75` and `EXP = 0.4`. `npm run cambrian:sizes` writes
+`src/content/cambrian/equivalent-sizing.json` from it; nothing else is generated, and the shipped
+roster in `creatures.ts` is untouched.
 
-The Cambrian's real span is narrower than the Devonian's 80:1, so at the same exponent it stays
-closer to life: Anomalocaris is 6.8 Marrella long in game, 24 in life, where Dunkleosteus is 3.9
-Coccosteus here against 9.6 in life.
+The two constants say the same thing from either end. **K is set so the largest animal lands exactly
+where the largest animal is today** — Anomalocaris at 3.9 units, an Apex Anomalocaris at 10.1 — so
+the Cambrian sea stays the size it is and the rest of the roster comes down to meet it rather than
+everything growing to meet Anomalocaris. **EXP is set so the smallest still has a body worth
+swimming**: the roster comes out 1.09–3.90 against today's 2.6–3.9, which is real variance inside
+the scale the game already has.
 
-Everything hatches at the same length (0.75 units, the Devonian's `MAX_HATCH_LENGTH`), and growth to
-Adult is geometric from there, so the animals with further to go grow faster per moult. Run
-`npm run cambrian:sizes` for the full table with the derived speed, health and poise; the shape of
-it:
+This is deliberately *not* the Devonian's exponent. That sea is built at a different scale for an
+80:1 roster; the thing worth sharing between the two is that adults differ at all, not the number
+they differ by.
 
-| | real | adult | larva | apex | was (adult) |
+| | real | adult | larva | apex | shipped |
 | --- | --- | --- | --- | --- | --- |
-| Anomalocaris | 37.8 cm | 6.25 | 0.75 | 16.3 | 3.9 |
-| Cambroraster | 25 cm | 4.88 | 0.75 | 12.7 | 3.8 |
-| Olenoides | 7 cm | 2.27 | 0.75 | 5.9 | 3.0 |
-| Opabinia | 5.5 cm | 1.97 | 0.75 | 5.1 | 3.0 |
-| Hallucigenia | 2.5 cm | 1.22 | 0.75 | 3.2 | 2.7 |
-| Marrella | 1.55 cm | 0.92 | 0.74 | 2.4 | 2.7 |
+| Anomalocaris | 37.8 cm | 3.90 | 0.75 | 10.1 | 3.9 |
+| Cambroraster | 25 cm | 3.30 | 0.75 | 8.6 | 3.8 |
+| Odaraia | 15 cm | 2.69 | 0.75 | 7.0 | 3.0 |
+| Olenoides | 7 cm | 1.98 | 0.75 | 5.1 | 3.0 |
+| Opabinia | 5.5 cm | 1.80 | 0.75 | 4.7 | 3.0 |
+| Hallucigenia | 2.5 cm | 1.31 | 0.75 | 3.4 | 2.7 |
+| Marrella | 1.55 cm | 1.09 | 0.75 | 2.8 | 2.7 |
 
-Speed, health and poise come along with the length so the simulation is unchanged *at any given
-body size* — nothing here is new tuning, it is the old tuning re-expressed for a body that is now a
-different number of units long. Speed scales with length (holding body lengths per second, and with
-it the on-screen pace, since the follow camera also sits a fixed number of body lengths back);
-health and poise scale with length^1.1, the power `applyScaleStats` already grows them by, so a body
-of a given *length* has exactly the health it has today. Damage, knockback and reach need nothing:
-combat's `sizeFactor` is a ratio of lengths, and lunge, sense, clearance and body radius are counted
-in body lengths already.
+**Everything hatches at the same length** (0.75 units), and growth to Adult is geometric from there,
+so the animals with further to go grow faster per moult — Anomalocaris doubles at each of its two
+moults, Marrella gains a fifth. Giant and Apex keep their old multiples of the adult body, because
+those two rungs were never biology in the first place. That is `tierScale` in `src/sim/tiers.ts`,
+the Devonian's `stageScale` rule on the Cambrian's five rungs.
 
-## 4. What adopting it costs
+**Speed, health and poise come along with the length**, so the simulation is unchanged at any given
+body size. Nothing there is new tuning: it is the shipped tuning re-expressed for a body that is now
+a different number of units long. Speed scales with length, holding body lengths per second — and
+with it the on-screen pace, since the follow camera also sits a fixed number of body lengths back.
+Health and poise scale with length^1.1, the power `applyScaleStats` already grows them by, so a body
+of a given *length* has exactly the health it has today; `npm run sizing` checks that a two-unit
+body of every animal on the roster comes out within 2% either way. Damage, knockback and reach need
+nothing: combat's `sizeFactor` is a ratio of lengths, and lunge, sense, clearance and body radius are
+counted in body lengths already.
 
-This was prototyped end to end, and it is not a table swap. Four things move with it, and the fourth
-is why this brief stops here rather than landing the change.
+## 4. What turning it on does
 
-1. **The ladder has to become per-creature.** `TIER_SCALE` is indexed in eight places across
-   `game.ts`, `ladder.ts` and `actors.ts`; the Larva and Juvenile rungs become a function of the
-   creature, the way the Devonian's `stageScale` is. `tierForScale` needs the creature id.
-   Mechanical, and it works.
-2. **Stats have to be regenerated, not hand-kept.** `adultLength`, `speed`, `hp` and `poise` become
-   generated fields with the research as their source — the same arrangement the Devonian has, and
-   the same obligation: no hand-editing, and a `--check` in `npm run eras`.
-3. **The selection card stops comparing like with like.** Its four bars read raw `speed` and `hp`,
-   which on a real-scaled roster draws the animal's size twice and leaves every small animal looking
-   unplayable — and a player never meets anything as an adult anyway, but at whatever size they have
-   grown to. The bars want normalising per body size (a one-line change, and one the Devonian's
-   cards need just as much: Titanichthys' 1100 health against Eldredgeops' 45 is size, not armour).
-4. **The scenery was authored for a three-unit roster, and does not move.** A sac sponge is 3.4
-   units tall. Today every animal is about that size and drives over it; at real scale two thirds of
-   the roster is shorter than the sponge and goes *round* it instead. That is arguably the better
-   game — a Marrella threading between sponges is exactly right, and small bodies already live under
-   the scenery at Larva — but it changes how most of the roster reads against the reef at every
-   tier, and it is a world-design call rather than a stats one. `tools/swim-test.ts` catches it:
-   "driving straight at a plant goes over it" stops holding for Olenoides at 7 cm.
+Four things move with the lengths, and the fourth is why this is a setting rather than the roster.
 
-Three test files encode the flat roster in their fixtures (absolute rock heights, absolute spawn
-scales) and want rewriting in body lengths — a good change on its own terms, since a fixed number of
-units stopped asking the same question of every animal.
+1. **The growth ladder becomes per-creature.** Everything hatches at one length instead of one
+   fraction of itself, so the roster starts level and size is earned rather than picked. Off, the
+   ladder is the shipped `TIER_SCALE` for every animal, unchanged.
+2. **Mass becomes cubed length rather than cubed scale.** Every use of it is a ratio between two
+   animals; scale stands in for mass only while the roster is all one size. Off, it is cubed scale,
+   exactly as shipped.
+3. **The selection card gains the animal's real length** beside its locality, and nothing else: the
+   four stat bars are drawn from the shipped numbers in both modes, deliberately. The option changes
+   how big an animal is, not how it fights at a given size, so a bar drawn from the resized figures
+   would report the size a second time and say Marrella had become slow, when what it has become is
+   small.
+4. **The reef does not resize with it.** A sac sponge is 3.4 units tall and stays there. Today every
+   animal is about that size and drives over it; with the option on, most of the roster is shorter
+   than the sponge and goes *round* it instead — an adult Marrella lives among the stalks with the
+   reef standing over it. That may well be the better game, and it is certainly the more honest one,
+   but it changes how most of the roster reads against the scenery at every tier, and it is the
+   thing to actually look at before deciding whether this becomes the default.
 
-**Recommendation.** Take it, with §4.4 understood: the roster is more interesting when size means
-something, and the Devonian already proves the engine and the design hold up at 16 units and at
-0.85. But land it as its own change with the scenery question answered — either the reef's flora
-scales with the animal looking at it, or the small half of the roster lives under the sponges on
-purpose.
+`npm run sizing` covers both halves: that off is the shipped game exactly, and that on does what §3
+says. Every other test in the suite runs with the option off and is untouched by it.
 
 ## 5. Sources
 
