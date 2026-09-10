@@ -1,9 +1,19 @@
 import { clamp, v3, type Vec3 } from '../shared/math';
-import { creature, type CreatureId } from './creatures';
-import { TIER_SCALE, type Actor, type Band, type Controller, type Tier } from './types';
+import { creature, equivalentSizing, type CreatureId } from './creatures';
+import { tierForScale } from './tiers';
+import type { Actor, Band, Controller } from './types';
 
 export const lengthOf = (a: Actor) => creature(a.creature).adultLength * a.scale;
-export const massOf = (a: Actor) => a.scale ** 3;
+/**
+ * Body mass, in arbitrary units — every use of it is a ratio between two animals.
+ *
+ * Cubed scale as shipped, and cubed *length* with equivalent sizing on. Scale is a fraction of the
+ * animal's own adult size, which stands in for mass only while the roster is all one size; once the
+ * adults spread out over their real proportions two creatures at scale 1 are nothing like the same
+ * animal, and a knockback weighted by that reads as nonsense. Left alone in the shipped roster so
+ * that turning the option off is exactly the game it was.
+ */
+export const massOf = (a: Actor) => (equivalentSizing() ? lengthOf(a) : a.scale) ** 3;
 /** Bigger creatures move faster in absolute terms but slower in body lengths. */
 export const speedFactor = (scale: number) => Math.pow(scale, 0.45);
 export const clearanceOf = (a: Actor) => lengthOf(a) * (creature(a.creature).clearance ?? (creature(a.creature).ground ? 0.13 : 0.2));
@@ -53,30 +63,24 @@ export function applyScaleStats(a: Actor, keepFraction = true) {
   a.stamina = Math.min(a.stamina || a.staminaMax, a.staminaMax);
 }
 
-export function tierForScale(s: number): Tier {
-  let best: Tier = 0;
-  for (let i = 0; i < TIER_SCALE.length; i++) if (s >= TIER_SCALE[i] * 0.98) best = i as Tier;
-  return best;
-}
-
 export function makeActor(id: number, creatureId: CreatureId, controller: Controller, pos: Vec3, scale: number, player = -1): Actor {
   const a: Actor = {
     id, creature: creatureId, controller, player,
     // Yaw is set by the caller from the game's seeded RNG: nothing in the simulation may use
     // Math.random, or the same seed stops reproducing the same match.
     pos: { ...pos }, vel: v3(), yaw: 0, pitch: 0, bank: 0, roll: 0,
-    scale, tier: tierForScale(scale), nutrition: 0, ageGrowth: 0,
+    scale, tier: tierForScale(creatureId, scale), nutrition: 0, ageGrowth: 0,
     hp: 0, hpMax: 0, stamina: 0, staminaMax: 0, exhausted: 0, poise: 0, poiseMax: 0,
     state: 'free', stateT: 0, stateDur: 0, combo: 0, comboT: 0, hitDone: new Set(),
     iframes: 0, lockTarget: -1, guardHeld: 0,
     hideMode: 'none', hideT: 0, hideCd: 0, camoStrength: 0, camoScheme: 'default', camoLabel: '', camoSource: -1, emergenceHeavy: false,
     abilityCd: 0, abilityT: 0, abilityActive: false, senseMode: true, senseT: 0, pulseT: 0, burstT: 0,
     hitFlash: 0, hitDir: v3(), hitStop: 0,
-    grabbedBy: -1, grabbing: -1, grabT: 0, eatingTarget: -1, eatProgress: 0,
+    grabbedBy: -1, grabbing: -1, grabT: 0, grabOff: v3(0, 0, 1), eatingTarget: -1, eatProgress: 0,
     corpseT: 0, eaten: 0, eatBites: 0, killer: -1, noise: 0.5, cover: 0, stillness: 0,
     dodgeDir: v3(0, 0, 1), dodgeTapT: 0, hopVel: 0, grounded: true, climbPush: 0, climbTo: -Infinity, airborne: false,
     prev: { light: false, heavy: false, ability: false, dodge: false, guard: false, lock: false, sense: false, rise: false, burst: false, dash: false, aim: false },
-    respawnT: 0, reviveT: 0, carriedTop: false, hatching: false, dashHoldT: 0, dashUsed: false, pounceCd: 0, dashCd: 0, sinceHit: 99, lastHitBy: -1, swallowedBy: -1, holdT: 0, graspHold: false, rideHost: -1, rideT: 0, rideOff: v3(), riddenBy: -1, deathY: 0, sparkled: false, tumble: v3(), aimInRange: false, aiming: false, kills: 0, eats: 0, escapes: 0, hunted: 0, hunterId: -1, wasHunted: false, seen: 0, bubbles: 0,
+    respawnT: 0, reviveT: 0, carriedTop: false, hatching: false, dashHoldT: 0, dashUsed: false, pounceCd: 0, dashCd: 0, sinceHit: 99, lastHitBy: -1, swallowedBy: -1, holdT: 0, graspHold: false, graspT: 0, rideHost: -1, rideT: 0, rideOff: v3(), riddenBy: -1, deathY: 0, sparkled: false, tumble: v3(), aimInRange: false, aiming: false, kills: 0, eats: 0, escapes: 0, hunted: 0, hunterId: -1, wasHunted: false, seen: 0, bubbles: 0,
     spawnProtect: controller === 'player' ? 3 : 0,
     home: { ...pos }, teleportCd: 0,
     prevT: { x: pos.x, y: pos.y, z: pos.z, yaw: 0, pitch: 0, bank: 0 },

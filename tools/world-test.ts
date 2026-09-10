@@ -236,6 +236,7 @@ const run = (g: Game, f: InputFrame, steps: number) => { const m = new Map([[0, 
 {
   const mk = () => {
     const g = new Game('rise', [{ creature: 'waptia', device: 'keyboard', ready: true }, { creature: 'marrella', device: 'keyboard2', ready: true }], 7);
+    g.skipHatch();   // this is about the rescue, not about the five seconds in the egg
     const [a, b] = g.players;
     b.spawnProtect = 99; a.spawnProtect = 0;
     return { g, a, b };

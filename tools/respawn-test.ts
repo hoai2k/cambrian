@@ -6,6 +6,7 @@ import { applyHit } from '../src/sim/combat';
 import { creature } from '../src/sim/creatures';
 // Exercise a lethal giant bite directly: AI target selection is intentionally affected by ecology.
 const g = new Game('rise', [{ creature: 'waptia', device: 'keyboard', ready: true }], 5);
+g.skipHatch();   // out of the egg: this is about the bite that follows
 const p = g.players[0];
 p.spawnProtect = 0;
 const giant = g.actors.find(a => a.controller === 'giant' && a.creature === 'anomalocaris')!;

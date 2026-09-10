@@ -10,7 +10,7 @@
  * player on its own.
  */
 import { Game, bitesFor } from '../src/sim/game';
-import { emptyInput, type InputFrame, type WorldEvent } from '../src/sim/types';
+import { emptyInput, TIER_NEED, type InputFrame, type WorldEvent } from '../src/sim/types';
 import { isAlive, lengthOf } from '../src/sim/actors';
 import { creature, type CreatureId } from '../src/sim/creatures';
 
@@ -19,6 +19,7 @@ const check = (name: string, ok: boolean, detail: string) => { console.log(`${ok
 
 function twoPlayers(a: CreatureId, b: CreatureId, seed = 9) {
   const g = new Game('rise', [{ creature: a, device: 'keyboard', ready: true }, { creature: b, device: 'keyboard2', ready: true }], seed);
+  g.skipHatch();   // these are questions about grown animals, not about the five seconds in the egg
   const [p, q] = g.players;
   p.spawnProtect = 0; q.spawnProtect = 0;
   return { g, p, q };
@@ -130,6 +131,33 @@ function feast(eaterId: CreatureId, foodId: CreatureId, foodScale: number, secon
   const strike = new Map<number, InputFrame>([[0, { ...emptyInput(), aim: true, aimTarget: q.id, heavy: true }]]);
   for (let i = 0; i < 4 && p.state !== 'pounce'; i++) { g.step(1 / 60, strike); g.events.length = 0; }
   check('...and RT pounces at them', p.state === 'pounce', `state=${p.state} inRange=${p.aimInRange}`);
+}
+
+// --- a bigger animal needs bigger prey to fill up ---
+{
+  const g = new Game('rise', [{ creature: 'anomalocaris', device: 'keyboard', ready: true }], 12);
+  const p = g.players[0];
+  const at = { ...p.pos };
+  const meal = (eaterScale: number, preyScale: number) => {
+    p.scale = eaterScale;
+    const food = g.spawn('waptia', 'ambient', at, preyScale);
+    const v = g.nutritionValue(p, food);
+    g.remove(food);
+    return v;
+  };
+  // The same mouthful, to two sizes of animal.
+  const toSmall = meal(0.25, 0.25), toBig = meal(2.6, 0.25);
+  check('a hatchling is fed by a hatchling-sized meal', toSmall > TIER_NEED[0] * 0.25,
+    `${toSmall.toFixed(1)} nutrition, against ${TIER_NEED[0]} to grow`);
+  check('...and the same meal is nothing to a giant', toBig < toSmall * 0.1, `${toBig.toFixed(1)} against ${toSmall.toFixed(1)}`);
+  // What the giant does need is something its own size.
+  const toBigProper = meal(2.6, 2.6);
+  check('...which has to eat its own size to gain the same', toBigProper > toSmall * 0.8,
+    `${toBigProper.toFixed(1)} nutrition from a meal its own size`);
+  // And the ladder asks for more at every rung, so growth is never a matter of more small bites.
+  const need = TIER_NEED.slice(0, 4);
+  check('...and each rung of the ladder costs more than the last', need.every((v, i) => i === 0 || v > need[i - 1]),
+    need.join(' → '));
 }
 
 console.log(failed ? `\n${failed} FAILED` : '\nall feast tests passed');

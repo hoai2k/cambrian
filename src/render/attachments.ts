@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import { damp, heading } from '../shared/math';
 import { bodyRadius, isAlive, isHidden, lengthOf } from '../sim/actors';
+import { rideHold } from '../sim/combat';
 import type { Actor } from '../sim/types';
 import { feedingPhase, type CreatureAnchors } from './anchors';
 
@@ -232,6 +233,25 @@ export class Attachments {
         this.insidePoint.copy(this.anchorPoint); pv.anchors.world('anchor_mouth_inside', this.insidePoint);
         fv.group.position.copy(this.anchorPoint).lerp(this.insidePoint, THREE.MathUtils.clamp(food.stateT / Math.max(.001, food.stateDur), 0, 1));
       }
+    }
+    // Riders. The far side of the same idea: here it is the *rider* that has the grip, so the rider
+    // is shifted until its own grasp socket sits on the hold point instead of its middle being near
+    // it. Without this a ride was the only hold in the game with nothing joining the two bodies —
+    // the rider was simply drawn at a position beside the host and read as floating alongside.
+    for (const rider of world.actors) {
+      if (rider.rideHost < 0 || claimed.has(rider.id)) continue;
+      const host = world.byId(rider.rideHost);
+      if (!host || host.riddenBy !== rider.id) continue;
+      const rv = views.get(rider.id); if (!rv) continue;
+      if (!rv.anchors.world('anchor_grasp', this.anchorPoint) && !rv.anchors.world('anchor_attack_primary', this.anchorPoint)) continue;
+      const hold = rideHold(rider, host);
+      this.target.set(hold.x, hold.y, hold.z).sub(this.anchorPoint);
+      // A correction, not a placement: the simulation already has the body against the host, and
+      // this closes the last of the gap. Bounded so a rig whose socket is somewhere unexpected
+      // cannot fling the animal across the sea.
+      const limit = lengthOf(rider) * 0.5;
+      if (this.target.length() > limit) this.target.setLength(limit);
+      rv.group.position.add(this.target);
     }
   }
 

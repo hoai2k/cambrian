@@ -53,6 +53,10 @@ const run = (g: Game, steps: number, f: InputFrame = emptyInput()) => { const m 
 function withNeighbour(opts: Parameters<typeof makeBrain>[3], gap: number, seed = 5) {
   const g = new Game('reef', [{ creature: 'anomalocaris', device: 'keyboard', ready: true }], seed);
   const p = g.players[0];
+  // One neighbour, and nothing else: these checks are about what this animal does about the
+  // player, and an area with its own residents in it answers a different question.
+  for (const o of [...g.actors]) if (o.controller !== 'player') g.remove(o);
+  g.skipHatch();
   p.spawnProtect = 1e9;                       // the checks are about the neighbour, not about dying
   const pos = { x: p.pos.x + gap, y: p.pos.y, z: p.pos.z };
   const n = g.spawn("opabinia", "ambient", pos, 1);
@@ -210,6 +214,54 @@ function withNeighbour(opts: Parameters<typeof makeBrain>[3], gap: number, seed 
   for (let i = 0; i < 60 * 40 && !ate; i++) { run(g, 1); if (body.eaten >= 1) ate = true; }
   check('...crosses to it and eats it', ate, `from ${start.toFixed(0)}m away, ${h.eats} meal(s)`);
   check('...and goes back to wandering afterwards', (run(g, 90), h.brain!.goal !== 'scavenge'), `goal=${h.brain!.goal}`);
+}
+
+// --- what lives where: an area has a character and holds to it ---
+{
+  const { areaProfile, drawBand, bandScale, AREA_CELL, PASSER_BY } = await import('../src/sim/population');
+  const { makeRng } = await import('../src/shared/math');
+  const { nurseryAt, shoreZ } = await import('../src/sim/world');
+  const SEED = 4242;
+  const at = (x: number, z: number) => areaProfile(x, z, SEED);
+
+  const twice = at(300, -400), again = at(300 + 5, -400 - 5);
+  check('an area is the same area every time you swim back to it',
+    twice.small === again.small && twice.density === again.density, `${twice.small.toFixed(2)} vs ${again.small.toFixed(2)}`);
+
+  const n = nurseryAt(0), nursery = at(n.x, n.z);
+  check('a nursery is a hatchery', nursery.small > nursery.large * 3, `small ${nursery.small.toFixed(2)} · large ${nursery.large.toFixed(2)}`);
+  // Deep water off the shelf: sample a few areas out there, because one cell's own roll can lean
+  // either way — the point is the band, not any single stretch of it.
+  let deepLarge = 0, shelfLarge = 0;
+  for (let i = 0; i < 12; i++) {
+    deepLarge += at(i * 260 - 1500, shoreZ(0) - 900 - i * 90).large;
+    shelfLarge += at(i * 260 - 1500, shoreZ(0) - 260 - i * 12).large;
+  }
+  check('the deep water holds the grown animals', deepLarge > shelfLarge * 1.4,
+    `large ${(deepLarge / 12).toFixed(2)} deep against ${(shelfLarge / 12).toFixed(2)} on the shelf`);
+
+  // Nowhere is empty, and nowhere is stranded: whatever one area is, a neighbour is something else.
+  let thinnest = Infinity, spread = 0, cells = 0;
+  for (let i = -6; i <= 6; i++) for (let j = -6; j <= 6; j++) {
+    const p = at(i * AREA_CELL, shoreZ(0) - 300 - j * AREA_CELL);
+    thinnest = Math.min(thinnest, p.density);
+    const q = at((i + 1) * AREA_CELL, shoreZ(0) - 300 - j * AREA_CELL);
+    spread += Math.abs(p.small - q.small); cells++;
+  }
+  check('no stretch of sea is empty', thinnest > 0.3, `thinnest area carries ${(thinnest * 100).toFixed(0)}% of the usual`);
+  check('...and next door is always something else', spread / cells > 0.05,
+    `neighbours differ by ${((spread / cells) * 100).toFixed(0)}% of their small share`);
+
+  // The draw follows the profile, and something big is always a swim upwards away.
+  const rng = makeRng(7);
+  const small = at(n.x, n.z);
+  let large = 0;
+  for (let i = 0; i < 2000; i++) if (drawBand(rng, small) === 'large') large++;
+  check('a hatchery rarely turns up an adult', large / 2000 < 0.15, `${((large / 2000) * 100).toFixed(0)}% of draws`);
+  check('...but the water above always might', PASSER_BY > 0.1, `${(PASSER_BY * 100).toFixed(0)}% of spawns are something passing`);
+  let big = 0;
+  for (let i = 0; i < 500; i++) big = Math.max(big, bandScale(rng, 'large'));
+  check('a full-grown animal is a full-grown animal', big > 2, `up to ${big.toFixed(1)} scale`);
 }
 
 console.log(failed ? `\n${failed} FAILED` : '\nall ecology tests passed');
