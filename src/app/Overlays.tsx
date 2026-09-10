@@ -229,7 +229,7 @@ export function Dialogs({ kind, onClose, settings, onSettings, scheme }: { kind:
           </label>
           {hasEquivalentSizing() && (
             <label className="setting-row">
-              <span>Equivalent sizing <small>Every animal at its real size beside the others. Takes effect next match.</small></span>
+              <span>Equivalent sizing <small>Give every animal the same size, instead of its own. Takes effect next match.</small></span>
               <input type="checkbox" checked={settings.equivalentSizing} onChange={(e) => onSettings({ ...settings, equivalentSizing: e.target.checked })} />
             </label>
           )}
