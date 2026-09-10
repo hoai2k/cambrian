@@ -10,7 +10,17 @@ size budget, a description of the sound, and the code that will consume it.
 
 ## Open
 
-Nothing outstanding: every sound and track the game asks for is delivered.
+- **Egg hatch — 2 files.** `public/assets/sfx/egg-poke.mp3` (~0.4 s) and
+  `public/assets/sfx/egg-crack.mp3` (~1.2 s), mono, -18 LUFS, under 30 KB each.
+  Every player now hatches out of an egg on the bottom rung: five seconds of a
+  soft shell taking a poke from inside, splitting along the top, and the animal
+  wriggling clear (`HATCH_TIME` in `src/sim/game.ts`, drawn by
+  `src/render/eggs.ts`). *Poke* is the muffled thud of something pressing the
+  wall from within, underwater and close — a knuckle on a taut membrane, not a
+  drum. *Crack* is the wall giving way: a wet tearing rather than a shell
+  shattering, these are not birds' eggs. Consumed by the `hatch` case in
+  `src/render/engine.ts`, which plays `respawn` in their place for now. Shared
+  between the eras (`assets/sfx/`), because both hatch the same way.
 
 ## Delivered
 

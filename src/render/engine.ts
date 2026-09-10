@@ -17,6 +17,7 @@ import { CreatureView, ensureLoaded, loadedSync, type Lod } from './creature';
 import { Edges } from '../shared/edges';
 import { Attachments } from './attachments';
 import { Bubbles, Impacts, Silt, Splash } from './fx';
+import { Eggs } from './eggs';
 import { Mouthfuls } from './carcass';
 import { createSea, type Quality, type SeaEnvironment } from './sea';
 import { RULES, type EraHud } from '../sim/era-rules';
@@ -239,6 +240,7 @@ export class Engine {
   private impacts = new Impacts();
   private splash = new Splash(SURFACE_Y);
   private silt = new Silt();
+  private eggs = new Eggs();
   private keyboard = new KeyboardInput();
   private mouse = new MouseLook();
   /**
@@ -295,7 +297,7 @@ export class Engine {
     // when quality changes, and the pointer lock has to survive that.
     this.mouse.attach(container);
     this.mouse.onLost = () => this.cb.onPointerLost?.();
-    this.scene.add(this.bubbles.points, this.sparkles.points, this.impacts.group, this.silt.group, this.splash.group, this.mouthfuls.group);
+    this.scene.add(this.bubbles.points, this.sparkles.points, this.impacts.group, this.silt.group, this.splash.group, this.mouthfuls.group, this.eggs.group);
     (window as any).__cambrian = this;
     this.resize = new ResizeObserver(() => this.onResize());
     this.resize.observe(container);
@@ -403,6 +405,7 @@ export class Engine {
   private clearMatch() {
     for (const v of this.views.values()) v.dispose();
     this.views.clear(); this.attachments.clear();
+    this.eggs.dispose();
     this.cams = [];
     this.game = undefined;
   }
@@ -525,6 +528,7 @@ export class Engine {
     // Views
     this.syncViews(game, camPositions, dt);
     this.bubbles.update(dt); this.sparkles.update(dt); this.splash.update(dt); this.mouthfuls.update(dt);
+    this.eggs.update(game.actors, dt);
     this.impacts.update(dt, focus);
     this.silt.sync(game.silt, this.time);
 
@@ -733,6 +737,9 @@ export class Engine {
     // Magnification: camera distance and framing scale with body length so the world re-reads at every tier.
     let dist = magnificationDistance(L) * cs.zoom * (1 - 0.3 * cs.aimBlend);
     if (p.state === 'dead') dist *= 1.5;
+    // In the egg the animal is a fraction of its hatched size and the camera would be pressed
+    // against the shell. Frame the egg instead, and ease back in as the body comes out of it.
+    if (p.hatching && p.state === 'moult' && p.stateDur > 2) dist *= 1 + 2.2 * (1 - Math.min(1, p.stateT / p.stateDur / 0.85));
     if (p.hunted > 0.5) dist *= 0.85;
     // Snap in behind the creature when it teleports (respawn), otherwise keep the player's framing.
     const jumped = cs.lastPos.distanceTo(pp) > 20;
@@ -1106,6 +1113,9 @@ export class Engine {
         case 'routed': { world('routed', e.pos, 0.8); this.impacts.spawn(e.pos, '#9ff6ff', 2.5, 0.6); break; }
         case 'pounce': { this.impacts.spawn(e.pos, '#ffe08a', 1.2 + (e.strength ?? 1) * 0.5, 0.35); this.bubbles.emit(e.pos, 24, 0.9, 4, 0.08); world('pounce', e.pos, 1.3); if (e.player != null && e.player >= 0) { const d = padOf(e.player); if (typeof d === 'number') rumble(d, 0.7, 0.4, 140); this.shake(e.player, 0.6); } break; }
         case 'burst': { const b = game.byId(e.actor); world(b && RULES?.jet(b) ? 'jet' : heavy('burst', e.actor), e.pos); if (b && RULES?.jet(b)) this.bubbles.emit(e.pos, 30, 0.9, 3, 0.1, 1.4); break; }
+        // Coming out of an egg. There is no shell-crack sample yet (docs/audio-requests.md), so it
+        // borrows the hatch-in sound rather than synthesising a stand-in for one.
+        case 'hatch': { if (e.player != null && e.player >= 0) audio.play('respawn'); else world('respawn', e.pos, 1, 0.5); break; }
         // Hatching out of a nursery after a respawn (the moult state is reused for the hatch-in).
         case 'moult': { if (e.player != null && e.player >= 0) audio.play(e.strength === 1 && RULES ? 'moult' : 'respawn'); else world('respawn', e.pos, 1, 0.5); break; }
         // Era events (Devonian). Their samples are registered by the era's entry page; an
@@ -1312,7 +1322,7 @@ export class Engine {
     this.sea?.dispose();
     this.bubbles.dispose(); this.splash.dispose(); this.sparkles.dispose(); this.impacts.dispose(); this.silt.dispose();
     this.shieldGeo.dispose();
-    this.mouthfuls.dispose();
+    this.mouthfuls.dispose(); this.eggs.dispose();
     this.renderer.dispose();
     this.renderer.forceContextLoss();
     this.renderer.domElement.remove();

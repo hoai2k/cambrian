@@ -429,8 +429,9 @@ export function App() {
             if (just('confirm')) { if (ps[idx].ready) startMatch(); else toggleReady(idx); }
             if (just('back')) { if (ps[idx].ready) toggleReady(idx); else removePlayer(idx); }
             if (just('menu')) startMatch();
-            // Y: hatch, or carry on from your record. Bound to `light` rather than to `ability`,
-            // which is D-pad right in play and so would fire on every rightward cursor move here.
+            // Hatch, or carry on from your record. On `light` — X — because it is the one attack
+            // control no other menu action wants; `ability` would be worse rather than better,
+            // since two menu actions on one button is the collision that matters here.
             if (just('light')) toggleCarry(idx);
             // LB and RB cycle the mode. Bind to the raw shoulder buttons, never to a gameplay
             // control: this used to read `burst`, which is button 0 — the same button as confirm —
