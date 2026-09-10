@@ -164,6 +164,20 @@ function FitName({ name }: { name: string }) {
 }
 
 const stat = (v: number, max: number) => Math.round((v / max) * 5);
+/**
+ * The bars compare animals *for their size*, not by size.
+ *
+ * `speed` and `hp` are stored for the adult body, and the roster's adults now run from a 0.9-unit
+ * Marrella to a 6.3-unit Anomalocaris (docs/research/cambrian-sizes.md), so comparing the raw
+ * numbers would just draw the size twice and leave every small animal reading as unplayable. What
+ * a player wants off this card is how the animal fights whatever it is next to — and it never
+ * meets anything as an adult in the first place; it meets it at whatever size it has grown to.
+ * So speed is divided back to body lengths per second, and health to health per body, using the
+ * same powers the simulation grows them with (`applyScaleStats`, `speedFactor`). Damage and
+ * agility need nothing: combat's `sizeFactor` is a ratio of lengths, and turn rate is already per
+ * second.
+ */
+const perSize = (v: number, adultLength: number, power = 1) => v / Math.pow(adultLength, power);
 const ASSETS = appBase();
 
 /** Grid columns: three rows at most, so 21 creatures sit in 7 x 3 and 8 sit in 4 x 2. */
@@ -242,9 +256,9 @@ export function SelectScreen(p: Props) {
                   {!compact && (
                     <>
                       <div className="stats">
-                        <Stat label="Speed" v={stat(def.speed * def.burst, 14.6)} />
+                        <Stat label="Speed" v={stat(perSize(def.speed * def.burst, def.adultLength), 4.87)} />
                         <Stat label="Power" v={stat(def.heavy.damage, 26)} />
-                        <Stat label="Armor" v={stat(def.hp * (1 + def.defense), 233)} />
+                        <Stat label="Armor" v={stat(perSize(def.hp * (1 + def.defense), def.adultLength, 1.1), 69.6)} />
                         <Stat label="Agility" v={stat(def.agility + def.turnRate, 8.6)} />
                       </div>
                       {def.kindNote && <p className="kind-note">{def.kindNote}</p>}

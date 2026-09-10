@@ -193,9 +193,13 @@ const rockWorld = (boulders: Boulder[]) => ({
    * rather than swimming over it. The climb is paid for out of the travel now, so what changes is
    * the direction of the motion and not the speed of it.
    */
-  const overARock = (tall: number, seconds = 10) => {
+  // Heights are in the swimmer's own body lengths: "a cliff" means a cliff to *this* animal, and
+  // the roster's lengths are real ones now (docs/research/cambrian-sizes.md), so a fixed number of
+  // units stopped meaning the same thing to every body.
+  const overARock = (bodies: number, seconds = 10) => {
     const g = new Game('reef', [{ creature: 'anomalocaris', device: 'keyboard', ready: true }], 21);
     const p = g.players[0]; p.spawnProtect = 0;
+    const tall = bodies * lengthOf(p);
     const ground = sampleHeight(p.pos.x, p.pos.z);
     const sy = tall / 1.3, y = ground + sy * 0.25;
     g.world.boulders.push({ pos: { x: p.pos.x, y, z: p.pos.z - 12 }, radius: 8 * 1.02, height: y + sy * 1.05, sx: 8, sy, sz: 8, rot: 0, shade: .7 });
@@ -214,14 +218,14 @@ const rockWorld = (boulders: Boulder[]) => ({
     // pointed upward, plus the rise it can swim — and nothing like the twentyfold it used to be.
     return { rate, peak, swim: creature(p.creature).speed * speedFactor(p.scale), tall };
   };
-  const r = overARock(7);
+  const r = overARock(1.8);
   check('a rock is climbed at swimming pace, not jumped', r.rate < r.swim * 4,
     `rose at most ${r.rate.toFixed(0)} u/s against a ${r.swim.toFixed(1)} u/s swim (${(r.rate / r.swim).toFixed(1)}x)`);
-  check('...and the body still gets over it', r.peak > r.tall, `reached ${r.peak.toFixed(1)} over a ${r.tall}-unit rock`);
+  check('...and the body still gets over it', r.peak > r.tall, `reached ${r.peak.toFixed(1)} over a ${r.tall.toFixed(1)}-unit rock`);
   // A cliff is where the pacing matters most: there is no height a body may be handed for free.
-  const c = overARock(12);
+  const c = overARock(3.1);
   check('...and a cliff is not vaulted either', c.rate < c.swim * 4 && c.peak < c.tall,
-    `rose at most ${c.rate.toFixed(0)} u/s and reached ${c.peak.toFixed(1)} of ${c.tall}`);
+    `rose at most ${c.rate.toFixed(0)} u/s and reached ${c.peak.toFixed(1)} of ${c.tall.toFixed(1)}`);
 }
 
 // --- a crawler walks up and over what it is pushed into, whatever it is ---
@@ -258,6 +262,12 @@ const rockWorld = (boulders: Boulder[]) => ({
   const atAPlant = (kind: 'sac' | 'spine', scale: number, off: number) => {
     const g = new Game('reef', [{ creature: 'olenoides', device: 'keyboard', ready: true }], 33);
     const p = g.players[0]; p.spawnProtect = 999; p.scale = 1; applyScaleStats(p, false);
+    // The sponge is sized against the body walking at it: whether a plant is something to climb or
+    // something to walk round is a question about the two of them, and the roster's lengths are
+    // real ones now (docs/research/cambrian-sizes.md) — a trilobite is a 7 cm animal — so a fixed
+    // number of units stopped asking the same question. Answers come back in body lengths too.
+    const body = lengthOf(p) / 3;
+    scale *= body; off *= body;
     const ground = sampleHeight(p.pos.x, p.pos.z);
     p.pos = { x: p.pos.x, y: ground + floorClearance(p), z: p.pos.z };
     p.yaw = Math.PI;
@@ -269,7 +279,7 @@ const rockWorld = (boulders: Boulder[]) => ({
     let peak = 0;
     const m = new Map([[0, { ...emptyInput(), my: 1, camYaw: Math.PI }]]);
     for (let i = 0; i < 60 * 8; i++) { g.step(1 / 60, m); g.events.length = 0; peak = Math.max(peak, p.pos.y - sampleHeight(p.pos.x, p.pos.z)); }
-    return { peak, past: f.pos.z - p.pos.z, height: f.H };
+    return { peak: peak / body, past: (f.pos.z - p.pos.z) / body, height: f.H / body };
   };
   // A sac sponge big enough to stand up to this body: a firm bulb, broad right down at the sand.
   const head = atAPlant('sac', 3, 0);
