@@ -739,7 +739,7 @@ export class Engine {
     if (p.state === 'dead') dist *= 1.5;
     // In the egg the animal is a fraction of its hatched size and the camera would be pressed
     // against the shell. Frame the egg instead, and ease back in as the body comes out of it.
-    if (p.hatching && p.state === 'moult' && p.stateDur > 2) dist *= 1 + 2.2 * (1 - Math.min(1, p.stateT / p.stateDur / 0.85));
+    if (p.hatching && p.state === 'moult' && p.stateDur > 2) dist *= 1 + 0.5 * (1 - Math.min(1, p.stateT / p.stateDur / 0.85));
     if (p.hunted > 0.5) dist *= 0.85;
     // Snap in behind the creature when it teleports (respawn), otherwise keep the player's framing.
     const jumped = cs.lastPos.distanceTo(pp) > 20;
