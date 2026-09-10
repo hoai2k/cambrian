@@ -59,6 +59,17 @@ unless the user explicitly asks for a PR. Steps:
 - Devonian specimens land in batches (`tools/devonian/shipped.json`). When one lands: run
   `node tools/update-asset-sizes.mjs` (refreshes `src/content/devonian/asset-sizes.json`), remove its
   entry from `DEVONIAN_STAND_INS` in `src/content/devonian/index.ts`, and run `npm run devonian`.
+- The Cambrian roster ships at one size — every animal grows to within a third of every other — and
+  *Equivalent sizing* (Settings, off by default) swaps in lengths taken from what the animals
+  actually measured: `docs/research/cambrian-sizes.json` → `npm run cambrian:sizes` →
+  `src/content/cambrian/equivalent-sizing.json`, which `npm run eras` checks. K is set so the
+  largest animal stays exactly where it is today, so the sea does not change size; speed, health and
+  poise come with the length so a body of a given length fights as it always did, and the growth
+  ladder becomes per-creature (`tierScale` in `src/sim/tiers.ts`) so everything hatches the same
+  length. Every consumer goes through `creature()`, which is where the swap happens, and the option
+  is fixed when a match starts because `src/sim` has to replay the same way from the same inputs.
+  `npm run sizing` checks both that off is the shipped game exactly and that on does what the brief
+  says.
 - Devonian sizes and swimming stats are generated: `docs/research/devonian-swimming.json` (sourced lengths
   and body-lengths-per-second) → `npm run devonian:stats` → the six movement fields in
   `src/content/devonian/creatures.ts`. Edit the research or the formulas in `tools/devonian/stats.mjs`,
