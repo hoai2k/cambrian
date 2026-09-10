@@ -10,18 +10,19 @@
  * with the cephalon tilted down, then a skid with the antennae trailing.
  */
 import { ss, arc, hold, UP, DOWN, FWD, BACK } from '../lib.mjs';
-import { pad, range } from '../common.mjs';
+import { pad, range, alive, beatPhase } from '../common.mjs';
 
 const ROWS = [['L', -1], ['R', 1]], SIDES = [1, -1];
 const inward = (sx) => [-sx, 0, 0];
 const BODY = range(9).map((i) => `body_${pad(i)}`);
 
-function legs(P, t, env, { amp = .16, coil = 0, drive = 0, brace = 0, loopU } = {}) {
-  const ph = loopU === undefined ? 2 * Math.PI * t / 1.2 : 2 * Math.PI * loopU;
+function legs(P, t, env, { power = 0, beats = 0, ramp = 0, amp = .16, coil = 0, drive = 0, brace = 0, loopU } = {}) {
+  const ph = beatPhase(t, { period: 1.2, beats, ramp, loopU });
+  const A = amp * env * (1 + power);
   for (const [row, sx] of ROWS) for (let i = 0; i < 15; i++) {
     const b = `leg_${pad(i)}_${row}`, tip = `${b}_tip`, phase = ph - i * .55 + (sx < 0 ? Math.PI : 0);
-    P.bend(b, FWD, .08 * amp * env * Math.sin(phase) + .25 * coil - .35 * drive * (1 - i * .02));
-    P.bend(tip, DOWN, .06 * amp * env * Math.cos(phase + .5) + .2 * coil + .25 * brace);
+    P.bend(b, FWD, .14 * A * Math.sin(phase) + .25 * coil - .35 * drive * (1 - i * .02));
+    P.bend(tip, DOWN, .11 * A * Math.cos(phase + .5) + .2 * coil + .25 * brace);
     P.bend(b, DOWN, .12 * brace);
   }
 }
@@ -39,6 +40,12 @@ function body(P, { low = 0, butt = 0, fwd = 0, bob = 0 }) {
   P.bend('body_01', UP, .06 * butt + .03 * bob);
 }
 
+/**
+ * Bones this performance authors. The front legs that work food, the antennae and the cerci are the performance; the body plates and
+ * the rest of the leg train keep the shipped clip's motion.
+ */
+export const authored = (n) => /^(leg_0[0-3]_|antenna_|cercus_)/.test(n);
+
 export const clips = [
   {
     name: 'Bite', duration: 0.5, loop: false,
@@ -46,8 +53,8 @@ export const clips = [
     pose(u, P, t) {
       const A = arc(0, .24, u), S = hold(.12, .28, .38, .86, u);
       body(P, { butt: 1.2 * S, fwd: .05 * S - .02 * A });
-      feelers(P, { sweep: .5 * A, trail: .4 * S, ph: 2 * Math.PI * u * 2 });
-      legs(P, t, Math.sin(Math.PI * u) ** 2, { brace: .8 * S });
+      feelers(P, { sweep: .7 * alive(u), trail: .4 * S, ph: 2 * Math.PI * u * 2 });
+      legs(P, t, alive(u), { amp: .8, power: .9 * S, beats: 1.4, ramp: ss(.1, .55, u), brace: .8 * S });
     },
   },
   {
@@ -58,8 +65,8 @@ export const clips = [
     pose(u, P, t) {
       const W = hold(0, .3, .36, .5, u), S = hold(.36, .46, .62, .95, u), skid = hold(.5, .62, .8, 1, u);
       body(P, { low: 1.0 * W + .4 * S, butt: -.2 * W + 1.6 * S, fwd: -.05 * W + .14 * S });
-      feelers(P, { sweep: .3 * W, trail: .9 * S + .5 * skid, ph: 2 * Math.PI * u * 3 });
-      legs(P, t, Math.sin(Math.PI * u) ** 2 * (1 - .8 * S), { coil: W, drive: S, brace: .5 * skid });
+      feelers(P, { sweep: .6 * alive(u), trail: .9 * S + .5 * skid, ph: 2 * Math.PI * u * 3 });
+      legs(P, t, alive(u), { amp: .9, power: 1.2 * S, beats: 2.1, ramp: ss(.3, .7, u), coil: W, drive: S, brace: .5 * skid });
     },
   },
   {
@@ -68,8 +75,8 @@ export const clips = [
     pose(u, P, t) {
       const R = hold(.05, .3, .55, .9, u), D = hold(.36, .5, .6, .9, u);
       body(P, { butt: 1.0 * R, fwd: .08 * R, low: .3 * R });
-      feelers(P, { sweep: .4 * (1 - R) * Math.sin(Math.PI * u) ** 2, trail: .6 * D, ph: 2 * Math.PI * u * 2 });
-      legs(P, t, Math.sin(Math.PI * u) ** 2 * (1 - .6 * R), { drive: .8 * R, brace: .4 * D });
+      feelers(P, { sweep: .7 * alive(u), trail: .6 * D, ph: 2 * Math.PI * u * 2 });
+      legs(P, t, alive(u), { amp: .8, power: .8 * R, beats: 1.6, ramp: ss(.1, .62, u), drive: .8 * R, brace: .4 * D });
     },
   },
   {
@@ -86,7 +93,7 @@ export const clips = [
         P.bend(b, FWD, .3 * R * (1 - Cy) + .3 * chew * w).bend(b, inward(sx), .2 * Cy + .15 * chew * w).bend(`${b}_tip`, inward(sx), .25 * Cy + .1 * chew * w);
       }
       feelers(P, { sweep: .6, ph: 2 * Math.PI * u * 2 });
-      legs(P, t, 1, { amp: .12, loopU: u });
+      legs(P, t, 1, { amp: .45, loopU: u });
     },
   },
 ];

@@ -5,7 +5,7 @@ import { gamepads, readGamepad, type RawControls } from '../input/input';
 import type { AssetProgress } from '../render/assets';
 import { Engine, type HudSnapshot } from '../render/engine';
 import type { Quality } from '../render/sea';
-import { PLAYABLE_IDS as CREATURE_IDS, PLAYABLE as CREATURES, creature, type CreatureId } from '../sim/creatures';
+import { PLAYABLE_IDS as CREATURE_IDS, PLAYABLE as CREATURES, creature, setEquivalentSizing, type CreatureId } from '../sim/creatures';
 import { MODE_IDS, type Mode, type PlayerSetup } from '../sim/types';
 import { clampMark } from '../sim/ladder';
 import { emptyCodex, hasNewFinds, loadCodex, mergeCodex, recordFinds, type Codex } from './codex';
@@ -21,14 +21,20 @@ import { freshCursor, menuPress, MENU_LOCKOUT, type MenuCursor, type MenuEvent }
 
 export type Screen = 'title' | 'select' | 'playing' | 'results';
 export type DialogKind = null | 'help' | 'settings';
-export interface Settings { quality: Quality; lookSpeed: number; invertY: boolean; volume: number; muted: boolean; music: boolean; }
+/**
+ * `equivalentSizing` is the roster at the animals' real relative sizes — see
+ * `setEquivalentSizing` in src/sim/creatures.ts. Off by default, and applied between matches
+ * rather than during one: body length is an input to almost everything in the simulation, and
+ * `src/sim` has to replay the same way from the same inputs.
+ */
+export interface Settings { quality: Quality; lookSpeed: number; invertY: boolean; volume: number; muted: boolean; music: boolean; equivalentSizing: boolean; }
 
 /** The active era's modes, in its order; the first is the default selection. */
 const MODES: Mode[] = ACTIVE_ERA.modes.map((m) => m.id);
 const SETTINGS_KEY = ACTIVE_ERA.copy.settingsKey;
 const defaultSettings = (): Settings => {
-  try { const s = localStorage.getItem(SETTINGS_KEY); if (s) return { ...{ quality: 'high', lookSpeed: 1, invertY: false, volume: 0.8, muted: false, music: true }, ...JSON.parse(s) }; } catch { /* ignore */ }
-  return { quality: 'high', lookSpeed: 1, invertY: false, volume: 0.8, muted: false, music: true };
+  try { const s = localStorage.getItem(SETTINGS_KEY); if (s) return { ...{ quality: 'high', lookSpeed: 1, invertY: false, volume: 0.8, muted: false, music: true, equivalentSizing: false }, ...JSON.parse(s) }; } catch { /* ignore */ }
+  return { quality: 'high', lookSpeed: 1, invertY: false, volume: 0.8, muted: false, music: true, equivalentSizing: false };
 };
 
 /**
@@ -70,6 +76,8 @@ export function App() {
   const [dialog, setDialog] = useState<DialogKind>(null);
   const dialogRef = useRef<DialogKind>(null);
   const [settings, setSettings] = useState<Settings>(defaultSettings);
+  const settingsRef = useRef<Settings>(settings);
+  useEffect(() => { settingsRef.current = settings; }, [settings]);
   const [loaded, setLoaded] = useState(false);
   const [progress, setProgress] = useState<AssetProgress | null>(null);
   const [error, setError] = useState('');
@@ -158,6 +166,8 @@ export function App() {
   useEffect(() => {
     engineRef.current?.setQuality(settings.quality);
     engineRef.current?.setLook(settings.lookSpeed, settings.invertY);
+    // Not mid-match: the running simulation is already built around the lengths it started with.
+    if (screenRef.current !== 'playing') setEquivalentSizing(settings.equivalentSizing);
     audio.setVolume(settings.volume); audio.setMuted(settings.muted); audio.setMusic(settings.music);
     try { localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings)); } catch { /* ignore */ }
   }, [settings]);
@@ -245,6 +255,8 @@ export function App() {
     const ps = playersRef.current;
     if (!ps.length || !ps.every((p) => p.ready) || !engineRef.current) return;
     clearFresh();
+    // Fixed for the length of the match, whatever the settings panel does while it runs.
+    setEquivalentSizing(settingsRef.current.equivalentSizing);
     engineRef.current.startMatch(modeRef.current, withCarry(ps));
     setPausedBoth(false);
     go('playing');
@@ -417,8 +429,9 @@ export function App() {
             if (just('confirm')) { if (ps[idx].ready) startMatch(); else toggleReady(idx); }
             if (just('back')) { if (ps[idx].ready) toggleReady(idx); else removePlayer(idx); }
             if (just('menu')) startMatch();
-            // Y: hatch, or carry on from your record. Bound to `light` rather than to `ability`,
-            // which is D-pad right in play and so would fire on every rightward cursor move here.
+            // Hatch, or carry on from your record. On `light` — X — because it is the one attack
+            // control no other menu action wants; `ability` would be worse rather than better,
+            // since two menu actions on one button is the collision that matters here.
             if (just('light')) toggleCarry(idx);
             // LB and RB cycle the mode. Bind to the raw shoulder buttons, never to a gameplay
             // control: this used to read `burst`, which is button 0 — the same button as confirm —

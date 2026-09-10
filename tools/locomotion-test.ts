@@ -102,7 +102,14 @@ const flat = (v: { x: number; z: number }) => Math.hypot(v.x, v.z);
 
 // --- hauling through weed: cover carries a limbed body and drags on a swimmer ---
 {
-  /** Cross a bed of soft weed — the growth this is actually about — and see what it cost. */
+  /**
+   * Cross a bed of soft weed — the growth this is actually about — and see what it cost.
+   *
+   * Unheld, the swimmer finished four units clear of plants 1.8 tall and came out with exactly the
+   * distance it went in with, which read as the drag being broken when it had never been asked
+   * for. The same input goes to both bodies and to both runs of each, so what is compared is still
+   * only the weed.
+   */
   const cross = (id: CreatureId, planted: boolean) => {
     const { g, p, step, into } = solo(id, 5);
     const ground = sampleHeight(p.pos.x, p.pos.z);
