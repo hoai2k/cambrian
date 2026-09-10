@@ -23,12 +23,18 @@ const check = (n: string, ok: boolean, d: string) => { console.log(`${ok ? 'PASS
 const ctxFor = (g: Game): HitContext => ({ events: g.events, byId: (id: number) => g.byId(id), time: 0, rng: g.rng });
 const run = (g: Game, f: InputFrame, steps: number) => { const m = new Map([[0, f]]); for (let i = 0; i < steps; i++) { g.step(1 / 60, m); g.events.length = 0; } };
 
-/** A player of `id` at adult scale, with a body of `scale` beside it, and nothing else in reach. */
-function pair(id: 'anomalocaris' | 'hallucigenia' | 'isoxys', otherScale: number, otherId = 'anomalocaris') {
+/**
+ * A player of `id` at adult scale, with a body beside it `times` its length, and nothing else in
+ * reach. The size is asked for as a *ratio* rather than a scale because the bands these tests are
+ * about are ratios: the roster's real lengths (docs/research/cambrian-sizes.md) mean a fixed scale
+ * on one animal is prey beside one player and a giant beside another.
+ */
+function pair(id: 'anomalocaris' | 'hallucigenia' | 'isoxys', times: number, otherId = 'anomalocaris') {
   const g = new Game('reef', [{ creature: id, device: 'keyboard', ready: true }], 9);
   const p = g.players[0]; p.spawnProtect = 1e6; p.state = 'free';
   // Clear the reef out of the way so only the pair matters.
   for (const a of g.actors) if (a !== p) a.pos = { x: a.pos.x + 2000, y: a.pos.y, z: a.pos.z };
+  const otherScale = times * lengthOf(p) / creature(otherId as never).adultLength;
   const o = g.spawn(otherId as never, 'ambient', { x: p.pos.x, y: p.pos.y, z: p.pos.z + lengthOf(p) }, otherScale);
   o.spawnProtect = 0; o.brain = undefined;
   return { g, p, o, ctx: ctxFor(g) };
@@ -71,7 +77,7 @@ function inFront(p: Actor, o: Actor) {
 
 // --- a held attack takes hold of prey, and letting go is a mouthful ---
 {
-  const { g, p, o, ctx } = pair('isoxys', 0.3);
+  const { g, p, o, ctx } = pair('isoxys', 0.39);
   p.graspHold = true;
   const def = creature(p.creature);
   check('prey is in the mouthful bands', bandOf(p, o) === 'snack' || bandOf(p, o) === 'prey', `${bandOf(p, o)} (${lengthOf(o).toFixed(2)} against ${lengthOf(p).toFixed(2)})`);
@@ -227,7 +233,7 @@ function inFront(p: Actor, o: Actor) {
 
 // --- something bigger is ridden, and only away from its head ---
 {
-  const { g, p, o, ctx } = pair('hallucigenia', 3.2);
+  const { g, p, o, ctx } = pair('hallucigenia', 4.6);
   check('a body this size is over the rival band', bandOf(p, o) === 'threat' || bandOf(p, o) === 'giant', `${bandOf(p, o)} (${lengthOf(o).toFixed(1)} against ${lengthOf(p).toFixed(1)})`);
   inFront(p, o);
   check('there is no hold at the head end', !takeRide(ctx, p, o) && p.rideHost === -1, 'the jaws are not a handhold');
@@ -258,7 +264,7 @@ function inFront(p: Actor, o: Actor) {
 
 // --- the host's own answer: throw yourself sideways ---
 {
-  const { g, p, o, ctx } = pair('hallucigenia', 3.2);
+  const { g, p, o, ctx } = pair('hallucigenia', 4.6);
   behind(p, o);
   takeRide(ctx, p, o);
   o.state = 'dodge'; o.stateT = 0; o.stateDur = 0.4;
@@ -270,7 +276,7 @@ function inFront(p: Actor, o: Actor) {
 
 // --- a ride cannot outlast its own grip ---
 {
-  const { g, p, o, ctx } = pair('hallucigenia', 3.2);
+  const { g, p, o, ctx } = pair('hallucigenia', 4.6);
   behind(p, o);
   takeRide(ctx, p, o);
   p.stamina = p.staminaMax;
@@ -283,7 +289,7 @@ function inFront(p: Actor, o: Actor) {
 
 // --- one rider at a time, and no chains ---
 {
-  const { g, p, o, ctx } = pair('hallucigenia', 3.2);
+  const { g, p, o, ctx } = pair('hallucigenia', 4.6);
   behind(p, o);
   takeRide(ctx, p, o);
   const other = g.spawn('hallucigenia', 'bot', { x: o.pos.x, y: o.pos.y, z: o.pos.z - 1 }, 1);

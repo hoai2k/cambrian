@@ -1,21 +1,20 @@
-import { creature, equivalentSizing, type CreatureId } from './creatures';
+import { creature, naturalSizing, type CreatureId } from './creatures';
 import { TIER_SCALE, type Tier } from './types';
 
 /**
  * The growth ladder's *sizes*, per creature.
  *
- * Shipped, this is one set of multipliers for the whole roster: a Larva is a quarter of *its own*
- * adult size, whatever that is. That only reads as growth because the roster is all one size to
- * begin with.
+ * `TIER_SCALE` alone is one set of multipliers for the whole roster: a Larva is a quarter of *its
+ * own* adult size, whatever that is. That only reads as growth while the roster is all one size to
+ * begin with, which is what *Equivalent sizing* turns it back into.
  *
- * With equivalent sizing on (see `setEquivalentSizing`), the adults spread out over the real
- * animals' proportions and the ladder has to change with them, or an Anomalocaris would hatch four
- * times the length of a Marrella and the level start the roster is meant to share would be gone.
- * So the bottom of the ladder becomes a *length* rather than a fraction: everything is
- * `LARVA_LENGTH` long at Larva whatever it will grow into, and growth to Adult is geometric from
- * there, which means the animals with further to go grow faster per moult. Giant and Apex keep
- * their old multiples of the adult body, because those two rungs were never biology in the first
- * place.
+ * At the roster's natural sizes the adults spread out over the real animals' proportions, and the
+ * ladder has to spread with them or an Anomalocaris would hatch four times the length of a Marrella
+ * and the level start would be gone. So the bottom of the ladder is a *length* rather than a
+ * fraction: everything is `LARVA_LENGTH` long at Larva whatever it will grow into, and growth to
+ * Adult is geometric from there, which means the animals with further to go grow faster per moult.
+ * Giant and Apex keep their old multiples of the adult body, because those two rungs were never
+ * biology in the first place.
  *
  * This is the Devonian's rule (`stageScale` in ./devonian/state.ts) on the Cambrian's five rungs.
  * The one difference is where adulthood sits: the Devonian moults three times to reach it with
@@ -30,7 +29,9 @@ export const larvaLength = (adultLength: number) => Math.min(adultLength * 0.8, 
 /** Body scale (of adult length) at `tier`, for the creature that has to do the growing. */
 export function tierScale(id: CreatureId, tier: number): number {
   const t = Math.max(0, Math.min(TIER_SCALE.length - 1, Math.round(tier))) as Tier;
-  if (!equivalentSizing() || t >= ADULT_TIER) return TIER_SCALE[t];
+  // Flattened back, or an era with no lengths of its own (the Devonian, which has its own ladder in
+  // `stageScale`): the authored multipliers, for every rung.
+  if (!naturalSizing() || t >= ADULT_TIER) return TIER_SCALE[t];
   const adult = creature(id).adultLength;
   const s0 = larvaLength(adult) / adult;
   return Math.pow(s0, 1 - t / ADULT_TIER);          // s0 → 1 over the two moults to adult
