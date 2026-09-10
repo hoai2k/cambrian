@@ -1,3 +1,4 @@
+import { hasEquivalentSizing } from '../sim/creatures';
 import { ACTIVE_ERA } from '../content';
 import { useEffect, useRef } from 'react';
 import type { HudSnapshot } from '../render/engine';
@@ -226,6 +227,12 @@ export function Dialogs({ kind, onClose, settings, onSettings, scheme }: { kind:
             <span>Mute</span>
             <input type="checkbox" checked={settings.muted} onChange={(e) => onSettings({ ...settings, muted: e.target.checked })} />
           </label>
+          {hasEquivalentSizing() && (
+            <label className="setting-row">
+              <span>Equivalent sizing <small>Every animal at its real size beside the others. Takes effect next match.</small></span>
+              <input type="checkbox" checked={settings.equivalentSizing} onChange={(e) => onSettings({ ...settings, equivalentSizing: e.target.checked })} />
+            </label>
+          )}
           <p className="dim">Settings apply to every local player and are remembered on this device.</p>
         </div>
       )}
