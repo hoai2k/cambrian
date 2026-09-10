@@ -12,7 +12,7 @@ import portraits from '../../../public/assets/creatures/schemes/manifest.json';
 export const CAMBRIAN = defineEra({
   id: 'cambrian',
   title: 'Cambrian Conquest',
-  copy: { tagline: 'Eat. Grow. Fight. Run.', taglineEm: '508 million years ago, everything was hungry.', loading: 'WAKING THE REEF…', lose: 'THE REEF WINS', settingsKey: 'cambrian-settings', sibling: { title: 'Devonian Domination', path: 'devonian/', blurb: '133 million years later' } },
+  copy: { tagline: 'Eat. Grow. Fight. Run.', taglineEm: '508 million years ago, everything was hungry.', loading: 'WAKING THE REEF…', lose: 'THE REEF WINS', settingsKey: 'cambrian-settings', sibling: { title: 'Devonian Domination', path: 'devonian/', blurb: '133 million years later', logo: 'assets/devonian/brand/logo-engraved.webp' } },
   modes: [
     { id: 'rise', name: 'Rise', blurb: 'Hatch as a larva. Eat, grow, fight, hide. Reach Apex and hold it for ninety seconds. Share the feast with the others, or eat them.', players: '1–4' },
     { id: 'hunted', name: 'Hunter & Hunted', blurb: 'Everyone takes a turn as the giant. On yours, catch as many of the small ones as you can; on theirs, hide, bait and grow out of reach. Most caught wins.', players: '2–4 asymmetric' },
@@ -32,6 +32,6 @@ export const CAMBRIAN = defineEra({
     logo: 'assets/brand/logo-engraved.webp', illustration: 'assets/brand/logo-illustrated.webp',
     emblem: 'assets/brand/emblem.webp', modelBytes, modelStatus: CAMBRIAN_MODEL_STATUS, modelNotes: CAMBRIAN_MODEL_NOTES, clipNotes: CAMBRIAN_CLIP_NOTES,
   },
-  audio: { music: MUSIC },
+  audio: { music: MUSIC, loops: { ambient: 'ambient-reef', drone: 'giant-drone' } },
   presentation: { schemes: SCHEMES, creatureSchemes: CREATURE_SCHEMES, portraits, authoredColors },
 });

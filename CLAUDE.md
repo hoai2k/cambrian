@@ -46,7 +46,12 @@ unless the user explicitly asks for a PR. Steps:
   need the Devonian do the same: select the era, then `await import(...)` (`tools/devonian-test.ts`).
 - An era's `assets.sfx` names the shared sound library (`assets/sfx/`): bites, hits and the UI are the
   same files in both eras. Era-specific samples are addressed as `<era>/<name>` and resolve under
-  `assets/<era>/sfx/` regardless. Only creatures with their own delivered model are pickable
+  `assets/<era>/sfx/` regardless. The two always-on beds are named per era in `audio.loops`, and a
+  music track that names biomes is an *area theme*: reserved for them, never shuffled into the
+  rotation, crossfaded to on a dwell and back again on a longer one, resuming where it left off
+  (`stepArea` in `src/audio/audio.ts`, the constants in `src/audio/music.ts`, `npm run music`).
+  Nothing synthesises a stand-in for a sound that has not loaded — it stays quiet and the file is
+  fetched; anything genuinely missing goes in `docs/audio-requests.md`. Only creatures with their own delivered model are pickable
   (`PLAYABLE` in `src/sim/creatures.ts`); the rest borrow a body in the world but stay off the roster.
 - Devonian gameplay lives in `src/sim/devonian/` and reaches the shared simulation only through the
   `RULES?.` hooks in `src/sim/era-rules.ts`. Do not branch on the era inside `game.ts`/`combat.ts`;
@@ -80,6 +85,13 @@ unless the user explicitly asks for a PR. Steps:
 - Devonian scenery and biome plates are procedural stand-ins: flora kinds and their density table in
   `src/content/devonian/environment.ts` + `src/render/sea.ts`, plates from `npm run devonian:plates`.
   Authored sets replace them without touching placement; see `docs/redesign/09-devonian-remaining.md`.
+- Every animal answers what bites it: `thinkNeeds` in `src/sim/ai.ts` turns any hit into fight or
+  flight whatever the attacker's size and however hurt the animal is, and an animal that has been
+  fleeing the same attacker for two seconds and is still in its reach turns and fights (cornered).
+  Nurseries are safe by non-aggression, not by size — `peaceful()` drops prey and rivals inside the
+  ring from an animal's reckoning but never its answer to being bitten — and ambient size is rolled
+  from the sea's own ages rather than the biggest player's tier, so something full grown passes by
+  from the first minute. `npm run reactions` guards all of it.
 - What a player has found — biomes, landmarks, species taken to the top, the Rise record — is
   written to `localStorage` as the match finds it (`recordFinds` in `src/app/codex.ts`), never at
   the results screen: a player who quits mid-match keeps what they found. The results screen marks
@@ -87,7 +99,8 @@ unless the user explicitly asks for a PR. Steps:
   `npm run codex` guards both halves.
 - `src/content/<era>/pending-refinements.json` is the one queue of outstanding creature art, and it
   separates the two kinds: `model: true` (geometry, materials, rig, LOD art) is what shows the
-  creature's ⚠ preview badge in the game and the viewer, with `reason` on hover; `clips` are
+  creature's ⚠ preview badge in the specimen viewer, with `reason` on hover (the game itself shows
+  no badge for now — see `src/shared/ModelStatusBadge.tsx`); `clips` are
   animation clips queued for rework on a body that is already right, flagged on those clip buttons
   in the viewer with `clipReason` and never on the creature. `src/content/pending-refinements.ts`
   derives both eras' tables and `npm run eras` enforces the split — an entry must claim model or

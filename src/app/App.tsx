@@ -10,11 +10,12 @@ import { MODE_IDS, type Mode, type PlayerSetup } from '../sim/types';
 import { clampMark } from '../sim/ladder';
 import { emptyCodex, hasNewFinds, loadCodex, mergeCodex, recordFinds, type Codex } from './codex';
 import { Hud } from './Hud';
-import { LoadingScreen } from './Loading';
+import { LoadingScreen, useSlow } from './Loading';
 import { Dialogs, PauseMenu, Results, type MenuItem } from './Overlays';
 import { gridColumns, SelectScreen } from './Select';
 import { TitleScreen } from './Title';
 import { Toolbar } from './Toolbar';
+import { toolbarPlace } from './toolbar-place';
 import { menuScheme } from '../shared/controls';
 import { freshCursor, menuPress, MENU_LOCKOUT, type MenuCursor, type MenuEvent } from './menu-cursor';
 
@@ -30,11 +31,24 @@ const defaultSettings = (): Settings => {
   return { quality: 'high', lookSpeed: 1, invertY: false, volume: 0.8, muted: false, music: true };
 };
 
+/**
+ * `?screen=select` opens straight on the roster instead of the title.
+ *
+ * It is how the other era's picker links across: switching game is a page load, and landing the
+ * player back on PRESS START would undo the choice they just made. Read once and then wiped from
+ * the address bar, so a refresh — or the emblem taking them back to the title — behaves like any
+ * other visit. Not a module-level constant: `location` has to be read inside the app, not while
+ * this module is being evaluated.
+ */
+function deepLinkedToSelect(): boolean {
+  try { return new URLSearchParams(location.search).get('screen') === 'select'; } catch { return false; }
+}
+
 export function App() {
   const canvasRef = useRef<HTMLDivElement>(null);
   const engineRef = useRef<Engine | null>(null);
-  const [screen, setScreen] = useState<Screen>('title');
-  const screenRef = useRef<Screen>('title');
+  const [screen, setScreen] = useState<Screen>(() => (deepLinkedToSelect() ? 'select' : 'title'));
+  const screenRef = useRef<Screen>(deepLinkedToSelect() ? 'select' : 'title');
   const [players, setPlayers] = useState<PlayerSetup[]>([]);
   const playersRef = useRef<PlayerSetup[]>([]);
   const [mode, setMode] = useState<Mode>(MODES[0]);
@@ -190,7 +204,16 @@ export function App() {
     return () => { for (const e of events) window.removeEventListener(e, mark); clearInterval(id); };
   }, [loaded]);
 
-  // Any user gesture: wake audio (browsers require it)  // Any user gesture: wake audio (browsers require it)
+  // Arriving on the roster from the other game's picker: the seat the title screen would have
+  // opened. Audio needs no help — any gesture wakes it below — and the parameter is cleared so the
+  // address bar stops claiming a screen the player may since have left.
+  useEffect(() => {
+    if (!deepLinkedToSelect()) return;
+    updatePlayers([{ creature: ACTIVE_ERA.defaults.player, device: 'keyboard', ready: false }]);
+    try { history.replaceState(null, '', location.pathname + location.hash); } catch { /* a file:// page has no history to rewrite */ }
+  }, [updatePlayers]);
+
+  // Any user gesture: wake audio (browsers require it)
   useEffect(() => {
     const wake = () => { audio.init(); audio.resume(); };
     window.addEventListener('pointerdown', wake); window.addEventListener('keydown', wake);
@@ -348,9 +371,10 @@ export function App() {
     updatePlayers([...ps, { creature: CREATURE_IDS[ps.length % CREATURE_IDS.length], device, ready: false }]);
     audio.play('ui-join');
   }, [updatePlayers]);
+  /** The keyboard joins once and only once: two players never share one. */
   const addKeyboard = useCallback(() => {
-    const used = playersRef.current.map((p) => p.device);
-    addPlayer(used.includes('keyboard') ? 'keyboard2' : 'keyboard');
+    if (playersRef.current.some((p) => typeof p.device === 'string')) return;
+    addPlayer('keyboard');
   }, [addPlayer]);
   const changeMode = useCallback((m: Mode) => { modeRef.current = m; setMode(m); audio.play('ui-move'); updatePlayers(playersRef.current.map((p) => ({ ...p, ready: false }))); }, [updatePlayers]);
 
@@ -538,6 +562,24 @@ export function App() {
 
   // A menu opening resets the cursor. The pause menu was asked for, so its highlight is there at
   // once; the results screen was not, so it shows none until the player touches something.
+  /**
+   * The boot screen waits to be needed. Switching era from the choice page is a page load, and on a
+   * warm one the assets are already in cache: a loading screen shown for two frames on the way
+   * through is a flicker, not information.
+   */
+  const bootSlow = useSlow(!loaded);
+
+  /**
+   * The icon buttons sit in somebody's viewport, so they answer to whether that somebody asked for
+   * a bare sea. Only in play, and only while there is a HUD to read the split from.
+   */
+  const toolbar = useMemo(() => {
+    if (screen !== 'playing' || !hud) return 'right' as const;
+    // A menu is already drawn over the water, so the buttons may as well be there with it.
+    const anyMenu = paused || dialog !== null || hud.players.some((p) => p.teleport || p.swap || p.board);
+    return toolbarPlace(hud.players.map((p, i) => ({ rect: hud.rects[i] ?? { x: 0, y: 0, w: 1, h: 1 }, senseOn: p.senseOn })), anyMenu);
+  }, [screen, hud, paused, dialog]);
+
   const menuOpen = screen === 'results' || (screen === 'playing' && paused);
   useEffect(() => {
     if (!menuOpen) return;
@@ -552,7 +594,7 @@ export function App() {
       <div className="sea-canvas" ref={canvasRef} aria-label="Cambrian sea" />
       <div className="vignette" />
 
-      {!loaded && <LoadingScreen progress={progress} fraction={progress ? Math.min(1, progress.fraction * 4) : 0} />}
+      {!loaded && bootSlow && <LoadingScreen progress={progress} fraction={progress ? Math.min(1, progress.fraction * 4) : 0} />}
       {screen === 'title' && loaded && <TitleScreen loaded={loaded} onStart={() => startFromTitle('keyboard', true)} padCount={padCount} />}
 
       {screen === 'select' && (
@@ -560,7 +602,7 @@ export function App() {
           players={players} mode={mode} modes={MODES} modeInfo={modeInfo} allReady={allReady} padIndices={padIndices}
           scheme={scheme}
           best={best} carry={carry}
-          onPick={setCreature} onReady={toggleReady} onRemove={removePlayer} onAddKeyboard={addKeyboard}
+          onPick={setCreature} onReady={toggleReady} onRemove={removePlayer}
           onMode={changeMode} onStart={startMatch} onBack={backToTitle} onCarry={toggleCarry}
         />
       )}
@@ -569,7 +611,7 @@ export function App() {
       {screen === 'playing' && paused && <PauseMenu scheme={scheme} items={menuItems} sel={menuCursor.sel} shown={menuCursor.shown} onHover={menuHover} />}
       {screen === 'results' && hud && <Results snapshot={hud} players={players} record={record} fresh={fresh} scheme={scheme} items={menuItems} sel={menuCursor.sel} shown={menuCursor.shown} onHover={menuHover} />}
 
-      <Toolbar isFs={isFs} muted={settings.muted} onHelp={() => openDialog(dialog === 'help' ? null : 'help')} onSettings={() => openDialog(dialog === 'settings' ? null : 'settings')} onMute={() => setSettings((s) => ({ ...s, muted: !s.muted }))} onFullscreen={toggleFullscreen} />
+      <Toolbar place={toolbar} isFs={isFs} muted={settings.muted} onHelp={() => openDialog(dialog === 'help' ? null : 'help')} onSettings={() => openDialog(dialog === 'settings' ? null : 'settings')} onMute={() => setSettings((s) => ({ ...s, muted: !s.muted }))} onFullscreen={toggleFullscreen} />
       <Dialogs kind={dialog} onClose={() => openDialog(null)} settings={settings} onSettings={setSettings} scheme={scheme} />
 
       {(notice || error) && (

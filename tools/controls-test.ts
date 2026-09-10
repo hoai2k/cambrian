@@ -39,19 +39,47 @@ for (const camYaw of [0, 0.7, 2.4, -1.9]) {
 const c = drive('olenoides', 1.1, 1, 0, 2);
 check('crawler: stick right -> screen right', c.onRight > 0.5 && c.onRight > Math.abs(c.onFwd), `right=${c.onRight.toFixed(2)} fwd=${c.onFwd.toFixed(2)}`);
 
-// Forward is parallel to the seafloor at the angles a follow camera actually rests at, and only
-// starts to follow the camera once it is deliberately aimed up or down. Rising and sinking have
-// their own buttons, so nothing is lost by ignoring a resting camera's slight downward tilt.
+// Forward follows the camera up. A follow camera rests 11-25° *below* the horizon and never above
+// it, so the slice that has to be ignored to stop every body drifting at the seabed is a downward
+// one only; looking up is always deliberate and is taken at close to its face value. At the end of
+// the camera's own travel, either way, the body swims at exactly the angle being looked along.
 {
-  const { swimPitch } = await import('../src/render/engine');
+  const { swimPitch, PITCH_UP, PITCH_DOWN } = await import('../src/render/engine');
   const deg = (d: number) => (d * Math.PI) / 180;
   for (const d of [0, 11, 20, 25]) check(`camera ${d}° down: forward stays level`, swimPitch(deg(d)) === 0, `pitch=${swimPitch(deg(d)).toFixed(3)}`);
   check('camera 40° down: forward tilts, but less than the camera', swimPitch(deg(40)) > 0 && swimPitch(deg(40)) < deg(40), `pitch=${swimPitch(deg(40)).toFixed(3)}`);
-  // Past FULL_PITCH the shaping is out of the way and the long-standing ±0.7 rad clamp is all
-  // that is left, so a steep camera gives the steepest swim the stick has ever been able to ask for.
-  check('camera 57° down: forward follows the camera to the clamp', swimPitch(deg(57)) === 0.7, `pitch=${swimPitch(deg(57)).toFixed(3)}`);
-  check('looking up is symmetric', swimPitch(deg(-40)) === -swimPitch(deg(40)), `pitch=${swimPitch(deg(-40)).toFixed(3)}`);
-  check('steep angles stay clamped', Math.abs(swimPitch(deg(89))) <= 0.7, `pitch=${swimPitch(deg(89)).toFixed(3)}`);
+  // Aiming up used to buy almost nothing: 26° of camera gave 0° of swim and 34° gave 6°, so
+  // pointing at prey overhead and swimming went nowhere near it.
+  check('camera 26° up: forward goes up with it', swimPitch(deg(-26)) < -deg(18), `pitch=${swimPitch(deg(-26)).toFixed(3)}`);
+  check('camera 40° up: within a few degrees of the camera', Math.abs(swimPitch(deg(-40)) + deg(40)) < deg(6), `pitch=${swimPitch(deg(-40)).toFixed(3)} against ${(-deg(40)).toFixed(3)}`);
+  // The end of the camera's travel is the whole angle, both ways: the clamp used to stop at 40°,
+  // so the steepest climb and the steepest dive the camera could ask for were both unreachable.
+  check('the top of the camera travel swims at that angle', Math.abs(swimPitch(PITCH_UP) - PITCH_UP) < 1e-9, `pitch=${swimPitch(PITCH_UP).toFixed(3)} against ${PITCH_UP}`);
+  check('...and so does the bottom of it', Math.abs(swimPitch(PITCH_DOWN) - PITCH_DOWN) < 1e-9, `pitch=${swimPitch(PITCH_DOWN).toFixed(3)} against ${PITCH_DOWN}`);
+  check('the flat slice is downward only', swimPitch(deg(-20)) < 0 && swimPitch(deg(20)) === 0, `up=${swimPitch(deg(-20)).toFixed(3)} down=${swimPitch(deg(20)).toFixed(3)}`);
+  check('nothing exceeds the camera it came from', [-89, -54, -20, 0, 20, 54, 89].every((d) => Math.abs(swimPitch(deg(d))) <= Math.abs(deg(d)) + 1e-9), 'monotone and bounded by the look angle');
+}
+
+// --- a dash goes where the camera is pointed, in all three directions ------------------------
+// The vertical of a dash used to be cut to seven tenths, which tipped every aimed dash about ten
+// degrees flatter than it was aimed and made lining one up on prey above or below harder than
+// lining it up on prey alongside.
+{
+  const { swimPitch } = await import('../src/render/engine');
+  const deg = (r: number) => (r * 180) / Math.PI;
+  for (const camPitch of [-0.95, -0.6, -0.3, 0]) {
+    const g = new Game('reef', [{ creature: 'anomalocaris', device: 'keyboard', ready: true }], 21);
+    const p = g.players[0]; p.spawnProtect = 0; p.pos = { ...p.pos, y: p.pos.y + 25 };
+    const base: InputFrame = { ...emptyInput(), my: 1, camYaw: Math.PI, camPitch: swimPitch(camPitch) };
+    const inputs = new Map<number, InputFrame>([[0, base]]);
+    for (let i = 0; i < 30; i++) { g.step(1 / 60, inputs); g.events.length = 0; }
+    inputs.set(0, { ...base, dash: true });
+    g.step(1 / 60, inputs); g.events.length = 0;
+    const v = p.vel, sp = Math.hypot(v.x, v.y, v.z);
+    const look = { x: Math.sin(Math.PI) * Math.cos(camPitch), y: -Math.sin(camPitch), z: Math.cos(Math.PI) * Math.cos(camPitch) };
+    const off = Math.acos(Math.min(1, (v.x * look.x + v.y * look.y + v.z * look.z) / sp));
+    check(`dash aimed ${deg(-camPitch).toFixed(0)}° up goes there`, deg(off) < 6 && sp > 40, `${deg(off).toFixed(0)}° off the camera at ${sp.toFixed(0)} u/s`);
+  }
 }
 
 // --- Sense is a mode, not a pulse: on by default, toggled by the button, and it never runs out ---

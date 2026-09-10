@@ -230,7 +230,7 @@ function SoundRow({ sound, info, levels, disabled, onPlayKind, onPlayFile }: {
       </button>
       {files.length
         ? files.map((f) => <FileChip key={f} file={f} info={info} levels={levels} disabled={disabled} onPlay={() => onPlayFile(f)} />)
-        : <span className="chip missing">no sample — synthesized fallback only</span>}
+        : <span className="chip missing">no sample — this cue is silent</span>}
       {sound.alts?.map((f) => (
         <FileChip key={f} file={f} info={info} levels={levels} disabled={disabled} alt onPlay={() => onPlayFile(f)} />
       ))}

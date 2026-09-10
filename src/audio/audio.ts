@@ -1,10 +1,20 @@
+import { ACTIVE_ERA } from '../content';
 import { assetPaths } from '../content/asset-paths';
 /**
- * Game audio. Generated sample library (public/assets/sfx, made with tools/gen-sfx.mjs) with a
- * synthesized fallback for anything that has not loaded yet, so the game is never silent.
+ * Game audio: the sample library in public/assets/sfx (made with tools/gen-sfx.mjs), the reef and
+ * drone loops, and the soundtrack.
+ *
+ * Samples only. There used to be a synthesised understudy for every one of them — oscillator beds
+ * standing in for the ambience and the giant's drone, and a bank of tones and noise bursts standing
+ * in for each event — on the principle that the game should never be silent. Every sound the game
+ * asks for now exists as a file (both eras: `tools/gen-sfx.mjs` and the era tables), so all those
+ * stand-ins ever did was play the wrong thing during the second or two before the right one
+ * arrived. A cue whose buffer has not landed asks for it and stays quiet; the loops fade in when
+ * their file is decoded. Anything genuinely missing belongs in docs/audio-requests.md, not in an
+ * oscillator.
  */
 import { AUDIBLE_FLOOR, MIN_GAP } from './mix';
-import { biomeHasTrack, BIOME_HOLD, CROSSFADE, FIRST_FADE, MISSING, openingTrack, pickNext, type MusicTrack } from './music';
+import { AREA_ENTER, AREA_FADE, AREA_LEAVE, CROSSFADE, FIRST_FADE, MISSING, openingTrack, pickNext, themeFor, type MusicTrack } from './music';
 import type { Biome } from '../sim/world';
 import { appBase, setAppBase } from '../shared/base';
 
@@ -38,7 +48,13 @@ export const SAMPLES: Record<string, string[]> = {
   pounce: ['pounce'], swallow: ['swallow'], disintegrate: ['disintegrate'], routed: ['routed'],
   'ui-move': ['ui-move'], 'ui-confirm': ['ui-confirm'], 'ui-back': ['ui-back'], 'ui-join': ['ui-join'], 'ui-start': ['ui-start'], won: ['won'],
 };
-export const LOOPS = { ambient: 'ambient-reef', drone: 'giant-drone' } as const;
+/**
+ * The two always-on beds, from the era rather than from a constant: the Devonian's ambience is
+ * cold open water, not the Cambrian reef. Resolved per call, not captured at import, because an
+ * era entry page selects its era after this module has loaded (the same reason `music()` is a
+ * function).
+ */
+export const loops = () => ACTIVE_ERA.audio.loops;
 /** An era adds its own sounds before the library preloads; the shared table stays as it is. */
 export function registerSamples(extra: Record<string, string[]>) { Object.assign(SAMPLES, extra); }
 /** URL of a music track in public/music, by name (no extension). See `src/audio/music.ts`. */
@@ -49,16 +65,23 @@ export class GameAudio {
   private master?: GainNode;
   private sfxBus?: GainNode;
   private ambGain?: GainNode;
-  private synthAmbGain?: GainNode;
   private tensionGain?: GainNode;
-  private synthTensionGain?: GainNode;
   private musicGain?: GainNode;
   private musicStarted = false;
   private music?: MusicVoice;
   /** The last track that actually started playing — see `nextTrack`. */
   private lastHeard?: MusicTrack;
   private biome?: Biome;
-  private biomeCueAt = -BIOME_HOLD;
+  /** The voice on its way out, kept whole so a change of mind can ramp it back rather than restart it. */
+  private fadingOut?: MusicVoice;
+  private fadeEnds = 0;
+  /** Where each track had got to when it was last faded down, so returning resumes it. */
+  private resumeAt = new Map<string, number>();
+  /** The track the score returns to when the player is nowhere in particular. */
+  private roamingTrack?: MusicTrack;
+  /** What the area rules want playing, and how long they have wanted it. */
+  private areaWant?: MusicTrack;
+  private areaWantT = 0;
   private ambience = true;
   musicOn = true;
   private musicLevel = 0.3;
@@ -74,8 +97,8 @@ export class GameAudio {
   muted = false;
 
   /**
-   * Bring up the audio graph. `ambience: false` leaves out the beds — music, the reef loop and
-   * the synth drones — for the audio workbench, which auditions single sounds on a silent stage.
+   * Bring up the audio graph. `ambience: false` leaves out the beds — the music and the reef and
+   * drone loops — for the audio workbench, which auditions single sounds on a silent stage.
    */
   init(opts: { ambience?: boolean } = {}) {
     if (this.started) return;
@@ -91,21 +114,7 @@ export class GameAudio {
     this.ambGain = ctx.createGain(); this.ambGain.gain.value = 0; this.ambGain.connect(this.master);
     this.tensionGain = ctx.createGain(); this.tensionGain.gain.value = 0; this.tensionGain.connect(this.master);
     this.musicGain = ctx.createGain(); this.musicGain.gain.value = 0; this.musicGain.connect(this.master);
-    // Synth fallbacks: drones through a low-pass, plus a filtered noise wash
-    if (!this.ambience) { void this.preload(); this.watchFocus(); return; }
-    this.synthAmbGain = ctx.createGain(); this.synthAmbGain.gain.value = 0; this.synthAmbGain.connect(this.master);
-    const lp = ctx.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 420; lp.connect(this.synthAmbGain);
-    for (const [f, type] of [[55, 'sine'], [82.5, 'triangle'], [110.2, 'sine']] as const) {
-      const o = ctx.createOscillator(); o.type = type; o.frequency.value = f;
-      const g = ctx.createGain(); g.gain.value = f < 60 ? 0.35 : 0.14; o.connect(g); g.connect(lp); o.start();
-    }
-    const noise = this.noiseSource(); const nf = ctx.createBiquadFilter(); nf.type = 'bandpass'; nf.frequency.value = 600; nf.Q.value = 0.5;
-    const ng = ctx.createGain(); ng.gain.value = 0.05; noise.connect(nf); nf.connect(ng); ng.connect(this.synthAmbGain);
-    this.synthAmbGain.gain.linearRampToValueAtTime(0.5, ctx.currentTime + 3);
-    this.synthTensionGain = ctx.createGain(); this.synthTensionGain.gain.value = 0; this.synthTensionGain.connect(this.master);
-    const td = ctx.createOscillator(); td.type = 'sawtooth'; td.frequency.value = 41; const tf = ctx.createBiquadFilter(); tf.type = 'lowpass'; tf.frequency.value = 160;
-    td.connect(tf); tf.connect(this.synthTensionGain); td.start();
-    this.startSoundtrack();
+    if (this.ambience) this.startSoundtrack();
     void this.preload();
     this.watchFocus();
   }
@@ -123,9 +132,11 @@ export class GameAudio {
   }
 
   private async preload() {
-    const names = new Set<string>([...Object.values(SAMPLES).flat(), ...Object.values(LOOPS)]);
-    // UI and frequent sounds first
-    const order = ['ui-start', 'ui-confirm', 'ui-move', 'bite-1', 'hit-light-1', 'ambient-reef', 'giant-drone', 'heartbeat', ...names];
+    const beds = loops();
+    const names = new Set<string>([...Object.values(SAMPLES).flat(), ...Object.values(beds)]);
+    // UI and frequent sounds first, then the beds — by the era's names for them, or the Devonian
+    // fetches the Cambrian reef it is never going to play.
+    const order = ['ui-start', 'ui-confirm', 'ui-move', 'bite-1', 'hit-light-1', beds.ambient, beds.drone, 'heartbeat', ...names];
     for (const n of order) await this.load(n);
   }
   private async load(name: string): Promise<AudioBuffer | undefined> {
@@ -138,8 +149,8 @@ export class GameAudio {
       if (!res.ok) throw new Error(String(res.status));
       const buf = await this.ctx.decodeAudioData(await res.arrayBuffer());
       this.buffers.set(name, buf);
-      if (this.ambience && name === LOOPS.ambient) this.startAmbient();
-      if (this.ambience && name === LOOPS.drone) this.startDrone();
+      if (this.ambience && name === loops().ambient) this.startAmbient();
+      if (this.ambience && name === loops().drone) this.startDrone();
       return buf;
     } catch { return undefined; } finally { this.loading.delete(name); }
   }
@@ -154,16 +165,22 @@ export class GameAudio {
     const ctx = this.ctx; if (!ctx || !this.musicGain) return undefined;
     const el = new Audio(musicUrl(track.name));
     el.preload = 'auto';
+    // Pick the track up where it was left rather than replaying its opening: a minute in the
+    // shallows and back should sound like a passage, not like the score starting over.
+    const at = this.resumeAt.get(track.name);
+    if (at) el.addEventListener('loadedmetadata', () => { if (Number.isFinite(el.duration)) el.currentTime = Math.min(at, Math.max(0, el.duration - 1)); }, { once: true });
     const gain = ctx.createGain(); gain.gain.value = 0;
     const node = ctx.createMediaElementSource(el);
     node.connect(gain); gain.connect(this.musicGain);
     const voice: MusicVoice = { track, el, node, gain };
     el.addEventListener('timeupdate', () => {
-      // Hand over before the end so the tracks overlap rather than leaving a hole.
-      if (this.music !== voice || !Number.isFinite(el.duration)) return;
+      // Hand over before the end so the tracks overlap rather than leaving a hole. An area theme
+      // loops instead: it is meant to hold for as long as the player stays in its water, and the
+      // rotation is not where it goes next.
+      if (this.music !== voice || el.loop || !Number.isFinite(el.duration)) return;
       if (el.duration - el.currentTime <= CROSSFADE) this.nextTrack();
     });
-    el.addEventListener('ended', () => { if (this.music === voice) this.nextTrack(); });
+    el.addEventListener('ended', () => { if (this.music === voice && !el.loop) this.nextTrack(); });
     // A track that is not there (a biome theme not yet delivered) leaves the rotation rather than
     // silencing it. Re-pick against the track it was taking over from: the failed one is already
     // out via MISSING, and without this the rotation can land straight back on what just played.
@@ -173,27 +190,57 @@ export class GameAudio {
     return voice;
   }
 
-  /** Fade `voice` out over `seconds` and tear it down. */
-  private endVoice(voice: MusicVoice, seconds: number) {
+  /** Ramp one voice to `to` over `seconds`, from wherever its gain is now. */
+  private ramp(voice: MusicVoice, to: number, seconds: number) {
     const ctx = this.ctx!;
     voice.gain.gain.cancelScheduledValues(ctx.currentTime);
     voice.gain.gain.setValueAtTime(voice.gain.gain.value, ctx.currentTime);
-    voice.gain.gain.linearRampToValueAtTime(0, ctx.currentTime + seconds);
-    window.setTimeout(() => {
-      voice.el.pause(); voice.el.removeAttribute('src'); voice.el.load();
-      voice.node.disconnect(); voice.gain.disconnect();
-    }, seconds * 1000 + 200);
+    voice.gain.gain.linearRampToValueAtTime(to, ctx.currentTime + seconds);
   }
 
-  /** Start `track`, crossfading out whatever is playing. */
+  /** Silence `voice`, remember where it had got to, and take it apart. */
+  private endVoice(voice: MusicVoice) {
+    if (Number.isFinite(voice.el.currentTime)) this.resumeAt.set(voice.track.name, voice.el.currentTime);
+    voice.el.pause(); voice.el.removeAttribute('src'); voice.el.load();
+    voice.node.disconnect(); voice.gain.disconnect();
+    if (this.fadingOut === voice) this.fadingOut = undefined;
+  }
+
+  /**
+   * Crossfade to `track`. Reversible: asked for the track that is *already* on its way out — the
+   * player left an area and came straight back — the two voices swap roles and ramp the other way,
+   * so the music never restarts and never jumps. That is the whole trick behind a short excursion
+   * sounding like part of the piece.
+   */
   private playTrack(track: MusicTrack, fade = CROSSFADE) {
     const ctx = this.ctx; if (!ctx) return;
+    if (this.music?.track.name === track.name) return;
+    if (this.fadingOut?.track.name === track.name) {
+      const back = this.fadingOut, away = this.music;
+      this.music = back; this.fadingOut = away;
+      this.ramp(back, 1, fade);
+      if (away) this.ramp(away, 0, fade);
+      this.scheduleTeardown(fade);
+      return;
+    }
+    // A third change inside one fade: the one already leaving has had its turn, and stacking
+    // voices would only pile up streams nobody is listening to.
+    if (this.fadingOut) this.endVoice(this.fadingOut);
     const outgoing = this.music;
     const voice = this.musicVoice(track);
     if (!voice) return;
     this.music = voice;
-    voice.gain.gain.linearRampToValueAtTime(1, ctx.currentTime + fade);
-    if (outgoing) this.endVoice(outgoing, fade);
+    voice.el.loop = !!track.biomes?.length;   // an area theme holds while you are in its area
+    this.ramp(voice, 1, fade);
+    if (outgoing) { this.fadingOut = outgoing; this.ramp(outgoing, 0, fade); this.scheduleTeardown(fade); }
+    if (!track.biomes?.length) this.roamingTrack = track;
+  }
+
+  /** Take the outgoing voice apart once the fade it is in has actually finished. */
+  private scheduleTeardown(fade: number) {
+    this.fadeEnds = performance.now() + fade * 1000 + 200;
+    const at = this.fadeEnds;
+    window.setTimeout(() => { if (this.fadingOut && this.fadeEnds === at) this.endVoice(this.fadingOut); }, fade * 1000 + 200);
   }
 
   /**
@@ -203,7 +250,7 @@ export class GameAudio {
    * straight back on the track that had just finished.
    */
   private nextTrack() {
-    this.playTrack(pickNext(this.lastHeard ?? this.music?.track, this.biome));
+    this.playTrack(pickNext(this.lastHeard ?? this.music?.track));
   }
 
   /** Begin the soundtrack: the opening track, then the random rotation. */
@@ -241,20 +288,27 @@ export class GameAudio {
   }
 
   /**
-   * Tell the music where the player is. A biome with a track of its own cues that track; the
-   * change is rate-limited by BIOME_HOLD so a player weaving across an edge does not thrash the
-   * score. No track names a biome yet, so today this only records where we are, and the biome
-   * then steers `pickNext` when the current track ends.
+   * Tell the music where the player is. Called every frame; the decision is taken in `update`,
+   * which is where the dwell timers live.
    */
-  setBiome(biome: Biome) {
-    if (biome === this.biome) return;
-    this.biome = biome;
-    if (!this.ctx || !this.music || !biomeHasTrack(biome)) return;
-    if (this.music.track.biomes?.includes(biome)) return;         // already the right music
-    const now = this.ctx.currentTime;
-    if (now - this.biomeCueAt < BIOME_HOLD) return;
-    this.biomeCueAt = now;
-    this.playTrack(pickNext(this.music.track, biome));
+  setBiome(biome: Biome) { this.biome = biome; }
+
+  /**
+   * The area score, one step at a time. `themeFor` says what this biome wants; a want has to hold
+   * for AREA_ENTER before the score acts on it, and losing one has to hold for AREA_LEAVE before
+   * the score gives it up. See the note on those constants in music.ts for why the two differ.
+   */
+  private stepArea(dt: number) {
+    if (!this.ctx || !this.musicStarted || !this.music) return;
+    const theme = themeFor(this.biome);
+    const target = theme ?? this.roamingTrack;
+    if (!target || target.name === this.music.track.name) { this.areaWant = undefined; this.areaWantT = 0; return; }
+    if (this.areaWant?.name !== target.name) { this.areaWant = target; this.areaWantT = 0; }
+    this.areaWantT += dt;
+    // Arriving somewhere is a lower bar than abandoning it: `theme` means we have entered one.
+    if (this.areaWantT < (theme ? AREA_ENTER : AREA_LEAVE)) return;
+    this.areaWant = undefined; this.areaWantT = 0;
+    this.playTrack(target, AREA_FADE);
   }
 
   private startLoop(name: string, dest: AudioNode) {
@@ -265,40 +319,34 @@ export class GameAudio {
     src.connect(dest); src.start(0, 0.05);
   }
   private startAmbient() {
-    if (this.ambientStarted || !this.ctx || !this.ambGain || !this.synthAmbGain) return;
+    if (this.ambientStarted || !this.ctx || !this.ambGain) return;
     this.ambientStarted = true;
-    this.startLoop(LOOPS.ambient, this.ambGain);
+    this.startLoop(loops().ambient, this.ambGain);
     const t = this.ctx.currentTime;
     this.ambGain.gain.linearRampToValueAtTime(0.55, t + 2.5);
-    this.synthAmbGain.gain.linearRampToValueAtTime(0, t + 2.5);
   }
-  private startDrone() { if (this.tensionGain) this.startLoop(LOOPS.drone, this.tensionGain); }
+  private startDrone() { if (this.tensionGain) this.startLoop(loops().drone, this.tensionGain); }
 
   resume() { this.ctx?.resume(); }
-  private noiseSource() {
-    const ctx = this.ctx!;
-    const buf = ctx.createBuffer(1, ctx.sampleRate * 2, ctx.sampleRate);
-    const d = buf.getChannelData(0); for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1;
-    const src = ctx.createBufferSource(); src.buffer = buf; src.loop = true; src.start(); return src;
-  }
   setVolume(v: number) { this.volume = v; this.applyGain(); }
   setMuted(m: boolean) { this.muted = m; this.setVolume(this.volume); }
   setTension(t: number) {
     this.tension = t;
     if (!this.ctx) return;
     const now = this.ctx.currentTime;
-    const haveDrone = this.buffers.has(LOOPS.drone);
+    // Held at silence until the drone's buffer exists: startDrone() begins the loop the moment it
+    // decodes, and a gain already wound up would drop it in at full volume.
+    const haveDrone = this.buffers.has(loops().drone);
     this.tensionGain?.gain.setTargetAtTime(haveDrone ? t * 0.7 : 0, now, 0.5);
     if (this.musicGain && this.musicOn) this.musicGain.gain.setTargetAtTime(this.musicLevel * (1 - t * 0.45), now, 0.8);
-    this.synthTensionGain?.gain.setTargetAtTime(haveDrone ? 0 : t * 0.3, now, 0.5);
   }
   update(dt: number) {
+    this.stepArea(dt);
     if (!this.ctx || this.tension < 0.2) { this.heartT = 0; return; }
     this.heartT -= dt;
     if (this.heartT <= 0) {
       this.heartT = 1.15 - this.tension * 0.55;
-      if (this.buffers.has('heartbeat')) this.playSample('heartbeat', 0.5 + this.tension * 0.5, 0, 1 + (this.tension - 0.5) * 0.15);
-      else { this.thump(0.5 + this.tension * 0.5); setTimeout(() => this.thump(0.3 + this.tension * 0.3), 140); }
+      this.playSample('heartbeat', 0.5 + this.tension * 0.5, 0, 1 + (this.tension - 0.5) * 0.15);
     }
   }
 
@@ -383,65 +431,16 @@ export class GameAudio {
     if (list) {
       const name = list[Math.floor(Math.random() * list.length)];
       const rate = (0.94 + Math.random() * 0.12) * (kind === 'eat' ? 1.15 - Math.min(0.3, s * 0.3) : 1);
-      if (this.playSample(name, vol, pan, rate, atten)) return;
-      void this.load(name);
+      // Not decoded yet: fetch it for next time and let this one pass. A stand-in here would only
+      // play the wrong sound for the second before the right one is ready.
+      if (!this.playSample(name, vol, pan, rate, atten)) void this.load(name);
     }
-    this.synth(kind, s * atten, pan);
   }
 
-  // ---------- synthesized fallbacks ----------
-  private thump(vol: number) {
-    const ctx = this.ctx; if (!ctx || !this.master) return;
-    const o = ctx.createOscillator(); o.type = 'sine'; o.frequency.setValueAtTime(70, ctx.currentTime); o.frequency.exponentialRampToValueAtTime(38, ctx.currentTime + 0.18);
-    const g = ctx.createGain(); g.gain.setValueAtTime(vol * 0.5, ctx.currentTime); g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.22);
-    o.connect(g); g.connect(this.master); o.start(); o.stop(ctx.currentTime + 0.25);
-  }
-  private tone(freq: number, dur: number, vol: number, type: OscillatorType = 'sine', slide?: number, pan = 0) {
-    const ctx = this.ctx; if (!ctx || !this.master) return;
-    const o = ctx.createOscillator(); o.type = type; o.frequency.setValueAtTime(freq, ctx.currentTime);
-    if (slide) o.frequency.exponentialRampToValueAtTime(Math.max(20, slide), ctx.currentTime + dur);
-    const g = ctx.createGain(); g.gain.setValueAtTime(0.0001, ctx.currentTime); g.gain.exponentialRampToValueAtTime(vol, ctx.currentTime + 0.01); g.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + dur);
-    const p = ctx.createStereoPanner(); p.pan.value = pan;
-    o.connect(g); g.connect(p); p.connect(this.master); o.start(); o.stop(ctx.currentTime + dur + 0.05);
-  }
-  private burstNoise(dur: number, vol: number, freq: number, q = 1, pan = 0, sweep?: number) {
-    const ctx = this.ctx; if (!ctx || !this.master) return;
-    const src = this.noiseSource();
-    const f = ctx.createBiquadFilter(); f.type = 'bandpass'; f.frequency.setValueAtTime(freq, ctx.currentTime); if (sweep) f.frequency.exponentialRampToValueAtTime(sweep, ctx.currentTime + dur); f.Q.value = q;
-    const g = ctx.createGain(); g.gain.setValueAtTime(vol, ctx.currentTime); g.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + dur);
-    const p = ctx.createStereoPanner(); p.pan.value = pan;
-    src.connect(f); f.connect(g); g.connect(p); p.connect(this.master); src.stop(ctx.currentTime + dur + 0.05);
-  }
-  private synth(kind: string, s: number, pan: number) {
-    switch (kind) {
-      case 'hit': this.burstNoise(0.12, 0.35 * s, 700, 0.8, pan); this.tone(120, 0.16, 0.35 * s, 'sine', 55, pan); break;
-      case 'eat': this.tone(520 + Math.random() * 200, 0.08, 0.12, 'triangle', 300, pan); this.burstNoise(0.05, 0.08, 2400, 2, pan); break;
-      case 'kill': this.tone(160, 0.5, 0.35, 'sawtooth', 50, pan); this.burstNoise(0.3, 0.3, 500, 0.6, pan, 120); break;
-      case 'death': this.tone(220, 0.9, 0.3, 'sine', 40, pan); break;
-      case 'parry': this.tone(1800, 0.25, 0.3, 'square', 2400, pan); this.burstNoise(0.08, 0.2, 3000, 4, pan); break;
-      case 'guardBreak': this.tone(300, 0.35, 0.35, 'square', 90, pan); this.burstNoise(0.2, 0.25, 900, 1, pan); break;
-      case 'stagger': this.tone(200, 0.2, 0.2, 'triangle', 120, pan); break;
-      case 'dodge': this.burstNoise(0.25, 0.14, 900, 0.7, pan, 300); break;
-      case 'silt': this.burstNoise(0.6, 0.18, 400, 0.5, pan, 150); break;
-      case 'burst': this.burstNoise(0.35, 0.1, 600, 0.6, pan, 1200); break;
-      case 'ability': this.burstNoise(0.4, 0.2, 1200, 1, pan, 300); this.tone(440, 0.4, 0.15, 'triangle', 660, pan); break;
-      case 'grab': this.tone(90, 0.3, 0.3, 'sawtooth', 60, pan); this.burstNoise(0.15, 0.2, 400, 1, pan); break;
-      case 'tierUp': [0, 0.12, 0.24, 0.4].forEach((d, i) => setTimeout(() => { this.tone([261, 329, 392, 523][i], 0.8, 0.25, 'triangle'); }, d * 1000)); this.thump(1); break;
-      case 'hunted': this.tone(55, 1.2, 0.35, 'sawtooth', 45); this.thump(1); break;
-      case 'escape': [0, 0.18].forEach((d, i) => setTimeout(() => this.tone([880, 1320][i], 0.9, 0.18, 'sine'), d * 1000)); break;
-      case 'noticed': case 'sense': this.tone(330, 0.3, 0.12, 'sine', 220); break;
-      case 'respawn': this.tone(392, 0.5, 0.15, 'triangle', 523); break;
-      case 'ui-move': this.tone(700, 0.06, 0.08, 'square'); break;
-      case 'ui-confirm': this.tone(520, 0.12, 0.15, 'triangle', 780); break;
-      case 'ui-back': this.tone(400, 0.12, 0.12, 'triangle', 260); break;
-      case 'ui-start': [0, 0.1, 0.2].forEach((d, i) => setTimeout(() => this.tone([392, 523, 784][i], 0.5, 0.2, 'triangle'), d * 1000)); this.thump(1); break;
-      case 'ui-join': this.tone(660, 0.2, 0.15, 'triangle', 990); break;
-      case 'won': [0, 0.15, 0.3, 0.45, 0.7].forEach((d, i) => setTimeout(() => this.tone([392, 494, 587, 784, 988][i], 1.2, 0.22, 'triangle'), d * 1000)); break;
-    }
-  }
   dispose() {
     // Stop the music stream first: a media element outlives the audio context it was routed into.
-    if (this.music) { this.music.el.pause(); this.music.el.removeAttribute('src'); this.music.el.load(); this.music = undefined; }
+    for (const v of [this.music, this.fadingOut]) if (v) { v.el.pause(); v.el.removeAttribute('src'); v.el.load(); }
+    this.music = undefined; this.fadingOut = undefined;
     this.musicStarted = false;
     this.ctx?.close(); this.ctx = undefined; this.started = false;
   }

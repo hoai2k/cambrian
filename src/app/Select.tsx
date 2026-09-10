@@ -1,14 +1,14 @@
-import { useLayoutEffect, useRef } from 'react';
-import { ModelStatusBadge } from '../shared/ModelStatusBadge';
+import { useEffect, useLayoutEffect, useRef, useState, type ReactNode } from 'react';
 import { ACTIVE_ERA } from '../content';
 import { assetPaths } from '../content/asset-paths';
 import { hideLabel, hideDescription, HEAVY_SPECIALS, DEFENSIVE_SPECIALS } from '../sim/concealment';
 import { RULES } from '../sim/era-rules';
 import { CreaturePortrait } from './CreaturePortrait';
+import { FeedbackButton } from './Feedback';
 import { PLAYER_COLORS } from '../render/engine';
 import { PLAYABLE as CREATURES, creature, type CreatureId } from '../sim/creatures';
 import type { Mode, PlayerSetup } from '../sim/types';
-import { CheckIcon, Emblem, KeyboardIcon, PadIcon } from './icons';
+import { CheckIcon, ChevronDown, Emblem, KeyboardIcon, PadIcon } from './icons';
 import { appBase } from '../shared/base';
 import { btn, fillControls, key, type Scheme } from '../shared/controls';
 import { fillOf, ladderName, rungOf } from '../sim/ladder';
@@ -23,8 +23,70 @@ interface Props {
   /** Per seat: whether that player has asked to carry on from their record rather than hatch. */
   carry: boolean[];
   onPick: (i: number, c: CreatureId) => void; onReady: (i: number) => void; onRemove: (i: number) => void;
-  onAddKeyboard: () => void; onMode: (m: Mode) => void; onStart: () => void; onBack: () => void;
+  onMode: (m: Mode) => void; onStart: () => void; onBack: () => void;
   onCarry: (i: number) => void;
+}
+
+/**
+ * The mark in the corner: the emblem goes back, the title opens the other game.
+ *
+ * The *emblem* is the way home. A mark in the corner of a screen you arrived at from the title is
+ * the affordance every site has taught, so it needs no arrow and no label of its own — the
+ * accessible name carries what a sighted player reads from the position, and Escape does the same
+ * on a keyboard. That is why there is no longer a "Title" button in the footer.
+ *
+ * The *title* beside it is the era picker — one button, wordmark and chevron together. Open, the
+ * other game's wordmark drops in directly under this one, aligned to it and the same width: one
+ * list of engraved titles with the one you are playing at the top of it, rather than a panel that
+ * repeats itself. Switching is a page load and not a state change, deliberately — a live match's
+ * simulation, queues and caches are built for one era and there is no runtime swap (see
+ * src/content/index.ts) — so what drops down is a link, and it shows the game rather than naming
+ * it. It lands on the other roster rather than the other title screen: this is a picker, and
+ * arriving at PRESS START would undo the choice the player just made.
+ */
+function BrandHeader({ onBack }: { onBack: () => void }) {
+  const [open, setOpen] = useState(false);
+  const wrap = useRef<HTMLDivElement>(null);
+  const sibling = ACTIVE_ERA.copy.sibling;
+  useEffect(() => {
+    if (!open) return;
+    const away = (e: MouseEvent) => { if (!wrap.current?.contains(e.target as Node)) setOpen(false); };
+    // Escape closes the list and stops there: on this screen the app's own Escape goes back to the
+    // title, and shutting a menu should never also leave the screen it was opened on.
+    const key = (e: KeyboardEvent) => { if (e.key === 'Escape') { e.stopPropagation(); setOpen(false); } };
+    document.addEventListener('pointerdown', away);
+    document.addEventListener('keydown', key, true);
+    return () => { document.removeEventListener('pointerdown', away); document.removeEventListener('keydown', key, true); };
+  }, [open]);
+  const toggle = () => setOpen((o) => !o);
+  return (
+    <div className="brand">
+      <button className="brand-home" onClick={onBack} aria-label={`Back to the ${ACTIVE_ERA.title} title screen`}>
+        <Emblem size={34} />
+      </button>
+      {/* Title and chevron are one control, so they light up together: the chevron is a mark on the
+          button saying it opens, not a button of its own beside it. The list hangs off that button,
+          so what drops down starts on the same left edge and comes out the same width — both
+          wordmarks are `.header-logo`, sized by one rule. */}
+      <div className={`brand-titles ${open ? 'open' : ''}`} ref={wrap}>
+        <button className="brand-title" onClick={sibling ? toggle : undefined} disabled={!sibling}
+          aria-expanded={sibling ? open : undefined} aria-haspopup={sibling ? 'true' : undefined}
+          aria-label={sibling ? `${ACTIVE_ERA.title} — choose which game to play` : ACTIVE_ERA.title}>
+          <img className="header-logo" src={`${ASSETS}${ACTIVE_ERA.assets.logo}`} alt="" />
+          {sibling && <ChevronDown width={18} height={18} aria-hidden="true" />}
+        </button>
+        {open && sibling && (
+          <nav className="era-menu" aria-label="Choose a game">
+            {/* Straight to the other game's roster, not its title screen: this is a picker, and
+                landing back on PRESS START would undo the choice the player just made. */}
+            <a className="era-item" href={`${ASSETS}${sibling.path}?screen=select`}>
+              <img className="header-logo" src={`${ASSETS}${sibling.logo}`} alt={sibling.title} />
+            </a>
+          </nav>
+        )}
+      </div>
+    </div>
+  );
 }
 
 /**
@@ -49,6 +111,31 @@ const MIN_NAME_FIT = 0.68;
  * re-runs when the tile changes width, and once more when the display face has finished loading,
  * because a name measured in the fallback face is measured against the wrong letters.
  */
+/**
+ * The creature copy, with a fade at its foot while there is more of it below the fold.
+ *
+ * The box scrolls when the window is too short to hold everything (see `.creature-copy`), and a
+ * scrollbar is not an affordance you can count on — overlay scrollbars are invisible until touched,
+ * so a description that runs past the bottom edge reads as text sliced off rather than text to
+ * scroll to. The fade says which it is, and goes away once you reach the end.
+ */
+function CopyBox({ children }: { children: ReactNode }) {
+  const ref = useRef<HTMLDivElement>(null);
+  const [more, setMore] = useState(false);
+  useLayoutEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const check = () => setMore(el.scrollHeight - el.clientHeight - el.scrollTop > 2);
+    check();
+    const ro = new ResizeObserver(check);
+    ro.observe(el);
+    for (const kid of el.children) ro.observe(kid);
+    el.addEventListener('scroll', check, { passive: true });
+    return () => { ro.disconnect(); el.removeEventListener('scroll', check); };
+  });
+  return <div className="creature-copy" data-more={more || undefined} ref={ref}>{children}</div>;
+}
+
 function FitName({ name }: { name: string }) {
   const ref = useRef<HTMLSpanElement>(null);
   useLayoutEffect(() => {
@@ -90,10 +177,12 @@ export function SelectScreen(p: Props) {
   // has since gone away (an Xbox pad that went to sleep looks exactly like an unplugged one).
   const joined = new Set(p.players.map((pl) => pl.device));
   const waiting = p.padIndices.filter((i) => !joined.has(i));
+  /** Nobody is on the keyboard yet, so it is still a way in. Only ever one player deep. */
+  const keyboardFree = !p.players.some((pl) => typeof pl.device === 'string');
   return (
     <section className="select" aria-label="Choose your creature">
       <header className="select-header">
-        <div className="brand"><Emblem size={34} /><img className="header-logo" src={`${ASSETS}${ACTIVE_ERA.assets.logo}`} alt={ACTIVE_ERA.title} /></div>
+        <BrandHeader onBack={p.onBack} />
         <div className="mode-picker" role="tablist" aria-label="Game mode">
           {p.modes.map((m) => (
             <button key={m} role="tab" aria-selected={p.mode === m} className={`mode-chip ${p.mode === m ? 'active' : ''}`} onClick={() => p.onMode(m)}>
@@ -120,7 +209,6 @@ export function SelectScreen(p: Props) {
                 <CreaturePortrait creatureId={c.id} kind="thumb" assetBase={ASSETS} alt="" draggable={false} loading="eager" />
                 <FitName name={c.name} />
                 {c.kind && <span className="cell-kind">{c.kind}</span>}
-                <ModelStatusBadge status={ACTIVE_ERA.assets.modelStatus?.[c.id]} note={ACTIVE_ERA.assets.modelNotes?.[c.id]} compact />
                 <span className="cell-rings">
                   {hovering.map(({ i, pl }) => <i key={i} style={{ ['--c' as string]: PLAYER_COLORS[i], ['--k' as string]: i }} className={pl.ready ? 'ring locked' : 'ring'} />)}
                 </span>
@@ -143,10 +231,9 @@ export function SelectScreen(p: Props) {
                   <button className="remove" aria-label={`Remove player ${i + 1}`} onClick={() => p.onRemove(i)}>×</button>
                 </div>
                 <div className="hero">
-                  <ModelStatusBadge status={ACTIVE_ERA.assets.modelStatus?.[def.id]} note={ACTIVE_ERA.assets.modelNotes?.[def.id]} />
                   <CreaturePortrait key={def.id} creatureId={def.id} kind="select" assetBase={ASSETS} alt={`${def.name} reconstruction`} draggable={false} />
                 </div>
-                <div className="creature-copy">
+                <CopyBox>
                   <span className="role">{def.ground ? 'SEAFLOOR' : 'SWIMMER'} · {def.role}</span>
                   <h2>{def.name}</h2>
                   <small className="provenance">{def.kind && <b className="kind">{def.kind}</b>}{def.species} · {def.provenance ?? def.locality ?? 'Burgess Shale'}</small>
@@ -170,7 +257,7 @@ export function SelectScreen(p: Props) {
                       </dl>
                     </>
                   )}
-                </div>
+                </CopyBox>
                 <button className="ready-button" aria-pressed={pl.ready} onClick={() => p.onReady(i)}>
                   {pl.ready ? <><CheckIcon width={18} height={18} /> LOCKED IN · {key('confirm', s).toUpperCase()} DIVES</> : `LOCK IN  ·  ${key('confirm', s).toUpperCase()}`}
                 </button>
@@ -178,30 +265,25 @@ export function SelectScreen(p: Props) {
             );
           })}
           {p.players.length < 4 && (
+            /*
+             * One line, and only the line that is true. There is never more than one keyboard
+             * player, so the keyboard is only an offer while nobody has taken it — which is the
+             * case where the first player came in on a pad.
+             */
             <div className={`join-card ${waiting.length ? 'waiting' : ''}`}>
-              {/* With no pad in the room the card leads with the thing that actually works here —
-                  a second player on the same keyboard — and mentions controllers second. */}
-              {p.padIndices.length > 0 ? <PadIcon width={32} height={32} /> : <KeyboardIcon width={32} height={32} />}
-              {p.padIndices.length > 0
-                ? <p><b>Press any button</b> on another controller to join.</p>
-                : <p><b>Plug in a controller</b> and press any button to join — or share this keyboard.</p>}
-              <button className="ghost" onClick={p.onAddKeyboard}>Add a keyboard player</button>
-              <small>
-                {p.padIndices.length} controller{p.padIndices.length === 1 ? '' : 's'} connected
-                {waiting.length > 0 && <> · <b>{waiting.map((i) => `Controller ${i + 1}`).join(', ')}</b> {waiting.length === 1 ? 'has' : 'have'} not joined</>}
-              </small>
-              {p.padIndices.length <= p.players.length && (
-                <small className="dim">A controller only shows up here once you press a button on it.</small>
-              )}
+              <PadIcon width={32} height={32} />
+              <p>Press <b>{btn('confirm', 'pad')}</b>{keyboardFree && <> or <b>{btn('confirm', 'kbm')}</b></>} to join</p>
             </div>
           )}
         </div>
       </div>
 
       <footer className="select-footer">
-        <button className="ghost" onClick={p.onBack}>← Title</button>
+        {/* Bottom left, opposite the dive button: the quiet corner of the screen, where something
+            worth offering but never worth pressing by accident belongs. Renders nothing at all
+            unless a feedback endpoint was compiled in — see src/shared/feedback.ts. */}
+        <FeedbackButton />
         <div className="start-wrap">
-          {!p.allReady && <span className="dim">Move on the grid with {btn('pick', s)}, <b>{key('confirm', s)}</b> locks in, <b>{key('confirm', s)}</b> again dives.</span>}
           <button className={`start-button ${p.allReady ? 'focused' : ''}`} disabled={!p.allReady} onClick={p.onStart}>DIVE IN  ·  {key('confirm', s).toUpperCase()}</button>
         </div>
       </footer>

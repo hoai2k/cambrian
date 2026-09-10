@@ -50,7 +50,7 @@ const authoredCreatures = Object.fromEntries(DEVONIAN_CREATURES.map((c) => {
 export const DEVONIAN = defineEra({
   id: 'devonian',
   title: 'Devonian Domination',
-  copy: { tagline: 'Feed. Grow. Fight. Escape.', taglineEm: '375 million years ago, the sea had a pecking order.', loading: 'FILLING THE BASIN…', lose: 'THE SEA WINS', settingsKey: 'devonian-settings', mobileIllustration: DEVONIAN_BRAND_EXTRAS.mobileIllustration, sibling: { title: 'Cambrian Conquest', path: '', blurb: '133 million years earlier' } },
+  copy: { tagline: 'Feed. Grow. Fight. Escape.', taglineEm: '375 million years ago, the sea had a pecking order.', loading: 'FILLING THE BASIN…', lose: 'THE SEA WINS', settingsKey: 'devonian-settings', mobileIllustration: DEVONIAN_BRAND_EXTRAS.mobileIllustration, sibling: { title: 'Cambrian Conquest', path: '', blurb: '133 million years earlier', logo: 'assets/brand/logo-engraved.webp' } },
   modes: [
     // The same three modes as the Cambrian, in the same order: this era changes the sea and the
     // animals in it, not what a match is.
@@ -86,6 +86,8 @@ export const DEVONIAN = defineEra({
     props: 'assets/devonian/scenery/', instancedScenery: DEVONIAN_SCENERY, biomes: 'assets/devonian/biomes/', ui: 'assets/ui/', sfx: 'assets/sfx/', music: 'music/',
     ...DEVONIAN_BRAND, modelStatus, modelNotes, clipNotes, modelBytes, standIns: DEVONIAN_STAND_INS,
   },
-  audio: { music: MUSIC },
+  // Its own ambience — cold open water, not the Cambrian reef. The giant's drone is shared:
+  // this era has no bed of its own for it.
+  audio: { music: MUSIC, loops: { ambient: 'devonian/ambient-open-sea', drone: 'giant-drone' } },
   presentation: { schemes: SCHEMES, creatureSchemes: CREATURE_SCHEMES, portraits: {}, authoredColors: { creatures: authoredCreatures, props: {} } },
 });

@@ -53,6 +53,12 @@ export function RefinementNote({ note, heading, label, className, children }: {
  * does *not* appear for a finished body whose animation clips are queued for rework: flagging the
  * whole animal for that said the wrong thing about a model that is actually done. That warning
  * lives on the clip buttons instead (`ClipQueuedBadge`), where it names what will change.
+ *
+ * For now this is the specimen viewer only. The game itself shows no badge: a player choosing a
+ * creature is not the audience for our production queue, and a ⚠ on the roster reads as a warning
+ * about the animal rather than a note about its art. The status data is untouched, so putting the
+ * badge back in `src/app/Select.tsx` is a one-line change when the roster is finished enough for
+ * the mark to mean something to a player.
  */
 export function ModelStatusBadge({ status, note, compact = false }: { status?: 'preview' | 'final'; note?: string; compact?: boolean }) {
   if (status !== 'preview') return null;
