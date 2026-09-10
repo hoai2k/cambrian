@@ -10,18 +10,19 @@
  * work the food and the antennae twitch. The legs never stop.
  */
 import { ss, arc, hold, UP, DOWN, FWD, BACK } from '../lib.mjs';
-import { pad, range } from '../common.mjs';
+import { pad, range, alive, beatPhase } from '../common.mjs';
 
 const ROWS = [['L', -1], ['R', 1]], SIDES = [1, -1];
 const inward = (sx) => [-sx, 0, 0], outward = (sx) => [sx, 0, 0];
 const BODY = range(9).map((i) => `body_${pad(i)}`);
 
-function legs(P, t, env, { amp = .16, surge = 0, coil = 0, loopU } = {}) {
-  const ph = loopU === undefined ? 2 * Math.PI * t / 1.2 : 2 * Math.PI * loopU;
+function legs(P, t, env, { power = 0, beats = 0, ramp = 0, amp = .16, surge = 0, coil = 0, loopU } = {}) {
+  const ph = beatPhase(t, { period: 1.2, beats, ramp, loopU });
+  const A = amp * env * (1 + power);
   for (const [row, sx] of ROWS) for (let i = 0; i < 26; i++) {
     const b = `leg_${pad(i)}_${row}`, tip = `${b}_tip`, phase = ph - i * .5 + (sx < 0 ? Math.PI : 0);
-    P.bend(b, FWD, .07 * amp * env * Math.sin(phase) + .22 * coil - .3 * surge * (1 - i * .015));
-    P.bend(tip, DOWN, .05 * amp * env * Math.cos(phase + .5) + .15 * coil);
+    P.bend(b, FWD, .13 * A * Math.sin(phase) + .22 * coil - .3 * surge * (1 - i * .015));
+    P.bend(tip, DOWN, .09 * A * Math.cos(phase + .5) + .15 * coil);
   }
 }
 function paddles(P, { sweep = 0, lift = 0, rake = 0, thrust = 0 }) {
@@ -40,6 +41,12 @@ function body(P, { crouch = 0, nod = 0, fwd = 0 }) {
   P.bend('body_00', UP, nod); P.bend('body_01', UP, nod * .5);
 }
 
+/**
+ * Bones this performance authors. The head paddles and antennae are the performance; the 26 leg pairs and the body plates keep the
+ * shipped clip's motion, which is where this animal's dynamism lives.
+ */
+export const authored = (n) => /^(paddle_|antenna_)/.test(n);
+
 export const clips = [
   {
     name: 'Bite', duration: 0.5, loop: false,
@@ -48,8 +55,8 @@ export const clips = [
       const A = arc(0, .26, u), S = hold(.14, .3, .4, .86, u);
       paddles(P, { lift: .6 * A * (1 - S), sweep: 1.2 * S });
       body(P, { nod: .05 * S, fwd: .02 * S });
-      antennae(P, Math.sin(Math.PI * u) ** 2, 2 * Math.PI * u * 2);
-      legs(P, t, Math.sin(Math.PI * u) ** 2);
+      antennae(P, 1.0 * alive(u), 2 * Math.PI * u * 2);
+      legs(P, t, alive(u), { amp: .8, power: .9 * S, beats: 1.5, ramp: ss(.1, .55, u) });
     },
   },
   {
@@ -62,8 +69,8 @@ export const clips = [
       const S = Math.max(...pulses);
       paddles(P, { lift: .8 * W, thrust: 1.3 * S, sweep: .3 * S });
       body(P, { crouch: 1.0 * W + .5 * hold(.34, .4, .8, .95, u), nod: -.03 * W + .06 * S, fwd: .06 * S });
-      antennae(P, Math.sin(Math.PI * u) ** 2 * .5, 2 * Math.PI * u * 3);
-      legs(P, t, Math.sin(Math.PI * u) ** 2, { coil: W, surge: S });
+      antennae(P, 1.2 * alive(u), 2 * Math.PI * u * 3);
+      legs(P, t, alive(u), { amp: .9, power: 1.3 * S, beats: 2.4, ramp: ss(.3, .92, u), coil: W, surge: S });
     },
   },
   {
@@ -73,8 +80,8 @@ export const clips = [
       const R = hold(.05, .3, .55, .9, u), C = hold(.3, .42, .64, .9, u), D = hold(.42, .58, .68, .92, u);
       paddles(P, { lift: .5 * hold(.05, .2, .28, .4, u), sweep: 1.0 * R, rake: 1.0 * D * (1 - .3 * C) });
       body(P, { nod: .05 * R, fwd: .03 * R });
-      antennae(P, Math.sin(Math.PI * u) ** 2, 2 * Math.PI * u * 2);
-      legs(P, t, Math.sin(Math.PI * u) ** 2);
+      antennae(P, 1.0 * alive(u), 2 * Math.PI * u * 2);
+      legs(P, t, alive(u), { amp: .8, power: .8 * R, beats: 1.6, ramp: ss(.1, .62, u) });
     },
   },
   {
@@ -89,7 +96,7 @@ export const clips = [
       body(P, { nod: .08 * Cy + .02 * chew * pulse, crouch: .3 * Cy });
       for (const [row] of ROWS) for (let i = 0; i < 4; i++) P.bend(`leg_${pad(i)}_${row}`, FWD, .25 * chew * Math.sin(2 * Math.PI * 3 * u - i * 1.2));
       antennae(P, .7, 2 * Math.PI * u * 2);
-      legs(P, t, 1, { amp: .12, loopU: u });
+      legs(P, t, 1, { amp: .45, loopU: u });
     },
   },
 ];
