@@ -15,6 +15,7 @@ import { Dialogs, PauseMenu, Results, type MenuItem } from './Overlays';
 import { gridColumns, SelectScreen } from './Select';
 import { TitleScreen } from './Title';
 import { Toolbar } from './Toolbar';
+import { toolbarPlace } from './toolbar-place';
 import { menuScheme } from '../shared/controls';
 import { freshCursor, menuPress, MENU_LOCKOUT, type MenuCursor, type MenuEvent } from './menu-cursor';
 
@@ -568,6 +569,17 @@ export function App() {
    */
   const bootSlow = useSlow(!loaded);
 
+  /**
+   * The icon buttons sit in somebody's viewport, so they answer to whether that somebody asked for
+   * a bare sea. Only in play, and only while there is a HUD to read the split from.
+   */
+  const toolbar = useMemo(() => {
+    if (screen !== 'playing' || !hud) return 'right' as const;
+    // A menu is already drawn over the water, so the buttons may as well be there with it.
+    const anyMenu = paused || dialog !== null || hud.players.some((p) => p.teleport || p.swap || p.board);
+    return toolbarPlace(hud.players.map((p, i) => ({ rect: hud.rects[i] ?? { x: 0, y: 0, w: 1, h: 1 }, senseOn: p.senseOn })), anyMenu);
+  }, [screen, hud, paused, dialog]);
+
   const menuOpen = screen === 'results' || (screen === 'playing' && paused);
   useEffect(() => {
     if (!menuOpen) return;
@@ -599,7 +611,7 @@ export function App() {
       {screen === 'playing' && paused && <PauseMenu scheme={scheme} items={menuItems} sel={menuCursor.sel} shown={menuCursor.shown} onHover={menuHover} />}
       {screen === 'results' && hud && <Results snapshot={hud} players={players} record={record} fresh={fresh} scheme={scheme} items={menuItems} sel={menuCursor.sel} shown={menuCursor.shown} onHover={menuHover} />}
 
-      <Toolbar isFs={isFs} muted={settings.muted} onHelp={() => openDialog(dialog === 'help' ? null : 'help')} onSettings={() => openDialog(dialog === 'settings' ? null : 'settings')} onMute={() => setSettings((s) => ({ ...s, muted: !s.muted }))} onFullscreen={toggleFullscreen} />
+      <Toolbar place={toolbar} isFs={isFs} muted={settings.muted} onHelp={() => openDialog(dialog === 'help' ? null : 'help')} onSettings={() => openDialog(dialog === 'settings' ? null : 'settings')} onMute={() => setSettings((s) => ({ ...s, muted: !s.muted }))} onFullscreen={toggleFullscreen} />
       <Dialogs kind={dialog} onClose={() => openDialog(null)} settings={settings} onSettings={setSettings} scheme={scheme} />
 
       {(notice || error) && (

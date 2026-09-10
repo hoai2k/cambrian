@@ -30,6 +30,7 @@
     "eras": "node tools/era-test.mjs",
     "merge": "node --experimental-transform-types tools/merge-test.mjs",
     "shapes": "node tools/prop-shapes.mjs",
+    "reactions": "esbuild tools/reaction-test.ts --bundle --platform=node --format=esm --outfile=node_modules/.cache/reaction-test.mjs --log-level=error && node node_modules/.cache/reaction-test.mjs",
     "conform": "node --experimental-transform-types tools/conform-test.mjs",
     "locomotion": "esbuild tools/locomotion-test.ts --bundle --platform=node --format=esm --outfile=node_modules/.cache/locomotion-test.mjs --log-level=error && node node_modules/.cache/locomotion-test.mjs",
     "props": "esbuild tools/prop-collider-test.ts --bundle --platform=node --format=esm --outfile=node_modules/.cache/prop-collider-test.mjs --log-level=error && node node_modules/.cache/prop-collider-test.mjs",
@@ -40,6 +41,7 @@
     "devonian:check": "node tools/devonian/check.mjs --shipped && node tools/devonian/check-props.mjs --shipped && node tools/devonian/catalogue.mjs --check",
     "devonian:check-all": "node tools/devonian/check.mjs && node tools/devonian/check-props.mjs && node tools/devonian/catalogue.mjs --check",
     "music": "esbuild tools/music-test.ts --bundle --platform=node --format=esm --outfile=node_modules/.cache/music-test.mjs && node node_modules/.cache/music-test.mjs",
+    "immersive": "esbuild tools/immersive-test.ts --bundle --platform=node --format=esm --outfile=node_modules/.cache/immersive.mjs --log-level=error && node node_modules/.cache/immersive.mjs",
     "menus": "esbuild tools/menu-cursor-test.ts --bundle --platform=node --format=esm --outfile=node_modules/.cache/menu-cursor.mjs && node node_modules/.cache/menu-cursor.mjs",
     "swap": "esbuild tools/swap-test.ts --bundle --platform=node --format=esm --outfile=node_modules/.cache/swap.mjs && node node_modules/.cache/swap.mjs",
     "edges": "esbuild tools/edges-test.ts --bundle --platform=node --format=esm --outfile=node_modules/.cache/edges.mjs && node node_modules/.cache/edges.mjs"
