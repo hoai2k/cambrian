@@ -27,6 +27,8 @@
     "hiding": "esbuild tools/hiding-test.ts --bundle --platform=node --format=esm --outfile=node_modules/.cache/hiding-test.mjs && node node_modules/.cache/hiding-test.mjs",
     "progress": "esbuild tools/progress-test.ts --bundle --platform=node --format=esm --outfile=node_modules/.cache/progress-test.mjs && node node_modules/.cache/progress-test.mjs cambrian && node node_modules/.cache/progress-test.mjs devonian",
     "codex": "esbuild tools/codex-test.ts --bundle --platform=node --format=esm --outfile=node_modules/.cache/codex-test.mjs && node node_modules/.cache/codex-test.mjs cambrian && node node_modules/.cache/codex-test.mjs devonian",
+    "focus": "esbuild tools/focus-test.ts --bundle --platform=node --format=esm --outfile=node_modules/.cache/focus-test.mjs && node node_modules/.cache/focus-test.mjs",
+    "spatial": "esbuild tools/spatial-test.ts --bundle --platform=node --format=esm --outfile=node_modules/.cache/spatial-test.mjs && node node_modules/.cache/spatial-test.mjs",
     "debug": "esbuild tools/debug-test.ts --bundle --platform=node --format=esm --outfile=node_modules/.cache/debug-test.mjs && node node_modules/.cache/debug-test.mjs",
     "eras": "node tools/era-test.mjs && node tools/cambrian/sizes.mjs --check",
     "merge": "node --experimental-transform-types tools/merge-test.mjs",

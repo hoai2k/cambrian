@@ -12,6 +12,8 @@ import { emptyCodex, hasNewFinds, loadCodex, mergeCodex, recordFinds, type Codex
 import { Hud } from './Hud';
 import { LoadingScreen, useSlow } from './Loading';
 import { Dialogs, PauseMenu, Results, type MenuItem } from './Overlays';
+import { atMain, cycle, groupsFor, stops, type Focus, type FocusGroup } from './focus-ring';
+import { rectsOf, step as spatialStep, type Dir } from './spatial-nav';
 import { gridColumns, SelectScreen } from './Select';
 import { TitleScreen } from './Title';
 import { Toolbar } from './Toolbar';
@@ -51,6 +53,35 @@ function deepLinkedToSelect(): boolean {
   try { return new URLSearchParams(location.search).get('screen') === 'select'; } catch { return false; }
 }
 
+/**
+ * One direction out of a pad, for steering a group of buttons.
+ *
+ * The D-pad answers on the press; the stick repeats on a timer, so holding it walks along a row
+ * rather than firing once or running away. `repeat` is the same per-pad map the rest of the loop
+ * uses, so a stick cannot drive two things at two rates in one frame.
+ */
+function padDir(
+  c: RawControls,
+  just: (k: keyof RawControls) => boolean,
+  index: number,
+  now: number,
+  repeat: Map<number, number>,
+): Dir | null {
+  if (just('dright')) return 'right';
+  if (just('dleft')) return 'left';
+  if (just('ddown')) return 'down';
+  if (just('dup')) return 'up';
+  const x = Math.abs(c.mx) > 0.6 ? Math.sign(c.mx) : 0;
+  const y = Math.abs(c.my) > 0.6 ? -Math.sign(c.my) : 0;
+  if ((x || y) && now - (repeat.get(index) ?? 0) > 240) {
+    repeat.set(index, now);
+    // A stick pushed on the diagonal answers on whichever axis it is further along.
+    if (Math.abs(c.mx) >= Math.abs(c.my)) return x > 0 ? 'right' : 'left';
+    return y > 0 ? 'up' : 'down';
+  }
+  return null;
+}
+
 export function App() {
   const canvasRef = useRef<HTMLDivElement>(null);
   const engineRef = useRef<Engine | null>(null);
@@ -74,6 +105,16 @@ export function App() {
   const menuCursorRef = useRef<MenuCursor>(freshCursor(true));
   const menuAtRef = useRef(0);
   const menuItemsRef = useRef<MenuItem[]>([]);
+  /**
+   * Which group of buttons the pad is steering, cycled with the shoulder buttons. See
+   * `focus-ring.ts`: `main` is the screen's own business, and the ring reaches the era link, the
+   * mode chips and the icon buttons without giving any of them a button of their own.
+   */
+  const [focus, setFocus] = useState<Focus>(atMain);
+  const focusRef = useRef<Focus>(focus);
+  /** Where the icon buttons went, for the gamepad loop — which runs outside the render. */
+  const toolbarRef = useRef<'left' | 'right' | 'hidden'>('right');
+  const setFocusBoth = useCallback((f: Focus) => { focusRef.current = f; setFocus(f); }, []);
   const [dialog, setDialog] = useState<DialogKind>(null);
   const dialogRef = useRef<DialogKind>(null);
   const [settings, setSettings] = useState<Settings>(defaultSettings);
@@ -304,6 +345,58 @@ export function App() {
     if (act) { const it = items[cursor.sel]; if (it) { audio.play('ui-confirm'); it.run(); } }
   }, []);
 
+  /**
+   * The buttons a focus group holds, read from the page rather than mirrored in state.
+   *
+   * These are the same elements the mouse clicks, so their rectangles are the truth about where
+   * they are — which is what `spatial-nav` needs, and what keeps a wrapped row of menu choices
+   * navigating the way it looks. Read-only: nothing here writes to the DOM React owns.
+   */
+  const groupEls = useCallback((group: FocusGroup): HTMLElement[] => {
+    const sel = group === 'icons' ? '.toolbar .icon-button'
+      : group === 'modes' ? '.mode-picker .mode-chip'
+      : group === 'era' ? '.era-switch'
+      : '.menu-choices button';
+    return [...document.querySelectorAll<HTMLElement>(sel)];
+  }, []);
+
+  /** Take the button the ring is pointing at. */
+  const runFocused = useCallback(() => {
+    const f = focusRef.current;
+    const els = groupEls(f.group);
+    const el = els[Math.min(f.index, els.length - 1)];
+    if (!el) return false;
+    audio.play('ui-confirm');
+    el.click();
+    return true;
+  }, [groupEls]);
+
+  /**
+   * How far a direction press should move the menu cursor, by where the choices actually are.
+   *
+   * The choices are a wrapping flex row, so left and right are the natural way along them and the
+   * old up/down-only cursor left the first thing a pad player tries doing nothing. Returned as a
+   * step so `menu-cursor.ts` keeps owning the rules — the lockout, the cursor that has to be woken,
+   * the wrap — and only the geometry lives here.
+   */
+  const menuStep = useCallback((dir: Dir) => {
+    const els = groupEls('main');
+    const at = menuCursorRef.current.sel;
+    if (els.length < 2) return dir === 'right' || dir === 'down' ? 1 : -1;
+    return spatialStep(rectsOf(els), Math.min(at, els.length - 1), dir) - at;
+  }, [groupEls]);
+
+  /** Steer inside the focused group, by where its buttons are. */
+  const moveFocus = useCallback((dir: Dir) => {
+    const f = focusRef.current;
+    const els = groupEls(f.group);
+    if (els.length <= 1) return;
+    const next = spatialStep(rectsOf(els), Math.min(f.index, els.length - 1), dir);
+    if (next === f.index) return;
+    setFocusBoth({ ...f, index: next });
+    audio.play('ui-move');
+  }, [groupEls, setFocusBoth]);
+
   const menuHover = useCallback((i: number) => {
     const cursor = { sel: i, shown: true };
     menuCursorRef.current = cursor; setMenuCursor(cursor);
@@ -391,6 +484,25 @@ export function App() {
   }, [addPlayer]);
   const changeMode = useCallback((m: Mode) => { modeRef.current = m; setMode(m); audio.play('ui-move'); updatePlayers(playersRef.current.map((p) => ({ ...p, ready: false }))); }, [updatePlayers]);
 
+  /**
+   * Hand the sticks to the next group along. The pad that does it owns the ring, so on a shared
+   * choice screen the other players keep steering their own pick.
+   */
+  const cycleFocus = useCallback((dir: number, owner: number | 'keyboard') => {
+    const ring = groupsFor(screenRef.current, pausedRef.current || screenRef.current === 'results', {
+      sibling: !!ACTIVE_ERA.copy.sibling, icons: toolbarRef.current !== 'hidden',
+    });
+    const all = stops(ring, { era: groupEls('era').length, modes: groupEls('modes').length, icons: groupEls('icons').length });
+    const f = focusRef.current;
+    const from = f.owner === null || f.owner === owner ? f : { group: 'main' as FocusGroup, index: 0 };
+    const to = cycle(all, from, dir);
+    setFocusBoth({ ...to, owner: to.group === 'main' ? null : owner });
+    // A mode chip is a tab: landing on it picks it, which is what the shoulders always did here.
+    if (to.group === 'modes') { const m = MODES[to.index]; if (m && m !== modeRef.current) changeMode(m); }
+    audio.play('ui-move');
+  }, [changeMode, groupEls, setFocusBoth]);
+
+
   // ---- Gamepad menu navigation ----
   useEffect(() => {
     const prev = new Map<number, RawControls>();
@@ -414,13 +526,34 @@ export function App() {
         if (dialogRef.current) {
           if (just('back') || just('menu')) openDialog(null);
         } else if (s === 'title') {
-          if (c.any && !(p?.any)) startFromTitle(gp.index, false);
+          // The shoulders reach the era link and the icon buttons; everything else is "press start"
+          // until the ring has moved off the screen's own business.
+          if (just('lb')) cycleFocus(-1, gp.index);
+          else if (just('rb')) cycleFocus(1, gp.index);
+          else if (focusRef.current.group !== 'main') {
+            const d = padDir(c, just, gp.index, now, repeat);
+            if (d) moveFocus(d);
+            else if (just('confirm')) runFocused();
+            else if (just('back')) setFocusBoth(atMain());
+          }
+          else if (c.any && !(p?.any)) startFromTitle(gp.index, false);
         } else if (s === 'select') {
           const ps = playersRef.current;
           const idx = ps.findIndex((x) => x.device === gp.index);
           // Any button joins, not just A. The title says PRESS START, so Start has to work here
           // too, and a pad that reports a non-standard mapping still gets its player in.
           if (idx < 0) { if (just('anyButton')) addPlayer(gp.index); }
+          else if (focusRef.current.owner === gp.index && focusRef.current.group !== 'main') {
+            // This pad has taken the ring off the roster. The others carry on picking.
+            if (just('lb')) cycleFocus(-1, gp.index);
+            else if (just('rb')) cycleFocus(1, gp.index);
+            else {
+              const d = padDir(c, just, gp.index, now, repeat);
+              if (d) moveFocus(d);
+              else if (just('confirm')) runFocused();
+              else if (just('back')) setFocusBoth(atMain());
+            }
+          }
           else {
             const stickX = Math.abs(c.mx) > 0.6 ? Math.sign(c.mx) : 0, stickY = Math.abs(c.my) > 0.6 ? -Math.sign(c.my) : 0;
             const dx = just('dright') ? 1 : just('dleft') ? -1 : 0, dy = just('ddown') ? 1 : just('dup') ? -1 : 0;
@@ -434,24 +567,33 @@ export function App() {
             // control no other menu action wants; `ability` would be worse rather than better,
             // since two menu actions on one button is the collision that matters here.
             if (just('light')) toggleCarry(idx);
-            // LB and RB cycle the mode. Bind to the raw shoulder buttons, never to a gameplay
-            // control: this used to read `burst`, which is button 0 — the same button as confirm —
-            // so every A press locked the player in and then changed mode, and changeMode
-            // un-readies everyone, which meant nobody could ever lock in or start a match.
-            if (just('lb')) changeMode(MODES[(MODES.indexOf(modeRef.current) + MODES.length - 1) % MODES.length]);
-            if (just('rb')) changeMode(MODES[(MODES.indexOf(modeRef.current) + 1) % MODES.length]);
+            // LB and RB hand the sticks to the next group along — the roster, the mode chips, the
+            // icon buttons. Bind to the raw shoulder buttons, never to a gameplay control: this
+            // used to read `burst`, which is button 0 — the same button as confirm — so every A
+            // press locked the player in and then changed mode, and changeMode un-readies
+            // everyone, which meant nobody could ever lock in or start a match.
+            if (just('lb')) cycleFocus(-1, gp.index);
+            else if (just('rb')) cycleFocus(1, gp.index);
           }
         } else if ((s === 'playing' && pausedRef.current) || s === 'results') {
           // Deaf for a moment after the menu opens. The results screen arrives on its own, with a
           // hand still working the pad, and a button that was part of the fight must not answer a
           // question it never saw. A button held across the lockout is not an edge afterwards
           // either, so it stays silent until it is released and pressed again.
-          const stickY = Math.abs(c.my) > 0.6 ? -Math.sign(c.my) : 0;
-          const lastRep = repeat.get(gp.index) ?? 0;
-          const dpad = just('ddown') ? 1 : just('dup') ? -1 : 0;
-          const step = dpad || (stickY && now - lastRep > 240 ? stickY : 0);
           const awake = menuCursorRef.current.shown;
-          if (step) { menuInput({ step }); repeat.set(gp.index, now); }
+          const dir = padDir(c, just, gp.index, now, repeat);
+          // The shoulders reach the icon buttons from a menu too, so a pause is a way to the
+          // settings without a mouse.
+          if (just('lb')) cycleFocus(-1, gp.index);
+          else if (just('rb')) cycleFocus(1, gp.index);
+          else if (focusRef.current.group !== 'main') {
+            if (dir) moveFocus(dir);
+            else if (just('confirm')) runFocused();
+            else if (just('back')) setFocusBoth(atMain());
+          }
+          // The choices are a row, so left and right walk them; `spatial-nav` reads where they
+          // actually are, which is what makes up and down keep working on a row that wrapped.
+          else if (dir) { menuInput({ step: menuStep(dir) }); }
           else if (just('confirm')) menuInput({ confirm: true });
           // Any other button wakes a sleeping cursor, and only that.
           else if (!awake && just('anyButton')) menuInput({ other: true });
@@ -594,6 +736,11 @@ export function App() {
     return toolbarPlace(hud.players.map((p, i) => ({ rect: hud.rects[i] ?? { x: 0, y: 0, w: 1, h: 1 }, senseOn: p.senseOn })), anyMenu);
   }, [screen, hud, paused, dialog]);
 
+  useEffect(() => { toolbarRef.current = toolbar; }, [toolbar]);
+  // A screen change puts the sticks back on that screen's own business: a ring pointing at a group
+  // the new screen does not have would swallow every press.
+  useEffect(() => { setFocusBoth(atMain()); }, [screen, paused, setFocusBoth]);
+
   const menuOpen = screen === 'results' || (screen === 'playing' && paused);
   useEffect(() => {
     if (!menuOpen) return;
@@ -609,13 +756,13 @@ export function App() {
       <div className="vignette" />
 
       {!loaded && bootSlow && <LoadingScreen progress={progress} fraction={progress ? Math.min(1, progress.fraction * 4) : 0} />}
-      {screen === 'title' && loaded && <TitleScreen loaded={loaded} onStart={() => startFromTitle('keyboard', true)} padCount={padCount} />}
+      {screen === 'title' && loaded && <TitleScreen loaded={loaded} onStart={() => startFromTitle('keyboard', true)} padCount={padCount} eraFocused={focus.group === 'era'} />}
 
       {screen === 'select' && (
         <SelectScreen
           players={players} mode={mode} modes={MODES} modeInfo={modeInfo} allReady={allReady} padIndices={padIndices}
           scheme={scheme}
-          best={best} carry={carry}
+          best={best} carry={carry} modeFocus={focus.group === 'modes' ? focus.index : -1}
           onPick={setCreature} onReady={toggleReady} onRemove={removePlayer}
           onMode={changeMode} onStart={startMatch} onBack={backToTitle} onCarry={toggleCarry}
         />
@@ -625,7 +772,7 @@ export function App() {
       {screen === 'playing' && paused && <PauseMenu scheme={scheme} items={menuItems} sel={menuCursor.sel} shown={menuCursor.shown} onHover={menuHover} />}
       {screen === 'results' && hud && <Results snapshot={hud} players={players} record={record} fresh={fresh} scheme={scheme} items={menuItems} sel={menuCursor.sel} shown={menuCursor.shown} onHover={menuHover} />}
 
-      <Toolbar place={toolbar} isFs={isFs} muted={settings.muted} onHelp={() => openDialog(dialog === 'help' ? null : 'help')} onSettings={() => openDialog(dialog === 'settings' ? null : 'settings')} onMute={() => setSettings((s) => ({ ...s, muted: !s.muted }))} onFullscreen={toggleFullscreen} />
+      <Toolbar place={toolbar} isFs={isFs} muted={settings.muted} focus={focus.group === 'icons' ? focus.index : -1} onHelp={() => openDialog(dialog === 'help' ? null : 'help')} onSettings={() => openDialog(dialog === 'settings' ? null : 'settings')} onMute={() => setSettings((s) => ({ ...s, muted: !s.muted }))} onFullscreen={toggleFullscreen} />
       <Dialogs kind={dialog} onClose={() => openDialog(null)} settings={settings} onSettings={setSettings} scheme={scheme} />
 
       {(notice || error) && (
