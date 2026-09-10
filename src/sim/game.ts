@@ -1339,9 +1339,10 @@ export class Game implements AiWorld {
         const nt = this.pickLockTarget(a, input.lookX > 0 ? 1 : -1, a.lockTarget);
         if (nt) { a.lockTarget = nt.id; a.comboT = 0.4; }
       }
-      // Sense: a display mode, held on or off. On, the band glyphs and the radar are drawn; off,
-      // nothing is drawn over the sea but the HUD. It costs nothing and never runs out — turning
-      // it off is for the look of the thing, not a trade.
+      // Sense: a display mode, held on or off. On, the whole panel is drawn — the gauges, the band
+      // glyphs, the radar; off, nothing is drawn over that player's sea at all but a faint line
+      // naming this button (`PlayerPanel` in src/app/Hud.tsx). It costs nothing and never runs out:
+      // turning it off is for the look of the thing, not a trade.
       if (justSense) {
         a.senseMode = !a.senseMode;
         // The ping is the toggle's own sound, both ways: it is how you know the button took.
