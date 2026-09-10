@@ -58,6 +58,29 @@ export function pulseThrust(phase: number): number {
  */
 export const pulseRefilling = (phase: number) => phase / PULSE_CYCLE > PULSE_THRUST + 0.15;
 
+/**
+ * Where in its `Swim` clip a bell should be, for a body at this point in its cycle. The clip is
+ * one cycle long with the squeeze filling exactly the thrust window, so scrubbing it here makes
+ * the contraction the player watches the water actually being thrown (`src/render/creature.ts`).
+ * Returned as a fraction of the clip so a frame of rounding in the export costs nothing.
+ */
+export const bellPhase = (pulseT: number) => pulseT / PULSE_CYCLE;
+
+/** How far over a bell tips at full tilt: apex well into the direction of travel, fringe trailing. */
+export const BELL_TILT = 1.15;
+
+/**
+ * How far from upright a bell should be tipped. A jellyfish going somewhere turns its apex into
+ * the direction of travel and trails its fringe behind it; one sinking or holding station relaxes
+ * and hangs upright. So this follows the *horizontal* part of the journey — climbing needs no
+ * tilt, because upright already points where it is going — and only while the animal is beating.
+ * The renderer eases toward it, which is the drift back to upright once nothing is being asked.
+ */
+export function bellTilt(flatSpeed: number, cruise: number, pulseT: number): number {
+  if (pulseT <= 0) return 0;                       // drifting, sinking, or holding station
+  return clamp(flatSpeed / Math.max(cruise, 0.1), 0, 1) * BELL_TILT;
+}
+
 // ---- drifting with the sea ----
 
 /**
@@ -103,3 +126,40 @@ export const punting = (a: Actor, floorGap: number) =>
  */
 export const rowWalkCurrent = (a: Actor, grounded: boolean) =>
   creature(a.creature).rowWalk ? (grounded ? 0.08 : 0.55) : undefined;
+
+// ---- how high in the water a body keeps itself ----
+
+/**
+ * How often a big animal's next wander is a run down over the bottom anyway. Roughly one in six: a
+ * large body feeds down there and passes through, it just does not live there.
+ */
+export const DIP_CHANCE = 0.18;
+
+/**
+ * Where in the water column a swimmer of length `L` puts itself. Small bodies use the whole of it,
+ * the sand included — that is where most of the reef lives, and at every age. A large swimmer does
+ * not lie on the bottom: the floor of its range rises with its length, so the biggest animals read
+ * as things that pass overhead rather than furniture on the seabed. It is a preference and not a
+ * ceiling — pass `dip` (see `DIP_CHANCE`) and a big body goes right down over the sand, which is
+ * where it feeds and where you actually get to meet one.
+ */
+export function columnY(ground: number, surface: number, L: number, rng: () => number, dip = false) {
+  const floor = ground + 1.5;
+  const column = Math.max(surface - 2 - floor, 0.5);
+  const lo = dip ? 0 : clamp(((L - 2.5) * 1.8) / column, 0, 0.55);
+  // A small body is drawn towards the bottom of whatever is left to it: the floor, the weed and
+  // the cover are where it lives, at every age. A big one spreads evenly through the water above
+  // its own floor, which is most of the column by the time it is grown.
+  const r = rng();
+  return clamp(floor + column * (lo + (lo > 0.05 ? r : r * r) * (1 - lo) * 0.9), ground + 1, surface - 2);
+}
+
+/**
+ * How much water a swimming body of length `L` keeps under it when it can. Nothing for a small
+ * animal — the sand is where most of the reef lives — and a body length or so for a big one, which
+ * is what keeps the largest animals reading as things that pass overhead. It is a preference the
+ * body acts on while it is getting on with something else, not a floor it cannot cross: a hunt, a
+ * carcass or a bolt for cover all take it down, and `columnY` sends it down there on its own
+ * account now and then.
+ */
+export const keepClear = (L: number) => Math.max(0, (L - 2.5) * 1.1);

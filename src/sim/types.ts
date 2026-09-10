@@ -3,6 +3,12 @@ import type { CreatureId, MoveDef } from './creatures';
 
 export type Tier = 0 | 1 | 2 | 3 | 4;
 export const TIER_NAMES = ['Larva', 'Juvenile', 'Adult', 'Giant', 'Apex'] as const;
+/**
+ * The rungs' scales, as multiples of the creature's adult length. Ask `tierScale` in
+ * src/sim/tiers.ts rather than indexing this: with equivalent sizing on the two rungs below Adult
+ * are per-creature, because everything hatches the same *length* rather than the same fraction of
+ * its eventual self, and an Anomalocaris then has far further to grow than a Marrella.
+ */
 export const TIER_SCALE = [0.25, 0.5, 1.0, 1.7, 2.6] as const;
 /** Nutrition needed to leave each tier. */
 export const TIER_NEED = [30, 60, 85, 120, Infinity] as const;
@@ -117,6 +123,14 @@ export interface Actor {
   burstT: number;          // free burst timer (ambush surge)
   hitFlash: number; hitDir: Vec3; hitStop: number;
   grabbedBy: number; grabbing: number; grabT: number;
+  /**
+   * Where the grip landed on this body, as a unit direction in its own frame (right, up, forward).
+   * Held prey used to be parked at a fixed point off the grabber's nose, sized by the *grabber*,
+   * so a big mouthful sat half inside its captor and a small one hung in front of it; this is the
+   * spot on the victim that the grip actually has, so the two stay joined whatever their sizes.
+   * Meaningless unless `grabbedBy >= 0`.
+   */
+  grabOff: Vec3;
   eatingTarget: number; eatProgress: number;
   corpseT: number;         // seconds since death for corpses
   eaten: number;           // 0..1 fraction of corpse consumed, in whole bites once it is being torn
@@ -162,6 +176,14 @@ export interface Actor {
    * striking through. Set from the input every step; false for anything that cannot grasp.
    */
   graspHold: boolean;
+  /**
+   * How long the grip has been armed, seconds. A grip closes on something too big to bite the
+   * moment the button is down — there is nothing else that press could usefully mean, and the
+   * point of it is to get hold without bothering the animal — but on a mouthful it waits for
+   * `GRASP_HOLD`, so a tap is still the bite it has always been and only a deliberate hold takes
+   * hold. Reset whenever the button comes up.
+   */
+  graspT: number;
   /**
    * Riding: the animal this one is clinging to (-1 when not riding), how long it has held on, and
    * where it took hold in the host's own frame — sideways, up and forward, in host body lengths —
@@ -222,6 +244,6 @@ export const isCoop = (m: Mode) => COOP_MODES.includes(m);
 export interface Prompt { text: string; t: number; }
 
 export interface WorldEvent {
-  kind: 'hit' | 'kill' | 'eat' | 'tierUp' | 'parry' | 'guardBreak' | 'burst' | 'escape' | 'noticed' | 'hunted' | 'dodge' | 'ability' | 'grab' | 'moult' | 'death' | 'silt' | 'stagger' | 'sense' | 'pounce' | 'swallow' | 'routed' | 'disintegrate' | 'teleport' | 'gulp' | 'winded' | 'anoxia' | 'beach' | 'shoalJoin' | 'shellCrush' | 'breach' | 'splash';
+  kind: 'hit' | 'kill' | 'eat' | 'tierUp' | 'parry' | 'guardBreak' | 'burst' | 'escape' | 'noticed' | 'hunted' | 'dodge' | 'ability' | 'grab' | 'moult' | 'death' | 'silt' | 'stagger' | 'sense' | 'pounce' | 'swallow' | 'routed' | 'disintegrate' | 'teleport' | 'gulp' | 'winded' | 'anoxia' | 'beach' | 'shoalJoin' | 'shellCrush' | 'breach' | 'splash' | 'hatch';
   pos: Vec3; actor: number; other?: number; strength?: number; player?: number;
 }

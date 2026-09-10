@@ -59,6 +59,20 @@ unless the user explicitly asks for a PR. Steps:
 - Devonian specimens land in batches (`tools/devonian/shipped.json`). When one lands: run
   `node tools/update-asset-sizes.mjs` (refreshes `src/content/devonian/asset-sizes.json`), remove its
   entry from `DEVONIAN_STAND_INS` in `src/content/devonian/index.ts`, and run `npm run devonian`.
+- The Cambrian roster plays at the animals' natural lengths — `docs/research/cambrian-sizes.json` →
+  `npm run cambrian:sizes` → `src/content/cambrian/natural-sizes.json`, which `npm run eras` checks.
+  The flat lengths it was authored with, every animal within a third of every other, are kept behind
+  *Equivalent sizing* (Settings, off by default) for comparison. K is set so the
+  roster's *average* adult is the average it is today, so the animals spread either side of the size
+  the sea already holds and the biggest one gets to be bigger than anything in it; speed, health and
+  poise come with the length so a body of a given length fights as it always did, and the growth
+  ladder becomes per-creature (`tierScale` in `src/sim/tiers.ts`) so everything hatches the same
+  length. Every consumer goes through `creature()`, which is where the swap happens, and the option
+  is fixed when a match starts because `src/sim` has to replay the same way from the same inputs.
+  `npm run sizing` checks both that the roster does what the brief says and that the option puts the
+  authored roster back exactly, ladder and mass included. Test fixtures ask for size in rungs, ratios
+  and body lengths rather than absolute units, because an absolute number stopped meaning the same
+  thing to every animal.
 - Devonian sizes and swimming stats are generated: `docs/research/devonian-swimming.json` (sourced lengths
   and body-lengths-per-second) → `npm run devonian:stats` → the six movement fields in
   `src/content/devonian/creatures.ts`. Edit the research or the formulas in `tools/devonian/stats.mjs`,
@@ -72,7 +86,11 @@ unless the user explicitly asks for a PR. Steps:
   punting, the row/walk gait, a rate-limited pitch, ram feeding, drifting and clinging. The
   mechanics live in `src/sim/locomotion.ts` and are keyed off the creature, never the era, because
   the same trait turns up in both: `npm run locomotion` covers the Cambrian bodies and
-  `npm run devonian` the Devonian ones. Which animal has what, and how well each is actually
+  `npm run devonian` the Devonian ones. A pulse swimmer's animation is that model rather than a
+  loop beside it: its `Swim` clip is one `PULSE_CYCLE` long with the squeeze filling the thrust
+  window, and the renderer scrubs the clip to the actor's `pulseT` (`bellPhase`) and turns the
+  apex into the direction of travel while it beats (`bellTilt`), so re-timing that clip breaks the
+  lock — which is what the bell cases in `npm run locomotion` are there to catch. Which animal has what, and how well each is actually
   attested, is `docs/research/locomotion-ideas.md`.
 - A body may shape itself to what it is on: `conformArms` bends a radial rig's arms onto the ground
   under them, or around a creature it is holding, after the mixer has written the pose
@@ -89,9 +107,25 @@ unless the user explicitly asks for a PR. Steps:
   flight whatever the attacker's size and however hurt the animal is, and an animal that has been
   fleeing the same attacker for two seconds and is still in its reach turns and fights (cornered).
   Nurseries are safe by non-aggression, not by size — `peaceful()` drops prey and rivals inside the
-  ring from an animal's reckoning but never its answer to being bitten — and ambient size is rolled
-  from the sea's own ages rather than the biggest player's tier, so something full grown passes by
-  from the first minute. `npm run reactions` guards all of it.
+  ring from an animal's reckoning (a mouthful taken in passing included) but never its answer to
+  being bitten — and ambient size is rolled from the sea's own ages rather than the biggest player's
+  tier, so something full grown passes by from the first minute. Where in the water a swimmer keeps
+  itself follows its length: `columnY` in `src/sim/locomotion.ts` raises the floor of a big body's
+  range and pulls small ones down towards the sand, and `keepOffTheFloor` in `src/sim/ai.ts` bends a
+  large body's travel up whatever its goal asked for (`keepClear`), so the largest animals pass
+  overhead rather than lying on the bottom — with about one wander in six (`DIP_CHANCE`) a run down
+  over it. `npm run reactions` and `npm run locomotion` guard
+  all of it.
+- What lives where is the place's own business, not the player's: `src/sim/population.ts` gives every
+  210-unit area a size profile and a density from a hash bent by the biome (hatcheries inshore, grown
+  animals in the deep), pure in the place and the world seed so an area is the same when you return.
+  `spawnAmbient` draws from it; `spawnPreyFor` still keeps food of your own size within reach, and
+  `PASSER_BY` sends a large animal through the upper water whatever the seabed holds. Ambient brains
+  wander within ~32 units of where they spawned, so a population stays in its biome.
+- Every player hatches out of an egg on the bottom rung: `HATCH_TIME` in `src/sim/game.ts` holds the
+  body still for five seconds (`skipHatch()` ends it for headless harnesses) and `src/render/eggs.ts`
+  draws the shell — pokes from inside, the split, the wriggle out. A moult above that rung is the
+  old one-second swell.
 - What a player has found — biomes, landmarks, species taken to the top, the Rise record — is
   written to `localStorage` as the match finds it (`recordFinds` in `src/app/codex.ts`), never at
   the results screen: a player who quits mid-match keeps what they found. The results screen marks

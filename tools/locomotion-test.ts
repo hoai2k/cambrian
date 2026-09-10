@@ -10,8 +10,11 @@ import { emptyInput, type InputFrame } from '../src/sim/types';
 import { creature, type CreatureId } from '../src/sim/creatures';
 import { climbHeight, lengthOf } from '../src/sim/actors';
 import { heading, wrapAngle } from '../src/shared/math';
+import { BELL_TILT, bellPhase, bellTilt, columnY, DIP_CHANCE, PULSE_CYCLE, pulseThrust } from '../src/sim/locomotion';
 import { floraSize } from '../src/sim/flora';
 import { chunkCoord, chunkKey, sampleHeight } from '../src/sim/world';
+import { CREATURE_IDS } from '../src/sim/creatures';
+import fs from 'node:fs';
 
 let failed = 0;
 const check = (n: string, ok: boolean, d = '') => { console.log(`${ok ? 'PASS' : 'FAIL'}  ${n.padEnd(52)} ${d}`); if (!ok) failed++; };
@@ -101,7 +104,14 @@ const flat = (v: { x: number; z: number }) => Math.hypot(v.x, v.z);
 
 // --- hauling through weed: cover carries a limbed body and drags on a swimmer ---
 {
-  /** Cross a bed of soft weed — the growth this is actually about — and see what it cost. */
+  /**
+   * Cross a bed of soft weed — the growth this is actually about — and see what it cost.
+   *
+   * Unheld, the swimmer finished four units clear of plants 1.8 tall and came out with exactly the
+   * distance it went in with, which read as the drag being broken when it had never been asked
+   * for. The same input goes to both bodies and to both runs of each, so what is compared is still
+   * only the weed.
+   */
   const cross = (id: CreatureId, planted: boolean) => {
     const { g, p, step, into } = solo(id, 5);
     const ground = sampleHeight(p.pos.x, p.pos.z);
@@ -170,6 +180,70 @@ const flat = (v: { x: number; z: number }) => Math.hypot(v.x, v.z);
   };
   const night = climb(480 * 0.84), day = climb(480 * 0.34);
   check('...and rises through the night, sinks through the day', night > day, `night ${night.toFixed(2)}, day ${day.toFixed(2)}`);
+}
+
+// --- how high in the water a body keeps itself ---
+{
+  const seq = (n: number) => { let i = 0; return () => ((i = (i * 1103515245 + 12345) % 2147483648), (i + n) % 2147483648 / 2147483648); };
+  const heights = (L: number, dip = false) => {
+    const rng = seq(7);
+    const hs: number[] = [];
+    for (let i = 0; i < 400; i++) hs.push(columnY(-30, 0, L, rng, dip) + 30);
+    return { mean: hs.reduce((s, v) => s + v, 0) / hs.length, min: Math.min(...hs), max: Math.max(...hs) };
+  };
+  const small = heights(1), big = heights(9);
+  check('a small body uses the whole column, sand included', small.min < 3 && small.max > 15,
+    `${small.min.toFixed(1)}–${small.max.toFixed(1)} above the floor`);
+  check('a big one keeps to the higher water', big.min > 10 && big.mean > small.mean * 1.35,
+    `${big.min.toFixed(1)}–${big.max.toFixed(1)}, mean ${big.mean.toFixed(1)} against ${small.mean.toFixed(1)}`);
+  const swept = heights(9, true);
+  check('...but comes down over the floor when it does', swept.min < 4, `${swept.min.toFixed(1)} above the floor on a dip`);
+  check('...which is a minority of the time', DIP_CHANCE > 0.05 && DIP_CHANCE < 0.3, `${(DIP_CHANCE * 100).toFixed(0)}% of wanders`);
+  // Shallow water has no higher water to keep to, and nothing may end up in the air over it.
+  const shallow = columnY(-4, 0, 9, seq(3), false);
+  check('...and shallow water is still water', shallow > -4 && shallow < -2, `${shallow.toFixed(2)} in 4 units of depth`);
+}
+
+// ---- a bell's clip is the simulation's beat ----
+// src/render/creature.ts scrubs Swim by the actor's pulseT, so the squeeze the player watches is
+// the water actually being thrown. That only holds while the clip is exactly one cycle long: a
+// re-timed Swim would slide out of step with the thrust and nothing would say so.
+{
+  const clipSeconds = (file: string, name: string) => {
+    const buf = fs.readFileSync(file);
+    const json = JSON.parse(buf.subarray(20, 20 + buf.readUInt32LE(12)).toString('utf8'));
+    const anim = (json.animations ?? []).find((a: any) => a.name === name);
+    if (!anim) return 0;
+    return Math.max(...anim.samplers.map((sm: any) => json.accessors[sm.input].max?.[0] ?? 0));
+  };
+  for (const id of CREATURE_IDS) {
+    if (creature(id).swimStyle !== 'pulse') continue;
+    const swim = clipSeconds(`public/assets/creatures/${id}.glb`, 'Swim');
+    // The scrub is proportional, so a frame of rounding at 30 fps costs nothing; two cycles in
+    // one clip would give two contractions per beat, which is what this is here to catch.
+    check(`${id}'s bell beats once per pulse cycle`, Math.abs(swim - PULSE_CYCLE) < 1 / 30 + 0.01,
+      `${swim.toFixed(3)}s against a ${PULSE_CYCLE}s cycle`);
+  }
+}
+
+// ---- and how a bell carries itself ----
+// What the player is promised: the apex turns into the direction of travel while the animal is
+// beating, and it hangs upright the rest of the time — sinking, drifting, or holding station.
+{
+  const cruise = creature('burgessomedusa').speed;
+  check('a bell hangs upright when it is asking for nothing', bellTilt(cruise, cruise, 0) === 0);
+  check('...and while it sinks, which it does by not swimming', bellTilt(0, cruise, 0) === 0);
+  check('...and while it climbs, because upright already points up', bellTilt(0, cruise, 0.2) === 0);
+  check('...but tips its apex over when it drives across the sea',
+    Math.abs(bellTilt(cruise, cruise, 0.2) - BELL_TILT) < 1e-9, `${BELL_TILT} rad at cruise`);
+  check('...by however much of its cruise it is actually making',
+    Math.abs(bellTilt(cruise / 2, cruise, 0.2) - BELL_TILT / 2) < 1e-9);
+  // The squeeze the player watches is the water being thrown: the clip's contraction fills the
+  // thrust window and nothing else, so the whole of the bell's closing happens while it pushes.
+  const thrustEnd = bellPhase(PULSE_CYCLE * 0.38);
+  check('a bell finishes closing exactly as its thrust runs out',
+    pulseThrust(PULSE_CYCLE * 0.379) > 0 && pulseThrust(PULSE_CYCLE * 0.381) === 0 && Math.abs(thrustEnd - 0.38) < 1e-9,
+    `${(thrustEnd * 100).toFixed(0)}% of the clip`);
 }
 
 console.log(failed ? `\n${failed} FAILED` : '\nall locomotion tests passed');

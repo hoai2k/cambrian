@@ -19,6 +19,10 @@ const { stateFor, devActor, stageScale, ADULT_STAGE, PRIME_STAGE, STAGE_AT, HOLD
 const { coverAt } = await import('../src/sim/world');
 const { applyScaleStats, bandOf, isAlive, lengthOf } = await import('../src/sim/actors');
 const { PLAYABLE } = await import('../src/sim/creatures');
+const { hasEquivalentSizing, naturalSizing, setEquivalentSizing } = await import('../src/sim/creatures');
+const { massOf } = await import('../src/sim/actors');
+const { tierScale } = await import('../src/sim/tiers');
+const { TIER_SCALE } = await import('../src/sim/types');
 const { creature } = await import('../src/sim/creatures');
 const { emptyInput } = await import('../src/sim/types');
 const { shoreZ, shoreDistance, SURFACE_Y, generateChunk, biomeAt, nurseryAt, chunkCoord, LOG_SHORE_RANGE, groundHeight } = await import('../src/sim/world');
@@ -133,6 +137,7 @@ ok(RULES !== undefined && !RULES.growthByNutrition, 'Devonian rules active: grow
 // ---- rung bands: same rung fights, one apart hunts, two apart is a snack ----
 {
   const g = new Game('reef', [{ creature: 'coccosteus', device: 'keyboard', ready: true }]);
+  g.skipHatch();
   const at = (id: CreatureId) => g.spawn(id, 'ambient', { x: 0, y: -10, z: 60 }, 1.0);
   const pairs: [CreatureId, CreatureId, string[]][] = [
     ['coccosteus', 'cheirolepis', ['rival', 'prey', 'threat']],      // II vs II
@@ -161,6 +166,7 @@ ok(RULES !== undefined && !RULES.growthByNutrition, 'Devonian rules active: grow
 // ---- start scales and modes ----
 {
   const dom = new Game('rise', [{ creature: 'eldredgeops', device: 'keyboard', ready: true }, { creature: 'dunkleosteus', device: 0, ready: true }]);
+  dom.skipHatch();
   for (const p of dom.players) ok(Math.abs(p.scale - stageScale(creature(p.creature).adultLength, 0)) < 1e-6, `${p.creature} starts as a hatchling in Rise`);
   ok(lengthOf(dom.players[1]) < creature('coccosteus').adultLength, `a hatchling Dunkleosteus (${lengthOf(dom.players[1]).toFixed(2)}) is shorter than an adult Coccosteus`);
   ok(lengthOf(dom.players[0]) >= 0.6 - 1e-6, `the smallest hatchling is still a playable body (${lengthOf(dom.players[0]).toFixed(2)})`);
@@ -172,14 +178,17 @@ ok(RULES !== undefined && !RULES.growthByNutrition, 'Devonian rules active: grow
   for (const p of dom.players) ok(coverAt(dom.world, p.pos, lengthOf(p), []) > 0.2, `${p.creature} hatches hidden in the plants (cover ${coverAt(dom.world, p.pos, lengthOf(p), []).toFixed(2)})`);
   ok(dom.actors.every((a) => a.controller !== 'bot'), 'Rise is whoever turned up: no bots fill the seats');
   const hunt = new Game('hunted', [{ creature: 'eldredgeops', device: 'keyboard', ready: true }]);
+  hunt.skipHatch();
   ok(hunt.actors.filter((a) => a.controller === 'bot').length === 3, 'Hunter & Hunted still fills to four with bots');
   const reef = new Game('reef', [{ creature: 'tiktaalik', device: 'keyboard', ready: true }]);
+  reef.skipHatch();
   ok(Math.abs(reef.players[0].scale - stageScale(creature('tiktaalik').adultLength, ADULT_STAGE)) < 1e-6 && devActor(reef, reef.players[0]).standing > STAGE_AT[ADULT_STAGE], 'Reef starts Adult');
 }
 
 // ---- standing, staging and no tier growth ----
 {
   const g = new Game('rise', [{ creature: 'coccosteus', device: 'keyboard', ready: true }]);
+  g.skipHatch();
   const p = g.players[0]; const d = devActor(g, p);
   p.spawnProtect = 1e6;                                       // the bots are quick now; this one is idling on purpose
   const tier0 = p.tier;
@@ -193,6 +202,7 @@ ok(RULES !== undefined && !RULES.growthByNutrition, 'Devonian rules active: grow
   for (let i = 0; i < 600; i++) tick(g, new Map<number, InputFrame>([[0, emptyInput()]]));
   ok(Math.abs(d.standing - idleBefore) < 1e-6, `idling neither grows nor decays it (${idleBefore.toFixed(1)} → ${d.standing.toFixed(1)})`);
   const g2 = new Game('rise', [{ creature: 'tiktaalik', device: 'keyboard', ready: true }]);
+  g2.skipHatch();
   const t = g2.players[0], d2 = devActor(g2, t);
   t.pos.z = shoreZ(t.pos.x); t.prevT.z = t.pos.z; d2.standing = 40;
   for (let i = 0; i < 600; i++) tick(g2, new Map<number, InputFrame>([[0, emptyInput()]]));
@@ -218,6 +228,7 @@ ok(RULES !== undefined && !RULES.growthByNutrition, 'Devonian rules active: grow
   ok(hud.stageProgress === 1, `at Prime the ring is full (${hud.stageProgress})`);
   {
     const fresh = new Game('rise', [{ creature: 'coccosteus', device: 'keyboard', ready: true }]);
+    fresh.skipHatch();
     const q = fresh.players[0]; q.spawnProtect = 1e6;
     const dq = devActor(fresh, q);
     const seen: number[] = [];
@@ -245,6 +256,7 @@ ok(RULES !== undefined && !RULES.growthByNutrition, 'Devonian rules active: grow
  */
 {
   const g = new Game('reef', [{ creature: 'tiktaalik', device: 'keyboard', ready: true }, { creature: 'coccosteus', device: 0, ready: true }]);
+  g.skipHatch();
   const [tik, coc] = g.players;
   for (const p of [tik, coc]) { p.hatching = false; p.state = 'free'; p.stateT = 0; p.stateDur = 0; p.spawnProtect = 0; p.pos.y = 20; p.prevT.y = 20; p.stamina = 0; }
   ok(RULES!.hud(g, 0)!.bimodal && !RULES!.hud(g, 1)!.bimodal, 'the HUD knows which bodies breathe both ways');
@@ -269,6 +281,7 @@ ok(RULES !== undefined && !RULES.growthByNutrition, 'Devonian rules active: grow
 {
   const climb = (id: CreatureId, up: boolean, stamina: number) => {
     const g = new Game('reef', [{ creature: id, device: 'keyboard', ready: true }]);
+    g.skipHatch();
     const p = g.players[0];
     p.hatching = false; p.state = 'free'; p.stateT = 0; p.stateDur = 0; p.spawnProtect = 0;
     p.pos.y = 20; p.prevT.y = 20; p.stamina = stamina; p.exhausted = 0;
@@ -299,6 +312,7 @@ ok(RULES !== undefined && !RULES.growthByNutrition, 'Devonian rules active: grow
 {
   const leaves = (id: CreatureId, scale: number, how: 'rise' | 'swim') => {
     const g = new Game('reef', [{ creature: id, device: 'keyboard', ready: true }]);
+    g.skipHatch();
     const p = g.players[0];
     p.hatching = false; p.state = 'free'; p.stateT = 0; p.stateDur = 0; p.spawnProtect = 0;
     p.pos.y = SURFACE_Y - 14; p.prevT.y = p.pos.y;
@@ -323,6 +337,7 @@ ok(RULES !== undefined && !RULES.growthByNutrition, 'Devonian rules active: grow
 /** The winded heartbeat: a nudge toward the surface while the bar is low, and silence once it is not. */
 {
   const g = new Game('reef', [{ creature: 'tiktaalik', device: 'keyboard', ready: true }]);
+  g.skipHatch();
   const p = g.players[0];
   p.hatching = false; p.state = 'free'; p.stateT = 0; p.stateDur = 0; p.spawnProtect = 0;
   const count = (stamina: number, seconds: number, y: number) => {
@@ -345,6 +360,7 @@ ok(RULES !== undefined && !RULES.growthByNutrition, 'Devonian rules active: grow
 // ---- dead water: gills suffer, lungs do not, leaving scores ----
 {
   const g = new Game('rise', [{ creature: 'coccosteus', device: 'keyboard', ready: true }, { creature: 'tiktaalik', device: 0, ready: true }]);
+  g.skipHatch();
   const [coc, tik] = g.players;
   coc.spawnProtect = tik.spawnProtect = 1e6;                 // nothing but the dead water may touch them here
   tik.pos.x = coc.pos.x + 8; tik.pos.z = coc.pos.z; tik.pos.y = coc.pos.y; tik.prevT.x = tik.pos.x; tik.prevT.z = tik.pos.z;
@@ -367,6 +383,7 @@ ok(RULES !== undefined && !RULES.growthByNutrition, 'Devonian rules active: grow
 // ---- shore reach: limbs get past the wall, fins do not ----
 {
   const g = new Game('reef', [{ creature: 'tiktaalik', device: 'keyboard', ready: true }, { creature: 'coccosteus', device: 0, ready: true }]);
+  g.skipHatch();
   const [tik, coc] = g.players;
   // start side by side in open water, then push both straight at the shore (+z) for a while
   tik.pos.x = coc.pos.x + 6; tik.pos.z = coc.pos.z; tik.pos.y = coc.pos.y = 20; tik.prevT.x = tik.pos.x; tik.prevT.z = tik.pos.z; tik.prevT.y = coc.prevT.y = 20;
@@ -382,6 +399,7 @@ ok(RULES !== undefined && !RULES.growthByNutrition, 'Devonian rules active: grow
 // ---- armour ----
 {
   const g = new Game('reef', [{ creature: 'coccosteus', device: 'keyboard', ready: true }]);
+  g.skipHatch();
   const mk = (id: CreatureId) => g.spawn(id, 'ambient', { x: 0, y: -10, z: 80 }, 1);
   const dir = { x: 0, y: 0, z: 1 };
   const shark = mk('cladoselache'), dunk = mk('dunkleosteus'), tusk = mk('onychodus'), plate = mk('bothriolepis'), soft = mk('cheirolepis');
@@ -408,6 +426,7 @@ ok(RULES !== undefined && !RULES.growthByNutrition, 'Devonian rules active: grow
   };
   const run = (id: CreatureId, gear: 'swim' | 'sprint' | 'dash', stick: 1 | -1 = 1, reverseAfter = false) => {
     const g = new Game('reef', [{ creature: id, device: 'keyboard', ready: true }]);
+    g.skipHatch();
     const p = g.players[0];
     p.pos = { x: 0, y: -14, z: 0 }; p.vel = { x: 0, y: 0, z: 0 }; p.yaw = 0; p.spawnProtect = 999;
     const push = (my: number): InputFrame => ({ ...emptyInput(), my, burst: gear === 'sprint' ? 1 : 0, dash: gear === 'dash' });
@@ -443,6 +462,7 @@ ok(RULES !== undefined && !RULES.growthByNutrition, 'Devonian rules active: grow
   // finned body, and out behind a shell, which is the way it is already pointing to jet.
   const neutral = (id: CreatureId) => {
     const g = new Game('reef', [{ creature: id, device: 'keyboard', ready: true }]);
+    g.skipHatch();
     const p = g.players[0];
     p.pos = { x: 0, y: -14, z: 0 }; p.vel = { x: 0, y: 0, z: 0 }; p.yaw = 0; p.spawnProtect = 999;
     const step = (f: Partial<InputFrame> = {}) => { tick(g, new Map<number, InputFrame>([[0, { ...emptyInput(), ...f } as InputFrame]])); p.spawnProtect = 999; };
@@ -471,6 +491,7 @@ ok(RULES !== undefined && !RULES.growthByNutrition, 'Devonian rules active: grow
   const { ladderMark, rungOf } = await import('../src/sim/ladder');
   const { devActor, stageForScale } = await import('../src/sim/devonian/state');
   const g = new Game('rise', [{ creature: 'coccosteus', device: 'keyboard', ready: true }]);
+  g.skipHatch();
   const p = g.players[0];
   for (let i = 0; i < 30; i++) tick(g, new Map<number, InputFrame>([[0, emptyInput()]]));
   p.spawnProtect = 0; p.teleportCd = 0; p.state = 'free';
@@ -488,6 +509,7 @@ ok(RULES !== undefined && !RULES.growthByNutrition, 'Devonian rules active: grow
 {
   const solo = (id: CreatureId, at?: { x: number; z: number }) => {
     const g = new Game('reef', [{ creature: id, device: 'keyboard', ready: true }], 17);
+    g.skipHatch();
     const p = g.players[0];
     const x = at?.x ?? 20, z = at?.z ?? -140;
     p.pos = { x, y: groundHeight(g.world, x, z, []) + 8, z };
@@ -605,6 +627,10 @@ ok(RULES !== undefined && !RULES.growthByNutrition, 'Devonian rules active: grow
   // speed / that distance: screens per second. The Cambrian band at full size is 0.61–1.30.
   const mag = (L: number) => L * 1.45 + 1.15 + Math.max(0, 0.8 - L) * 0.9;
   const { PLAYABLE } = await import('../src/sim/creatures');
+const { hasEquivalentSizing, naturalSizing, setEquivalentSizing } = await import('../src/sim/creatures');
+const { massOf } = await import('../src/sim/actors');
+const { tierScale } = await import('../src/sim/tiers');
+const { TIER_SCALE } = await import('../src/sim/types');
   const research = JSON.parse(fs.readFileSync('docs/research/devonian-swimming.json', 'utf8')) as { id: string; lengthM: number; burstBLs: number; cruiseBLs: number }[];
   for (const c of DEVONIAN.creatures) {
     const adult = c.speed / mag(c.adultLength), sprint = adult * c.burst;
@@ -636,6 +662,7 @@ ok(RULES !== undefined && !RULES.growthByNutrition, 'Devonian rules active: grow
     { creature: 'onychodus', device: 'keyboard', ready: true }, { creature: 'cheirolepis', device: 0, ready: true },
     { creature: 'stethacanthus', device: 1, ready: true }, { creature: 'gemuendina', device: 2, ready: true },
   ]);
+  g.skipHatch();
   ok(HEAVY_SPECIALS.has('tuskLunge') && HEAVY_SPECIALS.has('jawShear') && BURROWERS.has('gemuendina'), 'Devonian specials are installed with the game');
   // A heavy special replaces the heavy bite rather than adding to it, so it must never hit softer
   // than the bite it displaced. Every one of them was, before the floor in `specialHit`: the jaw
@@ -684,6 +711,7 @@ ok(RULES !== undefined && !RULES.growthByNutrition, 'Devonian rules active: grow
 {
   for (const [id, target] of [['dunkleosteus', 'cladoselache'], ['cladoselache', 'coccosteus'], ['coccosteus', 'doryaspis']] as const) {
     const g = new Game('reef', [{ creature: id, device: 'keyboard', ready: true }]);
+    g.skipHatch();
     const a = g.players[0];
     const idle = () => new Map<number, InputFrame>([[0, emptyInput()]]);
     for (let i = 0; i < 90; i++) tick(g, idle());
@@ -704,6 +732,7 @@ ok(RULES !== undefined && !RULES.growthByNutrition, 'Devonian rules active: grow
 // ---- crush bite cracks shells; floor sweep feeds standing ----
 {
   const g = new Game('rise', [{ creature: 'rhinodipterus', device: 'keyboard', ready: true }, { creature: 'doryaspis', device: 0, ready: true }]);
+  g.skipHatch();
   const [lung, dory] = g.players;
   const idle = () => new Map<number, InputFrame>([[0, emptyInput()], [1, emptyInput()]]);
   for (let i = 0; i < 90; i++) tick(g, idle());     // through the hatch-in, still protected
@@ -730,6 +759,7 @@ ok(RULES !== undefined && !RULES.growthByNutrition, 'Devonian rules active: grow
   ok(SURFACE_Y >= 60, `the Devonian water column is deep (surface at ${SURFACE_Y}, the Cambrian's is 40)`);
   ok(FLORA_PHYS.lilyColumn.h >= 8 && FLORA_PHYS.frondTower.h >= 5, `tall kinds reach into the column (lily ${FLORA_PHYS.lilyColumn.h}, frond tower ${FLORA_PHYS.frondTower.h})`);
   const g = new Game('rise', [{ creature: 'cladoselache', device: 'keyboard', ready: true }, { creature: 'bothriolepis', device: 0, ready: true }]);
+  g.skipHatch();
   const [shark, plate] = g.players;
   const floorS = groundHeight(g.world, shark.pos.x, shark.pos.z), floorP = groundHeight(g.world, plate.pos.x, plate.pos.z);
   ok(coverAt(g.world, shark.pos, lengthOf(shark), []) > 0.2 && shark.pos.y > floorS + 0.3, `a swimmer hatches hidden in the plants, off the floor (cover ${coverAt(g.world, shark.pos, lengthOf(shark), []).toFixed(2)}, ${(shark.pos.y - floorS).toFixed(1)} up, ${(SURFACE_Y - floorS).toFixed(0)} of water)`);
@@ -744,6 +774,7 @@ ok(RULES !== undefined && !RULES.growthByNutrition, 'Devonian rules active: grow
 // so the hatchling of this shark clears the surface by less than its own length.
 {
   const g = new Game('reef', [{ creature: 'cladoselache', device: 'keyboard', ready: true }]);
+  g.skipHatch();
   const a = g.players[0];
   const step = (f: Partial<InputFrame> = {}) => { g.step(DT, new Map([[0, { ...emptyInput(), ...f } as InputFrame]])); const k = g.events.map((e) => e.kind); g.events.length = 0; return k; };
   for (let i = 0; i < 120; i++) step();
@@ -770,6 +801,7 @@ ok(RULES !== undefined && !RULES.growthByNutrition, 'Devonian rules active: grow
   ok(!a.airborne || a.pos.y > SURFACE_Y - 2, 'it is never airborne under water');
   // a crawler never does
   const g2 = new Game('rise', [{ creature: 'bothriolepis', device: 'keyboard', ready: true }]);
+  g2.skipHatch();
   const b = g2.players[0];
   for (let i = 0; i < 120; i++) { g2.step(DT, new Map([[0, emptyInput()]])); g2.events.length = 0; }
   b.pos.y = SURFACE_Y - 3; b.prevT.y = b.pos.y; b.spawnProtect = 0;
@@ -782,6 +814,7 @@ ok(RULES !== undefined && !RULES.growthByNutrition, 'Devonian rules active: grow
 {
   const { nurseryAt } = await import('../src/sim/world');
   const g = new Game('rise', [{ creature: 'coccosteus', device: 'keyboard', ready: true }]);
+  g.skipHatch();
   const p = g.players[0];
   const bots = g.actors.filter((a) => a.controller === 'bot');
   ok(bots.every((b) => Math.hypot(b.pos.x - p.pos.x, b.pos.z - p.pos.z) > 120), `bots hatch in other nurseries (nearest ${Math.min(...bots.map((b) => Math.hypot(b.pos.x - p.pos.x, b.pos.z - p.pos.z))).toFixed(0)} away)`);
@@ -796,6 +829,7 @@ ok(RULES !== undefined && !RULES.growthByNutrition, 'Devonian rules active: grow
   ok(!targeted && isAlive(p) && p.hp === p.hpMax, `an unprovoked shark leaves the hatchling alone in the nursery (goal ${shark.brain.goal}, hp ${p.hp}/${p.hpMax})`);
   // outside a nursery, in open water, the same shark is a shark
   const g2 = new Game('reef', [{ creature: 'coccosteus', device: 'keyboard', ready: true }]);
+  g2.skipHatch();
   const q = g2.players[0];
   q.pos.x = 120; q.pos.z -= 420; q.prevT.x = q.pos.x; q.prevT.z = q.pos.z; g2.world.loadAround(q.pos); q.spawnProtect = 0;
   for (let i = 0; i < 60; i++) { g2.step(DT, new Map([[0, emptyInput()]])); g2.events.length = 0; }
@@ -811,6 +845,7 @@ ok(RULES !== undefined && !RULES.growthByNutrition, 'Devonian rules active: grow
 {
   const { spawnInCover } = await import('../src/sim/devonian/swim');
   const g = new Game('rise', [{ creature: 'coccosteus', device: 'keyboard', ready: true }], 77);
+  g.skipHatch();
   g.rng = () => 0; // selects the first shelter; used to produce a negative array index for bots
   for (const id of ['eldredgeops', 'coccosteus'] as const) {
     const p = spawnInCover(g, nurseryAt(0), id, 0.3, -1);
@@ -822,6 +857,7 @@ ok(RULES !== undefined && !RULES.growthByNutrition, 'Devonian rules active: grow
 {
   const run = (seed: number) => {
     const g = new Game('rise', [{ creature: 'coccosteus', device: 'keyboard', ready: true }], seed);
+    g.skipHatch();
     const inputs = new Map<number, InputFrame>([[0, { ...emptyInput(), my: 1, burst: 1 }]]);
     for (let i = 0; i < 60 * 60; i++) tick(g, inputs);
     const p = g.players[0];
@@ -835,12 +871,13 @@ ok(RULES !== undefined && !RULES.growthByNutrition, 'Devonian rules active: grow
 // ---- modes end ----
 {
   const g = new Game('rise', [{ creature: 'dunkleosteus', device: 'keyboard', ready: true }]);
+  g.skipHatch();
   const d = devActor(g, g.players[0]);
   d.standing = 100; d.stage = PRIME_STAGE; d.primeT = HOLD_TO_WIN - 0.01;
   tick(g, new Map([[0, emptyInput()]]));
   ok(g.state.status === 'won' && g.state.winner === 0, `holding Prime wins (${g.state.message})`);
   const modes: Mode[] = ['rise', 'hunted', 'reef'];
-  for (const m of modes) { const gm = new Game(m, [{ creature: 'coccosteus', device: 'keyboard', ready: true }, { creature: 'cladoselache', device: 0, ready: true }]); for (let i = 0; i < 120; i++) tick(gm, new Map([[0, emptyInput()], [1, emptyInput()]])); ok(gm.state.status === 'playing', `${m} runs`); }
+  for (const m of modes) { const gm = new Game(m, [{ creature: 'coccosteus', device: 'keyboard', ready: true }, { creature: 'cladoselache', device: 0, ready: true }]); gm.skipHatch(); for (let i = 0; i < 120; i++) tick(gm, new Map([[0, emptyInput()], [1, emptyInput()]])); ok(gm.state.status === 'playing', `${m} runs`); }
 
   // Rise is co-op, so its result is a milestone: the sea can be carried on into.
   ok(g.continueMatch() && g.state.status === 'playing' && g.endless, 'Rise carries on after it is won');
@@ -852,6 +889,7 @@ ok(RULES !== undefined && !RULES.growthByNutrition, 'Devonian rules active: grow
   // Reef is co-op too; Hunter & Hunted is a contest between players and stays decided.
   ok(isCoop('rise') && isCoop('reef') && !isCoop('hunted'), 'rise and reef are co-op, hunted is versus');
   const hh = new Game('hunted', [{ creature: 'coccosteus', device: 'keyboard', ready: true }, { creature: 'cladoselache', device: 0, ready: true }]);
+  hh.skipHatch();
   hh.state = { status: 'won', winner: 0, message: 'done' };
   ok(!hh.continueMatch() && hh.state.status === 'won', 'a versus verdict is final');
 }
@@ -862,6 +900,7 @@ ok(RULES !== undefined && !RULES.growthByNutrition, 'Devonian rules active: grow
 // case wins on tier, which the Devonian never advances, so the era hook decides it.
 {
   const g = new Game('rise', [{ creature: 'coccosteus', device: 'keyboard', ready: true }]);
+  g.skipHatch();
   const p = g.players[0];
   ok(devActor(g, p).stage === 0, 'Rise starts at Hatchling');
   ok(lengthOf(p) >= 0.6 - 1e-6, `a hatchling is no shorter than 0.6 units (${lengthOf(p).toFixed(2)})`);
@@ -917,6 +956,25 @@ ok(RULES !== undefined && !RULES.growthByNutrition, 'Devonian rules active: grow
       ok(mean > 0.06, `${id} is not a silhouette in ${sch.name} (mean albedo ${mean.toFixed(3)})`);
     }
   }
+}
+
+// --- the Cambrian's sizing option does nothing here ---
+// The Devonian's lengths are already generated from the real animals (npm run devonian:stats), so
+// it carries no table to swap and must be untouched whichever way the setting is left. Everything
+// keyed off sizing asks `naturalSizing`, which is false here for exactly that reason.
+{
+  ok(!hasEquivalentSizing(), 'the Devonian offers no sizing option');
+  for (const on of [true, false]) {
+    setEquivalentSizing(on);
+    ok(!naturalSizing(), `the sizing option is inert with it ${on ? 'on' : 'off'}`);
+    for (const c of PLAYABLE) {
+      ok(TIER_SCALE.every((v, t) => Math.abs(tierScale(c.id, t) - v) < 1e-9), `${c.id} keeps the authored ladder`);
+    }
+    const g = new Game('rise', [{ creature: PLAYABLE[0].id, device: 'keyboard', ready: true }], 4);
+    const p = g.players[0];
+    ok(Math.abs(massOf(p) - p.scale ** 3) < 1e-9, `mass is cubed scale, as it always was (${massOf(p).toFixed(4)})`);
+  }
+  setEquivalentSizing(false);
 }
 
 console.log(`PASS: ${passes} Devonian checks`);

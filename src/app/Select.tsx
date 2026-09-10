@@ -6,7 +6,7 @@ import { RULES } from '../sim/era-rules';
 import { CreaturePortrait } from './CreaturePortrait';
 import { FeedbackButton } from './Feedback';
 import { PLAYER_COLORS } from '../render/engine';
-import { PLAYABLE as CREATURES, creature, type CreatureId } from '../sim/creatures';
+import { PLAYABLE as CREATURES, authoredCreature, creature, naturalSizing, realCm, type CreatureId } from '../sim/creatures';
 import type { Mode, PlayerSetup } from '../sim/types';
 import { CheckIcon, ChevronDown, Emblem, KeyboardIcon, PadIcon } from './icons';
 import { appBase } from '../shared/base';
@@ -222,6 +222,11 @@ export function SelectScreen(p: Props) {
         <div className={`crew crew-${p.players.length} ${compact ? 'compact' : ''}`}>
           {p.players.map((pl, i) => {
             const def = creature(pl.creature);
+            // The bars describe the fighter and must not move with the sizing option; the length
+            // beside the locality is what the sizing actually changes, so that is where it shows —
+            // and only while the roster is at those lengths.
+            const bars = authoredCreature(pl.creature);
+            const cm = naturalSizing() ? realCm(pl.creature) : undefined;
             return (
               <article key={i} className={`crew-card ${pl.ready ? 'ready' : ''}`} style={{ ['--player' as string]: PLAYER_COLORS[i] }}>
                 {pl.ready && <span key={'fx' + pl.creature} className="lock-fx" aria-hidden="true" />}
@@ -236,16 +241,16 @@ export function SelectScreen(p: Props) {
                 <CopyBox>
                   <span className="role">{def.ground ? 'SEAFLOOR' : 'SWIMMER'} · {def.role}</span>
                   <h2>{def.name}</h2>
-                  <small className="provenance">{def.kind && <b className="kind">{def.kind}</b>}{def.species} · {def.provenance ?? def.locality ?? 'Burgess Shale'}</small>
+                  <small className="provenance">{def.kind && <b className="kind">{def.kind}</b>}{def.species} · {def.provenance ?? def.locality ?? 'Burgess Shale'}{cm != null && <> · <b className="real-size">{cm} cm</b></>}</small>
                   <p className="tagline">{def.tagline}</p>
                   <BestRun mark={p.best[def.id]} carrying={!!p.carry[i]} rise={p.mode === 'rise'} scheme={s} onToggle={() => p.onCarry(i)} />
                   {!compact && (
                     <>
                       <div className="stats">
-                        <Stat label="Speed" v={stat(def.speed * def.burst, 14.6)} />
-                        <Stat label="Power" v={stat(def.heavy.damage, 26)} />
-                        <Stat label="Armor" v={stat(def.hp * (1 + def.defense), 233)} />
-                        <Stat label="Agility" v={stat(def.agility + def.turnRate, 8.6)} />
+                        <Stat label="Speed" v={stat(bars.speed * bars.burst, 14.6)} />
+                        <Stat label="Power" v={stat(bars.heavy.damage, 26)} />
+                        <Stat label="Armor" v={stat(bars.hp * (1 + bars.defense), 233)} />
+                        <Stat label="Agility" v={stat(bars.agility + bars.turnRate, 8.6)} />
                       </div>
                       {def.kindNote && <p className="kind-note">{def.kindNote}</p>}
                       <dl className="kit">

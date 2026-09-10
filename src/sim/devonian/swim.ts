@@ -1,6 +1,7 @@
 import { clamp, dot, heading, type Vec3 } from '../../shared/math';
 import { isAlive, lengthOf } from '../actors';
 import { creature, type CreatureId } from '../creatures';
+import { DIP_CHANCE } from '../locomotion';
 import type { Game } from '../game';
 import type { Actor } from '../types';
 import { coverAt, groundHeight, nurseryAt, nurseryFactor, NURSERY_R, SURFACE_Y } from '../world';
@@ -123,13 +124,20 @@ export function spawnY(ground: number, L: number, isGround: boolean): number {
   return ground + clamp((SURFACE_Y - ground) * 0.45, 1.2 + L * 0.5, SURFACE_Y - ground - 4);
 }
 
-/** Where an AI swimmer wanders to: anywhere in the column, biased up for the open-water bodies. */
+/**
+ * Where an AI swimmer wanders to: anywhere in the column, biased up for the open-water bodies and
+ * further up the bigger the body is. A bottom-feeder stays down whatever its size; anything else
+ * large keeps to the higher water, apart from the occasional pass over the floor (`DIP_CHANCE`),
+ * because a big fish is something you see go by overhead and not something lying on the sand.
+ */
 export function wanderY(a: Actor, ground: number, rng: () => number): number {
   const def = creature(a.creature);
   if (def.ground) return ground;
   const L = lengthOf(a);
   const benthic = def.diet === 'deposit' || def.diet === 'grazer' || def.ability === 'sandAmbush' || def.ability === 'floorSweep';
   const column = SURFACE_Y - 2 - (ground + 1 + L * 0.3);
-  const f = benthic ? rng() * 0.25 : 0.15 + rng() * 0.75;
+  const dip = !benthic && L > 2.5 && rng() < DIP_CHANCE;
+  const lo = benthic || dip ? 0 : clamp(0.15 + Math.max(0, L - 2.5) * 0.1, 0.15, 0.6);
+  const f = benthic ? rng() * 0.25 : dip ? rng() * 0.2 : lo + rng() * (0.95 - lo);
   return clamp(ground + 1 + L * 0.3 + column * f, ground + 1, SURFACE_Y - 2);
 }
