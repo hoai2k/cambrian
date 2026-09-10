@@ -74,8 +74,13 @@ function withNeighbour(opts: Parameters<typeof makeBrain>[3], gap: number, seed 
   for (const o of [...g.actors]) if (o.controller !== 'player') g.remove(o);
   g.skipHatch();
   p.spawnProtect = 1e9;                       // the checks are about the neighbour, not about dying
+  // Sized to the player, because these checks are about disposition and disposition only reaches
+  // as far as a peer: squaring up and holding ground are what an animal does to a *rival*, and
+  // something twice your length is a threat you leave, whatever your temper. At a flat scale of 1
+  // this pairing used to be a rival and stopped being one when the roster was re-sized to its
+  // natural lengths, so the checks below started reading the size rule rather than the temper.
   const pos = { x: p.pos.x + gap, y: p.pos.y, z: p.pos.z };
-  const n = g.spawn("opabinia", "ambient", pos, 1);
+  const n = g.spawn("opabinia", "ambient", pos, lengthOf(p) / creature('opabinia').adultLength);
   n.brain = makeBrain('needs', pos, g.rng, opts);
   n.spawnProtect = 0;
   return { g, p, n };
@@ -172,6 +177,11 @@ function withNeighbour(opts: Parameters<typeof makeBrain>[3], gap: number, seed 
       // the spawn is never hunted whatever the hour, and the sample would say nothing.
       for (let i = 0; i < 60 * 90; i++) {
         const t = i / 60;
+        // Hold the hour still. The window is a minute and a half and a phase is forty-eight
+        // seconds, so a sample that let the clock run spent three quarters of "at dusk" in the
+        // night that follows it — which made the reading mostly about night, and turned the
+        // check into a coin toss on whether one giant's hunger happened to cross inside it.
+        g.time = fraction * DAY_LENGTH;
         run(g, 1, { ...emptyInput(), worldMove: { x: Math.cos(t * 0.07), y: 0, z: Math.sin(t * 0.045) } });
         if (i % 20) continue;
         for (const a of g.actors) {
