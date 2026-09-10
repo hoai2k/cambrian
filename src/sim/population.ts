@@ -1,5 +1,5 @@
 import { clamp, hash2, type Rng } from '../shared/math';
-import { biomeWeights, nurseryFactor, SURFACE_Y } from './world';
+import { BIOME_DANGER, biomeWeights, dangerOf, nurseryFactor, SURFACE_Y } from './world';
 
 /**
  * What lives where.
@@ -45,11 +45,15 @@ export function areaProfile(x: number, z: number, seed: number): AreaProfile {
   const cx = Math.floor(x / AREA_CELL), cz = Math.floor(z / AREA_CELL);
   const h = hash2(cx * 1.37 + (seed % 977) * 0.013, cz * 2.11 + (seed % 641) * 0.017);
   const d = hash2(cz * 3.7 + 11.3, cx * 1.9 + (seed % 313) * 0.021);
-  // How far the biome itself leans towards grown animals: the nursery and the shallows are a
-  // hatchery, the channel, escarpment and basin are where the big bodies are.
-  const deep = w.channel * 0.7 + w.escarpment * 0.9 + w.basin + w.boulders * 0.25;
+  // How far the biome itself leans towards grown animals: how dangerous it is, straight off the
+  // same table that decides how a place looks and sounds. Size and menace are the same statement
+  // about a stretch of sea — the nursery and the shallows are a hatchery, the channel, the
+  // escarpment and the basin are where the big bodies are — so they are made from one number
+  // rather than from two lists that can drift apart. The old hand-rolled list left the sponge
+  // forest and the flats indistinguishable from open shelf, though the reef treats one as half
+  // again as dangerous as the other.
   const young = Math.max(nurseryFactor(x, z), w.shallows * 0.8 + w.nursery);
-  const lean = clamp(0.5 + deep * 0.55 - young * 0.75 + (h - 0.5) * 0.8, 0.02, 0.98);
+  const lean = clamp(0.5 + (dangerOf(w) - BIOME_DANGER.shelf) * 0.95 - young * 0.5 + (h - 0.5) * 0.8, 0.02, 0.98);
   // The lean spreads over the three bands: at 0 an area is all fingerlings, at 1 it is all adults,
   // and the middle is a working mixture rather than a flat third each.
   const large = clamp(lean * lean * 0.85, 0.01, 0.72);
