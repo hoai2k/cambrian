@@ -21,6 +21,9 @@ const DT = 1 / 60;
 function solo(id: CreatureId, seed = 11) {
   const g = new Game('reef', [{ creature: id, device: 'keyboard', ready: true }], seed);
   const p = g.players[0];
+  // Alone means alone: the reef's own animals are cleared so a measurement is about the body being
+  // measured and not about whatever swam past it.
+  for (const o of [...g.actors]) if (o.controller !== 'player') g.remove(o);
   p.pos = { x: 12, y: sampleHeight(12, -90) + 9, z: -90 };
   p.vel = { x: 0, y: 0, z: 0 }; p.yaw = 0; p.spawnProtect = 999;
   const step = (f: Partial<InputFrame> = {}) => {
@@ -101,11 +104,10 @@ const flat = (v: { x: number; z: number }) => Math.hypot(v.x, v.z);
   /**
    * Cross a bed of soft weed — the growth this is actually about — and see what it cost.
    *
-   * Held down on the way through. Weed grows off the floor and the floor falls away here, so a
-   * swimmer holding its depth simply sailed over the top of the bed: it finished four units clear
-   * of plants 1.8 tall, touched nothing, and came out with exactly the distance it went in with,
-   * which read as the drag being broken when it had never been asked for. The same input goes to
-   * both bodies and to both runs of each, so what is compared is still only the weed.
+   * Unheld, the swimmer finished four units clear of plants 1.8 tall and came out with exactly the
+   * distance it went in with, which read as the drag being broken when it had never been asked
+   * for. The same input goes to both bodies and to both runs of each, so what is compared is still
+   * only the weed.
    */
   const cross = (id: CreatureId, planted: boolean) => {
     const { g, p, step, into } = solo(id, 5);
@@ -119,7 +121,9 @@ const flat = (v: { x: number; z: number }) => Math.hypot(v.x, v.z);
       g.world.rebuild();
     }
     const from = { ...p.pos };
-    for (let i = 0; i < 150; i++) step({ my: -1, camYaw: 0, sink: true });   // straight into the bed, down in it
+    // Held down into the growth: a body that can swim simply rises over a weed bed given the
+    // chance (and does, in play), and the question here is what crossing *through* one costs.
+    for (let i = 0; i < 150; i++) step({ my: -1, camYaw: 0, sink: true });     // straight into the bed
     return Math.hypot(p.pos.x - from.x, p.pos.z - from.z);
   };
   const trilobiteOpen = cross('olenoides', false), trilobiteWeed = cross('olenoides', true);

@@ -32,7 +32,14 @@ h3 { font-size: 13px; letter-spacing: .12em; color: var(--ember); margin: 14px 0
 .screen-playing .vignette, .screen-results .vignette { opacity: .5; }
 
 /* ---------- Toolbar (bottom-right icon buttons) ---------- */
-.toolbar { position: absolute; right: 18px; bottom: 18px; display: flex; gap: 8px; z-index: 40; }
+/*
+ * The icon buttons keep out of the way of a player who has asked for a bare sea: bottom right
+ * normally, bottom left when the player who owns that corner has sense off, and not drawn at all
+ * when both bottom corners belong to players who do (`toolbarPlace` in src/app/toolbar-place.ts).
+ */
+.toolbar { position: absolute; bottom: 18px; display: flex; gap: 8px; z-index: 40; transition: left .25s ease, right .25s ease; }
+.toolbar-right { right: 18px; }
+.toolbar-left { left: 18px; }
 .icon-button { width: 44px; height: 44px; border-radius: 14px; border: 1px solid rgba(238,250,246,.18); background: rgba(6, 22, 28, .55); backdrop-filter: blur(14px); color: var(--foam); display: grid; place-items: center; transition: transform .15s, background .15s, border-color .15s; }
 .icon-button:hover { background: rgba(255, 91, 110, .22); border-color: rgba(255, 179, 107, .6); transform: translateY(-2px); }
 .icon-button:active { transform: translateY(0) scale(.96); }
@@ -462,6 +469,16 @@ input[type='checkbox'] { width: 20px; height: 20px; accent-color: var(--ember); 
 @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: .35; } }
 @keyframes fade-in { from { opacity: 0; } to { opacity: 1; } }
 
+/*
+ * Sense off leaves this and nothing else. Bright for a moment so the player sees what just
+ * happened, then down to something that barely marks the water — but never away, because it is the
+ * only thing left saying which button brings the readouts back.
+ */
+.sense-off-mark { position: absolute; left: 50%; bottom: 14px; transform: translateX(-50%); display: flex; align-items: center; gap: 7px; font: 600 11px/1 var(--font-display); letter-spacing: .14em; text-transform: uppercase; color: var(--foam); text-shadow: 0 1px 3px rgba(0,0,0,.7); pointer-events: none; animation: sense-off-settle 2.6s ease-out both; }
+.sense-off-mark .btn { min-width: 1.5em; padding: .25em .4em; border-radius: .5em; border: 1px solid currentColor; font-size: .95em; letter-spacing: .06em; text-shadow: none; }
+@keyframes sense-off-settle { 0%, 25% { opacity: .85; } 100% { opacity: .26; } }
+@media (prefers-reduced-motion: reduce) { .sense-off-mark { animation: none; opacity: .3; } }
+
 /* Shown over a portrait only once it has kept us waiting (`useSlow`): a warm cache never sees it. */
 .portrait-wait { position: absolute; inset: 0; margin: auto; width: 26px; height: 26px; border-radius: 50%; border: 2px solid rgba(238,250,246,.18); border-top-color: var(--foam); animation: portrait-spin .9s linear infinite, fade-in .2s ease both; pointer-events: none; }
 @keyframes portrait-spin { to { transform: rotate(1turn); } }
@@ -544,6 +561,9 @@ input[type='checkbox'] { width: 20px; height: 20px; accent-color: var(--ember); 
 @keyframes focus-pulse { 0%, 100% { box-shadow: 0 10px 40px rgba(255, 91, 110, .4); transform: none; } 50% { box-shadow: 0 10px 56px rgba(255, 179, 107, .75); transform: translateY(-2px) scale(1.03); } }
 
 /* ---------- Aim crosshair (fixed at screen centre; steer the camera onto prey) ---------- */
+/* Dead centre, and it has to stay dead centre: `updateAim` picks its target by angular distance
+   from the camera's forward axis, so this reticle is a drawing of that axis rather than a thing of
+   its own. Sense off hides it and leaves the centre of the view to imply it. */
 .aim { position: absolute; left: 50%; top: 50%; width: 3.6em; height: 3.6em; transform: translate(-50%, -50%); transition: width .12s, height .12s; animation: fade-in .15s both; }
 .aim i { position: absolute; width: 1em; height: 1em; border: 2px solid currentColor; opacity: .55; transition: opacity .15s; }
 .aim i:nth-child(1) { left: 0; top: 0; border-right: 0; border-bottom: 0; }

@@ -44,6 +44,12 @@ function ovigers(P, work, ph) {
 const proboscis = (P, fwd, pump = 0) => { P.bend('proboscis', FWD, .9 * fwd); P.bend('oralTip', FWD, .3 * fwd + .1 * pump); };
 const body = (P, { noseDown = 0, fwd = 0, down = 0 }) => { P.spin('body', [1, 0, 0], noseDown); if (fwd || down) P.shift('body', [0, -down, fwd]); };
 
+/**
+ * Bones this performance authors. The chelifores, palps, ovigers and proboscis are the performance; the long walking legs and the
+ * trunk keep the shipped motion.
+ */
+export const authored = (n) => /^(scape|chela|finger|palp|oviger|proboscis|oralTip)/.test(n);
+
 export const clips = [
   {
     name: 'Bite', duration: 0.5, loop: false,

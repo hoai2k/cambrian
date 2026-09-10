@@ -611,10 +611,16 @@ export class Game implements AiWorld {
   private spawnAmbient(initial = false, near?: Vec3) {
     const c = CREATURE_IDS[Math.floor(this.rng() * CREATURE_IDS.length)];
     const def = creature(c);
-    const tierBias = this.maxPlayerTier();
-    // ambient scale spread widens as the players grow
-    const base = 0.28 + this.rng() * (0.5 + tierBias * 0.5);
-    const s = clamp(base * (this.rng() < 0.15 ? 1.6 : 1), 0.28, 2.4);
+    // The sea has its own ages in it, and they are not the player's. Ambient size used to widen
+    // with the biggest player, so a small animal met nothing but other small animals — a mirror
+    // rather than a sea. Now most of what passes is young, a third of it half grown, and one in
+    // eight a full adult on its way somewhere, rarer the larger it is. Meeting something enormous
+    // is meant to happen from the first minute; whether it is dangerous is the nursery's business,
+    // not its size's.
+    const roll = this.rng();
+    const s = clamp(roll < 0.55 ? 0.28 + this.rng() * 0.42
+      : roll < 0.88 ? 0.7 + this.rng() * 0.6
+      : 1.3 + this.rng() * this.rng() * 1.5, 0.28, 2.4);
     const anchor = near ?? this.randomAnchor();
     let pos: Vec3 | undefined;
     for (let tries = 0; tries < 20 && !pos; tries++) {
@@ -622,8 +628,8 @@ export class Game implements AiWorld {
       const x = anchor.x + Math.cos(a) * d, z = anchor.z + Math.sin(a) * d;
       if (shoreDistance(x, z) < 20) continue;
       if (!initial && this.players.some((p) => distXZ(p.pos, { x, y: 0, z }) < 55)) continue;
-      if (nurseryFactor(x, z) > 0.2 && s > 0.45) continue;
-      if (biomeAt(x, z) === 'nursery' && s > 0.6) continue;
+      // Nothing here turns big animals away from the nurseries any more: they are safe because
+      // nothing in one picks a fight (`peaceful` in ai.ts), not because only small things fit.
       const g = groundHeight(this.world, x, z, this.scratchBoulders);
       pos = { x, y: def.ground ? g + def.adultLength * s * 0.13 : g + 1.5 + this.rng() * 8, z };
     }
@@ -1385,9 +1391,10 @@ export class Game implements AiWorld {
         const nt = this.pickLockTarget(a, input.lookX > 0 ? 1 : -1, a.lockTarget);
         if (nt) { a.lockTarget = nt.id; a.comboT = 0.4; }
       }
-      // Sense: a display mode, held on or off. On, the band glyphs and the radar are drawn; off,
-      // nothing is drawn over the sea but the HUD. It costs nothing and never runs out — turning
-      // it off is for the look of the thing, not a trade.
+      // Sense: a display mode, held on or off. On, the whole panel is drawn — the gauges, the band
+      // glyphs, the radar; off, nothing is drawn over that player's sea at all but a faint line
+      // naming this button (`PlayerPanel` in src/app/Hud.tsx). It costs nothing and never runs out:
+      // turning it off is for the look of the thing, not a trade.
       if (justSense) {
         a.senseMode = !a.senseMode;
         // The ping is the toggle's own sound, both ways: it is how you know the button took.

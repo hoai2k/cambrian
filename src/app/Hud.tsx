@@ -9,7 +9,7 @@ import { BIOME_ART, biomeArtPath, radarGlyphPath } from '../shared/environment-a
 import { BAND_COLOR } from '../sim/types';
 import { CreaturePortrait } from './CreaturePortrait';
 import { appBase } from '../shared/base';
-import { fillControls, key } from '../shared/controls';
+import { fillControls, key, type Scheme } from '../shared/controls';
 
 export function Hud({ snapshot }: { snapshot: HudSnapshot }) {
   const W = snapshot.rects.reduce((m, r) => Math.max(m, r.x + r.w), 1);
@@ -28,7 +28,56 @@ export function Hud({ snapshot }: { snapshot: HudSnapshot }) {
   );
 }
 
+/**
+ * One player's half of the screen.
+ *
+ * Sense off is meant to read as the bare simulation: nothing over the sea at all. So it takes down
+ * the whole panel — the gauges, the name, the radar, the band marks, the day dial, the biome
+ * banner, the hints and warnings, even the red edges of low health — and leaves a single faint mark
+ * naming the button that brings it back.
+ *
+ * The aim reticle goes with the rest, and nothing is lost with it: it is drawn dead centre because
+ * `updateAim` picks its target by angular distance from the camera's forward axis, so with it gone
+ * the centre of the view is still the aim point — implied rather than drawn.
+ *
+ * Three things survive it, and they are all the player's own doing rather than a readout of the
+ * world: a menu they opened themselves (teleport, change-creature, the held scoreboard), the fade
+ * that takes the screen on a respawn, and the line that says what killed them — without that last
+ * one a death is a fade to black with no account of itself.
+ */
 function PlayerPanel({ p }: { p: PlayerHud }) {
+  const s = p.scheme;
+  return (
+    <>
+      {p.senseOn && <SensePanel p={p} />}
+      {!p.senseOn && <SenseOffMark s={s} />}
+      {p.teleport && <TeleportMenu t={p.teleport} s={s} />}
+      {p.swap && <SwapMenu swap={p.swap} s={s} />}
+      {p.board && <Scoreboard board={p.board} me={p.index} />}
+      <div className="fade" style={{ opacity: p.fade }} />
+      {p.spectating && !p.alive && (
+        <div className="spectating"><b>SPECTATING</b><span style={{ color: p.spectating.color }}>{p.spectating.name} · {creature(p.spectating.creature).name}</span></div>
+      )}
+      {!p.alive && p.fade < 0.9 && <DeathNote p={p} />}
+    </>
+  );
+}
+
+/**
+ * A single faint line saying the readouts are off and which button brings them back. It is bright
+ * for a moment as sense goes off — so the player sees what just happened — and then settles to
+ * something that barely registers against the water.
+ */
+function SenseOffMark({ s }: { s: Scheme }) {
+  return (
+    <div className="sense-off-mark" role="status" aria-label={`Readouts off. Press ${key('sense', s)} for sense.`}>
+      <span className="btn dpad">{key('sense', s)}</span><span>Sense off</span>
+    </div>
+  );
+}
+
+/** Everything sense draws over the sea. */
+function SensePanel({ p }: { p: PlayerHud }) {
   const def = creature(p.creature);
   // Every prompt on this half of the screen is written in whatever this player is holding.
   const s = p.scheme;
@@ -80,48 +129,19 @@ function PlayerPanel({ p }: { p: PlayerHud }) {
         </div>
       )}
       {p.notice && !p.board && <p className="notice">{p.notice}</p>}
-      {p.board && <Scoreboard board={p.board} me={p.index} />}
       <BiomeBanner biome={p.biome} alive={p.alive} />
       <DayPhase day={p.day} />
-      {p.senseOn && <Radar radar={p.radar} biome={p.biome} />}
-      {p.teleport && (
-        <div className="tele-menu">
-          <p className="eyebrow">TELEPORT</p>
-          <ul>
-            {p.teleport.options.map((o, k) => (
-              <li key={k} className={k === p.teleport!.index ? 'sel' : ''}>
-                <b>{o.label}</b>
-                <span>{o.detail} · {fmtDist(o.distance)}</span>
-              </li>
-            ))}
-          </ul>
-          <small>{p.teleport.cooldown > 0 ? `Ready in ${Math.ceil(p.teleport.cooldown)} s` : <><kbd>{key('confirm', s)}</kbd> go · <kbd>{key('back', s)}</kbd> back · <kbd>{key('teleport', s)}</kbd> next</>}</small>
-        </div>
-      )}
-      {p.swap && (
-        <div className="tele-menu swap-menu">
-          <p className="eyebrow">CHANGE CREATURE</p>
-          <div className="swap-body">
-            <CreaturePortrait creatureId={p.swap.creature} kind="thumb" assetBase={appBase()} alt="" draggable={false} loading="eager" />
-            <div>
-              <b>{p.swap.name}</b>
-              {p.swap.kind && <span className="swap-kind">{p.swap.kind}</span>}
-              <span className="swap-rung">{p.swap.rung}{p.swap.kept ? ' · your progress' : p.swap.grown ? ' · fully grown' : ' · hatchling'}</span>
-              <i className="swap-fill"><b style={{ transform: `scaleX(${p.swap.fill})` }} /></i>
-            </div>
-          </div>
-          <small><kbd>◀▶</kbd> {p.swap.index + 1}/{p.swap.count} · <kbd>{key('ability', s)}</kbd> {p.swap.grown ? 'grown' : 'hatchling'} · <kbd>{key('confirm', s)}</kbd> take it · <kbd>{key('back', s)}</kbd> back</small>
-        </div>
-      )}
+      <Radar radar={p.radar} biome={p.biome} />
       <div className="hud-bottom">
         <div className={`chip ability ${p.abilityUnlocked ? '' : 'locked'} ${p.abilityActive ? 'active' : ''}`} title={fillControls(hideDescription(def.id), s)}>
           <span className="btn y">{key('ability', s)}</span>
           <span className="chip-label">{p.abilityUnlocked ? p.abilityName : 'Hide'}</span>
           <i className="cool" style={{ transform: `scaleX(${p.abilityUnlocked ? p.abilityReady : 0})` }} />
         </div>
-        <div className={`chip sense ${p.senseOn ? 'ready active' : ''}`} title="Band marks and the radar. Off is the immersive view: nothing over the sea but this bar.">
-          <span className="btn dpad">{key('sense', s)}</span><span className="chip-label">Sense{p.senseOn ? '' : ' off'}</span>
-          <i className="cool" style={{ transform: `scaleX(${p.senseOn ? 1 : 0})` }} />
+        {/* Only ever drawn with sense on, so the chip is only ever the way out of it. */}
+        <div className="chip sense ready active" title="Band marks, the radar and the gauges. Off is the bare sea: nothing drawn over it at all.">
+          <span className="btn dpad">{key('sense', s)}</span><span className="chip-label">Sense</span>
+          <i className="cool" style={{ transform: 'scaleX(1)' }} />
         </div>
         <div className="tally"><span>{p.eats} eaten</span><span>{p.kills} kills</span><span>{p.escapes} escapes</span></div>
       </div>
@@ -153,12 +173,44 @@ function PlayerPanel({ p }: { p: PlayerHud }) {
           ))}
         </div>
       )}
-      <div className="fade" style={{ opacity: p.fade }} />
-      {p.spectating && !p.alive && (
-        <div className="spectating"><b>SPECTATING</b><span style={{ color: p.spectating.color }}>{p.spectating.name} · {creature(p.spectating.creature).name}</span></div>
-      )}
-      {!p.alive && p.fade < 0.9 && <DeathNote p={p} />}
     </>
+  );
+}
+
+/** Where else you could be, and how far. Opened with the teleport button, so sense never hides it. */
+function TeleportMenu({ t, s }: { t: NonNullable<PlayerHud['teleport']>; s: Scheme }) {
+  return (
+    <div className="tele-menu">
+      <p className="eyebrow">TELEPORT</p>
+      <ul>
+        {t.options.map((o, k) => (
+          <li key={k} className={k === t.index ? 'sel' : ''}>
+            <b>{o.label}</b>
+            <span>{o.detail} · {fmtDist(o.distance)}</span>
+          </li>
+        ))}
+      </ul>
+      <small>{t.cooldown > 0 ? `Ready in ${Math.ceil(t.cooldown)} s` : <><kbd>{key('confirm', s)}</kbd> go · <kbd>{key('back', s)}</kbd> back · <kbd>{key('teleport', s)}</kbd> next</>}</small>
+    </div>
+  );
+}
+
+/** The change-creature page of the same menu. */
+function SwapMenu({ swap, s }: { swap: NonNullable<PlayerHud['swap']>; s: Scheme }) {
+  return (
+    <div className="tele-menu swap-menu">
+      <p className="eyebrow">CHANGE CREATURE</p>
+      <div className="swap-body">
+        <CreaturePortrait creatureId={swap.creature} kind="thumb" assetBase={appBase()} alt="" draggable={false} loading="eager" />
+        <div>
+          <b>{swap.name}</b>
+          {swap.kind && <span className="swap-kind">{swap.kind}</span>}
+          <span className="swap-rung">{swap.rung}{swap.kept ? ' · your progress' : swap.grown ? ' · fully grown' : ' · hatchling'}</span>
+          <i className="swap-fill"><b style={{ transform: `scaleX(${swap.fill})` }} /></i>
+        </div>
+      </div>
+      <small><kbd>◀▶</kbd> {swap.index + 1}/{swap.count} · <kbd>{key('ability', s)}</kbd> {swap.grown ? 'grown' : 'hatchling'} · <kbd>{key('confirm', s)}</kbd> take it · <kbd>{key('back', s)}</kbd> back</small>
+    </div>
   );
 }
 
