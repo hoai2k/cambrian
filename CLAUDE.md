@@ -136,6 +136,14 @@ unless the user explicitly asks for a PR. Steps:
   derives both eras' tables and `npm run eras` enforces the split — an entry must claim model or
   clip work, whichever it claims must carry its reason, and animation-only work must not badge the
   animal.
+- Menu cursors move by where the buttons are, not by list order: `src/app/spatial-nav.ts` resolves a
+  direction against the buttons' own rectangles, so the pause and results rows answer left and
+  right, a column answers up and down, and the unused axis falls back to list order so no press is
+  ever swallowed (`npm run spatial`). On a pad, LB/RB step through every button a screen holds that
+  is not the screen's own business — the era link, the mode chips, the icons — one at a time and
+  round again, with A taking one and B giving the sticks back; landing on a mode chip picks it, as
+  the shoulders always did there. The ring is `src/app/focus-ring.ts` (`npm run focus`), and it is
+  owned by the pad that reached for it so the other seats on a shared choice screen keep picking.
 - `?debug=local` on either page (`/?debug=local`, `/devonian/?debug=local`) opens an editor for that
   era's saved state — `src/app/DebugLocal.tsx`, gated by `src/shared/debug.ts`, mounted by
   `src/app/Root.tsx` so both entry points get it without knowing about it. A new thing kept in
