@@ -1,7 +1,7 @@
 import { ACTIVE_ERA } from '../content';
 import { appBase } from '../shared/base';
 
-export function TitleScreen({ onStart, loaded, padCount }: { onStart: () => void; loaded: boolean; padCount: number }) {
+export function TitleScreen({ onStart, loaded, padCount, eraFocused = false }: { onStart: () => void; loaded: boolean; padCount: number; eraFocused?: boolean }) {
   const copy = ACTIVE_ERA.copy;
   const sibling = copy.sibling;
   return (
@@ -20,7 +20,7 @@ export function TitleScreen({ onStart, loaded, padCount }: { onStart: () => void
         // The other era, one click away and only from the title screen. Clicks and keys are kept
         // off the surrounding press-start surface, or following the link would also start a match.
         <a
-          className="era-switch"
+          className={`era-switch${eraFocused ? ' pad-focus' : ''}`}
           href={`${appBase()}${sibling.path}`}
           onClick={(e) => e.stopPropagation()}
           onKeyDown={(e) => e.stopPropagation()}

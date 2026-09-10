@@ -58,6 +58,29 @@ export function pulseThrust(phase: number): number {
  */
 export const pulseRefilling = (phase: number) => phase / PULSE_CYCLE > PULSE_THRUST + 0.15;
 
+/**
+ * Where in its `Swim` clip a bell should be, for a body at this point in its cycle. The clip is
+ * one cycle long with the squeeze filling exactly the thrust window, so scrubbing it here makes
+ * the contraction the player watches the water actually being thrown (`src/render/creature.ts`).
+ * Returned as a fraction of the clip so a frame of rounding in the export costs nothing.
+ */
+export const bellPhase = (pulseT: number) => pulseT / PULSE_CYCLE;
+
+/** How far over a bell tips at full tilt: apex well into the direction of travel, fringe trailing. */
+export const BELL_TILT = 1.15;
+
+/**
+ * How far from upright a bell should be tipped. A jellyfish going somewhere turns its apex into
+ * the direction of travel and trails its fringe behind it; one sinking or holding station relaxes
+ * and hangs upright. So this follows the *horizontal* part of the journey — climbing needs no
+ * tilt, because upright already points where it is going — and only while the animal is beating.
+ * The renderer eases toward it, which is the drift back to upright once nothing is being asked.
+ */
+export function bellTilt(flatSpeed: number, cruise: number, pulseT: number): number {
+  if (pulseT <= 0) return 0;                       // drifting, sinking, or holding station
+  return clamp(flatSpeed / Math.max(cruise, 0.1), 0, 1) * BELL_TILT;
+}
+
 // ---- drifting with the sea ----
 
 /**

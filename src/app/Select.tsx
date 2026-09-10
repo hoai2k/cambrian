@@ -22,6 +22,8 @@ interface Props {
   best: Partial<Record<CreatureId, number>>;
   /** Per seat: whether that player has asked to carry on from their record rather than hatch. */
   carry: boolean[];
+  /** Which mode chip the pad is pointing at, or -1 when the shoulder ring is elsewhere. */
+  modeFocus?: number;
   onPick: (i: number, c: CreatureId) => void; onReady: (i: number) => void; onRemove: (i: number) => void;
   onMode: (m: Mode) => void; onStart: () => void; onBack: () => void;
   onCarry: (i: number) => void;
@@ -184,8 +186,8 @@ export function SelectScreen(p: Props) {
       <header className="select-header">
         <BrandHeader onBack={p.onBack} />
         <div className="mode-picker" role="tablist" aria-label="Game mode">
-          {p.modes.map((m) => (
-            <button key={m} role="tab" aria-selected={p.mode === m} className={`mode-chip ${p.mode === m ? 'active' : ''}`} onClick={() => p.onMode(m)}>
+          {p.modes.map((m, i) => (
+            <button key={m} role="tab" aria-selected={p.mode === m} className={`mode-chip ${p.mode === m ? 'active' : ''}${i === p.modeFocus ? ' pad-focus' : ''}`} onClick={() => p.onMode(m)}>
               <img className="mode-art" src={`${ASSETS}${assetPaths.ui(`mode-${m}.webp`)}`} alt="" />
               <span>{p.modeInfo[m].name}</span><small>{p.modeInfo[m].players}</small>
             </button>

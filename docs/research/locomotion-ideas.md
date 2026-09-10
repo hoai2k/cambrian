@@ -95,7 +95,14 @@ feel *alien* next to the fish, which is exactly what they were.
 > first third of a 1.15 s cycle and nothing at all through the refill, so the animal surges and
 > coasts; sprint pressed while the bell is refilling fires the contraction *now* instead of waiting
 > for the beat, which is the rhythm in it. Its average speed is unchanged — it just arrives in
-> lumps.
+> lumps. Since 10 September the animation is the same thing rather than a loop running near it:
+> the `Swim` clip is exactly one cycle long with its squeeze filling exactly the thrust window, and
+> `src/render/creature.ts` scrubs the clip to the actor's own `pulseT` (`bellPhase`), so the bell
+> closing on screen is the water being thrown. Asking for nothing pins the phase at zero and the
+> animal falls back to `Idle`, the same beat at a third of the size and half the rate. The bell
+> also carries itself: `bellTilt` turns the apex into the direction of travel while it beats, and
+> it eases back upright when it is sinking, drifting or holding station — climbing needs no tilt,
+> because upright already points where it is going. `npm run locomotion` covers all of it.
 
 *Burgessomedusa, and to a lesser extent Ctenorhabdotus.* **Observed** in living medusae: swimming is
 discrete bell contractions with a passive relaxation between them, and the animal recaptures the

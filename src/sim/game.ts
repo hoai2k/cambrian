@@ -951,6 +951,9 @@ export class Game implements AiWorld {
     const egg = ladderRung(this, a) === 0;
     a.hatching = true; a.state = 'moult'; a.stateT = 0; a.stateDur = egg ? HATCH_TIME : 1.0;
     a.vel = v3();
+    // An era that places its own hatchlings (the Devonian's `spawnInCover`) has already laid the
+    // egg where it wants it; the Cambrian's spawn point is a point in the water, so lay it here.
+    if (egg && !RULES) this.layEgg(a);
     // Nothing may eat a body that cannot yet move: the shell is protection until it is out of it.
     if (egg) a.spawnProtect = Math.max(a.spawnProtect, HATCH_TIME + 1.5);
     this.events.push({ kind: egg ? 'hatch' : 'moult', pos: { ...a.pos }, actor: a.id, player: a.player, strength: egg ? 1 : 0.5 });
@@ -969,6 +972,34 @@ export class Game implements AiWorld {
       a.state = 'free'; a.stateT = 0; a.stateDur = 0; a.hatching = false;
       applyScaleStats(a, true); a.hp = a.hpMax;
     }
+  }
+
+  /**
+   * Where an egg is: on the sand, tucked against the nearest rock or plant. An egg does not float
+   * in open water, and the spawn point the body was handed is a point in the water, so the body
+   * is moved to the foot of the closest cover before the hatch starts (a jump, but the shell has
+   * not been drawn yet). With nothing to lean on it still goes down onto the floor.
+   */
+  private layEgg(a: Actor) {
+    const L = lengthOf(a) / 0.62;                       // what it will measure when it is out
+    let best: Cover | undefined, bd = Infinity;
+    for (const c of this.world.coverHash.query(a.pos.x, a.pos.z, 16, this.scratchCover)) {
+      const d = distXZ(a.pos, c.pos);
+      if (d < bd) { bd = d; best = c; }
+    }
+    let x = a.pos.x, z = a.pos.z;
+    if (best) {
+      const dx = a.pos.x - best.pos.x, dz = a.pos.z - best.pos.z;
+      const d = Math.max(Math.hypot(dx, dz), 1e-3);
+      const off = best.radius * 0.7 + L * 0.3;          // against its side, not inside it
+      x = best.pos.x + (dx / d) * off; z = best.pos.z + (dz / d) * off;
+      // Nose to the rock: the camera hangs behind the body, so this puts the open water behind
+      // the camera and the cover behind the egg, rather than a plant between the two.
+      a.yaw = Math.atan2(-dx, -dz);
+    }
+    const g = groundHeight(this.world, x, z, this.scratchBoulders);
+    a.pos = { x, y: g + L * 0.22, z };                  // the shell's own radius off the sand
+    a.prevT = { ...a.pos, yaw: a.yaw, pitch: a.pitch, bank: a.bank };
   }
 
   /** True while the body is still inside its shell: it cannot swim and nothing it presses counts. */

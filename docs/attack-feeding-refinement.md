@@ -212,3 +212,22 @@ six Devonian rigs, which are queued for model refinement, got the carried body m
 they are not worth polishing until their bodies settle. Every clip still keeps its `replaced/`
 copy, so the comparison in the viewer is now three-way in spirit: the shipped clip, the first
 pass (in git), and this one.
+
+## Also delivered — 10 September: two bodies that were not moving like themselves
+
+Neither is an attack-and-feeding item, but both came through the same pipeline.
+
+- **Ottoia** read as a torpedo: the shipped clips held the trunk rigid and moved the whole animal.
+  Its sixteen trunk rings now carry a travelling wave — lateral with a dorsoventral component,
+  growing toward the tail — through crawling, idling, turning, diving, rising, dodging, burrowing,
+  feeding and every attack, with the eversible throat leading or following it. `TurnLeft`,
+  `TurnRight`, `Dive` and `Rise` are authored around the pose at their midpoint, because the engine
+  uses those four as additive poses frozen there.
+- **Burgessomedusa** now pulses. See the pulse-and-glide entry in
+  `docs/research/locomotion-ideas.md` for how the clip and the simulation's beat became one thing,
+  and what the bell does with its apex. `Eat` keeps beating while the fringe holds the catch in
+  under the centre and the oral arms work it into the mouth at the bottom of the bell, which is
+  where the attachment pass already delivers it.
+
+Ctenorhabdotus is deliberately untouched: it is `swimStyle: 'omnidirectional'`, a comb jelly that
+swims on beating cilia rather than by contracting a bell, and it stays upright.
