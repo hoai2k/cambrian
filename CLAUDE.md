@@ -89,9 +89,13 @@ unless the user explicitly asks for a PR. Steps:
   flight whatever the attacker's size and however hurt the animal is, and an animal that has been
   fleeing the same attacker for two seconds and is still in its reach turns and fights (cornered).
   Nurseries are safe by non-aggression, not by size — `peaceful()` drops prey and rivals inside the
-  ring from an animal's reckoning but never its answer to being bitten — and ambient size is rolled
-  from the sea's own ages rather than the biggest player's tier, so something full grown passes by
-  from the first minute. `npm run reactions` guards all of it.
+  ring from an animal's reckoning (a mouthful taken in passing included) but never its answer to
+  being bitten — and ambient size is rolled from the sea's own ages rather than the biggest player's
+  tier, so something full grown passes by from the first minute. Where in the water a swimmer keeps
+  itself follows its length: `columnY` in `src/sim/locomotion.ts` raises the floor of a big body's
+  range so the largest animals pass overhead rather than lying on the sand, with about one wander in
+  six (`DIP_CHANCE`) a run down over the bottom. `npm run reactions` and `npm run locomotion` guard
+  all of it.
 - What a player has found — biomes, landmarks, species taken to the top, the Rise record — is
   written to `localStorage` as the match finds it (`recordFinds` in `src/app/codex.ts`), never at
   the results screen: a player who quits mid-match keeps what they found. The results screen marks

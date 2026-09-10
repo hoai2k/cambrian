@@ -4,7 +4,7 @@ import { BURROWERS, HEAVY_SPECIALS, DEFENSIVE_SPECIALS, CAMOUFLAGE_DRAIN, camouf
 import { abilitySpeed, beginExpansionAbility, beginHeavyStrike, heavyStrikeReach, specialHit, stepExpansionAbility, stepHeavyStrike, bloomRate, grazeRate } from './expansion-abilities';
 import { add, clamp, damp, dist, distXZ, dot, heading, len3, lerp, makeRng, norm, scale as vscale, sub, TAU, v3, wrapAngle, yawOf, type Rng, type Vec3 } from '../shared/math';
 import { applyScaleStats, bandOf, bodyRadius, canAct, clearanceOf, climbHeight, climbRise, floorClearance, glideOver, isAlive, isHidden, isInvulnerable, lengthOf, makeActor, massOf, speedFactor, staminaCost, tierForScale } from './actors';
-import { makeBrain, think, type AiWorld } from './ai';
+import { makeBrain, peaceful, think, type AiWorld } from './ai';
 import { huntingPressure, phaseAt, untilNextPhase, type Phase } from './daynight';
 import { applyHit, endRide, kill, RIDE_MAX, RIDE_STAMINA, startSwallow, type HitContext } from './combat';
 import { creature, CREATURE_IDS, PLAYABLE_IDS, type CreatureId, type MoveDef } from './creatures';
@@ -13,7 +13,7 @@ import { SpatialHash } from './spatial';
 import { clampMark, fillOf, ladderFill, ladderMark, ladderRung, ladderScale, LADDER_TOP, MARK_NEAR_TOP } from './ladder';
 import { emptyInput, isCoop, TIER_NAMES, TIER_NEED, TIER_SCALE, type Actor, type BrainState, type InputFrame, type Mode, type PlayerSetup, type Prompt, type SiltCloud, type Tier, type WorldEvent } from './types';
 import { BIOME_NAMES, biomeAt, biomeWeights, coverAt, groundHeight, LIGHT_WINDOW_Y, type Landmark, type LandmarkKind, microbialAt, nearestNursery, nurseryAt, nurseryFactor, resolveStatic, RISE_RATE, sampleCurrent, sampleHeight, shoreDistance, shoreZ, type StaticContact, SURFACE_Y, World, type Biome, type Boulder, type Cover, type Flora, type WorldData } from './world';
-import { DRIFT_CURRENT, driftRise, flipLaunch, FLIP_STAMINA, PULSE_CYCLE, pulseRefilling, pulseThrust, punting, rowWalkCurrent } from './locomotion';
+import { columnY, DIP_CHANCE, DRIFT_CURRENT, driftRise, flipLaunch, FLIP_STAMINA, PULSE_CYCLE, pulseRefilling, pulseThrust, punting, rowWalkCurrent } from './locomotion';
 
 export interface PlayerProgress {
   prompts: Prompt[];
@@ -585,7 +585,13 @@ export class Game implements AiWorld {
       // Nothing here turns big animals away from the nurseries any more: they are safe because
       // nothing in one picks a fight (`peaceful` in ai.ts), not because only small things fit.
       const g = groundHeight(this.world, x, z, this.scratchBoulders);
-      pos = { x, y: def.ground ? g + def.adultLength * s * 0.13 : g + 1.5 + this.rng() * 8, z };
+      // A crawler goes on the sand. A swimmer goes where a body its size belongs: small animals
+      // anywhere in the column including the bottom, a big one up in the water where it can be
+      // seen passing (`columnY`), with the occasional pass down over the floor.
+      const bodyL = def.adultLength * s;
+      pos = { x, y: RULES ? RULES.spawnY(g, bodyL, !!def.ground)
+        : def.ground ? g + bodyL * 0.13
+        : columnY(g, SURFACE_Y, bodyL, this.rng, bodyL > 2.5 && this.rng() < DIP_CHANCE), z };
     }
     if (!pos) return;
     const a = this.spawn(c, 'ambient', pos, s);
@@ -1933,6 +1939,8 @@ export class Game implements AiWorld {
       // Only small wild things go down in one gulp. Players and bots always get a fight (three bites from a giant).
       if (o.controller !== 'swarm' && o.controller !== 'ambient') continue;
       if (o.controller === 'ambient' && lengthOf(o) > lengthOf(a) * 0.3) continue;
+      // A nursery is a peace, and a mouthful taken in passing breaks it as surely as a hunt does.
+      if (peaceful(o.pos) && a.lastHitBy !== o.id) continue;
       if (dist(a.pos, o.pos) < L * 0.4 + bodyRadius(o) && (moving || a.state === 'attack')) this.consume(a, o);
     }
   }

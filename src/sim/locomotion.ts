@@ -103,3 +103,26 @@ export const punting = (a: Actor, floorGap: number) =>
  */
 export const rowWalkCurrent = (a: Actor, grounded: boolean) =>
   creature(a.creature).rowWalk ? (grounded ? 0.08 : 0.55) : undefined;
+
+// ---- how high in the water a body keeps itself ----
+
+/**
+ * How often a big animal's next wander is a run down over the bottom anyway. Roughly one in six: a
+ * large body feeds down there and passes through, it just does not live there.
+ */
+export const DIP_CHANCE = 0.18;
+
+/**
+ * Where in the water column a swimmer of length `L` puts itself. Small bodies use the whole of it,
+ * the sand included — that is where most of the reef lives, and at every age. A large swimmer does
+ * not lie on the bottom: the floor of its range rises with its length, so the biggest animals read
+ * as things that pass overhead rather than furniture on the seabed. It is a preference and not a
+ * ceiling — pass `dip` (see `DIP_CHANCE`) and a big body goes right down over the sand, which is
+ * where it feeds and where you actually get to meet one.
+ */
+export function columnY(ground: number, surface: number, L: number, rng: () => number, dip = false) {
+  const floor = ground + 1.5;
+  const column = Math.max(surface - 2 - floor, 0.5);
+  const lo = dip ? 0 : clamp(((L - 2.5) * 1.8) / column, 0, 0.55);
+  return clamp(floor + column * (lo + rng() * (1 - lo) * 0.9), ground + 1, surface - 2);
+}

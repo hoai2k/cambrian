@@ -9,6 +9,7 @@ import { applyScaleStats, bandOf, isAlive, lengthOf } from '../src/sim/actors';
 import { makeBrain } from '../src/sim/ai';
 import { dist } from '../src/shared/math';
 import { nurseryAt, nurseryFactor, sampleHeight } from '../src/sim/world';
+import { creature } from '../src/sim/creatures';
 import type { CreatureId } from '../src/sim/creatures';
 
 let failed = 0;
@@ -34,7 +35,11 @@ function pair(preyId: CreatureId, preyScale: number, playerScale: number, seed =
   if (tough) { n.hpMax = 5000; n.hp = n.hpMax; }
   n.brain = makeBrain('needs', { ...n.pos }, g.rng, {});
   const step = (f: Partial<InputFrame> = {}, chase = false) => {
-    if (chase) {   // hold the attacker within its own reach: this is what being cornered looks like
+    // A crawler settles on the sand and the attacker has to come down to it, or the bites simply
+    // pass overhead. Only the vertical is held, and only for a body that lives on the floor:
+    // getting away is the animal's own business.
+    if (creature(n.creature).ground) p.pos.y = n.pos.y;
+    if (chase) {   // hold it within its own reach as well: this is what being cornered looks like
       p.pos.x = n.pos.x; p.pos.z = n.pos.z + lengthOf(p) * 0.42; p.pos.y = n.pos.y;
       p.yaw = Math.PI;
     }
@@ -143,6 +148,26 @@ function harass(preyId: CreatureId, preyScale: number, playerScale: number, seco
     `${(grown * 100).toFixed(0)}% half grown or better`);
 }
 
+// --- and the big ones are up in the water, not lying on the sand ---
+{
+  const g = new Game('reef', [{ creature: 'waptia', device: 'keyboard', ready: true }], 3);
+  const m = new Map([[0, emptyInput()]]);
+  let bigLow = 0, bigSeen = 0, smallLow = 0, smallSeen = 0;
+  for (let i = 0; i < 60 * 150; i++) {
+    g.step(DT, m); g.events.length = 0;
+    if (i % 30) continue;
+    for (const a of g.actors) {
+      if (a.controller !== 'ambient' || !isAlive(a) || creature(a.creature).ground) continue;
+      const up = a.pos.y - sampleHeight(a.pos.x, a.pos.z);
+      if (lengthOf(a) > 4) { bigSeen++; if (up < 3) bigLow++; } else { smallSeen++; if (up < 3) smallLow++; }
+    }
+  }
+  check('the big swimmers are up in the water', bigSeen > 40 && bigLow / bigSeen < 0.3,
+    `${((bigLow / Math.max(bigSeen, 1)) * 100).toFixed(0)}% of ${bigSeen} sightings on the bottom`);
+  check('...where the small ones are all over it', smallLow / smallSeen > bigLow / bigSeen,
+    `${((smallLow / Math.max(smallSeen, 1)) * 100).toFixed(0)}% of ${smallSeen} small sightings on the bottom`);
+}
+
 // --- a nursery is safe because nothing in it starts anything, not because nothing big fits ---
 {
   const at = nurseryAt(0);
@@ -155,11 +180,15 @@ function harass(preyId: CreatureId, preyScale: number, playerScale: number, seco
   hunter.spawnProtect = 1e9; hunter.brain = makeBrain('needs', { ...hunter.pos }, g.rng, { hunger: 500 });
   const small = g.spawn('waptia', 'ambient', { x: at.x + 4, y, z: at.z + 2 }, 0.4);
   small.spawnProtect = 1e9; small.brain = makeBrain('needs', { ...small.pos }, g.rng, {});
+  const held = { ...small.pos };   // it stays in the nursery: the question is about the ring, not about it
   check('a nursery holds animals of any size', nurseryFactor(hunter.pos.x, hunter.pos.z) > 0.35 && lengthOf(hunter) > 6,
     `${lengthOf(hunter).toFixed(1)} m predator inside one`);
   const goals = new Set<string>();
   const m = new Map([[0, emptyInput()]]);
-  for (let i = 0; i < 60 * 30 && isAlive(small); i++) { g.step(DT, m); g.events.length = 0; goals.add(hunter.brain!.goal); }
+  for (let i = 0; i < 60 * 30 && isAlive(small); i++) {
+    small.pos = { ...held }; small.vel = { x: 0, y: 0, z: 0 };
+    g.step(DT, m); g.events.length = 0; goals.add(hunter.brain!.goal);
+  }
   check('...and the big one never starts on the small one there', !goals.has('hunt') && !goals.has('fight'),
     `goals ${[...goals].join(',')}`);
   check('...so the small one lives', isAlive(small), `hp ${(small.hp / small.hpMax).toFixed(2)}`);

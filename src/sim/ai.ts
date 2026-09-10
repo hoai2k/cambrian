@@ -1,6 +1,7 @@
 import { add, clamp, dist, distXZ, dot, heading, len3, norm, scale as vscale, sub, TAU, v3, type Rng, type Vec3 } from '../shared/math';
 import { bandOf, isAlive, isHidden, lengthOf } from './actors';
 import { RULES } from './era-rules';
+import { columnY, DIP_CHANCE } from './locomotion';
 import { creature } from './creatures';
 import type { Actor, BrainState, InputFrame, WorldEvent } from './types';
 import { emptyInput } from './types';
@@ -56,7 +57,10 @@ function pickWander(a: Actor, b: BrainState, rng: Rng, radius: number) {
   const shore = shoreDistance(x, z);
   if (shore < 28) z -= 28 - shore;
   const ground = sampleHeight(x, z);
-  const y = RULES ? RULES.wanderY(a, ground, rng) : creature(a.creature).ground ? ground : clamp(ground + 1.5 + rng() * (a.scale > 2 ? 12 : 6) * lengthOf(a) * 0.5, ground + 1, SURFACE_Y - 2);
+  const L = lengthOf(a);
+  const y = RULES ? RULES.wanderY(a, ground, rng)
+    : creature(a.creature).ground ? ground
+    : columnY(ground, SURFACE_Y, L, rng, L > 2.5 && rng() < DIP_CHANCE);
   b.wanderTo = { x, y, z };
 }
 
@@ -66,7 +70,7 @@ function pickWander(a: Actor, b: BrainState, rng: Rng, radius: number) {
  * of them is — but a nursery is not a spell: anything that gets bitten still answers, because
  * nothing in the sea does otherwise.
  */
-const peaceful = (p: Vec3) => nurseryFactor(p.x, p.z) > 0.35;
+export const peaceful = (p: Vec3) => nurseryFactor(p.x, p.z) > 0.35;
 
 /** Detection score update for hunters (giants, predators). 10 Hz. */
 export function updateDetection(g: AiWorld, hunter: Actor, b: BrainState, dt: number) {

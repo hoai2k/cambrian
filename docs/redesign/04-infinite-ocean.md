@@ -198,6 +198,12 @@ swims up to one has it recorded in `Game.discovery` for the results screen.
   adult (up to 2.4), rarer the larger it is. It used to be rolled against the
   biggest player's tier, so a small animal met nothing bigger than itself,
   which is a mirror rather than a sea (`spawnAmbient` in `src/sim/game.ts`).
+  Depth follows length: `columnY` in `src/sim/locomotion.ts` raises the floor of
+  a swimmer's range with its size, so small animals of every age use the whole
+  column including the sand and the big ones keep to the higher water — about
+  one wander in six (`DIP_CHANCE`) brings one down over the bottom. Crawlers are
+  on the floor whatever their size, and the Devonian's `wanderY` carries the same
+  bias with its own benthic exceptions.
 - **Precision.** Positions are doubles in the sim; the renderer's floats are
   good to a centimetre out to about 50 000 units from the origin, which is a
   couple of hours of sprinting in a straight line. A floating origin is the

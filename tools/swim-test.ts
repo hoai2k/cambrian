@@ -268,7 +268,12 @@ const rockWorld = (boulders: Boulder[]) => ({
     g.world.floraReach = Math.max(g.world.floraReach, 8);
     let peak = 0;
     const m = new Map([[0, { ...emptyInput(), my: 1, camYaw: Math.PI }]]);
-    for (let i = 0; i < 60 * 8; i++) { g.step(1 / 60, m); g.events.length = 0; peak = Math.max(peak, p.pos.y - sampleHeight(p.pos.x, p.pos.z)); }
+    // Only what the plant itself does to the body counts: past it the walk is over open floor with
+    // the whole reef on it, and whatever it climbs out there is a different question.
+    for (let i = 0; i < 60 * 8; i++) {
+      g.step(1 / 60, m); g.events.length = 0;
+      if (Math.hypot(p.pos.x - f.pos.x, p.pos.z - f.pos.z) < f.R + 3) peak = Math.max(peak, p.pos.y - sampleHeight(p.pos.x, p.pos.z));
+    }
     return { peak, past: f.pos.z - p.pos.z, height: f.H };
   };
   // A sac sponge big enough to stand up to this body: a firm bulb, broad right down at the sand.
