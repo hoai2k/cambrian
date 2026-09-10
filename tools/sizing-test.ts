@@ -48,9 +48,15 @@ check('turning it on takes', equivalentSizing());
   check('...and Marrella is the smallest', byLength[byLength.length - 1] === 'marrella', byLength.slice(-3).join(' < '));
   const lo = Math.min(...on.values()), hi = Math.max(...on.values());
   check('the adults spread out', hi / lo > 3, `${lo.toFixed(2)}–${hi.toFixed(2)} units (x${(hi / lo).toFixed(1)})`);
-  // The point of the constant: the sea does not get bigger, the roster spreads out inside it.
-  const wasHi = Math.max(...shippedLengths.values());
-  check('...without the sea getting any bigger', near(hi, wasHi, 0.02), `largest ${hi.toFixed(2)} against the shipped ${wasHi}`);
+  // The point of the constant: the average animal is the size the average animal already is, so the
+  // roster spreads out around what the sea holds today rather than shrinking under a pinned top.
+  const mean = (v: number[]) => v.reduce((a, b) => a + b, 0) / v.length;
+  const wasMean = mean([...shippedLengths.values()]), nowMean = mean([...on.values()]);
+  check('...around the size the roster already averaged', near(nowMean, wasMean, 0.02), `${nowMean.toFixed(2)} against the shipped ${wasMean.toFixed(2)}`);
+  check('...so the biggest animal is bigger than anything the sea held before',
+    hi > Math.max(...shippedLengths.values()) * 1.3, `largest ${hi.toFixed(2)} against the shipped ${Math.max(...shippedLengths.values())}`);
+  // The Devonian already puts a 16.3-unit body in the water, so that is the known ceiling.
+  check('...and an Apex of it still fits in the water', hi * 2.6 < 16.3, `Apex ${(hi * 2.6).toFixed(1)} units`);
   check('...and nothing shrinks below a body worth swimming', lo > LARVA_LENGTH * 1.35, `smallest adult ${lo.toFixed(2)} against a ${LARVA_LENGTH} larva`);
 }
 

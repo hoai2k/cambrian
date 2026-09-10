@@ -63,7 +63,8 @@ unless the user explicitly asks for a PR. Steps:
   *Equivalent sizing* (Settings, off by default) swaps in lengths taken from what the animals
   actually measured: `docs/research/cambrian-sizes.json` → `npm run cambrian:sizes` →
   `src/content/cambrian/equivalent-sizing.json`, which `npm run eras` checks. K is set so the
-  largest animal stays exactly where it is today, so the sea does not change size; speed, health and
+  roster's *average* adult is the average it is today, so the animals spread either side of the size
+  the sea already holds and the biggest one gets to be bigger than anything in it; speed, health and
   poise come with the length so a body of a given length fights as it always did, and the growth
   ladder becomes per-creature (`tierScale` in `src/sim/tiers.ts`) so everything hatches the same
   length. Every consumer goes through `creature()`, which is where the swap happens, and the option
