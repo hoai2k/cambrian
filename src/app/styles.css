@@ -787,3 +787,12 @@ input[type='checkbox'] { width: 20px; height: 20px; accent-color: var(--ember); 
 .standing-ticker span { opacity: .55; }
 .standing-ticker span:last-child { opacity: 1; color: var(--foam); }
 .blip-deadzone { filter: none; }
+
+/* Where the pad is pointing when the shoulder buttons have handed it a group of buttons that are
+   not the screen's own business — the era link, the mode chips, the icons in the corner. Loud
+   enough to find at a glance from a sofa, and the same mark on all three so the ring reads as one
+   thing. See src/app/focus-ring.ts. */
+.pad-focus { outline: 2px solid var(--ember); outline-offset: 3px; border-radius: 10px; }
+.icon-button.pad-focus { outline-offset: 2px; }
+.mode-chip.pad-focus { outline-offset: 2px; }
+.era-switch.pad-focus { outline-offset: 4px; }

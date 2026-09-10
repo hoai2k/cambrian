@@ -86,7 +86,11 @@ unless the user explicitly asks for a PR. Steps:
   punting, the row/walk gait, a rate-limited pitch, ram feeding, drifting and clinging. The
   mechanics live in `src/sim/locomotion.ts` and are keyed off the creature, never the era, because
   the same trait turns up in both: `npm run locomotion` covers the Cambrian bodies and
-  `npm run devonian` the Devonian ones. Which animal has what, and how well each is actually
+  `npm run devonian` the Devonian ones. A pulse swimmer's animation is that model rather than a
+  loop beside it: its `Swim` clip is one `PULSE_CYCLE` long with the squeeze filling the thrust
+  window, and the renderer scrubs the clip to the actor's `pulseT` (`bellPhase`) and turns the
+  apex into the direction of travel while it beats (`bellTilt`), so re-timing that clip breaks the
+  lock — which is what the bell cases in `npm run locomotion` are there to catch. Which animal has what, and how well each is actually
   attested, is `docs/research/locomotion-ideas.md`.
 - A body may shape itself to what it is on: `conformArms` bends a radial rig's arms onto the ground
   under them, or around a creature it is holding, after the mixer has written the pose
@@ -119,9 +123,11 @@ unless the user explicitly asks for a PR. Steps:
   `PASSER_BY` sends a large animal through the upper water whatever the seabed holds. Ambient brains
   wander within ~32 units of where they spawned, so a population stays in its biome.
 - Every player hatches out of an egg on the bottom rung: `HATCH_TIME` in `src/sim/game.ts` holds the
-  body still for five seconds (`skipHatch()` ends it for headless harnesses) and `src/render/eggs.ts`
-  draws the shell — pokes from inside, the split, the wriggle out. A moult above that rung is the
-  old one-second swell.
+  body still for five seconds (`skipHatch()` ends it for headless harnesses), `layEgg` puts the
+  Cambrian egg on the sand nose-to the nearest rock or plant (the Devonian's `spawnInCover` has
+  already chosen), and `src/render/eggs.ts` draws the shell — small, opaque, filled by the body,
+  pokes from inside, split open by the body growing into it. A moult above that rung is the old
+  one-second swell.
 - What a player has found — biomes, landmarks, species taken to the top, the Rise record — is
   written to `localStorage` as the match finds it (`recordFinds` in `src/app/codex.ts`), never at
   the results screen: a player who quits mid-match keeps what they found. The results screen marks
@@ -136,6 +142,14 @@ unless the user explicitly asks for a PR. Steps:
   derives both eras' tables and `npm run eras` enforces the split — an entry must claim model or
   clip work, whichever it claims must carry its reason, and animation-only work must not badge the
   animal.
+- Menu cursors move by where the buttons are, not by list order: `src/app/spatial-nav.ts` resolves a
+  direction against the buttons' own rectangles, so the pause and results rows answer left and
+  right, a column answers up and down, and the unused axis falls back to list order so no press is
+  ever swallowed (`npm run spatial`). On a pad, LB/RB step through every button a screen holds that
+  is not the screen's own business — the era link, the mode chips, the icons — one at a time and
+  round again, with A taking one and B giving the sticks back; landing on a mode chip picks it, as
+  the shoulders always did there. The ring is `src/app/focus-ring.ts` (`npm run focus`), and it is
+  owned by the pad that reached for it so the other seats on a shared choice screen keep picking.
 - `?debug=local` on either page (`/?debug=local`, `/devonian/?debug=local`) opens an editor for that
   era's saved state — `src/app/DebugLocal.tsx`, gated by `src/shared/debug.ts`, mounted by
   `src/app/Root.tsx` so both entry points get it without knowing about it. A new thing kept in

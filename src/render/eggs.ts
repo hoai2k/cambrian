@@ -6,10 +6,11 @@ import type { Actor } from '../sim/types';
  * The egg a hatchling comes out of.
  *
  * The simulation says only that a body is `hatching` and how far through its state clock it is
- * (`HATCH_TIME` in src/sim/game.ts, five seconds on the bottom rung). Everything here is the show:
- * a soft capsule with the animal curled inside it, taking a poke from within that pushes a bulge
- * out through the wall, then splitting along the top so the head can get out, then the wriggle
- * that shakes the rest of the body free and leaves the two halves of the shell drifting.
+ * (`HATCH_TIME` in src/sim/game.ts, five seconds on the bottom rung), and where it laid the egg:
+ * on the sand against a rock or a plant (`layEgg`). Everything here is the show: a small, mostly
+ * opaque capsule lying on its side that the animal fills, taking a poke from within that pushes a
+ * bulge out through the wall, swelling as the body starts to uncurl, then splitting along the top
+ * as it pushes out and leaving the two halves of the shell on the floor.
  *
  * Nothing in here feeds back into the sim, so it may use `Math.random` — a hatch that shimmers
  * differently on two machines is not a match that replayed differently.
@@ -45,9 +46,8 @@ class Egg {
       return g;
     };
     const mat = () => new THREE.MeshStandardMaterial({
-      color: 0xdff0e6, emissive: 0x86cbb4, emissiveIntensity: 0.45,
-      roughness: 0.22, metalness: 0, transparent: true, opacity: 0.42, side: THREE.DoubleSide,
-      depthWrite: false,
+      color: 0xe6dcc4, emissive: 0x6a5a3a, emissiveIntensity: 0.12,
+      roughness: 0.55, metalness: 0, transparent: true, opacity: 0.9, side: THREE.DoubleSide,
     });
     this.lid = new THREE.Mesh(shell(0, cut), mat());
     this.cup = new THREE.Mesh(shell(cut, Math.PI), mat());
@@ -58,16 +58,17 @@ class Egg {
       this.group.add(m);
     }
     this.group.position.copy(at);
-    this.group.scale.set(radius, radius * 1.18, radius);   // an egg is longer than it is wide
+    // An egg is longer than it is wide, and this one lies on its side along the body inside it.
+    this.group.scale.set(radius, radius, radius * 1.45);
     this.group.name = 'egg';
   }
 
   /** `t` is the hatch, 0..1. */
   update(t: number, dt: number, at: THREE.Vector3) {
     // The shell sits where it was laid; the animal is what leaves it.
-    if (t < 0.55) this.group.position.lerp(at, 1 - Math.exp(-dt * 2));
+    if (t < 0.5) this.group.position.lerp(at, 1 - Math.exp(-dt * 2));
     this.spin += dt * 0.35;
-    this.group.rotation.set(Math.sin(this.spin * 1.3) * 0.05, this.yaw + Math.sin(this.spin) * 0.09, Math.cos(this.spin * 0.9) * 0.05);
+    this.group.rotation.set(Math.sin(this.spin * 1.3) * 0.015, this.yaw, Math.cos(this.spin * 0.9) * 0.015);
 
     // Pokes from inside. They come faster as the animal runs out of room, and the last of them is
     // what opens the shell.
@@ -85,8 +86,10 @@ class Egg {
       if (this.pokes[i].t > this.pokes[i].dur) this.pokes.splice(i, 1);
     }
 
-    // Breathing, plus every live poke, written straight into the vertices.
-    const breath = 1 + Math.sin(t * 26) * 0.012;
+    // Breathing, the swell as the body inside starts to uncurl, and every live poke, written
+    // straight into the vertices.
+    const swell = Math.min(1, Math.max(0, (t - 0.38) / 0.2));
+    const breath = 1 + Math.sin(t * 26) * 0.01 + swell * 0.14;
     for (let m = 0; m < 2; m++) {
       const mesh = m === 0 ? this.lid : this.cup;
       const attr = mesh.geometry.attributes.position as THREE.BufferAttribute;
@@ -105,16 +108,16 @@ class Egg {
       mesh.geometry.computeVertexNormals();
     }
 
-    // The split, and then the fall.
-    const open = t <= 0.55 ? 0 : Math.min(1, (t - 0.55) / 0.22);
-    this.lid.position.y = open * 0.35;
-    this.lid.rotation.z = open * 1.5;
-    this.lid.position.x = open * 0.5;
-    const gone = t <= 0.78 ? 0 : Math.min(1, (t - 0.78) / 0.22);
+    // The split — pushed open by the body growing into it, on the sim's own growth curve — and
+    // then the halves left on the sand.
+    const open = t <= 0.48 ? 0 : Math.min(1, (t - 0.48) / 0.3);
+    this.lid.position.y = open * 0.25;
+    this.lid.rotation.z = open * 1.7;
+    this.lid.position.x = open * 0.7;
+    const gone = t <= 0.86 ? 0 : Math.min(1, (t - 0.86) / 0.14);
     for (const m of [this.lid, this.cup]) {
       const mat = m.material as THREE.MeshStandardMaterial;
-      mat.opacity = 0.42 * (1 - gone);
-      m.position.y -= gone * gone * 0.6 * (m === this.cup ? 1 : 0.2);
+      mat.opacity = 0.9 * (1 - gone);
     }
     this.group.visible = gone < 1;
   }
@@ -146,10 +149,9 @@ export class Eggs {
       this.at.set(a.pos.x, a.pos.y, a.pos.z);
       let egg = this.live.get(a.id);
       if (!egg) {
-        // The body is at a third of its hatched size at this point, so the shell is sized off what
-        // it is growing into rather than off what it is.
-        const full = lengthOf(a) / 0.62;
-        egg = new Egg(a.id, this.at, Math.max(0.25, full * 0.62), a.yaw);
+        // Sized to the body as it is inside, curled: the animal fills the egg, it does not float
+        // in it. The sim keeps it at 62% of hatched length until it starts to come out.
+        egg = new Egg(a.id, this.at, Math.max(0.12, lengthOf(a) * 0.36), a.yaw);
         this.live.set(a.id, egg);
         this.group.add(egg.group);
       }

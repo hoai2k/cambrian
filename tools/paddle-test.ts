@@ -63,10 +63,13 @@ function run(g: Game, p: ReturnType<typeof start>['p'], f: Partial<InputFrame>, 
   const { g, p } = start('olenoides');
   run(g, p, { rise: true }, 3);
   const high = p.pos.y - groundHeight(g.world, p.pos.x, p.pos.z, []);
-  const half = run(g, p, {}, 0.5);
+  // Over a second and a half rather than half of one: the settle eases in, so the first fraction
+  // of a second is almost still — which is the whole difference between a body sinking and a body
+  // dropping — and a window that short reads that as not sinking at all.
+  const half = run(g, p, {}, 1.5);
   const sank = high - half.above;
-  check('release sinks it gently', sank > 0.3 && sank < high * 0.75, `${sank.toFixed(2)} u in 0.5 s from ${high.toFixed(1)}`);
-  const down = run(g, p, {}, 6);
+  check('release sinks it gently', sank > 0.3 && sank < high * 0.75, `${sank.toFixed(2)} u in 1.5 s from ${high.toFixed(1)}`);
+  const down = run(g, p, {}, 8);
   check('...and it reaches the floor', down.above < 1, `${down.above.toFixed(2)} above the floor`);
   check('...and is grounded again', p.grounded, `grounded=${p.grounded}`);
 }
@@ -127,6 +130,50 @@ function run(g: Game, p: ReturnType<typeof start>['p'], f: Partial<InputFrame>, 
     const empty = run(g, p, { my: 1, camYaw: Math.PI, camPitch: -0.5 }, 2);
     check('...and an empty bar buys far less of it', empty.climbed < up.climbed * 0.8, `${empty.climbed.toFixed(2)} u against ${up.climbed.toFixed(2)} on a full bar`);
   }
+}
+
+// --- a shove aimed up takes a walker off the bottom along the line it chose ---
+// Only ever straight up by the button before this: the camera's pitch was thrown away while the
+// legs were down, so there was no way to leave the floor going anywhere in particular.
+{
+  const { swimPitch } = await import('../src/render/engine');
+  const up = swimPitch(-0.8);                        // camera aimed about 46 degrees above level
+  const shove = (f: Partial<InputFrame>, holdSeconds: number, totalSeconds: number) => {
+    const { g, p } = start('olenoides');
+    const floor = () => groundHeight(g.world, p.pos.x, p.pos.z, []);
+    run(g, p, {}, 1.5);                              // settle onto the bottom first
+    const from = p.pos.y - floor();
+    let peak = from;
+    for (let i = 0; i < 60 * totalSeconds; i++) {
+      const frame: InputFrame = i < 60 * holdSeconds ? { ...emptyInput(), ...f } : emptyInput();
+      g.step(1 / 60, new Map([[0, frame]])); g.events.length = 0;
+      peak = Math.max(peak, p.pos.y - floor());
+    }
+    return { from, peak, end: p.pos.y - floor(), grounded: p.grounded };
+  };
+  const aimed = { my: 1, camYaw: Math.PI, camPitch: up };
+  const dashed = shove({ ...aimed, dash: true }, 0.5, 16);
+  check('a dash aimed up carries a walker off the bottom', dashed.peak > dashed.from + 4, `${dashed.from.toFixed(1)} -> ${dashed.peak.toFixed(1)} above the floor`);
+  check('...and it settles back down again', dashed.end < dashed.peak * 0.3 && dashed.grounded, `back to ${dashed.end.toFixed(1)}, grounded=${dashed.grounded}`);
+  const sprinted = shove({ ...aimed, burst: 1 }, 2, 16);
+  check('a sprint aimed up does the same', sprinted.peak > sprinted.from + 3, `${sprinted.from.toFixed(1)} -> ${sprinted.peak.toFixed(1)}`);
+  const walked = shove(aimed, 4, 8);
+  check('...but merely walking uphill does not', walked.peak < walked.from + 1, `${walked.from.toFixed(1)} -> ${walked.peak.toFixed(1)}: the legs stay down`);
+}
+
+// --- up and down is a labour, not a bob ---
+{
+  const { g, p } = start('olenoides');
+  const floor = () => groundHeight(g.world, p.pos.x, p.pos.z, []);
+  run(g, p, { rise: true }, 4);
+  const high = p.pos.y - floor();
+  // A walker is not built for the water column: it climbs at well under a swimmer's rise and comes
+  // back down at a drift. Measured over the second after each begins, when both are at full pace.
+  const climbed = run(g, p, { rise: true }, 1).climbed;
+  run(g, p, {}, 0.8);                                          // let the settle take hold
+  const sank = -run(g, p, {}, 1).climbed;
+  check('a walker climbs at a labouring pace', climbed > 0.4 && climbed < 2.2, `${climbed.toFixed(1)} units in a second`);
+  check('...and comes down slower still', sank > 0.2 && sank < climbed, `${sank.toFixed(1)} units in a second, from ${high.toFixed(1)} up`);
 }
 
 // --- the seabed keeps its food ---------------------------------------------------------------
