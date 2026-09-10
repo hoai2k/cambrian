@@ -6,7 +6,7 @@ import { RULES } from '../sim/era-rules';
 import { CreaturePortrait } from './CreaturePortrait';
 import { FeedbackButton } from './Feedback';
 import { PLAYER_COLORS } from '../render/engine';
-import { PLAYABLE as CREATURES, creature, equivalentSizing, realCm, shippedCreature, type CreatureId } from '../sim/creatures';
+import { PLAYABLE as CREATURES, authoredCreature, creature, naturalSizing, realCm, type CreatureId } from '../sim/creatures';
 import type { Mode, PlayerSetup } from '../sim/types';
 import { CheckIcon, ChevronDown, Emblem, KeyboardIcon, PadIcon } from './icons';
 import { appBase } from '../shared/base';
@@ -223,9 +223,10 @@ export function SelectScreen(p: Props) {
           {p.players.map((pl, i) => {
             const def = creature(pl.creature);
             // The bars describe the fighter and must not move with the sizing option; the length
-            // beside the locality is what the option actually changes, so that is where it shows.
-            const bars = shippedCreature(pl.creature);
-            const cm = equivalentSizing() ? realCm(pl.creature) : undefined;
+            // beside the locality is what the sizing actually changes, so that is where it shows —
+            // and only while the roster is at those lengths.
+            const bars = authoredCreature(pl.creature);
+            const cm = naturalSizing() ? realCm(pl.creature) : undefined;
             return (
               <article key={i} className={`crew-card ${pl.ready ? 'ready' : ''}`} style={{ ['--player' as string]: PLAYER_COLORS[i] }}>
                 {pl.ready && <span key={'fx' + pl.creature} className="lock-fx" aria-hidden="true" />}

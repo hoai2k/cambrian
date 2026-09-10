@@ -167,12 +167,15 @@ export function biomeWeights(x: number, z: number, out: BiomeWeights = scratchW)
   out.shelf = rest;
   return out;
 }
-/** Blended danger (0..1) at a point, for the music and the HUD. */
-export function dangerAt(x: number, z: number) {
-  const w = biomeWeights(x, z);
+/** Blended danger (0..1) for a set of biome weights, for a caller that already has them. */
+export function dangerOf(w: Record<Biome, number>) {
   let d = 0;
   for (const b of BIOMES) d += w[b] * BIOME_DANGER[b];
   return d;
+}
+/** Blended danger (0..1) at a point: what the music, the HUD, appetite and body size all read. */
+export function dangerAt(x: number, z: number) {
+  return dangerOf(biomeWeights(x, z));
 }
 /** The dominant biome at a point. */
 export function biomeAt(x: number, z: number): Biome {
