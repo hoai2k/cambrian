@@ -642,6 +642,16 @@ export class Engine {
    * forward ray, inside range) becomes the target. Entering aim snaps the camera onto the best
    * candidate once, the way a console aim-assist does; after that the right stick steers freely.
    */
+  /**
+   * Who the aim button is pointing at: whatever sits closest to the camera's forward axis, inside a
+   * cone that is wide on entry (the snap) and tight afterwards.
+   *
+   * The axis *is* the middle of the viewport, and the crosshair is drawn there (`.aim`, at
+   * left/top 50%). That equivalence is the contract that lets sense off take the crosshair away
+   * with nothing lost: with no reticle drawn, the centre of the camera is the implied aim point,
+   * and it is the real one. Anything that moves the crosshair off centre, or picks a target from
+   * somewhere other than `fwd`, breaks the immersive view as well as the readout.
+   */
   private updateAim(cs: CamState, p: Actor | undefined, aiming: boolean, dt: number) {
     if (!p || !this.game) { cs.aimBlend = 0; cs.aimTarget = -1; return; }
     const wasAiming = cs.aimBlend > 0.5 || cs.aimSnapT > 0;

@@ -85,6 +85,13 @@ unless the user explicitly asks for a PR. Steps:
 - Devonian scenery and biome plates are procedural stand-ins: flora kinds and their density table in
   `src/content/devonian/environment.ts` + `src/render/sea.ts`, plates from `npm run devonian:plates`.
   Authored sets replace them without touching placement; see `docs/redesign/09-devonian-remaining.md`.
+- Every animal answers what bites it: `thinkNeeds` in `src/sim/ai.ts` turns any hit into fight or
+  flight whatever the attacker's size and however hurt the animal is, and an animal that has been
+  fleeing the same attacker for two seconds and is still in its reach turns and fights (cornered).
+  Nurseries are safe by non-aggression, not by size — `peaceful()` drops prey and rivals inside the
+  ring from an animal's reckoning but never its answer to being bitten — and ambient size is rolled
+  from the sea's own ages rather than the biggest player's tier, so something full grown passes by
+  from the first minute. `npm run reactions` guards all of it.
 - What a player has found — biomes, landmarks, species taken to the top, the Rise record — is
   written to `localStorage` as the match finds it (`recordFinds` in `src/app/codex.ts`), never at
   the results screen: a player who quits mid-match keeps what they found. The results screen marks

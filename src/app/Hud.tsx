@@ -36,6 +36,10 @@ export function Hud({ snapshot }: { snapshot: HudSnapshot }) {
  * banner, the hints and warnings, even the red edges of low health — and leaves a single faint mark
  * naming the button that brings it back.
  *
+ * The aim reticle goes with the rest, and nothing is lost with it: it is drawn dead centre because
+ * `updateAim` picks its target by angular distance from the camera's forward axis, so with it gone
+ * the centre of the view is still the aim point — implied rather than drawn.
+ *
  * Three things survive it, and they are all the player's own doing rather than a readout of the
  * world: a menu they opened themselves (teleport, change-creature, the held scoreboard), the fade
  * that takes the screen on a respawn, and the line that says what killed them — without that last

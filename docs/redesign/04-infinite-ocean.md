@@ -31,6 +31,13 @@ Tests: `tools/world-test.ts`, `tools/biome-tour.mjs`.
   clearing at its heart (nothing grows within ~8 units of the centre) so a
   hatchling is never wedged in the sponges, ringed by the dense growth that is
   the cover.
+- A nursery is safe because **nothing in one starts anything**, not because
+  only small animals fit in it: `peaceful()` in `src/sim/ai.ts` drops any prey
+  or rival standing inside the ring from an animal's reckoning, and drops what
+  an animal inside the ring will pick a fight over — but it never touches the
+  fight-or-flight answer, so anything bitten there still turns or runs. Full
+  adults pass through the pockets, and that is deliberate: the first minute of
+  a match should have something enormous in it.
 - Respawns go to the nursery **nearest another living player** (so a party
   stays together), or the nearest to where you died when you are alone; a
   nursery with a giant loitering in it is skipped. Your home for the teleport
@@ -186,6 +193,11 @@ swims up to one has it recorded in `Game.discovery` for the results screen.
   is given a new lair 130–210 units from a player, in the biome it belongs to
   (Anomalocaris in channels, escarpment and basin; Olenoides in boulders;
   Opabinia in the forest), never in a nursery.
+- **Ambient ages** are the sea's own, not the player's: 55% of what spawns is
+  young (scale 0.28–0.7), a third half grown (0.7–1.3) and one in eight a full
+  adult (up to 2.4), rarer the larger it is. It used to be rolled against the
+  biggest player's tier, so a small animal met nothing bigger than itself,
+  which is a mirror rather than a sea (`spawnAmbient` in `src/sim/game.ts`).
 - **Precision.** Positions are doubles in the sim; the renderer's floats are
   good to a centimetre out to about 50 000 units from the origin, which is a
   couple of hours of sprinting in a straight line. A floating origin is the
