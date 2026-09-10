@@ -166,5 +166,47 @@
       "Dash"
     ],
     "clipReason": "Newly authored for the grip mechanic and awaiting review: Grab is the animal taking hold with its feet \u2014 the clawed lobopods clamp in pairs and the dorsal spines stay clear \u2014 and doubles as the pose it holds while clinging to something bigger. Dash is the shove the engine had been borrowing the dodge for. Both are held for a contact-sheet review and a controller playtest; the clips they replace nothing, so the old fallbacks are one deletion away."
+  },
+  {
+    "id": "ottoia",
+    "status": "pending",
+    "scope": "attack-feeding-animation",
+    "model": false,
+    "clips": [
+      "Crawl",
+      "Idle",
+      "TurnLeft",
+      "TurnRight",
+      "Dive",
+      "Rise",
+      "Bite",
+      "Attack",
+      "Heavy",
+      "Dodge",
+      "Ability",
+      "Eat"
+    ],
+    "clipReason": "Re-authored 10 September so the animal moves like a worm rather than a torpedo: a travelling wave runs down the sixteen trunk rings through crawling, turning, diving, attacking and burrowing, with the eversible throat leading or following it. Awaiting review; every previous clip is kept as replaced/<name> in the viewer."
+  },
+  {
+    "id": "burgessomedusa",
+    "status": "pending",
+    "scope": "attack-feeding-animation",
+    "model": false,
+    "clips": [
+      "Swim",
+      "Idle",
+      "Rise",
+      "Dive",
+      "TurnLeft",
+      "TurnRight",
+      "Dodge",
+      "Ability",
+      "Bite",
+      "Heavy",
+      "Attack",
+      "Eat"
+    ],
+    "clipReason": "Re-authored 10 September as a bell that actually pulses: the squeeze fills the simulation's own thrust window and the renderer scrubs the clip to the actor's pulse, so the contraction is the water being thrown. Sinking relaxes the bell wide open, feeding keeps it beating while the fringe holds the catch under the mouth. Awaiting review; every previous clip is kept as replaced/<name>."
   }
 ]

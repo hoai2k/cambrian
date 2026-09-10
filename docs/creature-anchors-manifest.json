@@ -2236,8 +2236,8 @@
     "file": "ottoia.glb",
     "source": "tools/creatures/soft/anchors.json",
     "newSpecimen": true,
-    "updatedSHA256": "2a26b121394df1bb2d7c2005c6b8b1ff47a39297356aef73dc112c1d7919aba6",
-    "bytes": 2319740,
+    "updatedSHA256": "e69c2d59b9739d9141698de00f74209df82b5272f2e368f9d5f65a22d3d52821",
+    "bytes": 2498508,
     "changedClips": [],
     "anchors": [
       {
@@ -3040,8 +3040,8 @@
     "file": "burgessomedusa.glb",
     "source": "tools/creatures/jellies/anchors.json",
     "newSpecimen": true,
-    "updatedSHA256": "a02ce57f3ae03f734ec920538bc3d76187273aab2403a4bf12e3e03fed6b2076",
-    "bytes": 3048112,
+    "updatedSHA256": "1621356dd7d1da8811a21f6224aa12150e650be8a0e1cdca9a671b953593ea51",
+    "bytes": 4073480,
     "changedClips": [],
     "anchors": [
       {
