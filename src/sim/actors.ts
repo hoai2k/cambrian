@@ -53,9 +53,35 @@ export function applyScaleStats(a: Actor, keepFraction = true) {
   a.stamina = Math.min(a.stamina || a.staminaMax, a.staminaMax);
 }
 
-export function tierForScale(s: number): Tier {
+/**
+ * How long a Cambrian animal is when it hatches, in units — a hand's length of animal whatever it
+ * is going to become. An egg is the same size on the shelf whether an Anomalocaris or a Marrella
+ * is inside it, and the roster only feels like one sea if a hatchling of one species can be eaten
+ * by an adult of another. Anything whose adult body is barely bigger than this hatches at four
+ * fifths of it instead, because a Marrella cannot hatch out longer than a Marrella.
+ */
+export const HATCH_LENGTH = 0.7;
+
+/**
+ * The scale of one tier for a creature of this adult length. Adult and up are fixed multiples of
+ * the adult body (`TIER_SCALE`); Larva and Juvenile are pinned to `HATCH_LENGTH` at the bottom and
+ * step up geometrically, so every animal grows through the same number of rungs from about the
+ * same starting size to its own adult one.
+ */
+export function tierScale(adultLength: number, tier: number): number {
+  const t = clamp(Math.round(tier), 0, TIER_SCALE.length - 1);
+  if (t >= 2) return TIER_SCALE[t];
+  const s0 = Math.min(0.8, HATCH_LENGTH / Math.max(adultLength, 1e-3));
+  return t === 0 ? s0 : Math.sqrt(s0);      // s0 → 1.0 over the two moults to adult
+}
+
+/** The tier a body of this scale stands on. Without an adult length it reads the fixed rungs. */
+export function tierForScale(s: number, adultLength?: number): Tier {
   let best: Tier = 0;
-  for (let i = 0; i < TIER_SCALE.length; i++) if (s >= TIER_SCALE[i] * 0.98) best = i as Tier;
+  for (let i = 0; i < TIER_SCALE.length; i++) {
+    const at = adultLength === undefined ? TIER_SCALE[i] : tierScale(adultLength, i);
+    if (s >= at * 0.98) best = i as Tier;
+  }
   return best;
 }
 
@@ -65,7 +91,7 @@ export function makeActor(id: number, creatureId: CreatureId, controller: Contro
     // Yaw is set by the caller from the game's seeded RNG: nothing in the simulation may use
     // Math.random, or the same seed stops reproducing the same match.
     pos: { ...pos }, vel: v3(), yaw: 0, pitch: 0, bank: 0, roll: 0,
-    scale, tier: tierForScale(scale), nutrition: 0, ageGrowth: 0,
+    scale, tier: tierForScale(scale, creature(creatureId).adultLength), nutrition: 0, ageGrowth: 0,
     hp: 0, hpMax: 0, stamina: 0, staminaMax: 0, exhausted: 0, poise: 0, poiseMax: 0,
     state: 'free', stateT: 0, stateDur: 0, combo: 0, comboT: 0, hitDone: new Set(),
     iframes: 0, lockTarget: -1, guardHeld: 0,

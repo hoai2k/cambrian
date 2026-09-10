@@ -3,7 +3,7 @@ import { RULES } from './era-rules';
 import { BURROWERS, HEAVY_SPECIALS, DEFENSIVE_SPECIALS, CAMOUFLAGE_DRAIN, camouflageMatch, clearPursuit, stopHiding } from './concealment';
 import { abilitySpeed, beginExpansionAbility, beginHeavyStrike, heavyStrikeReach, specialHit, stepExpansionAbility, stepHeavyStrike, bloomRate, grazeRate } from './expansion-abilities';
 import { add, clamp, damp, dist, distXZ, dot, heading, len3, lerp, makeRng, norm, scale as vscale, sub, TAU, v3, wrapAngle, yawOf, type Rng, type Vec3 } from '../shared/math';
-import { applyScaleStats, bandOf, bodyRadius, canAct, clearanceOf, climbHeight, climbRise, floorClearance, glideOver, isAlive, isHidden, isInvulnerable, lengthOf, makeActor, massOf, speedFactor, staminaCost, tierForScale } from './actors';
+import { applyScaleStats, bandOf, bodyRadius, canAct, clearanceOf, climbHeight, climbRise, floorClearance, glideOver, isAlive, isHidden, isInvulnerable, lengthOf, makeActor, massOf, speedFactor, staminaCost, tierForScale, tierScale } from './actors';
 import { makeBrain, peaceful, think, type AiWorld } from './ai';
 import { huntingPressure, phaseAt, untilNextPhase, type Phase } from './daynight';
 import { applyHit, endRide, kill, RIDE_MAX, RIDE_STAMINA, startSwallow, type HitContext } from './combat';
@@ -265,6 +265,9 @@ interface Step {
   relief: number; freeClimb: boolean;
 }
 
+/** The scale a body of this creature starts a mode on: its own tier ladder, not a flat multiple. */
+const tierStart = (id: CreatureId, tier: number) => tierScale(creature(id).adultLength, tier);
+
 export class Game implements AiWorld {
   world: WorldData;
   actors: Actor[] = [];
@@ -344,7 +347,8 @@ export class Game implements AiWorld {
       // `tierForScale`, the Devonian's stage through `stageForScale` — so one number does it.
       const carry = mode === 'rise' ? clampMark(s.startRung ?? 0) : 0;
       const startScale = carry > 0 ? ladderScale(s.creature, carry)
-        : RULES ? RULES.startScale(mode, this.eraRoleIndex(i), s.creature) : mode === 'rise' ? TIER_SCALE[0] : mode === 'hunted' ? (this.isHunter(i) ? 3.0 : TIER_SCALE[1]) : mode === 'reef' ? TIER_SCALE[2] : TIER_SCALE[1];
+        : RULES ? RULES.startScale(mode, this.eraRoleIndex(i), s.creature)
+        : tierStart(s.creature, mode === 'rise' ? 0 : mode === 'hunted' ? (this.isHunter(i) ? 3 : 1) : mode === 'reef' ? 2 : 1);
       const a = this.spawn(s.creature, 'player', this.spawnPoint(nursery, s.creature, startScale, i), startScale, i);
       // Arriving on the top rung means the goal is already behind you: no clock, just the sea.
       a.carriedTop = carry >= LADDER_TOP;
@@ -359,7 +363,7 @@ export class Game implements AiWorld {
       for (let i = setups.length; i < 4; i++) {
         const c = this.pickBot(setups.map((s) => s.creature), i);
         // Bots are never the giant: the loop starts past the human seats, so `i` is never 0.
-        const botScale = RULES ? RULES.startScale(mode, i, c) : TIER_SCALE[1];
+        const botScale = RULES ? RULES.startScale(mode, i, c) : tierStart(c, 1);
         // an era may hatch its bots in a different nursery, so the players' one is a quiet start
         const botHome = RULES?.botNursery(i) ?? nursery;
         // keep every hatching ground loaded: streaming around one point alone would drop the others
@@ -816,7 +820,7 @@ export class Game implements AiWorld {
     if (RULES) RULES.onRespawn(this, a);
     else if (a.tier > 0 && this.mode !== 'reef') {
       const frac = a.nutrition / TIER_NEED[a.tier];
-      a.tier = (a.tier - 1) as Tier; a.scale = TIER_SCALE[a.tier];
+      a.tier = (a.tier - 1) as Tier; a.scale = tierScale(def.adultLength, a.tier);
       a.nutrition = TIER_NEED[a.tier] * clamp(frac * 0.5 + 0.35, 0, 0.9);
     } else a.nutrition *= 0.5;
     if (this.mode === 'hunted' && this.isHunter(a.player) && !RULES) { a.scale = 3.0; a.tier = 3; }
@@ -1517,8 +1521,8 @@ export class Game implements AiWorld {
     } else if (a.state === 'moult') {
       const t = clamp(a.stateT / a.stateDur, 0, 1);
       const era = RULES?.moultScale(this, a);
-      const to = era ? era.to : this.mode === 'hunted' && this.isHunter(a.player) ? a.scale : TIER_SCALE[a.tier];
-      const from = a.hatching ? to * 0.3 : era ? era.from : TIER_SCALE[Math.max(0, a.tier - 1) as Tier];
+      const to = era ? era.to : this.mode === 'hunted' && this.isHunter(a.player) ? a.scale : tierScale(def.adultLength, a.tier);
+      const from = a.hatching ? to * 0.3 : era ? era.from : tierScale(def.adultLength, Math.max(0, a.tier - 1));
       if (!(this.mode === 'hunted' && this.isHunter(a.player))) a.scale = lerp(from, to, t * t * (3 - 2 * t));
       if (a.stateT >= a.stateDur) { a.state = 'free'; a.stateT = 0; a.scale = to; applyScaleStats(a, true); a.hp = a.hpMax; a.hatching = false; }
     }
@@ -2277,7 +2281,7 @@ export class Game implements AiWorld {
     stopHiding(a); clearPursuit(a, this.actors);
     a.creature = id; a.scale = scale;
     applyScaleStats(a, false);
-    a.tier = tierForScale(a.scale);
+    a.tier = tierForScale(a.scale, creature(a.creature).adultLength);
     // The era resyncs whatever it keeps outside the actor before the meter is filled, or the fill
     // would be measured against the stage the *old* animal was on.
     RULES?.onSwap?.(this, a);
@@ -2561,7 +2565,7 @@ export class Game implements AiWorld {
       if (a.controller !== 'player' && a.controller !== 'bot') continue;
       const hunter = this.isHunter(a.player);
       a.tier = hunter ? 3 : 1;
-      a.scale = RULES ? RULES.startScale('hunted', hunter ? 0 : 1, a.creature) : hunter ? 3.0 : TIER_SCALE[1];
+      a.scale = RULES ? RULES.startScale('hunted', hunter ? 0 : 1, a.creature) : hunter ? 3.0 : tierStart(a.creature, 1);
       a.nutrition = 0;
       applyScaleStats(a, true);
       a.hp = a.hpMax; a.stamina = a.staminaMax; a.poise = a.poiseMax;

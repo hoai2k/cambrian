@@ -3,6 +3,13 @@ import type { CreatureId, MoveDef } from './creatures';
 
 export type Tier = 0 | 1 | 2 | 3 | 4;
 export const TIER_NAMES = ['Larva', 'Juvenile', 'Adult', 'Giant', 'Apex'] as const;
+/**
+ * The body scale of each tier, as a multiple of the creature's adult length — but only from Adult
+ * up. The two rungs below it are per creature and come from `tierScale` in actors.ts: everything
+ * hatches at about the same *absolute* size, the way an egg does, rather than at a quarter of
+ * whatever it will grow into (which had a larval Anomalocaris hatch out longer than a grown
+ * trilobite). These entries are what that ladder ends at, and what the giant rungs still mean.
+ */
 export const TIER_SCALE = [0.25, 0.5, 1.0, 1.7, 2.6] as const;
 /** Nutrition needed to leave each tier. */
 export const TIER_NEED = [30, 60, 85, 120, Infinity] as const;
