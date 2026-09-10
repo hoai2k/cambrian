@@ -13,6 +13,7 @@ import { ArmConform, type Surface } from './conform';
 import { schemeForCreature } from '../shared/palettes';
 import { creature, type CreatureId } from '../sim/creatures';
 import { lengthOf } from '../sim/actors';
+import { bellPhase, bellTilt } from '../sim/locomotion';
 import type { Actor } from '../sim/types';
 import { appBase } from '../shared/base';
 import type { AuthoredFeeding } from './attachments';
@@ -225,6 +226,42 @@ export class CreatureView {
     this.mixer.update(0); this.group.updateWorldMatrix(true, true);
   }
 
+  /** Where the bell is in its beat, and how far it is tipped over. Pulse swimmers only. */
+  private bellPulsing = false;
+  private bellTilt = 0;
+
+  /**
+   * A medusa swims in surges, and the surge *is* the animation. `pulseT` is the simulation's own
+   * place in the contraction (`src/sim/locomotion.ts`): the bell throws water over the first
+   * `PULSE_THRUST` of a `PULSE_CYCLE` and coasts through the refill. The `Swim` clip is exactly one
+   * cycle long with its squeeze filling exactly that window, so scrubbing the clip to `pulseT`
+   * makes the bell you watch close the water actually being thrown, rather than a loop running
+   * near it. Asking for nothing pins `pulseT` at zero, and the animal falls back to `Idle`, which
+   * is the same beat at a third of the size and half the rate.
+   *
+   * Returns true when it has taken charge of the locomotion layer.
+   */
+  private bell(a: Actor) {
+    if (this.def.swimStyle !== 'pulse') return false;
+    const swim = this.actions.get('Swim');
+    if (!swim) return false;
+    this.bellPulsing = a.pulseT > 0;
+    if (this.bellPulsing) {
+      this.playLoop('Swim');
+      if (this.loco === swim) { swim.paused = true; swim.time = bellPhase(a.pulseT) * swim.getClip().duration; }
+    } else {
+      swim.paused = false;
+      this.playLoop('Idle');
+    }
+    return true;
+  }
+
+  /** Eases toward `bellTilt`, which is the drift back to upright when nothing is being asked. */
+  private bellAim(a: Actor, cruise: number, dt: number) {
+    this.bellTilt = damp(this.bellTilt, bellTilt(Math.hypot(a.vel.x, a.vel.z), cruise, a.pulseT), 3.2, dt);
+    return this.bellTilt;
+  }
+
   /** Distant creatures stop casting shadows; the shadow pass does not frustum-cull these meshes. */
   setShadow(on: boolean) {
     if (this.shadowOn === on) return;
@@ -298,11 +335,12 @@ export class CreatureView {
         // A crawler off the seabed is paddling: keep its leg cycle running even when it is
         // barely translating, so the climb reads as swimming rather than hovering.
         const moving = speed > 0.35 || paddling;
-        this.playLoop(moving ? (def.ground ? 'Crawl' : 'Swim') : 'Idle');
+        if (this.bell(a)) { /* a bell picks its own clip and its own place in it */ }
+        else this.playLoop(moving ? (def.ground ? 'Crawl' : 'Swim') : 'Idle');
         // smaller creatures beat faster
         const rateScale = 1 / Math.pow(Math.max(a.scale, 0.1), 0.35);
         const beat = Math.max(speed, paddling ? cruise * 0.85 : 0);
-        this.loco?.setEffectiveTimeScale(moving ? clamp((beat / cruise) * rateScale, 0.5, 2.6) : 0.75 * rateScale);
+        if (!this.bellPulsing) this.loco?.setEffectiveTimeScale(moving ? clamp((beat / cruise) * rateScale, 0.5, 2.6) : 0.75 * rateScale);
       }
       // one-shots
       const inAttack = a.state === 'attack' || a.state === 'grabbing' || a.state === 'pounce' || (a.state === 'ability' && !held);
@@ -403,7 +441,8 @@ export class CreatureView {
         case 'anchor': oy = -L * 0.06 * k; break;
         case 'bristleFlare': sx = L * (1 + 0.12 * k); break;
       }
-    } else this.inner.rotation.x = damp(this.inner.rotation.x, 0, 8, dt);
+    } else if (def.swimStyle === 'pulse') this.inner.rotation.x = this.bellAim(a, cruise, dt);
+    else this.inner.rotation.x = damp(this.inner.rotation.x, 0, 8, dt);
     if (a.hideMode === 'burrowed') { const k = clamp(a.hideT / .6, 0, 1); oy -= L * .5 * k; sy *= 1 - .35*k; }
     // A body eaten in bites loses the meat itself, so it must not also shrink; one swallowed
     // whole has no bites to show and still closes down as it goes in.

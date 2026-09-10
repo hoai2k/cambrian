@@ -86,7 +86,11 @@ unless the user explicitly asks for a PR. Steps:
   punting, the row/walk gait, a rate-limited pitch, ram feeding, drifting and clinging. The
   mechanics live in `src/sim/locomotion.ts` and are keyed off the creature, never the era, because
   the same trait turns up in both: `npm run locomotion` covers the Cambrian bodies and
-  `npm run devonian` the Devonian ones. Which animal has what, and how well each is actually
+  `npm run devonian` the Devonian ones. A pulse swimmer's animation is that model rather than a
+  loop beside it: its `Swim` clip is one `PULSE_CYCLE` long with the squeeze filling the thrust
+  window, and the renderer scrubs the clip to the actor's `pulseT` (`bellPhase`) and turns the
+  apex into the direction of travel while it beats (`bellTilt`), so re-timing that clip breaks the
+  lock — which is what the bell cases in `npm run locomotion` are there to catch. Which animal has what, and how well each is actually
   attested, is `docs/research/locomotion-ideas.md`.
 - A body may shape itself to what it is on: `conformArms` bends a radial rig's arms onto the ground
   under them, or around a creature it is holding, after the mixer has written the pose
