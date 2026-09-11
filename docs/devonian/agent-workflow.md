@@ -24,6 +24,16 @@ in parallel; there is no required order among the six. Each rework gets its eye
 and general creature audits **after** its new candidate is frozen. Do not claim
 an old audit applies to new geometry.
 
+## The Blender hand-off is gone — 11 September 2026
+
+This document was written when execution lived on another machine, which is why every command is
+frozen into a hash-bound handoff. `npm run blender` now installs the pinned 5.2.1 into the session
+(`tools/blender-setup.sh`) and the builders reproduce there exactly, so sculpt, materials, rig,
+renders, export, packaging and intake all run in one place. Keep the hash discipline that still
+earns its place — never overwrite an archived candidate, verify an input before rebuilding on it —
+and drop the ceremony around commands that now run inline in seconds. The staging and the tier each
+stage actually needs are in `docs/model-queue-plan.md`.
+
 ## Delegation
 
 | Owner | Work | Budget and exit |

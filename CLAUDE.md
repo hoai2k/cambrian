@@ -27,6 +27,16 @@ unless the user explicitly asks for a PR. Steps:
 - Any change to a creature's model, colours or textures must go through
   `docs/creature-intake.md`: re-render, `npm run cards`, `npm run lods`, and
   `npm run check` must pass. The check flags stale images automatically.
+- The creature builders are Blender 5.2 Python and the version is not a detail: the glTF
+  exporter's `export_vertex_color='NAME'` is a 5.x option that 4.x does not have at all, so a 4.x
+  Blender will sculpt, shade and rig a creature and then fail on the export. `npm run blender`
+  installs the pinned 5.2.1 to `/opt/blender` (idempotent, upstream checksum, about half a minute
+  from cold), which is what a session should run before touching a builder. Doing this in the
+  environment's own setup script keeps it out of the session's way. The Linux build reproduces the
+  macOS one exactly: rebuilding Cheirolepis there gave byte-identical vertex positions across all
+  98,012 vertices, identical textures, accessors and clips, and passed packaging and
+  `tools/devonian/check.mjs`; only the meshopt-compressed byte stream differs, which the packager
+  verifies by value rather than by byte.
 - The sea is endless and streamed: `src/sim/world.ts` generates 64-unit chunks from the seed
   around every player, banded into nine biomes by distance from the one shoreline. Nothing may
   assume a world bound; anything that places things in the world must go through the biome

@@ -75,3 +75,21 @@ and is only good for comparing variants.
 
 Nothing here is accepted geometry. A real rebuild still owes scales, teeth, throat, opercula,
 materials, rig, all eighteen clips, the LOD and the full audit set.
+
+## V3 candidate — 11 September 2026
+
+`build_v3.py` is the redesign study carried into the real builder: V2 with the head profile, the
+eye, the five fin outlines and the fin-tip bone replaced by the study's values and nothing else.
+Run it with `/opt/blender/blender --background --python tools/devonian/creatures/cheirolepis/build_v3.py -- --skip-renders`;
+it writes to `../devonian-authoring/cheirolepis/v3-candidate/` and never into V2's directory.
+
+Evidence on the candidate: lossless packaging exact round-trip PASS (158,356 / 44,334 triangles,
+18 / 3 clips), `tools/devonian/check.mjs` PASS, and the packaged eye audit
+(`eye-audit-full-v3.json`, `eye-audit-lod-v3.json`) at 82.48% / 82.27% inside the continuous
+head for the full model and 82.53% / 82.35% for the reduced one, against V2's 80.12% / 79.86%
+and 79.99% / 79.72% — so the larger, more anterior eye seats better, as the study's proxy
+predicted. Loop seams and the head-envelope manifold assertion pass inside the builder.
+
+Not yet done: the user's acceptance, and the viewer / game-camera look that follows it. On
+acceptance, `build.py` points at V3, the family is packaged into `public/assets/devonian/creatures/`,
+and `validation.json` is regenerated from that build. V2 stays the shipped model until then.
