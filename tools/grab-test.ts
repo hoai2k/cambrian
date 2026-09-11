@@ -194,8 +194,13 @@ function inFront(p: Actor, o: Actor) {
   check('a lunge with the grip down ends up holding the prey', prey.held, `band ${prey.band}`);
   check('...and holding it does it no harm', prey.duringHold === 0, `${prey.duringHold.toFixed(0)} damage while held`);
   check('...and the meal is what the release is for', !isAlive(prey.o) && prey.p.eats > 0, `${prey.o.state}, ${prey.p.eats} eaten`);
-  const carried = pounceAt(0.5, 5);
-  check('...however long it is carried first', !isAlive(carried.o) && carried.p.eats > 0 && carried.duringHold === 0, `5 s in the mouth, ${carried.duringHold.toFixed(0)} damage`);
+  // ...but not however long. Carried past `GRIP_MEAL` from contact it is not a meal any more: it
+  // works loose and swims off, unhurt by having been carried around.
+  const carried = pounceAt(0.5, GRIP_MEAL + 1);
+  check('...but carried too long it gets away instead', isAlive(carried.o) && carried.p.eats === 0 && carried.duringHold === 0,
+    `${(GRIP_MEAL + 1).toFixed(0)} s in the mouth: ${carried.o.state}, ${carried.p.eats} eaten, ${carried.duringHold.toFixed(0)} damage`);
+  const inTime = pounceAt(0.5, 2);
+  check('...while a mouthful eaten in time is still the meal', !isAlive(inTime.o) && inTime.p.eats > 0, `${inTime.o.state}, ${inTime.p.eats} eaten`);
 
   // Grab a giant and let go and it is the blow the grip stood in for. Hold on past GRIP_STRIKE and
   // the grip has stopped being an attack entirely: the animal carrying you never learns you are

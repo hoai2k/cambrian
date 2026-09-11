@@ -1714,7 +1714,13 @@ export class Game implements AiWorld {
         // Fast enough to read as being carried rather than towed, and snapped once it is there so
         // the pair are rigidly joined and the grip does not visibly slip while the grabber turns.
         a.pos.x = damp(a.pos.x, target.x, 22, dt); a.pos.y = damp(a.pos.y, target.y, 22, dt); a.pos.z = damp(a.pos.z, target.z, 22, dt);
-        if (Math.hypot(a.pos.x - target.x, a.pos.y - target.y, a.pos.z - target.z) < lengthOf(a) * 0.05) a.pos = { ...target };
+        // Contact, from the mouthful's side: the grip has finished closing and the two are joined.
+        // The clock belongs to the grabber, because it is the grabber's release it decides, and it
+        // is set here because this is where the coming-together actually happens.
+        if (Math.hypot(a.pos.x - target.x, a.pos.y - target.y, a.pos.z - target.z) < lengthOf(a) * 0.05) {
+          a.pos = { ...target };
+          if (g.gripSyncT < 0) g.gripSyncT = 0;
+        }
         a.vel = v3();
         if (a.grabT <= 0) { a.state = 'free'; a.stateT = 0; a.grabbedBy = -1; g.state = 'free'; g.stateT = 0; g.grabbing = -1; g.graspSpent = true; a.iframes = 0.4; }
       }
