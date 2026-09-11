@@ -15,7 +15,8 @@ to `main`, so a session that runs out can be picked up from here without the con
 | Step | Status | Where it stands |
 | --- | --- | --- |
 | F triage (8 no-reference creatures) | **done** | 3 cleared, 2 small, 3 promoted — see below |
-| Cheirolepis from stage 4 | waiting on user | study at `tools/devonian/creatures/cheirolepis/redesign-study.py` |
+| Cheirolepis | **candidate built, waiting on user** | `build_v3.py` — package PASS, check PASS, eye audit 82.5/82.3 (V2 80.1/79.9). Comparison sheet sent. On yes: point `build.py` at v3, package into public/, regenerate validation.json, viewer look |
+| F small fixes (eldredgeops rig, manticoceras umbilicus) | **in progress** | two Medium (Sonnet) agents, each delivering a packaged candidate into the scratchpad `cand/<id>/` with package+check PASS; parent integrates. If this session died mid-run: re-run from their briefs in the conversation, or just rebuild — the fix is in `tools/devonian/creatures/<id>/` if they got that far |
 | B (gemuendina, dunkleosteus) | not started | |
 | A (cladoselache, tiktaalik) | not started | |
 | D resume reads | not started | |
