@@ -154,6 +154,15 @@ unless the user explicitly asks for a PR. Steps:
   era's saved state — `src/app/DebugLocal.tsx`, gated by `src/shared/debug.ts`, mounted by
   `src/app/Root.tsx` so both entry points get it without knowing about it. A new thing kept in
   `localStorage` should get a control there; `npm run debug` checks the gate.
+- `?debug=game` arms the match recorder instead of replacing the game: the pause menu grows one
+  button that walks Start → End → Export and hands a JSON file to the player's machine
+  (`src/app/debug-record.ts`, sampled from the engine's step loop). It is for answering "why did
+  that not work" with the match's own numbers. Each sample carries the input, the body, the bodies
+  near it — with the *surface* gap every reach test actually uses — and the simulation's own account
+  of the frame, written from inside the gates that decide (`Game.graspReason`) rather than
+  reconstructed beside them, so a recording can never disagree with what the game did. Anything that
+  gains a gate a player can fall foul of should say so there. `npm run record` checks that a
+  recording distinguishes a grab that worked from one that could not and names the reason.
 - The two typefaces are served from `public/fonts/`, not from fonts.googleapis.com: four
   variable WOFF2 files (one per family per Latin subset) declared over a weight range in
   `public/fonts/fonts.css`, which each entry page links. Both are OFL, and the licences ship

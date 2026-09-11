@@ -12,6 +12,8 @@ import { emptyCodex, hasNewFinds, loadCodex, mergeCodex, recordFinds, type Codex
 import { Hud } from './Hud';
 import { LoadingScreen, useSlow } from './Loading';
 import { Dialogs, PauseMenu, Results, type MenuItem } from './Overlays';
+import { debugGame } from '../shared/debug';
+import { exportRecording, recordingPhase, resetRecording, startRecording, stopRecording } from './debug-record';
 import { atMain, cycle, groupsFor, stops, type Focus, type FocusGroup } from './focus-ring';
 import { rectsOf, step as spatialStep, type Dir } from './spatial-nav';
 import { gridColumns, SelectScreen } from './Select';
@@ -93,6 +95,8 @@ export function App() {
   const modeRef = useRef<Mode>(MODES[0]);
   const [hud, setHud] = useState<HudSnapshot | null>(null);
   const [paused, setPaused] = useState(false);
+  /** The recorder's state, mirrored into React so the pause menu's one button can name itself. */
+  const [recPhase, setRecPhase] = useState(recordingPhase);
   const pausedRef = useRef(false);
   /**
    * The in-game menus (pause, results) are navigated rather than button-mapped: `menuSel` is the
@@ -708,13 +712,29 @@ export function App() {
       items.push({ label: 'Quit', run: backToSelect });
       return items;
     }
-    if (screen === 'playing' && paused) return [
-      { label: 'Resume', run: () => setPausedBoth(false), primary: true },
-      { label: 'Quit', run: backToSelect },
-    ];
+    if (screen === 'playing' && paused) {
+      const items: MenuItem[] = [{ label: 'Resume', run: () => setPausedBoth(false), primary: true }];
+      // The match recorder, and only when the URL asked for it (`?debug=game`). One button walking
+      // through its own three states, because that is the whole of the tool: record, stop, hand it
+      // over. Recording carries on while the menu is open — pausing to think is not a reason to
+      // lose the frames — and resuming is what gets you back to the action being recorded.
+      if (debugGame()) {
+        if (recPhase === 'idle') items.push({ label: 'Start recording', run: () => { startRecording(); setRecPhase('recording'); setPausedBoth(false); } });
+        else if (recPhase === 'recording') items.push({ label: 'End recording', run: () => { stopRecording(); setRecPhase('ready'); } });
+        else items.push(
+          { label: 'Export debug', run: () => { exportRecording(); } },
+          { label: 'Discard recording', run: () => { resetRecording(); setRecPhase('idle'); } },
+        );
+      }
+      items.push({ label: 'Quit', run: backToSelect });
+      return items;
+    }
     return [];
-  }, [screen, paused, hud?.canContinue, keepPlaying, playAgain, backToSelect]);
+  }, [screen, paused, recPhase, hud?.canContinue, keepPlaying, playAgain, backToSelect]);
   useEffect(() => { menuItemsRef.current = menuItems; }, [menuItems]);
+  // The recorder stops itself when its buffer fills, so the menu reads the real state whenever it
+  // opens rather than trusting what it last set.
+  useEffect(() => { if (paused) setRecPhase(recordingPhase()); }, [paused]);
 
   // A menu opening resets the cursor. The pause menu was asked for, so its highlight is there at
   // once; the results screen was not, so it shows none until the player touches something.
