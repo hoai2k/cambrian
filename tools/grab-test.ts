@@ -13,7 +13,7 @@
 import { Game, GRASP_AT, graspPoint, gripHold, gripReach } from '../src/sim/game';
 import { emptyInput, type Actor, type InputFrame } from '../src/sim/types';
 import { bandOf, bodyRadius, isAlive, lengthOf, surfaceGap } from '../src/sim/actors';
-import { applyHit, endRide, takeRide, RIDE_MAX, type HitContext } from '../src/sim/combat';
+import { applyHit, endRide, takeHold, takeRide, type HitContext } from '../src/sim/combat';
 import { creature, CREATURES } from '../src/sim/creatures';
 import { heading } from '../src/shared/math';
 import fs from 'node:fs';
@@ -387,17 +387,63 @@ function inFront(p: Actor, o: Actor) {
   check('...and it comes off badly', p.state === 'stagger', `${p.state}`);
 }
 
-// --- a ride cannot outlast its own grip ---
+// --- a ride outlasts anything that used to be counting it ---
+// It ran nine seconds and then dropped you, and it drained the bar while you hung there. Both are
+// gone: holding on is a thing the animal is doing, not a thing it is spending. Twenty seconds here
+// is well past the old limit and past any stamina it could have had to give.
 {
   const { g, p, o, ctx } = pair('hallucigenia', 4.6);
   behind(p, o);
   takeRide(ctx, p, o);
-  p.stamina = p.staminaMax;
+  p.stamina = 0;                                            // nothing left to spend, and none needed
   const held = new Map([[0, { ...emptyInput(), heavy: true }]]);
   p.prev = { ...p.prev, heavy: true };
-  let longest = 0, steps = 0;
-  for (; steps < 60 * 20 && p.rideHost >= 0; steps++) { p.graspHold = true; longest = Math.max(longest, p.rideT); g.step(1 / 60, held); g.events.length = 0; }
-  check('the grip runs out on its own', p.rideHost === -1 && longest > 1 && longest <= RIDE_MAX + 0.1, `held ${longest.toFixed(1)} s of ${RIDE_MAX} before it gave`);
+  const hp0 = o.hp;
+  for (let steps = 0; steps < 60 * 20; steps++) { p.graspHold = true; g.step(1 / 60, held); g.events.length = 0; }
+  check('the grip has no clock of its own', p.rideHost === o.id && p.rideT > 19, `held ${p.rideT.toFixed(1)} s and still on`);
+  check('...and costs no stamina to keep', p.rideHost === o.id, `stamina ${p.stamina.toFixed(0)}`);
+  check('...and never hurt what it was holding', o.hp === hp0, `host hp ${o.hp.toFixed(1)} of ${hp0.toFixed(1)}`);
+  // Letting go is letting go. A release used to land the creature's heavy blow if it came inside
+  // the first fraction of a second, so there was no way to take hold of an animal without hurting it.
+  p.graspHold = false;
+  for (let steps = 0; steps < 60; steps++) { g.step(1 / 60, new Map([[0, emptyInput()]])); g.events.length = 0; }
+  check('let go and nothing was struck', p.rideHost === -1 && o.hp === hp0, `host hp ${o.hp.toFixed(1)}`);
+}
+
+// --- a quick release is still only a release ---
+{
+  const { g, p, o, ctx } = pair('hallucigenia', 4.6);
+  behind(p, o);
+  takeRide(ctx, p, o);
+  const hp0 = o.hp;
+  // The button is already down, so no press lands this frame: a *press* while riding is the bite,
+  // and the bite is meant to hurt. What is on trial here is the hold and the letting go.
+  p.prev = { ...p.prev, heavy: true };
+  p.graspHold = true;
+  run(g, { ...emptyInput(), heavy: true }, 6);              // a tenth of a second, then off
+  p.graspHold = false;
+  run(g, emptyInput(), 60);
+  check('a grip taken and dropped at once does no damage', p.rideHost === -1 && o.hp === hp0,
+    `host hp ${o.hp.toFixed(1)} of ${hp0.toFixed(1)}`);
+}
+
+// --- something your own size is ridden, not crushed ---
+// A rival used to be taken into the jaws and squeezed, which made the one animal most worth
+// clinging to — something that can fight back and is going somewhere — the one thing a grip could
+// not hold on to.
+{
+  const { g, p, o } = pair('hallucigenia', 1);
+  o.brain = undefined; o.vel = { x: 0, y: 0, z: 0 };
+  behind(p, o);
+  p.yaw = o.yaw;                                            // facing the flank it is reaching for
+  p.prevT = { ...p.prevT, yaw: p.yaw };
+  const hp0 = o.hp;
+  // The button already down, so the grip closes on its own clock rather than a press firing a blow.
+  p.prev = { ...p.prev, heavy: true };
+  const held = new Map([[0, { ...emptyInput(), heavy: true, camYaw: p.yaw }]]);
+  for (let i = 0; i < 60 && p.rideHost < 0; i++) { g.step(1 / 60, held); g.events.length = 0; }
+  check('a rival is ridden', bandOf(p, o) === 'rival' && p.rideHost === o.id, `band ${bandOf(p, o)}, rideHost ${p.rideHost}`);
+  check('...and is not crushed while it is held', o.hp === hp0, `hp ${o.hp.toFixed(1)} of ${hp0.toFixed(1)}`);
 }
 
 // --- one rider at a time, and no chains ---
@@ -429,19 +475,25 @@ function inFront(p: Actor, o: Actor) {
   const held = g.gripFor(0);
   check('a ride is reported as a ride, naming what is under you',
     held?.kind === 'ride' && held.name === 'Anomalocaris' && held.band === 'giant', `${held?.kind} ${held?.name} ${held?.band}`);
-  check('...with the whole of the grip still ahead of it', !!held && held.left > 0.98, `left=${held?.left.toFixed(2)}`);
-  check('...and inside the window where letting go is a blow', held?.strike === true, '');
-  // Past that window, a release is just a release, and the readout stops promising otherwise.
-  p.rideT = 2;
-  const later = g.gripFor(0);
-  check('past the strike window it no longer offers the blow', later?.strike === false, '');
-  check('...and the clock has visibly run down', !!later && later.left < 0.8 && later.left > 0.7, `left=${later?.left.toFixed(2)}`);
-  // The arms give out and the button is still down: two and a half silent seconds in the recording.
+  // No bar on a ride: nothing is running down, and a bar would be a promise the grip does not make.
+  check('...and carries no clock, because nothing is counting it', held?.left === undefined, `left=${held?.left}`);
+  check('...and promises no blow on release', held?.eats === false, '');
+  p.rideT = 30;
+  check('...still, half a minute in', g.gripFor(0)?.kind === 'ride' && g.gripFor(0)?.left === undefined, '');
+  // A mouthful does have a bar, and it is the mouthful's own: how close it is to working free.
   endRide(p, o);
+  const { g: g2, p: p2, o: o2, ctx: ctx2 } = pair('hallucigenia', 0.3);
+  takeHold(ctx2, p2, o2);
+  const jaws = g2.gripFor(0);
+  check('a mouthful says what is in the jaws, and that letting go eats it',
+    jaws?.kind === 'hold' && jaws.eats === true, `${jaws?.kind} eats=${jaws?.eats}`);
+  check('...with the struggle to get free drawn as the bar it is',
+    !!jaws && jaws.left !== undefined && jaws.left > 0.98, `left=${jaws?.left}`);
+  // Something struggled out of the jaws and the button is still down.
   p.graspSpent = true; p.graspHold = true;
   const spent = g.gripFor(0);
-  check('a grip that has given out says so while the button is still held',
-    spent?.kind === 'spent' && spent.left === 0, `${spent?.kind}`);
+  check('a grip that has been struggled out of says so while the button is still held',
+    spent?.kind === 'spent', `${spent?.kind}`);
   p.graspHold = false;
   check('...and says nothing once the button comes up', g.gripFor(0) === undefined, '');
 }

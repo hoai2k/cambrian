@@ -185,8 +185,11 @@ function SensePanel({ p }: { p: PlayerHud }) {
  * The grip used to happen entirely in silence: a recording of a player trying to grab a giant had
  * the grip closing three separate times and carrying them thirteen seconds, while the player — who
  * could see none of that — reported that grabbing did not work. Every part of it was already
- * knowable, so this says all of it: what is in the grip, how long it has left, and which button
- * turns the hold into damage. Without the last line a ride is a thing that happens *to* you.
+ * knowable, so this says all of it: what is in the grip and which button bites what you are
+ * clinging to. Without that last line a ride is a thing that happens *to* you.
+ *
+ * There is no clock on a ride, because there is nothing timing it: holding on costs nothing and
+ * ends when the player lets go.
  */
 function GripPanel({ grip, s }: { grip: NonNullable<PlayerHud['grip']>; s: Scheme }) {
   if (grip.kind === 'spent') {
@@ -199,13 +202,15 @@ function GripPanel({ grip, s }: { grip: NonNullable<PlayerHud['grip']>; s: Schem
   }
   const ride = grip.kind === 'ride';
   return (
-    <div className={`grip-panel ${grip.strike ? 'strike' : ''}`} style={{ color: BAND_COLOR[grip.band] }}>
+    <div className="grip-panel" style={{ color: BAND_COLOR[grip.band] }}>
       <b>{ride ? 'HOLDING ON' : 'IN YOUR JAWS'} · {grip.name}</b>
-      <div className="bar grip"><i style={{ width: `${grip.left * 100}%` }} /></div>
+      {/* Only a mouthful has a bar, and it is the mouthful's own: how close it is to working free.
+          A ride has nothing running down, so it is given nothing that looks like it has. */}
+      {grip.left !== undefined && <div className="bar grip"><i style={{ width: `${grip.left * 100}%` }} /></div>}
       <span>
         {ride
-          ? grip.strike ? 'Release NOW to strike' : `${key('light', s)} bite · release to let go`
-          : grip.strike ? 'Release to eat' : 'Release to throw'}
+          ? `${key('light', s)} bite · release to let go`
+          : grip.eats ? 'Release to eat' : 'Release to let go'}
       </span>
     </div>
   );

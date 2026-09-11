@@ -169,12 +169,19 @@ unless the user explicitly asks for a PR. Steps:
   measured the wrong one and so listed no neighbours at all in eleven hundred samples. `npm run
   record` checks that a recording distinguishes a grab that worked from one that could not, names
   the reason, and lists the animal it is about however big that animal is.
+- Taking hold is not an attack. A grip does no damage at all and costs nothing to keep: no clock,
+  no stamina, no strike on release. Anything from the animal's own size upwards is *ridden*
+  (`takeRide`) and the ride lasts until the player lets go or the host shakes them off with a dash;
+  anything it could swallow is held in the jaws (`takeHold`) unhurt and eaten when the button comes
+  up. Biting what you are clinging to is a separate press ({light}). The grasping appendages
+  (`def.grasp`) only make a grip easier to close and further to reach with — never a different
+  outcome. `updateRide` and `closeGrip` in `src/sim/game.ts`; `npm run grab` covers it.
 - A player must be able to see the state the simulation is in. The grip is the worked example: it
-  closed, held and expired in complete silence, so a recording of it working read to the player as
-  it not working. `Game.gripFor` is the readout — what is in the grip, how much of it is left, and
-  the button that turns a hold into damage — drawn by `GripPanel` in `src/app/Hud.tsx`, and it
-  survives sense-off because it is the player's own act rather than a readout of the world.
-  `npm run grab` covers it.
+  closed and held in complete silence, so a recording of it working read to the player as it not
+  working. `Game.gripFor` is the readout — what is in the grip and the button that bites it —
+  drawn by `GripPanel` in `src/app/Hud.tsx`, and it survives sense-off because it is the player's
+  own act rather than a readout of the world. A ride carries no bar, because nothing about it runs
+  down; only a mouthful does, and that bar is the mouthful's own struggle to get free.
 - The two typefaces are served from `public/fonts/`, not from fonts.googleapis.com: four
   variable WOFF2 files (one per family per Latin subset) declared over a weight range in
   `public/fonts/fonts.css`, which each entry page links. Both are OFL, and the licences ship

@@ -185,11 +185,15 @@ export function takeHold(ctx: HitContext, attacker: Actor, victim: Actor): boole
  * that bites, and nothing gets a hold there.
  */
 const MOUTH_CONE = 0.55;
-/** How long a rider may hang on, and what the grip costs it per second. */
-export const RIDE_MAX = 9, RIDE_STAMINA = 4;
+/**
+ * Riding has no limit of its own — no clock, no stamina. It used to have both: nine seconds, then a
+ * bar that drained while you hung there. Between them they made holding on a thing you were
+ * spending rather than a thing you were doing, and the animals most worth clinging to were the ones
+ * it took the longest to reach. A rider lets go when it lets go.
+ */
 
 /**
- * Take hold of something bigger than you and ride it.
+ * Take hold of something your own size or bigger and ride it.
  *
  * Anything over the `rival` band cannot be held in the mouth — it is not a mouthful — but it can be
  * held *on to*, anywhere except the business end of its head: come at the face and there is nothing
