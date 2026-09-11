@@ -36,6 +36,37 @@ export class CreatureAnchors {
     return (data?.chain ?? []).map(n => this.model.getObjectByName(n)).filter((b): b is THREE.Object3D => !!b);
   }
   has(name: string) { return this.sockets.has(name); }
+  /**
+   * The rig's bones, for anything that has to follow a *part* of an animal rather than the animal.
+   *
+   * A grip is the case that needs it. A rider pinned to an offset from the host's rigid centre sits
+   * where the host's body would be if the host were a rigid capsule, and a swimming animal is not:
+   * its flank sweeps, its tail beats, its body flexes, and the rider holds still through all of it.
+   * That reads as floating alongside, which is exactly what a player who has taken hold of a giant
+   * reports as the grip not working. Following the nearest bone instead means the hold point is on
+   * the animation, so the rider goes where the part it is holding goes.
+   */
+  get bones(): THREE.Object3D[] {
+    if (!this.boneList) {
+      this.boneList = [];
+      this.model.traverse((o) => { if ((o as THREE.Bone).isBone) this.boneList!.push(o); });
+    }
+    return this.boneList;
+  }
+  private boneList?: THREE.Object3D[];
+  bone(name: string): THREE.Object3D | undefined {
+    return this.bones.find((b) => b.name === name);
+  }
+  /** The bone whose own origin is nearest `target` in world space. */
+  nearestBone(target: THREE.Vector3): THREE.Object3D | undefined {
+    let best: THREE.Object3D | undefined, bd = Infinity;
+    for (const b of this.bones) {
+      b.updateWorldMatrix(true, false); b.getWorldPosition(this.p);
+      const d = this.p.distanceToSquared(target);
+      if (d < bd) { bd = d; best = b; }
+    }
+    return best;
+  }
   /** A grasp chain exists: this rig can pick food up and carry it to the mouth. */
   get canGrasp() { return !!this.effector && this.chain.length > 0; }
   /** At least one attack socket can be steered toward a target. */

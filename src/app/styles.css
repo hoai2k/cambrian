@@ -245,6 +245,23 @@ h3 { font-size: 13px; letter-spacing: .12em; color: var(--ember); margin: 14px 0
 .lock-panel b { font: 700 .95em var(--font-display); color: var(--foam); }
 .lock-kind { font-size: .78em; letter-spacing: .1em; color: var(--mist); text-transform: uppercase; }
 .lock-panel .bar { width: 100%; height: .4em; }
+/* The grip. Centred and low, under the reticle rather than over it, because a player who has
+   hold of something is looking at the thing they have hold of. Loud enough that its arrival is
+   the answer to "did that work"; gone the instant the grip is. */
+.grip-panel { position: absolute; left: 50%; bottom: 8.2em; transform: translateX(-50%); display: grid; gap: .3em; justify-items: center; padding: .55em 1em; border-radius: 1em; background: rgba(6,22,28,.72); backdrop-filter: blur(10px); border: 1px solid currentColor; min-width: 13em; max-width: 92%; text-align: center; pointer-events: none; animation: rise-in .25s both; }
+.grip-panel b { font: 700 .95em var(--font-display); color: var(--foam); letter-spacing: .06em; }
+.grip-panel span { font-size: .8em; letter-spacing: .06em; color: var(--mist); }
+.grip-panel .bar.grip { width: 100%; height: .35em; border-radius: .2em; background: rgba(238,250,246,.16); overflow: hidden; }
+.grip-panel .bar.grip i { display: block; height: 100%; background: currentColor; transition: width .1s linear; }
+/* The window in which letting go is the blow the grip stood in for. Two seconds, and it decides
+   whether the animal ever knows you were there, so it reads loudly. */
+.grip-panel.strike { border-color: var(--ember); box-shadow: 0 0 22px rgba(255,179,107,.55); }
+.grip-panel.strike span { color: var(--ember); font-weight: 700; }
+/* Carried too long: it is coming loose whatever the player does next. */
+.grip-panel.lost { border-color: var(--coral); }
+.grip-panel.lost span { color: #ffd4da; }
+.grip-panel.spent { color: var(--coral); }
+.grip-panel.spent b { color: #ffd4da; }
 .hud-bottom { position: absolute; left: 1.4em; bottom: 1.4em; display: flex; gap: .6em; align-items: flex-end; }
 .chip { position: relative; display: flex; align-items: center; gap: .5em; padding: .45em .8em .45em .5em; border-radius: .9em; background: rgba(6,22,28,.6); border: 1px solid rgba(238,250,246,.14); overflow: hidden; }
 .chip .btn { min-width: 1.6em; height: 1.6em; padding: 0 .35em; border-radius: .8em; display: grid; place-items: center; font: 700 .8em var(--font-display); color: var(--ink); background: var(--foam); }
