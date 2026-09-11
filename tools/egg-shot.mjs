@@ -2,13 +2,14 @@
 // seconds (src/render/eggs.ts). Needs `npx vite preview --port 4173` running.
 // Usage: node tools/egg-shot.mjs   → /tmp/claude-0/shots/egg-*.png
 import { chromium } from 'playwright-core';
-const S = '/tmp/claude-0/shots';
+const S = process.argv[3] ?? '/tmp/claude-0/shots';
+const BASE = process.argv[2] ?? 'http://localhost:4173/';
 const browser = await chromium.launch({ executablePath: '/opt/pw-browsers/chromium', args: ['--use-gl=angle','--use-angle=swiftshader','--enable-unsafe-swiftshader','--ignore-gpu-blocklist','--no-sandbox'] });
 const page = await browser.newPage({ viewport: { width: 900, height: 520 } });
 page.on('pageerror', e => console.log('[pageerror]', e.message));
 page.on('console', m => { if (m.type()==='error') console.log('[err]', m.text().slice(0,200)); });
 await page.addInitScript(() => localStorage.setItem('cambrian-settings', JSON.stringify({ quality: 'low', lookSpeed: 1, invertY: false, volume: 0, muted: true })));
-await page.goto('http://localhost:4173/', { waitUntil: 'load' });
+await page.goto(BASE, { waitUntil: 'load' });
 await page.waitForTimeout(9000);
 await page.keyboard.press('Enter'); await page.waitForTimeout(1500);
 await page.keyboard.press('Space'); await page.waitForTimeout(500);

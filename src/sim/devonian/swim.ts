@@ -75,9 +75,13 @@ export function spawnInCover(g: Game, center: Vec3, id: CreatureId, scale: numbe
   if (!options.length) return undefined;
   const ground = (c: Vec3) => groundHeight(g.world, c.x, c.z, []);
   const high = options.filter((c) => c.pos.y > ground(c.pos) + 4);
-  // A crawler hatches down on the sand, so the patch has to reach the sand: a crinoid crown three
-  // units up is cover for a swimmer and open floor for a trilobite.
-  const pool = def.ground ? options.filter((c) => c.pos.y - ground(c.pos) <= c.radius * 0.8) : (high.length && g.rng() < 0.6 ? high : options);
+  const low = options.filter((c) => c.pos.y - ground(c.pos) <= c.radius * 0.8);
+  // The patch has to reach the sand for a crawler, and for anything hatching out of an egg —
+  // an egg is laid on the floor (`layEgg` in game.ts), and a crinoid crown three units up is cover
+  // for a swimming body but open floor for one lying under it. A grown body dropped in for any
+  // other reason still takes the high growth, which is where a fish that size shelters.
+  const onFloor = def.ground || stageForScale(def.adultLength, scale) === 0;
+  const pool = onFloor ? low : (high.length && g.rng() < 0.6 ? high : options);
   const from = pool.length ? pool : options;
   // Bots carry player index -1 when respawning; never use a negative array remainder.
   const c = from[(Math.max(0, index) * 7 + Math.floor(g.rng() * from.length)) % from.length];
@@ -90,7 +94,10 @@ export function spawnInCover(g: Game, center: Vec3, id: CreatureId, scale: numbe
     const ang = g.rng() * Math.PI * 2, r = g.rng() * c.radius * 0.4;
     const x = c.pos.x + Math.cos(ang) * r, z = c.pos.z + Math.sin(ang) * r;
     const gr = groundHeight(g.world, x, z, []);
-    const y = def.ground ? gr + L * 0.13 : clamp(c.pos.y, gr + 0.6 + L * 0.3, SURFACE_Y - 3);
+    // A hatchling of any shape starts down where its egg was laid, so it is scored at the height
+    // it will actually rest at — a patch that hides a body a body-length up may be open floor
+    // under it. Anything else sits at the heart of the patch it was given.
+    const y = onFloor ? gr + L * 0.13 : clamp(c.pos.y, gr + 0.6 + L * 0.3, SURFACE_Y - 3);
     const at = { x, y, z };
     const hidden = coverAt(g.world, at, L, []);
     if (hidden > bestCover) { bestCover = hidden; best = at; }

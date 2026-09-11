@@ -53,3 +53,25 @@ in `docs/devonian/refinement-queue.md` for concrete sculpt, eye, fin and materia
 The image and copy/hash-verified model/source backup are under local/devonian-authoring.
 Do not rerun the old builder into an existing candidate or treat old eye audits as approval
 for future geometry. Finish the redesign before fresh general quality audits.
+
+## Redesign sculpt study — 11 September 2026
+
+`redesign-study.py` is a shape study for the reopened redesign, not a builder: it lofts the same
+surfaces from two sets of profile tables and renders them side by side, so the silhouette can be
+judged before anything is rebuilt. It exports nothing and publishes nothing.
+
+What it proposes from `docs/reference/Cheirolepis.jpg`: a wedge snout in place of the rounded bead,
+a straighter dorsal head profile over a fuller cheek, the eye larger and further forward and
+higher, and all five fins redrawn as angular swept blades — convex leading edge, apex trailing
+backwards, concave trailing edge — instead of rounded paddles. What it refuses from the reference:
+the near-symmetrical fork. C. trailli is strongly epicercal and the cited sources settle that, so
+the tail keeps its raised scaled axis and only gains drawn-out points and a deeper notch.
+
+The eye is placed by measurement. `seating()` scores the globe against the head cross-sections
+under one proxy measure; the redesign's larger, more anterior eye scores 0.684 against the current
+model's 0.661, so moving it forward improves the seating rather than spending it. The proxy reads
+low against the packaged audit (which measures the exported polyhedron against the closed head)
+and is only good for comparing variants.
+
+Nothing here is accepted geometry. A real rebuild still owes scales, teeth, throat, opercula,
+materials, rig, all eighteen clips, the LOD and the full audit set.
