@@ -122,8 +122,11 @@ unless the user explicitly asks for a PR. Steps:
   `spawnAmbient` draws from it; `spawnPreyFor` still keeps food of your own size within reach, and
   `PASSER_BY` sends a large animal through the upper water whatever the seabed holds. Ambient brains
   wander within ~32 units of where they spawned, so a population stays in its biome.
-- Every player hatches out of an egg on the bottom rung: `HATCH_TIME` in `src/sim/game.ts` holds the
-  body still for five seconds (`skipHatch()` ends it for headless harnesses), `layEgg` puts the
+- Every player hatches out of an egg on the bottom rung: `src/sim/game.ts` holds the body still,
+  pinned where the egg was laid, until the shell cracks (`HATCH_HOLD`, which is `HATCH_FREE` of
+  `HATCH_TIME`) and hands control back there rather than at the end of the performance — the shell
+  goes on falling open behind the swimming animal on the renderer's own clock, the only one that
+  runs the whole `HATCH_TIME`. `skipHatch()` ends a hatch for headless harnesses. `layEgg` puts the
   Cambrian egg on the sand nose-to the nearest rock or plant (the Devonian's `spawnInCover` has
   already chosen, on the sand in the growth), and `src/render/eggs.ts` draws the shell — small,
   opaque, filled by the body, settled part-buried in the sand, taking pokes from inside, and split
