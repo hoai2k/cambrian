@@ -15,8 +15,8 @@ to `main`, so a session that runs out can be picked up from here without the con
 | Step | Status | Where it stands |
 | --- | --- | --- |
 | F triage (8 no-reference creatures) | **done** | 3 cleared, 2 small, 3 promoted — see below |
-| Cheirolepis | **candidate built, waiting on user** | `build_v3.py` — package PASS, check PASS, eye audit 82.5/82.3 (V2 80.1/79.9). Comparison sheet sent. On yes: point `build.py` at v3, package into public/, regenerate validation.json, viewer look |
-| F small fixes (eldredgeops rig, manticoceras umbilicus) | **in progress** | two Medium (Sonnet) agents, each delivering a packaged candidate into the scratchpad `cand/<id>/` with package+check PASS; parent integrates. If this session died mid-run: re-run from their briefs in the conversation, or just rebuild — the fix is in `tools/devonian/creatures/<id>/` if they got that far |
+| Cheirolepis | **V3 fins/face reopened** — see Face pass below | `build_v3.py` — package PASS, check PASS, eye audit 82.5/82.3 (V2 80.1/79.9). Comparison sheet sent. On yes: point `build.py` at v3, package into public/, regenerate validation.json, viewer look |
+| F small fixes (eldredgeops rig, manticoceras umbilicus) | **candidates built, waiting on user** | Both Medium (Sonnet) jobs delivered: manticoceras `build.py` INVOL=.85 (umbilicus 30%→9.4%, aperture/anchors unchanged; INVOL=.53 reproduces the shipped shell exactly); eldredgeops `build_v3.py` blends tergite_01's front rows onto the cephalon (gap closed; antenna tips at the rolled peak left open — a choreography redesign, not a value). Both package+check PASS on candidates. Not in public/: integration into shipped assets needs the user's go, and this session's auto-mode blocks writes to public/assets anyway. Candidates rebuild in about a minute from the committed builders; eldredgeops' `validate.py` is hardcoded to v2/candidate and needs its path parameterised before its v3 can go through the normal finish |
 | B (gemuendina, dunkleosteus) | not started | |
 | A (cladoselache, tiktaalik) | not started | |
 | D resume reads | not started | |
@@ -54,3 +54,16 @@ The sheets for the three promoted creatures were sent to the user.
 1. User looks at the three promoted sheets and the Cheirolepis study; says which first.
 2. Group A is now cheirolepis, cladoselache, tiktaalik, acanthostega, jaekelopterus, palaeoisopus.
 3. The two Medium fixes (eldredgeops, manticoceras) can run any time as a Low/Medium batch.
+
+## Cheirolepis face pass and fin roots — 11 September, late
+
+The user judged V3's face against the reference: not there. Blunt deep snout, flat dorsal line,
+deep mandible under a descending mouth line with lips, eye high, cheek relief. And they saw fins
+floating: measured, every fin root in V2/V3 sits at or outside the trunk (pectoral +0.07, pelvic
++0.31, dorsal trailing edge +0.17, anal trailing edge +0.26 on the section-ellipse metric, where
+<0 is inside). Study in the scratchpad `face/study.py` (port into the creature dir when
+accepted): `seat()` pulls fin origins and base controls radially inside to −0.18/−0.14; the face
+tables are in `FACE`; the eye is placed by the proxy search at (.155,−2.03,.150) r(.058,.092,.085)
+= 0.607 (V2 shipped 0.661 ≡ 80% real). Next: user verdict on the face sheet; then port into
+`build_v3.py` — also extend `fin()`'s body-bone weight blend to pectoral/pelvic so seated roots
+stay attached under tail bends.
