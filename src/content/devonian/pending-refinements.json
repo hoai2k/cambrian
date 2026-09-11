@@ -39,14 +39,14 @@
     "status": "pending",
     "scope": "individual-refinement",
     "model": true,
-    "reason": "Initial preview: individual anatomy, material, attachment and dynamic action refinements documented in source README/WORKING_STATE."
+    "reason": "Triage 11 September: the tail fin is a solid paddle fused to the tail tip; Acanthostega's caudal fin ran most of the tail's length, deep above and below, with fin rays. The trunk is a constant round tube where the animal was flat-bellied and wider than deep, and the limbs attach as thin sticks with wrist/palm intersections. Silhouette redesign before any audit."
   },
   {
     "id": "eldredgeops",
     "status": "pending",
     "scope": "individual-refinement",
     "model": true,
-    "reason": "Initial preview: individual anatomy, material, attachment and dynamic action refinements documented in source README/WORKING_STATE.",
+    "reason": "Triage 11 September: the model reads well \u2014 cephalon, schizochroal lens arrays, tergites and limbs. What is left is the rig: the occipital/first-tergite joint opens visibly at the Ability and Guard peak and some antenna tips sit outside the enrolled shell. Re-weight that joint and tuck the antennae; no sculpt change.",
     "clips": [
       "Bite",
       "Attack",
@@ -59,8 +59,7 @@
     "id": "walliserops",
     "status": "pending",
     "scope": "individual-refinement",
-    "model": true,
-    "reason": "Initial preview: individual anatomy, material, attachment and dynamic action refinements documented in source README/WORKING_STATE.",
+    "model": false,
     "clips": [
       "Bite",
       "Attack",
@@ -74,7 +73,7 @@
     "status": "pending",
     "scope": "individual-refinement",
     "model": true,
-    "reason": "Initial preview: individual anatomy, material, attachment and dynamic action refinements documented in source README/WORKING_STATE.",
+    "reason": "Triage 11 September: the opisthosoma is a uniform taper of rounded rings where the animal's was flattened with a broad preabdomen stepping down to a narrower postabdomen; the chelicerae are rounded tubes where the rami were long, slender and toothed; the cuticle reads as one flat beige. Silhouette and claw redesign, then material.",
     "clips": [
       "Bite",
       "Attack",
@@ -101,8 +100,7 @@
     "id": "furcaster",
     "status": "pending",
     "scope": "individual-refinement",
-    "model": true,
-    "reason": "Initial preview: individual anatomy, material, attachment and dynamic action refinements documented in source README/WORKING_STATE.",
+    "model": false,
     "clips": [
       "Bite",
       "Attack",
@@ -116,7 +114,7 @@
     "status": "pending",
     "scope": "individual-refinement",
     "model": true,
-    "reason": "Initial preview: individual anatomy, material, attachment and dynamic action refinements documented in source README/WORKING_STATE.",
+    "reason": "Triage 11 September: every leg and trunk segment is a beaded lozenge with dark joint bands, so the animal reads as strung olives. Palaeoisopus' defining feature is its dorsoventrally flattened, oar-like leg segments for swimming, on a flat trunk. Re-section the legs as blades and the trunk as a flat plate; keep the proboscis, chelifores and the long segmented abdomen.",
     "clips": [
       "Bite",
       "Attack",
@@ -130,7 +128,7 @@
     "status": "pending",
     "scope": "individual-refinement",
     "model": true,
-    "reason": "Initial preview: individual anatomy, material, attachment and dynamic action refinements documented in source README/WORKING_STATE.",
+    "reason": "Triage 11 September: the umbilicus is open to about a third of the diameter with the inner whorls showing, where the cited M. regulare source has a narrow discoidal, involute shell with a small umbilicus. Increase the whorl overlap in the shell parameters so it closes to roughly a tenth; soften the mantle edge. Arms and head are fine.",
     "clips": [
       "Bite",
       "Attack",
@@ -143,8 +141,7 @@
     "id": "michelinoceras",
     "status": "pending",
     "scope": "individual-refinement",
-    "model": true,
-    "reason": "Initial preview: individual anatomy, material, attachment and dynamic action refinements documented in source README/WORKING_STATE.",
+    "model": false,
     "clips": [
       "Bite",
       "Attack",
