@@ -182,8 +182,17 @@ unless the user explicitly asks for a PR. Steps:
   button charged the player for the approach. A ride let go of inside `GRIP_STRIKE` (2 s) lands the
   blow the grip stood in for and something big comes looking for you; held longer it does nothing
   and the host never learns it has a passenger. A mouthful let go of inside `GRIP_MEAL` (5 s) is
-  eaten; carried longer it works loose, unhurt, and swims off. Both constants in `src/sim/combat.ts`;
-  `npm run grab` covers it.
+  eaten; carried longer it works loose; and at `GRIP_BREAK` (15 s) it is out whatever the holder
+  wants — holding costs the holder nothing, so without that it would cost the held animal
+  everything. All three ways of getting away are one `breakLoose`. Constants in `src/sim/combat.ts`.
+- A grip is a tug of war, not a container. `Actor.drive` is what a body is *asking* for each step,
+  kept apart from `desired` because the state machine takes the wish away from anything grabbed. A
+  holder moves by both wishes summed and shared by mass, so a heavy catch that wants nothing drags
+  on it and one pulling the other way cancels it out; what wears the hold (`GRIP_STRAIN`) is how
+  *opposed* the two are, so a holder that goes slack and drifts along is the hardest to escape. A
+  dash decides between the two: against a holder that is pulling it tears the grip open, against a
+  slack one it shoves the holder instead, scaled by an *uncapped* mass share so hauling something
+  six times your length is very nearly futile. `npm run grab` covers all of it.
 - A grip is drawn on the host's *animation*, not on its rigid frame. `rideHold` is a point offset
   from the host's centre — where a rigid capsule's surface would be — and a swimming animal's flank
   sweeps and its tail beats right past it, so a rider pinned there holds still while the thing it is
