@@ -204,9 +204,13 @@ export function takeRide(ctx: HitContext, rider: Actor, host: Actor): boolean {
   if (rider.rideHost >= 0 || host.riddenBy >= 0 || rider.riddenBy >= 0 || host.rideHost >= 0) return false;
   if (host.state === 'dead' || host.state === 'grabbed' || rider.state === 'grabbed') return false;
   const h = heading(host.yaw);
-  const to = norm(sub(rider.pos, host.pos));
-  if (dot(to, h) > MOUTH_CONE) return false;                        // the head end: jaws, not handholds
-  const hl = lengthOf(host);
+  const hl = lengthOf(host), hr = bodyRadius(host);
+  // The head end is out of bounds, and the head end is the nose — not a cone opened from the
+  // middle of the animal. On a body twenty units long that cone swallowed the whole forward flank,
+  // so a rider alongside the shoulder of a giant was told it was trying to grab the jaws.
+  const half = Math.max(0, hl * 0.5 - hr);
+  const nose = { x: host.pos.x + h.x * half, y: host.pos.y, z: host.pos.z + h.z * half };
+  if (dot(norm(sub(rider.pos, nose)), h) > MOUTH_CONE) return false;
   const right: Vec3 = { x: -h.z, y: 0, z: h.x };
   const d = sub(rider.pos, host.pos);
   // Sideways and up, the hold has to be somewhere on the host, so it is bounded by how wide the

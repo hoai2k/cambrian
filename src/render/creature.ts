@@ -392,7 +392,9 @@ export class CreatureView {
       // Limp "ragdoll": once dead the spine sags and sways with decaying wobble, and the animation
       // fades out underneath it, so the body hangs rather than holding a pose.
       // New anatomical rigs own their death deformation as well as locomotion.
-      if (this.spine.length > 2 && def.proceduralUndulation !== false && a.state === 'dead') {
+      // Same rule as the undulation below: this sway is multiplied onto the animated pose, so it
+      // must not run on a frame the animation is not advancing through.
+      if (dt > 0 && this.spine.length > 2 && def.proceduralUndulation !== false && a.state === 'dead') {
         const k = Math.exp(-a.corpseT * 0.5);
         for (let i = 0; i < this.spine.length; i++) {
           const f = i / this.spine.length;
@@ -404,8 +406,16 @@ export class CreatureView {
           this.spine[i].quaternion.multiply(this.tmpQ2);
         }
       }
-      // procedural undulation along the spine for swimmers
-      if (this.spine.length > 3 && def.proceduralUndulation !== false && !def.ground && a.state !== 'dead') {
+      // Procedural undulation along the spine for swimmers.
+      //
+      // Only while the clip is actually advancing. Each bone is *multiplied* by its bend on top of
+      // the pose the mixer wrote, which is safe only for as long as the mixer keeps rewriting that
+      // pose — and it stops when nothing changes: three.js skips `binding.setValue` when an
+      // action's output matches the value it applied last frame, which is every frame once dt is
+      // zero. The bend then compounds on its own result, and since a frozen clock makes it a
+      // constant rather than a wave, a paused animal screws slowly round its own axis. There is no
+      // wave to add to a still frame anyway, so the pose simply holds.
+      if (dt > 0 && this.spine.length > 3 && def.proceduralUndulation !== false && !def.ground && a.state !== 'dead') {
         const amp = clamp(speed / Math.max(cruise, 0.1), 0, 1.6) * 0.045 + Math.abs(a.bank) * 0.02;
         const freq = 5.5 / Math.pow(Math.max(a.scale, 0.1), 0.35);
         // Local-space bend: each spine bone yaws slightly about its own up axis. Cheaper than

@@ -10,9 +10,9 @@
  * without bothering it is the whole point of riding; the bite (Y) always bites and takes hold only
  * on a real hold.
  */
-import { Game } from '../src/sim/game';
+import { Game, GRASP_AT, graspPoint, gripHold, gripReach } from '../src/sim/game';
 import { emptyInput, type Actor, type InputFrame } from '../src/sim/types';
-import { bandOf, bodyRadius, isAlive, lengthOf } from '../src/sim/actors';
+import { bandOf, bodyRadius, isAlive, lengthOf, surfaceGap } from '../src/sim/actors';
 import { applyHit, endRide, takeRide, RIDE_MAX, type HitContext } from '../src/sim/combat';
 import { creature, CREATURES } from '../src/sim/creatures';
 import { heading } from '../src/shared/math';
@@ -69,10 +69,16 @@ function inFront(p: Actor, o: Actor) {
   check('...but the bite keeps its bite', !step({ light: true }).graspHold, `graspHold=${p.graspHold}`);
   check('...while still closing a grip if it is held', step({ light: true }).graspT > 0, `graspT=${p.graspT.toFixed(2)}`);
   check('...and letting them all go disarms it', !step({}).graspHold && p.graspT === 0, `${p.graspHold} / ${p.graspT}`);
+  // Everything can take hold of something; `grasp` decides how easily, not whether. An animal
+  // without arms for it reaches about as far as its bite and has to work at it for longer.
   const w = new Game('reef', [{ creature: 'waptia', device: 'keyboard', ready: true }], 4);
   const q = w.players[0]; q.spawnProtect = 1e6;
   w.step(1 / 60, new Map([[0, { ...emptyInput(), heavy: true, ability: true }]])); w.events.length = 0;
-  check('an animal with no grip never arms one', !q.graspHold && q.graspT === 0, `${q.graspHold} / ${q.graspT}`);
+  check('an animal with no arms for it still arms a grip', q.graspHold && q.graspT > 0, `${q.graspHold} / ${q.graspT.toFixed(2)}`);
+  check('...but reaches less far for it', gripReach(creature('waptia'), 1) < gripReach(creature('opabinia'), 1),
+    `mouth ${gripReach(creature('waptia'), 1).toFixed(2)} body lengths against arms ${gripReach(creature('opabinia'), 1).toFixed(2)}`);
+  check('...and has to work at it for longer', gripHold(creature('waptia')) > gripHold(creature('opabinia')),
+    `${gripHold(creature('waptia')).toFixed(2)}s against ${gripHold(creature('opabinia')).toFixed(2)}s`);
 }
 
 // --- a held attack takes hold of prey, and letting go is a mouthful ---
@@ -197,6 +203,114 @@ function inFront(p: Actor, o: Actor) {
   check('...while holding on is a ride it is never troubled by', ridden.duringHold === 0 && ridden.onRelease <= 0, `${ridden.duringHold.toFixed(0)} while held, ${Math.max(0, ridden.onRelease).toFixed(0)} on the release`);
 }
 
+// --- reach is to the animal, not to a ball drawn round its middle ---
+// An adult Anomalocaris is twenty units nose to tail and four and a half across. Every reach test
+// measured `bodyRadius` from its centre, so the far half of it was not there: pressed against its
+// tail you were ten units from a centre whose grasp reach allowed six, and holding the button did
+// nothing at all. This is the bug as reported — an Opabinia beside a giant, unable to take hold.
+{
+  const atGiant = (creatureId: CreatureId, angDeg: number) => {
+    const g = new Game('reef', [{ creature: creatureId, device: 'keyboard', ready: true }], 21);
+    const p = g.players[0]; p.spawnProtect = 0; p.vel = { x: 0, y: 0, z: 0 };
+    const o = g.spawn('anomalocaris', 'giant', { x: 40, y: 14, z: -70 }, 3.5);
+    o.brain = undefined; o.spawnProtect = 0; o.yaw = Math.PI; o.vel = { x: 0, y: 0, z: 0 };
+    const ang = (angDeg * Math.PI) / 180, start = lengthOf(o) * 0.9;
+    p.pos = { x: o.pos.x + Math.sin(ang) * start, y: 14, z: o.pos.z + Math.cos(ang) * start };
+    const camYaw = Math.atan2(o.pos.x - p.pos.x, o.pos.z - p.pos.z);
+    p.yaw = camYaw;
+    g.hash.rebuild(g.actors);
+    const m = new Map([[0, { ...emptyInput(), my: 1, camYaw, heavy: true } as InputFrame]]);
+    for (let i = 0; i < 60 * 10; i++) {
+      o.pos = { x: 40, y: 14, z: -70 }; o.vel = { x: 0, y: 0, z: 0 }; o.spawnProtect = 0;
+      g.step(1 / 60, m); g.events.length = 0;
+      if (p.rideHost === o.id) return true;
+    }
+    return false;
+  };
+  const ANGLES = [0, 45, 90, 135, 180, 225, 270, 315];
+  const arms = ANGLES.filter((d) => atGiant('opabinia' as CreatureId, d));
+  check('a grasper takes hold of a giant from any side of it', arms.length === ANGLES.length,
+    `${arms.length}/${ANGLES.length} approaches`);
+  const jaws = ANGLES.filter((d) => atGiant('waptia' as CreatureId, d));
+  check('...and so does an animal with only its mouth', jaws.length === ANGLES.length,
+    `${jaws.length}/${ANGLES.length} approaches`);
+  // The measurement itself: a point beside the tail is against the body, however far it is from
+  // the middle of it.
+  const g = new Game('reef', [{ creature: 'opabinia', device: 'keyboard', ready: true }], 21);
+  const giant = g.spawn('anomalocaris', 'giant', { x: 0, y: 10, z: 0 }, 3.5);
+  giant.yaw = 0;                                            // faces +z, so the tail is at -z
+  const gl = lengthOf(giant), r = bodyRadius(giant);
+  const beside = (z: number) => surfaceGap(giant, { x: r + 0.2, y: 10, z });
+  // Down the straight of the body the surface is exactly where it is drawn; round the tail the
+  // capsule's own curve takes it gently away, which is the shape of the animal and not an error.
+  // What matters is that neither is the several body-lengths a ball round the middle reported.
+  check('the surface of a long body is where the body is', Math.abs(beside(0) - 0.2) < 0.01 && beside(-gl * 0.4) < 1,
+    `beside the middle ${beside(0).toFixed(2)}, beside the tail ${beside(-gl * 0.4).toFixed(2)} (body ${gl.toFixed(1)} long)`);
+  check('...where a ball round its middle put it body-lengths away',
+    Math.hypot(r + 0.2, gl * 0.4) - r > beside(-gl * 0.4) * 4,
+    `${(Math.hypot(r + 0.2, gl * 0.4) - r).toFixed(1)} as a ball against ${beside(-gl * 0.4).toFixed(1)} as the animal`);
+  check('...and open water past the end of it is not', surfaceGap(giant, { x: 0, y: 10, z: -gl }) > gl * 0.3,
+    `${surfaceGap(giant, { x: 0, y: 10, z: -gl }).toFixed(1)} clear of the tail`);
+}
+
+// --- holding the grip button swims you into what you are reaching for ---
+{
+  const reach = (creatureId: CreatureId, dist: number) => {
+    const g = new Game('reef', [{ creature: creatureId, device: 'keyboard', ready: true }], 21);
+    const p = g.players[0]; p.spawnProtect = 0; p.vel = { x: 0, y: 0, z: 0 };
+    const o = g.spawn('anomalocaris', 'giant', { x: 40, y: 14, z: -70 }, 3.5);
+    o.brain = undefined; o.spawnProtect = 0; o.yaw = Math.PI; o.vel = { x: 0, y: 0, z: 0 };
+    p.pos = { x: 40, y: 14, z: -70 + dist }; p.yaw = Math.PI;
+    g.hash.rebuild(g.actors);
+    // The button and nothing else: no stick, no steering.
+    const m = new Map([[0, { ...emptyInput(), camYaw: Math.PI, heavy: true } as InputFrame]]);
+    for (let i = 0; i < 60 * 8; i++) {
+      o.pos = { x: 40, y: 14, z: -70 }; o.vel = { x: 0, y: 0, z: 0 }; o.spawnProtect = 0;
+      g.step(1 / 60, m); g.events.length = 0;
+      if (p.rideHost === o.id) return i / 60;
+    }
+    return -1;
+  };
+  for (const c of ['opabinia', 'waptia'] as CreatureId[]) {
+    const times = [14, 22, 30].map((d) => reach(c, d));
+    check(`${creature(c).name} holds RT and swims to a giant until it has it`, times.every((t) => t > 0),
+      times.map((t, i) => `${[14, 22, 30][i]}u ${t < 0 ? 'never' : t.toFixed(1) + 's'}`).join(' · '));
+  }
+
+  // Across open water, after something that is going somewhere. A giant is patrolling and turning
+  // while you close on it, and its tail — the end you can actually hold — is another body length
+  // past its middle again. The pursuit re-aims every frame and keeps its target however far the
+  // swim turns out to be; it is paid for when it sets out, not by the second.
+  const chase = (creatureId: CreatureId, dist: number, moving: boolean) => {
+    const g = new Game('reef', [{ creature: creatureId, device: 'keyboard', ready: true }], 21);
+    const p = g.players[0]; p.spawnProtect = 0; p.vel = { x: 0, y: 0, z: 0 };
+    const o = g.spawn('anomalocaris', 'giant', { x: 40, y: 20, z: -70 }, 3.5);
+    o.brain = undefined; o.spawnProtect = 0; o.yaw = Math.PI;
+    p.pos = { x: 40, y: 20, z: -70 + dist }; p.yaw = Math.PI;
+    g.hash.rebuild(g.actors);
+    const m = new Map([[0, { ...emptyInput(), camYaw: Math.PI, heavy: true } as InputFrame]]);
+    let held = -1, stamina = 0;
+    for (let i = 0; i < 60 * 14; i++) {
+      if (moving) { o.yaw += 0.012; o.pos.x += Math.sin(o.yaw) * 0.09; o.pos.z += Math.cos(o.yaw) * 0.09; }
+      o.spawnProtect = 0;
+      g.step(1 / 60, m); g.events.length = 0;
+      if (held < 0 && p.rideHost === o.id) { held = i / 60; stamina = p.stamina; }
+      if (held >= 0 && p.rideHost < 0) return { held, ran: i / 60 - held, stamina, endStamina: p.stamina };
+    }
+    return { held, ran: held < 0 ? 0 : 14 - held, stamina, endStamina: p.stamina };
+  };
+  for (const c of ['opabinia', 'waptia'] as CreatureId[]) {
+    const far = [20, 40, 60].map((d) => chase(c, d, false));
+    check(`${creature(c).name} crosses open water to reach one`, far.every((r) => r.held > 0),
+      far.map((r, i) => `${[20, 40, 60][i]}u ${r.held < 0 ? 'never' : r.held.toFixed(1) + 's'}`).join(' · '));
+    const swimming = chase(c, 40, true);
+    check('...and catches one that is swimming and turning', swimming.held > 0, `caught at ${swimming.held < 0 ? 'never' : swimming.held.toFixed(1) + 's'}`);
+    // Holding on is free: the bar you spent getting there is not also the bar you hang on with.
+    check('...and hanging on costs it nothing', swimming.held > 0 && swimming.endStamina >= swimming.stamina - 1,
+      `${swimming.stamina.toFixed(0)} on grabbing, ${swimming.endStamina.toFixed(0)} on letting go`);
+  }
+}
+
 // --- what is held stays joined to what is holding it ---
 {
   const held = (() => {
@@ -215,14 +329,13 @@ function inFront(p: Actor, o: Actor) {
       if (o.state !== 'grabbed') break;
       // The grabber's grip point and the point on the victim the grip has: one place, or it is
       // not a hold. Measured against the victim's own size so it means the same for any body.
+      // Both points from the simulation's own definitions, so the check cannot quietly measure
+      // something the game does not do. What is under test is that they stay in one place while
+      // both animals swim and turn, which is the pinning, not the arithmetic.
       const gh = heading(p.yaw), gl = lengthOf(p);
-      const grip = { x: p.pos.x + gh.x * gl * 0.42, y: p.pos.y - Math.sin(p.pitch) * gl * 0.42, z: p.pos.z + gh.z * gl * 0.42 };
-      const vh = heading(o.yaw), r = bodyRadius(o), off = o.grabOff;
-      const hold = {
-        x: o.pos.x + (-vh.z * off.x + vh.x * off.z) * r,
-        y: o.pos.y + off.y * r,
-        z: o.pos.z + (vh.z * 0 + vh.x * off.x + vh.z * off.z) * r,
-      };
+      const grip = { x: p.pos.x + gh.x * gl * GRASP_AT, y: p.pos.y - Math.sin(p.pitch) * gl * GRASP_AT, z: p.pos.z + gh.z * gl * GRASP_AT };
+      const g0 = graspPoint(o);
+      const hold = { x: o.pos.x + g0.x, y: o.pos.y + g0.y, z: o.pos.z + g0.z };
       worst = Math.max(worst, Math.hypot(grip.x - hold.x, grip.y - hold.y, grip.z - hold.z) / lengthOf(o));
     }
     return { p, o, worst };

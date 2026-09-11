@@ -762,7 +762,10 @@ const { TIER_SCALE } = await import('../src/sim/types');
   g.skipHatch();
   const [shark, plate] = g.players;
   const floorS = groundHeight(g.world, shark.pos.x, shark.pos.z), floorP = groundHeight(g.world, plate.pos.x, plate.pos.z);
-  ok(coverAt(g.world, shark.pos, lengthOf(shark), []) > 0.2 && shark.pos.y > floorS + 0.3, `a swimmer hatches hidden in the plants, off the floor (cover ${coverAt(g.world, shark.pos, lengthOf(shark), []).toFixed(2)}, ${(shark.pos.y - floorS).toFixed(1)} up, ${(SURFACE_Y - floorS).toFixed(0)} of water)`);
+  // On the sand and hidden, because it comes out of an egg and an egg is laid on the floor at the
+  // foot of the growth (`layEgg` in game.ts). It used to hatch up in the high plants, which was
+  // right while a hatchling simply appeared mid-water.
+  ok(coverAt(g.world, shark.pos, lengthOf(shark), []) > 0.2 && shark.pos.y < floorS + lengthOf(shark) * 0.6, `a swimmer hatches hidden in the plants, down on the floor (cover ${coverAt(g.world, shark.pos, lengthOf(shark), []).toFixed(2)}, ${(shark.pos.y - floorS).toFixed(1)} up, ${(SURFACE_Y - floorS).toFixed(0)} of water)`);
   ok(plate.pos.y - floorP < 2, 'a crawler hatches on the floor');
   // lily crowns give cover high up, where a fish would use it
   const c = g.world.cover.find((cv) => cv.pos.y > floorS + 6);
