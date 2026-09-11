@@ -125,8 +125,10 @@ unless the user explicitly asks for a PR. Steps:
 - Every player hatches out of an egg on the bottom rung: `HATCH_TIME` in `src/sim/game.ts` holds the
   body still for five seconds (`skipHatch()` ends it for headless harnesses), `layEgg` puts the
   Cambrian egg on the sand nose-to the nearest rock or plant (the Devonian's `spawnInCover` has
-  already chosen), and `src/render/eggs.ts` draws the shell — small, opaque, filled by the body,
-  pokes from inside, split open by the body growing into it. A moult above that rung is the old
+  already chosen, on the sand in the growth), and `src/render/eggs.ts` draws the shell — small,
+  opaque, filled by the body, settled part-buried in the sand, taking pokes from inside, and split
+  down its length by the body growing into it: the cut is the vertical plane through the long axis
+  and the two halves hinge along the seam's floor and fall open to either side. A moult above that rung is the old
   one-second swell.
 - What a player has found — biomes, landmarks, species taken to the top, the Rise record — is
   written to `localStorage` as the match finds it (`recordFinds` in `src/app/codex.ts`), never at

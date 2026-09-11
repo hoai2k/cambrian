@@ -1010,10 +1010,12 @@ export class Game implements AiWorld {
       a.yaw = Math.atan2(-dx, -dz);
     }
     const g = groundHeight(this.world, x, z, this.scratchBoulders);
-    // Down on the sand — but never so far down that it drops out of the patch that was hiding it.
-    // A plant's cover is a ball centred over its own base, so the last few inches to the floor can
-    // cost a hatchling the growth it was laid in.
-    const rest = g + L * 0.22;                          // the shell's own radius off the sand
+    // Down *into* the sand — an egg is not balanced on the seabed, it is settled into it, so the
+    // shell stands a little under half buried and the body inside sits at the same height. Never so
+    // far down that it drops out of the patch that was hiding it, though: a plant's cover is a ball
+    // centred over its own base, and the last few inches to the floor can cost a hatchling the
+    // growth it was laid in.
+    const rest = g + L * 0.13;                          // the shell's radius is about 0.22 of this
     a.pos = { x, y: best && hidden ? Math.max(rest, best.pos.y - best.radius * 0.75) : rest, z };
     a.prevT = { ...a.pos, yaw: a.yaw, pitch: a.pitch, bank: a.bank };
   }
