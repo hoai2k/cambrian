@@ -27,6 +27,16 @@ unless the user explicitly asks for a PR. Steps:
 - Any change to a creature's model, colours or textures must go through
   `docs/creature-intake.md`: re-render, `npm run cards`, `npm run lods`, and
   `npm run check` must pass. The check flags stale images automatically.
+- The creature builders are Blender 5.2 Python and the version is not a detail: the glTF
+  exporter's `export_vertex_color='NAME'` is a 5.x option that 4.x does not have at all, so a 4.x
+  Blender will sculpt, shade and rig a creature and then fail on the export. `npm run blender`
+  installs the pinned 5.2.1 to `/opt/blender` (idempotent, upstream checksum, about half a minute
+  from cold), which is what a session should run before touching a builder. Doing this in the
+  environment's own setup script keeps it out of the session's way. The Linux build reproduces the
+  macOS one exactly: rebuilding Cheirolepis there gave byte-identical vertex positions across all
+  98,012 vertices, identical textures, accessors and clips, and passed packaging and
+  `tools/devonian/check.mjs`; only the meshopt-compressed byte stream differs, which the packager
+  verifies by value rather than by byte.
 - The sea is endless and streamed: `src/sim/world.ts` generates 64-unit chunks from the seed
   around every player, banded into nine biomes by distance from the one shoreline. Nothing may
   assume a world bound; anything that places things in the world must go through the biome
@@ -166,8 +176,50 @@ unless the user explicitly asks for a PR. Steps:
   near it — with the *surface* gap every reach test actually uses — and the simulation's own account
   of the frame, written from inside the gates that decide (`Game.graspReason`) rather than
   reconstructed beside them, so a recording can never disagree with what the game did. Anything that
-  gains a gate a player can fall foul of should say so there. `npm run record` checks that a
-  recording distinguishes a grab that worked from one that could not and names the reason.
+  gains a gate a player can fall foul of should say so there. Which bodies count as near is decided
+  by that surface gap too, not by a radius round the player's centre: a hatchling clinging to a
+  giant is a hand's breadth from its flank and ten units from its middle, and the first recording
+  measured the wrong one and so listed no neighbours at all in eleven hundred samples. `npm run
+  record` checks that a recording distinguishes a grab that worked from one that could not, names
+  the reason, and lists the animal it is about however big that animal is.
+- Taking hold is not an attack. Holding costs nothing — no clock, no stamina — and hurts nothing: a
+  player's grip never crushes, button down or up. Anything from the animal's own size upwards is
+  *ridden* (`takeRide`) until the player lets go or the host shakes them off with a dash; anything
+  it could swallow is held in the jaws (`takeHold`). Both decisions are made in one place per path
+  — `closeGrip` for a grip that arrives on a lunge or a landing blow, `tryGrasp` for one reached
+  for directly — and they must agree. Biting what you are clinging to is a separate press.
+  The grasping appendages (`def.grasp`) only make a grip easier to close and further to reach with,
+  never a different outcome.
+- What a grip *comes to* is decided by the release, and every window runs from `gripSyncT`: -1 while
+  the grip is still closing, counting from the frame the two bodies actually meet. Timing from the
+  button charged the player for the approach. A ride let go of inside `GRIP_STRIKE` (2 s) lands the
+  blow the grip stood in for and something big comes looking for you; held longer it does nothing
+  and the host never learns it has a passenger. A mouthful let go of inside `GRIP_MEAL` (5 s) is
+  eaten; carried longer it works loose; and at `GRIP_BREAK` (15 s) it is out whatever the holder
+  wants — holding costs the holder nothing, so without that it would cost the held animal
+  everything. All three ways of getting away are one `breakLoose`. Constants in `src/sim/combat.ts`.
+- A grip is a tug of war, not a container. `Actor.drive` is what a body is *asking* for each step,
+  kept apart from `desired` because the state machine takes the wish away from anything grabbed. A
+  holder moves by both wishes summed and shared by mass, so a heavy catch that wants nothing drags
+  on it and one pulling the other way cancels it out; what wears the hold (`GRIP_STRAIN`) is how
+  *opposed* the two are, so a holder that goes slack and drifts along is the hardest to escape. A
+  dash decides between the two: against a holder that is pulling it tears the grip open, against a
+  slack one it shoves the holder instead, scaled by an *uncapped* mass share so hauling something
+  six times your length is very nearly futile. `npm run grab` covers all of it.
+- A grip is drawn on the host's *animation*, not on its rigid frame. `rideHold` is a point offset
+  from the host's centre — where a rigid capsule's surface would be — and a swimming animal's flank
+  sweeps and its tail beats right past it, so a rider pinned there holds still while the thing it is
+  gripping moves, which reads as floating alongside. At contact `Attachments` takes the host bone
+  nearest the hold point (`CreatureAnchors.nearestBone`), keeps the hold point in that bone's frame,
+  and each frame reads it back out of the bone's live world matrix and applies the bone's *rotation
+  change* to the rider about the hold point. Presentation only — `src/sim` stays rigid and
+  deterministic, and the correction is bounded by half the rider's length.
+- A player must be able to see the state the simulation is in. The grip is the worked example: it
+  closed and held in complete silence, so a recording of it working read to the player as it not
+  working. `Game.gripFor` is the readout — what is in the grip and the button that bites it —
+  drawn by `GripPanel` in `src/app/Hud.tsx`, and it survives sense-off because it is the player's
+  own act rather than a readout of the world. A ride carries no bar, because nothing about it runs
+  down; only a mouthful does, and that bar is the mouthful's own struggle to get free.
 - The two typefaces are served from `public/fonts/`, not from fonts.googleapis.com: four
   variable WOFF2 files (one per family per Latin subset) declared over a weight range in
   `public/fonts/fonts.css`, which each entry page links. Both are OFL, and the licences ship

@@ -38,6 +38,12 @@ interface AimState { weight: number; target: THREE.Vector3; }
 export class Attachments {
   private feeding = new Map<number, FeedingState>();
   private aim = new Map<number, AimState>();
+  /** Which bone each rider has hold of, and where on it. See `gripOn`. */
+  private grips = new Map<number, { host: number; bone: string; local: THREE.Vector3; rest: THREE.Quaternion }>();
+  private bonePoint = new THREE.Vector3();
+  private boneInv = new THREE.Matrix4();
+  private boneQuat = new THREE.Quaternion();
+  private swingQuat = new THREE.Quaternion();
   private anchorPoint = new THREE.Vector3(); private mouthPoint = new THREE.Vector3(); private insidePoint = new THREE.Vector3();
   private target = new THREE.Vector3(); private tmp = new THREE.Vector3();
 
@@ -238,14 +244,49 @@ export class Attachments {
     // is shifted until its own grasp socket sits on the hold point instead of its middle being near
     // it. Without this a ride was the only hold in the game with nothing joining the two bodies —
     // the rider was simply drawn at a position beside the host and read as floating alongside.
+    //
+    // And the hold point is on the host's *animation*, not on its rigid frame. `rideHold` gives a
+    // point at a fixed offset from the host's centre, which is where a rigid capsule's surface
+    // would be; a swimming animal's flank sweeps and its tail beats right past it, so a rider
+    // pinned there holds still while the thing it is gripping moves. Whatever part the grip landed
+    // on, the rider rides that part: the bone nearest the hold point at the moment of contact is
+    // remembered, and from then on the hold follows that bone's own world transform, rotation
+    // included. That is the whole of what makes a grip read as a grip rather than as two bodies
+    // that happen to be near each other.
     for (const rider of world.actors) {
       if (rider.rideHost < 0 || claimed.has(rider.id)) continue;
       const host = world.byId(rider.rideHost);
       if (!host || host.riddenBy !== rider.id) continue;
       const rv = views.get(rider.id); if (!rv) continue;
-      if (!rv.anchors.world('anchor_grasp', this.anchorPoint) && !rv.anchors.world('anchor_attack_primary', this.anchorPoint)) continue;
+      const hv = views.get(host.id);
       const hold = rideHold(rider, host);
-      this.target.set(hold.x, hold.y, hold.z).sub(this.anchorPoint);
+      let holdX = hold.x, holdY = hold.y, holdZ = hold.z;
+      let swing: THREE.Quaternion | undefined;
+      // Only once the simulation says the two bodies have actually met. Before that the rider is
+      // still closing, and the bone nearest it then is not the one it ends up against.
+      if (hv && rider.gripSyncT >= 0) {
+        const grip = this.gripOn(rider.id, host.id, hv, hold);
+        if (grip) {
+          const bone = hv.anchors.bone(grip.bone);
+          if (bone) {
+            bone.updateWorldMatrix(true, false);
+            // The hold point, carried by the bone: where it sat in the bone's own frame at contact,
+            // read back out of the bone wherever the animation has since put it.
+            this.bonePoint.copy(grip.local).applyMatrix4(bone.matrixWorld);
+            holdX = this.bonePoint.x; holdY = this.bonePoint.y; holdZ = this.bonePoint.z;
+            // And carried by the bone's *turning*, so a rider on a beating tail leans with it.
+            bone.getWorldQuaternion(this.boneQuat);
+            swing = this.swingQuat.copy(this.boneQuat).multiply(grip.rest);
+          }
+        }
+      }
+      // The rider leans with the part it is holding, about the hold point rather than about its own
+      // middle — so the grip stays put and the body swings from it.
+      if (swing) rv.group.quaternion.premultiply(swing);
+      if (!rv.anchors.world('anchor_grasp', this.anchorPoint) && !rv.anchors.world('anchor_attack_primary', this.anchorPoint)) {
+        this.anchorPoint.copy(rv.group.position);
+      }
+      this.target.set(holdX, holdY, holdZ).sub(this.anchorPoint);
       // A correction, not a placement: the simulation already has the body against the host, and
       // this closes the last of the gap. Bounded so a rig whose socket is somewhere unexpected
       // cannot fling the animal across the sea.
@@ -253,6 +294,36 @@ export class Attachments {
       if (this.target.length() > limit) this.target.setLength(limit);
       rv.group.position.add(this.target);
     }
+    // Forget grips whose ride has ended, so a later one on the same host re-picks its bone.
+    for (const id of this.grips.keys()) {
+      const r = world.byId(id);
+      if (!r || r.rideHost < 0) this.grips.delete(id);
+    }
+  }
+
+  /**
+   * The bone this rider is holding, captured once at contact and kept for the life of the ride.
+   *
+   * Captured at *contact* rather than when the grip closed: the grip closes at arm's length and the
+   * bodies then come together, and the bone nearest the rider at the start of that is not
+   * necessarily the one it ends up against. `gripSyncT` is the simulation saying the two have met.
+   */
+  private gripOn(riderId: number, hostId: number, hv: AttachView, hold: { x: number; y: number; z: number }) {
+    const had = this.grips.get(riderId);
+    if (had && had.host === hostId) return had;
+    this.bonePoint.set(hold.x, hold.y, hold.z);
+    const bone = hv.anchors.nearestBone(this.bonePoint);
+    if (!bone) return undefined;
+    bone.updateWorldMatrix(true, false);
+    // The hold point in the bone's own frame, and the bone's rest rotation, so what is applied
+    // later is the bone's *change* since contact rather than its absolute orientation.
+    const local = this.bonePoint.clone().applyMatrix4(this.boneInv.copy(bone.matrixWorld).invert());
+    const rest = new THREE.Quaternion();
+    bone.getWorldQuaternion(rest);
+    rest.invert();
+    const grip = { host: hostId, bone: bone.name, local, rest };
+    this.grips.set(riderId, grip);
+    return grip;
   }
 
   /** World point where an attacker's strike visibly lands on `victimPos`, or false if the rig has no attack sockets. */
