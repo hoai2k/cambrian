@@ -2088,7 +2088,10 @@ export class Game implements AiWorld {
     }
     if (!best) { why(nearestWhy || 'nothing within reach to take hold of'); return 'none'; }
     const band = bandOf(a, best);
-    const bigger = band === 'threat' || band === 'giant';
+    // Ridden, or taken into the jaws? Only what this body could actually swallow is a mouthful;
+    // its own size and up is something to hold on to. Same rule as `closeGrip`, which is where a
+    // grip closed by a lunge or a landing blow decides it.
+    const bigger = band !== 'snack' && band !== 'prey';
     const name = `${creature(best.creature).name} (${band}, gap ${bd.toFixed(2)})`;
     if (bigger && gripButton && def.grasp) {
       const took = takeRide(this.hitCtx, a, best);
@@ -2114,8 +2117,9 @@ export class Game implements AiWorld {
 
   /**
    * Close whatever grip suits the far body's size, and say whether one closed. A mouthful is held
-   * in the mouth; anything over the rival band is held on to. Neither costs it any health — what
-   * the grip comes to is settled when the button comes up, not when it shuts.
+   * in the mouth; anything from the animal's own size upwards is held on to. Neither costs it any
+   * health — what the grip comes to is settled when the button comes up, not when it shuts, and for
+   * anything too big to swallow it comes to nothing at all.
    */
   private closeGrip(a: Actor, o: Actor): boolean {
     const band = bandOf(a, o);

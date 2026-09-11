@@ -1,9 +1,10 @@
 /**
- * Taking hold. A grasping animal closes its grip on what is in reach while the button is down —
- * a grip, not a blow, so nothing it takes hold of is hurt by the taking. Prey is held and
- * swallowed when the button comes up, a peer is crushed and thrown, and anything bigger than a
- * rival is *ridden*: grabbed anywhere but the head end and carried along until it shakes you off.
- * Riding does no damage by itself; biting while you cling does.
+ * Taking hold. An animal closes its grip on what is in reach while the button is down — a grip, not
+ * a blow, so nothing it takes hold of is hurt by the taking, by the keeping, or by the letting go.
+ * What it could swallow is held in the jaws and eaten when the button comes up; anything from its
+ * own size upwards is *ridden*, grabbed anywhere but the head end and carried along until it lets
+ * go or the host shakes it off. Riding costs nothing and has no clock: biting the thing you are
+ * clinging to is a separate press, and that is the only thing here that does damage.
  *
  * A tap is still an attack. The grip button (RT, or the ability) skips the wait against a body too
  * big to be a mouthful and fires no strike when it does, because getting hold of something huge
@@ -196,9 +197,13 @@ function inFront(p: Actor, o: Actor) {
   const carried = pounceAt(0.5, 5);
   check('...however long it is carried first', !isAlive(carried.o) && carried.p.eats > 0 && carried.duringHold === 0, `5 s in the mouth, ${carried.duringHold.toFixed(0)} damage`);
 
+  // A grip on something too big to swallow is a hold, however briefly it is kept. It used to land
+  // the creature's heavy blow if it was released inside the first fraction of a second, which meant
+  // grabbing a giant and thinking better of it hurt it — there was no way to take hold of an animal
+  // without attacking it. Both ends of the button are now free of consequences for what is held.
   const quick = pounceAt(3.5, 0.5);
   check('the same lunge at a giant takes hold of it', quick.held && quick.duringHold === 0, `band ${quick.band}, ${quick.duringHold.toFixed(0)} damage while held`);
-  check('...and letting go quickly is the blow that never landed', quick.onRelease > 0, `${quick.onRelease.toFixed(0)} damage on the release`);
+  check('...and letting go quickly is only letting go', quick.onRelease <= 0, `${Math.max(0, quick.onRelease).toFixed(0)} damage on the release`);
   const ridden = pounceAt(3.5, 5);
   check('...while holding on is a ride it is never troubled by', ridden.duringHold === 0 && ridden.onRelease <= 0, `${ridden.duringHold.toFixed(0)} while held, ${Math.max(0, ridden.onRelease).toFixed(0)} on the release`);
 }
