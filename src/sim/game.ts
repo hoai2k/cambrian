@@ -7,7 +7,7 @@ import { applyScaleStats, bandOf, bodyGap, bodyRadius, canAct, clearanceOf, clim
 import { tierForScale, tierScale } from './tiers';
 import { makeBrain, peaceful, think, type AiWorld } from './ai';
 import { huntingPressure, phaseAt, untilNextPhase, type Phase } from './daynight';
-import { applyHit, endRide, kill, rideHold, startSwallow, takeHold, takeRide, type HitContext } from './combat';
+import { applyHit, endRide, GRIP_MEAL, GRIP_STRIKE, kill, rideHold, startSwallow, takeHold, takeRide, type HitContext } from './combat';
 import { creature, CREATURE_IDS, PLAYABLE_IDS, type CreatureId, type MoveDef } from './creatures';
 import { resolveFlora, stepFlora, type FloraContact } from './flora';
 import { SpatialHash } from './spatial';
@@ -247,12 +247,17 @@ export interface GripHud {
   /** What is in the grip. Empty for `spent`, which has nothing in it. */
   name: string; band: Band;
   /**
-   * How close what is held is to struggling free, 1 → 0. A ride has none: nothing about holding on
-   * runs down, so there is no bar to draw and drawing one would be a promise the grip does not make.
+   * What letting go *right now* would do — the only thing about a grip a player needs decided in
+   * the moment. A grip has two windows and they both run from contact: release a ride inside
+   * `GRIP_STRIKE` and it is the blow the grip stood in for, past it the animal never knew you were
+   * there; release a mouthful inside `GRIP_MEAL` and you eat it, past it it has worked loose.
+   */
+  release: 'strike' | 'eat' | 'escape' | 'nothing';
+  /**
+   * How much of that window is left, 1 → 0, or absent when nothing is running down — which a ride
+   * settles into once it has stopped being an attack, and is the honest thing to show then.
    */
   left?: number;
-  /** Letting go eats what is held. Nothing a grip holds is ever hurt by the holding. */
-  eats: boolean;
 }
 /**
  * How far past its own pounce range an animal will look for something to take hold of. Wide enough
@@ -1726,24 +1731,35 @@ export class Game implements AiWorld {
         // squeezes as it always did — that is an attack, not a grip.
         const holdingOn = a.graspHold && a.controller === 'player';
         if (!holdingOn) v.grabT -= dt;
+        if (a.gripSyncT >= 0) a.gripSyncT += dt;
         // crush ticks
         if (!holdingOn && Math.floor(a.stateT * 2.5) !== Math.floor((a.stateT - dt) * 2.5)) {
           v.hp -= 6 * clamp(Math.pow(L / lengthOf(v), 1.6), 0.2, 4); v.hitFlash = 0.3;
           this.events.push({ kind: 'hit', pos: { ...v.pos }, actor: a.id, other: v.id, strength: 0.4, player: v.player });
           if (v.hp <= 0) { a.state = 'free'; a.grabbing = -1; if (lengthOf(a) >= lengthOf(v) * 1.35) startSwallow(this.hitCtx, a, v); else kill(this.hitCtx, v, a); }
         }
-        // A grasping player holds on for as long as the button is down. Letting go of something
-        // small is a mouthful — that is what the grip was for — and letting go of a peer is just
-        // letting go: it has taken the crushing, and the throw is the end of the exchange.
+        // A player holds on for as long as the button is down. Letting go of something small is a
+        // mouthful — that is what the grip was for — and letting go of a peer is just letting go.
         const holding = a.graspHold && a.state === 'grabbing' && v.state === 'grabbed';
         if (holding) a.stateDur = a.stateT + 0.4;
         else if (a.stateT >= a.stateDur && v.state === 'grabbed') {
-          // What you held and could swallow, you eat; the grasping appendages were never what made
-          // a mouthful a meal.
+          // What you held and could swallow, you eat — if you eat it while it is still worth
+          // eating. Past `GRIP_MEAL` the animal has had every chance: carrying prey around in your
+          // jaws for five seconds is not a meal you are having, and it works itself loose and goes.
+          // Timed from contact, like everything else a grip comes to.
           const swallowable = bandOf(a, v) === 'snack' || bandOf(a, v) === 'prey';
-          if (swallowable && a.controller === 'player') {
+          const inTime = a.gripSyncT >= 0 && a.gripSyncT < GRIP_MEAL;
+          if (swallowable && a.controller === 'player' && inTime) {
             v.grabbedBy = -1; a.grabbing = -1;
             startSwallow(this.hitCtx, a, v);
+          } else if (swallowable && a.controller === 'player') {
+            // Loose. Not thrown and not hurt — it simply gets away, and it swims like something
+            // that has just got away.
+            v.state = 'free'; v.stateT = 0; v.grabbedBy = -1; v.iframes = 0.4;
+            a.state = 'free'; a.stateT = 0; a.grabbing = -1;
+            v.escapes++;
+            if (v.brain) { v.brain.goal = 'flee'; v.brain.target = a.id; v.brain.goalT = 0; }
+            this.events.push({ kind: 'escape', pos: { ...v.pos }, actor: v.id, other: a.id, player: v.player });
           } else {
             // throw
             const h = heading(a.yaw);
@@ -1879,13 +1895,25 @@ export class Game implements AiWorld {
       || host.state === 'grabbed' || host.state === 'swallowed') { endRide(a, host); return; }
     if (host.state === 'dodge') { endRide(a, host, true); return; }                 // shaken off
     a.rideT += dt;
-    // Holding on is free and has no end of its own. `rideT` is kept because the renderer and the
-    // brief settling window below read it, not because anything is counting down.
+    if (a.gripSyncT >= 0) a.gripSyncT += dt;
+    // Holding on is free and has no end of its own. `rideT` is the time since the grip closed, and
+    // the only thing it is for is the short grace below.
     //
-    // The short grace before a release is honoured is the frame the grip was closed in: a pounce
-    // that arrives as a grip does so on the same frame the button is still travelling, and without
-    // it a hold could be dropped before the player had a chance to keep it.
-    if (player && !a.graspHold && a.rideT > 0.35) { endRide(a, host); return; }
+    // That grace is the frame the grip was closed in: a pounce that arrives as a grip does so while
+    // the button is still travelling, and without it a hold could be dropped before the player had
+    // any chance to keep it.
+    if (player && !a.graspHold && a.rideT > 0.35) {
+      // Grab and let go and it is the blow the grip stood in for — and the animal comes looking for
+      // whoever did it. Hold on past `GRIP_STRIKE` and the grip has stopped being an attack: it
+      // does nothing at all, and the host never learns it has a passenger.
+      //
+      // Judged from contact, so the fraction of a second the bodies spend coming together is not
+      // charged to the player as time spent holding on.
+      if (a.gripSyncT >= 0 && a.gripSyncT <= GRIP_STRIKE && isAlive(host)) {
+        applyHit(this.hitCtx, a, host, { ...def.heavy, name: 'Grip', lunge: 0 }, 1);
+      }
+      endRide(a, host); return;
+    }
     const h = heading(host.yaw);
     // The hold point on the host, then out along the host's surface by the rider's own half-width,
     // so the rider lies *on* the host rather than with its middle buried in it.
@@ -1898,7 +1926,12 @@ export class Game implements AiWorld {
     a.pos.x = damp(a.pos.x, target.x, 22, dt);
     a.pos.y = damp(a.pos.y, target.y, 22, dt);
     a.pos.z = damp(a.pos.z, target.z, 22, dt);
-    if (Math.hypot(a.pos.x - target.x, a.pos.y - target.y, a.pos.z - target.z) < lengthOf(a) * 0.05) a.pos = { ...target };
+    // Contact: the grip has stopped closing and the two bodies are together. Everything a grip
+    // comes to is timed from this frame, and the renderer takes its bone hold from here too.
+    if (Math.hypot(a.pos.x - target.x, a.pos.y - target.y, a.pos.z - target.z) < lengthOf(a) * 0.05) {
+      a.pos = { ...target };
+      if (a.gripSyncT < 0) a.gripSyncT = 0;
+    }
     a.vel = { x: host.vel.x, y: host.vel.y, z: host.vel.z };
     a.grounded = false; a.hopVel = 0; a.climbTo = -Infinity;
     if (player) this.flag(a, 'ride');
@@ -3099,22 +3132,35 @@ export class Game implements AiWorld {
     if (p.rideHost >= 0) {
       const host = this.idMap.get(p.rideHost);
       if (!host) return undefined;
-      // No `left`: a ride is not spending anything, and the only thing that ends it against the
-      // player's will is the host throwing itself sideways, which no bar could have predicted.
-      return { kind: 'ride', name: creature(host.creature).name, band: bandOf(p, host), eats: false };
+      const name = creature(host.creature).name, band = bandOf(p, host);
+      // Inside the strike window there is something running down and it matters: let go now and it
+      // is a blow. Once it has passed, nothing is running — the ride lasts as long as the player
+      // wants it to — so there is no bar, because a bar there would be a promise the grip does not
+      // make.
+      const held = p.gripSyncT;
+      if (held >= 0 && held <= GRIP_STRIKE) {
+        return { kind: 'ride', name, band, release: 'strike', left: clamp(1 - held / GRIP_STRIKE, 0, 1) };
+      }
+      return { kind: 'ride', name, band, release: 'nothing' };
     }
     if (p.state === 'grabbing' && p.grabbing >= 0) {
       const v = this.idMap.get(p.grabbing);
       if (!v) return undefined;
       const band = bandOf(p, v);
-      // The bar here is the *victim's* — how close it is to struggling out of the jaws — not a
-      // limit on the grip. A mouthful is eaten when the button comes up, and until then it is only
-      // held: the crush went with everything else that hurt what a grip had hold of.
-      return { kind: 'hold', name: creature(v.creature).name, band, left: clamp(v.grabT / 1.6, 0, 1), eats: true };
+      // A mouthful is eaten when the button comes up, and until then it is only held — the crush
+      // went with everything else that hurt what a grip had hold of. What the bar counts is the
+      // window in which it is still a meal: carry it around past `GRIP_MEAL` and it gets away.
+      const held = p.gripSyncT;
+      const inTime = held >= 0 && held < GRIP_MEAL;
+      return {
+        kind: 'hold', name: creature(v.creature).name, band,
+        release: inTime || held < 0 ? 'eat' : 'escape',
+        left: held < 0 ? 1 : clamp(1 - held / GRIP_MEAL, 0, 1),
+      };
     }
     // The arms have given out and the button is still down. Two and a half seconds of pressing
     // harder and nothing happening reads as a broken mechanic; one line saying so reads as a rule.
-    if (p.graspSpent && p.graspHold) return { kind: 'spent', name: '', band: 'rival', eats: false };
+    if (p.graspSpent && p.graspHold) return { kind: 'spent', name: '', band: 'rival', release: 'nothing' };
     return undefined;
   }
 

@@ -185,11 +185,12 @@ function SensePanel({ p }: { p: PlayerHud }) {
  * The grip used to happen entirely in silence: a recording of a player trying to grab a giant had
  * the grip closing three separate times and carrying them thirteen seconds, while the player — who
  * could see none of that — reported that grabbing did not work. Every part of it was already
- * knowable, so this says all of it: what is in the grip and which button bites what you are
- * clinging to. Without that last line a ride is a thing that happens *to* you.
+ * knowable, so this says all of it: what is in the grip, what letting go would do to it, and how
+ * long that stays true. Without the last line a ride is a thing that happens *to* you.
  *
- * There is no clock on a ride, because there is nothing timing it: holding on costs nothing and
- * ends when the player lets go.
+ * A settled ride shows no clock, because there is nothing timing it: holding on costs nothing and
+ * ends when the player lets go. What the bar counts, when there is one, is a window that is about
+ * to change what the button means.
  */
 function GripPanel({ grip, s }: { grip: NonNullable<PlayerHud['grip']>; s: Scheme }) {
   if (grip.kind === 'spent') {
@@ -201,17 +202,23 @@ function GripPanel({ grip, s }: { grip: NonNullable<PlayerHud['grip']>; s: Schem
     );
   }
   const ride = grip.kind === 'ride';
+  // What letting go would do, in the player's own words. The two windows both run from contact and
+  // both change what the button means, so the line changes with them rather than describing a grip
+  // in general.
+  const say = {
+    strike: 'Release NOW to strike',
+    eat: 'Release to eat it',
+    escape: 'It has worked loose — bite it or let it go',
+    nothing: `${key('light', s)} bite · release to let go`,
+  }[grip.release];
   return (
-    <div className="grip-panel" style={{ color: BAND_COLOR[grip.band] }}>
+    <div className={`grip-panel ${grip.release === 'strike' ? 'strike' : ''} ${grip.release === 'escape' ? 'lost' : ''}`} style={{ color: BAND_COLOR[grip.band] }}>
       <b>{ride ? 'HOLDING ON' : 'IN YOUR JAWS'} · {grip.name}</b>
-      {/* Only a mouthful has a bar, and it is the mouthful's own: how close it is to working free.
-          A ride has nothing running down, so it is given nothing that looks like it has. */}
+      {/* A bar only while something is actually running down — the strike window on a ride, the
+          meal window on a mouthful. A settled ride has no clock, so it is given nothing that looks
+          like one. */}
       {grip.left !== undefined && <div className="bar grip"><i style={{ width: `${grip.left * 100}%` }} /></div>}
-      <span>
-        {ride
-          ? `${key('light', s)} bite · release to let go`
-          : grip.eats ? 'Release to eat' : 'Release to let go'}
-      </span>
+      <span>{say}</span>
     </div>
   );
 }

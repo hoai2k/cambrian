@@ -167,6 +167,7 @@ export function takeHold(ctx: HitContext, attacker: Actor, victim: Actor): boole
   if (victim.state === 'grabbed' || attacker.grabbing >= 0 || victim.rideHost >= 0 || victim.riddenBy >= 0) return false;
   attacker.state = 'grabbing'; attacker.stateT = 0; attacker.stateDur = 1.6; attacker.grabbing = victim.id;
   victim.state = 'grabbed'; victim.stateT = 0; victim.grabbedBy = attacker.id; victim.grabT = 1.6;
+  attacker.gripSyncT = -1;                                // likewise: timed from when the mouth closes on it
   // Which way the grabber lies from the victim, in the victim's own frame: that is the side the
   // grip has, and the side that has to stay against the grabber's mouth.
   const vh = heading(victim.yaw);
@@ -185,6 +186,21 @@ export function takeHold(ctx: HitContext, attacker: Actor, victim: Actor): boole
  * that bites, and nothing gets a hold there.
  */
 const MOUTH_CONE = 0.55;
+/**
+ * How long after the grip *meets* the other body a release still counts as a blow.
+ *
+ * Grab and let go and it is a strike — and something big enough to shrug it off will come looking
+ * for whoever did it. Hold on past this and the grip has stopped being an attack: it does nothing,
+ * and the animal carrying you never learns you are there. Timed from contact (`gripSyncT`), not
+ * from the button, because the moment between the two is the grip travelling rather than holding.
+ */
+export const GRIP_STRIKE = 2;
+/**
+ * How long a mouthful may be carried and still be a meal. Past this the animal has had its chance:
+ * what it was holding works itself loose and swims off. Also timed from contact.
+ */
+export const GRIP_MEAL = 5;
+
 /**
  * Riding has no limit of its own — no clock, no stamina. It used to have both: nine seconds, then a
  * bar that drained while you hung there. Between them they made holding on a thing you were
@@ -222,7 +238,7 @@ export function takeRide(ctx: HitContext, rider: Actor, host: Actor): boolean {
   // flank of anything long, which is what made a ride read as floating alongside rather than
   // clinging on. Along the body it may be anywhere behind the jaws.
   const flank = bodyRadius(host) / hl;
-  rider.rideHost = host.id; rider.rideT = 0;
+  rider.rideHost = host.id; rider.rideT = 0; rider.gripSyncT = -1;   // not met yet: the bodies still have to come together
   rider.rideOff = {
     x: clamp(dot(d, right) / hl, -flank, flank),
     y: clamp((rider.pos.y - host.pos.y) / hl, -flank, flank),
@@ -251,7 +267,7 @@ export function rideHold(rider: Actor, host: Actor): Vec3 {
 /** Let go, from either side. `shaken` staggers the rider: it did not choose to come off. */
 export function endRide(rider: Actor, host: Actor | undefined, shaken = false) {
   if (host && host.riddenBy === rider.id) host.riddenBy = -1;
-  rider.rideHost = -1; rider.rideT = 0;
+  rider.rideHost = -1; rider.rideT = 0; rider.gripSyncT = -1;
   if (shaken && rider.state !== 'dead') { rider.state = 'stagger'; rider.stateT = 0; rider.stateDur = 0.5; rider.iframes = Math.max(rider.iframes, 0.2); }
 }
 

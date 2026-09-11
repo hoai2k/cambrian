@@ -14,7 +14,7 @@
 import { Game, GRASP_AT, graspPoint, gripHold, gripReach } from '../src/sim/game';
 import { emptyInput, type Actor, type InputFrame } from '../src/sim/types';
 import { bandOf, bodyRadius, isAlive, lengthOf, surfaceGap } from '../src/sim/actors';
-import { applyHit, endRide, takeHold, takeRide, type HitContext } from '../src/sim/combat';
+import { applyHit, endRide, GRIP_MEAL, GRIP_STRIKE, takeHold, takeRide, type HitContext } from '../src/sim/combat';
 import { creature, CREATURES } from '../src/sim/creatures';
 import { heading } from '../src/shared/math';
 import fs from 'node:fs';
@@ -197,13 +197,12 @@ function inFront(p: Actor, o: Actor) {
   const carried = pounceAt(0.5, 5);
   check('...however long it is carried first', !isAlive(carried.o) && carried.p.eats > 0 && carried.duringHold === 0, `5 s in the mouth, ${carried.duringHold.toFixed(0)} damage`);
 
-  // A grip on something too big to swallow is a hold, however briefly it is kept. It used to land
-  // the creature's heavy blow if it was released inside the first fraction of a second, which meant
-  // grabbing a giant and thinking better of it hurt it — there was no way to take hold of an animal
-  // without attacking it. Both ends of the button are now free of consequences for what is held.
+  // Grab a giant and let go and it is the blow the grip stood in for. Hold on past GRIP_STRIKE and
+  // the grip has stopped being an attack entirely: the animal carrying you never learns you are
+  // there. Both windows run from *contact*, not from the press.
   const quick = pounceAt(3.5, 0.5);
   check('the same lunge at a giant takes hold of it', quick.held && quick.duringHold === 0, `band ${quick.band}, ${quick.duringHold.toFixed(0)} damage while held`);
-  check('...and letting go quickly is only letting go', quick.onRelease <= 0, `${Math.max(0, quick.onRelease).toFixed(0)} damage on the release`);
+  check('...and letting go straight away is the blow the grip stood in for', quick.onRelease > 0, `${quick.onRelease.toFixed(0)} damage on the release`);
   const ridden = pounceAt(3.5, 5);
   check('...while holding on is a ride it is never troubled by', ridden.duringHold === 0 && ridden.onRelease <= 0, `${ridden.duringHold.toFixed(0)} while held, ${Math.max(0, ridden.onRelease).toFixed(0)} on the release`);
 }
@@ -408,28 +407,50 @@ function inFront(p: Actor, o: Actor) {
   check('the grip has no clock of its own', p.rideHost === o.id && p.rideT > 19, `held ${p.rideT.toFixed(1)} s and still on`);
   check('...and costs no stamina to keep', p.rideHost === o.id, `stamina ${p.stamina.toFixed(0)}`);
   check('...and never hurt what it was holding', o.hp === hp0, `host hp ${o.hp.toFixed(1)} of ${hp0.toFixed(1)}`);
-  // Letting go is letting go. A release used to land the creature's heavy blow if it came inside
-  // the first fraction of a second, so there was no way to take hold of an animal without hurting it.
+  // Long past the strike window, so letting go is only letting go — and the animal never knew.
   p.graspHold = false;
   for (let steps = 0; steps < 60; steps++) { g.step(1 / 60, new Map([[0, emptyInput()]])); g.events.length = 0; }
-  check('let go and nothing was struck', p.rideHost === -1 && o.hp === hp0, `host hp ${o.hp.toFixed(1)}`);
+  check('a ride let go of late leaves it unhurt', p.rideHost === -1 && o.hp === hp0, `host hp ${o.hp.toFixed(1)}`);
+  check('...and it never noticed the passenger', o.lastHitBy !== p.id && (!o.brain || o.brain.target !== p.id),
+    `lastHitBy ${o.lastHitBy}, brain target ${o.brain?.target ?? 'none'}`);
 }
 
-// --- a quick release is still only a release ---
+// --- the windows run from contact, not from the button ---
+// A grip closes at arm's length and the two bodies then come together over a fraction of a second.
+// Timing from the press charged the player for the approach: a grab-and-release could fall outside
+// its own strike window because the clock had been running while the animal was still travelling.
+{
+  const { g, p, o, ctx } = pair('hallucigenia', 4.6);
+  behind(p, o);
+  // Take hold from a body's length out, so the grip has real distance to close.
+  const away = heading(o.yaw);
+  p.pos = { x: p.pos.x - away.x * lengthOf(p), y: p.pos.y + lengthOf(p) * 0.6, z: p.pos.z - away.z * lengthOf(p) };
+  takeRide(ctx, p, o);
+  check('a grip that has not met the body yet has no clock', p.gripSyncT < 0, `gripSyncT=${p.gripSyncT}`);
+  p.prev = { ...p.prev, heavy: true };
+  const held = new Map([[0, { ...emptyInput(), heavy: true }]]);
+  let met = -1;
+  for (let i = 0; i < 120 && met < 0; i++) { p.graspHold = true; g.step(1 / 60, held); g.events.length = 0; if (p.gripSyncT >= 0) met = i; }
+  check('...and starts one the frame the bodies meet', met >= 0 && p.gripSyncT >= 0, `met on step ${met}`);
+  check('...which is after the grip closed, not when it closed', met > 0, `${met} steps of closing first`);
+}
+
+// --- a release inside the strike window is the blow, from contact ---
 {
   const { g, p, o, ctx } = pair('hallucigenia', 4.6);
   behind(p, o);
   takeRide(ctx, p, o);
   const hp0 = o.hp;
-  // The button is already down, so no press lands this frame: a *press* while riding is the bite,
-  // and the bite is meant to hurt. What is on trial here is the hold and the letting go.
   p.prev = { ...p.prev, heavy: true };
-  p.graspHold = true;
-  run(g, { ...emptyInput(), heavy: true }, 6);              // a tenth of a second, then off
+  const held = new Map([[0, { ...emptyInput(), heavy: true }]]);
+  // Hold until contact, then a moment longer — still well inside the two seconds.
+  for (let i = 0; i < 120 && (p.gripSyncT < 0 || p.gripSyncT < 0.5); i++) { p.graspHold = true; g.step(1 / 60, held); g.events.length = 0; }
+  check('the grip met the body', p.gripSyncT >= 0.5 && p.gripSyncT < GRIP_STRIKE, `${p.gripSyncT.toFixed(2)}s since contact`);
+  check('...and hurt nothing on the way', o.hp === hp0, `host hp ${o.hp.toFixed(1)}`);
   p.graspHold = false;
   run(g, emptyInput(), 60);
-  check('a grip taken and dropped at once does no damage', p.rideHost === -1 && o.hp === hp0,
-    `host hp ${o.hp.toFixed(1)} of ${hp0.toFixed(1)}`);
+  check('let go inside the strike window and it lands', p.rideHost === -1 && o.hp < hp0, `host hp ${o.hp.toFixed(1)} of ${hp0.toFixed(1)}`);
+  check('...and something that size comes looking for you', o.lastHitBy === p.id, `lastHitBy ${o.lastHitBy}, player ${p.id}`);
 }
 
 // --- something your own size is ridden, not crushed ---
@@ -467,6 +488,39 @@ function inFront(p: Actor, o: Actor) {
   check('let go by hand and both sides are clear', p.rideHost === -1 && o.riddenBy === -1, '');
 }
 
+// --- carry prey too long and it works loose ---
+// A mouthful is a meal you are having, not a thing you are keeping. Held past GRIP_MEAL from
+// contact, it gets away — unhurt, because nothing a grip holds is hurt by the holding.
+{
+  const { g, p, o, ctx } = pair('isoxys', 0.39);
+  const hp0 = o.hp;
+  takeHold(ctx, p, o);
+  check('prey is in the jaws', p.state === 'grabbing' && o.state === 'grabbed', `${p.state} / ${o.state}`);
+  p.prev = { ...p.prev, heavy: true };
+  const held = new Map([[0, { ...emptyInput(), heavy: true }]]);
+  for (let i = 0; i < 60 * (GRIP_MEAL + 1); i++) { p.graspHold = true; g.step(1 / 60, held); g.events.length = 0; }
+  check('...and is still held after the meal window', p.state === 'grabbing' && isAlive(o), `${p.state}, ${o.state}`);
+  check('...unhurt by the carrying', o.hp === hp0, `${o.hp.toFixed(1)} of ${hp0.toFixed(1)}`);
+  p.graspHold = false;
+  run(g, emptyInput(), 60);
+  check('let go that late and it swims off instead of being eaten',
+    isAlive(o) && o.state !== 'swallowed' && o.state !== 'dead' && o.grabbedBy === -1 && p.grabbing === -1,
+    `${o.state}, grabbedBy ${o.grabbedBy}`);
+  check('...and it is not eaten', p.eats === 0, `${p.eats} eaten`);
+}
+
+// --- but inside the window it is still the meal the grip was for ---
+{
+  const { g, p, o, ctx } = pair('isoxys', 0.39);
+  takeHold(ctx, p, o);
+  p.prev = { ...p.prev, heavy: true };
+  const held = new Map([[0, { ...emptyInput(), heavy: true }]]);
+  for (let i = 0; i < 60 * 2; i++) { p.graspHold = true; g.step(1 / 60, held); g.events.length = 0; }
+  p.graspHold = false;
+  run(g, emptyInput(), 60);
+  check('two seconds in the jaws and it is eaten', !isAlive(o) || o.state === 'swallowed' || o.state === 'dead', `${o.state}`);
+}
+
 // --- the grip says it has hold: the readout the HUD draws ---
 // The mechanic worked and the player could not tell. A real recording had the grip closing three
 // times on a giant and carrying the player thirteen seconds, while the player reported in good
@@ -477,23 +531,32 @@ function inFront(p: Actor, o: Actor) {
   check('nothing in the grip, nothing to say', g.gripFor(0) === undefined, '');
   o.pos = { x: p.pos.x + bodyRadius(o) * 0.9, y: p.pos.y, z: p.pos.z };
   takeRide(ctx, p, o);
+  p.gripSyncT = 0.2;                                        // met the body a moment ago
   const held = g.gripFor(0);
   check('a ride is reported as a ride, naming what is under you',
     held?.kind === 'ride' && held.name === 'Anomalocaris' && held.band === 'giant', `${held?.kind} ${held?.name} ${held?.band}`);
-  // No bar on a ride: nothing is running down, and a bar would be a promise the grip does not make.
-  check('...and carries no clock, because nothing is counting it', held?.left === undefined, `left=${held?.left}`);
-  check('...and promises no blow on release', held?.eats === false, '');
-  p.rideT = 30;
-  check('...still, half a minute in', g.gripFor(0)?.kind === 'ride' && g.gripFor(0)?.left === undefined, '');
-  // A mouthful does have a bar, and it is the mouthful's own: how close it is to working free.
+  check('...and says letting go now would be a blow', held?.release === 'strike', `${held?.release}`);
+  check('...with the window it is true for drawn as a bar', !!held && held.left !== undefined && held.left > 0.85, `left=${held?.left}`);
+  // Past the window the grip has stopped being an attack, and the readout stops offering one — and
+  // stops drawing a bar, because from here nothing is running down at all.
+  p.gripSyncT = GRIP_STRIKE + 1;
+  const settled = g.gripFor(0);
+  check('past the window it offers nothing and counts nothing', settled?.release === 'nothing' && settled.left === undefined, `${settled?.release}, left=${settled?.left}`);
+  p.gripSyncT = 120;
+  check('...still, two minutes in', g.gripFor(0)?.kind === 'ride' && g.gripFor(0)?.left === undefined, '');
+  // A mouthful counts the window in which it is still a meal.
   endRide(p, o);
   const { g: g2, p: p2, o: o2, ctx: ctx2 } = pair('hallucigenia', 0.3);
   takeHold(ctx2, p2, o2);
+  p2.gripSyncT = 0.1;
   const jaws = g2.gripFor(0);
   check('a mouthful says what is in the jaws, and that letting go eats it',
-    jaws?.kind === 'hold' && jaws.eats === true, `${jaws?.kind} eats=${jaws?.eats}`);
-  check('...with the struggle to get free drawn as the bar it is',
-    !!jaws && jaws.left !== undefined && jaws.left > 0.98, `left=${jaws?.left}`);
+    jaws?.kind === 'hold' && jaws.release === 'eat', `${jaws?.kind} release=${jaws?.release}`);
+  check('...with the meal window drawn as the bar it is',
+    !!jaws && jaws.left !== undefined && jaws.left > 0.95, `left=${jaws?.left}`);
+  p2.gripSyncT = GRIP_MEAL + 1;
+  const lost = g2.gripFor(0);
+  check('...and says when it has been carried past being a meal', lost?.release === 'escape' && lost.left === 0, `${lost?.release}, left=${lost?.left}`);
   // Something struggled out of the jaws and the button is still down.
   p.graspSpent = true; p.graspHold = true;
   const spent = g.gripFor(0);

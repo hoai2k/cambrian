@@ -199,6 +199,16 @@ export interface Actor {
    * is what lets it bite the thing it is holding on to.
    */
   rideHost: number; rideT: number; rideOff: Vec3; riddenBy: number;
+  /**
+   * Seconds since the grip actually *met* the other body, or -1 while it is still closing.
+   *
+   * Every consequence of a grip is timed from here rather than from the button: a grip closes at
+   * arm's length and the two bodies then come together over a fraction of a second, and a player
+   * who grabs and immediately lets go has held the animal for none of that. Timing from the press
+   * charged them for the approach. Both kinds of grip use it — a ride and a mouthful — because both
+   * spend that moment being pulled into place.
+   */
+  gripSyncT: number;
   deathY: number; sparkled: boolean; tumble: Vec3;
   kills: number; eats: number; escapes: number;
   hunted: number;          // 0..1 highest detection score against this actor (HUD)

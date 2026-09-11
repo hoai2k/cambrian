@@ -78,6 +78,8 @@ interface Sample {
   /** The grip: armed, how long for, whether it is spent, and what it has hold of. */
   graspHold: boolean; graspT: number; graspSpent: boolean;
   grabbing: number; grabbedBy: number; rideHost: number; riddenBy: number; rideT: number;
+  /** Seconds since the grip actually met the other body, -1 while still closing. Every window runs from it. */
+  gripSyncT: number;
   /** Aiming and the lunge, which is the other half of how a grip is reached. */
   aiming: boolean; aimTarget: number; aimInRange: boolean; lockTarget: number;
   pounceCd: number; dashCd: number; hitStop: number; iframes: number;
@@ -244,7 +246,7 @@ export function recordStep(g: Game, a: Actor, input: InputFrame, evs: readonly W
     scale: r2(a.scale), len: r2(lengthOf(a)), tier: a.tier,
     hp: Math.round(a.hp), stamina: Math.round(a.stamina), exhausted: r2(a.exhausted),
     graspHold: a.graspHold, graspT: r2(a.graspT), graspSpent: a.graspSpent,
-    grabbing: a.grabbing, grabbedBy: a.grabbedBy, rideHost: a.rideHost, riddenBy: a.riddenBy, rideT: r2(a.rideT),
+    grabbing: a.grabbing, grabbedBy: a.grabbedBy, rideHost: a.rideHost, riddenBy: a.riddenBy, rideT: r2(a.rideT), gripSyncT: r2(a.gripSyncT),
     aiming: a.aiming, aimTarget: input.aimTarget, aimInRange: a.aimInRange, lockTarget: a.lockTarget,
     pounceCd: r2(a.pounceCd), dashCd: r2(a.dashCd), hitStop: r2(a.hitStop), iframes: r2(a.iframes),
     grounded: a.grounded,
