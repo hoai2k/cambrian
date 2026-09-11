@@ -163,8 +163,18 @@ unless the user explicitly asks for a PR. Steps:
   near it — with the *surface* gap every reach test actually uses — and the simulation's own account
   of the frame, written from inside the gates that decide (`Game.graspReason`) rather than
   reconstructed beside them, so a recording can never disagree with what the game did. Anything that
-  gains a gate a player can fall foul of should say so there. `npm run record` checks that a
-  recording distinguishes a grab that worked from one that could not and names the reason.
+  gains a gate a player can fall foul of should say so there. Which bodies count as near is decided
+  by that surface gap too, not by a radius round the player's centre: a hatchling clinging to a
+  giant is a hand's breadth from its flank and ten units from its middle, and the first recording
+  measured the wrong one and so listed no neighbours at all in eleven hundred samples. `npm run
+  record` checks that a recording distinguishes a grab that worked from one that could not, names
+  the reason, and lists the animal it is about however big that animal is.
+- A player must be able to see the state the simulation is in. The grip is the worked example: it
+  closed, held and expired in complete silence, so a recording of it working read to the player as
+  it not working. `Game.gripFor` is the readout — what is in the grip, how much of it is left, and
+  the button that turns a hold into damage — drawn by `GripPanel` in `src/app/Hud.tsx`, and it
+  survives sense-off because it is the player's own act rather than a readout of the world.
+  `npm run grab` covers it.
 - The two typefaces are served from `public/fonts/`, not from fonts.googleapis.com: four
   variable WOFF2 files (one per family per Latin subset) declared over a weight range in
   `public/fonts/fonts.css`, which each entry page links. Both are OFL, and the licences ship

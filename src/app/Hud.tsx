@@ -40,10 +40,11 @@ export function Hud({ snapshot }: { snapshot: HudSnapshot }) {
  * `updateAim` picks its target by angular distance from the camera's forward axis, so with it gone
  * the centre of the view is still the aim point — implied rather than drawn.
  *
- * Three things survive it, and they are all the player's own doing rather than a readout of the
+ * Four things survive it, and they are all the player's own doing rather than a readout of the
  * world: a menu they opened themselves (teleport, change-creature, the held scoreboard), the fade
- * that takes the screen on a respawn, and the line that says what killed them — without that last
- * one a death is a fade to black with no account of itself.
+ * that takes the screen on a respawn, the line that says what killed them — without that last one
+ * a death is a fade to black with no account of itself — and the grip, which is the player holding
+ * a button down and is the one thing on the screen that says the button is doing anything.
  */
 function PlayerPanel({ p }: { p: PlayerHud }) {
   const s = p.scheme;
@@ -54,6 +55,7 @@ function PlayerPanel({ p }: { p: PlayerHud }) {
       {p.teleport && <TeleportMenu t={p.teleport} s={s} />}
       {p.swap && <SwapMenu swap={p.swap} s={s} />}
       {p.board && <Scoreboard board={p.board} me={p.index} />}
+      {p.grip && p.alive && <GripPanel grip={p.grip} s={s} />}
       <div className="fade" style={{ opacity: p.fade }} />
       {p.spectating && !p.alive && (
         <div className="spectating"><b>SPECTATING</b><span style={{ color: p.spectating.color }}>{p.spectating.name} · {creature(p.spectating.creature).name}</span></div>
@@ -174,6 +176,38 @@ function SensePanel({ p }: { p: PlayerHud }) {
         </div>
       )}
     </>
+  );
+}
+
+/**
+ * What you have hold of, while you have hold of it.
+ *
+ * The grip used to happen entirely in silence: a recording of a player trying to grab a giant had
+ * the grip closing three separate times and carrying them thirteen seconds, while the player — who
+ * could see none of that — reported that grabbing did not work. Every part of it was already
+ * knowable, so this says all of it: what is in the grip, how long it has left, and which button
+ * turns the hold into damage. Without the last line a ride is a thing that happens *to* you.
+ */
+function GripPanel({ grip, s }: { grip: NonNullable<PlayerHud['grip']>; s: Scheme }) {
+  if (grip.kind === 'spent') {
+    return (
+      <div className="grip-panel spent">
+        <b>GRIP GIVEN OUT</b>
+        <span>Let go before trying again</span>
+      </div>
+    );
+  }
+  const ride = grip.kind === 'ride';
+  return (
+    <div className={`grip-panel ${grip.strike ? 'strike' : ''}`} style={{ color: BAND_COLOR[grip.band] }}>
+      <b>{ride ? 'HOLDING ON' : 'IN YOUR JAWS'} · {grip.name}</b>
+      <div className="bar grip"><i style={{ width: `${grip.left * 100}%` }} /></div>
+      <span>
+        {ride
+          ? grip.strike ? 'Release NOW to strike' : `${key('light', s)} bite · release to let go`
+          : grip.strike ? 'Release to eat' : 'Release to throw'}
+      </span>
+    </div>
   );
 }
 

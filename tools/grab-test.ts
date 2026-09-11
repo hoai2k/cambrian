@@ -416,6 +416,36 @@ function inFront(p: Actor, o: Actor) {
   check('let go by hand and both sides are clear', p.rideHost === -1 && o.riddenBy === -1, '');
 }
 
+// --- the grip says it has hold: the readout the HUD draws ---
+// The mechanic worked and the player could not tell. A real recording had the grip closing three
+// times on a giant and carrying the player thirteen seconds, while the player reported in good
+// faith that grabbing did not work — because nothing on the screen changed when it closed, nothing
+// counted the seconds it had left, and nothing named the button that turns a hold into damage.
+{
+  const { g, p, o, ctx } = pair('opabinia', 4);
+  check('nothing in the grip, nothing to say', g.gripFor(0) === undefined, '');
+  o.pos = { x: p.pos.x + bodyRadius(o) * 0.9, y: p.pos.y, z: p.pos.z };
+  takeRide(ctx, p, o);
+  const held = g.gripFor(0);
+  check('a ride is reported as a ride, naming what is under you',
+    held?.kind === 'ride' && held.name === 'Anomalocaris' && held.band === 'giant', `${held?.kind} ${held?.name} ${held?.band}`);
+  check('...with the whole of the grip still ahead of it', !!held && held.left > 0.98, `left=${held?.left.toFixed(2)}`);
+  check('...and inside the window where letting go is a blow', held?.strike === true, '');
+  // Past that window, a release is just a release, and the readout stops promising otherwise.
+  p.rideT = 2;
+  const later = g.gripFor(0);
+  check('past the strike window it no longer offers the blow', later?.strike === false, '');
+  check('...and the clock has visibly run down', !!later && later.left < 0.8 && later.left > 0.7, `left=${later?.left.toFixed(2)}`);
+  // The arms give out and the button is still down: two and a half silent seconds in the recording.
+  endRide(p, o);
+  p.graspSpent = true; p.graspHold = true;
+  const spent = g.gripFor(0);
+  check('a grip that has given out says so while the button is still held',
+    spent?.kind === 'spent' && spent.left === 0, `${spent?.kind}`);
+  p.graspHold = false;
+  check('...and says nothing once the button comes up', g.gripFor(0) === undefined, '');
+}
+
 // --- the clips the grip needs are either delivered or queued, and the queue says so ---
 {
   const queue = JSON.parse(fs.readFileSync('tools/attack-feeding-refinements.json', 'utf8')) as { id: string; reviewClips: string[]; grip?: string }[];

@@ -7,7 +7,7 @@ import { applyMouse, emptyControls, gamepads, KeyboardInput, MouseLook, readGame
 import { clamp, damp, TAU, wrapAngle } from '../shared/math';
 import { bandOf, isAlive, isHidden, lengthOf } from '../sim/actors';
 import { creature, type CreatureId } from '../sim/creatures';
-import { CORPSE_WINDOW, DEATH_FADE, Game, radarRange as radarReach, type ScoreHeader, type ScoreRow, type TeleportDest } from '../sim/game';
+import { CORPSE_WINDOW, DEATH_FADE, Game, radarRange as radarReach, type GripHud, type ScoreHeader, type ScoreRow, type TeleportDest } from '../sim/game';
 import type { Phase } from '../sim/daynight';
 import { BAND_COLOR, emptyInput, isCoop, TIER_NAMES, TIER_NEED, type Actor, type Band, type InputFrame, type Mode, type PlayerSetup } from '../sim/types';
 import { recordStep, recordingPhase } from '../app/debug-record';
@@ -68,6 +68,8 @@ export interface PlayerHud {
   board?: { header: ScoreHeader; rows: ScoreRow[] };
   /** A short line from the simulation: a hand-over, a rescue. Outlives one frame. */
   notice?: string;
+  /** What this player has hold of, while they have hold of anything. */
+  grip?: GripHud;
   /** The era's own meters (Devonian standing, air, range), when the era defines them. */
   era?: EraHud;
 }
@@ -1298,7 +1300,7 @@ export class Engine {
         downedFor: game.reviveWindow(p), reviveProgress: game.reviveProgress(p), downedAllies: downed, spectating: spectate,
         death: p.state === 'dead' || p.state === 'swallowed' ? { eaten: p.swallowedBy >= 0 || p.eaten > 0, by: nameOf(killer) } : undefined,
         kills: p.kills, eats: p.eats, escapes: p.escapes, protect: p.spawnProtect > 0, bandMarkers: markers.slice(0, 24),
-        biome: BIOME_NAMES[game.biomeOf(i) ?? 'shelf'], day: game.dayPhase(), radar: { range: radarRange, blips }, teleport: tele, swap, board, notice: game.noticeFor(i), era,
+        grip: game.gripFor(i), biome: BIOME_NAMES[game.biomeOf(i) ?? 'shelf'], day: game.dayPhase(), radar: { range: radarRange, blips }, teleport: tele, swap, board, notice: game.noticeFor(i), era,
       };
     });
     return {

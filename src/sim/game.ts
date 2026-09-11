@@ -12,7 +12,7 @@ import { creature, CREATURE_IDS, PLAYABLE_IDS, type CreatureId, type MoveDef } f
 import { resolveFlora, stepFlora, type FloraContact } from './flora';
 import { SpatialHash } from './spatial';
 import { clampMark, fillOf, ladderFill, ladderMark, ladderRung, ladderScale, LADDER_TOP, MARK_NEAR_TOP } from './ladder';
-import { emptyInput, isCoop, TIER_NAMES, TIER_NEED, type Actor, type BrainState, type InputFrame, type Mode, type PlayerSetup, type Prompt, type SiltCloud, type Tier, type WorldEvent } from './types';
+import { emptyInput, isCoop, TIER_NAMES, TIER_NEED, type Actor, type Band, type BrainState, type InputFrame, type Mode, type PlayerSetup, type Prompt, type SiltCloud, type Tier, type WorldEvent } from './types';
 import { BIOME_NAMES, biomeAt, biomeWeights, coverAt, groundHeight, LIGHT_WINDOW_Y, type Landmark, type LandmarkKind, microbialAt, nearestNursery, nurseryAt, nurseryFactor, resolveStatic, RISE_RATE, sampleCurrent, sampleHeight, shoreDistance, shoreZ, type StaticContact, SURFACE_Y, World, type Biome, type Boulder, type Cover, type Flora, type WorldData } from './world';
 import { areaProfile, bandScale, drawBand, headroom, PASSER_BY } from './population';
 import { columnY, DIP_CHANCE, DRIFT_CURRENT, driftRise, flipLaunch, FLIP_STAMINA, PULSE_CYCLE, pulseRefilling, pulseThrust, punting, rowWalkCurrent } from './locomotion';
@@ -247,6 +247,18 @@ export const gripHold = (def: ReturnType<typeof creature>) => (def.grasp ? GRASP
  * different thing from grabbing and shoving off.
  */
 const GRIP_BITE = 0.7;
+
+/** What a player has hold of, as the HUD needs to show it. See `Game.gripFor`. */
+export interface GripHud {
+  /** Clinging to something bigger, carrying a mouthful, or holding a button the arms cannot answer. */
+  kind: 'ride' | 'hold' | 'spent';
+  /** What is in the grip. Empty for `spent`, which has nothing in it. */
+  name: string; band: Band;
+  /** How much of the grip is left, 1 → 0. */
+  left: number;
+  /** Letting go right now lands the blow, or eats what is held, rather than simply letting go. */
+  strike: boolean;
+}
 /**
  * How far past its own pounce range an animal will look for something to take hold of. Wide enough
  * to find a full-grown giant across open water — they are the reason the pursuit exists — and it
@@ -3062,6 +3074,44 @@ export class Game implements AiWorld {
   /** A short line in every player's viewport. */
   private announce(text: string, t = 3.5) {
     for (const pr of this.progress) pr.prompts.push({ text, t });
+  }
+
+  /**
+   * What this player has hold of, for the HUD.
+   *
+   * A grip was the one thing the game did that it never said it was doing. A recording of a player
+   * trying to grab a giant showed the grip closing three times, carrying them for thirteen seconds
+   * between them — and the player reporting, in good faith, that grabbing did not work. Nothing on
+   * the screen changed when the grip closed, nothing counted the seconds it had left, nothing named
+   * the button that turns a hold into damage, and nothing said the arms had given out and the
+   * button had to come up before they would close again. All of that is knowable; none of it was
+   * shown. So the simulation says it, here, where the clocks (`RIDE_MAX`, `GRIP_BITE`) and the
+   * spent flag already live, rather than leaving the HUD to guess at them.
+   */
+  gripFor(i: number): GripHud | undefined {
+    const p = this.players[i];
+    if (!p || !isAlive(p)) return undefined;
+    if (p.rideHost >= 0) {
+      const host = this.idMap.get(p.rideHost);
+      if (!host) return undefined;
+      return {
+        kind: 'ride', name: creature(host.creature).name, band: bandOf(p, host),
+        left: clamp(1 - p.rideT / RIDE_MAX, 0, 1), strike: p.rideT <= GRIP_BITE,
+      };
+    }
+    if (p.state === 'grabbing' && p.grabbing >= 0) {
+      const v = this.idMap.get(p.grabbing);
+      if (!v) return undefined;
+      const band = bandOf(p, v);
+      return {
+        kind: 'hold', name: creature(v.creature).name, band,
+        left: clamp(v.grabT / 1.6, 0, 1), strike: band === 'snack' || band === 'prey',
+      };
+    }
+    // The arms have given out and the button is still down. Two and a half seconds of pressing
+    // harder and nothing happening reads as a broken mechanic; one line saying so reads as a rule.
+    if (p.graspSpent && p.graspHold) return { kind: 'spent', name: '', band: 'rival', left: 0, strike: false };
+    return undefined;
   }
 
   /** The line to show this player right now, if any. Prompts expire; the newest wins. */
