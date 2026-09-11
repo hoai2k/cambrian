@@ -12,8 +12,8 @@
  * on a real hold.
  */
 import { Game, GRASP_AT, graspPoint, gripHold, gripReach } from '../src/sim/game';
-import { emptyInput, type Actor, type InputFrame } from '../src/sim/types';
-import { bandOf, bodyRadius, isAlive, lengthOf, surfaceGap } from '../src/sim/actors';
+import { emptyInput, type Actor, type InputFrame, type Vec3 } from '../src/sim/types';
+import { applyScaleStats, bandOf, bodyRadius, isAlive, lengthOf, surfaceGap } from '../src/sim/actors';
 import { applyHit, endRide, GRIP_BREAK, GRIP_MEAL, GRIP_STRIKE, takeHold, takeRide, type HitContext } from '../src/sim/combat';
 import { creature, CREATURES } from '../src/sim/creatures';
 import { heading } from '../src/shared/math';
@@ -532,82 +532,93 @@ function inFront(p: Actor, o: Actor) {
 // out of. Against one that is hauling you somewhere, a dash tears the grip open; against one that
 // has gone slack there is nothing to tear against, so the dash takes the holder with you.
 {
-  /** A player held in the jaws of something `times` its own length, with both wishes settable. */
+  /**
+   * A player held in the jaws of another player `times` its own length, with both wishes settable.
+   *
+   * Both ends are players on purpose. A grip is only a grip when a player is holding it: the reef's
+   * own predators still grab the way they always did — a squeeze on a clock — and that is an attack,
+   * not a hold. Everything here is about the hold.
+   */
   const caught = (times: number) => {
-    const g = new Game('reef', [{ creature: 'isoxys', device: 'keyboard', ready: true }], 9);
-    const p = g.players[0]; p.spawnProtect = 1e6; p.state = 'free'; p.stamina = p.staminaMax;
-    for (const a of g.actors) if (a !== p) a.pos = { x: a.pos.x + 2000, y: a.pos.y, z: a.pos.z };
-    const scale = times * lengthOf(p) / creature('anomalocaris').adultLength;
-    const o = g.spawn('anomalocaris', 'ambient', { x: p.pos.x, y: p.pos.y, z: p.pos.z + lengthOf(p) * 0.4 }, scale);
-    o.spawnProtect = 0; o.brain = undefined;
+    const g = new Game('reef', [
+      { creature: 'isoxys', device: 'keyboard', ready: true },
+      { creature: 'anomalocaris', device: 0, ready: true },
+    ], 9);
+    const [p, o] = g.players;
+    for (const a of g.actors) if (a !== p && a !== o) a.pos = { x: a.pos.x + 2000, y: a.pos.y, z: a.pos.z };
+    for (const a of [p, o]) { a.spawnProtect = 1e6; a.state = 'free'; a.stamina = a.staminaMax; }
+    o.scale = times * lengthOf(p) / creature('anomalocaris').adultLength;
+    applyScaleStats(o, creature('anomalocaris'));
+    o.pos = { x: p.pos.x, y: p.pos.y, z: p.pos.z + lengthOf(p) * 0.4 };
     g.hash.rebuild(g.actors);
     takeHold(ctxFor(g), o, p);
+    o.prev = { ...o.prev, heavy: true };                  // already holding: no fresh press
     return { g, p, o };
+  };
+  /** One step with the victim's stick and the holder's grip button, and both wishes forced. */
+  const tug = (g: Game, p: Actor, o: Actor, victim: Partial<InputFrame>, vDrive: Vec3, oDrive: Vec3) => {
+    p.drive = { ...vDrive }; o.drive = { ...oDrive };
+    g.step(1 / 60, new Map([[0, { ...emptyInput(), ...victim }], [1, { ...emptyInput(), heavy: true }]]));
+    g.events.length = 0;
+    o.drive = { ...oDrive };                              // the holder's wish, re-asserted for next step
   };
   {
     const { g, p, o } = caught(3);
-    check('a player can be taken in something bigger’s jaws', p.state === 'grabbed' && o.grabbing === p.id, `${p.state}`);
-    // The holder hauls one way; the player pulls the other. That is what wears the grip.
-    o.drive = { x: 0, y: 0, z: 4 };
+    check('a player can be taken in another’s jaws', p.state === 'grabbed' && o.grabbing === p.id, `${p.state}`);
     const t0 = p.grabT;
-    for (let i = 0; i < 60; i++) { p.drive = { x: 0, y: 0, z: -4 }; g.step(1 / 60, new Map([[0, { ...emptyInput(), my: -1 }]])); g.events.length = 0; }
-    check('...and pulling against a holder that is pulling wears the grip', p.grabT < t0 - 0.3, `grabT ${t0.toFixed(2)} → ${p.grabT.toFixed(2)}`);
+    for (let i = 0; i < 60; i++) tug(g, p, o, { my: -1 }, { x: 0, y: 0, z: -4 }, { x: 0, y: 0, z: 4 });
+    check('...and pulling against a holder that is pulling wears the grip', p.grabT < t0 - 0.2, `grabT ${t0.toFixed(2)} → ${p.grabT.toFixed(2)}`);
+    check('...without hurting anything', isAlive(p) && p.hp === p.hpMax, `${p.hp.toFixed(0)}/${p.hpMax}`);
   }
   {
-    const { g, p, o } = caught(3);
     // The same struggle against a holder that has gone slack: nothing to pull against.
-    o.drive = { x: 0, y: 0, z: 0 };
+    const { g, p, o } = caught(3);
     const t0 = p.grabT;
-    for (let i = 0; i < 60; i++) { p.drive = { x: 0, y: 0, z: -4 }; o.drive = { x: 0, y: 0, z: 0 }; g.step(1 / 60, new Map([[0, { ...emptyInput(), my: -1 }]])); g.events.length = 0; }
+    for (let i = 0; i < 60; i++) tug(g, p, o, { my: -1 }, { x: 0, y: 0, z: -4 }, { x: 0, y: 0, z: 0 });
     check('...while a holder that drifts along with you is the hardest to get out of', p.grabT >= t0 - 0.02, `grabT ${t0.toFixed(2)} → ${p.grabT.toFixed(2)}`);
   }
   {
     const { g, p, o } = caught(3);
-    o.drive = { x: 0, y: 0, z: 4 };
-    const dash = new Map([[0, { ...emptyInput(), my: -1, dash: true, dodge: true }]]);
-    p.prev = { ...p.prev, dash: false, dodge: false };
-    for (let i = 0; i < 4 && p.state === 'grabbed'; i++) { p.drive = { x: 0, y: 0, z: -4 }; o.drive = { x: 0, y: 0, z: 4 }; g.step(1 / 60, dash); g.events.length = 0; }
+    for (let i = 0; i < 4 && p.state === 'grabbed'; i++) {
+      tug(g, p, o, { my: -1, dash: true, dodge: true }, { x: 0, y: 0, z: -4 }, { x: 0, y: 0, z: 4 });
+    }
     check('a dash against a holder that is pulling tears the grip open', p.state !== 'grabbed' && p.grabbedBy === -1 && o.grabbing === -1, `${p.state}`);
     check('...and the grip has to be let go of before it can close again', o.graspSpent, `graspSpent ${o.graspSpent}`);
+    check('...and nothing was hurt by the tearing', isAlive(p) && p.hp === p.hpMax && isAlive(o) && o.hp === o.hpMax, `${p.hp.toFixed(0)} / ${o.hp.toFixed(0)}`);
   }
   {
+    // A slack holder has nothing to tear against, so the dash takes it along instead.
     const { g, p, o } = caught(3);
-    o.drive = { x: 0, y: 0, z: 0 };
     o.vel = { x: 0, y: 0, z: 0 };
-    const dash = new Map([[0, { ...emptyInput(), my: -1, dash: true, dodge: true }]]);
-    p.prev = { ...p.prev, dash: false, dodge: false };
-    const z0 = o.pos.z;
-    for (let i = 0; i < 20; i++) { p.drive = { x: 0, y: 0, z: -4 }; o.drive = { x: 0, y: 0, z: 0 }; g.step(1 / 60, dash); g.events.length = 0; }
+    for (let i = 0; i < 4; i++) tug(g, p, o, { my: -1, dash: true, dodge: true }, { x: 0, y: 0, z: -4 }, { x: 0, y: 0, z: 0 });
     check('a dash against a slack holder takes it with you instead', p.state === 'grabbed' && o.grabbing === p.id, `${p.state}`);
-    check('...and the pair actually moves', o.pos.z < z0 - 0.1, `host moved ${(z0 - o.pos.z).toFixed(2)} the way the dash went`);
+    check('...and the pair actually moves', o.vel.z < -0.1, `holder shoved ${o.vel.z.toFixed(2)} the way the dash went`);
   }
   {
-    // Weight decides. The same dash against something far heavier shifts it much less.
+    // Weight decides how much of the dash survives the haul. Measured as the shove itself rather
+    // than as distance covered: a bigger body also glides longer, which is a different question.
     const heave = (times: number) => {
       const { g, p, o } = caught(times);
-      o.drive = { x: 0, y: 0, z: 0 }; o.vel = { x: 0, y: 0, z: 0 };
-      const dash = new Map([[0, { ...emptyInput(), my: -1, dash: true, dodge: true }]]);
-      p.prev = { ...p.prev, dash: false, dodge: false };
-      const z0 = o.pos.z;
-      for (let i = 0; i < 20; i++) { p.drive = { x: 0, y: 0, z: -4 }; o.drive = { x: 0, y: 0, z: 0 }; g.step(1 / 60, dash); g.events.length = 0; }
-      return z0 - o.pos.z;
+      o.vel = { x: 0, y: 0, z: 0 };
+      let peak = 0;
+      for (let i = 0; i < 4; i++) { tug(g, p, o, { my: -1, dash: true, dodge: true }, { x: 0, y: 0, z: -4 }, { x: 0, y: 0, z: 0 }); peak = Math.min(peak, o.vel.z); }
+      return -peak;
     };
-    const light = heave(1.6), heavy = heave(5);
-    check('...and how far depends on what it weighs', light > heavy * 1.5, `${light.toFixed(2)} against something small, ${heavy.toFixed(2)} against something big`);
+    const light = heave(1.6), heavy = heave(6);
+    check('...and how hard the shove lands depends on what it weighs', light > heavy * 2,
+      `${light.toFixed(2)} against something small, ${heavy.toFixed(2)} against something big`);
   }
   {
     // Nothing stays in a grip for ever, however slack the holder is and however quiet the catch.
     const { g, p, o } = caught(3);
-    o.drive = { x: 0, y: 0, z: 0 };
     let broke = -1;
     for (let i = 0; i < 60 * (GRIP_BREAK + 3) && broke < 0; i++) {
-      o.graspHold = true; o.drive = { x: 0, y: 0, z: 0 };
-      g.step(1 / 60, new Map([[0, emptyInput()]])); g.events.length = 0;
+      tug(g, p, o, {}, { x: 0, y: 0, z: 0 }, { x: 0, y: 0, z: 0 });
       if (p.state !== 'grabbed') broke = i;
     }
     check('nothing stays in a grip for ever', broke > 0, broke > 0 ? `out after ${(broke / 60).toFixed(1)} s` : 'still held');
     check('...and it is out at the grip’s own limit', broke / 60 >= GRIP_BREAK - 0.5 && broke / 60 <= GRIP_BREAK + 1.5, `${(broke / 60).toFixed(1)} s against a limit of ${GRIP_BREAK}`);
-    check('...unhurt by any of it', isAlive(p), `${p.state}, ${p.hp.toFixed(0)} hp`);
+    check('...unhurt by any of it', isAlive(p) && p.hp === p.hpMax, `${p.state}, ${p.hp.toFixed(0)} hp`);
   }
 }
 
@@ -646,7 +657,11 @@ function inFront(p: Actor, o: Actor) {
     !!jaws && jaws.left !== undefined && jaws.left > 0.95, `left=${jaws?.left}`);
   p2.gripSyncT = GRIP_MEAL + 1;
   const lost = g2.gripFor(0);
-  check('...and says when it has been carried past being a meal', lost?.release === 'escape' && lost.left === 0, `${lost?.release}, left=${lost?.left}`);
+  check('...and says when it has been carried past being a meal', lost?.release === 'escape', `${lost?.release}`);
+  // Past the meal the bar is a different clock: what is left before it works itself out entirely.
+  const late = (t: number) => { p2.gripSyncT = t; return g2.gripFor(0)?.left ?? -1; };
+  check('...and counts down what is left before it is gone', late(GRIP_MEAL + 1) > late(GRIP_BREAK - 1) && late(GRIP_BREAK + 1) === 0,
+    `${late(GRIP_MEAL + 1).toFixed(2)} → ${late(GRIP_BREAK - 1).toFixed(2)} → ${late(GRIP_BREAK + 1).toFixed(2)}`);
   // Something struggled out of the jaws and the button is still down.
   p.graspSpent = true; p.graspHold = true;
   const spent = g.gripFor(0);
