@@ -1734,7 +1734,11 @@ export class Game implements AiWorld {
         // one that has gone slack there is nothing to tear against, so the dash takes the holder
         // with it: you get away with your captor rather than from it, slower by what it weighs.
         if ((justDodge || justDash) && a.stamina >= 10 && a.exhausted === 0) {
-          const share = clamp(massOf(g) / (massOf(a) + massOf(g)), 0, 0.85);
+          // Uncapped, unlike the blend above: what the blend needs a ceiling for is not letting a
+          // heavy catch steer its holder outright, but a *tow* is exactly the case where weight
+          // should be allowed to win. Hauling something six times your length off with you should
+          // be very nearly futile, and a ceiling here made it merely inconvenient.
+          const share = clamp(massOf(g) / (massOf(a) + massOf(g)), 0, 0.995);
           if (pull > 0.15) {
             this.breakLoose(g, a);
             g.graspSpent = true;                          // torn open: the button has to come up
