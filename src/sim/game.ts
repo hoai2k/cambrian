@@ -348,8 +348,19 @@ interface Step {
  * you is that you are the smallest thing in it.
  */
 export const HATCH_TIME = 5;
-/** How far through the hatch the body is out of the shell and free to swim. */
-export const HATCH_FREE = 0.72;
+/**
+ * Where in that performance the seam gives, and with it the body: the player has their animal back
+ * the moment the shell cracks, not when the halves have finished falling away. Waiting for the
+ * shell to settle held them still through two and a half seconds of an animation whose point they
+ * had already taken. `src/render/eggs.ts` starts the split here, so the two cannot drift.
+ */
+export const HATCH_FREE = 0.48;
+/**
+ * How long the simulation holds a hatchling: up to the crack and no further. The shell goes on
+ * falling open behind the animal on the renderer's own clock, which is why that is the only clock
+ * that runs the full `HATCH_TIME`.
+ */
+export const HATCH_HOLD = HATCH_TIME * HATCH_FREE;
 
 
 export class Game implements AiWorld {
@@ -399,6 +410,8 @@ export class Game implements AiWorld {
   /** Last grip decision per player, for the match recorder. Written only for players; never read by the sim. */
   private graspReasons = new Map<number, string>();
   private scratchCover: Cover[] = [];
+  /** Where each hatching body's egg was laid: it is held there until the shell gives. */
+  private eggAt = new Map<number, Vec3>();
   private scratchFlora: Flora[] = [];
   private ambientTimer = 0;
   /**
@@ -956,7 +969,7 @@ export class Game implements AiWorld {
    */
   private beginHatch(a: Actor) {
     const egg = ladderRung(this, a) === 0;
-    a.hatching = true; a.state = 'moult'; a.stateT = 0; a.stateDur = egg ? HATCH_TIME : 1.0;
+    a.hatching = true; a.state = 'moult'; a.stateT = 0; a.stateDur = egg ? HATCH_HOLD : 1.0;
     a.vel = v3();
     if (egg) this.layEgg(a);
     // Nothing may eat a body that cannot yet move: the shell is protection until it is out of it.
@@ -974,7 +987,7 @@ export class Game implements AiWorld {
       if (!a.hatching || a.state !== 'moult') continue;
       const era = RULES?.moultScale(this, a);
       a.scale = era ? era.to : tierScale(a.creature, a.tier);
-      a.state = 'free'; a.stateT = 0; a.stateDur = 0; a.hatching = false;
+      a.state = 'free'; a.stateT = 0; a.stateDur = 0; a.hatching = false; this.eggAt.delete(a.id);
       applyScaleStats(a, true); a.hp = a.hpMax;
     }
   }
@@ -1020,10 +1033,11 @@ export class Game implements AiWorld {
     const rest = g + L * 0.13;                          // the shell's radius is about 0.22 of this
     a.pos = { x, y: best && hidden ? Math.max(rest, best.pos.y - best.radius * 0.75) : rest, z };
     a.prevT = { ...a.pos, yaw: a.yaw, pitch: a.pitch, bank: a.bank };
+    this.eggAt.set(a.id, { ...a.pos });
   }
 
   /** True while the body is still inside its shell: it cannot swim and nothing it presses counts. */
-  private inShell(a: Actor) { return a.hatching && a.state === 'moult' && a.stateDur > 2 && a.stateT < a.stateDur * HATCH_FREE; }
+  private inShell(a: Actor) { return a.hatching && a.state === 'moult' && a.stateDur > 1.5; }
 
   private updateActor(a: Actor, input: InputFrame, dt: number) {
     // Inside the egg nothing the player presses reaches the water: the body is held where it
@@ -1781,15 +1795,21 @@ export class Game implements AiWorld {
       // In an egg the animal is already most of the size it will be when it comes out — an egg is
       // not a seed. A moult out of nothing (a respawn above the bottom rung) still swells from a
       // speck, which is what that second was always for.
-      const inEgg = a.hatching && a.stateDur > 2;
+      const inEgg = a.hatching && a.stateDur > 1.5;
       const from = a.hatching ? to * (inEgg ? 0.62 : 0.3) : era ? era.from : tierScale(a.creature, Math.max(0, a.tier - 1));
-      // Coming out of an egg, the animal is the size of what was in the egg until it is out: the
-      // growth is the last third of the hatch, not the whole of it.
-      const k = inEgg ? clamp((t - 0.45) / 0.5, 0, 1) : t;
+      // Coming out of an egg, the animal is the size of what was in the egg until the shell starts
+      // to give: the growth is what opens it, over the last third of the hold.
+      const k = inEgg ? clamp((t - 0.62) / 0.38, 0, 1) : t;
       if (!(this.mode === 'hunted' && this.isHunter(a.player))) a.scale = lerp(from, to, k * k * (3 - 2 * k));
-      // Held where it hatched, working at the shell: the wriggle is the animal, not the water.
-      if (this.inShell(a)) { a.vel = v3(); a.yaw += Math.sin(a.stateT * 11) * 0.9 * dt; a.pitch = Math.sin(a.stateT * 7) * 0.12; }
-      if (a.stateT >= a.stateDur) { a.state = 'free'; a.stateT = 0; a.scale = to; applyScaleStats(a, true); a.hp = a.hpMax; a.hatching = false; }
+      // Held where it hatched, working at the shell: the wriggle is the animal, not the water. The
+      // position is put back as well as the velocity — an egg does not drift down the current, and
+      // a step's worth of drift each step adds up to the shell crawling off its own patch of sand.
+      if (this.inShell(a)) {
+        const at = this.eggAt.get(a.id);
+        if (at) a.pos = { ...at };
+        a.vel = v3(); a.yaw += Math.sin(a.stateT * 11) * 0.9 * dt; a.pitch = Math.sin(a.stateT * 7) * 0.12;
+      }
+      if (a.stateT >= a.stateDur) { a.state = 'free'; a.stateT = 0; a.scale = to; applyScaleStats(a, true); a.hp = a.hpMax; a.hatching = false; this.eggAt.delete(a.id); }
     }
 
     // Snacks: swim-through consume
