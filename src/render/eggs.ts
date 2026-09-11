@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import { lengthOf } from '../sim/actors';
+import { HATCH_FREE, HATCH_TIME } from '../sim/game';
 import type { Actor } from '../sim/types';
 
 /**
@@ -23,7 +24,12 @@ import type { Actor } from '../sim/types';
  *   0.00–0.30  whole, breathing, the animal shifting inside
  *   0.30–0.48  pokes: a limb or a snout pushes a travelling bulge across the shell
  *   0.48–0.78  the seam gives and the halves swing open to either side
- *   0.78–1.00  the body wriggles clear, the halves lie back on the sand and fade
+ *   0.78–1.00  the halves lie back on the sand and fade
+ *
+ * The split starts at `HATCH_FREE`, which is where the simulation hands the player their body
+ * back: the sim's hold ends at the crack (`HATCH_HOLD`) and from there the animal is swimming, so
+ * the shell keeps its own clock and finishes falling open behind it. That clock is the only one
+ * that runs the whole `HATCH_TIME`.
  */
 
 const SEGMENTS = 28, RINGS = 20;
@@ -42,6 +48,10 @@ class Egg {
   private nextPoke = 0.35;
   private tmp = new THREE.Vector3();
   private spin = Math.random() * Math.PI * 2;
+  /** Seconds since the shell appeared. Its own, because the body stops hatching at the crack. */
+  private age = 0;
+  /** Where the body was while it was still inside; the shell stays here once it is out. */
+  private at = new THREE.Vector3();
 
   constructor(readonly actorId: number, at: THREE.Vector3, private radius: number, private yaw: number) {
     // Two halves of one ovoid, cut by the vertical plane that holds the long axis: three.js sweeps
@@ -74,10 +84,18 @@ class Egg {
     this.group.name = 'egg';
   }
 
-  /** `t` is the hatch, 0..1. */
-  update(t: number, dt: number, at: THREE.Vector3) {
-    // The shell sits where it was laid; the animal is what leaves it.
-    if (t < 0.5) this.group.position.lerp(at, 1 - Math.exp(-dt * 2));
+  /** True once the whole performance has played out and the shell can go. */
+  get done() { return this.age >= HATCH_TIME; }
+
+  /** Where the body is while it is still inside: the shell sits with it until the crack. */
+  follow(at: { x: number; y: number; z: number }) { this.at.set(at.x, at.y, at.z); }
+
+  update(dt: number) {
+    this.age += dt;
+    const t = Math.min(1, this.age / HATCH_TIME);
+    // The shell sits where it was laid; the animal is what leaves it, and from the crack on it is
+    // swimming, so the shell stops following it there.
+    if (t < HATCH_FREE) this.group.position.lerp(this.at, 1 - Math.exp(-dt * 2));
     this.spin += dt * 0.35;
     this.group.rotation.set(Math.sin(this.spin * 1.3) * 0.015, this.yaw, Math.cos(this.spin * 0.9) * 0.015);
 
@@ -121,7 +139,7 @@ class Egg {
 
     // The seam gives — pushed open by the body growing into it, on the sim's own growth curve — and
     // the halves fall away to either side and lie there.
-    const open = t <= 0.48 ? 0 : Math.min(1, (t - 0.48) / 0.3);
+    const open = t <= HATCH_FREE ? 0 : Math.min(1, (t - HATCH_FREE) / 0.3);
     const swing = open * open * (3 - 2 * open) * OPEN_ANGLE;
     this.hinges[0].rotation.z = -swing;
     this.hinges[1].rotation.z = swing;
@@ -147,27 +165,25 @@ export class Eggs {
 
   constructor() { this.group.name = 'eggs'; }
 
-  /** `hatchLength` is what the animal will measure when it is out, so the shell fits it. */
   update(actors: readonly Actor[], dt: number) {
-    const seen = new Set<number>();
     for (const a of actors) {
-      if (!a.hatching || a.state !== 'moult' || a.stateDur < 2) continue;
-      seen.add(a.id);
-      const t = Math.min(1, a.stateT / a.stateDur);
+      if (!a.hatching || a.state !== 'moult' || a.stateDur < 1.5) continue;
       this.at.set(a.pos.x, a.pos.y, a.pos.z);
       let egg = this.live.get(a.id);
       if (!egg) {
         // Sized to the body as it is inside, curled: the animal fills the egg, it does not float
-        // in it. The sim keeps it at 62% of hatched length until it starts to come out.
+        // in it. The sim keeps it at 62% of hatched length until the shell starts to give.
         egg = new Egg(a.id, this.at, Math.max(0.12, lengthOf(a) * 0.36), a.yaw);
         this.live.set(a.id, egg);
         this.group.add(egg.group);
       }
-      egg.update(t, dt, this.at);
+      egg.follow(a.pos);
     }
+    // Every shell runs its own clock to the end, including the ones whose animal is already out and
+    // away: an egg left half open on the sand is the point, not a loose end.
     for (const [id, egg] of this.live) {
-      if (seen.has(id)) continue;
-      this.group.remove(egg.group); egg.dispose(); this.live.delete(id);
+      egg.update(dt);
+      if (egg.done) { this.group.remove(egg.group); egg.dispose(); this.live.delete(id); }
     }
   }
 
