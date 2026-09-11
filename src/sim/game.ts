@@ -1738,8 +1738,15 @@ export class Game implements AiWorld {
         const holdingOn = a.graspHold && a.controller === 'player';
         if (!holdingOn) v.grabT -= dt;
         if (a.gripSyncT >= 0) a.gripSyncT += dt;
-        // crush ticks
-        if (!holdingOn && Math.floor(a.stateT * 2.5) !== Math.floor((a.stateT - dt) * 2.5)) {
+        // Crush ticks — and a player's grip never has them, button down or up.
+        //
+        // Gating this on the button alone meant the squeeze landed on the *release* frame: the
+        // grip spends a moment winding down after the button comes up, and a mouthful was crushed
+        // to death in it. Something held harmlessly for five seconds then died as it was let go,
+        // which is the one thing a grip is not supposed to be able to do. What is left here is what
+        // it was always for: a bot's grasp, and a move that grabs on its own. Those are attacks.
+        const crushes = a.controller !== 'player';
+        if (crushes && Math.floor(a.stateT * 2.5) !== Math.floor((a.stateT - dt) * 2.5)) {
           v.hp -= 6 * clamp(Math.pow(L / lengthOf(v), 1.6), 0.2, 4); v.hitFlash = 0.3;
           this.events.push({ kind: 'hit', pos: { ...v.pos }, actor: a.id, other: v.id, strength: 0.4, player: v.player });
           if (v.hp <= 0) { a.state = 'free'; a.grabbing = -1; if (lengthOf(a) >= lengthOf(v) * 1.35) startSwallow(this.hitCtx, a, v); else kill(this.hitCtx, v, a); }
