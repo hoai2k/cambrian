@@ -14,7 +14,7 @@
 import { Game, GRASP_AT, graspPoint, gripHold, gripReach } from '../src/sim/game';
 import { emptyInput, type Actor, type InputFrame } from '../src/sim/types';
 import { bandOf, bodyRadius, isAlive, lengthOf, surfaceGap } from '../src/sim/actors';
-import { applyHit, endRide, GRIP_MEAL, GRIP_STRIKE, takeHold, takeRide, type HitContext } from '../src/sim/combat';
+import { applyHit, endRide, GRIP_BREAK, GRIP_MEAL, GRIP_STRIKE, takeHold, takeRide, type HitContext } from '../src/sim/combat';
 import { creature, CREATURES } from '../src/sim/creatures';
 import { heading } from '../src/shared/math';
 import fs from 'node:fs';
@@ -524,6 +524,91 @@ function inFront(p: Actor, o: Actor) {
   p.graspHold = false;
   run(g, emptyInput(), 60);
   check('two seconds in the jaws and it is eaten', !isAlive(o) || o.state === 'swallowed' || o.state === 'dead', `${o.state}`);
+}
+
+// --- a grip is a tug of war, and a dash is the way out of one ---
+// A mouthful is not cargo. Both animals pull, weight decides how much each is worth, and what wears
+// the hold is the two of them pulling *apart* — so a holder that goes slack is the hardest to get
+// out of. Against one that is hauling you somewhere, a dash tears the grip open; against one that
+// has gone slack there is nothing to tear against, so the dash takes the holder with you.
+{
+  /** A player held in the jaws of something `times` its own length, with both wishes settable. */
+  const caught = (times: number) => {
+    const g = new Game('reef', [{ creature: 'isoxys', device: 'keyboard', ready: true }], 9);
+    const p = g.players[0]; p.spawnProtect = 1e6; p.state = 'free'; p.stamina = p.staminaMax;
+    for (const a of g.actors) if (a !== p) a.pos = { x: a.pos.x + 2000, y: a.pos.y, z: a.pos.z };
+    const scale = times * lengthOf(p) / creature('anomalocaris').adultLength;
+    const o = g.spawn('anomalocaris', 'ambient', { x: p.pos.x, y: p.pos.y, z: p.pos.z + lengthOf(p) * 0.4 }, scale);
+    o.spawnProtect = 0; o.brain = undefined;
+    g.hash.rebuild(g.actors);
+    takeHold(ctxFor(g), o, p);
+    return { g, p, o };
+  };
+  {
+    const { g, p, o } = caught(3);
+    check('a player can be taken in something bigger’s jaws', p.state === 'grabbed' && o.grabbing === p.id, `${p.state}`);
+    // The holder hauls one way; the player pulls the other. That is what wears the grip.
+    o.drive = { x: 0, y: 0, z: 4 };
+    const t0 = p.grabT;
+    for (let i = 0; i < 60; i++) { p.drive = { x: 0, y: 0, z: -4 }; g.step(1 / 60, new Map([[0, { ...emptyInput(), my: -1 }]])); g.events.length = 0; }
+    check('...and pulling against a holder that is pulling wears the grip', p.grabT < t0 - 0.3, `grabT ${t0.toFixed(2)} → ${p.grabT.toFixed(2)}`);
+  }
+  {
+    const { g, p, o } = caught(3);
+    // The same struggle against a holder that has gone slack: nothing to pull against.
+    o.drive = { x: 0, y: 0, z: 0 };
+    const t0 = p.grabT;
+    for (let i = 0; i < 60; i++) { p.drive = { x: 0, y: 0, z: -4 }; o.drive = { x: 0, y: 0, z: 0 }; g.step(1 / 60, new Map([[0, { ...emptyInput(), my: -1 }]])); g.events.length = 0; }
+    check('...while a holder that drifts along with you is the hardest to get out of', p.grabT >= t0 - 0.02, `grabT ${t0.toFixed(2)} → ${p.grabT.toFixed(2)}`);
+  }
+  {
+    const { g, p, o } = caught(3);
+    o.drive = { x: 0, y: 0, z: 4 };
+    const dash = new Map([[0, { ...emptyInput(), my: -1, dash: true, dodge: true }]]);
+    p.prev = { ...p.prev, dash: false, dodge: false };
+    for (let i = 0; i < 4 && p.state === 'grabbed'; i++) { p.drive = { x: 0, y: 0, z: -4 }; o.drive = { x: 0, y: 0, z: 4 }; g.step(1 / 60, dash); g.events.length = 0; }
+    check('a dash against a holder that is pulling tears the grip open', p.state !== 'grabbed' && p.grabbedBy === -1 && o.grabbing === -1, `${p.state}`);
+    check('...and the grip has to be let go of before it can close again', o.graspSpent, `graspSpent ${o.graspSpent}`);
+  }
+  {
+    const { g, p, o } = caught(3);
+    o.drive = { x: 0, y: 0, z: 0 };
+    o.vel = { x: 0, y: 0, z: 0 };
+    const dash = new Map([[0, { ...emptyInput(), my: -1, dash: true, dodge: true }]]);
+    p.prev = { ...p.prev, dash: false, dodge: false };
+    const z0 = o.pos.z;
+    for (let i = 0; i < 20; i++) { p.drive = { x: 0, y: 0, z: -4 }; o.drive = { x: 0, y: 0, z: 0 }; g.step(1 / 60, dash); g.events.length = 0; }
+    check('a dash against a slack holder takes it with you instead', p.state === 'grabbed' && o.grabbing === p.id, `${p.state}`);
+    check('...and the pair actually moves', o.pos.z < z0 - 0.1, `host moved ${(z0 - o.pos.z).toFixed(2)} the way the dash went`);
+  }
+  {
+    // Weight decides. The same dash against something far heavier shifts it much less.
+    const heave = (times: number) => {
+      const { g, p, o } = caught(times);
+      o.drive = { x: 0, y: 0, z: 0 }; o.vel = { x: 0, y: 0, z: 0 };
+      const dash = new Map([[0, { ...emptyInput(), my: -1, dash: true, dodge: true }]]);
+      p.prev = { ...p.prev, dash: false, dodge: false };
+      const z0 = o.pos.z;
+      for (let i = 0; i < 20; i++) { p.drive = { x: 0, y: 0, z: -4 }; o.drive = { x: 0, y: 0, z: 0 }; g.step(1 / 60, dash); g.events.length = 0; }
+      return z0 - o.pos.z;
+    };
+    const light = heave(1.6), heavy = heave(5);
+    check('...and how far depends on what it weighs', light > heavy * 1.5, `${light.toFixed(2)} against something small, ${heavy.toFixed(2)} against something big`);
+  }
+  {
+    // Nothing stays in a grip for ever, however slack the holder is and however quiet the catch.
+    const { g, p, o } = caught(3);
+    o.drive = { x: 0, y: 0, z: 0 };
+    let broke = -1;
+    for (let i = 0; i < 60 * (GRIP_BREAK + 3) && broke < 0; i++) {
+      o.graspHold = true; o.drive = { x: 0, y: 0, z: 0 };
+      g.step(1 / 60, new Map([[0, emptyInput()]])); g.events.length = 0;
+      if (p.state !== 'grabbed') broke = i;
+    }
+    check('nothing stays in a grip for ever', broke > 0, broke > 0 ? `out after ${(broke / 60).toFixed(1)} s` : 'still held');
+    check('...and it is out at the grip’s own limit', broke / 60 >= GRIP_BREAK - 0.5 && broke / 60 <= GRIP_BREAK + 1.5, `${(broke / 60).toFixed(1)} s against a limit of ${GRIP_BREAK}`);
+    check('...unhurt by any of it', isAlive(p), `${p.state}, ${p.hp.toFixed(0)} hp`);
+  }
 }
 
 // --- the grip says it has hold: the readout the HUD draws ---

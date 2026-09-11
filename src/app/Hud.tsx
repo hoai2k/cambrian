@@ -201,6 +201,15 @@ function GripPanel({ grip, s }: { grip: NonNullable<PlayerHud['grip']>; s: Schem
       </div>
     );
   }
+  if (grip.kind === 'held') {
+    return (
+      <div className="grip-panel lost" style={{ color: BAND_COLOR[grip.band] }}>
+        <b>{grip.name.toUpperCase()} HAS YOU</b>
+        <div className="bar grip"><i style={{ width: `${(grip.left ?? 1) * 100}%` }} /></div>
+        <span>{key('dash', s)} to break free · easier while it is pulling</span>
+      </div>
+    );
+  }
   const ride = grip.kind === 'ride';
   // What letting go would do, in the player's own words. The two windows both run from contact and
   // both change what the button means, so the line changes with them rather than describing a grip
@@ -208,7 +217,7 @@ function GripPanel({ grip, s }: { grip: NonNullable<PlayerHud['grip']>; s: Schem
   const say = {
     strike: 'Release NOW to strike',
     eat: 'Release to eat it',
-    escape: 'It has worked loose — bite it or let it go',
+    escape: 'It is working loose — let go or lose it',
     nothing: `${key('light', s)} bite · release to let go`,
   }[grip.release];
   return (

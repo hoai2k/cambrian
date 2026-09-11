@@ -209,6 +209,13 @@ export interface Actor {
    * spend that moment being pulled into place.
    */
   gripSyncT: number;
+  /**
+   * What this body is asking to do this step, in world units a second, whatever its state lets it
+   * do about it. A grabbed animal still wants to go somewhere, and a tug of war is made of exactly
+   * that wish: `desired` has already had the wish taken out of it by the time the state machine is
+   * done, so the wish itself has to be kept.
+   */
+  drive: Vec3;
   deathY: number; sparkled: boolean; tumble: Vec3;
   kills: number; eats: number; escapes: number;
   hunted: number;          // 0..1 highest detection score against this actor (HUD)

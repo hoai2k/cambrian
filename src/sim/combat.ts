@@ -200,6 +200,21 @@ export const GRIP_STRIKE = 2;
  * what it was holding works itself loose and swims off. Also timed from contact.
  */
 export const GRIP_MEAL = 5;
+/**
+ * How long anything stays in a grip it did not agree to. Past this it has worked itself out —
+ * whatever the holder wants. A grip costs the holder nothing, so without this it would cost the
+ * held animal everything: being carried around indefinitely by something that need not even be
+ * paying attention. Timed from contact like the rest.
+ */
+export const GRIP_BREAK = 15;
+/**
+ * How fast pulling *against* a grip wears it out, in grip-seconds per second at full opposition.
+ *
+ * A grip is a tug of war, not a container. Both animals are pulling, and what wears the hold is
+ * the two of them pulling apart — so a holder that goes slack and lets itself be towed along is
+ * the hardest to get out of, which is the price of not going anywhere while you hold something.
+ */
+export const GRIP_STRAIN = 0.55;
 
 /**
  * Riding has no limit of its own — no clock, no stamina. It used to have both: nine seconds, then a
