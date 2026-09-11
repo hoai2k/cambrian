@@ -396,6 +396,8 @@ export class Game implements AiWorld {
   readonly discovery: Discovery = { biomes: new Set(), landmarks: new Set(), apex: new Set(), best: new Map() };
   private scratchActors: Actor[] = [];
   private scratchBoulders: Boulder[] = [];
+  /** Last grip decision per player, for the match recorder. Written only for players; never read by the sim. */
+  private graspReasons = new Map<number, string>();
   private scratchCover: Cover[] = [];
   private scratchFlora: Flora[] = [];
   private ambientTimer = 0;
@@ -1535,6 +1537,13 @@ export class Game implements AiWorld {
    */
   private stepActions(a: Actor, input: InputFrame, dt: number, s: Step) {
     const { def, L, sf, justLight, justHeavy, justAbility, justDodge, justGuard, justLock, justSense, justDash, paddling, bursting, dir, mag, locked, jets, relief, freeClimb } = s;
+    // The grip is only ever asked about below, inside the block a free body reaches. Say so first,
+    // so a recording of a frame that never got there reads as the reason it did not rather than as
+    // whatever the last frame that did happened to say.
+    if (a.controller === 'player') {
+      this.graspReasons.set(a.id, a.rideHost >= 0 ? 'riding' : a.grabbing >= 0 ? 'holding something'
+        : a.state === 'free' || a.state === 'guard' ? 'not asked yet this frame' : `busy: state=${a.state}`);
+    }
     // --- Actions ---
     if ((a.state === 'free' || a.state === 'guard') && a.hideMode !== 'burrowed' && a.hideMode !== 'descending') {
       // Aim (LT held): the camera owns the crosshair; whatever it reports is the target. Bots toggle lock.
@@ -2034,11 +2043,19 @@ export class Game implements AiWorld {
    * buttons alone: the press bought the grip rather than the strike.
    */
   private tryGrasp(a: Actor, def: ReturnType<typeof creature>, L: number, gripButton: boolean): GraspResult {
-    if (a.graspT <= 0 || a.graspSpent || a.grabbing >= 0 || a.rideHost >= 0 || a.riddenBy >= 0) return 'none';
-    if (a.state !== 'free' && a.state !== 'guard') return 'none';
-    if (a.hitStop > 0 || isHidden(a) || !isAlive(a)) return 'none';
+    // `why` is the recorder's window onto this decision (`?debug=game`). It is written from inside
+    // the real gates rather than reconstructed alongside them, so a recording can never disagree
+    // with what the game actually did — which is the only way a diagnosis is worth having.
+    const why = (r: string) => { if (a.controller === 'player') this.graspReasons.set(a.id, r); };
+    if (a.graspT <= 0) { why('no attack button held'); return 'none'; }
+    if (a.graspSpent) { why('grip spent — let go of the button before trying again'); return 'none'; }
+    if (a.grabbing >= 0 || a.rideHost >= 0 || a.riddenBy >= 0) { why('already holding or held'); return 'none'; }
+    if (a.state !== 'free' && a.state !== 'guard') { why(`busy: state=${a.state}`); return 'none'; }
+    if (a.hitStop > 0) { why('hit-stopped'); return 'none'; }
+    if (isHidden(a) || !isAlive(a)) { why('hidden or dead'); return 'none'; }
     const h = heading(a.yaw), reach = gripReach(def, L);
     let best: Actor | undefined, bd = Infinity;
+    let nearestGap = Infinity, nearestWhy = '';
     for (const o of this.nearby(a.pos, reach + L * 2)) {
       if (o.id === a.id || !isAlive(o) || isHidden(o) || isInvulnerable(o)) continue;
       if (o.state === 'grabbed' || o.state === 'swallowed' || o.riddenBy >= 0 || o.rideHost >= 0) continue;
@@ -2047,25 +2064,44 @@ export class Game implements AiWorld {
       // To the body, not to a ball around its middle: pressed against a giant's tail you are ten
       // units from its centre and touching it, and the old test called that out of reach.
       const gap = bodyGap(o, a);
-      if (gap > reach) continue;
       // In front, measured in the yaw plane so something above or below is still in front of you.
       const to = sub(o.pos, a.pos);
       const flat = Math.hypot(to.x, to.z);
-      if (flat > 1e-6 && (to.x * h.x + to.z * h.z) / flat < GRASP_CONE) continue;
+      const ahead = flat <= 1e-6 || (to.x * h.x + to.z * h.z) / flat >= GRASP_CONE;
+      if (gap < nearestGap) {
+        nearestGap = gap;
+        nearestWhy = gap > reach ? `nearest ${creature(o.creature).name} is ${gap.toFixed(2)} from its surface, reach is ${reach.toFixed(2)}`
+          : !ahead ? `nearest ${creature(o.creature).name} is in reach but not ahead of you`
+          : '';
+      }
+      if (gap > reach || !ahead) continue;
       if (gap < bd) { bd = gap; best = o; }
     }
-    if (!best) return 'none';
+    if (!best) { why(nearestWhy || 'nothing within reach to take hold of'); return 'none'; }
     const band = bandOf(a, best);
     const bigger = band === 'threat' || band === 'giant';
-    if (bigger && gripButton && def.grasp) return takeRide(this.hitCtx, a, best) ? 'took' : 'none';
+    const name = `${creature(best.creature).name} (${band}, gap ${bd.toFixed(2)})`;
+    if (bigger && gripButton && def.grasp) {
+      const took = takeRide(this.hitCtx, a, best);
+      why(took ? `took hold of ${name}` : `${name} refused the grip — the head end, or it is already ridden`);
+      return took ? 'took' : 'none';
+    }
     // Still closing. Reported so the grip button can hold its own strike while it does: pressing it
     // against something already within arm's reach means taking hold of it, and a pounce that fired
     // on the press frame settled the matter before the grip ever shut — on prey the lunge simply
     // swallowed what the player was reaching for. Further off than this the button still pounces,
     // which is where a pounce was always for.
-    if (a.graspT < gripHold(def)) return 'closing';
-    return (bigger ? takeRide(this.hitCtx, a, best) : takeHold(this.hitCtx, a, best)) ? 'took' : 'closing';
+    if (a.graspT < gripHold(def)) {
+      why(`closing on ${name}: held ${a.graspT.toFixed(2)}s of ${gripHold(def).toFixed(2)}s`);
+      return 'closing';
+    }
+    const took = bigger ? takeRide(this.hitCtx, a, best) : takeHold(this.hitCtx, a, best);
+    why(took ? `took hold of ${name}` : `${name} refused the grip — the head end, or it is already held`);
+    return took ? 'took' : 'closing';
   }
+
+  /** Why this player's grip did or did not close, last time the question was asked. */
+  graspReason(id: number): string { return this.graspReasons.get(id) ?? ''; }
 
   /**
    * Close whatever grip suits the far body's size, and say whether one closed. A mouthful is held
@@ -2074,7 +2110,14 @@ export class Game implements AiWorld {
    */
   private closeGrip(a: Actor, o: Actor): boolean {
     const band = bandOf(a, o);
-    return band === 'threat' || band === 'giant' ? takeRide(this.hitCtx, a, o) : takeHold(this.hitCtx, a, o);
+    const took = band === 'threat' || band === 'giant' ? takeRide(this.hitCtx, a, o) : takeHold(this.hitCtx, a, o);
+    // The other way a grip closes — a lunge or a strike arriving — reports itself to the recorder
+    // as the direct reach does, so a recording accounts for every hold however it was got.
+    if (a.controller === 'player') {
+      const name = `${creature(o.creature).name} (${band})`;
+      this.graspReasons.set(a.id, took ? `took hold of ${name} on arriving` : `${name} refused the grip on arriving — the head end, or already held`);
+    }
+    return took;
   }
 
   private aimNudge(a: Actor, reach: number): void {
@@ -2226,6 +2269,9 @@ export class Game implements AiWorld {
     if (a.pounceCd > 0) return false;
     const fresh = a.lockTarget !== t.id;
     if (fresh && (a.stamina < 12 || a.pounceCd > 0)) return false;
+    if (a.controller === 'player') {
+      this.graspReasons.set(a.id, `reaching for ${creature(t.creature).name} (${bandOf(a, t)}), ${bodyGap(t, a).toFixed(1)} away`);
+    }
     this.startPounce(a, t, L, sf, !fresh);
     return true;
   }
