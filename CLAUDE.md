@@ -169,13 +169,29 @@ unless the user explicitly asks for a PR. Steps:
   measured the wrong one and so listed no neighbours at all in eleven hundred samples. `npm run
   record` checks that a recording distinguishes a grab that worked from one that could not, names
   the reason, and lists the animal it is about however big that animal is.
-- Taking hold is not an attack. A grip does no damage at all and costs nothing to keep: no clock,
-  no stamina, no strike on release. Anything from the animal's own size upwards is *ridden*
-  (`takeRide`) and the ride lasts until the player lets go or the host shakes them off with a dash;
-  anything it could swallow is held in the jaws (`takeHold`) unhurt and eaten when the button comes
-  up. Biting what you are clinging to is a separate press ({light}). The grasping appendages
-  (`def.grasp`) only make a grip easier to close and further to reach with — never a different
-  outcome. `updateRide` and `closeGrip` in `src/sim/game.ts`; `npm run grab` covers it.
+- Taking hold is not an attack. Holding costs nothing — no clock, no stamina — and hurts nothing: a
+  player's grip never crushes, button down or up. Anything from the animal's own size upwards is
+  *ridden* (`takeRide`) until the player lets go or the host shakes them off with a dash; anything
+  it could swallow is held in the jaws (`takeHold`). Both decisions are made in one place per path
+  — `closeGrip` for a grip that arrives on a lunge or a landing blow, `tryGrasp` for one reached
+  for directly — and they must agree. Biting what you are clinging to is a separate press.
+  The grasping appendages (`def.grasp`) only make a grip easier to close and further to reach with,
+  never a different outcome.
+- What a grip *comes to* is decided by the release, and every window runs from `gripSyncT`: -1 while
+  the grip is still closing, counting from the frame the two bodies actually meet. Timing from the
+  button charged the player for the approach. A ride let go of inside `GRIP_STRIKE` (2 s) lands the
+  blow the grip stood in for and something big comes looking for you; held longer it does nothing
+  and the host never learns it has a passenger. A mouthful let go of inside `GRIP_MEAL` (5 s) is
+  eaten; carried longer it works loose, unhurt, and swims off. Both constants in `src/sim/combat.ts`;
+  `npm run grab` covers it.
+- A grip is drawn on the host's *animation*, not on its rigid frame. `rideHold` is a point offset
+  from the host's centre — where a rigid capsule's surface would be — and a swimming animal's flank
+  sweeps and its tail beats right past it, so a rider pinned there holds still while the thing it is
+  gripping moves, which reads as floating alongside. At contact `Attachments` takes the host bone
+  nearest the hold point (`CreatureAnchors.nearestBone`), keeps the hold point in that bone's frame,
+  and each frame reads it back out of the bone's live world matrix and applies the bone's *rotation
+  change* to the rider about the hold point. Presentation only — `src/sim` stays rigid and
+  deterministic, and the correction is bounded by half the rider's length.
 - A player must be able to see the state the simulation is in. The grip is the worked example: it
   closed and held in complete silence, so a recording of it working read to the player as it not
   working. `Game.gripFor` is the readout — what is in the grip and the button that bites it —
