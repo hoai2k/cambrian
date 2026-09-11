@@ -10,6 +10,7 @@ import { creature, type CreatureId } from '../sim/creatures';
 import { CORPSE_WINDOW, DEATH_FADE, Game, radarRange as radarReach, type ScoreHeader, type ScoreRow, type TeleportDest } from '../sim/game';
 import type { Phase } from '../sim/daynight';
 import { BAND_COLOR, emptyInput, isCoop, TIER_NAMES, TIER_NEED, type Actor, type Band, type InputFrame, type Mode, type PlayerSetup } from '../sim/types';
+import { recordStep, recordingPhase } from '../app/debug-record';
 import { BIOME_NAMES, biomeAt, groundHeight, nurseryAt, sampleHeight, SURFACE_Y, type Biome, type Boulder, type LandmarkKind } from '../sim/world';
 import { AssetQueue, type AssetProgress } from './assets';
 import { fillOf, ladderName } from '../sim/ladder';
@@ -490,7 +491,16 @@ export class Engine {
     if (running) {
       this.acc += dt;
       let steps = 0;
-      while (this.acc >= 1 / 60 && steps < 3) { game.step(1 / 60, inputs); this.acc -= 1 / 60; steps++; }
+      while (this.acc >= 1 / 60 && steps < 3) {
+        game.step(1 / 60, inputs);
+        // The match recorder (`?debug=game`), after the step so it sees what the step decided. It
+        // is a no-op unless a recording is running, and it never writes to the simulation.
+        if (recordingPhase() === 'recording') {
+          const me = game.players[0];
+          if (me) recordStep(game, me, inputs.get(0) ?? emptyInput(), game.events);
+        }
+        this.acc -= 1 / 60; steps++;
+      }
       if (steps === 3) this.acc = 0;
       // How far this frame sits past the last completed step. The renderer interpolates across it,
       // so a display refreshing at 144 Hz shows smooth motion rather than each 60 Hz step held for
