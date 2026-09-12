@@ -1,12 +1,5 @@
 [
   {
-    "id": "titanichthys",
-    "status": "pending",
-    "scope": "total-rework",
-    "model": true,
-    "reason": "User reference directs a complete Blender remodel of silhouette, surfaces, rig and motion."
-  },
-  {
     "id": "doryaspis",
     "status": "pending",
     "scope": "total-rework",
@@ -184,19 +177,5 @@
     "scope": "individual-refinement",
     "model": true,
     "reason": "8 September user reference reopens final model: distinctive fin outlines/angles and body/fin patterning. Preserve prior final family; redesign before new audits."
-  },
-  {
-    "id": "gemuendina",
-    "status": "pending",
-    "scope": "individual-refinement",
-    "model": true,
-    "reason": "Corrected terminal snout and close-set anterior eyes delivered as candidate05 preview: front upper/lower lips form the leading body edge;18full/LODactions and new eye/oral checks pass. Broader final art, small LOD chin/cheek creases, pigmentation polish and controller playtest remain."
-  },
-  {
-    "id": "dunkleosteus",
-    "status": "pending",
-    "scope": "individual-refinement",
-    "model": true,
-    "reason": "Focused V4 head and sharp sculpted gnathals accepted with working jaws/interior, 18 full/LOD clips and 173 pose zero-contact checks. 12 September: the reduced-model colour mismatch was a builder regression (decimation wiped the inactive colour attribute; the bake skipped the sRGB decode) and is fixed in build_v2.py; the shipped LOD already matches the full model within 0.3%. What remains is the user's own look at the animal."
   }
 ]
