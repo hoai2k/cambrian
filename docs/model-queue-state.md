@@ -19,9 +19,9 @@ to `main`, so a session that runs out can be picked up from here without the con
 | F small fixes (eldredgeops rig, manticoceras umbilicus) | **done — user approved 12 Sep, integrated, badges cleared** | Both Medium (Sonnet) jobs delivered: manticoceras `build.py` INVOL=.85 (umbilicus 30%→9.4%, aperture/anchors unchanged; INVOL=.53 reproduces the shipped shell exactly); eldredgeops `build_v3.py` blends tergite_01's front rows onto the cephalon (gap closed; antenna tips at the rolled peak left open — a choreography redesign, not a value). Both package+check PASS on candidates. Not in public/: integration into shipped assets needs the user's go, and this session's auto-mode blocks writes to public/assets anyway. Candidates rebuild in about a minute from the committed builders; eldredgeops' `validate.py` is hardcoded to v2/candidate and needs its path parameterised before its v3 can go through the normal finish |
 | B (gemuendina, dunkleosteus) | **done** | accepted as published; Dunkleosteus LOD builder fix in `build_v2.py` |
 | A (acanthostega, jaekelopterus, palaeoisopus, cladoselache, tiktaalik) | **done — all shipped** | Acanthostega V2, Jaekelopterus V2, Palaeoisopus V2, Cladoselache V3, Tiktaalik V3 |
-| D (titanichthys, gemuendina, coccosteus, doryaspis, bothriolepis, stethacanthus) | 4 done, 2 blocked | Titanichthys/Gemuendina accepted; **Stethacanthus V3 and Bothriolepis V3 shipped**; Coccosteus and Doryaspis wait on the user |
+| D (titanichthys, gemuendina, coccosteus, doryaspis, bothriolepis, stethacanthus) | 4 done, 1 in flight, 1 blocked | Titanichthys/Gemuendina accepted; **Stethacanthus V3 and Bothriolepis V3 shipped**; Doryaspis unblocked 12 Sep (mouth terminal at the front, above the saw) and its V3 is being built; Coccosteus waits on the user |
 | C (onychodus, rhinodipterus, nahecaris) | **done — all shipped** | Onychodus V2, Rhinodipterus V3, Nahecaris V2 |
-| E (odaraia) | **candidate complete — one blocked step** | rig, 18 clips, LOD, export, validation, renderer fixes all done; `rework-v3/integrate_v3.sh` writes it into `public/assets/creatures/`, which this session's auto mode refuses — needs the user to run it or grant the write |
+| E (odaraia) | **shipped V3** 12 Sep | 406 bones, 19 clips (Grab added after the first export), 16 sockets, feeding contract; the Cambrian queue is empty |
 
 ## F triage
 
@@ -248,3 +248,30 @@ add-anchors, select + studio renders (`studio_render_v3.py`), cards, sizes, clea
 
 Now blocked on the user only: Odaraia (the write), Coccosteus (candidate07's GLBs), Doryaspis
 (the mouth call). Everything else in `docs/model-queue-plan.md` is shipped and on `main`.
+
+## 12 September, later — Odaraia shipped; Doryaspis unblocked; the Grab rule
+
+The user granted the public write: `integrate_v3.sh` ran (it needed `solver`/`contactType` kept in
+the anchor manifest copy — fixed in the script). Two checks turned out to be wrong rather than the
+asset: `add-anchors.mjs --check` refused eight expansion creatures whose sockets carry explicit
+identity rotation/scale (the clip re-encode spells every node out) — it now accepts identity; and
+`era-test.mjs` asserted an era always has a preview model, which the finished Cambrian roster no
+longer does — it now checks the queue and the badge table agree both ways. The V3 export had no
+`Grab`; the user confirmed every model must carry Grab, so it was added to the Odaraia clip table
+(`GRAB_STATION`: Eat's secured carry held with a squeeze per cycle), re-baked, re-exported,
+re-integrated: 19 clips full, verified in the built viewer (no badge, no errors).
+
+**Doryaspis** is unblocked. The user's words: the front of the body is the snout, the saw is the
+lower-jaw protrusion sticking out from the bottom, and the mouth is at the very front above the
+saw — not on top of the head, not an upward recess. An agent is running clay01-linux → clay02
+(terminal forward-facing mouth over the saw root) → materials → `build_v3.py` (V2's 12 bones, 18
+clips + Grab) → finalize → package → eye audit → portraits → sheet at scratchpad `dory/`.
+
+**Grab audit**: 26 shipped models lack the clip — Cambrian: burgessomedusa, canadia,
+ctenorhabdotus, marrella, odontogriphus, olenoides, pikaia, sidneyia, vetulicola, waptia, wiwaxia;
+Devonian: acanthostega, bothriolepis, cheirolepis, cladoselache, coccosteus, doryaspis,
+dunkleosteus, eldredgeops, gemuendina, nahecaris, onychodus, rhinodipterus, stethacanthus,
+tiktaalik, titanichthys. Three Sonnet agents are authoring them through
+`tools/creatures/motion/apply.mjs` (a performance per creature in `performances/<id>.mjs`, held
+loop 0.9–1.2 s, breathing, never opening; adds the clip without touching the others), with contact
+sheets at scratchpad `grab/*-grab-sheet.png`. The parent verifies, commits by path and merges.

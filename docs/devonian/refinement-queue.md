@@ -384,11 +384,14 @@ audit path runs in one place; the staging is `docs/model-queue-plan.md`, the res
   diagnostic proved the nuchal seam geometric, M05 resolved the shield and the rostral cap and
   halved the microrelief, and `build_v3.py` rigged it with V2's bones and clips (eye audit 96%).
   Badge cleared.
-- **Odaraia** (Cambrian, tracked here because it shares the pipeline): clay02/material02
-  re-derived with the accepted geometry hash reproduced exactly, then the production rig, clips,
-  LOD and export built to `production-plan03.md` and verified in the renderer, which needed two
-  translucency fixes. The write into `public/assets/creatures/` is the one step left
-  (`rework-v3/integrate_v3.sh`).
+- **Odaraia** (Cambrian, tracked here because it shares the pipeline) shipped: clay02/material02
+  re-derived with the accepted geometry hash reproduced exactly, then the production rig, 19 clips
+  (Grab included), LOD and export built to `production-plan03.md`, verified in the renderer, which
+  needed two translucency fixes for a shell over a solid body.
+- **Doryaspis** unblocked: the mouth is terminal, at the very front of the snout-like body, above
+  the saw that projects from the lower jaw. V3 in progress (clay02 → materials → rig).
+- **Grab everywhere**: the user's rule is that every model carries a Grab clip; 26 shipped models
+  lacked one and are getting it through `tools/creatures/motion/apply.mjs`.
 
-Still carrying `model: true`: Coccosteus and Doryaspis (both waiting on the user), Odaraia (one
-script run away).
+Still carrying `model: true`: Coccosteus (waiting on the user's two GLBs) and Doryaspis (in
+progress).
