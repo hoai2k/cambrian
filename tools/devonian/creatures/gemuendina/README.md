@@ -96,7 +96,7 @@ candidate; its positions reproduce the shipped ones), then recomputes normals. B
 through it; the reduced model's eyes paired by nearest position where Decimate had not landed on
 the same vertex count (worst 0.106 against bounds 7.29). Measured with `npm run sculpt:measure`,
 every changed station is within 2.4% of the sculpt's curves (the 30% at station 3 is a ventral
-value of 0.003 against 0.003) and the unchanged stations sit off the sculpt's grid only where the
-disc's leading edge makes linear interpolation between stations meaningless. Portraits:
+value of 0.003 against 0.003), and `--against` the previous shipped GLB shows stations 0–13
+identical to it (0.0% on every curve) with only the head changed. Portraits:
 `face-v4/portraits_final.py` (standalone; the same Idle-pose framing as `render_candidate_06.py`
 without its frozen-report dependency). Grab re-applied by `tools/creatures/motion/apply.mjs`.
