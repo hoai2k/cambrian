@@ -63,19 +63,30 @@ export interface EyeFeature {
 }
 
 /**
- * The mouth as a region around the mouth socket: a falloff sphere of `radius` whose contents can
- * be widened (lateral scale), deepened (vertical scale) and moved. What it changes is whatever the
- * model has there — a terminal slit, a jaw line, a beak — which is as much as a mesh can say about
- * a mouth without knowing how it was built.
+ * The mouth as a jaw that opens along the surface. The mouth socket sits at the front; the jaw
+ * hinges about a point `jawDepth` behind it on the axis, and the mouth's corners sit on the head's
+ * horizontal outline at the mouth's height, `gape` radians either side of the front (0 is closed
+ * to the centre, π wraps to the back of the head). Widening the mouth swings the corners further
+ * round that outline: the lips and everything inside the mouth stretch along the surface from
+ * the front, and the skin behind the corners is taken up so the jaw line runs further back along
+ * the flanks — an opening, not a scale. `radius` is the half-height of the band the jaw occupies
+ * (the falloff above and below the mouth line, times `reach`); `height` still scales that band
+ * vertically about the socket. `contour` is the outline the corners ride: the surface radius from
+ * the hinge at even angles over [0, π], sampled from the shipped mesh.
  */
 export interface MouthFeature {
   base: FeaturePoint;
   edit: FeaturePoint;
   radius: number;
-  width: number;
   height: number;
   reach: number;
+  jawDepth: number;
+  gapeBase: number;
+  gape: number;
+  contour: number[];
 }
+
+export const CONTOUR_BINS = 48;
 
 export interface SculptDoc {
   version: 1;
@@ -179,9 +190,74 @@ export function measure(input: MeasureInput, meta: { key: string; id: string; co
     const m = input.mouth;
     const base = { axis: m[A], up: m[1], lateral: m[L] };
     const h = evaluate(stations, 'dorsal', 'base', base.axis) - evaluate(stations, 'ventral', 'base', base.axis);
-    doc.mouth = { base, edit: { ...base }, radius: Math.max(h * .5, length * .01), width: 1, height: 1, reach: MOUTH_REACH };
+    const radius = Math.max(h * .5, length * .01);
+    // The jaw hinges half a head behind the mouth: half the Head region's length, or a tenth of
+    // the body if the regions have not resolved.
+    const head = doc.regions.find((r) => r.name === 'Head');
+    const headLength = head ? Math.abs(stations[head.to].axis - stations[head.from].axis) + h : length * .15;
+    const jawDepth = Math.max(headLength * .5, length * .02);
+    const contour = sampleContour(input.chunks, doc.frame, doc.bounds.lateralMid, base, jawDepth, radius);
+    // The shipped mouth's own corners cannot be read off a mesh; the base gape is a plausible
+    // small mouth — half the body's width at the mouth station, or the band's height, whichever
+    // is less — that the user drags outwards from.
+    const w = evaluate(stations, 'width', 'base', base.axis);
+    const half = Math.min(radius, w * .6);
+    const gapeBase = clamp(Math.atan2(half, jawDepth), .05, Math.PI * .5);
+    doc.mouth = { base, edit: { ...base }, radius, height: 1, reach: MOUTH_REACH, jawDepth, gapeBase, gape: gapeBase, contour };
   }
   return doc;
+}
+
+/**
+ * The head's horizontal outline at the mouth's height, as the surface radius from the jaw hinge
+ * at `CONTOUR_BINS` even angles from the front (0) round to the back (π). Sampled from the body's
+ * vertices within the jaw band; empty bins borrow their neighbours.
+ */
+export function sampleContour(chunks: ArrayLike<number>[], frame: SculptFrame, lateralMid: number, mouth: FeaturePoint, jawDepth: number, band: number): number[] {
+  const A = frame.axis === 'x' ? 0 : 2, L = frame.axis === 'x' ? 2 : 0;
+  const hingeAxis = mouth.axis - frame.forward * jawDepth;
+  const n = CONTOUR_BINS;
+  const best = new Array<number>(n + 1).fill(0);
+  for (const c of chunks) for (let i = 0; i + 2 < c.length; i += 3) {
+    if (Math.abs(c[i + 1] - mouth.up) > band) continue;
+    const da = frame.forward * (c[i + A] - hingeAxis), dl = Math.abs(c[i + L] - lateralMid);
+    const theta = Math.atan2(dl, da);
+    const r = Math.sqrt(da * da + dl * dl);
+    const b = Math.round(theta / Math.PI * n);
+    if (r > best[b]) best[b] = r;
+  }
+  for (let b = 0; b <= n; b++) if (best[b] <= 0) {
+    let k = 1;
+    while (k <= n && !(best[b - k] > 0 || best[b + k] > 0)) k++;
+    best[b] = best[b - k] > 0 ? best[b - k] : best[b + k] > 0 ? best[b + k] : jawDepth;
+  }
+  return best;
+}
+
+/** The outline radius at any angle, interpolated between bins. */
+export function contourAt(contour: readonly number[], theta: number): number {
+  const n = contour.length - 1;
+  const t = clamp(theta, 0, Math.PI) / Math.PI * n;
+  const i = Math.min(n - 1, Math.floor(t)), f = t - i;
+  return contour[i] + (contour[i + 1] - contour[i]) * f;
+}
+
+/** Where the mouth's corner sits for a gape, in root-frame terms (positive-lateral side). */
+export function mouthCorner(doc: SculptDoc, gape: number): FeaturePoint {
+  const m = doc.mouth!;
+  const r = contourAt(m.contour, gape);
+  return {
+    axis: m.base.axis - doc.frame.forward * m.jawDepth + doc.frame.forward * r * Math.cos(gape),
+    up: m.base.up,
+    lateral: doc.bounds.lateralMid + r * Math.sin(gape),
+  };
+}
+
+/** The angular remap of the jaw: the mouth's half stretches to the new corner, the rest of the outline takes up the slack. */
+export function gapeRemap(theta: number, from: number, to: number): number {
+  const t = Math.abs(theta);
+  const mapped = t <= from ? t * (to / Math.max(from, 1e-6)) : to + (t - from) * ((Math.PI - to) / Math.max(Math.PI - from, 1e-6));
+  return theta < 0 ? -mapped : mapped;
 }
 
 /**
@@ -373,17 +449,40 @@ export function featureWarp(doc: SculptDoc): WarpFn | null {
     }
   }
   const mouth = doc.mouth;
-  if (mouth && (mouth.width !== 1 || mouth.height !== 1 || mouth.edit.axis !== mouth.base.axis || mouth.edit.up !== mouth.base.up || mouth.edit.lateral !== mouth.base.lateral)) {
+  if (mouth && (mouth.height !== 1 || mouth.edit.axis !== mouth.base.axis || mouth.edit.up !== mouth.base.up || mouth.edit.lateral !== mouth.base.lateral)) {
     const c = [0, 0, 0], d = [0, 0, 0];
     c[A] = mouth.base.axis; c[1] = mouth.base.up; c[L] = mouth.base.lateral;
     d[A] = mouth.edit.axis - mouth.base.axis; d[1] = mouth.edit.up - mouth.base.up; d[L] = mouth.edit.lateral - mouth.base.lateral;
-    const s = [1, 1, 1]; s[1] = mouth.height; s[L] = mouth.width;
+    const s = [1, 1, 1]; s[1] = mouth.height;
     ops.push({ c, d, r: mouth.radius * mouth.reach, sx: s[0], sy: s[1], sl: s[2], globe: false });
   }
-  if (!ops.length) return null;
+  // The jaw: an angular remap about the hinge within the mouth's band, fading out behind it.
+  const jaw = mouth && Math.abs(mouth.gape - mouth.gapeBase) > 1e-6 ? mouth : null;
+  const forward = doc.frame.forward;
+  if (!ops.length && !jaw) return null;
   const p = [0, 0, 0];
   return (x, y, z, out, isEye) => {
     p[0] = x; p[1] = y; p[2] = z;
+    if (jaw) {
+      const band = jaw.radius * jaw.reach;
+      const wy = 1 - smooth(Math.abs(p[1] - jaw.base.up) / Math.max(band, 1e-6));
+      if (wy > 0) {
+        const hinge = jaw.base.axis - forward * jaw.jawDepth;
+        const da = forward * (p[A] - hinge), dl = p[L] - mid;
+        const wa = 1 - smooth(Math.max(0, -da) / Math.max(jaw.jawDepth * 1.5, 1e-6));
+        const w = wy * wa;
+        if (w > 0) {
+          const theta = Math.atan2(Math.abs(dl), da);
+          const r = Math.sqrt(da * da + dl * dl);
+          const f = r / Math.max(contourAt(jaw.contour, theta), 1e-6);
+          const theta2 = gapeRemap(theta, jaw.gapeBase, jaw.gape);
+          const r2 = f * contourAt(jaw.contour, theta2);
+          const ta = r2 * Math.cos(theta2), tl = r2 * Math.sin(theta2) * (dl < 0 ? -1 : 1);
+          p[A] += (hinge + forward * ta - p[A]) * w;
+          p[L] += (mid + tl - p[L]) * w;
+        }
+      }
+    }
     for (const o of ops) {
       const dx = p[0] - o.c[0], dy = p[1] - o.c[1], dz = p[2] - o.c[2];
       const dist = Math.sqrt(dx * dx + dy * dy + dz * dz);
@@ -474,7 +573,7 @@ export function isIdentity(doc: SculptDoc): boolean {
 
 const samePoint = (a: FeaturePoint, b: FeaturePoint) => a.axis === b.axis && a.up === b.up && a.lateral === b.lateral;
 export const eyesChanged = (doc: SculptDoc) => !!doc.eyes && (doc.eyes.scale !== 1 || !samePoint(doc.eyes.base, doc.eyes.edit));
-export const mouthChanged = (doc: SculptDoc) => !!doc.mouth && (doc.mouth.width !== 1 || doc.mouth.height !== 1 || !samePoint(doc.mouth.base, doc.mouth.edit));
+export const mouthChanged = (doc: SculptDoc) => !!doc.mouth && (Math.abs(doc.mouth.gape - doc.mouth.gapeBase) > 1e-6 || doc.mouth.height !== 1 || !samePoint(doc.mouth.base, doc.mouth.edit));
 
 // ---------------------------------------------------------------------------------------------
 // Editing helpers (each returns a new document; the history keeps the old one)
@@ -487,7 +586,7 @@ export function cloneDoc(doc: SculptDoc): SculptDoc {
     stations: doc.stations.map((s) => ({ ...s, base: { ...s.base }, edit: { ...s.edit }, tangent: { ...s.tangent } })),
     regions: doc.regions.map((r) => ({ ...r })),
     eyes: doc.eyes ? { ...doc.eyes, base: { ...doc.eyes.base }, edit: { ...doc.eyes.edit } } : undefined,
-    mouth: doc.mouth ? { ...doc.mouth, base: { ...doc.mouth.base }, edit: { ...doc.mouth.edit } } : undefined,
+    mouth: doc.mouth ? { ...doc.mouth, base: { ...doc.mouth.base }, edit: { ...doc.mouth.edit }, contour: [...doc.mouth.contour] } : undefined,
   };
 }
 
@@ -535,11 +634,11 @@ export function setEyeReach(doc: SculptDoc, reach: number): SculptDoc {
   return next;
 }
 
-export function setMouth(doc: SculptDoc, patch: Partial<Pick<MouthFeature, 'width' | 'height' | 'reach' | 'radius'>> & { edit?: Partial<FeaturePoint> }): SculptDoc {
+export function setMouth(doc: SculptDoc, patch: Partial<Pick<MouthFeature, 'gape' | 'height' | 'reach' | 'radius'>> & { edit?: Partial<FeaturePoint> }): SculptDoc {
   const next = cloneDoc(doc);
   const m = next.mouth;
   if (!m) return next;
-  if (patch.width !== undefined) m.width = Math.max(.2, Math.min(4, patch.width));
+  if (patch.gape !== undefined) m.gape = clamp(patch.gape, .02, Math.PI - .02);
   if (patch.height !== undefined) m.height = Math.max(.2, Math.min(4, patch.height));
   if (patch.reach !== undefined) m.reach = Math.max(.3, Math.min(4, patch.reach));
   if (patch.radius !== undefined) m.radius = Math.max(1e-4, patch.radius);
@@ -547,10 +646,46 @@ export function setMouth(doc: SculptDoc, patch: Partial<Pick<MouthFeature, 'widt
   return next;
 }
 
+/**
+ * Moves the jaw's hinge. The outline is re-sampled about the new hinge from the body, and the base
+ * gape is re-derived so the base corner stays where it was on the surface.
+ */
+export function setJawDepth(doc: SculptDoc, chunks: ArrayLike<number>[], jawDepth: number): SculptDoc {
+  const next = cloneDoc(doc);
+  const m = next.mouth;
+  if (!m) return next;
+  const before = mouthCorner(next, m.gapeBase);
+  const edited = mouthCorner(next, m.gape);
+  m.jawDepth = Math.max(next.bounds.length * .01, jawDepth);
+  m.contour = sampleContour(chunks, next.frame, next.bounds.lateralMid, m.base, m.jawDepth, m.radius);
+  const hinge = m.base.axis - next.frame.forward * m.jawDepth;
+  const angle = (p: FeaturePoint) => Math.atan2(Math.abs(p.lateral - next.bounds.lateralMid), next.frame.forward * (p.axis - hinge));
+  m.gapeBase = clamp(angle(before), .02, Math.PI - .02);
+  m.gape = clamp(angle(edited), .02, Math.PI - .02);
+  return next;
+}
+
+/** The gape that puts the corner nearest a point on the outline (a pointer in the top view, or an axial position in the side view). */
+export function gapeToward(doc: SculptDoc, axis: number, lateral: number | undefined): number {
+  const m = doc.mouth!;
+  const hinge = m.base.axis - doc.frame.forward * m.jawDepth;
+  if (lateral !== undefined) return clamp(Math.atan2(Math.abs(lateral - doc.bounds.lateralMid), doc.frame.forward * (axis - hinge)), .02, Math.PI - .02);
+  // Side view: only the axial position is known; find the outline angle whose corner sits there.
+  const da = doc.frame.forward * (axis - hinge);
+  let bestTheta = m.gape, bestErr = Infinity;
+  const n = m.contour.length - 1;
+  for (let b = 0; b <= n * 4; b++) {
+    const theta = b / (n * 4) * Math.PI;
+    const err = Math.abs(contourAt(m.contour, theta) * Math.cos(theta) - da);
+    if (err < bestErr) { bestErr = err; bestTheta = theta; }
+  }
+  return clamp(bestTheta, .02, Math.PI - .02);
+}
+
 export function resetFeatures(doc: SculptDoc, which: 'eyes' | 'mouth' | 'both' = 'both'): SculptDoc {
   const next = cloneDoc(doc);
   if (next.eyes && which !== 'mouth') { next.eyes.edit = { ...next.eyes.base }; next.eyes.scale = 1; next.eyes.reach = EYE_REACH; }
-  if (next.mouth && which !== 'eyes') { next.mouth.edit = { ...next.mouth.base }; next.mouth.width = 1; next.mouth.height = 1; next.mouth.reach = MOUTH_REACH; }
+  if (next.mouth && which !== 'eyes') { next.mouth.edit = { ...next.mouth.base }; next.mouth.gape = next.mouth.gapeBase; next.mouth.height = 1; next.mouth.reach = MOUTH_REACH; }
   return next;
 }
 
@@ -619,10 +754,16 @@ export function exportDoc(doc: SculptDoc) {
       } : null,
       mouth: doc.mouth ? {
         changed: mouthChanged(doc),
-        note: 'The mouth socket in the root frame and the region of `radius` × `reach` around it; `width` scales that region laterally, `height` vertically, `delta` moves it.',
+        note: 'The mouth socket in the root frame. The jaw hinges `jawDepth` behind it on the axis; `gape` is the half-angle from the front to each mouth corner about that hinge (radians, `gapeDegrees` too), and `corner` is where the positive-lateral corner sits on the head outline at the mouth height — base as shipped, edit as asked. Widening is an opening along the surface: the mouth stretches from the front to the new corner and the jaw line runs back along the flank to it. `height` scales the jaw band vertically, `delta` moves the socket.',
         base: doc.mouth.base, edit: doc.mouth.edit,
         delta: { axis: doc.mouth.edit.axis - doc.mouth.base.axis, up: doc.mouth.edit.up - doc.mouth.base.up, lateral: doc.mouth.edit.lateral - doc.mouth.base.lateral },
-        radius: doc.mouth.radius, reach: doc.mouth.reach, width: doc.mouth.width, height: doc.mouth.height,
+        hinge: { axis: doc.mouth.base.axis - doc.frame.forward * doc.mouth.jawDepth, up: doc.mouth.base.up, lateral: doc.bounds.lateralMid },
+        jawDepth: doc.mouth.jawDepth,
+        gape: { base: doc.mouth.gapeBase, edit: doc.mouth.gape },
+        gapeDegrees: { base: Math.round(doc.mouth.gapeBase * 180 / Math.PI * 10) / 10, edit: Math.round(doc.mouth.gape * 180 / Math.PI * 10) / 10 },
+        corner: { base: mouthCorner(doc, doc.mouth.gapeBase), edit: mouthCorner(doc, doc.mouth.gape) },
+        cornerBehindMouth: { base: Math.abs(mouthCorner(doc, doc.mouth.gapeBase).axis - doc.mouth.base.axis), edit: Math.abs(mouthCorner(doc, doc.mouth.gape).axis - doc.mouth.base.axis) },
+        radius: doc.mouth.radius, reach: doc.mouth.reach, height: doc.mouth.height,
       } : null,
     },
     stations: doc.stations.map((s, i) => ({

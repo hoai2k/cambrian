@@ -51,11 +51,15 @@ the model's `anchor_mouth` socket.
   there. The small square on the active eye's rim resizes both eyes about their centres. The skin
   within *reach* radii (2.2 by default) follows the eye with a smooth falloff, so a socket or an
   orbital rim moves and scales with it; the panel has the numbers and the reach.
-- **Mouth** is a region of *radius × reach* around the socket (radius defaults to half the body's
-  height at that station). On the top view drag an end of its bar to widen it; on the side view the
-  bar deepens it; drag the marker to move it. What changes is whatever the model has there — a
-  terminal slit widens, a jaw line stretches — which is as much as a mesh can say about a mouth
-  without knowing how it was built, and enough to show the builder what is wanted.
+- **Mouth** is a jaw that opens along the surface. The socket is the front of the mouth; the jaw
+  hinges about a point *jaw depth* behind it on the axis; the mouth's corners sit on the head's
+  outline at the mouth's height, a *gape* angle either side of the front. Drag a corner round the
+  head (on the top view, or along the body on the side view) and the mouth opens to it: the lips
+  and everything inside stretch along the surface from the front centre, the skin behind the
+  corners is taken up, and so a small terminal mouth widens to the edges of the face and on back
+  along the flanks. The band the jaw occupies is *half-height × reach* above and below the mouth
+  line; the handle on the side view scales it; the marker moves the mouth. Jaw depth changes where
+  the corners swing about. The jaw line is drawn as an arc with the shipped one dashed under it.
 
 ## Original and edited
 
@@ -103,8 +107,10 @@ envelope, so they scale with the station they stand on. `npm run sculpt` guards 
 
 `features.eyes` carries the eye centre (positive-lateral side; the other mirrors it) at rest and as
 edited, the delta, the measured radius, the scale, the reach, and the seat depths it was measured
-with; `features.mouth` the socket, its delta, the region radius and reach, and the width and
-height factors. Each says whether it changed.
+with; `features.mouth` the socket, its delta, the hinge and jaw depth, the gape (radians and
+degrees, base and edit), where the corner sits on the outline at rest and as asked (and how far
+behind the mouth that is), the band half-height and reach, and the height factor. Each says
+whether it changed.
 
 Everything is in the model's own root frame, unscaled — the same frame the GLB is exported in.
 `frame` says which axis the body runs along, which end the head is at (`forward: 1` means the
@@ -120,7 +126,9 @@ lofts from — never to the shipped GLB: a `percent` on `dorsal` is a scale on t
 half-height, on `ventral` its lower, on `width` its half-width; a `shift` moves the station along
 the body; a pulled `tangent` becomes the spline's tangent at that row. An eye `delta` and `scale` go
 into the builder's eye placement (its centre and radii, in the builder's frame) with the socket
-or orbit it cuts; a mouth `width`/`height` scales the oral cutter or lip rows about the socket. The builder's own
+or orbit it cuts; a mouth `gape` and `corner` say how far back along the head the oral cutter or
+lip rows should run — the corner's position behind the mouth and from the midline is the number
+to build to — and `height` scales them vertically. The builder's own
 coordinate frame differs from the GLB's (Blender is z-up and its exporter maps y to −z), so the
 port converts through `frame`, and the rebuilt creature goes through the usual pipeline
 (`docs/creature-intake.md`, or the Devonian package/check/audit path) and back into the viewer to

@@ -58,11 +58,14 @@ try {
   await page.mouse.move(sb.x + sb.width / 2 + 12, sb.y + sb.height / 2, { steps: 6 }); await page.mouse.up();
   await page.waitForTimeout(300);
   await page.getByRole('button', { name: /^Mouth/ }).click();
-  const bar = page.locator('.sculpt-top [data-kind="mouthWidth"]');
-  const mb = await bar.boundingBox();
-  assert.ok(mb, 'the mouth bar is drawn on the top view');
-  await page.mouse.move(mb.x + mb.width / 2, mb.y + 1); await page.mouse.down();
-  await page.mouse.move(mb.x + mb.width / 2, mb.y - 25, { steps: 6 }); await page.mouse.up();
+  const corner = page.locator('.sculpt-top [data-kind="mouthCorner"]').first();
+  const mb = await corner.boundingBox();
+  assert.ok(mb, 'the mouth corner is drawn on the top view');
+  const mouthMark = await page.locator('.sculpt-top [data-kind="mouth"]').boundingBox();
+  // Drag the corner back along the body (away from the nose) and outward: the jaw opens further round.
+  const back = Math.sign(mouthMark.x - mb.x) || -1;
+  await page.mouse.move(mb.x + mb.width / 2, mb.y + mb.height / 2); await page.mouse.down();
+  await page.mouse.move(mb.x + mb.width / 2 + back * 30, mb.y + mb.height / 2 + (mb.y > mouthMark.y ? 20 : -20), { steps: 6 }); await page.mouse.up();
   await page.waitForTimeout(300);
   assert.ok(await page.locator('.sculpt-features .clip', { hasText: 'Mouth' }).locator('.sculpt-dot').count() === 1, 'the mouth is marked edited');
   await page.screenshot({ path: path.join(out, 'sculpt-features.png') });
@@ -85,7 +88,7 @@ try {
   assert.equal(moved.length, 1, 'one station changed');
   assert.ok(moved[0].dorsal.edit > moved[0].dorsal.base, 'the dorsal line rose');
   assert.ok(json.features.eyes?.changed && json.features.eyes.delta.axis !== 0 && json.features.eyes.scale > 1, `the export carries the eye move and size: ${JSON.stringify(json.features.eyes)}`);
-  assert.ok(json.features.mouth?.changed && json.features.mouth.width !== 1, 'the export carries the mouth width');
+  assert.ok(json.features.mouth?.changed && json.features.mouth.gape.edit !== json.features.mouth.gape.base, 'the export carries the jaw gape');
   fs.writeFileSync(path.join(out, 'cheirolepis-sculpt.json'), JSON.stringify(json, null, 2));
   await page.getByRole('button', { name: /Done/ }).click(); await page.waitForTimeout(600);
   assert.equal(new URL(page.url()).searchParams.get('mode'), null, 'view mode drops the URL flag');
@@ -95,5 +98,5 @@ try {
   assert.equal(await page.getByRole('button', { name: /^Edit sculpt/ }).textContent(), 'Edit sculpt', 'a reload forgets the sculpt');
   assert.equal(new URL(page.url()).searchParams.get('specimen'), key, 'a reload keeps the specimen');
   assert.deepEqual(errors, [], 'no page errors');
-  console.log('PASS: sculpt mode — URL state, regions and points, drag edit, keyboard undo/redo, eyes moved and resized, mouth widened, original/edited toggle, export, edit kept in view mode, reload resets');
+  console.log('PASS: sculpt mode — URL state, regions and points, drag edit, keyboard undo/redo, eyes moved and resized, jaw opened, original/edited toggle, export, edit kept in view mode, reload resets');
 } finally { await browser.close(); }

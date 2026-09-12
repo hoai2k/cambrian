@@ -9,8 +9,8 @@
  */
 import assert from 'node:assert/strict';
 import {
-  autoSlope, evaluate, exportDoc, isIdentity, makeProbe, measure, moveEyesOnCrown, moveEyesOnFlank, remapAxis, resetFeatures,
-  resetStations, setEyeScale, setMouth, setShift, setTangent, setValue, warp,
+  autoSlope, evaluate, exportDoc, isIdentity, makeProbe, measure, mouthChanged, mouthCorner, moveEyesOnCrown, moveEyesOnFlank, remapAxis,
+  resetFeatures, resetStations, setEyeScale, setJawDepth, setMouth, setShift, setTangent, setValue, warp,
   type SculptDoc,
 } from '../src/viewer/sculpt/profile';
 import { History } from '../src/viewer/sculpt/history';
@@ -199,17 +199,34 @@ assert.ok(Math.abs(out[1] - (.1 + eyeR * 1.5)) < 1e-6, `eye vertex scales about 
 wS(eyeX, .1 + eyeR * bigger.eyes!.reach * 1.01, eyeZ, out, false);
 assert.ok(Math.abs(out[1] - (.1 + eyeR * bigger.eyes!.reach * 1.01)) < 1e-6, 'skin beyond the reach is untouched');
 
-// Mouth: widening scales lateral offsets near the socket and nothing at the tail.
-const wideMouth = setMouth(withFeatures, { width: 1.5, radius: .5 });
-const wM = warp(wideMouth);
-const m = wideMouth.mouth!;
-wM(.05, m.base.up, m.base.axis, out, false);
-// Just inside the region the falloff is nearly one, so the offset grows by almost the full 50%.
-assert.ok(out[0] > .072 && out[0] < .075, `a point beside the mouth widens: ${out[0]}`);
-wM(.05, 0, -2, out, false);
-assert.ok(Math.abs(out[0] - .05) < 1e-6, 'the tail does not');
-assert.equal(exportDoc(wideMouth).features.mouth!.width, 1.5);
-assert.ok(isIdentity(resetFeatures(setMouth(bigger, { width: 2, edit: { axis: 3 } }))), 'reset features restores rest');
+// Mouth: the jaw opens along the outline. The base corner moves to the new gape angle on the
+// surface; the front centre stays; the tail is untouched.
+const m0 = withFeatures.mouth!;
+assert.ok(m0.jawDepth > 0 && m0.contour.length === 49, `jaw hinge and outline measured: depth ${m0.jawDepth}`);
+const opened = setMouth(withFeatures, { gape: m0.gapeBase * 2 });
+assert.ok(mouthChanged(opened) && !isIdentity(opened));
+const cornerBase = mouthCorner(withFeatures, m0.gapeBase), cornerNew = mouthCorner(opened, opened.mouth!.gape);
+assert.ok(cornerNew.axis < cornerBase.axis, 'a wider gape puts the corner further back along the body');
+assert.ok(cornerNew.lateral > cornerBase.lateral, 'and further out round the side');
+const wJ = warp(opened);
+wJ(cornerBase.lateral, m0.base.up, cornerBase.axis, out, false);
+assert.ok(Math.abs(out[2] - cornerNew.axis) < 5e-3 && Math.abs(out[0] - cornerNew.lateral) < 5e-3, `the base corner lands on the new corner: ${out} vs ${JSON.stringify(cornerNew)}`);
+wJ(0, m0.base.up, m0.base.axis, out, false);
+assert.ok(Math.abs(out[0]) < 1e-9 && Math.abs(out[2] - m0.base.axis) < 1e-6, 'the front centre of the mouth stays put');
+wJ(.05, 0, -2, out, false);
+assert.ok(Math.abs(out[0] - .05) < 1e-6 && Math.abs(out[2] + 2) < 1e-6, 'the tail does not move');
+// Everything inside the mouth rides along: a point halfway in from the base corner keeps its
+// fraction of the outline radius at the new angle.
+const hinge = m0.base.axis - withFeatures.frame.forward * m0.jawDepth;
+wJ(cornerBase.lateral * .5, m0.base.up, hinge + (cornerBase.axis - hinge) * .5, out, false);
+const rNew = Math.hypot(out[0], withFeatures.frame.forward * (out[2] - hinge));
+const rCorner = Math.hypot(cornerNew.lateral, withFeatures.frame.forward * (cornerNew.axis - hinge));
+assert.ok(Math.abs(rNew / rCorner - .5) < .02, `an interior point keeps its depth fraction: ${rNew / rCorner}`);
+assert.equal(exportDoc(opened).features.mouth!.gape.edit, opened.mouth!.gape);
+assert.ok(exportDoc(opened).features.mouth!.cornerBehindMouth.edit > exportDoc(opened).features.mouth!.cornerBehindMouth.base);
+const deeper = setJawDepth(opened, [positions], m0.jawDepth * 1.5);
+assert.ok(Math.abs(deeper.mouth!.jawDepth - m0.jawDepth * 1.5) < 1e-9 && deeper.mouth!.gape < opened.mouth!.gape, 'a deeper hinge sees the same corner at a smaller angle');
+assert.ok(isIdentity(resetFeatures(setMouth(bigger, { gape: 2, edit: { axis: 3 } }))), 'reset features restores rest');
 assert.ok(isIdentity(resetStations(setMouth(setValue(bigger, 3, 'width', 9), { height: 2 }))), 'reset all covers features too');
 
-console.log('PASS: sculpt document — measuring, identity warp, local dorsal/ventral/width edits, monotone axis shifts, tangents, export, history, eyes seated on the flank and crown, eye scale, mouth width');
+console.log('PASS: sculpt document — measuring, identity warp, local dorsal/ventral/width edits, monotone axis shifts, tangents, export, history, eyes seated on the flank and crown, eye scale, the jaw opening along the outline');
