@@ -486,3 +486,14 @@ check → portraits → `ports/titanichthys-final-sheet.png`. When it reports: j
 `docs/sculpts/titanichthys-sculpt.json`, merge. A deployment-verification agent (Opus) is running
 every `pages.yml` step in parallel. Then the report to the user. Coccosteus still blocked on the
 Mac files.
+
+## 12 September, 23:50 UTC — all three sculpt ports and Doryaspis V3 on main
+
+Titanichthys (`51f241d`, cage-row loft, the pleated first port rejected), Dunkleosteus (`e7077e8`),
+Gemuendina (`64f597a`), Doryaspis V3 (`ebebf9f`). `docs/sculpts/` is empty of files; the
+Odaraia palette classification fixed (`palettes` was the one failing deployment-adjacent test).
+Every `pages.yml` step and every `npm run` suite passed on this head; the built pages load with no
+console errors. Outstanding: Coccosteus (blocked on the user's Mac candidate07 GLBs); the twenty
+`STALE <id>: lod1 older than the model` warnings from `npm run check` are mtime artefacts of
+checkout order, non-fatal. Judge sheets for the user are in the session scratchpad
+`ports/{gemuendina,titanichthys,dunkleosteus}-*-sheet.png` and `dory/doryaspis-v2-vs-v3-sheet.png`.
