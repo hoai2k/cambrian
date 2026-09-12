@@ -125,12 +125,5 @@
     "scope": "total-rework",
     "model": true,
     "reason": "User reference: bulky sculpted and textured armoured front; long pectoral appendages sweeping outward/backward with curved or slightly downward attitude. Sculpt subtle fish proportions first; audit only after full rework."
-  },
-  {
-    "id": "stethacanthus",
-    "status": "pending",
-    "scope": "total-rework",
-    "model": true,
-    "reason": "User reference: shark-like form, head/body/fin/tail proportions and dorsal spine-brush in the same colour family as the body. Audit after completed rework."
   }
 ]
