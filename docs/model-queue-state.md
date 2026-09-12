@@ -345,3 +345,36 @@ stations/regions/tangents, eyes and mouth features, Edited/Original toggle, URL 
 `npm run sculpt` and `npm run sculpt:measure`; Odaraia V3 (19 clips incl. Grab); Bothriolepis V3;
 Stethacanthus V3; Acanthostega V2, Tiktaalik V3, Onychodus V2, Rhinodipterus V3, Nahecaris V2;
 translucency fixes; the checks made honest (add-anchors identity transforms, era test two-way).
+
+## 12 September, evening — RESUME POINT (second)
+
+The session was paused mid-way; the seven agents were cancelled and could not be resumed, so six
+fresh ones were launched at 16:55 UTC from what was on disk. Shipped and on main since the last
+resume point: the sculpt mouth is now a **jaw that opens along the head outline** (hinge a `jawDepth`
+behind the socket, corners at `gape` on the sampled `contour`, angular remap so the mouth stretches
+from the front round the sides and back along the flanks; export carries hinge/gape/corner), with
+the browser and unit tests updated.
+
+**Ports reported** (geometry done, verified with `npm run sculpt:measure`; **materials missing**):
+- Gemuendina: `face-v4/shape_06.py` + `candidate_06.py` (+ `check_`/`audit_`/`render_candidate_06.py`),
+  candidate `/home/user/devonian-authoring/gemuendina/sculpt-candidate/`. Changed stations within
+  ±3%; the two pulled tangents were not representable in `sculpt_spec_02.profile()` (auto slope
+  used). Materials are flat placeholders because the imagegen swatch is not in the checkout.
+- Titanichthys: `sculpt-port/` (`geometry.py` with `nose_warp`, `build_base.py`, `build_candidate.py`,
+  `eye_audit_candidate.py`, `portraits.py`), candidate `/home/user/devonian-authoring/titanichthys/
+  sculpt-candidate/`. Snout lengthened/narrowed as asked; materials are flat colours because the
+  shipped atlases were baked to a smart_project UV that did not reproduce.
+- Fix in flight: a **material transplant** agent writing `tools/devonian/transplant-materials.mjs`
+  (copies material + textures + TEXCOORD/COLOR_0 from the shipped GLB onto the candidate, primitive
+  by primitive, vertex counts must match) and applying it to both candidates, with sheets at
+  scratchpad `ports/<id>-transplant-sheet.png`. When it passes: `integrate.sh <id> <candidate>
+  <candidate>`, re-apply Grab (`node tools/creatures/motion/apply.mjs <id>`), `check.mjs`, README,
+  commit (delete `docs/sculpts/<id>-sculpt.json` in the same commit), merge.
+- Dunkleosteus: a fresh agent is finishing the port from the unverified `build_v3.py`/`finalize_v3.py`/
+  `portraits_v3.py` left by the rate-limited one; it was told materials must be the real V2 ones.
+
+**Grab**: three fresh agents (Cambrian 11; Devonian fish 8 — three performances already existed
+unverified; Devonian others 7). **Doryaspis**: a fresh Opus agent from clay01-linux (done) → clay02
+→ materials → build_v3 → candidate at `/home/user/devonian-authoring/doryaspis/v3-candidate/`.
+Finishing steps for each are in the first RESUME POINT above. Then the Opus-medium deployment
+verification (every `pages.yml` step), then tell the user.
