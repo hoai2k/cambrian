@@ -25,9 +25,9 @@ function slotFor(materialName) {
   const n = materialName.toLowerCase();
   if (/eye/.test(n)) return 'eyes';
   if (/ventral|arthrodial/.test(n)) return 'underside';
-  if (/sclerotiz|oral|spine/.test(n)) return 'accent';
-  if (/membrane|swimming|marginal/.test(n)) return 'fins';
-  if (/bristle|appendage|endite|antenna|seta|gill|leg/.test(n)) return 'legs';
+  if (/sclerotiz|oral|spine|mouthpart/.test(n)) return 'accent';
+  if (/membrane|swimming|marginal|exopod/.test(n)) return 'fins';
+  if (/bristle|appendage|endite|antenna|seta|gill|leg|endopod/.test(n)) return 'legs';
   return 'body';
 }
 
@@ -60,6 +60,18 @@ const EXPECTED = {
   'oral cuticle': 'accent',
   'dark arthrodial membrane': 'underside',
   'continuous ventral body': 'underside',
+  // Anatomical names, from a body rebuilt out of its parts rather than out of generic surfaces.
+  // Odaraia V3 replaced Cuticle/Bristles/Membrane/Sclerotized-edges with these, and until they were
+  // classified six of its seven materials fell through to `body` — so a scheme painted the whole
+  // animal one colour. They land where the names they replaced landed: the carapace and the body
+  // under it are the animal's surface, the swimming branch of the limb is a fin, the walking and
+  // feeding branches are legs, and the feeding apparatus is the accent.
+  'shell': 'body',
+  'trunk': 'body',
+  'exopods': 'fins',
+  'endopods': 'legs',
+  'endites': 'legs',
+  'mouthparts': 'accent',
 };
 
 const { ACTIVE_ERA, SCHEMES, CREATURE_SCHEMES } = await loadContent();

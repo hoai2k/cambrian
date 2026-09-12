@@ -59,9 +59,14 @@ export function slotFor(materialName: string): Slot {
   const n = materialName.toLowerCase();
   if (/eye/.test(n)) return 'eyes';
   if (/ventral|arthrodial|belly|underside|bone/.test(n)) return 'underside';
-  if (/sclerotiz|oral|spine|accent|denticle|tooth|brush/.test(n)) return 'accent';
-  if (/membrane|swimming|marginal|\bfin/.test(n)) return 'fins';
-  if (/bristle|appendage|endite|antenna|seta|gill|leg/.test(n)) return 'legs';
+  if (/sclerotiz|oral|spine|accent|denticle|tooth|brush|mouthpart/.test(n)) return 'accent';
+  // A biramous limb's two branches go to different slots, because they are different things: the
+  // exopod is the lamellar swimming flap and the endopod is the walking and feeding branch. Named
+  // parts like this arrive when a creature is rebuilt from its anatomy rather than from generic
+  // surfaces — Odaraia V3 renamed Cuticle/Bristles/Membrane to shell/trunk/endopods/exopods and
+  // every one of them fell through to `body`, which is a scheme that cannot vary the animal.
+  if (/membrane|swimming|marginal|\bfin|exopod/.test(n)) return 'fins';
+  if (/bristle|appendage|endite|antenna|seta|gill|leg|endopod/.test(n)) return 'legs';
   return 'body';
 }
 
