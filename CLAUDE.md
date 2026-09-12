@@ -176,12 +176,17 @@ unless the user explicitly asks for a PR. Steps:
 - The specimen viewer (`/viewer/`) keeps which creature is open in the URL (`?specimen=<key>`) and
   has a sculpt mode (`&mode=sculpt`, the *Edit sculpt* button): side and top drawings of the body's
   silhouette as the builders' own kind of profile table — twenty stations, dorsal/ventral/width,
-  a spline with pullable tangents — grouped into head-to-tail regions, warping the loaded model
-  live and following it into view mode and the reduced model. Undo/redo, in-memory only (a reload
+  a spline with pullable tangents — grouped into head-to-tail regions, plus the eyes (a mirrored
+  pair that slides along the flank or across the crown and keeps its seat in the skin, resizable
+  with the socket following) and the mouth (a region round the socket that widens, deepens or
+  moves) as features, warping the loaded model live and following it into view mode and the
+  reduced model, with an Edited/Original toggle for the preview. Undo/redo, in-memory only (a reload
   returns to what ships). *Export sculpt* writes `<id>-sculpt.json`, which is the hand-off for a
   builder port: the change goes into the builder's profile rows, never into the GLB
   (`docs/viewer-sculpt.md`). `src/viewer/sculpt/profile.ts` is pure and `npm run sculpt` guards it;
-  `tools/sculpt-browser.mjs` drives the mode in a browser.
+  `tools/sculpt-browser.mjs` drives the mode in a browser; `npm run sculpt:measure -- <glb> [sculpt.json]`
+  measures a model the same way and reports how far a rebuilt candidate is from a sculpt's target,
+  which is how a port is checked.
 - `?debug=local` on either page (`/?debug=local`, `/devonian/?debug=local`) opens an editor for that
   era's saved state — `src/app/DebugLocal.tsx`, gated by `src/shared/debug.ts`, mounted by
   `src/app/Root.tsx` so both entry points get it without knowing about it. A new thing kept in

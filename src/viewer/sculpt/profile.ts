@@ -41,6 +41,42 @@ export interface Region { name: string; from: number; to: number }
 
 export interface SculptFrame { axis: 'x' | 'z'; forward: 1 | -1; up: 'y' }
 
+/** A point in the body's own terms: along the axis, up, and lateral (the raw lateral coordinate). */
+export interface FeaturePoint { axis: number; up: number; lateral: number }
+
+/**
+ * The eyes as one feature: the centre of the eye on the positive-lateral side at rest and as
+ * edited; the other eye mirrors it about the midline. The skin around each eye (its socket, an
+ * orbital rim) follows with a smooth falloff out to `reach` radii, so a moved or resized eye takes
+ * its indent with it. `depthLateral` and `depthTop` are how far the centre sits inside the flank
+ * and below the crown at rest — what "on the surface in the same way" means when it is moved.
+ */
+export interface EyeFeature {
+  base: FeaturePoint;
+  edit: FeaturePoint;
+  radius: number;
+  scale: number;
+  depthLateral: number;
+  depthTop: number;
+  reach: number;
+  mirrored: boolean;
+}
+
+/**
+ * The mouth as a region around the mouth socket: a falloff sphere of `radius` whose contents can
+ * be widened (lateral scale), deepened (vertical scale) and moved. What it changes is whatever the
+ * model has there — a terminal slit, a jaw line, a beak — which is as much as a mesh can say about
+ * a mouth without knowing how it was built.
+ */
+export interface MouthFeature {
+  base: FeaturePoint;
+  edit: FeaturePoint;
+  radius: number;
+  width: number;
+  height: number;
+  reach: number;
+}
+
 export interface SculptDoc {
   version: 1;
   key: string;
@@ -52,7 +88,12 @@ export interface SculptDoc {
   bounds: { length: number; height: number; width: number; lateralMid: number; axisMin: number; axisMax: number };
   stations: Station[];
   regions: Region[];
+  eyes?: EyeFeature;
+  mouth?: MouthFeature;
 }
+
+export const EYE_REACH = 2.2;
+export const MOUTH_REACH = 1.0;
 
 /** Default number of stations: enough for five regions of four, few enough to grab by hand. */
 export const STATION_COUNT = 20;
@@ -72,11 +113,16 @@ export interface MeasureInput {
   chunks: ArrayLike<number>[];
   /** The mouth socket in the root frame, when the model has one: it says which end is the head. */
   mouth?: [number, number, number];
+  /** Positions of the eye geometry alone (meshes or materials named for the eye), same frame. */
+  eyes?: ArrayLike<number>[];
 }
 
 export function measure(input: MeasureInput, meta: { key: string; id: string; collection: string; model: string }, count = STATION_COUNT): SculptDoc {
+  // The silhouette is the whole animal, eyes included; the surface the eyes are seated against is
+  // the body without them.
+  const all = [...input.chunks, ...(input.eyes ?? [])];
   const lo = [Infinity, Infinity, Infinity], hi = [-Infinity, -Infinity, -Infinity];
-  for (const c of input.chunks) for (let i = 0; i + 2 < c.length; i += 3) for (let k = 0; k < 3; k++) {
+  for (const c of all) for (let i = 0; i + 2 < c.length; i += 3) for (let k = 0; k < 3; k++) {
     const v = c[i + k];
     if (v < lo[k]) lo[k] = v;
     if (v > hi[k]) hi[k] = v;
@@ -94,7 +140,7 @@ export function measure(input: MeasureInput, meta: { key: string; id: string; co
   const n = Math.max(2, count);
   const h = length / (n - 1);
   const dorsal = new Array(n).fill(-Infinity), ventral = new Array(n).fill(Infinity), width = new Array(n).fill(0);
-  for (const c of input.chunks) for (let i = 0; i + 2 < c.length; i += 3) {
+  for (const c of all) for (let i = 0; i + 2 < c.length; i += 3) {
     const a = c[i + A], y = c[i + 1], l = Math.abs(c[i + L] - (lo[L] + hi[L]) / 2);
     // A vertex informs every station whose window (±h/2, so windows tile the length) holds it.
     const t = (a - lo[A]) / h;
@@ -119,12 +165,99 @@ export function measure(input: MeasureInput, meta: { key: string; id: string; co
     const base = { dorsal: dorsal[j], ventral: ventral[j], width: width[j] };
     stations.push({ axis: a, headFraction: forward === 1 ? 1 - u : u, base, edit: { ...base }, shift: 0, tangent: {} });
   }
-  return {
+  const doc: SculptDoc = {
     version: 1, ...meta,
     frame: { axis, forward, up: 'y' },
     bounds: { length, height: size[1], width: size[L], lateralMid: (lo[L] + hi[L]) / 2, axisMin: lo[A], axisMax: hi[A] },
     stations,
     regions: defaultRegions(stations),
+  };
+  const probe = makeProbe(input.chunks, doc.frame, doc.bounds.lateralMid);
+  const eye = measureEyes(input.eyes ?? [], doc, probe);
+  if (eye) doc.eyes = eye;
+  if (input.mouth) {
+    const m = input.mouth;
+    const base = { axis: m[A], up: m[1], lateral: m[L] };
+    const h = evaluate(stations, 'dorsal', 'base', base.axis) - evaluate(stations, 'ventral', 'base', base.axis);
+    doc.mouth = { base, edit: { ...base }, radius: Math.max(h * .5, length * .01), width: 1, height: 1, reach: MOUTH_REACH };
+  }
+  return doc;
+}
+
+/**
+ * The body surface near a point, from the vertices themselves: the flank's half-extent at a
+ * given station and height, and the crown's height at a given station and lateral offset. What
+ * an eye is seated against, so moving it can keep the same seat.
+ */
+export interface SurfaceProbe {
+  width(axis: number, up: number, tol: number): number;
+  top(axis: number, lateral: number, tol: number): number;
+}
+
+export function makeProbe(chunks: ArrayLike<number>[], frame: SculptFrame, lateralMid: number): SurfaceProbe {
+  const A = frame.axis === 'x' ? 0 : 2, L = frame.axis === 'x' ? 2 : 0;
+  // A sparse mesh may have no vertex inside the first window; widen it until one turns up.
+  const widen = <T>(tol: number, find: (t: number) => T, found: (v: T) => boolean): T => {
+    let t = tol, v = find(t);
+    for (let k = 0; k < 4 && !found(v); k++) { t *= 2; v = find(t); }
+    return v;
+  };
+  return {
+    width(axis, up, tol) {
+      return widen(tol, (t) => {
+        let best = 0;
+        for (const c of chunks) for (let i = 0; i + 2 < c.length; i += 3) {
+          if (Math.abs(c[i + A] - axis) > t || Math.abs(c[i + 1] - up) > t) continue;
+          const l = Math.abs(c[i + L] - lateralMid);
+          if (l > best) best = l;
+        }
+        return best;
+      }, (v) => v > 0);
+    },
+    top(axis, lateral, tol) {
+      const want = Math.abs(lateral - lateralMid);
+      return widen(tol, (t) => {
+        let best = -Infinity;
+        for (const c of chunks) for (let i = 0; i + 2 < c.length; i += 3) {
+          if (Math.abs(c[i + A] - axis) > t || Math.abs(Math.abs(c[i + L] - lateralMid) - want) > t) continue;
+          if (c[i + 1] > best) best = c[i + 1];
+        }
+        return best;
+      }, (v) => Number.isFinite(v));
+    },
+  };
+}
+
+function measureEyes(eyeChunks: ArrayLike<number>[], doc: SculptDoc, probe: SurfaceProbe): EyeFeature | undefined {
+  const A = doc.frame.axis === 'x' ? 0 : 2, L = doc.frame.axis === 'x' ? 2 : 0;
+  const mid = doc.bounds.lateralMid;
+  // Each side's eye is the bounding box of the eye vertices on that side of the midline.
+  const box = (sign: 1 | -1) => {
+    const lo = [Infinity, Infinity, Infinity], hi = [-Infinity, -Infinity, -Infinity];
+    let count = 0;
+    for (const c of eyeChunks) for (let i = 0; i + 2 < c.length; i += 3) {
+      const side = c[i + L] - mid;
+      if (sign === 1 ? side < 0 : side >= 0) continue;
+      count++;
+      for (let k = 0; k < 3; k++) { if (c[i + k] < lo[k]) lo[k] = c[i + k]; if (c[i + k] > hi[k]) hi[k] = c[i + k]; }
+    }
+    return count ? { lo, hi, count } : undefined;
+  };
+  const right = box(1), left = box(-1);
+  const pick = right ?? left;
+  if (!pick) return undefined;
+  const centre = [(pick.lo[0] + pick.hi[0]) / 2, (pick.lo[1] + pick.hi[1]) / 2, (pick.lo[2] + pick.hi[2]) / 2];
+  const radius = Math.max(pick.hi[0] - pick.lo[0], pick.hi[1] - pick.lo[1], pick.hi[2] - pick.lo[2]) / 2;
+  const base: FeaturePoint = { axis: centre[A], up: centre[1], lateral: centre[L] };
+  const tol = Math.max(radius * .6, doc.bounds.length * .004);
+  const flank = probe.width(base.axis, base.up, tol);
+  const crown = probe.top(base.axis, base.lateral, tol);
+  return {
+    base, edit: { ...base }, radius, scale: 1,
+    depthLateral: flank - Math.abs(base.lateral - mid),
+    depthTop: Number.isFinite(crown) ? crown - base.up : 0,
+    reach: EYE_REACH,
+    mirrored: !!(right && left),
   };
 }
 
@@ -217,7 +350,67 @@ const EPS = 1e-6;
  * midline scales to the edited dorsal line, depth below it to the edited ventral line, the
  * lateral offset by the width ratio, and the axial coordinate follows the shifted stations.
  */
-export function warp(doc: SculptDoc, subdivisions = 48): (x: number, y: number, z: number, out: [number, number, number]) => void {
+export type WarpFn = (x: number, y: number, z: number, out: [number, number, number], eye?: boolean) => void;
+
+const smooth = (t: number) => (t <= 0 ? 0 : t >= 1 ? 1 : t * t * (3 - 2 * t));
+
+/**
+ * The feature edits as a displacement in base space: each eye (and the skin within its reach)
+ * moves and scales about its base centre, and the mouth region widens, deepens and moves about
+ * the socket. Applied before the profile warp so features ride the body's own change.
+ */
+export function featureWarp(doc: SculptDoc): WarpFn | null {
+  const A = doc.frame.axis === 'x' ? 0 : 2, L = doc.frame.axis === 'x' ? 2 : 0;
+  const mid = doc.bounds.lateralMid;
+  const ops: { c: number[]; d: number[]; r: number; sx: number; sy: number; sl: number; globe: boolean }[] = [];
+  const eye = doc.eyes;
+  if (eye && (eye.scale !== 1 || eye.edit.axis !== eye.base.axis || eye.edit.up !== eye.base.up || eye.edit.lateral !== eye.base.lateral)) {
+    for (const sign of eye.mirrored ? [1, -1] : [Math.sign(eye.base.lateral - mid) || 1]) {
+      const c = [0, 0, 0], d = [0, 0, 0];
+      c[A] = eye.base.axis; c[1] = eye.base.up; c[L] = mid + sign * (eye.base.lateral - mid);
+      d[A] = eye.edit.axis - eye.base.axis; d[1] = eye.edit.up - eye.base.up; d[L] = sign * (eye.edit.lateral - eye.base.lateral);
+      ops.push({ c, d, r: eye.radius * eye.reach, sx: eye.scale, sy: eye.scale, sl: eye.scale, globe: true });
+    }
+  }
+  const mouth = doc.mouth;
+  if (mouth && (mouth.width !== 1 || mouth.height !== 1 || mouth.edit.axis !== mouth.base.axis || mouth.edit.up !== mouth.base.up || mouth.edit.lateral !== mouth.base.lateral)) {
+    const c = [0, 0, 0], d = [0, 0, 0];
+    c[A] = mouth.base.axis; c[1] = mouth.base.up; c[L] = mouth.base.lateral;
+    d[A] = mouth.edit.axis - mouth.base.axis; d[1] = mouth.edit.up - mouth.base.up; d[L] = mouth.edit.lateral - mouth.base.lateral;
+    const s = [1, 1, 1]; s[1] = mouth.height; s[L] = mouth.width;
+    ops.push({ c, d, r: mouth.radius * mouth.reach, sx: s[0], sy: s[1], sl: s[2], globe: false });
+  }
+  if (!ops.length) return null;
+  const p = [0, 0, 0];
+  return (x, y, z, out, isEye) => {
+    p[0] = x; p[1] = y; p[2] = z;
+    for (const o of ops) {
+      const dx = p[0] - o.c[0], dy = p[1] - o.c[1], dz = p[2] - o.c[2];
+      const dist = Math.sqrt(dx * dx + dy * dy + dz * dz);
+      // The eye's own vertices belong to it wholly; the skin fades out over the reach.
+      const w = o.globe && isEye && dist <= o.r ? 1 : 1 - smooth(dist / o.r);
+      if (w <= 0) continue;
+      const kx = 1 + (o.sx - 1) * w, ky = 1 + (o.sy - 1) * w, kz = 1 + (o.sl - 1) * w;
+      p[0] = o.c[0] + o.d[0] * w + dx * kx;
+      p[1] = o.c[1] + o.d[1] * w + dy * ky;
+      p[2] = o.c[2] + o.d[2] * w + dz * kz;
+    }
+    out[0] = p[0]; out[1] = p[1]; out[2] = p[2];
+  };
+}
+
+export function warp(doc: SculptDoc, subdivisions = 48): WarpFn {
+  const profile = profileWarp(doc, subdivisions);
+  const features = featureWarp(doc);
+  if (!features) return profile;
+  const tmp: [number, number, number] = [0, 0, 0];
+  return (x, y, z, out, isEye) => {
+    features(x, y, z, tmp, isEye);
+    profile(tmp[0], tmp[1], tmp[2], out);
+  };
+}
+
+function profileWarp(doc: SculptDoc, subdivisions = 48): WarpFn {
   const { stations } = doc;
   const A = doc.frame.axis === 'x' ? 0 : 2, L = doc.frame.axis === 'x' ? 2 : 0;
   // Width is measured from the model's lateral midline, which is not necessarily zero.
@@ -275,8 +468,13 @@ export function warp(doc: SculptDoc, subdivisions = 48): (x: number, y: number, 
 
 /** True when nothing in the document departs from what was measured. */
 export function isIdentity(doc: SculptDoc): boolean {
-  return doc.stations.every((s) => s.shift === 0 && CURVES.every((c) => s.edit[c] === s.base[c] && s.tangent[c] === undefined));
+  return doc.stations.every((s) => s.shift === 0 && CURVES.every((c) => s.edit[c] === s.base[c] && s.tangent[c] === undefined))
+    && !featureWarp(doc);
 }
+
+const samePoint = (a: FeaturePoint, b: FeaturePoint) => a.axis === b.axis && a.up === b.up && a.lateral === b.lateral;
+export const eyesChanged = (doc: SculptDoc) => !!doc.eyes && (doc.eyes.scale !== 1 || !samePoint(doc.eyes.base, doc.eyes.edit));
+export const mouthChanged = (doc: SculptDoc) => !!doc.mouth && (doc.mouth.width !== 1 || doc.mouth.height !== 1 || !samePoint(doc.mouth.base, doc.mouth.edit));
 
 // ---------------------------------------------------------------------------------------------
 // Editing helpers (each returns a new document; the history keeps the old one)
@@ -288,7 +486,72 @@ export function cloneDoc(doc: SculptDoc): SculptDoc {
     bounds: { ...doc.bounds },
     stations: doc.stations.map((s) => ({ ...s, base: { ...s.base }, edit: { ...s.edit }, tangent: { ...s.tangent } })),
     regions: doc.regions.map((r) => ({ ...r })),
+    eyes: doc.eyes ? { ...doc.eyes, base: { ...doc.eyes.base }, edit: { ...doc.eyes.edit } } : undefined,
+    mouth: doc.mouth ? { ...doc.mouth, base: { ...doc.mouth.base }, edit: { ...doc.mouth.edit } } : undefined,
   };
+}
+
+/**
+ * Moves the eyes on the flank: the new station and height are given, and the lateral seat is
+ * solved so the centre keeps its depth inside the surface it was measured against.
+ */
+export function moveEyesOnFlank(doc: SculptDoc, probe: SurfaceProbe, axis: number, up: number): SculptDoc {
+  const next = cloneDoc(doc);
+  const e = next.eyes;
+  if (!e) return next;
+  const mid = next.bounds.lateralMid;
+  const tol = Math.max(e.radius * .6, next.bounds.length * .004);
+  const flank = probe.width(axis, up, tol);
+  const sign = Math.sign(e.base.lateral - mid) || 1;
+  const seat = flank > 0 ? Math.max(0, flank - e.depthLateral) : Math.abs(e.edit.lateral - mid);
+  e.edit = { axis, up, lateral: mid + sign * seat };
+  return next;
+}
+
+/** Moves the eyes across the crown: station and lateral offset given, height solved to keep the top seat. */
+export function moveEyesOnCrown(doc: SculptDoc, probe: SurfaceProbe, axis: number, lateral: number): SculptDoc {
+  const next = cloneDoc(doc);
+  const e = next.eyes;
+  if (!e) return next;
+  const mid = next.bounds.lateralMid;
+  const sign = Math.sign(e.base.lateral - mid) || 1;
+  const off = Math.abs(lateral - mid);
+  const tol = Math.max(e.radius * .6, next.bounds.length * .004);
+  const crown = probe.top(axis, mid + off, tol);
+  const up = Number.isFinite(crown) ? crown - e.depthTop : e.edit.up;
+  e.edit = { axis, up, lateral: mid + sign * off };
+  return next;
+}
+
+export function setEyeScale(doc: SculptDoc, scale: number): SculptDoc {
+  const next = cloneDoc(doc);
+  if (next.eyes) next.eyes.scale = Math.max(.2, Math.min(4, scale));
+  return next;
+}
+
+export function setEyeReach(doc: SculptDoc, reach: number): SculptDoc {
+  const next = cloneDoc(doc);
+  if (next.eyes) next.eyes.reach = Math.max(1, Math.min(6, reach));
+  return next;
+}
+
+export function setMouth(doc: SculptDoc, patch: Partial<Pick<MouthFeature, 'width' | 'height' | 'reach' | 'radius'>> & { edit?: Partial<FeaturePoint> }): SculptDoc {
+  const next = cloneDoc(doc);
+  const m = next.mouth;
+  if (!m) return next;
+  if (patch.width !== undefined) m.width = Math.max(.2, Math.min(4, patch.width));
+  if (patch.height !== undefined) m.height = Math.max(.2, Math.min(4, patch.height));
+  if (patch.reach !== undefined) m.reach = Math.max(.3, Math.min(4, patch.reach));
+  if (patch.radius !== undefined) m.radius = Math.max(1e-4, patch.radius);
+  if (patch.edit) m.edit = { ...m.edit, ...patch.edit };
+  return next;
+}
+
+export function resetFeatures(doc: SculptDoc, which: 'eyes' | 'mouth' | 'both' = 'both'): SculptDoc {
+  const next = cloneDoc(doc);
+  if (next.eyes && which !== 'mouth') { next.eyes.edit = { ...next.eyes.base }; next.eyes.scale = 1; next.eyes.reach = EYE_REACH; }
+  if (next.mouth && which !== 'eyes') { next.mouth.edit = { ...next.mouth.base }; next.mouth.width = 1; next.mouth.height = 1; next.mouth.reach = MOUTH_REACH; }
+  return next;
 }
 
 export function setValue(doc: SculptDoc, i: number, curve: CurveName, value: number): SculptDoc {
@@ -316,7 +579,8 @@ export function setTangent(doc: SculptDoc, i: number, curve: CurveName, slopeVal
 
 /** Puts a region (or everything) back to what was measured. */
 export function resetStations(doc: SculptDoc, from = 0, to = doc.stations.length - 1): SculptDoc {
-  const next = cloneDoc(doc);
+  const whole = from === 0 && to === doc.stations.length - 1;
+  const next = whole ? resetFeatures(doc) : cloneDoc(doc);
   for (let i = from; i <= to; i++) {
     const s = next.stations[i];
     s.edit = { ...s.base }; s.shift = 0; s.tangent = {};
@@ -343,6 +607,24 @@ export function exportDoc(doc: SculptDoc) {
     bounds: doc.bounds,
     regions: doc.regions,
     changed: !isIdentity(doc),
+    features: {
+      eyes: doc.eyes ? {
+        changed: eyesChanged(doc),
+        mirrored: doc.eyes.mirrored,
+        note: 'Centre of the eye on the positive-lateral side, root frame (axis/up/lateral as in `frame`); the other eye mirrors it. `delta` is edit − base. `scale` multiplies the eye radius; the surrounding skin follows out to `reach` radii.',
+        base: doc.eyes.base, edit: doc.eyes.edit,
+        delta: { axis: doc.eyes.edit.axis - doc.eyes.base.axis, up: doc.eyes.edit.up - doc.eyes.base.up, lateral: doc.eyes.edit.lateral - doc.eyes.base.lateral },
+        radius: doc.eyes.radius, scale: doc.eyes.scale, reach: doc.eyes.reach,
+        depthLateral: doc.eyes.depthLateral, depthTop: doc.eyes.depthTop,
+      } : null,
+      mouth: doc.mouth ? {
+        changed: mouthChanged(doc),
+        note: 'The mouth socket in the root frame and the region of `radius` × `reach` around it; `width` scales that region laterally, `height` vertically, `delta` moves it.',
+        base: doc.mouth.base, edit: doc.mouth.edit,
+        delta: { axis: doc.mouth.edit.axis - doc.mouth.base.axis, up: doc.mouth.edit.up - doc.mouth.base.up, lateral: doc.mouth.edit.lateral - doc.mouth.base.lateral },
+        radius: doc.mouth.radius, reach: doc.mouth.reach, width: doc.mouth.width, height: doc.mouth.height,
+      } : null,
+    },
     stations: doc.stations.map((s, i) => ({
       index: i,
       headFraction: Math.round(s.headFraction * 1000) / 1000,

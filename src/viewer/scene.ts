@@ -51,13 +51,16 @@ export interface SculptMesh {
   base: Float32Array;
   toRoot: THREE.Matrix4;
   fromRoot: THREE.Matrix4;
+  /** Eye geometry: a mesh, material or parent bone named for the eye. */
+  eye: boolean;
+  name: string;
 }
 export interface SculptTarget {
   meshes: SculptMesh[];
   /** The mouth socket in the root frame, when the model has one. */
   mouth?: [number, number, number];
 }
-export type WarpFn = (x: number, y: number, z: number, out: [number, number, number]) => void;
+export type WarpFn = (x: number, y: number, z: number, out: [number, number, number], eye?: boolean) => void;
 export interface OrthoView {
   rect: Rect;
   /** The root-frame point at the centre of the view: [along the axis, up (side) or lateral (top)]. */
@@ -415,7 +418,12 @@ export function createViewerScene(canvas: HTMLCanvasElement): ViewerScene {
       if (!position || seen.has(o.geometry)) return;
       seen.add(o.geometry);
       const toRoot = rootInverse.clone().multiply(o.matrixWorld);
-      meshes.push({ geometry: o.geometry, base: Float32Array.from(position.array as ArrayLike<number>), toRoot, fromRoot: toRoot.clone().invert() });
+      const mats = Array.isArray(o.material) ? o.material : [o.material];
+      const names = [o.name, ...mats.map((m) => m?.name ?? '')];
+      let parent: THREE.Object3D | null = o.parent;
+      while (parent && parent !== root) { names.push(parent.name); parent = parent.parent; }
+      const eye = names.some((n) => /eye|ocul|orbit/i.test(n) && !/eyelid|socket/i.test(n));
+      meshes.push({ geometry: o.geometry, base: Float32Array.from(position.array as ArrayLike<number>), toRoot, fromRoot: toRoot.clone().invert(), eye, name: o.name });
     });
     let mouth: [number, number, number] | undefined;
     const socket = root.getObjectByName('anchor_mouth');
@@ -436,7 +444,7 @@ export function createViewerScene(canvas: HTMLCanvasElement): ViewerScene {
       if (!fn) dst.set(m.base);
       else for (let i = 0; i < m.base.length; i += 3) {
         v.set(m.base[i], m.base[i + 1], m.base[i + 2]).applyMatrix4(m.toRoot);
-        fn(v.x, v.y, v.z, out);
+        fn(v.x, v.y, v.z, out, m.eye);
         v.set(out[0], out[1], out[2]).applyMatrix4(m.fromRoot);
         dst[i] = v.x; dst[i + 1] = v.y; dst[i + 2] = v.z;
       }
