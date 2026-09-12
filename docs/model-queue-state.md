@@ -378,3 +378,29 @@ unverified; Devonian others 7). **Doryaspis**: a fresh Opus agent from clay01-li
 → materials → build_v3 → candidate at `/home/user/devonian-authoring/doryaspis/v3-candidate/`.
 Finishing steps for each are in the first RESUME POINT above. Then the Opus-medium deployment
 verification (every `pages.yml` step), then tell the user.
+
+## 12 September, 21:45 UTC — RESUME POINT (third)
+
+The 16:55 batch of six agents was killed by the account rate limit (resets on a five-hour
+window). Salvaged and on main: Grab for Cheirolepis, Cladoselache, Coccosteus. On disk, unverified:
+Cambrian performances for canadia, ctenorhabdotus, odontogriphus, pikaia, vetulicola, wiwaxia
+(new) and Grab entries appended to burgessomedusa/marrella; `dunkleosteus.mjs`; Doryaspis
+`rework-v3/geometry_clay02.py`. Relaunched **three at a time** to stay under the limit: Grab
+Cambrian (11), Grab Devonian (12 remaining), material transplant tool for the Gemuendina and
+Titanichthys candidates. **Next batch, once those report**: Doryaspis V3 (from clay01-linux +
+`geometry_clay02.py`), Dunkleosteus port (from the unverified `build_v3.py` set). Then integrate
+(ports: integrate.sh → re-apply Grab → check → README → commit, delete `docs/sculpts/<id>`),
+then the Opus-medium deployment verification, then report to the user. Agents were told to apply
+creature by creature so an interruption loses at most one.
+
+**22:10 UTC**: Cambrian Grab (11) shipped and on main. Material transplant by index failed for a
+structural reason — the port rebuilds carry no UVs and the shipped meshes have seam-split vertices
+— so `tools/devonian/transplant-materials.mjs` (kept; conservative, refuses mismatches) only moved
+the eyes. The fix in flight is the other direction: `transplant-positions.mjs` keeps the shipped
+GLB whole and replaces its POSITIONs with the port's deformation, matched through the port's base
+rebuild (index-aligned with the candidate; positions reproduce the shipped ones), then recomputes
+normals; output to `/home/user/devonian-authoring/<id>/sculpt-final/`. **Sculpt ports should always
+finish this way** — the builder rebuild is the *deformation source*, the shipped file the mesh.
+Doryaspis relaunched from `geometry_clay02.py`. Devonian Grab (12) still running. Dunkleosteus
+port is the last item to launch (from its unverified `build_v3.py` set; it too finishes through
+transplant-positions if its materials are not the real ones).
