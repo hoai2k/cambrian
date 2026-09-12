@@ -118,12 +118,5 @@
     "scope": "total-rework",
     "model": true,
     "reason": "User reference: stronger armoured front and angular fish back. Current model preserved as named backup. Run eye/general audits after full rework."
-  },
-  {
-    "id": "bothriolepis",
-    "status": "pending",
-    "scope": "total-rework",
-    "model": true,
-    "reason": "User reference: bulky sculpted and textured armoured front; long pectoral appendages sweeping outward/backward with curved or slightly downward attitude. Sculpt subtle fish proportions first; audit only after full rework."
   }
 ]
