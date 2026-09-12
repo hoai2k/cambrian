@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 620" role="img" aria-label="Triassic Triumph">
+  <defs>
+    <linearGradient id="gold" x1="0" x2="0" y1="0" y2="1"><stop stop-color="#fff3c4"/><stop offset=".42" stop-color="#d7a34b"/><stop offset="1" stop-color="#8b5521"/></linearGradient>
+    <pattern id="engrave" width="9" height="9" patternUnits="userSpaceOnUse"><path d="M0 9 9 0" stroke="#cab06f" stroke-opacity=".45"/></pattern>
+  </defs>
+  <g text-anchor="middle" font-family="Georgia, 'Times New Roman', serif" font-weight="900" letter-spacing="10">
+    <text x="800" y="265" font-size="240" fill="#15130f" stroke="url(#gold)" stroke-width="18" paint-order="stroke">TRIASSIC</text>
+    <text x="800" y="530" font-size="238" fill="#15130f" stroke="url(#gold)" stroke-width="18" paint-order="stroke">TRIUMPH</text>
+    <text x="800" y="265" font-size="240" fill="url(#engrave)" opacity=".55">TRIASSIC</text>
+    <text x="800" y="530" font-size="238" fill="url(#engrave)" opacity=".55">TRIUMPH</text>
+  </g>
+  <path d="M154 326c38-80 76-111 115-94-54 36-72 88-51 154-43-5-80-26-108-60m1226 0c-28 34-65 55-108 60 21-66 3-118-51-154 39-17 77 14 115 94" fill="none" stroke="#d7a34b" stroke-width="12"/>
+  <path d="M205 339c36 18 68 18 97 0m1093 0c-29 18-61 18-97 0" fill="none" stroke="#f7dea0" stroke-width="5"/>
+</svg>
