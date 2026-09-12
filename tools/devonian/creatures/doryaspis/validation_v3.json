@@ -1,0 +1,305 @@
+{
+  "checks": "finite transforms, normalized weights, root stable, identity-scale removal, unique motion, seamless loops, no base-colour texture, pigment present in COLOR_0 on both levels, V2 bone names and clip durations preserved, Grab present, socket bind alignment, true LOD reduction",
+  "models": [
+    {
+      "file": "doryaspis.glb",
+      "bytes": 6122192,
+      "vertices": 65046,
+      "triangles": 124836,
+      "bounds": [
+        3.619999885559082,
+        1.0250000059604645,
+        6.349999904632568
+      ],
+      "bones": 12,
+      "boneNames": [
+        "root",
+        "body",
+        "shield",
+        "oral_L",
+        "oral_lower",
+        "oral_R",
+        "oral_upper",
+        "tail_base",
+        "tail_mid",
+        "tail_distal",
+        "tail_tip",
+        "caudal"
+      ],
+      "textures": 2,
+      "materials": [
+        "doryaspis armour",
+        "doryaspis oral mucosa",
+        "doryaspis eye"
+      ],
+      "vertexColourByMaterial": {
+        "doryaspis armour": {
+          "white_fraction": 0.0,
+          "mean": [
+            0.1868,
+            0.1739,
+            0.1149
+          ]
+        },
+        "doryaspis oral mucosa": {
+          "white_fraction": 0.0,
+          "mean": [
+            0.06953,
+            0.03715,
+            0.03195
+          ]
+        },
+        "doryaspis eye": {
+          "white_fraction": 0.0,
+          "mean": [
+            0.00882,
+            0.00798,
+            0.00972
+          ]
+        }
+      },
+      "sockets": [
+        {
+          "name": "anchor_attack_primary",
+          "point": [
+            0.0,
+            -0.25700009244920613,
+            2.86999965931715
+          ]
+        },
+        {
+          "name": "anchor_mouth",
+          "point": [
+            0.0,
+            0.011999947857248231,
+            1.4599999885840425
+          ]
+        },
+        {
+          "name": "anchor_mouth_inside",
+          "point": [
+            0.0,
+            0.013999961768190825,
+            1.1699997983071775
+          ]
+        }
+      ],
+      "clips": [
+        {
+          "name": "Ability",
+          "duration": 2.4000000953674316,
+          "motion": 29.714,
+          "digest": "87e97f6df3bcf479afab9bdf91f060229bad356b0005cb33da8c9b98c8626d5d"
+        },
+        {
+          "name": "Attack",
+          "duration": 0.9999999403953552,
+          "motion": 13.746,
+          "digest": "2a505bf20f0f5afb12d34c00e3d8fb53d7ab8be288bfd01cd3ef3681ec53f69d"
+        },
+        {
+          "name": "Bite",
+          "duration": 0.5,
+          "motion": 2.252,
+          "digest": "e2ee3365619c94be04327f540e0587769eb285c553e3557f18c385a161789112"
+        },
+        {
+          "name": "Death",
+          "duration": 1.600000023841858,
+          "motion": 42.616,
+          "digest": "72cadf2e526d3e1bd9d12932228a4865d6c7bcd2f21f9e9e5527288f777a6de7"
+        },
+        {
+          "name": "Dive",
+          "duration": 1.399999976158142,
+          "motion": 14.439,
+          "digest": "0975774f420a47ba1395a454dee1728bdf49983315b7c411201e3c2fc54bff83"
+        },
+        {
+          "name": "Dodge",
+          "duration": 0.4000000059604645,
+          "motion": 11.209,
+          "digest": "f7649fc45046e7974e88e39743e80964a72905fd496f51c3cd91ecfb9f08beea"
+        },
+        {
+          "name": "Eat",
+          "duration": 1.600000023841858,
+          "motion": 15.885,
+          "digest": "5bf5e4f23df6024733d224bae79dad99968490ff382c19cb9b218dceb830a635"
+        },
+        {
+          "name": "Grab",
+          "duration": 0.8999999761581421,
+          "motion": 4.535,
+          "digest": "f5f28b10ee6d7b817d1b3fe6590301b2d3e27b1283711c98b611f921805d784a"
+        },
+        {
+          "name": "Growth",
+          "duration": 1.5,
+          "motion": 8.902,
+          "digest": "43612a940332ffb984220e34de511b657f5faec99b7e9e1c2c8e5ebd5e606715"
+        },
+        {
+          "name": "Guard",
+          "duration": 0.9999999403953552,
+          "motion": 11.265,
+          "digest": "cd078461764802b95cbb22e65f56e1323bfaf57d9cedb3c1ca888285562db71a"
+        },
+        {
+          "name": "Heavy",
+          "duration": 1.100000023841858,
+          "motion": 19.203,
+          "digest": "91c8ff984b632b2215c9a0049dc3fc26a1479967d9c70de3e31be64409717a31"
+        },
+        {
+          "name": "Hit",
+          "duration": 0.5999999642372131,
+          "motion": 7.478,
+          "digest": "3efef2f57a49246968263f66ac04cdee28bf92b01d6a648f28baa4a2ad570537"
+        },
+        {
+          "name": "Idle",
+          "duration": 2.4000000953674316,
+          "motion": 16.107,
+          "digest": "8011e19bc2482121ea9ac0260b7464ffb54470ddfc36f9a7870e212b221391c9"
+        },
+        {
+          "name": "Parry",
+          "duration": 0.36666667461395264,
+          "motion": 5.377,
+          "digest": "f26852b510346a6d422e6ff860a6d522b17209ca3b9d010287507385f04bd105"
+        },
+        {
+          "name": "Rise",
+          "duration": 1.399999976158142,
+          "motion": 14.439,
+          "digest": "c1bcb0e004a148f7ba86833ab496ed964e22f297dc586e8af7ad8ce068c3f821"
+        },
+        {
+          "name": "Stagger",
+          "duration": 1.2000000476837158,
+          "motion": 15.014,
+          "digest": "d0b6c18bf6241512d9bcee74bc599080aac462324a86cd643af214d1a9dbc26f"
+        },
+        {
+          "name": "Swim",
+          "duration": 2.4000000953674316,
+          "motion": 40.752,
+          "digest": "873ef3271373975890d7eb9ccf3f3bd6f6ade4617582b4d296edb74cbeec98b3"
+        },
+        {
+          "name": "TurnLeft",
+          "duration": 1.600000023841858,
+          "motion": 27.975,
+          "digest": "119f5df291b8bcc516b4ed034da3b3cf9efff79c9ded5c77b4cc260413cdff81"
+        },
+        {
+          "name": "TurnRight",
+          "duration": 1.600000023841858,
+          "motion": 27.975,
+          "digest": "09a014e95743ff8dd2ef6d5a3a0036f0fe5665706f1ab98eb13d63f63251c85c"
+        }
+      ],
+      "removedIdentityScaleChannels": 0,
+      "sha256": "5185382f7e3576a9425eae7dd4f72e7c18c529a0ccda3bd0211c7a9f5f2a0273"
+    },
+    {
+      "file": "doryaspis.lod1.glb",
+      "bytes": 1767508,
+      "vertices": 19724,
+      "triangles": 36928,
+      "bounds": [
+        3.6200125217437744,
+        1.0250040888786316,
+        6.3500025272369385
+      ],
+      "bones": 12,
+      "boneNames": [
+        "root",
+        "body",
+        "shield",
+        "oral_L",
+        "oral_lower",
+        "oral_R",
+        "oral_upper",
+        "tail_base",
+        "tail_mid",
+        "tail_distal",
+        "tail_tip",
+        "caudal"
+      ],
+      "textures": 0,
+      "materials": [
+        "doryaspis armour",
+        "doryaspis eye"
+      ],
+      "vertexColourByMaterial": {
+        "doryaspis armour": {
+          "white_fraction": 0.0,
+          "mean": [
+            0.1556,
+            0.14188,
+            0.09325
+          ]
+        },
+        "doryaspis eye": {
+          "white_fraction": 0.0,
+          "mean": [
+            0.00882,
+            0.00798,
+            0.00972
+          ]
+        }
+      },
+      "sockets": [
+        {
+          "name": "anchor_attack_primary",
+          "point": [
+            0.0,
+            -0.25700009244920613,
+            2.86999965931715
+          ]
+        },
+        {
+          "name": "anchor_mouth",
+          "point": [
+            0.0,
+            0.011999947857248231,
+            1.4599999885840425
+          ]
+        },
+        {
+          "name": "anchor_mouth_inside",
+          "point": [
+            0.0,
+            0.013999961768190825,
+            1.1699997983071775
+          ]
+        }
+      ],
+      "clips": [
+        {
+          "name": "Death",
+          "duration": 1.600000023841858,
+          "motion": 42.616,
+          "digest": "72cadf2e526d3e1bd9d12932228a4865d6c7bcd2f21f9e9e5527288f777a6de7"
+        },
+        {
+          "name": "Idle",
+          "duration": 2.4000000953674316,
+          "motion": 16.107,
+          "digest": "8011e19bc2482121ea9ac0260b7464ffb54470ddfc36f9a7870e212b221391c9"
+        },
+        {
+          "name": "Swim",
+          "duration": 2.4000000953674316,
+          "motion": 40.752,
+          "digest": "873ef3271373975890d7eb9ccf3f3bd6f6ade4617582b4d296edb74cbeec98b3"
+        }
+      ],
+      "removedIdentityScaleChannels": 0,
+      "sha256": "fc636ac843fd7cec8ca5cca51a723f586415822b7b76ee24a9ae332f0fe4aa20"
+    }
+  ],
+  "lodTriangleRatio": 0.2958121054823929
+}
