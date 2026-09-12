@@ -27,6 +27,14 @@ unless the user explicitly asks for a PR. Steps:
 - Any change to a creature's model, colours or textures must go through
   `docs/creature-intake.md`: re-render, `npm run cards`, `npm run lods`, and
   `npm run check` must pass. The check flags stale images automatically.
+- A fin is part of the body it grows from, and the builders check it. Every fin's origin and both
+  base controls must sit *inside* the trunk's cross-section (Cheirolepis' `build_v3.py` is the
+  pattern: `depth()` is the section-ellipse metric at the point's station, `seat()` pulls a root
+  radially inside to a margin, and an assertion refuses any fin whose base edges leave the trunk),
+  and the root's weights blend onto the body bones under it — radially, and for paired fins as much
+  as median ones — so a seated root follows the flank when the tail bends. Cheirolepis V2 shipped
+  every fin root at or outside the surface (pectoral +0.07, pelvic +0.31, dorsal and anal trailing
+  bases +0.17/+0.26) and read as fins floating beside the body; the reference's mottling hid it.
 - The creature builders are Blender 5.2 Python and the version is not a detail: the glTF
   exporter's `export_vertex_color='NAME'` is a 5.x option that 4.x does not have at all, so a 4.x
   Blender will sculpt, shade and rig a creature and then fail on the export. `npm run blender`
