@@ -200,3 +200,19 @@ Mac — drop the two GLBs into the repo to unblock, see `rework-v3/RESUME-CANDID
 
 Comparison sheets from this pass live in the session scratchpad (`*-port/*sheet.png`) and die
 with it; the shipped portraits in `public/assets/devonian/creatures/` are the durable record.
+
+## Bothriolepis M04 diagnostic judged — 12 September, night
+
+The diagnostic (`rework-v3/diagnostic_m04_closeup.py`, results under
+`/home/user/devonian-authoring/bothriolepis/rework-v3/diagnostic-m04-closeup/`) settled the hold.
+The nuchal seam is geometry: stacked relief fields make a faceted notch with a geometric-normal
+step of 76.7° at y≈−0.31 on the dorsal midline and 50–53° at y≈−0.35 on the flanks, against a
+median of 1.6–7.4° elsewhere. The rostral cap is smooth in the mesh and only lacks the shield atlas
+response (slot 7). The forehead microrelief amplitude is .041 (bump .18 × variance .226). M05
+brief: resolve the nuchal band into one smooth field (target: no step above 15° on those lines),
+give slot 7 a continuous fine response through a valid chart, halve the bump to ≈.08 and break the
+row organisation; preserve topology, protected vertices, the M04 oral correction and the
+appendages. An agent is running M05 → production `build_v3.py` (28-joint rig, 18 actions, anchors,
+full/LOD, finalize, package, eye audit, portraits) → sheet at scratchpad `both/`; the parent
+integrates with `integrate.sh`. The full Linux chain clay02 → M01–M04 reproduced every recorded
+invariant exactly (oral roundoff bit-identical); only the `.blend` container hashes differ.
