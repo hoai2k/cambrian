@@ -104,4 +104,17 @@ export const clips = [
       trunk(P, t, 1, { amp: .45, loopU: u });
     },
   },
+  {
+    name: 'Grab', duration: 1.0, loop: true,
+    // Held in the closed forearms: all three raptorial pairs stay snapped shut around the catch,
+    // breathing; the swimmerets and tail keep a slow, quiet beat and the antennae sway gently.
+    pose(u, P, t) {
+      const ph = 2 * Math.PI * u;
+      for (const s of SIDES) for (const j of PAIRS) raptor(P, s, j, { snap: .95 + .05 * Math.sin(ph - j * .4), thrust: .2 });
+      head(P, { noseDown: .05 + .01 * Math.sin(ph) });
+      eyes(P, .3);
+      antennae(P, .3, ph);
+      trunk(P, t, 1, { amp: .3, loopU: u });
+    },
+  },
 ];

@@ -37,7 +37,7 @@ distance from the surface to the sea floor's mean level in that biome, which is 
 | Slot | Triassic biome | Drawn from | `s` (approx.) | Danger | Depth | Character |
 | --- | --- | --- | --- | --- | --- | --- |
 | `shallows` | **Gypsum Flats** | Gipskeuper lagoons, Late Triassic Germany (Henodus' home) | 0–130 | 0.08 | 8–12 | Hypersaline, hot, blinding. Salt crusts, microbial domes, almost no plants. Too shallow for anything over rung III. |
-| `nursery` | **Conifer Shore** | Grès à Voltzia and Muschelkalk margins, Middle Triassic | pockets to ~90 | 0.05 | 10–16 | Estuary mouths under Voltzia and horsetail stands; brackish, silty, thick with cover. Where live-bearers calve and egg-layers haul out. The shore animals stand here. |
+| `nursery` | **Conifer Shore** | Grès à Voltzia and Muschelkalk margins, Middle Triassic | pockets to ~90 | 0.05 | 10–16 | Estuary mouths under Voltzia and horsetail stands; brackish, silty, thick with cover. Where live-bearers calve and everything else lays in the reeds. The shore animals stand here. |
 | `shelf` | **Dasyclad Lagoon** | Wetterstein / Latemar platform interior, Middle Triassic Dolomites | 130–660 | 0.35 | 22–30 | Milky turquoise platform water over meadows of *Diplopora* algae and shell sand. The default open lagoon. |
 | `forest` | **Sea-Lily Garden** | Trochitenkalk, Muschelkalk sea | mosaic | 0.42 | 26–34 | *Encrinus* meadows, stems a body-length tall, columnals carpeting the floor. Cover for the middle rungs; a placodont's larder beneath. |
 | `boulders` | **Sponge-Coral Reef** | Wetterstein and Dachstein reefs, Middle–Late Triassic Alps | mosaic | 0.50 | 16–28 | Bushes of *Thecosmilia*, calcisponge mounds, *Tubiphytes* crusts; the reef crests rise to within eight units of the surface. Chambers, overhangs, the one place the floor comes up to meet the air-breathers. |
@@ -50,9 +50,10 @@ Blended per point exactly as danger is, so the transitions read as slopes and no
 
 ### What the depths do
 
-- **Breath is the era's clock** ([01 · Breath](01-triassic-design.md#breath)). A dive to the
-  floor of the basin and back costs a rung III animal most of a breath; a dive to the flats costs
-  nothing. Depth is how the world prices the map.
+- **Air is what effort costs** ([01 · Air and stamina](01-triassic-design.md#air-and-stamina)). An
+  air-breather recovers no stamina under water at all, so depth is the price of going back for
+  more: a fight on the floor of the basin ends with an eighty-unit climb on an empty bar, and the
+  same fight on the flats ends beside the surface. Depth is how the world prices the map.
 - **Big bodies need water.** A body cannot enter water shallower than about its own height plus
   clearance (the existing `clearance` field in body lengths). At 8–12 the Gypsum Flats exclude
   rungs III and IV outright, which makes the flats a sanctuary for the small at the price of heat
@@ -60,7 +61,7 @@ Blended per point exactly as danger is, so the transitions read as slopes and no
   Shore admits a nothosaur but not an ichthyosaur, which is what puts the calving shallows in the
   amphibious animals' hands.
 - **The floor feeders have a ceiling.** Placodus, Henodus, Odontochelys and Atopodentatus feed
-  on and near the bottom, and cannot hold their breath long enough to work a floor 50 deep. Their
+  on and near the bottom, and a floor 50 deep is too far from the air to work for long. Their
   range is the platform; the deep is where they are prey.
 - **The basin has no floor to hide on.** Below a threshold the water is dead (the Devonian's
   anoxia hook, `RULES.anoxia`, reused): the bottom twenty units of the Black Basin drain stamina
@@ -90,8 +91,8 @@ Two things follow that the earlier eras did not have to think about:
 
 - **Rise rate scales with depth** already (`RISE_RATE` is proportional to `SURFACE_Y`); a 96
   column makes every animal climb 1.5× faster than in the Devonian in absolute terms, which is
-  right for a sea of air-breathers and wrong for a placodont. The per-creature rise rate the breath
-  mechanic wants is in [01](01-triassic-design.md#breath).
+  right for a sea of air-breathers and wrong for a placodont. The per-creature rise rate this needs
+  is in [01](01-triassic-design.md#air-and-stamina).
 - **The light window** (`LIGHT_WINDOW_Y`, nine below the surface) is where the era plays, so the
   surface needs its own presentation budget: a visible underside with refracted sky, blow spray,
   drift logs and floating shells, and a surfaced camera that reads as *out*, not clipped.

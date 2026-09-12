@@ -20,24 +20,26 @@ every player has to go and the one place everything can see them.
 
 So *Triassic Tide* is played between two edges, the surface and the floor, in a sea that gets
 deeper the further out you go. Feeding is on the bottom or in the column; breathing is at the top;
-the deep is where the giants are and where a breath does not stretch. Live-bearers are born at the
-surface beside their mother. Egg-layers hatch on a red beach and run for the water past the things
-that stand on it. And the shore is not safe ground: something with a three-metre neck is standing
+the deep is where the giants are and where a long fight leaves you empty a long way down.
+Live-bearers are born at the surface beside their mother; everything else hatches in the weed. No
+player ever goes ashore. But the shore comes to them: something with a three-metre neck is standing
 at the waterline, and it fishes.
 
 The verbs are the same as ever: camera-relative swimming, dash and sprint, bite and heavy, block
 and parry, grip, hide, the endless streamed sea, the radar, split-screen. The three shared modes
 (Rise, Hunter & Hunted, Reef) carry over as they did to the Devonian, and growth is the Devonian's
-five geometric stages. What the era adds is *breath*, *birth*, *the shore*, *depth*, and a roster
+five geometric stages. What the era adds is *air*, *birth*, *the shore*, *depth*, and a roster
 of bodies the sea had never seen before and, in half the cases, never saw again.
 
 ## Design pillars
 
-1. **Air is the clock.** Everything that matters breathes. A breath is a budget, the surface is
-   where you spend it, and the depth of the water under you is the price of what you are doing.
+1. **Air is what effort costs.** Everything that matters breathes, and nothing it spends down
+   there comes back until it goes up. The surface is where a body is paid, and the depth of the
+   water under it is the price of going to collect.
 2. **The surface is a place.** Bright, exposed, alive with logs, spray and the shadows of pods. It
    has its own presentation, its own sounds and its own dangers, and the camera reads *out* there.
-3. **The shore bites back.** Land is not a sanctuary. It is where the necks are.
+3. **The shore bites back.** No player ever leaves the water, and land is not somewhere to
+   retreat to. It is the edge the necks reach in from.
 4. **Bodies that are trying things.** Hammerheads, buzzsaws, half-shells, four-flipper flight,
    necks of thirteen and thirty-two joints. Every animal on the roster plays like nothing else on
    it, and the kits are built from the fossils' oddities rather than a shared template.
@@ -45,30 +47,42 @@ of bodies the sea had never seen before and, in half the cases, never saw again.
 
 ## Era mechanics
 
-### Breath
+### Air and stamina
 
-A new `breathing: 'air'` value beside `'gill'` and `'bimodal'`. Air-breathers carry a **breath
-meter**, in seconds of dive at rest, that drains under water and refills in a few seconds at the
-surface with a visible **blow** (spray, the era's signature sound, and a radar ping to anything
-hunting). Sprinting, fighting and being held drain it faster; gliding and hanging still drain it
-slowest. At empty, stamina drains, then health: an air-breather can **drown**, which the Devonian
-deliberately had no mechanic for and this era needs one for, because the animals are obligate.
-The HUD draws breath as the inner ring of the growth ring (where the Devonian drew standing), with
-the last quarter red and a low pulse the player hears before they see it.
+A new `breathing: 'air'` value beside `'gill'` and `'bimodal'`, and it works on the bar the game
+already draws. An air-breather's **stamina drains at the ordinary rate and does not come back at
+all under water.** Breaking the surface refills it, fast, with a visible **blow**: spray, the era's
+signature sound, and a ping on the radar of anything hunting. That is the whole mechanic. There is
+no breath meter, no countdown and no drowning, and nothing on this roster has to touch land.
 
-Dive time scales with body size, so a giant holds its breath for minutes and a pachypleurosaur
-for forty seconds; the numbers are per creature (`breath`, seconds at adult scale) and grow with
-the stage. Gill-breathers have no meter and that is their whole advantage: a Saurichthys never
-comes up, and a Helicoprion never has to.
+It is the Devonian's bimodal trade taken to its end. There, lungs bought a quarter-rate recovery
+under water and a full bar at the surface; here an air-breather gets nothing under water and
+everything at the top, and a gill-breather recovers anywhere, which is its whole advantage. A
+Saurichthys never comes up and never needs to. A Nothosaurus that has just run a fish down is
+empty until it does.
 
-Depth prices the meter: with the sea floor sinking by biome ([02](02-biomes-and-depth.md#the-nine-slots)),
-a floor feeder works the platform freely and cannot work the basin at all, and a hunt that ends
-sixty units down is a hunt the hunter had better win quickly. The rise button is free (no stamina),
-climbs at a per-creature rate (`riseRate`, replacing the shared `RISE_RATE`), and is faster for
-anything with flippers than anything with paddles. Air-breathers that dash upward from just below
-the surface **breach**, using the Devonian's `airborne`.
+Three consequences are the reason to build it this way:
 
-### Live birth and the beach
+- **Lying still is free.** A body that spends nothing keeps what it has, so an ambusher can wait on
+  the bottom as long as it likes. What costs air is *effort* — the chase, the fight, the escape —
+  which is exactly where the tension belongs, and it means the rule never nags a player who is
+  hunting patiently.
+- **Every fight has a second half.** Win a long exchange in deep water and you are empty at the
+  bottom of a column you now have to climb, in the open, blowing, where everything can see you.
+  A Devonian fight ended when someone died; this one ends at the surface.
+- **The bar is the readout.** Stamina is already drawn, already understood, and already what a
+  player watches in a fight. The air rule needs no new HUD element, only a mark on the bar saying
+  recovery is switched off and an arrow up.
+
+Depth is what prices it, since the sea floor sinks by biome
+([02](02-biomes-and-depth.md#the-nine-slots)): a floor feeder works a 30-deep platform between
+breaths and cannot work an 80-deep basin at all, and a hunt that ends sixty units down is a hunt
+worth finishing quickly. The rise button stays free of stamina — it must be, or an empty animal
+could never get up — and climbs at a per-creature rate (`riseRate`, replacing the shared
+`RISE_RATE`), faster for flippers than for paddles. An air-breather that drives hard at the surface
+from just below **breaches**, using the Devonian's `airborne`, and lands with a full bar.
+
+### Live birth, and eggs in the weed
 
 Viviparous species (`birth: 'live'`) are not laid as an egg on the sand. A new player is **born at
 the surface**, head-first for the basal ichthyosaurs and tail-first for the rest, beside an AI
@@ -77,18 +91,23 @@ that comes for the calf, and then goes. That is the nursery sanctuary of the Dev
 animal. The birth is the hatch performance: the calf's first act is its first breath, and the
 tutorial hint is the blow.
 
-Egg-layers whose eggs are on land (`birth: 'shore'`: the turtle, the placodonts, and the fishes'
-egg-cases in the weed) hatch on the red beach strip above the waterline and **run for the water**.
-The run is the hatch: thirty units of sand under the eye of whatever stands on the shore. The
-Cambrian egg on the sand (`layEgg`) stays for the ammonoid and the coleoid, laid in the dasyclad
-meadow.
+Everything else lays (`birth: 'egg'`), and lays **in the water**: the Cambrian's `layEgg` puts the
+egg in the dasyclad meadow or the reed cover of the Conifer Shore, as the Devonian's `spawnInCover`
+does, and the hatchling comes out of it already swimming. Several of these animals certainly nested
+on land and for most of them nesting is simply unknown, but a hatch on a beach would put a playable
+body out of the water, which this era does not do. The codex says so rather than the game pretending
+otherwise.
 
-### Haul-out
+### Nobody leaves the water
 
-Amphibious animals (`shoreReach`, the Devonian's field, with a per-creature distance) can climb the
-last of the shore slope onto the beach strip, where breath and stamina refill fully and nothing in
-the water can reach them — and where the shore animals can. It is the trade every seal makes.
-Hauled out, a body moves with the row/walk gait and cannot dash.
+There is no haul-out. Every playable animal is a swimmer for its whole life, including the four
+that could plausibly drag themselves up a beach, and the beach strip is scenery a player looks at
+rather than ground a player stands on. This costs those four a rest spot they would historically
+have used and buys the era a single consistent verb set: the shore is only ever a hazard and a
+horizon, the shallowest water is the safest water rather than a stepping stone, and no animation,
+camera or collision work is spent on a body out of its element. Anything that once wanted
+`shoreReach` gets its shallow-water behaviour instead — Cartorhynchus sucks prey off the bottom of
+the flats, Placodus prises shell beds, Henodus combs the mats — all of it under water.
 
 ### The shore that reaches in
 
@@ -106,15 +125,18 @@ Odontochelys has a plastron and no carapace, so it is armoured *from below* only
 Placodus carry their plating on the back; Henodus and the cyamodontoids are armoured all round. A
 hit tests the attacker's position against the facing, which the direction bonus already computes.
 
-### The grip, and the breath it costs
+### The grip, and the air it costs
 
 The grip mechanics carry over whole (`GRIP_STRIKE`, `GRIP_MEAL`, `GRIP_BREAK`, the tug of war). The
-era adds one thing: **a held air-breather's breath keeps running**, and its holder can take it
-down. A giant that seizes a nothosaur and dives does not need to bite it; it needs to hold on for
-longer than the nothosaur can hold its breath. The fossil for this is the thalattosaur inside a
-Guizhouichthyosaurus. In play it is the giants' signature and the reason a big animal's grab is
-frightening even though holding still costs it nothing: the held animal's dash-out is now a race
-against its own meter, and the HUD's grip panel shows both.
+era adds one thing: **a held air-breather cannot reach the surface**, so it recovers nothing while
+the holder keeps it down. A giant that seizes a nothosaur and dives does not have to bite it. It
+has to hold on while the nothosaur spends everything it has trying to tear loose, and then it has
+a catch that cannot fight. The fossil behind it is the thalattosaur inside a Guizhouichthyosaurus.
+
+This is why a big animal's grab is frightening in an era where holding costs the holder nothing:
+the dash-out is the only way loose, the dash-out costs stamina, and the stamina does not come back.
+The HUD's grip panel shows the held animal's bar for exactly this reason, and a held player can see
+the arithmetic — two more dashes, or one and a climb.
 
 ### Feeding stations on the floor
 
@@ -138,17 +160,19 @@ which is one reason they own the deep.
 In order of size. Nothing here touches `game.ts` or `combat.ts` directly; each is a `RULES?.` hook
 in `src/sim/era-rules.ts` or an era field read through `creature()`.
 
-1. **Breath**: `breathing: 'air'`, `breath`, the meter, the blow, drowning, the HUD ring, the
-   surface state and its sounds. Hooks: `stepBreath`, `atSurface`, `drownDamage`.
+1. **Air**: `breathing: 'air'`, the stamina-recovery gate, the surface state, the blow and its
+   sounds, the radar ping, and the bar's "recovery off" mark. Hooks: `staminaRegen` (return zero
+   under water for an air-breather) and `atSurface`. There is no meter, no drowning and no death
+   to build, which is most of why this shape was chosen.
 2. **Per-biome floor depth**: `environment.floorDepth`, the `sampleHeight` change and the
    `tools/world-test.ts` assertions in [02](02-biomes-and-depth.md#depth-the-engine-change).
 3. **Shore animals**: a placed actor class with a reach test against the surface gap (the grip's
    own measure), a telegraph, a strike, and the `takeHold` outcome for snack-sized victims.
-4. **Birth**: `birth: 'live' | 'shore' | 'egg'`, the surface birth with a mother, the beach run.
-5. **Haul-out** as a `shoreReach` refinement: the beach strip as a walkable surface with refill.
-6. **Armour facing**, **feeding stations**, **heat/salt/cold**, **the held breath**, and the new
+4. **Birth**: `birth: 'live' | 'egg'`, the surface birth with a mother beside the calf. Egg-laying
+   is the Cambrian's `layEgg` into cover, unchanged.
+5. **Armour facing**, **feeding stations**, **heat/salt/cold**, **the held breath**, and the new
    locomotion traits below — each a small hook.
-7. **Locomotion traits** on `CreatureDef`, in `src/sim/locomotion.ts` because they are keyed off
+6. **Locomotion traits** on `CreatureDef`, in `src/sim/locomotion.ts` because they are keyed off
    the creature: `swimStyle: 'flight'` (four-flipper underwater flight: high cruise and
    acceleration, wide turns, no reverse), `thunniform` (a stiff-bodied tail beat with a long
    glide), `paddleRow` (the nothosaur's two gears: rowing along the bottom, tail burst in the
@@ -200,11 +224,13 @@ undulation rather than a tuna's beat (I); viviparous by bracket (I).
 long tail, the flippers small for the body, and the head is a third of the animal's menace. Sander
 et al. 2021 for the skull; keep a size plate separate from the portrait.
 
-*Kit.* Role: apex hunter of the deep. `breathing: 'air'`, `breath` the longest in the sea, `warmBlooded`.
+*Kit.* Role: apex hunter of the deep. `breathing: 'air'`, the largest stamina pool in the sea and the
+slowest climb, `warmBlooded`.
 Locomotion: anguilliform — the slowest turn on the roster, a long glide, `pitchRate` limited.
-`light` Snap; `heavy` **Long-jaw seize** (`grab: true`, lunge 1.4). Ability ★ **Drown-hold**: a held
-air-breather's breath runs at double rate while this animal dives with it; the hold ends the meal
-when the meter empties. Passive: nothing but Shonisaurus is `rival` to it; deep water is home
+`light` Snap; `heavy` **Long-jaw seize** (`grab: true`, lunge 1.4). Ability ★ **Exhaustion hold**: a held
+air-breather cannot surface, so its stamina never comes back, and this animal dives with it: the
+catch spends everything trying to tear free and then has nothing left. Holding costs the holder
+nothing, as it does in both other eras, which is exactly why it works. Passive: nothing but Shonisaurus is `rival` to it; deep water is home
 (cold-immune). Weakness: small eyes (`sense` low for its size), the turn, and a hunger clock —
 it must eat big things, and a sea that hides in the shallows starves it because it cannot
 enter water under 20 deep.
@@ -222,7 +248,7 @@ crescent fluke, no dorsal fin.
 *Reconstruction.* The slim Kosch body with a deep chest, a toothed jaw that reads as toothed, and
 a calf beside it. Its identity in the game is the pod.
 
-*Kit.* Role: pod giant. `breathing: 'air'`, long `breath`, `warmBlooded`, `shoals: true` at rung IV ★
+*Kit.* Role: pod giant. `breathing: 'air'`, deep stamina, `warmBlooded`, `shoals: true` at rung IV ★
 (**pod**: two or three AI Shonisaurus that swim with a player and answer what attacks it). `light`
 Bite; `heavy` **Sectorial bite** (high damage, low pierce). Ability ★ **Pod call** (Y): the pod
 converges on the caller, and any calf within it is shielded (hits on the calf land on the nearest
@@ -247,13 +273,13 @@ in nothosaurids at Monte San Giorgio).
 *Reconstruction.* A crocodile's head on a seal's front and an eel's back. The fangs interlock
 visibly when the mouth is shut.
 
-*Kit.* Role: two-gear ambusher. `breathing: 'air'`, `breath` long, `shoreReach` 14 (haul-out).
+*Kit.* Role: two-gear ambusher. `breathing: 'air'`, deep stamina, a quick climb.
 Locomotion ★ `paddleRow`: rows along the bottom at a walk, and a tail burst in the column that is
 the best acceleration at rung III. `light` Snap; `heavy` **Fang trap** (`grab: true`: a held
 animal smaller than the holder cannot dash free for the first two seconds, and the hold costs it
 breath). Ability ★ **Bottom row** (Y, mobile): rowing the sand flushes anything burrowed or hidden
-within a body length into the open. Passive: hauls out to breathe and rest where nothing in the
-water can follow. Weakness: a cruise slower than the fishes it eats; its game is the wait.
+within a body length into the open. Passive: the wait costs it nothing — lying on the sand spends
+no stamina, so it can hold an ambush as long as its patience lasts. Weakness: a cruise slower than the fishes it eats; its game is the wait.
 
 #### T04 · Dinocephalosaurus orientalis — the neck in the water
 
@@ -269,13 +295,15 @@ idea is doubted (A).
 whole contrast with Tanystropheus' rigid boom. Build the neck procedurally on the skeleton
 ([04](04-tripo-pipeline.md)); Tripo will not give a neck with rhythm.
 
-*Kit.* Role: the reach. `breathing: 'air'`, medium `breath`. Locomotion: slow, body undulation with
+*Kit.* Role: the reach. `breathing: 'air'`, middling stamina. Locomotion: slow, body undulation with
 paddles, ★ `neckReach` 2 body lengths. `light` Snap; `heavy` **Neck strike** (`neckSnap` reused
 with the longer reach: snaps the head to the locked target while the body stays put behind cover).
-Ability ★ **Periscope** (Y): raises the head to the surface to breathe while the body stays two
-units down — a refill without surfacing, and without the blow's ping. Passive: strikes from behind
+Ability ★ **Periscope** (Y): raises the head to the surface while the body stays two units down —
+the only refill in the game that does not show the body or ring the radar. It is slower than a
+proper surfacing, so it is the cautious option rather than the free one. Passive: strikes from behind
 scenery a pursuer cannot see round. Weakness: the neck is the target — hits on the neck count as
-from behind, and a rung IV grip on it is a drown-hold on a short meter.
+from behind, and a rung IV grip on it is an exhaustion hold against a body that cannot get its
+head up.
 
 #### T05 · Helicoprion — the whorl (a relict, by choice)
 
@@ -301,7 +329,8 @@ cephalopods rather than shells (I). Whorls to 40 cm across give 3–4 m bodies; 
 *Reconstruction.* The whorl sits inside the lower jaw with only its front arc exposed; the classic
 "pizza cutter on the chin" is wrong. Tapanila's reconstruction is the reference.
 
-*Kit.* Role: the saw. `breathing: 'gill'` — no meter; that is its edge in a sea of divers.
+*Kit.* Role: the saw. `breathing: 'gill'` — it recovers anywhere, which is its edge in a sea of
+animals that have to go up for theirs.
 Locomotion: fast straight cruise, thunniform, poor turn. `light` Rake; `heavy` ★ **Whorl saw**
 (`grab: true`; while held, the whorl's rotation deals damage over time that ignores half of armour
 and *shortens* the victim's escape window — every second held is a second off its dash-out).
@@ -323,7 +352,8 @@ alternate if a longer neck is wanted.
 *Reconstruction.* Penguin-and-turtle flight in one body: the flippers are wings, the stroke is
 simultaneous, the trunk does not bend.
 
-*Kit.* Role: the flyer. `breathing: 'air'`, medium-long `breath`, `warmBlooded`. Locomotion ★
+*Kit.* Role: the flyer. `breathing: 'air'`, good stamina and the fastest climb on the roster,
+`warmBlooded`. Locomotion ★
 `swimStyle: 'flight'`: the best acceleration and cruise at rung III, wide turns, no reverse, and a
 rise rate that beats every paddler's. `light` Bite; `heavy` **Snatch** (the Cambrian `snatch`: a
 fast reaching bite with a lunge). Ability ★ **Power stroke** (Y): four flippers together — a dash
@@ -343,8 +373,8 @@ slow bottom-grazing paddler, possibly able to haul onto flats (A).
 *Reconstruction.* The bar is the animal. Front view first, and the sieve visible when the mouth
 opens: water out of the sides is the feeding set-piece.
 
-*Kit.* Role: the peaceful cow. `breathing: 'air'`, medium `breath`, `diet: 'grazer'`, `shoreReach`
-6. Locomotion: slow, `sink` (settles to graze), bottom-walking with `punt`. `light` Nudge
+*Kit.* Role: the peaceful cow. `breathing: 'air'`, large stamina spent slowly, `diet: 'grazer'`.
+Locomotion: slow, `sink` (settles to graze), bottom-walking with `punt`. `light` Nudge
 (`nibble`); `heavy` **Hammer sweep** (`sweep: true`, high knockback, low damage: the bar as a
 broad blunt shove). Ability ★ **Scrape and sieve** (Y, loop): feeds from algal meadows and reef
 biofilm — the one animal for whom the Diplopora lagoon is a larder — and the feeding animation is
@@ -363,12 +393,12 @@ fish and cephalopods (I).
 
 *Reconstruction.* Two-thirds tail. The head is small and the body is a ribbon.
 
-*Kit.* Role: the turner. `breathing: 'air'`, medium `breath`. Locomotion: the best `turnRate` on the
+*Kit.* Role: the turner. `breathing: 'air'`, middling stamina. Locomotion: the best `turnRate` on the
 roster — turns in its own length — at a middling cruise. `light` Bite; `heavy` **Tail whip** (the
 Cambrian `tailFlick`, 360°, knockback). Ability ★ **Coil** (Y): a full-body turn on the spot that
 puts the head where the tail was — the counter to anything circling for the flank. Passive: a
-hunter that gets behind it is in front of it a moment later. Weakness: fragile, no armour, shallow
-breath.
+hunter that gets behind it is in front of it a moment later. Weakness: fragile, no armour, and a
+small tank that the coil empties fast.
 
 #### T09 · Placodus gigas — the tank
 
@@ -383,9 +413,9 @@ slow tail-sculler (I); haul-out speculative (A).
 *Reconstruction.* Barrel body, the ventral basket visible as a texture, the front teeth sticking
 out under a closed mouth. Not a turtle.
 
-*Kit.* Role: the shell-cruncher. `breathing: 'air'`, short `breath` (it must surface often and
-does it slowly), `armour` 0.45 `armourFacing: 'ventral'` plus the dorsal knob row, `defense` high,
-`shoreReach` 6. Locomotion ★ `sink`: settles when idle, walks the floor with `punt`, sculls in the
+*Kit.* Role: the shell-cruncher. `breathing: 'air'`, a small tank and the slowest climb, so the
+trip up is its whole cost, `armour` 0.45 `armourFacing: 'ventral'` plus the dorsal knob row,
+`defense` high. Locomotion ★ `sink`: settles when idle, walks the floor with `punt`, sculls in the
 column at the slowest cruise at rung II. `light` Bite; `heavy` **Crush bite** (`crushBite`
 reused: double against shells and shell-armoured animals). Ability ★ **Pry** (Y, loop): prises
 food off shell beds and mounds — the floor feeding stations — and feeds standing on them. Passive:
@@ -438,13 +468,14 @@ in murky water (I); how it bred is open (A).
 *Reconstruction.* A crocodile that is not one: the flat skull, the far-back eyes, no armour, a
 newt's limbs.
 
-*Kit.* Role: the sensor. `breathing: 'air'` with a slow drain (a cold-blooded amphibian's
-metabolism; the longest breath at rung II), `shoreReach` 10. Locomotion: an eel's tail, a fair
-turn, slow. `light` Snap; `heavy` **Side swipe** (a half-arc `sweep` to one side, fast wind-up).
+*Kit.* Role: the sensor. `breathing: 'air'`, and it spends stamina more slowly than anything else
+at its rung (a cold-blooded amphibian's metabolism), so it stays down longest. Locomotion: an
+eel's tail, a fair turn, slow. `light` Snap; `heavy` **Side swipe** (a half-arc `sweep` to one side, fast wind-up).
 Ability ★ **Lateral line** (passive, and Y to pulse it): senses anything burrowed, camouflaged or
 inked within `sense` range, and the silt of the Conifer Shore does not shorten its sense as it
-does everyone else's. Passive: hauls out; at home in the murk. Weakness: no armour, slow, and the
-first thing a phytosaur at the bank looks for.
+does everyone else's. Passive: at home in the murk, and the longest worker of the deep floor at
+its rung. Weakness: no armour, slow, and the first thing a phytosaur at the bank looks for when it
+does come up.
 
 #### T13 · Mixosaurus cornalianus — the small fin
 
@@ -458,7 +489,7 @@ birth with in-situ embryos (S).
 
 *Reconstruction.* The fin is the point — a 1 m body with a shark's silhouette, dolphin-smooth.
 
-*Kit.* Role: the shoaling starter. `breathing: 'air'`, medium `breath`, `warmBlooded`, `shoals: true`,
+*Kit.* Role: the shoaling starter. `breathing: 'air'`, middling stamina, a quick climb, `warmBlooded`, `shoals: true`,
 `birth: 'live'`. Locomotion: quick, stable at speed, the best turn-at-speed at rung II. `light` Bite;
 `heavy` **Crush** (the rear teeth: `crushBite` at half effect — it eats small shells). Ability
 **Shoal dart** (`shoalDart` reused). Passive: born into a school; the fin holds a line at sprint.
@@ -477,12 +508,12 @@ small-particle diet are all argued; a diet of small things is supported, the mec
 *Reconstruction.* Square. The shell is a mosaic of hundreds of plates, not a turtle's dozen, and the
 face is short and wide with a fringed lip.
 
-*Kit.* Role: the unkillable hoover of the flats. `breathing: 'air'`, medium `breath`, `shell: true`,
-`armour` 0.9 `armourFacing: 'all'`, `noBite`, `diet: 'filter'`, `shoreReach` 8. Locomotion ★
+*Kit.* Role: the unkillable hoover of the flats. `breathing: 'air'`, small stamina that it barely
+spends, `shell: true`, `armour` 0.9 `armourFacing: 'all'`, `noBite`, `diet: 'filter'`. Locomotion ★
 `sink`, walks with `punt`; the slowest animal on the roster. `light`, `heavy`: `nibble`. Ability
 ★ **Comb** (Y, loop): strains the gypsum flats' microbial mats and brine — the one animal that
 feeds there — and grazes the algal meadows at half rate. Passive: immune to the flats' heat and
-salt; only Placodus' crush bite and a giant's drown-hold can hurt it. Weakness: no attack, no
+salt; only Placodus' crush bite and a giant's exhaustion hold can hurt it. Weakness: no attack, no
 speed; standing comes from feeding, surviving and the flats nobody else can use.
 
 #### T15 · Saurichthys — the needle
@@ -514,7 +545,7 @@ lunge-feeder on shoals is the stronger current reading (I).
 *Reconstruction.* The pelican pouch and the crocodile ridge: a toothless mouth that opens into a
 sac, and a back of plates.
 
-*Kit.* Role: the pouch. `breathing: 'air'`, medium `breath`, `armour` 0.5 `armourFacing: 'dorsal'`,
+*Kit.* Role: the pouch. `breathing: 'air'`, middling stamina, `armour` 0.5 `armourFacing: 'dorsal'`,
 `noBite`. Locomotion: stiff-trunked, tail-driven, slow. `light` Gape (`nibble`); `heavy` ★ **Gulp**
 (`filterGulp` reused against snack *schools* rather than blooms: a lunge through a school with the
 pouch open feeds on it; nothing else in the column feeds this way). Passive: hits from above do
@@ -533,28 +564,33 @@ limbs (S). Live birth, with two gravid females preserving articulated embryos (S
 
 *Reconstruction.* A lizard swimming with its arms. Two builds, male and female, as a cosmetic scheme.
 
-*Kit.* Role: the hatchling body of the era. `breathing: 'air'`, short `breath`, `shoals: true`,
-`birth: 'live'`, `shoreReach` 4 (it can crawl up the last of the shallows). Locomotion: forelimb
+*Kit.* Role: the hatchling body of the era. `breathing: 'air'`, a tiny tank but the shortest trip
+up, since it lives in water a few units deep, `shoals: true`, `birth: 'live'`. Locomotion: forelimb
 paddling, nimble, poor cruise. `light` Nip; `heavy` **Nip** (heavy). Ability **Kin scatter**
 (`shoalDart` reused: the school bursts in every direction, and the pursuer picks one). Passive: born
 into a crowd in the Conifer Shore; the crowd is the cover. Weakness: everything.
 
-#### T18 · Cartorhynchus lenticarpus — the crawler
+#### T18 · Cartorhynchus lenticarpus — the sucker
 
 *Spathian (~248 Ma), Nanlinghu Formation, Chaohu, Anhui.* About 40 cm reconstructed, the most
 basal ichthyosauriform (S). A short snout with toothless tips and, hidden inside, rows of rounded
 molariform teeth found by CT (S); large flexible poorly ossified flipper-wrists that bent like a
-turtle's (S); thick pachyostotic ribs; a large hyoid (S). Amphibious, hauling out like a seal (I);
-suction feeding on shelled invertebrates (I, the teeth S).
+turtle's (S); thick pachyostotic ribs; a large hyoid (S). Suction feeding on shelled invertebrates
+(I, the teeth S); heavy ribs as ballast for shallow water (I). The flexible wrists have also been
+read as an ability to haul out like a seal (I) — the game does not use that, because no player
+leaves the water; they are a bottom-walker's wrists here.
 
-*Reconstruction.* Small, thick-ribbed, a blunt face, and wrists that visibly bend when it crawls.
+*Reconstruction.* Small, thick-ribbed, a blunt face, and wrists that visibly bend as it works along
+the bottom.
 
-*Kit.* Role: the amphibian at the bottom of the ladder. `breathing: 'air'`, short `breath`, `shoreReach`
-12 — the strongest haul-out on the roster. Locomotion: slow swim, `limbHaul` reused on the sand
-(stronger crawl than swim), `sink`. `light` Snap; `heavy` **Crush** (`crushBite` at half). Ability ★
-**Suction snap** (Y): pulls any snack within half a body length into the mouth — reach for an
-animal with no reach. Passive: the beach is its refuge and the shore animals its only predators
-there. Weakness: everything in the water is faster.
+*Kit.* Role: the bottom-worker at the foot of the ladder. `breathing: 'air'`, a small tank, but it
+lives in the shallowest water anything plays in, so the trip up is a second and a half. Locomotion:
+slow swim, `sink`, and the best bottom-walk on the roster (`punt` with the wrists, faster over sand
+than its own swim). `light` Snap; `heavy` **Crush** (`crushBite` at half). Ability ★ **Suction
+snap** (Y): pulls any snack within half a body length into the mouth — reach for an animal with no
+reach, and it works on things wedged in the shell beds that nothing else can get at. Passive: the
+gypsum flats and the shallow lagoon are too thin for anything that could eat it. Weakness:
+everything in open water is faster, and out on the platform it is food.
 
 #### T19 · Odontochelys semitestacea — the half-shell
 
@@ -562,17 +598,19 @@ there. Weakness: everything in the water is faster.
 **a complete plastron and no carapace**, teeth in both jaws, a long tail, unspecialised limbs (S).
 Nearshore marine by setting and isotopes (S/I), with a minority view of a washed-in land animal
 (A); a belly-first shell reads as protection against attack from below in open water (I); diet
-small invertebrates or omnivory (A); eggs on land presumed (A).
+small invertebrates or omnivory (A); eggs on land presumed but unknown (A) — the game lays it in
+the weed with everything else, since no playable body goes ashore.
 
 *Reconstruction.* A toothed turtle with a bare back: the ribs broadened but unfused show as ridges
 under the skin, and the plastron is the only shell.
 
-*Kit.* Role: armoured from below. `breathing: 'air'`, medium `breath`, `armour` 0.85 `armourFacing:
-'ventral'`, `birth: 'shore'` (the beach run), `shoreReach` 10. Locomotion: slow, bottom-walking with
-`punt`, a fair swim. `light` Bite; `heavy` **Bite** (heavy). Ability ★ **Belly turn** (guard):
-rolls to present the plastron to the attacker — a guard that re-faces, the era's enrolment — at a
-cost of drifting. Passive: an attack from beneath bounces. Weakness: soft above; an ambush from
-overhead beats it, and the beach run is the most dangerous minute of any life on the roster.
+*Kit.* Role: armoured from below. `breathing: 'air'`, middling stamina, `armour` 0.85
+`armourFacing: 'ventral'`, `birth: 'egg'` (in the reed cover). Locomotion: slow, bottom-walking
+with `punt`, a fair swim. `light` Bite; `heavy` **Bite** (heavy). Ability ★ **Belly turn**
+(guard): rolls to present the plastron to the attacker — a guard that re-faces, the era's
+enrolment — at a cost of drifting. Passive: an attack from beneath bounces, which is the one
+defence that works while it is climbing for air in open water. Weakness: soft above; an ambush
+from overhead beats it, and the climb is when it is most exposed.
 
 #### T20 · Ceratites nodosus — the shell
 
@@ -617,10 +655,10 @@ Collected from the kits above; each is one hook or one trait, none touches the s
 
 | Effect | Kind | Who | What it does |
 | --- | --- | --- | --- |
-| Drown-hold | heavy special | Cymbospondylus | A held air-breather's breath drains at double rate while the holder dives; the meal ends at empty. |
+| Exhaustion hold | heavy special | Cymbospondylus | A held air-breather cannot surface, so its stamina never recovers; the holder dives and waits it out. |
 | Pod / Pod call | trait + Y | Shonisaurus | `shoals` at rung IV: two or three pod-mates; the call converges them and shields a calf for 8 s. |
 | Paddle row / Bottom row | trait + Y | Nothosaurus | Two gears; rowing the sand flushes hidden animals into the open. |
-| Neck reach / Periscope | trait + Y | Dinocephalosaurus | The head strikes two body lengths from a body that stays put; breathe with the body submerged. |
+| Neck reach / Periscope | trait + Y | Dinocephalosaurus | The head strikes two body lengths from a body that stays put; refill with the body still submerged and the radar quiet. |
 | Whorl saw | heavy special | Helicoprion | A grip that saws: damage over time, half pierce, and the victim's escape window shortens. |
 | Flight / Power stroke | trait + Y | Rhaeticosaurus | Four-flipper flight; a shoulder-first dash of three body lengths. |
 | Scrape and sieve | Y loop | Atopodentatus | Feeds from algal meadows and biofilm. |
@@ -637,7 +675,11 @@ Collected from the kits above; each is one hook or one trait, none touches the s
 
 Reused as they are: `neckSnap`, `crushBite`, `runThrough`, `snatch`, `ambushSurge`, `shoalDart`,
 `tailFlick`, `bristleFlare`, `filterGulp`, `cheliceraeGrab`, `shellHover`, `shellJet`, `shellUp`,
-`limbHaul`, `punt`, `drift`, `grasp`, `shoals`, `shell`, `noBite`, `diet`, `shoreReach`.
+`limbHaul`, `punt`, `drift`, `grasp`, `shoals`, `shell`, `noBite`, `diet`, `airborne`.
+
+Deliberately **not** used: `shoreReach`. It is the Devonian's field for a body that can push into
+water nothing with gills can follow it into, and it would be the natural way to give these animals
+a beach. The Triassic leaves it alone; see [Nobody leaves the water](#nobody-leaves-the-water).
 
 ## The shore animals
 
@@ -691,7 +733,7 @@ osteoderms (S). Fish and soft prey by microwear (I).
 *In the game.* It lies at the surface along the bank with only the crest showing, in the Conifer
 Shore and the estuary channels, and lunges a length and a half at anything that surfaces to breathe
 within reach. Slow in open water; retreats to bask on the bank. The counter to surfacing at the
-shore, and the reason the Periscope and the haul-out matter.
+shore, and the reason the Periscope matters.
 
 *Model.* Tripo body; the crest and the eyes must break the surface cleanly. Clips: Float, Lunge,
 Bite, Bask, Slide-in.
@@ -705,7 +747,7 @@ the shallows and is a rare snack if it wades. Tripo body, a Run and a Stand.
 #### S04 · Coelophysis (optional) — the dinosaur at the water
 
 *Norian, Chinle Formation.* A 3 m theropod at the estuary, drinking, that snatches a hatchling on
-the beach run and otherwise ignores the water. The only dinosaur on the shore and, if it is
+anything small in the last stretch of shallows and otherwise ignores the water. The only dinosaur on the shore and, if it is
 included, the one the codex can call one.
 
 ## Alternates and reserves
@@ -715,7 +757,7 @@ Bodies that were weighed and left out, with the slot each could take. All have r
 
 - **Shastasaurus sikanniensis / Ichthyotitan** (21–25 m, toothless): a size alternative to
   Shonisaurus if a truly whale-scale body is wanted; the suction-feeding story is contested.
-- **Guizhouichthyosaurus** (5–7 m, the thalattosaur in the stomach): the fossil the drown-hold is
+- **Guizhouichthyosaurus** (5–7 m, the thalattosaur in the stomach): the fossil the exhaustion hold is
   built on; a rung III ichthyosaur if one is wanted between Mixosaurus and the giants.
 - **Pistosaurus** (3 m, Middle Triassic): the long-necked alternative to Rhaeticosaurus.
 - **Psephoderma / Cyamodus / Placochelys**: the armoured placodonts, two-part shell with a soft
@@ -745,6 +787,8 @@ phytosaur on every third estuary bank. The shadow predator is the Cymbospondylus
 
 ## Onboarding
 
-The first minute teaches breath: the calf is born, blows, and the hint is the ring. The second
-teaches the shore: a Keichousaurus crowd in the Conifer Shore, the boom's arc on the radar, and the
-line "Something on the shore is fishing." The rest is the sea.
+The first minute teaches air, and it teaches it by taking some: the calf is born at the surface,
+blows, then swims down, and the first sprint it spends does not come back. The hint fires on the
+empty bar, points at the light above, and says so once. The second minute teaches the shore: a
+Keichousaurus crowd in the Conifer Shore, the boom's arc on the radar, and the line "Something on
+the shore is fishing." The rest is the sea.
