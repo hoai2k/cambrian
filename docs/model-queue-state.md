@@ -457,3 +457,18 @@ typecheck, check, devonian:check, eras, sculpt, portraits, build) plus `npm run 
 `add-anchors --check`; fix what fails; then report to the user with the sheets. Coccosteus is
 still blocked on the user's Mac files (candidate07 GLBs). Never commit
 `tools/creatures/motion/.scratch/`.
+
+**22:50 UTC addendum**: Doryaspis V3 agent **finished**: candidate (GLBs, json, four portraits,
+anchors) at `/home/user/devonian-authoring/doryaspis/v3-candidate/`, sheets at scratchpad
+`dory/doryaspis-v2-vs-v3-sheet.png` and `dory/doryaspis-v3-mouth.png`; new files under
+`tools/devonian/creatures/doryaspis/` (`materials_v3.py`, `build_v3.py`, `finalize_v3.py`,
+`portraits_v3.py`, `export_audit_v3.mjs`, `validation_v3.json`, `eyes-v3.json`) and `rework-v3/`
+(clay02 set, `DESIGN-clay02.md`, `review-clay02.md`, `review-material-v3.md`, `study_material_v3.py`,
+`mouth_strip_v3.py`). Not yet judged, checked or integrated — judge the mouth strip first (mouth at
+the very front, saw as the lower jaw below it). The Dunkleosteus agent had, at this point,
+**integrated into the working tree** (`public/assets/devonian/creatures/dunkleosteus.*`,
+`asset-sizes.json`, `specimens.json`, its README, `docs/sculpts/README.md` modified, uncommitted):
+verify its report and `ports/dunkleosteus-sculpt-sheet.png` before committing; `git checkout --`
+those paths reverts it if the sheet is bad. The Titanichthys agent was editing
+`sculpt-port/build_candidate.py`, `sculpt-port/geometry.py` and `tools/sculpt-measure.ts`
+(review that last diff — it was not asked to change the tool).
