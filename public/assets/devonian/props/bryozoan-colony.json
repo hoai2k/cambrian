@@ -1,0 +1,37 @@
+{
+  "id": "bryozoan-colony",
+  "family": "B10",
+  "name": "Fenestrate bryozoan",
+  "taxon": "Fenestrate bryozoan indet.",
+  "category": "attached",
+  "description": "Fine mesh colony with zooid-bearing longitudinal branches and connecting crossbars; not a coral fan.",
+  "provenance": "Devonian marine shelf comparative growth form",
+  "model": "assets/devonian/props/bryozoan-colony.glb",
+  "lod": "assets/devonian/props/bryozoan-colony.lod1.glb",
+  "image": "assets/devonian/props/bryozoan-colony.png",
+  "lengthMeters": 0.059891849756240845,
+  "dimensionsMeters": {
+    "x": 0.0512140654027462,
+    "y": 0.059891849756240845,
+    "z": 0.0048591624945402145
+  },
+  "clips": [],
+  "looping": [],
+  "sources": [
+    "https://www.digitalatlasofancientlife.org/learn/bryozoa/",
+    "https://data.wgnhs.wisc.edu/pubshare/B021.pdf"
+  ],
+  "notes": [
+    "Original parametric mesh, no downloaded model.",
+    "1 glTF unit = 1 metre. Dimensions describe this art specimen, not a taxon maximum.",
+    "Pigmentation and soft appearance are artistic interpretations.",
+    "Locality tags constrain future placement; library membership does not assert co-occurrence.",
+    "Preview model: initial scenery delivery; further individual material, silhouette and motion refinement is pending."
+  ],
+  "fullTriangles": 37840,
+  "lodTriangles": 11351,
+  "lodRatio": 0.2999735729386892,
+  "sourceBlend": "../devonian-authoring/props/bryozoan-colony/bryozoan-colony.blend",
+  "uncertainty": "Generalized fenestrate colony. Fine zooid structure is simplified, and no species/locality assignment is implied.",
+  "modelStatus": "preview"
+}

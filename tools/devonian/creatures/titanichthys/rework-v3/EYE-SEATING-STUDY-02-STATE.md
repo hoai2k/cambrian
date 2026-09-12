@@ -1,0 +1,3 @@
+# Eye-seating study 02 state
+
+Numerical audit passed its 50% lower-bound criterion: 60.32021392351526%--61.6838250550356%. The `.030` eye POSITION derivative and its audit evidence are complete. The former eight orbit images are invalid pose evidence and remain preserved. `orbit-renders03` is also preserved as a failed partial attempt: it contains only two full-Bind images, stopping on metadata serialization after rendering. `render_orbits_04.py` completed a clean fresh eight-image run at `orbit-renders04`; manifest SHA-256 `3d26f671a4b8a331df6dd4c620d1122c750b44b38371c435e53198b890606851`. The evidence now awaits visual author review.

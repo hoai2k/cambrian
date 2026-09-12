@@ -1,0 +1,7 @@
+"""Render local authoring model for anatomy inspection, without publishing candidates."""
+import bpy,os
+from mathutils import Vector
+here=os.path.dirname(os.path.abspath(__file__));root=os.path.abspath(os.path.join(here,'../../../..'));local=os.path.abspath(os.path.join(root,'../devonian-authoring/tiktaalik'));bpy.ops.wm.open_mainfile(filepath=os.path.join(local,'tiktaalik-v2.blend'));scene=bpy.context.scene;cam=scene.camera;rig=bpy.data.objects['tiktaalik_rig'];scene.render.resolution_x=1100;scene.render.resolution_y=825;scene.render.film_transparent=False;scene.cycles.samples=28
+for name,pos,target,scale,clip,phase in [('draft',(7,-6,6),(0,1.6,0),10.4,'Idle',0),('dorsal',(0,.7,12),(0,1.6,0),13.0,'Idle',0),('front',(0,-8,2),(0,-.75,.03),4.6,'Idle',0),('side',(9,0,.7),(0,1.6,0),10.4,'Idle',0),('eye',(2.2,-2.7,1.6),(0,-1.59,.18),1.6,'Idle',0),('oral',(2.0,-4.2,1.3),(0,-1.65,-.16),3.1,'Heavy',.30),('oral-left',(-2.2,-3.7,.50),(0,-1.63,-.20),3.1,'Heavy',.30),('palate',(.50,-4.0,-.15),(0,-1.50,.03),2.8,'Heavy',.30)]:
+ if os.environ.get('TIKTAALIK_SOURCE_DETAIL') and name not in ['eye','oral']:continue
+ rig.animation_data.action=bpy.data.actions[clip];scene.frame_set(round(rig.animation_data.action.frame_range[1]*phase));cam.location=pos;cam.rotation_euler=(Vector(target)-cam.location).to_track_quat('-Z','Y').to_euler();cam.data.ortho_scale=scale;scene.render.filepath=os.path.join(local,'v2-'+name+'.png');bpy.ops.render.render(write_still=True)

@@ -1,0 +1,47 @@
+[
+  {
+    "id": "shallows",
+    "prompt": "Use case: stylized-concept. Asset type: wide 16:9 biome card painting for Cambrian Explosion game, target 1024 x 576. Primary request: Sunlit Shallows: bright turquoise water, gentle sunlit caustics over pale rippled sand, a low meadow of small soft rounded green-gold algal tufts and a few rounded pale peach cushion sponges. Spacious, safe, relaxing. Style: polished atmospheric hand-painted underwater environment concept art, restrained naturalism with delicate painterly texture, cohesive teal ink shadows, soft foam highlights. Composition: underwater at a small creature's eye level close to seabed, full-bleed vista with depth and atmospheric fog. All visible life is Cambrian sponges, primitive algae or microbial mats. No creatures, animals, fish, modern kelp, modern coral heads, people, text, lettering, border, UI or watermark.",
+    "source": "exec-f65de3c4-9086-413a-8eeb-a9eae3c3f405.png"
+  },
+  {
+    "id": "nursery",
+    "prompt": "Use case: stylized-concept. Asset type: wide 16:9 biome card painting for Cambrian Explosion game, target 1024 x 576. Primary request: Nursery Reef: warm teal water, a sheltered sandy clearing surrounded by dense rounded ochre and peach primitive sponges, branching Vauxia and low radial Choia sponges, soft filament undergrowth. Intimate and safe. Style: polished atmospheric hand-painted underwater environment concept art, restrained naturalism with delicate painterly texture, cohesive teal ink shadows, soft foam highlights. Composition: underwater at a small creature's eye level close to seabed, full-bleed vista with depth and atmospheric fog. All visible life is Cambrian sponges, primitive algae or microbial mats. No creatures, animals, fish, modern kelp, modern coral heads, people, text, lettering, border, UI or watermark.",
+    "source": "exec-2da4f0fc-3699-46af-9595-1950baa9e061.png"
+  },
+  {
+    "id": "shelf",
+    "prompt": "Use case: stylized-concept. Asset type: wide 16:9 biome card painting for Cambrian Explosion game, target 1024 x 576. Primary request: Open Shelf: the standard Cambrian reef, teal blue-green water, scattered ochre primitive branching and sac sponges across grey sand and mud ripples, small pebbles. Natural unembellished underwater seabed, open visibility. Style: polished atmospheric hand-painted underwater environment concept art, restrained naturalism with delicate painterly texture, cohesive teal ink shadows, soft foam highlights. Composition: underwater at a small creature's eye level close to seabed, full-bleed vista with depth and atmospheric fog. All visible life is Cambrian sponges, primitive algae or microbial mats. No creatures, animals, fish, modern kelp, modern coral heads, people, text, lettering, border, UI or watermark.",
+    "source": "exec-47e5a56c-15ae-4727-844a-e6bb259e22f0.png"
+  },
+  {
+    "id": "forest",
+    "prompt": "Use case: stylized-concept. Asset type: wide 16:9 biome card painting for Cambrian Explosion game, target 1024 x 576. Primary request: Sponge Forest: tall stalked primitive branching Vauxia and tubular ochre sponges, broad primitive algal thalli, green-dark water, dense vertical growth with short lines of sight. A natural Cambrian sponge forest. Style: polished atmospheric hand-painted underwater environment concept art, restrained naturalism with delicate painterly texture, cohesive teal ink shadows, soft foam highlights. Composition: underwater at a small creature's eye level close to seabed, full-bleed vista with depth and atmospheric fog. All visible life is Cambrian sponges, primitive algae or microbial mats. No creatures, animals, fish, modern kelp, modern coral heads, people, text, lettering, border, UI or watermark.",
+    "source": "exec-b7ea3f10-36e0-4966-a228-bc7773b93f7a.png"
+  },
+  {
+    "id": "boulders",
+    "prompt": "Use case: stylized-concept. Asset type: wide 16:9 biome card painting for Cambrian Explosion game, target 1024 x 576. Primary request: Boulder Field: grey-green rounded weathered boulders, crevices and overhangs across a sandy muddy seabed, sparse small primitive ochre sponges. Muted green-teal water, natural standard reef look. Style: polished atmospheric hand-painted underwater environment concept art, restrained naturalism with delicate painterly texture, cohesive teal ink shadows, soft foam highlights. Composition: underwater at a small creature's eye level close to seabed, full-bleed vista with depth and atmospheric fog. All visible life is Cambrian sponges, primitive algae or microbial mats. No creatures, animals, fish, modern kelp, modern coral heads, people, text, lettering, border, UI or watermark.",
+    "source": "exec-2422865c-6011-400a-8629-c78b86abac91.png"
+  },
+  {
+    "id": "flats",
+    "prompt": "Use case: stylized-concept. Asset type: wide 16:9 biome card painting for Cambrian Explosion game, target 1024 x 576. Primary request: Microbial Flats: extremely flat green-grey microbial mats stretching to the underwater horizon, subtle wrinkled leathery mat textures and mud, almost no plants, subdued green-grey water. Vast empty exposed Cambrian seabed. Style: polished atmospheric hand-painted underwater environment concept art, restrained naturalism with delicate painterly texture, cohesive teal ink shadows, soft foam highlights. Composition: underwater at a small creature's eye level close to seabed, full-bleed vista with depth and atmospheric fog. All visible life is Cambrian sponges, primitive algae or microbial mats. No creatures, animals, fish, modern kelp, modern coral heads, people, text, lettering, border, UI or watermark.",
+    "source": "exec-26254487-bdb2-476c-bf65-8112a27ad94d.png"
+  },
+  {
+    "id": "channel",
+    "prompt": "Use case: stylized-concept. Asset type: wide 16:9 biome card painting for Cambrian Explosion game, target 1024 x 576. Primary request: The Channels: a dark narrow underwater cut in the seabed, angular slate blue-grey rock walls and sharp spires, bare silt floor, visible fine current streaks running into the distance. Cold dark teal water, tense and imposing. Style: polished atmospheric hand-painted underwater environment concept art, restrained naturalism with delicate painterly texture, cohesive teal ink shadows, soft foam highlights. Composition: underwater at a small creature's eye level close to seabed, full-bleed vista with depth and atmospheric fog. All visible life is Cambrian sponges, primitive algae or microbial mats. No creatures, animals, fish, modern kelp, modern coral heads, people, text, lettering, border, UI or watermark.",
+    "source": "exec-0283a85b-e737-4410-92fa-b3bb67dad497.png"
+  },
+  {
+    "id": "escarpment",
+    "prompt": "Use case: stylized-concept. Asset type: wide 16:9 biome card painting for Cambrian Explosion game, target 1024 x 576. Primary request: The Escarpment: an underwater cliff edge dropping into blue-black darkness, sharply faceted slate shards and angular talus at its foot, sparse bone-white primitive sponges. Oblique creature-eye view along the shelf edge that reveals the immense drop, near-dark cold water. Style: polished atmospheric hand-painted underwater environment concept art, restrained naturalism with delicate painterly texture, cohesive teal ink shadows, soft foam highlights. Composition: underwater at a small creature's eye level close to seabed, full-bleed vista with depth and atmospheric fog. All visible life is Cambrian sponges, primitive algae or microbial mats. No creatures, animals, fish, modern kelp, modern coral heads, people, text, lettering, border, UI or watermark.",
+    "source": "exec-3ba697b2-d0ce-4586-9c61-254fc130ed71.png"
+  },
+  {
+    "id": "basin",
+    "prompt": "Use case: stylized-concept. Asset type: wide 16:9 biome card painting for Cambrian Explosion game, target 1024 x 576. Primary request: Deep Basin: near-black navy-blue water above a sparse muddy abyssal floor, tall narrow angular bone-white spine sponges and fine ice-blue lattice sponge fans catching the last faint cold light, isolated jagged dark slate rocks. Ominous yet readable, deep Cambrian sea. Style: polished atmospheric hand-painted underwater environment concept art, restrained naturalism with delicate painterly texture, cohesive teal ink shadows, soft foam highlights. Composition: underwater at a small creature's eye level close to seabed, full-bleed vista with depth and atmospheric fog. All visible life is Cambrian sponges, primitive algae or microbial mats. No creatures, animals, fish, modern kelp, modern coral heads, people, text, lettering, border, UI or watermark.",
+    "source": "exec-bea1bb72-6842-4c46-8b9a-a39f04d78c7b.png"
+  }
+]

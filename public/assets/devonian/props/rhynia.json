@@ -1,0 +1,40 @@
+{
+  "id": "rhynia",
+  "family": "P01",
+  "name": "Rhynia-type early vegetation",
+  "taxon": "Rhynia gwynne-vaughanii comparative sporophytes",
+  "category": "plant",
+  "description": "Small leafless dichotomizing axes, creeping basal axis and terminal spindle-shaped sporangia. Not grass.",
+  "provenance": "Early Devonian Rhynie chert, Scotland",
+  "model": "assets/devonian/props/rhynia.glb",
+  "lod": "assets/devonian/props/rhynia.lod1.glb",
+  "image": "assets/devonian/props/rhynia.png",
+  "lengthMeters": 0.20573298633098602,
+  "dimensionsMeters": {
+    "x": 0.12007258832454681,
+    "y": 0.20573298633098602,
+    "z": 0.0649406909942627
+  },
+  "clips": [
+    "Idle"
+  ],
+  "looping": [
+    "Idle"
+  ],
+  "sources": [
+    "https://pmc.ncbi.nlm.nih.gov/articles/PMC5745331/"
+  ],
+  "notes": [
+    "Original parametric mesh, no downloaded model.",
+    "1 glTF unit = 1 metre. Dimensions describe this art specimen, not a taxon maximum.",
+    "Pigmentation and soft appearance are artistic interpretations.",
+    "Locality tags constrain future placement; library membership does not assert co-occurrence.",
+    "Preview model: initial scenery delivery; further individual material, silhouette and motion refinement is pending."
+  ],
+  "fullTriangles": 8348,
+  "lodTriangles": 2504,
+  "lodRatio": 0.29995208433157644,
+  "sourceBlend": "../devonian-authoring/props/rhynia/rhynia.blend",
+  "uncertainty": "Sporophyte axes and sporangia only; gametophytes are not combined into one invented life stage.",
+  "modelStatus": "preview"
+}

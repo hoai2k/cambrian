@@ -1,0 +1,124 @@
+{
+  "id": "tiktaalik",
+  "fullColorPolicy": "White COLOR_0 multiplied by UV albedo; no duplicate pigment darkening.",
+  "lodColorPolicy": "Texture-free, atlas-sampled linear vertex pigment.",
+  "exports": [
+    {
+      "file": "/home/user/devonian-authoring/tiktaalik/v3-candidate/tiktaalik.glb",
+      "sha256": "0c1ca7e1cafbef271e05de3a679f137596b149f5257a183eec8d007c24a4f12a",
+      "bytes": 19290168,
+      "clips": [
+        "Ability",
+        "Attack",
+        "Bite",
+        "Death",
+        "Dive",
+        "Dodge",
+        "Eat",
+        "Growth",
+        "Guard",
+        "Heavy",
+        "Hit",
+        "Idle",
+        "Parry",
+        "Rise",
+        "Stagger",
+        "Swim",
+        "TurnLeft",
+        "TurnRight"
+      ],
+      "distinctMotions": 18,
+      "materials": [
+        {
+          "material": "tiktaalik accent",
+          "rgbRange": [
+            1.0,
+            1.0
+          ],
+          "baseColorTexture": false,
+          "normalizedWeights": true
+        },
+        {
+          "material": "tiktaalik body",
+          "rgbRange": [
+            1.0,
+            1.0
+          ],
+          "baseColorTexture": true,
+          "normalizedWeights": true
+        },
+        {
+          "material": "tiktaalik eyes",
+          "rgbRange": [
+            1.0,
+            1.0
+          ],
+          "baseColorTexture": true,
+          "normalizedWeights": true
+        },
+        {
+          "material": "tiktaalik fins",
+          "rgbRange": [
+            1.0,
+            1.0
+          ],
+          "baseColorTexture": true,
+          "normalizedWeights": true
+        }
+      ],
+      "rootStable": true,
+      "scaleChannels": false
+    },
+    {
+      "file": "/home/user/devonian-authoring/tiktaalik/v3-candidate/tiktaalik.lod1.glb",
+      "sha256": "9edc6965225cef4c1ac9b5448bfa2c08c6216ca67e611feb99c7f45c4f490271",
+      "bytes": 2240272,
+      "clips": [
+        "Death",
+        "Idle",
+        "Swim"
+      ],
+      "distinctMotions": 3,
+      "materials": [
+        {
+          "material": "tiktaalik accent",
+          "rgbRange": [
+            0.2350041962310216,
+            0.4
+          ],
+          "baseColorTexture": false,
+          "normalizedWeights": true
+        },
+        {
+          "material": "tiktaalik body",
+          "rgbRange": [
+            0.004592965590905623,
+            0.3846341649500267
+          ],
+          "baseColorTexture": false,
+          "normalizedWeights": true
+        },
+        {
+          "material": "tiktaalik eyes",
+          "rgbRange": [
+            0.0025787747005416952,
+            0.0043945983062485695
+          ],
+          "baseColorTexture": false,
+          "normalizedWeights": true
+        },
+        {
+          "material": "tiktaalik fins",
+          "rgbRange": [
+            0.02340733958953231,
+            0.34482337682154574
+          ],
+          "baseColorTexture": false,
+          "normalizedWeights": true
+        }
+      ],
+      "rootStable": true,
+      "scaleChannels": false
+    }
+  ]
+}

@@ -1,0 +1,261 @@
+{
+  "audit": [
+    {
+      "id": "cladoselache",
+      "models": [
+        {
+          "level": 0,
+          "bones": 22,
+          "textures": 6,
+          "vertexColoredMeshes": 4,
+          "clips": [
+            {
+              "name": "Ability",
+              "duration": 2.4000000953674316,
+              "animatedTracks": 22,
+              "maxSeam": 0,
+              "maxRadius": 3.0048252235453057
+            },
+            {
+              "name": "Attack",
+              "duration": 1,
+              "animatedTracks": 22,
+              "maxSeam": 0,
+              "maxRadius": 3.032449630037512
+            },
+            {
+              "name": "Bite",
+              "duration": 0.5,
+              "animatedTracks": 22,
+              "maxSeam": 0,
+              "maxRadius": 2.9336485982409304
+            },
+            {
+              "name": "Death",
+              "duration": 1.600000023841858,
+              "animatedTracks": 22,
+              "maxSeam": 0,
+              "maxRadius": 2.933899479289261
+            },
+            {
+              "name": "Dive",
+              "duration": 1.399999976158142,
+              "animatedTracks": 20,
+              "maxSeam": 0,
+              "maxRadius": 2.932005746867302
+            },
+            {
+              "name": "Dodge",
+              "duration": 0.4000000059604645,
+              "animatedTracks": 20,
+              "maxSeam": 0,
+              "maxRadius": 2.933598013201054
+            },
+            {
+              "name": "Eat",
+              "duration": 1.600000023841858,
+              "animatedTracks": 22,
+              "maxSeam": 0,
+              "maxRadius": 2.9357589968595086
+            },
+            {
+              "name": "Growth",
+              "duration": 1.5,
+              "animatedTracks": 22,
+              "maxSeam": 0,
+              "maxRadius": 2.932510870121896
+            },
+            {
+              "name": "Guard",
+              "duration": 1,
+              "animatedTracks": 22,
+              "maxSeam": 0,
+              "maxRadius": 2.9479200794969227
+            },
+            {
+              "name": "Heavy",
+              "duration": 1.100000023841858,
+              "animatedTracks": 22,
+              "maxSeam": 0,
+              "maxRadius": 3.0612327224168228
+            },
+            {
+              "name": "Hit",
+              "duration": 0.6000000238418579,
+              "animatedTracks": 22,
+              "maxSeam": 0,
+              "maxRadius": 3.000833186037245
+            },
+            {
+              "name": "Idle",
+              "duration": 2.4000000953674316,
+              "animatedTracks": 22,
+              "maxSeam": 0,
+              "maxRadius": 2.9362759946309147
+            },
+            {
+              "name": "Parry",
+              "duration": 0.3499999940395355,
+              "animatedTracks": 20,
+              "maxSeam": 0,
+              "maxRadius": 2.933254522031995
+            },
+            {
+              "name": "Rise",
+              "duration": 1.399999976158142,
+              "animatedTracks": 20,
+              "maxSeam": 0,
+              "maxRadius": 2.952006749951046
+            },
+            {
+              "name": "Stagger",
+              "duration": 1.2000000476837158,
+              "animatedTracks": 22,
+              "maxSeam": 0,
+              "maxRadius": 2.958598067294374
+            },
+            {
+              "name": "Swim",
+              "duration": 2.4000000953674316,
+              "animatedTracks": 22,
+              "maxSeam": 0,
+              "maxRadius": 2.9308975749028607
+            },
+            {
+              "name": "TurnLeft",
+              "duration": 1.600000023841858,
+              "animatedTracks": 20,
+              "maxSeam": 0,
+              "maxRadius": 2.972235317061141
+            },
+            {
+              "name": "TurnRight",
+              "duration": 1.600000023841858,
+              "animatedTracks": 20,
+              "maxSeam": 0,
+              "maxRadius": 3.00706894145187
+            }
+          ],
+          "anchors": {
+            "sockets": 3,
+            "metadata": "[[\"anchor_attack_primary\",{\"parentBone\":\"skull\",\"role\":\"attack\",\"version\":1}],[\"anchor_mouth\",{\"parentBone\":\"jaw\",\"role\":\"mouth\",\"version\":1}],[\"anchor_mouth_inside\",{\"parentBone\":\"skull\",\"role\":\"swallow\",\"version\":1}]]",
+            "independentClones": true,
+            "transformedWorldPositions": true,
+            "solutions": []
+          }
+        },
+        {
+          "level": 1,
+          "bones": 22,
+          "textures": 0,
+          "vertexColoredMeshes": 4,
+          "clips": [
+            {
+              "name": "Death",
+              "duration": 1.600000023841858,
+              "animatedTracks": 22,
+              "maxSeam": 0,
+              "maxRadius": 3.008766344940092
+            },
+            {
+              "name": "Idle",
+              "duration": 2.4000000953674316,
+              "animatedTracks": 22,
+              "maxSeam": 0,
+              "maxRadius": 3.010617673406801
+            },
+            {
+              "name": "Swim",
+              "duration": 2.4000000953674316,
+              "animatedTracks": 22,
+              "maxSeam": 0,
+              "maxRadius": 3.009082419310501
+            }
+          ],
+          "anchors": {
+            "sockets": 3,
+            "metadata": "[[\"anchor_attack_primary\",{\"parentBone\":\"skull\",\"role\":\"attack\",\"version\":1}],[\"anchor_mouth\",{\"parentBone\":\"jaw\",\"role\":\"mouth\",\"version\":1}],[\"anchor_mouth_inside\",{\"parentBone\":\"skull\",\"role\":\"swallow\",\"version\":1}]]",
+            "independentClones": true,
+            "transformedWorldPositions": true,
+            "solutions": []
+          }
+        }
+      ]
+    }
+  ],
+  "clips": [
+    {
+      "name": "Ability",
+      "duration": 2.4000000953674316
+    },
+    {
+      "name": "Attack",
+      "duration": 1
+    },
+    {
+      "name": "Bite",
+      "duration": 0.5
+    },
+    {
+      "name": "Death",
+      "duration": 1.600000023841858
+    },
+    {
+      "name": "Dive",
+      "duration": 1.399999976158142
+    },
+    {
+      "name": "Dodge",
+      "duration": 0.4000000059604645
+    },
+    {
+      "name": "Eat",
+      "duration": 1.600000023841858
+    },
+    {
+      "name": "Growth",
+      "duration": 1.5
+    },
+    {
+      "name": "Guard",
+      "duration": 1
+    },
+    {
+      "name": "Heavy",
+      "duration": 1.100000023841858
+    },
+    {
+      "name": "Hit",
+      "duration": 0.6000000238418579
+    },
+    {
+      "name": "Idle",
+      "duration": 2.4000000953674316
+    },
+    {
+      "name": "Parry",
+      "duration": 0.3499999940395355
+    },
+    {
+      "name": "Rise",
+      "duration": 1.399999976158142
+    },
+    {
+      "name": "Stagger",
+      "duration": 1.2000000476837158
+    },
+    {
+      "name": "Swim",
+      "duration": 2.4000000953674316
+    },
+    {
+      "name": "TurnLeft",
+      "duration": 1.600000023841858
+    },
+    {
+      "name": "TurnRight",
+      "duration": 1.600000023841858
+    }
+  ],
+  "errors": []
+}

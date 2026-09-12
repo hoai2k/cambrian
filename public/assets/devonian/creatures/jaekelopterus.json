@@ -1,0 +1,60 @@
+{
+  "id": "jaekelopterus",
+  "name": "Jaekelopterus",
+  "species": "Jaekelopterus rhenaniae",
+  "provenance": "Early Devonian, Rhineland, Germany",
+  "description": "Large pterygotid eurypterid with acute lateral eyes, robust toothed chelicerae, four walking-limb pairs, swimming paddles, twelve trunk rings and a triangular keeled telson.",
+  "lengthMeters": 1.8,
+  "modelLength": 6.73,
+  "locomotion": "Crawl",
+  "clips": [
+    "Idle",
+    "Swim",
+    "Crawl",
+    "TurnLeft",
+    "TurnRight",
+    "Dive",
+    "Rise",
+    "Attack",
+    "Bite",
+    "Heavy",
+    "Hit",
+    "Death",
+    "Guard",
+    "Parry",
+    "Dodge",
+    "Eat",
+    "Stagger",
+    "Ability",
+    "Moult",
+    "Grab"
+  ],
+  "looping": [
+    "Idle",
+    "Swim",
+    "Crawl",
+    "Guard",
+    "Eat"
+  ],
+  "anchors": [
+    "anchor_mouth",
+    "anchor_mouth_inside",
+    "anchor_attack_primary",
+    "anchor_grasp_left",
+    "anchor_grasp_right"
+  ],
+  "sources": [
+    "https://doi.org/10.1098/rsbl.2007.0491",
+    "https://pmc.ncbi.nlm.nih.gov/articles/PMC4571687/",
+    "https://pmc.ncbi.nlm.nih.gov/articles/PMC9745958/",
+    "https://pmc.ncbi.nlm.nih.gov/articles/PMC3679797/"
+  ],
+  "notes": [
+    "Initial preview reconstruction; pigmentation and soft anatomy are artistic.",
+    "1.8 m is a representative display assumption; the famous roughly 2.5 m giant estimate is extrapolated from an isolated chelicera, not a complete giant body.",
+    "Four slender non-chelate walking pairs plus pair VI swimming paddles; enlarged chelicerae are pair I. No invented scorpion sting or venom anatomy.",
+    "Rhenaniae claw and eye evidence is distinguished from comparative Jaekelopterus howelli postcranial material.",
+    "Moult is a preparatory articulated extension without shell splitting or body scaling. Precise locomotor cycles are inferred, not fossil-observed.",
+    "Full regional pigment is multiplied once by near-neutral UV albedo; LOD bakes that factor once without textures."
+  ]
+}

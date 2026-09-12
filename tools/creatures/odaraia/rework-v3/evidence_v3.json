@@ -1,0 +1,1861 @@
+{
+  "scope": "Odaraia V3 stage 1 kinematic evidence on accepted M02 geometry",
+  "geometryHash": "b4086bbddf3bfb5a6551964df927f3a69fa8bbf79a2a1f405f23053a0df0023f",
+  "coordinates": {
+    "up": "+Y",
+    "ventral": "+Y",
+    "forward": "+Z"
+  },
+  "bones": 406,
+  "proxyDiameter": 0.07,
+  "jointLimitsRadians": {
+    "prox": 0.55,
+    "mid": 0.8,
+    "dist": 0.9,
+    "tip": 1.0
+  },
+  "attachmentExclusion": "only a limb's own endites on its own shaft",
+  "poses": [
+    {
+      "pose": "rest",
+      "method": "authored surface vertices skinned analytically",
+      "sampledPoints": 22320,
+      "foodCentre": null,
+      "hardShaftMinGap": -0.0179,
+      "hardShaftWorst": {
+        "a": "7R",
+        "b": "8R",
+        "kind": "hard shaft capsule",
+        "gap": -0.0179
+      },
+      "filterMinGap": 0.00098,
+      "filterWorst": {
+        "a": "5L",
+        "b": "6L",
+        "kind": "filter",
+        "gap": 0.00098
+      },
+      "shellMarginMinGap": 0.33138,
+      "shellEnclosedMinGap": null,
+      "shellWorstPoint": [
+        -0.3983,
+        0.5257,
+        0.2795
+      ],
+      "headMinGap": 0.01401,
+      "headWorstPoint": [
+        0.1717,
+        0.1104,
+        1.4186
+      ],
+      "pairGaps": {
+        "1L|2L|hard shaft capsule": 0.00739,
+        "1L|1R|hard shaft capsule": 0.3132,
+        "1R|2R|hard shaft capsule": -0.0123,
+        "2L|3L|hard shaft capsule": -0.00947,
+        "2L|2R|hard shaft capsule": 0.31055,
+        "2R|3R|hard shaft capsule": -0.01591,
+        "3L|4L|hard shaft capsule": -0.0131,
+        "3L|3R|hard shaft capsule": 0.30787,
+        "3R|4R|hard shaft capsule": -0.01271,
+        "4L|5L|hard shaft capsule": -0.01612,
+        "4L|4R|hard shaft capsule": 0.3051,
+        "4R|5R|hard shaft capsule": -0.01294,
+        "5L|6L|hard shaft capsule": -0.01315,
+        "5L|5R|hard shaft capsule": 0.30221,
+        "5R|6R|hard shaft capsule": -0.01224,
+        "6L|7L|hard shaft capsule": -0.01351,
+        "6L|6R|hard shaft capsule": 0.29916,
+        "6R|7R|hard shaft capsule": -0.01501,
+        "7L|8L|hard shaft capsule": -0.01324,
+        "7L|7R|hard shaft capsule": 0.29591,
+        "7R|8R|hard shaft capsule": -0.0179,
+        "8L|8R|hard shaft capsule": 0.29243,
+        "1L|2L|filter": 0.01054,
+        "1L|2L|paddle": 0.01983,
+        "1L|2L|filter vs shaft": 0.01734,
+        "1L|1R|filter": 0.31132,
+        "1L|1R|paddle": 0.36289,
+        "1L|1R|filter vs shaft": 0.37032,
+        "1R|2R|filter": 0.00225,
+        "1R|2R|paddle": 0.03212,
+        "1R|2R|filter vs shaft": 0.00362,
+        "2L|3L|filter": 0.00559,
+        "2L|3L|paddle": 0.03005,
+        "2L|3L|filter vs shaft": 0.0025,
+        "2L|2R|filter": 0.30897,
+        "2L|2R|paddle": 0.35967,
+        "2L|2R|filter vs shaft": 0.37109,
+        "2R|3R|filter": 0.00525,
+        "2R|3R|paddle": 0.03942,
+        "2R|3R|filter vs shaft": 0.00379,
+        "3L|4L|filter": 0.00563,
+        "3L|4L|paddle": 0.03789,
+        "3L|4L|filter vs shaft": 0.00609,
+        "3L|3R|filter": 0.30698,
+        "3L|3R|paddle": 0.3564,
+        "3L|3R|filter vs shaft": 0.372,
+        "3R|4R|filter": 0.00706,
+        "3R|4R|paddle": 0.04202,
+        "3R|4R|filter vs shaft": 0.00218,
+        "4L|5L|filter": 0.00253,
+        "4L|5L|paddle": 0.04257,
+        "4L|5L|filter vs shaft": 0.00631,
+        "4L|4R|filter": 0.30556,
+        "4L|4R|paddle": 0.35304,
+        "4L|4R|filter vs shaft": 0.3718,
+        "4R|5R|filter": 0.00517,
+        "4R|5R|paddle": 0.03742,
+        "4R|5R|filter vs shaft": 0.00141,
+        "5L|6L|filter": 0.00098,
+        "5L|6L|paddle": 0.04344,
+        "5L|6L|filter vs shaft": 0.00196,
+        "5L|5R|filter": 0.30405,
+        "5L|5R|paddle": 0.34957,
+        "5L|5R|filter vs shaft": 0.36972,
+        "5R|6R|filter": 0.00252,
+        "5R|6R|paddle": 0.03854,
+        "5R|6R|filter vs shaft": 0.00515,
+        "6L|7L|filter": 0.00528,
+        "6L|7L|paddle": 0.02859,
+        "6L|7L|filter vs shaft": 0.00339,
+        "6L|6R|filter": 0.30173,
+        "6L|6R|paddle": 0.34596,
+        "6L|6R|filter vs shaft": 0.36288,
+        "6R|7R|filter": 0.00168,
+        "6R|7R|paddle": 0.01572,
+        "6R|7R|filter vs shaft": 0.00658,
+        "7L|8L|filter": 0.00297,
+        "7L|8L|paddle": 0.0195,
+        "7L|8L|filter vs shaft": 0.00119,
+        "7L|7R|filter": 0.29906,
+        "7L|7R|paddle": 0.34215,
+        "7L|7R|filter vs shaft": 0.35561,
+        "7R|8R|filter": 0.0013,
+        "7R|8R|paddle": 0.00767,
+        "7R|8R|filter vs shaft": 0.00202,
+        "8L|8R|filter": 0.29653,
+        "8L|8R|paddle": 0.33812,
+        "8L|8R|filter vs shaft": 0.34893
+      },
+      "hardShaftTightest": [
+        {
+          "a": "7R",
+          "b": "8R",
+          "kind": "hard shaft capsule",
+          "gap": -0.0179
+        },
+        {
+          "a": "4L",
+          "b": "5L",
+          "kind": "hard shaft capsule",
+          "gap": -0.01612
+        },
+        {
+          "a": "2R",
+          "b": "3R",
+          "kind": "hard shaft capsule",
+          "gap": -0.01591
+        },
+        {
+          "a": "6R",
+          "b": "7R",
+          "kind": "hard shaft capsule",
+          "gap": -0.01501
+        }
+      ],
+      "filterTightest": [
+        {
+          "a": "5L",
+          "b": "6L",
+          "kind": "filter",
+          "gap": 0.00098
+        },
+        {
+          "a": "7L",
+          "b": "8L",
+          "kind": "filter vs shaft",
+          "gap": 0.00119
+        },
+        {
+          "a": "7R",
+          "b": "8R",
+          "kind": "filter",
+          "gap": 0.0013
+        },
+        {
+          "a": "4R",
+          "b": "5R",
+          "kind": "filter vs shaft",
+          "gap": 0.00141
+        }
+      ],
+      "deltaVsRest": {
+        "worstDelta": 0.0,
+        "worstPair": "1L|2L|hard shaft capsule",
+        "worstDeltaOutsideCupping": 0.0,
+        "worstPairOutsideCupping": "3L|4L|hard shaft capsule",
+        "midlineMinGap": 0.29243,
+        "midlinePair": "8L|8R|hard shaft capsule",
+        "scope": "delta is successive same-side pairs; midline is absolute"
+      }
+    },
+    {
+      "pose": "attack-018",
+      "method": "authored surface vertices skinned analytically",
+      "sampledPoints": 22320,
+      "foodCentre": null,
+      "hardShaftMinGap": -0.00211,
+      "hardShaftWorst": {
+        "a": "4R",
+        "b": "5R",
+        "kind": "hard shaft capsule",
+        "gap": -0.00211
+      },
+      "filterMinGap": 0.00111,
+      "filterWorst": {
+        "a": "6R",
+        "b": "7R",
+        "kind": "filter",
+        "gap": 0.00111
+      },
+      "shellMarginMinGap": 0.30979,
+      "shellEnclosedMinGap": 0.47316,
+      "shellWorstPoint": [
+        0.4153,
+        0.5052,
+        0.3239
+      ],
+      "headMinGap": 0.01685,
+      "headWorstPoint": [
+        -0.1888,
+        0.1039,
+        1.4216
+      ],
+      "pairGaps": {
+        "1L|2L|hard shaft capsule": 0.02721,
+        "1L|1R|hard shaft capsule": 0.3132,
+        "1R|2R|hard shaft capsule": 0.03058,
+        "2L|3L|hard shaft capsule": 0.02974,
+        "2L|2R|hard shaft capsule": 0.31055,
+        "2R|3R|hard shaft capsule": 0.03518,
+        "3L|4L|hard shaft capsule": 0.03576,
+        "3L|3R|hard shaft capsule": 0.30787,
+        "3R|4R|hard shaft capsule": 0.0179,
+        "4L|5L|hard shaft capsule": 0.04799,
+        "4L|4R|hard shaft capsule": 0.3051,
+        "4R|5R|hard shaft capsule": -0.00211,
+        "5L|6L|hard shaft capsule": 0.04856,
+        "5L|5R|hard shaft capsule": 0.30221,
+        "5R|6R|hard shaft capsule": 0.00846,
+        "6L|7L|hard shaft capsule": 0.04914,
+        "6L|6R|hard shaft capsule": 0.29916,
+        "6R|7R|hard shaft capsule": 0.02301,
+        "7L|8L|hard shaft capsule": 0.04834,
+        "7L|7R|hard shaft capsule": 0.29591,
+        "7R|8R|hard shaft capsule": 0.00717,
+        "8L|8R|hard shaft capsule": 0.29243,
+        "1L|2L|filter": 0.00253,
+        "1L|2L|paddle": 0.02543,
+        "1L|2L|filter vs shaft": 0.00266,
+        "1L|1R|filter": 0.3615,
+        "1L|1R|paddle": 0.36223,
+        "1L|1R|filter vs shaft": 0.402,
+        "1R|2R|filter": 0.00503,
+        "1R|2R|paddle": 0.0338,
+        "1R|2R|filter vs shaft": 0.00474,
+        "2L|3L|filter": 0.00662,
+        "2L|3L|paddle": 0.03331,
+        "2L|3L|filter vs shaft": 0.00208,
+        "2L|2R|filter": 0.39795,
+        "2L|2R|paddle": 0.35918,
+        "2L|2R|filter vs shaft": 0.4428,
+        "2R|3R|filter": 0.00787,
+        "2R|3R|paddle": 0.04064,
+        "2R|3R|filter vs shaft": 0.00499,
+        "3L|4L|filter": 0.01402,
+        "3L|4L|paddle": 0.04379,
+        "3L|4L|filter vs shaft": 0.00288,
+        "3L|3R|filter": 0.38863,
+        "3L|3R|paddle": 0.35607,
+        "3L|3R|filter vs shaft": 0.44078,
+        "3R|4R|filter": 0.00435,
+        "3R|4R|paddle": 0.04555,
+        "3R|4R|filter vs shaft": 0.00279,
+        "4L|5L|filter": 0.00538,
+        "4L|5L|paddle": 0.04306,
+        "4L|5L|filter vs shaft": 0.01405,
+        "4L|4R|filter": 0.37919,
+        "4L|4R|paddle": 0.35281,
+        "4L|4R|filter vs shaft": 0.43505,
+        "4R|5R|filter": 0.00117,
+        "4R|5R|paddle": 0.04331,
+        "4R|5R|filter vs shaft": 0.00206,
+        "5L|6L|filter": 0.01897,
+        "5L|6L|paddle": 0.04494,
+        "5L|6L|filter vs shaft": 0.0104,
+        "5L|5R|filter": 0.36768,
+        "5L|5R|paddle": 0.34934,
+        "5L|5R|filter vs shaft": 0.42357,
+        "5R|6R|filter": 0.00146,
+        "5R|6R|paddle": 0.04224,
+        "5R|6R|filter vs shaft": 0.00452,
+        "6L|7L|filter": 0.03437,
+        "6L|7L|paddle": 0.02067,
+        "6L|7L|filter vs shaft": 0.04019,
+        "6L|6R|filter": 0.34799,
+        "6L|6R|paddle": 0.34562,
+        "6L|6R|filter vs shaft": 0.4,
+        "6R|7R|filter": 0.00111,
+        "6R|7R|paddle": 0.01604,
+        "6R|7R|filter vs shaft": 0.00659,
+        "7L|8L|filter": 0.01362,
+        "7L|8L|paddle": 0.01208,
+        "7L|8L|filter vs shaft": 0.00125,
+        "7L|7R|filter": 0.31995,
+        "7L|7R|paddle": 0.3418,
+        "7L|7R|filter vs shaft": 0.37145,
+        "7R|8R|filter": 0.00111,
+        "7R|8R|paddle": 0.01626,
+        "7R|8R|filter vs shaft": 0.00202,
+        "8L|8R|filter": 0.30946,
+        "8L|8R|paddle": 0.33757,
+        "8L|8R|filter vs shaft": 0.35819
+      },
+      "hardShaftTightest": [
+        {
+          "a": "4R",
+          "b": "5R",
+          "kind": "hard shaft capsule",
+          "gap": -0.00211
+        },
+        {
+          "a": "7R",
+          "b": "8R",
+          "kind": "hard shaft capsule",
+          "gap": 0.00717
+        },
+        {
+          "a": "5R",
+          "b": "6R",
+          "kind": "hard shaft capsule",
+          "gap": 0.00846
+        },
+        {
+          "a": "3R",
+          "b": "4R",
+          "kind": "hard shaft capsule",
+          "gap": 0.0179
+        }
+      ],
+      "filterTightest": [
+        {
+          "a": "6R",
+          "b": "7R",
+          "kind": "filter",
+          "gap": 0.00111
+        },
+        {
+          "a": "7R",
+          "b": "8R",
+          "kind": "filter",
+          "gap": 0.00111
+        },
+        {
+          "a": "4R",
+          "b": "5R",
+          "kind": "filter",
+          "gap": 0.00117
+        },
+        {
+          "a": "7L",
+          "b": "8L",
+          "kind": "filter vs shaft",
+          "gap": 0.00125
+        }
+      ],
+      "deltaVsRest": {
+        "worstDelta": -0.01468,
+        "worstPair": "1L|2L|filter vs shaft",
+        "worstDeltaOutsideCupping": -0.00792,
+        "worstPairOutsideCupping": "6L|7L|paddle",
+        "midlineMinGap": 0.29243,
+        "midlinePair": "8L|8R|hard shaft capsule",
+        "scope": "delta is successive same-side pairs; midline is absolute"
+      }
+    },
+    {
+      "pose": "attack-050",
+      "method": "authored surface vertices skinned analytically",
+      "sampledPoints": 22320,
+      "foodCentre": null,
+      "hardShaftMinGap": -0.02513,
+      "hardShaftWorst": {
+        "a": "4R",
+        "b": "5R",
+        "kind": "hard shaft capsule",
+        "gap": -0.02513
+      },
+      "filterMinGap": 0.00184,
+      "filterWorst": {
+        "a": "2R",
+        "b": "3R",
+        "kind": "filter vs shaft",
+        "gap": 0.00184
+      },
+      "shellMarginMinGap": 0.22052,
+      "shellEnclosedMinGap": null,
+      "shellWorstPoint": [
+        0.4558,
+        0.4234,
+        2.0363
+      ],
+      "headMinGap": 0.00577,
+      "headWorstPoint": [
+        -0.1631,
+        0.1074,
+        1.4265
+      ],
+      "pairGaps": {
+        "1L|2L|hard shaft capsule": -0.01035,
+        "1L|1R|hard shaft capsule": 0.00254,
+        "1R|2R|hard shaft capsule": 0.00473,
+        "2L|3L|hard shaft capsule": 0.04617,
+        "2L|2R|hard shaft capsule": 0.03149,
+        "2R|3R|hard shaft capsule": -0.02308,
+        "3L|4L|hard shaft capsule": 0.04738,
+        "3L|3R|hard shaft capsule": 0.03553,
+        "3R|4R|hard shaft capsule": -0.01063,
+        "4L|5L|hard shaft capsule": 0.04799,
+        "4L|4R|hard shaft capsule": 0.00937,
+        "4R|5R|hard shaft capsule": -0.02513,
+        "5L|6L|hard shaft capsule": 0.04004,
+        "5L|5R|hard shaft capsule": -0.02165,
+        "5R|6R|hard shaft capsule": -0.02371,
+        "6L|7L|hard shaft capsule": 0.04914,
+        "6L|6R|hard shaft capsule": -0.00378,
+        "6R|7R|hard shaft capsule": 0.04914,
+        "7L|8L|hard shaft capsule": -0.00271,
+        "7L|7R|hard shaft capsule": 0.2546,
+        "7R|8R|hard shaft capsule": 0.01506,
+        "8L|8R|hard shaft capsule": 0.29243,
+        "1L|2L|filter": 0.00693,
+        "1L|2L|paddle": 0.0257,
+        "1L|2L|filter vs shaft": 0.00915,
+        "1L|1R|filter": 0.00545,
+        "1L|1R|paddle": 0.36187,
+        "1L|1R|filter vs shaft": 0.00944,
+        "1R|2R|filter": 0.00513,
+        "1R|2R|paddle": 0.02998,
+        "1R|2R|filter vs shaft": 0.02706,
+        "2L|3L|filter": 0.01347,
+        "2L|3L|paddle": 0.02915,
+        "2L|3L|filter vs shaft": 0.06403,
+        "2L|2R|filter": 0.01106,
+        "2L|2R|paddle": 0.35873,
+        "2L|2R|filter vs shaft": 0.0059,
+        "2R|3R|filter": 0.00956,
+        "2R|3R|paddle": 0.03463,
+        "2R|3R|filter vs shaft": 0.00184,
+        "3L|4L|filter": 0.02336,
+        "3L|4L|paddle": 0.03796,
+        "3L|4L|filter vs shaft": 0.08939,
+        "3L|3R|filter": 0.01641,
+        "3L|3R|paddle": 0.35558,
+        "3L|3R|filter vs shaft": 0.01142,
+        "3R|4R|filter": 0.00421,
+        "3R|4R|paddle": 0.03633,
+        "3R|4R|filter vs shaft": 0.00267,
+        "4L|5L|filter": 0.00848,
+        "4L|5L|paddle": 0.04339,
+        "4L|5L|filter vs shaft": 0.07854,
+        "4L|4R|filter": 0.00604,
+        "4L|4R|paddle": 0.35242,
+        "4L|4R|filter vs shaft": 0.00417,
+        "4R|5R|filter": 0.00253,
+        "4R|5R|paddle": 0.0366,
+        "4R|5R|filter vs shaft": 0.00469,
+        "5L|6L|filter": 0.00375,
+        "5L|6L|paddle": 0.04922,
+        "5L|6L|filter vs shaft": 0.06107,
+        "5L|5R|filter": 0.00931,
+        "5L|5R|paddle": 0.34913,
+        "5L|5R|filter vs shaft": 0.00373,
+        "5R|6R|filter": 0.00752,
+        "5R|6R|paddle": 0.04197,
+        "5R|6R|filter vs shaft": 0.00593,
+        "6L|7L|filter": 0.05737,
+        "6L|7L|paddle": 0.03265,
+        "6L|7L|filter vs shaft": 0.10735,
+        "6L|6R|filter": 0.00651,
+        "6L|6R|paddle": 0.34557,
+        "6L|6R|filter vs shaft": 0.00585,
+        "6R|7R|filter": 0.04437,
+        "6R|7R|paddle": 0.0357,
+        "6R|7R|filter vs shaft": 0.08754,
+        "7L|8L|filter": 0.00624,
+        "7L|8L|paddle": 0.02572,
+        "7L|8L|filter vs shaft": 0.01329,
+        "7L|7R|filter": 0.1303,
+        "7L|7R|paddle": 0.3422,
+        "7L|7R|filter vs shaft": 0.20201,
+        "7R|8R|filter": 0.00407,
+        "7R|8R|paddle": 0.01329,
+        "7R|8R|filter vs shaft": 0.02883,
+        "8L|8R|filter": 0.24863,
+        "8L|8R|paddle": 0.33807,
+        "8L|8R|filter vs shaft": 0.31821
+      },
+      "hardShaftTightest": [
+        {
+          "a": "4R",
+          "b": "5R",
+          "kind": "hard shaft capsule",
+          "gap": -0.02513
+        },
+        {
+          "a": "5R",
+          "b": "6R",
+          "kind": "hard shaft capsule",
+          "gap": -0.02371
+        },
+        {
+          "a": "2R",
+          "b": "3R",
+          "kind": "hard shaft capsule",
+          "gap": -0.02308
+        },
+        {
+          "a": "5L",
+          "b": "5R",
+          "kind": "hard shaft capsule",
+          "gap": -0.02165
+        }
+      ],
+      "filterTightest": [
+        {
+          "a": "2R",
+          "b": "3R",
+          "kind": "filter vs shaft",
+          "gap": 0.00184
+        },
+        {
+          "a": "4R",
+          "b": "5R",
+          "kind": "filter",
+          "gap": 0.00253
+        },
+        {
+          "a": "3R",
+          "b": "4R",
+          "kind": "filter vs shaft",
+          "gap": 0.00267
+        },
+        {
+          "a": "5L",
+          "b": "5R",
+          "kind": "filter vs shaft",
+          "gap": 0.00373
+        }
+      ],
+      "deltaVsRest": {
+        "worstDelta": -0.01774,
+        "worstPair": "1L|2L|hard shaft capsule",
+        "worstDeltaOutsideCupping": -0.01219,
+        "worstPairOutsideCupping": "4R|5R|hard shaft capsule",
+        "midlineMinGap": -0.02165,
+        "midlinePair": "5L|5R|hard shaft capsule",
+        "scope": "delta is successive same-side pairs; midline is absolute"
+      }
+    },
+    {
+      "pose": "attack-083",
+      "method": "authored surface vertices skinned analytically",
+      "sampledPoints": 22320,
+      "foodCentre": null,
+      "hardShaftMinGap": -0.02674,
+      "hardShaftWorst": {
+        "a": "5L",
+        "b": "5R",
+        "kind": "hard shaft capsule",
+        "gap": -0.02674
+      },
+      "filterMinGap": 0.00043,
+      "filterWorst": {
+        "a": "8L",
+        "b": "8R",
+        "kind": "filter vs shaft",
+        "gap": 0.00043
+      },
+      "shellMarginMinGap": 0.27912,
+      "shellEnclosedMinGap": 0.46969,
+      "shellWorstPoint": [
+        -0.4416,
+        0.5016,
+        0.2379
+      ],
+      "headMinGap": 0.01646,
+      "headWorstPoint": [
+        0.1715,
+        0.1103,
+        1.4135
+      ],
+      "pairGaps": {
+        "1L|2L|hard shaft capsule": 0.04603,
+        "1L|1R|hard shaft capsule": 0.20938,
+        "1R|2R|hard shaft capsule": 0.04626,
+        "2L|3L|hard shaft capsule": 0.04647,
+        "2L|2R|hard shaft capsule": 0.08822,
+        "2R|3R|hard shaft capsule": 0.04684,
+        "3L|4L|hard shaft capsule": 0.04703,
+        "3L|3R|hard shaft capsule": -0.01203,
+        "3R|4R|hard shaft capsule": 0.04723,
+        "4L|5L|hard shaft capsule": 0.04783,
+        "4L|4R|hard shaft capsule": 0.00386,
+        "4R|5R|hard shaft capsule": 0.04739,
+        "5L|6L|hard shaft capsule": 0.04852,
+        "5L|5R|hard shaft capsule": -0.02674,
+        "5R|6R|hard shaft capsule": 0.04787,
+        "6L|7L|hard shaft capsule": 0.04914,
+        "6L|6R|hard shaft capsule": -0.02113,
+        "6R|7R|hard shaft capsule": 0.04748,
+        "7L|8L|hard shaft capsule": -0.00828,
+        "7L|7R|hard shaft capsule": 0.00622,
+        "7R|8R|hard shaft capsule": 0.02439,
+        "8L|8R|hard shaft capsule": -0.01879,
+        "1L|2L|filter": 0.01301,
+        "1L|2L|paddle": 0.02638,
+        "1L|2L|filter vs shaft": 0.02326,
+        "1L|1R|filter": 0.09758,
+        "1L|1R|paddle": 0.36319,
+        "1L|1R|filter vs shaft": 0.17215,
+        "1R|2R|filter": 0.01307,
+        "1R|2R|paddle": 0.04154,
+        "1R|2R|filter vs shaft": 0.00811,
+        "2L|3L|filter": 0.01443,
+        "2L|3L|paddle": 0.03097,
+        "2L|3L|filter vs shaft": 0.02065,
+        "2L|2R|filter": 0.00696,
+        "2L|2R|paddle": 0.35969,
+        "2L|2R|filter vs shaft": 0.05765,
+        "2R|3R|filter": 0.01958,
+        "2R|3R|paddle": 0.04551,
+        "2R|3R|filter vs shaft": 0.00607,
+        "3L|4L|filter": 0.01588,
+        "3L|4L|paddle": 0.03501,
+        "3L|4L|filter vs shaft": 0.02065,
+        "3L|3R|filter": 0.00634,
+        "3L|3R|paddle": 0.35619,
+        "3L|3R|filter vs shaft": 0.00667,
+        "3R|4R|filter": 0.02469,
+        "3R|4R|paddle": 0.04323,
+        "3R|4R|filter vs shaft": 0.01022,
+        "4L|5L|filter": 0.0175,
+        "4L|5L|paddle": 0.03704,
+        "4L|5L|filter vs shaft": 0.02561,
+        "4L|4R|filter": 0.00176,
+        "4L|4R|paddle": 0.35261,
+        "4L|4R|filter vs shaft": 0.00702,
+        "4R|5R|filter": 0.02442,
+        "4R|5R|paddle": 0.03424,
+        "4R|5R|filter vs shaft": 0.02799,
+        "5L|6L|filter": 0.0243,
+        "5L|6L|paddle": 0.03931,
+        "5L|6L|filter vs shaft": 0.01273,
+        "5L|5R|filter": 0.0079,
+        "5L|5R|paddle": 0.34902,
+        "5L|5R|filter vs shaft": 0.00341,
+        "5R|6R|filter": 0.02234,
+        "5R|6R|paddle": 0.033,
+        "5R|6R|filter vs shaft": 0.00953,
+        "6L|7L|filter": 0.0217,
+        "6L|7L|paddle": 0.02946,
+        "6L|7L|filter vs shaft": 0.0779,
+        "6L|6R|filter": 0.00745,
+        "6L|6R|paddle": 0.34548,
+        "6L|6R|filter vs shaft": 0.00369,
+        "6R|7R|filter": 0.02145,
+        "6R|7R|paddle": 0.00865,
+        "6R|7R|filter vs shaft": 0.06717,
+        "7L|8L|filter": 0.00234,
+        "7L|8L|paddle": 0.02246,
+        "7L|8L|filter vs shaft": 0.00598,
+        "7L|7R|filter": 0.00393,
+        "7L|7R|paddle": 0.34194,
+        "7L|7R|filter vs shaft": 0.0051,
+        "7R|8R|filter": 0.00729,
+        "7R|8R|paddle": 0.00939,
+        "7R|8R|filter vs shaft": 0.00363,
+        "8L|8R|filter": 0.00154,
+        "8L|8R|paddle": 0.33823,
+        "8L|8R|filter vs shaft": 0.00043
+      },
+      "hardShaftTightest": [
+        {
+          "a": "5L",
+          "b": "5R",
+          "kind": "hard shaft capsule",
+          "gap": -0.02674
+        },
+        {
+          "a": "6L",
+          "b": "6R",
+          "kind": "hard shaft capsule",
+          "gap": -0.02113
+        },
+        {
+          "a": "8L",
+          "b": "8R",
+          "kind": "hard shaft capsule",
+          "gap": -0.01879
+        },
+        {
+          "a": "3L",
+          "b": "3R",
+          "kind": "hard shaft capsule",
+          "gap": -0.01203
+        }
+      ],
+      "filterTightest": [
+        {
+          "a": "8L",
+          "b": "8R",
+          "kind": "filter vs shaft",
+          "gap": 0.00043
+        },
+        {
+          "a": "8L",
+          "b": "8R",
+          "kind": "filter",
+          "gap": 0.00154
+        },
+        {
+          "a": "4L",
+          "b": "4R",
+          "kind": "filter",
+          "gap": 0.00176
+        },
+        {
+          "a": "7L",
+          "b": "8L",
+          "kind": "filter",
+          "gap": 0.00234
+        }
+      ],
+      "deltaVsRest": {
+        "worstDelta": -0.00707,
+        "worstPair": "6R|7R|paddle",
+        "worstDeltaOutsideCupping": -0.00707,
+        "worstPairOutsideCupping": "6R|7R|paddle",
+        "midlineMinGap": -0.02674,
+        "midlinePair": "5L|5R|hard shaft capsule",
+        "scope": "delta is successive same-side pairs; midline is absolute"
+      }
+    },
+    {
+      "pose": "eat-022",
+      "method": "authored surface vertices skinned analytically",
+      "sampledPoints": 22320,
+      "foodCentre": [
+        0.0,
+        1.055,
+        1.988
+      ],
+      "hardShaftMinGap": -0.02895,
+      "hardShaftWorst": {
+        "a": "2L",
+        "b": "3L",
+        "kind": "hard shaft capsule",
+        "gap": -0.02895
+      },
+      "filterMinGap": 0.00145,
+      "filterWorst": {
+        "a": "2R",
+        "b": "3R",
+        "kind": "filter vs shaft",
+        "gap": 0.00145
+      },
+      "shellMarginMinGap": 0.30346,
+      "shellEnclosedMinGap": 0.47879,
+      "shellWorstPoint": [
+        0.4364,
+        0.5108,
+        0.4906
+      ],
+      "headMinGap": 0.0137,
+      "headWorstPoint": [
+        -0.1711,
+        0.1076,
+        1.4167
+      ],
+      "pairGaps": {
+        "1L|2L|hard shaft capsule": -0.01224,
+        "1L|1R|hard shaft capsule": 0.09368,
+        "1R|2R|hard shaft capsule": -0.01123,
+        "2L|3L|hard shaft capsule": -0.02895,
+        "2L|2R|hard shaft capsule": 0.12774,
+        "2R|3R|hard shaft capsule": -0.01982,
+        "3L|4L|hard shaft capsule": 0.04741,
+        "3L|3R|hard shaft capsule": 0.15428,
+        "3R|4R|hard shaft capsule": 0.04727,
+        "4L|5L|hard shaft capsule": -0.02692,
+        "4L|4R|hard shaft capsule": 0.3051,
+        "4R|5R|hard shaft capsule": 0.00258,
+        "5L|6L|hard shaft capsule": -0.01879,
+        "5L|5R|hard shaft capsule": 0.30221,
+        "5R|6R|hard shaft capsule": -0.02756,
+        "6L|7L|hard shaft capsule": 0.04914,
+        "6L|6R|hard shaft capsule": 0.29916,
+        "6R|7R|hard shaft capsule": 0.04914,
+        "7L|8L|hard shaft capsule": 0.02557,
+        "7L|7R|hard shaft capsule": 0.29591,
+        "7R|8R|hard shaft capsule": -0.01465,
+        "8L|8R|hard shaft capsule": 0.29243,
+        "1L|2L|filter": 0.00367,
+        "1L|2L|paddle": 0.02251,
+        "1L|2L|filter vs shaft": 0.00514,
+        "1L|1R|filter": 0.0101,
+        "1L|1R|paddle": 0.36295,
+        "1L|1R|filter vs shaft": 0.03701,
+        "1R|2R|filter": 0.00312,
+        "1R|2R|paddle": 0.02762,
+        "1R|2R|filter vs shaft": 0.00544,
+        "2L|3L|filter": 0.00769,
+        "2L|3L|paddle": 0.03133,
+        "2L|3L|filter vs shaft": 0.00365,
+        "2L|2R|filter": 0.00487,
+        "2L|2R|paddle": 0.35995,
+        "2L|2R|filter vs shaft": 0.06632,
+        "2R|3R|filter": 0.00633,
+        "2R|3R|paddle": 0.03708,
+        "2R|3R|filter vs shaft": 0.00145,
+        "3L|4L|filter": 0.06861,
+        "3L|4L|paddle": 0.04445,
+        "3L|4L|filter vs shaft": 0.12152,
+        "3L|3R|filter": 0.01714,
+        "3L|3R|paddle": 0.35685,
+        "3L|3R|filter vs shaft": 0.09623,
+        "3R|4R|filter": 0.07028,
+        "3R|4R|paddle": 0.04258,
+        "3R|4R|filter vs shaft": 0.11686,
+        "4L|5L|filter": 0.0109,
+        "4L|5L|paddle": 0.04541,
+        "4L|5L|filter vs shaft": 0.0069,
+        "4L|4R|filter": 0.35794,
+        "4L|4R|paddle": 0.35354,
+        "4L|4R|filter vs shaft": 0.41615,
+        "4R|5R|filter": 0.01166,
+        "4R|5R|paddle": 0.04369,
+        "4R|5R|filter vs shaft": 0.01983,
+        "5L|6L|filter": 0.00663,
+        "5L|6L|paddle": 0.04816,
+        "5L|6L|filter vs shaft": 0.00256,
+        "5L|5R|filter": 0.36256,
+        "5L|5R|paddle": 0.34998,
+        "5L|5R|filter vs shaft": 0.41715,
+        "5R|6R|filter": 0.0053,
+        "5R|6R|paddle": 0.04387,
+        "5R|6R|filter vs shaft": 0.00721,
+        "6L|7L|filter": 0.04951,
+        "6L|7L|paddle": 0.02679,
+        "6L|7L|filter vs shaft": 0.08633,
+        "6L|6R|filter": 0.35807,
+        "6L|6R|paddle": 0.34614,
+        "6L|6R|filter vs shaft": 0.40469,
+        "6R|7R|filter": 0.04465,
+        "6R|7R|paddle": 0.02236,
+        "6R|7R|filter vs shaft": 0.05113,
+        "7L|8L|filter": 0.00668,
+        "7L|8L|paddle": 0.01468,
+        "7L|8L|filter vs shaft": 0.00437,
+        "7L|7R|filter": 0.30955,
+        "7L|7R|paddle": 0.34204,
+        "7L|7R|filter vs shaft": 0.36402,
+        "7R|8R|filter": 0.00218,
+        "7R|8R|paddle": 0.01802,
+        "7R|8R|filter vs shaft": 0.00269,
+        "8L|8R|filter": 0.30605,
+        "8L|8R|paddle": 0.33774,
+        "8L|8R|filter vs shaft": 0.35564
+      },
+      "hardShaftTightest": [
+        {
+          "a": "2L",
+          "b": "3L",
+          "kind": "hard shaft capsule",
+          "gap": -0.02895
+        },
+        {
+          "a": "5R",
+          "b": "6R",
+          "kind": "hard shaft capsule",
+          "gap": -0.02756
+        },
+        {
+          "a": "4L",
+          "b": "5L",
+          "kind": "hard shaft capsule",
+          "gap": -0.02692
+        },
+        {
+          "a": "2R",
+          "b": "3R",
+          "kind": "hard shaft capsule",
+          "gap": -0.01982
+        }
+      ],
+      "filterTightest": [
+        {
+          "a": "2R",
+          "b": "3R",
+          "kind": "filter vs shaft",
+          "gap": 0.00145
+        },
+        {
+          "a": "7R",
+          "b": "8R",
+          "kind": "filter",
+          "gap": 0.00218
+        },
+        {
+          "a": "5L",
+          "b": "6L",
+          "kind": "filter vs shaft",
+          "gap": 0.00256
+        },
+        {
+          "a": "7R",
+          "b": "8R",
+          "kind": "filter vs shaft",
+          "gap": 0.00269
+        }
+      ],
+      "foodProxyGap": {
+        "1L": -0.01895,
+        "1R": -0.01322,
+        "2L": -0.02097,
+        "2R": -0.01877,
+        "3L": 0.01002,
+        "3R": 0.00919,
+        "4L": 0.57198,
+        "4R": 0.54275,
+        "5L": 0.74727,
+        "5R": 0.75917,
+        "6L": 0.92546,
+        "6R": 0.9401,
+        "7L": 1.09318,
+        "7R": 1.0748,
+        "8L": 1.2062,
+        "8R": 1.15252
+      },
+      "foodProxyCupping": -0.02097,
+      "foodProxyLane": 0.54275,
+      "foodProxyShellMargin": 0.94153,
+      "foodProxyHead": 0.75309,
+      "deltaVsRest": {
+        "worstDelta": -0.01963,
+        "worstPair": "1L|2L|hard shaft capsule",
+        "worstDeltaOutsideCupping": -0.01532,
+        "worstPairOutsideCupping": "5R|6R|hard shaft capsule",
+        "midlineMinGap": 0.00487,
+        "midlinePair": "2L|2R|filter",
+        "scope": "delta is successive same-side pairs; midline is absolute"
+      }
+    },
+    {
+      "pose": "eat-052",
+      "method": "authored surface vertices skinned analytically",
+      "sampledPoints": 22320,
+      "foodCentre": [
+        0.0,
+        0.7,
+        1.92
+      ],
+      "hardShaftMinGap": -0.0287,
+      "hardShaftWorst": {
+        "a": "1L",
+        "b": "2L",
+        "kind": "hard shaft capsule",
+        "gap": -0.0287
+      },
+      "filterMinGap": 0.00048,
+      "filterWorst": {
+        "a": "5L",
+        "b": "6L",
+        "kind": "filter",
+        "gap": 0.00048
+      },
+      "shellMarginMinGap": 0.26268,
+      "shellEnclosedMinGap": 0.47248,
+      "shellWorstPoint": [
+        0.4597,
+        0.4975,
+        0.2599
+      ],
+      "headMinGap": 0.0145,
+      "headWorstPoint": [
+        -0.171,
+        0.1069,
+        1.4146
+      ],
+      "pairGaps": {
+        "1L|2L|hard shaft capsule": -0.0287,
+        "1L|1R|hard shaft capsule": 0.08849,
+        "1R|2R|hard shaft capsule": -0.01504,
+        "2L|3L|hard shaft capsule": -0.02113,
+        "2L|2R|hard shaft capsule": 0.11296,
+        "2R|3R|hard shaft capsule": -0.01098,
+        "3L|4L|hard shaft capsule": 0.04609,
+        "3L|3R|hard shaft capsule": 0.13947,
+        "3R|4R|hard shaft capsule": 0.04672,
+        "4L|5L|hard shaft capsule": -0.02111,
+        "4L|4R|hard shaft capsule": 0.3051,
+        "4R|5R|hard shaft capsule": 0.03486,
+        "5L|6L|hard shaft capsule": -0.02293,
+        "5L|5R|hard shaft capsule": 0.30221,
+        "5R|6R|hard shaft capsule": 0.01201,
+        "6L|7L|hard shaft capsule": 0.04914,
+        "6L|6R|hard shaft capsule": 0.29916,
+        "6R|7R|hard shaft capsule": 0.04914,
+        "7L|8L|hard shaft capsule": -0.02142,
+        "7L|7R|hard shaft capsule": 0.29591,
+        "7R|8R|hard shaft capsule": 0.00797,
+        "8L|8R|hard shaft capsule": 0.29243,
+        "1L|2L|filter": 0.0025,
+        "1L|2L|paddle": 0.01065,
+        "1L|2L|filter vs shaft": 0.00248,
+        "1L|1R|filter": 0.00724,
+        "1L|1R|paddle": 0.36247,
+        "1L|1R|filter vs shaft": 0.02696,
+        "1R|2R|filter": 0.00904,
+        "1R|2R|paddle": 0.03348,
+        "1R|2R|filter vs shaft": 0.00408,
+        "2L|3L|filter": 0.01017,
+        "2L|3L|paddle": 0.02561,
+        "2L|3L|filter vs shaft": 0.00256,
+        "2L|2R|filter": 0.00051,
+        "2L|2R|paddle": 0.35928,
+        "2L|2R|filter vs shaft": 0.04494,
+        "2R|3R|filter": 0.00593,
+        "2R|3R|paddle": 0.0368,
+        "2R|3R|filter vs shaft": 0.00907,
+        "3L|4L|filter": 0.06368,
+        "3L|4L|paddle": 0.03466,
+        "3L|4L|filter vs shaft": 0.11305,
+        "3L|3R|filter": 0.00399,
+        "3L|3R|paddle": 0.3561,
+        "3L|3R|filter vs shaft": 0.062,
+        "3R|4R|filter": 0.08117,
+        "3R|4R|paddle": 0.03665,
+        "3R|4R|filter vs shaft": 0.12492,
+        "4L|5L|filter": 0.00267,
+        "4L|5L|paddle": 0.04146,
+        "4L|5L|filter vs shaft": 0.00728,
+        "4L|4R|filter": 0.40374,
+        "4L|4R|paddle": 0.35296,
+        "4L|4R|filter vs shaft": 0.44727,
+        "4R|5R|filter": 0.00066,
+        "4R|5R|paddle": 0.03571,
+        "4R|5R|filter vs shaft": 0.00692,
+        "5L|6L|filter": 0.00048,
+        "5L|6L|paddle": 0.04673,
+        "5L|6L|filter vs shaft": 0.00652,
+        "5L|5R|filter": 0.39128,
+        "5L|5R|paddle": 0.34977,
+        "5L|5R|filter vs shaft": 0.43728,
+        "5R|6R|filter": 0.01103,
+        "5R|6R|paddle": 0.03955,
+        "5R|6R|filter vs shaft": 0.0068,
+        "6L|7L|filter": 0.08469,
+        "6L|7L|paddle": 0.03507,
+        "6L|7L|filter vs shaft": 0.10683,
+        "6L|6R|filter": 0.37872,
+        "6L|6R|paddle": 0.34642,
+        "6L|6R|filter vs shaft": 0.41791,
+        "6R|7R|filter": 0.07168,
+        "6R|7R|paddle": 0.01997,
+        "6R|7R|filter vs shaft": 0.09283,
+        "7L|8L|filter": 0.01166,
+        "7L|8L|paddle": 0.02515,
+        "7L|8L|filter vs shaft": 0.00454,
+        "7L|7R|filter": 0.25179,
+        "7L|7R|paddle": 0.34265,
+        "7L|7R|filter vs shaft": 0.3235,
+        "7R|8R|filter": 0.00646,
+        "7R|8R|paddle": 0.01302,
+        "7R|8R|filter vs shaft": 0.02445,
+        "8L|8R|filter": 0.29977,
+        "8L|8R|paddle": 0.33859,
+        "8L|8R|filter vs shaft": 0.35194
+      },
+      "hardShaftTightest": [
+        {
+          "a": "1L",
+          "b": "2L",
+          "kind": "hard shaft capsule",
+          "gap": -0.0287
+        },
+        {
+          "a": "5L",
+          "b": "6L",
+          "kind": "hard shaft capsule",
+          "gap": -0.02293
+        },
+        {
+          "a": "7L",
+          "b": "8L",
+          "kind": "hard shaft capsule",
+          "gap": -0.02142
+        },
+        {
+          "a": "2L",
+          "b": "3L",
+          "kind": "hard shaft capsule",
+          "gap": -0.02113
+        }
+      ],
+      "filterTightest": [
+        {
+          "a": "5L",
+          "b": "6L",
+          "kind": "filter",
+          "gap": 0.00048
+        },
+        {
+          "a": "2L",
+          "b": "2R",
+          "kind": "filter",
+          "gap": 0.00051
+        },
+        {
+          "a": "4R",
+          "b": "5R",
+          "kind": "filter",
+          "gap": 0.00066
+        },
+        {
+          "a": "1L",
+          "b": "2L",
+          "kind": "filter vs shaft",
+          "gap": 0.00248
+        }
+      ],
+      "foodProxyGap": {
+        "1L": -0.01895,
+        "1R": -0.01349,
+        "2L": -0.02172,
+        "2R": -0.01964,
+        "3L": 0.01082,
+        "3R": 0.00864,
+        "4L": 0.57163,
+        "4R": 0.65168,
+        "5L": 0.67389,
+        "5R": 0.72351,
+        "6L": 0.79844,
+        "6R": 0.82476,
+        "7L": 0.99839,
+        "7R": 0.95386,
+        "8L": 1.12927,
+        "8R": 1.02039
+      },
+      "foodProxyCupping": -0.02172,
+      "foodProxyLane": 0.57163,
+      "foodProxyShellMargin": 0.65296,
+      "foodProxyHead": 0.39554,
+      "deltaVsRest": {
+        "worstDelta": -0.03609,
+        "worstPair": "1L|2L|hard shaft capsule",
+        "worstDeltaOutsideCupping": -0.00978,
+        "worstPairOutsideCupping": "5L|6L|hard shaft capsule",
+        "midlineMinGap": 0.00051,
+        "midlinePair": "2L|2R|filter",
+        "scope": "delta is successive same-side pairs; midline is absolute"
+      }
+    },
+    {
+      "pose": "eat-088",
+      "method": "authored surface vertices skinned analytically",
+      "sampledPoints": 22320,
+      "foodCentre": [
+        0.0,
+        0.36,
+        1.69
+      ],
+      "hardShaftMinGap": -0.03851,
+      "hardShaftWorst": {
+        "a": "2R",
+        "b": "3R",
+        "kind": "hard shaft capsule",
+        "gap": -0.03851
+      },
+      "filterMinGap": 0.00054,
+      "filterWorst": {
+        "a": "1R",
+        "b": "2R",
+        "kind": "filter vs shaft",
+        "gap": 0.00054
+      },
+      "shellMarginMinGap": 0.29608,
+      "shellEnclosedMinGap": 0.47001,
+      "shellWorstPoint": [
+        0.4605,
+        0.5174,
+        0.7472
+      ],
+      "headMinGap": 0.01345,
+      "headWorstPoint": [
+        -0.1688,
+        0.1041,
+        1.4132
+      ],
+      "pairGaps": {
+        "1L|2L|hard shaft capsule": -0.01296,
+        "1L|1R|hard shaft capsule": -0.03234,
+        "1R|2R|hard shaft capsule": -0.02361,
+        "2L|3L|hard shaft capsule": -0.02121,
+        "2L|2R|hard shaft capsule": -0.02086,
+        "2R|3R|hard shaft capsule": -0.03851,
+        "3L|4L|hard shaft capsule": 0.04741,
+        "3L|3R|hard shaft capsule": -0.02094,
+        "3R|4R|hard shaft capsule": 0.04741,
+        "4L|5L|hard shaft capsule": 0.04799,
+        "4L|4R|hard shaft capsule": 0.3051,
+        "4R|5R|hard shaft capsule": 0.03533,
+        "5L|6L|hard shaft capsule": 0.04831,
+        "5L|5R|hard shaft capsule": 0.30221,
+        "5R|6R|hard shaft capsule": 0.04084,
+        "6L|7L|hard shaft capsule": 0.04914,
+        "6L|6R|hard shaft capsule": 0.29916,
+        "6R|7R|hard shaft capsule": 0.04914,
+        "7L|8L|hard shaft capsule": -0.00584,
+        "7L|7R|hard shaft capsule": 0.24599,
+        "7R|8R|hard shaft capsule": 0.03162,
+        "8L|8R|hard shaft capsule": 0.20748,
+        "1L|2L|filter": 0.00243,
+        "1L|2L|paddle": 0.02744,
+        "1L|2L|filter vs shaft": 0.00393,
+        "1L|1R|filter": 0.00271,
+        "1L|1R|paddle": 0.36326,
+        "1L|1R|filter vs shaft": 0.0026,
+        "1R|2R|filter": 0.00378,
+        "1R|2R|paddle": 0.03839,
+        "1R|2R|filter vs shaft": 0.00054,
+        "2L|3L|filter": 0.00287,
+        "2L|3L|paddle": 0.03322,
+        "2L|3L|filter vs shaft": 0.00329,
+        "2L|2R|filter": 0.00179,
+        "2L|2R|paddle": 0.35983,
+        "2L|2R|filter vs shaft": 0.00464,
+        "2R|3R|filter": 0.00222,
+        "2R|3R|paddle": 0.0459,
+        "2R|3R|filter vs shaft": 0.00202,
+        "3L|4L|filter": 0.1211,
+        "3L|4L|paddle": 0.0367,
+        "3L|4L|filter vs shaft": 0.17196,
+        "3L|3R|filter": 0.0047,
+        "3L|3R|paddle": 0.35635,
+        "3L|3R|filter vs shaft": 0.0026,
+        "3R|4R|filter": 0.14365,
+        "3R|4R|paddle": 0.04439,
+        "3R|4R|filter vs shaft": 0.19008,
+        "4L|5L|filter": 0.01539,
+        "4L|5L|paddle": 0.03792,
+        "4L|5L|filter vs shaft": 0.00648,
+        "4L|4R|filter": 0.41573,
+        "4L|4R|paddle": 0.35275,
+        "4L|4R|filter vs shaft": 0.45465,
+        "4R|5R|filter": 0.0066,
+        "4R|5R|paddle": 0.03712,
+        "4R|5R|filter vs shaft": 0.006,
+        "5L|6L|filter": 0.00644,
+        "5L|6L|paddle": 0.03898,
+        "5L|6L|filter vs shaft": 0.00897,
+        "5L|5R|filter": 0.40232,
+        "5L|5R|paddle": 0.3491,
+        "5L|5R|filter vs shaft": 0.44162,
+        "5R|6R|filter": 0.00165,
+        "5R|6R|paddle": 0.03442,
+        "5R|6R|filter vs shaft": 0.00585,
+        "6L|7L|filter": 0.06454,
+        "6L|7L|paddle": 0.02671,
+        "6L|7L|filter vs shaft": 0.08732,
+        "6L|6R|filter": 0.3781,
+        "6L|6R|paddle": 0.34547,
+        "6L|6R|filter vs shaft": 0.41345,
+        "6R|7R|filter": 0.05707,
+        "6R|7R|paddle": 0.0069,
+        "6R|7R|filter vs shaft": 0.0786,
+        "7L|8L|filter": 0.00396,
+        "7L|8L|paddle": 0.02034,
+        "7L|8L|filter vs shaft": 0.00481,
+        "7L|7R|filter": 0.10507,
+        "7L|7R|paddle": 0.34184,
+        "7L|7R|filter vs shaft": 0.18215,
+        "7R|8R|filter": 0.00519,
+        "7R|8R|paddle": 0.00313,
+        "7R|8R|filter vs shaft": 0.00437,
+        "8L|8R|filter": 0.06768,
+        "8L|8R|paddle": 0.33806,
+        "8L|8R|filter vs shaft": 0.13732
+      },
+      "hardShaftTightest": [
+        {
+          "a": "2R",
+          "b": "3R",
+          "kind": "hard shaft capsule",
+          "gap": -0.03851
+        },
+        {
+          "a": "1L",
+          "b": "1R",
+          "kind": "hard shaft capsule",
+          "gap": -0.03234
+        },
+        {
+          "a": "1R",
+          "b": "2R",
+          "kind": "hard shaft capsule",
+          "gap": -0.02361
+        },
+        {
+          "a": "2L",
+          "b": "3L",
+          "kind": "hard shaft capsule",
+          "gap": -0.02121
+        }
+      ],
+      "filterTightest": [
+        {
+          "a": "1R",
+          "b": "2R",
+          "kind": "filter vs shaft",
+          "gap": 0.00054
+        },
+        {
+          "a": "5R",
+          "b": "6R",
+          "kind": "filter",
+          "gap": 0.00165
+        },
+        {
+          "a": "2L",
+          "b": "2R",
+          "kind": "filter",
+          "gap": 0.00179
+        },
+        {
+          "a": "2R",
+          "b": "3R",
+          "kind": "filter vs shaft",
+          "gap": 0.00202
+        }
+      ],
+      "foodProxyGap": {
+        "1L": -0.01895,
+        "1R": -0.01023,
+        "2L": -0.02649,
+        "2R": -0.02317,
+        "3L": -0.02051,
+        "3R": -0.00649,
+        "4L": 0.59337,
+        "4R": 0.59966,
+        "5L": 0.69713,
+        "5R": 0.71255,
+        "6L": 0.79216,
+        "6R": 0.82064,
+        "7L": 0.87745,
+        "7R": 0.89763,
+        "8L": 0.94172,
+        "8R": 0.91561
+      },
+      "foodProxyCupping": -0.02649,
+      "foodProxyLane": 0.59337,
+      "foodProxyShellMargin": 0.54359,
+      "foodProxyHead": 0.05447,
+      "deltaVsRest": {
+        "worstDelta": -0.0226,
+        "worstPair": "2R|3R|hard shaft capsule",
+        "worstDeltaOutsideCupping": -0.00882,
+        "worstPairOutsideCupping": "6R|7R|paddle",
+        "midlineMinGap": -0.03234,
+        "midlinePair": "1L|1R|hard shaft capsule",
+        "scope": "delta is successive same-side pairs; midline is absolute"
+      }
+    }
+  ],
+  "meshPoses": [
+    {
+      "pose": "rest",
+      "method": "Blender evaluated skinned vertices",
+      "vertices": 36784,
+      "neighbourMinGap": 0.00098,
+      "neighbourWorst": {
+        "a": "5L",
+        "b": "6L",
+        "kind": "filter",
+        "gap": 0.00098
+      },
+      "shellMarginMinGap": 0.33138,
+      "shellEnclosedMinGap": null,
+      "headMinGap": 0.01401,
+      "headWorstPoint": [
+        0.1717,
+        0.1104,
+        1.4186
+      ]
+    },
+    {
+      "pose": "attack-018",
+      "method": "Blender evaluated skinned vertices",
+      "vertices": 36784,
+      "neighbourMinGap": 0.00111,
+      "neighbourWorst": {
+        "a": "6R",
+        "b": "7R",
+        "kind": "filter",
+        "gap": 0.00111
+      },
+      "shellMarginMinGap": 0.30979,
+      "shellEnclosedMinGap": 0.47316,
+      "headMinGap": 0.01685,
+      "headWorstPoint": [
+        -0.1888,
+        0.1039,
+        1.4216
+      ]
+    },
+    {
+      "pose": "attack-050",
+      "method": "Blender evaluated skinned vertices",
+      "vertices": 36784,
+      "neighbourMinGap": 0.00134,
+      "neighbourWorst": {
+        "a": "4R",
+        "b": "5R",
+        "kind": "shaft",
+        "gap": 0.00134
+      },
+      "shellMarginMinGap": 0.2203,
+      "shellEnclosedMinGap": null,
+      "headMinGap": 0.00577,
+      "headWorstPoint": [
+        -0.1631,
+        0.1074,
+        1.4265
+      ]
+    },
+    {
+      "pose": "attack-083",
+      "method": "Blender evaluated skinned vertices",
+      "vertices": 36784,
+      "neighbourMinGap": 0.00119,
+      "neighbourWorst": {
+        "a": "7L",
+        "b": "8L",
+        "kind": "filter",
+        "gap": 0.00119
+      },
+      "shellMarginMinGap": 0.27896,
+      "shellEnclosedMinGap": 0.46969,
+      "headMinGap": 0.01646,
+      "headWorstPoint": [
+        0.1715,
+        0.1103,
+        1.4135
+      ]
+    },
+    {
+      "pose": "eat-022",
+      "method": "Blender evaluated skinned vertices",
+      "vertices": 36784,
+      "neighbourMinGap": 0.00122,
+      "neighbourWorst": {
+        "a": "2R",
+        "b": "3R",
+        "kind": "shaft",
+        "gap": 0.00122
+      },
+      "shellMarginMinGap": 0.30336,
+      "shellEnclosedMinGap": 0.47879,
+      "headMinGap": 0.0137,
+      "headWorstPoint": [
+        -0.1711,
+        0.1076,
+        1.4167
+      ],
+      "foodProxyMinGap": -0.02165
+    },
+    {
+      "pose": "eat-052",
+      "method": "Blender evaluated skinned vertices",
+      "vertices": 36784,
+      "neighbourMinGap": 0.00026,
+      "neighbourWorst": {
+        "a": "5L",
+        "b": "6L",
+        "kind": "filter",
+        "gap": 0.00026
+      },
+      "shellMarginMinGap": 0.26268,
+      "shellEnclosedMinGap": 0.47248,
+      "headMinGap": 0.0145,
+      "headWorstPoint": [
+        -0.171,
+        0.1069,
+        1.4146
+      ],
+      "foodProxyMinGap": -0.0222
+    },
+    {
+      "pose": "eat-088",
+      "method": "Blender evaluated skinned vertices",
+      "vertices": 36784,
+      "neighbourMinGap": 0.00103,
+      "neighbourWorst": {
+        "a": "5R",
+        "b": "6R",
+        "kind": "filter",
+        "gap": 0.00103
+      },
+      "shellMarginMinGap": 0.29608,
+      "shellEnclosedMinGap": 0.47001,
+      "headMinGap": 0.01345,
+      "headWorstPoint": [
+        -0.1688,
+        0.1041,
+        1.4132
+      ],
+      "foodProxyMinGap": -0.02934
+    }
+  ],
+  "images": [
+    "/home/user/expansion-authoring/odaraia-rework/rig-v3/stage1-rest-side.png",
+    "/home/user/expansion-authoring/odaraia-rework/rig-v3/stage1-rest-front.png",
+    "/home/user/expansion-authoring/odaraia-rework/rig-v3/stage1-rest-oblique.png",
+    "/home/user/expansion-authoring/odaraia-rework/rig-v3/stage1-attack-018-side.png",
+    "/home/user/expansion-authoring/odaraia-rework/rig-v3/stage1-attack-018-front.png",
+    "/home/user/expansion-authoring/odaraia-rework/rig-v3/stage1-attack-018-oblique.png",
+    "/home/user/expansion-authoring/odaraia-rework/rig-v3/stage1-attack-050-side.png",
+    "/home/user/expansion-authoring/odaraia-rework/rig-v3/stage1-attack-050-front.png",
+    "/home/user/expansion-authoring/odaraia-rework/rig-v3/stage1-attack-050-oblique.png",
+    "/home/user/expansion-authoring/odaraia-rework/rig-v3/stage1-attack-050-oblique-cutaway.png",
+    "/home/user/expansion-authoring/odaraia-rework/rig-v3/stage1-attack-083-side.png",
+    "/home/user/expansion-authoring/odaraia-rework/rig-v3/stage1-attack-083-front.png",
+    "/home/user/expansion-authoring/odaraia-rework/rig-v3/stage1-attack-083-oblique.png",
+    "/home/user/expansion-authoring/odaraia-rework/rig-v3/stage1-eat-022-side.png",
+    "/home/user/expansion-authoring/odaraia-rework/rig-v3/stage1-eat-022-front.png",
+    "/home/user/expansion-authoring/odaraia-rework/rig-v3/stage1-eat-022-oblique.png",
+    "/home/user/expansion-authoring/odaraia-rework/rig-v3/stage1-eat-052-side.png",
+    "/home/user/expansion-authoring/odaraia-rework/rig-v3/stage1-eat-052-front.png",
+    "/home/user/expansion-authoring/odaraia-rework/rig-v3/stage1-eat-052-oblique.png",
+    "/home/user/expansion-authoring/odaraia-rework/rig-v3/stage1-eat-052-oblique-cutaway.png",
+    "/home/user/expansion-authoring/odaraia-rework/rig-v3/stage1-eat-088-side.png",
+    "/home/user/expansion-authoring/odaraia-rework/rig-v3/stage1-eat-088-front.png",
+    "/home/user/expansion-authoring/odaraia-rework/rig-v3/stage1-eat-088-oblique.png"
+  ],
+  "tipDisplacementPerControl": {
+    "1L": {
+      "flex": [
+        0.4233,
+        -0.1309,
+        -0.0375
+      ],
+      "twist": [
+        0.1977,
+        0.0389,
+        -0.1207
+      ],
+      "swing": [
+        0.0402,
+        -0.3503,
+        0.2547
+      ]
+    },
+    "1R": {
+      "flex": [
+        -0.4651,
+        -0.1421,
+        -0.0413
+      ],
+      "twist": [
+        -0.2158,
+        0.042,
+        -0.125
+      ],
+      "swing": [
+        -0.0407,
+        -0.389,
+        0.2749
+      ]
+    },
+    "6L": {
+      "flex": [
+        0.355,
+        -0.109,
+        -0.0275
+      ],
+      "twist": [
+        0.1583,
+        0.0291,
+        -0.1089
+      ],
+      "swing": [
+        0.0364,
+        -0.2674,
+        0.2338
+      ]
+    }
+  },
+  "curlDirectionCheck": {
+    "intent": "positive flex must carry a tip toward the median filtering side",
+    "leftMovesMedially": true,
+    "rightMovesMedially": true,
+    "mirrored": true
+  },
+  "restBaseline": {
+    "hardShaftMinGap": -0.0179,
+    "hardShaftWorst": {
+      "a": "7R",
+      "b": "8R",
+      "kind": "hard shaft capsule",
+      "gap": -0.0179
+    },
+    "filterMinGap": 0.00098,
+    "filterWorst": {
+      "a": "5L",
+      "b": "6L",
+      "kind": "filter",
+      "gap": 0.00098
+    },
+    "shellMarginMinGap": 0.33138,
+    "headMinGap": 0.01401,
+    "note": "The accepted M02 geometry already has adjacent distal endopod shafts inside one another as capsules at rest (the filtering comb interdigitates). Every pose is therefore judged by how much worse than this rest baseline it is, per pair, and the only contacts allowed to close further are the Eat cupping pairs."
+  },
+  "eatSolverResidual": {
+    "0.22": {
+      "1L": 9e-06,
+      "1R": 7e-06,
+      "2L": 1e-05,
+      "2R": 5e-06,
+      "3L": 1e-05,
+      "3R": 8e-06
+    },
+    "0.52": {
+      "1L": 2e-06,
+      "1R": 4e-06,
+      "2L": 5e-06,
+      "2R": 3e-06,
+      "3L": 2e-06,
+      "3R": 2e-06
+    },
+    "0.88": {
+      "1L": 8e-06,
+      "1R": 9e-06,
+      "2L": 2e-06,
+      "2R": 4e-06,
+      "3L": 4e-06,
+      "3R": 7e-06
+    }
+  },
+  "oral": {
+    "contactCentre": [
+      0.0,
+      0.345,
+      1.69
+    ],
+    "measuredApertureDiameter": 0.04513,
+    "narrowestCorridorPoint": [
+      0.0,
+      0.345,
+      1.69
+    ],
+    "nearestMouthpartSurface": 0.02257,
+    "presentationCentre": [
+      0.0,
+      0.305,
+      1.69
+    ],
+    "insidePoint": [
+      0.0,
+      0.22499999403953552,
+      1.6549999713897705
+    ],
+    "insideHeadEllipsoidRatio": 0.8651,
+    "insideIsWithinHead": true,
+    "labrumPlateEndsAtZ": 1.8,
+    "descentZ": 1.69,
+    "descentIsBehindLabrum": true
+  },
+  "pickupOffsetStudy": {
+    "runtimeContactAcceptanceRadius": 0.01128,
+    "samples": [
+      {
+        "offset": 0.0,
+        "worstClearance": -0.00933,
+        "costVersusUnoffsetPose": 0.0,
+        "worstDirection": [
+          1.0,
+          0.0,
+          0.0
+        ],
+        "maxContactResidual": 1e-05,
+        "reaches": true,
+        "pass": true
+      },
+      {
+        "offset": 0.02,
+        "worstClearance": -0.00933,
+        "costVersusUnoffsetPose": 0.0,
+        "worstDirection": [
+          1.0,
+          0.0,
+          0.0
+        ],
+        "maxContactResidual": 1e-05,
+        "reaches": true,
+        "pass": true
+      },
+      {
+        "offset": 0.04,
+        "worstClearance": -0.00933,
+        "costVersusUnoffsetPose": 0.0,
+        "worstDirection": [
+          1.0,
+          0.0,
+          0.0
+        ],
+        "maxContactResidual": 1e-05,
+        "reaches": true,
+        "pass": true
+      },
+      {
+        "offset": 0.08,
+        "worstClearance": -0.00933,
+        "costVersusUnoffsetPose": 0.0,
+        "worstDirection": [
+          1.0,
+          0.0,
+          0.0
+        ],
+        "maxContactResidual": 1e-05,
+        "reaches": true,
+        "pass": true
+      },
+      {
+        "offset": 0.12,
+        "worstClearance": -0.00933,
+        "costVersusUnoffsetPose": 0.0,
+        "worstDirection": [
+          1.0,
+          0.0,
+          0.0
+        ],
+        "maxContactResidual": 1e-05,
+        "reaches": true,
+        "pass": true
+      },
+      {
+        "offset": 0.18,
+        "worstClearance": -0.00933,
+        "costVersusUnoffsetPose": 0.0,
+        "worstDirection": [
+          1.0,
+          0.0,
+          0.0
+        ],
+        "maxContactResidual": 3e-05,
+        "reaches": true,
+        "pass": true
+      },
+      {
+        "offset": 0.24,
+        "worstClearance": -0.00933,
+        "costVersusUnoffsetPose": 0.0,
+        "worstDirection": [
+          1.0,
+          0.0,
+          0.0
+        ],
+        "maxContactResidual": 0.00043,
+        "reaches": true,
+        "pass": true
+      },
+      {
+        "offset": 0.32,
+        "worstClearance": -0.00933,
+        "costVersusUnoffsetPose": 0.0,
+        "worstDirection": [
+          1.0,
+          0.0,
+          0.0
+        ],
+        "maxContactResidual": 0.01255,
+        "reaches": false,
+        "pass": false
+      },
+      {
+        "offset": 0.44,
+        "worstClearance": -0.00933,
+        "costVersusUnoffsetPose": 0.0,
+        "worstDirection": [
+          1.0,
+          0.0,
+          0.0
+        ],
+        "maxContactResidual": 0.1104,
+        "reaches": false,
+        "pass": false
+      }
+    ]
+  },
+  "runtimeSolverStudy": {
+    "solver": "unbounded CCD as src/render/anchors.ts implements it",
+    "samples": [
+      {
+        "offset": 0.0,
+        "worstClearance": -0.01532,
+        "maxContactResidual": 1e-05,
+        "pass": true
+      },
+      {
+        "offset": 0.04,
+        "worstClearance": -0.01618,
+        "maxContactResidual": 1e-05,
+        "pass": true
+      },
+      {
+        "offset": 0.08,
+        "worstClearance": -0.01706,
+        "maxContactResidual": 0.00014,
+        "pass": true
+      },
+      {
+        "offset": 0.12,
+        "worstClearance": -0.0164,
+        "maxContactResidual": 0.00141,
+        "pass": true
+      },
+      {
+        "offset": 0.18,
+        "worstClearance": -0.01508,
+        "maxContactResidual": 0.00852,
+        "pass": true
+      },
+      {
+        "offset": 0.24,
+        "worstClearance": -0.02347,
+        "maxContactResidual": 0.02416,
+        "pass": false
+      },
+      {
+        "offset": 0.32,
+        "worstClearance": -0.01798,
+        "maxContactResidual": 0.06505,
+        "pass": false
+      }
+    ]
+  },
+  "measuredPickupOffsetLimitBounded": 0.24,
+  "measuredPickupOffsetLimitRuntime": 0.18,
+  "measuredPickupOffsetLimit": 0.18
+}

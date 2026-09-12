@@ -1,0 +1,122 @@
+[
+  {
+    "id": "doryaspis",
+    "status": "pending",
+    "scope": "total-rework",
+    "model": true,
+    "reason": "User reference directs a complete Blender remodel of silhouette, surfaces, rig and motion."
+  },
+  {
+    "id": "eldredgeops",
+    "status": "pending",
+    "scope": "individual-refinement",
+    "model": false,
+    "clips": [
+      "Bite",
+      "Attack",
+      "Heavy",
+      "Eat",
+      "Ability",
+      "Guard"
+    ],
+    "clipReason": "Re-authored 8\u20139 September 2026 in the articulated attack and feeding pass (tools/creatures/motion): the real appendages, joint chains and mouth drive Bite, Attack, Heavy and Eat with preparation, reach and recovery. Revised 10 September so the strike drives the body rather than quieting it: the shipped clip\u2019s body motion is carried through and the appendage work rides on top. Awaiting review; the previous clip is kept as replaced/<name> in the viewer for comparison. Ability and Guard: at the rolled peak some antenna tips sit outside the enrolled shell; bringing them inside is a choreography change on those two clips (12 September), not a value tweak."
+  },
+  {
+    "id": "walliserops",
+    "status": "pending",
+    "scope": "individual-refinement",
+    "model": false,
+    "clips": [
+      "Bite",
+      "Attack",
+      "Heavy",
+      "Eat"
+    ],
+    "clipReason": "Re-authored 8\u20139 September 2026 in the articulated attack and feeding pass (tools/creatures/motion): the real appendages, joint chains and mouth drive Bite, Attack, Heavy and Eat with preparation, reach and recovery. A Grab loop for the hold was added. Revised 10 September so the strike drives the body rather than quieting it: the shipped clip\u2019s body motion is carried through and the appendage work rides on top. Awaiting review; the previous clip is kept as replaced/<name> in the viewer for comparison."
+  },
+  {
+    "id": "jaekelopterus",
+    "status": "pending",
+    "scope": "individual-refinement",
+    "model": false,
+    "clips": [
+      "Bite",
+      "Attack",
+      "Heavy",
+      "Eat"
+    ],
+    "clipReason": "Re-authored 8\u20139 September 2026 in the articulated attack and feeding pass (tools/creatures/motion): the real appendages, joint chains and mouth drive Bite, Attack, Heavy and Eat with preparation, reach and recovery. Revised 10 September so the strike drives the body rather than quieting it: the shipped clip\u2019s body motion is carried through and the appendage work rides on top. Awaiting review; the previous clip is kept as replaced/<name> in the viewer for comparison."
+  },
+  {
+    "id": "nahecaris",
+    "status": "pending",
+    "scope": "individual-refinement",
+    "model": false,
+    "clips": [
+      "Bite",
+      "Attack",
+      "Heavy",
+      "Eat"
+    ],
+    "clipReason": "Queued for the articulated attack and feeding pass: re-authored so the animal's real appendages, joint chains and mouth placement drive the motion \u2014 deliberate preparation, a directed reach, then recovery \u2014 instead of rigid whole-part rotations. Reviewed clip by clip."
+  },
+  {
+    "id": "furcaster",
+    "status": "pending",
+    "scope": "individual-refinement",
+    "model": false,
+    "clips": [
+      "Bite",
+      "Attack",
+      "Heavy",
+      "Eat"
+    ],
+    "clipReason": "Re-authored 8\u20139 September 2026 in the articulated attack and feeding pass (tools/creatures/motion): the real appendages, joint chains and mouth drive Bite, Attack, Heavy and Eat with preparation, reach and recovery. A Grab loop for the hold was added. Revised 10 September so the strike drives the body rather than quieting it: the shipped clip\u2019s body motion is carried through and the appendage work rides on top. Awaiting review; the previous clip is kept as replaced/<name> in the viewer for comparison."
+  },
+  {
+    "id": "palaeoisopus",
+    "status": "pending",
+    "scope": "individual-refinement",
+    "model": false,
+    "clips": [
+      "Bite",
+      "Attack",
+      "Heavy",
+      "Eat"
+    ],
+    "clipReason": "Re-authored 8\u20139 September 2026 in the articulated attack and feeding pass (tools/creatures/motion): the real appendages, joint chains and mouth drive Bite, Attack, Heavy and Eat with preparation, reach and recovery. Revised 10 September so the strike drives the body rather than quieting it: the shipped clip\u2019s body motion is carried through and the appendage work rides on top. Awaiting review; the previous clip is kept as replaced/<name> in the viewer for comparison."
+  },
+  {
+    "id": "manticoceras",
+    "status": "pending",
+    "scope": "individual-refinement",
+    "model": false,
+    "clips": [
+      "Bite",
+      "Attack",
+      "Heavy",
+      "Eat"
+    ],
+    "clipReason": "Re-authored 8\u20139 September 2026 in the articulated attack and feeding pass (tools/creatures/motion): the real appendages, joint chains and mouth drive Bite, Attack, Heavy and Eat with preparation, reach and recovery. Revised 10 September so the strike drives the body rather than quieting it: the shipped clip\u2019s body motion is carried through and the appendage work rides on top. Awaiting review; the previous clip is kept as replaced/<name> in the viewer for comparison."
+  },
+  {
+    "id": "michelinoceras",
+    "status": "pending",
+    "scope": "individual-refinement",
+    "model": false,
+    "clips": [
+      "Bite",
+      "Attack",
+      "Heavy",
+      "Eat"
+    ],
+    "clipReason": "Queued for the articulated attack and feeding pass: re-authored so the animal's real appendages, joint chains and mouth placement drive the motion \u2014 deliberate preparation, a directed reach, then recovery \u2014 instead of rigid whole-part rotations. Reviewed clip by clip."
+  },
+  {
+    "id": "coccosteus",
+    "status": "pending",
+    "scope": "total-rework",
+    "model": true,
+    "reason": "User reference: stronger armoured front and angular fish back. Current model preserved as named backup. Run eye/general audits after full rework."
+  }
+]

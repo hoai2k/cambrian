@@ -1,0 +1,57 @@
+{
+  "id": "onychodus",
+  "name": "Onychodus",
+  "species": "Onychodus jandemarrai",
+  "provenance": "Late Devonian (Frasnian), Gogo Formation, Western Australia",
+  "description": "Robust lobe-finned fish with paired crescent-shaped lower-jaw tusk platforms, interleaved marginal and palatal teeth, oval scales, lobed fins and a nearly symmetrical deep tail.",
+  "lengthMeters": 1.5,
+  "modelLength": 6.802347660064697,
+  "locomotion": "Swim",
+  "clips": [
+    "Idle",
+    "Swim",
+    "TurnLeft",
+    "TurnRight",
+    "Dive",
+    "Rise",
+    "Attack",
+    "Bite",
+    "Heavy",
+    "Hit",
+    "Death",
+    "Guard",
+    "Parry",
+    "Dodge",
+    "Eat",
+    "Stagger",
+    "Ability",
+    "Growth"
+  ],
+  "looping": [
+    "Idle",
+    "Swim",
+    "Guard",
+    "Eat"
+  ],
+  "anchors": [
+    "anchor_mouth",
+    "anchor_mouth_inside",
+    "anchor_attack_primary"
+  ],
+  "sources": [
+    {
+      "title": "Andrews et al. 2006, The structure of Onychodus jandemarrai, Gogo; anatomy and competing functional interpretations",
+      "url": "https://doi.org/10.1017/S0263593300001309"
+    },
+    {
+      "title": "Campbell and Barwick 2006, illustrated Onychodontiform oral anatomy",
+      "url": "https://ijdb.ehu.eus/article/pdf/052125kc"
+    }
+  ],
+  "notes": [
+    "Gogo O. jandemarrai reconstruction; 1.5 m represents the proportional estimate in the original paper from an isolated large tusk, not a measured whole individual.",
+    "Paired anterior tusk platforms are distinct from marginal and palatal teeth. Motion of the whorls during feeding is disputed within Andrews et al.; the slight modeled adjustment is an interpretation, not an established mechanical cycle.",
+    "Incomplete fin outlines are comparative; the caudal is nearly diphycercal without an extended coelacanth filament. Pectoral mobility is deliberately restrained.",
+    "Living pigment, soft tissue thickness and animations are interpreted. Original material swatch is imagegen; surface anatomy is authored in Blender."
+  ]
+}

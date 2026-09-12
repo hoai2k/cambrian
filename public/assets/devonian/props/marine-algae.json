@@ -1,0 +1,40 @@
+{
+  "id": "marine-algae",
+  "family": "P05",
+  "name": "Marine algal thalli",
+  "taxon": "Yeaia/Hungerfordia-type comparative thalli",
+  "category": "plant",
+  "description": "Flattened dichotomous strap and rounded terminal thallus forms informed by marine algal remains. Attachment, three-dimensional posture and pigmentation remain inferred.",
+  "provenance": "Late Devonian Waterloo Farm, South Africa comparative reference; not assigned to every marine scene",
+  "model": "assets/devonian/props/marine-algae.glb",
+  "lod": "assets/devonian/props/marine-algae.lod1.glb",
+  "image": "assets/devonian/props/marine-algae.png",
+  "lengthMeters": 0.21738462150096893,
+  "dimensionsMeters": {
+    "x": 0.21738462150096893,
+    "y": 0.20145073533058167,
+    "z": 0.03407539427280426
+  },
+  "clips": [
+    "Idle"
+  ],
+  "looping": [
+    "Idle"
+  ],
+  "sources": [
+    "https://doi.org/10.1016/0034-6667(95)00062-3"
+  ],
+  "notes": [
+    "Original parametric mesh, no downloaded model.",
+    "1 glTF unit = 1 metre. Dimensions describe this art specimen, not a taxon maximum.",
+    "Pigmentation and soft appearance are artistic interpretations.",
+    "Locality tags constrain future placement; library membership does not assert co-occurrence.",
+    "Preview model: initial scenery delivery; further individual material, silhouette and motion refinement is pending."
+  ],
+  "fullTriangles": 5796,
+  "lodTriangles": 1737,
+  "lodRatio": 0.2996894409937888,
+  "sourceBlend": "../devonian-authoring/props/marine-algae/marine-algae.blend",
+  "uncertainty": "Waterloo Farm thallus morphology informs these forms. Attachment, full lengths and three-dimensional posture remain inferred.",
+  "modelStatus": "preview"
+}

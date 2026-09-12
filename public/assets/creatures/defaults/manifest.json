@@ -1,0 +1,296 @@
+{
+  "anomalocaris": {
+    "select": {
+      "path": "assets/creatures/defaults/anomalocaris.select.png",
+      "sha256": "50c8124859e40334ef7d08e58b2d5bacdc80bc617dc16e44a60600d06268fa1a"
+    },
+    "card": {
+      "path": "assets/creatures/defaults/anomalocaris.card.png",
+      "sha256": "81772b4ef23fcb24bde320ca34040daa413d520bbe56bfc09d08f2ad7fb50e1b"
+    },
+    "thumb": {
+      "path": "assets/creatures/defaults/anomalocaris.thumb.png",
+      "sha256": "fd38f67241ac1e2e1887af3b1921c84e6a43872f9a259928084fd219fcda4e18"
+    }
+  },
+  "opabinia": {
+    "select": {
+      "path": "assets/creatures/defaults/opabinia.select.png",
+      "sha256": "05c3d5197e5f4e529901d29526307febec186cb10b014daf39758a052428bca3"
+    },
+    "card": {
+      "path": "assets/creatures/defaults/opabinia.card.png",
+      "sha256": "ce426d384cd85b9f0f7ee644569ea24347c60ed856cfda8bdcde9e16b1da40eb"
+    },
+    "thumb": {
+      "path": "assets/creatures/defaults/opabinia.thumb.png",
+      "sha256": "2c1c0e223b8422e43b4519c5ec796e42fe0ce33ae68d74d36491c52e2c62eb06"
+    }
+  },
+  "waptia": {
+    "select": {
+      "path": "assets/creatures/defaults/waptia.select.png",
+      "sha256": "7c185e718150845f86f4075f7958695a2b514118288f109141b04b4787d24cb2"
+    },
+    "card": {
+      "path": "assets/creatures/defaults/waptia.card.png",
+      "sha256": "c8eca0270d85eb5fbcf5c6fa82c0718999bce9ba350ce59a9e7954656f3cf2e5"
+    },
+    "thumb": {
+      "path": "assets/creatures/defaults/waptia.thumb.png",
+      "sha256": "ddc5bebed8995b34af167c38bfd3871b232d5bbcf1a62833289abc174818cda0"
+    }
+  },
+  "canadia": {
+    "select": {
+      "path": "assets/creatures/defaults/canadia.select.png",
+      "sha256": "b49942ce90036e8b9b4bd7c1b12b5d266f17c534ed3cf54d7eff07264ace7615"
+    },
+    "card": {
+      "path": "assets/creatures/defaults/canadia.card.png",
+      "sha256": "fbbd6178a990f08af2bad22199e81cc4c0dac975a980cb39a2d553e0341a8da8"
+    },
+    "thumb": {
+      "path": "assets/creatures/defaults/canadia.thumb.png",
+      "sha256": "9198b59afa8b8cef70e3957b5f0daaf7473f7f5fcb966e8e84311584f432aa3a"
+    }
+  },
+  "hallucigenia": {
+    "select": {
+      "path": "assets/creatures/defaults/hallucigenia.select.png",
+      "sha256": "f423874e5bdb1cada2a9e7eee2b88e7ff917dc492df7b7e5a329765c8eeb2707"
+    },
+    "card": {
+      "path": "assets/creatures/defaults/hallucigenia.card.png",
+      "sha256": "6482d454b584fab695cbba92c7c75149886840651c648621838a3fd28024285c"
+    },
+    "thumb": {
+      "path": "assets/creatures/defaults/hallucigenia.thumb.png",
+      "sha256": "2378dccfcb5c2484a6e309ffe31c391193e673ecffbd1dd903d211c1e948c1bd"
+    }
+  },
+  "wiwaxia": {
+    "select": {
+      "path": "assets/creatures/defaults/wiwaxia.select.png",
+      "sha256": "51cbf38ef39ae536849c97f2490705a3a28d286d00fc36b561b00cfcf3d17371"
+    },
+    "card": {
+      "path": "assets/creatures/defaults/wiwaxia.card.png",
+      "sha256": "3e24a579f19a47d8c14d3b173b2759d835821e90a953a3c19ccbc359e14692f9"
+    },
+    "thumb": {
+      "path": "assets/creatures/defaults/wiwaxia.thumb.png",
+      "sha256": "d89b5f3f890eafbb8891417e694a3f2628218304695aa67b8137593a15578be6"
+    }
+  },
+  "marrella": {
+    "select": {
+      "path": "assets/creatures/defaults/marrella.select.png",
+      "sha256": "f8464ed20c2014829f356a601ef9157b6929f91d187cd7da287fd26a2f9680ca"
+    },
+    "card": {
+      "path": "assets/creatures/defaults/marrella.card.png",
+      "sha256": "33f193c3070328d258f84140630d7fbab995777e13e9f8da84cc96a8f589916d"
+    },
+    "thumb": {
+      "path": "assets/creatures/defaults/marrella.thumb.png",
+      "sha256": "57858cc31b750f33336bf165ac557fb624e9f0b8e860b67071c4ca16485fe3b3"
+    }
+  },
+  "olenoides": {
+    "select": {
+      "path": "assets/creatures/defaults/olenoides.select.png",
+      "sha256": "158767e1eaf889b742c6200a0c6367c96ff980b45328160087283cd4d3d3dfee"
+    },
+    "card": {
+      "path": "assets/creatures/defaults/olenoides.card.png",
+      "sha256": "778291ad37f17e4080a99f716070f8271d0d8eacf5a344da447fd2e8edf6d0a3"
+    },
+    "thumb": {
+      "path": "assets/creatures/defaults/olenoides.thumb.png",
+      "sha256": "280591be8d544d74f77532e7d19eeb12967ddc17a6e13a870206421e5afa8a3d"
+    }
+  },
+  "pikaia": {
+    "select": {
+      "path": "assets/creatures/defaults/pikaia.select.png",
+      "sha256": "cea3689c67746f501460a2f4aeff1d1e3297035d66e96bf7e9ebabdccd619660"
+    },
+    "card": {
+      "path": "assets/creatures/defaults/pikaia.card.png",
+      "sha256": "843591993502c54386e025fda75cd95e2a76960cbb399047eb8d4f79e24a6c5c"
+    },
+    "thumb": {
+      "path": "assets/creatures/defaults/pikaia.thumb.png",
+      "sha256": "d56ef4d0b0ba3b569b8f05a3c160b00126ffe94186807e112d95aebfca71b855"
+    }
+  },
+  "nectocaris": {
+    "select": {
+      "path": "assets/creatures/defaults/nectocaris.select.png",
+      "sha256": "9abbddb75d7d8218a895bab7450cca77666f324ed419b0fcd5205be12e480594"
+    },
+    "card": {
+      "path": "assets/creatures/defaults/nectocaris.card.png",
+      "sha256": "dec58c3d3689347e899cd6381701a567b25d4b1756ac0df436ec931a75c0e25b"
+    },
+    "thumb": {
+      "path": "assets/creatures/defaults/nectocaris.thumb.png",
+      "sha256": "599f24207d5b98bc2883d688242a6effa21e677e308b904149d770a7e0a8e818"
+    }
+  },
+  "burgessomedusa": {
+    "select": {
+      "path": "assets/creatures/defaults/burgessomedusa.select.png",
+      "sha256": "078ebb8ce04c1b9517605f01c5ea58e22d8e79d46637d366947be5be7e2351e3"
+    },
+    "card": {
+      "path": "assets/creatures/defaults/burgessomedusa.card.png",
+      "sha256": "79facab77f25ae26152793a9ee3f44615cc686d167343d30895f3d6f67ab8a12"
+    },
+    "thumb": {
+      "path": "assets/creatures/defaults/burgessomedusa.thumb.png",
+      "sha256": "948a1515469eaaa02ec0479db8552db1bb2396a5bc0eed576ccd9d8481b1093c"
+    }
+  },
+  "odaraia": {
+    "select": {
+      "path": "assets/creatures/defaults/odaraia.select.png",
+      "sha256": "40953c49f5f9cbc49d8514536d6d279a9fe6783f9dcba0bfe730037d81bf516d"
+    },
+    "card": {
+      "path": "assets/creatures/defaults/odaraia.card.png",
+      "sha256": "5a2d8729ca2f47cab3fbf6d20c6d5d75dfca07a33aff011a5455865447fdb4aa"
+    },
+    "thumb": {
+      "path": "assets/creatures/defaults/odaraia.thumb.png",
+      "sha256": "dc4c062e1c8f0b37ff1acb646fc33fb3df966434aa45ee5c7ed020aab238cd35"
+    }
+  },
+  "ottoia": {
+    "select": {
+      "path": "assets/creatures/defaults/ottoia.select.png",
+      "sha256": "2e85ed5aea620a8c106c2a4065ad1ed7d9412088749bfc74fc1d664ff9134e46"
+    },
+    "card": {
+      "path": "assets/creatures/defaults/ottoia.card.png",
+      "sha256": "ef06d3c0415c9310f69d012dec0cf0bcf91ccd91bcbd90bc4b1a372507dae4fa"
+    },
+    "thumb": {
+      "path": "assets/creatures/defaults/ottoia.thumb.png",
+      "sha256": "01cfa4d752e582a25e47a46749ca902b8fce4ba44d06c440d8994c465a8035a2"
+    }
+  },
+  "cambroraster": {
+    "select": {
+      "path": "assets/creatures/defaults/cambroraster.select.png",
+      "sha256": "e3f7c5e250e0eceaf758a4c0c90e60e093069160e092b8ed25fdfb469e637fa0"
+    },
+    "card": {
+      "path": "assets/creatures/defaults/cambroraster.card.png",
+      "sha256": "4d7c4d7fcc773ca09d7fded60c8f33e8b3ee616dedab9c091de29d6aff07933f"
+    },
+    "thumb": {
+      "path": "assets/creatures/defaults/cambroraster.thumb.png",
+      "sha256": "5026e43fd09906da3566acbc6e22a52665a10b33706969e42453a988fe029666"
+    }
+  },
+  "sidneyia": {
+    "select": {
+      "path": "assets/creatures/defaults/sidneyia.select.png",
+      "sha256": "ccf05fae2cba947e399976fc9a161c9dce6e026287e7ea3c5295548de04bd268"
+    },
+    "card": {
+      "path": "assets/creatures/defaults/sidneyia.card.png",
+      "sha256": "7ca174c3881da63ba5c721f6146b737ca4b0f9c9e2b48addbb769fcc65881a14"
+    },
+    "thumb": {
+      "path": "assets/creatures/defaults/sidneyia.thumb.png",
+      "sha256": "afcc68110a1980a2b6c262ab5ee9e164b29db87729f6c341043135503f09928c"
+    }
+  },
+  "leanchoilia": {
+    "select": {
+      "path": "assets/creatures/defaults/leanchoilia.select.png",
+      "sha256": "f0fcebde6ca88b9a8f80a91e45d1ebbd4cbfd0264f091a46b2cc4cab408f6e19"
+    },
+    "card": {
+      "path": "assets/creatures/defaults/leanchoilia.card.png",
+      "sha256": "e9465dce5fbb6e6ab7951658d3204592f944c8f9a5b08b2b5e0ebd20ffb41f65"
+    },
+    "thumb": {
+      "path": "assets/creatures/defaults/leanchoilia.thumb.png",
+      "sha256": "c2bf8501c62fb9d200966ea84d7ef0717646484f5e13edfc6d1d7e60fa4d19b3"
+    }
+  },
+  "isoxys": {
+    "select": {
+      "path": "assets/creatures/defaults/isoxys.select.png",
+      "sha256": "badc5b45c240ee42cbe815effa35a281a7d09bceffd7fa251ddb60fc04f59415"
+    },
+    "card": {
+      "path": "assets/creatures/defaults/isoxys.card.png",
+      "sha256": "27fb65924805814d4edf8a605745d548d05d2a21bfe391f4f7a0a517dc5fdfc4"
+    },
+    "thumb": {
+      "path": "assets/creatures/defaults/isoxys.thumb.png",
+      "sha256": "380feab7b00f1bff143dfd8e156d0c72185e232f3a09145468dda5cd82d08465"
+    }
+  },
+  "odontogriphus": {
+    "select": {
+      "path": "assets/creatures/defaults/odontogriphus.select.png",
+      "sha256": "ce94f46a861e9eb0ffe457348abb72bb839285f38e926ceab351bf2e03d10bcf"
+    },
+    "card": {
+      "path": "assets/creatures/defaults/odontogriphus.card.png",
+      "sha256": "0c6939d51498627f107deab9b7c8847d7eebe821160967ecd904ee325641d68a"
+    },
+    "thumb": {
+      "path": "assets/creatures/defaults/odontogriphus.thumb.png",
+      "sha256": "f3273b11ccd40c3ae0cd6406c6d9db1db6783de0d166f7266860ed25f1987fa9"
+    }
+  },
+  "ctenorhabdotus": {
+    "select": {
+      "path": "assets/creatures/defaults/ctenorhabdotus.select.png",
+      "sha256": "dc1dd3bb0a47e6913d1e52fc2ae2421e168231c24f2e76977e12e102362d9830"
+    },
+    "card": {
+      "path": "assets/creatures/defaults/ctenorhabdotus.card.png",
+      "sha256": "b9517b96b00b81b613b3144a933ff78e43f9120369c1fbc17fca08d44373811d"
+    },
+    "thumb": {
+      "path": "assets/creatures/defaults/ctenorhabdotus.thumb.png",
+      "sha256": "a54e8f7581eb365b653aa70d7fd93a1d97c08b131ae0e4edab7775b0bacb3fa7"
+    }
+  },
+  "vetulicola": {
+    "select": {
+      "path": "assets/creatures/defaults/vetulicola.select.png",
+      "sha256": "607e3c0fa24ad60f6f4d7f149c74b0ed3501a7fb7b57ca0f137f2016f05f90f5"
+    },
+    "card": {
+      "path": "assets/creatures/defaults/vetulicola.card.png",
+      "sha256": "dee753df4c1397b70d0863cd28ea0735ea2cc367ab513db49069dea0bea2ce4c"
+    },
+    "thumb": {
+      "path": "assets/creatures/defaults/vetulicola.thumb.png",
+      "sha256": "ec79a7680c63c2e5755c0b313eb0cd65caeda62cebfa8fd2139b5eb2bca50099"
+    }
+  },
+  "tamisiocaris": {
+    "select": {
+      "path": "assets/creatures/defaults/tamisiocaris.select.png",
+      "sha256": "08db9521097a67ce4c5f6b27a5744292a7f69b868727f3d246448ea16857c970"
+    },
+    "card": {
+      "path": "assets/creatures/defaults/tamisiocaris.card.png",
+      "sha256": "2fb2724bf053ff98fc058c462f1651b133ae7ba6f1e04ff81a43faacbdb630e4"
+    },
+    "thumb": {
+      "path": "assets/creatures/defaults/tamisiocaris.thumb.png",
+      "sha256": "a80e64ff4cbcc96e121eed8966528dafdbc4f2bdde7bce227c008a59a6a2e40f"
+    }
+  }
+}

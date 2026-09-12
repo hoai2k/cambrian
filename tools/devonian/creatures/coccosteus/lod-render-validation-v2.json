@@ -1,0 +1,23 @@
+{
+  "sourceGlbSha256": "bf79dd22064dbae6da3a3b51d772b44d461d26901bb53c127bd36323a225acda",
+  "renderer": "Blender actual imported GLB, Cycles 24 samples",
+  "reviewed": [
+    "Idle",
+    "Swim",
+    "Death"
+  ],
+  "images": [
+    {
+      "file": "LOD-Idle-v2.png",
+      "sha256": "0c40112a38b6089ce5010de28bd2899f280a71549150461687c305ca1333dab8"
+    },
+    {
+      "file": "LOD-Swim-v2.png",
+      "sha256": "1e4f47211ed08424d3fe5ad7280cd0eeb2c2bd2ce1e390a7c3005fdc44881db5"
+    },
+    {
+      "file": "LOD-Death-v2.png",
+      "sha256": "3211aa803984136b57149d4bd4ff261c6f09ac3f03b27c1850cefe6dbbd9666a"
+    }
+  ]
+}

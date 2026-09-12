@@ -1,0 +1,124 @@
+{
+  "id": "cladoselache",
+  "fullColorPolicy": "White COLOR_0 multiplied by UV albedo; no duplicate pigment darkening.",
+  "lodColorPolicy": "Texture-free, atlas-sampled linear vertex pigment.",
+  "exports": [
+    {
+      "file": "/Users/hoai/Documents/Stuff/Generations/cambrian/local/devonian-authoring/cladoselache/v2-candidate/cladoselache.glb",
+      "sha256": "63d16b3c60cf553cc7ce6788b2efd85d156aeec637d93578cec8ba98e1720272",
+      "bytes": 13158548,
+      "clips": [
+        "Ability",
+        "Attack",
+        "Bite",
+        "Death",
+        "Dive",
+        "Dodge",
+        "Eat",
+        "Growth",
+        "Guard",
+        "Heavy",
+        "Hit",
+        "Idle",
+        "Parry",
+        "Rise",
+        "Stagger",
+        "Swim",
+        "TurnLeft",
+        "TurnRight"
+      ],
+      "distinctMotions": 18,
+      "materials": [
+        {
+          "material": "cladoselache accent",
+          "rgbRange": [
+            1.0,
+            1.0
+          ],
+          "baseColorTexture": false,
+          "normalizedWeights": true
+        },
+        {
+          "material": "cladoselache body",
+          "rgbRange": [
+            1.0,
+            1.0
+          ],
+          "baseColorTexture": true,
+          "normalizedWeights": true
+        },
+        {
+          "material": "cladoselache eyes",
+          "rgbRange": [
+            1.0,
+            1.0
+          ],
+          "baseColorTexture": true,
+          "normalizedWeights": true
+        },
+        {
+          "material": "cladoselache fins",
+          "rgbRange": [
+            1.0,
+            1.0
+          ],
+          "baseColorTexture": true,
+          "normalizedWeights": true
+        }
+      ],
+      "rootStable": true,
+      "scaleChannels": false
+    },
+    {
+      "file": "/Users/hoai/Documents/Stuff/Generations/cambrian/local/devonian-authoring/cladoselache/v2-candidate/cladoselache.lod1.glb",
+      "sha256": "93a325d99cc78a2c09a9ecbfaf3a6ea5ccffe5832f8f568f3b104a86a93b4665",
+      "bytes": 2191804,
+      "clips": [
+        "Death",
+        "Idle",
+        "Swim"
+      ],
+      "distinctMotions": 3,
+      "materials": [
+        {
+          "material": "cladoselache accent",
+          "rgbRange": [
+            0.2350041962310216,
+            0.4
+          ],
+          "baseColorTexture": false,
+          "normalizedWeights": true
+        },
+        {
+          "material": "cladoselache body",
+          "rgbRange": [
+            0.0018616006713969636,
+            0.49181353475242234
+          ],
+          "baseColorTexture": false,
+          "normalizedWeights": true
+        },
+        {
+          "material": "cladoselache eyes",
+          "rgbRange": [
+            0.0036011291676203558,
+            0.007446402685587854
+          ],
+          "baseColorTexture": false,
+          "normalizedWeights": true
+        },
+        {
+          "material": "cladoselache fins",
+          "rgbRange": [
+            0.036041809719996945,
+            0.23382925154497597
+          ],
+          "baseColorTexture": false,
+          "normalizedWeights": true
+        }
+      ],
+      "rootStable": true,
+      "scaleChannels": false
+    }
+  ]
+}

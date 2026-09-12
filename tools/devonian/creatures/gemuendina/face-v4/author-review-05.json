@@ -1,0 +1,142 @@
+{
+  "verdict": "PASS for focused terminal-snout correction and preview delivery; not all-creature or broad final-art acceptance",
+  "reviewer": "Dedicated Gemuendina creative author, actual individual images viewed",
+  "assets": [
+    {
+      "path": "/Users/hoai/Documents/Stuff/Generations/cambrian/local/devonian-authoring/gemuendina/face-v4/candidate-05/gemuendina.glb",
+      "sha256": "0fa8b42cccf502e3f62c26f3402b860a35198cf790cdb4dc46baa8b2bf4b773d",
+      "bytes": 16412316
+    },
+    {
+      "path": "/Users/hoai/Documents/Stuff/Generations/cambrian/local/devonian-authoring/gemuendina/face-v4/candidate-05/gemuendina.lod1.glb",
+      "sha256": "44d56d05811711fe2a205a77d4178dc724620a98135124a70151d15b36f1faea",
+      "bytes": 2868160
+    }
+  ],
+  "actual_view_count": 12,
+  "actual_portrait_count": 4,
+  "verified_evidence": [
+    {
+      "path": "/Users/hoai/Documents/Stuff/Generations/cambrian/local/devonian-authoring/gemuendina/face-v4/candidate-05/pose-evidence/manifest.json",
+      "sha256": "dae2db55cf975b76260a7fc67b294a4fa2c55ee466b1cb1ef1663ea251795111",
+      "bytes": 11588
+    },
+    {
+      "path": "/Users/hoai/Documents/Stuff/Generations/cambrian/local/devonian-authoring/gemuendina/face-v4/candidate-05/pose-evidence/front.png",
+      "sha256": "7fe8be48bd6b2b8b8f285170fdd36ff4426946640f2b3532f91b5baa95778d9b",
+      "bytes": 1461013
+    },
+    {
+      "path": "/Users/hoai/Documents/Stuff/Generations/cambrian/local/devonian-authoring/gemuendina/face-v4/candidate-05/pose-evidence/face-oblique.png",
+      "sha256": "fcb186c9f70acb1e4573855e52ceac834092a478e8fcdc1f61747ed1e4d07b0b",
+      "bytes": 1669065
+    },
+    {
+      "path": "/Users/hoai/Documents/Stuff/Generations/cambrian/local/devonian-authoring/gemuendina/face-v4/candidate-05/pose-evidence/side.png",
+      "sha256": "55273279188b985ed75f26b026d60cc6dbd7743a86e444dc541ccdf8ef2f80fb",
+      "bytes": 1361994
+    },
+    {
+      "path": "/Users/hoai/Documents/Stuff/Generations/cambrian/local/devonian-authoring/gemuendina/face-v4/candidate-05/pose-evidence/Heavy-front.png",
+      "sha256": "7c3f73739580d11fd775450bcdc3d6daaacd36c2ec8a1f1d3f3b5dc48524ac57",
+      "bytes": 1372405
+    },
+    {
+      "path": "/Users/hoai/Documents/Stuff/Generations/cambrian/local/devonian-authoring/gemuendina/face-v4/candidate-05/pose-evidence/Heavy-side.png",
+      "sha256": "b723d194531c1297ea0567bef7ef019447f20d2512b7b4fb17bde6b294d9facd",
+      "bytes": 1389551
+    },
+    {
+      "path": "/Users/hoai/Documents/Stuff/Generations/cambrian/local/devonian-authoring/gemuendina/face-v4/candidate-05/pose-evidence/Bite-front.png",
+      "sha256": "6cbd5748e89e6f59b57c2d14b58e45f6375feba16dde77f0c7485835bad1dce6",
+      "bytes": 1479746
+    },
+    {
+      "path": "/Users/hoai/Documents/Stuff/Generations/cambrian/local/devonian-authoring/gemuendina/face-v4/candidate-05/pose-evidence/Eat-oblique.png",
+      "sha256": "d9db137c64f2be1858253fbc8d9c4bbdd7f75c7513ba5311322017f576e480bb",
+      "bytes": 1674663
+    },
+    {
+      "path": "/Users/hoai/Documents/Stuff/Generations/cambrian/local/devonian-authoring/gemuendina/face-v4/candidate-05/pose-evidence/oral-low.png",
+      "sha256": "067193cfab94e38f61cb0a14c0975553dae08d5c8327fb6c00ba0fc30a0f3855",
+      "bytes": 1426470
+    },
+    {
+      "path": "/Users/hoai/Documents/Stuff/Generations/cambrian/local/devonian-authoring/gemuendina/face-v4/candidate-05/pose-evidence/LOD-front.png",
+      "sha256": "933ee1269ce4260fcb995ec88e92ba82c51a339bf627c106ebdec0bba347a515",
+      "bytes": 1224893
+    },
+    {
+      "path": "/Users/hoai/Documents/Stuff/Generations/cambrian/local/devonian-authoring/gemuendina/face-v4/candidate-05/pose-evidence/LOD-Heavy.png",
+      "sha256": "21b58963fabc0fe1adb4410b970578a9429a8c92059079d8e1bfc56292fedc06",
+      "bytes": 1249715
+    },
+    {
+      "path": "/Users/hoai/Documents/Stuff/Generations/cambrian/local/devonian-authoring/gemuendina/face-v4/candidate-05/pose-evidence/LOD-Heavy-side.png",
+      "sha256": "7887d251fa3f41ef08a471d2ad90fdd4f73081cf94b8e6ca6a355a7cd76e5411",
+      "bytes": 1201276
+    },
+    {
+      "path": "/Users/hoai/Documents/Stuff/Generations/cambrian/local/devonian-authoring/gemuendina/face-v4/candidate-05/pose-evidence/LOD-Eat.png",
+      "sha256": "6cc63d8bd68a4c4a38ef8f5ee17e6d5ae38115c3d1b01f3f67945c18e83f8965",
+      "bytes": 1251612
+    },
+    {
+      "path": "/Users/hoai/Documents/Stuff/Generations/cambrian/local/devonian-authoring/gemuendina/face-v4/candidate-05/portrait-evidence/manifest.json",
+      "sha256": "fad8a3ba5520130bc2d8cc3536dabed7b4fe91b7f6fbc8a0103dd7d3c5ff2a98",
+      "bytes": 4746
+    },
+    {
+      "path": "/Users/hoai/Documents/Stuff/Generations/cambrian/local/devonian-authoring/gemuendina/face-v4/candidate-05/gemuendina.select.png",
+      "sha256": "3bd7930bd29907f0bb88fc454a2d5fb4b80986c1f5ef361f99df12054a2ed9a9",
+      "bytes": 919261
+    },
+    {
+      "path": "/Users/hoai/Documents/Stuff/Generations/cambrian/local/devonian-authoring/gemuendina/face-v4/candidate-05/gemuendina.card.png",
+      "sha256": "d13cdd8af000ecb57e74d2fc921d7ad48f498ca9249f02767e96063f50c5c679",
+      "bytes": 245901
+    },
+    {
+      "path": "/Users/hoai/Documents/Stuff/Generations/cambrian/local/devonian-authoring/gemuendina/face-v4/candidate-05/gemuendina.thumb.png",
+      "sha256": "209b95c757adf3e3239828b6a824671a990b5e29a5f27503aa6aff70459f4e1e",
+      "bytes": 30334
+    },
+    {
+      "path": "/Users/hoai/Documents/Stuff/Generations/cambrian/local/devonian-authoring/gemuendina/face-v4/candidate-05/gemuendina.png",
+      "sha256": "df3f6c3cd23898b30cfe41ae473662f37c416659c3375f5e1338fb6857ac3e2c",
+      "bytes": 2050217
+    }
+  ],
+  "visual_findings": [
+    "Front, oblique and side retain a true terminal snout: upper and lower lips form the leading body edge, with no preoral ledge or hanging belly fold.",
+    "Two close anterior eye caps remain supported directly above the snout; neither old dorsal marking is treated as an eye.",
+    "Heavy-front, Heavy-side, Bite-front and Eat-oblique expose a continuous oral floor and sidewalls attached to the opening lower jaw. No exposed lining inversion, visible shell intersection or detached tissue is evident in these views.",
+    "LOD front, Heavy oblique/side and Eat preserve the terminal opening, supported eyes and coherent lower-jaw silhouette. Small chin/cheek creases and loss of fine pigment remain broader preview polish.",
+    "All four actual exported-model portraits are complete, uncropped and show the corrected anterior face together with the preserved V3 posterior silhouette and material appearance."
+  ],
+  "numeric_evidence": {
+    "audit": {
+      "path": "/Users/hoai/Documents/Stuff/Generations/cambrian/local/devonian-authoring/gemuendina/face-v4/audit-candidate-05-03/audit.json",
+      "sha256": "0d3c3430ed46077035347b5ede3a70621ff4cc7d1a69b59b708a7fc73819263a",
+      "bytes": 31663
+    },
+    "structural": {
+      "path": "/Users/hoai/Documents/Stuff/Generations/cambrian/local/devonian-authoring/gemuendina/face-v4/candidate-05/export-structural-review.json",
+      "sha256": "05eafa36f0006b74e23cc76c490a7a2f75e916853ce8ade937d601d864397333",
+      "bytes": 7692
+    },
+    "actual_pose_count": 10,
+    "minimum_measured_eye_inside_percent": 75.13351134846462,
+    "minimum_conservative95_eye_inside_percent": 74.35164918513743,
+    "minimum_sampled_oral_corridor_clearance": 0.00728732580319047,
+    "maximum_denticle_contact_distance": 0.0037862900644540787,
+    "full_clips": 18,
+    "lod_clips": 18,
+    "closed_envelope_without_audit_caps": true
+  },
+  "limitations": [
+    "Only named rendered poses and sampled exported audit poses reviewed; not every instant or all remote self-intersections.",
+    "Broad final art/LOD refinement and interactive gameplay prey/controller playtest remain preview scope.",
+    "Root owns metadata cleanup, intake, public copying, catalogue refresh, build/typecheck and commit/main publication. No publication performed by this author."
+  ]
+}

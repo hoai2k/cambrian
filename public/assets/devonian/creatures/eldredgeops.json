@@ -1,0 +1,63 @@
+{
+  "id": "eldredgeops",
+  "name": "Eldredgeops",
+  "species": "Eldredgeops rana",
+  "provenance": "Middle Devonian, Givetian Hamilton Group, northeastern North America",
+  "description": "Rounded, tuberculate phacopid trilobite with seventeen-file schizochroal compound eyes, eleven articulated thoracic tergites and a ribbed pygidium. Ventral biramous limbs and antennae are comparative soft-part reconstruction.",
+  "lengthMeters": 0.06,
+  "modelLength": 3.7,
+  "locomotion": "Crawl",
+  "clips": [
+    "Idle",
+    "Crawl",
+    "Swim",
+    "TurnLeft",
+    "TurnRight",
+    "Dive",
+    "Rise",
+    "Attack",
+    "Bite",
+    "Heavy",
+    "Hit",
+    "Death",
+    "Guard",
+    "Parry",
+    "Dodge",
+    "Eat",
+    "Stagger",
+    "Ability",
+    "Growth",
+    "Moult"
+  ],
+  "looping": [
+    "Idle",
+    "Crawl",
+    "Swim",
+    "Guard",
+    "Eat"
+  ],
+  "anchors": [
+    "anchor_mouth",
+    "anchor_mouth_inside",
+    "anchor_attack_primary"
+  ],
+  "artVersion": 2,
+  "artStatus": "preview",
+  "refinementNeeded": [
+    "Exact enrollment coaptation remains incomplete; the rolling animation is a defensive flexion preview, not a verified closed enrolled shell.",
+    "Extended action playback and detailed appendage collision refinement are deferred under the preview-first production priority."
+  ],
+  "sources": [
+    "https://devonianatlas.org/species/eldredgeops-rana/",
+    "https://doi.org/10.1016/j.asd.2006.08.002",
+    "https://doi.org/10.1111/j.1502-3931.2009.00205.x",
+    "https://doi.org/10.1002/spp2.1401"
+  ],
+  "notes": [
+    "Shell uses E. rana sensu Eldredge1972, not E. milleri or spiny Moroccan phacopids.",
+    "Three cephalic post-antennal pairs, eleven thoracic pairs and four pygidial pairs are a comparative reconstruction; exact E. rana appendage anatomy and living pigmentation are uncertain.",
+    "Individual calcite lens solids are seated in continuous anatomical ocular platforms. Eye volume reports test each lens, not only aggregate eye volume.",
+    "All rigid shells move by joints. Growth is an unscaled compatibility posture; Moult is a separate preparation/withdrawal gesture. Swim is a plausible limb-powered compatibility action, not a claim of habitual pelagic swimming.",
+    "Representative 6cm shell length is illustrative, not a species maximum. Antennae extend the exported bounds."
+  ]
+}

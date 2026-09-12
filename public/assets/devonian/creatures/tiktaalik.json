@@ -1,0 +1,70 @@
+{
+  "id": "tiktaalik",
+  "name": "Tiktaalik",
+  "species": "Tiktaalik roseae",
+  "provenance": "Late Devonian, early Frasnian Fram Formation, Ellesmere Island, Nunavut, Canada",
+  "description": "Broad-headed finned tetrapodomorph with dorsal eyes, a mobile neck, rib-supported low trunk and robust jointed paired fins retaining fin-ray webs.",
+  "lengthMeters": 2.0,
+  "modelLength": 9.330000162124634,
+  "locomotion": "Swim",
+  "clips": [
+    "Idle",
+    "Swim",
+    "TurnLeft",
+    "TurnRight",
+    "Dive",
+    "Rise",
+    "Attack",
+    "Bite",
+    "Heavy",
+    "Hit",
+    "Death",
+    "Guard",
+    "Parry",
+    "Dodge",
+    "Eat",
+    "Stagger",
+    "Ability",
+    "Growth"
+  ],
+  "looping": [
+    "Idle",
+    "Swim",
+    "Guard",
+    "Eat"
+  ],
+  "anchors": [
+    "anchor_mouth",
+    "anchor_mouth_inside",
+    "anchor_attack_primary"
+  ],
+  "sources": [
+    {
+      "title": "Daeschler, Shubin & Jenkins 2006, Devonian tetrapod-like fish",
+      "url": "https://doi.org/10.1038/nature04639"
+    },
+    {
+      "title": "Shubin, Daeschler & Jenkins 2006, Tiktaalik pectoral fin",
+      "url": "https://doi.org/10.1038/nature04637"
+    },
+    {
+      "title": "Lemberg, Daeschler & Shubin 2021, feeding system",
+      "url": "https://knowledge.uchicago.edu/records/s34bv-j5m06"
+    },
+    {
+      "title": "Stewart et al. 2024, axial skeleton",
+      "url": "https://knowledge.uchicago.edu/records/mvb59-qth34"
+    },
+    {
+      "title": "Stewart et al. 2020, fin ray patterns",
+      "url": "https://doi.org/10.1073/pnas.1915983117"
+    }
+  ],
+  "notes": [
+    "Original Tiktaalik roseae reconstruction of a representative 2 m animal, not a fossil scan or species maximum.",
+    "Broad flattened skull with posterior dorsal orbits, short mobile neck and no bony opercular cover; the rigid central skull is not stretched during cheek expansion.",
+    "Four robust fins retain continuous lepidotrichial webs; the pectoral skeleton has shoulder, elbow and distal support zones, not tetrapod fingers. Pelvic fins are substantial but restricted hip retraction does not imply normal terrestrial walking.",
+    "Rhombic narrowly overlapping scales and dermal roof texture are fossil-informed. Pigmentation, soft tissues and the low inferred caudal outline remain artistic reconstruction.",
+    "Animations represent aquatic undulation, paddling, bracing, neck aiming, gape and modest cheek expansion. Growth is a relaxed extension display, with no body scaling. Runtime labels do not define Devonian gameplay."
+  ]
+}

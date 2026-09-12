@@ -1,0 +1,206 @@
+{
+  "method": "actual-eye-polyhedron uniform-volume samples against the continuous closed head",
+  "losslessPackagingVerified": true,
+  "reports": [
+    {
+      "level": "full",
+      "bytes": 17888292,
+      "id": "doryaspis",
+      "revision": "working-2026-09-07T16-28-31-788Z",
+      "assetSha256": "d5560920df5bd49b52fe9b230344f0c49b0111457bb440e1e6f5accaf52fd352",
+      "headMesh": "head_shield_continuous_closed",
+      "headTriangles": 122740,
+      "headTopology": {
+        "valid": true,
+        "nonmanifoldEdges": 0,
+        "cappedBoundaryLoops": []
+      },
+      "eyes": [
+        {
+          "eye": 0,
+          "center": [
+            0.23659080266952515,
+            0.07445751875638962,
+            0.8311687707901001
+          ],
+          "radii": [
+            0.035409003496170044,
+            0.027344897389411926,
+            0.03854095935821533
+          ],
+          "eyeTriangles": 2976,
+          "boundingBoxCandidates": 120000,
+          "volumeSamples": 61061,
+          "inside": 49440,
+          "insidePercent": 80.9682121157531,
+          "wilson95Percent": [
+            80.65490160144319,
+            81.27762619864531
+          ],
+          "conservative95Percent": [
+            80.65490160144319,
+            81.28088091074177
+          ],
+          "rayDisagreements": 2,
+          "insideLowerPercent": 80.9682121157531,
+          "insideUpperPercent": 80.97148752886457,
+          "closureClearanceLowerBounds": [],
+          "criterion50": "PASS",
+          "target65": true,
+          "guidanceOnly70PercentTranslationGlTF": [
+            0.0,
+            -9.010371968543041e-07,
+            0.0
+          ],
+          "guidanceOnly70PercentTranslationBlender": [
+            0.0,
+            -0.0,
+            -9.010371968543041e-07
+          ]
+        },
+        {
+          "eye": 1,
+          "center": [
+            -0.23659078776836395,
+            0.07445751130580902,
+            0.8311688303947449
+          ],
+          "radii": [
+            0.03540898859500885,
+            0.027344897389411926,
+            0.03854095935821533
+          ],
+          "eyeTriangles": 2976,
+          "boundingBoxCandidates": 120000,
+          "volumeSamples": 61354,
+          "inside": 49695,
+          "insidePercent": 80.99716399908726,
+          "wilson95Percent": [
+            80.68478615961769,
+            81.30566038829346
+          ],
+          "conservative95Percent": [
+            80.68478615961769,
+            81.3121387605277
+          ],
+          "rayDisagreements": 4,
+          "insideLowerPercent": 80.99716399908726,
+          "insideUpperPercent": 81.0036835414154,
+          "closureClearanceLowerBounds": [],
+          "criterion50": "PASS",
+          "target65": true,
+          "guidanceOnly70PercentTranslationGlTF": [
+            0.0,
+            -9.010370263240475e-07,
+            0.0
+          ],
+          "guidanceOnly70PercentTranslationBlender": [
+            0.0,
+            -0.0,
+            -9.010370263240475e-07
+          ]
+        }
+      ]
+    },
+    {
+      "level": "lod1",
+      "bytes": 1916912,
+      "id": "doryaspis",
+      "revision": "working-2026-09-07T16-28-32-036Z-lod1",
+      "assetSha256": "ac27aba952e6f12b97c6c68d0eaf8035f95fbb19e4642550e9b23fa9e2117c49",
+      "headMesh": "head_shield_continuous_closed",
+      "headTriangles": 33140,
+      "headTopology": {
+        "valid": true,
+        "nonmanifoldEdges": 0,
+        "cappedBoundaryLoops": []
+      },
+      "eyes": [
+        {
+          "eye": 0,
+          "center": [
+            0.23659080266952515,
+            0.07445751875638962,
+            0.8311687707901001
+          ],
+          "radii": [
+            0.035409003496170044,
+            0.027344897389411926,
+            0.03854095935821533
+          ],
+          "eyeTriangles": 2976,
+          "boundingBoxCandidates": 120000,
+          "volumeSamples": 61061,
+          "inside": 49422,
+          "insidePercent": 80.93873339774979,
+          "wilson95Percent": [
+            80.6252404414787,
+            81.24833363162594
+          ],
+          "conservative95Percent": [
+            80.6252404414787,
+            81.24833363162594
+          ],
+          "rayDisagreements": 0,
+          "insideLowerPercent": 80.93873339774979,
+          "insideUpperPercent": 80.93873339774979,
+          "closureClearanceLowerBounds": [],
+          "criterion50": "PASS",
+          "target65": true,
+          "guidanceOnly70PercentTranslationGlTF": [
+            0.0,
+            -9.010371968543041e-07,
+            0.0
+          ],
+          "guidanceOnly70PercentTranslationBlender": [
+            0.0,
+            -0.0,
+            -9.010371968543041e-07
+          ]
+        },
+        {
+          "eye": 1,
+          "center": [
+            -0.23659078776836395,
+            0.07445751130580902,
+            0.8311688303947449
+          ],
+          "radii": [
+            0.03540898859500885,
+            0.027344897389411926,
+            0.03854095935821533
+          ],
+          "eyeTriangles": 2976,
+          "boundingBoxCandidates": 120000,
+          "volumeSamples": 61354,
+          "inside": 49668,
+          "insidePercent": 80.9531570883724,
+          "wilson95Percent": [
+            80.64050722517383,
+            81.2619310118322
+          ],
+          "conservative95Percent": [
+            80.64050722517383,
+            81.2667898627118
+          ],
+          "rayDisagreements": 3,
+          "insideLowerPercent": 80.9531570883724,
+          "insideUpperPercent": 80.9580467451185,
+          "closureClearanceLowerBounds": [],
+          "criterion50": "PASS",
+          "target65": true,
+          "guidanceOnly70PercentTranslationGlTF": [
+            0.0,
+            -9.010370263240475e-07,
+            0.0
+          ],
+          "guidanceOnly70PercentTranslationBlender": [
+            0.0,
+            -0.0,
+            -9.010370263240475e-07
+          ]
+        }
+      ]
+    }
+  ]
+}

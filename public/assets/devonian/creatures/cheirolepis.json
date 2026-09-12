@@ -1,0 +1,67 @@
+{
+  "id": "cheirolepis",
+  "name": "Cheirolepis",
+  "species": "Cheirolepis trailli",
+  "provenance": "Middle Devonian, Scottish Orcadian Basin / Nairnshire assemblages",
+  "description": "Small early ray-finned fish with fine rhombic scales, a large toothed terminal mouth, mobile gill covers, ray-supported fins and a strongly unequal tail with an elongated scaled upper lobe.",
+  "lengthMeters": 0.25,
+  "modelLength": 6.009999990463257,
+  "locomotion": "Swim",
+  "clips": [
+    "Idle",
+    "Swim",
+    "TurnLeft",
+    "TurnRight",
+    "Dive",
+    "Rise",
+    "Attack",
+    "Bite",
+    "Heavy",
+    "Hit",
+    "Death",
+    "Guard",
+    "Parry",
+    "Dodge",
+    "Eat",
+    "Stagger",
+    "Ability",
+    "Growth"
+  ],
+  "looping": [
+    "Idle",
+    "Swim",
+    "Guard",
+    "Eat"
+  ],
+  "anchors": [
+    "anchor_mouth",
+    "anchor_mouth_inside",
+    "anchor_attack_primary"
+  ],
+  "sources": [
+    {
+      "title": "Giles et al. (2015), Endoskeletal structure in Cheirolepis; Scottish C. trailli specimens and pectoral anatomy",
+      "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC4950109/"
+    },
+    {
+      "title": "Igielman et al. (2026), Devonian ray-finned fish lower jaws; C. trailli NHMUK PV P62908b and P1370",
+      "url": "https://anatomypubs.onlinelibrary.wiley.com/doi/10.1002/ar.70005"
+    },
+    {
+      "title": "AMNH Digital Collections, Cheirolepis trailli ptc-5970, 25 cm Middle Devonian Nairnshire specimen",
+      "url": "https://digitalcollections.amnh.org/archive/Cheirolepis-trailli--primitive-ray-finned-fish--approximately-380-million-years-old--L-25-cm--Middle-Devonian-of-Nairnshire--Scotland-2URM1THIF2SU.html"
+    },
+    {
+      "title": "National Museums Scotland, fossil collections review; Scottish Middle Devonian assemblages",
+      "url": "https://files.nms.ac.uk/production/Documents/Our-Impact/Collections-reviews/Fossil-collections/fossil-review-complete-_review-of-fossil-collections-in-scotland.pdf"
+    }
+  ],
+  "notes": [
+    "Consistent Scottish Cheirolepis trailli reconstruction; no mixing with the Late Devonian Canadian species. Representative 0.25 m size follows the AMNH collection record ptc-5970, not an adult maximum.",
+    "Small rhombic enamel windows, posterior short-based dorsal and anal fins, separate opercular covers, large terminal jaw, segmented fin rays and the scaled upper caudal axis distinguish this early ray-finned fish.",
+    "Pigmentation, fin-membrane thickness, three-dimensional soft tissue, individual tooth arrangement and all motion are artistic reconstruction rather than fossil observations.",
+    "Growth is a relaxed ventilation and fin-spreading gesture, without scaling or moulting. Ability is a burst-and-bank display, not a Devonian gameplay rule.",
+    "Original source and review renders are preserved in cambrian/local/devonian-authoring/cheirolepis.",
+    "V3 (11-12 September 2026) takes the user reference for what is form: a blunt deep snout rising steeply to a prominent squared brow, a lip ridge along the long gape, a larger more anterior eye, fin roots seated in the trunk, and swept angular fins with pointed apices; the strongly epicercal tail is kept because the sources settle it."
+  ]
+}

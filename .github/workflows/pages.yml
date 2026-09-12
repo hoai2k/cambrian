@@ -1,0 +1,57 @@
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run typecheck
+      - run: npm run check
+      - run: npm run devonian:check
+      - run: npm run eras
+      - run: npm run sculpt
+      - run: npm run portraits
+      # The feedback button exists only in a build that was given somewhere to send to. Unset —
+      # a fork, or a repository variable that got lost — publishes the site without the button
+      # rather than with one that fails; see docs/FEEDBACK.md. The URL is committed rather than
+      # kept secret because it is compiled into the bundle either way, so anyone who opens the
+      # site can read it; a FEEDBACK_ENDPOINT repository variable wins when one is set, which is
+      # how the deployment changes without a commit.
+      - run: npm run build
+        env:
+          VITE_FEEDBACK_ENDPOINT: ${{ vars.FEEDBACK_ENDPOINT || 'https://script.google.com/macros/s/AKfycbyu8lINxYMmtqFhFarxqqIwHbGupWWoWjmeN_OW-kNSPW6Hgh6-KdkQuZAaWOcamTFF/exec' }}
+          VITE_TURNSTILE_KEY: ${{ vars.TURNSTILE_KEY }}
+          # Stamped onto every piece of feedback, so a report can be placed against the build it
+          # came from rather than against whatever is live by the time it is read.
+          VITE_BUILD: ${{ github.sha }}
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

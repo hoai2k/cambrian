@@ -1,0 +1,6 @@
+{
+  "tool": "built-in image_gen",
+  "original": "/Users/hoai/.codex/generated_images/01a07987-3084-72c2-88e4-5387ed08fc3a/exec-48e09cea-206f-4eac-a783-1177d6d23d24.png",
+  "prompt": "Create a square seamless tileable albedo texture for the chitinous cuticle of a living giant Devonian eurypterid Jaekelopterus. This is only a flat material swatch, NOT an animal or fossil, no objects. Extremely fine gently crescent-shaped imbricate cuticular ornament under translucent waxy cuticle, irregular subtle olive umber and warm brown mottling, tiny natural pinprick pores. Fine scale details, restrained photographic natural-history realism. Even neutral diffuse illumination, no directional shadows, no specular highlights, no ambient occlusion, no borders, no text, no large plates or cracks, no fish scales, no armour rivets. Keep contrast very low, almost monochromatic, suitable for multiplying a regional vertex palette. Material detail should look like an aquatic arthropod exoskeleton rather than leather or stone.",
+  "review": "Inspected source. Fine crescent/pore texture; broad mottling normalized away and contrast restrained by materials.py. Artistic source, not anatomical evidence."
+}

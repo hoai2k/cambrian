@@ -1,0 +1,33 @@
+{
+  "criterion": "Both embedded ocular organs AND every individual calcite lens; continuous actual cephalon; no rims or aggregate-only pass",
+  "models": [
+    {
+      "variant": "full",
+      "assetSha256": "145b07f864510197364b596dde99be9cfab81f7070a43dbe422eac573daaf1e2",
+      "ocularInsidePercent": [
+        100.0,
+        99.99126332343177
+      ],
+      "lensCount": 164,
+      "minimumIndividualLensInsidePercent": 73.76450365277181,
+      "minimumConservative95LowerPercent": 72.48137723158517,
+      "allIndividualLensesTarget65": true,
+      "ocularReport": "/Users/hoai/Documents/Stuff/Generations/cambrian/local/devonian-authoring/eldredgeops/v2/audit-full/report.json",
+      "lensReport": "/Users/hoai/Documents/Stuff/Generations/cambrian/local/devonian-authoring/eldredgeops/v2/audit-full/lens-report.json"
+    },
+    {
+      "variant": "lod",
+      "assetSha256": "466ffd6395bbf12bd495d2ae098c143a03aa304561176bb6c15fbfdd908544b7",
+      "ocularInsidePercent": [
+        100.0,
+        99.99126332343177
+      ],
+      "lensCount": 164,
+      "minimumIndividualLensInsidePercent": 73.67855608079071,
+      "minimumConservative95LowerPercent": 72.39417152198892,
+      "allIndividualLensesTarget65": true,
+      "ocularReport": "/Users/hoai/Documents/Stuff/Generations/cambrian/local/devonian-authoring/eldredgeops/v2/audit-lod/report.json",
+      "lensReport": "/Users/hoai/Documents/Stuff/Generations/cambrian/local/devonian-authoring/eldredgeops/v2/audit-lod/lens-report.json"
+    }
+  ]
+}

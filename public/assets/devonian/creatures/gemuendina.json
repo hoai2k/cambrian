@@ -1,0 +1,67 @@
+{
+  "id": "gemuendina",
+  "name": "Gemuendina",
+  "species": "Gemuendina stuertzi",
+  "provenance": "Early Devonian (Emsian), Hunsr\u00fcck Slate, Germany",
+  "description": "Broad rhenanid with a leading mouth, paired anterior eyes, small mosaic armour and a long finless tail; tail-driven swimming with restrained pectoral trim.",
+  "lengthMeters": 0.3,
+  "modelLength": 6.185060739517212,
+  "locomotion": "Swim",
+  "clips": [
+    "Idle",
+    "Swim",
+    "TurnLeft",
+    "TurnRight",
+    "Dive",
+    "Rise",
+    "Attack",
+    "Bite",
+    "Heavy",
+    "Hit",
+    "Death",
+    "Guard",
+    "Parry",
+    "Dodge",
+    "Eat",
+    "Stagger",
+    "Ability",
+    "Growth"
+  ],
+  "looping": [
+    "Idle",
+    "Swim",
+    "Guard",
+    "Eat"
+  ],
+  "anchors": [
+    "anchor_mouth",
+    "anchor_mouth_inside",
+    "anchor_attack_primary"
+  ],
+  "sources": [
+    {
+      "title": "Johanson and Smith (2005), Origin and evolution of gnathostome dentitions",
+      "url": "https://doi.org/10.1017/S1464793104006682",
+      "doi": "10.1017/S1464793104006682"
+    },
+    {
+      "title": "S\u00fcdkamp (2021), Ikonen des Hunsr\u00fcckschiefers, illustrated specimens pp.17\u201318",
+      "url": "https://www.bundenbach-fossilien.de/Literatur/2021_S%C3%BCdkamp_Ikonen.pdf"
+    },
+    {
+      "title": "Westoll (1967), Radotina and other tesserate fishes",
+      "url": "https://doi.org/10.1111/j.1096-3642.1967.tb01397.x",
+      "doi": "10.1111/j.1096-3642.1967.tb01397.x"
+    }
+  ],
+  "notes": [
+    "A finless tapering tail follows the illustrated specimen account; generic shark dorsal/caudal fins, fin spokes, ventral gill rows and sting are omitted.",
+    "Living thickness, soft-tissue cavity, exact denticle/tessera arrangement, fin flexibility, pigmentation and motions are explicit reconstruction choices.",
+    "0.30 m is a representative reconstructed length close to the illustrated 304 mm specimen, not a claimed species maximum.",
+    "All action names are compatibility labels for specimen gestures; no Devonian gameplay rules are prescribed.",
+    "V3 living mass and regional pigmentation follow user art direction as explicit interpretations; accepted clay-02 volume is retained except for the documented continuous orbital integration correction.",
+    "Seven sequential axial tail segments provide locomotor waves; limited pectoral-edge motion steers and trims the body.",
+    "V4 study05 forms a true terminal snout: the front upper and lower lips are the leading body edge, with closely paired eyes immediately above them. The oral lining connects continuously into an internal throat; accepted V3 posterior silhouette and pigmentation remain.",
+    "Paired anterior eyes above the leading mouth follow the user reference direction; dorsal eye-like motifs are skin markings, not additional eyes. This living orientation is an artistic reconstruction rather than a fossil certainty."
+  ]
+}

@@ -1,0 +1,85 @@
+{
+  "id": "bothriolepis",
+  "name": "Bothriolepis",
+  "species": "Bothriolepis canadensis",
+  "artVersion": 3,
+  "provenance": "Late Devonian (Frasnian), Escuminac Formation, Miguasha, Quebec, Canada",
+  "description": "Angular armoured antiarch with a steep immobile head, inset dorsal eyes, a posterior median crest and long jointed dermal pectoral appendages. A long flexible posterior carries a small square rayless dorsal and an asymmetrical tail.",
+  "lengthMeters": 0.4,
+  "modelLength": 5.0000001192092896,
+  "locomotion": "Swim",
+  "clips": [
+    "Ability",
+    "Attack",
+    "Bite",
+    "Death",
+    "Dive",
+    "Dodge",
+    "Eat",
+    "Growth",
+    "Guard",
+    "Heavy",
+    "Hit",
+    "Idle",
+    "Parry",
+    "Rise",
+    "Stagger",
+    "Swim",
+    "TurnLeft",
+    "TurnRight"
+  ],
+  "looping": [
+    "Idle",
+    "Swim",
+    "Guard",
+    "Eat"
+  ],
+  "anchors": [
+    "anchor_mouth",
+    "anchor_mouth_inside",
+    "anchor_attack_primary"
+  ],
+  "eyes": {
+    "meshes": [
+      "Closed inset eye L",
+      "Closed inset eye R"
+    ],
+    "headMesh": "bothriolepis_cuirass_v3",
+    "evidence": "tools/devonian/eye-audit.py on export_audit_v3.mjs output; the globes are inset into the continuous cuirass and were carried unchanged through the whole rework-v3 chain (eye mesh hash asserted at every stage).",
+    "audit": {
+      "tool": "tools/devonian/eye-audit.py on tools/devonian/creatures/bothriolepis/export_audit_v3.mjs output",
+      "full": {
+        "left": 96.11,
+        "right": 95.29,
+        "criterion50": "PASS",
+        "target65": true,
+        "rayDisagreements": 0
+      },
+      "lod1": {
+        "left": 96.14,
+        "right": 95.3,
+        "criterion50": "PASS",
+        "target65": true,
+        "rayDisagreements": 1
+      },
+      "headTopology": {
+        "valid": true,
+        "nonmanifoldEdges": 0,
+        "cappedBoundaryLoops": 0
+      },
+      "note": "The globes were never moved to satisfy the threshold: they are the MATERIAL01 seats, hash-asserted unchanged at every stage of the rework, and both read as visible dark beads in the forehead views."
+    }
+  },
+  "sources": [
+    "https://www.palaeo-electronica.org/content/2014/647-3d-bothriolepis",
+    "https://doi.org/10.26879/417"
+  ],
+  "notes": [
+    "V3 is a complete re-author, not a revision of V2: one closed 55,802-vertex cuirass with the oral annulus, cavity, both pectoral appendages and the posterior in a single manifold.",
+    "Surface relief is one resolved field. The V3 material chain (rework-v3) replaced MATERIAL04 stacked relief whose features were narrower than the mesh row pitch; longitudinal geometric-normal step excess over the smooth section form fell from 82.2 to 7.4 degrees.",
+    "Dermal microrelief is halved against MATERIAL04 (bump .18 -> .08, rostral-band normal-map slope .165 -> .079) and its lattice is isotropic, domain-warped and circumferentially periodic, so it no longer organises into rows.",
+    "The rostral cap carries the shared rest-space dermal field rather than a stretched chart; its mirrored disc chart is present in the UV layer but the cap is closed by a flat fan, which remains the reason it reads as a separate facet under raking light.",
+    "The shader carried a rest-space pore Bump that glTF cannot express; it is baked into the exported atlas normal maps. The root, articulation and rostral-cap slots ship vertex pigment only and do not carry that bake.",
+    "Pectoral segments have limited articulation, no ball joints, no head hinge and no terrestrial walking or rowing claim. Action labels are asset compatibility gestures, not Devonian gameplay definitions."
+  ]
+}

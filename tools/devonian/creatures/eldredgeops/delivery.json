@@ -1,0 +1,35 @@
+{
+  "status": "initial-preview",
+  "files": {
+    "eldredgeops.card.png": {
+      "bytes": 213503,
+      "sha256": "faecf91ef48030adf88a675b1069a5853bae4ad722f44f8651ca161480af0b11"
+    },
+    "eldredgeops.glb": {
+      "bytes": 34571900,
+      "sha256": "145b07f864510197364b596dde99be9cfab81f7070a43dbe422eac573daaf1e2"
+    },
+    "eldredgeops.json": {
+      "bytes": 3711,
+      "sha256": "4c0a7b695bfdd9c5f88d0c253dd0c363c2eddfb4c7510821adab71f64ab72667"
+    },
+    "eldredgeops.lod1.glb": {
+      "bytes": 10440880,
+      "sha256": "466ffd6395bbf12bd495d2ae098c143a03aa304561176bb6c15fbfdd908544b7"
+    },
+    "eldredgeops.png": {
+      "bytes": 356138,
+      "sha256": "d4368f64c5318f16e297cd17dc51f2ef95c93708c8c5c875438f940c449f46ed"
+    },
+    "eldredgeops.select.png": {
+      "bytes": 895935,
+      "sha256": "c6042c52a39f951b712151b3adf6a31e2850b397a1200ed4f358508fcc0dc755"
+    },
+    "eldredgeops.thumb.png": {
+      "bytes": 29547,
+      "sha256": "fcf9d200b7c691e832ac79808507d346e324b3152800d926973d20a2e3d29690"
+    }
+  },
+  "sourceBlend": "/Users/hoai/Documents/Stuff/Generations/cambrian/local/devonian-authoring/eldredgeops/v2/eldredgeops-v2.blend",
+  "sourceBlendSha256": "bf23de2155ca1e9bbe72d306705d078d32ca33feda7389232890152ba687de47"
+}

@@ -1,0 +1,35 @@
+{
+  "code": "T10",
+  "id": "massive-stromatoporoid",
+  "modelStatus": "preview",
+  "sourceModel": "assets/devonian/props/massive-stromatoporoid.glb",
+  "sourceBlendSHA256": "ef628a76b3091f8e5cce2f007974ecdf97fd8ac190b4034db14adf7ccdd75a98",
+  "projection": "orthographic top; RGBA cells; no lighting baked in colour",
+  "widthMeters": 1.3369315338134766,
+  "heightRangeMeters": [
+    0.0,
+    0.37405699491500854
+  ],
+  "normalConvention": "object/world XYZ encoded in RGB; not tangent-space normals",
+  "notes": "Original model surface study. Living colour is artistic; skeletal morphology and soft coating must remain separate. Transparent exterior is a mask.",
+  "maps": {
+    "albedo": {
+      "path": "assets/devonian/materials/massive-stromatoporoid/albedo.png",
+      "sha256": "983fad27ebac9a50155fec847b632fb4d77a5d69014d34614d49f71a936cd16c"
+    },
+    "normal-object": {
+      "path": "assets/devonian/materials/massive-stromatoporoid/normal-object.png",
+      "sha256": "5789bac092f312ea6f84aa7c06c7d4872d59635b49e7ebde92c282d1db3f5071"
+    },
+    "height": {
+      "path": "assets/devonian/materials/massive-stromatoporoid/height.png",
+      "sha256": "c5ac6a6d6c65d7b9430a7f3e5945cc982290eeb8dac0acfe79052e1f32d84990"
+    },
+    "roughness": {
+      "path": "assets/devonian/materials/massive-stromatoporoid/roughness.png",
+      "sha256": "f12b9f18556b939a516461a6d4332de3078b0ea2b23456c36629bb2cfd409089"
+    }
+  },
+  "heightEncoding": "8-bit RGBA orthographic reference only; not a 16-bit displacement map",
+  "dataSampling": "One point sample per pixel; denoising/compositor/sequencer disabled; 0.01 px box filter; Raw linear output; no RGB dilation or normal reconstruction across transparent exterior. Alpha is coverage, not a normal component."
+}

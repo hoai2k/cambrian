@@ -1,0 +1,69 @@
+{
+  "status": "preview",
+  "method": "Built-in imagegen, separate prompt for each painting; lossless source retained locally, resized WebP for game.",
+  "images": [
+    {
+      "id": "basin",
+      "modelStatus": "preview",
+      "sourceSHA256": "65ab24cc4662c594bcbb1c860626f31e4010a829abd4b51731fe13ac54853cd9",
+      "image": "assets/devonian/biomes/basin.webp",
+      "bytes": 11580
+    },
+    {
+      "id": "boulders",
+      "modelStatus": "preview",
+      "sourceSHA256": "61d93ee1feb3443aa3ca28c6d29634546a0b2591376d7a09aa4fd25de7379562",
+      "image": "assets/devonian/biomes/boulders.webp",
+      "bytes": 143112
+    },
+    {
+      "id": "channel",
+      "modelStatus": "preview",
+      "sourceSHA256": "8dce3aa0eb195d3467a1e1c5a9e67d890b7c20af39117b3fd92089126fdeb2e8",
+      "image": "assets/devonian/biomes/channel.webp",
+      "bytes": 91322
+    },
+    {
+      "id": "escarpment",
+      "modelStatus": "preview",
+      "sourceSHA256": "ff8e4436cb31300db5baff42b95023359598da49412000327c140f73015d8310",
+      "image": "assets/devonian/biomes/escarpment.webp",
+      "bytes": 61230
+    },
+    {
+      "id": "flats",
+      "modelStatus": "preview",
+      "sourceSHA256": "9ed8f8179067c76d26e72079d550280f411dd86cc9dbd783a2e5f631d00acbaa",
+      "image": "assets/devonian/biomes/flats.webp",
+      "bytes": 115072
+    },
+    {
+      "id": "forest",
+      "modelStatus": "preview",
+      "sourceSHA256": "908f3087aac174e436cd5b2cb115a108ca7c57bfc7ecc7934f3f4c6d0224ca31",
+      "image": "assets/devonian/biomes/forest.webp",
+      "bytes": 114758
+    },
+    {
+      "id": "nursery",
+      "modelStatus": "preview",
+      "sourceSHA256": "b54ce8df5a127c0fe7773635c6efc872d3bfd6ce922f137f4fb010bbe38e62dc",
+      "image": "assets/devonian/biomes/nursery.webp",
+      "bytes": 62518
+    },
+    {
+      "id": "shallows",
+      "modelStatus": "preview",
+      "sourceSHA256": "22d55dbd808a771e16e0f1a0f76c380cc6f3f5cf7396253e67c175f58d9f1581",
+      "image": "assets/devonian/biomes/shallows.webp",
+      "bytes": 89010
+    },
+    {
+      "id": "shelf",
+      "modelStatus": "preview",
+      "sourceSHA256": "2025e98683963ea6cd86afe25635957a8f68c7ac6def65107449f78dad7b15d8",
+      "image": "assets/devonian/biomes/shelf.webp",
+      "bytes": 93464
+    }
+  ]
+}

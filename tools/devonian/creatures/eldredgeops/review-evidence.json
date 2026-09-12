@@ -1,0 +1,33 @@
+{
+  "status": "initial-preview",
+  "actualGLBViews": [
+    "threequarter",
+    "side",
+    "dorsal",
+    "front",
+    "eye",
+    "oral-ventral",
+    "action-Crawl",
+    "action-Swim",
+    "action-Eat",
+    "action-Heavy",
+    "action-Guard",
+    "action-Ability",
+    "action-Dodge",
+    "action-Death"
+  ],
+  "sourceDirectory": "/Users/hoai/Documents/Stuff/Generations/cambrian/local/devonian-authoring/eldredgeops/v2/review-export-full",
+  "contactSheet": "/Users/hoai/Documents/Stuff/Generations/cambrian/local/devonian-authoring/eldredgeops/v2/preview-review.jpg",
+  "lodViews": [
+    "lod-Idle",
+    "lod-Crawl",
+    "lod-Death",
+    "lod-eye"
+  ],
+  "limits": [
+    "Static basic action and anatomical review completed; exhaustive sequential playback and all transition combinations deferred.",
+    "Enrollment coaptation and complete appendage enclosure remain refinement work."
+  ],
+  "modelSha256": "145b07f864510197364b596dde99be9cfab81f7070a43dbe422eac573daaf1e2",
+  "lodSha256": "466ffd6395bbf12bd495d2ae098c143a03aa304561176bb6c15fbfdd908544b7"
+}

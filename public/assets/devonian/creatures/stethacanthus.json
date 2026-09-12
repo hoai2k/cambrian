@@ -1,0 +1,105 @@
+{
+  "id": "stethacanthus",
+  "name": "Stethacanthus",
+  "species": "Stethacanthus sp. (CMNH 8988-informed reconstruction)",
+  "provenance": "Late Devonian, upper Famennian Cleveland Shale, Ohio, USA",
+  "description": "A deep-headed, deep-bodied early chondrichthyan with opposing cranial and dorsal crown denticles, a broad-rooted supported spine-brush, slender metapterygial fin extensions, and a strongly heterocercal caudal axis.",
+  "lengthMeters": 0.7,
+  "modelLength": 5.458940386772156,
+  "locomotion": "Swim",
+  "clips": [
+    "Ability",
+    "Attack",
+    "Bite",
+    "Death",
+    "Dive",
+    "Dodge",
+    "Eat",
+    "Growth",
+    "Guard",
+    "Heavy",
+    "Hit",
+    "Idle",
+    "Parry",
+    "Rise",
+    "Stagger",
+    "Swim",
+    "TurnLeft",
+    "TurnRight"
+  ],
+  "looping": [
+    "Idle",
+    "Swim",
+    "Guard",
+    "Eat"
+  ],
+  "anchors": [
+    "anchor_mouth",
+    "anchor_mouth_inside",
+    "anchor_attack_primary"
+  ],
+  "artVersion": 3,
+  "eyes": [
+    {
+      "name": "eye_globe_R",
+      "closedEnvelope": "head_body_envelope_closed",
+      "centerBlender": [
+        -0.2603197693824768,
+        -1.3076238632202148,
+        0.13816672563552856
+      ],
+      "radii": [
+        0.056159999999999995,
+        0.072,
+        0.061200000000000004
+      ],
+      "searchRadii": [
+        0.078,
+        0.1,
+        0.085
+      ],
+      "surfaceInwardDepth": 0.037000000000000005,
+      "sourceVolumeFraction": 0.9116628915765631,
+      "searchSourceVolumeFraction": 0.8010171374845079,
+      "samples": 23399,
+      "method": "Uniform solid ellipsoid samples tested against nearest oriented actual head surface; independent exported polyhedron audit required. Radii scaled x0.72 from the seating search, centre and inward depth held fixed; sourceVolumeFraction is recomputed at the final radii."
+    },
+    {
+      "name": "eye_globe_L",
+      "closedEnvelope": "head_body_envelope_closed",
+      "centerBlender": [
+        0.26026207208633423,
+        -1.3076237440109253,
+        0.13829471170902252
+      ],
+      "radii": [
+        0.056159999999999995,
+        0.072,
+        0.061200000000000004
+      ],
+      "searchRadii": [
+        0.078,
+        0.1,
+        0.085
+      ],
+      "surfaceInwardDepth": 0.037000000000000005,
+      "sourceVolumeFraction": 0.9111500491473995,
+      "searchSourceVolumeFraction": 0.8020855592119321,
+      "samples": 23399,
+      "method": "Uniform solid ellipsoid samples tested against nearest oriented actual head surface; independent exported polyhedron audit required. Radii scaled x0.72 from the seating search, centre and inward depth held fixed; sourceVolumeFraction is recomputed at the final radii."
+    }
+  ],
+  "sources": [
+    "https://www.app.pan.pl/archive/published/app52/app52-705.pdf",
+    "https://doi.org/10.1080/02724634.1984.10012016",
+    "https://www.nature.com/articles/25467",
+    "https://repozytorium.uw.edu.pl/bitstreams/5cc9e710-1bcb-4353-a08d-f1f56bde31ec/download"
+  ],
+  "notes": [
+    "Devonian specimen CMNH 8988 preserves spine-brush and associated teeth. Species assignment to S. altonensis is questioned in Ginter & Sun 2007; this is not Akmonistion zangerli.",
+    "Whole-animal proportions, exact brush crown width, fin-whip length, living pigmentation, soft-tissue lining and action timing are comparative artistic reconstruction, not measurements of a complete specimen.",
+    "Complex-bearing male configuration is comparative; the sex of CMNH 8988 is not established here. No brush inflation or mobile denticles.",
+    "Representative 0.7m illustrative individual, not a measured fossil total length or claimed species maximum.",
+    "V3: shape study ported onto the V2 builder for shark-like head/body/fin/tail proportions and a dorsal spine-brush in the body's own colour family (queue finding against docs/reference/Stethacanthus.jpg). Geometry only; the anatomical sourcing above is unchanged."
+  ]
+}

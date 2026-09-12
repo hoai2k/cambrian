@@ -1,0 +1,18 @@
+{
+  "candidate": "Bothriolepis V3 MATERIAL01",
+  "owner": "Astra high",
+  "executor": "Terra medium",
+  "state": "frozen source only; execution deferred at user pause",
+  "inputs": {
+    "/Users/hoai/Documents/Stuff/Generations/cambrian/local/expansion-repo/tools/devonian/creatures/bothriolepis/rework-v3/geometry_clay02.py": "cf5fa0dcecfa3cfd88d4b644785b939596cd0e98027108f057f543a53e169133",
+    "/Users/hoai/Documents/Stuff/Generations/cambrian/local/expansion-repo/tools/devonian/creatures/bothriolepis/rework-v3/material_fields01.py": "83318292f9d2dc238cf2605e5e4de6acdbad6f52097df6755960b6b88b88a36f",
+    "/Users/hoai/Documents/Stuff/Generations/cambrian/local/expansion-repo/tools/devonian/creatures/bothriolepis/rework-v3/build_material01.py": "13f43ff595ffb1cd03de6858bb86d87dd8563493a03bf904e88055815887da80",
+    "/Users/hoai/Documents/Stuff/Generations/cambrian/local/expansion-repo/tools/devonian/creatures/bothriolepis/rework-v3/execute_material01.py": "36297c28a2a6a534668981162c53234777787f78980e7aeb29e9ef7a704768af",
+    "/Users/hoai/Documents/Stuff/Generations/cambrian/local/expansion-repo/tools/devonian/creatures/bothriolepis/rework-v3/clay02-verdict-material01-handoff.md": "10ebc951e0544711e5c68be1afc25b453302d5b7dff1455a394c126ca599e188",
+    "/Users/hoai/Documents/Stuff/Generations/cambrian/local/expansion-repo/tools/devonian/creatures/bothriolepis/rework-v3/material01-inputs/dermal-source-material01.png": "28cfb67e462ee26668ad68f3d21b1560aed98da1fc7fbb3d6c05d91fee84c127",
+    "/Users/hoai/Documents/Stuff/Generations/cambrian/local/expansion-repo/tools/devonian/creatures/bothriolepis/rework-v3/material01-inputs/imagegen-provenance.md": "4e9e3e16e4014b61f545b21c2178f8a8a4b0655c4874c71b59986f3420241b6d",
+    "/Users/hoai/Documents/Stuff/Generations/cambrian/local/devonian-authoring/bothriolepis/rework-v3/clay02/bothriolepis-clay02.blend": "55ca3b38a1de698a9e788ca9f76ab576476aa28785c84380754d27ebcbecc84b",
+    "/Users/hoai/Documents/Stuff/Generations/cambrian/local/devonian-authoring/bothriolepis/rework-v3/clay02/outputs-sha256.json": "3d1f7511578f67e4ab1e0bbab5f766e77416f6bc7db0dad9549b9481dfca84e2",
+    "/Users/hoai/Documents/Stuff/Generations/cambrian/local/devonian-authoring/bothriolepis/reference-417.pdf": "862d19a8729a3ead88878cccf088744f0dae330cb9dc7a39e451fd1ef6d3b433"
+  }
+}
