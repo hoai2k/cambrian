@@ -1,4 +1,12 @@
-/** Plant collision: bodies slide around stiff sponges, fold soft algae over, and plants spring back. */
+/**
+ * Plant collision: bodies slide around stiff sponges, fold soft algae over, and plants spring back.
+ *
+ * What a plant does to a body, and a body to a plant, is graded by size — `give` in
+ * `src/sim/flora.ts` is the actor's size against the plant's rigidity — so the cases here ask for
+ * that gradient rather than for one animal's numbers. Two absolute thresholds used to be tuned to
+ * the adult Anomalocaris of the flat roster, and both went stale within a percent of their limits
+ * the day the Cambrian went to its natural lengths and that animal grew by half.
+ */
 import { Game } from '../src/sim/game';
 import { emptyInput, type InputFrame } from '../src/sim/types';
 import { bodyRadius, lengthOf } from '../src/sim/actors';
@@ -65,7 +73,12 @@ const settle = (g: Game, seconds: number) => { const m = new Map([[0, emptyInput
   if (S) console.log(p.pos, plant);
   check('adult gets past a sponge', p.pos.x > x0 + 4, `x=${p.pos.x.toFixed(1)} (plant at ${x0})`);
   check('adult was deflected sideways around it', maxDev > plant.R * 0.8 + bodyRadius(p) * 0.5, `dev=${maxDev.toFixed(2)} R=${plant.R.toFixed(2)} ra=${bodyRadius(p).toFixed(2)}`);
-  check('sponge bends only a little', maxBend < plant.H * 0.12, `maxBend=${maxBend.toFixed(3)} H=${plant.H.toFixed(2)}`);
+  // Measured against the sponge's own lean limit, not against a fraction of its height. The claim
+  // is "only giants push it over", and an adult leaving it half-bent is that claim holding — the
+  // giant case below pins it at the limit. As a fraction of height this read 12%, which was tuned
+  // when the roster was flat and every adult was about the size of the sponge; at its natural
+  // length an Anomalocaris is twice the sponge's height and of course shoulders it further over.
+  check('an adult does not push a sponge over', maxBend < plant.maxB * 0.8, `maxBend=${maxBend.toFixed(3)} of limit ${plant.maxB.toFixed(2)}`);
   check('adult keeps moving (slides, no dead stop)', minSpeed > 1.0, `minSpeed=${minSpeed.toFixed(2)}`);
 }
 // --- adult straight through soft algae: bends over, slows a little, springs back ---
@@ -76,7 +89,10 @@ const settle = (g: Game, seconds: number) => { const m = new Map([[0, emptyInput
   check('adult swims through algae', p.pos.x > x0 + 4, `x=${p.pos.x.toFixed(1)}`);
   check('algae folds over substantially', maxBend > plant.H * 0.35, `maxBend=${maxBend.toFixed(2)} H=${plant.H.toFixed(2)}`);
   check('algae bends away from the swimmer (+x)', bendDirX > 0, `bx at max=${bendDirX.toFixed(2)}`);
-  check('algae slows the swimmer slightly, not a lot', minSpeed < freeSpeed * 0.97 && minSpeed > freeSpeed * 0.45, `min=${minSpeed.toFixed(2)} free=${freeSpeed.toFixed(2)}`);
+  // At its worst instant, pushing through the middle of a frond. How much of an animal's speed that
+  // costs is a matter of how big the animal is — see the gradient below, which is the claim worth
+  // testing — so what is asked here is only that the plant is felt and is not a wall.
+  check('algae slows the swimmer without stopping it', minSpeed < freeSpeed * 0.97 && minSpeed > freeSpeed * 0.35, `min=${minSpeed.toFixed(2)} free=${freeSpeed.toFixed(2)}`);
   const active0 = g.world.activeFlora.length;
   settle(g, 6);
   check('algae springs back to rest and deactivates', !plant.active && Math.hypot(plant.bx, plant.bz) < 1e-3 && g.world.activeFlora.length === 0, `active ${active0} -> ${g.world.activeFlora.length} bend=${Math.hypot(plant.bx, plant.bz).toExponential(1)}`);
@@ -108,6 +124,36 @@ const settle = (g: Game, seconds: number) => { const m = new Map([[0, emptyInput
   check('tuft folds', maxBend > plant.H * 0.3, `maxBend=${maxBend.toFixed(2)} H=${plant.H.toFixed(2)}`);
   check('tuft only mildly slows a larva', minSpeed > freeSpeed * 0.5, `min=${minSpeed.toFixed(2)} free=${freeSpeed.toFixed(2)}`);
 }
+// --- what a plant costs you depends on how big you are ---
+// The two numbers above are one animal's place on a curve, and the curve is the actual contract: a
+// soft frond is a thicket to a larva and a nuisance to an adult, and a stiff sponge is immovable to
+// a larva and gets shouldered flat by anything big. Stated as a gradient it holds whatever lengths
+// the roster is playing at — which is why the absolute thresholds these replace went stale the day
+// the Cambrian went to its natural sizes.
+{
+  const scales = [0.25, 0.5, 1, 1.5];
+  const through = scales.map((sc) => {
+    const { g, p } = scene('thalli', 1.2, 'anomalocaris', sc, 0.05);
+    let min = Infinity, free = 0;
+    swim(g, p, 6, (t) => { const sp = Math.hypot(p.vel.x, p.vel.z); free = Math.max(free, sp); if (t > 0.6) min = Math.min(min, sp); });
+    return min / free;
+  });
+  check('a bigger body keeps more of its speed through an alga', through.every((v, i) => i === 0 || v > through[i - 1]),
+    scales.map((sc, i) => `${sc}x:${(through[i] * 100).toFixed(0)}%`).join(' '));
+  check('...and an alga is felt by all of them', through.every((v) => v < 0.9) && through[0] < through[through.length - 1] * 0.7,
+    `${(through[0] * 100).toFixed(0)}% for a larva against ${(through[through.length - 1] * 100).toFixed(0)}% for a big one`);
+  const bend = scales.map((sc) => {
+    const { g, p, plant } = scene('vauxia', 1.3, 'anomalocaris', sc, 0.25);
+    let b = 0;
+    swim(g, p, 6, () => { b = Math.max(b, Math.hypot(plant.bx, plant.bz)); });
+    return b / plant.maxB;
+  });
+  check('a bigger body bends a stiff sponge further', bend.every((v, i) => i === 0 || v >= bend[i - 1]),
+    scales.map((sc, i) => `${sc}x:${(bend[i] * 100).toFixed(0)}%`).join(' '));
+  check('...and only the big end of the roster lays it flat', bend[0] < 0.05 && bend[bend.length - 1] > 0.95,
+    `${(bend[0] * 100).toFixed(0)}% for a larva, ${(bend[bend.length - 1] * 100).toFixed(0)}% for a big one`);
+}
+
 // --- full world: cost of the plant pass ---
 {
   const g = new Game('rise', [{ creature: 'anomalocaris', device: 'keyboard', ready: true }], 5052026);
