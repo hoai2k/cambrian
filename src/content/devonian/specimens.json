@@ -27,8 +27,8 @@
       "Representative 3.5 m adult, not a genus maximum.",
       "PBR UV albedo, normal and roughness; independent vertex pigment bake for LOD.",
       "Growth is maturation display, no scaling or moulting.",
-      "V4 focused cranial and gnathal refinement; preserved V2 body, oral lining, rig, eye globes and anchors. Actual full/LOD eye-volume and 173 feeding-pose checks passed before an exact-geometry COLOR binding repair; audit transfer is hash-proven. Root completed individual visual review including corrected LOD pigment.",
-      "Focused V4 head and gnathal pass accepted; LOD05 corrects encoded sRGB pigment to linear vertex colors. Matched full/LOD rest and Heavy views reviewed. Reduced surface detail and normal/roughness parity plus broader controller/art polish remain pending; model stays preview."
+      "V4 cranial and gnathal treatment reconstructed from face-v4/study_02.py and study_03.py on the V2 body, oral lining, rig, eye globes and anchors.",
+      "V3 carries the viewer sculpt docs/sculpts/dunkleosteus-sculpt.json: crown raised over stations 16-18, snout lowered and shortened, applied as the same profile warp the viewer previews."
     ]
   },
   {
@@ -185,9 +185,9 @@
     "name": "Doryaspis",
     "species": "Doryaspis nathorsti",
     "category": "creature",
-    "modelStatus": "preview",
+    "modelStatus": "final",
     "provenance": "Early Devonian, Wood Bay Formation, Spitsbergen, Svalbard",
-    "description": "A jawless fish with a flat dorsal headshield, deep ventral armour, short fixed pseudorostrum and laterally extended rigid cornual plates; flexible scaled posterior with a hypocercal tail.",
+    "description": "A jawless fish with a low domed head shield over a deep ventral bowl, rigid cornual plates, a terminal forward-facing mouth on the front of the snout and a fixed pseudorostral saw projecting from the lower jaw beneath it; flexible scaled posterior with a hypocercal tail.",
     "model": "assets/devonian/creatures/doryaspis.glb",
     "lod": "assets/devonian/creatures/doryaspis.lod1.glb",
     "image": "assets/devonian/creatures/doryaspis.thumb.png",
@@ -196,7 +196,8 @@
       "Idle",
       "Swim",
       "Guard",
-      "Eat"
+      "Eat",
+      "Grab"
     ],
     "sources": [
       "https://doi.org/10.1038/s42003-024-06837-8",
@@ -204,9 +205,11 @@
       "https://www.app.pan.pl/archive/published/app07/app07-249.pdf"
     ],
     "notes": [
-      "Original reconstruction, not a scan; head/projection/tail proportions guided by the D. nathorsti reconstruction in Botella et al. 2024 supplementary figure 1b.",
-      "Living pigmentation, exact soft-tissue lining and action timing are artistic interpretation.",
-      "No jaws, paired fins, hinged cornua, or moving pseudorostrum; action labels retain runtime compatibility.",
+      "V3 is a complete new sculpture, not a reskin of V2. The mouth is terminal: a real recessed chamber bored horizontally through the blunt front face of the snout, directly above the pseudorostral root. There is no dorsal or upward aperture.",
+      "The pseudorostrum grows out of the lower front of the snout as a protruding lower jaw, and remains fixed: this animal is jawless and nothing here hinges or gapes.",
+      "Cornual plates are rigid armour continuous with the shield at wide thick roots, at full length; they are not hinged appendages or paired fins.",
+      "All pigment ships in COLOR_0 for both levels and no base-colour texture exists, so nothing is multiplied twice; the full model carries only a tiled microrelief normal and roughness pair, which the reduced model drops.",
+      "Living pigmentation, soft oral lining and action timing are artistic interpretation.",
       "Enlarged authoring coordinates; lengthMeters is the representative ecological size and modelLength supports runtime normalization."
     ]
   },

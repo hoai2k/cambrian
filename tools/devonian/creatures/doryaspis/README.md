@@ -85,3 +85,24 @@ The completed review includes all eighteen final action portraits and seven sequ
 ## Integrated release review
 
 The parent independently checked the final losslessly packaged full and reduced GLBs; `eye-packaged-review.json` records their exact hashes and containment results. Both specimens passed the shared asset/anchor checks and the built main viewer loaded all eighteen actions without browser errors. Paused action selection, frame stepping, feeding and terminal Death poses were inspected. Final matching portraits and the refreshed specimen catalogue accompany these assets. Editable Blender sources and extended visual recordings remain under `cambrian/local/devonian-authoring/`.
+
+## V3 — the rework, shipped 12 September 2026
+
+The user's direction, after the V2 head: the mouth is at the very front of the snout, not on top
+of the head, and the saw is a *lower-jaw* protrusion below it — the front of the body is the
+snout and the pseudorostrum sticks out from under it. V3 is a complete rebuild to the reference:
+`rework-v3/geometry_clay02.py` (the clay, five iterations, judged in `rework-v3/review-clay02.md`
+and designed in `rework-v3/DESIGN-clay02.md`), `materials_v3.py` (deterministic pigment and a
+tileable microrelief, five studies in `rework-v3/review-material-v3.md`), and the production
+`build_v3.py` → `finalize_v3.py` → `portraits_v3.py`, with `export_audit_v3.mjs` and
+`validation_v3.json` as the evidence. The snout ends in a blunt 0.45 × 0.41 front face; the mouth
+is a transverse ellipse bored straight back through the middle of it onto a 0.44-deep chamber
+behind a rolled rim, and the build asserts there is no dorsal or upward aperture; the
+pseudorostrum's root is buried in the ventral snout and emerges from underneath, its root top 0.063
+below the lower lip. Twelve bones with V2's names, V2's eighteen clips at their own names and
+durations plus `Grab` (0.9 s held loop). Anchors bind-aligned to 2e-5; packaging exact round-trip
+on both levels; eyes 66.5–66.7% embedded at both levels. Rebuild is deterministic (byte-identical
+GLBs on a second run). Pigment is speculative and the microrelief is deliberately near-invisible
+at whole-body distance; in pure side silhouette the saw's lower edge continues the ventral line, as
+the reference draws it, so the chin reads as a bulge rather than a step. `rework-v3/mouth_strip_v3.py`
+renders the front / three-quarter / side snout strip the direction is judged from.
