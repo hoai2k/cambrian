@@ -56,7 +56,9 @@ const EXPECTED = {
   // Odaraia V3's parts are named for the arthropod anatomy they are: the bivalved carapace and
   // the trunk under it are body, the articulated inner limb branches join the legs, the lamellate
   // swimming paddles are the fin fold of a filter feeder, and the mouth apparatus is an oral
-  // plate by another name.
+  // plate by another name. They replaced Cuticle/Bristles/Membrane/Sclerotized-edges, and they land
+  // in the same five slots those did — until they were classified, six of Odaraia's seven materials
+  // fell through to `body` and a scheme painted the whole animal one colour.
   'shell': 'body',
   'trunk': 'body',
   'endites': 'legs',
