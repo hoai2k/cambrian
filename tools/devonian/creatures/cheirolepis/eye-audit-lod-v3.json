@@ -4,7 +4,7 @@
     {
       "id": "cheirolepis",
       "revision": "V3 candidate",
-      "assetSha256": "90c870498440d1fe1e0bcf936af20c3ff477a4ea4fe44994fd92219a158390b7",
+      "assetSha256": "0b2f82e11c6759147e9881643ca2b9ae6ad1018f6c404de23c1b8b41316be64d",
       "headMesh": "cheirolepis cheirolepis head",
       "headTriangles": 3566,
       "headTopology": {
@@ -16,41 +16,41 @@
         {
           "eye": 0,
           "center": [
-            -0.12999999895691872,
-            0.11001097410917282,
-            2.050037682056427
+            0.17800000682473183,
+            0.15601195394992828,
+            2.0300002694129944
           ],
           "radii": [
-            0.05195818468928337,
-            0.07798901945352554,
-            0.08579438924789429
+            0.05795350298285484,
+            0.08498804271221161,
+            0.09181994199752808
           ],
           "eyeTriangles": 270,
           "boundingBoxCandidates": 120000,
           "volumeSamples": 61169,
-          "inside": 50480,
-          "insidePercent": 82.5254622439471,
+          "inside": 52659,
+          "insidePercent": 86.08772417400971,
           "wilson95Percent": [
-            82.22247713644843,
-            82.82436221129244
+            85.81119865289779,
+            86.35971714121172
           ],
           "conservative95Percent": [
-            82.22247713644843,
-            82.82923305843981
+            85.81119865289779,
+            86.35971714121172
           ],
-          "rayDisagreements": 3,
-          "insideLowerPercent": 82.5254622439471,
-          "insideUpperPercent": 82.53036668900914,
+          "rayDisagreements": 0,
+          "insideLowerPercent": 86.08772417400971,
+          "insideUpperPercent": 86.08772417400971,
           "closureClearanceLowerBounds": [],
           "criterion50": "PASS",
           "target65": true,
           "guidanceOnly70PercentTranslationGlTF": [
-            1.938684135893709e-06,
+            -2.1039693365310086e-06,
             0.0,
             0.0
           ],
           "guidanceOnly70PercentTranslationBlender": [
-            1.938684135893709e-06,
+            -2.1039693365310086e-06,
             -0.0,
             0.0
           ]
@@ -58,41 +58,41 @@
         {
           "eye": 1,
           "center": [
-            0.12999999895691872,
-            0.11001097410917282,
-            2.0501516461372375
+            -0.17800001055002213,
+            0.15601195394992828,
+            2.0299997329711914
           ],
           "radii": [
-            0.05195818468928337,
-            0.07798901945352554,
-            0.08590835332870483
+            0.057953499257564545,
+            0.08498804271221161,
+            0.09182000160217285
           ],
           "eyeTriangles": 266,
           "boundingBoxCandidates": 120000,
-          "volumeSamples": 61347,
-          "inside": 50522,
-          "insidePercent": 82.35447536146837,
+          "volumeSamples": 61492,
+          "inside": 52776,
+          "insidePercent": 85.82579847785078,
           "wilson95Percent": [
-            82.05079028073986,
-            82.6541085677871
+            85.54788016457432,
+            86.09924076855883
           ],
           "conservative95Percent": [
-            82.05079028073986,
-            82.6541085677871
+            85.54788016457432,
+            86.1008536930356
           ],
-          "rayDisagreements": 0,
-          "insideLowerPercent": 82.35447536146837,
-          "insideUpperPercent": 82.35447536146837,
+          "rayDisagreements": 1,
+          "insideLowerPercent": 85.82579847785078,
+          "insideUpperPercent": 85.82742470565277,
           "closureClearanceLowerBounds": [],
           "criterion50": "PASS",
           "target65": true,
           "guidanceOnly70PercentTranslationGlTF": [
-            -1.9398587483010488e-06,
+            2.103970018652035e-06,
             0.0,
             0.0
           ],
           "guidanceOnly70PercentTranslationBlender": [
-            -1.9398587483010488e-06,
+            2.103970018652035e-06,
             -0.0,
             0.0
           ]

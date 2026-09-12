@@ -349,3 +349,23 @@ a preview; small LOD crease/pigment and broader controller/art polish remain.
 ## Closing checkpoint — 8 September 2026
 
 Titanichthys V3 is on mainbc5a2d0 and Dunkleosteus linear-color LOD05 on mainff9a853, both retained as previews. Coccosteus candidate07 passes its full/reduced surface review but awaits final oral/eye/motion/runtime/package checks before replacement. Bothriolepis M04 remains held for nuchal/rostral shading and coarse relief after the mouth improvement. Odaraia material02 direction is accepted and production-plan03 is saved; rig/baking/game transparency/actions/export remain. No general audit of an obsolete model should precede its complete rework. Resume details and exact evidence are in `docs/devonian/current-state.md`. Work paused at the user's request.
+
+## 11–12 September 2026 — triage, small fixes and the first reference-led rebuilds
+
+Blender 5.2 now runs in the session (`npm run blender`), so the whole builder → package → check →
+audit path runs in one place; the staging is `docs/model-queue-plan.md`, the resume point
+`docs/model-queue-state.md`.
+
+- **Triage of the eight no-reference previews**: Walliserops, Furcaster and Michelinoceras read as
+  the animals they are — badges cleared. Eldredgeops (occipital joint opened at the Ability peak)
+  and Manticoceras (umbilicus open to a third of the diameter where its own sources say small)
+  were fixed, approved and shipped; badges cleared. Acanthostega, Jaekelopterus and Palaeoisopus
+  were promoted with written findings and their silhouette redesigns approved as studies.
+- **Cheirolepis V3** shipped: the reference-led face, seated fin roots and swept fins
+  (`tools/devonian/creatures/cheirolepis/README.md`).
+- **Titanichthys, Gemuendina, Dunkleosteus** accepted by the user as published; badges cleared.
+  Dunkleosteus' "paler LOD" was a builder regression, fixed in `build_v2.py`; the shipped asset
+  was already right.
+- **Coccosteus** is blocked here: candidate07's frozen recipe needs two evidence files that exist
+  only in the Mac authoring tree (`rework-v3/RESUME-CANDIDATE07-BLOCKED.md`).
+- **Doryaspis** waits on the mouth-position decision recorded in `rework-v3/root-review-clay01.md`.
