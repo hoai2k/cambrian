@@ -472,3 +472,17 @@ verify its report and `ports/dunkleosteus-sculpt-sheet.png` before committing; `
 those paths reverts it if the sheet is bad. The Titanichthys agent was editing
 `sculpt-port/build_candidate.py`, `sculpt-port/geometry.py` and `tools/sculpt-measure.ts`
 (review that last diff — it was not asked to change the tool).
+
+## 12 September, 23:15 UTC — Dunkleosteus and Doryaspis on main
+
+Dunkleosteus sculpt port (`e7077e8`, `build_v3.py` carries the viewer's own warp) and Doryaspis V3
+(`ebebf9f`, mouth at the front, saw as the lower jaw) are on main (`c657280`); both sculpt files
+retired. **Titanichthys**: the first port pleated the snout (per-vertex lateral scale of a blunt
+nose); a fresh Opus agent is rebuilding it as a loft of the head cage's own control rows
+(`sculpt-port/geometry.py` `nose_loft`, knots from `solve_nose.py`), then transplant → package →
+check → portraits → `ports/titanichthys-final-sheet.png`. When it reports: judge the sheet,
+`integrate.sh titanichthys <final> <final>`, `apply.mjs titanichthys`, `check.mjs`, measure
+(`--against` the old GLB from git `2199247`), commit the sculpt-port changes with it, delete
+`docs/sculpts/titanichthys-sculpt.json`, merge. A deployment-verification agent (Opus) is running
+every `pages.yml` step in parallel. Then the report to the user. Coccosteus still blocked on the
+Mac files.
