@@ -1,32 +1,32 @@
 {
-  "onychodus": [
+  "nahecaris": [
     {
       "name": "anchor_mouth",
-      "bone": "jaw",
+      "bone": "body",
       "point": [
         0,
-        -2.54,
-        0.085
+        -1.265,
+        -0.135
       ],
       "role": "mouth"
     },
     {
       "name": "anchor_mouth_inside",
-      "bone": "skull",
+      "bone": "body",
       "point": [
         0,
-        -1.7,
-        0.055
+        -1.265,
+        -0.065
       ],
       "role": "swallow"
     },
     {
       "name": "anchor_attack_primary",
-      "bone": "jaw",
+      "bone": "mandibleL",
       "point": [
-        0,
-        -2.56,
-        0.1
+        0.054,
+        -1.29,
+        -0.135
       ],
       "role": "attack"
     }

@@ -14,13 +14,6 @@
     "reason": "8 September user reference: long head with fuller cheek, inset fish-style eyes, mapped cranial bones and overlapping relief scales; reconcile comparative body with Gogo head evidence. Preserved backup; redesign before audits."
   },
   {
-    "id": "onychodus",
-    "status": "pending",
-    "scope": "individual-refinement",
-    "model": true,
-    "reason": "8 September user reference: distinctive paired lower tusk apparatus, mapped dermal cranial bones and modeled coherent oral/jaw motion; verify primary tooth-whorl anatomy. Preserved backup; redesign before audits."
-  },
-  {
     "id": "eldredgeops",
     "status": "pending",
     "scope": "individual-refinement",
@@ -65,8 +58,7 @@
     "id": "nahecaris",
     "status": "pending",
     "scope": "individual-refinement",
-    "model": true,
-    "reason": "8 September user reference: shrimp-like curved body/shell, positioned jointed legs and proportionate eyes/antennae. Coordinate redesign with attack/Eat articulation; preserve original; audit new geometry afterward.",
+    "model": false,
     "clips": [
       "Bite",
       "Attack",
