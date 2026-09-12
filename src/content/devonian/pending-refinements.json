@@ -7,13 +7,6 @@
     "reason": "User reference directs a complete Blender remodel of silhouette, surfaces, rig and motion."
   },
   {
-    "id": "rhinodipterus",
-    "status": "pending",
-    "scope": "individual-refinement",
-    "model": true,
-    "reason": "8 September user reference: long head with fuller cheek, inset fish-style eyes, mapped cranial bones and overlapping relief scales; reconcile comparative body with Gogo head evidence. Preserved backup; redesign before audits."
-  },
-  {
     "id": "eldredgeops",
     "status": "pending",
     "scope": "individual-refinement",
