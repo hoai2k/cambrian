@@ -51,7 +51,7 @@ const raiseToTop = (g: InstanceType<typeof Game>, i: number) => {
 // The Devonian keeps growth in its own side table, so a test that wants a body *put* on a rung
 // has to reach it. Nothing in the game does this — it moults — but a test must not have to run
 // twenty minutes of feeding to reach the case it is checking.
-const DEV = which === 'devonian'
+const DEV = which !== 'cambrian'                      // the Triassic grows in the same side table
   ? await import('../src/sim/devonian/state').then((m) => ({
       setStage: (g: InstanceType<typeof Game>, a: import('../src/sim/types').Actor, stage: number) => {
         const d = m.devActor(g, a); d.stage = stage; d.standing = m.STAGE_AT[stage];

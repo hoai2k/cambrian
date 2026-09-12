@@ -15,17 +15,46 @@ for the era's documents in one place next to `docs/devonian/`.
 | [canonical/](canonical/README.md) | The approved pose for each subject: the visual contract every model is made from. 26 images. |
 | [research.md](research.md) | The natural-history notes and sources the roster and biomes were drawn from, with confidence labels. |
 
+## Built: the playable skeleton
+
+The era is **playable at `/triassic/`** as of 12 September 2026, ahead of its art. What exists:
+
+- `src/content/triassic/` — the pack: 21 playable animals and the four shore animals, the biomes,
+  depth table, ecology, schemes, music rotation and sound map, the refinement queue (every model
+  outstanding) and `index.ts` with the borrowed bodies.
+- `src/sim/triassic/` — the rules behind the `RULES?.` hooks (`rules.ts`), the era's specials
+  (`specials.ts`), and the shore animals (`shore.ts`).
+- The engine seams the era needed, all optional and unused by the other eras: `breathing: 'air'`,
+  `armourFacing`, `warmBlooded`, `riseRate`, `shore`, `birth`, `flight`, `thunniform`, `sink`,
+  `neckReach`, `paddleRow`, `pod`, `peaceful` on `CreatureDef`; `environment.floorDepth` and the
+  per-biome sea floor in `src/sim/world.ts`; `liveBirth` on the era rules; `'<era>/<id>'` stand-ins
+  that borrow another era's body, and `standInsPlayable`, which lets them be picked; the HUD's
+  air and shore warnings; three-way era links on the title and pick screens.
+- **Every model is a borrowed Devonian body** (`TRIASSIC_STAND_INS`), recoloured with the
+  animal's scheme, with placeholder portraits cut from the canonical poses
+  (`tools/triassic/placeholder-portraits.mjs`), procedural biome plates (`npm run triassic:plates`)
+  and placeholder brand art (`npm run triassic:brand`). When a real model lands: put the GLB, LOD,
+  portraits and JSON in `public/assets/triassic/creatures/`, list the id in
+  `tools/triassic/shipped.json`, run `node tools/update-asset-sizes.mjs`, and the stand-in and the
+  preview badge go away on their own; `npm run triassic` checks both halves.
+- Movement stats are generated: `docs/research/triassic-swimming.json` → `npm run triassic:stats`.
+- `npm run triassic` is the era's headless suite (the pack, the floor, air, armour facing, birth,
+  the shore, every animal's specials, the ladder, determinism).
+
+What is *not* built, in the order it is worth doing: the viewer's Triassic collection (the
+catalogue only lists the first two eras); the shore animals' own clips and the strike as an
+animation (today it is a hit and an event on a borrowed body); the calf's birth performance and
+the blow's spray at the surface; the log rafts as a floating, grippable prop; authored Triassic
+scenery kinds (every plant is a re-tinted Devonian procedural kind); the era's own sounds
+(`docs/audio-requests.md`); and the balance pass, since every number was set by feel.
+
 ## Where it will live when built
 
-Following the era boundary in [06](../redesign/06-era-content.md): `src/content/triassic/` for the
+Following the era boundary in [06](../redesign/06-era-content.md), and now in place: `src/content/triassic/` for the
 pack, `src/sim/triassic/` for the rules behind the `RULES?.` hooks, `/triassic/` as the entry
 (`src/triassic/main.tsx` selecting the era before importing the app), `public/assets/triassic/`
 for the assets, `tools/triassic/` for the builders and checks, and `docs/triassic/` (this
-directory) for the era's own documents. Three things the Triassic needs that the shared engine
-does not yet have are called out in [01](01-triassic-design.md#what-the-engine-needs): a
-stamina-recovery gate for air-breathers that only the surface opens, a per-biome sea-floor depth,
-and a shore that can hold an animal that strikes into the water. No playable animal ever leaves
-the water.
+directory) for the era's own documents. No playable animal ever leaves the water.
 
 ## Looking at it
 
