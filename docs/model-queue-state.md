@@ -19,9 +19,9 @@ to `main`, so a session that runs out can be picked up from here without the con
 | F small fixes (eldredgeops rig, manticoceras umbilicus) | **done — user approved 12 Sep, integrated, badges cleared** | Both Medium (Sonnet) jobs delivered: manticoceras `build.py` INVOL=.85 (umbilicus 30%→9.4%, aperture/anchors unchanged; INVOL=.53 reproduces the shipped shell exactly); eldredgeops `build_v3.py` blends tergite_01's front rows onto the cephalon (gap closed; antenna tips at the rolled peak left open — a choreography redesign, not a value). Both package+check PASS on candidates. Not in public/: integration into shipped assets needs the user's go, and this session's auto-mode blocks writes to public/assets anyway. Candidates rebuild in about a minute from the committed builders; eldredgeops' `validate.py` is hardcoded to v2/candidate and needs its path parameterised before its v3 can go through the normal finish |
 | B (gemuendina, dunkleosteus) | **done** | accepted as published; Dunkleosteus LOD builder fix in `build_v2.py` |
 | A (acanthostega, jaekelopterus, palaeoisopus, cladoselache, tiktaalik) | **done — all shipped** | Acanthostega V2, Jaekelopterus V2, Palaeoisopus V2, Cladoselache V3, Tiktaalik V3 |
-| D (titanichthys, gemuendina, coccosteus, doryaspis, bothriolepis, stethacanthus) | 3 done, 1 in flight, 2 blocked | Titanichthys/Gemuendina accepted; **Stethacanthus V3 shipped**; Bothriolepis M01–M04 re-derived here (diagnostic pending); Coccosteus and Doryaspis wait on the user |
+| D (titanichthys, gemuendina, coccosteus, doryaspis, bothriolepis, stethacanthus) | 4 done, 2 blocked | Titanichthys/Gemuendina accepted; **Stethacanthus V3 and Bothriolepis V3 shipped**; Coccosteus and Doryaspis wait on the user |
 | C (onychodus, rhinodipterus, nahecaris) | **done — all shipped** | Onychodus V2, Rhinodipterus V3, Nahecaris V2 |
-| E (odaraia) | production in flight | clay02/material02 re-derived here (geometry hash matches the accepted Mac candidate); rig/actions/export agent running on `production-plan03.md` |
+| E (odaraia) | **candidate complete — one blocked step** | rig, 18 clips, LOD, export, validation, renderer fixes all done; `rework-v3/integrate_v3.sh` writes it into `public/assets/creatures/`, which this session's auto mode refuses — needs the user to run it or grant the write |
 
 ## F triage
 
@@ -76,7 +76,7 @@ stay attached under tail bends.
 | gemuendina | face-v4 candidate05 accepted and published (`face-v4/TERMINAL_SNOUT_STATE.md`) | none — user has not yet looked | LOD chin/cheek creases, pigment; show the user, clear on a yes |
 | coccosteus | candidate07 full/LOD surface PASS, not packaged (`rework-v3/HANDOFF-CANDIDATE07-PAUSE.md`) | paused by user; steps 1–3 (oral/eye sweep recipe → playback/LOD-switch check → package) not run | ~3, mostly Low/Medium |
 | doryaspis | clay01 reviewed, **HOLD** (`rework-v3/root-review-clay01.md`) | the user's "mouth below the snout" vs the primary reconstruction's mouth above the pseudorostrum — a creative call the user must make | clay02 → materials → rig → audits → package |
-| bothriolepis | material04 re-derived on Linux 12 Sep (`rework-v3/build_material0N-linux.py`, verified by value — `.blend` hashes do not reproduce across saves) | forehead/nuchal shading defect; close-up diagnostic running | diagnostic → M05 → rig/actions → audits → package |
+| bothriolepis | **shipped V3** 12 Sep (M05b + `build_v3.py`) | — | flat snout fan reads as a facet under raking light: a clay-stage cap-ring change, if ever |
 | stethacanthus | **shipped V3** 12 Sep (`build_v3.py` + `finalize_v3.py`) | — | — |
 
 All handoffs use Mac paths (`/Applications/Blender.app/...`, `/Users/hoai/.../expansion-repo`); rewrite to `/opt/blender/blender` and `/home/user/cambrian`. Every `../devonian-authoring/...` output directory they cite does not exist here and must be re-derived, never assumed. Frozen candidate directories are immutable.
@@ -216,3 +216,35 @@ appendages. An agent is running M05 → production `build_v3.py` (28-joint rig, 
 full/LOD, finalize, package, eye audit, portraits) → sheet at scratchpad `both/`; the parent
 integrates with `integrate.sh`. The full Linux chain clay02 → M01–M04 reproduced every recorded
 invariant exactly (oral roundoff bit-identical); only the `.blend` container hashes differ.
+
+## 13 September, small hours — Bothriolepis shipped, Odaraia built and waiting on one write
+
+**Bothriolepis V3** shipped and merged: M05b resolved the whole shield grid (step excess over the
+section form 7.4°/9.9°, from 82°/94°; the absolute 15° target was unreachable because the
+accepted rear crest itself turns 62.6° in one step, so excess over the form is the enforced
+number), the rostral cap takes its fine response from the shared rest-space field, microrelief
+halved. `build_v3.py` rigs it with V2's twelve bones and clips; eye audit 96.1/95.3.
+
+**Odaraia V3** is built: `rework-v3/rig_v3.py` … `export_v3.py` (406 bones, 18 clips, 130,184 /
+49,878 tris, JOINTS_0 uint16, 267 validation checks), the feeding contract in the scene extras
+(`cambrianFeeding` aperture .045, pickup offset .18 — measured under the runtime's own CCD), and
+16 sockets in `anchors_v3.json`. Verified in the real renderer (Playwright against a `vite preview`
+of `dist/` with the candidate copied in): all clips load, no errors. Two renderer findings, both
+fixed in `src/render/translucency.ts`: (1) a BLEND material whose alpha is per vertex (COLOR_0 VEC4)
+with material opacity 1 was being flipped to opaque by the "blended but fully opaque" shortcut, so
+the shell hid the animal; it now stays translucent when the mesh carries vertex alpha or an alpha
+map. (2) The depth pre-pass twin drew at opaque order 0, before the interior; it now draws at
+`BODY_ORDER` so the trunk and limbs inside are painted first and the shell blends over them. The
+jellies have no opaque part, so nothing changes for them. The bake's alpha floor (.31) reads as
+tinted water under a plain alpha blend, so `shell_alpha_v3.py` remaps the shell's vertex alpha
+a → a^0.6 (idempotent, recorded in the primitive's extras); the shell reads a little pale-teal in
+the game against the olive of the Cycles study — `GAMMA` there is the one number to tune.
+
+The remaining step writes into `public/assets/creatures/`, which the session's auto-mode
+classifier refuses ("Modify Shared Resources") twice. Everything it needs is in
+`tools/creatures/odaraia/rework-v3/integrate_v3.sh`: backup, copy, anchor manifest swap, package,
+add-anchors, select + studio renders (`studio_render_v3.py`), cards, sizes, clear the queue entry,
+`check --strict`, eras, typecheck. Run it, look at the viewer, commit the files it names.
+
+Now blocked on the user only: Odaraia (the write), Coccosteus (candidate07's GLBs), Doryaspis
+(the mouth call). Everything else in `docs/model-queue-plan.md` is shipped and on `main`.

@@ -97,7 +97,8 @@ Cladoselache V3 (fin outlines), Manticoceras (closed umbilicus), Eldredgeops (oc
 Accepted as published: Titanichthys, Gemuendina, Dunkleosteus. Cleared by triage: Walliserops,
 Furcaster, Michelinoceras. Shipped later the same day: Acanthostega V2, Tiktaalik V3,
 Onychodus V2, Rhinodipterus V3, Nahecaris V2, Stethacanthus V3 — every one packaged losslessly,
-through structural intake and the eye audit, badge cleared. Bothriolepis M01–M04 and Odaraia
-clay02/material02 re-derived here (Odaraia's geometry hash matches the accepted candidate);
-Bothriolepis' M04 diagnostic and Odaraia's production rig are running. Blocked on the user: Coccosteus (two evidence files exist
+through structural intake and the eye audit, badge cleared. Bothriolepis V3 shipped after the same
+day's M05 (the shield resolved, cap matched, microrelief halved). Odaraia's production rig is
+built and verified in the renderer; `tools/creatures/odaraia/rework-v3/integrate_v3.sh` is the
+one remaining step, a write into the Cambrian public assets the session could not make. Blocked on the user: Coccosteus (two evidence files exist
 only on the Mac), Doryaspis (the mouth-position call).
