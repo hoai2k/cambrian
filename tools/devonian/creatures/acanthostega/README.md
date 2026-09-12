@@ -37,3 +37,20 @@ Preview scope: coherent first asset, basic anatomy/eyes/attachment/export review
 ## Frozen preview metrics
 
 Full 13,996,232 bytes,102,108 triangles; reduced2,344,760 bytes,28,586 triangles(28%).56 bones,18/3 clips and3 matching version1 anchors. Actual eye-volume estimates ~73%, conservative lower bounds >72.5%, closed head/no temporary caps.72 sampled poses preserve four limb-root centroids and84 tooth bases. Details and deferred art issues: final-review-v1.json. Exact seven-file hashes: local v1-candidate/candidate-manifest.json.
+
+## V2 shipped — 12 September 2026
+
+`anatomy_v2.py` (selected by `ACA_ANATOMY`, now defaulting to `v2`) ports the approved study. The
+11 September triage found the tail fin a solid paddle fused on the tail tip, the trunk a constant
+round tube and the limbs sticks with a bolted-on palm. Now: the tail is a muscular core of its own
+height with a thin fin web above and below it and a crease where the web leaves the core, the
+dorsal web deeper than the ventral, fin rays from the core boundary to the edge every 0.13 along the
+tail (fin material, weighted to the tail bones with a blend along each ray), and a pointed tip; the
+trunk's ventral half is a flattened superellipse through the trunk band and the stations are wider;
+the limbs are fuller and the loft closes at the palm instead of an ellipsoid. The hind-limb root is
+seated inward and up so the pelvic root ring stays inside the body in every sampled pose — the
+`check-pose-attachments.py` selector now describes limb roots (`.10<|x|<.32`) because the new
+midline rays share material 5 and a UV.v==0 ring. All four limb roots buried in 72/72 poses; ray
+core centroids inside in 3,744/3,744 samples. Packaging exact round-trip PASS at 99,932 / 27,976
+triangles; intake PASS; check-export PASS; portraits from the V2 build. The user accepted the study
+on 12 September; badge cleared.

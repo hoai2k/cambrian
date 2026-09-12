@@ -451,7 +451,7 @@
     "name": "Acanthostega",
     "species": "Acanthostega gunnari",
     "category": "creature",
-    "modelStatus": "preview",
+    "modelStatus": "final",
     "provenance": "Late Devonian, Famennian, East Greenland",
     "description": "Aquatic early tetrapod with a rounded spade-like head, sutured skull, eight-digit paddle limbs and a deep ray-supported swimming tail.",
     "model": "assets/devonian/creatures/acanthostega.glb",
