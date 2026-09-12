@@ -98,7 +98,7 @@ Accepted as published: Titanichthys, Gemuendina, Dunkleosteus. Cleared by triage
 Furcaster, Michelinoceras. Shipped later the same day: Acanthostega V2, Tiktaalik V3,
 Onychodus V2, Rhinodipterus V3, Nahecaris V2, Stethacanthus V3 — every one packaged losslessly,
 through structural intake and the eye audit, badge cleared. Bothriolepis V3 shipped after the same
-day's M05 (the shield resolved, cap matched, microrelief halved). Odaraia's production rig is
-built and verified in the renderer; `tools/creatures/odaraia/rework-v3/integrate_v3.sh` is the
-one remaining step, a write into the Cambrian public assets the session could not make. Blocked on the user: Coccosteus (two evidence files exist
+day's M05 (the shield resolved, cap matched, microrelief halved). Odaraia V3 shipped (19 clips, Grab
+included) once the user granted the public write. Doryaspis is unblocked — the mouth is at the
+very front above the saw — and its V3 is being built; every model is getting a Grab clip. Blocked on the user: Coccosteus (two evidence files exist
 only on the Mac), Doryaspis (the mouth-position call).
