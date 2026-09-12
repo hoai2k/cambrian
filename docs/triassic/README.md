@@ -8,10 +8,11 @@ for the era's documents in one place next to `docs/devonian/`.
 
 | Doc | Contents |
 | --- | --- |
-| [01 · Design](01-triassic-design.md) | The pitch and the era mechanics (breath, live birth, haul-out, the shore that reaches in, depth), the 21 playable creatures with their natural history and in-game effects, the non-playable shore animals (Tanystropheus and company), alternates. |
+| [01 · Design](01-triassic-design.md) | The pitch and the era mechanics (air as the cost of effort, live birth, the shore that reaches in, depth), the 21 playable creatures with their natural history and in-game effects, the non-playable shore animals (Tanystropheus and company), alternates. |
 | [02 · Biomes and depth](02-biomes-and-depth.md) | The nine biome slots recast for the Triassic, the water-depth profile (a sea floor that sinks toward the basin), and the prop and plant models each biome needs. |
 | [03 · Image and model requests](03-image-and-model-requests.md) | Every image and 3D model the era needs, in two tiers: Tier 1 goes through Tripo (all creatures, the shore animals, a few organic scenery pieces), Tier 2 is built in-house. Source-image briefs first, model requests against them second. |
 | [04 · Tripo pipeline](04-tripo-pipeline.md) | The production strategy: Tripo bodies on procedural skeletons, motion authored on the procedural twin and applied to the Tripo mesh; where the strategy is agreed with, where it is amended and why. |
+| [canonical/](canonical/README.md) | The approved pose for each subject: the visual contract every model is made from. 26 images. |
 | [research.md](research.md) | The natural-history notes and sources the roster and biomes were drawn from, with confidence labels. |
 
 ## Where it will live when built
@@ -21,9 +22,16 @@ pack, `src/sim/triassic/` for the rules behind the `RULES?.` hooks, `/triassic/`
 (`src/triassic/main.tsx` selecting the era before importing the app), `public/assets/triassic/`
 for the assets, `tools/triassic/` for the builders and checks, and `docs/triassic/` (this
 directory) for the era's own documents. Three things the Triassic needs that the shared engine
-does not yet have are called out in [01](01-triassic-design.md#what-the-engine-needs): a breath
-meter for obligate air-breathers, a per-biome sea-floor depth, and a shore that can hold an
-animal that strikes into the water.
+does not yet have are called out in [01](01-triassic-design.md#what-the-engine-needs): a
+stamina-recovery gate for air-breathers that only the surface opens, a per-biome sea-floor depth,
+and a shore that can hold an animal that strikes into the water. No playable animal ever leaves
+the water.
+
+## Looking at it
+
+[`docs/research/triassic/viewer/`](../research/triassic/viewer/) is a page that puts every subject
+side by side with reference images from Wikimedia Commons, with a key that flips between the
+reference and our canonical pose. Open its `index.html`; it needs no server.
 
 ## Open decisions
 
