@@ -417,3 +417,43 @@ After each reports: integrate.sh → `apply.mjs <id>` → `check.mjs` → README
 over every `pages.yml` step, then report to the user (Coccosteus still blocked on the Mac files).
 Never commit `tools/creatures/motion/.scratch/`, the Doryaspis clay02/linux files or the
 Dunkleosteus V3 set until verified.
+
+## 12 September, 22:40 UTC — RESUME POINT (fourth; tokens running out)
+
+**On main**: Gemuendina sculpt port shipped (`64f597a`, position transplant through
+`tools/devonian/transplant-positions.mjs`, Grab re-applied, sculpt file retired); every shipped model
+in both eras carries Grab; `npm run sculpt:measure -- <glb> --against <shipped.glb>` (`7d75315`) is
+the fair check for unchanged stations once a port moves the grid.
+
+**Three agents were running when the session ended; their outputs are on disk, unverified by me:**
+- **Titanichthys** snout fix (Opus): the first port's candidate had *pleats* down the snout's side
+  (−78% nose width applied as a per-vertex lateral scale to a blunt snout) and a *hard vertical band*
+  at the head–body join — visible in scratchpad `ports/titanichthys-sculpt-sheet.png` and
+  `titanichthys-final-sheet.png`, bottom rows. Told to fix it in the builder as a proper loft of
+  new profile rows (`tools/devonian/creatures/titanichthys/sculpt-port/`), rebuild base +
+  candidate, transplant-positions → `/home/user/devonian-authoring/titanichthys/sculpt-final/`,
+  package, check, portraits, new sheet. **Do not ship the previous final** (its pleats are real).
+  When a clean final exists: `integrate.sh titanichthys <final> <final>` (scratchpad
+  `integrate.sh`; if the scratchpad is gone it is copy GLBs+json+four PNGs into
+  `public/assets/devonian/creatures/`, `check.mjs`, `update-asset-sizes.mjs`, clear the badge in
+  `pending-refinements.json`/`model-status.json`, `devonian:catalogue`, `eras`, `devonian`), then
+  `node tools/creatures/motion/apply.mjs titanichthys`, `check.mjs`, measure (`--against` the old
+  GLB from git), README section, commit deleting `docs/sculpts/titanichthys-sculpt.json`, merge.
+- **Dunkleosteus** verification (Opus): the 13:53 candidate at
+  `/home/user/devonian-authoring/dunkleosteus/sculpt-candidate/` carries the real V2 textures.
+  Told to measure against `docs/sculpts/dunkleosteus-sculpt.json`, compare materials/clips with
+  shipped, `check.mjs`, render `ports/dunkleosteus-sculpt-sheet.png`, and integrate only if all
+  pass, then README + `docs/sculpts/README.md` row. Then: `apply.mjs dunkleosteus`, check, commit
+  the `build_v3.py`/`finalize_v3.py`/`portraits_v3.py`/`validation_v3.json` set *with* the assets,
+  delete the sculpt json, merge. If `git status` shows `public/assets/devonian/creatures/dunkleosteus.*`
+  modified, the agent integrated: look at the sheet before committing.
+- **Doryaspis V3** (Opus, from `rework-v3/geometry_clay02.py`): candidate expected at
+  `/home/user/devonian-authoring/doryaspis/v3-candidate/`. Mouth at the very front of the snout,
+  the saw a lower-jaw protrusion below it (the user's correction). Judge the mouth strip/sheet,
+  integrate, commit the rework-v3 clay02/linux files with it, merge.
+
+**After those**: the Opus-medium deployment verification over every `pages.yml` step (`npm ci`,
+typecheck, check, devonian:check, eras, sculpt, portraits, build) plus `npm run sculpt` and
+`add-anchors --check`; fix what fails; then report to the user with the sheets. Coccosteus is
+still blocked on the user's Mac files (candidate07 GLBs). Never commit
+`tools/creatures/motion/.scratch/`.
