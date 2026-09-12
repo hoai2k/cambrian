@@ -369,3 +369,22 @@ audit path runs in one place; the staging is `docs/model-queue-plan.md`, the res
 - **Coccosteus** is blocked here: candidate07's frozen recipe needs two evidence files that exist
   only in the Mac authoring tree (`rework-v3/RESUME-CANDIDATE07-BLOCKED.md`).
 - **Doryaspis** waits on the mouth-position decision recorded in `rework-v3/root-review-clay01.md`.
+- **Acanthostega V2, Jaekelopterus V2, Palaeoisopus V2, Cladoselache V3, Tiktaalik V3** shipped
+  from their approved silhouette studies (groups A/B): tail fin along the tail and a flat belly;
+  stepped flattened opisthosoma and blade rami; oar-blade articles; fin outlines; the snout and
+  flattened skull. Badges cleared.
+- **Onychodus V2, Rhinodipterus V3, Nahecaris V2** (group C) shipped under the "continue to the
+  end" instruction: the tooth whorl and tusks, the lungfish eye and head, the phyllocarid carapace
+  and abdomen. Badges cleared.
+- **Stethacanthus V3** shipped: deeper head and trunk, wide pectorals, broad-rooted brush,
+  heterocercal tail; eye embedding 91%. Its `finalize_v3.py` strips the Blender 5.2.1 exporter's
+  identity scale tracks, which intake otherwise refuses — the same artifact hit Jaekelopterus and
+  Rhinodipterus.
+- **Bothriolepis** material01–04 re-derived on Linux, verified by value (the `.blend` hash gates
+  in the frozen chain cannot reproduce across saves); the M04 close-up diagnostic is next, then M05.
+- **Odaraia** (Cambrian, tracked here because it shares the pipeline) clay02/material02 re-derived
+  with the accepted geometry hash reproduced exactly; production rig/actions/export in progress on
+  `production-plan03.md`.
+
+Still carrying `model: true`: Coccosteus and Doryaspis (both waiting on the user), Bothriolepis
+(M05 onwards), Odaraia (production).

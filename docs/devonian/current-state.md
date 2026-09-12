@@ -79,7 +79,7 @@ Local originals/intermediates/blends/audits/logs/backups remain under `../devoni
 
 Root's Titan numerical classifier is asset-local; shared eye-audit.py and50% gate unchanged. Detailed repeated-ray failure, oral-boundary correction, preserved failed studies and frozen exact inputs remain beside the source. Do not cite old reports as fresh executions. Copy geometric audits only with proven unchanged geometric/rig/animation bytes and explicit provenance.
 
-Use Astra high for research/sculpt/material/rig judgment; Terra medium for frozen build/render/checks. Blender5.2 at `/Applications/Blender.app/Contents/MacOS/Blender`, CPU2. Serialize heavy jobs. Ignore .DS_Store and __pycache__; no such cache staged. One trailing whitespace line in frozen Cocc07 was deliberately retained so execution input hashes did not change.
+Use Astra high for research/sculpt/material/rig judgment; Terra medium for frozen build/render/checks. Blender5.2 at `/Applications/Blender.app/Contents/MacOS/Blender` on the Mac, `/opt/blender/blender` here (`npm run blender`), CPU2. Serialize heavy jobs. Ignore .DS_Store and __pycache__; no such cache staged. One trailing whitespace line in frozen Cocc07 was deliberately retained so execution input hashes did not change.
 
 Storage shortage resolved to roughly23GiB earlier. Root recovered732MB by hash-verifying777 duplicate dist files before replacing only those build copies with links; subsequent normal builds recreated dist. No authoring source/backups deleted. Proof `../devonian-authoring/viewer-build-duplicate-proof-2026-09-08.json`.
 
@@ -95,7 +95,9 @@ intake: Cheirolepis V3 (reference face, seated fin roots, swept fins), Palaeoiso
 articles, flat trunk, no joint beads), Jaekelopterus V2 (flattened stepped opisthosoma, blade rami),
 Cladoselache V3 (fin outlines), Manticoceras (closed umbilicus), Eldredgeops (occipital joint).
 Accepted as published: Titanichthys, Gemuendina, Dunkleosteus. Cleared by triage: Walliserops,
-Furcaster, Michelinoceras. In flight as candidates: Acanthostega, Tiktaalik, Onychodus,
-Rhinodipterus, Nahecaris, Stethacanthus; Bothriolepis M04 and Odaraia clay02/material02 being
-re-derived here for the next judgement. Blocked on the user: Coccosteus (two evidence files exist
+Furcaster, Michelinoceras. Shipped later the same day: Acanthostega V2, Tiktaalik V3,
+Onychodus V2, Rhinodipterus V3, Nahecaris V2, Stethacanthus V3 — every one packaged losslessly,
+through structural intake and the eye audit, badge cleared. Bothriolepis M01–M04 and Odaraia
+clay02/material02 re-derived here (Odaraia's geometry hash matches the accepted candidate);
+Bothriolepis' M04 diagnostic and Odaraia's production rig are running. Blocked on the user: Coccosteus (two evidence files exist
 only on the Mac), Doryaspis (the mouth-position call).
