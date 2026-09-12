@@ -53,6 +53,18 @@ const EXPECTED = {
   'bristles': 'legs',
   'soft appendages': 'legs',
   'amber endites': 'legs',
+  // Odaraia V3's parts are named for the arthropod anatomy they are: the bivalved carapace and
+  // the trunk under it are body, the articulated inner limb branches join the legs, the lamellate
+  // swimming paddles are the fin fold of a filter feeder, and the mouth apparatus is an oral
+  // plate by another name. They replaced Cuticle/Bristles/Membrane/Sclerotized-edges, and they land
+  // in the same five slots those did — until they were classified, six of Odaraia's seven materials
+  // fell through to `body` and a scheme painted the whole animal one colour.
+  'shell': 'body',
+  'trunk': 'body',
+  'endites': 'legs',
+  'endopods': 'legs',
+  'exopods': 'fins',
+  'mouthparts': 'accent',
   'gill filaments': 'legs',
   'sclerotized tips': 'accent',
   'sclerotized edges': 'accent',
@@ -60,18 +72,6 @@ const EXPECTED = {
   'oral cuticle': 'accent',
   'dark arthrodial membrane': 'underside',
   'continuous ventral body': 'underside',
-  // Anatomical names, from a body rebuilt out of its parts rather than out of generic surfaces.
-  // Odaraia V3 replaced Cuticle/Bristles/Membrane/Sclerotized-edges with these, and until they were
-  // classified six of its seven materials fell through to `body` — so a scheme painted the whole
-  // animal one colour. They land where the names they replaced landed: the carapace and the body
-  // under it are the animal's surface, the swimming branch of the limb is a fin, the walking and
-  // feeding branches are legs, and the feeding apparatus is the accent.
-  'shell': 'body',
-  'trunk': 'body',
-  'exopods': 'fins',
-  'endopods': 'legs',
-  'endites': 'legs',
-  'mouthparts': 'accent',
 };
 
 const { ACTIVE_ERA, SCHEMES, CREATURE_SCHEMES } = await loadContent();

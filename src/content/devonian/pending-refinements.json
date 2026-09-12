@@ -1,12 +1,5 @@
 [
   {
-    "id": "doryaspis",
-    "status": "pending",
-    "scope": "total-rework",
-    "model": true,
-    "reason": "User reference directs a complete Blender remodel of silhouette, surfaces, rig and motion."
-  },
-  {
     "id": "eldredgeops",
     "status": "pending",
     "scope": "individual-refinement",
