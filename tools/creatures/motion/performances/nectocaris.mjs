@@ -46,6 +46,11 @@ const eyes = (P, k) => { P.bend('eye_1', FWD, .08 * k); P.bend('eye_-1', FWD, .0
 /** A sweep whose segments arrive one after another. */
 const delayed = (env, u, per = .03) => (i) => env(u - per * i);
 
+/**
+ * Bones this performance authors. The grasping tentacles are the performance; the fin ripple and body keep the shipped motion.
+ */
+export const authored = (n) => /^tentacle_/.test(n);
+
 export const clips = [
   {
     name: 'Bite', duration: 0.5, loop: false,

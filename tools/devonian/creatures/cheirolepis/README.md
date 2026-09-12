@@ -53,3 +53,54 @@ in `docs/devonian/refinement-queue.md` for concrete sculpt, eye, fin and materia
 The image and copy/hash-verified model/source backup are under local/devonian-authoring.
 Do not rerun the old builder into an existing candidate or treat old eye audits as approval
 for future geometry. Finish the redesign before fresh general quality audits.
+
+## Redesign sculpt study — 11 September 2026
+
+`redesign-study.py` is a shape study for the reopened redesign, not a builder: it lofts the same
+surfaces from two sets of profile tables and renders them side by side, so the silhouette can be
+judged before anything is rebuilt. It exports nothing and publishes nothing.
+
+What it proposes from `docs/reference/Cheirolepis.jpg`: a wedge snout in place of the rounded bead,
+a straighter dorsal head profile over a fuller cheek, the eye larger and further forward and
+higher, and all five fins redrawn as angular swept blades — convex leading edge, apex trailing
+backwards, concave trailing edge — instead of rounded paddles. What it refuses from the reference:
+the near-symmetrical fork. C. trailli is strongly epicercal and the cited sources settle that, so
+the tail keeps its raised scaled axis and only gains drawn-out points and a deeper notch.
+
+The eye is placed by measurement. `seating()` scores the globe against the head cross-sections
+under one proxy measure; the redesign's larger, more anterior eye scores 0.684 against the current
+model's 0.661, so moving it forward improves the seating rather than spending it. The proxy reads
+low against the packaged audit (which measures the exported polyhedron against the closed head)
+and is only good for comparing variants.
+
+Nothing here is accepted geometry. A real rebuild still owes scales, teeth, throat, opercula,
+materials, rig, all eighteen clips, the LOD and the full audit set.
+
+## V3 shipped — 12 September 2026
+
+`build_v3.py` is now the model (`build.py` runs it; V2 stays beside it untouched). It is V2 with
+the shape the reference reopened and nothing else:
+
+- **Face**, settled with the user over four clay passes (`redesign-study.py` was the first; the
+  later passes' parameters are in `docs/model-queue-state.md`): a blunt, deep snout rising steeply
+  from the upper lip to a prominent squared brow, the roof running back over the eyes, the crown
+  flattened between the brows, a lip ridge along the long gape so the mouth reads shut, and a nose
+  station at y=−2.41 so the closed mouth has no opening. `faceRelief(y,a)` carries the lips, the
+  brow ledge and the crown flattening as one multiplier on the head shells; the eye is at
+  (±.178, −2.03, .156) with radii (.058, .092, .085).
+- **Fin roots seated.** V2 shipped every fin root at or outside the trunk surface — pectoral
+  +0.07, pelvic +0.31, dorsal and anal trailing bases +0.17 and +0.26 on the section-ellipse
+  metric — which read as fins floating beside the body. `seat()` pulls each origin and base control
+  radially inside (−0.18 / −0.14) and an assertion refuses any fin whose base edges leave the
+  trunk. The root weight blend onto the body bones is radial and applies to all five fins.
+- **Fins** redrawn as swept blades: convex leading edge, apex trailing back, concave trailing edge;
+  the tail keeps its raised scaled axis (the sources fix that) with drawn-out points and a deeper
+  notch. `pectoralTip` follows the new blade.
+
+Evidence: lossless packaging exact round-trip PASS (158,356 / 44,334 triangles, 18 / 3 clips);
+`tools/devonian/check.mjs` PASS; packaged eye audit (`eye-audit-full-v3.json`,
+`eye-audit-lod-v3.json`) 85.92% / 85.86% inside the continuous head for the full model and
+86.09% / 85.83% for the reduced one (V2: 80.12 / 79.86 and 79.99 / 79.72); loop seams and the
+head-envelope manifold assertion pass in the builder. Portraits re-derived by `render-v3.py`.
+Anchors moved to the new snout tip (`anchor_mouth` (0, −2.39, .012), `anchor_attack_primary`
+(0, −2.41, .02)). The user accepted this pass on 12 September; the badge is cleared.

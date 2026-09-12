@@ -46,6 +46,12 @@ function head(P, { butt = 0, low = 0, fwd = 0, pump = 0 }) {
   P.spin('hypostome', [1, 0, 0], -.15 * pump); P.shift('oral_pump', [0, .02 * pump, -.03 * pump]);
 }
 
+/**
+ * Bones this performance authors. The limb train, antennae, hypostome and cephalon are the performance; the thorax rings and
+ * pygidium keep the shipped motion.
+ */
+export const authored = (n) => /^(limb_|antenna_|hypostome|oral_pump|cephalon)/.test(n);
+
 export const clips = [
   {
     name: 'Bite', duration: 0.5, loop: false,

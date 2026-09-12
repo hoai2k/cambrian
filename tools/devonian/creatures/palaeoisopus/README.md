@@ -48,3 +48,17 @@ python3 tools/devonian/creatures/palaeoisopus/freeze-candidate.py
 ```
 
 Freeze only after renewed export, portrait and actual GLB review; candidate-manifest.json and final-review-v1.json hold exact hashes and known preview limitations.
+
+## V2 shipped — 12 September 2026
+
+`anatomy_v2.py` (selected by `PAL_ANATOMY`, now defaulting to `v2`) ports the approved study: the
+11 September triage found every leg and trunk segment a beaded lozenge with dark joint bands, and
+the flattened oar-like leg articles that define Palaeoisopus absent. `shell()`'s length profile is
+`.50+.50·sin(πt)^.55` (near-constant section, gentle end taper), its swelling is gone, its section
+is a superellipse (exponent 2.5) so faces are flat; leg articles from the third are broadened ×√1.45
+in the swing plane and thinned across it; trunk and abdomen depths are ×0.55; the joint spheres are
+small same-material knuckles on the legs and gone between tergites. Setae bases are recomputed from
+the new section (inset .975 — the old .92 put them outside). Evidence: `validation-v2.json`,
+`articulation-v2.json` (gap 0.0, setae at/inside the cuticle), `export-review-v2.json`; packaging
+exact round-trip PASS at 255,024 / 71,404 triangles; intake PASS. The user accepted the study on
+12 September; badge cleared.

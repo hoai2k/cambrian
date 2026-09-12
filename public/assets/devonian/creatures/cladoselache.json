@@ -5,7 +5,7 @@
   "provenance": "Late Devonian, Famennian Cleveland Shale, Ohio, USA",
   "description": "Streamlined early chondrichthyan with a broad terminal mouth, large eyes, broad paired fins, a curved anterior dorsal spine and a keeled crescent tail.",
   "lengthMeters": 1.5,
-  "modelLength": 5.661974906921387,
+  "modelLength": 5.733372926712036,
   "locomotion": "Swim",
   "clips": [
     "Idle",
@@ -61,6 +61,7 @@
     "Broad triangular paired fins, large lateral eyes, blunt snout, terminal cladodont mouth and strongly forked tail distinguish this animal from a modern great-white shark.",
     "The anterior dorsal spine follows the 2023 comparative study. A second dorsal spine remains hypothetical and is omitted. Fin radials are covered by skin. No cord meshes or anal fin are present.",
     "Original imagegen skin swatch with mapped PBR countershading, incised gills and seated eyes;  a modern all-over placoid-scale coat is not claimed. Pigmentation, soft-tissue volume and every animation are artistic reconstruction.",
-    "Growth is a relaxed fin-extension/breathing display. Ability is a short acceleration and bank display; compatible clip labels do not define Devonian gameplay."
+    "Growth is a relaxed fin-extension/breathing display. Ability is a short acceleration and bank display; compatible clip labels do not define Devonian gameplay.",
+    "V3 candidate: fin outlines only (pectoral, pelvic, dorsal, rear, caudal) ported from an approved reference-led shape study; body, mouth, gills and materials unchanged from V2."
   ]
 }

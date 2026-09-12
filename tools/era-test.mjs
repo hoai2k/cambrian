@@ -70,7 +70,13 @@ for (const { name, era: e, pending } of [
   }
 
   const previews = Object.entries(status).filter(([, v]) => v === 'preview').map(([id]) => id);
-  assert.ok(previews.length, `${name}: expected some preview models`);
+  // An era with nothing queued is the finished state, not a broken table: the Cambrian reached it
+  // when Odaraia shipped. What must hold either way is that the derived table and the queue agree
+  // in both directions, so a badge can never appear without outstanding work or go missing while
+  // work remains.
+  for (const p of pending.filter((p) => p.model)) {
+    assert.equal(status[p.id], 'preview', `${name}/${p.id} has queued model work but shows no preview badge`);
+  }
   for (const id of previews) {
     assert.ok(notes[id]?.length > 60, `${name}/${id} is a preview model with no note saying what remains`);
     assert.ok(pending.some((p) => p.id === id && p.model), `${name}/${id} shows a preview badge with no outstanding model work`);

@@ -72,6 +72,12 @@ function body(P, a) {
   if (a.roll) P.twist('body', a.roll);
 }
 
+/**
+ * Bones this performance authors. The great appendages, their claws and flagella are the performance; the trunk, legs, paddles and
+ * tail keep the shipped motion.
+ */
+export const authored = (n) => /^(great_|claw_|flagellum_)/.test(n);
+
 export const clips = [
   {
     name: 'Bite', duration: 0.5, loop: false,

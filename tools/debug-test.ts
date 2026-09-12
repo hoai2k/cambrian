@@ -8,7 +8,7 @@
  * must open the tool.
  */
 import assert from 'node:assert/strict';
-import { debugScreen } from '../src/shared/debug';
+import { debugGame, debugScreen } from '../src/shared/debug';
 
 let passes = 0;
 const ok = (cond: unknown, msg: string) => { assert.ok(cond, msg); passes++; };
@@ -21,6 +21,18 @@ ok(debugScreen('?debug=local&other=1') === 'local', '...in any order');
 // same parameter, not a way around the check. Asserted so the equivalence is deliberate.
 ok(debugScreen('?%64ebug=local') === 'local', '...however the name is percent-encoded');
 ok(debugScreen('?debug=%6Cocal') === 'local', '...or the value is');
+
+// `?debug=game` is a different kind of thing: it arms the recorder *inside* the game rather than
+// replacing the game with a tool, so it must never resolve to a screen — or it would swap the match
+// for the state editor, which is the one thing it must not do.
+ok(debugGame('?debug=game'), '?debug=game arms the match recorder');
+ok(debugGame('?other=1&debug=game'), '...alongside other parameters');
+ok(debugScreen('?debug=game') === undefined, '...and never opens a debug screen in place of the game');
+ok(!debugGame('?debug=local'), 'the state editor does not arm the recorder');
+ok(!debugGame(''), 'and an ordinary URL records nothing');
+for (const search of ['', '?debug', '?debug=', '?debug=1', '?debug=Game', '?debug=games', '?debug=game2', '?nodebug=game', '#debug=game']) {
+  ok(!debugGame(search), `"${search}" does not arm the recorder`);
+}
 
 // Everything else is the game.
 for (const search of [

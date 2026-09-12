@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import { CREATURES, creature } from '../src/sim/creatures';
 import { EXPANSION_CREATURES } from '../src/sim/expansion';
-import { makeActor, bodyRadius, clearanceOf, isHidden } from '../src/sim/actors';
+import { makeActor, bodyRadius, clearanceOf, isHidden, speedFactor } from '../src/sim/actors';
 import { applyHit } from '../src/sim/combat';
 import { beginExpansionAbility, stepExpansionAbility, bloomRate, grazeRate, HEAVY_STRIKE, specialHit } from '../src/sim/expansion-abilities';
 import { HEAVY_SPECIALS } from '../src/sim/concealment';
@@ -27,7 +27,15 @@ for (const d of EXPANSION_CREATURES) {
   assert.deepEqual(ally.vel, pos, `${d.id}: ability displaces ally`);
   assert([a.hp, enemy.hp, a.vel.x, a.vel.y, a.vel.z].every(Number.isFinite));
   assert(bodyRadius(a) > 0 && clearanceOf(a) > 0);
-  if (d.diet === 'filter') { a.scale = 2.6; assert(bloomRate(a, d) > 0, `${d.id}: giant cannot filter`); }
+  if (d.diet === 'filter') {
+    // Filtering has to stay worth it at giant size. A ram feeder's net only works with water going
+    // through it, so give it way on before asking — and check that stopping really does stop it.
+    a.scale = 2.6;
+    if (d.ramFeed) assert.equal(bloomRate(a, d), 0, `${d.id}: a ram feeder strains water while stopped`);
+    a.vel = { x: 0, y: 0, z: d.speed * speedFactor(a.scale) };
+    assert(bloomRate(a, d) > 0, `${d.id}: giant cannot filter`);
+    a.vel = { x: 0, y: 0, z: 0 };
+  }
   if (d.diet === 'grazer' || d.diet === 'deposit') assert(grazeRate(a, d) > 0);
 }
 // Armor piercing matters against armor, and no more than one corral hit per activation.

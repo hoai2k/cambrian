@@ -1,0 +1,466 @@
+{
+  "odaraia": [
+    {
+      "name": "anchor_mouth",
+      "bone": "head",
+      "point": [
+        0.0,
+        -1.69,
+        0.305
+      ],
+      "role": "mouth",
+      "blenderWorld": [
+        0.0,
+        0.305,
+        1.69
+      ],
+      "gltfWorld": [
+        0.0,
+        0.305,
+        1.69
+      ],
+      "note": "measured oral presentation centre between the moving mandibles, behind the labrum plate (which ends at z=1.80)"
+    },
+    {
+      "name": "anchor_mouth_inside",
+      "bone": "head",
+      "point": [
+        0.0,
+        -1.655,
+        0.225
+      ],
+      "role": "swallow",
+      "blenderWorld": [
+        0.0,
+        0.225,
+        1.655
+      ],
+      "gltfWorld": [
+        0.0,
+        0.225,
+        1.655
+      ],
+      "note": "shallow concealment point inside the sculpted head volume; head-ellipsoid ratio 0.8651, proven in evidence_v3.json"
+    },
+    {
+      "name": "anchor_attack_primary",
+      "bone": "limb_01_L_tip",
+      "point": [
+        -0.227,
+        -1.787949,
+        1.12438
+      ],
+      "role": "attack",
+      "blenderWorld": [
+        -0.227,
+        1.12438,
+        1.787949
+      ],
+      "gltfWorld": [
+        -0.227,
+        1.12438,
+        1.787949
+      ],
+      "note": "exact alias of the lead 1L contact so runtime deduplication spends its two-contact budget on distinct tips",
+      "chain": [
+        "limb_01_L_prox",
+        "limb_01_L_mid",
+        "limb_01_L_dist",
+        "limb_01_L_tip"
+      ],
+      "effectorBone": "limb_01_L_tip",
+      "solver": "CCD",
+      "contactType": "filtering endopod terminal pad"
+    },
+    {
+      "name": "anchor_grasp",
+      "bone": "limb_01_L_tip",
+      "point": [
+        -0.227,
+        -1.787949,
+        1.12438
+      ],
+      "role": "grasp",
+      "blenderWorld": [
+        -0.227,
+        1.12438,
+        1.787949
+      ],
+      "gltfWorld": [
+        -0.227,
+        1.12438,
+        1.787949
+      ],
+      "note": "offset from the lead filtering pad to the food centre in the verified secure pose; companion limbs are authored around the same physical centre",
+      "chain": [
+        "limb_01_L_prox",
+        "limb_01_L_mid",
+        "limb_01_L_dist",
+        "limb_01_L_tip"
+      ],
+      "effectorBone": "limb_01_L_tip",
+      "solver": "CCD",
+      "contactType": "filtering endopod terminal pad"
+    },
+    {
+      "name": "anchor_attack_01_L",
+      "bone": "limb_01_L_tip",
+      "point": [
+        -0.227,
+        -1.787949,
+        1.12438
+      ],
+      "role": "attack",
+      "blenderWorld": [
+        -0.227,
+        1.12438,
+        1.787949
+      ],
+      "gltfWorld": [
+        -0.227,
+        1.12438,
+        1.787949
+      ],
+      "note": "anterior endopod terminal contact; body, head, shell and eyes never enter a strike chain",
+      "chain": [
+        "limb_01_L_prox",
+        "limb_01_L_mid",
+        "limb_01_L_dist",
+        "limb_01_L_tip"
+      ],
+      "effectorBone": "limb_01_L_tip",
+      "solver": "CCD",
+      "contactType": "filtering endopod terminal pad"
+    },
+    {
+      "name": "anchor_attack_01_R",
+      "bone": "limb_01_R_tip",
+      "point": [
+        0.227,
+        -1.848108,
+        1.211656
+      ],
+      "role": "attack",
+      "blenderWorld": [
+        0.227,
+        1.211656,
+        1.848108
+      ],
+      "gltfWorld": [
+        0.227,
+        1.211656,
+        1.848108
+      ],
+      "note": "anterior endopod terminal contact; body, head, shell and eyes never enter a strike chain",
+      "chain": [
+        "limb_01_R_prox",
+        "limb_01_R_mid",
+        "limb_01_R_dist",
+        "limb_01_R_tip"
+      ],
+      "effectorBone": "limb_01_R_tip",
+      "solver": "CCD",
+      "contactType": "filtering endopod terminal pad"
+    },
+    {
+      "name": "anchor_attack_02_L",
+      "bone": "limb_02_L_tip",
+      "point": [
+        -0.225871,
+        -1.728263,
+        1.177662
+      ],
+      "role": "attack",
+      "blenderWorld": [
+        -0.225871,
+        1.177662,
+        1.728263
+      ],
+      "gltfWorld": [
+        -0.225871,
+        1.177662,
+        1.728263
+      ],
+      "note": "anterior endopod terminal contact; body, head, shell and eyes never enter a strike chain",
+      "chain": [
+        "limb_02_L_prox",
+        "limb_02_L_mid",
+        "limb_02_L_dist",
+        "limb_02_L_tip"
+      ],
+      "effectorBone": "limb_02_L_tip",
+      "solver": "CCD",
+      "contactType": "filtering endopod terminal pad"
+    },
+    {
+      "name": "anchor_attack_02_R",
+      "bone": "limb_02_R_tip",
+      "point": [
+        0.225871,
+        -1.724597,
+        1.224303
+      ],
+      "role": "attack",
+      "blenderWorld": [
+        0.225871,
+        1.224303,
+        1.724597
+      ],
+      "gltfWorld": [
+        0.225871,
+        1.224303,
+        1.724597
+      ],
+      "note": "anterior endopod terminal contact; body, head, shell and eyes never enter a strike chain",
+      "chain": [
+        "limb_02_R_prox",
+        "limb_02_R_mid",
+        "limb_02_R_dist",
+        "limb_02_R_tip"
+      ],
+      "effectorBone": "limb_02_R_tip",
+      "solver": "CCD",
+      "contactType": "filtering endopod terminal pad"
+    },
+    {
+      "name": "anchor_attack_03_L",
+      "bone": "limb_03_L_tip",
+      "point": [
+        -0.224742,
+        -1.622428,
+        1.203578
+      ],
+      "role": "attack",
+      "blenderWorld": [
+        -0.224742,
+        1.203578,
+        1.622428
+      ],
+      "gltfWorld": [
+        -0.224742,
+        1.203578,
+        1.622428
+      ],
+      "note": "anterior endopod terminal contact; body, head, shell and eyes never enter a strike chain",
+      "chain": [
+        "limb_03_L_prox",
+        "limb_03_L_mid",
+        "limb_03_L_dist",
+        "limb_03_L_tip"
+      ],
+      "effectorBone": "limb_03_L_tip",
+      "solver": "CCD",
+      "contactType": "filtering endopod terminal pad"
+    },
+    {
+      "name": "anchor_attack_03_R",
+      "bone": "limb_03_R_tip",
+      "point": [
+        0.224742,
+        -1.556344,
+        1.192943
+      ],
+      "role": "attack",
+      "blenderWorld": [
+        0.224742,
+        1.192943,
+        1.556344
+      ],
+      "gltfWorld": [
+        0.224742,
+        1.192943,
+        1.556344
+      ],
+      "note": "anterior endopod terminal contact; body, head, shell and eyes never enter a strike chain",
+      "chain": [
+        "limb_03_R_prox",
+        "limb_03_R_mid",
+        "limb_03_R_dist",
+        "limb_03_R_tip"
+      ],
+      "effectorBone": "limb_03_R_tip",
+      "solver": "CCD",
+      "contactType": "filtering endopod terminal pad"
+    },
+    {
+      "name": "anchor_attack_04_L",
+      "bone": "limb_04_L_tip",
+      "point": [
+        -0.223613,
+        -1.4681,
+        1.187584
+      ],
+      "role": "attack",
+      "blenderWorld": [
+        -0.223613,
+        1.187584,
+        1.4681
+      ],
+      "gltfWorld": [
+        -0.223613,
+        1.187584,
+        1.4681
+      ],
+      "note": "anterior endopod terminal contact; body, head, shell and eyes never enter a strike chain",
+      "chain": [
+        "limb_04_L_prox",
+        "limb_04_L_mid",
+        "limb_04_L_dist",
+        "limb_04_L_tip"
+      ],
+      "effectorBone": "limb_04_L_tip",
+      "solver": "CCD",
+      "contactType": "filtering endopod terminal pad"
+    },
+    {
+      "name": "anchor_attack_04_R",
+      "bone": "limb_04_R_tip",
+      "point": [
+        0.223613,
+        -1.364971,
+        1.125204
+      ],
+      "role": "attack",
+      "blenderWorld": [
+        0.223613,
+        1.125204,
+        1.364971
+      ],
+      "gltfWorld": [
+        0.223613,
+        1.125204,
+        1.364971
+      ],
+      "note": "anterior endopod terminal contact; body, head, shell and eyes never enter a strike chain",
+      "chain": [
+        "limb_04_R_prox",
+        "limb_04_R_mid",
+        "limb_04_R_dist",
+        "limb_04_R_tip"
+      ],
+      "effectorBone": "limb_04_R_tip",
+      "solver": "CCD",
+      "contactType": "filtering endopod terminal pad"
+    },
+    {
+      "name": "anchor_attack_05_L",
+      "bone": "limb_05_L_tip",
+      "point": [
+        -0.222484,
+        -1.281557,
+        1.131434
+      ],
+      "role": "attack",
+      "blenderWorld": [
+        -0.222484,
+        1.131434,
+        1.281557
+      ],
+      "gltfWorld": [
+        -0.222484,
+        1.131434,
+        1.281557
+      ],
+      "note": "anterior endopod terminal contact; body, head, shell and eyes never enter a strike chain",
+      "chain": [
+        "limb_05_L_prox",
+        "limb_05_L_mid",
+        "limb_05_L_dist",
+        "limb_05_L_tip"
+      ],
+      "effectorBone": "limb_05_L_tip",
+      "solver": "CCD",
+      "contactType": "filtering endopod terminal pad"
+    },
+    {
+      "name": "anchor_attack_05_R",
+      "bone": "limb_05_R_tip",
+      "point": [
+        0.222484,
+        -1.180979,
+        1.04233
+      ],
+      "role": "attack",
+      "blenderWorld": [
+        0.222484,
+        1.04233,
+        1.180979
+      ],
+      "gltfWorld": [
+        0.222484,
+        1.04233,
+        1.180979
+      ],
+      "note": "anterior endopod terminal contact; body, head, shell and eyes never enter a strike chain",
+      "chain": [
+        "limb_05_R_prox",
+        "limb_05_R_mid",
+        "limb_05_R_dist",
+        "limb_05_R_tip"
+      ],
+      "effectorBone": "limb_05_R_tip",
+      "solver": "CCD",
+      "contactType": "filtering endopod terminal pad"
+    },
+    {
+      "name": "anchor_attack_06_L",
+      "bone": "limb_06_L_tip",
+      "point": [
+        -0.221355,
+        -1.091444,
+        0.984436
+      ],
+      "role": "attack",
+      "blenderWorld": [
+        -0.221355,
+        0.984436,
+        1.091444
+      ],
+      "gltfWorld": [
+        -0.221355,
+        0.984436,
+        1.091444
+      ],
+      "note": "anterior endopod terminal contact; body, head, shell and eyes never enter a strike chain",
+      "chain": [
+        "limb_06_L_prox",
+        "limb_06_L_mid",
+        "limb_06_L_dist",
+        "limb_06_L_tip"
+      ],
+      "effectorBone": "limb_06_L_tip",
+      "solver": "CCD",
+      "contactType": "filtering endopod terminal pad"
+    },
+    {
+      "name": "anchor_attack_06_R",
+      "bone": "limb_06_R_tip",
+      "point": [
+        0.221355,
+        -1.032033,
+        0.908425
+      ],
+      "role": "attack",
+      "blenderWorld": [
+        0.221355,
+        0.908425,
+        1.032033
+      ],
+      "gltfWorld": [
+        0.221355,
+        0.908425,
+        1.032033
+      ],
+      "note": "anterior endopod terminal contact; body, head, shell and eyes never enter a strike chain",
+      "chain": [
+        "limb_06_R_prox",
+        "limb_06_R_mid",
+        "limb_06_R_dist",
+        "limb_06_R_tip"
+      ],
+      "effectorBone": "limb_06_R_tip",
+      "solver": "CCD",
+      "contactType": "filtering endopod terminal pad"
+    }
+  ]
+}

@@ -80,3 +80,31 @@ cephalopod head) that guess is meaningless — pitch those with `P.spin(name, [1
 Rigs whose kit has `grasp: true` (`docs/redesign/05-hiding-and-combat.md`) need a `Grab` clip: the
 game plays it once as the grip closes and loops it while the animal clings to something bigger.
 Author it as a **held loop** that starts in the held pose and breathes, never one that opens.
+
+## Base poses
+
+A performance may export `basePose(P)`: a resting shape the bind pose lacks (Opabinia's trunk
+hanging down and curving up). `apply.mjs` then re-poses **every** other clip in the file onto it —
+each rotation key of an affected joint is post-multiplied by the base delta, weighted down where
+the clip's own pose already departs strongly from bind (`rebase.fade`, radians) so an authored
+reach still arrives straight — and keeps each shipped clip as `replaced/<Name>`. Authored clips get
+the base underneath them automatically; a clip that says `base: false` handles the shape itself
+(Opabinia's attacks apply the curve scaled by `1 - straighten` so the trunk shoots out straight).
+
+## Body motion is never spent to pay for appendage motion
+
+Two rules, learned the hard way after the first pass damped the swimming wave during strikes and
+made the attacks read as *less* alive than the clips they replaced:
+
+- **A performance owns only the bones it names.** Export `authored(name)` and `apply.mjs` hands
+  every other bone the shipped clip's own motion, composed with whatever the performance still
+  does to it. An appendage rework then leaves the body's authored performance — the roll, the
+  rear-up, the lunge, the fin waves — exactly intact, and adds to it. Only the bones a
+  performance authors are held to the rest pose at the clip's ends, because a carried bone
+  reproduces the shipped clip's endpoints, which sit at that rig's neutral idle rather than at
+  bind. The root is never carried.
+- **A strike adds to the locomotor wave; it never subtracts.** Use `alive(u)` (full amplitude
+  across the clip, tapering only into the endpoints) rather than a sine hump, which is smallest
+  exactly where an attack needs the body driving hardest. Then raise the stroke with `power` and
+  push extra cycles through with `beats`/`ramp` (`beatPhase`), so a train of fins, flaps or legs
+  visibly powers up into the contact and rides out the recovery.

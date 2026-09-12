@@ -1,3 +1,4 @@
+import { hasEquivalentSizing } from '../sim/creatures';
 import { ACTIVE_ERA } from '../content';
 import { useEffect, useRef } from 'react';
 import type { HudSnapshot } from '../render/engine';
@@ -171,7 +172,7 @@ export function Dialogs({ kind, onClose, settings, onSettings, scheme }: { kind:
           <div className="help-columns">
             <section>
               <h3>Hunting</h3>
-              <p>Hold <b>{btn('aim', scheme)}</b> to aim: the view moves over your shoulder and a crosshair sits at the centre of the screen. It snaps to nearby prey as you enter aim; after that, steer it with the {scheme === 'pad' ? 'right stick' : 'mouse'}. <b>{btn('heavy', scheme)}</b> performs your creature’s heavy move: snatch, seize, rake, crush, charge or feeding sweep. Creatures without a special heavy pounce toward aimed prey or lunge forward. <b>{btn('guard', scheme)}</b> blocks with the creature’s natural defense; tap for a parry. Hallucigenia braces, Canadia flares its bristles, Olenoides rolls while blocking, and Wiwaxia releases a shove after holding block. <b>{btn('dash', scheme)}</b> dashes: press it with a direction held to burst that way with a moment of invulnerability, far enough to clear a giant's bite — and it scales with your body, so a grown creature covers real ground. Press it with no direction and you dash along your own axis: ahead for most animals, and out behind for a shelled jetter, which is how it escapes. <b>{btn('sprint', scheme)}</b> sprints, <b>{btn('rise', scheme)}</b> rises — seafloor creatures hop with it, and holding it paddles them up into open water, where they swim slowly and cannot sprint or dash until they are back on the bottom. <b>{btn('zoom', scheme)}</b> pulls the camera in and out. <b>{btn('sense', scheme)}</b> turns Sense on and off: on, the size-band marks over creatures and the radar are drawn; off, nothing is drawn over the sea but the bar at the bottom. It is on to begin with, costs nothing and never runs out — turning it off is for the look of the thing.</p>
+              <p>Hold <b>{btn('aim', scheme)}</b> to aim: the view moves over your shoulder and a crosshair sits at the centre of the screen. It snaps to nearby prey as you enter aim; after that, steer it with the {scheme === 'pad' ? 'right stick' : 'mouse'}. <b>{btn('heavy', scheme)}</b> performs your creature’s heavy move: snatch, seize, rake, crush, charge or feeding sweep. Creatures without a special heavy pounce toward aimed prey or lunge forward. <b>{btn('guard', scheme)}</b> blocks with the creature’s natural defense; tap for a parry. Hallucigenia braces, Canadia flares its bristles, Olenoides rolls while blocking, and Wiwaxia releases a shove after holding block. <b>{btn('dash', scheme)}</b> dashes: press it with a direction held to burst that way with a moment of invulnerability, far enough to clear a giant's bite — and it scales with your body, so a grown creature covers real ground. Press it with no direction and you dash along your own axis: ahead for most animals, and out behind for a shelled jetter, which is how it escapes. <b>{btn('sprint', scheme)}</b> sprints, <b>{btn('rise', scheme)}</b> rises — seafloor creatures hop with it, and holding it paddles them up into open water, where they swim — slower than a swimmer, but aimed with the camera and able to sprint and dash like anything else. Gaining height costs stamina, and a walker that stops asking to go anywhere settles back to the bottom. <b>{btn('zoom', scheme)}</b> pulls the camera in and out. <b>{btn('sense', scheme)}</b> turns Sense on and off: on, the size-band marks over creatures and the radar are drawn; off, nothing is drawn over the sea but the bar at the bottom. It is on to begin with, costs nothing and never runs out — turning it off is for the look of the thing.</p>
               <h3>The sea</h3>
               <p>It has one edge: the shore you hatch beside. Swim along it and the world stays gentle; swim <b>away</b> from it and the biomes change: shelf, sponge forest, boulder fields, the channels, the escarpment, and the deep basin, where the giants live. The <b>radar</b> at the top right shows anything big enough to hurt you, whatever is hunting you, the nearest shoals worth eating, your nursery and the shore. Creatures show only while they are inside its reach; the other players, your nursery and the shore sit hollow on the rim when they are past it, pointing the way. Press <b>{btn('teleport', scheme)}</b> for the teleport menu: back to your nursery, or straight to another player. Hold <b>{btn('view', scheme)}</b> for the scoreboard: everyone in the match, what they have done, and what this mode is asking of them.</p>
               <h3>Fighting</h3>
@@ -180,6 +181,10 @@ export function Dialogs({ kind, onClose, settings, onSettings, scheme }: { kind:
             <section>
               <h3>Giants</h3>
               <p>The big ones cruise high in the light and only dive when they are hungry. When one turns your way an eye fills at the top of your screen: <b>stop moving</b>, or slip under the sponges and <b>hold still</b> until it loses you. They are slow to turn and cannot get their heads into dense cover. Their bite is a slow heavy: dash the moment you see the wind-up. If one does catch you at zero health, it swallows you whole.</p>
+              {scheme === 'pad' && <>
+                <h3>Menus on a pad</h3>
+                <p>The stick and D-pad steer whatever the screen is about — the roster, a menu's choices — and move by where the buttons actually are, so a row answers left and right. <b>LB</b> and <b>RB</b> step through every other button on the screen, one at a time, and round to the roster again: the other era on the title screen, the mode chips, and the icons in the corner from anywhere — so settings and fullscreen are reachable without a mouse. <b>A</b> takes the one you land on and <b>B</b> gives the sticks back. On a shared screen only the pad that reached for them follows; everyone else keeps picking.</p>
+              </>}
               <h3>Growing</h3>
               <p>The ring fills as you eat. Fill it, moult, get bigger. Kills of your own size are worth far more than plankton. Dying drops you a tier but keeps half your progress. <b>{btn('ability', scheme)}</b> hides at every size. Marrella and Ottoia sink and burrow for free; hide or heavy emerges with a free strike. Other creatures gradually copy the nearest plant, rock, seabed or creature colours, spending stamina. Idle camouflage slowly sinks: move in any direction to counter it. Attacking, blocking, sprinting or being hit reveals you.</p>
               {scheme === 'pad'
@@ -226,6 +231,12 @@ export function Dialogs({ kind, onClose, settings, onSettings, scheme }: { kind:
             <span>Mute</span>
             <input type="checkbox" checked={settings.muted} onChange={(e) => onSettings({ ...settings, muted: e.target.checked })} />
           </label>
+          {hasEquivalentSizing() && (
+            <label className="setting-row">
+              <span>Equivalent sizing <small>Give every animal the same size, instead of its own. Takes effect next match.</small></span>
+              <input type="checkbox" checked={settings.equivalentSizing} onChange={(e) => onSettings({ ...settings, equivalentSizing: e.target.checked })} />
+            </label>
+          )}
           <p className="dim">Settings apply to every local player and are remembered on this device.</p>
         </div>
       )}

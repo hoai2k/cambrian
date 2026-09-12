@@ -53,3 +53,15 @@ The viewer helper expects the repo's Vite server on port 5173, overridable with 
 ## Published package review
 
 The independently reviewed package is 9,644,796 bytes full and 1,171,792 bytes reduced. Lossless compression preserves every decoded position, skin weight and animation sample. Fresh packaged eye-volume measurements are about 77% in both detail levels, with conservative lower confidence bounds above 76%. See `eye-packaged-review.json` for exact hashes and topology checks. The built viewer loaded all 18 actions; paused selection and one-frame stepping passed for each, the feeding gape was visually inspected, and no browser errors were reported (`main-viewer-review.json`). The Devonian suite passed all 410 checks.
+
+## V3 shipped — 12 September 2026
+
+`anatomy_v3.py` + `build_v3.py` port the approved fin study off the user reference
+(`docs/reference/Chondrichthyes.webp`): delta-wing pectorals with the base running further back
+along the body, the apex far back and a concave trailing edge; a taller, sharper anterior dorsal
+and rear dorsal with straight leading edges; a lunate tail with drawn-out lobes; `pectoralTip`
+moved mid-blade. The pectoral and pelvic apex roots measured outside the trunk once swept back
+(+0.151 / +0.042 on the section-ellipse metric) and are seated inside with `seat()` as Cheirolepis'
+were. Packaging exact round-trip PASS at 136,556 / 38,232 triangles; intake and check-export
+PASS; portraits from the V3 build. `build.py` still reproduces V2. The user accepted the study on
+12 September; badge cleared.

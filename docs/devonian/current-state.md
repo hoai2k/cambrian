@@ -79,8 +79,26 @@ Local originals/intermediates/blends/audits/logs/backups remain under `../devoni
 
 Root's Titan numerical classifier is asset-local; shared eye-audit.py and50% gate unchanged. Detailed repeated-ray failure, oral-boundary correction, preserved failed studies and frozen exact inputs remain beside the source. Do not cite old reports as fresh executions. Copy geometric audits only with proven unchanged geometric/rig/animation bytes and explicit provenance.
 
-Use Astra high for research/sculpt/material/rig judgment; Terra medium for frozen build/render/checks. Blender5.2 at `/Applications/Blender.app/Contents/MacOS/Blender`, CPU2. Serialize heavy jobs. Ignore .DS_Store and __pycache__; no such cache staged. One trailing whitespace line in frozen Cocc07 was deliberately retained so execution input hashes did not change.
+Use Astra high for research/sculpt/material/rig judgment; Terra medium for frozen build/render/checks. Blender5.2 at `/Applications/Blender.app/Contents/MacOS/Blender` on the Mac, `/opt/blender/blender` here (`npm run blender`), CPU2. Serialize heavy jobs. Ignore .DS_Store and __pycache__; no such cache staged. One trailing whitespace line in frozen Cocc07 was deliberately retained so execution input hashes did not change.
 
 Storage shortage resolved to roughly23GiB earlier. Root recovered732MB by hash-verifying777 duplicate dist files before replacing only those build copies with links; subsequent normal builds recreated dist. No authoring source/backups deleted. Proof `../devonian-authoring/viewer-build-duplicate-proof-2026-09-08.json`.
 
 This checkpoint is mirrored to `../devonian-authoring/CURRENT_STATE.md`. The user has paused again; retain the full rework queue and the stated review/runtime limits. Resume first at Coccosteus candidate07 validation, then Bothriolepis correction and Odaraia production. Do not repeat completed initial-asset delivery or surface studies.
+
+
+## 12 September 2026 — the model queue moved
+
+Blender 5.2.1 runs in the session (`npm run blender`); the staging and tiering are
+`docs/model-queue-plan.md`, the resume point `docs/model-queue-state.md`. Delivered on the user's
+acceptance, all shipped from packaged candidates that passed lossless packaging and structural
+intake: Cheirolepis V3 (reference face, seated fin roots, swept fins), Palaeoisopus V2 (oar-blade
+articles, flat trunk, no joint beads), Jaekelopterus V2 (flattened stepped opisthosoma, blade rami),
+Cladoselache V3 (fin outlines), Manticoceras (closed umbilicus), Eldredgeops (occipital joint).
+Accepted as published: Titanichthys, Gemuendina, Dunkleosteus. Cleared by triage: Walliserops,
+Furcaster, Michelinoceras. Shipped later the same day: Acanthostega V2, Tiktaalik V3,
+Onychodus V2, Rhinodipterus V3, Nahecaris V2, Stethacanthus V3 — every one packaged losslessly,
+through structural intake and the eye audit, badge cleared. Bothriolepis V3 shipped after the same
+day's M05 (the shield resolved, cap matched, microrelief halved). Odaraia V3 shipped (19 clips, Grab
+included) once the user granted the public write. Doryaspis is unblocked — the mouth is at the
+very front above the saw — and its V3 is being built; every model is getting a Grab clip. Blocked on the user: Coccosteus (two evidence files exist
+only on the Mac), Doryaspis (the mouth-position call).

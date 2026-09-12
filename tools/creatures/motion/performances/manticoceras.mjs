@@ -36,6 +36,11 @@ const mantle = (P, k, t) => { P.bend('mantleL', DOWN, .1 * k); P.bend('mantleR',
 const head = (P, { noseDown = 0, fwd = 0 }) => { P.spin('head', [1, 0, 0], noseDown); if (fwd) P.shift('head', [0, 0, fwd]); };
 const breathe = (P, u, amp = 1) => { const ph = 2 * Math.PI * u; mantle(P, .3 * amp * (1 + Math.sin(ph)) / 2); for (const k of ARMS) chain(P, arm(k).slice(2), UP, .015 * amp * Math.sin(ph - k * .6)); };
 
+/**
+ * Bones this performance authors. The arm crown and beak are the performance; the head, funnel and mantle keep the shipped motion.
+ */
+export const authored = (n) => /^(arm|beak)/.test(n);
+
 export const clips = [
   {
     name: 'Bite', duration: 0.5, loop: false,

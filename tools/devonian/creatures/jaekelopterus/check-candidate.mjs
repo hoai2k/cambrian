@@ -7,7 +7,9 @@ import { NodeIO } from '@gltf-transform/core';
 import { ALL_EXTENSIONS } from '@gltf-transform/extensions';
 import { MeshoptDecoder } from 'meshoptimizer';
 import { PNG } from 'pngjs';
-const root = '../devonian-authoring/jaekelopterus/intake-layout';
+// env override so a v2 (or other) candidate can be checked without touching the frozen
+// initial-candidate intake layout above; unset, behaviour is exactly as before.
+const root = process.env.JAEK_CHECK_ROOT || '../devonian-authoring/jaekelopterus/intake-layout';
 const roster = JSON.parse(fs.readFileSync('tools/devonian/roster.json', 'utf8'));
 const args = process.argv.slice(2), partial = args.includes('--partial');
 const chosen = args.filter(s => !s.startsWith('--'));
@@ -103,6 +105,7 @@ for(const id of ids) {
   console.log(`PASS ${id}: ${fullTris}/${lodTris} triangles, ${clips.length} clips, ${sockets.length} sockets`);
 }
 if(!partial && !chosen.length && !args.includes('--shipped')) assert.equal(results.length,21);
-fs.mkdirSync('../devonian-authoring/jaekelopterus/intake-review',{recursive:true});
-fs.writeFileSync('../devonian-authoring/jaekelopterus/intake-review/intake.json',JSON.stringify(results,null,2)+'\n');
+const reviewDir = process.env.JAEK_CHECK_ROOT ? `${root}/../intake-review` : '../devonian-authoring/jaekelopterus/intake-review';
+fs.mkdirSync(reviewDir,{recursive:true});
+fs.writeFileSync(`${reviewDir}/intake.json`,JSON.stringify(results,null,2)+'\n');
 console.log(`${results.length} Devonian specimens passed structural intake`);

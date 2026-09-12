@@ -1,7 +1,13 @@
-"""Analytic neutral oral-floor clearance against the continuous external mandibular surface."""
-import os,sys,math,json
+"""Analytic neutral oral-floor clearance against the continuous external mandibular surface.
+
+TIKTAALIK_ANATOMY (default anatomy_v2) selects the anatomy module; TIKTAALIK_CHECK_SUFFIX
+(default v2) selects the report filename (oral-clearance-<suffix>.json), so a v3 candidate can be
+checked without overwriting the v2 report.
+"""
+import importlib,os,sys,math,json
 sys.path.insert(0,os.path.dirname(os.path.abspath(__file__)))
-from anatomy_v2 import surf,section,oralPoint,physical_y
+ANATOMY=os.environ.get('TIKTAALIK_ANATOMY','anatomy_v2');SUFFIX=os.environ.get('TIKTAALIK_CHECK_SUFFIX','v2')
+_mod=importlib.import_module(ANATOMY);surf,section,oralPoint,physical_y=_mod.surf,_mod.section,_mod.oralPoint,_mod.physical_y
 records=[]
 for i in range(1,26):
  t=i/30
@@ -14,6 +20,6 @@ for i in range(1,26):
   clearance=p.z-q[2];records.append({'t':t,'angle':a,'clearance':float(clearance),'floor':list(p),'outer':list(map(float,q))})
 report={'neutralFloorSamples':len(records),'negativeSamples':sum(r['clearance']<0 for r in records),'minimum':min(records,key=lambda r:r['clearance']),'worst':sorted(records,key=lambda r:r['clearance'])[:12]}
 import hashlib
-report['anatomySourceSha256']=hashlib.sha256(open(os.path.join(os.path.dirname(__file__),'anatomy_v2.py'),'rb').read()).hexdigest()
-open(os.path.join(os.path.dirname(__file__),'oral-clearance-v2.json'),'w').write(json.dumps(report,indent=2))
+report['anatomySourceSha256']=hashlib.sha256(open(os.path.join(os.path.dirname(__file__),ANATOMY+'.py'),'rb').read()).hexdigest()
+open(os.path.join(os.path.dirname(__file__),'oral-clearance-'+SUFFIX+'.json'),'w').write(json.dumps(report,indent=2))
 print(json.dumps(report,indent=2))

@@ -27,7 +27,12 @@ export interface EraCopy {
    * step apart. `path` is joined to the app base, so it is where that era's page sits relative to
    * this one's asset root: '' is the build root, 'devonian/' the page one level down.
    */
-  readonly sibling?: { readonly title: string; readonly path: string; readonly blurb: string };
+  /**
+   * The other era's page. `logo` is its wordmark, so a switcher can *show* the other game rather
+   * than spell it: a plain path, because reaching into the other era's content module would pull
+   * its whole roster into this page's bundle and read ACTIVE_ERA at import time.
+   */
+  readonly sibling?: { readonly title: string; readonly path: string; readonly blurb: string; readonly logo: string };
 }
 
 /** Render-only replacements for existing scenery placements; never changes world generation. */
@@ -52,6 +57,20 @@ export interface EraDefinition {
   /** The modes this era offers, in selection order. The simulation's win checks are keyed by id. */
   readonly modes: readonly ModeInfo[];
   readonly creatures: readonly CreatureDef[];
+  /**
+   * This roster's body lengths taken from what the animals actually measured, which is what the era
+   * plays at. `Settings → Equivalent sizing` puts the flat authored lengths in `creatures` back.
+   *
+   * The Cambrian roster was authored at one size — every animal growing to within a third of every
+   * other — which is no use in a game where size decides who eats whom, so it now plays at the
+   * lengths in `docs/research/cambrian-sizes.md`. `speed`, `hp` and `poise` come with the length so
+   * the simulation is unchanged at any given body size; everything else on the def is already
+   * counted in body lengths. `realCm` is the animal itself, for the selection card.
+   *
+   * An era that leaves this out — the Devonian, whose roster is already generated from real
+   * lengths — plays at the lengths in `creatures` and has nothing for the setting to do.
+   */
+  readonly naturalSizes?: Readonly<Record<string, { adultLength: number; speed: number; hp: number; poise: number; realCm: number }>>;
   readonly defaults: {
     readonly player: CreatureId;
     readonly boot: readonly CreatureId[];
@@ -121,7 +140,15 @@ export interface EraDefinition {
      */
     readonly standIns?: Readonly<Partial<Record<CreatureId, CreatureId>>>;
   };
-  readonly audio: { readonly music: readonly MusicTrack[] };
+  readonly audio: {
+    readonly music: readonly MusicTrack[];
+    /**
+     * The two always-on loops, by sample name: the ambient bed and the drone a giant brings with
+     * it. Era-specific ones are addressed like any other era sample (`<era>/<name>`). These used
+     * to be one shared constant, which is why the Devonian played the Cambrian reef.
+     */
+    readonly loops: { readonly ambient: string; readonly drone: string };
+  };
   readonly presentation: {
     readonly schemes: readonly Scheme[];
     readonly creatureSchemes: Readonly<Record<string, string>>;
@@ -143,6 +170,7 @@ export function defineEra(def: EraDefinition): EraDefinition {
   for (const id of ids) if (!def.presentation.authoredColors.creatures[id]) throw new Error(`${def.id}: missing authored colours for ${id}`);
   if (!def.presentation.schemes.length) throw new Error(`${def.id}: a default colour scheme is required`);
   if (!def.audio.music.length) throw new Error(`${def.id}: a soundtrack is required`);
+  if (!def.audio.loops.ambient || !def.audio.loops.drone) throw new Error(`${def.id}: both loops are required`);
   if (!def.modes.length) throw new Error(`${def.id}: at least one mode is required`);
   return def;
 }

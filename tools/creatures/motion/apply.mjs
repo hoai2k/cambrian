@@ -22,7 +22,7 @@ import { readFile, writeFile, mkdir } from 'node:fs/promises';
 import { createHash } from 'node:crypto';
 import path from 'node:path';
 import assert from 'node:assert/strict';
-import { makeIO, loadRig, sampleClip, Rig } from './rig.mjs';
+import { makeIO, loadRig, sampleClip, rebaseAnimation, clipReader, Rig } from './rig.mjs';
 
 const args = process.argv.slice(2);
 const id = args.find((a) => !a.startsWith('--'));
@@ -40,7 +40,7 @@ const file = `${assetDir}/${id}.glb`;
 const before = await readFile(file);
 const rig = await loadRig(io, file);
 const doc = rig.doc, root = doc.getRoot();
-const { clips } = await import(`./performances/${id}.mjs`);
+const { clips, basePose, rebase, authored } = await import(`./performances/${id}.mjs`);
 
 const hash = (b) => createHash('sha256').update(b).digest('hex');
 const digest = (a) => a ? hash(new Uint8Array(new Float64Array(a.getArray()).buffer)) + ':' + a.getType() + ':' + a.getNormalized() : null;
@@ -69,7 +69,10 @@ function snapshot(d) {
   return {
     nodes: r.listNodes().map((n) => [n.getName(), n.getTranslation(), n.getRotation(), n.getScale(), n.listChildren().map((c) => c.getName()), n.getExtras()]),
     skins: r.listSkins().map((s) => [s.listJoints().map((j) => j.getName()), s.getSkeleton()?.getName(), digest(s.getInverseBindMatrices())]),
-    meshes: r.listMeshes().map((m) => [m.getName(), m.listPrimitives().map((p) => [p.listSemantics(), p.listSemantics().map((s) => digest(p.getAttribute(s))), indexDigest(p), p.getMaterial()?.getName(), p.getMode()])]),
+    // Attribute order within a primitive carries no meaning in glTF, and dedup() can reshuffle it
+    // (seen on files with duplicate-content COLOR_0/COLOR_1 or TANGENT/JOINTS_0 accessors), so the
+    // semantics are sorted before comparing rather than compared position-by-position.
+    meshes: r.listMeshes().map((m) => [m.getName(), m.listPrimitives().map((p) => { const sem = [...p.listSemantics()].sort(); return [sem, sem.map((s) => digest(p.getAttribute(s))), indexDigest(p), p.getMaterial()?.getName(), p.getMode()]; })]),
     materials: r.listMaterials().map((m) => [m.getName(), JSON.stringify(m.toJSON?.() ?? {}), m.getBaseColorFactor(), m.getBaseColorTexture()?.getName(), m.getNormalTexture()?.getName(), m.getMetallicRoughnessTexture()?.getName(), m.getAlphaMode(), m.getDoubleSided()]),
     textures: r.listTextures().map((t) => [t.getName(), t.getMimeType(), hash(t.getImage())]),
     kept: r.listAnimations().filter((a) => !clips.some((c) => c.name === a.getName())).map((a) => [a.getName(), a.listChannels().map((c) => [c.getTargetNode().getName(), c.getTargetPath(), digest(c.getSampler().getInput()), digest(c.getSampler().getOutput()), c.getSampler().getInterpolation()])]),
@@ -90,16 +93,38 @@ for (const def of clips) {
   if (kept && ours(kept)) { drop(kept); kept = undefined; log.push(`${def.name}: dropped a replaced/ copy that was this tool's own output`); }
   if (old && ours(old)) { drop(old); old = undefined; log.push(`${def.name}: previous ${PASS} clip dropped`); }
   if (!old && !kept) added.add(def.name);        // a clip the model never had: nothing to keep beside it
+  let source = kept;
   if (old && !kept) {
     old.setName(`replaced/${def.name}`);
     old.setExtras({ ...old.getExtras(), cambrianClip: { ...(old.getExtras()?.cambrianClip ?? {}), version: 1, replaced: def.name, replacedOn: authoredOn, by: PASS } });
     log.push(`${def.name}: shipped clip kept as replaced/${def.name}`);
+    source = old;
   } else if (old) {
     drop(old);
     log.push(`${def.name}: shipped clip dropped (replaced/${def.name} already kept)`);
   } else log.push(`${def.name}: ${kept ? 'new clip beside the kept original' : 'new clip'}`);
-  const { frames } = sampleClip(rig, def, { authoredOn, pass: PASS });
+  // Everything the performance does not claim keeps the shipped clip's motion.
+  const carry = authored && source ? clipReader(rig, source) : undefined;
+  const { frames } = sampleClip(rig, def, { authoredOn, pass: PASS, basePose, carry, authored });
+  if (carry) log.push(`${def.name}: body motion carried from replaced/${def.name}`);
   log.push(`${def.name}: ${frames} frames, ${def.duration}s, ${def.loop ? 'loop' : 'one-shot'}`);
+}
+// A base pose re-poses every other clip in the file onto the new resting shape; the shipped
+// version of each is kept as replaced/<Name> exactly like an authored replacement.
+if (basePose) {
+  const names = [...new Set(root.listAnimations().map((a) => a.getName().replace(/^replaced\//, '')))].filter((n) => !clips.some((c) => c.name === n));
+  for (const name of names) {
+    let old = byName.get(name), kept = byName.get(`replaced/${name}`);
+    if (kept && ours(kept)) { drop(kept); kept = undefined; }
+    if (old && ours(old)) { drop(old); old = undefined; }          // an earlier run's re-posed copy
+    let source = kept;
+    if (!source && old) { old.setName(`replaced/${name}`); old.setExtras({ ...old.getExtras(), cambrianClip: { version: 1, replaced: name, replacedOn: authoredOn, by: PASS } }); source = old; }
+    else if (source && old) drop(old);
+    if (!source) continue;
+    rebaseAnimation(rig, source, name, basePose, { ...rebase, pass: PASS, authoredOn });
+    log.push(`${name}: re-posed onto the base pose (shipped clip kept as replaced/${name})`);
+    clips.push({ name });                        // so the checks below expect it beside its replaced/ copy
+  }
 }
 // Fresh Rig over the same doc so the kept-animation snapshot sees the renamed clips.
 expected.kept = snapshot(new Rig(doc).doc).kept.filter(([n]) => !clips.some((c) => c.name === n));

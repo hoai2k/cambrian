@@ -1,7 +1,7 @@
 import { ACTIVE_ERA } from '../content';
 import type { Vec3 } from '../shared/math';
 import type { Game } from './game';
-import type { Actor, Mode, WorldEvent } from './types';
+import type { Actor, InputFrame, Mode, WorldEvent } from './types';
 import type { CreatureId } from './creatures';
 import type { ExpansionContext } from './expansion-abilities';
 import { DEVONIAN_RULES } from './devonian/rules';
@@ -22,8 +22,8 @@ export interface EraHud {
    */
   stageProgress: number;
   rung: number; rungName: string; stage: string;
-  /** 0..1 air remaining, for air breathers only. */
-  air?: number;
+  /** This body breathes both ways: lungs as well as gills, so dead water cannot touch it. */
+  bimodal: boolean;
   beached: boolean;
   /** Dead zones as world offsets from the player and radii, for the radar. */
   deadZones: { dx: number; dz: number; r: number }[];
@@ -110,6 +110,28 @@ export interface EraRules {
    * the stick magnitude, `cruise` the speed the shared rules would give.
    */
   swim(g: Game, a: Actor, dir: Vec3, mag: number, cruise: number, burstPressed: boolean): { speed: number; turn: number; impulse: number };
+  /**
+   * The vertical assist for this body this step, in units/s, positive up: what the rise and sink
+   * buttons are worth to it and anything it does for itself. `base` is the rate the shared rules
+   * would give (RISE_RATE for its size, already carrying a jetter's free hover) and `burst` the
+   * sprint multiplier the same press is buying horizontally, so an era can decide whether a sprint
+   * carries into a climb. With no rules the shared behaviour is exactly `rise ? base : sink ? -base
+   * : 0`, which is what the Cambrian keeps.
+   */
+  rise(g: Game, a: Actor, input: InputFrame, base: number, burst: number): number;
+  /**
+   * Multiplier on the shared stamina regeneration for this body right now. 1 is the shared rate.
+   * The Devonian's bimodal breathers recover at a quarter of it under water and at the full rate
+   * the moment they touch the surface, which is also where the bar is handed back whole.
+   */
+  staminaRegen(g: Game, a: Actor): number;
+  /**
+   * How much of the stamina a sprint or a dash in this direction is given to the body for nothing,
+   * 0..1. 1 is free — and free enough that an empty bar does not stop it, in which case only the
+   * upward part of the motion is accelerated, since the climb is what is being given away and
+   * nothing else. Devonian lungs climb for free; everything else pays in full.
+   */
+  climbRelief(a: Actor, input: InputFrame, dir: Vec3, mag: number): number;
   /** May this body leave the water when it drives hard at the surface? */
   canBreach(a: Actor): boolean;
   /** Height a body hatches at, given the floor under it and its length. */

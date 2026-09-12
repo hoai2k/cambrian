@@ -9,7 +9,7 @@ import { freshCursor, menuPress, MENU_LOCKOUT, type MenuCursor } from '../src/ap
 let failed = 0;
 const check = (n: string, ok: boolean, d = '') => { console.log(`${ok ? 'PASS' : 'FAIL'}  ${n.padEnd(58)} ${d}`); if (!ok) failed++; };
 
-const N = 4;   // Continue · Play again · Change creatures · Quit to title
+const N = 3;   // Continue · Play again · Quit
 
 // A menu the player did not ask for opens with nothing selected; one they did opens on its default.
 check('the results screen opens with nothing selected', !freshCursor(false).shown);
@@ -47,7 +47,7 @@ check('...and the default is the first choice, the harmless one', freshCursor(tr
   let c: MenuCursor = freshCursor(true);
   const seen: number[] = [];
   for (let i = 0; i < N + 1; i++) { const r = menuPress(c, N, { step: 1 }); check(`stepping never chooses (${i})`, !r.act); c = r.cursor; seen.push(c.sel); }
-  check('the list wraps', seen.join(',') === '1,2,3,0,1', seen.join(','));
+  check('the list wraps', seen.join(',') === '1,2,0,1', seen.join(','));
   const back = menuPress(freshCursor(true), N, { step: -1 });
   check('and wraps backwards to the last choice', back.cursor.sel === N - 1, `sel=${back.cursor.sel}`);
 }

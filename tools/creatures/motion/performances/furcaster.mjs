@@ -43,6 +43,11 @@ const disc = (P, { down = 0, pump = 0, angles = 0 }) => {
   for (let i = 0; i < 5; i++) P.bend(`oral_angle_${i}`, DOWN, .3 * angles);
 };
 
+/**
+ * Bones this performance authors. The five arms and the oral frame are the performance; the disc keeps the shipped motion.
+ */
+export const authored = (n) => /^(arm_|oral_)/.test(n);
+
 export const clips = [
   {
     name: 'Bite', duration: 0.5, loop: false,

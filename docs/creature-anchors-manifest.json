@@ -2048,8 +2048,8 @@
     "file": "nectocaris.glb",
     "source": "tools/creatures/soft/anchors.json",
     "newSpecimen": true,
-    "updatedSHA256": "c50871c3eb78bf98fe5c19874f8201731b8791d8b4785819d982f55247ef707f",
-    "bytes": 2596792,
+    "updatedSHA256": "33571b4a3d9e81ce40d8c9d3fb14fe23f9b2fb5e093af5370a1829b11baef4b1",
+    "bytes": 2609836,
     "changedClips": [],
     "anchors": [
       {
@@ -2236,8 +2236,8 @@
     "file": "ottoia.glb",
     "source": "tools/creatures/soft/anchors.json",
     "newSpecimen": true,
-    "updatedSHA256": "2a26b121394df1bb2d7c2005c6b8b1ff47a39297356aef73dc112c1d7919aba6",
-    "bytes": 2319740,
+    "updatedSHA256": "e69c2d59b9739d9141698de00f74209df82b5272f2e368f9d5f65a22d3d52821",
+    "bytes": 2498508,
     "changedClips": [],
     "anchors": [
       {
@@ -2420,45 +2420,217 @@
     "file": "odaraia.glb",
     "source": "tools/creatures/arthropods/anchors.json",
     "newSpecimen": true,
-    "updatedSHA256": "bf21bc96020a30ba6b210461e78ecf85ae0e6cbc33f1980157c40eea41bf2a04",
-    "bytes": 6757808,
+    "updatedSHA256": "bc7546de50521a27be99a91514a5335a4a986244a35961a6b10545e8cc780a69",
+    "bytes": 12926900,
     "changedClips": [],
     "anchors": [
       {
         "name": "anchor_mouth",
-        "bone": "body",
+        "bone": "head",
         "version": 1,
         "role": "mouth"
       },
       {
         "name": "anchor_mouth_inside",
-        "bone": "body",
+        "bone": "head",
         "version": 1,
         "role": "swallow"
       },
       {
         "name": "anchor_attack_primary",
-        "bone": "filter_1_00",
+        "bone": "limb_01_L_tip",
         "version": 1,
-        "role": "attack"
-      },
-      {
-        "name": "anchor_attack_left",
-        "bone": "filter_1_00",
-        "version": 1,
-        "role": "attack"
-      },
-      {
-        "name": "anchor_attack_right",
-        "bone": "filter_-1_00",
-        "version": 1,
-        "role": "attack"
+        "role": "attack",
+        "chain": [
+          "limb_01_L_prox",
+          "limb_01_L_mid",
+          "limb_01_L_dist",
+          "limb_01_L_tip"
+        ],
+        "effectorBone": "limb_01_L_tip",
+        "solver": "CCD"
       },
       {
         "name": "anchor_grasp",
-        "bone": "segment_00",
+        "bone": "limb_01_L_tip",
         "version": 1,
-        "role": "grasp"
+        "role": "grasp",
+        "chain": [
+          "limb_01_L_prox",
+          "limb_01_L_mid",
+          "limb_01_L_dist",
+          "limb_01_L_tip"
+        ],
+        "effectorBone": "limb_01_L_tip",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_attack_01_L",
+        "bone": "limb_01_L_tip",
+        "version": 1,
+        "role": "attack",
+        "chain": [
+          "limb_01_L_prox",
+          "limb_01_L_mid",
+          "limb_01_L_dist",
+          "limb_01_L_tip"
+        ],
+        "effectorBone": "limb_01_L_tip",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_attack_01_R",
+        "bone": "limb_01_R_tip",
+        "version": 1,
+        "role": "attack",
+        "chain": [
+          "limb_01_R_prox",
+          "limb_01_R_mid",
+          "limb_01_R_dist",
+          "limb_01_R_tip"
+        ],
+        "effectorBone": "limb_01_R_tip",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_attack_02_L",
+        "bone": "limb_02_L_tip",
+        "version": 1,
+        "role": "attack",
+        "chain": [
+          "limb_02_L_prox",
+          "limb_02_L_mid",
+          "limb_02_L_dist",
+          "limb_02_L_tip"
+        ],
+        "effectorBone": "limb_02_L_tip",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_attack_02_R",
+        "bone": "limb_02_R_tip",
+        "version": 1,
+        "role": "attack",
+        "chain": [
+          "limb_02_R_prox",
+          "limb_02_R_mid",
+          "limb_02_R_dist",
+          "limb_02_R_tip"
+        ],
+        "effectorBone": "limb_02_R_tip",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_attack_03_L",
+        "bone": "limb_03_L_tip",
+        "version": 1,
+        "role": "attack",
+        "chain": [
+          "limb_03_L_prox",
+          "limb_03_L_mid",
+          "limb_03_L_dist",
+          "limb_03_L_tip"
+        ],
+        "effectorBone": "limb_03_L_tip",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_attack_03_R",
+        "bone": "limb_03_R_tip",
+        "version": 1,
+        "role": "attack",
+        "chain": [
+          "limb_03_R_prox",
+          "limb_03_R_mid",
+          "limb_03_R_dist",
+          "limb_03_R_tip"
+        ],
+        "effectorBone": "limb_03_R_tip",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_attack_04_L",
+        "bone": "limb_04_L_tip",
+        "version": 1,
+        "role": "attack",
+        "chain": [
+          "limb_04_L_prox",
+          "limb_04_L_mid",
+          "limb_04_L_dist",
+          "limb_04_L_tip"
+        ],
+        "effectorBone": "limb_04_L_tip",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_attack_04_R",
+        "bone": "limb_04_R_tip",
+        "version": 1,
+        "role": "attack",
+        "chain": [
+          "limb_04_R_prox",
+          "limb_04_R_mid",
+          "limb_04_R_dist",
+          "limb_04_R_tip"
+        ],
+        "effectorBone": "limb_04_R_tip",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_attack_05_L",
+        "bone": "limb_05_L_tip",
+        "version": 1,
+        "role": "attack",
+        "chain": [
+          "limb_05_L_prox",
+          "limb_05_L_mid",
+          "limb_05_L_dist",
+          "limb_05_L_tip"
+        ],
+        "effectorBone": "limb_05_L_tip",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_attack_05_R",
+        "bone": "limb_05_R_tip",
+        "version": 1,
+        "role": "attack",
+        "chain": [
+          "limb_05_R_prox",
+          "limb_05_R_mid",
+          "limb_05_R_dist",
+          "limb_05_R_tip"
+        ],
+        "effectorBone": "limb_05_R_tip",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_attack_06_L",
+        "bone": "limb_06_L_tip",
+        "version": 1,
+        "role": "attack",
+        "chain": [
+          "limb_06_L_prox",
+          "limb_06_L_mid",
+          "limb_06_L_dist",
+          "limb_06_L_tip"
+        ],
+        "effectorBone": "limb_06_L_tip",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_attack_06_R",
+        "bone": "limb_06_R_tip",
+        "version": 1,
+        "role": "attack",
+        "chain": [
+          "limb_06_R_prox",
+          "limb_06_R_mid",
+          "limb_06_R_dist",
+          "limb_06_R_tip"
+        ],
+        "effectorBone": "limb_06_R_tip",
+        "solver": "CCD"
       }
     ]
   },
@@ -2466,45 +2638,217 @@
     "file": "odaraia.lod1.glb",
     "source": "tools/creatures/arthropods/anchors.json",
     "newSpecimen": true,
-    "updatedSHA256": "00a0d13c37dbb1a5461f146d198ac94faa8b7278e9c2ddbde44bad277cf40c3b",
-    "bytes": 1265488,
+    "updatedSHA256": "e38522cf02a5ca8b24d34ade92cad282e86806d182339713a030e001cac1956d",
+    "bytes": 3048752,
     "changedClips": [],
     "anchors": [
       {
         "name": "anchor_mouth",
-        "bone": "body",
+        "bone": "head",
         "version": 1,
         "role": "mouth"
       },
       {
         "name": "anchor_mouth_inside",
-        "bone": "body",
+        "bone": "head",
         "version": 1,
         "role": "swallow"
       },
       {
         "name": "anchor_attack_primary",
-        "bone": "filter_1_00",
+        "bone": "limb_01_L_tip",
         "version": 1,
-        "role": "attack"
-      },
-      {
-        "name": "anchor_attack_left",
-        "bone": "filter_1_00",
-        "version": 1,
-        "role": "attack"
-      },
-      {
-        "name": "anchor_attack_right",
-        "bone": "filter_-1_00",
-        "version": 1,
-        "role": "attack"
+        "role": "attack",
+        "chain": [
+          "limb_01_L_prox",
+          "limb_01_L_mid",
+          "limb_01_L_dist",
+          "limb_01_L_tip"
+        ],
+        "effectorBone": "limb_01_L_tip",
+        "solver": "CCD"
       },
       {
         "name": "anchor_grasp",
-        "bone": "segment_00",
+        "bone": "limb_01_L_tip",
         "version": 1,
-        "role": "grasp"
+        "role": "grasp",
+        "chain": [
+          "limb_01_L_prox",
+          "limb_01_L_mid",
+          "limb_01_L_dist",
+          "limb_01_L_tip"
+        ],
+        "effectorBone": "limb_01_L_tip",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_attack_01_L",
+        "bone": "limb_01_L_tip",
+        "version": 1,
+        "role": "attack",
+        "chain": [
+          "limb_01_L_prox",
+          "limb_01_L_mid",
+          "limb_01_L_dist",
+          "limb_01_L_tip"
+        ],
+        "effectorBone": "limb_01_L_tip",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_attack_01_R",
+        "bone": "limb_01_R_tip",
+        "version": 1,
+        "role": "attack",
+        "chain": [
+          "limb_01_R_prox",
+          "limb_01_R_mid",
+          "limb_01_R_dist",
+          "limb_01_R_tip"
+        ],
+        "effectorBone": "limb_01_R_tip",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_attack_02_L",
+        "bone": "limb_02_L_tip",
+        "version": 1,
+        "role": "attack",
+        "chain": [
+          "limb_02_L_prox",
+          "limb_02_L_mid",
+          "limb_02_L_dist",
+          "limb_02_L_tip"
+        ],
+        "effectorBone": "limb_02_L_tip",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_attack_02_R",
+        "bone": "limb_02_R_tip",
+        "version": 1,
+        "role": "attack",
+        "chain": [
+          "limb_02_R_prox",
+          "limb_02_R_mid",
+          "limb_02_R_dist",
+          "limb_02_R_tip"
+        ],
+        "effectorBone": "limb_02_R_tip",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_attack_03_L",
+        "bone": "limb_03_L_tip",
+        "version": 1,
+        "role": "attack",
+        "chain": [
+          "limb_03_L_prox",
+          "limb_03_L_mid",
+          "limb_03_L_dist",
+          "limb_03_L_tip"
+        ],
+        "effectorBone": "limb_03_L_tip",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_attack_03_R",
+        "bone": "limb_03_R_tip",
+        "version": 1,
+        "role": "attack",
+        "chain": [
+          "limb_03_R_prox",
+          "limb_03_R_mid",
+          "limb_03_R_dist",
+          "limb_03_R_tip"
+        ],
+        "effectorBone": "limb_03_R_tip",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_attack_04_L",
+        "bone": "limb_04_L_tip",
+        "version": 1,
+        "role": "attack",
+        "chain": [
+          "limb_04_L_prox",
+          "limb_04_L_mid",
+          "limb_04_L_dist",
+          "limb_04_L_tip"
+        ],
+        "effectorBone": "limb_04_L_tip",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_attack_04_R",
+        "bone": "limb_04_R_tip",
+        "version": 1,
+        "role": "attack",
+        "chain": [
+          "limb_04_R_prox",
+          "limb_04_R_mid",
+          "limb_04_R_dist",
+          "limb_04_R_tip"
+        ],
+        "effectorBone": "limb_04_R_tip",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_attack_05_L",
+        "bone": "limb_05_L_tip",
+        "version": 1,
+        "role": "attack",
+        "chain": [
+          "limb_05_L_prox",
+          "limb_05_L_mid",
+          "limb_05_L_dist",
+          "limb_05_L_tip"
+        ],
+        "effectorBone": "limb_05_L_tip",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_attack_05_R",
+        "bone": "limb_05_R_tip",
+        "version": 1,
+        "role": "attack",
+        "chain": [
+          "limb_05_R_prox",
+          "limb_05_R_mid",
+          "limb_05_R_dist",
+          "limb_05_R_tip"
+        ],
+        "effectorBone": "limb_05_R_tip",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_attack_06_L",
+        "bone": "limb_06_L_tip",
+        "version": 1,
+        "role": "attack",
+        "chain": [
+          "limb_06_L_prox",
+          "limb_06_L_mid",
+          "limb_06_L_dist",
+          "limb_06_L_tip"
+        ],
+        "effectorBone": "limb_06_L_tip",
+        "solver": "CCD"
+      },
+      {
+        "name": "anchor_attack_06_R",
+        "bone": "limb_06_R_tip",
+        "version": 1,
+        "role": "attack",
+        "chain": [
+          "limb_06_R_prox",
+          "limb_06_R_mid",
+          "limb_06_R_dist",
+          "limb_06_R_tip"
+        ],
+        "effectorBone": "limb_06_R_tip",
+        "solver": "CCD"
       }
     ]
   },
@@ -2512,8 +2856,8 @@
     "file": "sidneyia.glb",
     "source": "tools/creatures/arthropods/anchors.json",
     "newSpecimen": true,
-    "updatedSHA256": "b54b24595e601c3f97c356c532958088e6cfdacd17cd0c43f4b1a4b42802712c",
-    "bytes": 7091500,
+    "updatedSHA256": "c1d72561d330cf1f9bd88445efbd7b56884040ea850130c4ef477def74a70559",
+    "bytes": 7113312,
     "changedClips": [],
     "anchors": [
       {
@@ -2674,8 +3018,8 @@
     "file": "leanchoilia.glb",
     "source": "tools/creatures/arthropods/anchors.json",
     "newSpecimen": true,
-    "updatedSHA256": "09ccb273ded360b114468fc601c60a9d9fbb604d9b9651bd95cfb9a3fbb3416c",
-    "bytes": 8749240,
+    "updatedSHA256": "87be7d16d9e1327d8cdafe51707cbccbc8d63cc1477b453112d71c9fd12b9e47",
+    "bytes": 8758412,
     "changedClips": [],
     "anchors": [
       {
@@ -2854,8 +3198,8 @@
     "file": "isoxys.glb",
     "source": "tools/creatures/arthropods/anchors.json",
     "newSpecimen": true,
-    "updatedSHA256": "614fdfeea8aaa937f74adfb7297b87ea218858f638060fdca6e1342b4537de6a",
-    "bytes": 8165256,
+    "updatedSHA256": "b9eb5aa90b8079742b775787a40f16f9993f6e086127ca594161bf17c48341c0",
+    "bytes": 8199560,
     "changedClips": [],
     "anchors": [
       {
@@ -3040,8 +3384,8 @@
     "file": "burgessomedusa.glb",
     "source": "tools/creatures/jellies/anchors.json",
     "newSpecimen": true,
-    "updatedSHA256": "a02ce57f3ae03f734ec920538bc3d76187273aab2403a4bf12e3e03fed6b2076",
-    "bytes": 3048112,
+    "updatedSHA256": "1621356dd7d1da8811a21f6224aa12150e650be8a0e1cdca9a671b953593ea51",
+    "bytes": 4073480,
     "changedClips": [],
     "anchors": [
       {
@@ -4484,8 +4828,8 @@
     "file": "cambroraster.glb",
     "source": "tools/creatures/jellies/anchors.json",
     "newSpecimen": true,
-    "updatedSHA256": "5fe3875ba3388e644398eea64878bac4d216f35967b2915f0e78914ee0ee02d6",
-    "bytes": 5703936,
+    "updatedSHA256": "f35ce83e7e2879232d9d4c3fe1ae35466f3a6e453407048efbae54a43df292d2",
+    "bytes": 5719792,
     "changedClips": [],
     "anchors": [
       {
@@ -4968,8 +5312,8 @@
     "file": "tamisiocaris.glb",
     "source": "tools/creatures/jellies/anchors.json",
     "newSpecimen": true,
-    "updatedSHA256": "df7505f4b64eadc8d1c53e44e005b1604a3c969bebecf556baf75cbae2880a88",
-    "bytes": 6156508,
+    "updatedSHA256": "cfe4ebf6bb9f23d098c34f9ad2d8c6011c98b67b2a4ac58b2ae7512a8abbd581",
+    "bytes": 6178252,
     "changedClips": [],
     "anchors": [
       {

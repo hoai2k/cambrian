@@ -28,8 +28,15 @@ bpy.ops.object.mode_set(mode='OBJECT');exec(compile((H/'geometry.py').read_text(
 END=-.94;START=END-3.2*2*pi;B=math.log(2.65)/(2*pi);N=330;A=84
 # Radial cross section is slightly taller dorsoventrally than an exact ellipse;
 # outer venter narrowly rounds into flatter flanks. W/d~0.27 at final whorl.
+# Involution (umbilical-side overlap) ramps up over INVOL_BLEND radians of th, reaching
+# INVOL short of the aperture; at th==END it is exactly .53, so the aperture ring (and
+# everything measured off it: outer diameter, lip, head/arm placement) is untouched.
+INVOL=.85;INVOL_BLEND=1.6
 def shellpoint(th,a,inner=False):
- r=math.exp(B*(th-END));radial=.53*r*cos(a);width=.315*r*sin(a)*(1-.13*cos(a));radial+=.005*r*cos(a)**3
+ r=math.exp(B*(th-END));c=cos(a)
+ frac=max(0.,min(1.,(END-th)/INVOL_BLEND));frac=frac*frac*(3-2*frac)
+ inv=.53+(INVOL-.53)*frac
+ radial=r*((.53-inv)/2+(.53+inv)/2*c);width=.315*r*sin(a)*(1-.13*c);radial+=.005*r*c**3
  if inner:radial*=.942;width*=.943
  # Biconvex increments define growth lines; a restrained fine normal map refines them.
  wave=.006*(sin(2*a)-.42*sin(4*a));th+=wave

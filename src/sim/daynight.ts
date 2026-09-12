@@ -72,8 +72,13 @@ export function daylight(time: number, offset?: number): number {
  * night. It scales how long an animal will go between meals before it looks for another (see
  * `huntInterval`), so it changes how *often* things hunt rather than switching hunting on and off:
  * a hungry enough animal will always eventually go looking, whatever the hour.
+ *
+ * The middle of the day is quiet, not empty. At the old floor an animal went well over two minutes
+ * between meals, which over any stretch a player actually watched came to no hunting at all — and
+ * nothing ever hunting is as uninformative as everything always hunting. It is a low rate now
+ * rather than an absent one, and dawn and dusk are still five times it.
  */
-export const DAY_PRESSURE = 0.12, NIGHT_PRESSURE = 0.3, TWILIGHT_PRESSURE = 1;
+export const DAY_PRESSURE = 0.2, NIGHT_PRESSURE = 0.3, TWILIGHT_PRESSURE = 1;
 export function huntingPressure(time: number, offset?: number): number {
   const f = dayFraction(time, offset);
   // A raised cosine across each twilight band, so pressure builds and falls rather than stepping.
@@ -86,8 +91,28 @@ export function huntingPressure(time: number, offset?: number): number {
   return base + (TWILIGHT_PRESSURE - base) * twilight;
 }
 
-/** Seconds an animal will go after a meal before it hunts again, at the current hour. */
+/**
+ * What the water itself adds to the hour's appetite, as a multiplier on it.
+ *
+ * The clock says when the reef hunts; where you are says how much. A nursery or a sunlit flat is
+ * somewhere to be left alone even at dusk, and the channel and the basin are somewhere to be eaten
+ * even at noon — which is the whole argument for the deep being worth the swim and the shallows
+ * being worth retreating to. Keyed off `BIOME_DANGER`, the same table that already decides how a
+ * place looks and sounds, so a biome cannot say one thing to the music and another to the animals.
+ */
+export const SAFE_APPETITE = 0.45, WILD_APPETITE = 1.7;
+export function placeAppetite(danger: number): number {
+  const d = Math.max(0, Math.min(1, danger));
+  return SAFE_APPETITE + (WILD_APPETITE - SAFE_APPETITE) * d;
+}
+
+/** How much an animal at `danger` wants to hunt at this hour: the clock and the place together. */
+export function appetiteAt(time: number, danger: number, offset?: number): number {
+  return huntingPressure(time, offset) * placeAppetite(danger);
+}
+
+/** Seconds an animal will go after a meal before it hunts again, at this hour and in this water. */
 export const BASE_HUNT_INTERVAL = 16;
-export function huntInterval(time: number, offset?: number): number {
-  return BASE_HUNT_INTERVAL / Math.max(0.06, huntingPressure(time, offset));
+export function huntInterval(time: number, danger: number, offset?: number): number {
+  return BASE_HUNT_INTERVAL / Math.max(0.06, appetiteAt(time, danger, offset));
 }

@@ -6,7 +6,8 @@ from math import sin,cos,pi
 HERE=os.path.dirname(os.path.abspath(__file__))
 ROOT=os.path.abspath(os.path.join(HERE,'../../../..'))
 LOCAL=os.environ.get('DEVONIAN_AUTHORING',os.path.abspath(os.path.join(ROOT,'../devonian-authoring/palaeoisopus')))
-OUT=os.path.join(LOCAL,'v1-candidate')
+ANATOMY=os.environ.get('PAL_ANATOMY','v2')  # 'v2' selects the shape-study port; default keeps this build reproducing v1 exactly.
+OUT=os.path.join(LOCAL,ANATOMY+'-candidate')
 os.makedirs(LOCAL,exist_ok=True);os.makedirs(OUT,exist_ok=True)
 ID='palaeoisopus';CLIPS={'Idle':2.4,'Swim':2.4,'TurnLeft':1.6,'TurnRight':1.6,'Dive':1.4,'Rise':1.4,'Attack':1.,'Bite':.5,'Heavy':1.1,'Hit':.6,'Death':1.6,'Guard':1.,'Parry':.35,'Dodge':.4,'Eat':1.6,'Stagger':1.2,'Ability':2.4,'Moult':1.5,'Grab':1.1}
 LOOPS=['Idle','Swim','Guard','Eat']
@@ -43,7 +44,7 @@ def ell(c,scale,col,w,m=3):
 
 # Dedicated Palaeoisopus initial anatomy and original mapped PBR materials.
 sys.path.insert(0,HERE)
-from anatomy_v1 import make
+make=__import__('anatomy_'+ANATOMY,fromlist=['make']).make
 make(globals())
 from materials_v1 import build_materials
 mats,texture_lookup=build_materials(HERE)
@@ -160,7 +161,7 @@ notes=['Original initial preview based on Sabroux et al.2024; representative adu
 meta={'id':ID,'name':'Palaeoisopus','species':'Palaeoisopus problematicus','provenance':'Early Devonian, Early Emsian, Hunsrück Slate, Germany','description':'Robust fossil sea spider with a long segmented abdomen, massive grasping chelifores and eight flattened swimming limbs.','lengthMeters':.30,'modelLength':max(p[1]for p in V)-min(p[1]for p in V),'locomotion':'Swim','clips':list(CLIPS),'looping':LOOPS,'anchors':[a['name']for a in anchors],'sources':sources,'notes':notes}
 open(os.path.join(OUT,ID+'.json'),'w').write(json.dumps(meta,indent=2))
 report={'vertices':len(V),'fullTriangles':fulltris,'lodTriangles':lodtris,'reductionRatio':lodtris/fulltris,'bones':len(B),'clips':CLIPS,'loopSeams':seams,'boundsAtEveryFrame':bounds,'actionMetrics':actionMetrics,'weightNormalization':True,'rootStable':True,'noScaleChannels':True,'anchorCount':3,'fullBytes':os.path.getsize(os.path.join(OUT,ID+'.glb')),'lodBytes':os.path.getsize(os.path.join(OUT,ID+'.lod1.glb'))}
-open(os.path.join(HERE,'validation.json'),'w').write(json.dumps(report,indent=2))
+open(os.path.join(HERE,'validation-'+ANATOMY+'.json'if ANATOMY!='v1'else'validation.json'),'w').write(json.dumps(report,indent=2))
 # Studio and prescribed pose review.
 world=bpy.data.worlds.new('Deep neutral studio');scene.world=world;world.use_nodes=True;world.node_tree.nodes['Background'].inputs[0].default_value=(.022,.033,.041,1);world.node_tree.nodes['Background'].inputs[1].default_value=.4
 for name,pos,power,size,color in [('Key',(3,-5,7),1300,5,(1,.89,.72)),('Fill',(-5,-2,3),900,5,(.53,.78,1)),('Rim',(1,5,5),1700,4,(.70,.89,1)),('Lower bounce',(-2,2,-4),500,6,(.58,.78,.91))]:
@@ -168,7 +169,7 @@ for name,pos,power,size,color in [('Key',(3,-5,7),1300,5,(1,.89,.72)),('Fill',(-
 d=bpy.data.cameras.new('Camera');cam=bpy.data.objects.new('Camera',d);bpy.context.collection.objects.link(cam);scene.camera=cam;d.type='ORTHO';d.ortho_scale=9.2
 scene.render.engine='CYCLES';scene.cycles.samples=24;scene.cycles.use_denoising=True;scene.render.resolution_percentage=100;scene.view_settings.view_transform='AgX';scene.view_settings.exposure=0;scene.render.image_settings.file_format='PNG';scene.render.image_settings.color_mode='RGBA';scene.render.film_transparent=True
 cam.location=(7,-6,6);cam.rotation_euler=(Vector((0,.4,0))-cam.location).to_track_quat('-Z','Y').to_euler();rig.animation_data.action=bpy.data.actions['Idle'];scene.frame_set(0);scene.frame_start=0;scene.frame_end=72
-bpy.ops.wm.save_as_mainfile(filepath=os.path.join(LOCAL,ID+'-v1.blend'))
+bpy.ops.wm.save_as_mainfile(filepath=os.path.join(LOCAL,ID+'-'+ANATOMY+'.blend'))
 def render(path,w,h,transparent=True):
  scene.render.resolution_x=w;scene.render.resolution_y=h;scene.render.film_transparent=transparent;scene.render.filepath=path;bpy.ops.render.render(write_still=True)
 if os.environ.get('PALAEOISOPUS_EXPORT_ONLY'):sys.exit(0)

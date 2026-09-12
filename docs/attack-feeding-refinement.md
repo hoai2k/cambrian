@@ -69,7 +69,7 @@ Two clips the pass now owes, both requested with the grip mechanic that shipped 
 (`docs/redesign/05-hiding-and-combat.md` · Taking hold). The runtime already plays them the moment
 they exist: nothing here needs a code change to land.
 
-### `Grab`, for the eleven animals that grip
+### `Grab`, for the fifteen animals that grip
 
 `grasp: true` in the content is the mechanic; the clip is the performance. A grip is *held* — the
 button stays down, the animal keeps hold, and the same pose does double duty as the cling while
@@ -87,10 +87,11 @@ appendage-specific by design. The two that are *not* obvious:
 - **Furcaster grabs with its whole body.** The arms wrap and the disc flattens onto the target so
   the animal *sticks* to it, oral surface against the host. Never one arm poking forward.
 
-Anomalocaris, Nectocaris, Jaekelopterus, Manticoceras, Michelinoceras, Opabinia and Palaeoisopus
-already carry a `Grab` clip; those get reviewed against the held-grip rules rather than authored
-from nothing. Cambroraster, Leanchoilia, Isoxys, Tamisiocaris, Ottoia, Walliserops and Furcaster
-need one. Until it lands the runtime falls back to `Heavy`/`Attack`, which reads as a swing where
+Anomalocaris, Opabinia, Nectocaris, Jaekelopterus, Manticoceras, Michelinoceras and Palaeoisopus
+already carry a `Grab` clip — all seven of them now grasp, so those clips are live rather than
+idle, and each is reviewed against the held-grip rules rather than authored from nothing: the
+question for them is whether the grip *stays closed* and reads as a cling, not whether it exists.
+Cambroraster, Leanchoilia, Isoxys, Tamisiocaris, Ottoia, Walliserops and Furcaster need one. Until it lands the runtime falls back to `Heavy`/`Attack`, which reads as a swing where
 a hold belongs — that is the visible gap this closes.
 
 **Hallucigenia is done, as the first of them** (`performances/hallucigenia.mjs`, delivered
@@ -113,8 +114,9 @@ shape through the recovery. Length 0.45 s so it covers the state with a little t
 included: their dash is a shove off the substrate, not a swim.
 
 `src/render/creature.ts` already picks `Dash` for the long move and keeps `Dodge` for the short
-one, and falls back either way, so clips can land one model at a time. Hallucigenia's is
-authored; the amplitude lesson from it is worth carrying: a stubby limb swung by the angle a fin
+one, and falls back either way, so clips can land one model at a time. Hallucigenia's is the only
+one authored so far, so this is what the pass still owes on every other model; the amplitude
+lesson from it is worth carrying: a stubby limb swung by the angle a fin
 would use folds over the animal's own back, and the socket check (`pose-check.mjs`, or a scratch
 script printing tip positions) is what catches that before a render does.
 
@@ -158,7 +160,7 @@ marks each as `review`.
 | Sidneyia | re-authored | — | gnathobase clamps at the leg roots, body presses down |
 | Marrella | re-authored | — | paddle sweeps, three-pulse scuttle rush, paddles rake to the mouth |
 | Olenoides | re-authored | — | cephalon head-butt and shield charge; front legs work food |
-| Opabinia | unchanged | kept | already articulated by the anchor pass; queued for review only |
+| Opabinia | re-authored (Bite, Attack, Heavy) | kept | trunk-like: coils (under, to the side, over the head) then shoots out straight into a snapping grab; resting shape re-posed to hang down, curve up and reach forward, so *every* clip has a `replaced/` copy |
 | Ottoia | — | added | hold with the introvert curled over the catch |
 | Jaekelopterus | re-authored | kept | pincers draw back, open, reach and clamp; gnathobases work the catch |
 | Palaeoisopus | re-authored | kept | chelifores fold at the scapes; proboscis swings forward to meet the food |
@@ -168,6 +170,8 @@ marks each as `review`.
 
 Skipped on purpose: **Odaraia** and **Nahecaris** (their bodies are being rebuilt; the new rigs get
 their motion with the rebuild) and **Michelinoceras** (delivered separately on 8 September).
+
+Opabinia's resting proboscis is a **base pose** (`basePose` in its performance file): `apply.mjs` re-poses every other clip in the file onto it, fading the curve out where a clip's own motion already takes the trunk far from bind (the Snatch and the feeding reach still arrive straight), and the attacks coil from it and straighten fully as they shoot. The bind pose itself is untouched, so no model intake was needed.
 
 Runtime: the Cambrian creatures above are in `FEEDING_PERFORMANCE`, so their Eat clips are scrubbed
 by consumption progress on the `feedingPhase` timeline; the Devonian ones loop their Eat as a
@@ -185,3 +189,45 @@ than total rework, so they were done, but as light previews: if a refinement tou
 the performance file is re-applied with `apply.mjs` (or dropped) rather than polished first. Polish
 the Cambrian set, whose bodies are final, before any of those.
 
+## Revision — 10 September 2026: the body keeps its own performance
+
+The first pass made a mistake worth recording: it damped each rig's locomotor wave during the
+strike (`× (1 - k · strike)`) on the theory that the appendages should carry the moment. The
+result read as *less* dynamic than the clips it replaced, because on the original eight the
+shipped attacks have real authored body motion — Marrella rears up, Anomalocaris rolls and
+arches — and that was being flattened to make room for appendage detail.
+
+Fixed in both directions:
+
+- **Carried body motion.** Every performance now declares `authored(name)`, the bones it owns —
+  the attack appendages and mouthparts. Every other bone keeps the shipped clip's motion,
+  composed with whatever the performance still does to it. So the body's original performance
+  survives verbatim and the appendage work is added on top rather than in place of it.
+- **The wave drives the strike.** Locomotor waves run at full amplitude across the whole clip
+  (`alive`), and a strike raises the stroke and pushes extra cycles through the train
+  (`power`, `beats`) instead of quieting it. Sensory appendages sweep through the strike too.
+
+Applied to all sixteen re-authored creatures. The Cambrian set also got the amplified wave; the
+six Devonian rigs, which are queued for model refinement, got the carried body motion only —
+they are not worth polishing until their bodies settle. Every clip still keeps its `replaced/`
+copy, so the comparison in the viewer is now three-way in spirit: the shipped clip, the first
+pass (in git), and this one.
+
+## Also delivered — 10 September: two bodies that were not moving like themselves
+
+Neither is an attack-and-feeding item, but both came through the same pipeline.
+
+- **Ottoia** read as a torpedo: the shipped clips held the trunk rigid and moved the whole animal.
+  Its sixteen trunk rings now carry a travelling wave — lateral with a dorsoventral component,
+  growing toward the tail — through crawling, idling, turning, diving, rising, dodging, burrowing,
+  feeding and every attack, with the eversible throat leading or following it. `TurnLeft`,
+  `TurnRight`, `Dive` and `Rise` are authored around the pose at their midpoint, because the engine
+  uses those four as additive poses frozen there.
+- **Burgessomedusa** now pulses. See the pulse-and-glide entry in
+  `docs/research/locomotion-ideas.md` for how the clip and the simulation's beat became one thing,
+  and what the bell does with its apex. `Eat` keeps beating while the fringe holds the catch in
+  under the centre and the oral arms work it into the mouth at the bottom of the bell, which is
+  where the attachment pass already delivers it.
+
+Ctenorhabdotus is deliberately untouched: it is `swimStyle: 'omnidirectional'`, a comb jelly that
+swims on beating cilia rather than by contracting a bell, and it stays upright.

@@ -1,68 +1,68 @@
 {
-  "sourceGlbSha256": "c21f28f3529ac47860744ed802606e0606e2e41cc4fd8587f32f0d012851dd81",
+  "sourceGlbSha256": "a607a0705653efa4d491aa98c88267579bfc7fc52c5577f98f8843c8330f8663",
   "renders": [
     {
       "file": "manticoceras.select.png",
       "clip": "Idle",
       "frame": 0,
-      "imageSha256": "e0250214bc1f551855e4139f6c77c9d79783baa03b3f3e772f379d29d9537714",
-      "sourceGlbSha256": "c21f28f3529ac47860744ed802606e0606e2e41cc4fd8587f32f0d012851dd81"
+      "imageSha256": "16dcc08cb29769647f789ee2b111cb37b6144d85afdbcec560e7a6623c8caaf2",
+      "sourceGlbSha256": "a607a0705653efa4d491aa98c88267579bfc7fc52c5577f98f8843c8330f8663"
     },
     {
       "file": "lateral.png",
       "clip": "Idle",
       "frame": 0,
-      "imageSha256": "09db37c47b63b71a91aa4bb5fd5c2ed0670fae410dbd61a3960b15d836ad6976",
-      "sourceGlbSha256": "c21f28f3529ac47860744ed802606e0606e2e41cc4fd8587f32f0d012851dd81"
+      "imageSha256": "1c1aa802dd8995d9ae3239ea25a7dd5c26c088dd3a45aef74796c032cab56629",
+      "sourceGlbSha256": "a607a0705653efa4d491aa98c88267579bfc7fc52c5577f98f8843c8330f8663"
     },
     {
       "file": "eyes-front.png",
       "clip": "Idle",
       "frame": 0,
-      "imageSha256": "e7d373572a2c105fac72c4b64c737fd2f2c76db068f81d35b8acd8b24067d710",
-      "sourceGlbSha256": "c21f28f3529ac47860744ed802606e0606e2e41cc4fd8587f32f0d012851dd81"
+      "imageSha256": "27f2b2b2b9693526a92e5021e91fc981c53df56a2dc7789b8d6cef0bbddaf174",
+      "sourceGlbSha256": "a607a0705653efa4d491aa98c88267579bfc7fc52c5577f98f8843c8330f8663"
     },
     {
       "file": "eyes-side.png",
       "clip": "Idle",
       "frame": 0,
-      "imageSha256": "f5e084477cedd3ae0aed659bf55c5a2f5605b10ef9e783f1c4ca0da7309d6a7f",
-      "sourceGlbSha256": "c21f28f3529ac47860744ed802606e0606e2e41cc4fd8587f32f0d012851dd81"
+      "imageSha256": "2ae76fc7cb62fc07bfabf68821abd6ec9e0dd8218c71b0db82da24b56c0d473c",
+      "sourceGlbSha256": "a607a0705653efa4d491aa98c88267579bfc7fc52c5577f98f8843c8330f8663"
     },
     {
       "file": "eyes-dorsal.png",
       "clip": "Idle",
       "frame": 0,
-      "imageSha256": "8514c697340f9755bb2af8b1ef7e9039476126136b656e7a367f81d893b2a350",
-      "sourceGlbSha256": "c21f28f3529ac47860744ed802606e0606e2e41cc4fd8587f32f0d012851dd81"
+      "imageSha256": "43511d64da09c8097a79a5f9a4ab9b33a383454fbb4aae86e1bb685a70fb453a",
+      "sourceGlbSha256": "a607a0705653efa4d491aa98c88267579bfc7fc52c5577f98f8843c8330f8663"
     },
     {
       "file": "oral-lit-Eat.png",
       "clip": "Eat",
       "frame": 18,
-      "imageSha256": "3321474b0f1c37a8e89c2a9c60e3595951bf2683591a077716d974ce7275ad8a",
-      "sourceGlbSha256": "c21f28f3529ac47860744ed802606e0606e2e41cc4fd8587f32f0d012851dd81"
+      "imageSha256": "24a782fa4a8f61b050376575a39ac011743df17630c262e28e9045f5ebff0bc5",
+      "sourceGlbSha256": "a607a0705653efa4d491aa98c88267579bfc7fc52c5577f98f8843c8330f8663"
     },
     {
       "file": "oral-lit-Bite.png",
       "clip": "Bite",
       "frame": 5,
-      "imageSha256": "5adfdd3567657195c1e7fc622120ab7dedf6814e6c94db00f41cf63df4afbf6e",
-      "sourceGlbSha256": "c21f28f3529ac47860744ed802606e0606e2e41cc4fd8587f32f0d012851dd81"
+      "imageSha256": "84336add157702120a2272409cab89936d76f2d3ae1bfe9ad96c6d20ee386464",
+      "sourceGlbSha256": "a607a0705653efa4d491aa98c88267579bfc7fc52c5577f98f8843c8330f8663"
     },
     {
       "file": "aperture-Guard.png",
       "clip": "Guard",
       "frame": 15,
-      "imageSha256": "93fee0e18b124c16947654c7b67be598be6de560b3f8c34f2320d094e0341455",
-      "sourceGlbSha256": "c21f28f3529ac47860744ed802606e0606e2e41cc4fd8587f32f0d012851dd81"
+      "imageSha256": "5c3b5aa309233981b3bb1c21dbaec129f0ed4827e15a751a0e5e524427bbeb0d",
+      "sourceGlbSha256": "a607a0705653efa4d491aa98c88267579bfc7fc52c5577f98f8843c8330f8663"
     },
     {
       "file": "manticoceras.png",
       "clip": "Idle",
       "frame": 0,
-      "imageSha256": "c423ee0149c4c8b85b3a10ba89d62c03bc159aeee34213dcd7a4610e8278a04d",
-      "sourceGlbSha256": "c21f28f3529ac47860744ed802606e0606e2e41cc4fd8587f32f0d012851dd81",
+      "imageSha256": "9d69c83700f37fbeb7a3f1f2fb25ab8c8a773a1b0469fe87990715dbbddecba5",
+      "sourceGlbSha256": "a607a0705653efa4d491aa98c88267579bfc7fc52c5577f98f8843c8330f8663",
       "derivedFrom": "manticoceras.select.png",
       "method": "Same-camera GLB render; studio alpha composite or Lanczos UI downsample"
     },
@@ -70,8 +70,8 @@
       "file": "manticoceras.card.png",
       "clip": "Idle",
       "frame": 0,
-      "imageSha256": "e81e61e00199061834e78ea771cb446c272db66e7c4ec88d5b40ee1fe6047385",
-      "sourceGlbSha256": "c21f28f3529ac47860744ed802606e0606e2e41cc4fd8587f32f0d012851dd81",
+      "imageSha256": "1c5d69b51c24a2f62875b7299322e367b388e8a5d20f244932d8191551ce5964",
+      "sourceGlbSha256": "a607a0705653efa4d491aa98c88267579bfc7fc52c5577f98f8843c8330f8663",
       "derivedFrom": "manticoceras.select.png",
       "method": "Same-camera GLB render; studio alpha composite or Lanczos UI downsample"
     },
@@ -79,8 +79,8 @@
       "file": "manticoceras.thumb.png",
       "clip": "Idle",
       "frame": 0,
-      "imageSha256": "7cfefaa8c115374df7793a0bc868dca0f0911415d2a5b94566457c364f6c54ef",
-      "sourceGlbSha256": "c21f28f3529ac47860744ed802606e0606e2e41cc4fd8587f32f0d012851dd81",
+      "imageSha256": "93051984722de8382c7169750680ac2bb81e24e4a128246d8c1f3a02f573014b",
+      "sourceGlbSha256": "a607a0705653efa4d491aa98c88267579bfc7fc52c5577f98f8843c8330f8663",
       "derivedFrom": "manticoceras.select.png",
       "method": "Same-camera GLB render; studio alpha composite or Lanczos UI downsample"
     }

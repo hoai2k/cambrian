@@ -56,6 +56,16 @@ export interface Bloom { pos: Vec3; radius: number; drift: number; }
 /** The water surface. Era-driven: a pelagic roster (the Devonian) asks for a deeper column. */
 export const SURFACE_Y = ACTIVE_ERA.environment.surfaceY ?? 40;
 export const LIGHT_WINDOW_Y = SURFACE_Y - 9;
+/**
+ * What RB and LB are worth to a swimmer: units per second at scale 1, before the current.
+ *
+ * 2.6 was measured against the Cambrian's forty-unit column, where holding rise off the seabed
+ * puts you at the surface in about fifteen seconds. The Devonian's sea is sixty-four units deep
+ * because its roster is pelagic, and the same number there is a different button — half a minute
+ * of holding it, and a hatchling never getting there at all. So the rate is a property of the
+ * sea's depth rather than a constant: the button means the same thing in both of them.
+ */
+export const RISE_RATE = 2.6 * (SURFACE_Y / 40);
 /** Chunk edge in world units. Matches the renderer's scenery cells. */
 export const CHUNK = 64;
 /** Chunks are simulated (flora, cover, collision) this far from any player; the renderer draws terrain further out. */
@@ -157,12 +167,15 @@ export function biomeWeights(x: number, z: number, out: BiomeWeights = scratchW)
   out.shelf = rest;
   return out;
 }
-/** Blended danger (0..1) at a point, for the music and the HUD. */
-export function dangerAt(x: number, z: number) {
-  const w = biomeWeights(x, z);
+/** Blended danger (0..1) for a set of biome weights, for a caller that already has them. */
+export function dangerOf(w: Record<Biome, number>) {
   let d = 0;
   for (const b of BIOMES) d += w[b] * BIOME_DANGER[b];
   return d;
+}
+/** Blended danger (0..1) at a point: what the music, the HUD, appetite and body size all read. */
+export function dangerAt(x: number, z: number) {
+  return dangerOf(biomeWeights(x, z));
 }
 /** The dominant biome at a point. */
 export function biomeAt(x: number, z: number): Biome {

@@ -41,6 +41,12 @@ function pincer(P, s, sx, a) {
 const gnath = (P, k) => { for (const [s, sx] of SIDES) P.bend(`gnathobase${s}`, inward(sx), .3 * k); };
 const body = (P, { noseDown = 0, fwd = 0, down = 0 }) => { P.spin('body', [1, 0, 0], noseDown); if (fwd || down) P.shift('body', [0, -down, fwd]); };
 
+/**
+ * Bones this performance authors. The chelicerae and gnathobases are the performance; the walking legs, paddles and trunk keep the
+ * shipped motion.
+ */
+export const authored = (n) => /^(chelicera|finger|gnathobase)/.test(n);
+
 export const clips = [
   {
     name: 'Bite', duration: 0.5, loop: false,

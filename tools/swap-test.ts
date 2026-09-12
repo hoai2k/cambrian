@@ -12,7 +12,7 @@ import { PLAYABLE_IDS } from '../src/sim/creatures';
 let failed = 0;
 const check = (n: string, ok: boolean, d = '') => { console.log(`${ok ? 'PASS' : 'FAIL'}  ${n.padEnd(56)} ${d}`); if (!ok) failed++; };
 const run = (g: Game, n: number, f: InputFrame = emptyInput()) => { const m = new Map([[0, f]]); for (let i = 0; i < n; i++) { g.step(1 / 60, m); g.events.length = 0; } };
-const fresh = () => { const g = new Game('rise', [{ creature: 'anomalocaris', device: 'keyboard', ready: true }], 7); const p = g.players[0]; p.spawnProtect = 0; p.teleportCd = 0; run(g, 30); p.teleportCd = 0; return { g, p }; };
+const fresh = () => { const g = new Game('rise', [{ creature: 'anomalocaris', device: 'keyboard', ready: true }], 7); g.skipHatch(); const p = g.players[0]; p.spawnProtect = 0; p.teleportCd = 0; run(g, 30); p.teleportCd = 0; return { g, p }; };
 
 // The cycle starts on the body you are in, and offers the whole roster.
 {
@@ -78,6 +78,7 @@ const fresh = () => { const g = new Game('rise', [{ creature: 'anomalocaris', de
     { creature: 'anomalocaris', device: 'keyboard', ready: true },
     { creature: 'opabinia', device: 'keyboard2', ready: true },
   ], 11);
+  g.skipHatch();
   const [p, other] = g.players;
   p.spawnProtect = 0; p.teleportCd = 0;
   run(g, 30);

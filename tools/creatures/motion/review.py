@@ -12,6 +12,7 @@ argv = sys.argv[sys.argv.index('--') + 1:] if '--' in sys.argv else sys.argv[1:]
 glb, out = argv[0], argv[1]
 frames_n = int(argv[argv.index('--frames') + 1]) if '--frames' in argv else 8
 new_only = '--new-only' in argv
+wide = '--wide' in argv   # frame the whole animal, to judge body/fin motion rather than mouthparts
 clips = [a for a in argv[2:] if not a.startswith('--') and not a.isdigit()]
 os.makedirs(out, exist_ok=True)
 
@@ -53,6 +54,12 @@ views = {
     'above': lambda: aim(focus + Vector((size * .38, -size * .32, size * .26)), focus),
     'below': lambda: aim(focus + Vector((size * .22, -size * .42, -size * .24)), focus),
 }
+if wide:
+    # The whole animal from the side and from above: what a fin or leg train is doing.
+    views = {
+        'side': lambda: aim(centre + Vector((size * .15, -size * 1.15, size * .18)), centre),
+        'top': lambda: aim(centre + Vector((size * .35, -size * .75, size * .85)), centre),
+    }
 def action_for(name):
     for a in bpy.data.actions:
         if a.name == name or a.name.startswith(name + '_'): return a

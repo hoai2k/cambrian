@@ -3,6 +3,12 @@ import type { CreatureId, MoveDef } from './creatures';
 
 export type Tier = 0 | 1 | 2 | 3 | 4;
 export const TIER_NAMES = ['Larva', 'Juvenile', 'Adult', 'Giant', 'Apex'] as const;
+/**
+ * The rungs' scales, as multiples of the creature's adult length. Ask `tierScale` in
+ * src/sim/tiers.ts rather than indexing this: with equivalent sizing on the two rungs below Adult
+ * are per-creature, because everything hatches the same *length* rather than the same fraction of
+ * its eventual self, and an Anomalocaris then has far further to grow than a Marrella.
+ */
 export const TIER_SCALE = [0.25, 0.5, 1.0, 1.7, 2.6] as const;
 /** Nutrition needed to leave each tier. */
 export const TIER_NEED = [30, 60, 85, 120, Infinity] as const;
@@ -110,11 +116,21 @@ export interface Actor {
    * which is the immersive way to play. Display only — nothing in the simulation reads it.
    */
   senseMode: boolean;
+  /** Where a pulse swimmer's bell is in its cycle, seconds. Unused by everything else. */
+  pulseT: number;
   /** How long this body still reads as revealed: the whip search, and a hidden body found by one. */
   senseT: number;
   burstT: number;          // free burst timer (ambush surge)
   hitFlash: number; hitDir: Vec3; hitStop: number;
   grabbedBy: number; grabbing: number; grabT: number;
+  /**
+   * Where the grip landed on this body, as a unit direction in its own frame (right, up, forward).
+   * Held prey used to be parked at a fixed point off the grabber's nose, sized by the *grabber*,
+   * so a big mouthful sat half inside its captor and a small one hung in front of it; this is the
+   * spot on the victim that the grip actually has, so the two stay joined whatever their sizes.
+   * Meaningless unless `grabbedBy >= 0`.
+   */
+  grabOff: Vec3;
   eatingTarget: number; eatProgress: number;
   corpseT: number;         // seconds since death for corpses
   eaten: number;           // 0..1 fraction of corpse consumed, in whole bites once it is being torn
@@ -161,6 +177,20 @@ export interface Actor {
    */
   graspHold: boolean;
   /**
+   * How long the grip has been armed, seconds. A grip closes on something too big to bite the
+   * moment the button is down — there is nothing else that press could usefully mean, and the
+   * point of it is to get hold without bothering the animal — but on a mouthful it waits for
+   * `GRASP_HOLD`, so a tap is still the bite it has always been and only a deliberate hold takes
+   * hold. Reset whenever the button comes up.
+   */
+  graspT: number;
+  /**
+   * A grip that ended on its own — the ride ran out, or the arms gave — stays ended until the
+   * button comes up. Without it a hold that had just expired was retaken on the very next frame by
+   * the button still being held, so nothing could ever run out.
+   */
+  graspSpent: boolean;
+  /**
    * Riding: the animal this one is clinging to (-1 when not riding), how long it has held on, and
    * where it took hold in the host's own frame — sideways, up and forward, in host body lengths —
    * so the grip follows the host as it turns. `riddenBy` is the same hold from the host's side.
@@ -169,6 +199,23 @@ export interface Actor {
    * is what lets it bite the thing it is holding on to.
    */
   rideHost: number; rideT: number; rideOff: Vec3; riddenBy: number;
+  /**
+   * Seconds since the grip actually *met* the other body, or -1 while it is still closing.
+   *
+   * Every consequence of a grip is timed from here rather than from the button: a grip closes at
+   * arm's length and the two bodies then come together over a fraction of a second, and a player
+   * who grabs and immediately lets go has held the animal for none of that. Timing from the press
+   * charged them for the approach. Both kinds of grip use it — a ride and a mouthful — because both
+   * spend that moment being pulled into place.
+   */
+  gripSyncT: number;
+  /**
+   * What this body is asking to do this step, in world units a second, whatever its state lets it
+   * do about it. A grabbed animal still wants to go somewhere, and a tug of war is made of exactly
+   * that wish: `desired` has already had the wish taken out of it by the time the state machine is
+   * done, so the wish itself has to be kept.
+   */
+  drive: Vec3;
   deathY: number; sparkled: boolean; tumble: Vec3;
   kills: number; eats: number; escapes: number;
   hunted: number;          // 0..1 highest detection score against this actor (HUD)
@@ -220,6 +267,6 @@ export const isCoop = (m: Mode) => COOP_MODES.includes(m);
 export interface Prompt { text: string; t: number; }
 
 export interface WorldEvent {
-  kind: 'hit' | 'kill' | 'eat' | 'tierUp' | 'parry' | 'guardBreak' | 'burst' | 'escape' | 'noticed' | 'hunted' | 'dodge' | 'ability' | 'grab' | 'moult' | 'death' | 'silt' | 'stagger' | 'sense' | 'pounce' | 'swallow' | 'routed' | 'disintegrate' | 'teleport' | 'gulp' | 'anoxia' | 'beach' | 'shoalJoin' | 'shellCrush' | 'breach' | 'splash';
+  kind: 'hit' | 'kill' | 'eat' | 'tierUp' | 'parry' | 'guardBreak' | 'burst' | 'escape' | 'noticed' | 'hunted' | 'dodge' | 'ability' | 'grab' | 'moult' | 'death' | 'silt' | 'stagger' | 'sense' | 'pounce' | 'swallow' | 'routed' | 'disintegrate' | 'teleport' | 'gulp' | 'winded' | 'anoxia' | 'beach' | 'shoalJoin' | 'shellCrush' | 'breach' | 'splash' | 'hatch';
   pos: Vec3; actor: number; other?: number; strength?: number; player?: number;
 }

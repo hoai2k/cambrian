@@ -1,6 +1,7 @@
 import { RULES } from './era-rules';
 import { creature, type CreatureId } from './creatures';
-import { TIER_NAMES, TIER_NEED, TIER_SCALE, type Actor } from './types';
+import { tierScale } from './tiers';
+import { TIER_NAMES, TIER_NEED, type Actor } from './types';
 import type { Game } from './game';
 
 /**
@@ -60,7 +61,7 @@ export const ladderRung = (g: Game, a: Actor): number => (RULES ? RULES.ladderRu
  */
 export const ladderScale = (id: CreatureId, mark: number): number => {
   const r = rungOf(mark);
-  return RULES ? RULES.ladderScale(id, r) : TIER_SCALE[r];
+  return RULES ? RULES.ladderScale(id, r) : tierScale(id, r);
 };
 
 /**

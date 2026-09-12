@@ -4,8 +4,9 @@
  */
 import { Game, radarRange } from '../src/sim/game';
 import { emptyInput, type InputFrame } from '../src/sim/types';
-import { applyScaleStats, bodyRadius, clearanceOf, climbHeight, climbRise, floorClearance, glideOver, lengthOf } from '../src/sim/actors';
+import { applyScaleStats, bodyRadius, clearanceOf, climbHeight, climbRise, floorClearance, glideOver, lengthOf, speedFactor } from '../src/sim/actors';
 import { boulderQ, boulderTop, groundHeight, resolveStatic, rockRadius, sampleHeight, type Boulder, type StaticContact, type WorldData } from '../src/sim/world';
+import { creature } from '../src/sim/creatures';
 import { floraSize } from '../src/sim/flora';
 import { fitCameraArm, PITCH_DOWN, PITCH_UP } from '../src/render/engine';
 
@@ -83,7 +84,7 @@ const rockWorld = (boulders: Boulder[]) => ({
 {
   const rock: Boulder = { pos: { x: 0, y: 0, z: 0 }, radius: 3 * 1.02, height: 2.6, sx: 3, sy: 2.2, sz: 3, rot: 0, shade: .7 };
   const world = rockWorld([rock]);
-  const body = { radius: 0.86, glide: 2.45, climb: 7.8 };    // an adult Anomalocaris
+  const body = { radius: 0.86, glide: 2.45, climb: 7.8 };    // a body about 3.9 units long
   // Walk a body straight across the rock at the height it would be riding at, resolving each step.
   let blocked = 0, worstLift = 0, y = -0.6, x = -6;
   const stepsAcross = 240;
@@ -111,7 +112,7 @@ const rockWorld = (boulders: Boulder[]) => ({
     const sy = tall / 1.3, y = sy * 0.25;
     return { pos: { x: 0, y, z: 0 }, radius: 1.6 * 1.02, height: y + sy * 1.05, sx: 1.6, sy, sz: 1.6, rot: 0, shade: .7 };
   };
-  const surmountable = wall(7), cliff = wall(20);   // 7 is just inside two bodies of an adult Anomalocaris
+  const surmountable = wall(7), cliff = wall(20);   // 7 is just inside two bodies of a 3.9-unit swimmer
   const push = (b: Boulder, y: number) => { const p = { x: 1.2, y, z: 0 }; const hit = resolveStatic(rockWorld([b]), p, body.radius, [], 0, body.glide, body.climb, out); return { hit, moved: p.x - 1.2 }; };
   const a = push(surmountable, 0);
   check('a steep rock within two bodies still blocks the way through', a.hit && a.moved > 0, `pushed out ${a.moved.toFixed(2)}`);
@@ -174,13 +175,57 @@ const rockWorld = (boulders: Boulder[]) => ({
     for (let i = 0; i < 60 * 8; i++) { g.step(1 / 60, m); g.events.length = 0; peak = Math.max(peak, p.pos.y - sampleHeight(p.pos.x, p.pos.z)); }
     return { peak, forward: start.z - p.pos.z, tall };
   };
-  // Two bodies tall (an Anomalocaris is 3.9): over the top and on.
+  // Two bodies tall, for the 3.9-unit body above: over the top and on.
   const over = intoAWall(7);
   check('a sheer rock inside two bodies is climbed and crossed', over.peak > over.tall && over.forward > 12,
     `rose ${over.peak.toFixed(1)} over a ${over.tall}-unit face and carried on ${over.forward.toFixed(0)} units`);
   // Four times that is a cliff: the body works along the foot of it and never gets up.
   const wall = intoAWall(28);
   check('a cliff is still a cliff', wall.peak < 6, `never got above ${wall.peak.toFixed(1)} on a ${wall.tall}-unit face`);
+}
+
+// --- and it is climbed at swimming pace, not jumped ---
+{
+  /**
+   * A rock's dome is `sqrt(1 - q^2)` tall, so its flank is near-vertical at the rim: the floor
+   * under a body crossing that rim used to rise a couple of the body's own lengths in a single
+   * step while it moved a tenth of a unit forward, which read as jetting to the top of the rock
+   * rather than swimming over it. The climb is paid for out of the travel now, so what changes is
+   * the direction of the motion and not the speed of it.
+   */
+  // Heights are in the swimmer's own body lengths: "a cliff" means a cliff to *this* animal, and
+  // the roster's lengths are real ones now (docs/research/cambrian-sizes.md), so a fixed number of
+  // units stopped meaning the same thing to every body.
+  const overARock = (bodies: number, seconds = 10) => {
+    const g = new Game('reef', [{ creature: 'anomalocaris', device: 'keyboard', ready: true }], 21);
+    const p = g.players[0]; p.spawnProtect = 0;
+    const tall = bodies * lengthOf(p);
+    const ground = sampleHeight(p.pos.x, p.pos.z);
+    const sy = tall / 1.3, y = ground + sy * 0.25;
+    g.world.boulders.push({ pos: { x: p.pos.x, y, z: p.pos.z - 12 }, radius: 8 * 1.02, height: y + sy * 1.05, sx: 8, sy, sz: 8, rot: 0, shade: .7 });
+    g.world.boulderHash.rebuild(g.world.boulders);
+    p.pos = { x: p.pos.x, y: ground + floorClearance(p), z: p.pos.z };
+    p.yaw = Math.PI;
+    const m = new Map([[0, { ...emptyInput(), my: 1, camYaw: Math.PI }]]);
+    let rate = 0, peak = 0;
+    for (let i = 0; i < 60 * seconds; i++) {
+      const y0 = p.pos.y;
+      g.step(1 / 60, m); g.events.length = 0;
+      rate = Math.max(rate, (p.pos.y - y0) * 60);
+      peak = Math.max(peak, p.pos.y - sampleHeight(p.pos.x, p.pos.z));
+    }
+    // Against the body's own swimming speed: a climb is allowed to be brisk — it is its travel
+    // pointed upward, plus the rise it can swim — and nothing like the twentyfold it used to be.
+    return { rate, peak, swim: creature(p.creature).speed * speedFactor(p.scale), tall };
+  };
+  const r = overARock(1.8);
+  check('a rock is climbed at swimming pace, not jumped', r.rate < r.swim * 4,
+    `rose at most ${r.rate.toFixed(0)} u/s against a ${r.swim.toFixed(1)} u/s swim (${(r.rate / r.swim).toFixed(1)}x)`);
+  check('...and the body still gets over it', r.peak > r.tall, `reached ${r.peak.toFixed(1)} over a ${r.tall.toFixed(1)}-unit rock`);
+  // A cliff is where the pacing matters most: there is no height a body may be handed for free.
+  const c = overARock(3.1);
+  check('...and a cliff is not vaulted either', c.rate < c.swim * 4 && c.peak < c.tall,
+    `rose at most ${c.rate.toFixed(0)} u/s and reached ${c.peak.toFixed(1)} of ${c.tall.toFixed(1)}`);
 }
 
 // --- a crawler walks up and over what it is pushed into, whatever it is ---
@@ -209,7 +254,11 @@ const rockWorld = (boulders: Boulder[]) => ({
 
 // --- a plant is something to go round; you only go over one you drive straight at ---
 {
-  /** Walk a crawler at a plant, `off` units to the side of dead centre. */
+  /**
+   * Walk a crawler at a plant, `off` units to the side of dead centre. A body that hauls itself
+   * through weed has the leverage to bend the soft growth aside, but a sponge this size is still
+   * something to get over — that a thicket carries the same animal along is in locomotion-test.
+   */
   const atAPlant = (kind: 'sac' | 'spine', scale: number, off: number) => {
     const g = new Game('reef', [{ creature: 'olenoides', device: 'keyboard', ready: true }], 33);
     const p = g.players[0]; p.spawnProtect = 999; p.scale = 1; applyScaleStats(p, false);
@@ -223,7 +272,12 @@ const rockWorld = (boulders: Boulder[]) => ({
     g.world.floraReach = Math.max(g.world.floraReach, 8);
     let peak = 0;
     const m = new Map([[0, { ...emptyInput(), my: 1, camYaw: Math.PI }]]);
-    for (let i = 0; i < 60 * 8; i++) { g.step(1 / 60, m); g.events.length = 0; peak = Math.max(peak, p.pos.y - sampleHeight(p.pos.x, p.pos.z)); }
+    // Only what the plant itself does to the body counts: past it the walk is over open floor with
+    // the whole reef on it, and whatever it climbs out there is a different question.
+    for (let i = 0; i < 60 * 8; i++) {
+      g.step(1 / 60, m); g.events.length = 0;
+      if (Math.hypot(p.pos.x - f.pos.x, p.pos.z - f.pos.z) < f.R + 3) peak = Math.max(peak, p.pos.y - sampleHeight(p.pos.x, p.pos.z));
+    }
     return { peak, past: f.pos.z - p.pos.z, height: f.H };
   };
   // A sac sponge big enough to stand up to this body: a firm bulb, broad right down at the sand.

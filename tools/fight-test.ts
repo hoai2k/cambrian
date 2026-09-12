@@ -6,21 +6,30 @@ import { makeBrain } from '../src/sim/ai';
 let failed = 0;
 const check = (n: string, ok: boolean, d: string) => { console.log(`${ok ? 'PASS' : 'FAIL'}  ${n.padEnd(46)} ${d}`); if (!ok) failed++; };
 const run = (g: Game, f: InputFrame, steps: number, extra?: (i: number) => void) => { const m = new Map([[0, f]]); for (let i = 0; i < steps; i++) { extra?.(i); g.step(1 / 60, m); g.events.length = 0; } };
-const fresh = (seed = 5) => { const g = new Game('reef', [{ creature: 'anomalocaris', device: 'keyboard', ready: true }], seed); const p = g.players[0]; p.pos = { x: 60, y: 6, z: -30 }; p.spawnProtect = 0; p.yaw = 0; return { g, p }; };
+// Balance is measured between two animals, so the reef's own residents are cleared out first:
+// with a dozen of them around the giant, some of the damage routing it is theirs and the counts
+// here stop meaning what they say.
+const fresh = (seed = 5) => { const g = new Game('reef', [{ creature: 'anomalocaris', device: 'keyboard', ready: true }], seed); const p = g.players[0]; for (const o of [...g.actors]) if (o.controller !== 'player') g.remove(o); p.pos = { x: 60, y: 6, z: -30 }; p.spawnProtect = 0; p.yaw = 0; return { g, p }; };
 
 // --- giant bites needed to kill an adult ---
 {
   const { g, p } = fresh();
   const giant = g.spawn('anomalocaris', 'giant', { x: 60, y: 6, z: -27 }, 3.5); giant.brain = makeBrain('giant', giant.pos, g.rng);
-  let bites = 0; const hp0 = p.hp;
+  let bites = 0, frames = 0; const hp0 = p.hp;
   const m = new Map([[0, emptyInput()]]);
   for (let i = 0; i < 60 * 30 && isAlive(p); i++) {
     giant.pos = { x: p.pos.x, y: p.pos.y, z: p.pos.z - lengthOf(giant) * 0.5 }; giant.yaw = 0; giant.brain!.goal = 'hunt'; giant.brain!.target = p.id; giant.brain!.detection.set(p.id, 3); giant.brain!.hunger = 999; giant.brain!.courage = 1;
-    g.step(1 / 60, m);
+    g.step(1 / 60, m); frames++;
     for (const e of g.events) if (e.kind === 'hit' && e.actor === giant.id && e.other === p.id) bites++;
     g.events.length = 0;
   }
-  check('giant kills an adult in about 3 bites', bites >= 2 && bites <= 4, `bites=${bites} hp0=${hp0} hpMax=${p.hpMax} state=${p.state}`);
+  // A handful of bites, and over in seconds. The count is the looser half of that pair on purpose:
+  // a move's damage is a flat number while health grows with the body, so the bigger the animal the
+  // more bites it takes from something the same multiple of its size — which is how the ladder has
+  // always worked, an Apex soaking far more than a Larva, and is not particular to this pairing.
+  // How long it lasts is what a player actually feels, so that is pinned tight.
+  check('a giant kills an adult in a handful of bites', bites >= 2 && bites <= 7, `bites=${bites} hp0=${hp0} hpMax=${p.hpMax} state=${p.state}`);
+  check('...and in seconds, not a fight', frames / 60 < 6, `${(frames / 60).toFixed(1)} s`);
   check('killed by a giant = swallowed, not a plain corpse', p.state === 'swallowed' || (p.state === 'dead' && p.eaten >= 1) || p.hatching, `state=${p.state}`);
   run(g, emptyInput(), 60 * (CORPSE_WINDOW + 2));
   check('...and the player respawns afterwards', isAlive(p) && g.actors.includes(p), `state=${p.state}`);
@@ -57,6 +66,44 @@ const fresh = (seed = 5) => { const g = new Game('reef', [{ creature: 'anomaloca
   }
   check('a giant breaks off after 4-10 bites', giant.brain!.goal === 'flee' && routedAt >= 4 && routedAt <= 10, `routed after ${routedAt} bites, goal=${giant.brain!.goal}, giant hp ${Math.round(giant.hp)}/${giant.hpMax}`);
 }
+// --- animals answer for themselves ---
+{
+  /**
+   * Bite something and it fights you or it runs; what it must never do is neither. Two ways that
+   * used to happen: an animal struck by something much smaller picked `fight`, failed the fight
+   * case's "is this a peer" test on the next tick and wandered off; and the courage rule, which
+   * costs a fixed fraction of health however small the thing biting you is, routed a big animal
+   * in three bites from a minnow — and a routed animal never answers at all.
+   */
+  const bite = (npcScale: number, playerScale: number, seconds: number) => {
+    const { g, p } = fresh(17);
+    p.scale = playerScale; p.stamina = p.staminaMax;
+    const npc = g.spawn('anomalocaris', 'ambient', { x: p.pos.x, y: p.pos.y, z: p.pos.z + lengthOf(p) * 0.45 }, npcScale);
+    npc.brain = makeBrain('needs', { ...npc.pos }, g.rng);
+    let bitBack = 0, swung = 0, fought = 0, frames = 0;
+    let wasAttacking = false;
+    for (let i = 0; i < 60 * seconds && isAlive(npc); i++) {
+      p.pos = { x: npc.pos.x, y: npc.pos.y, z: npc.pos.z - lengthOf(p) * 0.45 };
+      p.vel = { x: 0, y: 0, z: 0 }; p.yaw = 0; p.hp = p.hpMax; p.stamina = p.staminaMax;
+      npc.hp = Math.max(npc.hp, npc.hpMax * 0.6);      // keep it on its feet: what it *decides* is the test
+      g.step(1 / 60, new Map([[0, { ...emptyInput(), light: i % 40 < 2 }]]));
+      for (const e of g.events) if (e.kind === 'hit' && e.actor === npc.id && e.other === p.id) bitBack++;
+      g.events.length = 0;
+      // Whether the bite connects depends on where the rig pins the player; whether the animal
+      // swings at all is the behaviour under test.
+      const attacking = npc.state === 'attack' || npc.state === 'pounce';
+      if (attacking && !wasAttacking) swung++;
+      wasAttacking = attacking;
+      frames++; if (npc.brain!.goal === 'fight') fought++;
+    }
+    return { bitBack, swung, fight: fought / Math.max(1, frames), band: bandOf(npc, p) };
+  };
+  const tiny = bite(3.5, 0.5, 12);
+  check('something far smaller biting you is answered, not ignored', tiny.band === 'snack' && tiny.fight > 0.4 && tiny.swung > 0, `player reads as ${tiny.band}; fighting ${(tiny.fight * 100).toFixed(0)}% of the time, swung ${tiny.swung}×`);
+  const peer = bite(1, 1, 12);
+  check('...and so is a peer', peer.fight > 0.4 && peer.swung > 0 && peer.bitBack > 0, `fighting ${(peer.fight * 100).toFixed(0)}% of the time, swung ${peer.swung}×, bit back ${peer.bitBack}×`);
+}
+
 // --- regen ---
 {
   const { g, p } = fresh(2);
@@ -153,6 +200,38 @@ const fresh = (seed = 5) => { const g = new Game('reef', [{ creature: 'anomaloca
     const m = new Map([[0, { ...emptyInput(), light: true }], [1, emptyInput()]]);
     g.step(1 / 60, m);
     check('a bite never turns onto another player', Math.abs(p.yaw) < 0.02, `yaw=${p.yaw.toFixed(3)}`);
+  }
+  // --- and it aims up and down, not only round ---
+  // The nudge only ever moved yaw, so a bite lined up perfectly in the horizontal was still off
+  // by the whole elevation: prey a body length above sat 45° off the aim after the nudge had run.
+  const upDown = (elev: number) => {
+    const { g, p } = fresh(24);
+    p.yaw = 0; p.pitch = 0; p.vel = { x: 0, y: 0, z: 0 }; p.stamina = p.staminaMax;
+    const d = lengthOf(p) * 1.2, yawTo = 0.18;
+    const prey = g.spawn('waptia', 'ambient', {
+      x: p.pos.x + Math.sin(yawTo) * d * Math.cos(elev),
+      y: p.pos.y + d * Math.sin(elev),
+      z: p.pos.z + Math.cos(yawTo) * d * Math.cos(elev),
+    }, 1);
+    prey.hp = prey.hpMax = 400; prey.vel = { x: 0, y: 0, z: 0 };
+    g.hash.rebuild(g.actors);
+    run(g, { ...emptyInput(), light: true }, 1);
+    // How far off the body's own aim the prey ended up.
+    const cp = Math.cos(p.pitch);
+    const aim = { x: Math.sin(p.yaw) * cp, y: -Math.sin(p.pitch), z: Math.cos(p.yaw) * cp };
+    const to = { x: prey.pos.x - p.pos.x, y: prey.pos.y - p.pos.y, z: prey.pos.z - p.pos.z };
+    const tl = Math.hypot(to.x, to.y, to.z);
+    return Math.acos(Math.max(-1, Math.min(1, (aim.x * to.x + aim.y * to.y + aim.z * to.z) / tl)));
+  };
+  const deg = (r: number) => ((r * 180) / Math.PI).toFixed(0);
+  for (const e of [-0.8, -0.5, 0.5]) {
+    const err = upDown(e);
+    check(`a bite aims at prey ${deg(-e)}\u00b0 above it`, err < 0.2, `${deg(err)}\u00b0 off the aim (was ${deg(Math.abs(e))}\u00b0)`);
+  }
+  {
+    // Capped like the yaw is: it will not fold the animal in half to reach something overhead.
+    const steep = upDown(-1.5);
+    check('...but the nose only goes so far up', steep > 0.2, `${deg(steep)}\u00b0 off the aim at 86\u00b0 overhead`);
   }
 }
 

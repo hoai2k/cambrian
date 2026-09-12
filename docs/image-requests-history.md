@@ -1,4 +1,4 @@
-# Image request history — Cambrian Explosion
+# Image request history — Cambrian Conquest
 
 Completed image, glyph and prop briefs are archived here, newest first. Open requests
 belong in [image-requests.md](image-requests.md); audio requests are in
@@ -8,7 +8,9 @@ belong in [image-requests.md](image-requests.md); audio requests are in
 
 **Completed.** Replaced the title/loading wordmark with the user-supplied natural-history illustration, preserved as `docs/art/sources/cambrian-explosion-original.png`. The full composition is delivered as `public/assets/brand/logo-illustrated.webp` (1536×1024); only web compression was applied. Title/loading layouts give the illustration space and remove the competing standalone neon emblem and reef backdrop.
 
-For small UI sizes, created `public/assets/brand/logo-engraved.webp` (1024×384, transparent) and `public/assets/brand/emblem-engraved.webp` (512×512) using the built-in image generator and the supplied illustration as reference. Exact prompts are in [docs/art/engraved-brand-prompts.json](art/engraved-brand-prompts.json). The compact wordmark is used in the selection header; the emblem is shared by the UI.
+For small UI sizes, created `public/assets/brand/logo-engraved.webp` (1024×384, transparent) and `public/assets/brand/emblem-engraved.webp` (512×512) using the built-in image generator and the supplied illustration as reference. Exact prompts are in [docs/art/engraved-brand-prompts.json](art/engraved-brand-prompts.json). The compact wordmark is used in the selection header; the emblem was shared by the UI until the
+Anomalocaris delivery below took that role (2026-09-09), and `emblem-engraved.webp` is now
+unreferenced — the wordmark beside it is still the engraved one.
 
 Matching PNG favicons are `public/favicon-engraved-16.png`, `favicon-engraved-32.png`, `favicon-engraved-192.png`, `favicon-engraved-512.png`, and `public/apple-touch-icon-engraved.png` (180×180). Both HTML entry points use the new icons. Prior brand assets remain available at their original paths. Every new runtime asset is below 600 KB; the unmodified source PNG is archived separately.
 
@@ -156,3 +158,7 @@ reddish Anomalocaris head. Delivered `public/favicon-anomalocaris-{16,32,192,512
 The approved built-in imagegen illustration is downsampled without restyling;
 `tools/art/export-anomalocaris-favicon.py <approved-source.png>` reproduces the
 exports. New filenames ensure browsers request the new version.
+
+**2026-09-09:** the same art is now the in-game emblem too, so the browser tab and the mark beside
+the title on the pick screen are one animal rather than two. `npm run brand` derives
+`public/assets/brand/emblem.webp` (128 px, trimmed to the ink) from the 512 px favicon master.

@@ -1,6 +1,7 @@
 import { clamp, dot, heading, type Vec3 } from '../../shared/math';
 import { isAlive, lengthOf } from '../actors';
 import { creature, type CreatureId } from '../creatures';
+import { DIP_CHANCE } from '../locomotion';
 import type { Game } from '../game';
 import type { Actor } from '../types';
 import { coverAt, groundHeight, nurseryAt, nurseryFactor, NURSERY_R, SURFACE_Y } from '../world';
@@ -17,7 +18,9 @@ import { ADULT_STAGE, devActor, stageForScale } from './state';
  *   has built up speed.
  * - Shells jet, so no direction is the slow one for them: no reverse penalty, and a smaller
  *   fast-start. Their sprint still goes where the stick points, like every other body's — the
- *   funnel buys them free rise and sink, not a reversed control.
+ *   funnel buys them free rise and sink, not a reversed control. A shell also swims both ways
+ *   round: it leads with whichever end it is already pointing rather than turning round first
+ *   (the heading rule is in `Game.updateActor`).
  * - Crawlers (ground bodies) keep the shared rules.
  * - A fish can leave the water if it is driving hard at the surface: the sim lets it through the
  *   ceiling into a ballistic arc and it splashes back in. Crawlers and shells stay under.
@@ -72,9 +75,13 @@ export function spawnInCover(g: Game, center: Vec3, id: CreatureId, scale: numbe
   if (!options.length) return undefined;
   const ground = (c: Vec3) => groundHeight(g.world, c.x, c.z, []);
   const high = options.filter((c) => c.pos.y > ground(c.pos) + 4);
-  // A crawler hatches down on the sand, so the patch has to reach the sand: a crinoid crown three
-  // units up is cover for a swimmer and open floor for a trilobite.
-  const pool = def.ground ? options.filter((c) => c.pos.y - ground(c.pos) <= c.radius * 0.8) : (high.length && g.rng() < 0.6 ? high : options);
+  const low = options.filter((c) => c.pos.y - ground(c.pos) <= c.radius * 0.8);
+  // The patch has to reach the sand for a crawler, and for anything hatching out of an egg —
+  // an egg is laid on the floor (`layEgg` in game.ts), and a crinoid crown three units up is cover
+  // for a swimming body but open floor for one lying under it. A grown body dropped in for any
+  // other reason still takes the high growth, which is where a fish that size shelters.
+  const onFloor = def.ground || stageForScale(def.adultLength, scale) === 0;
+  const pool = onFloor ? low : (high.length && g.rng() < 0.6 ? high : options);
   const from = pool.length ? pool : options;
   // Bots carry player index -1 when respawning; never use a negative array remainder.
   const c = from[(Math.max(0, index) * 7 + Math.floor(g.rng() * from.length)) % from.length];
@@ -87,7 +94,10 @@ export function spawnInCover(g: Game, center: Vec3, id: CreatureId, scale: numbe
     const ang = g.rng() * Math.PI * 2, r = g.rng() * c.radius * 0.4;
     const x = c.pos.x + Math.cos(ang) * r, z = c.pos.z + Math.sin(ang) * r;
     const gr = groundHeight(g.world, x, z, []);
-    const y = def.ground ? gr + L * 0.13 : clamp(c.pos.y, gr + 0.6 + L * 0.3, SURFACE_Y - 3);
+    // A hatchling of any shape starts down where its egg was laid, so it is scored at the height
+    // it will actually rest at — a patch that hides a body a body-length up may be open floor
+    // under it. Anything else sits at the heart of the patch it was given.
+    const y = onFloor ? gr + L * 0.13 : clamp(c.pos.y, gr + 0.6 + L * 0.3, SURFACE_Y - 3);
     const at = { x, y, z };
     const hidden = coverAt(g.world, at, L, []);
     if (hidden > bestCover) { bestCover = hidden; best = at; }
@@ -121,13 +131,20 @@ export function spawnY(ground: number, L: number, isGround: boolean): number {
   return ground + clamp((SURFACE_Y - ground) * 0.45, 1.2 + L * 0.5, SURFACE_Y - ground - 4);
 }
 
-/** Where an AI swimmer wanders to: anywhere in the column, biased up for the open-water bodies. */
+/**
+ * Where an AI swimmer wanders to: anywhere in the column, biased up for the open-water bodies and
+ * further up the bigger the body is. A bottom-feeder stays down whatever its size; anything else
+ * large keeps to the higher water, apart from the occasional pass over the floor (`DIP_CHANCE`),
+ * because a big fish is something you see go by overhead and not something lying on the sand.
+ */
 export function wanderY(a: Actor, ground: number, rng: () => number): number {
   const def = creature(a.creature);
   if (def.ground) return ground;
   const L = lengthOf(a);
   const benthic = def.diet === 'deposit' || def.diet === 'grazer' || def.ability === 'sandAmbush' || def.ability === 'floorSweep';
   const column = SURFACE_Y - 2 - (ground + 1 + L * 0.3);
-  const f = benthic ? rng() * 0.25 : 0.15 + rng() * 0.75;
+  const dip = !benthic && L > 2.5 && rng() < DIP_CHANCE;
+  const lo = benthic || dip ? 0 : clamp(0.15 + Math.max(0, L - 2.5) * 0.1, 0.15, 0.6);
+  const f = benthic ? rng() * 0.25 : dip ? rng() * 0.2 : lo + rng() * (0.95 - lo);
   return clamp(ground + 1 + L * 0.3 + column * f, ground + 1, SURFACE_Y - 2);
 }

@@ -1,5 +1,5 @@
 import { dist, dot, heading, norm, scale, sub } from '../../shared/math';
-import { isAlive, isHidden, lengthOf } from '../actors';
+import { isAlive, isHidden, lengthOf, speedFactor } from '../actors';
 import { applyHit } from '../combat';
 import { BURROWERS, DEFENSIVE_SPECIALS, HEAVY_SPECIALS } from '../concealment';
 import { creature, type CreatureId } from '../creatures';
@@ -109,14 +109,17 @@ export function stepAbility(g: Game, a: Actor, ctx: ExpansionContext, dt: number
       if (a.pos.y < floor + L * 0.8) DEVONIAN_RULES.onNutrition(g, a, 1.6 * dt, undefined);
       return;
     }
-    case 'filterGulp':
-      DEVONIAN_RULES.onNutrition(g, a, 1.2 * dt, undefined);
+    case 'filterGulp': {
+      // A ram feeder strains what it swims through: gaping while stopped catches nothing.
+      const way = Math.hypot(a.vel.x, a.vel.y, a.vel.z) / Math.max(0.1, def.speed * speedFactor(a.scale));
+      if (!def.ramFeed || way >= 0.25) DEVONIAN_RULES.onNutrition(g, a, 1.2 * dt, undefined);
       for (const o of ctx.nearby(a.pos, L * 2)) {
         if (o.id === a.id || !isAlive(o) || o.controller !== 'swarm') continue;
         const direction = norm(sub(o.pos, a.pos));
         if (dot(direction, h) > 0.45) { const pull = 12 * dt; o.vel.x -= direction.x * pull; o.vel.y -= direction.y * pull; o.vel.z -= direction.z * pull; }
       }
       return;
+    }
   }
   if (!(HEAVY as readonly string[]).includes(def.ability)) return;
   for (const o of ctx.nearby(a.pos, L * 2.2)) {

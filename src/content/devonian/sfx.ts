@@ -8,7 +8,7 @@ export const DEVONIAN_SAMPLES: Record<string, string[]> = {
   armour: ['devonian/armour-clang-1', 'devonian/armour-clang-2'],
   armourPierce: ['devonian/armour-pierce'],
   gulp: ['devonian/air-gulp'],
-  airLow: ['devonian/air-low'],
+  winded: ['devonian/air-low'],
   anoxia: ['devonian/anoxia-warning'],
   jet: ['devonian/jet-1', 'devonian/jet-2'],
   withdraw: ['devonian/withdraw'],

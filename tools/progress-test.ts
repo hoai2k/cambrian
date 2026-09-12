@@ -21,7 +21,7 @@ selectEra(which === 'devonian' ? DEVONIAN : CAMBRIAN);
 
 const { Game } = await import('../src/sim/game');
 const { ladderName, ladderNames, ladderRung, ladderScale, clampMark, fillOf, rungOf, MARK_NEAR_TOP, LADDER_RUNGS, LADDER_TOP } = await import('../src/sim/ladder');
-const { PLAYABLE } = await import('../src/sim/creatures');
+const { PLAYABLE, creature } = await import('../src/sim/creatures');
 const { emptyInput, isCoop, MODE_IDS, TIER_NEED } = await import('../src/sim/types');
 type InputFrame = import('../src/sim/types').InputFrame;
 type Mode = import('../src/sim/types').Mode;
@@ -229,6 +229,28 @@ const meterFill = (g: InstanceType<typeof Game>, a: import('../src/sim/types').A
   const versus = new Game('hunted', setup(HERO), 3);
   versus.state = { status: 'won', winner: 0, message: 'won' };
   ok(!versus.continueMatch(), 'the versus mode refuses: its result is a verdict between players');
+}
+
+// ---- an egg is an egg: everything hatches at about the same size and grows from there ----
+{
+  const hatch = PLAYABLE.map((c) => ({ id: c.id as CreatureId, len: creature(c.id as CreatureId).adultLength * ladderScale(c.id as CreatureId, 0) }));
+  const biggest = hatch.reduce((m, h) => (creature(h.id).adultLength > creature(m.id).adultLength ? h : m), hatch[0]);
+  ok(creature(biggest.id).adultLength * ladderScale(biggest.id, LADDER_TOP) > biggest.len * 8,
+    `the largest animal on the roster grows many times over (${biggest.id})`);
+  const lo = Math.min(...hatch.map((h) => h.len)), hi = Math.max(...hatch.map((h) => h.len));
+  // "About" one size. With equivalent sizing on the roster's adults spread over their real
+  // proportions and the hatch length is identical for all of them — that exact claim is
+  // tools/sizing-test.ts. Here it is the shipped roster, where the adults are within half again of
+  // each other and the hatchlings inherit that.
+  ok(hi <= lo * 1.6, `every playable creature hatches at about one size (${lo.toFixed(2)}–${hi.toFixed(2)} units)`);
+  ok(lo > 0.2 && hi < 1.6, `and that size is a hatchling's (${lo.toFixed(2)}–${hi.toFixed(2)} units)`);
+  for (const { id } of hatch) {
+    const rungs = Array.from({ length: LADDER_RUNGS }, (_, r) => ladderScale(id, r));
+    ok(rungs.every((v, i) => i === 0 || v > rungs[i - 1]), `${id} grows at every rung: ${rungs.map((v) => v.toFixed(2)).join(' → ')}`);
+    // Growth is proportional: the rungs are steps towards this animal's own adult size, so the
+    // ones with a big adult body take big steps and a small animal stays small its whole life.
+    ok(rungs[LADDER_TOP] > rungs[0] * 1.6, `${id} ends larger than it hatched`);
+  }
 }
 
 console.log(`${passes} progress assertions passed (${which})`);

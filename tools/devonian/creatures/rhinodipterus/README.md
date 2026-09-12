@@ -167,3 +167,15 @@ in `docs/devonian/refinement-queue.md` for concrete sculpt, eye, fin and materia
 The image and copy/hash-verified model/source backup are under local/devonian-authoring.
 Do not rerun the old builder into an existing candidate or treat old eye audits as approval
 for future geometry. Finish the redesign before fresh general quality audits.
+
+## V3 shipped — 12 September 2026
+
+`build-v3.py` + `anatomy-v3.py` + `motion-v3.py` (with `-v3` copies of export, attachment audit,
+finalize, render and delivery) port the approved head study off the user reference
+(`docs/reference/Rhinodipterus.webp`): the head 1.12× longer about its rear, the cheek rows widened
+and deepened, the cranial bones mapped as suture grooves, the eye inset like a fish's — a first
+inset of .058 buried the globe entirely (audit 100%, nothing visible) and was brought back to .036,
+which audits at 93.5% / 93.4% (full) and 93.5% / 93.4% (reduced) with the eye clearly showing.
+Scales stay the existing normal map. Packaging exact round-trip PASS at 216,511 / 57,761
+triangles; intake PASS; portraits from the V3 build; `anchors.json` is V3's. `build.py` still
+reproduces V2. The user accepted the study on 12 September; badge cleared.
