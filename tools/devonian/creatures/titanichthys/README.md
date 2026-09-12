@@ -70,3 +70,29 @@ The three v1 compatible sockets are `anchor_mouth` on jaw, `anchor_mouth_inside`
 The full export contains all 18 clips. The decimated LOD retains exactly Idle, Swim and Death. `validation.json` records geometry reduction, weights, finite deformation bounds at five phases of every clip, loop/recovery seams, stable root and absent scale channels. Exporter-generated constant root/scale tracks are verified against bind transforms and removed; authored motion remains intact. The root's fixed glTF axis-conversion rotation is retained.
 
 Review images cover Idle and Swim laterally, Eat and Ability frontally, Bite and Dodge laterally, and Heavy, Guard and Death in three-quarter view. See `review.md` for the visual inspection result and any amendments made after inspection.
+
+## Sculpt port shipped — 12 September 2026
+
+The user's viewer sculpt (`docs/viewer-sculpt.md`) asked for a longer, narrower, pointed snout:
+the nose +0.23 along the axis and +0.14 behind it, half-width −78% at the nose and −10%/−4% at
+stations 15/16, the underside raised 8%/25% at 17/18, dorsal −14% at the nose; nothing from
+station 14 back. `sculpt-port/` carries it (`build_base_full.py` the base with the edit off,
+`build_candidate.py` with it on, `geometry.py` the loft).
+
+A first port applied the numbers as a per-vertex lateral scale of the finished snout and pleated
+it: rows that wrapped a wide blunt nose folded when squeezed into a narrow one (adjacent face
+normals up to 170° apart over the snout, against 90° shipped), and a knot at station 15 put an 8%
+waist behind the neck that read as a hard ring. The port that shipped edits the head cage's own
+control rows instead — the snout's profile table, `head_controls` and the same lofted mouth rim in
+`oral_surface` — lofting through a denser table (`HEAD_KNOTS_LOFT`, fourteen rows read off the
+shipped cage) with monotone shape-preserving Hermite envelope curves (`_hermite`) that leave the
+neck flat, so the surface is smooth by construction. `solve_nose.py` measures a build the way
+`sculpt:measure` does, names the profile row each extreme comes off, and reports the face-normal
+bands; its `--knots` mode is how the tables were solved.
+
+The rebuild is a deformation source: `tools/devonian/transplant-positions.mjs` keeps the shipped
+GLB whole (materials, UVs, skin, clips, sockets) and takes only the rebuild's vertex positions,
+matched through the base, both LODs. Measured: changed stations 15–19 within 1.3% of the sculpt's
+curves on every curve; `--against` the previous shipped GLB, stations 0–14 read 0.0% on every
+curve. Neck-band face-normal angles identical to shipped. `modelLength` 7.212 → 7.438. Portraits
+by `sculpt-port/portraits.py --out`. Grab re-applied by `tools/creatures/motion/apply.mjs`.

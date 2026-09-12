@@ -21,6 +21,13 @@ import sharp from 'sharp';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
 const OUT_DIR = path.join(ROOT, 'public', 'assets', 'triassic', 'biomes');
+// The painted plates were delivered under the biomes' names (src/content/triassic/environment.ts BIOME_PLATES);
+// while every one of those exists this tool has nothing to stand in for and stops.
+const PAINTED = ['gypsum-flats', 'conifer-shore', 'dasyclad-lagoon', 'sea-lily-garden', 'sponge-coral-reef', 'shell-pavement', 'margin-channels', 'reef-front', 'black-basin'];
+if (!process.argv.includes('--overwrite-painted') && PAINTED.every((n) => (await import('node:fs')).existsSync(path.join(OUT_DIR, `${n}.webp`)))) {
+  console.log('Painted Triassic plates are installed; nothing to stand in for. Use --overwrite-painted to write procedural slot plates anyway.');
+  process.exit(0);
+}
 if (process.argv.includes('--overwrite-painted')) {
   console.warn('Explicitly regenerating procedural biome plates over the painted set.');
 } else if ((await import('node:fs')).existsSync(path.join(OUT_DIR, 'manifest.json'))) {

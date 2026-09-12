@@ -77,7 +77,7 @@ size budget, a description of the sound, and the code that will consume it.
   flags anything missing or too quiet to read.
 
 
-## Triassic Tide — 12 September 2026
+## Triassic Triumph — 12 September 2026
 
 The era plays with every sound borrowed (`src/content/triassic/sfx.ts` maps each event to a
 delivered Devonian or shared sample). Its own, in priority order:

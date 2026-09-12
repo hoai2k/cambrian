@@ -59,9 +59,11 @@ export function slotFor(materialName: string): Slot {
   const n = materialName.toLowerCase();
   if (/eye/.test(n)) return 'eyes';
   if (/ventral|arthrodial|belly|underside|bone/.test(n)) return 'underside';
-  if (/sclerotiz|oral|spine|accent|denticle|tooth|brush/.test(n)) return 'accent';
-  if (/membrane|swimming|marginal|\bfin/.test(n)) return 'fins';
-  if (/bristle|appendage|endite|antenna|seta|gill|leg/.test(n)) return 'legs';
+  if (/sclerotiz|oral|spine|accent|denticle|tooth|brush|mouthpart/.test(n)) return 'accent';
+  // A biramous limb's two branches part company here, because they are different things: the exopod
+  // is the lamellar swimming flap and the endopod is the branch that walks and feeds.
+  if (/membrane|swimming|marginal|\bfin|exopod/.test(n)) return 'fins';
+  if (/bristle|appendage|endite|antenna|seta|gill|leg|endopod/.test(n)) return 'legs';
   return 'body';
 }
 

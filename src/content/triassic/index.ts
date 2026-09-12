@@ -4,7 +4,7 @@ import type { DevonianCreatureId } from '../devonian/ids';
 import type { Slot } from '../../shared/palettes';
 import { TRIASSIC_CREATURES } from './creatures';
 import { SNACK_SCHOOLS, GIANTS } from './ecology';
-import { BIOME_NAMES, BIOME_DANGER, ATMOS, SAND_COLORS, FLORA_BASE, FLORA_DENSITY, FLORA_PROPS, SURFACE_Y, FLOOR_DEPTH } from './environment';
+import { BIOME_NAMES, BIOME_DANGER, BIOME_PLATES, ATMOS, SAND_COLORS, FLORA_BASE, FLORA_DENSITY, FLORA_PROPS, SURFACE_Y, FLOOR_DEPTH } from './environment';
 import { MUSIC } from './music';
 import { SCHEMES, CREATURE_SCHEMES } from './palettes';
 import { TRIASSIC_BRAND, TRIASSIC_BRAND_EXTRAS } from './brand';
@@ -60,7 +60,7 @@ const DEVONIAN_LINK = { title: 'Devonian Domination', path: 'devonian/', blurb: 
 
 export const TRIASSIC = defineEra({
   id: 'triassic',
-  title: 'Triassic Tide',
+  title: 'Triassic Triumph',
   copy: {
     tagline: 'Breathe. Dive. Hunt. Surface.', taglineEm: '240 million years ago, the sea belonged to things that had to come up for air.',
     loading: 'FILLING THE LUNGS…', lose: 'THE TIDE WINS', settingsKey: 'triassic-settings', mobileIllustration: TRIASSIC_BRAND_EXTRAS.mobileIllustration,
@@ -80,7 +80,7 @@ export const TRIASSIC = defineEra({
     title: ['cymbospondylus', 'nothosaurus', 'mixosaurus', 'rhaeticosaurus'],
   },
   ecology: { schools: SNACK_SCHOOLS, giants: GIANTS, shadow: { creature: 'shonisaurus', scale: 1.0 } },
-  environment: { biomeNames: BIOME_NAMES, biomeDanger: BIOME_DANGER, atmosphere: ATMOS, sandColors: SAND_COLORS, floraColors: FLORA_BASE, flora: FLORA_DENSITY, floraProps: FLORA_PROPS, surfaceY: SURFACE_Y, floorDepth: FLOOR_DEPTH },
+  environment: { biomeNames: BIOME_NAMES, biomeDanger: BIOME_DANGER, atmosphere: ATMOS, sandColors: SAND_COLORS, floraColors: FLORA_BASE, flora: FLORA_DENSITY, floraProps: FLORA_PROPS, surfaceY: SURFACE_Y, floorDepth: FLOOR_DEPTH, biomePlates: BIOME_PLATES },
   assets: {
     // Portraits are the placeholder set cut from docs/triassic/canonical/; models are borrowed (see
     // TRIASSIC_STAND_INS) and come from assets/devonian/creatures/ until this folder fills. The UI

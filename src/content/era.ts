@@ -110,6 +110,11 @@ export interface EraDefinition {
      * and only the shore, the channels and the escarpment move it (docs/triassic/02-biomes-and-depth.md).
      */
     readonly floorDepth?: Record<Biome, number>;
+    /**
+     * The file (no extension) under `assets.biomes` that paints each slot, where it is not the
+     * slot id itself: the Triassic's plates were delivered under the biomes' own names.
+     */
+    readonly biomePlates?: Partial<Record<Biome, string>>;
     readonly biomeNames: Record<Biome, string>;
     readonly biomeDanger: Record<Biome, number>;
   };

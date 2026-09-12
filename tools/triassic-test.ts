@@ -1,5 +1,5 @@
 /**
- * Triassic Tide: the era pack, the borrowed bodies, the sea floor that sinks by biome, air as the
+ * Triassic Triumph: the era pack, the borrowed bodies, the sea floor that sinks by biome, air as the
  * cost of effort, armour with a facing, the shore that reaches in, the specials, and determinism,
  * all headless. Run: npm run triassic
  *

@@ -161,7 +161,7 @@ export interface CreatureDef {
    */
   conformArms?: boolean;
 
-  // ---- Triassic Tide (docs/triassic/01-triassic-design.md). All optional; the earlier rosters set
+  // ---- Triassic Triumph (docs/triassic/01-triassic-design.md). All optional; the earlier rosters set
   // none of them and the shared simulation ignores them unless the era's rules ask.
   /**
    * Which side the `armour` fraction is on. `all` is the shell of a placodont or an ammonoid;

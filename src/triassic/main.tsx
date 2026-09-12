@@ -7,7 +7,7 @@ import { nestedBase, setAppBase } from '../shared/base';
 import '../app/styles.css';
 
 /**
- * Triassic Tide lives at /triassic/ beside the other two games. The era is chosen and the asset
+ * Triassic Triumph lives at /triassic/ beside the other two games. The era is chosen and the asset
  * base pointed one directory up before the app is imported, so every module-top read of
  * ACTIVE_ERA (creature tables, asset paths, era rules, the sea floor) sees the Triassic pack.
  */

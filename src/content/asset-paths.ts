@@ -14,7 +14,7 @@ export function createAssetPaths(era: EraDefinition) {
       return `${folder}${file}${lod ? '.lod1' : ''}.glb`;
     },
     portrait: (id: string, kind: 'select' | 'card' | 'thumb') => `${a.defaultPortraits}${id}.${kind}.png`,
-    biome: (id: string) => `${a.biomes}${id}.webp`,
+    biome: (id: string) => `${a.biomes}${era.environment.biomePlates?.[id as keyof typeof era.environment.biomePlates] ?? id}.webp`,
     prop: (id: string) => `${a.props}${id}.glb`,
     ui: (file: string) => `${a.ui}${file}`,
     sfx: (name: string) => `${a.sfx}${name}.mp3`,

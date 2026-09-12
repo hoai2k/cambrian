@@ -1,4 +1,4 @@
-# 01 · Triassic Tide: era design and the roster
+# 01 · Triassic Triumph: era design and the roster
 
 **Status:** design proposal, 12 September 2026. Nothing here is built. This is the third era's
 equivalent of [07](../redesign/07-devonian-design.md) and [08](../redesign/08-devonian-domination.md)
@@ -18,7 +18,7 @@ for air. That is the era's whole game. Fish had the water; the reptiles took it 
 lungful at a time, and the surface, which in the earlier eras was a ceiling, is now the one place
 every player has to go and the one place everything can see them.
 
-So *Triassic Tide* is played between two edges, the surface and the floor, in a sea that gets
+So *Triassic Triumph* is played between two edges, the surface and the floor, in a sea that gets
 deeper the further out you go. Feeding is on the bottom or in the column; breathing is at the top;
 the deep is where the giants are and where a long fight leaves you empty a long way down.
 Live-bearers are born at the surface beside their mother; everything else hatches in the weed. No

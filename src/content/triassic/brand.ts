@@ -1,8 +1,12 @@
 import type { EraDefinition } from '../era';
 
-/** Brand assets consumed by the Triassic era. Placeholders until the wordmark and key art land (docs/triassic/03-image-and-model-requests.md). */
+/**
+ * Brand assets consumed by the Triassic era. The wordmark and the composed title art are the
+ * delivered set (public/assets/triassic/brand/manifest.json); the emblem is still the
+ * placeholder from `npm run triassic:brand` until one is delivered.
+ */
 export const TRIASSIC_BRAND = {
-  logo: 'assets/triassic/brand/logo.svg',
+  logo: 'assets/triassic/brand/logo-triassic-compact.png',
   illustration: 'assets/triassic/brand/title.webp',
   emblem: 'assets/triassic/brand/emblem.webp',
 } as const satisfies Pick<EraDefinition['assets'], 'logo' | 'illustration' | 'emblem'>;

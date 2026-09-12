@@ -32,8 +32,13 @@ The era is **playable at `/triassic/`** as of 12 September 2026, ahead of its ar
   air and shore warnings; three-way era links on the title and pick screens.
 - **Every model is a borrowed Devonian body** (`TRIASSIC_STAND_INS`), recoloured with the
   animal's scheme, with placeholder portraits cut from the canonical poses
-  (`tools/triassic/placeholder-portraits.mjs`), procedural biome plates (`npm run triassic:plates`)
-  and placeholder brand art (`npm run triassic:brand`). When a real model lands: put the GLB, LOD,
+  (`tools/triassic/placeholder-portraits.mjs`), procedural biome plates if the paintings are ever missing (`npm run triassic:plates`)
+  and placeholder brand art (`npm run triassic:brand`) — except that the wordmark, the composed
+  title art and the nine painted biome plates have since been **delivered**
+  (`public/assets/triassic/brand/manifest.json`, `tools/triassic/environment-image-prompts.json`;
+  the plates are wired by name through `BIOME_PLATES`), so only the emblem is still a placeholder.
+  The scenery source sheets for the four organic props sit in `intake/triassic/scenery/`, waiting
+  for their Tripo generations. When a real model lands: put the GLB, LOD,
   portraits and JSON in `public/assets/triassic/creatures/`, list the id in
   `tools/triassic/shipped.json`, run `node tools/update-asset-sizes.mjs`, and the stand-in and the
   preview badge go away on their own; `npm run triassic` checks both halves.

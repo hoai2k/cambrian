@@ -10,6 +10,11 @@ export const BIOME_NAMES: Record<Biome, string> = {
   shallows: 'Gypsum Flats', nursery: 'Conifer Shore', shelf: 'Dasyclad Lagoon', forest: 'Sea-Lily Garden', boulders: 'Sponge-Coral Reef',
   flats: 'Shell Pavement', channel: 'Margin Channels', escarpment: 'Reef Front', basin: 'Black Basin',
 };
+/** The delivered plates (public/assets/triassic/biomes/, prompts in tools/triassic/environment-image-prompts.json) are named for the biomes, not the slots. */
+export const BIOME_PLATES: Record<Biome, string> = {
+  shallows: 'gypsum-flats', nursery: 'conifer-shore', shelf: 'dasyclad-lagoon', forest: 'sea-lily-garden', boulders: 'sponge-coral-reef',
+  flats: 'shell-pavement', channel: 'margin-channels', escarpment: 'reef-front', basin: 'black-basin',
+};
 export const BIOME_DANGER: Record<Biome, number> = {
   shallows: 0.08, nursery: 0.05, shelf: 0.35, forest: 0.42, boulders: 0.50, flats: 0.30, channel: 0.70, escarpment: 0.80, basin: 0.92,
 };
