@@ -1,0 +1,20 @@
+{
+  "title": "Triassic Triumph",
+  "styleReference": [
+    "public/assets/brand/logo-engraved.webp",
+    "public/assets/devonian/brand/logo-engraved.webp"
+  ],
+  "wide": {
+    "backdrop": "keyart.webp",
+    "wordmark": "logo-triassic.svg",
+    "titleOverlay": "title.svg",
+    "readyComposedTitle": "title.webp"
+  },
+  "mobile": {
+    "backdrop": "keyart-mobile.webp",
+    "wordmark": "logo-triassic-compact.svg",
+    "titleOverlay": "title-mobile.svg",
+    "readyComposedTitle": "title-mobile.webp"
+  },
+  "rule": "Keep the composition marine-first. No terrestrial dinosaur focal point."
+}

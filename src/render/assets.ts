@@ -13,7 +13,7 @@ import { ACTIVE_ERA } from '../content';
  * streamed through media elements, so preloading one would pull four megabytes the player may never
  * reach.
  */
-import { CREATURE_IDS, type CreatureId } from '../sim/creatures';
+import { creature, CREATURE_IDS, type CreatureId } from '../sim/creatures';
 import { ensureLoaded } from './creature';
 import { loops, SAMPLES, sfxUrl } from '../audio/audio';
 import { appBase } from '../shared/base';
@@ -63,7 +63,7 @@ export class AssetQueue {
     // falls back to a placeholder for it at render time. Requesting images that are not there
     // just to have them fail is noise in the network panel and two wasted round trips each.
     const standIns = ACTIVE_ERA.assets.standIns ?? {};
-    const hasArt = (id: CreatureId) => !(id in standIns);
+    const hasArt = (id: CreatureId) => ACTIVE_ERA.assets.standInsPlayable ? !creature(id).shore : !(id in standIns);
     CREATURE_IDS.forEach((id, i) => {
       this.items.set(`glb:${id}`, { key: `glb:${id}`, kind: 'glb', url: `${B}${assetPaths.model(id)}`, size: GLB_SIZES[id]!, priority: 100 + i, status: 'queued', loaded: 0 });
       // The two images the pick screen draws. These used to be the `.card` cutout, which the pick

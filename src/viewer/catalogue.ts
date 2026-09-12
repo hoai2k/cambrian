@@ -4,7 +4,11 @@ import type { CambrianCreatureId } from '../content/cambrian/ids';
 import { SCHEMES as CAMBRIAN_SCHEMES, CREATURE_SCHEMES as CAMBRIAN_DEFAULTS } from '../content/cambrian/palettes';
 import { SCHEMES as DEVONIAN_SCHEMES, CREATURE_SCHEMES as DEVONIAN_DEFAULTS } from '../content/devonian/palettes';
 import type { Scheme } from '../shared/palettes';
-import { assetPaths } from '../content/asset-paths';
+import { assetPaths, createAssetPaths } from '../content/asset-paths';
+import { TRIASSIC } from '../content/triassic';
+import { TRIASSIC_CREATURES } from '../content/triassic/creatures';
+import { SCHEMES as TRIASSIC_SCHEMES, CREATURE_SCHEMES as TRIASSIC_DEFAULTS } from '../content/triassic/palettes';
+import triassicPending from '../content/triassic/pending-refinements.json';
 import { DEVONIAN_SPECIMENS } from '../content/devonian/specimens';
 import { DEVONIAN_CREATURES } from '../content/devonian/creatures';
 import devonianPending from '../content/devonian/pending-refinements.json';
@@ -21,7 +25,15 @@ const DEVONIAN_REFINEMENTS = refinementTables(devonianPending as PendingRefineme
   clipNotes: Record<string, Partial<Record<string, string>> | undefined>;
 };
 
-export type CollectionId = 'cambrian' | 'devonian' | 'devonian-props';
+const TRIASSIC_REFINEMENTS = refinementTables(triassicPending as PendingRefinement[]) as {
+  modelStatus: Record<string, 'preview' | 'final' | undefined>;
+  modelNotes: Record<string, string | undefined>;
+  clipNotes: Record<string, Partial<Record<string, string>> | undefined>;
+};
+/** The Triassic's paths resolve its borrowed bodies into the Devonian folder; the viewer runs as the Cambrian, so ask its pack directly. */
+const TRIASSIC_PATHS = createAssetPaths(TRIASSIC);
+
+export type CollectionId = 'cambrian' | 'devonian' | 'devonian-props' | 'triassic';
 export interface ViewerSpecimen {
   key: string;
   id: string;
@@ -51,6 +63,7 @@ export const COLLECTIONS: readonly { id: CollectionId; name: string }[] = [
   { id: 'cambrian', name: 'Cambrian creatures' },
   { id: 'devonian', name: 'Devonian creatures' },
   { id: 'devonian-props', name: 'Devonian plants & props' },
+  { id: 'triassic', name: 'Triassic creatures (borrowed bodies)' },
 ];
 export const SPECIMENS: readonly ViewerSpecimen[] = [
   ...CREATURES.map(c => ({
@@ -73,6 +86,19 @@ export const SPECIMENS: readonly ViewerSpecimen[] = [
     clipNotes: DEVONIAN_REFINEMENTS.clipNotes[c.id], model: c.model, lod: c.lod, image: c.image, displayLength: 4,
     lengthMeters: c.lengthMeters, looping: c.looping,
   })),
+  // The Triassic has no models of its own yet: each entry is the Devonian body it borrows in
+  // play, recoloured with its scheme, under its own name and preview badge — which is what a
+  // reviewer wants to see while judging the recolour and the size against the canonical pose.
+  ...TRIASSIC_CREATURES.map(c => ({
+    key: `triassic:${c.id}`, id: c.id, collection: 'triassic' as const,
+    name: c.name, species: c.species, kind: c.kind, kindNote: c.kindNote,
+    role: `TRIASSIC · ${c.shore ? 'SHORE ANIMAL' : c.ground ? 'SEAFLOOR' : 'SWIMMER'} · ${c.role}`,
+    provenance: c.locality ?? 'Triassic', description: TRIASSIC.assets.standIns?.[c.id] ? `Borrowed body: ${String(TRIASSIC.assets.standIns[c.id]).replace('devonian/', 'Devonian ')}. ${c.tagline}` : c.tagline,
+    modelStatus: TRIASSIC_REFINEMENTS.modelStatus[c.id], modelNote: TRIASSIC_REFINEMENTS.modelNotes[c.id],
+    clipNotes: TRIASSIC_REFINEMENTS.clipNotes[c.id],
+    model: TRIASSIC_PATHS.model(c.id), lod: TRIASSIC_PATHS.model(c.id, 1), image: TRIASSIC_PATHS.portrait(c.id, 'card'), displayLength: Math.min(c.adultLength, 8),
+    looping: ['Idle', 'Swim', 'Crawl', 'Guard', 'Eat', ...(c.abilityLoop ? ['Ability'] : [])],
+  })),
 ];
 export const specimenByKey = new Map(SPECIMENS.map(c => [c.key, c]));
 
@@ -86,9 +112,10 @@ export const specimenByKey = new Map(SPECIMENS.map(c => [c.key, c]));
 export interface Palette { schemes: readonly Scheme[]; defaults: Record<string, string> }
 const CAMBRIAN: Palette = { schemes: CAMBRIAN_SCHEMES, defaults: CAMBRIAN_DEFAULTS };
 const DEVONIAN: Palette = { schemes: DEVONIAN_SCHEMES, defaults: DEVONIAN_DEFAULTS };
+const TRIASSIC_PALETTE: Palette = { schemes: TRIASSIC_SCHEMES, defaults: TRIASSIC_DEFAULTS };
 
 export const paletteFor = (collection: CollectionId): Palette =>
-  collection === 'cambrian' ? CAMBRIAN : DEVONIAN;
+  collection === 'cambrian' ? CAMBRIAN : collection === 'triassic' ? TRIASSIC_PALETTE : DEVONIAN;
 
 /** Every scheme in either pack, for `registerSchemes` so a pick from either resolves. */
-export const ALL_SCHEMES: readonly Scheme[] = [...CAMBRIAN_SCHEMES, ...DEVONIAN_SCHEMES];
+export const ALL_SCHEMES: readonly Scheme[] = [...CAMBRIAN_SCHEMES, ...DEVONIAN_SCHEMES, ...TRIASSIC_SCHEMES];

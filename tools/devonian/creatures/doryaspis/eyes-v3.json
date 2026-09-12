@@ -1,0 +1,62 @@
+[
+  {
+    "mesh": "eye_globe_R",
+    "surroundingMeshes": [
+      "doryaspis_shield_v3"
+    ],
+    "seatBlender": [
+      -0.5312711596488953,
+      -0.9692018032073975,
+      -0.07667245715856552
+    ],
+    "normal": [
+      -0.7758456468582153,
+      -0.4764021337032318,
+      -0.41364791989326477
+    ],
+    "centerBlender": [
+      -0.520409345626831,
+      -0.9625321626663208,
+      -0.07088138908147812
+    ],
+    "centerInset": 0.014,
+    "radiiForeVertNormal": [
+      0.072,
+      0.06,
+      0.052
+    ],
+    "embeddedFraction": 0.6644,
+    "sampleCount": 41583,
+    "method": "seeded uniform ellipsoid volume samples against the closed head BVH signed nearest surface"
+  },
+  {
+    "mesh": "eye_globe_L",
+    "surroundingMeshes": [
+      "doryaspis_shield_v3"
+    ],
+    "seatBlender": [
+      0.5312711596488953,
+      -0.9692018032073975,
+      -0.07667245715856552
+    ],
+    "normal": [
+      0.7758456468582153,
+      -0.4764021337032318,
+      -0.41364791989326477
+    ],
+    "centerBlender": [
+      0.520409345626831,
+      -0.9625321626663208,
+      -0.07088138908147812
+    ],
+    "centerInset": 0.014,
+    "radiiForeVertNormal": [
+      0.072,
+      0.06,
+      0.052
+    ],
+    "embeddedFraction": 0.6643,
+    "sampleCount": 41583,
+    "method": "seeded uniform ellipsoid volume samples against the closed head BVH signed nearest surface"
+  }
+]
