@@ -107,3 +107,24 @@ The -2.41 nose station is what closes the mouth; the head shells must stay outer
   joint spheres (the dark bands); lever: bulge→0, flatter taper, superellipse exponent so sections
   become blades, trunk w:d from 2.4:1 to a plate; drop or re-material the `ball()`s.
   `check-articulation.py` needs bone chains contiguous to 2e-5 — keep `art()` head/tail points.
+
+## 12 September, later — where everything stands
+
+Sent for approval, awaiting the user: Cheirolepis face (passes 2/3/4; pass 4 recommended),
+Titanichthys and Gemuendina (published reworks nobody had approved), Acanthostega study (tail
+core+web+rays, flat belly, fuller limbs — scratchpad `acan/study.py` NEW2), Palaeoisopus study
+(oar blades, knuckles, flat trunk — `pala/study.py` NEW pass 2), Jaekelopterus study (stepped
+flattened opisthosoma, blade rami — `jaek/study.py` NEW), Dunkleosteus LOD (builder fix; shipped
+asset already fine — `build_v2.py` committed, candidate not needed in public).
+
+Blocked and needs the user: **Coccosteus** (two evidence files exist only on the Mac; simplest
+unblock is to drop candidate07's two GLBs into the repo — see
+`tools/devonian/creatures/coccosteus/rework-v3/RESUME-CANDIDATE07-BLOCKED.md`); **Doryaspis**
+(the mouth position call: the user asked for the mouth below the snout, the primary
+reconstruction puts it above the fixed pseudorostrum — `rework-v3/root-review-clay01.md`).
+
+Not started: Stethacanthus rework, Bothriolepis M05, group C (onychodus, rhinodipterus,
+nahecaris), Cladoselache and Tiktaalik studies, Odaraia.
+
+Studies live in the session scratchpad and die with it; the parameters that matter are in this
+file and the scripts are ~150 lines each following `tools/devonian/creatures/cheirolepis/redesign-study.py`.

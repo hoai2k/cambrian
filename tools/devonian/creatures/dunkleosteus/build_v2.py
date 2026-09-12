@@ -5,7 +5,7 @@ from pathlib import Path
 from mathutils import Vector,Matrix
 from mathutils.bvhtree import BVHTree
 from math import sin,cos,pi
-H=Path(__file__).resolve().parent;R=H.parents[3];O=R/'public/assets/devonian/creatures';L=R.parent/'devonian-authoring/dunkleosteus';V=L/'v2';V.mkdir(exist_ok=True)
+H=Path(__file__).resolve().parent;R=H.parents[3];O=Path(os.environ.get('DUNK_OUT',str(R/'public/assets/devonian/creatures')));O.mkdir(parents=True,exist_ok=True);L=R.parent/'devonian-authoring/dunkleosteus';V=L/'v2';V.mkdir(exist_ok=True)
 bpy.ops.object.select_all(action='SELECT');bpy.ops.object.delete(use_global=False)
 for a in list(bpy.data.actions):bpy.data.actions.remove(a)
 scene=bpy.context.scene;scene.render.fps=30
@@ -33,9 +33,19 @@ def material(n,col,rough=.45,pbr=None):
  M[n]=m;return m
 material('body_armour_living_skin',(.12,.15,.13),pbr='body');material('fins_membrane',(.12,.17,.14),pbr='fin');material('eye_dark_cornea',(.006,.010,.009),.205,pbr='eye');material('gnathal_bone',(.42,.375,.255),.37,pbr='gnathal');material('oral_mucosa',(.105,.038,.032),.39,pbr='oral');material('pharynx_mucosa',(.047,.018,.021),.52)
 # Image pixels are used only for the dedicated LOD vertex bake; full is proper UV PBR.
+# Image.pixels returns the file's raw stored (gamma-encoded sRGB) values, not the linear
+# values the shader graph gets from the same texture via an Image Texture node — that node
+# decodes sRGB->linear automatically because the image keeps the default sRGB colorspace
+# (never overridden to Non-Color for suffix=='albedo' in material()). Sampling im.pixels
+# straight into BakedPigment skipped that decode, so the LOD's baked colour came out ~2.4x
+# too bright relative to the full model's textured colour: a rendered-paler LOD. Decode here
+# so the vertex bake matches what the full model's shader actually shows.
+def srgb_to_linear(c):
+ return np.where(c<=.04045,c/12.92,((c+.055)/1.055)**2.4)
 pix={}
 for k in ['body','fin','gnathal','eye','oral']:
- im=image(k+'-albedo.png');pix[k]=(im.size[0],im.size[1],np.array(im.pixels[:]).reshape(im.size[1],im.size[0],4))
+ im=image(k+'-albedo.png');arr=np.array(im.pixels[:]).reshape(im.size[1],im.size[0],4)
+ arr[...,:3]=srgb_to_linear(arr[...,:3]);pix[k]=(im.size[0],im.size[1],arr)
 objects=[]
 def bodyuv(p):
  x,y,z=p;return((y+1.48)/3.48,((math.atan2(z,x)+pi/2)/(2*pi))%1)
@@ -315,6 +325,12 @@ if os.environ.get('DUNK_PREVIEW')!='1':
   ca=o.data.color_attributes.get('Color');ba=o.data.color_attributes.get('BakedPigment')
   if ca and ba:
    for i in range(len(ca.data)):ca.data[i].color=ba.data[i].color
+   # BakedPigment (created after Color) is Blender's active color attribute; leaving both
+   # on the mesh means the DECIMATE modifier below only carries the active one through
+   # collapse and resets the inactive 'Color' layer to its neutral (1,1,1,1) default, so
+   # the LOD ships with no pigment at all (COLOR_0 measured as pure white). Drop it now
+   # that its values are copied, so 'Color' is the only — and so the active — attribute.
+   o.data.color_attributes.remove(ba)
   if len(o.data.polygons)>150 and not o.name.startswith('eye_globe'):
    d=o.modifiers.new('True reduced geometry','DECIMATE');d.ratio=.25;bpy.context.view_layer.objects.active=o;bpy.ops.object.modifier_move_up(modifier=d.name);bpy.ops.object.modifier_apply(modifier=d.name)
  for m in M.values():
