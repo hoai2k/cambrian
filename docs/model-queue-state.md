@@ -392,3 +392,15 @@ Titanichthys candidates. **Next batch, once those report**: Doryaspis V3 (from c
 (ports: integrate.sh → re-apply Grab → check → README → commit, delete `docs/sculpts/<id>`),
 then the Opus-medium deployment verification, then report to the user. Agents were told to apply
 creature by creature so an interruption loses at most one.
+
+**22:10 UTC**: Cambrian Grab (11) shipped and on main. Material transplant by index failed for a
+structural reason — the port rebuilds carry no UVs and the shipped meshes have seam-split vertices
+— so `tools/devonian/transplant-materials.mjs` (kept; conservative, refuses mismatches) only moved
+the eyes. The fix in flight is the other direction: `transplant-positions.mjs` keeps the shipped
+GLB whole and replaces its POSITIONs with the port's deformation, matched through the port's base
+rebuild (index-aligned with the candidate; positions reproduce the shipped ones), then recomputes
+normals; output to `/home/user/devonian-authoring/<id>/sculpt-final/`. **Sculpt ports should always
+finish this way** — the builder rebuild is the *deformation source*, the shipped file the mesh.
+Doryaspis relaunched from `geometry_clay02.py`. Devonian Grab (12) still running. Dunkleosteus
+port is the last item to launch (from its unverified `build_v3.py` set; it too finishes through
+transplant-positions if its materials are not the real ones).
