@@ -164,3 +164,63 @@ h1, h2, h3 { font-family: var(--font-display); margin: 0; }
 /* Matches the game's portrait spinner (src/app/styles.css): only drawn once a thumbnail is slow. */
 .portrait-wait { position: absolute; inset: 0; margin: auto; width: 22px; height: 22px; border-radius: 50%; border: 2px solid rgba(238, 250, 246, .18); border-top-color: var(--foam); animation: portrait-spin .9s linear infinite; pointer-events: none; }
 @keyframes portrait-spin { to { transform: rotate(1turn); } }
+
+/* ---------- sculpt mode ----------
+ * The stage takes the animation row as well and splits into three cells: two drawings on the
+ * left (side above, top below) and the orbit preview on the right. The cells are only layout and
+ * pointer surfaces — the scene renders all three into the one canvas underneath, and each drawing
+ * carries an SVG for its spline controls. The info card gives way to the sculpt panel.
+ */
+.viewer.sculpting .stage { grid-row: 1 / 3; }
+.viewer.sculpting .clips, .viewer.sculpting .info { display: none; }
+.sculpt-stage { grid-column: 2; grid-row: 1 / 3; position: relative; z-index: 5; min-width: 0; min-height: 0; display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); grid-template-rows: minmax(0, 1fr) minmax(0, 1fr); gap: 6px; pointer-events: none; }
+.sculpt-cell { position: relative; min-width: 0; min-height: 0; border: 1px solid var(--line); border-radius: 12px; overflow: hidden; }
+.sculpt-side { grid-column: 1; grid-row: 1; pointer-events: auto; }
+.sculpt-top { grid-column: 1; grid-row: 2; pointer-events: auto; }
+.sculpt-main { grid-column: 2; grid-row: 1 / 3; pointer-events: none; }
+.sculpt-label { position: absolute; left: 10px; top: 8px; z-index: 2; font: 700 10px var(--font-display); letter-spacing: .18em; color: var(--dim); text-transform: uppercase; pointer-events: none; }
+.sculpt-svg { position: absolute; inset: 0; width: 100%; height: 100%; display: block; touch-action: none; cursor: grab; user-select: none; -webkit-user-select: none; }
+.sculpt-svg:active { cursor: grabbing; }
+.sculpt-band { fill: rgba(238, 250, 246, .03); stroke: rgba(238, 250, 246, .12); stroke-width: 1; cursor: pointer; }
+.sculpt-band:hover { fill: rgba(238, 250, 246, .07); }
+.sculpt-band.active { fill: rgba(97, 242, 213, .08); stroke: rgba(97, 242, 213, .45); }
+.sculpt-band-label { fill: var(--dim); font: 600 11px var(--font-body); pointer-events: none; }
+.sculpt-curve { fill: none; stroke-linejoin: round; pointer-events: none; }
+.sculpt-curve.base { stroke: rgba(238, 250, 246, .35); stroke-width: 1; stroke-dasharray: 4 4; }
+.sculpt-curve.edit { stroke: var(--lagoon); stroke-width: 1.6; }
+.sculpt-curve.edit.ventral { stroke: #8fd3ff; }
+.sculpt-point { fill: rgba(6, 22, 28, .9); stroke: var(--lagoon); stroke-width: 1.6; cursor: move; }
+.sculpt-point.ventral { stroke: #8fd3ff; }
+.sculpt-point.changed { fill: var(--ember); }
+.sculpt-point.active { stroke: var(--foam); stroke-width: 2.2; }
+.sculpt-point:hover { stroke: var(--ember); }
+.sculpt-handle-line { stroke: rgba(255, 179, 107, .7); stroke-width: 1; pointer-events: none; }
+.sculpt-handle { fill: rgba(6, 22, 28, .9); stroke: var(--ember); stroke-width: 1.4; cursor: crosshair; }
+.sculpt-handle.pulled { fill: var(--ember); }
+.sculpt-panel { grid-column: 3; grid-row: 1 / 3; position: relative; z-index: 10; background: var(--panel); backdrop-filter: blur(14px); border: 1px solid var(--line); border-radius: 18px; padding: 16px 18px; overflow: auto; display: flex; flex-direction: column; gap: 10px; min-width: 0; }
+.sculpt-head .role { font: 700 10px var(--font-display); letter-spacing: .22em; color: var(--ember); }
+.sculpt-head h2 { font-size: 24px; margin: 4px 0 2px; }
+.sculpt-head h2.long-name { font-size: 18px; }
+.sculpt-panel h3 { font: 700 12px var(--font-display); letter-spacing: .2em; color: var(--ember); margin: 8px 0 0; }
+.sculpt-panel .hint { color: var(--dim); font-size: 12px; margin: 0; }
+.sculpt-actions { display: flex; flex-wrap: wrap; gap: 6px; }
+.sculpt-actions .ghost { padding: 6px 10px; font-size: 12px; }
+.sculpt-regions { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+.sculpt-regions .clip { position: relative; padding: 8px 6px; font-size: 12px; }
+.sculpt-dot { position: absolute; right: 7px; top: 7px; width: 7px; height: 7px; border-radius: 50%; background: var(--ember); }
+.sculpt-station { display: flex; flex-direction: column; gap: 8px; padding-top: 6px; border-top: 1px solid var(--line); }
+.sculpt-station label { display: flex; flex-direction: column; gap: 3px; font-size: 12px; color: var(--mist); padding: 4px 6px; border-radius: 8px; border: 1px solid transparent; }
+.sculpt-station label.active { border-color: rgba(97, 242, 213, .35); background: rgba(97, 242, 213, .06); }
+.sculpt-station input { width: 100%; padding: 6px 8px; border-radius: 8px; border: 1px solid var(--line); background: rgba(6, 22, 28, .72); color: var(--foam); font: 600 13px var(--font-body); font-variant-numeric: tabular-nums; }
+.sculpt-station small { color: var(--dim); font-size: 11px; }
+.link { background: none; border: none; padding: 0; color: var(--lagoon); font-size: 11px; text-decoration: underline; cursor: pointer; }
+.sculpt-foot { margin-top: auto; display: flex; flex-direction: column; gap: 6px; padding-top: 10px; border-top: 1px solid var(--line); }
+.ghost.primary { border-color: var(--lagoon); background: rgba(97, 242, 213, .14); }
+.sculpt-error { color: var(--coral); font-size: 12px; }
+.info-actions { display: flex; flex-wrap: wrap; gap: 6px; }
+@media (max-width: 900px) {
+  .viewer.sculpting .stage, .viewer.sculpting .sculpt-stage { grid-column: 1; grid-row: 2 / 4; }
+  .sculpt-panel { grid-column: 2; grid-row: 2 / 4; }
+  .sculpt-stage { grid-template-columns: minmax(0, 1fr); grid-template-rows: 1fr 1fr 1.2fr; }
+  .sculpt-main { grid-column: 1; grid-row: 3; }
+}
