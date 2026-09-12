@@ -24,6 +24,10 @@ The current request covers 21 individually authored mobile creatures with action
 > to commission. `mode-frenzy.webp` is likewise left over from a mode that was
 > folded into Rise and is no longer requested by any pick screen.
 
+## Triassic (third era)
+
+The Triassic's image and model requests are collected in [`docs/triassic/03-image-and-model-requests.md`](triassic/03-image-and-model-requests.md), tiered by whether they go through Tripo or are built in-house, and stay there until the era is built. Nothing on that page is open here yet.
+
 ## Checking what is outstanding
 
 `run tools/assets-test.ts` walks both eras' own tables — roster, sound library,

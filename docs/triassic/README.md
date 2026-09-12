@@ -25,11 +25,25 @@ does not yet have are called out in [01](01-triassic-design.md#what-the-engine-n
 meter for obligate air-breathers, a per-biome sea-floor depth, and a shore that can hold an
 animal that strikes into the water.
 
+## Open decisions
+
+Three things the documents could not settle and the user should:
+
+1. **Helicoprion.** It has no Triassic record (Permian only; see [research.md](research.md#corrections-that-changed-the-design)).
+   It is on the roster as asked, designed to ship as a **labelled relict**; the honest Triassic
+   alternative, *Fadenia*, takes the same kit. [01 · T05](01-triassic-design.md#t05--helicoprion--the-whorl-a-relict-by-choice).
+2. **The Tripo account**: whether its plan permits commercial use of the output, and whether
+   multi-view input is available. [04](04-tripo-pipeline.md#what-tripo-is-asked-for-and-what-it-is-not).
+3. **A dinosaur on the shore.** Tanystropheus, the animal the "necks that reach in" idea is built
+   on, is not a dinosaur. A *Coelophysis* at the estuary is listed as an optional shore animal if
+   one is wanted. [01 · The shore animals](01-triassic-design.md#the-shore-animals).
+
 ## Resume point
 
-Written in one session on 12 September 2026. If this is being continued: the research notes in
-`research.md` are the compiled output of four parallel searches (sauropterygians and placodonts;
-ichthyosaurs; other reptiles and amphibians; fish, invertebrates and environments). Anything in
-the design marked *to verify* was written before those notes were in and should be checked against
-them. The Tripo licence and multi-view questions in [04](04-tripo-pipeline.md) are open and need
-an answer from whoever holds the account.
+Written in one session on 12 September 2026 and complete as a proposal: all five documents are
+in, and the research behind them is compiled in `research.md` from four parallel literature
+searches (sauropterygians and placodonts; ichthyosaurs; other reptiles and amphibians; fish,
+invertebrates and environments), every subject with sources and confidence labels. The next
+step is not more writing: it is the answers to the three decisions above, then the reference
+boards (A1 in [03](03-image-and-model-requests.md)) and the four pipeline-proving generations
+named at the end of that document.
