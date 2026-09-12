@@ -1,0 +1,270 @@
+{
+  "checks": "finite transforms, normalized weights, root stable, identity-scale removal, unique motion, seamless loops, socket bind alignment, true LOD reduction",
+  "models": [
+    {
+      "file": "stethacanthus.glb",
+      "bytes": 22669060,
+      "vertices": 142153,
+      "triangles": 262388,
+      "bounds": [
+        2.5399227142333984,
+        1.6326143443584442,
+        5.458940386772156
+      ],
+      "bones": 24,
+      "boneNames": [
+        "root",
+        "body",
+        "brush",
+        "pectoral_L",
+        "pectoral_tip_L",
+        "whip_L",
+        "whip_tip_L",
+        "pectoral_R",
+        "pectoral_tip_R",
+        "whip_R",
+        "whip_tip_R",
+        "skull",
+        "gill_L",
+        "gill_R",
+        "jaw",
+        "tail_base",
+        "tail_mid",
+        "pelvic_L",
+        "pelvic_R",
+        "rear_dorsal",
+        "tail_distal",
+        "tail_tip",
+        "caudal",
+        "throat"
+      ],
+      "textures": 27,
+      "sockets": [
+        {
+          "name": "anchor_mouth",
+          "point": [
+            0.0,
+            -0.03300005508597387,
+            1.7019998433387031
+          ]
+        },
+        {
+          "name": "anchor_attack_primary",
+          "point": [
+            0.0,
+            0.030999939969928277,
+            1.707999887285627
+          ]
+        },
+        {
+          "name": "anchor_mouth_inside",
+          "point": [
+            0.0,
+            0.011999963411313298,
+            1.0599999069080313
+          ]
+        }
+      ],
+      "clips": [
+        {
+          "name": "Ability",
+          "duration": 2.4000000953674316,
+          "motion": 38.02,
+          "digest": "21912c5d470a94c84178a10900d9a51a35cc02c0b78a4f85bfd8c0dbb972c17c"
+        },
+        {
+          "name": "Attack",
+          "duration": 0.9999999403953552,
+          "motion": 19.604,
+          "digest": "fb2b916275413887f94bbe0208bbdf84bd9011b53f070e04292a47f8e9b211ff"
+        },
+        {
+          "name": "Bite",
+          "duration": 0.5,
+          "motion": 5.534,
+          "digest": "0ed2780accc4fa05aba4a9f7176cd4a455b8a5d52a3dc2dbc0e3a4674dbd60c5"
+        },
+        {
+          "name": "Death",
+          "duration": 1.600000023841858,
+          "motion": 48.931,
+          "digest": "36544d9bd32a2fdfaf13d4a6f610d8122df00e8c75490bbc4a3181e592e8923c"
+        },
+        {
+          "name": "Dive",
+          "duration": 1.399999976158142,
+          "motion": 21.03,
+          "digest": "8f00145714e55d45a127d8c63c003af37414dfed7b4f456ddce7e876d965a51a"
+        },
+        {
+          "name": "Dodge",
+          "duration": 0.4000000059604645,
+          "motion": 12.068,
+          "digest": "efc713d64bd18b58b39194f6dffbbffb4beb66fe49e90b32a5dd14a08c9fec49"
+        },
+        {
+          "name": "Eat",
+          "duration": 1.600000023841858,
+          "motion": 32.824,
+          "digest": "4f609ccebdafb590e162f7df1b470cec09da78ffa1926f4f67b54466331da45d"
+        },
+        {
+          "name": "Growth",
+          "duration": 1.5,
+          "motion": 15.926,
+          "digest": "c606f761642161d805e805ff3eef93dac1fb1011e1033f5be7fa3d6a4b66de41"
+        },
+        {
+          "name": "Guard",
+          "duration": 0.9999999403953552,
+          "motion": 23.049,
+          "digest": "b0ce6dc7c7f00bffc4162a35ae29329627383186edc91155704e1da226896976"
+        },
+        {
+          "name": "Heavy",
+          "duration": 1.100000023841858,
+          "motion": 27.644,
+          "digest": "4a59be26770ec0b81e272af1f5bb1a39eae497d72c412966096d212dfe6124c9"
+        },
+        {
+          "name": "Hit",
+          "duration": 0.5999999642372131,
+          "motion": 8.376,
+          "digest": "6c2c71731785d4b666150767f8fb10111646edb14022cad5529de38fd1954384"
+        },
+        {
+          "name": "Idle",
+          "duration": 2.4000000953674316,
+          "motion": 41.823,
+          "digest": "d09d334f8a3fa7d62278483d8f78e3a93a01cd16b479f6b9fa8d8ff026f4258c"
+        },
+        {
+          "name": "Parry",
+          "duration": 0.36666667461395264,
+          "motion": 6.895,
+          "digest": "609df9d31cdc353b557d20608ad86edc992d5faee01280ed522b9046cba0c207"
+        },
+        {
+          "name": "Rise",
+          "duration": 1.399999976158142,
+          "motion": 22.295,
+          "digest": "9bf944b6c15ba2fef9bd017cbcfc87bf8dd5c7e6351c16d2289358a71bcb68e0"
+        },
+        {
+          "name": "Stagger",
+          "duration": 1.2000000476837158,
+          "motion": 19.09,
+          "digest": "e35c6c21deb07690226ec8b10d0a663e71b7fb3d6f3c2be36efee75be45e206a"
+        },
+        {
+          "name": "Swim",
+          "duration": 2.4000000953674316,
+          "motion": 64.451,
+          "digest": "42851be654577db221a31f4b68cfef9eccb77ed834f462cc3c3b000f55179ded"
+        },
+        {
+          "name": "TurnLeft",
+          "duration": 1.600000023841858,
+          "motion": 33.543,
+          "digest": "670f43263a6e3c5306a932349bbff70558220b5c80bc1fb58f38d33f934dc375"
+        },
+        {
+          "name": "TurnRight",
+          "duration": 1.600000023841858,
+          "motion": 33.373,
+          "digest": "93fe67fdb2a5d2deb35cb5345b44f57c36a3851432986e4b5ba3e2f319064cc2"
+        }
+      ],
+      "removedIdentityScaleChannels": 432,
+      "sha256": "a56edd2779f26f0e5ef5dd101a0211cdfe50411c521b4da9223fcb2b7cb1d734"
+    },
+    {
+      "file": "stethacanthus.lod1.glb",
+      "bytes": 4057680,
+      "vertices": 45317,
+      "triangles": 78114,
+      "bounds": [
+        2.5399787425994873,
+        1.6326343715190887,
+        5.45898962020874
+      ],
+      "bones": 24,
+      "boneNames": [
+        "root",
+        "body",
+        "brush",
+        "pectoral_L",
+        "pectoral_tip_L",
+        "whip_L",
+        "whip_tip_L",
+        "pectoral_R",
+        "pectoral_tip_R",
+        "whip_R",
+        "whip_tip_R",
+        "skull",
+        "gill_L",
+        "gill_R",
+        "jaw",
+        "tail_base",
+        "tail_mid",
+        "pelvic_L",
+        "pelvic_R",
+        "rear_dorsal",
+        "tail_distal",
+        "tail_tip",
+        "caudal",
+        "throat"
+      ],
+      "textures": 0,
+      "sockets": [
+        {
+          "name": "anchor_mouth",
+          "point": [
+            0.0,
+            -0.03300005508597387,
+            1.7019998433387031
+          ]
+        },
+        {
+          "name": "anchor_attack_primary",
+          "point": [
+            0.0,
+            0.030999939969928277,
+            1.707999887285627
+          ]
+        },
+        {
+          "name": "anchor_mouth_inside",
+          "point": [
+            0.0,
+            0.011999963411313298,
+            1.0599999069080313
+          ]
+        }
+      ],
+      "clips": [
+        {
+          "name": "Death",
+          "duration": 1.600000023841858,
+          "motion": 48.931,
+          "digest": "36544d9bd32a2fdfaf13d4a6f610d8122df00e8c75490bbc4a3181e592e8923c"
+        },
+        {
+          "name": "Idle",
+          "duration": 2.4000000953674316,
+          "motion": 41.823,
+          "digest": "d09d334f8a3fa7d62278483d8f78e3a93a01cd16b479f6b9fa8d8ff026f4258c"
+        },
+        {
+          "name": "Swim",
+          "duration": 2.4000000953674316,
+          "motion": 64.451,
+          "digest": "42851be654577db221a31f4b68cfef9eccb77ed834f462cc3c3b000f55179ded"
+        }
+      ],
+      "removedIdentityScaleChannels": 72,
+      "sha256": "b308a2fbfad112e1c2e175b90e5bbeb1a03f9f4ae201356e16b7d84e7304e99c"
+    }
+  ],
+  "lodTriangleRatio": 0.2977041633001509
+}

@@ -98,3 +98,27 @@ Final GLB SHA-256: `1a5db57c8e55a4a1bbdf7f72c52f30b3277e517eb7c3a26a2858aa576b43
 ## Published package review
 
 The final losslessly packaged model is 15,733,048 bytes full and 2,352,376 bytes reduced, with decoded geometry, weights and animation samples unchanged. Independent `eye-packaged-review.json` reports bind the actual shipped hashes to approximately 80% embedding in both detail levels. The built viewer loaded all 18 actions; paused selection and one-frame stepping passed for each, and the articulated feeding gape was visually inspected without browser errors (`main-viewer-review.json`). Combined main-branch validation passed 416 Devonian checks and all world tests.
+
+## V3 — proportions pass against the reference (12 September 2026)
+
+The queue finding against `docs/reference/Stethacanthus.jpg` was that V2 read as a tube with a
+brush on it: the head and trunk were too shallow, the pectorals too narrow, the brush a slender stalk
+and the caudal fin nearly symmetrical. `build_v3.py` is `build_v2.py` with the shape study ported
+onto its tables: a deeper head and trunk, pectoral tips out to x = ±1.27, a broad-rooted brush with a
+wide crown, and a heterocercal caudal whose upper lobe reaches z = 1.00. The spine-brush stays in
+the body's own colour family. Everything that reads `controls` (gill clefts, the cranial denticle
+field) followed the new surface; the oral-cavity cutter, the cladodont tooth row and the eye seed
+were moved by hand to the same fractional seat on the bigger sections, and the mouth and attack
+anchors moved forward with the snout (`NOSE_SHIFT`). Eye radii went to ×0.72 with the centre held,
+which lifts the embedding audit from ~80% to 91.4% / 91.2% (full), 91.4% / 91.1% (LOD).
+
+Two toolchain effects surfaced under Blender 5.2.1 on Linux, neither a shape change. The EXACT
+boolean left a branched seam where the oral cutter grazes the head cap at the new numbers, fixed by
+a `remove_doubles` weld scoped to y ∈ [−1.85, −1.55] plus `dissolve_degenerate` (mesh validates
+clean, no non-2-face edges). And the exporter keeps a constant one-ULP scale track on `tail_tip`,
+which `check.mjs` refuses; `finalize_v3.py` strips those identity scale tracks and the root channels
+in place, audits the decoded geometry, rig, clips and anchor sockets against the candidate's
+`anchors.json`, and writes `validation_v3.json`. The order is `build_v3.py` → `finalize_v3.py` →
+`package.mjs` → `portraits_v3.py`; `export_audit_v3.mjs` is the audit-geometry export for the eye
+audit. Packaged: 15,687,012 bytes full (262,388 tris, 18 clips), 2,304,708 bytes LOD (78,114 tris,
+3 clips), exact round-trip. Comparison sheet: the model queue state doc records where it lives.

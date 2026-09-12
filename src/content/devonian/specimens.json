@@ -259,9 +259,9 @@
     "name": "Stethacanthus",
     "species": "Stethacanthus sp. (CMNH 8988-informed reconstruction)",
     "category": "creature",
-    "modelStatus": "preview",
+    "modelStatus": "final",
     "provenance": "Late Devonian, upper Famennian Cleveland Shale, Ohio, USA",
-    "description": "A short-headed early chondrichthyan with opposing cranial and dorsal crown denticles, a supported spine-brush, slender metapterygial fin extensions, and an epicercal caudal axis.",
+    "description": "A deep-headed, deep-bodied early chondrichthyan with opposing cranial and dorsal crown denticles, a broad-rooted supported spine-brush, slender metapterygial fin extensions, and a strongly heterocercal caudal axis.",
     "model": "assets/devonian/creatures/stethacanthus.glb",
     "lod": "assets/devonian/creatures/stethacanthus.lod1.glb",
     "image": "assets/devonian/creatures/stethacanthus.thumb.png",
@@ -282,7 +282,8 @@
       "Devonian specimen CMNH 8988 preserves spine-brush and associated teeth. Species assignment to S. altonensis is questioned in Ginter & Sun 2007; this is not Akmonistion zangerli.",
       "Whole-animal proportions, exact brush crown width, fin-whip length, living pigmentation, soft-tissue lining and action timing are comparative artistic reconstruction, not measurements of a complete specimen.",
       "Complex-bearing male configuration is comparative; the sex of CMNH 8988 is not established here. No brush inflation or mobile denticles.",
-      "Representative 0.7m illustrative individual, not a measured fossil total length or claimed species maximum."
+      "Representative 0.7m illustrative individual, not a measured fossil total length or claimed species maximum.",
+      "V3: shape study ported onto the V2 builder for shark-like head/body/fin/tail proportions and a dorsal spine-brush in the body's own colour family (queue finding against docs/reference/Stethacanthus.jpg). Geometry only; the anatomical sourcing above is unchanged."
     ]
   },
   {
