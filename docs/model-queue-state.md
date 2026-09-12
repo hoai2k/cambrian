@@ -404,3 +404,16 @@ finish this way** — the builder rebuild is the *deformation source*, the shipp
 Doryaspis relaunched from `geometry_clay02.py`. Devonian Grab (12) still running. Dunkleosteus
 port is the last item to launch (from its unverified `build_v3.py` set; it too finishes through
 transplant-positions if its materials are not the real ones).
+
+**22:25 UTC**: Devonian Grab done and on main; every shipped model in both eras carries Grab
+(Eldredgeops' articulated pass restored on top, `2199247`). Three agents running: position
+transplant (Gemuendina + Titanichthys finals at `/home/user/devonian-authoring/<id>/sculpt-final/`,
+judge sheets `scratchpad/ports/<id>-final-sheet.png`), Doryaspis V3 (from `geometry_clay02.py`,
+candidate at `/home/user/devonian-authoring/doryaspis/v3-candidate/`), and Dunkleosteus
+verification (Opus; the 13:53 `sculpt-candidate` already carries the real V2 textures, so it
+measures, checks, renders `ports/dunkleosteus-sculpt-sheet.png` and integrates if it passes).
+After each reports: integrate.sh → `apply.mjs <id>` → `check.mjs` → README → commit (delete
+`docs/sculpts/<id>-sculpt.json`) → merge to main. Then the Opus-medium deployment verification
+over every `pages.yml` step, then report to the user (Coccosteus still blocked on the Mac files).
+Never commit `tools/creatures/motion/.scratch/`, the Doryaspis clay02/linux files or the
+Dunkleosteus V3 set until verified.

@@ -8,6 +8,6 @@ its port, with the port recorded in the creature's README.
 
 | File | Asks for | Status |
 | --- | --- | --- |
-| `gemuendina-sculpt.json` | head dome lowered 14–17% over stations 15–19, nose thinner in height and 21% wider, nose shifted +0.08 | port in progress (`face-v4/candidate_06.py`) |
+| ~~`gemuendina-sculpt.json`~~ | head dome lowered 14–17% over stations 15–19, nose thinner in height and 21% wider, nose shifted +0.08 | shipped 12 September (`face-v4/candidate_06.py` + `transplant-positions.mjs`; file removed) |
 | `titanichthys-sculpt.json` | snout longer (+0.23 at the nose, +0.14 behind it), narrower (nose width −78%, fore body −13%/−7%), lower | port in progress (`sculpt-port/`) |
 | `dunkleosteus-sculpt.json` | crown raised +3/+13/+25% over stations 16–18, nose lowered 12.5%, small shifts, two pulled tangents | port in progress (`build_v3.py`) |
