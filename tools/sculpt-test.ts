@@ -9,7 +9,8 @@
  */
 import assert from 'node:assert/strict';
 import {
-  autoSlope, evaluate, exportDoc, isIdentity, measure, remapAxis, resetStations, setShift, setTangent, setValue, warp,
+  autoSlope, evaluate, exportDoc, isIdentity, makeProbe, measure, moveEyesOnCrown, moveEyesOnFlank, remapAxis, resetFeatures,
+  resetStations, setEyeScale, setMouth, setShift, setTangent, setValue, warp,
   type SculptDoc,
 } from '../src/viewer/sculpt/profile';
 import { History } from '../src/viewer/sculpt/history';
@@ -142,4 +143,73 @@ assert.ok(!h.canRedo);
 h.undo(); h.push(shifted);
 assert.ok(!h.canRedo, 'a new step after undo drops the redo branch');
 
-console.log('PASS: sculpt document — measuring, identity warp, local dorsal/ventral/width edits, monotone axis shifts, tangents, export, history');
+// ---- eyes and mouth ----
+// Two eye spheres seated in the flanks near the nose, half sunk into the surface.
+function sphere(cx: number, cy: number, cz: number, r: number): Float32Array {
+  const out: number[] = [];
+  for (let i = 0; i <= 12; i++) for (let k = 0; k < 16; k++) {
+    const th = Math.PI * (i / 12), ph = 2 * Math.PI * (k / 16);
+    out.push(cx + r * Math.sin(th) * Math.cos(ph), cy + r * Math.sin(th) * Math.sin(ph), cz + r * Math.cos(th));
+  }
+  return new Float32Array(out);
+}
+const eyeZ = 2.5, eyeR = .12;
+const flankAt = .6 * (1 - (eyeZ / 4) ** 2); // the spindle's half-width at the eye station
+const eyeX = flankAt - eyeR * .4;            // centre a little inside the surface
+const eyes = [sphere(eyeX, .1, eyeZ, eyeR), sphere(-eyeX, .1, eyeZ, eyeR)];
+const withFeatures = measure({ chunks: [positions], eyes, mouth: [0, 0, 4] }, meta);
+assert.ok(withFeatures.eyes, 'eye geometry is found');
+assert.ok(withFeatures.eyes!.mirrored, 'both eyes found');
+assert.ok(Math.abs(withFeatures.eyes!.base.axis - eyeZ) < 1e-6 && Math.abs(withFeatures.eyes!.base.lateral - eyeX) < 1e-6, 'eye centre measured');
+assert.ok(Math.abs(withFeatures.eyes!.radius - eyeR) < 1e-6, 'eye radius measured');
+assert.ok(withFeatures.eyes!.depthLateral > 0 && withFeatures.eyes!.depthLateral < eyeR, `the eye sits partly inside the flank: depth ${withFeatures.eyes!.depthLateral}`);
+assert.ok(withFeatures.mouth, 'a mouth socket makes a mouth feature');
+assert.ok(isIdentity(withFeatures), 'features at rest are not an edit');
+assert.equal(exportDoc(withFeatures).features.eyes!.changed, false);
+
+const probe = makeProbe([positions], withFeatures.frame, withFeatures.bounds.lateralMid);
+// Move the eyes back along the flank to z = 2.0, where the body is wider: the seat follows the surface.
+const movedBack = moveEyesOnFlank(withFeatures, probe, 2.0, .1);
+assert.ok(!isIdentity(movedBack));
+const e1 = movedBack.eyes!;
+assert.equal(e1.edit.axis, 2.0);
+const flankThere = .6 * (1 - (2.0 / 4) ** 2);
+assert.ok(Math.abs(e1.edit.lateral - (flankThere - e1.depthLateral)) < .03, `eye re-seated on the wider flank: ${e1.edit.lateral} vs ${flankThere - e1.depthLateral}`);
+assert.ok(e1.edit.lateral > e1.base.lateral, 'moving back onto a wider body moves the eye outward');
+const wE = warp(movedBack);
+// The eye's own vertex moves by the full delta; a body vertex far from the eye does not move.
+wE(eyeX, .1 + eyeR, eyeZ, out, true);
+assert.ok(Math.abs(out[2] - 2.0) < 1e-6 && Math.abs(out[0] - e1.edit.lateral) < 1e-6, `eye vertex follows the eye: ${out} vs ${JSON.stringify(e1.edit)}`);
+wE(0, 0, -2, out, false);
+assert.ok(Math.abs(out[2] + 2) < 1e-6 && Math.abs(out[1]) < 1e-6, 'the tail is untouched by an eye move');
+// The mirrored eye moves the same way on its side.
+wE(-eyeX, .1, eyeZ, out, true);
+assert.ok(Math.abs(out[0] + e1.edit.lateral) < 1e-6, 'the left eye mirrors the right');
+
+// Across the crown: closer to the midline, the height is solved from the top surface.
+const closer = moveEyesOnCrown(withFeatures, probe, eyeZ, eyeX * .5);
+assert.ok(Math.abs(closer.eyes!.edit.lateral - eyeX * .5) < 1e-6);
+assert.ok(closer.eyes!.edit.up > withFeatures.eyes!.base.up, 'nearer the midline the crown is higher, so the eye rises with it');
+
+// Scale: the globe grows about its centre, the skin at the reach edge does not.
+const bigger = setEyeScale(withFeatures, 1.5);
+const wS = warp(bigger);
+wS(eyeX, .1 + eyeR, eyeZ, out, true);
+assert.ok(Math.abs(out[1] - (.1 + eyeR * 1.5)) < 1e-6, `eye vertex scales about the centre: ${out[1]}`);
+wS(eyeX, .1 + eyeR * bigger.eyes!.reach * 1.01, eyeZ, out, false);
+assert.ok(Math.abs(out[1] - (.1 + eyeR * bigger.eyes!.reach * 1.01)) < 1e-6, 'skin beyond the reach is untouched');
+
+// Mouth: widening scales lateral offsets near the socket and nothing at the tail.
+const wideMouth = setMouth(withFeatures, { width: 1.5, radius: .5 });
+const wM = warp(wideMouth);
+const m = wideMouth.mouth!;
+wM(.05, m.base.up, m.base.axis, out, false);
+// Just inside the region the falloff is nearly one, so the offset grows by almost the full 50%.
+assert.ok(out[0] > .072 && out[0] < .075, `a point beside the mouth widens: ${out[0]}`);
+wM(.05, 0, -2, out, false);
+assert.ok(Math.abs(out[0] - .05) < 1e-6, 'the tail does not');
+assert.equal(exportDoc(wideMouth).features.mouth!.width, 1.5);
+assert.ok(isIdentity(resetFeatures(setMouth(bigger, { width: 2, edit: { axis: 3 } }))), 'reset features restores rest');
+assert.ok(isIdentity(resetStations(setMouth(setValue(bigger, 3, 'width', 9), { height: 2 }))), 'reset all covers features too');
+
+console.log('PASS: sculpt document — measuring, identity warp, local dorsal/ventral/width edits, monotone axis shifts, tangents, export, history, eyes seated on the flank and crown, eye scale, mouth width');

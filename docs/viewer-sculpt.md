@@ -37,6 +37,32 @@ as points on the curves in both drawings.
 Undo and redo: ⌘/Ctrl+Z and ⇧⌘/Ctrl+Z (or Ctrl+Y); one drag is one step. **Reset region** and
 **Reset all** put stations back to what was measured.
 
+## Eyes and mouth
+
+Two things on a body are not stations: the eyes and the mouth. They appear under **Features** when
+the model has them — eye geometry is any mesh, material or bone named for the eye; the mouth is
+the model's `anchor_mouth` socket.
+
+- **Eyes** move as a pair and stay in the skin. Drag the eye on the **side** view and it slides
+  along the flank: you set where it is along the body and how high, and the editor re-seats it
+  laterally so its centre keeps the same depth inside the surface it was measured against. Drag it
+  on the **top** view to bring the pair closer together or further apart across the crown: you set
+  the station and the distance from the midline, and the height is solved from the top surface
+  there. The small square on the active eye's rim resizes both eyes about their centres. The skin
+  within *reach* radii (2.2 by default) follows the eye with a smooth falloff, so a socket or an
+  orbital rim moves and scales with it; the panel has the numbers and the reach.
+- **Mouth** is a region of *radius × reach* around the socket (radius defaults to half the body's
+  height at that station). On the top view drag an end of its bar to widen it; on the side view the
+  bar deepens it; drag the marker to move it. What changes is whatever the model has there — a
+  terminal slit widens, a jaw line stretches — which is as much as a mesh can say about a mouth
+  without knowing how it was built, and enough to show the builder what is wanted.
+
+## Original and edited
+
+The **Edited / Original** toggle (or the **O** key) swaps the preview and both drawings' renders
+between the sculpt and the shipped body, so a change can be judged against what it replaces. The
+drawings keep showing the shipped lines dashed under the edited ones either way.
+
 Nothing is saved. The edit lives in the page for the session — go back to **View** and every
 animation plays on the edited body; switch to the reduced model and the same edit is applied to
 it — but reloading returns to what the codebase ships. The URL keeps only which specimen (and
@@ -75,6 +101,11 @@ envelope, so they scale with the station they stand on. `npm run sculpt` guards 
 }
 ```
 
+`features.eyes` carries the eye centre (positive-lateral side; the other mirrors it) at rest and as
+edited, the delta, the measured radius, the scale, the reach, and the seat depths it was measured
+with; `features.mouth` the socket, its delta, the region radius and reach, and the width and
+height factors. Each says whether it changed.
+
 Everything is in the model's own root frame, unscaled — the same frame the GLB is exported in.
 `frame` says which axis the body runs along, which end the head is at (`forward: 1` means the
 high end) and what is up. Each station carries the shipped and edited dorsal, ventral and width,
@@ -87,7 +118,9 @@ Give the file to the assistant with the creature named. The port is a change to 
 profile table — the rows of station, width, height above and below the axis that every builder
 lofts from — never to the shipped GLB: a `percent` on `dorsal` is a scale on that station's upper
 half-height, on `ventral` its lower, on `width` its half-width; a `shift` moves the station along
-the body; a pulled `tangent` becomes the spline's tangent at that row. The builder's own
+the body; a pulled `tangent` becomes the spline's tangent at that row. An eye `delta` and `scale` go
+into the builder's eye placement (its centre and radii, in the builder's frame) with the socket
+or orbit it cuts; a mouth `width`/`height` scales the oral cutter or lip rows about the socket. The builder's own
 coordinate frame differs from the GLB's (Blender is z-up and its exporter maps y to −z), so the
 port converts through `frame`, and the rebuilt creature goes through the usual pipeline
 (`docs/creature-intake.md`, or the Devonian package/check/audit path) and back into the viewer to
