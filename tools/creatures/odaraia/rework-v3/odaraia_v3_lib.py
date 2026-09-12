@@ -448,8 +448,14 @@ CLIPS = {
     'Idle': 2.4, 'Swim': 1.4, 'TurnLeft': 1.2, 'TurnRight': 1.2, 'Rise': 1.3, 'Dive': 1.3,
     'Dodge': .8, 'Guard': 1.6, 'Parry': .85, 'Attack': 1.3, 'Bite': .70, 'Heavy': 1.8,
     'Ability': 2.0, 'Eat': 3.0, 'Hit': .65, 'Stagger': 1.4, 'Moult': 3.2, 'Death': 2.8,
+    'Grab': .9,
 }
-LOOPS = {'Idle', 'Swim', 'Guard', 'Eat', 'Ability', 'Moult', 'TurnLeft', 'TurnRight', 'Rise', 'Dive'}
+LOOPS = {'Idle', 'Swim', 'Guard', 'Eat', 'Ability', 'Moult', 'TurnLeft', 'TurnRight', 'Rise', 'Dive',
+         'Grab'}
+#: Grab holds Eat's secured carry (between the .36 "secured" and .52 "elevated carry" stations)
+#: as a loop: the runtime plays it while a mouthful or a ride is held and as the one-shot on the
+#: grab itself (src/render/creature.ts), and every roster model carries it.
+GRAB_STATION = .40
 FPS = 24
 #: Attack / Eat evidence stations required by the production plan.
 ATTACK_STATIONS = (0.0, .18, .42, .50, .60, .83, 1.0)

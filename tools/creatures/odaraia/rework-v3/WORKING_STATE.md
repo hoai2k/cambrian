@@ -67,3 +67,19 @@ Root re-inspected01 dark/light oblique and frontal images. Reduced shell/eye mir
 
 ## 8 September — material02 coarse appearance accepted
 Six actual dark/light renders complete and root-inspected. Cuticle glare/pigment direction accepted for production development, not final model. Output manifest eabb28c993294e62c3bbdf47a122caf2116a56acd97ba59fc60e19848a5a3139; geometry b4086bbddf3bfb5a6551964df927f3a69fa8bbf79a2a1f405f23053a0df0023f unchanged. root-review-material02.md records residual eye-edge highlight and rigid limb-fan concern. Next production rig/18actions/baking/fullLOD/anchors/real alpha sorting, then eye/geometry audits. No new public assets.
+
+## 12 September 2026 — V3 shipped
+
+Clay02/material02 re-derived on Linux (`*-linux.py`; material02's geometry hash matched the accepted
+`b4086bbd…` exactly). Production on `production-plan03.md`: `odaraia_v3_lib.py` (recovered curves,
+406-bone table, controlled weights, clip table), `perform_v3.py` (every clip a pure function of
+normalised time), `rig_v3.py` (stage 1 + kinematic evidence, `evidence_v3.*`), `actions_v3.py`
+(bake, 24 fps, key-reduced), `lod_v3.py`, `export_v3.py`, `validate_v3.py` (271 checks), then
+`shell_alpha_v3.py` (vertex alpha a → a^0.6 so the carapace reads as a shell under the runtime's
+plain alpha blend) and `integrate_v3.sh` (package, sockets, portraits via `studio_render_v3.py`,
+cards, sizes, queue). Grab was added after the first export: every roster model carries it, and the
+runtime loops it while a hold or a ride is kept — it is Eat's secured carry held at `GRAB_STATION`
+with one squeeze per cycle. Shipped: 130,184 / 49,878 tris, 19 clips full / 3 LOD, 16 sockets,
+`cambrianFeeding` aperture .045 / pickup .18. The renderer's translucency pass needed two fixes for
+a shell over a solid body (`src/render/translucency.ts`). Queue entry removed; the Cambrian roster
+has no outstanding model work.
