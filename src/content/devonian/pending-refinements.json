@@ -197,6 +197,6 @@
     "status": "pending",
     "scope": "individual-refinement",
     "model": true,
-    "reason": "Focused V4 head and sharp sculpted gnathals accepted with working jaws/interior,18full/LODclips and173pose zero-contact checks. Broader preview remains: reduced-model color-space/material polish (paler than full) and controller/art review. Preserved V2 and all face studies."
+    "reason": "Focused V4 head and sharp sculpted gnathals accepted with working jaws/interior, 18 full/LOD clips and 173 pose zero-contact checks. 12 September: the reduced-model colour mismatch was a builder regression (decimation wiped the inactive colour attribute; the bake skipped the sRGB decode) and is fixed in build_v2.py; the shipped LOD already matches the full model within 0.3%. What remains is the user's own look at the animal."
   }
 ]
