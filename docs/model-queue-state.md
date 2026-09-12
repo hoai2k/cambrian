@@ -15,13 +15,13 @@ to `main`, so a session that runs out can be picked up from here without the con
 | Step | Status | Where it stands |
 | --- | --- | --- |
 | F triage (8 no-reference creatures) | **done** | 3 cleared, 2 small, 3 promoted — see below |
-| Cheirolepis | **V3 fins/face reopened** — see Face pass below | `build_v3.py` — package PASS, check PASS, eye audit 82.5/82.3 (V2 80.1/79.9). Comparison sheet sent. On yes: point `build.py` at v3, package into public/, regenerate validation.json, viewer look |
+| Cheirolepis | **shipped V3** (face pass 4, seated fins) | `build_v3.py` — package PASS, check PASS, eye audit 82.5/82.3 (V2 80.1/79.9). Comparison sheet sent. On yes: point `build.py` at v3, package into public/, regenerate validation.json, viewer look |
 | F small fixes (eldredgeops rig, manticoceras umbilicus) | **done — user approved 12 Sep, integrated, badges cleared** | Both Medium (Sonnet) jobs delivered: manticoceras `build.py` INVOL=.85 (umbilicus 30%→9.4%, aperture/anchors unchanged; INVOL=.53 reproduces the shipped shell exactly); eldredgeops `build_v3.py` blends tergite_01's front rows onto the cephalon (gap closed; antenna tips at the rolled peak left open — a choreography redesign, not a value). Both package+check PASS on candidates. Not in public/: integration into shipped assets needs the user's go, and this session's auto-mode blocks writes to public/assets anyway. Candidates rebuild in about a minute from the committed builders; eldredgeops' `validate.py` is hardcoded to v2/candidate and needs its path parameterised before its v3 can go through the normal finish |
-| B (gemuendina, dunkleosteus) | not started | |
-| A (cladoselache, tiktaalik) | not started | |
-| D resume reads | not started | |
-| C (onychodus, rhinodipterus, nahecaris) | not started | |
-| E (odaraia) | not started | |
+| B (gemuendina, dunkleosteus) | **done** | accepted as published; Dunkleosteus LOD builder fix in `build_v2.py` |
+| A (acanthostega, jaekelopterus, palaeoisopus, cladoselache, tiktaalik) | **done — all shipped** | Acanthostega V2, Jaekelopterus V2, Palaeoisopus V2, Cladoselache V3, Tiktaalik V3 |
+| D (titanichthys, gemuendina, coccosteus, doryaspis, bothriolepis, stethacanthus) | 3 done, 1 in flight, 2 blocked | Titanichthys/Gemuendina accepted; **Stethacanthus V3 shipped**; Bothriolepis M01–M04 re-derived here (diagnostic pending); Coccosteus and Doryaspis wait on the user |
+| C (onychodus, rhinodipterus, nahecaris) | **done — all shipped** | Onychodus V2, Rhinodipterus V3, Nahecaris V2 |
+| E (odaraia) | production in flight | clay02/material02 re-derived here (geometry hash matches the accepted Mac candidate); rig/actions/export agent running on `production-plan03.md` |
 
 ## F triage
 
@@ -76,8 +76,8 @@ stay attached under tail bends.
 | gemuendina | face-v4 candidate05 accepted and published (`face-v4/TERMINAL_SNOUT_STATE.md`) | none — user has not yet looked | LOD chin/cheek creases, pigment; show the user, clear on a yes |
 | coccosteus | candidate07 full/LOD surface PASS, not packaged (`rework-v3/HANDOFF-CANDIDATE07-PAUSE.md`) | paused by user; steps 1–3 (oral/eye sweep recipe → playback/LOD-switch check → package) not run | ~3, mostly Low/Medium |
 | doryaspis | clay01 reviewed, **HOLD** (`rework-v3/root-review-clay01.md`) | the user's "mouth below the snout" vs the primary reconstruction's mouth above the pseudorostrum — a creative call the user must make | clay02 → materials → rig → audits → package |
-| bothriolepis | material04: oral fix accepted, appearance HOLD (`rework-v3/review-material04-and-next-direction.md`) | forehead/nuchal shading defect; next is a read-only close-up diagnostic on the M04 blend, then M05 | diagnostic → M05 → rig/actions → audits → package |
-| stethacanthus | not started (no rework-v3) | — | brief → clay → material → rig → audits → package |
+| bothriolepis | material04 re-derived on Linux 12 Sep (`rework-v3/build_material0N-linux.py`, verified by value — `.blend` hashes do not reproduce across saves) | forehead/nuchal shading defect; close-up diagnostic running | diagnostic → M05 → rig/actions → audits → package |
+| stethacanthus | **shipped V3** 12 Sep (`build_v3.py` + `finalize_v3.py`) | — | — |
 
 All handoffs use Mac paths (`/Applications/Blender.app/...`, `/Users/hoai/.../expansion-repo`); rewrite to `/opt/blender/blender` and `/home/user/cambrian`. Every `../devonian-authoring/...` output directory they cite does not exist here and must be re-derived, never assumed. Frozen candidate directories are immutable.
 
@@ -149,3 +149,54 @@ defaults to v2 for palaeoisopus; the others document it in their README).
 
 Still open after these: Stethacanthus rework (not started), Bothriolepis M05, Odaraia; blocked
 on the user: Coccosteus (evidence files), Doryaspis (mouth call).
+
+## 12 September, night — groups A and C and Stethacanthus shipped; the two re-derivations
+
+Shipped to public and badge cleared, each with a README section, packaged losslessly, structural
+intake and the catalogue/eras/devonian checks passing: **Acanthostega V2** (`anatomy_v2.py`,
+`ACA_ANATOMY` defaults to v2; tail fin core+web+rays down the tail, flat belly, fuller limbs;
+pose-attachment selector `.10<|x|<.32` so it tests the limb roots rather than the ray cores),
+**Tiktaalik V3** (`anatomy_v3.py`/`build_v3.py`/`materials_v3.py`; oral tube front ring reads
+`SEC[0][1]` so it follows the new snout), **Onychodus V2** (`build_v2.py`; tooth whorl at
+`(±.105,-2.28,.070)`, tusks `[.17,.20,.19,.16]`, eye 73%), **Rhinodipterus V3** (`build-v3.py`,
+eye inset .036 — .058 buried the globe — audit 93.4%; `finalize-v3.py` must run before packaging),
+**Nahecaris V2** (`build_v2.py`, abdomen a straight overlapping chain that the rig curves;
+portraits from `portraits_v2.py`), **Stethacanthus V3** (`build_v3.py`; deeper head and trunk,
+pectoral tips at x=±1.27, broad-rooted brush, heterocercal caudal to z=1.00; eye 91.4/91.2;
+`finalize_v3.py` then `package.mjs` then `portraits_v3.py`). Twelve model badges cleared this
+pass in all; `pending-refinements.json` now carries only Coccosteus, Doryaspis, Bothriolepis
+(Devonian) and Odaraia (Cambrian) as `model: true`.
+
+**Blender 5.2.1 exporter artifact, seen three times** (Jaekelopterus, Rhinodipterus, Stethacanthus):
+`export_optimize_animation_keep_anim_armature` defaults on and keeps a constant per-bone scale
+track that can be one float32 ULP off identity (Stethacanthus `tail_tip` = `(1, 0.99999994, 1)`),
+and `check.mjs` refuses it as a non-identity scale. Either export with that option `False` or run
+a finalize script that strips identity scale tracks and root channels (the rhinodipterus /
+stethacanthus `finalize*` scripts are the pattern). Rebuilding an untouched v2 builder here
+reproduces the artifact, so it is the toolchain, not the port. Similarly the EXACT boolean can
+leave a branched seam where a cutter grazes a cap; a `remove_doubles` scoped to that band fixes it.
+
+**Odaraia**: clay02 and material02 re-derived on Linux (`rework-v3/*-linux.py` wrappers, frozen
+input hashes verified; the clay02 `.blend` SHA differs across machines as expected, but
+material02's own geometry hash is bit-identical to the accepted `b4086bbd…`). The re-derived scene
+is `/home/user/expansion-authoring/odaraia-rework/material02/odaraia-material02.blend`; review
+sheet in the session scratchpad `odar/odaraia-review-sheet.png`. Production (rig ≈406 bones,
+18 clips, bakes, LOD, export to `/home/user/expansion-authoring/odaraia-rework/v3-candidate/`) is
+running as an agent on `production-plan03.md`; the parent then runs `package-expansion.mjs`,
+`add-anchors.mjs`, `docs/creature-intake.md`, and does the renderer work the plan names
+(`cambrianFeeding` extras rather than a species case in `FEEDING_PERFORMANCE`; shell
+transparency through `settleTranslucency()` in `src/render/translucency.ts`). If the session dies
+mid-way, the agent's files are `rework-v3/rig_v3.py`, `evidence_v3.*`, `validate_v3.py`,
+`anchors_v3.json`; check which exist and resume from the last one.
+
+**Bothriolepis**: material01–04 re-derived through `rework-v3/build_material0N-linux.py`, copies of
+the frozen scripts with the prior-stage `.blend` hash constant replaced and each stage verified by
+value (its own invariants) rather than by hash. The M04 close-up diagnostic is running; on its
+report the parent judges the forehead/nuchal shading and writes the M05 brief.
+
+Blocked on the user, unchanged: **Coccosteus** (candidate07's two evidence files exist only on the
+Mac — drop the two GLBs into the repo to unblock, see `rework-v3/RESUME-CANDIDATE07-BLOCKED.md`),
+**Doryaspis** (the mouth-position call in `rework-v3/root-review-clay01.md`).
+
+Comparison sheets from this pass live in the session scratchpad (`*-port/*sheet.png`) and die
+with it; the shipped portraits in `public/assets/devonian/creatures/` are the durable record.
