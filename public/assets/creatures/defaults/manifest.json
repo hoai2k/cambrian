@@ -156,15 +156,15 @@
   "odaraia": {
     "select": {
       "path": "assets/creatures/defaults/odaraia.select.png",
-      "sha256": "95db43432085bc173c95d8e0671afafea467b164b6fed3fa155c644606e0abf0"
+      "sha256": "40953c49f5f9cbc49d8514536d6d279a9fe6783f9dcba0bfe730037d81bf516d"
     },
     "card": {
       "path": "assets/creatures/defaults/odaraia.card.png",
-      "sha256": "ff48337427df4bed113af75c1b5af317f27a82c2cb83d0d2bc86b82a0a8ee931"
+      "sha256": "5a2d8729ca2f47cab3fbf6d20c6d5d75dfca07a33aff011a5455865447fdb4aa"
     },
     "thumb": {
       "path": "assets/creatures/defaults/odaraia.thumb.png",
-      "sha256": "ede4a2c2b52c2a8efb3314536f2a250061f7d9f8c9a74518834089a975cbdc90"
+      "sha256": "dc4c062e1c8f0b37ff1acb646fc33fb3df966434aa45ee5c7ed020aab238cd35"
     }
   },
   "ottoia": {
