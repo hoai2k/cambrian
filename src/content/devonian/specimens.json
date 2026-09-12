@@ -335,7 +335,7 @@
     "name": "Rhinodipterus",
     "species": "Rhinodipterus kimberleyensis",
     "category": "creature",
-    "modelStatus": "preview",
+    "modelStatus": "final",
     "provenance": "Late Devonian, Gogo Formation, Western Australia",
     "description": "Long-snouted marine lungfish with a narrow mandibular symphysis, small lateral eyes, rounded radial tooth plates, cosmine skull roof and comparative lobed fins with two posterior dorsals.",
     "model": "assets/devonian/creatures/rhinodipterus.glb",

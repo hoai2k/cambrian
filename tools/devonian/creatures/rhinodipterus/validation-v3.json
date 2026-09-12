@@ -3,7 +3,7 @@
   "models": [
     {
       "file": "rhinodipterus.glb",
-      "bytes": 14875072,
+      "bytes": 14875076,
       "vertices": 110756,
       "triangles": 216511,
       "bounds": [
@@ -173,13 +173,13 @@
         }
       ],
       "removedIdentityScaleChannels": 378,
-      "sha256": "4bcae321d9271842f38730f2f03dc1afe1136e6a84963f98361d1d13296ce1ee"
+      "sha256": "233e3b2f41a89355a1a731570667a8c2c029f01232876b81d9aaaf5f430e1a8d"
     },
     {
       "file": "rhinodipterus.lod1.glb",
-      "bytes": 2281240,
-      "vertices": 30156,
-      "triangles": 57707,
+      "bytes": 2285520,
+      "vertices": 30222,
+      "triangles": 57761,
       "bounds": [
         1.8200000524520874,
         1.0848772525787354,
@@ -257,8 +257,8 @@
         }
       ],
       "removedIdentityScaleChannels": 63,
-      "sha256": "d7965571ace394e81365d42db0d2648e18b248f06aa72833e2f39d588e71eee5"
+      "sha256": "b620152df82818791d73fab20dae1147776de020e5d7b229dcda44a0d1e4747d"
     }
   ],
-  "lodTriangleRatio": 0.2665314926262407
+  "lodTriangleRatio": 0.26678090258693554
 }
