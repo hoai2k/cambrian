@@ -3,7 +3,9 @@
 User-authored sculpts exported from the viewer's sculpt mode (`docs/viewer-sculpt.md`). Each is a
 target for its creature's builder: port it into the profile rows, rebuild, and check the candidate
 with `npm run sculpt:measure -- <candidate.glb> docs/sculpts/<id>-sculpt.json` (deviation within
-±3% at the changed stations, ±1% elsewhere). A file leaves this directory in the commit that ships
+±3% at the changed stations, ±1% elsewhere; when the port lengthens the body the grid moves off
+the sculpt's, so check the unchanged stations with `--against <the shipped glb>` instead, which
+measures the shipped model's own envelope at the candidate's stations). A file leaves this directory in the commit that ships
 its port, with the port recorded in the creature's README.
 
 | File | Asks for | Status |
