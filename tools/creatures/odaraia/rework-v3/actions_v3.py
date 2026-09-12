@@ -1,4 +1,4 @@
-"""Odaraia V3 stage 2a — bake the eighteen actions onto the stage 1 rig.
+"""Odaraia V3 stage 2a — bake the nineteen actions (eighteen plus Grab) onto the stage 1 rig.
 
     /opt/blender/blender -b --factory-startup --python actions_v3.py
 
@@ -33,8 +33,34 @@ KEY_TOLERANCE = .0015
 IDENTITY_EPS = 1e-6
 
 
+_GRAB_SOLVED = {}
+
+
+def grab_basis(kin, u):
+    """Grab: `grab_pose` for the body, with the lead pairs' contact taken from the
+    Eat solve at `GRAB_STATION` (solved once, held) and a small squeeze on the
+    tips once per cycle."""
+    if not _GRAB_SOLVED:
+        _GRAB_SOLVED['basis'] = eat_solved_basis(kin, L.GRAB_STATION)[0]
+    solved = _GRAB_SOLVED['basis']
+    basis = pose_to_basis(P.grab_pose(u))
+    squeeze = .5 - .5 * math.cos(2 * math.pi * u)
+    for (number, label) in EAT_TARGET_OFFSET:
+        for seg in L.SEGMENTS:
+            name = L.limb_bone(number, label, seg)
+            if name not in solved:
+                continue
+            m = solved[name]
+            if seg == 'tip':
+                m = m @ Matrix.Rotation(P.GRAB_SQUEEZE * squeeze, 4, 'X')
+            basis[name] = m
+    return basis
+
+
 def clip_basis(kin, clip, u):
     """The full per-bone rotation basis for one clip at normalized time `u`."""
+    if clip == 'Grab':
+        return grab_basis(kin, u)
     if clip != 'Eat':
         return pose_to_basis(P.clip_pose(clip, u))
     basis, food, _ = eat_solved_basis(kin, u)

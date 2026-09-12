@@ -28,7 +28,7 @@ python3 - <<'PY'
 import json
 m=json.load(open('tools/creatures/arthropods/anchors.json'))
 v3=json.load(open('tools/creatures/odaraia/rework-v3/anchors_v3.json'))['odaraia']
-keep=['name','bone','point','role','chain','effectorBone']
+keep=['name','bone','point','role','chain','effectorBone','solver','contactType']
 m['odaraia']=[{k:r[k] for k in keep if k in r} for r in v3]
 open('tools/creatures/arthropods/anchors.json','w').write(json.dumps(m,indent=2)+'\n')
 print('anchors.json: odaraia ->',len(m['odaraia']),'sockets')

@@ -24,8 +24,8 @@ SIZES = {5120: 1, 5121: 1, 5122: 2, 5123: 2, 5125: 4, 5126: 4}
 COUNTS = {'SCALAR': 1, 'VEC2': 2, 'VEC3': 3, 'VEC4': 4, 'MAT4': 16}
 CLIPS = {'Idle': 2.4, 'Swim': 1.4, 'TurnLeft': 1.2, 'TurnRight': 1.2, 'Rise': 1.3, 'Dive': 1.3,
          'Dodge': .8, 'Guard': 1.6, 'Parry': .85, 'Attack': 1.3, 'Bite': .70, 'Heavy': 1.8,
-         'Ability': 2.0, 'Eat': 3.0, 'Hit': .65, 'Stagger': 1.4, 'Moult': 3.2, 'Death': 2.8}
-SEAMLESS = ('Idle', 'Swim', 'Guard', 'Eat')
+         'Ability': 2.0, 'Eat': 3.0, 'Hit': .65, 'Stagger': 1.4, 'Moult': 3.2, 'Death': 2.8, 'Grab': .9}
+SEAMLESS = ('Idle', 'Swim', 'Guard', 'Eat', 'Grab')
 DEATH_HOLD = .75
 FPS = 24
 
@@ -149,7 +149,7 @@ def check_file(g, label, results):
     ok('COLOR_0 is VEC4 on every primitive', all(colours), f'{sum(colours)}/{len(colours)}')
 
     names = sorted(a['name'] for a in g.json['animations'])
-    ok('all eighteen clips', names == sorted(CLIPS), str(names))
+    ok('all nineteen clips', names == sorted(CLIPS), str(names))
     clip_report = {}
     for anim in g.json['animations']:
         name = anim['name']

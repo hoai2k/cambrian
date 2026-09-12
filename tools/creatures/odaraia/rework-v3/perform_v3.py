@@ -264,12 +264,43 @@ def eat_pose(u):
     return pose
 
 
+def grab_pose(u):
+    """Grab: Eat's secured carry held as a loop. The unsolved part — the lane
+    open on pairs 4-6, the mouth closed, the rest of the basket on a quiet beat,
+    the body breathing — with the lead pairs' contact layered on by the caller
+    from `eat_solved_basis` at `GRAB_STATION`, plus one squeeze per cycle on the
+    closed tips so the hold reads as a grip rather than a freeze."""
+    pose = Pose()
+    gait(pose, u, gain=.30)
+    squeeze = .5 - .5 * cos(2 * pi * u)
+    for l in LIMBS:
+        if l.number in EAT_LANE:
+            pose.limb(l, 'prox', flex=-.20, swing=.16)
+            pose.limb(l, 'mid', flex=-.24)
+            pose.limb(l, 'dist', flex=.18)
+            pose.limb(l, 'tip', flex=.26)
+        elif 7 <= l.number <= 12:
+            pose.limb(l, 'mid', flex=.10)
+            pose.limb(l, 'dist', flex=.12)
+    for label, s in (('L', -1), ('R', 1)):
+        pose.add(f'mandible_{label}', flex=.05 * squeeze, swing=-s * .04 * squeeze)
+    pose.add('body_core', flex=-.045 + .012 * sin(2 * pi * u))
+    pose.add('head', flex=.010 * squeeze)
+    tail_beat(pose, u, gain=.45, lag=.15)
+    eyes(pose, u, gain=.55)
+    return pose
+
+
+#: Extra flex the caller adds to the solved lead tips once per Grab cycle.
+GRAB_SQUEEZE = .06
+
+
 # --------------------------------------------------------------------------
 # The remaining clips.
 # --------------------------------------------------------------------------
 
 def clip_pose(clip, u):
-    """Every clip except the solved part of Eat/Attack contact, which the
+    """Every clip except the solved part of Eat/Attack/Grab contact, which the
     caller layers on top."""
     if clip == 'Attack' or clip == 'Heavy':
         return attack_pose(u, clip)
@@ -277,6 +308,8 @@ def clip_pose(clip, u):
         return bite_pose(u)
     if clip == 'Eat':
         return eat_pose(u)
+    if clip == 'Grab':
+        return grab_pose(u)
     pose = Pose()
     env = sin(pi * u) ** 2
     if clip == 'Idle':

@@ -7,7 +7,7 @@
 Exports are **raw** (uncompressed): `package-expansion.mjs` applies the lossless
 meshopt pass afterwards, and `add-anchors.mjs` appends the sockets from
 `anchors_v3.json`. Both files carry the identical 406-bone skeleton, the same
-eighteen actions and the same socket parents; the packager keeps every clip on
+nineteen actions (eighteen plus Grab) and the same socket parents; the packager keeps every clip on
 the full model and reduces the LOD to Idle/Swim/Death itself.
 """
 import json

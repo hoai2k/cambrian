@@ -39,6 +39,11 @@
           "intended": 3.0,
           "channels": 405
         },
+        "Grab": {
+          "seconds": 0.91667,
+          "intended": 0.9166666666666666,
+          "channels": 400
+        },
         "Guard": {
           "seconds": 1.58333,
           "intended": 1.5833333333333333,
@@ -97,7 +102,7 @@
       },
       "meshes": 7,
       "materials": 7,
-      "bytes": 19611928
+      "bytes": 19814728
     },
     "lod1": {
       "triangles": 49878,
@@ -137,6 +142,11 @@
           "intended": 3.0,
           "channels": 405
         },
+        "Grab": {
+          "seconds": 0.91667,
+          "intended": 0.9166666666666666,
+          "channels": 400
+        },
         "Guard": {
           "seconds": 1.58333,
           "intended": 1.5833333333333333,
@@ -195,7 +205,7 @@
       },
       "meshes": 7,
       "materials": 7,
-      "bytes": 13509764
+      "bytes": 13712516
     },
     "anchors": [
       {
@@ -497,9 +507,9 @@
     },
     {
       "file": "full",
-      "check": "all eighteen clips",
+      "check": "all nineteen clips",
       "pass": true,
-      "detail": "['Ability', 'Attack', 'Bite', 'Death', 'Dive', 'Dodge', 'Eat', 'Guard', 'Heavy', 'Hit', 'Idle', 'Moult', 'Parry', 'Rise', 'Stagger', 'Swim', 'TurnLeft', 'TurnRight']"
+      "detail": "['Ability', 'Attack', 'Bite', 'Death', 'Dive', 'Dodge', 'Eat', 'Grab', 'Guard', 'Heavy', 'Hit', 'Idle', 'Moult', 'Parry', 'Rise', 'Stagger', 'Swim', 'TurnLeft', 'TurnRight']"
     },
     {
       "file": "full",
@@ -542,6 +552,12 @@
       "check": "Eat duration",
       "pass": true,
       "detail": "3.00000 vs 3.00000"
+    },
+    {
+      "file": "full",
+      "check": "Grab duration",
+      "pass": true,
+      "detail": "0.91667 vs 0.91667"
     },
     {
       "file": "full",
@@ -638,6 +654,12 @@
       "check": "Eat loops seamlessly",
       "pass": true,
       "detail": "max endpoint delta 9.31e-08"
+    },
+    {
+      "file": "full",
+      "check": "Grab loops seamlessly",
+      "pass": true,
+      "detail": "max endpoint delta 0.00e+00"
     },
     {
       "file": "full",
@@ -725,9 +747,9 @@
     },
     {
       "file": "lod1",
-      "check": "all eighteen clips",
+      "check": "all nineteen clips",
       "pass": true,
-      "detail": "['Ability', 'Attack', 'Bite', 'Death', 'Dive', 'Dodge', 'Eat', 'Guard', 'Heavy', 'Hit', 'Idle', 'Moult', 'Parry', 'Rise', 'Stagger', 'Swim', 'TurnLeft', 'TurnRight']"
+      "detail": "['Ability', 'Attack', 'Bite', 'Death', 'Dive', 'Dodge', 'Eat', 'Grab', 'Guard', 'Heavy', 'Hit', 'Idle', 'Moult', 'Parry', 'Rise', 'Stagger', 'Swim', 'TurnLeft', 'TurnRight']"
     },
     {
       "file": "lod1",
@@ -770,6 +792,12 @@
       "check": "Eat duration",
       "pass": true,
       "detail": "3.00000 vs 3.00000"
+    },
+    {
+      "file": "lod1",
+      "check": "Grab duration",
+      "pass": true,
+      "detail": "0.91667 vs 0.91667"
     },
     {
       "file": "lod1",
@@ -866,6 +894,12 @@
       "check": "Eat loops seamlessly",
       "pass": true,
       "detail": "max endpoint delta 9.31e-08"
+    },
+    {
+      "file": "lod1",
+      "check": "Grab loops seamlessly",
+      "pass": true,
+      "detail": "max endpoint delta 0.00e+00"
     },
     {
       "file": "lod1",

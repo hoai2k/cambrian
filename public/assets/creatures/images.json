@@ -397,8 +397,8 @@
     "generatedAt": "2026-09-06T16:40:41.584Z"
   },
   "odaraia": {
-    "glbSha256": "bf21bc96020a30ba6b210461e78ecf85ae0e6cbc33f1980157c40eea41bf2a04",
-    "appearanceSha256": "7ccf832ca354836785f16da879ff9da18b0d28f618f2dc2d6d370abae340462b",
+    "glbSha256": "bc7546de50521a27be99a91514a5335a4a986244a35961a6b10545e8cc780a69",
+    "appearanceSha256": "b9f75100998c93c8a4b4fb0cde5c4cdce2c367218f7553dfb73e9a720d42d729",
     "clips": [
       "Ability",
       "Attack",
@@ -407,6 +407,7 @@
       "Dive",
       "Dodge",
       "Eat",
+      "Grab",
       "Guard",
       "Heavy",
       "Hit",
@@ -419,9 +420,9 @@
       "TurnLeft",
       "TurnRight"
     ],
-    "renderSha256": "c750cefd79c5d03117276fb49fa9c7564c99aef315f766f94b17e97a259d193b",
-    "selectSha256": "95db43432085bc173c95d8e0671afafea467b164b6fed3fa155c644606e0abf0",
-    "generatedAt": "2026-09-06T16:49:51.543Z"
+    "renderSha256": "13a415051af664ba4e9307ff83e1750192ac0e06ed43829557627eadc605e0c3",
+    "selectSha256": "40953c49f5f9cbc49d8514536d6d279a9fe6783f9dcba0bfe730037d81bf516d",
+    "generatedAt": "2026-09-12T11:48:02.029Z"
   },
   "odontogriphus": {
     "glbSha256": "d8b773d65c0a817d23ee5fbd27184ac0cf9fb26540ca4031d9873bd9f36fb1ef",

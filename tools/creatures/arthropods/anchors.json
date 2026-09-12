@@ -2,67 +2,289 @@
   "odaraia": [
     {
       "name": "anchor_mouth",
-      "bone": "body",
+      "bone": "head",
       "point": [
-        0,
-        -1.57,
-        0.205
+        0.0,
+        -1.69,
+        0.305
       ],
       "role": "mouth"
     },
     {
       "name": "anchor_mouth_inside",
-      "bone": "body",
+      "bone": "head",
       "point": [
-        0,
-        -1.54,
-        0.11
+        0.0,
+        -1.655,
+        0.225
       ],
       "role": "swallow"
     },
     {
       "name": "anchor_attack_primary",
-      "bone": "filter_1_00",
+      "bone": "limb_01_L_tip",
       "point": [
-        0.26,
-        -1.48,
-        0.36
+        -0.227,
+        -1.787949,
+        1.12438
       ],
       "role": "attack",
-      "contactType": "filter"
-    },
-    {
-      "name": "anchor_attack_left",
-      "bone": "filter_1_00",
-      "point": [
-        0.26,
-        -1.48,
-        0.36
+      "chain": [
+        "limb_01_L_prox",
+        "limb_01_L_mid",
+        "limb_01_L_dist",
+        "limb_01_L_tip"
       ],
-      "role": "attack",
-      "contactType": "filter"
-    },
-    {
-      "name": "anchor_attack_right",
-      "bone": "filter_-1_00",
-      "point": [
-        -0.26,
-        -1.48,
-        0.36
-      ],
-      "role": "attack",
-      "contactType": "filter"
+      "effectorBone": "limb_01_L_tip",
+      "solver": "CCD",
+      "contactType": "filtering endopod terminal pad"
     },
     {
       "name": "anchor_grasp",
-      "bone": "segment_00",
+      "bone": "limb_01_L_tip",
       "point": [
-        0,
-        -1.48,
-        0.24
+        -0.227,
+        -1.787949,
+        1.12438
       ],
       "role": "grasp",
-      "contactType": "filter"
+      "chain": [
+        "limb_01_L_prox",
+        "limb_01_L_mid",
+        "limb_01_L_dist",
+        "limb_01_L_tip"
+      ],
+      "effectorBone": "limb_01_L_tip",
+      "solver": "CCD",
+      "contactType": "filtering endopod terminal pad"
+    },
+    {
+      "name": "anchor_attack_01_L",
+      "bone": "limb_01_L_tip",
+      "point": [
+        -0.227,
+        -1.787949,
+        1.12438
+      ],
+      "role": "attack",
+      "chain": [
+        "limb_01_L_prox",
+        "limb_01_L_mid",
+        "limb_01_L_dist",
+        "limb_01_L_tip"
+      ],
+      "effectorBone": "limb_01_L_tip",
+      "solver": "CCD",
+      "contactType": "filtering endopod terminal pad"
+    },
+    {
+      "name": "anchor_attack_01_R",
+      "bone": "limb_01_R_tip",
+      "point": [
+        0.227,
+        -1.848108,
+        1.211656
+      ],
+      "role": "attack",
+      "chain": [
+        "limb_01_R_prox",
+        "limb_01_R_mid",
+        "limb_01_R_dist",
+        "limb_01_R_tip"
+      ],
+      "effectorBone": "limb_01_R_tip",
+      "solver": "CCD",
+      "contactType": "filtering endopod terminal pad"
+    },
+    {
+      "name": "anchor_attack_02_L",
+      "bone": "limb_02_L_tip",
+      "point": [
+        -0.225871,
+        -1.728263,
+        1.177662
+      ],
+      "role": "attack",
+      "chain": [
+        "limb_02_L_prox",
+        "limb_02_L_mid",
+        "limb_02_L_dist",
+        "limb_02_L_tip"
+      ],
+      "effectorBone": "limb_02_L_tip",
+      "solver": "CCD",
+      "contactType": "filtering endopod terminal pad"
+    },
+    {
+      "name": "anchor_attack_02_R",
+      "bone": "limb_02_R_tip",
+      "point": [
+        0.225871,
+        -1.724597,
+        1.224303
+      ],
+      "role": "attack",
+      "chain": [
+        "limb_02_R_prox",
+        "limb_02_R_mid",
+        "limb_02_R_dist",
+        "limb_02_R_tip"
+      ],
+      "effectorBone": "limb_02_R_tip",
+      "solver": "CCD",
+      "contactType": "filtering endopod terminal pad"
+    },
+    {
+      "name": "anchor_attack_03_L",
+      "bone": "limb_03_L_tip",
+      "point": [
+        -0.224742,
+        -1.622428,
+        1.203578
+      ],
+      "role": "attack",
+      "chain": [
+        "limb_03_L_prox",
+        "limb_03_L_mid",
+        "limb_03_L_dist",
+        "limb_03_L_tip"
+      ],
+      "effectorBone": "limb_03_L_tip",
+      "solver": "CCD",
+      "contactType": "filtering endopod terminal pad"
+    },
+    {
+      "name": "anchor_attack_03_R",
+      "bone": "limb_03_R_tip",
+      "point": [
+        0.224742,
+        -1.556344,
+        1.192943
+      ],
+      "role": "attack",
+      "chain": [
+        "limb_03_R_prox",
+        "limb_03_R_mid",
+        "limb_03_R_dist",
+        "limb_03_R_tip"
+      ],
+      "effectorBone": "limb_03_R_tip",
+      "solver": "CCD",
+      "contactType": "filtering endopod terminal pad"
+    },
+    {
+      "name": "anchor_attack_04_L",
+      "bone": "limb_04_L_tip",
+      "point": [
+        -0.223613,
+        -1.4681,
+        1.187584
+      ],
+      "role": "attack",
+      "chain": [
+        "limb_04_L_prox",
+        "limb_04_L_mid",
+        "limb_04_L_dist",
+        "limb_04_L_tip"
+      ],
+      "effectorBone": "limb_04_L_tip",
+      "solver": "CCD",
+      "contactType": "filtering endopod terminal pad"
+    },
+    {
+      "name": "anchor_attack_04_R",
+      "bone": "limb_04_R_tip",
+      "point": [
+        0.223613,
+        -1.364971,
+        1.125204
+      ],
+      "role": "attack",
+      "chain": [
+        "limb_04_R_prox",
+        "limb_04_R_mid",
+        "limb_04_R_dist",
+        "limb_04_R_tip"
+      ],
+      "effectorBone": "limb_04_R_tip",
+      "solver": "CCD",
+      "contactType": "filtering endopod terminal pad"
+    },
+    {
+      "name": "anchor_attack_05_L",
+      "bone": "limb_05_L_tip",
+      "point": [
+        -0.222484,
+        -1.281557,
+        1.131434
+      ],
+      "role": "attack",
+      "chain": [
+        "limb_05_L_prox",
+        "limb_05_L_mid",
+        "limb_05_L_dist",
+        "limb_05_L_tip"
+      ],
+      "effectorBone": "limb_05_L_tip",
+      "solver": "CCD",
+      "contactType": "filtering endopod terminal pad"
+    },
+    {
+      "name": "anchor_attack_05_R",
+      "bone": "limb_05_R_tip",
+      "point": [
+        0.222484,
+        -1.180979,
+        1.04233
+      ],
+      "role": "attack",
+      "chain": [
+        "limb_05_R_prox",
+        "limb_05_R_mid",
+        "limb_05_R_dist",
+        "limb_05_R_tip"
+      ],
+      "effectorBone": "limb_05_R_tip",
+      "solver": "CCD",
+      "contactType": "filtering endopod terminal pad"
+    },
+    {
+      "name": "anchor_attack_06_L",
+      "bone": "limb_06_L_tip",
+      "point": [
+        -0.221355,
+        -1.091444,
+        0.984436
+      ],
+      "role": "attack",
+      "chain": [
+        "limb_06_L_prox",
+        "limb_06_L_mid",
+        "limb_06_L_dist",
+        "limb_06_L_tip"
+      ],
+      "effectorBone": "limb_06_L_tip",
+      "solver": "CCD",
+      "contactType": "filtering endopod terminal pad"
+    },
+    {
+      "name": "anchor_attack_06_R",
+      "bone": "limb_06_R_tip",
+      "point": [
+        0.221355,
+        -1.032033,
+        0.908425
+      ],
+      "role": "attack",
+      "chain": [
+        "limb_06_R_prox",
+        "limb_06_R_mid",
+        "limb_06_R_dist",
+        "limb_06_R_tip"
+      ],
+      "effectorBone": "limb_06_R_tip",
+      "solver": "CCD",
+      "contactType": "filtering endopod terminal pad"
     }
   ],
   "sidneyia": [
