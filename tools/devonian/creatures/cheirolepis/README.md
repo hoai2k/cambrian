@@ -76,20 +76,31 @@ and is only good for comparing variants.
 Nothing here is accepted geometry. A real rebuild still owes scales, teeth, throat, opercula,
 materials, rig, all eighteen clips, the LOD and the full audit set.
 
-## V3 candidate — 11 September 2026
+## V3 shipped — 12 September 2026
 
-`build_v3.py` is the redesign study carried into the real builder: V2 with the head profile, the
-eye, the five fin outlines and the fin-tip bone replaced by the study's values and nothing else.
-Run it with `/opt/blender/blender --background --python tools/devonian/creatures/cheirolepis/build_v3.py -- --skip-renders`;
-it writes to `../devonian-authoring/cheirolepis/v3-candidate/` and never into V2's directory.
+`build_v3.py` is now the model (`build.py` runs it; V2 stays beside it untouched). It is V2 with
+the shape the reference reopened and nothing else:
 
-Evidence on the candidate: lossless packaging exact round-trip PASS (158,356 / 44,334 triangles,
-18 / 3 clips), `tools/devonian/check.mjs` PASS, and the packaged eye audit
-(`eye-audit-full-v3.json`, `eye-audit-lod-v3.json`) at 82.48% / 82.27% inside the continuous
-head for the full model and 82.53% / 82.35% for the reduced one, against V2's 80.12% / 79.86%
-and 79.99% / 79.72% — so the larger, more anterior eye seats better, as the study's proxy
-predicted. Loop seams and the head-envelope manifold assertion pass inside the builder.
+- **Face**, settled with the user over four clay passes (`redesign-study.py` was the first; the
+  later passes' parameters are in `docs/model-queue-state.md`): a blunt, deep snout rising steeply
+  from the upper lip to a prominent squared brow, the roof running back over the eyes, the crown
+  flattened between the brows, a lip ridge along the long gape so the mouth reads shut, and a nose
+  station at y=−2.41 so the closed mouth has no opening. `faceRelief(y,a)` carries the lips, the
+  brow ledge and the crown flattening as one multiplier on the head shells; the eye is at
+  (±.178, −2.03, .156) with radii (.058, .092, .085).
+- **Fin roots seated.** V2 shipped every fin root at or outside the trunk surface — pectoral
+  +0.07, pelvic +0.31, dorsal and anal trailing bases +0.17 and +0.26 on the section-ellipse
+  metric — which read as fins floating beside the body. `seat()` pulls each origin and base control
+  radially inside (−0.18 / −0.14) and an assertion refuses any fin whose base edges leave the
+  trunk. The root weight blend onto the body bones is radial and applies to all five fins.
+- **Fins** redrawn as swept blades: convex leading edge, apex trailing back, concave trailing edge;
+  the tail keeps its raised scaled axis (the sources fix that) with drawn-out points and a deeper
+  notch. `pectoralTip` follows the new blade.
 
-Not yet done: the user's acceptance, and the viewer / game-camera look that follows it. On
-acceptance, `build.py` points at V3, the family is packaged into `public/assets/devonian/creatures/`,
-and `validation.json` is regenerated from that build. V2 stays the shipped model until then.
+Evidence: lossless packaging exact round-trip PASS (158,356 / 44,334 triangles, 18 / 3 clips);
+`tools/devonian/check.mjs` PASS; packaged eye audit (`eye-audit-full-v3.json`,
+`eye-audit-lod-v3.json`) 85.92% / 85.86% inside the continuous head for the full model and
+86.09% / 85.83% for the reduced one (V2: 80.12 / 79.86 and 79.99 / 79.72); loop seams and the
+head-envelope manifold assertion pass in the builder. Portraits re-derived by `render-v3.py`.
+Anchors moved to the new snout tip (`anchor_mouth` (0, −2.39, .012), `anchor_attack_primary`
+(0, −2.41, .02)). The user accepted this pass on 12 September; the badge is cleared.

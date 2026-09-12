@@ -78,7 +78,22 @@ rows=grid(141,72,torso,0,True);face(rows[-1],0)
 # diamond islands. The scaled upper caudal axis remains part of the body loft.
 # Upper and lower head shells meet at a genuine long lateral gape. Inner surfaces form
 # a deep oral cavity, with a flexible membrane at the jaw hinge rather than a solid snout.
-HEAD=[(-2.35,.042,.032,.030,.004),(-2.22,.122,.130,.078,.000),(-1.98,.222,.272,.150,-.014),(-1.70,.288,.360,.245,-.026),(-1.38,.312,.396,.312,-.030),(-1.16,.320,.400,.330,0)]
+# The face, read off the reference and settled with the user over four clay passes (12 September):
+# the front rises steeply from the upper lip to a prominent brow and the roof runs back over the
+# eyes from there; the crown is flattened between the brows so the skull reads squared from the
+# front; a lip ridge runs the mouth line so the mouth reads shut; the -2.41 nose station closes
+# the blunt snout so there is no opening when the jaw is closed.
+HEAD=[(-2.41,.008,.008,.008,.018),(-2.35,.130,.140,.110,.020),(-2.27,.200,.225,.150,.008),(-2.12,.240,.278,.190,-.012),(-2.00,.250,.280,.205,-.026),(-1.80,.286,.302,.255,-.050),(-1.50,.314,.352,.300,-.062),(-1.16,.320,.400,.330,0)]
+HEAD_Y0=HEAD[0][0];HEAD_LEN=-1.16-HEAD_Y0
+def ss(e0,e1,x):
+ t=max(0.,min(1.,(x-e0)/(e1-e0)));return t*t*(3-2*t)
+def faceRelief(y,a):
+ # multiplier on the shell radius: lips along the mouth line, the brow ledge and the flat crown
+ f=.055*math.exp(-(sin(a)/.20)**2)*ss(-1.60,-1.35,-y)*ss(-2.35,-2.29,y)
+ if sin(a)>=0:
+  s_=abs(cos(a));along=ss(-2.32,-2.16,y)*(1-ss(-1.94,-1.76,y))
+  f+=.12*ss(.20,.32,s_)*(1-ss(.78,.90,s_))*along-.045*(1-ss(.0,.30,s_))*along
+ return 1+f
 def hd(y):
  if y<=HEAD[0][0]:return np.array(HEAD[0][1:])
  for k in range(len(HEAD)-1):
@@ -91,13 +106,13 @@ def hd(y):
 def jawWeight(y):
  q=max(0,min(1,(-1.16-y)/.15));return {'jaw':q,'skull':1-q}
 def hp(y,a,inset=0):
- w,upper,lower,z=hd(y);ht=upper if sin(a)>=0 else lower
- return Vector(((w-inset)*cos(a),y,z+(ht-inset*.65)*sin(a)))
+ w,upper,lower,z=hd(y);ht=upper if sin(a)>=0 else lower;r=faceRelief(y,a)
+ return Vector(((w*r-inset)*cos(a),y,z+(ht*r-inset*.65)*sin(a)))
 for low in [False,True]:
  shellrows=[];mi=7 if low else 6
  for inside in [False,True]:
   def hv(i,j):
-   y=-2.35+1.19*i/64;a=(pi if low else 0)+pi*j/48;p=hp(y,a)
+   y=HEAD_Y0+HEAD_LEN*i/64;a=(pi if low else 0)+pi*j/48;p=hp(y,a)
    if inside:
     # A true palate under the cranial volume, and a separate mandibular floor.
     # The mouth is not an inset duplicate that hollows out the entire braincase.
@@ -125,14 +140,14 @@ face(throatrows[-1],4)
 # are artistic; no modern serrations, crushing pavement, or giant exposed tusks.
 for low in [False,True]:
  for side in [-1,1]:
-  for k,y in enumerate(np.linspace(-2.26,-1.29,23)):
+  for k,y in enumerate(np.linspace(-2.30,-1.31,23)):
    x=side*(hd(y)[0]-.022);z=hd(y)[3]+(-.009 if low else .009);height=(.031+.020*sin(pi*k/22))*(.88+.16*sin(k*2.37)**2+.10*cos(k*.73)**2)
    tip=Vector((x-side*.012,y+.012,z+(height if low else-height)))
    tube([(x,y,z),Vector((x,y,z)).lerp(tip,.45),tip],[.009,.005,.0007],(.61,.57,.38),jawWeight(y)if low else'skull',2,7)
 # Complete globes seated in the continuous cranial tissue; no applied orbital hoop.
 for side in [-1,1]:
- eye=Vector((side*.130,-2.05,.110));ell(eye,(.052,.086,.078),(.002,.004,.003),'skull')
- nostril=Vector((side*.092,-2.20,.104));ell(nostril,(.012,.020,.010),(.006,.014,.009),'skull',4)
+ eye=Vector((side*.178,-2.03,.156));ell(eye,(.058,.092,.085),(.002,.004,.003),'skull')
+ nostril=Vector((side*.105,-2.27,.150));ell(nostril,(.012,.020,.010),(.006,.014,.009),'skull',4)
  # Mobile posterior gill cover follows the contour of the body, clear of pectoral bases.
  bn='gill'+('L'if side==1 else'R');nrow=25;ncol=32
  def op(i,j):
@@ -321,7 +336,7 @@ for clip,duration in CLIPS.items():
  rig.animation_data.action=None
 for c in set(CLIPS)-{'Death'}:assert seams[c]<1e-6,(c,seams[c])
 reset();scene.frame_set(0)
-anchors=[{'name':'anchor_mouth','bone':'jaw','point':[0,-2.32,-.018],'role':'mouth'}, {'name':'anchor_mouth_inside','bone':'skull','point':[0,-1.62,-.010],'role':'swallow'},{'name':'anchor_attack_primary','bone':'skull','point':[0,-2.33,.01],'role':'attack'}]
+anchors=[{'name':'anchor_mouth','bone':'jaw','point':[0,-2.39,.012],'role':'mouth'}, {'name':'anchor_mouth_inside','bone':'skull','point':[0,-1.62,-.010],'role':'swallow'},{'name':'anchor_attack_primary','bone':'skull','point':[0,-2.41,.02],'role':'attack'}]
 open(os.path.join(HERE,'anchors.json'),'w').write(json.dumps({ID:anchors},indent=2))
 # Parent inverse equals inverse bind bone tail transform; matrix_world sets real anatomical world point.
 sockets=[]
@@ -389,7 +404,7 @@ for g in [full,lod]:
   assert all(g['nodes'][c['target']['node']].get('name')!='root'for c in a['channels'])
 assert lodtris/fulltris<.4
 sources=[{'title':'Giles et al. (2015), Endoskeletal structure in Cheirolepis; Scottish C. trailli specimens and pectoral anatomy','url':'https://pmc.ncbi.nlm.nih.gov/articles/PMC4950109/'},{'title':'Igielman et al. (2026), Devonian ray-finned fish lower jaws; C. trailli NHMUK PV P62908b and P1370','url':'https://anatomypubs.onlinelibrary.wiley.com/doi/10.1002/ar.70005'},{'title':'AMNH Digital Collections, Cheirolepis trailli ptc-5970, 25 cm Middle Devonian Nairnshire specimen','url':'https://digitalcollections.amnh.org/archive/Cheirolepis-trailli--primitive-ray-finned-fish--approximately-380-million-years-old--L-25-cm--Middle-Devonian-of-Nairnshire--Scotland-2URM1THIF2SU.html'},{'title':'National Museums Scotland, fossil collections review; Scottish Middle Devonian assemblages','url':'https://files.nms.ac.uk/production/Documents/Our-Impact/Collections-reviews/Fossil-collections/fossil-review-complete-_review-of-fossil-collections-in-scotland.pdf'}]
-notes=['Consistent Scottish Cheirolepis trailli reconstruction; no mixing with the Late Devonian Canadian species. Representative 0.25 m size follows the AMNH collection record ptc-5970, not an adult maximum.','Small rhombic enamel windows, posterior short-based dorsal and anal fins, separate opercular covers, large terminal jaw, segmented fin rays and the scaled upper caudal axis distinguish this early ray-finned fish.','Pigmentation, fin-membrane thickness, three-dimensional soft tissue, individual tooth arrangement and all motion are artistic reconstruction rather than fossil observations.','Growth is a relaxed ventilation and fin-spreading gesture, without scaling or moulting. Ability is a burst-and-bank display, not a Devonian gameplay rule.','Original source and review renders are preserved in cambrian/local/devonian-authoring/cheirolepis.','V3 (11 September 2026) takes the user reference for what is form: a wedge snout over a fuller cheek, a larger more anterior eye, and swept angular fins with pointed apices; the strongly epicercal tail is kept because the sources settle it.']
+notes=['Consistent Scottish Cheirolepis trailli reconstruction; no mixing with the Late Devonian Canadian species. Representative 0.25 m size follows the AMNH collection record ptc-5970, not an adult maximum.','Small rhombic enamel windows, posterior short-based dorsal and anal fins, separate opercular covers, large terminal jaw, segmented fin rays and the scaled upper caudal axis distinguish this early ray-finned fish.','Pigmentation, fin-membrane thickness, three-dimensional soft tissue, individual tooth arrangement and all motion are artistic reconstruction rather than fossil observations.','Growth is a relaxed ventilation and fin-spreading gesture, without scaling or moulting. Ability is a burst-and-bank display, not a Devonian gameplay rule.','Original source and review renders are preserved in cambrian/local/devonian-authoring/cheirolepis.','V3 (11-12 September 2026) takes the user reference for what is form: a blunt deep snout rising steeply to a prominent squared brow, a lip ridge along the long gape, a larger more anterior eye, fin roots seated in the trunk, and swept angular fins with pointed apices; the strongly epicercal tail is kept because the sources settle it.']
 meta={'id':ID,'name':'Cheirolepis','species':'Cheirolepis trailli','provenance':'Middle Devonian, Scottish Orcadian Basin / Nairnshire assemblages','description':'Small early ray-finned fish with fine rhombic scales, a large toothed terminal mouth, mobile gill covers, ray-supported fins and a strongly unequal tail with an elongated scaled upper lobe.','lengthMeters':.25,'modelLength':max(p[1]for p in V)-min(p[1]for p in V),'locomotion':'Swim','clips':list(CLIPS),'looping':LOOPS,'anchors':[a['name']for a in anchors],'sources':sources,'notes':notes}
 open(os.path.join(OUT,ID+'.json'),'w').write(json.dumps(meta,indent=2))
 report={'vertices':len(V),'fullTriangles':fulltris,'lodTriangles':lodtris,'reductionRatio':lodtris/fulltris,'bones':len(B),'clips':CLIPS,'loopSeams':seams,'boundsAtFivePhases':bounds,'weightNormalization':True,'rootStable':True,'noScaleChannels':True,'anchorCount':3,'fullBytes':os.path.getsize(os.path.join(OUT,ID+'.glb')),'lodBytes':os.path.getsize(os.path.join(OUT,ID+'.lod1.glb'))}
