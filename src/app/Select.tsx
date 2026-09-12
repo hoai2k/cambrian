@@ -50,6 +50,7 @@ function BrandHeader({ onBack }: { onBack: () => void }) {
   const [open, setOpen] = useState(false);
   const wrap = useRef<HTMLDivElement>(null);
   const sibling = ACTIVE_ERA.copy.sibling;
+  const siblings = [...(sibling ? [sibling] : []), ...(ACTIVE_ERA.copy.siblings ?? [])];
   useEffect(() => {
     if (!open) return;
     const away = (e: MouseEvent) => { if (!wrap.current?.contains(e.target as Node)) setOpen(false); };
@@ -81,9 +82,11 @@ function BrandHeader({ onBack }: { onBack: () => void }) {
           <nav className="era-menu" aria-label="Choose a game">
             {/* Straight to the other game's roster, not its title screen: this is a picker, and
                 landing back on PRESS START would undo the choice the player just made. */}
-            <a className="era-item" href={`${ASSETS}${sibling.path}?screen=select`}>
-              <img className="header-logo" src={`${ASSETS}${sibling.logo}`} alt={sibling.title} />
-            </a>
+            {siblings.map((s) => (
+              <a key={s.path} className="era-item" href={`${ASSETS}${s.path}?screen=select`}>
+                <img className="header-logo" src={`${ASSETS}${s.logo}`} alt={s.title} />
+              </a>
+            ))}
           </nav>
         )}
       </div>

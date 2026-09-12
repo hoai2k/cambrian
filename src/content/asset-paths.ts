@@ -5,7 +5,14 @@ import type { EraDefinition } from './era';
 export function createAssetPaths(era: EraDefinition) {
   const a = era.assets;
   return {
-    model: (id: string, lod = 0) => `${a.creatures}${a.standIns?.[id as keyof typeof a.standIns] ?? id}${lod ? '.lod1' : ''}.glb`,
+    model: (id: string, lod = 0) => {
+      const standIn = a.standIns?.[id as keyof typeof a.standIns];
+      // '<era>/<id>' borrows a body from another era's folder (the Triassic, until its own land).
+      const slash = standIn?.indexOf('/') ?? -1;
+      const folder = standIn && slash > 0 ? `assets/${standIn.slice(0, slash)}/creatures/` : a.creatures;
+      const file = standIn && slash > 0 ? standIn.slice(slash + 1) : standIn ?? id;
+      return `${folder}${file}${lod ? '.lod1' : ''}.glb`;
+    },
     portrait: (id: string, kind: 'select' | 'card' | 'thumb') => `${a.defaultPortraits}${id}.${kind}.png`,
     biome: (id: string) => `${a.biomes}${id}.webp`,
     prop: (id: string) => `${a.props}${id}.glb`,

@@ -5,6 +5,7 @@ import type { Actor, InputFrame, Mode, WorldEvent } from './types';
 import type { CreatureId } from './creatures';
 import type { ExpansionContext } from './expansion-abilities';
 import { DEVONIAN_RULES } from './devonian/rules';
+import { TRIASSIC_RULES } from './triassic/rules';
 
 /**
  * The seams where an era changes how the shared simulation behaves. Every hook is optional in
@@ -24,6 +25,14 @@ export interface EraHud {
   rung: number; rungName: string; stage: string;
   /** This body breathes both ways: lungs as well as gills, so dead water cannot touch it. */
   bimodal: boolean;
+  /** This body breathes air and nothing else: stamina comes back only at the surface. */
+  air?: boolean;
+  /** Air-breathers: whether the last step found the body at the surface, breathing. */
+  atSurface?: boolean;
+  /** 0..1 while a shore animal is winding up to strike at this player; 0 otherwise. */
+  shoreWarn?: number;
+  /** Held under by something that will not let it up: its bar is going and cannot come back. */
+  heldUnder?: boolean;
   beached: boolean;
   /** Dead zones as world offsets from the player and radii, for the radar. */
   deadZones: { dx: number; dz: number; r: number }[];
@@ -73,6 +82,12 @@ export interface EraRules {
   botNursery(index: number): Vec3 | undefined;
   /** Seconds of protection a body gets when it hatches or comes back. */
   spawnProtect(a: Actor): number;
+  /**
+   * Optional: this body is born alive rather than hatched from an egg on the sand. The hatch is
+   * then the short swell where the era's `spawnPoint` put it (the Triassic: at the surface,
+   * beside a mother) and no egg is laid or drawn.
+   */
+  liveBirth?(a: Actor): boolean;
   /**
    * True when `hunter` (an AI body) must leave `target` alone unless provoked: the era's nursery
    * sanctuary. The caller has already established the hunter is not provoked.
@@ -157,5 +172,5 @@ export interface EraRules {
   scoreLine?(g: Game, a: Actor): { rank: string; progress: number } | undefined;
 }
 
-export const RULES: EraRules | undefined = ACTIVE_ERA.id === 'devonian' ? DEVONIAN_RULES : undefined;
+export const RULES: EraRules | undefined = ACTIVE_ERA.id === 'devonian' ? DEVONIAN_RULES : ACTIVE_ERA.id === 'triassic' ? TRIASSIC_RULES : undefined;
 RULES?.install();

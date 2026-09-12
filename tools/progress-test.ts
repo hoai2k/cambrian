@@ -15,9 +15,10 @@ import assert from 'node:assert/strict';
 import { selectEra } from '../src/content';
 import { CAMBRIAN } from '../src/content/cambrian';
 import { DEVONIAN } from '../src/content/devonian';
+import { TRIASSIC } from '../src/content/triassic';
 
-const which = process.argv[2] === 'devonian' ? 'devonian' : 'cambrian';
-selectEra(which === 'devonian' ? DEVONIAN : CAMBRIAN);
+const which = process.argv[2] === 'devonian' ? 'devonian' : process.argv[2] === 'triassic' ? 'triassic' : 'cambrian';
+selectEra(which === 'devonian' ? DEVONIAN : which === 'triassic' ? TRIASSIC : CAMBRIAN);
 
 const { Game } = await import('../src/sim/game');
 const { ladderName, ladderNames, ladderRung, ladderScale, clampMark, fillOf, rungOf, MARK_NEAR_TOP, LADDER_RUNGS, LADDER_TOP } = await import('../src/sim/ladder');

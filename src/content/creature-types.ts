@@ -103,8 +103,13 @@ export interface CreatureDef {
    * Devonian marine one. So nothing on this roster is lung-only, and there is deliberately no value
    * for one: an obligate air breather would drown without the surface, which is a different mechanic
    * (a meter, a warning, a death) and should be added with that mechanic rather than in advance.
+   *
+   * `air` is that mechanic, and it turned out not to need a meter or a death: the Triassic's
+   * reptiles are obligate air-breathers, and what that costs them is *recovery*. Under water their
+   * stamina drains at the ordinary rate and comes back not at all; breaking the surface refills
+   * it with a blow. Nothing counts down and nothing drowns (docs/triassic/01-triassic-design.md).
    */
-  breathing?: 'gill' | 'bimodal';
+  breathing?: 'gill' | 'bimodal' | 'air';
   /** How far past the shore wall this creature may push (world units). 0 for swimmers. */
   shoreReach?: number;
   /** Chambered shell: backward jet sprint, free buoyancy, withdraw on block. */
@@ -155,5 +160,42 @@ export interface CreatureDef {
    * names and should not be laid out on the seabed.
    */
   conformArms?: boolean;
+
+  // ---- Triassic Tide (docs/triassic/01-triassic-design.md). All optional; the earlier rosters set
+  // none of them and the shared simulation ignores them unless the era's rules ask.
+  /**
+   * Which side the `armour` fraction is on. `all` is the shell of a placodont or an ammonoid;
+   * `dorsal` the plates down a hupehsuchian's back; `ventral` the plastron of a turtle with no
+   * carapace yet. Absent, the Devonian's snout-to-tail fraction applies whichever way the hit comes.
+   */
+  armourFacing?: 'dorsal' | 'ventral' | 'all';
+  /** Ichthyosaurs and the plesiosaur: immune to the cold of the deep biomes (a stamina-regen modifier). */
+  warmBlooded?: boolean;
+  /** Multiplier on the shared rise rate: flippers climb faster than paddles, a shell-cruncher slowest. */
+  riseRate?: number;
+  /**
+   * A shore animal: modelled, placed on the beach by the world, and never played. It strikes into
+   * the water from where it stands (src/sim/triassic/shore.ts) and is off every pick screen.
+   */
+  shore?: boolean;
+  /**
+   * How a new player of this species arrives. `live`: born at the surface beside an AI adult of
+   * its kind, which stays a minute. `egg` (the default): the Cambrian's egg on the sand in cover.
+   */
+  birth?: 'live' | 'egg';
+  /** Four-flipper underwater flight: fast acceleration and cruise, wide turns, no reverse. */
+  flight?: boolean;
+  /** A stiff body driven by the tail: the best sustained cruise, a long glide, a wide turn. */
+  thunniform?: boolean;
+  /** Negatively buoyant: settles when the stick is still and walks the floor with `punt`. */
+  sink?: boolean;
+  /** A head that strikes this many body lengths from a body that stays put (the neck's reach). */
+  neckReach?: number;
+  /** Two gears: rows along the bottom at a walk, and a tail burst in the column. */
+  paddleRow?: boolean;
+  /** A giant that keeps a pod: `shoals` for rung IV, with pod-mates that answer what attacks it. */
+  pod?: boolean;
+  /** A body the Cambrian's `peaceful()` reckoning leaves alone until it bites: nothing hunts a grazer. */
+  peaceful?: boolean;
 }
 
