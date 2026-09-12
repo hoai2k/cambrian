@@ -178,8 +178,9 @@ unless the user explicitly asks for a PR. Steps:
   silhouette as the builders' own kind of profile table — twenty stations, dorsal/ventral/width,
   a spline with pullable tangents — grouped into head-to-tail regions, plus the eyes (a mirrored
   pair that slides along the flank or across the crown and keeps its seat in the skin, resizable
-  with the socket following) and the mouth (a region round the socket that widens, deepens or
-  moves) as features, warping the loaded model live and following it into view mode and the
+  with the socket following) and the mouth (a jaw that opens along the head's outline about a
+  hinge behind the socket: drag a corner and the mouth stretches from the front round the sides
+  and back along the flanks, everything inside riding with it) as features, warping the loaded model live and following it into view mode and the
   reduced model, with an Edited/Original toggle for the preview. Undo/redo, in-memory only (a reload
   returns to what ships). *Export sculpt* writes `<id>-sculpt.json`, which is the hand-off for a
   builder port: the change goes into the builder's profile rows, never into the GLB
