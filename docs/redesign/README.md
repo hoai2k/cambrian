@@ -15,6 +15,7 @@ and the procedural environment.
 | [06 · Era content boundary](06-era-content.md) | Implemented configuration boundary for future content packs; Cambrian remains the only available era. |
 | [07 · Devonian natural-history and asset brief](07-devonian-design.md) | Natural-history descriptions for 21 creatures; regional environments, plants, props, and a quantified image/3D asset inventory. No gameplay specification. |
 | [08 · Devonian Domination](08-devonian-domination.md) | Game design for the Devonian era: rungs of a food chain instead of growth, standing and range as progress, armour, air, anoxia, shells, moulting, shoaling, a climbable shore, the biome set, modes and an implementation order. Proposal, not built. |
+| [Triassic (docs/triassic/)](../triassic/README.md) | The third era: design, roster, biomes and depth, image and model requests in Tripo / in-house tiers, and the Tripo production strategy. Proposal, not built. |
 
 Start with the design doc if you want the game; start with the technical plan
 if you want to build it. The audit is the shared set of facts both rely on, and
