@@ -1,0 +1,268 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Triassic reference viewer</title>
+<style>
+  :root {
+    --ink: #06161c; --ink-2: #0b2029; --ink-3: #103039; --line: #1d4450;
+    --foam: #eefaf6; --mute: #8fb0b4; --lagoon: #61f2d5; --ember: #ffb36b; --coral: #ff5b6e;
+    --pad: 16px;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--ink); color: var(--foam);
+    font: 14px/1.5 ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+  a { color: var(--lagoon); }
+  header { position: sticky; top: 0; z-index: 20; background: rgba(6,22,28,.94);
+    backdrop-filter: blur(8px); border-bottom: 1px solid var(--line); padding: 12px var(--pad); }
+  .bar { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+  h1 { font-size: 16px; margin: 0 8px 0 0; letter-spacing: .02em; font-weight: 650; }
+  h1 small { color: var(--mute); font-weight: 400; margin-left: 8px; font-size: 12px; }
+  input[type=search] { flex: 1 1 180px; min-width: 140px; background: var(--ink-2); color: var(--foam);
+    border: 1px solid var(--line); border-radius: 7px; padding: 7px 10px; font: inherit; }
+  input[type=search]:focus { outline: 2px solid var(--lagoon); outline-offset: -1px; }
+  .chips { display: flex; flex-wrap: wrap; gap: 6px; }
+  button.chip, .seg button { background: var(--ink-2); color: var(--mute); border: 1px solid var(--line);
+    border-radius: 999px; padding: 5px 11px; font: inherit; font-size: 12.5px; cursor: pointer; }
+  button.chip:hover, .seg button:hover { color: var(--foam); border-color: #2c6374; }
+  button.chip[aria-pressed=true] { background: var(--lagoon); color: var(--ink); border-color: var(--lagoon); font-weight: 600; }
+  .seg { display: inline-flex; border: 1px solid var(--line); border-radius: 8px; overflow: hidden; }
+  .seg button { border: 0; border-radius: 0; border-left: 1px solid var(--line); }
+  .seg button:first-child { border-left: 0; }
+  .seg button[aria-pressed=true] { background: var(--ember); color: var(--ink); font-weight: 650; }
+  .seg button:disabled { opacity: .38; cursor: not-allowed; }
+  .hint { color: var(--mute); font-size: 12px; }
+  kbd { background: var(--ink-3); border: 1px solid var(--line); border-bottom-width: 2px;
+    border-radius: 4px; padding: 0 5px; font: 11px/1.6 ui-monospace, monospace; color: var(--foam); }
+
+  main { padding: var(--pad); }
+  section > h2 { font-size: 13px; text-transform: uppercase; letter-spacing: .09em; color: var(--ember);
+    margin: 26px 0 2px; }
+  section > p.note { color: var(--mute); margin: 0 0 14px; max-width: 68ch; }
+  .grid { display: grid; gap: 14px; grid-template-columns: repeat(auto-fill, minmax(var(--card, 230px), 1fr)); }
+  .card { background: var(--ink-2); border: 1px solid var(--line); border-radius: 10px; overflow: hidden;
+    cursor: pointer; display: flex; flex-direction: column; text-align: left; color: inherit; font: inherit; padding: 0; }
+  .card:hover { border-color: var(--lagoon); }
+  .card:focus-visible { outline: 2px solid var(--lagoon); outline-offset: 2px; }
+  .shot { position: relative; aspect-ratio: 4 / 3; background: #081c24; overflow: hidden; }
+  .shot img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block; }
+  .shot .none { position: absolute; inset: 0; display: grid; place-items: center; color: var(--mute);
+    font-size: 12px; text-align: center; padding: 10px; }
+  .tag { position: absolute; top: 7px; left: 7px; font-size: 10.5px; letter-spacing: .06em; text-transform: uppercase;
+    background: rgba(6,22,28,.82); border: 1px solid var(--line); color: var(--mute); padding: 2px 7px; border-radius: 999px; }
+  .tag.canon { color: var(--ink); background: var(--lagoon); border-color: var(--lagoon); font-weight: 650; }
+  .count { position: absolute; bottom: 7px; right: 7px; font-size: 11px; background: rgba(6,22,28,.82);
+    border: 1px solid var(--line); color: var(--mute); padding: 1px 7px; border-radius: 999px; }
+  .meta { padding: 9px 11px 11px; }
+  .meta .n { font-weight: 620; font-style: italic; }
+  .meta .r { color: var(--mute); font-size: 12px; margin-top: 2px; }
+  .meta .l { color: var(--ember); font-size: 11.5px; margin-top: 3px; }
+
+  dialog { border: 0; padding: 0; background: transparent; max-width: 100vw; max-height: 100vh; width: 100%; height: 100%; }
+  dialog::backdrop { background: rgba(3,11,15,.93); }
+  .sheet { display: flex; flex-direction: column; height: 100vh; color: var(--foam); }
+  .top { display: flex; gap: 12px; align-items: baseline; flex-wrap: wrap; padding: 10px 14px;
+    border-bottom: 1px solid var(--line); background: var(--ink); }
+  .top .n { font-style: italic; font-weight: 650; font-size: 16px; }
+  .top .r { color: var(--mute); font-size: 12.5px; }
+  .top .sp { flex: 1; }
+  .stage { flex: 1; min-height: 0; display: grid; grid-template-columns: 1fr; gap: 8px; padding: 10px 14px;
+    background: #050f14; place-items: center; }
+  .stage.split { grid-template-columns: 1fr 1fr; }
+  .pane { position: relative; width: 100%; height: 100%; display: grid; place-items: center; min-height: 0; }
+  .pane img { max-width: 100%; max-height: 100%; object-fit: contain; }
+  .pane .lab { position: absolute; top: 4px; left: 4px; font-size: 11px; text-transform: uppercase; letter-spacing: .07em;
+    background: rgba(6,22,28,.85); border: 1px solid var(--line); padding: 2px 8px; border-radius: 999px; color: var(--mute); }
+  .pane .lab.canon { background: var(--lagoon); color: var(--ink); border-color: var(--lagoon); font-weight: 650; }
+  .pane .empty { color: var(--mute); text-align: center; max-width: 42ch; font-size: 13px; }
+  .pane .empty code { color: var(--ember); }
+  .strip { display: flex; gap: 7px; overflow-x: auto; padding: 9px 14px; border-top: 1px solid var(--line); background: var(--ink); }
+  .strip button { flex: 0 0 auto; width: 84px; height: 62px; padding: 0; border: 1px solid var(--line);
+    border-radius: 6px; overflow: hidden; background: var(--ink-2); cursor: pointer; }
+  .strip button img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .strip button[aria-current=true] { border-color: var(--ember); outline: 1px solid var(--ember); }
+  .strip button.c { border-color: var(--lagoon); }
+  .credit { padding: 7px 14px 11px; border-top: 1px solid var(--line); background: var(--ink);
+    color: var(--mute); font-size: 12px; display: flex; gap: 14px; flex-wrap: wrap; }
+  .credit b { color: var(--foam); font-weight: 550; }
+  @media (max-width: 700px) { .stage.split { grid-template-columns: 1fr; } .strip button { width: 66px; height: 50px; } }
+</style>
+</head>
+<body>
+<header>
+  <div class="bar">
+    <h1>Triassic reference viewer <small id="tally"></small></h1>
+    <input type="search" id="q" placeholder="Filter by name or role…" aria-label="Filter subjects">
+    <div class="seg" role="group" aria-label="Which image to show">
+      <button id="m-web" aria-pressed="true">Web reference</button>
+      <button id="m-canon" aria-pressed="false">Canonical</button>
+      <button id="m-split" aria-pressed="false">Both</button>
+    </div>
+  </div>
+  <div class="bar" style="margin-top:9px">
+    <div class="chips" id="groups"></div>
+    <span class="sp" style="flex:1"></span>
+    <span class="hint"><kbd>C</kbd> toggle · <kbd>←</kbd><kbd>→</kbd> image · <kbd>J</kbd><kbd>K</kbd> subject · <kbd>Esc</kbd> close</span>
+  </div>
+</header>
+<main id="main"></main>
+
+<dialog id="dlg"><div class="sheet">
+  <div class="top">
+    <span class="n" id="d-name"></span><span class="r" id="d-role"></span>
+    <span class="sp"></span>
+    <div class="seg" role="group" aria-label="Which image to show">
+      <button id="d-web" aria-pressed="true">Web</button>
+      <button id="d-canon" aria-pressed="false">Canonical</button>
+      <button id="d-split" aria-pressed="false">Both</button>
+    </div>
+    <button class="chip" id="d-close">Close</button>
+  </div>
+  <div class="stage" id="d-stage"></div>
+  <div class="strip" id="d-strip"></div>
+  <div class="credit" id="d-credit"></div>
+</div></dialog>
+
+<script src="data.js"></script>
+<script>
+const DATA = window.TRIASSIC, CANON = window.TRIASSIC_CANONICAL || {};
+const $ = (id) => document.getElementById(id);
+const all = DATA.groups.flatMap((g) => g.subjects.map((s) => ({ ...s, group: g.id, canon: CANON[s.id] || [] })));
+const state = { mode: 'web', groups: new Set(DATA.groups.map((g) => g.id)), q: '', open: null, i: 0 };
+
+$('tally').textContent = `${all.length} subjects · ${all.reduce((n, s) => n + s.images.length, 0)} web images · `
+  + `${all.filter((s) => s.canon.length).length} with a canonical image · Commons, ${DATA.generated}`;
+
+// ---------- header controls
+$('groups').innerHTML = DATA.groups.map((g) =>
+  `<button class="chip" data-g="${g.id}" aria-pressed="true">${g.name} <span style="opacity:.65">${g.subjects.length}</span></button>`).join('');
+$('groups').addEventListener('click', (e) => {
+  const b = e.target.closest('[data-g]'); if (!b) return;
+  const on = b.getAttribute('aria-pressed') !== 'true';
+  b.setAttribute('aria-pressed', String(on));
+  on ? state.groups.add(b.dataset.g) : state.groups.delete(b.dataset.g);
+  render();
+});
+$('q').addEventListener('input', (e) => { state.q = e.target.value.toLowerCase(); render(); });
+for (const [id, mode] of [['m-web', 'web'], ['m-canon', 'canon'], ['m-split', 'split']])
+  $(id).addEventListener('click', () => setMode(mode));
+for (const [id, mode] of [['d-web', 'web'], ['d-canon', 'canon'], ['d-split', 'split']])
+  $(id).addEventListener('click', () => setMode(mode));
+
+function setMode(mode) {
+  state.mode = mode;
+  for (const [id, m] of [['m-web', 'web'], ['m-canon', 'canon'], ['m-split', 'split'],
+                         ['d-web', 'web'], ['d-canon', 'canon'], ['d-split', 'split']])
+    $(id).setAttribute('aria-pressed', String(m === mode));
+  render(); if (state.open) paint();
+}
+
+// ---------- grid
+function visible(s) {
+  if (!state.groups.has(s.group)) return false;
+  if (!state.q) return true;
+  return `${s.name} ${s.role} ${s.id} ${s.len}`.toLowerCase().includes(state.q);
+}
+function lead(s) {
+  const web = s.images[0], canon = s.canon[0];
+  if (state.mode === 'canon') return canon ? { src: canon.thumb || canon.src, canon: true } : null;
+  if (state.mode === 'split' && canon) return { src: canon.thumb || canon.src, canon: true };
+  return web ? { src: web.thumb, canon: false } : null;
+}
+function render() {
+  $('main').innerHTML = DATA.groups.filter((g) => state.groups.has(g.id)).map((g) => {
+    const subs = g.subjects.map((s) => all.find((a) => a.id === s.id)).filter(visible);
+    if (!subs.length) return '';
+    return `<section><h2>${g.name}</h2><p class="note">${g.note}</p><div class="grid">${subs.map(card).join('')}</div></section>`;
+  }).join('') || `<p class="hint" style="padding:30px 0">Nothing matches that filter.</p>`;
+}
+function card(s) {
+  const l = lead(s);
+  const shot = l
+    ? `<img src="${l.src}" alt="${s.name}" loading="lazy" onerror="this.style.display='none'">`
+    : `<div class="none">${state.mode === 'canon' ? 'no canonical image' : 'no reference found'}</div>`;
+  return `<button class="card" data-id="${s.id}">
+    <div class="shot">${shot}
+      <span class="tag ${l && l.canon ? 'canon' : ''}">${l && l.canon ? 'canonical' : 'web'}</span>
+      <span class="count">${s.imagesAre ? '⚠ ' : ''}${s.images.length} web${s.canon.length ? ` · ${s.canon.length} canon` : ''}</span>
+    </div>
+    <div class="meta"><div class="n">${s.name}</div><div class="r">${s.role}</div><div class="l">${s.len}</div></div>
+  </button>`;
+}
+$('main').addEventListener('click', (e) => {
+  const b = e.target.closest('[data-id]'); if (b) open(b.dataset.id, 0);
+});
+
+// ---------- detail
+function open(id, i) { state.open = all.find((s) => s.id === id); state.i = i; paint(); if (!$('dlg').open) $('dlg').showModal(); }
+$('d-close').addEventListener('click', () => $('dlg').close());
+$('dlg').addEventListener('close', () => { state.open = null; });
+
+function paint() {
+  const s = state.open; if (!s) return;
+  $('d-name').textContent = s.name;
+  $('d-role').textContent = `${s.role} · ${s.len}`;
+  const web = s.images[Math.min(state.i, Math.max(0, s.images.length - 1))];
+  $('d-role').title = s.imagesAre || '';
+  const canon = s.canon[0];
+  $('d-canon').disabled = $('d-split').disabled = !canon;
+
+  const webPane = web
+    ? `<div class="pane"><span class="lab">web reference</span><img src="${web.full && web.width < 2400 ? web.thumb : web.thumb}" alt="${web.title}"></div>`
+    : `<div class="pane"><span class="lab">web reference</span><p class="empty">No reference image was found for this subject on Commons.</p></div>`;
+  const canonPane = canon
+    ? `<div class="pane"><span class="lab canon">canonical${canon.label !== 'canonical' ? ' · ' + canon.label : ''}</span><img src="${canon.src}" alt="${s.name} canonical"></div>`
+    : `<div class="pane"><span class="lab canon">canonical</span><p class="empty">No canonical image yet. Drop one at
+         <code>docs/triassic/canonical/${s.id}.png</code> and run <code>node bundle.mjs</code>.</p></div>`;
+
+  const stage = $('d-stage');
+  stage.classList.toggle('split', state.mode === 'split');
+  stage.innerHTML = state.mode === 'split' ? webPane + canonPane : (state.mode === 'canon' ? canonPane : webPane);
+
+  $('d-strip').innerHTML = s.canon.map((c, k) =>
+      `<button class="c" data-canon="${k}" title="canonical: ${c.label}"><img src="${c.thumb || c.src}" alt="" loading="lazy"></button>`).join('')
+    + s.images.map((im, k) =>
+      `<button data-web="${k}" aria-current="${k === state.i && state.mode !== 'canon'}" title="${im.title}"><img src="${im.thumb}" alt="" loading="lazy"></button>`).join('');
+
+  $('d-credit').innerHTML = state.mode === 'canon'
+    ? `<span><b>Canonical image</b> — the game's own art for this subject. Press <kbd>C</kbd> to flip back to the reference.</span>`
+    : (web ? (s.imagesAre ? `<span style="flex:1 1 100%;color:var(--coral)">⚠ ${s.imagesAre}</span>` : '')
+        + `<span><b>${web.title}</b></span><span>${web.artist}</span><span>${web.licence}</span>`
+        + `<a href="${web.page}" target="_blank" rel="noreferrer">file page</a>`
+        + `<a href="${web.full}" target="_blank" rel="noreferrer">full size</a>`
+        + (web.description ? `<span style="flex:1 1 100%">${web.description}</span>` : '')
+      : '<span>Nothing found. Try a different search term in subjects.json and re-run fetch-images.mjs.</span>');
+}
+$('d-strip').addEventListener('click', (e) => {
+  const b = e.target.closest('button'); if (!b) return;
+  if (b.dataset.web !== undefined) { state.i = +b.dataset.web; if (state.mode === 'canon') setMode('web'); else paint(); }
+  else if (b.dataset.canon !== undefined) { const c = state.open.canon.splice(+b.dataset.canon, 1)[0]; state.open.canon.unshift(c); setMode('canon'); }
+});
+
+// ---------- keyboard
+addEventListener('keydown', (e) => {
+  if (e.target.tagName === 'INPUT') { if (e.key === 'Escape') e.target.blur(); return; }
+  if (e.key === '/') { e.preventDefault(); $('q').focus(); return; }
+  const k = e.key.toLowerCase();
+  if (k === 'c') {
+    e.preventDefault();
+    if (state.mode === 'canon') setMode('web');
+    else if (state.mode === 'web') setMode('canon');
+    else setMode('web');
+    return;
+  }
+  if (k === 'b') { e.preventDefault(); setMode(state.mode === 'split' ? 'web' : 'split'); return; }
+  if (!state.open) return;
+  const list = all.filter(visible);
+  const at = list.findIndex((s) => s.id === state.open.id);
+  if (e.key === 'ArrowRight') { state.i = (state.i + 1) % Math.max(1, state.open.images.length); paint(); }
+  if (e.key === 'ArrowLeft') { state.i = (state.i - 1 + Math.max(1, state.open.images.length)) % Math.max(1, state.open.images.length); paint(); }
+  if (k === 'j' && at < list.length - 1) open(list[at + 1].id, 0);
+  if (k === 'k' && at > 0) open(list[at - 1].id, 0);
+});
+
+render();
+</script>
+</body>
+</html>

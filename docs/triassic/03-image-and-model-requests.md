@@ -25,16 +25,22 @@ representative length and its source, the anatomy that must be right (listed per
 [01](01-triassic-design.md)), and the uncertainty labels. Multi-panel; the panels are not separate
 files. Twenty-five boards: T01–T21, S01–S04.
 
-### A2 · Tripo source views (Tier 1 inputs, generated in-house from the boards)
+### A2 · Tripo source views (Tier 1 inputs, generated in-house)
 
-For each Tier 1 subject, four images at 2048×2048, PNG, on a plain mid-grey ground, neutral light,
-no cast shadow, no text: **left side**, **top**, **front** (orthographic) and **three-quarter**
-(the view the portrait will use). Mouth closed; limbs in the rig's rest pose (flippers half
-spread, neck straight, tail straight); the animal alone. Saved to
-`intake/triassic/<id>/source-{side,top,front,threequarter}.png` with the prompt beside each in
-`prompts.json`. The cross-check before a generation: the top view's width and the side view's
-height must agree at every station within a tenth, or the body Tripo makes from them will be
-warped.
+**Canonical first.** Each subject gets one approved pose — silhouette, species-defining anatomy,
+the whole tail, every limb or fin — and the four-view sheet is generated *from that image*, never
+from prose, so the four views agree with each other and with a picture somebody has actually
+approved. **The 26 canonical poses are delivered** and live in
+[`docs/triassic/canonical/`](canonical/README.md); `manifest.json` there tracks which subjects have
+gone on to a turnaround. None have yet, so A2 below is the open half of this request.
+
+For each Tier 1 subject, four images at 2048×2048, PNG, on a pale neutral studio grey, neutral
+light, no cast shadow, no text: **left side**, **top**, **front** (orthographic) and
+**three-quarter** (the view the portrait will use). Mouth closed; limbs in the rig's rest pose
+(flippers half spread, neck straight, tail straight); the animal alone, and the same animal as its
+canonical pose. Delivered through `intake/triassic/<id>/` and landed beside the pose. The
+cross-check before a generation: the top view's width and the side view's height must agree at
+every station within a tenth, or the body Tripo makes from them will be warped.
 
 | Subject | Views | Notes for the images |
 | --- | --- | --- |
@@ -85,7 +91,7 @@ makes: `intake/triassic/scenery/<id>/`.
 | `public/assets/triassic/biomes/<biome>.webp` × 9 | 1600×900 | The nine biome banners of [02](02-biomes-and-depth.md#the-nine-slots): the red shore, the milk-turquoise flats, the log rafts over the black basin. Text-free. Prompts kept in `tools/triassic/environment-image-prompts.json`. | The procedural banners the era would otherwise draw. |
 | `public/assets/triassic/brand/keyart.webp` + mobile | 2560×1440, 1080×1920 | Low angle from below the surface: a Keichousaurus crowd in the Conifer Shore, the sun through the surface, and the boom of a Tanystropheus neck coming down out of the light. Upper third quiet for the wordmark. | Nothing; the era's title backdrop. |
 | `public/assets/triassic/brand/logo-triassic.{svg,png}` | as the other eras | The era wordmark in the trilogy's lettering. | — |
-| `public/assets/ui/breath-*.svg` × 3 | 64×64, currentColor | The breath ring's states: full, last quarter, empty (the blow). | The ring drawn procedurally in the HUD. |
+| `public/assets/ui/air-*.svg` × 2 | 64×64, currentColor | The stamina bar's air marks: *recovery off* (shown while an air-breather is under water) and *surface for air* (the arrow up on an empty bar). | Nothing; the bar is drawn procedurally and gains these. |
 | `public/assets/ui/shore-reach.svg` | 64×64 | The hatched arc the radar draws inside a shore animal's reach. | — |
 | Regional boards × 9 | multi-panel | One per biome, art direction with the localities labelled, as `docs/devonian/supporting-assets.md` describes. Not evidence that the pictured animals coexisted. | — |
 | Scale plates × 2 | multi-panel | Roster at true lengths; roster at game lengths under the 4.0·m^0.55 rule. | — |
@@ -105,25 +111,25 @@ follow the instanced-prop rules on the requests page.
 
 | Id | Blocked on | Rig and clips beyond the contract set | Special |
 | --- | --- | --- | --- |
-| `cymbospondylus` | A2 T01 | Long spine chain, low fluke; jaw. `Grab` (held loop), `Breathe` (surface blow), `Dive`. | Mouth interior with the full tooth row; the drown-hold is `Grab` + `Dive`. |
+| `cymbospondylus` | A2 T01 | Long spine chain, low fluke; jaw. `Grab` (held loop), `Breathe` (the surface blow; every air-breather needs it), `Dive`. | Mouth interior with the full tooth row; the exhaustion hold is `Grab` + `Dive`. |
 | `shonisaurus` | A2 T02 | As above; `PodCall`. A calf model at 0.6 scale is the same rig, no separate build. | The deep chest; the calf as a stage, not a body. |
-| `nothosaurus` | A2 T03 | Paddle chain for the forelimbs, a rowing `Crawl` on the bottom, `Swim` tail-driven, `HaulOut`, `Grab`, `Breathe`. | Two locomotion clips: row and burst. |
+| `nothosaurus` | A2 T03 | Paddle chain for the forelimbs, a rowing `Crawl` on the bottom, `Swim` tail-driven, `Grab`, `Breathe`. | Two locomotion clips: row and burst. |
 | `dinocephalosaurus` | A2 T04 | Procedural 32-joint neck; `NeckStrike`, `Periscope` (head up, body level), `Breathe`. | Neck built on the skeleton, stitched to the Tripo head and trunk. |
 | `helicoprion` | A2 T05 | Whorl as a jaw-bone with a rotation channel; `WhorlSaw` (held loop with the whorl turning). | The whorl's rotation is a bone, so `apply.mjs` can drive it. |
 | `rhaeticosaurus` | A2 T06 | Four flipper chains with a simultaneous stroke, `PowerStroke`, `Breach`, `Breathe`. | The flight loop is the model, as the medusa's pulse is: the renderer may scrub it to stroke phase. |
 | `atopodentatus` | A2 T07 | Jaw with the bar; `Scrape` (loop, mouth open, sieve), `HammerSweep`, `Crawl` (bottom walk), `Breathe`. | Mouth interior with chisels and the needle mesh both. |
 | `askeptosaurus` | A2 T08 | Long tail chain; `Coil`, `TailWhip`. | — |
-| `placodus` | A2 T09 | `Crawl` (bottom walk), `Pry` (loop), `CrushBite`, `HaulOut`, `Breathe`. | Ventral armour as a separate rigid part. |
+| `placodus` | A2 T09 | `Crawl` (bottom walk), `Pry` (loop), `CrushBite`, `Breathe`. | Ventral armour as a separate rigid part. |
 | `hybodus` | A2 T10 | `SpineBrace` (guard). Male hooks as a scheme-toggled part. | — |
 | `birgeria` | A2 T11 | `RunThrough`, `Gulp`. | Wide gape; the mouth interior is most of the head. |
-| `aphaneramma` | A2 T12 | `SideSwipe` (left and right), `HaulOut`, `Crawl`, `Breathe`. | — |
+| `aphaneramma` | A2 T12 | `SideSwipe` (left and right), `Crawl`, `Breathe`. | — |
 | `mixosaurus` | A2 T13 | Dorsal fin as a bone (it flexes); `ShoalDart`, `Breathe`. | — |
-| `henodus` | A2 T14 | Shell rigid; `Comb` (loop), `Crawl`, `HaulOut`, `Breathe`. | Embedded albedo allowed for the plate mosaic. |
+| `henodus` | A2 T14 | Shell rigid; `Comb` (loop), `Crawl`, `Breathe`. | Embedded albedo allowed for the plate mosaic. |
 | `saurichthys` | A2 T15 | Stiff body, few spine joints; `AmbushSurge`, `Drift` (hang). | — |
 | `hupehsuchus` | A2 T16 | Pouch as a blend-shaped throat; `Gulp` (pouch open), `Breathe`. | The pouch is Blender work, the one morph target on the roster. |
 | `keichousaurus` | A2 T17 | Forelimb-driven `Swim`, `Crawl`, `KinScatter`, `Breathe`. Two schemes. | — |
-| `cartorhynchus` | A2 T18 | Bending wrists as joints; `Crawl` (the strong one), `SuctionSnap`, `HaulOut`, `Breathe`. | — |
-| `odontochelys` | A2 T19 | Plastron rigid; `BellyTurn` (guard: the roll), `Crawl`, `Breathe`, `BeachRun`. | The beach run is the hatch clip. |
+| `cartorhynchus` | A2 T18 | Bending wrists as joints; `Crawl` (the strong bottom-walk), `SuctionSnap`, `Breathe`. | — |
+| `odontochelys` | A2 T19 | Plastron rigid; `BellyTurn` (guard: the roll), `Crawl`, `Breathe`. | No beach clip: it hatches in the weed like everything else that lays. |
 | `ceratites` | A2 T20 | Shell rigid, soft body; `Jet`, `Hover`, `Withdraw` (aptychus). | The same shell mesh, unlit, is the `ceratite-drift` prop. |
 | `phragmoteuthis` | A2 T21 | Ten arm chains with hooks; `Grab` (held loop), `Ink`, `Jet`. | Ink is a particle; the clip is the mantle squeeze. |
 
@@ -182,7 +188,7 @@ is built: the blow is the era's signature sample and needs a real recording, not
 
 | | Tier 1 (Tripo) | Tier 2 (in-house) |
 | --- | --- | --- |
-| Source images | 112 creature and shore-animal views + 12 scenery views (generated in-house as inputs) | 25 reference boards, 9 banners, 2 key art, 1 wordmark, 4 glyphs, 9 regional boards, 2 scale plates |
+| Source images | 26 canonical poses **(delivered)** + 112 creature and shore-animal views + 12 scenery views (generated in-house as inputs) | 25 reference boards, 9 banners, 2 key art, 1 wordmark, 4 glyphs, 9 regional boards, 2 scale plates |
 | Models | 21 creatures, 3–4 shore animals, 4 scenery | 19 instanced prop kinds in 38 variants |
 | Derived | 25 procedural twins as LODs | 100 portraits |
 
