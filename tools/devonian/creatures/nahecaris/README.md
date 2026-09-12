@@ -80,3 +80,15 @@ Run shared `tools/devonian/eye-audit.py` in Blender against each generated geome
 ## Frozen initial delivery
 
 Full/LOD hashes and exact seven-file family are in `delivery.json` and `WORKING_STATE.md`. Full177,975 triangles; LOD54,288 (30.50%); 82matching joints; 19full actions; fourLODclips; threeanchors. Both actual eye-volume audits pass around80% with closed uncapped head. Shared intake and actualThree19clip playback pass. Four final portraits, seven basic close/side/full views and threeLODposes match the final exports. Final lit oral review corrected exterior pigment on the recessed roof. Further fine appendage, oral-surface and material refinement is deferred under the initial-delivery priority.
+
+## V2 shipped — 12 September 2026
+
+`build_v2.py` (with `export_v2.py`, `finalize_v2.py`, `render_v2.py`, `portraits_v2.py`) ports the
+approved study off the user reference (`docs/reference/Nahecaris.jpg`): an elongate valve with a
+straight dorsal hinge and a flatter flank (`valverows` rewritten, flank exponent .55), extending
+to y=1.05; the abdomen's seven somites spaced .28 with overlapping spans so the chain reads
+continuous, the telson and furcal rami longer; the eyes larger and standing proud under the
+rostrum as the drawing's stalked eyes do (they are arthropod eyes and exempt from the fish-globe
+threshold; the audit reports 34%); the antennal rami 1.3× longer. Packaging exact round-trip PASS
+at 177,975 / 54,288 triangles; intake PASS; portraits derived from the V2 render. `build.py` still
+reproduces V1. The user accepted the study on 12 September; badge cleared.

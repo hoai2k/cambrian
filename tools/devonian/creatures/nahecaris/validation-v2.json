@@ -1,0 +1,398 @@
+{
+  "checks": "finite transforms, normalized weights, root stable, identity-scale removal, unique motion, seamless loops, socket bind alignment, true LOD reduction",
+  "models": [
+    {
+      "file": "nahecaris.glb",
+      "bytes": 11993368,
+      "vertices": 93963,
+      "triangles": 177975,
+      "bounds": [
+        1.7331507205963135,
+        1.1401537954807281,
+        6.6098034381866455
+      ],
+      "bones": 82,
+      "boneNames": [
+        "root",
+        "body",
+        "abdomen0",
+        "abdomen1",
+        "abdomen2",
+        "abdomen3",
+        "abdomen4",
+        "abdomen5",
+        "abdomen6",
+        "telson",
+        "furcaL",
+        "furcaR",
+        "pleopodL4",
+        "pleopodR4",
+        "pleopodL3",
+        "pleopodR3",
+        "pleopodL2",
+        "pleopodR2",
+        "pleopodL1",
+        "pleopodR1",
+        "pleopodL0",
+        "pleopodR0",
+        "antenna0L",
+        "antennaTip0L",
+        "antenna0R",
+        "antennaTip0R",
+        "antenna1L",
+        "antennaTip1L",
+        "antenna1R",
+        "antennaTip1R",
+        "mandibleL",
+        "mandibleR",
+        "thoracopodL0",
+        "endopodL0",
+        "exopodL0",
+        "thoracopodL1",
+        "endopodL1",
+        "exopodL1",
+        "thoracopodL2",
+        "endopodL2",
+        "exopodL2",
+        "thoracopodL3",
+        "endopodL3",
+        "exopodL3",
+        "thoracopodL4",
+        "endopodL4",
+        "exopodL4",
+        "thoracopodL5",
+        "endopodL5",
+        "exopodL5",
+        "thoracopodL6",
+        "endopodL6",
+        "exopodL6",
+        "thoracopodL7",
+        "endopodL7",
+        "exopodL7",
+        "thoracopodR0",
+        "endopodR0",
+        "exopodR0",
+        "thoracopodR1",
+        "endopodR1",
+        "exopodR1",
+        "thoracopodR2",
+        "endopodR2",
+        "exopodR2",
+        "thoracopodR3",
+        "endopodR3",
+        "exopodR3",
+        "thoracopodR4",
+        "endopodR4",
+        "exopodR4",
+        "thoracopodR5",
+        "endopodR5",
+        "exopodR5",
+        "thoracopodR6",
+        "endopodR6",
+        "exopodR6",
+        "thoracopodR7",
+        "endopodR7",
+        "exopodR7",
+        "valveL",
+        "valveR"
+      ],
+      "textures": 9,
+      "sockets": [
+        {
+          "name": "anchor_attack_primary",
+          "point": [
+            0.05400000140070915,
+            -0.13500003462981935,
+            1.2899999233459192
+          ]
+        },
+        {
+          "name": "anchor_mouth",
+          "point": [
+            0.0,
+            -0.13500003377410663,
+            1.26499994804349
+          ]
+        },
+        {
+          "name": "anchor_mouth_inside",
+          "point": [
+            0.0,
+            -0.06500002842150099,
+            1.264999950439488
+          ]
+        }
+      ],
+      "clips": [
+        {
+          "name": "Ability",
+          "duration": 1.7999999523162842,
+          "motion": 135.369,
+          "digest": "17eb56efafd998d2cc53ebfe7e6a959707e443a9553d9c7f9bb79ca1f42b05ed"
+        },
+        {
+          "name": "Attack",
+          "duration": 1.0,
+          "motion": 65.591,
+          "digest": "45d34b2b816e63faaca2c37e2569b652b108610d3b4d7467d091de2af387b674"
+        },
+        {
+          "name": "Bite",
+          "duration": 0.5,
+          "motion": 25.144,
+          "digest": "19527b4fa9eebe4f4ba790d030585b503b64c7a13065fd16281736d5154b6ad4"
+        },
+        {
+          "name": "Crawl",
+          "duration": 2.4000000953674316,
+          "motion": 187.035,
+          "digest": "4024455ab80560683b9978eba5c15e5539fea8661963493b7102968764972e4f"
+        },
+        {
+          "name": "Death",
+          "duration": 1.600000023841858,
+          "motion": 108.534,
+          "digest": "28de4212bd02b2c1f7dbad9f67678ed64864acfaaedee3ad0aecac53d4cb129a"
+        },
+        {
+          "name": "Dive",
+          "duration": 1.2000000476837158,
+          "motion": 17.643,
+          "digest": "0b38f08de3d3e001941ea9f6e9715bb687b6b0fc8ead0abcd310a2cc70b76481"
+        },
+        {
+          "name": "Dodge",
+          "duration": 0.4000000059604645,
+          "motion": 19.503,
+          "digest": "a43824509d89d12b6927c72a1e8dbfd78b0bc577bbd94dd6885f68a0593f806e"
+        },
+        {
+          "name": "Eat",
+          "duration": 1.2000000476837158,
+          "motion": 150.93,
+          "digest": "c561f6849058ccb1fe9a649369bfb16a811c6c30b23c5be518230592287b4142"
+        },
+        {
+          "name": "Guard",
+          "duration": 1.0,
+          "motion": 29.965,
+          "digest": "6b0915b1b1b8736304a6f10979ccbbb5c4d48fc5211d799ccc29088b591be3d6"
+        },
+        {
+          "name": "Heavy",
+          "duration": 1.100000023841858,
+          "motion": 89.339,
+          "digest": "7b6ad66e8d72c2a831bb93bd4b7488cd85f3c8c8746063e80e440bb71a10252c"
+        },
+        {
+          "name": "Hit",
+          "duration": 0.6000000238418579,
+          "motion": 28.664,
+          "digest": "0bc5a841810e4be91b2b6bdfc1a26e11bdfce1aec78fcdb096901b9a9c4f2a0c"
+        },
+        {
+          "name": "Idle",
+          "duration": 2.4000000953674316,
+          "motion": 92.69,
+          "digest": "16d8c2d6dab0331c18fbdbf4871d9d22ed0f570ff7e158271b04ad3301a52fd5"
+        },
+        {
+          "name": "Moult",
+          "duration": 1.5,
+          "motion": 33.594,
+          "digest": "ce7bc132f74af1fb3b4b4e2f10cfd198cc718fb0dfd924ae65127b2217239922"
+        },
+        {
+          "name": "Parry",
+          "duration": 0.3333333432674408,
+          "motion": 16.256,
+          "digest": "876381babc3351671c28e3f449c023c49620002032a99be66ed7a0b4039d1531"
+        },
+        {
+          "name": "Rise",
+          "duration": 1.2000000476837158,
+          "motion": 17.643,
+          "digest": "2343828704a11f30e97b42d610f6a23cf79fa25c1f318d786335611fce679210"
+        },
+        {
+          "name": "Stagger",
+          "duration": 1.2000000476837158,
+          "motion": 57.369,
+          "digest": "db0b55fdfa72cda41a78496091c2194998146a1541e1b669b7b80112fbf7bbc2"
+        },
+        {
+          "name": "Swim",
+          "duration": 2.4000000953674316,
+          "motion": 305.698,
+          "digest": "9c4ff8d5a69d8712a624c4d8671a7efd3a284ee2b733453dc7d2dee763887670"
+        },
+        {
+          "name": "TurnLeft",
+          "duration": 1.600000023841858,
+          "motion": 35.015,
+          "digest": "c0c9e5978ebb8827175d540069ed2aea0c5e2741e79849e5fb9db5174d0c11eb"
+        },
+        {
+          "name": "TurnRight",
+          "duration": 1.600000023841858,
+          "motion": 35.015,
+          "digest": "92649984f7a5131555c512ada377f4d72a6fa085388e5ff84bdd0fd895820f27"
+        }
+      ],
+      "removedIdentityScaleChannels": 1558,
+      "sha256": "4b55bcb1597e6d7afcef8b248917bce62267fa0570325aa489e844c1b3961e52"
+    },
+    {
+      "file": "nahecaris.lod1.glb",
+      "bytes": 3025956,
+      "vertices": 29929,
+      "triangles": 54288,
+      "bounds": [
+        1.7331507205963135,
+        1.140243947505951,
+        6.6098034381866455
+      ],
+      "bones": 82,
+      "boneNames": [
+        "root",
+        "body",
+        "abdomen0",
+        "abdomen1",
+        "abdomen2",
+        "abdomen3",
+        "abdomen4",
+        "abdomen5",
+        "abdomen6",
+        "telson",
+        "furcaL",
+        "furcaR",
+        "pleopodL4",
+        "pleopodR4",
+        "pleopodL3",
+        "pleopodR3",
+        "pleopodL2",
+        "pleopodR2",
+        "pleopodL1",
+        "pleopodR1",
+        "pleopodL0",
+        "pleopodR0",
+        "antenna0L",
+        "antennaTip0L",
+        "antenna0R",
+        "antennaTip0R",
+        "antenna1L",
+        "antennaTip1L",
+        "antenna1R",
+        "antennaTip1R",
+        "mandibleL",
+        "mandibleR",
+        "thoracopodL0",
+        "endopodL0",
+        "exopodL0",
+        "thoracopodL1",
+        "endopodL1",
+        "exopodL1",
+        "thoracopodL2",
+        "endopodL2",
+        "exopodL2",
+        "thoracopodL3",
+        "endopodL3",
+        "exopodL3",
+        "thoracopodL4",
+        "endopodL4",
+        "exopodL4",
+        "thoracopodL5",
+        "endopodL5",
+        "exopodL5",
+        "thoracopodL6",
+        "endopodL6",
+        "exopodL6",
+        "thoracopodL7",
+        "endopodL7",
+        "exopodL7",
+        "thoracopodR0",
+        "endopodR0",
+        "exopodR0",
+        "thoracopodR1",
+        "endopodR1",
+        "exopodR1",
+        "thoracopodR2",
+        "endopodR2",
+        "exopodR2",
+        "thoracopodR3",
+        "endopodR3",
+        "exopodR3",
+        "thoracopodR4",
+        "endopodR4",
+        "exopodR4",
+        "thoracopodR5",
+        "endopodR5",
+        "exopodR5",
+        "thoracopodR6",
+        "endopodR6",
+        "exopodR6",
+        "thoracopodR7",
+        "endopodR7",
+        "exopodR7",
+        "valveL",
+        "valveR"
+      ],
+      "textures": 0,
+      "sockets": [
+        {
+          "name": "anchor_attack_primary",
+          "point": [
+            0.05400000140070915,
+            -0.13500003462981935,
+            1.2899999233459192
+          ]
+        },
+        {
+          "name": "anchor_mouth",
+          "point": [
+            0.0,
+            -0.13500003377410663,
+            1.26499994804349
+          ]
+        },
+        {
+          "name": "anchor_mouth_inside",
+          "point": [
+            0.0,
+            -0.06500002842150099,
+            1.264999950439488
+          ]
+        }
+      ],
+      "clips": [
+        {
+          "name": "Crawl",
+          "duration": 2.4000000953674316,
+          "motion": 187.035,
+          "digest": "4024455ab80560683b9978eba5c15e5539fea8661963493b7102968764972e4f"
+        },
+        {
+          "name": "Death",
+          "duration": 1.600000023841858,
+          "motion": 108.534,
+          "digest": "28de4212bd02b2c1f7dbad9f67678ed64864acfaaedee3ad0aecac53d4cb129a"
+        },
+        {
+          "name": "Idle",
+          "duration": 2.4000000953674316,
+          "motion": 92.69,
+          "digest": "16d8c2d6dab0331c18fbdbf4871d9d22ed0f570ff7e158271b04ad3301a52fd5"
+        },
+        {
+          "name": "Swim",
+          "duration": 2.4000000953674316,
+          "motion": 305.698,
+          "digest": "9c4ff8d5a69d8712a624c4d8671a7efd3a284ee2b733453dc7d2dee763887670"
+        }
+      ],
+      "removedIdentityScaleChannels": 328,
+      "sha256": "c24446caf070ff3f2fe9da13f2a34ff2d3ca1ee35663589cbbf74b6b6babe64d"
+    }
+  ],
+  "lodTriangleRatio": 0.305031605562579
+}
