@@ -66,8 +66,7 @@
     "id": "jaekelopterus",
     "status": "pending",
     "scope": "individual-refinement",
-    "model": true,
-    "reason": "Triage 11 September: the opisthosoma is a uniform taper of rounded rings where the animal's was flattened with a broad preabdomen stepping down to a narrower postabdomen; the chelicerae are rounded tubes where the rami were long, slender and toothed; the cuticle reads as one flat beige. Silhouette and claw redesign, then material.",
+    "model": false,
     "clips": [
       "Bite",
       "Attack",
@@ -107,8 +106,7 @@
     "id": "palaeoisopus",
     "status": "pending",
     "scope": "individual-refinement",
-    "model": true,
-    "reason": "Triage 11 September: every leg and trunk segment is a beaded lozenge with dark joint bands, so the animal reads as strung olives. Palaeoisopus' defining feature is its dorsoventrally flattened, oar-like leg segments for swimming, on a flat trunk. Re-section the legs as blades and the trunk as a flat plate; keep the proboscis, chelifores and the long segmented abdomen.",
+    "model": false,
     "clips": [
       "Bite",
       "Attack",
@@ -163,12 +161,5 @@
     "scope": "total-rework",
     "model": true,
     "reason": "User reference: shark-like form, head/body/fin/tail proportions and dorsal spine-brush in the same colour family as the body. Audit after completed rework."
-  },
-  {
-    "id": "cladoselache",
-    "status": "pending",
-    "scope": "individual-refinement",
-    "model": true,
-    "reason": "8 September user reference reopens final model: distinctive fin outlines/angles and body/fin patterning. Preserve prior final family; redesign before new audits."
   }
 ]
