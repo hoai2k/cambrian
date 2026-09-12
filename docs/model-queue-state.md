@@ -275,3 +275,73 @@ tiktaalik, titanichthys. Three Sonnet agents are authoring them through
 `tools/creatures/motion/apply.mjs` (a performance per creature in `performances/<id>.mjs`, held
 loop 0.9–1.2 s, breathing, never opening; adds the clip without touching the others), with contact
 sheets at scratchpad `grab/*-grab-sheet.png`. The parent verifies, commits by path and merges.
+
+## 12 September, afternoon — RESUME POINT (written as the session's tokens ran out)
+
+Everything finished is on `main` (last merge: sculpt features, preview toggle, measure tool).
+Seven agents were running when this was written; their in-progress files are untracked in the
+working tree and **must not be committed until verified**. What each is, where its output lands,
+and what to do with it:
+
+**Grab batch** (three Sonnet agents; the user's rule is every model carries a `Grab` clip; 26
+models lacked one). Mechanism: `tools/creatures/motion/apply.mjs <id>` with a performance in
+`tools/creatures/motion/performances/<id>.mjs` (a held loop 0.9–1.2 s, breathing, never opening;
+adds the clip, touches nothing else). Cambrian: burgessomedusa, canadia, ctenorhabdotus, marrella,
+odontogriphus, olenoides, pikaia, sidneyia, vetulicola, waptia, wiwaxia. Devonian fish:
+cheirolepis, cladoselache, coccosteus, dunkleosteus, gemuendina, onychodus, rhinodipterus,
+stethacanthus. Devonian others: acanthostega, bothriolepis, doryaspis, eldredgeops, nahecaris,
+tiktaalik, titanichthys. When this was written, performances existed for cheirolepis,
+cladoselache, coccosteus (dry-run output under scratchpad `grab/<id>/`) and no public GLB had
+been rewritten — the agents may have been refused the write into `public/` by the session's
+auto-mode classifier (it refused the parent twice before the user granted it). **To finish**: for
+each creature with a performance file, `node tools/creatures/motion/apply.mjs <id>` (the parent
+has the grant), then `node tools/devonian/check.mjs <id>` (Devonian) / `npm run check`
+(Cambrian), look at the agents' contact sheets (`scratchpad/grab/*-grab-sheet.png` if made, else
+render with `tools/creatures/motion/review.py`), commit performances + GLBs by path, merge. Any
+creature still without a performance needs one written (see the three existing ones and
+`performances/cambroraster.mjs`, `hallucigenia.mjs` for the form).
+
+**Sculpt ports** (three Sonnet agents) from `docs/sculpts/*.json` (copied there so they survive):
+Gemuendina → `tools/devonian/creatures/gemuendina/face-v4/candidate_06.py` (+ `shape_06`,
+`render_candidate_06`, `check_candidate_06`, `audit_candidate_06`), candidate at
+`/home/user/devonian-authoring/gemuendina/sculpt-candidate/`; Titanichthys →
+`tools/devonian/creatures/titanichthys/sculpt-port/`, candidate at
+`/home/user/devonian-authoring/titanichthys/sculpt-candidate/`; Dunkleosteus →
+`tools/devonian/creatures/dunkleosteus/build_v3.py` + `finalize_v3.py` + `portraits_v3.py`,
+candidate at `/home/user/devonian-authoring/dunkleosteus/sculpt-candidate/`. Sheets go to
+scratchpad `ports/<id>-sculpt-sheet.png`. **To finish** each: check
+`npm run sculpt:measure -- <candidate>/<id>.glb docs/sculpts/<id>-sculpt.json` (±3% at changed
+stations, ±1% elsewhere), look at the sheet, then `bash scratchpad/integrate.sh <id> <candidate>
+<candidate>` (the script is in the session scratchpad; it copies glb/lod1/json + 4 portraits into
+`public/assets/devonian/creatures/`, runs check.mjs, update-asset-sizes, clears the badge if any,
+regenerates the catalogue, eras, devonian — recreate it from the description in the 12 September
+"later" section above if the scratchpad is gone), **then re-apply Grab** (`node
+tools/creatures/motion/apply.mjs <id>` — a rebuilt GLB loses the added clip; apply.mjs is
+re-runnable), then `node tools/devonian/check.mjs <id>`, README section, commit by path, merge,
+delete the sculpt file from `docs/sculpts/` in the same commit. Note the candidate directories
+live outside the repo and die with the container: if they are gone, re-run the port builders.
+
+**Doryaspis V3** (Opus agent): clay01 re-derived on Linux (`rework-v3/*clay01-linux.py`, sheet at
+scratchpad `dory/clay01-sheet.png`), then clay02 with the mouth terminal at the very front above
+the saw (the user's words are in the 12 September "later" section), materials, `build_v3.py`
+(V2's 12 bones, 18 clips + Grab), finalize, package, eye audit, portraits, sheet at scratchpad
+`dory/doryaspis-v2-vs-v3-sheet.png` + `dory/doryaspis-v3-mouth.png`. Candidate at
+`/home/user/devonian-authoring/doryaspis/v3-candidate/`. **To finish**: judge the mouth strip and
+sheet, `integrate.sh doryaspis <candidate> <candidate>`, check, README, commit, merge; it carries
+Grab itself. Doryaspis' queue entry is cleared by integrate.sh.
+
+**After all of that**: run the Opus-medium verification the user asked for — every step of
+`.github/workflows/pages.yml` (`npm ci`, typecheck, check, devonian:check, eras, sculpt, portraits,
+build) plus `npm run sculpt`, `node tools/creatures/add-anchors.mjs --check`; fix what fails.
+Known: `npm run check --strict` reports 14 pre-existing "lod1 is older than the model" warnings
+(the clip re-encodes); the workflow runs it non-strict. When a model's portraits are re-rendered,
+`public/assets/creatures/defaults/` (Cambrian only) must be refreshed with manifest hashes or
+`npm run portraits` fails the deploy — that is what broke the build after Odaraia.
+
+**Blocked on the user**: Coccosteus (candidate07's two GLBs exist only on the Mac).
+
+**Shipped this session, all on main**: viewer sculpt mode (`docs/viewer-sculpt.md`) with
+stations/regions/tangents, eyes and mouth features, Edited/Original toggle, URL state,
+`npm run sculpt` and `npm run sculpt:measure`; Odaraia V3 (19 clips incl. Grab); Bothriolepis V3;
+Stethacanthus V3; Acanthostega V2, Tiktaalik V3, Onychodus V2, Rhinodipterus V3, Nahecaris V2;
+translucency fixes; the checks made honest (add-anchors identity transforms, era test two-way).

@@ -1,0 +1,635 @@
+{
+  "format": "cambrian-sculpt",
+  "version": 1,
+  "generated": "2026-09-12T12:39:22.061Z",
+  "creature": {
+    "key": "devonian:creature:gemuendina",
+    "id": "gemuendina",
+    "collection": "devonian",
+    "model": "assets/devonian/creatures/gemuendina.glb"
+  },
+  "frame": {
+    "axis": "z",
+    "forward": 1,
+    "up": "y",
+    "note": "Model root frame, unscaled. Stations run along z in ascending order; the head is at the high end. dorsal/ventral are y extremes at the station, width the half-extent from the lateral midline. A tangent is the curve's slope (value per unit axis) where one was pulled by hand; otherwise the spline is Catmull-Rom through the stations."
+  },
+  "bounds": {
+    "length": 6.185060739517212,
+    "height": 0.7069340348243713,
+    "width": 3.799855947494507,
+    "lateralMid": 0,
+    "axisMin": -4.079999923706055,
+    "axisMax": 2.1050608158111572
+  },
+  "regions": [
+    {
+      "name": "Head",
+      "from": 17,
+      "to": 19
+    },
+    {
+      "name": "Fore body",
+      "from": 12,
+      "to": 16
+    },
+    {
+      "name": "Mid body",
+      "from": 7,
+      "to": 11
+    },
+    {
+      "name": "Hind body",
+      "from": 3,
+      "to": 6
+    },
+    {
+      "name": "Tail",
+      "from": 0,
+      "to": 2
+    }
+  ],
+  "changed": true,
+  "stations": [
+    {
+      "index": 0,
+      "headFraction": 1,
+      "axis": -4.079999923706055,
+      "shift": 0,
+      "editedAxis": -4.079999923706055,
+      "dorsal": {
+        "base": 0.03351298347115517,
+        "edit": 0.03351298347115517,
+        "percent": 0,
+        "tangent": null
+      },
+      "ventral": {
+        "base": 0.014400364831089973,
+        "edit": 0.014400364831089973,
+        "percent": 0,
+        "tangent": null
+      },
+      "width": {
+        "base": 0.16034838557243347,
+        "edit": 0.16034838557243347,
+        "percent": 0,
+        "tangent": null
+      },
+      "height": {
+        "base": 0.019112618640065193,
+        "edit": 0.019112618640065193
+      }
+    },
+    {
+      "index": 1,
+      "headFraction": 0.947,
+      "axis": -3.7544704110998857,
+      "shift": 0,
+      "editedAxis": -3.7544704110998857,
+      "dorsal": {
+        "base": 0.07452043145895004,
+        "edit": 0.07452043145895004,
+        "percent": 0,
+        "tangent": null
+      },
+      "ventral": {
+        "base": 0.01770254410803318,
+        "edit": 0.01770254410803318,
+        "percent": 0,
+        "tangent": null
+      },
+      "width": {
+        "base": 0.17271117866039276,
+        "edit": 0.17271117866039276,
+        "percent": 0,
+        "tangent": null
+      },
+      "height": {
+        "base": 0.05681788735091686,
+        "edit": 0.05681788735091686
+      }
+    },
+    {
+      "index": 2,
+      "headFraction": 0.895,
+      "axis": -3.4289408984937166,
+      "shift": 0,
+      "editedAxis": -3.4289408984937166,
+      "dorsal": {
+        "base": 0.10306520015001297,
+        "edit": 0.10306520015001297,
+        "percent": 0,
+        "tangent": null
+      },
+      "ventral": {
+        "base": 0.0164814330637455,
+        "edit": 0.0164814330637455,
+        "percent": 0,
+        "tangent": null
+      },
+      "width": {
+        "base": 0.164619579911232,
+        "edit": 0.164619579911232,
+        "percent": 0,
+        "tangent": null
+      },
+      "height": {
+        "base": 0.08658376708626747,
+        "edit": 0.08658376708626747
+      }
+    },
+    {
+      "index": 3,
+      "headFraction": 0.842,
+      "axis": -3.1034113858875476,
+      "shift": 0,
+      "editedAxis": -3.1034113858875476,
+      "dorsal": {
+        "base": 0.12128163874149323,
+        "edit": 0.12128163874149323,
+        "percent": 0,
+        "tangent": null
+      },
+      "ventral": {
+        "base": 0.003499783342704177,
+        "edit": 0.003499783342704177,
+        "percent": 0,
+        "tangent": null
+      },
+      "width": {
+        "base": 0.11864053457975388,
+        "edit": 0.11864053457975388,
+        "percent": 0,
+        "tangent": null
+      },
+      "height": {
+        "base": 0.11778185539878905,
+        "edit": 0.11778185539878905
+      }
+    },
+    {
+      "index": 4,
+      "headFraction": 0.789,
+      "axis": -2.7778818732813786,
+      "shift": 0,
+      "editedAxis": -2.7778818732813786,
+      "dorsal": {
+        "base": 0.1306411623954773,
+        "edit": 0.1306411623954773,
+        "percent": 0,
+        "tangent": null
+      },
+      "ventral": {
+        "base": -0.01769270747900009,
+        "edit": -0.01769270747900009,
+        "percent": 0,
+        "tangent": null
+      },
+      "width": {
+        "base": 0.14867563545703888,
+        "edit": 0.14867563545703888,
+        "percent": 0,
+        "tangent": null
+      },
+      "height": {
+        "base": 0.1483338698744774,
+        "edit": 0.1483338698744774
+      }
+    },
+    {
+      "index": 5,
+      "headFraction": 0.737,
+      "axis": -2.4523523606752096,
+      "shift": 0,
+      "editedAxis": -2.4523523606752096,
+      "dorsal": {
+        "base": 0.1392224133014679,
+        "edit": 0.1392224133014679,
+        "percent": 0,
+        "tangent": null
+      },
+      "ventral": {
+        "base": -0.04666057229042053,
+        "edit": -0.04666057229042053,
+        "percent": 0,
+        "tangent": null
+      },
+      "width": {
+        "base": 0.19225864112377167,
+        "edit": 0.19225864112377167,
+        "percent": 0,
+        "tangent": null
+      },
+      "height": {
+        "base": 0.18588298559188843,
+        "edit": 0.18588298559188843
+      }
+    },
+    {
+      "index": 6,
+      "headFraction": 0.684,
+      "axis": -2.1268228480690405,
+      "shift": 0,
+      "editedAxis": -2.1268228480690405,
+      "dorsal": {
+        "base": 0.14827489852905273,
+        "edit": 0.14827489852905273,
+        "percent": 0,
+        "tangent": null
+      },
+      "ventral": {
+        "base": -0.06754262745380402,
+        "edit": -0.06754262745380402,
+        "percent": 0,
+        "tangent": null
+      },
+      "width": {
+        "base": 0.22205808758735657,
+        "edit": 0.22205808758735657,
+        "percent": 0,
+        "tangent": null
+      },
+      "height": {
+        "base": 0.21581752598285675,
+        "edit": 0.21581752598285675
+      }
+    },
+    {
+      "index": 7,
+      "headFraction": 0.632,
+      "axis": -1.8012933354628715,
+      "shift": 0,
+      "editedAxis": -1.8012933354628715,
+      "dorsal": {
+        "base": 0.16087771952152252,
+        "edit": 0.16087771952152252,
+        "percent": 0,
+        "tangent": null
+      },
+      "ventral": {
+        "base": -0.07958175987005234,
+        "edit": -0.07958175987005234,
+        "percent": 0,
+        "tangent": null
+      },
+      "width": {
+        "base": 0.35514897108078003,
+        "edit": 0.35514897108078003,
+        "percent": 0,
+        "tangent": null
+      },
+      "height": {
+        "base": 0.24045947939157486,
+        "edit": 0.24045947939157486
+      }
+    },
+    {
+      "index": 8,
+      "headFraction": 0.579,
+      "axis": -1.4757638228567025,
+      "shift": 0,
+      "editedAxis": -1.4757638228567025,
+      "dorsal": {
+        "base": 0.18731078505516052,
+        "edit": 0.18731078505516052,
+        "percent": 0,
+        "tangent": null
+      },
+      "ventral": {
+        "base": -0.089388407766819,
+        "edit": -0.089388407766819,
+        "percent": 0,
+        "tangent": null
+      },
+      "width": {
+        "base": 0.4707866609096527,
+        "edit": 0.4707866609096527,
+        "percent": 0,
+        "tangent": null
+      },
+      "height": {
+        "base": 0.2766991928219795,
+        "edit": 0.2766991928219795
+      }
+    },
+    {
+      "index": 9,
+      "headFraction": 0.526,
+      "axis": -1.1502343102505335,
+      "shift": 0,
+      "editedAxis": -1.1502343102505335,
+      "dorsal": {
+        "base": 0.22307321429252625,
+        "edit": 0.22307321429252625,
+        "percent": 0,
+        "tangent": null
+      },
+      "ventral": {
+        "base": -0.10158888250589371,
+        "edit": -0.10158888250589371,
+        "percent": 0,
+        "tangent": null
+      },
+      "width": {
+        "base": 0.9021275639533997,
+        "edit": 0.9021275639533997,
+        "percent": 0,
+        "tangent": null
+      },
+      "height": {
+        "base": 0.32466209679841995,
+        "edit": 0.32466209679841995
+      }
+    },
+    {
+      "index": 10,
+      "headFraction": 0.474,
+      "axis": -0.8247047976443644,
+      "shift": 0,
+      "editedAxis": -0.8247047976443644,
+      "dorsal": {
+        "base": 0.2624204754829407,
+        "edit": 0.2624204754829407,
+        "percent": 0,
+        "tangent": null
+      },
+      "ventral": {
+        "base": -0.1172482892870903,
+        "edit": -0.1172482892870903,
+        "percent": 0,
+        "tangent": null
+      },
+      "width": {
+        "base": 1.5801422595977783,
+        "edit": 1.5801422595977783,
+        "percent": 0,
+        "tangent": null
+      },
+      "height": {
+        "base": 0.379668764770031,
+        "edit": 0.379668764770031
+      }
+    },
+    {
+      "index": 11,
+      "headFraction": 0.421,
+      "axis": -0.4991752850381954,
+      "shift": 0,
+      "editedAxis": -0.4991752850381954,
+      "dorsal": {
+        "base": 0.30382290482521057,
+        "edit": 0.30382290482521057,
+        "percent": 0,
+        "tangent": null
+      },
+      "ventral": {
+        "base": -0.13326986134052277,
+        "edit": -0.13326986134052277,
+        "percent": 0,
+        "tangent": null
+      },
+      "width": {
+        "base": 1.849528193473816,
+        "edit": 1.849528193473816,
+        "percent": 0,
+        "tangent": null
+      },
+      "height": {
+        "base": 0.43709276616573334,
+        "edit": 0.43709276616573334
+      }
+    },
+    {
+      "index": 12,
+      "headFraction": 0.368,
+      "axis": -0.1736457724320264,
+      "shift": 0,
+      "editedAxis": -0.1736457724320264,
+      "dorsal": {
+        "base": 0.3554437756538391,
+        "edit": 0.3554437756538391,
+        "percent": 0,
+        "tangent": null
+      },
+      "ventral": {
+        "base": -0.1547585129737854,
+        "edit": -0.1547585129737854,
+        "percent": 0,
+        "tangent": null
+      },
+      "width": {
+        "base": 1.8999279737472534,
+        "edit": 1.8999279737472534,
+        "percent": 0,
+        "tangent": null
+      },
+      "height": {
+        "base": 0.5102022886276245,
+        "edit": 0.5102022886276245
+      }
+    },
+    {
+      "index": 13,
+      "headFraction": 0.316,
+      "axis": 0.1518837401741422,
+      "shift": 0,
+      "editedAxis": 0.1518837401741422,
+      "dorsal": {
+        "base": 0.40329715609550476,
+        "edit": 0.40329715609550476,
+        "percent": 0,
+        "tangent": null
+      },
+      "ventral": {
+        "base": -0.16619808971881866,
+        "edit": -0.16619808971881866,
+        "percent": 0,
+        "tangent": null
+      },
+      "width": {
+        "base": 1.8884278535842896,
+        "edit": 1.8884278535842896,
+        "percent": 0,
+        "tangent": null
+      },
+      "height": {
+        "base": 0.5694952458143234,
+        "edit": 0.5694952458143234
+      }
+    },
+    {
+      "index": 14,
+      "headFraction": 0.263,
+      "axis": 0.47741325278031166,
+      "shift": 0,
+      "editedAxis": 0.47741325278031166,
+      "dorsal": {
+        "base": 0.48451998829841614,
+        "edit": 0.48451998829841614,
+        "percent": 0,
+        "tangent": null
+      },
+      "ventral": {
+        "base": -0.17007645964622498,
+        "edit": -0.17007645964622498,
+        "percent": 0,
+        "tangent": null
+      },
+      "width": {
+        "base": 1.802498698234558,
+        "edit": 1.802498698234558,
+        "percent": 0,
+        "tangent": null
+      },
+      "height": {
+        "base": 0.6545964479446411,
+        "edit": 0.6545964479446411
+      }
+    },
+    {
+      "index": 15,
+      "headFraction": 0.211,
+      "axis": 0.8029427653864811,
+      "shift": 0.002961963953451766,
+      "editedAxis": 0.8059047293399328,
+      "dorsal": {
+        "base": 0.5277643799781799,
+        "edit": 0.45149380817679696,
+        "percent": -14.5,
+        "tangent": null
+      },
+      "ventral": {
+        "base": -0.1708257794380188,
+        "edit": -0.1708257794380188,
+        "percent": 0,
+        "tangent": null
+      },
+      "width": {
+        "base": 1.5688130855560303,
+        "edit": 1.5688130855560303,
+        "percent": 0,
+        "tangent": null
+      },
+      "height": {
+        "base": 0.6985901594161987,
+        "edit": 0.6223195876148158
+      }
+    },
+    {
+      "index": 16,
+      "headFraction": 0.158,
+      "axis": 1.1284722779926497,
+      "shift": 0.005372189523417419,
+      "editedAxis": 1.133844467516067,
+      "dorsal": {
+        "base": 0.5361082553863525,
+        "edit": 0.45799371582963444,
+        "percent": -14.6,
+        "tangent": -0.11182698153459245
+      },
+      "ventral": {
+        "base": -0.17070624232292175,
+        "edit": -0.17070624232292175,
+        "percent": 0,
+        "tangent": null
+      },
+      "width": {
+        "base": 1.269307017326355,
+        "edit": 1.269307017326355,
+        "percent": 0,
+        "tangent": null
+      },
+      "height": {
+        "base": 0.7068144977092743,
+        "edit": 0.6286999581525562
+      }
+    },
+    {
+      "index": 17,
+      "headFraction": 0.105,
+      "axis": 1.4540017905988183,
+      "shift": 0,
+      "editedAxis": 1.4540017905988183,
+      "dorsal": {
+        "base": 0.4204378128051758,
+        "edit": 0.4204378128051758,
+        "percent": 0,
+        "tangent": -0.3376382331323197
+      },
+      "ventral": {
+        "base": -0.14646120369434357,
+        "edit": -0.14646120369434357,
+        "percent": 0,
+        "tangent": null
+      },
+      "width": {
+        "base": 1.0452892780303955,
+        "edit": 1.0452892780303955,
+        "percent": 0,
+        "tangent": null
+      },
+      "height": {
+        "base": 0.5668990164995193,
+        "edit": 0.5668990164995193
+      }
+    },
+    {
+      "index": 18,
+      "headFraction": 0.053,
+      "axis": 1.7795313032049878,
+      "shift": -0.015869738240797942,
+      "editedAxis": 1.7636615649641898,
+      "dorsal": {
+        "base": 0.35851365327835083,
+        "edit": 0.33458563075242675,
+        "percent": -6.7,
+        "tangent": null
+      },
+      "ventral": {
+        "base": -0.14267045259475708,
+        "edit": -0.14267045259475708,
+        "percent": 0,
+        "tangent": null
+      },
+      "width": {
+        "base": 0.8889618515968323,
+        "edit": 0.8889618515968323,
+        "percent": 0,
+        "tangent": null
+      },
+      "height": {
+        "base": 0.5011841058731079,
+        "edit": 0.47725608334718383
+      }
+    },
+    {
+      "index": 19,
+      "headFraction": 0,
+      "axis": 2.1050608158111572,
+      "shift": 0.08171085654727923,
+      "editedAxis": 2.1867716723584363,
+      "dorsal": {
+        "base": 0.24652869999408722,
+        "edit": 0.173728272236209,
+        "percent": -29.5,
+        "tangent": null
+      },
+      "ventral": {
+        "base": -0.08839814364910126,
+        "edit": -0.08839814364910126,
+        "percent": 0,
+        "tangent": null
+      },
+      "width": {
+        "base": 0.6244459748268127,
+        "edit": 0.7245756950549561,
+        "percent": 16,
+        "tangent": null
+      },
+      "height": {
+        "base": 0.3349268436431885,
+        "edit": 0.26212641588531027
+      }
+    }
+  ]
+}
