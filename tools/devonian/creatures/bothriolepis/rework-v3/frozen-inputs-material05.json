@@ -1,0 +1,22 @@
+{
+  "phase": "MATERIAL05",
+  "variant": "material05b",
+  "input_blend": "/home/user/devonian-authoring/bothriolepis/rework-v3/material04/bothriolepis-material04.blend",
+  "input_blend_verified_by": "recorded invariants (geometry hash carried on the M04 object, topology, 38904 protected vertices, oral key delta, five oral poses, eye meshes) -- NOT by blend hash, which is not reproducible across Blender saves",
+  "inputs": {
+    "/home/user/cambrian/tools/devonian/creatures/bothriolepis/rework-v3/material_fields01.py": "83318292f9d2dc238cf2605e5e4de6acdbad6f52097df6755960b6b88b88a36f",
+    "/home/user/cambrian/tools/devonian/creatures/bothriolepis/rework-v3/material_fields02.py": "02fffe5964ea4e7b2896f91f7ba4b9232d45909ee14a62bc4de31dab17144288",
+    "/home/user/cambrian/tools/devonian/creatures/bothriolepis/rework-v3/material_fields03.py": "a79e4988150d06b900c4fcb24e6bac4c9fda3570b8d12df25174010abbe737c4",
+    "/home/user/cambrian/tools/devonian/creatures/bothriolepis/rework-v3/material_fields04.py": "76aa6b91456ef863d32f6d4bce81bf77d75010eaefc0fc5522b4d33242613e86",
+    "/home/user/cambrian/tools/devonian/creatures/bothriolepis/rework-v3/material_fields05.py": "2ae9f06d71b4c0726d156e4092d5b2cf75a3f5ae2233bdf001ffa83ffd7dc7e4",
+    "/home/user/cambrian/tools/devonian/creatures/bothriolepis/rework-v3/geometry_clay02.py": "cf5fa0dcecfa3cfd88d4b644785b939596cd0e98027108f057f543a53e169133",
+    "/home/user/cambrian/tools/devonian/creatures/bothriolepis/rework-v3/geometry_material04.py": "3f757317cdff2e28aa98c3ad2ff69b8b87315ca976e3db181f367263c2ce48c1",
+    "/home/user/cambrian/tools/devonian/creatures/bothriolepis/rework-v3/geometry_material05.py": "3918752645bc5fbaabfcb2eb0cba2564ffa4995aced03274805a41b3914703e7",
+    "/home/user/cambrian/tools/devonian/creatures/bothriolepis/rework-v3/build_material05.py": "e9006ea27fda11b7553f2ae2d71ca556698b8be575bf872471ce05a6622d2a81",
+    "/home/user/cambrian/tools/devonian/creatures/bothriolepis/rework-v3/render_material05.py": "a4dfb9f547984ce18c636ff67cfe2dd2745fb915542e841df6e178aaef18ddee",
+    "/home/user/cambrian/tools/devonian/creatures/bothriolepis/rework-v3/diagnostic_m05_closeup.py": "38c3e3f892b9a5b2846e75a9496a19499d77f460a69d304e0e8b7d466c44b9f3",
+    "/home/user/cambrian/tools/devonian/creatures/bothriolepis/rework-v3/execute_material05.py": "a89a36f924bcc0c638480a99de20908f8262f88ce7848f7ee31295b9ed6b6d22",
+    "/home/user/cambrian/tools/devonian/creatures/bothriolepis/rework-v3/material01-inputs/dermal-source-material01.png": "28cfb67e462ee26668ad68f3d21b1560aed98da1fc7fbb3d6c05d91fee84c127",
+    "/home/user/cambrian/tools/devonian/creatures/bothriolepis/rework-v3/review-material04-and-next-direction.md": "93ce76a278d3be53a6137a8670be4987ccfe5c43c09936af4d3557ca68fd5c49"
+  }
+}

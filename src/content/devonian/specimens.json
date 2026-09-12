@@ -108,9 +108,9 @@
     "name": "Bothriolepis",
     "species": "Bothriolepis canadensis",
     "category": "creature",
-    "modelStatus": "preview",
+    "modelStatus": "final",
     "provenance": "Late Devonian (Frasnian), Escuminac Formation, Miguasha, Quebec, Canada",
-    "description": "Angular armoured antiarch with a steep immobile head, inset dorsal eyes, a posterior dorsal crest and jointed dermal pectoral fins. A long flexible posterior carries a small dorsal fin and asymmetrical tail.",
+    "description": "Angular armoured antiarch with a steep immobile head, inset dorsal eyes, a posterior median crest and long jointed dermal pectoral appendages. A long flexible posterior carries a small square rayless dorsal and an asymmetrical tail.",
     "model": "assets/devonian/creatures/bothriolepis.glb",
     "lod": "assets/devonian/creatures/bothriolepis.lod1.glb",
     "image": "assets/devonian/creatures/bothriolepis.thumb.png",
@@ -126,12 +126,12 @@
       "https://doi.org/10.26879/417"
     ],
     "notes": [
-      "Original anatomical reconstruction informed by Bechard et al. 2014 figures 2-3; not a fossil scan. Representative 0.40 m adult.",
-      "Continuous rigid cephalic/thoracic armour, steep head roof and approximately 36% armoured body length; exact living tissue thickness and pigmentation are inferred.",
-      "Dorsal eyes are placed within continuous head tissue, with no separate pads or orbital hoops; volume audit accompanies the delivery.",
-      "Pectoral segments have limited articulation, no toy ball joints, no head hinge and no terrestrial walking or rowing claim.",
-      "UV dermal detail uses an original imagegen swatch with authored anatomical seam relief; distant LOD bakes pigment into vertex colours and removes textures.",
-      "Small ventral oral folds and interior tissues are interpreted; action labels are asset compatibility gestures rather than Devonian gameplay definitions."
+      "V3 is a complete re-author, not a revision of V2: one closed 55,802-vertex cuirass with the oral annulus, cavity, both pectoral appendages and the posterior in a single manifold.",
+      "Surface relief is one resolved field. The V3 material chain (rework-v3) replaced MATERIAL04 stacked relief whose features were narrower than the mesh row pitch; longitudinal geometric-normal step excess over the smooth section form fell from 82.2 to 7.4 degrees.",
+      "Dermal microrelief is halved against MATERIAL04 (bump .18 -> .08, rostral-band normal-map slope .165 -> .079) and its lattice is isotropic, domain-warped and circumferentially periodic, so it no longer organises into rows.",
+      "The rostral cap carries the shared rest-space dermal field rather than a stretched chart; its mirrored disc chart is present in the UV layer but the cap is closed by a flat fan, which remains the reason it reads as a separate facet under raking light.",
+      "The shader carried a rest-space pore Bump that glTF cannot express; it is baked into the exported atlas normal maps. The root, articulation and rostral-cap slots ship vertex pigment only and do not carry that bake.",
+      "Pectoral segments have limited articulation, no ball joints, no head hinge and no terrestrial walking or rowing claim. Action labels are asset compatibility gestures, not Devonian gameplay definitions."
     ]
   },
   {

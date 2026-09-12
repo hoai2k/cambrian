@@ -82,3 +82,25 @@ The screenshots and volume measurement address different quality requirements. A
 The integration review also includes `parent-fixed-Bite.png` and `parent-fixed-Eat.png`: directly lit, close underside views imported from the corrected actual GLB. The four portraits and full action/eye render suite were regenerated after the mouth correction.
 
 Final packaged runtime review loaded the production viewer and selected all 18 clips without browser errors. Paused Swim, Bite, Eat, Heavy and terminal Death frames were inspected alongside the corrected close underside Blender views. The exact packaged eye-volume samples are 78.69% / 78.64% in the full model and 78.67% / 78.62% in the reduced model; both continuous heads are closed with no temporary caps or ray disagreements. Local viewer evidence is in `../devonian-authoring/viewer-release-review/`.
+
+## V3 — the rework-v3 chain shipped (12 September 2026)
+
+The `rework-v3/` chain (clay01 → clay02 → material01–04, held at M04 for the forehead) was
+re-derived on Linux through the `build_material0N-linux.py` copies, each verified by its recorded
+invariants rather than by `.blend` hash, and the close-up diagnostic (`diagnostic_m04_closeup.py`)
+showed the nuchal seam to be geometry — stacked relief fields faceting to a 76.7° normal step on
+the dorsal midline — and the rostral cap to be a material-slot mismatch. M05 (`build_material05.py`,
+variant `material05b` accepted) resolves the whole shield grid into one smooth field (step excess
+over the section form 7.4° longitudinal / 9.9° circumferential, from 82° / 94°), gives the cap its
+fine response from the shared rest-space field, and halves the microrelief (bump .08, amplitude
+.018). Topology, the 38,904 protected vertices, the M04 oral correction, eye seats and appendages
+are unchanged; `review-material05-and-production-handoff.md` has the numbers and the one flagged
+leftover (the flat snout fan reads as a facet under raking light — a clay-stage cap-ring change).
+
+`build_v3.py` rigs the M05 mesh with V2's twelve bones, eighteen clips and three anchors on the
+new oral geometry; `finalize_v3.py` audits the export (no scale tracks — exported with the
+armature-optimisation option off — normalised weights, unique motion, loop seams, socket bind
+alignment, per-material COLOR_0 layout); `export_audit_v3.mjs` feeds the eye audit (96.1 / 95.3 %
+full, 96.1 / 95.3 % LOD); `portraits_v3.py` renders the four portraits. Packaged: 11,780,044 bytes
+full (115,280 tris, 12 textures), 711,428 bytes LOD (32,276 tris, vertex pigment only), exact
+round-trip. The shipped model badge is cleared.
