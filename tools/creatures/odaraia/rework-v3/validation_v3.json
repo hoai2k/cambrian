@@ -1,0 +1,2049 @@
+{
+  "candidate": "/home/user/expansion-authoring/odaraia-rework/v3-candidate",
+  "summary": {
+    "full": {
+      "triangles": 130184,
+      "clips": {
+        "Ability": {
+          "seconds": 2.0,
+          "intended": 2.0,
+          "channels": 404
+        },
+        "Attack": {
+          "seconds": 1.29167,
+          "intended": 1.2916666666666667,
+          "channels": 405
+        },
+        "Bite": {
+          "seconds": 0.70833,
+          "intended": 0.7083333333333334,
+          "channels": 405
+        },
+        "Death": {
+          "seconds": 2.79167,
+          "intended": 2.7916666666666665,
+          "channels": 397
+        },
+        "Dive": {
+          "seconds": 1.29167,
+          "intended": 1.2916666666666667,
+          "channels": 398
+        },
+        "Dodge": {
+          "seconds": 0.79167,
+          "intended": 0.7916666666666666,
+          "channels": 391
+        },
+        "Eat": {
+          "seconds": 3.0,
+          "intended": 3.0,
+          "channels": 405
+        },
+        "Guard": {
+          "seconds": 1.58333,
+          "intended": 1.5833333333333333,
+          "channels": 404
+        },
+        "Heavy": {
+          "seconds": 1.79167,
+          "intended": 1.7916666666666667,
+          "channels": 405
+        },
+        "Hit": {
+          "seconds": 0.66667,
+          "intended": 0.6666666666666666,
+          "channels": 395
+        },
+        "Idle": {
+          "seconds": 2.41667,
+          "intended": 2.4166666666666665,
+          "channels": 404
+        },
+        "Moult": {
+          "seconds": 3.20833,
+          "intended": 3.2083333333333335,
+          "channels": 404
+        },
+        "Parry": {
+          "seconds": 0.83333,
+          "intended": 0.8333333333333334,
+          "channels": 393
+        },
+        "Rise": {
+          "seconds": 1.29167,
+          "intended": 1.2916666666666667,
+          "channels": 398
+        },
+        "Stagger": {
+          "seconds": 1.41667,
+          "intended": 1.4166666666666667,
+          "channels": 396
+        },
+        "Swim": {
+          "seconds": 1.41667,
+          "intended": 1.4166666666666667,
+          "channels": 404
+        },
+        "TurnLeft": {
+          "seconds": 1.20833,
+          "intended": 1.2083333333333333,
+          "channels": 404
+        },
+        "TurnRight": {
+          "seconds": 1.20833,
+          "intended": 1.2083333333333333,
+          "channels": 404
+        }
+      },
+      "meshes": 7,
+      "materials": 7,
+      "bytes": 19611928
+    },
+    "lod1": {
+      "triangles": 49878,
+      "clips": {
+        "Ability": {
+          "seconds": 2.0,
+          "intended": 2.0,
+          "channels": 404
+        },
+        "Attack": {
+          "seconds": 1.29167,
+          "intended": 1.2916666666666667,
+          "channels": 405
+        },
+        "Bite": {
+          "seconds": 0.70833,
+          "intended": 0.7083333333333334,
+          "channels": 405
+        },
+        "Death": {
+          "seconds": 2.79167,
+          "intended": 2.7916666666666665,
+          "channels": 397
+        },
+        "Dive": {
+          "seconds": 1.29167,
+          "intended": 1.2916666666666667,
+          "channels": 398
+        },
+        "Dodge": {
+          "seconds": 0.79167,
+          "intended": 0.7916666666666666,
+          "channels": 391
+        },
+        "Eat": {
+          "seconds": 3.0,
+          "intended": 3.0,
+          "channels": 405
+        },
+        "Guard": {
+          "seconds": 1.58333,
+          "intended": 1.5833333333333333,
+          "channels": 404
+        },
+        "Heavy": {
+          "seconds": 1.79167,
+          "intended": 1.7916666666666667,
+          "channels": 405
+        },
+        "Hit": {
+          "seconds": 0.66667,
+          "intended": 0.6666666666666666,
+          "channels": 395
+        },
+        "Idle": {
+          "seconds": 2.41667,
+          "intended": 2.4166666666666665,
+          "channels": 404
+        },
+        "Moult": {
+          "seconds": 3.20833,
+          "intended": 3.2083333333333335,
+          "channels": 404
+        },
+        "Parry": {
+          "seconds": 0.83333,
+          "intended": 0.8333333333333334,
+          "channels": 393
+        },
+        "Rise": {
+          "seconds": 1.29167,
+          "intended": 1.2916666666666667,
+          "channels": 398
+        },
+        "Stagger": {
+          "seconds": 1.41667,
+          "intended": 1.4166666666666667,
+          "channels": 396
+        },
+        "Swim": {
+          "seconds": 1.41667,
+          "intended": 1.4166666666666667,
+          "channels": 404
+        },
+        "TurnLeft": {
+          "seconds": 1.20833,
+          "intended": 1.2083333333333333,
+          "channels": 404
+        },
+        "TurnRight": {
+          "seconds": 1.20833,
+          "intended": 1.2083333333333333,
+          "channels": 404
+        }
+      },
+      "meshes": 7,
+      "materials": 7,
+      "bytes": 13509764
+    },
+    "anchors": [
+      {
+        "name": "anchor_mouth",
+        "role": "mouth",
+        "parent": "head",
+        "gltfWorld": [
+          0.0,
+          0.305,
+          1.69
+        ],
+        "local": [
+          -0.0,
+          0.17,
+          0.295
+        ]
+      },
+      {
+        "name": "anchor_mouth_inside",
+        "role": "swallow",
+        "parent": "head",
+        "gltfWorld": [
+          0.0,
+          0.225,
+          1.655
+        ],
+        "local": [
+          -0.0,
+          0.135,
+          0.215
+        ]
+      },
+      {
+        "name": "anchor_attack_primary",
+        "role": "attack",
+        "parent": "limb_01_L_tip",
+        "gltfWorld": [
+          -0.227,
+          1.12438,
+          1.78795
+        ],
+        "local": [
+          0.01785,
+          0.22293,
+          0.04785
+        ]
+      },
+      {
+        "name": "anchor_grasp",
+        "role": "grasp",
+        "parent": "limb_01_L_tip",
+        "gltfWorld": [
+          -0.227,
+          1.12438,
+          1.78795
+        ],
+        "local": [
+          0.01785,
+          0.22293,
+          0.04785
+        ]
+      },
+      {
+        "name": "anchor_attack_01_L",
+        "role": "attack",
+        "parent": "limb_01_L_tip",
+        "gltfWorld": [
+          -0.227,
+          1.12438,
+          1.78795
+        ],
+        "local": [
+          0.01785,
+          0.22293,
+          0.04785
+        ]
+      },
+      {
+        "name": "anchor_attack_01_R",
+        "role": "attack",
+        "parent": "limb_01_R_tip",
+        "gltfWorld": [
+          0.227,
+          1.21166,
+          1.84811
+        ],
+        "local": [
+          -0.01785,
+          0.23946,
+          0.0479
+        ]
+      },
+      {
+        "name": "anchor_attack_02_L",
+        "role": "attack",
+        "parent": "limb_02_L_tip",
+        "gltfWorld": [
+          -0.22587,
+          1.17766,
+          1.72826
+        ],
+        "local": [
+          0.01785,
+          0.2371,
+          0.04789
+        ]
+      },
+      {
+        "name": "anchor_attack_02_R",
+        "role": "attack",
+        "parent": "limb_02_R_tip",
+        "gltfWorld": [
+          0.22587,
+          1.2243,
+          1.7246
+        ],
+        "local": [
+          -0.01784,
+          0.23616,
+          0.0479
+        ]
+      },
+      {
+        "name": "anchor_attack_03_L",
+        "role": "attack",
+        "parent": "limb_03_L_tip",
+        "gltfWorld": [
+          -0.22474,
+          1.20358,
+          1.62243
+        ],
+        "local": [
+          0.01785,
+          0.23866,
+          0.04791
+        ]
+      },
+      {
+        "name": "anchor_attack_03_R",
+        "role": "attack",
+        "parent": "limb_03_R_tip",
+        "gltfWorld": [
+          0.22474,
+          1.19294,
+          1.55634
+        ],
+        "local": [
+          -0.01782,
+          0.22059,
+          0.04789
+        ]
+      },
+      {
+        "name": "anchor_attack_04_L",
+        "role": "attack",
+        "parent": "limb_04_L_tip",
+        "gltfWorld": [
+          -0.22361,
+          1.18758,
+          1.4681
+        ],
+        "local": [
+          0.01784,
+          0.22689,
+          0.0479
+        ]
+      },
+      {
+        "name": "anchor_attack_04_R",
+        "role": "attack",
+        "parent": "limb_04_R_tip",
+        "gltfWorld": [
+          0.22361,
+          1.1252,
+          1.36497
+        ],
+        "local": [
+          -0.01781,
+          0.19879,
+          0.04785
+        ]
+      },
+      {
+        "name": "anchor_attack_05_L",
+        "role": "attack",
+        "parent": "limb_05_L_tip",
+        "gltfWorld": [
+          -0.22248,
+          1.13143,
+          1.28156
+        ],
+        "local": [
+          0.01782,
+          0.20635,
+          0.04787
+        ]
+      },
+      {
+        "name": "anchor_attack_05_R",
+        "role": "attack",
+        "parent": "limb_05_R_tip",
+        "gltfWorld": [
+          0.22248,
+          1.04233,
+          1.18098
+        ],
+        "local": [
+          -0.01779,
+          0.17913,
+          0.04779
+        ]
+      },
+      {
+        "name": "anchor_attack_06_L",
+        "role": "attack",
+        "parent": "limb_06_L_tip",
+        "gltfWorld": [
+          -0.22135,
+          0.98444,
+          1.09144
+        ],
+        "local": [
+          0.01783,
+          0.1849,
+          0.04779
+        ]
+      },
+      {
+        "name": "anchor_attack_06_R",
+        "role": "attack",
+        "parent": "limb_06_R_tip",
+        "gltfWorld": [
+          0.22135,
+          0.90843,
+          1.03203
+        ],
+        "local": [
+          -0.01782,
+          0.16895,
+          0.04771
+        ]
+      }
+    ]
+  },
+  "checks": [
+    {
+      "file": "full",
+      "check": "finite node transforms, positive scales",
+      "pass": true,
+      "detail": "414 nodes"
+    },
+    {
+      "file": "full",
+      "check": "406 joints",
+      "pass": true,
+      "detail": "406"
+    },
+    {
+      "file": "full",
+      "check": "skeleton root named root",
+      "pass": true,
+      "detail": "root"
+    },
+    {
+      "file": "full",
+      "check": "root translation zero",
+      "pass": true,
+      "detail": "None"
+    },
+    {
+      "file": "full",
+      "check": "JOINTS_0 is uint16",
+      "pass": true,
+      "detail": "5123"
+    },
+    {
+      "file": "full",
+      "check": "joint indices within the skin",
+      "pass": true,
+      "detail": "405"
+    },
+    {
+      "file": "full",
+      "check": "at most four influences",
+      "pass": true,
+      "detail": "2"
+    },
+    {
+      "file": "full",
+      "check": "weights normalised",
+      "pass": true,
+      "detail": "max |sum-1| = 2.98e-08 over 130043 vertices"
+    },
+    {
+      "file": "full",
+      "check": "COLOR_0 is VEC4 on every primitive",
+      "pass": true,
+      "detail": "7/7"
+    },
+    {
+      "file": "full",
+      "check": "all eighteen clips",
+      "pass": true,
+      "detail": "['Ability', 'Attack', 'Bite', 'Death', 'Dive', 'Dodge', 'Eat', 'Guard', 'Heavy', 'Hit', 'Idle', 'Moult', 'Parry', 'Rise', 'Stagger', 'Swim', 'TurnLeft', 'TurnRight']"
+    },
+    {
+      "file": "full",
+      "check": "Ability duration",
+      "pass": true,
+      "detail": "2.00000 vs 2.00000"
+    },
+    {
+      "file": "full",
+      "check": "Attack duration",
+      "pass": true,
+      "detail": "1.29167 vs 1.29167"
+    },
+    {
+      "file": "full",
+      "check": "Bite duration",
+      "pass": true,
+      "detail": "0.70833 vs 0.70833"
+    },
+    {
+      "file": "full",
+      "check": "Death duration",
+      "pass": true,
+      "detail": "2.79167 vs 2.79167"
+    },
+    {
+      "file": "full",
+      "check": "Dive duration",
+      "pass": true,
+      "detail": "1.29167 vs 1.29167"
+    },
+    {
+      "file": "full",
+      "check": "Dodge duration",
+      "pass": true,
+      "detail": "0.79167 vs 0.79167"
+    },
+    {
+      "file": "full",
+      "check": "Eat duration",
+      "pass": true,
+      "detail": "3.00000 vs 3.00000"
+    },
+    {
+      "file": "full",
+      "check": "Guard duration",
+      "pass": true,
+      "detail": "1.58333 vs 1.58333"
+    },
+    {
+      "file": "full",
+      "check": "Heavy duration",
+      "pass": true,
+      "detail": "1.79167 vs 1.79167"
+    },
+    {
+      "file": "full",
+      "check": "Hit duration",
+      "pass": true,
+      "detail": "0.66667 vs 0.66667"
+    },
+    {
+      "file": "full",
+      "check": "Idle duration",
+      "pass": true,
+      "detail": "2.41667 vs 2.41667"
+    },
+    {
+      "file": "full",
+      "check": "Moult duration",
+      "pass": true,
+      "detail": "3.20833 vs 3.20833"
+    },
+    {
+      "file": "full",
+      "check": "Parry duration",
+      "pass": true,
+      "detail": "0.83333 vs 0.83333"
+    },
+    {
+      "file": "full",
+      "check": "Rise duration",
+      "pass": true,
+      "detail": "1.29167 vs 1.29167"
+    },
+    {
+      "file": "full",
+      "check": "Stagger duration",
+      "pass": true,
+      "detail": "1.41667 vs 1.41667"
+    },
+    {
+      "file": "full",
+      "check": "Swim duration",
+      "pass": true,
+      "detail": "1.41667 vs 1.41667"
+    },
+    {
+      "file": "full",
+      "check": "TurnLeft duration",
+      "pass": true,
+      "detail": "1.20833 vs 1.20833"
+    },
+    {
+      "file": "full",
+      "check": "TurnRight duration",
+      "pass": true,
+      "detail": "1.20833 vs 1.20833"
+    },
+    {
+      "file": "full",
+      "check": "rotation-only animation (no translation or scale channels)",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "file": "full",
+      "check": "Idle loops seamlessly",
+      "pass": true,
+      "detail": "max endpoint delta 0.00e+00"
+    },
+    {
+      "file": "full",
+      "check": "Swim loops seamlessly",
+      "pass": true,
+      "detail": "max endpoint delta 0.00e+00"
+    },
+    {
+      "file": "full",
+      "check": "Guard loops seamlessly",
+      "pass": true,
+      "detail": "max endpoint delta 0.00e+00"
+    },
+    {
+      "file": "full",
+      "check": "Eat loops seamlessly",
+      "pass": true,
+      "detail": "max endpoint delta 9.31e-08"
+    },
+    {
+      "file": "full",
+      "check": "Death holds its final pose",
+      "pass": true,
+      "detail": "max deviation over the last 25% 0.00e+00"
+    },
+    {
+      "file": "full",
+      "check": "cambrianFeeding contract",
+      "pass": true,
+      "detail": "{\"version\": 1, \"mode\": \"authored-grasp\", \"clip\": \"Eat\", \"apertureDiameter\": 0.045, \"pickupOffsetLimit\": 0.18}"
+    },
+    {
+      "file": "full",
+      "check": "shell is a separate blended draw",
+      "pass": true,
+      "detail": "BLEND"
+    },
+    {
+      "file": "full",
+      "check": "no transmission extension",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "file": "full",
+      "check": "textures embedded",
+      "pass": true,
+      "detail": "14 textures"
+    },
+    {
+      "file": "lod1",
+      "check": "finite node transforms, positive scales",
+      "pass": true,
+      "detail": "414 nodes"
+    },
+    {
+      "file": "lod1",
+      "check": "406 joints",
+      "pass": true,
+      "detail": "406"
+    },
+    {
+      "file": "lod1",
+      "check": "skeleton root named root",
+      "pass": true,
+      "detail": "root"
+    },
+    {
+      "file": "lod1",
+      "check": "root translation zero",
+      "pass": true,
+      "detail": "None"
+    },
+    {
+      "file": "lod1",
+      "check": "JOINTS_0 is uint16",
+      "pass": true,
+      "detail": "5123"
+    },
+    {
+      "file": "lod1",
+      "check": "joint indices within the skin",
+      "pass": true,
+      "detail": "405"
+    },
+    {
+      "file": "lod1",
+      "check": "at most four influences",
+      "pass": true,
+      "detail": "3"
+    },
+    {
+      "file": "lod1",
+      "check": "weights normalised",
+      "pass": true,
+      "detail": "max |sum-1| = 8.06e-08 over 59414 vertices"
+    },
+    {
+      "file": "lod1",
+      "check": "COLOR_0 is VEC4 on every primitive",
+      "pass": true,
+      "detail": "7/7"
+    },
+    {
+      "file": "lod1",
+      "check": "all eighteen clips",
+      "pass": true,
+      "detail": "['Ability', 'Attack', 'Bite', 'Death', 'Dive', 'Dodge', 'Eat', 'Guard', 'Heavy', 'Hit', 'Idle', 'Moult', 'Parry', 'Rise', 'Stagger', 'Swim', 'TurnLeft', 'TurnRight']"
+    },
+    {
+      "file": "lod1",
+      "check": "Ability duration",
+      "pass": true,
+      "detail": "2.00000 vs 2.00000"
+    },
+    {
+      "file": "lod1",
+      "check": "Attack duration",
+      "pass": true,
+      "detail": "1.29167 vs 1.29167"
+    },
+    {
+      "file": "lod1",
+      "check": "Bite duration",
+      "pass": true,
+      "detail": "0.70833 vs 0.70833"
+    },
+    {
+      "file": "lod1",
+      "check": "Death duration",
+      "pass": true,
+      "detail": "2.79167 vs 2.79167"
+    },
+    {
+      "file": "lod1",
+      "check": "Dive duration",
+      "pass": true,
+      "detail": "1.29167 vs 1.29167"
+    },
+    {
+      "file": "lod1",
+      "check": "Dodge duration",
+      "pass": true,
+      "detail": "0.79167 vs 0.79167"
+    },
+    {
+      "file": "lod1",
+      "check": "Eat duration",
+      "pass": true,
+      "detail": "3.00000 vs 3.00000"
+    },
+    {
+      "file": "lod1",
+      "check": "Guard duration",
+      "pass": true,
+      "detail": "1.58333 vs 1.58333"
+    },
+    {
+      "file": "lod1",
+      "check": "Heavy duration",
+      "pass": true,
+      "detail": "1.79167 vs 1.79167"
+    },
+    {
+      "file": "lod1",
+      "check": "Hit duration",
+      "pass": true,
+      "detail": "0.66667 vs 0.66667"
+    },
+    {
+      "file": "lod1",
+      "check": "Idle duration",
+      "pass": true,
+      "detail": "2.41667 vs 2.41667"
+    },
+    {
+      "file": "lod1",
+      "check": "Moult duration",
+      "pass": true,
+      "detail": "3.20833 vs 3.20833"
+    },
+    {
+      "file": "lod1",
+      "check": "Parry duration",
+      "pass": true,
+      "detail": "0.83333 vs 0.83333"
+    },
+    {
+      "file": "lod1",
+      "check": "Rise duration",
+      "pass": true,
+      "detail": "1.29167 vs 1.29167"
+    },
+    {
+      "file": "lod1",
+      "check": "Stagger duration",
+      "pass": true,
+      "detail": "1.41667 vs 1.41667"
+    },
+    {
+      "file": "lod1",
+      "check": "Swim duration",
+      "pass": true,
+      "detail": "1.41667 vs 1.41667"
+    },
+    {
+      "file": "lod1",
+      "check": "TurnLeft duration",
+      "pass": true,
+      "detail": "1.20833 vs 1.20833"
+    },
+    {
+      "file": "lod1",
+      "check": "TurnRight duration",
+      "pass": true,
+      "detail": "1.20833 vs 1.20833"
+    },
+    {
+      "file": "lod1",
+      "check": "rotation-only animation (no translation or scale channels)",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "file": "lod1",
+      "check": "Idle loops seamlessly",
+      "pass": true,
+      "detail": "max endpoint delta 0.00e+00"
+    },
+    {
+      "file": "lod1",
+      "check": "Swim loops seamlessly",
+      "pass": true,
+      "detail": "max endpoint delta 0.00e+00"
+    },
+    {
+      "file": "lod1",
+      "check": "Guard loops seamlessly",
+      "pass": true,
+      "detail": "max endpoint delta 0.00e+00"
+    },
+    {
+      "file": "lod1",
+      "check": "Eat loops seamlessly",
+      "pass": true,
+      "detail": "max endpoint delta 9.31e-08"
+    },
+    {
+      "file": "lod1",
+      "check": "Death holds its final pose",
+      "pass": true,
+      "detail": "max deviation over the last 25% 0.00e+00"
+    },
+    {
+      "file": "lod1",
+      "check": "cambrianFeeding contract",
+      "pass": true,
+      "detail": "{\"version\": 1, \"mode\": \"authored-grasp\", \"clip\": \"Eat\", \"apertureDiameter\": 0.045, \"pickupOffsetLimit\": 0.18}"
+    },
+    {
+      "file": "lod1",
+      "check": "shell is a separate blended draw",
+      "pass": true,
+      "detail": "BLEND"
+    },
+    {
+      "file": "lod1",
+      "check": "no transmission extension",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "file": "lod1",
+      "check": "textures embedded",
+      "pass": true,
+      "detail": "14 textures"
+    },
+    {
+      "file": "full",
+      "check": "anchor_mouth: exactly one node named head",
+      "pass": true,
+      "detail": "1"
+    },
+    {
+      "file": "full",
+      "check": "anchor_mouth: world point reconstructs",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "file": "full",
+      "check": "anchor_mouth_inside: exactly one node named head",
+      "pass": true,
+      "detail": "1"
+    },
+    {
+      "file": "full",
+      "check": "anchor_mouth_inside: world point reconstructs",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "file": "full",
+      "check": "anchor_attack_primary: exactly one node named limb_01_L_tip",
+      "pass": true,
+      "detail": "1"
+    },
+    {
+      "file": "full",
+      "check": "anchor_attack_primary: chain ends at its own parent",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "file": "full",
+      "check": "anchor_attack_primary: chain is ordered direct ancestry",
+      "pass": true,
+      "detail": "limb_01_L_prox -> limb_01_L_mid -> limb_01_L_dist -> limb_01_L_tip"
+    },
+    {
+      "file": "full",
+      "check": "anchor_attack_primary: no locomotor bone in the chain",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "file": "full",
+      "check": "anchor_attack_primary: non-zero reach from the effector joint",
+      "pass": true,
+      "detail": "0.22871"
+    },
+    {
+      "file": "full",
+      "check": "anchor_attack_primary: world point reconstructs",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "file": "full",
+      "check": "anchor_grasp: exactly one node named limb_01_L_tip",
+      "pass": true,
+      "detail": "1"
+    },
+    {
+      "file": "full",
+      "check": "anchor_grasp: chain ends at its own parent",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "file": "full",
+      "check": "anchor_grasp: chain is ordered direct ancestry",
+      "pass": true,
+      "detail": "limb_01_L_prox -> limb_01_L_mid -> limb_01_L_dist -> limb_01_L_tip"
+    },
+    {
+      "file": "full",
+      "check": "anchor_grasp: no locomotor bone in the chain",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "file": "full",
+      "check": "anchor_grasp: non-zero reach from the effector joint",
+      "pass": true,
+      "detail": "0.22871"
+    },
+    {
+      "file": "full",
+      "check": "anchor_grasp: world point reconstructs",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "file": "full",
+      "check": "anchor_attack_01_L: exactly one node named limb_01_L_tip",
+      "pass": true,
+      "detail": "1"
+    },
+    {
+      "file": "full",
+      "check": "anchor_attack_01_L: chain ends at its own parent",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "file": "full",
+      "check": "anchor_attack_01_L: chain is ordered direct ancestry",
+      "pass": true,
+      "detail": "limb_01_L_prox -> limb_01_L_mid -> limb_01_L_dist -> limb_01_L_tip"
+    },
+    {
+      "file": "full",
+      "check": "anchor_attack_01_L: no locomotor bone in the chain",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "file": "full",
+      "check": "anchor_attack_01_L: non-zero reach from the effector joint",
+      "pass": true,
+      "detail": "0.22871"
+    },
+    {
+      "file": "full",
+      "check": "anchor_attack_01_L: world point reconstructs",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "file": "full",
+      "check": "anchor_attack_01_R: exactly one node named limb_01_R_tip",
+      "pass": true,
+      "detail": "1"
+    },
+    {
+      "file": "full",
+      "check": "anchor_attack_01_R: chain ends at its own parent",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "file": "full",
+      "check": "anchor_attack_01_R: chain is ordered direct ancestry",
+      "pass": true,
+      "detail": "limb_01_R_prox -> limb_01_R_mid -> limb_01_R_dist -> limb_01_R_tip"
+    },
+    {
+      "file": "full",
+      "check": "anchor_attack_01_R: no locomotor bone in the chain",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "file": "full",
+      "check": "anchor_attack_01_R: non-zero reach from the effector joint",
+      "pass": true,
+      "detail": "0.24485"
+    },
+    {
+      "file": "full",
+      "check": "anchor_attack_01_R: world point reconstructs",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "file": "full",
+      "check": "anchor_attack_02_L: exactly one node named limb_02_L_tip",
+      "pass": true,
+      "detail": "1"
+    },
+    {
+      "file": "full",
+      "check": "anchor_attack_02_L: chain ends at its own parent",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "file": "full",
+      "check": "anchor_attack_02_L: chain is ordered direct ancestry",
+      "pass": true,
+      "detail": "limb_02_L_prox -> limb_02_L_mid -> limb_02_L_dist -> limb_02_L_tip"
+    },
+    {
+      "file": "full",
+      "check": "anchor_attack_02_L: no locomotor bone in the chain",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "file": "full",
+      "check": "anchor_attack_02_L: non-zero reach from the effector joint",
+      "pass": true,
+      "detail": "0.24255"
+    },
+    {
+      "file": "full",
+      "check": "anchor_attack_02_L: world point reconstructs",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "file": "full",
+      "check": "anchor_attack_02_R: exactly one node named limb_02_R_tip",
+      "pass": true,
+      "detail": "1"
+    },
+    {
+      "file": "full",
+      "check": "anchor_attack_02_R: chain ends at its own parent",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "file": "full",
+      "check": "anchor_attack_02_R: chain is ordered direct ancestry",
+      "pass": true,
+      "detail": "limb_02_R_prox -> limb_02_R_mid -> limb_02_R_dist -> limb_02_R_tip"
+    },
+    {
+      "file": "full",
+      "check": "anchor_attack_02_R: no locomotor bone in the chain",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "file": "full",
+      "check": "anchor_attack_02_R: non-zero reach from the effector joint",
+      "pass": true,
+      "detail": "0.24163"
+    },
+    {
+      "file": "full",
+      "check": "anchor_attack_02_R: world point reconstructs",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "file": "full",
+      "check": "anchor_attack_03_L: exactly one node named limb_03_L_tip",
+      "pass": true,
+      "detail": "1"
+    },
+    {
+      "file": "full",
+      "check": "anchor_attack_03_L: chain ends at its own parent",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "file": "full",
+      "check": "anchor_attack_03_L: chain is ordered direct ancestry",
+      "pass": true,
+      "detail": "limb_03_L_prox -> limb_03_L_mid -> limb_03_L_dist -> limb_03_L_tip"
+    },
+    {
+      "file": "full",
+      "check": "anchor_attack_03_L: no locomotor bone in the chain",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "file": "full",
+      "check": "anchor_attack_03_L: non-zero reach from the effector joint",
+      "pass": true,
+      "detail": "0.24407"
+    },
+    {
+      "file": "full",
+      "check": "anchor_attack_03_L: world point reconstructs",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "file": "full",
+      "check": "anchor_attack_03_R: exactly one node named limb_03_R_tip",
+      "pass": true,
+      "detail": "1"
+    },
+    {
+      "file": "full",
+      "check": "anchor_attack_03_R: chain ends at its own parent",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "file": "full",
+      "check": "anchor_attack_03_R: chain is ordered direct ancestry",
+      "pass": true,
+      "detail": "limb_03_R_prox -> limb_03_R_mid -> limb_03_R_dist -> limb_03_R_tip"
+    },
+    {
+      "file": "full",
+      "check": "anchor_attack_03_R: no locomotor bone in the chain",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "file": "full",
+      "check": "anchor_attack_03_R: non-zero reach from the effector joint",
+      "pass": true,
+      "detail": "0.22643"
+    },
+    {
+      "file": "full",
+      "check": "anchor_attack_03_R: world point reconstructs",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "file": "full",
+      "check": "anchor_attack_04_L: exactly one node named limb_04_L_tip",
+      "pass": true,
+      "detail": "1"
+    },
+    {
+      "file": "full",
+      "check": "anchor_attack_04_L: chain ends at its own parent",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "file": "full",
+      "check": "anchor_attack_04_L: chain is ordered direct ancestry",
+      "pass": true,
+      "detail": "limb_04_L_prox -> limb_04_L_mid -> limb_04_L_dist -> limb_04_L_tip"
+    },
+    {
+      "file": "full",
+      "check": "anchor_attack_04_L: no locomotor bone in the chain",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "file": "full",
+      "check": "anchor_attack_04_L: non-zero reach from the effector joint",
+      "pass": true,
+      "detail": "0.23258"
+    },
+    {
+      "file": "full",
+      "check": "anchor_attack_04_L: world point reconstructs",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "file": "full",
+      "check": "anchor_attack_04_R: exactly one node named limb_04_R_tip",
+      "pass": true,
+      "detail": "1"
+    },
+    {
+      "file": "full",
+      "check": "anchor_attack_04_R: chain ends at its own parent",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "file": "full",
+      "check": "anchor_attack_04_R: chain is ordered direct ancestry",
+      "pass": true,
+      "detail": "limb_04_R_prox -> limb_04_R_mid -> limb_04_R_dist -> limb_04_R_tip"
+    },
+    {
+      "file": "full",
+      "check": "anchor_attack_04_R: no locomotor bone in the chain",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "file": "full",
+      "check": "anchor_attack_04_R: non-zero reach from the effector joint",
+      "pass": true,
+      "detail": "0.20524"
+    },
+    {
+      "file": "full",
+      "check": "anchor_attack_04_R: world point reconstructs",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "file": "full",
+      "check": "anchor_attack_05_L: exactly one node named limb_05_L_tip",
+      "pass": true,
+      "detail": "1"
+    },
+    {
+      "file": "full",
+      "check": "anchor_attack_05_L: chain ends at its own parent",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "file": "full",
+      "check": "anchor_attack_05_L: chain is ordered direct ancestry",
+      "pass": true,
+      "detail": "limb_05_L_prox -> limb_05_L_mid -> limb_05_L_dist -> limb_05_L_tip"
+    },
+    {
+      "file": "full",
+      "check": "anchor_attack_05_L: no locomotor bone in the chain",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "file": "full",
+      "check": "anchor_attack_05_L: non-zero reach from the effector joint",
+      "pass": true,
+      "detail": "0.21257"
+    },
+    {
+      "file": "full",
+      "check": "anchor_attack_05_L: world point reconstructs",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "file": "full",
+      "check": "anchor_attack_05_R: exactly one node named limb_05_R_tip",
+      "pass": true,
+      "detail": "1"
+    },
+    {
+      "file": "full",
+      "check": "anchor_attack_05_R: chain ends at its own parent",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "file": "full",
+      "check": "anchor_attack_05_R: chain is ordered direct ancestry",
+      "pass": true,
+      "detail": "limb_05_R_prox -> limb_05_R_mid -> limb_05_R_dist -> limb_05_R_tip"
+    },
+    {
+      "file": "full",
+      "check": "anchor_attack_05_R: no locomotor bone in the chain",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "file": "full",
+      "check": "anchor_attack_05_R: non-zero reach from the effector joint",
+      "pass": true,
+      "detail": "0.18625"
+    },
+    {
+      "file": "full",
+      "check": "anchor_attack_05_R: world point reconstructs",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "file": "full",
+      "check": "anchor_attack_06_L: exactly one node named limb_06_L_tip",
+      "pass": true,
+      "detail": "1"
+    },
+    {
+      "file": "full",
+      "check": "anchor_attack_06_L: chain ends at its own parent",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "file": "full",
+      "check": "anchor_attack_06_L: chain is ordered direct ancestry",
+      "pass": true,
+      "detail": "limb_06_L_prox -> limb_06_L_mid -> limb_06_L_dist -> limb_06_L_tip"
+    },
+    {
+      "file": "full",
+      "check": "anchor_attack_06_L: no locomotor bone in the chain",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "file": "full",
+      "check": "anchor_attack_06_L: non-zero reach from the effector joint",
+      "pass": true,
+      "detail": "0.19180"
+    },
+    {
+      "file": "full",
+      "check": "anchor_attack_06_L: world point reconstructs",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "file": "full",
+      "check": "anchor_attack_06_R: exactly one node named limb_06_R_tip",
+      "pass": true,
+      "detail": "1"
+    },
+    {
+      "file": "full",
+      "check": "anchor_attack_06_R: chain ends at its own parent",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "file": "full",
+      "check": "anchor_attack_06_R: chain is ordered direct ancestry",
+      "pass": true,
+      "detail": "limb_06_R_prox -> limb_06_R_mid -> limb_06_R_dist -> limb_06_R_tip"
+    },
+    {
+      "file": "full",
+      "check": "anchor_attack_06_R: no locomotor bone in the chain",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "file": "full",
+      "check": "anchor_attack_06_R: non-zero reach from the effector joint",
+      "pass": true,
+      "detail": "0.17646"
+    },
+    {
+      "file": "full",
+      "check": "anchor_attack_06_R: world point reconstructs",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "file": "full",
+      "check": "required socket anchor_mouth/mouth",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "file": "full",
+      "check": "required socket anchor_mouth_inside/swallow",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "file": "full",
+      "check": "required socket anchor_attack_primary/attack",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "file": "full",
+      "check": "a grasp chain exists (runtime canGrasp)",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "file": "lod1",
+      "check": "anchor_mouth: exactly one node named head",
+      "pass": true,
+      "detail": "1"
+    },
+    {
+      "file": "lod1",
+      "check": "anchor_mouth: world point reconstructs",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "file": "lod1",
+      "check": "anchor_mouth_inside: exactly one node named head",
+      "pass": true,
+      "detail": "1"
+    },
+    {
+      "file": "lod1",
+      "check": "anchor_mouth_inside: world point reconstructs",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "file": "lod1",
+      "check": "anchor_attack_primary: exactly one node named limb_01_L_tip",
+      "pass": true,
+      "detail": "1"
+    },
+    {
+      "file": "lod1",
+      "check": "anchor_attack_primary: chain ends at its own parent",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "file": "lod1",
+      "check": "anchor_attack_primary: chain is ordered direct ancestry",
+      "pass": true,
+      "detail": "limb_01_L_prox -> limb_01_L_mid -> limb_01_L_dist -> limb_01_L_tip"
+    },
+    {
+      "file": "lod1",
+      "check": "anchor_attack_primary: no locomotor bone in the chain",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "file": "lod1",
+      "check": "anchor_attack_primary: non-zero reach from the effector joint",
+      "pass": true,
+      "detail": "0.22871"
+    },
+    {
+      "file": "lod1",
+      "check": "anchor_attack_primary: world point reconstructs",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "file": "lod1",
+      "check": "anchor_grasp: exactly one node named limb_01_L_tip",
+      "pass": true,
+      "detail": "1"
+    },
+    {
+      "file": "lod1",
+      "check": "anchor_grasp: chain ends at its own parent",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "file": "lod1",
+      "check": "anchor_grasp: chain is ordered direct ancestry",
+      "pass": true,
+      "detail": "limb_01_L_prox -> limb_01_L_mid -> limb_01_L_dist -> limb_01_L_tip"
+    },
+    {
+      "file": "lod1",
+      "check": "anchor_grasp: no locomotor bone in the chain",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "file": "lod1",
+      "check": "anchor_grasp: non-zero reach from the effector joint",
+      "pass": true,
+      "detail": "0.22871"
+    },
+    {
+      "file": "lod1",
+      "check": "anchor_grasp: world point reconstructs",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "file": "lod1",
+      "check": "anchor_attack_01_L: exactly one node named limb_01_L_tip",
+      "pass": true,
+      "detail": "1"
+    },
+    {
+      "file": "lod1",
+      "check": "anchor_attack_01_L: chain ends at its own parent",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "file": "lod1",
+      "check": "anchor_attack_01_L: chain is ordered direct ancestry",
+      "pass": true,
+      "detail": "limb_01_L_prox -> limb_01_L_mid -> limb_01_L_dist -> limb_01_L_tip"
+    },
+    {
+      "file": "lod1",
+      "check": "anchor_attack_01_L: no locomotor bone in the chain",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "file": "lod1",
+      "check": "anchor_attack_01_L: non-zero reach from the effector joint",
+      "pass": true,
+      "detail": "0.22871"
+    },
+    {
+      "file": "lod1",
+      "check": "anchor_attack_01_L: world point reconstructs",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "file": "lod1",
+      "check": "anchor_attack_01_R: exactly one node named limb_01_R_tip",
+      "pass": true,
+      "detail": "1"
+    },
+    {
+      "file": "lod1",
+      "check": "anchor_attack_01_R: chain ends at its own parent",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "file": "lod1",
+      "check": "anchor_attack_01_R: chain is ordered direct ancestry",
+      "pass": true,
+      "detail": "limb_01_R_prox -> limb_01_R_mid -> limb_01_R_dist -> limb_01_R_tip"
+    },
+    {
+      "file": "lod1",
+      "check": "anchor_attack_01_R: no locomotor bone in the chain",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "file": "lod1",
+      "check": "anchor_attack_01_R: non-zero reach from the effector joint",
+      "pass": true,
+      "detail": "0.24485"
+    },
+    {
+      "file": "lod1",
+      "check": "anchor_attack_01_R: world point reconstructs",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "file": "lod1",
+      "check": "anchor_attack_02_L: exactly one node named limb_02_L_tip",
+      "pass": true,
+      "detail": "1"
+    },
+    {
+      "file": "lod1",
+      "check": "anchor_attack_02_L: chain ends at its own parent",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "file": "lod1",
+      "check": "anchor_attack_02_L: chain is ordered direct ancestry",
+      "pass": true,
+      "detail": "limb_02_L_prox -> limb_02_L_mid -> limb_02_L_dist -> limb_02_L_tip"
+    },
+    {
+      "file": "lod1",
+      "check": "anchor_attack_02_L: no locomotor bone in the chain",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "file": "lod1",
+      "check": "anchor_attack_02_L: non-zero reach from the effector joint",
+      "pass": true,
+      "detail": "0.24255"
+    },
+    {
+      "file": "lod1",
+      "check": "anchor_attack_02_L: world point reconstructs",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "file": "lod1",
+      "check": "anchor_attack_02_R: exactly one node named limb_02_R_tip",
+      "pass": true,
+      "detail": "1"
+    },
+    {
+      "file": "lod1",
+      "check": "anchor_attack_02_R: chain ends at its own parent",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "file": "lod1",
+      "check": "anchor_attack_02_R: chain is ordered direct ancestry",
+      "pass": true,
+      "detail": "limb_02_R_prox -> limb_02_R_mid -> limb_02_R_dist -> limb_02_R_tip"
+    },
+    {
+      "file": "lod1",
+      "check": "anchor_attack_02_R: no locomotor bone in the chain",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "file": "lod1",
+      "check": "anchor_attack_02_R: non-zero reach from the effector joint",
+      "pass": true,
+      "detail": "0.24163"
+    },
+    {
+      "file": "lod1",
+      "check": "anchor_attack_02_R: world point reconstructs",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "file": "lod1",
+      "check": "anchor_attack_03_L: exactly one node named limb_03_L_tip",
+      "pass": true,
+      "detail": "1"
+    },
+    {
+      "file": "lod1",
+      "check": "anchor_attack_03_L: chain ends at its own parent",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "file": "lod1",
+      "check": "anchor_attack_03_L: chain is ordered direct ancestry",
+      "pass": true,
+      "detail": "limb_03_L_prox -> limb_03_L_mid -> limb_03_L_dist -> limb_03_L_tip"
+    },
+    {
+      "file": "lod1",
+      "check": "anchor_attack_03_L: no locomotor bone in the chain",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "file": "lod1",
+      "check": "anchor_attack_03_L: non-zero reach from the effector joint",
+      "pass": true,
+      "detail": "0.24407"
+    },
+    {
+      "file": "lod1",
+      "check": "anchor_attack_03_L: world point reconstructs",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "file": "lod1",
+      "check": "anchor_attack_03_R: exactly one node named limb_03_R_tip",
+      "pass": true,
+      "detail": "1"
+    },
+    {
+      "file": "lod1",
+      "check": "anchor_attack_03_R: chain ends at its own parent",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "file": "lod1",
+      "check": "anchor_attack_03_R: chain is ordered direct ancestry",
+      "pass": true,
+      "detail": "limb_03_R_prox -> limb_03_R_mid -> limb_03_R_dist -> limb_03_R_tip"
+    },
+    {
+      "file": "lod1",
+      "check": "anchor_attack_03_R: no locomotor bone in the chain",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "file": "lod1",
+      "check": "anchor_attack_03_R: non-zero reach from the effector joint",
+      "pass": true,
+      "detail": "0.22643"
+    },
+    {
+      "file": "lod1",
+      "check": "anchor_attack_03_R: world point reconstructs",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "file": "lod1",
+      "check": "anchor_attack_04_L: exactly one node named limb_04_L_tip",
+      "pass": true,
+      "detail": "1"
+    },
+    {
+      "file": "lod1",
+      "check": "anchor_attack_04_L: chain ends at its own parent",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "file": "lod1",
+      "check": "anchor_attack_04_L: chain is ordered direct ancestry",
+      "pass": true,
+      "detail": "limb_04_L_prox -> limb_04_L_mid -> limb_04_L_dist -> limb_04_L_tip"
+    },
+    {
+      "file": "lod1",
+      "check": "anchor_attack_04_L: no locomotor bone in the chain",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "file": "lod1",
+      "check": "anchor_attack_04_L: non-zero reach from the effector joint",
+      "pass": true,
+      "detail": "0.23258"
+    },
+    {
+      "file": "lod1",
+      "check": "anchor_attack_04_L: world point reconstructs",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "file": "lod1",
+      "check": "anchor_attack_04_R: exactly one node named limb_04_R_tip",
+      "pass": true,
+      "detail": "1"
+    },
+    {
+      "file": "lod1",
+      "check": "anchor_attack_04_R: chain ends at its own parent",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "file": "lod1",
+      "check": "anchor_attack_04_R: chain is ordered direct ancestry",
+      "pass": true,
+      "detail": "limb_04_R_prox -> limb_04_R_mid -> limb_04_R_dist -> limb_04_R_tip"
+    },
+    {
+      "file": "lod1",
+      "check": "anchor_attack_04_R: no locomotor bone in the chain",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "file": "lod1",
+      "check": "anchor_attack_04_R: non-zero reach from the effector joint",
+      "pass": true,
+      "detail": "0.20524"
+    },
+    {
+      "file": "lod1",
+      "check": "anchor_attack_04_R: world point reconstructs",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "file": "lod1",
+      "check": "anchor_attack_05_L: exactly one node named limb_05_L_tip",
+      "pass": true,
+      "detail": "1"
+    },
+    {
+      "file": "lod1",
+      "check": "anchor_attack_05_L: chain ends at its own parent",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "file": "lod1",
+      "check": "anchor_attack_05_L: chain is ordered direct ancestry",
+      "pass": true,
+      "detail": "limb_05_L_prox -> limb_05_L_mid -> limb_05_L_dist -> limb_05_L_tip"
+    },
+    {
+      "file": "lod1",
+      "check": "anchor_attack_05_L: no locomotor bone in the chain",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "file": "lod1",
+      "check": "anchor_attack_05_L: non-zero reach from the effector joint",
+      "pass": true,
+      "detail": "0.21257"
+    },
+    {
+      "file": "lod1",
+      "check": "anchor_attack_05_L: world point reconstructs",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "file": "lod1",
+      "check": "anchor_attack_05_R: exactly one node named limb_05_R_tip",
+      "pass": true,
+      "detail": "1"
+    },
+    {
+      "file": "lod1",
+      "check": "anchor_attack_05_R: chain ends at its own parent",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "file": "lod1",
+      "check": "anchor_attack_05_R: chain is ordered direct ancestry",
+      "pass": true,
+      "detail": "limb_05_R_prox -> limb_05_R_mid -> limb_05_R_dist -> limb_05_R_tip"
+    },
+    {
+      "file": "lod1",
+      "check": "anchor_attack_05_R: no locomotor bone in the chain",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "file": "lod1",
+      "check": "anchor_attack_05_R: non-zero reach from the effector joint",
+      "pass": true,
+      "detail": "0.18625"
+    },
+    {
+      "file": "lod1",
+      "check": "anchor_attack_05_R: world point reconstructs",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "file": "lod1",
+      "check": "anchor_attack_06_L: exactly one node named limb_06_L_tip",
+      "pass": true,
+      "detail": "1"
+    },
+    {
+      "file": "lod1",
+      "check": "anchor_attack_06_L: chain ends at its own parent",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "file": "lod1",
+      "check": "anchor_attack_06_L: chain is ordered direct ancestry",
+      "pass": true,
+      "detail": "limb_06_L_prox -> limb_06_L_mid -> limb_06_L_dist -> limb_06_L_tip"
+    },
+    {
+      "file": "lod1",
+      "check": "anchor_attack_06_L: no locomotor bone in the chain",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "file": "lod1",
+      "check": "anchor_attack_06_L: non-zero reach from the effector joint",
+      "pass": true,
+      "detail": "0.19180"
+    },
+    {
+      "file": "lod1",
+      "check": "anchor_attack_06_L: world point reconstructs",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "file": "lod1",
+      "check": "anchor_attack_06_R: exactly one node named limb_06_R_tip",
+      "pass": true,
+      "detail": "1"
+    },
+    {
+      "file": "lod1",
+      "check": "anchor_attack_06_R: chain ends at its own parent",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "file": "lod1",
+      "check": "anchor_attack_06_R: chain is ordered direct ancestry",
+      "pass": true,
+      "detail": "limb_06_R_prox -> limb_06_R_mid -> limb_06_R_dist -> limb_06_R_tip"
+    },
+    {
+      "file": "lod1",
+      "check": "anchor_attack_06_R: no locomotor bone in the chain",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "file": "lod1",
+      "check": "anchor_attack_06_R: non-zero reach from the effector joint",
+      "pass": true,
+      "detail": "0.17646"
+    },
+    {
+      "file": "lod1",
+      "check": "anchor_attack_06_R: world point reconstructs",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "file": "lod1",
+      "check": "required socket anchor_mouth/mouth",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "file": "lod1",
+      "check": "required socket anchor_mouth_inside/swallow",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "file": "lod1",
+      "check": "required socket anchor_attack_primary/attack",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "file": "lod1",
+      "check": "a grasp chain exists (runtime canGrasp)",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "file": "parity",
+      "check": "identical joint list and order",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "file": "parity",
+      "check": "identical inverse bind matrices",
+      "pass": true,
+      "detail": "max delta 0.00e+00"
+    },
+    {
+      "file": "parity",
+      "check": "identical clip set and durations",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "file": "parity",
+      "check": "identical channel counts per clip",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "file": "parity",
+      "check": "identical bind pose",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "file": "parity",
+      "check": "full in the authored triangle range",
+      "pass": true,
+      "detail": "130184"
+    },
+    {
+      "file": "parity",
+      "check": "LOD in the authored triangle range",
+      "pass": true,
+      "detail": "49878"
+    }
+  ],
+  "failures": [],
+  "status": "PASS"
+}

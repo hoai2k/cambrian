@@ -1,0 +1,28 @@
+{
+  "cambrianFeeding": {
+    "version": 1,
+    "mode": "authored-grasp",
+    "clip": "Eat",
+    "apertureDiameter": 0.045,
+    "pickupOffsetLimit": 0.18
+  },
+  "source": "measured in evidence_v3.json: aperture 0.04513 model units, pickup offset limit 0.18 under the runtime's own unbounded CCD",
+  "sockets": [
+    "anchor_mouth",
+    "anchor_mouth_inside",
+    "anchor_attack_primary",
+    "anchor_grasp",
+    "anchor_attack_01_L",
+    "anchor_attack_01_R",
+    "anchor_attack_02_L",
+    "anchor_attack_02_R",
+    "anchor_attack_03_L",
+    "anchor_attack_03_R",
+    "anchor_attack_04_L",
+    "anchor_attack_04_R",
+    "anchor_attack_05_L",
+    "anchor_attack_05_R",
+    "anchor_attack_06_L",
+    "anchor_attack_06_R"
+  ]
+}
