@@ -5,7 +5,7 @@
   "provenance": "Late Devonian (Famennian), Southern Ma\u00efder basin, Morocco",
   "description": "Broad-headed armoured giant with small eyes and slender toothless jaws, reconstructed as a suspension feeder.",
   "lengthMeters": 5,
-  "modelLength": 7.211911916732788,
+  "modelLength": 7.438093900680542,
   "locomotion": "Swim",
   "clips": [
     "Idle",
@@ -60,6 +60,7 @@
     "Deep armored cranial and thoracic volume, a lined edentulous mouth, separate upper-cranial and lower-jaw bones, a deforming oral floor, six muscular tail sections and articulated long-fin trim.",
     "The revised oral skinning retains the broad feeding gape. Both globes are seated deeper along their original socket axes; orbital rim, eye size and skull attachment are preserved.",
     "Regional full-model PBR retains the 4096-pixel body albedo, with a reviewed vector-filtered 2048-pixel body normal. The reduced model retains vertex pigmentation and all 18 authored actions.",
-    "Refined preview model: close-up reduced-model surface polish, broader controller playtesting and dependent environment illustration updates remain pending."
+    "Refined preview model: close-up reduced-model surface polish, broader controller playtesting and dependent environment illustration updates remain pending.",
+    "Sculpt port (docs/viewer-sculpt.md): the snout drawn out to a longer point and pulled in (nose axis +0.23 model units, width -77.6% at station 19 and -9.8%/-3.5% at 15/16, dorsal -13.8% at the nose) by re-lofting the head cage's own profile rows; everything at or behind station 14 is unchanged."
   ]
 }
