@@ -1,22 +1,34 @@
-"""Bespoke Palaeoisopus sp. reconstruction; Blender 4.5+ standalone builder."""
+"""Bespoke Cladoselache sp. reconstruction; Blender 4.5+ standalone builder.
+
+V3 candidate builder: identical to build.py except it imports anatomy_v3 (the ported fin-outline
+study) instead of anatomy_v2, moves the pectoralTip bone to sit mid-blade toward the new far
+apex, and writes everything -- GLBs, JSON metadata, anchors.json, validation.json, the .blend and
+every preview render -- under a v3-candidate/'v3-' prefixed area so nothing this script writes
+touches the shipped v2 candidate or any tracked file. build.py itself is untouched, so the
+default (v2) build still reproduces exactly.
+"""
 import bpy,bmesh,math,os,sys,json,struct
 import numpy as np
 from mathutils import Vector,noise
 from math import sin,cos,pi
 HERE=os.path.dirname(os.path.abspath(__file__))
 ROOT=os.path.abspath(os.path.join(HERE,'../../../..'))
-LOCAL=os.environ.get('DEVONIAN_AUTHORING',os.path.abspath(os.path.join(ROOT,'../devonian-authoring/palaeoisopus')))
-ANATOMY=os.environ.get('PAL_ANATOMY','v2')  # 'v2' selects the shape-study port; default keeps this build reproducing v1 exactly.
-OUT=os.path.join(LOCAL,ANATOMY+'-candidate')
+LOCAL=os.environ.get('DEVONIAN_AUTHORING',os.path.abspath(os.path.join(ROOT,'../devonian-authoring/cladoselache')))
+OUT=os.path.join(LOCAL,'v3-candidate')
 os.makedirs(LOCAL,exist_ok=True);os.makedirs(OUT,exist_ok=True)
-ID='palaeoisopus';CLIPS={'Idle':2.4,'Swim':2.4,'TurnLeft':1.6,'TurnRight':1.6,'Dive':1.4,'Rise':1.4,'Attack':1.,'Bite':.5,'Heavy':1.1,'Hit':.6,'Death':1.6,'Guard':1.,'Parry':.35,'Dodge':.4,'Eat':1.6,'Stagger':1.2,'Ability':2.4,'Moult':1.5,'Grab':1.1}
+ID='cladoselache';CLIPS={'Idle':2.4,'Swim':2.4,'TurnLeft':1.6,'TurnRight':1.6,'Dive':1.4,'Rise':1.4,'Attack':1.,'Bite':.5,'Heavy':1.1,'Hit':.6,'Death':1.6,'Guard':1.,'Parry':.35,'Dodge':.4,'Eat':1.6,'Stagger':1.2,'Ability':2.4,'Growth':1.5}
 LOOPS=['Idle','Swim','Guard','Eat']
 bpy.ops.object.select_all(action='SELECT');bpy.ops.object.delete(use_global=False)
 for a in list(bpy.data.actions):bpy.data.actions.remove(a)
 V=[];C=[];W=[];U=[];F=[];M=[];B={}
 def bone(n,p,parent='body'):
  B[n]=(Vector(p),Vector(p)+Vector((0,.35,0)),parent)
-bone('root',(0,0,0),None);bone('body',(0,0,0),'root');bone('proboscis',(0,-.52,-.16),'body');bone('oralTip',(0,.25,-.42),'proboscis')
+bone('root',(0,0,0),None);bone('body',(0,0,0),'root');bone('skull',(0,-.9,.02));bone('jaw',(0,-1.22,-.13),'skull');bone('throat',(0,-1.02,-.18),'skull')
+for i,y in enumerate([.15,.65,1.15,1.65,2.15,2.65]):bone('tail%d'%i,(0,y,0),'body' if i==0 else 'tail%d'%(i-1))
+for side in [-1,1]:
+ # pectoralTip moved to sit mid-blade toward the ported study's far apex (was (side*.92,-.12,-.30)).
+ s='L' if side==1 else 'R';bone('pectoral'+s,(side*.35,-.5,-.22));bone('pectoralTip'+s,(side*1.05,.20,-.36),'pectoral'+s);bone('pelvic'+s,(side*.22,1.2,-.21),'tail2');bone('gill'+s,(side*.38,-.94,-.04),'skull')
+bone('dorsal',(0,-.11,.38),'body');bone('dorsalRear',(0,1.32,.28),'tail2');bone('caudal',(0,2.62,.02),'tail5')
 def vertex(p,col,w,uv=(0,0),var=True):
  p=Vector(p);v=1
  # Irregular sparse mottling preserves the smooth-skinned silhouette.
@@ -42,24 +54,24 @@ def ell(c,scale,col,w,m=3):
  c=Vector(c)
  grid(17,32,lambda i,j:vertex(c+Vector((scale[0]*sin(pi*i/16)*cos(2*pi*j/32),scale[1]*sin(pi*i/16)*sin(2*pi*j/32),scale[2]*cos(pi*i/16))),col,w,(j/32,i/16),False),m,True)
 
-# Dedicated Palaeoisopus initial anatomy and original mapped PBR materials.
+# V3 candidate anatomy (ported fin outlines) and the same original mapped PBR materials.
 sys.path.insert(0,HERE)
-make=__import__('anatomy_'+ANATOMY,fromlist=['make']).make
+from anatomy_v3 import make
 make(globals())
-from materials_v1 import build_materials
+from materials_v2 import build_materials
 mats,texture_lookup=build_materials(HERE)
 for fi,mi in zip(F,M):
- family=['body','fin',None,'eye','eye','fin'][mi]
+ family=['body','body',None,'eye','body','fin'][mi]
  for vi in fi:
   if family:
    data=texture_lookup[family];u,v=U[vi];yy=round(min(.999,max(0,v))*(data.shape[0]-1));xx=round(min(.999,max(0,u))*(data.shape[1]-1));rgb=data[max(0,yy-2):yy+3,max(0,xx-2):xx+3].mean(axis=(0,1));linear=np.where(rgb<=.04045,rgb/12.92,((rgb+.055)/1.055)**2.4);C[vi]=tuple(float(x)for x in linear)+(1,)
-  else:C[vi]=(.26,.19,.12,1)
+  else:C[vi]=(.40,.365,.235,1)
 mesh=bpy.data.meshes.new(ID+' contiguous anatomy');mesh.from_pydata(V,[],F);mesh.update();obj=bpy.data.objects.new(ID,mesh);bpy.context.collection.objects.link(obj)
 for m in mats:mesh.materials.append(m)
 for p,mi in zip(mesh.polygons,M):p.material_index=mi;p.use_smooth=True
 col=mesh.color_attributes.new(name='Color',type='FLOAT_COLOR',domain='POINT');col.data.foreach_set('color',np.array(C,dtype=np.float32).ravel());uv=mesh.uv_layers.new(name='UVMap');loopUV=[U[l.vertex_index] for l in mesh.loops]
 for poly in mesh.polygons:
- if poly.material_index not in [0,3,5]:continue
+ if poly.material_index not in [0,3]:continue
  if max(loopUV[i][0] for i in poly.loop_indices)-min(loopUV[i][0] for i in poly.loop_indices)>.5:
   for li in poly.loop_indices:
    u,v=loopUV[li];loopUV[li]=(u+1 if u<.5 else u,v)
@@ -83,18 +95,20 @@ scene=bpy.context.scene;scene.render.fps=30;rig.animation_data_create()
 for pb in rig.pose.bones:pb.rotation_mode='XYZ'
 def reset():
  for pb in rig.pose.bones:pb.rotation_euler=(0,0,0);pb.location=(0,0,0);pb.scale=(1,1,1)
-from actions_v1 import animate
+from actions_v2 import animate
 seams,bounds,actionMetrics=animate(bpy,scene,rig,obj,CLIPS,LOOPS,reset)
 reset();scene.frame_set(0)
-anchors=[{'name':'anchor_mouth','bone':'oralTip','point':[0,.38,-.44],'role':'mouth'},{'name':'anchor_mouth_inside','bone':'proboscis','point':[0,.16,-.41],'role':'swallow'},{'name':'anchor_attack_primary','bone':'chelaL','point':[.24,-1.65,-.015],'role':'attack'}]
-open(os.path.join(HERE,'anchors.json'),'w').write(json.dumps({ID:anchors},indent=2))
+anchors=[{'name':'anchor_mouth','bone':'jaw','point':[0,-2.168,-.107],'role':'mouth'}, {'name':'anchor_mouth_inside','bone':'skull','point':[0,-1.64,-.075],'role':'swallow'},{'name':'anchor_attack_primary','bone':'skull','point':[0,-2.17,-.06],'role':'attack'}]
+# Written into OUT (the v3 candidate dir), never HERE: anchors.json is a tracked file and this
+# port does not change the mouth/skull anchors it holds.
+open(os.path.join(OUT,'anchors.json'),'w').write(json.dumps({ID:anchors},indent=2))
 # Parent inverse equals inverse bind bone tail transform; matrix_world sets real anatomical world point.
 sockets=[]
 for a in anchors:
  socket=bpy.data.objects.new(a['name'],None);bpy.context.collection.objects.link(socket);socket.parent=rig;socket.parent_type='BONE';socket.parent_bone=a['bone'];socket.matrix_world.translation=Vector(a['point']);socket['cambrianAnchor']={'version':1,'role':a['role'],'parentBone':a['bone']};sockets.append(socket)
 # Split by material before export (avoids Blender multi-material colour-index exporter regression).
 bpy.ops.object.select_all(action='DESELECT');temp=obj.copy();temp.data=obj.data.copy();bpy.context.collection.objects.link(temp);temp.select_set(True);bpy.context.view_layer.objects.active=temp;bpy.ops.object.mode_set(mode='EDIT');bpy.ops.mesh.select_all(action='SELECT');bpy.ops.mesh.separate(type='MATERIAL');bpy.ops.object.mode_set(mode='OBJECT');parts=list(bpy.context.selected_objects)
-for part in parts:bpy.context.view_layer.objects.active=part;bpy.ops.object.material_slot_remove_unused();part.parent=rig;part.name=ID+' '+part.data.materials[0].name
+for part in parts:bpy.context.view_layer.objects.active=part;bpy.ops.object.material_slot_remove_unused();part.parent=None;part.name=ID+' '+part.data.materials[0].name
 rig.select_set(True)
 for s in sockets:s.select_set(True)
 bpy.context.view_layer.objects.active=rig
@@ -106,7 +120,7 @@ bpy.ops.export_scene.gltf(filepath=os.path.join(OUT,ID+'.glb'),**kwargs)
 for part in parts:part.data.color_attributes['Color'].data.foreach_set('color',fullColors[part.name].astype(np.float32).ravel())
 fulltris=sum(len(p.vertices)-2 for p in mesh.polygons)
 for part in parts:
- bpy.context.view_layer.objects.active=part;de=part.modifiers.new('Reduced silhouette preserving topology','DECIMATE');de.ratio=.28;bpy.ops.object.modifier_move_up(modifier=de.name);bpy.ops.object.modifier_apply(modifier=de.name);bpy.ops.object.vertex_group_limit_total(group_select_mode='ALL',limit=4);bpy.ops.object.vertex_group_normalize_all(group_select_mode='ALL',lock_active=False)
+ bpy.context.view_layer.objects.active=part;de=part.modifiers.new('Reduced silhouette preserving topology','DECIMATE');de.ratio=.28;bpy.ops.object.modifier_move_up(modifier=de.name);bpy.ops.object.modifier_apply(modifier=de.name)
 lodtris=sum(sum(len(p.vertices)-2 for p in part.data.polygons)for part in parts)
 materialLinks=[]
 for mat in mats:
@@ -117,7 +131,7 @@ for mat in mats:
 bpy.ops.export_scene.gltf(filepath=os.path.join(OUT,ID+'.lod1.glb'),**kwargs)
 for mat,source,target in materialLinks:mat.node_tree.links.new(source,target)
 mats[3].node_tree.nodes.get('Principled BSDF').inputs['Base Color'].default_value=(1,1,1,1)
-mats[2].node_tree.nodes.get('Principled BSDF').inputs['Base Color'].default_value=(.26,.19,.12,1)
+mats[2].node_tree.nodes.get('Principled BSDF').inputs['Base Color'].default_value=(.40,.365,.235,1)
 for part in parts:bpy.data.objects.remove(part,do_unlink=True)
 # Resolve exact socket local transforms post-export from inverse exported parent world bind matrix.
 def patch(path,lod=False):
@@ -156,28 +170,29 @@ for g in [full,lod]:
   assert all(c['target']['path']!='scale'for c in a['channels'])
   assert all(g['nodes'][c['target']['node']].get('name')!='root'for c in a['channels'])
 assert lodtris/fulltris<.4
-sources=[{'title':'Sabroux et al.2024, New insights into the Devonian sea spiders of the Hunsrück Slate','url':'https://doi.org/10.7717/peerj.17766'}]
-notes=['Original initial preview based on Sabroux et al.2024; representative adult leg span0.30m, not a maximum-size claim.','Four walking-leg pairs have flattened distal articles, first pair nine podomeres and remaining pairs ten with metatibia; proximal coxal rings are ornamental divisions within coxa1.','Long articulated abdomen terminates in a lanceolate fifth element/telson complex; homology of the fifth abdominal element remains debated.','Chelifores follow the favored two-scape interpretation; oviger segmentation remains incompletely preserved.','Proboscis is a broad ventral tube shown posteriorly folded at rest, plausibly mobile; action names represent grasping/probing equivalents and do not imply fish-like biting jaws.','Prominent ocular-region bumps are modeled as cuticular/sensory tubercles, not asserted eye globes. Eye positions are unresolved in the fossil; no differentiated external eyes are invented.','Pigmentation, exact soft oral margins, appendage thickness, setal density and motion amplitudes are inferred.','Preview: finer cuticle, joint and animation refinement deferred until the initial roster is complete.']
-meta={'id':ID,'name':'Palaeoisopus','species':'Palaeoisopus problematicus','provenance':'Early Devonian, Early Emsian, Hunsrück Slate, Germany','description':'Robust fossil sea spider with a long segmented abdomen, massive grasping chelifores and eight flattened swimming limbs.','lengthMeters':.30,'modelLength':max(p[1]for p in V)-min(p[1]for p in V),'locomotion':'Swim','clips':list(CLIPS),'looping':LOOPS,'anchors':[a['name']for a in anchors],'sources':sources,'notes':notes}
+sources=[{'title':'Klug, Coates, Frey et al. (2023), Broad snouted cladoselachian with sensory specialization; Cladoselache comparisons','url':'https://link.springer.com/article/10.1186/s13358-023-00266-6'}, {'title':'The Development of the Chimaeroid Pelvic Skeleton and the Evolution of Chondrichthyan Pelvic Fins (2022), Cladoselache kepleri NHMUK PV P9269','url':'https://pmc.ncbi.nlm.nih.gov/articles/PMC9782884/'},{'title':'Case Western Reserve University Hyde Collection, Cleveland Shale Cladoselache specimens','url':'https://caslabs.case.edu/hyde-collection/historical-geology/'},{'title':'Cleveland Museum of Natural History casting program: complete Cladoselache CMNH5371','url':'https://gsa.confex.com/gsa/2006NC/webprogram/Paper103585.html'}]
+notes=['Genus-level Cladoselache reconstruction of a representative 1.5 m individual, not a specimen scan or a species maximum. Body outline informed by Cleveland Shale material, pelvic anatomy by C. kepleri NHMUK PV P9269.','Broad triangular paired fins, large lateral eyes, blunt snout, terminal cladodont mouth and strongly forked tail distinguish this animal from a modern great-white shark.','The anterior dorsal spine follows the 2023 comparative study. A second dorsal spine remains hypothetical and is omitted. Fin radials are covered by skin. No cord meshes or anal fin are present.','Original imagegen skin swatch with mapped PBR countershading, incised gills and seated eyes;  a modern all-over placoid-scale coat is not claimed. Pigmentation, soft-tissue volume and every animation are artistic reconstruction.','Growth is a relaxed fin-extension/breathing display. Ability is a short acceleration and bank display; compatible clip labels do not define Devonian gameplay.','V3 candidate: fin outlines only (pectoral, pelvic, dorsal, rear, caudal) ported from an approved reference-led shape study; body, mouth, gills and materials unchanged from V2.']
+meta={'id':ID,'name':'Cladoselache','species':'Cladoselache sp. (Cleveland Shale reconstruction)','provenance':'Late Devonian, Famennian Cleveland Shale, Ohio, USA','description':'Streamlined early chondrichthyan with a broad terminal mouth, large eyes, broad paired fins, a curved anterior dorsal spine and a keeled crescent tail.','lengthMeters':1.5,'modelLength':max(p[1]for p in V)-min(p[1]for p in V),'locomotion':'Swim','clips':list(CLIPS),'looping':LOOPS,'anchors':[a['name']for a in anchors],'sources':sources,'notes':notes}
 open(os.path.join(OUT,ID+'.json'),'w').write(json.dumps(meta,indent=2))
 report={'vertices':len(V),'fullTriangles':fulltris,'lodTriangles':lodtris,'reductionRatio':lodtris/fulltris,'bones':len(B),'clips':CLIPS,'loopSeams':seams,'boundsAtEveryFrame':bounds,'actionMetrics':actionMetrics,'weightNormalization':True,'rootStable':True,'noScaleChannels':True,'anchorCount':3,'fullBytes':os.path.getsize(os.path.join(OUT,ID+'.glb')),'lodBytes':os.path.getsize(os.path.join(OUT,ID+'.lod1.glb'))}
-open(os.path.join(HERE,'validation-'+ANATOMY+'.json'if ANATOMY!='v1'else'validation.json'),'w').write(json.dumps(report,indent=2))
+# Written into OUT, not HERE: validation.json here is a build-report side effect, not part of the
+# ported diff, and this run's vertex/action numbers belong with the v3 candidate they describe.
+open(os.path.join(OUT,'validation.json'),'w').write(json.dumps(report,indent=2))
 # Studio and prescribed pose review.
 world=bpy.data.worlds.new('Deep neutral studio');scene.world=world;world.use_nodes=True;world.node_tree.nodes['Background'].inputs[0].default_value=(.022,.033,.041,1);world.node_tree.nodes['Background'].inputs[1].default_value=.4
 for name,pos,power,size,color in [('Key',(3,-5,7),1300,5,(1,.89,.72)),('Fill',(-5,-2,3),900,5,(.53,.78,1)),('Rim',(1,5,5),1700,4,(.70,.89,1)),('Lower bounce',(-2,2,-4),500,6,(.58,.78,.91))]:
  d=bpy.data.lights.new(name,'AREA');d.energy=power;d.shape='DISK';d.size=size;d.color=color;o=bpy.data.objects.new(name,d);bpy.context.collection.objects.link(o);o.location=pos;o.rotation_euler=(Vector((0,.3,0))-o.location).to_track_quat('-Z','Y').to_euler()
-d=bpy.data.cameras.new('Camera');cam=bpy.data.objects.new('Camera',d);bpy.context.collection.objects.link(cam);scene.camera=cam;d.type='ORTHO';d.ortho_scale=9.2
+d=bpy.data.cameras.new('Camera');cam=bpy.data.objects.new('Camera',d);bpy.context.collection.objects.link(cam);scene.camera=cam;d.type='ORTHO';d.ortho_scale=6.7
 scene.render.engine='CYCLES';scene.cycles.samples=24;scene.cycles.use_denoising=True;scene.render.resolution_percentage=100;scene.view_settings.view_transform='AgX';scene.view_settings.exposure=0;scene.render.image_settings.file_format='PNG';scene.render.image_settings.color_mode='RGBA';scene.render.film_transparent=True
-cam.location=(7,-6,6);cam.rotation_euler=(Vector((0,.4,0))-cam.location).to_track_quat('-Z','Y').to_euler();rig.animation_data.action=bpy.data.actions['Idle'];scene.frame_set(0);scene.frame_start=0;scene.frame_end=72
-bpy.ops.wm.save_as_mainfile(filepath=os.path.join(LOCAL,ID+'-'+ANATOMY+'.blend'))
+cam.location=(7,-6,4.2);cam.rotation_euler=(Vector((0,.65,0))-cam.location).to_track_quat('-Z','Y').to_euler();rig.animation_data.action=bpy.data.actions['Idle'];scene.frame_set(0);scene.frame_start=0;scene.frame_end=72
+bpy.ops.wm.save_as_mainfile(filepath=os.path.join(LOCAL,ID+'-v3.blend'))
 def render(path,w,h,transparent=True):
  scene.render.resolution_x=w;scene.render.resolution_y=h;scene.render.film_transparent=transparent;scene.render.filepath=path;bpy.ops.render.render(write_still=True)
-if os.environ.get('PALAEOISOPUS_EXPORT_ONLY'):sys.exit(0)
-if os.environ.get('PALAEOISOPUS_QUICK'):
- render(os.path.join(LOCAL,'v1-silhouette.png'),1000,750,False)
- cam.location=(9,0,.55);cam.rotation_euler=(Vector((0,.4,0))-cam.location).to_track_quat('-Z','Y').to_euler();render(os.path.join(LOCAL,'v1-side.png'),1000,750,False)
- print('PALAEOISOPUS_QUICK_COMPLETE',flush=True);sys.exit(0)
+if os.environ.get('CLADOSELACHE_QUICK'):
+ render(os.path.join(LOCAL,'v3-silhouette.png'),1000,750,False)
+ cam.location=(9,0,.55);cam.rotation_euler=(Vector((0,.60,0))-cam.location).to_track_quat('-Z','Y').to_euler();render(os.path.join(LOCAL,'v3-side.png'),1000,750,False)
+ print('CLADOSELACHE_QUICK_COMPLETE',flush=True);sys.exit(0)
 render(os.path.join(OUT,ID+'.select.png'),1600,1200);render(os.path.join(OUT,ID+'.card.png'),800,600);render(os.path.join(OUT,ID+'.thumb.png'),256,192);render(os.path.join(OUT,ID+'.png'),1200,900,False)
 for clip,phase,view in [('Idle',0,'side'),('Swim',.35,'side'),('Eat',.125,'front'),('Bite',.5,'side'),('Heavy',.20,'threequarter'),('Ability',.38,'front'),('Guard',.5,'threequarter'),('Dodge',.5,'side'),('Death',1,'threequarter')]:
- rig.animation_data.action=bpy.data.actions[clip];scene.frame_set(round(CLIPS[clip]*30*phase));cam.location={'side':(9,0,1.2),'front':(0,-10,1),'threequarter':(7,-6,6)}[view];cam.rotation_euler=(Vector((0,.4,0))-cam.location).to_track_quat('-Z','Y').to_euler();render(os.path.join(LOCAL,clip+'-'+view+'.png'),900,675,False)
-print('PALAEOISOPUS_COMPLETE',json.dumps(report),flush=True)
+ rig.animation_data.action=bpy.data.actions[clip];scene.frame_set(round(CLIPS[clip]*30*phase));cam.location={'side':(9,0,1.2),'front':(0,-10,1),'threequarter':(7,-6,4.2)}[view];cam.rotation_euler=(Vector((0,.65,0))-cam.location).to_track_quat('-Z','Y').to_euler();render(os.path.join(OUT,'v3-'+clip+'-'+view+'.png'),900,675,False)
+print('CLADOSELACHE_COMPLETE',json.dumps(report),flush=True)
