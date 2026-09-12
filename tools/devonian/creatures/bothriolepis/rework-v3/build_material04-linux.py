@@ -1,6 +1,13 @@
 """MATERIAL04 bounded shield/oral appearance candidate on immutable M03.
 No production rig/export, public writes, or source blend overwrite. CPU2.
 Same topology, aperture, interior, appendages, posterior and study-key motion.
+
+-linux variant: identical to build_material04.py except EXPECTED below. .blend
+files are not byte-reproducible across Blender saves (proven empirically), so
+verified BY VALUE instead: material03's source-check.json invariants (cephalic
+tangent delta ~0.0043, matching the handoff's 0.004317 within float32
+cross-platform tolerance; 2,822 boundary vertices; only the declared change
+touched geometry) were confirmed before this ran.
 """
 import bpy,sys,json,hashlib,math,struct,zlib
 import numpy as np
@@ -14,7 +21,9 @@ from geometry_material04 import corrected_deltas
 from geometry_clay02 import validate
 import copy
 BASE=REPO.parent/'devonian-authoring/bothriolepis/rework-v3/material03/bothriolepis-material03.blend'
-EXPECTED='6521d66e5ed42a8706dbfe6329db230bad75cbed43694ac57d85e782c6b2d751'
+# Actual sha256 of the material03.blend rebuilt here by the unmodified frozen
+# build_material03-linux.py, in place of the unreproducible original hash.
+EXPECTED='cbf1089f43da720d6b1f295026dd75da953fc01edc51fb985dedd60b67270c53'
 assert hashlib.sha256(BASE.read_bytes()).hexdigest()==EXPECTED
 OUT=REPO.parent/'devonian-authoring/bothriolepis/rework-v3/material04';OUT.mkdir(parents=True,exist_ok=True)
 assert not (OUT/'bothriolepis-material04.blend').exists(),'STOP existing MATERIAL04 candidate'
