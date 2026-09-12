@@ -45,15 +45,16 @@
     "id": "eldredgeops",
     "status": "pending",
     "scope": "individual-refinement",
-    "model": true,
-    "reason": "Triage 11 September: the model reads well \u2014 cephalon, schizochroal lens arrays, tergites and limbs. What is left is the rig: the occipital/first-tergite joint opens visibly at the Ability and Guard peak and some antenna tips sit outside the enrolled shell. Re-weight that joint and tuck the antennae; no sculpt change.",
+    "model": false,
     "clips": [
       "Bite",
       "Attack",
       "Heavy",
-      "Eat"
+      "Eat",
+      "Ability",
+      "Guard"
     ],
-    "clipReason": "Re-authored 8\u20139 September 2026 in the articulated attack and feeding pass (tools/creatures/motion): the real appendages, joint chains and mouth drive Bite, Attack, Heavy and Eat with preparation, reach and recovery. Revised 10 September so the strike drives the body rather than quieting it: the shipped clip\u2019s body motion is carried through and the appendage work rides on top. Awaiting review; the previous clip is kept as replaced/<name> in the viewer for comparison."
+    "clipReason": "Re-authored 8\u20139 September 2026 in the articulated attack and feeding pass (tools/creatures/motion): the real appendages, joint chains and mouth drive Bite, Attack, Heavy and Eat with preparation, reach and recovery. Revised 10 September so the strike drives the body rather than quieting it: the shipped clip\u2019s body motion is carried through and the appendage work rides on top. Awaiting review; the previous clip is kept as replaced/<name> in the viewer for comparison. Ability and Guard: at the rolled peak some antenna tips sit outside the enrolled shell; bringing them inside is a choreography change on those two clips (12 September), not a value tweak."
   },
   {
     "id": "walliserops",
@@ -127,8 +128,7 @@
     "id": "manticoceras",
     "status": "pending",
     "scope": "individual-refinement",
-    "model": true,
-    "reason": "Triage 11 September: the umbilicus is open to about a third of the diameter with the inner whorls showing, where the cited M. regulare source has a narrow discoidal, involute shell with a small umbilicus. Increase the whorl overlap in the shell parameters so it closes to roughly a tenth; soften the mantle edge. Arms and head are fine.",
+    "model": false,
     "clips": [
       "Bite",
       "Attack",

@@ -151,8 +151,21 @@ for side in [-1,1]:
  for k in range(13):
   y=-1.95+.050*k;a=.53+.20*sin(k*.35);p=hp(y,a,.0);p.x*=side
   ell(p,(.004,.006,.006),(.034,.050,.022),'skull',4)
+# Fin roots must sit inside the trunk, not on the number the outline was drawn to. depth() is the
+# trunk section's ellipse metric at the point's station (<0 inside), and seat() pulls a root
+# radially toward the section centre until it is a margin inside. V2 shipped every fin root at or
+# outside the surface (pectoral +0.07, pelvic +0.31, dorsal and anal trailing bases +0.17/+0.26),
+# which read as fins floating beside the body; the assertion below keeps that from coming back.
+def depth(p):
+ w,h,z=section(p[1]);return (p[0]/w)**2+((p[2]-z)/h)**2-1
+def seat(p,target):
+ p=Vector(p);d=depth(p)
+ if d<=target:return p
+ w,h,z=section(p.y);s=math.sqrt((target+1)/(d+1));return Vector((p.x*s,p.y,z+(p.z-z)*s))
 def fin(name,origin,boundary,base,tip=None,thickness=.012,rays=9):
- origin=Vector(origin);controls=list(map(Vector,boundary));boundary=[]
+ origin=seat(origin,-.18);controls=list(map(Vector,boundary));controls[0]=seat(controls[0],-.14);controls[-1]=seat(controls[-1],-.14);boundary=[]
+ for a,b in [(origin,controls[0]),(origin,controls[-1])]:
+  assert max(depth(a.lerp(b,t))for t in np.linspace(0,1,20))<-.05,(name,'fin root outside the trunk')
  for k in range(len(controls)-1):
   a,b=controls[k:k+2];pre=controls[max(0,k-1)];post=controls[min(len(controls)-1,k+2)]
   for t0 in np.linspace(0,1,7,endpoint=False):
@@ -161,8 +174,9 @@ def fin(name,origin,boundary,base,tip=None,thickness=.012,rays=9):
  def point(t,j):return origin.lerp(boundary[j],t)+normal*(thickness*sin(pi*t)*sin(pi*j/(N-1)))
  def weight(t,p=None):
   out={base:1-max(0,(t-.45)/.55),tip:max(0,(t-.45)/.55)}if tip else {base:1}
-  if p is not None and name in ['dorsal','anal','caudal']:
-   w,h,z=section(p.y);outside=max(0,abs(p.z-z)-h);free=min(1,outside/.13)
+  if p is not None:
+   # Radial, so a side fin measures its distance from the flank, not from the back or belly.
+   free=min(1,max(0,depth(p))/.9)
    out={k:v*free for k,v in out.items()}
    for k,v in bw(p.y).items():out[k]=out.get(k,0)+v*(1-free)
   return out
