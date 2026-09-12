@@ -80,3 +80,30 @@ stay attached under tail bends.
 | stethacanthus | not started (no rework-v3) | — | brief → clay → material → rig → audits → package |
 
 All handoffs use Mac paths (`/Applications/Blender.app/...`, `/Users/hoai/.../expansion-repo`); rewrite to `/opt/blender/blender` and `/home/user/cambrian`. Every `../devonian-authoring/...` output directory they cite does not exist here and must be re-derived, never assumed. Frozen candidate directories are immutable.
+
+## Cheirolepis face — passes 2–4 sent 12 September, waiting on the user's pick
+
+Study: scratchpad `face/study2.py` (port the chosen `FACE<n>` dict into `build_v3.py`'s HEAD table,
+eye, and the `hp()` lip/brow terms). Pass 4 = FACE4: head stations
+`[(-2.41,.008,.008,.008,.018),(-2.35,.130,.140,.110,.020),(-2.27,.200,.225,.150,.008),(-2.12,.240,.278,.190,-.012),(-2.00,.250,.280,.205,-.026),(-1.80,.286,.302,.255,-.050),(-1.50,.314,.352,.300,-.062),(-1.16,.320,.400,.330,0)]`,
+eye `(.160,-2.03,.150)` r `(.058,.092,.085)` (proxy 0.633; V2 shipped 0.661 ≡ 80% audit), lip ridge
+`.055·exp(-(sin a/.20)²)` along the mouth line, brow `.12` on a ledge over `|cos a|∈[.20,.32]…[.78,.90]`
+and `y∈[-2.32,-2.16]…[-1.94,-1.76]`, crown flattened `-.045` over `|cos a|<.30` in the same band.
+The -2.41 nose station is what closes the mouth; the head shells must stay outer+inner stitched.
+
+## Group A geometry maps — 12 September (Explore agent)
+
+- **acanthostega** `anatomy_v1.py`: trunk+tail are one loft over `SEC` rows `(y,w,h,z)` via `surf(y,a)`;
+  the "paddle" is the late `h` spike at y 2.5–4.5. Lever: sustain `h` from y≈1.1 to the tip, keep `w`
+  thin, flatten the ventral half in `surf()` (the `s<0` branch), widen `w:h` for the flat belly; add
+  `tube()` ray strokes. Limbs: `limbPoint`/`centers`/`widths`/`depths`; palm is a bolt-on `ell()` — loft
+  it from the limb's last ring instead. UV.v ≡ y-station (`materials_v1.py:14`): keep the y-range
+  -2.2..5.0 or mirror the change there. `check-pose-attachments.py` asserts fin-root centroids buried.
+- **jaekelopterus** `build.py`: `segs` table (12 rows y,w,h) + `shellpoint()`; lever: hold w through
+  segments 0–5 then step down, strengthen ventral flattening; chelicerae rami are `tube(..., flat=.77)` —
+  drop `flat` to ~.35, lengthen, densify denticles. Eyes sample `hp(y,a)` — do not reshape the head.
+  Vertex-colour shading keys off world z (`materials.py:24-30`): retune if the body flattens.
+- **palaeoisopus** `anatomy_v1.py`: every segment is `shell()` with a `bulge` swelling and `ball()`
+  joint spheres (the dark bands); lever: bulge→0, flatter taper, superellipse exponent so sections
+  become blades, trunk w:d from 2.4:1 to a plate; drop or re-material the `ball()`s.
+  `check-articulation.py` needs bone chains contiguous to 2e-5 — keep `art()` head/tail points.
