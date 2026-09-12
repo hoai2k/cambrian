@@ -3,8 +3,9 @@ import type { ViewerSpecimen } from '../catalogue';
 import type { OrthoView, Rect, SculptMesh, ViewerScene } from '../scene';
 import { History } from './history';
 import {
-  CURVES, autoSlope, evaluate, exportDoc, eyesChanged, isIdentity, makeProbe, measure, mouthChanged, moveEyesOnCrown, moveEyesOnFlank,
-  resetFeatures, resetStations, setEyeReach, setEyeScale, setMouth, setShift, setTangent, setValue, shiftRange, warp,
+  CURVES, autoSlope, contourAt, evaluate, exportDoc, eyesChanged, gapeToward, isIdentity, makeProbe, measure, mouthChanged, mouthCorner,
+  moveEyesOnCrown, moveEyesOnFlank, resetFeatures, resetStations, setEyeReach, setEyeScale, setJawDepth, setMouth, setShift, setTangent,
+  setValue, shiftRange, warp,
   type CurveName, type SculptDoc, type SurfaceProbe,
 } from './profile';
 import { getSculpt, setSculpt } from './store';
@@ -35,7 +36,7 @@ type ViewName = 'side' | 'top';
 type Feature = 'eyes' | 'mouth';
 interface Camera2D { centre: [number, number]; upp: number }
 interface Drag {
-  kind: 'point' | 'handle' | 'pan' | 'eye' | 'eyeSize' | 'mouth' | 'mouthWidth' | 'mouthHeight';
+  kind: 'point' | 'handle' | 'pan' | 'eye' | 'eyeSize' | 'mouth' | 'mouthCorner' | 'mouthHeight';
   view: ViewName;
   station?: number;
   curve?: CurveName;
@@ -61,6 +62,7 @@ export function SculptEditor({ scene, specimen, onExit }: Props) {
   const [doc, setDocState] = useState<SculptDoc | null>(null);
   const historyRef = useRef<History<SculptDoc> | null>(null);
   const probeRef = useRef<SurfaceProbe | null>(null);
+  const bodyRef = useRef<Float32Array[]>([]);
   const [region, setRegion] = useState(0);
   const [activeStation, setActiveStation] = useState<number | null>(null);
   const [activeCurve, setActiveCurve] = useState<CurveName>('dorsal');
@@ -87,6 +89,7 @@ export function SculptEditor({ scene, specimen, onExit }: Props) {
       } catch (e) { setError((e as Error).message); return; }
     }
     probeRef.current = makeProbe(body, d.frame, d.bounds.lateralMid);
+    bodyRef.current = body;
     historyRef.current = new History(d);
     setDocState(d);
     setRegion(0); setActiveStation(null); setActiveFeature(null); setPreviewOriginal(false);
@@ -217,11 +220,11 @@ export function SculptEditor({ scene, specimen, onExit }: Props) {
       const eye = doc.eyes!;
       const [a, v] = featureScreen(doc, view, 'eyes', (Number(target.dataset.mirror) || 1) as 1 | -1);
       dragRef.current = { ...base, kind, mirror: (Number(target.dataset.mirror) || 1) as 1 | -1, startA: a, startV: v, startScale: eye.scale };
-    } else if (kind === 'mouth' || kind === 'mouthWidth' || kind === 'mouthHeight') {
+    } else if (kind === 'mouth' || kind === 'mouthCorner' || kind === 'mouthHeight') {
       setActiveFeature('mouth'); setActiveStation(null);
       const m = doc.mouth!;
       const [a, v] = featureScreen(doc, view, 'mouth', 1);
-      dragRef.current = { ...base, kind, mirror: (Number(target.dataset.mirror) || 1) as 1 | -1, startA: a, startV: v, startScale: kind === 'mouthHeight' ? m.height : m.width };
+      dragRef.current = { ...base, kind, mirror: (Number(target.dataset.mirror) || 1) as 1 | -1, startA: a, startV: v, startScale: m.height };
     } else if (kind === 'region') {
       setRegion(Number(target.dataset.region)); setActiveFeature(null);
       dragRef.current = base;
@@ -278,14 +281,13 @@ export function SculptEditor({ scene, specimen, onExit }: Props) {
       const a = d.startA! + dx * upp, v = d.startV! - dy * upp;
       if (view === 'side') drag(setMouth(present, { edit: { axis: a, up: v } }));
       else drag(setMouth(present, { edit: { axis: a } }));
-    } else if (d.kind === 'mouthWidth') {
-      const m = present.mouth!;
-      const [cx] = toPx(view, m.edit.axis, 0);
-      void cx;
-      const [, cyPx] = toPx(view, m.edit.axis, latMid(present));
+    } else if (d.kind === 'mouthCorner') {
+      // The corner follows the pointer round the outline: on the top view its angle about the
+      // hinge, on the side view the outline point at that position along the body.
       const box = e.currentTarget.getBoundingClientRect();
-      const off = Math.abs(e.clientY - box.top - cyPx) * upp;
-      drag(setMouth(present, { width: off / Math.max(m.radius, 1e-6) }));
+      const [a, v] = fromPx(view, e.clientX - box.left, e.clientY - box.top);
+      if (view === 'top') drag(setMouth(present, { gape: gapeToward(present, a, present.bounds.lateralMid + Math.abs(v - latMid(present))) }));
+      else drag(setMouth(present, { gape: gapeToward(present, a, undefined) }));
     } else if (d.kind === 'mouthHeight') {
       const m = present.mouth!;
       const [, cyPx] = toPx(view, m.edit.axis, m.edit.up);
@@ -378,7 +380,7 @@ export function SculptEditor({ scene, specimen, onExit }: Props) {
       </>}
       <p className="hint">
         {activeFeature === 'eyes' ? 'Drag the eye on the side view to slide it along the flank (it keeps its seat in the skin), on the top view to bring the pair closer or further apart. The square on its rim resizes it.'
-          : activeFeature === 'mouth' ? 'Drag the mouth to move it; drag the bar ends on the top view to widen it, the handle on the side view to deepen it. The region reach sets how much surrounding surface follows.'
+          : activeFeature === 'mouth' ? 'Drag a corner of the mouth round the head to open the jaw further back along the sides; what is inside stretches with it. Drag the handle on the side view to deepen it, the marker to move it. Jaw depth is where the corners hinge.'
           : 'Drag a point across the body to change it, along the body to move the station. Pull the active point\'s handles to bend the curve; double-click a handle to release it.'}
       </p>
       {doc && reg && !activeFeature && (
@@ -434,9 +436,12 @@ export function SculptEditor({ scene, specimen, onExit }: Props) {
       {doc && doc.mouth && activeFeature === 'mouth' && (
         <section className="sculpt-station" aria-label="Mouth">
           <h3>Mouth</h3>
-          <label><span>Width</span>
-            <NumberField value={doc.mouth.width} step={.05} onChange={(v) => step(setMouth(doc, { width: v }))} />
-            <small>{pct(1, doc.mouth.width) || 'as shipped'}</small></label>
+          <label><span>Gape (half-angle, degrees)</span>
+            <NumberField value={doc.mouth.gape * 180 / Math.PI} step={1} range={[1.5, 178]} onChange={(v) => step(setMouth(doc, { gape: v * Math.PI / 180 }))} />
+            <small>base {(doc.mouth.gapeBase * 180 / Math.PI).toFixed(1)}° · corner {fmt(Math.abs(mouthCorner(doc, doc.mouth.gape).axis - doc.mouth.base.axis))} behind the mouth, {fmt(Math.abs(mouthCorner(doc, doc.mouth.gape).lateral - doc.bounds.lateralMid))} from the midline</small></label>
+          <label><span>Jaw depth (hinge behind the mouth)</span>
+            <NumberField value={doc.mouth.jawDepth} step={doc.bounds.length / 200} onChange={(v) => step(setJawDepth(doc, bodyRef.current, v))} />
+            <small>the corners swing about a point this far back on the axis</small></label>
           <label><span>Height</span>
             <NumberField value={doc.mouth.height} step={.05} onChange={(v) => step(setMouth(doc, { height: v }))} />
             <small>{pct(1, doc.mouth.height) || 'as shipped'}</small></label>
@@ -446,9 +451,9 @@ export function SculptEditor({ scene, specimen, onExit }: Props) {
           <label><span>Height on the body</span>
             <NumberField value={doc.mouth.edit.up} step={doc.bounds.height / 400} onChange={(v) => step(setMouth(doc, { edit: { up: v } }))} />
             <small>base {fmt(doc.mouth.base.up)}</small></label>
-          <label><span>Region radius</span>
+          <label><span>Jaw band (half-height)</span>
             <NumberField value={doc.mouth.radius} step={doc.bounds.height / 200} onChange={(v) => step(setMouth(doc, { radius: v }))} />
-            <small>× reach <NumberInline value={doc.mouth.reach} onChange={(v) => step(setMouth(doc, { reach: v }))} /> — the surface within this distance of the mouth socket changes</small></label>
+            <small>× reach <NumberInline value={doc.mouth.reach} onChange={(v) => step(setMouth(doc, { reach: v }))} /> — the surface this far above and below the mouth line opens with it</small></label>
           <div className="sculpt-actions"><button className="ghost" onClick={() => step(resetFeatures(doc, 'mouth'))} disabled={!mouthChanged(doc)}>Reset mouth</button></div>
         </section>
       )}
@@ -560,8 +565,29 @@ function Drawing(p: DrawingProps) {
   const mouthMark = mouth ? (() => {
     const [a, v] = featureScreen(doc, view, 'mouth', 1);
     const [x, y] = toPx(view, a, v);
-    const half = mouth.radius * (view === 'top' ? mouth.width : mouth.height) / upp;
-    return { x, y, half, reach: mouth.radius * mouth.reach / upp };
+    const half = mouth.radius * mouth.height / upp;
+    // The jaw line: the outline from one corner round the front to the other, and the corners.
+    const cornerPx = (gape: number, mirror: 1 | -1): [number, number] => {
+      const c = mouthCorner(doc, gape);
+      return view === 'top'
+        ? toPx(view, c.axis, latMid(doc) + latSign(doc) * (c.lateral - doc.bounds.lateralMid) * mirror)
+        : toPx(view, c.axis, c.up);
+    };
+    const line = (gape: number) => {
+      const pts: string[] = [];
+      const steps = 24;
+      for (let k = -steps; k <= steps; k++) {
+        const theta = gape * (k / steps);
+        const r = contourAt(mouth.contour, Math.abs(theta));
+        const hinge = mouth.base.axis - doc.frame.forward * mouth.jawDepth;
+        const axis = hinge + doc.frame.forward * r * Math.cos(theta);
+        const lat = doc.bounds.lateralMid + r * Math.sin(theta);
+        const [px, py] = view === 'top' ? toPx(view, axis, latMid(doc) + latSign(doc) * (lat - doc.bounds.lateralMid)) : toPx(view, axis, mouth.base.up);
+        pts.push(`${pts.length ? 'L' : 'M'}${px.toFixed(1)} ${py.toFixed(1)}`);
+      }
+      return pts.join(' ');
+    };
+    return { x, y, half, reach: mouth.radius * mouth.reach / upp, corners: ([1, -1] as const).map((m) => ({ mirror: m, at: cornerPx(mouth.gape, m), base: cornerPx(mouth.gapeBase, m) })), jaw: line(mouth.gape), jawBase: line(mouth.gapeBase) };
   })() : null;
 
   return (
@@ -626,10 +652,14 @@ function Drawing(p: DrawingProps) {
       ))}
       {mouth && mouthMark && (
         <g>
-          {activeFeature === 'mouth' && <circle className="sculpt-feature base" cx={mouthMark.x} cy={mouthMark.y} r={Math.max(2, mouthMark.reach)} />}
-          {view === 'top'
-            ? <line data-kind="mouthWidth" className="sculpt-mouth-bar" x1={mouthMark.x} y1={mouthMark.y - mouthMark.half} x2={mouthMark.x} y2={mouthMark.y + mouthMark.half}><title>Mouth width: drag an end</title></line>
-            : <line data-kind="mouthHeight" className="sculpt-mouth-bar" x1={mouthMark.x} y1={mouthMark.y - mouthMark.half} x2={mouthMark.x} y2={mouthMark.y + mouthMark.half}><title>Mouth height: drag an end</title></line>}
+          {mouthChanged(doc) && <path className="sculpt-jaw base" d={mouthMark.jawBase} />}
+          <path className={`sculpt-jaw ${activeFeature === 'mouth' ? 'active' : ''}`} d={mouthMark.jaw} />
+          {view === 'side' && <line data-kind="mouthHeight" className="sculpt-mouth-bar" x1={mouthMark.x} y1={mouthMark.y - mouthMark.half} x2={mouthMark.x} y2={mouthMark.y + mouthMark.half}><title>Mouth height: drag an end</title></line>}
+          {(view === 'top' ? mouthMark.corners : mouthMark.corners.slice(0, 1)).map((c) => (
+            <circle key={c.mirror} data-kind="mouthCorner" data-mirror={c.mirror} className={`sculpt-corner ${activeFeature === 'mouth' ? 'active' : ''}`} cx={c.at[0]} cy={c.at[1]} r={5.5}>
+              <title>Mouth corner: drag round the head to open the jaw further back</title>
+            </circle>
+          ))}
           <circle data-kind="mouth" className={`sculpt-feature ${activeFeature === 'mouth' ? 'active' : ''} ${mouthChanged(doc) ? 'changed' : ''}`} cx={mouthMark.x} cy={mouthMark.y} r={6}>
             <title>Mouth: drag to move</title>
           </circle>
