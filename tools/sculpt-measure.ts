@@ -29,7 +29,7 @@ import { measure, type CurveName, type SculptDoc, type Station } from '../src/vi
 const argv = process.argv.slice(2);
 const againstIx = argv.indexOf('--against');
 const againstPath = againstIx >= 0 ? argv[againstIx + 1] : undefined;
-const args = argv.filter((a, i) => !a.startsWith('--') && i !== againstIx + 1);
+const args = argv.filter((a, i) => !a.startsWith('--') && !(againstIx >= 0 && i === againstIx + 1));
 const asJson = argv.includes('--json');
 const [modelPath, sculptPath] = args;
 if (!modelPath) { console.error('usage: sculpt-measure <model.glb> [sculpt.json] [--json]'); process.exit(2); }
