@@ -4,6 +4,9 @@ import { useEffect, useRef, useState } from 'react';
 import { COLLECTIONS, paletteFor, SPECIMENS, specimenByKey, type CollectionId } from './catalogue';
 import { scheme, SLOT_LABEL, type Slot } from '../shared/palettes';
 import { ASSET_BASE, createViewerScene, isReplaced, replacedName, type PlaybackState, type ViewerScene } from './scene';
+import { SculptEditor } from './sculpt/SculptEditor';
+import { getSculpt } from './sculpt/store';
+import { isIdentity, warp } from './sculpt/profile';
 
 const SPEEDS = [0.25, 0.5, 1, 2];
 
@@ -27,11 +30,32 @@ function readPicks(): Picks {
   }
 }
 
+/**
+ * The page remembers which specimen it is showing in the URL (`?specimen=<key>`, and `&mode=sculpt`
+ * while sculpting), so a reload — or a link — comes back to the same creature. Nothing else is
+ * kept there: the view, the clip and any sculpt in progress start over.
+ */
+function readUrlState(): { key: string; sculpt: boolean } {
+  const params = new URLSearchParams(location.search);
+  const requested = params.get('specimen') ?? '';
+  const key = specimenByKey.has(requested) ? requested : SPECIMENS[0].key;
+  return { key, sculpt: params.get('mode') === 'sculpt' && specimenByKey.get(key)?.collection !== 'devonian-props' };
+}
+function writeUrlState(key: string, sculpt: boolean) {
+  const params = new URLSearchParams(location.search);
+  params.set('specimen', key);
+  if (sculpt) params.set('mode', 'sculpt'); else params.delete('mode');
+  const url = `${location.pathname}?${params.toString()}${location.hash}`;
+  if (url !== `${location.pathname}${location.search}${location.hash}`) history.replaceState(null, '', url);
+}
+
 export function Viewer() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const sceneRef = useRef<ViewerScene | null>(null);
-  const [collection, setCollection] = useState<CollectionId>('cambrian');
-  const [id, setId] = useState(SPECIMENS[0].key);
+  const initial = useRef(readUrlState());
+  const [collection, setCollection] = useState<CollectionId>(specimenByKey.get(initial.current.key)!.collection);
+  const [id, setId] = useState(initial.current.key);
+  const [mode, setMode] = useState<'view' | 'sculpt'>(initial.current.sculpt ? 'sculpt' : 'view');
   const [detail, setDetail] = useState<'full' | 'reduced'>('full');
   const requestedId = useRef('');
   const def = specimenByKey.get(id)!;
@@ -53,6 +77,10 @@ export function Viewer() {
   const [loadedId, setLoadedId] = useState('');
   const [picks, setPicks] = useState<Picks>(readPicks);
   const [slots, setSlots] = useState<readonly Slot[]>([]);
+  useEffect(() => { writeUrlState(id, mode === 'sculpt'); }, [id, mode]);
+  // Sculpting needs a creature on stage; a prop or a load in progress has nothing to sculpt.
+  const canSculpt = collection !== 'devonian-props' && !loading && !error && loadedId === id;
+  useEffect(() => { if (mode === 'sculpt' && collection === 'devonian-props') setMode('view'); }, [mode, collection]);
 
   // The show effect must not re-run when a pick changes, so it reads the picks through a ref.
   const picksRef = useRef(picks);
@@ -80,6 +108,9 @@ export function Viewer() {
     sceneRef.current?.show({ ...def, model: modelPath }, { preserveView: true })
       .then((names) => {
         if (cancelled) return;
+        // A sculpt made this session follows the creature back onto the stage, full or reduced.
+        const sculpt = getSculpt(id);
+        if (sculpt && !isIdentity(sculpt)) sceneRef.current?.applySculpt(warp(sculpt), true);
         setClips(names); setSlots(sceneRef.current?.activeSlots() ?? []); setLoading(false); setLoadedId(id);
       })
       .catch((e: Error) => { if (!cancelled) { setError(e.message); setLoading(false); } });
@@ -113,7 +144,7 @@ export function Viewer() {
   const changed = roster.filter((c) => (picks[c.key] ?? defaultScheme(c.key)) !== defaultScheme(c.key)).length;
 
   return (
-    <div className="viewer">
+    <div className={`viewer ${mode === 'sculpt' ? 'sculpting' : ''}`} data-mode={mode}>
       <div className="stage">
         <canvas ref={canvasRef} className="viewer-canvas" />
         {/* The notice sits on the stage, over where the specimen will stand. `status` stays in the
@@ -125,6 +156,12 @@ export function Viewer() {
           </div>
         )}
       </div>
+
+      {/* Sculpt mode lays its drawings over the stage cell (same grid area, stacked above the canvas)
+          and puts its panel where the info card was. */}
+      {mode === 'sculpt' && canSculpt && sceneRef.current && (
+        <SculptEditor key={id} scene={sceneRef.current} specimen={def} onExit={() => setMode('view')} />
+      )}
 
       <aside className="specimens" aria-label="Specimens">
         <header>
@@ -173,7 +210,12 @@ export function Viewer() {
         </label>}
         {def.lod && <p className="hint">Switch detail to compare at the same view and animation time. Missing clips return to rest.</p>}
         <p className="hint">Drag to orbit · right-drag to pan · scroll to zoom</p>
-        <button className="ghost" onClick={() => sceneRef.current?.resetCamera()}>Reset view</button>
+        <div className="info-actions">
+          <button className="ghost" onClick={() => sceneRef.current?.resetCamera()}>Reset view</button>
+          {collection !== 'devonian-props' && <button className="ghost" onClick={() => setMode('sculpt')} disabled={!canSculpt} title="Reshape the body on side and top drawings and export the change as a sculpt file">
+            Edit sculpt{(() => { const d = getSculpt(id); return d && !isIdentity(d) ? ' (edited)' : ''; })()}
+          </button>}
+        </div>
 
         {collection !== 'devonian-props' && <section className="scheme" aria-label="Colour scheme">
           <h3>Colours</h3>

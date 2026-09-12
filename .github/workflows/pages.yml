@@ -28,6 +28,7 @@ jobs:
       - run: npm run check
       - run: npm run devonian:check
       - run: npm run eras
+      - run: npm run sculpt
       - run: npm run portraits
       # The feedback button exists only in a build that was given somewhere to send to. Unset —
       # a fork, or a repository variable that got lost — publishes the site without the button
