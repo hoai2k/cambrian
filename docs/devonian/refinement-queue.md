@@ -380,11 +380,15 @@ audit path runs in one place; the staging is `docs/model-queue-plan.md`, the res
   heterocercal tail; eye embedding 91%. Its `finalize_v3.py` strips the Blender 5.2.1 exporter's
   identity scale tracks, which intake otherwise refuses — the same artifact hit Jaekelopterus and
   Rhinodipterus.
-- **Bothriolepis** material01–04 re-derived on Linux, verified by value (the `.blend` hash gates
-  in the frozen chain cannot reproduce across saves); the M04 close-up diagnostic is next, then M05.
-- **Odaraia** (Cambrian, tracked here because it shares the pipeline) clay02/material02 re-derived
-  with the accepted geometry hash reproduced exactly; production rig/actions/export in progress on
-  `production-plan03.md`.
+- **Bothriolepis V3** shipped: material01–04 re-derived on Linux and verified by value, the M04
+  diagnostic proved the nuchal seam geometric, M05 resolved the shield and the rostral cap and
+  halved the microrelief, and `build_v3.py` rigged it with V2's bones and clips (eye audit 96%).
+  Badge cleared.
+- **Odaraia** (Cambrian, tracked here because it shares the pipeline): clay02/material02
+  re-derived with the accepted geometry hash reproduced exactly, then the production rig, clips,
+  LOD and export built to `production-plan03.md` and verified in the renderer, which needed two
+  translucency fixes. The write into `public/assets/creatures/` is the one step left
+  (`rework-v3/integrate_v3.sh`).
 
-Still carrying `model: true`: Coccosteus and Doryaspis (both waiting on the user), Bothriolepis
-(M05 onwards), Odaraia (production).
+Still carrying `model: true`: Coccosteus and Doryaspis (both waiting on the user), Odaraia (one
+script run away).

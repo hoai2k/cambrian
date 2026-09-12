@@ -18,6 +18,10 @@ import * as THREE from 'three';
  * the nearest one — is composited over the water, from every direction. Translucency is
  * unchanged: the authored alpha still lets the background through.
  *
+ * A body that is only partly translucent — a shell over a solid animal — needs one more thing:
+ * the pre-pass twin must draw after the body's opaque parts, or the shell's depth hides what it
+ * is meant to show through. See the note where the twin is made.
+ *
  * Nothing here alters the authored colours, alpha or geometry.
  */
 
@@ -31,11 +35,15 @@ export function settleTranslucency(root: THREE.Object3D): THREE.Material[] {
   root.traverse((o) => {
     if (!(o instanceof THREE.Mesh) || o.userData.depthPrepass) return;
     const mats: THREE.Material[] = Array.isArray(o.material) ? o.material : [o.material];
+    // Alpha can be authored per vertex (a four-component colour attribute — Odaraia's carapace
+    // carries its coverage that way, with the material's own opacity at 1) or in an alpha map.
+    const vertexAlpha = o.geometry.getAttribute('color')?.itemSize === 4;
     let translucent = false;
     for (const m of mats) {
       if (!m?.transparent) continue;
+      const alphaMapped = 'alphaMap' in m && !!(m as THREE.Material & { alphaMap?: THREE.Texture | null }).alphaMap;
       // Blended but fully opaque: cheaper and steadier drawn as what it is.
-      if (m.opacity >= 0.999) { m.transparent = false; m.depthWrite = true; continue; }
+      if (m.opacity >= 0.999 && !vertexAlpha && !alphaMapped) { m.transparent = false; m.depthWrite = true; continue; }
       m.depthWrite = false;
       m.blending = THREE.NormalBlending;
       translucent = true;
@@ -54,6 +62,14 @@ export function settleTranslucency(root: THREE.Object3D): THREE.Material[] {
       twin.bind(mesh.skeleton, mesh.bindMatrix);
     }
     twin.userData.depthPrepass = true;
+    // The twin is opaque, so it sorts among the opaque draws, and there it must come *after* the
+    // rest of the body: a translucent shell with solid parts inside it (Odaraia's carapace over
+    // its trunk and limbs) would otherwise write its near surface first and the interior, farther
+    // away, would then fail the depth test and vanish. Drawn last among the opaques, the twin
+    // only settles the shell's own layers — the interior has already been painted and stays
+    // under the blend. Bodies that are translucent throughout (the jellies) have no opaque part
+    // for this to order against, so nothing changes for them.
+    twin.renderOrder = BODY_ORDER;
     twin.frustumCulled = mesh.frustumCulled;
     twin.castShadow = false; twin.receiveShadow = false;
     mesh.add(twin);
