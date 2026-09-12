@@ -28,13 +28,6 @@
     "reason": "8 September user reference: fuller rounded trunk and shoulder/pelvis volumes; broad rounded-arrow snout rather than flat spear shape. Structural redesign before new eye/general audits; preserved backup."
   },
   {
-    "id": "acanthostega",
-    "status": "pending",
-    "scope": "individual-refinement",
-    "model": true,
-    "reason": "Triage 11 September: the tail fin is a solid paddle fused to the tail tip; Acanthostega's caudal fin ran most of the tail's length, deep above and below, with fin rays. The trunk is a constant round tube where the animal was flat-bellied and wider than deep, and the limbs attach as thin sticks with wrist/palm intersections. Silhouette redesign before any audit."
-  },
-  {
     "id": "eldredgeops",
     "status": "pending",
     "scope": "individual-refinement",

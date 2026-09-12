@@ -84,3 +84,18 @@ Use Astra high for research/sculpt/material/rig judgment; Terra medium for froze
 Storage shortage resolved to roughly23GiB earlier. Root recovered732MB by hash-verifying777 duplicate dist files before replacing only those build copies with links; subsequent normal builds recreated dist. No authoring source/backups deleted. Proof `../devonian-authoring/viewer-build-duplicate-proof-2026-09-08.json`.
 
 This checkpoint is mirrored to `../devonian-authoring/CURRENT_STATE.md`. The user has paused again; retain the full rework queue and the stated review/runtime limits. Resume first at Coccosteus candidate07 validation, then Bothriolepis correction and Odaraia production. Do not repeat completed initial-asset delivery or surface studies.
+
+
+## 12 September 2026 — the model queue moved
+
+Blender 5.2.1 runs in the session (`npm run blender`); the staging and tiering are
+`docs/model-queue-plan.md`, the resume point `docs/model-queue-state.md`. Delivered on the user's
+acceptance, all shipped from packaged candidates that passed lossless packaging and structural
+intake: Cheirolepis V3 (reference face, seated fin roots, swept fins), Palaeoisopus V2 (oar-blade
+articles, flat trunk, no joint beads), Jaekelopterus V2 (flattened stepped opisthosoma, blade rami),
+Cladoselache V3 (fin outlines), Manticoceras (closed umbilicus), Eldredgeops (occipital joint).
+Accepted as published: Titanichthys, Gemuendina, Dunkleosteus. Cleared by triage: Walliserops,
+Furcaster, Michelinoceras. In flight as candidates: Acanthostega, Tiktaalik, Onychodus,
+Rhinodipterus, Nahecaris, Stethacanthus; Bothriolepis M04 and Odaraia clay02/material02 being
+re-derived here for the next judgement. Blocked on the user: Coccosteus (two evidence files exist
+only on the Mac), Doryaspis (the mouth-position call).

@@ -128,3 +128,24 @@ nahecaris), Cladoselache and Tiktaalik studies, Odaraia.
 
 Studies live in the session scratchpad and die with it; the parameters that matter are in this
 file and the scripts are ~150 lines each following `tools/devonian/creatures/cheirolepis/redesign-study.py`.
+
+## 12 September, evening — the user approved everything for this pass; shipping
+
+Shipped to public and badge cleared: **Cheirolepis V3** (face + seated fins), **Palaeoisopus V2**
+(oar blades), **Jaekelopterus V2** (stepped flat opisthosoma, blade rami), **Cladoselache V3**
+(fin outlines), plus Manticoceras/Eldredgeops earlier. Badges also cleared on acceptance as shipped:
+Titanichthys, Gemuendina, Dunkleosteus (builder fix only).
+
+Ports in flight (Sonnet agents, candidates → `scratchpad/<id>-port/cand/<id>/`, portraits in
+`/home/user/devonian-authoring/<id>/<vN>-candidate/`): **Acanthostega** (one hind-limb root pose
+to seat, then ship), **Tiktaalik** (oral-tube front width .63→.52 to match the new snout, then
+ship), **Onychodus**, **Rhinodipterus**, **Nahecaris** (group C studies approved by the "continue
+to the end" instruction; studies in `scratchpad/onyc|rhin|nahe/study.py`).
+
+Integration is `scratchpad/integrate.sh <id> <packaged dir> <portrait dir>` then a README section,
+`git add` by path, commit, merge to main. Every builder keeps its previous version reproducible;
+the shipped one is the highest version present (build.py runs it for cheirolepis; PAL_ANATOMY
+defaults to v2 for palaeoisopus; the others document it in their README).
+
+Still open after these: Stethacanthus rework (not started), Bothriolepis M05, Odaraia; blocked
+on the user: Coccosteus (evidence files), Doryaspis (mouth call).
