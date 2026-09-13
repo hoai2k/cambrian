@@ -14,6 +14,7 @@ for the era's documents in one place next to `docs/devonian/`.
 | [04 · Tripo pipeline](04-tripo-pipeline.md) | The production strategy: Tripo bodies on procedural skeletons, motion authored on the procedural twin and applied to the Tripo mesh; where the strategy is agreed with, where it is amended and why. |
 | [canonical/](canonical/README.md) | The approved pose for each subject: the visual contract every model is made from, greenlit before anything is built from it. 26 images, plus the generated [review.md](canonical/review.md). |
 | [research.md](research.md) | The natural-history notes and sources the roster and biomes were drawn from, with confidence labels. |
+| [proportion-audit.md](proportion-audit.md) | Every Triassic body measured against that research, 13 September 2026: what each one's proportions actually are, which documented proportions they contradict, and whether the fix is a regeneration or a new canonical pose. |
 
 ## Built: the playable skeleton
 
