@@ -97,7 +97,7 @@
     </main>
 
     <script type="module">
-      import { GOATCOUNTER_SITE, dashboardUrl, STATS_VIEWS } from '../src/shared/config-stats.ts';
+      import { GOATCOUNTER_SITE, dashboardUrl, pathFilter, STATS_VIEWS } from '../src/shared/config-stats.ts';
 
       // Two pages in one, because the honest answer differs before and after setup. Unconfigured, a
       // blank dashboard would read as "nobody has ever played them" — the single most misleading
@@ -123,37 +123,45 @@
             </ol>
             <p>One site covers all five counted pages: GoatCounter records the path of every visit,
             so the three games, the trilogy page and the viewer are told apart by filtering rather
-            than by keeping separate counters. The dev workbench is not counted. Counting starts the moment it is switched on — visits before
-            that are gone, because Pages keeps no log to backfill from.</p>
+            than by keeping separate counters — and one site can hold other games on the same domain
+            without their visits landing in these views. The dev workbench is not counted. Counting
+            starts the moment it is switched on — visits before that are gone, because Pages keeps
+            no log to backfill from.</p>
           </div>`;
       } else {
         const chips = STATS_VIEWS.map((v, i) =>
           `<button class="chip" data-i="${i}" data-view="${v.id}" aria-pressed="${i === 0}">${v.name}</button>`).join('');
         mount.innerHTML = `
           <div class="panel">
-            <p>All five counted pages report to one counter, so this is the trilogy whole. The chips point
-            the view at one game; <strong>All of it</strong> leaves it alone, and the dashboard's own
-            <em>Pages</em> list breaks every path out there — including the trilogy page itself,
-            which sits at the site root and so has no path a filter could name without also catching
-            the games underneath.</p>
+            <p>All five counted pages report to one counter, so <strong>All of it</strong> is the
+            trilogy whole — every page under <code>/cambrian/</code>, which is where this site is
+            published. The other chips narrow it to one game, and each filter is anchored to the
+            path, so a game's view is that game and nothing that merely mentions it. The same
+            GoatCounter site may hold other things on this domain; they are not in any of these
+            views, and the unfiltered dashboard behind the link below is where they would be.</p>
             <div class="chips">${chips}</div>
             <p class="chip-note" id="note"></p>
           </div>
           <div class="frame-wrap">
             <iframe id="frame" title="GoatCounter dashboard" loading="lazy" referrerpolicy="no-referrer"></iframe>
           </div>
-          <p class="sub" style="margin-top:.6rem">Frame blank, or asking you to sign in? Browsers
-          withhold the GoatCounter session cookie inside a frame on another domain. Either mark the
-          dashboard public in its settings, or use the open link above the frame — the frame is a
-          convenience, not the record.</p>`;
+          <p class="sub" style="margin-top:.6rem">Frame blank, or asking you to sign in? A browser
+          withholds the GoatCounter session cookie inside a frame on another domain, so a private
+          dashboard cannot show here however you are logged in. In GoatCounter,
+          <em>Settings → Dashboard viewable by</em>, choose <em>Anyone</em> — or leave it private and
+          use the open link above the frame, which carries the same filter. The frame is a
+          convenience; their page is the record. (A frame also needs this site listed under
+          <em>Settings → Sites that can embed GoatCounter</em>.)</p>`;
 
         const frame = document.getElementById('frame');
         const note = document.getElementById('note');
         const show = (i) => {
           const v = STATS_VIEWS[i];
-          const q = v.path ? `?filter=${encodeURIComponent(v.path)}&hideui=1` : '?hideui=1';
-          frame.src = `${url}/${q}`;
-          note.innerHTML = `${v.blurb} <a href="${url}/${v.path ? `?filter=${encodeURIComponent(v.path)}` : ''}"
+          // hideui= drops the dashboard's own chrome inside the frame; the link out deliberately
+          // keeps it, because that page is the record and the filter box should be reachable there.
+          const f = encodeURIComponent(pathFilter(v.path, v.exact));
+          frame.src = `${url}/?filter=${f}&hideui=1`;
+          note.innerHTML = `${v.blurb} <a href="${url}/?filter=${f}"
             target="_blank" rel="noopener">Open this view in GoatCounter ↗</a>`;
           for (const b of document.querySelectorAll('.chip')) b.setAttribute('aria-pressed', String(+b.dataset.i === i));
         };
