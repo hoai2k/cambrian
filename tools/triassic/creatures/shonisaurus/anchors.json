@@ -1,0 +1,32 @@
+[
+  {
+    "name": "anchor_mouth",
+    "bone": "jaw",
+    "point": [
+      0.0,
+      -2.880000114440918,
+      -0.05400000140070915
+    ],
+    "role": "mouth"
+  },
+  {
+    "name": "anchor_mouth_inside",
+    "bone": "jaw",
+    "point": [
+      0.0,
+      -2.190000057220459,
+      -0.05400000140070915
+    ],
+    "role": "swallow"
+  },
+  {
+    "name": "anchor_attack_primary",
+    "bone": "skull",
+    "point": [
+      0.0,
+      -2.98799991607666,
+      0.1080000028014183
+    ],
+    "role": "attack"
+  }
+]

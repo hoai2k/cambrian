@@ -8,8 +8,8 @@ import type { CreatureDef, MoveDef } from '../creature-types';
  * docs/research/triassic-swimming.json (representative lengths and swimming performance with
  * sources). Do not hand-edit those six fields — rerun the script. Every mechanic flag is a game
  * reading of anatomy in the design document, not a claim of fossil behaviour, and the Helicoprion
- * is on the roster as a labelled Permian relict. Model assets are pending; every animal here
- * borrows a Devonian body (src/content/triassic/index.ts) until its own lands.
+ * is on the roster as a labelled Permian relict. Animals borrow Devonian bodies
+ * (src/content/triassic/index.ts) until their own models land.
  */
 const light = (name: string, o: Partial<MoveDef> = {}): MoveDef => ({
   name, windup: 0.14, active: 0.16, recovery: 0.22, damage: 9, poise: 12, knockback: 1.2, stamina: 6, lunge: 0.25, ...o,
@@ -44,7 +44,7 @@ export const TRIASSIC_CREATURES: readonly CreatureDef[] = [
     kind: 'Ichthyosaur', kindNote: 'A shastasaurid ichthyosaur: deep-chested, long-flippered, and toothed as an adult after all — dozens died together in one Nevada basin, a birthing ground used for ages.',
     locality: 'Late Triassic · Berlin-Ichthyosaur, Nevada',
     tagline: 'It never swims alone. That is the whole trouble with it.',
-    role: 'Pod giant', ground: false, adultLength: 17.08, rung: 4, breathing: 'air', warmBlooded: true, birth: 'live', shoals: true, pod: true, riseRate: 0.85, pitchRate: 1.3,
+    role: 'Pod giant', ground: false, adultLength: 17.08, rung: 4, breathing: 'air', warmBlooded: true, birth: 'live', shoals: true, pod: true, riseRate: 0.85, pitchRate: 1.3, proceduralUndulation: false,
     speed: 13, burst: 1.6, agility: 3.5, turnRate: 2.17, glide: 0.25,
     hp: 950, poise: 420, stamina: 180, defense: 0.10, sense: 10,
     color: '#4a5860', accent: '#d0d6d2',
@@ -62,7 +62,7 @@ export const TRIASSIC_CREATURES: readonly CreatureDef[] = [
     kind: 'Nothosaur', kindNote: 'A sauropterygian — the paddle-limbed reptile line that led to the plesiosaurs — with a long flat skull and interlocking fangs at the front, a fish trap.',
     locality: 'Middle Triassic · Muschelkalk and Monte San Giorgio',
     tagline: 'Rows along the sand until something moves. Then the other gear.',
-    role: 'Two-gear ambusher', ground: false, adultLength: 10.72, rung: 3, breathing: 'air', birth: 'live', paddleRow: true, riseRate: 1.1,
+    role: 'Two-gear ambusher', ground: false, adultLength: 10.72, rung: 3, breathing: 'air', birth: 'live', paddleRow: true, riseRate: 1.1, proceduralUndulation: false,
     speed: 8.3, burst: 4, agility: 3.5, turnRate: 3.89, glide: 0.25,
     hp: 210, poise: 95, stamina: 140, defense: 0.06, sense: 11,
     color: '#6b6444', accent: '#b7ad8a',

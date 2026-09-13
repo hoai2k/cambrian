@@ -83,8 +83,8 @@ export const TRIASSIC = defineEra({
   ecology: { schools: SNACK_SCHOOLS, giants: GIANTS, shadow: { creature: 'shonisaurus', scale: 1.0 } },
   environment: { biomeNames: BIOME_NAMES, biomeDanger: BIOME_DANGER, atmosphere: ATMOS, sandColors: SAND_COLORS, floraColors: FLORA_BASE, flora: FLORA_DENSITY, floraProps: FLORA_PROPS, surfaceY: SURFACE_Y, floorDepth: FLOOR_DEPTH, biomePlates: BIOME_PLATES },
   assets: {
-    // Portraits are the placeholder set cut from docs/triassic/canonical/; models are borrowed (see
-    // TRIASSIC_STAND_INS) and come from assets/devonian/creatures/ until this folder fills. The UI
+    // Portraits began as the placeholder set cut from docs/triassic/canonical/; undelivered models
+    // remain borrowed (see TRIASSIC_STAND_INS) until this folder fills. The UI
     // glyphs and the shared sound library are the other eras'; the era's own samples are addressed
     // as 'triassic/<name>' and resolve under assets/triassic/sfx/ the day they exist (sfx.ts).
     creatures: 'assets/triassic/creatures/', defaultPortraits: 'assets/triassic/creatures/',

@@ -78,6 +78,7 @@ export class CreatureView {
   private mixer: THREE.AnimationMixer;
   private actions = new Map<string, THREE.AnimationAction>();
   private loco?: THREE.AnimationAction;
+  private sprinting = false;
   private oneShot?: THREE.AnimationAction;
   private oneShotT = 0;
   private additive: (THREE.AnimationAction | undefined)[] = [];
@@ -335,12 +336,18 @@ export class CreatureView {
         // A crawler off the seabed is paddling: keep its leg cycle running even when it is
         // barely translating, so the climb reads as swimming rather than hovering.
         const moving = speed > 0.35 || paddling;
+        // Authored Sprint clips carry their own faster stroke cadence. Switch to one only once a
+        // swimmer is materially above cruise; older rigs without Sprint keep the Swim fallback.
+        const canSprint = moving && !def.ground && this.has('Sprint');
+        this.sprinting = canSprint && speed > cruise * (this.sprinting ? 1.1 : 1.2);
         if (this.bell(a)) { /* a bell picks its own clip and its own place in it */ }
-        else this.playLoop(moving ? (def.ground ? 'Crawl' : 'Swim') : 'Idle');
+        else this.playLoop(moving ? (def.ground ? 'Crawl' : this.sprinting ? 'Sprint' : 'Swim') : 'Idle');
         // smaller creatures beat faster
         const rateScale = 1 / Math.pow(Math.max(a.scale, 0.1), 0.35);
         const beat = Math.max(speed, paddling ? cruise * 0.85 : 0);
-        if (!this.bellPulsing) this.loco?.setEffectiveTimeScale(moving ? clamp((beat / cruise) * rateScale, 0.5, 2.6) : 0.75 * rateScale);
+        if (!this.bellPulsing) this.loco?.setEffectiveTimeScale(
+          moving ? this.sprinting ? clamp(rateScale, 0.8, 1.35) : clamp((beat / cruise) * rateScale, 0.5, 2.6) : 0.75 * rateScale,
+        );
       }
       // one-shots
       const inAttack = a.state === 'attack' || a.state === 'grabbing' || a.state === 'pounce' || (a.state === 'ability' && !held);

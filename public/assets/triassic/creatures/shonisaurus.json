@@ -1,0 +1,52 @@
+{
+  "id": "shonisaurus",
+  "name": "Shonisaurus",
+  "species": "Shonisaurus popularis",
+  "provenance": "Late Triassic \u00b7 Berlin-Ichthyosaur, Nevada",
+  "description": "Deep-bodied shastasaurid with long paired flippers, slender rostrum and lateral tail propulsion. Authored Tripo body and measured procedural volume puppet share the exact armature and actions.",
+  "lengthMeters": 14,
+  "modelLength": 6,
+  "locomotion": "Swim",
+  "clips": [
+    "Idle",
+    "Swim",
+    "Sprint",
+    "TurnLeft",
+    "TurnRight",
+    "Dive",
+    "Rise",
+    "Attack",
+    "Bite",
+    "Heavy",
+    "Hit",
+    "Death",
+    "Guard",
+    "Parry",
+    "Dodge",
+    "Eat",
+    "Stagger",
+    "Ability",
+    "Growth"
+  ],
+  "looping": [
+    "Idle",
+    "Swim",
+    "Sprint",
+    "Guard",
+    "Eat"
+  ],
+  "anchors": [
+    "anchor_mouth",
+    "anchor_mouth_inside",
+    "anchor_attack_primary"
+  ],
+  "sources": [
+    "docs/triassic/canonical/shonisaurus.png",
+    "intake/triassic-tests/shonisaurus/shonisaurus.raw.glb"
+  ],
+  "notes": [
+    "Pigmentation is baked from source albedo to COLOR_0; full body retains source tangent-space normal detail.",
+    "Procedural geometry is rebuilt from measured radial/spanning sections, not mesh decimation.",
+    "Shared clips are applied verbatim to the authored and procedural exports. Oral articulation and swimming performance are inferred soft-tissue behaviour."
+  ]
+}

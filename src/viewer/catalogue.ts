@@ -60,6 +60,7 @@ export interface ViewerSpecimen {
   looping: readonly string[];
 }
 const DEVONIAN_KIND = new Map(DEVONIAN_CREATURES.map(c => [c.id as string, { kind: c.kind, kindNote: c.kindNote }]));
+const TRIASSIC_ROSTER = new Map(TRIASSIC_CREATURES.map(c => [c.id as string, c]));
 /**
  * How many Triassic animals are still wearing somebody else's body. The label says so rather than
  * letting the collection look finished, and it clears itself: `standIns` empties an entry at a
@@ -104,9 +105,8 @@ export const SPECIMENS: readonly ViewerSpecimen[] = [
     clipNotes: DEVONIAN_REFINEMENTS.clipNotes[c.id], model: c.model, lod: c.lod, image: c.image, displayLength: 4,
     lengthMeters: c.lengthMeters, looping: c.looping,
   })),
-  // The Triassic has no models of its own yet: each entry is the Devonian body it borrows in
-  // play, recoloured with its scheme, under its own name and preview badge — which is what a
-  // reviewer wants to see while judging the recolour and the size against the canonical pose.
+  // A Triassic roster entry resolves to its own delivered body or to the Devonian body it still
+  // borrows in play. Both appear under the Triassic name and current preview status.
   ...TRIASSIC_CREATURES.map(c => ({
     key: `triassic:${c.id}`, id: c.id, collection: 'triassic' as const,
     name: c.name, species: c.species, kind: c.kind, kindNote: c.kindNote,
@@ -123,8 +123,9 @@ export const SPECIMENS: readonly ViewerSpecimen[] = [
     name: c.name, species: c.species,
     role: c.category === 'prop' ? 'TRIASSIC · SCENERY' : 'TRIASSIC · SPECIMEN',
     provenance: c.provenance, description: c.description,
-    modelStatus: TRIASSIC_REFINEMENTS.modelStatus[c.id], modelNote: TRIASSIC_REFINEMENTS.modelNotes[c.id],
-    clipNotes: TRIASSIC_REFINEMENTS.clipNotes[c.id], model: c.model, lod: c.lod, image: c.image, displayLength: 4,
+    modelStatus: TRIASSIC_REFINEMENTS.modelStatus[c.id] ?? c.modelStatus, modelNote: TRIASSIC_REFINEMENTS.modelNotes[c.id],
+    clipNotes: TRIASSIC_REFINEMENTS.clipNotes[c.id], model: c.model, lod: c.lod, image: c.image,
+    displayLength: c.category === 'creature' ? Math.min(TRIASSIC_ROSTER.get(c.id)?.adultLength ?? c.lengthMeters, 8) : 4,
     lengthMeters: c.lengthMeters, looping: c.looping,
   })),
 ];

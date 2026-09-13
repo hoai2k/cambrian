@@ -20,3 +20,13 @@ Both API jobs completed and downloaded (30 credits each; 60 total). Raw GLBs, ta
 
 ## Active paired-rig work
 User requested authored Tripo plus procedural volume-matched puppet for both tests, identical skeleton/anchors/action clips, realistic dynamic animal motion and game integration. Separate agents own each species; root owns shared registration. Raw tests are already on main at eb103ca. New inputs and six candidate02 options are in the review viewer; replacements remain unapproved.
+
+## Paired rigs delivered (2026-09-13)
+- Nothosaurus: authored 1,756,604 bytes, puppet/LOD 686,488 bytes, 27 identical joints, 21 identical clips, 3 identical anchors. Profile maximum envelope deviation 1.13% of body length.
+- Shonisaurus: authored 4,387,380 bytes, puppet/LOD 586,100 bytes, 21 identical joints, 19 identical clips, 3 identical anchors. Profile maximum envelope deviation 0.884% of body length.
+- Sources and reproducible Blender builders/audits are committed under `tools/triassic/creatures/<id>/`. Editable `.blend` and per-frame intermediates live in `local/triassic-authoring/<id>/` (not committed). Raw inputs remain in `intake/triassic-tests/`.
+- Both authored files are registered for gameplay; each puppet is independently selectable in the Triassic specimen collection and also supplies LOD1. Models stay PREVIEW pending human visual review. Default runtime procedural undulation is disabled for these baked performers.
+- All 18 greenlit modeling image sets and SIX candidate02 replacements were pushed to main at 9c0f086. Candidate decisions remain unchanged; use the reference viewer to greenlight them.
+- Verification: exact decoded skeleton/inverse-bind/animation/anchor parity, finite normalized skinning, volume profiles, Blender multi-pose inspection, exported GLB playback, typecheck, build and Triassic tests. Future refinement may improve the original Tripo surface detail; do not call these human-finalized.
+
+Runtime verification also confirmed Idle/Swim/Sprint selection and fallback using actual CreatureView loads of both GLBs. Sprint enters above 1.2× cruise and exits at 1.1× to avoid flicker; its authored cadence is preserved. Local specimen viewer successfully loaded all four full/puppet selections with 21 and 19 clips, preview badges and working playback.
