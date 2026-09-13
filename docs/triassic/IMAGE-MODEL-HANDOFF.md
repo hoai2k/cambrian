@@ -112,3 +112,22 @@ fins as much as median ones.
 For the ongoing roster batch, resume from `PRODUCTION-SESSION.json`: all requested images are
 on main at `237bf24`; the review window ends 2026-09-13 15:20:54 UTC. Sync and reevaluate
 greenlights then, generate/process/commit raw Tripo bodies before starting new paired rigs.
+
+## Nothosaurus gait corrected and re-verified — 13 September 2026
+
+Re-measured off the shipped GLB, every point of the brief holds:
+
+| | before | after |
+| --- | --- | --- |
+| forelimbs furthest aft | L 0.13, R 0.67 of the cycle — antiphase | **both 0.67** — bilaterally synchronous, as the trackways show |
+| skull lateral swing | 0.100 units | **0.006** |
+| hind-limb fore-aft travel | as much as the forelimbs | 0.277 / 0.227 against the forelimbs' 0.494 — trailing |
+| tail lateral swing | 0.795 (correct, untouched) | 0.795 |
+
+`Sprint` carries the same shape at larger amplitude. The renderer's `steadyHead` patch has been
+removed with the fix, which is what it was for: the head is now steady in the clip itself, and at a
+sixteenth of the swing the patch was able to take out.
+
+One residual, small enough to leave: the hind paddles are still an eighth of a cycle apart (L aft at
+0.63, R at 0.75) and travel differs by a fifth. They are secondary and low-amplitude now, so this is
+a note for whoever next opens the builder rather than a request.

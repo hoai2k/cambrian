@@ -89,6 +89,15 @@ delivered Devonian or shared sample). Its own, in priority order:
 3. **The shore strike**: the neck's snap and the water taken with it; the phytosaur's lunge.
 4. **Ambient bed** (`audio.loops.ambient`, today the Devonian's open sea): a bright, shallow,
    hot-water lagoon with the surface close overhead; and the basin's dead stillness as the drone.
-5. Two area themes named in `src/content/triassic/music.ts`: *Triassic Flats* (the shallows and
-   the shore) and *Triassic Deep* (channels, front, basin). They are picked up from
-   `public/music/` the day they exist.
+5. ~~Two area themes named in `src/content/triassic/music.ts`.~~ **Delivered and wired, 13
+   September 2026** — and three rather than two, under names of their own:
+
+   | Track | Role |
+   | --- | --- |
+   | *Triassic Horizon* | The era's opener, where the shared *First Tide* used to stand in. |
+   | *Triassic Calm* | Area theme for the water you are safe in: the gypsum flats and the conifer shore. |
+   | *Triassic Ritual* | Area theme for the water you are not: the margin channels, the reef front and the black basin. |
+
+   The two themes take the same biome split both other eras use, and the placeholder names
+   *Triassic Flats* and *Triassic Deep* are retired with them. The shared tide tracks still fill
+   the rotation between the three, so a fourth and fifth of the era's own would still be welcome.
