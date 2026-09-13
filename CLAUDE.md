@@ -113,6 +113,15 @@ unless the user explicitly asks for a PR. Steps:
   the beach by `src/sim/triassic/shore.ts` that telegraph and strike into the water. No playable
   Triassic animal ever leaves the water; `shoreReach` is deliberately unused there.
   `npm run triassic` guards all of it.
+- The climb for air is the era's central act and must stay usable at every size. The shared rise
+  rate is scaled by the body, but the water is not — the surface is the same twelve units above the
+  shelf whether you hatched this minute or own the sea — so an air-breather's climb has a floor
+  under it (`AIR_CLIMB_FLOOR` in `src/sim/triassic/rules.ts`), which *replaces* rather than
+  multiplies a slow body's own rate. And rise and sink are asks like any other: leaving them out of
+  the "asked for nothing" test put a body holding the climb button into its glide rate, its slowest
+  acceleration. Together those two made a hatchling take nineteen seconds to reach air from the
+  shelf floor, which reads as the button not working. `npm run triassic` holds both, and the
+  winded heartbeat to a heartbeat — it fired every second for as long as a player stayed down.
 - Every Triassic animal hatches from an egg on the sea floor, as in the other two eras. The
   live-bearers were briefly born at the surface instead — which is what the fossils say, and
   Keichousaurus and Dinocephalosaurus preserve the embryos — but it cost the series its one opening
@@ -121,7 +130,11 @@ unless the user explicitly asks for a PR. Steps:
   care viviparity implies. A reptile's egg is *leathery* (`eggShell: 'leathery'`): opaque, matte,
   dimpled, longer and narrower than the Cambrian's calcareous capsule, and set on the animal rather
   than the era, because the roster also has two sharks, two fish, an amphibian and two cephalopods
-  that lay nothing of the kind (`src/render/eggs.ts`).
+  that lay nothing of the kind (`src/render/eggs.ts`). The hatch has to be *seen*: `spawnInCover`
+  picks the spot that hides a body best, which is right for the minute after and wrong for the five
+  seconds of the shell, so the Triassic steps the egg out of the thickest cover and away from
+  anything big enough to stand in front of it (`clearTheView`), and the camera picks the side it
+  can be seen from on the frame the egg appears rather than simply sitting behind the animal.
 - Triassic art is greenlit before it is built from. Each subject has one **canonical pose** in
   `docs/triassic/canonical/`, and the four-view modelling sheet, the Tripo generation and the
   shipped body are all derived from that one image — so a body that no longer matches its pose is
