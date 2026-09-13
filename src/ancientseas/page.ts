@@ -1,5 +1,5 @@
 /**
- * The Ancient Seas Trilogy title page (/ancientseas/): everything about it that is data.
+ * The Ancient Seas Trilogy title page, which is the site root: everything about it that is data.
  *
  * Pure — no DOM, no React, no era content — so `npm run ancientseas` can check it headless: that
  * the version parameter defaults sensibly, that every game links to an entry page that exists and
@@ -35,7 +35,7 @@ export type EraId = 'cambrian' | 'devonian' | 'triassic';
 export interface GameLink {
   readonly id: EraId;
   readonly title: string;
-  /** Entry page, relative to the app root (the trilogy page lives one level below it). */
+  /** The game's own folder, relative to the app root — which is this page. */
   readonly path: string;
   /** The game's own composed title painting, the one its title screen shows. */
   readonly art: string;
@@ -50,7 +50,7 @@ export interface GameLink {
 
 export const GAMES: readonly GameLink[] = [
   {
-    id: 'cambrian', title: 'Cambrian Conquest', path: '',
+    id: 'cambrian', title: 'Cambrian Conquest', path: 'cambrian/',
     art: 'assets/brand/logo-illustrated.webp', artWidth: 1536, artHeight: 1024,
     wordmark: 'assets/brand/logo-engraved.webp',
     when: '508 million years ago', tagline: 'Eat. Grow. Fight. Run.',
