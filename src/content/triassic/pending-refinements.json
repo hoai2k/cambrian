@@ -4,21 +4,21 @@
     "status": "pending",
     "scope": "initial-model",
     "model": true,
-    "reason": "No Triassic model has been delivered yet: this animal borrows a Devonian body in play until its own Tripo model, rig and clips land through the pipeline in docs/triassic/04-tripo-pipeline.md. The pose is not cleared to build from: the review sent it back for a redo steered toward \"Cymbospondylus youngorum reconstruction 2023.jpg\" (docs/triassic/canonical/review.md), so the modelling sheet and the generation wait on the regenerated pose."
+    "reason": "No Triassic model has been delivered yet: this animal borrows a Devonian body in play until its own Tripo model, rig and clips land through the pipeline in docs/triassic/04-tripo-pipeline.md. Its canonical pose is back under review — a regenerated candidate is in the viewer beside the pose it replaces (docs/triassic/canonical/review.md) — so nothing downstream may be built from it yet."
   },
   {
     "id": "shonisaurus",
     "status": "pending",
     "scope": "initial-model",
     "model": true,
-    "reason": "No Triassic model has been delivered yet: this animal borrows a Devonian body in play until its own Tripo model, rig and clips land through the pipeline in docs/triassic/04-tripo-pipeline.md. Its canonical pose is greenlit in docs/triassic/canonical/review.md, so the four-view modelling sheet and the Tripo generation are cleared to be made from it."
+    "reason": "The Triassic model has landed and the game and the specimen viewer both load it (2026-09-13). It keeps the preview badge until a human approves the body itself: the generated shape, its procedural twin and the clips they share (docs/triassic/04-tripo-pipeline.md)."
   },
   {
     "id": "nothosaurus",
     "status": "pending",
     "scope": "initial-model",
     "model": true,
-    "reason": "No Triassic model has been delivered yet: this animal borrows a Devonian body in play until its own Tripo model, rig and clips land through the pipeline in docs/triassic/04-tripo-pipeline.md. Its canonical pose is greenlit in docs/triassic/canonical/review.md, so the four-view modelling sheet and the Tripo generation are cleared to be made from it."
+    "reason": "The Triassic model has landed and the game and the specimen viewer both load it (2026-09-13). It keeps the preview badge until a human approves the body itself: the generated shape, its procedural twin and the clips they share (docs/triassic/04-tripo-pipeline.md)."
   },
   {
     "id": "dinocephalosaurus",
@@ -39,7 +39,7 @@
     "status": "pending",
     "scope": "initial-model",
     "model": true,
-    "reason": "No Triassic model has been delivered yet: this animal borrows a Devonian body in play until its own Tripo model, rig and clips land through the pipeline in docs/triassic/04-tripo-pipeline.md. The pose is not cleared to build from: the review sent it back for a redraw of our own pose (docs/triassic/canonical/review.md), so the modelling sheet and the generation wait on the regenerated pose."
+    "reason": "No Triassic model has been delivered yet: this animal borrows a Devonian body in play until its own Tripo model, rig and clips land through the pipeline in docs/triassic/04-tripo-pipeline.md. Its canonical pose is back under review — a regenerated candidate is in the viewer beside the pose it replaces (docs/triassic/canonical/review.md) — so nothing downstream may be built from it yet."
   },
   {
     "id": "atopodentatus",
@@ -81,7 +81,7 @@
     "status": "pending",
     "scope": "initial-model",
     "model": true,
-    "reason": "No Triassic model has been delivered yet: this animal borrows a Devonian body in play until its own Tripo model, rig and clips land through the pipeline in docs/triassic/04-tripo-pipeline.md. The pose is not cleared to build from: the review sent it back for a redo steered toward \"Metoposaurus diagnosticus kraselovi 1DB.jpg\" (docs/triassic/canonical/review.md), so the modelling sheet and the generation wait on the regenerated pose."
+    "reason": "No Triassic model has been delivered yet: this animal borrows a Devonian body in play until its own Tripo model, rig and clips land through the pipeline in docs/triassic/04-tripo-pipeline.md. Its canonical pose is back under review — a regenerated candidate is in the viewer beside the pose it replaces (docs/triassic/canonical/review.md) — so nothing downstream may be built from it yet."
   },
   {
     "id": "mixosaurus",
@@ -130,7 +130,7 @@
     "status": "pending",
     "scope": "initial-model",
     "model": true,
-    "reason": "No Triassic model has been delivered yet: this animal borrows a Devonian body in play until its own Tripo model, rig and clips land through the pipeline in docs/triassic/04-tripo-pipeline.md. The pose is not cleared to build from: the review sent it back for a redo steered toward \"Thaichelys ruchae life restoration.png\" (docs/triassic/canonical/review.md), so the modelling sheet and the generation wait on the regenerated pose."
+    "reason": "No Triassic model has been delivered yet: this animal borrows a Devonian body in play until its own Tripo model, rig and clips land through the pipeline in docs/triassic/04-tripo-pipeline.md. Its canonical pose is back under review — a regenerated candidate is in the viewer beside the pose it replaces (docs/triassic/canonical/review.md) — so nothing downstream may be built from it yet."
   },
   {
     "id": "ceratites",
@@ -151,14 +151,14 @@
     "status": "pending",
     "scope": "initial-model",
     "model": true,
-    "reason": "No Triassic model has been delivered yet: this animal borrows a Devonian body in play until its own Tripo model, rig and clips land through the pipeline in docs/triassic/04-tripo-pipeline.md. The pose is not cleared to build from: the review sent it back for a redraw of our own pose (docs/triassic/canonical/review.md), so the modelling sheet and the generation wait on the regenerated pose."
+    "reason": "No Triassic model has been delivered yet: this animal borrows a Devonian body in play until its own Tripo model, rig and clips land through the pipeline in docs/triassic/04-tripo-pipeline.md. Its canonical pose is back under review — a regenerated candidate is in the viewer beside the pose it replaces (docs/triassic/canonical/review.md) — so nothing downstream may be built from it yet."
   },
   {
     "id": "mystriosuchus",
     "status": "pending",
     "scope": "initial-model",
     "model": true,
-    "reason": "No Triassic model has been delivered yet: this animal borrows a Devonian body in play until its own Tripo model, rig and clips land through the pipeline in docs/triassic/04-tripo-pipeline.md. The pose is not cleared to build from: the review sent it back for a redraw of our own pose (docs/triassic/canonical/review.md), so the modelling sheet and the generation wait on the regenerated pose."
+    "reason": "No Triassic model has been delivered yet: this animal borrows a Devonian body in play until its own Tripo model, rig and clips land through the pipeline in docs/triassic/04-tripo-pipeline.md. Its canonical pose is back under review — a regenerated candidate is in the viewer beside the pose it replaces (docs/triassic/canonical/review.md) — so nothing downstream may be built from it yet."
   },
   {
     "id": "macrocnemus",

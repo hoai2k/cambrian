@@ -57,9 +57,18 @@ export function Viewer() {
   const [id, setId] = useState(initial.current.key);
   const [mode, setMode] = useState<'view' | 'sculpt'>(initial.current.sculpt ? 'sculpt' : 'view');
   const [detail, setDetail] = useState<'full' | 'reduced'>('full');
+  /**
+   * Which body of a pair is on stage. The procedural twin is built to the generated model's own
+   * volume on the same skeleton, and the whole point of having both is that a human can see one
+   * become the other — so this swaps in place: the stage is not cleared, the camera is preserved,
+   * and the clip keeps playing, which turns any difference between them into movement rather than
+   * something to hold in your head across two list entries.
+   */
+  const [body, setBody] = useState<'model' | 'puppet'>('model');
   const requestedId = useRef('');
   const def = specimenByKey.get(id)!;
-  const modelPath = detail === 'reduced' && def.lod ? def.lod : def.model;
+  const showPuppet = body === 'puppet' && !!def.puppet;
+  const modelPath = showPuppet ? def.puppet! : detail === 'reduced' && def.lod ? def.lod : def.model;
   const roster = SPECIMENS.filter(c => c.collection === collection);
   // Both eras are on this page, so a specimen's palette comes from its own pack, not ACTIVE_ERA.
   const defaultScheme = (key: string) => {
@@ -78,9 +87,13 @@ export function Viewer() {
   const [picks, setPicks] = useState<Picks>(readPicks);
   const [slots, setSlots] = useState<readonly Slot[]>([]);
   useEffect(() => { writeUrlState(id, mode === 'sculpt'); }, [id, mode]);
+  useEffect(() => { if (!def.puppet) setBody('model'); }, [def.puppet]);
   // Sculpting needs a creature on stage; a prop or a load in progress has nothing to sculpt.
-  const canSculpt = !isPropCollection(collection) && !loading && !error && loadedId === id;
-  useEffect(() => { if (mode === 'sculpt' && isPropCollection(collection)) setMode('view'); }, [mode, collection]);
+  // Not on the twin: a sculpt is the hand-off that goes into a builder's profile rows for the body
+  // that ships, and one exported off the comparison body would name the right creature and describe
+  // the wrong mesh.
+  const canSculpt = !isPropCollection(collection) && !showPuppet && !loading && !error && loadedId === id;
+  useEffect(() => { if (mode === 'sculpt' && (isPropCollection(collection) || showPuppet)) setMode('view'); }, [mode, collection, showPuppet]);
 
   // The show effect must not re-run when a pick changes, so it reads the picks through a ref.
   const picksRef = useRef(picks);
@@ -200,7 +213,7 @@ export function Viewer() {
         {def.kindNote && <p className="specimen-description">{def.kindNote}</p>}
         {def.description && <p className="specimen-description">{def.description}</p>}
         {def.lengthMeters != null && <p className="specimen-scale">Representative length: {new Intl.NumberFormat('en', { maximumSignificantDigits: 3 }).format(def.lengthMeters)} m · views individually framed</p>}
-        {collection !== 'cambrian' && <p className="specimen-downloads"><a href={`${ASSET_BASE}${def.model}`} download>Full model</a>{def.lod && <a href={`${ASSET_BASE}${def.lod}`} download>Reduced model</a>}</p>}
+        {collection !== 'cambrian' && <p className="specimen-downloads"><a href={`${ASSET_BASE}${def.model}`} download>Full model</a>{def.lod && <a href={`${ASSET_BASE}${def.lod}`} download>Reduced model</a>}{def.puppet && <a href={`${ASSET_BASE}${def.puppet}`} download>Procedural twin</a>}</p>}
         {def.lod && <label className="scheme-pick">
           <span>Model detail</span>
           <select aria-label="Model detail" value={detail} disabled={loading} onChange={e => setDetail(e.target.value as 'full' | 'reduced')}>
@@ -209,6 +222,18 @@ export function Viewer() {
           </select>
         </label>}
         {def.lod && <p className="hint">Switch detail to compare at the same view and animation time. Missing clips return to rest.</p>}
+        {def.puppet && <label className="scheme-pick">
+          <span>Body</span>
+          <select aria-label="Which body" value={body} disabled={loading} onChange={e => setBody(e.target.value as 'model' | 'puppet')}>
+            <option value="model">Authored model</option>
+            <option value="puppet">Procedural twin</option>
+          </select>
+        </label>}
+        {def.puppet && <p className="hint">
+          The twin is rebuilt to this body's own volume on the same skeleton, and is where the clips
+          are animated before they are applied here. Switching holds the view and the frame, so a
+          difference between the two reads as movement. {def.puppetNote}
+        </p>}
         <p className="hint">Drag to orbit · right-drag to pan · scroll to zoom</p>
         <div className="info-actions">
           <button className="ghost" onClick={() => sceneRef.current?.resetCamera()}>Reset view</button>

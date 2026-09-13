@@ -26,9 +26,17 @@ are hotlinked from Wikimedia Commons in both copies, so the page wants a connect
 | Scenery, plants and the shore | 17 | What the biomes are built from, the three Tier 1 organic props, and four locality references. |
 
 Each subject shows its own images first — the canonical pose, any extra authored view, and the
-**3D views** modelling sheet once one exists (picked up from `docs/triassic/canonical/
-<id>-turnaround.png` or straight out of `intake/triassic/…` while it is still a fresh delivery) —
-then the references.
+integrated **3D views** sheet at `docs/triassic/canonical/<id>-turnaround.png` — then the references.
+For subjects marked `greenlit` in the canonical manifest, the viewer also shows `input.png`,
+`three-quarter.png`, and `turnaround.png` from `canonical/model-inputs/<id>/` when present.
+These are explicitly **modelling references only**: they have no **Use as canon** action, and
+Enter cannot select them. The greenlit pose remains authoritative. Legacy sheets in
+`intake/triassic/` are excluded.
+
+Replacement poses named `<id>-candidate02.png` appear as additional **replacement candidate**
+options in the thumbnail strip. The original pose stays first, and rebuilding the viewer keeps
+existing choices intact. Picking a candidate with **Use as canon** greenlights that specific
+image in the exported decisions; merely adding it does not approve it.
 
 ## The canonical toggle
 

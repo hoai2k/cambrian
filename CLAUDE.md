@@ -110,8 +110,25 @@ unless the user explicitly asks for a PR. Steps:
   the Devonian's procedural stand-ins. Never point a Triassic kind at a Devonian mesh in the
   scenery pack: a wrong genus placed by the thousand is worse than an honestly generic shape, and
   which stand-in the game plays with is `environment.ts`'s business.
-- The Triassic has no creature models of its own yet. Every animal borrows a Devonian body through a
-  cross-era stand-in (`'devonian/<id>'` in `TRIASSIC_STAND_INS`, resolved into that era's folder
+- A delivered Triassic body arrives **paired**: the authored (Tripo-derived) model and a procedural
+  twin rebuilt to its own volume on the same skeleton, sharing inverse binds, clips and anchors.
+  That pairing is the pipeline's verification step, so the specimen viewer swaps between them in
+  place — same camera, same scale, same clip at the same frame (`puppet` on `ViewerSpecimen`,
+  the *Body* control in `src/viewer/Viewer.tsx`) — and a twin is never a second row in the roster.
+  Sculpt is off on the twin: a sculpt is the hand-off into a builder's profile rows for the body
+  that ships. A model landing also moves its canonical state to `delivered`, which
+  `tools/triassic/apply-selections.mjs` derives from `tools/triassic/shipped.json`; a regenerated
+  pose (a `candidate-awaiting-human-greenlight` in any `docs/triassic/canonical/prompts*.json`)
+  clears whatever was decided about the old one and sends the subject back to the undecided pile.
+  Run the tool with no arguments to reconcile the manifest with the tree.
+- An era's scenery pack must **name** every prop it draws with. An id it does not name falls back to
+  the bare id under that era's own props folder, and an era whose folder is empty then asks the
+  network for a GLB that was never there — silent everywhere but the network tab, which is how the
+  Triassic requested three rock meshes on every seabed. Borrow explicitly instead (the Triassic's
+  rocks come from the shared `assets/props/`), and `npm run props` checks both halves: every mapping
+  has a file behind it, and nothing is left to the fallback.
+- The Triassic's creature models are arriving. Every animal that has not had one yet borrows a
+  Devonian body through a cross-era stand-in (`'devonian/<id>'` in `TRIASSIC_STAND_INS`, resolved into that era's folder
   by `src/content/asset-paths.ts`) and is still pickable (`assets.standInsPlayable`), because the
   roster ships placeholder portraits cut from `docs/triassic/canonical/`
   (`tools/triassic/placeholder-portraits.mjs`). When a model lands: files into

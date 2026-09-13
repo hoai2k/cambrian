@@ -1,5 +1,12 @@
 # Candidate07 re-derivation — blocked at candidate-04, 2026-09-12
 
+> **Resolved 13 September 2026 — this block no longer applies.** It was never unblocked; it was
+> made unnecessary. The user delivered the candidate07 exports themselves (the third option under
+> "What would unblock this") to `intake/coccosteus-candidate07/`, hashes matching, so nothing had
+> to be re-derived. The finishing gates then ran against those exact exports and the creature
+> shipped: see `tools/devonian/creatures/coccosteus/README.md`. The analysis below stands as the
+> record of why the frozen recipe could not be replayed in a fresh checkout, which is still true.
+
 Resumed from `HANDOFF-CANDIDATE07-PAUSE.md` to run the three finishing steps (oral/eye sweep,
 playback/LOD-switch check, packaging). Step 0 of that plan — re-deriving candidate07 in this
 checkout, since none of the handoffs' `../devonian-authoring/coccosteus/rework-v3/...` output
