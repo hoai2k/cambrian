@@ -17,7 +17,7 @@ sends the subject back to the undecided pile, where the viewer shows the candida
 
 | Delivered | Greenlit | Redo | Not yet reviewed |
 | --- | --- | --- | --- |
-| 2 | 22 | 1 | 45 |
+| 2 | 23 | 0 | 55 |
 
 ## Delivered — the model exists
 
@@ -55,26 +55,12 @@ shipped with the body, the specimen viewer switches between the two in place.
 | **Placodus gigas** `placodus` | T09 · Rung II · the shell-cruncher | the pose | — |
 | **Rhaeticosaurus mertensi** `rhaeticosaurus` | T06 · Rung III · the flyer (first plesiosaur) | the pose | — |
 | **Saurichthys** `saurichthys` | T15 · Rung II · the needle | the pose | — |
+| **Tanystropheus hydroides** `tanystropheus` | S01 · the boom (13-joint stiff neck) | the pose | Human-approved after the neck-proportion redraw; use the full canonical for silhouette and the shortened-neck model input for Tripo. |
 
 ## Redo — regenerate the canonical pose
 
-Each row is a generator brief: take the subject's current pose in `docs/triassic/canonical/`,
-regenerate it with the steer given here, and put the result back through the viewer. Some steers
-name somebody else's artwork — use it as direction, keep its credit with the prompt, and never
-ship it. Others name our own image, which means the reading is accepted and only the picture is
-wrong: there the note is the entire brief.
-
-### Tanystropheus hydroides `tanystropheus`
-
-- **Slot:** S01 · the boom (13-joint stiff neck) · ~5–6 m
-- **Steer toward:** Tanystropheus hydroides reaching out over the water
-- **Credit:** Unknown — reviewer-supplied URL · Unknown; steering reference only, not for redistribution or shipping
-- **File page:** https://clickpetroleoegas.com.br/wp-content/uploads/2026/01/Tanystropheus-hydroides.jpg
-- **Full size:** https://clickpetroleoegas.com.br/wp-content/uploads/2026/01/Tanystropheus-hydroides.jpg
-- **Described as:** The reference the reviewer supplied for candidate03 and is naming again for candidate04. Its neck-to-body proportion is the point: the neck is the animal's identifying feature and dwarfs the trunk.
-- **Reviewer's note:** Candidate04 repeats candidate03's fault, so this is a redraw against the same reference as last time. The defining characteristic of this animal is the NECK: it must read as extraordinarily long and prominent RELATIVE TO THE BODY. Every candidate so far has made the torso too massive and the neck too short for it — chasing the 'sauropod body' note has cost the proportion that actually identifies the species. Take the reference image's proportions as indicative: neck clearly longer than head, torso and tail combined. Fetch the reference this round rather than working from the written description alone; the previous attempt could not retrieve it and drifted without it. For the model that follows: the neck is what has to be right, because it is nearly all the player will see. Tanystropheus is a shore animal that strikes into the water from the bank, so the neck and head come into frame and the torso, limbs and tail usually stay out of it. Put the geometry and the detail into the neck and head; the body, limbs and tail can be comparatively simple.
-
+Nothing queued for rework.
 
 ## Not yet reviewed
 
-`acrodus` · `anshunsaurus` · `antrimpos` · `chaohusaurus` · `choristoceras` · `coral-head` · `cyamodus` · `cymbospondylus-buchseri` · `dachstein-reef` · `daonella` · `diplopora` · `encrinus` · `eusaurosphargis` · `fadenia` · `germanonautilus` · `gipskeuper` · `guizhouichthyosaurus` · `helveticosaurus` · `ichthyotitan` · `log-raft` · `monte-san-giorgio` · `muschelkalk` · `nanchangosaurus` · `neocalamites` · `neusticosaurus` · `nothosaurus` · `pistosaurus` · `placochelys` · `placunopsis` · `pleuromeia` · `psephoderma` · `rebellatrix` · `retiophyllia` · `saurosphargis` · `shastasaurus` · `shonisaurus` · `sponge-mound` · `stromatolite` · `thylacocephala` · `traumatocrinus` · `tropites` · `utatsusaurus` · `voltzia` · `xinpusaurus` · `yunnanolimulus`
+`acrodus` · `anshunsaurus` · `antrimpos` · `bjuvia` · `brachiopod-cluster` · `calcisponge` · `chaohusaurus` · `choristoceras` · `cidaris` · `coral-head` · `cyamodus` · `cymbospondylus-buchseri` · `dachstein-reef` · `daonella` · `daonella-bed` · `diplopora` · `encrinus` · `encrinus-litter` · `eusaurosphargis` · `fadenia` · `germanonautilus` · `gipskeuper` · `guizhouichthyosaurus` · `helveticosaurus` · `ichthyotitan` · `log-raft` · `monte-san-giorgio` · `muschelkalk` · `nanchangosaurus` · `neocalamites` · `neusticosaurus` · `nothosaurus` · `pistosaurus` · `placochelys` · `placunopsis` · `placunopsis-mound` · `pleuromeia` · `psephoderma` · `rebellatrix` · `reef-block` · `retiophyllia` · `saurosphargis` · `shastasaurus` · `shonisaurus` · `shore-boulder` · `sponge-mound` · `stromatolite` · `thecosmilia` · `thylacocephala` · `traumatocrinus` · `tropites` · `utatsusaurus` · `voltzia` · `xinpusaurus` · `yunnanolimulus`

@@ -436,14 +436,22 @@
       "name": "Scenery, plants and the shore",
       "note": "What the biomes are built from. These are model requests, not animals.",
       "subjects": [
-        {
-          "id": "encrinus",
+    {
+      "id": "encrinus",
           "name": "Encrinus liliiformis",
           "wiki": "Encrinus",
           "search": "Encrinus liliiformis",
           "role": "The sea-lily garden · stems to 1.5 m",
-          "len": "stem ~1.5 m"
-        },
+      "len": "stem ~1.5 m"
+    },
+    {
+      "id": "encrinus-litter",
+      "name": "Encrinus columnal litter",
+      "wiki": "Encrinus",
+      "search": "Encrinus columnals Muschelkalk",
+      "role": "Broken stem and columnal seafloor scatter",
+      "len": "low patch"
+    },
         {
           "id": "traumatocrinus",
           "name": "Traumatocrinus hsui",
@@ -460,31 +468,87 @@
           "role": "The dasyclad lagoon meadow",
           "len": "cm-scale tufts"
         },
-        {
-          "id": "retiophyllia",
+    {
+      "id": "retiophyllia",
           "name": "Retiophyllia / \"Thecosmilia\"",
           "wiki": "Retiophyllia",
           "search": "Triassic scleractinian coral fossil Thecosmilia",
           "role": "Phaceloid coral bush of the reef",
           "len": "reef-scale",
-          "imagesAre": "Little of Retiophyllia on Commons. These are Triassic scleractinian corals and phaceloid growth forms."
-        },
-        {
-          "id": "daonella",
+      "imagesAre": "Little of Retiophyllia on Commons. These are Triassic scleractinian corals and phaceloid growth forms."
+    },
+    {
+      "id": "thecosmilia",
+      "name": "Thecosmilia phaceloid colony",
+      "wiki": "Scleractinia",
+      "search": "Thecosmilia phaceloid coral fossil",
+      "role": "Parallel-tube coral bush",
+      "len": "reef-scale"
+    },
+    {
+      "id": "calcisponge",
+      "name": "Triassic calcareous sponge",
+      "wiki": "Calcarea",
+      "search": "Triassic calcareous sponge fossil",
+      "role": "Stacked-chamber reef column",
+      "len": "reef-scale"
+    },
+    {
+      "id": "daonella",
           "name": "Daonella / Halobia",
           "wiki": "Daonella",
           "search": "Daonella Halobia",
           "role": "Flat-clam shell pavement",
-          "len": "5–8 cm shells"
-        },
-        {
-          "id": "placunopsis",
+      "len": "5–8 cm shells"
+    },
+    {
+      "id": "daonella-bed",
+      "name": "Daonella shell bed",
+      "wiki": "Daonella",
+      "search": "Daonella shell bed Triassic",
+      "role": "Overlapping flat-clam feeding slab",
+      "len": "low patch"
+    },
+    {
+      "id": "placunopsis",
           "name": "Placunopsis ostracina",
           "wiki": "Placunopsis",
           "search": "Placunopsis Muschelkalk",
           "role": "Bivalve bioherm mounds · a feeding station",
-          "len": "mounds to 4.5 m"
-        },
+      "len": "mounds to 4.5 m"
+    },
+    {
+      "id": "placunopsis-mound",
+      "name": "Placunopsis shell mound",
+      "wiki": "Placunopsis",
+      "search": "Placunopsis bioherm Muschelkalk",
+      "role": "Stacked-shell feeding mound",
+      "len": "mounds to 4.5 m"
+    },
+    {
+      "id": "brachiopod-cluster",
+      "name": "Coenothyris brachiopod cluster",
+      "wiki": "Coenothyris",
+      "search": "Coenothyris Muschelkalk brachiopod",
+      "role": "Small lampshell cluster",
+      "len": "low cluster"
+    },
+    {
+      "id": "cidaris",
+      "name": "Triassic cidaroid urchin",
+      "wiki": "Cidaroida",
+      "search": "Triassic cidarid sea urchin fossil",
+      "role": "Club-spined benthic prop",
+      "len": "small benthic prop"
+    },
+    {
+      "id": "reef-block",
+      "name": "Reef-margin breccia block",
+      "wiki": "Breccia",
+      "search": "Dachstein reef breccia limestone",
+      "role": "Angular reef rock slot",
+      "len": "scale-1 boulder"
+    },
         {
           "id": "stromatolite",
           "name": "Triassic microbialites",
@@ -509,14 +573,30 @@
           "role": "The disaster-flora lycopsid on the shore",
           "len": "1–2 m"
         },
-        {
-          "id": "neocalamites",
+    {
+      "id": "neocalamites",
           "name": "Neocalamites / Equisetites",
           "wiki": "Neocalamites",
           "search": "Neocalamites Equisetites horsetail Triassic",
           "role": "Horsetail reed beds at the estuary",
-          "len": "2–5 m"
-        },
+      "len": "2–5 m"
+    },
+    {
+      "id": "bjuvia",
+      "name": "Bjuvia cycadophyte",
+      "wiki": "Bjuvia",
+      "search": "Bjuvia Triassic cycad fossil",
+      "role": "Low cycad rosette on shore",
+      "len": "shore shrub"
+    },
+    {
+      "id": "shore-boulder",
+      "name": "Red-sandstone shore boulder",
+      "wiki": "Sandstone",
+      "search": "red sandstone boulder shoreline",
+      "role": "Conifer-shore rock slot",
+      "len": "scale-1 boulder"
+    },
         {
           "id": "monte-san-giorgio",
           "name": "Monte San Giorgio / Besano",
