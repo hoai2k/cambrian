@@ -104,12 +104,5 @@
       "Eat"
     ],
     "clipReason": "Queued for the articulated attack and feeding pass: re-authored so the animal's real appendages, joint chains and mouth placement drive the motion \u2014 deliberate preparation, a directed reach, then recovery \u2014 instead of rigid whole-part rotations. Reviewed clip by clip."
-  },
-  {
-    "id": "coccosteus",
-    "status": "pending",
-    "scope": "total-rework",
-    "model": true,
-    "reason": "User reference: stronger armoured front and angular fish back. Current model preserved as named backup. Run eye/general audits after full rework."
   }
 ]
