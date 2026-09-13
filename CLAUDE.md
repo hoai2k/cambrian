@@ -296,12 +296,31 @@ unless the user explicitly asks for a PR. Steps:
   overhead rather than lying on the bottom — with about one wander in six (`DIP_CHANCE`) a run down
   over it. `npm run reactions` and `npm run locomotion` guard
   all of it.
+- How deep the sea is, is the biome's business. An era that declares `environment.floorDepth` gets a
+  floor at the surface less the biome-weighted depth (`depthProfile` in `src/sim/world.ts`), so the
+  way out to the open water is a slope rather than a step; an era that declares none keeps the old
+  flat-ish floor. The Triassic and the Devonian both do: the Devonian runs 34 units of water at the
+  shore, near the Cambrian's 40, to 111 in the open sea, and the tidal channels carve down from
+  about 170 out so deep water is a short swim. The stromatoporoid reef is the one thing offshore
+  that rises, which is what a reef does. Depth is what the lungs are for — recovery is bad under
+  water and complete at the surface — so distance out costs the climb for air. A body placed at an
+  *absolute* y is a bug in a sea like this: ask the seabed where the water is (`openWater` in
+  `tools/devonian-test.ts` is the pattern).
 - What lives where is the place's own business, not the player's: `src/sim/population.ts` gives every
   210-unit area a size profile and a density from a hash bent by the biome (hatcheries inshore, grown
   animals in the deep), pure in the place and the world seed so an area is the same when you return.
+  Size and number come off the one number, the biome's own danger: the deep is busier as well as
+  bigger, and the hatchery is thin as well as small. The danger term only ever *adds*, because the
+  floor of a third of the usual is a promise that no stretch of sea is empty.
   `spawnAmbient` draws from it; `spawnPreyFor` still keeps food of your own size within reach, and
   `PASSER_BY` sends a large animal through the upper water whatever the seabed holds. Ambient brains
   wander within ~32 units of where they spawned, so a population stays in its biome.
+- A death costs a rung, not the swim back. `respawnAt` in `src/sim/game.ts` returns a body to the
+  distance from shore it died at — the same biome, the same depth — and away from any giant;
+  inshore that is still the nursery, which is the hatchery and in the shore band anyway. Every
+  nursery sits a fixed 88 units off the beach, so sending a death to the nearest one returned a
+  player who had spent the match working out to the open sea to the shallows every time. `home` is
+  still the nursery, because that is what the teleport means. `tools/respawn-test.ts` covers it.
 - Every player hatches out of an egg on the bottom rung: `src/sim/game.ts` holds the body still,
   pinned where the egg was laid, until the shell cracks (`HATCH_HOLD`, which is `HATCH_FREE` of
   `HATCH_TIME`) and hands control back there rather than at the end of the performance — the shell
