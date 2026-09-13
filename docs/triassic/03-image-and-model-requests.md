@@ -221,12 +221,11 @@ Tier 2 props can start at once; nothing blocks them, and the sea-lily garden and
 playable stand-in biomes as soon as `encrinus`, `diplopora`, `stromatolite` and `daonella-bed`
 exist.
 
-## Blender work requested — Nothosaurus `Swim` and `Sprint`, 13 September 2026
+## Blender correction delivered — Nothosaurus `Swim` and `Sprint`, 13 September 2026
 
-**Needs Blender**, in `tools/triassic/creatures/nothosaurus/build.py`, and it must be re-exported to
-both the authored body and the procedural twin, which share the clips. Everything below is measured
-off the shipped GLB by skinning it the way the game does; the numbers are the cycle fraction at
-which each bone reaches its rearmost point.
+**Delivered in Blender** through `tools/triassic/creatures/nothosaurus/build.py` and re-exported to
+both the authored body and the procedural twin, which share the clips exactly. The diagnosis below
+records the prior shipped GLB; the delivery measurements follow it.
 
 **The complaint.** In play the animal reads as walking, or as swimming backwards.
 
@@ -256,9 +255,8 @@ tail undulation is auxiliary: steering and a little thrust, not the engine.
    edge-on. Without this the eye cannot tell which way the animal is pushing water, which is most of
    where "backwards" comes from.
 3. **Quiet the head.** The skull should hold the line the shoulders hold; let the neck take the
-   body's beat. The renderer damps this at runtime meanwhile (`steadyHead`, `src/render/steady-head.ts`,
-   about a fifth of the swing) — that is a patch over the clip, and should come out once the clip is
-   right.
+   body's beat. The temporary renderer-side `steadyHead` correction was removed when the clips
+   were fixed.
 4. **Let the hind limbs trail.** They currently stroke as hard as the forelimbs and on their own
    rhythm; `hind_paddle_R` beats at four times the stroke rate against the left's two, which is a
    flutter rather than a stroke. Reduce them to a slow, mostly passive sweep in phase with the fore
@@ -267,4 +265,10 @@ tail undulation is auxiliary: steering and a little thrust, not the engine.
    cleanly from `tail_01` (0.015) to `tail_06` (0.398), and the wave lags rearward down the body.
    `Sprint` shares the same faults and the same fix.
 
-Re-run the paired audits after the export so the twin keeps matching the body.
+**Delivered measurements.** In the packaged `Swim`, both fore paddles are furthest aft at 0.683 of
+the cycle; in `Sprint`, both are aft at 0.667. The broadside power sweep occupies about 68% of the
+cycle and the feathered recovery about 32%. Hind-paddle travel is below 65% of fore-paddle travel
+and remains a secondary, trailing sweep. Skull lateral travel fell from 0.100/0.145 units to
+0.006/0.009 in `Swim`/`Sprint`, without changing the tail-wave formula. The paired audit samples
+both complete exports, asserts the gait measurements, and confirms exact rig, anchor and all
+21-clip parity. Decoded top and three-quarter renders are retained in the paired review sheets.

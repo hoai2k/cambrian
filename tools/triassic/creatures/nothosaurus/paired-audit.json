@@ -2,22 +2,22 @@
   "models": [
     {
       "suffix": "",
-      "bytes": 1794048,
-      "sha256": "6cab5d0fb827290c4b7d668d7814ee76c545bafae01d84bb43ef4d8d2070c674",
+      "bytes": 1794664,
+      "sha256": "7d4e8774b84924d3b738a3760a9aadca81240f67bde56d939e0d5c999a612535",
       "triangles": 21208,
       "vertices": 12868
     },
     {
       "suffix": ".puppet",
-      "bytes": 686620,
-      "sha256": "16d0f37adaf97df2d88ce50a83ae29bc73655b725667d601b67e260714cc2c29",
+      "bytes": 687232,
+      "sha256": "72eb60e953bd2e7a2b78d89a9b842c501956a400a2765ccccc828bad2544cd6f",
       "triangles": 9004,
       "vertices": 4652
     },
     {
       "suffix": ".lod1",
-      "bytes": 686620,
-      "sha256": "16d0f37adaf97df2d88ce50a83ae29bc73655b725667d601b67e260714cc2c29",
+      "bytes": 687232,
+      "sha256": "72eb60e953bd2e7a2b78d89a9b842c501956a400a2765ccccc828bad2544cd6f",
       "triangles": 9004,
       "vertices": 4652
     }
@@ -157,7 +157,7 @@
     },
     {
       "name": "Sprint",
-      "sha256": "a6c49b057bf45aae5c14cce15922d6481df5d7c1f8a952c58008977444bd6a44"
+      "sha256": "cb07c7d74099e6aafc0e1e4cf7dc21a1cec20bb100817b5ccaee432e2cc12069"
     },
     {
       "name": "Stagger",
@@ -165,7 +165,7 @@
     },
     {
       "name": "Swim",
-      "sha256": "6ce36b56aff6fa58d3ccefc76d79808a30464e1914daaca1b6ea95c1460d7679"
+      "sha256": "824f24c16093c6291077ff7f54b3386e9e0bbdf81b0dda88c8f391933a558425"
     },
     {
       "name": "TurnLeft",
@@ -280,7 +280,7 @@
           "clip": "Sprint",
           "duration": 1.2000000476837158,
           "samples": 61,
-          "maxVertexTravel": 1.504996311714892
+          "maxVertexTravel": 1.4973259122173739
         },
         {
           "clip": "Stagger",
@@ -292,7 +292,7 @@
           "clip": "Swim",
           "duration": 1.7999999523162842,
           "samples": 61,
-          "maxVertexTravel": 1.0535833111625528
+          "maxVertexTravel": 1.0485409595211257
         },
         {
           "clip": "TurnLeft",
@@ -411,7 +411,7 @@
           "clip": "Sprint",
           "duration": 1.2000000476837158,
           "samples": 61,
-          "maxVertexTravel": 1.5241591098646012
+          "maxVertexTravel": 1.5167655784461858
         },
         {
           "clip": "Stagger",
@@ -423,7 +423,7 @@
           "clip": "Swim",
           "duration": 1.7999999523162842,
           "samples": 61,
-          "maxVertexTravel": 1.0672215611173297
+          "maxVertexTravel": 1.0623586476610987
         },
         {
           "clip": "TurnLeft",
@@ -438,6 +438,54 @@
           "maxVertexTravel": 1.3608708938078882
         }
       ]
+    }
+  ],
+  "gait": [
+    {
+      "clip": "Swim",
+      "foreL": {
+        "rearPhase": 0.6833333333333333,
+        "travel": 0.49441515840388517
+      },
+      "foreR": {
+        "rearPhase": 0.6833333333333333,
+        "travel": 0.4944151629030178
+      },
+      "hindL": {
+        "rearPhase": 0.6416666666666667,
+        "travel": 0.278166681138092
+      },
+      "hindR": {
+        "rearPhase": 0.7416666666666667,
+        "travel": 0.2279442504837968
+      },
+      "skullLateral": 0.006013542023171753,
+      "chestLateral": 0.0004999966088134605,
+      "powerFraction": 0.6833333333333333,
+      "recoveryFraction": 0.31666666666666665
+    },
+    {
+      "clip": "Sprint",
+      "foreL": {
+        "rearPhase": 0.6666666666666666,
+        "travel": 0.6998964582290489
+      },
+      "foreR": {
+        "rearPhase": 0.6666666666666666,
+        "travel": 0.6998964586557694
+      },
+      "hindL": {
+        "rearPhase": 0.6416666666666667,
+        "travel": 0.40038348328738327
+      },
+      "hindR": {
+        "rearPhase": 0.75,
+        "travel": 0.32839122571898205
+      },
+      "skullLateral": 0.008709702249171669,
+      "chestLateral": 0.0007243937401016157,
+      "powerFraction": 0.6666666666666666,
+      "recoveryFraction": 0.33333333333333337
     }
   ],
   "exactRigParity": true,

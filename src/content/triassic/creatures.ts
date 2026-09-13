@@ -62,7 +62,7 @@ export const TRIASSIC_CREATURES: readonly CreatureDef[] = [
     kind: 'Nothosaur', kindNote: 'A sauropterygian — the paddle-limbed reptile line that led to the plesiosaurs — with a long flat skull and interlocking fangs at the front, a fish trap.',
     locality: 'Middle Triassic · Muschelkalk and Monte San Giorgio',
     tagline: 'Rows along the sand until something moves. Then the other gear.',
-    eggShell: 'leathery', steadyHead: true, role: 'Two-gear ambusher', ground: false, adultLength: 10.72, rung: 3, breathing: 'air', birth: 'live', paddleRow: true, riseRate: 1.1, proceduralUndulation: false,
+    eggShell: 'leathery', role: 'Two-gear ambusher', ground: false, adultLength: 10.72, rung: 3, breathing: 'air', birth: 'live', paddleRow: true, riseRate: 1.1, proceduralUndulation: false,
     speed: 8.3, burst: 4, agility: 3.5, turnRate: 3.89, glide: 0.25,
     hp: 210, poise: 95, stamina: 140, defense: 0.06, sense: 11,
     color: '#6b6444', accent: '#b7ad8a',

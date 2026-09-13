@@ -31,10 +31,24 @@ User requested authored Tripo plus procedural volume-matched puppet for both tes
 
 Runtime verification also confirmed Idle/Swim/Sprint selection and fallback using actual CreatureView loads of both GLBs. Sprint enters above 1.2× cruise and exits at 1.1× to avoid flicker; its authored cadence is preserved. Local specimen viewer successfully loaded all four full/puppet selections with 21 and 19 clips, preview badges and working playback.
 
+## Nothosaurus paired-rowing correction (2026-09-13)
+
+`Swim` and `Sprint` now use one bilateral forelimb row per clip: a roughly 68% broadside power
+sweep followed by a 32% feathered recovery. The hind limbs follow at reduced travel while the
+existing travelling tail wave is unchanged. Exported-bone sampling puts both fore paddles at the
+same rear phase (0.683 in `Swim`, 0.667 in `Sprint`) and reduces skull lateral travel from
+0.100/0.145 units to 0.006/0.009. The temporary renderer-side `steadyHead` correction has been
+removed because the motion now lives in the source clips.
+
+Both packaged bodies retain the same 27-joint rig, three anchors and 21 exactly matching clips.
+`paired-audit.json` now asserts the locomotion measurements as well as paired playback; the new
+`paired-gait-sheet.jpg` shows all power/recovery phases from above for both bodies. The models
+remain previews pending human approval of the generated body itself.
+
 ## Mouth and material correction checkpoint (2026-09-13)
 - Shonisaurus authored and procedural bind geometry now closes the mouth. Only Bite, Attack, Heavy and Eat open it; all other clips, including Ability and Death, keep it shut. Exact 21-joint/19-clip/anchor parity remains. Closure probes exclude internal oral fillers and find no open rays in either rostrum. Evidence: `tools/triassic/creatures/shonisaurus/closed-mouth-review.jpg` and `mouth-closure-validation.json`. A tiny internal oral-web edge still stretches at maximum Heavy; no external tearing was observed. Models remain previews.
 - Nothosaurus preserves the original albedo texture, uses white vertex pigment on the authored skin to avoid multiplying colour twice, and reduces excessive normal-map relief to 0.15 with nonmetallic roughness 0.7. The source grey-white streaks remain: controlled original/processed comparisons and UV checks establish they came from Tripo. Meshes, weights, rigs and all 21 clips are unchanged. Evidence: `tools/triassic/creatures/nothosaurus/material-comparison.jpg` and `material-audit.json`.
-- Current bytes: Nothosaurus full 1,794,048 / puppet and LOD 686,620; Shonisaurus full 4,379,136 / puppet and LOD 572,216. Portraits were refreshed. Blender authoring files and detailed frames remain under `local/triassic-authoring/`.
+- Current bytes after the paired-rowing correction: Nothosaurus full 1,794,664 / puppet and LOD 687,232; Shonisaurus full 4,379,136 / puppet and LOD 572,216. Portraits were refreshed. Blender authoring files and detailed frames remain under `local/triassic-authoring/`.
 - Synced the upstream viewer Body switch: compare the pair on each animal's single entry, preserving camera and animation. Raw source files are now under each builder's `tripo-raw/` folder; reproduction paths were corrected after the upstream move.
 - Scope remaining: human review of these preview pairs, the broader queued creature/image work described above, and any future repaint of inherited source markings. This correction task does not finalize the models or start other creatures.
 

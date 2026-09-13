@@ -19,6 +19,10 @@ def pose(clip,t):
  s.frame_set(round(t*30))
 def render(file,w=800,h=600,loc=(7,-5,4.2),target=(0,0,0),scale=6.8):
  cam.location=loc;cam.rotation_euler=(Vector(target)-cam.location).to_track_quat('-Z','Y').to_euler();cam.data.ortho_scale=scale;s.render.resolution_x=w;s.render.resolution_y=h;s.render.filepath=str(file);bpy.ops.render.render(write_still=True)
+if '--gait-only' in sys.argv:
+ for clip,t in [('Swim',0),('Swim',.612),('Swim',1.224),('Swim',1.512),('Sprint',0),('Sprint',.408),('Sprint',.816),('Sprint',1.008)]:
+  pose(clip,t);render(REVIEW/(clip+'-'+str(t)+'-top.png'),1000,750,(0,0,8))
+ sys.exit(0)
 if '--extras-only' in sys.argv:
  for clip,t in [('Ability',.5),('Grab',.6),('Breath',1.2)]:
   pose(clip,t);render(REVIEW/(clip+'-'+str(t)+'.png'))
@@ -31,7 +35,7 @@ if SUFFIX and '--review-only'not in sys.argv:
  if '--portrait-only'in sys.argv:sys.exit(0)
 if not SUFFIX and '--review-only'not in sys.argv:
  for suffix,w,h in [('select.png',1600,1200),('card.png',800,600),('thumb.png',256,192),('png',1200,900)]:render(OUT/('nothosaurus.'+suffix),w,h)
-for clip,t in [('Idle',0),('Swim',.225),('Swim',.675),('Swim',1.125),('Swim',1.575),('Sprint',.15),('Sprint',.45),('TurnLeft',.8),('TurnRight',.8),('Dive',.7),('Rise',.7),('Attack',.14),('Attack',.4),('Attack',.7),('Bite',.25),('Heavy',.15),('Heavy',.45),('Heavy',.8),('Hit',.3),('Death',1.6),('Guard',.5),('Parry',.2),('Dodge',.25),('Eat',.4),('Stagger',.6),('Ability',.5),('Grab',.6),('Breath',1.2),('Growth',.75)]:
+for clip,t in [('Idle',0),('Swim',0),('Swim',.612),('Swim',1.224),('Swim',1.512),('Sprint',0),('Sprint',.408),('Sprint',.816),('Sprint',1.008),('TurnLeft',.8),('TurnRight',.8),('Dive',.7),('Rise',.7),('Attack',.14),('Attack',.4),('Attack',.7),('Bite',.25),('Heavy',.15),('Heavy',.45),('Heavy',.8),('Hit',.3),('Death',1.6),('Guard',.5),('Parry',.2),('Dodge',.25),('Eat',.4),('Stagger',.6),('Ability',.5),('Grab',.6),('Breath',1.2),('Growth',.75)]:
  pose(clip,t);render(REVIEW/(clip+'-'+str(t)+'.png'))
 for name,loc in [('side',(7,0,.1)),('top',(0,0,8))]:
  pose('Idle',0);render(REVIEW/(name+'.png'),1000,750,loc)

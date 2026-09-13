@@ -212,13 +212,9 @@ unless the user explicitly asks for a PR. Steps:
   apex into the direction of travel while it beats (`bellTilt`), so re-timing that clip breaks the
   lock — which is what the bell cases in `npm run locomotion` are there to catch. Which animal has what, and how well each is actually
   attested, is `docs/research/locomotion-ideas.md`.
-- A swimmer holds its head still, and `steadyHead` makes it do so after the mixer has written the
-  pose (`src/render/steady-head.ts`): the neck gives up a share of the yaw the clip put in the
-  skull, weighted toward the base so the neck absorbs the beat instead of the head snapping to
-  centre. The yaw has to be taken about *world up carried into the parent's frame* — a neck bone's
-  own axes run along the bone, so reading the local Euler's `y` measures a twist and comes out as
-  zero. It is a patch over a clip that swings its head at the stroke rate, asked for by name because
-  a Tanystropheus' neck is meant to swing; the clip is what should be fixed.
+- Nothosaurus now holds its head still in its authored `Swim` and `Sprint` clips. The earlier
+  renderer-side `steadyHead` counter-rotation was removed when those clips were corrected; do not
+  reintroduce a runtime pose patch for motion that belongs in the reproducible Blender builder.
 - A body may shape itself to what it is on: `conformArms` bends a radial rig's arms onto the ground
   under them, or around a creature it is holding, after the mixer has written the pose
   (`src/render/conform.ts`, `npm run conform`). Presentation only, and asked for by name rather than
