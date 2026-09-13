@@ -1,0 +1,146 @@
+{
+  "status": "candidate07 handoff; not final creature acceptance",
+  "sourceDirectory": "/Users/hoai/Documents/Stuff/Generations/cambrian/local/devonian-authoring/coccosteus/rework-v3",
+  "files": [
+    {
+      "path": "HANDOFF-CANDIDATE07-PAUSE.md",
+      "bytes": 2718,
+      "sha256": "9086afcdd06a4cb1ba79899c1c325cdb64a3479a824e98235d71439c1d8e57a8"
+    },
+    {
+      "path": "candidate-07-actual-review.json",
+      "bytes": 7881,
+      "sha256": "2c1f0076591ec28421a5a7874a9a653de973e1367ec73a8e7d6ff141b2a94669"
+    },
+    {
+      "path": "candidate-report.json",
+      "bytes": 44425,
+      "sha256": "15c2e4a93f9b2d9cba7936a0e5ef63bc03b1fea1341c0b4ae14e2c02024de39b"
+    },
+    {
+      "path": "coccosteus.card.png",
+      "bytes": 224610,
+      "sha256": "2eb10e79b601020262b4516be2aa032d3491e3ef3c5a0484ebb90155cb01f2c6"
+    },
+    {
+      "path": "coccosteus.glb",
+      "bytes": 22931780,
+      "sha256": "b7b929b9978f51f89e0cb1e687dec10d95b90edd3e2b2ba27b12432f58474655"
+    },
+    {
+      "path": "coccosteus.json",
+      "bytes": 2080,
+      "sha256": "6e561d504e6928ffbda23388a187972b2adfc26182ddc0bfade47adb7e997f2a"
+    },
+    {
+      "path": "coccosteus.lod1.glb",
+      "bytes": 3236312,
+      "sha256": "eec740e92fcf2187c54eacb2418fc7335cd584fe57b2792e64e8e4f1bbd31756"
+    },
+    {
+      "path": "coccosteus.png",
+      "bytes": 1592366,
+      "sha256": "684dea255ed5ff316aaa7722a470ad88e41460dc13a79b9d38c8bf7c07f1be71"
+    },
+    {
+      "path": "coccosteus.select.png",
+      "bytes": 813900,
+      "sha256": "a625847dae7a214048b94da39f2de19cc9b6f4ebd18a62371ee2b0f60f3865b7"
+    },
+    {
+      "path": "coccosteus.thumb.png",
+      "bytes": 30292,
+      "sha256": "5c6925f426d3e4c5f1cca650faf7e588eba6d65f071b50d9e43f006f8461d8e4"
+    },
+    {
+      "path": "export-structural-review.json",
+      "bytes": 10991,
+      "sha256": "6ac6cfbc34f2b3fbe5e4d7960f3fa732e8b775ef86fed4d7cb3f17b45d31adce"
+    },
+    {
+      "path": "frozen-candidate07-review.json",
+      "bytes": 2020,
+      "sha256": "77754ed4e0757d6d30f4330192a4154f063cc64122cd0a401ef7ef395c799c71"
+    },
+    {
+      "path": "frozen-lod-07.json",
+      "bytes": 54780,
+      "sha256": "58a67b430259bd10a73e0079101318b6e83d81b8b827818b4744fbecc8247b56"
+    },
+    {
+      "path": "matched-evidence/Full-Attack.png",
+      "bytes": 1241855,
+      "sha256": "5ecc94988bee207fb6d140301f712b24044109022027fef1b1cb818935d507a2"
+    },
+    {
+      "path": "matched-evidence/Full-Fin-close.png",
+      "bytes": 1349466,
+      "sha256": "e55fa07d58d43aa52839b21cb8979ed163b444a61eb9e4582165f466f37ef53a"
+    },
+    {
+      "path": "matched-evidence/Full-Idle-oblique.png",
+      "bytes": 1054962,
+      "sha256": "be277eb8221bf6c4b941731060298359be4740a93d1202e65e05c0d9a203bea7"
+    },
+    {
+      "path": "matched-evidence/Full-Idle-side.png",
+      "bytes": 1043880,
+      "sha256": "e011beee7001bcce97325ca3fbe7ec5c014201c4b0e81f6e9545eb3bec932984"
+    },
+    {
+      "path": "matched-evidence/Full-albedo-emission-finclose.png",
+      "bytes": 1316410,
+      "sha256": "c2d81f7962d04e53097a4e51c91d18602f1fc696e91b0390f049706a458f7f36"
+    },
+    {
+      "path": "matched-evidence/Full-albedo-emission-oblique.png",
+      "bytes": 1038130,
+      "sha256": "0c78a2f1b3b25efbd6d40e36869cd2fffdc6bc93a7de9db3a4046fab02e6bf10"
+    },
+    {
+      "path": "matched-evidence/LOD-Attack.png",
+      "bytes": 1135282,
+      "sha256": "18acf2a6af8a162661fcc0c3d3757b06094318311fef5748c2397d182a56af74"
+    },
+    {
+      "path": "matched-evidence/LOD-Fin-close.png",
+      "bytes": 1130307,
+      "sha256": "5ef14dd9c5be1fcb103ad5cbb57044022241b6283ff21311f20d3c06c86db3b9"
+    },
+    {
+      "path": "matched-evidence/LOD-Idle-oblique.png",
+      "bytes": 1031662,
+      "sha256": "075ab3f40fb06df40a23237d9b92ff8ae301b0fa1ed8db8ce0f658fa746f085c"
+    },
+    {
+      "path": "matched-evidence/LOD-Idle-side.png",
+      "bytes": 1018544,
+      "sha256": "6146e90f0afac95c06434bddf31d3aa81400849a1dd1d95f47d0ea3f991000a9"
+    },
+    {
+      "path": "matched-evidence/LOD-albedo-emission-finclose.png",
+      "bytes": 1135114,
+      "sha256": "05d6a76994aa2755a3a3b9788e68ba25218bd1d486efc90172538b6d4f634d79"
+    },
+    {
+      "path": "matched-evidence/LOD-albedo-emission-oblique.png",
+      "bytes": 1013012,
+      "sha256": "ddce03f86fc67a5fab5995df7e42b6340b8f66f222954782af960460d318b391"
+    },
+    {
+      "path": "matched-evidence/manifest.json",
+      "bytes": 13640,
+      "sha256": "3084d54004baa4c46f160beafb6c0604809d900d23de2b75154e3eb3389020ca"
+    },
+    {
+      "path": "review-candidate07-actual.md",
+      "bytes": 3465,
+      "sha256": "e2a31ca1396567ba32106800e3b92846418db729706ddd7579dee2748fcc00c7"
+    },
+    {
+      "path": "source/coccosteus-production-04.blend",
+      "bytes": 20867486,
+      "sha256": "ad622a6204055384109219ed81edebf6e67e426d62cf4d3b3feff394d50dd720"
+    }
+  ]
+}
