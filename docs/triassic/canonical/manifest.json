@@ -4,31 +4,188 @@
   "modelingSheetBackground": "pale neutral studio gray; use chroma key only when explicitly needed for compositing",
   "externalReferencePolicy": "Save any used external input in canonical/references with provenance in prompts.json.",
   "subjects": {
-    "cymbospondylus": { "canonical": "approved", "turnaround": "not-started" },
-    "shonisaurus": { "canonical": "approved", "turnaround": "not-started" },
-    "nothosaurus": { "canonical": "approved", "turnaround": "not-started" },
-    "dinocephalosaurus": { "canonical": "approved", "turnaround": "not-started" },
-    "helicoprion": { "canonical": "approved", "turnaround": "not-started", "requiredFeature": "single lower-jaw tooth whorl" },
-    "rhaeticosaurus": { "canonical": "approved", "turnaround": "not-started" },
-    "atopodentatus": { "canonical": "approved", "turnaround": "not-started" },
-    "askeptosaurus": { "canonical": "approved", "turnaround": "not-started" },
-    "placodus": { "canonical": "approved", "turnaround": "not-started" },
-    "hybodus": { "canonical": "approved", "turnaround": "not-started" },
-    "birgeria": { "canonical": "approved", "turnaround": "not-started" },
-    "aphaneramma": { "canonical": "approved", "turnaround": "not-started" },
-    "mixosaurus": { "canonical": "approved", "turnaround": "not-started" },
-    "henodus": { "canonical": "approved", "turnaround": "not-started" },
-    "saurichthys": { "canonical": "approved", "turnaround": "not-started" },
-    "hupehsuchus": { "canonical": "approved", "turnaround": "not-started" },
-    "keichousaurus-male": { "canonical": "approved", "turnaround": "not-started" },
-    "keichousaurus-female": { "canonical": "approved", "turnaround": "not-started" },
-    "cartorhynchus": { "canonical": "approved", "turnaround": "not-started" },
-    "odontochelys": { "canonical": "approved", "turnaround": "not-started" },
-    "ceratites": { "canonical": "approved", "turnaround": "not-started", "requiredFeature": "long, large articulated tentacles" },
-    "phragmoteuthis": { "canonical": "approved", "turnaround": "not-started" },
-    "tanystropheus": { "canonical": "approved", "turnaround": "not-started" },
-    "mystriosuchus": { "canonical": "approved", "turnaround": "not-started" },
-    "macrocnemus": { "canonical": "approved", "turnaround": "not-started" },
-    "coelophysis": { "canonical": "approved", "turnaround": "not-started" }
+    "cymbospondylus": {
+      "canonical": "needs-rework",
+      "turnaround": "not-started",
+      "reworkToward": {
+        "kind": "web",
+        "title": "Cymbospondylus youngorum reconstruction 2023.jpg",
+        "page": "https://commons.wikimedia.org/wiki/File:Cymbospondylus_youngorum_reconstruction_2023.jpg"
+      },
+      "decidedAt": "2026-09-13T01:00:13.500Z"
+    },
+    "shonisaurus": {
+      "canonical": "greenlit",
+      "turnaround": "not-started",
+      "decidedAt": "2026-09-13T01:00:47.144Z"
+    },
+    "nothosaurus": {
+      "canonical": "greenlit",
+      "turnaround": "not-started",
+      "decidedAt": "2026-09-13T01:01:08.730Z"
+    },
+    "dinocephalosaurus": {
+      "canonical": "greenlit",
+      "turnaround": "not-started",
+      "decidedAt": "2026-09-13T01:01:15.101Z"
+    },
+    "helicoprion": {
+      "canonical": "greenlit",
+      "turnaround": "not-started",
+      "requiredFeature": "single lower-jaw tooth whorl",
+      "decidedAt": "2026-09-13T01:01:22.623Z"
+    },
+    "rhaeticosaurus": {
+      "canonical": "approved",
+      "turnaround": "not-started"
+    },
+    "atopodentatus": {
+      "canonical": "greenlit",
+      "turnaround": "not-started",
+      "decidedAt": "2026-09-13T01:02:09.321Z"
+    },
+    "askeptosaurus": {
+      "canonical": "greenlit",
+      "turnaround": "not-started",
+      "decidedAt": "2026-09-13T01:02:52.596Z"
+    },
+    "placodus": {
+      "canonical": "greenlit",
+      "turnaround": "not-started",
+      "decidedAt": "2026-09-13T01:03:01.825Z"
+    },
+    "hybodus": {
+      "canonical": "greenlit",
+      "turnaround": "not-started",
+      "decidedAt": "2026-09-13T01:03:09.333Z"
+    },
+    "birgeria": {
+      "canonical": "greenlit",
+      "turnaround": "not-started",
+      "decidedAt": "2026-09-13T01:03:25.643Z"
+    },
+    "aphaneramma": {
+      "canonical": "needs-rework",
+      "turnaround": "not-started",
+      "reworkToward": {
+        "kind": "web",
+        "title": "Metoposaurus diagnosticus kraselovi 1DB.jpg",
+        "page": "https://commons.wikimedia.org/wiki/File:Metoposaurus_diagnosticus_kraselovi_1DB.jpg"
+      },
+      "decidedAt": "2026-09-13T01:04:06.153Z"
+    },
+    "mixosaurus": {
+      "canonical": "greenlit",
+      "turnaround": "not-started",
+      "decidedAt": "2026-09-13T01:04:33.564Z"
+    },
+    "henodus": {
+      "canonical": "greenlit",
+      "turnaround": "not-started",
+      "decidedAt": "2026-09-13T01:04:55.343Z"
+    },
+    "saurichthys": {
+      "canonical": "greenlit",
+      "turnaround": "not-started",
+      "decidedAt": "2026-09-13T01:05:07.724Z"
+    },
+    "hupehsuchus": {
+      "canonical": "greenlit",
+      "turnaround": "not-started",
+      "decidedAt": "2026-09-13T01:05:32.675Z"
+    },
+    "keichousaurus-male": {
+      "canonical": "approved",
+      "turnaround": "not-started"
+    },
+    "keichousaurus-female": {
+      "canonical": "approved",
+      "turnaround": "not-started"
+    },
+    "cartorhynchus": {
+      "canonical": "greenlit",
+      "turnaround": "not-started",
+      "decidedAt": "2026-09-13T01:06:03.044Z"
+    },
+    "odontochelys": {
+      "canonical": "needs-rework",
+      "turnaround": "not-started",
+      "reworkToward": {
+        "kind": "web",
+        "title": "Thaichelys ruchae life restoration.png",
+        "page": "https://commons.wikimedia.org/wiki/File:Thaichelys_ruchae_life_restoration.png"
+      },
+      "decidedAt": "2026-09-13T01:06:24.789Z"
+    },
+    "ceratites": {
+      "canonical": "greenlit",
+      "turnaround": "not-started",
+      "requiredFeature": "long, large articulated tentacles",
+      "decidedAt": "2026-09-13T01:06:29.964Z"
+    },
+    "phragmoteuthis": {
+      "canonical": "greenlit",
+      "turnaround": "not-started",
+      "decidedAt": "2026-09-13T01:06:43.197Z"
+    },
+    "tanystropheus": {
+      "canonical": "approved",
+      "turnaround": "not-started"
+    },
+    "mystriosuchus": {
+      "canonical": "approved",
+      "turnaround": "not-started"
+    },
+    "macrocnemus": {
+      "canonical": "approved",
+      "turnaround": "not-started"
+    },
+    "coelophysis": {
+      "canonical": "greenlit",
+      "turnaround": "not-started",
+      "decidedAt": "2026-09-13T01:07:28.068Z"
+    },
+    "keichousaurus": {
+      "canonical": "greenlit",
+      "turnaround": "not-started",
+      "decidedAt": "2026-09-13T01:05:52.838Z",
+      "greenlitImage": "male"
+    },
+    "voltzia": {
+      "canonical": "approved",
+      "turnaround": "delivered",
+      "views": [
+        "side",
+        "top"
+      ],
+      "prompt": "scenery-prompts.json"
+    },
+    "coral-head": {
+      "canonical": "approved",
+      "turnaround": "delivered",
+      "views": [
+        "side",
+        "top"
+      ],
+      "prompt": "scenery-prompts.json"
+    },
+    "sponge-mound": {
+      "canonical": "approved",
+      "turnaround": "delivered",
+      "views": [
+        "side",
+        "top"
+      ],
+      "prompt": "scenery-prompts.json"
+    },
+    "log-raft": {
+      "canonical": "approved",
+      "turnaround": "delivered",
+      "views": [
+        "side",
+        "top"
+      ],
+      "prompt": "scenery-prompts.json"
+    }
   }
 }

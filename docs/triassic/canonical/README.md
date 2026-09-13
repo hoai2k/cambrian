@@ -17,9 +17,17 @@ Keichousaurus has two, `keichousaurus-male` and `keichousaurus-female`, because 
 in the limb proportions the fossils record and both are wanted as schemes.
 
 `manifest.json` tracks each subject's state: `canonical` is whether the pose is approved and
-`turnaround` whether its four-view sheet has been made. 26 poses are approved; no turnarounds
-exist yet. After adding or replacing a pose here, run `npm run triassic:viewer` so the viewer and
-its deployed copy pick it up.
+`turnaround` whether its four-view sheet has been made. After adding or replacing a pose here, run
+`npm run triassic:viewer` so the viewer and its deployed copy pick it up.
+
+Scenery is here on the same terms as the animals. The four organic props — `voltzia`,
+`coral-head`, `sponge-mound`, `log-raft` — arrived with their modelling sheets already made, so
+each has a pose (`<id>.png`, the three-quarter view), its sheet (`<id>-turnaround.png`) and the
+side and top views beside them. They were generated from the briefs in `scenery-prompts.json` with
+no external source image, and `log-raft` is deliberately the bare drift trunk: the crinoid colony
+that rides it is assembled procedurally in the engine. Having the sheet already does not skip the
+gate — the pose is still what a human greenlights in the viewer, and the sheet is in the running
+against it there.
 
 ## Reviewing them
 
