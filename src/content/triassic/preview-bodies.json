@@ -3,114 +3,180 @@
     "id": "askeptosaurus",
     "model": "assets/triassic/creatures/askeptosaurus.preview.glb",
     "bytes": 1522268,
-    "sha256": "1c4cdc6d30e97d72a65162e7bafe85bd417c310ea3c0b500cbbe8398e7ee19e6"
+    "sha256": "1c4cdc6d30e97d72a65162e7bafe85bd417c310ea3c0b500cbbe8398e7ee19e6",
+    "yaw": 0,
+    "scale": 6.62,
+    "lengthUnits": 6.62
   },
   {
     "id": "atopodentatus",
     "model": "assets/triassic/creatures/atopodentatus.preview.glb",
     "bytes": 1371660,
-    "sha256": "569badc2582ce5687aec344a7741e8d60d4325b0de62ddf87af4854d9f1f8b6e"
+    "sha256": "569badc2582ce5687aec344a7741e8d60d4325b0de62ddf87af4854d9f1f8b6e",
+    "yaw": -90,
+    "scale": 7.32,
+    "lengthUnits": 7.32
   },
   {
     "id": "birgeria",
     "model": "assets/triassic/creatures/birgeria.preview.glb",
     "bytes": 1405984,
-    "sha256": "cf0066f158e010af6bf9144fb42178acf56ad8a50ea4ef5674c129f120b7eb32"
+    "sha256": "cf0066f158e010af6bf9144fb42178acf56ad8a50ea4ef5674c129f120b7eb32",
+    "yaw": -90,
+    "scale": 5.53,
+    "lengthUnits": 5.53
   },
   {
     "id": "cartorhynchus",
     "model": "assets/triassic/creatures/cartorhynchus.preview.glb",
     "bytes": 1312676,
-    "sha256": "2adaf4664eb5deb1ced150e30322affa3c606412a8de0142abaa23c09e043b9a"
+    "sha256": "2adaf4664eb5deb1ced150e30322affa3c606412a8de0142abaa23c09e043b9a",
+    "yaw": 180,
+    "scale": 2.42,
+    "lengthUnits": 2.42
   },
   {
     "id": "ceratites",
     "model": "assets/triassic/creatures/ceratites.preview.glb",
     "bytes": 1732120,
-    "sha256": "360aa06c3293d257f37c2eb57dc1bcc6902d9025283b130edb342ae6beba2769"
+    "sha256": "360aa06c3293d257f37c2eb57dc1bcc6902d9025283b130edb342ae6beba2769",
+    "yaw": 0,
+    "scale": 1.41,
+    "lengthUnits": 1.41
   },
   {
     "id": "coelophysis",
     "model": "assets/triassic/creatures/coelophysis.preview.glb",
     "bytes": 1365460,
-    "sha256": "cd945622320116fd716362bd02c2b1d66fecefc64d822c2328a86d9e68d17557"
+    "sha256": "cd945622320116fd716362bd02c2b1d66fecefc64d822c2328a86d9e68d17557",
+    "yaw": 0,
+    "scale": 7.32,
+    "lengthUnits": 7.32
   },
   {
     "id": "cymbospondylus",
     "model": "assets/triassic/creatures/cymbospondylus.preview.glb",
     "bytes": 1334636,
-    "sha256": "2f9b83b19c44bf0048ed0fd7871b6d673156627deb57e43c2eb6acea3afcaddc"
+    "sha256": "2f9b83b19c44bf0048ed0fd7871b6d673156627deb57e43c2eb6acea3afcaddc",
+    "yaw": 180,
+    "scale": 19.37,
+    "lengthUnits": 19.37
   },
   {
     "id": "dinocephalosaurus",
     "model": "assets/triassic/creatures/dinocephalosaurus.preview.glb",
     "bytes": 1497660,
-    "sha256": "82fd33934f48287495820ee56f5c7a85dc870a1080797dd09ac8be74ebb29dae"
+    "sha256": "82fd33934f48287495820ee56f5c7a85dc870a1080797dd09ac8be74ebb29dae",
+    "yaw": -90,
+    "scale": 10.22,
+    "lengthUnits": 10.22
   },
   {
     "id": "helicoprion",
     "model": "assets/triassic/creatures/helicoprion.preview.glb",
     "bytes": 1215376,
-    "sha256": "8c66c237f8adacf7429a422c2b51c7fad62181f33e007d696b01c697e4fd719e"
+    "sha256": "8c66c237f8adacf7429a422c2b51c7fad62181f33e007d696b01c697e4fd719e",
+    "yaw": 0,
+    "scale": 9.69,
+    "lengthUnits": 9.69
   },
   {
     "id": "henodus",
     "model": "assets/triassic/creatures/henodus.preview.glb",
     "bytes": 1562320,
-    "sha256": "cce264852a859338f307db9b842ac596a39ae407ef1bee48857d99a175911943"
+    "sha256": "cce264852a859338f307db9b842ac596a39ae407ef1bee48857d99a175911943",
+    "yaw": -90,
+    "scale": 4,
+    "lengthUnits": 4
   },
   {
     "id": "hupehsuchus",
     "model": "assets/triassic/creatures/hupehsuchus.preview.glb",
     "bytes": 1234968,
-    "sha256": "da38d1761028720d60112aface293f7b0dae38d956e40b49354ea533b158ec98"
+    "sha256": "da38d1761028720d60112aface293f7b0dae38d956e40b49354ea533b158ec98",
+    "yaw": 180,
+    "scale": 4,
+    "lengthUnits": 4
   },
   {
     "id": "hybodus",
     "model": "assets/triassic/creatures/hybodus.preview.glb",
     "bytes": 1267536,
-    "sha256": "f28722ca94cbe5a5396d92eccb58faf800699b9f57f43a4a147c174222fbac1f"
+    "sha256": "f28722ca94cbe5a5396d92eccb58faf800699b9f57f43a4a147c174222fbac1f",
+    "yaw": 180,
+    "scale": 5.86,
+    "lengthUnits": 5.86
   },
   {
     "id": "keichousaurus",
     "model": "assets/triassic/creatures/keichousaurus.preview.glb",
     "bytes": 1171500,
-    "sha256": "91ce3cc47a5b5658baf707f82c0273bc28d6cef5002622516e58ff739193022a"
+    "sha256": "91ce3cc47a5b5658baf707f82c0273bc28d6cef5002622516e58ff739193022a",
+    "yaw": 180,
+    "scale": 2.06,
+    "lengthUnits": 2.06
   },
   {
     "id": "macrocnemus",
     "model": "assets/triassic/creatures/macrocnemus.preview.glb",
     "bytes": 1219576,
-    "sha256": "b0be4e86e871266abd9e69a72c2b746cc18b54707e09e74dca09f6d74300cc66"
+    "sha256": "b0be4e86e871266abd9e69a72c2b746cc18b54707e09e74dca09f6d74300cc66",
+    "yaw": 0,
+    "scale": 3.77,
+    "lengthUnits": 3.77
   },
   {
     "id": "mixosaurus",
     "model": "assets/triassic/creatures/mixosaurus.preview.glb",
     "bytes": 1335344,
-    "sha256": "9405cf580dcf4477705c4d4984b68c6507b912b6fed1b1bf64e8de57ff9e63d6"
+    "sha256": "9405cf580dcf4477705c4d4984b68c6507b912b6fed1b1bf64e8de57ff9e63d6",
+    "yaw": 180,
+    "scale": 4,
+    "lengthUnits": 4
   },
   {
     "id": "odontochelys",
     "model": "assets/triassic/creatures/odontochelys.preview.glb",
     "bytes": 1470864,
-    "sha256": "9e8e884a4d7983e129aebbc7da1698176974669eec4f6ad00e55c51814d15f41"
+    "sha256": "9e8e884a4d7983e129aebbc7da1698176974669eec4f6ad00e55c51814d15f41",
+    "yaw": 180,
+    "scale": 2.42,
+    "lengthUnits": 2.42
   },
   {
     "id": "phragmoteuthis",
     "model": "assets/triassic/creatures/phragmoteuthis.preview.glb",
     "bytes": 1585836,
-    "sha256": "c00c71573f3adc3157f0bdd09f4deada27b5e6aa0827b7ba98c1793420c6f00c"
+    "sha256": "c00c71573f3adc3157f0bdd09f4deada27b5e6aa0827b7ba98c1793420c6f00c",
+    "yaw": -90,
+    "scale": 2.42,
+    "lengthUnits": 2.42
   },
   {
     "id": "placodus",
     "model": "assets/triassic/creatures/placodus.preview.glb",
     "bytes": 1622000,
-    "sha256": "21489b61773f3be56ecee97b86eeb2b1403bd0396e579a645c5ef60d9e7cdad8"
+    "sha256": "21489b61773f3be56ecee97b86eeb2b1403bd0396e579a645c5ef60d9e7cdad8",
+    "yaw": -90,
+    "scale": 6.62,
+    "lengthUnits": 6.62
   },
   {
     "id": "saurichthys",
     "model": "assets/triassic/creatures/saurichthys.preview.glb",
     "bytes": 1253544,
-    "sha256": "fb68c6c247d9a60f8ed4ac2580de2e3124dc70f54454c4a2d5eb5e894aae3478"
+    "sha256": "fb68c6c247d9a60f8ed4ac2580de2e3124dc70f54454c4a2d5eb5e894aae3478",
+    "yaw": 180,
+    "scale": 4,
+    "lengthUnits": 4
+  },
+  {
+    "id": "tanystropheus",
+    "model": "assets/triassic/creatures/tanystropheus.preview.glb",
+    "bytes": 1472892,
+    "sha256": "540dd697ad385f628ee5f30f4fcc8741bad4cf3c9e131395db1f652e4aa90532",
+    "yaw": 0,
+    "scale": 10.22,
+    "lengthUnits": 10.22
   }
 ]
