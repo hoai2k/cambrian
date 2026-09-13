@@ -40,9 +40,18 @@ async function api(base, params) {
 const REJECT = /(locator|location|map|cladogram|phylogen|stratigraph|timeline|chart|logo|icon|barnstar|wikispecies|commons-|disambig|question_book|edit-|ambox|crystal|nuvola|flag_of|coat_of_arms|signature|portal|spoken)/i;
 /** Diagrams worth keeping despite being drawings rather than photographs. */
 const SIZE_PLATE = /(size|scale|comparison|chart_of|silhouette)/i;
+// What this page is actually for is somebody's picture of the LIVING animal or plant. Fossils are
+// evidence and worth having, but they are not the thing a canonical pose is drawn from, and for the
+// plants and the invertebrates Commons is overwhelmingly fossils — so a bare slab used to outrank a
+// restoration on filename length alone and the reference column filled up with rock. Restorations
+// now lead by a wide margin, and a specimen that is *only* a specimen is scored below them.
 const GOOD = [
-  [/(_bw\.|_nt\.|nobu|tamura|restoration|reconstruction|life_|lifestyle|pareidolia|artwork|paleoart|_db\.)/i, 40],
-  [/(skeleton|skeletal|mounted|holotype|specimen|fossil|slab)/i, 30],
+  [/(_bw\.|_nt\.|nobu|tamura|restoration|reconstruction|life_|lifestyle|pareidolia|artwork|paleoart|_db\.)/i, 70],
+  // The rest of the palaeoart vocabulary: illustrators' own naming, and the words used for plant
+  // and invertebrate reconstructions, which the list above was built for vertebrates and missed.
+  [/(restored|reconstr|artist|impression|illustration|painting|drawing|render|in_life|alive|living|habitus|diorama|mural|model_of|museum_model|sculpture|animatronic)/i, 55],
+  [/(ecosystem|environment|habitat|seascape|landscape|scene|fauna_of|flora_of|biota)/i, 30],
+  [/(skeleton|skeletal|mounted|holotype|specimen|fossil|slab)/i, 12],
   [/(skull|jaw|tooth|teeth|dentition|whorl|carapace|shell|limb|flipper|neck)/i, 22],
   [/(museum|naturkunde|naturhistor|senckenberg|nhm|smithsonian|paleontolog)/i, 14],
   [SIZE_PLATE, 18],
@@ -68,8 +77,13 @@ const plain = (html) => (html ?? '').replace(/<[^>]*>/g, '').replace(/\s+/g, ' '
 
 async function candidates(subject) {
   const titles = new Set();
-  const search = await api(COMMONS, { action: 'query', list: 'search', srsearch: subject.search, srnamespace: '6', srlimit: '40' });
-  for (const hit of search?.query?.search ?? []) titles.add(hit.title);
+  // Three searches, not one. The plain name returns what Commons has most of, which for these
+  // subjects is fossils; the other two ask for the picture we actually want by name, so a
+  // restoration that exists is found even where rock outnumbers it twenty to one.
+  for (const q of [subject.search, `${subject.search} reconstruction`, `${subject.search} life restoration`]) {
+    const search = await api(COMMONS, { action: 'query', list: 'search', srsearch: q, srnamespace: '6', srlimit: '40' });
+    for (const hit of search?.query?.search ?? []) titles.add(hit.title);
+  }
   if (subject.wiki) {
     const page = await api(WIKIPEDIA, { action: 'query', prop: 'images', titles: subject.wiki, imlimit: '60' });
     for (const p of page?.query?.pages ?? []) for (const im of p.images ?? []) titles.add(im.title);
