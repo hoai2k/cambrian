@@ -1,0 +1,165 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Ancient Seas — visitor stats</title>
+    <!-- Not indexed: this is the trilogy's back office, not part of it. -->
+    <meta name="robots" content="noindex" />
+    <link rel="icon" href="../favicon.svg" type="image/svg+xml" />
+    <link href="../fonts/fonts.css" rel="stylesheet" />
+    <!-- Deliberately not the game's stylesheet. That is the whole HUD and menu system for a page
+         that is a heading, a row of chips and a frame, and every rule in it is one more thing that
+         can reflow this by accident. The tokens below are copied from it so the two still match. -->
+    <style>
+      :root {
+        --ink: #06161c; --ink-2: #0b232c; --foam: #eefaf6;
+        --mist: rgba(238, 250, 246, .72); --dim: rgba(238, 250, 246, .5);
+        --line: rgba(238, 250, 246, .14);
+        --lagoon: #61f2d5; --ember: #ffb36b;
+        --font-display: 'Unbounded', 'Arial Black', 'Segoe UI', sans-serif;
+        --font-body: 'Manrope', 'Segoe UI', system-ui, sans-serif;
+      }
+      * { box-sizing: border-box; }
+      body { margin: 0; padding: 2.2rem 1.25rem 3rem; background: var(--ink); color: var(--foam);
+             font: 16px/1.6 var(--font-body); }
+      main { max-width: 64rem; margin: 0 auto; }
+      h1 { margin: 0 0 .2rem; font: 600 1.6rem/1.2 var(--font-display); letter-spacing: .01em; }
+      h2 { margin: 2.2rem 0 .5rem; font: 600 1.05rem/1.3 var(--font-display); color: var(--lagoon); }
+      p { margin: .5rem 0; }
+      a { color: var(--lagoon); }
+      .sub { color: var(--mist); margin: 0 0 1.4rem; }
+      .panel { background: var(--ink-2); border: 1px solid var(--line); border-radius: 14px;
+               padding: 1rem 1.2rem; margin: 1rem 0; }
+      .panel.quiet { color: var(--mist); font-size: .93rem; }
+      ol, ul { margin: .5rem 0; padding-left: 1.25rem; }
+      li { margin: .3rem 0; }
+      code { background: #08303b; border: 1px solid var(--line); border-radius: 5px;
+             padding: .08em .38em; font-size: .9em; }
+      /* The drill-down. One frame, not four: the question is "which of them, and where from",
+         and four dashboards side by side answers it worse than one that can be pointed. */
+      .chips { display: flex; flex-wrap: wrap; gap: .5rem; margin: 1rem 0 .4rem; }
+      .chip { appearance: none; cursor: pointer; font: inherit; font-size: .92rem;
+              background: var(--ink-2); color: var(--foam); border: 1px solid var(--line);
+              border-radius: 999px; padding: .42rem 1rem; transition: border-color .15s, color .15s; }
+      .chip:hover { border-color: var(--lagoon); }
+      .chip[aria-pressed="true"] { background: var(--lagoon); color: #06161c; border-color: var(--lagoon); font-weight: 650; }
+      .chip-note { color: var(--dim); font-size: .88rem; margin: .1rem 0 0; min-height: 1.5em; }
+      .frame-wrap { margin-top: .9rem; border: 1px solid var(--line); border-radius: 14px;
+                    overflow: hidden; background: #fff; }
+      iframe { display: block; width: 100%; height: 78vh; min-height: 34rem; border: 0; }
+      .cols { display: flex; flex-wrap: wrap; gap: 1rem; }
+      .cols > * { flex: 1 1 17rem; }
+      .back { display: inline-block; margin-top: 2rem; color: var(--mist); }
+      @media (max-width: 560px) { iframe { height: 62vh; } }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1>Visitor stats</h1>
+      <p class="sub">Who is finding the <a href="../">Ancient Seas</a> games, and from where.</p>
+
+      <div id="mount"></div>
+
+      <h2>What this records</h2>
+      <div class="cols">
+        <div class="panel quiet">
+          <strong>Kept, per visit</strong>
+          <ul>
+            <li>Country, derived from the IP address</li>
+            <li>Referrer — the page that linked here</li>
+            <li>Browser and operating system</li>
+            <li>Screen width and language</li>
+            <li>Which page, and when</li>
+          </ul>
+        </div>
+        <div class="panel quiet">
+          <strong>Never kept</strong>
+          <ul>
+            <li>IP addresses</li>
+            <li>The full User-Agent string</li>
+            <li>Any tracker or advertising ID</li>
+            <li>Cookies — none are set, by us or by the counter</li>
+            <li>Anything about how a game was played</li>
+          </ul>
+        </div>
+      </div>
+      <p class="sub" style="margin-top:.75rem">
+        Counting is done by <a href="https://www.goatcounter.com/">GoatCounter</a>, whose
+        <a href="https://www.goatcounter.com/help/privacy">privacy page</a> is the authority on the
+        two lists above. Local play is not counted: its script skips <code>localhost</code>, private
+        addresses and <code>file://</code>, so these are other people rather than you testing a
+        biome forty times. Nothing from inside a game is recorded — no creature picked, no match
+        played, no session length. That would need a collector of our own.
+      </p>
+
+      <a class="back" href="../">← back to the trilogy</a>
+    </main>
+
+    <script type="module">
+      import { GOATCOUNTER_SITE, dashboardUrl, STATS_VIEWS } from '../src/shared/config-stats.ts';
+
+      // Two pages in one, because the honest answer differs before and after setup. Unconfigured, a
+      // blank dashboard would read as "nobody has ever played them" — the single most misleading
+      // thing this page could say — so it shows the steps instead and claims no numbers at all.
+      const url = dashboardUrl(GOATCOUNTER_SITE);
+      const mount = document.getElementById('mount');
+
+      if (!url) {
+        mount.innerHTML = `
+          <div class="panel">
+            <p><strong>Not switched on yet.</strong> Nothing is being counted, and nothing has been
+            counted in the past — this page cannot show history that was never recorded. Four steps,
+            about five minutes:</p>
+            <ol>
+              <li>Register a site at <a href="https://www.goatcounter.com/signup">goatcounter.com/signup</a>.
+                The <em>code</em> you choose becomes the dashboard subdomain.</li>
+              <li>Put that code in <code>src/shared/config-stats.ts</code> —
+                <code>export const GOATCOUNTER_SITE = 'yourcode';</code></li>
+              <li>In GoatCounter, <em>Settings → Sites that can embed GoatCounter</em>, add
+                <code>games.hoai.net</code>, so the dashboard can appear on this page rather than
+                only on theirs.</li>
+              <li>Push to <code>main</code>. The next deploy starts counting.</li>
+            </ol>
+            <p>One site covers all five counted pages: GoatCounter records the path of every visit,
+            so the three games, the trilogy page and the viewer are told apart by filtering rather
+            than by keeping separate counters. The dev workbench is not counted. Counting starts the moment it is switched on — visits before
+            that are gone, because Pages keeps no log to backfill from.</p>
+          </div>`;
+      } else {
+        const chips = STATS_VIEWS.map((v, i) =>
+          `<button class="chip" data-i="${i}" data-view="${v.id}" aria-pressed="${i === 0}">${v.name}</button>`).join('');
+        mount.innerHTML = `
+          <div class="panel">
+            <p>All five counted pages report to one counter, so this is the trilogy whole. The chips point
+            the view at one game; <strong>All of it</strong> leaves it alone, and the dashboard's own
+            <em>Pages</em> list breaks every path out there — including the trilogy page itself,
+            which sits at the site root and so has no path a filter could name without also catching
+            the games underneath.</p>
+            <div class="chips">${chips}</div>
+            <p class="chip-note" id="note"></p>
+          </div>
+          <div class="frame-wrap">
+            <iframe id="frame" title="GoatCounter dashboard" loading="lazy" referrerpolicy="no-referrer"></iframe>
+          </div>
+          <p class="sub" style="margin-top:.6rem">Frame blank, or asking you to sign in? Browsers
+          withhold the GoatCounter session cookie inside a frame on another domain. Either mark the
+          dashboard public in its settings, or use the open link above the frame — the frame is a
+          convenience, not the record.</p>`;
+
+        const frame = document.getElementById('frame');
+        const note = document.getElementById('note');
+        const show = (i) => {
+          const v = STATS_VIEWS[i];
+          const q = v.path ? `?filter=${encodeURIComponent(v.path)}&hideui=1` : '?hideui=1';
+          frame.src = `${url}/${q}`;
+          note.innerHTML = `${v.blurb} <a href="${url}/${v.path ? `?filter=${encodeURIComponent(v.path)}` : ''}"
+            target="_blank" rel="noopener">Open this view in GoatCounter ↗</a>`;
+          for (const b of document.querySelectorAll('.chip')) b.setAttribute('aria-pressed', String(+b.dataset.i === i));
+        };
+        for (const b of document.querySelectorAll('.chip')) b.addEventListener('click', () => show(+b.dataset.i));
+        show(0);
+      }
+    </script>
+  </body>
+</html>
