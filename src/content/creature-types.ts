@@ -193,14 +193,6 @@ export interface CreatureDef {
    * amphibian and two cephalopods that lay nothing of the kind.
    */
   eggShell?: 'leathery';
-  /**
-   * Hold the head steady while swimming: the neck absorbs the body's beat instead of the skull
-   * swinging with it (`src/render/steady-head.ts`). For a rower whose clip yaws its head at the
-   * stroke rate this is the difference between swimming and walking on the spot — but it is asked
-   * for by name, because a Tanystropheus' neck is meant to swing and a body that leads with its
-   * head is meant to lead with it. Presentation only.
-   */
-  steadyHead?: boolean;
   /** Four-flipper underwater flight: fast acceleration and cruise, wide turns, no reverse. */
   flight?: boolean;
   /** A stiff body driven by the tail: the best sustained cruise, a long glide, a wide turn. */
@@ -216,4 +208,3 @@ export interface CreatureDef {
   /** A body the Cambrian's `peaceful()` reckoning leaves alone until it bites: nothing hunts a grazer. */
   peaceful?: boolean;
 }
-

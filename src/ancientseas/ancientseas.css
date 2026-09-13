@@ -47,7 +47,7 @@ a:focus-visible { outline: 2px solid var(--as-gold); outline-offset: 6px; border
 .as-title-dark { background: linear-gradient(180deg, #f4dfa6 0%, var(--as-gold) 40%, var(--as-gold-2) 78%, #8a6528 100%); -webkit-background-clip: text; background-clip: text; color: transparent; filter: drop-shadow(0 2px 0 rgba(0,0,0,.6)) drop-shadow(0 0 18px rgba(230, 194, 122, .18)); }
 /* On parchment it is the paintings' ink: black with a thin pale rim, the same sepia halo the
    drawn titles carry, and the paper's own shadow. */
-.as-title-parchment { color: #15100a; text-shadow: 0 0 1px rgba(255, 244, 214, .8), 0 1px 0 rgba(255, 244, 214, .5), 0 0 10px rgba(255, 246, 222, .95), 0 0 26px rgba(247, 231, 195, .8), 0 3px 6px rgba(60, 40, 15, .3); }
+.as-title-parchment { color: #15100a; text-shadow: 0 0 1px rgba(255, 244, 214, .7), 0 0 4px rgba(255, 247, 226, .55), 0 1px 2px rgba(60, 40, 15, .22); }
 .as-title-art img { display: block; width: 100%; height: auto; }
 
 /* ================= version 1 ================= */
@@ -86,20 +86,28 @@ a:focus-visible { outline: 2px solid var(--as-gold); outline-offset: 6px; border
 }
 
 /* ================= version 2 ================= */
-.as-v2 { background: var(--as-ink); place-items: center; padding: 0; grid-template-rows: 1fr; }
-/* The stage is the painting: a parchment plate vignetted to the page's black on every side, sized
-   to the viewport like a title screen. Below 720px it becomes a tall plate the page scrolls. */
-.as-stage { position: relative; width: min(100vw, calc(100svh * 1.6)); aspect-ratio: 16 / 10; overflow: hidden; background:
+/*
+ * Two layers, because the paper and the arrangement want different shapes. The paper — the
+ * parchment, its mottle, the vignette and the seabed along the bottom — is as wide as the window,
+ * so on a screen wider than the composition it still runs edge to edge instead of sitting in the
+ * middle with black either side. The arrangement is a 16:10 plate of the height the window allows,
+ * centred inside that, so the pieces keep their proportions and nothing is cropped.
+ */
+.as-v2 { background: var(--as-ink); place-items: center; padding: 0; grid-template-rows: 1fr; height: 100svh; overflow: hidden; color: #15100a; }
+.as-paper { position: absolute; inset: 0; z-index: 0; overflow: hidden; background:
   radial-gradient(ellipse 62% 66% at 50% 48%, rgba(255, 246, 220, .35), transparent 70%),
-  radial-gradient(ellipse 82% 90% at 50% 50%, var(--as-parchment) 0%, var(--as-parchment-2) 34%, #b79b6e 52%, #7a5d3a 68%, var(--as-umber) 84%, var(--as-ink) 100%);
-  color: #15100a; }
+  radial-gradient(ellipse 82% 90% at 50% 50%, var(--as-parchment) 0%, var(--as-parchment-2) 34%, #b79b6e 52%, #7a5d3a 68%, var(--as-umber) 84%, var(--as-ink) 100%); }
 /* The paper's mottle: two soft stains the paintings' backgrounds all carry. */
-.as-stage::before { content: ''; position: absolute; inset: 0; pointer-events: none; z-index: 2; background:
+.as-paper::before { content: ''; position: absolute; inset: 0; pointer-events: none; z-index: 2; background:
   radial-gradient(ellipse 30% 26% at 22% 30%, rgba(120, 90, 50, .16), transparent 70%),
   radial-gradient(ellipse 34% 30% at 78% 66%, rgba(120, 90, 50, .14), transparent 70%),
   radial-gradient(ellipse 40% 20% at 50% 88%, rgba(60, 40, 18, .22), transparent 70%); }
+/* The seabed is as wide as the window and as tall as the plate, so the animals standing on it line
+   up with it however wide the window is. */
+.as-ground { position: absolute; left: 0; right: 0; top: 50%; transform: translateY(-50%); height: min(100svh, calc(100vw / 1.6)); }
+.as-stage { position: relative; z-index: 1; width: min(100vw, calc(100svh * 1.6)); aspect-ratio: 16 / 10; }
 
-.as-slot { position: absolute; left: var(--dx); top: var(--dy); width: var(--dw); z-index: var(--z); transform: translate(-50%, -50%) rotate(var(--dr)) scaleX(var(--df)); display: block; }
+.as-slot { position: absolute; left: var(--dx); top: var(--dy); width: var(--dw); z-index: var(--z); transform: translate(-50%, -50%) rotate(var(--dr)) scaleX(var(--df)) scale(var(--grow, 1)); display: block; }
 .as-slot img { display: block; width: 100%; height: 100%; object-fit: contain; }
 .as-slot-ground { z-index: var(--z); }
 /* The plate's own paper: it covers the stage at any shape rather than sitting on it at a size. */
@@ -107,6 +115,16 @@ a:focus-visible { outline: 2px solid var(--as-gold); outline-offset: 6px; border
 .as-slot-fill img { width: 100%; height: 100%; object-fit: cover; }
 /* A delivered animal or plant casts the faint offset shadow the paintings give their subjects. */
 .as-slot-animal.as-src-delivered img, .as-slot-plant.as-src-delivered img, .as-slot-ornament.as-src-delivered img { filter: drop-shadow(1px 3px 3px rgba(50, 32, 10, .28)); }
+/* A game is its title and the animal arching over it, so the two answer the pointer together: the
+   animal comes up in size where it stands and its shadow lengthens, which is all a plate can do.
+   It grows rather than moving because a drawing on paper that slides has come loose from the page,
+   while one that comes closer has not. `--grow` is the slot's own transform, so a piece never has
+   to restate where it sits in order to change size. */
+.as-slot-animal { transition: transform .28s cubic-bezier(.2,.8,.2,1), filter .28s; }
+.as-slot-animal.as-lit { --grow: 1.05; }
+.as-slot-animal.as-lit img { filter: brightness(1.05) drop-shadow(2px 7px 7px rgba(50, 32, 10, .32)); }
+.as-slot-animal.as-lit.as-src-stand-in img { filter: sepia(.25) contrast(.95) brightness(1.05) drop-shadow(2px 7px 7px rgba(50, 32, 10, .32)); }
+.as-slot-title.as-lit { filter: var(--as-halo) brightness(1.04); }
 /* The shipped emblems standing in are lit for the dark UI; a touch of sepia and a shadow settles them onto paper. */
 .as-slot-animal.as-src-stand-in img { filter: sepia(.25) contrast(.95) drop-shadow(1px 3px 3px rgba(50, 32, 10, .3)); transform: scale(.8); transform-origin: 50% 0; }
 
@@ -114,13 +132,15 @@ a:focus-visible { outline: 2px solid var(--as-gold); outline-offset: 6px; border
    on parchment it reads as gilt, which is not wrong for a plate, and the requested ink versions
    replace them in place.
 
-   Each title carries a pale sepia halo — the light coming off the paper behind the letters — so
-   black ink still reads where a plant or an animal's shadow darkens the parchment under it. Two
-   soft shadows for the glow and one tight dark one to seat the lettering on the page; on an image
-   it is a filter, on the typeset stand-in the same thing as a text-shadow. */
-.as-slot-title { text-decoration: none; transition: transform .28s cubic-bezier(.2,.8,.2,1), filter .28s;
-  filter: drop-shadow(0 0 6px rgba(255, 246, 222, .95)) drop-shadow(0 0 22px rgba(247, 231, 195, .75)) drop-shadow(0 2px 3px rgba(60, 40, 15, .35)); }
-a.as-slot-title:hover, a.as-slot-title:focus-visible { transform: translate(-50%, -50%) rotate(var(--dr)) scaleX(var(--df)) scale(1.04); filter: brightness(1.05); outline: none; }
+   Each title carries a faint sepia halo — the light coming off the paper behind the letters — so
+   black ink still reads where a plant or an animal's shadow darkens the parchment under it. It is
+   one soft light and one tight dark, kept in `--as-halo` so the hover state cannot drift from the
+   resting one; on an image it is a filter, on the typeset stand-in the same thing as a shadow. */
+.as-slot-title { --as-halo: drop-shadow(0 0 4px rgba(255, 247, 226, .55)) drop-shadow(0 1px 2px rgba(60, 40, 15, .22));
+  text-decoration: none; transition: transform .28s cubic-bezier(.2,.8,.2,1), filter .28s; filter: var(--as-halo); }
+/* `filter` replaces rather than adds, so the hover state has to carry the halo itself or the
+   lettering loses its light the moment the pointer arrives. */
+a.as-slot-title:hover, a.as-slot-title:focus-visible { --grow: 1.03; filter: var(--as-halo) brightness(1.04); outline: none; }
 a.as-slot-title:focus-visible img { outline: 2px solid #15100a; outline-offset: 8px; border-radius: 6px; }
 .as-slot-title.as-src-stand-in img { filter: drop-shadow(1px 3px 4px rgba(50, 32, 10, .3)); }
 .as-slot[data-slot='trilogy'] .as-title-text { height: 100%; align-content: center; }
@@ -139,12 +159,14 @@ a.as-slot-title:focus-visible img { outline: 2px solid #15100a; outline-offset: 
 
 
 @media (max-width: 720px) {
-  .as-stage { width: 100vw; aspect-ratio: 9 / 27; background:
+  .as-v2 { height: auto; min-height: 100svh; }
+  .as-stage { width: 100vw; aspect-ratio: 9 / 27; }
+  .as-ground { top: 0; transform: none; height: 100%; }
+  .as-paper { background:
     radial-gradient(ellipse 66% 60% at 50% 48%, rgba(255, 246, 220, .35), transparent 70%),
     radial-gradient(ellipse 100% 86% at 50% 50%, var(--as-parchment) 0%, var(--as-parchment-2) 34%, #b79b6e 52%, #7a5d3a 68%, var(--as-umber) 84%, var(--as-ink) 100%); }
-  .as-slot { left: var(--mx); top: var(--my); width: var(--mw); transform: translate(-50%, -50%) rotate(var(--mr)) scaleX(var(--mf)); }
+  .as-slot { left: var(--mx); top: var(--my); width: var(--mw); transform: translate(-50%, -50%) rotate(var(--mr)) scaleX(var(--mf)) scale(var(--grow, 1)); }
   .as-slot-fill { left: 0; top: 0; width: 100%; transform: none; }
-  a.as-slot-title:hover, a.as-slot-title:focus-visible { transform: translate(-50%, -50%) rotate(var(--mr)) scaleX(var(--mf)) scale(1.04); }
   .as-placeholder i { font-size: 11px; transform: scaleX(var(--mf)); }
 }
 

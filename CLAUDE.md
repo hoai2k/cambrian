@@ -69,8 +69,14 @@ unless the user explicitly asks for a PR. Steps:
   16:10 desktop stage and a 9:27 phone one — and the plate is built the same way three times over,
   one big animal arching above each era's title with two bottom-dwellers gathered under it, because
   an animal half behind another or a row spread evenly across all three eras reads as a mistake.
-  Titles clear the animals above them and carry a pale sepia halo drawn by the page, so a delivered
-  title is flat ink on transparency. `?version=1` still reaches the first draft (the three title
+  Titles clear the animals above them and carry a faint sepia halo drawn by the page (one custom
+  property used by the resting *and* hover states, because `filter` replaces rather than adds),
+  so a delivered title is flat ink on transparency. The paper is the window's and the plate is
+  the composition's — parchment and seabed span the full width while the 16:10 arrangement is
+  centred in it — so a wide screen is filled rather than letterboxed, and a game's title and the
+  animal arching over it light together, because between them they are the link — the animal comes
+  up in size where it stands rather than moving, since a drawing that slides has come loose from
+  the page. `?version=1` still reaches the first draft (the three title
   paintings whole on a dark ground) but neither version draws a switch between them: the parameter
   is for comparing drafts, not something a visitor is offered. Every piece has a brief in
   `docs/image-requests.md` (delivered ones move to the history) and lands in
@@ -208,13 +214,9 @@ unless the user explicitly asks for a PR. Steps:
   apex into the direction of travel while it beats (`bellTilt`), so re-timing that clip breaks the
   lock — which is what the bell cases in `npm run locomotion` are there to catch. Which animal has what, and how well each is actually
   attested, is `docs/research/locomotion-ideas.md`.
-- A swimmer holds its head still, and `steadyHead` makes it do so after the mixer has written the
-  pose (`src/render/steady-head.ts`): the neck gives up a share of the yaw the clip put in the
-  skull, weighted toward the base so the neck absorbs the beat instead of the head snapping to
-  centre. The yaw has to be taken about *world up carried into the parent's frame* — a neck bone's
-  own axes run along the bone, so reading the local Euler's `y` measures a twist and comes out as
-  zero. It is a patch over a clip that swings its head at the stroke rate, asked for by name because
-  a Tanystropheus' neck is meant to swing; the clip is what should be fixed.
+- Nothosaurus now holds its head still in its authored `Swim` and `Sprint` clips. The earlier
+  renderer-side `steadyHead` counter-rotation was removed when those clips were corrected; do not
+  reintroduce a runtime pose patch for motion that belongs in the reproducible Blender builder.
 - A body may shape itself to what it is on: `conformArms` bends a radial rig's arms onto the ground
   under them, or around a creature it is holding, after the mixer has written the pose
   (`src/render/conform.ts`, `npm run conform`). Presentation only, and asked for by name rather than

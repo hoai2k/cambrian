@@ -4,6 +4,24 @@ Completed image, glyph and prop briefs are archived here, newest first. Open req
 belong in [image-requests.md](image-requests.md); audio requests are in
 [audio-requests.md](audio-requests.md).
 
+## Ancient Seas Tiktaalik replacement — 2026-09-13
+
+**Completed.** `public/assets/ancientseas/animal-tiktaalik.webp` is a 1024×768 transparent
+hand-coloured natural-history engraving of *Tiktaalik roseae*, resting on its broad front fins
+with its raised head facing left. It replaces the Devonian coiled ammonoid in the trilogy plate,
+avoiding a repeated shell silhouette beside the Triassic nautiloid. The packaged asset is 152 KB
+and is integrated through `src/ancientseas/delivered.json`.
+
+The exact built-in imagegen prompt and both generation stages are retained in
+`tools/art/ancientseas/animals/`. The second stage flattened the generated checkerboard to white;
+the established packaging script then recovered real alpha while preserving the warm contact
+shadow. The packager now accepts optional asset IDs so future one-off additions do not restore
+withdrawn composition pieces.
+
+The second-pass composition also withdrew `animal-opabinia.webp`, `animal-cladoselache.webp`,
+`animal-mixosaurus.webp`, and `animal-ammonoid.webp`; their authoring sources remain available,
+but their public files and page slots intentionally remain absent.
+
 ## Ancient Seas Trilogy title-page artwork — 2026-09-13
 
 **Completed.** The complete page-art set is delivered under `public/assets/ancientseas/`: twelve animal cutouts, five plant cutouts, five title/wordmark assets, the parchment and seabed grounds, the fleuron, and four favicon sizes. The `/ancientseas/` entry point now uses the trilogy favicon set, and `src/ancientseas/delivered.json` is generated from the files actually present.

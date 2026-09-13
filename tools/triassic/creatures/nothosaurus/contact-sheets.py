@@ -3,8 +3,9 @@ from PIL import Image,ImageDraw
 from pathlib import Path
 ROOT=Path(__file__).resolve().parents[4];base=ROOT/'local/triassic-authoring/nothosaurus';dest=Path(__file__).resolve().parent
 sets={
-'paired-deformation-sheet':['Idle-0','Swim-0.225','Swim-0.675','Swim-1.125','TurnLeft-0.8','TurnRight-0.8','Attack-0.14','Attack-0.4','Attack-0.7','Bite-0.25','Heavy-0.45','Dodge-0.25'],
-'paired-actions-sheet':['Sprint-0.15','Sprint-0.45','Dive-0.7','Rise-0.7','Hit-0.3','Stagger-0.6','Guard-0.5','Parry-0.2','Eat-0.4','Death-1.6','Ability-0.5','Grab-0.6','Breath-1.2','Growth-0.75'],
+'paired-deformation-sheet':['Idle-0','Swim-0','Swim-0.612','Swim-1.224','Swim-1.512','TurnLeft-0.8','TurnRight-0.8','Attack-0.14','Attack-0.4','Attack-0.7','Bite-0.25','Heavy-0.45','Dodge-0.25'],
+'paired-actions-sheet':['Sprint-0','Sprint-0.408','Sprint-0.816','Sprint-1.008','Dive-0.7','Rise-0.7','Hit-0.3','Stagger-0.6','Guard-0.5','Parry-0.2','Eat-0.4','Death-1.6','Ability-0.5','Grab-0.6','Breath-1.2','Growth-0.75'],
+'paired-gait-sheet':['Swim-0-top','Swim-0.612-top','Swim-1.224-top','Swim-1.512-top','Sprint-0-top','Sprint-0.408-top','Sprint-0.816-top','Sprint-1.008-top'],
 'paired-volume-sheet':['side','top','mouth-Bite']}
 for sheet,names in sets.items():
  w,h=360,280;cols=2 if len(names)<4 else 4;rows=(len(names)*2+cols-1)//cols
