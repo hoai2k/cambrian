@@ -88,7 +88,7 @@ from an impression.
 | **Rhaeticosaurus** | **WRONG** | flipper span 1.00 L, each flipper ~0.36 L clear of the flank, against ~0.25 L |
 | **Birgeria** | **WRONG** | two dorsal fins, the large one at frac 0.42–0.46, against "single dorsal set far back" |
 | **Mixosaurus** | **WRONG** | caudal fin 0.284 L deep, deeply forked, two comparable lobes, against "not the post-Triassic lunate fluke" |
-| **Helicoprion** | **WRONG** | whorl modelled outside the chin; research and its own pose put it inside the jaw |
+| **Helicoprion** | ~~WRONG~~ → **OK on placement, WRONG on form** | the "disc outside the chin" was the dropped mandible of an open-mouthed generation — see the correction in section 8. The whorl is correctly seated inside the lower jaw; its *shape* is a lumpy rosette rather than a spiral, and there is phantom upper-jaw dentition |
 | **Askeptosaurus** | **WRONG** | tail 0.49–0.54 against "about two-thirds"; no neck (body full width within 0.06 of the snout) against 13 elongate cervicals |
 | Atopodentatus | OK | T-bar 0.208 L across and only 0.050 L deep; present and reading |
 | Hybodus | OK | two spined dorsals at frac 0.29 and 0.46, heterocercal tail |
@@ -278,6 +278,32 @@ it correctly, coiled inside an open mouth. **Fixable downstream: regenerate, or 
 pelvic fins are in the pose and would need a redraw if they are to go.
 
 *Helicoprion's builder directory is being worked on by another session; nothing here was touched.*
+
+#### Correction — this finding was wrong about the placement
+
+The session building Helicoprion was asked to fix the whorl against the pose and **measured it
+first instead**, which is what this audit asks of everyone else and is the right answer here.
+`tools/triassic/creatures/helicoprion/whorl-audit.py` ray-casts from every head vertex of the raw
+source: **374 of 382 whorl vertices (97.9%) have chin skin directly beneath them** — they are
+inside the mouth — and only 8 (2.1%) sit on the ventral silhouette, which is the exposed front arc
+the 2013 reconstruction calls for. 80.9% of the whorl's mass lies within 0.030 of the midline, so
+it is a single midline structure, as it should be.
+
+What this audit measured as "a toothed disc projecting outside and below the chin" is the
+**dropped mandible**: this generation has its mouth open, and an axial cross-section table cannot
+tell a lower jaw hanging below the jaw line from a whorl doing the same. The cutaway
+`tools/triassic/creatures/helicoprion/whorl-section.jpg` shows the whorl seated inside the gape.
+
+The lesson is the instrument's, not the animal's: **a silhouette method cannot judge anything
+inside a mouth**, and a body posed with its mouth open will fool it every time. Read any finding in
+this report about jaws, teeth or oral anatomy with that in mind — the method is sound for necks,
+tails, fins and body depth, which is what it was built for.
+
+The whorl is not clean, though, and the same session recorded what is actually wrong with it, none
+of it placement: its **form** is a lumpy rosette rather than a legible spiral; **157 vertices of
+upper-jaw tooth material** exist where the animal had a cartilage pad; and **51 vertices of
+lower-jaw teeth sit outside the symphysis**. Those want a regeneration, not a redraw. The pelvic
+and anal fins stand as written — they are in the pose.
 
 ### Nothosaurus — already settled
 
