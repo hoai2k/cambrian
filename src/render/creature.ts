@@ -10,6 +10,7 @@ import { settleTranslucency } from './translucency';
 import { mergeSkinnedParts } from './merge-skins';
 import { Carcass } from './carcass';
 import { ArmConform, type Surface } from './conform';
+import { SteadyHead } from './steady-head';
 import { schemeForCreature } from '../shared/palettes';
 import { creature, type CreatureId } from '../sim/creatures';
 import { lengthOf } from '../sim/actors';
@@ -106,6 +107,7 @@ export class CreatureView {
   readonly heightUnits: number;
   /** Arms that lie along what they are on, where the creature asks for it. */
   private armConform?: ArmConform;
+  private steadyHead?: SteadyHead;
   /** The Eat clip is a progress-driven performance rather than a loop. */
   readonly feedingPerformance: boolean;
   readonly authoredFeeding?: AuthoredFeeding;
@@ -146,6 +148,7 @@ export class CreatureView {
     // the materials cloned just above rather than a second set of models. Both LODs share the
     // material names the slots are read from, so a distant creature keeps its colours.
     if (this.def.conformArms) { const c = new ArmConform(this.model); if (c.active) this.armConform = c; }
+    if (this.def.steadyHead) { const h = new SteadyHead(this.model); if (h.active) this.steadyHead = h; }
     this.recolor = makeRecolor(this.model); this.recolor.setScheme(schemeForCreature(creatureId));
     // Distance haze, chained after the palette hook (which owns onBeforeCompile). Mixing the
     // finished pixel toward the water it is seen through is the only correct way to fade a body
@@ -395,6 +398,9 @@ export class CreatureView {
       if (a.state === 'dead') { this.loco?.setEffectiveWeight(Math.max(0, 1 - a.corpseT * 2)); this.oneShot?.setEffectiveWeight(def.proceduralUndulation === false ? 1 : Math.max(0.15, 1 - a.corpseT * 0.7)); }
       else this.loco?.setEffectiveWeight(this.oneShotT > 0.1 ? 0.15 : 1);
       this.mixer.update(a.hitStop > 0 ? dt * 0.1 : dt);
+      // Straight after the mixer, before anything reads the pose: the head gives up the yaw the
+      // clip put in it, unless the animal is dead, when a limp neck is the point.
+      if (a.state !== 'dead') this.steadyHead?.apply();
 
       // Limp "ragdoll": once dead the spine sags and sways with decaying wobble, and the animation
       // fades out underneath it, so the body hangs rather than holding a pose.
