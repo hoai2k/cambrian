@@ -1,0 +1,40 @@
+{
+  "schemaVersion": 1,
+  "createdAt": "2026-09-13",
+  "tool": "builtin image_gen.imagegen",
+  "purpose": "Candidate05 redraw from the fetched reviewer reference, followed by the corrected human-approved full-neck Tripo input.",
+  "externalInputs": [
+    {
+      "url": "https://clickpetroleoegas.com.br/wp-content/uploads/2026/01/Tanystropheus-hydroides.jpg",
+      "local": "references/tanystropheus/reviewer-neck-reference.jpg",
+      "sha256": "0f67824ad583bcc306e7715327b78c29d0d51b98e75ae9250b43faa193f963dd",
+      "role": "Reviewer-supplied neck proportion and shore-reaching pose reference; steering only, not shipped."
+    }
+  ],
+  "subjects": {
+    "tanystropheus": {
+      "status": "greenlit-and-promoted",
+      "candidate": "tanystropheus-candidate05.png",
+      "original": "tanystropheus-candidate04.png",
+      "reviewerNote": "Human-approved after the neck-proportion redraw; use the full canonical for silhouette and the shortened-neck model input for Tripo.",
+      "prompt": "Precise edit using candidate04 for species identity and the fetched reviewer image for proportion. Make the low rigid neck longer than head, torso and complete tail combined and dominant across the frame; compact the body on shore, reach the head left over water, retain all four feet and the complete tail, brown-and-cream mottling, and full-body modeling-reference clarity. No literal sauropod anatomy, upright neck, modern vegetation, extra limbs, cropping, labels or text.",
+      "generatedSource": "/Users/hoai/.codex/generated_images/01a09ac3-37dc-7381-ad26-8d5c8cd87ad6/exec-aa8b18be-15f8-454c-a3f3-879112f1b66a.png",
+      "inputImage": "tanystropheus-candidate04.png",
+      "sha256": "128a7053946126d2e5ff2e435887691cfb4eab5c004e1b90efe0ecaf9f0dfc12",
+      "originalSha256": "bb3a8112669b0db3998c86f1617afb04e0cbb8a029dbef60854fb3b48a61e6f6",
+      "dimensions": [
+        1536,
+        1024
+      ],
+      "visualReview": "The neck now spans most of the frame and clearly dominates the compact shore-bound body; complete head, four feet and tail are visible.",
+      "reviewedAt": "2026-09-13T19:15:00.000Z"
+    }
+  },
+  "modelInputCorrection": {
+    "reason": "The first model input incorrectly followed an obsolete short-neck-stub pipeline note and contradicted the approved canonical.",
+    "prompt": "Isolate the complete approved Tanystropheus on pale neutral studio gray, preserving the uninterrupted neck longer than compact torso and tail combined. Include the full neck in both the single image-to-3D input and all four turnaround views; do not use a neck stub.",
+    "inputSha256": "53927cf8b3507d983ebc2d72fd32c24f965ad9bfa12753816a2671d50c45dd3e",
+    "turnaroundSha256": "4ca4e1abb8fafe29f7d5dabd51a263b5f37b9a9489f776c16a2adec3fbb38e48",
+    "visualReview": "Both files now preserve the canonical's dominant full neck, compact body, four feet and complete tail on neutral gray."
+  }
+}

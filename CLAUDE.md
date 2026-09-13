@@ -92,6 +92,23 @@ unless the user explicitly asks for a PR. Steps:
   with the picture kept out of the keyboard's way so a game is one stop rather than two.
   `npm run ancientseas` checks all of it; `node tools/ancientseas-smoke.mjs <outdir>` screenshots
   the page against a preview build and follows the three links.
+- The wordmark the interface draws is derived, not delivered: `npm run logos`
+  (`tools/art/header-logos.mjs`) reads each era's delivered `logo-engraved.webp` and writes
+  `logo-header.webp` beside it, which is what `assets.logo` and the pick screen's era menu point
+  at. The three were drawn at different times and did not read alike at the 190 pixels the pick
+  screen gives them — the Triassic's letters are a thin gold rim around a black face, mean ink
+  luminance 55 against 107 and 98 — so each mark's ink keeps its own *rank* (stipple, rim and
+  shading stay where they are) while the luminance that rank is worth comes from one reference
+  mark's distribution, and the result is coloured through one gold ramp. Each is then trimmed to
+  its own lettering and re-seated on one canvas at one height, because the delivered marks sit in
+  their canvases differently and drew at three different sizes from one CSS rule. Re-run it after
+  any brand wordmark is redelivered; the delivered files are never touched.
+- The trilogy page answers a controller (`src/ancientseas/picker.ts`): the pad walks the three
+  games in the order they stand on the plate, lights the one it is on with the same lighting the
+  pointer gives, and A or Start opens it — not any button, because B on a picker means back. The
+  arrow keys do the same. It polls on the frame clock only while a pad is actually connected. A
+  headless check has to give the page a pad to read *and* a browser with a working frame clock:
+  under the software renderer the game pages need, a page that draws no WebGL barely gets frames.
 - A game's title screen is drawn from the first frame, before the creatures have streamed in: it
   used to wait for them, and until then the page was the sea the engine had already started
   drawing, so arriving from a link showed the water and then cut to the title. It says it is
@@ -99,6 +116,18 @@ unless the user explicitly asks for a PR. Steps:
   `src/app/Loading.tsx`) it grows a progress bar under that line. The full boot screen is for a
   boot nobody is looking at a screen for — deep-linked to the roster — because over the title it
   would be the title's own painting a second time.
+- Fullscreen rides across a change of game rather than surviving it, because it cannot survive it:
+  it belongs to the document, switching game is a page load, and the new document may only enter
+  on a user gesture of its own. (A query parameter would change nothing — `/cambrian/?game=devonian`
+  reached by a link is still a new document. Only a same-document navigation keeps it, and the
+  content layer reads `ACTIVE_ERA` at import time, so a second era cannot be booted into a document
+  that has already loaded one.) So `src/shared/fullscreen.ts` writes down every entry and exit in
+  `sessionStorage`, and each page puts itself back on the first click or key it sees — on a title
+  screen that is the press that starts the game anyway. `enterFullscreen` is deliberately not a
+  toggle: the toolbar button is the one control that toggles, and a start that toggled would take
+  a player who arrived fullscreen straight back out. `npm run fullscreen` covers the decision and
+  `tools/ancientseas-smoke.mjs` the whole trip, on the roster screen where a stray click starts
+  nothing and so shows the restore on its own.
 - An era's `assets.sfx` names the shared sound library (`assets/sfx/`): bites, hits and the UI are the
   same files in both eras. Era-specific samples are addressed as `<era>/<name>` and resolve under
   `assets/<era>/sfx/` regardless. The two always-on beds are named per era in `audio.loops`, and a

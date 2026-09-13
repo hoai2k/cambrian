@@ -124,20 +124,10 @@
     },
     "tanystropheus": {
       "turnaround": "not-started",
-      "awaitingReview": "a regenerated candidate is in the viewer beside the pose it replaces",
-      "reviewedCandidate": "candidate04",
-      "canonical": "needs-rework",
-      "reworkToward": {
-        "kind": "web",
-        "title": "Tanystropheus hydroides reaching out over the water",
-        "artist": "Unknown — reviewer-supplied URL",
-        "licence": "Unknown; steering reference only, not for redistribution or shipping",
-        "page": "https://clickpetroleoegas.com.br/wp-content/uploads/2026/01/Tanystropheus-hydroides.jpg",
-        "full": "https://clickpetroleoegas.com.br/wp-content/uploads/2026/01/Tanystropheus-hydroides.jpg",
-        "description": "The reference the reviewer supplied for candidate03 and is naming again for candidate04. Its neck-to-body proportion is the point: the neck is the animal's identifying feature and dwarfs the trunk."
-      },
-      "reworkNote": "Candidate04 repeats candidate03's fault, so this is a redraw against the same reference as last time. The defining characteristic of this animal is the NECK: it must read as extraordinarily long and prominent RELATIVE TO THE BODY. Every candidate so far has made the torso too massive and the neck too short for it — chasing the 'sauropod body' note has cost the proportion that actually identifies the species. Take the reference image's proportions as indicative: neck clearly longer than head, torso and tail combined. Fetch the reference this round rather than working from the written description alone; the previous attempt could not retrieve it and drifted without it. For the model that follows: the neck is what has to be right, because it is nearly all the player will see. Tanystropheus is a shore animal that strikes into the water from the bank, so the neck and head come into frame and the torso, limbs and tail usually stay out of it. Put the geometry and the detail into the neck and head; the body, limbs and tail can be comparatively simple.",
-      "decidedAt": "2026-09-13T18:54:11.138683Z"
+      "canonical": "greenlit",
+      "decidedAt": "2026-09-13T19:15:00.000Z",
+      "note": "Human-approved after the neck-proportion redraw; the canonical, single-model input and turnaround all preserve the complete extraordinarily long neck.",
+      "promotedFrom": "candidate05"
     },
     "mystriosuchus": {
       "turnaround": "not-started",
@@ -161,6 +151,118 @@
       "decidedAt": "2026-09-13T01:05:52.838Z",
       "greenlitImage": "male",
       "reviewedCandidate": "male"
+    },
+    "encrinus": {
+      "canonical": "approved",
+      "turnaround": "not-requested",
+      "awaitingReview": "the first canonical pose is in the viewer"
+    },
+    "encrinus-litter": {
+      "canonical": "needs-rework",
+      "turnaround": "not-requested",
+      "awaitingReview": "the first canonical pose is in the viewer",
+      "reworkToward": {
+        "kind": "canonical",
+        "label": "canonical pose"
+      },
+      "reworkNote": "These are instanced props: one mesh, no rig, a few hundred triangles, vertex colours, pivot at the base centre where the prop meets the ground, scattered by the thousand and bent and swayed in the shader. The canonical pose is what the model is built from, so it has to show the organism AS IT SITS ON THE GROUND, not as a museum specimen. This is specified as a ground DECAL-MESH 0.6 wide — a flat scatter lying on the seabed where the moulted and the dead lie. The image draws a deep rounded HEAP of about a hundred columnals, several layers thick, with a domed profile. Built from this it becomes a mound of rubble, which is not what the pavement and the garden need and reads as a cairn among flat ground cover. Redraw as a single-layer scatter seen from a high three-quarter angle: ten to twenty loose columnals and two or three short stem lengths lying flat and separate on the sediment, the widest piece no more than a fifth of the patch, plenty of bare ground showing between them, and the whole thing essentially flat — height no more than one part in eight of its width. No pile, no mound, no container edge.",
+      "decidedAt": "2026-09-13T19:28:44.522739Z"
+    },
+    "diplopora": {
+      "canonical": "approved",
+      "turnaround": "not-requested",
+      "awaitingReview": "the first canonical pose is in the viewer"
+    },
+    "thecosmilia": {
+      "canonical": "approved",
+      "turnaround": "not-requested",
+      "awaitingReview": "the first canonical pose is in the viewer"
+    },
+    "calcisponge": {
+      "canonical": "approved",
+      "turnaround": "not-requested",
+      "awaitingReview": "the first canonical pose is in the viewer"
+    },
+    "placunopsis-mound": {
+      "canonical": "approved",
+      "turnaround": "not-requested",
+      "awaitingReview": "the first canonical pose is in the viewer"
+    },
+    "daonella-bed": {
+      "canonical": "needs-rework",
+      "turnaround": "not-requested",
+      "awaitingReview": "the first canonical pose is in the viewer",
+      "reworkToward": {
+        "kind": "canonical",
+        "label": "canonical pose"
+      },
+      "reworkNote": "These are instanced props: one mesh, no rig, a few hundred triangles, vertex colours, pivot at the base centre where the prop meets the ground, scattered by the thousand and bent and swayed in the shader. The canonical pose is what the model is built from, so it has to show the organism AS IT SITS ON THE GROUND, not as a museum specimen. This is the pavement biome's floor, 1.2 wide, instanced fourteen to the area — the thing the player swims over. The image draws a QUARRIED FOSSIL SLAB: shells compressed into dark grey-black shale, with a thick raised rim like a cut block. Built from this, the pavement becomes black stone plaques dropped on a pale carbonate floor, and the rim models as a plinth standing proud of the sand. Redraw as a living shell bed on the sea floor: flat Daonella valves, thin and near-circular with fine radial ribs, lying loose and overlapping at shallow angles directly on pale carbonate sediment, some half-buried, a few tilted. Pale buff and cream shells on light sediment, no dark shale, no matrix block, no cut edge or rim — the patch should fade into the sand at its margin rather than stopping at a wall. High three-quarter view. Three orientations are wanted, so keep the outline roughly circular rather than a rectangle.",
+      "decidedAt": "2026-09-13T19:28:44.522739Z"
+    },
+    "brachiopod-cluster": {
+      "canonical": "needs-rework",
+      "turnaround": "not-requested",
+      "awaitingReview": "the first canonical pose is in the viewer",
+      "reworkToward": {
+        "kind": "canonical",
+        "label": "canonical pose"
+      },
+      "reworkNote": "These are instanced props: one mesh, no rig, a few hundred triangles, vertex colours, pivot at the base centre where the prop meets the ground, scattered by the thousand and bent and swayed in the shader. The canonical pose is what the model is built from, so it has to show the organism AS IT SITS ON THE GROUND, not as a museum specimen. This is a 0.3-unit cluster of small food on the seabed. The image draws a FOSSIL NODULE: the shells are set into a large rounded lump of rock matrix that makes up most of the object's volume, so what gets built is a stone with shells in it rather than a cluster of animals. Redraw as living Coenothyris clustered on the sea floor: six to ten small, smooth, oval biconvex brachiopods with a clear beak and pedicle opening, attached close together and to each other on a thin patch of hard ground, shells clearly the bulk of the object and the substrate a low crust rather than a boulder. High three-quarter view, pale shells on pale sediment.",
+      "decidedAt": "2026-09-13T19:28:44.522739Z"
+    },
+    "cidaris": {
+      "canonical": "needs-rework",
+      "turnaround": "not-requested",
+      "awaitingReview": "the first canonical pose is in the viewer",
+      "reworkToward": {
+        "kind": "canonical",
+        "label": "canonical pose"
+      },
+      "reworkNote": "These are instanced props: one mesh, no rig, a few hundred triangles, vertex colours, pivot at the base centre where the prop meets the ground, scattered by the thousand and bent and swayed in the shader. The canonical pose is what the model is built from, so it has to show the organism AS IT SITS ON THE GROUND, not as a museum specimen. The urchin itself reads well — a cidaroid test with stout club-shaped primary spines is right. The fault is that it FLOATS: it is drawn as a specimen suspended in space with spines radiating equally in every direction including straight down, and there is no ground plane anywhere in the image. This prop is 0.3 units sitting on the reef floor, so built from this its lower spines drive through the sand. Redraw it resting on the substrate: oral surface down on the sediment, the test sitting just clear of the floor on the short ventral spines, the long club spines directed upward and outward, and the sediment surface visible under it so the contact is unambiguous.",
+      "decidedAt": "2026-09-13T19:28:44.522739Z"
+    },
+    "reef-block": {
+      "canonical": "approved",
+      "turnaround": "not-requested",
+      "awaitingReview": "the first canonical pose is in the viewer"
+    },
+    "neocalamites": {
+      "canonical": "needs-rework",
+      "turnaround": "not-requested",
+      "awaitingReview": "the first canonical pose is in the viewer",
+      "reworkToward": {
+        "kind": "canonical",
+        "label": "canonical pose"
+      },
+      "reworkNote": "These are instanced props: one mesh, no rig, a few hundred triangles, vertex colours, pivot at the base centre where the prop meets the ground, scattered by the thousand and bent and swayed in the shader. The canonical pose is what the model is built from, so it has to show the organism AS IT SITS ON THE GROUND, not as a museum specimen. The plant is right — a jointed horsetail clump with whorled leaves is exactly the read. The fault is that it is drawn as an UPROOTED SPECIMEN: the rhizome and a full mass of fine roots hang below in open air, and that root ball is a third of the silhouette. The pose is the contract, so a modeller either builds those roots, and the game then draws a horsetail hovering above the sand with its roots in the air, or omits them and the body no longer matches the pose. Redraw with the plant standing in the ground: cut the image at the ground line, show the stems emerging from the substrate with at most a little basal swelling and some scattered litter where they enter it, and no visible roots. Keep the clump, the joints, the whorls and the 3-unit proportion.",
+      "decidedAt": "2026-09-13T19:28:44.522739Z"
+    },
+    "pleuromeia": {
+      "canonical": "needs-rework",
+      "turnaround": "not-requested",
+      "awaitingReview": "the first canonical pose is in the viewer",
+      "reworkToward": {
+        "kind": "canonical",
+        "label": "canonical pose"
+      },
+      "reworkNote": "These are instanced props: one mesh, no rig, a few hundred triangles, vertex colours, pivot at the base centre where the prop meets the ground, scattered by the thousand and bent and swayed in the shader. The canonical pose is what the model is built from, so it has to show the organism AS IT SITS ON THE GROUND, not as a museum specimen. The plant is right — unbranched trunk, rhomboid leaf scars, a crown of strap leaves and a terminal cone is exactly Pleuromeia, and it is a good distinctive silhouette. The fault is the same as the other two shore plants: it is drawn as an UPROOTED SPECIMEN, with the bulbous rhizomorph and a spreading mass of roots fully exposed below, making up nearly half the height. Redraw with the plant standing in the ground: cut at the ground line so the rhizomorph base is only just emerging, or buried entirely, and show no free roots. Keep the trunk, the scars, the strap-leaf crown and the cone, and keep the 2-unit proportion.",
+      "decidedAt": "2026-09-13T19:28:44.522739Z"
+    },
+    "bjuvia": {
+      "canonical": "needs-rework",
+      "turnaround": "not-requested",
+      "awaitingReview": "the first canonical pose is in the viewer",
+      "reworkToward": {
+        "kind": "canonical",
+        "label": "canonical pose"
+      },
+      "reworkNote": "These are instanced props: one mesh, no rig, a few hundred triangles, vertex colours, pivot at the base centre where the prop meets the ground, scattered by the thousand and bent and swayed in the shader. The canonical pose is what the model is built from, so it has to show the organism AS IT SITS ON THE GROUND, not as a museum specimen. Two faults. First, the same as the other shore plants: it is drawn as an UPROOTED SPECIMEN with a wide spreading root mass fully exposed below the trunk, which would model as roots hovering over the beach. Cut at the ground line and show no free roots. Second, the leaves are wrong for the genus: this draws a normal pinnate cycad with divided, feather-like fronds, but Bjuvia is the cycad with SIMPLE, ENTIRE leaves — broad undivided strap- or tongue-shaped blades with a single midrib, not split into leaflets. That undivided leaf is the whole reason the plant is recognisable and the reason the genus is named for its simplicity. Redraw as a squat trunk in the ground carrying a rosette of broad, entire, strap-shaped leaves, 1.5 units overall.",
+      "decidedAt": "2026-09-13T19:28:44.522739Z"
+    },
+    "shore-boulder": {
+      "canonical": "approved",
+      "turnaround": "not-requested",
+      "awaitingReview": "the first canonical pose is in the viewer"
     },
     "voltzia": {
       "canonical": "approved",
