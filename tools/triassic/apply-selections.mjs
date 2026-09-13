@@ -90,7 +90,7 @@ for (const row of selections) {
     // A greenlit subject can carry a note too — a caveat the build should know about — and it has
     // to survive the round trip, or the viewer reloads without it and the reviewer retypes it.
     if (row.note) entry.note = row.note; else delete entry.note;
-    delete entry.reworkToward; delete entry.reworkNote;
+    delete entry.reworkToward; delete entry.reworkNote; delete entry.awaitingReview;
   } else {
     entry.canonical = 'needs-rework';
     // A redo does not have to name somebody else's picture. "Redraw this one — the reading is
@@ -124,6 +124,7 @@ for (const { id, label } of promotions) {
   }
   const entry = manifest.subjects[id];
   delete entry.greenlitImage; delete entry.reviewedCandidate;
+  delete entry.awaitingReview;
   entry.promotedFrom = label;
   promoted.push(`${id} (${label})`);
 }
@@ -166,8 +167,14 @@ for (const id of shipped) {
   if (entry.canonical === 'greenlit') entry.greenlitAt = entry.decidedAt;
   entry.canonical = 'delivered';
   entry.deliveredAt = new Date().toISOString().slice(0, 10);
-  delete entry.reworkToward; delete entry.reworkNote;
+  delete entry.reworkToward; delete entry.reworkNote; delete entry.awaitingReview;
 }
+
+// `awaitingReview` describes only the interval between a regenerated candidate landing and a
+// human deciding it. Older manifests may retain the historical note after that human decision;
+// clear it without changing the decision itself.
+for (const entry of Object.values(manifest.subjects))
+  if (entry.canonical === 'greenlit' || entry.canonical === 'delivered') delete entry.awaitingReview;
 
 /**
  * A pose has been regenerated. The prompt records beside the poses mark a fresh candidate as
@@ -302,12 +309,12 @@ function refinementReason(id) {
     return 'The Triassic model has landed and the game and the specimen viewer both load it'
       + `${e.deliveredAt ? ` (${e.deliveredAt})` : ''}. It keeps the preview badge until a human approves the body itself: `
       + 'the generated shape, its procedural twin and the clips they share (docs/triassic/04-tripo-pipeline.md).';
-  if (e.awaitingReview)
-    return `${BORROWED} Its canonical pose is back under review — ${e.awaitingReview} `
-      + '(docs/triassic/canonical/review.md) — so nothing downstream may be built from it yet.';
   if (e.canonical === 'greenlit')
     return `${BORROWED} Its canonical pose is greenlit${e.greenlitImage ? ` (the \`${e.greenlitImage}\` pose)` : ''} in `
       + 'docs/triassic/canonical/review.md, so the four-view modelling sheet and the Tripo generation are cleared to be made from it.';
+  if (e.awaitingReview)
+    return `${BORROWED} Its canonical pose is back under review — ${e.awaitingReview} `
+      + '(docs/triassic/canonical/review.md) — so nothing downstream may be built from it yet.';
   if (e.canonical === 'needs-rework') {
     const t = e.reworkToward ?? {};
     const steer = t.kind === 'web' ? `a redo steered toward "${t.title}"` : 'a redraw of our own pose';

@@ -7,7 +7,6 @@
     "cymbospondylus": {
       "turnaround": "not-started",
       "canonical": "greenlit",
-      "awaitingReview": "a regenerated candidate is in the viewer beside the pose it replaces",
       "decidedAt": "2026-09-13T13:52:17.045Z",
       "promotedFrom": "candidate02",
       "reviewedCandidate": "candidate02",
@@ -111,7 +110,6 @@
     "odontochelys": {
       "turnaround": "not-started",
       "canonical": "greenlit",
-      "awaitingReview": "a regenerated candidate is in the viewer beside the pose it replaces",
       "decidedAt": "2026-09-13T13:57:25.792Z",
       "promotedFrom": "candidate02",
       "reviewedCandidate": "candidate02",
