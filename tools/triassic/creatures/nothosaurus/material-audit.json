@@ -17,6 +17,7 @@
         "Swim"
       ],
       "tailChannelsUnchanged": true,
+      "baselineCommit": "67f7cf3c008fc06cf5be95240222a39177430748",
       "baselineSha256": "6cab5d0fb827290c4b7d668d7814ee76c545bafae01d84bb43ef4d8d2070c674"
     },
     {
@@ -32,6 +33,7 @@
         "Swim"
       ],
       "tailChannelsUnchanged": true,
+      "baselineCommit": "67f7cf3c008fc06cf5be95240222a39177430748",
       "baselineSha256": "16d0f37adaf97df2d88ce50a83ae29bc73655b725667d601b67e260714cc2c29"
     },
     {
@@ -47,6 +49,7 @@
         "Swim"
       ],
       "tailChannelsUnchanged": true,
+      "baselineCommit": "67f7cf3c008fc06cf5be95240222a39177430748",
       "baselineSha256": "16d0f37adaf97df2d88ce50a83ae29bc73655b725667d601b67e260714cc2c29"
     }
   ],

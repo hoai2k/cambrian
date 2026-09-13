@@ -3,6 +3,9 @@ import fs from 'node:fs';import assert from 'node:assert/strict';import crypto f
 import {NodeIO}from'@gltf-transform/core';import{ALL_EXTENSIONS}from'@gltf-transform/extensions';import{MeshoptDecoder}from'meshoptimizer';await MeshoptDecoder.ready;
 const io=new NodeIO().registerExtensions(ALL_EXTENSIONS).registerDependencies({'meshopt.decoder':MeshoptDecoder});const sha=x=>crypto.createHash('sha256').update(x).digest('hex');const data=a=>Array.from(a.getArray());
 const sourcePath='tools/triassic/creatures/nothosaurus/tripo-raw/nothosaurus.raw.glb';
+// Last main commit containing the diagnosed walking-gait exports. Pinning the
+// comparison makes this audit reproducible after the correction itself is committed.
+const motionBaseline='67f7cf3c008fc06cf5be95240222a39177430748';
 const source=await io.read(sourcePath),sourceAlbedo=source.getRoot().listMaterials()[0].getBaseColorTexture();const report={sourceSha256:sha(fs.readFileSync(sourcePath)),sourceAlbedoSha256:sha(sourceAlbedo.getImage()),models:[]};
 function topology(p){const a=p.getIndices().getArray(),rows=[];for(let i=0;i<a.length;i+=3){const tri=[a[i],a[i+1],a[i+2]],k=tri.indexOf(Math.min(...tri));rows.push([tri[k],tri[(k+1)%3],tri[(k+2)%3]].join(','));}return rows.sort();}
 function structure(d){return{skins:d.getRoot().listSkins().map(s=>({joints:s.listJoints().map(n=>[n.getName(),n.getParentNode()?.getName(),n.getTranslation(),n.getRotation(),n.getScale()]),bind:data(s.getInverseBindMatrices())})),meshes:d.getRoot().listMeshes().map(m=>m.listPrimitives().map(p=>({orientedTriangles:topology(p),attributes:p.listSemantics().filter(s=>s!=='COLOR_0').sort().map(s=>[s,data(p.getAttribute(s))])})))};}
@@ -13,10 +16,10 @@ for(const suffix of ['', '.puppet','.lod1']){
  const file='public/assets/triassic/creatures/nothosaurus'+suffix+'.glb',d=await io.read(file);const body=d.getRoot().listMaterials().find(m=>/Nothosaurus (body pigmentation|puppet body)/.test(m.getName()));const row={suffix,sha256:sha(fs.readFileSync(file)),baseColorTexture:body.getBaseColorTexture()?.getName()??null,normalScale:body.getNormalScale(),roughness:body.getRoughnessFactor(),metallic:body.getMetallicFactor()};
  assert.equal(body.getMetallicFactor(),0);assert.equal(body.getMetallicRoughnessTexture(),null);
  if(!suffix){assert(body.getBaseColorTexture());assert.equal(sha(body.getBaseColorTexture().getImage()),report.sourceAlbedoSha256);assert(Math.abs(body.getNormalScale()-.15)<1e-6);assert(Math.abs(body.getRoughnessFactor()-.7)<1e-6);let count=0;for(const m of d.getRoot().listMeshes())for(const p of m.listPrimitives())if(p.getMaterial()===body){const a=p.getAttribute('COLOR_0');assert(a);const white=a.getNormalized()?(a.getComponentType()===5123?65535:255):1;for(const n of a.getArray())assert.equal(n,white);count+=a.getCount();}row.whiteColorVertices=count;row.sourceAlbedoPreservedExactly=true;}
- const baseline=execFileSync('git',['show',`HEAD:${file}`],{maxBuffer:16*1024*1024}),old=await io.readBinary(baseline);assert.deepEqual(structure(d),structure(old));
+ const baseline=execFileSync('git',['show',`${motionBaseline}:${file}`],{maxBuffer:16*1024*1024}),old=await io.readBinary(baseline);assert.deepEqual(structure(d),structure(old));
  const currentClips=clipHashes(d),oldClips=clipHashes(old),changed=Object.keys(currentClips).filter(name=>currentClips[name]!==oldClips[name]).sort();assert.deepEqual(changed,['Sprint','Swim']);
  for(const name of changed)assertTailClose(tailChannels(d,name),tailChannels(old,name));
- row.geometryNormalsUvWeightsRigUnchanged=true;row.intentionallyChangedClips=changed;row.tailChannelsUnchanged=true;row.baselineSha256=sha(baseline);
+ row.geometryNormalsUvWeightsRigUnchanged=true;row.intentionallyChangedClips=changed;row.tailChannelsUnchanged=true;row.baselineCommit=motionBaseline;row.baselineSha256=sha(baseline);
  report.models.push(row);
 }
 // Original source UV corners vs unchanged exported skin vertices, after the exact axis/scale transform.
