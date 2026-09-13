@@ -6,6 +6,8 @@ The 18 human-greenlit creatures now each have a dedicated single-model input and
 
 Nothosaurus and Shonisaurus now ship authored Tripo bodies plus procedural volume twins with **identical skeletons, inverse binds, action samples and anchors within each pair**. The puppet also supplies LOD1. Both pairs are registered in the game and viewer, with model-rendered portraits replacing their placeholders, and remain preview models pending human visual approval. See [delivery state](IMAGE-MODEL-HANDOFF.md), [Nothosaurus pipeline](../../tools/triassic/creatures/nothosaurus/README.md), and [Shonisaurus pipeline](../../tools/triassic/creatures/shonisaurus/README.md). Raw Tripo tests are preserved in `tools/triassic/creatures/<id>/tripo-raw/`. The request tables below remain the broader roster specification, not a claim that every listed deliverable is still missing.
 
+**Plants and props have no canonical poses.** The greenlight-before-you-build rule was applied to the twenty-five animals and never extended to the scenery, so the reference viewer's scenery group shows external references with none of ours to choose between, and the nineteen B2 prop and plant kinds were specified in prose alone. **A5** below requests the missing canonical poses and model-input sheets; every unbuilt B2 row now points at it, and the four Tier 1 scenery subjects need the four-view sheet even though their poses are delivered.
+
 **Status:** open requests, 12 September 2026. Everything the Triassic needs that does not exist,
 in two tiers by who makes it, and in two passes by what it is: **source images** first (reference
 boards and the orthographic views Tripo is fed), **3D models** second, each model request
@@ -93,6 +95,48 @@ and `-turnaround` PNGs under `docs/triassic/canonical/` (twelve derived source v
 | `sponge-mound` | A Tubiphytes and sponge crust mound with visible chambers. |
 | `voltzia` | The shore conifer, three sizes; drooping shoots, cone clusters. |
 
+### A5 · Canonical poses and model inputs for plants and props (Tier 2, in-house)
+
+**Open, and the reason the reference viewer shows no canonical image for any plant or prop.** The
+era's rule is that art is greenlit before it is built from: every subject gets one approved
+canonical pose, and the modelling sheet and the shipped body are derived from that one image
+(`CLAUDE.md`, [`canonical/README.md`](../triassic/canonical/README.md)). That rule was applied to
+the twenty-five creatures and shore animals and never extended to the scenery, so the nineteen
+instanced prop and plant kinds of B2 were specified in prose alone. `apply-selections.mjs` says so
+in as many words — *"the alternates and the scenery have no pose of their own"* — and the viewer's
+**Scenery, plants and the shore** group therefore carries external reference images with nothing of
+ours beside them to choose between. A builder script written from prose is exactly the drift the
+canonical rule exists to stop, and a plant is as easy to get wrong as an animal: `diplopora` is a
+calcified alga and `encrinus` a stalked crinoid, and neither reads correctly from a one-line note.
+
+Deliver per subject, in this order, the same way the creatures went:
+
+1. **Canonical pose** — one image, `docs/triassic/canonical/<id>.png`, 2048×2048 PNG on the
+   modelling-sheet background, the whole organism with nothing cropped: the holdfast or base where
+   it meets the seabed, the full stem or wall, and the crown or margin. Side-on unless the subject
+   reads better from three-quarters (`daonella-bed`, `placunopsis-mound` and the rock slots are
+   plan-view subjects). Generated as candidates into the reference viewer, chosen by a human there,
+   and applied with `node tools/triassic/apply-selections.mjs <file>` — the same three decisions the
+   creatures had (greenlight ours, redraw ours, regenerate toward a reference that beat it).
+2. **Model-input sheet** — `docs/triassic/canonical/model-inputs/<id>/`, four views (side, top,
+   front, three-quarter) derived *from the approved pose*, matching the twenty-one creature sheets
+   already there. For a Tier 2 prop this is a modelling guide for the builder script, not a Tripo
+   input: it fixes the proportions the script lofts, so `npm run shapes` measures a footprint from
+   a shape somebody approved.
+3. **Variant note** — one line per variant on the sheet saying what differs (stem height, plate
+   curl, block angle), since B2's variants are one builder with parameters rather than separate
+   subjects.
+
+| Subjects | Canonical pose | Model-input sheet |
+| --- | --- | --- |
+| The 16 unbuilt B2 kinds: `encrinus`, `encrinus-litter`, `diplopora`, `thecosmilia`, `calcisponge`, `placunopsis-mound`, `daonella-bed`, `ceratite-drift`, `brachiopod-cluster`, `cidaris`, `reef-block`, `drift-log`, `neocalamites`, `pleuromeia`, `bjuvia`, `shore-boulder` | **Requested — none exists.** | **Requested — none exists.** |
+| The 3 built B2 kinds: `stromatolite`, `salt-crust`, `mud-ripple` | Not requested retroactively. | Not requested retroactively. |
+| The 4 Tier 1 scenery: `log-raft`, `coral-head`, `sponge-mound`, `voltzia` | **Delivered** (A3), though approved through `scenery-prompts.json` rather than the viewer, and only as side and top. | **Requested — none exists.** These go through Tripo, so they need the same four-view sheet the creatures get; A3's three views predate the `model-inputs/` mechanism. |
+
+`ceratite-drift` stays blocked on the `ceratites` model as B2 says: it is that shell reused, so it
+takes the animal's canonical pose and needs no pose of its own — only the half-buried placement
+note. `drift-log` is the Devonian `submerged-log` re-pivoted and likewise needs no new pose.
+
 ### A4 · Paintings, glyphs and plates (Tier 2, in-house)
 
 | File | Size | Brief | Status |
@@ -149,7 +193,7 @@ follow the instanced-prop rules on the requests page.
 
 | Id | Blocked on | Clips |
 | --- | --- | --- |
-| `tanystropheus` | A2 S01 | Procedural 13-joint neck with the rib struts as ridges. `Watch` (idle, head under the surface), `Lower` (telegraph), `SnapLeft`, `SnapRight`, `Drag`, `Retract`, `Severed` (body one-shot), `Flee`. |
+| `tanystropheus` | A2 S01 (**pose in redraw** — see `canonical/review.md`) | Procedural 13-joint neck with the rib struts as ridges. `Watch` (idle, head under the surface), `Lower` (telegraph), `SnapLeft`, `SnapRight`, `Drag`, `Retract`, `Severed` (body one-shot), `Flee`. **Spend the budget on the neck and head.** This animal strikes into the water from the bank, so the neck and head are nearly all a player ever sees; the torso, limbs and tail are usually out of frame behind the shoreline and can be comparatively simple. The neck is also the species' identifying feature and every candidate pose so far has under-length it against the trunk. |
 | `mystriosuchus` | A2 S02 | `Float` (crest showing), `Lunge`, `Bite`, `SlideIn`, `Bask`. |
 | `macrocnemus` | A2 S03 | `Stand`, `Run`, `Bolt`. |
 | `coelophysis` (optional) | A2 S04 | `Drink`, `Snatch`, `Look`. |
@@ -158,10 +202,10 @@ follow the instanced-prop rules on the requests page.
 
 | Id | Blocked on | Notes |
 | --- | --- | --- |
-| `log-raft` | A3 | The Tripo log at the surface; the Traumatocrinus colony (root cirri at the log's ends, stems of differing length to eight units, ten-armed crowns) built procedurally under it; drifts on the current; grippable. Full and reduced. |
-| `coral-head` | A3 | One mesh, a collider footprint from `npm run shapes`. Sparse. |
-| `sponge-mound` | A3 | With an interior a rung I body can enter; footprint measured. |
-| `voltzia` | A3 | Three sizes, on the shore; no collider needed above the waterline beyond the trunk. |
+| `log-raft` | A3 + A5 sheet | The Tripo log at the surface; the Traumatocrinus colony (root cirri at the log's ends, stems of differing length to eight units, ten-armed crowns) built procedurally under it; drifts on the current; grippable. Full and reduced. |
+| `coral-head` | A3 + A5 sheet | One mesh, a collider footprint from `npm run shapes`. Sparse. |
+| `sponge-mound` | A3 + A5 sheet | With an interior a rung I body can enter; footprint measured. |
+| `voltzia` | A3 + A5 sheet | Three sizes, on the shore; no collider needed above the waterline beyond the trunk. |
 
 ### B2 · Tier 2 — built in-house
 
@@ -178,25 +222,25 @@ a few hundred triangles, at the scale-1 sizes in [02](02-biomes-and-depth.md#pro
 
 | Id | Variants | Blocked on | Notes |
 | --- | --- | --- | --- |
-| `encrinus` | 3 (stem height) | — | Segmented stem, ten-armed crown that opens and closes in the shader. |
-| `encrinus-litter` | 2 | — | Columnal and stem-length scatter. |
-| `diplopora` | 2 | — | Calcified whorled tuft; sways. |
-| `thecosmilia` | 3 | — | Phaceloid bush of parallel tubes. |
-| `calcisponge` | 2 | — | Stacked-chamber column. |
+| `encrinus` | 3 (stem height) | A5 | Segmented stem, ten-armed crown that opens and closes in the shader. |
+| `encrinus-litter` | 2 | A5 | Columnal and stem-length scatter. |
+| `diplopora` | 2 | A5 | Calcified whorled tuft; sways. |
+| `thecosmilia` | 3 | A5 | Phaceloid bush of parallel tubes. |
+| `calcisponge` | 2 | A5 | Stacked-chamber column. |
 | `stromatolite` | 2 | — | Layered dome. |
 | `salt-crust` | 2 | — | Curled gypsum plate. |
-| `placunopsis-mound` | 2 | — | Stacked-shell dome, a feeding station. |
-| `daonella-bed` | 3 | — | Overlapping flat-clam slab, a feeding station. |
-| `ceratite-drift` | 1 | B1 `ceratites` | The live shell's mesh, unlit and half-buried. |
-| `brachiopod-cluster` | 1 | — | Coenothyris. |
-| `cidaris` | 1 | — | Club-spined urchin. |
-| `reef-block` | 4 | — | Angular margin breccia; the rock slot. |
+| `placunopsis-mound` | 2 | A5 | Stacked-shell dome, a feeding station. |
+| `daonella-bed` | 3 | A5 | Overlapping flat-clam slab, a feeding station. |
+| `ceratite-drift` | 1 | B1 `ceratites` (no pose of its own) | The live shell's mesh, unlit and half-buried. |
+| `brachiopod-cluster` | 1 | A5 | Coenothyris. |
+| `cidaris` | 1 | A5 | Club-spined urchin. |
+| `reef-block` | 4 | A5 | Angular margin breccia; the rock slot. |
 | `mud-ripple` | 2 | — | Laminated black-mud plate with an ash band. |
-| `drift-log` | 1 | — | The Devonian `submerged-log` re-pivoted to float. |
-| `neocalamites` | 2 | — | Jointed horsetail stand. |
-| `pleuromeia` | 1 | — | Unbranched trunk, strap-leaf crown, one cone. |
-| `bjuvia` | 1 | — | Cycad rosette. |
-| `shore-boulder` | 3 | — | Red sandstone. |
+| `drift-log` | 1 | — (re-pivot, no pose) | The Devonian `submerged-log` re-pivoted to float. |
+| `neocalamites` | 2 | A5 | Jointed horsetail stand. |
+| `pleuromeia` | 1 | A5 | Unbranched trunk, strap-leaf crown, one cone. |
+| `bjuvia` | 1 | A5 | Cycad rosette. |
+| `shore-boulder` | 3 | A5 | Red sandstone. |
 
 Effects that are not meshes and are built with the renderer: the blow (spray and a foam ring at
 the surface), the ink cloud, the ash fall in the basin, the surface underside with refracted sky,
@@ -207,7 +251,7 @@ is built: the blow is the era's signature sample and needs a real recording, not
 
 | | Tier 1 (Tripo) | Tier 2 (in-house) |
 | --- | --- | --- |
-| Source images | 26 canonical poses **(delivered)** + 112 creature and shore-animal views + 12 scenery views **(delivered)** | 25 reference boards **(delivered)**, 9 banners, 2 key art, 1 wordmark, 4 glyphs, 9 regional boards **(delivered)**, 2 scale plates **(delivered)** |
+| Source images | 26 canonical poses **(delivered)** + 112 creature and shore-animal views + 12 scenery views **(delivered)** + 4 scenery model-input sheets **(A5, open)** | 25 reference boards **(delivered)**, 9 banners, 2 key art, 1 wordmark, 4 glyphs, 9 regional boards **(delivered)**, 2 scale plates **(delivered)**, 16 plant and prop canonical poses + 16 model-input sheets **(A5, open)** |
 | Models | 21 creatures, 3–4 shore animals, 4 scenery | 19 instanced prop kinds in 38 variants |
 | Derived | 25 procedural twins as LODs | 100 portraits |
 

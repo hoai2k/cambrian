@@ -67,9 +67,12 @@ wrong: there the note is the entire brief.
 ### Tanystropheus hydroides `tanystropheus`
 
 - **Slot:** S01 · the boom (13-joint stiff neck) · ~5–6 m
-- **Redraw our own pose:** `docs/triassic/canonical/tanystropheus-candidate03.png`
-- **Steer toward:** nothing external — the reading is accepted and the note below is the whole brief.
-- **Reviewer's note:** Can you use this as a reference: https://clickpetroleoegas.com.br/wp-content/uploads/2026/01/Tanystropheus-hydroides.jpg . Note the sauropod body and long neck reaching out over the water.
+- **Steer toward:** Tanystropheus hydroides reaching out over the water
+- **Credit:** Unknown — reviewer-supplied URL · Unknown; steering reference only, not for redistribution or shipping
+- **File page:** https://clickpetroleoegas.com.br/wp-content/uploads/2026/01/Tanystropheus-hydroides.jpg
+- **Full size:** https://clickpetroleoegas.com.br/wp-content/uploads/2026/01/Tanystropheus-hydroides.jpg
+- **Described as:** The reference the reviewer supplied for candidate03 and is naming again for candidate04. Its neck-to-body proportion is the point: the neck is the animal's identifying feature and dwarfs the trunk.
+- **Reviewer's note:** Candidate04 repeats candidate03's fault, so this is a redraw against the same reference as last time. The defining characteristic of this animal is the NECK: it must read as extraordinarily long and prominent RELATIVE TO THE BODY. Every candidate so far has made the torso too massive and the neck too short for it — chasing the 'sauropod body' note has cost the proportion that actually identifies the species. Take the reference image's proportions as indicative: neck clearly longer than head, torso and tail combined. Fetch the reference this round rather than working from the written description alone; the previous attempt could not retrieve it and drifted without it. For the model that follows: the neck is what has to be right, because it is nearly all the player will see. Tanystropheus is a shore animal that strikes into the water from the bank, so the neck and head come into frame and the torso, limbs and tail usually stay out of it. Put the geometry and the detail into the neck and head; the body, limbs and tail can be comparatively simple.
 
 
 ## Not yet reviewed
