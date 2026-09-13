@@ -158,6 +158,58 @@ for (const [id, kind] of [['mixosaurus', 'a live-bearer'], ['placodus', 'an egg-
     `and only the two sharks, two fish, the amphibian and the two cephalopods do not (${plain.join(', ')})`);
 }
 
+// ---- the climb for air ----
+// The era's central act, and it was quietly impossible: the shared climb rate scales with the body
+// but the water does not, so a hatchling Nothosaurus took nineteen seconds to reach the surface from
+// the shelf floor and over a minute from the deep, with no stamina coming back the whole way. And
+// holding the climb button alone counted as asking for nothing, which put the body in its slowest
+// acceleration on top. Every lung on the roster must be able to get up for air promptly, at any size.
+{
+  let worst = 0, worstId = '';
+  for (const c of PLAYABLE) {
+    if (creature(c.id).breathing !== 'air') continue;
+    const g = new Game('rise', [{ creature: c.id, device: 'keyboard', ready: true }], 99);
+    g.skipHatch();
+    const p = g.players[0]; p.spawnProtect = 0;
+    const m = new Map([[0, { ...emptyInput(), rise: true } as InputFrame]]);
+    let t = 0, reached = -1;
+    for (let i = 0; i < 60 * 30; i++) {
+      g.step(1 / 60, m); g.events.length = 0; t += 1 / 60;
+      if (p.pos.y > SURFACE_Y - 3.5) { reached = t; break; }
+    }
+    if (reached < 0) { worst = 99; worstId = c.id; break; }
+    if (reached > worst) { worst = reached; worstId = c.id; }
+  }
+  ok(worst < 12, `every air-breather climbs to the surface from the floor, at hatchling size (slowest: ${worstId} at ${worst > 90 ? 'never' : worst.toFixed(1) + ' s'})`);
+}
+// Holding the climb is asking for something, so it must not be treated as coasting.
+{
+  const g = new Game('rise', [{ creature: 'nothosaurus', device: 'keyboard', ready: true }], 99);
+  g.skipHatch();
+  const p = g.players[0]; p.spawnProtect = 0;
+  const y0 = p.pos.y;
+  const m = new Map([[0, { ...emptyInput(), rise: true } as InputFrame]]);
+  for (let i = 0; i < 60; i++) { g.step(1 / 60, m); g.events.length = 0; }
+  ok(p.pos.y - y0 > 1, `one second of the climb button is worth more than a metre (${(p.pos.y - y0).toFixed(2)} units)`);
+}
+// The winded heartbeat is a heartbeat. It used to fire every second for as long as a player stayed
+// down — a hundred and forty times in three minutes — each one a loud cue and a puff of bubbles.
+{
+  const g = new Game('reef', [{ creature: 'nothosaurus', device: 'keyboard', ready: true }], 7);
+  g.skipHatch();
+  const p = g.players[0]; p.spawnProtect = 0;
+  p.stamina = 0;
+  const m = new Map([[0, { ...emptyInput(), my: -1 } as InputFrame]]);
+  let winded = 0;
+  for (let i = 0; i < 60 * 60; i++) {
+    g.step(1 / 60, m);
+    for (const e of g.events) if (e.kind === 'winded' && e.player === 0) winded++;
+    g.events.length = 0;
+    p.stamina = 0;                                   // held spent, the worst case
+  }
+  ok(winded > 0 && winded <= 32, `a minute spent and under water sounds the heartbeat ${winded} times, not sixty`);
+}
+
 // ---- armour with a facing ----
 {
   const g = new Game('reef', [{ creature: 'hybodus', device: 'keyboard', ready: true }]);

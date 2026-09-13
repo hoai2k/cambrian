@@ -4,35 +4,53 @@
   "models": [
     {
       "suffix": "",
-      "sha256": "6cab5d0fb827290c4b7d668d7814ee76c545bafae01d84bb43ef4d8d2070c674",
+      "sha256": "7d4e8774b84924d3b738a3760a9aadca81240f67bde56d939e0d5c999a612535",
       "baseColorTexture": "Color_ea4528e3-1f9a-42f4-b0c4-2b84b879ff7c",
       "normalScale": 0.15000000596046448,
       "roughness": 0.699999988079071,
       "metallic": 0,
       "whiteColorVertices": 12165,
       "sourceAlbedoPreservedExactly": true,
-      "geometryNormalsUvWeightsRigClipsUnchanged": true,
-      "beforeSha256": "0b436d4fed21229037330be22419fcbd91eb4e6ffa9e951c6afd0cd298b529eb"
+      "geometryNormalsUvWeightsRigUnchanged": true,
+      "intentionallyChangedClips": [
+        "Sprint",
+        "Swim"
+      ],
+      "tailChannelsUnchanged": true,
+      "baselineCommit": "67f7cf3c008fc06cf5be95240222a39177430748",
+      "baselineSha256": "6cab5d0fb827290c4b7d668d7814ee76c545bafae01d84bb43ef4d8d2070c674"
     },
     {
       "suffix": ".puppet",
-      "sha256": "16d0f37adaf97df2d88ce50a83ae29bc73655b725667d601b67e260714cc2c29",
+      "sha256": "72eb60e953bd2e7a2b78d89a9b842c501956a400a2765ccccc828bad2544cd6f",
       "baseColorTexture": null,
       "normalScale": 1,
       "roughness": 0.7400000095367432,
       "metallic": 0,
-      "geometryNormalsUvWeightsRigClipsUnchanged": true,
-      "beforeSha256": "3281dd58e5c151dea3c3c4dfffdca89bf287af1d1acee9d2b8da91cd344f85c6"
+      "geometryNormalsUvWeightsRigUnchanged": true,
+      "intentionallyChangedClips": [
+        "Sprint",
+        "Swim"
+      ],
+      "tailChannelsUnchanged": true,
+      "baselineCommit": "67f7cf3c008fc06cf5be95240222a39177430748",
+      "baselineSha256": "16d0f37adaf97df2d88ce50a83ae29bc73655b725667d601b67e260714cc2c29"
     },
     {
       "suffix": ".lod1",
-      "sha256": "16d0f37adaf97df2d88ce50a83ae29bc73655b725667d601b67e260714cc2c29",
+      "sha256": "72eb60e953bd2e7a2b78d89a9b842c501956a400a2765ccccc828bad2544cd6f",
       "baseColorTexture": null,
       "normalScale": 1,
       "roughness": 0.7400000095367432,
       "metallic": 0,
-      "geometryNormalsUvWeightsRigClipsUnchanged": true,
-      "beforeSha256": "3281dd58e5c151dea3c3c4dfffdca89bf287af1d1acee9d2b8da91cd344f85c6"
+      "geometryNormalsUvWeightsRigUnchanged": true,
+      "intentionallyChangedClips": [
+        "Sprint",
+        "Swim"
+      ],
+      "tailChannelsUnchanged": true,
+      "baselineCommit": "67f7cf3c008fc06cf5be95240222a39177430748",
+      "baselineSha256": "16d0f37adaf97df2d88ce50a83ae29bc73655b725667d601b67e260714cc2c29"
     }
   ],
   "sourceUvComparison": {

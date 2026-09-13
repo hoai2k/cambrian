@@ -1200,7 +1200,12 @@ export class Game implements AiWorld {
       }
     }
     let rate = def.agility;
-    if (mag === 0 && controllable) rate = def.glide; // glide out
+    // Glide is for a body that has been asked for *nothing*. Rise and sink are asks like any other,
+    // and leaving them out meant holding the climb button alone put the animal in its slowest
+    // acceleration: a hatchling Nothosaurus took four and a half seconds to reach even two thirds
+    // of a climb speed that was already too small, which in an era where air is the economy reads
+    // as the button not working.
+    if (mag === 0 && controllable && !input.rise && !input.sink) rate = def.glide; // glide out
     if (a.state === 'stagger' || a.state === 'grabbed') { desired = v3(); rate = 2.5; }
     // A tail-flip is ballistic: the reflex has fired and there is nothing to steer with until it lands.
     if (a.state === 'dodge' || a.state === 'attack' || a.state === 'eating' || a.state === 'moult' || a.state === 'grabbing' || a.state === 'parry') rate = a.state === 'dodge' ? (def.tailFlip ? 0.25 : 1.4) : 3;
