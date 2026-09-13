@@ -18,6 +18,7 @@ import { FLORA_PHYS } from '../src/sim/flora';
 import { unionShape } from '../src/content/prop-shapes';
 import { DEVONIAN_SCENERY } from '../src/content/devonian/scenery';
 import { TRIASSIC_SCENERY } from '../src/content/triassic/scenery';
+import { existsSync } from 'node:fs';
 
 let checks = 0, failures = 0;
 const ok = (pass: boolean, name: string, detail = '') => {
@@ -74,6 +75,25 @@ for (const id of Object.keys(files).sort()) {
 for (const [id, least] of [['devonian-log', 0.35], ['glass-fan', 0.5], ['devonian-bryozoan', 0.5], ['talus-shard', 0.15], ['devonian-algal-clump', 0.5]] as [string, number][]) {
   const w = worst.find((x) => x.id === id);
   ok(w && w.saved > least, `${id} blocks its own shape, not a disc around it`, `${((w?.saved ?? 0) * 100).toFixed(0)}% of the disc is open water again`);
+}
+
+// ---- every prop an era can ask for is a file that exists ----
+// A scenery pack that does not name a prop falls back to the bare id under *that era's* props
+// folder, so an era with an empty folder quietly asks the network for a GLB that was never there —
+// which is what the Triassic did for its three rock variants, on every seabed, with no error
+// anywhere but the network tab. A mapping is a promise that a file is behind it.
+for (const [era, scenery] of [['Devonian', DEVONIAN_SCENERY], ['Triassic', TRIASSIC_SCENERY]] as const) {
+  const declared = Object.entries(scenery.props);
+  for (const [id, prop] of declared)
+    ok(existsSync(`public/${prop.path}`), `${era} ${id}: the mesh behind the mapping exists`, prop.path);
+  const named = new Set(declared.map(([id]) => id));
+  const used = [
+    ...Object.values(scenery.flora).flatMap((v) => (typeof v === 'string' ? [v] : [...(v ?? [])])),
+    ...Object.values(scenery.rocks ?? {}),
+  ].filter((v): v is string => !!v);
+  for (const id of new Set(used))
+    ok(named.has(id), `${era} ${id}: is declared in the pack rather than resolved by fallback`,
+      named.has(id) ? '' : 'unnamed ids resolve under the era folder and 404 when it is empty');
 }
 
 // ---- a plant's collider is as tall as the mesh it is drawn from ----

@@ -63,6 +63,17 @@ unless the user explicitly asks for a PR. Steps:
   stay behind that import (or resolve lazily like `assetPaths` and `music()`); the entry page itself
   must not statically import the audio library or the sim for the same reason. Headless tests that
   need the Devonian do the same: select the era, then `await import(...)` (`tools/devonian-test.ts`).
+- `/ancientseas/` is the trilogy's title page (entry `src/ancientseas/main.tsx`, data in
+  `src/ancientseas/page.ts`): the three games' titles as links, in two versions picked by
+  `?version=` (1, the default, is the three title paintings whole on the dark their vignettes run
+  out to; 2 is one plate in the paintings' style assembled from individually requested pieces —
+  `SLOTS`, placed by centre and width on a 16:10 desktop stage and a 9:25 phone stage). Every piece
+  it asks for has a brief in `docs/image-requests.md` and lands in `public/assets/ancientseas/`;
+  the page only ever loads what `src/ancientseas/delivered.json` lists (`npm run
+  ancientseas:delivered` regenerates it from the folder) and draws a shipped stand-in or a named
+  wash for the rest, so nothing asks the network for art that has not arrived. `npm run
+  ancientseas` checks all of it; `node tools/ancientseas-smoke.mjs <outdir>` screenshots both
+  versions against a preview build and follows the three links.
 - An era's `assets.sfx` names the shared sound library (`assets/sfx/`): bites, hits and the UI are the
   same files in both eras. Era-specific samples are addressed as `<era>/<name>` and resolve under
   `assets/<era>/sfx/` regardless. The two always-on beds are named per era in `audio.loops`, and a
@@ -110,8 +121,25 @@ unless the user explicitly asks for a PR. Steps:
   the Devonian's procedural stand-ins. Never point a Triassic kind at a Devonian mesh in the
   scenery pack: a wrong genus placed by the thousand is worse than an honestly generic shape, and
   which stand-in the game plays with is `environment.ts`'s business.
-- The Triassic has no creature models of its own yet. Every animal borrows a Devonian body through a
-  cross-era stand-in (`'devonian/<id>'` in `TRIASSIC_STAND_INS`, resolved into that era's folder
+- A delivered Triassic body arrives **paired**: the authored (Tripo-derived) model and a procedural
+  twin rebuilt to its own volume on the same skeleton, sharing inverse binds, clips and anchors.
+  That pairing is the pipeline's verification step, so the specimen viewer swaps between them in
+  place — same camera, same scale, same clip at the same frame (`puppet` on `ViewerSpecimen`,
+  the *Body* control in `src/viewer/Viewer.tsx`) — and a twin is never a second row in the roster.
+  Sculpt is off on the twin: a sculpt is the hand-off into a builder's profile rows for the body
+  that ships. A model landing also moves its canonical state to `delivered`, which
+  `tools/triassic/apply-selections.mjs` derives from `tools/triassic/shipped.json`; a regenerated
+  pose (a `candidate-awaiting-human-greenlight` in any `docs/triassic/canonical/prompts*.json`)
+  clears whatever was decided about the old one and sends the subject back to the undecided pile.
+  Run the tool with no arguments to reconcile the manifest with the tree.
+- An era's scenery pack must **name** every prop it draws with. An id it does not name falls back to
+  the bare id under that era's own props folder, and an era whose folder is empty then asks the
+  network for a GLB that was never there — silent everywhere but the network tab, which is how the
+  Triassic requested three rock meshes on every seabed. Borrow explicitly instead (the Triassic's
+  rocks come from the shared `assets/props/`), and `npm run props` checks both halves: every mapping
+  has a file behind it, and nothing is left to the fallback.
+- The Triassic's creature models are arriving. Every animal that has not had one yet borrows a
+  Devonian body through a cross-era stand-in (`'devonian/<id>'` in `TRIASSIC_STAND_INS`, resolved into that era's folder
   by `src/content/asset-paths.ts`) and is still pickable (`assets.standInsPlayable`), because the
   roster ships placeholder portraits cut from `docs/triassic/canonical/`
   (`tools/triassic/placeholder-portraits.mjs`). When a model lands: files into

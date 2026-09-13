@@ -8,17 +8,17 @@
       "station": -2.93,
       "full": [
         0.15060458571395818,
-        -0.0862769035205791,
+        0.06896246352551832,
         0.059731623882248154
       ],
       "puppet": [
         0.14856615368264733,
-        -0.08706514924526386,
+        0.062241726902028865,
         0.0564051320475538
       ],
       "absoluteError": [
         0.0020384320313108495,
-        0.0007882457246847635,
+        0.0067207366234894594,
         0.003326491834694356
       ]
     },
@@ -26,17 +26,17 @@
       "station": -2.621578947368421,
       "full": [
         0.16764074966893996,
-        -0.13452718295743013,
+        -0.01789957748538502,
         0.12690848287769024
       ],
       "puppet": [
         0.1674999019805513,
-        -0.13423679139338368,
+        -0.017468094945568682,
         0.11634154985545185
       ],
       "absoluteError": [
         0.00014084768838865114,
-        0.0002903915640464494,
+        0.00043148253981633786,
         0.010566933022238392
       ]
     },
@@ -44,17 +44,17 @@
       "station": -2.3131578947368423,
       "full": [
         0.2149122856201256,
-        -0.18317943899020653,
+        -0.10573497918281217,
         0.19803403819909285
       ],
       "puppet": [
         0.21192081057484125,
-        -0.1823549042654045,
+        -0.10486107101428557,
         0.1926876768639185
       ],
       "absoluteError": [
         0.002991475045284353,
-        0.0008245347248020396,
+        0.000873908168526602,
         0.005346361335174354
       ]
     },
@@ -62,18 +62,18 @@
       "station": -2.004736842105263,
       "full": [
         0.296726986912493,
-        -0.2831827183519856,
+        -0.2855251110534789,
         0.34570106862925576
       ],
       "puppet": [
-        0.2969181431393189,
-        -0.2830658479524984,
-        0.33848606935929865
+        0.29691810166105076,
+        -0.28322282731435305,
+        0.33832270747224186
       ],
       "absoluteError": [
-        0.00019115622682591704,
-        0.00011687039948721223,
-        0.007214999269957112
+        0.00019111474855776356,
+        0.002302283739125832,
+        0.007378361157013902
       ]
     },
     {
@@ -367,19 +367,19 @@
   ],
   "surfaceDistances": {
     "fullToPuppet": {
-      "p50": 0.004176419693976641,
-      "p95": 0.03822032455354928,
+      "p50": 0.004241584800183773,
+      "p95": 0.0382393054664135,
       "max": 0.1131371408700943
     },
     "puppetToFull": {
-      "p50": 6.006850128414953e-08,
-      "p95": 0.03910398427397012,
-      "max": 0.16336163878440857
+      "p50": 7.972298377012521e-08,
+      "p95": 0.040115687251090985,
+      "max": 0.19753268361091614
     }
   },
   "signedVolume": {
-    "full": 3.302665090932378,
-    "puppet": 3.080469902257425
+    "full": 3.298938884249219,
+    "puppet": 3.2452516222779217
   },
   "finRootSeating": {
     "pectoral0L": {
@@ -486,15 +486,15 @@
       {
         "object": "Shonisaurus authored skin",
         "phase": 0.2,
-        "maxTravel": 0.10709828685922552,
-        "stretch99": 1.0378642901976853,
+        "maxTravel": 0.1057005601311796,
+        "stretch99": 1.0357238174514183,
         "stretchMax": 1.5793357602768265,
         "edgesOver5x": 0
       },
       {
         "object": "Puppet measured trunk",
         "phase": 0.2,
-        "maxTravel": 0.0410263027027586,
+        "maxTravel": 0.04156232566975423,
         "stretch99": 1.0488248224120351,
         "stretchMax": 1.0753249129258047,
         "edgesOver5x": 0
@@ -510,17 +510,17 @@
       {
         "object": "Puppet upper rostrum",
         "phase": 0.2,
-        "maxTravel": 0.10638085850645379,
-        "stretch99": 1.000004496195833,
-        "stretchMax": 1.0000064563291424,
+        "maxTravel": 0.10499596088871929,
+        "stretch99": 1.0000034782516525,
+        "stretchMax": 1.0000049810350768,
         "edgesOver5x": 0
       },
       {
         "object": "Puppet lower rostrum",
         "phase": 0.2,
-        "maxTravel": 0.0861626449232037,
-        "stretch99": 1.0272964071902486,
-        "stretchMax": 1.0459762929533787,
+        "maxTravel": 0.10292054499535408,
+        "stretch99": 1.0000088731112997,
+        "stretchMax": 1.0000998399315106,
         "edgesOver5x": 0
       },
       {
@@ -558,15 +558,15 @@
       {
         "object": "Shonisaurus authored skin",
         "phase": 0.35,
-        "maxTravel": 0.16983702554414437,
-        "stretch99": 1.0610271330274421,
-        "stretchMax": 2.230713476673405,
+        "maxTravel": 0.16149651633368214,
+        "stretch99": 1.0508845319868845,
+        "stretchMax": 1.796364359993538,
         "edgesOver5x": 0
       },
       {
         "object": "Puppet measured trunk",
         "phase": 0.35,
-        "maxTravel": 0.06164716368494872,
+        "maxTravel": 0.06205966004511457,
         "stretch99": 1.0699740840284337,
         "stretchMax": 1.106852004560626,
         "edgesOver5x": 0
@@ -582,17 +582,17 @@
       {
         "object": "Puppet upper rostrum",
         "phase": 0.35,
-        "maxTravel": 0.16865174399416188,
-        "stretch99": 1.0000054765989126,
-        "stretchMax": 1.0000071152698553,
+        "maxTravel": 0.16038846745951688,
+        "stretch99": 1.0000052641463069,
+        "stretchMax": 1.000005924581058,
         "edgesOver5x": 0
       },
       {
         "object": "Puppet lower rostrum",
         "phase": 0.35,
-        "maxTravel": 0.0623141106172533,
-        "stretch99": 1.1636751524915778,
-        "stretchMax": 1.2736714282828847,
+        "maxTravel": 0.1571544839566593,
+        "stretch99": 1.000012337903584,
+        "stretchMax": 1.0002805709863205,
         "edgesOver5x": 0
       },
       {
@@ -630,15 +630,15 @@
       {
         "object": "Shonisaurus authored skin",
         "phase": 0.5,
-        "maxTravel": 0.17864429027230205,
-        "stretch99": 1.0611559311980852,
-        "stretchMax": 2.2634638438299586,
+        "maxTravel": 0.17008916727821588,
+        "stretch99": 1.051078514288741,
+        "stretchMax": 1.7770218132291362,
         "edgesOver5x": 0
       },
       {
         "object": "Puppet measured trunk",
         "phase": 0.5,
-        "maxTravel": 0.06342486738504102,
+        "maxTravel": 0.06437138625957683,
         "stretch99": 1.0689688933289612,
         "stretchMax": 1.1065254512758151,
         "edgesOver5x": 0
@@ -654,24 +654,24 @@
       {
         "object": "Puppet upper rostrum",
         "phase": 0.5,
-        "maxTravel": 0.1773788318125264,
-        "stretch99": 1.0000073773089295,
-        "stretchMax": 1.0000090365301568,
+        "maxTravel": 0.16890291894589574,
+        "stretch99": 1.0000045372151176,
+        "stretchMax": 1.0000069775701017,
         "edgesOver5x": 0
       },
       {
         "object": "Puppet lower rostrum",
         "phase": 0.5,
-        "maxTravel": 0.06463026093866099,
-        "stretch99": 1.1678987613726677,
-        "stretchMax": 1.2806813613722803,
+        "maxTravel": 0.1654464710245085,
+        "stretch99": 1.0000083968397349,
+        "stretchMax": 1.0001320342019788,
         "edgesOver5x": 0
       },
       {
         "object": "Puppet pectoral L",
         "phase": 0.5,
         "maxTravel": 0.11438360230299681,
-        "stretch99": 1.0454033355664085,
+        "stretch99": 1.0432860923541116,
         "stretchMax": 1.1009377928733537,
         "edgesOver5x": 0
       },
@@ -679,7 +679,7 @@
         "object": "Puppet pectoral R",
         "phase": 0.5,
         "maxTravel": 0.11627514853786582,
-        "stretch99": 1.0464823621401762,
+        "stretch99": 1.0433664102477058,
         "stretchMax": 1.1028874790068128,
         "edgesOver5x": 0
       },
@@ -702,15 +702,15 @@
       {
         "object": "Shonisaurus authored skin",
         "phase": 0.7,
-        "maxTravel": 0.15163490585356126,
-        "stretch99": 1.0552576552869093,
-        "stretchMax": 2.0174573115652374,
+        "maxTravel": 0.1446947673568996,
+        "stretch99": 1.0465750865737375,
+        "stretchMax": 1.738779406146623,
         "edgesOver5x": 0
       },
       {
         "object": "Puppet measured trunk",
         "phase": 0.7,
-        "maxTravel": 0.055590342190694975,
+        "maxTravel": 0.05596168962745526,
         "stretch99": 1.0631496932473157,
         "stretchMax": 1.0970675827889858,
         "edgesOver5x": 0
@@ -726,17 +726,17 @@
       {
         "object": "Puppet upper rostrum",
         "phase": 0.7,
-        "maxTravel": 0.15058845088132974,
-        "stretch99": 1.0000045589530162,
-        "stretchMax": 1.0000066112874093,
+        "maxTravel": 0.14371224393331916,
+        "stretch99": 1.0000048900252767,
+        "stretchMax": 1.0000081109698393,
         "edgesOver5x": 0
       },
       {
         "object": "Puppet lower rostrum",
         "phase": 0.7,
-        "maxTravel": 0.05623394021014264,
-        "stretch99": 1.1360891286932624,
-        "stretchMax": 1.2278373065455261,
+        "maxTravel": 0.14082473495116463,
+        "stretch99": 1.0000109170628035,
+        "stretchMax": 1.0001795922499543,
         "edgesOver5x": 0
       },
       {
@@ -920,16 +920,16 @@
       {
         "object": "Shonisaurus authored skin",
         "phase": 0.2,
-        "maxTravel": 0.3017124424931321,
-        "stretch99": 1.0258966672516032,
-        "stretchMax": 3.8575940394511847,
-        "edgesOver5x": 0
+        "maxTravel": 0.4025727298462334,
+        "stretch99": 1.0261067903877776,
+        "stretchMax": 5.434145684719265,
+        "edgesOver5x": 1
       },
       {
         "object": "Puppet measured trunk",
         "phase": 0.2,
         "maxTravel": 0.1627709446013765,
-        "stretch99": 1.0255314408021652,
+        "stretch99": 1.027281125575856,
         "stretchMax": 1.0719878734707842,
         "edgesOver5x": 0
       },
@@ -944,33 +944,33 @@
       {
         "object": "Puppet upper rostrum",
         "phase": 0.2,
-        "maxTravel": 0.05919872099034277,
-        "stretch99": 1.0000060254684,
-        "stretchMax": 1.0000107649449603,
+        "maxTravel": 0.05806065981086681,
+        "stretch99": 1.0000072352085856,
+        "stretchMax": 1.000018016374431,
         "edgesOver5x": 0
       },
       {
         "object": "Puppet lower rostrum",
         "phase": 0.2,
-        "maxTravel": 0.30542695382644536,
-        "stretch99": 1.3720030418496971,
-        "stretchMax": 1.618869174226881,
+        "maxTravel": 0.4005689378953718,
+        "stretch99": 1.0000935662411823,
+        "stretchMax": 1.0005768391340453,
         "edgesOver5x": 0
       },
       {
         "object": "Puppet pectoral L",
         "phase": 0.2,
         "maxTravel": 0.17997567601699785,
-        "stretch99": 1.0193178994325969,
-        "stretchMax": 1.0355038380690864,
+        "stretch99": 1.0237487980783384,
+        "stretchMax": 1.0431488330812286,
         "edgesOver5x": 0
       },
       {
         "object": "Puppet pectoral R",
         "phase": 0.2,
         "maxTravel": 0.18045580891716495,
-        "stretch99": 1.0145869587765117,
-        "stretchMax": 1.0204662975516994,
+        "stretch99": 1.0141553474861524,
+        "stretchMax": 1.0201223030125093,
         "edgesOver5x": 0
       },
       {
@@ -992,10 +992,10 @@
       {
         "object": "Shonisaurus authored skin",
         "phase": 0.35,
-        "maxTravel": 0.34207220381572184,
-        "stretch99": 1.0303203184310679,
-        "stretchMax": 3.805900825855144,
-        "edgesOver5x": 0
+        "maxTravel": 0.3672639068630361,
+        "stretch99": 1.029860433654729,
+        "stretchMax": 5.355160725938805,
+        "edgesOver5x": 1
       },
       {
         "object": "Puppet measured trunk",
@@ -1016,33 +1016,33 @@
       {
         "object": "Puppet upper rostrum",
         "phase": 0.35,
-        "maxTravel": 0.15847228967358773,
-        "stretch99": 1.0000061550414037,
-        "stretchMax": 1.0000074306724756,
+        "maxTravel": 0.16100095083498037,
+        "stretch99": 1.0000065353766816,
+        "stretchMax": 1.0000079717475918,
         "edgesOver5x": 0
       },
       {
         "object": "Puppet lower rostrum",
         "phase": 0.35,
-        "maxTravel": 0.2822965405493984,
-        "stretch99": 1.3654041766121616,
-        "stretchMax": 1.6079820923817605,
+        "maxTravel": 0.36234629227996373,
+        "stretch99": 1.0000888453433852,
+        "stretchMax": 1.000548822929997,
         "edgesOver5x": 0
       },
       {
         "object": "Puppet pectoral L",
         "phase": 0.35,
         "maxTravel": 0.16607804382351157,
-        "stretch99": 1.0154029173674997,
-        "stretchMax": 1.0209828041855291,
+        "stretch99": 1.0162044188717962,
+        "stretchMax": 1.0249545684600707,
         "edgesOver5x": 0
       },
       {
         "object": "Puppet pectoral R",
         "phase": 0.35,
         "maxTravel": 0.17472897280534094,
-        "stretch99": 1.013519290368462,
-        "stretchMax": 1.0180642687880208,
+        "stretch99": 1.0154258095875452,
+        "stretchMax": 1.025850337515631,
         "edgesOver5x": 0
       },
       {
@@ -1065,7 +1065,7 @@
         "object": "Shonisaurus authored skin",
         "phase": 0.5,
         "maxTravel": 0.1573585032691466,
-        "stretch99": 1.0113050291480414,
+        "stretch99": 1.0112535878962647,
         "stretchMax": 1.4315153474821563,
         "edgesOver5x": 0
       },
@@ -1088,32 +1088,32 @@
       {
         "object": "Puppet upper rostrum",
         "phase": 0.5,
-        "maxTravel": 0.05077324279239499,
-        "stretch99": 1.0000079038546625,
-        "stretchMax": 1.00001399770114,
+        "maxTravel": 0.05078518935283439,
+        "stretch99": 1.0000056826644377,
+        "stretchMax": 1.0000069834887004,
         "edgesOver5x": 0
       },
       {
         "object": "Puppet lower rostrum",
         "phase": 0.5,
-        "maxTravel": 0.05071298981521116,
-        "stretch99": 1.002568627387166,
-        "stretchMax": 1.0043273243856206,
+        "maxTravel": 0.050726073134665484,
+        "stretch99": 1.0000157176941924,
+        "stretchMax": 1.0000635314158541,
         "edgesOver5x": 0
       },
       {
         "object": "Puppet pectoral L",
         "phase": 0.5,
         "maxTravel": 0.05391715442286196,
-        "stretch99": 1.0035043903755196,
-        "stretchMax": 1.0047890069477052,
+        "stretch99": 1.0035029610970352,
+        "stretchMax": 1.0047797637173597,
         "edgesOver5x": 0
       },
       {
         "object": "Puppet pectoral R",
         "phase": 0.5,
         "maxTravel": 0.056815698127392546,
-        "stretch99": 1.0039478807000088,
+        "stretch99": 1.0039772398054088,
         "stretchMax": 1.0049943000777266,
         "edgesOver5x": 0
       },
@@ -1168,9 +1168,9 @@
       {
         "object": "Puppet lower rostrum",
         "phase": 0.7,
-        "maxTravel": 0.007024618956910695,
-        "stretch99": 1.0000062063326085,
-        "stretchMax": 1.000006913509521,
+        "maxTravel": 0.0069970736187078865,
+        "stretch99": 1.0000086768081138,
+        "stretchMax": 1.0000531510520234,
         "edgesOver5x": 0
       },
       {
@@ -1354,17 +1354,17 @@
       {
         "object": "Shonisaurus authored skin",
         "phase": 0.2,
-        "maxTravel": 0.21815254224414404,
-        "stretch99": 1.0105537670379516,
-        "stretchMax": 3.3474048288662503,
+        "maxTravel": 0.31133670013783155,
+        "stretch99": 1.0132083089880881,
+        "stretchMax": 4.719724545777222,
         "edgesOver5x": 0
       },
       {
         "object": "Puppet measured trunk",
         "phase": 0.2,
         "maxTravel": 0.026870863730699347,
-        "stretch99": 1.0104949828309477,
-        "stretchMax": 1.0151190451974434,
+        "stretch99": 1.0133869744366888,
+        "stretchMax": 1.0208659192746683,
         "edgesOver5x": 0
       },
       {
@@ -1378,33 +1378,33 @@
       {
         "object": "Puppet upper rostrum",
         "phase": 0.2,
-        "maxTravel": 0.014135629343240334,
-        "stretch99": 1.0000065062636183,
-        "stretchMax": 1.000011217487473,
+        "maxTravel": 0.01896834015690342,
+        "stretch99": 1.0000049005435458,
+        "stretchMax": 1.000006610993881,
         "edgesOver5x": 0
       },
       {
         "object": "Puppet lower rostrum",
         "phase": 0.2,
-        "maxTravel": 0.22152682608359706,
-        "stretch99": 1.306778796803334,
-        "stretchMax": 1.5112099933356806,
+        "maxTravel": 0.3092618658135264,
+        "stretch99": 1.0000915212673827,
+        "stretchMax": 1.0003642232201615,
         "edgesOver5x": 0
       },
       {
         "object": "Puppet pectoral L",
         "phase": 0.2,
         "maxTravel": 0.043349350535076554,
-        "stretch99": 1.0102949433150517,
-        "stretchMax": 1.0184628269182119,
+        "stretch99": 1.0137892456962214,
+        "stretchMax": 1.0251460684161176,
         "edgesOver5x": 0
       },
       {
         "object": "Puppet pectoral R",
         "phase": 0.2,
         "maxTravel": 0.04339040412037017,
-        "stretch99": 1.004829444831492,
-        "stretchMax": 1.0113928635735054,
+        "stretch99": 1.007816238725979,
+        "stretchMax": 1.0183173759245052,
         "edgesOver5x": 0
       },
       {
@@ -1426,16 +1426,16 @@
       {
         "object": "Shonisaurus authored skin",
         "phase": 0.35,
-        "maxTravel": 0.19154934673873636,
-        "stretch99": 1.016205485760848,
-        "stretchMax": 3.193402578601682,
+        "maxTravel": 0.2834766590095977,
+        "stretch99": 1.0160751404398383,
+        "stretchMax": 4.478924131189794,
         "edgesOver5x": 0
       },
       {
         "object": "Puppet measured trunk",
         "phase": 0.35,
         "maxTravel": 0.12487153750449097,
-        "stretch99": 1.0160758255105593,
+        "stretch99": 1.016917080524856,
         "stretchMax": 1.0438228110944796,
         "edgesOver5x": 0
       },
@@ -1450,33 +1450,33 @@
       {
         "object": "Puppet upper rostrum",
         "phase": 0.35,
-        "maxTravel": 0.05072357279828162,
-        "stretch99": 1.0000049503052333,
-        "stretchMax": 1.0000069529354676,
+        "maxTravel": 0.05276571882749548,
+        "stretch99": 1.0000063420430332,
+        "stretchMax": 1.000009108582777,
         "edgesOver5x": 0
       },
       {
         "object": "Puppet lower rostrum",
         "phase": 0.35,
-        "maxTravel": 0.20175411801115276,
-        "stretch99": 1.287076160716267,
-        "stretchMax": 1.4786064274905895,
+        "maxTravel": 0.2805884601159357,
+        "stretch99": 1.0001185723984762,
+        "stretchMax": 1.0003016055640908,
         "edgesOver5x": 0
       },
       {
         "object": "Puppet pectoral L",
         "phase": 0.35,
-        "maxTravel": 0.04707248428331137,
-        "stretch99": 1.00760416833248,
-        "stretchMax": 1.0136875459394843,
+        "maxTravel": 0.048130942919816955,
+        "stretch99": 1.0103908965956947,
+        "stretchMax": 1.019938785671843,
         "edgesOver5x": 0
       },
       {
         "object": "Puppet pectoral R",
         "phase": 0.35,
-        "maxTravel": 0.04901117915915028,
-        "stretch99": 1.0067335764368945,
-        "stretchMax": 1.0141866881850423,
+        "maxTravel": 0.050091612748542486,
+        "stretch99": 1.0098209028800484,
+        "stretchMax": 1.0206621848616297,
         "edgesOver5x": 0
       },
       {
@@ -1499,7 +1499,7 @@
         "object": "Shonisaurus authored skin",
         "phase": 0.5,
         "maxTravel": 0.15105992141139674,
-        "stretch99": 1.011429003357,
+        "stretch99": 1.0114032569896292,
         "stretchMax": 1.3560126188745159,
         "edgesOver5x": 0
       },
@@ -1522,33 +1522,33 @@
       {
         "object": "Puppet upper rostrum",
         "phase": 0.5,
-        "maxTravel": 0.015480168720400521,
-        "stretch99": 1.0000068758261709,
-        "stretchMax": 1.0000088921540375,
+        "maxTravel": 0.015490174264906315,
+        "stretch99": 1.0000042649580234,
+        "stretchMax": 1.0000061901341981,
         "edgesOver5x": 0
       },
       {
         "object": "Puppet lower rostrum",
         "phase": 0.5,
-        "maxTravel": 0.015473528491038757,
-        "stretch99": 1.002017748175684,
-        "stretchMax": 1.0034062941736597,
+        "maxTravel": 0.015503785382400862,
+        "stretch99": 1.0000081649162076,
+        "stretchMax": 1.0001263392338062,
         "edgesOver5x": 0
       },
       {
         "object": "Puppet pectoral L",
         "phase": 0.5,
         "maxTravel": 0.023066370234412457,
-        "stretch99": 1.0027035236368755,
-        "stretchMax": 1.0033019841508022,
+        "stretch99": 1.002702446338436,
+        "stretchMax": 1.003294259756069,
         "edgesOver5x": 0
       },
       {
         "object": "Puppet pectoral R",
         "phase": 0.5,
         "maxTravel": 0.023641859314369514,
-        "stretch99": 1.0026255996189704,
-        "stretchMax": 1.003579758702705,
+        "stretch99": 1.0026233854354343,
+        "stretchMax": 1.0035724445633467,
         "edgesOver5x": 0
       },
       {
@@ -1602,9 +1602,9 @@
       {
         "object": "Puppet lower rostrum",
         "phase": 0.7,
-        "maxTravel": 0.006353645279467709,
-        "stretch99": 1.000006557303081,
-        "stretchMax": 1.0000084617654341,
+        "maxTravel": 0.0062970125296088935,
+        "stretch99": 1.000012818106168,
+        "stretchMax": 1.0001325501726885,
         "edgesOver5x": 0
       },
       {
@@ -1789,7 +1789,7 @@
         "object": "Shonisaurus authored skin",
         "phase": 0.2,
         "maxTravel": 0.06127032214490146,
-        "stretch99": 1.0034319575451418,
+        "stretch99": 1.0031827813053853,
         "stretchMax": 1.0343148287951096,
         "edgesOver5x": 0
       },
@@ -1820,9 +1820,9 @@
       {
         "object": "Puppet lower rostrum",
         "phase": 0.2,
-        "maxTravel": 0.016359259230416555,
-        "stretch99": 1.0045966070075905,
-        "stretchMax": 1.007750929635309,
+        "maxTravel": 0.015128052856924567,
+        "stretch99": 1.0000075912474218,
+        "stretchMax": 1.0000262408536398,
         "edgesOver5x": 0
       },
       {
@@ -1861,7 +1861,7 @@
         "object": "Shonisaurus authored skin",
         "phase": 0.35,
         "maxTravel": 0.5786540214348664,
-        "stretch99": 1.010798438521737,
+        "stretch99": 1.0095309747809893,
         "stretchMax": 1.4471782272908118,
         "edgesOver5x": 0
       },
@@ -1892,9 +1892,9 @@
       {
         "object": "Puppet lower rostrum",
         "phase": 0.35,
-        "maxTravel": 0.1523096330869106,
-        "stretch99": 1.0445520357262745,
-        "stretchMax": 1.074957522707961,
+        "maxTravel": 0.14656392510870372,
+        "stretch99": 1.000012484426943,
+        "stretchMax": 1.000144238399023,
         "edgesOver5x": 0
       },
       {
@@ -1933,7 +1933,7 @@
         "object": "Shonisaurus authored skin",
         "phase": 0.5,
         "maxTravel": 1.344447154616437,
-        "stretch99": 1.0169186597965256,
+        "stretch99": 1.014423662665157,
         "stretchMax": 1.9066438145180915,
         "edgesOver5x": 0
       },
@@ -1964,9 +1964,9 @@
       {
         "object": "Puppet lower rostrum",
         "phase": 0.5,
-        "maxTravel": 0.3603028786231345,
-        "stretch99": 1.1069710055027835,
-        "stretchMax": 1.1793527898322753,
+        "maxTravel": 0.3473037975630681,
+        "stretch99": 1.0000125458772902,
+        "stretchMax": 1.000058141783254,
         "edgesOver5x": 0
       },
       {
@@ -2005,7 +2005,7 @@
         "object": "Shonisaurus authored skin",
         "phase": 0.7,
         "maxTravel": 2.2096392313959274,
-        "stretch99": 1.020044089363046,
+        "stretch99": 1.0166148827895736,
         "stretchMax": 2.3841640527475025,
         "edgesOver5x": 0
       },
@@ -2036,9 +2036,9 @@
       {
         "object": "Puppet lower rostrum",
         "phase": 0.7,
-        "maxTravel": 0.597292297161736,
-        "stretch99": 1.182418243127018,
-        "stretchMax": 1.3047567328303797,
+        "maxTravel": 0.569225775391905,
+        "stretch99": 1.0000097635412444,
+        "stretchMax": 1.0000302280433746,
         "edgesOver5x": 0
       },
       {
@@ -2077,7 +2077,7 @@
         "object": "Shonisaurus authored skin",
         "phase": 1,
         "maxTravel": 2.5034863623476995,
-        "stretch99": 1.023137715577772,
+        "stretch99": 1.018936737943245,
         "stretchMax": 2.5934633662965165,
         "edgesOver5x": 0
       },
@@ -2108,9 +2108,9 @@
       {
         "object": "Puppet lower rostrum",
         "phase": 1,
-        "maxTravel": 0.6773831362215023,
-        "stretch99": 1.209946925050695,
-        "stretchMax": 1.3504047982458842,
+        "maxTravel": 0.6421503885463988,
+        "stretch99": 1.000009417860335,
+        "stretchMax": 1.0000426663744588,
         "edgesOver5x": 0
       },
       {
@@ -2254,9 +2254,9 @@
       {
         "object": "Puppet lower rostrum",
         "phase": 0.2,
-        "maxTravel": 0.35105104579313967,
-        "stretch99": 1.0000047791923412,
-        "stretchMax": 1.0000116382454949,
+        "maxTravel": 0.346570827814654,
+        "stretch99": 1.0000072852645798,
+        "stretchMax": 1.0001399175495045,
         "edgesOver5x": 0
       },
       {
@@ -2326,9 +2326,9 @@
       {
         "object": "Puppet lower rostrum",
         "phase": 0.35,
-        "maxTravel": 0.5082750997653953,
-        "stretch99": 1.0000038053636189,
-        "stretchMax": 1.000005875832342,
+        "maxTravel": 0.5017766356028851,
+        "stretch99": 1.0000075545200724,
+        "stretchMax": 1.0000569784026665,
         "edgesOver5x": 0
       },
       {
@@ -2398,9 +2398,9 @@
       {
         "object": "Puppet lower rostrum",
         "phase": 0.5,
-        "maxTravel": 0.5082167077529891,
-        "stretch99": 1.0000069174711401,
-        "stretchMax": 1.0000258743093988,
+        "maxTravel": 0.5017189746484088,
+        "stretch99": 1.0000108367816822,
+        "stretchMax": 1.0001131357627149,
         "edgesOver5x": 0
       },
       {
@@ -2470,9 +2470,9 @@
       {
         "object": "Puppet lower rostrum",
         "phase": 0.7,
-        "maxTravel": 0.4231217641626077,
-        "stretch99": 1.0000070628399773,
-        "stretchMax": 1.0000166878103227,
+        "maxTravel": 0.41771737717131335,
+        "stretch99": 1.0000173730410848,
+        "stretchMax": 1.0000585164759372,
         "edgesOver5x": 0
       },
       {
@@ -2656,7 +2656,7 @@
       {
         "object": "Shonisaurus authored skin",
         "phase": 0.2,
-        "maxTravel": 0.36241227196546727,
+        "maxTravel": 0.35853800366675237,
         "stretch99": 1.040819664412611,
         "stretchMax": 1.833538727822403,
         "edgesOver5x": 0
@@ -2664,7 +2664,7 @@
       {
         "object": "Puppet measured trunk",
         "phase": 0.2,
-        "maxTravel": 0.22675687681595197,
+        "maxTravel": 0.22770046945326972,
         "stretch99": 1.0485418634558479,
         "stretchMax": 1.1436243031320517,
         "edgesOver5x": 0
@@ -2688,9 +2688,9 @@
       {
         "object": "Puppet lower rostrum",
         "phase": 0.2,
-        "maxTravel": 0.3648185871535849,
-        "stretch99": 1.0000069954814756,
-        "stretchMax": 1.0000166710602987,
+        "maxTravel": 0.35479459233976185,
+        "stretch99": 1.0000101139288144,
+        "stretchMax": 1.0000786362049021,
         "edgesOver5x": 0
       },
       {
@@ -2736,7 +2736,7 @@
       {
         "object": "Puppet measured trunk",
         "phase": 0.35,
-        "maxTravel": 0.5146879320991548,
+        "maxTravel": 0.5163326721769683,
         "stretch99": 1.115135903763943,
         "stretchMax": 1.3246243977051573,
         "edgesOver5x": 0
@@ -2760,9 +2760,9 @@
       {
         "object": "Puppet lower rostrum",
         "phase": 0.35,
-        "maxTravel": 0.7169169224242202,
-        "stretch99": 1.0000095283590078,
-        "stretchMax": 1.0000178479576947,
+        "maxTravel": 0.6957871836630971,
+        "stretch99": 1.0000273072022399,
+        "stretchMax": 1.0002633811484873,
         "edgesOver5x": 0
       },
       {
@@ -2800,7 +2800,7 @@
       {
         "object": "Shonisaurus authored skin",
         "phase": 0.5,
-        "maxTravel": 0.900183903358356,
+        "maxTravel": 0.8828179385167363,
         "stretch99": 1.0656374110961426,
         "stretchMax": 3.1014780977056957,
         "edgesOver5x": 0
@@ -2808,7 +2808,7 @@
       {
         "object": "Puppet measured trunk",
         "phase": 0.5,
-        "maxTravel": 0.6907121771732875,
+        "maxTravel": 0.6925104780692327,
         "stretch99": 1.075888248021435,
         "stretchMax": 1.2004939582810357,
         "edgesOver5x": 0
@@ -2832,9 +2832,9 @@
       {
         "object": "Puppet lower rostrum",
         "phase": 0.5,
-        "maxTravel": 0.906093401658662,
-        "stretch99": 1.0000088574896258,
-        "stretchMax": 1.0000852154816993,
+        "maxTravel": 0.8794545453795974,
+        "stretch99": 1.0000219688796597,
+        "stretchMax": 1.0001916347898678,
         "edgesOver5x": 0
       },
       {
@@ -2872,7 +2872,7 @@
       {
         "object": "Shonisaurus authored skin",
         "phase": 0.7,
-        "maxTravel": 0.5688704685069759,
+        "maxTravel": 0.5578468137539004,
         "stretch99": 1.032529497713885,
         "stretchMax": 2.220238536567695,
         "edgesOver5x": 0
@@ -2880,7 +2880,7 @@
       {
         "object": "Puppet measured trunk",
         "phase": 0.7,
-        "maxTravel": 0.42209784288240804,
+        "maxTravel": 0.4233413873432997,
         "stretch99": 1.0398895635623089,
         "stretchMax": 1.1148661787315004,
         "edgesOver5x": 0
@@ -2904,9 +2904,9 @@
       {
         "object": "Puppet lower rostrum",
         "phase": 0.7,
-        "maxTravel": 0.5728210744312849,
-        "stretch99": 1.000007417806347,
-        "stretchMax": 1.0000654351547988,
+        "maxTravel": 0.5552830501802614,
+        "stretch99": 1.0000156961067241,
+        "stretchMax": 1.0000802248199592,
         "edgesOver5x": 0
       },
       {
@@ -3050,9 +3050,9 @@
       {
         "object": "Puppet lower rostrum",
         "phase": 0,
-        "maxTravel": 0.0006322761129239808,
-        "stretch99": 1.0000056881696595,
-        "stretchMax": 1.0000066398174479,
+        "maxTravel": 0.0006217839545570336,
+        "stretch99": 1.0000065019712387,
+        "stretchMax": 1.0001212822431211,
         "edgesOver5x": 0
       },
       {
@@ -3090,9 +3090,9 @@
       {
         "object": "Shonisaurus authored skin",
         "phase": 0.2,
-        "maxTravel": 0.11246552234078888,
-        "stretch99": 1.0049567498654801,
-        "stretchMax": 2.111096200719734,
+        "maxTravel": 0.2133326785251721,
+        "stretch99": 1.004485025663669,
+        "stretchMax": 3.4584343449762045,
         "edgesOver5x": 0
       },
       {
@@ -3114,33 +3114,33 @@
       {
         "object": "Puppet upper rostrum",
         "phase": 0.2,
-        "maxTravel": 0.005329604251939998,
-        "stretch99": 1.00000489546271,
-        "stretchMax": 1.0000074632367228,
+        "maxTravel": 0.0051513445193033715,
+        "stretch99": 1.0000044387040607,
+        "stretchMax": 1.0000073984977702,
         "edgesOver5x": 0
       },
       {
         "object": "Puppet lower rostrum",
         "phase": 0.2,
-        "maxTravel": 0.11486324878883439,
-        "stretch99": 1.1482163864543111,
-        "stretchMax": 1.2480032865869068,
+        "maxTravel": 0.21177743583984127,
+        "stretch99": 1.0000386892081494,
+        "stretchMax": 1.000144286006792,
         "edgesOver5x": 0
       },
       {
         "object": "Puppet pectoral L",
         "phase": 0.2,
         "maxTravel": 0.003326532567748892,
-        "stretch99": 1.0010033284941404,
-        "stretchMax": 1.0012324563576347,
+        "stretch99": 1.001772467953845,
+        "stretchMax": 1.003406467672938,
         "edgesOver5x": 0
       },
       {
         "object": "Puppet pectoral R",
         "phase": 0.2,
         "maxTravel": 0.005194559400935157,
-        "stretch99": 1.000432548654146,
-        "stretchMax": 1.0010034490567512,
+        "stretch99": 1.0016755925511176,
+        "stretchMax": 1.0035338639652522,
         "edgesOver5x": 0
       },
       {
@@ -3162,17 +3162,17 @@
       {
         "object": "Shonisaurus authored skin",
         "phase": 0.35,
-        "maxTravel": 0.06055651206756644,
-        "stretch99": 1.0119343425239768,
-        "stretchMax": 1.836464066693563,
+        "maxTravel": 0.1376352237801089,
+        "stretch99": 1.0131606534219495,
+        "stretchMax": 2.8571247260664925,
         "edgesOver5x": 0
       },
       {
         "object": "Puppet measured trunk",
         "phase": 0.35,
         "maxTravel": 0.03551540647969732,
-        "stretch99": 1.0124739564184007,
-        "stretchMax": 1.0201980606290386,
+        "stretch99": 1.015644603838217,
+        "stretchMax": 1.0254844451140845,
         "edgesOver5x": 0
       },
       {
@@ -3186,33 +3186,33 @@
       {
         "object": "Puppet upper rostrum",
         "phase": 0.35,
-        "maxTravel": 0.022630886768842038,
-        "stretch99": 1.00000670186981,
-        "stretchMax": 1.0000088885162306,
+        "maxTravel": 0.0282655639781215,
+        "stretch99": 1.000006427975042,
+        "stretchMax": 1.0000105997868967,
         "edgesOver5x": 0
       },
       {
         "object": "Puppet lower rostrum",
         "phase": 0.35,
-        "maxTravel": 0.06227651743285291,
-        "stretch99": 1.1125518823809002,
-        "stretchMax": 1.1886574545312003,
+        "maxTravel": 0.1365584373531549,
+        "stretch99": 1.000013886081842,
+        "stretchMax": 1.0000925976498765,
         "edgesOver5x": 0
       },
       {
         "object": "Puppet pectoral L",
         "phase": 0.35,
         "maxTravel": 0.009787843892565866,
-        "stretch99": 1.0109924677960824,
-        "stretchMax": 1.021086296766641,
+        "stretch99": 1.013831954726509,
+        "stretchMax": 1.0265027737358594,
         "edgesOver5x": 0
       },
       {
         "object": "Puppet pectoral R",
         "phase": 0.35,
         "maxTravel": 0.009459665030666623,
-        "stretch99": 1.0103898152208228,
-        "stretchMax": 1.0218468715121882,
+        "stretch99": 1.0130724563883173,
+        "stretchMax": 1.0274582569425956,
         "edgesOver5x": 0
       },
       {
@@ -3266,9 +3266,9 @@
       {
         "object": "Puppet lower rostrum",
         "phase": 0.5,
-        "maxTravel": 0.0006322761129239808,
-        "stretch99": 1.0000051156046512,
-        "stretchMax": 1.0000059969649249,
+        "maxTravel": 0.0006217839545570292,
+        "stretch99": 1.0000128157159434,
+        "stretchMax": 1.0001325982454907,
         "edgesOver5x": 0
       },
       {
@@ -3306,9 +3306,9 @@
       {
         "object": "Shonisaurus authored skin",
         "phase": 0.7,
-        "maxTravel": 0.1124650463154508,
-        "stretch99": 1.0051834486637636,
-        "stretchMax": 2.1110974546415755,
+        "maxTravel": 0.21333500303244887,
+        "stretch99": 1.0046600635684677,
+        "stretchMax": 3.45843527519162,
         "edgesOver5x": 0
       },
       {
@@ -3330,33 +3330,33 @@
       {
         "object": "Puppet upper rostrum",
         "phase": 0.7,
-        "maxTravel": 0.005328884615718567,
-        "stretch99": 1.0000050044332875,
-        "stretchMax": 1.000006273796902,
+        "maxTravel": 0.005152007214435887,
+        "stretch99": 1.0000045659098413,
+        "stretchMax": 1.000005945521899,
         "edgesOver5x": 0
       },
       {
         "object": "Puppet lower rostrum",
         "phase": 0.7,
-        "maxTravel": 0.11486324878883439,
-        "stretch99": 1.1482161229127363,
-        "stretchMax": 1.2480047950307196,
+        "maxTravel": 0.21177548280408812,
+        "stretch99": 1.00004231136244,
+        "stretchMax": 1.0001389781605736,
         "edgesOver5x": 0
       },
       {
         "object": "Puppet pectoral L",
         "phase": 0.7,
         "maxTravel": 0.0033286877246716607,
-        "stretch99": 1.000521409358132,
-        "stretchMax": 1.0009455960408828,
+        "stretch99": 1.0017718652191214,
+        "stretchMax": 1.003406626072649,
         "edgesOver5x": 0
       },
       {
         "object": "Puppet pectoral R",
         "phase": 0.7,
         "maxTravel": 0.0051945425707647635,
-        "stretch99": 1.0009732864488272,
-        "stretchMax": 1.0012188745928756,
+        "stretch99": 1.0016755645379523,
+        "stretchMax": 1.0035338639652522,
         "edgesOver5x": 0
       },
       {
@@ -3410,9 +3410,9 @@
       {
         "object": "Puppet lower rostrum",
         "phase": 1,
-        "maxTravel": 0.0006322761129239808,
-        "stretch99": 1.0000056881696595,
-        "stretchMax": 1.0000066398174479,
+        "maxTravel": 0.0006217839545570336,
+        "stretch99": 1.0000065019712387,
+        "stretchMax": 1.0001212822431211,
         "edgesOver5x": 0
       },
       {
@@ -3524,15 +3524,15 @@
       {
         "object": "Shonisaurus authored skin",
         "phase": 0.2,
-        "maxTravel": 0.02766140451212134,
-        "stretch99": 1.0120287363624603,
-        "stretchMax": 1.2356521088174703,
+        "maxTravel": 0.025981669853422193,
+        "stretch99": 1.0101085588604308,
+        "stretchMax": 1.177440512418902,
         "edgesOver5x": 0
       },
       {
         "object": "Puppet measured trunk",
         "phase": 0.2,
-        "maxTravel": 0.01116303909129186,
+        "maxTravel": 0.010889234425102711,
         "stretch99": 1.0139735116345352,
         "stretchMax": 1.0217024786135083,
         "edgesOver5x": 0
@@ -3548,17 +3548,17 @@
       {
         "object": "Puppet upper rostrum",
         "phase": 0.2,
-        "maxTravel": 0.02748375088957817,
-        "stretch99": 1.0000049125801713,
-        "stretchMax": 1.0000083821487808,
+        "maxTravel": 0.025819258856473026,
+        "stretch99": 1.0000074469863818,
+        "stretchMax": 1.0000098385516691,
         "edgesOver5x": 0
       },
       {
         "object": "Puppet lower rostrum",
         "phase": 0.2,
-        "maxTravel": 0.011010092520742148,
-        "stretch99": 1.0328353389227523,
-        "stretchMax": 1.0552878495720273,
+        "maxTravel": 0.025337322271337562,
+        "stretch99": 1.0000081630392206,
+        "stretchMax": 1.0000295249553677,
         "edgesOver5x": 0
       },
       {
@@ -3596,9 +3596,9 @@
       {
         "object": "Shonisaurus authored skin",
         "phase": 0.35,
-        "maxTravel": 0.06494809954628863,
-        "stretch99": 1.0287082298199284,
-        "stretchMax": 1.5671690367659334,
+        "maxTravel": 0.06100441724193554,
+        "stretch99": 1.0241396906787683,
+        "stretchMax": 1.4314051447087899,
         "edgesOver5x": 0
       },
       {
@@ -3620,17 +3620,17 @@
       {
         "object": "Puppet upper rostrum",
         "phase": 0.35,
-        "maxTravel": 0.06453033143579429,
-        "stretch99": 1.0000060873137713,
-        "stretchMax": 1.0000102684591676,
+        "maxTravel": 0.06062268229187734,
+        "stretch99": 1.0000070700698478,
+        "stretchMax": 1.0000084588627742,
         "edgesOver5x": 0
       },
       {
         "object": "Puppet lower rostrum",
         "phase": 0.35,
-        "maxTravel": 0.025867013363167764,
-        "stretch99": 1.077226531059357,
-        "stretchMax": 1.129684837568389,
+        "maxTravel": 0.059491265720885554,
+        "stretch99": 1.0000111622513357,
+        "stretchMax": 1.0000291665284797,
         "edgesOver5x": 0
       },
       {
@@ -3668,9 +3668,9 @@
       {
         "object": "Shonisaurus authored skin",
         "phase": 0.5,
-        "maxTravel": 0.08211186892369225,
-        "stretch99": 1.0365210614030966,
-        "stretchMax": 1.723633003822471,
+        "maxTravel": 0.07711437015086539,
+        "stretch99": 1.0306744404828423,
+        "stretchMax": 1.552732081199731,
         "edgesOver5x": 0
       },
       {
@@ -3692,17 +3692,17 @@
       {
         "object": "Puppet upper rostrum",
         "phase": 0.5,
-        "maxTravel": 0.08158446893162372,
-        "stretch99": 1.0000046848017339,
-        "stretchMax": 1.0000059982392917,
+        "maxTravel": 0.07663264721401054,
+        "stretch99": 1.000006950153936,
+        "stretchMax": 1.000008511117401,
         "edgesOver5x": 0
       },
       {
         "object": "Puppet lower rostrum",
         "phase": 0.5,
-        "maxTravel": 0.03263419675579491,
-        "stretch99": 1.09780943572949,
-        "stretchMax": 1.1640678946238794,
+        "maxTravel": 0.0751994433164119,
+        "stretch99": 1.0000142641662944,
+        "stretchMax": 1.0000803496469228,
         "edgesOver5x": 0
       },
       {
@@ -3740,15 +3740,15 @@
       {
         "object": "Shonisaurus authored skin",
         "phase": 0.7,
-        "maxTravel": 0.054548267264632314,
-        "stretch99": 1.0238562207840145,
-        "stretchMax": 1.4736298712299802,
+        "maxTravel": 0.05123585025209563,
+        "stretch99": 1.0200538018965644,
+        "stretchMax": 1.3580033918730905,
         "edgesOver5x": 0
       },
       {
         "object": "Puppet measured trunk",
         "phase": 0.7,
-        "maxTravel": 0.022009114422756645,
+        "maxTravel": 0.021497331885938872,
         "stretch99": 1.027415062986439,
         "stretchMax": 1.042301651421004,
         "edgesOver5x": 0
@@ -3764,17 +3764,17 @@
       {
         "object": "Puppet upper rostrum",
         "phase": 0.7,
-        "maxTravel": 0.05419984534666227,
-        "stretch99": 1.0000043944046466,
-        "stretchMax": 1.0000064810184321,
+        "maxTravel": 0.05091760323410392,
+        "stretch99": 1.0000071136125999,
+        "stretchMax": 1.000010271881637,
         "edgesOver5x": 0
       },
       {
         "object": "Puppet lower rostrum",
         "phase": 0.7,
-        "maxTravel": 0.021728846229400075,
-        "stretch99": 1.0648345558736483,
-        "stretchMax": 1.1089545458026342,
+        "maxTravel": 0.04996554702246074,
+        "stretch99": 1.0000135082466148,
+        "stretchMax": 1.0000938844553953,
         "edgesOver5x": 0
       },
       {
@@ -3918,9 +3918,9 @@
       {
         "object": "Puppet lower rostrum",
         "phase": 0,
-        "maxTravel": 0.016630007503878278,
-        "stretch99": 1.0000042556003361,
-        "stretchMax": 1.000005940740537,
+        "maxTravel": 0.016539829608227453,
+        "stretch99": 1.0000073661944242,
+        "stretchMax": 1.0000288957998695,
         "edgesOver5x": 0
       },
       {
@@ -3959,7 +3959,7 @@
         "object": "Shonisaurus authored skin",
         "phase": 0.2,
         "maxTravel": 0.16345659128510748,
-        "stretch99": 1.0207346716086543,
+        "stretch99": 1.0204821868367733,
         "stretchMax": 2.013042046563642,
         "edgesOver5x": 0
       },
@@ -3982,33 +3982,33 @@
       {
         "object": "Puppet upper rostrum",
         "phase": 0.2,
-        "maxTravel": 0.016496257827789077,
-        "stretch99": 1.000006740044088,
-        "stretchMax": 1.0000081927700153,
+        "maxTravel": 0.016849034726890307,
+        "stretch99": 1.0000047828053733,
+        "stretchMax": 1.0000071296570554,
         "edgesOver5x": 0
       },
       {
         "object": "Puppet lower rostrum",
         "phase": 0.2,
-        "maxTravel": 0.02170756985935657,
-        "stretch99": 1.0070363679819387,
-        "stretchMax": 1.0118601979945432,
+        "maxTravel": 0.016750182459681278,
+        "stretch99": 1.0000118028764777,
+        "stretchMax": 1.0000465643182885,
         "edgesOver5x": 0
       },
       {
         "object": "Puppet pectoral L",
         "phase": 0.2,
         "maxTravel": 0.1642470660694486,
-        "stretch99": 1.015410501274272,
-        "stretchMax": 1.024868755064862,
+        "stretch99": 1.0151998192998415,
+        "stretchMax": 1.024527371153528,
         "edgesOver5x": 0
       },
       {
         "object": "Puppet pectoral R",
         "phase": 0.2,
         "maxTravel": 0.16563102399239008,
-        "stretch99": 1.0173462559579884,
-        "stretchMax": 1.0257629180961483,
+        "stretch99": 1.0172601941350767,
+        "stretchMax": 1.0254118511870263,
         "edgesOver5x": 0
       },
       {
@@ -4031,7 +4031,7 @@
         "object": "Shonisaurus authored skin",
         "phase": 0.35,
         "maxTravel": 0.1552869226412537,
-        "stretch99": 1.020883403309345,
+        "stretch99": 1.0200770551674545,
         "stretchMax": 1.9907160186776076,
         "edgesOver5x": 0
       },
@@ -4054,33 +4054,33 @@
       {
         "object": "Puppet upper rostrum",
         "phase": 0.35,
-        "maxTravel": 0.016079128629336827,
-        "stretch99": 1.0000049997810605,
-        "stretchMax": 1.0000073141144352,
+        "maxTravel": 0.016845465436633948,
+        "stretch99": 1.0000043734891022,
+        "stretchMax": 1.0000073098275977,
         "edgesOver5x": 0
       },
       {
         "object": "Puppet lower rostrum",
         "phase": 0.35,
-        "maxTravel": 0.0274446484680134,
-        "stretch99": 1.0152914477781028,
-        "stretchMax": 1.0257699277358803,
+        "maxTravel": 0.01674616146732102,
+        "stretch99": 1.0000076191571843,
+        "stretchMax": 1.0000495000603749,
         "edgesOver5x": 0
       },
       {
         "object": "Puppet pectoral L",
         "phase": 0.35,
         "maxTravel": 0.15641396939129976,
-        "stretch99": 1.0150693302757055,
-        "stretchMax": 1.0252697780689783,
+        "stretch99": 1.014860404063822,
+        "stretchMax": 1.02452780313125,
         "edgesOver5x": 0
       },
       {
         "object": "Puppet pectoral R",
         "phase": 0.35,
         "maxTravel": 0.15734796462709813,
-        "stretch99": 1.016887737154213,
-        "stretchMax": 1.026177350543794,
+        "stretch99": 1.0167033078645142,
+        "stretchMax": 1.0254157059120799,
         "edgesOver5x": 0
       },
       {
@@ -4103,7 +4103,7 @@
         "object": "Shonisaurus authored skin",
         "phase": 0.5,
         "maxTravel": 0.14797103273911594,
-        "stretch99": 1.0208344868799868,
+        "stretch99": 1.0197915311352297,
         "stretchMax": 1.9730178055496497,
         "edgesOver5x": 0
       },
@@ -4126,33 +4126,33 @@
       {
         "object": "Puppet upper rostrum",
         "phase": 0.5,
-        "maxTravel": 0.01564594057956849,
-        "stretch99": 1.0000061309080315,
-        "stretchMax": 1.0000099386774832,
+        "maxTravel": 0.016636187685474067,
+        "stretch99": 1.0000042606452046,
+        "stretchMax": 1.0000060631601935,
         "edgesOver5x": 0
       },
       {
         "object": "Puppet lower rostrum",
         "phase": 0.5,
-        "maxTravel": 0.030266845555623405,
-        "stretch99": 1.0195076376995214,
-        "stretchMax": 1.032868005440623,
+        "maxTravel": 0.016539936363168146,
+        "stretch99": 1.0000098825627812,
+        "stretchMax": 1.00001658205239,
         "edgesOver5x": 0
       },
       {
         "object": "Puppet pectoral L",
         "phase": 0.5,
         "maxTravel": 0.14948053297692063,
-        "stretch99": 1.014669676791985,
-        "stretchMax": 1.0254741348186924,
+        "stretch99": 1.01440400078102,
+        "stretchMax": 1.0245281162758593,
         "edgesOver5x": 0
       },
       {
         "object": "Puppet pectoral R",
         "phase": 0.5,
         "maxTravel": 0.14969663429013075,
-        "stretch99": 1.0164568860399974,
-        "stretchMax": 1.0263861262687326,
+        "stretch99": 1.0161765983153634,
+        "stretchMax": 1.0254051853488133,
         "edgesOver5x": 0
       },
       {
@@ -4175,7 +4175,7 @@
         "object": "Shonisaurus authored skin",
         "phase": 0.7,
         "maxTravel": 0.15032094740630403,
-        "stretch99": 1.0204911145871034,
+        "stretch99": 1.0199004423090667,
         "stretchMax": 1.9837676709183718,
         "edgesOver5x": 0
       },
@@ -4198,33 +4198,33 @@
       {
         "object": "Puppet upper rostrum",
         "phase": 0.7,
-        "maxTravel": 0.016223782260392842,
-        "stretch99": 1.0000061798924271,
-        "stretchMax": 1.0000080218035272,
+        "maxTravel": 0.01684823703185888,
+        "stretch99": 1.0000042731443792,
+        "stretchMax": 1.0000063644866932,
         "edgesOver5x": 0
       },
       {
         "object": "Puppet lower rostrum",
         "phase": 0.7,
-        "maxTravel": 0.025478428327973125,
-        "stretch99": 1.012459379495022,
-        "stretchMax": 1.0210156889912814,
+        "maxTravel": 0.016750076397749454,
+        "stretch99": 1.0000082444386351,
+        "stretchMax": 1.0000238320196413,
         "edgesOver5x": 0
       },
       {
         "object": "Puppet pectoral L",
         "phase": 0.7,
         "maxTravel": 0.15191292392823802,
-        "stretch99": 1.0148837321408142,
-        "stretchMax": 1.0251300160480354,
+        "stretch99": 1.0147135069864066,
+        "stretchMax": 1.024528866635728,
         "edgesOver5x": 0
       },
       {
         "object": "Puppet pectoral R",
         "phase": 0.7,
         "maxTravel": 0.15166352762621427,
-        "stretch99": 1.0164511139158996,
-        "stretchMax": 1.0260347391891225,
+        "stretch99": 1.0162809240085213,
+        "stretchMax": 1.0254115809651794,
         "edgesOver5x": 0
       },
       {
@@ -4278,9 +4278,9 @@
       {
         "object": "Puppet lower rostrum",
         "phase": 1,
-        "maxTravel": 0.016630007503878278,
-        "stretch99": 1.0000042556003361,
-        "stretchMax": 1.000005940740537,
+        "maxTravel": 0.016539829608227453,
+        "stretch99": 1.0000073661944242,
+        "stretchMax": 1.0000288957998695,
         "edgesOver5x": 0
       },
       {
@@ -4392,16 +4392,16 @@
       {
         "object": "Shonisaurus authored skin",
         "phase": 0.2,
-        "maxTravel": 0.39401289574521137,
-        "stretch99": 1.037195781656916,
-        "stretchMax": 4.272621927720406,
-        "edgesOver5x": 0
+        "maxTravel": 0.46942566296857363,
+        "stretch99": 1.0371059243146183,
+        "stretchMax": 5.988129612515608,
+        "edgesOver5x": 2
       },
       {
         "object": "Puppet measured trunk",
         "phase": 0.2,
         "maxTravel": 0.23625078904597693,
-        "stretch99": 1.037100744570314,
+        "stretch99": 1.037615019932142,
         "stretchMax": 1.1053149823720176,
         "edgesOver5x": 0
       },
@@ -4416,33 +4416,33 @@
       {
         "object": "Puppet upper rostrum",
         "phase": 0.2,
-        "maxTravel": 0.08734961332933777,
-        "stretch99": 1.0000051814946567,
+        "maxTravel": 0.08538607939309524,
+        "stretch99": 1.000004962245626,
         "stretchMax": 1.0000279833016932,
         "edgesOver5x": 0
       },
       {
         "object": "Puppet lower rostrum",
         "phase": 0.2,
-        "maxTravel": 0.36744902961186904,
-        "stretch99": 1.424932641200425,
-        "stretchMax": 1.706102695756763,
+        "maxTravel": 0.46762048391619127,
+        "stretch99": 1.0023172554714803,
+        "stretchMax": 1.0030139153572653,
         "edgesOver5x": 0
       },
       {
         "object": "Puppet pectoral L",
         "phase": 0.2,
         "maxTravel": 0.2601537938181178,
-        "stretch99": 1.0261299153039443,
-        "stretchMax": 1.0460950814526337,
+        "stretch99": 1.0295793357652712,
+        "stretchMax": 1.0543810879041349,
         "edgesOver5x": 0
       },
       {
         "object": "Puppet pectoral R",
         "phase": 0.2,
         "maxTravel": 0.26090984219780855,
-        "stretch99": 1.022074419850532,
-        "stretchMax": 1.0306369218090619,
+        "stretch99": 1.0215677532256324,
+        "stretchMax": 1.0296547034776686,
         "edgesOver5x": 0
       },
       {
@@ -4465,9 +4465,9 @@
         "object": "Shonisaurus authored skin",
         "phase": 0.35,
         "maxTravel": 0.6417477283795857,
-        "stretch99": 1.0502750948718262,
-        "stretchMax": 3.9496511201609783,
-        "edgesOver5x": 0
+        "stretch99": 1.0494315253025206,
+        "stretchMax": 5.503192225869364,
+        "edgesOver5x": 1
       },
       {
         "object": "Puppet measured trunk",
@@ -4488,24 +4488,24 @@
       {
         "object": "Puppet upper rostrum",
         "phase": 0.35,
-        "maxTravel": 0.29825255107238013,
-        "stretch99": 1.0000044990606174,
-        "stretchMax": 1.0000076240883509,
+        "maxTravel": 0.300761627287355,
+        "stretch99": 1.0000067073763932,
+        "stretchMax": 1.0000078234192284,
         "edgesOver5x": 0
       },
       {
         "object": "Puppet lower rostrum",
         "phase": 0.35,
-        "maxTravel": 0.37232711999054363,
-        "stretch99": 1.3837532579826215,
-        "stretchMax": 1.6382399672381145,
+        "maxTravel": 0.43051549066979994,
+        "stretch99": 1.0001530272681827,
+        "stretchMax": 1.0005976882020629,
         "edgesOver5x": 0
       },
       {
         "object": "Puppet pectoral L",
         "phase": 0.35,
         "maxTravel": 0.3305127662783175,
-        "stretch99": 1.0227281954975063,
+        "stretch99": 1.0252750700947442,
         "stretchMax": 1.038490839939569,
         "edgesOver5x": 0
       },
@@ -4513,7 +4513,7 @@
         "object": "Puppet pectoral R",
         "phase": 0.35,
         "maxTravel": 0.3395742717136399,
-        "stretch99": 1.0243281064884788,
+        "stretch99": 1.0262485963015626,
         "stretchMax": 1.035659429782279,
         "edgesOver5x": 0
       },
@@ -4537,7 +4537,7 @@
         "object": "Shonisaurus authored skin",
         "phase": 0.5,
         "maxTravel": 0.1650865905227195,
-        "stretch99": 1.0112367606249608,
+        "stretch99": 1.011168804703661,
         "stretchMax": 1.4826724100670068,
         "edgesOver5x": 0
       },
@@ -4560,32 +4560,32 @@
       {
         "object": "Puppet upper rostrum",
         "phase": 0.5,
-        "maxTravel": 0.07346464911824155,
-        "stretch99": 1.0000076032317429,
-        "stretchMax": 1.0000145051849925,
+        "maxTravel": 0.07347780183677552,
+        "stretch99": 1.0000071200783642,
+        "stretchMax": 1.0000096894670023,
         "edgesOver5x": 0
       },
       {
         "object": "Puppet lower rostrum",
         "phase": 0.5,
-        "maxTravel": 0.07339878752453192,
-        "stretch99": 1.002934828578634,
-        "stretchMax": 1.0049518313943349,
+        "maxTravel": 0.07341321066094024,
+        "stretch99": 1.0000137314502222,
+        "stretchMax": 1.0000716239088665,
         "edgesOver5x": 0
       },
       {
         "object": "Puppet pectoral L",
         "phase": 0.5,
         "maxTravel": 0.07827045623972038,
-        "stretch99": 1.0046910404438354,
-        "stretchMax": 1.0057602067007243,
+        "stretch99": 1.0046895603336463,
+        "stretchMax": 1.005749955499532,
         "edgesOver5x": 0
       },
       {
         "object": "Puppet pectoral R",
         "phase": 0.5,
         "maxTravel": 0.08148792301866634,
-        "stretch99": 1.0053280550638257,
+        "stretch99": 1.0053228282381907,
         "stretchMax": 1.0067999961757519,
         "edgesOver5x": 0
       },
@@ -4640,9 +4640,9 @@
       {
         "object": "Puppet lower rostrum",
         "phase": 0.7,
-        "maxTravel": 0.008003210185787828,
-        "stretch99": 1.0000026179046453,
-        "stretchMax": 1.0000035901106727,
+        "maxTravel": 0.007988275887775509,
+        "stretch99": 1.0000063609114656,
+        "stretchMax": 1.0000250364514665,
         "edgesOver5x": 0
       },
       {
@@ -4827,14 +4827,14 @@
         "object": "Shonisaurus authored skin",
         "phase": 0.2,
         "maxTravel": 0.18396983273177805,
-        "stretch99": 1.0465058808683263,
+        "stretch99": 1.0432665934734857,
         "stretchMax": 2.598330783091161,
         "edgesOver5x": 0
       },
       {
         "object": "Puppet measured trunk",
         "phase": 0.2,
-        "maxTravel": 0.08764175481460255,
+        "maxTravel": 0.08776841686348082,
         "stretch99": 1.056911990468349,
         "stretchMax": 1.0909888124696776,
         "edgesOver5x": 0
@@ -4850,17 +4850,17 @@
       {
         "object": "Puppet upper rostrum",
         "phase": 0.2,
-        "maxTravel": 0.12957243512077712,
-        "stretch99": 1.000007085519005,
-        "stretchMax": 1.0001477415202678,
+        "maxTravel": 0.12954202300364231,
+        "stretch99": 1.0000047911883674,
+        "stretchMax": 1.0000339869619808,
         "edgesOver5x": 0
       },
       {
         "object": "Puppet lower rostrum",
         "phase": 0.2,
-        "maxTravel": 0.13475613056260613,
-        "stretch99": 1.0358367586614377,
-        "stretchMax": 1.0603271882862524,
+        "maxTravel": 0.12788147617847676,
+        "stretch99": 1.000010725672299,
+        "stretchMax": 1.0000222363373272,
         "edgesOver5x": 0
       },
       {
@@ -4875,8 +4875,8 @@
         "object": "Puppet pectoral R",
         "phase": 0.2,
         "maxTravel": 0.18311190413259662,
-        "stretch99": 1.0086220191216562,
-        "stretchMax": 1.009890192067414,
+        "stretch99": 1.0081186607455133,
+        "stretchMax": 1.0096579176591818,
         "edgesOver5x": 0
       },
       {
@@ -4899,14 +4899,14 @@
         "object": "Shonisaurus authored skin",
         "phase": 0.35,
         "maxTravel": 0.23808527356286371,
-        "stretch99": 1.0520144128760214,
+        "stretch99": 1.046802582893738,
         "stretchMax": 2.6360167955931377,
         "edgesOver5x": 0
       },
       {
         "object": "Puppet measured trunk",
         "phase": 0.35,
-        "maxTravel": 0.12666566650730307,
+        "maxTravel": 0.1267768496314294,
         "stretch99": 1.0603616149671178,
         "stretchMax": 1.096618702763259,
         "edgesOver5x": 0
@@ -4922,17 +4922,17 @@
       {
         "object": "Puppet upper rostrum",
         "phase": 0.35,
-        "maxTravel": 0.15223897001140074,
-        "stretch99": 1.0000070622081396,
+        "maxTravel": 0.1521746603730658,
+        "stretch99": 1.0000054550754227,
         "stretchMax": 1.000096751229372,
         "edgesOver5x": 0
       },
       {
         "object": "Puppet lower rostrum",
         "phase": 0.35,
-        "maxTravel": 0.1646382178923268,
-        "stretch99": 1.06153575595495,
-        "stretchMax": 1.1034279893937355,
+        "maxTravel": 0.1510966864731451,
+        "stretch99": 1.0000082595453967,
+        "stretchMax": 1.000157701159543,
         "edgesOver5x": 0
       },
       {
@@ -4947,8 +4947,8 @@
         "object": "Puppet pectoral R",
         "phase": 0.35,
         "maxTravel": 0.2371554162711055,
-        "stretch99": 1.019993500577827,
-        "stretchMax": 1.0228512849498945,
+        "stretch99": 1.0191253692403592,
+        "stretchMax": 1.0224645812748563,
         "edgesOver5x": 0
       },
       {
@@ -4971,7 +4971,7 @@
         "object": "Shonisaurus authored skin",
         "phase": 0.5,
         "maxTravel": 0.15938632786235976,
-        "stretch99": 1.0240509838793028,
+        "stretch99": 1.023026888622669,
         "stretchMax": 1.3253718180853085,
         "edgesOver5x": 0
       },
@@ -4994,33 +4994,33 @@
       {
         "object": "Puppet upper rostrum",
         "phase": 0.5,
-        "maxTravel": 0.0627018090144188,
-        "stretch99": 1.0000075320811288,
-        "stretchMax": 1.0000093657264493,
+        "maxTravel": 0.0628736149388081,
+        "stretch99": 1.0000048723392652,
+        "stretchMax": 1.0000093538195785,
         "edgesOver5x": 0
       },
       {
         "object": "Puppet lower rostrum",
         "phase": 0.5,
-        "maxTravel": 0.0630186089154107,
-        "stretch99": 1.0183294593804535,
-        "stretchMax": 1.0308815007535863,
+        "maxTravel": 0.06289323487150907,
+        "stretch99": 1.0000104158048106,
+        "stretchMax": 1.0002490368789223,
         "edgesOver5x": 0
       },
       {
         "object": "Puppet pectoral L",
         "phase": 0.5,
         "maxTravel": 0.06012096608315005,
-        "stretch99": 1.0078096208109737,
-        "stretchMax": 1.027714222590388,
+        "stretch99": 1.007594361227256,
+        "stretchMax": 1.026923096986907,
         "edgesOver5x": 0
       },
       {
         "object": "Puppet pectoral R",
         "phase": 0.5,
         "maxTravel": 0.08364740627348759,
-        "stretch99": 1.0245555563247863,
-        "stretchMax": 1.028562644334681,
+        "stretch99": 1.0243477665471639,
+        "stretchMax": 1.0284486783792974,
         "edgesOver5x": 0
       },
       {
@@ -5074,9 +5074,9 @@
       {
         "object": "Puppet lower rostrum",
         "phase": 0.7,
-        "maxTravel": 0.015210109668753524,
-        "stretch99": 1.000006536279249,
-        "stretchMax": 1.000009100663366,
+        "maxTravel": 0.015211349013988486,
+        "stretch99": 1.0000090954325815,
+        "stretchMax": 1.0001462477231315,
         "edgesOver5x": 0
       },
       {
@@ -5220,9 +5220,9 @@
       {
         "object": "Puppet lower rostrum",
         "phase": 0,
-        "maxTravel": 0.0005419509631483147,
-        "stretch99": 1.0000055474368617,
-        "stretchMax": 1.000006702311439,
+        "maxTravel": 0.0005329576670192204,
+        "stretch99": 1.0000097869452533,
+        "stretchMax": 1.0001434263045188,
         "edgesOver5x": 0
       },
       {
@@ -5261,8 +5261,8 @@
         "object": "Shonisaurus authored skin",
         "phase": 0.2,
         "maxTravel": 0.019804630230488465,
-        "stretch99": 1.0035373595379453,
-        "stretchMax": 1.0464757267257088,
+        "stretch99": 1.003202598807117,
+        "stretchMax": 1.0221929891059178,
         "edgesOver5x": 0
       },
       {
@@ -5284,17 +5284,17 @@
       {
         "object": "Puppet upper rostrum",
         "phase": 0.2,
-        "maxTravel": 0.0031918663133674377,
-        "stretch99": 1.000005961678358,
-        "stretchMax": 1.000009501566886,
+        "maxTravel": 0.0031740057973049314,
+        "stretch99": 1.000002860088203,
+        "stretchMax": 1.000003492680274,
         "edgesOver5x": 0
       },
       {
         "object": "Puppet lower rostrum",
         "phase": 0.2,
-        "maxTravel": 0.005623903418935699,
-        "stretch99": 1.0066164564725757,
-        "stretchMax": 1.0111498932288647,
+        "maxTravel": 0.0031467331292274786,
+        "stretch99": 1.0000040891976807,
+        "stretchMax": 1.0000352257388925,
         "edgesOver5x": 0
       },
       {
@@ -5309,8 +5309,8 @@
         "object": "Puppet pectoral R",
         "phase": 0.2,
         "maxTravel": 0.004559441561905192,
-        "stretch99": 1.0002920913226625,
-        "stretchMax": 1.0003646289084906,
+        "stretch99": 1.0002564827979246,
+        "stretchMax": 1.00038932215538,
         "edgesOver5x": 0
       },
       {
@@ -5333,8 +5333,8 @@
         "object": "Shonisaurus authored skin",
         "phase": 0.35,
         "maxTravel": 0.03230855080829755,
-        "stretch99": 1.004383438746046,
-        "stretchMax": 1.1111429580545225,
+        "stretch99": 1.0038335778207363,
+        "stretchMax": 1.0866150414964186,
         "edgesOver5x": 0
       },
       {
@@ -5356,33 +5356,33 @@
       {
         "object": "Puppet upper rostrum",
         "phase": 0.35,
-        "maxTravel": 0.003235000140508149,
-        "stretch99": 1.000006170289882,
-        "stretchMax": 1.0000080883695392,
+        "maxTravel": 0.0031351295061663276,
+        "stretch99": 1.0000057226043242,
+        "stretchMax": 1.0000069587473983,
         "edgesOver5x": 0
       },
       {
         "object": "Puppet lower rostrum",
         "phase": 0.35,
-        "maxTravel": 0.011444512263223785,
-        "stretch99": 1.0156872485645378,
-        "stretchMax": 1.0264454569271844,
+        "maxTravel": 0.003104357169155103,
+        "stretch99": 1.0000084416592412,
+        "stretchMax": 1.0001534858158883,
         "edgesOver5x": 0
       },
       {
         "object": "Puppet pectoral L",
         "phase": 0.35,
         "maxTravel": 0.008495938013674802,
-        "stretch99": 1.0007685702776197,
-        "stretchMax": 1.0008576515568666,
+        "stretch99": 1.0007497725686354,
+        "stretchMax": 1.0009246717139753,
         "edgesOver5x": 0
       },
       {
         "object": "Puppet pectoral R",
         "phase": 0.35,
         "maxTravel": 0.008157631042488084,
-        "stretch99": 1.0007371978206454,
-        "stretchMax": 1.001031887979122,
+        "stretch99": 1.0007285903494372,
+        "stretchMax": 1.0011592769551758,
         "edgesOver5x": 0
       },
       {
@@ -5405,8 +5405,8 @@
         "object": "Shonisaurus authored skin",
         "phase": 0.5,
         "maxTravel": 0.04760787602651022,
-        "stretch99": 1.0041287337673406,
-        "stretchMax": 1.1386182277170311,
+        "stretch99": 1.0035919077634328,
+        "stretchMax": 1.1020225986651229,
         "edgesOver5x": 0
       },
       {
@@ -5428,33 +5428,33 @@
       {
         "object": "Puppet upper rostrum",
         "phase": 0.5,
-        "maxTravel": 0.0011292278149521418,
-        "stretch99": 1.0000038383664405,
-        "stretchMax": 1.000005485918683,
+        "maxTravel": 0.0005419953664287092,
+        "stretch99": 1.0000047658777107,
+        "stretchMax": 1.000005479243441,
         "edgesOver5x": 0
       },
       {
         "object": "Puppet lower rostrum",
         "phase": 0.5,
-        "maxTravel": 0.013693848445039462,
-        "stretch99": 1.0195092973945057,
-        "stretchMax": 1.0328681560995567,
+        "maxTravel": 0.000532957667019216,
+        "stretch99": 1.000012069834668,
+        "stretchMax": 1.0001533041422292,
         "edgesOver5x": 0
       },
       {
         "object": "Puppet pectoral L",
         "phase": 0.5,
         "maxTravel": 0.007006336355218838,
-        "stretch99": 1.000767900300484,
-        "stretchMax": 1.0009301797175298,
+        "stretch99": 1.0007611840853277,
+        "stretchMax": 1.000856872187596,
         "edgesOver5x": 0
       },
       {
         "object": "Puppet pectoral R",
         "phase": 0.5,
         "maxTravel": 0.006283529040886449,
-        "stretch99": 1.0008292155733132,
-        "stretchMax": 1.0009661477094873,
+        "stretch99": 1.0008257128784728,
+        "stretchMax": 1.0009836370469187,
         "edgesOver5x": 0
       },
       {
@@ -5477,8 +5477,8 @@
         "object": "Shonisaurus authored skin",
         "phase": 0.7,
         "maxTravel": 0.019802933594713135,
-        "stretch99": 1.0038115174511293,
-        "stretchMax": 1.091049366132952,
+        "stretch99": 1.0033833725234278,
+        "stretchMax": 1.0215502787781323,
         "edgesOver5x": 0
       },
       {
@@ -5500,24 +5500,24 @@
       {
         "object": "Puppet upper rostrum",
         "phase": 0.7,
-        "maxTravel": 0.0032409395955295935,
-        "stretch99": 1.0000057441032384,
-        "stretchMax": 1.0000080085062537,
+        "maxTravel": 0.0031739912556501717,
+        "stretch99": 1.0000030143627632,
+        "stretchMax": 1.0000037203012384,
         "edgesOver5x": 0
       },
       {
         "object": "Puppet lower rostrum",
         "phase": 0.7,
-        "maxTravel": 0.009581964274363653,
-        "stretch99": 1.0128855246156354,
-        "stretchMax": 1.0217246524754509,
+        "maxTravel": 0.003146733129227483,
+        "stretch99": 1.0000048469116827,
+        "stretchMax": 1.0000608697275706,
         "edgesOver5x": 0
       },
       {
         "object": "Puppet pectoral L",
         "phase": 0.7,
         "maxTravel": 0.003020812590641842,
-        "stretch99": 1.0005532130442718,
+        "stretch99": 1.0004756911860966,
         "stretchMax": 1.0008586613521537,
         "edgesOver5x": 0
       },
@@ -5580,9 +5580,9 @@
       {
         "object": "Puppet lower rostrum",
         "phase": 1,
-        "maxTravel": 0.0005419509631483147,
-        "stretch99": 1.0000055474368617,
-        "stretchMax": 1.000006702311439,
+        "maxTravel": 0.0005329576670192204,
+        "stretch99": 1.0000097869452533,
+        "stretchMax": 1.0001434263045188,
         "edgesOver5x": 0
       },
       {
@@ -5702,7 +5702,7 @@
       {
         "object": "Puppet measured trunk",
         "phase": 0.2,
-        "maxTravel": 0.07293811313036386,
+        "maxTravel": 0.07330832948643065,
         "stretch99": 1.0683607710970646,
         "stretchMax": 1.1117575690019674,
         "edgesOver5x": 0
@@ -5726,9 +5726,9 @@
       {
         "object": "Puppet lower rostrum",
         "phase": 0.2,
-        "maxTravel": 0.1730685321000494,
-        "stretch99": 1.000004009570071,
-        "stretchMax": 1.0000101309171812,
+        "maxTravel": 0.1663751379731655,
+        "stretch99": 1.000010265738904,
+        "stretchMax": 1.0000776303151637,
         "edgesOver5x": 0
       },
       {
@@ -5774,7 +5774,7 @@
       {
         "object": "Puppet measured trunk",
         "phase": 0.35,
-        "maxTravel": 0.1111997520508357,
+        "maxTravel": 0.11177282338938026,
         "stretch99": 1.0990927004692268,
         "stretchMax": 1.1584819253262433,
         "edgesOver5x": 0
@@ -5798,9 +5798,9 @@
       {
         "object": "Puppet lower rostrum",
         "phase": 0.35,
-        "maxTravel": 0.2605931405193921,
-        "stretch99": 1.0000061934113174,
-        "stretchMax": 1.0000172077738123,
+        "maxTravel": 0.24748902608378118,
+        "stretch99": 1.0000126327954344,
+        "stretchMax": 1.000304416613082,
         "edgesOver5x": 0
       },
       {
@@ -5870,9 +5870,9 @@
       {
         "object": "Puppet lower rostrum",
         "phase": 0.5,
-        "maxTravel": 0.11369428530885986,
-        "stretch99": 1.0000058269647885,
-        "stretchMax": 1.0000072264217432,
+        "maxTravel": 0.10065772521606783,
+        "stretch99": 1.0000116576748674,
+        "stretchMax": 1.000163973622443,
         "edgesOver5x": 0
       },
       {
@@ -5942,9 +5942,9 @@
       {
         "object": "Puppet lower rostrum",
         "phase": 0.7,
-        "maxTravel": 0.028300281094094392,
-        "stretch99": 1.0000038931245148,
-        "stretchMax": 1.0000064582185613,
+        "maxTravel": 0.02047735011661055,
+        "stretch99": 1.0000120686659677,
+        "stretchMax": 1.0000583594494574,
         "edgesOver5x": 0
       },
       {
@@ -6160,9 +6160,9 @@
       {
         "object": "Puppet lower rostrum",
         "phase": 0.2,
-        "maxTravel": 0.3509713997781732,
-        "stretch99": 1.000004513090549,
-        "stretchMax": 1.0000116382454949,
+        "maxTravel": 0.3464962101227368,
+        "stretch99": 1.0000050486076764,
+        "stretchMax": 1.0000857100928293,
         "edgesOver5x": 0
       },
       {
@@ -6232,9 +6232,9 @@
       {
         "object": "Puppet lower rostrum",
         "phase": 0.35,
-        "maxTravel": 0.5081554997821478,
-        "stretch99": 1.0000049602014727,
-        "stretchMax": 1.0000100218757315,
+        "maxTravel": 0.5016195499379679,
+        "stretch99": 1.000009252265737,
+        "stretchMax": 1.0000282338952529,
         "edgesOver5x": 0
       },
       {
@@ -6304,9 +6304,9 @@
       {
         "object": "Puppet lower rostrum",
         "phase": 0.5,
-        "maxTravel": 0.5080971884070251,
-        "stretch99": 1.0000082366171148,
-        "stretchMax": 1.0000319663376758,
+        "maxTravel": 0.5015630176828654,
+        "stretch99": 1.0000118939368685,
+        "stretchMax": 1.000139035268146,
         "edgesOver5x": 0
       },
       {
@@ -6376,9 +6376,9 @@
       {
         "object": "Puppet lower rostrum",
         "phase": 0.7,
-        "maxTravel": 0.4230241160654483,
-        "stretch99": 1.0000054568889607,
-        "stretchMax": 1.0000107230641233,
+        "maxTravel": 0.4176085245944467,
+        "stretch99": 1.0000054669818625,
+        "stretchMax": 1.000044947445291,
         "edgesOver5x": 0
       },
       {
@@ -6522,9 +6522,9 @@
       {
         "object": "Puppet lower rostrum",
         "phase": 0,
-        "maxTravel": 0.007000185482666961,
-        "stretch99": 1.0000036556202385,
-        "stretchMax": 1.000004435801219,
+        "maxTravel": 0.0068840318910450326,
+        "stretch99": 1.0000051155965384,
+        "stretchMax": 1.0000942654141194,
         "edgesOver5x": 0
       },
       {
@@ -6563,7 +6563,7 @@
         "object": "Shonisaurus authored skin",
         "phase": 0.2,
         "maxTravel": 0.20800946025127534,
-        "stretch99": 1.0445861811345476,
+        "stretch99": 1.0444999561627568,
         "stretchMax": 1.3001808670985757,
         "edgesOver5x": 0
       },
@@ -6586,17 +6586,17 @@
       {
         "object": "Puppet upper rostrum",
         "phase": 0.2,
-        "maxTravel": 0.04273549538831965,
-        "stretch99": 1.000006696197006,
-        "stretchMax": 1.0000260717885212,
+        "maxTravel": 0.04273373075807076,
+        "stretch99": 1.0000060766038499,
+        "stretchMax": 1.000023258378911,
         "edgesOver5x": 0
       },
       {
         "object": "Puppet lower rostrum",
         "phase": 0.2,
-        "maxTravel": 0.04305307635013784,
-        "stretch99": 1.0074488501581944,
-        "stretchMax": 1.0125629285185287,
+        "maxTravel": 0.04236023296980655,
+        "stretch99": 1.0000098933006738,
+        "stretchMax": 1.0000289590249711,
         "edgesOver5x": 0
       },
       {
@@ -6611,8 +6611,8 @@
         "object": "Puppet pectoral R",
         "phase": 0.2,
         "maxTravel": 0.06471823121592324,
-        "stretch99": 1.0040108266204686,
-        "stretchMax": 1.0062778650722475,
+        "stretch99": 1.004032611953705,
+        "stretchMax": 1.006317349212011,
         "edgesOver5x": 0
       },
       {
@@ -6635,7 +6635,7 @@
         "object": "Shonisaurus authored skin",
         "phase": 0.35,
         "maxTravel": 0.43590563585194114,
-        "stretch99": 1.0523642546214351,
+        "stretch99": 1.0518372782630054,
         "stretchMax": 2.2157731924893374,
         "edgesOver5x": 0
       },
@@ -6658,33 +6658,33 @@
       {
         "object": "Puppet upper rostrum",
         "phase": 0.35,
-        "maxTravel": 0.03910941759612592,
-        "stretch99": 1.000006890818315,
-        "stretchMax": 1.0000161944894828,
+        "maxTravel": 0.039100660784897365,
+        "stretch99": 1.0000060115403462,
+        "stretchMax": 1.0000074858655033,
         "edgesOver5x": 0
       },
       {
         "object": "Puppet lower rostrum",
         "phase": 0.35,
-        "maxTravel": 0.040715078152458124,
-        "stretch99": 1.0161385961614624,
-        "stretchMax": 1.0272006632312825,
+        "maxTravel": 0.038712816119693315,
+        "stretch99": 1.0000216331612592,
+        "stretchMax": 1.0001057509592837,
         "edgesOver5x": 0
       },
       {
         "object": "Puppet pectoral L",
         "phase": 0.35,
         "maxTravel": 0.1103554657628552,
-        "stretch99": 1.0095399906327587,
-        "stretchMax": 1.0124492945632129,
+        "stretch99": 1.0096001025588948,
+        "stretchMax": 1.0125844212980437,
         "edgesOver5x": 0
       },
       {
         "object": "Puppet pectoral R",
         "phase": 0.35,
         "maxTravel": 0.10632993214457424,
-        "stretch99": 1.0095714060245695,
-        "stretchMax": 1.0153178049884048,
+        "stretch99": 1.0096007538153866,
+        "stretchMax": 1.015449035985709,
         "edgesOver5x": 0
       },
       {
@@ -6707,7 +6707,7 @@
         "object": "Shonisaurus authored skin",
         "phase": 0.5,
         "maxTravel": 0.6030425346848688,
-        "stretch99": 1.048776509783721,
+        "stretch99": 1.0479886350320946,
         "stretchMax": 2.366539734424387,
         "edgesOver5x": 0
       },
@@ -6730,33 +6730,33 @@
       {
         "object": "Puppet upper rostrum",
         "phase": 0.5,
-        "maxTravel": 0.011353901711210163,
-        "stretch99": 1.0000048309493306,
-        "stretchMax": 1.00000719166458,
+        "maxTravel": 0.011310338748169793,
+        "stretch99": 1.000005451145558,
+        "stretchMax": 1.0000136602793326,
         "edgesOver5x": 0
       },
       {
         "object": "Puppet lower rostrum",
         "phase": 0.5,
-        "maxTravel": 0.017732632084416205,
-        "stretch99": 1.01946285131112,
-        "stretchMax": 1.0327955136285392,
+        "maxTravel": 0.01115509198266181,
+        "stretch99": 1.0000131440066053,
+        "stretchMax": 1.0001336240222625,
         "edgesOver5x": 0
       },
       {
         "object": "Puppet pectoral L",
         "phase": 0.5,
         "maxTravel": 0.09616638306250834,
-        "stretch99": 1.0101551019229553,
-        "stretchMax": 1.0116355334401974,
+        "stretch99": 1.0102095995900413,
+        "stretchMax": 1.0117953241919853,
         "edgesOver5x": 0
       },
       {
         "object": "Puppet pectoral R",
         "phase": 0.5,
         "maxTravel": 0.08654392328116209,
-        "stretch99": 1.0108066278190124,
-        "stretchMax": 1.0135243588489387,
+        "stretch99": 1.0108376277045628,
+        "stretchMax": 1.013680373367699,
         "edgesOver5x": 0
       },
       {
@@ -6779,7 +6779,7 @@
         "object": "Shonisaurus authored skin",
         "phase": 0.7,
         "maxTravel": 0.25947888210189135,
-        "stretch99": 1.0459409284781211,
+        "stretch99": 1.0455750732055715,
         "stretchMax": 1.2832330746958864,
         "edgesOver5x": 0
       },
@@ -6802,24 +6802,24 @@
       {
         "object": "Puppet upper rostrum",
         "phase": 0.7,
-        "maxTravel": 0.04087520011264078,
-        "stretch99": 1.000005307423476,
-        "stretchMax": 1.0000161944894828,
+        "maxTravel": 0.0408697612596364,
+        "stretch99": 1.0000073956503797,
+        "stretchMax": 1.0000225323202763,
         "edgesOver5x": 0
       },
       {
         "object": "Puppet lower rostrum",
         "phase": 0.7,
-        "maxTravel": 0.04186863384804683,
-        "stretch99": 1.012936627662483,
-        "stretchMax": 1.0218109190251219,
+        "maxTravel": 0.04051828435089941,
+        "stretch99": 1.0000062071590867,
+        "stretchMax": 1.0000510009276282,
         "edgesOver5x": 0
       },
       {
         "object": "Puppet pectoral L",
         "phase": 0.7,
         "maxTravel": 0.038584136249875375,
-        "stretch99": 1.0060376809402616,
+        "stretch99": 1.0060373015524835,
         "stretchMax": 1.010896799353294,
         "edgesOver5x": 0
       },
@@ -6882,9 +6882,9 @@
       {
         "object": "Puppet lower rostrum",
         "phase": 1,
-        "maxTravel": 0.007000185482666961,
-        "stretch99": 1.0000036556202385,
-        "stretchMax": 1.000004435801219,
+        "maxTravel": 0.0068840318910450326,
+        "stretch99": 1.0000051155965384,
+        "stretchMax": 1.0000942654141194,
         "edgesOver5x": 0
       },
       {
@@ -7028,9 +7028,9 @@
       {
         "object": "Puppet lower rostrum",
         "phase": 0.2,
-        "maxTravel": 0.042300812618188834,
-        "stretch99": 1.0000059088421724,
-        "stretchMax": 1.0000075517862979,
+        "maxTravel": 0.04193245237223252,
+        "stretch99": 1.0000198347229023,
+        "stretchMax": 1.0000840958390012,
         "edgesOver5x": 0
       },
       {
@@ -7100,9 +7100,9 @@
       {
         "object": "Puppet lower rostrum",
         "phase": 0.35,
-        "maxTravel": 0.13101299298586674,
-        "stretch99": 1.0000047487987516,
-        "stretchMax": 1.0000096150951892,
+        "maxTravel": 0.12963270593575793,
+        "stretch99": 1.0000114035151766,
+        "stretchMax": 1.0000504355129347,
         "edgesOver5x": 0
       },
       {
@@ -7172,9 +7172,9 @@
       {
         "object": "Puppet lower rostrum",
         "phase": 0.5,
-        "maxTravel": 0.07233868642948864,
-        "stretch99": 1.000005951457556,
-        "stretchMax": 1.0000095161975626,
+        "maxTravel": 0.07239619583388923,
+        "stretch99": 1.000009502951129,
+        "stretchMax": 1.0000719730669996,
         "edgesOver5x": 0
       },
       {
@@ -7244,9 +7244,9 @@
       {
         "object": "Puppet lower rostrum",
         "phase": 0.7,
-        "maxTravel": 0.08247229379015429,
-        "stretch99": 1.0000044986854264,
-        "stretchMax": 1.0000052345636872,
+        "maxTravel": 0.08170566584533386,
+        "stretch99": 1.000004861544157,
+        "stretchMax": 1.0001340633194402,
         "edgesOver5x": 0
       },
       {
@@ -7390,9 +7390,9 @@
       {
         "object": "Puppet lower rostrum",
         "phase": 0,
-        "maxTravel": 0.0045162521617412785,
-        "stretch99": 1.0000035626064667,
-        "stretchMax": 1.0000062071356526,
+        "maxTravel": 0.0044413127885781275,
+        "stretch99": 1.000005667566413,
+        "stretchMax": 1.0000255227346873,
         "edgesOver5x": 0
       },
       {
@@ -7431,7 +7431,7 @@
         "object": "Shonisaurus authored skin",
         "phase": 0.2,
         "maxTravel": 0.15222444573192415,
-        "stretch99": 1.0280373286360127,
+        "stretch99": 1.0278572913987523,
         "stretchMax": 1.193761386141294,
         "edgesOver5x": 0
       },
@@ -7454,17 +7454,17 @@
       {
         "object": "Puppet upper rostrum",
         "phase": 0.2,
-        "maxTravel": 0.02693490575336453,
-        "stretch99": 1.0000061078650868,
-        "stretchMax": 1.000022464800486,
+        "maxTravel": 0.02693247829733709,
+        "stretch99": 1.000002971991321,
+        "stretchMax": 1.0000070025626404,
         "edgesOver5x": 0
       },
       {
         "object": "Puppet lower rostrum",
         "phase": 0.2,
-        "maxTravel": 0.02737137779507302,
-        "stretch99": 1.0069534141734453,
-        "stretchMax": 1.01172207759065,
+        "maxTravel": 0.026699280108909644,
+        "stretch99": 1.0000067607890237,
+        "stretchMax": 1.000022169412882,
         "edgesOver5x": 0
       },
       {
@@ -7479,8 +7479,8 @@
         "object": "Puppet pectoral R",
         "phase": 0.2,
         "maxTravel": 0.03951148485679463,
-        "stretch99": 1.0022822131617763,
-        "stretchMax": 1.0035556421103082,
+        "stretch99": 1.0023027352744127,
+        "stretchMax": 1.0035923155000221,
         "edgesOver5x": 0
       },
       {
@@ -7503,7 +7503,7 @@
         "object": "Shonisaurus authored skin",
         "phase": 0.35,
         "maxTravel": 0.266251667743708,
-        "stretch99": 1.033683387796748,
+        "stretch99": 1.0328439848578364,
         "stretchMax": 1.7444597310444436,
         "edgesOver5x": 0
       },
@@ -7526,33 +7526,33 @@
       {
         "object": "Puppet upper rostrum",
         "phase": 0.35,
-        "maxTravel": 0.026344255258651892,
-        "stretch99": 1.0000067342160577,
-        "stretchMax": 1.0000093676766206,
+        "maxTravel": 0.026332146347662067,
+        "stretch99": 1.0000062326083607,
+        "stretchMax": 1.0000073414305957,
         "edgesOver5x": 0
       },
       {
         "object": "Puppet lower rostrum",
         "phase": 0.35,
-        "maxTravel": 0.028514346891745954,
-        "stretch99": 1.0155756057726395,
-        "stretchMax": 1.02625220581404,
+        "maxTravel": 0.02607402434867061,
+        "stretch99": 1.0000091653182188,
+        "stretchMax": 1.0000171169968275,
         "edgesOver5x": 0
       },
       {
         "object": "Puppet pectoral L",
         "phase": 0.35,
         "maxTravel": 0.07016569981612981,
-        "stretch99": 1.006209625322842,
-        "stretchMax": 1.0076720663023946,
+        "stretch99": 1.0062299784891493,
+        "stretchMax": 1.0078023469134627,
         "edgesOver5x": 0
       },
       {
         "object": "Puppet pectoral R",
         "phase": 0.35,
         "maxTravel": 0.06800397123272495,
-        "stretch99": 1.0059783834453953,
-        "stretchMax": 1.0095827522388634,
+        "stretch99": 1.0059981748281028,
+        "stretchMax": 1.0097092229519602,
         "edgesOver5x": 0
       },
       {
@@ -7575,7 +7575,7 @@
         "object": "Shonisaurus authored skin",
         "phase": 0.5,
         "maxTravel": 0.39577061213002024,
-        "stretch99": 1.03173720235533,
+        "stretch99": 1.0307822869542485,
         "stretchMax": 1.8613372827864507,
         "edgesOver5x": 0
       },
@@ -7598,33 +7598,33 @@
       {
         "object": "Puppet upper rostrum",
         "phase": 0.5,
-        "maxTravel": 0.004624581145883072,
-        "stretch99": 1.0000060662297259,
-        "stretchMax": 1.0000081178268356,
+        "maxTravel": 0.004516645343156999,
+        "stretch99": 1.000005094954347,
+        "stretchMax": 1.0000081107413124,
         "edgesOver5x": 0
       },
       {
         "object": "Puppet lower rostrum",
         "phase": 0.5,
-        "maxTravel": 0.014410109828818162,
-        "stretch99": 1.019506745711577,
-        "stretchMax": 1.032873248952698,
+        "maxTravel": 0.004441312788578122,
+        "stretch99": 1.0000084060418757,
+        "stretchMax": 1.0000272806082955,
         "edgesOver5x": 0
       },
       {
         "object": "Puppet pectoral L",
         "phase": 0.5,
         "maxTravel": 0.058285098036599405,
-        "stretch99": 1.0062960397324259,
-        "stretchMax": 1.0069864405477382,
+        "stretch99": 1.0063268537752676,
+        "stretchMax": 1.0071477472640087,
         "edgesOver5x": 0
       },
       {
         "object": "Puppet pectoral R",
         "phase": 0.5,
         "maxTravel": 0.05232280474609182,
-        "stretch99": 1.006810368134983,
-        "stretchMax": 1.008098849507835,
+        "stretch99": 1.0068413335051645,
+        "stretchMax": 1.0082557490773338,
         "edgesOver5x": 0
       },
       {
@@ -7647,7 +7647,7 @@
         "object": "Shonisaurus authored skin",
         "phase": 0.7,
         "maxTravel": 0.15205103230112088,
-        "stretch99": 1.0299865681295437,
+        "stretch99": 1.029379710062118,
         "stretchMax": 1.1938226817073025,
         "edgesOver5x": 0
       },
@@ -7670,17 +7670,17 @@
       {
         "object": "Puppet upper rostrum",
         "phase": 0.7,
-        "maxTravel": 0.026940010904336887,
-        "stretch99": 1.000004319676475,
+        "maxTravel": 0.026932300524551346,
+        "stretch99": 1.0000030862452338,
         "stretchMax": 1.0000070025626404,
         "edgesOver5x": 0
       },
       {
         "object": "Puppet lower rostrum",
         "phase": 0.7,
-        "maxTravel": 0.028336607582586062,
-        "stretch99": 1.0125456087633404,
-        "stretchMax": 1.0211546071760556,
+        "maxTravel": 0.02669928010890965,
+        "stretch99": 1.000012647229902,
+        "stretchMax": 1.0000479592585525,
         "edgesOver5x": 0
       },
       {
@@ -7750,9 +7750,9 @@
       {
         "object": "Puppet lower rostrum",
         "phase": 1,
-        "maxTravel": 0.0045162521617412785,
-        "stretch99": 1.0000035626064667,
-        "stretchMax": 1.0000062071356526,
+        "maxTravel": 0.0044413127885781275,
+        "stretch99": 1.000005667566413,
+        "stretchMax": 1.0000255227346873,
         "edgesOver5x": 0
       },
       {
@@ -7896,9 +7896,9 @@
       {
         "object": "Puppet lower rostrum",
         "phase": 0.2,
-        "maxTravel": 0.48192460524061814,
-        "stretch99": 1.0000062728020784,
-        "stretchMax": 1.0000267104855731,
+        "maxTravel": 0.4654434902954901,
+        "stretch99": 1.0000134021272438,
+        "stretchMax": 1.0000476529986582,
         "edgesOver5x": 0
       },
       {
@@ -7968,9 +7968,9 @@
       {
         "object": "Puppet lower rostrum",
         "phase": 0.35,
-        "maxTravel": 0.6753257769696757,
-        "stretch99": 1.0000110645612623,
-        "stretchMax": 1.0000406926734038,
+        "maxTravel": 0.6522731843941311,
+        "stretch99": 1.0000220848212722,
+        "stretchMax": 1.0002426370031985,
         "edgesOver5x": 0
       },
       {
@@ -8040,9 +8040,9 @@
       {
         "object": "Puppet lower rostrum",
         "phase": 0.5,
-        "maxTravel": 0.6690986309052744,
-        "stretch99": 1.0000093662632414,
-        "stretchMax": 1.0000441850678627,
+        "maxTravel": 0.6460924284979097,
+        "stretch99": 1.000020601815518,
+        "stretchMax": 1.0001170064270986,
         "edgesOver5x": 0
       },
       {
@@ -8112,9 +8112,9 @@
       {
         "object": "Puppet lower rostrum",
         "phase": 0.7,
-        "maxTravel": 0.5395614520016815,
-        "stretch99": 1.0000092849153206,
-        "stretchMax": 1.0000361339171675,
+        "maxTravel": 0.5208248896941884,
+        "stretch99": 1.0000169979806905,
+        "stretchMax": 1.000176077763814,
         "edgesOver5x": 0
       },
       {
@@ -8330,9 +8330,9 @@
       {
         "object": "Puppet lower rostrum",
         "phase": 0.2,
-        "maxTravel": 0.4742670628043365,
-        "stretch99": 1.0000090878376675,
-        "stretchMax": 1.0000164242196643,
+        "maxTravel": 0.4578506781807989,
+        "stretch99": 1.0000188643610397,
+        "stretchMax": 1.0000437976026721,
         "edgesOver5x": 0
       },
       {
@@ -8402,9 +8402,9 @@
       {
         "object": "Puppet lower rostrum",
         "phase": 0.35,
-        "maxTravel": 0.6594918513552607,
-        "stretch99": 1.0000080906080306,
-        "stretchMax": 1.0000389469404756,
+        "maxTravel": 0.6365888931921112,
+        "stretch99": 1.0000274972718435,
+        "stretchMax": 1.0000579926955153,
         "edgesOver5x": 0
       },
       {
@@ -8474,9 +8474,9 @@
       {
         "object": "Puppet lower rostrum",
         "phase": 0.5,
-        "maxTravel": 0.6657201895106508,
-        "stretch99": 1.0000096064599606,
-        "stretchMax": 1.0000531494808569,
+        "maxTravel": 0.6427706621539482,
+        "stretch99": 1.000031314503672,
+        "stretchMax": 1.0001733285686238,
         "edgesOver5x": 0
       },
       {
@@ -8546,9 +8546,9 @@
       {
         "object": "Puppet lower rostrum",
         "phase": 0.7,
-        "maxTravel": 0.5525517899364535,
-        "stretch99": 1.0000081540900394,
-        "stretchMax": 1.00008247648783,
+        "maxTravel": 0.5337062750725091,
+        "stretch99": 1.0000249858704326,
+        "stretchMax": 1.0000560454438405,
         "edgesOver5x": 0
       },
       {

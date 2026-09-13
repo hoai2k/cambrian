@@ -29,7 +29,7 @@
     "bytes": 1957385
   },
   "artifact": {
-    "path": "intake/triassic-tests/nothosaurus/nothosaurus.raw.glb",
+    "path": "tools/triassic/creatures/nothosaurus/tripo-raw/nothosaurus.raw.glb",
     "bytes": 1541680,
     "sha256": "5cb48becbdcbbc3863519bca8a2bb99c5129c6a0e5b1affb6252e15e01c49604",
     "source_output_field": "model_url"

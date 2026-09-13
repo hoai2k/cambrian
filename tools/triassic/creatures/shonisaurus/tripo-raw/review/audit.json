@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "input": {
-    "path": "/Users/hoai/Documents/Stuff/Generations/cambrian/local/expansion-repo/intake/triassic-tests/shonisaurus/shonisaurus.raw.glb",
+    "path": "tools/triassic/creatures/shonisaurus/tripo-raw/shonisaurus.raw.glb",
     "bytes": 1335372,
     "sha256": "576114e5d8e4b3eabfd97148a515cc8f9f4567788478791a4441eb85606b6330"
   },
@@ -90,8 +90,8 @@
     }
   ],
   "renders": {
-    "side": "/Users/hoai/Documents/Stuff/Generations/cambrian/local/expansion-repo/intake/triassic-tests/shonisaurus/review/side.png",
-    "top": "/Users/hoai/Documents/Stuff/Generations/cambrian/local/expansion-repo/intake/triassic-tests/shonisaurus/review/top.png",
-    "three-quarter": "/Users/hoai/Documents/Stuff/Generations/cambrian/local/expansion-repo/intake/triassic-tests/shonisaurus/review/three-quarter.png"
+    "side": "tools/triassic/creatures/shonisaurus/tripo-raw/review/side.png",
+    "top": "tools/triassic/creatures/shonisaurus/tripo-raw/review/top.png",
+    "three-quarter": "tools/triassic/creatures/shonisaurus/tripo-raw/review/three-quarter.png"
   }
 }

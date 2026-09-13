@@ -37,6 +37,7 @@ every push to `main` (set the repository's Pages source to "GitHub Actions").
 | `src/render/` | Three.js: sea environment, creature views and animation layering, effects, cameras, split-screen engine. |
 | `src/app/` | React shell: title, creature select, HUD, pause/results, help and settings. |
 | `src/input/`, `src/audio/` | Gamepad/keyboard reading; the WebAudio graph, its sample library and the distance falloff for world sounds. |
+| `src/ancientseas/` | The trilogy's title page at `/ancientseas/`: the three games as links, in two versions (`?version=1` the paintings on dark, `?version=2` a plate assembled from requested pieces). |
 | `src/workbench/` | Development workbenches at `/workbench/?edit=<name>`. `?edit=audio` plays every sound through the real audio module; `?edit=environment` previews biome paintings, 3D props and radar marks. |
 | `src/shared/palettes.ts` | Creature colour schemes and the material-name to slot mapping they apply through (`src/render/recolor.ts`). |
 | `public/assets/creatures/` | 21 rigged full models, reduced LODs, anatomical anchors, studio renders, hero cards, thumbnails and transparent `.select.png` portraits. |

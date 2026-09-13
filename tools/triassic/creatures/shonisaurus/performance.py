@@ -26,17 +26,17 @@ def pose(clip,t,bones):
  attack=clip in ['Attack','Heavy','Bite'];power={'Attack':1,'Heavy':1.45,'Bite':.3}.get(clip,0)
  if attack:
   l('body',1,power*(.065*load-.26*contact-.085*follow+.015*recovery));r('chest',0,power*(.028*load-.025*contact));r('skull',2,power*(-.018*load+.015*follow))
- gape=.014*(.5-.5*cos(cycle))if clip in ['Idle','Swim','Sprint','Guard']else 0
- if attack:gape={'Bite':.22,'Attack':.28,'Heavy':.32}[clip]*hold(t,.01,.23,.30,.51)-.025*pulse(t,.50,.68)
- if clip=='Eat':gape=.12*(.5-.5*cos(2*cycle));r('skull',0,.015*sin(2*cycle))
- if clip=='Ability':gape=.12*hold(t,.15,.37,.64,.85);r('chest',0,-.075*hold(t,.04,.30,.64,.96));r('skull',0,-.035*env)
- if clip=='Hit':r('chest',2,-.09*pulse(t,.01,.55)+.018*recovery);r('skull',1,.045*env);l('body',1,.09*pulse(t,.02,.70));gape=.045*pulse(t,.05,.6)
+ gape=0.
+ if attack:gape={'Bite':.32,'Attack':.40,'Heavy':.45}[clip]*hold(t,.01,.23,.30,.51)
+ if clip=='Eat':gape=.24*(.5-.5*cos(2*cycle));r('skull',0,.015*sin(2*cycle))
+ if clip=='Ability':r('chest',0,-.075*hold(t,.04,.30,.64,.96));r('skull',0,-.035*env)
+ if clip=='Hit':r('chest',2,-.09*pulse(t,.01,.55)+.018*recovery);r('skull',1,.045*env);l('body',1,.09*pulse(t,.02,.70))
  if clip=='Guard':r('chest',0,.025);r('skull',0,-.022)
  if clip=='Parry':r('chest',2,.13*pulse(t,.02,.60));r('skull',2,.04*env);r('body',1,-.07*env)
  if clip=='Dodge':r('body',2,-.16*hold(t,.02,.27,.56,.95));r('chest',2,-.075*env);l('body',0,-.38*pulse(t,.10,.92));r('body',1,.13*env)
  if clip=='Stagger':r('body',1,.12*sin(2*cycle+.2)*env*(1-.45*t));r('chest',2,.085*sin(2*cycle)*env);l('body',2,-.07*env)
- if clip=='Growth':r('chest',0,-.045*env);gape=.07*env
- r('jaw',0,gape*alive+.15*dead);r('skull',0,-.06*gape*alive)
+ if clip=='Growth':r('chest',0,-.045*env)
+ r('jaw',0,gape*alive);r('skull',0,-.06*gape*alive)
  r('body',1,.93*dead);r('body',0,.09*dead);l('body',2,-.22*dead)
  for k in range(6):
   wave=(.031+.021*k)*effort*sin(cycle-.54*k-.48)*env*alive

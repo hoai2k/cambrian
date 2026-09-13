@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "input": {
-    "path": "/Users/hoai/Documents/Stuff/Generations/cambrian/local/expansion-repo/intake/triassic-tests/nothosaurus/nothosaurus.raw.glb",
+    "path": "tools/triassic/creatures/nothosaurus/tripo-raw/nothosaurus.raw.glb",
     "bytes": 1541680,
     "sha256": "5cb48becbdcbbc3863519bca8a2bb99c5129c6a0e5b1affb6252e15e01c49604"
   },
@@ -90,8 +90,8 @@
     }
   ],
   "renders": {
-    "side": "/Users/hoai/Documents/Stuff/Generations/cambrian/local/expansion-repo/intake/triassic-tests/nothosaurus/review/side.png",
-    "top": "/Users/hoai/Documents/Stuff/Generations/cambrian/local/expansion-repo/intake/triassic-tests/nothosaurus/review/top.png",
-    "three-quarter": "/Users/hoai/Documents/Stuff/Generations/cambrian/local/expansion-repo/intake/triassic-tests/nothosaurus/review/three-quarter.png"
+    "side": "tools/triassic/creatures/nothosaurus/tripo-raw/review/side.png",
+    "top": "tools/triassic/creatures/nothosaurus/tripo-raw/review/top.png",
+    "three-quarter": "tools/triassic/creatures/nothosaurus/tripo-raw/review/three-quarter.png"
   }
 }

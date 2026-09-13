@@ -18,8 +18,8 @@
  * The directory is the art's home, not a copy of it: see its README.
  *
  * Integrated `<id>-turnaround.png` views remain beside the pose. New images from
- * `canonical/model-inputs/<id>/` appear as read-only modelling references only when the
- * subject's manifest status is `greenlit`. Legacy intake sheets are never ingested.
+ * `canonical/model-inputs/<id>/` appear as read-only modelling references once the subject's
+ * manifest status is `greenlit` or `delivered`. Legacy intake sheets are never ingested.
  */
 import { readFile, writeFile, readdir, mkdir, stat, copyFile, rm } from 'node:fs/promises';
 import { dirname, join, extname, basename } from 'node:path';
@@ -49,7 +49,9 @@ const manifest = JSON.parse(await readFile(join(HERE, CANON_DIR, 'manifest.json'
 function decisions(manifest) {
   const out = {};
   for (const [id, e] of Object.entries(manifest.subjects ?? {})) {
-    if (e.canonical === 'greenlit')
+    if (e.canonical === 'delivered')
+      out[id] = { verdict: 'delivered', choice: 'canonical', ref: e.greenlitImage || 'canonical', note: e.note || '', at: e.deliveredAt || e.greenlitAt, locked: true };
+    else if (e.canonical === 'greenlit')
       out[id] = { verdict: 'greenlit', choice: 'canonical', ref: e.greenlitImage || 'canonical', note: e.note || '', at: e.decidedAt };
     else if (e.canonical === 'needs-rework') {
       const t = e.reworkToward ?? {};
@@ -111,7 +113,10 @@ for (const file of files.sort()) {
 // The manifest gate is authoritative; metadata inside an input folder cannot approve a subject.
 let modelReferences = 0;
 for (const id of ids) {
-  if (manifest.subjects?.[id]?.canonical !== 'greenlit') continue;
+  // Greenlit *or* delivered: a body having been built is not a reason to hide the images it was
+  // built from — that is exactly when someone wants to look at them, to ask whether the model is
+  // the animal the input asked for.
+  if (!['greenlit', 'delivered'].includes(manifest.subjects?.[id]?.canonical)) continue;
   for (const name of ['input', 'three-quarter', 'turnaround']) {
     const rel = `${CANON_DIR}/model-inputs/${id}/${name}.png`;
     const abs = join(HERE, rel);
@@ -133,8 +138,9 @@ await writeFile(join(HERE, 'data.js'), bundle(canonical));
 
 const withCanon = Object.values(canonical).filter((l) => l.some((c) => c.kind === 'canonical')).length;
 const green = Object.values(decided).filter((d) => d.verdict === 'greenlit').length;
-console.log(`data.js written — ${ids.size} subjects, ${withCanon} with a canonical image, ${ids.size - withCanon} without, ${modelReferences} modelling references for greenlit subjects`);
-console.log(`  decisions carried from the manifest: ${green} greenlit, ${Object.keys(decided).length - green} to redo`);
+const built = Object.values(decided).filter((d) => d.verdict === 'delivered').length;
+console.log(`data.js written — ${ids.size} subjects, ${withCanon} with a canonical image, ${ids.size - withCanon} without, ${modelReferences} modelling references`);
+console.log(`  decisions carried from the manifest: ${built} delivered, ${green} greenlit, ${Object.keys(decided).length - green - built} to redo`);
 if (orphans.length) console.log(`canonical files matching no subject id: ${orphans.join(', ')}`);
 
 // ---- the deployable copy ----
