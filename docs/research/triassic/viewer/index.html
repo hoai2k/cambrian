@@ -210,17 +210,18 @@ function shots(s) {
 }
 const chosenRef = (id) => sel[id]?.ref;
 const isChosen = (id, shot) => sel[id]?.ref === shot.ref;
-/** The one image the pipeline currently treats as this subject's pose: our own, and the first of them. */
-const primary = (s) => { const first = shots(s)[0]; return first && first.kind !== 'web' ? first : null; };
 /**
- * Greenlit means the image already standing as the pose won. Anything else — a reference, or one of
- * our own later views — says the pose is not the one yet and names what to regenerate it toward.
+ * The verdict is about *whose* picture won, and nothing else. One of ours greenlights the subject
+ * — and says which of ours is the canon, where a subject has more than one (the male and female
+ * Keichousaurus, a modelling sheet beside its pose). A reference says ours is not right yet and
+ * names the picture to regenerate toward.
+ *
+ * This was briefly cleverer: it also ranked our own images and called anything but the first of
+ * them a rework. That made the summary disagree with the rows it was counting — a subject with a
+ * male and a female pose read as a rework for picking the male — and it was the wrong question
+ * anyway. Picking between our own variants is choosing the canon, not rejecting it.
  */
-function verdictOf(id) {
-  const pick = sel[id]; if (!pick) return null;
-  const s = byId.get(id), p = s && primary(s);
-  return p && p.ref === pick.ref ? 'greenlit' : 'replace';
-}
+const verdictOf = (id) => (sel[id] ? (sel[id].choice === 'web' ? 'replace' : 'greenlit') : null);
 const counts = () => {
   let green = 0, replace = 0;
   for (const s of all) { const v = verdictOf(s.id); if (v === 'greenlit') green++; else if (v === 'replace') replace++; }
@@ -278,7 +279,7 @@ $('export').addEventListener('click', () => {
     const shot = shots(s).find((x) => x.ref === pick.ref);
     rows.push({
       id: s.id, name: s.name, group: s.group, role: s.role,
-      verdict: pick.choice === 'canonical' ? 'greenlit' : 'replace',
+      verdict: verdictOf(s.id),
       chose: pick.choice, ref: pick.ref, note: (pick.note || '').trim() || undefined, at: pick.at,
       image: shot ? (shot.kind === 'web'
         ? { kind: 'web', title: shot.title, artist: shot.artist, licence: shot.licence, page: shot.page, full: shot.full, description: shot.description || undefined }
