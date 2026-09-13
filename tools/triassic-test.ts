@@ -340,13 +340,23 @@ for (const [id, kind] of [['mixosaurus', 'a live-bearer'], ['placodus', 'an egg-
 // drifts, the Body control offers a mesh that 404s.
 {
   const manifest = JSON.parse(fs.readFileSync('src/content/triassic/preview-bodies.json', 'utf8')) as
-    { id: string; model: string; bytes: number }[];
-  const shippedIds = new Set(TRIASSIC_SHIPPED);
+    { id: string; model: string; bytes: number; yaw: number; scale: number; lengthUnits: number | null }[];
+  const orientation = JSON.parse(fs.readFileSync('tools/triassic/preview-orientation.json', 'utf8')) as { yaw: Record<string, number> };
+  const shippedIds = new Set<string>(TRIASSIC_SHIPPED as readonly string[]);
   for (const row of manifest) {
     ok(fs.existsSync(`public/${row.model}`), `${row.id}: generated body is published`);
     ok(fs.statSync(`public/${row.model}`).size === row.bytes, `${row.id}: published generated body matches the manifest`);
-    // An animal with its own body must not also be offered its raw generation.
-    ok(!shippedIds.includes?.(row.id) && !shippedIds.has(row.id), `${row.id} has not shipped a body of its own`);
+    // A preview is only ever a stand-in. The day an animal's own body ships, every piece of this —
+    // the published mesh, the manifest row and the estimated yaw — is removed by the tool, so a
+    // shipped animal carrying any of it means a replacement went in without clearing up after it.
+    ok(!shippedIds.has(row.id), `${row.id} has not shipped a body of its own`);
+    ok(Number.isFinite(row.yaw), `${row.id}: has an estimated yaw`);
+    ok(row.scale > 0, `${row.id}: has an estimated scale`);
+    ok(row.id in orientation.yaw, `${row.id}: its yaw estimate is recorded where a human can change it`);
+  }
+  for (const id of Object.keys(orientation.yaw)) {
+    ok(!shippedIds.has(id), `${id} has shipped, so it must not keep an estimated yaw`);
+    ok(manifest.some((r) => r.id === id), `${id} has a yaw estimate and a published body to use it`);
   }
   ok(manifest.length > 0, `the viewer offers ${manifest.length} generated bodies`);
 }

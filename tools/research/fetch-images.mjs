@@ -1,22 +1,26 @@
 /**
- * Collects reference images for every Triassic subject in `subjects.json` from Wikimedia
- * Commons and writes `images.json`, which the viewer reads. Research tooling: the images are
+ * Collects reference images for every subject in an era's `subjects.json` from Wikimedia Commons
+ * and writes that era's `images.json`, which the viewer reads. Research tooling: the images are
  * hotlinked from upload.wikimedia.org at 900 px, with the artist and licence carried beside each
- * one, so this directory stays a few hundred kilobytes rather than forty megabytes.
+ * one, so the directory stays a few hundred kilobytes rather than forty megabytes.
  *
- *   node docs/research/triassic/viewer/fetch-images.mjs            # refresh images.json
- *   node docs/research/triassic/viewer/fetch-images.mjs --local    # also download into img/
+ *   node tools/research/fetch-images.mjs triassic            # refresh that era's images.json
+ *   node tools/research/fetch-images.mjs devonian --local    # also download into img/
  *
- * Re-runnable. Nothing here is shipped with the game.
+ * Re-runnable, and careful about it: a refresh never deletes a subject's pictures (see `previous`
+ * below) and never re-adds one a reviewer has rejected (see `rejected`). Nothing here ships.
  */
 import { execFile } from 'node:child_process';
 import { promisify } from 'node:util';
 import { readFile, writeFile, mkdir } from 'node:fs/promises';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { eraFromArgv } from './eras.mjs';
 
 const run = promisify(execFile);
-const HERE = dirname(fileURLToPath(import.meta.url));
+const ROOT = join(dirname(fileURLToPath(import.meta.url)), '../..');
+const era = eraFromArgv(process.argv.slice(2), 'tools/research/fetch-images.mjs');
+const HERE = join(ROOT, era.data);
 const COMMONS = 'https://commons.wikimedia.org/w/api.php';
 const WIKIPEDIA = 'https://en.wikipedia.org/w/api.php';
 const PER_SUBJECT = 8;
@@ -38,7 +42,7 @@ async function api(base, params) {
   const url = `${base}?${new URLSearchParams({ format: 'json', formatversion: '2', ...params })}`;
   for (let attempt = 0; attempt < 4; attempt++) {
     try {
-      const { stdout } = await run('curl', ['-sS', '--max-time', '40', '-H', 'User-Agent: cambrian-triassic-research/1.0', url], { maxBuffer: 64 << 20 });
+      const { stdout } = await run('curl', ['-sS', '--max-time', '40', '-H', 'User-Agent: cambrian-research/1.0', url], { maxBuffer: 64 << 20 });
       return JSON.parse(stdout);
     } catch (err) {
       if (attempt === 3) throw err;
@@ -60,7 +64,9 @@ const GOOD = [
   [/(_bw\.|_nt\.|nobu|tamura|restoration|reconstruction|life_|lifestyle|pareidolia|artwork|paleoart|_db\.)/i, 70],
   // The rest of the palaeoart vocabulary: illustrators' own naming, and the words used for plant
   // and invertebrate reconstructions, which the list above was built for vertebrates and missed.
-  [/(restored|reconstr|artist|impression|illustration|painting|drawing|render|in_life|alive|living|habitus|diorama|mural|model_of|museum_model|sculpture|animatronic)/i, 55],
+  // No "impression" here: on Commons that word is far more often a *fossil* impression in rock
+  // than an artist's impression, and it pulled slabs to the top of the plant subjects.
+  [/(restored|reconstr|artist|illustration|painting|drawing|render|in_life|alive|living|habitus|diorama|mural|model_of|museum_model|sculpture|animatronic)/i, 55],
   [/(ecosystem|environment|habitat|seascape|landscape|scene|fauna_of|flora_of|biota)/i, 30],
   [/(skeleton|skeletal|mounted|holotype|specimen|fossil|slab)/i, 12],
   [/(skull|jaw|tooth|teeth|dentition|whorl|carapace|shell|limb|flipper|neck)/i, 22],
@@ -75,10 +81,16 @@ function score(title, info, subject) {
   if (!['jpg', 'jpeg', 'png', 'webp', 'svg', 'tif', 'tiff'].includes(ext)) return -1;
   if (ext === 'svg' && !SIZE_PLATE.test(name)) return -1;             // svg is usually a diagram
   if ((info.width ?? 0) < 380 && ext !== 'svg') return -1;
+  // The picture has to be OF this subject. Without this a restoration of some other plant scored
+  // above a correctly identified fossil of this one — "Reconstruction of Cycadeoidea life.jpg" led
+  // the dasyclad alga — because the restoration bonus outweighed the name match. Precision matters
+  // more than volume on a reference board: a wrong animal is worse than one picture fewer.
   let s = 0;
   const genus = subject.name.split(/[\s/]/)[0].toLowerCase();
-  if (name.toLowerCase().includes(genus)) s += 60;
-  else if (name.toLowerCase().includes(subject.id.split('-')[0])) s += 30;
+  const lower = name.toLowerCase();
+  if (lower.includes(genus)) s += 60;
+  else if (lower.includes(subject.id.split('-')[0])) s += 30;
+  else return -1;
   for (const [re, points] of GOOD) if (re.test(name)) s += points;
   s += Math.min(12, Math.round((info.width ?? 0) / 400));             // prefer larger originals
   return s;
@@ -129,6 +141,17 @@ const subjectsFile = JSON.parse(await readFile(join(HERE, 'subjects.json'), 'utf
  * this file is reviewed art direction, and losing it to a transient network answer is worse than
  * having it a week stale.
  */
+/**
+ * Pictures a reviewer has thrown out, by subject. They are not offered again: the slot goes to the
+ * next candidate down, so each round is a better board than the last rather than the same one
+ * reshuffled. Written by tools/research/apply-rejections.mjs from a viewer export.
+ */
+let rejected = new Map();
+try {
+  const raw = JSON.parse(await readFile(join(HERE, 'rejected.json'), 'utf8'));
+  rejected = new Map(Object.entries(raw).map(([id, titles]) => [id, new Set(titles)]));
+} catch { /* nothing rejected yet */ }
+
 const previous = new Map();
 try {
   const old = JSON.parse(await readFile(join(HERE, 'images.json'), 'utf8'));
@@ -143,9 +166,12 @@ for (const group of subjectsFile.groups) {
     let picks = [];
     try {
       const infos = await imageInfo(await candidates(subject));
+      const no = rejected.get(subject.id);
       picks = infos
         .map((x) => ({ ...x, s: score(x.title, x.info, subject) }))
         .filter((x) => x.s > 0)
+        // A rejected title is treated as though Commons did not hold it.
+        .filter((x) => !no?.has(x.title.replace(/^File:/, '').replace(/_/g, ' ')))
         .sort((a, b) => b.s - a.s)
         .slice(0, PER_SUBJECT)
         .map(({ title, info, s }) => {
@@ -170,7 +196,8 @@ for (const group of subjectsFile.groups) {
     if (!picks.length && previous.has(subject.id)) { picks = previous.get(subject.id); kept = true; }
     if (!picks.length) empty.push(subject.id);
     total += picks.length;
-    console.log(`${subject.id.padEnd(24)} ${String(picks.length).padStart(2)} images${kept ? ' (kept, refresh found none)' : ''}`);
+    const dropped = rejected.get(subject.id)?.size ?? 0;
+    console.log(`${subject.id.padEnd(24)} ${String(picks.length).padStart(2)} images${kept ? ' (kept, refresh found none)' : ''}${dropped ? ` · ${dropped} rejected` : ''}`);
     outGroup.subjects.push({ ...subject, images: picks });
   }
   result.groups.push(outGroup);
@@ -182,7 +209,7 @@ if (LOCAL) {
     for (const [i, im] of s.images.entries()) {
       const file = `${s.id}-${i}.jpg`;
       try {
-        await run('curl', ['-sS', '--max-time', '60', '-H', 'User-Agent: cambrian-triassic-research/1.0', '-o', join(HERE, 'img', file), im.thumb]);
+        await run('curl', ['-sS', '--max-time', '60', '-H', 'User-Agent: cambrian-research/1.0', '-o', join(HERE, 'img', file), im.thumb]);
         im.local = `img/${file}`;
       } catch { /* keep the hotlink */ }
     }

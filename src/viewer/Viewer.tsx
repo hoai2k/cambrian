@@ -125,7 +125,9 @@ export function Viewer() {
     requestedId.current = id;
     // Set the scheme before the model is built so it never appears in the wrong palette first.
     sceneRef.current?.setScheme(picksRef.current[id] ?? defaultScheme(id));
-    sceneRef.current?.show({ ...def, model: modelPath }, { preserveView: true })
+    // The yaw is the generated mesh's alone: the shipped body and the twin are already built to
+    // the engine's convention and must not be turned.
+    sceneRef.current?.show({ ...def, model: modelPath, previewYaw: showGenerated ? def.previewYaw : 0 }, { preserveView: true })
       .then((names) => {
         if (cancelled) return;
         // A sculpt made this session follows the creature back onto the stage, full or reduced.
@@ -135,7 +137,7 @@ export function Viewer() {
       })
       .catch((e: Error) => { if (!cancelled) { setError(e.message); setLoading(false); } });
     return () => { cancelled = true; };
-  }, [id, modelPath]);
+  }, [id, modelPath, showGenerated, def.previewYaw]);
 
   useEffect(() => { sceneRef.current?.setSpeed(speed); }, [speed]);
   useEffect(() => { sceneRef.current?.setScheme(schemeId); }, [schemeId]);
@@ -239,10 +241,13 @@ export function Viewer() {
         </label>}
         {def.generated && <p className="hint">
           <strong>Generated mesh:</strong> the raw body this animal will be built from. It has no
-          skeleton, no animation clips and no anchors, and its orientation and scale are not yet
-          normalized for the engine, so it sits still and may not face the way the others do. It is
-          here to be looked at — the animal still borrows another era's body in play until this one
-          is cleaned, rigged and animated.
+          skeleton, no animation clips and no anchors, so it sits still. Its facing and its size here
+          are <em>estimates</em> — the mesh arrives pointing wherever it was generated and normalized
+          to one unit, and it has been turned to face the way the shipped bodies do{def.previewLength
+            ? ` and taken up to the ${def.previewLength} units the roster gives the animal` : ''}. Both
+          are redone properly when the body is cleaned and rigged, and every bit of this preview is
+          thrown away the day the real one lands. Until then the animal still borrows another era's
+          body in play.
         </p>}
         {def.puppet && <p className="hint">
           The twin is rebuilt to this body's own volume on the same skeleton, and is where the clips

@@ -1,7 +1,8 @@
 # Visitor stats
 
 **The page:** `/stats/` — <https://games.hoai.net/cambrian/stats/> once deployed.
-**The switch:** `GOATCOUNTER_SITE` in `src/shared/config-stats.ts`, currently empty.
+**The switch:** `GOATCOUNTER_SITE` in `src/shared/config-stats.ts`, set to `hoai` —
+<https://hoai.goatcounter.com>.
 **The check:** `npm run stats`, plus `node tools/stats-smoke.mjs <outdir>` in a browser.
 
 ## The question this answers
@@ -22,19 +23,28 @@ consent banner on any of the four pages, and why there does not need to be one.
 
 ## Switching it on
 
-Five minutes, once:
+The code is set (`hoai`), so counting starts on the next deploy. Two settings on GoatCounter's side
+are worth doing, and neither affects whether visits are counted — only whether the dashboard can be
+read from inside `/stats/`:
 
-1. Register a site at <https://www.goatcounter.com/signup>. The **code** you pick becomes the
-   dashboard subdomain: `ancientseas` gives you `https://ancientseas.goatcounter.com`.
-2. Put that code — the bare code, not a URL — in `src/shared/config-stats.ts`.
-3. In GoatCounter, *Settings → Sites that can embed GoatCounter*, add `games.hoai.net`, so the
-   dashboard can appear inside `/stats/` rather than only on theirs.
-4. Push. The next deploy starts counting.
+- *Settings → Sites that can embed GoatCounter* must list this site, or the frame is refused
+  outright. On `hoai` it already does: the dashboard's `frame-ancestors` names `games.hoai.net`
+  and `hoai2k.github.io`.
+- *Settings → Dashboard viewable by* decides whether anything shows inside that frame. The frame
+  carries no login — a browser will not send the GoatCounter session cookie to a frame on another
+  domain, so on *Only logged in users* (the default, and where `hoai` stands) the frame shows a
+  sign-in page however you are logged in on their site. *Anyone* makes it show. The third option,
+  *Logged in users or with secret token*, works via `?access-token=…`, but the token would then sit
+  in this public repository, which is only half a private dashboard.
+- Either way the *Open this view in GoatCounter* link beside the frame carries the same filter and
+  is the record. If the dashboard stays private, that link is the whole of `/stats/` that works,
+  and the chips are still doing their job — they build the filtered URL.
 
-Empty is the honest default. Nothing is sent, `/stats/` says so and repeats these steps, and nobody
-has to trust a subdomain this repository does not own. A code that is not a code — most often the
-whole dashboard URL, pasted — is refused loudly by `countEndpoint` rather than glued to `/count`
-and 404'd once per pageview with nothing on screen to say why; `npm run stats` covers that case.
+To move to a different site, or to stop counting, change the one string. Empty is a supported
+state, not a broken one: nothing is sent, and `/stats/` prints the setup steps instead of an empty
+dashboard. A code that is not a code — most often the whole dashboard URL, pasted — is refused
+loudly by `countEndpoint` rather than glued to `/count` and 404'd once per pageview with nothing on
+screen to say why; `npm run stats` covers that case.
 
 ## The page
 
@@ -48,20 +58,37 @@ allowed to make the first one by accident.
 **On:** one dashboard frame and a row of chips. The chips are `STATS_VIEWS`, and each one points
 the frame at the same dashboard with a different `?filter=` — which GoatCounter's own dashboard
 handler reads and applies to the whole view, so "Triassic Triumph" is every panel of the dashboard
-about that game rather than a single number. One frame and not four: the question is *which of
-them, and where from*, and four dashboards side by side answer it worse than one that can be
-pointed. Beside the frame, every view also has a plain link out to GoatCounter, because the frame
-is a convenience and their page is the record.
+about that game rather than a single number. One frame and not six: the question is *which of them,
+and where from*, and six dashboards side by side answer it worse than one that can be pointed.
+Beside the frame, every view also has a plain link out to GoatCounter, because the frame is a
+convenience and their page is the record.
 
-The filters carry the published prefix — the games sit at `/cambrian/cambrian/`,
-`/cambrian/devonian/` and `/cambrian/triassic/`, because the whole site is published under
-`/cambrian/`. A filter that forgot the prefix would match nothing and read as *nobody played the
-Devonian*, so `npm run stats` asserts the shape of every one.
+## The filters
 
-The trilogy page has no chip, deliberately. It sits at `/cambrian/` itself, the directory the three
-games are nested in, so every path a filter could name for it also sweeps them in. It is not
-missing: it is a row in the dashboard's own *Pages* list, which already breaks each path out
-separately in the unfiltered view.
+Worth knowing exactly what `?filter=` does, because the obvious reading is wrong. GoatCounter turns
+it into a `LIKE` and wraps it in `%` at *both* ends, matching the path **or the title**
+(`PathFilterFromQuery`, their `filter.go`). Bare `/cambrian/devonian/` would therefore be a
+substring search across titles as well as paths. Their parser also takes keywords out of the query,
+and `pathFilter()` in `src/shared/config-stats.ts` always adds them:
+
+| Filter | Means |
+| --- | --- |
+| `/cambrian/ at:start in:path` | that directory and everything under it — every Ancient Seas page |
+| `/cambrian/ at:start at:end in:path` | that path and nothing else — the trilogy page alone |
+
+So every chip is anchored to the front of the path and matched on the path alone. That is what lets
+the trilogy page have a view of its own: it sits at `/cambrian/`, the directory the three games are
+nested in, and only an `at:end` filter tells it apart from them.
+
+The prefix is not optional. The whole site is published under `/cambrian/`, so the games are
+recorded at `/cambrian/cambrian/`, `/cambrian/devonian/` and `/cambrian/triassic/`; a filter that
+forgot it would match nothing and read as *nobody played the Devonian*.
+
+**"All of it" is filtered too**, to `/cambrian/`. One GoatCounter site counts a whole domain, and
+`hoai` counts all of `games.hoai.net` — so an unfiltered dashboard would quietly fold another game
+into this trilogy's total. `npm run stats` models the matching and asserts that each view counts
+what it claims and leaves out everything else, the other games on the domain included. The
+unfiltered view is still one click away on GoatCounter's own page.
 
 ## What is counted
 
@@ -94,7 +121,7 @@ anything was meant to happen.
 
 | File | What it is |
 | --- | --- |
-| `src/shared/config-stats.ts` | The site code, the validators, and `STATS_VIEWS`. The one file to edit. |
+| `src/shared/config-stats.ts` | The site code, the validators, `pathFilter()` and `STATS_VIEWS`. The one file to edit. |
 | `src/shared/stats.ts` | `installStats()` — attaches the counter, and nothing else. |
 | `stats/index.html` | The page. Its own small stylesheet, tokens copied from the game's. |
 | `tools/stats-test.ts` | `npm run stats` — the config, the views, and that every entry installs the counter. |

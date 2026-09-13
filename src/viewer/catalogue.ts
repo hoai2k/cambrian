@@ -70,6 +70,13 @@ export interface ViewerSpecimen {
    * normalized, so it is a thing to look at rather than a thing to animate or play.
    */
   generated?: string;
+  /**
+   * Estimated degrees about +y to bring the generated mesh's head round to +z, where every shipped
+   * body keeps it, and the length the roster gives the animal. Both are previewing estimates read
+   * off fixed-axis renders, not the normalization the pipeline does when a body is rigged.
+   */
+  previewYaw?: number;
+  previewLength?: number;
   image?: string;
   displayLength: number;
   lengthMeters?: number;
@@ -77,7 +84,8 @@ export interface ViewerSpecimen {
 }
 const DEVONIAN_KIND = new Map(DEVONIAN_CREATURES.map(c => [c.id as string, { kind: c.kind, kindNote: c.kindNote }]));
 /** The raw generated body of each animal still waiting for one, by id. */
-const TRIASSIC_PREVIEW = new Map((previewBodies as { id: string; model: string }[]).map(b => [b.id, b.model]));
+const TRIASSIC_PREVIEW = new Map((previewBodies as { id: string; model: string; yaw: number; lengthUnits: number | null }[])
+  .map(b => [b.id, b]));
 /** The procedural twin of each animal that has one, by the animal's id. */
 const TRIASSIC_PUPPETS = new Map(TRIASSIC_SPECIMENS.filter(c => c.category === 'creature').map(c => [c.id, c]));
 /**
@@ -133,7 +141,9 @@ export const SPECIMENS: readonly ViewerSpecimen[] = [
     clipNotes: TRIASSIC_REFINEMENTS.clipNotes[c.id],
     model: TRIASSIC_PATHS.model(c.id), lod: TRIASSIC_PATHS.model(c.id, 1), image: TRIASSIC_PATHS.portrait(c.id, 'card'), displayLength: Math.min(c.adultLength, 8),
     puppet: TRIASSIC_PUPPETS.get(c.id)?.model, puppetNote: TRIASSIC_PUPPETS.get(c.id)?.description,
-    generated: TRIASSIC_PREVIEW.get(c.id),
+    generated: TRIASSIC_PREVIEW.get(c.id)?.model,
+    previewYaw: TRIASSIC_PREVIEW.get(c.id)?.yaw,
+    previewLength: TRIASSIC_PREVIEW.get(c.id)?.lengthUnits ?? undefined,
     looping: ['Idle', 'Swim', 'Crawl', 'Guard', 'Eat', ...(c.abilityLoop ? ['Ability'] : [])],
   })),
   // Scenery only. A creature row in TRIASSIC_SPECIMENS is a procedural twin, and a twin is not a

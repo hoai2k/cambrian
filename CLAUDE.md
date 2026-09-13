@@ -208,8 +208,8 @@ unless the user explicitly asks for a PR. Steps:
   clears whatever was decided about the old one and sends the subject back to the undecided pile —
   unless a human has already ruled on that candidate (`reviewedCandidate`), or the reopen would
   undo the decision it was meant to prompt. A **greenlit candidate becomes the pose**: the tool
-  renames it over `<id>.png`, keeps the loser under `canonical/backups/`, and marks the prompt
-  record answered, because everything downstream reads `<id>.png` and nothing else — leaving the
+  renames it over `<id>.png`, **deletes** the loser and every other candidate for that subject, and
+  marks the prompt record answered, because everything downstream reads `<id>.png` and nothing else — leaving the
   winner beside the picture it beat would send the loser to be built. Run the tool with no
   arguments to reconcile the manifest with the tree.
 - An era's scenery pack must **name** every prop it draws with. An id it does not name falls back to
@@ -420,14 +420,20 @@ unless the user explicitly asks for a PR. Steps:
   the conversion is deterministic, so a recovered source reproduces the shipped asset exactly.
   See `intake/README.md`.
 - Who visits is counted, and nothing else is. `/stats/` reads one GoatCounter site whose code is
-  the single editable value in `src/shared/config-stats.ts` (empty ships, and the page then prints
-  the setup steps rather than an empty dashboard, because "nobody ever played it" and "we were
-  never counting" look identical otherwise). `installStats()` in `src/shared/stats.ts` is called
-  from each public entry — the trilogy page, the three games and the viewer, never the workbench —
-  and attaches one async script and no storage of our own. Drilling into a game is a `?filter=` on
-  the dashboard, and the filters carry the published prefix (`/cambrian/triassic/`), so the trilogy
-  page itself gets no chip: it sits at the directory the games are nested in. `npm run stats` and
-  `node tools/stats-smoke.mjs <outdir>` check both states; `docs/stats.md` is the whole of it.
+  the single editable value in `src/shared/config-stats.ts` (`hoai`; empty is a supported state and
+  the page then prints the setup steps rather than an empty dashboard, because "nobody ever played
+  it" and "we were never counting" look identical otherwise). `installStats()` in
+  `src/shared/stats.ts` is called from each public entry — the trilogy page, the three games and
+  the viewer, never the workbench — and attaches one async script and no storage of our own.
+  Drilling into a game is a `?filter=` on the dashboard, and what that filter means is not the
+  obvious thing: GoatCounter wraps it in `%` at both ends and matches the path *or the title*, so
+  every view goes through `pathFilter()`, which adds the `at:start in:path` their parser strips back
+  out (`at:end` too for a view that is one page). That is what gives the trilogy page a chip of its
+  own despite sitting at the directory the games are nested in — and why *All of it* is
+  `/cambrian/` rather than an unfiltered dashboard, since one GoatCounter site counts a whole domain
+  and `hoai` also holds other games. `npm run stats` models the matching and checks every view
+  counts what it claims; `node tools/stats-smoke.mjs <outdir>` drives both states in a browser with
+  `gc.zgo.at` intercepted; `docs/stats.md` is the whole of it.
 - All docs live in `docs/`. Design docs are in `docs/redesign/`. Image, glyph and prop
   needs go in `docs/image-requests.md` and move to `docs/image-requests-history.md` once
   delivered and integrated; sound and music needs go in `docs/audio-requests.md`.

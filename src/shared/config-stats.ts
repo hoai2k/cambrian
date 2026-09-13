@@ -25,7 +25,7 @@
  * keeping four separate counters, which is what lets /stats/ show the trilogy whole and then break
  * it down.
  */
-export const GOATCOUNTER_SITE = '';
+export const GOATCOUNTER_SITE = 'hoai';
 
 /**
  * Is a code shaped like one GoatCounter would have issued?
@@ -55,17 +55,39 @@ export const dashboardUrl = (code: string = GOATCOUNTER_SITE): string | null =>
   isValidSite(code) ? `https://${code}.goatcounter.com` : null;
 
 /**
- * The pages worth drilling into, in the order /stats/ offers them. `path` is what goes to
- * GoatCounter's dashboard as `?filter=`, which its handler reads and applies to the whole view.
+ * A dashboard filter that means exactly one path, or exactly one directory.
  *
- * The site is published under /cambrian/, so a visit to the Devonian is recorded as
- * `/cambrian/devonian/` and the filter has to say so. The trilogy page is not in this list: it
- * sits at `/cambrian/` itself, so every path a filter could name for it also matches the three
- * games underneath. It is not missing — it is a row in the dashboard's own Pages list, which is
- * where the unfiltered view already breaks every page out separately.
+ * GoatCounter's `?filter=` is a `LIKE` against the path *and the title*, wrapped in `%` at both
+ * ends unless told otherwise (`PathFilterFromQuery` in their filter.go). Left bare, `/cambrian/`
+ * would therefore also match any page whose title happens to contain that text — and, more to the
+ * point, it would not be anchored, so it is worth saying what is meant. Their parser takes
+ * keywords out of the query: `in:path` drops the title half, `at:start` anchors the front, and
+ * `at:end` the back. Prefix plus `in:path` is "this page and everything under it"; adding `at:end`
+ * makes it that page and nothing else.
  */
-export const STATS_VIEWS: readonly { id: string; name: string; blurb: string; path: string }[] = [
-  { id: 'all', name: 'All of it', blurb: 'Every page together, broken out by path in the dashboard\u2019s own Pages list.', path: '' },
+export const pathFilter = (path: string, exact = false): string =>
+  `${path} at:start${exact ? ' at:end' : ''} in:path`;
+
+/**
+ * The views /stats/ offers, in the order it offers them. `path` is the page or directory each one
+ * means; `exact` marks the ones that are a single page rather than everything beneath it.
+ *
+ * Two things shape this list. The site is published under `/cambrian/`, so a visit to the Devonian
+ * is recorded as `/cambrian/devonian/` and a filter that forgot the prefix would match nothing and
+ * read as "nobody played it". And one GoatCounter site can hold more than one game — `hoai` counts
+ * the whole of games.hoai.net — so *All of it* is `/cambrian/` and its contents rather than an
+ * unfiltered dashboard, which would fold somebody else's game into this trilogy's total. The
+ * unfiltered view is still one click away, on GoatCounter's own page.
+ *
+ * The trilogy page can have a view of its own because `at:end` exists: it sits at `/cambrian/`,
+ * the directory the three games are nested in, so only an exactly-this-path filter tells it apart
+ * from them.
+ */
+export const STATS_VIEWS: readonly {
+  id: string; name: string; blurb: string; path: string; exact?: boolean;
+}[] = [
+  { id: 'all', name: 'All of it', blurb: 'Every Ancient Seas page together \u2014 the trilogy page, the three games and the viewer.', path: '/cambrian/' },
+  { id: 'trilogy', name: 'Trilogy page', blurb: 'The plate with the three games on it, and nothing under it \u00b7 the site root', path: '/cambrian/', exact: true },
   { id: 'cambrian', name: 'Cambrian Conquest', blurb: '508 million years ago \u00b7 /cambrian/', path: '/cambrian/cambrian/' },
   { id: 'devonian', name: 'Devonian Domination', blurb: '375 million years ago \u00b7 /devonian/', path: '/cambrian/devonian/' },
   { id: 'triassic', name: 'Triassic Triumph', blurb: '240 million years ago \u00b7 /triassic/', path: '/cambrian/triassic/' },

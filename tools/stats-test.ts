@@ -13,7 +13,7 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import {
-  GOATCOUNTER_SITE, STATS_VIEWS, countEndpoint, dashboardUrl, isValidSite,
+  GOATCOUNTER_SITE, STATS_VIEWS, countEndpoint, dashboardUrl, isValidSite, pathFilter,
 } from '../src/shared/config-stats';
 
 let passes = 0;
@@ -64,29 +64,74 @@ ok(GOATCOUNTER_SITE === '' || isValidSite(GOATCOUNTER_SITE),
 // ---------------------------------------------------------------- the views
 
 ok(STATS_VIEWS.length >= 4, 'there are views to drill into');
-ok(STATS_VIEWS[0]!.id === 'all' && STATS_VIEWS[0]!.path === '',
-  'the first view is everything, unfiltered');
+ok(STATS_VIEWS[0]!.id === 'all', 'the first view is the trilogy whole');
 ok(new Set(STATS_VIEWS.map(v => v.id)).size === STATS_VIEWS.length, 'view ids are unique');
-ok(new Set(STATS_VIEWS.map(v => v.path)).size === STATS_VIEWS.length, 'view filters are unique');
+ok(new Set(STATS_VIEWS.map(v => pathFilter(v.path, v.exact))).size === STATS_VIEWS.length,
+  'no two views resolve to the same filter');
 for (const v of STATS_VIEWS) {
   ok(v.name.trim() !== '' && v.blurb.trim() !== '', `${v.id} is named and described`);
-  if (v.path === '') continue;
   // The site is published one directory down, so a filter that forgets the prefix silently
   // matches nothing and reads as "nobody played the Devonian".
   ok(v.path.startsWith('/cambrian/') && v.path.endsWith('/'),
     `${v.id} filters on the published path ("${v.path}")`);
 }
 
-// Each game the trilogy ships is drillable by name.
+// Every view is filtered, including the widest. One GoatCounter site can hold other games on the
+// same domain, and an unfiltered "All of it" would quietly fold them into this trilogy's total.
+ok(STATS_VIEWS.every(v => v.path !== ''), 'no view is the unfiltered dashboard');
+ok(STATS_VIEWS.find(v => v.id === 'all')?.path === '/cambrian/',
+  'the widest view is everything published under /cambrian/, and no more');
+
+// Each game the trilogy ships is drillable by name, and by its own directory.
 for (const era of ['cambrian', 'devonian', 'triassic']) {
   const view = STATS_VIEWS.find(v => v.id === era);
-  ok(view?.path === `/cambrian/${era}/`, `${era} has its own view`);
+  ok(view?.path === `/cambrian/${era}/` && !view.exact, `${era} has its own view`);
 }
 
-// The trilogy page is deliberately absent: it sits at the root the games are nested under, so any
-// filter naming it would sweep them in too. If someone adds it, this says why not.
-ok(!STATS_VIEWS.some(v => v.path === '/cambrian/'),
-  'the trilogy page has no filter of its own (it would catch the games under it)');
+// The trilogy page sits at the directory the games are nested in, so only an exact filter tells it
+// apart from them — which is the one thing `exact` is for.
+const trilogy = STATS_VIEWS.find(v => v.id === 'trilogy');
+ok(trilogy?.path === '/cambrian/' && trilogy.exact === true,
+  'the trilogy page is filtered exactly, or it would catch the games under it');
+
+// --------------------------------------------------- the filters GoatCounter is handed
+
+// Their parser strips these keywords out of the query and applies them to the LIKE it builds:
+// `in:path` drops the title half of the default match, `at:start` anchors the front, `at:end` the
+// back. Without them a filter is `%text%` over path *or* title, which is not what any chip means.
+ok(pathFilter('/cambrian/devonian/') === '/cambrian/devonian/ at:start in:path',
+  'a directory view is an anchored path prefix');
+ok(pathFilter('/cambrian/', true) === '/cambrian/ at:start at:end in:path',
+  'an exact view is anchored at both ends');
+for (const v of STATS_VIEWS) {
+  const f = pathFilter(v.path, v.exact);
+  ok(f.startsWith(v.path) && f.includes('in:path') && f.includes('at:start'),
+    `${v.id} is matched on the path alone, from the start`);
+  ok(f.includes('at:end') === Boolean(v.exact), `${v.id} is closed at the end only if it is one page`);
+}
+
+// The chips must not overlap where they claim not to. Modelled the way GoatCounter matches: a
+// filter is a prefix on the path, plus an end anchor when it is exact.
+const matches = (filter: string, path: string) => {
+  const [prefix] = filter.split(' at:start');
+  return filter.includes('at:end') ? path === prefix : path.startsWith(prefix!);
+};
+const TRILOGY = '/cambrian/';
+const GAMES = ['/cambrian/cambrian/', '/cambrian/devonian/', '/cambrian/triassic/'];
+const ELSEWHERE = ['/jjkbrawler/', '/mando/', '/', '/cambrian-notes/'];
+const view = (id: string) => pathFilter(STATS_VIEWS.find(v => v.id === id)!.path,
+  STATS_VIEWS.find(v => v.id === id)!.exact);
+for (const p of [TRILOGY, ...GAMES]) ok(matches(view('all'), p), `"All of it" counts ${p}`);
+for (const p of ELSEWHERE) ok(!matches(view('all'), p), `"All of it" leaves ${p} out`);
+ok(matches(view('trilogy'), TRILOGY), 'the trilogy view counts the trilogy page');
+for (const p of GAMES) ok(!matches(view('trilogy'), p), `the trilogy view leaves ${p} out`);
+for (const era of ['cambrian', 'devonian', 'triassic']) {
+  ok(matches(view(era), `/cambrian/${era}/`), `the ${era} view counts its own pages`);
+  ok(!matches(view(era), TRILOGY), `the ${era} view leaves the trilogy page out`);
+  for (const other of GAMES.filter(p => p !== `/cambrian/${era}/`)) {
+    ok(!matches(view(era), other), `the ${era} view leaves ${other} out`);
+  }
+}
 
 // ---------------------------------------------------------------- the wiring
 
