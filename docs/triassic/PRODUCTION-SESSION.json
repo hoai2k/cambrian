@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "updatedAt": "2026-09-13T15:03:20.423352+00:00",
+  "updatedAt": "2026-09-13T16:07:26Z",
   "phase": "paused-complex-work-routine-tripo-only",
   "instructions": [
     "User paused on2026-09-13: finish and push all current work.",
@@ -14,6 +14,51 @@
   "apiWalletLastVerified": 655,
   "expectedCreditsPerGeneration": 30,
   "maximumNewSubmissionsAtCurrentCost": 21,
+  "routineRawBatch": {
+    "status": "complete",
+    "completedAt": "2026-09-13T16:07:26Z",
+    "planned": 19,
+    "successfulTasks": 19,
+    "newPaidSubmissions": 18,
+    "resumedExistingTasks": 1,
+    "downloadedArtifacts": 19,
+    "processedStaticSources": 19,
+    "creditsConsumedFromTaskRecords": 570,
+    "walletBeforeRunVerified": 655,
+    "walletAfterRunVerified": null,
+    "walletArithmeticRemainder": 85,
+    "walletNote": "The API wallet was verified at 655 before the run. Each of the 19 successful task records reports 30 credits consumed. The 85 remainder is arithmetic and has not been independently rechecked in billing UI.",
+    "recovery": "Cymbospondylus reused its already-successful task after a transient artifact download failure. The completed task was refreshed and its artifact downloaded with idempotent GET requests; no second generation was submitted.",
+    "staticQa": "All raw and preview hashes match sanitized metadata and audit records; each source has side, top and three-quarter Blender review renders. These are unrigged source bodies and are not shipped assets.",
+    "futureComplexReview": [
+      "Askeptosaurus has a detached pale geometry island in top view and a severely curled tail.",
+      "Dinocephalosaurus has a tightly curved, raised neck that needs anatomical and deformation review.",
+      "Henodus has a pronounced hard scuted carapace and a bifurcated-looking tail silhouette that need anatomy review.",
+      "Keichousaurus has paddle-like limbs without clearly resolved digit-bearing feet.",
+      "Hybodus has a sharply raised tail pose that should be corrected during later authored-model work."
+    ],
+    "creatures": [
+      "cymbospondylus",
+      "dinocephalosaurus",
+      "helicoprion",
+      "atopodentatus",
+      "askeptosaurus",
+      "placodus",
+      "hybodus",
+      "birgeria",
+      "mixosaurus",
+      "henodus",
+      "saurichthys",
+      "hupehsuchus",
+      "keichousaurus",
+      "cartorhynchus",
+      "odontochelys",
+      "ceratites",
+      "phragmoteuthis",
+      "macrocnemus",
+      "coelophysis"
+    ]
+  },
   "alreadyDelivered": [
     "nothosaurus",
     "shonisaurus"
@@ -283,8 +328,8 @@
   ],
   "notes": [
     "Imagerymain237bf24; correctedShonisaurus and checkpointmain926bc81.",
-    "Nineteen currentlygreenlit verified inputs; four candidate03 redraws awaitingreview. Newlygreenlit candidates without verifiedinputs stayblocked duringpause.",
-    "Routine batchscript resumes taskIDs; failedjobs stopratherthanpaidretry. APIcredential nevercommitted.",
+    "Nineteen greenlit verified inputs were generated, downloaded and processed as static sources; four candidate03 redraws remain outside this batch. Newlygreenlit candidates without verifiedinputs stayblocked duringpause.",
+    "Routine batchscript resumes taskIDs; failed generation jobs stop rather than incur a paid retry. API credential was removed after the batch and never committed.",
     "Resume complexwork onlyafter user explicitly resumes; then speciesby species pairedrig/puppet/actionQA andcommits."
   ],
   "imageBatchMainCommit": "237bf24",

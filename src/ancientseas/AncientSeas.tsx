@@ -1,5 +1,5 @@
 import { nestedBase } from '../shared/base';
-import { GAMES, SLOTS, TRILOGY_LOGO, VERSIONS, isDelivered, parseVersion, sourceFor, type PageVersion, type Slot } from './page';
+import { GAMES, SLOTS, TRILOGY_LOGO, isDelivered, parseVersion, sourceFor, type Slot } from './page';
 
 /** The page sits one level below the app root, so `assets/...` is reached the way /devonian/ reaches it. */
 const url = (path: string) => `${nestedBase()}${path}`;
@@ -18,19 +18,6 @@ function TrilogyTitle({ ground }: { ground: 'dark' | 'parchment' }) {
       <span className="as-title-line">Ancient Seas</span>
       <span className="as-title-line as-title-sub">Trilogy</span>
     </h1>
-  );
-}
-
-function VersionSwitch({ version }: { version: PageVersion }) {
-  return (
-    <footer className="as-foot">
-      <span className="as-foot-label">Compare</span>
-      {VERSIONS.map((v) => (
-        <a key={v} className={`as-foot-link${v === version ? ' current' : ''}`} href={`?version=${v}`} aria-current={v === version ? 'page' : undefined}>
-          Version {v}
-        </a>
-      ))}
-    </footer>
   );
 }
 
@@ -55,7 +42,6 @@ function VersionOne() {
           </a>
         ))}
       </nav>
-      <VersionSwitch version={1} />
     </main>
   );
 }
@@ -63,14 +49,16 @@ function VersionOne() {
 /** One piece of the version-2 composition, at its place on the stage. */
 function SlotView({ slot }: { slot: Slot }) {
   const { desktop: d, mobile: m } = slot;
-  const style = {
-    '--dx': `${d.x}%`, '--dy': `${d.y}%`, '--dw': `${d.w}%`, '--dr': `${d.rot ?? 0}deg`, '--df': d.flip ? -1 : 1,
-    '--mx': `${m.x}%`, '--my': `${m.y}%`, '--mw': `${m.w}%`, '--mr': `${m.rot ?? 0}deg`, '--mf': m.flip ? -1 : 1,
-    '--z': slot.z, aspectRatio: `${slot.width} / ${slot.height}`,
-  } as React.CSSProperties;
+  const style = (slot.fill
+    ? { '--z': slot.z } as Record<string, string | number>
+    : {
+      '--dx': `${d.x}%`, '--dy': `${d.y}%`, '--dw': `${d.w}%`, '--dr': `${d.rot ?? 0}deg`, '--df': d.flip ? -1 : 1,
+      '--mx': `${m.x}%`, '--my': `${m.y}%`, '--mw': `${m.w}%`, '--mr': `${m.rot ?? 0}deg`, '--mf': m.flip ? -1 : 1,
+      '--z': slot.z, aspectRatio: `${slot.width} / ${slot.height}`,
+    }) as React.CSSProperties;
   const source = sourceFor(slot);
   const game = slot.game ? GAMES.find((g) => g.id === slot.game) : undefined;
-  const cls = `as-slot as-slot-${slot.kind} as-src-${source.kind}`;
+  const cls = `as-slot as-slot-${slot.kind} as-src-${source.kind}${slot.fill ? ' as-slot-fill' : ''}`;
 
   if (slot.id === 'trilogy') {
     // The trilogy title is the one slot whose stand-in is typeset rather than drawn.
@@ -93,7 +81,12 @@ function SlotView({ slot }: { slot: Slot }) {
   return <div className={cls} style={style} data-slot={slot.id} aria-hidden="true">{body}</div>;
 }
 
-/** Version 2: the page is itself a painting in the three title paintings' style. */
+/**
+ * Version 2, the page itself: one painting in the three title paintings' style, filling the
+ * viewport with nothing round it — what a visitor sees is the finished plate, not a draft with a
+ * switch under it. `?version=1` still reaches the earlier draft, but neither version offers a link
+ * to the other.
+ */
 function VersionTwo() {
   return (
     <main className="as as-v2">
@@ -101,7 +94,6 @@ function VersionTwo() {
       <div className="as-stage" role="navigation" aria-label="The three games">
         {SLOTS.map((slot) => <SlotView key={slot.id} slot={slot} />)}
       </div>
-      <VersionSwitch version={2} />
     </main>
   );
 }

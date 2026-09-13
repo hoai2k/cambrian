@@ -1,0 +1,105 @@
+{
+  "schema_version": 1,
+  "input": {
+    "path": "tools/triassic/creatures/hybodus/tripo-raw/hybodus.raw.glb",
+    "bytes": 1384316,
+    "sha256": "e453ee9d120f3f18bda26b294c419691912fa788dc0d444d3392490cab0825c9"
+  },
+  "summary": {
+    "mesh_objects": 1,
+    "vertices": 11544,
+    "faces": 19424,
+    "triangles": 19424,
+    "connected_components": 63,
+    "materials": 1,
+    "textures": 3
+  },
+  "bounds": {
+    "min_xyz": [
+      -0.307664,
+      -0.5,
+      -0.263029
+    ],
+    "max_xyz": [
+      0.307664,
+      0.5,
+      0.263029
+    ],
+    "center_xyz": [
+      0,
+      0,
+      0
+    ],
+    "size_xyz": [
+      0.615327,
+      1,
+      0.526058
+    ]
+  },
+  "meshes": [
+    {
+      "object": "tripo_node_1a016b48-0e1d-4070-9662-b14318537b08",
+      "mesh": "tripo_mesh_1a016b48-0e1d-4070-9662-b14318537b08",
+      "vertices": 11544,
+      "edges": 30905,
+      "faces": 19424,
+      "triangles": 19424,
+      "connected_components": 63,
+      "material_slots": [
+        "tripo_material_1a016b48-0e1d-4070-9662-b14318537b08"
+      ]
+    }
+  ],
+  "materials": [
+    {
+      "name": "tripo_material_1a016b48-0e1d-4070-9662-b14318537b08",
+      "image_textures": [
+        "Color_1a016b48-0e1d-4070-9662-b14318537b08",
+        "NormalGL_1a016b48-0e1d-4070-9662-b14318537b08",
+        "ORM_1a016b48-0e1d-4070-9662-b14318537b08"
+      ]
+    }
+  ],
+  "textures": [
+    {
+      "name": "Color_1a016b48-0e1d-4070-9662-b14318537b08",
+      "width": 2048,
+      "height": 2048,
+      "channels": 4,
+      "packed": true,
+      "source": "FILE",
+      "colorspace": "sRGB"
+    },
+    {
+      "name": "NormalGL_1a016b48-0e1d-4070-9662-b14318537b08",
+      "width": 2048,
+      "height": 2048,
+      "channels": 4,
+      "packed": true,
+      "source": "FILE",
+      "colorspace": "Non-Color"
+    },
+    {
+      "name": "ORM_1a016b48-0e1d-4070-9662-b14318537b08",
+      "width": 2048,
+      "height": 2048,
+      "channels": 4,
+      "packed": true,
+      "source": "FILE",
+      "colorspace": "Non-Color"
+    }
+  ],
+  "renders": {
+    "side": "tools/triassic/creatures/hybodus/tripo-raw/review/side.png",
+    "top": "tools/triassic/creatures/hybodus/tripo-raw/review/top.png",
+    "three-quarter": "tools/triassic/creatures/hybodus/tripo-raw/review/three-quarter.png"
+  },
+  "preview": {
+    "path": "tools/triassic/creatures/hybodus/hybodus.preview.glb",
+    "triangle_limit": 40000,
+    "triangles_before": 19424,
+    "triangles_after": 19424,
+    "bytes": 1267536,
+    "sha256": "f28722ca94cbe5a5396d92eccb58faf800699b9f57f43a4a147c174222fbac1f"
+  }
+}

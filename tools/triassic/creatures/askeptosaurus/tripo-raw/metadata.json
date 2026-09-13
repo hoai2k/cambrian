@@ -1,0 +1,38 @@
+{
+  "schema_version": 1,
+  "name": "askeptosaurus",
+  "task": {
+    "type": "image_to_model",
+    "status": "success",
+    "progress": 100,
+    "task_id": "93520fae-b1e1-4356-a4e1-46f978243502",
+    "created_at": "2026-09-13T15:35:24.653762Z",
+    "completed_at": "2026-09-13T15:37:36.736244Z",
+    "credits_consumed": 30,
+    "output": {
+      "model_url": "<redacted download URL>",
+      "rendered_image_url": "<redacted download URL>"
+    }
+  },
+  "request": {
+    "file": {
+      "file_token": "<uploaded at runtime>"
+    },
+    "model": "v3.1-20260211",
+    "face_limit": 20000,
+    "texture": true,
+    "pbr": true
+  },
+  "image": {
+    "path": "docs/triassic/canonical/model-inputs/askeptosaurus/input.png",
+    "sha256": "bcbd577fe27b6481fcbad0e61ea29469d4347085959405db1e68bc138b244195",
+    "bytes": 1616209
+  },
+  "artifact": {
+    "path": "tools/triassic/creatures/askeptosaurus/tripo-raw/askeptosaurus.raw.glb",
+    "bytes": 1637620,
+    "sha256": "8348549043848ee2c71f109968b41a1d4f7fd3215cd1b65a916c32bad71f9a2c",
+    "source_output_field": "model_url"
+  },
+  "downloaded_at": "2026-09-13T15:37:50.019Z"
+}

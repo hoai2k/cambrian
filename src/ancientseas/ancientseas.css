@@ -34,7 +34,7 @@ a { color: inherit; }
 a:focus-visible { outline: 2px solid var(--as-gold); outline-offset: 6px; border-radius: 4px; }
 .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
 
-.as { position: relative; min-height: 100svh; display: grid; grid-template-rows: auto 1fr auto; isolation: isolate; }
+.as { position: relative; min-height: 100svh; display: grid; grid-template-rows: auto 1fr; isolation: isolate; }
 /* Grain over everything, faint: a print, not a screen. */
 .as::after { content: ''; position: fixed; inset: 0; background: var(--as-grain); background-size: 240px 240px; opacity: .22; mix-blend-mode: multiply; pointer-events: none; z-index: 50; }
 
@@ -45,12 +45,13 @@ a:focus-visible { outline: 2px solid var(--as-gold); outline-offset: 6px; border
 .as-title-sub { font-size: clamp(22px, 3.6vw, 46px); letter-spacing: .34em; padding-left: .34em; }
 /* On the dark ground the lettering is the gold rim the engraved wordmarks carry. */
 .as-title-dark { background: linear-gradient(180deg, #f4dfa6 0%, var(--as-gold) 40%, var(--as-gold-2) 78%, #8a6528 100%); -webkit-background-clip: text; background-clip: text; color: transparent; filter: drop-shadow(0 2px 0 rgba(0,0,0,.6)) drop-shadow(0 0 18px rgba(230, 194, 122, .18)); }
-/* On parchment it is the paintings' ink: black with a thin pale rim, and the paper's own shadow. */
-.as-title-parchment { color: #15100a; text-shadow: 0 0 1px rgba(255, 244, 214, .7), 0 1px 0 rgba(255, 244, 214, .45), 0 3px 6px rgba(60, 40, 15, .35); }
+/* On parchment it is the paintings' ink: black with a thin pale rim, the same sepia halo the
+   drawn titles carry, and the paper's own shadow. */
+.as-title-parchment { color: #15100a; text-shadow: 0 0 1px rgba(255, 244, 214, .8), 0 1px 0 rgba(255, 244, 214, .5), 0 0 10px rgba(255, 246, 222, .95), 0 0 26px rgba(247, 231, 195, .8), 0 3px 6px rgba(60, 40, 15, .3); }
 .as-title-art img { display: block; width: 100%; height: auto; }
 
 /* ================= version 1 ================= */
-.as-v1 { padding: clamp(28px, 5vh, 64px) clamp(16px, 4vw, 48px) 24px; gap: clamp(20px, 4vh, 44px); }
+.as-v1 { padding: clamp(28px, 5vh, 64px) clamp(16px, 4vw, 48px) clamp(28px, 5vh, 64px); gap: clamp(20px, 4vh, 44px); align-content: center; }
 /* A warm glow behind the middle of the page, no stronger than the paintings' own centres would leave on a black table. */
 .as-v1::before { content: ''; position: fixed; inset: 0; z-index: -1; background:
   radial-gradient(ellipse 70% 55% at 50% 58%, rgba(110, 82, 44, .30), transparent 70%),
@@ -78,10 +79,6 @@ a:focus-visible { outline: 2px solid var(--as-gold); outline-offset: 6px; border
 .as-caption small { font: 600 11px/1 var(--as-body); letter-spacing: .24em; text-transform: uppercase; color: var(--as-cream-dim); }
 .as-caption em { font-style: normal; font-size: 13px; color: var(--as-cream-dim); }
 
-.as-foot { display: flex; justify-content: center; align-items: baseline; gap: 14px; padding: 12px 0 0; font: 600 11px/1 var(--as-body); letter-spacing: .2em; text-transform: uppercase; color: var(--as-cream-dim); }
-.as-foot-link { text-decoration: none; padding: 6px 2px; border-bottom: 1px solid transparent; opacity: .65; }
-.as-foot-link:hover { opacity: 1; }
-.as-foot-link.current { opacity: 1; color: var(--as-gold); border-bottom-color: var(--as-gold-2); }
 
 @media (max-width: 860px) {
   .as-games { grid-template-columns: 1fr; gap: 4px; max-width: 640px; }
@@ -89,10 +86,10 @@ a:focus-visible { outline: 2px solid var(--as-gold); outline-offset: 6px; border
 }
 
 /* ================= version 2 ================= */
-.as-v2 { background: var(--as-ink); place-items: center; padding: 0 0 18px; grid-template-rows: 1fr auto; }
+.as-v2 { background: var(--as-ink); place-items: center; padding: 0; grid-template-rows: 1fr; }
 /* The stage is the painting: a parchment plate vignetted to the page's black on every side, sized
    to the viewport like a title screen. Below 720px it becomes a tall plate the page scrolls. */
-.as-stage { position: relative; width: min(100vw, calc((100svh - 56px) * 1.6)); aspect-ratio: 16 / 10; overflow: hidden; background:
+.as-stage { position: relative; width: min(100vw, calc(100svh * 1.6)); aspect-ratio: 16 / 10; overflow: hidden; background:
   radial-gradient(ellipse 62% 66% at 50% 48%, rgba(255, 246, 220, .35), transparent 70%),
   radial-gradient(ellipse 82% 90% at 50% 50%, var(--as-parchment) 0%, var(--as-parchment-2) 34%, #b79b6e 52%, #7a5d3a 68%, var(--as-umber) 84%, var(--as-ink) 100%);
   color: #15100a; }
@@ -105,6 +102,9 @@ a:focus-visible { outline: 2px solid var(--as-gold); outline-offset: 6px; border
 .as-slot { position: absolute; left: var(--dx); top: var(--dy); width: var(--dw); z-index: var(--z); transform: translate(-50%, -50%) rotate(var(--dr)) scaleX(var(--df)); display: block; }
 .as-slot img { display: block; width: 100%; height: 100%; object-fit: contain; }
 .as-slot-ground { z-index: var(--z); }
+/* The plate's own paper: it covers the stage at any shape rather than sitting on it at a size. */
+.as-slot-fill { left: 0; top: 0; width: 100%; height: 100%; transform: none; }
+.as-slot-fill img { width: 100%; height: 100%; object-fit: cover; }
 /* A delivered animal or plant casts the faint offset shadow the paintings give their subjects. */
 .as-slot-animal.as-src-delivered img, .as-slot-plant.as-src-delivered img, .as-slot-ornament.as-src-delivered img { filter: drop-shadow(1px 3px 3px rgba(50, 32, 10, .28)); }
 /* The shipped emblems standing in are lit for the dark UI; a touch of sepia and a shadow settles them onto paper. */
@@ -112,11 +112,17 @@ a:focus-visible { outline: 2px solid var(--as-gold); outline-offset: 6px; border
 
 /* Titles are the links. The engraved wordmarks standing in carry the gold rim the dark UI needs;
    on parchment it reads as gilt, which is not wrong for a plate, and the requested ink versions
-   replace them in place. */
-.as-slot-title { text-decoration: none; transition: transform .28s cubic-bezier(.2,.8,.2,1), filter .28s; }
+   replace them in place.
+
+   Each title carries a pale sepia halo — the light coming off the paper behind the letters — so
+   black ink still reads where a plant or an animal's shadow darkens the parchment under it. Two
+   soft shadows for the glow and one tight dark one to seat the lettering on the page; on an image
+   it is a filter, on the typeset stand-in the same thing as a text-shadow. */
+.as-slot-title { text-decoration: none; transition: transform .28s cubic-bezier(.2,.8,.2,1), filter .28s;
+  filter: drop-shadow(0 0 6px rgba(255, 246, 222, .95)) drop-shadow(0 0 22px rgba(247, 231, 195, .75)) drop-shadow(0 2px 3px rgba(60, 40, 15, .35)); }
 a.as-slot-title:hover, a.as-slot-title:focus-visible { transform: translate(-50%, -50%) rotate(var(--dr)) scaleX(var(--df)) scale(1.04); filter: brightness(1.05); outline: none; }
 a.as-slot-title:focus-visible img { outline: 2px solid #15100a; outline-offset: 8px; border-radius: 6px; }
-.as-slot-title.as-src-stand-in img { filter: drop-shadow(1px 3px 4px rgba(50, 32, 10, .38)); }
+.as-slot-title.as-src-stand-in img { filter: drop-shadow(1px 3px 4px rgba(50, 32, 10, .3)); }
 .as-slot[data-slot='trilogy'] .as-title-text { height: 100%; align-content: center; }
 .as-slot[data-slot='trilogy'] .as-title-line { font-size: 12.5cqw; }
 .as-slot[data-slot='trilogy'] .as-title-sub { font-size: 5.6cqw; }
@@ -131,13 +137,13 @@ a.as-slot-title:focus-visible img { outline: 2px solid #15100a; outline-offset: 
 .as-slot-plant .as-placeholder { border-radius: 50% 50% 40% 40% / 60% 60% 40% 40%; background: radial-gradient(ellipse at 50% 60%, rgba(70, 80, 40, .26), rgba(70, 80, 40, .10) 60%, transparent 72%); }
 .as-slot-plant .as-placeholder i { color: rgba(40, 46, 18, .7); }
 
-.as-v2 .as-foot { color: rgba(241, 230, 200, .5); }
 
 @media (max-width: 720px) {
-  .as-stage { width: 100vw; aspect-ratio: 9 / 25; background:
+  .as-stage { width: 100vw; aspect-ratio: 9 / 27; background:
     radial-gradient(ellipse 66% 60% at 50% 48%, rgba(255, 246, 220, .35), transparent 70%),
     radial-gradient(ellipse 100% 86% at 50% 50%, var(--as-parchment) 0%, var(--as-parchment-2) 34%, #b79b6e 52%, #7a5d3a 68%, var(--as-umber) 84%, var(--as-ink) 100%); }
   .as-slot { left: var(--mx); top: var(--my); width: var(--mw); transform: translate(-50%, -50%) rotate(var(--mr)) scaleX(var(--mf)); }
+  .as-slot-fill { left: 0; top: 0; width: 100%; transform: none; }
   a.as-slot-title:hover, a.as-slot-title:focus-visible { transform: translate(-50%, -50%) rotate(var(--mr)) scaleX(var(--mf)) scale(1.04); }
   .as-placeholder i { font-size: 11px; transform: scaleX(var(--mf)); }
 }

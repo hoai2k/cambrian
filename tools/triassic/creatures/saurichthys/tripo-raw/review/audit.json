@@ -1,0 +1,105 @@
+{
+  "schema_version": 1,
+  "input": {
+    "path": "tools/triassic/creatures/saurichthys/tripo-raw/saurichthys.raw.glb",
+    "bytes": 1368452,
+    "sha256": "cc2f1d5c08667762bb344114786814839253f709ef17d6a0ba4f5567e3daa907"
+  },
+  "summary": {
+    "mesh_objects": 1,
+    "vertices": 11598,
+    "faces": 19112,
+    "triangles": 19112,
+    "connected_components": 92,
+    "materials": 1,
+    "textures": 3
+  },
+  "bounds": {
+    "min_xyz": [
+      -0.130731,
+      -0.5,
+      -0.171809
+    ],
+    "max_xyz": [
+      0.130731,
+      0.5,
+      0.171809
+    ],
+    "center_xyz": [
+      0,
+      0,
+      0
+    ],
+    "size_xyz": [
+      0.261461,
+      1,
+      0.343618
+    ]
+  },
+  "meshes": [
+    {
+      "object": "tripo_node_fcd37f06-a374-42dc-b9eb-6aa38e6160db",
+      "mesh": "tripo_mesh_fcd37f06-a374-42dc-b9eb-6aa38e6160db",
+      "vertices": 11598,
+      "edges": 30618,
+      "faces": 19112,
+      "triangles": 19112,
+      "connected_components": 92,
+      "material_slots": [
+        "tripo_material_fcd37f06-a374-42dc-b9eb-6aa38e6160db"
+      ]
+    }
+  ],
+  "materials": [
+    {
+      "name": "tripo_material_fcd37f06-a374-42dc-b9eb-6aa38e6160db",
+      "image_textures": [
+        "Color_fcd37f06-a374-42dc-b9eb-6aa38e6160db",
+        "NormalGL_fcd37f06-a374-42dc-b9eb-6aa38e6160db",
+        "ORM_fcd37f06-a374-42dc-b9eb-6aa38e6160db"
+      ]
+    }
+  ],
+  "textures": [
+    {
+      "name": "Color_fcd37f06-a374-42dc-b9eb-6aa38e6160db",
+      "width": 2048,
+      "height": 2048,
+      "channels": 4,
+      "packed": true,
+      "source": "FILE",
+      "colorspace": "sRGB"
+    },
+    {
+      "name": "NormalGL_fcd37f06-a374-42dc-b9eb-6aa38e6160db",
+      "width": 2048,
+      "height": 2048,
+      "channels": 4,
+      "packed": true,
+      "source": "FILE",
+      "colorspace": "Non-Color"
+    },
+    {
+      "name": "ORM_fcd37f06-a374-42dc-b9eb-6aa38e6160db",
+      "width": 2048,
+      "height": 2048,
+      "channels": 4,
+      "packed": true,
+      "source": "FILE",
+      "colorspace": "Non-Color"
+    }
+  ],
+  "renders": {
+    "side": "tools/triassic/creatures/saurichthys/tripo-raw/review/side.png",
+    "top": "tools/triassic/creatures/saurichthys/tripo-raw/review/top.png",
+    "three-quarter": "tools/triassic/creatures/saurichthys/tripo-raw/review/three-quarter.png"
+  },
+  "preview": {
+    "path": "tools/triassic/creatures/saurichthys/saurichthys.preview.glb",
+    "triangle_limit": 40000,
+    "triangles_before": 19112,
+    "triangles_after": 19112,
+    "bytes": 1253544,
+    "sha256": "fb68c6c247d9a60f8ed4ac2580de2e3124dc70f54454c4a2d5eb5e894aae3478"
+  }
+}

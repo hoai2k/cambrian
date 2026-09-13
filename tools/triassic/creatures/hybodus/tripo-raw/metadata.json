@@ -1,0 +1,38 @@
+{
+  "schema_version": 1,
+  "name": "hybodus",
+  "task": {
+    "type": "image_to_model",
+    "status": "success",
+    "progress": 100,
+    "task_id": "1a016b48-0e1d-4070-9662-b14318537b08",
+    "created_at": "2026-09-13T15:40:41.711310Z",
+    "completed_at": "2026-09-13T15:42:26.782167Z",
+    "credits_consumed": 30,
+    "output": {
+      "model_url": "<redacted download URL>",
+      "rendered_image_url": "<redacted download URL>"
+    }
+  },
+  "request": {
+    "file": {
+      "file_token": "<uploaded at runtime>"
+    },
+    "model": "v3.1-20260211",
+    "face_limit": 20000,
+    "texture": true,
+    "pbr": true
+  },
+  "image": {
+    "path": "docs/triassic/canonical/model-inputs/hybodus/input.png",
+    "sha256": "56d7e515ba7f0ca011c64bd9d535fb15d6cb8b32e6aae59bd8238cf4289565a7",
+    "bytes": 2067707
+  },
+  "artifact": {
+    "path": "tools/triassic/creatures/hybodus/tripo-raw/hybodus.raw.glb",
+    "bytes": 1384316,
+    "sha256": "e453ee9d120f3f18bda26b294c419691912fa788dc0d444d3392490cab0825c9",
+    "source_output_field": "model_url"
+  },
+  "downloaded_at": "2026-09-13T15:42:45.844Z"
+}

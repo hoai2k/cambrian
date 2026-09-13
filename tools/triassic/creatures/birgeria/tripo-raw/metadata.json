@@ -1,0 +1,38 @@
+{
+  "schema_version": 1,
+  "name": "birgeria",
+  "task": {
+    "type": "image_to_model",
+    "status": "success",
+    "progress": 100,
+    "task_id": "3dc0dbb9-5dd8-407f-9f76-5500d926e63f",
+    "created_at": "2026-09-13T15:42:48.375316Z",
+    "completed_at": "2026-09-13T15:43:59.954224Z",
+    "credits_consumed": 30,
+    "output": {
+      "model_url": "<redacted download URL>",
+      "rendered_image_url": "<redacted download URL>"
+    }
+  },
+  "request": {
+    "file": {
+      "file_token": "<uploaded at runtime>"
+    },
+    "model": "v3.1-20260211",
+    "face_limit": 20000,
+    "texture": true,
+    "pbr": true
+  },
+  "image": {
+    "path": "docs/triassic/canonical/model-inputs/birgeria/input.png",
+    "sha256": "37a8535f61157dfa0ff5a762501f4d8be873e23c884226f2bcb5be788cd901e7",
+    "bytes": 1883765
+  },
+  "artifact": {
+    "path": "tools/triassic/creatures/birgeria/tripo-raw/birgeria.raw.glb",
+    "bytes": 1525312,
+    "sha256": "69dde4465d3842bb17b4f0a30082978e3802bed980e693e183e6c019a7bf3b48",
+    "source_output_field": "model_url"
+  },
+  "downloaded_at": "2026-09-13T15:44:11.795Z"
+}

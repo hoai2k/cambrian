@@ -91,6 +91,37 @@ function safeTask(task) {
   return copy;
 }
 
+async function downloadCompletedTask(initialTask, taskId, apiKey) {
+  let task = initialTask;
+  let lastError;
+  for (let attempt = 1; attempt <= 4; attempt += 1) {
+    // Refresh the completed task before a retry so an expired signed URL can be replaced. This is
+    // an idempotent GET; generation POSTs remain guarded by the persisted task_id above.
+    if (attempt > 1) task = await request(`/tasks/${encodeURIComponent(taskId)}`, { apiKey });
+    const output = task.output || {};
+    const candidates = ['pbr_model_url', 'model_url', 'pbr_model', 'model'];
+    const selected = candidates.find((key) => typeof output[key] === 'string' && /^https?:\/\//.test(output[key]));
+    if (!selected) throw new Error('successful task did not expose a model download URL');
+    try {
+      const response = await fetch(output[selected], { signal: AbortSignal.timeout(120_000) });
+      if (!response.ok) throw new Error(`HTTP ${response.status}`);
+      const bytes = new Uint8Array(await response.arrayBuffer());
+      if (bytes.length < 12 || Buffer.from(bytes.subarray(0, 4)).toString('ascii') !== 'glTF')
+        throw new Error('response was not a binary GLB');
+      return { bytes, selected, task };
+    } catch (error) {
+      lastError = error;
+      const detail = error?.cause?.code || error?.cause?.name || error?.name || error?.message || 'network error';
+      if (attempt < 4) {
+        console.warn(`Model download attempt ${attempt} failed (${detail}); refreshing the completed task and retrying.`);
+        await new Promise((done) => setTimeout(done, attempt * 2_000));
+      }
+    }
+  }
+  const detail = lastError?.cause?.code || lastError?.cause?.name || lastError?.name || lastError?.message || 'network error';
+  throw new Error(`model download failed after 4 idempotent attempts (${detail}); rerun to resume the same task`);
+}
+
 async function main() {
   const args = parseArgs(process.argv.slice(2));
   if (args.help) return usage();
@@ -165,14 +196,9 @@ async function main() {
   }
   if (task.status !== 'success') throw new Error(`task ${state.task_id} ended with status ${task.status}`);
 
-  const output = task.output || {};
-  const candidates = ['pbr_model_url', 'model_url', 'pbr_model', 'model'];
-  const selected = candidates.find((key) => typeof output[key] === 'string' && /^https?:\/\//.test(output[key]));
-  if (!selected) throw new Error('successful task did not expose a model download URL');
-  const response = await fetch(output[selected]);
-  if (!response.ok) throw new Error(`model download failed with HTTP ${response.status}; rerun promptly to refresh the signed URL`);
-  const bytes = new Uint8Array(await response.arrayBuffer());
-  if (bytes.length < 12 || Buffer.from(bytes.subarray(0, 4)).toString('ascii') !== 'glTF') throw new Error('download was not a binary GLB');
+  const downloaded = await downloadCompletedTask(task, state.task_id, apiKey);
+  task = downloaded.task;
+  const { bytes, selected } = downloaded;
   const tempModel = `${modelPath}.${process.pid}.tmp`;
   await writeFile(tempModel, bytes);
   await rename(tempModel, modelPath);

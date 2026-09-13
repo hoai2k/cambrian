@@ -12,7 +12,7 @@ import { existsSync, readFileSync } from 'node:fs';
 import { CAMBRIAN } from '../src/content/cambrian';
 import { DEVONIAN } from '../src/content/devonian';
 import { TRIASSIC } from '../src/content/triassic';
-import { ART_DIR, DEFAULT_VERSION, GAMES, REQUESTED, SLOTS, STAGE, TRILOGY_LOGO, isDelivered, parseVersion, sourceFor } from '../src/ancientseas/page';
+import { ANIMAL_ERA, ART_DIR, DEFAULT_VERSION, GAMES, REQUESTED, SLOTS, STAGE, TRILOGY_LOGO, isDelivered, parseVersion, sourceFor } from '../src/ancientseas/page';
 
 let passes = 0;
 const ok = (cond: unknown, msg: string) => { assert.ok(cond, msg); passes++; };
@@ -25,7 +25,11 @@ eq(parseVersion('?version=2'), 2, '?version=2');
 eq(parseVersion('?version=3'), DEFAULT_VERSION, 'an unknown version falls back rather than drawing nothing');
 eq(parseVersion('?version=two'), DEFAULT_VERSION, 'junk falls back');
 eq(parseVersion('?foo=1&version=2'), 2, 'other parameters are ignored');
-eq(DEFAULT_VERSION, 1, 'version 1 is the default');
+eq(DEFAULT_VERSION, 2, 'the composed plate is what a visitor gets');
+// The parameter is a way to look at the other draft, not something the page offers: no switcher.
+const page = readFileSync('src/ancientseas/AncientSeas.tsx', 'utf8');
+ok(!/VersionSwitch|as-foot/.test(page), 'neither version draws a link to the other');
+ok(!/as-foot/.test(readFileSync('src/ancientseas/ancientseas.css', 'utf8')), 'and the switcher styles are gone with it');
 
 // ---- the games: three, in order, each opening a page that exists and showing its own title art ----
 const ERAS = { cambrian: CAMBRIAN, devonian: DEVONIAN, triassic: TRIASSIC } as const;
@@ -67,10 +71,72 @@ for (const s of SLOTS) {
 const titles = SLOTS.filter((s) => s.kind === 'title' && s.game).map((s) => s.game);
 eq(titles, GAMES.map((g) => g.id), 'version 2 links to the same three games in the same order');
 ok(SLOTS.some((s) => s.kind === 'animal') && SLOTS.some((s) => s.kind === 'plant'), 'animals and plants surround the titles');
-for (const id of GAMES.map((g) => g.id)) {
-  const t = SLOTS.find((s) => s.game === id)!;
-  const near = SLOTS.filter((s) => s.kind === 'animal' && Math.abs(s.desktop.x - t.desktop.x) < 20);
-  ok(near.length >= 3, `${id}: has its own animals round its title on the desktop stage (${near.length})`);
+/**
+ * Each era's animals gather under that era's own title rather than being strung across the plate,
+ * on both stages: a row of nine spread evenly reads as a row of nine, not as three games.
+ */
+for (const stage of ['desktop', 'mobile'] as const) {
+  for (const id of GAMES.map((g) => g.id)) {
+    const t = SLOTS.find((s) => s.game === id)![stage];
+    const mine = SLOTS.filter((s) => s.kind === 'animal' && ANIMAL_ERA[s.id] === id);
+    eq(mine.length, 3, `${id}: three animals, as every era has`);
+    for (const a of mine) {
+      const own = Math.abs(a[stage].x - t.x);
+      const nearest = Math.min(...GAMES.filter((g) => g.id !== id).map((g) => Math.abs(a[stage].x - SLOTS.find((s) => s.game === g.id)![stage].x)));
+      ok(own <= nearest, `${stage}: ${a.id} sits under ${id}, not under another era`);
+    }
+  }
+}
+eq(Object.keys(ANIMAL_ERA).sort(), SLOTS.filter((s) => s.kind === 'animal').map((s) => s.id).sort(), 'every animal is placed in an era');
+// Nothing is tucked behind the big animal any more: no two animals of an era overlap.
+for (const stage of ['desktop', 'mobile'] as const) {
+  const animals = SLOTS.filter((s) => s.kind === 'animal');
+  const box = (s: typeof animals[number]) => {
+    const p = s[stage], h = (p.w * s.height / s.width) / STAGE[stage];
+    return { x0: p.x - p.w / 2, x1: p.x + p.w / 2, y0: p.y - h / 2, y1: p.y + h / 2 };
+  };
+  for (let i = 0; i < animals.length; i++) for (let j = i + 1; j < animals.length; j++) {
+    const a = box(animals[i]), b = box(animals[j]);
+    const over = a.x0 < b.x1 && b.x0 < a.x1 && a.y0 < b.y1 && b.y0 < a.y1;
+    ok(!over, `${stage}: ${animals[i].id} and ${animals[j].id} do not sit on top of one another`);
+  }
+}
+/**
+ * A title's lettering is the one thing on the plate that must read at a glance, so no animal
+ * crosses it. Measured as how much of the title's own area an animal covers rather than as any
+ * touching at all: a cutout is a rectangle around a drawing that does not fill its corners, so a
+ * body and a title may share a corner of their boxes and still be nowhere near each other. An
+ * animal actually lying across a title covers a great deal more than this.
+ */
+const CORNER = 0.2;
+// The three game titles, which is where the question arises: each has an animal arching over it.
+// The trilogy title runs the whole width of the plate with the big animals hanging below it, and
+// a box around all of that says nothing useful about whether they touch.
+for (const stage of ['desktop', 'mobile'] as const) {
+  for (const t of SLOTS.filter((s) => s.kind === 'title' && s.game)) {
+    const p = t[stage], th = (p.w * t.height / t.width) / STAGE[stage];
+    for (const a of SLOTS.filter((s) => s.kind === 'animal')) {
+      const q = a[stage], ah = (q.w * a.height / a.width) / STAGE[stage];
+      const ox = Math.max(0, (p.w + q.w) / 2 - Math.abs(p.x - q.x));
+      const oy = Math.max(0, (th + ah) / 2 - Math.abs(p.y - q.y));
+      const share = (ox * oy) / (p.w * th);
+      ok(share <= CORNER, `${stage}: ${a.id} keeps off the ${t.id} lettering (${Math.round(share * 100)}% of it)`);
+    }
+  }
+}
+/**
+ * And the case that made the titles move down in the first place: an era's big animal hangs
+ * *above* its title rather than across it. Its box may reach into the top of the title's box,
+ * which is the margin over the capitals, and no further.
+ */
+const BIG = { cambrian: 'anomalocaris', devonian: 'dunkleosteus', triassic: 'cymbospondylus' } as const;
+for (const stage of ['desktop', 'mobile'] as const) {
+  for (const [era, animalId] of Object.entries(BIG)) {
+    const t = SLOTS.find((s) => s.game === era)!, a = SLOTS.find((s) => s.id === animalId)!;
+    const th = (t[stage].w * t.height / t.width) / STAGE[stage], ah = (a[stage].w * a.height / a.width) / STAGE[stage];
+    const animalBottom = a[stage].y + ah / 2, lettersTop = t[stage].y - th / 2 + th * 0.25;
+    ok(animalBottom <= lettersTop, `${stage}: the ${animalId} hangs above the ${era} title (${animalBottom.toFixed(1)} vs ${lettersTop.toFixed(1)})`);
+  }
 }
 // Every title stays clear of every other title on both stages, whatever the pictures around them do.
 const titleSlots = SLOTS.filter((s) => s.kind === 'title');
@@ -87,7 +153,32 @@ for (const stage of ['desktop', 'mobile'] as const) {
 // The stylesheet's stages are the ones the placements were laid out on.
 const css = readFileSync('src/ancientseas/ancientseas.css', 'utf8');
 ok(css.includes('aspect-ratio: 16 / 10'), 'the desktop stage is 16:10 in the stylesheet');
-ok(css.includes('aspect-ratio: 9 / 25'), 'the mobile stage is 9:25 in the stylesheet');
-eq([STAGE.desktop, STAGE.mobile], [10 / 16, 25 / 9], 'and page.ts agrees');
+ok(css.includes('aspect-ratio: 9 / 27'), 'the mobile stage is 9:27 in the stylesheet');
+eq([STAGE.desktop, STAGE.mobile], [10 / 16, 27 / 9], 'and page.ts agrees');
+
+// The withdrawn cutouts are gone from the page and from public/ (docs/image-requests.md says why).
+for (const gone of ['animal-opabinia.webp', 'animal-cladoselache.webp', 'animal-mixosaurus.webp', 'animal-ammonoid.webp']) {
+  ok(!REQUESTED.some((f) => f.endsWith(gone)), `${gone} is no longer asked for`);
+  ok(!existsSync(`public/${ART_DIR}${gone}`), `${gone} is no longer shipped`);
+}
+
+/**
+ * Arriving at a game from this page used to show the sea for a moment before the title screen
+ * appeared, because the title waited for the creatures to stream in. It is drawn from the first
+ * frame now, and it carries the boot progress bar itself once the wait outlasts WAIT_HINT — the
+ * boot screen would be the title's own painting a second time over the title.
+ *
+ * The bar's window is a few hundred milliseconds on a warm machine, too narrow for a browser test
+ * to hit reliably (see tools/ancientseas-smoke.mjs), so what is checked is the wiring.
+ */
+const app = readFileSync('src/app/App.tsx', 'utf8');
+const title = readFileSync('src/app/Title.tsx', 'utf8');
+const loading = readFileSync('src/app/Loading.tsx', 'utf8');
+ok(/\{screen === 'title' && \(?\s*<TitleScreen/.test(app), 'the title screen is drawn whether or not the assets are in');
+ok(!/screen === 'title' && loaded/.test(app), 'and nothing gates it on loaded any more');
+ok(/bootSlow && screen !== 'title'/.test(app), 'the boot screen keeps off the title screen');
+ok(/progress=\{bootSlow \? bootFraction : null\}/.test(app), 'the title gets a bar only once the wait is slow');
+ok(/!loaded && progress !== null/.test(title), 'and draws it only while it is still loading');
+ok(/WAIT_HINT = 700/.test(loading), 'slow means 700ms');
 
 console.log(`ancientseas: ${passes} checks passed`);

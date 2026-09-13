@@ -1,0 +1,105 @@
+{
+  "schema_version": 1,
+  "input": {
+    "path": "tools/triassic/creatures/askeptosaurus/tripo-raw/askeptosaurus.raw.glb",
+    "bytes": 1637620,
+    "sha256": "8348549043848ee2c71f109968b41a1d4f7fd3215cd1b65a916c32bad71f9a2c"
+  },
+  "summary": {
+    "mesh_objects": 1,
+    "vertices": 11128,
+    "faces": 19186,
+    "triangles": 19186,
+    "connected_components": 52,
+    "materials": 1,
+    "textures": 3
+  },
+  "bounds": {
+    "min_xyz": [
+      -0.429948,
+      -0.5,
+      -0.199963
+    ],
+    "max_xyz": [
+      0.429948,
+      0.5,
+      0.199963
+    ],
+    "center_xyz": [
+      0,
+      0,
+      0
+    ],
+    "size_xyz": [
+      0.859896,
+      1,
+      0.399925
+    ]
+  },
+  "meshes": [
+    {
+      "object": "tripo_node_93520fae-b1e1-4356-a4e1-46f978243502",
+      "mesh": "tripo_mesh_93520fae-b1e1-4356-a4e1-46f978243502",
+      "vertices": 11128,
+      "edges": 30262,
+      "faces": 19186,
+      "triangles": 19186,
+      "connected_components": 52,
+      "material_slots": [
+        "tripo_material_93520fae-b1e1-4356-a4e1-46f978243502"
+      ]
+    }
+  ],
+  "materials": [
+    {
+      "name": "tripo_material_93520fae-b1e1-4356-a4e1-46f978243502",
+      "image_textures": [
+        "Color_93520fae-b1e1-4356-a4e1-46f978243502",
+        "NormalGL_93520fae-b1e1-4356-a4e1-46f978243502",
+        "ORM_93520fae-b1e1-4356-a4e1-46f978243502"
+      ]
+    }
+  ],
+  "textures": [
+    {
+      "name": "Color_93520fae-b1e1-4356-a4e1-46f978243502",
+      "width": 2048,
+      "height": 2048,
+      "channels": 4,
+      "packed": true,
+      "source": "FILE",
+      "colorspace": "sRGB"
+    },
+    {
+      "name": "NormalGL_93520fae-b1e1-4356-a4e1-46f978243502",
+      "width": 2048,
+      "height": 2048,
+      "channels": 4,
+      "packed": true,
+      "source": "FILE",
+      "colorspace": "Non-Color"
+    },
+    {
+      "name": "ORM_93520fae-b1e1-4356-a4e1-46f978243502",
+      "width": 2048,
+      "height": 2048,
+      "channels": 4,
+      "packed": true,
+      "source": "FILE",
+      "colorspace": "Non-Color"
+    }
+  ],
+  "renders": {
+    "side": "tools/triassic/creatures/askeptosaurus/tripo-raw/review/side.png",
+    "top": "tools/triassic/creatures/askeptosaurus/tripo-raw/review/top.png",
+    "three-quarter": "tools/triassic/creatures/askeptosaurus/tripo-raw/review/three-quarter.png"
+  },
+  "preview": {
+    "path": "tools/triassic/creatures/askeptosaurus/askeptosaurus.preview.glb",
+    "triangle_limit": 40000,
+    "triangles_before": 19186,
+    "triangles_after": 19186,
+    "bytes": 1522268,
+    "sha256": "1c4cdc6d30e97d72a65162e7bafe85bd417c310ea3c0b500cbbe8398e7ee19e6"
+  }
+}
