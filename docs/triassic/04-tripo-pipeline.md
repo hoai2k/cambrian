@@ -54,6 +54,22 @@ Tripo mesh. So the twin costs nothing extra; it is a deliverable. It is also the
 Tripo body that fails verification twice ships as its twin, which is the Devonian route and is
 known to work.
 
+**4. One image is greenlit first, and everything is built from that image.** The pipeline has a
+gate before it has a generation. Each subject gets one **canonical pose** — the approved picture of
+that animal — and a human says yes to it before any modelling sheet, any Tripo job or any Blender
+work happens. Everything downstream is derived from that single image and from nothing else, so
+there is one place where the animal is decided and one thing to argue about. A pose that is not
+greenlit is regenerated, not worked around: fixing a body at the mesh stage means the picture and
+the model disagree from then on, and nobody can say which is the animal.
+
+The review is [the reference viewer](https://games.hoai.net/cambrian/research/triassic/). It puts
+each pose beside reference art from Wikimedia Commons, flips between them in place on **C**, and
+takes a decision per subject: choose our own pose and it is greenlit; choose a reference instead
+and the pose is regenerated steered toward that picture. *Export selections* writes the decisions
+out, and `node tools/triassic/apply-selections.mjs <file>` records them in
+`docs/triassic/canonical/manifest.json` and writes the rework brief to
+`docs/triassic/canonical/review.md`. Nothing reaches step 3 below without a `greenlit` state.
+
 Two risks the proposal does not mention, and should:
 
 - **Tripo bodies are closed shells.** There is no mouth interior, no separate jaw, no eye globe,
@@ -81,7 +97,8 @@ in-house.
 | # | Step | Produces | Check |
 | --- | --- | --- | --- |
 | 1 | **Reference board** from the sources in [01](01-triassic-design.md): skeletal, size, the anatomy that must be right. | `docs/triassic/boards/<id>.md` with cited images | Reviewed once; uncertainties labelled supported / inferred / artistic. |
-| 2 | **Source images for Tripo.** Three orthographic views (left, top, front) and one three-quarter, of the reconstructed animal on a plain mid-grey ground, neutral light, mouth closed, limbs in the rest pose the rig wants (flippers half-spread, neck straight). Generated from the board with the image tool; prompts kept beside them. | `intake/triassic/<id>/source-*.png` | Views agree with each other (the top view's width matches the side view's height at every station, within a tenth) — a disagreement here becomes a warped body. |
+| 1b | **The canonical pose**, generated from the board: one picture of the whole animal — silhouette, species-defining anatomy, the complete tail, every limb and fin — in the rest pose the rig wants (flippers half-spread, neck straight, mouth closed). **This is the thing that gets greenlit**, and every later step reads it. | `docs/triassic/canonical/<id>.png` | A human chooses it in the viewer against the reference art; `manifest.json` reads `greenlit`. Not greenlit means regenerate toward the chosen reference and review again — never carry on. |
+| 2 | **The four-view modelling sheet**, generated *from the greenlit pose* and never from prose: left, top, front and three-quarter of that same animal on a pale neutral studio grey. | `intake/triassic/<id>/turnaround.png` and `source-*.png` | The views agree with each other and with the pose (the top view's width matches the side view's height at every station, within a tenth) — a disagreement here becomes a warped body. The sheet shows in the viewer beside its pose as *3D views*. |
 | 3 | **Tripo generation**, multi-view where the plan allows it, single-image (the side view) otherwise. Keep the job id, the prompt, the seed and the raw output. | `local/triassic-authoring/<id>/tripo/` | Watertight; symmetric about the sagittal plane to within 2 % of length; no fused limbs. Regenerate rather than repair anything that fails this. |
 | 4 | **Intake surgery** in Blender (scripted where possible, `tools/triassic/intake.py`): scale to the board's `lengthMeters` and the era's unit rule, orient +Z forward +Y up, quad-remesh to a deformable density (about 20–40 k faces for a full model), cut and hinge the jaw, model the mouth interior, seat eye globes, separate rigid parts (shell, carapace, tooth plates), free and re-seat paired flippers so their roots sit inside the trunk. | `<id>.intake.blend` | Eye-containment audit (`tools/devonian/eye-audit.py` pattern); the fin-seating assertion from the builders. |
 | 5 | **Measure** the intake mesh into a profile table. | `<id>-profile.json` (the sculpt-export format) | Twenty stations, both drawings, eyes and mouth as features. |
@@ -95,6 +112,9 @@ in-house.
 
 Two rules that follow from the steps:
 
+- **The canonical pose is the animal.** Steps 2 onward are derivations of it, so a change of shape
+  goes back to the pose, a fresh generation and another greenlight — never into a later artefact.
+  A model that no longer matches its greenlit pose is the model that is wrong.
 - **The Tripo mesh is never edited after step 4.** Everything downstream reads it. A change of
   shape goes back to the source images and a fresh generation, so the provenance chain stays whole.
 - **The profile table is the hand-off**, exactly as the viewer's sculpt export is for the Cambrian:

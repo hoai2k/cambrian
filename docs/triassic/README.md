@@ -12,7 +12,7 @@ for the era's documents in one place next to `docs/devonian/`.
 | [02 · Biomes and depth](02-biomes-and-depth.md) | The nine biome slots recast for the Triassic, the water-depth profile (a sea floor that sinks toward the basin), and the prop and plant models each biome needs. |
 | [03 · Image and model requests](03-image-and-model-requests.md) | Every image and 3D model the era needs, in two tiers: Tier 1 goes through Tripo (all creatures, the shore animals, a few organic scenery pieces), Tier 2 is built in-house. Source-image briefs first, model requests against them second. |
 | [04 · Tripo pipeline](04-tripo-pipeline.md) | The production strategy: Tripo bodies on procedural skeletons, motion authored on the procedural twin and applied to the Tripo mesh; where the strategy is agreed with, where it is amended and why. |
-| [canonical/](canonical/README.md) | The approved pose for each subject: the visual contract every model is made from. 26 images. |
+| [canonical/](canonical/README.md) | The approved pose for each subject: the visual contract every model is made from, greenlit before anything is built from it. 26 images, plus the generated [review.md](canonical/review.md). |
 | [research.md](research.md) | The natural-history notes and sources the roster and biomes were drawn from, with confidence labels. |
 
 ## Built: the playable skeleton
@@ -68,6 +68,12 @@ puts every subject side by side with reference images from Wikimedia Commons, wi
 between the reference and our canonical pose. Its source is
 [`docs/research/triassic/viewer/`](../research/triassic/viewer/), whose `index.html` also opens
 straight off the disk; `npm run triassic:viewer` regenerates both after a new pose lands.
+
+It is also where the **greenlight** happens: pick the image each animal should be built from, export
+the decisions, and `node tools/triassic/apply-selections.mjs <file>` records them in
+[canonical/manifest.json](canonical/manifest.json) and writes the rework brief to
+[canonical/review.md](canonical/review.md). A pose is greenlit before its modelling sheet and its
+Tripo generation are made, never after — see [04](04-tripo-pipeline.md).
 
 ## Open decisions
 
