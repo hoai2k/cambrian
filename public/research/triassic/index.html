@@ -7,7 +7,7 @@
 <style>
   :root {
     --ink: #06161c; --ink-2: #0b2029; --ink-3: #103039; --line: #1d4450;
-    --foam: #eefaf6; --mute: #8fb0b4; --lagoon: #61f2d5; --ember: #ffb36b; --coral: #ff5b6e;
+    --foam: #eefaf6; --mute: #8fb0b4; --lagoon: #61f2d5; --ember: #ffb36b; --coral: #ff5b6e; --pick: #7ae582;
     --pad: 16px;
   }
   * { box-sizing: border-box; }
@@ -67,11 +67,18 @@
   .top .n { font-style: italic; font-weight: 650; font-size: 16px; }
   .top .r { color: var(--mute); font-size: 12.5px; }
   .top .sp { flex: 1; }
-  .stage { flex: 1; min-height: 0; display: grid; grid-template-columns: 1fr; gap: 8px; padding: 10px 14px;
-    background: #050f14; place-items: center; }
-  .stage.split { grid-template-columns: 1fr 1fr; }
-  .pane { position: relative; width: 100%; height: 100%; display: grid; place-items: center; min-height: 0; }
-  .pane img { max-width: 100%; max-height: 100%; object-fit: contain; }
+  /* The stage is exactly the space left between the top bar and the strip, and never more: an
+     auto-sized grid row takes its height from the image, so a tall pose used to push the strip off
+     the bottom of the sheet. A fixed 1fr row plus a contained img can never overflow. */
+  .stage { flex: 1 1 0; min-height: 0; overflow: hidden; display: grid; grid-template-columns: 1fr;
+    grid-auto-rows: minmax(0, 1fr); gap: 8px; padding: 10px 14px; background: #050f14; }
+  .stage.split { grid-template-columns: 1fr 1fr; grid-auto-rows: minmax(0, 1fr); }
+  .pane { position: relative; min-width: 0; min-height: 0; display: grid; place-items: center; }
+  /* The picture is pinned to the pane's four edges rather than laid out by it, so its box is the
+     space available and never the image's own height: a portrait pose used to size the row, push
+     past the stage and land on the thumbnail strip. `contain` then letterboxes it inside that box.
+     It takes no clicks either — the only thing to press in here is the pick button over it. */
+  .pane img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; display: block; pointer-events: none; }
   .pane .lab { position: absolute; top: 4px; left: 4px; font-size: 11px; text-transform: uppercase; letter-spacing: .07em;
     background: rgba(6,22,28,.85); border: 1px solid var(--line); padding: 2px 8px; border-radius: 999px; color: var(--mute); }
   .pane .lab.canon { background: var(--lagoon); color: var(--ink); border-color: var(--lagoon); font-weight: 650; }
@@ -83,6 +90,34 @@
   .strip button img { width: 100%; height: 100%; object-fit: cover; display: block; }
   .strip button[aria-current=true] { border-color: var(--ember); outline: 1px solid var(--ember); }
   .strip button.c { border-color: var(--lagoon); }
+  .strip button { position: relative; }
+  .strip button.picked { outline: 2px solid var(--pick); border-color: var(--pick); }
+  .strip button .tick { position: absolute; top: 2px; right: 2px; background: var(--pick); color: #06161c;
+    font-size: 10px; font-weight: 800; line-height: 1; padding: 2px 3px; border-radius: 3px; pointer-events: none; }
+  .strip button .kindtag { position: absolute; bottom: 0; left: 0; right: 0; background: rgba(6,22,28,.8);
+    color: var(--lagoon); font-size: 9px; letter-spacing: .04em; text-transform: uppercase; text-align: center; }
+
+  /* the pick affordance, one per pane, so the choice is never ambiguous about which image it means */
+  .pane .pick { position: absolute; top: 4px; right: 4px; z-index: 5; background: rgba(6,22,28,.88);
+    color: var(--foam); border: 1px solid var(--line); border-radius: 999px; padding: 4px 11px;
+    font: inherit; font-size: 12px; cursor: pointer; }
+  .pane .pick:hover { border-color: var(--pick); color: var(--pick); }
+  .pane .pick.on { background: var(--pick); color: #06161c; border-color: var(--pick); font-weight: 700; }
+  .decide { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; padding: 8px 14px;
+    border-top: 1px solid var(--line); background: var(--ink-2); font-size: 12.5px; }
+  .decide .verdict { font-weight: 650; }
+  .decide .verdict.green { color: var(--pick); }
+  .decide .verdict.replace { color: var(--ember); }
+  .decide .verdict.none { color: var(--mute); font-weight: 400; }
+  .decide input[type=text] { flex: 1 1 260px; min-width: 160px; background: var(--ink); color: var(--foam);
+    border: 1px solid var(--line); border-radius: 6px; padding: 5px 9px; font: inherit; font-size: 12.5px; }
+  .decide input[type=text]:focus { outline: 2px solid var(--lagoon); outline-offset: -1px; }
+  .nav { display: inline-flex; gap: 4px; align-items: center; }
+  .nav .pos { color: var(--mute); font-size: 12px; min-width: 52px; text-align: center; }
+  button.chip.go { background: var(--pick); color: #06161c; border-color: var(--pick); font-weight: 700; }
+  button.chip:disabled { opacity: .4; cursor: not-allowed; }
+  .card.chosen { border-color: var(--pick); }
+  .tag.pick { background: var(--pick); color: #06161c; border-color: var(--pick); font-weight: 700; left: auto; right: 7px; }
   .credit { padding: 7px 14px 11px; border-top: 1px solid var(--line); background: var(--ink);
     color: var(--mute); font-size: 12px; display: flex; gap: 14px; flex-wrap: wrap; }
   .credit b { color: var(--foam); font-weight: 550; }
@@ -99,11 +134,13 @@
       <button id="m-canon" aria-pressed="false">Canonical</button>
       <button id="m-split" aria-pressed="false">Both</button>
     </div>
+    <button class="chip go" id="export">Export selections</button>
   </div>
   <div class="bar" style="margin-top:9px">
     <div class="chips" id="groups"></div>
-    <span class="sp" style="flex:1"></span>
-    <span class="hint"><kbd>C</kbd> toggle · <kbd>←</kbd><kbd>→</kbd> image · <kbd>J</kbd><kbd>K</kbd> subject · <kbd>Esc</kbd> close</span>
+    <button class="chip" id="only-todo" aria-pressed="false">Undecided only</button>
+    <span style="flex:1"></span>
+    <span class="hint"><kbd>C</kbd> toggle · <kbd>B</kbd> both · <kbd>←</kbd><kbd>→</kbd> image · <kbd>J</kbd><kbd>K</kbd> subject · <kbd>Enter</kbd> choose · <kbd>X</kbd> clear · <kbd>Esc</kbd> close</span>
   </div>
 </header>
 <main id="main"></main>
@@ -112,6 +149,11 @@
   <div class="top">
     <span class="n" id="d-name"></span><span class="r" id="d-role"></span>
     <span class="sp"></span>
+    <div class="nav">
+      <button class="chip" id="d-prev" title="Previous subject (K)">‹ Prev</button>
+      <span class="pos" id="d-pos"></span>
+      <button class="chip" id="d-next" title="Next subject (J)">Next ›</button>
+    </div>
     <div class="seg" role="group" aria-label="Which image to show">
       <button id="d-web" aria-pressed="true">Web</button>
       <button id="d-canon" aria-pressed="false">Canonical</button>
@@ -120,6 +162,11 @@
     <button class="chip" id="d-close">Close</button>
   </div>
   <div class="stage" id="d-stage"></div>
+  <div class="decide">
+    <span id="d-verdict"></span>
+    <input type="text" id="d-note" placeholder="Note for the write-up — what the canonical image should change (optional)" aria-label="Note">
+    <button class="chip" id="d-clear">Clear choice</button>
+  </div>
   <div class="strip" id="d-strip"></div>
   <div class="credit" id="d-credit"></div>
 </div></dialog>
@@ -128,11 +175,72 @@
 <script>
 const DATA = window.TRIASSIC, CANON = window.TRIASSIC_CANONICAL || {};
 const $ = (id) => document.getElementById(id);
-const all = DATA.groups.flatMap((g) => g.subjects.map((s) => ({ ...s, group: g.id, canon: CANON[s.id] || [] })));
-const state = { mode: 'web', groups: new Set(DATA.groups.map((g) => g.id)), q: '', open: null, i: 0 };
+const all = DATA.groups.flatMap((g) => g.subjects.map((s) => ({ ...s, group: g.id, groupName: g.name, canon: CANON[s.id] || [] })));
+const byId = new Map(all.map((s) => [s.id, s]));
+const state = { mode: 'web', groups: new Set(DATA.groups.map((g) => g.id)), q: '', todoOnly: false, open: null, i: 0, ci: 0 };
 
-$('tally').textContent = `${all.length} subjects · ${all.reduce((n, s) => n + s.images.length, 0)} web images · `
-  + `${all.filter((s) => s.canon.length).length} with a canonical image · Commons, ${DATA.generated}`;
+/**
+ * The choice, per subject: which single image is the one this animal should be built from.
+ * Kept in this browser (a research page has no server) and keyed by a *stable* reference rather
+ * than an index, so refetching the Commons set or regenerating the deployed copy cannot silently
+ * move a decision onto a different picture. `Export selections` is what leaves the browser.
+ */
+const SEL_KEY = 'triassic-viewer-selections-v1';
+let sel = {};
+try { sel = JSON.parse(localStorage.getItem(SEL_KEY) || '{}') || {}; } catch { sel = {}; }
+const saveSel = () => { try { localStorage.setItem(SEL_KEY, JSON.stringify(sel)); } catch { /* private window */ } };
+
+/**
+ * Every candidate image for a subject in one list: the generated canonical pose first, then any
+ * extra authored view and the four-view modelling sheet, then the web references. `ref` is the
+ * stable identity a choice is stored against — an authored image's label, a reference's Commons
+ * filename — because both survive a rebuild and neither collides with the other.
+ */
+function shots(s) {
+  return [
+    ...s.canon.map((c) => ({
+      kind: c.kind || 'canonical', ref: c.label, label: c.label,
+      src: c.src, thumb: c.thumb || c.src,
+    })),
+    ...s.images.map((im) => ({
+      kind: 'web', ref: im.title, label: im.title, src: im.thumb, thumb: im.thumb,
+      title: im.title, artist: im.artist, licence: im.licence, page: im.page, full: im.full, description: im.description,
+    })),
+  ];
+}
+const chosenRef = (id) => sel[id]?.ref;
+const isChosen = (id, shot) => sel[id]?.ref === shot.ref;
+/** The one image the pipeline currently treats as this subject's pose: our own, and the first of them. */
+const primary = (s) => { const first = shots(s)[0]; return first && first.kind !== 'web' ? first : null; };
+/**
+ * Greenlit means the image already standing as the pose won. Anything else — a reference, or one of
+ * our own later views — says the pose is not the one yet and names what to regenerate it toward.
+ */
+function verdictOf(id) {
+  const pick = sel[id]; if (!pick) return null;
+  const s = byId.get(id), p = s && primary(s);
+  return p && p.ref === pick.ref ? 'greenlit' : 'replace';
+}
+const counts = () => {
+  let green = 0, replace = 0;
+  for (const s of all) { const v = verdictOf(s.id); if (v === 'greenlit') green++; else if (v === 'replace') replace++; }
+  return { green, replace, total: green + replace };
+};
+
+function choose(id, shot) {
+  sel[id] = { choice: shot.kind, ref: shot.ref, note: sel[id]?.note || '', at: new Date().toISOString() };
+  saveSel(); refreshCounts(); render(); if (state.open) paint();
+}
+function clearChoice(id) { delete sel[id]; saveSel(); refreshCounts(); render(); if (state.open) paint(); }
+
+function refreshCounts() {
+  const c = counts();
+  $('export').textContent = c.total ? `Export selections (${c.total})` : 'Export selections';
+  $('export').disabled = c.total === 0;
+  $('tally').textContent = `${all.length} subjects · ${all.reduce((n, s) => n + s.images.length, 0)} web images · `
+    + `${all.filter((s) => s.canon.some((x) => (x.kind || 'canonical') === 'canonical')).length} with a canonical image · `
+    + `${c.green} greenlit, ${c.replace} to redo · Commons, ${DATA.generated}`;
+}
 
 // ---------- header controls
 $('groups').innerHTML = DATA.groups.map((g) =>
@@ -144,10 +252,14 @@ $('groups').addEventListener('click', (e) => {
   on ? state.groups.add(b.dataset.g) : state.groups.delete(b.dataset.g);
   render();
 });
+$('only-todo').addEventListener('click', (e) => {
+  state.todoOnly = !state.todoOnly;
+  e.currentTarget.setAttribute('aria-pressed', String(state.todoOnly));
+  render();
+});
 $('q').addEventListener('input', (e) => { state.q = e.target.value.toLowerCase(); render(); });
-for (const [id, mode] of [['m-web', 'web'], ['m-canon', 'canon'], ['m-split', 'split']])
-  $(id).addEventListener('click', () => setMode(mode));
-for (const [id, mode] of [['d-web', 'web'], ['d-canon', 'canon'], ['d-split', 'split']])
+for (const [id, mode] of [['m-web', 'web'], ['m-canon', 'canon'], ['m-split', 'split'],
+                          ['d-web', 'web'], ['d-canon', 'canon'], ['d-split', 'split']])
   $(id).addEventListener('click', () => setMode(mode));
 
 function setMode(mode) {
@@ -158,33 +270,68 @@ function setMode(mode) {
   render(); if (state.open) paint();
 }
 
+// ---------- the export: what leaves the browser for the codebase
+$('export').addEventListener('click', () => {
+  const rows = [];
+  for (const s of all) {
+    const pick = sel[s.id]; if (!pick) continue;
+    const shot = shots(s).find((x) => x.ref === pick.ref);
+    rows.push({
+      id: s.id, name: s.name, group: s.group, role: s.role,
+      verdict: pick.choice === 'canonical' ? 'greenlit' : 'replace',
+      chose: pick.choice, ref: pick.ref, note: (pick.note || '').trim() || undefined, at: pick.at,
+      image: shot ? (shot.kind === 'web'
+        ? { kind: 'web', title: shot.title, artist: shot.artist, licence: shot.licence, page: shot.page, full: shot.full, description: shot.description || undefined }
+        : { kind: shot.kind, label: shot.label, src: shot.src })
+        : { kind: pick.choice, missing: true },
+    });
+  }
+  const c = counts();
+  const out = {
+    schema: 'triassic-canonical-selections/1',
+    generated: new Date().toISOString(),
+    dataGenerated: DATA.generated,
+    summary: { subjects: all.length, decided: c.total, greenlit: c.green, replace: c.replace },
+    howToApply: 'node tools/triassic/apply-selections.mjs <this file> — greenlights the approved poses in docs/triassic/canonical/manifest.json and writes the rework brief to docs/triassic/canonical/review.md',
+    selections: rows,
+  };
+  const blob = new Blob([JSON.stringify(out, null, 2)], { type: 'application/json' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `triassic-canonical-selections-${new Date().toISOString().slice(0, 10)}.json`;
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(a.href), 4000);
+});
+
 // ---------- grid
 function visible(s) {
   if (!state.groups.has(s.group)) return false;
+  if (state.todoOnly && sel[s.id]) return false;
   if (!state.q) return true;
   return `${s.name} ${s.role} ${s.id} ${s.len}`.toLowerCase().includes(state.q);
 }
 function lead(s) {
-  const web = s.images[0], canon = s.canon[0];
+  const canon = s.canon[0], web = s.images[0];
   if (state.mode === 'canon') return canon ? { src: canon.thumb || canon.src, canon: true } : null;
   if (state.mode === 'split' && canon) return { src: canon.thumb || canon.src, canon: true };
   return web ? { src: web.thumb, canon: false } : null;
 }
 function render() {
   $('main').innerHTML = DATA.groups.filter((g) => state.groups.has(g.id)).map((g) => {
-    const subs = g.subjects.map((s) => all.find((a) => a.id === s.id)).filter(visible);
+    const subs = g.subjects.map((s) => byId.get(s.id)).filter(visible);
     if (!subs.length) return '';
     return `<section><h2>${g.name}</h2><p class="note">${g.note}</p><div class="grid">${subs.map(card).join('')}</div></section>`;
   }).join('') || `<p class="hint" style="padding:30px 0">Nothing matches that filter.</p>`;
 }
 function card(s) {
-  const l = lead(s);
+  const l = lead(s), v = verdictOf(s.id);
   const shot = l
     ? `<img src="${l.src}" alt="${s.name}" loading="lazy" onerror="this.style.display='none'">`
     : `<div class="none">${state.mode === 'canon' ? 'no canonical image' : 'no reference found'}</div>`;
-  return `<button class="card" data-id="${s.id}">
+  return `<button class="card${v ? ' chosen' : ''}" data-id="${s.id}">
     <div class="shot">${shot}
       <span class="tag ${l && l.canon ? 'canon' : ''}">${l && l.canon ? 'canonical' : 'web'}</span>
+      ${v ? `<span class="tag pick">${v === 'greenlit' ? '✓ greenlit' : '✎ redo'}</span>` : ''}
       <span class="count">${s.imagesAre ? '⚠ ' : ''}${s.images.length} web${s.canon.length ? ` · ${s.canon.length} canon` : ''}</span>
     </div>
     <div class="meta"><div class="n">${s.name}</div><div class="r">${s.role}</div><div class="l">${s.len}</div></div>
@@ -195,38 +342,103 @@ $('main').addEventListener('click', (e) => {
 });
 
 // ---------- detail
-function open(id, i) { state.open = all.find((s) => s.id === id); state.i = i; paint(); if (!$('dlg').open) $('dlg').showModal(); }
+const listNow = () => all.filter(visible);
+function open(id, i) {
+  const s = byId.get(id); if (!s) return;
+  state.open = s; state.i = i; state.ci = 0;
+  paint(); if (!$('dlg').open) $('dlg').showModal();
+}
+function step(d) {
+  // Stepping never drops out of the set being worked through, even when "Undecided only" is on and
+  // the subject just decided has left it: the position is taken before the filter is re-applied.
+  const list = listNow();
+  const s = state.open; if (!s) return;
+  let at = list.findIndex((x) => x.id === s.id);
+  if (at < 0) { const near = all.filter(visible); if (!near.length) return; at = d > 0 ? -1 : near.length; }
+  const next = list[at + d];
+  if (next) open(next.id, 0);
+}
+$('d-prev').addEventListener('click', () => step(-1));
+$('d-next').addEventListener('click', () => step(1));
 $('d-close').addEventListener('click', () => $('dlg').close());
 $('dlg').addEventListener('close', () => { state.open = null; });
+$('d-clear').addEventListener('click', () => { if (state.open) clearChoice(state.open.id); });
+$('d-note').addEventListener('input', (e) => {
+  const s = state.open; if (!s) return;
+  if (!sel[s.id]) return;                                   // a note without a choice has nothing to attach to
+  sel[s.id].note = e.target.value; saveSel();
+});
+
+/** The image the keyboard acts on: whichever side is on show. */
+function currentShot() {
+  const s = state.open; if (!s) return null;
+  const list = shots(s);
+  if (state.mode === 'canon') return list.find((x) => x.kind !== 'web') && s.canon[state.ci] ? canonShot(s, state.ci) : null;
+  return s.images.length ? webShot(s, Math.min(state.i, s.images.length - 1)) : null;
+}
+const canonShot = (s, k) => shots(s)[k];
+const webShot = (s, k) => shots(s)[s.canon.length + k];
+
+function pane(side, s) {
+  const chosen = chosenRef(s.id);
+  if (side === 'canon') {
+    const c = s.canon[state.ci];
+    if (!c) return `<div class="pane"><span class="lab canon">canonical</span><p class="empty">No canonical image yet. Drop one at
+      <code>docs/triassic/canonical/${s.id}.png</code> and run <code>npm run triassic:viewer</code>.</p></div>`;
+    const shot = canonShot(s, state.ci), on = chosen === shot.ref;
+    return `<div class="pane"><span class="lab canon">${c.kind === 'turnaround' ? '3D model views' : 'canonical'}${c.label !== 'canonical' && c.kind !== 'turnaround' ? ' · ' + c.label : ''}</span>
+      <button class="pick${on ? ' on' : ''}" data-pick="${encodeURIComponent(shot.ref)}">${on ? '✓ Chosen' : 'Use as canon'}</button>
+      <img src="${c.src}" alt="${s.name} canonical"></div>`;
+  }
+  const im = s.images[Math.min(state.i, Math.max(0, s.images.length - 1))];
+  if (!im) return `<div class="pane"><span class="lab">web reference</span><p class="empty">No reference image was found for this subject on Commons.</p></div>`;
+  const shot = webShot(s, Math.min(state.i, s.images.length - 1)), on = chosen === shot.ref;
+  return `<div class="pane"><span class="lab">web reference</span>
+    <button class="pick${on ? ' on' : ''}" data-pick="${encodeURIComponent(shot.ref)}">${on ? '✓ Chosen' : 'Use as canon'}</button>
+    <img src="${im.thumb}" alt="${im.title}"></div>`;
+}
 
 function paint() {
   const s = state.open; if (!s) return;
   $('d-name').textContent = s.name;
   $('d-role').textContent = `${s.role} · ${s.len}`;
-  const web = s.images[Math.min(state.i, Math.max(0, s.images.length - 1))];
   $('d-role').title = s.imagesAre || '';
-  const canon = s.canon[0];
-  $('d-canon').disabled = $('d-split').disabled = !canon;
-
-  const webPane = web
-    ? `<div class="pane"><span class="lab">web reference</span><img src="${web.full && web.width < 2400 ? web.thumb : web.thumb}" alt="${web.title}"></div>`
-    : `<div class="pane"><span class="lab">web reference</span><p class="empty">No reference image was found for this subject on Commons.</p></div>`;
-  const canonPane = canon
-    ? `<div class="pane"><span class="lab canon">canonical${canon.label !== 'canonical' ? ' · ' + canon.label : ''}</span><img src="${canon.src}" alt="${s.name} canonical"></div>`
-    : `<div class="pane"><span class="lab canon">canonical</span><p class="empty">No canonical image yet. Drop one at
-         <code>docs/triassic/canonical/${s.id}.png</code> and run <code>node bundle.mjs</code>.</p></div>`;
+  const list = listNow(), at = list.findIndex((x) => x.id === s.id);
+  $('d-pos').textContent = at >= 0 ? `${at + 1} / ${list.length}` : `– / ${list.length}`;
+  $('d-prev').disabled = at <= 0;
+  $('d-next').disabled = at < 0 || at >= list.length - 1;
+  $('d-canon').disabled = $('d-split').disabled = !s.canon.length;
 
   const stage = $('d-stage');
   stage.classList.toggle('split', state.mode === 'split');
-  stage.innerHTML = state.mode === 'split' ? webPane + canonPane : (state.mode === 'canon' ? canonPane : webPane);
+  stage.innerHTML = state.mode === 'split' ? pane('web', s) + pane('canon', s)
+    : (state.mode === 'canon' ? pane('canon', s) : pane('web', s));
 
-  $('d-strip').innerHTML = s.canon.map((c, k) =>
-      `<button class="c" data-canon="${k}" title="canonical: ${c.label}"><img src="${c.thumb || c.src}" alt="" loading="lazy"></button>`).join('')
-    + s.images.map((im, k) =>
-      `<button data-web="${k}" aria-current="${k === state.i && state.mode !== 'canon'}" title="${im.title}"><img src="${im.thumb}" alt="" loading="lazy"></button>`).join('');
+  // the decision
+  const pick = sel[s.id], v = verdictOf(s.id);
+  const shot = pick ? shots(s).find((x) => x.ref === pick.ref) : null;
+  $('d-verdict').className = `verdict ${v === 'greenlit' ? 'green' : v === 'replace' ? 'replace' : 'none'}`;
+  $('d-verdict').textContent = !pick ? 'No choice yet — pick the image this animal should be built from.'
+    : v === 'greenlit' ? '✓ Greenlit — our own image is the one; build from it.'
+    : `✎ Redo the canonical image to match: ${shot ? shot.label : pick.ref}`;
+  $('d-note').value = pick?.note || '';
+  $('d-note').disabled = !pick;
+  $('d-clear').disabled = !pick;
 
+  const allShots = shots(s);
+  $('d-strip').innerHTML = allShots.map((shot, k) => {
+    const canonSide = k < s.canon.length;
+    const cur = canonSide ? (state.mode === 'canon' && k === state.ci) : (state.mode !== 'canon' && k - s.canon.length === state.i);
+    return `<button class="${canonSide ? 'c ' : ''}${isChosen(s.id, shot) ? 'picked' : ''}" data-shot="${k}" aria-current="${cur}" title="${shot.label}">
+      <img src="${shot.thumb}" alt="" loading="lazy">
+      ${isChosen(s.id, shot) ? '<span class="tick">✓</span>' : ''}
+      ${shot.kind === 'turnaround' ? '<span class="kindtag">3D views</span>' : ''}
+    </button>`;
+  }).join('');
+
+  const web = s.images[Math.min(state.i, Math.max(0, s.images.length - 1))];
   $('d-credit').innerHTML = state.mode === 'canon'
-    ? `<span><b>Canonical image</b> — the game's own art for this subject. Press <kbd>C</kbd> to flip back to the reference.</span>`
+    ? `<span><b>${s.canon[state.ci]?.kind === 'turnaround' ? 'Modelling sheet' : 'Canonical image'}</b> — our own art for this subject. Press <kbd>C</kbd> to flip back to the reference, <kbd>Enter</kbd> to choose it.</span>`
     : (web ? (s.imagesAre ? `<span style="flex:1 1 100%;color:var(--coral)">⚠ ${s.imagesAre}</span>` : '')
         + `<span><b>${web.title}</b></span><span>${web.artist}</span><span>${web.licence}</span>`
         + `<a href="${web.page}" target="_blank" rel="noreferrer">file page</a>`
@@ -234,34 +446,52 @@ function paint() {
         + (web.description ? `<span style="flex:1 1 100%">${web.description}</span>` : '')
       : '<span>Nothing found. Try a different search term in subjects.json and re-run fetch-images.mjs.</span>');
 }
+
+$('d-stage').addEventListener('click', (e) => {
+  const b = e.target.closest('[data-pick]'); if (!b || !state.open) return;
+  const ref = decodeURIComponent(b.dataset.pick);
+  if (chosenRef(state.open.id) === ref) clearChoice(state.open.id);
+  else { const shot = shots(state.open).find((x) => x.ref === ref); if (shot) choose(state.open.id, shot); }
+});
 $('d-strip').addEventListener('click', (e) => {
-  const b = e.target.closest('button'); if (!b) return;
-  if (b.dataset.web !== undefined) { state.i = +b.dataset.web; if (state.mode === 'canon') setMode('web'); else paint(); }
-  else if (b.dataset.canon !== undefined) { const c = state.open.canon.splice(+b.dataset.canon, 1)[0]; state.open.canon.unshift(c); setMode('canon'); }
+  const b = e.target.closest('[data-shot]'); if (!b || !state.open) return;
+  const s = state.open, k = +b.dataset.shot;
+  if (k < s.canon.length) { state.ci = k; if (state.mode === 'web') setMode('canon'); else paint(); }
+  else { state.i = k - s.canon.length; if (state.mode === 'canon') setMode('web'); else paint(); }
 });
 
 // ---------- keyboard
 addEventListener('keydown', (e) => {
-  if (e.target.tagName === 'INPUT') { if (e.key === 'Escape') e.target.blur(); return; }
+  if (e.target.tagName === 'INPUT') { if (e.key === 'Escape' || e.key === 'Enter') e.target.blur(); return; }
   if (e.key === '/') { e.preventDefault(); $('q').focus(); return; }
   const k = e.key.toLowerCase();
   if (k === 'c') {
     e.preventDefault();
-    if (state.mode === 'canon') setMode('web');
-    else if (state.mode === 'web') setMode('canon');
-    else setMode('web');
+    setMode(state.mode === 'canon' ? 'web' : state.mode === 'web' ? 'canon' : 'web');
     return;
   }
   if (k === 'b') { e.preventDefault(); setMode(state.mode === 'split' ? 'web' : 'split'); return; }
   if (!state.open) return;
-  const list = all.filter(visible);
-  const at = list.findIndex((s) => s.id === state.open.id);
-  if (e.key === 'ArrowRight') { state.i = (state.i + 1) % Math.max(1, state.open.images.length); paint(); }
-  if (e.key === 'ArrowLeft') { state.i = (state.i - 1 + Math.max(1, state.open.images.length)) % Math.max(1, state.open.images.length); paint(); }
-  if (k === 'j' && at < list.length - 1) open(list[at + 1].id, 0);
-  if (k === 'k' && at > 0) open(list[at - 1].id, 0);
+  const s = state.open;
+  if (e.key === 'Enter') {
+    e.preventDefault();
+    const shot = currentShot();
+    if (shot) { chosenRef(s.id) === shot.ref ? clearChoice(s.id) : choose(s.id, shot); }
+    return;
+  }
+  if (k === 'x') { e.preventDefault(); clearChoice(s.id); return; }
+  if (e.key === 'ArrowRight' || e.key === 'ArrowLeft') {
+    e.preventDefault();
+    const d = e.key === 'ArrowRight' ? 1 : -1;
+    if (state.mode === 'canon') { const n = Math.max(1, s.canon.length); state.ci = (state.ci + d + n) % n; }
+    else { const n = Math.max(1, s.images.length); state.i = (state.i + d + n) % n; }
+    paint();
+  }
+  if (k === 'j') step(1);
+  if (k === 'k') step(-1);
 });
 
+refreshCounts();
 render();
 </script>
 </body>
