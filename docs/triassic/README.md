@@ -63,9 +63,11 @@ directory) for the era's own documents. No playable animal ever leaves the water
 
 ## Looking at it
 
-[`docs/research/triassic/viewer/`](../research/triassic/viewer/) is a page that puts every subject
-side by side with reference images from Wikimedia Commons, with a key that flips between the
-reference and our canonical pose. Open its `index.html`; it needs no server.
+[games.hoai.net/cambrian/research/triassic/](https://games.hoai.net/cambrian/research/triassic/)
+puts every subject side by side with reference images from Wikimedia Commons, with a key that flips
+between the reference and our canonical pose. Its source is
+[`docs/research/triassic/viewer/`](../research/triassic/viewer/), whose `index.html` also opens
+straight off the disk; `npm run triassic:viewer` regenerates both after a new pose lands.
 
 ## Open decisions
 
