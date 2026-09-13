@@ -56,6 +56,7 @@
     "triassic:selections": "node tools/triassic/apply-selections.mjs",
     "triassic": "esbuild tools/triassic-test.ts --bundle --platform=node --format=esm --outfile=node_modules/.cache/triassic-test.mjs && node node_modules/.cache/triassic-test.mjs",
     "triassic:portraits": "node tools/triassic/placeholder-portraits.mjs",
+    "triassic:previews": "node tools/triassic/preview-bodies.mjs",
     "triassic:stats": "node tools/triassic/stats.mjs",
     "music": "esbuild tools/music-test.ts --bundle --platform=node --format=esm --outfile=node_modules/.cache/music-test.mjs && node node_modules/.cache/music-test.mjs",
     "immersive": "esbuild tools/immersive-test.ts --bundle --platform=node --format=esm --outfile=node_modules/.cache/immersive.mjs --log-level=error && node node_modules/.cache/immersive.mjs",

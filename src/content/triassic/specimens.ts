@@ -5,8 +5,9 @@
  * `EraDefinition`.
  *
  * Creature rows expose procedural twins beside their playable textured bodies for paired review.
- * Prop rows will join them when the first generated Triassic scenery model lands. Until then the
- * game draws the era's scenery procedurally (`src/content/triassic/environment.ts`).
+ * Prop rows are the authored scenery library: static meshes with no rig and no clips, which the
+ * viewer lists so they can be inspected long before anything animates. The rest of the era's
+ * scenery is still drawn procedurally (`src/content/triassic/environment.ts`).
  */
 import specimens from './specimens.json';
 
@@ -16,10 +17,13 @@ export interface TriassicSpecimen {
   species: string;
   category: 'creature' | 'prop';
   modelStatus: 'preview' | 'final';
+  /** Why the preview badge is showing, where the refinement queue has nothing to say. */
+  modelNote?: string;
   provenance: string;
   description: string;
   model: string;
-  lod: string;
+  /** Absent where a prop has no reduced model: scenery this small is drawn at one detail. */
+  lod?: string;
   image: string;
   lengthMeters: number;
   looping: string[];
