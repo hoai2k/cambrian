@@ -5,9 +5,16 @@ A research surface for choosing and judging the Triassic roster: every subject i
 Commons, and a toggle that flips each one against our own canonical image so the two can be
 compared in place.
 
-**Open `index.html` in a browser.** It needs no server: the data is a plain `data.js`, and the
-reference images are hotlinked from Commons, so this directory stays a few hundred kilobytes
-instead of forty megabytes. Being online is the price of that.
+**Live at [games.hoai.net/cambrian/research/triassic/](https://games.hoai.net/cambrian/research/triassic/)**,
+or open `index.html` straight off the disk — it needs no server either way, because the data is a
+plain `data.js` rather than a `fetch()` a browser would block on a `file://` page.
+
+`npm run triassic:viewer` writes both: this directory, and the deployable copy in
+`public/research/triassic/` that Vite carries into `dist/`. Only `dist/` is deployed — `docs/` is
+not, which is why a `…/docs/research/triassic/viewer` URL 404s on the live site. The deployed copy
+carries the canonical images re-encoded at 1400 px (5 MB) rather than the 66 MB of full-resolution
+PNGs in `docs/triassic/canonical/`, which stay in git for anyone porting a model. Reference images
+are hotlinked from Wikimedia Commons in both copies, so the page wants a connection.
 
 ## What is in it
 
@@ -44,8 +51,12 @@ scenery — read *no canonical image* and the toggle is greyed out on them until
 
 ```sh
 node docs/research/triassic/viewer/fetch-images.mjs     # re-query Commons → images.json
-node docs/research/triassic/viewer/bundle.mjs           # images.json + canonical/ → data.js
+npm run triassic:viewer                                 # images.json + canonical/ → data.js + the deployed copy
 ```
+
+The second command is the one to run after dropping a new canonical pose in: it re-thumbnails,
+rewrites both `data.js` files and refreshes `public/research/triassic/`. Commit that folder — it is
+generated, but it is what the site serves.
 
 `fetch-images.mjs --local` also downloads the references into `img/` if an offline copy is wanted;
 the viewer prefers the hotlink either way, and nothing in `img/` should be committed.

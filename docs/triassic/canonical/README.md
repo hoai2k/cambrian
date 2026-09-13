@@ -12,11 +12,13 @@ in the limb proportions the fossils record and both are wanted as schemes.
 
 `manifest.json` tracks each subject's state: `canonical` is whether the pose is approved and
 `turnaround` whether its four-view sheet has been made. 26 poses are approved; no turnarounds
-exist yet.
+exist yet. After adding or replacing a pose here, run `npm run triassic:viewer` so the viewer and
+its deployed copy pick it up.
 
 ## Reviewing them
 
-Open the [reference viewer](../../research/triassic/viewer/) and press **C** on any subject. It
+Open the [reference viewer](https://games.hoai.net/cambrian/research/triassic/) (source in
+[`docs/research/triassic/viewer/`](../../research/triassic/viewer/)) and press **C** on any subject. It
 flips between the canonical pose and reference images collected from Wikimedia Commons, in place
 and at the same size, so a drifted silhouette is obvious. **B** puts them side by side. The
 anatomy each animal has to get right is in the design's per-creature entries and the sources in
