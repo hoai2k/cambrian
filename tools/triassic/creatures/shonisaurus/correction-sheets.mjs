@@ -1,0 +1,7 @@
+import sharp from 'sharp';
+const h='tools/triassic/creatures/shonisaurus',l='local/triassic-authoring/shonisaurus',label=(text,w)=>Buffer.from(`<svg width="${w}" height="40"><rect width="100%" height="100%" fill="#17232c"/><text x="16" y="27" fill="#eee" font-family="sans-serif" font-size="21">${text}</text></svg>`);
+let rows=[];
+for(const [i,[name,title]]of [['01-before-vertex-normal1','Prior vertex pigment / normal 1.0'],['02-vertex-flat','Prior vertex pigment / normal 0'],['04-source-albedo-normal015','Restored source albedo / normal 0.15'],['05-neutral-smooth','Same geometry / neutral smooth shading']].entries()){const x=i%2*1000,y=Math.floor(i/2)*732;rows.push({input:label(title,1000),left:x,top:y},{input:await sharp(`${l}/lip-material-fix/${name}.png`).resize(1000,692).png().toBuffer(),left:x,top:y+40});}
+await sharp({create:{width:2000,height:1464,channels:3,background:'#17232c'}}).composite(rows).jpeg({quality:90}).toFile(`${h}/material-comparison.jpg`);
+rows=[];for(const [j,kind]of ['full','puppet'].entries())for(const [i,[clip,sign]]of [['Idle',-1],['Idle',1],['Heavy',-1],['Heavy',1]].entries()){const x=i*1000,y=j*740;rows.push({input:label(`${kind} / ${clip} 0.35 s / side ${sign} / culling`,1000),left:x,top:y},{input:`${l}/review/${kind}-packaged-mouth-${clip}-${sign}.png`,left:x,top:y+40});}
+const mouth=await sharp({create:{width:4000,height:1480,channels:3,background:'#17232c'}}).composite(rows).png().toBuffer();await sharp(mouth).resize(2400).jpeg({quality:90}).toFile(`${h}/packaged-mouth-review.jpg`);

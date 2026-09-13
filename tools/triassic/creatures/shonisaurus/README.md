@@ -4,7 +4,7 @@ The delivered Tripo body and the procedural volume puppet use one armature and o
 
 ## Delivered files
 
-- `public/assets/triassic/creatures/shonisaurus.glb`: 117,442 triangles, 4,379,136 bytes, vertex pigmentation and source normal detail.
+- `public/assets/triassic/creatures/shonisaurus.glb`: 117,442 triangles, 7,381,764 bytes, detailed source UV albedo and restrained source normal detail.
 - `shonisaurus.puppet.glb`: 10,874 triangles, 572,216 bytes, measured procedural body, rostrum branches, four flipper lofts and crescent caudal loft.
 - `shonisaurus.lod1.glb`: byte-identical to the procedural puppet.
 - `shonisaurus.json`: physical scale, clip and socket metadata.
@@ -41,11 +41,11 @@ Three bone-parented sockets are identical in both files: `anchor_mouth`, `anchor
 `deformation-validation.json` records:
 
 - Maximum dorsal/ventral/width error across twenty sections: **0.0530 units, 0.884% of length**, under the 4% contract tolerance.
-- Signed surface volume: **3.2989 full / 3.2453 puppet**, a 1.6% difference.
-- Full-to-puppet surface distance: median 0.00424, 95th percentile 0.0382 units.
+- Signed surface volume: **3.3276 full / 3.2453 puppet**, a 2.5% difference (signed surface integral; the articulated cutaneous split is not a single closed solid).
+- Full-to-puppet surface distance: median 0.00424, 95th percentile 0.0384 units.
 - All four flipper root joints inside the source trunk.
 - Sampled globe volume inside the head: **69.8% left / 61.7% right** (619 samples per globe).
-- Every action sampled at six phases with finite skinned positions and per-edge stretch measurements; the largest stretch is 5.99× on a small internal oral web edge opening from its compressed closed-rest shape during Heavy. Five sampled edge instances exceed 5×; the overall 99th-percentile maximum is 1.116×. Reviewed external surfaces show no tears, and the mouth interior remains present while opening. This remains a PREVIEW reconstruction.
+- Every action sampled at six phases with finite skinned positions and per-edge stretch measurements. The current external cutaneous maximum is 3.27× on a small source edge during Parry. A separate fractional-frame lip audit covers the feeding phases specifically; see below. This remains a PREVIEW reconstruction.
 
 Codex visually reviewed paired side/three-quarter views, close mouth views and multi-frame swimming, sprint, heavy strike, dodge and death sheets on 2026-09-13. `exported-motion-review.jpg` is rendered from the shipped GLBs after meshopt decode, viewed from above to expose the lateral tail wave and steering. `action-review.jpg` shows matching side-view action phases, and `volume-review.jpg` compares the bodies from three views.
 
@@ -61,6 +61,19 @@ A live Three.js review exposed a separate winding defect that two-sided Blender 
 
 The prior open `.blend` is preserved locally as `shonisaurus.before-mouth-closure.blend`. Raw source data and PREVIEW status are preserved.
 
+
+## Lip and material correction — 2026-09-13
+
+The closed-rest revision exposed a real skinning regression: thin lip triangles crossed soft skull/jaw ownership and folded inside out when the jaw opened. The authored mandible is now a separate cutaneous mesh. Its front is owned by the jaw, its rear blends smoothly to the skull at the hinge, and the upper lip stays with the skull. The existing triangles and UVs are preserved; the split duplicates boundary vertices without adding or removing faces. Rigid anterior ownership removes the folding while the rear blend avoids an artificial vertical seam. Both closed mouths still pass the filler-excluded aperture scan.
+
+`lip-validation.json` evaluates fractional frames in Idle, Bite, Attack, Heavy and Eat, including Heavy at exactly 0.35 seconds. Across 54 distinct samples, **zero mouth faces invert**. The identical geometric-normal metric reports **259** inverted faces in the preserved prior closed build at Heavy 0.35 seconds and **one** in the former neutral/open build. The earlier independent runtime review reported 286 using its own metric; counts are not interchangeable. `material-audit.json` records this controlled comparison and proves that all prior skeleton transforms and animation values are unchanged, as well as exact parity with the procedural twin. The puppet and LOD files remain byte-identical to the prior corrected winding version.
+
+The triangular starbursts came from interpolating the source albedo through vertex pigment, amplified by full-strength normal relief. Controlled same-camera/same-geometry renders isolate this from geometry shading. The authored material now uses the original detailed UV albedo, a white COLOR_0 multiplier, roughness 0.7, metallic 0, and normal strength 0.15. `maps/source-albedo.png` preserves the source map; the exported pixels match it exactly. This replaces the faulty vertex-color bake with its clean source texture rather than repainting the source markings. `material-comparison.jpg` shows the controlled variants. No texture change is applied to the procedural twin.
+
+`packaged-mouth-review.jpg` is rendered from the decoded shipped GLBs, with backface transparency explicitly enforcing the skin's single-sided culling. It includes both sides in closed Idle and open Heavy, plus Bite/Eat closeups locally. Root independently reviewed the live viewer with its normal single-sided display: authored Idle at 0.5 seconds and Heavy at exactly 0.35 seconds, zoomed flank plus side and frontal mouth. No disappearing or inverted lip triangles were seen; the oral interior remained present and the pigmentation was smooth without the previous starbursts.
+
+Source lip/teeth irregularity and the inferred oral meshes remain visible at extreme close range; this work does not claim a new oral anatomy reconstruction. The external inversion regression is resolved. The earlier source, bad closed baseline, and controlled material frames remain under `local/triassic-authoring/shonisaurus/lip-material-fix/`.
+
 ## Reproduction
 
 Run from the repository root with Blender 5.2 (the local application is `/Applications/Blender.app/Contents/MacOS/Blender`):
@@ -73,7 +86,11 @@ Blender -b --python tools/triassic/creatures/shonisaurus/review.py
 Blender -b --python tools/triassic/creatures/shonisaurus/review.py -- --mouth-only
 Blender -b --python tools/triassic/creatures/shonisaurus/mouth-closure-audit.py
 Blender -b --python tools/triassic/creatures/shonisaurus/exported-review.py
+Blender -b --python tools/triassic/creatures/shonisaurus/exported-review.py -- --mouth-only
+Blender -b --python tools/triassic/creatures/shonisaurus/lip-audit.py
+node tools/triassic/creatures/shonisaurus/material-audit.mjs
 node tools/triassic/creatures/shonisaurus/portraits.mjs
+node tools/triassic/creatures/shonisaurus/correction-sheets.mjs
 ```
 
 The source blend, decoded/uncompressed intermediates and individual review renders are local authoring outputs under `local/triassic-authoring/shonisaurus/`. Commit the public asset family and this tooling/report directory; the original intake and local `.blend` remain preserved locally.
