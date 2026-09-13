@@ -335,5 +335,46 @@ for (const [id, kind] of [['mixosaurus', 'a live-bearer'], ['placodus', 'an egg-
   ok(play() === play(), 'the same seed and inputs replay the same match, shore animals and mothers included');
 }
 
+// ---- the raw generated bodies the viewer offers ----
+// Published out of tools/ into public/ so the viewer can load them; if the copy or the manifest
+// drifts, the Body control offers a mesh that 404s.
+{
+  const manifest = JSON.parse(fs.readFileSync('src/content/triassic/preview-bodies.json', 'utf8')) as
+    { id: string; model: string; bytes: number }[];
+  const shippedIds = new Set(TRIASSIC_SHIPPED);
+  for (const row of manifest) {
+    ok(fs.existsSync(`public/${row.model}`), `${row.id}: generated body is published`);
+    ok(fs.statSync(`public/${row.model}`).size === row.bytes, `${row.id}: published generated body matches the manifest`);
+    // An animal with its own body must not also be offered its raw generation.
+    ok(!shippedIds.includes?.(row.id) && !shippedIds.has(row.id), `${row.id} has not shipped a body of its own`);
+  }
+  ok(manifest.length > 0, `the viewer offers ${manifest.length} generated bodies`);
+}
+
+// ---- the viewer's scenery catalogue ----
+// The props are static meshes with no rig, which is exactly why they are easy to forget: nothing
+// in the game loads this file, so a prop could be delivered, placed, and still never appear in the
+// viewer. This ties the catalogue to the manifest the builder writes.
+{
+  const manifest = JSON.parse(fs.readFileSync('public/assets/triassic/props-instanced/manifest.json', 'utf8')) as
+    { assets: { id: string; path: string; portrait: string }[] };
+  const specimens = JSON.parse(fs.readFileSync('src/content/triassic/specimens.json', 'utf8')) as
+    { id: string; category: string; model: string; image: string; lod?: string; looping: string[]; modelNote?: string }[];
+  const props = new Map(specimens.filter((s) => s.category === 'prop').map((s) => [s.id, s]));
+  ok(props.size === manifest.assets.length, `every authored prop is in the viewer catalogue (${props.size} of ${manifest.assets.length})`);
+  for (const a of manifest.assets) {
+    const row = props.get(a.id);
+    ok(!!row, `${a.id} is catalogued for the viewer`);
+    if (!row) continue;
+    ok(row.model === a.path, `${a.id} points at the delivered mesh`);
+    ok(row.image === a.portrait, `${a.id} points at its portrait`);
+    ok(fs.existsSync(`public/${row.model}`) && fs.existsSync(`public/${row.image}`), `${a.id}: model and portrait exist`);
+    // A static prop must not offer a detail switch or an animation list it cannot honour.
+    ok(row.lod === undefined, `${a.id} declares no reduced model`);
+    ok(row.looping.length === 0, `${a.id} declares no looping clips`);
+    ok(!!row.modelNote, `${a.id} says why it carries the preview badge`);
+  }
+}
+
 console.log(`\nall ${passes} Triassic checks passed`);
 void CREATURES; void biomeAt; void nurseryAt;
