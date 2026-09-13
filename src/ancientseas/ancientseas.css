@@ -107,7 +107,7 @@ a:focus-visible { outline: 2px solid var(--as-gold); outline-offset: 6px; border
 .as-ground { position: absolute; left: 0; right: 0; top: 50%; transform: translateY(-50%); height: min(100svh, calc(100vw / 1.6)); }
 .as-stage { position: relative; z-index: 1; width: min(100vw, calc(100svh * 1.6)); aspect-ratio: 16 / 10; }
 
-.as-slot { position: absolute; left: var(--dx); top: var(--dy); width: var(--dw); z-index: var(--z); transform: translate(-50%, -50%) rotate(var(--dr)) scaleX(var(--df)) translateY(var(--lift, 0)); display: block; }
+.as-slot { position: absolute; left: var(--dx); top: var(--dy); width: var(--dw); z-index: var(--z); transform: translate(-50%, -50%) rotate(var(--dr)) scaleX(var(--df)) scale(var(--grow, 1)); display: block; }
 .as-slot img { display: block; width: 100%; height: 100%; object-fit: contain; }
 .as-slot-ground { z-index: var(--z); }
 /* The plate's own paper: it covers the stage at any shape rather than sitting on it at a size. */
@@ -116,9 +116,12 @@ a:focus-visible { outline: 2px solid var(--as-gold); outline-offset: 6px; border
 /* A delivered animal or plant casts the faint offset shadow the paintings give their subjects. */
 .as-slot-animal.as-src-delivered img, .as-slot-plant.as-src-delivered img, .as-slot-ornament.as-src-delivered img { filter: drop-shadow(1px 3px 3px rgba(50, 32, 10, .28)); }
 /* A game is its title and the animal arching over it, so the two answer the pointer together: the
-   animal rises off the paper a little and its shadow lengthens, which is all a plate can do. */
+   animal comes up in size where it stands and its shadow lengthens, which is all a plate can do.
+   It grows rather than moving because a drawing on paper that slides has come loose from the page,
+   while one that comes closer has not. `--grow` is the slot's own transform, so a piece never has
+   to restate where it sits in order to change size. */
 .as-slot-animal { transition: transform .28s cubic-bezier(.2,.8,.2,1), filter .28s; }
-.as-slot-animal.as-lit { --lift: -2.5%; }
+.as-slot-animal.as-lit { --grow: 1.05; }
 .as-slot-animal.as-lit img { filter: brightness(1.05) drop-shadow(2px 7px 7px rgba(50, 32, 10, .32)); }
 .as-slot-animal.as-lit.as-src-stand-in img { filter: sepia(.25) contrast(.95) brightness(1.05) drop-shadow(2px 7px 7px rgba(50, 32, 10, .32)); }
 .as-slot-title.as-lit { filter: var(--as-halo) brightness(1.04); }
@@ -137,7 +140,7 @@ a:focus-visible { outline: 2px solid var(--as-gold); outline-offset: 6px; border
   text-decoration: none; transition: transform .28s cubic-bezier(.2,.8,.2,1), filter .28s; filter: var(--as-halo); }
 /* `filter` replaces rather than adds, so the hover state has to carry the halo itself or the
    lettering loses its light the moment the pointer arrives. */
-a.as-slot-title:hover, a.as-slot-title:focus-visible { transform: translate(-50%, -50%) rotate(var(--dr)) scaleX(var(--df)) translateY(var(--lift, 0)) scale(1.03); filter: var(--as-halo) brightness(1.04); outline: none; }
+a.as-slot-title:hover, a.as-slot-title:focus-visible { --grow: 1.03; filter: var(--as-halo) brightness(1.04); outline: none; }
 a.as-slot-title:focus-visible img { outline: 2px solid #15100a; outline-offset: 8px; border-radius: 6px; }
 .as-slot-title.as-src-stand-in img { filter: drop-shadow(1px 3px 4px rgba(50, 32, 10, .3)); }
 .as-slot[data-slot='trilogy'] .as-title-text { height: 100%; align-content: center; }
@@ -162,9 +165,8 @@ a.as-slot-title:focus-visible img { outline: 2px solid #15100a; outline-offset: 
   .as-paper { background:
     radial-gradient(ellipse 66% 60% at 50% 48%, rgba(255, 246, 220, .35), transparent 70%),
     radial-gradient(ellipse 100% 86% at 50% 50%, var(--as-parchment) 0%, var(--as-parchment-2) 34%, #b79b6e 52%, #7a5d3a 68%, var(--as-umber) 84%, var(--as-ink) 100%); }
-  .as-slot { left: var(--mx); top: var(--my); width: var(--mw); transform: translate(-50%, -50%) rotate(var(--mr)) scaleX(var(--mf)) translateY(var(--lift, 0)); }
+  .as-slot { left: var(--mx); top: var(--my); width: var(--mw); transform: translate(-50%, -50%) rotate(var(--mr)) scaleX(var(--mf)) scale(var(--grow, 1)); }
   .as-slot-fill { left: 0; top: 0; width: 100%; transform: none; }
-  a.as-slot-title:hover, a.as-slot-title:focus-visible { transform: translate(-50%, -50%) rotate(var(--mr)) scaleX(var(--mf)) translateY(var(--lift, 0)) scale(1.03); }
   .as-placeholder i { font-size: 11px; transform: scaleX(var(--mf)); }
 }
 
