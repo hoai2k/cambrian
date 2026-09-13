@@ -5,7 +5,7 @@
   "purpose": "Aphaneramma amphibian redraw following human-selected source; candidate pending review.",
   "subjects": {
     "aphaneramma": {
-      "status": "candidate-awaiting-human-greenlight",
+      "status": "greenlit-and-promoted",
       "candidate": "aphaneramma-candidate03.png",
       "original": "aphaneramma.png",
       "reviewerNote": "More amphibian than reptile; use Aphaneramma12DB.jpg.",
@@ -18,7 +18,8 @@
       "dimensions": [
         1610,
         977
-      ]
+      ],
+      "reviewedAt": "2026-09-13T15:03:56.373Z"
     }
   }
 }

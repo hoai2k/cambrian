@@ -82,6 +82,19 @@ The 572,216-byte puppet and LOD are unchanged, as are the 21-joint skeleton and 
 Portraits, paired review sheets and reproducible audits are refreshed. Fine source tooth/rim
 irregularity and the reconstructed oral web remain limitations, not new human approval.
 
+**Independently re-audited on the shipped GLB, 13 September 2026.** Skinning every vertex the way
+three.js does, at 20 frames of all 19 clips, both defects are gone: `Heavy`, `Attack` and `Bite`
+now invert nothing at all, against 286 faces before, and the flank renders as smooth mottled hide
+with no trace of the starburst faceting. Nothosaurus is unchanged at 5 hairline faces in `Sprint`.
+
+What remains on Shonisaurus is the *original* finding, untouched by either correction and never
+claimed by it: **28 faces invert at the pelvic fin root in `Parry` (t=0.21) and `Dodge`**, with
+`pelvic0R` against `spine1`/`spine0`. They are hairline — sub-millimetre on a six-metre animal,
+invisible without being painted — so they are worth a smoothed weight falloff across that root
+next time the builder is open, and not worth a re-export on their own. The project's own fin rule
+already asks for it: a root's weights blend onto the body bones under it, radially, and for paired
+fins as much as median ones.
+
 For the ongoing roster batch, resume from `PRODUCTION-SESSION.json`: all requested images are
 on main at `237bf24`; the review window ends 2026-09-13 15:20:54 UTC. Sync and reevaluate
 greenlights then, generate/process/commit raw Tripo bodies before starting new paired rigs.
