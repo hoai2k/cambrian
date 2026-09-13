@@ -4,6 +4,23 @@ Completed image, glyph and prop briefs are archived here, newest first. Open req
 belong in [image-requests.md](image-requests.md); audio requests are in
 [audio-requests.md](audio-requests.md).
 
+## Devonian mode panels — 2026-09-13
+
+**Completed.** Delivered `public/assets/ui/mode-domination.webp` and
+`public/assets/ui/mode-foodchain.webp`, both 640×360 WebP panels below 600 KB.
+They complete the two Devonian mode cards named by `src/app/Select.tsx`, removing
+the empty-card fallback and its two missing-asset requests.
+
+- **Domination:** a frontal, bone-armoured Dunkleosteus holds the centre of its
+  dark green-blue water, framed by smaller fish and a silted seafloor.
+- **Food Chain:** three clearly scaled Devonian predators form a vertical feeding
+  chain in a central shaft of water, from the smallest prey at the bottom to the
+  apex animal above.
+
+Both panels were generated with the built-in image generator and encoded locally
+as WebP for runtime delivery. They are text-free and use the existing underwater
+card palette and treatment.
+
 ## Illustrated logo and favicon — 2026-09-06
 
 **Completed.** Replaced the title/loading wordmark with the user-supplied natural-history illustration, preserved as `docs/art/sources/cambrian-explosion-original.png`. The full composition is delivered as `public/assets/brand/logo-illustrated.webp` (1536×1024); only web compression was applied. Title/loading layouts give the illustration space and remove the competing standalone neon emblem and reef backdrop.
