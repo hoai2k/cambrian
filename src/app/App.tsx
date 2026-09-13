@@ -744,6 +744,16 @@ export function App() {
    * through is a flicker, not information.
    */
   const bootSlow = useSlow(!loaded);
+  /**
+   * How far the boot has got, and what it is doing. The fraction is scaled because the assets the
+   * loader counts go on arriving long after the game is playable: what the player is waiting for
+   * is the first quarter of them.
+   */
+  const bootFraction = progress ? Math.min(1, progress.fraction * 4) : 0;
+  const bootStatus = useMemo(() => {
+    const name = progress?.current ? creature(progress.current as never)?.name : undefined;
+    return `${name ? `Waking ${name}` : 'Waking the sea'}… ${Math.round(bootFraction * 100)}%`;
+  }, [progress, bootFraction]);
 
   /**
    * The icon buttons sit in somebody's viewport, so they answer to whether that somebody asked for
@@ -775,8 +785,27 @@ export function App() {
       <div className="sea-canvas" ref={canvasRef} aria-label="Cambrian sea" />
       <div className="vignette" />
 
-      {!loaded && bootSlow && <LoadingScreen progress={progress} fraction={progress ? Math.min(1, progress.fraction * 4) : 0} />}
-      {screen === 'title' && loaded && <TitleScreen loaded={loaded} onStart={() => startFromTitle('keyboard', true)} padCount={padCount} eraFocused={focus.group === 'era'} />}
+      {/*
+        * The boot screen is for a boot the player is not already looking at a screen for: deep
+        * linked to the roster, say. On the title it would be the title's own painting a second
+        * time over the title itself, so the title carries the bar instead.
+        */}
+      {!loaded && bootSlow && screen !== 'title' && <LoadingScreen progress={progress} fraction={bootFraction} />}
+      {/*
+        * The title screen is drawn from the first frame, before the creatures have streamed in. It
+        * used to wait for `loaded`, and until then the only thing on the page was the sea the
+        * engine had already started drawing — so arriving from a link showed the game's water for
+        * a moment and then cut to the title, which read as landing in the wrong place. It has
+        * always known how to draw itself unloaded (the era's loading line in place of PRESS
+        * START), and a key or a pad button has always been able to start from it either way, so
+        * the wait bought nothing. The boot screen still stacks over it when a load is slow.
+        */}
+      {screen === 'title' && (
+        <TitleScreen
+          loaded={loaded} onStart={() => startFromTitle('keyboard', true)} padCount={padCount} eraFocused={focus.group === 'era'}
+          progress={bootSlow ? bootFraction : null} status={bootSlow ? bootStatus : undefined}
+        />
+      )}
 
       {screen === 'select' && (
         <SelectScreen
