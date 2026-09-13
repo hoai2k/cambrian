@@ -1,0 +1,16 @@
+{
+  "schemaVersion": 1,
+  "canonicalStatus": "greenlit",
+  "canonical": "canonical.png",
+  "canonicalSource": "../../saurichthys.png",
+  "canonicalSha256": "135ec5a8b47e545ebe5a783ca3781e4165ac99c5a2cdbe5d234533814b06d030",
+  "input": "input.png",
+  "inputSha256": "cef2af0863cb12cb8696db8a2e486dc285008da36f1933c08a0bf6abb54b75c9",
+  "turnaround": "turnaround.png",
+  "turnaroundSha256": "9f4b9dbce9fcba1103c236a36e0c706139894bd7729383eb0fb16ce480160540",
+  "generator": "builtin imagegen",
+  "subjectSpec": "Saurichthys, extremely slender needle-shaped predatory fish with very long narrow jaws, small paired fins, dorsal and anal fins set far back, and forked tail",
+  "inputPrompt": "Create ONE full-body subject derived strictly from the supplied approved canonical. Preserve canonical anatomy, proportions, head, appendage count and placement, silhouette, coloration, markings, and texture exactly; no redesign. Single clean three-quarter front view from slightly above in a straight neutral symmetric extended pose, with paired appendages separated and the entire subject fully framed on flat pale neutral studio gray. No water, scenery, text, labels, borders, cropping, or extra animals.",
+  "turnaroundPrompt": "Derive a clean four-view orthographic modeling sheet from the supplied approved canonical, which is the sole visual authority. Preserve exact anatomy, proportions, appendage count and placement, silhouette, coloration, markings, and texture. Use a pale neutral studio gray background and a 2x2 grid containing strict left profile, dorsal/top, frontal, and three-quarter front views; keep the entire subject and every extremity fully framed. No labels, text, scenery, or extra animals.",
+  "review": "Single input is complete and neutral. Turnaround is qualitative; canonical.png remains the authority for the exact needle-like body and fin positions."
+}

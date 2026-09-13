@@ -223,7 +223,8 @@ function shots(s) {
     kind: 'web', ref: im.title, label: im.title, src: im.thumb, thumb: im.thumb, side: 'web', k,
     title: im.title, artist: im.artist, licence: im.licence, page: im.page, full: im.full, description: im.description,
   }));
-  return [...canon.filter((c) => c.kind !== 'turnaround'), ...web, ...canon.filter((c) => c.kind === 'turnaround')];
+  const isModel = (c) => c.kind === 'turnaround' || c.kind === 'model-reference';
+  return [...canon.filter((c) => !isModel(c)), ...web, ...canon.filter(isModel)];
 }
 const chosenRef = (id) => sel[id]?.ref;
 const isChosen = (id, shot) => sel[id]?.ref === shot.ref;
@@ -240,9 +241,12 @@ const isChosen = (id, shot) => sel[id]?.ref === shot.ref;
  */
 const verdictOf = (id) => sel[id]?.verdict ?? null;
 const counts = () => {
-  let green = 0, replace = 0;
-  for (const s of all) { const v = verdictOf(s.id); if (v === 'greenlit') green++; else if (v === 'replace') replace++; }
-  return { green, replace, total: green + replace };
+  let green = 0, replace = 0, built = 0;
+  for (const s of all) {
+    const v = verdictOf(s.id);
+    if (v === 'delivered') built++; else if (v === 'greenlit') green++; else if (v === 'replace') replace++;
+  }
+  return { green, replace, built, total: green + replace + built };
 };
 
 /**
@@ -259,6 +263,7 @@ function choose(id, shot) { set(id, shot, shot.kind === 'web' ? 'replace' : 'gre
  */
 function redraw(id, shot) { set(id, shot, 'replace'); }
 function set(id, shot, verdict) {
+  if (shot.kind === 'model-reference') return;
   sel[id] = { verdict, choice: shot.kind, ref: shot.ref, note: sel[id]?.note || '', at: new Date().toISOString() };
   refreshCounts(); render(); if (state.open) paint();
 }
@@ -273,7 +278,7 @@ function refreshCounts() {
     : 'This page matches the codebase. Exporting now re-states the decisions already applied.';
   $('tally').textContent = `${all.length} subjects · ${all.reduce((n, s) => n + s.images.length, 0)} web images · `
     + `${all.filter((s) => s.canon.some((x) => (x.kind || 'canonical') === 'canonical')).length} with a canonical image · `
-    + `${c.green} greenlit, ${c.replace} to redo`
+    + `${c.built ? `${c.built} delivered, ` : ''}${c.green} greenlit, ${c.replace} to redo`
     + (p ? ` · ${p} unsaved here` : ' · matching the codebase')
     + ` · Commons, ${DATA.generated}`;
 }
@@ -367,7 +372,7 @@ function card(s) {
   return `<button class="card${v ? ' chosen' : ''}" data-id="${s.id}">
     <div class="shot">${shot}
       <span class="tag ${l && l.canon ? 'canon' : ''}">${l && l.canon ? 'canonical' : 'web'}</span>
-      ${v ? `<span class="tag pick">${v === 'greenlit' ? '✓ greenlit' : '✎ redo'}</span>` : ''}
+      ${v ? `<span class="tag pick">${v === 'delivered' ? '★ delivered' : v === 'greenlit' ? '✓ greenlit' : '✎ redo'}</span>` : ''}
       <span class="count">${s.imagesAre ? '⚠ ' : ''}${s.images.length} web${s.canon.length ? ` · ${s.canon.length} canon` : ''}</span>
     </div>
     <div class="meta"><div class="n">${s.name}</div><div class="r">${s.role}</div><div class="l">${s.len}</div></div>
@@ -421,9 +426,10 @@ function pane(side, s) {
     if (!c) return `<div class="pane"><span class="lab canon">canonical</span><p class="empty">No canonical image yet. Drop one at
       <code>docs/triassic/canonical/${s.id}.png</code> and run <code>npm run triassic:viewer</code>.</p></div>`;
     const shot = canonShot(s, state.ci), on = chosen === shot.ref, v = verdictOf(s.id);
-    return `<div class="pane"><span class="lab canon">${c.kind === 'turnaround' ? '3D model views' : 'canonical'}${c.label !== 'canonical' && c.kind !== 'turnaround' ? ' · ' + c.label : ''}</span>
-      <button class="pick${on && v === 'greenlit' ? ' on' : ''}" data-pick="${encodeURIComponent(shot.ref)}">${on && v === 'greenlit' ? '✓ Chosen' : 'Use as canon'}</button>
-      <button class="pick redo${on && v === 'replace' ? ' on' : ''}" data-redraw="${encodeURIComponent(shot.ref)}" title="The reading is right but this image is not — say what to change in the note">${on && v === 'replace' ? '✎ Redrawing' : 'Needs redraw'}</button>
+    const modelReference = c.kind === 'model-reference';
+    return `<div class="pane"><span class="lab canon">${modelReference ? c.label : c.kind === 'turnaround' ? '3D model views' : c.kind === 'candidate' ? 'replacement candidate' : 'canonical'}${c.label !== 'canonical' && c.kind !== 'turnaround' && !modelReference ? ' · ' + c.label : ''}</span>
+      ${modelReference ? '' : `<button class="pick${on && v === 'greenlit' ? ' on' : ''}" data-pick="${encodeURIComponent(shot.ref)}">${on && v === 'greenlit' ? '✓ Chosen' : 'Use as canon'}</button>
+      <button class="pick redo${on && v === 'replace' ? ' on' : ''}" data-redraw="${encodeURIComponent(shot.ref)}" title="The reading is right but this image is not — say what to change in the note">${on && v === 'replace' ? '✎ Redrawing' : 'Needs redraw'}</button>`}
       <img src="${c.src}" alt="${s.name} canonical"></div>`;
   }
   const im = s.images[Math.min(state.i, Math.max(0, s.images.length - 1))];
@@ -453,8 +459,9 @@ function paint() {
   // the decision
   const pick = sel[s.id], v = verdictOf(s.id);
   const shot = pick ? shots(s).find((x) => x.ref === pick.ref) : null;
-  $('d-verdict').className = `verdict ${v === 'greenlit' ? 'green' : v === 'replace' ? 'replace' : 'none'}`;
+  $('d-verdict').className = `verdict ${v === 'delivered' || v === 'greenlit' ? 'green' : v === 'replace' ? 'replace' : 'none'}`;
   $('d-verdict').textContent = !pick ? 'No choice yet — pick the image this animal should be built from.'
+    : v === 'delivered' ? '★ Delivered — the model is built. The body is what is under review now, in the specimen viewer.'
     : v === 'greenlit' ? '✓ Greenlit — our own image is the one; build from it.'
     : pick.choice === 'web' ? `✎ Redo the canonical image toward: ${shot ? shot.label : pick.ref}`
     : `✎ Redraw our own ${shot && shot.kind === 'turnaround' ? 'modelling sheet' : 'pose'} — the note is the brief.`;
@@ -470,12 +477,16 @@ function paint() {
       <img src="${shot.thumb}" alt="" loading="lazy">
       ${isChosen(s.id, shot) ? '<span class="tick">✓</span>' : ''}
       ${shot.kind === 'turnaround' ? '<span class="kindtag">3D views</span>' : ''}
+      ${shot.kind === 'candidate' ? `<span class="kindtag">${shot.label}</span>` : ''}
+      ${shot.kind === 'model-reference' ? '<span class="kindtag">model reference</span>' : ''}
     </button>`;
   }).join('');
 
   const web = s.images[Math.min(state.i, Math.max(0, s.images.length - 1))];
   $('d-credit').innerHTML = state.mode === 'canon'
-    ? `<span><b>${s.canon[state.ci]?.kind === 'turnaround' ? 'Modelling sheet' : 'Canonical image'}</b> — our own art for this subject. Press <kbd>C</kbd> to flip back to the reference, <kbd>Enter</kbd> to choose it.</span>`
+    ? (s.canon[state.ci]?.kind === 'model-reference'
+      ? '<span><b>Modelling reference only</b> — derived from the greenlit pose. The canonical pose remains the authority; this reference cannot replace it.</span>'
+      : `<span><b>${s.canon[state.ci]?.kind === 'turnaround' ? 'Modelling sheet' : s.canon[state.ci]?.kind === 'candidate' ? 'Replacement candidate — choose to greenlight' : 'Canonical image'}</b> — our own art for this subject. Press <kbd>C</kbd> to flip back to the reference, <kbd>Enter</kbd> to choose it.</span>`)
     : (web ? (s.imagesAre ? `<span style="flex:1 1 100%;color:var(--coral)">⚠ ${s.imagesAre}</span>` : '')
         + `<span><b>${web.title}</b></span><span>${web.artist}</span><span>${web.licence}</span>`
         + `<a href="${web.page}" target="_blank" rel="noreferrer">file page</a>`

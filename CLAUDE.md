@@ -56,13 +56,49 @@ unless the user explicitly asks for a PR. Steps:
 - The renderer interpolates between fixed simulation steps using each actor's `prevT` snapshot,
   so anything that moves an actor by more than it could swim in one step (teleport, respawn)
   must read as a jump. `tools/motion-test.ts` guards this.
-- Three eras, one engine. `/` is the Cambrian; `/devonian/` (entry `src/devonian/main.tsx`) and
-  `/triassic/` (entry `src/triassic/main.tsx`) each call
-  `selectEra(DEVONIAN)` and `setAppBase(nestedBase())` *before* dynamically importing the app, because
+- Three eras, one engine, and the site root is none of them: it is the trilogy's page, with
+  `/cambrian/` (entry `src/cambrian/main.tsx`), `/devonian/` and `/triassic/` below it. Each entry
+  calls `selectEra(...)` and `setAppBase(nestedBase())` *before* dynamically importing the app, because
   many modules read `ACTIVE_ERA` at module top. Anything new that reads the era at import time must
   stay behind that import (or resolve lazily like `assetPaths` and `music()`); the entry page itself
   must not statically import the audio library or the sim for the same reason. Headless tests that
   need the Devonian do the same: select the era, then `await import(...)` (`tools/devonian-test.ts`).
+- The site root is the trilogy's page (entry `src/ancientseas/main.tsx`, data in
+  `src/ancientseas/page.ts`); `/ancientseas/`, the address it was first published at, is a redirect
+  up to it in `public/`. Every game's title screen offers it, bottom left, in place of the card per
+  other era that used to sit there — three games made two of somebody else's titles on a screen
+  meant to say press start, and the page they pointed towards holds all three. The pick screen
+  keeps its own menu of the other games (`copy.sibling`/`siblings`), because mid-flow a player who
+  wants another roster is saved a screen. The page itself: one plate in the three games' own engraved style, filling the window,
+  with the three titles on it as links. It is `SLOTS` — pieces placed by centre and width on a
+  16:10 desktop stage and a 9:27 phone one — and the plate is built the same way three times over,
+  one big animal arching above each era's title with two bottom-dwellers gathered under it, because
+  an animal half behind another or a row spread evenly across all three eras reads as a mistake.
+  Titles clear the animals above them and carry a faint sepia halo drawn by the page (one custom
+  property used by the resting *and* hover states, because `filter` replaces rather than adds),
+  so a delivered title is flat ink on transparency. The paper is the window's and the plate is
+  the composition's — parchment and seabed span the full width while the 16:10 arrangement is
+  centred in it — so a wide screen is filled rather than letterboxed, and a game's title and the
+  animal arching over it light together, because between them they are the link — the animal comes
+  up in size where it stands rather than moving, since a drawing that slides has come loose from
+  the page. `?version=1` still reaches the first draft (the three title
+  paintings whole on a dark ground) but neither version draws a switch between them: the parameter
+  is for comparing drafts, not something a visitor is offered. Every piece has a brief in
+  `docs/image-requests.md` (delivered ones move to the history) and lands in
+  `public/assets/ancientseas/`; the page only ever loads what `src/ancientseas/delivered.json`
+  lists (`npm run ancientseas:delivered` regenerates it from the folder) and draws a shipped
+  stand-in or a named wash for the rest, so nothing asks the network for art that has not arrived.
+  A game is its title *and* the animal arching over it: both carry the link and light together,
+  with the picture kept out of the keyboard's way so a game is one stop rather than two.
+  `npm run ancientseas` checks all of it; `node tools/ancientseas-smoke.mjs <outdir>` screenshots
+  the page against a preview build and follows the three links.
+- A game's title screen is drawn from the first frame, before the creatures have streamed in: it
+  used to wait for them, and until then the page was the sea the engine had already started
+  drawing, so arriving from a link showed the water and then cut to the title. It says it is
+  loading where PRESS START goes, and once the wait outlasts `WAIT_HINT` (700 ms, `useSlow` in
+  `src/app/Loading.tsx`) it grows a progress bar under that line. The full boot screen is for a
+  boot nobody is looking at a screen for — deep-linked to the roster — because over the title it
+  would be the title's own painting a second time.
 - An era's `assets.sfx` names the shared sound library (`assets/sfx/`): bites, hits and the UI are the
   same files in both eras. Era-specific samples are addressed as `<era>/<name>` and resolve under
   `assets/<era>/sfx/` regardless. The two always-on beds are named per era in `audio.loops`, and a
@@ -80,11 +116,32 @@ unless the user explicitly asks for a PR. Steps:
   `breathing: 'air'` is a stamina economy, not a meter (no recovery under water, a blow and a
   full bar at the surface, no drowning), armour has a facing (`armourFacing`), the sea floor sinks
   by biome (`environment.floorDepth` → `depthProfile` in `src/sim/world.ts`; the other eras leave
-  it out and keep their flat floor), live-bearers are born at the surface beside a mother
-  (`liveBirth`), and shore animals (`shore: true`, never pickable) are brainless actors pinned on
+  it out and keep their flat floor), and shore animals (`shore: true`, never pickable) are brainless actors pinned on
   the beach by `src/sim/triassic/shore.ts` that telegraph and strike into the water. No playable
   Triassic animal ever leaves the water; `shoreReach` is deliberately unused there.
   `npm run triassic` guards all of it.
+- The climb for air is the era's central act and must stay usable at every size. The shared rise
+  rate is scaled by the body, but the water is not — the surface is the same twelve units above the
+  shelf whether you hatched this minute or own the sea — so an air-breather's climb has a floor
+  under it (`AIR_CLIMB_FLOOR` in `src/sim/triassic/rules.ts`), which *replaces* rather than
+  multiplies a slow body's own rate. And rise and sink are asks like any other: leaving them out of
+  the "asked for nothing" test put a body holding the climb button into its glide rate, its slowest
+  acceleration. Together those two made a hatchling take nineteen seconds to reach air from the
+  shelf floor, which reads as the button not working. `npm run triassic` holds both, and the
+  winded heartbeat to a heartbeat — it fired every second for as long as a player stayed down.
+- Every Triassic animal hatches from an egg on the sea floor, as in the other two eras. The
+  live-bearers were briefly born at the surface instead — which is what the fossils say, and
+  Keichousaurus and Dinocephalosaurus preserve the embryos — but it cost the series its one opening
+  beat, and a player dropped into open midwater never sees the shell crack. `birth: 'live'` now only
+  puts a grown adult of the animal's own kind beside it for the first minute, which is the parental
+  care viviparity implies. A reptile's egg is *leathery* (`eggShell: 'leathery'`): opaque, matte,
+  dimpled, longer and narrower than the Cambrian's calcareous capsule, and set on the animal rather
+  than the era, because the roster also has two sharks, two fish, an amphibian and two cephalopods
+  that lay nothing of the kind (`src/render/eggs.ts`). The hatch has to be *seen*: `spawnInCover`
+  picks the spot that hides a body best, which is right for the minute after and wrong for the five
+  seconds of the shell, so the Triassic steps the egg out of the thickest cover and away from
+  anything big enough to stand in front of it (`clearTheView`), and the camera picks the side it
+  can be seen from on the frame the egg appears rather than simply sitting behind the animal.
 - Triassic art is greenlit before it is built from. Each subject has one **canonical pose** in
   `docs/triassic/canonical/`, and the four-view modelling sheet, the Tripo generation and the
   shipped body are all derived from that one image — so a body that no longer matches its pose is
@@ -110,8 +167,30 @@ unless the user explicitly asks for a PR. Steps:
   the Devonian's procedural stand-ins. Never point a Triassic kind at a Devonian mesh in the
   scenery pack: a wrong genus placed by the thousand is worse than an honestly generic shape, and
   which stand-in the game plays with is `environment.ts`'s business.
-- The Triassic has no creature models of its own yet. Every animal borrows a Devonian body through a
-  cross-era stand-in (`'devonian/<id>'` in `TRIASSIC_STAND_INS`, resolved into that era's folder
+- A delivered Triassic body arrives **paired**: the authored (Tripo-derived) model and a procedural
+  twin rebuilt to its own volume on the same skeleton, sharing inverse binds, clips and anchors.
+  That pairing is the pipeline's verification step, so the specimen viewer swaps between them in
+  place — same camera, same scale, same clip at the same frame (`puppet` on `ViewerSpecimen`,
+  the *Body* control in `src/viewer/Viewer.tsx`) — and a twin is never a second row in the roster.
+  Sculpt is off on the twin: a sculpt is the hand-off into a builder's profile rows for the body
+  that ships. A model landing also moves its canonical state to `delivered`, which
+  `tools/triassic/apply-selections.mjs` derives from `tools/triassic/shipped.json`; a regenerated
+  pose (a `candidate-awaiting-human-greenlight` in any `docs/triassic/canonical/prompts*.json`)
+  clears whatever was decided about the old one and sends the subject back to the undecided pile —
+  unless a human has already ruled on that candidate (`reviewedCandidate`), or the reopen would
+  undo the decision it was meant to prompt. A **greenlit candidate becomes the pose**: the tool
+  renames it over `<id>.png`, keeps the loser under `canonical/backups/`, and marks the prompt
+  record answered, because everything downstream reads `<id>.png` and nothing else — leaving the
+  winner beside the picture it beat would send the loser to be built. Run the tool with no
+  arguments to reconcile the manifest with the tree.
+- An era's scenery pack must **name** every prop it draws with. An id it does not name falls back to
+  the bare id under that era's own props folder, and an era whose folder is empty then asks the
+  network for a GLB that was never there — silent everywhere but the network tab, which is how the
+  Triassic requested three rock meshes on every seabed. Borrow explicitly instead (the Triassic's
+  rocks come from the shared `assets/props/`), and `npm run props` checks both halves: every mapping
+  has a file behind it, and nothing is left to the fallback.
+- The Triassic's creature models are arriving. Every animal that has not had one yet borrows a
+  Devonian body through a cross-era stand-in (`'devonian/<id>'` in `TRIASSIC_STAND_INS`, resolved into that era's folder
   by `src/content/asset-paths.ts`) and is still pickable (`assets.standInsPlayable`), because the
   roster ships placeholder portraits cut from `docs/triassic/canonical/`
   (`tools/triassic/placeholder-portraits.mjs`). When a model lands: files into
@@ -155,6 +234,9 @@ unless the user explicitly asks for a PR. Steps:
   apex into the direction of travel while it beats (`bellTilt`), so re-timing that clip breaks the
   lock — which is what the bell cases in `npm run locomotion` are there to catch. Which animal has what, and how well each is actually
   attested, is `docs/research/locomotion-ideas.md`.
+- Nothosaurus now holds its head still in its authored `Swim` and `Sprint` clips. The earlier
+  renderer-side `steadyHead` counter-rotation was removed when those clips were corrected; do not
+  reintroduce a runtime pose patch for motion that belongs in the reproducible Blender builder.
 - A body may shape itself to what it is on: `conformArms` bends a radial rig's arms onto the ground
   under them, or around a creature it is holding, after the mixer has written the pose
   (`src/render/conform.ts`, `npm run conform`). Presentation only, and asked for by name rather than
@@ -239,7 +321,7 @@ unless the user explicitly asks for a PR. Steps:
   `tools/sculpt-browser.mjs` drives the mode in a browser; `npm run sculpt:measure -- <glb> [sculpt.json]`
   measures a model the same way and reports how far a rebuilt candidate is from a sculpt's target,
   which is how a port is checked.
-- `?debug=local` on either page (`/?debug=local`, `/devonian/?debug=local`) opens an editor for that
+- `?debug=local` on any game page (`/cambrian/?debug=local`, `/devonian/?debug=local`) opens an editor for that
   era's saved state — `src/app/DebugLocal.tsx`, gated by `src/shared/debug.ts`, mounted by
   `src/app/Root.tsx` so both entry points get it without knowing about it. A new thing kept in
   `localStorage` should get a control there; `npm run debug` checks the gate.

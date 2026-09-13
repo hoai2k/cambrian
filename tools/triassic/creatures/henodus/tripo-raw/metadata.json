@@ -1,0 +1,38 @@
+{
+  "schema_version": 1,
+  "name": "henodus",
+  "task": {
+    "type": "image_to_model",
+    "status": "success",
+    "progress": 100,
+    "task_id": "521afa1a-b50a-4d12-add2-cc8f441e88f0",
+    "created_at": "2026-09-13T15:45:41.924834Z",
+    "completed_at": "2026-09-13T15:46:57.429600Z",
+    "credits_consumed": 30,
+    "output": {
+      "model_url": "<redacted download URL>",
+      "rendered_image_url": "<redacted download URL>"
+    }
+  },
+  "request": {
+    "file": {
+      "file_token": "<uploaded at runtime>"
+    },
+    "model": "v3.1-20260211",
+    "face_limit": 20000,
+    "texture": true,
+    "pbr": true
+  },
+  "image": {
+    "path": "docs/triassic/canonical/model-inputs/henodus/input.png",
+    "sha256": "6de8d0a15a7a4bcba5dfe3e20f088d30a00d03f75099a97fd500fa0e4f2e6770",
+    "bytes": 2263520
+  },
+  "artifact": {
+    "path": "tools/triassic/creatures/henodus/tripo-raw/henodus.raw.glb",
+    "bytes": 1677780,
+    "sha256": "f27e090789b6210a47e135baf7197058657febd98947ad15b1c38c3f865d7530",
+    "source_output_field": "model_url"
+  },
+  "downloaded_at": "2026-09-13T15:47:04.909Z"
+}

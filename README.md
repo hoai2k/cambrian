@@ -37,6 +37,8 @@ every push to `main` (set the repository's Pages source to "GitHub Actions").
 | `src/render/` | Three.js: sea environment, creature views and animation layering, effects, cameras, split-screen engine. |
 | `src/app/` | React shell: title, creature select, HUD, pause/results, help and settings. |
 | `src/input/`, `src/audio/` | Gamepad/keyboard reading; the WebAudio graph, its sample library and the distance falloff for world sounds. |
+| `src/ancientseas/` | The trilogy's page, which the site root serves: one engraved plate with the three games on it as links. `?version=1` is the first draft (the three title paintings on a dark ground) kept for comparison. |
+| `src/cambrian/`, `src/devonian/`, `src/triassic/` | The three game entry pages: each selects its era and points the asset base one level up before importing the app. |
 | `src/workbench/` | Development workbenches at `/workbench/?edit=<name>`. `?edit=audio` plays every sound through the real audio module; `?edit=environment` previews biome paintings, 3D props and radar marks. |
 | `src/shared/palettes.ts` | Creature colour schemes and the material-name to slot mapping they apply through (`src/render/recolor.ts`). |
 | `public/assets/creatures/` | 21 rigged full models, reduced LODs, anatomical anchors, studio renders, hero cards, thumbnails and transparent `.select.png` portraits. |
@@ -114,8 +116,9 @@ reproducible generation scripts are in `tools/creatures/`.
 
 ## Era content
 
-Two eras share one engine. The Cambrian pack (`src/content/cambrian/`) is the default at `/`;
-**Devonian Domination** lives at `/devonian/` with its own pack in `src/content/devonian/`. The
+Three eras share one engine, each on its own page below the trilogy's: **Cambrian Conquest** at
+`/cambrian/` (`src/content/cambrian/`, the build's default pack), **Devonian Domination** at
+`/devonian/` and **Triassic Triumph** at `/triassic/`, with their own packs beside it. The
 entry page selects its era (`selectEra`) before the app loads, so every module-top read of
 `ACTIVE_ERA` sees the right roster, assets and modes. See [the era content plan](docs/redesign/06-era-content.md)
 for the boundary and run `npm run eras` to validate the content contract.

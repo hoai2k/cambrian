@@ -33,6 +33,14 @@ export interface EraCopy {
    * its whole roster into this page's bundle and read ACTIVE_ERA at import time.
    */
   readonly sibling?: { readonly title: string; readonly path: string; readonly blurb: string; readonly logo: string };
+  /**
+   * The trilogy's own page, which is the site root and holds all three games. It is what the title
+   * screen offers, in place of a link per era: three games make three corners of links out of a
+   * screen that is meant to say press start, and the page they all point at is one click from any
+   * of them anyway. `sibling`/`siblings` stay for the pick screen, where going straight to another
+   * game's roster saves the player a screen.
+   */
+  readonly trilogy?: { readonly title: string; readonly path: string; readonly blurb: string };
   /** The other eras, when there are more than one: the picker lists these after `sibling`. */
   readonly siblings?: readonly { readonly title: string; readonly path: string; readonly blurb: string; readonly logo: string }[];
 }

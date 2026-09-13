@@ -1,0 +1,75 @@
+[
+  {
+    "file": "logo-engraved.webp",
+    "path": "/Users/hoai/.codex/generated_images/01a09b1b-33d5-7ee0-8952-0992369838b4/exec-5d815a6e-2cec-4e65-973f-10c59b9fc360.png",
+    "size": [
+      1536,
+      512
+    ],
+    "source": "logo-engraved.png"
+  },
+  {
+    "file": "title-trilogy.webp",
+    "path": "/Users/hoai/.codex/generated_images/01a09b1b-33d5-7ee0-8952-0992369838b4/exec-31cb715c-6b59-4add-97cd-96b1e0692ba0.png",
+    "size": [
+      2048,
+      640
+    ],
+    "source": "title-trilogy.png"
+  },
+  {
+    "file": "title-cambrian.webp",
+    "path": "/Users/hoai/.codex/generated_images/01a09b1b-33d5-7ee0-8952-0992369838b4/exec-07e65eba-024a-4a2d-871c-fb4b7c16d657.png",
+    "size": [
+      1536,
+      640
+    ],
+    "source": "title-cambrian.png"
+  },
+  {
+    "file": "title-devonian.webp",
+    "path": "/Users/hoai/.codex/generated_images/01a09b1b-33d5-7ee0-8952-0992369838b4/exec-0329cd45-13ae-4372-9069-0c61b1d70a34.png",
+    "size": [
+      1536,
+      640
+    ],
+    "source": "title-devonian.png"
+  },
+  {
+    "file": "title-triassic.webp",
+    "path": "/Users/hoai/.codex/generated_images/01a09b1b-33d5-7ee0-8952-0992369838b4/exec-05e2bf38-1b46-4a0c-8312-ce3502cf02eb.png",
+    "size": [
+      1536,
+      640
+    ],
+    "source": "title-triassic.png"
+  },
+  {
+    "file": "ground-parchment.webp",
+    "path": "/Users/hoai/.codex/generated_images/01a09b1b-33d5-7ee0-8952-0992369838b4/exec-aa86708d-b616-473a-9a97-0e1c3ff13f24.png",
+    "size": [
+      2048,
+      1280
+    ],
+    "source": "ground-parchment.png"
+  },
+  {
+    "file": "ground-seabed.webp",
+    "path": "/Users/hoai/.codex/generated_images/01a09b1b-33d5-7ee0-8952-0992369838b4/exec-ebab06d2-5588-472f-880a-49671e760233.png",
+    "size": [
+      2048,
+      384
+    ],
+    "keyWhite": true,
+    "source": "ground-seabed.png"
+  },
+  {
+    "file": "ornament-fleuron.webp",
+    "path": "/Users/hoai/.codex/generated_images/01a09b1b-33d5-7ee0-8952-0992369838b4/exec-371ef22b-37ee-4af0-a216-cacf01e6c5c0.png",
+    "size": [
+      512,
+      384
+    ],
+    "source": "ornament-fleuron.png"
+  }
+]

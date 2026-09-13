@@ -24,16 +24,36 @@ The current request covers 21 individually authored mobile creatures with action
 > to commission. `mode-frenzy.webp` is likewise left over from a mode that was
 > folded into Rise and is no longer requested by any pick screen.
 
+### Devonian — the two giant flora still procedural
+
+The authored Devonian scenery set covers eleven game-space proxies (seven flora kinds and four
+rock slots) out of 29 shipped prop kinds. Two flora kinds are still drawn by the procedural
+silhouette and have no authored model: **`lilyColumn`** (the giant sea lily that reaches up the
+water column) and **`frondTower`** (the algal frond tower). Both are held deliberately —
+`src/content/devonian/scenery.ts` says they wait on *"supported colony/framework compositions"*,
+because neither is one organism: a lily column is a stand of stalked crinoids at differing heights
+and a frond tower is an algal thicket, and stretching a small fossil thallus or a land plant to
+fill the slot is explicitly ruled out there.
+
+What is needed first is therefore a **composition reference** for each, not a model brief: one
+multi-panel board showing how many individuals, at what spread of heights, on what framework or
+holdfast, with the sources for the association — the same evidence standard as the 29 scenery
+appearance boards in `docs/devonian/supporting-assets.md`. The model brief follows the instanced-prop
+rules below once a composition is approved, and both are tall subjects, so each needs its scale
+against a Dunkleosteus length stated on the board. Until then the procedural silhouettes stay and
+nothing in the game is missing a path.
+
 ## Triassic (third era)
 
 The Triassic's image and model requests are collected in [`docs/triassic/03-image-and-model-requests.md`](triassic/03-image-and-model-requests.md), tiered by whether they go through Tripo or are built in-house, and stay there until the era is built.
 
-Two glyphs on that page are open here, because they are not era art but additions to the shared UI
-set in `public/assets/ui/`: **`air-recovery-off.svg`** and **`air-surface.svg`**, 64×64 in
-`currentColor`, in the line of the existing `breath-*.svg` marks. The Triassic's one new economy is
-that an air-breather's stamina does not recover under water and fills at the surface, and the bar
-says nothing about either — these are the two things it needs to say. Everything else on that page
-is either delivered, still in-house production, or art direction rather than shipped art.
+The shared air-status glyphs (`air-recovery-off.svg` and `air-surface.svg`) have been delivered under `public/assets/ui/`; their completed brief is recorded in [image-requests-history.md](image-requests-history.md).
+
+## Ancient Seas Trilogy page
+
+All requested page artwork, including the second-pass Tiktaalik replacement, is delivered and
+integrated. The completed briefs and notes about withdrawn cutouts are recorded in
+[image-requests-history.md](image-requests-history.md).
 
 ## Checking what is outstanding
 

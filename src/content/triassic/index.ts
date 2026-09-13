@@ -56,7 +56,7 @@ const authoredCreatures = Object.fromEntries(TRIASSIC_CREATURES.map((c) => {
   return [c.id, scheme?.colors ?? ({ body: c.color, eyes: '#101010', fins: c.accent, legs: c.color, accent: c.accent, underside: c.color } as Record<Slot, string>)];
 }));
 
-const CAMBRIAN_LINK = { title: 'Cambrian Conquest', path: '', blurb: '268 million years earlier', logo: 'assets/brand/logo-engraved.webp' };
+const CAMBRIAN_LINK = { title: 'Cambrian Conquest', path: 'cambrian/', blurb: '268 million years earlier', logo: 'assets/brand/logo-engraved.webp' };
 const DEVONIAN_LINK = { title: 'Devonian Domination', path: 'devonian/', blurb: '135 million years earlier', logo: 'assets/devonian/brand/logo-engraved.webp' };
 
 export const TRIASSIC = defineEra({
@@ -65,7 +65,7 @@ export const TRIASSIC = defineEra({
   copy: {
     tagline: 'Breathe. Dive. Hunt. Surface.', taglineEm: '240 million years ago, the sea belonged to things that had to come up for air.',
     loading: 'FILLING THE LUNGS…', lose: 'THE TIDE WINS', settingsKey: 'triassic-settings', mobileIllustration: TRIASSIC_BRAND_EXTRAS.mobileIllustration,
-    sibling: CAMBRIAN_LINK, siblings: [DEVONIAN_LINK],
+    trilogy: { title: 'Ancient Seas Trilogy', path: '', blurb: 'All three games' }, sibling: CAMBRIAN_LINK, siblings: [DEVONIAN_LINK],
   },
   modes: [
     // The same three modes as the other eras: the sea and the animals change, not what a match is.
@@ -83,8 +83,8 @@ export const TRIASSIC = defineEra({
   ecology: { schools: SNACK_SCHOOLS, giants: GIANTS, shadow: { creature: 'shonisaurus', scale: 1.0 } },
   environment: { biomeNames: BIOME_NAMES, biomeDanger: BIOME_DANGER, atmosphere: ATMOS, sandColors: SAND_COLORS, floraColors: FLORA_BASE, flora: FLORA_DENSITY, floraProps: FLORA_PROPS, surfaceY: SURFACE_Y, floorDepth: FLOOR_DEPTH, biomePlates: BIOME_PLATES },
   assets: {
-    // Portraits are the placeholder set cut from docs/triassic/canonical/; models are borrowed (see
-    // TRIASSIC_STAND_INS) and come from assets/devonian/creatures/ until this folder fills. The UI
+    // Portraits began as the placeholder set cut from docs/triassic/canonical/; undelivered models
+    // remain borrowed (see TRIASSIC_STAND_INS) until this folder fills. The UI
     // glyphs and the shared sound library are the other eras'; the era's own samples are addressed
     // as 'triassic/<name>' and resolve under assets/triassic/sfx/ the day they exist (sfx.ts).
     creatures: 'assets/triassic/creatures/', defaultPortraits: 'assets/triassic/creatures/',

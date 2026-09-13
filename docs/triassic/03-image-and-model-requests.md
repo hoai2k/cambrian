@@ -1,5 +1,13 @@
 # 03 · Image and model requests
 
+## Delivery checkpoint — 2026-09-13
+
+The 18 human-greenlit creatures now each have a dedicated single-model input and a qualitative four-view sheet under `canonical/model-inputs/<id>/`, derived from the approved pose. These sheets are visual guides; perspective drift is documented in each metadata file rather than treated as measured orthographic precision. Six replacement `candidate02` poses are available in the reference viewer and await human greenlight.
+
+Nothosaurus and Shonisaurus now ship authored Tripo bodies plus procedural volume twins with **identical skeletons, inverse binds, action samples and anchors within each pair**. The puppet also supplies LOD1. Both pairs are registered in the game and viewer, with model-rendered portraits replacing their placeholders, and remain preview models pending human visual approval. See [delivery state](IMAGE-MODEL-HANDOFF.md), [Nothosaurus pipeline](../../tools/triassic/creatures/nothosaurus/README.md), and [Shonisaurus pipeline](../../tools/triassic/creatures/shonisaurus/README.md). Raw Tripo tests are preserved in `tools/triassic/creatures/<id>/tripo-raw/`. The request tables below remain the broader roster specification, not a claim that every listed deliverable is still missing.
+
+**Plants and props have no canonical poses.** The greenlight-before-you-build rule was applied to the twenty-five animals and never extended to the scenery, so the reference viewer's scenery group shows external references with none of ours to choose between, and the nineteen B2 prop and plant kinds were specified in prose alone. **A5** below requests the missing canonical poses and model-input sheets; every unbuilt B2 row now points at it, and the four Tier 1 scenery subjects need the four-view sheet even though their poses are delivered.
+
 **Status:** open requests, 12 September 2026. Everything the Triassic needs that does not exist,
 in two tiers by who makes it, and in two passes by what it is: **source images** first (reference
 boards and the orthographic views Tripo is fed), **3D models** second, each model request
@@ -23,7 +31,7 @@ One per creature and shore animal, `docs/triassic/boards/<id>.md`: skeletal and 
 reconstructions from the sources in [research.md](research.md), specimen images with credits, the
 representative length and its source, the anatomy that must be right (listed per subject in
 [01](01-triassic-design.md)), and the uncertainty labels. Multi-panel; the panels are not separate
-files. Twenty-five boards: T01–T21, S01–S04.
+files. **All twenty-five boards are delivered** at `docs/triassic/boards/`: T01–T21, S01–S04.
 
 ### A2 · Tripo source views (Tier 1 inputs, generated in-house)
 
@@ -77,12 +85,57 @@ Twenty-five subjects, 26 bodies (two Keichousaurus), 112 images.
 Three views each (side, top, three-quarter), same conventions, for the organic scenery Tripo
 makes: `intake/triassic/scenery/<id>/`.
 
+**Delivered.** Each of the four subjects has its canonical image plus dedicated `-side`, `-top`,
+and `-turnaround` PNGs under `docs/triassic/canonical/` (twelve derived source views total).
+
 | Subject | Notes |
 | --- | --- |
 | `log-raft` | A drift trunk at the surface; the crinoid colony is built procedurally and hung from it, so the images are the log alone, waterline marked. |
 | `coral-head` | A massive scleractinian head, Dachstein type. |
 | `sponge-mound` | A Tubiphytes and sponge crust mound with visible chambers. |
 | `voltzia` | The shore conifer, three sizes; drooping shoots, cone clusters. |
+
+### A5 · Canonical poses and model inputs for plants and props (Tier 2, in-house)
+
+**Open, and the reason the reference viewer shows no canonical image for any plant or prop.** The
+era's rule is that art is greenlit before it is built from: every subject gets one approved
+canonical pose, and the modelling sheet and the shipped body are derived from that one image
+(`CLAUDE.md`, [`canonical/README.md`](../triassic/canonical/README.md)). That rule was applied to
+the twenty-five creatures and shore animals and never extended to the scenery, so the nineteen
+instanced prop and plant kinds of B2 were specified in prose alone. `apply-selections.mjs` says so
+in as many words — *"the alternates and the scenery have no pose of their own"* — and the viewer's
+**Scenery, plants and the shore** group therefore carries external reference images with nothing of
+ours beside them to choose between. A builder script written from prose is exactly the drift the
+canonical rule exists to stop, and a plant is as easy to get wrong as an animal: `diplopora` is a
+calcified alga and `encrinus` a stalked crinoid, and neither reads correctly from a one-line note.
+
+Deliver per subject, in this order, the same way the creatures went:
+
+1. **Canonical pose** — one image, `docs/triassic/canonical/<id>.png`, 2048×2048 PNG on the
+   modelling-sheet background, the whole organism with nothing cropped: the holdfast or base where
+   it meets the seabed, the full stem or wall, and the crown or margin. Side-on unless the subject
+   reads better from three-quarters (`daonella-bed`, `placunopsis-mound` and the rock slots are
+   plan-view subjects). Generated as candidates into the reference viewer, chosen by a human there,
+   and applied with `node tools/triassic/apply-selections.mjs <file>` — the same three decisions the
+   creatures had (greenlight ours, redraw ours, regenerate toward a reference that beat it).
+2. **Model-input sheet** — `docs/triassic/canonical/model-inputs/<id>/`, four views (side, top,
+   front, three-quarter) derived *from the approved pose*, matching the twenty-one creature sheets
+   already there. For a Tier 2 prop this is a modelling guide for the builder script, not a Tripo
+   input: it fixes the proportions the script lofts, so `npm run shapes` measures a footprint from
+   a shape somebody approved.
+3. **Variant note** — one line per variant on the sheet saying what differs (stem height, plate
+   curl, block angle), since B2's variants are one builder with parameters rather than separate
+   subjects.
+
+| Subjects | Canonical pose | Model-input sheet |
+| --- | --- | --- |
+| The 16 unbuilt B2 kinds: `encrinus`, `encrinus-litter`, `diplopora`, `thecosmilia`, `calcisponge`, `placunopsis-mound`, `daonella-bed`, `ceratite-drift`, `brachiopod-cluster`, `cidaris`, `reef-block`, `drift-log`, `neocalamites`, `pleuromeia`, `bjuvia`, `shore-boulder` | **Requested — none exists.** | **Requested — none exists.** |
+| The 3 built B2 kinds: `stromatolite`, `salt-crust`, `mud-ripple` | Not requested retroactively. | Not requested retroactively. |
+| The 4 Tier 1 scenery: `log-raft`, `coral-head`, `sponge-mound`, `voltzia` | **Delivered** (A3), though approved through `scenery-prompts.json` rather than the viewer, and only as side and top. | **Requested — none exists.** These go through Tripo, so they need the same four-view sheet the creatures get; A3's three views predate the `model-inputs/` mechanism. |
+
+`ceratite-drift` stays blocked on the `ceratites` model as B2 says: it is that shell reused, so it
+takes the animal's canonical pose and needs no pose of its own — only the half-buried placement
+note. `drift-log` is the Devonian `submerged-log` re-pivoted and likewise needs no new pose.
 
 ### A4 · Paintings, glyphs and plates (Tier 2, in-house)
 
@@ -92,11 +145,13 @@ makes: `intake/triassic/scenery/<id>/`.
 | `public/assets/triassic/brand/keyart.webp` + mobile | 2560×1440, 1080×1920 | Low angle from below the surface: a Keichousaurus crowd in the Conifer Shore, the sun through the surface, and the boom of a Tanystropheus neck coming down out of the light. Upper third quiet for the wordmark. | **Delivered and wired.** |
 | `public/assets/triassic/brand/logo-triassic.{svg,png}` | as the other eras | The era wordmark in the trilogy's lettering. | **Delivered**, as the engraved set (`logo-engraved.webp`, `logo.svg`), which every era's own title screen and every cross-era link now uses. |
 | `public/assets/ui/shore-reach.svg` | 64×64 | The hatched arc the radar draws inside a shore animal's reach. | **Delivered.** |
-| **`public/assets/ui/air-recovery-off.svg`** | 64×64, `currentColor`, square | The stamina bar's *recovery off* mark, shown on the bar the whole time an air-breather is under water: the era's one new economy is that the bar does not refill down here, and nothing on screen currently says so. A struck-through or barred breath glyph reading at 16 px, in the line of `breath-empty.svg` / `breath-low.svg` so the three sit together. | **Open.** The only image the Triassic HUD is actually short of. |
-| **`public/assets/ui/air-surface.svg`** | 64×64, `currentColor`, square | Its partner: *surface for air*, an arrow up shown on an empty bar, the prompt that the fix is the surface rather than waiting. Same weight and optical size as above. | **Open.** |
-| Regional boards × 9 | multi-panel | One per biome, art direction with the localities labelled, as `docs/devonian/supporting-assets.md` describes. Not evidence that the pictured animals coexisted. | **Open.** Art direction, not shipped art. |
-| Scale plates × 2 | multi-panel | Roster at true lengths; roster at game lengths under the 4.0·m^0.55 rule. | **Open.** Art direction, not shipped art. |
-| Portraits × 25 subjects | studio, select 1600×1200, card, thumb | Rendered from the shipped models by the intake tooling; not commissioned. | **Placeholder in the tree.** All 75 files under `public/assets/triassic/creatures/` are the canonical pose letterboxed onto each portrait canvas by `tools/triassic/placeholder-portraits.mjs` — not cut-outs, because there is no model to cut around yet. They are replaced per animal, automatically, by the intake render the day its model lands; nothing needs commissioning. |
+| **`public/assets/ui/air-recovery-off.svg`** | 64×64, `currentColor`, square | The stamina bar's *recovery off* mark, shown on the bar the whole time an air-breather is under water: the era's one new economy is that the bar does not refill down here, and nothing on screen currently says so. A struck-through or barred breath glyph reading at 16 px, in the line of `breath-empty.svg` / `breath-low.svg` so the three sit together. | **Delivered.** Shared SVG is ready for the HUD. |
+| **`public/assets/ui/air-surface.svg`** | 64×64, `currentColor`, square | Its partner: *surface for air*, an arrow up shown on an empty bar, the prompt that the fix is the surface rather than waiting. Same weight and optical size as above. | **Delivered.** |
+| Regional boards × 9 | multi-panel | One per biome, art direction with the localities labelled, as `docs/devonian/supporting-assets.md` describes. Not evidence that the pictured animals coexisted. | **Delivered** as PNG and editable SVG pairs at `public/assets/triassic/reference/regions/`. |
+| Scale plates × 2 | multi-panel | Roster at true lengths; roster at game lengths under the 4.0·m^0.55 rule. | **Delivered** as PNG and editable SVG pairs at `public/assets/triassic/reference/scale/`. |
+| **`public/assets/triassic/creatures/shonisaurus` texture re-bake** | replaces the shipped maps | The skin's baked maps carry triangular starburst faceting over the flank, belly and skull. It is the bake and not the mesh — the same geometry with the same vertex normals renders smooth untextured — so only the maps need redoing; the rig, the clips and the twin are unaffected. Nothosaurus' bake is clean and is the reference for what this should look like. | **Delivered and verified.** Original UV albedo restored pixel-for-pixel; restrained normal relief removes the starbursts, and an independent re-audit of the shipped GLB confirms both the faceting and the 286-face lip inversion are gone. See [the handoff](IMAGE-MODEL-HANDOFF.md). |
+| **`public/assets/triassic/creatures/nothosaurus.puppet.png`** | as `shonisaurus.puppet.png` | A still of the procedural twin, matching the one Shonisaurus already has. The pair is the pipeline's verification step and the two animals should be presentable the same way — Shonisaurus has a twin render beside its body render, Nothosaurus has only the body. Same camera and framing as `nothosaurus.png`, so the two stills overlay. | **Delivered.** Same Idle pose, camera and 1200×900 framing as the authored render; reproducible with `render.py -- --decoded --puppet --portrait-only`. |
+| Portraits × 25 subjects | studio, select 1600×1200, card, thumb | Rendered from the shipped models by the intake tooling; not commissioned. | **23 of 25 still placeholder.** Nothosaurus and Shonisaurus now carry real model-rendered portraits, which is the mechanism working: the rest are the canonical pose letterboxed onto each canvas by `tools/triassic/placeholder-portraits.mjs` — not cut-outs, because there is no model to cut around yet — and each is replaced the day its own model lands. Nothing needs commissioning. |
 
 ## B · 3D models
 
@@ -147,10 +202,10 @@ follow the instanced-prop rules on the requests page.
 
 | Id | Blocked on | Notes |
 | --- | --- | --- |
-| `log-raft` | A3 | The Tripo log at the surface; the Traumatocrinus colony (root cirri at the log's ends, stems of differing length to eight units, ten-armed crowns) built procedurally under it; drifts on the current; grippable. Full and reduced. |
-| `coral-head` | A3 | One mesh, a collider footprint from `npm run shapes`. Sparse. |
-| `sponge-mound` | A3 | With an interior a rung I body can enter; footprint measured. |
-| `voltzia` | A3 | Three sizes, on the shore; no collider needed above the waterline beyond the trunk. |
+| `log-raft` | A3 + A5 sheet | The Tripo log at the surface; the Traumatocrinus colony (root cirri at the log's ends, stems of differing length to eight units, ten-armed crowns) built procedurally under it; drifts on the current; grippable. Full and reduced. |
+| `coral-head` | A3 + A5 sheet | One mesh, a collider footprint from `npm run shapes`. Sparse. |
+| `sponge-mound` | A3 + A5 sheet | With an interior a rung I body can enter; footprint measured. |
+| `voltzia` | A3 + A5 sheet | Three sizes, on the shore; no collider needed above the waterline beyond the trunk. |
 
 ### B2 · Tier 2 — built in-house
 
@@ -167,25 +222,25 @@ a few hundred triangles, at the scale-1 sizes in [02](02-biomes-and-depth.md#pro
 
 | Id | Variants | Blocked on | Notes |
 | --- | --- | --- | --- |
-| `encrinus` | 3 (stem height) | — | Segmented stem, ten-armed crown that opens and closes in the shader. |
-| `encrinus-litter` | 2 | — | Columnal and stem-length scatter. |
-| `diplopora` | 2 | — | Calcified whorled tuft; sways. |
-| `thecosmilia` | 3 | — | Phaceloid bush of parallel tubes. |
-| `calcisponge` | 2 | — | Stacked-chamber column. |
+| `encrinus` | 3 (stem height) | A5 | Segmented stem, ten-armed crown that opens and closes in the shader. |
+| `encrinus-litter` | 2 | A5 | Columnal and stem-length scatter. |
+| `diplopora` | 2 | A5 | Calcified whorled tuft; sways. |
+| `thecosmilia` | 3 | A5 | Phaceloid bush of parallel tubes. |
+| `calcisponge` | 2 | A5 | Stacked-chamber column. |
 | `stromatolite` | 2 | — | Layered dome. |
 | `salt-crust` | 2 | — | Curled gypsum plate. |
-| `placunopsis-mound` | 2 | — | Stacked-shell dome, a feeding station. |
-| `daonella-bed` | 3 | — | Overlapping flat-clam slab, a feeding station. |
-| `ceratite-drift` | 1 | B1 `ceratites` | The live shell's mesh, unlit and half-buried. |
-| `brachiopod-cluster` | 1 | — | Coenothyris. |
-| `cidaris` | 1 | — | Club-spined urchin. |
-| `reef-block` | 4 | — | Angular margin breccia; the rock slot. |
+| `placunopsis-mound` | 2 | A5 | Stacked-shell dome, a feeding station. |
+| `daonella-bed` | 3 | A5 | Overlapping flat-clam slab, a feeding station. |
+| `ceratite-drift` | 1 | B1 `ceratites` (no pose of its own) | The live shell's mesh, unlit and half-buried. |
+| `brachiopod-cluster` | 1 | A5 | Coenothyris. |
+| `cidaris` | 1 | A5 | Club-spined urchin. |
+| `reef-block` | 4 | A5 | Angular margin breccia; the rock slot. |
 | `mud-ripple` | 2 | — | Laminated black-mud plate with an ash band. |
-| `drift-log` | 1 | — | The Devonian `submerged-log` re-pivoted to float. |
-| `neocalamites` | 2 | — | Jointed horsetail stand. |
-| `pleuromeia` | 1 | — | Unbranched trunk, strap-leaf crown, one cone. |
-| `bjuvia` | 1 | — | Cycad rosette. |
-| `shore-boulder` | 3 | — | Red sandstone. |
+| `drift-log` | 1 | — (re-pivot, no pose) | The Devonian `submerged-log` re-pivoted to float. |
+| `neocalamites` | 2 | A5 | Jointed horsetail stand. |
+| `pleuromeia` | 1 | A5 | Unbranched trunk, strap-leaf crown, one cone. |
+| `bjuvia` | 1 | A5 | Cycad rosette. |
+| `shore-boulder` | 3 | A5 | Red sandstone. |
 
 Effects that are not meshes and are built with the renderer: the blow (spray and a foam ring at
 the surface), the ink cloud, the ash fall in the basin, the surface underside with refracted sky,
@@ -196,7 +251,7 @@ is built: the blow is the era's signature sample and needs a real recording, not
 
 | | Tier 1 (Tripo) | Tier 2 (in-house) |
 | --- | --- | --- |
-| Source images | 26 canonical poses **(delivered)** + 112 creature and shore-animal views + 12 scenery views (generated in-house as inputs) | 25 reference boards, 9 banners, 2 key art, 1 wordmark, 4 glyphs, 9 regional boards, 2 scale plates |
+| Source images | 26 canonical poses **(delivered)** + 112 creature and shore-animal views + 12 scenery views **(delivered)** + 4 scenery model-input sheets **(A5, open)** | 25 reference boards **(delivered)**, 9 banners, 2 key art, 1 wordmark, 4 glyphs, 9 regional boards **(delivered)**, 2 scale plates **(delivered)**, 16 plant and prop canonical poses + 16 model-input sheets **(A5, open)** |
 | Models | 21 creatures, 3–4 shore animals, 4 scenery | 19 instanced prop kinds in 38 variants |
 | Derived | 25 procedural twins as LODs | 100 portraits |
 
@@ -209,3 +264,55 @@ other seventeen, so the step list in [04](04-tripo-pipeline.md) is proven on the
 Tier 2 props can start at once; nothing blocks them, and the sea-lily garden and the flats are
 playable stand-in biomes as soon as `encrinus`, `diplopora`, `stromatolite` and `daonella-bed`
 exist.
+
+## Blender correction delivered — Nothosaurus `Swim` and `Sprint`, 13 September 2026
+
+**Delivered in Blender** through `tools/triassic/creatures/nothosaurus/build.py` and re-exported to
+both the authored body and the procedural twin, which share the clips exactly. The diagnosis below
+records the prior shipped GLB; the delivery measurements follow it.
+
+**The complaint.** In play the animal reads as walking, or as swimming backwards.
+
+**The cause is the limb sequence, not the tail.** The forelimbs row in *antiphase* — `fore_paddle_L`
+is furthest aft at 0.13 of the cycle, `fore_paddle_R` at 0.67, half a cycle apart — while the hind
+pair strokes *together* at 0.38. Left fore, then both hinds, then right fore is a trot: it is the
+gait of something walking on a floor, and the eye reads it as one whether or not there is a floor.
+The head then confirms it: the skull yaws at the stroke rate with the widest arc anywhere on the
+front of the animal (lateral swing 0.100 units against the chest's 0.003), which is the head-sway of
+a walking lizard rather than the steady head a swimmer holds.
+
+**What the animal actually did.** Nothosaurs are reconstructed as **paraxial rowers driven by the
+forelimbs**, with drag-based rowing rather than the lift-based underwater flight plesiosaurs later
+evolved: the limb sweeps back broadside-on for the power stroke, then feathers edge-on and returns.
+The decisive evidence for the sequence is trackway rather than anatomy — the Yunnan *Nothosaurus*
+trackways (Zhang et al. 2014, *Nature Communications*) preserve **paired** forelimb impressions, so
+the forelimbs rowed **bilaterally, together**. The hind limbs contribute little and trail. Trunk and
+tail undulation is auxiliary: steering and a little thrust, not the engine.
+
+**So:**
+
+1. **Put the forelimbs in phase.** Both furthest aft at the same moment. This is the whole fix; the
+   alternation is what makes it a gait.
+2. **Make the stroke asymmetric in time.** Right now each paddle's fore-aft trace rises and falls
+   evenly, so neither half reads as the push. Give the power sweep rearward the longer, broader half
+   of the cycle with the paddle broadside, and the recovery the shorter half with it feathered
+   edge-on. Without this the eye cannot tell which way the animal is pushing water, which is most of
+   where "backwards" comes from.
+3. **Quiet the head.** The skull should hold the line the shoulders hold; let the neck take the
+   body's beat. The temporary renderer-side `steadyHead` correction was removed when the clips
+   were fixed.
+4. **Let the hind limbs trail.** They currently stroke as hard as the forelimbs and on their own
+   rhythm; `hind_paddle_R` beats at four times the stroke rate against the left's two, which is a
+   flutter rather than a stroke. Reduce them to a slow, mostly passive sweep in phase with the fore
+   pair.
+5. **Do not touch the tail.** It is already correct and it is the one part that is: amplitude grows
+   cleanly from `tail_01` (0.015) to `tail_06` (0.398), and the wave lags rearward down the body.
+   `Sprint` shares the same faults and the same fix.
+
+**Delivered measurements.** In the packaged `Swim`, both fore paddles are furthest aft at 0.683 of
+the cycle; in `Sprint`, both are aft at 0.667. The broadside power sweep occupies about 68% of the
+cycle and the feathered recovery about 32%. Hind-paddle travel is below 65% of fore-paddle travel
+and remains a secondary, trailing sweep. Skull lateral travel fell from 0.100/0.145 units to
+0.006/0.009 in `Swim`/`Sprint`, without changing the tail-wave formula. The paired audit samples
+both complete exports, asserts the gait measurements, and confirms exact rig, anchor and all
+21-clip parity. Decoded top and three-quarter renders are retained in the paired review sheets.

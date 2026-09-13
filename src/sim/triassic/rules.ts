@@ -4,9 +4,10 @@ import type { EraHud, EraRules } from '../era-rules';
 import { applyScaleStats, isAlive, lengthOf, speedFactor } from '../actors';
 import type { HitContext } from '../combat';
 import { creature } from '../creatures';
+import type { CreatureId } from '../../content/ids';
 import type { Game } from '../game';
 import type { Actor, InputFrame } from '../types';
-import { biomeWeights, groundHeight, nurseryAt, RISE_RATE, SURFACE_Y } from '../world';
+import { biomeWeights, coverAt, groundHeight, nurseryAt, RISE_RATE, SURFACE_Y } from '../world';
 import { DEVONIAN_RULES } from '../devonian/rules';
 import { ADULT_STAGE, devActor, PRIME_STAGE, RUNG_NAMES, STAGE_AT, STAGES, stageForScale, stageProgress, stageScale } from '../devonian/state';
 import { botNursery, canBreach as devCanBreach, sanctuary, spawnInCover, spawnProtect, spawnY, swim as devSwim, wanderY } from '../devonian/swim';
@@ -32,11 +33,19 @@ import { triActor, triState } from './state';
 const RUNG_NAMES_TRI = ['', 'Floor', 'Shelf', 'Hunters', 'Giants'] as const;
 /** The stamina left, under water, at which the body starts to sound winded — a quarter bar. */
 const WINDED_BELOW = 0.25;
+/** How often the winded heartbeat sounds at a quarter bar, closing to a shade under two seconds when the bar is gone. */
+const WINDED_EVERY = 3.4;
 /** Heat on the gypsum flats: stamina per second for anything that is not built for the salt. */
 const HEAT_DRAIN = 1.5;
 /** Cold in the deep: the share of recovery an ectotherm keeps there. */
 const COLD_REGEN = 0.5;
 const MOTHER_T = 60, POD_SIZE = 2;
+/**
+ * The least of its full-grown climb an air-breather keeps, however small it is. At 0.7 a hatchling
+ * crosses the shelf's twelve units in about eight seconds instead of nineteen, and the deepest
+ * water stays a long climb without being an impossible one.
+ */
+const AIR_CLIMB_FLOOR = 0.7;
 
 const isPlayerish = (a: Actor) => a.controller === 'player' || a.controller === 'bot';
 /** The game whose step is running, for the hooks that are not handed it (armour). */
@@ -67,7 +76,11 @@ function updateAir(g: Game, a: Actor, dt: number) {
   const left = clamp(a.stamina / Math.max(1, a.staminaMax), 0, 1);
   if (!up && a.controller === 'player' && isAlive(a) && left < WINDED_BELOW) {
     const hard = clamp(1 - left / WINDED_BELOW, 0, 1);
-    if (t.windT >= 3 - 2 * hard) { t.windT = 0; g.events.push({ kind: 'winded', pos: { ...a.pos }, actor: a.id, player: a.player, strength: hard }); }
+    // A heartbeat, not an alarm. At full spentness this used to fire every second for as long as a
+    // player stayed down — a hundred and forty times in three minutes of swimming out to sea, each
+    // one a loud cue and a puff of bubbles across the camera. The bar's own mark says the state
+    // continuously and silently; the sound is only there to make you feel it, so it stays slow.
+    if (t.windT >= WINDED_EVERY - 1.4 * hard) { t.windT = 0; g.events.push({ kind: 'winded', pos: { ...a.pos }, actor: a.id, player: a.player, strength: hard }); }
   } else if (up) t.windT = 0;
   // held under: whatever holds it keeps it from the air, and an exhaustion hold wears it faster
   if (a.grabbedBy >= 0) {
@@ -85,6 +98,51 @@ function updateClimate(g: Game, a: Actor, dt: number) {
   if (heat > 0.3 && !def.shell && def.id !== 'henodus' && isAlive(a)) a.stamina = Math.max(0, a.stamina - HEAT_DRAIN * heat * dt);
 }
 const coldAt = (a: Actor) => { const w = biomeWeights(a.pos.x, a.pos.z); return w.basin + w.escarpment * 0.6; };
+
+/**
+ * Where the shell can actually be seen.
+ *
+ * `spawnInCover` picks the spot that hides the body *best*, which is right for a hatchling that
+ * has to survive its first minute and wrong for the five seconds before that: the egg is the
+ * series' opening beat, and players were watching it happen behind a log or inside a crowd of
+ * other animals. So the cover spot is the starting point, not the answer — the egg steps out of
+ * the thickest of it into the nearest pocket that still has shelter *around* it, and away from
+ * whatever else is standing there.
+ *
+ * Cheap and bounded: one ring of candidates at a fixed radius, scored and the best taken. Pure in
+ * the world and the rng, and it draws nothing from the rng at all, so a match still replays.
+ */
+function clearTheView(g: Game, at: Vec3, id: CreatureId, scale: number): Vec3 {
+  const L = creature(id).adultLength * scale;
+  const reach = Math.max(1.2, L * 3);
+  /** Shelter worth keeping, and burial to get out of: the band the egg wants to sit in. */
+  const WANT = 0.35;
+  const crowd = (p: Vec3) => {
+    let worst = 0;
+    for (const o of g.actors) {
+      if (!isAlive(o) || o.controller === 'player') continue;
+      const d = Math.hypot(o.pos.x - p.x, o.pos.z - p.z) - lengthOf(o) * 0.5;
+      // Anything big enough to stand in front of the shell, near enough to do it.
+      if (lengthOf(o) > L * 0.8 && d < reach) worst = Math.max(worst, 1 - clamp(d / reach, 0, 1));
+    }
+    return worst;
+  };
+  const score = (p: Vec3) => {
+    const c = coverAt(g.world, p, L, []);
+    // Distance from the shelter the egg wants, plus whatever is standing in the way.
+    return Math.abs(c - WANT) + crowd(p) * 1.5;
+  };
+  let best = at, bestScore = score(at);
+  const N = 8;
+  for (let i = 0; i < N; i++) {
+    const ang = (i / N) * Math.PI * 2;
+    const x = at.x + Math.cos(ang) * reach, z = at.z + Math.sin(ang) * reach;
+    const p = { x, y: groundHeight(g.world, x, z, []) + L * 0.13, z };
+    const sc = score(p);
+    if (sc < bestScore) { bestScore = sc; best = p; }
+  }
+  return best;
+}
 
 // ---- birth: the mother beside the calf ----
 function updateMother(g: Game, a: Actor, dt: number) {
@@ -271,12 +329,32 @@ export const TRIASSIC_RULES: EraRules = {
     return base;
   },
 
-  /** The vertical assist: the shared rate times the body's own, and an air-breather's sprint carries into its climb. */
+  /**
+   * The vertical assist: the shared rate times the body's own, and an air-breather's sprint carries
+   * into its climb.
+   *
+   * The shared rate is scaled by the body — but the water is not. The surface is the same twelve
+   * units above the shelf and the same seventy-eight above the basin whether you hatched this
+   * minute or own the sea, so scaling the climb by size made the one animal that *must* reach air
+   * the one that could not: a hatchling Nothosaurus climbed at 0.65 units a second against an
+   * adult's 2.15, nineteen seconds from the shelf floor and over a minute from the deep, with no
+   * stamina coming back the whole way. So an air-breather's climb has a floor under it. It is not
+   * a bonus — a grown animal still climbs faster, and everything else in the sea is unchanged —
+   * it is the difference between the era's central act being possible and not.
+   */
   rise(g, a, input, base, burst) {
     void g;
     const def = creature(a.creature);
     const k = def.riseRate ?? 1;
-    if (input.rise) return base * k * (breathesAir(a) ? Math.max(1, burst) : 1);
+    if (input.rise) {
+      const air = breathesAir(a);
+      // `base` already carries the body's speed factor, so the floor is expressed against it. It
+      // replaces the body's own rate rather than multiplying it: a Placodus climbs badly on purpose
+      // (0.6) and is a small animal besides, and the two together put air out of reach — but it
+      // still has lungs, and the one thing the era may never do is leave a lung with no way up.
+      const lift = air ? Math.max(k, AIR_CLIMB_FLOOR / Math.max(speedFactor(a.scale), 0.05)) : k;
+      return base * lift * (air ? Math.max(1, burst) : 1);
+    }
     if (input.sink) return -base * (def.sink ? 1.4 : 1);
     return 0;
   },
@@ -301,17 +379,21 @@ export const TRIASSIC_RULES: EraRules = {
   canBreach(a) { return !creature(a.creature).shore && devCanBreach(a); },
   spawnY, wanderY,
 
-  /** Live-bearers are born at the surface, near the nursery; everything else hatches in cover. */
+  /**
+   * Everything hatches in cover on the sea floor, the way it does in the other two eras.
+   *
+   * The live-bearers were briefly born at the surface instead — which is what the fossils say, and
+   * Keichousaurus and Dinocephalosaurus have the embryos to prove it — but it cost the series' one
+   * opening beat: you come out of an egg, on the bottom, held still while the shell gives. Dropping
+   * a player into open midwater instead is a worse first ten seconds than the biology is worth. The
+   * research is kept where it still pays: the same species get a grown adult of their own kind
+   * beside them for the first minute, which reads as the parental care viviparity implies.
+   */
   spawnPoint(g, center, id, scale, index) {
-    const def = creature(id);
-    if (def.birth === 'live' && stageForScale(def.adultLength, scale) === 0) {
-      const ang = (index * 1.7 + g.rng() * 0.6) % (Math.PI * 2), r = 6 + g.rng() * 6;
-      return { x: center.x + Math.cos(ang) * r, y: SURFACE_Y - 1.2 - def.adultLength * scale * 0.4, z: center.z + Math.sin(ang) * r };
-    }
-    return spawnInCover(g, center, id, scale, index);
+    const at = spawnInCover(g, center, id, scale, index);
+    return at ? clearTheView(g, at, id, scale) : at;
   },
   botNursery, spawnProtect, sanctuary,
-  liveBirth: (a) => creature(a.creature).birth === 'live',
 
   moultScale: DEVONIAN_RULES.moultScale,
 
@@ -340,9 +422,8 @@ export const TRIASSIC_RULES: EraRules = {
   hint(g, i) {
     const p = g.players[i]; if (!p || !isAlive(p)) return undefined;
     const t = triActor(g, p), def = creature(p.creature), rung = rungOf(p);
-    if (def.breathing === 'air' && !t.atSurface && p.stamina < p.staminaMax * 0.2) return 'Nothing comes back down here. Go up for it.';
     if (t.shoreWarn > 0) return 'Something on the shore is fishing. Get deeper.';
-    if (g.time < 12) return def.birth === 'live' ? 'Born at the surface. Breathe, dive, feed; your mother stays a minute.' : rung === 1 ? 'Feed, hide, moult. Everything out there is bigger than you are today.' : rung === 2 ? 'Feed and keep near the top. Air is what effort costs.' : rung === 3 ? 'Hunt the shelf. Five stages between you and Prime, and every fight ends at the surface.' : 'Stay fed. The deep is yours; the flats are closed to you.';
+    if (g.time < 12) return def.birth === 'live' ? 'Out of the shell, and a parent of your own kind is with you for a minute. Breathe, dive, feed.' : rung === 1 ? 'Feed, hide, moult. Everything out there is bigger than you are today.' : rung === 2 ? 'Feed and keep near the top. Air is what effort costs.' : rung === 3 ? 'Hunt the shelf. Five stages between you and Prime, and every fight ends at the surface.' : 'Stay fed. The deep is yours; the flats are closed to you.';
     if (def.shell && g.time < 40) return 'Your funnel makes rise and sink free, and no direction is slow. Block withdraws into the shell.';
     if (def.sink && g.time < 40) return 'You settle when you stop. The floor is where you feed.';
     return undefined;

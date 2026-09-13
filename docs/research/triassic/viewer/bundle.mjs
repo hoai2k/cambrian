@@ -13,12 +13,13 @@
  *
  * Canonical images are matched by filename: `<subject-id>.png` (or .jpg/.webp), and
  * `<subject-id>-<anything>.png` for extra views (`keichousaurus-male`), which sort after the
- * plain one. The directory is the art's home, not a copy of it: see its README.
+ * plain one. Files ending in `-candidate<number>` are explicit replacement candidates, with
+ * their own selection identity; bundling never promotes one or changes an existing decision.
+ * The directory is the art's home, not a copy of it: see its README.
  *
- * The **four-view modelling sheet** a subject's canonical pose was turned into (the "3D model
- * views" the Tripo generation is fed) joins the same list, labelled `3D views`, from either
- * `docs/triassic/canonical/<id>-turnaround.png` once integrated or `intake/triassic/<id>/
- * turnaround.png` (and `intake/triassic/scenery/<id>/`) while it is still a fresh delivery.
+ * Integrated `<id>-turnaround.png` views remain beside the pose. New images from
+ * `canonical/model-inputs/<id>/` appear as read-only modelling references once the subject's
+ * manifest status is `greenlit` or `delivered`. Legacy intake sheets are never ingested.
  */
 import { readFile, writeFile, readdir, mkdir, stat, copyFile, rm } from 'node:fs/promises';
 import { dirname, join, extname, basename } from 'node:path';
@@ -31,14 +32,8 @@ const DEPLOY_DIR = join(HERE, '../../../../public/research/triassic');
 const DEPLOY_WIDTH = 1400, DEPLOY_QUALITY = 82;
 const IMAGE_EXT = new Set(['.png', '.jpg', '.jpeg', '.webp', '.gif', '.avif']);
 
-/** Where a four-view modelling sheet turns up, newest delivery first. Relative to this directory. */
-const TURNAROUNDS = (id) => [
-  `${CANON_DIR}/${id}-turnaround.png`,
-  `../../../../intake/triassic/${id}/turnaround.png`,
-  `../../../../intake/triassic/scenery/${id}/turnaround.png`,
-];
-
 const data = JSON.parse(await readFile(join(HERE, 'images.json'), 'utf8'));
+const manifest = JSON.parse(await readFile(join(HERE, CANON_DIR, 'manifest.json'), 'utf8'));
 
 /**
  * The decisions the repository already holds, read out of the canonical manifest and bundled
@@ -54,7 +49,9 @@ const data = JSON.parse(await readFile(join(HERE, 'images.json'), 'utf8'));
 function decisions(manifest) {
   const out = {};
   for (const [id, e] of Object.entries(manifest.subjects ?? {})) {
-    if (e.canonical === 'greenlit')
+    if (e.canonical === 'delivered')
+      out[id] = { verdict: 'delivered', choice: 'canonical', ref: e.greenlitImage || 'canonical', note: e.note || '', at: e.deliveredAt || e.greenlitAt, locked: true };
+    else if (e.canonical === 'greenlit')
       out[id] = { verdict: 'greenlit', choice: 'canonical', ref: e.greenlitImage || 'canonical', note: e.note || '', at: e.decidedAt };
     else if (e.canonical === 'needs-rework') {
       const t = e.reworkToward ?? {};
@@ -68,7 +65,6 @@ function decisions(manifest) {
   }
   return out;
 }
-const manifest = JSON.parse(await readFile(join(HERE, CANON_DIR, 'manifest.json'), 'utf8').catch(() => '{}'));
 const decided = decisions(manifest);
 
 let files = [];
@@ -104,28 +100,35 @@ for (const file of files.sort()) {
   const id = [...ids].filter((i) => stem === i || stem.startsWith(`${i}-`)).sort((a, b) => b.length - a.length)[0];
   if (!id) { orphans.push(file); continue; }
   const turn = stem.endsWith('-turnaround');
+  const candidate = /-candidate\d+$/.test(stem);
   (canonical[id] ??= []).push({
     abs: join(HERE, CANON_DIR, file),
     src: `${CANON_DIR}/${file}`,
     thumb: await thumbnail(join(HERE, CANON_DIR, file), stem),
-    kind: turn ? 'turnaround' : 'canonical',
+    kind: turn ? 'turnaround' : candidate ? 'candidate' : 'canonical',
     label: stem === id ? 'canonical' : turn ? '3D views' : stem.slice(id.length + 1).replace(/[-_]/g, ' '),
   });
 }
-// Modelling sheets still sitting in the intake inbox: shown beside the pose they were built from,
-// so a reviewer judging the canonical image can see what was made of it without integrating first.
-let sheets = 0;
+// Canonical-derived inputs are inspection aids, never alternative canonical selections.
+// The manifest gate is authoritative; metadata inside an input folder cannot approve a subject.
+let modelReferences = 0;
 for (const id of ids) {
-  if (canonical[id]?.some((c) => c.kind === 'turnaround')) continue;
-  for (const rel of TURNAROUNDS(id)) {
+  // Greenlit *or* delivered: a body having been built is not a reason to hide the images it was
+  // built from — that is exactly when someone wants to look at them, to ask whether the model is
+  // the animal the input asked for.
+  if (!['greenlit', 'delivered'].includes(manifest.subjects?.[id]?.canonical)) continue;
+  for (const name of ['input', 'three-quarter', 'turnaround']) {
+    const rel = `${CANON_DIR}/model-inputs/${id}/${name}.png`;
     const abs = join(HERE, rel);
     if (!(await stat(abs).catch(() => null))) continue;
-    (canonical[id] ??= []).push({ abs, src: rel, thumb: await thumbnail(abs, `${id}-turnaround`), kind: 'turnaround', label: '3D views' });
-    sheets++;
-    break;
+    (canonical[id] ??= []).push({
+      abs, src: rel, thumb: await thumbnail(abs, `${id}-model-${name}`),
+      kind: 'model-reference', label: `modelling reference · ${name.replaceAll('-', ' ')}`,
+    });
+    modelReferences++;
   }
 }
-const rank = (c) => (c.kind === 'turnaround' ? 2 : c.label === 'canonical' ? 0 : 1);
+const rank = (c) => (c.kind === 'model-reference' ? 3 : c.kind === 'turnaround' ? 2 : c.label === 'canonical' ? 0 : 1);
 for (const list of Object.values(canonical)) list.sort((a, b) => rank(a) - rank(b) || a.label.localeCompare(b.label));
 
 /** `abs` is this script's own business; it never reaches the page. */
@@ -135,8 +138,9 @@ await writeFile(join(HERE, 'data.js'), bundle(canonical));
 
 const withCanon = Object.values(canonical).filter((l) => l.some((c) => c.kind === 'canonical')).length;
 const green = Object.values(decided).filter((d) => d.verdict === 'greenlit').length;
-console.log(`data.js written — ${ids.size} subjects, ${withCanon} with a canonical image, ${ids.size - withCanon} without, ${sheets} modelling sheets from the intake inbox`);
-console.log(`  decisions carried from the manifest: ${green} greenlit, ${Object.keys(decided).length - green} to redo`);
+const built = Object.values(decided).filter((d) => d.verdict === 'delivered').length;
+console.log(`data.js written — ${ids.size} subjects, ${withCanon} with a canonical image, ${ids.size - withCanon} without, ${modelReferences} modelling references`);
+console.log(`  decisions carried from the manifest: ${built} delivered, ${green} greenlit, ${Object.keys(decided).length - green - built} to redo`);
 if (orphans.length) console.log(`canonical files matching no subject id: ${orphans.join(', ')}`);
 
 // ---- the deployable copy ----
@@ -154,8 +158,8 @@ const deployed = {};
 for (const [id, list] of Object.entries(canonical)) {
   deployed[id] = [];
   for (const entry of list) {
-    const stem = entry.kind === 'turnaround' && !basename(entry.src).includes('-turnaround')
-      ? `${id}-turnaround` : basename(entry.src, extname(basename(entry.src)));
+    const fileStem = basename(entry.src, extname(entry.src));
+    const stem = entry.kind === 'model-reference' ? `${id}-model-${fileStem}` : fileStem;
     const out = join(DEPLOY_DIR, 'canonical', `${stem}.webp`);
     await sharp(entry.abs).resize({ width: DEPLOY_WIDTH, withoutEnlargement: true }).webp({ quality: DEPLOY_QUALITY }).toFile(out);
     bytes += (await stat(out)).size;

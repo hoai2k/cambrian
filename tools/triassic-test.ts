@@ -120,20 +120,94 @@ ok(opener && fs.existsSync(`public/${decodeURIComponent(paths.music(opener.name)
   notho.grabbedBy = -1; giant.grabbing = -1;
 }
 
-// ---- birth: live-bearers arrive at the surface beside a mother ----
+// ---- birth: everything hatches from an egg on the floor, and the live-bearers get a parent ----
+// The live-bearers were once born at the surface, which is what the fossils say and what the first
+// ten seconds of a match could least afford: the series opens on an egg cracking on the bottom, and
+// a player dropped into open midwater never sees it. The research stays as the escort.
+for (const [id, kind] of [['mixosaurus', 'a live-bearer'], ['placodus', 'an egg-layer']] as const) {
+  const g = new Game('rise', [{ creature: id, device: 'keyboard', ready: true }]);
+  const born = g.players[0];
+  ok(born.hatching && born.state === 'moult' && born.stateDur > 1.5, `${kind} starts inside an egg`);
+  const floor = sampleHeight(born.pos.x, born.pos.z);
+  ok(born.pos.y < SURFACE_Y - 6 && born.pos.y - floor < 3,
+    `...laid on the sea floor, not in open water (y ${born.pos.y.toFixed(1)}, floor ${floor.toFixed(1)}, surface ${SURFACE_Y})`);
+  g.skipHatch();
+}
 {
   const g = new Game('rise', [{ creature: 'mixosaurus', device: 'keyboard', ready: true }]);
   g.skipHatch();
   const calf = g.players[0];
-  ok(calf.pos.y > SURFACE_Y - 6, `a Mixosaurus calf is born at the surface (y ${calf.pos.y.toFixed(1)} of ${SURFACE_Y})`);
   run(g, 1);
   const t = triActor(g, calf);
   const mother = t.mother >= 0 ? g.byId(t.mother) : undefined;
-  ok(!!mother && mother.creature === 'mixosaurus' && lengthOf(mother) > lengthOf(calf) * 2, 'and an adult of its kind is beside it');
-  ok(t.calfT > 50 && t.calfT < 60, 'the mother stays a minute');
+  ok(!!mother && mother.creature === 'mixosaurus' && lengthOf(mother) > lengthOf(calf) * 2, 'an adult of its kind is beside a live-bearer');
+  ok(t.calfT > 50 && t.calfT < 60, 'and it stays a minute');
   const e = new Game('rise', [{ creature: 'placodus', device: 'keyboard', ready: true }]);
   e.skipHatch();
-  ok(e.players[0].pos.y < SURFACE_Y - 6, 'an egg-layer hatches down in cover, as in the other eras');
+  run(e, 1);
+  ok(triActor(e, e.players[0]).mother < 0, 'an egg-layer gets no escort');
+}
+// The shell an animal comes out of says what it is: a reptile's is leathery, and the sharks, fish,
+// amphibian and cephalopods on the roster lay nothing of the kind.
+{
+  const leathery = CREATURES.filter((c) => c.eggShell === 'leathery').map((c) => c.id);
+  const plain = CREATURES.filter((c) => c.eggShell !== 'leathery').map((c) => c.id);
+  ok(leathery.includes('nothosaurus') && leathery.includes('henodus') && leathery.includes('coelophysis'),
+    `the reptiles lay leathery eggs (${leathery.length} of ${CREATURES.length})`);
+  ok(!plain.some((id) => !['helicoprion', 'hybodus', 'birgeria', 'saurichthys', 'aphaneramma', 'ceratites', 'phragmoteuthis'].includes(id)),
+    `and only the two sharks, two fish, the amphibian and the two cephalopods do not (${plain.join(', ')})`);
+}
+
+// ---- the climb for air ----
+// The era's central act, and it was quietly impossible: the shared climb rate scales with the body
+// but the water does not, so a hatchling Nothosaurus took nineteen seconds to reach the surface from
+// the shelf floor and over a minute from the deep, with no stamina coming back the whole way. And
+// holding the climb button alone counted as asking for nothing, which put the body in its slowest
+// acceleration on top. Every lung on the roster must be able to get up for air promptly, at any size.
+{
+  let worst = 0, worstId = '';
+  for (const c of PLAYABLE) {
+    if (creature(c.id).breathing !== 'air') continue;
+    const g = new Game('rise', [{ creature: c.id, device: 'keyboard', ready: true }], 99);
+    g.skipHatch();
+    const p = g.players[0]; p.spawnProtect = 0;
+    const m = new Map([[0, { ...emptyInput(), rise: true } as InputFrame]]);
+    let t = 0, reached = -1;
+    for (let i = 0; i < 60 * 30; i++) {
+      g.step(1 / 60, m); g.events.length = 0; t += 1 / 60;
+      if (p.pos.y > SURFACE_Y - 3.5) { reached = t; break; }
+    }
+    if (reached < 0) { worst = 99; worstId = c.id; break; }
+    if (reached > worst) { worst = reached; worstId = c.id; }
+  }
+  ok(worst < 12, `every air-breather climbs to the surface from the floor, at hatchling size (slowest: ${worstId} at ${worst > 90 ? 'never' : worst.toFixed(1) + ' s'})`);
+}
+// Holding the climb is asking for something, so it must not be treated as coasting.
+{
+  const g = new Game('rise', [{ creature: 'nothosaurus', device: 'keyboard', ready: true }], 99);
+  g.skipHatch();
+  const p = g.players[0]; p.spawnProtect = 0;
+  const y0 = p.pos.y;
+  const m = new Map([[0, { ...emptyInput(), rise: true } as InputFrame]]);
+  for (let i = 0; i < 60; i++) { g.step(1 / 60, m); g.events.length = 0; }
+  ok(p.pos.y - y0 > 1, `one second of the climb button is worth more than a metre (${(p.pos.y - y0).toFixed(2)} units)`);
+}
+// The winded heartbeat is a heartbeat. It used to fire every second for as long as a player stayed
+// down — a hundred and forty times in three minutes — each one a loud cue and a puff of bubbles.
+{
+  const g = new Game('reef', [{ creature: 'nothosaurus', device: 'keyboard', ready: true }], 7);
+  g.skipHatch();
+  const p = g.players[0]; p.spawnProtect = 0;
+  p.stamina = 0;
+  const m = new Map([[0, { ...emptyInput(), my: -1 } as InputFrame]]);
+  let winded = 0;
+  for (let i = 0; i < 60 * 60; i++) {
+    g.step(1 / 60, m);
+    for (const e of g.events) if (e.kind === 'winded' && e.player === 0) winded++;
+    g.events.length = 0;
+    p.stamina = 0;                                   // held spent, the worst case
+  }
+  ok(winded > 0 && winded <= 32, `a minute spent and under water sounds the heartbeat ${winded} times, not sixty`);
 }
 
 // ---- armour with a facing ----

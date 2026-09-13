@@ -1,0 +1,105 @@
+{
+  "schema_version": 1,
+  "input": {
+    "path": "tools/triassic/creatures/macrocnemus/tripo-raw/macrocnemus.raw.glb",
+    "bytes": 1339712,
+    "sha256": "25fe69221698be87f6c7939edff529638baec8bc2b55988aeb315a865d14984a"
+  },
+  "summary": {
+    "mesh_objects": 1,
+    "vertices": 11966,
+    "faces": 19984,
+    "triangles": 19984,
+    "connected_components": 95,
+    "materials": 1,
+    "textures": 3
+  },
+  "bounds": {
+    "min_xyz": [
+      -0.221665,
+      -0.5,
+      -0.216357
+    ],
+    "max_xyz": [
+      0.221665,
+      0.5,
+      0.216357
+    ],
+    "center_xyz": [
+      0,
+      0,
+      0
+    ],
+    "size_xyz": [
+      0.44333,
+      1,
+      0.432715
+    ]
+  },
+  "meshes": [
+    {
+      "object": "tripo_node_4a7236f8-f6b3-4ee0-8194-e2a6a39f5015",
+      "mesh": "tripo_mesh_4a7236f8-f6b3-4ee0-8194-e2a6a39f5015",
+      "vertices": 11966,
+      "edges": 31855,
+      "faces": 19984,
+      "triangles": 19984,
+      "connected_components": 95,
+      "material_slots": [
+        "tripo_material_4a7236f8-f6b3-4ee0-8194-e2a6a39f5015"
+      ]
+    }
+  ],
+  "materials": [
+    {
+      "name": "tripo_material_4a7236f8-f6b3-4ee0-8194-e2a6a39f5015",
+      "image_textures": [
+        "Color_4a7236f8-f6b3-4ee0-8194-e2a6a39f5015",
+        "NormalGL_4a7236f8-f6b3-4ee0-8194-e2a6a39f5015",
+        "ORM_4a7236f8-f6b3-4ee0-8194-e2a6a39f5015"
+      ]
+    }
+  ],
+  "textures": [
+    {
+      "name": "Color_4a7236f8-f6b3-4ee0-8194-e2a6a39f5015",
+      "width": 2048,
+      "height": 2048,
+      "channels": 4,
+      "packed": true,
+      "source": "FILE",
+      "colorspace": "sRGB"
+    },
+    {
+      "name": "NormalGL_4a7236f8-f6b3-4ee0-8194-e2a6a39f5015",
+      "width": 2048,
+      "height": 2048,
+      "channels": 4,
+      "packed": true,
+      "source": "FILE",
+      "colorspace": "Non-Color"
+    },
+    {
+      "name": "ORM_4a7236f8-f6b3-4ee0-8194-e2a6a39f5015",
+      "width": 2048,
+      "height": 2048,
+      "channels": 4,
+      "packed": true,
+      "source": "FILE",
+      "colorspace": "Non-Color"
+    }
+  ],
+  "renders": {
+    "side": "tools/triassic/creatures/macrocnemus/tripo-raw/review/side.png",
+    "top": "tools/triassic/creatures/macrocnemus/tripo-raw/review/top.png",
+    "three-quarter": "tools/triassic/creatures/macrocnemus/tripo-raw/review/three-quarter.png"
+  },
+  "preview": {
+    "path": "tools/triassic/creatures/macrocnemus/macrocnemus.preview.glb",
+    "triangle_limit": 40000,
+    "triangles_before": 19984,
+    "triangles_after": 19984,
+    "bytes": 1219576,
+    "sha256": "b0be4e86e871266abd9e69a72c2b746cc18b54707e09e74dca09f6d74300cc66"
+  }
+}

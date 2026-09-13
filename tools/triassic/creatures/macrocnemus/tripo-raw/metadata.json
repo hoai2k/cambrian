@@ -1,0 +1,38 @@
+{
+  "schema_version": 1,
+  "name": "macrocnemus",
+  "task": {
+    "type": "image_to_model",
+    "status": "success",
+    "progress": 100,
+    "task_id": "4a7236f8-f6b3-4ee0-8194-e2a6a39f5015",
+    "created_at": "2026-09-13T15:57:23.997096Z",
+    "completed_at": "2026-09-13T15:58:59.501991Z",
+    "credits_consumed": 30,
+    "output": {
+      "model_url": "<redacted download URL>",
+      "rendered_image_url": "<redacted download URL>"
+    }
+  },
+  "request": {
+    "file": {
+      "file_token": "<uploaded at runtime>"
+    },
+    "model": "v3.1-20260211",
+    "face_limit": 20000,
+    "texture": true,
+    "pbr": true
+  },
+  "image": {
+    "path": "docs/triassic/canonical/model-inputs/macrocnemus/input.png",
+    "sha256": "f2a42b763aebf59bb4162b759b4c2ce19717330f07c5b1d4f2f962272fd995c4",
+    "bytes": 1698186
+  },
+  "artifact": {
+    "path": "tools/triassic/creatures/macrocnemus/tripo-raw/macrocnemus.raw.glb",
+    "bytes": 1339712,
+    "sha256": "25fe69221698be87f6c7939edff529638baec8bc2b55988aeb315a865d14984a",
+    "source_output_field": "model_url"
+  },
+  "downloaded_at": "2026-09-13T15:59:07.015Z"
+}

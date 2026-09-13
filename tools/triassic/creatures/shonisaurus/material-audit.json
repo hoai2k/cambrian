@@ -1,0 +1,34 @@
+{
+  "passed": true,
+  "authoredFileSha256": "f4a1cc71bfb9920026a51467d5da83c74527be8c7d82c30974f1e15a7473c2f5",
+  "sourceAlbedoRestored": true,
+  "sourceAlbedoPixelDifference": {
+    "maximum8Bit": 0,
+    "mean8Bit": 0
+  },
+  "whiteColorVertices": 60357,
+  "normalScale": 0.15000000596046448,
+  "roughness": 0.699999988079071,
+  "metallic": 0,
+  "singleSided": true,
+  "priorSkeletonAndClipsPreservedExactly": true,
+  "lipComparison": {
+    "metric": "Geometric skinned face normal versus mean-weight transported rest normal; rostral/head mask author Y < -1.75; fractional frame evaluation. Counts all authored cutaneous meshes.",
+    "priorClosed": {
+      "heavyAt035Seconds": 259,
+      "maxAcrossSamples": 259,
+      "samples": 54
+    },
+    "priorNeutralOpen": {
+      "heavyAt035Seconds": 1,
+      "maxAcrossSamples": 1,
+      "samples": 54
+    },
+    "corrected": {
+      "heavyAt035Seconds": 0,
+      "maxAcrossSamples": 0,
+      "samples": 54
+    }
+  },
+  "note": "Restore detailed original UV albedo instead of interpolated vertex-color bake; source markings remain. Cutaneous mandibular skin has separate ownership, with a smooth rear hinge blend."
+}

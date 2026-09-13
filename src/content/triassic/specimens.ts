@@ -1,14 +1,12 @@
 /**
- * Asset-only Triassic collection — the scenery and props that will ship beside the animals, in the
- * same shape the Devonian uses, so the specimen viewer can list them without knowing which era
- * they came from. Deliberately separate from the playable `EraDefinition`.
+ * Asset-only Triassic collection — procedural comparison bodies and the scenery and props that
+ * will ship beside the animals, in the same shape the Devonian uses, so the specimen viewer can
+ * list them without knowing which era they came from. Deliberately separate from the playable
+ * `EraDefinition`.
  *
- * Empty on purpose: the era has no props of its own yet. Its four organic subjects — Voltzia, the
- * coral head, the sponge mound and the log raft — have their canonical poses and modelling sheets
- * in `docs/triassic/canonical/` and are waiting on generation. When one lands, its GLB goes in
- * `public/assets/triassic/props/`, its row goes here, and the viewer's *Triassic plants & props*
- * collection stops being empty on its own. Until then the game draws the era's scenery
- * procedurally (`src/content/triassic/environment.ts`).
+ * Creature rows expose procedural twins beside their playable textured bodies for paired review.
+ * Prop rows will join them when the first generated Triassic scenery model lands. Until then the
+ * game draws the era's scenery procedurally (`src/content/triassic/environment.ts`).
  */
 import specimens from './specimens.json';
 

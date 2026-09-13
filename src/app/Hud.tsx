@@ -112,7 +112,19 @@ function SensePanel({ p }: { p: PlayerHud }) {
         <div className="bars">
           <div className="name-row"><b>{def.name}</b><span className="tier-name">{p.tierName}</span>{p.protect && <span className="protect">PROTECTED</span>}</div>
           <div className="bar hp"><i style={{ width: `${(p.hp / p.hpMax) * 100}%` }} /></div>
-          <div className={`bar stamina ${p.exhausted ? 'exhausted' : ''}`}><i style={{ width: `${(p.stamina / p.staminaMax) * 100}%` }} /></div>
+          <div className={`bar stamina ${p.exhausted ? 'exhausted' : ''}`}>
+            <i style={{ width: `${(p.stamina / p.staminaMax) * 100}%` }} />
+            {/* The era's one new rule, on the bar it is about. An air-breather's stamina does not
+                come back under water and fills at the surface, and the bar said nothing about
+                either — so the game said it in a sentence, twice, and then in a sound once a
+                second. A mark on the bar says it continuously and silently: barred while the
+                recovery is off, an arrow up once the bar is spent and the fix is the surface. */}
+            {p.era?.air && !p.era.atSurface
+              && <i className={`air-mark ${p.stamina < p.staminaMax * 0.25 ? 'urgent' : ''}`}
+                   role="img"
+                   aria-label={p.stamina < p.staminaMax * 0.25 ? 'Surface for air' : 'No stamina recovery under water'}
+                   style={{ maskImage: `url(${appBase()}${assetPaths.ui(p.stamina < p.staminaMax * 0.25 ? 'air-surface.svg' : 'air-recovery-off.svg')})` }} />}
+          </div>
         </div>
       </div>
       {p.era && <EraStatus era={p.era} alive={p.alive} />}
