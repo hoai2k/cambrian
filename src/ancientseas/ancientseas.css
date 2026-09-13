@@ -121,6 +121,8 @@ a:focus-visible { outline: 2px solid var(--as-gold); outline-offset: 6px; border
    while one that comes closer has not. `--grow` is the slot's own transform, so a piece never has
    to restate where it sits in order to change size. */
 .as-slot-animal { transition: transform .28s cubic-bezier(.2,.8,.2,1), filter .28s; }
+/* The animal is half of its game's link, so it takes the pointer that says so. */
+a.as-slot-animal { cursor: pointer; }
 .as-slot-animal.as-lit { --grow: 1.05; }
 .as-slot-animal.as-lit img { filter: brightness(1.05) drop-shadow(2px 7px 7px rgba(50, 32, 10, .32)); }
 .as-slot-animal.as-lit.as-src-stand-in img { filter: sepia(.25) contrast(.95) brightness(1.05) drop-shadow(2px 7px 7px rgba(50, 32, 10, .32)); }

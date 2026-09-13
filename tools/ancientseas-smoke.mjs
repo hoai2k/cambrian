@@ -1,5 +1,5 @@
-// Headless look at the trilogy page: both versions, desktop and phone, with the three links
-// followed. Usage: node tools/ancientseas-smoke.mjs <outdir>
+// Headless look at the trilogy page — the site root — in both versions, desktop and phone, with
+// the three game links followed. Usage: node tools/ancientseas-smoke.mjs <outdir>
 // Requires `npm run build && npx vite preview --port 4173` in another shell.
 import { chromium } from 'playwright-core';
 const S = process.argv[2] ?? '.';
@@ -15,12 +15,15 @@ for (const [name, viewport] of [['desktop', { width: 1440, height: 900 }], ['pho
     page.on('console', (m) => { if (m.type() === 'error') errors.push(m.text().slice(0, 200)); });
     page.on('pageerror', (e) => errors.push(e.message));
     page.on('response', (r) => { if (r.status() >= 400) missing.push(`${r.status()} ${r.url()}`); });
-    await page.goto(`http://localhost:4173/ancientseas/?version=${version}`, { waitUntil: 'networkidle' });
+    await page.goto(`http://localhost:4173/?version=${version}`, { waitUntil: 'networkidle' });
     await page.waitForTimeout(800);
     await page.screenshot({ path: `${S}/ancientseas-v${version}-${name}.png`, fullPage: true });
-    const links = await page.$$eval('a[href]', (as) => as.map((a) => a.getAttribute('href')));
-    const games = links.filter((h) => /^(\.\.\/|\.\.\/devonian\/|\.\.\/triassic\/)$/.test(h));
-    check(`v${version} ${name}: three game links`, games.length === 3, games.join(' '));
+    // Three games, each reachable by its title and — in version 2 — by the animal over it, which
+    // is the same link twice and so one keyboard stop rather than two.
+    const links = await page.$$eval('a[href]', (as) => as.map((a) => ({ href: a.getAttribute('href'), tab: a.tabIndex >= 0 })));
+    const games = links.filter((l) => /^\.\/(cambrian|devonian|triassic)\/$/.test(l.href ?? ''));
+    const where = [...new Set(games.map((l) => l.href))].sort();
+    check(`v${version} ${name}: the three games, once each`, where.length === 3 && games.filter((l) => l.tab).length === 3, `${where.join(' ')} · ${games.length} links, ${games.filter((l) => l.tab).length} tabbable`);
     const broken = await page.$$eval('img', (im) => im.filter((i) => !i.complete || i.naturalWidth === 0).map((i) => i.getAttribute('src')));
     check(`v${version} ${name}: every image drew`, broken.length === 0, broken.join(' '));
     check(`v${version} ${name}: nothing asked for a missing file`, missing.length === 0, missing.join(' '));
@@ -50,12 +53,15 @@ const covering = () => page.waitForFunction(() => {
   };
 }, null, { timeout: 20000 }).then((h) => h.jsonValue());
 
-for (const [href, url, title] of [['../', 'http://localhost:4173/', 'Cambrian Conquest'], ['../devonian/', 'http://localhost:4173/devonian/', 'Devonian Domination'], ['../triassic/', 'http://localhost:4173/triassic/', 'Triassic Triumph']]) {
-  await page.goto('http://localhost:4173/ancientseas/', { waitUntil: 'load' });
+for (const [href, url, title] of [['./cambrian/', 'http://localhost:4173/cambrian/', 'Cambrian Conquest'], ['./devonian/', 'http://localhost:4173/devonian/', 'Devonian Domination'], ['./triassic/', 'http://localhost:4173/triassic/', 'Triassic Triumph']]) {
+  await page.goto('http://localhost:4173/', { waitUntil: 'load' });
   await Promise.all([page.waitForURL(url, { timeout: 20000 }), page.click(`a[href="${href}"]`)]);
   check(`link ${href} opens ${title}`, (await page.title()) === title, await page.title());
   const seen = await covering().catch((e) => ({ error: String(e).slice(0, 80) }));
   check(`${title}: a screen of its own, not the sea`, !!(seen.title || seen.boot), JSON.stringify(seen));
+  // And one way off that screen that is not press start: back to the page these links came from.
+  const back = await page.$$eval('.era-switch', (as) => as.map((a) => `${a.getAttribute('href')} ${a.textContent}`));
+  check(`${title}: one link back to the trilogy`, back.length === 1 && back[0].startsWith('../') && /Ancient Seas Trilogy/.test(back[0]), back.join(' | '));
 }
 
 // The boot bar under the loading line is not checked here. Its window is bounded at both ends —
