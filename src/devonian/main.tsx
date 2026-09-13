@@ -4,6 +4,7 @@ import { selectEra } from '../content';
 import { DEVONIAN } from '../content/devonian';
 import { DEVONIAN_SAMPLES } from '../content/devonian/sfx';
 import { nestedBase, setAppBase } from '../shared/base';
+import { installStats } from '../shared/stats';
 import '../app/styles.css';
 
 /**
@@ -13,6 +14,7 @@ import '../app/styles.css';
  */
 selectEra(DEVONIAN);
 setAppBase(nestedBase());
+installStats();
 
 // Everything below is imported dynamically, after the era is chosen: a static import here would be
 // evaluated first, and the audio library and the creature tables read ACTIVE_ERA as they load.
