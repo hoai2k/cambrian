@@ -1,3 +1,16 @@
 {
-  "files": []
+  "files": [
+    "assets/ancientseas/apple-touch-icon.png",
+    "assets/ancientseas/favicon-16.png",
+    "assets/ancientseas/favicon-192.png",
+    "assets/ancientseas/favicon-32.png",
+    "assets/ancientseas/ground-parchment.webp",
+    "assets/ancientseas/ground-seabed.webp",
+    "assets/ancientseas/logo-engraved.webp",
+    "assets/ancientseas/ornament-fleuron.webp",
+    "assets/ancientseas/title-cambrian.webp",
+    "assets/ancientseas/title-devonian.webp",
+    "assets/ancientseas/title-triassic.webp",
+    "assets/ancientseas/title-trilogy.webp"
+  ]
 }
