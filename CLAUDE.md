@@ -208,8 +208,8 @@ unless the user explicitly asks for a PR. Steps:
   clears whatever was decided about the old one and sends the subject back to the undecided pile —
   unless a human has already ruled on that candidate (`reviewedCandidate`), or the reopen would
   undo the decision it was meant to prompt. A **greenlit candidate becomes the pose**: the tool
-  renames it over `<id>.png`, keeps the loser under `canonical/backups/`, and marks the prompt
-  record answered, because everything downstream reads `<id>.png` and nothing else — leaving the
+  renames it over `<id>.png`, **deletes** the loser and every other candidate for that subject, and
+  marks the prompt record answered, because everything downstream reads `<id>.png` and nothing else — leaving the
   winner beside the picture it beat would send the loser to be built. Run the tool with no
   arguments to reconcile the manifest with the tree.
 - An era's scenery pack must **name** every prop it draws with. An id it does not name falls back to

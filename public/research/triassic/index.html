@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Triassic reference viewer</title>
+<title>Reference viewer</title>
 <style>
   :root {
     --ink: #06161c; --ink-2: #0b2029; --ink-3: #103039; --line: #1d4450;
@@ -131,7 +131,7 @@
 <body>
 <header>
   <div class="bar">
-    <h1>Triassic reference viewer <small id="tally"></small></h1>
+    <h1 id="page-title">Reference viewer <small id="tally"></small></h1>
     <input type="search" id="q" placeholder="Filter by name or role…" aria-label="Filter subjects">
     <div class="seg" role="group" aria-label="Which image to show">
       <button id="m-web" aria-pressed="true">Web reference</button>
@@ -177,7 +177,12 @@
 
 <script src="data.js"></script>
 <script>
-const DATA = window.TRIASSIC, CANON = window.TRIASSIC_CANONICAL || {}, REPO = window.TRIASSIC_DECIDED || {};
+// The page is the same review for any era; `data.js` says which one it was bundled for.
+const ERA = window.REFERENCE_ERA;
+const DATA = window.REFERENCE_DATA, CANON = window.REFERENCE_CANONICAL || {}, REPO = window.REFERENCE_DECIDED || {};
+document.title = `${ERA.name} reference viewer`;
+// getElementById rather than the `$` helper below: this runs at the top of the module, before it.
+document.getElementById('page-title').firstChild.textContent = `${ERA.name} reference viewer `;
 const $ = (id) => document.getElementById(id);
 const all = DATA.groups.flatMap((g) => g.subjects.map((s) => ({ ...s, group: g.id, groupName: g.name, canon: CANON[s.id] || [] })));
 const byId = new Map(all.map((s) => [s.id, s]));
@@ -188,7 +193,7 @@ const state = { mode: 'web', groups: new Set(DATA.groups.map((g) => g.id)), q: '
  * by a *stable* reference rather than an index, so refetching the Commons set or regenerating the
  * deployed copy cannot silently move a decision onto a different picture.
  *
- * The state starts as the repository's own, bundled from docs/triassic/canonical/manifest.json,
+ * The state starts as the repository's own, bundled from the era's canonical manifest,
  * and a reload returns to it. Nothing is kept in this browser: clicks live in the tab until
  * *Export selections* takes them out, and applying that file is what makes them real. Decisions
  * used to persist in localStorage, which quietly made the page disagree with the codebase — a
@@ -329,17 +334,18 @@ $('export').addEventListener('click', () => {
   }
   const c = counts();
   const out = {
-    schema: 'triassic-canonical-selections/1',
+    schema: 'canonical-selections/1',
+    era: ERA.id,
     generated: new Date().toISOString(),
     dataGenerated: DATA.generated,
     summary: { subjects: all.length, decided: c.total, greenlit: c.green, replace: c.replace, changedHere: pending() },
-    howToApply: 'node tools/triassic/apply-selections.mjs <this file> — greenlights the approved poses in docs/triassic/canonical/manifest.json and writes the rework brief to docs/triassic/canonical/review.md',
+    howToApply: `${ERA.applyCmd} — greenlights the approved poses in ${ERA.canon}/manifest.json and writes the rework brief to ${ERA.canon}/review.md`,
     selections: rows,
   };
   const blob = new Blob([JSON.stringify(out, null, 2)], { type: 'application/json' });
   const a = document.createElement('a');
   a.href = URL.createObjectURL(blob);
-  a.download = `triassic-canonical-selections-${new Date().toISOString().slice(0, 10)}.json`;
+  a.download = `${ERA.id}-canonical-selections-${new Date().toISOString().slice(0, 10)}.json`;
   document.body.appendChild(a); a.click(); a.remove();
   setTimeout(() => URL.revokeObjectURL(a.href), 4000);
 });
@@ -424,7 +430,7 @@ function pane(side, s) {
   if (side === 'canon') {
     const c = s.canon[state.ci];
     if (!c) return `<div class="pane"><span class="lab canon">canonical</span><p class="empty">No canonical image yet. Drop one at
-      <code>docs/triassic/canonical/${s.id}.png</code> and run <code>npm run triassic:viewer</code>.</p></div>`;
+      <code>${ERA.canon}/${s.id}.png</code> and run <code>${ERA.viewerCmd}</code>.</p></div>`;
     const shot = canonShot(s, state.ci), on = chosen === shot.ref, v = verdictOf(s.id);
     const modelReference = c.kind === 'model-reference';
     return `<div class="pane"><span class="lab canon">${modelReference ? c.label : c.kind === 'turnaround' ? '3D model views' : c.kind === 'candidate' ? 'replacement candidate' : 'canonical'}${c.label !== 'canonical' && c.kind !== 'turnaround' && !modelReference ? ' · ' + c.label : ''}</span>

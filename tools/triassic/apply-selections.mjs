@@ -25,7 +25,7 @@
  * Nothing is invented here. A subject the export does not mention is left exactly as it was, so
  * the file can be applied a screenful at a time.
  */
-import { readFile, writeFile, readdir, rename, mkdir } from 'node:fs/promises';
+import { readFile, writeFile, readdir, rename, mkdir, rm } from 'node:fs/promises';
 import { existsSync } from 'node:fs';
 
 const args = process.argv.slice(2);
@@ -38,16 +38,24 @@ const file = args.find((a) => !a.startsWith('-'));
 
 const MANIFEST = 'docs/triassic/canonical/manifest.json';
 const REVIEW = 'docs/triassic/canonical/review.md';
-const SUBJECTS = 'docs/research/triassic/viewer/subjects.json';
+const SUBJECTS = 'docs/research/triassic/viewer/subjects.json';   // tools/research/eras.mjs: triassic.data
 const REFINEMENTS = 'src/content/triassic/pending-refinements.json';
 const SHIPPED = 'tools/triassic/shipped.json';
 const CANON_DIR = 'docs/triassic/canonical';
-const BACKUP = `backups/promoted-${new Date().toISOString().slice(0, 10)}`;
+
 
 const exported = file ? JSON.parse(await readFile(file, 'utf8')) : { selections: [] };
 let applied = 0;
-if (file && exported.schema !== 'triassic-canonical-selections/1') {
+// The viewer is shared between eras now, so an export says which era it came from and this
+// refuses one from another. The old single-era schema is still accepted: a file exported before
+// the split is a Triassic file by construction.
+const SCHEMAS = new Set(['canonical-selections/1', 'triassic-canonical-selections/1']);
+if (file && !SCHEMAS.has(exported.schema)) {
   console.error(`${file} is not a viewer selection export (schema: ${exported.schema ?? 'none'})`);
+  process.exit(1);
+}
+if (file && exported.era && exported.era !== 'triassic') {
+  console.error(`${file} is a ${exported.era} export; this tool applies Triassic decisions`);
   process.exit(1);
 }
 // An export with no decisions in it is not an error: it still writes an honest review.md saying
@@ -108,7 +116,7 @@ for (const row of selections) {
 
 /**
  * Promote each greenlit candidate to *be* the subject's canonical pose: the old pose is kept under
- * `backups/`, the candidate takes its place, and the prompt record that was waiting on a human
+ * deleted, the candidate takes its place, and the prompt record that was waiting on a human
  * answer records the one it got. The candidate file itself goes, because two identical images
  * under two names in the viewer is a question a reviewer should never have to answer.
  */
@@ -128,8 +136,12 @@ for (const { id, label } of promotions) {
   if (!ext) { console.warn(`  ${id}: greenlit \`${label}\` but no such image beside the pose; left as it was`); continue; }
   const from = `${CANON_DIR}/${id}-${label}.${ext}`, to = `${CANON_DIR}/${id}.${ext}`;
   if (!dryRun) {
-    await mkdir(`${CANON_DIR}/${BACKUP}`, { recursive: true });
-    if (existsSync(to)) await rename(to, `${CANON_DIR}/${BACKUP}/${id}.${ext}`);
+    // The pose it replaces is deleted rather than stashed. One greenlit image per subject is the
+    // whole point of the canonical directory, and a shelf of the ones that lost is a second answer
+    // to what the animal looks like — the failure mode this rule exists to prevent. Nothing is
+    // lost: every one of them is in git history, recoverable by the same two commands
+    // `intake/README.md` gives for a converted source.
+    if (existsSync(to)) await rm(to);
     await rename(from, to);
   }
   const entry = manifest.subjects[id];
@@ -138,17 +150,15 @@ for (const { id, label } of promotions) {
   entry.promotedFrom = label;
   promoted.push(`${id} (${label})`);
   // The candidates it beat go with the pose it replaced. They lost to the picture that is now the
-  // canon, so leaving them in the directory leaves them in the viewer, where the next reviewer has
-  // to work out which of four images of the same animal is the one being built from.
+  // canon, so leaving them anywhere leaves a second answer to what the animal looks like.
   await retireCandidates(id);
 }
-/** Move every remaining candidate of a promoted subject out of the directory the viewer reads. */
+/** Delete every remaining candidate of a promoted subject: they lost to the picture that is now
+ * the canon, and a subject keeps exactly one image once it is greenlit. Git history holds them. */
 async function retireCandidates(id) {
   if (dryRun) return;
   const rest = (await readdir(CANON_DIR).catch(() => [])).filter((f) => f.startsWith(`${id}-candidate`));
-  if (!rest.length) return;
-  await mkdir(`${CANON_DIR}/${BACKUP}`, { recursive: true });
-  for (const f of rest) await rename(`${CANON_DIR}/${f}`, `${CANON_DIR}/${BACKUP}/${f}`);
+  for (const f of rest) await rm(`${CANON_DIR}/${f}`);
 }
 // The prompt records stop asking: the candidate they were waiting on has had its answer.
 if (promoted.length || selections.length) {
