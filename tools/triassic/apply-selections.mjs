@@ -25,25 +25,27 @@
  * Nothing is invented here. A subject the export does not mention is left exactly as it was, so
  * the file can be applied a screenful at a time.
  */
-import { readFile, writeFile } from 'node:fs/promises';
+import { readFile, writeFile, readdir } from 'node:fs/promises';
 import { existsSync } from 'node:fs';
 
 const args = process.argv.slice(2);
 const dryRun = args.includes('--dry-run');
+// The file is optional. With no export the tool still runs, and reconciles the manifest with what
+// is actually on disk — which models have shipped, which poses have been regenerated and are
+// waiting to be looked at again. That reconciliation has to happen whether or not a human has
+// just been through the viewer, so it cannot be something only an export triggers.
 const file = args.find((a) => !a.startsWith('-'));
-if (!file) {
-  console.error('usage: node tools/triassic/apply-selections.mjs <selections.json> [--dry-run]');
-  process.exit(2);
-}
 
 const MANIFEST = 'docs/triassic/canonical/manifest.json';
 const REVIEW = 'docs/triassic/canonical/review.md';
 const SUBJECTS = 'docs/research/triassic/viewer/subjects.json';
 const REFINEMENTS = 'src/content/triassic/pending-refinements.json';
+const SHIPPED = 'tools/triassic/shipped.json';
+const CANON_DIR = 'docs/triassic/canonical';
 
-const exported = JSON.parse(await readFile(file, 'utf8'));
+const exported = file ? JSON.parse(await readFile(file, 'utf8')) : { selections: [] };
 let applied = 0;
-if (exported.schema !== 'triassic-canonical-selections/1') {
+if (file && exported.schema !== 'triassic-canonical-selections/1') {
   console.error(`${file} is not a viewer selection export (schema: ${exported.schema ?? 'none'})`);
   process.exit(1);
 }
@@ -92,6 +94,55 @@ for (const row of selections) {
   applied++;
 }
 
+// ---- reconciling the manifest with the tree ----
+// Two things happen to a subject without anybody opening the viewer, and both make the recorded
+// decision wrong rather than merely old. They are derived here, from the repository itself, so the
+// manifest cannot drift from what has actually been built and drawn.
+
+/**
+ * A model has shipped. The pose that was greenlit produced a body, and the roster's status for that
+ * animal is no longer "cleared to build" but **delivered** — which is what a reviewer wants to see,
+ * because the question has moved from *is this the right picture* to *is this the right animal*.
+ * Derived from the shipped list the asset tooling already maintains, so it follows a delivery
+ * rather than waiting to be typed in.
+ */
+const shipped = JSON.parse(await readFile(SHIPPED, 'utf8').catch(() => '{"creatures":[]}')).creatures ?? [];
+for (const id of shipped) {
+  const entry = manifest.subjects[id];
+  if (!entry || entry.canonical === 'delivered') continue;
+  if (entry.canonical === 'greenlit') entry.greenlitAt = entry.decidedAt;
+  entry.canonical = 'delivered';
+  entry.deliveredAt = new Date().toISOString().slice(0, 10);
+  delete entry.reworkToward; delete entry.reworkNote;
+}
+
+/**
+ * A pose has been regenerated. The prompt records beside the poses mark a fresh candidate as
+ * `candidate-awaiting-human-greenlight`, and the moment one exists the decision that asked for it
+ * is spent: the subject is neither greenlit nor still waiting on a redraw, it is waiting to be
+ * *looked at*. So the decision is cleared and the subject returns to the undecided pile, where the
+ * viewer shows the new candidate beside the pose it is meant to replace.
+ */
+const candidates = new Set();
+for (const f of (await readdir(CANON_DIR).catch(() => []))) {
+  if (!f.startsWith('prompts') || !f.endsWith('.json')) continue;
+  const j = JSON.parse(await readFile(`${CANON_DIR}/${f}`, 'utf8').catch(() => '{}'));
+  for (const [id, sub] of Object.entries(j.subjects ?? {}))
+    if (sub.status === 'candidate-awaiting-human-greenlight') candidates.add(id);
+}
+const reopened = [];
+for (const id of candidates) {
+  const entry = manifest.subjects[id];
+  // A delivered body is not reopened by a new drawing of the animal: the model is the thing under
+  // review by then, and the pose it was built from is history.
+  if (!entry || entry.canonical === 'delivered' || entry.canonical === 'approved') continue;
+  delete entry.canonical; delete entry.reworkToward; delete entry.reworkNote;
+  delete entry.decidedAt; delete entry.greenlitImage; delete entry.note;
+  entry.canonical = hasPose(id) ? 'approved' : 'none';
+  entry.awaitingReview = 'a regenerated candidate is in the viewer beside the pose it replaces';
+  reopened.push(id);
+}
+
 /**
  * The write-up is of the repository's whole state, not of this pass. Applying a three-row export
  * used to rewrite review.md from those three rows alone and silently drop the eighteen decisions
@@ -101,7 +152,7 @@ for (const row of selections) {
 const stateOf = (id) => manifest.subjects[id]?.canonical;
 const rows = (want) => [...subjects.keys()].filter((id) => stateOf(id) === want).sort()
   .map((id) => ({ id, subject: subjects.get(id), ...manifest.subjects[id] }));
-const greenlit = rows('greenlit'), rework = rows('needs-rework');
+const greenlit = rows('greenlit'), rework = rows('needs-rework'), delivered = rows('delivered');
 const undecided = [...subjects.keys()].filter((id) => !['greenlit', 'needs-rework'].includes(stateOf(id)));
 
 const esc = (v) => String(v ?? '').replace(/\|/g, '\\|').replace(/\n+/g, ' ').trim();
@@ -117,7 +168,21 @@ lines.push('generation, the skeleton and the shipped body — is made from that 
 lines.push('([04 · The Tripo pipeline](../04-tripo-pipeline.md)). A subject marked **redo** is not cleared:');
 lines.push('its pose is regenerated — steered toward a reference that beat it, or simply redrawn where the');
 lines.push('reading is accepted and only the picture is wrong — then reviewed again, and only then built.', '');
-lines.push(`| Greenlit | Redo | Not yet reviewed |`, `| --- | --- | --- |`, `| ${greenlit.length} | ${rework.length} | ${undecided.length} |`, '');
+lines.push('A subject whose model has landed reads **delivered**: the picture is settled and the body is');
+lines.push('what is under review now. A regenerated pose clears whatever was decided about the old one and');
+lines.push('sends the subject back to the undecided pile, where the viewer shows the candidate beside it.', '');
+lines.push('| Delivered | Greenlit | Redo | Not yet reviewed |', '| --- | --- | --- | --- |',
+  `| ${delivered.length} | ${greenlit.length} | ${rework.length} | ${undecided.length} |`, '');
+
+lines.push('## Delivered — the model exists', '');
+if (delivered.length) {
+  lines.push('| Subject | Slot | Built from | Landed |', '| --- | --- | --- | --- |');
+  for (const r of delivered)
+    lines.push(`| **${esc(r.subject.name)}** \`${r.id}\` | ${esc(r.subject.role)} | ${r.greenlitImage ? `\`${esc(r.greenlitImage)}\`` : 'the greenlit pose'} | ${esc(r.deliveredAt) || '—'} |`);
+  lines.push('', 'These keep their preview badge until a human approves the body itself. Where a procedural twin');
+  lines.push('shipped with the body, the specimen viewer switches between the two in place.');
+} else lines.push('No Triassic model has landed yet.');
+lines.push('');
 
 lines.push('## Greenlit — build from the canonical pose', '');
 if (greenlit.length) {
@@ -170,6 +235,13 @@ const BORROWED = 'No Triassic model has been delivered yet: this animal borrows 
   + 'Tripo model, rig and clips land through the pipeline in docs/triassic/04-tripo-pipeline.md.';
 function refinementReason(id) {
   const e = manifest.subjects[id] ?? {};
+  if (e.canonical === 'delivered')
+    return 'The Triassic model has landed and the game and the specimen viewer both load it'
+      + `${e.deliveredAt ? ` (${e.deliveredAt})` : ''}. It keeps the preview badge until a human approves the body itself: `
+      + 'the generated shape, its procedural twin and the clips they share (docs/triassic/04-tripo-pipeline.md).';
+  if (e.awaitingReview)
+    return `${BORROWED} Its canonical pose is back under review — ${e.awaitingReview} `
+      + '(docs/triassic/canonical/review.md) — so nothing downstream may be built from it yet.';
   if (e.canonical === 'greenlit')
     return `${BORROWED} Its canonical pose is greenlit${e.greenlitImage ? ` (the \`${e.greenlitImage}\` pose)` : ''} in `
       + 'docs/triassic/canonical/review.md, so the four-view modelling sheet and the Tripo generation are cleared to be made from it.';
@@ -189,7 +261,7 @@ for (const row of refinements) if (row.scope === 'initial-model') row.reason = r
 if (unknown.length) console.warn(`ignored ${unknown.length} selection(s) for unknown subjects: ${unknown.join(', ')}`);
 
 if (dryRun) {
-  console.log(`--dry-run: ${applied} decision(s) from this file would leave ${greenlit.length} greenlit, ${rework.length} to redo, ${undecided.length} unreviewed. Nothing written.`);
+  console.log(`--dry-run: would leave ${delivered.length} delivered, ${greenlit.length} greenlit, ${rework.length} to redo, ${undecided.length} unreviewed. Nothing written.`);
 } else {
   // The manifest is only rewritten when a decision actually moved something: re-serialising it for
   // a pass that changed nothing would reformat the whole file and show up as a diff that says nothing.
@@ -198,6 +270,7 @@ if (dryRun) {
   const reasonsChanged = JSON.stringify(refinements) !== refinementsBefore;
   if (reasonsChanged) await writeFile(REFINEMENTS, `${JSON.stringify(refinements, null, 2)}\n`);
   await writeFile(REVIEW, `${lines.join('\n')}`);
-  console.log(`${applied} decision(s) applied — the roster now stands at ${greenlit.length} greenlit, ${rework.length} to redo, ${undecided.length} unreviewed`);
+  console.log(`${applied} decision(s) applied${reopened.length ? `, ${reopened.length} reopened by a fresh candidate (${reopened.join(', ')})` : ''}`);
+  console.log(`  the roster now stands at ${delivered.length} delivered, ${greenlit.length} greenlit, ${rework.length} to redo, ${undecided.length} unreviewed`);
   console.log(`wrote ${REVIEW}${changed ? ` and ${MANIFEST}` : `; ${MANIFEST} unchanged`}${reasonsChanged ? ` and ${REFINEMENTS}` : ''}`);
 }

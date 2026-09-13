@@ -241,9 +241,12 @@ const isChosen = (id, shot) => sel[id]?.ref === shot.ref;
  */
 const verdictOf = (id) => sel[id]?.verdict ?? null;
 const counts = () => {
-  let green = 0, replace = 0;
-  for (const s of all) { const v = verdictOf(s.id); if (v === 'greenlit') green++; else if (v === 'replace') replace++; }
-  return { green, replace, total: green + replace };
+  let green = 0, replace = 0, built = 0;
+  for (const s of all) {
+    const v = verdictOf(s.id);
+    if (v === 'delivered') built++; else if (v === 'greenlit') green++; else if (v === 'replace') replace++;
+  }
+  return { green, replace, built, total: green + replace + built };
 };
 
 /**
@@ -275,7 +278,7 @@ function refreshCounts() {
     : 'This page matches the codebase. Exporting now re-states the decisions already applied.';
   $('tally').textContent = `${all.length} subjects · ${all.reduce((n, s) => n + s.images.length, 0)} web images · `
     + `${all.filter((s) => s.canon.some((x) => (x.kind || 'canonical') === 'canonical')).length} with a canonical image · `
-    + `${c.green} greenlit, ${c.replace} to redo`
+    + `${c.built ? `${c.built} delivered, ` : ''}${c.green} greenlit, ${c.replace} to redo`
     + (p ? ` · ${p} unsaved here` : ' · matching the codebase')
     + ` · Commons, ${DATA.generated}`;
 }
@@ -369,7 +372,7 @@ function card(s) {
   return `<button class="card${v ? ' chosen' : ''}" data-id="${s.id}">
     <div class="shot">${shot}
       <span class="tag ${l && l.canon ? 'canon' : ''}">${l && l.canon ? 'canonical' : 'web'}</span>
-      ${v ? `<span class="tag pick">${v === 'greenlit' ? '✓ greenlit' : '✎ redo'}</span>` : ''}
+      ${v ? `<span class="tag pick">${v === 'delivered' ? '★ delivered' : v === 'greenlit' ? '✓ greenlit' : '✎ redo'}</span>` : ''}
       <span class="count">${s.imagesAre ? '⚠ ' : ''}${s.images.length} web${s.canon.length ? ` · ${s.canon.length} canon` : ''}</span>
     </div>
     <div class="meta"><div class="n">${s.name}</div><div class="r">${s.role}</div><div class="l">${s.len}</div></div>
@@ -456,8 +459,9 @@ function paint() {
   // the decision
   const pick = sel[s.id], v = verdictOf(s.id);
   const shot = pick ? shots(s).find((x) => x.ref === pick.ref) : null;
-  $('d-verdict').className = `verdict ${v === 'greenlit' ? 'green' : v === 'replace' ? 'replace' : 'none'}`;
+  $('d-verdict').className = `verdict ${v === 'delivered' || v === 'greenlit' ? 'green' : v === 'replace' ? 'replace' : 'none'}`;
   $('d-verdict').textContent = !pick ? 'No choice yet — pick the image this animal should be built from.'
+    : v === 'delivered' ? '★ Delivered — the model is built. The body is what is under review now, in the specimen viewer.'
     : v === 'greenlit' ? '✓ Greenlit — our own image is the one; build from it.'
     : pick.choice === 'web' ? `✎ Redo the canonical image toward: ${shot ? shot.label : pick.ref}`
     : `✎ Redraw our own ${shot && shot.kind === 'turnaround' ? 'modelling sheet' : 'pose'} — the note is the brief.`;

@@ -42,7 +42,7 @@
   ],
   "sources": [
     "docs/triassic/canonical/shonisaurus.png",
-    "intake/triassic-tests/shonisaurus/shonisaurus.raw.glb"
+    "tools/triassic/creatures/shonisaurus/tripo-raw/shonisaurus.raw.glb"
   ],
   "notes": [
     "Pigmentation is baked from source albedo to COLOR_0; full body retains source tangent-space normal detail.",

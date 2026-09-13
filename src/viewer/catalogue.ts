@@ -54,13 +54,23 @@ export interface ViewerSpecimen {
   clipNotes?: Partial<Record<string, string>>;
   model: string;
   lod?: string;
+  /**
+   * The procedurally rebuilt twin of this body, where one exists. The pipeline builds it to the
+   * generated model's own volume on the same skeleton, and animating it is how the authored body
+   * gets its clips (docs/triassic/04-tripo-pipeline.md), so the pair only means anything when a
+   * human can see one become the other: the viewer swaps between them in place, same camera, same
+   * scale, same clip at the same frame, and any drift between the two shows up as movement.
+   */
+  puppet?: string;
+  puppetNote?: string;
   image?: string;
   displayLength: number;
   lengthMeters?: number;
   looping: readonly string[];
 }
 const DEVONIAN_KIND = new Map(DEVONIAN_CREATURES.map(c => [c.id as string, { kind: c.kind, kindNote: c.kindNote }]));
-const TRIASSIC_ROSTER = new Map(TRIASSIC_CREATURES.map(c => [c.id as string, c]));
+/** The procedural twin of each animal that has one, by the animal's id. */
+const TRIASSIC_PUPPETS = new Map(TRIASSIC_SPECIMENS.filter(c => c.category === 'creature').map(c => [c.id, c]));
 /**
  * How many Triassic animals are still wearing somebody else's body. The label says so rather than
  * letting the collection look finished, and it clears itself: `standIns` empties an entry at a
@@ -115,18 +125,20 @@ export const SPECIMENS: readonly ViewerSpecimen[] = [
     modelStatus: TRIASSIC_REFINEMENTS.modelStatus[c.id], modelNote: TRIASSIC_REFINEMENTS.modelNotes[c.id],
     clipNotes: TRIASSIC_REFINEMENTS.clipNotes[c.id],
     model: TRIASSIC_PATHS.model(c.id), lod: TRIASSIC_PATHS.model(c.id, 1), image: TRIASSIC_PATHS.portrait(c.id, 'card'), displayLength: Math.min(c.adultLength, 8),
+    puppet: TRIASSIC_PUPPETS.get(c.id)?.model, puppetNote: TRIASSIC_PUPPETS.get(c.id)?.description,
     looping: ['Idle', 'Swim', 'Crawl', 'Guard', 'Eat', ...(c.abilityLoop ? ['Ability'] : [])],
   })),
-  ...TRIASSIC_SPECIMENS.map(c => ({
-    key: `triassic:${c.category}:${c.id}`, id: c.id,
-    collection: (c.category === 'prop' ? 'triassic-props' : 'triassic') as CollectionId,
-    name: c.name, species: c.species,
-    role: c.category === 'prop' ? 'TRIASSIC · SCENERY' : 'TRIASSIC · SPECIMEN',
+  // Scenery only. A creature row in TRIASSIC_SPECIMENS is a procedural twin, and a twin is not a
+  // second animal: it is the same animal drawn the other way, so it belongs behind a switch on
+  // the roster entry it belongs to (`TRIASSIC_PUPPETS` above) rather than beside it in the list,
+  // where a reviewer would have to click away and back and lose the pose they were judging.
+  ...TRIASSIC_SPECIMENS.filter(c => c.category === 'prop').map(c => ({
+    key: `triassic:prop:${c.id}`, id: c.id, collection: 'triassic-props' as CollectionId,
+    name: c.name, species: c.species, role: 'TRIASSIC · SCENERY',
     provenance: c.provenance, description: c.description,
     modelStatus: TRIASSIC_REFINEMENTS.modelStatus[c.id] ?? c.modelStatus, modelNote: TRIASSIC_REFINEMENTS.modelNotes[c.id],
     clipNotes: TRIASSIC_REFINEMENTS.clipNotes[c.id], model: c.model, lod: c.lod, image: c.image,
-    displayLength: c.category === 'creature' ? Math.min(TRIASSIC_ROSTER.get(c.id)?.adultLength ?? c.lengthMeters, 8) : 4,
-    lengthMeters: c.lengthMeters, looping: c.looping,
+    displayLength: 4, lengthMeters: c.lengthMeters, looping: c.looping,
   })),
 ];
 export const specimenByKey = new Map(SPECIMENS.map(c => [c.key, c]));

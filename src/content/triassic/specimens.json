@@ -21,7 +21,7 @@
     "sources": [
       "docs/triassic/canonical/model-inputs/nothosaurus/input.png",
       "docs/triassic/04-tripo-pipeline.md",
-      "intake/triassic-tests/nothosaurus/metadata.json"
+      "tools/triassic/creatures/nothosaurus/tripo-raw/metadata.json"
     ],
     "notes": [
       "The procedural twin preserves the accepted generated volume but does not reuse the raw Tripo mesh's vertices or faces.",
@@ -51,7 +51,7 @@
     "sources": [
       "docs/triassic/canonical/model-inputs/shonisaurus/input.png",
       "docs/triassic/04-tripo-pipeline.md",
-      "intake/triassic-tests/shonisaurus/metadata.json"
+      "tools/triassic/creatures/shonisaurus/tripo-raw/metadata.json"
     ],
     "notes": [
       "The procedural twin preserves the accepted generated volume but does not reuse the raw Tripo mesh's vertices or faces.",
