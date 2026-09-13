@@ -46,7 +46,7 @@
     "devonian:check": "node tools/devonian/check.mjs --shipped && node tools/devonian/check-props.mjs --shipped && node tools/devonian/catalogue.mjs --check",
     "devonian:check-all": "node tools/devonian/check.mjs && node tools/devonian/check-props.mjs && node tools/devonian/catalogue.mjs --check",
     "triassic:plates": "node tools/triassic/biome-plates.mjs",
-    "triassic:brand": "node tools/triassic/placeholder-brand.mjs",
+    "triassic:brand": "node tools/art/triassic/export.mjs",
     "triassic:viewer": "node docs/research/triassic/viewer/bundle.mjs",
     "triassic": "esbuild tools/triassic-test.ts --bundle --platform=node --format=esm --outfile=node_modules/.cache/triassic-test.mjs && node node_modules/.cache/triassic-test.mjs",
     "triassic:portraits": "node tools/triassic/placeholder-portraits.mjs",
