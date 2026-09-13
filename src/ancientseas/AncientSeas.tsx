@@ -1,5 +1,6 @@
+import { useState } from 'react';
 import { nestedBase } from '../shared/base';
-import { GAMES, SLOTS, TRILOGY_LOGO, isDelivered, parseVersion, sourceFor, type Slot } from './page';
+import { ANIMAL_ERA, BIG_ANIMAL, GAMES, SLOTS, TRILOGY_LOGO, isDelivered, parseVersion, sourceFor, type EraId, type Slot } from './page';
 
 /** The page sits one level below the app root, so `assets/...` is reached the way /devonian/ reaches it. */
 const url = (path: string) => `${nestedBase()}${path}`;
@@ -20,6 +21,15 @@ function TrilogyTitle({ ground }: { ground: 'dark' | 'parchment' }) {
     </h1>
   );
 }
+
+/**
+ * Three layers. The paper covers the window whatever shape it is; the seabed spans the window's
+ * width but sits at the plate's own height, so the animals standing on it line up; everything else
+ * is placed on the plate.
+ */
+const PAPER = SLOTS.filter((s) => s.kind === 'ground' && s.fill);
+const GROUND = SLOTS.filter((s) => s.kind === 'ground' && !s.fill);
+const PIECES = SLOTS.filter((s) => s.kind !== 'ground');
 
 /** Version 1: the three paintings whole, each fading into the dark the page is made of. */
 function VersionOne() {
@@ -46,8 +56,13 @@ function VersionOne() {
   );
 }
 
-/** One piece of the version-2 composition, at its place on the stage. */
-function SlotView({ slot }: { slot: Slot }) {
+/**
+ * One piece of the version-2 composition, at its place on the stage.
+ *
+ * `active` is the game the pointer is on: its title and the animal arching over that title light
+ * together, because between them they are the link.
+ */
+function SlotView({ slot, active, onActive }: { slot: Slot; active: EraId | null; onActive: (era: EraId | null) => void }) {
   const { desktop: d, mobile: m } = slot;
   const style = (slot.fill
     ? { '--z': slot.z } as Record<string, string | number>
@@ -58,7 +73,9 @@ function SlotView({ slot }: { slot: Slot }) {
     }) as React.CSSProperties;
   const source = sourceFor(slot);
   const game = slot.game ? GAMES.find((g) => g.id === slot.game) : undefined;
-  const cls = `as-slot as-slot-${slot.kind} as-src-${source.kind}${slot.fill ? ' as-slot-fill' : ''}`;
+  const era = slot.game ?? ANIMAL_ERA[slot.id];
+  const lit = era !== undefined && era === active && (slot.kind === 'title' || BIG_ANIMAL[era] === slot.id);
+  const cls = `as-slot as-slot-${slot.kind} as-src-${source.kind}${slot.fill ? ' as-slot-fill' : ''}${lit ? ' as-lit' : ''}`;
 
   if (slot.id === 'trilogy') {
     // The trilogy title is the one slot whose stand-in is typeset rather than drawn.
@@ -73,7 +90,11 @@ function SlotView({ slot }: { slot: Slot }) {
     : <img src={url(source.src)} alt={game ? game.title : ''} width={slot.width} height={slot.height} decoding="async" />;
   if (game) {
     return (
-      <a className={cls} style={style} data-slot={slot.id} href={url(game.path)} aria-label={`${game.title} — ${game.when}`}>
+      <a
+        className={cls} style={style} data-slot={slot.id} href={url(game.path)} aria-label={`${game.title} — ${game.when}`}
+        onMouseEnter={() => onActive(game.id)} onMouseLeave={() => onActive(null)}
+        onFocus={() => onActive(game.id)} onBlur={() => onActive(null)}
+      >
         {body}
       </a>
     );
@@ -88,11 +109,23 @@ function SlotView({ slot }: { slot: Slot }) {
  * to the other.
  */
 function VersionTwo() {
+  const [active, setActive] = useState<EraId | null>(null);
   return (
     <main className="as as-v2">
       <h1 className="sr-only">Ancient Seas Trilogy</h1>
+      {/*
+        * The paper is the window, the arrangement is a 16:10 plate inside it. Keeping the two apart
+        * is what lets the parchment and the seabed run edge to edge on a screen wider than the
+        * composition without the composition stretching to match.
+        */}
+      <div className="as-paper" aria-hidden="true">
+        {PAPER.map((slot) => <SlotView key={slot.id} slot={slot} active={null} onActive={() => {}} />)}
+        <div className="as-ground">
+          {GROUND.map((slot) => <SlotView key={slot.id} slot={slot} active={null} onActive={() => {}} />)}
+        </div>
+      </div>
       <div className="as-stage" role="navigation" aria-label="The three games">
-        {SLOTS.map((slot) => <SlotView key={slot.id} slot={slot} />)}
+        {PIECES.map((slot) => <SlotView key={slot.id} slot={slot} active={active} onActive={setActive} />)}
       </div>
     </main>
   );

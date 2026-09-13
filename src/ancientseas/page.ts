@@ -195,8 +195,17 @@ export const SLOTS: readonly Slot[] = [
 ];
 
 /**
- * Which era each animal belongs to, so the test can check that an era's animals really do gather
- * under its own title rather than being strung across the plate.
+ * The one animal of each era that arches over its title — the one the page lifts when the pointer
+ * is on that game, so the link is the title and the creature above it together.
+ */
+export const BIG_ANIMAL: Readonly<Record<EraId, string>> = {
+  cambrian: 'anomalocaris', devonian: 'dunkleosteus', triassic: 'cymbospondylus',
+};
+
+/**
+ * Which era each animal belongs to, so the page can light an era's own animal with its title and
+ * the test can check that an era's animals really do gather under it rather than being strung
+ * across the plate.
  */
 export const ANIMAL_ERA: Readonly<Record<string, EraId>> = {
   anomalocaris: 'cambrian', trilobite: 'cambrian', hallucigenia: 'cambrian',
