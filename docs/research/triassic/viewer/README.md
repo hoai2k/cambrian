@@ -23,7 +23,12 @@ are hotlinked from Wikimedia Commons in both copies, so the page wants a connect
 | Playable roster | 21 | The animals of the design, in rung order, each labelled with its slot and length. |
 | Shore animals | 4 | Tanystropheus and company. Modelled and placed, never played. |
 | Alternates and reserves | 26 | Weighed and left out, each with the slot it could take. This is the swap list. |
-| Scenery, plants and the shore | 14 | What the biomes are built from, plus four locality references. |
+| Scenery, plants and the shore | 17 | What the biomes are built from, the three Tier 1 organic props, and four locality references. |
+
+Each subject shows its own images first — the canonical pose, any extra authored view, and the
+**3D views** modelling sheet once one exists (picked up from `docs/triassic/canonical/
+<id>-turnaround.png` or straight out of `intake/triassic/…` while it is still a fresh delivery) —
+then the references.
 
 ## The canonical toggle
 
@@ -42,10 +47,38 @@ scenery — read *no canonical image* and the toggle is greyed out on them until
 | --- | --- |
 | `C` | Flip between the web reference and the canonical image |
 | `B` | Side by side |
-| `←` `→` | Previous / next reference image for this subject |
-| `J` `K` | Next / previous subject, keeping the same view |
+| `←` `→` | Previous / next image on the side being shown |
+| `J` `K` | Next / previous subject, keeping the same view (or the **‹ Prev / Next ›** buttons) |
+| `Enter` | Choose the image on show as this subject's canon (again to undo) |
+| `X` | Clear this subject's choice |
 | `/` | Jump to the filter box |
 | `Esc` | Close |
+
+## Choosing, and the export
+
+The point of the comparison is a decision, so each pane carries **Use as canon**. Choosing our own
+generated pose greenlights it — the model gets built from that image. Choosing a reference says the
+pose is not right yet and names the picture the regeneration should be steered toward; the note box
+under the stage is what should change, and it travels with the decision. The four-view modelling
+sheet, where one exists, is in the running as well.
+
+Decided subjects carry a badge in the grid, and **Undecided only** hides them so a pass through 68
+subjects can be finished in sittings. Choices are kept in this browser (a research page has no
+server) against a stable reference — an authored image's label, a reference's Commons filename — so
+refetching the Commons set or regenerating the deployed copy cannot move a decision onto a
+different picture.
+
+**Export selections** downloads them as JSON, and
+
+```sh
+node tools/triassic/apply-selections.mjs <the downloaded file>   # --dry-run first, if you like
+```
+
+applies it: `docs/triassic/canonical/manifest.json` gains each subject's `greenlit` or
+`needs-rework` state, and `docs/triassic/canonical/review.md` is rewritten as the brief — what is
+cleared to build, and for each rework the image to steer by, its credit and licence, and the note.
+A subject the file does not mention is left exactly as it was, so the pass can be applied in
+pieces. Nothing leaves the browser until you press export.
 
 ## Refreshing it
 
