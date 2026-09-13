@@ -5,7 +5,10 @@ Current human decisions are authoritative in canonical/manifest.json and canonic
 ## Priority
 1. Nothosaurus giganteus and Shonisaurus popularis: canonical-derived `canonical/model-inputs/<id>/input.png` visually checked, full tail and four appendages. Nothosaurus corrected to expose far hind leg. These single images are intended for initial Tripo tests.
 2. Other 16 greenlit creatures: canonical-derived modeling sheets and dedicated single inputs delivered. Preserve large Ceratites tentacles and Helicoprion lower jaw whorl.
-3. Six candidate02 replacements await HUMAN review: Aphaneramma, Cymbospondylus, Odontochelys, Mystriosuchus, Rhaeticosaurus, Tanystropheus. Original canonicals and backups preserved. Sources/prompts/licenses in canonical/references and canonical/prompts.json. Do not generate models from replacements until greenlit.
+3. The canonical manifest is authoritative. Tanystropheus candidate05 was human-greenlit on
+   13 September and its matching input set was completed; its initial Tripo source was subsequently
+   generated and preserved. Other replacement candidates must still remain gated on their own
+   manifest state. Original canonicals and backups remain preserved with their prompts and sources.
 
 ## Tripo route
 Use API wallet, not Studio. User supplied an API key privately; never commit it. API wallet showed 715 credits before tests. Studio is a separate limited account (20 model slots, export upgrade gate). An initial Studio Nothosaurus generation consumed 55 Studio credits and exists as task `56e8fe68-7a8c-4e4b-a635-54d580243eae`, but export was blocked. No GLB was downloaded from Studio. Do not duplicate that UI attempt or purchase a subscription.

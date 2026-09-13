@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "updatedAt": "2026-09-13T16:07:26Z",
+  "updatedAt": "2026-09-13T19:49:00Z",
   "phase": "paused-complex-work-routine-tripo-only",
   "instructions": [
     "User paused on2026-09-13: finish and push all current work.",
@@ -27,7 +27,7 @@
     "walletBeforeRunVerified": 655,
     "walletAfterRunVerified": null,
     "walletArithmeticRemainder": 85,
-    "walletNote": "The API wallet was verified at 655 before the run. Each of the 19 successful task records reports 30 credits consumed. The 85 remainder is arithmetic and has not been independently rechecked in billing UI.",
+    "walletNote": "The API wallet was verified at 655 before the 19-model run. Those tasks record 570 credits and Tanystropheus records 30 more. The 55 remainder is arithmetic and has not been independently rechecked in billing UI.",
     "recovery": "Cymbospondylus reused its already-successful task after a transient artifact download failure. The completed task was refreshed and its artifact downloaded with idempotent GET requests; no second generation was submitted.",
     "staticQa": "All raw and preview hashes match sanitized metadata and audit records; each source has side, top and three-quarter Blender review renders. These are unrigged source bodies and are not shipped assets.",
     "futureComplexReview": [
@@ -57,7 +57,9 @@
       "phragmoteuthis",
       "macrocnemus",
       "coelophysis"
-    ]
+    ],
+    "walletArithmeticRemainderAfterTanystropheus": 55,
+    "walletAfterTanystropheusVerified": null
   },
   "alreadyDelivered": [
     "nothosaurus",
@@ -333,5 +335,22 @@
     "Resume complexwork onlyafter user explicitly resumes; then speciesby species pairedrig/puppet/actionQA andcommits."
   ],
   "imageBatchMainCommit": "237bf24",
-  "complexWorkPaused": true
+  "complexWorkPaused": true,
+  "additionalApprovedSources": [
+    {
+      "id": "tanystropheus",
+      "status": "generated-processed-static-source",
+      "canonical": "human-greenlit candidate05",
+      "taskId": "aa7cb744-2664-426b-9e1e-a21ff6e96ec8",
+      "creditsConsumed": 30,
+      "rawBytes": 1590656,
+      "rawSha256": "b4ca21e0cfaec7f6ed3c332cb57162658a977c49833b5c44812cbf0cb4853af2",
+      "triangles": 19588,
+      "components": 143,
+      "staticQa": "hashes, metadata, preview and side/top/three-quarter Blender renders verified",
+      "futureComplexReview": "detached thin textured island beside neck; inspect loose components, head, feet, mouth and long-neck rig",
+      "shipped": false,
+      "warningCleared": false
+    }
+  ]
 }
