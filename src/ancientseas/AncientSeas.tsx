@@ -1,9 +1,9 @@
 import { useState } from 'react';
-import { nestedBase } from '../shared/base';
+import { appBase } from '../shared/base';
 import { ANIMAL_ERA, BIG_ANIMAL, GAMES, SLOTS, TRILOGY_LOGO, isDelivered, parseVersion, sourceFor, type EraId, type Slot } from './page';
 
-/** The page sits one level below the app root, so `assets/...` is reached the way /devonian/ reaches it. */
-const url = (path: string) => `${nestedBase()}${path}`;
+/** The page is the app root, so `assets/...` and each game's folder hang directly off it. */
+const url = (path: string) => `${appBase()}${path}`;
 
 /**
  * "Ancient Seas Trilogy" until the wordmark is delivered: typeset, in the engraved lettering's
@@ -72,9 +72,16 @@ function SlotView({ slot, active, onActive }: { slot: Slot; active: EraId | null
       '--z': slot.z, aspectRatio: `${slot.width} / ${slot.height}`,
     }) as React.CSSProperties;
   const source = sourceFor(slot);
-  const game = slot.game ? GAMES.find((g) => g.id === slot.game) : undefined;
   const era = slot.game ?? ANIMAL_ERA[slot.id];
-  const lit = era !== undefined && era === active && (slot.kind === 'title' || BIG_ANIMAL[era] === slot.id);
+  /**
+   * A game's title and the animal arching over it are one link between them, so the animal is
+   * clickable too rather than being a picture next to the thing you have to hit. It is the same
+   * link twice, so the picture is taken out of the keyboard's and the screen reader's way: the
+   * title is the one that carries the game's name.
+   */
+  const partOfLink = era !== undefined && (slot.kind === 'title' || BIG_ANIMAL[era] === slot.id);
+  const game = partOfLink ? GAMES.find((g) => g.id === era) : undefined;
+  const lit = partOfLink && era === active;
   const cls = `as-slot as-slot-${slot.kind} as-src-${source.kind}${slot.fill ? ' as-slot-fill' : ''}${lit ? ' as-lit' : ''}`;
 
   if (slot.id === 'trilogy') {
@@ -87,11 +94,14 @@ function SlotView({ slot, active, onActive }: { slot: Slot; active: EraId | null
   }
   const body = source.kind === 'placeholder'
     ? (slot.kind === 'ground' ? null : <span className="as-placeholder"><i>{slot.label}</i></span>)
-    : <img src={url(source.src)} alt={game ? game.title : ''} width={slot.width} height={slot.height} decoding="async" />;
+    : <img src={url(source.src)} alt={game && slot.kind === 'title' ? game.title : ''} width={slot.width} height={slot.height} decoding="async" />;
   if (game) {
+    const isTitle = slot.kind === 'title';
     return (
       <a
-        className={cls} style={style} data-slot={slot.id} href={url(game.path)} aria-label={`${game.title} — ${game.when}`}
+        className={cls} style={style} data-slot={slot.id} href={url(game.path)}
+        aria-label={isTitle ? `${game.title} — ${game.when}` : undefined}
+        aria-hidden={isTitle ? undefined : true} tabIndex={isTitle ? undefined : -1}
         onMouseEnter={() => onActive(game.id)} onMouseLeave={() => onActive(null)}
         onFocus={() => onActive(game.id)} onBlur={() => onActive(null)}
       >

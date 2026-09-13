@@ -56,6 +56,26 @@ for(const suffix of ['','.puppet']){
   }
   assert(maxVertexTravel>.01,clip.name+' visibly moving');results.push({clip:clip.name,duration:clip.duration,samples:61,maxVertexTravel});
  }report.playback.push({suffix,results});
+ if(!suffix){
+  report.gait=[];const phaseGap=(a,b)=>Math.min(Math.abs(a-b),1-Math.abs(a-b));
+  const bones={};scene.traverse(o=>{if(o.isBone)bones[o.name]=o});const v=new THREE.Vector3();
+  for(const clipName of ['Swim','Sprint']){
+   mixer.stopAllAction();const clip=gltf.animations.find(a=>a.name===clipName);mixer.clipAction(clip).play();const rows=[];
+   for(let sample=0;sample<=120;sample++){mixer.setTime(clip.duration*sample/120);scene.updateMatrixWorld(true);const row={phase:sample/120};
+    for(const name of ['fore_paddle_L','fore_paddle_R','hind_paddle_L','hind_paddle_R','skull','chest']){bones[name].getWorldPosition(v);row[name]=v.toArray();}rows.push(row);
+   }
+   const metric=name=>{const values=rows.map(row=>row[name][2]),minimum=Math.min(...values),maximum=Math.max(...values);return {rearPhase:rows[values.indexOf(minimum)].phase,travel:maximum-minimum};};
+   const foreL=metric('fore_paddle_L'),foreR=metric('fore_paddle_R'),hindL=metric('hind_paddle_L'),hindR=metric('hind_paddle_R');
+   const lateral=name=>Math.max(...rows.map(row=>row[name][0]))-Math.min(...rows.map(row=>row[name][0]));
+   const skullLateral=lateral('skull'),chestLateral=lateral('chest'),foreRear=(foreL.rearPhase+foreR.rearPhase)/2;
+   assert(phaseGap(foreL.rearPhase,foreR.rearPhase)<=1/120,clipName+' forelimbs must row together');
+   assert(foreRear>=.64&&foreRear<=.71,clipName+' power stroke must occupy the long part of the cycle');
+   assert(phaseGap(hindL.rearPhase,foreRear)<=.12&&phaseGap(hindR.rearPhase,foreRear)<=.12,clipName+' hind limbs must trail the paired forelimb stroke');
+   assert((hindL.travel+hindR.travel)<(foreL.travel+foreR.travel)*.65,clipName+' hind stroke must remain secondary');
+   assert(skullLateral<.02&&skullLateral<Math.max(.012,chestLateral*4),clipName+' skull must hold the shoulder line');
+   report.gait.push({clip:clipName,foreL,foreR,hindL,hindR,skullLateral,chestLateral,powerFraction:foreRear,recoveryFraction:1-foreRear});
+  }
+ }
 }
 report.exactRigParity=true;report.exactAnimationParity=true;report.exactAnchorParity=true;report.normalizedWeights=true;delete report.rig;
 fs.writeFileSync('tools/triassic/creatures/nothosaurus/paired-audit.json',JSON.stringify(report,null,2)+'\n');console.log(JSON.stringify({models:report.models,clips:report.clipSignatures.length,exactRigParity:true,exactAnimationParity:true,playbackSamples:61},null,2));

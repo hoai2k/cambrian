@@ -45,7 +45,7 @@ and **M8 (polish) is complete except for two music files**:
 
 ### Debug entry points
 
-`?debug=local` on either era's page — `/?debug=local`, `/devonian/?debug=local` — opens an editor
+`?debug=local` on any game's page — `/cambrian/?debug=local`, `/devonian/?debug=local` — opens an editor
 for everything that era keeps in this browser: the biomes, landmarks and species in the codex, the
 per-creature Rise record, and the settings. Controls match how each value is actually stored, a
 number that stands for an option says what the number means, and every record has a raw-JSON

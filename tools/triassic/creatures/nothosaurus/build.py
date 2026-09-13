@@ -203,6 +203,15 @@ scene=bpy.context.scene;scene.render.fps=30;rig.animation_data_create()
 for pb in rig.pose.bones:pb.rotation_mode='XYZ'
 def reset():
  for pb in rig.pose.bones:pb.rotation_euler=(0,0,0);pb.location=(0,0,0);pb.scale=(1,1,1)
+def smooth(t):
+ t=max(0,min(1,t));return t*t*(3-2*t)
+def rowing_cycle(u):
+ # One deliberate stroke per locomotion clip. The broadside power sweep occupies
+ # 68% of the cycle; the paddle then feathers edge-on for the short recovery.
+ phase=u%1;power_end=.68
+ if phase<power_end:return -1+2*smooth(phase/power_end),0
+ recovery=smooth((phase-power_end)/(1-power_end))
+ return 1-2*recovery,sin(pi*recovery)
 seams={};bounds={}
 for clip,duration in CLIPS.items():
  a=bpy.data.actions.new(clip);a.use_fake_user=True;rig.animation_data.action=a;last=round(duration*30);first=None
@@ -221,7 +230,8 @@ for clip,duration in CLIPS.items():
   if clip=='Grab':opening=.025*e
   opening+=.12*dead
   pb['jaw'].rotation_euler.x=opening;pb['skull'].rotation_euler.x=-.05*opening
-  body=pb['body'];body.rotation_euler.y=.025*amp*wave(.3);body.location.z=.018*amp*wave(.2)
+  locomotor=clip in ['Swim','Sprint']
+  body=pb['body'];body.rotation_euler.y=(.005 if locomotor else .025)*amp*wave(.3);body.location.z=.018*amp*wave(.2)
   turn=(-1 if clip=='TurnLeft'else 1)*e if clip in ['TurnLeft','TurnRight']else 0
   body.rotation_euler.z=.22*turn;body.rotation_euler.y+=.13*turn
   if clip in ['Dive','Rise']:body.rotation_euler.x=(1 if clip=='Dive'else-1)*.22*e
@@ -236,9 +246,11 @@ for clip,duration in CLIPS.items():
   if clip=='Grab':body.location.y=.10*e;body.rotation_euler.z=.075*e*sin(p*3)
   if clip=='Growth':body.rotation_euler.x=-.045*e;body.rotation_euler.y=.04*e
   body.rotation_euler.y+=1.18*dead;body.rotation_euler.x+=.10*dead;body.location.z-=.18*dead
-  pb['chest'].rotation_euler.z=.022*amp*wave(.5)+.075*turn
+  pb['chest'].rotation_euler.z=(0 if locomotor else .022*amp*wave(.5))+.075*turn
   for j,n in enumerate(['neck_base','neck_mid','neck_tip']):
-   pb[n].rotation_euler.z=.025*amp*wave(.9+j*.4)+.04*turn
+   # Locomotion holds the skull on the shoulder line. Turns and authored actions
+   # still use the neck; only the obsolete stroke-rate walking sway is removed.
+   pb[n].rotation_euler.z=(0 if locomotor else .025*amp*wave(.9+j*.4))+.04*turn
    pb[n].rotation_euler.x=-.04*wind+.055*peak if clip in ['Attack','Heavy']else(-.055*e if clip=='Breath'else .008*wave(j*.4))
   if clip in ['Ability','Grab']:
    pb['neck_mid'].rotation_euler.z=.055*e*sin(p*(2 if clip=='Ability'else 3));pb['neck_tip'].rotation_euler.x=.04*e
@@ -248,11 +260,27 @@ for clip,duration in CLIPS.items():
    if clip=='Heavy':q.rotation_euler.z-=.07*peak
   for key,(pts,names) in LIMBS.items():
    s=1 if key.endswith('L')else-1;hind=key.startswith('hind');lag=(pi if hind else 0)+(.12 if s<0 else 0);q=pb[names[0]]
-   # Rowing power stroke + feathered recovery; fore and hind pairs alternate.
-   q.rotation_euler.z=s*(.27*amp*wave(lag,2 if clip in ['Swim','Sprint']else 1)-.12*dead)
-   q.rotation_euler.y=s*(.13*amp*wave(lag+pi/2,2 if clip in ['Swim','Sprint']else 1)+.16*dead)
-   pb[names[1]].rotation_euler.z=s*.13*amp*wave(lag+.7,2 if clip in ['Swim','Sprint']else 1)
-   pb[names[2]].rotation_euler.y=s*(.19*amp*wave(lag+1.3,2 if clip in ['Swim','Sprint']else 1)+.12*dead)
+   if locomotor:
+    sweep,feather=rowing_cycle(u)
+    if hind:
+     # Hind limbs trail the paired forelimb drive: same phase, much smaller
+     # excursion, with only enough feathering to avoid becoming rigid rudders.
+     q.rotation_euler.z=s*.12*amp*sweep
+     q.rotation_euler.y=s*.035*amp*sweep
+     pb[names[1]].rotation_euler.z=s*.05*amp*sweep
+     pb[names[2]].rotation_euler.y=s*(.035*amp*sweep+.20*feather)
+    else:
+     # The bones share axes but the limb geometry is mirrored across the body,
+     # so opposite signed rotations produce the same physical fore-aft stroke.
+     q.rotation_euler.z=s*.27*amp*sweep
+     q.rotation_euler.y=s*.055*amp*sweep
+     pb[names[1]].rotation_euler.z=s*.13*amp*sweep
+     pb[names[2]].rotation_euler.y=s*(.055*amp*sweep+.52*feather)
+   else:
+    q.rotation_euler.z=s*(.27*amp*wave(lag)-.12*dead)
+    q.rotation_euler.y=s*(.13*amp*wave(lag+pi/2)+.16*dead)
+    pb[names[1]].rotation_euler.z=s*.13*amp*wave(lag+.7)
+    pb[names[2]].rotation_euler.y=s*(.19*amp*wave(lag+1.3)+.12*dead)
    if clip=='Guard':q.rotation_euler.z-=s*.17*(1-cos(p))
    if clip=='Growth':q.rotation_euler.y-=s*.23*e
    if clip=='Dodge':q.rotation_euler.y+=s*(.28 if s==1 else-.1)*e

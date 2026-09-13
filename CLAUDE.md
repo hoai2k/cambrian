@@ -56,15 +56,20 @@ unless the user explicitly asks for a PR. Steps:
 - The renderer interpolates between fixed simulation steps using each actor's `prevT` snapshot,
   so anything that moves an actor by more than it could swim in one step (teleport, respawn)
   must read as a jump. `tools/motion-test.ts` guards this.
-- Three eras, one engine. `/` is the Cambrian; `/devonian/` (entry `src/devonian/main.tsx`) and
-  `/triassic/` (entry `src/triassic/main.tsx`) each call
-  `selectEra(DEVONIAN)` and `setAppBase(nestedBase())` *before* dynamically importing the app, because
+- Three eras, one engine, and the site root is none of them: it is the trilogy's page, with
+  `/cambrian/` (entry `src/cambrian/main.tsx`), `/devonian/` and `/triassic/` below it. Each entry
+  calls `selectEra(...)` and `setAppBase(nestedBase())` *before* dynamically importing the app, because
   many modules read `ACTIVE_ERA` at module top. Anything new that reads the era at import time must
   stay behind that import (or resolve lazily like `assetPaths` and `music()`); the entry page itself
   must not statically import the audio library or the sim for the same reason. Headless tests that
   need the Devonian do the same: select the era, then `await import(...)` (`tools/devonian-test.ts`).
-- `/ancientseas/` is the trilogy's title page (entry `src/ancientseas/main.tsx`, data in
-  `src/ancientseas/page.ts`): one plate in the three games' own engraved style, filling the window,
+- The site root is the trilogy's page (entry `src/ancientseas/main.tsx`, data in
+  `src/ancientseas/page.ts`); `/ancientseas/`, the address it was first published at, is a redirect
+  up to it in `public/`. Every game's title screen offers it, bottom left, in place of the card per
+  other era that used to sit there — three games made two of somebody else's titles on a screen
+  meant to say press start, and the page they pointed towards holds all three. The pick screen
+  keeps its own menu of the other games (`copy.sibling`/`siblings`), because mid-flow a player who
+  wants another roster is saved a screen. The page itself: one plate in the three games' own engraved style, filling the window,
   with the three titles on it as links. It is `SLOTS` — pieces placed by centre and width on a
   16:10 desktop stage and a 9:27 phone one — and the plate is built the same way three times over,
   one big animal arching above each era's title with two bottom-dwellers gathered under it, because
@@ -83,6 +88,8 @@ unless the user explicitly asks for a PR. Steps:
   `public/assets/ancientseas/`; the page only ever loads what `src/ancientseas/delivered.json`
   lists (`npm run ancientseas:delivered` regenerates it from the folder) and draws a shipped
   stand-in or a named wash for the rest, so nothing asks the network for art that has not arrived.
+  A game is its title *and* the animal arching over it: both carry the link and light together,
+  with the picture kept out of the keyboard's way so a game is one stop rather than two.
   `npm run ancientseas` checks all of it; `node tools/ancientseas-smoke.mjs <outdir>` screenshots
   the page against a preview build and follows the three links.
 - A game's title screen is drawn from the first frame, before the creatures have streamed in: it
@@ -113,6 +120,15 @@ unless the user explicitly asks for a PR. Steps:
   the beach by `src/sim/triassic/shore.ts` that telegraph and strike into the water. No playable
   Triassic animal ever leaves the water; `shoreReach` is deliberately unused there.
   `npm run triassic` guards all of it.
+- The climb for air is the era's central act and must stay usable at every size. The shared rise
+  rate is scaled by the body, but the water is not — the surface is the same twelve units above the
+  shelf whether you hatched this minute or own the sea — so an air-breather's climb has a floor
+  under it (`AIR_CLIMB_FLOOR` in `src/sim/triassic/rules.ts`), which *replaces* rather than
+  multiplies a slow body's own rate. And rise and sink are asks like any other: leaving them out of
+  the "asked for nothing" test put a body holding the climb button into its glide rate, its slowest
+  acceleration. Together those two made a hatchling take nineteen seconds to reach air from the
+  shelf floor, which reads as the button not working. `npm run triassic` holds both, and the
+  winded heartbeat to a heartbeat — it fired every second for as long as a player stayed down.
 - Every Triassic animal hatches from an egg on the sea floor, as in the other two eras. The
   live-bearers were briefly born at the surface instead — which is what the fossils say, and
   Keichousaurus and Dinocephalosaurus preserve the embryos — but it cost the series its one opening
@@ -121,7 +137,11 @@ unless the user explicitly asks for a PR. Steps:
   care viviparity implies. A reptile's egg is *leathery* (`eggShell: 'leathery'`): opaque, matte,
   dimpled, longer and narrower than the Cambrian's calcareous capsule, and set on the animal rather
   than the era, because the roster also has two sharks, two fish, an amphibian and two cephalopods
-  that lay nothing of the kind (`src/render/eggs.ts`).
+  that lay nothing of the kind (`src/render/eggs.ts`). The hatch has to be *seen*: `spawnInCover`
+  picks the spot that hides a body best, which is right for the minute after and wrong for the five
+  seconds of the shell, so the Triassic steps the egg out of the thickest cover and away from
+  anything big enough to stand in front of it (`clearTheView`), and the camera picks the side it
+  can be seen from on the frame the egg appears rather than simply sitting behind the animal.
 - Triassic art is greenlit before it is built from. Each subject has one **canonical pose** in
   `docs/triassic/canonical/`, and the four-view modelling sheet, the Tripo generation and the
   shipped body are all derived from that one image — so a body that no longer matches its pose is
@@ -214,13 +234,9 @@ unless the user explicitly asks for a PR. Steps:
   apex into the direction of travel while it beats (`bellTilt`), so re-timing that clip breaks the
   lock — which is what the bell cases in `npm run locomotion` are there to catch. Which animal has what, and how well each is actually
   attested, is `docs/research/locomotion-ideas.md`.
-- A swimmer holds its head still, and `steadyHead` makes it do so after the mixer has written the
-  pose (`src/render/steady-head.ts`): the neck gives up a share of the yaw the clip put in the
-  skull, weighted toward the base so the neck absorbs the beat instead of the head snapping to
-  centre. The yaw has to be taken about *world up carried into the parent's frame* — a neck bone's
-  own axes run along the bone, so reading the local Euler's `y` measures a twist and comes out as
-  zero. It is a patch over a clip that swings its head at the stroke rate, asked for by name because
-  a Tanystropheus' neck is meant to swing; the clip is what should be fixed.
+- Nothosaurus now holds its head still in its authored `Swim` and `Sprint` clips. The earlier
+  renderer-side `steadyHead` counter-rotation was removed when those clips were corrected; do not
+  reintroduce a runtime pose patch for motion that belongs in the reproducible Blender builder.
 - A body may shape itself to what it is on: `conformArms` bends a radial rig's arms onto the ground
   under them, or around a creature it is holding, after the mixer has written the pose
   (`src/render/conform.ts`, `npm run conform`). Presentation only, and asked for by name rather than
@@ -305,7 +321,7 @@ unless the user explicitly asks for a PR. Steps:
   `tools/sculpt-browser.mjs` drives the mode in a browser; `npm run sculpt:measure -- <glb> [sculpt.json]`
   measures a model the same way and reports how far a rebuilt candidate is from a sculpt's target,
   which is how a port is checked.
-- `?debug=local` on either page (`/?debug=local`, `/devonian/?debug=local`) opens an editor for that
+- `?debug=local` on any game page (`/cambrian/?debug=local`, `/devonian/?debug=local`) opens an editor for that
   era's saved state — `src/app/DebugLocal.tsx`, gated by `src/shared/debug.ts`, mounted by
   `src/app/Root.tsx` so both entry points get it without knowing about it. A new thing kept in
   `localStorage` should get a control there; `npm run debug` checks the gate.

@@ -8,7 +8,7 @@ page.on('console', (m) => { if (m.type() === 'error') errors.push(`[${m.type()}]
 page.on('pageerror', (e) => errors.push('[pageerror] ' + e.message + '\n' + (e.stack || '').split('\n').slice(0, 4).join('\n')));
 await page.addInitScript(() => localStorage.setItem('cambrian-settings', JSON.stringify({ quality: 'low', lookSpeed: 1, invertY: false, volume: 0.8, muted: true })));
 const shot = (name) => page.screenshot({ path: `${S}/${name}.png`, timeout: 120000 });
-await page.goto('http://localhost:4173/', { waitUntil: 'load' });
+await page.goto('http://localhost:4173/cambrian/', { waitUntil: 'load' });
 await page.waitForTimeout(9000);
 await shot('title');
 await page.keyboard.press('Enter'); await page.waitForTimeout(1200);

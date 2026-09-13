@@ -4,9 +4,9 @@ The delivered Tripo body and procedural puppet preserve the canonical model's cu
 
 | Delivery | Triangles | Packaged bytes |
 | --- | ---: | ---: |
-| `nothosaurus.glb` — authored Tripo body | 21,208 | 1,794,048 |
-| `nothosaurus.puppet.glb` — procedural twin | 9,004 | 686,620 |
-| `nothosaurus.lod1.glb` — identical puppet alias | 9,004 | 686,620 |
+| `nothosaurus.glb` — authored Tripo body | 21,208 | 1,794,664 |
+| `nothosaurus.puppet.glb` — procedural twin | 9,004 | 687,232 |
+| `nothosaurus.lod1.glb` — identical puppet alias | 9,004 | 687,232 |
 
 Files are in `public/assets/triassic/creatures/`, with matching studio, 1600 × 1200 transparent select, card and thumbnail portraits, plus metadata. Meshopt packaging preserves mesh attributes and animation sample values exactly. Textures are embedded. The model is 5 engine authoring units long, faces +Z in glTF and uses +Y up; runtime applies the species' natural size. The research registry supplies the 6 m representative length.
 
@@ -26,16 +26,22 @@ The shared rig has root, body, chest, three cervical controls, skull, jaw, seven
 
 The complete shared action set is Idle, Swim, Sprint, TurnLeft, TurnRight, Dive, Rise, Attack, Bite, Heavy, Hit, Death, Guard, Parry, Dodge, Eat, Stagger, Ability, Grab, Breath and Growth. Idle, Swim, Sprint, Guard and Eat loop exactly. Root motion and scale animation are absent.
 
-Swim coordinates alternating fore/hind rowing, feathered paddle recovery and a travelling tail wave; Sprint increases the tail/limb amplitudes and cadence. Turns bank the torso, bend the cervical chain and propagate a caudal steering curve. Attack and Heavy have anticipation, jaw opening, strike, recoil and recovery; Bite is a short gape/snap. Dodge uses an asymmetric paddle stroke and bank, whereas Hit and Stagger use distinct impact/recovery oscillations. Ability is the roster's fang-trap clamp; Grab braces and tugs with the cervical chain. Breath separately raises and lowers the head/torso for a surface cycle. Death relaxes the appendages and holds a rolled terminal pose. These clips supply body performance; world travel and capture rules remain engine-owned.
+Swim coordinates one bilateral forelimb row with a long broadside power sweep and short feathered recovery, reduced trailing hind-limb motion, a steady head and the existing travelling tail wave; Sprint increases the tail/limb amplitudes and cadence. Turns bank the torso, bend the cervical chain and propagate a caudal steering curve. Attack and Heavy have anticipation, jaw opening, strike, recoil and recovery; Bite is a short gape/snap. Dodge uses an asymmetric paddle stroke and bank, whereas Hit and Stagger use distinct impact/recovery oscillations. Ability is the roster's fang-trap clamp; Grab braces and tugs with the cervical chain. Breath separately raises and lowers the head/torso for a surface cycle. Death relaxes the appendages and holds a rolled terminal pose. These clips supply body performance; world travel and capture rules remain engine-owned.
 
 ## Verification
 
 `paired-audit.json` binds the checks to the final packaged file hashes. It asserts exact paired joint names, hierarchy, local rest transforms, inverse bind arrays, socket transforms/metadata, clip names, timing and all sample arrays. It checks normalized weights, finite attributes, unique dynamic clips, loop seams, no root/scale channels and the reduced geometry budget. The Three.js GLTFLoader/AnimationMixer then plays **61 phases of every clip for both models**, evaluating sampled actual skinned vertices. The Blender build also checks every vertex at 13 phases per clip.
 
+The gait audit additionally samples 121 phases of `Swim` and `Sprint`. Both fore paddles reach
+their rearmost position together at 0.683/0.667 of the cycle, hind travel stays secondary, and
+skull lateral travel is 0.006/0.009 units instead of the prior 0.100/0.145. This made the temporary
+runtime head correction unnecessary.
+
 Visual QA inspected the exported models through the same side, top, mouth and action cameras. The first jaw studies exposed a false lip and stretched seam; the delivered separate jaw and explicit hinge boundary correct those defects. Final sheets show seated limbs, matching swept-tail volume, articulated rowing and steering, open/closed attacks and terminal Death:
 
 - [Paired deformation sheet](paired-deformation-sheet.jpg)
 - [Remaining actions, including Sprint / Fang Trap / Grab / Breath](paired-actions-sheet.jpg)
+- [Paired rowing from above](paired-gait-sheet.jpg)
 - [Side, top and mouth comparison](paired-volume-sheet.jpg)
 
 The current portraits and action sheets are rendered from decoded packaged files after the material correction. Packing assertions establish unchanged geometry and animation values. No independent human review is invented by this automated QA record.

@@ -12,16 +12,16 @@
     ]
   },
   "nothosaurus.glb": {
-    "bytes": 1794048,
-    "sha256": "6cab5d0fb827290c4b7d668d7814ee76c545bafae01d84bb43ef4d8d2070c674"
+    "bytes": 1794664,
+    "sha256": "7d4e8774b84924d3b738a3760a9aadca81240f67bde56d939e0d5c999a612535"
   },
   "nothosaurus.json": {
     "bytes": 1759,
     "sha256": "2db4b7c668c4483f27bd1840db7fa0826bb9f04ff7013b193af895d1efac629a"
   },
   "nothosaurus.lod1.glb": {
-    "bytes": 686620,
-    "sha256": "16d0f37adaf97df2d88ce50a83ae29bc73655b725667d601b67e260714cc2c29"
+    "bytes": 687232,
+    "sha256": "72eb60e953bd2e7a2b78d89a9b842c501956a400a2765ccccc828bad2544cd6f"
   },
   "nothosaurus.png": {
     "bytes": 445696,
@@ -36,8 +36,8 @@
     ]
   },
   "nothosaurus.puppet.glb": {
-    "bytes": 686620,
-    "sha256": "16d0f37adaf97df2d88ce50a83ae29bc73655b725667d601b67e260714cc2c29"
+    "bytes": 687232,
+    "sha256": "72eb60e953bd2e7a2b78d89a9b842c501956a400a2765ccccc828bad2544cd6f"
   },
   "nothosaurus.select.png": {
     "bytes": 769587,
