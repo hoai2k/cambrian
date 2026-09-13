@@ -4,9 +4,9 @@ The delivered Tripo body and procedural puppet preserve the canonical model's cu
 
 | Delivery | Triangles | Packaged bytes |
 | --- | ---: | ---: |
-| `nothosaurus.glb` — authored Tripo body | 21,208 | 1,756,604 |
-| `nothosaurus.puppet.glb` — procedural twin | 9,004 | 686,488 |
-| `nothosaurus.lod1.glb` — identical puppet alias | 9,004 | 686,488 |
+| `nothosaurus.glb` — authored Tripo body | 21,208 | 1,794,048 |
+| `nothosaurus.puppet.glb` — procedural twin | 9,004 | 686,620 |
+| `nothosaurus.lod1.glb` — identical puppet alias | 9,004 | 686,620 |
 
 Files are in `public/assets/triassic/creatures/`, with matching studio, 1600 × 1200 transparent select, card and thumbnail portraits, plus metadata. Meshopt packaging preserves mesh attributes and animation sample values exactly. Textures are embedded. The model is 5 engine authoring units long, faces +Z in glTF and uses +Y up; runtime applies the species' natural size. The research registry supplies the 6 m representative length.
 
@@ -14,7 +14,7 @@ Files are in `public/assets/triassic/creatures/`, with matching studio, 1600 × 
 
 The preserved source is `intake/triassic-tests/nothosaurus/nothosaurus.raw.glb`, SHA-256 `5cb48becbdcbbc3863519bca8a2bb99c5129c6a0e5b1affb6252e15e01c49604`. It came from Tripo task `ea4528e3-1f9a-42f4-b0c4-2b84b879ff7c`, using `docs/triassic/canonical/model-inputs/nothosaurus/input.png` (the intake metadata records the image hash). The raw file is never changed.
 
-The twin is a procedural **volume resurfacing**, rather than a generic anatomical substitute or a decimation of the authored faces. Blender regenerates topology from a 0.007 raw-unit voxel occupancy field, relaxes that surface twice, and reduces the new topology to the puppet budget. Source vertices and faces are not reused. This preserves the asymmetric tail sweep and individual paddle silhouettes that a symmetrical ellipsoid proxy would lose. Pigment is sampled from the source onto the new surface. The authored body carries baked vertex pigment and the embedded source normal/detail material.
+The twin is a procedural **volume resurfacing**, rather than a generic anatomical substitute or a decimation of the authored faces. Blender regenerates topology from a 0.007 raw-unit voxel occupancy field, relaxes that surface twice, and reduces the new topology to the puppet budget. Source vertices and faces are not reused. This preserves the asymmetric tail sweep and individual paddle silhouettes that a symmetrical ellipsoid proxy would lose. Puppet pigment is sampled through each nearest source triangle’s interpolated UV. The authored body retains the full embedded original albedo with white vertex colors, restrained normal relief (0.15) and explicitly nonmetallic skin at roughness 0.7.
 
 Intake welds coincident texture-seam vertices and removes ten collapsed triangles; the detached-flake threshold removed no vertices. Connected foot webbing is retained. A true, separate lower-jaw shell is cut along the mouth seam and rigidly skinned to its hinge. Curved oral floor, palate and seated hinge tissue close the interior and prevent a stretched membrane across the open gape. The source's fine surface and tooth detail remains limited by the Tripo reconstruction.
 
@@ -38,7 +38,7 @@ Visual QA inspected the exported models through the same side, top, mouth and ac
 - [Remaining actions, including Sprint / Fang Trap / Grab / Breath](paired-actions-sheet.jpg)
 - [Side, top and mouth comparison](paired-volume-sheet.jpg)
 
-The action sheets were rendered from the final geometry and matching action arrays before lossless packaging, with Fang Trap/Grab/Breath rendered from decoded packaged files. Packing assertions establish the unchanged geometry and animation values. No independent human review is invented by this automated QA record.
+The current portraits and action sheets are rendered from decoded packaged files after the material correction. Packing assertions establish unchanged geometry and animation values. No independent human review is invented by this automated QA record.
 
 ## Reproduction
 
@@ -53,3 +53,18 @@ python3 tools/triassic/creatures/nothosaurus/contact-sheets.py
 ```
 
 The paired editable Blender project, decoded review GLBs, logs and individual frames live in `local/triassic-authoring/nothosaurus/`. `build.py` authors both geometry and performance and writes only this species' asset family. It does not modify shared registries or perform git operations. The macOS sandbox may block Metal initialization even for background work; the same Blender command succeeds with its normal approved desktop permissions.
+
+
+## Material investigation and correction — 13 September 2026
+
+The reported black/white crumpled appearance was reproduced under identical lights in Blender and the live viewer. The main cause was the Tripo tangent-space normal texture at full strength, amplified by its linked ORM shading. The initial conversion also discarded the 2048² original albedo in favor of sparse vertex pigment, losing fine markings and averaging color across atlas seams. Setting Principled roughness/metallic defaults had not overridden the linked texture.
+
+The corrected authored skin embeds the **exact original albedo bytes**, uses white COLOR_0 so runtime recoloring remains available without multiplying the albedo by itself, reduces normal strength from 1 to 0.15, and explicitly disconnects ORM roughness/metallic inputs before setting roughness 0.7 and metallic 0. The puppet samples the nearest triangle’s interpolated UV with bilinear texture lookup; it no longer averages unrelated seam corners or copies the nearest vertex’s color. Its reduced, texture-free material remains matte. The jaw-hinge material now sets its actual shader color and roughness, correcting the exporter’s previous default-gray fallback.
+
+[Controlled material comparison](material-comparison.jpg) shows the old processed material, corrected material, and original Tripo geometry with the same corrected material. The remaining broad grey/white painted streaks are present on the original model and its albedo; this change does not redraw them. The raw model and all its textures remain preserved.
+
+This was **not double gamma, reversed normals or a corrupted UV atlas**. Encoded source-image samples were checked against their PNG bytes, confirming exactly one sRGB-to-linear conversion for puppet colors. Source and processed geometric-normal alignment remained comparable. Of 11,542 matched original surface vertices, all but one UV matched within 1e-5; the sole larger difference was 0.000192, under 0.4 pixel at 2048², far too small to explain the broad paint streaks. New jaw-cut vertices are reported separately.
+
+`material-audit.mjs` verifies the retained source-albedo hash, white authored color attributes, material settings and original UV correspondence. Against the preserved pre-fix exports it proves **exactly unchanged positions, normals, UV arrays, skin weights, inverse bind matrices, skeletons and all 21 animation arrays** for the authored model, puppet and LOD. `material-audit.json` records this evidence against final packaged hashes. The paired playback audit was rerun, and all four portraits and three pose sheets were regenerated. An independent check of the corrected material in the live viewer confirmed the crumpled highlight artifacts were gone while all 21 clips remained available.
+
+The before-files and full-sized comparison renders are preserved under `local/triassic-authoring/nothosaurus/material-fix/`. `material-review.py` reproduces the matched-light study when its preserved `before/nothosaurus.unpacked.glb` is available. Run `node tools/triassic/creatures/nothosaurus/material-audit.mjs` to validate the delivered material; before/after equivalence checks run when the preserved baseline files are present.

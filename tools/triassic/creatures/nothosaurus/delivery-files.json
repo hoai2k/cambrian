@@ -1,7 +1,7 @@
 {
   "nothosaurus.card.png": {
-    "bytes": 210272,
-    "sha256": "ff5e3b585f39da2d7bf2ffdb491e0360a899e19678d6973e01e8a423e3efb6cc",
+    "bytes": 208352,
+    "sha256": "efa01c1f0653c7650819af281f6a726be1677d778f7512701e2cc0a59d76f551",
     "dimensions": [
       800,
       600
@@ -12,20 +12,20 @@
     ]
   },
   "nothosaurus.glb": {
-    "bytes": 1756604,
-    "sha256": "0b436d4fed21229037330be22419fcbd91eb4e6ffa9e951c6afd0cd298b529eb"
+    "bytes": 1794048,
+    "sha256": "6cab5d0fb827290c4b7d668d7814ee76c545bafae01d84bb43ef4d8d2070c674"
   },
   "nothosaurus.json": {
-    "bytes": 1627,
-    "sha256": "9ba0a27ba13ee9ef3dfd21bf961ed2d33add4de6679fa244fe5e283650d045e7"
+    "bytes": 1759,
+    "sha256": "2db4b7c668c4483f27bd1840db7fa0826bb9f04ff7013b193af895d1efac629a"
   },
   "nothosaurus.lod1.glb": {
-    "bytes": 686488,
-    "sha256": "3281dd58e5c151dea3c3c4dfffdca89bf287af1d1acee9d2b8da91cd344f85c6"
+    "bytes": 686620,
+    "sha256": "16d0f37adaf97df2d88ce50a83ae29bc73655b725667d601b67e260714cc2c29"
   },
   "nothosaurus.png": {
-    "bytes": 446843,
-    "sha256": "03f3a3a53f7eef4048daf8b7e7fd8c62ce71b3c1a46cd024272395f24d1f1785",
+    "bytes": 445696,
+    "sha256": "c8f12fc7709c1728d9b6af3a3cf7fe6db49bba653fe67308940fabb39d5f60fd",
     "dimensions": [
       1200,
       900
@@ -36,12 +36,12 @@
     ]
   },
   "nothosaurus.puppet.glb": {
-    "bytes": 686488,
-    "sha256": "3281dd58e5c151dea3c3c4dfffdca89bf287af1d1acee9d2b8da91cd344f85c6"
+    "bytes": 686620,
+    "sha256": "16d0f37adaf97df2d88ce50a83ae29bc73655b725667d601b67e260714cc2c29"
   },
   "nothosaurus.select.png": {
-    "bytes": 768478,
-    "sha256": "02a6ef55dfbba3decd5afc2cb3107beda7ed7a801a6068a5aff9408ed8d27cfa",
+    "bytes": 769587,
+    "sha256": "9b18f1723eec8fa05bb42128906a13a00718ae5d873fc53eac3e5a58ce94b70f",
     "dimensions": [
       1600,
       1200
@@ -52,8 +52,8 @@
     ]
   },
   "nothosaurus.thumb.png": {
-    "bytes": 26954,
-    "sha256": "b9e53b03cf9fd82bf6e38541bd764e010d75c51397e96c5dff1e316f2771a054",
+    "bytes": 26695,
+    "sha256": "62ec512453fc52a58a39321ee6b539a1ca72c4c1692a07c0e0a0f968844621ee",
     "dimensions": [
       256,
       192
