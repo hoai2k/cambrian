@@ -2,8 +2,8 @@
   {
     "id": "askeptosaurus",
     "model": "assets/triassic/creatures/askeptosaurus.preview.glb",
-    "bytes": 1522268,
-    "sha256": "1c4cdc6d30e97d72a65162e7bafe85bd417c310ea3c0b500cbbe8398e7ee19e6",
+    "bytes": 1516160,
+    "sha256": "92eccf60942151a8914a90d9133a64fb54359b9b5d7a9914ad6e12d3a49e9035",
     "yaw": 0,
     "scale": 6.62,
     "lengthUnits": 6.62
@@ -182,8 +182,8 @@
   {
     "id": "tanystropheus",
     "model": "assets/triassic/creatures/tanystropheus.preview.glb",
-    "bytes": 1472892,
-    "sha256": "540dd697ad385f628ee5f30f4fcc8741bad4cf3c9e131395db1f652e4aa90532",
+    "bytes": 1466260,
+    "sha256": "2eeedc87a9200d6084b1a60a52afb621bcbc2c01f67a8f2d97f9f56ee007cb11",
     "yaw": 0,
     "scale": 10.22,
     "lengthUnits": 10.22
