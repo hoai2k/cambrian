@@ -74,3 +74,54 @@ This was **not double gamma, reversed normals or a corrupted UV atlas**. Encoded
 `material-audit.mjs` verifies the retained source-albedo hash, white authored color attributes, material settings and original UV correspondence. Against the preserved pre-fix exports it proves **exactly unchanged positions, normals, UV arrays, skin weights, inverse bind matrices, skeletons and all 21 animation arrays** for the authored model, puppet and LOD. `material-audit.json` records this evidence against final packaged hashes. The paired playback audit was rerun, and all four portraits and three pose sheets were regenerated. An independent check of the corrected material in the live viewer confirmed the crumpled highlight artifacts were gone while all 21 clips remained available.
 
 The before-files and full-sized comparison renders are preserved under `local/triassic-authoring/nothosaurus/material-fix/`. `material-review.py` reproduces the matched-light study when its preserved `before/nothosaurus.unpacked.glb` is available. Run `node tools/triassic/creatures/nothosaurus/material-audit.mjs` to validate the delivered material; before/after equivalence checks run when the preserved baseline files are present.
+
+
+## The neck — 13 September 2026
+
+The research is explicit that *Nothosaurus* has a long neck (19 cervicals in *N. mirabilis*), and
+the shipped body does not. Asked where the idea of "lengthening the neck in Blender" came from, the
+answer is that it was never this animal's plan: the only procedural necks in the era's paperwork are
+**Dinocephalosaurus**, whose canonical images are generated with a short neck stub because the neck
+is built procedurally, and **Tanystropheus**, whose rig carries 13 cervical joints. No Nothosaurus
+prompt record, board or brief mentions the neck at all; its "anatomy that must read" is the
+interlocking fangs, the wing-shaped humeri and the webbed feet.
+
+**What is actually there.** Two independent landmarks in the delivered file agree on where the head
+starts — the `skull` bone's head at glTF z +1.775 and the lower-jaw mesh's first vertex at z +1.775.
+Behind it the last of the shoulder mass sits at z +1.55 (half-width 1.40, flippers out) and the
+first narrow slice at z +1.625 (half-width 0.40). So the visible neck is the run from about 1.55 to
+1.72: **0.17 of a 5.00 body, a thirtieth of the animal**, where a nothosaur skeletal puts it near a
+fifth. The rig chain's apparent 20.6% (chest → neck_base → neck_mid → neck_tip → skull) is not the
+neck; it runs diagonally up from inside the chest and most of it is under the shoulders.
+
+**The model is not at fault.** It reproduces `docs/triassic/canonical/nothosaurus.png` faithfully,
+and the pose is what draws the head almost on the shoulders. The procedural twin was built to the
+authored body's own envelopes (`nothosaurus-profile.json`), so it carries the same short neck and
+offers no way round it.
+
+**Can it be stretched after the fact?** `neck-study.py` answers that by doing it — a piecewise axial
+remap of the neck band with the head carried forward, rendered from one fixed camera so the
+silhouettes compare ([neck-study.jpg](neck-study.jpg)). It cannot:
+
+- Reaching a nothosaur's proportions means ×5 to ×7 on a band 0.17 long. There is not enough neck
+  to stretch; the factors that matter are the ones that visibly tear.
+- The UVs are not remapped, so the dorsal scale pattern stops dead at the shoulders and a blank
+  pale sock takes over. Visible at ×3, unmistakable at ×5.
+- `Seated jaw hinge tissue` spans z 1.660–1.880 and straddles the band, so half of it stretches and
+  half translates: the white wedge under the jaw at ×5 is that mesh tearing.
+- Only `neck_tip` and `skull` lie forward of the band's start, so a neck five times longer is driven
+  by one and a half bones and its front half is rigid with the skull. A long neck is a chain of
+  cervical joints; this rig has three neck bones in total, and 19 cervicals is what the animal had.
+- A stretch cannot invent cervical anatomy. It smears what is there and nothing else.
+
+So the honest route is the pipeline's own rule: a change of shape goes back to the canonical pose, a
+fresh generation and another greenlight. That is an **update to a delivered animal**, not an
+outstanding reconstruction ask — the body matches the pose it was greenlit from, which is the bar
+for carrying no caution sign.
+
+Reproduce with:
+
+```sh
+/opt/blender/blender --background --factory-startup --python tools/triassic/creatures/nothosaurus/neck-study.py \
+    -- OUTDIR DECODED.glb 1.0 3.0 5.0 7.0
+```

@@ -64,7 +64,8 @@ export function Viewer() {
    * and the clip keeps playing, which turns any difference between them into movement rather than
    * something to hold in your head across two list entries.
    */
-  const [body, setBody] = useState<'model' | 'puppet' | 'generated'>('model');
+  const [body, setBody] = useState<'model' | 'puppet' | 'generated'>(
+    () => specimenByKey.get(initial.current.key)!.generated ? 'generated' : 'model');
   const requestedId = useRef('');
   const def = specimenByKey.get(id)!;
   const showPuppet = body === 'puppet' && !!def.puppet;
@@ -95,6 +96,18 @@ export function Viewer() {
     if (body === 'puppet' && !def.puppet) setBody('model');
     if (body === 'generated' && !def.generated) setBody('model');
   }, [body, def.puppet, def.generated]);
+  // Which body a specimen *opens* on. An animal that has a generated mesh is by definition one
+  // whose own body has not shipped — the manifest retires the preview the day it does — so what
+  // `model` resolves to for it is the Devonian fish it borrows in play. Opening there made the
+  // page look like it had never been told about the generated meshes: a reviewer asking to see the
+  // Triassic body got a Devonian one and no reason to touch the Body control. So it opens on the
+  // animal's own mesh instead, and a reviewer's explicit choice holds until they change specimen.
+  const opened = useRef(id);
+  useEffect(() => {
+    if (opened.current === id) return;   // not a specimen change: leave a reviewer's own choice alone
+    opened.current = id;
+    setBody(specimenByKey.get(id)!.generated ? 'generated' : 'model');
+  }, [id]);
   // Sculpting needs a creature on stage; a prop or a load in progress has nothing to sculpt.
   // Not on the twin: a sculpt is the hand-off that goes into a builder's profile rows for the body
   // that ships, and one exported off the comparison body would name the right creature and describe

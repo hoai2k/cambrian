@@ -52,7 +52,12 @@ const data = {
     subjects: group.subjects.map((subject) => ({ ...subject, images: fetchedById.get(subject.id) ?? [] })),
   })),
 };
-const manifest = JSON.parse(await readFile(join(HERE, CANON_DIR, 'manifest.json'), 'utf8'));
+// An era earns a manifest when its first pose is decided on. Until then there are no decisions to
+// carry and the board is simply every subject, undecided — which is exactly what a new era's first
+// look should be, rather than a crash.
+const manifest = await readFile(join(ROOT, era.canon, 'manifest.json'), 'utf8')
+  .then(JSON.parse)
+  .catch(() => ({ subjects: {} }));
 
 /**
  * The decisions the repository already holds, read out of the canonical manifest and bundled
