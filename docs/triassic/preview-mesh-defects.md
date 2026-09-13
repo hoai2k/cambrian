@@ -48,18 +48,24 @@ The route is a **regeneration** (or, where the pose is also wrong, a redraw firs
 | Animal | Reported | Status |
 |---|---|---|
 | **Atopodentatus** | three fins on the underside that should not be there | welded |
-| **Rhaeticosaurus** | two extra tails either side of the real tail | welded — and see below |
+| **Rhaeticosaurus** | two extra tail blades either side of the real tail, in addition to its four correctly placed flippers | welded — and see below |
 | **Askeptosaurus** | an extra fin on the belly (separate from the flake, which is fixed) | welded |
 | **Phragmoteuthis** | an extra fin on top | welded |
 | **Birgeria** | a second dorsal fin, where the research says "single dorsal set far back" | welded |
 | **Mixosaurus** | a deeply forked lunate fluke it should not have | welded |
 | **Helicoprion** | pelvic and anal fins, against *Fadenia*'s "no pelvic fins" | welded, **and in the greenlit pose** — needs a redraw, not just a regeneration |
 
-**Rhaeticosaurus is probably one finding, not two.** `docs/triassic/proportion-audit.md` measured
-its flippers at **0.36 of a body length clear of the flank, with a span of 1.00 L** against a
-plesiosaur forelimb of about 0.25 L. Flippers that long, seen from above beside the tail, are very
-likely the "two extra tails" — in which case the fix is the proportion fix, and the pose draws them
-that long.
+**Rhaeticosaurus has two separate problems, not one.** A first pass here guessed that the "two
+extra tails" were its over-long flippers read from above. That guess was wrong, and a top-down
+render settles it: the animal has **four flippers in their proper places** — a forelimb pair and a
+hindlimb pair, spread laterally — and *then*, at the rear, **three tail blades where there should
+be one**: a central tail with a further blade either side of it. The extra pair grows from the tail
+root, not from the hips, and is nothing to do with the limbs.
+
+So both findings stand independently: the spare tails recorded here, and the flipper proportions
+recorded in `docs/triassic/proportion-audit.md` (each flipper 0.36 of a body length clear of the
+flank, span 1.00 L, against about 0.25 L for a plesiosaur forelimb). The tails are a generation
+defect; the flipper length is drawn that way in the pose, so that one needs a redraw first.
 
 ## Not defects
 
