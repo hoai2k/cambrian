@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "createdAt": "2026-09-13",
   "tool": "builtin image_gen.imagegen",
-  "purpose": "Candidate05 redraw from the fetched reviewer reference, followed by the human-approved shortened-neck Tripo input.",
+  "purpose": "Candidate05 redraw from the fetched reviewer reference, followed by the corrected human-approved full-neck Tripo input.",
   "externalInputs": [
     {
       "url": "https://clickpetroleoegas.com.br/wp-content/uploads/2026/01/Tanystropheus-hydroides.jpg",
@@ -29,5 +29,12 @@
       "visualReview": "The neck now spans most of the frame and clearly dominates the compact shore-bound body; complete head, four feet and tail are visible.",
       "reviewedAt": "2026-09-13T19:15:00.000Z"
     }
+  },
+  "modelInputCorrection": {
+    "reason": "The first model input incorrectly followed an obsolete short-neck-stub pipeline note and contradicted the approved canonical.",
+    "prompt": "Isolate the complete approved Tanystropheus on pale neutral studio gray, preserving the uninterrupted neck longer than compact torso and tail combined. Include the full neck in both the single image-to-3D input and all four turnaround views; do not use a neck stub.",
+    "inputSha256": "53927cf8b3507d983ebc2d72fd32c24f965ad9bfa12753816a2671d50c45dd3e",
+    "turnaroundSha256": "4ca4e1abb8fafe29f7d5dabd51a263b5f37b9a9489f776c16a2adec3fbb38e48",
+    "visualReview": "Both files now preserve the canonical's dominant full neck, compact body, four feet and complete tail on neutral gray."
   }
 }
