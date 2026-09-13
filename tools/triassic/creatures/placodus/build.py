@@ -16,6 +16,17 @@ RAW=os.path.join(HERE,'tripo-raw/placodus.raw.glb'); ID='placodus'; SCALE=5
 
 # 21 contract clips plus the era's four for this animal: Crawl (the bounding bottom walk),
 # Pry (the incisors levering a shell), CrushBite (the palate crush) and Breathe (settled at air).
+# How far the Crawl shove throws the body clear of the sand, in engine units on a 5.577-unit
+# animal. Bottom walking at near-neutral buoyancy is the era's signature gait and is meant to read
+# as springing rather than trudging, so this is the one number that decides whether it does.
+# 0.38 is what ships and measures 6.8% of body length. That is quieter than the era's brief asks
+# for, but raising it is not the fix on its own: at 0.90 (16%) the animal reads as floating higher
+# rather than bounding harder, because `contact` holds the body up for most of the cycle and only
+# dips at the footfall. Making this gait read as a spring means sharpening that curve -- a shorter,
+# deeper contact and a faster rise off it -- as much as raising the amplitude. Compare candidates
+# without editing the builder: PLACODUS_CRAWL_SPRING=0.9 blender ... --python build.py
+CRAWL_SPRING = float(os.environ.get('PLACODUS_CRAWL_SPRING', 0.38))
+
 CLIPS={'Idle':2.4,'Swim':1.8,'Sprint':1.2,'TurnLeft':1.6,'TurnRight':1.6,'Dive':1.4,'Rise':1.4,
  'Attack':1.,'Bite':.5,'Heavy':1.1,'Hit':.6,'Death':1.6,'Guard':1.,'Parry':.4,'Dodge':.5,'Eat':1.6,
  'Stagger':1.2,'Ability':.9,'Grab':1.2,'Breath':2.4,'Growth':1.5,
@@ -471,7 +482,7 @@ for clip,duration in CLIPS.items():
    # the animal springs, floats most of the cycle, then reaches down for the next contact.
    fore_push=pulse(.10,9);hind_push=pulse(.23,9);fore_reach=pulse(.70,3.5);hind_reach=pulse(.83,3.5)
    contact=pulse(.02,3.2)
-   body.location.z=.38*(1-contact)              # engine units: a 7%-of-length spring off the floor
+   body.location.z=CRAWL_SPRING*(1-contact)     # how far the shove throws it clear of the sand
    body.rotation_euler.x=-.115*hind_push-.05*fore_push+.075*fore_reach
    body.rotation_euler.z=.035*sin(p+.4);body.rotation_euler.y=.05*sin(p*2+.9)
    pb['chest'].rotation_euler.x=-.05*hind_push+.04*fore_reach
