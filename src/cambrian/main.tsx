@@ -3,6 +3,7 @@ import { createRoot } from 'react-dom/client';
 import { selectEra } from '../content';
 import { CAMBRIAN } from '../content/cambrian';
 import { nestedBase, setAppBase } from '../shared/base';
+import { installStats } from '../shared/stats';
 import '../app/styles.css';
 
 /**
@@ -14,6 +15,7 @@ import '../app/styles.css';
  */
 selectEra(CAMBRIAN);
 setAppBase(nestedBase());
+installStats();
 
 // Imported after the era and the base are set, for the reason src/devonian/main.tsx gives: a
 // static import here would be evaluated first, and the audio library and the creature tables read

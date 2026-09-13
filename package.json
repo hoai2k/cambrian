@@ -35,6 +35,7 @@
     "sculpt": "esbuild tools/sculpt-test.ts --bundle --platform=node --format=esm --outfile=node_modules/.cache/sculpt-test.mjs && node node_modules/.cache/sculpt-test.mjs",
     "sculpt:measure": "esbuild tools/sculpt-measure.ts --bundle --platform=node --format=esm --packages=external --outfile=node_modules/.cache/sculpt-measure.mjs && node node_modules/.cache/sculpt-measure.mjs",
     "spatial": "esbuild tools/spatial-test.ts --bundle --platform=node --format=esm --outfile=node_modules/.cache/spatial-test.mjs && node node_modules/.cache/spatial-test.mjs",
+    "stats": "esbuild tools/stats-test.ts --bundle --platform=node --format=esm --outfile=node_modules/.cache/stats-test.mjs && node node_modules/.cache/stats-test.mjs",
     "debug": "esbuild tools/debug-test.ts --bundle --platform=node --format=esm --outfile=node_modules/.cache/debug-test.mjs && node node_modules/.cache/debug-test.mjs",
     "eras": "node tools/era-test.mjs && node tools/cambrian/sizes.mjs --check",
     "merge": "node --experimental-transform-types tools/merge-test.mjs",
