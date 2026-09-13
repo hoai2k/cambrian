@@ -497,3 +497,23 @@ console errors. Outstanding: Coccosteus (blocked on the user's Mac candidate07 G
 `STALE <id>: lod1 older than the model` warnings from `npm run check` are mtime artefacts of
 checkout order, non-fatal. Judge sheets for the user are in the session scratchpad
 `ports/{gemuendina,titanichthys,dunkleosteus}-*-sheet.png` and `dory/doryaspis-v2-vs-v3-sheet.png`.
+
+## 13 September — Coccosteus shipped; the Devonian rework queue is empty
+
+The user delivered candidate07 itself to `intake/coccosteus-candidate07/` (it had arrived on
+`origin/main` in a commit newer than this branch's copy, which is why a first look found nothing).
+Hashes matched the accepted SHAs and all 28 manifest entries verified, so the frozen recipe never
+had to be replayed — `rework-v3/RESUME-CANDIDATE07-BLOCKED.md` carries a resolution note saying so.
+Both outstanding gates passed against those exact exports, the model shipped (`e8bf266`), the badge
+is cleared and the intake sources were deleted in the same commit.
+
+The catch worth remembering: candidate07 is a **new rig** (20 bones, two-bone paired fins, a
+six-stage tail, no gill or throat bones), so `performances/coccosteus.mjs` had to be rewritten
+before Grab would apply. Any future whole-model delivery should be diffed for bone names the same
+way. Also: run `update-asset-sizes.mjs` *after* `apply.mjs`, not before — integrate.sh runs it
+first, and Grab changes the byte count, which fails `npm run devonian`'s pack check.
+
+No creature in either era now carries `model: true`. Remaining Devonian art is polish only
+(Bothriolepis nuchal/rostral shading, the Odaraia production chain) and two Coccosteus art notes:
+Idle and Guard read as nearly static at game distance, and Ability does not read as distinct from
+the bite family.
