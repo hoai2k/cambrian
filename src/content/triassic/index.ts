@@ -56,8 +56,8 @@ const authoredCreatures = Object.fromEntries(TRIASSIC_CREATURES.map((c) => {
   return [c.id, scheme?.colors ?? ({ body: c.color, eyes: '#101010', fins: c.accent, legs: c.color, accent: c.accent, underside: c.color } as Record<Slot, string>)];
 }));
 
-const CAMBRIAN_LINK = { title: 'Cambrian Conquest', path: 'cambrian/', blurb: '268 million years earlier', logo: 'assets/brand/logo-engraved.webp' };
-const DEVONIAN_LINK = { title: 'Devonian Domination', path: 'devonian/', blurb: '135 million years earlier', logo: 'assets/devonian/brand/logo-engraved.webp' };
+const CAMBRIAN_LINK = { title: 'Cambrian Conquest', path: 'cambrian/', blurb: '268 million years earlier', logo: 'assets/brand/logo-header.webp' };
+const DEVONIAN_LINK = { title: 'Devonian Domination', path: 'devonian/', blurb: '135 million years earlier', logo: 'assets/devonian/brand/logo-header.webp' };
 
 export const TRIASSIC = defineEra({
   id: 'triassic',

@@ -1,6 +1,7 @@
-import { useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { appBase } from '../shared/base';
 import { ANIMAL_ERA, BIG_ANIMAL, GAMES, SLOTS, TRILOGY_LOGO, isDelivered, parseVersion, sourceFor, type EraId, type Slot } from './page';
+import { poll, step, type Dir } from './picker';
 
 /** The page is the app root, so `assets/...` and each game's folder hang directly off it. */
 const url = (path: string) => `${appBase()}${path}`;
@@ -118,8 +119,72 @@ function SlotView({ slot, active, onActive }: { slot: Slot; active: EraId | null
  * switch under it. `?version=1` still reaches the earlier draft, but neither version offers a link
  * to the other.
  */
+/**
+ * A pad steers the same choice the pointer does.
+ *
+ * Polling only starts when a pad is actually there, and stops when the last one goes: this page is
+ * three pictures and two links, and a frame loop running on it forever to watch buttons nobody is
+ * pressing would be the busiest thing about it. `chosen` is what is lit; `open` is called with the
+ * game to go to.
+ */
+function usePad(chosen: EraId | null, onMove: (era: EraId) => void, onOpen: () => void) {
+  const state = useRef({ chosen, onMove, onOpen });
+  state.current = { chosen, onMove, onOpen };
+  const [pads, setPads] = useState(() => (typeof navigator === 'undefined' ? 0 : (navigator.getGamepads?.() ?? []).filter(Boolean).length));
+  useEffect(() => {
+    const count = () => setPads((navigator.getGamepads?.() ?? []).filter(Boolean).length);
+    addEventListener('gamepadconnected', count);
+    addEventListener('gamepaddisconnected', count);
+    return () => { removeEventListener('gamepadconnected', count); removeEventListener('gamepaddisconnected', count); };
+  }, []);
+  useEffect(() => {
+    if (pads === 0) return;
+    const held = new Map<number, { dir: Dir | null; confirm: boolean }>();
+    let raf = 0;
+    const frame = () => {
+      const { dir, confirm } = poll(held);
+      const { chosen: at, onMove: move, onOpen: open } = state.current;
+      if (dir) move(step(at, dir, GAMES.map((g) => g.id)));
+      // Nothing chosen yet and a button pressed: take the first game rather than doing nothing.
+      else if (confirm) { if (at === null) move(GAMES[0].id); else open(); }
+      raf = requestAnimationFrame(frame);
+    };
+    raf = requestAnimationFrame(frame);
+    return () => cancelAnimationFrame(raf);
+  }, [pads]);
+}
+
 function VersionTwo() {
   const [active, setActive] = useState<EraId | null>(null);
+  const go = useCallback((era: EraId) => {
+    const game = GAMES.find((g) => g.id === era);
+    if (game) location.href = url(game.path);
+  }, []);
+  usePad(active, setActive, () => active && go(active));
+  /**
+   * On a phone the plate is taller than the screen, so a choice made without a pointer has to be
+   * brought into view — a pad that lights a game three screens down has not shown the player
+   * anything. A choice made *with* a pointer is under the pointer already, so this never fires.
+   */
+  useEffect(() => {
+    if (!active) return;
+    const el = document.querySelector(`a[data-slot="${active}"]`);
+    const box = el?.getBoundingClientRect();
+    if (box && (box.top < 0 || box.bottom > innerHeight)) el?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }, [active]);
+  // The arrow keys answer too, for a keyboard that has not reached for Tab: same choice, same
+  // lighting, Enter to take it.
+  useEffect(() => {
+    const key = (e: KeyboardEvent) => {
+      if (e.metaKey || e.ctrlKey || e.altKey) return;
+      const dir: Dir | null = e.key === 'ArrowRight' || e.key === 'ArrowDown' ? 'right'
+        : e.key === 'ArrowLeft' || e.key === 'ArrowUp' ? 'left' : null;
+      if (dir) { e.preventDefault(); setActive((at) => step(at, dir, GAMES.map((g) => g.id))); return; }
+      if ((e.key === 'Enter' || e.key === ' ') && active && !(e.target as HTMLElement | null)?.closest?.('a')) { e.preventDefault(); go(active); }
+    };
+    addEventListener('keydown', key);
+    return () => removeEventListener('keydown', key);
+  }, [active, go]);
   return (
     <main className="as as-v2">
       <h1 className="sr-only">Ancient Seas Trilogy</h1>

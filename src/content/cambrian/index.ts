@@ -13,7 +13,7 @@ import portraits from '../../../public/assets/creatures/schemes/manifest.json';
 export const CAMBRIAN = defineEra({
   id: 'cambrian',
   title: 'Cambrian Conquest',
-  copy: { tagline: 'Eat. Grow. Fight. Run.', taglineEm: '508 million years ago, everything was hungry.', loading: 'WAKING THE REEF…', lose: 'THE REEF WINS', settingsKey: 'cambrian-settings', trilogy: { title: 'Ancient Seas Trilogy', path: '', blurb: 'All three games' }, sibling: { title: 'Devonian Domination', path: 'devonian/', blurb: '133 million years later', logo: 'assets/devonian/brand/logo-engraved.webp' }, siblings: [{ title: 'Triassic Triumph', path: 'triassic/', blurb: '268 million years later', logo: 'assets/triassic/brand/logo-engraved.webp' }] },
+  copy: { tagline: 'Eat. Grow. Fight. Run.', taglineEm: '508 million years ago, everything was hungry.', loading: 'WAKING THE REEF…', lose: 'THE REEF WINS', settingsKey: 'cambrian-settings', trilogy: { title: 'Ancient Seas Trilogy', path: '', blurb: 'All three games' }, sibling: { title: 'Devonian Domination', path: 'devonian/', blurb: '133 million years later', logo: 'assets/devonian/brand/logo-header.webp' }, siblings: [{ title: 'Triassic Triumph', path: 'triassic/', blurb: '268 million years later', logo: 'assets/triassic/brand/logo-header.webp' }] },
   modes: [
     { id: 'rise', name: 'Rise', blurb: 'Hatch as a larva. Eat, grow, fight, hide. Reach Apex and hold it for ninety seconds. Share the feast with the others, or eat them.', players: '1–4' },
     { id: 'hunted', name: 'Hunter & Hunted', blurb: 'Everyone takes a turn as the giant. On yours, catch as many of the small ones as you can; on theirs, hide, bait and grow out of reach. Most caught wins.', players: '2–4 asymmetric' },
@@ -34,7 +34,9 @@ export const CAMBRIAN = defineEra({
   assets: {
     creatures: 'assets/creatures/', defaultPortraits: 'assets/creatures/defaults/',
     props: 'assets/props/', biomes: 'assets/biomes/', ui: 'assets/ui/', sfx: 'assets/sfx/', music: 'music/',
-    logo: 'assets/brand/logo-engraved.webp', illustration: 'assets/brand/logo-illustrated.webp',
+    // `npm run logos` derives the interface wordmark from the delivered engraved mark, so the
+    // three games' marks carry the same lightness and weight at the size the pick screen uses.
+    logo: 'assets/brand/logo-header.webp', illustration: 'assets/brand/logo-illustrated.webp',
     emblem: 'assets/brand/emblem.webp', modelBytes, modelStatus: CAMBRIAN_MODEL_STATUS, modelNotes: CAMBRIAN_MODEL_NOTES, clipNotes: CAMBRIAN_CLIP_NOTES,
   },
   audio: { music: MUSIC, loops: { ambient: 'ambient-reef', drone: 'giant-drone' } },

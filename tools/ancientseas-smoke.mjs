@@ -64,6 +64,46 @@ for (const [href, url, title] of [['./cambrian/', 'http://localhost:4173/cambria
   check(`${title}: one link back to the trilogy`, back.length === 1 && back[0].startsWith('../') && /Ancient Seas Trilogy/.test(back[0]), back.join(' | '));
 }
 
+// A controller walks the three games and opens one. Playwright cannot plug a pad in, so the page
+// is given one to read: the same object shape `navigator.getGamepads()` returns, driven by hand.
+{
+  // Its own browser, without the software renderer the game pages need: under swiftshader this
+  // page — which draws no WebGL at all — gets almost no animation frames, and the pad is read on
+  // the frame clock. Nothing about the page differs; only how often it is allowed to look.
+  const plain = await chromium.launch({ executablePath: '/opt/pw-browsers/chromium', args: ['--no-sandbox'] });
+  const ctx = await plain.newContext({ viewport: { width: 1440, height: 900 } });
+  await ctx.addInitScript(() => {
+    const pad = { index: 0, id: 'Smoke Pad (STANDARD GAMEPAD)', connected: true, mapping: 'standard',
+      axes: [0, 0, 0, 0], buttons: Array.from({ length: 17 }, () => ({ pressed: false, touched: false, value: 0 })) };
+    window.__pad = pad;
+    navigator.getGamepads = () => [pad, null, null, null];
+  });
+  const page = await ctx.newPage();
+  await page.goto('http://localhost:4173/', { waitUntil: 'networkidle' });
+  await page.evaluate(() => dispatchEvent(new Event('gamepadconnected')));
+  const lit = () => page.$$eval('.as-lit', (n) => n.map((e) => e.getAttribute('data-slot')).join(' '));
+  /** Hold the button for a few frames, let go, and give the page a moment to answer. */
+  const press = async (button) => {
+    await page.evaluate((b) => { window.__pad.buttons[b].pressed = true; window.__pad.buttons[b].value = 1; }, button);
+    await page.waitForTimeout(150);
+    await page.evaluate((b) => { window.__pad.buttons[b].pressed = false; window.__pad.buttons[b].value = 0; }, button);
+    await page.waitForTimeout(250);
+  };
+  const after = async (button, want) => {
+    await press(button);
+    for (let i = 0; i < 10 && (await lit()) !== want; i++) await page.waitForTimeout(100);
+    return lit();
+  };
+  check('a pad lights nothing until it is used', (await lit()) === '');
+  check('d-pad right takes the first game', (await after(15, 'cambrian anomalocaris')) === 'cambrian anomalocaris', await lit());
+  check('and walks along the plate', (await after(15, 'devonian dunkleosteus')) === 'devonian dunkleosteus', await lit());
+  check('and back', (await after(14, 'cambrian anomalocaris')) === 'cambrian anomalocaris', await lit());
+  await press(0); // A
+  const opened = await page.waitForURL('**/cambrian/', { timeout: 10000 }).then(() => true).catch(() => false);
+  check('A opens what is lit', opened, page.url());
+  await ctx.close(); await plain.close();
+}
+
 // The boot bar under the loading line is not checked here. Its window is bounded at both ends —
 // it opens 700 ms after the app mounts and closes when the engine gives up waiting for the first
 // card, 4 s after it starts — and on this machine, with the sea running on a software renderer,
