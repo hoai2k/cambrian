@@ -1992,8 +1992,8 @@
     "file": "pikaia.glb",
     "source": "tools/creatures/soft/anchors.json",
     "newSpecimen": true,
-    "updatedSHA256": "d8680d9842f11d370c80124e372883888126848878efe79bd8ca353138265d73",
-    "bytes": 1487644,
+    "updatedSHA256": "070d8e6b2b6b640c0a36d076a622ef26fa224a15340f328431c1259d09fd5076",
+    "bytes": 1510736,
     "changedClips": [],
     "anchors": [
       {
@@ -2308,8 +2308,8 @@
     "file": "odontogriphus.glb",
     "source": "tools/creatures/soft/anchors.json",
     "newSpecimen": true,
-    "updatedSHA256": "d8b773d65c0a817d23ee5fbd27184ac0cf9fb26540ca4031d9873bd9f36fb1ef",
-    "bytes": 3060960,
+    "updatedSHA256": "79ef61740aeea1a005b8a2be9d3104e144b7ba55bcac5be167d6a4df27ff2185",
+    "bytes": 3138532,
     "changedClips": [],
     "anchors": [
       {
@@ -2364,8 +2364,8 @@
     "file": "vetulicola.glb",
     "source": "tools/creatures/soft/anchors.json",
     "newSpecimen": true,
-    "updatedSHA256": "7ec986872f47b3599c497bcb0e6a30daca1b9654575ed7a33873c70b817f7f5c",
-    "bytes": 1533316,
+    "updatedSHA256": "4fcef3d0793457d89e7ea0dee9773e35c2adc59a932ed3fd41e7721b5afa0f4e",
+    "bytes": 1541708,
     "changedClips": [],
     "anchors": [
       {
@@ -2856,8 +2856,8 @@
     "file": "sidneyia.glb",
     "source": "tools/creatures/arthropods/anchors.json",
     "newSpecimen": true,
-    "updatedSHA256": "c1d72561d330cf1f9bd88445efbd7b56884040ea850130c4ef477def74a70559",
-    "bytes": 7113312,
+    "updatedSHA256": "e97bfd93fd5aef071533f2a3acece34f2962d6daa6a3e75f65518bf5f37f4cca",
+    "bytes": 7181676,
     "changedClips": [],
     "anchors": [
       {
@@ -3384,8 +3384,8 @@
     "file": "burgessomedusa.glb",
     "source": "tools/creatures/jellies/anchors.json",
     "newSpecimen": true,
-    "updatedSHA256": "1621356dd7d1da8811a21f6224aa12150e650be8a0e1cdca9a671b953593ea51",
-    "bytes": 4073480,
+    "updatedSHA256": "ca730d9eab14b9a33b9631a2abe45b243e5302124f3ab151408e8db6348ef1a9",
+    "bytes": 4154568,
     "changedClips": [],
     "anchors": [
       {
@@ -4676,8 +4676,8 @@
     "file": "ctenorhabdotus.glb",
     "source": "tools/creatures/jellies/anchors.json",
     "newSpecimen": true,
-    "updatedSHA256": "53dc1eff94165e36b7d163b7748a2e701581c76ac571c403a6ab53101f43b3e8",
-    "bytes": 1904616,
+    "updatedSHA256": "6038dea00fd63b5328dea527eb067372347c301d35588c96c5d0b25dd52b70d9",
+    "bytes": 1932840,
     "changedClips": [],
     "anchors": [
       {

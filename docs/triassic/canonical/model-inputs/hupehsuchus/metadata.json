@@ -1,0 +1,16 @@
+{
+  "schemaVersion": 1,
+  "canonicalStatus": "greenlit",
+  "canonical": "canonical.png",
+  "canonicalSource": "../../hupehsuchus.png",
+  "canonicalSha256": "416007044dbf7079600bbc65148ea493a9e1c13c95864f69b6a2c0ab18ed99f1",
+  "input": "input.png",
+  "inputSha256": "0916866db9bb33889731c9642634b61458a30e230c2b837f8436a30f2270c03d",
+  "turnaround": "turnaround.png",
+  "turnaroundSha256": "9af8c0e5f349fb2f507a52c86ee63daf133d47c37fe7a29cac0f39a929c0b42e",
+  "generator": "builtin imagegen",
+  "subjectSpec": "Hupehsuchus nanchangensis, long narrow armored marine reptile with small pointed head, rigid segmented dorsal armor, four compact paddle limbs, and very long tapering tail",
+  "inputPrompt": "Create ONE full-body subject derived strictly from the supplied approved canonical. Preserve canonical anatomy, proportions, head, appendage count and placement, silhouette, coloration, markings, and texture exactly; no redesign. Single clean three-quarter front view from slightly above in a straight neutral symmetric extended pose, with paired appendages separated and the entire subject fully framed on flat pale neutral studio gray. No water, scenery, text, labels, borders, cropping, or extra animals.",
+  "turnaroundPrompt": "Derive a clean four-view orthographic modeling sheet from the supplied approved canonical, which is the sole visual authority. Preserve exact anatomy, proportions, appendage count and placement, silhouette, coloration, markings, and texture. Use a pale neutral studio gray background and a 2x2 grid containing strict left profile, dorsal/top, frontal, and three-quarter front views; keep the entire subject and every extremity fully framed. No labels, text, scenery, or extra animals.",
+  "review": "Single input is complete and exposes the armor and four paddles. Turnaround is qualitative; canonical.png remains the authority for exact armor segmentation."
+}

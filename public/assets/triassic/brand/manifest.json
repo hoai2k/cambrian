@@ -1,0 +1,140 @@
+{
+  "era": "triassic",
+  "title": "Triassic Triumph",
+  "status": "ready; Devonian-style engraved title, wordmark and full-body four-flipper plesiosaur emblem",
+  "provenance": "docs/triassic-brand-assets.md",
+  "assets": [
+    {
+      "path": "assets/triassic/brand/title.webp",
+      "width": 1536,
+      "height": 1024,
+      "bytes": 565340,
+      "sha256": "4c08b44c92a57ed9ea78cf15e124d36a364941ed1b5615294b5ba6c620c1f22e"
+    },
+    {
+      "path": "assets/triassic/brand/title.svg",
+      "width": 1536,
+      "height": 1024,
+      "bytes": 753966,
+      "sha256": "32814696be4cbcd58471724454adf668d4b407d2540fadcc0f7522ea52b49364"
+    },
+    {
+      "path": "assets/triassic/brand/title-mobile.webp",
+      "width": 941,
+      "height": 1672,
+      "bytes": 637196,
+      "sha256": "a7c76ef68c911d5dd54014adf3d653f7c86531638eb70756a07afee6ca3fe884"
+    },
+    {
+      "path": "assets/triassic/brand/title-mobile.svg",
+      "width": 941,
+      "height": 1672,
+      "bytes": 849772,
+      "sha256": "b7bc796f861c64df579854628e9d9143f1d642a1f35270bebe3c8895581098ee"
+    },
+    {
+      "path": "assets/triassic/brand/logo-engraved.webp",
+      "width": 1536,
+      "height": 640,
+      "bytes": 301462,
+      "sha256": "745fe4fa4ff3e4496a2dac7690f334f52d535b277b8427033b91facaed911b45"
+    },
+    {
+      "path": "assets/triassic/brand/logo-triassic.png",
+      "width": 1536,
+      "height": 640,
+      "bytes": 1037429,
+      "sha256": "d49584f71572910d4e45633bc5c4cc51f68ce460611c00ede62c04e8bdcdfa91"
+    },
+    {
+      "path": "assets/triassic/brand/logo-triassic.svg",
+      "width": 1536,
+      "height": 640,
+      "bytes": 1383415,
+      "sha256": "8edd945c400392937a99be98673f5ce24872ec19245d663bf07c74f40072cdbf"
+    },
+    {
+      "path": "assets/triassic/brand/logo-triassic-compact.png",
+      "width": 720,
+      "height": 300,
+      "bytes": 249984,
+      "sha256": "094bfdb9348c0c336cc76ee60ca6de469926eb41981863b7cb744c3e5c0ee5e2"
+    },
+    {
+      "path": "assets/triassic/brand/logo-triassic-compact.svg",
+      "width": 720,
+      "height": 300,
+      "bytes": 333485,
+      "sha256": "1a651247007fbf72ecf031464e774fded849fd3eef7e80262b8a11472843a9db"
+    },
+    {
+      "path": "assets/triassic/brand/logo.png",
+      "width": 1536,
+      "height": 640,
+      "bytes": 1037429,
+      "sha256": "d49584f71572910d4e45633bc5c4cc51f68ce460611c00ede62c04e8bdcdfa91"
+    },
+    {
+      "path": "assets/triassic/brand/logo.svg",
+      "width": 1536,
+      "height": 640,
+      "bytes": 1383415,
+      "sha256": "8edd945c400392937a99be98673f5ce24872ec19245d663bf07c74f40072cdbf"
+    },
+    {
+      "path": "assets/triassic/brand/emblem.webp",
+      "width": 512,
+      "height": 512,
+      "bytes": 70270,
+      "sha256": "ab6faf816621c7afbab69d0c74b6f20eb61db8be7a30814a32c2002d137d9cba"
+    },
+    {
+      "path": "assets/triassic/brand/favicon-16.png",
+      "width": 16,
+      "height": 16,
+      "bytes": 737,
+      "sha256": "d126d94ececb27543750493e5c722bfb2a2c4316ac780e8fd542a0abe4551ee1"
+    },
+    {
+      "path": "assets/triassic/brand/favicon-32.png",
+      "width": 32,
+      "height": 32,
+      "bytes": 2059,
+      "sha256": "468f14f255d493abe71e27095d35eac2604b88b5562ad2ba56fa3658d894f7f9"
+    },
+    {
+      "path": "assets/triassic/brand/favicon-192.png",
+      "width": 192,
+      "height": 192,
+      "bytes": 41235,
+      "sha256": "0da0613bce35f2dc91e035e77c0619cde670ff80e5329ae9d2b3b97242f214cb"
+    },
+    {
+      "path": "assets/triassic/brand/favicon-512.png",
+      "width": 512,
+      "height": 512,
+      "bytes": 274654,
+      "sha256": "406324fab66ea54104b03969f890754f0757e0143f873e9df3f7eb03090956f2"
+    },
+    {
+      "path": "assets/triassic/brand/apple-touch-icon.png",
+      "width": 180,
+      "height": 180,
+      "bytes": 36560,
+      "sha256": "e1fa6ae48b19657814547aa3142f850807fe8512808dd3be9edaec426b4c60f6"
+    },
+    {
+      "path": "assets/triassic/brand/favicon.ico",
+      "bytes": 6647,
+      "sha256": "da3ac9a79606aee7ea94bb734cf0a348601599f3eda315687be906b1024b0679"
+    }
+  ],
+  "pending": [],
+  "svgNote": "Compatibility wrappers embed the illustrated raster master; they are not vector redraws.",
+  "supplementary": [
+    "keyart.png",
+    "keyart.webp",
+    "keyart-mobile.png",
+    "keyart-mobile.webp"
+  ]
+}

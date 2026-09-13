@@ -1,13 +1,19 @@
 /**
  * Measure a GLB the way the viewer's sculpt mode does, and compare it with a sculpt file.
  *
- *   npm run sculpt:measure -- <model.glb> [sculpt.json] [--json]
+ *   npm run sculpt:measure -- <model.glb> [sculpt.json] [--json] [--against <shipped.glb>]
  *
  * With only a model it prints the station table (axis, dorsal, ventral, width). With a sculpt
  * file it also evaluates that file's *edited* curves at the model's stations and prints how far
  * the model is from the target — which is how a builder port is checked: rebuild, measure, and
  * the deviations should be near zero where the sculpt changed something and near the shipped
  * model's own values everywhere else. `--json` prints the comparison as JSON for scripts.
+ *
+ * A port that lengthens a body moves its station grid off the sculpt's, and the linear
+ * interpolation between the sculpt's stations invents deviations wherever the curve is not
+ * straight between them (a fin's leading edge). `--against <shipped.glb>` is the fair check for
+ * the *unchanged* stations: it measures the shipped model's own envelope at the model's stations
+ * (its vertices within half a station spacing of each) and reports the model against that.
  *
  * Positions are gathered in the root frame from every mesh (skinned meshes at their bind pose,
  * which is the node's own transform for these exporters) and the mouth socket names the head end,
@@ -20,8 +26,11 @@ import { ALL_EXTENSIONS } from '@gltf-transform/extensions';
 import { MeshoptDecoder } from 'meshoptimizer';
 import { measure, type CurveName, type SculptDoc, type Station } from '../src/viewer/sculpt/profile';
 
-const args = process.argv.slice(2).filter((a) => !a.startsWith('--'));
-const asJson = process.argv.includes('--json');
+const argv = process.argv.slice(2);
+const againstIx = argv.indexOf('--against');
+const againstPath = againstIx >= 0 ? argv[againstIx + 1] : undefined;
+const args = argv.filter((a, i) => !a.startsWith('--') && !(againstIx >= 0 && i === againstIx + 1));
+const asJson = argv.includes('--json');
 const [modelPath, sculptPath] = args;
 if (!modelPath) { console.error('usage: sculpt-measure <model.glb> [sculpt.json] [--json]'); process.exit(2); }
 
@@ -31,32 +40,36 @@ const doc = await io.read(modelPath);
 const root = doc.getRoot();
 
 // World matrices from the scene graph; the whole graph is the root frame.
-const chunks: Float32Array[] = [];
-let mouth: [number, number, number] | undefined;
-const seen = new Set<object>();
-const mat = (n: Node) => n.getWorldMatrix();
-for (const scene of root.listScenes()) scene.traverse((node) => {
-  const m = mat(node) as unknown as number[];
-  if (node.getName() === 'anchor_mouth') mouth = [m[12], m[13], m[14]];
-  const mesh = node.getMesh();
-  if (!mesh) return;
-  for (const prim of mesh.listPrimitives()) {
-    const pos = prim.getAttribute('POSITION');
-    if (!pos || seen.has(pos)) continue;
-    seen.add(pos);
-    const n = pos.getCount();
-    const out = new Float32Array(n * 3);
-    const v = [0, 0, 0];
-    for (let i = 0; i < n; i++) {
-      pos.getElement(i, v);
-      const [x, y, z] = v;
-      out[i * 3] = m[0] * x + m[4] * y + m[8] * z + m[12];
-      out[i * 3 + 1] = m[1] * x + m[5] * y + m[9] * z + m[13];
-      out[i * 3 + 2] = m[2] * x + m[6] * y + m[10] * z + m[14];
+function gather(document: ReturnType<typeof io.read> extends Promise<infer D> ? D : never) {
+  const chunks: Float32Array[] = [];
+  let mouth: [number, number, number] | undefined;
+  const seen = new Set<object>();
+  const mat = (n: Node) => n.getWorldMatrix();
+  for (const scene of document.getRoot().listScenes()) scene.traverse((node) => {
+    const m = mat(node) as unknown as number[];
+    if (node.getName() === 'anchor_mouth') mouth = [m[12], m[13], m[14]];
+    const mesh = node.getMesh();
+    if (!mesh) return;
+    for (const prim of mesh.listPrimitives()) {
+      const pos = prim.getAttribute('POSITION');
+      if (!pos || seen.has(pos)) continue;
+      seen.add(pos);
+      const n = pos.getCount();
+      const out = new Float32Array(n * 3);
+      const v = [0, 0, 0];
+      for (let i = 0; i < n; i++) {
+        pos.getElement(i, v);
+        const [x, y, z] = v;
+        out[i * 3] = m[0] * x + m[4] * y + m[8] * z + m[12];
+        out[i * 3 + 1] = m[1] * x + m[5] * y + m[9] * z + m[13];
+        out[i * 3 + 2] = m[2] * x + m[6] * y + m[10] * z + m[14];
+      }
+      chunks.push(out);
     }
-    chunks.push(out);
-  }
-});
+  });
+  return { chunks, mouth };
+}
+const { chunks, mouth } = gather(doc);
 
 const id = path.basename(modelPath).replace(/\.(lod1\.)?glb$/, '');
 const measured = measure({ chunks, mouth }, { key: id, id, collection: 'measured', model: modelPath });
@@ -83,6 +96,34 @@ function evalAt(stations: Station[], curve: CurveName, a: number): number {
   const s0 = stations[i], s1 = stations[i + 1];
   const t = (a - s0.axis) / (s1.axis - s0.axis);
   return s0.base[curve] + (s1.base[curve] - s0.base[curve]) * t;
+}
+
+// ---- the shipped model's own envelope at this model's stations ----
+if (againstPath) {
+  const shipped = gather(await io.read(againstPath));
+  const ax = measured.frame.axis === 'x' ? 0 : 2;
+  const lat = ax === 0 ? 2 : 0;
+  const half = (measured.bounds.length / (measured.stations.length - 1)) / 2;
+  const mid = measured.bounds.lateralMid;
+  const rows = measured.stations.map((s, i) => {
+    let dorsal = -Infinity, ventral = Infinity, width = 0, count = 0;
+    for (const c of shipped.chunks) for (let k = 0; k < c.length; k += 3) {
+      if (Math.abs(c[k + ax] - s.axis) > half) continue;
+      count++;
+      dorsal = Math.max(dorsal, c[k + 1]); ventral = Math.min(ventral, c[k + 1]); width = Math.max(width, Math.abs(c[k + lat] - mid));
+    }
+    const dev = (m: number, t: number) => (Math.abs(t) > 1e-4 ? (m / t - 1) * 100 : null);
+    return { index: i, axis: s.axis, headFraction: s.headFraction, count, dorsal: { model: s.base.dorsal, shipped: dorsal, deviation: dev(s.base.dorsal, dorsal) }, ventral: { model: s.base.ventral, shipped: ventral, deviation: dev(s.base.ventral, ventral) }, width: { model: s.base.width, shipped: width, deviation: dev(s.base.width, width) } };
+  });
+  if (asJson) console.log(JSON.stringify({ id, against: path.basename(againstPath), rows }, null, 2));
+  else {
+    console.log(`${id} against ${path.basename(againstPath)}'s own envelope at ${id}'s stations (vertices within ±${half.toFixed(3)} of each)`);
+    console.log(' i  nose%   axis  | dorsal  shipped   dev | ventral shipped   dev | width   shipped   dev');
+    for (const r of rows) {
+      const cell = (v: { model: number; shipped: number; deviation: number | null }) => `${(v.model >= 0 ? ' ' : '') + v.model.toFixed(3)} ${(v.shipped >= 0 ? ' ' : '') + v.shipped.toFixed(3)} ${v.deviation == null ? '   —  ' : `${v.deviation.toFixed(1).padStart(6)}%`}`;
+      console.log(`${String(r.index).padStart(2)}  ${(r.headFraction * 100).toFixed(0).padStart(3)}%  ${(r.axis >= 0 ? ' ' : '') + r.axis.toFixed(3)} | ${cell(r.dorsal)} | ${cell(r.ventral)} | ${cell(r.width)}${r.count === 0 ? '   (no shipped vertices here)' : ''}`);
+    }
+  }
 }
 
 const fmt = (v: number) => (v >= 0 ? ' ' : '') + v.toFixed(3);

@@ -96,4 +96,21 @@ export const clips = [
       legs(P, t, 1, { amp: .45, loopU: u });
     },
   },
+  {
+    name: 'Grab', duration: 1.1, loop: true,
+    // Held under the cephalon: the front two leg pairs stay clamped in around the catch, the
+    // head pressed down onto it and breathing; the rest of the legs keep a slow, quiet walking
+    // cycle rather than going still, and the antennae and cerci settle to a light sway.
+    pose(u, P, t) {
+      const ph = 2 * Math.PI * u;
+      for (const [row, sx] of ROWS) for (const i of [0, 1]) {
+        const b = `leg_${pad(i)}_${row}`, tip = `${b}_tip`;
+        P.bend(b, inward(sx), .3 + .04 * Math.sin(ph - i * .4)).bend(b, DOWN, .1);
+        P.bend(tip, inward(sx), .22 + .05 * Math.sin(ph - i * .4 - .5));
+      }
+      body(P, { butt: .55 + .05 * Math.sin(ph), low: .35, bob: .1 * Math.sin(ph) });
+      feelers(P, { sweep: .3, trail: .35, ph });
+      legs(P, t, 1, { amp: .3, loopU: u });
+    },
+  },
 ];

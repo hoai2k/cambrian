@@ -8,22 +8,72 @@ for the era's documents in one place next to `docs/devonian/`.
 
 | Doc | Contents |
 | --- | --- |
-| [01 · Design](01-triassic-design.md) | The pitch and the era mechanics (breath, live birth, haul-out, the shore that reaches in, depth), the 21 playable creatures with their natural history and in-game effects, the non-playable shore animals (Tanystropheus and company), alternates. |
+| [01 · Design](01-triassic-design.md) | The pitch and the era mechanics (air as the cost of effort, live birth, the shore that reaches in, depth), the 21 playable creatures with their natural history and in-game effects, the non-playable shore animals (Tanystropheus and company), alternates. |
 | [02 · Biomes and depth](02-biomes-and-depth.md) | The nine biome slots recast for the Triassic, the water-depth profile (a sea floor that sinks toward the basin), and the prop and plant models each biome needs. |
 | [03 · Image and model requests](03-image-and-model-requests.md) | Every image and 3D model the era needs, in two tiers: Tier 1 goes through Tripo (all creatures, the shore animals, a few organic scenery pieces), Tier 2 is built in-house. Source-image briefs first, model requests against them second. |
 | [04 · Tripo pipeline](04-tripo-pipeline.md) | The production strategy: Tripo bodies on procedural skeletons, motion authored on the procedural twin and applied to the Tripo mesh; where the strategy is agreed with, where it is amended and why. |
+| [canonical/](canonical/README.md) | The approved pose for each subject: the visual contract every model is made from, greenlit before anything is built from it. 26 images, plus the generated [review.md](canonical/review.md). |
 | [research.md](research.md) | The natural-history notes and sources the roster and biomes were drawn from, with confidence labels. |
+
+## Built: the playable skeleton
+
+The era is **playable at `/triassic/`** as of 12 September 2026, ahead of its art. What exists:
+
+- `src/content/triassic/` — the pack: 21 playable animals and the four shore animals, the biomes,
+  depth table, ecology, schemes, music rotation and sound map, the refinement queue (every model
+  outstanding) and `index.ts` with the borrowed bodies.
+- `src/sim/triassic/` — the rules behind the `RULES?.` hooks (`rules.ts`), the era's specials
+  (`specials.ts`), and the shore animals (`shore.ts`).
+- The engine seams the era needed, all optional and unused by the other eras: `breathing: 'air'`,
+  `armourFacing`, `warmBlooded`, `riseRate`, `shore`, `birth`, `flight`, `thunniform`, `sink`,
+  `neckReach`, `paddleRow`, `pod`, `peaceful` on `CreatureDef`; `environment.floorDepth` and the
+  per-biome sea floor in `src/sim/world.ts`; `liveBirth` on the era rules; `'<era>/<id>'` stand-ins
+  that borrow another era's body, and `standInsPlayable`, which lets them be picked; the HUD's
+  air and shore warnings; three-way era links on the title and pick screens.
+- **Every model is a borrowed Devonian body** (`TRIASSIC_STAND_INS`), recoloured with the
+  animal's scheme, with placeholder portraits cut from the canonical poses
+  (`tools/triassic/placeholder-portraits.mjs`), procedural biome plates if the paintings are ever missing (`npm run triassic:plates`)
+  and placeholder brand art (`npm run triassic:brand`) — except that the wordmark, the composed
+  title art and the nine painted biome plates have since been **delivered**
+  (`public/assets/triassic/brand/manifest.json`, `tools/triassic/environment-image-prompts.json`;
+  the plates are wired by name through `BIOME_PLATES`), so only the emblem is still a placeholder.
+  The scenery source sheets for the four organic props sit in `intake/triassic/scenery/`, waiting
+  for their Tripo generations. When a real model lands: put the GLB, LOD,
+  portraits and JSON in `public/assets/triassic/creatures/`, list the id in
+  `tools/triassic/shipped.json`, run `node tools/update-asset-sizes.mjs`, and the stand-in and the
+  preview badge go away on their own; `npm run triassic` checks both halves.
+- Movement stats are generated: `docs/research/triassic-swimming.json` → `npm run triassic:stats`.
+- `npm run triassic` is the era's headless suite (the pack, the floor, air, armour facing, birth,
+  the shore, every animal's specials, the ladder, determinism).
+
+What is *not* built, in the order it is worth doing: the viewer's Triassic collection (the
+catalogue only lists the first two eras); the shore animals' own clips and the strike as an
+animation (today it is a hit and an event on a borrowed body); the calf's birth performance and
+the blow's spray at the surface; the log rafts as a floating, grippable prop; authored Triassic
+scenery kinds (every plant is a re-tinted Devonian procedural kind); the era's own sounds
+(`docs/audio-requests.md`); and the balance pass, since every number was set by feel.
 
 ## Where it will live when built
 
-Following the era boundary in [06](../redesign/06-era-content.md): `src/content/triassic/` for the
+Following the era boundary in [06](../redesign/06-era-content.md), and now in place: `src/content/triassic/` for the
 pack, `src/sim/triassic/` for the rules behind the `RULES?.` hooks, `/triassic/` as the entry
 (`src/triassic/main.tsx` selecting the era before importing the app), `public/assets/triassic/`
 for the assets, `tools/triassic/` for the builders and checks, and `docs/triassic/` (this
-directory) for the era's own documents. Three things the Triassic needs that the shared engine
-does not yet have are called out in [01](01-triassic-design.md#what-the-engine-needs): a breath
-meter for obligate air-breathers, a per-biome sea-floor depth, and a shore that can hold an
-animal that strikes into the water.
+directory) for the era's own documents. No playable animal ever leaves the water.
+
+## Looking at it
+
+[games.hoai.net/cambrian/research/triassic/](https://games.hoai.net/cambrian/research/triassic/)
+puts every subject side by side with reference images from Wikimedia Commons, with a key that flips
+between the reference and our canonical pose. Its source is
+[`docs/research/triassic/viewer/`](../research/triassic/viewer/), whose `index.html` also opens
+straight off the disk; `npm run triassic:viewer` regenerates both after a new pose lands.
+
+It is also where the **greenlight** happens: pick the image each animal should be built from, export
+the decisions, and `node tools/triassic/apply-selections.mjs <file>` records them in
+[canonical/manifest.json](canonical/manifest.json) and writes the rework brief to
+[canonical/review.md](canonical/review.md). A pose is greenlit before its modelling sheet and its
+Tripo generation are made, never after — see [04](04-tripo-pipeline.md).
 
 ## Open decisions
 

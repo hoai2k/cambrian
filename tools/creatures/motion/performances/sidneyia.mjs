@@ -104,4 +104,18 @@ export const clips = [
       trunk(P, t, 1, { amp: .45, loopU: u });
     },
   },
+  {
+    name: 'Grab', duration: 1.1, loop: true,
+    // Held under the head: all four crushing pairs stay clamped shut on the catch, the head
+    // pressed down onto it and breathing; the walking legs and tail keep a slow, quiet beat and
+    // the antennae sweep at a low amplitude.
+    pose(u, P, t) {
+      const ph = 2 * Math.PI * u;
+      for (const s of SIDES) for (const i of FRONT) crusher(P, s, i, { clamp: .9 + .05 * Math.sin(ph - i * .3) });
+      head(P, { noseDown: .07 + .01 * Math.sin(ph), down: .06 + .01 * Math.sin(ph) });
+      eyes(P, .3);
+      antennae(P, .35, ph);
+      trunk(P, t, 1, { amp: .3, loopU: u });
+    },
+  },
 ];

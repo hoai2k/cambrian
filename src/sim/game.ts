@@ -980,7 +980,7 @@ export class Game implements AiWorld {
    * the old second-long swell out of nothing, because it did not come from an egg.
    */
   private beginHatch(a: Actor) {
-    const egg = ladderRung(this, a) === 0;
+    const egg = ladderRung(this, a) === 0 && !RULES?.liveBirth?.(a);
     a.hatching = true; a.state = 'moult'; a.stateT = 0; a.stateDur = egg ? HATCH_HOLD : 1.0;
     a.vel = v3();
     if (egg) this.layEgg(a);

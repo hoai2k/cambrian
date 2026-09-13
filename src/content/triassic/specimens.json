@@ -1,0 +1,62 @@
+[
+  {
+    "id": "nothosaurus",
+    "name": "Nothosaurus procedural twin",
+    "species": "Nothosaurus giganteus",
+    "category": "creature",
+    "modelStatus": "preview",
+    "provenance": "Middle Triassic; approved canonical image, Tripo image-to-model body, and independently rebuilt procedural volume twin",
+    "description": "A procedural comparison body built to the delivered Tripo volume and animated on the same 27-joint rig as the textured runtime model.",
+    "model": "assets/triassic/creatures/nothosaurus.puppet.glb",
+    "lod": "assets/triassic/creatures/nothosaurus.puppet.glb",
+    "image": "assets/triassic/creatures/nothosaurus.thumb.png",
+    "lengthMeters": 6,
+    "looping": [
+      "Idle",
+      "Swim",
+      "Sprint",
+      "Guard",
+      "Eat"
+    ],
+    "sources": [
+      "docs/triassic/canonical/model-inputs/nothosaurus/input.png",
+      "docs/triassic/04-tripo-pipeline.md",
+      "tools/triassic/creatures/nothosaurus/tripo-raw/metadata.json"
+    ],
+    "notes": [
+      "The procedural twin preserves the accepted generated volume but does not reuse the raw Tripo mesh's vertices or faces.",
+      "It shares the runtime body's rest rig, inverse binds, sockets, and 21 named animation clips.",
+      "This paired model remains a preview until a human approves the generated body and procedural twin together."
+    ]
+  },
+  {
+    "id": "shonisaurus",
+    "name": "Shonisaurus procedural twin",
+    "species": "Shonisaurus popularis",
+    "category": "creature",
+    "modelStatus": "preview",
+    "provenance": "Late Triassic, Nevada; approved canonical image, Tripo image-to-model body, and independently rebuilt procedural volume twin",
+    "description": "A procedural comparison body built to the delivered Tripo volume and animated on the same 21-bone rig as the textured runtime model.",
+    "model": "assets/triassic/creatures/shonisaurus.puppet.glb",
+    "lod": "assets/triassic/creatures/shonisaurus.puppet.glb",
+    "image": "assets/triassic/creatures/shonisaurus.thumb.png",
+    "lengthMeters": 14,
+    "looping": [
+      "Idle",
+      "Swim",
+      "Sprint",
+      "Guard",
+      "Eat"
+    ],
+    "sources": [
+      "docs/triassic/canonical/model-inputs/shonisaurus/input.png",
+      "docs/triassic/04-tripo-pipeline.md",
+      "tools/triassic/creatures/shonisaurus/tripo-raw/metadata.json"
+    ],
+    "notes": [
+      "The procedural twin preserves the accepted generated volume but does not reuse the raw Tripo mesh's vertices or faces.",
+      "It shares the runtime body's rest rig, inverse binds, sockets, and 19 named animation clips.",
+      "This paired model remains a preview until a human approves the generated body and procedural twin together."
+    ]
+  }
+]

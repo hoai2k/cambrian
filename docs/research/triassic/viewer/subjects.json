@@ -1,0 +1,579 @@
+{
+  "groups": [
+    {
+      "id": "playable",
+      "name": "Playable roster",
+      "note": "The 21 playable animals of the design. All are swimmers; none leaves the water.",
+      "subjects": [
+        {
+          "id": "cymbospondylus",
+          "name": "Cymbospondylus youngorum",
+          "wiki": "Cymbospondylus",
+          "search": "Cymbospondylus",
+          "role": "T01 · Rung IV giant · the first giant",
+          "len": "~17.6 m"
+        },
+        {
+          "id": "shonisaurus",
+          "name": "Shonisaurus popularis",
+          "wiki": "Shonisaurus",
+          "search": "Shonisaurus",
+          "role": "T02 · Rung IV giant · the pod",
+          "len": "13.5–15 m"
+        },
+        {
+          "id": "nothosaurus",
+          "name": "Nothosaurus giganteus",
+          "wiki": "Nothosaurus",
+          "search": "Nothosaurus",
+          "role": "T03 · Rung III · two-gear ambusher",
+          "len": "5–7 m"
+        },
+        {
+          "id": "dinocephalosaurus",
+          "name": "Dinocephalosaurus orientalis",
+          "wiki": "Dinocephalosaurus",
+          "search": "Dinocephalosaurus",
+          "role": "T04 · Rung III · the reach (32-joint neck)",
+          "len": "~6 m"
+        },
+        {
+          "id": "helicoprion",
+          "name": "Helicoprion",
+          "wiki": "Helicoprion",
+          "search": "Helicoprion",
+          "role": "T05 · Rung III · the whorl (Permian relict; see Fadenia)",
+          "len": "3–7.5 m"
+        },
+        {
+          "id": "rhaeticosaurus",
+          "name": "Rhaeticosaurus mertensi",
+          "wiki": "Rhaeticosaurus",
+          "search": "Rhaeticosaurus",
+          "role": "T06 · Rung III · the flyer (first plesiosaur)",
+          "len": "~2.4 m+"
+        },
+        {
+          "id": "atopodentatus",
+          "name": "Atopodentatus unicus",
+          "wiki": "Atopodentatus",
+          "search": "Atopodentatus",
+          "role": "T07 · Rung III · the grazer (hammerhead)",
+          "len": "~3 m"
+        },
+        {
+          "id": "askeptosaurus",
+          "name": "Askeptosaurus italicus",
+          "wiki": "Askeptosaurus",
+          "search": "Askeptosaurus",
+          "role": "T08 · Rung II · the turner",
+          "len": "2–3 m"
+        },
+        {
+          "id": "placodus",
+          "name": "Placodus gigas",
+          "wiki": "Placodus",
+          "search": "Placodus",
+          "role": "T09 · Rung II · the shell-cruncher",
+          "len": "2–3 m"
+        },
+        {
+          "id": "hybodus",
+          "name": "Hybodus",
+          "wiki": "Hybodus",
+          "search": "Hybodus",
+          "role": "T10 · Rung II · the spined shark",
+          "len": "~2 m"
+        },
+        {
+          "id": "birgeria",
+          "name": "Birgeria stensioei",
+          "wiki": "Birgeria",
+          "search": "Birgeria",
+          "role": "T11 · Rung II · the tuna",
+          "len": "1–2 m"
+        },
+        {
+          "id": "aphaneramma",
+          "name": "Aphaneramma rostratum",
+          "wiki": "Aphaneramma",
+          "search": "Aphaneramma",
+          "role": "T12 · Rung II · the sensor (marine amphibian)",
+          "len": "~1.5–2 m"
+        },
+        {
+          "id": "mixosaurus",
+          "name": "Mixosaurus cornalianus",
+          "wiki": "Mixosaurus",
+          "search": "Mixosaurus",
+          "role": "T13 · Rung II · the small fin",
+          "len": "0.7–2 m"
+        },
+        {
+          "id": "henodus",
+          "name": "Henodus chelyops",
+          "wiki": "Henodus",
+          "search": "Henodus",
+          "role": "T14 · Rung II · the lagoon oddity",
+          "len": "~1 m"
+        },
+        {
+          "id": "saurichthys",
+          "name": "Saurichthys",
+          "wiki": "Saurichthys",
+          "search": "Saurichthys",
+          "role": "T15 · Rung II · the needle",
+          "len": "0.6–1.5 m"
+        },
+        {
+          "id": "hupehsuchus",
+          "name": "Hupehsuchus nanchangensis",
+          "wiki": "Hupehsuchus",
+          "search": "Hupehsuchus",
+          "role": "T16 · Rung II · the armoured gulper",
+          "len": "~1 m"
+        },
+        {
+          "id": "keichousaurus",
+          "name": "Keichousaurus hui",
+          "wiki": "Keichousaurus",
+          "search": "Keichousaurus",
+          "role": "T17 · Rung I · the crowd",
+          "len": "10–30 cm"
+        },
+        {
+          "id": "cartorhynchus",
+          "name": "Cartorhynchus lenticarpus",
+          "wiki": "Cartorhynchus",
+          "search": "Cartorhynchus",
+          "role": "T18 · Rung I · the shallow-water sucker",
+          "len": "~40 cm"
+        },
+        {
+          "id": "odontochelys",
+          "name": "Odontochelys semitestacea",
+          "wiki": "Odontochelys",
+          "search": "Odontochelys",
+          "role": "T19 · Rung I · the half-shell",
+          "len": "~40 cm"
+        },
+        {
+          "id": "ceratites",
+          "name": "Ceratites nodosus",
+          "wiki": "Ceratites",
+          "search": "Ceratites nodosus",
+          "role": "T20 · Rung I · the shell",
+          "len": "7–20 cm"
+        },
+        {
+          "id": "phragmoteuthis",
+          "name": "Phragmoteuthis bisinuata",
+          "wiki": "Phragmoteuthis",
+          "search": "Phragmoteuthis",
+          "role": "T21 · Rung I · the hooks",
+          "len": "20–30 cm"
+        }
+      ]
+    },
+    {
+      "id": "shore",
+      "name": "Shore animals (non-playable)",
+      "note": "Modelled, rigged and placed on the beach and estuary banks. They strike into the water; they are never played.",
+      "subjects": [
+        {
+          "id": "tanystropheus",
+          "name": "Tanystropheus hydroides",
+          "wiki": "Tanystropheus",
+          "search": "Tanystropheus",
+          "role": "S01 · the boom (13-joint stiff neck)",
+          "len": "~5–6 m"
+        },
+        {
+          "id": "mystriosuchus",
+          "name": "Mystriosuchus",
+          "wiki": "Mystriosuchus",
+          "search": "Mystriosuchus",
+          "role": "S02 · the surface lurker (marine phytosaur)",
+          "len": "~4 m"
+        },
+        {
+          "id": "macrocnemus",
+          "name": "Macrocnemus bassanii",
+          "wiki": "Macrocnemus",
+          "search": "Macrocnemus",
+          "role": "S03 · the runner (ambient)",
+          "len": "~90 cm"
+        },
+        {
+          "id": "coelophysis",
+          "name": "Coelophysis",
+          "wiki": "Coelophysis",
+          "search": "Coelophysis",
+          "role": "S04 · optional · the dinosaur at the water",
+          "len": "~3 m"
+        }
+      ]
+    },
+    {
+      "id": "alternates",
+      "name": "Alternates and reserves",
+      "note": "Weighed and left out, each with a slot it could take. Useful for swaps.",
+      "subjects": [
+        {
+          "id": "shastasaurus",
+          "name": "Shastasaurus sikanniensis",
+          "wiki": "Shastasaurus",
+          "search": "Shastasaurus",
+          "role": "Giant alternative · toothless, ~21 m",
+          "len": "~21 m"
+        },
+        {
+          "id": "ichthyotitan",
+          "name": "Ichthyotitan severnensis",
+          "wiki": "Ichthyotitan",
+          "search": "Ichthyotitan",
+          "role": "Giant alternative · ~25 m from two jawbones",
+          "len": "~25 m (est.)"
+        },
+        {
+          "id": "guizhouichthyosaurus",
+          "name": "Guizhouichthyosaurus tangae",
+          "wiki": "Guizhouichthyosaurus",
+          "search": "Guizhouichthyosaurus",
+          "role": "The megapredation fossil the drown-hold is built on",
+          "len": "5–7 m"
+        },
+        {
+          "id": "cymbospondylus-buchseri",
+          "name": "Cymbospondylus buchseri",
+          "wiki": "Cymbospondylus",
+          "search": "Cymbospondylus buchseri",
+          "role": "Mid-size squid hunter, Monte San Giorgio",
+          "len": "~5 m"
+        },
+        {
+          "id": "pistosaurus",
+          "name": "Pistosaurus longaevus",
+          "wiki": "Pistosaurus",
+          "search": "Pistosaurus",
+          "role": "Long-necked alternative to Rhaeticosaurus",
+          "len": "~3 m"
+        },
+        {
+          "id": "psephoderma",
+          "name": "Psephoderma alpinum",
+          "wiki": "Psephoderma",
+          "search": "Psephoderma",
+          "role": "Armoured placodont · sand-probing beak",
+          "len": "~1.8 m"
+        },
+        {
+          "id": "cyamodus",
+          "name": "Cyamodus",
+          "wiki": "Cyamodus",
+          "search": "Cyamodus",
+          "role": "Armoured placodont · broad-jawed crusher",
+          "len": "1.3–1.5 m"
+        },
+        {
+          "id": "placochelys",
+          "name": "Placochelys placodonta",
+          "wiki": "Placochelys",
+          "search": "Placochelys",
+          "role": "Small turtle-like placodont",
+          "len": "~90 cm"
+        },
+        {
+          "id": "neusticosaurus",
+          "name": "Neusticosaurus",
+          "wiki": "Neusticosaurus",
+          "search": "Neusticosaurus",
+          "role": "Alternative to Keichousaurus",
+          "len": "20 cm–1.2 m"
+        },
+        {
+          "id": "xinpusaurus",
+          "name": "Xinpusaurus",
+          "wiki": "Xinpusaurus",
+          "search": "Xinpusaurus",
+          "role": "Crushing thalattosaur",
+          "len": "1.3–3 m"
+        },
+        {
+          "id": "anshunsaurus",
+          "name": "Anshunsaurus",
+          "wiki": "Anshunsaurus",
+          "search": "Anshunsaurus",
+          "role": "Piscivorous thalattosaur, the largest",
+          "len": "~3.5 m"
+        },
+        {
+          "id": "helveticosaurus",
+          "name": "Helveticosaurus zollingeri",
+          "wiki": "Helveticosaurus",
+          "search": "Helveticosaurus",
+          "role": "Fanged oddity with no clear analogue",
+          "len": "2–3.6 m"
+        },
+        {
+          "id": "eusaurosphargis",
+          "name": "Eusaurosphargis dalsassoi",
+          "wiki": "Eusaurosphargis",
+          "search": "Eusaurosphargis",
+          "role": "Spiky shore lizard, ambient",
+          "len": "20 cm (juvenile)"
+        },
+        {
+          "id": "chaohusaurus",
+          "name": "Chaohusaurus",
+          "wiki": "Chaohusaurus",
+          "search": "Chaohusaurus",
+          "role": "Basal ichthyosaur · head-first birth fossil",
+          "len": "0.7–1.8 m"
+        },
+        {
+          "id": "utatsusaurus",
+          "name": "Utatsusaurus hataii",
+          "wiki": "Utatsusaurus",
+          "search": "Utatsusaurus",
+          "role": "Basal, lizard-bodied ichthyosaur",
+          "len": "2.5–3 m"
+        },
+        {
+          "id": "nanchangosaurus",
+          "name": "Nanchangosaurus suni",
+          "wiki": "Nanchangosaurus",
+          "search": "Nanchangosaurus",
+          "role": "Small armoured hupehsuchian",
+          "len": "~40 cm"
+        },
+        {
+          "id": "saurosphargis",
+          "name": "Saurosphargis volzi",
+          "wiki": "Saurosphargis",
+          "search": "Saurosphargis",
+          "role": "Pseudo-shelled bottom-dweller",
+          "len": "~1 m"
+        },
+        {
+          "id": "fadenia",
+          "name": "Fadenia / Caseodus",
+          "wiki": "Fadenia",
+          "search": "Fadenia Caseodus eugeneodont",
+          "role": "The honest Triassic eugeneodont · Helicoprion's replacement",
+          "len": "1–2 m"
+        },
+        {
+          "id": "rebellatrix",
+          "name": "Rebellatrix divaricerca",
+          "wiki": "Rebellatrix",
+          "search": "Rebellatrix",
+          "role": "Fork-tailed fast coelacanth",
+          "len": "~1.3 m"
+        },
+        {
+          "id": "acrodus",
+          "name": "Acrodus",
+          "wiki": "Acrodus",
+          "search": "Acrodus",
+          "role": "Crushing hybodont shark",
+          "len": "~1–2 m"
+        },
+        {
+          "id": "thylacocephala",
+          "name": "Thylacocephala",
+          "wiki": "Thylacocephala",
+          "search": "Thylacocephala",
+          "role": "Eye-and-claws arthropod · the missing rung I arthropod",
+          "len": "4–15 cm"
+        },
+        {
+          "id": "antrimpos",
+          "name": "Antrimpos",
+          "wiki": "Antrimpos",
+          "search": "Antrimpos",
+          "role": "Penaeid shrimp · already has the tail-flip trait",
+          "len": "5–15 cm"
+        },
+        {
+          "id": "yunnanolimulus",
+          "name": "Yunnanolimulus luopingensis",
+          "wiki": "Yunnanolimulus",
+          "search": "Mesolimulus horseshoe crab fossil",
+          "role": "Horseshoe crab · walks and digs",
+          "len": "~10 cm",
+          "imagesAre": "No Commons image of Yunnanolimulus. These are other fossil horseshoe crabs (mostly Jurassic Mesolimulus) — the right body plan, the wrong genus."
+        },
+        {
+          "id": "choristoceras",
+          "name": "Choristoceras",
+          "wiki": "Choristoceras",
+          "search": "Choristoceras heteromorph ammonoid",
+          "role": "Heteromorph ammonoid · the drifter",
+          "len": "<3 cm"
+        },
+        {
+          "id": "tropites",
+          "name": "Tropites",
+          "wiki": "Tropites",
+          "search": "Trachyceras Hallstatt ammonite",
+          "role": "Globose ammonoid · the ballast variant",
+          "len": "5–10 cm",
+          "imagesAre": "No Commons image of Tropites. These are Trachyceras and other Hallstatt-facies Carnian ammonoids of the same fauna."
+        },
+        {
+          "id": "germanonautilus",
+          "name": "Germanonautilus",
+          "wiki": "Germanonautilus",
+          "search": "Germanonautilus",
+          "role": "Muschelkalk nautiloid",
+          "len": "10–20 cm"
+        }
+      ]
+    },
+    {
+      "id": "scenery",
+      "name": "Scenery, plants and the shore",
+      "note": "What the biomes are built from. These are model requests, not animals.",
+      "subjects": [
+        {
+          "id": "encrinus",
+          "name": "Encrinus liliiformis",
+          "wiki": "Encrinus",
+          "search": "Encrinus liliiformis",
+          "role": "The sea-lily garden · stems to 1.5 m",
+          "len": "stem ~1.5 m"
+        },
+        {
+          "id": "traumatocrinus",
+          "name": "Traumatocrinus hsui",
+          "wiki": "Traumatocrinus",
+          "search": "Traumatocrinus",
+          "role": "The log-raft crinoid colony · the hero prop",
+          "len": "stems to 11 m"
+        },
+        {
+          "id": "diplopora",
+          "name": "Diplopora annulata",
+          "wiki": "Diplopora",
+          "search": "Diplopora dasycladales",
+          "role": "The dasyclad lagoon meadow",
+          "len": "cm-scale tufts"
+        },
+        {
+          "id": "retiophyllia",
+          "name": "Retiophyllia / \"Thecosmilia\"",
+          "wiki": "Retiophyllia",
+          "search": "Triassic scleractinian coral fossil Thecosmilia",
+          "role": "Phaceloid coral bush of the reef",
+          "len": "reef-scale",
+          "imagesAre": "Little of Retiophyllia on Commons. These are Triassic scleractinian corals and phaceloid growth forms."
+        },
+        {
+          "id": "daonella",
+          "name": "Daonella / Halobia",
+          "wiki": "Daonella",
+          "search": "Daonella Halobia",
+          "role": "Flat-clam shell pavement",
+          "len": "5–8 cm shells"
+        },
+        {
+          "id": "placunopsis",
+          "name": "Placunopsis ostracina",
+          "wiki": "Placunopsis",
+          "search": "Placunopsis Muschelkalk",
+          "role": "Bivalve bioherm mounds · a feeding station",
+          "len": "mounds to 4.5 m"
+        },
+        {
+          "id": "stromatolite",
+          "name": "Triassic microbialites",
+          "wiki": "Stromatolite",
+          "search": "stromatolite Triassic microbialite",
+          "role": "The gypsum flats' only structure",
+          "len": "0.5–1 m domes"
+        },
+        {
+          "id": "voltzia",
+          "name": "Voltzia heterophylla",
+          "wiki": "Voltzia",
+          "search": "Voltzia",
+          "role": "The shore conifer · the tree-line",
+          "len": "~10 m"
+        },
+        {
+          "id": "pleuromeia",
+          "name": "Pleuromeia",
+          "wiki": "Pleuromeia",
+          "search": "Pleuromeia",
+          "role": "The disaster-flora lycopsid on the shore",
+          "len": "1–2 m"
+        },
+        {
+          "id": "neocalamites",
+          "name": "Neocalamites / Equisetites",
+          "wiki": "Neocalamites",
+          "search": "Neocalamites Equisetites horsetail Triassic",
+          "role": "Horsetail reed beds at the estuary",
+          "len": "2–5 m"
+        },
+        {
+          "id": "monte-san-giorgio",
+          "name": "Monte San Giorgio / Besano",
+          "wiki": "Monte San Giorgio",
+          "search": "Monte San Giorgio Besano Formation fossil",
+          "role": "The Black Basin · anoxic floor, 30–100 m",
+          "len": "biome reference"
+        },
+        {
+          "id": "muschelkalk",
+          "name": "Muschelkalk sea",
+          "wiki": "Muschelkalk",
+          "search": "Muschelkalk",
+          "role": "The shelf, garden and pavement biomes",
+          "len": "biome reference"
+        },
+        {
+          "id": "dachstein-reef",
+          "name": "Dachstein / Wetterstein reefs",
+          "wiki": "Dachstein Formation",
+          "search": "Dachstein Limestone reef Wetterstein",
+          "role": "The Sponge-Coral Reef biome",
+          "len": "biome reference"
+        },
+        {
+          "id": "gipskeuper",
+          "name": "Gipskeuper lagoons",
+          "wiki": "Keuper",
+          "search": "Gipskeuper gypsum Keuper",
+          "role": "The Gypsum Flats biome · Henodus' home",
+          "len": "biome reference"
+        },
+        {
+          "id": "coral-head",
+          "name": "Coral head (Tier 1)",
+          "wiki": "Scleractinia",
+          "search": "scleractinian coral colony massive",
+          "role": "Tier 1 model · reef landmark",
+          "len": "2.5 units at scale 1"
+        },
+        {
+          "id": "sponge-mound",
+          "name": "Sponge mound (Tier 1)",
+          "wiki": "Calcarea",
+          "search": "calcareous sponge fossil reef",
+          "role": "Tier 1 model · reef cover with an interior",
+          "len": "3.0 units at scale 1"
+        },
+        {
+          "id": "log-raft",
+          "name": "Log raft (Tier 1)",
+          "wiki": "Traumatocrinus",
+          "search": "driftwood log floating",
+          "role": "Tier 1 model · the basin's only cover, at the surface",
+          "len": "12 units long"
+        }
+      ]
+    }
+  ]
+}

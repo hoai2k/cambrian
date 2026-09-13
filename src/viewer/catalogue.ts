@@ -4,7 +4,12 @@ import type { CambrianCreatureId } from '../content/cambrian/ids';
 import { SCHEMES as CAMBRIAN_SCHEMES, CREATURE_SCHEMES as CAMBRIAN_DEFAULTS } from '../content/cambrian/palettes';
 import { SCHEMES as DEVONIAN_SCHEMES, CREATURE_SCHEMES as DEVONIAN_DEFAULTS } from '../content/devonian/palettes';
 import type { Scheme } from '../shared/palettes';
-import { assetPaths } from '../content/asset-paths';
+import { assetPaths, createAssetPaths } from '../content/asset-paths';
+import { TRIASSIC } from '../content/triassic';
+import { TRIASSIC_CREATURES } from '../content/triassic/creatures';
+import { TRIASSIC_SPECIMENS } from '../content/triassic/specimens';
+import { SCHEMES as TRIASSIC_SCHEMES, CREATURE_SCHEMES as TRIASSIC_DEFAULTS } from '../content/triassic/palettes';
+import triassicPending from '../content/triassic/pending-refinements.json';
 import { DEVONIAN_SPECIMENS } from '../content/devonian/specimens';
 import { DEVONIAN_CREATURES } from '../content/devonian/creatures';
 import devonianPending from '../content/devonian/pending-refinements.json';
@@ -21,7 +26,15 @@ const DEVONIAN_REFINEMENTS = refinementTables(devonianPending as PendingRefineme
   clipNotes: Record<string, Partial<Record<string, string>> | undefined>;
 };
 
-export type CollectionId = 'cambrian' | 'devonian' | 'devonian-props';
+const TRIASSIC_REFINEMENTS = refinementTables(triassicPending as PendingRefinement[]) as {
+  modelStatus: Record<string, 'preview' | 'final' | undefined>;
+  modelNotes: Record<string, string | undefined>;
+  clipNotes: Record<string, Partial<Record<string, string>> | undefined>;
+};
+/** The Triassic's paths resolve its borrowed bodies into the Devonian folder; the viewer runs as the Cambrian, so ask its pack directly. */
+const TRIASSIC_PATHS = createAssetPaths(TRIASSIC);
+
+export type CollectionId = 'cambrian' | 'devonian' | 'devonian-props' | 'triassic' | 'triassic-props';
 export interface ViewerSpecimen {
   key: string;
   id: string;
@@ -41,17 +54,46 @@ export interface ViewerSpecimen {
   clipNotes?: Partial<Record<string, string>>;
   model: string;
   lod?: string;
+  /**
+   * The procedurally rebuilt twin of this body, where one exists. The pipeline builds it to the
+   * generated model's own volume on the same skeleton, and animating it is how the authored body
+   * gets its clips (docs/triassic/04-tripo-pipeline.md), so the pair only means anything when a
+   * human can see one become the other: the viewer swaps between them in place, same camera, same
+   * scale, same clip at the same frame, and any drift between the two shows up as movement.
+   */
+  puppet?: string;
+  puppetNote?: string;
   image?: string;
   displayLength: number;
   lengthMeters?: number;
   looping: readonly string[];
 }
 const DEVONIAN_KIND = new Map(DEVONIAN_CREATURES.map(c => [c.id as string, { kind: c.kind, kindNote: c.kindNote }]));
+/** The procedural twin of each animal that has one, by the animal's id. */
+const TRIASSIC_PUPPETS = new Map(TRIASSIC_SPECIMENS.filter(c => c.category === 'creature').map(c => [c.id, c]));
+/**
+ * How many Triassic animals are still wearing somebody else's body. The label says so rather than
+ * letting the collection look finished, and it clears itself: `standIns` empties an entry at a
+ * time as ids are added to tools/triassic/shipped.json, and at zero this is simply *Triassic
+ * creatures*, with no edit here needed the day the models land.
+ */
+const TRIASSIC_BORROWED = TRIASSIC_CREATURES.filter(c => TRIASSIC.assets.standIns?.[c.id]).length;
 export const COLLECTIONS: readonly { id: CollectionId; name: string }[] = [
   { id: 'cambrian', name: 'Cambrian creatures' },
   { id: 'devonian', name: 'Devonian creatures' },
   { id: 'devonian-props', name: 'Devonian plants & props' },
+  { id: 'triassic', name: `Triassic creatures${TRIASSIC_BORROWED ? ` (${TRIASSIC_BORROWED} borrowed bodies)` : ''}` },
+  // Empty until the first Triassic prop is generated, which the picker shows as a disabled option:
+  // the slot is visible, so a delivery has somewhere to go rather than somewhere to be invented.
+  { id: 'triassic-props', name: 'Triassic plants & props' },
 ];
+/**
+ * A scenery collection rather than an animal one. Props have no colour schemes and nothing to
+ * sculpt, and the page used to ask that question as "is this the Devonian's props?" — which was
+ * the same answer only for as long as the Devonian was the one era with any.
+ */
+export const isPropCollection = (c: CollectionId | undefined): boolean => c === 'devonian-props' || c === 'triassic-props';
+
 export const SPECIMENS: readonly ViewerSpecimen[] = [
   ...CREATURES.map(c => ({
     key: `cambrian:${c.id}`, id: c.id, collection: 'cambrian' as const,
@@ -73,6 +115,31 @@ export const SPECIMENS: readonly ViewerSpecimen[] = [
     clipNotes: DEVONIAN_REFINEMENTS.clipNotes[c.id], model: c.model, lod: c.lod, image: c.image, displayLength: 4,
     lengthMeters: c.lengthMeters, looping: c.looping,
   })),
+  // A Triassic roster entry resolves to its own delivered body or to the Devonian body it still
+  // borrows in play. Both appear under the Triassic name and current preview status.
+  ...TRIASSIC_CREATURES.map(c => ({
+    key: `triassic:${c.id}`, id: c.id, collection: 'triassic' as const,
+    name: c.name, species: c.species, kind: c.kind, kindNote: c.kindNote,
+    role: `TRIASSIC · ${c.shore ? 'SHORE ANIMAL' : c.ground ? 'SEAFLOOR' : 'SWIMMER'} · ${c.role}`,
+    provenance: c.locality ?? 'Triassic', description: TRIASSIC.assets.standIns?.[c.id] ? `Borrowed body: ${String(TRIASSIC.assets.standIns[c.id]).replace('devonian/', 'Devonian ')}. ${c.tagline}` : c.tagline,
+    modelStatus: TRIASSIC_REFINEMENTS.modelStatus[c.id], modelNote: TRIASSIC_REFINEMENTS.modelNotes[c.id],
+    clipNotes: TRIASSIC_REFINEMENTS.clipNotes[c.id],
+    model: TRIASSIC_PATHS.model(c.id), lod: TRIASSIC_PATHS.model(c.id, 1), image: TRIASSIC_PATHS.portrait(c.id, 'card'), displayLength: Math.min(c.adultLength, 8),
+    puppet: TRIASSIC_PUPPETS.get(c.id)?.model, puppetNote: TRIASSIC_PUPPETS.get(c.id)?.description,
+    looping: ['Idle', 'Swim', 'Crawl', 'Guard', 'Eat', ...(c.abilityLoop ? ['Ability'] : [])],
+  })),
+  // Scenery only. A creature row in TRIASSIC_SPECIMENS is a procedural twin, and a twin is not a
+  // second animal: it is the same animal drawn the other way, so it belongs behind a switch on
+  // the roster entry it belongs to (`TRIASSIC_PUPPETS` above) rather than beside it in the list,
+  // where a reviewer would have to click away and back and lose the pose they were judging.
+  ...TRIASSIC_SPECIMENS.filter(c => c.category === 'prop').map(c => ({
+    key: `triassic:prop:${c.id}`, id: c.id, collection: 'triassic-props' as CollectionId,
+    name: c.name, species: c.species, role: 'TRIASSIC · SCENERY',
+    provenance: c.provenance, description: c.description,
+    modelStatus: TRIASSIC_REFINEMENTS.modelStatus[c.id] ?? c.modelStatus, modelNote: TRIASSIC_REFINEMENTS.modelNotes[c.id],
+    clipNotes: TRIASSIC_REFINEMENTS.clipNotes[c.id], model: c.model, lod: c.lod, image: c.image,
+    displayLength: 4, lengthMeters: c.lengthMeters, looping: c.looping,
+  })),
 ];
 export const specimenByKey = new Map(SPECIMENS.map(c => [c.key, c]));
 
@@ -86,9 +153,10 @@ export const specimenByKey = new Map(SPECIMENS.map(c => [c.key, c]));
 export interface Palette { schemes: readonly Scheme[]; defaults: Record<string, string> }
 const CAMBRIAN: Palette = { schemes: CAMBRIAN_SCHEMES, defaults: CAMBRIAN_DEFAULTS };
 const DEVONIAN: Palette = { schemes: DEVONIAN_SCHEMES, defaults: DEVONIAN_DEFAULTS };
+const TRIASSIC_PALETTE: Palette = { schemes: TRIASSIC_SCHEMES, defaults: TRIASSIC_DEFAULTS };
 
 export const paletteFor = (collection: CollectionId): Palette =>
-  collection === 'cambrian' ? CAMBRIAN : DEVONIAN;
+  collection === 'cambrian' ? CAMBRIAN : collection === 'triassic' ? TRIASSIC_PALETTE : DEVONIAN;
 
 /** Every scheme in either pack, for `registerSchemes` so a pick from either resolves. */
-export const ALL_SCHEMES: readonly Scheme[] = [...CAMBRIAN_SCHEMES, ...DEVONIAN_SCHEMES];
+export const ALL_SCHEMES: readonly Scheme[] = [...CAMBRIAN_SCHEMES, ...DEVONIAN_SCHEMES, ...TRIASSIC_SCHEMES];

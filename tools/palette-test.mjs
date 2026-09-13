@@ -25,9 +25,9 @@ function slotFor(materialName) {
   const n = materialName.toLowerCase();
   if (/eye/.test(n)) return 'eyes';
   if (/ventral|arthrodial/.test(n)) return 'underside';
-  if (/sclerotiz|oral|spine/.test(n)) return 'accent';
-  if (/membrane|swimming|marginal/.test(n)) return 'fins';
-  if (/bristle|appendage|endite|antenna|seta|gill|leg/.test(n)) return 'legs';
+  if (/sclerotiz|oral|spine|mouthpart/.test(n)) return 'accent';
+  if (/membrane|swimming|marginal|exopod/.test(n)) return 'fins';
+  if (/bristle|appendage|endite|antenna|seta|gill|leg|endopod/.test(n)) return 'legs';
   return 'body';
 }
 
@@ -53,6 +53,18 @@ const EXPECTED = {
   'bristles': 'legs',
   'soft appendages': 'legs',
   'amber endites': 'legs',
+  // Odaraia V3's parts are named for the arthropod anatomy they are: the bivalved carapace and
+  // the trunk under it are body, the articulated inner limb branches join the legs, the lamellate
+  // swimming paddles are the fin fold of a filter feeder, and the mouth apparatus is an oral
+  // plate by another name. They replaced Cuticle/Bristles/Membrane/Sclerotized-edges, and they land
+  // in the same five slots those did — until they were classified, six of Odaraia's seven materials
+  // fell through to `body` and a scheme painted the whole animal one colour.
+  'shell': 'body',
+  'trunk': 'body',
+  'endites': 'legs',
+  'endopods': 'legs',
+  'exopods': 'fins',
+  'mouthparts': 'accent',
   'gill filaments': 'legs',
   'sclerotized tips': 'accent',
   'sclerotized edges': 'accent',

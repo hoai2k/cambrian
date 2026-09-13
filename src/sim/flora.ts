@@ -1,5 +1,5 @@
 import { clamp } from '../shared/math';
-import { floraPropId, propShape } from '../content/prop-shapes';
+import { propShapeFor } from '../content/prop-shapes';
 import { fpMax, fpReachAt, FOOTPRINT_BANDS, ROUND, type Footprint, type Reach } from './footprint';
 import { bodyRadius } from './actors';
 import { WEED_LEVERAGE, WEED_PULL } from './locomotion';
@@ -73,6 +73,12 @@ export const FLORA_PHYS: Record<FloraKind, FloraPhys> = {
   reed: { h: 1.8, r: 0.25, profile: (f) => 0.25 + 0.75 * f, rigidity: 0.12, maxLean: 0.9, k: 14, c: 2.0, drag: 1.5 },
   // Log: a trunk lying on the sand. Rigid; `r` is half its length, so it reads as a low round obstacle.
   log: { h: 0.5, r: 1.3, profile: () => 1, rigidity: 30, maxLean: 0.02, k: 80, c: 12, drag: 0.2 },
+  // Triassic substrate. Mineral, not growth: nothing here bends, sways or gives, so each is rigid
+  // with no lean, and the heights are the authored meshes' own (the union over a family's
+  // variants, which is what `npm run props` checks these against).
+  stromatolite: { h: 0.314, r: 0.37, profile: (t) => 1 - t * 0.55, rigidity: 100, maxLean: 0, k: 200, c: 20, drag: 0.1 },
+  saltCrust: { h: 0.097, r: 0.51, profile: () => 1, rigidity: 100, maxLean: 0, k: 200, c: 20, drag: 0.05 },
+  mudRipple: { h: 0.184, r: 1.0, profile: () => 1, rigidity: 100, maxLean: 0, k: 200, c: 20, drag: 0.05 },
 };
 
 /**
@@ -83,7 +89,7 @@ export const FLORA_PHYS: Record<FloraKind, FloraPhys> = {
  */
 interface KindShape { bands: readonly Footprint[]; unit: number; widest: number }
 const KIND_SHAPE = Object.fromEntries((Object.keys(FLORA_PHYS) as FloraKind[]).map((kind) => {
-  const shape = propShape(floraPropId(kind));
+  const shape = propShapeFor(kind);
   const P = FLORA_PHYS[kind];
   // A round stand-in is one band of unit circle, scaled by its own radius and tapered by `profile`.
   const bands: readonly Footprint[] = shape
@@ -169,8 +175,11 @@ export function resolveFlora(world: WorldData, a: Actor, dt: number, scratch: Fl
     f.bvx += vel.x * shove; f.bvz += vel.z * shove;
     activate(world, f);
 
-    // Nudge the body out by the rest. A plant that is flat on the floor stops resisting.
-    const bendFrac = Math.min(1, Math.hypot(f.bx, f.bz) / maxB);
+    // Nudge the body out by the rest. A plant that is flat on the floor stops resisting, and one
+    // that cannot bend at all never stops — `maxB` is zero for the mineral kinds (a stromatolite
+    // dome, a salt crust), and dividing by it put a NaN into the push and from there into the hp
+    // and stamina of everything that touched one.
+    const bendFrac = maxB > EPS ? Math.min(1, Math.hypot(f.bx, f.bz) / maxB) : 0;
     const resist = (1 - give) * (1 - bendFrac * bendFrac);
     const push = pen * resist;
     pos.x += nx * push; pos.z += nz * push;

@@ -15,9 +15,10 @@ import assert from 'node:assert/strict';
 import { selectEra } from '../src/content';
 import { CAMBRIAN } from '../src/content/cambrian';
 import { DEVONIAN } from '../src/content/devonian';
+import { TRIASSIC } from '../src/content/triassic';
 
-const which = process.argv[2] === 'devonian' ? 'devonian' : 'cambrian';
-selectEra(which === 'devonian' ? DEVONIAN : CAMBRIAN);
+const which = process.argv[2] === 'devonian' ? 'devonian' : process.argv[2] === 'triassic' ? 'triassic' : 'cambrian';
+selectEra(which === 'devonian' ? DEVONIAN : which === 'triassic' ? TRIASSIC : CAMBRIAN);
 
 const { Game } = await import('../src/sim/game');
 const { ladderName, ladderNames, ladderRung, ladderScale, clampMark, fillOf, rungOf, MARK_NEAR_TOP, LADDER_RUNGS, LADDER_TOP } = await import('../src/sim/ladder');
@@ -50,7 +51,7 @@ const raiseToTop = (g: InstanceType<typeof Game>, i: number) => {
 // The Devonian keeps growth in its own side table, so a test that wants a body *put* on a rung
 // has to reach it. Nothing in the game does this — it moults — but a test must not have to run
 // twenty minutes of feeding to reach the case it is checking.
-const DEV = which === 'devonian'
+const DEV = which !== 'cambrian'                      // the Triassic grows in the same side table
   ? await import('../src/sim/devonian/state').then((m) => ({
       setStage: (g: InstanceType<typeof Game>, a: import('../src/sim/types').Actor, stage: number) => {
         const d = m.devActor(g, a); d.stage = stage; d.standing = m.STAGE_AT[stage];

@@ -15,9 +15,10 @@ import assert from 'node:assert/strict';
 import { selectEra } from '../src/content';
 import { CAMBRIAN } from '../src/content/cambrian';
 import { DEVONIAN } from '../src/content/devonian';
+import { TRIASSIC } from '../src/content/triassic';
 
-const which = process.argv[2] === 'devonian' ? 'devonian' : 'cambrian';
-const era = which === 'devonian' ? DEVONIAN : CAMBRIAN;
+const which = process.argv[2] === 'devonian' ? 'devonian' : process.argv[2] === 'triassic' ? 'triassic' : 'cambrian';
+const era = which === 'devonian' ? DEVONIAN : which === 'triassic' ? TRIASSIC : CAMBRIAN;
 selectEra(era);
 
 /** A localStorage that behaves like the real one, including throwing when told to. */
