@@ -1,0 +1,38 @@
+{
+  "schema_version": 1,
+  "name": "odontochelys",
+  "task": {
+    "type": "image_to_model",
+    "status": "success",
+    "progress": 100,
+    "task_id": "2e5595f5-1dfa-4cff-8d9b-f507c92f4c17",
+    "created_at": "2026-09-13T15:52:47.417508Z",
+    "completed_at": "2026-09-13T15:54:07.275781Z",
+    "credits_consumed": 30,
+    "output": {
+      "model_url": "<redacted download URL>",
+      "rendered_image_url": "<redacted download URL>"
+    }
+  },
+  "request": {
+    "file": {
+      "file_token": "<uploaded at runtime>"
+    },
+    "model": "v3.1-20260211",
+    "face_limit": 20000,
+    "texture": true,
+    "pbr": true
+  },
+  "image": {
+    "path": "docs/triassic/canonical/model-inputs/odontochelys/input.png",
+    "sha256": "3f574fd0e009d3e6f4429db01359bc52084acbeca26335c62f3c646472f733c7",
+    "bytes": 1837153
+  },
+  "artifact": {
+    "path": "tools/triassic/creatures/odontochelys/tripo-raw/odontochelys.raw.glb",
+    "bytes": 1590056,
+    "sha256": "1d90a0442ac624d382370e4cad0888dec92257c82e4b1242478234baa11db080",
+    "source_output_field": "model_url"
+  },
+  "downloaded_at": "2026-09-13T15:54:10.283Z"
+}

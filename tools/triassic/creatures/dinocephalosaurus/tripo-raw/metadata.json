@@ -1,0 +1,38 @@
+{
+  "schema_version": 1,
+  "name": "dinocephalosaurus",
+  "task": {
+    "type": "image_to_model",
+    "status": "success",
+    "progress": 100,
+    "task_id": "4f30c63b-3efd-40cd-bb73-4030c1acdd93",
+    "created_at": "2026-09-13T15:29:26.751773Z",
+    "completed_at": "2026-09-13T15:31:16.075121Z",
+    "credits_consumed": 30,
+    "output": {
+      "model_url": "<redacted download URL>",
+      "rendered_image_url": "<redacted download URL>"
+    }
+  },
+  "request": {
+    "file": {
+      "file_token": "<uploaded at runtime>"
+    },
+    "model": "v3.1-20260211",
+    "face_limit": 20000,
+    "texture": true,
+    "pbr": true
+  },
+  "image": {
+    "path": "docs/triassic/canonical/model-inputs/dinocephalosaurus/input.png",
+    "sha256": "53e61e7845656b618ca735cc70ee5714f213c2c50db8401617c18cec3babc9e5",
+    "bytes": 1706704
+  },
+  "artifact": {
+    "path": "tools/triassic/creatures/dinocephalosaurus/tripo-raw/dinocephalosaurus.raw.glb",
+    "bytes": 1613612,
+    "sha256": "df0704b432a7480952c58e16e04c258aef9d8c888b87eefb13968eeb412f0fd2",
+    "source_output_field": "model_url"
+  },
+  "downloaded_at": "2026-09-13T15:31:31.076Z"
+}

@@ -1,0 +1,105 @@
+{
+  "schema_version": 1,
+  "input": {
+    "path": "tools/triassic/creatures/odontochelys/tripo-raw/odontochelys.raw.glb",
+    "bytes": 1590056,
+    "sha256": "1d90a0442ac624d382370e4cad0888dec92257c82e4b1242478234baa11db080"
+  },
+  "summary": {
+    "mesh_objects": 1,
+    "vertices": 11746,
+    "faces": 19826,
+    "triangles": 19826,
+    "connected_components": 69,
+    "materials": 1,
+    "textures": 3
+  },
+  "bounds": {
+    "min_xyz": [
+      -0.255615,
+      -0.5,
+      -0.265226
+    ],
+    "max_xyz": [
+      0.255615,
+      0.5,
+      0.265226
+    ],
+    "center_xyz": [
+      0,
+      0,
+      0
+    ],
+    "size_xyz": [
+      0.511229,
+      1,
+      0.530453
+    ]
+  },
+  "meshes": [
+    {
+      "object": "tripo_node_2e5595f5-1dfa-4cff-8d9b-f507c92f4c17",
+      "mesh": "tripo_mesh_2e5595f5-1dfa-4cff-8d9b-f507c92f4c17",
+      "vertices": 11746,
+      "edges": 31503,
+      "faces": 19826,
+      "triangles": 19826,
+      "connected_components": 69,
+      "material_slots": [
+        "tripo_material_2e5595f5-1dfa-4cff-8d9b-f507c92f4c17"
+      ]
+    }
+  ],
+  "materials": [
+    {
+      "name": "tripo_material_2e5595f5-1dfa-4cff-8d9b-f507c92f4c17",
+      "image_textures": [
+        "Color_2e5595f5-1dfa-4cff-8d9b-f507c92f4c17",
+        "NormalGL_2e5595f5-1dfa-4cff-8d9b-f507c92f4c17",
+        "ORM_2e5595f5-1dfa-4cff-8d9b-f507c92f4c17"
+      ]
+    }
+  ],
+  "textures": [
+    {
+      "name": "Color_2e5595f5-1dfa-4cff-8d9b-f507c92f4c17",
+      "width": 2048,
+      "height": 2048,
+      "channels": 4,
+      "packed": true,
+      "source": "FILE",
+      "colorspace": "sRGB"
+    },
+    {
+      "name": "NormalGL_2e5595f5-1dfa-4cff-8d9b-f507c92f4c17",
+      "width": 2048,
+      "height": 2048,
+      "channels": 4,
+      "packed": true,
+      "source": "FILE",
+      "colorspace": "Non-Color"
+    },
+    {
+      "name": "ORM_2e5595f5-1dfa-4cff-8d9b-f507c92f4c17",
+      "width": 2048,
+      "height": 2048,
+      "channels": 4,
+      "packed": true,
+      "source": "FILE",
+      "colorspace": "Non-Color"
+    }
+  ],
+  "renders": {
+    "side": "tools/triassic/creatures/odontochelys/tripo-raw/review/side.png",
+    "top": "tools/triassic/creatures/odontochelys/tripo-raw/review/top.png",
+    "three-quarter": "tools/triassic/creatures/odontochelys/tripo-raw/review/three-quarter.png"
+  },
+  "preview": {
+    "path": "tools/triassic/creatures/odontochelys/odontochelys.preview.glb",
+    "triangle_limit": 40000,
+    "triangles_before": 19826,
+    "triangles_after": 19826,
+    "bytes": 1470864,
+    "sha256": "9e8e884a4d7983e129aebbc7da1698176974669eec4f6ad00e55c51814d15f41"
+  }
+}

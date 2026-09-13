@@ -1,0 +1,105 @@
+{
+  "schema_version": 1,
+  "input": {
+    "path": "tools/triassic/creatures/cartorhynchus/tripo-raw/cartorhynchus.raw.glb",
+    "bytes": 1430596,
+    "sha256": "edbb71276d4a9c831b1498afc748a6b0767f30d02561da0916918a1a67864f61"
+  },
+  "summary": {
+    "mesh_objects": 1,
+    "vertices": 11278,
+    "faces": 19614,
+    "triangles": 19614,
+    "connected_components": 44,
+    "materials": 1,
+    "textures": 3
+  },
+  "bounds": {
+    "min_xyz": [
+      -0.29617,
+      -0.5,
+      -0.212473
+    ],
+    "max_xyz": [
+      0.29617,
+      0.5,
+      0.212473
+    ],
+    "center_xyz": [
+      0,
+      0,
+      0
+    ],
+    "size_xyz": [
+      0.592339,
+      1,
+      0.424946
+    ]
+  },
+  "meshes": [
+    {
+      "object": "tripo_node_0934f26f-24dd-4e66-9616-30250a630939",
+      "mesh": "tripo_mesh_0934f26f-24dd-4e66-9616-30250a630939",
+      "vertices": 11278,
+      "edges": 30848,
+      "faces": 19614,
+      "triangles": 19614,
+      "connected_components": 44,
+      "material_slots": [
+        "tripo_material_0934f26f-24dd-4e66-9616-30250a630939"
+      ]
+    }
+  ],
+  "materials": [
+    {
+      "name": "tripo_material_0934f26f-24dd-4e66-9616-30250a630939",
+      "image_textures": [
+        "Color_0934f26f-24dd-4e66-9616-30250a630939",
+        "NormalGL_0934f26f-24dd-4e66-9616-30250a630939",
+        "ORM_0934f26f-24dd-4e66-9616-30250a630939"
+      ]
+    }
+  ],
+  "textures": [
+    {
+      "name": "Color_0934f26f-24dd-4e66-9616-30250a630939",
+      "width": 2048,
+      "height": 2048,
+      "channels": 4,
+      "packed": true,
+      "source": "FILE",
+      "colorspace": "sRGB"
+    },
+    {
+      "name": "NormalGL_0934f26f-24dd-4e66-9616-30250a630939",
+      "width": 2048,
+      "height": 2048,
+      "channels": 4,
+      "packed": true,
+      "source": "FILE",
+      "colorspace": "Non-Color"
+    },
+    {
+      "name": "ORM_0934f26f-24dd-4e66-9616-30250a630939",
+      "width": 2048,
+      "height": 2048,
+      "channels": 4,
+      "packed": true,
+      "source": "FILE",
+      "colorspace": "Non-Color"
+    }
+  ],
+  "renders": {
+    "side": "tools/triassic/creatures/cartorhynchus/tripo-raw/review/side.png",
+    "top": "tools/triassic/creatures/cartorhynchus/tripo-raw/review/top.png",
+    "three-quarter": "tools/triassic/creatures/cartorhynchus/tripo-raw/review/three-quarter.png"
+  },
+  "preview": {
+    "path": "tools/triassic/creatures/cartorhynchus/cartorhynchus.preview.glb",
+    "triangle_limit": 40000,
+    "triangles_before": 19614,
+    "triangles_after": 19614,
+    "bytes": 1312676,
+    "sha256": "2adaf4664eb5deb1ced150e30322affa3c606412a8de0142abaa23c09e043b9a"
+  }
+}

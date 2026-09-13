@@ -1,0 +1,38 @@
+{
+  "schema_version": 1,
+  "name": "placodus",
+  "task": {
+    "type": "image_to_model",
+    "status": "success",
+    "progress": 100,
+    "task_id": "29cee7a9-c253-42f0-8149-d238b9273d2a",
+    "created_at": "2026-09-13T15:37:54.991023Z",
+    "completed_at": "2026-09-13T15:40:21.983700Z",
+    "credits_consumed": 30,
+    "output": {
+      "model_url": "<redacted download URL>",
+      "rendered_image_url": "<redacted download URL>"
+    }
+  },
+  "request": {
+    "file": {
+      "file_token": "<uploaded at runtime>"
+    },
+    "model": "v3.1-20260211",
+    "face_limit": 20000,
+    "texture": true,
+    "pbr": true
+  },
+  "image": {
+    "path": "docs/triassic/canonical/model-inputs/placodus/input.png",
+    "sha256": "f28daf6f448916638e5a4f6be4d50577e12452055d5bf33014054b406d60f07c",
+    "bytes": 2312512
+  },
+  "artifact": {
+    "path": "tools/triassic/creatures/placodus/tripo-raw/placodus.raw.glb",
+    "bytes": 1737372,
+    "sha256": "da0e59fb34fee098f9fdd2da12b95ce1a48de640db1b34428c9b1575508eed84",
+    "source_output_field": "model_url"
+  },
+  "downloaded_at": "2026-09-13T15:40:39.388Z"
+}

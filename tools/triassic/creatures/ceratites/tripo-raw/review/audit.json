@@ -1,0 +1,105 @@
+{
+  "schema_version": 1,
+  "input": {
+    "path": "tools/triassic/creatures/ceratites/tripo-raw/ceratites.raw.glb",
+    "bytes": 1848760,
+    "sha256": "6bc7e4710e0b36cde6b7b1da77c653fa3f49edc27a930790c5895fc74c8c91f1"
+  },
+  "summary": {
+    "mesh_objects": 1,
+    "vertices": 14597,
+    "faces": 19422,
+    "triangles": 19422,
+    "connected_components": 767,
+    "materials": 1,
+    "textures": 3
+  },
+  "bounds": {
+    "min_xyz": [
+      -0.375179,
+      -0.5,
+      -0.34729
+    ],
+    "max_xyz": [
+      0.375179,
+      0.5,
+      0.34729
+    ],
+    "center_xyz": [
+      0,
+      0,
+      0
+    ],
+    "size_xyz": [
+      0.750358,
+      1,
+      0.694581
+    ]
+  },
+  "meshes": [
+    {
+      "object": "tripo_node_bfa5ec0a-0d0d-4dbe-9ed6-c9e9a9a9f420",
+      "mesh": "tripo_mesh_bfa5ec0a-0d0d-4dbe-9ed6-c9e9a9a9f420",
+      "vertices": 14597,
+      "edges": 33252,
+      "faces": 19422,
+      "triangles": 19422,
+      "connected_components": 767,
+      "material_slots": [
+        "tripo_material_bfa5ec0a-0d0d-4dbe-9ed6-c9e9a9a9f420"
+      ]
+    }
+  ],
+  "materials": [
+    {
+      "name": "tripo_material_bfa5ec0a-0d0d-4dbe-9ed6-c9e9a9a9f420",
+      "image_textures": [
+        "Color_bfa5ec0a-0d0d-4dbe-9ed6-c9e9a9a9f420",
+        "NormalGL_bfa5ec0a-0d0d-4dbe-9ed6-c9e9a9a9f420",
+        "ORM_bfa5ec0a-0d0d-4dbe-9ed6-c9e9a9a9f420"
+      ]
+    }
+  ],
+  "textures": [
+    {
+      "name": "Color_bfa5ec0a-0d0d-4dbe-9ed6-c9e9a9a9f420",
+      "width": 2048,
+      "height": 2048,
+      "channels": 4,
+      "packed": true,
+      "source": "FILE",
+      "colorspace": "sRGB"
+    },
+    {
+      "name": "NormalGL_bfa5ec0a-0d0d-4dbe-9ed6-c9e9a9a9f420",
+      "width": 2048,
+      "height": 2048,
+      "channels": 4,
+      "packed": true,
+      "source": "FILE",
+      "colorspace": "Non-Color"
+    },
+    {
+      "name": "ORM_bfa5ec0a-0d0d-4dbe-9ed6-c9e9a9a9f420",
+      "width": 2048,
+      "height": 2048,
+      "channels": 4,
+      "packed": true,
+      "source": "FILE",
+      "colorspace": "Non-Color"
+    }
+  ],
+  "renders": {
+    "side": "tools/triassic/creatures/ceratites/tripo-raw/review/side.png",
+    "top": "tools/triassic/creatures/ceratites/tripo-raw/review/top.png",
+    "three-quarter": "tools/triassic/creatures/ceratites/tripo-raw/review/three-quarter.png"
+  },
+  "preview": {
+    "path": "tools/triassic/creatures/ceratites/ceratites.preview.glb",
+    "triangle_limit": 40000,
+    "triangles_before": 19422,
+    "triangles_after": 19422,
+    "bytes": 1732120,
+    "sha256": "360aa06c3293d257f37c2eb57dc1bcc6902d9025283b130edb342ae6beba2769"
+  }
+}

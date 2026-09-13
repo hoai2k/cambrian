@@ -1,0 +1,105 @@
+{
+  "schema_version": 1,
+  "input": {
+    "path": "tools/triassic/creatures/mixosaurus/tripo-raw/mixosaurus.raw.glb",
+    "bytes": 1449064,
+    "sha256": "3078ee238d387222165d30d7bf3910f62b889c06712c798c775cd84e23002f3a"
+  },
+  "summary": {
+    "mesh_objects": 1,
+    "vertices": 10932,
+    "faces": 18914,
+    "triangles": 18914,
+    "connected_components": 42,
+    "materials": 1,
+    "textures": 3
+  },
+  "bounds": {
+    "min_xyz": [
+      -0.325116,
+      -0.5,
+      -0.295028
+    ],
+    "max_xyz": [
+      0.325116,
+      0.5,
+      0.295028
+    ],
+    "center_xyz": [
+      0,
+      0,
+      0
+    ],
+    "size_xyz": [
+      0.650232,
+      1,
+      0.590057
+    ]
+  },
+  "meshes": [
+    {
+      "object": "tripo_node_6af8c703-b983-4b3e-b0f1-a0303a535207",
+      "mesh": "tripo_mesh_6af8c703-b983-4b3e-b0f1-a0303a535207",
+      "vertices": 10932,
+      "edges": 29804,
+      "faces": 18914,
+      "triangles": 18914,
+      "connected_components": 42,
+      "material_slots": [
+        "tripo_material_6af8c703-b983-4b3e-b0f1-a0303a535207"
+      ]
+    }
+  ],
+  "materials": [
+    {
+      "name": "tripo_material_6af8c703-b983-4b3e-b0f1-a0303a535207",
+      "image_textures": [
+        "Color_6af8c703-b983-4b3e-b0f1-a0303a535207",
+        "NormalGL_6af8c703-b983-4b3e-b0f1-a0303a535207",
+        "ORM_6af8c703-b983-4b3e-b0f1-a0303a535207"
+      ]
+    }
+  ],
+  "textures": [
+    {
+      "name": "Color_6af8c703-b983-4b3e-b0f1-a0303a535207",
+      "width": 2048,
+      "height": 2048,
+      "channels": 4,
+      "packed": true,
+      "source": "FILE",
+      "colorspace": "sRGB"
+    },
+    {
+      "name": "NormalGL_6af8c703-b983-4b3e-b0f1-a0303a535207",
+      "width": 2048,
+      "height": 2048,
+      "channels": 4,
+      "packed": true,
+      "source": "FILE",
+      "colorspace": "Non-Color"
+    },
+    {
+      "name": "ORM_6af8c703-b983-4b3e-b0f1-a0303a535207",
+      "width": 2048,
+      "height": 2048,
+      "channels": 4,
+      "packed": true,
+      "source": "FILE",
+      "colorspace": "Non-Color"
+    }
+  ],
+  "renders": {
+    "side": "tools/triassic/creatures/mixosaurus/tripo-raw/review/side.png",
+    "top": "tools/triassic/creatures/mixosaurus/tripo-raw/review/top.png",
+    "three-quarter": "tools/triassic/creatures/mixosaurus/tripo-raw/review/three-quarter.png"
+  },
+  "preview": {
+    "path": "tools/triassic/creatures/mixosaurus/mixosaurus.preview.glb",
+    "triangle_limit": 40000,
+    "triangles_before": 18914,
+    "triangles_after": 18914,
+    "bytes": 1335344,
+    "sha256": "9405cf580dcf4477705c4d4984b68c6507b912b6fed1b1bf64e8de57ff9e63d6"
+  }
+}
