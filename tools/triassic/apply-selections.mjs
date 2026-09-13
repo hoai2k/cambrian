@@ -359,6 +359,22 @@ function refinementReason(id) {
 const refinements = JSON.parse(await readFile(REFINEMENTS, 'utf8'));
 const refinementsBefore = JSON.stringify(refinements);
 for (const row of refinements) if (row.scope === 'initial-model') row.reason = refinementReason(row.id);
+/**
+ * A body a human has approved stops carrying the preview badge.
+ *
+ * `delivered` only says the model landed and the game loads it; the badge stayed on because
+ * nobody had looked at the body itself. `bodyApproved` is that look having happened. The entry is
+ * then removed rather than reworded: the queue's own rule is that an entry must claim model or
+ * clip work, and an approved body claims neither. The bar is the reviewer's — playable, with no
+ * outstanding reconstruction request against it — not that the animal is beyond improvement.
+ */
+const approved = Object.entries(manifest.subjects ?? {})
+  .filter(([, e]) => e.canonical === 'delivered' && e.bodyApproved)
+  .map(([id]) => id);
+for (let i = refinements.length - 1; i >= 0; i--) {
+  const row = refinements[i];
+  if (row.scope === 'initial-model' && approved.includes(row.id) && !row.clips?.length) refinements.splice(i, 1);
+}
 
 if (unknown.length) console.warn(`ignored ${unknown.length} selection(s) for unknown subjects: ${unknown.join(', ')}`);
 

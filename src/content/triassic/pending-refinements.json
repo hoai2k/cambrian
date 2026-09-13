@@ -7,20 +7,6 @@
     "reason": "No Triassic model has been delivered yet: this animal borrows a Devonian body in play until its own Tripo model, rig and clips land through the pipeline in docs/triassic/04-tripo-pipeline.md. Its canonical pose is greenlit in docs/triassic/canonical/review.md, so the four-view modelling sheet and the Tripo generation are cleared to be made from it."
   },
   {
-    "id": "shonisaurus",
-    "status": "pending",
-    "scope": "initial-model",
-    "model": true,
-    "reason": "The Triassic model has landed and the game and the specimen viewer both load it (2026-09-13). It keeps the preview badge until a human approves the body itself: the generated shape, its procedural twin and the clips they share (docs/triassic/04-tripo-pipeline.md)."
-  },
-  {
-    "id": "nothosaurus",
-    "status": "pending",
-    "scope": "initial-model",
-    "model": true,
-    "reason": "The Triassic model has landed and the game and the specimen viewer both load it (2026-09-13). It keeps the preview badge until a human approves the body itself: the generated shape, its procedural twin and the clips they share (docs/triassic/04-tripo-pipeline.md)."
-  },
-  {
     "id": "dinocephalosaurus",
     "status": "pending",
     "scope": "initial-model",
