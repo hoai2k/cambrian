@@ -45,7 +45,7 @@
     "tools/triassic/creatures/shonisaurus/tripo-raw/shonisaurus.raw.glb"
   ],
   "notes": [
-    "Pigmentation is baked from source albedo to COLOR_0; full body retains source tangent-space normal detail.",
+    "Authored skin retains source UV albedo with white COLOR_0 and restrained normal strength 0.15; procedural skin uses measured source pigment.",
     "Procedural geometry is rebuilt from measured radial/spanning sections, not mesh decimation.",
     "Bind geometry has a sealed mouth; only Bite, Attack, Heavy and Eat open it.",
     "Shared clips are applied verbatim to the authored and procedural exports. Oral articulation and swimming performance are inferred soft-tissue behaviour."

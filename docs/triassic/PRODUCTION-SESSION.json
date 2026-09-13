@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
-  "updatedAt": "2026-09-13T14:41:24.391173+00:00",
-  "phase": "requested-images",
+  "updatedAt": "2026-09-13T14:50:54Z",
+  "phase": "review-window",
   "instructions": [
     "Sync main; deliver requested imagery including any canonical redraws.",
     "After committing images wait 30 minutes, then sync main and reevaluate human greenlights.",
@@ -17,8 +17,8 @@
     "nothosaurus",
     "shonisaurus"
   ],
-  "imageReviewWindowStart": null,
-  "imageReviewWindowEnd": null,
+  "imageReviewWindowStart": "2026-09-13T14:50:54Z",
+  "imageReviewWindowEnd": "2026-09-13T15:20:54Z",
   "creatures": [
     {
       "id": "cymbospondylus",
@@ -281,11 +281,11 @@
     }
   ],
   "notes": [
-    "Main synchronized through 306491b; 19 remaining greenlit, 4 candidate03 redraws in progress after fresh human review.",
-    "Ancient Seas: titles already on main; all12 animals and5 plants complete, integration underway. 25 creature boards,9 regional boards and2 scale plates complete.",
-    "New greenlit model-input packages cymbospondylus, odontochelys and macrocnemus completed; current batch dry-run verifies19 jobs,570 expected credits.",
-    "Shonisaurus existing model lip inversion and baked texture faceting correction underway; no new rigs before raw batch completes.",
-    "30-minute review window has NOT started; start only after image batch is committed and pushed.",
-    "Tripo credentials are not committed. Raw generation state stays local; only sanitized metadata is committed."
-  ]
+    "All requested image batches pushed to main237bf24. Four candidate03 redraws await human review. Current19 greenlit inputs validated.",
+    "WAIT until15:20:54UTC on2026-09-13 before fresh sync + Tripo submissions. No new submissions yet.",
+    "Ancient Seas29files integrated, build/typecheck/260checks pass, Chrome visual review complete.",
+    "Shonisaurus existing-body lip/texture correction final QA underway; do not begin new rigs before raw batch stage finishes.",
+    "Next: syncmain, rebuildplan, run-batch within655credits, process-batch --process, review+commit allraws; then rig+puppet+animations onebyone with own commit/warning removal after QA."
+  ],
+  "imageBatchMainCommit": "237bf24"
 }

@@ -15,7 +15,7 @@
   "full": {
     "closedSurfaceWinding": [],
     "triangles": 117442,
-    "weightedVertices": 62445,
+    "weightedVertices": 62615,
     "bones": 21,
     "clips": [
       {
@@ -183,8 +183,8 @@
         }
       }
     ],
-    "bytes": 4379136,
-    "sha256": "35366658cc820e362cfec19366ba4fc1f14e47b1bc89d702443f2f475422ef3e"
+    "bytes": 7381764,
+    "sha256": "f4a1cc71bfb9920026a51467d5da83c74527be8c7d82c30974f1e15a7473c2f5"
   },
   "puppet": {
     "closedSurfaceWinding": [

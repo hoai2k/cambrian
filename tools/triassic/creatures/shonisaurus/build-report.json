@@ -65,9 +65,14 @@
   "rawTriangles": 18984,
   "meshes": {
     "Shonisaurus authored skin": {
-      "vertices": 56954,
-      "triangles": 113904,
+      "vertices": 54939,
+      "triangles": 109712,
       "maxInfluences": 3
+    },
+    "Shonisaurus authored jaw": {
+      "vertices": 2179,
+      "triangles": 4192,
+      "maxInfluences": 2
     },
     "Puppet measured trunk": {
       "vertices": 2016,
@@ -187,5 +192,20 @@
     "Ability",
     "Growth"
   ],
-  "profileSections": 190
+  "profileSections": 190,
+  "materialCorrection": {
+    "authoredAlbedo": "original UV texture; white COLOR_0",
+    "normalStrength": 0.15,
+    "roughness": 0.7,
+    "puppetMaterialUnchanged": true
+  },
+  "authoredMandibleSeparation": {
+    "frontOwner": "jaw",
+    "upperLipOwner": "skull",
+    "rearHingeRawY": [
+      0.326,
+      0.36
+    ],
+    "trianglesPreserved": true
+  }
 }

@@ -142,6 +142,34 @@ for input in ['Metallic','Roughness']:
 pm=mat.copy();pm.name='Body skin puppet';pbs=next(n for n in pm.node_tree.nodes if n.type=='BSDF_PRINCIPLED')
 for link in list(pbs.inputs['Normal'].links):pm.node_tree.links.remove(link)
 for o in puppets:o.data.materials.append(pm)
+# Preserve the source UV albedo instead of interpolating it across sparse color
+# corners (which made triangular starbursts). White COLOR_0 avoids multiplying
+# the authored texture twice. The measured puppet keeps its existing pigment.
+for link in list(bsdf.inputs['Base Color'].links):mat.node_tree.links.remove(link)
+mat.node_tree.links.new(tex.outputs['Color'],bsdf.inputs['Base Color'])
+bsdf.inputs['Roughness'].default_value=.7
+for n in mat.node_tree.nodes:
+ if n.type=='NORMAL_MAP':n.inputs['Strength'].default_value=.15
+source.data.color_attributes['Color'].data.foreach_set('color_srgb',np.ones(len(source.data.loops)*4,dtype=np.float32))
+mapdir=HERE/'maps';mapdir.mkdir(exist_ok=True)
+im.filepath_raw=str(mapdir/'source-albedo.png');im.file_format='PNG';im.save()
+# The mandible is a separate anatomical owner. No cutaneous triangle crosses
+# skull/jaw ownership: soft weights on a thin lip caused inverted triangles when
+# its baked-open form was closed in bind geometry and then opened in attacks.
+def is_mandible(center):
+ x,y,z=center
+ line=float(np.interp(y,[.305,.33,.37,.395,.5],[-.027,-.017,-.005,-.0015,-.0015]))
+ return y>.326 and z<line
+jaw_mesh=source.copy();jaw_mesh.data=source.data.copy();jaw_mesh.name='Shonisaurus authored jaw';bpy.context.collection.objects.link(jaw_mesh);jaw_mesh['region']='mandible'
+for ob,keep_jaw in [(source,False),(jaw_mesh,True)]:
+ bm=bmesh.new();bm.from_mesh(ob.data)
+ remove=[f for f in bm.faces if is_mandible(f.calc_center_median())!=keep_jaw]
+ bmesh.ops.delete(bm,geom=remove,context='FACES')
+ loose=[v for v in bm.verts if not v.link_faces]
+ if loose:bmesh.ops.delete(bm,geom=loose,context='VERTS')
+ bm.to_mesh(ob.data);bm.free();ob.data.update()
+source['region']='authored_upper';authored=[source,jaw_mesh]
+
 # Palate, floor, throat and lateral buccal walls are anatomical meshes with exact
 # skull/jaw ownership. They overlap the imported lip rims inside the mouth.
 def solidmat(name,color):
@@ -212,9 +240,10 @@ def axial(y):
  return blend({'spine5':1},{'caudal':1},ramp(-y,.415,.46))
 def weights(p,region=''):
  x,y,z=p;a=axial(y);side='L'if x<0 else'R';x=abs(x)
- if region in ['palate','upper']:return {'skull':1}
+ if region in ['palate','upper']or(region=='authored_upper'and y>.305):return {'skull':1}
  if region=='lower':return blend(axial(y),{'jaw':1},ramp(y,.315,.35))
  if region=='floor':return {'jaw':1}
+ if region=='mandible':return blend({'skull':1},{'jaw':1},ramp(y,.326,.360))
  if region=='throat':return blend({'skull':1},{'jaw':1},ramp(-z,-.005,.016))
  if y>.305:
   line=float(np.interp(y,[.305,.33,.37,.395,.5],[-.027,-.017,-.005,-.0015,-.0015]))
@@ -237,7 +266,7 @@ def close_rest(p,weight=1.):
  seated=jaw_pivot+rest_closure@(p-jaw_pivot)
  yr=-p.y/S;seated.z+=S*.0045*math.exp(-((yr-.395)/.050)**2)
  return p.lerp(seated,weight)
-allmesh=[source]+puppets+oral
+allmesh=authored+puppets+oral
 weight_report={}
 for o in allmesh:
  for n in B:o.vertex_groups.new(name=n)
@@ -296,9 +325,11 @@ def export(obs,path):
  for o in obs+[rig]:o.select_set(True)
  bpy.context.view_layer.objects.active=rig
  bpy.ops.export_scene.gltf(filepath=str(path),export_format='GLB',use_selection=True,export_animations=True,export_animation_mode='ACTIONS',export_force_sampling=True,export_frame_range=False,export_skins=True,export_normals=True,export_tangents=True,export_texcoords=True,export_materials='EXPORT',export_vertex_color='NAME',export_vertex_color_name='Color',export_all_vertex_colors=False,export_yup=True,export_extras=True,export_morph=False)
-export([source]+oral,LOCAL/'shonisaurus.full.uncompressed.glb');export(puppets+oral,LOCAL/'shonisaurus.puppet.uncompressed.glb')
+export(authored+oral,LOCAL/'shonisaurus.full.uncompressed.glb');export(puppets+oral,LOCAL/'shonisaurus.puppet.uncompressed.glb')
 # Authoring file carries both geometries; collection visibility is set by review.py.
 bpy.ops.wm.save_as_mainfile(filepath=str(LOCAL/'shonisaurus.shared-rig.blend'))
-meta={'id':'shonisaurus','name':'Shonisaurus','species':'Shonisaurus popularis','provenance':'Late Triassic · Berlin-Ichthyosaur, Nevada','description':'Deep-bodied shastasaurid with long paired flippers, slender rostrum and lateral tail propulsion. Authored Tripo body and measured procedural volume puppet share the exact armature and actions.','lengthMeters':14,'modelLength':6,'locomotion':'Swim','clips':list(CLIPS),'looping':list(LOOPS),'anchors':[a['name']for a in anchors],'sources':['docs/triassic/canonical/shonisaurus.png','tools/triassic/creatures/shonisaurus/tripo-raw/shonisaurus.raw.glb'],'notes':['Pigmentation is baked from source albedo to COLOR_0; full body retains source tangent-space normal detail.','Procedural geometry is rebuilt from measured radial/spanning sections, not mesh decimation.','Bind geometry has a sealed mouth; only Bite, Attack, Heavy and Eat open it.','Shared clips are applied verbatim to the authored and procedural exports. Oral articulation and swimming performance are inferred soft-tissue behaviour.']}
+meta={'id':'shonisaurus','name':'Shonisaurus','species':'Shonisaurus popularis','provenance':'Late Triassic · Berlin-Ichthyosaur, Nevada','description':'Deep-bodied shastasaurid with long paired flippers, slender rostrum and lateral tail propulsion. Authored Tripo body and measured procedural volume puppet share the exact armature and actions.','lengthMeters':14,'modelLength':6,'locomotion':'Swim','clips':list(CLIPS),'looping':list(LOOPS),'anchors':[a['name']for a in anchors],'sources':['docs/triassic/canonical/shonisaurus.png','tools/triassic/creatures/shonisaurus/tripo-raw/shonisaurus.raw.glb'],'notes':['Authored skin retains source UV albedo with white COLOR_0 and restrained normal strength 0.15; procedural skin uses measured source pigment.','Procedural geometry is rebuilt from measured radial/spanning sections, not mesh decimation.','Bind geometry has a sealed mouth; only Bite, Attack, Heavy and Eat open it.','Shared clips are applied verbatim to the authored and procedural exports. Oral articulation and swimming performance are inferred soft-tissue behaviour.']}
+existing=json.loads((OUT/'shonisaurus.json').read_text())if(OUT/'shonisaurus.json').exists()else{}
+meta={**existing,**meta}
 (OUT/'shonisaurus.json').write_text(json.dumps(meta,indent=2)+'\n')
-(HERE/'build-report.json').write_text(json.dumps({'rawSHA256':hashlib.sha256(RAW.read_bytes()).hexdigest(),'closedRestJawAngleRadians':CLOSED_REST_ANGLE,'puppetLipContactFit':{'vertices':puppet_lip_seated,'maximumModelDisplacement':puppet_lip_max},'chinSurgery':{'adjustedVertices':chin_count,'maximumRawLengthDisplacement':chin_max},'closedSurfaceWinding':winding_report,'rawVertices':len(points),'rawTriangles':raw_triangles,'meshes':weight_report,'bones':len(B),'clips':list(CLIPS),'profileSections':len(profile)},indent=2)+'\n')
+(HERE/'build-report.json').write_text(json.dumps({'materialCorrection':{'authoredAlbedo':'original UV texture; white COLOR_0','normalStrength':.15,'roughness':.7,'puppetMaterialUnchanged':True},'authoredMandibleSeparation':{'frontOwner':'jaw','upperLipOwner':'skull','rearHingeRawY':[.326,.360],'trianglesPreserved':True},'rawSHA256':hashlib.sha256(RAW.read_bytes()).hexdigest(),'closedRestJawAngleRadians':CLOSED_REST_ANGLE,'puppetLipContactFit':{'vertices':puppet_lip_seated,'maximumModelDisplacement':puppet_lip_max},'chinSurgery':{'adjustedVertices':chin_count,'maximumRawLengthDisplacement':chin_max},'closedSurfaceWinding':winding_report,'rawVertices':len(points),'rawTriangles':raw_triangles,'meshes':weight_report,'bones':len(B),'clips':list(CLIPS),'profileSections':len(profile)},indent=2)+'\n')
