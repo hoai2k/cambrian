@@ -1,0 +1,13 @@
+# Candidate07 pause checkpoint — 2026-09-08
+
+Bounded full/LOD surface art PASS after actual 12-image inspection. Preserve candidate07 full/LOD, accepted bake03, rig/actions/anchors and all original attempts. No new LOD iteration is queued. The user requested finishing the current small jobs and then pausing.
+
+Accepted full SHA `b7b929b9978f51f89e0cb1e687dec10d95b90edd3e2b2ba27b12432f58474655`; accepted LOD SHA `eec740e92fcf2187c54eacb2418fc7335cd584fe57b2792e64e8e4f1bbd31756`. Execution sources remain bound by frozen-lod-07.json, SHA `58a67b430259bd10a73e0079101318b6e83d81b8b827818b4744fbecc8247b56`, all 207 unchanged. Detailed residuals: review-candidate07-actual.md. Machine-readable evidence: authoring candidate-07-actual-review.json.
+
+## Smallest finishing sequence after resumption
+
+1. Freeze one bounded full/LOD oral/eye validation recipe against these exact exports. Reuse imported action slots and actual CLIPS durations; reset frame and pose between imports. Numerically sweep each of the 18 clips, both eyes and shared lip/commissure landmarks. Inspect mouth continuity/internal surfaces through Attack, Bite, Heavy, Eat and Ability at closed, peak and recovery phases; render only the informative extrema flagged by the sweep. Verify the four repaired rim normal/tangent rows remain exact. Tiny commissure dots and the close Attack crease highlight are watchpoints, not diagnosed holes. Eye seating and temporal deformation are not approved by present stills. Stop and version any demonstrated local correction; preserve current exports.
+2. Complete actual full/LOD playback at game distance for all 18 clips, including loop recovery, terminal Death, turn/dive/rise, feeding and distinct combat reactions. Check LOD switching, anchor motion and runtime palette slots. Structural 18/18 availability and matching animation samples already pass; reuse that report instead of rebuilding the rig or rerunning geometry work without a new change.
+3. If those gates pass, run the repository's final creature/eye/export/package checks and make the local delivery from the exact accepted files. Both raw exports already meet the 25 MB per-export gate. Verify final packaged size and correspondence after any required packaging operation. Reuse the four hash-recorded candidate04 full portraits while full bytes remain unchanged; regenerate only if the validated full changes. Parent owns final integration/publication decisions.
+
+This is a reviewable finishing plan, not a frozen executable audit job. Authoring that small recipe waits for resumed work/parent assignment. Do not interpret this file as an instruction to launch jobs during the pause. No more heavy execution or new source iteration today.

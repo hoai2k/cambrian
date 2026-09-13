@@ -10,6 +10,13 @@ const devSizes=Object.fromEntries(shipped.map(id=>[id,fs.statSync(`public/assets
 fs.writeFileSync('src/content/devonian/asset-sizes.json',JSON.stringify(devSizes,null,2)+'\n');
 console.log('Recorded Devonian GLB sizes for',shipped.length,'shipped specimens');
 
+// The Triassic pack likewise (tools/triassic/shipped.json): an animal not listed keeps borrowing
+// a Devonian body and reports that body's bytes (src/content/triassic/index.ts).
+const triShipped=JSON.parse(fs.readFileSync('tools/triassic/shipped.json','utf8')).creatures;
+const triSizes=Object.fromEntries(triShipped.map(id=>[id,fs.statSync(`public/assets/triassic/creatures/${id}.glb`).size]));
+fs.writeFileSync('src/content/triassic/asset-sizes.json',JSON.stringify(triSizes,null,2)+'\n');
+console.log('Recorded Triassic GLB sizes for',triShipped.length,'shipped specimens');
+
 // Keep the shared anchor registry complete without rewriting the original eight records.
 const anchorPath='docs/creature-anchors-manifest.json';
 const sourceFiles=['soft','arthropods','jellies'].map(group=>`tools/creatures/${group}/anchors.json`);

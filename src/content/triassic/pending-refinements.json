@@ -1,0 +1,177 @@
+[
+  {
+    "id": "cymbospondylus",
+    "status": "pending",
+    "scope": "initial-model",
+    "model": true,
+    "reason": "No Triassic model has been delivered yet: this animal borrows a Devonian body in play until its own Tripo model, rig and clips land through the pipeline in docs/triassic/04-tripo-pipeline.md; its canonical pose is approved in docs/triassic/canonical/."
+  },
+  {
+    "id": "shonisaurus",
+    "status": "pending",
+    "scope": "initial-model",
+    "model": true,
+    "reason": "No Triassic model has been delivered yet: this animal borrows a Devonian body in play until its own Tripo model, rig and clips land through the pipeline in docs/triassic/04-tripo-pipeline.md; its canonical pose is approved in docs/triassic/canonical/."
+  },
+  {
+    "id": "nothosaurus",
+    "status": "pending",
+    "scope": "initial-model",
+    "model": true,
+    "reason": "No Triassic model has been delivered yet: this animal borrows a Devonian body in play until its own Tripo model, rig and clips land through the pipeline in docs/triassic/04-tripo-pipeline.md; its canonical pose is approved in docs/triassic/canonical/."
+  },
+  {
+    "id": "dinocephalosaurus",
+    "status": "pending",
+    "scope": "initial-model",
+    "model": true,
+    "reason": "No Triassic model has been delivered yet: this animal borrows a Devonian body in play until its own Tripo model, rig and clips land through the pipeline in docs/triassic/04-tripo-pipeline.md; its canonical pose is approved in docs/triassic/canonical/."
+  },
+  {
+    "id": "helicoprion",
+    "status": "pending",
+    "scope": "initial-model",
+    "model": true,
+    "reason": "No Triassic model has been delivered yet: this animal borrows a Devonian body in play until its own Tripo model, rig and clips land through the pipeline in docs/triassic/04-tripo-pipeline.md; its canonical pose is approved in docs/triassic/canonical/."
+  },
+  {
+    "id": "rhaeticosaurus",
+    "status": "pending",
+    "scope": "initial-model",
+    "model": true,
+    "reason": "No Triassic model has been delivered yet: this animal borrows a Devonian body in play until its own Tripo model, rig and clips land through the pipeline in docs/triassic/04-tripo-pipeline.md; its canonical pose is approved in docs/triassic/canonical/."
+  },
+  {
+    "id": "atopodentatus",
+    "status": "pending",
+    "scope": "initial-model",
+    "model": true,
+    "reason": "No Triassic model has been delivered yet: this animal borrows a Devonian body in play until its own Tripo model, rig and clips land through the pipeline in docs/triassic/04-tripo-pipeline.md; its canonical pose is approved in docs/triassic/canonical/."
+  },
+  {
+    "id": "askeptosaurus",
+    "status": "pending",
+    "scope": "initial-model",
+    "model": true,
+    "reason": "No Triassic model has been delivered yet: this animal borrows a Devonian body in play until its own Tripo model, rig and clips land through the pipeline in docs/triassic/04-tripo-pipeline.md; its canonical pose is approved in docs/triassic/canonical/."
+  },
+  {
+    "id": "placodus",
+    "status": "pending",
+    "scope": "initial-model",
+    "model": true,
+    "reason": "No Triassic model has been delivered yet: this animal borrows a Devonian body in play until its own Tripo model, rig and clips land through the pipeline in docs/triassic/04-tripo-pipeline.md; its canonical pose is approved in docs/triassic/canonical/."
+  },
+  {
+    "id": "hybodus",
+    "status": "pending",
+    "scope": "initial-model",
+    "model": true,
+    "reason": "No Triassic model has been delivered yet: this animal borrows a Devonian body in play until its own Tripo model, rig and clips land through the pipeline in docs/triassic/04-tripo-pipeline.md; its canonical pose is approved in docs/triassic/canonical/."
+  },
+  {
+    "id": "birgeria",
+    "status": "pending",
+    "scope": "initial-model",
+    "model": true,
+    "reason": "No Triassic model has been delivered yet: this animal borrows a Devonian body in play until its own Tripo model, rig and clips land through the pipeline in docs/triassic/04-tripo-pipeline.md; its canonical pose is approved in docs/triassic/canonical/."
+  },
+  {
+    "id": "aphaneramma",
+    "status": "pending",
+    "scope": "initial-model",
+    "model": true,
+    "reason": "No Triassic model has been delivered yet: this animal borrows a Devonian body in play until its own Tripo model, rig and clips land through the pipeline in docs/triassic/04-tripo-pipeline.md; its canonical pose is approved in docs/triassic/canonical/."
+  },
+  {
+    "id": "mixosaurus",
+    "status": "pending",
+    "scope": "initial-model",
+    "model": true,
+    "reason": "No Triassic model has been delivered yet: this animal borrows a Devonian body in play until its own Tripo model, rig and clips land through the pipeline in docs/triassic/04-tripo-pipeline.md; its canonical pose is approved in docs/triassic/canonical/."
+  },
+  {
+    "id": "henodus",
+    "status": "pending",
+    "scope": "initial-model",
+    "model": true,
+    "reason": "No Triassic model has been delivered yet: this animal borrows a Devonian body in play until its own Tripo model, rig and clips land through the pipeline in docs/triassic/04-tripo-pipeline.md; its canonical pose is approved in docs/triassic/canonical/."
+  },
+  {
+    "id": "saurichthys",
+    "status": "pending",
+    "scope": "initial-model",
+    "model": true,
+    "reason": "No Triassic model has been delivered yet: this animal borrows a Devonian body in play until its own Tripo model, rig and clips land through the pipeline in docs/triassic/04-tripo-pipeline.md; its canonical pose is approved in docs/triassic/canonical/."
+  },
+  {
+    "id": "hupehsuchus",
+    "status": "pending",
+    "scope": "initial-model",
+    "model": true,
+    "reason": "No Triassic model has been delivered yet: this animal borrows a Devonian body in play until its own Tripo model, rig and clips land through the pipeline in docs/triassic/04-tripo-pipeline.md; its canonical pose is approved in docs/triassic/canonical/."
+  },
+  {
+    "id": "keichousaurus",
+    "status": "pending",
+    "scope": "initial-model",
+    "model": true,
+    "reason": "No Triassic model has been delivered yet: this animal borrows a Devonian body in play until its own Tripo model, rig and clips land through the pipeline in docs/triassic/04-tripo-pipeline.md; its canonical pose is approved in docs/triassic/canonical/."
+  },
+  {
+    "id": "cartorhynchus",
+    "status": "pending",
+    "scope": "initial-model",
+    "model": true,
+    "reason": "No Triassic model has been delivered yet: this animal borrows a Devonian body in play until its own Tripo model, rig and clips land through the pipeline in docs/triassic/04-tripo-pipeline.md; its canonical pose is approved in docs/triassic/canonical/."
+  },
+  {
+    "id": "odontochelys",
+    "status": "pending",
+    "scope": "initial-model",
+    "model": true,
+    "reason": "No Triassic model has been delivered yet: this animal borrows a Devonian body in play until its own Tripo model, rig and clips land through the pipeline in docs/triassic/04-tripo-pipeline.md; its canonical pose is approved in docs/triassic/canonical/."
+  },
+  {
+    "id": "ceratites",
+    "status": "pending",
+    "scope": "initial-model",
+    "model": true,
+    "reason": "No Triassic model has been delivered yet: this animal borrows a Devonian body in play until its own Tripo model, rig and clips land through the pipeline in docs/triassic/04-tripo-pipeline.md; its canonical pose is approved in docs/triassic/canonical/."
+  },
+  {
+    "id": "phragmoteuthis",
+    "status": "pending",
+    "scope": "initial-model",
+    "model": true,
+    "reason": "No Triassic model has been delivered yet: this animal borrows a Devonian body in play until its own Tripo model, rig and clips land through the pipeline in docs/triassic/04-tripo-pipeline.md; its canonical pose is approved in docs/triassic/canonical/."
+  },
+  {
+    "id": "tanystropheus",
+    "status": "pending",
+    "scope": "initial-model",
+    "model": true,
+    "reason": "No Triassic model has been delivered yet: this animal borrows a Devonian body in play until its own Tripo model, rig and clips land through the pipeline in docs/triassic/04-tripo-pipeline.md; its canonical pose is approved in docs/triassic/canonical/."
+  },
+  {
+    "id": "mystriosuchus",
+    "status": "pending",
+    "scope": "initial-model",
+    "model": true,
+    "reason": "No Triassic model has been delivered yet: this animal borrows a Devonian body in play until its own Tripo model, rig and clips land through the pipeline in docs/triassic/04-tripo-pipeline.md; its canonical pose is approved in docs/triassic/canonical/."
+  },
+  {
+    "id": "macrocnemus",
+    "status": "pending",
+    "scope": "initial-model",
+    "model": true,
+    "reason": "No Triassic model has been delivered yet: this animal borrows a Devonian body in play until its own Tripo model, rig and clips land through the pipeline in docs/triassic/04-tripo-pipeline.md; its canonical pose is approved in docs/triassic/canonical/."
+  },
+  {
+    "id": "coelophysis",
+    "status": "pending",
+    "scope": "initial-model",
+    "model": true,
+    "reason": "No Triassic model has been delivered yet: this animal borrows a Devonian body in play until its own Tripo model, rig and clips land through the pipeline in docs/triassic/04-tripo-pipeline.md; its canonical pose is approved in docs/triassic/canonical/."
+  }
+]

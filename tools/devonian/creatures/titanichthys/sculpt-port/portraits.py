@@ -1,12 +1,20 @@
 """Four delivery portraits for the sculpt-port candidate (pattern: stethacanthus/portraits_v3.py,
 adapted to titanichthys's own bounding box and a three-quarter framing that fits its longer body).
 
-    /opt/blender/blender --background --python tools/devonian/creatures/titanichthys/sculpt-port/portraits.py
+    /opt/blender/blender --background --factory-startup \
+        --python tools/devonian/creatures/titanichthys/sculpt-port/portraits.py -- [--out DIR]
+
+--out names the directory holding titanichthys.glb, and is where the four PNGs are written; it
+defaults to the candidate's own. The finished port's portraits come from its sculpt-final copy,
+rendered before packaging (Blender cannot import a meshopt-compressed GLB).
 """
 import bpy
+import sys
 from pathlib import Path
 from mathutils import Vector
-OUT = Path('/home/user/devonian-authoring/titanichthys/sculpt-candidate')
+argv = sys.argv[sys.argv.index('--') + 1:] if '--' in sys.argv else []
+OUT = Path(argv[argv.index('--out') + 1] if '--out' in argv
+           else '/home/user/devonian-authoring/titanichthys/sculpt-candidate')
 bpy.ops.wm.read_factory_settings(use_empty=True)
 scene = bpy.context.scene
 scene.render.fps = 30

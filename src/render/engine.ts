@@ -920,7 +920,8 @@ export class Engine {
   private breathe(game: Game, keep: Set<number>) {
     for (const [id, v] of this.views) {
       const a = keep.has(id) ? game.byId(id) : undefined;
-      if (!a || !isAlive(a) || isHidden(a) || creature(a.creature).breathing !== 'bimodal') { this.breath.delete(id); continue; }
+      const breathing = a ? creature(a.creature).breathing : undefined;
+      if (!a || !isAlive(a) || isHidden(a) || (breathing !== 'bimodal' && breathing !== 'air')) { this.breath.delete(id); continue; }
       const L = lengthOf(a);
       const prev = this.breath.get(id);
       this.breath.set(id, { stamina: a.stamina, owed: prev?.owed ?? 0 });
