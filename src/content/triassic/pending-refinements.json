@@ -18,7 +18,12 @@
     "status": "pending",
     "scope": "initial-model",
     "model": true,
-    "reason": "The Triassic model has landed and the game and the specimen viewer both load it (2026-09-13). It keeps the preview badge until a human approves the body itself: the generated shape, its procedural twin and the clips they share (docs/triassic/04-tripo-pipeline.md)."
+    "reason": "The Triassic model has landed and the game and the specimen viewer both load it (2026-09-13). It keeps the preview badge until a human approves the body itself: the generated shape, its procedural twin and the clips they share (docs/triassic/04-tripo-pipeline.md).",
+    "clips": [
+      "Swim",
+      "Sprint"
+    ],
+    "clipReason": "The stroke is a walking gait, not a swimming one. Measured off the shipped clip: the two forelimb paddles row in antiphase (left furthest aft at 0.13 of the cycle, right at 0.67 — half a cycle apart), the hind pair strokes together at 0.38, and the skull yaws at the stroke rate with the widest arc on the whole front of the animal. Left fore, both hinds, right fore is a trot. Nothosaur trackways (Zhang et al. 2014) preserve PAIRED forelimb marks: the forelimbs rowed bilaterally, together. The tail is already right and must not be touched — its amplitude grows head to tail (0.015 to 0.398) and the wave lags rearward. Brief in docs/triassic/03-image-and-model-requests.md; the renderer damps the head swing meanwhile (steadyHead)."
   },
   {
     "id": "dinocephalosaurus",

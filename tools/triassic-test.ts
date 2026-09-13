@@ -120,20 +120,42 @@ ok(opener && fs.existsSync(`public/${decodeURIComponent(paths.music(opener.name)
   notho.grabbedBy = -1; giant.grabbing = -1;
 }
 
-// ---- birth: live-bearers arrive at the surface beside a mother ----
+// ---- birth: everything hatches from an egg on the floor, and the live-bearers get a parent ----
+// The live-bearers were once born at the surface, which is what the fossils say and what the first
+// ten seconds of a match could least afford: the series opens on an egg cracking on the bottom, and
+// a player dropped into open midwater never sees it. The research stays as the escort.
+for (const [id, kind] of [['mixosaurus', 'a live-bearer'], ['placodus', 'an egg-layer']] as const) {
+  const g = new Game('rise', [{ creature: id, device: 'keyboard', ready: true }]);
+  const born = g.players[0];
+  ok(born.hatching && born.state === 'moult' && born.stateDur > 1.5, `${kind} starts inside an egg`);
+  const floor = sampleHeight(born.pos.x, born.pos.z);
+  ok(born.pos.y < SURFACE_Y - 6 && born.pos.y - floor < 3,
+    `...laid on the sea floor, not in open water (y ${born.pos.y.toFixed(1)}, floor ${floor.toFixed(1)}, surface ${SURFACE_Y})`);
+  g.skipHatch();
+}
 {
   const g = new Game('rise', [{ creature: 'mixosaurus', device: 'keyboard', ready: true }]);
   g.skipHatch();
   const calf = g.players[0];
-  ok(calf.pos.y > SURFACE_Y - 6, `a Mixosaurus calf is born at the surface (y ${calf.pos.y.toFixed(1)} of ${SURFACE_Y})`);
   run(g, 1);
   const t = triActor(g, calf);
   const mother = t.mother >= 0 ? g.byId(t.mother) : undefined;
-  ok(!!mother && mother.creature === 'mixosaurus' && lengthOf(mother) > lengthOf(calf) * 2, 'and an adult of its kind is beside it');
-  ok(t.calfT > 50 && t.calfT < 60, 'the mother stays a minute');
+  ok(!!mother && mother.creature === 'mixosaurus' && lengthOf(mother) > lengthOf(calf) * 2, 'an adult of its kind is beside a live-bearer');
+  ok(t.calfT > 50 && t.calfT < 60, 'and it stays a minute');
   const e = new Game('rise', [{ creature: 'placodus', device: 'keyboard', ready: true }]);
   e.skipHatch();
-  ok(e.players[0].pos.y < SURFACE_Y - 6, 'an egg-layer hatches down in cover, as in the other eras');
+  run(e, 1);
+  ok(triActor(e, e.players[0]).mother < 0, 'an egg-layer gets no escort');
+}
+// The shell an animal comes out of says what it is: a reptile's is leathery, and the sharks, fish,
+// amphibian and cephalopods on the roster lay nothing of the kind.
+{
+  const leathery = CREATURES.filter((c) => c.eggShell === 'leathery').map((c) => c.id);
+  const plain = CREATURES.filter((c) => c.eggShell !== 'leathery').map((c) => c.id);
+  ok(leathery.includes('nothosaurus') && leathery.includes('henodus') && leathery.includes('coelophysis'),
+    `the reptiles lay leathery eggs (${leathery.length} of ${CREATURES.length})`);
+  ok(!plain.some((id) => !['helicoprion', 'hybodus', 'birgeria', 'saurichthys', 'aphaneramma', 'ceratites', 'phragmoteuthis'].includes(id)),
+    `and only the two sharks, two fish, the amphibian and the two cephalopods do not (${plain.join(', ')})`);
 }
 
 // ---- armour with a facing ----
