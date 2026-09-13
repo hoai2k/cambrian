@@ -4,8 +4,8 @@ The delivered Tripo body and the procedural volume puppet use one armature and o
 
 ## Delivered files
 
-- `public/assets/triassic/creatures/shonisaurus.glb`: 117,442 triangles, 4,387,380 bytes, vertex pigmentation and source normal detail.
-- `shonisaurus.puppet.glb`: 10,874 triangles, 586,100 bytes, measured procedural body, rostrum branches, four flipper lofts and crescent caudal loft.
+- `public/assets/triassic/creatures/shonisaurus.glb`: 117,442 triangles, 4,379,544 bytes, vertex pigmentation and source normal detail.
+- `shonisaurus.puppet.glb`: 10,874 triangles, 578,472 bytes, measured procedural body, rostrum branches, four flipper lofts and crescent caudal loft.
 - `shonisaurus.lod1.glb`: byte-identical to the procedural puppet.
 - `shonisaurus.json`: physical scale, clip and socket metadata.
 - Studio, select, card, thumbnail and puppet portraits are rendered from the final meshes.
@@ -41,13 +41,23 @@ Three bone-parented sockets are identical in both files: `anchor_mouth`, `anchor
 `deformation-validation.json` records:
 
 - Maximum dorsal/ventral/width error across twenty sections: **0.0530 units, 0.884% of length**, under the 4% contract tolerance.
-- Signed surface volume: **3.3027 full / 3.0805 puppet**, a 6.7% difference.
-- Full-to-puppet surface distance: median 0.00418, 95th percentile 0.0382 units.
+- Signed surface volume: **3.2989 full / 3.0300 puppet**, an 8.2% difference.
+- Full-to-puppet surface distance: median 0.00424, 95th percentile 0.0382 units.
 - All four flipper root joints inside the source trunk.
 - Sampled globe volume inside the head: **69.8% left / 61.7% right** (619 samples per globe).
-- Every action sampled at six phases with finite skinned positions and per-edge stretch measurements; no edge exceeds five times its rest length. The highest local stretch is a small oral web edge at maximum Heavy gape; swimming's 99th-percentile stretch is about 3.4%, Sprint's about 5.2%.
+- Every action sampled at six phases with finite skinned positions and per-edge stretch measurements; the largest stretch is 5.99× on a small internal oral web edge opening from its compressed closed-rest shape during Heavy. Five sampled edge instances exceed 5×; the overall 99th-percentile maximum is 1.116×. Reviewed external surfaces show no tears, and the mouth interior remains present while opening. This remains a PREVIEW reconstruction.
 
-Codex visually reviewed paired side/three-quarter views, close mouth views and multi-frame swimming, sprint, heavy strike, dodge and death sheets on 2026-09-12. `exported-motion-review.jpg` is rendered from the shipped GLBs after meshopt decode, viewed from above to expose the lateral tail wave and steering. `action-review.jpg` shows matching side-view action phases, and `volume-review.jpg` compares the bodies from three views.
+Codex visually reviewed paired side/three-quarter views, close mouth views and multi-frame swimming, sprint, heavy strike, dodge and death sheets on 2026-09-13. `exported-motion-review.jpg` is rendered from the shipped GLBs after meshopt decode, viewed from above to expose the lateral tail wave and steering. `action-review.jpg` shows matching side-view action phases, and `volume-review.jpg` compares the bodies from three views.
+
+## Closed-mouth revision — 2026-09-13
+
+The jaw's zero pose is closed in the actual mesh. The builder seats the imported lower jaw by −0.155 radians, applies a small smooth middle-rostrum lip correction, and fits the procedural lower lip against the upper-rostrum underside. Opposite-jaw ray contamination at the procedural tip is removed. Palate and floor ends are retracted inside the rostrum, and mouth sockets follow the revised bind geometry.
+
+Only **Bite, Attack, Heavy and Eat** open the mouth. Idle, Swim, Sprint, turning, diving/rising, defensive reactions, Ability, Growth and Death keep a constant closed jaw. Attack phases return to closed contact without the former negative closing overshoot. The package audit enforces no jaw motion in the other fifteen clips and exact rig/clip/socket parity between bodies.
+
+`mouth-closure-validation.json` proves geometric closure with oral fillers and teeth excluded: 14,400 lateral rays across 60 rostral sections detect **zero through-apertures in either body**. The same scan on the preserved former-open control detects 3,128 full / 3,736 puppet misses and maximum openings of 0.126 / 0.130 units. Thus the puppet's dark lip wedge is a sealed, shadowed surface, not a lumen left open by the rest pose. `closed-mouth-review.jpg` shows Idle and Ability beside a feeding strike for both bodies.
+
+The prior open `.blend` is preserved locally as `shonisaurus.before-mouth-closure.blend`. Raw source data and PREVIEW status are preserved.
 
 ## Reproduction
 
@@ -58,6 +68,8 @@ Blender -b --python tools/triassic/creatures/shonisaurus/build.py
 node tools/triassic/creatures/shonisaurus/package-audit.mjs
 Blender -b --python tools/triassic/creatures/shonisaurus/deformation-audit.py
 Blender -b --python tools/triassic/creatures/shonisaurus/review.py
+Blender -b --python tools/triassic/creatures/shonisaurus/review.py -- --mouth-only
+Blender -b --python tools/triassic/creatures/shonisaurus/mouth-closure-audit.py
 Blender -b --python tools/triassic/creatures/shonisaurus/exported-review.py
 node tools/triassic/creatures/shonisaurus/portraits.mjs
 ```

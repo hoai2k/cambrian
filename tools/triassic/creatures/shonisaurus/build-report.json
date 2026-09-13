@@ -1,5 +1,10 @@
 {
   "rawSHA256": "576114e5d8e4b3eabfd97148a515cc8f9f4567788478791a4441eb85606b6330",
+  "closedRestJawAngleRadians": -0.155,
+  "puppetLipContactFit": {
+    "vertices": 66,
+    "maximumModelDisplacement": 0.07871732556819916
+  },
   "chinSurgery": {
     "adjustedVertices": 23,
     "maximumRawLengthDisplacement": 0.0011560130119323726
