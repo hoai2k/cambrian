@@ -25,7 +25,7 @@
  * Nothing is invented here. A subject the export does not mention is left exactly as it was, so
  * the file can be applied a screenful at a time.
  */
-import { readFile, writeFile, readdir } from 'node:fs/promises';
+import { readFile, writeFile, readdir, rename, mkdir } from 'node:fs/promises';
 import { existsSync } from 'node:fs';
 
 const args = process.argv.slice(2);
@@ -42,6 +42,7 @@ const SUBJECTS = 'docs/research/triassic/viewer/subjects.json';
 const REFINEMENTS = 'src/content/triassic/pending-refinements.json';
 const SHIPPED = 'tools/triassic/shipped.json';
 const CANON_DIR = 'docs/triassic/canonical';
+const BACKUP = `backups/promoted-${new Date().toISOString().slice(0, 10)}`;
 
 const exported = file ? JSON.parse(await readFile(file, 'utf8')) : { selections: [] };
 let applied = 0;
@@ -64,12 +65,23 @@ const before = JSON.stringify(manifest);
 /** A subject the manifest has never heard of: the alternates and the scenery have no pose of their own. */
 const hasPose = (id) => ['png', 'jpg', 'jpeg', 'webp'].some((e) => existsSync(`docs/triassic/canonical/${id}.${e}`));
 
-const unknown = [];
+const unknown = [], promotions = [];
 for (const row of selections) {
   const subject = subjects.get(row.id);
   if (!subject) { unknown.push(row.id); continue; }
   const entry = (manifest.subjects[row.id] ??= { canonical: hasPose(row.id) ? 'approved' : 'none', turnaround: 'not-started' });
+  if (row.verdict === 'delivered') {
+    // The page reports what the manifest already told it. Nothing to apply; the state is derived
+    // from the shipped list above, and a stale export must never be able to un-deliver a body.
+    if (entry.canonical !== 'delivered') entry.reviewedCandidate ??= row.ref;
+    continue;
+  }
+  if (row.ref && row.ref !== 'canonical') entry.reviewedCandidate = row.ref;
   if (row.verdict === 'greenlit') {
+    // A greenlit candidate *becomes* the pose. Everything downstream — the modelling sheet, the
+    // Tripo input, the portraits — reads `<id>.png` and nothing else, so leaving the winner beside
+    // the picture it beat under a different name would send the loser to be built.
+    if (row.image?.kind === 'candidate' || /^candidate/.test(row.ref ?? '')) promotions.push({ id: row.id, label: row.ref });
     entry.canonical = 'greenlit';
     // Which of our images is the canon, where a subject has more than one — the male Keichousaurus
     // rather than the female, a modelling sheet rather than the pose beside it. A plain pose leaves
@@ -92,6 +104,47 @@ for (const row of selections) {
   }
   entry.decidedAt = row.at ?? exported.generated;
   applied++;
+}
+
+/**
+ * Promote each greenlit candidate to *be* the subject's canonical pose: the old pose is kept under
+ * `backups/`, the candidate takes its place, and the prompt record that was waiting on a human
+ * answer records the one it got. The candidate file itself goes, because two identical images
+ * under two names in the viewer is a question a reviewer should never have to answer.
+ */
+const promoted = [];
+for (const { id, label } of promotions) {
+  const ext = ['png', 'jpg', 'jpeg', 'webp'].find((e) => existsSync(`${CANON_DIR}/${id}-${label}.${e}`));
+  if (!ext) { console.warn(`  ${id}: greenlit \`${label}\` but no such image beside the pose; left as it was`); continue; }
+  const from = `${CANON_DIR}/${id}-${label}.${ext}`, to = `${CANON_DIR}/${id}.${ext}`;
+  if (!dryRun) {
+    await mkdir(`${CANON_DIR}/${BACKUP}`, { recursive: true });
+    if (existsSync(to)) await rename(to, `${CANON_DIR}/${BACKUP}/${id}.${ext}`);
+    await rename(from, to);
+  }
+  const entry = manifest.subjects[id];
+  delete entry.greenlitImage; delete entry.reviewedCandidate;
+  entry.promotedFrom = label;
+  promoted.push(`${id} (${label})`);
+}
+// The prompt records stop asking: the candidate they were waiting on has had its answer.
+if (promoted.length || selections.length) {
+  for (const f of (await readdir(CANON_DIR).catch(() => []))) {
+    if (!f.startsWith('prompts') || !f.endsWith('.json')) continue;
+    const path = `${CANON_DIR}/${f}`;
+    const j = JSON.parse(await readFile(path, 'utf8').catch(() => '{}'));
+    let touched = false;
+    for (const [id, sub] of Object.entries(j.subjects ?? {})) {
+      if (sub.status !== 'candidate-awaiting-human-greenlight') continue;
+      const row = selections.find((r) => r.id === id);
+      if (!row) continue;
+      sub.status = row.verdict === 'greenlit' ? 'greenlit-and-promoted' : `reviewed-${row.verdict}`;
+      sub.reviewedAt = row.at ?? exported.generated;
+      if (row.note) sub.reviewerNote = row.note;
+      touched = true;
+    }
+    if (touched && !dryRun) await writeFile(path, `${JSON.stringify(j, null, 2)}\n`);
+  }
 }
 
 // ---- reconciling the manifest with the tree ----
@@ -123,19 +176,25 @@ for (const id of shipped) {
  * *looked at*. So the decision is cleared and the subject returns to the undecided pile, where the
  * viewer shows the new candidate beside the pose it is meant to replace.
  */
-const candidates = new Set();
+const candidates = new Map();
 for (const f of (await readdir(CANON_DIR).catch(() => []))) {
   if (!f.startsWith('prompts') || !f.endsWith('.json')) continue;
   const j = JSON.parse(await readFile(`${CANON_DIR}/${f}`, 'utf8').catch(() => '{}'));
   for (const [id, sub] of Object.entries(j.subjects ?? {}))
-    if (sub.status === 'candidate-awaiting-human-greenlight') candidates.add(id);
+    if (sub.status === 'candidate-awaiting-human-greenlight')
+      // `mystriosuchus-candidate02.png` → `candidate02`, which is the label the viewer shows it
+      // under and therefore the one a decision names.
+      candidates.set(id, String(sub.candidate ?? '').replace(/\.[a-z]+$/i, '').replace(`${id}-`, '') || 'candidate');
 }
 const reopened = [];
-for (const id of candidates) {
+for (const [id, label] of candidates) {
   const entry = manifest.subjects[id];
   // A delivered body is not reopened by a new drawing of the animal: the model is the thing under
   // review by then, and the pose it was built from is history.
   if (!entry || entry.canonical === 'delivered' || entry.canonical === 'approved') continue;
+  // Nor is one a human has already looked at. Without this the reopen fires on every run and
+  // quietly undoes the decision the reviewer just made about that very candidate.
+  if (entry.reviewedCandidate === label) continue;
   delete entry.canonical; delete entry.reworkToward; delete entry.reworkNote;
   delete entry.decidedAt; delete entry.greenlitImage; delete entry.note;
   entry.canonical = hasPose(id) ? 'approved' : 'none';
@@ -210,7 +269,11 @@ if (rework.length) {
       if (im.full) lines.push(`- **Full size:** ${im.full}`);
       if (im.description) lines.push(`- **Described as:** ${esc(im.description)}`);
     } else {
-      lines.push(`- **Redraw our own ${im.kind === 'turnaround' ? 'modelling sheet' : 'pose'}:** \`docs/triassic/canonical/${r.id}.png\``);
+      // The picture to redraw is the one that was *chosen*, which after a candidate round is the
+      // candidate rather than the pose it was drawn against. Naming the wrong file here would send
+      // the generator back to the version the reviewer had already moved past.
+      const stem = im.label && im.label !== 'canonical' ? `${r.id}-${im.label}` : r.id;
+      lines.push(`- **Redraw our own ${im.kind === 'turnaround' ? 'modelling sheet' : 'pose'}:** \`docs/triassic/canonical/${stem}.png\``);
       lines.push('- **Steer toward:** nothing external — the reading is accepted and the note below is the whole brief.');
     }
     lines.push(`- **Reviewer's note:** ${esc(r.reworkNote) || '—'}`);
@@ -270,7 +333,7 @@ if (dryRun) {
   const reasonsChanged = JSON.stringify(refinements) !== refinementsBefore;
   if (reasonsChanged) await writeFile(REFINEMENTS, `${JSON.stringify(refinements, null, 2)}\n`);
   await writeFile(REVIEW, `${lines.join('\n')}`);
-  console.log(`${applied} decision(s) applied${reopened.length ? `, ${reopened.length} reopened by a fresh candidate (${reopened.join(', ')})` : ''}`);
+  console.log(`${applied} decision(s) applied${promoted.length ? `, ${promoted.length} candidate(s) promoted to the pose (${promoted.join(', ')})` : ''}${reopened.length ? `, ${reopened.length} reopened by a fresh candidate (${reopened.join(', ')})` : ''}`);
   console.log(`  the roster now stands at ${delivered.length} delivered, ${greenlit.length} greenlit, ${rework.length} to redo, ${undecided.length} unreviewed`);
   console.log(`wrote ${REVIEW}${changed ? ` and ${MANIFEST}` : `; ${MANIFEST} unchanged`}${reasonsChanged ? ` and ${REFINEMENTS}` : ''}`);
 }
