@@ -7,11 +7,8 @@
     "cymbospondylus": {
       "turnaround": "not-started",
       "canonical": "greenlit",
-      "awaitingReview": "a regenerated candidate is in the viewer beside the pose it replaces",
       "decidedAt": "2026-09-13T13:52:17.045Z",
-      "promotedFrom": "candidate02",
-      "reviewedCandidate": "candidate02",
-      "greenlitImage": "candidate02"
+      "promotedFrom": "candidate02"
     },
     "shonisaurus": {
       "canonical": "delivered",
@@ -40,15 +37,9 @@
     },
     "rhaeticosaurus": {
       "turnaround": "not-started",
-      "canonical": "needs-rework",
-      "awaitingReview": "a regenerated candidate is in the viewer beside the pose it replaces",
-      "reviewedCandidate": "candidate02",
-      "reworkToward": {
-        "kind": "candidate",
-        "label": "candidate02"
-      },
-      "reworkNote": "It has 2 back fins on the same side, that's not right",
-      "decidedAt": "2026-09-13T13:52:43.169Z"
+      "canonical": "greenlit",
+      "decidedAt": "2026-09-13T15:03:39.359Z",
+      "promotedFrom": "candidate03"
     },
     "atopodentatus": {
       "canonical": "greenlit",
@@ -77,20 +68,9 @@
     },
     "aphaneramma": {
       "turnaround": "not-started",
-      "canonical": "needs-rework",
-      "awaitingReview": "a regenerated candidate is in the viewer beside the pose it replaces",
-      "reviewedCandidate": "Aphaneramma12DB.jpg",
-      "reworkToward": {
-        "kind": "web",
-        "title": "Aphaneramma12DB.jpg",
-        "artist": "Богданов",
-        "licence": "CC BY-SA 3.0",
-        "page": "https://commons.wikimedia.org/wiki/File:Aphaneramma12DB.jpg",
-        "full": "https://upload.wikimedia.org/wikipedia/commons/9/9a/Aphaneramma12DB.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
-        "description": "Aphaneramma, my own work, dmitrchel@mail.ru"
-      },
-      "reworkNote": "It should look more like an amphibian than a reptile",
-      "decidedAt": "2026-09-13T13:55:55.371Z"
+      "canonical": "greenlit",
+      "decidedAt": "2026-09-13T15:03:56.373Z",
+      "promotedFrom": "candidate03"
     },
     "mixosaurus": {
       "canonical": "greenlit",
@@ -128,11 +108,8 @@
     "odontochelys": {
       "turnaround": "not-started",
       "canonical": "greenlit",
-      "awaitingReview": "a regenerated candidate is in the viewer beside the pose it replaces",
       "decidedAt": "2026-09-13T13:57:25.792Z",
-      "promotedFrom": "candidate02",
-      "reviewedCandidate": "candidate02",
-      "greenlitImage": "candidate02"
+      "promotedFrom": "candidate02"
     },
     "ceratites": {
       "canonical": "greenlit",
@@ -147,27 +124,21 @@
     },
     "tanystropheus": {
       "turnaround": "not-started",
-      "canonical": "needs-rework",
       "awaitingReview": "a regenerated candidate is in the viewer beside the pose it replaces",
-      "reviewedCandidate": "candidate02",
+      "reviewedCandidate": "candidate03",
+      "canonical": "needs-rework",
       "reworkToward": {
         "kind": "candidate",
-        "label": "candidate02"
+        "label": "candidate03"
       },
-      "reworkNote": "Should be more apatasaurus sized - huge. And also, let's keep the background a bit different color and show the whole animal including feet so it's easier to translate into a 3d model reference",
-      "decidedAt": "2026-09-13T13:57:43.232Z"
+      "reworkNote": "Can you use this as a reference: https://clickpetroleoegas.com.br/wp-content/uploads/2026/01/Tanystropheus-hydroides.jpg . Note the sauropod body and long neck reaching out over the water.",
+      "decidedAt": "2026-09-13T15:07:22.780Z"
     },
     "mystriosuchus": {
       "turnaround": "not-started",
-      "canonical": "needs-rework",
-      "awaitingReview": "a regenerated candidate is in the viewer beside the pose it replaces",
-      "reviewedCandidate": "candidate02",
-      "reworkToward": {
-        "kind": "candidate",
-        "label": "candidate02"
-      },
-      "reworkNote": "Draw a picture from deep underwater instead of at the top of the water.",
-      "decidedAt": "2026-09-13T13:58:49.385Z"
+      "canonical": "greenlit",
+      "decidedAt": "2026-09-13T15:04:15.933Z",
+      "promotedFrom": "candidate03"
     },
     "macrocnemus": {
       "canonical": "greenlit",

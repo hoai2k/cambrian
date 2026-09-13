@@ -90,7 +90,7 @@ for (const row of selections) {
     // A greenlit subject can carry a note too — a caveat the build should know about — and it has
     // to survive the round trip, or the viewer reloads without it and the reviewer retypes it.
     if (row.note) entry.note = row.note; else delete entry.note;
-    delete entry.reworkToward; delete entry.reworkNote;
+    delete entry.reworkToward; delete entry.reworkNote; delete entry.awaitingReview;
   } else {
     entry.canonical = 'needs-rework';
     // A redo does not have to name somebody else's picture. "Redraw this one — the reading is
@@ -114,6 +114,16 @@ for (const row of selections) {
  */
 const promoted = [];
 for (const { id, label } of promotions) {
+  const entry0 = manifest.subjects[id];
+  // Already done. A viewer export re-states every standing decision, so the greenlight that
+  // promoted a candidate comes back on every later pass — by which time the candidate file is
+  // gone, because it *became* the pose. Without this the tool warns about a missing image on
+  // every run and records the promoted label as though the pose were still one of two.
+  if (entry0?.promotedFrom === label) {
+    delete entry0.greenlitImage; delete entry0.reviewedCandidate;
+    await retireCandidates(id);
+    continue;
+  }
   const ext = ['png', 'jpg', 'jpeg', 'webp'].find((e) => existsSync(`${CANON_DIR}/${id}-${label}.${e}`));
   if (!ext) { console.warn(`  ${id}: greenlit \`${label}\` but no such image beside the pose; left as it was`); continue; }
   const from = `${CANON_DIR}/${id}-${label}.${ext}`, to = `${CANON_DIR}/${id}.${ext}`;
@@ -124,8 +134,21 @@ for (const { id, label } of promotions) {
   }
   const entry = manifest.subjects[id];
   delete entry.greenlitImage; delete entry.reviewedCandidate;
+  delete entry.awaitingReview;
   entry.promotedFrom = label;
   promoted.push(`${id} (${label})`);
+  // The candidates it beat go with the pose it replaced. They lost to the picture that is now the
+  // canon, so leaving them in the directory leaves them in the viewer, where the next reviewer has
+  // to work out which of four images of the same animal is the one being built from.
+  await retireCandidates(id);
+}
+/** Move every remaining candidate of a promoted subject out of the directory the viewer reads. */
+async function retireCandidates(id) {
+  if (dryRun) return;
+  const rest = (await readdir(CANON_DIR).catch(() => [])).filter((f) => f.startsWith(`${id}-candidate`));
+  if (!rest.length) return;
+  await mkdir(`${CANON_DIR}/${BACKUP}`, { recursive: true });
+  for (const f of rest) await rename(`${CANON_DIR}/${f}`, `${CANON_DIR}/${BACKUP}/${f}`);
 }
 // The prompt records stop asking: the candidate they were waiting on has had its answer.
 if (promoted.length || selections.length) {
@@ -166,8 +189,14 @@ for (const id of shipped) {
   if (entry.canonical === 'greenlit') entry.greenlitAt = entry.decidedAt;
   entry.canonical = 'delivered';
   entry.deliveredAt = new Date().toISOString().slice(0, 10);
-  delete entry.reworkToward; delete entry.reworkNote;
+  delete entry.reworkToward; delete entry.reworkNote; delete entry.awaitingReview;
 }
+
+// `awaitingReview` describes only the interval between a regenerated candidate landing and a
+// human deciding it. Older manifests may retain the historical note after that human decision;
+// clear it without changing the decision itself.
+for (const entry of Object.values(manifest.subjects))
+  if (entry.canonical === 'greenlit' || entry.canonical === 'delivered') delete entry.awaitingReview;
 
 /**
  * A pose has been regenerated. The prompt records beside the poses mark a fresh candidate as
@@ -302,12 +331,12 @@ function refinementReason(id) {
     return 'The Triassic model has landed and the game and the specimen viewer both load it'
       + `${e.deliveredAt ? ` (${e.deliveredAt})` : ''}. It keeps the preview badge until a human approves the body itself: `
       + 'the generated shape, its procedural twin and the clips they share (docs/triassic/04-tripo-pipeline.md).';
-  if (e.awaitingReview)
-    return `${BORROWED} Its canonical pose is back under review — ${e.awaitingReview} `
-      + '(docs/triassic/canonical/review.md) — so nothing downstream may be built from it yet.';
   if (e.canonical === 'greenlit')
     return `${BORROWED} Its canonical pose is greenlit${e.greenlitImage ? ` (the \`${e.greenlitImage}\` pose)` : ''} in `
       + 'docs/triassic/canonical/review.md, so the four-view modelling sheet and the Tripo generation are cleared to be made from it.';
+  if (e.awaitingReview)
+    return `${BORROWED} Its canonical pose is back under review — ${e.awaitingReview} `
+      + '(docs/triassic/canonical/review.md) — so nothing downstream may be built from it yet.';
   if (e.canonical === 'needs-rework') {
     const t = e.reworkToward ?? {};
     const steer = t.kind === 'web' ? `a redo steered toward "${t.title}"` : 'a redraw of our own pose';

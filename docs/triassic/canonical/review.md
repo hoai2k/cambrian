@@ -17,7 +17,7 @@ sends the subject back to the undecided pile, where the viewer shows the candida
 
 | Delivered | Greenlit | Redo | Not yet reviewed |
 | --- | --- | --- | --- |
-| 2 | 19 | 4 | 45 |
+| 2 | 22 | 1 | 45 |
 
 ## Delivered — the model exists
 
@@ -33,13 +33,14 @@ shipped with the body, the specimen viewer switches between the two in place.
 
 | Subject | Slot | Canon image | Note |
 | --- | --- | --- | --- |
+| **Aphaneramma rostratum** `aphaneramma` | T12 · Rung II · the sensor (marine amphibian) | the pose | — |
 | **Askeptosaurus italicus** `askeptosaurus` | T08 · Rung II · the turner | the pose | — |
 | **Atopodentatus unicus** `atopodentatus` | T07 · Rung III · the grazer (hammerhead) | the pose | — |
 | **Birgeria stensioei** `birgeria` | T11 · Rung II · the tuna | the pose | — |
 | **Cartorhynchus lenticarpus** `cartorhynchus` | T18 · Rung I · the shallow-water sucker | the pose | — |
 | **Ceratites nodosus** `ceratites` | T20 · Rung I · the shell | the pose | — |
 | **Coelophysis** `coelophysis` | S04 · optional · the dinosaur at the water | the pose | — |
-| **Cymbospondylus youngorum** `cymbospondylus` | T01 · Rung IV giant · the first giant | `candidate02` | — |
+| **Cymbospondylus youngorum** `cymbospondylus` | T01 · Rung IV giant · the first giant | the pose | — |
 | **Dinocephalosaurus orientalis** `dinocephalosaurus` | T04 · Rung III · the reach (32-joint neck) | the pose | — |
 | **Helicoprion** `helicoprion` | T05 · Rung III · the whorl (Permian relict; see Fadenia) | the pose | — |
 | **Henodus chelyops** `henodus` | T14 · Rung II · the lagoon oddity | the pose | — |
@@ -48,9 +49,11 @@ shipped with the body, the specimen viewer switches between the two in place.
 | **Keichousaurus hui** `keichousaurus` | T17 · Rung I · the crowd | `male` | — |
 | **Macrocnemus bassanii** `macrocnemus` | S03 · the runner (ambient) | the pose | — |
 | **Mixosaurus cornalianus** `mixosaurus` | T13 · Rung II · the small fin | the pose | — |
-| **Odontochelys semitestacea** `odontochelys` | T19 · Rung I · the half-shell | `candidate02` | — |
+| **Mystriosuchus** `mystriosuchus` | S02 · the surface lurker (marine phytosaur) | the pose | — |
+| **Odontochelys semitestacea** `odontochelys` | T19 · Rung I · the half-shell | the pose | — |
 | **Phragmoteuthis bisinuata** `phragmoteuthis` | T21 · Rung I · the hooks | the pose | — |
 | **Placodus gigas** `placodus` | T09 · Rung II · the shell-cruncher | the pose | — |
+| **Rhaeticosaurus mertensi** `rhaeticosaurus` | T06 · Rung III · the flyer (first plesiosaur) | the pose | — |
 | **Saurichthys** `saurichthys` | T15 · Rung II · the needle | the pose | — |
 
 ## Redo — regenerate the canonical pose
@@ -61,36 +64,12 @@ name somebody else's artwork — use it as direction, keep its credit with the p
 ship it. Others name our own image, which means the reading is accepted and only the picture is
 wrong: there the note is the entire brief.
 
-### Aphaneramma rostratum `aphaneramma`
-
-- **Slot:** T12 · Rung II · the sensor (marine amphibian) · ~1.5–2 m
-- **Steer toward:** Aphaneramma12DB.jpg
-- **Credit:** Богданов · CC BY-SA 3.0
-- **File page:** https://commons.wikimedia.org/wiki/File:Aphaneramma12DB.jpg
-- **Full size:** https://upload.wikimedia.org/wikipedia/commons/9/9a/Aphaneramma12DB.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original
-- **Described as:** Aphaneramma, my own work, dmitrchel@mail.ru
-- **Reviewer's note:** It should look more like an amphibian than a reptile
-
-### Mystriosuchus `mystriosuchus`
-
-- **Slot:** S02 · the surface lurker (marine phytosaur) · ~4 m
-- **Redraw our own pose:** `docs/triassic/canonical/mystriosuchus-candidate02.png`
-- **Steer toward:** nothing external — the reading is accepted and the note below is the whole brief.
-- **Reviewer's note:** Draw a picture from deep underwater instead of at the top of the water.
-
-### Rhaeticosaurus mertensi `rhaeticosaurus`
-
-- **Slot:** T06 · Rung III · the flyer (first plesiosaur) · ~2.4 m+
-- **Redraw our own pose:** `docs/triassic/canonical/rhaeticosaurus-candidate02.png`
-- **Steer toward:** nothing external — the reading is accepted and the note below is the whole brief.
-- **Reviewer's note:** It has 2 back fins on the same side, that's not right
-
 ### Tanystropheus hydroides `tanystropheus`
 
 - **Slot:** S01 · the boom (13-joint stiff neck) · ~5–6 m
-- **Redraw our own pose:** `docs/triassic/canonical/tanystropheus-candidate02.png`
+- **Redraw our own pose:** `docs/triassic/canonical/tanystropheus-candidate03.png`
 - **Steer toward:** nothing external — the reading is accepted and the note below is the whole brief.
-- **Reviewer's note:** Should be more apatasaurus sized - huge. And also, let's keep the background a bit different color and show the whole animal including feet so it's easier to translate into a 3d model reference
+- **Reviewer's note:** Can you use this as a reference: https://clickpetroleoegas.com.br/wp-content/uploads/2026/01/Tanystropheus-hydroides.jpg . Note the sauropod body and long neck reaching out over the water.
 
 
 ## Not yet reviewed

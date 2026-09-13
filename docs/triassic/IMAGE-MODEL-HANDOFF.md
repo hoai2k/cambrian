@@ -52,7 +52,7 @@ self-intersects in any clip. A ratio-based reading suggested otherwise at first 
 ×3 on a 0.035-unit edge and ×1.3 on a 0.224-unit edge are the same absolute movement, so a dense
 mesh flatters itself. Duplicated seam vertices were checked too: none carry mismatched weights.
 
-Two things are outstanding.
+Two defects were reported at this checkpoint; both are resolved in the correction below.
 
 **Shonisaurus' mouth inverts, and this is a regression.** At `Heavy` t=0.35 (and `Attack`, `Bite`)
 286 faces along the upper lip turn completely inside out — flip 1.00, the surface exactly
@@ -65,3 +65,36 @@ opens. It is plainly visible at any distance where the mouth is on screen.
 starbursts. It is in the baked maps, not the mesh: the same geometry with the same vertex normals
 and no textures renders perfectly smooth. Nothosaurus' texture is clean, so this is one model's
 bake. Both need Blender, which is why they are recorded here rather than fixed in place.
+
+## Lip and texture correction delivered — 13 September 2026
+
+Shonisaurus now preserves the original UV albedo pixel-for-pixel, uses white vertex colour,
+normal strength 0.15 and nonmetallic roughness 0.7. This removes the faulty vertex bake's
+starburst pattern. The lip has explicit skull/mandible ownership with a seated rear hinge;
+54 fractional-frame samples report zero lip inversions, compared with 259 in the prior closed
+build under the same audit (the earlier runtime audit above counted 286). Both filler-excluded
+mouth-closure scans remain 0/14,400 open rays. Root inspected packaged Idle at 0.5 s and Heavy
+at 0.35 s, zoomed side and front, with normal single-sided viewer rendering.
+
+Full GLB is 7,381,764 bytes, SHA-256
+`f4a1cc71bfb9920026a51467d5da83c74527be8c7d82c30974f1e15a7473c2f5`.
+The 572,216-byte puppet and LOD are unchanged, as are the 21-joint skeleton and 19 clips.
+Portraits, paired review sheets and reproducible audits are refreshed. Fine source tooth/rim
+irregularity and the reconstructed oral web remain limitations, not new human approval.
+
+**Independently re-audited on the shipped GLB, 13 September 2026.** Skinning every vertex the way
+three.js does, at 20 frames of all 19 clips, both defects are gone: `Heavy`, `Attack` and `Bite`
+now invert nothing at all, against 286 faces before, and the flank renders as smooth mottled hide
+with no trace of the starburst faceting. Nothosaurus is unchanged at 5 hairline faces in `Sprint`.
+
+What remains on Shonisaurus is the *original* finding, untouched by either correction and never
+claimed by it: **28 faces invert at the pelvic fin root in `Parry` (t=0.21) and `Dodge`**, with
+`pelvic0R` against `spine1`/`spine0`. They are hairline — sub-millimetre on a six-metre animal,
+invisible without being painted — so they are worth a smoothed weight falloff across that root
+next time the builder is open, and not worth a re-export on their own. The project's own fin rule
+already asks for it: a root's weights blend onto the body bones under it, radially, and for paired
+fins as much as median ones.
+
+For the ongoing roster batch, resume from `PRODUCTION-SESSION.json`: all requested images are
+on main at `237bf24`; the review window ends 2026-09-13 15:20:54 UTC. Sync and reevaluate
+greenlights then, generate/process/commit raw Tripo bodies before starting new paired rigs.

@@ -9,7 +9,7 @@ P=Path.cwd();L=P/'local/triassic-authoring/shonisaurus';H=P/'tools/triassic/crea
 def audit(file):
  bpy.ops.wm.open_mainfile(filepath=str(file));result={}
  for kind in ['full','puppet']:
-  obs=[bpy.data.objects['Shonisaurus authored skin']]if kind=='full'else[bpy.data.objects[n]for n in ['Puppet measured trunk','Puppet upper rostrum','Puppet lower rostrum']]
+  obs=[o for o in bpy.data.objects if o.type=='MESH'and o.name.startswith('Shonisaurus authored')]if kind=='full'else[bpy.data.objects[n]for n in ['Puppet measured trunk','Puppet upper rostrum','Puppet lower rostrum']]
   ps=[];ts=[]
   for o in obs:
    start=len(ps);ps.extend(v.co[:]for v in o.data.vertices);o.data.calc_loop_triangles();ts.extend(tuple(start+i for i in t.vertices)for t in o.data.loop_triangles)
