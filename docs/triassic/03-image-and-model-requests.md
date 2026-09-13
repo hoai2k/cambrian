@@ -1,11 +1,10 @@
 # 03 · Image and model requests
 
-
 ## Delivery checkpoint — 2026-09-13
 
 The 18 human-greenlit creatures now each have a dedicated single-model input and a qualitative four-view sheet under `canonical/model-inputs/<id>/`, derived from the approved pose. These sheets are visual guides; perspective drift is documented in each metadata file rather than treated as measured orthographic precision. Six replacement `candidate02` poses are available in the reference viewer and await human greenlight.
 
-Nothosaurus and Shonisaurus now ship authored Tripo bodies plus procedural volume twins with **identical skeletons, inverse binds, action samples and anchors within each pair**. The puppet also supplies LOD1. Both pairs are registered in the game and viewer, with model-rendered portraits replacing their placeholders, and remain preview models pending human visual approval. See [delivery state](IMAGE-MODEL-HANDOFF.md), [Nothosaurus pipeline](../../../tools/triassic/creatures/nothosaurus/README.md), and [Shonisaurus pipeline](../../../tools/triassic/creatures/shonisaurus/README.md). Raw Tripo tests are preserved in `intake/triassic-tests/`. The request tables below remain the broader roster specification, not a claim that every listed deliverable is still missing.
+Nothosaurus and Shonisaurus now ship authored Tripo bodies plus procedural volume twins with **identical skeletons, inverse binds, action samples and anchors within each pair**. The puppet also supplies LOD1. Both pairs are registered in the game and viewer, with model-rendered portraits replacing their placeholders, and remain preview models pending human visual approval. See [delivery state](IMAGE-MODEL-HANDOFF.md), [Nothosaurus pipeline](../../tools/triassic/creatures/nothosaurus/README.md), and [Shonisaurus pipeline](../../tools/triassic/creatures/shonisaurus/README.md). Raw Tripo tests are preserved in `intake/triassic-tests/`. The request tables below remain the broader roster specification, not a claim that every listed deliverable is still missing.
 
 **Status:** open requests, 12 September 2026. Everything the Triassic needs that does not exist,
 in two tiers by who makes it, and in two passes by what it is: **source images** first (reference
