@@ -24,7 +24,8 @@ const rows = TRIASSIC_CREATURES.filter(c => !shipped.has(c.id)).map(c => {
     const meta = JSON.parse(readFileSync(metaPath, 'utf8'));
     const source = resolve(folder, meta.canonicalSource);
     const image = resolve(folder, meta.input);
-    const variant = approval.greenlitImage;
+    // Promoted candidates now occupy the canonical base filename.
+    const variant = approval.promotedFrom ? null : approval.greenlitImage;
     const expected = resolve(root, `docs/triassic/canonical/${c.id}${variant && variant !== 'canonical' ? '-' + variant : ''}.png`);
     if (source !== expected) blocked = 'modeling input was not derived from the newly selected canonical';
     else if (!existsSync(source) || hash(source) !== meta.canonicalSha256) blocked = 'canonical changed since modeling input was made';

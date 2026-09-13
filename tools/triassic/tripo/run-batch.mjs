@@ -21,6 +21,13 @@ const hash = p => createHash('sha256').update(readFileSync(p)).digest('hex');
 const rows = plan.ready.slice(0, cap);
 for (const r of rows) {
   if (manifest.subjects[r.id]?.canonical !== 'greenlit') throw new Error(`${r.id}: approval changed`);
+  const approval = manifest.subjects[r.id];
+  const variant = approval.promotedFrom ? null : approval.greenlitImage;
+  const selected = resolve(`docs/triassic/canonical/${r.id}${variant && variant !== 'canonical' ? '-' + variant : ''}.png`);
+  const folder = resolve(`docs/triassic/canonical/model-inputs/${r.id}`);
+  const inputMeta = JSON.parse(readFileSync(resolve(folder, 'metadata.json'), 'utf8'));
+  if (resolve(folder, inputMeta.canonicalSource) !== selected || hash(selected) !== inputMeta.canonicalSha256)
+    throw new Error(`${r.id}: selected canonical changed; rebuild the inputs and plan`);
   if (hash(r.input) !== r.inputSha256) throw new Error(`${r.id}: input changed`);
 }
 console.log(`${rows.length} jobs within ${budget} credits (${cap} maximum submissions), playable first.`);

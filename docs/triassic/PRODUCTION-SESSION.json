@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "updatedAt": "2026-09-13T14:15:08.419078+00:00",
+  "updatedAt": "2026-09-13T14:41:24.391173+00:00",
   "phase": "requested-images",
   "instructions": [
     "Sync main; deliver requested imagery including any canonical redraws.",
@@ -19,10 +19,273 @@
   ],
   "imageReviewWindowStart": null,
   "imageReviewWindowEnd": null,
-  "creatures": [],
+  "creatures": [
+    {
+      "id": "cymbospondylus",
+      "name": "Cymbospondylus",
+      "priority": "playable",
+      "approval": {
+        "turnaround": "not-started",
+        "canonical": "greenlit",
+        "awaitingReview": "a regenerated candidate is in the viewer beside the pose it replaces",
+        "decidedAt": "2026-09-13T13:52:17.045Z",
+        "promotedFrom": "candidate02",
+        "reviewedCandidate": "candidate02",
+        "greenlitImage": "candidate02"
+      },
+      "input": "docs/triassic/canonical/model-inputs/cymbospondylus/input.png",
+      "inputSha256": "f59372a449488faf70f2119e9f2e0c03af2f847ef59a9a328996a698f1f4e8ea",
+      "blocked": null
+    },
+    {
+      "id": "dinocephalosaurus",
+      "name": "Dinocephalosaurus",
+      "priority": "playable",
+      "approval": {
+        "canonical": "greenlit",
+        "turnaround": "not-started",
+        "decidedAt": "2026-09-13T01:01:15.101Z"
+      },
+      "input": "docs/triassic/canonical/model-inputs/dinocephalosaurus/input.png",
+      "inputSha256": "53e61e7845656b618ca735cc70ee5714f213c2c50db8401617c18cec3babc9e5",
+      "blocked": null
+    },
+    {
+      "id": "helicoprion",
+      "name": "Helicoprion",
+      "priority": "playable",
+      "approval": {
+        "canonical": "greenlit",
+        "turnaround": "not-started",
+        "requiredFeature": "single lower-jaw tooth whorl",
+        "decidedAt": "2026-09-13T01:01:22.623Z"
+      },
+      "input": "docs/triassic/canonical/model-inputs/helicoprion/input.png",
+      "inputSha256": "e73b47a0d33867e5638a990ef76fd2471c235905505510d803c2e8348a9d12ea",
+      "blocked": null
+    },
+    {
+      "id": "atopodentatus",
+      "name": "Atopodentatus",
+      "priority": "playable",
+      "approval": {
+        "canonical": "greenlit",
+        "turnaround": "not-started",
+        "decidedAt": "2026-09-13T01:02:09.321Z"
+      },
+      "input": "docs/triassic/canonical/model-inputs/atopodentatus/input.png",
+      "inputSha256": "e1632ba77da43e48262803b43796fd91da044cdb0b0d38a5a4717c052a5fa2e3",
+      "blocked": null
+    },
+    {
+      "id": "askeptosaurus",
+      "name": "Askeptosaurus",
+      "priority": "playable",
+      "approval": {
+        "canonical": "greenlit",
+        "turnaround": "not-started",
+        "decidedAt": "2026-09-13T01:02:52.596Z"
+      },
+      "input": "docs/triassic/canonical/model-inputs/askeptosaurus/input.png",
+      "inputSha256": "bcbd577fe27b6481fcbad0e61ea29469d4347085959405db1e68bc138b244195",
+      "blocked": null
+    },
+    {
+      "id": "placodus",
+      "name": "Placodus",
+      "priority": "playable",
+      "approval": {
+        "canonical": "greenlit",
+        "turnaround": "not-started",
+        "decidedAt": "2026-09-13T01:03:01.825Z"
+      },
+      "input": "docs/triassic/canonical/model-inputs/placodus/input.png",
+      "inputSha256": "f28daf6f448916638e5a4f6be4d50577e12452055d5bf33014054b406d60f07c",
+      "blocked": null
+    },
+    {
+      "id": "hybodus",
+      "name": "Hybodus",
+      "priority": "playable",
+      "approval": {
+        "canonical": "greenlit",
+        "turnaround": "not-started",
+        "decidedAt": "2026-09-13T01:03:09.333Z"
+      },
+      "input": "docs/triassic/canonical/model-inputs/hybodus/input.png",
+      "inputSha256": "56d7e515ba7f0ca011c64bd9d535fb15d6cb8b32e6aae59bd8238cf4289565a7",
+      "blocked": null
+    },
+    {
+      "id": "birgeria",
+      "name": "Birgeria",
+      "priority": "playable",
+      "approval": {
+        "canonical": "greenlit",
+        "turnaround": "not-started",
+        "decidedAt": "2026-09-13T01:03:25.643Z"
+      },
+      "input": "docs/triassic/canonical/model-inputs/birgeria/input.png",
+      "inputSha256": "37a8535f61157dfa0ff5a762501f4d8be873e23c884226f2bcb5be788cd901e7",
+      "blocked": null
+    },
+    {
+      "id": "mixosaurus",
+      "name": "Mixosaurus",
+      "priority": "playable",
+      "approval": {
+        "canonical": "greenlit",
+        "turnaround": "not-started",
+        "decidedAt": "2026-09-13T01:04:33.564Z"
+      },
+      "input": "docs/triassic/canonical/model-inputs/mixosaurus/input.png",
+      "inputSha256": "149c8843bdd6c1410f5c21b506ee85e79d3b3f0709fdc3ee16ebd94a501d01a3",
+      "blocked": null
+    },
+    {
+      "id": "henodus",
+      "name": "Henodus",
+      "priority": "playable",
+      "approval": {
+        "canonical": "greenlit",
+        "turnaround": "not-started",
+        "decidedAt": "2026-09-13T01:04:55.343Z"
+      },
+      "input": "docs/triassic/canonical/model-inputs/henodus/input.png",
+      "inputSha256": "6de8d0a15a7a4bcba5dfe3e20f088d30a00d03f75099a97fd500fa0e4f2e6770",
+      "blocked": null
+    },
+    {
+      "id": "saurichthys",
+      "name": "Saurichthys",
+      "priority": "playable",
+      "approval": {
+        "canonical": "greenlit",
+        "turnaround": "not-started",
+        "decidedAt": "2026-09-13T01:05:07.724Z"
+      },
+      "input": "docs/triassic/canonical/model-inputs/saurichthys/input.png",
+      "inputSha256": "cef2af0863cb12cb8696db8a2e486dc285008da36f1933c08a0bf6abb54b75c9",
+      "blocked": null
+    },
+    {
+      "id": "hupehsuchus",
+      "name": "Hupehsuchus",
+      "priority": "playable",
+      "approval": {
+        "canonical": "greenlit",
+        "turnaround": "not-started",
+        "decidedAt": "2026-09-13T01:05:32.675Z"
+      },
+      "input": "docs/triassic/canonical/model-inputs/hupehsuchus/input.png",
+      "inputSha256": "0916866db9bb33889731c9642634b61458a30e230c2b837f8436a30f2270c03d",
+      "blocked": null
+    },
+    {
+      "id": "keichousaurus",
+      "name": "Keichousaurus",
+      "priority": "playable",
+      "approval": {
+        "canonical": "greenlit",
+        "turnaround": "not-started",
+        "decidedAt": "2026-09-13T01:05:52.838Z",
+        "greenlitImage": "male",
+        "reviewedCandidate": "male"
+      },
+      "input": "docs/triassic/canonical/model-inputs/keichousaurus/input.png",
+      "inputSha256": "87aa8db7f7ffe219017010459e9952ceb8229662dc37ce30a69da3bfdbc6653a",
+      "blocked": null
+    },
+    {
+      "id": "cartorhynchus",
+      "name": "Cartorhynchus",
+      "priority": "playable",
+      "approval": {
+        "canonical": "greenlit",
+        "turnaround": "not-started",
+        "decidedAt": "2026-09-13T01:06:03.044Z"
+      },
+      "input": "docs/triassic/canonical/model-inputs/cartorhynchus/input.png",
+      "inputSha256": "e6f763ba27de1154c0e2923a02c15a4d0a52bf5ce3e762829113dc51908b7a10",
+      "blocked": null
+    },
+    {
+      "id": "odontochelys",
+      "name": "Odontochelys",
+      "priority": "playable",
+      "approval": {
+        "turnaround": "not-started",
+        "canonical": "greenlit",
+        "awaitingReview": "a regenerated candidate is in the viewer beside the pose it replaces",
+        "decidedAt": "2026-09-13T13:57:25.792Z",
+        "promotedFrom": "candidate02",
+        "reviewedCandidate": "candidate02",
+        "greenlitImage": "candidate02"
+      },
+      "input": "docs/triassic/canonical/model-inputs/odontochelys/input.png",
+      "inputSha256": "3f574fd0e009d3e6f4429db01359bc52084acbeca26335c62f3c646472f733c7",
+      "blocked": null
+    },
+    {
+      "id": "ceratites",
+      "name": "Ceratites",
+      "priority": "playable",
+      "approval": {
+        "canonical": "greenlit",
+        "turnaround": "not-started",
+        "requiredFeature": "long, large articulated tentacles",
+        "decidedAt": "2026-09-13T01:06:29.964Z"
+      },
+      "input": "docs/triassic/canonical/model-inputs/ceratites/input.png",
+      "inputSha256": "40e304665122fff230dcb237dc49c84688afce0951ddc8c7342e5417a191b183",
+      "blocked": null
+    },
+    {
+      "id": "phragmoteuthis",
+      "name": "Phragmoteuthis",
+      "priority": "playable",
+      "approval": {
+        "canonical": "greenlit",
+        "turnaround": "not-started",
+        "decidedAt": "2026-09-13T01:06:43.197Z"
+      },
+      "input": "docs/triassic/canonical/model-inputs/phragmoteuthis/input.png",
+      "inputSha256": "9df35dff192ee8851f4d1b139cfbf0260e15559b4cd59db75739289c10f8e556",
+      "blocked": null
+    },
+    {
+      "id": "macrocnemus",
+      "name": "Macrocnemus",
+      "priority": "ambient",
+      "approval": {
+        "canonical": "greenlit",
+        "turnaround": "not-started",
+        "decidedAt": "2026-09-13T13:59:36.493Z"
+      },
+      "input": "docs/triassic/canonical/model-inputs/macrocnemus/input.png",
+      "inputSha256": "f2a42b763aebf59bb4162b759b4c2ce19717330f07c5b1d4f2f962272fd995c4",
+      "blocked": null
+    },
+    {
+      "id": "coelophysis",
+      "name": "Coelophysis",
+      "priority": "ambient",
+      "approval": {
+        "canonical": "greenlit",
+        "turnaround": "not-started",
+        "decidedAt": "2026-09-13T01:07:28.068Z"
+      },
+      "input": "docs/triassic/canonical/model-inputs/coelophysis/input.png",
+      "inputSha256": "a3cedbef559dbf717b4cfd17f2620a87b9c4c59d15dede790420d413de36e900",
+      "blocked": null
+    }
+  ],
   "notes": [
-    "Six canonical candidate02 images await human review; no fresh needs-rework entries at initial sync.",
-    "Ancient Seas Trilogy requested artwork delegated to trilogy_titles, trilogy_animals, trilogy_plants.",
-    "API credentials are not committed. Raw generation state stays local; only sanitized metadata is committed."
+    "Main synchronized through 306491b; 19 remaining greenlit, 4 candidate03 redraws in progress after fresh human review.",
+    "Ancient Seas: titles already on main; all12 animals and5 plants complete, integration underway. 25 creature boards,9 regional boards and2 scale plates complete.",
+    "New greenlit model-input packages cymbospondylus, odontochelys and macrocnemus completed; current batch dry-run verifies19 jobs,570 expected credits.",
+    "Shonisaurus existing model lip inversion and baked texture faceting correction underway; no new rigs before raw batch completes.",
+    "30-minute review window has NOT started; start only after image batch is committed and pushed.",
+    "Tripo credentials are not committed. Raw generation state stays local; only sanitized metadata is committed."
   ]
 }

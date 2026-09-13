@@ -40,15 +40,9 @@
     },
     "rhaeticosaurus": {
       "turnaround": "not-started",
-      "canonical": "needs-rework",
       "awaitingReview": "a regenerated candidate is in the viewer beside the pose it replaces",
       "reviewedCandidate": "candidate02",
-      "reworkToward": {
-        "kind": "candidate",
-        "label": "candidate02"
-      },
-      "reworkNote": "It has 2 back fins on the same side, that's not right",
-      "decidedAt": "2026-09-13T13:52:43.169Z"
+      "canonical": "approved"
     },
     "atopodentatus": {
       "canonical": "greenlit",
@@ -77,20 +71,9 @@
     },
     "aphaneramma": {
       "turnaround": "not-started",
-      "canonical": "needs-rework",
       "awaitingReview": "a regenerated candidate is in the viewer beside the pose it replaces",
       "reviewedCandidate": "Aphaneramma12DB.jpg",
-      "reworkToward": {
-        "kind": "web",
-        "title": "Aphaneramma12DB.jpg",
-        "artist": "Богданов",
-        "licence": "CC BY-SA 3.0",
-        "page": "https://commons.wikimedia.org/wiki/File:Aphaneramma12DB.jpg",
-        "full": "https://upload.wikimedia.org/wikipedia/commons/9/9a/Aphaneramma12DB.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
-        "description": "Aphaneramma, my own work, dmitrchel@mail.ru"
-      },
-      "reworkNote": "It should look more like an amphibian than a reptile",
-      "decidedAt": "2026-09-13T13:55:55.371Z"
+      "canonical": "approved"
     },
     "mixosaurus": {
       "canonical": "greenlit",
@@ -147,27 +130,15 @@
     },
     "tanystropheus": {
       "turnaround": "not-started",
-      "canonical": "needs-rework",
       "awaitingReview": "a regenerated candidate is in the viewer beside the pose it replaces",
       "reviewedCandidate": "candidate02",
-      "reworkToward": {
-        "kind": "candidate",
-        "label": "candidate02"
-      },
-      "reworkNote": "Should be more apatasaurus sized - huge. And also, let's keep the background a bit different color and show the whole animal including feet so it's easier to translate into a 3d model reference",
-      "decidedAt": "2026-09-13T13:57:43.232Z"
+      "canonical": "approved"
     },
     "mystriosuchus": {
       "turnaround": "not-started",
-      "canonical": "needs-rework",
       "awaitingReview": "a regenerated candidate is in the viewer beside the pose it replaces",
       "reviewedCandidate": "candidate02",
-      "reworkToward": {
-        "kind": "candidate",
-        "label": "candidate02"
-      },
-      "reworkNote": "Draw a picture from deep underwater instead of at the top of the water.",
-      "decidedAt": "2026-09-13T13:58:49.385Z"
+      "canonical": "approved"
     },
     "macrocnemus": {
       "canonical": "greenlit",
