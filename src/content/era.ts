@@ -46,7 +46,17 @@ export interface InstancedScenery {
     readonly bend?: boolean;
     readonly doubleSided?: boolean;
   }>>;
-  readonly flora: Readonly<Partial<Record<FloraKind, string>>>;
+  /**
+   * Which prop draws each plant kind. A kind may name **several**, and then it is one family with
+   * that many authored shapes — two ripple phases, two crust rims, a taller dome and a lower one —
+   * and the renderer picks per instance so a field of them does not read as one mesh repeated.
+   * The design's prop table assumes this throughout ("three variants by size", "four variants").
+   *
+   * The simulation does not choose: it collides against the family's *union* envelope, the widest
+   * each band gets over all the variants (`propShapeFor`). So a variant is presentation, `src/sim`
+   * stays free of it, and the collider is never smaller than the thing that was drawn.
+   */
+  readonly flora: Readonly<Partial<Record<FloraKind, string | readonly string[]>>>;
   /** Dense authored flora can opt into the existing high tier; rocks are independent. */
   readonly minimumFloraQuality?: 'high';
   readonly rocks?: Readonly<Partial<Record<'boulder' | 'blade-spire' | 'talus-shard' | 'pebble-cluster', string>>>;

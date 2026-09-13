@@ -1,7 +1,7 @@
 import { ClipQueuedBadge, ModelStatusBadge } from '../shared/ModelStatusBadge';
 import { CreaturePortrait } from '../app/CreaturePortrait';
 import { useEffect, useRef, useState } from 'react';
-import { COLLECTIONS, paletteFor, SPECIMENS, specimenByKey, type CollectionId } from './catalogue';
+import { COLLECTIONS, isPropCollection, paletteFor, SPECIMENS, specimenByKey, type CollectionId } from './catalogue';
 import { scheme, SLOT_LABEL, type Slot } from '../shared/palettes';
 import { ASSET_BASE, createViewerScene, isReplaced, replacedName, type PlaybackState, type ViewerScene } from './scene';
 import { SculptEditor } from './sculpt/SculptEditor';
@@ -39,7 +39,7 @@ function readUrlState(): { key: string; sculpt: boolean } {
   const params = new URLSearchParams(location.search);
   const requested = params.get('specimen') ?? '';
   const key = specimenByKey.has(requested) ? requested : SPECIMENS[0].key;
-  return { key, sculpt: params.get('mode') === 'sculpt' && specimenByKey.get(key)?.collection !== 'devonian-props' };
+  return { key, sculpt: params.get('mode') === 'sculpt' && !isPropCollection(specimenByKey.get(key)?.collection) };
 }
 function writeUrlState(key: string, sculpt: boolean) {
   const params = new URLSearchParams(location.search);
@@ -79,8 +79,8 @@ export function Viewer() {
   const [slots, setSlots] = useState<readonly Slot[]>([]);
   useEffect(() => { writeUrlState(id, mode === 'sculpt'); }, [id, mode]);
   // Sculpting needs a creature on stage; a prop or a load in progress has nothing to sculpt.
-  const canSculpt = collection !== 'devonian-props' && !loading && !error && loadedId === id;
-  useEffect(() => { if (mode === 'sculpt' && collection === 'devonian-props') setMode('view'); }, [mode, collection]);
+  const canSculpt = !isPropCollection(collection) && !loading && !error && loadedId === id;
+  useEffect(() => { if (mode === 'sculpt' && isPropCollection(collection)) setMode('view'); }, [mode, collection]);
 
   // The show effect must not re-run when a pick changes, so it reads the picks through a ref.
   const picksRef = useRef(picks);
@@ -212,12 +212,12 @@ export function Viewer() {
         <p className="hint">Drag to orbit · right-drag to pan · scroll to zoom</p>
         <div className="info-actions">
           <button className="ghost" onClick={() => sceneRef.current?.resetCamera()}>Reset view</button>
-          {collection !== 'devonian-props' && <button className="ghost" onClick={() => setMode('sculpt')} disabled={!canSculpt} title="Reshape the body on side and top drawings and export the change as a sculpt file">
+          {!isPropCollection(collection) && <button className="ghost" onClick={() => setMode('sculpt')} disabled={!canSculpt} title="Reshape the body on side and top drawings and export the change as a sculpt file">
             Edit sculpt{(() => { const d = getSculpt(id); return d && !isIdentity(d) ? ' (edited)' : ''; })()}
           </button>}
         </div>
 
-        {collection !== 'devonian-props' && <section className="scheme" aria-label="Colour scheme">
+        {!isPropCollection(collection) && <section className="scheme" aria-label="Colour scheme">
           <h3>Colours</h3>
           <label className="scheme-pick">
             <span className="sr-only">Colour scheme for {def.name}</span>

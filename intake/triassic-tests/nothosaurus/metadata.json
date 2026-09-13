@@ -1,0 +1,38 @@
+{
+  "schema_version": 1,
+  "name": "nothosaurus",
+  "task": {
+    "type": "image_to_model",
+    "status": "success",
+    "progress": 100,
+    "output": {
+      "model_url": "<redacted download URL>",
+      "rendered_image_url": "<redacted download URL>"
+    },
+    "task_id": "ea4528e3-1f9a-42f4-b0c4-2b84b879ff7c",
+    "created_at": "2026-09-13T02:00:41.813235Z",
+    "completed_at": "2026-09-13T02:01:53.265249Z",
+    "credits_consumed": 30
+  },
+  "request": {
+    "file": {
+      "file_token": "<uploaded at runtime>"
+    },
+    "model": "v3.1-20260211",
+    "face_limit": 20000,
+    "texture": true,
+    "pbr": true
+  },
+  "image": {
+    "path": "docs/triassic/canonical/model-inputs/nothosaurus/input.png",
+    "sha256": "67437fee3a3f5afedd392a97fc4c240f6abe0efdaba5432e8bcca361c2bc56f7",
+    "bytes": 1957385
+  },
+  "artifact": {
+    "path": "intake/triassic-tests/nothosaurus/nothosaurus.raw.glb",
+    "bytes": 1541680,
+    "sha256": "5cb48becbdcbbc3863519bca8a2bb99c5129c6a0e5b1affb6252e15e01c49604",
+    "source_output_field": "model_url"
+  },
+  "downloaded_at": "2026-09-13T02:01:56.647Z"
+}

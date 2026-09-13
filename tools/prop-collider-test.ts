@@ -15,7 +15,9 @@ import { measure, propFiles, shapes as measureAll, BINS, BANDS } from './prop-sh
 import table from '../src/content/prop-shapes.json';
 import { fpRadius, fpRadiusAt } from '../src/sim/footprint';
 import { FLORA_PHYS } from '../src/sim/flora';
-import { floraPropId } from '../src/content/prop-shapes';
+import { unionShape } from '../src/content/prop-shapes';
+import { DEVONIAN_SCENERY } from '../src/content/devonian/scenery';
+import { TRIASSIC_SCENERY } from '../src/content/triassic/scenery';
 
 let checks = 0, failures = 0;
 const ok = (pass: boolean, name: string, detail = '') => {
@@ -75,14 +77,28 @@ for (const [id, least] of [['devonian-log', 0.35], ['glass-fan', 0.5], ['devonia
 }
 
 // ---- a plant's collider is as tall as the mesh it is drawn from ----
-for (const kind of Object.keys(FLORA_PHYS) as (keyof typeof FLORA_PHYS)[]) {
-  const id = floraPropId(kind);
-  if (!id) continue;
-  const shape = (table as Record<string, typeof table['devonian-log']>)[id];
-  assert(shape, `${kind} is drawn with ${id}, which has no measured shape`);
-  const drawn = shape.y1 - shape.y0;
-  ok(Math.abs(FLORA_PHYS[kind].h - drawn) < 0.02, `${kind}: the collider is as tall as ${id}`, `${FLORA_PHYS[kind].h} vs ${drawn.toFixed(2)}`);
-}
+// Every era's mapping, not just the era this process happens to have selected: a kind is drawn by
+// whichever pack owns it, and a kind the Cambrian never places is still one the Triassic collides
+// with. A family of variants is checked against the union envelope the simulation actually uses,
+// so adding a taller variant to a family fails here rather than reaching the water as a dome the
+// player's belly passes through.
+const MAPPINGS: [string, Readonly<Partial<Record<string, string | readonly string[]>>>][] = [
+  ['Cambrian', { cushion: 'cushion-sponge', lettuce: 'lettuce-tuft', spine: 'spine-sponge', glass: 'glass-fan' }],
+  ['Devonian', DEVONIAN_SCENERY.flora],
+  ['Triassic', TRIASSIC_SCENERY.flora],
+];
+for (const [era, flora] of MAPPINGS)
+  for (const kind of Object.keys(FLORA_PHYS) as (keyof typeof FLORA_PHYS)[]) {
+    const named = flora[kind];
+    if (named === undefined) continue;
+    const ids = typeof named === 'string' ? [named] : named;
+    for (const id of ids) assert((table as Record<string, unknown>)[id], `${kind} is drawn with ${id}, which has no measured shape`);
+    const shape = unionShape(ids)!;
+    const drawn = shape.y1 - shape.y0;
+    ok(Math.abs(FLORA_PHYS[kind].h - drawn) < 0.02,
+      `${era} ${kind}: the collider is as tall as ${ids.join(' + ')}`,
+      `${FLORA_PHYS[kind].h} vs ${drawn.toFixed(3)}`);
+  }
 
 console.log(`\n${checks} checks, ${failures} failure(s)`);
 console.log(worst.map((w) => `${w.id}: ${(w.saved * 100).toFixed(0)}% tighter than a disc`).join('\n'));

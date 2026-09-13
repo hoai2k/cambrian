@@ -425,6 +425,11 @@ export function createSea(scene: THREE.Scene, world: WorldData, quality: Quality
     } }
   const logGeo = merged(logParts);
 
+  // Triassic substrate fallbacks. Mineral ground cover: a squat layered dome, a thin curled plate
+  // and a flat slab, at the authored meshes' own scale-1 sizes so a swap is not a jump in size.
+  const stromatoliteFallback = G(new THREE.SphereGeometry(.36, 10, 5)); stromatoliteFallback.scale(1, .87, 1); stromatoliteFallback.translate(0, 0, 0);
+  const saltCrustFallback = G(new THREE.CylinderGeometry(.5, .46, .097, 9)); saltCrustFallback.translate(0, .048, 0);
+  const mudRippleFallback = G(new THREE.BoxGeometry(2, .184, 1.7)); mudRippleFallback.translate(0, .092, 0);
   const cushionFallback = G(sacGeo.clone()); cushionFallback.scale(1.28, .6 / 1.13, 1.28);
   const lettuceFallback = G(tuftGeo.clone()); lettuceFallback.scale(.8, .45 / .55, .8);
   const spineFallback = G(sacGeo.clone()); spineFallback.scale(1.14, 2.6 / 1.13, 1.14);
@@ -434,10 +439,22 @@ export function createSea(scene: THREE.Scene, world: WorldData, quality: Quality
   const pebbleFallback = G(new THREE.SphereGeometry(.3, 8, 4)); pebbleFallback.scale(1, .25, 1); pebbleFallback.translate(0, .075, 0);
   // An explicit proxy collection owns its complete mapping, including intentionally procedural
   // kinds and its quality gate. Era folder mappings remain the fallback for other collections.
-  const floraProps: Partial<Record<Flora['kind'], PropId>> = scenery
+  const floraProps: Partial<Record<Flora['kind'], PropId | readonly PropId[]>> = scenery
     ? authoredFlora ?? {}
     : ACTIVE_ERA.environment.floraProps
       ?? { cushion: 'cushion-sponge', lettuce: 'lettuce-tuft', spine: 'spine-sponge', glass: 'glass-fan' };
+  /** A kind's authored variants, in order; empty where it is drawn procedurally. */
+  const variantsOf = (kind: string): readonly PropId[] => {
+    const v = floraProps[kind as Flora['kind']];
+    return v === undefined ? [] : typeof v === 'string' ? [v] : v;
+  };
+  /**
+   * Which variant one plant draws. Pure in where it stands, so it is the same on every machine and
+   * every reload without the simulation carrying it — `src/sim` collides against the family's union
+   * envelope and never learns which shape was picked (`propShapeFor`).
+   */
+  const variantAt = (f: Flora, n: number) => n < 2 ? 0
+    : ((Math.round(f.pos.x * 8) * 73856093 ^ Math.round(f.pos.z * 8) * 19349663) >>> 0) % n;
   const floraSlots = new Map<Flora, { attr: THREE.InstancedBufferAttribute; i: number }>();
   const floraSets: Record<string, { geo: THREE.BufferGeometry; mat: THREE.Material }> = {
     cushion: { geo: cushionFallback, mat: spongeMat }, lettuce: { geo: lettuceFallback, mat: tuftMat },
@@ -447,6 +464,8 @@ export function createSea(scene: THREE.Scene, world: WorldData, quality: Quality
     crinoid: { geo: crinoidGeo, mat: crinoidMat }, stromatoporoid: { geo: stromGeo, mat: moundMat }, tabulate: { geo: tabulateGeo, mat: plateMat },
     rugose: { geo: rugoseGeo, mat: coralMat }, bryozoan: { geo: bryozoanGeo, mat: fanMat }, reed: { geo: reedGeo, mat: reedMat }, log: { geo: logGeo, mat: logMat },
     lilyColumn: { geo: lilyGeo, mat: crinoidMat }, frondTower: { geo: towerGeo, mat: reedMat },
+    stromatolite: { geo: stromatoliteFallback, mat: moundMat }, saltCrust: { geo: saltCrustFallback, mat: rockMat },
+    mudRipple: { geo: mudRippleFallback, mat: rockMat },
   };
   const microGeo = G(new THREE.ConeGeometry(0.012, 0.22, 3, 1, true));
   microGeo.translate(0, 0.11, 0);
@@ -490,10 +509,17 @@ export function createSea(scene: THREE.Scene, world: WorldData, quality: Quality
       const items = chunk.flora.filter((f) => f.kind === kind);
       const range = kind === 'tuft' ? 58 : kind === 'choia' ? 88 : kind === 'sac' ? 100 : kind === 'thalli' ? 100
         : kind === 'reed' ? 70 : kind === 'rugose' ? 80 : kind === 'tabulate' || kind === 'bryozoan' ? 90 : 125;
-      instanced(view, `flora-${kind}`, set.geo, set.mat, items,
-        (f, d) => { d.position.set(f.pos.x, f.pos.y, f.pos.z); d.rotation.set(0, f.rot, 0); d.scale.set(f.scale, f.sy, f.scale); },
-        { prop: floraProps[kind as Flora['kind']], range, maxLength: kind === 'tuft' || kind === 'lettuce' ? 7 : kind === 'reed' ? 9 : Infinity, color: (f) => authoredFlora?.[f.kind] ? color.setScalar(f.shade) : color.fromArray(floraTint(f)),
-          bend: (f, attr, i) => floraSlots.set(f, { attr, i }) });
+      const variants = variantsOf(kind), n = variants.length;
+      // One batch per authored variant: a family shares a kind, a density and a collider, but each
+      // shape is its own instanced mesh. With no pack, or one variant, this is the single batch it
+      // always was.
+      for (let v = 0; v < Math.max(1, n); v++) {
+        const mine = n < 2 ? items : items.filter((f) => variantAt(f, n) === v);
+        instanced(view, n < 2 ? `flora-${kind}` : `flora-${kind}-${v}`, set.geo, set.mat, mine,
+          (f, d) => { d.position.set(f.pos.x, f.pos.y, f.pos.z); d.rotation.set(0, f.rot, 0); d.scale.set(f.scale, f.sy, f.scale); },
+          { prop: variants[v], range, maxLength: kind === 'tuft' || kind === 'lettuce' ? 7 : kind === 'reed' ? 9 : Infinity, color: (f) => authoredFlora?.[f.kind] ? color.setScalar(f.shade) : color.fromArray(floraTint(f)),
+            bend: (f, attr, i) => floraSlots.set(f, { attr, i }) });
+      }
     }
 
     // Micro layer: fine filament "grass" clustered around the plants; only matters when you are small.

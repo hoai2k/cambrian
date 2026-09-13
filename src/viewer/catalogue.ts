@@ -7,6 +7,7 @@ import type { Scheme } from '../shared/palettes';
 import { assetPaths, createAssetPaths } from '../content/asset-paths';
 import { TRIASSIC } from '../content/triassic';
 import { TRIASSIC_CREATURES } from '../content/triassic/creatures';
+import { TRIASSIC_SPECIMENS } from '../content/triassic/specimens';
 import { SCHEMES as TRIASSIC_SCHEMES, CREATURE_SCHEMES as TRIASSIC_DEFAULTS } from '../content/triassic/palettes';
 import triassicPending from '../content/triassic/pending-refinements.json';
 import { DEVONIAN_SPECIMENS } from '../content/devonian/specimens';
@@ -33,7 +34,7 @@ const TRIASSIC_REFINEMENTS = refinementTables(triassicPending as PendingRefineme
 /** The Triassic's paths resolve its borrowed bodies into the Devonian folder; the viewer runs as the Cambrian, so ask its pack directly. */
 const TRIASSIC_PATHS = createAssetPaths(TRIASSIC);
 
-export type CollectionId = 'cambrian' | 'devonian' | 'devonian-props' | 'triassic';
+export type CollectionId = 'cambrian' | 'devonian' | 'devonian-props' | 'triassic' | 'triassic-props';
 export interface ViewerSpecimen {
   key: string;
   id: string;
@@ -59,12 +60,29 @@ export interface ViewerSpecimen {
   looping: readonly string[];
 }
 const DEVONIAN_KIND = new Map(DEVONIAN_CREATURES.map(c => [c.id as string, { kind: c.kind, kindNote: c.kindNote }]));
+/**
+ * How many Triassic animals are still wearing somebody else's body. The label says so rather than
+ * letting the collection look finished, and it clears itself: `standIns` empties an entry at a
+ * time as ids are added to tools/triassic/shipped.json, and at zero this is simply *Triassic
+ * creatures*, with no edit here needed the day the models land.
+ */
+const TRIASSIC_BORROWED = TRIASSIC_CREATURES.filter(c => TRIASSIC.assets.standIns?.[c.id]).length;
 export const COLLECTIONS: readonly { id: CollectionId; name: string }[] = [
   { id: 'cambrian', name: 'Cambrian creatures' },
   { id: 'devonian', name: 'Devonian creatures' },
   { id: 'devonian-props', name: 'Devonian plants & props' },
-  { id: 'triassic', name: 'Triassic creatures (borrowed bodies)' },
+  { id: 'triassic', name: `Triassic creatures${TRIASSIC_BORROWED ? ` (${TRIASSIC_BORROWED} borrowed bodies)` : ''}` },
+  // Empty until the first Triassic prop is generated, which the picker shows as a disabled option:
+  // the slot is visible, so a delivery has somewhere to go rather than somewhere to be invented.
+  { id: 'triassic-props', name: 'Triassic plants & props' },
 ];
+/**
+ * A scenery collection rather than an animal one. Props have no colour schemes and nothing to
+ * sculpt, and the page used to ask that question as "is this the Devonian's props?" — which was
+ * the same answer only for as long as the Devonian was the one era with any.
+ */
+export const isPropCollection = (c: CollectionId | undefined): boolean => c === 'devonian-props' || c === 'triassic-props';
+
 export const SPECIMENS: readonly ViewerSpecimen[] = [
   ...CREATURES.map(c => ({
     key: `cambrian:${c.id}`, id: c.id, collection: 'cambrian' as const,
@@ -98,6 +116,16 @@ export const SPECIMENS: readonly ViewerSpecimen[] = [
     clipNotes: TRIASSIC_REFINEMENTS.clipNotes[c.id],
     model: TRIASSIC_PATHS.model(c.id), lod: TRIASSIC_PATHS.model(c.id, 1), image: TRIASSIC_PATHS.portrait(c.id, 'card'), displayLength: Math.min(c.adultLength, 8),
     looping: ['Idle', 'Swim', 'Crawl', 'Guard', 'Eat', ...(c.abilityLoop ? ['Ability'] : [])],
+  })),
+  ...TRIASSIC_SPECIMENS.map(c => ({
+    key: `triassic:${c.category}:${c.id}`, id: c.id,
+    collection: (c.category === 'prop' ? 'triassic-props' : 'triassic') as CollectionId,
+    name: c.name, species: c.species,
+    role: c.category === 'prop' ? 'TRIASSIC · SCENERY' : 'TRIASSIC · SPECIMEN',
+    provenance: c.provenance, description: c.description,
+    modelStatus: TRIASSIC_REFINEMENTS.modelStatus[c.id], modelNote: TRIASSIC_REFINEMENTS.modelNotes[c.id],
+    clipNotes: TRIASSIC_REFINEMENTS.clipNotes[c.id], model: c.model, lod: c.lod, image: c.image, displayLength: 4,
+    lengthMeters: c.lengthMeters, looping: c.looping,
   })),
 ];
 export const specimenByKey = new Map(SPECIMENS.map(c => [c.key, c]));

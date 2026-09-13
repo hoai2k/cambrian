@@ -7,6 +7,7 @@ import { SNACK_SCHOOLS, GIANTS } from './ecology';
 import { BIOME_NAMES, BIOME_DANGER, BIOME_PLATES, ATMOS, SAND_COLORS, FLORA_BASE, FLORA_DENSITY, FLORA_PROPS, SURFACE_Y, FLOOR_DEPTH } from './environment';
 import { MUSIC } from './music';
 import { SCHEMES, CREATURE_SCHEMES } from './palettes';
+import { TRIASSIC_SCENERY } from './scenery';
 import { TRIASSIC_BRAND, TRIASSIC_BRAND_EXTRAS } from './brand';
 import shippedBytes from './asset-sizes.json';
 import devonianBytes from '../devonian/asset-sizes.json';
@@ -87,7 +88,7 @@ export const TRIASSIC = defineEra({
     // glyphs and the shared sound library are the other eras'; the era's own samples are addressed
     // as 'triassic/<name>' and resolve under assets/triassic/sfx/ the day they exist (sfx.ts).
     creatures: 'assets/triassic/creatures/', defaultPortraits: 'assets/triassic/creatures/',
-    props: 'assets/triassic/props/', biomes: 'assets/triassic/biomes/', ui: 'assets/ui/', sfx: 'assets/sfx/', music: 'music/',
+    props: 'assets/triassic/props/', instancedScenery: TRIASSIC_SCENERY, biomes: 'assets/triassic/biomes/', ui: 'assets/ui/', sfx: 'assets/sfx/', music: 'music/',
     ...TRIASSIC_BRAND, modelStatus, modelNotes, clipNotes, modelBytes, standIns: TRIASSIC_STAND_INS, standInsPlayable: true,
   },
   // No Triassic beds yet: the Devonian's open-water ambience and the shared drone stand in.

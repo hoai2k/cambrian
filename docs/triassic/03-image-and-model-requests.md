@@ -86,16 +86,17 @@ makes: `intake/triassic/scenery/<id>/`.
 
 ### A4 · Paintings, glyphs and plates (Tier 2, in-house)
 
-| File | Size | Brief | Replaces |
+| File | Size | Brief | Status |
 | --- | --- | --- | --- |
-| `public/assets/triassic/biomes/<biome>.webp` × 9 | 1600×900 | The nine biome banners of [02](02-biomes-and-depth.md#the-nine-slots): the red shore, the milk-turquoise flats, the log rafts over the black basin. Text-free. Prompts kept in `tools/triassic/environment-image-prompts.json`. | The procedural banners the era would otherwise draw. |
-| `public/assets/triassic/brand/keyart.webp` + mobile | 2560×1440, 1080×1920 | Low angle from below the surface: a Keichousaurus crowd in the Conifer Shore, the sun through the surface, and the boom of a Tanystropheus neck coming down out of the light. Upper third quiet for the wordmark. | Nothing; the era's title backdrop. |
-| `public/assets/triassic/brand/logo-triassic.{svg,png}` | as the other eras | The era wordmark in the trilogy's lettering. | — |
-| `public/assets/ui/air-*.svg` × 2 | 64×64, currentColor | The stamina bar's air marks: *recovery off* (shown while an air-breather is under water) and *surface for air* (the arrow up on an empty bar). | Nothing; the bar is drawn procedurally and gains these. |
-| `public/assets/ui/shore-reach.svg` | 64×64 | The hatched arc the radar draws inside a shore animal's reach. | — |
-| Regional boards × 9 | multi-panel | One per biome, art direction with the localities labelled, as `docs/devonian/supporting-assets.md` describes. Not evidence that the pictured animals coexisted. | — |
-| Scale plates × 2 | multi-panel | Roster at true lengths; roster at game lengths under the 4.0·m^0.55 rule. | — |
-| Portraits × 25 subjects | studio, select 1600×1200, card, thumb | Rendered from the shipped models by the intake tooling; not commissioned. | — |
+| `public/assets/triassic/biomes/<biome>.webp` × 9 | 1600×900 | The nine biome banners of [02](02-biomes-and-depth.md#the-nine-slots): the red shore, the milk-turquoise flats, the log rafts over the black basin. Text-free. Prompts kept in `tools/triassic/environment-image-prompts.json`. | **Delivered and wired.** |
+| `public/assets/triassic/brand/keyart.webp` + mobile | 2560×1440, 1080×1920 | Low angle from below the surface: a Keichousaurus crowd in the Conifer Shore, the sun through the surface, and the boom of a Tanystropheus neck coming down out of the light. Upper third quiet for the wordmark. | **Delivered and wired.** |
+| `public/assets/triassic/brand/logo-triassic.{svg,png}` | as the other eras | The era wordmark in the trilogy's lettering. | **Delivered**, as the engraved set (`logo-engraved.webp`, `logo.svg`), which every era's own title screen and every cross-era link now uses. |
+| `public/assets/ui/shore-reach.svg` | 64×64 | The hatched arc the radar draws inside a shore animal's reach. | **Delivered.** |
+| **`public/assets/ui/air-recovery-off.svg`** | 64×64, `currentColor`, square | The stamina bar's *recovery off* mark, shown on the bar the whole time an air-breather is under water: the era's one new economy is that the bar does not refill down here, and nothing on screen currently says so. A struck-through or barred breath glyph reading at 16 px, in the line of `breath-empty.svg` / `breath-low.svg` so the three sit together. | **Open.** The only image the Triassic HUD is actually short of. |
+| **`public/assets/ui/air-surface.svg`** | 64×64, `currentColor`, square | Its partner: *surface for air*, an arrow up shown on an empty bar, the prompt that the fix is the surface rather than waiting. Same weight and optical size as above. | **Open.** |
+| Regional boards × 9 | multi-panel | One per biome, art direction with the localities labelled, as `docs/devonian/supporting-assets.md` describes. Not evidence that the pictured animals coexisted. | **Open.** Art direction, not shipped art. |
+| Scale plates × 2 | multi-panel | Roster at true lengths; roster at game lengths under the 4.0·m^0.55 rule. | **Open.** Art direction, not shipped art. |
+| Portraits × 25 subjects | studio, select 1600×1200, card, thumb | Rendered from the shipped models by the intake tooling; not commissioned. | **Placeholder in the tree.** All 75 files under `public/assets/triassic/creatures/` are the canonical pose letterboxed onto each portrait canvas by `tools/triassic/placeholder-portraits.mjs` — not cut-outs, because there is no model to cut around yet. They are replaced per animal, automatically, by the intake render the day its model lands; nothing needs commissioning. |
 
 ## B · 3D models
 
@@ -152,6 +153,13 @@ follow the instanced-prop rules on the requests page.
 | `voltzia` | A3 | Three sizes, on the shore; no collider needed above the waterline beyond the trunk. |
 
 ### B2 · Tier 2 — built in-house
+
+**Initial delivery, 12 September 2026:** six Blender-authored preview library models
+cover both variants of `stromatolite`, `salt-crust`, and `mud-ripple`, with source
+projects, renders, measured footprints and validation. See
+[`tools/triassic/props/README.md`](../../tools/triassic/props/README.md).
+**Placed 13 September 2026:** all three families are scattered at the densities this page's table
+gives them and collided against their measured union envelopes. All other B2 rows remain unbuilt.
 
 Instanced props by builder script (`tools/triassic/props/`), one mesh, base pivot, vertex colours,
 a few hundred triangles, at the scale-1 sizes in [02](02-biomes-and-depth.md#props-and-plants-the-models-each-biome-needs);
