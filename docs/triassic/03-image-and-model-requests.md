@@ -29,7 +29,7 @@ One per creature and shore animal, `docs/triassic/boards/<id>.md`: skeletal and 
 reconstructions from the sources in [research.md](research.md), specimen images with credits, the
 representative length and its source, the anatomy that must be right (listed per subject in
 [01](01-triassic-design.md)), and the uncertainty labels. Multi-panel; the panels are not separate
-files. Twenty-five boards: T01–T21, S01–S04.
+files. **All twenty-five boards are delivered** at `docs/triassic/boards/`: T01–T21, S01–S04.
 
 ### A2 · Tripo source views (Tier 1 inputs, generated in-house)
 
@@ -100,9 +100,9 @@ makes: `intake/triassic/scenery/<id>/`.
 | `public/assets/ui/shore-reach.svg` | 64×64 | The hatched arc the radar draws inside a shore animal's reach. | **Delivered.** |
 | **`public/assets/ui/air-recovery-off.svg`** | 64×64, `currentColor`, square | The stamina bar's *recovery off* mark, shown on the bar the whole time an air-breather is under water: the era's one new economy is that the bar does not refill down here, and nothing on screen currently says so. A struck-through or barred breath glyph reading at 16 px, in the line of `breath-empty.svg` / `breath-low.svg` so the three sit together. | **Delivered.** Shared SVG is ready for the HUD. |
 | **`public/assets/ui/air-surface.svg`** | 64×64, `currentColor`, square | Its partner: *surface for air*, an arrow up shown on an empty bar, the prompt that the fix is the surface rather than waiting. Same weight and optical size as above. | **Delivered.** |
-| Regional boards × 9 | multi-panel | One per biome, art direction with the localities labelled, as `docs/devonian/supporting-assets.md` describes. Not evidence that the pictured animals coexisted. | **Open.** Art direction, not shipped art. |
-| Scale plates × 2 | multi-panel | Roster at true lengths; roster at game lengths under the 4.0·m^0.55 rule. | **Open.** Art direction, not shipped art. |
-| **`public/assets/triassic/creatures/shonisaurus` texture re-bake** | replaces the shipped maps | The skin's baked maps carry triangular starburst faceting over the flank, belly and skull. It is the bake and not the mesh — the same geometry with the same vertex normals renders smooth untextured — so only the maps need redoing; the rig, the clips and the twin are unaffected. Nothosaurus' bake is clean and is the reference for what this should look like. | **Open.** The most visible defect on either delivered body. |
+| Regional boards × 9 | multi-panel | One per biome, art direction with the localities labelled, as `docs/devonian/supporting-assets.md` describes. Not evidence that the pictured animals coexisted. | **Delivered** as PNG and editable SVG pairs at `public/assets/triassic/reference/regions/`. |
+| Scale plates × 2 | multi-panel | Roster at true lengths; roster at game lengths under the 4.0·m^0.55 rule. | **Delivered** as PNG and editable SVG pairs at `public/assets/triassic/reference/scale/`. |
+| **`public/assets/triassic/creatures/shonisaurus` texture re-bake** | replaces the shipped maps | The skin's baked maps carry triangular starburst faceting over the flank, belly and skull. It is the bake and not the mesh — the same geometry with the same vertex normals renders smooth untextured — so only the maps need redoing; the rig, the clips and the twin are unaffected. Nothosaurus' bake is clean and is the reference for what this should look like. | **Open — agent fix ongoing.** The most visible defect on either delivered body. |
 | **`public/assets/triassic/creatures/nothosaurus.puppet.png`** | as `shonisaurus.puppet.png` | A still of the procedural twin, matching the one Shonisaurus already has. The pair is the pipeline's verification step and the two animals should be presentable the same way — Shonisaurus has a twin render beside its body render, Nothosaurus has only the body. Same camera and framing as `nothosaurus.png`, so the two stills overlay. | **Delivered.** Same Idle pose, camera and 1200×900 framing as the authored render; reproducible with `render.py -- --decoded --puppet --portrait-only`. |
 | Portraits × 25 subjects | studio, select 1600×1200, card, thumb | Rendered from the shipped models by the intake tooling; not commissioned. | **23 of 25 still placeholder.** Nothosaurus and Shonisaurus now carry real model-rendered portraits, which is the mechanism working: the rest are the canonical pose letterboxed onto each canvas by `tools/triassic/placeholder-portraits.mjs` — not cut-outs, because there is no model to cut around yet — and each is replaced the day its own model lands. Nothing needs commissioning. |
 
@@ -204,7 +204,7 @@ is built: the blow is the era's signature sample and needs a real recording, not
 
 | | Tier 1 (Tripo) | Tier 2 (in-house) |
 | --- | --- | --- |
-| Source images | 26 canonical poses **(delivered)** + 112 creature and shore-animal views + 12 scenery views (generated in-house as inputs) | 25 reference boards, 9 banners, 2 key art, 1 wordmark, 4 glyphs, 9 regional boards, 2 scale plates |
+| Source images | 26 canonical poses **(delivered)** + 112 creature and shore-animal views + 12 scenery views (generated in-house as inputs) | 25 reference boards **(delivered)**, 9 banners, 2 key art, 1 wordmark, 4 glyphs, 9 regional boards **(delivered)**, 2 scale plates **(delivered)** |
 | Models | 21 creatures, 3–4 shore animals, 4 scenery | 19 instanced prop kinds in 38 variants |
 | Derived | 25 procedural twins as LODs | 100 portraits |
 

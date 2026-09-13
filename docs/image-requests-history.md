@@ -4,6 +4,109 @@ Completed image, glyph and prop briefs are archived here, newest first. Open req
 belong in [image-requests.md](image-requests.md); audio requests are in
 [audio-requests.md](audio-requests.md).
 
+## Ancient Seas Trilogy title-page artwork — 2026-09-13
+
+**Completed.** The complete page-art set is delivered under `public/assets/ancientseas/`: twelve animal cutouts, five plant cutouts, five title/wordmark assets, the parchment and seabed grounds, the fleuron, and four favicon sizes. The `/ancientseas/` entry point now uses the trilogy favicon set, and `src/ancientseas/delivered.json` is generated from the files actually present.
+
+Editable and generation sources, exact prompts, packaging scripts, and QA records are retained in `tools/art/ancientseas/animals/`, `tools/art/ancientseas/plants/`, and `tools/art/ancientseas/titles/`. The animal and title READMEs document the transparency recovery used where image generation returned opaque or checkerboard backgrounds. The delivered WebPs remain under the brief's 600 KB ceiling.
+
+### Archived brief
+
+
+The three games now share a title page at `/ancientseas/`, in two versions the page switches
+between with `?version=1` (default) and `?version=2`, so they can be compared side by side
+(`src/ancientseas/`, checked by `npm run ancientseas`). Everything below is delivered to
+**`public/assets/ancientseas/`**; after dropping files in, run `npm run ancientseas:delivered`
+and the page swaps each stand-in for the delivered piece in place. Until then version 1 typesets
+the trilogy title and version 2 draws a named wash where each picture will go (the three game
+titles borrow their shipped engraved wordmarks and two animals borrow the shipped emblems).
+
+The reference for all of it is the three title paintings themselves — `assets/brand/logo-illustrated.webp`,
+`assets/devonian/brand/title.webp`, `assets/triassic/brand/title.webp` — hand-coloured
+natural-history engravings on aged parchment: fine cross-hatched line, muted earth pigments
+(rust, ochre, slate blue, moss and sage green, a dusty red for the corals), a soft offset shadow
+under every subject, and the lettering a heavy Roman serif in black ink with a fine pale rim.
+Every piece here should look cut from one of those plates. **Text-free** except the four
+wordmarks. Transparent WebP unless the row says otherwise, under 600 KB each.
+
+### Version 1 — the trilogy wordmark on the dark ground
+
+| File | Size | Brief | Replaces |
+| --- | --- | --- | --- |
+| `logo-engraved.webp` | 1536×512, transparent | "ANCIENT SEAS" over a smaller "TRILOGY", in the exact lettering of the three engraved game wordmarks (`assets/*/brand/logo-engraved.webp`): black stippled ink with the thin gold rim, so it sits on the near-black page above the three paintings. Centred, no ornament. | The typeset serif title at the top of `/ancientseas/` |
+
+### Version 2 — the page as a fourth plate
+
+The page is one composition in the paintings' style: the trilogy title across the top, the three
+game titles in a row beneath it with each game's animals round its own title (Cambrian left,
+Devonian middle, Triassic right), the plants the three paintings share filling between, a rocky
+seabed along the bottom, and the whole plate vignetting to black at the edges. On a phone the
+same pieces stack into a tall plate. The arrangement is `SLOTS` in `src/ancientseas/page.ts`; a
+piece is placed by its centre and width, so what matters in each picture is that the subject fills
+its canvas and faces the way the row says.
+
+**Titles** — ink lettering only, as it appears *inside* the paintings (black with the pale rim and
+the paper's soft shadow), with no gold rim: on parchment the gold reads as gilt, on the paintings
+it does not exist.
+
+| File | Size | Brief |
+| --- | --- | --- |
+| `title-trilogy.webp` | 2048×640, transparent | "ANCIENT SEAS" over "TRILOGY", the same lettering, wide enough to run across the top of the plate |
+| `title-cambrian.webp` | 1536×640, transparent | "CAMBRIAN CONQUEST" on two lines exactly as lettered in its painting |
+| `title-devonian.webp` | 1536×640, transparent | "DEVONIAN DOMINATION" on two lines exactly as lettered in its painting |
+| `title-triassic.webp` | 1536×640, transparent | "TRIASSIC TRIUMPH" on two lines exactly as lettered in its painting |
+
+**Ground** — the two pieces that are not transparent.
+
+| File | Size | Brief |
+| --- | --- | --- |
+| `ground-parchment.webp` | 2048×1280, opaque | Empty aged parchment as the three paintings' backgrounds: warm cream at the centre, mottled, foxed, darkening through umber to black at all four edges with the same heavy vignette. Nothing drawn on it. The page's CSS gradient stands in for it |
+| `ground-seabed.webp` | 2048×384, transparent above | The strip of seabed the paintings put along their bottom edge: rock, rubble, small sponges, a scallop or two, sea urchins, encrusting coral, fading to nothing along the top edge so it can lie under the animals. Reads as one continuous shelf across the whole width |
+
+**Ornament**
+
+| File | Size | Brief |
+| --- | --- | --- |
+| `ornament-fleuron.webp` | 512×384, transparent | The small engraved scallop shell with fronds either side that the Devonian and Triassic paintings put between the title and the animals above it |
+
+**Animals** — each on its own, complete, filling its canvas, with the soft offset shadow, drawn
+in the same hand as the animal in its game's painting (they are the same animals). Default
+canvas 1024×768; *facing* is where the head points, so the right-hand animal of each row is
+seen from its other side.
+
+| File | Era | Brief |
+| --- | --- | --- |
+| `animal-anomalocaris.webp` | Cambrian | *Anomalocaris* arching from upper left to lower right, frontal appendages curled, as in the Cambrian painting; it hangs over the Cambrian title |
+| `animal-opabinia.webp` | Cambrian | *Opabinia*, five eyes and the proboscis, facing left; small, right of the title |
+| `animal-trilobite.webp` | Cambrian | *Olenoides* trilobite on the seabed, three-quarter view from above, facing right |
+| `animal-hallucigenia.webp` | Cambrian | *Hallucigenia* walking on its stilts, spines up, facing left |
+| `animal-dunkleosteus.webp` | Devonian | *Dunkleosteus* diving from upper left, jaws open, as in the Devonian painting; it hangs over the Devonian title. The shipped Devonian emblem (its head) stands in |
+| `animal-cladoselache.webp` | Devonian | *Cladoselache* shark swimming left, small, right of the title |
+| `animal-ammonoid.webp` | Devonian | Coiled ammonoid with tentacles trailing right, on the seabed |
+| `animal-bothriolepis.webp` | Devonian | *Bothriolepis* resting on the seabed, seen from the front-left, facing left |
+| `animal-cymbospondylus.webp` | Triassic | *Cymbospondylus* ichthyosaur swimming from upper left to the right, long jaws parted, as in the Triassic painting; it hangs over the Triassic title |
+| `animal-mixosaurus.webp` | Triassic | *Mixosaurus*, small, swimming left, right of the title |
+| `animal-nautiloid.webp` | Triassic | Coiled nautiloid with tentacles trailing right, on the seabed |
+| `animal-placodont.webp` | Triassic | *Placodus* on the seabed, facing left. The shipped Triassic emblem (the plesiosaur) stands in |
+
+**Plants** — the growth the three paintings share. Default canvas 768×1024 (upright); a second
+or third of a kind is the same file mirrored, so one drawing per kind. Each should be complete
+in itself, on transparency, with no ground under it.
+
+| File | Size | Brief |
+| --- | --- | --- |
+| `plant-crinoid.webp` | 768×1024 | One crinoid on a tall stalk, feathery crown open, in the Devonian painting's ochre and sage; used mirrored as `plant-crinoid-b` |
+| `plant-sea-fern.webp` | 1024×768 | A spray of fine sage-green sea fern, wide and low, the frond that runs behind every title's letters; used three times, mirrored for `plant-sea-fern-b` and `-c` |
+| `plant-red-coral.webp` | 768×1024 | The dusty-red branching coral from the paintings' corners; used mirrored as `plant-red-coral-b` |
+| `plant-tube-sponge.webp` | 768×1024 | A cluster of three or four ochre tube sponges; used mirrored as `plant-tube-sponge-b` |
+| `plant-brain-coral.webp` | 1024×768 | The round grooved brain coral the paintings put front and centre on the seabed |
+
+A trilogy favicon (`favicon-16.png`, `favicon-32.png`, `favicon-192.png`, `apple-touch-icon.png`
+at 180×180) would let the page stop borrowing the Cambrian's anomalocaris: a scallop shell in the
+engraved style on the rounded-square `#070402`.
+
+
+
 ## Illustrated logo and favicon — 2026-09-06
 
 **Completed.** Replaced the title/loading wordmark with the user-supplied natural-history illustration, preserved as `docs/art/sources/cambrian-explosion-original.png`. The full composition is delivered as `public/assets/brand/logo-illustrated.webp` (1536×1024); only web compression was applied. Title/loading layouts give the illustration space and remove the competing standalone neon emblem and reef backdrop.
