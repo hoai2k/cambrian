@@ -78,9 +78,9 @@
     "name": "Coccosteus",
     "species": "Coccosteus cuspidatus",
     "category": "creature",
-    "modelStatus": "preview",
+    "modelStatus": "final",
     "provenance": "Middle Devonian, Scotland",
-    "description": "Compact arthrodire with a broad short jaw, sculpted dermal head and thoracic armour, rounded pectoral fans, anterior pelvic fins, one long low dorsal fin and a sharply heterocercal tail.",
+    "description": "Compact arthrodire with sculpted cranial and thoracic plates, a coherent articulated oral passage, fine dermal pigment, a short flexible posterior, anterior pelvic fins and a sharply heterocercal tail.",
     "model": "assets/devonian/creatures/coccosteus.glb",
     "lod": "assets/devonian/creatures/coccosteus.lod1.glb",
     "image": "assets/devonian/creatures/coccosteus.thumb.png",
@@ -97,11 +97,11 @@
       "https://palaeo-electronica.org/content/images/1343/figure7.jpg"
     ],
     "notes": [
-      "Original anatomical reconstruction informed by Miles and Westoll 1968, revised body outline following Engelman 2024 figure 7.",
-      "Exact pigment, skin thickness, oral soft tissues and behaviour are inferred.",
-      "Continuous closed globe and head envelopes; fitted lid intersection does not count as eye-embedding tissue.",
-      "Full asset intentionally multiplies regional vertex pigment by a near-neutral UV dermal factor. Texture-free LOD bakes the factor once.",
-      "Jaw and cranial articulation coordinated with oral cheeks, palate, mandibular floor and rear throat; action labels are compatibility gestures, not gameplay design."
+      "Original rework uses the accepted clay04 continuous surface and material04 dermal finish; complete source and prior models preserved.",
+      "Cranial, jaw and body LBS ownership reproduces the validated gape; a six-stage tail and segmented paired fins provide bespoke motion.",
+      "Pigmentation, soft-tissue thickness, fin compliance and behaviour are artistic reconstruction. Action names are compatibility gestures.",
+      "Full glTF embeds baked albedo, roughness and normal fields; texture-free LOD uses explicitly sampled linear pigment with verified export correspondence.",
+      "Accepted 13 September 2026: the bounded full/LOD surface review, the oral/eye temporal sweep over all eighteen clips and the playback and reduced-model switching check at game distance all passed, and the exports replaced the previous model. The swallow socket rides the jaw here, as the mouth socket already did."
     ]
   },
   {

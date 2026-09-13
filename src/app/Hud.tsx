@@ -452,11 +452,16 @@ const RUNG_NUMERALS = ['', 'I', 'II', 'III', 'IV'];
  */
 function EraStatus({ era, alive }: { era: EraHud; alive: boolean }) {
   if (!alive) return null;
-  const warn = era.inDeadZone ? (era.bimodal ? 'DEAD WATER · your lungs are fine, their gills are not' : 'DEAD WATER · no oxygen, get out') : era.beached ? 'ON THE SAND · nothing with gills can follow' : '';
+  const warn = era.inDeadZone ? (era.bimodal ? 'DEAD WATER · your lungs are fine, their gills are not' : 'DEAD WATER · no oxygen, get out')
+    : era.beached ? 'ON THE SAND · nothing with gills can follow'
+    : era.heldUnder ? 'HELD UNDER · nothing comes back until you are loose'
+    : (era.shoreWarn ?? 0) > 0 ? 'SOMETHING ON THE SHORE · it is reaching for you'
+    : era.air && !era.atSurface ? 'NO AIR DOWN HERE · stamina returns at the surface' : '';
+  const danger = (era.inDeadZone && !era.bimodal) || era.heldUnder || (era.shoreWarn ?? 0) > 0;
   return (
     <div className="era-status">
       {era.primeT > 0 && <div className="dominant"><span>PRIME</span><b>{Math.max(0, Math.ceil(90 - era.primeT))}</b></div>}
-      {warn && <div className={`era-warn ${era.inDeadZone && !era.bimodal ? 'danger' : ''}`}>{warn}</div>}
+      {warn && <div className={`era-warn ${danger ? 'danger' : ''}`}>{warn}</div>}
     </div>
   );
 }

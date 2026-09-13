@@ -548,6 +548,30 @@
           "search": "Gipskeuper gypsum Keuper",
           "role": "The Gypsum Flats biome · Henodus' home",
           "len": "biome reference"
+        },
+        {
+          "id": "coral-head",
+          "name": "Coral head (Tier 1)",
+          "wiki": "Scleractinia",
+          "search": "scleractinian coral colony massive",
+          "role": "Tier 1 model · reef landmark",
+          "len": "2.5 units at scale 1"
+        },
+        {
+          "id": "sponge-mound",
+          "name": "Sponge mound (Tier 1)",
+          "wiki": "Calcarea",
+          "search": "calcareous sponge fossil reef",
+          "role": "Tier 1 model · reef cover with an interior",
+          "len": "3.0 units at scale 1"
+        },
+        {
+          "id": "log-raft",
+          "name": "Log raft (Tier 1)",
+          "wiki": "Traumatocrinus",
+          "search": "driftwood log floating",
+          "role": "Tier 1 model · the basin's only cover, at the surface",
+          "len": "12 units long"
         }
       ]
     }

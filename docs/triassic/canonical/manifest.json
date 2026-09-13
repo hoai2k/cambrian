@@ -4,31 +4,218 @@
   "modelingSheetBackground": "pale neutral studio gray; use chroma key only when explicitly needed for compositing",
   "externalReferencePolicy": "Save any used external input in canonical/references with provenance in prompts.json.",
   "subjects": {
-    "cymbospondylus": { "canonical": "approved", "turnaround": "not-started" },
-    "shonisaurus": { "canonical": "approved", "turnaround": "not-started" },
-    "nothosaurus": { "canonical": "approved", "turnaround": "not-started" },
-    "dinocephalosaurus": { "canonical": "approved", "turnaround": "not-started" },
-    "helicoprion": { "canonical": "approved", "turnaround": "not-started", "requiredFeature": "single lower-jaw tooth whorl" },
-    "rhaeticosaurus": { "canonical": "approved", "turnaround": "not-started" },
-    "atopodentatus": { "canonical": "approved", "turnaround": "not-started" },
-    "askeptosaurus": { "canonical": "approved", "turnaround": "not-started" },
-    "placodus": { "canonical": "approved", "turnaround": "not-started" },
-    "hybodus": { "canonical": "approved", "turnaround": "not-started" },
-    "birgeria": { "canonical": "approved", "turnaround": "not-started" },
-    "aphaneramma": { "canonical": "approved", "turnaround": "not-started" },
-    "mixosaurus": { "canonical": "approved", "turnaround": "not-started" },
-    "henodus": { "canonical": "approved", "turnaround": "not-started" },
-    "saurichthys": { "canonical": "approved", "turnaround": "not-started" },
-    "hupehsuchus": { "canonical": "approved", "turnaround": "not-started" },
-    "keichousaurus-male": { "canonical": "approved", "turnaround": "not-started" },
-    "keichousaurus-female": { "canonical": "approved", "turnaround": "not-started" },
-    "cartorhynchus": { "canonical": "approved", "turnaround": "not-started" },
-    "odontochelys": { "canonical": "approved", "turnaround": "not-started" },
-    "ceratites": { "canonical": "approved", "turnaround": "not-started", "requiredFeature": "long, large articulated tentacles" },
-    "phragmoteuthis": { "canonical": "approved", "turnaround": "not-started" },
-    "tanystropheus": { "canonical": "approved", "turnaround": "not-started" },
-    "mystriosuchus": { "canonical": "approved", "turnaround": "not-started" },
-    "macrocnemus": { "canonical": "approved", "turnaround": "not-started" },
-    "coelophysis": { "canonical": "approved", "turnaround": "not-started" }
+    "cymbospondylus": {
+      "canonical": "needs-rework",
+      "turnaround": "not-started",
+      "reworkToward": {
+        "kind": "web",
+        "title": "Cymbospondylus youngorum reconstruction 2023.jpg",
+        "artist": "Mariolanzas",
+        "licence": "CC BY-SA 4.0",
+        "page": "https://commons.wikimedia.org/wiki/File:Cymbospondylus_youngorum_reconstruction_2023.jpg",
+        "full": "https://upload.wikimedia.org/wikipedia/commons/6/61/Cymbospondylus_youngorum_reconstruction_2023.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+        "description": "Life restoration of Cymbospondylus youngorum, a giant ichthyosaur from Nevada, USA."
+      },
+      "decidedAt": "2026-09-13T01:00:13.500Z"
+    },
+    "shonisaurus": {
+      "canonical": "greenlit",
+      "turnaround": "not-started",
+      "decidedAt": "2026-09-13T01:00:47.144Z"
+    },
+    "nothosaurus": {
+      "canonical": "greenlit",
+      "turnaround": "not-started",
+      "decidedAt": "2026-09-13T01:01:08.730Z"
+    },
+    "dinocephalosaurus": {
+      "canonical": "greenlit",
+      "turnaround": "not-started",
+      "decidedAt": "2026-09-13T01:01:15.101Z"
+    },
+    "helicoprion": {
+      "canonical": "greenlit",
+      "turnaround": "not-started",
+      "requiredFeature": "single lower-jaw tooth whorl",
+      "decidedAt": "2026-09-13T01:01:22.623Z"
+    },
+    "rhaeticosaurus": {
+      "canonical": "needs-rework",
+      "turnaround": "not-started",
+      "reworkToward": {
+        "kind": "canonical",
+        "label": "canonical"
+      },
+      "reworkNote": "Redraw only — the reading of the animal is accepted. The rear fins are wrong: an extra fin rises off the back above the tail, and a plesiosaur has no dorsal fin. Rhaeticosaurus is a four-flipper underwater flier, so the hind pair must be flippers seated low on the flanks at the pelvis, mirroring the fore pair in shape and size, with the tail short and unfinned between them. Keep the pose, the colouring, the mottling, the sunlit shallow-reef setting and the underwater three-quarter camera exactly as they are.",
+      "decidedAt": "2026-09-13T02:30:00.000Z"
+    },
+    "atopodentatus": {
+      "canonical": "greenlit",
+      "turnaround": "not-started",
+      "decidedAt": "2026-09-13T01:02:09.321Z"
+    },
+    "askeptosaurus": {
+      "canonical": "greenlit",
+      "turnaround": "not-started",
+      "decidedAt": "2026-09-13T01:02:52.596Z"
+    },
+    "placodus": {
+      "canonical": "greenlit",
+      "turnaround": "not-started",
+      "decidedAt": "2026-09-13T01:03:01.825Z"
+    },
+    "hybodus": {
+      "canonical": "greenlit",
+      "turnaround": "not-started",
+      "decidedAt": "2026-09-13T01:03:09.333Z"
+    },
+    "birgeria": {
+      "canonical": "greenlit",
+      "turnaround": "not-started",
+      "decidedAt": "2026-09-13T01:03:25.643Z"
+    },
+    "aphaneramma": {
+      "canonical": "needs-rework",
+      "turnaround": "not-started",
+      "reworkToward": {
+        "kind": "web",
+        "title": "Metoposaurus diagnosticus kraselovi 1DB.jpg",
+        "artist": "Dmitry Bogdanov",
+        "licence": "CC BY-SA 3.0",
+        "page": "https://commons.wikimedia.org/wiki/File:Metoposaurus_diagnosticus_kraselovi_1DB.jpg",
+        "full": "https://upload.wikimedia.org/wikipedia/commons/6/6b/Metoposaurus_diagnosticus_kraselovi_1DB.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+        "description": "Reconstruction of Metoposaurus diagnosticus"
+      },
+      "decidedAt": "2026-09-13T01:04:06.153Z"
+    },
+    "mixosaurus": {
+      "canonical": "greenlit",
+      "turnaround": "not-started",
+      "decidedAt": "2026-09-13T01:04:33.564Z"
+    },
+    "henodus": {
+      "canonical": "greenlit",
+      "turnaround": "not-started",
+      "decidedAt": "2026-09-13T01:04:55.343Z"
+    },
+    "saurichthys": {
+      "canonical": "greenlit",
+      "turnaround": "not-started",
+      "decidedAt": "2026-09-13T01:05:07.724Z"
+    },
+    "hupehsuchus": {
+      "canonical": "greenlit",
+      "turnaround": "not-started",
+      "decidedAt": "2026-09-13T01:05:32.675Z"
+    },
+    "keichousaurus-male": {
+      "canonical": "approved",
+      "turnaround": "not-started"
+    },
+    "keichousaurus-female": {
+      "canonical": "approved",
+      "turnaround": "not-started"
+    },
+    "cartorhynchus": {
+      "canonical": "greenlit",
+      "turnaround": "not-started",
+      "decidedAt": "2026-09-13T01:06:03.044Z"
+    },
+    "odontochelys": {
+      "canonical": "needs-rework",
+      "turnaround": "not-started",
+      "reworkToward": {
+        "kind": "web",
+        "title": "Thaichelys ruchae life restoration.png",
+        "artist": "Tomasz Szczygielski, Dawid Dróżdż, Phornphen Chanthasit, Sita Manitkoon, Pitaksit Ditbanjong",
+        "licence": "CC BY 4.0",
+        "page": "https://commons.wikimedia.org/wiki/File:Thaichelys_ruchae_life_restoration.png",
+        "full": "https://upload.wikimedia.org/wikipedia/commons/0/05/Thaichelys_ruchae_life_restoration.png?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+        "description": "Fig 18. Thaichelys ruchae, life restoration as a proterochersid turtle. Digital drawing by Sita Manitkoon."
+      },
+      "decidedAt": "2026-09-13T01:06:24.789Z"
+    },
+    "ceratites": {
+      "canonical": "greenlit",
+      "turnaround": "not-started",
+      "requiredFeature": "long, large articulated tentacles",
+      "decidedAt": "2026-09-13T01:06:29.964Z"
+    },
+    "phragmoteuthis": {
+      "canonical": "greenlit",
+      "turnaround": "not-started",
+      "decidedAt": "2026-09-13T01:06:43.197Z"
+    },
+    "tanystropheus": {
+      "canonical": "needs-rework",
+      "turnaround": "not-started",
+      "reworkToward": {
+        "kind": "canonical",
+        "label": "canonical"
+      },
+      "reworkNote": "Redraw for scale — the anatomy is right but everything around it says lizard. This animal is 5.5-6 m with a neck of about 3 m on a trunk of about 1.5 m, and the current frame (ankle-deep water, pebbles, small weed, a distant headland, a high wide camera) reads it at well under a metre. Put the camera low and close, at or just above the waterline and near enough that the trunk fills the frame with the neck running out of it; stand it in water at elbow depth against boulders rather than pebbles; and pose it as the slot actually is, the neck swung out low over the water from the bank, ready to strike at something in it. Keep the species, the proportions, the banded mottling and the clear shallow-marine setting.",
+      "decidedAt": "2026-09-13T02:30:01.000Z"
+    },
+    "mystriosuchus": {
+      "canonical": "needs-rework",
+      "turnaround": "not-started",
+      "reworkToward": {
+        "kind": "canonical",
+        "label": "canonical"
+      },
+      "reworkNote": "Redraw into the water — the current pose is a high walk across a mudflat, and this animal is never seen out of the water in play. Draw it swimming: body wholly in the water, limbs folded back against the flanks, the tail sculling, and the dorsal crest, the eyes and the tip of the snout breaking the surface as the design requires of the model. A low camera close to the waterline, part of the body read through the water. Keep the species, the crocodile-like proportions, the long narrow snout and the armour. Two fixes to the setting: the mangrove roots and pneumatophores in the foreground are tens of millions of years too early, so replace them with Triassic lagoon margin — horsetails, Voltzia conifers, drift logs; and the light and the water should read marine lagoon rather than estuarine mud.",
+      "decidedAt": "2026-09-13T02:30:02.000Z"
+    },
+    "macrocnemus": {
+      "canonical": "approved",
+      "turnaround": "not-started"
+    },
+    "coelophysis": {
+      "canonical": "greenlit",
+      "turnaround": "not-started",
+      "decidedAt": "2026-09-13T01:07:28.068Z"
+    },
+    "keichousaurus": {
+      "canonical": "greenlit",
+      "turnaround": "not-started",
+      "decidedAt": "2026-09-13T01:05:52.838Z",
+      "greenlitImage": "male"
+    },
+    "voltzia": {
+      "canonical": "approved",
+      "turnaround": "delivered",
+      "views": [
+        "side",
+        "top"
+      ],
+      "prompt": "scenery-prompts.json"
+    },
+    "coral-head": {
+      "canonical": "approved",
+      "turnaround": "delivered",
+      "views": [
+        "side",
+        "top"
+      ],
+      "prompt": "scenery-prompts.json"
+    },
+    "sponge-mound": {
+      "canonical": "approved",
+      "turnaround": "delivered",
+      "views": [
+        "side",
+        "top"
+      ],
+      "prompt": "scenery-prompts.json"
+    },
+    "log-raft": {
+      "canonical": "approved",
+      "turnaround": "delivered",
+      "views": [
+        "side",
+        "top"
+      ],
+      "prompt": "scenery-prompts.json"
+    }
   }
 }

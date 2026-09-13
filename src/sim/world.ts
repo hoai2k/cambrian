@@ -26,7 +26,11 @@ export const BIOME_DANGER = ACTIVE_ERA.environment.biomeDanger;
 export type FloraKind = 'vauxia' | 'sac' | 'choia' | 'thalli' | 'tuft' | 'cushion' | 'lettuce' | 'spine' | 'glass'
   | 'crinoid' | 'stromatoporoid' | 'tabulate' | 'rugose' | 'bryozoan' | 'reed' | 'log'
   // tall Devonian kinds that reach up into the water column: a giant sea lily and an algal frond tower
-  | 'lilyColumn' | 'frondTower';
+  | 'lilyColumn' | 'frondTower'
+  // Triassic substrate: the microbial domes of the gypsum flats, the gypsum crust plates beside
+  // them, and the laminated mud floor of the black basin. Ground cover rather than growth — they
+  // are flora only in the sense that the chunk scatters them and the floor collides with them.
+  | 'stromatolite' | 'saltCrust' | 'mudRipple';
 /** Driftwood only washes out this far from the shore. */
 export const LOG_SHORE_RANGE = 120;
 
@@ -55,6 +59,13 @@ export interface Bloom { pos: Vec3; radius: number; drift: number; }
 
 /** The water surface. Era-driven: a pelagic roster (the Devonian) asks for a deeper column. */
 export const SURFACE_Y = ACTIVE_ERA.environment.surfaceY ?? 40;
+/**
+ * The era's target depth per biome, when it has one (the Triassic: docs/triassic/02-biomes-and-
+ * depth.md). Without it the floor undulates around zero everywhere off the shore, which is what
+ * the Cambrian and the Devonian were built on and must keep, so `sampleHeight` only reads this
+ * when it is set and takes exactly its old path otherwise.
+ */
+export const FLOOR_DEPTH: Readonly<Record<Biome, number>> | undefined = ACTIVE_ERA.environment.floorDepth;
 export const LIGHT_WINDOW_Y = SURFACE_Y - 9;
 /**
  * What RB and LB are worth to a swimmer: units per second at scale 1, before the current.
@@ -197,6 +208,7 @@ export function sampleHeight(x: number, z: number) {
     + 0.45 * Math.sin(x * 0.093 + z * 0.037)
     + 0.18 * Math.sin(z * 0.2 + x * 0.107)
     + (fbm2(x * 0.02 + 7, z * 0.02 + 3) - 0.5) * 3.2;
+  if (FLOOR_DEPTH) return depthProfile(x, z, s, h);
   // shore: the shallows sit a few units high, then the beach climbs to the waterline over the last 48 units
   h += 8 * (1 - smoothstep(40, 140, s));
   if (s < 48) h += (SURFACE_Y + 1 - 8) * Math.pow(1 - smoothstep(0, 48, s), 1.7);
@@ -213,6 +225,30 @@ export function sampleHeight(x: number, z: number) {
   // escarpment and basin
   h -= 13 * smoothstep(690, 760, s + rag);
   h -= 6 * smoothstep(1100, 1700, s);
+  return h;
+}
+
+/**
+ * The floor of a sea whose depth is the biome's own (`FLOOR_DEPTH`): the mean level at a point is
+ * the surface less the biome-weighted target depth, the same small undulation `u` rides on it, the
+ * reef's crests ridge up toward the light, the boulder fields roughen and the flats flatten as
+ * before, and the last 48 units climb to the waterline. Blended by the biome weights, so a point
+ * that is half reef and half lagoon sits halfway, and the slope from the front into the basin is a
+ * slope. Its own scratch weights, because a caller may be holding `biomeWeights`' shared ones.
+ */
+const scratchDepthW: BiomeWeights = { shallows: 0, nursery: 0, shelf: 0, forest: 0, boulders: 0, flats: 0, channel: 0, escarpment: 0, basin: 0 };
+function depthProfile(x: number, z: number, s: number, u: number): number {
+  const w = biomeWeights(x, z, scratchDepthW);
+  let depth = 0;
+  for (const b of BIOMES) depth += w[b] * FLOOR_DEPTH![b];
+  // the reef comes up to meet the air-breathers: ridges a player can follow, never a single bump
+  const crest = w.boulders > 0.01 ? w.boulders * 7 * smoothstep(0.5, 0.75, fbm2(x * 0.035 + 11, z * 0.035 + 4)) : 0;
+  // boulder fields are rough and a little high; the flats are flat
+  const rocks = w.boulders * (0.6 + fbm2(x * 0.06, z * 0.06)) * 1.2;
+  const flat = w.flats;
+  let h = SURFACE_Y - depth + u * (1 - flat * 0.8) + crest + rocks;
+  // the shore: the beach climbs to a unit above the waterline over the last 48 units
+  if (s < 48) { const k = Math.pow(1 - smoothstep(0, 48, s), 1.7); h = h * (1 - k) + (SURFACE_Y + 1) * k; }
   return h;
 }
 

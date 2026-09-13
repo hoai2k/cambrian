@@ -5,9 +5,16 @@ A research surface for choosing and judging the Triassic roster: every subject i
 Commons, and a toggle that flips each one against our own canonical image so the two can be
 compared in place.
 
-**Open `index.html` in a browser.** It needs no server: the data is a plain `data.js`, and the
-reference images are hotlinked from Commons, so this directory stays a few hundred kilobytes
-instead of forty megabytes. Being online is the price of that.
+**Live at [games.hoai.net/cambrian/research/triassic/](https://games.hoai.net/cambrian/research/triassic/)**,
+or open `index.html` straight off the disk — it needs no server either way, because the data is a
+plain `data.js` rather than a `fetch()` a browser would block on a `file://` page.
+
+`npm run triassic:viewer` writes both: this directory, and the deployable copy in
+`public/research/triassic/` that Vite carries into `dist/`. Only `dist/` is deployed — `docs/` is
+not, which is why a `…/docs/research/triassic/viewer` URL 404s on the live site. The deployed copy
+carries the canonical images re-encoded at 1400 px (5 MB) rather than the 66 MB of full-resolution
+PNGs in `docs/triassic/canonical/`, which stay in git for anyone porting a model. Reference images
+are hotlinked from Wikimedia Commons in both copies, so the page wants a connection.
 
 ## What is in it
 
@@ -16,7 +23,12 @@ instead of forty megabytes. Being online is the price of that.
 | Playable roster | 21 | The animals of the design, in rung order, each labelled with its slot and length. |
 | Shore animals | 4 | Tanystropheus and company. Modelled and placed, never played. |
 | Alternates and reserves | 26 | Weighed and left out, each with the slot it could take. This is the swap list. |
-| Scenery, plants and the shore | 14 | What the biomes are built from, plus four locality references. |
+| Scenery, plants and the shore | 17 | What the biomes are built from, the three Tier 1 organic props, and four locality references. |
+
+Each subject shows its own images first — the canonical pose, any extra authored view, and the
+**3D views** modelling sheet once one exists (picked up from `docs/triassic/canonical/
+<id>-turnaround.png` or straight out of `intake/triassic/…` while it is still a fresh delivery) —
+then the references.
 
 ## The canonical toggle
 
@@ -35,17 +47,58 @@ scenery — read *no canonical image* and the toggle is greyed out on them until
 | --- | --- |
 | `C` | Flip between the web reference and the canonical image |
 | `B` | Side by side |
-| `←` `→` | Previous / next reference image for this subject |
-| `J` `K` | Next / previous subject, keeping the same view |
+| `←` `→` | Previous / next image on the side being shown |
+| `J` `K` | Next / previous subject, keeping the same view (or the **‹ Prev / Next ›** buttons) |
+| `Enter` | Choose the image on show as this subject's canon (again to undo) |
+| `X` | Clear this subject's choice |
 | `/` | Jump to the filter box |
 | `Esc` | Close |
+
+## Choosing, and the export
+
+The point of the comparison is a decision, so each pane carries **Use as canon**. Choosing our own
+generated pose greenlights it — the model gets built from that image. Choosing a reference says the
+pose is not right yet and names the picture the regeneration should be steered toward; the note box
+under the stage is what should change, and it travels with the decision. The four-view modelling
+sheet, where one exists, is in the running as well.
+
+A third answer sits beside those two: **Needs redraw** on one of our own images says the reading is
+right and only the picture is wrong — a fin that should not be there, a frame that makes a
+six-metre animal read as a lizard — and then the note is the whole brief and nothing external is
+being copied.
+
+Decided subjects carry a badge in the grid, and **Undecided only** hides them so a pass through 68
+subjects can be finished in sittings. The page starts every load from the decisions the repository
+already holds (`docs/triassic/canonical/manifest.json`, bundled into `data.js`), and keeps nothing
+of its own: a reload discards unexported clicks and returns to what has actually been applied. The
+header says how many subjects differ from the codebase. Choices are held against a stable reference
+— an authored image's label, a reference's Commons filename — so refetching the Commons set or
+regenerating the deployed copy cannot move a decision onto a different picture.
+
+**Export selections** downloads them as JSON, and
+
+```sh
+node tools/triassic/apply-selections.mjs <the downloaded file>   # --dry-run first, if you like
+```
+
+applies it: `docs/triassic/canonical/manifest.json` gains each subject's `greenlit` or
+`needs-rework` state, and `docs/triassic/canonical/review.md` is rewritten as the brief — what is
+cleared to build, and for each rework the image to steer by, its credit and licence, and the note.
+A subject the file does not mention is left exactly as it was, so the pass can be applied in
+pieces — `review.md` is rebuilt from the whole manifest rather than from the export, so a partial
+pass never drops the decisions it is not carrying. Nothing leaves the browser until you press
+export, and nothing stays in it after you close the tab.
 
 ## Refreshing it
 
 ```sh
 node docs/research/triassic/viewer/fetch-images.mjs     # re-query Commons → images.json
-node docs/research/triassic/viewer/bundle.mjs           # images.json + canonical/ → data.js
+npm run triassic:viewer                                 # images.json + canonical/ → data.js + the deployed copy
 ```
+
+The second command is the one to run after dropping a new canonical pose in: it re-thumbnails,
+rewrites both `data.js` files and refreshes `public/research/triassic/`. Commit that folder — it is
+generated, but it is what the site serves.
 
 `fetch-images.mjs --local` also downloads the references into `img/` if an offline copy is wanted;
 the viewer prefers the hotlink either way, and nothing in `img/` should be committed.

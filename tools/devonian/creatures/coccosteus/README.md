@@ -78,3 +78,53 @@ Final render provenance is recorded in [render-validation-v2.json](render-valida
 ## Final integration
 
 Final full/LOD packaging preserved all geometry, numeric samples, weights, materials and sockets exactly. `eye-packaged-review.json` identifies the packaged hashes and fresh independent measurements. Both detail levels passed structural intake. The built main viewer loaded the specimen, all eighteen action selections retained paused state and accepted frame stepping, feeding poses were inspected, and no browser errors were recorded. The era integration checks and type/build checks passed; original Cambrian assets remain unchanged.
+
+## V3 candidate07 shipped — 13 September 2026
+
+The rework reached candidate07 on the user's Mac in September and then stalled: a fresh checkout
+could not replay the frozen recipe, because two evidence files it hash-checks (`production-04-static-report.json`
+and `lod-plan-07/lip-basis-fixture.json`) had no producing script anywhere and existed only in the
+original authoring tree — the analysis in `rework-v3/RESUME-CANDIDATE07-BLOCKED.md`. Rather than
+re-derive it, the user delivered the accepted exports themselves to `intake/coccosteus-candidate07/`,
+with the rigged source, the portraits, the review evidence and a manifest. All 28 manifest entries
+verified, and both GLBs matched the accepted hashes exactly: full
+`b7b929b9978f51f89e0cb1e687dec10d95b90edd3e2b2ba27b12432f58474655`, reduced
+`eec740e92fcf2187c54eacb2418fc7335cd584fe57b2792e64e8e4f1bbd31756`.
+
+The two gates `rework-v3/HANDOFF-CANDIDATE07-PAUSE.md` left outstanding were then run against
+those exact files, and both passed. The **oral and eye sweep** took all eighteen clips at their
+real frame ranges, with twenty-four lip and commissure landmarks located from the builder's own
+`lip_point`, and both eye meshes sampled against a per-frame surface tree: the lips never
+interpenetrate (minimum gap 0.0059, the authored resting gap, in every clip and frame), the
+commissure span holds to 1.00000 so the mouth opens by the jaw dropping rather than by the corners
+pulling apart, the eyes' signed depth in the skin moves by at most 0.0001 anywhere, and a
+backface-culled render of the widest gapes shows no hole and no flipped normal anywhere in the
+oral lumen. The two watchpoints the surface review had flagged are both benign and were ruled so
+on the evidence: the dark commissure dots are a pinched cusp of skin where the lip loop's two
+branches meet, identical in shape at every gape, and the upper-cranial crease is a modelled plate
+suture that is present at rest and merely catches the key light as the head pitches. The
+**playback gate** confirmed all eighteen clips on both levels, full and reduced landmarks and all
+three anchors agreeing exactly, and no pop at either switch distance (silhouette overlap
+0.934–0.988 at the demote and promote points).
+
+The delivery replaces the model wholesale, so this is a new rig, not a re-skin: twenty bones
+against the old nineteen, the pectorals and pelvics now two-bone pairs (`pectoral0L`/`pectoral1L`),
+the tail six stages instead of four, and no separate gill or throat bones. The `Grab` performance
+in `tools/creatures/motion/performances/coccosteus.mjs` bound to the old names and was rewritten
+for this rig before it was re-applied; `jaw` and `skull` are now both leaves off `body`, so the
+skull's brace stays a `spin` rather than a bend. The three sockets survive, but `anchor_mouth_inside`
+is parented to `jaw` here where the old model used `skull`, which is the builder's own intent and
+was kept: a mouthful rides an extra 0.05–0.07 units on a 4.45-unit body through the feeding clips,
+and `anchor_mouth` already rode the jaw in both. The eleven renamed materials still classify into
+five palette slots, so `orcadie-leaf` still varies the animal.
+
+Packaged losslessly to 19.0 MB full and 1.46 MB reduced, exact round-trip on both; the packager
+trims the reduced model's eighteen clips to the usual three. Portraits are candidate04's, valid
+because that full export is byte-identical to this one. The intake sources were deleted in the
+shipping commit per `intake/README.md`; recover any of them with
+`git log --diff-filter=A -- intake/coccosteus-candidate07/<file>` and `git show <commit>:<path>`.
+The rigged source is also kept on disk at
+`../devonian-authoring/coccosteus/rework-v3/coccosteus-production-04.blend`.
+
+Two art notes, neither a gate failure: Idle and Guard are very low amplitude and read as nearly
+static at game distance, and Ability does not read as distinct from the bite family.

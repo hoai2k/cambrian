@@ -3,21 +3,73 @@
  * loads with a plain <script> tag so `index.html` works when opened straight off the disk
  * (a fetch() of a local file is blocked by the browser; a script assignment is not).
  *
- *   node docs/research/triassic/viewer/bundle.mjs
+ *   node docs/research/triassic/viewer/bundle.mjs          # npm run triassic:viewer
+ *
+ * It also writes the **deployable copy** into `public/research/triassic/`, which Vite copies
+ * verbatim into `dist/` — so the viewer is reachable at `<site>/research/triassic/` and not only
+ * off the disk. `docs/` is never deployed (only `dist/` is), which is why a `docs/...` URL on the
+ * live site 404s. The copy carries web-sized canonical images rather than the 66 MB of full-
+ * resolution PNGs this directory's source set holds; those stay in git for anyone porting a model.
  *
  * Canonical images are matched by filename: `<subject-id>.png` (or .jpg/.webp), and
  * `<subject-id>-<anything>.png` for extra views (`keichousaurus-male`), which sort after the
  * plain one. The directory is the art's home, not a copy of it: see its README.
+ *
+ * The **four-view modelling sheet** a subject's canonical pose was turned into (the "3D model
+ * views" the Tripo generation is fed) joins the same list, labelled `3D views`, from either
+ * `docs/triassic/canonical/<id>-turnaround.png` once integrated or `intake/triassic/<id>/
+ * turnaround.png` (and `intake/triassic/scenery/<id>/`) while it is still a fresh delivery.
  */
-import { readFile, writeFile, readdir, mkdir, stat } from 'node:fs/promises';
+import { readFile, writeFile, readdir, mkdir, stat, copyFile, rm } from 'node:fs/promises';
 import { dirname, join, extname, basename } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const CANON_DIR = '../../../triassic/canonical';   // relative to this directory, and to index.html
+const DEPLOY_DIR = join(HERE, '../../../../public/research/triassic');
+/** The deployed canonical images: big enough to judge a silhouette against a reference, small enough to ship. */
+const DEPLOY_WIDTH = 1400, DEPLOY_QUALITY = 82;
 const IMAGE_EXT = new Set(['.png', '.jpg', '.jpeg', '.webp', '.gif', '.avif']);
 
+/** Where a four-view modelling sheet turns up, newest delivery first. Relative to this directory. */
+const TURNAROUNDS = (id) => [
+  `${CANON_DIR}/${id}-turnaround.png`,
+  `../../../../intake/triassic/${id}/turnaround.png`,
+  `../../../../intake/triassic/scenery/${id}/turnaround.png`,
+];
+
 const data = JSON.parse(await readFile(join(HERE, 'images.json'), 'utf8'));
+
+/**
+ * The decisions the repository already holds, read out of the canonical manifest and bundled
+ * alongside the images. They are the page's starting state on every load, which is the whole
+ * point: a reviewer's clicks live in the tab and nowhere else, so a reload shows what has
+ * actually been applied to the codebase rather than what this browser last did.
+ *
+ * The manifest's vocabulary and the page's are the same decision seen from two ends —
+ * `greenlit` names which of our images won (`greenlitImage`, absent when there is only the one
+ * pose), `needs-rework` names the picture to steer the regeneration toward, and that picture may
+ * be one of ours: "redraw this, the reading is right" is a real verdict and not a greenlight.
+ */
+function decisions(manifest) {
+  const out = {};
+  for (const [id, e] of Object.entries(manifest.subjects ?? {})) {
+    if (e.canonical === 'greenlit')
+      out[id] = { verdict: 'greenlit', choice: 'canonical', ref: e.greenlitImage || 'canonical', note: e.note || '', at: e.decidedAt };
+    else if (e.canonical === 'needs-rework') {
+      const t = e.reworkToward ?? {};
+      out[id] = {
+        verdict: 'replace',
+        choice: t.kind === 'web' ? 'web' : t.kind || 'canonical',
+        ref: t.kind === 'web' ? t.title : t.label ?? 'canonical',
+        note: e.reworkNote || '', at: e.decidedAt,
+      };
+    }
+  }
+  return out;
+}
+const manifest = JSON.parse(await readFile(join(HERE, CANON_DIR, 'manifest.json'), 'utf8').catch(() => '{}'));
+const decided = decisions(manifest);
 
 let files = [];
 try {
@@ -27,9 +79,9 @@ try {
 // Grid thumbnails: the canonical poses are ~3 MB each, and a grid of twenty-five of them at full
 // size is a slow page for no benefit. 520 px webp is a tenth of a per cent of the bytes and the
 // large view still loads the original.
-async function thumbnail(file) {
-  const out = `thumbs/${file.replace(/\.[^.]+$/, '')}.webp`;
-  const src = join(HERE, CANON_DIR, file), dst = join(HERE, out);
+async function thumbnail(src, stem) {
+  const out = `thumbs/${stem}.webp`;
+  const dst = join(HERE, out);
   try {
     const [a, b] = await Promise.all([stat(src), stat(dst).catch(() => null)]);
     if (b && b.mtimeMs >= a.mtimeMs) return out;                     // already current
@@ -51,16 +103,67 @@ for (const file of files.sort()) {
   // longest matching id wins, so `cymbospondylus-buchseri` beats `cymbospondylus`
   const id = [...ids].filter((i) => stem === i || stem.startsWith(`${i}-`)).sort((a, b) => b.length - a.length)[0];
   if (!id) { orphans.push(file); continue; }
+  const turn = stem.endsWith('-turnaround');
   (canonical[id] ??= []).push({
+    abs: join(HERE, CANON_DIR, file),
     src: `${CANON_DIR}/${file}`,
-    thumb: await thumbnail(file),
-    label: stem === id ? 'canonical' : stem.slice(id.length + 1).replace(/[-_]/g, ' '),
+    thumb: await thumbnail(join(HERE, CANON_DIR, file), stem),
+    kind: turn ? 'turnaround' : 'canonical',
+    label: stem === id ? 'canonical' : turn ? '3D views' : stem.slice(id.length + 1).replace(/[-_]/g, ' '),
   });
 }
-for (const list of Object.values(canonical)) list.sort((a, b) => (a.label === 'canonical' ? -1 : b.label === 'canonical' ? 1 : a.label.localeCompare(b.label)));
+// Modelling sheets still sitting in the intake inbox: shown beside the pose they were built from,
+// so a reviewer judging the canonical image can see what was made of it without integrating first.
+let sheets = 0;
+for (const id of ids) {
+  if (canonical[id]?.some((c) => c.kind === 'turnaround')) continue;
+  for (const rel of TURNAROUNDS(id)) {
+    const abs = join(HERE, rel);
+    if (!(await stat(abs).catch(() => null))) continue;
+    (canonical[id] ??= []).push({ abs, src: rel, thumb: await thumbnail(abs, `${id}-turnaround`), kind: 'turnaround', label: '3D views' });
+    sheets++;
+    break;
+  }
+}
+const rank = (c) => (c.kind === 'turnaround' ? 2 : c.label === 'canonical' ? 0 : 1);
+for (const list of Object.values(canonical)) list.sort((a, b) => rank(a) - rank(b) || a.label.localeCompare(b.label));
 
-await writeFile(join(HERE, 'data.js'), `/* Generated by bundle.mjs — do not edit. */\nwindow.TRIASSIC = ${JSON.stringify(data)};\nwindow.TRIASSIC_CANONICAL = ${JSON.stringify(canonical)};\n`);
+/** `abs` is this script's own business; it never reaches the page. */
+const strip = (canon) => Object.fromEntries(Object.entries(canon).map(([id, list]) => [id, list.map(({ abs, ...rest }) => rest)]));
+const bundle = (canon) => `/* Generated by bundle.mjs — do not edit. */\nwindow.TRIASSIC = ${JSON.stringify(data)};\nwindow.TRIASSIC_CANONICAL = ${JSON.stringify(strip(canon))};\nwindow.TRIASSIC_DECIDED = ${JSON.stringify(decided)};\n`;
+await writeFile(join(HERE, 'data.js'), bundle(canonical));
 
-const withCanon = Object.keys(canonical).length;
-console.log(`data.js written — ${ids.size} subjects, ${withCanon} with a canonical image, ${ids.size - withCanon} without`);
+const withCanon = Object.values(canonical).filter((l) => l.some((c) => c.kind === 'canonical')).length;
+const green = Object.values(decided).filter((d) => d.verdict === 'greenlit').length;
+console.log(`data.js written — ${ids.size} subjects, ${withCanon} with a canonical image, ${ids.size - withCanon} without, ${sheets} modelling sheets from the intake inbox`);
+console.log(`  decisions carried from the manifest: ${green} greenlit, ${Object.keys(decided).length - green} to redo`);
 if (orphans.length) console.log(`canonical files matching no subject id: ${orphans.join(', ')}`);
+
+// ---- the deployable copy ----
+// Everything the page needs beside itself, with the canonical images re-encoded for the web and
+// every path made local, so the folder can be dropped anywhere. The reference images stay
+// hotlinked to Wikimedia Commons, as they are off the disk.
+const { default: sharp } = await import('sharp');
+await rm(DEPLOY_DIR, { recursive: true, force: true });
+await mkdir(join(DEPLOY_DIR, 'canonical'), { recursive: true });
+await mkdir(join(DEPLOY_DIR, 'thumbs'), { recursive: true });
+await copyFile(join(HERE, 'index.html'), join(DEPLOY_DIR, 'index.html'));
+
+let bytes = 0;
+const deployed = {};
+for (const [id, list] of Object.entries(canonical)) {
+  deployed[id] = [];
+  for (const entry of list) {
+    const stem = entry.kind === 'turnaround' && !basename(entry.src).includes('-turnaround')
+      ? `${id}-turnaround` : basename(entry.src, extname(basename(entry.src)));
+    const out = join(DEPLOY_DIR, 'canonical', `${stem}.webp`);
+    await sharp(entry.abs).resize({ width: DEPLOY_WIDTH, withoutEnlargement: true }).webp({ quality: DEPLOY_QUALITY }).toFile(out);
+    bytes += (await stat(out)).size;
+    if (entry.thumb) { await copyFile(join(HERE, entry.thumb), join(DEPLOY_DIR, entry.thumb)); bytes += (await stat(join(DEPLOY_DIR, entry.thumb))).size; }
+    const { abs, ...rest } = entry;
+    deployed[id].push({ ...rest, src: `canonical/${stem}.webp`, thumb: entry.thumb ?? null });
+  }
+}
+await writeFile(join(DEPLOY_DIR, 'data.js'), bundle(deployed));
+await writeFile(join(DEPLOY_DIR, 'README.md'), `# Deployed copy — generated\n\nWritten by \`docs/research/triassic/viewer/bundle.mjs\` (\`npm run triassic:viewer\`) so the reference\nviewer ships with the site at \`<site>/research/triassic/\`. Do not edit anything here: the source\nis \`docs/research/triassic/viewer/\`, and the canonical images are the full-resolution set in\n\`docs/triassic/canonical/\`, re-encoded here at ${DEPLOY_WIDTH} px for the web.\n`);
+console.log(`deploy copy written to public/research/triassic — ${(bytes / 1048576).toFixed(1)} MB of images at ${DEPLOY_WIDTH} px`);
