@@ -17,7 +17,7 @@ sends the subject back to the undecided pile, where the viewer shows the candida
 
 | Delivered | Greenlit | Redo | Not yet reviewed |
 | --- | --- | --- | --- |
-| 2 | 16 | 0 | 52 |
+| 2 | 19 | 4 | 45 |
 
 ## Delivered — the model exists
 
@@ -39,21 +39,60 @@ shipped with the body, the specimen viewer switches between the two in place.
 | **Cartorhynchus lenticarpus** `cartorhynchus` | T18 · Rung I · the shallow-water sucker | the pose | — |
 | **Ceratites nodosus** `ceratites` | T20 · Rung I · the shell | the pose | — |
 | **Coelophysis** `coelophysis` | S04 · optional · the dinosaur at the water | the pose | — |
+| **Cymbospondylus youngorum** `cymbospondylus` | T01 · Rung IV giant · the first giant | `candidate02` | — |
 | **Dinocephalosaurus orientalis** `dinocephalosaurus` | T04 · Rung III · the reach (32-joint neck) | the pose | — |
 | **Helicoprion** `helicoprion` | T05 · Rung III · the whorl (Permian relict; see Fadenia) | the pose | — |
 | **Henodus chelyops** `henodus` | T14 · Rung II · the lagoon oddity | the pose | — |
 | **Hupehsuchus nanchangensis** `hupehsuchus` | T16 · Rung II · the armoured gulper | the pose | — |
 | **Hybodus** `hybodus` | T10 · Rung II · the spined shark | the pose | — |
 | **Keichousaurus hui** `keichousaurus` | T17 · Rung I · the crowd | `male` | — |
+| **Macrocnemus bassanii** `macrocnemus` | S03 · the runner (ambient) | the pose | — |
 | **Mixosaurus cornalianus** `mixosaurus` | T13 · Rung II · the small fin | the pose | — |
+| **Odontochelys semitestacea** `odontochelys` | T19 · Rung I · the half-shell | `candidate02` | — |
 | **Phragmoteuthis bisinuata** `phragmoteuthis` | T21 · Rung I · the hooks | the pose | — |
 | **Placodus gigas** `placodus` | T09 · Rung II · the shell-cruncher | the pose | — |
 | **Saurichthys** `saurichthys` | T15 · Rung II · the needle | the pose | — |
 
 ## Redo — regenerate the canonical pose
 
-Nothing queued for rework.
+Each row is a generator brief: take the subject's current pose in `docs/triassic/canonical/`,
+regenerate it with the steer given here, and put the result back through the viewer. Some steers
+name somebody else's artwork — use it as direction, keep its credit with the prompt, and never
+ship it. Others name our own image, which means the reading is accepted and only the picture is
+wrong: there the note is the entire brief.
+
+### Aphaneramma rostratum `aphaneramma`
+
+- **Slot:** T12 · Rung II · the sensor (marine amphibian) · ~1.5–2 m
+- **Steer toward:** Aphaneramma12DB.jpg
+- **Credit:** Богданов · CC BY-SA 3.0
+- **File page:** https://commons.wikimedia.org/wiki/File:Aphaneramma12DB.jpg
+- **Full size:** https://upload.wikimedia.org/wikipedia/commons/9/9a/Aphaneramma12DB.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original
+- **Described as:** Aphaneramma, my own work, dmitrchel@mail.ru
+- **Reviewer's note:** It should look more like an amphibian than a reptile
+
+### Mystriosuchus `mystriosuchus`
+
+- **Slot:** S02 · the surface lurker (marine phytosaur) · ~4 m
+- **Redraw our own pose:** `docs/triassic/canonical/mystriosuchus-candidate02.png`
+- **Steer toward:** nothing external — the reading is accepted and the note below is the whole brief.
+- **Reviewer's note:** Draw a picture from deep underwater instead of at the top of the water.
+
+### Rhaeticosaurus mertensi `rhaeticosaurus`
+
+- **Slot:** T06 · Rung III · the flyer (first plesiosaur) · ~2.4 m+
+- **Redraw our own pose:** `docs/triassic/canonical/rhaeticosaurus-candidate02.png`
+- **Steer toward:** nothing external — the reading is accepted and the note below is the whole brief.
+- **Reviewer's note:** It has 2 back fins on the same side, that's not right
+
+### Tanystropheus hydroides `tanystropheus`
+
+- **Slot:** S01 · the boom (13-joint stiff neck) · ~5–6 m
+- **Redraw our own pose:** `docs/triassic/canonical/tanystropheus-candidate02.png`
+- **Steer toward:** nothing external — the reading is accepted and the note below is the whole brief.
+- **Reviewer's note:** Should be more apatasaurus sized - huge. And also, let's keep the background a bit different color and show the whole animal including feet so it's easier to translate into a 3d model reference
+
 
 ## Not yet reviewed
 
-`acrodus` · `anshunsaurus` · `antrimpos` · `aphaneramma` · `chaohusaurus` · `choristoceras` · `coral-head` · `cyamodus` · `cymbospondylus` · `cymbospondylus-buchseri` · `dachstein-reef` · `daonella` · `diplopora` · `encrinus` · `eusaurosphargis` · `fadenia` · `germanonautilus` · `gipskeuper` · `guizhouichthyosaurus` · `helveticosaurus` · `ichthyotitan` · `log-raft` · `macrocnemus` · `monte-san-giorgio` · `muschelkalk` · `mystriosuchus` · `nanchangosaurus` · `neocalamites` · `neusticosaurus` · `nothosaurus` · `odontochelys` · `pistosaurus` · `placochelys` · `placunopsis` · `pleuromeia` · `psephoderma` · `rebellatrix` · `retiophyllia` · `rhaeticosaurus` · `saurosphargis` · `shastasaurus` · `shonisaurus` · `sponge-mound` · `stromatolite` · `tanystropheus` · `thylacocephala` · `traumatocrinus` · `tropites` · `utatsusaurus` · `voltzia` · `xinpusaurus` · `yunnanolimulus`
+`acrodus` · `anshunsaurus` · `antrimpos` · `chaohusaurus` · `choristoceras` · `coral-head` · `cyamodus` · `cymbospondylus-buchseri` · `dachstein-reef` · `daonella` · `diplopora` · `encrinus` · `eusaurosphargis` · `fadenia` · `germanonautilus` · `gipskeuper` · `guizhouichthyosaurus` · `helveticosaurus` · `ichthyotitan` · `log-raft` · `monte-san-giorgio` · `muschelkalk` · `nanchangosaurus` · `neocalamites` · `neusticosaurus` · `nothosaurus` · `pistosaurus` · `placochelys` · `placunopsis` · `pleuromeia` · `psephoderma` · `rebellatrix` · `retiophyllia` · `saurosphargis` · `shastasaurus` · `shonisaurus` · `sponge-mound` · `stromatolite` · `thylacocephala` · `traumatocrinus` · `tropites` · `utatsusaurus` · `voltzia` · `xinpusaurus` · `yunnanolimulus`

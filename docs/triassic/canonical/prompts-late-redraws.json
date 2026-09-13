@@ -6,11 +6,11 @@
   "externalInputs": [],
   "subjects": {
     "mystriosuchus": {
-      "status": "candidate-awaiting-human-greenlight",
+      "status": "reviewed-replace",
       "candidate": "mystriosuchus-candidate02.png",
       "original": "mystriosuchus.png",
       "originalBackup": "backups/pre-redo-2026-09-13/mystriosuchus.png",
-      "reviewerNote": "Redraw into the water — the current pose is a high walk across a mudflat, and this animal is never seen out of the water in play. Draw it swimming: body wholly in the water, limbs folded back against the flanks, the tail sculling, and the dorsal crest, the eyes and the tip of the snout breaking the surface as the design requires of the model. A low camera close to the waterline, part of the body read through the water. Keep the species, the crocodile-like proportions, the long narrow snout and the armour. Two fixes to the setting: the mangrove roots and pneumatophores in the foreground are tens of millions of years too early, so replace them with Triassic lagoon margin — horsetails, Voltzia conifers, drift logs; and the light and the water should read marine lagoon rather than estuarine mud.",
+      "reviewerNote": "Draw a picture from deep underwater instead of at the top of the water.",
       "prompt": "Use case: precise-object-edit. Redraw this existing canonical Mystriosuchus portrait following the reviewer's entire brief. Preserve species, crocodile-like proportions, long narrow snout, dark/golden mottled armor and armored dorsal crest. Change high walking pose to SWIMMING, body wholly IN the water with all four limbs folded rearward close against the flanks, long tail sculling in a gentle lateral curve under the water. Only the dorsal crest, eyes and tip of snout break the surface; torso and belly submerged, no walking on the bottom. A low camera almost at the clear waterline, three-quarter side view, enough transparent blue-green lagoon water to read the submerged flank, folded limbs and sculling tail through it. Replace all foreground mangrove roots and pneumatophores with a Triassic lagoon margin of horsetails, Voltzia-like conifers and weathered drift logs farther behind the animal. Light and water must read as a sunlit MARINE LAGOON with clean sandy substrate and blue-green salt water, not an estuarine brown mudflat. Single animal, entire long silhouette comfortably in frame, aquatic surface-lurker behavior unambiguous. Maintain detailed photorealistic paleoart quality, landscape 1536x1024, no extra creatures, labels or text. Exact reviewer note: Redraw into the water — the current pose is a high walk across a mudflat, and this animal is never seen out of the water in play. Draw it swimming: body wholly in the water, limbs folded back against the flanks, the tail sculling, and the dorsal crest, the eyes and the tip of the snout breaking the surface as the design requires of the model. A low camera close to the waterline, part of the body read through the water. Keep the species, the crocodile-like proportions, the long narrow snout and the armour. Two fixes to the setting: the mangrove roots and pneumatophores in the foreground are tens of millions of years too early, so replace them with Triassic lagoon margin — horsetails, Voltzia conifers, drift logs; and the light and the water should read marine lagoon rather than estuarine mud.",
       "generatedSource": "/Users/hoai/.codex/generated_images/01a0986b-fad5-79d1-af54-e589e5cb5cf8/exec-5b374af6-6276-40aa-915c-67f176512d8c.png",
       "visualReview": "Visually reviewed at 1536×1024: body submerged and read through clear marine lagoon water; visible near limbs folded rearward, lateral tail curve, crest/eyes/snout at surface. Horsetails, conifers and driftwood replace old mudflat root clutter. Far limbs naturally obscured by torso/water.",
@@ -19,14 +19,15 @@
         1536,
         1024
       ],
-      "originalSha256": "f2231f277aac1f58a698261608b8a2fd43cec28677450764b29b502ef94761cf"
+      "originalSha256": "f2231f277aac1f58a698261608b8a2fd43cec28677450764b29b502ef94761cf",
+      "reviewedAt": "2026-09-13T13:58:49.385Z"
     },
     "rhaeticosaurus": {
-      "status": "candidate-awaiting-human-greenlight",
+      "status": "reviewed-replace",
       "candidate": "rhaeticosaurus-candidate02.png",
       "original": "rhaeticosaurus.png",
       "originalBackup": "backups/pre-redo-2026-09-13/rhaeticosaurus.png",
-      "reviewerNote": "Redraw only — the reading of the animal is accepted. The rear fins are wrong: an extra fin rises off the back above the tail, and a plesiosaur has no dorsal fin. Rhaeticosaurus is a four-flipper underwater flier, so the hind pair must be flippers seated low on the flanks at the pelvis, mirroring the fore pair in shape and size, with the tail short and unfinned between them. Keep the pose, the colouring, the mottling, the sunlit shallow-reef setting and the underwater three-quarter camera exactly as they are.",
+      "reviewerNote": "It has 2 back fins on the same side, that's not right",
       "prompt": "Use case: precise-object-edit. Make ONLY the requested rear-fin anatomical correction to this Rhaeticosaurus mertensi canonical image. Preserve the head, neck, body silhouette, foreflippers, animal pose and direction, colouring and mottling, sunlit shallow-reef setting, camera and underwater three-quarter composition exactly. The rear fins are wrong: REMOVE the high extra dorsal/back fin protruding upward above the tail at upper right. This plesiosaur has NO dorsal fin. Reconstruct the hind pair as TWO broad long flippers seated LOW on left/right flanks at the PELVIS; match the fore pair in outline and approximate size. The near hind flipper extends diagonally down-right from its existing low pelvic root; the far hind flipper also starts on the far LOW pelvic flank, visible partly beneath/behind the rear body, not on the spine or atop the back. Exactly FOUR flippers TOTAL on the entire animal, two at shoulders and two at pelvis. The short narrow conical unfinned tail projects centrally between the pelvic flippers. No dorsal fin, no tail fin, no additional appendages. Keep full animal in this exact landscape frame, photorealistic rendering. Exact reviewer note: Redraw only — the reading of the animal is accepted. The rear fins are wrong: an extra fin rises off the back above the tail, and a plesiosaur has no dorsal fin. Rhaeticosaurus is a four-flipper underwater flier, so the hind pair must be flippers seated low on the flanks at the pelvis, mirroring the fore pair in shape and size, with the tail short and unfinned between them. Keep the pose, the colouring, the mottling, the sunlit shallow-reef setting and the underwater three-quarter camera exactly as they are.",
       "generatedSource": "/Users/hoai/.codex/generated_images/01a0986b-fad5-79d1-af54-e589e5cb5cf8/exec-85788c90-000c-44f6-aef8-27e959ca5c57.png",
       "visualReview": "Visually reviewed at 1536×1024: high dorsal fin removed, four flippers total with hind pair low at pelvis; short unfinned central tail. Head, foreground foreflippers, mottling, lighting and reef camera preserved closely. Far hind flipper is partly hidden by the near pair's overlap and perspective.",
@@ -35,14 +36,15 @@
         1536,
         1024
       ],
-      "originalSha256": "2d61693471dec58e1489013fa15a7c394df66b187ab71401abf6df5c50edc1a6"
+      "originalSha256": "2d61693471dec58e1489013fa15a7c394df66b187ab71401abf6df5c50edc1a6",
+      "reviewedAt": "2026-09-13T13:52:43.169Z"
     },
     "tanystropheus": {
-      "status": "candidate-awaiting-human-greenlight",
+      "status": "reviewed-replace",
       "candidate": "tanystropheus-candidate02.png",
       "original": "tanystropheus.png",
       "originalBackup": "backups/pre-redo-2026-09-13/tanystropheus.png",
-      "reviewerNote": "Redraw for scale — the anatomy is right but everything around it says lizard. This animal is 5.5-6 m with a neck of about 3 m on a trunk of about 1.5 m, and the current frame (ankle-deep water, pebbles, small weed, a distant headland, a high wide camera) reads it at well under a metre. Put the camera low and close, at or just above the waterline and near enough that the trunk fills the frame with the neck running out of it; stand it in water at elbow depth against boulders rather than pebbles; and pose it as the slot actually is, the neck swung out low over the water from the bank, ready to strike at something in it. Keep the species, the proportions, the banded mottling and the clear shallow-marine setting.",
+      "reviewerNote": "Should be more apatasaurus sized - huge. And also, let's keep the background a bit different color and show the whole animal including feet so it's easier to translate into a 3d model reference",
       "prompt": "Use case: precise-object-edit. Redraw this Tanystropheus hydroides canonical portrait to express its true large scale and shoreline ambush pose. Anatomy is accepted: preserve the species, the extremely long stiff narrow neck, head, four limbs, trunk and tail proportions, banded dark-brown and cream mottling and clear shallow marine setting. Subject is a 5.5–6 metre reptile, with about 3m of neck and 1.5m trunk. Recompose with camera LOW and CLOSE at or barely above the waterline; the bulky 1.5m trunk dominates the foreground and the tremendously long neck extends sideways out from the shoulders LOW almost horizontally over the water, long snout just above the water ready to strike. Not a swan-like lifted neck. Stand in clear water at ELBOW depth beside the bank, legs partially submerged and naturally refracted. Surround it with massive rough coastal BOULDERS rather than tiny pebbles, remove little weed clutter and distant miniature headland cues. Strong physical scale through low close wide-angle perspective, substantial rocks and broad water ripples. Retain a readable complete neck and head, keep animal's important anatomy and full tail within the landscape 1536x1024 frame, the neck spans most of the frame from a large foreground body. Photorealistic paleoart, bright marine daylight. No people, scale bars, labels, added prey or text. Exact reviewer note: Redraw for scale — the anatomy is right but everything around it says lizard. This animal is 5.5-6 m with a neck of about 3 m on a trunk of about 1.5 m, and the current frame (ankle-deep water, pebbles, small weed, a distant headland, a high wide camera) reads it at well under a metre. Put the camera low and close, at or just above the waterline and near enough that the trunk fills the frame with the neck running out of it; stand it in water at elbow depth against boulders rather than pebbles; and pose it as the slot actually is, the neck swung out low over the water from the bank, ready to strike at something in it. Keep the species, the proportions, the banded mottling and the clear shallow-marine setting.",
       "generatedSource": "/Users/hoai/.codex/generated_images/01a0986b-fad5-79d1-af54-e589e5cb5cf8/exec-ad238499-3456-496a-8f11-08867c0ef54d.png",
       "visualReview": "Visually reviewed at 1536×1024: close low waterline camera, large foreground trunk, very long neck nearly horizontal over water with head poised to strike; elbow-depth water, large boulders and no miniature weed/headland cues. Species proportions and banded mottling retained; foreground near foot refracted through water.",
@@ -51,7 +53,8 @@
         1536,
         1024
       ],
-      "originalSha256": "dc34b69e4278fe2b2ae851be0528c62cee906c774ab4e58a80b2cb2ff41e24f2"
+      "originalSha256": "dc34b69e4278fe2b2ae851be0528c62cee906c774ab4e58a80b2cb2ff41e24f2",
+      "reviewedAt": "2026-09-13T13:57:43.232Z"
     }
   }
 }

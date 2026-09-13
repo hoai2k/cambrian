@@ -5,7 +5,7 @@
   "subjects": {
     "aphaneramma": {
       "candidate": "aphaneramma-candidate02.png",
-      "status": "candidate-awaiting-human-greenlight",
+      "status": "reviewed-replace",
       "tool": "builtin image_gen.imagegen",
       "original": "aphaneramma.png",
       "originalBackup": "backups/pre-redo-2026-09-13/aphaneramma.png",
@@ -38,11 +38,13 @@
       "dimensions": [
         1536,
         1024
-      ]
+      ],
+      "reviewedAt": "2026-09-13T13:55:55.371Z",
+      "reviewerNote": "It should look more like an amphibian than a reptile"
     },
     "cymbospondylus": {
       "candidate": "cymbospondylus-candidate02.png",
-      "status": "candidate-awaiting-human-greenlight",
+      "status": "greenlit-and-promoted",
       "tool": "builtin image_gen.imagegen",
       "original": "cymbospondylus.png",
       "originalBackup": "backups/pre-redo-2026-09-13/cymbospondylus.png",
@@ -75,11 +77,12 @@
       "dimensions": [
         1536,
         1024
-      ]
+      ],
+      "reviewedAt": "2026-09-13T13:52:17.045Z"
     },
     "odontochelys": {
       "candidate": "odontochelys-candidate02.png",
-      "status": "candidate-awaiting-human-greenlight",
+      "status": "greenlit-and-promoted",
       "tool": "builtin image_gen.imagegen",
       "original": "odontochelys.png",
       "originalBackup": "backups/pre-redo-2026-09-13/odontochelys.png",
@@ -112,7 +115,8 @@
       "dimensions": [
         1536,
         1024
-      ]
+      ],
+      "reviewedAt": "2026-09-13T13:57:25.792Z"
     }
   }
 }
