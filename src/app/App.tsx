@@ -494,7 +494,7 @@ export function App() {
    */
   const cycleFocus = useCallback((dir: number, owner: number | 'keyboard') => {
     const ring = groupsFor(screenRef.current, pausedRef.current || screenRef.current === 'results', {
-      sibling: !!ACTIVE_ERA.copy.sibling, icons: toolbarRef.current !== 'hidden',
+      link: !!ACTIVE_ERA.copy.trilogy, icons: toolbarRef.current !== 'hidden',
     });
     const all = stops(ring, { era: groupEls('era').length, modes: groupEls('modes').length, icons: groupEls('icons').length });
     const f = focusRef.current;

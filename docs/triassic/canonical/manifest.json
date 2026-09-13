@@ -126,13 +126,7 @@
       "turnaround": "not-started",
       "awaitingReview": "a regenerated candidate is in the viewer beside the pose it replaces",
       "reviewedCandidate": "candidate03",
-      "canonical": "needs-rework",
-      "reworkToward": {
-        "kind": "candidate",
-        "label": "candidate03"
-      },
-      "reworkNote": "Can you use this as a reference: https://clickpetroleoegas.com.br/wp-content/uploads/2026/01/Tanystropheus-hydroides.jpg . Note the sauropod body and long neck reaching out over the water.",
-      "decidedAt": "2026-09-13T15:07:22.780Z"
+      "canonical": "approved"
     },
     "mystriosuchus": {
       "turnaround": "not-started",

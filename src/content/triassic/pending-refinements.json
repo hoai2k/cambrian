@@ -18,7 +18,7 @@
     "status": "pending",
     "scope": "initial-model",
     "model": true,
-    "reason": "The Triassic model has landed and the game and the specimen viewer both load it (2026-09-13). It keeps the preview badge until a human approves the body itself: the generated shape, its procedural twin and the clips they share (docs/triassic/04-tripo-pipeline.md). The paired forelimb-rowing correction for Swim and Sprint is delivered and audited."
+    "reason": "The Triassic model has landed and the game and the specimen viewer both load it (2026-09-13). It keeps the preview badge until a human approves the body itself: the generated shape, its procedural twin and the clips they share (docs/triassic/04-tripo-pipeline.md)."
   },
   {
     "id": "dinocephalosaurus",

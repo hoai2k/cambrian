@@ -17,7 +17,7 @@ sends the subject back to the undecided pile, where the viewer shows the candida
 
 | Delivered | Greenlit | Redo | Not yet reviewed |
 | --- | --- | --- | --- |
-| 2 | 22 | 1 | 45 |
+| 2 | 22 | 0 | 46 |
 
 ## Delivered — the model exists
 
@@ -58,20 +58,8 @@ shipped with the body, the specimen viewer switches between the two in place.
 
 ## Redo — regenerate the canonical pose
 
-Each row is a generator brief: take the subject's current pose in `docs/triassic/canonical/`,
-regenerate it with the steer given here, and put the result back through the viewer. Some steers
-name somebody else's artwork — use it as direction, keep its credit with the prompt, and never
-ship it. Others name our own image, which means the reading is accepted and only the picture is
-wrong: there the note is the entire brief.
-
-### Tanystropheus hydroides `tanystropheus`
-
-- **Slot:** S01 · the boom (13-joint stiff neck) · ~5–6 m
-- **Redraw our own pose:** `docs/triassic/canonical/tanystropheus-candidate03.png`
-- **Steer toward:** nothing external — the reading is accepted and the note below is the whole brief.
-- **Reviewer's note:** Can you use this as a reference: https://clickpetroleoegas.com.br/wp-content/uploads/2026/01/Tanystropheus-hydroides.jpg . Note the sauropod body and long neck reaching out over the water.
-
+Nothing queued for rework.
 
 ## Not yet reviewed
 
-`acrodus` · `anshunsaurus` · `antrimpos` · `chaohusaurus` · `choristoceras` · `coral-head` · `cyamodus` · `cymbospondylus-buchseri` · `dachstein-reef` · `daonella` · `diplopora` · `encrinus` · `eusaurosphargis` · `fadenia` · `germanonautilus` · `gipskeuper` · `guizhouichthyosaurus` · `helveticosaurus` · `ichthyotitan` · `log-raft` · `monte-san-giorgio` · `muschelkalk` · `nanchangosaurus` · `neocalamites` · `neusticosaurus` · `nothosaurus` · `pistosaurus` · `placochelys` · `placunopsis` · `pleuromeia` · `psephoderma` · `rebellatrix` · `retiophyllia` · `saurosphargis` · `shastasaurus` · `shonisaurus` · `sponge-mound` · `stromatolite` · `thylacocephala` · `traumatocrinus` · `tropites` · `utatsusaurus` · `voltzia` · `xinpusaurus` · `yunnanolimulus`
+`acrodus` · `anshunsaurus` · `antrimpos` · `chaohusaurus` · `choristoceras` · `coral-head` · `cyamodus` · `cymbospondylus-buchseri` · `dachstein-reef` · `daonella` · `diplopora` · `encrinus` · `eusaurosphargis` · `fadenia` · `germanonautilus` · `gipskeuper` · `guizhouichthyosaurus` · `helveticosaurus` · `ichthyotitan` · `log-raft` · `monte-san-giorgio` · `muschelkalk` · `nanchangosaurus` · `neocalamites` · `neusticosaurus` · `nothosaurus` · `pistosaurus` · `placochelys` · `placunopsis` · `pleuromeia` · `psephoderma` · `rebellatrix` · `retiophyllia` · `saurosphargis` · `shastasaurus` · `shonisaurus` · `sponge-mound` · `stromatolite` · `tanystropheus` · `thylacocephala` · `traumatocrinus` · `tropites` · `utatsusaurus` · `voltzia` · `xinpusaurus` · `yunnanolimulus`

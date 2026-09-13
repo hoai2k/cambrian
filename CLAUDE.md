@@ -56,15 +56,20 @@ unless the user explicitly asks for a PR. Steps:
 - The renderer interpolates between fixed simulation steps using each actor's `prevT` snapshot,
   so anything that moves an actor by more than it could swim in one step (teleport, respawn)
   must read as a jump. `tools/motion-test.ts` guards this.
-- Three eras, one engine. `/` is the Cambrian; `/devonian/` (entry `src/devonian/main.tsx`) and
-  `/triassic/` (entry `src/triassic/main.tsx`) each call
-  `selectEra(DEVONIAN)` and `setAppBase(nestedBase())` *before* dynamically importing the app, because
+- Three eras, one engine, and the site root is none of them: it is the trilogy's page, with
+  `/cambrian/` (entry `src/cambrian/main.tsx`), `/devonian/` and `/triassic/` below it. Each entry
+  calls `selectEra(...)` and `setAppBase(nestedBase())` *before* dynamically importing the app, because
   many modules read `ACTIVE_ERA` at module top. Anything new that reads the era at import time must
   stay behind that import (or resolve lazily like `assetPaths` and `music()`); the entry page itself
   must not statically import the audio library or the sim for the same reason. Headless tests that
   need the Devonian do the same: select the era, then `await import(...)` (`tools/devonian-test.ts`).
-- `/ancientseas/` is the trilogy's title page (entry `src/ancientseas/main.tsx`, data in
-  `src/ancientseas/page.ts`): one plate in the three games' own engraved style, filling the window,
+- The site root is the trilogy's page (entry `src/ancientseas/main.tsx`, data in
+  `src/ancientseas/page.ts`); `/ancientseas/`, the address it was first published at, is a redirect
+  up to it in `public/`. Every game's title screen offers it, bottom left, in place of the card per
+  other era that used to sit there — three games made two of somebody else's titles on a screen
+  meant to say press start, and the page they pointed towards holds all three. The pick screen
+  keeps its own menu of the other games (`copy.sibling`/`siblings`), because mid-flow a player who
+  wants another roster is saved a screen. The page itself: one plate in the three games' own engraved style, filling the window,
   with the three titles on it as links. It is `SLOTS` — pieces placed by centre and width on a
   16:10 desktop stage and a 9:27 phone one — and the plate is built the same way three times over,
   one big animal arching above each era's title with two bottom-dwellers gathered under it, because
@@ -83,6 +88,8 @@ unless the user explicitly asks for a PR. Steps:
   `public/assets/ancientseas/`; the page only ever loads what `src/ancientseas/delivered.json`
   lists (`npm run ancientseas:delivered` regenerates it from the folder) and draws a shipped
   stand-in or a named wash for the rest, so nothing asks the network for art that has not arrived.
+  A game is its title *and* the animal arching over it: both carry the link and light together,
+  with the picture kept out of the keyboard's way so a game is one stop rather than two.
   `npm run ancientseas` checks all of it; `node tools/ancientseas-smoke.mjs <outdir>` screenshots
   the page against a preview build and follows the three links.
 - A game's title screen is drawn from the first frame, before the creatures have streamed in: it
@@ -314,7 +321,7 @@ unless the user explicitly asks for a PR. Steps:
   `tools/sculpt-browser.mjs` drives the mode in a browser; `npm run sculpt:measure -- <glb> [sculpt.json]`
   measures a model the same way and reports how far a rebuilt candidate is from a sculpt's target,
   which is how a port is checked.
-- `?debug=local` on either page (`/?debug=local`, `/devonian/?debug=local`) opens an editor for that
+- `?debug=local` on any game page (`/cambrian/?debug=local`, `/devonian/?debug=local`) opens an editor for that
   era's saved state — `src/app/DebugLocal.tsx`, gated by `src/shared/debug.ts`, mounted by
   `src/app/Root.tsx` so both entry points get it without knowing about it. A new thing kept in
   `localStorage` should get a control there; `npm run debug` checks the gate.

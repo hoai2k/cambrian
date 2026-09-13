@@ -13,8 +13,6 @@ import { appBase } from '../shared/base';
  */
 export function TitleScreen({ onStart, loaded, padCount, eraFocused = false, progress = null, status }: { onStart: () => void; loaded: boolean; padCount: number; eraFocused?: boolean; progress?: number | null; status?: string }) {
   const copy = ACTIVE_ERA.copy;
-  // Every other era in the build: `sibling` first (the one the copy was written around), then the rest.
-  const siblings = [...(copy.sibling ? [copy.sibling] : []), ...(copy.siblings ?? [])];
   return (
     <section className="title title-illustrated" onClick={onStart} role="button" tabIndex={0} aria-label="Press start">
       <picture>
@@ -42,26 +40,27 @@ export function TitleScreen({ onStart, loaded, padCount, eraFocused = false, pro
         <p className="title-hint">{padCount > 0 ? `${padCount} controller${padCount > 1 ? 's' : ''} connected · any button · others join on the next screen` : 'Press any key or click to play on mouse and keyboard · or connect a controller'}</p>
       </div>
       {/*
-        * The other eras, one click away and only from the title screen. Clicks and keys are kept
-        * off the surrounding press-start surface, or following the link would also start a match.
-        * They are in a column: each link used to place itself in the corner, so with two of them
-        * (which is every era now there are three games) the second sat on top of the first.
+        * One way off this screen that is not "press start": the trilogy's own page, which is the
+        * site root and holds all three games. It used to be a link per era, stacked in this
+        * corner — with three games that is two cards of somebody else's title on a screen that is
+        * meant to be about this one, and the page they both pointed towards is where a player who
+        * wants another game is going anyway. Clicks and keys are kept off the surrounding
+        * press-start surface, or following the link would also start a match.
         */}
-      <nav className="era-switches" aria-label="The other games">
-      {siblings.map((sibling, i) => (
-        <a
-          key={sibling.path}
-          className={`era-switch${eraFocused && i === 0 ? ' pad-focus' : ''}`}
-          href={`${appBase()}${sibling.path}`}
-          onClick={(e) => e.stopPropagation()}
-          onKeyDown={(e) => e.stopPropagation()}
-        >
-          <span className="era-switch-eyebrow">ALSO PLAYABLE</span>
-          <b>{sibling.title}</b>
-          <span className="era-switch-blurb">{sibling.blurb}</span>
-        </a>
-      ))}
-      </nav>
+      {copy.trilogy && (
+        <nav className="era-switches" aria-label="The trilogy">
+          <a
+            className={`era-switch${eraFocused ? ' pad-focus' : ''}`}
+            href={`${appBase()}${copy.trilogy.path}`}
+            onClick={(e) => e.stopPropagation()}
+            onKeyDown={(e) => e.stopPropagation()}
+          >
+            <span className="era-switch-eyebrow">PART OF</span>
+            <b>{copy.trilogy.title}</b>
+            <span className="era-switch-blurb">{copy.trilogy.blurb}</span>
+          </a>
+        </nav>
+      )}
     </section>
   );
 }

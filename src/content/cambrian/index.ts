@@ -13,7 +13,7 @@ import portraits from '../../../public/assets/creatures/schemes/manifest.json';
 export const CAMBRIAN = defineEra({
   id: 'cambrian',
   title: 'Cambrian Conquest',
-  copy: { tagline: 'Eat. Grow. Fight. Run.', taglineEm: '508 million years ago, everything was hungry.', loading: 'WAKING THE REEF…', lose: 'THE REEF WINS', settingsKey: 'cambrian-settings', sibling: { title: 'Devonian Domination', path: 'devonian/', blurb: '133 million years later', logo: 'assets/devonian/brand/logo-engraved.webp' }, siblings: [{ title: 'Triassic Triumph', path: 'triassic/', blurb: '268 million years later', logo: 'assets/triassic/brand/logo-engraved.webp' }] },
+  copy: { tagline: 'Eat. Grow. Fight. Run.', taglineEm: '508 million years ago, everything was hungry.', loading: 'WAKING THE REEF…', lose: 'THE REEF WINS', settingsKey: 'cambrian-settings', trilogy: { title: 'Ancient Seas Trilogy', path: '', blurb: 'All three games' }, sibling: { title: 'Devonian Domination', path: 'devonian/', blurb: '133 million years later', logo: 'assets/devonian/brand/logo-engraved.webp' }, siblings: [{ title: 'Triassic Triumph', path: 'triassic/', blurb: '268 million years later', logo: 'assets/triassic/brand/logo-engraved.webp' }] },
   modes: [
     { id: 'rise', name: 'Rise', blurb: 'Hatch as a larva. Eat, grow, fight, hide. Reach Apex and hold it for ninety seconds. Share the feast with the others, or eat them.', players: '1–4' },
     { id: 'hunted', name: 'Hunter & Hunted', blurb: 'Everyone takes a turn as the giant. On yours, catch as many of the small ones as you can; on theirs, hide, bait and grow out of reach. Most caught wins.', players: '2–4 asymmetric' },

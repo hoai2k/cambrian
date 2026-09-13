@@ -3,7 +3,7 @@
 // Usage: node tools/egg-shot.mjs   → /tmp/claude-0/shots/egg-*.png
 import { chromium } from 'playwright-core';
 const S = process.argv[3] ?? '/tmp/claude-0/shots';
-const BASE = process.argv[2] ?? 'http://localhost:4173/';
+const BASE = process.argv[2] ?? 'http://localhost:4173/cambrian/';
 const browser = await chromium.launch({ executablePath: '/opt/pw-browsers/chromium', args: ['--use-gl=angle','--use-angle=swiftshader','--enable-unsafe-swiftshader','--ignore-gpu-blocklist','--no-sandbox'] });
 const page = await browser.newPage({ viewport: { width: 900, height: 520 } });
 page.on('pageerror', e => console.log('[pageerror]', e.message));

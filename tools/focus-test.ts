@@ -11,21 +11,21 @@ import { atMain, cycle, groupsFor, stops, type FocusGroup, type Stop } from '../
 let passes = 0;
 const ok = (cond: unknown, msg: string) => { assert.ok(cond, msg); passes++; };
 const eq = (a: unknown, b: unknown, msg: string) => { assert.deepEqual(a, b, msg); passes++; };
-const ALL = { sibling: true, icons: true };
+const ALL = { link: true, icons: true };
 
 // ---- each screen offers what it draws, left to right ----
 eq(groupsFor('title', false, ALL), ['era', 'main', 'icons'], 'the title reaches the other era and the icons');
-eq(groupsFor('title', false, { sibling: false, icons: true }), ['main', 'icons'], 'an era with no sibling offers no link');
+eq(groupsFor('title', false, { link: false, icons: true }), ['main', 'icons'], 'an era that names no trilogy page offers no link');
 eq(groupsFor('select', false, ALL), ['main', 'modes', 'icons'], 'the choice screen reaches the modes and the icons');
 eq(groupsFor('playing', false, ALL), ['main', 'icons'], 'in play there are only the icons');
 eq(groupsFor('playing', true, ALL), ['main', 'icons'], 'a pause menu owns the pad: its choices and the icons');
 eq(groupsFor('results', true, ALL), ['main', 'icons'], 'and so does the results screen');
-eq(groupsFor('select', false, { sibling: true, icons: false }), ['main', 'modes'], 'hidden icons are not in the ring');
+eq(groupsFor('select', false, { link: true, icons: false }), ['main', 'modes'], 'hidden icons are not in the ring');
 
 // ---- main is always reachable, on every screen and configuration ----
 for (const screen of ['title', 'select', 'playing', 'results'] as const) {
-  for (const sibling of [true, false]) for (const icons of [true, false]) for (const menu of [true, false]) {
-    const ring = groupsFor(screen, menu, { sibling, icons });
+  for (const link of [true, false]) for (const icons of [true, false]) for (const menu of [true, false]) {
+    const ring = groupsFor(screen, menu, { link, icons });
     ok(ring.includes('main'), `${screen} always keeps a way back to its own business`);
     ok(ring.length >= 1 && new Set(ring).size === ring.length, `${screen}: no duplicates`);
   }

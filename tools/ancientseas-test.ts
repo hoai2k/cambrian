@@ -31,6 +31,15 @@ const page = readFileSync('src/ancientseas/AncientSeas.tsx', 'utf8');
 ok(!/VersionSwitch|as-foot/.test(page), 'neither version draws a link to the other');
 ok(!/as-foot/.test(readFileSync('src/ancientseas/ancientseas.css', 'utf8')), 'and the switcher styles are gone with it');
 
+/**
+ * The page is the site root: the three games are folders below it, and /ancientseas/ — the address
+ * it was first published at — is a redirect up to it rather than a second copy.
+ */
+ok(readFileSync('index.html', 'utf8').includes('src/ancientseas/main.tsx'), 'the root serves the trilogy page');
+ok(/vite/.test(readFileSync('vite.config.ts', 'utf8')) && readFileSync('vite.config.ts', 'utf8').includes("'./cambrian/index.html'"), 'and the build has a page for the Cambrian below it');
+const alias = readFileSync('public/ancientseas/index.html', 'utf8');
+ok(/http-equiv="refresh"[^>]*url=\.\.\//.test(alias) && /canonical" href="\.\.\//.test(alias), 'the old address redirects to it');
+
 // ---- the games: three, in order, each opening a page that exists and showing its own title art ----
 const ERAS = { cambrian: CAMBRIAN, devonian: DEVONIAN, triassic: TRIASSIC } as const;
 eq(GAMES.map((g) => g.id), ['cambrian', 'devonian', 'triassic'], 'the three games, oldest first');
@@ -44,6 +53,27 @@ for (const g of GAMES) {
   ok(existsSync(`public/${g.wordmark}`), `${g.id}: that wordmark is in public/`);
   eq(g.tagline, era.copy.tagline, `${g.id}: the tagline is the game's own`);
   ok(era.copy.taglineEm.startsWith(g.when), `${g.id}: "${g.when}" is how the game's own copy dates itself`);
+}
+
+/**
+ * Every game's title screen offers this page rather than a card per other era: with three games
+ * that was two other titles stacked in the corner of a screen that is meant to say press start.
+ */
+for (const era of [CAMBRIAN, DEVONIAN, TRIASSIC]) {
+  const t = era.copy.trilogy;
+  ok(t, `${era.id}: names the trilogy page`);
+  eq(t?.path, '', `${era.id}: which is the app root, one level up from the game`);
+  eq(t?.title, 'Ancient Seas Trilogy', `${era.id}: by its own name`);
+}
+const titleScreen = readFileSync('src/app/Title.tsx', 'utf8');
+ok(/copy\.trilogy/.test(titleScreen), 'the title screen draws that link');
+ok(!/copy\.siblings|siblings\.map/.test(titleScreen), 'and no longer a card per other era');
+// The pick screen keeps its own era menu: mid-flow, going straight to another roster saves a screen.
+ok(/copy\.siblings/.test(readFileSync('src/app/Select.tsx', 'utf8')), 'the pick screen still links to the other games directly');
+for (const era of [CAMBRIAN, DEVONIAN, TRIASSIC]) {
+  for (const s of [...(era.copy.sibling ? [era.copy.sibling] : []), ...(era.copy.siblings ?? [])]) {
+    ok(existsSync(`${s.path}index.html`), `${era.id}: its link to ${s.title} goes to a page that exists (${s.path})`);
+  }
 }
 
 // ---- version 2: every slot has a brief, and never asks for what has not been delivered ----
@@ -162,6 +192,10 @@ eq([STAGE.desktop, STAGE.mobile], [10 / 16, 27 / 9], 'and page.ts agrees');
 eq(Object.keys(BIG_ANIMAL).sort(), GAMES.map((g) => g.id).sort(), 'every era names the animal that lights with its title');
 for (const id of Object.values(BIG_ANIMAL)) ok(SLOTS.some((s) => s.id === id && s.kind === 'animal'), `${id} is an animal on the plate`);
 ok(/BIG_ANIMAL\[era\] === slot\.id/.test(page), 'the page lights that animal with its title');
+// And the animal is half the link, not a picture beside it — the same href, kept out of the
+// keyboard's and the screen reader's way so a game is one stop rather than two.
+ok(/partOfLink/.test(page) && /href=\{url\(game\.path\)\}/.test(page), 'the animal opens the game its title opens');
+ok(/aria-hidden=\{isTitle \? undefined : true\}/.test(page) && /tabIndex=\{isTitle \? undefined : -1\}/.test(page), 'and only the title is a stop for a keyboard');
 /**
  * `filter` replaces rather than adds, so a hover state that sets its own filter drops whatever the
  * resting state had. The halo lives in one custom property used by both, which is the only way the
