@@ -170,6 +170,9 @@ ok(/BIG_ANIMAL\[era\] === slot\.id/.test(page), 'the page lights that animal wit
 const css2 = readFileSync('src/ancientseas/ancientseas.css', 'utf8');
 ok(/--as-halo:/.test(css2) && (css2.match(/filter: var\(--as-halo\)/g) ?? []).length >= 2, 'resting and hover titles carry the same halo');
 ok(!/a\.as-slot-title:hover[^}]*filter: brightness/.test(css2), 'and hover does not replace it with a bare brightness');
+// A lit animal comes up in size where it stands: a drawing on paper that slides has come loose.
+ok(/\.as-slot-animal\.as-lit \{ --grow: [\d.]+; \}/.test(css2), 'the lit animal grows');
+ok(!/--lift/.test(css2), 'and nothing moves a piece off its place to say it is chosen');
 // The paper is the window's, the plate is the composition's: that is what fills a wide screen.
 ok(/\.as-paper \{ position: absolute; inset: 0/.test(css2), 'the paper covers the window');
 ok(/\.as-stage \{[^}]*width: min\(100vw, calc\(100svh \* 1\.6\)\)/.test(css2), 'the plate keeps 16:10 inside it');
