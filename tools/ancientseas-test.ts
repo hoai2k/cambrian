@@ -180,5 +180,12 @@ ok(/bootSlow && screen !== 'title'/.test(app), 'the boot screen keeps off the ti
 ok(/progress=\{bootSlow \? bootFraction : null\}/.test(app), 'the title gets a bar only once the wait is slow');
 ok(/!loaded && progress !== null/.test(title), 'and draws it only while it is still loading');
 ok(/WAIT_HINT = 700/.test(loading), 'slow means 700ms');
+// `.loading` is the boot screen's own class — absolute, inset 0, its own background — so the
+// title's loading line must not wear it, or the line draws itself as a panel over the painting.
+ok(!/press-start \$\{loaded \? '' : 'loading'\}/.test(title), 'the title\'s loading line is not the boot screen');
+ok(/press-start \$\{loaded \? '' : 'waiting'\}/.test(title), 'it says waiting instead');
+ok(/\.press-start\.waiting/.test(readFileSync('src/app/styles.css', 'utf8')), 'and the stylesheet agrees');
+// Three games means two era links on every title screen; they are a column, not two corners.
+ok(/className="era-switches"/.test(title), 'the other eras stack rather than sitting on each other');
 
 console.log(`ancientseas: ${passes} checks passed`);
