@@ -153,6 +153,13 @@ follow the instanced-prop rules on the requests page.
 
 ### B2 · Tier 2 — built in-house
 
+**Initial delivery, 12 September 2026:** six Blender-authored preview library models
+cover both variants of `stromatolite`, `salt-crust`, and `mud-ripple`, with source
+projects, renders, measured footprints and validation. See
+[`tools/triassic/props/README.md`](../../tools/triassic/props/README.md).
+**Placed 13 September 2026:** all three families are scattered at the densities this page's table
+gives them and collided against their measured union envelopes. All other B2 rows remain unbuilt.
+
 Instanced props by builder script (`tools/triassic/props/`), one mesh, base pivot, vertex colours,
 a few hundred triangles, at the scale-1 sizes in [02](02-biomes-and-depth.md#props-and-plants-the-models-each-biome-needs);
 `npm run shapes` for anything collided with, `npm run props` to audit.

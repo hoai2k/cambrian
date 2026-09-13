@@ -154,6 +154,25 @@ const settle = (g: Game, seconds: number) => { const m = new Map([[0, emptyInput
     `${(bend[0] * 100).toFixed(0)}% for a larva, ${(bend[bend.length - 1] * 100).toFixed(0)}% for a big one`);
 }
 
+// --- a plant that cannot bend at all ---
+// The Triassic's substrate is mineral: a stromatolite dome, a gypsum crust, a mud slab, all at
+// `maxLean: 0`. The bend fraction is the plant's lean over its maximum, and that maximum being
+// zero made it 0/0 — one NaN into the push-out, then into the swimmer's position, its hp and its
+// stamina, from the first body to brush a salt pan. Nothing about a rigid plant should be special:
+// it resists fully, it never leans, and everything stays a number.
+for (const kind of ['stromatolite', 'saltCrust', 'mudRipple'] as const) {
+  const { g, p, plant } = scene(kind, 1, 'waptia', 0.6, 0);
+  const m = new Map([[0, { ...emptyInput(), move: { x: 1, y: 0 } } as InputFrame]]);
+  let finite = true;
+  for (let i = 0; i < 240; i++) {
+    g.step(1 / 60, m); g.events.length = 0;
+    if (!Number.isFinite(p.pos.x) || !Number.isFinite(p.hp) || !Number.isFinite(p.stamina)) { finite = false; break; }
+  }
+  check(`swimming into ${kind} leaves everything a number`, finite,
+    `pos ${p.pos.x.toFixed(2)} hp ${p.hp.toFixed(1)} stamina ${p.stamina.toFixed(1)}`);
+  check(`...and ${kind} never leans`, plant.maxB === 0 && plant.bx === 0 && plant.bz === 0, `maxB ${plant.maxB}`);
+}
+
 // --- full world: cost of the plant pass ---
 {
   const g = new Game('rise', [{ creature: 'anomalocaris', device: 'keyboard', ready: true }], 5052026);

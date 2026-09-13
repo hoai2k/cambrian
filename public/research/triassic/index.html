@@ -103,6 +103,10 @@
     font: inherit; font-size: 12px; cursor: pointer; }
   .pane .pick:hover { border-color: var(--pick); color: var(--pick); }
   .pane .pick.on { background: var(--pick); color: #06161c; border-color: var(--pick); font-weight: 700; }
+  /* the second answer, stacked under the first: redraw this one rather than crown it or replace it */
+  .pane .pick.redo { top: 34px; }
+  .pane .pick.redo:hover { border-color: var(--ember); color: var(--ember); }
+  .pane .pick.redo.on { background: var(--ember); color: #1c1004; border-color: var(--ember); }
   .decide { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; padding: 8px 14px;
     border-top: 1px solid var(--line); background: var(--ink-2); font-size: 12.5px; }
   .decide .verdict { font-weight: 650; }
@@ -140,7 +144,7 @@
     <div class="chips" id="groups"></div>
     <button class="chip" id="only-todo" aria-pressed="false">Undecided only</button>
     <span style="flex:1"></span>
-    <span class="hint"><kbd>C</kbd> toggle · <kbd>B</kbd> both · <kbd>←</kbd><kbd>→</kbd> image · <kbd>J</kbd><kbd>K</kbd> subject · <kbd>Enter</kbd> choose · <kbd>X</kbd> clear · <kbd>Esc</kbd> close</span>
+    <span class="hint"><kbd>C</kbd> toggle · <kbd>B</kbd> both · <kbd>←</kbd><kbd>→</kbd> image · <kbd>J</kbd><kbd>K</kbd> subject · <kbd>Enter</kbd> choose · <kbd>R</kbd> redraw · <kbd>X</kbd> clear · <kbd>Esc</kbd> close</span>
   </div>
 </header>
 <main id="main"></main>
@@ -173,40 +177,53 @@
 
 <script src="data.js"></script>
 <script>
-const DATA = window.TRIASSIC, CANON = window.TRIASSIC_CANONICAL || {};
+const DATA = window.TRIASSIC, CANON = window.TRIASSIC_CANONICAL || {}, REPO = window.TRIASSIC_DECIDED || {};
 const $ = (id) => document.getElementById(id);
 const all = DATA.groups.flatMap((g) => g.subjects.map((s) => ({ ...s, group: g.id, groupName: g.name, canon: CANON[s.id] || [] })));
 const byId = new Map(all.map((s) => [s.id, s]));
 const state = { mode: 'web', groups: new Set(DATA.groups.map((g) => g.id)), q: '', todoOnly: false, open: null, i: 0, ci: 0 };
 
 /**
- * The choice, per subject: which single image is the one this animal should be built from.
- * Kept in this browser (a research page has no server) and keyed by a *stable* reference rather
- * than an index, so refetching the Commons set or regenerating the deployed copy cannot silently
- * move a decision onto a different picture. `Export selections` is what leaves the browser.
+ * The choice, per subject: which single image is the one this animal should be built from. Keyed
+ * by a *stable* reference rather than an index, so refetching the Commons set or regenerating the
+ * deployed copy cannot silently move a decision onto a different picture.
+ *
+ * The state starts as the repository's own, bundled from docs/triassic/canonical/manifest.json,
+ * and a reload returns to it. Nothing is kept in this browser: clicks live in the tab until
+ * *Export selections* takes them out, and applying that file is what makes them real. Decisions
+ * used to persist in localStorage, which quietly made the page disagree with the codebase — a
+ * reviewer looking at it a week later was reading their own old clicks, not what was applied.
  */
-const SEL_KEY = 'triassic-viewer-selections-v1';
-let sel = {};
-try { sel = JSON.parse(localStorage.getItem(SEL_KEY) || '{}') || {}; } catch { sel = {}; }
-const saveSel = () => { try { localStorage.setItem(SEL_KEY, JSON.stringify(sel)); } catch { /* private window */ } };
+let sel = JSON.parse(JSON.stringify(REPO));
+/** Does this subject still say what the repository says? Used only to report what is unsaved. */
+const sameAsRepo = (id) => {
+  const a = sel[id], b = REPO[id];
+  if (!a || !b) return !a === !b;
+  return a.verdict === b.verdict && a.ref === b.ref && (a.note || '') === (b.note || '');
+};
+const pending = () => all.filter((s) => !sameAsRepo(s.id)).length;
 
 /**
- * Every candidate image for a subject in one list: the generated canonical pose first, then any
- * extra authored view and the four-view modelling sheet, then the web references. `ref` is the
- * stable identity a choice is stored against — an authored image's label, a reference's Commons
- * filename — because both survive a rebuild and neither collides with the other.
+ * Every candidate image for a subject in one list: the generated canonical pose and any extra
+ * authored view first, then the web references, and the four-view modelling sheet last of all.
+ * The sheet is what was made *from* a pose rather than another pose beside it, so it belongs at
+ * the end of the row where it reads as the output of the decision and not as a rival to it.
+ *
+ * `ref` is the stable identity a choice is stored against — an authored image's label, a
+ * reference's Commons filename — because both survive a rebuild and neither collides with the
+ * other. `side` and `k` say where a shot sits in `s.canon` / `s.images`, because the two panes
+ * step through those arrays and the display order is no longer the same as either.
  */
 function shots(s) {
-  return [
-    ...s.canon.map((c) => ({
-      kind: c.kind || 'canonical', ref: c.label, label: c.label,
-      src: c.src, thumb: c.thumb || c.src,
-    })),
-    ...s.images.map((im) => ({
-      kind: 'web', ref: im.title, label: im.title, src: im.thumb, thumb: im.thumb,
-      title: im.title, artist: im.artist, licence: im.licence, page: im.page, full: im.full, description: im.description,
-    })),
-  ];
+  const canon = s.canon.map((c, k) => ({
+    kind: c.kind || 'canonical', ref: c.label, label: c.label,
+    src: c.src, thumb: c.thumb || c.src, side: 'canon', k,
+  }));
+  const web = s.images.map((im, k) => ({
+    kind: 'web', ref: im.title, label: im.title, src: im.thumb, thumb: im.thumb, side: 'web', k,
+    title: im.title, artist: im.artist, licence: im.licence, page: im.page, full: im.full, description: im.description,
+  }));
+  return [...canon.filter((c) => c.kind !== 'turnaround'), ...web, ...canon.filter((c) => c.kind === 'turnaround')];
 }
 const chosenRef = (id) => sel[id]?.ref;
 const isChosen = (id, shot) => sel[id]?.ref === shot.ref;
@@ -221,26 +238,44 @@ const isChosen = (id, shot) => sel[id]?.ref === shot.ref;
  * male and a female pose read as a rework for picking the male — and it was the wrong question
  * anyway. Picking between our own variants is choosing the canon, not rejecting it.
  */
-const verdictOf = (id) => (sel[id] ? (sel[id].choice === 'web' ? 'replace' : 'greenlit') : null);
+const verdictOf = (id) => sel[id]?.verdict ?? null;
 const counts = () => {
   let green = 0, replace = 0;
   for (const s of all) { const v = verdictOf(s.id); if (v === 'greenlit') green++; else if (v === 'replace') replace++; }
   return { green, replace, total: green + replace };
 };
 
-function choose(id, shot) {
-  sel[id] = { choice: shot.kind, ref: shot.ref, note: sel[id]?.note || '', at: new Date().toISOString() };
-  saveSel(); refreshCounts(); render(); if (state.open) paint();
+/**
+ * Picking an image is the verdict: one of ours greenlights the subject and says which of ours is
+ * the canon; a reference says ours is not right yet and names the picture to regenerate toward.
+ */
+function choose(id, shot) { set(id, shot, shot.kind === 'web' ? 'replace' : 'greenlit'); }
+/**
+ * The third answer, and the one this page could not say out loud until a reviewer had to say it
+ * in prose: *redraw this one*. The reading is right and no other picture beats it, but the image
+ * itself has something wrong — a fin, a scale that reads small, a pose out of its element. The
+ * steer is then our own image and the note is the brief, so the regeneration has something to aim
+ * at without borrowing somebody else's animal.
+ */
+function redraw(id, shot) { set(id, shot, 'replace'); }
+function set(id, shot, verdict) {
+  sel[id] = { verdict, choice: shot.kind, ref: shot.ref, note: sel[id]?.note || '', at: new Date().toISOString() };
+  refreshCounts(); render(); if (state.open) paint();
 }
-function clearChoice(id) { delete sel[id]; saveSel(); refreshCounts(); render(); if (state.open) paint(); }
+function clearChoice(id) { delete sel[id]; refreshCounts(); render(); if (state.open) paint(); }
 
 function refreshCounts() {
-  const c = counts();
-  $('export').textContent = c.total ? `Export selections (${c.total})` : 'Export selections';
+  const c = counts(), p = pending();
+  $('export').textContent = p ? `Export selections (${p} changed)` : 'Export selections';
   $('export').disabled = c.total === 0;
+  $('export').title = p
+    ? `${p} subject${p === 1 ? '' : 's'} differ from the codebase. Export and apply to make it real — nothing is kept in this browser.`
+    : 'This page matches the codebase. Exporting now re-states the decisions already applied.';
   $('tally').textContent = `${all.length} subjects · ${all.reduce((n, s) => n + s.images.length, 0)} web images · `
     + `${all.filter((s) => s.canon.some((x) => (x.kind || 'canonical') === 'canonical')).length} with a canonical image · `
-    + `${c.green} greenlit, ${c.replace} to redo · Commons, ${DATA.generated}`;
+    + `${c.green} greenlit, ${c.replace} to redo`
+    + (p ? ` · ${p} unsaved here` : ' · matching the codebase')
+    + ` · Commons, ${DATA.generated}`;
 }
 
 // ---------- header controls
@@ -292,7 +327,7 @@ $('export').addEventListener('click', () => {
     schema: 'triassic-canonical-selections/1',
     generated: new Date().toISOString(),
     dataGenerated: DATA.generated,
-    summary: { subjects: all.length, decided: c.total, greenlit: c.green, replace: c.replace },
+    summary: { subjects: all.length, decided: c.total, greenlit: c.green, replace: c.replace, changedHere: pending() },
     howToApply: 'node tools/triassic/apply-selections.mjs <this file> — greenlights the approved poses in docs/triassic/canonical/manifest.json and writes the rework brief to docs/triassic/canonical/review.md',
     selections: rows,
   };
@@ -367,18 +402,17 @@ $('d-clear').addEventListener('click', () => { if (state.open) clearChoice(state
 $('d-note').addEventListener('input', (e) => {
   const s = state.open; if (!s) return;
   if (!sel[s.id]) return;                                   // a note without a choice has nothing to attach to
-  sel[s.id].note = e.target.value; saveSel();
+  sel[s.id].note = e.target.value; refreshCounts();
 });
 
 /** The image the keyboard acts on: whichever side is on show. */
 function currentShot() {
   const s = state.open; if (!s) return null;
-  const list = shots(s);
-  if (state.mode === 'canon') return list.find((x) => x.kind !== 'web') && s.canon[state.ci] ? canonShot(s, state.ci) : null;
+  if (state.mode === 'canon') return canonShot(s, state.ci);
   return s.images.length ? webShot(s, Math.min(state.i, s.images.length - 1)) : null;
 }
-const canonShot = (s, k) => shots(s)[k];
-const webShot = (s, k) => shots(s)[s.canon.length + k];
+const canonShot = (s, k) => shots(s).find((x) => x.side === 'canon' && x.k === k) || null;
+const webShot = (s, k) => shots(s).find((x) => x.side === 'web' && x.k === k) || null;
 
 function pane(side, s) {
   const chosen = chosenRef(s.id);
@@ -386,16 +420,17 @@ function pane(side, s) {
     const c = s.canon[state.ci];
     if (!c) return `<div class="pane"><span class="lab canon">canonical</span><p class="empty">No canonical image yet. Drop one at
       <code>docs/triassic/canonical/${s.id}.png</code> and run <code>npm run triassic:viewer</code>.</p></div>`;
-    const shot = canonShot(s, state.ci), on = chosen === shot.ref;
+    const shot = canonShot(s, state.ci), on = chosen === shot.ref, v = verdictOf(s.id);
     return `<div class="pane"><span class="lab canon">${c.kind === 'turnaround' ? '3D model views' : 'canonical'}${c.label !== 'canonical' && c.kind !== 'turnaround' ? ' · ' + c.label : ''}</span>
-      <button class="pick${on ? ' on' : ''}" data-pick="${encodeURIComponent(shot.ref)}">${on ? '✓ Chosen' : 'Use as canon'}</button>
+      <button class="pick${on && v === 'greenlit' ? ' on' : ''}" data-pick="${encodeURIComponent(shot.ref)}">${on && v === 'greenlit' ? '✓ Chosen' : 'Use as canon'}</button>
+      <button class="pick redo${on && v === 'replace' ? ' on' : ''}" data-redraw="${encodeURIComponent(shot.ref)}" title="The reading is right but this image is not — say what to change in the note">${on && v === 'replace' ? '✎ Redrawing' : 'Needs redraw'}</button>
       <img src="${c.src}" alt="${s.name} canonical"></div>`;
   }
   const im = s.images[Math.min(state.i, Math.max(0, s.images.length - 1))];
   if (!im) return `<div class="pane"><span class="lab">web reference</span><p class="empty">No reference image was found for this subject on Commons.</p></div>`;
   const shot = webShot(s, Math.min(state.i, s.images.length - 1)), on = chosen === shot.ref;
   return `<div class="pane"><span class="lab">web reference</span>
-    <button class="pick${on ? ' on' : ''}" data-pick="${encodeURIComponent(shot.ref)}">${on ? '✓ Chosen' : 'Use as canon'}</button>
+    <button class="pick${on ? ' on' : ''}" data-pick="${encodeURIComponent(shot.ref)}" title="Ours is not right yet — regenerate it toward this picture">${on ? '✓ Chosen' : 'Redraw toward this'}</button>
     <img src="${im.thumb}" alt="${im.title}"></div>`;
 }
 
@@ -421,15 +456,16 @@ function paint() {
   $('d-verdict').className = `verdict ${v === 'greenlit' ? 'green' : v === 'replace' ? 'replace' : 'none'}`;
   $('d-verdict').textContent = !pick ? 'No choice yet — pick the image this animal should be built from.'
     : v === 'greenlit' ? '✓ Greenlit — our own image is the one; build from it.'
-    : `✎ Redo the canonical image to match: ${shot ? shot.label : pick.ref}`;
+    : pick.choice === 'web' ? `✎ Redo the canonical image toward: ${shot ? shot.label : pick.ref}`
+    : `✎ Redraw our own ${shot && shot.kind === 'turnaround' ? 'modelling sheet' : 'pose'} — the note is the brief.`;
   $('d-note').value = pick?.note || '';
   $('d-note').disabled = !pick;
   $('d-clear').disabled = !pick;
 
   const allShots = shots(s);
   $('d-strip').innerHTML = allShots.map((shot, k) => {
-    const canonSide = k < s.canon.length;
-    const cur = canonSide ? (state.mode === 'canon' && k === state.ci) : (state.mode !== 'canon' && k - s.canon.length === state.i);
+    const canonSide = shot.side === 'canon';
+    const cur = canonSide ? (state.mode === 'canon' && shot.k === state.ci) : (state.mode !== 'canon' && shot.k === state.i);
     return `<button class="${canonSide ? 'c ' : ''}${isChosen(s.id, shot) ? 'picked' : ''}" data-shot="${k}" aria-current="${cur}" title="${shot.label}">
       <img src="${shot.thumb}" alt="" loading="lazy">
       ${isChosen(s.id, shot) ? '<span class="tick">✓</span>' : ''}
@@ -449,16 +485,19 @@ function paint() {
 }
 
 $('d-stage').addEventListener('click', (e) => {
-  const b = e.target.closest('[data-pick]'); if (!b || !state.open) return;
-  const ref = decodeURIComponent(b.dataset.pick);
-  if (chosenRef(state.open.id) === ref) clearChoice(state.open.id);
-  else { const shot = shots(state.open).find((x) => x.ref === ref); if (shot) choose(state.open.id, shot); }
+  const b = e.target.closest('[data-pick],[data-redraw]'); if (!b || !state.open) return;
+  const id = state.open.id, redo = b.dataset.redraw !== undefined;
+  const ref = decodeURIComponent(redo ? b.dataset.redraw : b.dataset.pick);
+  // Pressing the answer a subject already gives takes it back; pressing the other one switches.
+  if (chosenRef(id) === ref && (verdictOf(id) === 'replace') === redo) { clearChoice(id); return; }
+  const shot = shots(state.open).find((x) => x.ref === ref); if (!shot) return;
+  redo ? redraw(id, shot) : choose(id, shot);
 });
 $('d-strip').addEventListener('click', (e) => {
   const b = e.target.closest('[data-shot]'); if (!b || !state.open) return;
-  const s = state.open, k = +b.dataset.shot;
-  if (k < s.canon.length) { state.ci = k; if (state.mode === 'web') setMode('canon'); else paint(); }
-  else { state.i = k - s.canon.length; if (state.mode === 'canon') setMode('web'); else paint(); }
+  const s = state.open, shot = shots(s)[+b.dataset.shot]; if (!shot) return;
+  if (shot.side === 'canon') { state.ci = shot.k; if (state.mode === 'web') setMode('canon'); else paint(); }
+  else { state.i = shot.k; if (state.mode === 'canon') setMode('web'); else paint(); }
 });
 
 // ---------- keyboard
@@ -478,6 +517,12 @@ addEventListener('keydown', (e) => {
     e.preventDefault();
     const shot = currentShot();
     if (shot) { chosenRef(s.id) === shot.ref ? clearChoice(s.id) : choose(s.id, shot); }
+    return;
+  }
+  if (k === 'r') {
+    e.preventDefault();
+    const shot = currentShot();
+    if (shot && shot.kind !== 'web') { chosenRef(s.id) === shot.ref && verdictOf(s.id) === 'replace' ? clearChoice(s.id) : redraw(s.id, shot); }
     return;
   }
   if (k === 'x') { e.preventDefault(); clearChoice(s.id); return; }

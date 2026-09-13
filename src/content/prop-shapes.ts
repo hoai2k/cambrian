@@ -21,12 +21,39 @@ const SHAPES = shapes as Record<string, PropShape>;
 
 export const propShape = (id: string | undefined): PropShape | undefined => (id ? SHAPES[id] : undefined);
 
-/** The prop id the active era draws a plant kind with, if it has one. */
-export function floraPropId(kind: string): string | undefined {
+/** Every prop the active era draws a plant kind with: one id, or a family's variants in order. */
+export function floraPropIds(kind: string): readonly string[] {
   const scenery = ACTIVE_ERA.assets.instancedScenery;
-  if (scenery) return (scenery.flora as Record<string, string | undefined>)[kind];
-  const named = ACTIVE_ERA.environment.floraProps as Record<string, string | undefined> | undefined;
-  return (named ?? { cushion: 'cushion-sponge', lettuce: 'lettuce-tuft', spine: 'spine-sponge', glass: 'glass-fan' })[kind];
+  const named = scenery
+    ? (scenery.flora as Record<string, string | readonly string[] | undefined>)[kind]
+    : (ACTIVE_ERA.environment.floraProps as Record<string, string | undefined> | undefined
+      ?? { cushion: 'cushion-sponge', lettuce: 'lettuce-tuft', spine: 'spine-sponge', glass: 'glass-fan' })[kind];
+  return named === undefined ? [] : typeof named === 'string' ? [named] : named;
+}
+
+/** The prop id the active era draws a plant kind with, if it has one — the first of a family. */
+export const floraPropId = (kind: string): string | undefined => floraPropIds(kind)[0];
+
+/**
+ * What a plant kind collides as. One prop is its own measured shape; a family of variants is the
+ * *union* of theirs — the widest radius each band reaches over all of them, and the tallest span.
+ * The simulation places one collider per kind and never learns which variant was drawn, so the
+ * envelope has to cover the one that was: a collider smaller than the mesh is a body the player
+ * can swim through the side of.
+ */
+export const propShapeFor = (kind: string): PropShape | undefined => unionShape(floraPropIds(kind));
+
+/** The envelope a list of props share, band by band. One id is simply its own shape. */
+export function unionShape(ids: readonly string[]): PropShape | undefined {
+  const shapes = ids.map(propShape).filter((s): s is PropShape => !!s);
+  if (shapes.length < 2) return shapes[0];
+  return {
+    y0: Math.min(...shapes.map((s) => s.y0)),
+    y1: Math.max(...shapes.map((s) => s.y1)),
+    rmax: Math.max(...shapes.map((s) => s.rmax)),
+    r: shapes[0].r.map((_, i) => Math.max(...shapes.map((s) => s.r[i]))),
+    bands: shapes[0].bands.map((band, b) => band.map((_, i) => Math.max(...shapes.map((s) => s.bands[b][i])))),
+  };
 }
 
 /** The prop id the active era draws a rock with. `undefined` variant is the plain boulder. */

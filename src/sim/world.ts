@@ -26,7 +26,11 @@ export const BIOME_DANGER = ACTIVE_ERA.environment.biomeDanger;
 export type FloraKind = 'vauxia' | 'sac' | 'choia' | 'thalli' | 'tuft' | 'cushion' | 'lettuce' | 'spine' | 'glass'
   | 'crinoid' | 'stromatoporoid' | 'tabulate' | 'rugose' | 'bryozoan' | 'reed' | 'log'
   // tall Devonian kinds that reach up into the water column: a giant sea lily and an algal frond tower
-  | 'lilyColumn' | 'frondTower';
+  | 'lilyColumn' | 'frondTower'
+  // Triassic substrate: the microbial domes of the gypsum flats, the gypsum crust plates beside
+  // them, and the laminated mud floor of the black basin. Ground cover rather than growth — they
+  // are flora only in the sense that the chunk scatters them and the floor collides with them.
+  | 'stromatolite' | 'saltCrust' | 'mudRipple';
 /** Driftwood only washes out this far from the shore. */
 export const LOG_SHORE_RANGE = 120;
 
