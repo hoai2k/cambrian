@@ -126,7 +126,7 @@
       "turnaround": "not-started",
       "canonical": "greenlit",
       "decidedAt": "2026-09-13T19:15:00.000Z",
-      "note": "Human-approved after the neck-proportion redraw; use the full canonical for silhouette and the shortened-neck model input for Tripo.",
+      "note": "Human-approved after the neck-proportion redraw; the canonical, single-model input and turnaround all preserve the complete extraordinarily long neck.",
       "promotedFrom": "candidate05"
     },
     "mystriosuchus": {

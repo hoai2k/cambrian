@@ -116,6 +116,18 @@ unless the user explicitly asks for a PR. Steps:
   `src/app/Loading.tsx`) it grows a progress bar under that line. The full boot screen is for a
   boot nobody is looking at a screen for — deep-linked to the roster — because over the title it
   would be the title's own painting a second time.
+- Fullscreen rides across a change of game rather than surviving it, because it cannot survive it:
+  it belongs to the document, switching game is a page load, and the new document may only enter
+  on a user gesture of its own. (A query parameter would change nothing — `/cambrian/?game=devonian`
+  reached by a link is still a new document. Only a same-document navigation keeps it, and the
+  content layer reads `ACTIVE_ERA` at import time, so a second era cannot be booted into a document
+  that has already loaded one.) So `src/shared/fullscreen.ts` writes down every entry and exit in
+  `sessionStorage`, and each page puts itself back on the first click or key it sees — on a title
+  screen that is the press that starts the game anyway. `enterFullscreen` is deliberately not a
+  toggle: the toolbar button is the one control that toggles, and a start that toggled would take
+  a player who arrived fullscreen straight back out. `npm run fullscreen` covers the decision and
+  `tools/ancientseas-smoke.mjs` the whole trip, on the roster screen where a stray click starts
+  nothing and so shows the restore on its own.
 - An era's `assets.sfx` names the shared sound library (`assets/sfx/`): bites, hits and the UI are the
   same files in both eras. Era-specific samples are addressed as `<era>/<name>` and resolve under
   `assets/<era>/sfx/` regardless. The two always-on beds are named per era in `audio.loops`, and a

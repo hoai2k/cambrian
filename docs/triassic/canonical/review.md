@@ -55,7 +55,7 @@ shipped with the body, the specimen viewer switches between the two in place.
 | **Placodus gigas** `placodus` | T09 · Rung II · the shell-cruncher | the pose | — |
 | **Rhaeticosaurus mertensi** `rhaeticosaurus` | T06 · Rung III · the flyer (first plesiosaur) | the pose | — |
 | **Saurichthys** `saurichthys` | T15 · Rung II · the needle | the pose | — |
-| **Tanystropheus hydroides** `tanystropheus` | S01 · the boom (13-joint stiff neck) | the pose | Human-approved after the neck-proportion redraw; use the full canonical for silhouette and the shortened-neck model input for Tripo. |
+| **Tanystropheus hydroides** `tanystropheus` | S01 · the boom (13-joint stiff neck) | the pose | Human-approved after the neck-proportion redraw; the canonical, single-model input and turnaround all preserve the complete extraordinarily long neck. |
 
 ## Redo — regenerate the canonical pose
 
