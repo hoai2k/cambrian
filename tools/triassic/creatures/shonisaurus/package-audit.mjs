@@ -20,9 +20,11 @@ function geometry(doc){return doc.getRoot().listMeshes().map(m=>({name:m.getName
 function clips(doc){return doc.getRoot().listAnimations().map(a=>({name:a.getName(),channels:a.listChannels().map(c=>({node:c.getTargetNode().getName(),path:c.getTargetPath(),input:numDigest(c.getSampler().getInput()),output:numDigest(c.getSampler().getOutput())})).sort((a,b)=>(a.node+a.path).localeCompare(b.node+b.path))})).sort((a,b)=>a.name.localeCompare(b.name));}
 function check(doc,label){
  const root=doc.getRoot(), animations=root.listAnimations(),names=animations.map(a=>a.getName());assert.deepEqual([...names].sort(),[...meta.clips].sort());
- const signatures=new Set();let weights=0,tris=0;
+ const signatures=new Set();let weights=0,tris=0;const winding=[];
  for(const m of root.listMeshes())for(const p of m.listPrimitives()){
   tris+=(p.getIndices()?.getCount()??p.getAttribute('POSITION').getCount())/3;
+  if(m.getName().startsWith('Puppet')){const vs=p.getAttribute('POSITION').getArray(),ids=p.getIndices().getArray();let volume=0;for(let k=0;k<ids.length;k+=3){const a=ids[k]*3,b=ids[k+1]*3,c=ids[k+2]*3;volume+=(vs[a]*(vs[b+1]*vs[c+2]-vs[b+2]*vs[c+1])+vs[a+1]*(vs[b+2]*vs[c]-vs[b]*vs[c+2])+vs[a+2]*(vs[b]*vs[c+1]-vs[b+1]*vs[c]))/6;}assert(volume>0,`${m.getName()}: inward single-sided shell`);winding.push({mesh:m.getName(),signedVolume:volume,doubleSided:p.getMaterial().getDoubleSided()});}
+
   for(const a of p.listAttributes())for(const n of arr(a))assert(Number.isFinite(n));
   const w=p.getAttribute('WEIGHTS_0');assert(w,`${label} ${m.getName()} is unskinned`);
   for(let i=0;i<w.getCount();i++){const v=w.getElement(i,[]);assert(Math.abs(v.reduce((a,b)=>a+b,0)-1)<1e-5);assert(v.every(n=>n>=0&&n<=1));weights++;}
@@ -44,7 +46,7 @@ function check(doc,label){
  }
  const socketRecords=root.listNodes().filter(n=>n.getName().startsWith('anchor_')).map(n=>({name:n.getName(),parent:n.getParentNode().getName(),translation:n.getTranslation(),extras:n.getExtras()}));assert.equal(socketRecords.length,3);
  for(const n of socketRecords)assert.equal(n.parent,n.extras.cambrianAnchor.parentBone);
- return {triangles:tris,weightedVertices:weights,bones:skeleton(doc).joints.length,clips:measures,sockets:socketRecords};
+ return {closedSurfaceWinding:winding,triangles:tris,weightedVertices:weights,bones:skeleton(doc).joints.length,clips:measures,sockets:socketRecords};
 }
 const results={},docs={};
 for(const [src,suffix]of [['full',''],['puppet','.puppet']]){

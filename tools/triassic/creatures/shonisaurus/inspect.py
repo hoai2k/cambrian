@@ -3,7 +3,7 @@ from mathutils import Vector
 from pathlib import Path
 P=Path.cwd(); O=P/'local/triassic-authoring/shonisaurus/review'
 bpy.ops.wm.read_factory_settings(use_empty=True)
-bpy.ops.import_scene.gltf(filepath=str(P/'intake/triassic-tests/shonisaurus/shonisaurus.raw.glb'))
+bpy.ops.import_scene.gltf(filepath=str(P/'tools/triassic/creatures/shonisaurus/tripo-raw/shonisaurus.raw.glb'))
 obs=[o for o in bpy.context.scene.objects if o.type=='MESH']; print('MESHES',[(o.name,len(o.data.vertices),len(o.data.polygons),[list(o.matrix_world@Vector(c)) for c in o.bound_box])for o in obs])
 for o in obs: print('MATS',[(m.name,[(n.type,n.image.name if n.type=='TEX_IMAGE' and n.image else '')for n in m.node_tree.nodes])for m in o.data.materials])
 vs=[o.matrix_world@v.co for o in obs for v in o.data.vertices]; lo=Vector([min(v[i]for v in vs)for i in range(3)]);hi=Vector([max(v[i]for v in vs)for i in range(3)]);center=(lo+hi)/2;dim=hi-lo

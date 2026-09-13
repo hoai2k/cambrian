@@ -4,8 +4,8 @@ The delivered Tripo body and the procedural volume puppet use one armature and o
 
 ## Delivered files
 
-- `public/assets/triassic/creatures/shonisaurus.glb`: 117,442 triangles, 4,379,544 bytes, vertex pigmentation and source normal detail.
-- `shonisaurus.puppet.glb`: 10,874 triangles, 578,472 bytes, measured procedural body, rostrum branches, four flipper lofts and crescent caudal loft.
+- `public/assets/triassic/creatures/shonisaurus.glb`: 117,442 triangles, 4,379,136 bytes, vertex pigmentation and source normal detail.
+- `shonisaurus.puppet.glb`: 10,874 triangles, 572,216 bytes, measured procedural body, rostrum branches, four flipper lofts and crescent caudal loft.
 - `shonisaurus.lod1.glb`: byte-identical to the procedural puppet.
 - `shonisaurus.json`: physical scale, clip and socket metadata.
 - Studio, select, card, thumbnail and puppet portraits are rendered from the final meshes.
@@ -36,12 +36,12 @@ Three bone-parented sockets are identical in both files: `anchor_mouth`, `anchor
 
 ## Verification
 
-`validation.json` checks the delivered compressed files after decoding: exact joint names/hierarchy/rest transforms/inverse-bind matrices, exact action key times and values, identical socket transforms and metadata, finite geometry, normalized nonzero weights, unique dynamic clips, looping seams, static identity scale, stationary root, and the reduced geometry budget. Compression preserves every decoded mesh attribute and animation value.
+`validation.json` checks the delivered compressed files after decoding: exact joint names/hierarchy/rest transforms/inverse-bind matrices, exact action key times and values, identical socket transforms and metadata, finite geometry, normalized nonzero weights, unique dynamic clips, looping seams, static identity scale, stationary root, and the reduced geometry budget. Compression preserves every decoded mesh attribute and animation value. Every closed procedural shell must also have positive signed volume with the intended single-sided material; this enforces outward winding for trunk, both rostra, caudal and all four flippers.
 
 `deformation-validation.json` records:
 
 - Maximum dorsal/ventral/width error across twenty sections: **0.0530 units, 0.884% of length**, under the 4% contract tolerance.
-- Signed surface volume: **3.2989 full / 3.0300 puppet**, an 8.2% difference.
+- Signed surface volume: **3.2989 full / 3.2453 puppet**, a 1.6% difference.
 - Full-to-puppet surface distance: median 0.00424, 95th percentile 0.0382 units.
 - All four flipper root joints inside the source trunk.
 - Sampled globe volume inside the head: **69.8% left / 61.7% right** (619 samples per globe).
@@ -56,6 +56,8 @@ The jaw's zero pose is closed in the actual mesh. The builder seats the imported
 Only **Bite, Attack, Heavy and Eat** open the mouth. Idle, Swim, Sprint, turning, diving/rising, defensive reactions, Ability, Growth and Death keep a constant closed jaw. Attack phases return to closed contact without the former negative closing overshoot. The package audit enforces no jaw motion in the other fifteen clips and exact rig/clip/socket parity between bodies.
 
 `mouth-closure-validation.json` proves geometric closure with oral fillers and teeth excluded: 14,400 lateral rays across 60 rostral sections detect **zero through-apertures in either body**. The same scan on the preserved former-open control detects 3,128 full / 3,736 puppet misses and maximum openings of 0.126 / 0.130 units. Thus the puppet's dark lip wedge is a sealed, shadowed surface, not a lumen left open by the rest pose. `closed-mouth-review.jpg` shows Idle and Ability beside a feeding strike for both bodies.
+
+A live Three.js review exposed a separate winding defect that two-sided Blender rendering and geometric aperture scans did not reveal: axial rostra/trunk and mirrored left flippers had inward faces while the skin material was single-sided. The builder now recalculates consistent outward winding on every closed procedural shell; the actual packaged meshes are checked for positive signed volume without enabling double-sided skin. Upper tooth winding is corrected as well. The interior throat material remains deliberately double-sided. A fresh live viewer load verified an opaque, closed procedural snout with no pink interior during Idle and correct trunk/flipper shading. Public portraits were refreshed after this correction.
 
 The prior open `.blend` is preserved locally as `shonisaurus.before-mouth-closure.blend`. Raw source data and PREVIEW status are preserved.
 

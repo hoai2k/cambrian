@@ -4,8 +4,7 @@ from pathlib import Path
 from mathutils import Vector
 ROOT=Path(__file__).resolve().parents[4];LOCAL=ROOT/'local/triassic-authoring/nothosaurus';OUT=LOCAL/'material-fix';OUT.mkdir(exist_ok=True)
 bpy.ops.object.select_all(action='SELECT');bpy.ops.object.delete(use_global=False)
-RAW=ROOT/'tools/triassic/creatures/nothosaurus/tripo-raw/nothosaurus.raw.glb'
-if not RAW.exists():RAW=ROOT/'intake/triassic-tests/nothosaurus/nothosaurus.raw.glb'
+RAW=Path(__file__).resolve().parent/'tripo-raw/nothosaurus.raw.glb'
 bpy.ops.import_scene.gltf(filepath=str(RAW));raw=next(o for o in bpy.context.scene.objects if o.type=='MESH');raw.rotation_mode='XYZ';raw.rotation_euler.z=-math.pi/2;raw.scale=(5,5,5);sourceMat=raw.data.materials[0];raw.name='original Tripo'
 originals=set(bpy.context.scene.objects);bpy.context.scene.render.fps=30
 bpy.ops.import_scene.gltf(filepath=str(OUT/'before/nothosaurus.unpacked.glb'));imported=[o for o in bpy.context.scene.objects if o not in originals];meshes=[o for o in imported if o.type=='MESH'];rig=next(o for o in imported if o.type=='ARMATURE')

@@ -19,6 +19,11 @@ def render(kind,clip,t,view,name,w=900,h=600,transparent=False):
  cam.location=Vector(pos);cam.data.ortho_scale=scale;cam.rotation_euler=(target-cam.location).to_track_quat('-Z','Y').to_euler();
  if view=='top':cam.rotation_euler.z+=math.pi/2
  scene.render.filepath=str(R/(name+'.png'));bpy.ops.render.render(write_still=True)
+if '--portraits-only' in sys.argv:
+ render('full','TurnLeft',.24,'hero','portrait',1600,1200,True)
+ render('full','Idle',.05,'hero','studio',1200,900,False)
+ render('puppet','TurnLeft',.24,'hero','puppet-portrait',1600,1200,True)
+ sys.exit(0)
 if '--mouth-only' in sys.argv:
  for kind in ['full','puppet']:
   for clip in ['Idle','Swim','Sprint','Ability','Death','Heavy','Eat']:

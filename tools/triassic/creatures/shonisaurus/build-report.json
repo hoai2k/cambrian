@@ -9,6 +9,58 @@
     "adjustedVertices": 23,
     "maximumRawLengthDisplacement": 0.0011560130119323726
   },
+  "closedSurfaceWinding": {
+    "Puppet measured trunk": {
+      "signedVolumeBefore": -2.928754114746648,
+      "signedVolumeAfter": 2.928615457845187,
+      "outward": true
+    },
+    "Puppet measured crescent caudal": {
+      "signedVolumeBefore": 0.0470415485224488,
+      "signedVolumeAfter": 0.0470415485224488,
+      "outward": true
+    },
+    "Puppet upper rostrum": {
+      "signedVolumeBefore": -0.10512265864862451,
+      "signedVolumeAfter": 0.1051226586486244,
+      "outward": true
+    },
+    "Puppet lower rostrum": {
+      "signedVolumeBefore": -0.0433952441213341,
+      "signedVolumeAfter": 0.043396381176651115,
+      "outward": true
+    },
+    "Puppet pectoral L": {
+      "signedVolumeBefore": -0.03949105483381993,
+      "signedVolumeAfter": 0.039491054833819914,
+      "outward": true
+    },
+    "Puppet pectoral R": {
+      "signedVolumeBefore": 0.039335131456851566,
+      "signedVolumeAfter": 0.039335131456851566,
+      "outward": true
+    },
+    "Puppet pelvic L": {
+      "signedVolumeBefore": -0.019299217217905184,
+      "signedVolumeAfter": 0.019299217217905187,
+      "outward": true
+    },
+    "Puppet pelvic R": {
+      "signedVolumeBefore": 0.019419103293470113,
+      "signedVolumeAfter": 0.019419103293470113,
+      "outward": true
+    },
+    "Upper teeth": {
+      "signedVolumeBefore": -2.1665154433771954e-05,
+      "signedVolumeAfter": 2.1665154433772672e-05,
+      "outward": true
+    },
+    "Lower teeth": {
+      "signedVolumeBefore": 2.1567704413195727e-05,
+      "signedVolumeAfter": 2.1567704413195727e-05,
+      "outward": true
+    }
+  },
   "rawVertices": 9494,
   "rawTriangles": 18984,
   "meshes": {

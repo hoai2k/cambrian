@@ -8,7 +8,7 @@ from mathutils.bvhtree import BVHTree
 from math import sin,cos,pi
 HERE=os.path.dirname(os.path.abspath(__file__)); ROOT=os.path.abspath(os.path.join(HERE,'../../../..'))
 LOCAL=os.path.join(ROOT,'local/triassic-authoring/nothosaurus'); OUT=os.path.join(ROOT,'public/assets/triassic/creatures'); os.makedirs(LOCAL,exist_ok=True);os.makedirs(OUT,exist_ok=True)
-RAW=os.path.join(ROOT,'intake/triassic-tests/nothosaurus/nothosaurus.raw.glb'); ID='nothosaurus'
+RAW=os.path.join(HERE,'tripo-raw/nothosaurus.raw.glb'); ID='nothosaurus'
 CLIPS={'Idle':2.4,'Swim':1.8,'Sprint':1.2,'TurnLeft':1.6,'TurnRight':1.6,'Dive':1.4,'Rise':1.4,'Attack':1.,'Bite':.5,'Heavy':1.1,'Hit':.6,'Death':1.6,'Guard':1.,'Parry':.4,'Dodge':.5,'Eat':1.6,'Stagger':1.2,'Ability':1.0,'Grab':1.2,'Breath':2.4,'Growth':1.5}
 LOOPS=['Idle','Swim','Sprint','Guard','Eat'];SCALE=5
 bpy.ops.object.select_all(action='SELECT');bpy.ops.object.delete(use_global=False)

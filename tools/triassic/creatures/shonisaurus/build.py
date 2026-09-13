@@ -10,7 +10,7 @@ from pathlib import Path
 from math import sin,cos,pi
 P=Path.cwd();HERE=P/'tools/triassic/creatures/shonisaurus';LOCAL=P/'local/triassic-authoring/shonisaurus';OUT=P/'public/assets/triassic/creatures';REVIEW=LOCAL/'review'
 for d in [HERE,LOCAL,OUT,REVIEW]:d.mkdir(parents=True,exist_ok=True)
-S=6.; CLOSED_REST_ANGLE=-.155; RAW=P/'intake/triassic-tests/shonisaurus/shonisaurus.raw.glb'
+S=6.; CLOSED_REST_ANGLE=-.155; RAW=HERE/'tripo-raw/shonisaurus.raw.glb'
 def vworld(v):return Vector((-v[0]*S,-v[1]*S,v[2]*S))
 def smooth(t):t=max(0,min(1,t));return t*t*(3-2*t)
 def ramp(x,a,b):return smooth((x-a)/(b-a))
@@ -260,6 +260,16 @@ for v in lower.data.vertices:
   if loc is not None and loc.z+.0015>v.co.z:
    delta=loc.z+.0015-v.co.z
    if delta<.18:v.co.z=loc.z+.0015;puppet_lip_seated+=1;puppet_lip_max=max(puppet_lip_max,delta)
+# Closed lofts must face outward. Axial and mirrored span lofts have different
+# parameter handedness; two-sided Blender preview concealed inward winding,
+# but the exported skin intentionally uses single-sided rendering in Three.js.
+winding_report={}
+for o in puppets+[o for o in oral if o.name in ['Upper teeth','Lower teeth']]:
+ bm=bmesh.new();bm.from_mesh(o.data);before=bm.calc_volume(signed=True)
+ bmesh.ops.recalc_face_normals(bm,faces=list(bm.faces))
+ if bm.calc_volume(signed=True)<0:bmesh.ops.reverse_faces(bm,faces=list(bm.faces))
+ after=bm.calc_volume(signed=True);assert after>0,('Inward closed surface',o.name,after)
+ bm.to_mesh(o.data);bm.free();o.data.update();winding_report[o.name]={'signedVolumeBefore':before,'signedVolumeAfter':after,'outward':True}
 # Performance specification is a separate reproducible source.
 sys.path.insert(0,str(HERE));from performance import CLIPS,LOOPS,pose
 for clip,duration in CLIPS.items():
@@ -289,6 +299,6 @@ def export(obs,path):
 export([source]+oral,LOCAL/'shonisaurus.full.uncompressed.glb');export(puppets+oral,LOCAL/'shonisaurus.puppet.uncompressed.glb')
 # Authoring file carries both geometries; collection visibility is set by review.py.
 bpy.ops.wm.save_as_mainfile(filepath=str(LOCAL/'shonisaurus.shared-rig.blend'))
-meta={'id':'shonisaurus','name':'Shonisaurus','species':'Shonisaurus popularis','provenance':'Late Triassic · Berlin-Ichthyosaur, Nevada','description':'Deep-bodied shastasaurid with long paired flippers, slender rostrum and lateral tail propulsion. Authored Tripo body and measured procedural volume puppet share the exact armature and actions.','lengthMeters':14,'modelLength':6,'locomotion':'Swim','clips':list(CLIPS),'looping':list(LOOPS),'anchors':[a['name']for a in anchors],'sources':['docs/triassic/canonical/shonisaurus.png','intake/triassic-tests/shonisaurus/shonisaurus.raw.glb'],'notes':['Pigmentation is baked from source albedo to COLOR_0; full body retains source tangent-space normal detail.','Procedural geometry is rebuilt from measured radial/spanning sections, not mesh decimation.','Bind geometry has a sealed mouth; only Bite, Attack, Heavy and Eat open it.','Shared clips are applied verbatim to the authored and procedural exports. Oral articulation and swimming performance are inferred soft-tissue behaviour.']}
+meta={'id':'shonisaurus','name':'Shonisaurus','species':'Shonisaurus popularis','provenance':'Late Triassic · Berlin-Ichthyosaur, Nevada','description':'Deep-bodied shastasaurid with long paired flippers, slender rostrum and lateral tail propulsion. Authored Tripo body and measured procedural volume puppet share the exact armature and actions.','lengthMeters':14,'modelLength':6,'locomotion':'Swim','clips':list(CLIPS),'looping':list(LOOPS),'anchors':[a['name']for a in anchors],'sources':['docs/triassic/canonical/shonisaurus.png','tools/triassic/creatures/shonisaurus/tripo-raw/shonisaurus.raw.glb'],'notes':['Pigmentation is baked from source albedo to COLOR_0; full body retains source tangent-space normal detail.','Procedural geometry is rebuilt from measured radial/spanning sections, not mesh decimation.','Bind geometry has a sealed mouth; only Bite, Attack, Heavy and Eat open it.','Shared clips are applied verbatim to the authored and procedural exports. Oral articulation and swimming performance are inferred soft-tissue behaviour.']}
 (OUT/'shonisaurus.json').write_text(json.dumps(meta,indent=2)+'\n')
-(HERE/'build-report.json').write_text(json.dumps({'rawSHA256':hashlib.sha256(RAW.read_bytes()).hexdigest(),'closedRestJawAngleRadians':CLOSED_REST_ANGLE,'puppetLipContactFit':{'vertices':puppet_lip_seated,'maximumModelDisplacement':puppet_lip_max},'chinSurgery':{'adjustedVertices':chin_count,'maximumRawLengthDisplacement':chin_max},'rawVertices':len(points),'rawTriangles':raw_triangles,'meshes':weight_report,'bones':len(B),'clips':list(CLIPS),'profileSections':len(profile)},indent=2)+'\n')
+(HERE/'build-report.json').write_text(json.dumps({'rawSHA256':hashlib.sha256(RAW.read_bytes()).hexdigest(),'closedRestJawAngleRadians':CLOSED_REST_ANGLE,'puppetLipContactFit':{'vertices':puppet_lip_seated,'maximumModelDisplacement':puppet_lip_max},'chinSurgery':{'adjustedVertices':chin_count,'maximumRawLengthDisplacement':chin_max},'closedSurfaceWinding':winding_report,'rawVertices':len(points),'rawTriangles':raw_triangles,'meshes':weight_report,'bones':len(B),'clips':list(CLIPS),'profileSections':len(profile)},indent=2)+'\n')
