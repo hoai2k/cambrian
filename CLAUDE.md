@@ -94,8 +94,23 @@ unless the user explicitly asks for a PR. Steps:
   `npm run triassic:viewer`, which also writes the deployed copy in `public/research/triassic/`
   because `docs/` is never published). A human picks the image per subject there and exports the
   decisions; `node tools/triassic/apply-selections.mjs <file>` writes them into
-  `docs/triassic/canonical/manifest.json` and generates `docs/triassic/canonical/review.md`.
-- The Triassic has no models of its own yet. Every animal borrows a Devonian body through a
+  `docs/triassic/canonical/manifest.json`, regenerates `docs/triassic/canonical/review.md` from the
+  whole manifest (not from the export, so a partial pass never drops the decisions it is not
+  carrying) and rewrites the preview-badge reasons in
+  `src/content/triassic/pending-refinements.json` from where each pose actually stands. The viewer
+  keeps **nothing** in the browser: it starts every load from the manifest that `npm run
+  triassic:viewer` bundles into `data.js`, so the page always shows what has been applied, and a
+  reviewer's clicks are unsaved until they are exported and applied. A decision is one of three —
+  greenlight one of ours, redraw one of ours (the reading is right, the picture is not), or
+  regenerate toward a reference that beat it.
+- Triassic scenery is arriving before the animals: the substrate families in
+  `tools/triassic/props/` (stromatolite, salt crust, mud ripple, two authored variants each) are
+  placed by `src/content/triassic/scenery.ts` and carpet the biomes the design gives them —
+  the gypsum flats and the black basin, where almost nothing grows. The era's *growth* is still
+  the Devonian's procedural stand-ins. Never point a Triassic kind at a Devonian mesh in the
+  scenery pack: a wrong genus placed by the thousand is worse than an honestly generic shape, and
+  which stand-in the game plays with is `environment.ts`'s business.
+- The Triassic has no creature models of its own yet. Every animal borrows a Devonian body through a
   cross-era stand-in (`'devonian/<id>'` in `TRIASSIC_STAND_INS`, resolved into that era's folder
   by `src/content/asset-paths.ts`) and is still pickable (`assets.standInsPlayable`), because the
   roster ships placeholder portraits cut from `docs/triassic/canonical/`
@@ -147,7 +162,13 @@ unless the user explicitly asks for a PR. Steps:
 - Seabed scenery collides as the shape it is drawn with: `src/content/prop-shapes.json` is measured
   off the prop GLBs by `npm run shapes` and is what `src/sim` collides against (footprints in
   `src/sim/footprint.ts`). Any new or changed instanced prop must re-run `npm run shapes`, and
-  `npm run props` checks the table against the meshes and audits collider against geometry.
+  `npm run props` checks the table against the meshes and audits collider against geometry, for
+  every era's mapping rather than the one the process happens to have selected. A flora kind may
+  name **several** props and is then a family with that many authored shapes (the design's prop
+  table asks for this throughout — "three variants by size", "four variants"): the renderer picks
+  one per instance from a hash of where it stands, and `src/sim` collides against the family's
+  *union* envelope (`propShapeFor`), so a variant is presentation and the collider is never
+  smaller than what was drawn. A mineral kind sets `maxLean: 0` and genuinely never bends.
 - Devonian scenery and biome plates are procedural stand-ins: flora kinds and their density table in
   `src/content/devonian/environment.ts` + `src/render/sea.ts`, plates from `npm run devonian:plates`.
   Authored sets replace them without touching placement; see `docs/redesign/09-devonian-remaining.md`.

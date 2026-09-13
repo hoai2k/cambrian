@@ -54,6 +54,9 @@ export const FLOOR_DEPTH: Record<Biome, number> = {
 export const FLORA_BASE: Record<string, string> = {
   crinoid: '#b9ad8a', lilyColumn: '#a89c7c', tabulate: '#c98a6a', rugose: '#d9cfae', bryozoan: '#7fa66a', stromatoporoid: '#c9b99a',
   reed: '#6f8a3e', frondTower: '#4f6b3a', log: '#6a4a2e',
+  // The three authored substrate families. They carry their own vertex pigment, so these are only
+  // what the procedural fallback is tinted with where the GLB has not loaded.
+  stromatolite: '#9a8f74', saltCrust: '#e8e6dd', mudRipple: '#3a3630',
   vauxia: '#9c8f72', sac: '#a89a80', choia: '#8f8a6a', thalli: '#6b6a3a', tuft: '#5e7a45',
 };
 /**
@@ -63,15 +66,23 @@ export const FLORA_BASE: Record<string, string> = {
  * from the rafts overhead.
  */
 export const FLORA_DENSITY: Record<Biome, Partial<Record<FloraKind, number>>> = {
-  shallows: { stromatoporoid: 4, bryozoan: 1.5, log: 0.4 },
-  nursery: { reed: 24, frondTower: 3, log: 5, bryozoan: 6, crinoid: 2 },
+  // The gypsum flats are salt crust and microbial dome and almost nothing else, which is the
+  // biome's whole character (02-biomes-and-depth.md). The sponge-mound stand-in that used to hold
+  // this slot has gone: `stromatoporoid` means sponge mound here, and a reef form scattered over a
+  // hypersaline pan was the wrong animal in the wrong sea — the authored dome is what belongs.
+  shallows: { saltCrust: 5, stromatolite: 6, bryozoan: 1.5, log: 0.4 },
+  nursery: { reed: 24, frondTower: 3, log: 5, bryozoan: 6, crinoid: 2, stromatolite: 1 },
   shelf: { bryozoan: 22, crinoid: 2, tabulate: 0.6, rugose: 0.5, log: 0.3 },
   forest: { crinoid: 28, bryozoan: 4, tabulate: 1.2, rugose: 1.5, lilyColumn: 1.5 },
   boulders: { tabulate: 9, rugose: 7, stromatoporoid: 3, bryozoan: 2, crinoid: 1 },
   flats: { bryozoan: 3, crinoid: 0.4, tabulate: 0.3 },
   channel: { rugose: 1.2, tabulate: 0.8, bryozoan: 0.5, log: 1 },
   escarpment: { tabulate: 3, rugose: 3, lilyColumn: 2.5, crinoid: 1 },
-  basin: { lilyColumn: 0.6, log: 0.3 },
+  basin: { mudRipple: 2, lilyColumn: 0.6, log: 0.3 },
 };
-/** No authored Triassic scenery yet: every kind keeps the procedural geometry `src/render/sea.ts` builds. */
+/**
+ * Superseded by the scenery pack (`./scenery.ts`), which the era declares as `instancedScenery`
+ * and which owns the complete mapping — including the kinds that are deliberately still
+ * procedural. Kept empty and exported because the era shape still carries the field.
+ */
 export const FLORA_PROPS: Partial<Record<FloraKind, string>> = {};

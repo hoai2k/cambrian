@@ -8,11 +8,12 @@ A subject is **greenlit** when a human picked our own generated pose as the imag
 should be built from. Everything downstream — the four-view modelling sheet, the Tripo
 generation, the skeleton and the shipped body — is made from that one image
 ([04 · The Tripo pipeline](../04-tripo-pipeline.md)). A subject marked **redo** is not cleared:
-its pose is regenerated with the named picture as the steer, reviewed again, and only then built.
+its pose is regenerated — steered toward a reference that beat it, or simply redrawn where the
+reading is accepted and only the picture is wrong — then reviewed again, and only then built.
 
 | Greenlit | Redo | Not yet reviewed |
 | --- | --- | --- |
-| 18 | 3 | 47 |
+| 18 | 6 | 44 |
 
 ## Greenlit — build from the canonical pose
 
@@ -37,12 +38,13 @@ its pose is regenerated with the named picture as the steer, reviewed again, and
 | **Saurichthys** `saurichthys` | T15 · Rung II · the needle | the pose | — |
 | **Shonisaurus popularis** `shonisaurus` | T02 · Rung IV giant · the pod | the pose | — |
 
-## Redo — regenerate the canonical pose toward the chosen image
+## Redo — regenerate the canonical pose
 
 Each row is a generator brief: take the subject's current pose in `docs/triassic/canonical/`,
-regenerate it steered by the image named here, and put the result back through the viewer.
-A reference is somebody else's artwork — use it as direction, keep its credit with the prompt,
-and never ship it.
+regenerate it with the steer given here, and put the result back through the viewer. Some steers
+name somebody else's artwork — use it as direction, keep its credit with the prompt, and never
+ship it. Others name our own image, which means the reading is accepted and only the picture is
+wrong: there the note is the entire brief.
 
 ### Aphaneramma rostratum `aphaneramma`
 
@@ -64,6 +66,13 @@ and never ship it.
 - **Described as:** Life restoration of Cymbospondylus youngorum, a giant ichthyosaur from Nevada, USA.
 - **Reviewer's note:** —
 
+### Mystriosuchus `mystriosuchus`
+
+- **Slot:** S02 · the surface lurker (marine phytosaur) · ~4 m
+- **Redraw our own pose:** `docs/triassic/canonical/mystriosuchus.png`
+- **Steer toward:** nothing external — the reading is accepted and the note below is the whole brief.
+- **Reviewer's note:** Redraw into the water — the current pose is a high walk across a mudflat, and this animal is never seen out of the water in play. Draw it swimming: body wholly in the water, limbs folded back against the flanks, the tail sculling, and the dorsal crest, the eyes and the tip of the snout breaking the surface as the design requires of the model. A low camera close to the waterline, part of the body read through the water. Keep the species, the crocodile-like proportions, the long narrow snout and the armour. Two fixes to the setting: the mangrove roots and pneumatophores in the foreground are tens of millions of years too early, so replace them with Triassic lagoon margin — horsetails, Voltzia conifers, drift logs; and the light and the water should read marine lagoon rather than estuarine mud.
+
 ### Odontochelys semitestacea `odontochelys`
 
 - **Slot:** T19 · Rung I · the half-shell · ~40 cm
@@ -74,7 +83,21 @@ and never ship it.
 - **Described as:** Fig 18. Thaichelys ruchae, life restoration as a proterochersid turtle. Digital drawing by Sita Manitkoon.
 - **Reviewer's note:** —
 
+### Rhaeticosaurus mertensi `rhaeticosaurus`
+
+- **Slot:** T06 · Rung III · the flyer (first plesiosaur) · ~2.4 m+
+- **Redraw our own pose:** `docs/triassic/canonical/rhaeticosaurus.png`
+- **Steer toward:** nothing external — the reading is accepted and the note below is the whole brief.
+- **Reviewer's note:** Redraw only — the reading of the animal is accepted. The rear fins are wrong: an extra fin rises off the back above the tail, and a plesiosaur has no dorsal fin. Rhaeticosaurus is a four-flipper underwater flier, so the hind pair must be flippers seated low on the flanks at the pelvis, mirroring the fore pair in shape and size, with the tail short and unfinned between them. Keep the pose, the colouring, the mottling, the sunlit shallow-reef setting and the underwater three-quarter camera exactly as they are.
+
+### Tanystropheus hydroides `tanystropheus`
+
+- **Slot:** S01 · the boom (13-joint stiff neck) · ~5–6 m
+- **Redraw our own pose:** `docs/triassic/canonical/tanystropheus.png`
+- **Steer toward:** nothing external — the reading is accepted and the note below is the whole brief.
+- **Reviewer's note:** Redraw for scale — the anatomy is right but everything around it says lizard. This animal is 5.5-6 m with a neck of about 3 m on a trunk of about 1.5 m, and the current frame (ankle-deep water, pebbles, small weed, a distant headland, a high wide camera) reads it at well under a metre. Put the camera low and close, at or just above the waterline and near enough that the trunk fills the frame with the neck running out of it; stand it in water at elbow depth against boulders rather than pebbles; and pose it as the slot actually is, the neck swung out low over the water from the bank, ready to strike at something in it. Keep the species, the proportions, the banded mottling and the clear shallow-marine setting.
+
 
 ## Not yet reviewed
 
-`acrodus` · `anshunsaurus` · `antrimpos` · `chaohusaurus` · `choristoceras` · `coral-head` · `cyamodus` · `cymbospondylus-buchseri` · `dachstein-reef` · `daonella` · `diplopora` · `encrinus` · `eusaurosphargis` · `fadenia` · `germanonautilus` · `gipskeuper` · `guizhouichthyosaurus` · `helveticosaurus` · `ichthyotitan` · `log-raft` · `macrocnemus` · `monte-san-giorgio` · `muschelkalk` · `mystriosuchus` · `nanchangosaurus` · `neocalamites` · `neusticosaurus` · `pistosaurus` · `placochelys` · `placunopsis` · `pleuromeia` · `psephoderma` · `rebellatrix` · `retiophyllia` · `rhaeticosaurus` · `saurosphargis` · `shastasaurus` · `sponge-mound` · `stromatolite` · `tanystropheus` · `thylacocephala` · `traumatocrinus` · `tropites` · `utatsusaurus` · `voltzia` · `xinpusaurus` · `yunnanolimulus`
+`acrodus` · `anshunsaurus` · `antrimpos` · `chaohusaurus` · `choristoceras` · `coral-head` · `cyamodus` · `cymbospondylus-buchseri` · `dachstein-reef` · `daonella` · `diplopora` · `encrinus` · `eusaurosphargis` · `fadenia` · `germanonautilus` · `gipskeuper` · `guizhouichthyosaurus` · `helveticosaurus` · `ichthyotitan` · `log-raft` · `macrocnemus` · `monte-san-giorgio` · `muschelkalk` · `nanchangosaurus` · `neocalamites` · `neusticosaurus` · `pistosaurus` · `placochelys` · `placunopsis` · `pleuromeia` · `psephoderma` · `rebellatrix` · `retiophyllia` · `saurosphargis` · `shastasaurus` · `sponge-mound` · `stromatolite` · `thylacocephala` · `traumatocrinus` · `tropites` · `utatsusaurus` · `voltzia` · `xinpusaurus` · `yunnanolimulus`
