@@ -1,11 +1,11 @@
 # Triassic approved-image / Tripo tests — 2026-09-13
 
-Current human decisions are authoritative in canonical/manifest.json and canonical/review.md: 18 greenlit creatures, three requested replacements. Old `canonical: approved` placeholders without human greenlight do not authorize downstream generation.
+Current human decisions are authoritative in canonical/manifest.json and canonical/review.md: 18 greenlit creatures, six requested replacements. Old `canonical: approved` placeholders without human greenlight do not authorize downstream generation.
 
 ## Priority
 1. Nothosaurus giganteus and Shonisaurus popularis: canonical-derived `canonical/model-inputs/<id>/input.png` visually checked, full tail and four appendages. Nothosaurus corrected to expose far hind leg. These single images are intended for initial Tripo tests.
-2. Other 16 greenlit creatures: canonical-derived modeling sheets in progress. Preserve large Ceratites tentacles and Helicoprion lower jaw whorl.
-3. Three candidate02 replacements await HUMAN review: Aphaneramma, Cymbospondylus, Odontochelys. Original canonicals and backups preserved. Sources/prompts/licenses in canonical/references and canonical/prompts.json. Do not generate models from replacements until greenlit.
+2. Other 16 greenlit creatures: canonical-derived modeling sheets and dedicated single inputs delivered. Preserve large Ceratites tentacles and Helicoprion lower jaw whorl.
+3. Six candidate02 replacements await HUMAN review: Aphaneramma, Cymbospondylus, Odontochelys, Mystriosuchus, Rhaeticosaurus, Tanystropheus. Original canonicals and backups preserved. Sources/prompts/licenses in canonical/references and canonical/prompts.json. Do not generate models from replacements until greenlit.
 
 ## Tripo route
 Use API wallet, not Studio. User supplied an API key privately; never commit it. API wallet showed 715 credits before tests. Studio is a separate limited account (20 model slots, export upgrade gate). An initial Studio Nothosaurus generation consumed 55 Studio credits and exists as task `56e8fe68-7a8c-4e4b-a635-54d580243eae`, but export was blocked. No GLB was downloaded from Studio. Do not duplicate that UI attempt or purchase a subscription.
@@ -17,3 +17,6 @@ Four-view sheets are qualitative illustration guides, not measured orthographic 
 
 ## API result
 Both API jobs completed and downloaded (30 credits each; 60 total). Raw GLBs, task IDs, source hashes, Blender audits and renders are in `intake/triassic-tests/`. Nothosaurus 19,250 triangles; Shonisaurus 18,992. Follow-on cleanup/rig/anchor/animation work is explicitly pending there. No further generation needed to resume these tests.
+
+## Active paired-rig work
+User requested authored Tripo plus procedural volume-matched puppet for both tests, identical skeleton/anchors/action clips, realistic dynamic animal motion and game integration. Separate agents own each species; root owns shared registration. Raw tests are already on main at eb103ca. New inputs and six candidate02 options are in the review viewer; replacements remain unapproved.
