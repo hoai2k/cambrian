@@ -4,10 +4,10 @@
   "canonical": "canonical.png",
   "canonicalSha256": "128a7053946126d2e5ff2e435887691cfb4eab5c004e1b90efe0ecaf9f0dfc12",
   "input": "input.png",
-  "inputSha256": "8b63eeffed3fcd95359252f335a8a3132f2b4c4cfe4c38176184e30bf7d7a4ca",
+  "inputSha256": "53927cf8b3507d983ebc2d72fd32c24f965ad9bfa12753816a2671d50c45dd3e",
   "turnaround": "turnaround.png",
-  "turnaroundSha256": "a4de73093668ef2bdf1ef17559476399b1f01ffa702e5ea5300f9356e4087235",
+  "turnaroundSha256": "4ca4e1abb8fafe29f7d5dabd51a263b5f37b9a9489f776c16a2adec3fbb38e48",
   "tool": "builtin image_gen.imagegen",
-  "note": "The single-model input and four-view sheet deliberately shorten the neck to a straight one-torso-length stub. The approved canonical is the whole-animal proportion reference; the final rigid 13-joint neck and cervical-rib ridges are procedural Blender work.",
-  "quality": "Qualitative modeling guide, not measured orthographic projection; preserve the canonical head, pigmentation, compact body, four splayed feet and complete tail."
+  "note": "Corrected after human review: the single-model input and every turnaround view include the complete extraordinarily long neck from the approved canonical. Blender may add the 13-joint rig and cervical-rib ridges, but must not replace or infer the defining neck proportion.",
+  "quality": "Qualitative modeling guide, not measured orthographic projection; preserve the canonical full neck, head, pigmentation, compact body, four splayed feet and complete tail."
 }

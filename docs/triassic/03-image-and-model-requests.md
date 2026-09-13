@@ -76,7 +76,7 @@ every station within a tenth, or the body Tripo makes from them will be warped.
 | T19 Odontochelys semitestacea | 4 + ventral | Toothed, no carapace, broadened ribs as ridges, long tail; the plastron. |
 | T20 Ceratites nodosus | 4 | Ribbed, noded, evolute shell; nautilus-like soft body; the aptychus. |
 | T21 Phragmoteuthis bisinuata | 4 | A squid with a rigid internal shell; paired hooks along the arms. |
-| S01 Tanystropheus hydroides | 4 (head and trunk only) + whole side | As Dinocephalosaurus: the neck is procedural; head with the high nostrils and fang trap; the whole-animal side view for the profile. |
+| S01 Tanystropheus hydroides | 4 full-animal views + whole side | The complete extraordinarily long neck must be present in the model input and every turnaround view; Blender rigs it with 13 joints and adds cervical-rib ridges without replacing or shortening the approved silhouette. Head with the high nostrils and fang trap. |
 | S02 Mystriosuchus | 4 | Gharial snout with the nostril crest before the eyes; osteoderm rows; the tail half the body. |
 | S03 Macrocnemus bassanii | 4 | Long hindlimbs, a runner's stance. |
 | S04 Coelophysis (optional) | 4 | A 3 m theropod at a drinking stance. |
@@ -189,7 +189,7 @@ follow the instanced-prop rules on the requests page.
 
 | Id | Blocked on | Clips |
 | --- | --- | --- |
-| `tanystropheus` | A2 S01 (**pose in redraw** — see `canonical/review.md`) | Procedural 13-joint neck with the rib struts as ridges. `Watch` (idle, head under the surface), `Lower` (telegraph), `SnapLeft`, `SnapRight`, `Drag`, `Retract`, `Severed` (body one-shot), `Flee`. **Spend the budget on the neck and head.** This animal strikes into the water from the bank, so the neck and head are nearly all a player ever sees; the torso, limbs and tail are usually out of frame behind the shoreline and can be comparatively simple. The neck is also the species' identifying feature and every candidate pose so far has under-length it against the trunk. |
+| `tanystropheus` | A2 S01 (**approved full-neck pose and model inputs delivered**) | Procedural 13-joint neck rig with cervical-rib ridges. `Watch` (idle, head under the surface), `Lower` (telegraph), `SnapLeft`, `SnapRight`, `Drag`, `Retract`, `Severed` (body one-shot), `Flee`. **Spend the budget on the neck and head.** This animal strikes into the water from the bank, so the neck and head are nearly all a player ever sees; the torso, limbs and tail are usually out of frame behind the shoreline and can be comparatively simple. The full defining neck is present in every approved modeling image and must not be shortened during generation or rigging. |
 | `mystriosuchus` | A2 S02 | `Float` (crest showing), `Lunge`, `Bite`, `SlideIn`, `Bask`. |
 | `macrocnemus` | A2 S03 | `Stand`, `Run`, `Bolt`. |
 | `coelophysis` (optional) | A2 S04 | `Drink`, `Snatch`, `Look`. |
