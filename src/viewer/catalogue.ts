@@ -11,6 +11,7 @@ import { TRIASSIC_SPECIMENS } from '../content/triassic/specimens';
 import { SCHEMES as TRIASSIC_SCHEMES, CREATURE_SCHEMES as TRIASSIC_DEFAULTS } from '../content/triassic/palettes';
 import triassicPending from '../content/triassic/pending-refinements.json';
 import previewBodies from '../content/triassic/preview-bodies.json';
+import reviewBodies from '../content/triassic/review-bodies.json';
 import { DEVONIAN_SPECIMENS } from '../content/devonian/specimens';
 import { DEVONIAN_CREATURES } from '../content/devonian/creatures';
 import devonianPending from '../content/devonian/pending-refinements.json';
@@ -77,6 +78,12 @@ export interface ViewerSpecimen {
    */
   previewYaw?: number;
   previewLength?: number;
+  /**
+   * True while this animal's own body is built but not yet in tools/triassic/shipped.json. The
+   * game still draws the body it borrows and the animal keeps its warning; the viewer shows the
+   * real thing, because deciding whether it ships is what the viewer is for.
+   */
+  inReview?: boolean;
   image?: string;
   displayLength: number;
   lengthMeters?: number;
@@ -88,6 +95,14 @@ const TRIASSIC_PREVIEW = new Map((previewBodies as { id: string; model: string; 
   .map(b => [b.id, b]));
 /** The procedural twin of each animal that has one, by the animal's id. */
 const TRIASSIC_PUPPETS = new Map(TRIASSIC_SPECIMENS.filter(c => c.category === 'creature').map(c => [c.id, c]));
+/**
+ * Bodies that are built and waiting on a human, by id. They are not in shipped.json, so every
+ * runtime path still resolves them to the body they borrow in play; this is the one register that
+ * points at the real files, and it exists because without it a finished animal is invisible to the
+ * person whose job is to approve it. An entry retires itself when the animal ships.
+ */
+const TRIASSIC_REVIEW = new Map((reviewBodies as { id: string; model: string; puppet: string | null; lod: string | null; clips: string[] }[])
+  .map(b => [b.id, b]));
 /**
  * How many Triassic animals are still wearing somebody else's body. The label says so rather than
  * letting the collection look finished, and it clears itself: `standIns` empties an entry at a
@@ -139,11 +154,17 @@ export const SPECIMENS: readonly ViewerSpecimen[] = [
     provenance: c.locality ?? 'Triassic', description: TRIASSIC.assets.standIns?.[c.id] ? `Borrowed body: ${String(TRIASSIC.assets.standIns[c.id]).replace('devonian/', 'Devonian ')}. ${c.tagline}` : c.tagline,
     modelStatus: TRIASSIC_REFINEMENTS.modelStatus[c.id], modelNote: TRIASSIC_REFINEMENTS.modelNotes[c.id],
     clipNotes: TRIASSIC_REFINEMENTS.clipNotes[c.id],
-    model: TRIASSIC_PATHS.model(c.id), lod: TRIASSIC_PATHS.model(c.id, 1), image: TRIASSIC_PATHS.portrait(c.id, 'card'), displayLength: Math.min(c.adultLength, 8),
-    puppet: TRIASSIC_PUPPETS.get(c.id)?.model, puppetNote: TRIASSIC_PUPPETS.get(c.id)?.description,
+    // A body in review is this animal's own; only without one does the roster path apply, and for
+    // an unshipped animal that resolves to the body it borrows.
+    model: TRIASSIC_REVIEW.get(c.id)?.model ?? TRIASSIC_PATHS.model(c.id),
+    lod: TRIASSIC_REVIEW.get(c.id)?.lod ?? TRIASSIC_PATHS.model(c.id, 1),
+    image: TRIASSIC_PATHS.portrait(c.id, 'card'), displayLength: Math.min(c.adultLength, 8),
+    puppet: TRIASSIC_REVIEW.get(c.id)?.puppet ?? TRIASSIC_PUPPETS.get(c.id)?.model,
+    puppetNote: TRIASSIC_PUPPETS.get(c.id)?.description,
     generated: TRIASSIC_PREVIEW.get(c.id)?.model,
     previewYaw: TRIASSIC_PREVIEW.get(c.id)?.yaw,
     previewLength: TRIASSIC_PREVIEW.get(c.id)?.lengthUnits ?? undefined,
+    inReview: TRIASSIC_REVIEW.has(c.id),
     looping: ['Idle', 'Swim', 'Crawl', 'Guard', 'Eat', ...(c.abilityLoop ? ['Ability'] : [])],
   })),
   // Scenery only. A creature row in TRIASSIC_SPECIMENS is a procedural twin, and a twin is not a

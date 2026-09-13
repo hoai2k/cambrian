@@ -64,8 +64,14 @@ export function Viewer() {
    * and the clip keeps playing, which turns any difference between them into movement rather than
    * something to hold in your head across two list entries.
    */
-  const [body, setBody] = useState<'model' | 'puppet' | 'generated'>(
-    () => specimenByKey.get(initial.current.key)!.generated ? 'generated' : 'model');
+  const openingBody = (key: string): 'model' | 'generated' => {
+    const c = specimenByKey.get(key)!;
+    // A body that is built and waiting on a human is the thing to open on, even though the animal
+    // also still has the raw mesh it was built from. Only when there is no built body does the
+    // generated mesh win, because then `model` is somebody else's body borrowed in play.
+    return c.generated && !c.inReview ? 'generated' : 'model';
+  };
+  const [body, setBody] = useState<'model' | 'puppet' | 'generated'>(() => openingBody(initial.current.key));
   const requestedId = useRef('');
   const def = specimenByKey.get(id)!;
   const showPuppet = body === 'puppet' && !!def.puppet;
@@ -106,7 +112,7 @@ export function Viewer() {
   useEffect(() => {
     if (opened.current === id) return;   // not a specimen change: leave a reviewer's own choice alone
     opened.current = id;
-    setBody(specimenByKey.get(id)!.generated ? 'generated' : 'model');
+    setBody(openingBody(id));
   }, [id]);
   // Sculpting needs a creature on stage; a prop or a load in progress has nothing to sculpt.
   // Not on the twin: a sculpt is the hand-off that goes into a builder's profile rows for the body
@@ -247,11 +253,17 @@ export function Viewer() {
         {(def.puppet || def.generated) && <label className="scheme-pick">
           <span>Body</span>
           <select aria-label="Which body" value={body} disabled={loading} onChange={e => setBody(e.target.value as 'model' | 'puppet' | 'generated')}>
-            <option value="model">{def.generated ? 'Borrowed body (in play)' : 'Authored model'}</option>
+            <option value="model">{def.inReview ? 'Authored model (in review)' : def.generated ? 'Borrowed body (in play)' : 'Authored model'}</option>
             {def.puppet && <option value="puppet">Procedural twin</option>}
             {def.generated && <option value="generated">Generated mesh (no rig)</option>}
           </select>
         </label>}
+        {def.inReview && <p className="hint">
+          <strong>Awaiting review:</strong> this animal's own body, twin and clips are built, but it
+          is not in <code>shipped.json</code> yet — so the game still draws the body it borrows and
+          the animal keeps its warning. Everything on this page is the real thing; what is being
+          decided is whether it ships. The raw mesh it was built from is still under <em>Body</em>.
+        </p>}
         {def.generated && <p className="hint">
           <strong>Generated mesh:</strong> the raw body this animal will be built from. It has no
           skeleton, no animation clips and no anchors, so it sits still. Its facing and its size here
