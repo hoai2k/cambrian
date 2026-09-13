@@ -6,11 +6,11 @@
   "externalInputs": [],
   "subjects": {
     "mystriosuchus": {
-      "status": "candidate-awaiting-human-greenlight",
+      "status": "greenlit-and-promoted",
       "candidate": "mystriosuchus-candidate03.png",
       "original": "mystriosuchus-candidate02.png",
       "reviewerNote": "Draw a picture from deep underwater instead of at the top of the water.",
-      "prompt": "Use case: precise-object-edit. Edit this candidate02 canonical Mystriosuchus paleoart image. Preserve this exact animal's long slender crocodile-like snout, head, armored back, dark charcoal and ochre mottled hide, robust crocodilian torso, four folded swimming limbs and gently sculling complete tail. The single requested change is viewpoint and underwater depth: camera and entire animal are now DEEP BELOW the water surface, in open blue marine water about 15\u201320 metres down. The whole animal is clearly visible fully submerged, cruising horizontally several metres above a distant rocky/sandy seabed. Camera at animal level in a three-quarter side view, head toward right, full tail at left. The top of the image is blue water fading upward, NO waterline, NO above-water sky, NO trees or shoreline, NO surface-breaking eyes or crest, NO split-level shot. Atmospheric blue depth with gentle filtered shafts of sunlight from far above, sufficient natural lighting and contrast to read every armor plate and the complete silhouette. All visible feet remain folded backward along flanks, not walking, preserve four limbs total and no extra appendages. Whole animal comfortably inside frame with about 6% margin and tail fully visible. Photorealistic paleoart matching input quality, landscape 1536x1024. No labels, text, people or new animals.",
+      "prompt": "Use case: precise-object-edit. Edit this candidate02 canonical Mystriosuchus paleoart image. Preserve this exact animal's long slender crocodile-like snout, head, armored back, dark charcoal and ochre mottled hide, robust crocodilian torso, four folded swimming limbs and gently sculling complete tail. The single requested change is viewpoint and underwater depth: camera and entire animal are now DEEP BELOW the water surface, in open blue marine water about 15–20 metres down. The whole animal is clearly visible fully submerged, cruising horizontally several metres above a distant rocky/sandy seabed. Camera at animal level in a three-quarter side view, head toward right, full tail at left. The top of the image is blue water fading upward, NO waterline, NO above-water sky, NO trees or shoreline, NO surface-breaking eyes or crest, NO split-level shot. Atmospheric blue depth with gentle filtered shafts of sunlight from far above, sufficient natural lighting and contrast to read every armor plate and the complete silhouette. All visible feet remain folded backward along flanks, not walking, preserve four limbs total and no extra appendages. Whole animal comfortably inside frame with about 6% margin and tail fully visible. Photorealistic paleoart matching input quality, landscape 1536x1024. No labels, text, people or new animals.",
       "generatedSource": "/Users/hoai/.codex/generated_images/01a09b1b-790b-7903-aa75-f1b8f3100478/exec-f4ea9822-3597-4bcc-b6c9-fe4474d2a7a6.png",
       "inputImage": "/Users/hoai/Documents/Stuff/Generations/cambrian/local/expansion-repo/docs/triassic/canonical/mystriosuchus-candidate02.png",
       "sha256": "27ee24ccfedbeee8afb16942ba4ea77172063e4f4fa72af3e34deb1efee8e150",
@@ -19,10 +19,11 @@
         1536,
         1024
       ],
-      "visualReview": "Full animal is fully underwater, with complete tail and armored body above deeper seabed. No sky, shoreline or split waterline; folded near limbs retained and far limbs naturally occluded."
+      "visualReview": "Full animal is fully underwater, with complete tail and armored body above deeper seabed. No sky, shoreline or split waterline; folded near limbs retained and far limbs naturally occluded.",
+      "reviewedAt": "2026-09-13T15:04:15.933Z"
     },
     "rhaeticosaurus": {
-      "status": "candidate-awaiting-human-greenlight",
+      "status": "greenlit-and-promoted",
       "candidate": "rhaeticosaurus-candidate03.png",
       "original": "rhaeticosaurus-candidate02.png",
       "reviewerNote": "It has 2 back fins on the same side, that's not right",
@@ -45,13 +46,14 @@
         1536,
         1024
       ],
-      "visualReview": "Exactly four visible paddles after targeted correction: bilateral shoulder pair and bilateral pelvic pair, plus one short central unfinned tail. Slightly elevated dorsal oblique view separates opposite-side appendages. All flipper tips in frame, no extra fifth paddle."
+      "visualReview": "Exactly four visible paddles after targeted correction: bilateral shoulder pair and bilateral pelvic pair, plus one short central unfinned tail. Slightly elevated dorsal oblique view separates opposite-side appendages. All flipper tips in frame, no extra fifth paddle.",
+      "reviewedAt": "2026-09-13T15:03:39.359Z"
     },
     "tanystropheus": {
-      "status": "candidate-awaiting-human-greenlight",
+      "status": "reviewed-replace",
       "candidate": "tanystropheus-candidate03.png",
       "original": "tanystropheus-candidate02.png",
-      "reviewerNote": "Should be more apatasaurus sized - huge. And also, let's keep the background a bit different color and show the whole animal including feet so it's easier to translate into a 3d model reference",
+      "reviewerNote": "Can you use this as a reference: https://clickpetroleoegas.com.br/wp-content/uploads/2026/01/Tanystropheus-hydroides.jpg . Note the sauropod body and long neck reaching out over the water.",
       "prompt": "Use case: precise-object-edit. Redraw this canonical Tanystropheus hydroides as a clearly readable FULL-BODY 3D modeling reference following reviewer: 'Should be more apatasaurus sized - huge. And also, let's keep the background a bit different color and show the whole animal including feet so it's easier to translate into a 3d model reference'. This is intentional immense GAME-ART SCALE, not a claim of fossil body size. Preserve Tanystropheus species anatomy: extremely long slender stiff almost horizontal neck with small narrow reptilian head, dark brown/cream banded mottling, long tapering reptilian tail, low broad reptile trunk, exactly four splayed reptilian legs ending in long distinct toes. Do NOT turn it into Apatosaurus anatomy: no upright sauropod legs, elephant feet, massive upright giraffe neck or dinosaur skull. Make the animal read as truly gigantic with a heavy monumental torso and huge limbs, its trunk towering over person-sized coastal boulders, distant full-grown horsetail trees appearing small relative to it; no humans. Recompose to show the ENTIRE animal from head to terminal tail tip and ALL FOUR FEET completely unobscured in frame with visible toes. Three-quarter side view, camera a little above the feet, whole animal framed with 6% clear margin on every side. The long stiff neck extends low to RIGHT from broad shoulders, tail curls in a gentle arc toward LEFT, no tight loop. Four feet splayed apart on a pale cool BLUE-GRAY wet limestone marine shelf with only a very thin clear water film, no submerged or hidden toes, no foreground objects hiding feet, no water refraction across legs. Keep the cool pale blue/cyan sea and blue-gray distant cliffs distinctly different in hue/value from warm brown animal for clean silhouette separation; background simple and softly out of focus, not same colored rocks behind torso. Crisp richly detailed photorealistic paleoart, realistic scales, very large physical presence but accurate long-neck reptile body proportions. Landscape 1536x1024, no text, labels, scale bars or extra animals.",
       "generatedSource": "/Users/hoai/.codex/generated_images/01a09b1b-790b-7903-aa75-f1b8f3100478/exec-cea37851-e50f-458f-b42a-aaeb1115016e.png",
       "inputImage": "/Users/hoai/Documents/Stuff/Generations/cambrian/local/expansion-repo/docs/triassic/canonical/tanystropheus-candidate02.png",
@@ -61,7 +63,8 @@
         1536,
         1024
       ],
-      "visualReview": "Full head, very long horizontal neck, torso, entire tail tip and four splayed feet visible on cool blue-gray wet shelf. Warm banded reptile contrasted against cool coast; heavier giant game-art body, distant trees/cliffs and full-foot visibility. No sauropod head or upright neck. Far hind foot partly behind torso but foot itself visible."
+      "visualReview": "Full head, very long horizontal neck, torso, entire tail tip and four splayed feet visible on cool blue-gray wet shelf. Warm banded reptile contrasted against cool coast; heavier giant game-art body, distant trees/cliffs and full-foot visibility. No sauropod head or upright neck. Far hind foot partly behind torso but foot itself visible.",
+      "reviewedAt": "2026-09-13T15:07:22.780Z"
     }
   }
 }
