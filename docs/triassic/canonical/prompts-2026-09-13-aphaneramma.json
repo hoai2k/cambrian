@@ -1,0 +1,24 @@
+{
+  "schemaVersion": 1,
+  "createdAt": "2026-09-13",
+  "tool": "builtin image_gen.imagegen",
+  "purpose": "Aphaneramma amphibian redraw following human-selected source; candidate pending review.",
+  "subjects": {
+    "aphaneramma": {
+      "status": "candidate-awaiting-human-greenlight",
+      "candidate": "aphaneramma-candidate03.png",
+      "original": "aphaneramma.png",
+      "reviewerNote": "More amphibian than reptile; use Aphaneramma12DB.jpg.",
+      "prompt": "Create a new canonical paleoart portrait of Aphaneramma rostratum, following the supplied life reconstruction as anatomical direction. The reviewer specifically wants an AMPHIBIAN, not a reptile. Whole animal, elongated smooth moist olive-green and yellow-brown spotted skin, no reptilian scales, no armour or crocodile scutes. Very long narrow flattened snout continuous with a broad flat skull, small high-set eyes far behind the snout, gently rounded soft trunk, exactly four short soft salamander-like limbs held out to sides, four forefoot digits and five hindfoot digits, flexible deep tapering swimming tail with subtle soft fin fold, not a separate shark fin. Keep mouth naturally closed. Near-side three-quarter underwater swim pose with little foreshortening: head right, complete tail on left, all feet and tail tip inside the image with generous margins. Entire animal isolated visually against softly blurred blue-teal deep water above distant pale sand, lighting reveals body silhouette and smooth amphibian folds. Naturalistic high-quality 3D-style paleoart, restrained markings inspired by reference but original composition, no text or watermark. Anatomy and silhouette clearly readable for future modeling input.",
+      "refinementPrompt": "Refine this canonical Aphaneramma paleoart without changing its silhouette, composition, amphibian skin, color, long snout, full tail, lighting or scene. Correct just its anatomy: the small near-side FRONT hand beside the throat on the RIGHT must have exactly FOUR short slender amphibian digits, not five. Hind foot on the LEFT correctly has five digits, retain it. Keep all limbs smooth amphibian rather than reptilian and preserve high quality detail. No text.",
+      "generatedSource": "/Users/hoai/.codex/generated_images/01a0775c-6a4b-74a3-a675-e5223d0a9359/exec-883a5824-fd55-42aa-a372-43d90318eb11.png",
+      "sourceReference": "references/aphaneramma/Aphaneramma12DB.jpg",
+      "visualReview": "Complete animal and tail in frame; moist amphibian skin, long flattened snout, front hand corrected to four digits. Opposite limbs occluded by body in this canonical pose; modeling views must expose all four limbs.",
+      "sha256": "1e1f2408d6e7a43624b8b8c1768dd8e27ec926aba364a50c323f8f6bfc2c73a4",
+      "dimensions": [
+        1610,
+        977
+      ]
+    }
+  }
+}
