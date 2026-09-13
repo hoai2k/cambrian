@@ -38,13 +38,20 @@ and at the same size, so a drifted silhouette is obvious. **B** puts them side b
 **‹ Prev / Next ›** walks the roster. The anatomy each animal has to get right is in the design's
 per-creature entries and the sources in [research.md](../research.md).
 
-Then decide. **Use as canon** on the image showing is the whole verdict:
+Then decide, on the image showing. There are three answers:
 
-- the **canonical pose** → greenlit, and the model is built from it;
-- a **reference** → the pose is regenerated with that picture as the steer, and the note you type
-  goes into the brief as what to change;
-- the **3D views** sheet is in the running as well: choosing it over a pose says the pose should be
-  redone to match it, and for a subject whose only image *is* the sheet it greenlights that.
+- **Use as canon** on one of ours → greenlit, and the model is built from that image. Where a
+  subject has more than one of ours — the male and female Keichousaurus, a modelling sheet beside
+  its pose — this is also which of them is the canon.
+- **Needs redraw** on one of ours → the reading is right and no other picture beats it, but the
+  image itself is wrong: a fin that should not be there, a frame that makes a six-metre animal
+  read as a lizard, a pose out of the water. The note you type is then the entire brief.
+- **Redraw toward this** on a reference → ours is not right yet, and that picture is the steer.
+  Somebody else's artwork is direction only: its credit travels with the prompt and it is never
+  shipped.
+
+The **3D views** sheet sits last in the row and takes the same answers, so a subject whose only
+image is the sheet can be greenlit on it.
 
 *Export selections* downloads the decisions, and
 
@@ -52,10 +59,17 @@ Then decide. **Use as canon** on the image showing is the whole verdict:
 node tools/triassic/apply-selections.mjs <the downloaded file>   # --dry-run to see it first
 ```
 
-writes them into `manifest.json` (`greenlit` / `needs-rework`) and into
-[review.md](review.md) — the generated write-up of what is cleared to build and, for each rework,
-the reference to steer by with its credit and licence. Decisions live in the browser until they
-are exported, so export before clearing site data.
+writes them into `manifest.json` (`greenlit` / `needs-rework`), regenerates [review.md](review.md)
+— the brief: what is cleared to build, and for each redo the steer with its credit and licence and
+the reviewer's note — and rewrites the preview-badge reasons in
+`src/content/triassic/pending-refinements.json`, so what the specimen viewer says about an animal
+matches where its pose actually stands.
+
+**The page keeps nothing.** It starts every load from `manifest.json` as bundled by
+`npm run triassic:viewer`, so what you see is what has been applied to the codebase; clicks live in
+the tab and a reload discards them. Export before you close it. This is deliberate: choices used to
+persist in the browser, which quietly let the page disagree with the repository — a reviewer coming
+back a week later was reading their own old clicks rather than the decisions that were made real.
 
 ## Why they live here and not in `intake/`
 

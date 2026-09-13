@@ -62,11 +62,18 @@ pose is not right yet and names the picture the regeneration should be steered t
 under the stage is what should change, and it travels with the decision. The four-view modelling
 sheet, where one exists, is in the running as well.
 
+A third answer sits beside those two: **Needs redraw** on one of our own images says the reading is
+right and only the picture is wrong — a fin that should not be there, a frame that makes a
+six-metre animal read as a lizard — and then the note is the whole brief and nothing external is
+being copied.
+
 Decided subjects carry a badge in the grid, and **Undecided only** hides them so a pass through 68
-subjects can be finished in sittings. Choices are kept in this browser (a research page has no
-server) against a stable reference — an authored image's label, a reference's Commons filename — so
-refetching the Commons set or regenerating the deployed copy cannot move a decision onto a
-different picture.
+subjects can be finished in sittings. The page starts every load from the decisions the repository
+already holds (`docs/triassic/canonical/manifest.json`, bundled into `data.js`), and keeps nothing
+of its own: a reload discards unexported clicks and returns to what has actually been applied. The
+header says how many subjects differ from the codebase. Choices are held against a stable reference
+— an authored image's label, a reference's Commons filename — so refetching the Commons set or
+regenerating the deployed copy cannot move a decision onto a different picture.
 
 **Export selections** downloads them as JSON, and
 
@@ -78,7 +85,9 @@ applies it: `docs/triassic/canonical/manifest.json` gains each subject's `greenl
 `needs-rework` state, and `docs/triassic/canonical/review.md` is rewritten as the brief — what is
 cleared to build, and for each rework the image to steer by, its credit and licence, and the note.
 A subject the file does not mention is left exactly as it was, so the pass can be applied in
-pieces. Nothing leaves the browser until you press export.
+pieces — `review.md` is rebuilt from the whole manifest rather than from the export, so a partial
+pass never drops the decisions it is not carrying. Nothing leaves the browser until you press
+export, and nothing stays in it after you close the tab.
 
 ## Refreshing it
 
