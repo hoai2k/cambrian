@@ -104,6 +104,42 @@ for (const [href, url, title] of [['./cambrian/', 'http://localhost:4173/cambria
   await ctx.close(); await plain.close();
 }
 
+// Fullscreen across a change of game. The browser drops it when a document is replaced and the
+// next one cannot ask for it back on its own, so the preference rides along and the page puts
+// itself back on the player's first click or key — which on a title screen is press start. Done
+// in its own browser again, for the frame clock: the game boots a sea here.
+{
+  const plain = await chromium.launch({ executablePath: '/opt/pw-browsers/chromium', args: ['--use-gl=angle', '--use-angle=swiftshader', '--enable-unsafe-swiftshader', '--no-sandbox'] });
+  const page = await plain.newPage({ viewport: { width: 1280, height: 800 } });
+  const fs = () => page.evaluate(() => !!document.fullscreenElement);
+
+  // On the roster, where a stray click starts nothing, so what is seen is the restore alone and
+  // not the fullscreen the game has always asked for when a match begins.
+  await page.goto('http://localhost:4173/cambrian/?screen=select', { waitUntil: 'load' });
+  await page.waitForSelector('.brand-title', { timeout: 40000 });
+  await page.mouse.click(1200, 700);
+  await page.waitForTimeout(700);
+  check('a player who never asked keeps their window', !(await fs()));
+
+  // A player who was in fullscreen in the game they came from.
+  await page.evaluate(() => sessionStorage.setItem('fullscreen', '1'));
+  await page.goto('http://localhost:4173/devonian/?screen=select', { waitUntil: 'load' });
+  await page.waitForSelector('.brand-title', { timeout: 40000 });
+  check('the next game starts windowed, as the browser leaves it', !(await fs()));
+  await page.mouse.click(1200, 700);
+  await page.waitForTimeout(800);
+  check('and puts itself back on the first click there', await fs());
+
+  // The press that starts a match must not toggle a player who is already fullscreen back out.
+  await page.evaluate(() => sessionStorage.setItem('fullscreen', '1'));
+  await page.goto('http://localhost:4173/devonian/', { waitUntil: 'load' });
+  await page.waitForSelector('.title', { timeout: 40000 });
+  await page.mouse.click(640, 300);
+  await page.waitForTimeout(900);
+  check('press start arrives fullscreen and stays there', await fs());
+  await page.close(); await plain.close();
+}
+
 // The boot bar under the loading line is not checked here. Its window is bounded at both ends —
 // it opens 700 ms after the app mounts and closes when the engine gives up waiting for the first
 // card, 4 s after it starts — and on this machine, with the sea running on a software renderer,

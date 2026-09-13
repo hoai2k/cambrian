@@ -13,6 +13,7 @@ import { Hud } from './Hud';
 import { LoadingScreen, useSlow } from './Loading';
 import { Dialogs, PauseMenu, Results, type MenuItem } from './Overlays';
 import { debugGame } from '../shared/debug';
+import { enterFullscreen, rememberFullscreen, restoreFullscreenOnGesture } from '../shared/fullscreen';
 import { exportRecording, recordingPhase, resetRecording, startRecording, stopRecording } from './debug-record';
 import { atMain, cycle, groupsFor, stops, type Focus, type FocusGroup } from './focus-ring';
 import { rectsOf, step as spatialStep, type Dir } from './spatial-nav';
@@ -218,12 +219,21 @@ export function App() {
     try { localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings)); } catch { /* ignore */ }
   }, [settings]);
 
-  // Fullscreen tracking
+  /**
+   * Fullscreen tracking, and carrying it across a change of game.
+   *
+   * Every entry and exit is written down (`rememberFullscreen`), including the exit the browser
+   * performs when this document is replaced by another game's — so the page the player lands on
+   * knows they were in fullscreen and puts itself back on their first click or key there, which on
+   * a title screen is the press that starts the game anyway. See src/shared/fullscreen.ts for why
+   * it cannot simply be kept.
+   */
   useEffect(() => {
-    const on = () => setIsFs(!!document.fullscreenElement);
+    const on = () => { setIsFs(!!document.fullscreenElement); rememberFullscreen(!!document.fullscreenElement); };
     document.addEventListener('fullscreenchange', on);
     return () => document.removeEventListener('fullscreenchange', on);
   }, []);
+  useEffect(() => restoreFullscreenOnGesture(), []);
   const toggleFullscreen = useCallback(async () => {
     try {
       if (document.fullscreenElement) await document.exitFullscreen();
@@ -277,15 +287,16 @@ export function App() {
   }, []);
 
   // ---- Screen transitions ----
-  const startFromTitle = useCallback((device: PlayerSetup['device'], viaGesture: boolean) => {
+  const startFromTitle = useCallback((device: PlayerSetup['device']) => {
     audio.init(); audio.resume(); audio.play('ui-start');
     updatePlayers([{ creature: ACTIVE_ERA.defaults.player, device, ready: false }]);
     go('select');
-    // Try for fullscreen on the way in; if the browser will not, say nothing. Starting from a pad
-    // is not a gesture it counts, and a transient refusal is not worth a message either.
-    if (viaGesture) void toggleFullscreen();
-    else if (!document.fullscreenElement) void document.documentElement.requestFullscreen({ navigationUI: 'hide' }).catch(() => {});
-  }, [go, toggleFullscreen, updatePlayers]);
+    // Be fullscreen on the way in; if the browser will not, say nothing. Starting from a pad is not
+    // a gesture it counts, and a transient refusal is not worth a message either. Not a toggle: a
+    // player who is already fullscreen — which, since the preference now rides across a change of
+    // game, is the usual way to arrive — would otherwise be taken straight back out of it.
+    enterFullscreen();
+  }, [go, updatePlayers]);
 
   /**
    * The setups as the simulation wants them: the roster plus, for anyone who asked and has a record
@@ -540,7 +551,7 @@ export function App() {
             else if (just('confirm')) runFocused();
             else if (just('back')) setFocusBoth(atMain());
           }
-          else if (c.any && !(p?.any)) startFromTitle(gp.index, false);
+          else if (c.any && !(p?.any)) startFromTitle(gp.index);
         } else if (s === 'select') {
           const ps = playersRef.current;
           const idx = ps.findIndex((x) => x.device === gp.index);
@@ -629,7 +640,7 @@ export function App() {
       if ((e.target as HTMLElement | null)?.matches?.('input,textarea,select')) return;
       const s = screenRef.current;
       if (dialogRef.current) { if (e.code === 'Escape') openDialog(null); return; }
-      if (s === 'title') { if (!e.metaKey && !e.ctrlKey && e.code !== 'F11') startFromTitle('keyboard', true); return; }
+      if (s === 'title') { if (!e.metaKey && !e.ctrlKey && e.code !== 'F11') startFromTitle('keyboard'); return; }
       if (s === 'select') {
         const ps = playersRef.current;
         const idx = ps.findIndex((x) => x.device === 'keyboard');
@@ -803,7 +814,7 @@ export function App() {
         */}
       {screen === 'title' && (
         <TitleScreen
-          loaded={loaded} onStart={() => startFromTitle('keyboard', true)} padCount={padCount} eraFocused={focus.group === 'era'}
+          loaded={loaded} onStart={() => startFromTitle('keyboard')} padCount={padCount} eraFocused={focus.group === 'era'}
           progress={bootSlow ? bootFraction : null} status={bootSlow ? bootStatus : undefined}
         />
       )}
