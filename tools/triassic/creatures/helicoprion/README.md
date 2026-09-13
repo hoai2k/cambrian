@@ -287,6 +287,11 @@ without ever closing past bind. Measurements are written to `paired-audit.json` 
 judged, so a failure leaves its numbers behind. The Blender build additionally checks every vertex
 of both bodies at 13 phases per clip for finiteness and bounds.
 
+The build is reproducible: run end to end a second time, `build.py` followed by `audit.mjs
+--package --decode` produced the three GLBs **byte for byte identical** to the committed ones (git
+reported no change to any of them), and the envelope and surface-distance figures repeated to the
+last digit.
+
 Repository checks run green with these files present: `npm run triassic` (582 checks),
 `npm run typecheck`, `npm run build`, `npm run props`, `npm run eras`.
 `node tools/update-asset-sizes.mjs` was run and is a no-op, as it should be: it records only ids
@@ -309,10 +314,26 @@ claimed.
 - [Cutaway of the raw source](whorl-section.jpg) — the evidence for the whorl section above.
 
 What I saw: the trunk and fins deform cleanly through the whole set; the gape opens and closes with
-no crease at the hinge and no membrane; the pectorals stay seated; the twin tracks the authored
-silhouette closely enough that on the volume sheet the difference is the fin plumpness and nothing
-else. The caudal lobe's lag is real but slight at four hundredths of a beat — it reads as a fin
-rather than a plate, but only just.
+no crease at the hinge and no membrane; the pectorals stay seated; the turns bank and the bank is
+flown on the pectorals; Death rolls belly-up with the fins spread and nothing tears. On the volume
+sheet the twin tracks the authored silhouette closely enough that from side, top and front the
+difference is the fin plumpness and the general softening, and nothing else. The beat sheet from
+above shows the wave running back with a still head, phase for phase on both bodies.
+
+Two things the pictures show that the numbers do not:
+
+- **The twin does not carry the whorl.** On [the whorl sheet](paired-whorl-sheet.jpg) the authored
+  body's tooth rosette is legible and the twin's is a smooth lump in the same place. That is the
+  voxel field again: the denticles are 0.005 or less of a body across, at or below the 0.0052 voxel,
+  so the occupancy field cannot resolve them and no amount of blade dilation brings them back. The
+  twin's *silhouette* is right, which is what the envelope check measures and what an LOD is for,
+  but the species-defining feature is not on it. If the twin is ever used as anything other than a
+  distant model, that has to be fixed — most cheaply by resurfacing the head at a finer voxel than
+  the body.
+- **The twin's upper tooth row also goes.** Same cause; same consequence, and in this case an
+  improvement, since the animal should not have had one.
+- The caudal lobe's lag is real but slight at four hundredths of a beat — it reads as a fin rather
+  than a plate, but only just.
 
 ## Honest limitations
 
@@ -327,6 +348,9 @@ rather than a plate, but only just.
 4. **The twin's fins are about 0.005 of a body plumper** than the authored ones by construction.
    That is inside every tolerance but it is a real difference, and at the LOD distances the twin is
    drawn at it will read as very slightly thicker fins.
+4b. **The twin loses the whorl's denticles entirely** — see the visual QA section. Its silhouette
+   and volume are right; its mouth is not. Acceptable for a distant model, not acceptable if the
+   twin is ever shown close.
 5. **Surface distance max 1.73 %** sits at the fin rims where the dilation is largest; the 95th
    percentile of 0.57 % is the honest figure for the body as a whole.
 6. **The bind pose has an open mouth** and cannot be given a closed one, because the whorl is

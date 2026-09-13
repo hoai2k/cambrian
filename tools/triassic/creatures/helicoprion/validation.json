@@ -11,6 +11,8 @@
   "twinTriangles": 7098,
   "twinRemeshTriangles": 68024,
   "twinDecimateRatio": 0.10437492281198502,
+  "twinVerticesHeldBackFromRelaxation": 12384,
+  "bladeDilation": 0.005,
   "bones": 23,
   "boneNames": [
     "root",
