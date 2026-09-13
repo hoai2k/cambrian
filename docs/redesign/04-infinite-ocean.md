@@ -31,6 +31,13 @@ Tests: `tools/world-test.ts`, `tools/biome-tour.mjs`.
   clearing at its heart (nothing grows within ~8 units of the centre) so a
   hatchling is never wedged in the sponges, ringed by the dense growth that is
   the cover.
+- A nursery is safe because **nothing in one starts anything**, not because
+  only small animals fit in it: `peaceful()` in `src/sim/ai.ts` drops any prey
+  or rival standing inside the ring from an animal's reckoning, and drops what
+  an animal inside the ring will pick a fight over — but it never touches the
+  fight-or-flight answer, so anything bitten there still turns or runs. Full
+  adults pass through the pockets, and that is deliberate: the first minute of
+  a match should have something enormous in it.
 - Respawns go to the nursery **nearest another living player** (so a party
   stays together), or the nearest to where you died when you are alone; a
   nursery with a giant loitering in it is skipped. Your home for the teleport
@@ -186,6 +193,37 @@ swims up to one has it recorded in `Game.discovery` for the results screen.
   is given a new lair 130–210 units from a player, in the biome it belongs to
   (Anomalocaris in channels, escarpment and basin; Olenoides in boulders;
   Opabinia in the forest), never in a nursery.
+- **Areas have a character.** `src/sim/population.ts` gives every 210-unit cell
+  a size profile and a density, from a hash of where it is bent by the biome:
+  the nursery and the shallows are hatcheries, the channel, escarpment and basin
+  hold the grown animals, and the shelf between them is whatever its own roll
+  says. Neighbouring cells draw independently, so a shelf with nothing on it but
+  fingerlings always has somewhere gentler — or somewhere richer — a few hundred
+  units away, and the density floor is a third of the usual rather than nothing.
+  It is a pure function of the place and the world seed: an area is the same area
+  every time you swim back to it. Two things override it — `spawnPreyFor` keeps
+  something of your own food size within reach of every player, and about one
+  spawn in five (`PASSER_BY`) is simply a large animal up in the water, so
+  swimming up is always a way to find something bigger than the seabed holds.
+- **Ambient ages** are the sea's own, not the player's: 55% of what spawns is
+  young (scale 0.28–0.7), a third half grown (0.7–1.3) and one in eight a full
+  adult (up to 2.4), rarer the larger it is. It used to be rolled against the
+  biggest player's tier, so a small animal met nothing bigger than itself,
+  which is a mirror rather than a sea (`spawnAmbient` in `src/sim/game.ts`).
+  Depth follows length: `columnY` in `src/sim/locomotion.ts` raises the floor of
+  a swimmer's range with its size and draws small bodies towards the bottom of
+  what is left, so the sand and the weed belong to the small animals of every age
+  and the grown ones keep to the higher water — about one wander in six
+  (`DIP_CHANCE`) brings one down over the bottom. Placement alone was not enough:
+  half of what an animal *does* points at the seabed (cover, a squabble, a
+  carcass), so `keepOffTheFloor` in `src/sim/ai.ts` bends any large body's travel
+  upwards as it runs out of clearance — `keepClear`, about a body length, nothing
+  at all for a small animal. It is a lean and not a lid: a hunt or a meal on the
+  bottom still wins. A grown animal is found on the floor about 5% of the time
+  against a small one's 22% (`npm run reactions`). Crawlers are on the floor
+  whatever their size, big bodies are not spawned where there is no water over
+  them, and the Devonian's `wanderY` carries the same bias with its own benthic
+  exceptions.
 - **Precision.** Positions are doubles in the sim; the renderer's floats are
   good to a centimetre out to about 50 000 units from the origin, which is a
   couple of hours of sprinting in a straight line. A floating origin is the
@@ -206,30 +244,133 @@ The sea is endless, so a party needs a way to regroup.
   with a fade, 2.5 s of spawn protection, and a 20 s cooldown. Not while
   dead, swallowed, grabbed or mid-move.
 
+## Changing creature
+
+The last entry on the teleport menu is not a destination: it opens the roster.
+Left and right cycle through every playable creature starting on the one you
+are, **Y** flips whether an animal you have never worn would arrive fully grown
+or as a hatchling, **A** takes it and **B** backs out.
+
+The point is that a body you put down is not thrown away. `Game.changeCreature`
+writes the animal you are leaving into a per-player table at the size and the
+ladder mark it had, and hands the one you pick up back exactly as you left it —
+or hatches it fresh if it is new to you. So the toggle only decides how a
+*stranger* arrives; a creature of your own comes back at its own progress
+whichever way it is set, and the menu says which of the two you are looking at.
+One session can therefore raise several animals rather than one.
+
+Nothing else changes: the sea, the hour, the mode's clock and everything anyone
+else has grown carry straight on, and the swap costs the same 20 s cooldown as a
+teleport, from the same menu. It is refused while dead, mid-move, or grabbed.
+
+That last part is why the swap is done **in place on the actor** rather than by
+restarting anything. On a sofa with four people on it, one of them going off to
+raise something new must not cost the other three their afternoon: the body is
+edited, its player index keeps its own wardrobe of put-down creatures, and no
+other actor, table or timer is touched. `npm run swap` asserts it — a second
+player's species, size, mark, position, health and state all come through a
+neighbour's swap untouched, and the two players' wardrobes stay separate, so
+taking up the body somebody else grew still starts you at the bottom of it.
+
+The era resyncs whatever it keeps outside the actor through the `onSwap` hook —
+the Devonian stores the life stage in a side table rather than deriving it, so
+without that the new animal would wear the old one's stage. `npm run swap`
+covers the keeping and the refusals; `npm run devonian` covers the resync.
+
 ## Radar
 
 A small circle at the top right of each viewport (the bottom right carries the
 chips and the tally). Up is the way the camera looks. Its reach is
-`55 + 12 × body length` units, so it grows with you.
+`24 + 11 × body length` units (`radarRange` in `src/sim/game.ts`), so it grows
+with you: about 30 m for a hatchling and 200 m for the largest Devonian prime.
+Size is the proxy for range — a small animal lives inside a few plants and a
+giant crosses biomes, so a fixed sweep would be a map for one and a blur for
+the other.
 
 - **Other players** always, in their player colour, wherever they are.
-- **Threats and giants**: anything in the `threat` or `giant` band relative to
-  you, *inside the reach*, as diamonds (bigger for giants). Prey and rivals are
-  deliberately not shown as contacts: there are far too many.
+- **The nearest predator**: the closest body in the `threat` or `giant` band
+  relative to you, *inside the reach*, as a diamond (bigger for giants). One,
+  not all of them. Same-size rivals, prey and snacks are never contacts.
 - **Whatever is hunting you**, whatever its size, blinking — inside the reach.
-- **Food**: the nearest three shoals worth eating, as discs the size of the
-  school rather than a dot per body. Wild snack and prey band creatures only:
+  This is the only thing that puts a second creature on the dial.
+- **Food**: the nearest shoal worth eating, as a disc the size of the school
+  rather than a dot per body. Wild snack and prey band creatures only:
   another player is never marked as a meal.
+- **Height**, because the dial is read from overhead and a shoal thirty metres
+  up would otherwise sit on the same spot as one on the sand — swim to the
+  mark and there is nothing there. Every creature contact carries `dy`; one
+  more than a body or two above or below you gets a chevron, and a shoal
+  overhead is drawn in its own colour (`FOOD_ABOVE`) rather than the snack
+  green of one on the floor. Reach is a sphere for the same reason: food far
+  above a body on the seabed is not food within reach of it.
 - **Home** (your nursery) as a small house, and the **shore** as an arc of
   sand on the rim in its direction.
+
+One predator and one meal is a decision; twenty of each is wallpaper. Listing
+every animal in reach made the dial useless exactly where it mattered most —
+at hatchling size almost everything alive outranks you, so the radar read as a
+solid ring of threats.
 
 Only the other players and the two bearings carry off the edge: they sit hollow
 on the rim pointing the way. A creature outside the reach is simply not on the
 dial — the radar tells you what is around you, not what exists.
 The biome's name is announced in a banner for three seconds when it changes.
 
+## Rocks, plants and the shapes they block
+
+Everything on the seabed collides as the shape it is drawn with, and the shape
+comes off the mesh: `npm run shapes` measures every instanced prop and writes
+`src/content/prop-shapes.json`, which is what `src/sim` reads (it is
+deterministic and never loads a GLB). A **footprint**
+(`src/sim/footprint.ts`) is sixteen radii around the compass, starting at the
+prop's local +z and turning toward +x, measured again in each of five height
+bands. It turns with `rot` and scales the way the mesh is drawn.
+
+That replaced two approximations that were fine for a big animal and
+impassable for a small one, which is the size everything starts at now:
+
+- A circle around a plant. A driftwood log two and a half units long and one
+  wide blocked a disc two and a half units *across*, so there was an arm's
+  length of invisible wall off each side of it. Bryozoan fans, glass fans and
+  reed clumps — sheets, all of them — did the same.
+- An ellipse fitted to a rock's drawing scale. That is right for the Cambrian's
+  procedural boulder, which is a unit sphere; the Devonian's boulder puts its
+  corners a third further out than its axes, so it could be swum straight
+  through, and a blade spire or talus shard is a flat rock inside a round
+  collider a third to twice too wide.
+
+A rock uses the whole silhouette (`boulderQ`, `boulderReach`), and the same
+footprint gives the dome height, so what you can see, what you bump into and
+what you can stand on are one shape. `radius` is now only the furthest that
+footprint reaches: a broad-phase bound and the size of the cover the rock gives.
+A plant reads the band at the height it is touched (`fpReachAt`), so a crinoid
+is a thin stalk under a wide crown and a spine sponge is a stalk down at the
+sand — a floor-walker slips past its foot instead of climbing a pillar that is
+not there. Kinds with no authored prop keep the round profile `FLORA_PHYS`
+describes.
+
+`resolveStatic` reports what it found (`StaticContact`): whether anything
+blocked, the height to reach to get over a rock inside the climbing budget, and
+the top of the tallest thing that blocked at all — which is what a crawler
+leaning on a cliff eventually goes over. `resolveFlora` reports the same for
+plants, plus whether the body was driving at the middle of one or clipping past
+its edge. `Game.updateActor` turns those into `Actor.climbTo`.
+
 ## Tests
 
+- `tools/prop-collider-test.ts` (`npm run props`): the seabed audit. The
+  checked-in shapes are the meshes on disk; every prop's collider contains its
+  mesh at every height, so nothing can be swum through; and the long, flat props
+  block their own shape rather than a disc around it (a log gets three quarters
+  of that disc back as open water, a glass fan almost all of it).
+- `tools/swim-test.ts`: sprint endurance, how close to the sand a swimmer may
+  ride, rock colliders matching the drawn silhouette (including a rotated rock
+  and a carved prop that is twice as long as it is wide), riding over a boulder
+  without being pushed back and without a jolt, climbing a steep face and
+  handing over to the glide, a cliff still being a cliff for a swimmer, a
+  crawler walking up and over both a rock and a wall, a plant climbed head-on,
+  gone round when clipped and passed at the floor when it stands on a stalk,
+  camera reach, and the radar's reading of height.
 - `tools/world-test.ts`: the shore is a wall and swimmable beyond; all nine
   biomes occur with the bands in the right places; chunks are deterministic;
   a player sprinting out to sea for 90 s has chunks, ecosystem and giants

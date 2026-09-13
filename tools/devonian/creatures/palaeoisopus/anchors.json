@@ -1,0 +1,34 @@
+{
+  "palaeoisopus": [
+    {
+      "name": "anchor_mouth",
+      "bone": "oralTip",
+      "point": [
+        0,
+        0.38,
+        -0.44
+      ],
+      "role": "mouth"
+    },
+    {
+      "name": "anchor_mouth_inside",
+      "bone": "proboscis",
+      "point": [
+        0,
+        0.16,
+        -0.41
+      ],
+      "role": "swallow"
+    },
+    {
+      "name": "anchor_attack_primary",
+      "bone": "chelaL",
+      "point": [
+        0.24,
+        -1.65,
+        -0.015
+      ],
+      "role": "attack"
+    }
+  ]
+}

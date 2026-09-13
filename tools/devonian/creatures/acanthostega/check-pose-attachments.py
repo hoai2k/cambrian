@@ -2,7 +2,12 @@
 import bpy,os,json,numpy as np
 from mathutils import Vector
 from mathutils.bvhtree import BVHTree
-HERE=os.path.dirname(os.path.abspath(__file__));LOCAL=os.path.abspath(os.path.join(HERE,'../../../../../devonian-authoring/acanthostega'));bpy.ops.wm.open_mainfile(filepath=os.path.join(LOCAL,'acanthostega-v1.blend'));obj=bpy.data.objects['acanthostega'];rig=bpy.data.objects['acanthostega_rig'];scene=bpy.context.scene;mesh=obj.data;uv=mesh.uv_layers.active.data
+HERE=os.path.dirname(os.path.abspath(__file__))
+# ACA_LOCAL/ACA_BLEND point this check at a candidate's authoring directory and .blend (e.g. a
+# v2 build's acanthostega-v2.blend) instead of the shipped v1 one.
+LOCAL=os.environ.get('ACA_LOCAL')or os.path.abspath(os.path.join(HERE,'../../../../../devonian-authoring/acanthostega'))
+BLEND=os.environ.get('ACA_BLEND','acanthostega-v1.blend')
+bpy.ops.wm.open_mainfile(filepath=os.path.join(LOCAL,BLEND));obj=bpy.data.objects['acanthostega'];rig=bpy.data.objects['acanthostega_rig'];scene=bpy.context.scene;mesh=obj.data;uv=mesh.uv_layers.active.data
 bodyFaces=[tuple(p.vertices)for p in mesh.polygons if p.material_index==0]
 oralFaces=[tuple(p.vertices)for p in mesh.polygons if p.material_index==0 and min(uv[i].uv.y for i in p.loop_indices)>=.79999]
 finRoots={};toothVerts=set()
@@ -10,7 +15,9 @@ for p in mesh.polygons:
  for li in p.loop_indices:
   i=mesh.loops[li].vertex_index
   if uv[li].uv.y>1e-6:continue
-  if p.material_index==5 and abs(mesh.vertices[i].co.x)<.32:
+  # Limb roots sit at |x| roughly .2-.32; the >.10 floor excludes the midline tail-fin rays, which
+  # also carry material 5 and a uv.v==0 ring at their core end but sit near x=0.
+  if p.material_index==5 and .10<abs(mesh.vertices[i].co.x)<.32:
    co=mesh.vertices[i].co;key=('pectoral'if co.y<1 else'pelvic')+('L'if co.x>0 else'R');finRoots.setdefault(key,set()).add(i)
   if p.material_index==2:toothVerts.add(i)
 # Each tooth is a connected accent component. Average its basal ring, not its point.
@@ -46,4 +53,5 @@ for action in sorted(bpy.data.actions,key=lambda a:a.name):
    p=co[ids].mean(0);hit,n,idx,dist=oral.find_nearest(Vector(p));distances.append(float(dist))
   results.append({'clip':action.name,'phase':phase,'finRoots':roots,'maximumToothBaseToLiningDistance':max(distances)});ev.to_mesh_clear()
 report={'sampledPoses':len(results),'toothBases':len(toothBases),'finRoots':{k:len(v)for k,v in finRoots.items()},'allFinRootCentroidsBuried':all(v['insideContinuousBody']for r in results for v in r['finRoots'].values()),'maximumToothBaseToLiningDistance':max(r['maximumToothBaseToLiningDistance']for r in results),'results':results}
-open(os.path.join(HERE,'pose-attachments-v1.json'),'w').write(json.dumps(report,indent=2));print(json.dumps({k:v for k,v in report.items()if k!='results'},indent=2))
+report_path=os.environ.get('ACA_POSE_REPORT')or os.path.join(HERE,'pose-attachments-v1.json')
+open(report_path,'w').write(json.dumps(report,indent=2));print(json.dumps({k:v for k,v in report.items()if k!='results'},indent=2))

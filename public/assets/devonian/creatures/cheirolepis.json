@@ -5,7 +5,7 @@
   "provenance": "Middle Devonian, Scottish Orcadian Basin / Nairnshire assemblages",
   "description": "Small early ray-finned fish with fine rhombic scales, a large toothed terminal mouth, mobile gill covers, ray-supported fins and a strongly unequal tail with an elongated scaled upper lobe.",
   "lengthMeters": 0.25,
-  "modelLength": 5.8965888023376465,
+  "modelLength": 6.009999990463257,
   "locomotion": "Swim",
   "clips": [
     "Idle",
@@ -61,6 +61,7 @@
     "Small rhombic enamel windows, posterior short-based dorsal and anal fins, separate opercular covers, large terminal jaw, segmented fin rays and the scaled upper caudal axis distinguish this early ray-finned fish.",
     "Pigmentation, fin-membrane thickness, three-dimensional soft tissue, individual tooth arrangement and all motion are artistic reconstruction rather than fossil observations.",
     "Growth is a relaxed ventilation and fin-spreading gesture, without scaling or moulting. Ability is a burst-and-bank display, not a Devonian gameplay rule.",
-    "Original source and review renders are preserved in cambrian/local/devonian-authoring/cheirolepis."
+    "Original source and review renders are preserved in cambrian/local/devonian-authoring/cheirolepis.",
+    "V3 (11-12 September 2026) takes the user reference for what is form: a blunt deep snout rising steeply to a prominent squared brow, a lip ridge along the long gape, a larger more anterior eye, fin roots seated in the trunk, and swept angular fins with pointed apices; the strongly epicercal tail is kept because the sources settle it."
   ]
 }

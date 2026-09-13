@@ -1,4 +1,4 @@
-# Cambrian Explosion
+# Cambrian Conquest
 
 Eat. Grow. Fight. Run. A 3D hunting, growing, fighting and escaping game set on a
 Cambrian sea inspired by the Burgess Shale. Play one of 21 real Cambrian
@@ -33,15 +33,16 @@ every push to `main` (set the repository's Pages source to "GitHub Actions").
 
 | Path | What |
 | --- | --- |
-| `src/sim/` | Pure TypeScript simulation: world, creatures, movement, combat, growth, AI, modes, seeded landmarks. No Three.js. |
+| `src/sim/` | Pure TypeScript simulation: world, creatures, movement, combat, growth, AI, modes, seeded landmarks, the day/night cycle. No Three.js. |
 | `src/render/` | Three.js: sea environment, creature views and animation layering, effects, cameras, split-screen engine. |
 | `src/app/` | React shell: title, creature select, HUD, pause/results, help and settings. |
 | `src/input/`, `src/audio/` | Gamepad/keyboard reading; the WebAudio graph, its sample library and the distance falloff for world sounds. |
+| `src/ancientseas/` | The trilogy's title page at `/ancientseas/`: the three games as links, in two versions (`?version=1` the paintings on dark, `?version=2` a plate assembled from requested pieces). |
 | `src/workbench/` | Development workbenches at `/workbench/?edit=<name>`. `?edit=audio` plays every sound through the real audio module; `?edit=environment` previews biome paintings, 3D props and radar marks. |
 | `src/shared/palettes.ts` | Creature colour schemes and the material-name to slot mapping they apply through (`src/render/recolor.ts`). |
 | `public/assets/creatures/` | 21 rigged full models, reduced LODs, anatomical anchors, studio renders, hero cards, thumbnails and transparent `.select.png` portraits. |
 | `docs/redesign/` | Design and technical plan. |
-| `tools/` | Headless sim tests (`harness.ts`, `controls-test.ts`, `hunt-test.ts`, `fight-test.ts`, `corpse-test.ts`, `respawn-test.ts`, `flora-test.ts`, `world-test.ts`, `environment-test.ts`, `expansion-test.ts`, `motion-test.ts`, `modes-test.ts`, `assets-test.ts`), asset tests (`anchors-test.mjs`, `feeding-test.mjs`, `hallucigenia-test.mjs`, `asset-audit.ts`, `portrait-test.mjs`), browser smoke tests (`smoke.mjs`, `viewer-smoke.mjs`, `workbench-smoke.mjs`, `biome-tour.mjs`, `expansion-browser.mjs`), menu button-binding check (`menu-bindings-test.ts`), creature image intake (`make-cards.mjs`, `check-creature-assets.mjs`), colour-slot check (`palette-test.mjs`), audio density check (`audio-mix-test.ts`), LOD generator (`make-lods.mjs`), SFX generator (`gen-sfx.mjs`). |
+| `tools/` | Headless sim tests (`harness.ts`, `controls-test.ts`, `hunt-test.ts`, `fight-test.ts`, `corpse-test.ts`, `respawn-test.ts`, `flora-test.ts`, `world-test.ts`, `environment-test.ts`, `expansion-test.ts`, `motion-test.ts`, `modes-test.ts`, `assets-test.ts`, `ecology-test.ts`), asset tests (`anchors-test.mjs`, `feeding-test.mjs`, `hallucigenia-test.mjs`, `asset-audit.ts`, `portrait-test.mjs`), browser smoke tests (`smoke.mjs`, `viewer-smoke.mjs`, `workbench-smoke.mjs`, `biome-tour.mjs`, `expansion-browser.mjs`), menu button-binding check (`menu-bindings-test.ts`), creature image intake (`make-cards.mjs`, `check-creature-assets.mjs`), colour-slot check (`palette-test.mjs`), audio density check (`audio-mix-test.ts`), LOD generator (`make-lods.mjs`), SFX generator (`gen-sfx.mjs`). |
 | `public/assets/brand/`, `public/assets/ui/` | Delivered art: logo and key art, tier and band glyphs, mode panels, loading motif. |
 | `tools/art/` | How that art was made: generation prompts, the Blender portrait render, vector export and review scripts. |
 | `docs/` | Everything written down. See the index below. |
@@ -66,6 +67,7 @@ every push to `main` (set the repository's Pages source to "GitHub Actions").
 ```sh
 run() { npx esbuild "$1" --bundle --platform=node --format=esm --outfile=/tmp/t.mjs && node /tmp/t.mjs "${@:2}"; }
 npm run bindings                  # no two menu actions share a controller button
+npm run edges                     # rising-edge detection: a press fires once, a hold never repeats
 run tools/controls-test.ts        # camera-relative movement directions
 run tools/respawn-test.ts         # a giant eats a larva; it must come back
 run tools/flora-test.ts           # plants: slide around sponges, fold algae, spring back
@@ -74,6 +76,7 @@ run tools/world-test.ts           # the endless sea: shore, biome bands, streami
 run tools/environment-test.ts     # biome prop placement, collision bounds, deterministic regeneration
 run tools/modes-test.ts           # Hunter & Hunted turns and scoring, and the scoreboard every mode shows
 run tools/assets-test.ts          # every path each era asks for exists, and neither reaches into the other's
+run tools/ecology-test.ts         # the day/night cycle, appetite by the hour, grumpy and territorial animals
 run tools/motion-test.ts          # smooth motion: the interpolation snapshot, no step-to-step oscillation
 node --experimental-transform-types tools/anchors-test.mjs
 node --experimental-transform-types tools/feeding-test.mjs

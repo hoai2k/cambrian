@@ -1,0 +1,34 @@
+{
+  "status": "initial-preview",
+  "actualGLBViews": [
+    "threequarter",
+    "side",
+    "dorsal",
+    "front",
+    "eye",
+    "oral-ventral",
+    "action-Crawl",
+    "action-Swim",
+    "action-Eat",
+    "action-Heavy",
+    "action-Guard",
+    "action-Ability",
+    "action-Dodge",
+    "action-Death"
+  ],
+  "sourceDirectory": "/Users/hoai/Documents/Stuff/Generations/cambrian/local/devonian-authoring/walliserops/v2/review-export-full",
+  "contactSheet": "/Users/hoai/Documents/Stuff/Generations/cambrian/local/devonian-authoring/walliserops/v2/preview-review.jpg",
+  "lodViews": [
+    "lod-Idle",
+    "lod-Crawl",
+    "lod-Swim",
+    "lod-Death",
+    "lod-eye"
+  ],
+  "limits": [
+    "Basic action/anatomical review and fourteen sequential Heavy/Ability/Crawl frames completed; exhaustive playback and all transition combinations deferred.",
+    "Fine spine-root blending and complete appendage/spine collision clearance remain refinement work."
+  ],
+  "modelSha256": "672d7d09cb75c3ca614162719d3b0d5f08780bd4aa00e512653f50a2ff2aae08",
+  "lodSha256": "ddb9e6f41dfa1a4fe0e54e8c8bc4e82c0c0b825d9730a01bde3930bdd4d2212d"
+}

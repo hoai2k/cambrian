@@ -54,6 +54,17 @@ check says so:
 Geometry- or clip-only changes are noted but do not invalidate the images. An LOD older than its
 model is also flagged; rerun `node tools/make-lods.mjs`.
 
+**Re-made portraits must be copied into `defaults/` in the same commit.** `make-cards.mjs` writes
+the root aliases (`<id>.select.png`, `<id>.card.png`, `<id>.thumb.png`) and nothing keeps the
+preserved copies in `public/assets/creatures/defaults/` in step with them. Those copies are what
+the game actually serves for any creature with no matching scheme render, so leaving them behind
+ships the *old* portrait, and `npm run portraits` fails the deploy with
+
+    AssertionError: <id> select: original alias changed
+
+Copy the three re-made images over `defaults/<id>.{select,card,thumb}.png` and refresh their
+`sha256` entries in `defaults/manifest.json`, then re-run `npm run portraits`.
+
 ## Colours and schemes
 
 None of the colour is textured. Every creature's GLB carries a white `baseColorFactor` and puts

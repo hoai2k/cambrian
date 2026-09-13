@@ -28,18 +28,56 @@ const CLIP_ORDER = [
   'Eat', 'Moult', 'Growth',
 ];
 
+/** A clip kept for comparison after being re-authored: `replaced/<Name>` (tools/creatures/motion). */
+export const REPLACED_PREFIX = 'replaced/';
+export const isReplaced = (name: string) => name.startsWith(REPLACED_PREFIX);
+/** The name a replaced clip had, and that its replacement now carries. */
+export const replacedName = (name: string) => (isReplaced(name) ? name.slice(REPLACED_PREFIX.length) : name);
 export const orderClips = (names: string[]) =>
   [...names].sort((a, b) => {
-    const ia = CLIP_ORDER.indexOf(a), ib = CLIP_ORDER.indexOf(b);
+    const ia = CLIP_ORDER.indexOf(replacedName(a)), ib = CLIP_ORDER.indexOf(replacedName(b));
     if (ia !== ib) return (ia < 0 ? 1e3 : ia) - (ib < 0 ? 1e3 : ib);
     return a.localeCompare(b);
   });
 
 export interface PlaybackState { time: number; duration: number; paused: boolean }
 
+/** A rectangle on the canvas in CSS pixels, y down from the top edge. */
+export interface Rect { x: number; y: number; width: number; height: number }
+
+/** One mesh of the specimen for sculpting: its base positions and the transform into the root frame. */
+export interface SculptMesh {
+  geometry: THREE.BufferGeometry;
+  base: Float32Array;
+  toRoot: THREE.Matrix4;
+  fromRoot: THREE.Matrix4;
+  /** Eye geometry: a mesh, material or parent bone named for the eye. */
+  eye: boolean;
+  name: string;
+}
+export interface SculptTarget {
+  meshes: SculptMesh[];
+  /** The mouth socket in the root frame, when the model has one. */
+  mouth?: [number, number, number];
+}
+export type WarpFn = (x: number, y: number, z: number, out: [number, number, number], eye?: boolean) => void;
+export interface OrthoView {
+  rect: Rect;
+  /** The root-frame point at the centre of the view: [along the axis, up (side) or lateral (top)]. */
+  centre: [number, number];
+  /** Root-frame units per CSS pixel. */
+  unitsPerPixel: number;
+  axis: 'x' | 'z';
+}
+
 export interface ViewerScene {
   /** Loads a creature and returns its clip names in button order. */
-  show(specimen: ViewerSpecimen): Promise<string[]>;
+  show(specimen: ViewerSpecimen, options?: { preserveView?: boolean }): Promise<string[]>;
+  /**
+   * Takes the stage down now. Loading the next specimen takes a moment, and the one standing
+   * there must not spend it being recoloured into the next one's palette.
+   */
+  clear(): void;
   /** Plays a clip. One-shots fade back to the resting loop unless `loop` forces a repeat. */
   play(name: string, loop: boolean): void;
   setSpeed(s: number): void;
@@ -54,6 +92,15 @@ export interface ViewerScene {
   /** The clip currently driving the rig, so the button grid can follow auto-returns. */
   onClip(cb: (name: string) => void): void;
   resetCamera(): void;
+  /** The specimen's geometry in its root frame, for the sculpt editor to measure and warp. */
+  sculptTarget(): SculptTarget | undefined;
+  /** Writes warped positions into every geometry (null restores the shipped ones); `finalize` recomputes normals. */
+  applySculpt(fn: WarpFn | null, finalize: boolean): void;
+  /** Sculpt layout renders the orbit view into `main` and two orthographic views; single is the whole stage. */
+  setLayout(layout: 'single' | 'sculpt', main?: Rect): void;
+  setOrthoView(view: 'side' | 'top', v: OrthoView): void;
+  /** Stops the clips and puts the rig in its bind pose, or hands it back to the resting clip. */
+  setRestPose(on: boolean): void;
   dispose(): void;
 }
 
@@ -198,6 +245,14 @@ export function createViewerScene(canvas: HTMLCanvasElement): ViewerScene {
   let clipCb: (name: string) => void = () => {};
   let playbackCb: (state: PlaybackState) => void = () => {};
   let lastPlaybackUpdate = 0;
+  let sculptTarget: SculptTarget | undefined;
+  let layout: 'single' | 'sculpt' = 'single';
+  let mainRect: Rect | undefined;
+  const orthoViews: Partial<Record<'side' | 'top', OrthoView>> = {};
+  const orthoCameras = { side: new THREE.OrthographicCamera(-1, 1, 1, -1, 0.1, 2000), top: new THREE.OrthographicCamera(-1, 1, 1, -1, 0.1, 2000) };
+  let modelCenter = new THREE.Vector3();
+  let modelUnit = 1;
+  let restPose = false;
 
   function reportPlayback() {
     playbackCb({ time: current?.time ?? 0, duration: current?.getClip().duration ?? 0,
@@ -220,6 +275,7 @@ export function createViewerScene(canvas: HTMLCanvasElement): ViewerScene {
     if (source) disposeAsset(source);
     source = undefined;
     model = undefined; mixer = undefined; current = undefined;
+    sculptTarget = undefined;
     actions = new Map();
     paused = false;
     setClip('');
@@ -246,10 +302,16 @@ export function createViewerScene(canvas: HTMLCanvasElement): ViewerScene {
     controls.update();
   }
 
-  async function show(specimen: ViewerSpecimen) {
+  async function show(specimen: ViewerSpecimen, options: { preserveView?: boolean } = {}) {
     const mine = ++token;
     const gltf = await loadCreature(specimen);
     if (mine !== token || disposed) { disposeAsset(gltf); return []; }
+    // Detail swaps retain the orbit and authored pose for direct full/LOD comparison.
+    // A different specimen is cleared by the caller and starts with its own framing.
+    const retained = options.preserveView && model ? {
+      name: currentName, time: current?.time ?? 0,
+      paused: paused || !!current?.paused, loop: current?.loop === THREE.LoopRepeat,
+    } : undefined;
     clearModel();
     source = gltf;
     looping = specimen.looping;
@@ -276,6 +338,8 @@ export function createViewerScene(canvas: HTMLCanvasElement): ViewerScene {
 
     model = src;
     stage.add(model);
+    modelCenter = center.clone(); modelUnit = unit;
+    sculptTarget = buildSculptTarget(src);
     mixer = new THREE.AnimationMixer(model);
     for (const clip of gltf.animations) actions.set(clip.name, mixer.clipAction(clip));
     mixer.addEventListener('finished', (event) => {
@@ -287,15 +351,27 @@ export function createViewerScene(canvas: HTMLCanvasElement): ViewerScene {
     const names = orderClips([...actions.keys()]);
     restingClip = actions.has('Idle') ? 'Idle' : names[0] ?? '';
     current = undefined; currentName = '';
-    if (restingClip) play(restingClip, false);
-    frame();
+    if (retained && actions.has(retained.name)) {
+      play(retained.name, retained.loop);
+      seek(retained.time);
+      paused = retained.paused;
+      reportPlayback();
+    } else if (restingClip) {
+      paused = retained?.paused ?? false;
+      play(restingClip, false);
+    }
+    if (!retained) frame();
+    else {
+      controls.minDistance = frameRadius * 0.4;
+      controls.maxDistance = frameRadius * 18;
+    }
     return names;
   }
 
   function play(name: string, loop: boolean) {
     const act = actions.get(name);
     if (!act) return;
-    const repeat = loop || looping.includes(name);
+    const repeat = loop || looping.includes(replacedName(name));
     const prev = current;
     act.reset();
     act.setLoop(repeat ? THREE.LoopRepeat : THREE.LoopOnce, repeat ? Infinity : 1);
@@ -326,6 +402,102 @@ export function createViewerScene(canvas: HTMLCanvasElement): ViewerScene {
     reportPlayback();
   }
 
+  // ---- sculpting ----
+  // Geometry positions are in each mesh's own space; the sculpt document works in the model's
+  // root frame, so each mesh carries the transform between the two. A skinned mesh's geometry is
+  // its bind pose, which is what the exporters place at the node's own transform, so the same
+  // matrix serves it. Meshes sharing a geometry (a depth pre-pass twin) count once.
+  function buildSculptTarget(root: THREE.Object3D): SculptTarget {
+    root.updateMatrixWorld(true);
+    const rootInverse = root.matrixWorld.clone().invert();
+    const seen = new Set<THREE.BufferGeometry>();
+    const meshes: SculptMesh[] = [];
+    root.traverse((o) => {
+      if (!(o instanceof THREE.Mesh) || o.userData.depthPrepass) return;
+      const position = o.geometry.getAttribute('position');
+      if (!position || seen.has(o.geometry)) return;
+      seen.add(o.geometry);
+      const toRoot = rootInverse.clone().multiply(o.matrixWorld);
+      const mats = Array.isArray(o.material) ? o.material : [o.material];
+      const names = [o.name, ...mats.map((m) => m?.name ?? '')];
+      let parent: THREE.Object3D | null = o.parent;
+      while (parent && parent !== root) { names.push(parent.name); parent = parent.parent; }
+      const eye = names.some((n) => /eye|ocul|orbit/i.test(n) && !/eyelid|socket/i.test(n));
+      meshes.push({ geometry: o.geometry, base: Float32Array.from(position.array as ArrayLike<number>), toRoot, fromRoot: toRoot.clone().invert(), eye, name: o.name });
+    });
+    let mouth: [number, number, number] | undefined;
+    const socket = root.getObjectByName('anchor_mouth');
+    if (socket) {
+      const p = socket.getWorldPosition(new THREE.Vector3()).applyMatrix4(rootInverse);
+      mouth = [p.x, p.y, p.z];
+    }
+    return { meshes, mouth };
+  }
+
+  function applySculpt(fn: WarpFn | null, finalize: boolean) {
+    if (!sculptTarget) return;
+    const v = new THREE.Vector3();
+    const out: [number, number, number] = [0, 0, 0];
+    for (const m of sculptTarget.meshes) {
+      const attr = m.geometry.getAttribute('position') as THREE.BufferAttribute;
+      const dst = attr.array as Float32Array;
+      if (!fn) dst.set(m.base);
+      else for (let i = 0; i < m.base.length; i += 3) {
+        v.set(m.base[i], m.base[i + 1], m.base[i + 2]).applyMatrix4(m.toRoot);
+        fn(v.x, v.y, v.z, out, m.eye);
+        v.set(out[0], out[1], out[2]).applyMatrix4(m.fromRoot);
+        dst[i] = v.x; dst[i + 1] = v.y; dst[i + 2] = v.z;
+      }
+      attr.needsUpdate = true;
+      if (finalize) { m.geometry.computeVertexNormals(); m.geometry.computeBoundingSphere(); m.geometry.computeBoundingBox(); }
+    }
+  }
+
+  function setRestPose(on: boolean) {
+    restPose = on;
+    if (!model) return;
+    if (on) {
+      mixer?.stopAllAction();
+      mixer?.update(0);
+      model.traverse((o) => { if (o instanceof THREE.SkinnedMesh) o.skeleton.pose(); });
+      current = undefined; setClip('');
+    } else if (restingClip && actions.has(restingClip)) {
+      paused = false;
+      play(restingClip, false);
+    }
+  }
+
+  /** A root-frame point as the scene shows it: the model is centred on FOCUS and scaled to its display length. */
+  const rootToWorld = (x: number, y: number, z: number) => new THREE.Vector3(x, y, z).sub(modelCenter).multiplyScalar(modelUnit).add(FOCUS);
+
+  function placeOrtho(view: 'side' | 'top') {
+    const v = orthoViews[view];
+    if (!v) return;
+    const cam = orthoCameras[view];
+    const halfW = v.rect.width / 2 * v.unitsPerPixel * modelUnit, halfH = v.rect.height / 2 * v.unitsPerPixel * modelUnit;
+    cam.left = -halfW; cam.right = halfW; cam.top = halfH; cam.bottom = -halfH;
+    cam.updateProjectionMatrix();
+    const axisZ = v.axis === 'z';
+    // Screen-right is always +axis. Side: look across the body with +y up. Top: look down, with an
+    // up vector that keeps +axis on the right (that fixes the lateral sign the editor mirrors).
+    const c = axisZ ? new THREE.Vector3(modelCenter.x, 0, v.centre[0]) : new THREE.Vector3(v.centre[0], 0, modelCenter.z);
+    if (view === 'side') {
+      c.y = v.centre[1];
+      const target = rootToWorld(c.x, c.y, c.z);
+      const away = axisZ ? new THREE.Vector3(-1, 0, 0) : new THREE.Vector3(0, 0, 1);
+      cam.up.set(0, 1, 0);
+      cam.position.copy(target).addScaledVector(away, 500);
+      cam.lookAt(target);
+    } else {
+      c.y = modelCenter.y;
+      if (axisZ) c.x = v.centre[1]; else c.z = -v.centre[1];
+      const target = rootToWorld(c.x, c.y, c.z);
+      cam.up.set(axisZ ? 1 : 0, 0, axisZ ? 0 : -1);
+      cam.position.copy(target).add(new THREE.Vector3(0, 500, 0));
+      cam.lookAt(target);
+    }
+  }
+
   // ---- loop ----
   const clock = new THREE.Clock();
   let time = 0, raf = 0, disposed = false;
@@ -333,7 +505,8 @@ export function createViewerScene(canvas: HTMLCanvasElement): ViewerScene {
   function resize() {
     const w = canvas.clientWidth || 1, h = canvas.clientHeight || 1;
     renderer.setSize(w, h, false);
-    camera.aspect = w / h;
+    const r = layout === 'sculpt' && mainRect ? mainRect : { width: w, height: h };
+    camera.aspect = Math.max(r.width, 1) / Math.max(r.height, 1);
     camera.updateProjectionMatrix();
   }
   const ro = new ResizeObserver(resize);
@@ -374,12 +547,41 @@ export function createViewerScene(canvas: HTMLCanvasElement): ViewerScene {
     controls.update();
     fill.position.copy(camera.position);
     fill.position.y += frameRadius * .4;
+    if (layout !== 'sculpt' || !mainRect) {
+      renderer.setScissorTest(false);
+      renderer.setViewport(0, 0, canvas.clientWidth || 1, canvas.clientHeight || 1);
+      renderer.render(scene, camera);
+      return;
+    }
+    const H = canvas.clientHeight || 1;
+    const viewport = (r: Rect) => {
+      renderer.setViewport(r.x, H - r.y - r.height, r.width, r.height);
+      renderer.setScissor(r.x, H - r.y - r.height, r.width, r.height);
+    };
+    renderer.setScissorTest(true);
+    viewport(mainRect);
     renderer.render(scene, camera);
+    // The two drawings: no water, no fog, no snow — a flat ground so the silhouette reads.
+    const savedBg = scene.background, savedFog = scene.fog;
+    scene.background = ORTHO_BG; scene.fog = null;
+    surface.visible = false; shafts.visible = false; particles.visible = false;
+    for (const view of ['side', 'top'] as const) {
+      const v = orthoViews[view];
+      if (!v || v.rect.width < 2 || v.rect.height < 2) continue;
+      placeOrtho(view);
+      viewport(v.rect);
+      renderer.render(scene, orthoCameras[view]);
+    }
+    surface.visible = true; shafts.visible = true; particles.visible = true;
+    scene.background = savedBg; scene.fog = savedFog;
   }
+  const ORTHO_BG = new THREE.Color('#0a2f38');
   tick();
 
   return {
     show,
+    // Bumping the token first drops anything already in flight; `show` takes a fresh one.
+    clear() { token++; clearModel(); },
     play,
     setSpeed(s) { speed = s; },
     setPaused(value) {
@@ -396,6 +598,12 @@ export function createViewerScene(canvas: HTMLCanvasElement): ViewerScene {
     activeSlots() { return recolor?.slots ?? []; },
     onClip(cb) { clipCb = cb; cb(currentName); },
     resetCamera: frame,
+    sculptTarget() { return sculptTarget; },
+    applySculpt,
+    // A new viewport shape needs the specimen framed again for it.
+    setLayout(next, main) { const changed = next !== layout; layout = next; mainRect = main; resize(); if (changed) frame(); },
+    setOrthoView(view, v) { orthoViews[view] = v; },
+    setRestPose,
     dispose() {
       if (disposed) return;
       disposed = true;

@@ -1,10 +1,11 @@
 import { ACTIVE_ERA } from '../content';
 import type { Vec3 } from '../shared/math';
 import type { Game } from './game';
-import type { Actor, Mode, WorldEvent } from './types';
+import type { Actor, InputFrame, Mode, WorldEvent } from './types';
 import type { CreatureId } from './creatures';
 import type { ExpansionContext } from './expansion-abilities';
 import { DEVONIAN_RULES } from './devonian/rules';
+import { TRIASSIC_RULES } from './triassic/rules';
 
 /**
  * The seams where an era changes how the shared simulation behaves. Every hook is optional in
@@ -13,20 +14,30 @@ import { DEVONIAN_RULES } from './devonian/rules';
  * these calls, so the two eras never share gameplay code paths they do not both want.
  */
 export interface EraHud {
-  /** 0..100 standing, the era's progress meter. */
+  /** 0..100 growth meter: what this animal has eaten, which is what moults it up a stage. */
   standing: number;
+  /**
+   * 0..1 toward the *next* moult, which is what the HUD ring reads. The whole meter would answer a
+   * different question ("how grown am I overall") and leave the ring nowhere near full at the
+   * moment the body moults — in both eras a full ring means the next stage, and nothing else.
+   */
+  stageProgress: number;
   rung: number; rungName: string; stage: string;
-  /** 0..1 air remaining, for air breathers only. */
-  air?: number;
-  /** This player currently holds range here. */
-  inRange: boolean;
+  /** This body breathes both ways: lungs as well as gills, so dead water cannot touch it. */
+  bimodal: boolean;
+  /** This body breathes air and nothing else: stamina comes back only at the surface. */
+  air?: boolean;
+  /** Air-breathers: whether the last step found the body at the surface, breathing. */
+  atSurface?: boolean;
+  /** 0..1 while a shore animal is winding up to strike at this player; 0 otherwise. */
+  shoreWarn?: number;
+  /** Held under by something that will not let it up: its bar is going and cannot come back. */
+  heldUnder?: boolean;
   beached: boolean;
   /** Dead zones as world offsets from the player and radii, for the radar. */
   deadZones: { dx: number; dz: number; r: number }[];
-  /** Seconds this player has been Dominant (standing at 100), for the win countdown. */
-  dominantT: number;
-  /** The last few standing sources, newest last, for the ring's ticks. */
-  recent: string[];
+  /** Seconds this player has held Prime, for Rise's win countdown. */
+  primeT: number;
   inDeadZone: boolean;
 }
 
@@ -38,6 +49,31 @@ export interface EraRules {
   /** Starting body scale for the player or bot at `index` in `mode`, for creature `id`. */
   startScale(mode: Mode, index: number, id: CreatureId): number;
   /**
+   * The growth ladder, in this era's own terms (see src/sim/ladder.ts). Five rungs either way:
+   * the Cambrian's tiers and the Devonian's life stages are the same ladder under two names, and
+   * everything that reports or restores a player's progress goes through these rather than
+   * branching on the era.
+   */
+  ladderNames: readonly string[];
+  /** How far up the ladder this body is: its tier, its stage, whatever the era grows. */
+  ladderRung(g: Game, a: Actor): number;
+  /** The body scale a creature of `id` has on `rung`. */
+  ladderScale(id: CreatureId, rung: number): number;
+  /**
+   * Put this body `fraction` (0..1) of the way from the rung it is on to the next. Each era keeps
+   * growth in its own currency — nutrition in the Cambrian, standing here — so the era fills its
+   * own meter and the shared code only says how full.
+   */
+  ladderFill(g: Game, a: Actor, fraction: number): void;
+  /** The other direction: how full this body's growth meter is, 0..1, for reading a mark back. */
+  ladderFillOf(g: Game, a: Actor): number;
+  /**
+   * Optional: a player has just changed which creature they are, in place. The shared code has
+   * already set the new body and its scale; an era that keeps growth in a side table of its own
+   * has to resync that table here, because nothing else derives it per step.
+   */
+  onSwap?(g: Game, a: Actor): void;
+  /**
    * Where a player or bot hatches, given the nursery centre; undefined leaves the shared placement.
    * The Devonian puts every hatchling inside plant cover, on the floor or up a column.
    */
@@ -47,6 +83,12 @@ export interface EraRules {
   /** Seconds of protection a body gets when it hatches or comes back. */
   spawnProtect(a: Actor): number;
   /**
+   * Optional: this body is born alive rather than hatched from an egg on the sand. The hatch is
+   * then the short swell where the era's `spawnPoint` put it (the Triassic: at the surface,
+   * beside a mother) and no egg is laid or drawn.
+   */
+  liveBirth?(a: Actor): boolean;
+  /**
    * True when `hunter` (an AI body) must leave `target` alone unless provoked: the era's nursery
    * sanctuary. The caller has already established the hunter is not provoked.
    */
@@ -54,8 +96,6 @@ export interface EraRules {
   init(g: Game): void;
   /** After every fixed step, before the events are drained by the renderer. */
   step(g: Game, dt: number): void;
-  /** Every event this step produced (the renderer drains them afterwards). */
-  onEvents(g: Game, events: readonly WorldEvent[]): void;
   /** Nutrition a player or bot just gained; `food` is the eaten actor when there is one. */
   onNutrition(g: Game, a: Actor, amount: number, food: Actor | undefined): void;
   /** When true the shared nutrition → tier growth runs; when false the era owns growth. */
@@ -71,7 +111,9 @@ export interface EraRules {
   /** Y pressed while free or guarding and not hidden: true when the era's own special took it (the shared hide is skipped). */
   useAbility(g: Game, a: Actor, ctx: ExpansionContext): boolean;
   /** A heavy special started (after the shared begin): the era may aim and commit it. */
-  beginAbility(g: Game, a: Actor, ctx: ExpansionContext): void;
+  /** Optional: the shared code aims and carries every heavy strike (`HEAVY_STRIKE`); this is for
+   *  anything an era needs on top of that. */
+  beginAbility?(g: Game, a: Actor, ctx: ExpansionContext): void;
   /** Every step in the 'ability' state (after the shared step). */
   stepAbility(g: Game, a: Actor, ctx: ExpansionContext, dt: number): void;
   /** Multiplier on the camouflage stamina drain. */
@@ -83,6 +125,28 @@ export interface EraRules {
    * the stick magnitude, `cruise` the speed the shared rules would give.
    */
   swim(g: Game, a: Actor, dir: Vec3, mag: number, cruise: number, burstPressed: boolean): { speed: number; turn: number; impulse: number };
+  /**
+   * The vertical assist for this body this step, in units/s, positive up: what the rise and sink
+   * buttons are worth to it and anything it does for itself. `base` is the rate the shared rules
+   * would give (RISE_RATE for its size, already carrying a jetter's free hover) and `burst` the
+   * sprint multiplier the same press is buying horizontally, so an era can decide whether a sprint
+   * carries into a climb. With no rules the shared behaviour is exactly `rise ? base : sink ? -base
+   * : 0`, which is what the Cambrian keeps.
+   */
+  rise(g: Game, a: Actor, input: InputFrame, base: number, burst: number): number;
+  /**
+   * Multiplier on the shared stamina regeneration for this body right now. 1 is the shared rate.
+   * The Devonian's bimodal breathers recover at a quarter of it under water and at the full rate
+   * the moment they touch the surface, which is also where the bar is handed back whole.
+   */
+  staminaRegen(g: Game, a: Actor): number;
+  /**
+   * How much of the stamina a sprint or a dash in this direction is given to the body for nothing,
+   * 0..1. 1 is free — and free enough that an empty bar does not stop it, in which case only the
+   * upward part of the motion is accelerated, since the climb is what is being given away and
+   * nothing else. Devonian lungs climb for free; everything else pays in full.
+   */
+  climbRelief(a: Actor, input: InputFrame, dir: Vec3, mag: number): number;
   /** May this body leave the water when it drives hard at the surface? */
   canBreach(a: Actor): boolean;
   /** Height a body hatches at, given the floor under it and its length. */
@@ -93,6 +157,11 @@ export interface EraRules {
   onRespawn(g: Game, a: Actor): void;
   /** Win checks for the era's own modes; the shared ones (reef, hunted) run as before. */
   updateModes(g: Game, dt: number): void;
+  /**
+   * A finished co-op match is being carried on (`Game.continueMatch`): clear whatever the era was
+   * counting towards its win so the goal is not met again the instant play resumes.
+   */
+  continueMatch(g: Game): void;
   hud(g: Game, i: number): EraHud | undefined;
   hint(g: Game, i: number): string | undefined;
   /**
@@ -103,5 +172,5 @@ export interface EraRules {
   scoreLine?(g: Game, a: Actor): { rank: string; progress: number } | undefined;
 }
 
-export const RULES: EraRules | undefined = ACTIVE_ERA.id === 'devonian' ? DEVONIAN_RULES : undefined;
+export const RULES: EraRules | undefined = ACTIVE_ERA.id === 'devonian' ? DEVONIAN_RULES : ACTIVE_ERA.id === 'triassic' ? TRIASSIC_RULES : undefined;
 RULES?.install();

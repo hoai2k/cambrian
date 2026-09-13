@@ -1,0 +1,26 @@
+[
+  {
+    "path": "/Users/hoai/Documents/Stuff/Generations/cambrian/local/expansion-repo/tools/devonian/creatures/dunkleosteus/face-v4/fix_lod_linear_05.py",
+    "sha256": "0f3bc54c42d72da3bad2d27c8e51bc1c902531e507858ac65d557db35710a9f1"
+  },
+  {
+    "path": "/Users/hoai/Documents/Stuff/Generations/cambrian/local/expansion-repo/tools/devonian/creatures/dunkleosteus/face-v4/render_linear_05.py",
+    "sha256": "14516046e9e4b0ec509ee6a7c47fc9cc54eaeef15b682ba2c4f9cbacd7f450d7"
+  },
+  {
+    "path": "/Users/hoai/Documents/Stuff/Generations/cambrian/local/expansion-repo/tools/devonian/creatures/dunkleosteus/face-v4/COLOR-SPACE-DIAGNOSTIC-01.md",
+    "sha256": "c8faa364dcc56c37a16a7fb9beab3c27f3e73cdedb06afd4c86701106a81faaa"
+  },
+  {
+    "path": "/Users/hoai/Documents/Stuff/Generations/cambrian/local/devonian-authoring/dunkleosteus/face-v4/candidate03/exports-pigment04/dunkleosteus.glb",
+    "sha256": "0ace6026c6b46d9d560528677ffdaf31769d74bea51065b884214c8b1037950d"
+  },
+  {
+    "path": "/Users/hoai/Documents/Stuff/Generations/cambrian/local/devonian-authoring/dunkleosteus/face-v4/candidate03/exports-pigment04/dunkleosteus.lod1.glb",
+    "sha256": "2d57904f0a8a2c858f597730e38927b1f38126a51a9f87011b2f3f78d7c52bca"
+  },
+  {
+    "path": "/Users/hoai/Documents/Stuff/Generations/cambrian/local/devonian-authoring/dunkleosteus/face-v4/candidate03/exports-pigment04/export-evidence.json",
+    "sha256": "85f9cc9dd02d8ef36084fdfd9d6054249e4866ba266f965302ba25d5f38606c5"
+  }
+]

@@ -1,0 +1,35 @@
+{
+  "code": "T10",
+  "id": "massive-tabulate-coral",
+  "modelStatus": "preview",
+  "sourceModel": "assets/devonian/props/massive-tabulate-coral.glb",
+  "sourceBlendSHA256": "82946423da3d0db183de2df9652e0569c8ab12ded08b1153abd09ce35b0ee6c7",
+  "projection": "orthographic top; RGBA cells; no lighting baked in colour",
+  "widthMeters": 0.23266537189483644,
+  "heightRangeMeters": [
+    0.003000000026077032,
+    0.09546563029289246
+  ],
+  "normalConvention": "object/world XYZ encoded in RGB; not tangent-space normals",
+  "notes": "Original model surface study. Living colour is artistic; skeletal morphology and soft coating must remain separate. Transparent exterior is a mask.",
+  "maps": {
+    "albedo": {
+      "path": "assets/devonian/materials/massive-tabulate-coral/albedo.png",
+      "sha256": "086cbd77f2ef92c680c1402b96f9a93c8b2c9456d594f00c4729f070aec820ec"
+    },
+    "normal-object": {
+      "path": "assets/devonian/materials/massive-tabulate-coral/normal-object.png",
+      "sha256": "3f392da91791e861661c31435698cb6ead64fad4efff2bfad3fb32a37a4923d3"
+    },
+    "height": {
+      "path": "assets/devonian/materials/massive-tabulate-coral/height.png",
+      "sha256": "2ecd3a487831a49a3cd9de39c27fa36fd6bc73d63a8fd367499ef03ecde84741"
+    },
+    "roughness": {
+      "path": "assets/devonian/materials/massive-tabulate-coral/roughness.png",
+      "sha256": "e621c7e93abefa7e41210a4d14d05a0d05ac61da9aa38eb74fa5b25ab99a9c1f"
+    }
+  },
+  "heightEncoding": "8-bit RGBA orthographic reference only; not a 16-bit displacement map",
+  "dataSampling": "One point sample per pixel; denoising/compositor/sequencer disabled; 0.01 px box filter; Raw linear output; no RGB dilation or normal reconstruction across transparent exterior. Alpha is coverage, not a normal component."
+}

@@ -26,7 +26,9 @@
       "Rear-body proportions, caudal silhouette, living integument and oral soft tissues remain interpretations.",
       "Representative 3.5 m adult, not a genus maximum.",
       "PBR UV albedo, normal and roughness; independent vertex pigment bake for LOD.",
-      "Growth is maturation display, no scaling or moulting."
+      "Growth is maturation display, no scaling or moulting.",
+      "V4 cranial and gnathal treatment reconstructed from face-v4/study_02.py and study_03.py on the V2 body, oral lining, rig, eye globes and anchors.",
+      "V3 carries the viewer sculpt docs/sculpts/dunkleosteus-sculpt.json: crown raised over stations 16-18, snout lowered and shortened, applied as the same profile warp the viewer previews."
     ]
   },
   {
@@ -63,7 +65,12 @@
       "Slender edentulous jaw and small relative orbits supported by fossils; suspension feeding supported biomechanically, actual filtering organs unknown and omitted.",
       "Complete body outline, tail and fin proportions, soft tissues, pigmentation and all motion are explicitly artistic reconstruction.",
       "Representative reconstructed display length 5 m; not a measured complete specimen or claimed maximum.",
-      "Attack/Heavy are shield/contact motions, Bite is a gentle oral closing cycle, Ability is a broad ram-feeding gape; names are compatibility labels, not gameplay design."
+      "Attack/Heavy are shield/contact motions, Bite is a gentle oral closing cycle, Ability is a broad ram-feeding gape; names are compatibility labels, not gameplay design.",
+      "Deep armored cranial and thoracic volume, a lined edentulous mouth, separate upper-cranial and lower-jaw bones, a deforming oral floor, six muscular tail sections and articulated long-fin trim.",
+      "The revised oral skinning retains the broad feeding gape. Both globes are seated deeper along their original socket axes; orbital rim, eye size and skull attachment are preserved.",
+      "Regional full-model PBR retains the 4096-pixel body albedo, with a reviewed vector-filtered 2048-pixel body normal. The reduced model retains vertex pigmentation and all 18 authored actions.",
+      "Refined preview model: close-up reduced-model surface polish, broader controller playtesting and dependent environment illustration updates remain pending.",
+      "Sculpt port (docs/viewer-sculpt.md): the snout drawn out to a longer point and pulled in (nose axis +0.23 model units, width -77.6% at station 19 and -9.8%/-3.5% at 15/16, dorsal -13.8% at the nose) by re-lofting the head cage's own profile rows; everything at or behind station 14 is unchanged."
     ]
   },
   {
@@ -73,7 +80,7 @@
     "category": "creature",
     "modelStatus": "final",
     "provenance": "Middle Devonian, Scotland",
-    "description": "Compact arthrodire with a broad short jaw, sculpted dermal head and thoracic armour, rounded pectoral fans, anterior pelvic fins, one long low dorsal fin and a sharply heterocercal tail.",
+    "description": "Compact arthrodire with sculpted cranial and thoracic plates, a coherent articulated oral passage, fine dermal pigment, a short flexible posterior, anterior pelvic fins and a sharply heterocercal tail.",
     "model": "assets/devonian/creatures/coccosteus.glb",
     "lod": "assets/devonian/creatures/coccosteus.lod1.glb",
     "image": "assets/devonian/creatures/coccosteus.thumb.png",
@@ -90,11 +97,11 @@
       "https://palaeo-electronica.org/content/images/1343/figure7.jpg"
     ],
     "notes": [
-      "Original anatomical reconstruction informed by Miles and Westoll 1968, revised body outline following Engelman 2024 figure 7.",
-      "Exact pigment, skin thickness, oral soft tissues and behaviour are inferred.",
-      "Continuous closed globe and head envelopes; fitted lid intersection does not count as eye-embedding tissue.",
-      "Full asset intentionally multiplies regional vertex pigment by a near-neutral UV dermal factor. Texture-free LOD bakes the factor once.",
-      "Jaw and cranial articulation coordinated with oral cheeks, palate, mandibular floor and rear throat; action labels are compatibility gestures, not gameplay design."
+      "Original rework uses the accepted clay04 continuous surface and material04 dermal finish; complete source and prior models preserved.",
+      "Cranial, jaw and body LBS ownership reproduces the validated gape; a six-stage tail and segmented paired fins provide bespoke motion.",
+      "Pigmentation, soft-tissue thickness, fin compliance and behaviour are artistic reconstruction. Action names are compatibility gestures.",
+      "Full glTF embeds baked albedo, roughness and normal fields; texture-free LOD uses explicitly sampled linear pigment with verified export correspondence.",
+      "Accepted 13 September 2026: the bounded full/LOD surface review, the oral/eye temporal sweep over all eighteen clips and the playback and reduced-model switching check at game distance all passed, and the exports replaced the previous model. The swallow socket rides the jaw here, as the mouth socket already did."
     ]
   },
   {
@@ -104,7 +111,7 @@
     "category": "creature",
     "modelStatus": "final",
     "provenance": "Late Devonian (Frasnian), Escuminac Formation, Miguasha, Quebec, Canada",
-    "description": "Angular armoured antiarch with a steep immobile head, inset dorsal eyes, a posterior dorsal crest and jointed dermal pectoral fins. A long flexible posterior carries a small dorsal fin and asymmetrical tail.",
+    "description": "Angular armoured antiarch with a steep immobile head, inset dorsal eyes, a posterior median crest and long jointed dermal pectoral appendages. A long flexible posterior carries a small square rayless dorsal and an asymmetrical tail.",
     "model": "assets/devonian/creatures/bothriolepis.glb",
     "lod": "assets/devonian/creatures/bothriolepis.lod1.glb",
     "image": "assets/devonian/creatures/bothriolepis.thumb.png",
@@ -120,12 +127,12 @@
       "https://doi.org/10.26879/417"
     ],
     "notes": [
-      "Original anatomical reconstruction informed by Bechard et al. 2014 figures 2-3; not a fossil scan. Representative 0.40 m adult.",
-      "Continuous rigid cephalic/thoracic armour, steep head roof and approximately 36% armoured body length; exact living tissue thickness and pigmentation are inferred.",
-      "Dorsal eyes are placed within continuous head tissue, with no separate pads or orbital hoops; volume audit accompanies the delivery.",
-      "Pectoral segments have limited articulation, no toy ball joints, no head hinge and no terrestrial walking or rowing claim.",
-      "UV dermal detail uses an original imagegen swatch with authored anatomical seam relief; distant LOD bakes pigment into vertex colours and removes textures.",
-      "Small ventral oral folds and interior tissues are interpreted; action labels are asset compatibility gestures rather than Devonian gameplay definitions."
+      "V3 is a complete re-author, not a revision of V2: one closed 55,802-vertex cuirass with the oral annulus, cavity, both pectoral appendages and the posterior in a single manifold.",
+      "Surface relief is one resolved field. The V3 material chain (rework-v3) replaced MATERIAL04 stacked relief whose features were narrower than the mesh row pitch; longitudinal geometric-normal step excess over the smooth section form fell from 82.2 to 7.4 degrees.",
+      "Dermal microrelief is halved against MATERIAL04 (bump .18 -> .08, rostral-band normal-map slope .165 -> .079) and its lattice is isotropic, domain-warped and circumferentially periodic, so it no longer organises into rows.",
+      "The rostral cap carries the shared rest-space dermal field rather than a stretched chart; its mirrored disc chart is present in the UV layer but the cap is closed by a flat fan, which remains the reason it reads as a separate facet under raking light.",
+      "The shader carried a rest-space pore Bump that glTF cannot express; it is baked into the exported atlas normal maps. The root, articulation and rostral-cap slots ship vertex pigment only and do not carry that bake.",
+      "Pectoral segments have limited articulation, no ball joints, no head hinge and no terrestrial walking or rowing claim. Action labels are asset compatibility gestures, not Devonian gameplay definitions."
     ]
   },
   {
@@ -133,9 +140,9 @@
     "name": "Gemuendina",
     "species": "Gemuendina stuertzi",
     "category": "creature",
-    "modelStatus": "preview",
+    "modelStatus": "final",
     "provenance": "Early Devonian (Emsian), Hunsrück Slate, Germany",
-    "description": "Low, broad rhenanid placoderm with a mosaic of small armour elements, undulating pectoral margins and upward-looking eyes and mouth.",
+    "description": "Broad rhenanid with a leading mouth, paired anterior eyes, small mosaic armour and a long finless tail; tail-driven swimming with restrained pectoral trim.",
     "model": "assets/devonian/creatures/gemuendina.glb",
     "lod": "assets/devonian/creatures/gemuendina.lod1.glb",
     "image": "assets/devonian/creatures/gemuendina.thumb.png",
@@ -163,11 +170,15 @@
       }
     ],
     "notes": [
-      "Broad low rhenanid form, upward eye/oral orientation, small lower-jaw denticles and regional differences in dermal ornament follow inspected fossil discussions.",
       "A finless tapering tail follows the illustrated specimen account; generic shark dorsal/caudal fins, fin spokes, ventral gill rows and sting are omitted.",
       "Living thickness, soft-tissue cavity, exact denticle/tessera arrangement, fin flexibility, pigmentation and motions are explicit reconstruction choices.",
       "0.30 m is a representative reconstructed length close to the illustrated 304 mm specimen, not a claimed species maximum.",
-      "All action names are compatibility labels for specimen gestures; no Devonian gameplay rules are prescribed."
+      "All action names are compatibility labels for specimen gestures; no Devonian gameplay rules are prescribed.",
+      "V3 living mass and regional pigmentation follow user art direction as explicit interpretations; accepted clay-02 volume is retained except for the documented continuous orbital integration correction.",
+      "Seven sequential axial tail segments provide locomotor waves; limited pectoral-edge motion steers and trims the body.",
+      "V4 study05 forms a true terminal snout: the front upper and lower lips are the leading body edge, with closely paired eyes immediately above them. The oral lining connects continuously into an internal throat; accepted V3 posterior silhouette and pigmentation remain.",
+      "Paired anterior eyes above the leading mouth follow the user reference direction; dorsal eye-like motifs are skin markings, not additional eyes. This living orientation is an artistic reconstruction rather than a fossil certainty.",
+      "Sculpt port (docs/viewer-sculpt.md): the head dome lowered (dorsal stations 15/16/18/19, -14.5%/-14.6%/-6.7%/-29.5%) and the nose thinned and widened with the tip shifted forward (width +16%, shift +0.08 model units); everything at or behind station 14 is unchanged."
     ]
   },
   {
@@ -175,9 +186,9 @@
     "name": "Doryaspis",
     "species": "Doryaspis nathorsti",
     "category": "creature",
-    "modelStatus": "preview",
+    "modelStatus": "final",
     "provenance": "Early Devonian, Wood Bay Formation, Spitsbergen, Svalbard",
-    "description": "A jawless fish with a flat dorsal headshield, deep ventral armour, short fixed pseudorostrum and laterally extended rigid cornual plates; flexible scaled posterior with a hypocercal tail.",
+    "description": "A jawless fish with a low domed head shield over a deep ventral bowl, rigid cornual plates, a terminal forward-facing mouth on the front of the snout and a fixed pseudorostral saw projecting from the lower jaw beneath it; flexible scaled posterior with a hypocercal tail.",
     "model": "assets/devonian/creatures/doryaspis.glb",
     "lod": "assets/devonian/creatures/doryaspis.lod1.glb",
     "image": "assets/devonian/creatures/doryaspis.thumb.png",
@@ -186,7 +197,8 @@
       "Idle",
       "Swim",
       "Guard",
-      "Eat"
+      "Eat",
+      "Grab"
     ],
     "sources": [
       "https://doi.org/10.1038/s42003-024-06837-8",
@@ -194,9 +206,11 @@
       "https://www.app.pan.pl/archive/published/app07/app07-249.pdf"
     ],
     "notes": [
-      "Original reconstruction, not a scan; head/projection/tail proportions guided by the D. nathorsti reconstruction in Botella et al. 2024 supplementary figure 1b.",
-      "Living pigmentation, exact soft-tissue lining and action timing are artistic interpretation.",
-      "No jaws, paired fins, hinged cornua, or moving pseudorostrum; action labels retain runtime compatibility.",
+      "V3 is a complete new sculpture, not a reskin of V2. The mouth is terminal: a real recessed chamber bored horizontally through the blunt front face of the snout, directly above the pseudorostral root. There is no dorsal or upward aperture.",
+      "The pseudorostrum grows out of the lower front of the snout as a protruding lower jaw, and remains fixed: this animal is jawless and nothing here hinges or gapes.",
+      "Cornual plates are rigid armour continuous with the shield at wide thick roots, at full length; they are not hinged appendages or paired fins.",
+      "All pigment ships in COLOR_0 for both levels and no base-colour texture exists, so nothing is multiplied twice; the full model carries only a tiled microrelief normal and roughness pair, which the reduced model drops.",
+      "Living pigmentation, soft oral lining and action timing are artistic interpretation.",
       "Enlarged authoring coordinates; lengthMeters is the representative ecological size and modelLength supports runtime normalization."
     ]
   },
@@ -241,7 +255,8 @@
       "Broad triangular paired fins, large lateral eyes, blunt snout, terminal cladodont mouth and strongly forked tail distinguish this animal from a modern great-white shark.",
       "The anterior dorsal spine follows the 2023 comparative study. A second dorsal spine remains hypothetical and is omitted. Fin radials are covered by skin. No cord meshes or anal fin are present.",
       "Original imagegen skin swatch with mapped PBR countershading, incised gills and seated eyes;  a modern all-over placoid-scale coat is not claimed. Pigmentation, soft-tissue volume and every animation are artistic reconstruction.",
-      "Growth is a relaxed fin-extension/breathing display. Ability is a short acceleration and bank display; compatible clip labels do not define Devonian gameplay."
+      "Growth is a relaxed fin-extension/breathing display. Ability is a short acceleration and bank display; compatible clip labels do not define Devonian gameplay.",
+      "V3 candidate: fin outlines only (pectoral, pelvic, dorsal, rear, caudal) ported from an approved reference-led shape study; body, mouth, gills and materials unchanged from V2."
     ]
   },
   {
@@ -251,7 +266,7 @@
     "category": "creature",
     "modelStatus": "final",
     "provenance": "Late Devonian, upper Famennian Cleveland Shale, Ohio, USA",
-    "description": "A short-headed early chondrichthyan with opposing cranial and dorsal crown denticles, a supported spine-brush, slender metapterygial fin extensions, and an epicercal caudal axis.",
+    "description": "A deep-headed, deep-bodied early chondrichthyan with opposing cranial and dorsal crown denticles, a broad-rooted supported spine-brush, slender metapterygial fin extensions, and a strongly heterocercal caudal axis.",
     "model": "assets/devonian/creatures/stethacanthus.glb",
     "lod": "assets/devonian/creatures/stethacanthus.lod1.glb",
     "image": "assets/devonian/creatures/stethacanthus.thumb.png",
@@ -272,7 +287,8 @@
       "Devonian specimen CMNH 8988 preserves spine-brush and associated teeth. Species assignment to S. altonensis is questioned in Ginter & Sun 2007; this is not Akmonistion zangerli.",
       "Whole-animal proportions, exact brush crown width, fin-whip length, living pigmentation, soft-tissue lining and action timing are comparative artistic reconstruction, not measurements of a complete specimen.",
       "Complex-bearing male configuration is comparative; the sex of CMNH 8988 is not established here. No brush inflation or mobile denticles.",
-      "Representative 0.7m illustrative individual, not a measured fossil total length or claimed species maximum."
+      "Representative 0.7m illustrative individual, not a measured fossil total length or claimed species maximum.",
+      "V3: shape study ported onto the V2 builder for shark-like head/body/fin/tail proportions and a dorsal spine-brush in the body's own colour family (queue finding against docs/reference/Stethacanthus.jpg). Geometry only; the anatomical sourcing above is unchanged."
     ]
   },
   {
@@ -316,7 +332,8 @@
       "Small rhombic enamel windows, posterior short-based dorsal and anal fins, separate opercular covers, large terminal jaw, segmented fin rays and the scaled upper caudal axis distinguish this early ray-finned fish.",
       "Pigmentation, fin-membrane thickness, three-dimensional soft tissue, individual tooth arrangement and all motion are artistic reconstruction rather than fossil observations.",
       "Growth is a relaxed ventilation and fin-spreading gesture, without scaling or moulting. Ability is a burst-and-bank display, not a Devonian gameplay rule.",
-      "Original source and review renders are preserved in cambrian/local/devonian-authoring/cheirolepis."
+      "Original source and review renders are preserved in cambrian/local/devonian-authoring/cheirolepis.",
+      "V3 (11-12 September 2026) takes the user reference for what is form: a blunt deep snout rising steeply to a prominent squared brow, a lip ridge along the long gape, a larger more anterior eye, fin roots seated in the trunk, and swept angular fins with pointed apices; the strongly epicercal tail is kept because the sources settle it."
     ]
   },
   {
@@ -324,7 +341,7 @@
     "name": "Rhinodipterus",
     "species": "Rhinodipterus kimberleyensis",
     "category": "creature",
-    "modelStatus": "preview",
+    "modelStatus": "final",
     "provenance": "Late Devonian, Gogo Formation, Western Australia",
     "description": "Long-snouted marine lungfish with a narrow mandibular symphysis, small lateral eyes, rounded radial tooth plates, cosmine skull roof and comparative lobed fins with two posterior dorsals.",
     "model": "assets/devonian/creatures/rhinodipterus.glb",
@@ -356,7 +373,7 @@
     "name": "Onychodus",
     "species": "Onychodus jandemarrai",
     "category": "creature",
-    "modelStatus": "preview",
+    "modelStatus": "final",
     "provenance": "Late Devonian (Frasnian), Gogo Formation, Western Australia",
     "description": "Robust lobe-finned fish with paired crescent-shaped lower-jaw tusk platforms, interleaved marginal and palatal teeth, oval scales, lobed fins and a nearly symmetrical deep tail.",
     "model": "assets/devonian/creatures/onychodus.glb",
@@ -391,7 +408,7 @@
     "name": "Tiktaalik",
     "species": "Tiktaalik roseae",
     "category": "creature",
-    "modelStatus": "preview",
+    "modelStatus": "final",
     "provenance": "Late Devonian, early Frasnian Fram Formation, Ellesmere Island, Nunavut, Canada",
     "description": "Broad-headed finned tetrapodomorph with dorsal eyes, a mobile neck, rib-supported low trunk and robust jointed paired fins retaining fin-ray webs.",
     "model": "assets/devonian/creatures/tiktaalik.glb",
@@ -431,8 +448,7 @@
       "Broad flattened skull with posterior dorsal orbits, short mobile neck and no bony opercular cover; the rigid central skull is not stretched during cheek expansion.",
       "Four robust fins retain continuous lepidotrichial webs; the pectoral skeleton has shoulder, elbow and distal support zones, not tetrapod fingers. Pelvic fins are substantial but restricted hip retraction does not imply normal terrestrial walking.",
       "Rhombic narrowly overlapping scales and dermal roof texture are fossil-informed. Pigmentation, soft tissues and the low inferred caudal outline remain artistic reconstruction.",
-      "Animations represent aquatic undulation, paddling, bracing, neck aiming, gape and modest cheek expansion. Growth is a relaxed extension display, with no body scaling. Runtime labels do not define Devonian gameplay.",
-      "Initial preview release. Further review may refine soft tissue, fin-web contours, cranial surface detail and oral presentation."
+      "Animations represent aquatic undulation, paddling, bracing, neck aiming, gape and modest cheek expansion. Growth is a relaxed extension display, with no body scaling. Runtime labels do not define Devonian gameplay."
     ]
   },
   {
@@ -440,7 +456,7 @@
     "name": "Acanthostega",
     "species": "Acanthostega gunnari",
     "category": "creature",
-    "modelStatus": "preview",
+    "modelStatus": "final",
     "provenance": "Late Devonian, Famennian, East Greenland",
     "description": "Aquatic early tetrapod with a rounded spade-like head, sutured skull, eight-digit paddle limbs and a deep ray-supported swimming tail.",
     "model": "assets/devonian/creatures/acanthostega.glb",
@@ -478,7 +494,7 @@
     "name": "Eldredgeops",
     "species": "Eldredgeops rana",
     "category": "creature",
-    "modelStatus": "preview",
+    "modelStatus": "final",
     "provenance": "Middle Devonian, Givetian Hamilton Group, northeastern North America",
     "description": "Rounded, tuberculate phacopid trilobite with seventeen-file schizochroal compound eyes, eleven articulated thoracic tergites and a ribbed pygidium. Ventral biramous limbs and antennae are comparative soft-part reconstruction.",
     "model": "assets/devonian/creatures/eldredgeops.glb",
@@ -507,11 +523,44 @@
     ]
   },
   {
+    "id": "walliserops",
+    "name": "Walliserops",
+    "species": "Walliserops trifurcatus",
+    "category": "creature",
+    "modelStatus": "final",
+    "provenance": "Early Devonian, late Emsian Timrhanrhart Formation, Morocco",
+    "description": "Spiny asteropygine trilobite with an elevated rigid cephalic trident, broad keeled tines, long genal spines and articulated thoracic armour.",
+    "model": "assets/devonian/creatures/walliserops.glb",
+    "lod": "assets/devonian/creatures/walliserops.lod1.glb",
+    "image": "assets/devonian/creatures/walliserops.thumb.png",
+    "lengthMeters": 0.055,
+    "looping": [
+      "Idle",
+      "Crawl",
+      "Swim",
+      "Guard",
+      "Eat"
+    ],
+    "sources": [
+      "https://doi.org/10.1073/pnas.2119970120",
+      "https://doi.org/10.1016/j.asd.2006.08.002",
+      "https://doi.org/10.1002/spp2.1401"
+    ],
+    "notes": [
+      "Trident follows W. trifurcatus topotype UA13447 and HMNS PI1810 specimen figures, with flattened keeled tines and slight bifurcation asymmetry. It stays rigidly attached to cephalon.",
+      "Eleven thoracic tergites and five paired plus one terminal pygidial marginal processes; finer spine arrangement/proportions need specimen-overlay refinement.",
+      "Ventral appendages, oral tissues, 82 lens solids per side and living pigmentation are comparative artistic reconstruction, not measured W. trifurcatus soft anatomy.",
+      "Primary contact anchor is on the trident; actual feeding aperture and swallow anchor are under cephalon. Combat function is a hypothesis, not settled fossil behavior.",
+      "Representative 5.5cm shell length is illustrative, not species maximum; trident extends total model bounds.",
+      "Twenty compatibility actions include unscaled Growth and Moult preparation without a detached shell. Swim is limb-powered compatibility, not evidence of habitual swimming."
+    ]
+  },
+  {
     "id": "jaekelopterus",
     "name": "Jaekelopterus",
     "species": "Jaekelopterus rhenaniae",
     "category": "creature",
-    "modelStatus": "preview",
+    "modelStatus": "final",
     "provenance": "Early Devonian, Rhineland, Germany",
     "description": "Large pterygotid eurypterid with acute lateral eyes, robust toothed chelicerae, four walking-limb pairs, swimming paddles, twelve trunk rings and a triangular keeled telson.",
     "model": "assets/devonian/creatures/jaekelopterus.glb",
@@ -538,6 +587,173 @@
       "Rhenaniae claw and eye evidence is distinguished from comparative Jaekelopterus howelli postcranial material.",
       "Moult is a preparatory articulated extension without shell splitting or body scaling. Precise locomotor cycles are inferred, not fossil-observed.",
       "Full regional pigment is multiplied once by near-neutral UV albedo; LOD bakes that factor once without textures."
+    ]
+  },
+  {
+    "id": "nahecaris",
+    "name": "Nahecaris",
+    "species": "Nahecaris stuertzi",
+    "category": "creature",
+    "modelStatus": "final",
+    "provenance": "Early Devonian, Hunsrück Slate, Germany",
+    "description": "Bivalved phyllocarid with a rostral plate, branching antennae, eight pairs of biramous basket-forming thoracopods, seven abdominal rings and narrow telson/furcal rami.",
+    "model": "assets/devonian/creatures/nahecaris.glb",
+    "lod": "assets/devonian/creatures/nahecaris.lod1.glb",
+    "image": "assets/devonian/creatures/nahecaris.thumb.png",
+    "lengthMeters": 0.12,
+    "looping": [
+      "Idle",
+      "Swim",
+      "Crawl",
+      "Guard",
+      "Eat"
+    ],
+    "sources": [
+      "https://doi.org/10.1007/BF02985909",
+      "https://doi.org/10.1016/j.asd.2016.01.004",
+      "https://doi.org/10.1080/08912963.2025.2492356",
+      "https://pmc.ncbi.nlm.nih.gov/articles/PMC5378094/"
+    ],
+    "notes": [
+      "Initial preview reconstruction with explicitly uncertain ocular bases, soft tissues and exact appendage proportions.",
+      "Eight biramous thoracopod pairs with finger-like exopod lobes and progressively shorter endopods; no generic decapod claw or tail fan.",
+      "Compact eyes beneath rostral plate are reconstructed; precise eye preservation is not asserted from the accessible species abstract.",
+      "The 0.12 m representative display length is an art assumption, not a measured maximum.",
+      "Historical whole-animal drawing and comparative archaeostracan abdomen/pleopods guide missing proportions.",
+      "Crawl is a restrained antenna-supported substrate gesture; Swim is compatibility locomotion using metachronal limbs. Precise cycles are inferred.",
+      "Moult is preparatory limb/rim extension, without shell splitting, scale channels or whole-model growth.",
+      "Full regional vertex pigment times near-neutral albedo once; texture-free LOD bakes that factor once."
+    ]
+  },
+  {
+    "id": "furcaster",
+    "name": "Furcaster",
+    "species": "Furcaster palaeozoicus",
+    "category": "creature",
+    "modelStatus": "final",
+    "provenance": "Early Devonian, lower Emsian Hunsrück Slate, Germany",
+    "description": "Five long articulated arms surround a small granular disc. Opposing paired ambulacrals and curved lateral arm ossicles inform arm-powered motion, with delicate lateral and groove spines and a modeled oral underside.",
+    "model": "assets/devonian/creatures/furcaster.glb",
+    "lod": "assets/devonian/creatures/furcaster.lod1.glb",
+    "image": "assets/devonian/creatures/furcaster.thumb.png",
+    "lengthMeters": 0.12,
+    "looping": [
+      "Idle",
+      "Crawl",
+      "Swim",
+      "Guard",
+      "Eat"
+    ],
+    "sources": [
+      "https://doi.org/10.1098/rsos.201380",
+      "https://doi.org/10.1017/jpa.2025.10096"
+    ],
+    "notes": [
+      "Primary fossil arm reference OKL96, Clark et al.2020 Fig3c. Five chains with36 articulated sections each are an authored reconstruction rather than a measured segment count.",
+      "No vertebrate jaw or trilobite moulting action. Five radial mouth-angle structures and a soft oral pump participate in feeding.",
+      "Swim is a compatibility arm-sculling interpretation, not a claim of habitual swimming. Growth is unscaled.",
+      "Representative12cm overall span is illustrative, not a species maximum; modelLength measures +Z bound of initial arm spread.",
+      "Pigmentation is artistic; source and imagegen provenance preserved."
+    ]
+  },
+  {
+    "id": "palaeoisopus",
+    "name": "Palaeoisopus",
+    "species": "Palaeoisopus problematicus",
+    "category": "creature",
+    "modelStatus": "final",
+    "provenance": "Early Devonian, Early Emsian, Hunsrück Slate, Germany",
+    "description": "Robust fossil sea spider with a long segmented abdomen, massive grasping chelifores and eight flattened swimming limbs.",
+    "model": "assets/devonian/creatures/palaeoisopus.glb",
+    "lod": "assets/devonian/creatures/palaeoisopus.lod1.glb",
+    "image": "assets/devonian/creatures/palaeoisopus.thumb.png",
+    "lengthMeters": 0.3,
+    "looping": [
+      "Idle",
+      "Swim",
+      "Guard",
+      "Eat"
+    ],
+    "sources": [
+      {
+        "title": "Sabroux et al.2024, New insights into the Devonian sea spiders of the Hunsrück Slate",
+        "url": "https://doi.org/10.7717/peerj.17766"
+      }
+    ],
+    "notes": [
+      "Original initial preview based on Sabroux et al.2024; representative adult leg span0.30m, not a maximum-size claim.",
+      "Four walking-leg pairs have flattened distal articles, first pair nine podomeres and remaining pairs ten with metatibia; proximal coxal rings are ornamental divisions within coxa1.",
+      "Long articulated abdomen terminates in a lanceolate fifth element/telson complex; homology of the fifth abdominal element remains debated.",
+      "Chelifores follow the favored two-scape interpretation; oviger segmentation remains incompletely preserved.",
+      "Proboscis is a broad ventral tube shown posteriorly folded at rest, plausibly mobile; action names represent grasping/probing equivalents and do not imply fish-like biting jaws.",
+      "Prominent ocular-region bumps are modeled as cuticular/sensory tubercles, not asserted eye globes. Eye positions are unresolved in the fossil; no differentiated external eyes are invented.",
+      "Pigmentation, exact soft oral margins, appendage thickness, setal density and motion amplitudes are inferred.",
+      "Preview: finer cuticle, joint and animation refinement deferred until the initial roster is complete."
+    ]
+  },
+  {
+    "id": "manticoceras",
+    "name": "Manticoceras",
+    "species": "Manticoceras regulare",
+    "category": "creature",
+    "modelStatus": "final",
+    "provenance": "Late Devonian, Frasnian; Lime Creek Formation / Amana Beds, Iowa",
+    "description": "Compressed coiled ammonoid shell with embracing whorls, a genuine open body chamber and an editable conservative soft-body reconstruction.",
+    "model": "assets/devonian/creatures/manticoceras.glb",
+    "lod": "assets/devonian/creatures/manticoceras.lod1.glb",
+    "image": "assets/devonian/creatures/manticoceras.thumb.png",
+    "lengthMeters": 0.16,
+    "looping": [
+      "Idle",
+      "Swim",
+      "Guard",
+      "Eat"
+    ],
+    "sources": [
+      "https://scholarworks.uni.edu/pias/vol93/iss1/4/",
+      "https://igs.iihr.uiowa.edu/igs/publications/uploads/GB-29.pdf",
+      "https://www.app.pan.pl/archive/published/app49/app49-235.pdf",
+      "https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0235180"
+    ],
+    "notes": [
+      "Initial preview; shell is anatomically constrained but exact soft parts and all living pigmentation are uncertain.",
+      "Representative shell diameter 0.11 m follows the Baker et al.1986 material; total living length 0.16 m includes artistically reconstructed soft parts and is not a species maximum. Larger M.regulare shells occur in the 2013 Iowa Survey figures.",
+      "Ten modest arms, small beak and funnel are conservative comparative choices, not directly preserved M.regulare soft anatomy. No hooks, suckers, long squid clubs or Nautilus arm count are asserted.",
+      "Smooth biconvex growth increments replace decorative fossil sutures; the visible fossil septal boundaries are internal structures.",
+      "Shell is rigid on body bone; flexible arms, mantle margins and open funnel interpret jetting and feeding actions. No scale channels or shell deformation.",
+      "Growth is relaxed extension, not a shell moult. Grab is a conservative arm-gathering interpretation.",
+      "Full regional vertex pigment multiplies near-neutral albedo once; texture-free LOD bakes the same factor once."
+    ]
+  },
+  {
+    "id": "michelinoceras",
+    "name": "Michelinoceras",
+    "species": "Michelinoceras currens",
+    "category": "creature",
+    "modelStatus": "final",
+    "provenance": "Lower Devonian, southwestern Sardinia; shell reference Modena19380, Gnoli1982 Plate2Fig1",
+    "description": "Smooth narrow orthoconic shell with simple chambered interior, subcentral siphuncle and an editable conservative cephalopod soft body. Ten tapering arms surround a modeled oral recess; a lined ventral funnel and recessed eyes fit inside the shell aperture.",
+    "model": "assets/devonian/creatures/michelinoceras.glb",
+    "lod": "assets/devonian/creatures/michelinoceras.lod1.glb",
+    "image": "assets/devonian/creatures/michelinoceras.thumb.png",
+    "lengthMeters": 0.5,
+    "looping": [
+      "Idle",
+      "Swim",
+      "Guard"
+    ],
+    "sources": [
+      "https://www.paleoitalia.it/wp-content/uploads/2023/06/05_Gnoli.pdf",
+      "https://www.app.pan.pl/archive/published/app50/app50-329.pdf",
+      "https://pmc.ncbi.nlm.nih.gov/articles/PMC8288114/"
+    ],
+    "notes": [
+      "Vetted M.currens shell reference: circular section, near7degree expansion, smooth exterior. Internal septa remain inside intact conch.",
+      "Model .5m representative is a project working value; the best described fragment is28mm, not a complete animal.",
+      "Rigid shell weighted entirely to body; separate head retraction, ten arm chains, two corneous jaw bones and funnel motion.",
+      "Forward-aligned bind pose meets runtime convention and does not claim horizontal living trim. Ability/Dodge interpret shell-stable jet escape; Growth does not scale shell.",
+      "No squid fins, sucker discs, differentiated long capture clubs or invented closure operculum.",
+      "Motion-v3 retains original ten-arm anatomy and every other full action. Distinct sectional anticipation, whip, contact and recovery; Eat is consumption-progress driven. Comparative soft-part movement is uncertain."
     ]
   },
   {

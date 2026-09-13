@@ -1,0 +1,44 @@
+[
+  {
+    "code": "L01",
+    "id": "clear-marine",
+    "subject": "titanichthys",
+    "title": "Clear marine water",
+    "regional": "E04",
+    "details": "Cool blue-green light in clear water; restrained warm pale top light, broad cool fill, soft contrast on the underside, gradual blue distance haze.",
+    "prompt": "Use case: game art lighting and colour concept study. Make one polished horizontal landscape two-panel board titled exactly \"L01 \u00b7 Clear marine water\". The provided image is our actual 3D titanichthys specimen, the second is an environment art direction board. Preserve the specimen's exact anatomy, proportions, fin arrangement, mouth, eye placement, surface shapes and pose; do not redesign the creature. LEFT panel, labelled \"Neutral specimen light\", shows the supplied specimen against a soft neutral dark grey studio background with unbiased soft white lighting and faithful source material colour. RIGHT panel, labelled \"Atmospheric study\", shows the SAME specimen at the same size and pose, under this light treatment: Cool blue-green light in clear water; restrained warm pale top light, broad cool fill, soft contrast on the underside, gradual blue distance haze. Use only subtle substrate and distant water hints from the environment reference, with lots of space around the specimen. No other creatures. Bottom strip has five restrained colour swatches sampled from the lighting treatment and the small clear note \"Lighting concept only \u00b7 not a locality or co-occurrence claim\". Elegant small text, fine dark gutters, no logos or game UI. Fine naturalistic material rendering, legible silhouettes, never opaque fog across the entire subject. This is a first-pass visual lighting study, not an actual render validation.",
+    "referencedImages": [
+      "/Users/hoai/Documents/Stuff/Generations/cambrian/local/expansion-repo/public/assets/devonian/creatures/titanichthys.select.png",
+      "/Users/hoai/.codex/generated_images/01a0775c-6a4b-74a3-a675-e5223d0a9359/exec-6643eb55-22c1-4c90-bdf1-26e2db97363a.png"
+    ],
+    "generatedSource": "/Users/hoai/.codex/generated_images/01a0775c-6a4b-74a3-a675-e5223d0a9359/exec-5779b3e3-90f1-4dc0-97ff-6b66c8c8bf88.png"
+  },
+  {
+    "code": "L02",
+    "id": "suspended-sediment",
+    "subject": "coccosteus",
+    "title": "Suspended-sediment water",
+    "regional": "E03",
+    "details": "Grey-olive diffuse light in silty lake or marine water, shorter visibility, very soft illumination, reduced contrast and subtle scattered warm particles. This is optical treatment, not a claim about salinity.",
+    "prompt": "Use case: game art lighting and colour concept study. Make one polished horizontal landscape two-panel board titled exactly \"L02 \u00b7 Suspended-sediment water\". The provided image is our actual 3D coccosteus specimen, the second is an environment art direction board. Preserve the specimen's exact anatomy, proportions, fin arrangement, mouth, eye placement, surface shapes and pose; do not redesign the creature. LEFT panel, labelled \"Neutral specimen light\", shows the supplied specimen against a soft neutral dark grey studio background with unbiased soft white lighting and faithful source material colour. RIGHT panel, labelled \"Atmospheric study\", shows the SAME specimen at the same size and pose, under this light treatment: Grey-olive diffuse light in silty lake or marine water, shorter visibility, very soft illumination, reduced contrast and subtle scattered warm particles. This is optical treatment, not a claim about salinity. Use only subtle substrate and distant water hints from the environment reference, with lots of space around the specimen. No other creatures. Bottom strip has five restrained colour swatches sampled from the lighting treatment and the small clear note \"Lighting concept only \u00b7 not a locality or co-occurrence claim\". Elegant small text, fine dark gutters, no logos or game UI. Fine naturalistic material rendering, legible silhouettes, never opaque fog across the entire subject. This is a first-pass visual lighting study, not an actual render validation.",
+    "referencedImages": [
+      "/Users/hoai/Documents/Stuff/Generations/cambrian/local/expansion-repo/public/assets/devonian/creatures/coccosteus.select.png",
+      "/Users/hoai/.codex/generated_images/01a0775c-6a4b-74a3-a675-e5223d0a9359/exec-07f232e4-21a1-488d-acbd-19a506ff6dd2.png"
+    ],
+    "generatedSource": "/Users/hoai/.codex/generated_images/01a0775c-6a4b-74a3-a675-e5223d0a9359/exec-a6889231-3543-4a81-a5b4-93f4f8a9847b.png"
+  },
+  {
+    "code": "L03",
+    "id": "shallow-wooded",
+    "subject": "tiktaalik",
+    "title": "Shallow wooded waterway",
+    "regional": "E05",
+    "details": "Warm tan-olive shallow water near wood, subdued green-brown fill, broken pale surface light, soft wooded-bank occlusion, moderate sediment haze. No underwater forest or modern plants.",
+    "prompt": "Use case: game art lighting and colour concept study. Make one polished horizontal landscape two-panel board titled exactly \"L03 \u00b7 Shallow wooded waterway\". The provided image is our actual 3D tiktaalik specimen, the second is an environment art direction board. Preserve the specimen's exact anatomy, proportions, fin arrangement, mouth, eye placement, surface shapes and pose; do not redesign the creature. LEFT panel, labelled \"Neutral specimen light\", shows the supplied specimen against a soft neutral dark grey studio background with unbiased soft white lighting and faithful source material colour. RIGHT panel, labelled \"Atmospheric study\", shows the SAME specimen at the same size and pose, under this light treatment: Warm tan-olive shallow water near wood, subdued green-brown fill, broken pale surface light, soft wooded-bank occlusion, moderate sediment haze. No underwater forest or modern plants. Use only subtle substrate and distant water hints from the environment reference, with lots of space around the specimen. No other creatures. Bottom strip has five restrained colour swatches sampled from the lighting treatment and the small clear note \"Lighting concept only \u00b7 not a locality or co-occurrence claim\". Elegant small text, fine dark gutters, no logos or game UI. Fine naturalistic material rendering, legible silhouettes, never opaque fog across the entire subject. This is a first-pass visual lighting study, not an actual render validation.",
+    "referencedImages": [
+      "/Users/hoai/Documents/Stuff/Generations/cambrian/local/expansion-repo/public/assets/devonian/creatures/tiktaalik.select.png",
+      "/Users/hoai/.codex/generated_images/01a0775c-6a4b-74a3-a675-e5223d0a9359/exec-009b4092-44dd-43b4-b889-c255eab0cb31.png"
+    ],
+    "generatedSource": "/Users/hoai/.codex/generated_images/01a0775c-6a4b-74a3-a675-e5223d0a9359/exec-a90cfc16-e7b1-4faf-9821-7783f4828c95.png"
+  }
+]

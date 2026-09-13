@@ -1,7 +1,13 @@
-"""Read-only raw GLB material/skin/action validation for the authored Tiktaalik exports."""
-import json,struct,hashlib,math
+"""Read-only raw GLB material/skin/action validation for the authored Tiktaalik exports.
+
+TIKTAALIK_CHECK_SUFFIX (default v2) selects the candidate directory (<suffix>-candidate) and the
+report filename (export-review-<suffix>.json), so a v3 candidate can be checked without touching
+the v2 candidate or its report.
+"""
+import json,os,struct,hashlib,math
 from pathlib import Path
-here=Path(__file__).resolve().parent;root=here.parents[3];out=root.parent/'devonian-authoring/tiktaalik/v2-candidate';reports=[]
+SUFFIX=os.environ.get('TIKTAALIK_CHECK_SUFFIX','v2')
+here=Path(__file__).resolve().parent;root=here.parents[3];out=root.parent/('devonian-authoring/tiktaalik/'+SUFFIX+'-candidate');reports=[]
 for suffix in ['', '.lod1']:
  path=out/('tiktaalik'+suffix+'.glb');raw=path.read_bytes();n=struct.unpack_from('<I',raw,12)[0];g=json.loads(raw[20:20+n]);blob=raw[28+n:]
  def data(ai):
@@ -25,4 +31,4 @@ for suffix in ['', '.lod1']:
  assert len(signatures)==len(set(signatures))
  reports.append({'file':str(path),'sha256':hashlib.sha256(raw).hexdigest(),'bytes':len(raw),'clips':names,'distinctMotions':len(signatures),'materials':primitiveReports,'rootStable':True,'scaleChannels':False})
 assert len(reports[0]['clips'])==18;assert set(reports[1]['clips'])=={'Idle','Swim','Death'}
-(here/'export-review-v2.json').write_text(json.dumps({'id':'tiktaalik','fullColorPolicy':'White COLOR_0 multiplied by UV albedo; no duplicate pigment darkening.','lodColorPolicy':'Texture-free, atlas-sampled linear vertex pigment.','exports':reports},indent=2));print('PASS',[(r['file'],r['bytes'],r['distinctMotions'])for r in reports])
+(here/('export-review-'+SUFFIX+'.json')).write_text(json.dumps({'id':'tiktaalik','fullColorPolicy':'White COLOR_0 multiplied by UV albedo; no duplicate pigment darkening.','lodColorPolicy':'Texture-free, atlas-sampled linear vertex pigment.','exports':reports},indent=2));print('PASS',[(r['file'],r['bytes'],r['distinctMotions'])for r in reports])

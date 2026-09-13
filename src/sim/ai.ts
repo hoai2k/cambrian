@@ -1,10 +1,12 @@
 import { add, clamp, dist, distXZ, dot, heading, len3, norm, scale as vscale, sub, TAU, v3, type Rng, type Vec3 } from '../shared/math';
 import { bandOf, isAlive, isHidden, lengthOf } from './actors';
 import { RULES } from './era-rules';
+import { columnY, DIP_CHANCE, keepClear } from './locomotion';
 import { creature } from './creatures';
 import type { Actor, BrainState, InputFrame, WorldEvent } from './types';
 import { emptyInput } from './types';
-import { biomeAt, LIGHT_WINDOW_Y, nurseryFactor, sampleHeight, shoreDistance, SURFACE_Y, type Cover, type WorldData } from './world';
+import { biomeAt, dangerAt, LIGHT_WINDOW_Y, microbialAt, nurseryFactor, sampleHeight, shoreDistance, SURFACE_Y, type Cover, type WorldData } from './world';
+import { appetiteAt, huntInterval } from './daynight';
 
 export interface AiWorld {
   actors: Actor[];
@@ -22,11 +24,20 @@ export function makeBrain(kind: BrainState['kind'], home: Vec3, rng: Rng, opts: 
   return {
     kind, goal: kind === 'giant' ? 'patrol' : 'wander', target: -1, goalT: 0, thinkT: rng() * 0.3,
     wanderTo: { ...home }, home: { ...home }, patrolIndex: 0, detection: new Map(), hunger: 3, lastEats: 0, parrySkill: 0.3, courage: 1,
-    aggression: rng(), reaction: 0.15 + rng() * 0.25, reactT: 0, ...opts,
+    aggression: rng(), temper: 0, appetite: rng(), territoryR: 0, reaction: 0.15 + rng() * 0.25, reactT: 0, ...opts,
   };
 }
 
 const scratchDir = v3();
+
+/**
+ * How far past the edge of its patch an animal will take an argument, as a multiple of the patch
+ * radius. A little, so an intruder hovering on the line does not make it flicker between charging
+ * and turning back — and no further, whatever it has left in the tank.
+ */
+const TERRITORY_LEASH = 1.15;
+/** The goals that chase something. Fleeing and feeding are not leashed to the patch. */
+const PURSUITS = new Set<BrainState['goal']>(['defend', 'fight', 'hunt']);
 
 function steerToward(a: Actor, target: Vec3, out: InputFrame, speedWanted = 1) {
   const d = sub(target, a.pos);
@@ -46,9 +57,20 @@ function pickWander(a: Actor, b: BrainState, rng: Rng, radius: number) {
   const shore = shoreDistance(x, z);
   if (shore < 28) z -= 28 - shore;
   const ground = sampleHeight(x, z);
-  const y = RULES ? RULES.wanderY(a, ground, rng) : creature(a.creature).ground ? ground : clamp(ground + 1.5 + rng() * (a.scale > 2 ? 12 : 6) * lengthOf(a) * 0.5, ground + 1, SURFACE_Y - 2);
+  const L = lengthOf(a);
+  const y = RULES ? RULES.wanderY(a, ground, rng)
+    : creature(a.creature).ground ? ground
+    : columnY(ground, SURFACE_Y, L, rng, L > 2.5 && rng() < DIP_CHANCE);
   b.wanderTo = { x, y, z };
 }
+
+/**
+ * The nurseries keep the young alive by keeping the peace, not by keeping the animals small. An
+ * animal standing in one starts nothing there and nothing there is hunted — whatever size either
+ * of them is — but a nursery is not a spell: anything that gets bitten still answers, because
+ * nothing in the sea does otherwise.
+ */
+export const peaceful = (p: Vec3) => nurseryFactor(p.x, p.z) > 0.35;
 
 /** Detection score update for hunters (giants, predators). 10 Hz. */
 export function updateDetection(g: AiWorld, hunter: Actor, b: BrainState, dt: number) {
@@ -73,7 +95,7 @@ export function updateDetection(g: AiWorld, hunter: Actor, b: BrainState, dt: nu
     const speed = len3(t.vel);
     const motion = t.state === 'attack' ? 1.5 : speed > 0.3 ? (t.burstT > 0 || t.noise > 2 ? 2.5 : 1) : 0.5;
     const camo = t.hideMode === 'camouflage' ? 1 - t.camoStrength * (speed < .4 ? .88 : .70) : 1;
-    const coverF = camo * (isHidden(t) ? 0.03 : 1 - t.cover * 0.95) * (L > 1.2 && nurseryFactor(t.pos.x, t.pos.z) > 0.35 ? 0.12 : 1);
+    const coverF = camo * (isHidden(t) ? 0.03 : 1 - t.cover * 0.95) * (peaceful(t.pos) ? 0.12 : 1);
     const distF = clamp(1.6 - d / range, 0.2, 1.6);
     // Only clear signals grow the score: a still or covered target decays out of attention.
     const rate = sight * sizeF * motion * coverF * distF * 1.1 - 0.35;
@@ -120,6 +142,17 @@ export function thinkSwarm(g: AiWorld, a: Actor, b: BrainState, dt: number): Inp
       }
     }
   }
+  // Something has just bitten it. A school does not fight back, but it does not carry on schooling
+  // either: whatever the size of the thing, being bitten scatters the fish away from it at once.
+  // The alarm above only sees bodies nearly twice their length, so a predator their own size — a
+  // hatchling player, most often — could eat through a school without any of it reacting.
+  const biter = a.sinceHit < 1.5 && a.lastHitBy >= 0 ? g.byId(a.lastHitBy) : undefined;
+  if (biter && isAlive(biter)) {
+    const d = Math.max(dist(a.pos, biter.pos), 1e-3);
+    const k = 6 / d;
+    flee.x += (a.pos.x - biter.pos.x) * k; flee.y += (a.pos.y - biter.pos.y) * k * 0.5; flee.z += (a.pos.z - biter.pos.z) * k;
+    threat = 1;
+  }
   const move = v3();
   if (n > 0) {
     cohesion.x = cohesion.x / n - a.pos.x; cohesion.y = cohesion.y / n - a.pos.y; cohesion.z = cohesion.z / n - a.pos.z;
@@ -145,12 +178,29 @@ export function thinkSwarm(g: AiWorld, a: Actor, b: BrainState, dt: number): Inp
   return out;
 }
 
+/** Whether there is a microbial mat worth grazing under this animal or a short crawl away. */
+function matsNear(a: Actor): boolean {
+  if (microbialAt(a.pos.x, a.pos.z) > .15) return true;
+  const step = 26;
+  for (let k = 0; k < 4; k++) {
+    const ang = (k / 4) * TAU;
+    if (microbialAt(a.pos.x + Math.cos(ang) * step, a.pos.z + Math.sin(ang) * step) > .25) return true;
+  }
+  return false;
+}
+
 export function thinkNeeds(g: AiWorld, a: Actor, b: BrainState, dt: number): InputFrame {
   const out = emptyInput();
   const def = creature(a.creature);
   const L = lengthOf(a);
   b.goalT += dt; b.thinkT -= dt; b.reactT -= dt; b.hunger += dt;
-  if (a.eats !== b.lastEats) { b.lastEats = a.eats; b.hunger = a.controller === 'bot' ? 2 : 0; }
+  /**
+   * A brain standing in for a player — a versus bot, or the balance harness driving a creature
+   * through a match — is a competitor in a game, not an animal in an ecosystem. The hour governs
+   * what the wildlife does; it must not decide how hard a rival plays.
+   */
+  const competitor = a.controller === 'bot' || a.controller === 'player';
+  if (a.eats !== b.lastEats) { b.lastEats = a.eats; b.hunger = competitor ? 2 : 0; }
 
   if (b.thinkT <= 0) {
     b.thinkT = 0.25 + g.rng() * 0.15;
@@ -158,35 +208,136 @@ export function thinkNeeds(g: AiWorld, a: Actor, b: BrainState, dt: number): Inp
     let worst: Actor | undefined, worstD = Infinity;
     let prey: Actor | undefined, preyD = Infinity;
     let rival: Actor | undefined, rivalD = Infinity;
+    let intruder: Actor | undefined;
+    /** The nearest body worth eating: scavengers live on these, opportunists take them when offered. */
+    let carrion: Actor | undefined, carrionD = Infinity;
     const senseR = Math.min(def.sense * L + 6, 40);
-    for (const o of g.nearby(a.pos, senseR)) {
-      if (o.id === a.id || !isAlive(o) || isHidden(o)) continue;
+    // How dangerous the water this animal is standing in is, for the appetite below. Read once a
+    // think rather than per candidate: it is a noise field, and it does not change over an animal's
+    // own length.
+    const here = dangerAt(a.pos.x, a.pos.z);
+    // An animal that holds ground knows its own ground: it notices an intruder anywhere in the
+    // patch, not only within the range it can see prey at. Everything else still works off
+    // `senseR`, so widening the sweep does not make it hunt or pick fights from further away.
+    const scanR = Math.max(senseR, b.territoryR > 0 ? b.territoryR + L : 0);
+    for (const o of g.nearby(a.pos, scanR)) {
+      if (o.id === a.id) continue;
+      // Bodies are looked for before the living are, and are the one thing here that is *not*
+      // skipped for being dead. A carcass is worth crossing more ground for than a live meal is
+      // worth chasing, so it is seen from further out than anything else.
+      if (o.state === 'dead') {
+        if (o.eaten < 1 && (def.diet === 'scavenger' || !def.diet)) {
+          const dd = dist(a.pos, o.pos);
+          if (dd < senseR * 1.6 && dd < carrionD && lengthOf(o) > L * 0.2) { carrion = o; carrionD = dd; }
+        }
+        continue;
+      }
+      if (!isAlive(o) || isHidden(o)) continue;
       const d = dist(a.pos, o.pos);
       const band = bandOf(a, o);
+      if (d > senseR) {
+        // Out of sight: only its own territory is still its business.
+        if (b.territory && b.territoryR > 0 && !intruder && distXZ(o.pos, b.territory) < b.territoryR
+          && (o.controller === 'player' || o.controller === 'bot' || o.controller === 'ambient')
+          && lengthOf(o) > L * 0.5 && band !== 'giant' && band !== 'threat') intruder = o;
+        continue;
+      }
       if (band === 'giant' || band === 'threat') {
         const hunting = o.brain ? (o.brain.detection.get(a.id) ?? 0) > 1 || o.brain.target === a.id : o.controller === 'player' || o.controller === 'bot';
         const r = band === 'giant' ? senseR : senseR * 0.6;
         if (d < r && (hunting || d < r * 0.5) && d < worstD) { worst = o; worstD = d; }
       } else if (band === 'snack' || band === 'prey') {
-        if (o.controller === 'swarm' && d > senseR * 0.8) continue;
-        if (RULES?.sanctuary(a, o) && a.lastHitBy !== o.id) continue;            // the young in a nursery are left alone
-        if (d < preyD) { prey = o; preyD = d; }
+        // The young in a nursery are left alone, and so is anything else standing in one. These
+        // only bar it from being *food*: holding ground against it is further down, because an
+        // animal that will not eat you may still be moved off the patch you are sitting on.
+        const spared = (RULES?.sanctuary(a, o) || peaceful(o.pos)) && a.lastHitBy !== o.id;
+        const tooFar = o.controller === 'swarm' && d > senseR * 0.8;
+        if (!spared && !tooFar && d < preyD) { prey = o; preyD = d; }
       } else if (band === 'rival') {
         const provoked = o.lockTarget === a.id || (o.state === 'attack' && d < L * 2) || (o.brain?.target === a.id) || a.hitFlash > 0 || a.lastHitBy === o.id;
-        if (!provoked && RULES?.sanctuary(a, o)) continue;
-        const wants = a.controller === 'bot' ? (o.controller === 'player' || o.controller === 'bot') : (b.aggression > 0.55 && d < senseR * 0.5) || provoked;
-        if (wants && d < rivalD) { rival = o; rivalD = d; }
+        const peace = !provoked && (RULES?.sanctuary(a, o) || peaceful(o.pos) || peaceful(a.pos));
+        // A grumpy animal has a personal space and does not like it crossed: anything its own size
+        // that comes inside it gets seen off, hungry or not, dawn or noon.
+        const crowded = b.temper > 0 && d < L * (1.1 + b.temper * 1.3);
+        // Picking a fight for no reason is a twilight thing too. An animal squaring up to a
+        // neighbour at midday, unprovoked and not hungry, is exactly the restlessness that made
+        // the old reef tiring, so the odds of it scale with the hour like everything else.
+        const spoiling = b.aggression > 0.7 && d < senseR * 0.35 && g.rng() < 0.3 * appetiteAt(g.time, here);
+        const wants = competitor ? (o.controller === 'player' || o.controller === 'bot') : crowded || provoked || spoiling;
+        if (wants && !peace && d < rivalD) { rival = o; rivalD = d; }
+      }
+      // Anything of consequence standing in the patch this animal holds, whatever size it is.
+      if (b.territory && b.territoryR > 0 && !intruder) {
+        const inside = distXZ(o.pos, b.territory) < b.territoryR;
+        const worthChasing = (o.controller === 'player' || o.controller === 'bot' || o.controller === 'ambient') && lengthOf(o) > L * 0.5;
+        if (inside && worthChasing && band !== 'giant' && band !== 'threat') intruder = o;
       }
     }
-    const hungry = b.hunger > 4 || a.hp < a.hpMax * 0.9 || a.controller === 'bot';
+    // How long this animal will go after a meal before it looks for another. Short through the
+    // twilight, when the whole reef is hunting at once; long through the middle of the day, when
+    // a fed animal simply gets on with its life — and shorter or longer again for the water it is
+    // in, so the channel and the basin are hungry places and a flat of sunlit sand is not. Bots
+    // are competitors in a versus match rather than wildlife, so they are always hungry.
+    const hungry = competitor || b.hunger > huntInterval(g.time, here) * (0.7 + b.appetite * 0.6) || a.hp < a.hpMax * 0.45;
+    const predatory = !def.diet || (competitor && def.diet !== 'filter');
     const attacker = a.lastHitBy >= 0 ? g.byId(a.lastHitBy) : undefined;
-    const routed = b.courage <= 0 && attacker && isAlive(attacker);
-    if (routed && a.controller !== 'bot') { if (b.goal !== 'flee') b.goalT = 0; b.goal = 'flee'; b.target = attacker.id; }
+    // Whatever else it was doing, something that just bit it has its attention — whatever size it
+    // is, and however badly hurt the animal already is. Fight or flight, always one of the two:
+    // there is nothing in the sea that carries on grazing while something eats it. This is the one
+    // rule the hour never softens.
+    const struck = !!attacker && isAlive(attacker) && a.sinceHit < 4;
+    // Which of the two it picks. Anything much bigger is run from, and so is anything at all once
+    // the animal has been beaten down or has no fight left in it.
+    const outmatched = struck && (bandOf(a, attacker!) === 'giant' || a.hp <= a.hpMax * 0.3 || b.courage <= 0);
+    // Running away is only an answer if it works. An animal that has been swimming from something
+    // for a couple of seconds and is *still* being bitten by it has not got away, and nothing in
+    // the sea keeps holding its line while something chews on it: it turns and fights, whatever
+    // the thing is. Without this a routed animal swims in a straight line and takes the whole
+    // beating without once answering, which is the one thing a real animal never does.
+    const cornered = struck && b.goal === 'flee' && b.target === attacker!.id && b.goalT > 2
+      && dist(a.pos, attacker!.pos) < L * 1.6 + lengthOf(attacker!) * 0.6;
+    if (cornered) { if (b.goal !== 'fight' || b.target !== attacker!.id) b.goalT = 0; b.goal = 'fight'; b.target = attacker!.id; }
+    else if (outmatched && a.controller !== 'bot') { if (b.goal !== 'flee' || b.target !== attacker!.id) b.goalT = 0; b.goal = 'flee'; b.target = attacker!.id; }
+    else if (struck) { if (b.goal !== 'fight' || b.target !== attacker!.id) b.goalT = 0; b.goal = 'fight'; b.target = attacker!.id; }
     else if (worst) { if (b.goal !== 'flee') b.goalT = 0; b.goal = 'flee'; b.target = worst.id; }
+    // Its own ground comes before a squabble with a neighbour and before feeding. Without this an
+    // animal would wander off its patch to bicker and leave the intruder standing in it.
+    else if (intruder) { if (b.goal !== 'defend' || b.target !== intruder.id) b.goalT = 0; b.goal = 'defend'; b.target = intruder.id; }
     else if (rival && (a.hp > a.hpMax * 0.35 || a.controller === 'bot')) { if (b.goal !== 'fight') b.goalT = 0; b.goal = 'fight'; b.target = rival.id; }
-    else if (prey && hungry && !def.diet) { if (b.goal !== 'hunt') b.goalT = 0; b.goal = 'hunt'; b.target = prey.id; }
-    else if ((def.diet || def.id === 'wiwaxia') && (def.diet === 'filter' || biomeAt(a.pos.x, a.pos.z) === 'flats') && g.rng() < .8) { b.goal = 'graze'; b.target = -1; }
-    else if (b.goal !== 'wander' || distXZ(a.pos, b.wanderTo) < 3 || b.goalT > 14) { b.goal = 'wander'; b.target = -1; b.goalT = 0; pickWander(a, b, g.rng, a.controller === 'bot' ? 60 : 32); }
+    // A scavenger goes to the dead rather than making its own. It looks whenever it is hungry,
+    // and falls through to wandering when there is nothing to find, which is most of the time.
+    else if (def.diet === 'scavenger' && hungry && carrion) { if (b.goal !== 'scavenge') b.goalT = 0; b.goal = 'scavenge'; b.target = carrion.id; }
+    // Everything without a diet of its own hunts, and so does anything standing in for a player:
+    // a bot picking Wiwaxia still has to compete, and a human in that shell can always bite. Only
+    // suspension feeders are left out — their whole living is the bloom, and chasing loses it.
+    // Opportunists take a free meal first: a body on the floor is a better proposition than a
+    // chase, and a trilobite is in no position to be proud.
+    else if (carrion && predatory && hungry && g.rng() < 0.7) { if (b.goal !== 'scavenge') b.goalT = 0; b.goal = 'scavenge'; b.target = carrion.id; }
+    else if (prey && hungry && predatory) { if (b.goal !== 'hunt') b.goalT = 0; b.goal = 'hunt'; b.target = prey.id; }
+    // Mat feeders used to be allowed to graze only inside the Microbial Flats, which is a fraction
+    // of the ground that actually has mats on it — so a grazer that spawned anywhere else simply
+    // never ate. They now graze wherever the mats are, and go looking when they are not underfoot.
+    else if (def.diet && def.diet !== 'scavenger' && (def.diet === 'filter' || matsNear(a)) && g.rng() < .8) { b.goal = 'graze'; b.target = -1; }
+    else if (b.goal !== 'wander' || distXZ(a.pos, b.wanderTo) < 3 || b.goalT > 14) {
+      b.goal = 'wander'; b.target = -1; b.goalT = 0;
+      // An animal with a patch wanders inside it; everything else roams.
+      if (b.territory && b.territoryR > 0) {
+        const ang = g.rng() * TAU, r = Math.sqrt(g.rng()) * b.territoryR * 0.75;
+        b.wanderTo = { x: b.territory.x + Math.cos(ang) * r, y: a.pos.y, z: b.territory.z + Math.sin(ang) * r };
+      } else pickWander(a, b, g.rng, a.controller === 'bot' ? 60 : 32);
+    }
+  }
+
+  // Holding ground is a leash on every pursuit, not only on driving an intruder out. An animal
+  // with a patch goes a little past its edge and no further: once the argument leaves the patch it
+  // turns for home whatever its stamina, because an animal that chased across the reef would not
+  // be holding anything. Fleeing is never leashed — running off your own ground is the point.
+  if (b.territory && b.territoryR > 0 && PURSUITS.has(b.goal)) {
+    const leash = b.territoryR * TERRITORY_LEASH;
+    const quarry = b.target >= 0 ? g.byId(b.target) : undefined;
+    if (!quarry || !isAlive(quarry) || distXZ(quarry.pos, b.territory) > leash) {
+      b.goal = 'wander'; b.target = -1; b.goalT = 0; b.wanderTo = { ...b.territory };
+    }
   }
 
   const t = b.target >= 0 ? g.byId(b.target) : undefined;
@@ -200,7 +351,9 @@ export function thinkNeeds(g: AiWorld, a: Actor, b: BrainState, dt: number): Inp
       if (cover && dot(norm(sub(cover.pos, a.pos)), away) > -0.3) {
         const tc = norm(sub(cover.pos, a.pos));
         dir = norm({ x: away.x + tc.x * 1.4, y: away.y * 0.4 + tc.y, z: away.z + tc.z * 1.4 });
-        if (dist(a.pos, cover.pos) < cover.radius * 0.5) { out.worldMove = v3(); out.burst = 0; return out; } // hide, hold still
+        // Hide and hold still — but only while hiding is still worth anything. Sitting motionless
+        // in a plant with something already biting you is not cover, it is standing there taking it.
+        if (dist(a.pos, cover.pos) < cover.radius * 0.5 && a.sinceHit > 2) { out.worldMove = v3(); out.burst = 0; return out; }
       }
       out.worldMove = dir; out.burst = a.stamina > 25 ? 1 : 0;
       if (a.hideMode === 'none' && a.hideCd <= 0 && a.stamina > 10 && (def.ability === 'tailFlick' || def.ability === 'burrow' || def.ability === 'enroll' || def.ability === 'shellUp' || ['ribbonSlip', 'sedimentDive', 'combCruise', 'adhesiveGlide', 'bellCorral'].includes(def.ability)) && dist(a.pos, t.pos) < L * 3) out.ability = true;
@@ -211,7 +364,7 @@ export function thinkNeeds(g: AiWorld, a: Actor, b: BrainState, dt: number): Inp
     }
     case 'hunt': {
       if (!t || !isAlive(t) || isHidden(t)) { b.goal = 'wander'; b.target = -1; break; }
-      if ((L > 1.2 && nurseryFactor(t.pos.x, t.pos.z) > 0.35) || (RULES?.sanctuary(a, t) && a.lastHitBy !== t.id)) { b.goal = 'wander'; b.target = -1; b.goalT = 0; pickWander(a, b, g.rng, 30); break; }
+      if ((peaceful(t.pos) && a.lastHitBy !== t.id) || (RULES?.sanctuary(a, t) && a.lastHitBy !== t.id)) { b.goal = 'wander'; b.target = -1; b.goalT = 0; pickWander(a, b, g.rng, 30); break; }
       if (b.goalT > 9 || (t.cover > 0.45 && t.stillness > 0.8 && lengthOf(t) < L * 0.7)) { b.goal = 'wander'; b.target = -1; b.goalT = 0; b.hunger = 0; pickWander(a, b, g.rng, 30); break; }
       const d = dist(a.pos, t.pos);
       const predicted = add(t.pos, vscale(t.vel, clamp(d / 8, 0, 0.6)));
@@ -221,9 +374,56 @@ export function thinkNeeds(g: AiWorld, a: Actor, b: BrainState, dt: number): Inp
       if (a.controller === 'bot' && d < L * 3 && def.ability === 'ambushSurge') out.burst = 1;
       break;
     }
+    case 'defend': {
+      // Driving something off its ground. The animal closes, threatens, and fights if the
+      // intruder stays — but the edge of the patch is the edge of the argument. Step outside it
+      // and it turns around and goes home, every time, so walking away is always an answer and
+      // going in is always the player's own decision.
+      const home = b.territory;
+      if (!t || !isAlive(t) || !home) { b.goal = 'wander'; b.target = -1; b.goalT = 0; break; }
+      // The intruder leaving the patch is handled by the shared leash above; this is the animal
+      // simply running out of patience with one that will not leave.
+      if (b.goalT > 22) { b.goal = 'wander'; b.target = -1; b.goalT = 0; b.wanderTo = { ...home }; break; }
+      const d = dist(a.pos, t.pos);
+      const reach = L * 0.7 + lengthOf(t) * 0.35;
+      const to = norm(sub(t.pos, a.pos));
+      out.lock = true;
+      if (d > reach * 1.05) {
+        // Close it down, but never far from the middle of the patch: this is a warning-off, not
+        // a pursuit, and an animal that abandoned its ground to chase would not be holding it.
+        const leash = distXZ(a.pos, home) > b.territoryR ? norm(sub(home, a.pos)) : to;
+        out.worldMove = leash;
+        out.burst = d > L * 3 && a.stamina > 40 ? 1 : 0;
+      } else if (b.reactT <= 0 && a.state === 'free') {
+        // In reach: a real fight, but it opens with a shove rather than a killing blow.
+        out.worldMove = vscale(to, 0.35);
+        out.light = g.rng() < 0.7;
+        out.heavy = !out.light && a.stamina > 30;
+        b.reactT = b.reaction * 1.6;
+      } else out.worldMove = vscale(to, 0.3);
+      if (t.state === 'attack' && d < reach * 1.6 && def.canGuard && g.rng() < 0.5) out.guard = true;
+      // Losing badly on your own ground is still losing.
+      if (a.hp < a.hpMax * 0.3 && a.controller !== 'bot') { b.goal = 'flee'; b.goalT = 0; }
+      break;
+    }
     case 'fight': {
-      if (!t || !isAlive(t) || bandOf(a, t) !== 'rival') { b.goal = 'wander'; b.target = -1; break; }
-      if (RULES?.sanctuary(a, t) && a.lastHitBy !== t.id && a.hitFlash <= 0) { b.goal = 'wander'; b.target = -1; b.goalT = 0; pickWander(a, b, g.rng, 30); break; }
+      // A squabble is between peers, but answering for yourself is not: whatever has its teeth in
+      // you is worth biting whether or not it is your own size. Without the second clause an
+      // animal struck by something far smaller picked `fight`, failed the band test on the very
+      // next tick and went back to wandering — which is what "it just let me hit it" looks like.
+      const answering = !!t && a.lastHitBy === t.id && a.sinceHit < 4;
+      if (!t || !isAlive(t) || (bandOf(a, t) !== 'rival' && !answering)) { b.goal = 'wander'; b.target = -1; break; }
+      // A grumpy animal is defending its personal space, not prosecuting a war. Once whatever
+      // crowded it has backed off — and as long as it has not been hit — it lets the matter drop.
+      // Without this, being approached once turns an animal into a permanent enemy.
+      if (b.temper > 0 && !competitor && a.lastHitBy !== t.id && a.hitFlash <= 0
+        && dist(a.pos, t.pos) > L * (2.2 + b.temper * 2.6)) { b.goal = 'wander'; b.target = -1; b.goalT = 0; break; }
+      if ((RULES?.sanctuary(a, t) || peaceful(t.pos) || peaceful(a.pos)) && a.lastHitBy !== t.id && a.hitFlash <= 0) { b.goal = 'wander'; b.target = -1; b.goalT = 0; pickWander(a, b, g.rng, 30); break; }
+      // An animal that holds ground stops at the edge of it, whoever the quarrel is with. The
+      // leash was on `defend` only, so a rolling brawl with a neighbour could still walk a
+      // territorial animal clean off its patch — the one thing the whole idea promises it will not do.
+      if (b.territory && b.territoryR > 0 && !competitor
+        && distXZ(a.pos, b.territory) > b.territoryR * 1.05) { b.goal = 'wander'; b.target = -1; b.goalT = 0; pickWander(a, b, g.rng, 20); break; }
       const d = dist(a.pos, t.pos);
       const reach = L * 0.7 + lengthOf(t) * 0.35;
       out.lock = true;
@@ -255,6 +455,26 @@ export function thinkNeeds(g: AiWorld, a: Actor, b: BrainState, dt: number): Inp
       if (a.hp < a.hpMax * 0.3 && a.controller !== 'bot') { b.goal = 'flee'; b.goalT = 0; }
       break;
     }
+    case 'scavenge': {
+      // Going to a body. Nothing here is a fight: the animal walks up to the carcass and feeds,
+      // and gives up the moment somebody else has finished it or it has drifted out of reach.
+      if (!t || t.state !== 'dead' || t.eaten >= 1 || b.goalT > 20) { b.goal = 'wander'; b.target = -1; b.goalT = 0; break; }
+      const d = dist(a.pos, t.pos);
+      const reach = L * 0.6 + lengthOf(t) * 0.4;
+      if (d > reach) {
+        steerToward(a, t.pos, out, 0.7);
+        out.burst = d > L * 5 && a.stamina > 45 ? 1 : 0;
+        // A body goes limp and drifts up off the floor, so a bottom-crawler has to leave the
+        // bottom to reach one. Crawlers can paddle (see the rise handling in Game.updateActor);
+        // it costs stamina, which is the price of a free meal.
+        if (t.pos.y > a.pos.y + L * 0.35) out.rise = true;
+      } else {
+        // In reach: the light attack is what starts eating a corpse (see Game.corpseInReach).
+        out.worldMove = vscale(norm(sub(t.pos, a.pos)), 0.15);
+        if (a.state === 'free' && b.reactT <= 0) { out.light = true; b.reactT = b.reaction * 2; }
+      }
+      break;
+    }
     case 'graze': {
       if (def.diet === 'filter') {
         const bloom = g.world.blooms.reduce<(typeof g.world.blooms)[number] | undefined>((best, v) => !best || dist(a.pos, v.pos) < dist(a.pos, best.pos) ? v : best, undefined);
@@ -263,17 +483,37 @@ export function thinkNeeds(g: AiWorld, a: Actor, b: BrainState, dt: number): Inp
           if (a.abilityCd <= 0 && dist(a.pos, bloom.pos) < bloom.radius) out.heavy = true;
         }
       } else {
-        out.worldMove = vscale(heading(a.yaw), def.diet ? .2 : 0);
+        // Follow the mat uphill. Grazing pays by how thick the mat underneath is, so an animal
+        // that just crawls in a straight line starves on bare mud however long it grazes for.
+        const here = microbialAt(a.pos.x, a.pos.z);
+        if (here > .45) out.worldMove = vscale(heading(a.yaw), .12);       // good ground: stay on it
+        else {
+          const step = 14 + lengthOf(a) * 3;
+          let bestDir: Vec3 | undefined, best = here;
+          for (let k = 0; k < 6; k++) {
+            const ang = (k / 6) * TAU + a.yaw;
+            const m = microbialAt(a.pos.x + Math.cos(ang) * step, a.pos.z + Math.sin(ang) * step);
+            if (m > best) { best = m; bestDir = { x: Math.cos(ang), y: 0, z: Math.sin(ang) }; }
+          }
+          out.worldMove = bestDir ? vscale(bestDir, .55) : vscale(heading(a.yaw), .25);
+        }
         if (def.diet === 'deposit') out.sink = true;
         if (def.ability === 'adhesiveGlide') out.guard = true;
       }
-      if (b.goalT > 6) { b.goal = 'wander'; pickWander(a, b, g.rng, 20); }
+      if (b.goalT > (def.diet === 'filter' ? 6 : 12)) { b.goal = 'wander'; pickWander(a, b, g.rng, 20); }
       break;
     }
     default: {
       steerToward(a, b.wanderTo, out, 0.55);
       break;
     }
+  }
+  // ...and the same leash on the steering, so no goal can walk the animal off its ground by
+  // degrees. Past the edge it heads home at a cruise; a sprint is for crossing your own water.
+  if (b.territory && b.territoryR > 0 && PURSUITS.has(b.goal) && distXZ(a.pos, b.territory) > b.territoryR * TERRITORY_LEASH) {
+    const home = norm(sub(b.territory, a.pos));
+    out.worldMove = { x: home.x, y: 0, z: home.z };
+    out.burst = 0;
   }
   return out;
 }
@@ -298,9 +538,16 @@ export function thinkGiant(g: AiWorld, a: Actor, b: BrainState, dt: number): Inp
   if (b.thinkT <= 0) { b.thinkT = 0.1; updateDetection(g, a, b, 0.1); }
   const cur = b.target >= 0 ? g.byId(b.target) : undefined;
   const curScore = cur ? (b.detection.get(cur.id) ?? 0) : 0;
-  // Giants cruise high and only come down when hungry (roughly once every 70–100 s) or when
-  // something practically swims into their mouth. Noticing is telegraphed before any dive.
-  const hungry = b.hunger > 70 + (a.id % 30);
+  // Giants cruise high and only come down when hungry, or when something practically swims into
+  // their mouth. Noticing is telegraphed before any dive.
+  //
+  // How often that is follows the hour, like everything else in the reef — and because giants are
+  // what "something is hunting me" actually means to a player, this is the setting that decides
+  // how the day *feels*. Through the middle of the day one comes down about as rarely as it always
+  // did; at dusk and dawn it is every twenty seconds or so, and the whole sea knows it.
+  // ...and where it is doing it. A giant cruising over the basin comes down far oftener than one
+  // over a sunlit flat, which is what makes the deep water read as the deep water.
+  const hungry = b.hunger > (14 + (a.id % 6)) / Math.max(0.12, appetiteAt(g.time, dangerAt(a.pos.x, a.pos.z)));
   const shadow = a.controller === 'shadow';
 
   // Routed: enough bites from something smaller and even a giant backs off for a while.
@@ -325,7 +572,7 @@ export function thinkGiant(g: AiWorld, a: Actor, b: BrainState, dt: number): Inp
       break;
     }
     case 'hunt': {
-      if (!cur || !isAlive(cur) || curScore < 0.5 || isHidden(cur) || (nurseryFactor(cur.pos.x, cur.pos.z) > 0.35 && !shadow)) {
+      if (!cur || !isAlive(cur) || curScore < 0.5 || isHidden(cur) || (peaceful(cur.pos) && !shadow)) {
         b.goal = 'search'; b.goalT = 0; b.target = -1; if (cur) b.detection.set(cur.id, Math.min(curScore, 0.4)); break;
       }
       b.lastSeen = { ...cur.pos };
@@ -379,6 +626,31 @@ export function thinkGiant(g: AiWorld, a: Actor, b: BrainState, dt: number): Inp
   return out;
 }
 
+/**
+ * A big body does not lie on the sand.
+ *
+ * Where it *aims* is decided by whatever it is doing, and half of what an animal does — running
+ * for cover, squabbling with a neighbour, following a carcass down — points at the seabed. Left at
+ * that, the grown animals spent their lives on the floor, which is the one place a large fish is
+ * not. So whatever the goal picked, a body keeps a little water under it (`keepClear`, a body
+ * length or so, nothing at all for a small animal) by bending its travel upwards as it runs out of
+ * clearance. It is a lean, not a lid: it never stops the body going down, and a hunt or a meal on
+ * the bottom still wins. Wildlife only — the three giants are placed by hand and keep their own
+ * counsel.
+ */
+function keepOffTheFloor(g: AiWorld, a: Actor, out: InputFrame) {
+  const keep = creature(a.creature).ground ? 0 : keepClear(lengthOf(a));
+  if (keep <= 0 || !out.worldMove) return out;
+  const gap = a.pos.y - sampleHeight(a.pos.x, a.pos.z);
+  if (gap >= keep) return out;
+  const mv = out.worldMove;
+  const speed = len3(mv);
+  if (speed < 1e-3) return out;
+  const lift = clamp((keep - gap) / keep, 0, 1);
+  out.worldMove = vscale(norm({ x: mv.x, y: mv.y + speed * lift * 1.3, z: mv.z }), speed);
+  return out;
+}
+
 export function think(g: AiWorld, a: Actor, dt: number): InputFrame {
   const b = a.brain!;
   scratchDir.x = 0;
@@ -388,10 +660,12 @@ export function think(g: AiWorld, a: Actor, dt: number): InputFrame {
       b.thinkT -= dt;
       if (b.cached && b.thinkT > 0) return b.cached;
       b.thinkT = 1 / 12;
-      b.cached = thinkSwarm(g, a, b, dt);
+      b.cached = keepOffTheFloor(g, a, thinkSwarm(g, a, b, dt));
       return b.cached;
     }
+    // The three giants keep their own counsel: their lairs, routes and hunts are placed for them
+    // (`placeGiant`), and lifting them off the seabed would be overruling that.
     case 'giant': return thinkGiant(g, a, b, dt);
-    default: return thinkNeeds(g, a, b, dt);
+    default: return keepOffTheFloor(g, a, thinkNeeds(g, a, b, dt));
   }
 }

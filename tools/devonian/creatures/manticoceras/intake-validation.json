@@ -1,0 +1,56 @@
+[
+  {
+    "id": "manticoceras",
+    "fullTriangles": 122346,
+    "lodTriangles": 29336,
+    "joints": 49,
+    "clips": [
+      "Ability",
+      "Attack",
+      "Bite",
+      "Death",
+      "Dive",
+      "Dodge",
+      "Eat",
+      "Grab",
+      "Growth",
+      "Guard",
+      "Heavy",
+      "Hit",
+      "Idle",
+      "Parry",
+      "Rise",
+      "Stagger",
+      "Swim",
+      "TurnLeft",
+      "TurnRight"
+    ],
+    "sockets": 3,
+    "files": {
+      "glb": {
+        "bytes": 8103064,
+        "sha256": "c21f28f3529ac47860744ed802606e0606e2e41cc4fd8587f32f0d012851dd81"
+      },
+      "lod1.glb": {
+        "bytes": 1354760,
+        "sha256": "1fbe0959de6df68b4bbe4d67f297b08ac0595893202619311bf1f57f36f1d1ee"
+      },
+      "png": {
+        "bytes": 406651,
+        "sha256": "c423ee0149c4c8b85b3a10ba89d62c03bc159aeee34213dcd7a4610e8278a04d"
+      },
+      "select.png": {
+        "bytes": 927059,
+        "sha256": "e0250214bc1f551855e4139f6c77c9d79783baa03b3f3e772f379d29d9537714"
+      },
+      "card.png": {
+        "bytes": 140369,
+        "sha256": "e81e61e00199061834e78ea771cb446c272db66e7c4ec88d5b40ee1fe6047385"
+      },
+      "thumb.png": {
+        "bytes": 22045,
+        "sha256": "7cfefaa8c115374df7793a0bc868dca0f0911415d2a5b94566457c364f6c54ef"
+      }
+    }
+  }
+]

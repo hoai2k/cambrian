@@ -1,0 +1,27 @@
+{
+  "interpretation": "Coccosteus-specific cranial and thoracic regional sutures, guided by TUG 1817-152 and existing Miles/Westoll and Engelman references; not exact fossil plate tracing or known living pigmentation.",
+  "head": [
+    {"region":"rostral roofing junction","points":[[0.045,0.05],[0.09,0.13],[0.14,0.25],[0.24,0.31]],"width":0.0065,"depth":0.0024},
+    {"region":"central roof to orbital-temporal region","points":[[0.14,0.25],[0.29,0.32],[0.46,0.36],[0.64,0.29],[0.81,0.10]],"width":0.0075,"depth":0.0028},
+    {"region":"postorbital to cheek boundary","points":[[0.27,0.33],[0.30,0.48],[0.27,0.68],[0.35,0.91],[0.44,1.10]],"width":0.0065,"depth":0.0026},
+    {"region":"posterior cheek to temporal region","points":[[0.64,0.29],[0.60,0.48],[0.64,0.72],[0.73,0.99],[0.80,1.19]],"width":0.008,"depth":0.0028},
+    {"region":"broad cheek subdivision","points":[[0.35,0.91],[0.44,0.94],[0.54,0.83],[0.64,0.72]],"width":0.0065,"depth":0.0025},
+    {"region":"preorbital dermal margin","points":[[0.08,0.49],[0.12,0.61],[0.18,0.69],[0.27,0.68]],"width":0.0055,"depth":0.0020}
+  ],
+  "thorax": [
+    {"region":"median dorsal to dorsolateral shield","points":[[-0.69,0.22],[-0.51,0.32],[-0.29,0.34],[-0.12,0.28],[0.12,0.13]],"width":0.009,"depth":0.0030},
+    {"region":"anterior dorsolateral to side shield","points":[[-0.51,0.32],[-0.52,0.55],[-0.46,0.83],[-0.33,1.12]],"width":0.0085,"depth":0.0028},
+    {"region":"posterior side shield junction","points":[[-0.12,0.28],[-0.08,0.51],[-0.21,0.81],[-0.33,1.12]],"width":0.0085,"depth":0.0028},
+    {"region":"lower shoulder plate margin","points":[[-0.68,1.14],[-0.49,1.28],[-0.28,1.24],[-0.03,1.04]],"width":0.008,"depth":0.0026}
+  ],
+  "head_curvature": [
+    {"center":[0.43,0.14],"radius":[0.29,0.23],"height":0.006},
+    {"center":[0.48,0.62],"radius":[0.22,0.30],"height":0.007},
+    {"center":[0.47,1.05],"radius":[0.20,0.24],"height":0.005}
+  ],
+  "thorax_curvature": [
+    {"center":[-0.35,0.13],"radius":[0.32,0.22],"height":0.006},
+    {"center":[-0.30,0.60],"radius":[0.27,0.34],"height":0.007},
+    {"center":[-0.49,1.02],"radius":[0.21,0.24],"height":0.005}
+  ]
+}

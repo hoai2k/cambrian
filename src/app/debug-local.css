@@ -1,0 +1,54 @@
+/* The local state editor (?debug=local). A plain, dense tool page: it is not part of the game's
+   look because it is not part of the game, and reading it should feel like reading the save. */
+.debug-local {
+  --ink: #e9f4f7; --dim: #93a7ae; --line: #24343a; --panel: #0e1a1f; --warn: #ffb36b;
+  position: fixed; inset: 0; overflow: auto; z-index: 50;
+  background: #071115; color: var(--ink);
+  font: 13px/1.5 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  padding: 24px clamp(16px, 4vw, 48px) 64px;
+}
+.debug-local header { display: flex; gap: 24px; align-items: flex-start; justify-content: space-between; flex-wrap: wrap; border-bottom: 1px solid var(--line); padding-bottom: 16px; margin-bottom: 20px; }
+.debug-local h1 { margin: 2px 0 6px; font-size: 22px; letter-spacing: .01em; }
+.debug-local .eyebrow { margin: 0; color: var(--warn); font-size: 10px; letter-spacing: .18em; }
+.debug-local .sub { margin: 0; color: var(--dim); max-width: 70ch; }
+.debug-local .saved { margin: 0 0 16px; color: #7ef0a8; }
+.debug-local button { font: inherit; color: var(--ink); background: #16252b; border: 1px solid var(--line); border-radius: 6px; padding: 4px 10px; cursor: pointer; }
+.debug-local button:hover { border-color: #3d565f; }
+.debug-local button.danger { color: #ff8a8a; border-color: #4a2529; }
+.debug-local button.link { background: none; border: none; color: var(--warn); text-decoration: underline; padding: 0 6px; }
+.debug-local .back { white-space: nowrap; }
+
+.debug-local .record { border: 1px solid var(--line); border-radius: 10px; background: var(--panel); padding: 16px; margin-bottom: 20px; }
+.debug-local .record-head { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 12px; }
+.debug-local .record-head h2 { margin: 0; font-size: 15px; }
+.debug-local .record-head code { color: var(--warn); }
+.debug-local .record-head .danger { margin-left: auto; }
+
+.debug-local .field { border-top: 1px solid var(--line); padding: 12px 0; }
+.debug-local .field-head { display: flex; gap: 12px; align-items: baseline; justify-content: space-between; }
+.debug-local .field label { font-weight: 700; }
+.debug-local .raw { color: var(--dim); word-break: break-all; max-width: 60%; text-align: right; }
+.debug-local .note { margin: 4px 0 8px; color: var(--dim); max-width: 90ch; }
+.debug-local .note.warn { color: var(--warn); }
+
+.debug-local select, .debug-local input[type="number"], .debug-local textarea {
+  font: inherit; color: var(--ink); background: #16252b; border: 1px solid var(--line); border-radius: 6px; padding: 4px 6px;
+}
+.debug-local textarea { width: 100%; resize: vertical; }
+.debug-local .row { display: flex; align-items: center; gap: 10px; }
+.debug-local .row input[type="range"] { flex: 1; max-width: 320px; }
+/* Name on one line, whatever the value is stored as underneath it. Some notes are a short id and
+   some are a sentence, and letting the long ones run inline turned the grid into a thicket. */
+.debug-local .check { display: grid; grid-template-columns: auto 1fr; gap: 0 6px; align-items: baseline; font-weight: 400; cursor: pointer; }
+.debug-local .check small { grid-column: 2; color: var(--dim); }
+.debug-local .bulk select { max-width: 420px; }
+.debug-local .bulk { display: flex; align-items: center; gap: 8px; margin: 6px 0; color: var(--dim); flex-wrap: wrap; }
+
+.debug-local ul { list-style: none; margin: 0; padding: 0; }
+.debug-local .checks { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 4px 16px; }
+.debug-local .marks { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 6px 20px; }
+.debug-local .marks li { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.debug-local .mark-name { min-width: 140px; display: flex; flex-direction: column; }
+.debug-local .mark-name small, .debug-local .mark-note { color: var(--dim); }
+.debug-local .marks select { flex: 1; min-width: 180px; }
+.debug-local .raw-json { border-top: 1px solid var(--line); padding-top: 12px; margin-top: 4px; }

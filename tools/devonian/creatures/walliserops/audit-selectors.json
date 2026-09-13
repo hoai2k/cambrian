@@ -1,0 +1,9 @@
+{
+  "walliserops": {
+    "headMesh": "cephalon_continuous_closed",
+    "eyeMeshes": [
+      "ocular_volume_L",
+      "ocular_volume_R"
+    ]
+  }
+}

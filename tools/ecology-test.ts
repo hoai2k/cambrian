@@ -1,0 +1,316 @@
+/**
+ * The day, and the tempers in it.
+ *
+ * The reef used to hunt around the clock: every ambient creature counted as hungry four seconds
+ * after its last meal, so anything that could see you was coming. These checks pin down the
+ * behaviour that replaced it — appetite that follows the hour, animals that see you off their
+ * ground without chasing you across the sea, and the one rule none of it is allowed to break:
+ * hit something and it fights back, whatever time it is.
+ */
+import { Game } from '../src/sim/game';
+import { emptyInput, type InputFrame } from '../src/sim/types';
+import { isAlive, lengthOf } from '../src/sim/actors';
+import { makeBrain } from '../src/sim/ai';
+import { grazeRate } from '../src/sim/expansion-abilities';
+import { creature, type CreatureId } from '../src/sim/creatures';
+import { DAY_LENGTH, dayFraction, daylight, huntInterval, huntingPressure, phaseAt, placeAppetite, untilNextPhase } from '../src/sim/daynight';
+import { dangerAt } from '../src/sim/world';
+import { distXZ, makeRng } from '../src/shared/math';
+
+/** Ordinary open water: what an hour means where nobody says where. */
+const SHELF = 0.4;
+
+let failed = 0;
+const check = (n: string, ok: boolean, d = '') => { console.log(`${ok ? 'PASS' : 'FAIL'}  ${n.padEnd(60)} ${d}`); if (!ok) failed++; };
+const run = (g: Game, steps: number, f: InputFrame = emptyInput()) => { const m = new Map([[0, f]]); for (let i = 0; i < steps; i++) { g.step(1 / 60, m); g.events.length = 0; } };
+
+// --- the shape of the day ---
+{
+  const secs: Record<string, number> = {};
+  for (let t = 0; t < DAY_LENGTH; t++) { const p = phaseAt(t); secs[p] = (secs[p] ?? 0) + 1; }
+  check('the day turns through all four phases', Object.keys(secs).length === 4, Object.entries(secs).map(([k, v]) => `${k} ${v}s`).join(' · '));
+  check('night is shorter than daylight', secs.night < secs.day, `${secs.night}s vs ${secs.day}s`);
+  check('twilight is brief', secs.dawn + secs.dusk < secs.day, `${secs.dawn + secs.dusk}s of twilight`);
+  check('the cycle is continuous', Math.abs(dayFraction(DAY_LENGTH) - dayFraction(0)) < 1e-9, '');
+
+  // light: full through the day, gone at night, ramping through the bands
+  const at = (p: string) => { for (let t = 0; t < DAY_LENGTH; t++) if (phaseAt(t) === p) return t + 12; return 0; };
+  check('it is light by day and dark at night', daylight(at('day')) > 0.95 && daylight(at('night')) < 0.05, `day ${daylight(at('day')).toFixed(2)} night ${daylight(at('night')).toFixed(2)}`);
+  const mid = (from: number) => { for (let t = from; t < from + DAY_LENGTH; t++) if (phaseAt(t) === 'dusk') return t; return 0; };
+  const duskStart = mid(0);
+  check('dusk is a ramp, not a switch', daylight(duskStart + 24) > 0.1 && daylight(duskStart + 24) < 0.9, `half way through dusk: ${daylight(duskStart + 24).toFixed(2)}`);
+
+  // appetite: the twilight bands are when the reef eats
+  const pressures = { dawn: 0, day: 0, dusk: 0, night: 0 } as Record<string, number>, counts = { ...pressures };
+  for (let t = 0; t < DAY_LENGTH; t++) { const p = phaseAt(t); pressures[p] += huntingPressure(t); counts[p]++; }
+  for (const k of Object.keys(pressures)) pressures[k] /= counts[k];
+  check('hunting peaks at dawn and dusk', pressures.dawn > pressures.day * 2 && pressures.dusk > pressures.day * 2,
+    Object.entries(pressures).map(([k, v]) => `${k} ${v.toFixed(2)}`).join(' · '));
+  check('...and the middle of the day is quiet', pressures.day < pressures.dusk * 0.4, pressures.day.toFixed(2));
+  // Quiet, not shut. At the old floor an animal went over two minutes between meals, which over
+  // any stretch a player actually watched came to nothing hunting at all.
+  check('...but never stops entirely', pressures.day > 0.1 && huntInterval(at('day'), SHELF) < 100,
+    `${huntInterval(at('day'), SHELF).toFixed(0)}s between meals on the shelf at noon`);
+  check('night sits between the two', pressures.night > pressures.day && pressures.night < pressures.dusk, pressures.night.toFixed(2));
+  check('an animal goes far longer between meals by day', huntInterval(at('day'), SHELF) > huntInterval(duskStart + 24, SHELF) * 3,
+    `${huntInterval(at('day'), SHELF).toFixed(0)}s by day vs ${huntInterval(duskStart + 24, SHELF).toFixed(0)}s at dusk`);
+  // Where, as well as when. The same hour is a different sea in a nursery and in the basin.
+  const noon = at('day');
+  check('dangerous water is hungrier than safe water', huntInterval(noon, 0.9) < huntInterval(noon, 0.05) * 0.45,
+    `${huntInterval(noon, 0.9).toFixed(0)}s in the basin vs ${huntInterval(noon, 0.05).toFixed(0)}s in a nursery, at the same hour`);
+  check('...and the hour still tells on top of it', huntInterval(duskStart + 24, 0.05) < huntInterval(noon, 0.05),
+    `safe water at dusk ${huntInterval(duskStart + 24, 0.05).toFixed(0)}s against ${huntInterval(noon, 0.05).toFixed(0)}s at noon`);
+  check('...both ways round', placeAppetite(0.9) > placeAppetite(0.4) && placeAppetite(0.4) > placeAppetite(0.05),
+    `nursery ${placeAppetite(0.05).toFixed(2)} · shelf ${placeAppetite(0.4).toFixed(2)} · basin ${placeAppetite(0.9).toFixed(2)}`);
+  check('the phase countdown never exceeds the phase', untilNextPhase(0) <= DAY_LENGTH && untilNextPhase(0) > 0, `${untilNextPhase(0).toFixed(0)}s`);
+}
+
+/** A creature placed by hand beside the player, with a disposition of our choosing. */
+function withNeighbour(opts: Parameters<typeof makeBrain>[3], gap: number, seed = 5) {
+  const g = new Game('reef', [{ creature: 'anomalocaris', device: 'keyboard', ready: true }], seed);
+  const p = g.players[0];
+  // One neighbour, and nothing else: these checks are about what this animal does about the
+  // player, and an area with its own residents in it answers a different question.
+  for (const o of [...g.actors]) if (o.controller !== 'player') g.remove(o);
+  g.skipHatch();
+  p.spawnProtect = 1e9;                       // the checks are about the neighbour, not about dying
+  // Sized to the player, because these checks are about disposition and disposition only reaches
+  // as far as a peer: squaring up and holding ground are what an animal does to a *rival*, and
+  // something twice your length is a threat you leave, whatever your temper. At a flat scale of 1
+  // this pairing used to be a rival and stopped being one when the roster was re-sized to its
+  // natural lengths, so the checks below started reading the size rule rather than the temper.
+  const pos = { x: p.pos.x + gap, y: p.pos.y, z: p.pos.z };
+  const n = g.spawn("opabinia", "ambient", pos, lengthOf(p) / creature('opabinia').adultLength);
+  n.brain = makeBrain('needs', pos, g.rng, opts);
+  n.spawnProtect = 0;
+  return { g, p, n };
+}
+
+// --- grumpy: sees you off when you crowd it, and lets it go when you leave ---
+{
+  const { g, p, n } = withNeighbour({ temper: 0.9, aggression: 0.2 }, 60);
+  run(g, 60);
+  check('a grumpy animal ignores you at a distance', n.brain!.goal !== 'fight', `goal=${n.brain!.goal} at ${distXZ(p.pos, n.pos).toFixed(0)}m`);
+  p.pos = { x: n.pos.x + lengthOf(n) * 0.9, y: n.pos.y, z: n.pos.z };
+  run(g, 40);
+  check('...and squares up when you get too close', n.brain!.goal === 'fight' && n.brain!.target === p.id, `goal=${n.brain!.goal}`);
+  p.pos = { x: n.pos.x + 90, y: n.pos.y, z: n.pos.z };
+  run(g, 90);
+  check('...then drops it once you have backed off', n.brain!.goal !== 'fight', `goal=${n.brain!.goal}`);
+}
+
+// --- placid: leaves you alone, but still fights back ---
+{
+  const { g, p, n } = withNeighbour({ temper: 0, aggression: 0.1 }, 8);
+  run(g, 120);
+  // It may well be busy with a neighbour; what matters is that it is not interested in *you*.
+  const onPlayer = () => n.brain!.goal === 'fight' && n.brain!.target === p.id;
+  check('a placid animal lets you stand next to it', !onPlayer(), `goal=${n.brain!.goal} target=${n.brain!.target === p.id ? 'player' : 'other'}`);
+  // exactly what a landed hit leaves behind: who did it, and how long ago
+  n.lastHitBy = p.id; n.hitFlash = 1; n.sinceHit = 0; n.courage = 1;
+  run(g, 60);
+  check('...but hits back when you hit it', onPlayer() || n.brain!.goal === 'flee', `goal=${n.brain!.goal}`);
+}
+
+// --- territorial: drives you out of its patch, and stops at the edge ---
+{
+  const R = 40;
+  const { g, p, n } = withNeighbour({ temper: 0.5, territoryR: R }, 12);
+  n.brain!.territory = { ...n.pos };
+  const home = { ...n.brain!.territory };
+  run(g, 60);
+  check('an intruder inside the patch is challenged', n.brain!.goal === 'defend' && n.brain!.target === p.id, `goal=${n.brain!.goal}`);
+  // stand off outside the boundary and it must break off rather than follow
+  // Step outside and it stops caring about *you*. It may well turn on something else that is
+  // still standing in its patch — that is the same rule, applied to somebody else.
+  p.pos = { x: home.x + R * 1.6, y: home.y, z: home.z };
+  run(g, 120);
+  const onPlayer = n.brain!.goal === 'defend' && n.brain!.target === p.id;
+  check('...and dropped the moment you leave it', !onPlayer, `goal=${n.brain!.goal} target=${n.brain!.target === p.id ? 'player' : 'someone else in its patch'}`);
+  check('...without following you out', distXZ(n.pos, home) < R * 1.3, `it is ${distXZ(n.pos, home).toFixed(0)}m from home, patch is ${R}m`);
+  // it should also still be alive and not have chased across the sea over a long stretch
+  let furthest = 0;
+  for (let i = 0; i < 60 * 20; i++) { run(g, 1); furthest = Math.max(furthest, distXZ(n.pos, home)); }
+  // The leash is the contract, not stamina: it goes a little past the edge of the patch and turns
+  // round, however much it has left to sprint on.
+  // A metre or two of that is the rest of the sea moving: the whole match is one trajectory, so the
+  // exact overshoot shifts whenever anything else in the water does. The contract is that it turns
+  // round near its own edge rather than following you over the horizon.
+  check('...and stays on its ground for good', isAlive(n) ? furthest < R * 1.4 : true, `furthest ${furthest.toFixed(0)}m over 20 s, patch is ${R}m`);
+}
+
+// --- appetite: the same reef hunts far more at dusk than at noon ---
+{
+  // One reef is a couple of dozen animals, so a single wounded straggler that stays on a chase can
+  // be a whole percent on its own. Pool several seeds so the reading is of the clock, not of him.
+  const SEEDS = [33, 7, 91, 404, 12, 555];
+  const sample = (startFraction: number) => {
+    let hunting = 0, seen = 0;
+    for (const seed of SEEDS) {
+      const g = new Game('reef', [{ creature: 'waptia', device: 'keyboard', ready: true }], seed);
+      g.players[0].spawnProtect = 1e9;
+      g.time = startFraction * DAY_LENGTH;            // jump the clock to the hour under test
+      for (let i = 0; i < 60 * 40; i++) {
+        run(g, 1);
+        if (i % 20) continue;
+        for (const a of g.actors) if (a.controller === 'ambient' && a.brain) { seen++; if (a.brain.goal === 'hunt') hunting++; }
+      }
+    }
+    return seen ? hunting / seen : 0;
+  };
+  // the clock offset puts fraction 0.84 at dawn and 0.2 in the middle of the day
+  const atDusk = sample(0.44), atNoon = sample(0.2);
+  check('the reef hunts several times more at dusk than at noon', atDusk > atNoon * 2,
+    `${(atDusk * 100).toFixed(1)}% at dusk vs ${(atNoon * 100).toFixed(1)}% at noon`);
+  check('...and mostly does something else even then', atDusk < 0.5, `${(atDusk * 100).toFixed(1)}%`);
+}
+
+// --- the giants keep the same hours, which is what "being hunted" actually means to a player ---
+{
+  const sample = (fraction: number) => {
+    let hunting = 0, seen = 0;
+    for (const seed of [3, 31]) {
+      const g = new Game('reef', [{ creature: 'waptia', device: 'keyboard', ready: true }], seed);
+      const p = g.players[0]; p.spawnProtect = 1e9;
+      g.time = fraction * DAY_LENGTH;
+      // Out in the open and moving: a giant will not come into a nursery, so a player parked on
+      // the spawn is never hunted whatever the hour, and the sample would say nothing.
+      for (let i = 0; i < 60 * 90; i++) {
+        const t = i / 60;
+        // Hold the hour still. The window is a minute and a half and a phase is forty-eight
+        // seconds, so a sample that let the clock run spent three quarters of "at dusk" in the
+        // night that follows it — which made the reading mostly about night, and turned the
+        // check into a coin toss on whether one giant's hunger happened to cross inside it.
+        g.time = fraction * DAY_LENGTH;
+        run(g, 1, { ...emptyInput(), worldMove: { x: Math.cos(t * 0.07), y: 0, z: Math.sin(t * 0.045) } });
+        if (i % 20) continue;
+        for (const a of g.actors) {
+          if ((a.controller !== 'giant' && a.controller !== 'shadow') || !a.brain) continue;
+          seen++; if (a.brain.goal === 'hunt') hunting++;
+        }
+      }
+    }
+    return seen ? hunting / seen : 0;
+  };
+  const dusk = sample(0.44), noon = sample(0.2);
+  check('giants come down to hunt far more at dusk than at noon', dusk > noon * 2,
+    `${(dusk * 100).toFixed(1)}% at dusk vs ${(noon * 100).toFixed(1)}% at noon`);
+  check('...and are mostly just cruising even then', dusk < 0.35, `${(dusk * 100).toFixed(1)}%`);
+}
+
+// --- what each animal actually eats ---
+{
+  // Feeding ecology follows the palaeontology, not the roster's combat role: see
+  // docs/redesign/01-game-design.md · Feeding. A creature with a diet does not go hunting.
+  const diet = (id: string) => creature(id as CreatureId).diet;
+  check('the mat grazers graze', diet('wiwaxia') === 'grazer' && diet('odontogriphus') === 'grazer',
+    `wiwaxia ${diet('wiwaxia')} · odontogriphus ${diet('odontogriphus')}`);
+  check('the deposit feeders sift', diet('marrella') === 'deposit' && diet('pikaia') === 'deposit',
+    `marrella ${diet('marrella')} · pikaia ${diet('pikaia')}`);
+  check('the suspension feeders strain', ['odaraia', 'vetulicola', 'tamisiocaris', 'ctenorhabdotus'].every((c) => diet(c) === 'filter'), '');
+  check('Hallucigenia lives on the dead', diet('hallucigenia') === 'scavenger', String(diet('hallucigenia')));
+  check('the predators still hunt', ['anomalocaris', 'opabinia', 'sidneyia', 'isoxys', 'nectocaris'].every((c) => !diet(c)), '');
+
+  // Wiwaxia's grazing used to be a name check in two files. It is data now, and the behaviour it
+  // encoded — nothing while it is moving — has to survive the move.
+  const wiw = creature('wiwaxia' as CreatureId);
+  check('...and Wiwaxia still only grazes while it is still', wiw.grazeStill === true, `grazeStill=${wiw.grazeStill}`);
+  const still = { stillness: 1, abilityActive: false, scale: 1 } as unknown as Parameters<typeof grazeRate>[0];
+  const moving = { stillness: 0, abilityActive: false, scale: 1 } as unknown as Parameters<typeof grazeRate>[0];
+  check('...worth something when planted, nothing when moving', grazeRate(still, wiw) > 0 && grazeRate(moving, wiw) === 0,
+    `${grazeRate(still, wiw).toFixed(1)} still, ${grazeRate(moving, wiw).toFixed(1)} moving`);
+  check('a scavenger does not graze mats', grazeRate(still, creature('hallucigenia' as CreatureId)) === 0, '');
+}
+
+// --- a scavenger crosses to a body and eats it ---
+{
+  const g = new Game('reef', [{ creature: 'anomalocaris', device: 'keyboard', ready: true }], 8);
+  const p = g.players[0]; p.spawnProtect = 1e9;
+  // An empty stretch of sea, so the observation is about the scavenger and not about the reef.
+  const at = { x: p.pos.x + 60, y: p.pos.y, z: p.pos.z + 60 };
+  for (const a of [...g.actors]) if (a.controller !== 'player') g.remove(a);
+  const h = g.spawn('hallucigenia', 'ambient', at, 1);
+  h.brain = makeBrain('needs', at, g.rng, { hunger: 500 }); h.spawnProtect = 1e9;
+  const body = g.spawn('waptia', 'ambient', { x: at.x + 16, y: at.y, z: at.z }, 0.8);
+  body.state = 'dead'; body.hp = 0; body.deathY = body.pos.y;
+  const start = distXZ(h.pos, body.pos);
+  run(g, 60);
+  check('a scavenger sets off for a body it can see', h.brain!.goal === 'scavenge' && h.brain!.target === body.id, `goal=${h.brain!.goal}`);
+  let ate = false;
+  for (let i = 0; i < 60 * 40 && !ate; i++) { run(g, 1); if (body.eaten >= 1) ate = true; }
+  check('...crosses to it and eats it', ate, `from ${start.toFixed(0)}m away, ${h.eats} meal(s)`);
+  check('...and goes back to wandering afterwards', (run(g, 90), h.brain!.goal !== 'scavenge'), `goal=${h.brain!.goal}`);
+}
+
+// --- what lives where: an area has a character and holds to it ---
+{
+  const { areaProfile, drawBand, bandScale, AREA_CELL, PASSER_BY } = await import('../src/sim/population');
+  const { makeRng } = await import('../src/shared/math');
+  const { nurseryAt, shoreZ } = await import('../src/sim/world');
+  const SEED = 4242;
+  const at = (x: number, z: number) => areaProfile(x, z, SEED);
+
+  const twice = at(300, -400), again = at(300 + 5, -400 - 5);
+  check('an area is the same area every time you swim back to it',
+    twice.small === again.small && twice.density === again.density, `${twice.small.toFixed(2)} vs ${again.small.toFixed(2)}`);
+
+  const n = nurseryAt(0), nursery = at(n.x, n.z);
+  check('a nursery is a hatchery', nursery.small > nursery.large * 3, `small ${nursery.small.toFixed(2)} · large ${nursery.large.toFixed(2)}`);
+  // Deep water off the shelf: sample a few areas out there, because one cell's own roll can lean
+  // either way — the point is the band, not any single stretch of it.
+  let deepLarge = 0, shelfLarge = 0;
+  for (let i = 0; i < 12; i++) {
+    deepLarge += at(i * 260 - 1500, shoreZ(0) - 900 - i * 90).large;
+    shelfLarge += at(i * 260 - 1500, shoreZ(0) - 260 - i * 12).large;
+  }
+  check('the deep water holds the grown animals', deepLarge > shelfLarge * 1.4,
+    `large ${(deepLarge / 12).toFixed(2)} deep against ${(shelfLarge / 12).toFixed(2)} on the shelf`);
+
+  // Size and menace are one statement about a stretch of sea, made from one number: what a place
+  // holds is read straight off how dangerous it is. Sampled over real water rather than over
+  // chosen points, so an area's own roll averages out and only the biome is left.
+  {
+    const rng = makeRng(7);
+    const bands = [
+      { name: 'safe', lo: 0, hi: 0.2, n: 0, sum: 0 },
+      { name: 'middling', lo: 0.45, hi: 0.65, n: 0, sum: 0 },
+      { name: 'deadly', lo: 0.8, hi: 1.01, n: 0, sum: 0 },
+    ];
+    for (let i = 0; i < 24000; i++) {
+      const x = (rng() - 0.5) * 6000, z = -(rng() * 1400);
+      const d = dangerAt(x, z);
+      const band = bands.find((b) => d >= b.lo && d < b.hi);
+      if (!band) continue;
+      band.n++; band.sum += bandScale(rng, drawBand(rng, areaProfile(x, z, 12345)));
+    }
+    const mean = (i: number) => bands[i].n ? bands[i].sum / bands[i].n : 0;
+    check('dangerous water holds bigger animals than safe water', mean(2) > mean(0) * 1.6 && mean(1) > mean(0) && mean(2) > mean(1),
+      bands.map((b, i) => `${b.name} ${mean(i).toFixed(2)}`).join(' · '));
+  }
+
+  // Nowhere is empty, and nowhere is stranded: whatever one area is, a neighbour is something else.
+  let thinnest = Infinity, spread = 0, cells = 0;
+  for (let i = -6; i <= 6; i++) for (let j = -6; j <= 6; j++) {
+    const p = at(i * AREA_CELL, shoreZ(0) - 300 - j * AREA_CELL);
+    thinnest = Math.min(thinnest, p.density);
+    const q = at((i + 1) * AREA_CELL, shoreZ(0) - 300 - j * AREA_CELL);
+    spread += Math.abs(p.small - q.small); cells++;
+  }
+  check('no stretch of sea is empty', thinnest > 0.3, `thinnest area carries ${(thinnest * 100).toFixed(0)}% of the usual`);
+  check('...and next door is always something else', spread / cells > 0.05,
+    `neighbours differ by ${((spread / cells) * 100).toFixed(0)}% of their small share`);
+
+  // The draw follows the profile, and something big is always a swim upwards away.
+  const rng = makeRng(7);
+  const small = at(n.x, n.z);
+  let large = 0;
+  for (let i = 0; i < 2000; i++) if (drawBand(rng, small) === 'large') large++;
+  check('a hatchery rarely turns up an adult', large / 2000 < 0.15, `${((large / 2000) * 100).toFixed(0)}% of draws`);
+  check('...but the water above always might', PASSER_BY > 0.1, `${(PASSER_BY * 100).toFixed(0)}% of spawns are something passing`);
+  let big = 0;
+  for (let i = 0; i < 500; i++) big = Math.max(big, bandScale(rng, 'large'));
+  check('a full-grown animal is a full-grown animal', big > 2, `up to ${big.toFixed(1)} scale`);
+}
+
+console.log(failed ? `\n${failed} FAILED` : '\nall ecology tests passed');
+process.exit(failed ? 1 : 0);

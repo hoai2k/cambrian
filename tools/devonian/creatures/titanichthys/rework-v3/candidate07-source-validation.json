@@ -1,0 +1,34 @@
+{
+  "scope": "Source-only validation; no Blender, output GLB, pose gate or render executed by Astra",
+  "python_ast_pass": [
+    "oral_weights_07.py",
+    "candidate_07.py",
+    "check_candidate_07.py",
+    "check_oral07_01.py",
+    "render_oral07_01.py"
+  ],
+  "unchanged_structural_checker_except_candidate_path": true,
+  "previous245_frozen_inputs_verified": true,
+  "actual06_accessor_storage_dedicated": true,
+  "static_weight_field": {
+    "full_affected_vertices": [
+      1042,
+      6459,
+      7343
+    ],
+    "lod_affected_vertices": [
+      356,
+      1805,
+      1967
+    ],
+    "max_influences": 4,
+    "no_influence_truncation": true
+  },
+  "source_sha256": {
+    "oral_weights_07.py": "566a92c10be6585535ac3fc3bbeeb45cc66817c88c9f67cf2c74743ecaf6c1a0",
+    "candidate_07.py": "3b2405eb9e2324bd7228c33543a92dc4c7a41745d79ae2ca74bb4acd5f8632b8",
+    "check_candidate_07.py": "de816cce8bd4cf0b44d44c55cb450cefc2bf65319868a3758309e0adbaacb8c5",
+    "check_oral07_01.py": "b9f3c318ed78a4cc6d28d0b3c5fc99cf9a9252470b56f79387e62ca2b6251ddc",
+    "render_oral07_01.py": "8696a47a784eea71bfea3d0721d3c08ddb1ed3fe4803a5a62f998554ac186192"
+  }
+}

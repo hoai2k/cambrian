@@ -1,6 +1,8 @@
 import { ACTIVE_ERA } from '../content';
 import { clamp, fbm2, makeRng, noise2, smoothstep, TAU, type Vec3 } from '../shared/math';
 import { floraSize } from './flora';
+import { footprintOf, propShape, rockPropId } from '../content/prop-shapes';
+import { fpMax, fpReach, ROUND, type Footprint, type Reach } from './footprint';
 import { SpatialHash } from './spatial';
 
 /**
@@ -24,7 +26,11 @@ export const BIOME_DANGER = ACTIVE_ERA.environment.biomeDanger;
 export type FloraKind = 'vauxia' | 'sac' | 'choia' | 'thalli' | 'tuft' | 'cushion' | 'lettuce' | 'spine' | 'glass'
   | 'crinoid' | 'stromatoporoid' | 'tabulate' | 'rugose' | 'bryozoan' | 'reed' | 'log'
   // tall Devonian kinds that reach up into the water column: a giant sea lily and an algal frond tower
-  | 'lilyColumn' | 'frondTower';
+  | 'lilyColumn' | 'frondTower'
+  // Triassic substrate: the microbial domes of the gypsum flats, the gypsum crust plates beside
+  // them, and the laminated mud floor of the black basin. Ground cover rather than growth — they
+  // are flora only in the sense that the chunk scatters them and the floor collides with them.
+  | 'stromatolite' | 'saltCrust' | 'mudRipple';
 /** Driftwood only washes out this far from the shore. */
 export const LOG_SHORE_RANGE = 120;
 
@@ -53,7 +59,24 @@ export interface Bloom { pos: Vec3; radius: number; drift: number; }
 
 /** The water surface. Era-driven: a pelagic roster (the Devonian) asks for a deeper column. */
 export const SURFACE_Y = ACTIVE_ERA.environment.surfaceY ?? 40;
+/**
+ * The era's target depth per biome, when it has one (the Triassic: docs/triassic/02-biomes-and-
+ * depth.md). Without it the floor undulates around zero everywhere off the shore, which is what
+ * the Cambrian and the Devonian were built on and must keep, so `sampleHeight` only reads this
+ * when it is set and takes exactly its old path otherwise.
+ */
+export const FLOOR_DEPTH: Readonly<Record<Biome, number>> | undefined = ACTIVE_ERA.environment.floorDepth;
 export const LIGHT_WINDOW_Y = SURFACE_Y - 9;
+/**
+ * What RB and LB are worth to a swimmer: units per second at scale 1, before the current.
+ *
+ * 2.6 was measured against the Cambrian's forty-unit column, where holding rise off the seabed
+ * puts you at the surface in about fifteen seconds. The Devonian's sea is sixty-four units deep
+ * because its roster is pelagic, and the same number there is a different button — half a minute
+ * of holding it, and a hatchling never getting there at all. So the rate is a property of the
+ * sea's depth rather than a constant: the button means the same thing in both of them.
+ */
+export const RISE_RATE = 2.6 * (SURFACE_Y / 40);
 /** Chunk edge in world units. Matches the renderer's scenery cells. */
 export const CHUNK = 64;
 /** Chunks are simulated (flora, cover, collision) this far from any player; the renderer draws terrain further out. */
@@ -155,12 +178,15 @@ export function biomeWeights(x: number, z: number, out: BiomeWeights = scratchW)
   out.shelf = rest;
   return out;
 }
-/** Blended danger (0..1) at a point, for the music and the HUD. */
-export function dangerAt(x: number, z: number) {
-  const w = biomeWeights(x, z);
+/** Blended danger (0..1) for a set of biome weights, for a caller that already has them. */
+export function dangerOf(w: Record<Biome, number>) {
   let d = 0;
   for (const b of BIOMES) d += w[b] * BIOME_DANGER[b];
   return d;
+}
+/** Blended danger (0..1) at a point: what the music, the HUD, appetite and body size all read. */
+export function dangerAt(x: number, z: number) {
+  return dangerOf(biomeWeights(x, z));
 }
 /** The dominant biome at a point. */
 export function biomeAt(x: number, z: number): Biome {
@@ -182,6 +208,7 @@ export function sampleHeight(x: number, z: number) {
     + 0.45 * Math.sin(x * 0.093 + z * 0.037)
     + 0.18 * Math.sin(z * 0.2 + x * 0.107)
     + (fbm2(x * 0.02 + 7, z * 0.02 + 3) - 0.5) * 3.2;
+  if (FLOOR_DEPTH) return depthProfile(x, z, s, h);
   // shore: the shallows sit a few units high, then the beach climbs to the waterline over the last 48 units
   h += 8 * (1 - smoothstep(40, 140, s));
   if (s < 48) h += (SURFACE_Y + 1 - 8) * Math.pow(1 - smoothstep(0, 48, s), 1.7);
@@ -198,6 +225,30 @@ export function sampleHeight(x: number, z: number) {
   // escarpment and basin
   h -= 13 * smoothstep(690, 760, s + rag);
   h -= 6 * smoothstep(1100, 1700, s);
+  return h;
+}
+
+/**
+ * The floor of a sea whose depth is the biome's own (`FLOOR_DEPTH`): the mean level at a point is
+ * the surface less the biome-weighted target depth, the same small undulation `u` rides on it, the
+ * reef's crests ridge up toward the light, the boulder fields roughen and the flats flatten as
+ * before, and the last 48 units climb to the waterline. Blended by the biome weights, so a point
+ * that is half reef and half lagoon sits halfway, and the slope from the front into the basin is a
+ * slope. Its own scratch weights, because a caller may be holding `biomeWeights`' shared ones.
+ */
+const scratchDepthW: BiomeWeights = { shallows: 0, nursery: 0, shelf: 0, forest: 0, boulders: 0, flats: 0, channel: 0, escarpment: 0, basin: 0 };
+function depthProfile(x: number, z: number, s: number, u: number): number {
+  const w = biomeWeights(x, z, scratchDepthW);
+  let depth = 0;
+  for (const b of BIOMES) depth += w[b] * FLOOR_DEPTH![b];
+  // the reef comes up to meet the air-breathers: ridges a player can follow, never a single bump
+  const crest = w.boulders > 0.01 ? w.boulders * 7 * smoothstep(0.5, 0.75, fbm2(x * 0.035 + 11, z * 0.035 + 4)) : 0;
+  // boulder fields are rough and a little high; the flats are flat
+  const rocks = w.boulders * (0.6 + fbm2(x * 0.06, z * 0.06)) * 1.2;
+  const flat = w.flats;
+  let h = SURFACE_Y - depth + u * (1 - flat * 0.8) + crest + rocks;
+  // the shore: the beach climbs to a unit above the waterline over the last 48 units
+  if (s < 48) { const k = Math.pow(1 - smoothstep(0, 48, s), 1.7); h = h * (1 - k) + (SURFACE_Y + 1) * k; }
   return h;
 }
 
@@ -332,7 +383,7 @@ function buildLandmark(chunk: Chunk, m: Landmark, far: boolean) {
   const { x: cxp, z: czp } = m.pos;
   const rock = (x: number, z: number, sx: number, sy: number, sz: number, y: number, floor?: number) => {
     chunk.boulders.push({
-      pos: { x, y, z }, radius: Math.max(sx, sz) * 1.02, height: y + sy * 1.05,
+      pos: { x, y, z }, radius: rockRadius(undefined, sx, sz), height: y + rockRise(undefined, sy) * 1.05,
       sx, sy, sz, rot: rng() * TAU, shade: 0.62 + rng() * 0.22, floor,
     });
   };
@@ -431,7 +482,7 @@ export function generateChunk(seed: number, cx: number, cz: number, detail: 'ful
     const sy = sx * (0.3 + rng() * 0.5);
     const sz = sx * (0.65 + rng() * 0.4);
     const y = sampleHeight(x, z) + sy * 0.25;
-    boulders.push({ pos: { x, y, z }, radius: Math.max(sx, sz) * 1.02, height: y + sy * 1.05, sx, sy, sz, rot: rng() * TAU, shade: 0.68 + rng() * 0.21 });
+    boulders.push({ pos: { x, y, z }, radius: rockRadius(undefined, sx, sz), height: y + rockRise(undefined, sy) * 1.05, sx, sy, sz, rot: rng() * TAU, shade: 0.68 + rng() * 0.21 });
     if (big) cover.push({ pos: { x, y: y + sy * 0.4, z }, radius: Math.max(sx, sz) * 1.5, maxLength: sx * 0.9, strength: 0.45 });
   }
   if (detail === 'far') { applyBiomeProps(chunk); addLandmark(chunk, mark, true); return chunk; }
@@ -522,8 +573,8 @@ function applyBiomeProps(chunk: Chunk) {
     const scale = blade && biome === 'basin' ? 2 + b.shade : clamp(b.sx * (blade ? .55 : .9), .6, 2.5);
     b.pos.y = sampleHeight(b.pos.x, b.pos.z);
     b.sx = b.sy = b.sz = scale;
-    b.radius = (blade ? .624 : .864) * scale;
-    b.height = b.pos.y + (blade ? 4 : .8) * scale;
+    b.radius = rockRadius(b.variant, scale, scale);
+    b.height = b.pos.y + rockRise(b.variant, scale);
   }
   const flow = { x: 0, y: 0, z: 0 };
   // These swaps are Cambrian-specific (sac→cushion, tuft→lettuce, vauxia/sac→spine, choia/thalli→glass) and
@@ -656,9 +707,85 @@ export function coverAt(world: WorldData, pos: Vec3, length: number, scratch: Co
   return best;
 }
 
-/** Push (x,z) out of boulders and off the beach. Returns whether a collision happened. */
-export function resolveStatic(world: WorldData, pos: Vec3, radius: number, scratch: Boulder[], reach = 0): boolean {
+/**
+ * A rock collides as the shape it is drawn with.
+ *
+ * Its footprint is the prop's own silhouette (`src/sim/footprint.ts`), turned by `rot` and scaled
+ * the way the mesh is — not the circle around it, which on a long rock stands a couple of units
+ * out into open water on the narrow side and reads as an invisible wall, and not an ellipse fitted
+ * to that circle, which a blocky boulder pokes its corners straight out of. `radius` is the
+ * furthest that footprint reaches, for the broad phase and for the cover a rock gives.
+ *
+ * `q` is the distance to the centre in units of the footprint: below 1 is inside the rock, and the
+ * same number gives the height of its dome, so what you can see is what you collide with and what
+ * you can stand on.
+ */
+const ROCK_SHAPE = {
+  boulder: { fp: footprintOf(rockPropId()), top: propShape(rockPropId())?.y1 ?? 1 },
+  'blade-spire': { fp: footprintOf(rockPropId('blade-spire')), top: propShape(rockPropId('blade-spire'))?.y1 ?? 4 },
+  'talus-shard': { fp: footprintOf(rockPropId('talus-shard')), top: propShape(rockPropId('talus-shard'))?.y1 ?? 0.8 },
+} as const;
+const rockShape = (b: Boulder) => ROCK_SHAPE[b.variant ?? 'boulder'];
+/** The radius a rock of this shape and scale needs around it. */
+export const rockRadius = (variant: Boulder['variant'], sx: number, sz: number) =>
+  fpMax(ROCK_SHAPE[variant ?? 'boulder'].fp, sx, sz) * 1.02;
+/** The top of a rock of this shape above the point it is placed at. */
+export const rockRise = (variant: Boulder['variant'], sy: number) => ROCK_SHAPE[variant ?? 'boulder'].top * sy;
+
+export function boulderFootprint(b: Boulder): Footprint { return rockShape(b).fp; }
+const scratchReach: Reach = { d: 0, reach: 0, nx: 0, nz: 1 };
+const staticReach: Reach = { d: 0, reach: 0, nx: 0, nz: 1 };
+export function boulderReach(b: Boulder, x: number, z: number, out: Reach = scratchReach): Reach {
+  return fpReach(rockShape(b).fp, b.pos.x, b.pos.z, b.rot, b.sx, b.sz, x, z, out);
+}
+export function boulderQ(b: Boulder, x: number, z: number, pad = 0): number {
+  const r = boulderReach(b, x, z, scratchReach);
+  return r.d / Math.max(r.reach + pad, 1e-6);
+}
+/** Height of a rock's dome above its own centre at `q` (0 outside it). */
+const domeRise = (b: Boulder, q: number) =>
+  q >= 1 ? 0 : rockRise(b.variant, b.sy) * Math.sqrt(Math.max(0, 1 - q * q)) * .95;
+/** The top of a rock directly above (x,z), or undefined where the rock is not underneath. */
+export function boulderTop(b: Boulder, x: number, z: number): number | undefined {
+  const q = boulderQ(b, x, z);
+  return q >= 1 ? undefined : b.pos.y + domeRise(b, q);
+}
+
+/** What a body found when it was pushed out of the scenery. */
+export interface StaticContact {
+  /** Something pushed the body this step. */
+  hit: boolean;
+  /**
+   * The height the body has to reach to get over the tallest rock it is pressed against, or
+   * -Infinity when there is nothing to climb (open water, or a face too tall to be worth trying).
+   */
+  climbTo: number;
+  /**
+   * The top of the tallest rock that actually blocked, however tall it is. A cliff is not offered
+   * as a climb, but a body with legs that keeps pushing into one gets over it in the end.
+   */
+  wallTop: number;
+}
+
+/**
+ * Push (x,z) out of boulders and off the beach. Returns whether a collision happened.
+ *
+ * Rocks come in three kinds, by how they stand relative to the body:
+ *
+ * - **Shallow enough to glide over.** The rock's surface at this column is within `glide` (see
+ *   `glideOver`), so it does not block at all: the floor under the body carries it up and across.
+ *   Sand-scale bumps, domes and the flanks of anything rounded end up here.
+ * - **Steep, but not a cliff.** The rock's top is within `climb` of the body (see `climbHeight`).
+ *   It blocks the way through — the body never enters the rock — but reports the height to get
+ *   over it in `out.climbTo`, and the caller lifts the body up the face until it is clear. This is
+ *   how a boulder taller than you is still something you go over rather than around.
+ * - **A wall.** Anything standing higher than that above you blocks, and nothing else happens.
+ *
+ * A landmark's raised span (`floor`) is none of these: it is something you swim under.
+ */
+export function resolveStatic(world: WorldData, pos: Vec3, radius: number, scratch: Boulder[], reach = 0, glide = 0, climb = 0, out?: StaticContact): boolean {
   let hit = false;
+  if (out) { out.hit = false; out.climbTo = -Infinity; out.wallTop = -Infinity; }
   // The shore is the one wall in the sea. Push straight back along -z; the coast wanders gently
   // enough that the local normal is close to that. `reach` lets a limbed body push that far past it.
   const s = shoreDistance(pos.x, pos.z), wall = Math.max(radius, SHORE_WALL + radius * 3 - reach);
@@ -666,26 +793,35 @@ export function resolveStatic(world: WorldData, pos: Vec3, radius: number, scrat
   for (const b of world.boulderHash.query(pos.x, pos.z, radius + 8, scratch)) {
     if (pos.y > b.height + radius * 0.5) continue;
     if (b.floor !== undefined && pos.y < b.floor - radius * 0.5) continue;   // pass under a raised span
-    const dx = pos.x - b.pos.x, dz = pos.z - b.pos.z;
-    const d = Math.hypot(dx, dz), min = b.radius + radius;
-    if (d < min) {
-      const nx = d > 1e-3 ? dx / d : 1, nz = d > 1e-3 ? dz / d : 0;
-      pos.x = b.pos.x + nx * min; pos.z = b.pos.z + nz * min; hit = true;
+    const rr = boulderReach(b, pos.x, pos.z, staticReach);
+    if (rr.d >= rr.reach + radius) continue;
+    if (b.floor === undefined) {
+      // Angled and low: let the floor carry the body over rather than stopping it here.
+      if (glide > 0 && b.pos.y + domeRise(b, rr.d / Math.max(rr.reach, 1e-6)) <= pos.y + glide) continue;
+      // Too steep to glide: block, and say how high the top is. Within `climb` that is an offer to
+      // go over; higher, it is only what it would take, for a body stubborn enough to want it.
+      if (out) {
+        const top = b.height + radius * 0.6;
+        out.wallTop = Math.max(out.wallTop, top);
+        if (climb > 0 && b.height <= pos.y + climb) out.climbTo = Math.max(out.climbTo, top);
+      }
     }
+    // Straight out along the ray from the centre, to where the footprint crosses it.
+    const want = rr.reach + radius;
+    pos.x = b.pos.x + rr.nx * want;
+    pos.z = b.pos.z + rr.nz * want;
+    hit = true;
   }
+  if (out) out.hit = hit;
   return hit;
 }
 
-/** Ground height including boulder tops, for crawlers. */
+/** Ground height including boulder tops. Only where a rock actually is: its drawn ellipse, not a circle around it. */
 export function groundHeight(world: WorldData, x: number, z: number, scratch: Boulder[]): number {
   let h = sampleHeight(x, z);
   for (const b of world.boulderHash.query(x, z, 8, scratch)) {
-    const dx = x - b.pos.x, dz = z - b.pos.z;
-    const d = Math.hypot(dx, dz);
-    if (d < b.radius) {
-      const dome = Math.sqrt(Math.max(0, 1 - (d / b.radius) ** 2));
-      h = Math.max(h, b.pos.y + b.sy * (b.variant === 'blade-spire' ? 4 : b.variant === 'talus-shard' ? .8 : 1) * dome * .95);
-    }
+    const top = boulderTop(b, x, z);
+    if (top !== undefined && top > h) h = top;
   }
   return h;
 }

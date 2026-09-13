@@ -18,9 +18,9 @@ setAppBase(nestedBase());
 // evaluated first, and the audio library and the creature tables read ACTIVE_ERA as they load.
 const { registerSamples } = await import('../audio/audio');
 registerSamples(DEVONIAN_SAMPLES);
-const { App } = await import('../app/App');
+const { Root } = await import('../app/Root');
 createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
-    <App />
+    <Root />
   </React.StrictMode>,
 );

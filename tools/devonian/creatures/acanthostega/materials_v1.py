@@ -1,7 +1,12 @@
 """Original swatch mapped in physical space to avoid stretched snout pigmentation."""
 import bpy,os,struct,zlib,numpy as np
 from math import pi
-from anatomy_v1 import surf,smooth
+# Sample the same surf()/smooth() the active build used, so the body/fin texture's physical-space
+# mapping (materials sample surf(y,angle) directly) matches whichever anatomy shaped the mesh.
+if os.environ.get('ACA_ANATOMY')=='v2':
+ from anatomy_v2 import surf,smooth
+else:
+ from anatomy_v1 import surf,smooth
 
 def build_materials(here):
  src=bpy.data.images.load(os.path.join(here,'skin-source.png'),check_existing=False);sw,sh=src.size;art=np.array(src.pixels[:]).reshape(sh,sw,4)[...,:3];maps={};lookup={}

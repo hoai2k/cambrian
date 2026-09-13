@@ -1,0 +1,58 @@
+{
+  "id": "palaeoisopus",
+  "name": "Palaeoisopus",
+  "species": "Palaeoisopus problematicus",
+  "provenance": "Early Devonian, Early Emsian, Hunsr\u00fcck Slate, Germany",
+  "description": "Robust fossil sea spider with a long segmented abdomen, massive grasping chelifores and eight flattened swimming limbs.",
+  "lengthMeters": 0.3,
+  "modelLength": 6.840831518173218,
+  "locomotion": "Swim",
+  "clips": [
+    "Idle",
+    "Swim",
+    "TurnLeft",
+    "TurnRight",
+    "Dive",
+    "Rise",
+    "Attack",
+    "Bite",
+    "Heavy",
+    "Hit",
+    "Death",
+    "Guard",
+    "Parry",
+    "Dodge",
+    "Eat",
+    "Stagger",
+    "Ability",
+    "Moult",
+    "Grab"
+  ],
+  "looping": [
+    "Idle",
+    "Swim",
+    "Guard",
+    "Eat"
+  ],
+  "anchors": [
+    "anchor_mouth",
+    "anchor_mouth_inside",
+    "anchor_attack_primary"
+  ],
+  "sources": [
+    {
+      "title": "Sabroux et al.2024, New insights into the Devonian sea spiders of the Hunsr\u00fcck Slate",
+      "url": "https://doi.org/10.7717/peerj.17766"
+    }
+  ],
+  "notes": [
+    "Original initial preview based on Sabroux et al.2024; representative adult leg span0.30m, not a maximum-size claim.",
+    "Four walking-leg pairs have flattened distal articles, first pair nine podomeres and remaining pairs ten with metatibia; proximal coxal rings are ornamental divisions within coxa1.",
+    "Long articulated abdomen terminates in a lanceolate fifth element/telson complex; homology of the fifth abdominal element remains debated.",
+    "Chelifores follow the favored two-scape interpretation; oviger segmentation remains incompletely preserved.",
+    "Proboscis is a broad ventral tube shown posteriorly folded at rest, plausibly mobile; action names represent grasping/probing equivalents and do not imply fish-like biting jaws.",
+    "Prominent ocular-region bumps are modeled as cuticular/sensory tubercles, not asserted eye globes. Eye positions are unresolved in the fossil; no differentiated external eyes are invented.",
+    "Pigmentation, exact soft oral margins, appendage thickness, setal density and motion amplitudes are inferred.",
+    "Preview: finer cuticle, joint and animation refinement deferred until the initial roster is complete."
+  ]
+}

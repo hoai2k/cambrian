@@ -1,0 +1,13 @@
+{
+  "candidate": "Bothriolepis V3 clay01",
+  "owner": "Astra high",
+  "executor": "Terra medium",
+  "inputs": {
+    "/Users/hoai/Documents/Stuff/Generations/cambrian/local/expansion-repo/tools/devonian/creatures/bothriolepis/rework-v3/geometry_clay01.py": "3a5c1b6e1ba8092fe1ffd9c58e11c0127e2b034210f721173be2e1c624d148c4",
+    "/Users/hoai/Documents/Stuff/Generations/cambrian/local/expansion-repo/tools/devonian/creatures/bothriolepis/rework-v3/build_clay01.py": "4061aaf623bbac30acedfb1157a0b662c53022c1ae481f651eb720c906b75ccd",
+    "/Users/hoai/Documents/Stuff/Generations/cambrian/local/expansion-repo/tools/devonian/creatures/bothriolepis/rework-v3/execute_clay01.py": "b85540c876e4b4b9f3a9bff432ad37df309f23e04608c7b56b2f78806616703b",
+    "/Users/hoai/Documents/Stuff/Generations/cambrian/local/expansion-repo/tools/devonian/creatures/bothriolepis/rework-v3/anatomy-brief-clay01.md": "52f4933550382b76da35ebb12be4c9269a76041a862bd024214e6fc03b98e2ee",
+    "/Users/hoai/Documents/Stuff/Generations/cambrian/local/devonian-authoring/bothriolepis/reference-417.pdf": "862d19a8729a3ead88878cccf088744f0dae330cb9dc7a39e451fd1ef6d3b433",
+    "/Users/hoai/Downloads/Bothriolepis.jpeg": "9ccf6370e4e74e14a93a64b9f091bd75cca3a306dcd5405aaf89950c75373c6f"
+  }
+}

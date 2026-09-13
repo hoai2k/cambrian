@@ -1,0 +1,232 @@
+{
+  "status": "initial-preview-integration-candidate",
+  "files": [
+    {
+      "path": "src/content/era.ts",
+      "bytes": 6986,
+      "sha256": "122b8a13f9eab4ac94d2dc096baa4b2f71f3149851f39a1026e35a6a7bddcf79"
+    },
+    {
+      "path": "src/content/devonian/scenery.ts",
+      "bytes": 1941,
+      "sha256": "fd476c5fd5577d0a2f4e2c0022c243124794e339b070d4f04b594c48776927f6"
+    },
+    {
+      "path": "src/content/devonian/index.ts",
+      "bytes": 6128,
+      "sha256": "411948a2ab8c85c3f9e6804e20427301f90954b00cef0f40a36cecf40307684a"
+    },
+    {
+      "path": "src/render/props.ts",
+      "bytes": 3754,
+      "sha256": "f47f6b4b5221520f4f3457a9ed5e9251ab96b7bc67014e74541b560895ed803e"
+    },
+    {
+      "path": "src/render/sea.ts",
+      "bytes": 49016,
+      "sha256": "eab30c764733754aaae04bad1988124928c3dda87c5357ee009cfa18450b3bd1"
+    },
+    {
+      "path": "tools/devonian/props-instancing/build.py",
+      "bytes": 5816,
+      "sha256": "8ba11ea239b9892d19b5995898a3d382a21486948594aec254b2b68c3b28f4b3"
+    },
+    {
+      "path": "tools/devonian/props-instancing/config.json",
+      "bytes": 2405,
+      "sha256": "eda395ac7a8fd6d89055bf0ab342aa9497793f0007d101eced983415e320422c"
+    },
+    {
+      "path": "tools/devonian/props-instancing/loader-test.ts",
+      "bytes": 3153,
+      "sha256": "2d313cc6d65a03184cf21d21e9fdc3a6dc598319ebfa5056ff36606809fe652a"
+    },
+    {
+      "path": "tools/devonian/props-instancing/README.md",
+      "bytes": 7233,
+      "sha256": "909aa4ab658590790e401dc4a10af96efd04e801f11944446b6cf4685768c41f"
+    },
+    {
+      "path": "tools/devonian/props-instancing/validation.json",
+      "bytes": 8231,
+      "sha256": "f4438b6b394562d5382f644cec98b98470222140a3fcabed67765887a4c4a3f7"
+    },
+    {
+      "path": "tools/devonian/props-instancing/package.mjs",
+      "bytes": 4171,
+      "sha256": "c63975fbbc74cff7e12feec9428c3b6329e3945b8a70d7667ca71f7b4fbb2165"
+    },
+    {
+      "path": "tools/devonian/props-instancing/review.mjs",
+      "bytes": 5259,
+      "sha256": "7d5e43f35711fde5b8853482db57ed3f439f0b4f4ddc9105495fd5fe1b975ddf"
+    },
+    {
+      "path": "tools/devonian/props-instancing/build-report.json",
+      "bytes": 11175,
+      "sha256": "14f2d8322ecb45a4ee27fffec7942c8bf871657a3a12fc5f260e811dd74d3d60"
+    },
+    {
+      "path": "tools/devonian/props-instancing/decode.mjs",
+      "bytes": 2412,
+      "sha256": "a32d0a55d5801e79edd1e1863c347ca3a81a576e2549671924f21c8e92f36f87"
+    },
+    {
+      "path": "public/assets/devonian/props-instanced/devonian-crinoid.glb",
+      "bytes": 70712,
+      "sha256": "39cce35aab639887b51ea8c1adf287e633753c445a642b2ab8a39aab19da9ce1"
+    },
+    {
+      "path": "public/assets/devonian/props-instanced/devonian-rugose.glb",
+      "bytes": 82924,
+      "sha256": "5fb98a3a44d94ca637dddb4b5f2d70a74f5ef63e376f88bdfa5d2e99d6c7d5b0"
+    },
+    {
+      "path": "public/assets/devonian/props-instanced/devonian-talus.glb",
+      "bytes": 25072,
+      "sha256": "8265cddb0280cc112ac8e76ac0be491dcbd604788f1613ad17d3e7652f6eb2a2"
+    },
+    {
+      "path": "public/assets/devonian/props-instanced/devonian-boulder.glb",
+      "bytes": 8228,
+      "sha256": "d4b5c6a72ab74c1e8859a102f9c11c83dbfb0434affd68ce40ea7b6627dd089f"
+    },
+    {
+      "path": "public/assets/devonian/props-instanced/devonian-log.glb",
+      "bytes": 29124,
+      "sha256": "765903b8c39f3092cb7da5d49bb999787286d93e6b920776a88f631dee603f45"
+    },
+    {
+      "path": "public/assets/devonian/props-instanced/devonian-stromatoporoid.glb",
+      "bytes": 25692,
+      "sha256": "2e4b08205e742200fa86a56a6b205cd2ec5e62cc750f515109ddb8e682a49de1"
+    },
+    {
+      "path": "public/assets/devonian/props-instanced/devonian-algal-clump.glb",
+      "bytes": 36064,
+      "sha256": "ba5e2acd1826a53ff2bcf6c05bcce85c74adf6719b9ebd1c7f21ccb771754c62"
+    },
+    {
+      "path": "public/assets/devonian/props-instanced/devonian-pebbles.glb",
+      "bytes": 25480,
+      "sha256": "c35e530ef11fd01f8380ab198c5326b1962fdfa09dcd846d4deccfcf2286a15d"
+    },
+    {
+      "path": "public/assets/devonian/props-instanced/devonian-bryozoan.glb",
+      "bytes": 58360,
+      "sha256": "c5606d91cb309bd4d649c12ff5cec5a1e7f511c9679c1eaeb3ba886a79ab0f72"
+    },
+    {
+      "path": "public/assets/devonian/props-instanced/devonian-outcrop.glb",
+      "bytes": 8436,
+      "sha256": "4af19c0a8155d8a7668575a9f1b3b99f1f80b14950de1e6c9a6c2814c58013e8"
+    },
+    {
+      "path": "public/assets/devonian/props-instanced/devonian-tabulate.glb",
+      "bytes": 31268,
+      "sha256": "de11255d7bd7a86696d9e0a0f2d79513051ab939933d3f0a5960ca24f9143686"
+    }
+  ],
+  "localBlenderSources": [
+    {
+      "path": "/Users/hoai/Documents/Stuff/Generations/cambrian/local/devonian-authoring/props-instancing/devonian-pebbles.blend",
+      "bytes": 131047,
+      "sha256": "e4ea6b626a29026edc96d6391b52fa3d0c2fcd3f3edf6d4610a1f05c84c7ff5c"
+    },
+    {
+      "path": "/Users/hoai/Documents/Stuff/Generations/cambrian/local/devonian-authoring/props-instancing/devonian-rugose.blend",
+      "bytes": 210072,
+      "sha256": "93a782cbb28c4afe98d721ef88a7562a8776dad314ba4c8525b390b32d9259a9"
+    },
+    {
+      "path": "/Users/hoai/Documents/Stuff/Generations/cambrian/local/devonian-authoring/props-instancing/devonian-bryozoan.blend",
+      "bytes": 168306,
+      "sha256": "34630772ad511d664fe92e73466e5b94e105ddc9d74460144ac9468a9b776916"
+    },
+    {
+      "path": "/Users/hoai/Documents/Stuff/Generations/cambrian/local/devonian-authoring/props-instancing/devonian-crinoid.blend",
+      "bytes": 198112,
+      "sha256": "cd8d63e75717b26170f72e589c6a141c87c58b7e73eccf5d9f565644300dd02f"
+    },
+    {
+      "path": "/Users/hoai/Documents/Stuff/Generations/cambrian/local/devonian-authoring/props-instancing/devonian-outcrop.blend",
+      "bytes": 104589,
+      "sha256": "454cb18becc8cf1b9f9b5a1b3b54b08d37f03971f4c9df0415c67e8f0f18cd2e"
+    },
+    {
+      "path": "/Users/hoai/Documents/Stuff/Generations/cambrian/local/devonian-authoring/props-instancing/devonian-tabulate.blend",
+      "bytes": 153814,
+      "sha256": "bfb3ff76024203a4e7913e0e84cd81c258afb5472967adc0dffd85106398896b"
+    },
+    {
+      "path": "/Users/hoai/Documents/Stuff/Generations/cambrian/local/devonian-authoring/props-instancing/devonian-talus.blend",
+      "bytes": 136963,
+      "sha256": "0fc2b0eff75a5d86ea77c2f7144cd67bfdfc9fdb59dbc870b4a856ab9bff4e22"
+    },
+    {
+      "path": "/Users/hoai/Documents/Stuff/Generations/cambrian/local/devonian-authoring/props-instancing/devonian-boulder.blend",
+      "bytes": 104552,
+      "sha256": "b6129f23e078aa109a02fc4103e9b072fd3a4bd492976e750565484669b3f630"
+    },
+    {
+      "path": "/Users/hoai/Documents/Stuff/Generations/cambrian/local/devonian-authoring/props-instancing/devonian-log.blend",
+      "bytes": 143079,
+      "sha256": "27607d51adfe5c234f8f6326aa09ec4470003c7492111138f7dae64f10b235e6"
+    },
+    {
+      "path": "/Users/hoai/Documents/Stuff/Generations/cambrian/local/devonian-authoring/props-instancing/devonian-algal-clump.blend",
+      "bytes": 150253,
+      "sha256": "142d380e886ab62a3b31248acf42dfef068e04a0b28b957b743058c0863ba522"
+    },
+    {
+      "path": "/Users/hoai/Documents/Stuff/Generations/cambrian/local/devonian-authoring/props-instancing/devonian-stromatoporoid.blend",
+      "bytes": 140294,
+      "sha256": "89fab8b90d214fa9ca5d2ffc319a1411c51b4e6cf6a57794c28b3a6ebd6bb119"
+    }
+  ],
+  "verification": {
+    "typecheck": "pass",
+    "devonianChecks": 618,
+    "eras": "pass",
+    "viteBuild": "pass",
+    "loaderRegression": "pass",
+    "browserErrors": [],
+    "originalMetricSourcesUnchanged": true,
+    "lowModeHasNoAuthoredFlora": true,
+    "highModeHasAuthoredFlora": true
+  },
+  "renderComparison": {
+    "seed": 5052026,
+    "colourPassOnly": true,
+    "shadowsEnabled": false,
+    "lowBefore": {
+      "frame": 2,
+      "calls": 104,
+      "triangles": 1211203,
+      "points": 600,
+      "lines": 0
+    },
+    "lowAfter": {
+      "frame": 2,
+      "calls": 104,
+      "triangles": 1307304,
+      "points": 600,
+      "lines": 0
+    },
+    "highAfter": {
+      "frame": 2,
+      "calls": 104,
+      "triangles": 8087473,
+      "points": 1600,
+      "lines": 0
+    },
+    "lowTriangleMultiplier": 1.0793434296315316,
+    "highQualityPreviewLimitation": "Dense authored flora still costly; future scatter LODs."
+  },
+  "remaining": [
+    "High-quality dense-scatter geometry cost; future cheaper LOD. Performance/low already retains procedural flora.",
+    "Two giant procedural silhouette exceptions documented in README/config.",
+    "Pebble derivative retains small source sediment patch; future art refinement."
+  ],
+  "ownership": "Root owns integration/commit after this handoff. No git mutations performed."
+}

@@ -1,0 +1,20 @@
+# Candidate06 actual render review — final art HOLD
+
+Astra high independently inspected all23 actual rendered images and the original /Users/hoai/Downloads/Titanichthys.webp reference. Every image hash was reverified against portrait-pose-manifest.json SHA507de45a64ed53697dcbb138452990752a5fdf490551b8246e9f3feb9f16f48b.
+
+Bound objects: full GLB e2c69eab63e50805c7d3980ee5e65e8b328b8d88e190a944e3f26db2b8ef36ad (43,409,408 bytes), LOD27ca2ebdc5d40482dccc93d2fdc13f0390c6b4082407c245ba45913fa3773f40 (3,878,132 bytes), production blend0965e540499f333fd6af34c196c9d3d1f90a0f59658cbb64b56d85e669eb3d82. Structural review03d699e467f1f3eb2d64ac6db61c0d61546bd73c8a6472800673fd7cc9f695f3 passes18/18 clips and exact full/LOD animation contract. Structural completion does not resolve the visible issues below.
+
+## Accepted progress
+
+- Full studio/select/card/thumb retain the broad armoured anterior, blue/slate pigment, swept paired fins and asymmetric caudal profile. Fine pigment and fin rays remain visible in the full model. Posterior material is quieter. Sutures remain softer than the illustration, but form coherent authored fields rather than masonry blocks. No broad sculpt or material restart is warranted by these exports.
+- Idle/Swim/TurnLeft/Heavy/Guard/Dodge/Death poses retain body and appendage continuity at the sampled instants. The rolled Death posture is distinct. Still images do not prove timing, anticipation/recovery or fin clearance throughout playback.
+- Full Bite/Eat and imported LOD Eat show a continuous inset edentulous floor/lip and attached corners, without the old detached rail/panel defect. The triangular side projection remains a lower-mouth volume, not sufficient evidence by itself for another broad cheek rebuild.
+- LOD-oblique/Attack/Eat preserve authored pigment and real oral motion; no white whole primitives remain. Texture-free LOD loses fine flecks/rays as expected but keeps broad palette/armour identity. Small light edge marks in the coloured pectoral view largely disappear in the neutral LOD view, so they do not establish missing fin geometry. Judge the transition at actual runtime distance later.
+
+## Final art hold
+
+1. **Maximum-gape oral defect unresolved.** Ability-oral.png SHA bd69a3ca3d61730d20a1af0994d711579a473458197515154440fcbd4c475acc shows two discrete pale oval patches on the pink lower floor/lip around pixels(474,560) and(927,560) in1400x1050. They are absent from the comparable Bite/Eat images. Their sharp flat appearance suggests another material-bearing surface becomes exposed through the lining, but a still image cannot prove whether that is geometry, region ownership or PBR response. Do not paint them away or change weights blindly. First trace actual full/LOD triangles and materials at these camera rays and inspect planar sections.
+2. **Orbital final gate remains open.** Eyes are readable in frontal, side and oblique views, but the lateral globe still reads as a small protruding bead. There is no detached decorative torus. Actual new full/LOD globe-volume containment has not yet been measured; the old-model audit is irrelevant. Require both eyes against the continuous actual head, minimum50% with65% target margin, then revisit all four orbital views. A numerical pass alone will not approve the appearance.
+3. **Runtime and size still pending.** Still-pose coverage and18/18 dynamic channels do not substitute for actual playback/palette/LOD transition review. Raw full GLB43.4MB exceeds the delivery budget. A separate local lossless study may proceed to establish whether exact numeric/image/animation preservation fits25MiB; it is not integration approval.
+
+Verdict: accept the preserved coarse form, material identity and completed structural candidate as inputs for bounded validation only. HOLD final visual approval and public delivery. Root independently agrees the paired pale Ability patches need resolution. Next: numerical oral/material/section evidence first, independent actual eye volume, and independent lossless18/18 packaging study. No heavy Blender work was executed by Astra, and no public/Git/shared files were modified.

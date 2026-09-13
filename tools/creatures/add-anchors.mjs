@@ -118,7 +118,15 @@ export function appendAnchors(input, sourceRecords) {
       anchorIndex = existing[0];
       assert.equal(parent.get(anchorIndex), parentIndex, `${a.name}: existing socket has another parent`);
       assert.deepEqual(nodes[anchorIndex].extras?.cambrianAnchor, extras, `${a.name}: existing metadata differs`);
-      assert(!nodes[anchorIndex].matrix && !nodes[anchorIndex].rotation && !nodes[anchorIndex].scale, `${a.name}: existing nontranslation socket`);
+      // A socket must be a pure translation in its parent bone's frame. Absent rotation/scale and
+      // explicit identity ones say the same thing, and the clip re-encode (tools/creatures/motion/
+      // apply.mjs) rewrites every node with all three components spelled out, so an identity pair
+      // is what most of the expansion carries today. Reject only a transform that actually turns
+      // or resizes the socket.
+      const socket = nodes[anchorIndex];
+      const identityRotation = !socket.rotation || socket.rotation.every((v, i) => v === (i === 3 ? 1 : 0));
+      const identityScale = !socket.scale || socket.scale.every((v) => v === 1);
+      assert(!socket.matrix && identityRotation && identityScale, `${a.name}: existing nontranslation socket`);
       assert(new Vector3().fromArray(nodes[anchorIndex].translation ?? [0, 0, 0]).distanceTo(local) < 1e-9, `${a.name}: existing point differs`);
     } else {
       anchorIndex = nodes.length; nodes.push(expected);

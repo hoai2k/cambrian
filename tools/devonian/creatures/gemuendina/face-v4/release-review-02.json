@@ -1,0 +1,60 @@
+{
+  "status": "preview",
+  "candidate": "candidate-02",
+  "files": {
+    "gemuendina.glb": {
+      "sha256": "7ccbe5be171d515cc17ebed857ef85e1caadab24d85e39efb88866758bfdec27",
+      "bytes": 16412444
+    },
+    "gemuendina.lod1.glb": {
+      "sha256": "94738efcb8e43c1c5ee9ab249cd45b9b1f88277d184fcf60d8050c26d52b09ea",
+      "bytes": 2862364
+    },
+    "gemuendina.png": {
+      "sha256": "8c82027b2ea8400795320959f2af023093af228e07121fa79cb4dd0a6f24d183",
+      "bytes": 2036477
+    },
+    "gemuendina.select.png": {
+      "sha256": "8ea7c9850f6e55f82ae8c6917320a2eed45d288aeeefdbcaaa63a330e8f2507f",
+      "bytes": 910651
+    },
+    "gemuendina.card.png": {
+      "sha256": "ef1d2cac1a8cad8157ddf2889a4d675dc87826e7e48b5df17f2db9aa79f08649",
+      "bytes": 244636
+    },
+    "gemuendina.thumb.png": {
+      "sha256": "67e34a16d02af77d3a17d9d98cd9bacbe2191efcfd1d3b1b6752b1165522b98e",
+      "bytes": 30427
+    },
+    "gemuendina.json": {
+      "sha256": "60c73507201168a10e097f6709304061cda5bfaf0c7fe0ea00815ce9725987aa",
+      "bytes": 2826
+    }
+  },
+  "metadata_source_sha256": "eb2eaf5f9940d99de6f0cc279ce6013049954791f5d90f36a323ff5c23c44b51",
+  "eye_audit_sha256": "1f10e36db2d7df2e0dae1ddfd9fbac873712b1b2f7d55ac97dc6066d29557f7d",
+  "remaining": "Broader final art review, distant LOD crease/pigment cleanup and controller playtest.",
+  "root_review": "Accepted focused face preview, all11 actual export views inspected; final LOD/general review remains",
+  "minimum_eye_inside_percent": 77.79530173487174,
+  "minimum_conservative95_percent": 77.04431538875355,
+  "viewer": "Built4176: Idle and Heavy.495s;18clips; preview badge; controller prey play not tested",
+  "validation": [
+    "selected Devonian intake PASS",
+    "typecheck PASS",
+    "build PASS"
+  ],
+  "source_inputs": {
+    "candidate_01.py": "05e8c4802ee359fe93b1e01fddf00b349bca55d4b8bb82e27698cb2d7263a615",
+    "render_candidate_01.py": "41b17bb145bc736ce83830b3d1557a25538e5963a136b67b708b41a309d29ab3",
+    "release_02.py": "b2833577217f963cc7f38cbfa38d16b2fe02b85c6a64744a38ada6a01b8b7405",
+    "study_01.py": "2da0b5327016fa63ac04b4ab28370b7300a500a42a46ef8443bc2071ea7ddb94",
+    "check_candidate_02.py": "75a9697dd86bf74c55cf7137f5019d167f8340841daed8ba255f74acfaef0ed8",
+    "shape_02.py": "51141ce7982d563b9f6fc85caab1b3aec0b4261b0cabf4a449b75085c3049f6e",
+    "audit_candidate_02.py": "5d0d0e8948b7c43ccded1a1379ff29fe0ee6602fbd32d0f93a3cfecfbef2a5bd",
+    "check_candidate_01.py": "15d114cb9077f68bd6b099952598ed3eb04917171575a451b2f2fff432c9c74d",
+    "audit_candidate_01.py": "818c1774b1d0d4851ac4a4bb36cededd153e600bffcd425f67c6bb2dcac99341",
+    "render_candidate_02.py": "f599e48d9b2b881edebf3c88c324be46dc4a3e3f055624856c8793098663951a",
+    "study_02.py": "f0f9e97bb2e3bb5fc06e52e87cbda90db641178939cea994495a03b64f5e7aeb",
+    "candidate_02.py": "90c3bc7154c2cc78d08370193a4c5f7c36ebdabe4f65106be6822eb4c5172e6c"
+  }
+}

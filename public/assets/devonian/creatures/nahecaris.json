@@ -1,0 +1,59 @@
+{
+  "id": "nahecaris",
+  "name": "Nahecaris",
+  "species": "Nahecaris stuertzi",
+  "provenance": "Early Devonian, Hunsr\u00fcck Slate, Germany",
+  "description": "Bivalved phyllocarid with a rostral plate, branching antennae, eight pairs of biramous basket-forming thoracopods, seven abdominal rings and narrow telson/furcal rami.",
+  "lengthMeters": 0.12,
+  "modelLength": 6.6098034381866455,
+  "locomotion": "Swim",
+  "clips": [
+    "Ability",
+    "Attack",
+    "Bite",
+    "Crawl",
+    "Death",
+    "Dive",
+    "Dodge",
+    "Eat",
+    "Guard",
+    "Heavy",
+    "Hit",
+    "Idle",
+    "Moult",
+    "Parry",
+    "Rise",
+    "Stagger",
+    "Swim",
+    "TurnLeft",
+    "TurnRight"
+  ],
+  "looping": [
+    "Idle",
+    "Swim",
+    "Crawl",
+    "Guard",
+    "Eat"
+  ],
+  "anchors": [
+    "anchor_mouth",
+    "anchor_mouth_inside",
+    "anchor_attack_primary"
+  ],
+  "sources": [
+    "https://doi.org/10.1007/BF02985909",
+    "https://doi.org/10.1016/j.asd.2016.01.004",
+    "https://doi.org/10.1080/08912963.2025.2492356",
+    "https://pmc.ncbi.nlm.nih.gov/articles/PMC5378094/"
+  ],
+  "notes": [
+    "Initial preview reconstruction with explicitly uncertain ocular bases, soft tissues and exact appendage proportions.",
+    "Eight biramous thoracopod pairs with finger-like exopod lobes and progressively shorter endopods; no generic decapod claw or tail fan.",
+    "Compact eyes beneath rostral plate are reconstructed; precise eye preservation is not asserted from the accessible species abstract.",
+    "The 0.12 m representative display length is an art assumption, not a measured maximum.",
+    "Historical whole-animal drawing and comparative archaeostracan abdomen/pleopods guide missing proportions.",
+    "Crawl is a restrained antenna-supported substrate gesture; Swim is compatibility locomotion using metachronal limbs. Precise cycles are inferred.",
+    "Moult is preparatory limb/rim extension, without shell splitting, scale channels or whole-model growth.",
+    "Full regional vertex pigment times near-neutral albedo once; texture-free LOD bakes that factor once."
+  ]
+}

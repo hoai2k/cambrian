@@ -1,4 +1,4 @@
-# Audio requests — Cambrian Explosion
+# Audio requests — Cambrian Conquest
 
 Open sound and music requests. Image, glyph and prop requests live in
 [image-requests.md](image-requests.md). How the audio system consumes what is
@@ -10,28 +10,27 @@ size budget, a description of the sound, and the code that will consume it.
 
 ## Open
 
-### Biome music themes — 2 loops (optional)
-
-Optional: nothing in either era waits on these; the tags fall silent until the files exist.
-The soundtrack (`src/audio/music.ts`) rotates tracks and cues a track when you
-enter a biome it is tagged for. The two reef tracks exist (*Tide of First
-Bones*, *First Tide*). Two more are wanted, same instrumentation family so the
-crossfades feel like one score. **Both tags are already live in `MUSIC`, so
-dropping the files into `public/music/` is the whole integration**; until then
-each one fails to load and drops out of the rotation (`MISSING` in `music.ts`),
-and the reef tracks play everywhere.
-
-| File | Biomes | Brief |
-| --- | --- | --- |
-| `public/music/theme-calm.mp3` | Sunlit Shallows, Nursery Reef | The shallows and nurseries. 2–3 minutes, seamless loop, slow (60–70 bpm), major or lydian, warm pads, soft mallets, gentle water-like arpeggios, no percussion beyond a soft pulse. Should sit under sunlit caustics and let the player relax; it also plays over most of the early game. −16 LUFS integrated, under 6 MB. |
-| `public/music/theme-danger.mp3` | The Channels, The Escarpment, Deep Basin | 2–3 minutes, seamless loop, slow and low (50–60 bpm), minor or phrygian, sub bass, bowed metal, distant slow drums, long dissonant swells; tense but not a chase (the giant drone and heartbeat layer on top when one is actually hunting you). −16 LUFS, under 6 MB. |
-
-Both are optional: the rotation plays the reef tracks while a file is missing.
-The danger scale that decides the tagging is `BIOME_DANGER` in `src/sim/world.ts`;
-see [redesign/04-infinite-ocean.md](redesign/04-infinite-ocean.md) · *Danger, mood and
-the art brief*.
+- **Egg hatch — 2 files.** `public/assets/sfx/egg-poke.mp3` (~0.4 s) and
+  `public/assets/sfx/egg-crack.mp3` (~1.2 s), mono, -18 LUFS, under 30 KB each.
+  Every player now hatches out of an egg on the bottom rung: five seconds of a
+  soft shell taking a poke from inside, splitting along the top, and the animal
+  wriggling clear (`HATCH_TIME` in `src/sim/game.ts`, drawn by
+  `src/render/eggs.ts`). *Poke* is the muffled thud of something pressing the
+  wall from within, underwater and close — a knuckle on a taut membrane, not a
+  drum. *Crack* is the wall giving way: a wet tearing rather than a shell
+  shattering, these are not birds' eggs. Consumed by the `hatch` case in
+  `src/render/engine.ts`, which plays `respawn` in their place for now. Shared
+  between the eras (`assets/sfx/`), because both hatch the same way.
 
 ## Delivered
+
+- **Area music themes — 4 tracks** (`Cambrian Drifting`, `Cambrian Abyss`, `Devonian Calm`,
+  `Devonian Ritual`) in `public/music/`, replacing the placeholder `theme-calm` / `theme-danger`
+  tags. Calm for the shallows and the nursery, dangerous for the channels, escarpment and basin —
+  the two safest bands of `BIOME_DANGER` against the three worst, one pair per era. Consumed by the
+  area score in `src/audio/audio.ts` (`stepArea`) and tagged in each era's `music.ts`; see
+  [audio.md](audio.md) · *The area score* for the crossfade and dwell rules, and `npm run music`
+  for the test that drives them.
 
 - **Big-body sounds — 6 files** (`hit-huge-1/-2`, `crunch-huge`, `surge-huge`, `sweep-huge`,
   `death-huge`) in the shared `public/assets/sfx/`, from `MANIFEST` in `tools/gen-sfx.mjs`.
@@ -76,3 +75,20 @@ the art brief*.
   takes kept out of `SAMPLES` are all documented in [audio.md](audio.md).
   `node tools/workbench-smoke.mjs <outdir>` measures the whole library and
   flags anything missing or too quiet to read.
+
+
+## Triassic Triumph — 12 September 2026
+
+The era plays with every sound borrowed (`src/content/triassic/sfx.ts` maps each event to a
+delivered Devonian or shared sample). Its own, in priority order:
+
+1. **The blow** (`gulp` in the Triassic): an air-breather breaking the surface. The era's signature
+   sound; a real recording of a large animal exhaling at the surface, not a synthesis. Three
+   takes by size (small, mid, giant).
+2. **Winded under water** (`winded`): a low, quiet pulse for a bar running down with no refill.
+3. **The shore strike**: the neck's snap and the water taken with it; the phytosaur's lunge.
+4. **Ambient bed** (`audio.loops.ambient`, today the Devonian's open sea): a bright, shallow,
+   hot-water lagoon with the surface close overhead; and the basin's dead stillness as the drone.
+5. Two area themes named in `src/content/triassic/music.ts`: *Triassic Flats* (the shallows and
+   the shore) and *Triassic Deep* (channels, front, basin). They are picked up from
+   `public/music/` the day they exist.

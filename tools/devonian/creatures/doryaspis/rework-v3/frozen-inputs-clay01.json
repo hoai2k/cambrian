@@ -1,0 +1,19 @@
+{
+  "phase": "Doryaspis rework V3 clay01",
+  "owner": "Astra high",
+  "executor": "Terra medium",
+  "frozenAtUTC": "2026-09-08T13:22:48.413521+00:00",
+  "status": "candidate source ready, no Blender execution, no art approval",
+  "inputs": {
+    "/Users/hoai/Documents/Stuff/Generations/cambrian/local/expansion-repo/tools/devonian/creatures/doryaspis/rework-v3/geometry_clay01.py": "181983f576c5ce4e0f767df639ac244a7471175cf3169d962c529245119ab7bd",
+    "/Users/hoai/Documents/Stuff/Generations/cambrian/local/expansion-repo/tools/devonian/creatures/doryaspis/rework-v3/build_clay01.py": "4de2eee03863cd2ea26e850e2cc2615820d214bd28933d7858b2ef150bcf2194",
+    "/Users/hoai/Documents/Stuff/Generations/cambrian/local/expansion-repo/tools/devonian/creatures/doryaspis/rework-v3/render_clay01.py": "1d1991f398a250b2e7fcee6847cc6891003cffdb473ef9c53263c1351da7aab8",
+    "/Users/hoai/Documents/Stuff/Generations/cambrian/local/expansion-repo/tools/devonian/creatures/doryaspis/rework-v3/check_source_clay01.py": "3d667a4cc0e962aaf57dfe0be666943199344b255c6f73315a408c1f4edcb416",
+    "/Users/hoai/Documents/Stuff/Generations/cambrian/local/expansion-repo/tools/devonian/creatures/doryaspis/rework-v3/execute_clay01.py": "173e4049aaa77136abc4f910be100d9c06619cc2ba999866dc43ac7b86de12ea",
+    "/Users/hoai/Documents/Stuff/Generations/cambrian/local/expansion-repo/tools/devonian/creatures/doryaspis/rework-v3/source-checks-clay01.json": "e37998d256a25187a8dd1148a60f351ab1b6012af1f56fca61677a59d9fb996a",
+    "/Users/hoai/Documents/Stuff/Generations/cambrian/local/expansion-repo/tools/devonian/creatures/doryaspis/rework-v3/DESIGN-clay01.md": "e9b6953026212ef9d5f089b74599a67a634f5fd74898f4de06075a064b8b0ea5",
+    "/Users/hoai/Documents/Stuff/Generations/cambrian/local/devonian-authoring/doryaspis/user-reference/doryaspis-user-reference-2026-09-07.png": "d743df4c5c8d5a9a2040e8878b3cb6461a105f22143ffa06f3db1fce47b91cf4",
+    "/Users/hoai/Documents/Stuff/Generations/cambrian/local/devonian-authoring/doryaspis/v2/reference-supplement.pdf": "6a39203c12e8b764dcf873d1359b65c8b5c8a988e2fb70921bd97cfc489f3ecf",
+    "/Users/hoai/Documents/Stuff/Generations/cambrian/local/devonian-authoring/doryaspis/v2/reference-supplement-1.png": "942afd7c14bd1108fe3704c98338e33c5587dc1e38c05657d338c95aa834e092"
+  }
+}

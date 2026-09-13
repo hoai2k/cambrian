@@ -1,0 +1,191 @@
+[
+  {
+    "id": "anomalocaris",
+    "lengthM": 0.378,
+    "maxLengthM": 0.5,
+    "basis": "trunk, excluding frontal appendages and tail fan",
+    "confidence": "published",
+    "source": "Daley & Edgecombe 2014, J. Paleontol. 88:68-91; maximum 38.7 cm in Lerosey-Aubril & Pates 2018",
+    "note": "The largest known Cambrian animal in Whittington & Briggs 1985's title, and still the biggest thing on this roster. 0.5 m is the whole animal with appendages and tail fan; the trunk figure is the one that scales."
+  },
+  {
+    "id": "tamisiocaris",
+    "lengthM": 0.28,
+    "maxLengthM": 0.336,
+    "basis": "whole animal, reconstructed",
+    "confidence": "derived",
+    "source": "Lerosey-Aubril & Pates 2018, Nat. Commun. 9:3774 (22.8-33.6 cm); appendages described by Daley & Peel 2010, feeding by Vinther et al. 2014, Nature 507:496",
+    "note": "Known from frontal appendages and a head shield, so the body length is reconstructed from relatives. Popular accounts of a 2 m filter feeder come from the 2014 press cycle, not from a measurement; the 2018 estimate is the one to use."
+  },
+  {
+    "id": "cambroraster",
+    "lengthM": 0.25,
+    "maxLengthM": 0.3,
+    "basis": "whole animal",
+    "confidence": "published",
+    "source": "Moysiuk & Caron 2019, Proc. R. Soc. B 286:20191079",
+    "note": "Hundreds of specimens; the carapace alone is the size of a hand. Second only to Anomalocaris here."
+  },
+  {
+    "id": "burgessomedusa",
+    "lengthM": 0.2,
+    "maxLengthM": 0.24,
+    "basis": "bell height, tentacles excluded",
+    "confidence": "published",
+    "source": "Moon, Caron & Moysiuk 2023, Proc. R. Soc. B 290:20222490 (182 specimens)",
+    "note": "The oldest unequivocal swimming medusa. Bell width is about 40% of height and the ~90 tentacles add another 15%, so the swimming silhouette is taller than it is wide."
+  },
+  {
+    "id": "odaraia",
+    "lengthM": 0.15,
+    "maxLengthM": 0.2,
+    "basis": "whole animal including tail fluke",
+    "confidence": "published",
+    "source": "Briggs 1981, Phil. Trans. R. Soc. B 291:541; Izquierdo-Lopez & Caron 2024, Proc. R. Soc. B 291:20240622",
+    "note": "One of the largest Cambrian bivalved arthropods. The 2024 redescription works from specimens near 20 cm."
+  },
+  {
+    "id": "sidneyia",
+    "lengthM": 0.12,
+    "maxLengthM": 0.16,
+    "basis": "whole animal",
+    "confidence": "published",
+    "source": "Bruton 1981, Phil. Trans. R. Soc. B 295:619; Zacai et al. 2016 on the gut contents",
+    "note": "One of the largest arthropods in the Walcott Quarry. Typical specimens 5-13 cm."
+  },
+  {
+    "id": "odontogriphus",
+    "lengthM": 0.08,
+    "maxLengthM": 0.125,
+    "basis": "whole animal",
+    "confidence": "published",
+    "source": "Caron, Scheltema, Schander & Rudkin 2006, Nature 442:159 (189 specimens)",
+    "note": "A flat grazing oval with one muscular foot. The same radula-like apparatus as Wiwaxia, at more than twice the length."
+  },
+  {
+    "id": "ottoia",
+    "lengthM": 0.08,
+    "maxLengthM": 0.15,
+    "basis": "whole animal, proboscis retracted",
+    "confidence": "published",
+    "source": "Conway Morris 1977, Spec. Pap. Palaeontol. 20; Smith, Harvey & Butterfield 2015, Palaeontology 58:705",
+    "note": "Specimens average about 8 cm; the largest reach 15. An extended proboscis adds to that without adding to the body."
+  },
+  {
+    "id": "olenoides",
+    "lengthM": 0.07,
+    "maxLengthM": 0.1,
+    "basis": "whole exoskeleton",
+    "confidence": "published",
+    "source": "Whittington 1975/1980 on the appendages; Losso, Hughes et al. 2025 on leg mobility",
+    "note": "Adults commonly 5-7 cm, up to 9-10. A mid-sized animal here, which is roughly where a Burgess trilobite belongs."
+  },
+  {
+    "id": "waptia",
+    "lengthM": 0.065,
+    "maxLengthM": 0.08,
+    "basis": "whole animal including tail fan",
+    "confidence": "published",
+    "source": "Vannier, Aria, Taylor & Caron 2018, R. Soc. Open Sci. 5:172206",
+    "note": "Shrimp-shaped under a folded carapace, and the earliest animal known to brood eggs."
+  },
+  {
+    "id": "vetulicola",
+    "lengthM": 0.07,
+    "maxLengthM": 0.09,
+    "basis": "whole animal, carapace plus tail",
+    "confidence": "published",
+    "source": "Hou 1987; Shu et al. 2001, Nature 414:419 (Chengjiang)",
+    "note": "Not a Burgess animal: Chengjiang, and about 8 million years older than the rest of the roster."
+  },
+  {
+    "id": "pikaia",
+    "lengthM": 0.05,
+    "maxLengthM": 0.06,
+    "basis": "whole animal",
+    "confidence": "published",
+    "source": "Conway Morris & Caron 2012, Biol. Rev. 87:480 (114 specimens); range 1.5-6 cm",
+    "note": "Averages about 5 cm. Reoriented the other way up by Mussini et al. 2024, which does not change the length."
+  },
+  {
+    "id": "leanchoilia",
+    "lengthM": 0.05,
+    "maxLengthM": 0.068,
+    "basis": "body, excluding the trailing whips of the great appendages",
+    "confidence": "published",
+    "source": "Bruton & Whittington 1983, Phil. Trans. R. Soc. B 300:553; Haug, Briggs & Haug 2012, BMC Evol. Biol. 12:162",
+    "note": "The great appendages carry long flagella that roughly double the animal's reach without adding body."
+  },
+  {
+    "id": "opabinia",
+    "lengthM": 0.055,
+    "maxLengthM": 0.07,
+    "basis": "head to tail, proboscis excluded",
+    "confidence": "published",
+    "source": "Whittington 1975, Phil. Trans. R. Soc. B 271:1 (range 4-7 cm)",
+    "note": "The proboscis adds about a third again to the reach and nothing to the body."
+  },
+  {
+    "id": "nectocaris",
+    "lengthM": 0.04,
+    "maxLengthM": 0.072,
+    "basis": "whole animal, tentacles excluded",
+    "confidence": "published",
+    "source": "Smith & Caron 2010, Nature 465:469; Smith 2013, Paleobiology 39:297",
+    "note": "Two size morphs, anatomically identical: a small one around 2.5 cm and a large one near four times that. The mid figure covers both."
+  },
+  {
+    "id": "ctenorhabdotus",
+    "lengthM": 0.034,
+    "maxLengthM": 0.07,
+    "basis": "body height, comb rows along it",
+    "confidence": "published",
+    "source": "Conway Morris & Collins 1996, Phil. Trans. R. Soc. B 351:279",
+    "note": "24 comb rows, three times a modern ctenophore's eight. Specimen figures cluster near 3.4 cm."
+  },
+  {
+    "id": "wiwaxia",
+    "lengthM": 0.03,
+    "maxLengthM": 0.055,
+    "basis": "whole animal, sclerites included, spines excluded",
+    "confidence": "published",
+    "source": "Conway Morris 1985, Phil. Trans. R. Soc. B 307:507; Smith 2014, Palaeontology 57:215",
+    "note": "Most specimens are 1-3 cm; the dorsal spines stand well clear of that and are not counted in the length."
+  },
+  {
+    "id": "canadia",
+    "lengthM": 0.03,
+    "maxLengthM": 0.045,
+    "basis": "whole animal, chaetae excluded",
+    "confidence": "published",
+    "source": "Conway Morris 1979, Phil. Trans. R. Soc. B 285:227; Parry & Caron 2019, Proc. R. Soc. B 286:20191247",
+    "note": "The iridescent bristles are longer than the body is wide, and are not part of the length."
+  },
+  {
+    "id": "isoxys",
+    "lengthM": 0.025,
+    "maxLengthM": 0.04,
+    "basis": "carapace, excluding the cardinal spines",
+    "confidence": "published",
+    "source": "Vannier, Garcia-Bellido, Hu & Chen 2009, Proc. R. Soc. B 276:2567; Legg & Vannier 2013, Acta Palaeontol. Pol. 54:699 on the Burgess species",
+    "note": "The spines at each end add roughly half again to the outline and nothing to the animal."
+  },
+  {
+    "id": "hallucigenia",
+    "lengthM": 0.025,
+    "maxLengthM": 0.055,
+    "basis": "body, spines excluded",
+    "confidence": "published",
+    "source": "Smith & Caron 2015, Nature 523:75; Conway Morris 1977 (range 0.5-5.5 cm)",
+    "note": "The seven pairs of dorsal spines stand about as tall as the body is long, so the drawn silhouette is far bigger than the length."
+  },
+  {
+    "id": "marrella",
+    "lengthM": 0.0155,
+    "maxLengthM": 0.0245,
+    "basis": "whole animal, head-shield spines excluded",
+    "confidence": "published",
+    "source": "Garcia-Bellido & Collins 2006, Can. J. Earth Sci. 43:721 (range 2.4-24.5 mm, >25000 specimens)",
+    "note": "The commonest animal in the Burgess Shale and the smallest on this roster. The four swept spines make it look larger than it measures."
+  }
+]

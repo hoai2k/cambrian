@@ -15,6 +15,7 @@ and the procedural environment.
 | [06 · Era content boundary](06-era-content.md) | Implemented configuration boundary for future content packs; Cambrian remains the only available era. |
 | [07 · Devonian natural-history and asset brief](07-devonian-design.md) | Natural-history descriptions for 21 creatures; regional environments, plants, props, and a quantified image/3D asset inventory. No gameplay specification. |
 | [08 · Devonian Domination](08-devonian-domination.md) | Game design for the Devonian era: rungs of a food chain instead of growth, standing and range as progress, armour, air, anoxia, shells, moulting, shoaling, a climbable shore, the biome set, modes and an implementation order. Proposal, not built. |
+| [Triassic (docs/triassic/)](../triassic/README.md) | The third era: design, roster, biomes and depth, image and model requests in Tripo / in-house tiers, and the Tripo production strategy. Proposal, not built. |
 
 Start with the design doc if you want the game; start with the technical plan
 if you want to build it. The audit is the shared set of facts both rely on, and
@@ -38,11 +39,25 @@ and **M8 (polish) is complete except for two music files**:
 | Onboarding, rumble, quality tiers, viewer | Shipped (`hintFor()` in `src/sim/game.ts`, `rumble()` wired to hits, deaths, parries, grabs, tier-ups). |
 | Landmarks, co-op revive, spectating, the discovery record | Shipped; see below. |
 | The View scoreboard, and turns in Hunter & Hunted | Shipped; see below. |
+| The day/night cycle, and the temperaments under it | Shipped: [01 · The hours](01-game-design.md#the-hours) and [Temperament](01-game-design.md#temperament). |
+| Feeding: who hunts, who grazes, who lives on the dead | Shipped: [01 · Feeding](01-game-design.md#feeding). |
+| Carrying a Rise run on, and the record it leaves | Shipped: [01 · Carrying Rise on](01-game-design.md#carrying-rise-on) and [The growth ladder](01-game-design.md#the-growth-ladder). One implementation for both eras; `npm run progress` runs the same assertions against each. |
+
+### Debug entry points
+
+`?debug=local` on either era's page — `/?debug=local`, `/devonian/?debug=local` — opens an editor
+for everything that era keeps in this browser: the biomes, landmarks and species in the codex, the
+per-creature Rise record, and the settings. Controls match how each value is actually stored, a
+number that stands for an option says what the number means, and every record has a raw-JSON
+escape hatch for anything the page does not model. The game is never started behind it.
+
+Nothing links to it and nothing advertises it; it exists so a save can be put into whatever state
+a bug needs without hand-editing JSON in devtools. `src/shared/debug.ts` is the whole gate and
+`npm run debug` guards it: only that parameter opens it, and every ordinary URL is the game.
 
 Designed but **not built** (nothing depends on them; listed so they are not
 mistaken for shipped):
 
-- A day/night cycle. `01-game-design.md` marks it optional, after core.
 - Swarm impostor billboards, from the technical plan's rendering section.
   Superseded: swarm members use the shared `*.lod1.glb` path instead, which met
   the performance targets.

@@ -1,0 +1,180 @@
+{
+  "sourceGlbSha256": "b0f2a92bffd2a2bc5194023b6e5a08be68898a57a3528602a540d39a872a0429",
+  "renders": [
+    {
+      "file": "rhinodipterus.select.png",
+      "clip": "Idle",
+      "frame": 1,
+      "imageSha256": "58364f0e84b72a269d29460f6af23e49dcbe9dea3d937fd2c28f9ea46f6a3bf5",
+      "sourceGlbSha256": "b0f2a92bffd2a2bc5194023b6e5a08be68898a57a3528602a540d39a872a0429"
+    },
+    {
+      "file": "rhinodipterus.png",
+      "clip": "Idle",
+      "frame": 1,
+      "imageSha256": "4f8bc727f5542483a8cccc935df1d9c6288274522a65ccc68a41a5d8a064f6f1",
+      "sourceGlbSha256": "b0f2a92bffd2a2bc5194023b6e5a08be68898a57a3528602a540d39a872a0429"
+    },
+    {
+      "file": "rhinodipterus.card.png",
+      "clip": "Idle",
+      "frame": 1,
+      "imageSha256": "b4c706367ba2a9964f1a9f3408da2d244bf89cd6e27dbb80b946d81d4451d4fb",
+      "sourceGlbSha256": "b0f2a92bffd2a2bc5194023b6e5a08be68898a57a3528602a540d39a872a0429"
+    },
+    {
+      "file": "rhinodipterus.thumb.png",
+      "clip": "Idle",
+      "frame": 1,
+      "imageSha256": "64c14961b13a02941235ca7f2d1dd68068c54d74587e0a3b9c165dff95010b39",
+      "sourceGlbSha256": "b0f2a92bffd2a2bc5194023b6e5a08be68898a57a3528602a540d39a872a0429"
+    },
+    {
+      "file": "Idle-v3.png",
+      "clip": "Idle",
+      "frame": 1,
+      "imageSha256": "5492557be0ae4b708bbd05fc4ea3005661ee2d61028bcdfd0b93285e6f309397",
+      "sourceGlbSha256": "b0f2a92bffd2a2bc5194023b6e5a08be68898a57a3528602a540d39a872a0429"
+    },
+    {
+      "file": "Swim-v3.png",
+      "clip": "Swim",
+      "frame": 16,
+      "imageSha256": "6940b60668c58374a0452d8e11ba70830778925b912eea1c3d927163f3e9253c",
+      "sourceGlbSha256": "b0f2a92bffd2a2bc5194023b6e5a08be68898a57a3528602a540d39a872a0429"
+    },
+    {
+      "file": "Bite-v3.png",
+      "clip": "Bite",
+      "frame": 7,
+      "imageSha256": "aa6bb2480f63f72229cbf7a2c6948751cdb196e0008df257848dd02565394a9e",
+      "sourceGlbSha256": "b0f2a92bffd2a2bc5194023b6e5a08be68898a57a3528602a540d39a872a0429"
+    },
+    {
+      "file": "Eat-v3.png",
+      "clip": "Eat",
+      "frame": 29,
+      "imageSha256": "8e25e1b085170de145b4a6f6092e11228990bdbe6dc8d61d6452f61007b4a29d",
+      "sourceGlbSha256": "b0f2a92bffd2a2bc5194023b6e5a08be68898a57a3528602a540d39a872a0429"
+    },
+    {
+      "file": "Heavy-v3.png",
+      "clip": "Heavy",
+      "frame": 12,
+      "imageSha256": "e9af17a227c21dc321553e5c0840373b10ea3403efa9585eeb41a7ef6878f915",
+      "sourceGlbSha256": "b0f2a92bffd2a2bc5194023b6e5a08be68898a57a3528602a540d39a872a0429"
+    },
+    {
+      "file": "Ability-v3.png",
+      "clip": "Ability",
+      "frame": 22,
+      "imageSha256": "89c8f8113570d653b3d7be724b91121e8f793356f9aa82b6f67a94e6ad1d626e",
+      "sourceGlbSha256": "b0f2a92bffd2a2bc5194023b6e5a08be68898a57a3528602a540d39a872a0429"
+    },
+    {
+      "file": "Guard-v3.png",
+      "clip": "Guard",
+      "frame": 16,
+      "imageSha256": "18cfdd6ff00879305ddbc3b1760695abc145cfae730cd1bdfc5c64f9958db86d",
+      "sourceGlbSha256": "b0f2a92bffd2a2bc5194023b6e5a08be68898a57a3528602a540d39a872a0429"
+    },
+    {
+      "file": "Dodge-v3.png",
+      "clip": "Dodge",
+      "frame": 7,
+      "imageSha256": "06f818febf4641557d8761e2a142ca1cddf21d607f3e2d749f6366aca99ff7b3",
+      "sourceGlbSha256": "b0f2a92bffd2a2bc5194023b6e5a08be68898a57a3528602a540d39a872a0429"
+    },
+    {
+      "file": "Death-v3.png",
+      "clip": "Death",
+      "frame": 49,
+      "imageSha256": "7079c4db201646e4437472b905ea236ebe0794b388068d30c1875f8b9f8426fe",
+      "sourceGlbSha256": "b0f2a92bffd2a2bc5194023b6e5a08be68898a57a3528602a540d39a872a0429"
+    },
+    {
+      "file": "TurnLeft-v3.png",
+      "clip": "TurnLeft",
+      "frame": 25,
+      "imageSha256": "6f0f0cd68af9ddd93f1439becb82e8500ce1bc9a64feb4740c7b332c11c0d255",
+      "sourceGlbSha256": "b0f2a92bffd2a2bc5194023b6e5a08be68898a57a3528602a540d39a872a0429"
+    },
+    {
+      "file": "eyes-front-v3.png",
+      "clip": "Idle",
+      "frame": 1,
+      "imageSha256": "6223c5f6a63f5a4f39ace1faf13438e17cbaa17347f76d1f70f7f7b1e6fbcd8c",
+      "sourceGlbSha256": "b0f2a92bffd2a2bc5194023b6e5a08be68898a57a3528602a540d39a872a0429"
+    },
+    {
+      "file": "eyes-side-v3.png",
+      "clip": "Idle",
+      "frame": 1,
+      "imageSha256": "d0df7592a0674dbe17cdce13522896a7e705659c21958646db824a66d6339504",
+      "sourceGlbSha256": "b0f2a92bffd2a2bc5194023b6e5a08be68898a57a3528602a540d39a872a0429"
+    },
+    {
+      "file": "eyes-dorsal-v3.png",
+      "clip": "Idle",
+      "frame": 1,
+      "imageSha256": "370bfe0f63834afa17e541f5b076b9548c7ba064b5caa2d79996cc748c9abc45",
+      "sourceGlbSha256": "b0f2a92bffd2a2bc5194023b6e5a08be68898a57a3528602a540d39a872a0429"
+    },
+    {
+      "file": "eyes-threequarter-v3.png",
+      "clip": "Idle",
+      "frame": 1,
+      "imageSha256": "fdc848427a070275815653ef11ce662ed77a66b02f200030788fb88378ba8bcc",
+      "sourceGlbSha256": "b0f2a92bffd2a2bc5194023b6e5a08be68898a57a3528602a540d39a872a0429"
+    },
+    {
+      "file": "mouth-gape-v3.png",
+      "clip": "Heavy",
+      "frame": 12,
+      "imageSha256": "a03949882ea67b6880a22084741116b238a521b5dbcb626a99a0c0b064bfbf59",
+      "sourceGlbSha256": "b0f2a92bffd2a2bc5194023b6e5a08be68898a57a3528602a540d39a872a0429"
+    },
+    {
+      "file": "mouth-closing-v3.png",
+      "clip": "Bite",
+      "frame": 10,
+      "imageSha256": "33ec95eb65f68b156868585d2c6a1afc752be6fb995bb517a9692eb574941d52",
+      "sourceGlbSha256": "b0f2a92bffd2a2bc5194023b6e5a08be68898a57a3528602a540d39a872a0429"
+    },
+    {
+      "file": "mouth-rest-v3.png",
+      "clip": "Idle",
+      "frame": 1,
+      "imageSha256": "5dfdab06eeb0b033e094806e3b8f3809f07a3ffb9f38bf2eab79cb1d060d0878",
+      "sourceGlbSha256": "b0f2a92bffd2a2bc5194023b6e5a08be68898a57a3528602a540d39a872a0429"
+    },
+    {
+      "file": "mouth-eat-v3.png",
+      "clip": "Eat",
+      "frame": 29,
+      "imageSha256": "f76e09faf3e814665ffd097fb1acb93d3881357eea805dde289ebb950107fc4e",
+      "sourceGlbSha256": "b0f2a92bffd2a2bc5194023b6e5a08be68898a57a3528602a540d39a872a0429"
+    },
+    {
+      "file": "mouth-gape-oblique-v3.png",
+      "clip": "Heavy",
+      "frame": 12,
+      "imageSha256": "b331f50ea4d188dffe20ff25c3bf43dee79c51514de2a7ff8a6f290c8468ad1c",
+      "sourceGlbSha256": "b0f2a92bffd2a2bc5194023b6e5a08be68898a57a3528602a540d39a872a0429"
+    },
+    {
+      "file": "mouth-closing-oblique-v3.png",
+      "clip": "Bite",
+      "frame": 10,
+      "imageSha256": "b8c65d7a3608ae8c691f8188c6fc2e8e7c0174dbfe1552ddf0bab6b693ca8625",
+      "sourceGlbSha256": "b0f2a92bffd2a2bc5194023b6e5a08be68898a57a3528602a540d39a872a0429"
+    },
+    {
+      "file": "Death-opposite-v3.png",
+      "clip": "Death",
+      "frame": 49,
+      "imageSha256": "374131fdfe4b2408891612e12304381ffc65fef92a9faafee1851047965283c4",
+      "sourceGlbSha256": "b0f2a92bffd2a2bc5194023b6e5a08be68898a57a3528602a540d39a872a0429"
+    }
+  ]
+}

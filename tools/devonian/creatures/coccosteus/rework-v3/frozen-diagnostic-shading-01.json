@@ -1,0 +1,75 @@
+{
+  "purpose": "Candidate02 actual shading ablation, read-only originals, CPU2",
+  "inputs": [
+    {
+      "path": "/Users/hoai/Documents/Stuff/Generations/cambrian/local/expansion-repo/tools/devonian/creatures/coccosteus/rework-v3/diagnostic_shading_01.py",
+      "bytes": 5140,
+      "sha256": "57d934d7fa63d13f66b4b0f2c84775251a714e12b9a8ef67e73e0f307672c34d"
+    },
+    {
+      "path": "/Users/hoai/Documents/Stuff/Generations/cambrian/local/expansion-repo/tools/devonian/creatures/coccosteus/rework-v3/inspect_atlas_01.py",
+      "bytes": 3680,
+      "sha256": "7489745c1ae24def765bbc44b5acc3181dccf836719966de96fb2e7bf30535dc"
+    },
+    {
+      "path": "/Users/hoai/Documents/Stuff/Generations/cambrian/local/expansion-repo/tools/devonian/creatures/coccosteus/rework-v3/frozen-candidate-02.json",
+      "bytes": 6140,
+      "sha256": "a2cf3f2ff14f2124032882b885d46db5c05e1a3c5a47f1aef5f5ac9d71772bfd"
+    },
+    {
+      "path": "/Users/hoai/Documents/Stuff/Generations/cambrian/local/expansion-repo/tools/devonian/creatures/coccosteus/rework-v3/render_candidate_02.py",
+      "bytes": 6061,
+      "sha256": "1c3b2cb40df977356c8ef18d0f0791713de64548b0637b23ec0877ab210f83c6"
+    },
+    {
+      "path": "/Users/hoai/Documents/Stuff/Generations/cambrian/local/devonian-authoring/coccosteus/rework-v3/candidate-02/coccosteus.glb",
+      "bytes": 12287108,
+      "sha256": "c302d1972c44253cb17c0ef77f0a16866ddef92d6a841b34acf9d6396da351e5"
+    },
+    {
+      "path": "/Users/hoai/Documents/Stuff/Generations/cambrian/local/devonian-authoring/coccosteus/rework-v3/candidate-02/coccosteus.lod1.glb",
+      "bytes": 2268428,
+      "sha256": "cc8f990f61e20572815781fb8385262ac737a3b52eea9d5b064118fe0f183b11"
+    },
+    {
+      "path": "/Users/hoai/Documents/Stuff/Generations/cambrian/local/devonian-authoring/coccosteus/rework-v3/candidate-02/coccosteus-production-02.blend",
+      "bytes": 10271771,
+      "sha256": "ee005e98301de58cfb03854fa2a53301c66198336593a06f2d3a2b0b549dedfe"
+    },
+    {
+      "path": "/Users/hoai/Documents/Stuff/Generations/cambrian/local/devonian-authoring/coccosteus/rework-v3/candidate-02/candidate-report.json",
+      "bytes": 44879,
+      "sha256": "8a513528759b781e15b9575cd456c5f95989636b6d74251053083e9f7c463b0e"
+    },
+    {
+      "path": "/Users/hoai/Documents/Stuff/Generations/cambrian/local/devonian-authoring/coccosteus/rework-v3/candidate-02/portrait-evidence/manifest.json",
+      "bytes": 4372,
+      "sha256": "c7d5f0d290d652d068c389c58ddf2480afc204f96aef0d89303eae93104dd6d3"
+    },
+    {
+      "path": "/Users/hoai/Documents/Stuff/Generations/cambrian/local/devonian-authoring/coccosteus/rework-v3/candidate-02/pose-evidence/manifest.json",
+      "bytes": 17204,
+      "sha256": "2f2ffea8f7d13cbda5bd13defca861b134ddc1d75ecca055f802a239cfff822c"
+    },
+    {
+      "path": "/Users/hoai/Documents/Stuff/Generations/cambrian/local/devonian-authoring/coccosteus/rework-v3/material-04/coccosteus-material-04.blend",
+      "bytes": 5824475,
+      "sha256": "2bd0d3da5ed2ad73801e200325b51f3c776989e027d01020e196838f10e633c9"
+    },
+    {
+      "path": "/Users/hoai/Documents/Stuff/Generations/cambrian/local/devonian-authoring/coccosteus/rework-v3/baked-01/coccosteus-baked-01.blend",
+      "bytes": 12242499,
+      "sha256": "ff9d86688f5c3921c120f3710c835afe3182841e006eb08507d025479b7ecdcd"
+    },
+    {
+      "path": "/Users/hoai/Documents/Stuff/Generations/cambrian/local/devonian-authoring/coccosteus/rework-v3/baked-01/bake-report.json",
+      "bytes": 20733,
+      "sha256": "2b8f0f703fac9e39db9aae9c122c8a5b079bd2bc1861171ac8418a3b42134336"
+    },
+    {
+      "path": "/Users/hoai/Documents/Stuff/Generations/cambrian/local/devonian-authoring/coccosteus/rework-v3/candidate-02-atlas-audit-01.json",
+      "bytes": 221594,
+      "sha256": "9b6859c923e777ee519a865823ad66063b2977d57f98b5f99986e692b2c8365f"
+    }
+  ]
+}

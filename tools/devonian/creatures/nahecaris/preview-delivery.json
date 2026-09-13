@@ -1,0 +1,19 @@
+{
+  "id": "nahecaris",
+  "modelStatus": "preview",
+  "notes": "Basic anatomy, export, animation and anchor checks passed. Eye embedding passes where eyes are modeled; Furcaster has no macroscopic eyes, and Palaeoisopus eye location is unresolved. Further individual visual refinements follow initial library delivery. See README and WORKING_STATE.",
+  "models": {
+    "glb": {
+      "sourceSHA256": "af608947cb933775338f91ddc46861911879a3b465a69ccf02ae3978023ddb6a",
+      "packagedSHA256": "29eb08849e5ecb522ba554cbc57999d25266f701b84cd79cdad51993e2cc3717",
+      "bytes": 7711700,
+      "losslessDecodedRoundTrip": true
+    },
+    "lod1.glb": {
+      "sourceSHA256": "26760efd2f8d09d9a2d00b724dbcba8434df4eaa9b7e7a4913864ea30b444c02",
+      "packagedSHA256": "591791c336071dd335b13096e0611e384905c1774148dfb5d4911fcadf43ef0d",
+      "bytes": 1973680,
+      "losslessDecodedRoundTrip": true
+    }
+  }
+}

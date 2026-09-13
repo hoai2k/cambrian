@@ -1,0 +1,35 @@
+{
+  "code": "T10",
+  "id": "solitary-rugose-coral",
+  "modelStatus": "preview",
+  "sourceModel": "assets/devonian/props/solitary-rugose-coral.glb",
+  "sourceBlendSHA256": "4bfdc230cfb8a241270425b42d694dfd27df541c1ee10be118f8cca3c93923f2",
+  "projection": "orthographic top; RGBA cells; no lighting baked in colour",
+  "widthMeters": 0.07985040068626405,
+  "heightRangeMeters": [
+    -0.0005251097027212381,
+    0.10100000351667404
+  ],
+  "normalConvention": "object/world XYZ encoded in RGB; not tangent-space normals",
+  "notes": "Original model surface study. Living colour is artistic; skeletal morphology and soft coating must remain separate. Transparent exterior is a mask.",
+  "maps": {
+    "albedo": {
+      "path": "assets/devonian/materials/solitary-rugose-coral/albedo.png",
+      "sha256": "1538dc6ad291dbc314da1bb945cfa468c121a1b4f17d4550b62361b59ee345e0"
+    },
+    "normal-object": {
+      "path": "assets/devonian/materials/solitary-rugose-coral/normal-object.png",
+      "sha256": "c5f659b759fe104b42720d9c5897b3936c01a7d25678bc6875de8699dea301be"
+    },
+    "height": {
+      "path": "assets/devonian/materials/solitary-rugose-coral/height.png",
+      "sha256": "88305aba57ca1fbb1f02d92400720a9e6fad2b337611c4c90efe52799de3ad97"
+    },
+    "roughness": {
+      "path": "assets/devonian/materials/solitary-rugose-coral/roughness.png",
+      "sha256": "06dfeccd1dcfdf0e7ac8aefab2c58d8e35c80d10d26d2f8dc9cf93e6bbf0f03d"
+    }
+  },
+  "heightEncoding": "8-bit RGBA orthographic reference only; not a 16-bit displacement map",
+  "dataSampling": "One point sample per pixel; denoising/compositor/sequencer disabled; 0.01 px box filter; Raw linear output; no RGB dilation or normal reconstruction across transparent exterior. Alpha is coverage, not a normal component."
+}

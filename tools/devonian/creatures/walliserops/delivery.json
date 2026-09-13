@@ -1,0 +1,35 @@
+{
+  "status": "initial-preview",
+  "files": {
+    "walliserops.card.png": {
+      "bytes": 155437,
+      "sha256": "ff3609f0b2dbb180ac2bf8e36a2c9f79b7951ae6721b7c4d25c3a9ed8b942fd6"
+    },
+    "walliserops.glb": {
+      "bytes": 37985340,
+      "sha256": "672d7d09cb75c3ca614162719d3b0d5f08780bd4aa00e512653f50a2ff2aae08"
+    },
+    "walliserops.json": {
+      "bytes": 3742,
+      "sha256": "a427277660b730c6a51bd12783b0c28af1dbcd919b296193a25ca32d8f974bbd"
+    },
+    "walliserops.lod1.glb": {
+      "bytes": 11046304,
+      "sha256": "ddb9e6f41dfa1a4fe0e54e8c8bc4e82c0c0b825d9730a01bde3930bdd4d2212d"
+    },
+    "walliserops.png": {
+      "bytes": 259574,
+      "sha256": "57b175e7ea68bb9ea5742113e62e02e242f7fb814998bd6f571bc4355193ad8d"
+    },
+    "walliserops.select.png": {
+      "bytes": 710051,
+      "sha256": "973f6c51e5474bc94aa3f9198c29a010d254e9105a7852305e1b9535c4d5eb38"
+    },
+    "walliserops.thumb.png": {
+      "bytes": 22040,
+      "sha256": "9d8d996554b2b7d2b550e2380db455ec2dee2b73f763204ce3f82be7649417ad"
+    }
+  },
+  "sourceBlend": "/Users/hoai/Documents/Stuff/Generations/cambrian/local/devonian-authoring/walliserops/v2/walliserops-v2.blend",
+  "sourceBlendSha256": "a798d19e6df95370739b7487d271dc625c23fdc3a63c56f4cc36feacfb1b6862"
+}

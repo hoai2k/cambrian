@@ -10,7 +10,7 @@ about what these animals did.
 
 ## The pitch
 
-*Cambrian Explosion* is a growth story: hatch tiny, eat, moult, become the
+*Cambrian Conquest* is a growth story: hatch tiny, eat, moult, become the
 thing that frightened you. That story cannot be told in the Devonian. A
 trilobite is never going to be a Dunkleosteus, and pretending otherwise would
 throw away the most interesting fact about the period: it is the first sea
@@ -172,17 +172,42 @@ the lock-on panel as a small silhouette with the soft region lit.
 - A trilobite's enrolment (Eldredgeops, Olenoides-style) is all armour for as
   long as the block is held.
 
-### Air
+### Breathing both ways
 
-Rhinodipterus, Tiktaalik and Acanthostega are **air breathers**. They have an
-air meter under stamina. It drains slowly; when it is low their stamina
-regeneration halves and sprint is disabled until they surface. Surfacing is
-**RB held at the light window**: a gulp refills the meter and grants a short
-"second wind" (a free sprint), but the surface is where the water is
-brightest and every rung IV shadow is watching it.
+Rhinodipterus, Tiktaalik and Acanthostega have **lungs as well as gills**, and
+the literature is clear that all three kept the gills: Acanthostega's fish-like
+internal gills are the whole point of Coates & Clack 1991; Tiktaalik retained
+gills and ventilated them by buccal pumping after losing the bony operculum,
+with spiracles on the skull roof for supplementary air; and Rhinodipterus is a
+*marine* Devonian dipnoan carrying the buccal-pump kit for air breathing —
+obligate air breathing with reduced gills is a modern Protopterus trait, not a
+Devonian marine one. **Nothing on this roster is lung-only**, so there is no
+air meter, no countdown and no drowning, and deliberately no `breathing` value
+for an obligate air breather: one would need its own mechanic (a meter, a
+warning, a death) and should arrive with it.
 
-Everyone else is a gill breather and has no meter. The difference matters in
-one place:
+What lungs buy is a **place to go**. Under water these three recover stamina at
+a quarter of everyone else's rate, which makes them poor at long chases and
+grinding fights; break the surface and the whole bar comes back at once, with a
+short "second wind" (a free sprint) on top. Their game is the round trip — and
+the surface is where the water is brightest and every rung IV shadow is
+watching it.
+
+So everything about them points up. They climb half again as fast as the shared
+rise rate, a sprint carries into the climb rather than only into the swim, and
+they are the one thing here that leaves the water on the rise button alone
+(everything else must drive hard at the surface to breach). Above all the climb
+is **free**: driving upward costs no stamina, and on an empty bar a sprint or a
+dash still fires with only its upward part, so nothing can ever be stranded on
+the bottom with no way back. Going to breathe is never taxed.
+
+A quiet heartbeat (`winded`) starts at a quarter bar under water and quickens
+as the rest goes — a nudge toward the surface rather than a warning, since nothing bad
+happens if it is ignored. And the effort shows: what a lung lets go of the
+mouth is the stamina it just spent, so a sprint streams bubbles, a dash coughs a
+handful, and hanging still or climbing releases none.
+
+Everyone else breathes water only. The difference matters in one place:
 
 ### Anoxia events
 
@@ -261,8 +286,8 @@ from [05](05-hiding-and-combat.md) without new systems:
 | Gemuendina | Y: sand burial (the existing burrow) with an upward ambush emergence bite; flat body makes it near-immune to hits from above while buried. |
 | Bothriolepis | Ground creature; block is armour; can enter the shallows further than swimmers (see *The shore*). |
 | Coccosteus | The small arthrodire: a full armour zone and an ordinary bite. Rung II's fighter. |
-| Rhinodipterus | Air breather; heavy is a crushing bite that does extra damage to shells (Manticoceras, Michelinoceras, snails). |
-| Tiktaalik / Acanthostega | Air breathers with the shore refuge; Tiktaalik has the stronger bite and a neck (its lock-on turn is faster than its body's); Acanthostega is smaller, quicker, and can push further up the beach. |
+| Rhinodipterus | Lungs as well as gills; heavy is a crushing bite that does extra damage to shells (Manticoceras, Michelinoceras, snails). |
+| Tiktaalik / Acanthostega | Lungs as well as gills, plus the shore refuge; Tiktaalik has the stronger bite and a neck (its lock-on turn is faster than its body's); Acanthostega is smaller, quicker, and can push further up the beach. |
 | Eldredgeops | Block: enroll. Excellent eyes: its sense pulse has the longest reach in rung I. |
 | Walliserops | Heavy: trident shove — a low-damage push that displaces a rival, meant for rival duels over grazing patches; the brief notes the function is unsettled, and the game says so. |
 | Nahecaris | The scavenger: corpses give it double nutrition; fast and fragile. |
@@ -311,28 +336,41 @@ the river mouths and shallows for the creatures that are allowed to.
 
 ## Modes
 
+**Superseded (September 2026).** The era ran its own two modes — Domination (a
+standing race inside your rung) and Food Chain (one player per rung, one
+scoreboard) — and they are gone. Both eras now offer the same three modes,
+because an era is a change of sea and cast, not a change of what a match is:
+
 | Mode | Players | What it is |
 | --- | --- | --- |
-| **Domination** | 1–4, co-op or solo | The main mode. Pick any creature from any rung. First to Dominant standing and 90 s holding it wins; co-op shares standing from assists and ends when the party's combined standing crosses the line. Escalation: dead zones come more often and giants roam wider as standing rises. |
-| **Food Chain** | 2–4 versus | Each player must pick from a *different rung*. Everyone's standing is on the board. The hunter needs the prey; the prey scores by surviving the hunter. The purest expression of the era, and the mode the name promises. |
+| **Rise** | 1–4 | Hatch tiny, eat, grow through the five stages, hold Prime for ninety seconds. Share the feast with the others or eat them: co-op and versus are how it is played, not two modes. |
 | **Hunter & Hunted** | 2–4 versus | Carries over unchanged with Dunkleosteus as the giant; the small ones are rung II picks with the river mouth as their refuge. |
-| **Reef** | 1–4 | Sandbox: any creature, any stage, any biome, dead zones on or off. |
+| **Reef** | 1–4 | Sandbox: any creature, adult, any biome, dead zones on or off. |
 
-Frenzy (the growth race) does not carry over: without growth it has nothing to
-race. Food Chain replaces it.
+What that took out of `src/sim/devonian/`: the range/territory game and its
+give-way behaviour, standing from escapes, rivals, shoals, anoxia and time
+alive in the open, the standing decay and the giant's starvation clock, and the
+Dominant hold. **Standing is now what the animal has eaten** — the one meter
+behind the five stages — which is the Cambrian's nutrition under another name,
+and the rungs stay as what they always were: a description of where an animal
+sits in the chain, never a rule about who may eat whom. Size decides that, so a
+newborn Dunkleosteus is food for a grown trilobite.
 
 ## Readability, HUD and feedback
 
 Keep everything the Cambrian HUD does and change the meaning of one element:
 
-- The **tier ring becomes the standing ring**, with the rung glyph (I–IV) at
-  its centre instead of the tier glyph. Filling it to the top is the win. Small
-  ticks on the ring show the last few sources ("+escape", "+range") so the
-  player learns what their rung scores from.
+- The **ring keeps the meaning it has in the Cambrian** — how close the next
+  moult is, full when the body grows — and only the glyph at its centre
+  changes, to the rung (I–IV) instead of the tier. It reads `stageProgress`,
+  the run up to the next of the five stages, rather than the whole 0–100
+  growth meter: a ring that crept up across all of growth would be nowhere
+  near full at the moment the body actually moulted, and the two eras would
+  not feel like the same game. Small ticks under it show the last few standing
+  sources so the player learns what feeds them.
 - The **radar** gains the range arc (yours and others'), and the hollow ring of
-  a dead zone. The shore mark already exists; for air breathers a small surface
-  mark shows the nearest good gulping spot when air is low.
-- **Air meter** under stamina for the three air breathers only.
+  a dead zone. The shore mark already exists; for the bimodal breathers a small
+  surface mark shows the nearest good gulping spot when the bar is low.
 - The **lock-on panel** shows the target's armour silhouette with its soft
   region lit, for armoured targets.
 - The biome banner reads "Your range" inside it, and the dead-zone warning is
@@ -384,7 +422,7 @@ music is optional. The notes below are kept as the build order that was followed
 4. **Armour zones** in `combat.ts`: a per-hit test of the contact angle
    against the victim's armour fraction, with a `pierce` bypass. The existing
    direction bonus is the hook.
-5. **Air and anoxia**: an `air` field and drain on air breathers; a
+5. **Breathing and anoxia**: the bimodal stamina economy; a
    `DeadZone` list on the game (position, radius, drift, age) stepped like
    silt clouds; stamina and health effects in `updateActor`; a renderer fog
    tint and radar ring.
@@ -396,8 +434,9 @@ music is optional. The notes below are kept as the build order that was followed
    static `Corpse`-like decoy that AI detection scores as a target.
 9. **Shoaling**: the swarm brain already follows a `home`; point a school's
    home at a player of its species when they are near and calm.
-10. **Modes**: Domination and Food Chain in `updateModes`; Frenzy removed for
-    this era; selection screen enforces distinct rungs in Food Chain and shows
+10. **Modes**: superseded — see the Modes section above. Originally Domination
+    and Food Chain in `updateModes`; the selection screen enforced distinct rungs
+    in Food Chain and showed
     the locality label.
 
 Tests to add, in the spirit of the existing suite: a `rung-test` that every

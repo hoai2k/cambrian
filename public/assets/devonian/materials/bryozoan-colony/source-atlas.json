@@ -1,0 +1,35 @@
+{
+  "code": "T10",
+  "id": "bryozoan-colony",
+  "modelStatus": "preview",
+  "sourceModel": "assets/devonian/props/bryozoan-colony.glb",
+  "sourceBlendSHA256": "8f9060d60b3d5e574ec89680e25ccfda7b2f3da183e765a68b525401213b9ab5",
+  "projection": "orthographic top; RGBA cells; no lighting baked in colour",
+  "widthMeters": 0.05735975325107575,
+  "heightRangeMeters": [
+    0.00018750003073364496,
+    0.06007935106754303
+  ],
+  "normalConvention": "object/world XYZ encoded in RGB; not tangent-space normals",
+  "notes": "Original model surface study. Living colour is artistic; skeletal morphology and soft coating must remain separate. Transparent exterior is a mask.",
+  "maps": {
+    "albedo": {
+      "path": "assets/devonian/materials/bryozoan-colony/albedo.png",
+      "sha256": "0b1fe810cf7427d6c2ed0501bf0ea0ce1b68b2fa9adac5a114b137aed75f1e3c"
+    },
+    "normal-object": {
+      "path": "assets/devonian/materials/bryozoan-colony/normal-object.png",
+      "sha256": "e2bd3ef7840426c14f7b3cf309ebf2e450b2dd18d046e0eef6507d0a8ae2b333"
+    },
+    "height": {
+      "path": "assets/devonian/materials/bryozoan-colony/height.png",
+      "sha256": "a59a63f88162727ea093faaac16113929a51a3c9793e64267ec34a4e2bbe94bc"
+    },
+    "roughness": {
+      "path": "assets/devonian/materials/bryozoan-colony/roughness.png",
+      "sha256": "929e853ed7da253374f81d69a394126921b940ed5848799ef8da32a655c4378b"
+    }
+  },
+  "heightEncoding": "8-bit RGBA orthographic reference only; not a 16-bit displacement map",
+  "dataSampling": "One point sample per pixel; denoising/compositor/sequencer disabled; 0.01 px box filter; Raw linear output; no RGB dilation or normal reconstruction across transparent exterior. Alpha is coverage, not a normal component."
+}

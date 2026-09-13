@@ -5,10 +5,17 @@ import { ACTIVE_ERA } from '../content';
  * Priority asset loader. Everything heavy (creature GLBs, card images, sound files) goes through one
  * queue so the title screen can appear as soon as the first creature is in, and idle time on the
  * title / select screens streams the rest in the order the player is most likely to need it.
+ *
+ * Sound goes through it too. The queue fetches a sample to prime the HTTP cache and the audio
+ * module decodes it from there when it has a context to decode into (it cannot have one before the
+ * player's first gesture), so the two passes cost one download — measured in a browser at 4575 KB
+ * over the wire against 4549 KB of distinct files. Music is the exception and stays out: tracks are
+ * streamed through media elements, so preloading one would pull four megabytes the player may never
+ * reach.
  */
-import { CREATURE_IDS, type CreatureId } from '../sim/creatures';
+import { creature, CREATURE_IDS, type CreatureId } from '../sim/creatures';
 import { ensureLoaded } from './creature';
-import { SAMPLES, sfxUrl } from '../audio/audio';
+import { loops, SAMPLES, sfxUrl } from '../audio/audio';
 import { appBase } from '../shared/base';
 
 export type AssetKind = 'glb' | 'lod' | 'thumb' | 'select' | 'ui' | 'sfx';
@@ -21,15 +28,23 @@ export const GLB_SIZES: Readonly<Partial<Record<CreatureId, number>>> = ACTIVE_E
 const THUMB_SIZE = 60_000, SELECT_SIZE = 700_000;
 
 /**
- * Every sample the active era can play, taken from the audio library itself rather than a list
- * kept alongside it. An era registers its own sounds before this runs (see src/devonian/main.tsx),
- * so the Devonian warms its own library and the Cambrian warms its own; neither fetches the
- * other's. `sfxUrl` is the audio module's own resolver, which knows an era's sounds live in a
- * directory of their own.
+ * Every sound the active era can play, taken from the audio library itself rather than a list kept
+ * alongside it. An era registers its own sounds before this runs (see src/devonian/main.tsx), so
+ * the Devonian warms its own library and the Cambrian warms its own; neither fetches the other's.
+ * `sfxUrl` is the audio module's own resolver, which knows an era's sounds live in a directory of
+ * their own.
+ *
+ * The two loops — the era's ambient bed and the giant's drone — belong here as much as any one-shot, and
+ * were the only sounds the queue never asked for: this list was built from `SAMPLES` alone, which
+ * does not contain them. They are also the heaviest of them by an order of magnitude (259 KB and
+ * 141 KB against 12 KB for a bite) and the longest missed, since the bed runs for the whole match
+ * and nothing stands in for it any more.
  */
-export const sfxFiles = () => [...new Set(Object.values(SAMPLES).flat())];
+export const sfxFiles = () => [...new Set([...Object.values(SAMPLES).flat(), ...Object.values(loops())])];
 /** Sounds the menus use, which are worth having before anything a match needs. */
 const UI_SFX = ['ui-start', 'ui-confirm', 'ui-move', 'ui-back', 'ui-join'];
+/** The beds. Behind the menu sounds, ahead of the rest: one file covers the whole session. */
+const isLoop = (n: string) => (Object.values(loops()) as string[]).includes(n);
 
 /** Never cached at module level: an era entry page sets the base after this module is imported. */
 const base = () => appBase();
@@ -48,7 +63,7 @@ export class AssetQueue {
     // falls back to a placeholder for it at render time. Requesting images that are not there
     // just to have them fail is noise in the network panel and two wasted round trips each.
     const standIns = ACTIVE_ERA.assets.standIns ?? {};
-    const hasArt = (id: CreatureId) => !(id in standIns);
+    const hasArt = (id: CreatureId) => ACTIVE_ERA.assets.standInsPlayable ? !creature(id).shore : !(id in standIns);
     CREATURE_IDS.forEach((id, i) => {
       this.items.set(`glb:${id}`, { key: `glb:${id}`, kind: 'glb', url: `${B}${assetPaths.model(id)}`, size: GLB_SIZES[id]!, priority: 100 + i, status: 'queued', loaded: 0 });
       // The two images the pick screen draws. These used to be the `.card` cutout, which the pick
@@ -64,6 +79,8 @@ export class AssetQueue {
     ACTIVE_ERA.modes.forEach((m, i) => this.items.set(`ui:mode-${m.id}`, {
       key: `ui:mode-${m.id}`, kind: 'ui', url: `${B}${assetPaths.ui(`mode-${m.id}.webp`)}`, size: 40_000, priority: 260 + i, status: 'queued', loaded: 0,
     }));
+    // Sizes so the bar is honest before the first byte arrives: the beds are measured, everything
+    // else is a one-shot of about twelve kilobytes.
     sfxFiles().forEach((n, i) => this.items.set(`sfx:${n}`, { key: `sfx:${n}`, kind: 'sfx', url: sfxUrl(n), size: /ambient/.test(n) ? 265_000 : /drone|anoxia/.test(n) ? 145_000 : 12_000, priority: 300 + i, status: 'queued', loaded: 0 }));
   }
 
@@ -89,6 +106,7 @@ export class AssetQueue {
    * sounds trail everything but stay ahead of unlikely models once the UI ones are in.
    */
   prioritize(creatures: CreatureId[], phase: 'boot' | 'title' | 'select' | 'playing') {
+    for (const id of creatures) this.wanted.add(id);
     const order = [...creatures, ...CREATURE_IDS.filter((c) => !creatures.includes(c))];
     order.forEach((id, i) => {
       const glb = this.items.get(`glb:${id}`)!, lod = this.items.get(`lod:${id}`)!;
@@ -108,15 +126,30 @@ export class AssetQueue {
     ACTIVE_ERA.modes.forEach((m, i) => { const it = this.items.get(`ui:mode-${m.id}`); if (it) it.priority = phase === 'playing' ? 80 + i : 2 + i; });
     for (const [i, n] of sfxFiles().entries()) {
       const it = this.items.get(`sfx:${n}`); if (!it) continue;
-      it.priority = (UI_SFX.includes(n) ? 40 : phase === 'playing' ? 20 : 120) + i;
+      it.priority = (UI_SFX.includes(n) ? 40 : isLoop(n) ? 42 : phase === 'playing' ? 20 : 120) + i;
     }
     this.pump();
   }
 
+  /**
+   * Creatures whose full-detail model the queue may fetch in the background: the ones the era
+   * boots with, plus whatever the players have picked. Everything else stays on its decimated
+   * copy until something actually needs the full body, at which point the renderer asks for it
+   * directly (`ensureLoaded`) and the loader fetches it then.
+   *
+   * This is the difference between a menu that streams a handful of models and one that streams
+   * the whole roster: the Devonian ships 302 MB of creature models against the Cambrian's 113 MB,
+   * and hoovering all of it up behind the title screen is felt as lag on every frame that has to
+   * share the main thread with a meshopt decode.
+   */
+  private wanted = new Set<CreatureId>(ACTIVE_ERA.defaults.boot);
+
   private pump() {
     if (this.disposed || !this.idle) return;
     while (this.active < this.concurrency) {
-      const next = [...this.items.values()].filter((i) => i.status === 'queued').sort((a, b) => a.priority - b.priority)[0];
+      const next = [...this.items.values()]
+        .filter((i) => i.status === 'queued' && (i.kind !== 'glb' || this.wanted.has(i.key.slice(4) as CreatureId)))
+        .sort((a, b) => a.priority - b.priority)[0];
       if (!next) break;
       void this.run(next);
     }

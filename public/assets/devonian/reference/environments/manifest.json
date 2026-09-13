@@ -1,0 +1,101 @@
+[
+  {
+    "code": "E01",
+    "id": "hunsruck-mud-shelf",
+    "title": "Hunsr\u00fcck marine mud shelf",
+    "age": "Early Devonian \u00b7 Germany",
+    "image": "assets/devonian/reference/environments/e01-hunsruck-mud-shelf.webp",
+    "sourceSHA256": "f0610a217829daa20f0021a0a6e8b544404aa5e1b629a9c3baa96cf2e37a0830",
+    "source": "https://doi.org/10.7717/peerj.17766",
+    "modelStatus": "preview",
+    "notes": "Initial imagegen habitat interpretation. Colour, light, detailed scenery and unverified small organisms are artistic; local occurrence and vegetation require further review. Boards are separate regions, not a single coexisting assemblage."
+  },
+  {
+    "code": "E02",
+    "id": "moroccan-carbonate-shelf",
+    "title": "Moroccan carbonate shelf",
+    "age": "Late Emsian \u00b7 Early Devonian",
+    "image": "assets/devonian/reference/environments/e02-moroccan-carbonate-shelf.webp",
+    "sourceSHA256": "24f497f0a6d445759d5afac9402af69e84f1be00cbecd3a0b66c224047775854",
+    "source": "https://pubmed.ncbi.nlm.nih.gov/36649420/",
+    "modelStatus": "preview",
+    "notes": "Initial imagegen habitat interpretation. Colour, light, detailed scenery and unverified small organisms are artistic; local occurrence and vegetation require further review. Boards are separate regions, not a single coexisting assemblage."
+  },
+  {
+    "code": "E03",
+    "id": "orcadian-lake",
+    "title": "Orcadian lake margin",
+    "age": "Middle Devonian \u00b7 Scotland",
+    "image": "assets/devonian/reference/environments/e03-orcadian-lake.webp",
+    "sourceSHA256": "9044faad8592255831ff277074773196d7f8112497f9ebb97a7b2b7f4fb56005",
+    "source": "docs/redesign/07-devonian-design.md#4-regional-environments",
+    "modelStatus": "preview",
+    "notes": "Initial imagegen habitat interpretation. Colour, light, detailed scenery and unverified small organisms are artistic; local occurrence and vegetation require further review. Boards are separate regions, not a single coexisting assemblage."
+  },
+  {
+    "code": "E04",
+    "id": "gogo-reef-margin",
+    "title": "Gogo reef margin",
+    "age": "Frasnian \u00b7 Late Devonian \u00b7 Australia",
+    "image": "assets/devonian/reference/environments/e04-gogo-reef-margin.webp",
+    "sourceSHA256": "9b28d6e5a651a1a06a6085eb1f82c28378c2b72be8469d5c2ae34866d7cc23ea",
+    "source": "https://www.annualreviews.org/content/journals/10.1146/annurev-earth-040809-152416",
+    "modelStatus": "preview",
+    "notes": "Initial imagegen habitat interpretation. Colour, light, detailed scenery and unverified small organisms are artistic; local occurrence and vegetation require further review. Boards are separate regions, not a single coexisting assemblage."
+  },
+  {
+    "code": "E05",
+    "id": "miguasha-waterway",
+    "title": "Miguasha waterway",
+    "age": "Late Devonian \u00b7 Quebec",
+    "image": "assets/devonian/reference/environments/e05-miguasha-waterway.webp",
+    "sourceSHA256": "3007fa9378a104139ac2132e3c96027b9b079b22867740969769e668a7b2a8d8",
+    "source": "docs/redesign/07-devonian-design.md#4-regional-environments",
+    "modelStatus": "preview",
+    "notes": "Initial imagegen habitat interpretation. Colour, light, detailed scenery and unverified small organisms are artistic; local occurrence and vegetation require further review. Boards are separate regions, not a single coexisting assemblage."
+  },
+  {
+    "code": "E06",
+    "id": "cleveland-offshore",
+    "title": "Cleveland offshore sea",
+    "age": "Famennian \u00b7 Latest Devonian \u00b7 Ohio",
+    "image": "assets/devonian/reference/environments/e06-cleveland-offshore.webp",
+    "sourceSHA256": "4cbcd537f58db7a921702ca36576f1fc8c3b8c4cf6b8a33f0c7d1a47922c95b1",
+    "source": "docs/redesign/07-devonian-design.md#4-regional-environments",
+    "modelStatus": "preview",
+    "notes": "Initial imagegen habitat interpretation. Colour, light, detailed scenery and unverified small organisms are artistic; local occurrence and vegetation require further review. Boards are separate regions, not a single coexisting assemblage."
+  },
+  {
+    "code": "E07",
+    "id": "ellesmere-channel",
+    "title": "Ellesmere shallow channel",
+    "age": "Late Devonian \u00b7 Canadian Arctic",
+    "image": "assets/devonian/reference/environments/e07-ellesmere-channel.webp",
+    "sourceSHA256": "5f8f95ee749299578e2e3c8c7acca853e48e727a3523c33ddbb2306a44b81c3d",
+    "source": "docs/redesign/07-devonian-design.md#4-regional-environments",
+    "modelStatus": "preview",
+    "notes": "Initial imagegen habitat interpretation. Colour, light, detailed scenery and unverified small organisms are artistic; local occurrence and vegetation require further review. Boards are separate regions, not a single coexisting assemblage."
+  },
+  {
+    "code": "E08",
+    "id": "east-greenland-waterbody",
+    "title": "East Greenland floodplain water",
+    "age": "Late Devonian \u00b7 Greenland",
+    "image": "assets/devonian/reference/environments/e08-east-greenland-waterbody.webp",
+    "sourceSHA256": "1289702e00ac4e71707ac074e820c7bb02646cc4df121903529a72d7d3499c19",
+    "source": "docs/redesign/07-devonian-design.md#4-regional-environments",
+    "modelStatus": "preview",
+    "notes": "Initial imagegen habitat interpretation. Colour, light, detailed scenery and unverified small organisms are artistic; local occurrence and vegetation require further review. Boards are separate regions, not a single coexisting assemblage."
+  },
+  {
+    "code": "E09",
+    "id": "wood-bay-waterbody",
+    "title": "Wood Bay water bodies",
+    "age": "Early Devonian \u00b7 Svalbard",
+    "image": "assets/devonian/reference/environments/e09-wood-bay-waterbody.webp",
+    "sourceSHA256": "d44c51847e76e9803275f11d6258536e725f186bbbc0bbb13e44a5689c3856f9",
+    "source": "https://www.sciencedirect.com/science/article/abs/pii/S0016699505000239",
+    "modelStatus": "preview",
+    "notes": "Initial imagegen habitat interpretation. Colour, light, detailed scenery and unverified small organisms are artistic; local occurrence and vegetation require further review. Boards are separate regions, not a single coexisting assemblage."
+  }
+]

@@ -1,9 +1,12 @@
-import { ModelStatusBadge } from '../shared/ModelStatusBadge';
+import { ClipQueuedBadge, ModelStatusBadge } from '../shared/ModelStatusBadge';
 import { CreaturePortrait } from '../app/CreaturePortrait';
 import { useEffect, useRef, useState } from 'react';
-import { COLLECTIONS, paletteFor, SPECIMENS, specimenByKey, type CollectionId } from './catalogue';
+import { COLLECTIONS, isPropCollection, paletteFor, SPECIMENS, specimenByKey, type CollectionId } from './catalogue';
 import { scheme, SLOT_LABEL, type Slot } from '../shared/palettes';
-import { ASSET_BASE, createViewerScene, type PlaybackState, type ViewerScene } from './scene';
+import { ASSET_BASE, createViewerScene, isReplaced, replacedName, type PlaybackState, type ViewerScene } from './scene';
+import { SculptEditor } from './sculpt/SculptEditor';
+import { getSculpt } from './sculpt/store';
+import { isIdentity, warp } from './sculpt/profile';
 
 const SPEEDS = [0.25, 0.5, 1, 2];
 
@@ -27,12 +30,45 @@ function readPicks(): Picks {
   }
 }
 
+/**
+ * The page remembers which specimen it is showing in the URL (`?specimen=<key>`, and `&mode=sculpt`
+ * while sculpting), so a reload — or a link — comes back to the same creature. Nothing else is
+ * kept there: the view, the clip and any sculpt in progress start over.
+ */
+function readUrlState(): { key: string; sculpt: boolean } {
+  const params = new URLSearchParams(location.search);
+  const requested = params.get('specimen') ?? '';
+  const key = specimenByKey.has(requested) ? requested : SPECIMENS[0].key;
+  return { key, sculpt: params.get('mode') === 'sculpt' && !isPropCollection(specimenByKey.get(key)?.collection) };
+}
+function writeUrlState(key: string, sculpt: boolean) {
+  const params = new URLSearchParams(location.search);
+  params.set('specimen', key);
+  if (sculpt) params.set('mode', 'sculpt'); else params.delete('mode');
+  const url = `${location.pathname}?${params.toString()}${location.hash}`;
+  if (url !== `${location.pathname}${location.search}${location.hash}`) history.replaceState(null, '', url);
+}
+
 export function Viewer() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const sceneRef = useRef<ViewerScene | null>(null);
-  const [collection, setCollection] = useState<CollectionId>('cambrian');
-  const [id, setId] = useState(SPECIMENS[0].key);
+  const initial = useRef(readUrlState());
+  const [collection, setCollection] = useState<CollectionId>(specimenByKey.get(initial.current.key)!.collection);
+  const [id, setId] = useState(initial.current.key);
+  const [mode, setMode] = useState<'view' | 'sculpt'>(initial.current.sculpt ? 'sculpt' : 'view');
+  const [detail, setDetail] = useState<'full' | 'reduced'>('full');
+  /**
+   * Which body of a pair is on stage. The procedural twin is built to the generated model's own
+   * volume on the same skeleton, and the whole point of having both is that a human can see one
+   * become the other — so this swaps in place: the stage is not cleared, the camera is preserved,
+   * and the clip keeps playing, which turns any difference between them into movement rather than
+   * something to hold in your head across two list entries.
+   */
+  const [body, setBody] = useState<'model' | 'puppet'>('model');
+  const requestedId = useRef('');
   const def = specimenByKey.get(id)!;
+  const showPuppet = body === 'puppet' && !!def.puppet;
+  const modelPath = showPuppet ? def.puppet! : detail === 'reduced' && def.lod ? def.lod : def.model;
   const roster = SPECIMENS.filter(c => c.collection === collection);
   // Both eras are on this page, so a specimen's palette comes from its own pack, not ACTIVE_ERA.
   const defaultScheme = (key: string) => {
@@ -50,6 +86,14 @@ export function Viewer() {
   const [loadedId, setLoadedId] = useState('');
   const [picks, setPicks] = useState<Picks>(readPicks);
   const [slots, setSlots] = useState<readonly Slot[]>([]);
+  useEffect(() => { writeUrlState(id, mode === 'sculpt'); }, [id, mode]);
+  useEffect(() => { if (!def.puppet) setBody('model'); }, [def.puppet]);
+  // Sculpting needs a creature on stage; a prop or a load in progress has nothing to sculpt.
+  // Not on the twin: a sculpt is the hand-off that goes into a builder's profile rows for the body
+  // that ships, and one exported off the comparison body would name the right creature and describe
+  // the wrong mesh.
+  const canSculpt = !isPropCollection(collection) && !showPuppet && !loading && !error && loadedId === id;
+  useEffect(() => { if (mode === 'sculpt' && (isPropCollection(collection) || showPuppet)) setMode('view'); }, [mode, collection, showPuppet]);
 
   // The show effect must not re-run when a pick changes, so it reads the picks through a ref.
   const picksRef = useRef(picks);
@@ -68,16 +112,23 @@ export function Viewer() {
   useEffect(() => {
     let cancelled = false;
     setLoading(true); setLoadedId(''); setError(''); setClips([]); setSlots([]);
+    // The specimen on stage leaves before the next one is fetched: watching the last creature
+    // repaint into the new one's colours, then pop out of frame, read as a glitch.
+    if (requestedId.current !== id) sceneRef.current?.clear();
+    requestedId.current = id;
     // Set the scheme before the model is built so it never appears in the wrong palette first.
     sceneRef.current?.setScheme(picksRef.current[id] ?? defaultScheme(id));
-    sceneRef.current?.show(def)
+    sceneRef.current?.show({ ...def, model: modelPath }, { preserveView: true })
       .then((names) => {
         if (cancelled) return;
+        // A sculpt made this session follows the creature back onto the stage, full or reduced.
+        const sculpt = getSculpt(id);
+        if (sculpt && !isIdentity(sculpt)) sceneRef.current?.applySculpt(warp(sculpt), true);
         setClips(names); setSlots(sceneRef.current?.activeSlots() ?? []); setLoading(false); setLoadedId(id);
       })
       .catch((e: Error) => { if (!cancelled) { setError(e.message); setLoading(false); } });
     return () => { cancelled = true; };
-  }, [id]);
+  }, [id, modelPath]);
 
   useEffect(() => { sceneRef.current?.setSpeed(speed); }, [speed]);
   useEffect(() => { sceneRef.current?.setScheme(schemeId); }, [schemeId]);
@@ -106,12 +157,28 @@ export function Viewer() {
   const changed = roster.filter((c) => (picks[c.key] ?? defaultScheme(c.key)) !== defaultScheme(c.key)).length;
 
   return (
-    <div className="viewer">
-      <canvas ref={canvasRef} className="viewer-canvas" />
+    <div className={`viewer ${mode === 'sculpt' ? 'sculpting' : ''}`} data-mode={mode}>
+      <div className="stage">
+        <canvas ref={canvasRef} className="viewer-canvas" />
+        {/* The notice sits on the stage, over where the specimen will stand. `status` stays in the
+            class list because the QA tools wait on it (tools/devonian/browser.mjs and friends). */}
+        {(loading || error) && (
+          <div className={`status stage-status ${error ? 'error' : ''}`} role="status">
+            {!error && <i className="spinner" aria-hidden="true" />}
+            <span>{error || `Loading ${def.name}…`}</span>
+          </div>
+        )}
+      </div>
+
+      {/* Sculpt mode lays its drawings over the stage cell (same grid area, stacked above the canvas)
+          and puts its panel where the info card was. */}
+      {mode === 'sculpt' && canSculpt && sceneRef.current && (
+        <SculptEditor key={id} scene={sceneRef.current} specimen={def} onExit={() => setMode('view')} />
+      )}
 
       <aside className="specimens" aria-label="Specimens">
         <header>
-          <a className="back" href="../">← Cambrian Explosion</a>
+          <a className="back" href="../">← Cambrian Conquest</a>
           <h1>Specimens</h1>
           <label className="collection-pick"><span className="sr-only">Specimen collection</span>
             <select aria-label="Specimen collection" value={collection} onChange={e => {
@@ -129,7 +196,7 @@ export function Viewer() {
                 <span>
                   <b>{c.name}</b>
                   <small>{c.species}</small>
-                  <ModelStatusBadge status={c.modelStatus} compact />
+                  <ModelStatusBadge status={c.modelStatus} note={c.modelNote} compact />
                 </span>
               </button>
             </li>
@@ -140,17 +207,42 @@ export function Viewer() {
       <div className="info">
         <span className="role">{def.role}</span>
         <h2 className={def.name.length > 11 ? 'long-name' : undefined}>{def.name}</h2>
-        <ModelStatusBadge status={def.modelStatus} />
+        <ModelStatusBadge status={def.modelStatus} note={def.modelNote} />
         {def.kind && <p className="kind-line"><b className="kind">{def.kind}</b>{def.species}</p>}
         <p>{def.provenance ?? 'Burgess Shale'} · {clips.length} clips</p>
         {def.kindNote && <p className="specimen-description">{def.kindNote}</p>}
         {def.description && <p className="specimen-description">{def.description}</p>}
         {def.lengthMeters != null && <p className="specimen-scale">Representative length: {new Intl.NumberFormat('en', { maximumSignificantDigits: 3 }).format(def.lengthMeters)} m · views individually framed</p>}
-        {collection !== 'cambrian' && <p className="specimen-downloads"><a href={`${ASSET_BASE}${def.model}`} download>Full model</a>{def.lod && <a href={`${ASSET_BASE}${def.lod}`} download>Reduced model</a>}</p>}
+        {collection !== 'cambrian' && <p className="specimen-downloads"><a href={`${ASSET_BASE}${def.model}`} download>Full model</a>{def.lod && <a href={`${ASSET_BASE}${def.lod}`} download>Reduced model</a>}{def.puppet && <a href={`${ASSET_BASE}${def.puppet}`} download>Procedural twin</a>}</p>}
+        {def.lod && <label className="scheme-pick">
+          <span>Model detail</span>
+          <select aria-label="Model detail" value={detail} disabled={loading} onChange={e => setDetail(e.target.value as 'full' | 'reduced')}>
+            <option value="full">Full model</option>
+            <option value="reduced">Reduced model</option>
+          </select>
+        </label>}
+        {def.lod && <p className="hint">Switch detail to compare at the same view and animation time. Missing clips return to rest.</p>}
+        {def.puppet && <label className="scheme-pick">
+          <span>Body</span>
+          <select aria-label="Which body" value={body} disabled={loading} onChange={e => setBody(e.target.value as 'model' | 'puppet')}>
+            <option value="model">Authored model</option>
+            <option value="puppet">Procedural twin</option>
+          </select>
+        </label>}
+        {def.puppet && <p className="hint">
+          The twin is rebuilt to this body's own volume on the same skeleton, and is where the clips
+          are animated before they are applied here. Switching holds the view and the frame, so a
+          difference between the two reads as movement. {def.puppetNote}
+        </p>}
         <p className="hint">Drag to orbit · right-drag to pan · scroll to zoom</p>
-        <button className="ghost" onClick={() => sceneRef.current?.resetCamera()}>Reset view</button>
+        <div className="info-actions">
+          <button className="ghost" onClick={() => sceneRef.current?.resetCamera()}>Reset view</button>
+          {!isPropCollection(collection) && <button className="ghost" onClick={() => setMode('sculpt')} disabled={!canSculpt} title="Reshape the body on side and top drawings and export the change as a sculpt file">
+            Edit sculpt{(() => { const d = getSculpt(id); return d && !isIdentity(d) ? ' (edited)' : ''; })()}
+          </button>}
+        </div>
 
-        {collection !== 'devonian-props' && <section className="scheme" aria-label="Colour scheme">
+        {!isPropCollection(collection) && <section className="scheme" aria-label="Colour scheme">
           <h3>Colours</h3>
           <label className="scheme-pick">
             <span className="sr-only">Colour scheme for {def.name}</span>
@@ -175,10 +267,10 @@ export function Viewer() {
         </section>}
       </div>
 
-      <section className="clips" aria-label="Animations" data-loaded-specimen={loadedId}>
+      <section className="clips" aria-label="Animations" data-loaded-specimen={loadedId} data-loaded-model={loadedId ? modelPath : ''}>
         <div className="clips-head">
           <h3>Animations</h3>
-          {clips.length > 0 && <><label className="toggle">
+          {(clips.length > 0 || loading) && <><label className="toggle">
             <input type="checkbox" checked={loop} onChange={(e) => setLoop(e.target.checked)} />
             <span>Loop one-shots</span>
           </label>
@@ -208,17 +300,35 @@ export function Viewer() {
         </div>}
         {!loading && !clips.length && <p className="hint">Static specimen</p>}
         <div className="clip-grid">
-          {clips.map((name) => (
-            <button key={name} className={`clip ${name === active ? 'active' : ''}`} aria-pressed={name === active} onClick={() => sceneRef.current?.play(name, loop)}>
-              {name}
-            </button>
-          ))}
+          {clips.filter((n) => !isReplaced(n)).map((name) => {
+            // A clip queued for rework is flagged on its own button rather than on the creature:
+            // the body is finished, this motion is not, and that is what a viewer wants to know.
+            const queued = def.clipNotes?.[name];
+            return (
+              <button key={name} className={`clip ${name === active ? 'active' : ''}${queued ? ' clip-queued' : ''}`}
+                aria-pressed={name === active} onClick={() => sceneRef.current?.play(name, loop)}>
+                {name}
+                {queued && <ClipQueuedBadge name={name} note={queued} />}
+              </button>
+            );
+          })}
         </div>
+        {clips.some(isReplaced) && <>
+          {/* A re-authored clip keeps its predecessor in the file as replaced/<Name>, so the two
+              can be played side by side and the old one restored if the new one is worse. The
+              game never asks for these names; only this page shows them. */}
+          <h4 className="clips-replaced-head">Replaced</h4>
+          <div className="clip-grid clip-grid-replaced">
+            {clips.filter(isReplaced).map((name) => (
+              <button key={name} className={`clip clip-replaced ${name === active ? 'active' : ''}`} aria-pressed={name === active}
+                title={`The clip ${replacedName(name)} superseded; kept for comparison`} onClick={() => sceneRef.current?.play(name, loop)}>
+                {replacedName(name)}
+              </button>
+            ))}
+          </div>
+        </>}
       </section>
 
-      {(loading || error) && (
-        <div className={`status ${error ? 'error' : ''}`} role="status">{error || `Loading ${def.name}…`}</div>
-      )}
     </div>
   );
 }

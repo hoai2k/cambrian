@@ -1,0 +1,256 @@
+{
+  "status": "initial-preview",
+  "fullSha256": "f69f1bfaae8e96d775756bb1fdbdc6b4c0971adf88892fd132ed885baaaaa313",
+  "lodSha256": "7166c05353811611d978fe202caea234a9a9b70eab359cd4d0e51da6a80be34b",
+  "fullViews": [
+    "threequarter",
+    "dorsal",
+    "side",
+    "eye-detail",
+    "oral-open",
+    "aperture-funnel",
+    "action-Bite",
+    "action-Swim",
+    "action-Eat",
+    "action-Heavy",
+    "action-Guard",
+    "action-Ability",
+    "action-Dodge",
+    "action-Death",
+    "action-Grab"
+  ],
+  "lodViews": [
+    "Idle",
+    "Swim",
+    "Death"
+  ],
+  "selectedSequenceFrames": [
+    "sequence-Grab-01.png",
+    "sequence-Grab-10.png",
+    "sequence-Grab-22.png",
+    "sequence-Grab-33.png",
+    "sequence-Grab-43.png",
+    "sequence-Heavy-01.png",
+    "sequence-Heavy-08.png",
+    "sequence-Heavy-18.png",
+    "sequence-Heavy-27.png",
+    "sequence-Heavy-34.png",
+    "sequence-Swim-01.png",
+    "sequence-Swim-07.png",
+    "sequence-Swim-13.png",
+    "sequence-Swim-19.png",
+    "sequence-Swim-25.png"
+  ],
+  "eyeAudit": {
+    "full": {
+      "method": "actual-eye-polyhedron uniform-volume rejection samples; actual continuous-head triangle parity; three independent ray directions; explicit distant oral boundary closures",
+      "results": [
+        {
+          "id": "michelinoceras",
+          "revision": "local-v1-candidate",
+          "assetSha256": "f69f1bfaae8e96d775756bb1fdbdc6b4c0971adf88892fd132ed885baaaaa313",
+          "headMesh": "head_continuous_closed",
+          "headTriangles": 63392,
+          "headTopology": {
+            "valid": true,
+            "nonmanifoldEdges": 0,
+            "cappedBoundaryLoops": []
+          },
+          "eyes": [
+            {
+              "eye": 0,
+              "center": [
+                0.23199999332427979,
+                0.05499999783933163,
+                1.534999966621399
+              ],
+              "radii": [
+                0.05500000715255737,
+                0.05299999751150608,
+                0.0700000524520874
+              ],
+              "eyeTriangles": 4992,
+              "boundingBoxCandidates": 120000,
+              "volumeSamples": 62514,
+              "inside": 46663,
+              "insidePercent": 74.64407972614134,
+              "wilson95Percent": [
+                74.30153291948743,
+                74.98359787108038
+              ],
+              "conservative95Percent": [
+                74.30153291948743,
+                74.98359787108038
+              ],
+              "rayDisagreements": 0,
+              "insideLowerPercent": 74.64407972614134,
+              "insideUpperPercent": 74.64407972614134,
+              "closureClearanceLowerBounds": [],
+              "criterion50": "PASS",
+              "target65": true,
+              "guidanceOnly70PercentTranslationGlTF": [
+                -1.5808876696610241e-06,
+                0.0,
+                0.0
+              ],
+              "guidanceOnly70PercentTranslationBlender": [
+                -1.5808876696610241e-06,
+                -0.0,
+                0.0
+              ]
+            },
+            {
+              "eye": 1,
+              "center": [
+                -0.23199999332427979,
+                0.05499999783933163,
+                1.534999966621399
+              ],
+              "radii": [
+                0.05500000715255737,
+                0.05299999751150608,
+                0.0700000524520874
+              ],
+              "eyeTriangles": 4992,
+              "boundingBoxCandidates": 120000,
+              "volumeSamples": 62654,
+              "inside": 46884,
+              "insidePercent": 74.83001883359402,
+              "wilson95Percent": [
+                74.48867402061762,
+                75.168318951831
+              ],
+              "conservative95Percent": [
+                74.48867402061762,
+                75.1778518594097
+              ],
+              "rayDisagreements": 6,
+              "insideLowerPercent": 74.83001883359402,
+              "insideUpperPercent": 74.8395952373352,
+              "closureClearanceLowerBounds": [],
+              "criterion50": "PASS",
+              "target65": true,
+              "guidanceOnly70PercentTranslationGlTF": [
+                1.5808876696610241e-06,
+                0.0,
+                0.0
+              ],
+              "guidanceOnly70PercentTranslationBlender": [
+                1.5808876696610241e-06,
+                -0.0,
+                0.0
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "lod": {
+      "method": "actual-eye-polyhedron uniform-volume rejection samples; actual continuous-head triangle parity; three independent ray directions; explicit distant oral boundary closures",
+      "results": [
+        {
+          "id": "michelinoceras",
+          "revision": "local-v1-candidate.lod1",
+          "assetSha256": "7166c05353811611d978fe202caea234a9a9b70eab359cd4d0e51da6a80be34b",
+          "headMesh": "head_continuous_closed",
+          "headTriangles": 16480,
+          "headTopology": {
+            "valid": true,
+            "nonmanifoldEdges": 0,
+            "cappedBoundaryLoops": []
+          },
+          "eyes": [
+            {
+              "eye": 0,
+              "center": [
+                0.23199999332427979,
+                0.05500180600211024,
+                1.534999966621399
+              ],
+              "radii": [
+                0.05499204993247986,
+                0.05299756349995732,
+                0.06997835636138916
+              ],
+              "eyeTriangles": 1296,
+              "boundingBoxCandidates": 120000,
+              "volumeSamples": 62347,
+              "inside": 46555,
+              "insidePercent": 74.67079410396651,
+              "wilson95Percent": [
+                74.32790404226304,
+                75.01064410012481
+              ],
+              "conservative95Percent": [
+                74.32629307354921,
+                75.01064410012481
+              ],
+              "rayDisagreements": 1,
+              "insideLowerPercent": 74.66919017755465,
+              "insideUpperPercent": 74.67079410396651,
+              "closureClearanceLowerBounds": [],
+              "criterion50": "PASS",
+              "target65": true,
+              "guidanceOnly70PercentTranslationGlTF": [
+                -1.580580601512338e-06,
+                0.0,
+                0.0
+              ],
+              "guidanceOnly70PercentTranslationBlender": [
+                -1.580580601512338e-06,
+                -0.0,
+                0.0
+              ]
+            },
+            {
+              "eye": 1,
+              "center": [
+                -0.23199999332427979,
+                0.05500180518720299,
+                1.534999966621399
+              ],
+              "radii": [
+                0.05499204993247986,
+                0.052997564314864576,
+                0.06997835636138916
+              ],
+              "eyeTriangles": 1296,
+              "boundingBoxCandidates": 120000,
+              "volumeSamples": 62471,
+              "inside": 46766,
+              "insidePercent": 74.86033519553072,
+              "wilson95Percent": [
+                74.51862282549317,
+                75.19899022404516
+              ],
+              "conservative95Percent": [
+                74.51862282549317,
+                75.2053640253587
+              ],
+              "rayDisagreements": 4,
+              "insideLowerPercent": 74.86033519553072,
+              "insideUpperPercent": 74.86673816650926,
+              "closureClearanceLowerBounds": [],
+              "criterion50": "PASS",
+              "target65": true,
+              "guidanceOnly70PercentTranslationGlTF": [
+                1.580580601512338e-06,
+                0.0,
+                0.0
+              ],
+              "guidanceOnly70PercentTranslationBlender": [
+                1.580580601512338e-06,
+                -0.0,
+                0.0
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "limits": [
+    "Detailed arm-root fusion, arm-to-arm contact and all transition combinations need later refinement.",
+    "Whole adult shell length, living chamber and soft parts are conservative comparative completions of fragmentary M.currens material."
+  ]
+}

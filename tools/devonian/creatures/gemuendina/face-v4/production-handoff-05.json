@@ -1,0 +1,16 @@
+{
+  "status": "shape05 actual six views author reviewed; production sources frozen, execution pending",
+  "sources": {
+    "/Users/hoai/Documents/Stuff/Generations/cambrian/local/expansion-repo/tools/devonian/creatures/gemuendina/face-v4/shape_05.py": "ecaf536048fe536e814c45bc802ad7e5211d9df05cd828211035f521d01d5c03",
+    "/Users/hoai/Documents/Stuff/Generations/cambrian/local/expansion-repo/tools/devonian/creatures/gemuendina/face-v4/study_05.py": "ef7bce44ffb1458107e837f3ed049928d151cf633966106b090409df5741ba5f",
+    "/Users/hoai/Documents/Stuff/Generations/cambrian/local/expansion-repo/tools/devonian/creatures/gemuendina/face-v4/rig_spec_05.py": "a9960c1f0e1f35f7c3746fc142be0a81048bcc8c764fe0daed858d333617e061",
+    "/Users/hoai/Documents/Stuff/Generations/cambrian/local/expansion-repo/tools/devonian/creatures/gemuendina/face-v4/candidate_05.py": "0c94afe1b891e0e36f26bcd7a2a49b9c2890653bb6484576e28aa583aebf04ae",
+    "/Users/hoai/Documents/Stuff/Generations/cambrian/local/expansion-repo/tools/devonian/creatures/gemuendina/face-v4/check_candidate_05.py": "e945374b73901f8a49f6e5bd4a13204f3dbbcfc4d775cefa26427f9071ca7782",
+    "/Users/hoai/Documents/Stuff/Generations/cambrian/local/expansion-repo/tools/devonian/creatures/gemuendina/face-v4/audit_candidate_05.py": "177f4bf280c80f698edb04ca26d9b9817fde366735af76b78988aee6139017eb",
+    "/Users/hoai/Documents/Stuff/Generations/cambrian/local/expansion-repo/tools/devonian/creatures/gemuendina/face-v4/render_candidate_05.py": "3bc2c07c9a0d32ca56a80220e3d97f315d0167350ba908644ca6f509c3a32306"
+  },
+  "inputs": {
+    "/Users/hoai/Documents/Stuff/Generations/cambrian/local/devonian-authoring/gemuendina/face-v4/study-05/gemuendina-face-study-05.blend": "147a90e3233d6af75dcd06b3dd6ac92829bfffe45ac3f4020c6a87e0f7b9b40c",
+    "/Users/hoai/Documents/Stuff/Generations/cambrian/local/devonian-authoring/backups/gemuendina-final-pre-face-refinement-2026-09-08/public/gemuendina.json": "27ad05fc69089fed186820c5c28f9bdd6e7daf6d6fdf33fea0a64d2c15a49cb3"
+  }
+}

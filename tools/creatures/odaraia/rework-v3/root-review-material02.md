@@ -1,0 +1,9 @@
+# Odaraia material02 focused review — 8 September2026
+
+Root inspected all six actual images: oblique and side on dark/light backgrounds, front dark, underside light. Accept this material direction for production development. Broad white glass bands have been reduced, olive cuticular pigment reads across the wrapping coat, and internal trunk silhouettes remain visible through it. Darker less saturated eyes and copper/olive appendages improve on the turquoise marbles and uniform tan01.
+
+This is not final model approval. The corneal lower edge remains bright at some angles; the rigid repeated limb fan still needs staggered natural posture and expressive articulation in the animation stage. Keep coarse material02 geometry unchanged as the starting point, then evaluate actual articulated full/LOD exports. Compound-eye surface cues must not turn into a fish iris. Validate real game alpha sorting and appearance after baking—Cycles transparency alone is insufficient.
+
+Verified output manifest SHA256 `eabb28c993294e62c3bbdf47a122caf2116a56acd97ba59fc60e19848a5a3139`; material report `2893db7926522ac1848c64280b6e882c539d12aeaa0cddcf2f89b0e54db8ebc6`. Geometry hashes before/after equal `b4086bbddf3bfb5a6551964df927f3a69fa8bbf79a2a1f405f23053a0df0023f`. All source inputs unchanged. Six render hashes and editable blend are in the local manifest. Preserve clay02, material01/02 and original backup.
+
+Next: articulated32-pair limb rig with proximal/mid/distal controls, shell following trunk without floppy valve collapse, animated tail blades and mouthpart motions, all18 existing action names including Moult, semantic mouth/swallow/attack/grasp sockets, baked pigment/full PBR and reduced delivery. Read ATTACK_EAT_RIG_DIRECTION.md. Root or an Astra author freezes the production plan before routine execution.

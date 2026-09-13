@@ -1,0 +1,26 @@
+{
+  "sourceGlbSha256": "26760efd2f8d09d9a2d00b724dbcba8434df4eaa9b7e7a4913864ea30b444c02",
+  "renders": [
+    {
+      "file": "LOD-Idle.png",
+      "clip": "Idle",
+      "frame": 0,
+      "imageSha256": "c3965fb25a5a0c0135dda6eada87e95afa7443de701910c871102e1b5c371b64",
+      "sourceGlbSha256": "26760efd2f8d09d9a2d00b724dbcba8434df4eaa9b7e7a4913864ea30b444c02"
+    },
+    {
+      "file": "LOD-Swim.png",
+      "clip": "Swim",
+      "frame": 18,
+      "imageSha256": "ef738477541a80c82d768154f5dcd3d83ab03568b1d9f39d6063895dc343212f",
+      "sourceGlbSha256": "26760efd2f8d09d9a2d00b724dbcba8434df4eaa9b7e7a4913864ea30b444c02"
+    },
+    {
+      "file": "LOD-Death.png",
+      "clip": "Death",
+      "frame": 48,
+      "imageSha256": "7fabc35c6cfb185de1e70ad1e2199a7bac4f2d60dcdcf699e7e6a86f5e1b894e",
+      "sourceGlbSha256": "26760efd2f8d09d9a2d00b724dbcba8434df4eaa9b7e7a4913864ea30b444c02"
+    }
+  ]
+}

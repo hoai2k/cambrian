@@ -1,0 +1,447 @@
+{
+  "id": "odaraia",
+  "stage": "V3 production candidate, UNREVIEWED",
+  "source": {
+    "blend": "material02/odaraia-material02.blend",
+    "acceptedGeometrySha256": "b4086bbddf3bfb5a6551964df927f3a69fa8bbf79a2a1f405f23053a0df0023f",
+    "geometryUnchangedByRigging": true,
+    "curveRecovery": {
+      "endopodRingCentreMaxError": 2.457562461863554e-07,
+      "paddleRingCentreMaxError": 2.5288109106536417e-07,
+      "enditeStationMaxError": 2.457562461863554e-07,
+      "ringsChecked": 3904,
+      "limbsChecked": 64
+    }
+  },
+  "orientation": {
+    "up": "+Y",
+    "ventral": "+Y",
+    "forward": "+Z",
+    "exportYup": false,
+    "note": "the scene is authored directly in game coordinates, so the exporter applies no conversion"
+  },
+  "skeleton": {
+    "bones": 406,
+    "jointsComponentType": "UNSIGNED_SHORT (5123)",
+    "maxInfluencesAuthored": 2,
+    "namesMatchPlanTable": true
+  },
+  "animation": {
+    "fps": 24,
+    "clips": {
+      "Idle": {
+        "intendedSeconds": 2.4,
+        "frames": 59,
+        "seconds": 2.4167,
+        "loop": true,
+        "animatedBones": 404,
+        "sampledKeys": 95344,
+        "retainedKeys": 21732,
+        "reduction": 0.7721,
+        "maxComponentError": 0.0015,
+        "maxTipErrorModelUnits": 0.011443,
+        "endpointSeam": 0.0,
+        "deathHoldMaxDeviation": null
+      },
+      "Swim": {
+        "intendedSeconds": 1.4,
+        "frames": 35,
+        "seconds": 1.4167,
+        "loop": true,
+        "animatedBones": 404,
+        "sampledKeys": 56560,
+        "retainedKeys": 33948,
+        "reduction": 0.3998,
+        "maxComponentError": 0.0015,
+        "maxTipErrorModelUnits": 0.006707,
+        "endpointSeam": 0.0,
+        "deathHoldMaxDeviation": null
+      },
+      "TurnLeft": {
+        "intendedSeconds": 1.2,
+        "frames": 30,
+        "seconds": 1.2083,
+        "loop": true,
+        "animatedBones": 404,
+        "sampledKeys": 48480,
+        "retainedKeys": 31456,
+        "reduction": 0.3512,
+        "maxComponentError": 0.0015,
+        "maxTipErrorModelUnits": 0.010449,
+        "endpointSeam": 0.0,
+        "deathHoldMaxDeviation": null
+      },
+      "TurnRight": {
+        "intendedSeconds": 1.2,
+        "frames": 30,
+        "seconds": 1.2083,
+        "loop": true,
+        "animatedBones": 404,
+        "sampledKeys": 48480,
+        "retainedKeys": 31468,
+        "reduction": 0.3509,
+        "maxComponentError": 0.0015,
+        "maxTipErrorModelUnits": 0.009456,
+        "endpointSeam": 0.0,
+        "deathHoldMaxDeviation": null
+      },
+      "Rise": {
+        "intendedSeconds": 1.3,
+        "frames": 32,
+        "seconds": 1.2917,
+        "loop": true,
+        "animatedBones": 398,
+        "sampledKeys": 50944,
+        "retainedKeys": 32508,
+        "reduction": 0.3619,
+        "maxComponentError": 0.001499,
+        "maxTipErrorModelUnits": 0.007241,
+        "endpointSeam": 0.0,
+        "deathHoldMaxDeviation": null
+      },
+      "Dive": {
+        "intendedSeconds": 1.3,
+        "frames": 32,
+        "seconds": 1.2917,
+        "loop": true,
+        "animatedBones": 398,
+        "sampledKeys": 50944,
+        "retainedKeys": 32600,
+        "reduction": 0.3601,
+        "maxComponentError": 0.0015,
+        "maxTipErrorModelUnits": 0.010784,
+        "endpointSeam": 0.0,
+        "deathHoldMaxDeviation": null
+      },
+      "Dodge": {
+        "intendedSeconds": 0.8,
+        "frames": 20,
+        "seconds": 0.7917,
+        "loop": false,
+        "animatedBones": 391,
+        "sampledKeys": 31280,
+        "retainedKeys": 25476,
+        "reduction": 0.1855,
+        "maxComponentError": 0.0015,
+        "maxTipErrorModelUnits": 0.00651,
+        "endpointSeam": 0.0,
+        "deathHoldMaxDeviation": null
+      },
+      "Guard": {
+        "intendedSeconds": 1.6,
+        "frames": 39,
+        "seconds": 1.5833,
+        "loop": true,
+        "animatedBones": 404,
+        "sampledKeys": 63024,
+        "retainedKeys": 18800,
+        "reduction": 0.7017,
+        "maxComponentError": 0.001499,
+        "maxTipErrorModelUnits": 0.004495,
+        "endpointSeam": 0.0,
+        "deathHoldMaxDeviation": null
+      },
+      "Parry": {
+        "intendedSeconds": 0.85,
+        "frames": 21,
+        "seconds": 0.8333,
+        "loop": false,
+        "animatedBones": 393,
+        "sampledKeys": 33012,
+        "retainedKeys": 23580,
+        "reduction": 0.2857,
+        "maxComponentError": 0.0015,
+        "maxTipErrorModelUnits": 0.003949,
+        "endpointSeam": 0.0,
+        "deathHoldMaxDeviation": null
+      },
+      "Attack": {
+        "intendedSeconds": 1.3,
+        "frames": 32,
+        "seconds": 1.2917,
+        "loop": false,
+        "animatedBones": 405,
+        "sampledKeys": 51840,
+        "retainedKeys": 25132,
+        "reduction": 0.5152,
+        "maxComponentError": 0.001499,
+        "maxTipErrorModelUnits": 0.009205,
+        "endpointSeam": 0.0,
+        "deathHoldMaxDeviation": null
+      },
+      "Bite": {
+        "intendedSeconds": 0.7,
+        "frames": 18,
+        "seconds": 0.7083,
+        "loop": false,
+        "animatedBones": 405,
+        "sampledKeys": 29160,
+        "retainedKeys": 21232,
+        "reduction": 0.2719,
+        "maxComponentError": 0.0015,
+        "maxTipErrorModelUnits": 0.008653,
+        "endpointSeam": 0.0,
+        "deathHoldMaxDeviation": null
+      },
+      "Heavy": {
+        "intendedSeconds": 1.8,
+        "frames": 44,
+        "seconds": 1.7917,
+        "loop": false,
+        "animatedBones": 405,
+        "sampledKeys": 71280,
+        "retainedKeys": 27196,
+        "reduction": 0.6185,
+        "maxComponentError": 0.0015,
+        "maxTipErrorModelUnits": 0.01048,
+        "endpointSeam": 0.0,
+        "deathHoldMaxDeviation": null
+      },
+      "Ability": {
+        "intendedSeconds": 2.0,
+        "frames": 49,
+        "seconds": 2.0,
+        "loop": true,
+        "animatedBones": 404,
+        "sampledKeys": 79184,
+        "retainedKeys": 25496,
+        "reduction": 0.678,
+        "maxComponentError": 0.0015,
+        "maxTipErrorModelUnits": 0.006355,
+        "endpointSeam": 0.0,
+        "deathHoldMaxDeviation": null
+      },
+      "Eat": {
+        "intendedSeconds": 3.0,
+        "frames": 73,
+        "seconds": 3.0,
+        "loop": true,
+        "animatedBones": 405,
+        "sampledKeys": 118260,
+        "retainedKeys": 22856,
+        "reduction": 0.8067,
+        "maxComponentError": 0.0015,
+        "maxTipErrorModelUnits": 0.008414,
+        "endpointSeam": 9e-08,
+        "deathHoldMaxDeviation": null
+      },
+      "Hit": {
+        "intendedSeconds": 0.65,
+        "frames": 17,
+        "seconds": 0.6667,
+        "loop": false,
+        "animatedBones": 395,
+        "sampledKeys": 26860,
+        "retainedKeys": 21244,
+        "reduction": 0.2091,
+        "maxComponentError": 0.001499,
+        "maxTipErrorModelUnits": 0.005518,
+        "endpointSeam": 0.0,
+        "deathHoldMaxDeviation": null
+      },
+      "Stagger": {
+        "intendedSeconds": 1.4,
+        "frames": 35,
+        "seconds": 1.4167,
+        "loop": false,
+        "animatedBones": 396,
+        "sampledKeys": 55440,
+        "retainedKeys": 30772,
+        "reduction": 0.4449,
+        "maxComponentError": 0.001499,
+        "maxTipErrorModelUnits": 0.009719,
+        "endpointSeam": 0.0,
+        "deathHoldMaxDeviation": null
+      },
+      "Moult": {
+        "intendedSeconds": 3.2,
+        "frames": 78,
+        "seconds": 3.2083,
+        "loop": true,
+        "animatedBones": 404,
+        "sampledKeys": 126048,
+        "retainedKeys": 31532,
+        "reduction": 0.7498,
+        "maxComponentError": 0.0015,
+        "maxTipErrorModelUnits": 0.009263,
+        "endpointSeam": 0.0,
+        "deathHoldMaxDeviation": null
+      },
+      "Death": {
+        "intendedSeconds": 2.8,
+        "frames": 68,
+        "seconds": 2.7917,
+        "loop": false,
+        "animatedBones": 397,
+        "sampledKeys": 107984,
+        "retainedKeys": 20944,
+        "reduction": 0.806,
+        "maxComponentError": 0.0015,
+        "maxTipErrorModelUnits": 0.006648,
+        "endpointSeam": 0.40705341,
+        "deathHoldMaxDeviation": 0.0
+      }
+    },
+    "totalRetainedKeyComponents": 477972,
+    "totalSampledKeyComponents": 1144124,
+    "reduction": 0.5822,
+    "reductionTolerance": 0.0015,
+    "maxTipErrorModelUnits": 0.011443
+  },
+  "meshes": {
+    "full": {
+      "triangles": 130184,
+      "bytesRaw": 19611928,
+      "draws": [
+        {
+          "name": "odaraia trunk",
+          "triangles": 22576,
+          "vertices": 11310
+        },
+        {
+          "name": "odaraia endopods",
+          "triangles": 26240,
+          "vertices": 13248
+        },
+        {
+          "name": "odaraia exopods",
+          "triangles": 23552,
+          "vertices": 12928
+        },
+        {
+          "name": "odaraia endites",
+          "triangles": 32768,
+          "vertices": 34816
+        },
+        {
+          "name": "odaraia eyes",
+          "triangles": 3312,
+          "vertices": 1660
+        },
+        {
+          "name": "odaraia mouthparts",
+          "triangles": 2760,
+          "vertices": 1462
+        },
+        {
+          "name": "odaraia shell",
+          "triangles": 18976,
+          "vertices": 9490
+        }
+      ],
+      "profile": {
+        "endopodSides": 5,
+        "paddleStations": 11,
+        "leafSides": 7,
+        "rodSides": 4,
+        "lamellae": 7,
+        "lamellaSides": 3,
+        "stubSides": 4,
+        "spinePoints": 3,
+        "bodyRatio": null
+      },
+      "surfaceDeviation": {
+        "endopod": 0.005042,
+        "exopodBlade": 0.004654,
+        "exopodRod": 0.003222,
+        "enditeRoot": 0.004101,
+        "spine": 0.0045,
+        "note": "centrelines, radii, lengths and directions are the authored ones exactly; only the cross-section polygons differ. Spines and, at LOD, endite roots and lamellae become flat blades of the same length and taper."
+      },
+      "sha256": "ffcbea1f8db2a9be3f7886583e4c99c8c421a404097d28fd9351e47221b71c37"
+    },
+    "lod1": {
+      "triangles": 49878,
+      "bytesRaw": 13509764,
+      "draws": [
+        {
+          "name": "odaraia trunk",
+          "triangles": 7030,
+          "vertices": 3537
+        },
+        {
+          "name": "odaraia endopods",
+          "triangles": 15744,
+          "vertices": 8000
+        },
+        {
+          "name": "odaraia exopods",
+          "triangles": 8448,
+          "vertices": 5760
+        },
+        {
+          "name": "odaraia endites",
+          "triangles": 10240,
+          "vertices": 20480
+        },
+        {
+          "name": "odaraia eyes",
+          "triangles": 1488,
+          "vertices": 748
+        },
+        {
+          "name": "odaraia mouthparts",
+          "triangles": 1236,
+          "vertices": 679
+        },
+        {
+          "name": "odaraia shell",
+          "triangles": 5692,
+          "vertices": 2848
+        }
+      ],
+      "profile": {
+        "endopodSides": 3,
+        "paddleStations": 7,
+        "leafSides": 5,
+        "rodSides": 3,
+        "lamellae": 5,
+        "lamellaSides": 0,
+        "stubSides": 0,
+        "spinePoints": 2,
+        "bodyRatio": {
+          "Carapace | continuous rigid valve fields": 0.3,
+          "Trunk | 32 integrated tergal segments": 0.26
+        },
+        "bodyDefault": 0.45
+      },
+      "surfaceDeviation": {
+        "endopod": 0.0132,
+        "exopodBlade": 0.008976,
+        "exopodRod": 0.0055,
+        "enditeRoot": 0.014,
+        "spine": 0.0045,
+        "note": "centrelines, radii, lengths and directions are the authored ones exactly; only the cross-section polygons differ. Spines and, at LOD, endite roots and lamellae become flat blades of the same length and taper."
+      },
+      "sha256": "5d8b0c4940d68fd243e1d9f4207350c64700cd766a8999468c494b89caecf10a"
+    },
+    "animationBytes": 2235748,
+    "bakedShellAlphaRange": [
+      0.3114,
+      1.0
+    ]
+  },
+  "runtime": {
+    "cambrianFeeding": {
+      "version": 1,
+      "mode": "authored-grasp",
+      "clip": "Eat",
+      "apertureDiameter": 0.045,
+      "pickupOffsetLimit": 0.18
+    },
+    "measuredApertureDiameter": 0.04513,
+    "measuredPickupOffsetLimitBounded": 0.24,
+    "measuredPickupOffsetLimitRuntimeSolver": 0.18,
+    "sockets": 16
+  },
+  "validation": {
+    "checks": 267,
+    "failures": 0,
+    "status": "PASS"
+  },
+  "nextSteps": [
+    "node tools/creatures/package-expansion.mjs odaraia",
+    "node tools/creatures/add-anchors.mjs odaraia  (merge anchors_v3.json into tools/creatures/arthropods/anchors.json first)",
+    "node tools/update-asset-sizes.mjs"
+  ]
+}

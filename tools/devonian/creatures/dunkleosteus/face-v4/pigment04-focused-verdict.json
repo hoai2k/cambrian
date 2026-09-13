@@ -1,0 +1,55 @@
+{
+  "scope": "Focused head/brow/cheek/gnathal refinement",
+  "verdict": "Accepted for preview integration; not whole-creature final approval",
+  "broaderCreatureStatus": "preview",
+  "materialParity": "Partial: missing COLOR_0 binding corrected, but LOD remains substantially paler/smoother than full; colour-space/roughness/normal polish pending",
+  "assets": [
+    {
+      "path": "/Users/hoai/Documents/Stuff/Generations/cambrian/local/devonian-authoring/dunkleosteus/face-v4/candidate03/exports-pigment04/dunkleosteus.glb",
+      "sha256": "0ace6026c6b46d9d560528677ffdaf31769d74bea51065b884214c8b1037950d"
+    },
+    {
+      "path": "/Users/hoai/Documents/Stuff/Generations/cambrian/local/devonian-authoring/dunkleosteus/face-v4/candidate03/exports-pigment04/dunkleosteus.lod1.glb",
+      "sha256": "2d57904f0a8a2c858f597730e38927b1f38126a51a9f87011b2f3f78d7c52bca"
+    }
+  ],
+  "proofSHA256": "46d02096994e37a94b910cca6e7525e832896344c666288d2f6b7be314f642ad",
+  "newLODRenderEvidenceSHA256": "99c32c5abcca0c77261c636467eb1cb0524c66402366959573b4f8f7becd11f9",
+  "inspectedLODImages": [
+    {
+      "path": "/Users/hoai/Documents/Stuff/Generations/cambrian/local/devonian-authoring/dunkleosteus/face-v4/candidate03/exports-pigment04/review-lod/rest-side.png",
+      "sha256": "36de4d98e5a7908a0838610574aca05dcae77cec26b4163760b3c490b6160f4b"
+    },
+    {
+      "path": "/Users/hoai/Documents/Stuff/Generations/cambrian/local/devonian-authoring/dunkleosteus/face-v4/candidate03/exports-pigment04/review-lod/rest-oblique.png",
+      "sha256": "4433d5585afbfdd2aee6b86aec7fc3564ffdcce10ba79b3686e89a4474c30041"
+    },
+    {
+      "path": "/Users/hoai/Documents/Stuff/Generations/cambrian/local/devonian-authoring/dunkleosteus/face-v4/candidate03/exports-pigment04/review-lod/rest-front.png",
+      "sha256": "6b10b86c8b8dae55b141088fc9698ba75e7b5a8e4ffb43119976937f11538a10"
+    },
+    {
+      "path": "/Users/hoai/Documents/Stuff/Generations/cambrian/local/devonian-authoring/dunkleosteus/face-v4/candidate03/exports-pigment04/review-lod/max-oblique.png",
+      "sha256": "7e47da58d443e7201cf364844aeb61a350daa83d09831dd0d6eccdd99b32f988"
+    },
+    {
+      "path": "/Users/hoai/Documents/Stuff/Generations/cambrian/local/devonian-authoring/dunkleosteus/face-v4/candidate03/exports-pigment04/review-lod/max-front.png",
+      "sha256": "9170461c4921c33a8b87bc16800c7378fa3f0eb67f1fbfa96c469ff8bbfea2cb"
+    },
+    {
+      "path": "/Users/hoai/Documents/Stuff/Generations/cambrian/local/devonian-authoring/dunkleosteus/face-v4/candidate03/exports-pigment04/review-lod/mid-bite-side.png",
+      "sha256": "f932c6b618789ce860c91b5ed3689c8f23e8254723a2e5900bec91b575683803"
+    },
+    {
+      "path": "/Users/hoai/Documents/Stuff/Generations/cambrian/local/devonian-authoring/dunkleosteus/face-v4/candidate03/exports-pigment04/review-lod/eat-oblique.png",
+      "sha256": "95477a2fa8b3e868f1e09d6cd989231c2243aa9125aa53ab714c5d599dbd3c90"
+    },
+    {
+      "path": "/Users/hoai/Documents/Stuff/Generations/cambrian/local/devonian-authoring/dunkleosteus/face-v4/candidate03/exports-pigment04/review-lod/recovery-oblique.png",
+      "sha256": "4bd9bf1d54837bfa07a0ab462be63747e87b9259e571dd2e28760a04e7ed9fd7"
+    }
+  ],
+  "fullReview": "All eight full views and four portraits individually inspected earlier; all twelve copied images verified byte-identical against the same full GLB hash.",
+  "auditBridge": "Independently verified full BIN and all non-colour JSON equality. Original full/LOD173-pose zero-contact results and eye reports retain their original execution identity.",
+  "measuredScope": "173 integer feeding poses per full/LOD, opposing-shell/gnathal vertex penetration tests; closed-eye-volume three-ray parity. Not an assertion of exhaustive edge-only collision or new realtime playback testing."
+}

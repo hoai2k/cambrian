@@ -1,0 +1,16 @@
+{
+  "schemaVersion": 1,
+  "canonicalStatus": "greenlit",
+  "canonical": "canonical.png",
+  "canonicalSource": "../../atopodentatus.png",
+  "canonicalSha256": "7c104d2ff201e6102074a29df58de003c390e344c6132743ae8434930009da4c",
+  "input": "input.png",
+  "inputSha256": "e1632ba77da43e48262803b43796fd91da044cdb0b0d38a5a4717c052a5fa2e3",
+  "turnaround": "turnaround.png",
+  "turnaroundSha256": "a804317c0158bb1d276226b9f630f89d8ce26308a6bebcc60f9e1c9b7f3411b3",
+  "generator": "builtin imagegen",
+  "subjectSpec": "Atopodentatus unicus, broad hammer-shaped shovel head with comb-like front teeth, heavy marine reptile trunk, four paddle limbs, long tail",
+  "inputPrompt": "Create ONE full-body subject derived strictly from the supplied approved canonical. Preserve canonical anatomy, proportions, head, appendage count and placement, silhouette, coloration, markings, and texture exactly; no redesign. Single clean three-quarter front view from slightly above in a straight neutral symmetric extended pose, with paired appendages separated and the entire subject fully framed on flat pale neutral studio gray. No water, scenery, text, labels, borders, cropping, or extra animals.",
+  "turnaroundPrompt": "Derive a clean four-view orthographic modeling sheet from the supplied approved canonical, which is the sole visual authority. Preserve exact anatomy, proportions, appendage count and placement, silhouette, coloration, markings, and texture. Use a pale neutral studio gray background and a 2x2 grid containing strict left profile, dorsal/top, frontal, and three-quarter front views; keep the entire subject and every extremity fully framed. No labels, text, scenery, or extra animals.",
+  "review": "Single input exposes all four paddles and the hammer-shaped feeding apparatus. Turnaround is qualitative; canonical.png remains the authority for exact head proportions and markings."
+}

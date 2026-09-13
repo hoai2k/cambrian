@@ -235,6 +235,18 @@ target) pair within sense range using the spatial hash, at 10 Hz.
 - Performance targets: ≤ 400 draw calls per viewport at `high`; ≤ 1.2 M
   triangles total for 4 viewports; GPU skinning for all creatures; swarm
   members instanced per creature type with per-instance animation phase.
+- Part merge (`render/merge-skins.ts`): a rig is one draw call per material,
+  not per authored part. The Devonian bodies are modelled part by part —
+  Nahecaris arrives as 415 skinned meshes, Michelinoceras as 328, against a
+  Cambrian body's four or five — and each one is a draw call per animal on
+  screen. Every part is skinned to the same skeleton, sits at identity under
+  the root, and no clip animates a mesh node, so the parts sharing a material
+  merge into one geometry when the GLB is first loaded, before any instance is
+  cloned from it. The merge is skipped for anything that would make it lossy
+  (an animated node, a morph target, a multi-material mesh, a non-identity
+  transform, mismatched attributes), so a rig that does not fit is left alone.
+  Every Devonian rig lands at 4–10 meshes; `npm run merge` proves the posed
+  surface is unchanged, vertex for vertex, under every clip in both eras.
 
 ## Input
 
@@ -261,9 +273,10 @@ target) pair within sense range using the spatial hash, at 10 Hz.
 > **Superseded by what shipped.** The table above is the plan; the bindings the
 > game reads are in `readGamepad()` in `src/input/input.ts` and are listed in
 > [01 · Combat](01-game-design.md#verbs). The differences that matter: **A** is
-> sprint (not rise), **RB** is rise (not light), **X** is light (not heavy),
-> **RT** is heavy/pounce (not burst), **LB** is dodge (not guard), **B** is
-> guard/parry (not dodge), **LT** is aim rather than a lock-on toggle, and
+> sprint (not rise), **RB** is rise (not light), **X** is dash (not heavy),
+> **Y** is the light bite (not the ability), **RT** is heavy/pounce (not burst),
+> **LB** is sink (not guard), **B** is guard/parry (not dodge), **D-pad →** is
+> hide, **LT** is aim rather than a lock-on toggle, and
 > **D-pad ↓** opens the teleport menu, which this plan predates.
 
 - Rumble via `gamepad.vibrationActuator` on hits taken, Giant proximity

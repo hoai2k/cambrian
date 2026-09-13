@@ -5,7 +5,7 @@
   "provenance": "Late Devonian (Famennian), Cleveland Shale, Ohio, USA",
   "description": "An armoured pelagic arthrodire with a short cranial wedge, articulated cutting jaws and a compact muscular trunk.",
   "lengthMeters": 3.5,
-  "modelLength": 3.4418946504592896,
+  "modelLength": 3.4156177043914795,
   "locomotion": "Swim",
   "clips": [
     "Ability",
@@ -47,7 +47,9 @@
     "Rear-body proportions, caudal silhouette, living integument and oral soft tissues remain interpretations.",
     "Representative 3.5 m adult, not a genus maximum.",
     "PBR UV albedo, normal and roughness; independent vertex pigment bake for LOD.",
-    "Growth is maturation display, no scaling or moulting."
+    "Growth is maturation display, no scaling or moulting.",
+    "V4 cranial and gnathal treatment reconstructed from face-v4/study_02.py and study_03.py on the V2 body, oral lining, rig, eye globes and anchors.",
+    "V3 carries the viewer sculpt docs/sculpts/dunkleosteus-sculpt.json: crown raised over stations 16-18, snout lowered and shortened, applied as the same profile warp the viewer previews."
   ],
   "eyes": [
     {
@@ -57,24 +59,24 @@
       ],
       "bone": "head",
       "centerBlender": [
-        -0.286259263753891,
-        -1.2123372554779053,
-        0.1287265419960022
+        -0.28465279936790466,
+        -1.2350498192761183,
+        0.1773031269537582
       ],
       "normal": [
-        -0.8715881109237671,
-        -0.318354070186615,
-        0.372806578874588
+        -0.9007768630981445,
+        -0.30734705924987793,
+        0.30682045221328735
       ],
       "tangentU": [
-        -0.2927023768424988,
-        0.9479718804359436,
-        0.12519831955432892
+        -0.2909330129623413,
+        0.9515974521636963,
+        0.09909690171480179
       ],
       "tangentV": [
-        -0.39326760172843933,
-        -7.450581485102248e-09,
-        -0.9194241166114807
+        -0.3224267363548279,
+        0.0,
+        -0.9465944766998291
       ],
       "radii": [
         0.052,
@@ -82,7 +84,7 @@
         0.053
       ],
       "sampleCount": 36560,
-      "embeddedFraction": 0.8416028446389496,
+      "embeddedFraction": 0.8653719912472647,
       "centerInsetMeters": 0.027,
       "method": "Seeded uniform ellipsoid volume samples tested against the actual closed subdivided head BVH signed nearest surface."
     },
@@ -93,24 +95,24 @@
       ],
       "bone": "head",
       "centerBlender": [
-        0.2862592339515686,
-        -1.2123373746871948,
-        0.128726527094841
+        0.28437453508377075,
+        -1.2361544070986212,
+        0.17736859011318754
       ],
       "normal": [
-        0.871588945388794,
-        -0.31835150718688965,
-        0.37280693650245667
+        0.9007752537727356,
+        -0.30734845995903015,
+        0.3068237900733948
       ],
       "tangentU": [
-        0.29270005226135254,
-        0.9479727149009705,
-        0.12519732117652893
+        0.2909339368343353,
+        0.9515970349311829,
+        0.09909847378730774
       ],
       "tangentV": [
-        -0.39326757192611694,
-        7.450580596923828e-09,
-        0.9194240570068359
+        -0.3224303722381592,
+        0.0,
+        0.946593165397644
       ],
       "radii": [
         0.052,
@@ -118,10 +120,11 @@
         0.053
       ],
       "sampleCount": 36560,
-      "embeddedFraction": 0.8431892778993435,
+      "embeddedFraction": 0.8653719912472647,
       "centerInsetMeters": 0.027,
       "method": "Seeded uniform ellipsoid volume samples tested against the actual closed subdivided head BVH signed nearest surface."
     }
   ],
-  "artVersion": 2
+  "artVersion": 3,
+  "artCandidate": "sculpt-v3-nose-crown"
 }

@@ -1,0 +1,14 @@
+{
+  "candidate": "Bothriolepis V3 clay02",
+  "owner": "Astra high",
+  "executor": "Terra medium",
+  "inputs": {
+    "/Users/hoai/Documents/Stuff/Generations/cambrian/local/expansion-repo/tools/devonian/creatures/bothriolepis/rework-v3/geometry_clay02.py": "cf5fa0dcecfa3cfd88d4b644785b939596cd0e98027108f057f543a53e169133",
+    "/Users/hoai/Documents/Stuff/Generations/cambrian/local/expansion-repo/tools/devonian/creatures/bothriolepis/rework-v3/build_clay02.py": "23fcd249334a62f053c900138f2b0f298c18a9256b4355f2ba947b8abd68f6e2",
+    "/Users/hoai/Documents/Stuff/Generations/cambrian/local/expansion-repo/tools/devonian/creatures/bothriolepis/rework-v3/execute_clay02.py": "18bf9ff7b059a050c4820a26a63ca970bf59beaa3fc0029fbca76a8921555e95",
+    "/Users/hoai/Documents/Stuff/Generations/cambrian/local/expansion-repo/tools/devonian/creatures/bothriolepis/rework-v3/review-clay01-and-clay02-handoff.md": "dc766226f8fb3a4a444cb1b41674369aa08b145956854b7f7686e4b71135ff11",
+    "/Users/hoai/Documents/Stuff/Generations/cambrian/local/devonian-authoring/bothriolepis/reference-417.pdf": "862d19a8729a3ead88878cccf088744f0dae330cb9dc7a39e451fd1ef6d3b433",
+    "/Users/hoai/Downloads/Bothriolepis.jpeg": "9ccf6370e4e74e14a93a64b9f091bd75cca3a306dcd5405aaf89950c75373c6f",
+    "/Users/hoai/Documents/Stuff/Generations/cambrian/local/devonian-authoring/bothriolepis/rework-v3/clay01/outputs-sha256.json": "ab922e535b869b5597fca6bab7213d77923fa248d745973d85ac264742a7487a"
+  }
+}

@@ -60,3 +60,21 @@ export const FLORA_DENSITY: Record<Biome, Partial<Record<FloraKind, number>>> = 
   escarpment: { rugose: 4, bryozoan: 3, crinoid: 1.5, tabulate: 1, lilyColumn: 2.5, frondTower: 2 },
   basin: { bryozoan: 0.6, crinoid: 0.1, lilyColumn: 0.3 },
 };
+
+/**
+ * The authored scenery each stand-in kind is drawn from, by prop id in `assets/devonian/scenery/`.
+ * Those are the instanced exports built by `node tools/devonian/props/instance.mjs` from the
+ * preview library in `assets/devonian/props/`: one primitive, vertex colours, a few hundred
+ * triangles. A kind left out here keeps the procedural geometry `src/render/sea.ts` builds.
+ */
+export const FLORA_PROPS: Partial<Record<FloraKind, string>> = {
+  crinoid: 'stalked-crinoid',
+  lilyColumn: 'stalked-crinoid-v2',
+  stromatoporoid: 'massive-stromatoporoid',
+  tabulate: 'massive-tabulate-coral',
+  rugose: 'solitary-rugose-coral',
+  bryozoan: 'bryozoan-colony',
+  reed: 'rhynia',
+  frondTower: 'cladoxylopsid-tree',
+  log: 'submerged-log',
+};

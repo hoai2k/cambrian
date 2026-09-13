@@ -1,0 +1,1159 @@
+{
+  "status": "ACTUAL DEFECT; original checker threshold retained",
+  "observed_failure": "Parent/Terra reported check_candidate_01.py line72 RGB range <=.005; no G3 run",
+  "inputs": {
+    "/Users/hoai/Documents/Stuff/Generations/cambrian/local/devonian-authoring/titanichthys/rework-v3/candidate-01/titanichthys.glb": "0897b02d8325eafc9c0c725674a7619fdd027f70a2c3aedbf8a221716a156be8",
+    "/Users/hoai/Documents/Stuff/Generations/cambrian/local/devonian-authoring/titanichthys/rework-v3/candidate-01/titanichthys.lod1.glb": "c473191e85a5593a25b3f2232922901c4e3fede1633f7618934a00ec85bff0e1",
+    "/Users/hoai/Documents/Stuff/Generations/cambrian/local/devonian-authoring/titanichthys/rework-v3/candidate-01/titanichthys-production-01.blend": "ae007bbdf8dfc56e03c360e3d36a3221e10b6bbe6cf5f3cab2894d52109fda9d",
+    "/Users/hoai/Documents/Stuff/Generations/cambrian/local/devonian-authoring/titanichthys/rework-v3/candidate-01/candidate-report.json": "654934060d0c0542577e7a82343e4f168d2a3dbcd3dc0bc046309b596334e7c7"
+  },
+  "finding": "All11 LOD primitives including both eyes contain exactly white COLOR_0. COLOR_1 contains construction attributes, not usable pigment. All6 retained candidate albedo files are byte-identical to accepted material02 albedos.",
+  "localization_limit": "Candidate01 saved no dense/pre-decimation/post-decimation pigment measurements and overwrote production Color with white before saving. Exact initial whitening stage is not established from preserved evidence; do not claim it is only bake or only exporter.",
+  "exporter_hazard": "Installed Blender5.2 primitive_extract.py assigns material_idxs_using_vc to vc_key for subsequent same-colour materials, then compares it with glTF COLOR_n when masking, independently capable of whitening secondary body regions. No installed exporter code is edited.",
+  "primitives": [
+    {
+      "file": "titanichthys.glb",
+      "mesh": "Long pectoral L.mesh.001",
+      "primitive": 0,
+      "material": "Titanichthys fins Long pectoral L",
+      "colors": {
+        "COLOR_0": {
+          "count": 6630,
+          "component_type": 5123,
+          "min": [
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "max": [
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "mean": [
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ]
+        },
+        "COLOR_1": {
+          "count": 6630,
+          "component_type": 5123,
+          "min": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "max": [
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "mean": [
+            0.4888388816448811,
+            0.5000005914884808,
+            0.5000000046030232,
+            1.0
+          ]
+        }
+      }
+    },
+    {
+      "file": "titanichthys.glb",
+      "mesh": "Long pectoral R.mesh.001",
+      "primitive": 0,
+      "material": "Titanichthys fins Long pectoral R",
+      "colors": {
+        "COLOR_0": {
+          "count": 6630,
+          "component_type": 5123,
+          "min": [
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "max": [
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "mean": [
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ]
+        },
+        "COLOR_1": {
+          "count": 6630,
+          "component_type": 5123,
+          "min": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "max": [
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "mean": [
+            0.4888388816448811,
+            0.5000005914884808,
+            0.5000000046030232,
+            1.0
+          ]
+        }
+      }
+    },
+    {
+      "file": "titanichthys.glb",
+      "mesh": "Modest swept dorsal.mesh.001",
+      "primitive": 0,
+      "material": "Titanichthys fins Modest swept dorsal",
+      "colors": {
+        "COLOR_0": {
+          "count": 7112,
+          "component_type": 5123,
+          "min": [
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "max": [
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "mean": [
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ]
+        },
+        "COLOR_1": {
+          "count": 7112,
+          "component_type": 5123,
+          "min": [
+            0.0,
+            0.0,
+            0.6500038147554742,
+            0.0
+          ],
+          "max": [
+            1.0,
+            0.9895780880445564,
+            0.6500038147554742,
+            0.0
+          ],
+          "mean": [
+            0.5272784581831139,
+            0.4945370556078064,
+            0.6500038147554742,
+            0.0
+          ]
+        }
+      }
+    },
+    {
+      "file": "titanichthys.glb",
+      "mesh": "Pelvic L.mesh.001",
+      "primitive": 0,
+      "material": "Titanichthys fins Pelvic L",
+      "colors": {
+        "COLOR_0": {
+          "count": 6633,
+          "component_type": 5123,
+          "min": [
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "max": [
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "mean": [
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ]
+        },
+        "COLOR_1": {
+          "count": 6633,
+          "component_type": 5123,
+          "min": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "max": [
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "mean": [
+            0.4889282844489644,
+            0.49992102369196073,
+            0.4999246239285457,
+            1.0
+          ]
+        }
+      }
+    },
+    {
+      "file": "titanichthys.glb",
+      "mesh": "Pelvic R.mesh.001",
+      "primitive": 0,
+      "material": "Titanichthys fins Pelvic R",
+      "colors": {
+        "COLOR_0": {
+          "count": 6633,
+          "component_type": 5123,
+          "min": [
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "max": [
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "mean": [
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ]
+        },
+        "COLOR_1": {
+          "count": 6633,
+          "component_type": 5123,
+          "min": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "max": [
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "mean": [
+            0.4889282844489644,
+            0.49992102369196073,
+            0.4999246239285457,
+            1.0
+          ]
+        }
+      }
+    },
+    {
+      "file": "titanichthys.glb",
+      "mesh": "Sphere.002",
+      "primitive": 0,
+      "material": "Titanichthys eyes",
+      "colors": {
+        "COLOR_0": {
+          "count": 1023,
+          "component_type": 5123,
+          "min": [
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "max": [
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "mean": [
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ]
+        },
+        "COLOR_1": {
+          "count": 1023,
+          "component_type": 5123,
+          "min": [
+            0.024414435034714275,
+            0.00015259021896696422,
+            0.0014801251239795529,
+            1.0
+          ],
+          "max": [
+            1.0,
+            0.999847409781033,
+            0.9990539406424048,
+            1.0
+          ],
+          "mean": [
+            0.8360983561051488,
+            0.49364810771348033,
+            0.5008534685673471,
+            1.0
+          ]
+        }
+      }
+    },
+    {
+      "file": "titanichthys.glb",
+      "mesh": "Sphere.003",
+      "primitive": 0,
+      "material": "Titanichthys eyes.001",
+      "colors": {
+        "COLOR_0": {
+          "count": 1023,
+          "component_type": 5123,
+          "min": [
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "max": [
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "mean": [
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ]
+        },
+        "COLOR_1": {
+          "count": 1023,
+          "component_type": 5123,
+          "min": [
+            0.024414435034714275,
+            0.00015259021896696422,
+            0.0009460593575951781,
+            1.0
+          ],
+          "max": [
+            1.0,
+            0.999847409781033,
+            0.9985198748760205,
+            1.0
+          ],
+          "mean": [
+            0.8360983561051488,
+            0.5063518624546097,
+            0.49914660601242755,
+            1.0
+          ]
+        }
+      }
+    },
+    {
+      "file": "titanichthys.glb",
+      "mesh": "Strong heterocercal caudal.mesh.001",
+      "primitive": 0,
+      "material": "Titanichthys fins Strong heterocercal caudal",
+      "colors": {
+        "COLOR_0": {
+          "count": 11558,
+          "component_type": 5123,
+          "min": [
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "max": [
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "mean": [
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ]
+        },
+        "COLOR_1": {
+          "count": 11558,
+          "component_type": 5123,
+          "min": [
+            0.0,
+            0.0,
+            0.6500038147554742,
+            0.0
+          ],
+          "max": [
+            1.0,
+            0.9935912108033875,
+            0.6500038147554742,
+            0.0
+          ],
+          "mean": [
+            0.5274275083251643,
+            0.49661143964831744,
+            0.6500038147554742,
+            0.0
+          ]
+        }
+      }
+    },
+    {
+      "file": "titanichthys.glb",
+      "mesh": "Titanichthys_new_continuous_sculpt.mesh.001",
+      "primitive": 0,
+      "material": "Titanichthys body",
+      "colors": {
+        "COLOR_0": {
+          "count": 38765,
+          "component_type": 5123,
+          "min": [
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "max": [
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "mean": [
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ]
+        },
+        "COLOR_1": {
+          "count": 38765,
+          "component_type": 5123,
+          "min": [
+            0.0,
+            0.0008697642481116961,
+            0.0036774242771038376,
+            0.28000305180437934
+          ],
+          "max": [
+            1.0,
+            1.0,
+            1.0,
+            0.8
+          ],
+          "mean": [
+            0.5479453109018823,
+            0.8044652133516028,
+            0.8889302822414222,
+            0.5184223415225943
+          ]
+        }
+      }
+    },
+    {
+      "file": "titanichthys.glb",
+      "mesh": "Titanichthys_new_continuous_sculpt.mesh.001",
+      "primitive": 1,
+      "material": "Titanichthys underside",
+      "colors": {
+        "COLOR_0": {
+          "count": 21176,
+          "component_type": 5123,
+          "min": [
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "max": [
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "mean": [
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ]
+        },
+        "COLOR_1": {
+          "count": 21176,
+          "component_type": 5123,
+          "min": [
+            0.0,
+            0.0,
+            0.011612115663385977,
+            0.28000305180437934
+          ],
+          "max": [
+            0.1527275501640345,
+            1.0,
+            1.0,
+            0.8
+          ],
+          "mean": [
+            0.005458541822618396,
+            0.0001666905467188794,
+            0.9667239485275779,
+            0.5041015639805686
+          ]
+        }
+      }
+    },
+    {
+      "file": "titanichthys.glb",
+      "mesh": "Titanichthys_new_continuous_sculpt.mesh.001",
+      "primitive": 2,
+      "material": "Titanichthys oral accent",
+      "colors": {
+        "COLOR_0": {
+          "count": 36892,
+          "component_type": 5123,
+          "min": [
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "max": [
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "mean": [
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ]
+        },
+        "COLOR_1": {
+          "count": 36892,
+          "component_type": 5123,
+          "min": [
+            0.0,
+            0.0,
+            0.8094300755321584,
+            0.28000305180437934
+          ],
+          "max": [
+            1.0,
+            1.0,
+            1.0,
+            0.8
+          ],
+          "mean": [
+            0.3997011011072668,
+            0.31250956842669964,
+            0.9979146262605517,
+            0.5697627218786157
+          ]
+        }
+      }
+    },
+    {
+      "file": "titanichthys.lod1.glb",
+      "mesh": "Long pectoral L.mesh.001",
+      "primitive": 0,
+      "material": "Titanichthys fins Long pectoral L LOD",
+      "colors": {
+        "COLOR_0": {
+          "count": 1613,
+          "component_type": 5123,
+          "min": [
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "max": [
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "mean": [
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ]
+        },
+        "COLOR_1": {
+          "count": 1613,
+          "component_type": 5123,
+          "min": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "max": [
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "mean": [
+            0.42847982443705396,
+            0.4890841091382384,
+            0.5498426774030394,
+            1.0
+          ]
+        }
+      }
+    },
+    {
+      "file": "titanichthys.lod1.glb",
+      "mesh": "Long pectoral R.mesh.001",
+      "primitive": 0,
+      "material": "Titanichthys fins Long pectoral R LOD",
+      "colors": {
+        "COLOR_0": {
+          "count": 1614,
+          "component_type": 5123,
+          "min": [
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "max": [
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "mean": [
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ]
+        },
+        "COLOR_1": {
+          "count": 1614,
+          "component_type": 5123,
+          "min": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "max": [
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "mean": [
+            0.42509702572922575,
+            0.4888012487817127,
+            0.550055141415869,
+            1.0
+          ]
+        }
+      }
+    },
+    {
+      "file": "titanichthys.lod1.glb",
+      "mesh": "Modest swept dorsal.mesh.001",
+      "primitive": 0,
+      "material": "Titanichthys fins Modest swept dorsal LOD",
+      "colors": {
+        "COLOR_0": {
+          "count": 1690,
+          "component_type": 5123,
+          "min": [
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "max": [
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "mean": [
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ]
+        },
+        "COLOR_1": {
+          "count": 1690,
+          "component_type": 5123,
+          "min": [
+            0.0,
+            0.0,
+            0.6500038147554742,
+            0.0
+          ],
+          "max": [
+            1.0,
+            0.9895780880445564,
+            0.6500038147554742,
+            0.0
+          ],
+          "mean": [
+            0.6908503112524451,
+            0.5831477646661547,
+            0.6500038147554742,
+            0.0
+          ]
+        }
+      }
+    },
+    {
+      "file": "titanichthys.lod1.glb",
+      "mesh": "Pelvic L.mesh.001",
+      "primitive": 0,
+      "material": "Titanichthys fins Pelvic L LOD",
+      "colors": {
+        "COLOR_0": {
+          "count": 1595,
+          "component_type": 5123,
+          "min": [
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "max": [
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "mean": [
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ]
+        },
+        "COLOR_1": {
+          "count": 1595,
+          "component_type": 5123,
+          "min": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "max": [
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "mean": [
+            0.42014476937232087,
+            0.4846031255164569,
+            0.5673981478226118,
+            1.0
+          ]
+        }
+      }
+    },
+    {
+      "file": "titanichthys.lod1.glb",
+      "mesh": "Pelvic R.mesh.001",
+      "primitive": 0,
+      "material": "Titanichthys fins Pelvic R LOD",
+      "colors": {
+        "COLOR_0": {
+          "count": 1598,
+          "component_type": 5123,
+          "min": [
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "max": [
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "mean": [
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ]
+        },
+        "COLOR_1": {
+          "count": 1598,
+          "component_type": 5123,
+          "min": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "max": [
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "mean": [
+            0.41705947189461,
+            0.485176480900966,
+            0.5675844996984003,
+            1.0
+          ]
+        }
+      }
+    },
+    {
+      "file": "titanichthys.lod1.glb",
+      "mesh": "Sphere.002",
+      "primitive": 0,
+      "material": "Titanichthys eyes LOD",
+      "colors": {
+        "COLOR_0": {
+          "count": 644,
+          "component_type": 5123,
+          "min": [
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "max": [
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "mean": [
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ]
+        },
+        "COLOR_1": {
+          "count": 644,
+          "component_type": 5123,
+          "min": [
+            0.024414435034714275,
+            0.00015259021896696422,
+            0.0014801251239795529,
+            1.0
+          ],
+          "max": [
+            0.9999847409781033,
+            0.999847409781033,
+            0.9990539406424048,
+            1.0
+          ],
+          "mean": [
+            0.7844231449981448,
+            0.4898763734896767,
+            0.5016500594485807,
+            1.0
+          ]
+        }
+      }
+    },
+    {
+      "file": "titanichthys.lod1.glb",
+      "mesh": "Sphere.003",
+      "primitive": 0,
+      "material": "Titanichthys eyes.001 LOD",
+      "colors": {
+        "COLOR_0": {
+          "count": 644,
+          "component_type": 5123,
+          "min": [
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "max": [
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "mean": [
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ]
+        },
+        "COLOR_1": {
+          "count": 644,
+          "component_type": 5123,
+          "min": [
+            0.024414435034714275,
+            0.00015259021896696422,
+            0.0009460593575951781,
+            1.0
+          ],
+          "max": [
+            1.0,
+            0.999847409781033,
+            0.9985198748760205,
+            1.0
+          ],
+          "mean": [
+            0.7859946347004375,
+            0.5082282380047265,
+            0.49965344960518465,
+            1.0
+          ]
+        }
+      }
+    },
+    {
+      "file": "titanichthys.lod1.glb",
+      "mesh": "Strong heterocercal caudal.mesh.001",
+      "primitive": 0,
+      "material": "Titanichthys fins Strong heterocercal caudal LOD",
+      "colors": {
+        "COLOR_0": {
+          "count": 2760,
+          "component_type": 5123,
+          "min": [
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "max": [
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "mean": [
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ]
+        },
+        "COLOR_1": {
+          "count": 2760,
+          "component_type": 5123,
+          "min": [
+            0.0,
+            0.0,
+            0.6500038147554742,
+            0.0
+          ],
+          "max": [
+            1.0,
+            0.9935912108033875,
+            0.6500038147554742,
+            0.0
+          ],
+          "mean": [
+            0.6970192274733161,
+            0.5043316548409247,
+            0.6500038147554742,
+            0.0
+          ]
+        }
+      }
+    },
+    {
+      "file": "titanichthys.lod1.glb",
+      "mesh": "Titanichthys_new_continuous_sculpt.mesh.001",
+      "primitive": 0,
+      "material": "Titanichthys body LOD",
+      "colors": {
+        "COLOR_0": {
+          "count": 11546,
+          "component_type": 5123,
+          "min": [
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "max": [
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "mean": [
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ]
+        },
+        "COLOR_1": {
+          "count": 11546,
+          "component_type": 5123,
+          "min": [
+            0.0,
+            0.0,
+            0.0036774242771038376,
+            0.28000305180437934
+          ],
+          "max": [
+            1.0,
+            1.0,
+            1.0,
+            0.8
+          ],
+          "mean": [
+            0.7266469372509133,
+            0.8042187389379195,
+            0.7869734036675652,
+            0.5021231806943479
+          ]
+        }
+      }
+    },
+    {
+      "file": "titanichthys.lod1.glb",
+      "mesh": "Titanichthys_new_continuous_sculpt.mesh.001",
+      "primitive": 1,
+      "material": "Titanichthys underside LOD",
+      "colors": {
+        "COLOR_0": {
+          "count": 5169,
+          "component_type": 5123,
+          "min": [
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "max": [
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "mean": [
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ]
+        },
+        "COLOR_1": {
+          "count": 5169,
+          "component_type": 5123,
+          "min": [
+            0.0,
+            0.0,
+            0.011612115663385977,
+            0.28000305180437934
+          ],
+          "max": [
+            0.37875944151979857,
+            1.0,
+            1.0,
+            0.8
+          ],
+          "mean": [
+            0.008975003026933562,
+            0.0007296581466918645,
+            0.9198409188664758,
+            0.5088450208983508
+          ]
+        }
+      }
+    },
+    {
+      "file": "titanichthys.lod1.glb",
+      "mesh": "Titanichthys_new_continuous_sculpt.mesh.001",
+      "primitive": 2,
+      "material": "Titanichthys oral accent LOD",
+      "colors": {
+        "COLOR_0": {
+          "count": 10064,
+          "component_type": 5123,
+          "min": [
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "max": [
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "mean": [
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ]
+        },
+        "COLOR_1": {
+          "count": 10064,
+          "component_type": 5123,
+          "min": [
+            0.0,
+            0.0,
+            0.8156252384222171,
+            0.28000305180437934
+          ],
+          "max": [
+            1.0,
+            1.0,
+            1.0,
+            0.8
+          ],
+          "mean": [
+            0.44593158451357257,
+            0.3263602575014528,
+            0.9963381531464819,
+            0.5718296137344783
+          ]
+        }
+      }
+    }
+  ]
+}

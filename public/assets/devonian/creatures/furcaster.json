@@ -1,0 +1,64 @@
+{
+  "id": "furcaster",
+  "name": "Furcaster",
+  "species": "Furcaster palaeozoicus",
+  "provenance": "Early Devonian, lower Emsian Hunsr\u00fcck Slate, Germany",
+  "description": "Five long articulated arms surround a small granular disc. Opposing paired ambulacrals and curved lateral arm ossicles inform arm-powered motion, with delicate lateral and groove spines and a modeled oral underside.",
+  "lengthMeters": 0.12,
+  "modelLength": 5.522961139678955,
+  "locomotion": "Crawl",
+  "clips": [
+    "Ability",
+    "Attack",
+    "Bite",
+    "Crawl",
+    "Death",
+    "Dive",
+    "Dodge",
+    "Eat",
+    "Growth",
+    "Guard",
+    "Heavy",
+    "Hit",
+    "Idle",
+    "Parry",
+    "Rise",
+    "Stagger",
+    "Swim",
+    "TurnLeft",
+    "TurnRight"
+  ],
+  "looping": [
+    "Idle",
+    "Crawl",
+    "Swim",
+    "Guard",
+    "Eat"
+  ],
+  "anchors": [
+    "anchor_mouth",
+    "anchor_mouth_inside",
+    "anchor_attack_primary"
+  ],
+  "artVersion": 1,
+  "artStatus": "preview",
+  "sources": [
+    "https://doi.org/10.1098/rsos.201380",
+    "https://doi.org/10.1017/jpa.2025.10096"
+  ],
+  "eyes": {
+    "applicable": false,
+    "reason": "No macroscopic paired eye globes reconstructed for this ophiuroid."
+  },
+  "refinementNeeded": [
+    "Detailed disc/arm junction sculpting and complete multi-arm collision/transition refinement remain preview work.",
+    "Exact spine posture, podial dimensions, oral frame and disc plate layout are comparative interpretations, not directly resolved from the selected arm CT."
+  ],
+  "notes": [
+    "Primary fossil arm reference OKL96, Clark et al.2020 Fig3c. Five chains with36 articulated sections each are an authored reconstruction rather than a measured segment count.",
+    "No vertebrate jaw or trilobite moulting action. Five radial mouth-angle structures and a soft oral pump participate in feeding.",
+    "Swim is a compatibility arm-sculling interpretation, not a claim of habitual swimming. Growth is unscaled.",
+    "Representative12cm overall span is illustrative, not a species maximum; modelLength measures +Z bound of initial arm spread.",
+    "Pigmentation is artistic; source and imagegen provenance preserved."
+  ]
+}

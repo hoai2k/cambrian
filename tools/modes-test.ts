@@ -7,7 +7,7 @@
  * catch rather than the seat.
  */
 import { Game } from '../src/sim/game';
-import { emptyInput, type InputFrame } from '../src/sim/types';
+import { emptyInput, TIER_SCALE, type InputFrame } from '../src/sim/types';
 import { isAlive } from '../src/sim/actors';
 import type { CreatureId } from '../src/sim/creatures';
 
@@ -117,6 +117,40 @@ const hunted = (n: number, seed = 11) => new Game('hunted',
   check('...and so is the next turn', /Turn 2 of 2/.test(g.noticeFor(1) ?? ''), g.noticeFor(1) ?? 'none');
   run(g, 60 * 6);
   check('...and the line expires', g.noticeFor(0) === undefined, g.noticeFor(0) ?? 'gone');
+}
+
+// --- a finished co-op match can carry on; a versus one cannot ---
+{
+  // Rise is won by holding Apex for ninety seconds. Put a player there and let the clock run out.
+  const g = new Game('rise', [{ creature: 'anomalocaris', device: 'keyboard', ready: true }], 21);
+  const p = g.players[0];
+  p.scale = TIER_SCALE[4]; p.tier = 4; p.spawnProtect = 0;
+  run(g, 60 * 95);
+  check('Rise ends when Apex is held', g.state.status === 'won', `${g.state.status}: ${g.state.message}`);
+  check('...and the sim stops with it', (() => { const t = g.time; run(g, 60); return g.time === t; })(), `t=${g.time.toFixed(1)}`);
+
+  const scale = p.scale, kills = p.kills, where = { ...p.pos };
+  check('Rise offers to carry on', g.continueMatch());
+  check('...the match is playing again', g.state.status === 'playing' && g.state.message === '', `${g.state.status} "${g.state.message}"`);
+  check('...on the same body in the same place', p.scale === scale && p.kills === kills && p.pos.x === where.x && p.pos.z === where.z);
+  check('...and time moves', (() => { const t = g.time; run(g, 60); return g.time > t; })(), `t=${g.time.toFixed(1)}`);
+
+  // The win condition must not fire again the moment play resumes, or the results screen returns.
+  p.tier = 4;
+  run(g, 60 * 120);
+  check('...without winning all over again', g.state.status === 'playing' && g.endless, `${g.state.status} endless=${g.endless}`);
+  check('...and the objective says so', /Swim on/.test(g.scoreboard(0).header.detail), g.scoreboard(0).header.detail);
+}
+{
+  const g = hunted(2);
+  run(g, 60 * 60 * 6);
+  check('Hunter & Hunted is decided', g.state.status !== 'playing', g.state.status);
+  check('...and versus results are final', !g.continueMatch() && g.state.status !== 'playing', `status=${g.state.status}`);
+}
+{
+  const g = new Game('rise', [{ creature: 'waptia', device: 'keyboard', ready: true }], 22);
+  run(g, 30);
+  check('a match still running cannot be continued', !g.continueMatch() && !g.endless);
 }
 
 console.log(failed ? `\n${failed} FAILED` : '\nall mode tests passed');

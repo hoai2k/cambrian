@@ -1,0 +1,25 @@
+{
+  "tool": "built-in image_gen.imagegen",
+  "mode": "new image generation; no input images",
+  "owner": "Astra high",
+  "date": "2026-09-07",
+  "purpose": "Original speculative Titanichthys dermal albedo pigment only; no user reference pixels or third-party textures",
+  "records": [
+    {
+      "original_path": "/Users/hoai/.codex/generated_images/01a07de4-46f9-71b3-9342-79a13be3b343/exec-fc89a7bc-cd47-4676-90bb-3fb8471cf2e4.png",
+      "local_path": "/Users/hoai/Documents/Stuff/Generations/cambrian/local/devonian-authoring/titanichthys/rework-v3/material-sources/titanichthys-dermal-imagegen-01.png",
+      "sha256": "c3b3391695f3646a037230baec717ce44201b5c71f86e3f2b3e2cb435f6b11f2",
+      "bytes": 3229621,
+      "prompt": "Create one original square seamless ALBEDO texture swatch for the fine living dermal surface of a speculative Devonian armored fish. Orthographic flat texture fills every pixel, uniformly lit with absolutely no directional shading, highlights, shadow, vignette, depth of field or macro gradient. Palette is restrained dark slate blue, steel blue, blue-grey and tiny muted cyan-grey flecks; no olive green. Rich layered pigment at three SMALL scales: dense tiny irregular rounded/ovoid dermal granules, scattered very fine pale pinprick flecks, and subtle clusters of closely spaced darker pores. Surface is smooth tough living skin over armor, not rock. Granules should be irregular, softly edged, slightly elongated in places, nonuniform and naturally interlocking, approximately 60 to 90 small granules across the image width; not large mosaic cells. Fine intricate organic detail and varied muted color density, with similar average color everywhere in the square. No large plates or sutures; these will be anatomically authored separately. No cracked earth, cobblestones, stone, reptile hexagon scales, alligator scales, veins, deep channels, metallic flakes, glitter, strokes or cloudy airbrush mottling. No fish, anatomy, teeth, eyes, objects, text, labels, borders or watermark. Designed to tile with matching opposite edges. High resolution original material pigment study, realistic restrained aquatic skin texture, color only.",
+      "assessment": "REJECTED: dark ringed cell edges and apparent relief; not used"
+    },
+    {
+      "original_path": "/Users/hoai/.codex/generated_images/01a07de4-46f9-71b3-9342-79a13be3b343/exec-f16da096-559f-4d51-abe9-5cb521a96eb4.png",
+      "local_path": "/Users/hoai/Documents/Stuff/Generations/cambrian/local/devonian-authoring/titanichthys/rework-v3/material-sources/titanichthys-dermal-imagegen-02.png",
+      "sha256": "2e208ae8f68a51c412a70dd3031a67adecb3512269d833984d8279974874643f",
+      "bytes": 1435797,
+      "prompt": "One seamless square flat 2D pigment texture, color only, NOT a photograph or 3D surface. Dense exquisite tiny irregular blue-grey freckles and dashes on a smooth medium dark slate-blue ground. Quiet steel-blue, muted cyan-grey and desaturated indigo pigment layered like a fine aquatic dermal pattern. About 90 to 130 tiny freckles across the image width, variable sizes, small irregular clusters, many very fine pepper-like dots. Freckles are filled solid soft shapes, NEVER rings or outlines. Closely spaced organic flecks and scattered pinpoints separated by the smooth ground; do NOT form cells or a tessellation. The entire image has the same average brightness, flat diffuse color, no large cloudy blotches or gradients. Absolutely zero simulated depth, lighting, specular shine, shadow, bevels, edge highlights or bump relief. No pebbles, rocks, scales, cobblestones, pores with holes, cracks, polygon cells, mosaic, white highlights, plate boundaries or sutures. These are exclusively natural-looking tiny PIGMENT MARKS for a living slate-blue armored fish; anatomy and actual relief will be authored independently. No fish, eyes, teeth, objects, text, border or watermark. Original intricate restrained albedo swatch, match opposite edges seamlessly.",
+      "assessment": "ACCEPTED AS COLOUR SOURCE ONLY: flat irregular flecks; no geometry or relief source"
+    }
+  ]
+}

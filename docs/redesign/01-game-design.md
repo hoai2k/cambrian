@@ -111,22 +111,63 @@ momentum-based movement**.
   banks and turns to follow with a creature-specific turn rate. Release the
   stick and you **glide**: velocity decays over ~1.5 s, you keep drifting.
 - **Right stick** orbits the camera. **A** kicks you upward, **left stick
-  click** sinks you. These are nudges; most depth change comes from pitch.
+  click** sinks you. These are nudges; most depth change comes from pitch. The
+  view reaches ~54° above the horizon and ~76° below it (`PITCH_UP` /
+  `PITCH_DOWN` in `src/render/engine.ts`): the water above you is where what
+  eats you comes from, and the sand below is where what you eat lives, so both
+  have to be lookable-at.
+- **The seabed is the only thing the camera cannot be inside** (`fitCameraArm`).
+  Aiming up from the floor asks for a camera under the sand, and the answer is,
+  in order: shorten the arm — same angle, creature just closer — and then, when
+  the shortest arm is still buried, lift the whole rig, look point and all, so
+  the shot keeps the angle it was given and you see *past* your own creature
+  into the water above rather than being levelled off into the floor. Rocks are
+  not in that list: a camera shoved sideways out of a boulder, or lifted onto
+  one, throws the shot away for scenery. It passes through instead, and a
+  camera inside a rock sees straight out of it, because the far side of a
+  closed mesh is not drawn.
 - **RT (analog) = burst.** Holding it drains stamina and multiplies speed
   (× 1.6–2.2 depending on creature). Tapping it gives a short lunge. Burst is
   how you close on prey and how you outrun a Threat, so stamina management is
-  the heart of the chase.
+  the heart of the chase. The drain (`BURST_STAMINA` in `src/sim/game.ts`) is
+  set so a full bar sprints for the best part of fifteen seconds: long enough
+  that a sprint is a crossing or a chase, short enough that the swim home is
+  still paid for out of the same bar.
+- **The floor is somewhere you swim, not a surface you hover over.** A swimmer
+  may come down to a fraction of its resting clearance (`floorClearance`), so
+  you can graze the sand and take what lives on it.
+- **Obstacles are things you get over, in three grades.** Anything shallow
+  enough that the floor can carry you across inside a step's worth of lift
+  (`glideOver`) does not block at all — you glide over sand, domes and the
+  flanks of anything rounded. A face too steep for that, whose top is within
+  two bodies of you (`climbHeight`), blocks the way through but offers the way
+  up: you are held out of the rock and lifted up its side at a swim's pace
+  (`climbRise`) until the top is clear, then carry on over it. Higher than
+  that is a wall — for a swimmer. A crawler has legs: it gets over whatever it
+  keeps pushing into, however tall, once it has leaned on it for `CLIMB_PUSH`.
+  A climb is a commitment (`Actor.climbTo`), so a rock falling away underneath
+  you mid-climb does not drop you back to the foot of it, and the camera is
+  never moved by it — the body tilts to the slope, the view stays where you
+  put it.
+- **Plants are things you go round.** A stem is thin, so contact with one
+  steers you past it. Only a body driving at the middle of one — within about
+  25° of dead-on, and held there — is taken to mean *over*, and climbs it.
 - **Currents** are real. The existing current field pushes everyone; a
   larva in the channel current moves at half its burst speed for free. Giants
   patrol *with* the current, so the smart escape is across it.
 - **Seafloor creatures** (Hallucigenia, Marrella, Olenoides, Wiwaxia) stick
-  to terrain and climb boulders and sponges. **RB** is a **hop** (short
-  ballistic arc, a dodge and a way onto a ledge) and, held, a **paddle**:
+  to terrain and climb boulders and sponges. **RB** eases them up off the
+  floor — a gradual rise, the same one a swimmer gets from the same button,
+  never a jump — and, held, is a **paddle**:
   they climb into open water and keep swimming there at roughly a third of
   their crawl, with no sprint and no dash until their legs are back on the
   floor, and the climb costs more stamina than they regain. So open water is
   a crossing, not a second home, and the seabed is where they hunt, are fed
   and get their burrow/anchor tools. They are the "ground fighter" archetypes.
+- **The growth ring means one thing in both eras**: how close the next moult
+  is, full when the body grows. The Cambrian reads nutrition against the tier's
+  need; the Devonian reads `stageProgress`, the run up to the next of its five
+  life stages, rather than the whole 0–100 standing meter it used to show.
 - **Ambient body motion**: idle sway, fin/flap frequency tied to speed
   (already in the current animation layer), a small procedural bob so nothing
   is ever perfectly still.
@@ -147,7 +188,7 @@ expresses them differently so fights are varied.
 | **Guard** | LB (hold) | Halves damage, prevents knockback, drains stamina on each hit. A guard-broken creature is **staggered** for 1.2 s. |
 | **Parry** | LB (tap, timing) | Guard in the first 0.15 s of an incoming hit: no damage, attacker is staggered 0.8 s and you get a free heavy. Swimmers parry with a body twist, armoured crawlers with a shell clank. |
 | **Lock-on** | LT (toggle) | Camera frames you and the target, movement becomes **orbit/strafe** relative to the target, attacks home. Left stick left/right circles. Flick right stick to switch target. |
-| **Sense pulse** | D-pad ↑ | 2 s highlight of everything within sense range through cover, colour-coded by size band. Cooldown 6 s. |
+| **Sense** | D-pad ↑ | Toggles the read-out: the size-band marks over creatures and the radar. On by default, free, and it never runs out — off is the immersive view, with nothing drawn over the sea but the HUD bar. |
 | **Eat** | automatic | Biting a dead body or a Snack consumes it. **Anything can feed on anything**, however much bigger it was: the carcass comes apart in whole bites, `ceil(3 × its length / yours)` of them (1–12), a bite every 0.62 s. A body under a third of your length goes down whole and is carried into your mouth; bigger, it stays where it fell, and each bite tears its share of the meat off the model and flies it into your mouth. Eating can be interrupted, so opening a giant carcass in the open is a long risk. |
 
 > **The shipped bindings are different.** The layout above is the design's first
@@ -159,18 +200,59 @@ expresses them differently so fights are varied.
 > | Left stick | axes 0–1 | Camera-relative swim |
 > | Right stick | axes 2–3 | Orbit the camera |
 > | RS click + stick up/down | 11 | Zoom |
-> | LS click | 10 | Sink |
+> | LS click | 10 | **Sink**, alongside LB |
 > | **A** | 0 | **Sprint / burst** (analog-free, held) |
 > | **B** | 1 | **Guard** (hold) / **parry** (tap) |
-> | **X** | 2 | **Light bite** |
-> | **Y** | 3 | **Ability** |
-> | **LB** | 4 | **Dodge / dash** |
+> | **X** | 2 | **Dodge / dash** |
+> | **Y** | 3 | **Light bite** · on the select screen: hatch, or carry a Rise run on · on the results screen: keep playing |
+> | **LB** | 4 | **Sink** |
 > | **RB** | 5 | **Rise** / **hop**, held to paddle upward (crawlers) |
 > | **LT** (analog) | 6 | **Aim** — the centred crosshair picks the target |
 > | **RT** (analog) | 7 | **Heavy / pounce** |
-> | D-pad ↑ | 12 | Sense pulse |
+> | D-pad ↑ | 12 | Sense on/off |
 > | D-pad ↓ | 13 | Teleport menu (added with the endless sea) |
+> | D-pad → | 15 | **Hide / camouflage** |
 > | D-pad ←/→ | 14/15 | Menu navigation and creature select |
+>
+> The pad layout is arranged around two pairs. **LB and RB are the vertical
+> axis** — sink and rise — and **A and X are the horizontal one**, sprint and
+> dash, adjacent under the thumb. Hiding went to D-pad right, next to the other
+> two D-pad tools, and the left stick click keeps sinking so the old reflex
+> still works.
+>
+> **The in-game menus are steered, not button-mapped.** The pause menu and the
+> results screen used to give every choice its own pad button — A resumed, RT
+> went back to select, Y quit — which is three live shortcuts on a screen that
+> can appear on its own, the instant a match ends, while a hand is still
+> fighting. Three rules now stand between the end of a fight and an answer
+> (`src/app/menu-cursor.ts`, covered by `npm run menus`):
+>
+> 1. **A lockout.** Nothing is read for `MENU_LOCKOUT` (0.7 s) after the menu
+>    opens, and a button held across it is not an edge afterwards either.
+> 2. **A cursor that has to be woken.** The results screen starts with nothing
+>    highlighted; the first press or nudge only makes the cursor appear.
+> 3. **A harmless default.** It wakes on the first choice, which each menu makes
+>    the one that costs least: *Resume* on pause, *Continue* on the results
+>    screen (*Play again* in the versus modes, which have nothing to continue).
+>
+> Both menus end at *Quit*, which leaves the match for the choice screen — where
+> you go to play as something else, and where the way back to the title already
+> is. A separate "quit to title" button sat one careless press from the end of a
+> session for no gain.
+>
+> Afterwards it is one cursor and one button: up and down move, A confirms. The
+> results panel is a flex column with a scrolling middle, so the choices stay
+> pinned on screen — they used to be the last thing inside one tall scroller and
+> fell off the bottom of a short window.
+>
+> Sharing a button between gameplay and a menu is fine and always has been — A
+> is sprint and confirm, B is guard and back — because they are different
+> screens. Two *menu* actions on one button is the bug. Hiding on D-pad right
+> made `ability` collide with the select screen's creature cursor, so the
+> carry-on toggle moved off `ability` and onto `light`: it stays on Y, exactly
+> where players already press it. `tools/menu-bindings-test.ts` holds that line
+> — it walks every button through `readGamepad` and fails if two menu actions
+> land on one of them.
 > | Menu | 9 | Pause |
 > | View | 8 | Scoreboard (hold) |
 >
@@ -180,6 +262,22 @@ expresses them differently so fights are varied.
 > with H for teleport and comma for the scoreboard.
 > The in-game **?** panel and `npm run bindings` are generated from the same
 > source, so they never drift from the code.
+>
+> **With no controller connected, the game is a mouse-and-keyboard game.** At the
+> dive, `Engine.startMatch` checks: no pad in the session means pointer lock, the
+> mouse steers the camera, the wheel zooms, and the three buttons take the three
+> controls that have to fire the instant they are wanted — **left click** is the
+> heavy (RT), **right click** dashes (X), **middle click** aims (LT). G, V and
+> Tab keep working alongside them. One pad anywhere in the session and the pads
+> own the match; the mouse stays a cursor.
+>
+> Every button *name* in the game comes from `src/shared/controls.ts`, per scheme
+> (`pad`, `kbm`, `key1`, `key2`) and per player: the HUD chips, the crosshair
+> prompt, the choice screen's kit list, the pause and results menus, and the help
+> page, which swaps the Xbox diagram for a keyboard-and-mouse one. Onboarding
+> hints come out of `src/sim` naming actions — `{heavy}`, `{dash}` — because the
+> simulation must not know what anyone is holding; `fillControls` resolves them
+> for that player's own device.
 
 ### Rules that make it dynamic
 
@@ -274,6 +372,121 @@ Prey should be **catchable but never free**.
 - **Wounded prey** leaves a faint particle trail (blood in the current) that
   Anomalocaris and Marrella can follow.
 
+## Feeding
+
+Not everything in the Burgess Shale was a hunter, and the roster should not
+pretend otherwise. A creature's `diet` field (`src/content/creature-types.ts`)
+says where its living comes from. It is a **fact about the animal**, not a
+restriction on the person driving it: a player in any shell can bite anything
+they can catch. What the field changes is what *else* that shell can eat, and
+what the ambient copies of it spend their day doing.
+
+| Diet | What it eats | How it feeds |
+| --- | --- | --- |
+| *(none)* | Other animals | Hunts. The default. |
+| `grazer` | Microbial mats on the seabed | Near the floor, over mats, `grazeRate` 1.6 × mat density. |
+| `deposit` | Detritus in the sediment | The same, at 1.1 × — sifting is slower than scraping. |
+| `filter` | Plankton blooms in the water column | Anywhere inside a bloom, at any tier (`bloomRate`). |
+| `scavenger` | Carrion | Feeds on bodies and bone falls; makes none of its own. |
+
+Some mat feeders are anchored: `grazeStill` means the animal only feeds while
+planted (`stillness > 0.5`). Wiwaxia scrapes with a stationary radula-like
+apparatus, so a Wiwaxia on the move earns nothing.
+
+The roster, as researched: **Wiwaxia** and **Odontogriphus** graze mats,
+**Marrella** and **Pikaia** are deposit feeders, **Vetulicola**,
+**Tamisiocaris**, **Ctenorhabdotus** and **Odaraia** strain the water, and
+**Hallucigenia** lives on the dead. Everything else hunts. The Devonian roster
+carries the same field and the same rules.
+
+### What this means for the AI
+
+Ambient animals follow their diet honestly. A `grazer` goes looking for mats
+rather than for you; a `scavenger` crosses open water to a body but will not
+make one. This is most of the reason the reef reads as ecology rather than as
+a pit of predators — roughly a third of the roster is no threat to anybody.
+
+Two deliberate exceptions:
+
+- **Anything standing in for a player hunts too.** A bot in versus, or the
+  balance harness driving a creature, is a competitor, and a competitor that
+  refused to hunt would simply lose. Suspension feeders are the one exception
+  even here: the bloom *is* their living and a chase only loses it, which is
+  how Vetulicola and Tamisiocaris still reach Apex.
+- **Everything fights back.** Diet gates hunting, never retaliation,
+  territory or self-defence. A grazer that is attacked turns around, and a
+  grumpy one still objects to being crowded (see *Temperament*).
+
+Grazing is a real living but a slow one: mats worth eating (density > 0.2)
+cover about 28% of the seabed, so a mat feeder that stays put on a good patch
+takes one to three minutes per tier. It is a floor under a bad hunt, not a
+replacement for hunting.
+
+## The hours
+
+The reef used to hunt around the clock. Every ambient animal counted as hungry
+four seconds after its last meal, so anything that could see you was coming for
+you — which made the sea exhausting, and, less obviously, dull: when everything
+hunts all the time, nothing hunting is information.
+
+The day now turns on an eight-minute cycle (`src/sim/daynight.ts`, a pure
+function of simulation time so both split-screen players and the renderer agree
+on it):
+
+| Phase | Length | What it is |
+| --- | --- | --- |
+| **Dawn** | 48 s | Half light. The reef feeds. |
+| **Day** | 230 s | Full light, long, and quiet. Most animals have eaten and are getting on with their lives. |
+| **Dusk** | 48 s | Half light again, and the busiest hunting of the cycle. |
+| **Night** | 154 s | Dark, shorter than the day, colour drained and the far water closed in. Hunting sits between the two extremes. |
+
+The cycle drives one number, **hunting pressure**, which peaks through both
+twilight bands (≈1), sits low through the middle of the day (0.12) and rests
+above that at night (0.3). Pressure sets how long an animal will go after a meal
+before it looks for another: about sixteen seconds at dusk, over two minutes at
+noon. It changes how *often* things hunt rather than switching hunting on and
+off — a hungry enough animal always eventually goes looking, whatever the hour.
+
+Measured over four full days, the giants — which are what "something is hunting
+me" actually means to a player — come down to hunt 1.3% of the time at midday
+and 6–8% at dawn and dusk. The ambient roster follows the same curve. Both are
+covered by `tools/ecology-test.ts`.
+
+A brain standing in for a player is exempt: versus bots and the balance harness
+are competitors in a game, not animals in an ecosystem, and the hour must not
+decide how hard a rival plays.
+
+## Temperament
+
+On top of the clock, two dispositions are dealt out at spawn, because a sea
+whose only question is *can it eat me* runs out of questions:
+
+- **Grumpy** animals have a personal space and see off anything their own size
+  that enters it, hungry or not, dawn or noon — and drop the matter once you
+  have backed off. They are the reason you do not swim straight through a crowd.
+- **Territorial** animals hold a patch and drive intruders out of it, then go
+  home. They never follow past the edge, so they are a *decision* rather than a
+  threat: the ground one is sitting on is often worth crossing, and you can
+  always choose not to. Held ground is drawn on the radar as a dashed ring, so
+  the choice is made before you are in it rather than after.
+
+  "Past the edge" is 1.15 patch radii (`TERRITORY_LEASH` in `src/sim/ai.ts`) — a
+  little slack so an intruder hovering on the line does not make the animal
+  flicker between charging and turning back. The leash applies to *every* goal
+  that chases something, not only to driving an intruder out, and it is a hard
+  limit rather than a stamina one: the animal turns for home whatever it has
+  left in the tank. Both halves matter. A grumpy exchange with a passing
+  neighbour used to escape the leash entirely, and when sprinting got cheaper a
+  territory holder simply chased further on the same behaviour — 94 m off a 40 m
+  patch. `tools/ecology-test.ts` now holds it to 1.3 radii over twenty seconds.
+
+About a third of grown, armed animals hold a patch; about a fifth of everything
+grown is simply grumpy; the rest are indifferent. Grazers and filter feeders
+mostly hold nothing, having somewhere to be rather than something to defend.
+
+The one rule none of this softens: **hit something and it fights back**,
+whatever the hour and whatever it was doing.
+
 ## Escaping: how detection and hiding work
 
 Every AI has a **detection score** for each potential target, updated
@@ -339,7 +552,9 @@ Everything is still procedural (seeded), so it costs no new art.
   and a magnet. See* [the endless sea](04-infinite-ocean.md#landmarks).*)*
 - **Time and light**: a slow day cycle (20 min) that changes caustic intensity
   and Giant activity (they hunt more at dusk). Optional; ships after core.
-  *(Not built.)*
+  *(Built, at eight minutes rather than twenty, and it turned out to be the
+  spine of the ecology rather than a lighting effect — see* **The hours**
+  *below.)*
 
 ## Modes
 
@@ -348,20 +563,95 @@ population.
 
 | Mode | Players | Description |
 | --- | --- | --- |
-| **Rise** (single / co-op) | 1–4 | The main experience. Everyone hatches as a Larva in the nursery. Reach Apex. Co-op shares nutrition from assisted kills, players can revive a downed ally by bumping them within 10 s. Players *can* turn on each other — bites land, and a dead player can be fed on — but nothing aims at another player for you: no aim snap, no auto-pounce, no auto-lock. Area abilities still spare a co-op partner, so nobody kills a friend by accident. Session ends when any player reaches Apex and survives 90 s, or continues in free-play. Escalation: the reef's giant population grows as players grow. |
-| **Feeding frenzy** (versus) | 2–4 | Growth race. Everyone starts Juvenile in separate nurseries. First to Apex wins; killing a player takes a third of their tier progress and gives it to you. Bots fill empty slots. 12-minute cap, biggest wins. |
+| **Rise** (single / co-op) | 1–4 | The main experience. Everyone hatches as a Larva in the nursery — or, having grown this creature before, at the stage they reached (see *Carrying Rise on*). Reach Apex. Co-op shares nutrition from assisted kills, players can revive a downed ally by bumping them within 10 s. Players *can* turn on each other — bites land, and a dead player can be fed on — but nothing aims at another player for you: no aim snap, no auto-pounce, no auto-lock. Area abilities still spare a co-op partner, so nobody kills a friend by accident. Session ends when any player reaches Apex and survives 90 s, or continues in free-play (a player who *started* at Apex has no clock — see *Carrying Rise on*). Escalation: the reef's giant population grows as players grow. |
 | **Hunter & hunted** (versus, asymmetric) | 2–4 | One player is a Giant (× 3) with a shrinking hunger meter; the others are Juveniles who must survive and reach Adult. Giant eats to stay alive; small ones hide, bait, and grow. Rotates who is the Giant. *(As built: one **turn** each, 100 s, and your score is what you caught on your own turn — the same job for everyone, so the winner is the best hunter and prey play is how you keep the others' scores down. A turn ends early if every small one reaches Adult. One human plays it as a single turn, exactly as before.)* |
 | **Reef** (sandbox) | 1–4 | No win condition, pick any tier, tune giant density. For messing around and screenshots. |
 
-Bots (the current "nearest enemy" bots become the needs-based AI above) fill
-every mode, so nothing requires a second controller.
+Bots (the current "nearest enemy" bots become the needs-based AI above) fill the
+seats in Hunter & Hunted; Rise and Reef are whoever turned up.
 
-> **As built.** All four modes ship (`updateModes()` in `src/sim/game.ts`), with
+> **As built.** Three modes ship (`updateModes()` in `src/sim/game.ts`) — Feeding
+> Frenzy is gone, folded into Rise, which is co-op or versus depending on how the
+> people playing it behave — with
 > everything this table asks of them: co-op's shared nutrition and its **revive**
 > (a downed ally stays down for ten seconds when a team-mate was near enough to
 > matter, and holding station over them brings them back with their tier
 > intact), **spectating** for a dead player in versus, and **rotation** in
 > Hunter & Hunted — see below.
+
+### Carrying Rise on
+
+Rise is the mode about growing up, so it is the one that keeps a record. Two
+things follow from that, and both are written once for both eras.
+
+**A finished run does not take the sea away.** Rise and Reef are co-op — a
+milestone rather than a verdict — so their results screen offers *Continue*,
+which is also the choice its cursor wakes on. The match resumes exactly where it stood,
+with everything grown in it intact, and the goal stops watching so it cannot be
+met twice. Hunter & Hunted refuses: its result is a judgement between players.
+
+**Everything is written as it is found, not when a match ends.** Biomes swum
+through, landmarks come across, species taken to the top and growth marks all
+go into the record the moment they happen. This used to be the results screen's
+job alone, which meant a player who swam through half the sea and then quit to
+the title had nothing to show for it. Writing live costs the results screen the
+trick it used to mark finds new — comparing the store against the match no
+longer works, because the store already contains the match — so the shell
+accumulates what each match added and the screen renders that instead.
+
+**The furthest you have taken each creature is kept.** The record is per era and
+per creature, stored on the device beside the rest of the codex, and it is a
+high-water mark: it never falls, however the run ended, and like every other
+find it is written as the run happens, so dying, quitting to the title or
+closing the tab never throws away what you grew. A
+creature with a record wears it as a badge on its expanded card on the select
+screen, and in Rise the card offers to hatch you at that stage instead of at the
+bottom — **Y** on a pad, **C** on a keyboard. The offer only appears where it is
+real: in Rise, for a creature you have actually grown. Everything else hands out
+its own body and ignores the choice.
+
+**The top rung is the one you cannot bank by standing on it.** Rise asks you to
+reach the top *and hold it for ninety seconds*, so that is what the record
+listens for. Reach Apex and then die, or quit, and what is stored is the rung
+below with its **growth meter half full** — a mark of 3.5. Coming back on that
+puts you a short swim from the top rather than at the bottom of the sea, which
+is the honest reading of how far you actually got. Only finishing the run writes
+the top itself.
+
+**Arriving at the top is a victory lap, not a second win.** Because the top can
+only be stored by finishing, carrying it back in means the goal is already
+behind you: the ninety-second clock never starts for that player and the sea is
+simply open, exactly as it is after pressing *Continue*. The exemption is
+**per player, not per match** — a friend in the same co-op game who is still
+growing keeps their clock, reaches the top on their own, and wins it. A player
+on a victory lap banks nothing, because their record already says everything it
+can.
+
+### The growth ladder
+
+Both eras grow a player through five rungs, and they do it in different state:
+the Cambrian moults **Larva → Juvenile → Adult → Giant → Apex** on nutrition and
+keeps the rung on the actor's `tier`; the Devonian moults **Hatchling →
+Juvenile → Young → Adult → Prime** on standing and keeps it in its own side
+table. `src/sim/ladder.ts` is the one place that difference is reconciled —
+`ladderRung`, `ladderName`, `ladderScale` — and an era answers through the
+`ladder*` hooks in `EraRules`.
+
+Everything that reports or restores progress goes through it, so the record, its
+badge, the carry-on option and the codex's *reached the top* mark are each
+written once and behave identically in both eras. `tools/progress-test.ts` is
+the contract: one set of assertions, run against both eras, with no branch on
+which era is in play.
+
+Both eras derive the rest of a body from its **scale** — the Cambrian's tier
+through `tierForScale`, the Devonian's stage through `stageForScale` — which is
+why hatching a player part-grown is a single number handed to `spawn`.
+
+A position on the ladder is a **mark**, not an index: the whole part is the rung,
+the fraction is how far through it. A mark's fraction is never size — there is no
+animal between two rungs, and the size rule has no name for one — it is meter, so
+`ladderScale` reads the rung and `ladderFill` fills the era's own currency
+(nutrition here, standing in the Devonian) to the fraction.
 
 ## Local multiplayer specifics
 
@@ -379,6 +669,19 @@ every mode, so nothing requires a second controller.
 - **Spectating**: a dead player in versus gets a free camera following the
   leader until respawn. *(Built. Versus only: in co-op the camera stays on your
   own body, because a team-mate may be on the way to it.)*
+- **Dying is a shot, not a dialog.** Death used to drop a red panel over the
+  middle of the viewport the instant it happened, which hid the one thing worth
+  seeing. The whole death watch (`CORPSE_WINDOW`, seven seconds) is now spent
+  watching what actually happened: eaten, the camera rides with the predator,
+  because that is where you are; killed any other way, it stays on your own body
+  drifting up, since whatever landed the blow has already moved on. The only UI
+  is a line low on the screen, "You've been eaten by P2", over an unobstructed
+  view.
+  The screen fades to black over the last 1.2 s of the watch and then fades
+  slowly back in on the new body, so the respawn is a dissolve rather than a cut.
+  A downed team-mate never fades out at all — their window is a race somebody
+  else is running, so they keep the picture and get the rescue meter under the
+  same low line.
 
 ## Readability, HUD and feedback
 

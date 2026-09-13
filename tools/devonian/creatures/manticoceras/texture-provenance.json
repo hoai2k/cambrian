@@ -1,0 +1,7 @@
+{
+  "tool": "imagegen built-in",
+  "source": "shell-source.png",
+  "original": "/Users/hoai/.codex/generated_images/01a07987-3084-72c2-88e4-5387ed08fc3a/exec-e7d42a38-9178-40a5-9281-d2577abd8d31.png",
+  "prompt": "Create a seamless square physically based albedo material swatch for the living exterior of a smooth Paleozoic ammonoid shell. A flat unlit close-up field of warm ivory organic carbonate with very subdued irregular honey-sepia narrow growth bands flowing gently from top to bottom, sparse delicate off-white microgrowth striae and extremely fine natural mineral-organic grain. Nearly smooth shell, low contrast, subtle natural colour, no cracks, no fossils, no sutures, no ribs, no spiral, no actual animal or shell object, no shadows, no highlights, no perspective, no text, no border, no visible tiling. It is a raw bitmap texture to map onto an anatomically modelled Manticoceras shell in Blender; the pattern is an artistic reconstruction and not evidence. Avoid polished stone, marble veins, metal, leather, reptile scales, and bold Nautilus zebra stripes. Professional neutral PBR diffuse texture.",
+  "processing": "Inspected pale fine striae bitmap; normalised microtexture is used at very low amplitude. Deterministic biconvex shell UV growth increments define anatomy; pigment is explicitly conjectural."
+}

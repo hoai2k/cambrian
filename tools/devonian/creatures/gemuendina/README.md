@@ -76,3 +76,27 @@ Independent full-eye penetration is 82.350% / 82.334%, with conservative lower 9
 ## Integrated release review
 
 The parent independently checked the final losslessly packaged full and reduced GLBs; `eye-packaged-review.json` records their exact hashes and containment results. Both specimens passed the shared asset/anchor checks and the built main viewer loaded all eighteen actions without browser errors. Paused action selection, frame stepping, feeding and terminal Death poses were inspected. Final matching portraits and the refreshed specimen catalogue accompany these assets. Editable Blender sources and extended visual recordings remain under `cambrian/local/devonian-authoring/`.
+
+## Reopened 8 September 2026
+
+Current shipped version is preview pending the focused face pass in
+`docs/devonian/refinement-queue.md`. Previous final reports apply only to the preserved backup.
+
+## Sculpt port shipped — 12 September 2026
+
+The user's viewer sculpt (`docs/viewer-sculpt.md`) asked for the head dome lowered 14–17% over
+stations 15–19, the nose thinner in height and 21% wider, and the nose moved +0.08 along the axis;
+nothing behind station 14 changed. `face-v4/shape_06.py` carries it in the builder's own profile
+rows and `face-v4/candidate_06.py` rebuilds the head from them (base rebuild with the edit off, the
+candidate with it on). The rebuild has no UV map and placeholder materials, so it is a
+*deformation source*, not the asset: `tools/devonian/transplant-positions.mjs` keeps the shipped
+GLB whole — materials, textures, UVs, tangents, skin, clips, sockets — and replaces only its
+vertex positions with the candidate's, matched through the base rebuild (index-aligned with the
+candidate; its positions reproduce the shipped ones), then recomputes normals. Both LODs went
+through it; the reduced model's eyes paired by nearest position where Decimate had not landed on
+the same vertex count (worst 0.106 against bounds 7.29). Measured with `npm run sculpt:measure`,
+every changed station is within 2.4% of the sculpt's curves (the 30% at station 3 is a ventral
+value of 0.003 against 0.003), and `--against` the previous shipped GLB shows stations 0–13
+identical to it (0.0% on every curve) with only the head changed. Portraits:
+`face-v4/portraits_final.py` (standalone; the same Idle-pose framing as `render_candidate_06.py`
+without its frozen-report dependency). Grab re-applied by `tools/creatures/motion/apply.mjs`.

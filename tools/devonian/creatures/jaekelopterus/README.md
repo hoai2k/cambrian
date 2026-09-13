@@ -77,3 +77,18 @@ Run `tools/devonian/eye-audit.py` in Blender against each emitted geometry folde
 Initial handoff evidence is recorded in `WORKING_STATE.md` and `delivery.json` once the basic checks complete. The integration agent owns lossless packaging, publishing, viewer checks and main commits.
 
 Initial preview rendering uses one actual 1600×1200 GLB cutout, with `portraits.py` deriving the studio background and the two UI sizes from that same frame. The extended Blender action suite is deferred under the user’s initial-delivery priority; all twenty actions have actual Three playback frames/video, and basic Blender lateral, eye, lit oral and LOD views are retained. `check-candidate.mjs` is a snapshot of shared intake with only its input/output paths changed; it passed with all five sockets.
+
+## V2 shipped — 12 September 2026
+
+`build_v2.py` (with `export_v2.py`, `materials_v2.py`, `render_v2.py`, `portraits_v2.py`,
+`anchors_v2.json`) ports the approved study: the 11 September triage found the opisthosoma a
+uniform taper of rounded rings and the chelicerae rounded tubes. Segments 1–7 now hold their width
+as a flattened preabdomen and step down into a narrower postabdomen (8–12); the ventral term of
+`shellpoint()` is .08; the cheliceral rami are blades (`flat=.36`), 1.28× longer from their first
+point, with 13 alternating denticles each; the grasp and attack anchors moved to the new ramus
+tips by the same stretch; the dorsal/belly shading thresholds are retuned to the flatter body.
+`export_v2.py` sets `export_optimize_animation_keep_anim_armature=False`: on Blender 5.2.1 the
+default keeps a constant near-identity scale channel per bone that the intake refuses, and the
+shipped asset never had one. Packaging exact round-trip PASS at 156,661 / 41,884 triangles;
+intake and `check-candidate.mjs` PASS. `build.py` still reproduces the previous model. The user
+accepted the study on 12 September; badge cleared.

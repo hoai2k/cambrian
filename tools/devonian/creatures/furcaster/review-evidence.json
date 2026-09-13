@@ -1,0 +1,52 @@
+{
+  "status": "initial-preview",
+  "fullSha256": "ef3111da7de76e59a4167f8a07e08c70cad950412a16e7c9c9d5a5284cfd6f0b",
+  "lodSha256": "449ed9fd684de4bc349faea55b6629228729a119cc2eeeb18d35387b64d86b79",
+  "fullViews": [
+    "threequarter",
+    "dorsal",
+    "side",
+    "arm-detail",
+    "oral",
+    "ventral",
+    "action-Crawl",
+    "action-Swim",
+    "action-Eat",
+    "action-Heavy",
+    "action-Guard",
+    "action-Ability",
+    "action-Dodge",
+    "action-Death"
+  ],
+  "lodViews": [
+    "Idle",
+    "Crawl",
+    "Swim",
+    "Death"
+  ],
+  "selectedSequenceFrames": [
+    "sequence-Ability-01.png",
+    "sequence-Ability-17.png",
+    "sequence-Ability-33.png",
+    "sequence-Ability-56.png",
+    "sequence-Ability-73.png",
+    "sequence-Crawl-01.png",
+    "sequence-Crawl-10.png",
+    "sequence-Crawl-19.png",
+    "sequence-Crawl-28.png",
+    "sequence-Crawl-37.png",
+    "sequence-Heavy-01.png",
+    "sequence-Heavy-08.png",
+    "sequence-Heavy-18.png",
+    "sequence-Heavy-27.png",
+    "sequence-Heavy-34.png"
+  ],
+  "eyeAudit": {
+    "applicable": false,
+    "reason": "No macroscopic eye globes in this reconstruction of an ophiuroid."
+  },
+  "limits": [
+    "Detailed multi-arm collision clearance and all transition combinations not exhaustively reviewed.",
+    "Disc, oral tissues and spine details need further specimen comparison/refinement."
+  ]
+}

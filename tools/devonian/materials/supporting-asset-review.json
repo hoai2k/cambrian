@@ -1,0 +1,635 @@
+{
+  "status": "pass-with-documented-preview-limits",
+  "scope": "Supporting surfaces, source atlases, reference environments/lighting/scenery and atmosphere. Scale plates excluded. Read-only asset inspection.",
+  "imageFilesDecoded": 104,
+  "coverage": {
+    "surfaceSets": 8,
+    "surfaceCodes": [
+      "T01",
+      "T02",
+      "T03",
+      "T04",
+      "T05",
+      "T07",
+      "T08",
+      "T09"
+    ],
+    "sourceAtlasCells": 6,
+    "sourceAtlasCodes": [
+      "T06",
+      "T08",
+      "T10"
+    ],
+    "environments": 9,
+    "lighting": 3,
+    "scenery": 29,
+    "rgbaAtmosphereAtlases": 2,
+    "atmosphereCells": 32,
+    "scalePlates": "excluded, another agent owns review"
+  },
+  "corrections": [
+    {
+      "issue": "Tangent normal green sign used image-down derivative as UV-up derivative.",
+      "fix": "build-data.py now encodes (-dh/dcolumn,+dh/drow,1), normalized; --normals-only regenerated eight maps and hashes.",
+      "preserved": "Eight original albedo hashes, all non-normal surface maps, original imagegen source hashes."
+    },
+    {
+      "issue": "Source atlas normals had large non-unit errors from inherited postprocessing/filtering; constant roughness also contaminated near edges.",
+      "fix": "render-source-atlases.py --data-only bypasses cached atlases and rebuilds normal/height/roughness with denoising, compositor and sequencer off, Raw transfer, dither off and .01px box point sampling.",
+      "preserved": "Six albedos and original Blender source hashes.",
+      "alphaInterpretation": "Data pixels are point samples; exterior alpha zero excludes them. No smoothing, dilation or vector reconstruction across transparency. Byte quantization causes the remaining <0.0068 length error; extra normalization was not necessary.",
+      "heightLabel": "All six atlas heights explicitly labeled 8-bit RGBA orthographic reference only; not 16-bit displacement."
+    }
+  ],
+  "checks": {
+    "manifestImageHashes": "All recorded map/atlas/scenery hashes match current images. Twelve original imagegen environment/lighting source hashes match generated source files.",
+    "sourceHashes": "All eight material source-image hashes and six source .blend hashes match.",
+    "dimensions": "Surface maps 1024\u00d71024; source atlas cells 768\u00d7768; atmosphere 1024\u00d71024 / 4\u00d74 grid of 256px cells. All images decode fully.",
+    "surfaceHeights": "All eight PNG IHDR bit depths are 16, unsigned grayscale, range 0\u201365535.",
+    "normals": "Linear RGB decoded numerically, compared to height-derived UV-up vectors; positive Z checked for tangent maps. Object/world atlas normals checked on opaque coverage, not confused with tangent maps.",
+    "roughness": "All fixed source atlas covered pixels encode .78 within .005; surface maps decode as scalar data.",
+    "atmosphere": "All 32 cells nonempty, exact [column/4,row/4,.25,.25] rectangles match image cells, each source-model path exists. Particles minimum transparent padding 34px; decals 20px.",
+    "references": "Nine environments, three lighting and 29 scenery image boards inspected as contact sheets; all expected manifests present. Local source-document paths exist; external source URLs preserved but not comprehensively fetched or palaeoecological claims re-audited.",
+    "visualInspection": [
+      "All eight albedo previews",
+      "All six corrected source-atlas colour/normal/height/roughness previews",
+      "All 41 environment/lighting/scenery boards as contact sheets",
+      "Both atmosphere atlases, including all 32 cells"
+    ]
+  },
+  "surfaceMetrics": [
+    {
+      "id": "pale-carbonate",
+      "normalRMSEConventionalImageUVUpBasis": 0.0018498655861926775,
+      "normalLengthP99AbsError": 0.0005688501232614662,
+      "albedoEdgeToNeighbourRatio": 1.6324882041915145
+    },
+    {
+      "id": "dark-carbonate",
+      "normalRMSEConventionalImageUVUpBasis": 0.001852221267091246,
+      "normalLengthP99AbsError": 0.000753272614674616,
+      "albedoEdgeToNeighbourRatio": 1.8088853866884207
+    },
+    {
+      "id": "marine-mud",
+      "normalRMSEConventionalImageUVUpBasis": 0.0018459905831481659,
+      "normalLengthP99AbsError": 0.0001383987273944065,
+      "albedoEdgeToNeighbourRatio": 1.4015740572333377
+    },
+    {
+      "id": "freshwater-sediment",
+      "normalRMSEConventionalImageUVUpBasis": 0.0018502606242320522,
+      "normalLengthP99AbsError": 0.0001383987273944065,
+      "albedoEdgeToNeighbourRatio": 1.413152382949783
+    },
+    {
+      "id": "ripple-sand",
+      "normalRMSEConventionalImageUVUpBasis": 0.0022448474771361456,
+      "normalLengthP99AbsError": 0.004434611554624324,
+      "albedoEdgeToNeighbourRatio": 1.2839835325344984
+    },
+    {
+      "id": "microbial-film",
+      "normalRMSEConventionalImageUVUpBasis": 0.0018498703715066121,
+      "normalLengthP99AbsError": 0.0001383987273944065,
+      "albedoEdgeToNeighbourRatio": 1.7013905175457686
+    },
+    {
+      "id": "submerged-wood",
+      "normalRMSEConventionalImageUVUpBasis": 0.002232476967632667,
+      "normalLengthP99AbsError": 0.004114577909133943,
+      "albedoEdgeToNeighbourRatio": 1.4755039737578
+    },
+    {
+      "id": "rooted-bank",
+      "normalRMSEConventionalImageUVUpBasis": 0.0019929248879681505,
+      "normalLengthP99AbsError": 0.003682289045762288,
+      "albedoEdgeToNeighbourRatio": 1.4199682125381046
+    }
+  ],
+  "atlasMetrics": [
+    {
+      "id": "shell-hash",
+      "opaqueNormalLengthRange": [
+        0.9940925084805474,
+        1.0060868194131396
+      ],
+      "opaqueNormalLengthP99AbsError": 0.0047942683599939695,
+      "transparentPaddingPx": [
+        42,
+        66,
+        43,
+        66
+      ]
+    },
+    {
+      "id": "massive-stromatoporoid",
+      "opaqueNormalLengthRange": [
+        0.9937211569616279,
+        1.0065758416675987
+      ],
+      "opaqueNormalLengthP99AbsError": 0.004979719062408128,
+      "transparentPaddingPx": [
+        41,
+        118,
+        41,
+        118
+      ]
+    },
+    {
+      "id": "massive-tabulate-coral",
+      "opaqueNormalLengthRange": [
+        0.9935354291524593,
+        1.006698060113772
+      ],
+      "opaqueNormalLengthP99AbsError": 0.0049856493129019075,
+      "transparentPaddingPx": [
+        41,
+        69,
+        41,
+        69
+      ]
+    },
+    {
+      "id": "solitary-rugose-coral",
+      "opaqueNormalLengthRange": [
+        0.9935973422796377,
+        1.0065758416675987
+      ],
+      "opaqueNormalLengthP99AbsError": 0.0049178983213884475,
+      "transparentPaddingPx": [
+        41,
+        41,
+        41,
+        41
+      ]
+    },
+    {
+      "id": "bryozoan-colony",
+      "opaqueNormalLengthRange": [
+        0.9939068500645077,
+        1.0060256749173198
+      ],
+      "opaqueNormalLengthP99AbsError": 0.004863222591451999,
+      "transparentPaddingPx": [
+        41,
+        351,
+        41,
+        351
+      ]
+    },
+    {
+      "id": "submerged-log",
+      "opaqueNormalLengthRange": [
+        0.993968740056321,
+        1.0060868194131394
+      ],
+      "opaqueNormalLengthP99AbsError": 0.004856081420822389,
+      "transparentPaddingPx": [
+        41,
+        248,
+        44,
+        248
+      ]
+    }
+  ],
+  "previewLimits": [
+    "Albedo seamlessness and relief alignment need in-engine tiling review; edge jump/neighbor ratios are 1.28\u20131.81, not proof of seamlessness. Numerical microrelief is artistic and intentionally not reconstructed from albedo.",
+    "Atlas heights are 8-bit reference images. Object/world normals are not directly usable as tangent-space normal maps. Point-sampled data coverage differs from filtered colour edges.",
+    "Bryozoan source atlas uses the declared top projection and reads nearly edge-on; a frontal view would be more useful for future fan-surface authoring.",
+    "Atmosphere UV rectangles follow image top-left rows; consumers using bottom-left UV origins must convert rows. Transparent padding was checked at base level, not every mip/aniso footprint. No in-water rendering or blending/FPS validation performed.",
+    "Wood fragment decals retain straight crop edges from the authored log source; initial source-derived preview, not refined broken-edge silhouettes.",
+    "Concept boards are art direction, not engine-render verification or evidence of coexistence; taxonomy/locality/colour details remain subject to scientific and art refinement."
+  ],
+  "remainingBlockers": [],
+  "standardsConsulted": [
+    "https://registry.khronos.org/glTF/specs/2.0/glTF-2.0.html#material-normaltexture"
+  ],
+  "evidenceDirectory": "/Users/hoai/Documents/Stuff/Generations/cambrian/local/devonian-authoring/environment-materials/supporting-review",
+  "regenerateCommands": [
+    "python3 tools/devonian/materials/build-data.py --normals-only",
+    "/Applications/Blender.app/Contents/MacOS/Blender -b --threads 2 --python tools/devonian/materials/render-source-atlases.py -- --data-only"
+  ],
+  "changedCode": [
+    "tools/devonian/materials/build-data.py",
+    "tools/devonian/materials/render-source-atlases.py"
+  ],
+  "files": [
+    {
+      "path": "public/assets/devonian/materials/pale-carbonate/albedo.webp",
+      "sha256": "0210e47281199d0aa0bc3fd8919cea63da5051251cf4b3525fef947e58a166c0"
+    },
+    {
+      "path": "public/assets/devonian/materials/pale-carbonate/height.png",
+      "sha256": "352f565e7fc9196c2d587ababee091f77f2e20dc672bf9334b7c45353a8c20be"
+    },
+    {
+      "path": "public/assets/devonian/materials/pale-carbonate/normal.png",
+      "sha256": "7acd18ae73741f5310172f18dbf858e41684fc6510bd379971a8113d962c22bc"
+    },
+    {
+      "path": "public/assets/devonian/materials/pale-carbonate/roughness.png",
+      "sha256": "b0e080ee572efe49055f2f06afba909d7e7fd1ee47ee4bc1f067383ef6ad326a"
+    },
+    {
+      "path": "public/assets/devonian/materials/dark-carbonate/albedo.webp",
+      "sha256": "a5b8d96950aa8179d01e54d2559750a88c2e0caff732fc70bc3ff94ae6fdd3f9"
+    },
+    {
+      "path": "public/assets/devonian/materials/dark-carbonate/height.png",
+      "sha256": "d703902933bff066b8c94f530682cba7fd00329f8f33f9dbcaf5e6836841c0d4"
+    },
+    {
+      "path": "public/assets/devonian/materials/dark-carbonate/normal.png",
+      "sha256": "ce6e4485246b1665831c0580208ab272f435eac83c21ab2d2c4c1852aa67f764"
+    },
+    {
+      "path": "public/assets/devonian/materials/dark-carbonate/roughness.png",
+      "sha256": "7a4b4410ff5dc950e4a949ffe11479ab9da86bcefb0fe940d2dba32ff30ea689"
+    },
+    {
+      "path": "public/assets/devonian/materials/marine-mud/albedo.webp",
+      "sha256": "e074cc29803fcdbc71fbd78f30fac9e624b10d993163ddd4bc34c5cffb329a92"
+    },
+    {
+      "path": "public/assets/devonian/materials/marine-mud/disturbance-mask.png",
+      "sha256": "0f154331766a8672276c476ce519533a3650d2c3b5d0566dd78000cdbc6dde87"
+    },
+    {
+      "path": "public/assets/devonian/materials/marine-mud/height.png",
+      "sha256": "afd447a3da9a844446eadc09366d930d73cc8406050dca70abb97f9901dd5253"
+    },
+    {
+      "path": "public/assets/devonian/materials/marine-mud/normal.png",
+      "sha256": "466a55288e8cbfa63575b3e4757ccd93d8bffdc93e28567bf48fdc02dd7ffd89"
+    },
+    {
+      "path": "public/assets/devonian/materials/marine-mud/roughness.png",
+      "sha256": "941441911941e5776db095d0eded1be0184c27fae03a98a29b04629c02a4eec4"
+    },
+    {
+      "path": "public/assets/devonian/materials/freshwater-sediment/albedo.webp",
+      "sha256": "ef9f1f1d32a3eafa1dff2ab0cba7b293c6834e5d882dbcd4baad51b3dde67706"
+    },
+    {
+      "path": "public/assets/devonian/materials/freshwater-sediment/height.png",
+      "sha256": "7a9e17b91db54f837633451ddf1bd2b529b6cc1f42140e70fa691ad646a006c1"
+    },
+    {
+      "path": "public/assets/devonian/materials/freshwater-sediment/normal.png",
+      "sha256": "4ff3ad7e71b1df6a241f7e2e85012a82bd9042123c2b0397405bbbcaf45d01bf"
+    },
+    {
+      "path": "public/assets/devonian/materials/freshwater-sediment/roughness.png",
+      "sha256": "1bb24f779516f4c38b8c421a5433ae14cc2d0c8f82229380b8315439175c7bfb"
+    },
+    {
+      "path": "public/assets/devonian/materials/ripple-sand/albedo.webp",
+      "sha256": "e517cb311951b3d40a2a872595e3674f9fb23c41d7389796ff9a367e0bcccaed"
+    },
+    {
+      "path": "public/assets/devonian/materials/ripple-sand/height.png",
+      "sha256": "bc09b264b1afc8abda0e20ff62fbbb3a7f4763fd8fe13c168c64deb17767855e"
+    },
+    {
+      "path": "public/assets/devonian/materials/ripple-sand/normal.png",
+      "sha256": "ccd256b9077111b7282680324d6da508fd6eeadd7f3ef500644413cf8a96561d"
+    },
+    {
+      "path": "public/assets/devonian/materials/ripple-sand/roughness.png",
+      "sha256": "49af9a9303051ec06cddf170d23eaeaf99289163580edca19aa3e033397334d5"
+    },
+    {
+      "path": "public/assets/devonian/materials/microbial-film/albedo.webp",
+      "sha256": "3c2eb6a1d213d47716cd41a6cda9b4a785730f946c002b2b9ac4d3f4efc7dcbc"
+    },
+    {
+      "path": "public/assets/devonian/materials/microbial-film/coverage-broad.png",
+      "sha256": "8e37daa7136dd8042e16665289d974b1b4fb2f2182965fa8a833e1e8f507c368"
+    },
+    {
+      "path": "public/assets/devonian/materials/microbial-film/coverage-patchy.png",
+      "sha256": "392d006ce365ae93c580899cb82cd800ab0f36fb9eeb7c17fd74744eb3ec1df2"
+    },
+    {
+      "path": "public/assets/devonian/materials/microbial-film/coverage-sparse.png",
+      "sha256": "7e6d336b4d3bcff04641971539ed99113fdb64043b4cb9b89dd727e22f7abd3e"
+    },
+    {
+      "path": "public/assets/devonian/materials/microbial-film/height.png",
+      "sha256": "a80591e972b4a3e791c83b71f18b5c1b7f014ab73ae816e67c9bbd0e56901cf1"
+    },
+    {
+      "path": "public/assets/devonian/materials/microbial-film/normal.png",
+      "sha256": "c174de4b896831e4ff7e524043d3c92950ba8408bf45f0fa929a14a965e1537d"
+    },
+    {
+      "path": "public/assets/devonian/materials/microbial-film/roughness.png",
+      "sha256": "26b05bd38a5c65ce128723392349ed6b10717c68e54096d11bde37d7ecd63993"
+    },
+    {
+      "path": "public/assets/devonian/materials/submerged-wood/albedo.webp",
+      "sha256": "ec6455b4a9e8e408384c16130211a027274f09e37aab53f479b1019f46110f10"
+    },
+    {
+      "path": "public/assets/devonian/materials/submerged-wood/height.png",
+      "sha256": "d92da5ef72f060511d23520609227e2c1d012005c82101939bcae6e323412043"
+    },
+    {
+      "path": "public/assets/devonian/materials/submerged-wood/normal.png",
+      "sha256": "84dd2db5c0d475f41c2fda169d2f261134f4399ee73e00e01a03d3649b351b13"
+    },
+    {
+      "path": "public/assets/devonian/materials/submerged-wood/roughness.png",
+      "sha256": "7306f46b51c721ad482612ddb672e54629729c5808bc93d1244acf04acab8036"
+    },
+    {
+      "path": "public/assets/devonian/materials/submerged-wood/sediment-mask.png",
+      "sha256": "538612118ef1374f3c0605c78921a51c78e523e96a309eaf106a50d7ef8ab8e0"
+    },
+    {
+      "path": "public/assets/devonian/materials/rooted-bank/albedo.webp",
+      "sha256": "6feb660c3c84bae219b50cfa680222e5d590e74d778fe84148a181eff9a729d5"
+    },
+    {
+      "path": "public/assets/devonian/materials/rooted-bank/height.png",
+      "sha256": "064b707022480660951dcf400aca5861460dcff6842f7bd13eba4f9e2a757d03"
+    },
+    {
+      "path": "public/assets/devonian/materials/rooted-bank/normal.png",
+      "sha256": "6149a0928e43486f5fa717808b7732b5353503f7f9efb2e674e7dcbc9b4f9de3"
+    },
+    {
+      "path": "public/assets/devonian/materials/rooted-bank/roughness.png",
+      "sha256": "cf63615b3be91a157fcca7724b59642db77739e9bd690610b39e10ea45305287"
+    },
+    {
+      "path": "public/assets/devonian/materials/shell-hash/albedo.png",
+      "sha256": "e1de5399aeeb767e571f7c8eb7a3660618aeefce0ffc23086f6714f985a12be0"
+    },
+    {
+      "path": "public/assets/devonian/materials/shell-hash/normal-object.png",
+      "sha256": "910a18565d772ba3edc1fc11851f8b7b23dd2426bf72ccd94357589912597e6c"
+    },
+    {
+      "path": "public/assets/devonian/materials/shell-hash/height.png",
+      "sha256": "61747485288600bfcbd3088a14b975d20226de9a9e843e24f6bca98d0279adeb"
+    },
+    {
+      "path": "public/assets/devonian/materials/shell-hash/roughness.png",
+      "sha256": "682be96c1efd86083e9723f0255bc30170408af8834ccb1e8a9f49a401c757e0"
+    },
+    {
+      "path": "public/assets/devonian/materials/massive-stromatoporoid/albedo.png",
+      "sha256": "983fad27ebac9a50155fec847b632fb4d77a5d69014d34614d49f71a936cd16c"
+    },
+    {
+      "path": "public/assets/devonian/materials/massive-stromatoporoid/normal-object.png",
+      "sha256": "5789bac092f312ea6f84aa7c06c7d4872d59635b49e7ebde92c282d1db3f5071"
+    },
+    {
+      "path": "public/assets/devonian/materials/massive-stromatoporoid/height.png",
+      "sha256": "c5ac6a6d6c65d7b9430a7f3e5945cc982290eeb8dac0acfe79052e1f32d84990"
+    },
+    {
+      "path": "public/assets/devonian/materials/massive-stromatoporoid/roughness.png",
+      "sha256": "f12b9f18556b939a516461a6d4332de3078b0ea2b23456c36629bb2cfd409089"
+    },
+    {
+      "path": "public/assets/devonian/materials/massive-tabulate-coral/albedo.png",
+      "sha256": "086cbd77f2ef92c680c1402b96f9a93c8b2c9456d594f00c4729f070aec820ec"
+    },
+    {
+      "path": "public/assets/devonian/materials/massive-tabulate-coral/normal-object.png",
+      "sha256": "3f392da91791e861661c31435698cb6ead64fad4efff2bfad3fb32a37a4923d3"
+    },
+    {
+      "path": "public/assets/devonian/materials/massive-tabulate-coral/height.png",
+      "sha256": "2ecd3a487831a49a3cd9de39c27fa36fd6bc73d63a8fd367499ef03ecde84741"
+    },
+    {
+      "path": "public/assets/devonian/materials/massive-tabulate-coral/roughness.png",
+      "sha256": "e621c7e93abefa7e41210a4d14d05a0d05ac61da9aa38eb74fa5b25ab99a9c1f"
+    },
+    {
+      "path": "public/assets/devonian/materials/solitary-rugose-coral/albedo.png",
+      "sha256": "1538dc6ad291dbc314da1bb945cfa468c121a1b4f17d4550b62361b59ee345e0"
+    },
+    {
+      "path": "public/assets/devonian/materials/solitary-rugose-coral/normal-object.png",
+      "sha256": "c5f659b759fe104b42720d9c5897b3936c01a7d25678bc6875de8699dea301be"
+    },
+    {
+      "path": "public/assets/devonian/materials/solitary-rugose-coral/height.png",
+      "sha256": "88305aba57ca1fbb1f02d92400720a9e6fad2b337611c4c90efe52799de3ad97"
+    },
+    {
+      "path": "public/assets/devonian/materials/solitary-rugose-coral/roughness.png",
+      "sha256": "06dfeccd1dcfdf0e7ac8aefab2c58d8e35c80d10d26d2f8dc9cf93e6bbf0f03d"
+    },
+    {
+      "path": "public/assets/devonian/materials/bryozoan-colony/albedo.png",
+      "sha256": "0b1fe810cf7427d6c2ed0501bf0ea0ce1b68b2fa9adac5a114b137aed75f1e3c"
+    },
+    {
+      "path": "public/assets/devonian/materials/bryozoan-colony/normal-object.png",
+      "sha256": "e2bd3ef7840426c14f7b3cf309ebf2e450b2dd18d046e0eef6507d0a8ae2b333"
+    },
+    {
+      "path": "public/assets/devonian/materials/bryozoan-colony/height.png",
+      "sha256": "a59a63f88162727ea093faaac16113929a51a3c9793e64267ec34a4e2bbe94bc"
+    },
+    {
+      "path": "public/assets/devonian/materials/bryozoan-colony/roughness.png",
+      "sha256": "929e853ed7da253374f81d69a394126921b940ed5848799ef8da32a655c4378b"
+    },
+    {
+      "path": "public/assets/devonian/materials/submerged-log/albedo.png",
+      "sha256": "e399739b5b66d965626be0e8580d936881638d57cf99833b64fcd630830007c8"
+    },
+    {
+      "path": "public/assets/devonian/materials/submerged-log/normal-object.png",
+      "sha256": "681d2c7cf74af87b209ee69060115db012946c0c72ba8007e458dc74e8b7c46a"
+    },
+    {
+      "path": "public/assets/devonian/materials/submerged-log/height.png",
+      "sha256": "b72a842c94cbeb6937b3224b85cdb29281ecfd4d7d3c7e84c49b7c5a3c769866"
+    },
+    {
+      "path": "public/assets/devonian/materials/submerged-log/roughness.png",
+      "sha256": "7e7d7cb1ef664c2ab4d50eb0c9d2e31024cefe9ed5d6d644f3b4fe29929bbbef"
+    },
+    {
+      "path": "public/assets/devonian/reference/environments/e01-hunsruck-mud-shelf.webp",
+      "sha256": "fb0d1ff6cc1f79b65f9248ea7ffe6b8f307ce4f9500481c93c24cd219e541a9f"
+    },
+    {
+      "path": "public/assets/devonian/reference/environments/e02-moroccan-carbonate-shelf.webp",
+      "sha256": "5d47dae1c21cd4f5bdb9db27e8cc2a2924636fcbb5b75e2f0ae05256dce0433c"
+    },
+    {
+      "path": "public/assets/devonian/reference/environments/e03-orcadian-lake.webp",
+      "sha256": "ef10dcd409d1d6643b877d0a44e087e50b0d7168f017a14c9ce1c70168184b92"
+    },
+    {
+      "path": "public/assets/devonian/reference/environments/e04-gogo-reef-margin.webp",
+      "sha256": "0eedb57b5bfbd2c610b9146624989696dfb62188fcff8d5f711cfac5c9a3f6ce"
+    },
+    {
+      "path": "public/assets/devonian/reference/environments/e05-miguasha-waterway.webp",
+      "sha256": "c0185af927e32e3fc14217ed64f5a20a325c0acf2a47a46fd51b779ca5f8e3cb"
+    },
+    {
+      "path": "public/assets/devonian/reference/environments/e06-cleveland-offshore.webp",
+      "sha256": "cd4e3cb36140558aaa60c8a569099c8296a8042d28835ad1adb60e6b3c220312"
+    },
+    {
+      "path": "public/assets/devonian/reference/environments/e07-ellesmere-channel.webp",
+      "sha256": "001e3c45376b4a4adf77be83288b06d267da4896c137bf8cf2f2dac05157f86a"
+    },
+    {
+      "path": "public/assets/devonian/reference/environments/e08-east-greenland-waterbody.webp",
+      "sha256": "6ee647e3cdb08efe4961175cf30bd10b92c9ccc4f33b835155c986e7f88f04e5"
+    },
+    {
+      "path": "public/assets/devonian/reference/environments/e09-wood-bay-waterbody.webp",
+      "sha256": "b8904a2200c1764304f842bed6f54159a8d0d8b8c747772a4fbabbdc5bef4b2d"
+    },
+    {
+      "path": "public/assets/devonian/reference/lighting/clear-marine.webp",
+      "sha256": "c1f2035b1c650410287cf5f8f4bcd3b8172f8ea4001a5fa0eef951f655221397"
+    },
+    {
+      "path": "public/assets/devonian/reference/lighting/suspended-sediment.webp",
+      "sha256": "d579e5c02da62be1cc198932452ca4e4b25d1ce71007350ddf1e676526a14045"
+    },
+    {
+      "path": "public/assets/devonian/reference/lighting/shallow-wooded.webp",
+      "sha256": "fd95e5e3ce65f47b4c644f70d1f4052fc86ec937d239bf949468f874cfe7c899"
+    },
+    {
+      "path": "public/assets/devonian/reference/scenery/b01-massive-stromatoporoid.jpg",
+      "sha256": "cc200d12a091efc7e19a1c4484d67ce1c3718f43275abe16afea9105cd76fcc0"
+    },
+    {
+      "path": "public/assets/devonian/reference/scenery/b02-branching-stromatoporoid.jpg",
+      "sha256": "d344bfe339600723d39723659accaa0be85166114f0283afe93f27c6ad22df75"
+    },
+    {
+      "path": "public/assets/devonian/reference/scenery/b03-encrusting-stromatoporoid.jpg",
+      "sha256": "0ea46bf7b5a49c1877561cfe8fc48f6a829b3c7938015df536aad51279e0ca36"
+    },
+    {
+      "path": "public/assets/devonian/reference/scenery/b04-massive-tabulate-coral.jpg",
+      "sha256": "0def8c49ca5c755b204264692c41f412636a4e1df9b4397b8b644e0f7bcbfe1f"
+    },
+    {
+      "path": "public/assets/devonian/reference/scenery/b05-branching-tabulate-coral.jpg",
+      "sha256": "fb9ca68551228724575505c76f756ac85056bbbc1879971f69ee7b4fb041cff5"
+    },
+    {
+      "path": "public/assets/devonian/reference/scenery/b06-solitary-rugose-coral.jpg",
+      "sha256": "a432b84e2641f15bf344744d3a444a594ec4b68f56792c278f96fa5449934ec4"
+    },
+    {
+      "path": "public/assets/devonian/reference/scenery/b07-colonial-rugose-coral.jpg",
+      "sha256": "f2c43a7c1e794ed66178147eac8b89f2f741c1df9f590e5b10196b65034b2576"
+    },
+    {
+      "path": "public/assets/devonian/reference/scenery/b08-stalked-crinoid.jpg",
+      "sha256": "1f032bda74710b1b2b2701c28ff88f6a1498df665f42d5ee08457a42816cb873"
+    },
+    {
+      "path": "public/assets/devonian/reference/scenery/b09-brachiopod-bed.jpg",
+      "sha256": "accfebeecdbb22b46cf829cd98d86fb9803f10f96643480c18268755e9ff64a7"
+    },
+    {
+      "path": "public/assets/devonian/reference/scenery/b10-bryozoan-colony.jpg",
+      "sha256": "d1494c128ee0e522e1cd17e8a727734257c42d699510cfbaf55ec411bfe30ba1"
+    },
+    {
+      "path": "public/assets/devonian/reference/scenery/b11-gastropod-shells.jpg",
+      "sha256": "d2415facbe7b7ad1dbdd6e9d50bb1e3c6917066a414452c7c9576d78e04d4df5"
+    },
+    {
+      "path": "public/assets/devonian/reference/scenery/b12-small-bivalves.jpg",
+      "sha256": "72a9614c6a1a6922a9fe5b482893e7d8f3bb0926675a9a0b49c7a1559f484727"
+    },
+    {
+      "path": "public/assets/devonian/reference/scenery/p01-rhynia.jpg",
+      "sha256": "6c5cf0dbd7f146a8fd6838f8fac316fffabb0b84550c5544b50e1ed80d11466e"
+    },
+    {
+      "path": "public/assets/devonian/reference/scenery/p02-asteroxylon.jpg",
+      "sha256": "9aa1ab249e3a3a81d35dc3232d09135ebde7fb6448a59fec4b9d575bb41a6424"
+    },
+    {
+      "path": "public/assets/devonian/reference/scenery/p03-cladoxylopsid-tree.jpg",
+      "sha256": "2500d927af5925a3af887cd0fbe133fc77ddad5c3ee0c89d20c62a0d16128167"
+    },
+    {
+      "path": "public/assets/devonian/reference/scenery/p04-archaeopteris.jpg",
+      "sha256": "8ea5ec38f42247a84a8715440ba96eaf3f7c20b9e214d292c6e2880f4765c9bc"
+    },
+    {
+      "path": "public/assets/devonian/reference/scenery/p05-marine-algae.jpg",
+      "sha256": "732f11079d53931ba6634025534e807b22fd43583646b50f85db5d90b70dc8bb"
+    },
+    {
+      "path": "public/assets/devonian/reference/scenery/g01-carbonate-outcrop.jpg",
+      "sha256": "b9b3563a658833fb5c11ea1c076c8de050d8561bfd9fe4d8b86a510ebec245bc"
+    },
+    {
+      "path": "public/assets/devonian/reference/scenery/g02-reef-framework.jpg",
+      "sha256": "7d40cf372a3216774cf22ab0af121a8f6eb23436341fb90e61d60821c554d26b"
+    },
+    {
+      "path": "public/assets/devonian/reference/scenery/g03-carbonate-rubble.jpg",
+      "sha256": "1053bd2b29d6864d6f54ebf8f86939a7b1a239a1f3b431d5d9151109743c430d"
+    },
+    {
+      "path": "public/assets/devonian/reference/scenery/g04-fine-sediment-bed.jpg",
+      "sha256": "4cc1111bc84e1ea791a28a147724cae0e426ff05c8adf11aa81ac25c872e5533"
+    },
+    {
+      "path": "public/assets/devonian/reference/scenery/g05-sand-pebble-bed.jpg",
+      "sha256": "3e68edc7556b9308dbdcb7ea67311a1e68dbde6d3d25be60abaad3b2bc6e1d27"
+    },
+    {
+      "path": "public/assets/devonian/reference/scenery/g06-eroded-bank.jpg",
+      "sha256": "39fcd3606f9777085218924ce820eda084046a53d3ea38351c2988a322eed6cd"
+    },
+    {
+      "path": "public/assets/devonian/reference/scenery/g07-large-boulder.jpg",
+      "sha256": "207a2c958d2ea54af3a31ee9daeb27a3d7ee38af5b91dd53c4ae6746e419df7c"
+    },
+    {
+      "path": "public/assets/devonian/reference/scenery/g08-shell-hash.jpg",
+      "sha256": "20729c7499e42b8d8eccd412beee8ac014240339a480749238ff60f96b82e396"
+    },
+    {
+      "path": "public/assets/devonian/reference/scenery/g09-crinoid-debris.jpg",
+      "sha256": "d80bf0680be1ba30e4fdd82a4f825439d19ef651724529ecf22f3e6425043bc0"
+    },
+    {
+      "path": "public/assets/devonian/reference/scenery/g10-submerged-log.jpg",
+      "sha256": "1d84ecba795d79e5e5ce9bc95175264dc7b4a01362fe74351fd8f09319e7669b"
+    },
+    {
+      "path": "public/assets/devonian/reference/scenery/g11-root-bearing-bank.jpg",
+      "sha256": "f48a62b36a0abede929506ca99d8d84ce630b70d4286e2803146ef2b8fe6d4a6"
+    },
+    {
+      "path": "public/assets/devonian/reference/scenery/g12-organic-remains.jpg",
+      "sha256": "25ca8cb5db60c1721619fdda403758b93a5d3d87dd55e0bbf77a0b5c04d002da"
+    },
+    {
+      "path": "public/assets/devonian/atmosphere/particles.png",
+      "sha256": "6169c8446e74040944686cc88017cea534787ac8fb6a8dd8cbc2b53cdd34b1ca"
+    },
+    {
+      "path": "public/assets/devonian/atmosphere/substrate-decals.png",
+      "sha256": "063bd4b48c35fcfcdb03b9939415e6cec64f5e8df98f3c7a08679279115d6d14"
+    }
+  ]
+}

@@ -1,0 +1,81 @@
+{
+  "sourceGlbSha256": "4b55bcb1597e6d7afcef8b248917bce62267fa0570325aa489e844c1b3961e52",
+  "renders": [
+    {
+      "file": "nahecaris.select.png",
+      "clip": "Idle",
+      "frame": 0,
+      "imageSha256": "edeb85d510db60a854a36fb28db03c7c822cb4016ee1e539e6ca3e6f69e979fe",
+      "sourceGlbSha256": "4b55bcb1597e6d7afcef8b248917bce62267fa0570325aa489e844c1b3961e52"
+    },
+    {
+      "file": "lateral.png",
+      "clip": "Idle",
+      "frame": 0,
+      "imageSha256": "b0249a7e4faeb652a957190ed0104eb13f7e9dd21127a17199067672493a8cb0",
+      "sourceGlbSha256": "4b55bcb1597e6d7afcef8b248917bce62267fa0570325aa489e844c1b3961e52"
+    },
+    {
+      "file": "eyes-front.png",
+      "clip": "Idle",
+      "frame": 0,
+      "imageSha256": "151623c3b7042ffde797044dbfe3700b1f4bd8c2aca6dde92c5a97abd37f6b3c",
+      "sourceGlbSha256": "4b55bcb1597e6d7afcef8b248917bce62267fa0570325aa489e844c1b3961e52"
+    },
+    {
+      "file": "eyes-side.png",
+      "clip": "Idle",
+      "frame": 0,
+      "imageSha256": "5339a6ed3ff182441e0a1785870c52a0e1e42c681f9d92a7c76b5d1c21232961",
+      "sourceGlbSha256": "4b55bcb1597e6d7afcef8b248917bce62267fa0570325aa489e844c1b3961e52"
+    },
+    {
+      "file": "eyes-dorsal.png",
+      "clip": "Idle",
+      "frame": 0,
+      "imageSha256": "4069b8b6f6db7b340715e8885cd9015c06fd56dc2bd897fbe140857f9a28bb13",
+      "sourceGlbSha256": "4b55bcb1597e6d7afcef8b248917bce62267fa0570325aa489e844c1b3961e52"
+    },
+    {
+      "file": "oral-lit-Eat.png",
+      "clip": "Eat",
+      "frame": 18,
+      "imageSha256": "639aa586848be3eda69343c740a2c36da723f0a92d5b6c9bcd145fabed8e4e66",
+      "sourceGlbSha256": "4b55bcb1597e6d7afcef8b248917bce62267fa0570325aa489e844c1b3961e52"
+    },
+    {
+      "file": "basket-Eat.png",
+      "clip": "Eat",
+      "frame": 18,
+      "imageSha256": "a5350054186fc2bc6763c0efb90cc9e3822e30ce6f55ad7e7207e85de8b3a084",
+      "sourceGlbSha256": "4b55bcb1597e6d7afcef8b248917bce62267fa0570325aa489e844c1b3961e52"
+    },
+    {
+      "file": "nahecaris.png",
+      "clip": "Idle",
+      "frame": 0,
+      "imageSha256": "e12c9c3c4a28602e69ef554a737977cd7dc253bc335dfa8c9d5d800b30a152d9",
+      "sourceGlbSha256": "4b55bcb1597e6d7afcef8b248917bce62267fa0570325aa489e844c1b3961e52",
+      "derivedFrom": "nahecaris.select.png",
+      "method": "Same-camera GLB render; studio alpha composite or Lanczos UI downsample"
+    },
+    {
+      "file": "nahecaris.card.png",
+      "clip": "Idle",
+      "frame": 0,
+      "imageSha256": "bcacacabe08b0506dbaba537f26c9f019bbac7d8f9a0d2b3af06707abe5e4635",
+      "sourceGlbSha256": "4b55bcb1597e6d7afcef8b248917bce62267fa0570325aa489e844c1b3961e52",
+      "derivedFrom": "nahecaris.select.png",
+      "method": "Same-camera GLB render; studio alpha composite or Lanczos UI downsample"
+    },
+    {
+      "file": "nahecaris.thumb.png",
+      "clip": "Idle",
+      "frame": 0,
+      "imageSha256": "15e0de0d9ca2f110cbb0d103ca47028ca1e29816562d54b256c540eac8b33f89",
+      "sourceGlbSha256": "4b55bcb1597e6d7afcef8b248917bce62267fa0570325aa489e844c1b3961e52",
+      "derivedFrom": "nahecaris.select.png",
+      "method": "Same-camera GLB render; studio alpha composite or Lanczos UI downsample"
+    }
+  ]
+}

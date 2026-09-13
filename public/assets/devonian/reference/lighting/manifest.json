@@ -1,0 +1,29 @@
+[
+  {
+    "code": "L01",
+    "id": "clear-marine",
+    "title": "Clear marine water",
+    "image": "assets/devonian/reference/lighting/clear-marine.webp",
+    "sourceSHA256": "84608e414bec7f5043071163633a8f2ca04ff7270566db35f0e297dc77d3cfa2",
+    "modelStatus": "preview",
+    "notes": "Imagegen lighting concept based on actual model portrait and regional board. Not an engine-render validation, exact anatomy reference or co-occurrence claim."
+  },
+  {
+    "code": "L02",
+    "id": "suspended-sediment",
+    "title": "Suspended-sediment water",
+    "image": "assets/devonian/reference/lighting/suspended-sediment.webp",
+    "sourceSHA256": "2143c135e46841be96ebd960293cff9797d4af2bb6d7c4afcd5c17a36c526106",
+    "modelStatus": "preview",
+    "notes": "Imagegen lighting concept based on actual model portrait and regional board. Not an engine-render validation, exact anatomy reference or co-occurrence claim."
+  },
+  {
+    "code": "L03",
+    "id": "shallow-wooded",
+    "title": "Shallow wooded waterway",
+    "image": "assets/devonian/reference/lighting/shallow-wooded.webp",
+    "sourceSHA256": "ff767645ccb1e8c7a1c47c6d306b62916db71d6c98c9b2875273023bd8284315",
+    "modelStatus": "preview",
+    "notes": "Imagegen lighting concept based on actual model portrait and regional board. Not an engine-render validation, exact anatomy reference or co-occurrence claim."
+  }
+]

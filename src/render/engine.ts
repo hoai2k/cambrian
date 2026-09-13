@@ -3,30 +3,39 @@ import { BURROWERS, hideLabel } from '../sim/concealment';
 import * as THREE from 'three';
 import { audio, SAMPLES } from '../audio/audio';
 import { distanceAtten, HUGE_LENGTH } from '../audio/mix';
-import { emptyControls, gamepads, KeyboardInput, readGamepad, rumble, type RawControls } from '../input/input';
+import { applyMouse, emptyControls, gamepads, KeyboardInput, MouseLook, readGamepad, rumble, type RawControls } from '../input/input';
 import { clamp, damp, TAU, wrapAngle } from '../shared/math';
 import { bandOf, isAlive, isHidden, lengthOf } from '../sim/actors';
 import { creature, type CreatureId } from '../sim/creatures';
-import { Game, type ScoreHeader, type ScoreRow, type TeleportDest } from '../sim/game';
-import { BAND_COLOR, emptyInput, TIER_NAMES, TIER_NEED, type Actor, type Band, type InputFrame, type Mode, type PlayerSetup } from '../sim/types';
-import { BIOME_NAMES, biomeAt, groundHeight, nurseryAt, resolveStatic, SURFACE_Y, type Biome, type Boulder, type LandmarkKind } from '../sim/world';
+import { CORPSE_WINDOW, DEATH_FADE, Game, radarRange as radarReach, type GripHud, type ScoreHeader, type ScoreRow, type TeleportDest } from '../sim/game';
+import type { Phase } from '../sim/daynight';
+import { BAND_COLOR, emptyInput, isCoop, TIER_NAMES, TIER_NEED, type Actor, type Band, type InputFrame, type Mode, type PlayerSetup } from '../sim/types';
+import { recordStep, recordingPhase } from '../app/debug-record';
+import { BIOME_NAMES, biomeAt, groundHeight, nurseryAt, sampleHeight, SURFACE_Y, type Biome, type Boulder, type LandmarkKind } from '../sim/world';
 import { AssetQueue, type AssetProgress } from './assets';
+import { fillOf, ladderName } from '../sim/ladder';
 import { CreatureView, ensureLoaded, loadedSync, type Lod } from './creature';
+import { Edges } from '../shared/edges';
 import { Attachments } from './attachments';
 import { Bubbles, Impacts, Silt, Splash } from './fx';
+import { Eggs } from './eggs';
 import { Mouthfuls } from './carcass';
 import { createSea, type Quality, type SeaEnvironment } from './sea';
 import { RULES, type EraHud } from '../sim/era-rules';
+import { key as controlKey, schemeForDevice, type Scheme } from '../shared/controls';
 
 export interface Rect { x: number; y: number; w: number; h: number; }
 export interface PlayerHud {
   index: number; creature: CreatureId; color: string; alive: boolean;
+  /** What this player is holding, so every prompt on their half of the screen names their buttons. */
+  scheme: Scheme;
   hp: number; hpMax: number; stamina: number; staminaMax: number; exhausted: boolean;
   tier: number; tierName: string; progress: number; scale: number;
   abilityName: string; abilityReady: number; abilityActive: boolean; abilityUnlocked: boolean;
-  senseReady: number;
   lock?: { name: string; kind?: string; band: Band; hp: number; color: string };
-  aim?: { hasTarget: boolean; inRange: boolean; name?: string; color: string; ready: boolean };
+  aim?: { hasTarget: boolean; inRange: boolean; name?: string; color: string; ready: boolean; /** What RT does for this creature: POUNCE, or the special's own name. */ action: string };
+  /** Sense is on: the band glyphs and the radar are drawn. */
+  senseOn: boolean;
   hunted: number; hunterAngle: number | null; hunterName?: string; hunterState: 'none' | 'noticed' | 'hunting'; inCover: boolean; still: boolean;
   hint?: string; respawnIn: number; fade: number; state: string; modelReady: boolean; kills: number; eats: number; escapes: number; protect: boolean;
   /**
@@ -39,25 +48,51 @@ export interface PlayerHud {
   downedAllies: { index: number; name: string; color: string; seconds: number; distance: number; x: number; y: number; progress: number }[];
   /** Versus: whose viewport this one is borrowing while dead. */
   spectating?: { index: number; name: string; color: string; creature: CreatureId };
+  /**
+   * What happened, while this player is dead: whether they were swallowed or simply killed, and
+   * who by, for the line of text that plays over the watch.
+   */
+  death?: { eaten: boolean; by?: string };
   bandMarkers: { x: number; y: number; band: Band; size: number }[];
   /** Dominant biome under the player. */
   biome: string;
+  /** The hour of the day, for the dial above the radar. */
+  day: { phase: Phase; until: number; pressure: number };
   /** Radar contacts in radar space (x right, y down, unit circle = the radar's reach); `beyond` contacts are clamped to the rim. */
   radar: { range: number; blips: RadarBlipHud[] };
   /** The teleport menu, while open. */
   teleport?: { options: { label: string; detail: string; distance: number; dest: TeleportDest }[]; index: number; cooldown: number };
+  /** The change-creature page of that menu, while it is open. */
+  swap?: { name: string; kind?: string; creature: CreatureId; rung: string; fill: number; kept: boolean; grown: boolean; count: number; index: number };
   /** The scoreboard, while the View button is held. */
   board?: { header: ScoreHeader; rows: ScoreRow[] };
   /** A short line from the simulation: a hand-over, a rescue. Outlives one frame. */
   notice?: string;
+  /** What this player has hold of, while they have hold of anything. */
+  grip?: GripHud;
   /** The era's own meters (Devonian standing, air, range), when the era defines them. */
   era?: EraHud;
 }
-export interface RadarBlipHud { x: number; y: number; kind: 'player' | 'threat' | 'giant' | 'home' | 'shore' | 'deadzone' | 'food' | 'landmark'; color: string; beyond: boolean; hunting: boolean; distance: number; /** Radius in radar units, for area contacts. */ r?: number; }
+export interface RadarBlipHud {
+  x: number; y: number; kind: 'player' | 'threat' | 'giant' | 'home' | 'shore' | 'deadzone' | 'food' | 'landmark' | 'territory';
+  color: string; beyond: boolean; hunting: boolean; distance: number;
+  /** Radius in radar units, for area contacts. */
+  r?: number;
+  /**
+   * Whether the contact is well above or below the viewer, for contacts where that is a real
+   * difference (creatures and shoals). A dial seen from overhead cannot show height, so the marks
+   * carry it themselves: what is above you is what you look up for.
+   */
+  level?: 'above' | 'below';
+}
 export interface HudSnapshot {
   players: PlayerHud[]; rects: Rect[]; time: number; status: 'playing' | 'won' | 'lost'; message: string; mode: Mode; winner: number; fps: number;
+  /** This match is over but its mode is co-op, so the results screen can offer to carry on. */
+  canContinue: boolean;
   /** What this match turned up, for the results screen's record. */
-  discovery: { biomes: Biome[]; landmarks: LandmarkKind[]; apex: CreatureId[] };
+  discovery: { biomes: Biome[]; landmarks: LandmarkKind[]; apex: CreatureId[]; best: Partial<Record<CreatureId, number>> };
+  /** The hour of the day: what it is, how long until it turns, and how much the reef is hunting. */
+  day: { phase: Phase; until: number; pressure: number };
 }
 export interface EngineCallbacks {
   onHud(s: HudSnapshot): void;
@@ -65,14 +100,25 @@ export interface EngineCallbacks {
   onError(msg: string): void;
   onLoaded(): void;
   onProgress?(p: AssetProgress): void;
+  /** The pointer lock went away on its own (Escape, alt-tab). The match should pause. */
+  onPointerLost?(): void;
 }
 
 export const PLAYER_COLORS = ['#61f2d5', '#ffb457', '#c7a3ff', '#ff86a4'];
 
 interface CamState { showBoard: boolean; yaw: number; pitch: number; zoom: number; fade: number; aimBlend: number; aimTarget: number; aimSnapT: number; pos: THREE.Vector3; look: THREE.Vector3; shake: number; camera: THREE.PerspectiveCamera; lockBlend: number; lastPos: THREE.Vector3; frustum: THREE.Frustum; projScreen: THREE.Matrix4; tele: TeleMenu; }
 /** Per-player teleport menu state: opened with D-pad down, steered with the D-pad or stick, A confirms, B closes. */
-interface TeleMenu { open: boolean; index: number; prev: { teleport: boolean; up: boolean; down: boolean; confirm: boolean; back: boolean }; }
-const freshTele = (): TeleMenu => ({ open: false, index: 0, prev: { teleport: false, up: false, down: false, confirm: false, back: false } });
+/**
+ * The D-pad-down menu. A list of places to go, plus one entry that opens a second page: the roster,
+ * to change which animal you are. `swap` is that page — the index into `Game.swapOptions` and
+ * whether a creature you have never worn would hatch grown or newborn.
+ */
+interface TeleMenu {
+  open: boolean; index: number;
+  swap: { open: boolean; index: number; grown: boolean };
+  edges: Edges;
+}
+const freshTele = (): TeleMenu => ({ open: false, index: 0, swap: { open: false, index: 0, grown: false }, edges: new Edges() });
 
 /** Magnification levels (see docs/redesign/01-game-design.md · Magnification). */
 export const MAGNIFICATION = [
@@ -89,6 +135,9 @@ export const distanceHaze = (d: number, far: number) => THREE.MathUtils.smoothst
 /** Something hunting you keeps most of its presence, however far off: the warning has to read. */
 export const HUNTER_HAZE = 0.4;
 
+/** Radar colour for a shoal in the water above you, against the snack green of one on the floor. */
+export const FOOD_ABOVE = '#9ec2ff';
+
 /** Follow-camera distance for a body length: about two body lengths back plus a floor so larvae are still readable. */
 export const magnificationDistance = (L: number) => L * 1.45 + 1.15 + Math.max(0, 0.8 - L) * 0.9;
 
@@ -102,13 +151,69 @@ export const magnificationDistance = (L: number) => L * 1.45 + 1.15 + Math.max(0
  * camera is being aimed deliberately up or down, so its pitch eases in and takes over completely
  * by FULL_PITCH.
  */
-const FLAT_PITCH = 0.45;   // ~26°, comfortably above a resting follow camera (which sits at ~11-25°)
-const FULL_PITCH = 1.0;    // ~57°, by which the camera is clearly being pointed somewhere
+/**
+ * How far the camera may be aimed. Up is what matters for a swimmer: the water above you is where
+ * the thing that eats you comes from, so the view has to reach it. Down goes almost overhead, which
+ * is how you read the floor for prey while swimming over it.
+ */
+/**
+ * How close to the sand the camera may sit, and the shortest arm it will pull in to, in body
+ * lengths — short enough to clear the floor at a steep angle, long enough to stay outside the
+ * animal rather than inside its own ribs.
+ */
+const CAMERA_SAND = 0.45, CAMERA_CLOSE = 0.9;
+
+/**
+ * Fit the camera onto its arm with the seabed in the way.
+ *
+ * Aiming up from the floor asks for a camera below the creature, which is under the sand. Two
+ * answers, in order: shorten the arm, which clears the floor at the same angle and only brings the
+ * creature closer; and, when even the shortest arm is still buried, lift the whole rig. `lift` is
+ * how far it had to go, and the caller moves the look point by the same amount, so the view keeps
+ * the angle the player gave it instead of being levelled off into the seabed.
+ *
+ * `sandAt` returns the height the camera may not go below for an arm of that length (it moves the
+ * camera as a side effect in the renderer, which is why the fit is written against a callback).
+ */
+export function fitCameraArm(baseY: number, pitch: number, dist: number, minDist: number, sandAt: (d: number) => number, ceiling: number): { dist: number; y: number; lift: number } {
+  const rise = -Math.sin(pitch);
+  let d = dist, y = baseY + Math.sin(pitch) * d;
+  if (rise > 0.05) for (let i = 0; i < 4; i++) {
+    const floor = sandAt(d);
+    if (y >= floor) break;
+    d = Math.max(minDist, d - (floor - y) / rise);
+    y = baseY + Math.sin(pitch) * d;
+  }
+  const clamped = clamp(y, sandAt(d), ceiling);
+  return { dist: d, y: clamped, lift: clamped - y };
+}
+export const PITCH_UP = -0.95;   // ~54° above the horizon
+export const PITCH_DOWN = 1.32;  // ~76° below it, near enough straight down at the seabed
+/**
+ * How much of the camera's tilt the body swims along.
+ *
+ * The camera is not a joystick. A follow camera at rest already sits 11-25° below the horizon, so
+ * reading its pitch straight off would have every body drifting at the seabed whenever the player
+ * did nothing but hold forward. That is what the flat slice around level is for.
+ *
+ * It only ever needed to be on the *downward* side, though: nobody's camera rests above the
+ * horizon, so looking up is always deliberate. Ignoring 26° of it in both directions and then
+ * squashing what was left through a smoothstep that clamped at 40° meant aiming up at something
+ * and swimming went almost nowhere — 26° of camera bought 0°, 34° bought 6° — and the top of the
+ * camera's own travel could not be reached at any tilt. Past its own slice each side is linear
+ * onto the camera's real angle now, so the end of the camera's travel is the angle you are looking
+ * along, and pointing at prey and swimming goes at it.
+ */
+const FLAT_DOWN = 0.45;   // ~26°, comfortably below a resting follow camera (which sits at ~11-25°)
+const FLAT_UP = 0.10;     // ~6°: nothing rests above the horizon, so only the noise comes out
 
 export function swimPitch(pitch: number): number {
+  const up = pitch < 0;
+  const flat = up ? FLAT_UP : FLAT_DOWN;
   const mag = Math.abs(pitch);
-  const t = clamp((mag - FLAT_PITCH) / (FULL_PITCH - FLAT_PITCH), 0, 1);
-  return clamp(Math.sign(pitch) * mag * (t * t * (3 - 2 * t)), -0.7, 0.7);
+  if (mag <= flat) return 0;
+  const limit = up ? -PITCH_UP : PITCH_DOWN;
+  return Math.sign(pitch) * limit * Math.min(1, (mag - flat) / (limit - flat));
 }
 
 export function layoutRects(n: number, w: number, h: number): Rect[] {
@@ -138,7 +243,21 @@ export class Engine {
   private impacts = new Impacts();
   private splash = new Splash(SURFACE_Y);
   private silt = new Silt();
+  private eggs = new Eggs();
   private keyboard = new KeyboardInput();
+  private mouse = new MouseLook();
+  /**
+   * Whether the mouse is steering the camera. Decided once per match, at `startMatch`: with no
+   * controller anywhere the game is a mouse-and-keyboard game, and with even one pad in the
+   * session the pads own it and the mouse stays a pointer.
+   */
+  private mouseLook = false;
+  /**
+   * Whether the match still wants the pointer. Distinct from `mouseLook`, which only says the
+   * match is being played on a mouse: the lock also has to come off while paused, in a dialog and
+   * on the results screen, all of which are places the player needs a cursor back.
+   */
+  private pointerWanted = false;
   private setups: PlayerSetup[] = [];
   private raf = 0;
   private last = performance.now();
@@ -147,7 +266,8 @@ export class Engine {
   private disposed = false;
   private paused = false;
   private hudT = 0;
-  private prevMenu = new Map<string, boolean>();
+  /** The pause button, per device: `onMenu` fires on the press, never on the hold. */
+  private menuEdges = new Map<string, Edges>();
   private fps = 60; private fpsFrames = 0; private fpsT = 0;
   private resize: ResizeObserver;
   private scratchBoulders: Boulder[] = [];
@@ -176,7 +296,11 @@ export class Engine {
     // Split-screen renders the scene once per player; without this the shadow map is rebuilt every time.
     this.renderer.shadowMap.autoUpdate = false;
     container.appendChild(this.renderer.domElement);
-    this.scene.add(this.bubbles.points, this.sparkles.points, this.impacts.group, this.silt.group, this.splash.group, this.mouthfuls.group);
+    // The mouse is attached to the canvas host, not the canvas: the canvas is torn down and rebuilt
+    // when quality changes, and the pointer lock has to survive that.
+    this.mouse.attach(container);
+    this.mouse.onLost = () => this.cb.onPointerLost?.();
+    this.scene.add(this.bubbles.points, this.sparkles.points, this.impacts.group, this.silt.group, this.splash.group, this.mouthfuls.group, this.eggs.group);
     (window as any).__cambrian = this;
     this.resize = new ResizeObserver(() => this.onResize());
     this.resize.observe(container);
@@ -211,7 +335,23 @@ export class Engine {
     this.onResize();
   }
   setLook(speed: number, invert: boolean) { this.lookSpeed = speed; this.invertY = invert; }
-  setPaused(p: boolean) { this.paused = p; }
+  setPaused(p: boolean) { this.paused = p; this.syncPointer(); }
+  private syncPointer() { this.mouse.want(this.pointerWanted && !this.paused && !this.attract); }
+  /** The match is over but the sea keeps running behind the results: give the cursor back. */
+  releasePointer() { this.pointerWanted = false; this.syncPointer(); }
+  /** Whether this match is being played on mouse and keyboard, so the HUD can name the buttons. */
+  get usingMouse() { return this.mouseLook; }
+
+  /**
+   * Carry a finished co-op match on rather than restarting it: same world, same bodies, same
+   * progress, with the mode's goal no longer watching. Returns whether the match resumed.
+   */
+  continueMatch(): boolean {
+    const ok = this.game?.continueMatch() ?? false;
+    // Back into the sea, so the pointer comes back with it (the results screen gave it up).
+    if (ok) { this.pointerWanted = this.mouseLook; this.syncPointer(); }
+    return ok;
+  }
   get isAttract() { return this.attract; }
 
   /** Background ecosystem for the title / select screens. */
@@ -219,6 +359,9 @@ export class Engine {
     this.generation++;
     this.clearMatch();
     this.attract = true;
+    this.mouseLook = false;
+    this.pointerWanted = false;
+    this.mouse.want(false);
     this.setups = [];
     this.game = new Game('reef', []);
     this.sea?.dispose();
@@ -247,23 +390,34 @@ export class Engine {
       return cs;
     });
     this.paused = false;
+    // Mouse and keyboard, or pads. Not both: a session with a controller in it is a controller
+    // game, and stealing the pointer there would only take the cursor away from the other player.
+    this.mouseLook = gamepads().length === 0 && !setups.some((s) => typeof s.device === 'number');
+    this.pointerWanted = this.mouseLook;
+    this.syncPointer();
     // The button that started the match is almost certainly still held right now. Seed the menu
     // edge from what each device reads at this instant, or the first frame sees Start down with
     // no previous state, calls it a fresh press, and pauses the match the moment it begins.
-    this.prevMenu.clear();
-    for (const s of setups) this.prevMenu.set(String(s.device), this.controlsFor(s, 0).menu);
+    // Seed each device with whatever it is holding right now, so the button that started the match
+    // is not read as a press to pause it.
+    this.menuEdges.clear();
+    for (const s of setups) { const e = new Edges(); e.step({ menu: this.controlsFor(s, 0).menu }); this.menuEdges.set(String(s.device), e); }
     audio.play('ui-start');
   }
 
   private clearMatch() {
     for (const v of this.views.values()) v.dispose();
     this.views.clear(); this.attachments.clear();
+    this.eggs.dispose();
     this.cams = [];
     this.game = undefined;
   }
 
   private controlsFor(setup: PlayerSetup, index: number): RawControls {
-    if (setup.device === 'keyboard') return this.keyboard.read(1);
+    if (setup.device === 'keyboard') {
+      const c = this.keyboard.read(1);
+      return this.mouseLook ? applyMouse(c, this.mouse.read()) : c;
+    }
     if (setup.device === 'keyboard2') return this.keyboard.read(2);
     const gp = navigator.getGamepads?.()[setup.device];
     if (!gp || !gp.connected) return emptyControls();
@@ -302,9 +456,9 @@ export class Engine {
       this.setups.forEach((s, i) => {
         const c = this.controlsFor(s, i);
         const key = String(s.device);
-        const prevMenu = this.prevMenu.get(key) ?? false;
-        if (c.menu && !prevMenu) this.cb.onMenu(i);
-        this.prevMenu.set(key, c.menu);
+        let edges = this.menuEdges.get(key);
+        if (!edges) this.menuEdges.set(key, (edges = new Edges()));
+        if (edges.step({ menu: c.menu }).menu) this.cb.onMenu(i);
         const p = game.players[i];
         const menuOpen = running && p ? this.updateTeleMenu(game, i, c) : false;
         // While the teleport menu is up the creature drifts: A and B belong to the menu.
@@ -320,10 +474,16 @@ export class Engine {
             // Right stick pressed in: up/down zooms instead of pitching.
             cs.zoom = clamp(cs.zoom * Math.exp(c.lookY * dt * 1.6), 0.55, 2.2);
           } else {
-            cs.yaw = wrapAngle(cs.yaw - c.lookX * dt * 2.6 * this.lookSpeed);
-            cs.pitch = clamp(cs.pitch + c.lookY * dt * 1.6 * this.lookSpeed * (this.invertY ? -1 : 1), -0.55, 1.15);
-            if (Math.abs(c.lookY) < 0.05) cs.pitch = damp(cs.pitch, 0.2, 0.6, dt);
+            // A stick is a rate and the mouse is a distance, so the stick term is scaled by the
+            // frame time and the mouse term is not; one of the two is always zero.
+            cs.yaw = wrapAngle(cs.yaw - (c.lookX * dt * 2.6 + c.lookDX) * this.lookSpeed);
+            cs.pitch = clamp(cs.pitch + (c.lookY * dt * 1.6 + c.lookDY) * this.lookSpeed * (this.invertY ? -1 : 1), PITCH_UP, PITCH_DOWN);
+            // Pitch drifts back to level when a stick is let go, which is what makes a pad feel
+            // like it is swimming for you. A mouse holds where it was put: the same drift there
+            // would fight the hand every frame.
+            if (!this.mouseLook && Math.abs(c.lookY) < 0.05) cs.pitch = damp(cs.pitch, 0.2, 0.6, dt);
           }
+          if (c.zoomDelta) cs.zoom = clamp(cs.zoom * Math.exp(c.zoomDelta), 0.55, 2.2);
         }
       });
     }
@@ -333,7 +493,16 @@ export class Engine {
     if (running) {
       this.acc += dt;
       let steps = 0;
-      while (this.acc >= 1 / 60 && steps < 3) { game.step(1 / 60, inputs); this.acc -= 1 / 60; steps++; }
+      while (this.acc >= 1 / 60 && steps < 3) {
+        game.step(1 / 60, inputs);
+        // The match recorder (`?debug=game`), after the step so it sees what the step decided. It
+        // is a no-op unless a recording is running, and it never writes to the simulation.
+        if (recordingPhase() === 'recording') {
+          const me = game.players[0];
+          if (me) recordStep(game, me, inputs.get(0) ?? emptyInput(), game.events);
+        }
+        this.acc -= 1 / 60; steps++;
+      }
       if (steps === 3) this.acc = 0;
       // How far this frame sits past the last completed step. The renderer interpolates across it,
       // so a display refreshing at 144 Hz shows smooth motion rather than each 60 Hz step held for
@@ -363,7 +532,7 @@ export class Engine {
     }
     const focus = camPositions.length ? camPositions[0] : this.lastFocus;
     this.lastFocus.copy(focus);
-    this.sea?.update(this.time, dt, focus, camPositions);
+    this.sea?.update(this.time, dt, focus, camPositions, this.attract ? undefined : game.time);
     // Tell the music where the first player is; a biome with a track of its own cues it.
     const listener = game.players[0];
     if (listener && !this.attract) audio.setBiome(biomeAt(listener.pos.x, listener.pos.z));
@@ -371,6 +540,7 @@ export class Engine {
     // Views
     this.syncViews(game, camPositions, dt);
     this.bubbles.update(dt); this.sparkles.update(dt); this.splash.update(dt); this.mouthfuls.update(dt);
+    this.eggs.update(game.actors, dt);
     this.impacts.update(dt, focus);
     this.silt.sync(game.silt, this.time);
 
@@ -421,25 +591,60 @@ export class Engine {
    */
   private updateTeleMenu(game: Game, i: number, c: RawControls): boolean {
     const cs = this.cams[i]; if (!cs) return false;
-    const t = cs.tele, prev = t.prev;
+    const t = cs.tele, edges = t.edges;
     const p = game.players[i];
-    const justTele = c.teleport && !prev.teleport;
-    const up = c.dup || c.my > 0.6, down = c.ddown || c.my < -0.6;
-    const justUp = up && !prev.up, justDown = down && !prev.down;
-    const justConfirm = c.confirm && !prev.confirm, justBack = c.back && !prev.back;
-    prev.teleport = c.teleport; prev.up = up; prev.down = down; prev.confirm = c.confirm; prev.back = c.back;
+    // One list, not two: `Edges` remembers what it was handed, so a control cannot be added to the
+    // reading and forgotten in the remembering — which used to leave that button held forever.
+    const { teleport: justTele, up: justUp, down: justDown, left: justLeft, right: justRight,
+            confirm: justConfirm, back: justBack, ability: justAbility } = edges.step({
+      teleport: c.teleport,
+      up: c.dup || c.my > 0.6, down: c.ddown || c.my < -0.6,
+      left: c.dleft || c.mx < -0.6, right: c.dright || c.mx > 0.6,
+      confirm: c.confirm, back: c.back, ability: c.ability,
+    });
     if (justTele && !t.open) {
       // D-pad down opens it; once open the same button steps down the list
-      if (isAlive(p) && (p.state === 'free' || p.state === 'guard')) { t.open = true; t.index = 0; prev.confirm = true; prev.down = true; audio.play('ui-confirm'); }
+      if (isAlive(p) && (p.state === 'free' || p.state === 'guard')) { t.open = true; t.index = 0; t.swap.open = false; edges.hold('confirm', 'down'); audio.play('ui-confirm'); }
       return t.open;
     }
     if (!t.open) return false;
-    if (!isAlive(p)) { t.open = false; return false; }
+    if (!isAlive(p)) { t.open = false; t.swap.open = false; return false; }
+
+    // ---- the change-creature page ----
+    if (t.swap.open) {
+      const roster = game.swapOptions(i, t.swap.grown);
+      if (!roster.length) { t.swap.open = false; return true; }
+      const step = (d: number) => { t.swap.index = (t.swap.index + d + roster.length) % roster.length; audio.play('ui-move'); };
+      if (justRight) step(1);
+      if (justLeft) step(-1);
+      // Y flips how an animal you have never worn would arrive. One you have is handed back as you
+      // left it either way, so the flip is a preview of a fresh start, not of your own progress.
+      if (justAbility) { t.swap.grown = !t.swap.grown; audio.play('ui-move'); }
+      if (justBack) { t.swap.open = false; audio.play('ui-back'); return true; }
+      if (justConfirm) {
+        const pick = roster[t.swap.index];
+        if (pick && !pick.current && game.changeCreature(i, pick.id, t.swap.grown)) { t.open = false; t.swap.open = false; audio.play('ui-start'); return false; }
+        audio.play('ui-back');
+        return true;
+      }
+      // Browsing loads the body you are looking at, so committing to it is not a wait.
+      const ahead = roster[t.swap.index];
+      if (ahead) void ensureLoaded(ahead.id, undefined, 0);
+      return true;
+    }
+
     const options = game.teleportOptions(i);
-    if (justUp) { t.index = (t.index + options.length - 1) % options.length; audio.play('ui-move'); }
-    if (justDown || justTele) { t.index = (t.index + 1) % options.length; audio.play('ui-move'); }
+    // One entry past the destinations opens the roster instead of going anywhere.
+    const count = options.length + 1;
+    if (justUp) { t.index = (t.index + count - 1) % count; audio.play('ui-move'); }
+    if (justDown || justTele) { t.index = (t.index + 1) % count; audio.play('ui-move'); }
     if (justBack) { t.open = false; audio.play('ui-back'); return false; }
     if (justConfirm) {
+      if (t.index >= options.length) {
+        t.swap.open = true; t.swap.index = 0; t.swap.grown = false;
+        audio.play('ui-confirm');
+        return true;
+      }
       const opt = options[t.index];
       if (opt && game.teleport(i, opt.dest)) { t.open = false; audio.play('ui-start'); }
       else audio.play('ui-back');
@@ -452,6 +657,16 @@ export class Engine {
    * Aim mode. The crosshair is the screen centre; whatever prey it is over (nearest to the camera
    * forward ray, inside range) becomes the target. Entering aim snaps the camera onto the best
    * candidate once, the way a console aim-assist does; after that the right stick steers freely.
+   */
+  /**
+   * Who the aim button is pointing at: whatever sits closest to the camera's forward axis, inside a
+   * cone that is wide on entry (the snap) and tight afterwards.
+   *
+   * The axis *is* the middle of the viewport, and the crosshair is drawn there (`.aim`, at
+   * left/top 50%). That equivalence is the contract that lets sense off take the crosshair away
+   * with nothing lost: with no reticle drawn, the centre of the camera is the implied aim point,
+   * and it is the real one. Anything that moves the crosshair off centre, or picks a target from
+   * somewhere other than `fwd`, breaks the immersive view as well as the readout.
    */
   private updateAim(cs: CamState, p: Actor | undefined, aiming: boolean, dt: number) {
     if (!p || !this.game) { cs.aimBlend = 0; cs.aimTarget = -1; return; }
@@ -485,7 +700,7 @@ export class Engine {
       if (cs.aimSnapT > 0) {
         // ease the camera onto the target
         const dx = best.pos.x - cs.camera.position.x, dy = best.pos.y - cs.camera.position.y, dz = best.pos.z - cs.camera.position.z;
-        const ty = Math.atan2(dx, dz), tp = clamp(Math.atan2(-dy, Math.hypot(dx, dz)) + 0.12, -0.55, 1.15);
+        const ty = Math.atan2(dx, dz), tp = clamp(Math.atan2(-dy, Math.hypot(dx, dz)) + 0.12, PITCH_UP, PITCH_DOWN);
         const k = 1 - Math.exp(-14 * dt);
         cs.yaw = wrapAngle(cs.yaw + wrapAngle(ty - cs.yaw) * k);
         cs.pitch += (tp - cs.pitch) * k;
@@ -534,23 +749,32 @@ export class Engine {
     // Magnification: camera distance and framing scale with body length so the world re-reads at every tier.
     let dist = magnificationDistance(L) * cs.zoom * (1 - 0.3 * cs.aimBlend);
     if (p.state === 'dead') dist *= 1.5;
+    // In the egg the animal is a fraction of its hatched size and the camera would be pressed
+    // against the shell. Frame the egg instead, and ease back in as the body comes out of it.
+    if (p.hatching && p.state === 'moult' && p.stateDur > 1.5) dist *= 1 + 0.9 * (1 - Math.min(1, p.stateT / p.stateDur / 0.85));
     if (p.hunted > 0.5) dist *= 0.85;
     // Snap in behind the creature when it teleports (respawn), otherwise keep the player's framing.
     const jumped = cs.lastPos.distanceTo(pp) > 20;
     cs.lastPos.copy(pp);
     if (jumped) { cs.yaw = p.yaw; cs.fade = 1; }
-    // Eaten: ride along with the predator from the same angle until the respawn.
-    const pred = (p.state === 'swallowed' || (p.state === 'dead' && p.swallowedBy >= 0)) ? this.game!.byId(p.swallowedBy) : undefined;
+    // Eaten: ride along with the predator, from the same angle, until the respawn — you are inside
+    // it, so it is where you are. Killed any other way, the shot stays on your own body drifting
+    // up: whatever landed the blow has moved on, and following it would be a camera nobody asked
+    // for. The line of text still names it either way.
+    const pred = p.state === 'swallowed' || (p.state === 'dead' && p.swallowedBy >= 0) ? this.game!.byId(p.swallowedBy) : undefined;
     const lookAt = pred
       ? this.renderPos(pred, this.tmpLook).setY(this.tmpLook.y + lengthOf(pred) * 0.1)
       : this.tmpLook.set(pp.x, pp.y + L * 0.15, pp.z);
     if (pred) dist = magnificationDistance(lengthOf(pred)) * cs.zoom * 0.85;
     // Fade to black just before the respawn, and in again just after. Always the real player's
     // own death, never the spectated one's: this viewport's owner is the one coming back.
+    // Fade to black over the last moment before the respawn, and in again slowly on the new body:
+    // the watch is the point, so the black is a curtain at the end of it rather than a cut. Always
+    // the real player's own death, never the spectated one's: this viewport's owner is coming back.
     const dying = p0.state === 'dead' || p0.state === 'swallowed';
-    const respawnAt = this.game!.reviveWindow(p0) ? Infinity : 2.6;   // a downed player waiting on an ally never fades out
+    const respawnAt = this.game!.reviveWindow(p0) ? Infinity : CORPSE_WINDOW - DEATH_FADE;   // a downed player waiting on an ally never fades out
     const fadeTarget = dying && (p0.state === 'dead' ? p0.respawnT : p0.stateT) > (p0.state === 'dead' ? respawnAt : 99) ? 1 : 0;
-    cs.fade = damp(cs.fade, fadeTarget, fadeTarget > cs.fade ? 6 : 4, dt);
+    cs.fade = damp(cs.fade, fadeTarget, fadeTarget > cs.fade ? 4 : 1.5, dt);
     if (locked && target) {
       const tp = this.renderPos(target, this.tmpPred);
       const dx = tp.x - pp.x, dz = tp.z - pp.z;
@@ -570,17 +794,26 @@ export class Engine {
       lookAt.y += L * 0.1 * cs.aimBlend;
     }
     const pitch = cs.pitch + (locked ? 0.1 : 0) + (def.ground ? 0.12 : 0);
-    const desired = this.tmpDesired.set(
-      lookAt.x - Math.sin(yaw) * Math.cos(pitch) * dist,
-      lookAt.y + Math.sin(pitch) * dist + L * 0.18,
-      lookAt.z - Math.cos(yaw) * Math.cos(pitch) * dist,
+    const place = (d: number) => this.tmpDesired.set(
+      lookAt.x - Math.sin(yaw) * Math.cos(pitch) * d,
+      lookAt.y + Math.sin(pitch) * d + L * 0.18,
+      lookAt.z - Math.cos(yaw) * Math.cos(pitch) * d,
     );
-    // keep camera out of the ground and boulders, and below the surface unless the player has left the water
-    const g = groundHeight(this.game!.world, desired.x, desired.z, this.scratchBoulders);
-    desired.y = clamp(desired.y, g + 0.7, p.airborne ? SURFACE_Y + 40 : SURFACE_Y - 0.4);
-    const pos = { x: desired.x, y: desired.y, z: desired.z };
-    resolveStatic(this.game!.world, pos, 0.7, this.scratchBoulders);
-    desired.set(pos.x, pos.y, pos.z);
+    const desired = place(dist);
+    // The sand is the only thing the camera cannot be inside. A rock is not: shoving the camera
+    // sideways out of a boulder, or lifting it onto one, throws the shot away for scenery, and a
+    // camera *inside* a rock simply sees out of it — the far side of a closed mesh is not drawn —
+    // so it passes through and keeps looking at the creature. Hence the sand itself here, and not
+    // `groundHeight`, which counts boulder tops as floor.
+    const fit = fitCameraArm(lookAt.y + L * 0.18, pitch, dist, L * CAMERA_CLOSE,
+      (d) => { place(d); return sampleHeight(desired.x, desired.z) + CAMERA_SAND; },
+      p.airborne ? SURFACE_Y + 40 : SURFACE_Y - 0.4);
+    place(fit.dist);
+    desired.y = fit.y;
+    // The rig had to be lifted off its arm, so the look point goes with it rather than the view
+    // tipping flat: you see *past* your own creature into the water above, which is the whole point
+    // of aiming up from the floor. Not while locked on — there the target is the shot.
+    if (!locked) lookAt.y += clamp(fit.lift, -L * 1.5, L * 1.5);
     const k = jumped ? 1 : p.state === 'dodge' ? 5 : 7;
     if (jumped) { cs.pos.copy(desired); cs.look.copy(lookAt); }
     else { cs.pos.lerp(desired, 1 - Math.exp(-k * dt)); cs.look.lerp(lookAt, 1 - Math.exp(-10 * dt)); }
@@ -607,15 +840,31 @@ export class Engine {
     }
     candidates.sort((x, y) => y.size - x.size);
     const cap = Math.round((this.quality === 'high' ? 88 : 56) / (0.6 + 0.4 * players));
-    let count = 0;
+    // Full-detail bodies are the most expensive thing in the frame — they are skinned on the CPU
+    // and drawn again into the shadow map, once per viewport — and how expensive depends entirely
+    // on the era: a Devonian placoderm is 105k triangles where a Cambrian arthropod is 55k, and
+    // one of its trilobites is 516k. Apparent size alone therefore buys wildly different frame
+    // costs in the two eras, which is why the Devonian ran heavy. So spend a triangle budget
+    // instead: biggest-on-screen first, everything past it takes the decimated copy.
+    const budget = (this.quality === 'high' ? 700_000 : 320_000) / (0.6 + 0.4 * players);
+    let spent = 0, count = 0;
     for (const { a, d } of candidates) {
       if (count >= cap && a.controller !== 'player') break;
       // Pick a detail level from apparent size, with hysteresis so it cannot flicker at the boundary.
       let v = this.views.get(a.id);
       const size = lengthOf(a) / d;
       let wantLod: Lod = a.controller === 'player' ? 0 : v ? (v.lod === 0 ? (size < 0.05 ? 1 : 0) : (size > 0.075 ? 0 : 1)) : (size < 0.06 ? 1 : 0);
+      // The budget only ever demotes: your own body, and anything already at full detail whose
+      // share is still affordable, keep it.
+      const full = loadedSync(a.creature, 0);
+      if (wantLod === 0 && a.controller !== 'player') {
+        if (full && spent + full.tris > budget) wantLod = 1;
+      }
+      if (wantLod === 0) spent += full?.tris ?? 0;
       if (wantLod === 1 && !loadedSync(a.creature, 1)) { void ensureLoaded(a.creature, undefined, 1); wantLod = 0; }
-      if (v && v.lod !== wantLod) { v.dispose(); this.views.delete(a.id); v = undefined; }
+      // A view is built for one creature at one detail level. Both can change under it: the level
+      // with distance, and the creature itself when a player changes body mid-match.
+      if (v && (v.lod !== wantLod || v.creatureId !== a.creature)) { v.dispose(); this.views.delete(a.id); v = undefined; }
       if (!v) {
         const loaded = loadedSync(a.creature, wantLod);
         if (!loaded) { void ensureLoaded(a.creature, undefined, wantLod); continue; }
@@ -633,14 +882,65 @@ export class Engine {
       const continuous = a.state === 'eating' || a.holdT > 0;
       const animate = continuous || !far || ((a.id + Math.floor(this.time * 60)) % 3 === 0);
       v.update(a, animate && far && !continuous ? dt * 3 : dt, this.time, animate, this.alpha);
+      // Arms that lie along what they are on. Near views only: it is a per-segment solve, and at
+      // any distance the shape it makes is smaller than a pixel.
+      if (v.conforms && d < 26 && animate) {
+        const host = a.rideHost >= 0 ? game.byId(a.rideHost) : undefined;
+        const L = lengthOf(a);
+        const gap = a.pos.y - groundHeight(game.world, a.pos.x, a.pos.z, this.scratchBoulders);
+        // Fade out as it leaves the floor: an arm in open water has nothing to lie on.
+        const weight = host ? 1 : clamp(1 - (gap - L * 0.35) / Math.max(L, 0.4), 0, 1);
+        v.conform({
+          groundAt: (x, z) => groundHeight(game.world, x, z, this.scratchBoulders),
+          clearance: L * 0.06,
+          host: host ? { x: host.pos.x, y: host.pos.y, z: host.pos.z, radius: lengthOf(host) * 0.32 } : undefined,
+        }, weight, dt);
+      }
       // A carcass shows what has been taken out of it, and gets whole again when its owner
       // respawns into the same view.
       if (a.state === 'dead' && a.eatBites > 1 && a.eaten > 0) v.carcass.setEaten(a.eaten);
       else if (a.state !== 'dead' && a.eaten <= 0) v.restoreCarcass();
     }
     this.attachments.sync(game, this.views, dt);
+    this.breathe(game, keep);
     for (const [id, v] of this.views) if (!keep.has(id)) { v.dispose(); this.views.delete(id); }
   }
+
+  /**
+   * Lungs leak when they work. A bag of air inside a body under water shows every time the body
+   * spends itself: what a bimodal animal lets go of the mouth is the effort it just made, so the
+   * bubbles are the stamina bar draining, seen from outside. A sprint streams them, a dash coughs a
+   * handful, and hanging still or climbing — which costs nothing — releases none at all.
+   *
+   * Purely a look, so it lives in the renderer with its own randomness and reads the one creature
+   * flag it needs; nothing in the Cambrian roster breathes both ways, so nothing there emits. Run
+   * after `attachments.sync` so the mouth socket is posed, and skipped at the surface, where the
+   * animal is breathing rather than holding it.
+   */
+  private breathe(game: Game, keep: Set<number>) {
+    for (const [id, v] of this.views) {
+      const a = keep.has(id) ? game.byId(id) : undefined;
+      const breathing = a ? creature(a.creature).breathing : undefined;
+      if (!a || !isAlive(a) || isHidden(a) || (breathing !== 'bimodal' && breathing !== 'air')) { this.breath.delete(id); continue; }
+      const L = lengthOf(a);
+      const prev = this.breath.get(id);
+      this.breath.set(id, { stamina: a.stamina, owed: prev?.owed ?? 0 });
+      // First sight of a body, or a bar that went up (regen, a breath, a respawn): nothing was spent.
+      if (prev == null || a.stamina >= prev.stamina) continue;
+      if (a.pos.y > SURFACE_Y - 3 - L * 0.3) continue;
+      const entry = this.breath.get(id)!;
+      entry.owed = prev.owed + (prev.stamina - a.stamina);
+      // One bubble per few points of effort, so a whole bar vented is a couple of dozen of them.
+      const n = Math.floor(entry.owed / 3.5);
+      if (n < 1) continue;
+      entry.owed -= n * 3.5;
+      const at = v.anchors.world('anchor_mouth', this.tmpV)
+        ? { x: this.tmpV.x, y: this.tmpV.y, z: this.tmpV.z }
+        : { x: a.pos.x + Math.sin(a.yaw) * L * 0.45, y: a.pos.y + L * 0.05, z: a.pos.z + Math.cos(a.yaw) * L * 0.45 };
+      this.bubbles.emit(at, Math.min(12, n), L * 0.1, 0.35, Math.min(0.18, 0.035 + L * 0.03), 1.6 + L * 0.2);
+    }
+  }
+  private breath = new Map<number, { stamina: number; owed: number }>();
 
   /**
    * A mouthful comes off the carcass: the eaten share stops being drawn on the body, and the
@@ -810,7 +1110,11 @@ export class Engine {
         case 'stagger': { world('stagger', e.pos); break; }
         case 'dodge': { this.bubbles.emit(e.pos, 14, 0.8, 2.5, 0.06, 0.7); world(heavy('dodge', e.actor), e.pos); break; }
         case 'silt': { this.bubbles.emit(e.pos, 30, 1.5, 2, 0.08, 1.2); world('silt', e.pos); break; }
-        case 'ability': { this.impacts.spawn(e.pos, '#c8fff0', 1.2 + (e.strength ?? 1) * 0.4, 0.45); this.bubbles.emit(e.pos, 20, 1, 3, 0.08); const ab = game.byId(e.actor); const key = ab ? `ability:${creature(ab.creature).ability}` : 'ability'; world(SAMPLES[key] ? key : 'ability', e.pos); break; }
+        // A special is your own action, not something happening to you, so its tell is the quietest
+        // in the game: a few sparkles close to the body that say "this one is not the ordinary
+        // heavy". Deliberately under the shoal-join burst, and well under anything that means
+        // damage — a flash here read as being hit or respawning, which is why it is gone.
+        case 'ability': { const len = e.strength ?? 1; this.sparkles.emit(e.pos, Math.round(5 + len * 2), 0.25 + len * 0.18, 0.25 + len * 0.1, 0.035, 0.5); this.bubbles.emit(e.pos, 20, 1, 3, 0.08); const ab = game.byId(e.actor); const key = ab ? `ability:${creature(ab.creature).ability}` : 'ability'; world(SAMPLES[key] ? key : 'ability', e.pos); break; }
         case 'shellCrush': { this.impacts.spawn(e.pos, '#ffd9a0', 2.2, 0.5); this.bubbles.emit(e.pos, 28, 0.8, 4, 0.1, 1.4); world('shellCrush', e.pos); break; }
         case 'grab': { const at = this.impactPos(e.actor, e.other, e.pos); this.impacts.spawn(at, '#ffb070', 1.4, 0.35); world('grab', at); if (e.player != null && e.player >= 0) { const d = padOf(e.player); if (typeof d === 'number') rumble(d, 1, 0.6, 300); } break; }
         case 'hunted': { personal('hunted'); if (e.player != null && e.player >= 0) { const d = padOf(e.player); if (typeof d === 'number') rumble(d, 0.6, 0.9, 500); } break; }
@@ -822,6 +1126,9 @@ export class Engine {
         case 'routed': { world('routed', e.pos, 0.8); this.impacts.spawn(e.pos, '#9ff6ff', 2.5, 0.6); break; }
         case 'pounce': { this.impacts.spawn(e.pos, '#ffe08a', 1.2 + (e.strength ?? 1) * 0.5, 0.35); this.bubbles.emit(e.pos, 24, 0.9, 4, 0.08); world('pounce', e.pos, 1.3); if (e.player != null && e.player >= 0) { const d = padOf(e.player); if (typeof d === 'number') rumble(d, 0.7, 0.4, 140); this.shake(e.player, 0.6); } break; }
         case 'burst': { const b = game.byId(e.actor); world(b && RULES?.jet(b) ? 'jet' : heavy('burst', e.actor), e.pos); if (b && RULES?.jet(b)) this.bubbles.emit(e.pos, 30, 0.9, 3, 0.1, 1.4); break; }
+        // Coming out of an egg. There is no shell-crack sample yet (docs/audio-requests.md), so it
+        // borrows the hatch-in sound rather than synthesising a stand-in for one.
+        case 'hatch': { if (e.player != null && e.player >= 0) audio.play('respawn'); else world('respawn', e.pos, 1, 0.5); break; }
         // Hatching out of a nursery after a respawn (the moult state is reused for the hatch-in).
         case 'moult': { if (e.player != null && e.player >= 0) audio.play(e.strength === 1 && RULES ? 'moult' : 'respawn'); else world('respawn', e.pos, 1, 0.5); break; }
         // Era events (Devonian). Their samples are registered by the era's entry page; an
@@ -844,12 +1151,18 @@ export class Engine {
           break;
         }
         case 'gulp': { this.bubbles.emit(e.pos, 24, 1.0, 3, 0.09, 1.4); personal('gulp'); break; }
+        // The winded heartbeat, and a thin trickle of bubbles escaping with it: a body that
+        // recovers badly under water, running low on stamina and a long way from the surface that
+        // would hand it all back. `strength` is how spent it is.
+        case 'winded': {
+          const s = e.strength ?? 0;
+          this.bubbles.emit(e.pos, 2 + Math.round(4 * s), 0.5, 2, 0.05, 1);
+          personal('winded', 0.35 + 0.45 * s);
+          break;
+        }
         case 'anoxia': { personal('anoxia', 0.8); break; }
         case 'beach': { if (e.strength) { this.bubbles.emit(e.pos, 12, 0.5, 2, 0.06, 1); personal('beach', 0.9); } break; }
         case 'shoalJoin': { this.sparkles.emit(e.pos, 16, 0.6, 1.2, 0.05, 1.2); personal('shoalJoin', 0.7); break; }
-        case 'rangeClaim': { personal('rangeClaim'); break; }
-        case 'rangeLost': { personal('rangeLost'); break; }
-        case 'dominant': { this.sparkles.emit(e.pos, 60, 1.2, 1.8, 0.08, 2.2); personal('dominant'); if (e.player != null && e.player >= 0) { const d = padOf(e.player); if (typeof d === 'number') rumble(d, 0.6, 0.6, 500); } break; }
         case 'teleport': {
           // sparkles where they left and where they arrived; the camera snaps behind them on arrival
           this.sparkles.emit(e.pos, e.strength ? 50 : 30, 0.9, 1.4, 0.07, 1.8);
@@ -881,8 +1194,10 @@ export class Engine {
         if (!onScreen) hunterAngle = Math.atan2(v.y * (v.z > 1 ? -1 : 1), v.x * (v.z > 1 ? -1 : 1));
       }
       const era = RULES?.hud(game, i);
+      const scheme = schemeForDevice(this.setups[i]?.device ?? 'keyboard', this.mouseLook);
+      // Sense off: nothing is drawn over the sea, so there is nothing to work out either.
       const markers: PlayerHud['bandMarkers'] = [];
-      if (cs) {
+      if (cs && p.senseMode) {
         const L = lengthOf(p);
         for (const a of game.actors) {
           if (a.id === p.id || !isAlive(a) || isHidden(a) || a.controller === 'swarm') continue;
@@ -897,10 +1212,13 @@ export class Engine {
         }
       }
       // Radar: reach grows with the creature, contacts rotate into the camera frame (up = camera forward).
-      const radarRange = 55 + lengthOf(p) * 12;
+      const radarRange = radarReach(p);
       const blips: RadarBlipHud[] = [];
-      if (cs) {
+      if (cs && p.senseMode) {
         const sy = Math.sin(cs.yaw), cy = Math.cos(cs.yaw);
+        // Above or below counts once the gap is more than a body or two; inside that the contact is
+        // level with you for all practical purposes and the mark should not keep changing colour.
+        const levelBand = Math.max(2.5, lengthOf(p) * 1.5);
         for (const b of game.radarFor(i, radarRange)) {
           // forward = (sin yaw, cos yaw), right = (-cos yaw, sin yaw)
           const f = (b.dx * sy + b.dz * cy) / radarRange, r = (-b.dx * cy + b.dz * sy) / radarRange;
@@ -908,9 +1226,14 @@ export class Engine {
           const l = Math.hypot(x, y);
           const beyond = l > 1;
           if (beyond) { x /= l; y /= l; }
+          const level = b.kind === 'home' || b.kind === 'shore' || b.kind === 'landmark' || b.kind === 'territory' || Math.abs(b.dy) < levelBand
+            ? undefined : b.dy > 0 ? 'above' as const : 'below' as const;
+          // A shoal overhead is a different decision from one on the sand — rise for it, or dive —
+          // so it gets its own colour rather than sitting on the dial as the same green mark.
           const color = b.kind === 'player' ? PLAYER_COLORS[b.id % 4] : b.kind === 'giant' ? BAND_COLOR.giant : b.kind === 'threat' ? BAND_COLOR.threat
-            : b.kind === 'food' ? BAND_COLOR.snack : b.kind === 'home' ? '#9be9ff' : b.kind === 'landmark' ? '#ffd9a0' : '#d9cfa4';
-          blips.push({ x, y, kind: b.kind, color, beyond, hunting: b.hunting, distance: b.distance, r: b.radius != null ? b.radius / radarRange : undefined });
+            : b.kind === 'food' ? (level === 'above' ? FOOD_ABOVE : BAND_COLOR.snack) : b.kind === 'home' ? '#9be9ff' : b.kind === 'landmark' ? '#ffd9a0'
+            : b.kind === 'territory' ? BAND_COLOR.rival : '#d9cfa4';
+          blips.push({ x, y, kind: b.kind, color, beyond, hunting: b.hunting, distance: b.distance, r: b.radius != null ? b.radius / radarRange : undefined, level });
         }
         // Dead zones are areas, not contacts: drawn as rings, clamped to the rim like anything else.
         if (era) for (const z of era.deadZones) {
@@ -921,7 +1244,20 @@ export class Engine {
           blips.push({ x, y, kind: 'deadzone', color: '#8fd66a', beyond, hunting: false, distance: Math.hypot(z.dx, z.dz), r: z.r / radarRange });
         }
       }
-      const tele = cs?.tele.open ? { options: game.teleportOptions(i).map((o) => ({ label: o.label, detail: o.detail, distance: o.distance, dest: o.dest })), index: cs.tele.index, cooldown: p.teleportCd } : undefined;
+      const tele = cs?.tele.open && !cs.tele.swap.open
+        ? { options: [...game.teleportOptions(i).map((o) => ({ label: o.label, detail: o.detail, distance: o.distance, dest: o.dest })),
+                      { label: 'Change creature', detail: 'Swap bodies · each keeps what it has grown', distance: 0, dest: 'home' as TeleportDest }],
+            index: cs.tele.index, cooldown: p.teleportCd }
+        : undefined;
+      let swap: PlayerHud['swap'];
+      if (cs?.tele.open && cs.tele.swap.open) {
+        const roster = game.swapOptions(i, cs.tele.swap.grown);
+        const pick = roster[cs.tele.swap.index % Math.max(1, roster.length)];
+        if (pick) {
+          const def = creature(pick.id);
+          swap = { name: def.name, kind: def.kind, creature: pick.id, rung: ladderName(pick.mark), fill: fillOf(pick.mark), kept: pick.kept, grown: cs.tele.swap.grown, count: roster.length, index: cs.tele.swap.index };
+        }
+      }
       const board = cs?.showBoard ? game.scoreboard(i) : undefined;
       // Co-op: team-mates on the floor waiting to be picked up, as a bearing this player can follow.
       const downed: PlayerHud['downedAllies'] = [];
@@ -937,31 +1273,42 @@ export class Engine {
         downed.push({ index: j, name: creature(o.creature).name, color: PLAYER_COLORS[j % 4], seconds, distance: Math.hypot(dx, dz), x: r / l, y: -f / l, progress: game.reviveProgress(o) });
       }
       // Versus: a dead player watches the leader rather than their own sinking body.
+      // Who killed this player, named the way the rest of the HUD names bodies: another player by
+      // their seat, anything else by its species.
+      const killerId = p.swallowedBy >= 0 ? p.swallowedBy : p.killer;
+      const killer = killerId >= 0 ? game.byId(killerId) : undefined;
+      const nameOf = (a: Actor | undefined) => (a ? (a.player >= 0 ? `P${a.player + 1}` : creature(a.creature).name) : undefined);
       const watched = this.spectatorTarget(game, i);
       const spectate = watched ? { index: watched.player, name: `P${watched.player + 1}`, color: PLAYER_COLORS[watched.player % 4], creature: watched.creature } : undefined;
       let aim: PlayerHud['aim'];
       if (p.aiming && cs) {
         const t = lockA && isAlive(lockA) ? lockA : undefined;
-        aim = { hasTarget: !!t, inRange: !!t && p.aimInRange, name: t ? creature(t.creature).name : undefined, color: t ? BAND_COLOR[bandOf(p, t)] : '#eefaf6', ready: p.pounceCd === 0 && p.stamina >= 12 };
+        const heavyMove = game.heavyMove(p);
+        aim = { hasTarget: !!t, inRange: !!t && p.aimInRange, name: t ? creature(t.creature).name : undefined, color: t ? BAND_COLOR[bandOf(p, t)] : '#eefaf6', ready: heavyMove.ready, action: heavyMove.name };
       }
       return {
         index: i, creature: p.creature, color: PLAYER_COLORS[i % 4], alive: p.state !== 'dead', aim,
+        scheme,
         hp: p.hp, hpMax: p.hpMax, stamina: p.stamina, staminaMax: p.staminaMax, exhausted: p.exhausted > 0,
-        tier: p.tier, tierName: era ? `${era.stage} · ${era.rungName}` : TIER_NAMES[p.tier], progress: era ? era.standing / 100 : p.tier >= 4 ? 1 : clamp(p.nutrition / TIER_NEED[p.tier], 0, 1), scale: p.scale,
-        abilityName: p.hideMode === 'descending' ? 'Sinking to burrow' : p.hideMode === 'burrowed' ? 'Buried · Y emerge' : p.hideMode === 'camouflage' ? `Camo: ${p.camoLabel}` : RULES?.ySpecial(p.creature)?.name ?? hideLabel(p.creature), abilityReady: p.hideMode === 'camouflage' ? p.stamina / p.staminaMax : RULES?.ySpecial(p.creature) ? 1 - clamp(p.abilityCd / Math.max(1, creature(p.creature).abilityCooldown), 0, 1) : 1 - clamp(p.hideCd / 2, 0, 1), abilityActive: p.hideMode !== 'none' || (p.state === 'ability' && !!RULES?.ySpecial(p.creature)), abilityUnlocked: true,
-        senseReady: 1 - clamp(p.senseCd / 6, 0, 1),
+        tier: p.tier, tierName: era ? `${era.stage} · ${era.rungName}` : TIER_NAMES[p.tier], // The ring means the same thing in both eras: how close the next moult is, full when it lands.
+        progress: era ? era.stageProgress : p.tier >= 4 ? 1 : clamp(p.nutrition / TIER_NEED[p.tier], 0, 1), scale: p.scale,
+        abilityName: p.hideMode === 'descending' ? 'Sinking to burrow' : p.hideMode === 'burrowed' ? `Buried · ${controlKey('ability', scheme)} emerge` : p.hideMode === 'camouflage' ? `Camo: ${p.camoLabel}` : RULES?.ySpecial(p.creature)?.name ?? hideLabel(p.creature), abilityReady: p.hideMode === 'camouflage' ? p.stamina / p.staminaMax : RULES?.ySpecial(p.creature) ? 1 - clamp(p.abilityCd / Math.max(1, creature(p.creature).abilityCooldown), 0, 1) : 1 - clamp(p.hideCd / 2, 0, 1), abilityActive: p.hideMode !== 'none' || (p.state === 'ability' && !!RULES?.ySpecial(p.creature)), abilityUnlocked: true,
+        senseOn: p.senseMode,
         lock: lockA && isAlive(lockA) ? { name: creature(lockA.creature).name, kind: creature(lockA.creature).kind, band: bandOf(p, lockA), hp: lockA.hp / lockA.hpMax, color: BAND_COLOR[bandOf(p, lockA)] } : undefined,
         hunted: p.hunted, hunterAngle, hunterName: hunter ? creature(hunter.creature).name : undefined,
         hunterState: p.hunted >= 0.5 ? 'hunting' : p.hunted > 0.2 ? 'noticed' : 'none', inCover: p.cover > 0.3, still: Math.hypot(p.vel.x, p.vel.y, p.vel.z) < 0.3,
-        hint: game.hintFor(i), respawnIn: p.state === 'dead' ? Math.max(0, (game.reviveWindow(p) || 3) - (game.reviveWindow(p) ? 0 : p.respawnT)) : 0, fade: cs?.fade ?? 0, state: p.state, modelReady: !!loadedSync(p.creature),
+        hint: game.hintFor(i), respawnIn: p.state === 'dead' ? Math.max(0, (game.reviveWindow(p) || CORPSE_WINDOW) - (game.reviveWindow(p) ? 0 : p.respawnT)) : 0, fade: cs?.fade ?? 0, state: p.state, modelReady: !!loadedSync(p.creature),
         downedFor: game.reviveWindow(p), reviveProgress: game.reviveProgress(p), downedAllies: downed, spectating: spectate,
+        death: p.state === 'dead' || p.state === 'swallowed' ? { eaten: p.swallowedBy >= 0 || p.eaten > 0, by: nameOf(killer) } : undefined,
         kills: p.kills, eats: p.eats, escapes: p.escapes, protect: p.spawnProtect > 0, bandMarkers: markers.slice(0, 24),
-        biome: BIOME_NAMES[game.biomeOf(i) ?? 'shelf'], radar: { range: radarRange, blips }, teleport: tele, board, notice: game.noticeFor(i), era,
+        grip: game.gripFor(i), biome: BIOME_NAMES[game.biomeOf(i) ?? 'shelf'], day: game.dayPhase(), radar: { range: radarRange, blips }, teleport: tele, swap, board, notice: game.noticeFor(i), era,
       };
     });
     return {
       players, rects, time: game.time, status: game.state.status, message: game.state.message, mode: game.mode, winner: game.state.winner, fps: this.fps,
-      discovery: { biomes: [...game.discovery.biomes], landmarks: [...game.discovery.landmarks], apex: [...game.discovery.apex] },
+      canContinue: game.state.status !== 'playing' && isCoop(game.mode),
+      discovery: { biomes: [...game.discovery.biomes], landmarks: [...game.discovery.landmarks], apex: [...game.discovery.apex], best: Object.fromEntries(game.discovery.best) },
+      day: game.dayPhase(),
     };
   }
 
@@ -982,12 +1329,13 @@ export class Engine {
     cancelAnimationFrame(this.raf);
     this.resize.disconnect();
     this.keyboard.dispose();
+    this.mouse.dispose();
     this.assets.dispose();
     this.clearMatch();
     this.sea?.dispose();
     this.bubbles.dispose(); this.splash.dispose(); this.sparkles.dispose(); this.impacts.dispose(); this.silt.dispose();
     this.shieldGeo.dispose();
-    this.mouthfuls.dispose();
+    this.mouthfuls.dispose(); this.eggs.dispose();
     this.renderer.dispose();
     this.renderer.forceContextLoss();
     this.renderer.domElement.remove();

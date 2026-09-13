@@ -14,7 +14,7 @@
  * Usage: npx esbuild tools/menu-bindings-test.ts --bundle --platform=node --format=esm \
  *          --outfile=/tmp/mb.mjs && node /tmp/mb.mjs
  */
-import { readGamepad, type RawControls } from '../src/input/input';
+import { applyMouse, emptyControls, readGamepad, type RawControls } from '../src/input/input';
 
 /** Every control the menu code in src/app/App.tsx reads, with where it is used. */
 const MENU_ACTIONS: { key: keyof RawControls; used: string }[] = [
@@ -28,7 +28,7 @@ const MENU_ACTIONS: { key: keyof RawControls; used: string }[] = [
   { key: 'dup', used: 'select: move cursor' },
   { key: 'ddown', used: 'select: move cursor' },
   { key: 'heavy', used: 'pause and results: back to select' },
-  { key: 'ability', used: 'pause: quit to title' },
+  { key: 'light', used: 'select: hatch or carry on · pause: quit to title · results: keep playing (co-op modes)' },
 ];
 
 const BUTTONS = 17;
@@ -75,8 +75,61 @@ if (anyMisses.length) fail(`anyButton (used to join a player) misses button(s) $
 const drifting = { ...padWith([]), axes: [0.9, 0.9, 0.9, 0.9] } as unknown as Gamepad;
 if (readGamepad(drifting).anyButton) fail('anyButton fires on stick movement, so drift could join a player');
 
+/**
+ * The layout itself, button by button. Menus and gameplay may share a button because they are
+ * different screens, but which button does what in play is a decision, and one that has moved
+ * more than once; this is where it is written down so a remap that misses a file shows up here
+ * rather than in someone's hands. `dodge`/`dash` and `lock`/`aim` are each one action under two
+ * names, which is why they are allowed to sit together.
+ */
+const PAD_LAYOUT: { button: number; name: string; drives: (keyof RawControls)[] }[] = [
+  { button: 0, name: 'A', drives: ['dodge', 'dash'] },
+  { button: 1, name: 'B', drives: ['guard'] },
+  { button: 2, name: 'X', drives: ['light'] },
+  { button: 3, name: 'Y', drives: ['ability'] },
+  { button: 4, name: 'LB', drives: ['burst'] },
+  { button: 5, name: 'RB', drives: ['rise'] },
+  { button: 6, name: 'LT', drives: ['lock', 'aim'] },
+  { button: 7, name: 'RT', drives: ['heavy'] },
+  { button: 10, name: 'Left stick click', drives: ['sink'] },
+  { button: 12, name: 'D-pad up', drives: ['sense'] },
+  { button: 13, name: 'D-pad down', drives: ['teleport'] },
+  { button: 14, name: 'D-pad left', drives: [] },
+  { button: 15, name: 'D-pad right', drives: [] },
+];
+/** Every control a body is driven by, so a button that quietly picks one up is caught. */
+const IN_PLAY: (keyof RawControls)[] = ['burst', 'rise', 'sink', 'light', 'heavy', 'ability', 'dodge', 'dash', 'guard', 'lock', 'aim', 'sense', 'teleport'];
+for (const { button, name, drives } of PAD_LAYOUT) {
+  const c = readGamepad(padWith([button]));
+  const on = IN_PLAY.filter((k) => (typeof c[k] === 'number' ? (c[k] as number) > 0 : !!c[k]));
+  const missing = drives.filter((k) => !on.includes(k));
+  const extra = on.filter((k) => !drives.includes(k));
+  if (missing.length) fail(`${name} (button ${button}) should drive ${missing.join(', ')} and does not`);
+  if (extra.length) fail(`${name} (button ${button}) also drives ${extra.join(', ')}, which belongs elsewhere`);
+  console.log(`  ${name.padEnd(17)} → ${drives.length ? drives.join(', ') : '— (menus only)'}`);
+}
+/**
+ * The mouse, for a session with no controller in it. Same rule as the pad: one button, one action,
+ * and never a menu action — a mouse press must not be able to confirm, back out or pause, or a
+ * click aimed at the sea would also answer whatever the menus were asking.
+ */
+const MOUSE: { name: string; press: Partial<Record<'left' | 'middle' | 'right', boolean>>; expect: (keyof RawControls)[] }[] = [
+  { name: 'left click', press: { left: true }, expect: ['heavy'] },
+  { name: 'right click', press: { right: true }, expect: ['dash', 'dodge'] },
+  { name: 'middle click', press: { middle: true }, expect: ['aim', 'lock'] },
+];
+const MOUSE_FORBIDDEN: (keyof RawControls)[] = ['confirm', 'back', 'menu', 'lb', 'rb', 'view', 'teleport', 'light', 'ability', 'guard', 'rise', 'sink'];
+for (const m of MOUSE) {
+  const c = applyMouse(emptyControls(), { dx: 0, dy: 0, zoom: 0, left: false, middle: false, right: false, ...m.press });
+  for (const k of m.expect) if (!c[k]) fail(`${m.name} does not drive "${String(k)}"`);
+  for (const k of MOUSE_FORBIDDEN) if (c[k]) fail(`${m.name} drives the menu/gameplay control "${String(k)}"`);
+  const others = MOUSE.filter((o) => o !== m).flatMap((o) => o.expect).filter((k) => !m.expect.includes(k));
+  for (const k of others) if (c[k]) fail(`${m.name} also drives "${String(k)}", which belongs to another button`);
+  console.log(`  ${m.name.padEnd(13)} → ${m.expect.join(', ')}`);
+}
+
 for (const { key, used } of MENU_ACTIONS) {
   console.log(`  ${key.padEnd(9)} button(s) ${buttonsFor.get(key)!.join(', ').padEnd(6)}  ${used}`);
 }
-console.log(`\n${MENU_ACTIONS.length} menu actions over ${BUTTONS} buttons · ${failures} failure(s)`);
+console.log(`\n${MENU_ACTIONS.length} menu actions over ${BUTTONS} buttons, ${MOUSE.length} mouse buttons · ${failures} failure(s)`);
 process.exit(failures ? 1 : 0);

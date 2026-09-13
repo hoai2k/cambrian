@@ -1,0 +1,42 @@
+[
+  {
+    "path": "/Users/hoai/Documents/Stuff/Generations/cambrian/local/expansion-repo/tools/devonian/creatures/dunkleosteus/face-v4/fix_lod_pigment_04.py",
+    "sha256": "8d313420c2a8089af6b22da90a7618cf6ce4982ceebff770c7a10c7a0cafb43b",
+    "bytes": 7429
+  },
+  {
+    "path": "/Users/hoai/Documents/Stuff/Generations/cambrian/local/expansion-repo/tools/devonian/creatures/dunkleosteus/face-v4/render_lod_pigment_04.py",
+    "sha256": "3b761c7e152733599603c2c6aa6e46c4d5c79daa317238197c84d2368d2166a1",
+    "bytes": 6022
+  },
+  {
+    "path": "/Users/hoai/Documents/Stuff/Generations/cambrian/local/expansion-repo/tools/devonian/creatures/dunkleosteus/face-v4/finalize_local_pigment_04.py",
+    "sha256": "a6e1c88e19e2e06babce76c4018c89a7b7fdc2b9d4c192b2432b9713f5ddc97c",
+    "bytes": 4440
+  },
+  {
+    "path": "/Users/hoai/Documents/Stuff/Generations/cambrian/local/devonian-authoring/dunkleosteus/face-v4/candidate03/exports/dunkleosteus.glb",
+    "sha256": "0ace6026c6b46d9d560528677ffdaf31769d74bea51065b884214c8b1037950d",
+    "bytes": 18293228
+  },
+  {
+    "path": "/Users/hoai/Documents/Stuff/Generations/cambrian/local/devonian-authoring/dunkleosteus/face-v4/candidate03/exports/dunkleosteus.lod1.glb",
+    "sha256": "d34ec130e45a4540c89aade61e8ae3cc1c48f25fbf337e67296416b0bec0b4ea",
+    "bytes": 2371332
+  },
+  {
+    "path": "/Users/hoai/Documents/Stuff/Generations/cambrian/local/devonian-authoring/dunkleosteus/face-v4/candidate03/exports/export-evidence.json",
+    "sha256": "e9cbe827041496c436966065fe9dc637b6ec6415bd2d351e5d33da7e5b3b169d",
+    "bytes": 1924
+  },
+  {
+    "path": "/Users/hoai/Documents/Stuff/Generations/cambrian/local/devonian-authoring/dunkleosteus/face-v4/candidate03/exports/render-evidence-all.json",
+    "sha256": "88f2539b7b8e134f4e4a9d7e49f8c805fadf43a4ba070d77ac33edca8bb5b043",
+    "bytes": 26489
+  },
+  {
+    "path": "/Users/hoai/Documents/Stuff/Generations/cambrian/local/devonian-authoring/dunkleosteus/face-v4/candidate03/exports/eye-oral-audit-summary.json",
+    "sha256": "2eaa8a497219e89b5d69afb6ef8d8a592e3fed12fd4bc56111cbb448e9d39cd0",
+    "bytes": 979
+  }
+]

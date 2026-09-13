@@ -19,7 +19,7 @@ export function Workbench() {
     <div className="bench">
       <header className="bench-head">
         <div>
-          <a className="back" href="../">← Cambrian Explosion</a>
+          <a className="back" href="../">← Cambrian Conquest</a>
           <h1>Workbench</h1>
           <p className="sub">{section ? `No workbench called “${section}”.` : 'Pick a workbench.'}</p>
         </div>

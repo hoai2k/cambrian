@@ -1,0 +1,44 @@
+{
+  "status": "TEXTURE_CHANGE_ACCEPTED_FOR_COMPOSITION",
+  "scope": "Body normal2048 versus4096 only; candidate06 immutable form. Not whole-creature approval.",
+  "reviewed": [
+    {
+      "file": "/Users/hoai/Documents/Stuff/Generations/cambrian/local/devonian-authoring/titanichthys/rework-v3/normal-render-study-02/renders/original-head.png",
+      "sha256": "4a0c0336acd190daff9076f443360a0935581d5fc82d439621753164c677ed81"
+    },
+    {
+      "file": "/Users/hoai/Documents/Stuff/Generations/cambrian/local/devonian-authoring/titanichthys/rework-v3/normal-render-study-02/renders/normal2048-head.png",
+      "sha256": "c3afe1f498acc6912685844cd0f23726bb9b5433a47785f53868e4997618b91c"
+    },
+    {
+      "file": "/Users/hoai/Documents/Stuff/Generations/cambrian/local/devonian-authoring/titanichthys/rework-v3/normal-render-study-02/renders/original-body.png",
+      "sha256": "d6fc45dd9086688c78a238a6862570cd46dc86ba79c863d5cf102b0a0f00327d"
+    },
+    {
+      "file": "/Users/hoai/Documents/Stuff/Generations/cambrian/local/devonian-authoring/titanichthys/rework-v3/normal-render-study-02/renders/normal2048-body.png",
+      "sha256": "a232bf21f8f707d401a727a5195ff94d1cb5648e5fc6c207732ea5829fe8b15c"
+    },
+    {
+      "file": "/Users/hoai/Documents/Stuff/Generations/cambrian/local/devonian-authoring/titanichthys/rework-v3/normal-render-study-02/renders/original-oral.png",
+      "sha256": "99754f57f208c00076672e2dde05e708d06dac65c7bd77ca1f46456d30e284a8"
+    },
+    {
+      "file": "/Users/hoai/Documents/Stuff/Generations/cambrian/local/devonian-authoring/titanichthys/rework-v3/normal-render-study-02/renders-resume-03/normal2048-oral.png",
+      "sha256": "491e6fcb7df8141eea783e29cf12d961270ce123a9bf5b31f6bca32761ef636b"
+    }
+  ],
+  "observations": [
+    "Matched head views preserve armor seam placement, blue mottling, grain and broad highlights; no visible loss at this review framing.",
+    "Matched body views preserve full silhouette, fin rays, armor bands and pigment.",
+    "Original Ability oral view visibly shows the two known pale underside patches; oral07 is separate and must pass its own review.",
+    "Resumed final oral image compared with original: same lip/interior material response and same preexisting candidate06 collision patches; no new normal-map artifact visible. All three matched view pairs retain the accepted surface appearance."
+  ],
+  "normalStudyReportSha256": "c124ddab7dd10dfe1aa25e294ce99f9a21b4271dac9dcb30614cbef74ca42957",
+  "packageReportSha256": "6a7f9f68e6ef59b147087aeeb8824d691e063f88b0e524da2986f2c581849810",
+  "packageBytes": 21853112,
+  "eyeReview": "Initial study02 orbit pictures invalid as pose evidence due omitted Bind reset and wrong Ability duration; corrected renderer needed. Numeric actual-GLB containment pass remains independent.",
+  "limitations": [
+    "Approval only for PNG recompression plus body normal2048; candidate06 mouth collision and shallow eyes require separately validated07 and eye-seating changes.",
+    "Actual composed final asset still needs numerical/structural and viewer verification; no public asset was changed by this study."
+  ]
+}

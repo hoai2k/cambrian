@@ -7,14 +7,18 @@ import * as SkeletonUtils from 'three/examples/jsm/utils/SkeletonUtils.js';
 import { clamp, damp, wrapAngle } from '../shared/math';
 import { makeRecolor, type Recolor } from './recolor';
 import { settleTranslucency } from './translucency';
+import { mergeSkinnedParts } from './merge-skins';
 import { Carcass } from './carcass';
+import { ArmConform, type Surface } from './conform';
 import { schemeForCreature } from '../shared/palettes';
 import { creature, type CreatureId } from '../sim/creatures';
 import { lengthOf } from '../sim/actors';
+import { bellPhase, bellTilt } from '../sim/locomotion';
 import type { Actor } from '../sim/types';
 import { appBase } from '../shared/base';
+import type { AuthoredFeeding } from './attachments';
 
-interface Loaded { gltf: GLTF; unit: number; center: THREE.Vector3; size: THREE.Vector3; }
+interface Loaded { gltf: GLTF; unit: number; center: THREE.Vector3; size: THREE.Vector3; /** Triangles in one instance of this body, for the renderer's detail budget. */ tris: number; }
 export type Lod = 0 | 1;
 const cache = new Map<string, Promise<Loaded>>();
 const loader = new GLTFLoader().setMeshoptDecoder(MeshoptDecoder);
@@ -27,12 +31,21 @@ export function loadCreature(id: CreatureId, onProgress?: (loaded: number, total
   let p = cache.get(key);
   if (!p) {
     p = new Promise<GLTF>((res, rej) => loader.load(creatureUrl(id, lod), res, (e) => onProgress?.(e.loaded, e.total), rej)).then((gltf) => {
+      // Part-by-part rigs cost one draw call per part; merge what shares a material before the
+      // first instance is cloned from this scene.
+      mergeSkinnedParts(gltf.scene, gltf.animations);
       const box = new THREE.Box3().setFromObject(gltf.scene);
       const size = box.getSize(new THREE.Vector3());
       const center = box.getCenter(new THREE.Vector3());
       const unit = 1 / Math.max(size.z, size.x, 0.01);
-      gltf.scene.traverse((o) => { if (o instanceof THREE.Mesh) { o.frustumCulled = false; } });
-      return { gltf, unit, center, size };
+      let tris = 0;
+      gltf.scene.traverse((o) => {
+        if (!(o instanceof THREE.Mesh)) return;
+        o.frustumCulled = false;
+        const g = o.geometry;
+        tris += (g.index ? g.index.count : g.getAttribute('position')?.count ?? 0) / 3;
+      });
+      return { gltf, unit, center, size, tris: Math.round(tris) };
     }).catch((e) => { cache.delete(key); throw new Error(`Could not load ${creature(id).name}: ${e?.message ?? e}`); });
     cache.set(key, p);
   }
@@ -49,10 +62,13 @@ export async function ensureLoaded(id: CreatureId, onProgress?: (loaded: number,
 const SPINE_RE = /^(body|segment)_(\d+)$/;
 /**
  * Rigs whose Eat clip is an authored reach/grasp/carry performance, scrubbed by consumption progress
- * (see `changedClips` in docs/creature-anchors-manifest.json). Every other rig loops its Eat clip while
+ * (the articulated attack and feeding pass, tools/creatures/motion, authors Eat on the feedingPhase
+ * timeline: reach, grasp, carry, hold at the mouth). Every other rig loops its Eat clip while
  * the attachment pass moves the food through its sockets.
  */
-const FEEDING_PERFORMANCE: ReadonlySet<CreatureId> = new Set<CreatureId>(['opabinia']);
+const FEEDING_PERFORMANCE: ReadonlySet<CreatureId> = new Set<CreatureId>([
+  'opabinia', 'leanchoilia', 'anomalocaris', 'nectocaris', 'cambroraster', 'tamisiocaris', 'isoxys', 'waptia', 'sidneyia', 'marrella', 'olenoides',
+]);
 
 export class CreatureView {
   readonly group = new THREE.Group();
@@ -62,6 +78,7 @@ export class CreatureView {
   private mixer: THREE.AnimationMixer;
   private actions = new Map<string, THREE.AnimationAction>();
   private loco?: THREE.AnimationAction;
+  private sprinting = false;
   private oneShot?: THREE.AnimationAction;
   private oneShotT = 0;
   private additive: (THREE.AnimationAction | undefined)[] = [];
@@ -87,8 +104,11 @@ export class CreatureView {
   public visibleLength = 1;
   readonly def;
   readonly heightUnits: number;
+  /** Arms that lie along what they are on, where the creature asks for it. */
+  private armConform?: ArmConform;
   /** The Eat clip is a progress-driven performance rather than a loop. */
   readonly feedingPerformance: boolean;
+  readonly authoredFeeding?: AuthoredFeeding;
 
   constructor(readonly creatureId: CreatureId, loaded: Loaded, private shared: { shieldGeo: THREE.BufferGeometry }, readonly lod: Lod = 0) {
     this.def = creature(creatureId);
@@ -97,7 +117,15 @@ export class CreatureView {
     this.model.position.copy(loaded.center).multiplyScalar(-loaded.unit);
     this.heightUnits = loaded.size.y * loaded.unit;
     this.anchors = new CreatureAnchors(this.model);
-    this.feedingPerformance = FEEDING_PERFORMANCE.has(creatureId) && loaded.gltf.animations.some((c) => c.name === 'Eat');
+    const feeding = this.model.userData.cambrianFeeding;
+    const hasEat = loaded.gltf.animations.some((c) => c.name === 'Eat');
+    if (hasEat && this.anchors.canGrasp && this.anchors.has('anchor_mouth_inside') &&
+        feeding?.version === 1 && feeding.mode === 'authored-grasp' && feeding.clip === 'Eat' &&
+        Number.isFinite(feeding.apertureDiameter) && feeding.apertureDiameter > 0 &&
+        Number.isFinite(feeding.pickupOffsetLimit) && feeding.pickupOffsetLimit > 0) {
+      this.authoredFeeding = { apertureDiameter: feeding.apertureDiameter * loaded.unit, pickupOffsetLimit: feeding.pickupOffsetLimit * loaded.unit };
+    }
+    this.feedingPerformance = hasEat && (FEEDING_PERFORMANCE.has(creatureId) || !!this.authoredFeeding);
     this.inner.add(this.model);
     this.group.add(this.inner);
     this.model.traverse((o) => {
@@ -117,6 +145,7 @@ export class CreatureView {
     // All of a creature's colour lives in its vertex colours, so its palette is a shader hook on
     // the materials cloned just above rather than a second set of models. Both LODs share the
     // material names the slots are read from, so a distant creature keeps its colours.
+    if (this.def.conformArms) { const c = new ArmConform(this.model); if (c.active) this.armConform = c; }
     this.recolor = makeRecolor(this.model); this.recolor.setScheme(schemeForCreature(creatureId));
     // Distance haze, chained after the palette hook (which owns onBeforeCompile). Mixing the
     // finished pixel toward the water it is seen through is the only correct way to fade a body
@@ -181,9 +210,57 @@ export class CreatureView {
   poseFeeding(progress: number) {
     const eat = this.actions.get('Eat'); if (!eat) return;
     this.playLoop('Eat');
+    if (this.authoredFeeding) {
+      // This asset owns the whole cupping pose. A fading locomotion/attack or
+      // additive turn must not flatten its arms while the clip is scrubbed.
+      for (const action of this.actions.values()) if (action !== eat) action.stop();
+      this.oneShot = undefined; this.oneShotT = 0;
+      this.additive.forEach(a => a?.setEffectiveWeight(0)); this.addW.fill(0);
+      eat.stopFading().stopWarping().setEffectiveWeight(1).setLoop(THREE.LoopOnce, 1).play();
+      eat.clampWhenFinished = true; eat.paused = true;
+      eat.time = THREE.MathUtils.clamp(progress, 0, 1) * eat.getClip().duration;
+      this.mixer.update(0); this.group.updateWorldMatrix(true, true);
+      return;
+    }
     this.oneShot?.setEffectiveWeight(0);
     eat.setEffectiveWeight(1); eat.time = THREE.MathUtils.clamp(progress, 0, .99999) * eat.getClip().duration;
     this.mixer.update(0); this.group.updateWorldMatrix(true, true);
+  }
+
+  /** Where the bell is in its beat, and how far it is tipped over. Pulse swimmers only. */
+  private bellPulsing = false;
+  private bellTilt = 0;
+
+  /**
+   * A medusa swims in surges, and the surge *is* the animation. `pulseT` is the simulation's own
+   * place in the contraction (`src/sim/locomotion.ts`): the bell throws water over the first
+   * `PULSE_THRUST` of a `PULSE_CYCLE` and coasts through the refill. The `Swim` clip is exactly one
+   * cycle long with its squeeze filling exactly that window, so scrubbing the clip to `pulseT`
+   * makes the bell you watch close the water actually being thrown, rather than a loop running
+   * near it. Asking for nothing pins `pulseT` at zero, and the animal falls back to `Idle`, which
+   * is the same beat at a third of the size and half the rate.
+   *
+   * Returns true when it has taken charge of the locomotion layer.
+   */
+  private bell(a: Actor) {
+    if (this.def.swimStyle !== 'pulse') return false;
+    const swim = this.actions.get('Swim');
+    if (!swim) return false;
+    this.bellPulsing = a.pulseT > 0;
+    if (this.bellPulsing) {
+      this.playLoop('Swim');
+      if (this.loco === swim) { swim.paused = true; swim.time = bellPhase(a.pulseT) * swim.getClip().duration; }
+    } else {
+      swim.paused = false;
+      this.playLoop('Idle');
+    }
+    return true;
+  }
+
+  /** Eases toward `bellTilt`, which is the drift back to upright when nothing is being asked. */
+  private bellAim(a: Actor, cruise: number, dt: number) {
+    this.bellTilt = damp(this.bellTilt, bellTilt(Math.hypot(a.vel.x, a.vel.z), cruise, a.pulseT), 3.2, dt);
+    return this.bellTilt;
   }
 
   /** Distant creatures stop casting shadows; the shadow pass does not frustum-cull these meshes. */
@@ -202,6 +279,14 @@ export class CreatureView {
   get carcass(): Carcass { return (this.carcassParts ??= new Carcass(this.model, [...this.materials, ...this.extraMats])); }
   /** Whole again — and nothing is built for a body that was never bitten. */
   restoreCarcass() { this.carcassParts?.reset(); }
+  /**
+   * Lay the arms along the ground under them, or around whatever the animal is holding. Called
+   * after `update`, because it bends the pose the mixer has just written.
+   */
+  conform(surface: Surface, weight = 1, dt = 1 / 60) { this.armConform?.apply(this.model, surface, weight, dt); }
+  /** This body shapes itself to what it is on. */
+  get conforms() { return !!this.armConform; }
+
   setHighlight(intensity: number, color?: string) { this.highlight = intensity; if (color) this.highlightColor.set(color); }
 
   /**
@@ -239,21 +324,30 @@ export class CreatureView {
       // locomotion layer
       const held = a.state === 'ability' && a.abilityActive && ['collectorWake','pharyngealPump','planktonComb','whipSearch'].includes(def.ability);
       if (a.state === 'dead') { /* handled by one-shot */ }
-      else if (a.state === 'eating' || a.holdT > 0) { this.playLoop(this.pick('Eat', 'Grab') ?? (def.ground ? 'Crawl' : 'Swim')); this.loco?.setEffectiveTimeScale(this.has('Eat') ? 1 : 0.55); }
+      else if (a.state === 'eating' || a.holdT > 0) { this.playLoop((this.authoredFeeding && a.state !== 'eating' ? this.pick('Grab', 'Idle') : this.pick('Eat', 'Grab')) ?? (def.ground ? 'Crawl' : 'Swim')); this.loco?.setEffectiveTimeScale(this.has('Eat') ? 1 : 0.55); }
       else if (a.state === 'swallowed') { this.playLoop(this.pick('Stagger', 'Hit') ?? 'Idle'); this.loco?.setEffectiveTimeScale(0.8); }
       else if ((a.hideMode === 'burrowed' || ((a.state === 'guard' || a.state === 'parry') && ['anchor','enroll','shellUp','bristleFlare'].includes(def.ability))) && this.has('Ability')) { this.playLoop('Ability'); this.loco?.setEffectiveTimeScale(.55); }
       else if ((a.state === 'guard') && this.has('Guard')) { this.playLoop('Guard'); this.loco?.setEffectiveTimeScale(1); }
+      // Clinging to something bigger: the grip is held, so the grab pose is the locomotion.
+      else if (a.rideHost >= 0 && a.state === 'free' && this.has('Grab')) { this.playLoop('Grab'); this.loco?.setEffectiveTimeScale(0.4); }
       else if (held && this.has('Ability')) { this.playLoop('Ability'); this.loco?.setEffectiveTimeScale(1); }
       else if (a.state === 'moult' && this.has('Moult')) { this.playLoop('Moult'); this.loco?.setEffectiveTimeScale(1); }
       else {
         // A crawler off the seabed is paddling: keep its leg cycle running even when it is
         // barely translating, so the climb reads as swimming rather than hovering.
         const moving = speed > 0.35 || paddling;
-        this.playLoop(moving ? (def.ground ? 'Crawl' : 'Swim') : 'Idle');
+        // Authored Sprint clips carry their own faster stroke cadence. Switch to one only once a
+        // swimmer is materially above cruise; older rigs without Sprint keep the Swim fallback.
+        const canSprint = moving && !def.ground && this.has('Sprint');
+        this.sprinting = canSprint && speed > cruise * (this.sprinting ? 1.1 : 1.2);
+        if (this.bell(a)) { /* a bell picks its own clip and its own place in it */ }
+        else this.playLoop(moving ? (def.ground ? 'Crawl' : this.sprinting ? 'Sprint' : 'Swim') : 'Idle');
         // smaller creatures beat faster
         const rateScale = 1 / Math.pow(Math.max(a.scale, 0.1), 0.35);
         const beat = Math.max(speed, paddling ? cruise * 0.85 : 0);
-        this.loco?.setEffectiveTimeScale(moving ? clamp((beat / cruise) * rateScale, 0.5, 2.6) : 0.75 * rateScale);
+        if (!this.bellPulsing) this.loco?.setEffectiveTimeScale(
+          moving ? this.sprinting ? clamp(rateScale, 0.8, 1.35) : clamp((beat / cruise) * rateScale, 0.5, 2.6) : 0.75 * rateScale,
+        );
       }
       // one-shots
       const inAttack = a.state === 'attack' || a.state === 'grabbing' || a.state === 'pounce' || (a.state === 'ability' && !held);
@@ -266,7 +360,10 @@ export class CreatureView {
         else this.playOnce(this.pick('Ability', 'Attack')!, Math.max(0.4, a.stateDur), false);
       }
       if (a.state === 'grabbing' && this.wasAttack && this.oneShotT <= 0) this.playOnce(this.pick('Grab', 'Attack')!, 0.9, false);
-      if (a.state === 'dodge' && !this.wasDodge) this.playOnce(this.pick('Dodge') ?? '', a.stateDur + 0.1, false);
+      // A dash and a dodge are different moves — one drives, one jinks — so a model that has been
+      // given its own Dash clip uses it for the long one and keeps Dodge for the short jink. Until
+      // that clip lands (see docs/cambrian/refinement-queue.md) both read as the dodge.
+      if (a.state === 'dodge' && !this.wasDodge) this.playOnce((a.stateDur > 0.36 ? this.pick('Dash', 'Dodge') : this.pick('Dodge', 'Dash')) ?? '', a.stateDur + 0.1, false);
       if (a.state === 'parry' && !this.wasParry && this.has('Parry')) this.playOnce('Parry', 0.35, false);
       const hurt = a.hitFlash > 0.3 && a.state !== 'dead' && a.state !== 'stagger';
       if (hurt && !this.wasHit) this.playOnce('Hit', 0.5, false);
@@ -280,7 +377,7 @@ export class CreatureView {
       // additive layers: turn / dive / rise, dodge & guard reuse them
       // Increasing yaw turns the creature to its LEFT, and right = (-cos yaw, 0, sin yaw).
       const turning = a.bank * -6;                                    // > 0 while turning left
-      const dodging = a.state === 'dodge' && !this.has('Dodge') ? 0.9 : 0;
+      const dodging = a.state === 'dodge' && !this.has('Dodge') && !this.has('Dash') ? 0.9 : 0;
       const guarding = (a.state === 'guard' || a.state === 'parry') && !this.has('Guard') ? 0.45 : 0;
       const lateral = dodging ? -a.dodgeDir.x * Math.cos(a.yaw) + a.dodgeDir.z * Math.sin(a.yaw) : 0; // + = to its right
       const targets = [
@@ -302,7 +399,9 @@ export class CreatureView {
       // Limp "ragdoll": once dead the spine sags and sways with decaying wobble, and the animation
       // fades out underneath it, so the body hangs rather than holding a pose.
       // New anatomical rigs own their death deformation as well as locomotion.
-      if (this.spine.length > 2 && def.proceduralUndulation !== false && a.state === 'dead') {
+      // Same rule as the undulation below: this sway is multiplied onto the animated pose, so it
+      // must not run on a frame the animation is not advancing through.
+      if (dt > 0 && this.spine.length > 2 && def.proceduralUndulation !== false && a.state === 'dead') {
         const k = Math.exp(-a.corpseT * 0.5);
         for (let i = 0; i < this.spine.length; i++) {
           const f = i / this.spine.length;
@@ -314,8 +413,16 @@ export class CreatureView {
           this.spine[i].quaternion.multiply(this.tmpQ2);
         }
       }
-      // procedural undulation along the spine for swimmers
-      if (this.spine.length > 3 && def.proceduralUndulation !== false && !def.ground && a.state !== 'dead') {
+      // Procedural undulation along the spine for swimmers.
+      //
+      // Only while the clip is actually advancing. Each bone is *multiplied* by its bend on top of
+      // the pose the mixer wrote, which is safe only for as long as the mixer keeps rewriting that
+      // pose — and it stops when nothing changes: three.js skips `binding.setValue` when an
+      // action's output matches the value it applied last frame, which is every frame once dt is
+      // zero. The bend then compounds on its own result, and since a frozen clock makes it a
+      // constant rather than a wave, a paused animal screws slowly round its own axis. There is no
+      // wave to add to a still frame anyway, so the pose simply holds.
+      if (dt > 0 && this.spine.length > 3 && def.proceduralUndulation !== false && !def.ground && a.state !== 'dead') {
         const amp = clamp(speed / Math.max(cruise, 0.1), 0, 1.6) * 0.045 + Math.abs(a.bank) * 0.02;
         const freq = 5.5 / Math.pow(Math.max(a.scale, 0.1), 0.35);
         // Local-space bend: each spine bone yaws slightly about its own up axis. Cheaper than
@@ -351,7 +458,8 @@ export class CreatureView {
         case 'anchor': oy = -L * 0.06 * k; break;
         case 'bristleFlare': sx = L * (1 + 0.12 * k); break;
       }
-    } else this.inner.rotation.x = damp(this.inner.rotation.x, 0, 8, dt);
+    } else if (def.swimStyle === 'pulse') this.inner.rotation.x = this.bellAim(a, cruise, dt);
+    else this.inner.rotation.x = damp(this.inner.rotation.x, 0, 8, dt);
     if (a.hideMode === 'burrowed') { const k = clamp(a.hideT / .6, 0, 1); oy -= L * .5 * k; sy *= 1 - .35*k; }
     // A body eaten in bites loses the meat itself, so it must not also shrink; one swallowed
     // whole has no bites to show and still closes down as it goes in.

@@ -2,6 +2,10 @@
 
 The eight first-release models were integration examples. An independent audit of `1e43197` found all sixteen eye globes below the requested 50% containment. Each subject is being revised separately in Blender, with source projects and older versions retained under `cambrian/local/devonian-authoring/`.
 
+## Reopened models and audit order
+
+Titanichthys, Doryaspis, Gemuendina and Coccosteus are now **previews awaiting complete reworks** from user references. Their old reports below remain historical measurements and are not final art approvals. Finish each full rework before running its eye/general quality audits, as the user requested. See [the refinement queue](refinement-queue.md).
+
 ## Reviewed revisions
 
 | Creature | Changes | Full / reduced eye containment | Evidence |

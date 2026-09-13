@@ -1,0 +1,1055 @@
+{
+  "scope": "Read-only actual output analysis, not new model/audit execution",
+  "inputs": {
+    "/Users/hoai/Documents/Stuff/Generations/cambrian/local/devonian-authoring/titanichthys/rework-v3/candidate-06/titanichthys.glb": "e2c69eab63e50805c7d3980ee5e65e8b328b8d88e190a944e3f26db2b8ef36ad",
+    "/Users/hoai/Documents/Stuff/Generations/cambrian/local/devonian-authoring/titanichthys/rework-v3/packaging-study-candidate06-01/titanichthys.glb": "54a56a7490f1510b805f2d18968522cb782a7237c92d76d6e737e7f7296b8a25",
+    "/Users/hoai/Documents/Stuff/Generations/cambrian/local/devonian-authoring/titanichthys/rework-v3/oral-numerical-candidate06-01/result.json": "2e513809bc2d369c71db00b173521cc9a2c21da64aef9d3c42800d261843cdc9"
+  },
+  "packaging": [
+    {
+      "file": "candidate-06/titanichthys.glb",
+      "bytes": 43409408,
+      "images": [
+        {
+          "name": "fins-pectoral-normal",
+          "bytes": 3473332,
+          "dimensions": [
+            2048,
+            2048
+          ],
+          "mode": "RGB",
+          "channel_extrema": [
+            [
+              28,
+              138
+            ],
+            [
+              103,
+              140
+            ],
+            [
+              206,
+              255
+            ]
+          ]
+        },
+        {
+          "name": "fins-pectoral-albedo",
+          "bytes": 1897391,
+          "dimensions": [
+            2048,
+            2048
+          ],
+          "mode": "RGB",
+          "channel_extrema": [
+            [
+              0,
+              98
+            ],
+            [
+              0,
+              115
+            ],
+            [
+              0,
+              113
+            ]
+          ]
+        },
+        {
+          "name": "fins-pectoral-roughness",
+          "bytes": 129155,
+          "dimensions": [
+            512,
+            512
+          ],
+          "mode": "RGB",
+          "channel_extrema": [
+            [
+              255,
+              255
+            ],
+            [
+              0,
+              120
+            ],
+            [
+              255,
+              255
+            ]
+          ]
+        },
+        {
+          "name": "fins-dorsal-normal",
+          "bytes": 576329,
+          "dimensions": [
+            1024,
+            1024
+          ],
+          "mode": "RGB",
+          "channel_extrema": [
+            [
+              118,
+              136
+            ],
+            [
+              118,
+              136
+            ],
+            [
+              255,
+              255
+            ]
+          ]
+        },
+        {
+          "name": "fins-dorsal-albedo",
+          "bytes": 389919,
+          "dimensions": [
+            1024,
+            1024
+          ],
+          "mode": "RGB",
+          "channel_extrema": [
+            [
+              0,
+              88
+            ],
+            [
+              0,
+              108
+            ],
+            [
+              0,
+              111
+            ]
+          ]
+        },
+        {
+          "name": "fins-dorsal-roughness",
+          "bytes": 87000,
+          "dimensions": [
+            512,
+            512
+          ],
+          "mode": "RGB",
+          "channel_extrema": [
+            [
+              255,
+              255
+            ],
+            [
+              0,
+              122
+            ],
+            [
+              255,
+              255
+            ]
+          ]
+        },
+        {
+          "name": "fins-pelvic-normal",
+          "bytes": 761458,
+          "dimensions": [
+            1024,
+            1024
+          ],
+          "mode": "RGB",
+          "channel_extrema": [
+            [
+              117,
+              138
+            ],
+            [
+              117,
+              138
+            ],
+            [
+              255,
+              255
+            ]
+          ]
+        },
+        {
+          "name": "fins-pelvic-albedo",
+          "bytes": 475763,
+          "dimensions": [
+            1024,
+            1024
+          ],
+          "mode": "RGB",
+          "channel_extrema": [
+            [
+              0,
+              98
+            ],
+            [
+              0,
+              114
+            ],
+            [
+              0,
+              113
+            ]
+          ]
+        },
+        {
+          "name": "fins-pelvic-roughness",
+          "bytes": 114379,
+          "dimensions": [
+            512,
+            512
+          ],
+          "mode": "RGB",
+          "channel_extrema": [
+            [
+              255,
+              255
+            ],
+            [
+              0,
+              122
+            ],
+            [
+              255,
+              255
+            ]
+          ]
+        },
+        {
+          "name": "eyes-normal",
+          "bytes": 4588,
+          "dimensions": [
+            512,
+            512
+          ],
+          "mode": "RGB",
+          "channel_extrema": [
+            [
+              128,
+              128
+            ],
+            [
+              128,
+              128
+            ],
+            [
+              255,
+              255
+            ]
+          ]
+        },
+        {
+          "name": "eyes-albedo",
+          "bytes": 43373,
+          "dimensions": [
+            512,
+            512
+          ],
+          "mode": "RGB",
+          "channel_extrema": [
+            [
+              0,
+              65
+            ],
+            [
+              0,
+              61
+            ],
+            [
+              0,
+              44
+            ]
+          ]
+        },
+        {
+          "name": "eyes-roughness",
+          "bytes": 102242,
+          "dimensions": [
+            512,
+            512
+          ],
+          "mode": "RGB",
+          "channel_extrema": [
+            [
+              255,
+              255
+            ],
+            [
+              0,
+              53
+            ],
+            [
+              255,
+              255
+            ]
+          ]
+        },
+        {
+          "name": "fins-caudal-normal",
+          "bytes": 1772271,
+          "dimensions": [
+            2048,
+            2048
+          ],
+          "mode": "RGB",
+          "channel_extrema": [
+            [
+              114,
+              138
+            ],
+            [
+              118,
+              138
+            ],
+            [
+              254,
+              255
+            ]
+          ]
+        },
+        {
+          "name": "fins-caudal-albedo",
+          "bytes": 1085185,
+          "dimensions": [
+            2048,
+            2048
+          ],
+          "mode": "RGB",
+          "channel_extrema": [
+            [
+              0,
+              88
+            ],
+            [
+              0,
+              108
+            ],
+            [
+              0,
+              111
+            ]
+          ]
+        },
+        {
+          "name": "fins-caudal-roughness",
+          "bytes": 74720,
+          "dimensions": [
+            512,
+            512
+          ],
+          "mode": "RGB",
+          "channel_extrema": [
+            [
+              255,
+              255
+            ],
+            [
+              0,
+              121
+            ],
+            [
+              255,
+              255
+            ]
+          ]
+        },
+        {
+          "name": "body-normal",
+          "bytes": 11792939,
+          "dimensions": [
+            4096,
+            4096
+          ],
+          "mode": "RGB",
+          "channel_extrema": [
+            [
+              93,
+              163
+            ],
+            [
+              92,
+              247
+            ],
+            [
+              0,
+              255
+            ]
+          ]
+        },
+        {
+          "name": "body-albedo",
+          "bytes": 7133674,
+          "dimensions": [
+            4096,
+            4096
+          ],
+          "mode": "RGB",
+          "channel_extrema": [
+            [
+              0,
+              112
+            ],
+            [
+              0,
+              143
+            ],
+            [
+              0,
+              167
+            ]
+          ]
+        },
+        {
+          "name": "body-roughness",
+          "bytes": 410915,
+          "dimensions": [
+            1024,
+            1024
+          ],
+          "mode": "RGB",
+          "channel_extrema": [
+            [
+              255,
+              255
+            ],
+            [
+              0,
+              125
+            ],
+            [
+              255,
+              255
+            ]
+          ]
+        }
+      ],
+      "image_bytes": 30324633,
+      "non_image_bytes": 13084775,
+      "animation_payload_bytes": 297236,
+      "geometry_payload_bytes": 12561924
+    },
+    {
+      "file": "packaging-study-candidate06-01/titanichthys.glb",
+      "bytes": 36046104,
+      "images": [
+        {
+          "name": "fins-pectoral-normal",
+          "bytes": 3473332,
+          "dimensions": [
+            2048,
+            2048
+          ],
+          "mode": "RGB",
+          "channel_extrema": [
+            [
+              28,
+              138
+            ],
+            [
+              103,
+              140
+            ],
+            [
+              206,
+              255
+            ]
+          ]
+        },
+        {
+          "name": "fins-pectoral-albedo",
+          "bytes": 1897391,
+          "dimensions": [
+            2048,
+            2048
+          ],
+          "mode": "RGB",
+          "channel_extrema": [
+            [
+              0,
+              98
+            ],
+            [
+              0,
+              115
+            ],
+            [
+              0,
+              113
+            ]
+          ]
+        },
+        {
+          "name": "fins-pectoral-roughness",
+          "bytes": 129155,
+          "dimensions": [
+            512,
+            512
+          ],
+          "mode": "RGB",
+          "channel_extrema": [
+            [
+              255,
+              255
+            ],
+            [
+              0,
+              120
+            ],
+            [
+              255,
+              255
+            ]
+          ]
+        },
+        {
+          "name": "fins-dorsal-normal",
+          "bytes": 576329,
+          "dimensions": [
+            1024,
+            1024
+          ],
+          "mode": "RGB",
+          "channel_extrema": [
+            [
+              118,
+              136
+            ],
+            [
+              118,
+              136
+            ],
+            [
+              255,
+              255
+            ]
+          ]
+        },
+        {
+          "name": "fins-dorsal-albedo",
+          "bytes": 389919,
+          "dimensions": [
+            1024,
+            1024
+          ],
+          "mode": "RGB",
+          "channel_extrema": [
+            [
+              0,
+              88
+            ],
+            [
+              0,
+              108
+            ],
+            [
+              0,
+              111
+            ]
+          ]
+        },
+        {
+          "name": "fins-dorsal-roughness",
+          "bytes": 87000,
+          "dimensions": [
+            512,
+            512
+          ],
+          "mode": "RGB",
+          "channel_extrema": [
+            [
+              255,
+              255
+            ],
+            [
+              0,
+              122
+            ],
+            [
+              255,
+              255
+            ]
+          ]
+        },
+        {
+          "name": "fins-pelvic-normal",
+          "bytes": 761458,
+          "dimensions": [
+            1024,
+            1024
+          ],
+          "mode": "RGB",
+          "channel_extrema": [
+            [
+              117,
+              138
+            ],
+            [
+              117,
+              138
+            ],
+            [
+              255,
+              255
+            ]
+          ]
+        },
+        {
+          "name": "fins-pelvic-albedo",
+          "bytes": 475763,
+          "dimensions": [
+            1024,
+            1024
+          ],
+          "mode": "RGB",
+          "channel_extrema": [
+            [
+              0,
+              98
+            ],
+            [
+              0,
+              114
+            ],
+            [
+              0,
+              113
+            ]
+          ]
+        },
+        {
+          "name": "fins-pelvic-roughness",
+          "bytes": 114379,
+          "dimensions": [
+            512,
+            512
+          ],
+          "mode": "RGB",
+          "channel_extrema": [
+            [
+              255,
+              255
+            ],
+            [
+              0,
+              122
+            ],
+            [
+              255,
+              255
+            ]
+          ]
+        },
+        {
+          "name": "eyes-normal",
+          "bytes": 4588,
+          "dimensions": [
+            512,
+            512
+          ],
+          "mode": "RGB",
+          "channel_extrema": [
+            [
+              128,
+              128
+            ],
+            [
+              128,
+              128
+            ],
+            [
+              255,
+              255
+            ]
+          ]
+        },
+        {
+          "name": "eyes-albedo",
+          "bytes": 43373,
+          "dimensions": [
+            512,
+            512
+          ],
+          "mode": "RGB",
+          "channel_extrema": [
+            [
+              0,
+              65
+            ],
+            [
+              0,
+              61
+            ],
+            [
+              0,
+              44
+            ]
+          ]
+        },
+        {
+          "name": "eyes-roughness",
+          "bytes": 102242,
+          "dimensions": [
+            512,
+            512
+          ],
+          "mode": "RGB",
+          "channel_extrema": [
+            [
+              255,
+              255
+            ],
+            [
+              0,
+              53
+            ],
+            [
+              255,
+              255
+            ]
+          ]
+        },
+        {
+          "name": "fins-caudal-normal",
+          "bytes": 1772271,
+          "dimensions": [
+            2048,
+            2048
+          ],
+          "mode": "RGB",
+          "channel_extrema": [
+            [
+              114,
+              138
+            ],
+            [
+              118,
+              138
+            ],
+            [
+              254,
+              255
+            ]
+          ]
+        },
+        {
+          "name": "fins-caudal-albedo",
+          "bytes": 1085185,
+          "dimensions": [
+            2048,
+            2048
+          ],
+          "mode": "RGB",
+          "channel_extrema": [
+            [
+              0,
+              88
+            ],
+            [
+              0,
+              108
+            ],
+            [
+              0,
+              111
+            ]
+          ]
+        },
+        {
+          "name": "fins-caudal-roughness",
+          "bytes": 74720,
+          "dimensions": [
+            512,
+            512
+          ],
+          "mode": "RGB",
+          "channel_extrema": [
+            [
+              255,
+              255
+            ],
+            [
+              0,
+              121
+            ],
+            [
+              255,
+              255
+            ]
+          ]
+        },
+        {
+          "name": "body-normal",
+          "bytes": 11792939,
+          "dimensions": [
+            4096,
+            4096
+          ],
+          "mode": "RGB",
+          "channel_extrema": [
+            [
+              93,
+              163
+            ],
+            [
+              92,
+              247
+            ],
+            [
+              0,
+              255
+            ]
+          ]
+        },
+        {
+          "name": "body-albedo",
+          "bytes": 7133674,
+          "dimensions": [
+            4096,
+            4096
+          ],
+          "mode": "RGB",
+          "channel_extrema": [
+            [
+              0,
+              112
+            ],
+            [
+              0,
+              143
+            ],
+            [
+              0,
+              167
+            ]
+          ]
+        },
+        {
+          "name": "body-roughness",
+          "bytes": 410915,
+          "dimensions": [
+            1024,
+            1024
+          ],
+          "mode": "RGB",
+          "channel_extrema": [
+            [
+              255,
+              255
+            ],
+            [
+              0,
+              125
+            ],
+            [
+              255,
+              255
+            ]
+          ]
+        }
+      ],
+      "image_bytes": 30324633,
+      "non_image_bytes": 5721471,
+      "animation_payload_bytes": 204421,
+      "geometry_payload_bytes": 5288894
+    }
+  ],
+  "mouth": [
+    {
+      "asset": "titanichthys.glb",
+      "clip": "Bite",
+      "counts": {
+        "oral": 340
+      },
+      "underside_then_near_oral_under_01_count": 0
+    },
+    {
+      "asset": "titanichthys.glb",
+      "clip": "Eat",
+      "counts": {
+        "oral": 340
+      },
+      "underside_then_near_oral_under_01_count": 0
+    },
+    {
+      "asset": "titanichthys.glb",
+      "clip": "Ability",
+      "counts": {
+        "oral": 260,
+        "underside": 80
+      },
+      "underside_then_near_oral_under_01_count": 46,
+      "near_reversal_depth_range": [
+        7.772445678710938e-05,
+        0.0021276473999023438
+      ],
+      "representative_ray": {
+        "side": "right",
+        "pixel": [
+          937,
+          550
+        ],
+        "hits": [
+          {
+            "triangle": 76288,
+            "material": "Titanichthys underside",
+            "role": "underside",
+            "point": [
+              0.4749999940395355,
+              -0.210999995470047,
+              2.4506611824035645
+            ],
+            "normal": [
+              -0.3138778805732727,
+              -0.6855846047401428,
+              -0.6568518877029419
+            ]
+          },
+          {
+            "triangle": 119554,
+            "material": "Titanichthys oral accent",
+            "role": "oral",
+            "point": [
+              0.4749999940395355,
+              -0.210999995470047,
+              2.4505834579467773
+            ],
+            "normal": [
+              0.3982372581958771,
+              0.5621078014373779,
+              0.7248738408088684
+            ]
+          },
+          {
+            "triangle": 77918,
+            "material": "Titanichthys underside",
+            "role": "underside",
+            "point": [
+              0.4749999940395355,
+              -0.210999995470047,
+              2.362464189529419
+            ],
+            "normal": [
+              0.5061521530151367,
+              -0.7906201481819153,
+              0.34457170963287354
+            ]
+          },
+          {
+            "triangle": 130306,
+            "material": "Titanichthys oral accent",
+            "role": "oral",
+            "point": [
+              0.4749999940395355,
+              -0.210999995470047,
+              2.191960334777832
+            ],
+            "normal": [
+              -0.5339173078536987,
+              0.7354601621627808,
+              -0.4171697497367859
+            ]
+          }
+        ]
+      },
+      "actual_triangles": {
+        "76288": {
+          "material": "Titanichthys underside",
+          "vertices": [
+            {
+              "position": [
+                0.4661030173301697,
+                -0.19850347936153412,
+                2.3507349491119385
+              ],
+              "weights": {
+                "jaw": 0.6139436364173889,
+                "body": 0.23321965336799622,
+                "oral_floor": 0.15283671021461487
+              }
+            },
+            {
+              "position": [
+                0.4627099931240082,
+                -0.2023838460445404,
+                2.344736099243164
+              ],
+              "weights": {
+                "jaw": 0.5625916123390198,
+                "body": 0.24794551730155945,
+                "oral_floor": 0.18946287035942078
+              }
+            },
+            {
+              "position": [
+                0.4797254800796509,
+                -0.19839069247245789,
+                2.327765703201294
+              ],
+              "weights": {
+                "jaw": 0.5625916123390198,
+                "body": 0.24794550240039825,
+                "oral_floor": 0.18946287035942078
+              }
+            }
+          ]
+        },
+        "119554": {
+          "material": "Titanichthys oral accent",
+          "vertices": [
+            {
+              "position": [
+                0.4600740671157837,
+                -0.161267951130867,
+                2.357872247695923
+              ],
+              "weights": {
+                "jaw": 0.8380992412567139,
+                "body": 0.12845683097839355,
+                "oral_floor": 0.03344393149018288
+              }
+            },
+            {
+              "position": [
+                0.47817009687423706,
+                -0.1587977558374405,
+                2.3404288291931152
+              ],
+              "weights": {
+                "jaw": 0.8380992412567139,
+                "body": 0.12845681607723236,
+                "oral_floor": 0.03344393149018288
+              }
+            },
+            {
+              "position": [
+                0.4671962857246399,
+                -0.16020901501178741,
+                2.341261148452759
+              ],
+              "weights": {
+                "jaw": 0.7994032502174377,
+                "body": 0.15183159708976746,
+                "oral_floor": 0.04876517131924629
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "asset": "titanichthys.lod1.glb",
+      "clip": "Ability",
+      "counts": {
+        "underside": 94,
+        "oral": 246
+      },
+      "underside_then_near_oral_under_01_count": 60,
+      "near_reversal_depth_range": [
+        3.9577484130859375e-05,
+        0.0052127838134765625
+      ]
+    }
+  ]
+}
