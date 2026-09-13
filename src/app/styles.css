@@ -56,7 +56,7 @@ h3 { font-size: 13px; letter-spacing: .12em; color: var(--ember); margin: 14px 0
 .title-tag { font-size: clamp(14px, 1.6vw, 19px); font-weight: 600; margin: 0 0 34px; color: var(--mist); }
 .title-tag em { color: var(--ember); font-style: normal; }
 .press-start { font: 700 clamp(16px, 2vw, 24px) var(--font-display); letter-spacing: .32em; color: var(--foam); margin: 0 0 12px; animation: blink 1.5s ease-in-out infinite; }
-.press-start.loading { animation: none; color: var(--dim); letter-spacing: .2em; }
+.press-start.waiting { animation: none; color: var(--dim); letter-spacing: .2em; }
 .title-hint { font-size: 13px; color: var(--dim); margin: 0; }
 
 /* ---------- Select ---------- */
@@ -763,18 +763,20 @@ input[type='checkbox'] { width: 20px; height: 20px; accent-color: var(--ember); 
 
 /* The other era, bottom left of the title screen. Small, out of the way of the artwork, and the
    one thing on this screen that is not "press start". */
-.era-switch { position: absolute; left: max(18px, env(safe-area-inset-left)); bottom: max(18px, env(safe-area-inset-bottom)); z-index: 3; display: grid; gap: 1px; padding: 10px 14px; border-radius: 14px; text-decoration: none; color: var(--foam); background: rgba(6,22,28,.6); border: 1px solid rgba(238,250,246,.18); backdrop-filter: blur(6px); transition: background .18s, border-color .18s, transform .18s; }
+.era-switches { position: absolute; left: max(18px, env(safe-area-inset-left)); bottom: max(18px, env(safe-area-inset-bottom)); z-index: 3; display: grid; gap: 8px; justify-items: start; }
+.era-switch { display: grid; gap: 1px; padding: 10px 14px; border-radius: 14px; text-decoration: none; color: var(--foam); background: rgba(6,22,28,.6); border: 1px solid rgba(238,250,246,.18); backdrop-filter: blur(6px); transition: background .18s, border-color .18s, transform .18s; }
 .era-switch:hover, .era-switch:focus-visible { background: rgba(6,22,28,.82); border-color: var(--ember); transform: translateY(-2px); }
 .era-switch b { font: 800 14px var(--font-display); letter-spacing: .01em; }
 .era-switch-eyebrow { font: 800 9px var(--font-display); letter-spacing: .16em; color: var(--ember); }
 .era-switch-blurb { font-size: 11px; color: var(--dim); }
 @media (max-width: 560px) { .era-switch { padding: 8px 11px; } .era-switch b { font-size: 12px; } .era-switch-blurb { display: none; } }
 .title-illustrated .press-start { margin: 14px 0; }
-/* The boot bar, under the loading line on the title screen. Narrow and quiet: the screen is
-   already the game's own painting, and this is a progress bar, not a boot screen. */
-.title-progress { width: min(60vw, 320px); margin: 0 auto 10px; }
-.title-progress .loading-bar { height: 6px; margin: 0; }
-.title-progress-status { margin: 8px 0 0; font-size: 12px; letter-spacing: .06em; color: var(--mist); }
+/* The boot bar, under the loading line on the title screen. Narrow — this is a progress bar, not
+   a boot screen — but it has to read over a painting, so it carries its own dark track and rim the
+   way the text on this screen carries its own shadow. */
+.title-progress { width: min(60vw, 300px); margin: 2px auto 10px; }
+.title-progress .loading-bar { height: 7px; margin: 0; background: rgba(6, 22, 28, .62); border-color: rgba(238, 250, 246, .38); box-shadow: 0 1px 6px rgba(0,0,0,.5); }
+.title-progress-status { margin: 8px 0 0; font-size: 12px; letter-spacing: .08em; color: #e4ece6; }
 .loading-illustrated .loading-inner { width: min(92vw, 780px); }
 .loading-illustrated .title-logo.small .illustrated-logo { width: 100%; max-height: calc(100svh - 220px); object-fit: contain; }
 .loading-illustrated .loading-bar { margin-top: 16px; }

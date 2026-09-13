@@ -24,7 +24,13 @@ export function TitleScreen({ onStart, loaded, padCount, eraFocused = false, pro
       <h1 className="sr-only">{ACTIVE_ERA.title}</h1>
       <div className="title-inner">
         <p className="title-tag">{copy.tagline} <em>{copy.taglineEm}</em></p>
-        <p className={`press-start ${loaded ? '' : 'loading'}`}>{loaded ? 'PRESS START' : copy.loading}</p>
+        {/*
+          * `waiting`, not `loading`: `.loading` is the boot screen's own class — position absolute,
+          * inset 0, its own background — and this line was quietly picking all of that up and
+          * drawing itself as a full-screen panel over the title. It only showed while the assets
+          * were still coming, which until now was a moment nobody saw.
+          */}
+        <p className={`press-start ${loaded ? '' : 'waiting'}`}>{loaded ? 'PRESS START' : copy.loading}</p>
         {!loaded && progress !== null && (
           <div className="title-progress">
             <div className="loading-bar" role="progressbar" aria-valuemin={0} aria-valuemax={100} aria-valuenow={Math.round(progress * 100)} aria-label={copy.loading}>
@@ -35,13 +41,17 @@ export function TitleScreen({ onStart, loaded, padCount, eraFocused = false, pro
         )}
         <p className="title-hint">{padCount > 0 ? `${padCount} controller${padCount > 1 ? 's' : ''} connected · any button · others join on the next screen` : 'Press any key or click to play on mouse and keyboard · or connect a controller'}</p>
       </div>
+      {/*
+        * The other eras, one click away and only from the title screen. Clicks and keys are kept
+        * off the surrounding press-start surface, or following the link would also start a match.
+        * They are in a column: each link used to place itself in the corner, so with two of them
+        * (which is every era now there are three games) the second sat on top of the first.
+        */}
+      <nav className="era-switches" aria-label="The other games">
       {siblings.map((sibling, i) => (
-        // The other eras, one click away and only from the title screen. Clicks and keys are kept
-        // off the surrounding press-start surface, or following the link would also start a match.
         <a
           key={sibling.path}
           className={`era-switch${eraFocused && i === 0 ? ' pad-focus' : ''}`}
-          style={i > 0 ? { marginTop: 8 } : undefined}
           href={`${appBase()}${sibling.path}`}
           onClick={(e) => e.stopPropagation()}
           onKeyDown={(e) => e.stopPropagation()}
@@ -51,6 +61,7 @@ export function TitleScreen({ onStart, loaded, padCount, eraFocused = false, pro
           <span className="era-switch-blurb">{sibling.blurb}</span>
         </a>
       ))}
+      </nav>
     </section>
   );
 }
