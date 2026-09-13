@@ -1,0 +1,105 @@
+{
+  "schema_version": 1,
+  "input": {
+    "path": "tools/triassic/creatures/henodus/tripo-raw/henodus.raw.glb",
+    "bytes": 1677780,
+    "sha256": "f27e090789b6210a47e135baf7197058657febd98947ad15b1c38c3f865d7530"
+  },
+  "summary": {
+    "mesh_objects": 1,
+    "vertices": 11602,
+    "faces": 19204,
+    "triangles": 19204,
+    "connected_components": 97,
+    "materials": 1,
+    "textures": 3
+  },
+  "bounds": {
+    "min_xyz": [
+      -0.5,
+      -0.34726,
+      -0.122709
+    ],
+    "max_xyz": [
+      0.5,
+      0.34726,
+      0.122709
+    ],
+    "center_xyz": [
+      0,
+      0,
+      0
+    ],
+    "size_xyz": [
+      1,
+      0.694519,
+      0.245417
+    ]
+  },
+  "meshes": [
+    {
+      "object": "tripo_node_521afa1a-b50a-4d12-add2-cc8f441e88f0",
+      "mesh": "tripo_mesh_521afa1a-b50a-4d12-add2-cc8f441e88f0",
+      "vertices": 11602,
+      "edges": 30709,
+      "faces": 19204,
+      "triangles": 19204,
+      "connected_components": 97,
+      "material_slots": [
+        "tripo_material_521afa1a-b50a-4d12-add2-cc8f441e88f0"
+      ]
+    }
+  ],
+  "materials": [
+    {
+      "name": "tripo_material_521afa1a-b50a-4d12-add2-cc8f441e88f0",
+      "image_textures": [
+        "Color_521afa1a-b50a-4d12-add2-cc8f441e88f0",
+        "NormalGL_521afa1a-b50a-4d12-add2-cc8f441e88f0",
+        "ORM_521afa1a-b50a-4d12-add2-cc8f441e88f0"
+      ]
+    }
+  ],
+  "textures": [
+    {
+      "name": "Color_521afa1a-b50a-4d12-add2-cc8f441e88f0",
+      "width": 2048,
+      "height": 2048,
+      "channels": 4,
+      "packed": true,
+      "source": "FILE",
+      "colorspace": "sRGB"
+    },
+    {
+      "name": "NormalGL_521afa1a-b50a-4d12-add2-cc8f441e88f0",
+      "width": 2048,
+      "height": 2048,
+      "channels": 4,
+      "packed": true,
+      "source": "FILE",
+      "colorspace": "Non-Color"
+    },
+    {
+      "name": "ORM_521afa1a-b50a-4d12-add2-cc8f441e88f0",
+      "width": 2048,
+      "height": 2048,
+      "channels": 4,
+      "packed": true,
+      "source": "FILE",
+      "colorspace": "Non-Color"
+    }
+  ],
+  "renders": {
+    "side": "tools/triassic/creatures/henodus/tripo-raw/review/side.png",
+    "top": "tools/triassic/creatures/henodus/tripo-raw/review/top.png",
+    "three-quarter": "tools/triassic/creatures/henodus/tripo-raw/review/three-quarter.png"
+  },
+  "preview": {
+    "path": "tools/triassic/creatures/henodus/henodus.preview.glb",
+    "triangle_limit": 40000,
+    "triangles_before": 19204,
+    "triangles_after": 19204,
+    "bytes": 1562320,
+    "sha256": "cce264852a859338f307db9b842ac596a39ae407ef1bee48857d99a175911943"
+  }
+}
