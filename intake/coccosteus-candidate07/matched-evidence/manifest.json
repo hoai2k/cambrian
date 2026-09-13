@@ -1,0 +1,412 @@
+{
+  "group": "LOD07 six new views paired with immutable actual full references",
+  "renderer_sha256": "9713077c5e840be61ab166c3c4d08da5eee9c6eab732f7b2aaaf1ba79144dd4f",
+  "source_sha256": {
+    "lod_common_07.py": "8ba998caae71c33f6642b771a991ba35e9be8a6811009b0803fcab1ce017e3a9",
+    "lod_plan_05.py": "b66487a18a62022233c7e2d31e160b6a0bd770bdb0daa93b88a5f8e95cdf4c49",
+    "lod_plan_07.py": "86ab4aa464a992bcde45cd710191be58097b85c4be31bbd7ae3b8547f0556665",
+    "inspect_lod_plan_08.py": "e3a7fe20bd595559680d0135994464548239ad8204558c28cce4945bfcd71e91",
+    "build_lod_07.py": "11926e99e6d45b32b676ec802f3f565f29e7bdd16491f4e2bc628bad0150d57f",
+    "render_lod_07.py": "9713077c5e840be61ab166c3c4d08da5eee9c6eab732f7b2aaaf1ba79144dd4f",
+    "check_candidate_07.py": "77de7419cc444a566b26aae89b607fe12d0425a4bc16395636d97158c12455f6",
+    "lip_basis_07.py": "bead492cd282324f10bb7d9b999dfbad9f051d458d332cba244b7b87c81f133e",
+    "atlas_pigment_01.py": "278a0597dd491309f8a0c5a1dd5c6bc89e29754425ec3dc4374fbc160eeb012f",
+    "export_patch_02.py": "933ba01dcac26b7e2d8d9cecae85dffb29408728f63c896345aed19ea54b602f",
+    "rig_actions_01.py": "ca1d7bec10dfaa3a40bdb48974cd88f8f105eca85a686a6d544436c2f2c0320b"
+  },
+  "complete": true,
+  "renders": [
+    {
+      "path": "/Users/hoai/Documents/Stuff/Generations/cambrian/local/devonian-authoring/coccosteus/rework-v3/candidate-07/matched-evidence/LOD-Idle-side.png",
+      "bytes": 1018544,
+      "sha256": "6146e90f0afac95c06434bddf31d3aa81400849a1dd1d95f47d0ea3f991000a9",
+      "sourceGlb": {
+        "path": "/Users/hoai/Documents/Stuff/Generations/cambrian/local/devonian-authoring/coccosteus/rework-v3/candidate-07/coccosteus.lod1.glb",
+        "bytes": 3236312,
+        "sha256": "eec740e92fcf2187c54eacb2418fc7335cd584fe57b2792e64e8e4f1bbd31756"
+      },
+      "clip": "Idle",
+      "phase": 0,
+      "frame": 0,
+      "importedAction": "Idle",
+      "importedSlot": "OBcoccosteus_rig",
+      "durationSeconds": 2.0,
+      "materialMode": "lit",
+      "fullReference": {
+        "path": "/Users/hoai/Documents/Stuff/Generations/cambrian/local/devonian-authoring/coccosteus/rework-v3/candidate-05/matched-evidence-06/Full-Idle-side.png",
+        "bytes": 1043880,
+        "sha256": "e011beee7001bcce97325ca3fbe7ec5c014201c4b0e81f6e9545eb3bec932984",
+        "sourceGlb": {
+          "path": "/Users/hoai/Documents/Stuff/Generations/cambrian/local/devonian-authoring/coccosteus/rework-v3/candidate-05/coccosteus.glb",
+          "bytes": 22931780,
+          "sha256": "b7b929b9978f51f89e0cb1e687dec10d95b90edd3e2b2ba27b12432f58474655"
+        },
+        "clip": "Idle",
+        "phase": 0,
+        "frame": 0,
+        "importedAction": "Idle",
+        "importedSlot": "OBcoccosteus_rig",
+        "durationSeconds": 2.0,
+        "camera": [
+          7,
+          0.4,
+          0.1
+        ],
+        "target": [
+          0,
+          0.4,
+          0.1
+        ],
+        "scale": 5.1,
+        "resolution": [
+          1280,
+          960
+        ],
+        "oralFill": false
+      },
+      "camera": [
+        7,
+        0.4,
+        0.1
+      ],
+      "target": [
+        0,
+        0.4,
+        0.1
+      ],
+      "scale": 5.1,
+      "resolution": [
+        1280,
+        960
+      ],
+      "oralFill": false
+    },
+    {
+      "path": "/Users/hoai/Documents/Stuff/Generations/cambrian/local/devonian-authoring/coccosteus/rework-v3/candidate-07/matched-evidence/LOD-Idle-oblique.png",
+      "bytes": 1031662,
+      "sha256": "075ab3f40fb06df40a23237d9b92ff8ae301b0fa1ed8db8ce0f658fa746f085c",
+      "sourceGlb": {
+        "path": "/Users/hoai/Documents/Stuff/Generations/cambrian/local/devonian-authoring/coccosteus/rework-v3/candidate-07/coccosteus.lod1.glb",
+        "bytes": 3236312,
+        "sha256": "eec740e92fcf2187c54eacb2418fc7335cd584fe57b2792e64e8e4f1bbd31756"
+      },
+      "clip": "Idle",
+      "phase": 0,
+      "frame": 0,
+      "importedAction": "Idle",
+      "importedSlot": "OBcoccosteus_rig",
+      "durationSeconds": 2.0,
+      "materialMode": "lit",
+      "fullReference": {
+        "path": "/Users/hoai/Documents/Stuff/Generations/cambrian/local/devonian-authoring/coccosteus/rework-v3/candidate-05/matched-evidence-06/Full-Idle-oblique.png",
+        "bytes": 1054962,
+        "sha256": "be277eb8221bf6c4b941731060298359be4740a93d1202e65e05c0d9a203bea7",
+        "sourceGlb": {
+          "path": "/Users/hoai/Documents/Stuff/Generations/cambrian/local/devonian-authoring/coccosteus/rework-v3/candidate-05/coccosteus.glb",
+          "bytes": 22931780,
+          "sha256": "b7b929b9978f51f89e0cb1e687dec10d95b90edd3e2b2ba27b12432f58474655"
+        },
+        "clip": "Idle",
+        "phase": 0,
+        "frame": 0,
+        "importedAction": "Idle",
+        "importedSlot": "OBcoccosteus_rig",
+        "durationSeconds": 2.0,
+        "camera": [
+          4.6,
+          -5.2,
+          2.7
+        ],
+        "target": [
+          0,
+          0.3,
+          0
+        ],
+        "scale": 4.85,
+        "resolution": [
+          1280,
+          960
+        ],
+        "oralFill": false
+      },
+      "camera": [
+        4.6,
+        -5.2,
+        2.7
+      ],
+      "target": [
+        0,
+        0.3,
+        0
+      ],
+      "scale": 4.85,
+      "resolution": [
+        1280,
+        960
+      ],
+      "oralFill": false
+    },
+    {
+      "path": "/Users/hoai/Documents/Stuff/Generations/cambrian/local/devonian-authoring/coccosteus/rework-v3/candidate-07/matched-evidence/LOD-Fin-close.png",
+      "bytes": 1130307,
+      "sha256": "5ef14dd9c5be1fcb103ad5cbb57044022241b6283ff21311f20d3c06c86db3b9",
+      "sourceGlb": {
+        "path": "/Users/hoai/Documents/Stuff/Generations/cambrian/local/devonian-authoring/coccosteus/rework-v3/candidate-07/coccosteus.lod1.glb",
+        "bytes": 3236312,
+        "sha256": "eec740e92fcf2187c54eacb2418fc7335cd584fe57b2792e64e8e4f1bbd31756"
+      },
+      "clip": "Idle",
+      "phase": 0,
+      "frame": 0,
+      "importedAction": "Idle",
+      "importedSlot": "OBcoccosteus_rig",
+      "durationSeconds": 2.0,
+      "materialMode": "lit",
+      "fullReference": {
+        "path": "/Users/hoai/Documents/Stuff/Generations/cambrian/local/devonian-authoring/coccosteus/rework-v3/candidate-05/matched-evidence-06/Full-Fin-close.png",
+        "bytes": 1349466,
+        "sha256": "e55fa07d58d43aa52839b21cb8979ed163b444a61eb9e4582165f466f37ef53a",
+        "sourceGlb": {
+          "path": "/Users/hoai/Documents/Stuff/Generations/cambrian/local/devonian-authoring/coccosteus/rework-v3/candidate-05/coccosteus.glb",
+          "bytes": 22931780,
+          "sha256": "b7b929b9978f51f89e0cb1e687dec10d95b90edd3e2b2ba27b12432f58474655"
+        },
+        "clip": "Idle",
+        "phase": 0,
+        "frame": 0,
+        "importedAction": "Idle",
+        "importedSlot": "OBcoccosteus_rig",
+        "durationSeconds": 2.0,
+        "camera": [
+          3,
+          -0.25,
+          1.0
+        ],
+        "target": [
+          0.45,
+          -0.18,
+          -0.2
+        ],
+        "scale": 1.65,
+        "resolution": [
+          1280,
+          960
+        ],
+        "oralFill": false
+      },
+      "camera": [
+        3,
+        -0.25,
+        1.0
+      ],
+      "target": [
+        0.45,
+        -0.18,
+        -0.2
+      ],
+      "scale": 1.65,
+      "resolution": [
+        1280,
+        960
+      ],
+      "oralFill": false
+    },
+    {
+      "path": "/Users/hoai/Documents/Stuff/Generations/cambrian/local/devonian-authoring/coccosteus/rework-v3/candidate-07/matched-evidence/LOD-Attack.png",
+      "bytes": 1135282,
+      "sha256": "18acf2a6af8a162661fcc0c3d3757b06094318311fef5748c2397d182a56af74",
+      "sourceGlb": {
+        "path": "/Users/hoai/Documents/Stuff/Generations/cambrian/local/devonian-authoring/coccosteus/rework-v3/candidate-07/coccosteus.lod1.glb",
+        "bytes": 3236312,
+        "sha256": "eec740e92fcf2187c54eacb2418fc7335cd584fe57b2792e64e8e4f1bbd31756"
+      },
+      "clip": "Attack",
+      "phase": 0.32,
+      "frame": 8,
+      "importedAction": "Attack",
+      "importedSlot": "OBcoccosteus_rig",
+      "durationSeconds": 0.8,
+      "materialMode": "lit",
+      "fullReference": {
+        "path": "/Users/hoai/Documents/Stuff/Generations/cambrian/local/devonian-authoring/coccosteus/rework-v3/candidate-05/matched-evidence-06/Full-Attack.png",
+        "bytes": 1241855,
+        "sha256": "5ecc94988bee207fb6d140301f712b24044109022027fef1b1cb818935d507a2",
+        "sourceGlb": {
+          "path": "/Users/hoai/Documents/Stuff/Generations/cambrian/local/devonian-authoring/coccosteus/rework-v3/candidate-05/coccosteus.glb",
+          "bytes": 22931780,
+          "sha256": "b7b929b9978f51f89e0cb1e687dec10d95b90edd3e2b2ba27b12432f58474655"
+        },
+        "clip": "Attack",
+        "phase": 0.32,
+        "frame": 8,
+        "importedAction": "Attack",
+        "importedSlot": "OBcoccosteus_rig",
+        "durationSeconds": 0.8,
+        "camera": [
+          1.65,
+          -4.7,
+          -0.35
+        ],
+        "target": [
+          0,
+          -1.34,
+          -0.11
+        ],
+        "scale": 1.55,
+        "resolution": [
+          1280,
+          960
+        ],
+        "oralFill": true
+      },
+      "camera": [
+        1.65,
+        -4.7,
+        -0.35
+      ],
+      "target": [
+        0,
+        -1.34,
+        -0.11
+      ],
+      "scale": 1.55,
+      "resolution": [
+        1280,
+        960
+      ],
+      "oralFill": true
+    },
+    {
+      "path": "/Users/hoai/Documents/Stuff/Generations/cambrian/local/devonian-authoring/coccosteus/rework-v3/candidate-07/matched-evidence/LOD-albedo-emission-oblique.png",
+      "bytes": 1013012,
+      "sha256": "ddce03f86fc67a5fab5995df7e42b6340b8f66f222954782af960460d318b391",
+      "sourceGlb": {
+        "path": "/Users/hoai/Documents/Stuff/Generations/cambrian/local/devonian-authoring/coccosteus/rework-v3/candidate-07/coccosteus.lod1.glb",
+        "bytes": 3236312,
+        "sha256": "eec740e92fcf2187c54eacb2418fc7335cd584fe57b2792e64e8e4f1bbd31756"
+      },
+      "clip": "Idle",
+      "phase": 0,
+      "frame": 0,
+      "importedAction": "Idle",
+      "importedSlot": "OBcoccosteus_rig",
+      "durationSeconds": 2.0,
+      "materialMode": "albedo-emission",
+      "fullReference": {
+        "path": "/Users/hoai/Documents/Stuff/Generations/cambrian/local/devonian-authoring/coccosteus/rework-v3/diagnostic-lod05-fields-01/Full-albedo-emission-oblique.png",
+        "bytes": 1038130,
+        "sha256": "0c78a2f1b3b25efbd6d40e36869cd2fffdc6bc93a7de9db3a4046fab02e6bf10",
+        "sourceGlb": {
+          "path": "/Users/hoai/Documents/Stuff/Generations/cambrian/local/devonian-authoring/coccosteus/rework-v3/candidate-05/coccosteus.glb",
+          "bytes": 22931780,
+          "sha256": "b7b929b9978f51f89e0cb1e687dec10d95b90edd3e2b2ba27b12432f58474655"
+        },
+        "clip": "Idle",
+        "phase": 0,
+        "frame": 0,
+        "importedAction": "Idle",
+        "importedSlot": "OBcoccosteus_rig",
+        "durationSeconds": 2.0,
+        "ablation": "albedo-emission",
+        "camera": [
+          4.6,
+          -5.2,
+          2.7
+        ],
+        "target": [
+          0,
+          0.3,
+          0
+        ],
+        "scale": 4.85,
+        "resolution": [
+          1280,
+          960
+        ],
+        "oralFill": false
+      },
+      "camera": [
+        4.6,
+        -5.2,
+        2.7
+      ],
+      "target": [
+        0,
+        0.3,
+        0
+      ],
+      "scale": 4.85,
+      "resolution": [
+        1280,
+        960
+      ],
+      "oralFill": false
+    },
+    {
+      "path": "/Users/hoai/Documents/Stuff/Generations/cambrian/local/devonian-authoring/coccosteus/rework-v3/candidate-07/matched-evidence/LOD-albedo-emission-finclose.png",
+      "bytes": 1135114,
+      "sha256": "05d6a76994aa2755a3a3b9788e68ba25218bd1d486efc90172538b6d4f634d79",
+      "sourceGlb": {
+        "path": "/Users/hoai/Documents/Stuff/Generations/cambrian/local/devonian-authoring/coccosteus/rework-v3/candidate-07/coccosteus.lod1.glb",
+        "bytes": 3236312,
+        "sha256": "eec740e92fcf2187c54eacb2418fc7335cd584fe57b2792e64e8e4f1bbd31756"
+      },
+      "clip": "Idle",
+      "phase": 0,
+      "frame": 0,
+      "importedAction": "Idle",
+      "importedSlot": "OBcoccosteus_rig",
+      "durationSeconds": 2.0,
+      "materialMode": "albedo-emission",
+      "fullReference": {
+        "path": "/Users/hoai/Documents/Stuff/Generations/cambrian/local/devonian-authoring/coccosteus/rework-v3/diagnostic-lod05-fields-01/Full-albedo-emission-finclose.png",
+        "bytes": 1316410,
+        "sha256": "c2d81f7962d04e53097a4e51c91d18602f1fc696e91b0390f049706a458f7f36",
+        "sourceGlb": {
+          "path": "/Users/hoai/Documents/Stuff/Generations/cambrian/local/devonian-authoring/coccosteus/rework-v3/candidate-05/coccosteus.glb",
+          "bytes": 22931780,
+          "sha256": "b7b929b9978f51f89e0cb1e687dec10d95b90edd3e2b2ba27b12432f58474655"
+        },
+        "clip": "Idle",
+        "phase": 0,
+        "frame": 0,
+        "importedAction": "Idle",
+        "importedSlot": "OBcoccosteus_rig",
+        "durationSeconds": 2.0,
+        "ablation": "albedo-emission",
+        "camera": [
+          3,
+          -0.25,
+          1.0
+        ],
+        "target": [
+          0.45,
+          -0.18,
+          -0.2
+        ],
+        "scale": 1.65,
+        "resolution": [
+          1280,
+          960
+        ],
+        "oralFill": false
+      },
+      "camera": [
+        3,
+        -0.25,
+        1.0
+      ],
+      "target": [
+        0.45,
+        -0.18,
+        -0.2
+      ],
+      "scale": 1.65,
+      "resolution": [
+        1280,
+        960
+      ],
+      "oralFill": false
+    }
+  ]
+}

@@ -1,0 +1,391 @@
+{
+  "phase": "structural candidate checks only; actual playback/palette/final eye and creature audits plus packaged size gate separate",
+  "full_lod_skeleton_and_bind_matrices_match": true,
+  "full_lod_anchor_graph_matches": true,
+  "exports": [
+    {
+      "file": "/Users/hoai/Documents/Stuff/Generations/cambrian/local/devonian-authoring/coccosteus/rework-v3/candidate-07/coccosteus.glb",
+      "sha256": "b7b929b9978f51f89e0cb1e687dec10d95b90edd3e2b2ba27b12432f58474655",
+      "bytes": 22931780,
+      "triangles": 151920.0,
+      "clips": [
+        "Ability",
+        "Attack",
+        "Bite",
+        "Death",
+        "Dive",
+        "Dodge",
+        "Eat",
+        "Growth",
+        "Guard",
+        "Heavy",
+        "Hit",
+        "Idle",
+        "Parry",
+        "Rise",
+        "Stagger",
+        "Swim",
+        "TurnLeft",
+        "TurnRight"
+      ],
+      "durations": {
+        "Ability": 1.399999976158142,
+        "Attack": 0.800000011920929,
+        "Bite": 0.5,
+        "Death": 1.7999999523162842,
+        "Dive": 1.399999976158142,
+        "Dodge": 0.5,
+        "Eat": 1.7999999523162842,
+        "Growth": 1.5,
+        "Guard": 1.7999999523162842,
+        "Heavy": 1.100000023841858,
+        "Hit": 0.6000000238418579,
+        "Idle": 2.0,
+        "Parry": 0.4000000059604645,
+        "Rise": 1.399999976158142,
+        "Stagger": 1.2000000476837158,
+        "Swim": 1.600000023841858,
+        "TurnLeft": 1.2000000476837158,
+        "TurnRight": 1.2000000476837158
+      },
+      "channel_variation": {
+        "Ability": 0.23999863862991333,
+        "Attack": 0.18735641241073608,
+        "Bite": 0.14904262125492096,
+        "Death": 0.4346597194671631,
+        "Dive": 0.11474699527025223,
+        "Dodge": 0.19781476259231567,
+        "Eat": 0.10997814685105567,
+        "Growth": 0.04050740227103233,
+        "Guard": 0.011546275112777948,
+        "Heavy": 0.2532907724380493,
+        "Hit": 0.07427248358726501,
+        "Idle": 0.017328134272247553,
+        "Parry": 0.10820921510457993,
+        "Rise": 0.1147485002875328,
+        "Stagger": 0.06703487783670425,
+        "Swim": 0.11536943167448044,
+        "TurnLeft": 0.135773703455925,
+        "TurnRight": 0.13500934839248657
+      },
+      "seams": {
+        "Ability": 6.009294262006541e-34,
+        "Attack": 3.154879441635686e-34,
+        "Bite": 3.154879441635686e-34,
+        "Death": 0.4346597194671631,
+        "Dive": 1.4410034435135099e-33,
+        "Dodge": 2.9995195879107854e-33,
+        "Eat": 0.0,
+        "Growth": 5.921745187631724e-34,
+        "Guard": 0.0,
+        "Heavy": 3.154879441635686e-34,
+        "Hit": 5.81829433791967e-34,
+        "Idle": 0.0,
+        "Parry": 9.929183131269968e-34,
+        "Rise": 1.408540146634637e-33,
+        "Stagger": 9.910755420610906e-34,
+        "Swim": 0.0,
+        "TurnLeft": 3.154879441635686e-34,
+        "TurnRight": 3.154879441635686e-34
+      },
+      "materials": [
+        {
+          "material": "Coccosteus fins 00-fins",
+          "palette_slot": "fins",
+          "color_range": [
+            1.0,
+            1.0
+          ],
+          "texture": true
+        },
+        {
+          "material": "Coccosteus body 01-body",
+          "palette_slot": "body",
+          "color_range": [
+            1.0,
+            1.0
+          ],
+          "texture": true
+        },
+        {
+          "material": "Coccosteus oral accent 01-body",
+          "palette_slot": "accent",
+          "color_range": [
+            1.0,
+            1.0
+          ],
+          "texture": true
+        },
+        {
+          "material": "Coccosteus underside",
+          "palette_slot": "underside",
+          "color_range": [
+            1.0,
+            1.0
+          ],
+          "texture": true
+        },
+        {
+          "material": "Coccosteus eyes 03-eyes",
+          "palette_slot": "eyes",
+          "color_range": [
+            1.0,
+            1.0
+          ],
+          "texture": true
+        },
+        {
+          "material": "Coccosteus eyes 02-eyes",
+          "palette_slot": "eyes",
+          "color_range": [
+            1.0,
+            1.0
+          ],
+          "texture": true
+        },
+        {
+          "material": "Coccosteus fins 04-fins",
+          "palette_slot": "fins",
+          "color_range": [
+            1.0,
+            1.0
+          ],
+          "texture": true
+        },
+        {
+          "material": "Coccosteus fins 06-fins",
+          "palette_slot": "fins",
+          "color_range": [
+            1.0,
+            1.0
+          ],
+          "texture": true
+        },
+        {
+          "material": "Coccosteus fins 05-fins",
+          "palette_slot": "fins",
+          "color_range": [
+            1.0,
+            1.0
+          ],
+          "texture": true
+        },
+        {
+          "material": "Coccosteus fins 08-fins",
+          "palette_slot": "fins",
+          "color_range": [
+            1.0,
+            1.0
+          ],
+          "texture": true
+        },
+        {
+          "material": "Coccosteus fins 07-fins",
+          "palette_slot": "fins",
+          "color_range": [
+            1.0,
+            1.0
+          ],
+          "texture": true
+        }
+      ],
+      "all_three_nested_anchors": true,
+      "under_25mb_raw": true,
+      "root_stable": true,
+      "no_scale_channels": true,
+      "weights_normalized": true
+    },
+    {
+      "file": "/Users/hoai/Documents/Stuff/Generations/cambrian/local/devonian-authoring/coccosteus/rework-v3/candidate-07/coccosteus.lod1.glb",
+      "sha256": "eec740e92fcf2187c54eacb2418fc7335cd584fe57b2792e64e8e4f1bbd31756",
+      "bytes": 3236312,
+      "triangles": 59194.0,
+      "clips": [
+        "Ability",
+        "Attack",
+        "Bite",
+        "Death",
+        "Dive",
+        "Dodge",
+        "Eat",
+        "Growth",
+        "Guard",
+        "Heavy",
+        "Hit",
+        "Idle",
+        "Parry",
+        "Rise",
+        "Stagger",
+        "Swim",
+        "TurnLeft",
+        "TurnRight"
+      ],
+      "durations": {
+        "Ability": 1.399999976158142,
+        "Attack": 0.800000011920929,
+        "Bite": 0.5,
+        "Death": 1.7999999523162842,
+        "Dive": 1.399999976158142,
+        "Dodge": 0.5,
+        "Eat": 1.7999999523162842,
+        "Growth": 1.5,
+        "Guard": 1.7999999523162842,
+        "Heavy": 1.100000023841858,
+        "Hit": 0.6000000238418579,
+        "Idle": 2.0,
+        "Parry": 0.4000000059604645,
+        "Rise": 1.399999976158142,
+        "Stagger": 1.2000000476837158,
+        "Swim": 1.600000023841858,
+        "TurnLeft": 1.2000000476837158,
+        "TurnRight": 1.2000000476837158
+      },
+      "channel_variation": {
+        "Ability": 0.23999863862991333,
+        "Attack": 0.18735641241073608,
+        "Bite": 0.14904262125492096,
+        "Death": 0.4346597194671631,
+        "Dive": 0.11474699527025223,
+        "Dodge": 0.19781476259231567,
+        "Eat": 0.10997814685105567,
+        "Growth": 0.04050740227103233,
+        "Guard": 0.011546275112777948,
+        "Heavy": 0.2532907724380493,
+        "Hit": 0.07427248358726501,
+        "Idle": 0.017328134272247553,
+        "Parry": 0.10820921510457993,
+        "Rise": 0.1147485002875328,
+        "Stagger": 0.06703487783670425,
+        "Swim": 0.11536943167448044,
+        "TurnLeft": 0.135773703455925,
+        "TurnRight": 0.13500934839248657
+      },
+      "seams": {
+        "Ability": 6.009294262006541e-34,
+        "Attack": 3.154879441635686e-34,
+        "Bite": 3.154879441635686e-34,
+        "Death": 0.4346597194671631,
+        "Dive": 1.4410034435135099e-33,
+        "Dodge": 2.9995195879107854e-33,
+        "Eat": 0.0,
+        "Growth": 5.921745187631724e-34,
+        "Guard": 0.0,
+        "Heavy": 3.154879441635686e-34,
+        "Hit": 5.81829433791967e-34,
+        "Idle": 0.0,
+        "Parry": 9.929183131269968e-34,
+        "Rise": 1.408540146634637e-33,
+        "Stagger": 9.910755420610906e-34,
+        "Swim": 0.0,
+        "TurnLeft": 3.154879441635686e-34,
+        "TurnRight": 3.154879441635686e-34
+      },
+      "materials": [
+        {
+          "material": "Coccosteus fins 00-fins LOD structured07",
+          "palette_slot": "fins",
+          "color_range": [
+            0.033951323720149536,
+            0.14702067597467003
+          ],
+          "texture": false
+        },
+        {
+          "material": "Coccosteus body 01-body LOD structured07",
+          "palette_slot": "body",
+          "color_range": [
+            0.029236285954070344,
+            0.26636148622873274
+          ],
+          "texture": false
+        },
+        {
+          "material": "Coccosteus oral accent 01-body LOD structured07",
+          "palette_slot": "accent",
+          "color_range": [
+            0.028427557793545433,
+            0.09530785076676584
+          ],
+          "texture": false
+        },
+        {
+          "material": "Coccosteus underside LOD structured07",
+          "palette_slot": "underside",
+          "color_range": [
+            0.02951094834821088,
+            0.26636148622873274
+          ],
+          "texture": false
+        },
+        {
+          "material": "Coccosteus fins 04-fins LOD structured07",
+          "palette_slot": "fins",
+          "color_range": [
+            0.033112077515831236,
+            0.14702067597467003
+          ],
+          "texture": false
+        },
+        {
+          "material": "Coccosteus fins 06-fins LOD structured07",
+          "palette_slot": "fins",
+          "color_range": [
+            0.034531166552224005,
+            0.1441214618142977
+          ],
+          "texture": false
+        },
+        {
+          "material": "Coccosteus fins 05-fins LOD structured07",
+          "palette_slot": "fins",
+          "color_range": [
+            0.03450064850843061,
+            0.1441214618142977
+          ],
+          "texture": false
+        },
+        {
+          "material": "Coccosteus fins 08-fins LOD structured07",
+          "palette_slot": "fins",
+          "color_range": [
+            0.03588921950102998,
+            0.1441214618142977
+          ],
+          "texture": false
+        },
+        {
+          "material": "Coccosteus fins 07-fins LOD structured07",
+          "palette_slot": "fins",
+          "color_range": [
+            0.03585870145723659,
+            0.1441214618142977
+          ],
+          "texture": false
+        },
+        {
+          "material": "Coccosteus eyes 02-eyes LOD structured07",
+          "palette_slot": "eyes",
+          "color_range": [
+            0.004028381780727856,
+            0.17924773022049287
+          ],
+          "texture": false
+        },
+        {
+          "material": "Coccosteus eyes 03-eyes LOD structured07",
+          "palette_slot": "eyes",
+          "color_range": [
+            0.004028381780727856,
+            0.17924773022049287
+          ],
+          "texture": false
+        }
+      ],
+      "all_three_nested_anchors": true,
+      "under_25mb_raw": true,
+      "root_stable": true,
+      "no_scale_channels": true,
+      "weights_normalized": true
+    }
+  ]
+}

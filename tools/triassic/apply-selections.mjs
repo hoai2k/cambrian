@@ -64,7 +64,11 @@ for (const row of selections) {
   const entry = (manifest.subjects[row.id] ??= { canonical: hasPose(row.id) ? 'approved' : 'none', turnaround: 'not-started' });
   if (row.verdict === 'greenlit') {
     entry.canonical = 'greenlit';
-    delete entry.reworkToward;
+    // Which of our images is the canon, where a subject has more than one — the male Keichousaurus
+    // rather than the female, a modelling sheet rather than the pose beside it. A plain pose leaves
+    // this off, because there is nothing to disambiguate.
+    if (row.ref && row.ref !== 'canonical') entry.greenlitImage = row.ref; else delete entry.greenlitImage;
+    delete entry.reworkToward; delete entry.reworkNote;
     greenlit.push({ ...row, subject });
   } else {
     entry.canonical = 'needs-rework';
@@ -99,9 +103,9 @@ lines.push(`| Greenlit | Redo | Not yet reviewed |`, `| --- | --- | --- |`, `| $
 
 lines.push('## Greenlit — build from the canonical pose', '');
 if (greenlit.length) {
-  lines.push('| Subject | Slot | Note |', '| --- | --- | --- |');
+  lines.push('| Subject | Slot | Canon image | Note |', '| --- | --- | --- | --- |');
   for (const r of greenlit.sort((a, b) => a.id.localeCompare(b.id)))
-    lines.push(`| **${esc(r.name || r.subject.name)}** \`${r.id}\` | ${esc(r.subject.role)} | ${esc(r.note) || '—'} |`);
+    lines.push(`| **${esc(r.name || r.subject.name)}** \`${r.id}\` | ${esc(r.subject.role)} | ${r.ref && r.ref !== 'canonical' ? `\`${esc(r.image?.label ?? r.ref)}\`` : 'the pose'} | ${esc(r.note) || '—'} |`);
 } else lines.push('Nothing greenlit yet.');
 lines.push('');
 
