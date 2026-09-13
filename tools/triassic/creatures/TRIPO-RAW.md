@@ -1,6 +1,13 @@
-# Initial Tripo tests
+# Raw Tripo output
 
-These are **raw static test meshes**, preserved for review and follow-on Blender work. They are not final game specimens and have no authored skeleton, anchor contract, or animation clips. Runtime stand-ins and preview flags remain unchanged.
+The untouched generation each Triassic body was cleaned, rigged and animated *from*, kept beside
+the builder that did it (`tools/triassic/creatures/<id>/tripo-raw/`) rather than in `intake/`.
+`intake/` is a handoff inbox and is emptied when a delivery is integrated; these are integrated —
+both animals ship — so they live with the pipeline, which is also where anyone resuming the
+follow-on work below would look for them.
+
+These are **raw static meshes**: no authored skeleton, no anchor contract, no clips. They are not
+the game specimens. What ships is in `public/assets/triassic/creatures/`, built from these.
 
 | Creature | API task | Triangles | GLB | API credits |
 | --- | --- | ---: | ---: | ---: |

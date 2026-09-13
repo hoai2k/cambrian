@@ -14,7 +14,7 @@ Both exports face glTF +Z, use +Y up, and have a six-unit source length. The met
 
 ## Anatomy and provenance
 
-The immutable input is `intake/triassic-tests/shonisaurus/shonisaurus.raw.glb`, SHA-256 `576114e5d8e4b3eabfd97148a515cc8f9f4567788478791a4441eb85606b6330`. Its canonical image is `docs/triassic/canonical/shonisaurus.png`.
+The immutable input is `tools/triassic/creatures/shonisaurus/tripo-raw/shonisaurus.raw.glb`, SHA-256 `576114e5d8e4b3eabfd97148a515cc8f9f4567788478791a4441eb85606b6330`. Its canonical image is `docs/triassic/canonical/shonisaurus.png`.
 
 The authored mesh is welded at coincident texture seams, given extra pigment sampling density without subdivision shrinkage, and skinned anatomically. A bounded intake correction seats 23 ventral rostral outlier vertices onto the measured chin profile; the largest correction is 0.116% of body length. The raw source remains untouched.
 

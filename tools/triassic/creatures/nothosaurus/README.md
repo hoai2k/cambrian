@@ -12,7 +12,7 @@ Files are in `public/assets/triassic/creatures/`, with matching studio, 1600 × 
 
 ## Source and reconstruction
 
-The preserved source is `intake/triassic-tests/nothosaurus/nothosaurus.raw.glb`, SHA-256 `5cb48becbdcbbc3863519bca8a2bb99c5129c6a0e5b1affb6252e15e01c49604`. It came from Tripo task `ea4528e3-1f9a-42f4-b0c4-2b84b879ff7c`, using `docs/triassic/canonical/model-inputs/nothosaurus/input.png` (the intake metadata records the image hash). The raw file is never changed.
+The preserved source is `tools/triassic/creatures/nothosaurus/tripo-raw/nothosaurus.raw.glb`, SHA-256 `5cb48becbdcbbc3863519bca8a2bb99c5129c6a0e5b1affb6252e15e01c49604`. It came from Tripo task `ea4528e3-1f9a-42f4-b0c4-2b84b879ff7c`, using `docs/triassic/canonical/model-inputs/nothosaurus/input.png` (the intake metadata records the image hash). The raw file is never changed.
 
 The twin is a procedural **volume resurfacing**, rather than a generic anatomical substitute or a decimation of the authored faces. Blender regenerates topology from a 0.007 raw-unit voxel occupancy field, relaxes that surface twice, and reduces the new topology to the puppet budget. Source vertices and faces are not reused. This preserves the asymmetric tail sweep and individual paddle silhouettes that a symmetrical ellipsoid proxy would lose. Pigment is sampled from the source onto the new surface. The authored body carries baked vertex pigment and the embedded source normal/detail material.
 
