@@ -1,0 +1,13 @@
+{
+  "schemaVersion": 1,
+  "createdAt": "2026-09-13",
+  "canonical": "canonical.png",
+  "canonicalSha256": "128a7053946126d2e5ff2e435887691cfb4eab5c004e1b90efe0ecaf9f0dfc12",
+  "input": "input.png",
+  "inputSha256": "8b63eeffed3fcd95359252f335a8a3132f2b4c4cfe4c38176184e30bf7d7a4ca",
+  "turnaround": "turnaround.png",
+  "turnaroundSha256": "a4de73093668ef2bdf1ef17559476399b1f01ffa702e5ea5300f9356e4087235",
+  "tool": "builtin image_gen.imagegen",
+  "note": "The single-model input and four-view sheet deliberately shorten the neck to a straight one-torso-length stub. The approved canonical is the whole-animal proportion reference; the final rigid 13-joint neck and cervical-rib ridges are procedural Blender work.",
+  "quality": "Qualitative modeling guide, not measured orthographic projection; preserve the canonical head, pigmentation, compact body, four splayed feet and complete tail."
+}

@@ -6,7 +6,10 @@ The 18 human-greenlit creatures now each have a dedicated single-model input and
 
 Nothosaurus and Shonisaurus now ship authored Tripo bodies plus procedural volume twins with **identical skeletons, inverse binds, action samples and anchors within each pair**. The puppet also supplies LOD1. Both pairs are registered in the game and viewer, with model-rendered portraits replacing their placeholders, and remain preview models pending human visual approval. See [delivery state](IMAGE-MODEL-HANDOFF.md), [Nothosaurus pipeline](../../tools/triassic/creatures/nothosaurus/README.md), and [Shonisaurus pipeline](../../tools/triassic/creatures/shonisaurus/README.md). Raw Tripo tests are preserved in `tools/triassic/creatures/<id>/tripo-raw/`. The request tables below remain the broader roster specification, not a claim that every listed deliverable is still missing.
 
-**Plants and props have no canonical poses.** The greenlight-before-you-build rule was applied to the twenty-five animals and never extended to the scenery, so the reference viewer's scenery group shows external references with none of ours to choose between, and the nineteen B2 prop and plant kinds were specified in prose alone. **A5** below requests the missing canonical poses and model-input sheets; every unbuilt B2 row now points at it, and the four Tier 1 scenery subjects need the four-view sheet even though their poses are delivered.
+**Plant and prop canonicals are delivered for review.** Fourteen original B2 subjects now have
+square canonical images in the reference viewer. Their separate multi-view request was withdrawn:
+once a pose is greenlit, its deterministic builder parameters and `npm run shapes` measurements are
+the modeling constraints. The four Tier 1 scenery subjects still need four-view Tripo sheets.
 
 **Status:** open requests, 12 September 2026. Everything the Triassic needs that does not exist,
 in two tiers by who makes it, and in two passes by what it is: **source images** first (reference
@@ -95,19 +98,15 @@ and `-turnaround` PNGs under `docs/triassic/canonical/` (twelve derived source v
 | `sponge-mound` | A Tubiphytes and sponge crust mound with visible chambers. |
 | `voltzia` | The shore conifer, three sizes; drooping shoots, cone clusters. |
 
-### A5 · Canonical poses and model inputs for plants and props (Tier 2, in-house)
+### A5 · Canonical poses for plants and props (Tier 2, in-house)
 
-**Open, and the reason the reference viewer shows no canonical image for any plant or prop.** The
-era's rule is that art is greenlit before it is built from: every subject gets one approved
+**Delivered for human review on 13 September 2026.** The era's rule is that art is greenlit before it is built from: every subject gets one approved
 canonical pose, and the modelling sheet and the shipped body are derived from that one image
-(`CLAUDE.md`, [`canonical/README.md`](../triassic/canonical/README.md)). That rule was applied to
-the twenty-five creatures and shore animals and never extended to the scenery, so the nineteen
-instanced prop and plant kinds of B2 were specified in prose alone. `apply-selections.mjs` says so
-in as many words — *"the alternates and the scenery have no pose of their own"* — and the viewer's
-**Scenery, plants and the shore** group therefore carries external reference images with nothing of
-ours beside them to choose between. A builder script written from prose is exactly the drift the
-canonical rule exists to stop, and a plant is as easy to get wrong as an animal: `diplopora` is a
-calcified alga and `encrinus` a stalked crinoid, and neither reads correctly from a one-line note.
+(`CLAUDE.md`, [`canonical/README.md`](../triassic/canonical/README.md)). The original gap was that
+the nineteen B2 prop and plant kinds were specified in prose alone. Fourteen now have an authored
+pose beside their external references; the three already-built families and the two explicit mesh
+reuse cases need no retroactive pose. This removes the prose-only drift while keeping the human
+greenlight between generation and modeling.
 
 Deliver per subject, in this order, the same way the creatures went:
 
@@ -118,18 +117,15 @@ Deliver per subject, in this order, the same way the creatures went:
    plan-view subjects). Generated as candidates into the reference viewer, chosen by a human there,
    and applied with `node tools/triassic/apply-selections.mjs <file>` — the same three decisions the
    creatures had (greenlight ours, redraw ours, regenerate toward a reference that beat it).
-2. **Model-input sheet** — `docs/triassic/canonical/model-inputs/<id>/`, four views (side, top,
-   front, three-quarter) derived *from the approved pose*, matching the twenty-one creature sheets
-   already there. For a Tier 2 prop this is a modelling guide for the builder script, not a Tripo
-   input: it fixes the proportions the script lofts, so `npm run shapes` measures a footprint from
-   a shape somebody approved.
-3. **Variant note** — one line per variant on the sheet saying what differs (stem height, plate
-   curl, block angle), since B2's variants are one builder with parameters rather than separate
-   subjects.
+2. **Tier 2 modeling source** — the approved canonical pose is sufficient for deterministic
+   builder-script props. Orthogonal dimensions and variants are parameters recorded by the builder
+   and verified by `npm run shapes`; separate generated multi-view sheets were withdrawn by the
+   human reviewer on 13 September 2026 because they would add perspective drift without adding
+   useful constraints. Tier 1 Tripo scenery still needs its four-view input sheet.
 
 | Subjects | Canonical pose | Model-input sheet |
 | --- | --- | --- |
-| The 16 unbuilt B2 kinds: `encrinus`, `encrinus-litter`, `diplopora`, `thecosmilia`, `calcisponge`, `placunopsis-mound`, `daonella-bed`, `ceratite-drift`, `brachiopod-cluster`, `cidaris`, `reef-block`, `drift-log`, `neocalamites`, `pleuromeia`, `bjuvia`, `shore-boulder` | **Requested — none exists.** | **Requested — none exists.** |
+| The 14 original B2 canonical subjects: `encrinus`, `encrinus-litter`, `diplopora`, `thecosmilia`, `calcisponge`, `placunopsis-mound`, `daonella-bed`, `brachiopod-cluster`, `cidaris`, `reef-block`, `neocalamites`, `pleuromeia`, `bjuvia`, `shore-boulder` | **Delivered as first-pass canonicals; awaiting human greenlight in the viewer.** | **Not requested.** The approved canonical plus builder parameters is sufficient. |
 | The 3 built B2 kinds: `stromatolite`, `salt-crust`, `mud-ripple` | Not requested retroactively. | Not requested retroactively. |
 | The 4 Tier 1 scenery: `log-raft`, `coral-head`, `sponge-mound`, `voltzia` | **Delivered** (A3), though approved through `scenery-prompts.json` rather than the viewer, and only as side and top. | **Requested — none exists.** These go through Tripo, so they need the same four-view sheet the creatures get; A3's three views predate the `model-inputs/` mechanism. |
 
@@ -251,7 +247,7 @@ is built: the blow is the era's signature sample and needs a real recording, not
 
 | | Tier 1 (Tripo) | Tier 2 (in-house) |
 | --- | --- | --- |
-| Source images | 26 canonical poses **(delivered)** + 112 creature and shore-animal views + 12 scenery views **(delivered)** + 4 scenery model-input sheets **(A5, open)** | 25 reference boards **(delivered)**, 9 banners, 2 key art, 1 wordmark, 4 glyphs, 9 regional boards **(delivered)**, 2 scale plates **(delivered)**, 16 plant and prop canonical poses + 16 model-input sheets **(A5, open)** |
+| Source images | 26 canonical poses **(delivered)** + 112 creature and shore-animal views + 12 scenery views **(delivered)** + 4 scenery model-input sheets **(A5, open)** | 25 reference boards **(delivered)**, 9 banners, 2 key art, 1 wordmark, 4 glyphs, 9 regional boards **(delivered)**, 2 scale plates **(delivered)**, 14 plant and prop canonical poses **(delivered for review)**; separate model-input sheets withdrawn |
 | Models | 21 creatures, 3–4 shore animals, 4 scenery | 19 instanced prop kinds in 38 variants |
 | Derived | 25 procedural twins as LODs | 100 portraits |
 
