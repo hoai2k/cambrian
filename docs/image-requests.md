@@ -26,7 +26,14 @@ The current request covers 21 individually authored mobile creatures with action
 
 ## Triassic (third era)
 
-The Triassic's image and model requests are collected in [`docs/triassic/03-image-and-model-requests.md`](triassic/03-image-and-model-requests.md), tiered by whether they go through Tripo or are built in-house, and stay there until the era is built. Nothing on that page is open here yet.
+The Triassic's image and model requests are collected in [`docs/triassic/03-image-and-model-requests.md`](triassic/03-image-and-model-requests.md), tiered by whether they go through Tripo or are built in-house, and stay there until the era is built.
+
+Two glyphs on that page are open here, because they are not era art but additions to the shared UI
+set in `public/assets/ui/`: **`air-recovery-off.svg`** and **`air-surface.svg`**, 64×64 in
+`currentColor`, in the line of the existing `breath-*.svg` marks. The Triassic's one new economy is
+that an air-breather's stamina does not recover under water and fills at the surface, and the bar
+says nothing about either — these are the two things it needs to say. Everything else on that page
+is either delivered, still in-house production, or art direction rather than shipped art.
 
 ## Checking what is outstanding
 
