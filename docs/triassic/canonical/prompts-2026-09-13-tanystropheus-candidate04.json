@@ -11,17 +11,21 @@
   ],
   "subjects": {
     "tanystropheus": {
-      "status": "candidate-awaiting-human-greenlight",
+      "status": "reviewed-replace",
       "candidate": "tanystropheus-candidate04.png",
       "original": "tanystropheus-candidate03.png",
-      "reviewerNote": "Can you use this as a reference: https://clickpetroleoegas.com.br/wp-content/uploads/2026/01/Tanystropheus-hydroides.jpg . Note the sauropod body and long neck reaching out over the water.",
+      "reviewerNote": "Candidate04 repeats candidate03's fault, so this is a redraw against the same reference as last time. The defining characteristic of this animal is the NECK: it must read as extraordinarily long and prominent RELATIVE TO THE BODY. Every candidate so far has made the torso too massive and the neck too short for it — chasing the 'sauropod body' note has cost the proportion that actually identifies the species. Take the reference image's proportions as indicative: neck clearly longer than head, torso and tail combined. Fetch the reference this round rather than working from the written description alone; the previous attempt could not retrieve it and drifted without it. For the model that follows: the neck is what has to be right, because it is nearly all the player will see. Tanystropheus is a shore animal that strikes into the water from the bank, so the neck and head come into frame and the torso, limbs and tail usually stay out of it. Put the geometry and the detail into the neck and head; the body, limbs and tail can be comparatively simple.",
       "prompt": "Use case: precise-object-edit. Asset type: canonical full-body paleoart reference for downstream 3D modeling. Redraw the supplied Tanystropheus hydroides candidate using the reviewer's correction: use a much heavier, more monumental, sauropod-like body mass and silhouette, with the extraordinarily long neck reaching outward over the water from the shoreline. Preserve this as Tanystropheus, not a literal sauropod. One immense game-art-scale Tanystropheus, approximately 5.5–6 m long, with a deep robust barrel-like torso, powerful shoulder and hip masses, exactly four splayed reptilian limbs with distinct long toes, a long tapering reptilian tail, a very small narrow reptilian head, and an extremely long slender stiff 13-vertebra neck. The neck must project low and almost horizontally from the shoulders far out over open water, like a rigid fishing boom. Pale cool blue-gray wet limestone shoreline beside clear turquoise marine water; body remains on the shelf while head and much of neck reach over water. Clear three-quarter side view suitable for 3D translation. Entire animal visible: complete head, uninterrupted neck, torso, all four legs and every foot/toe, and terminal tail tip. Leave clear margin around the silhouette. Neck extends to the right over water; tail balances left with a broad gentle curve. Crisp high-detail photorealistic paleoart, realistic scales and weight, neutral documentary modeling-reference readability. Warm dark-brown and cream mottled animal separated clearly from cool cyan/blue-gray environment. Retain the input's species identity, banded mottling, horizontal neck posture, full-body visibility, and shore setting. Increase the torso's height, depth, and massive load-bearing presence; legs should feel powerful but remain anatomically reptilian and laterally splayed. No humans, text, labels, scale bars, prey, other animals, monitor-lizard-like skinny torso, crocodilian body, literal Apatosaurus head, upright columnar sauropod legs, elephant feet, upright giraffe neck, vertical swan neck, hidden feet, submerged toes, foreground occlusion, tight tail loop, extra limbs, cropped anatomy, or fantasy ornament.",
       "generatedSource": "/Users/hoai/.codex/generated_images/01a09ac3-37dc-7381-ad26-8d5c8cd87ad6/exec-573930d7-da44-41d2-81c7-83ee8958433a.png",
       "inputImage": "/Users/hoai/Documents/Stuff/Generations/cambrian-image-requests-20260906/docs/triassic/canonical/tanystropheus-candidate03.png",
       "sha256": "bb3a8112669b0db3998c86f1617afb04e0cbb8a029dbef60854fb3b48a61e6f6",
       "originalSha256": "771ff3a86f17256e474d3ed3806ddd27d54e8a5bf979c1741352fa31830e81d6",
-      "dimensions": [1536, 1024],
-      "visualReview": "Full head, long stiff horizontal neck, deep monumental torso, complete tail and exactly four splayed reptilian feet are visible. The warmer animal separates from the cool marine shelf; the body is substantially heavier without literal sauropod feet, skull or upright neck."
+      "dimensions": [
+        1536,
+        1024
+      ],
+      "visualReview": "Full head, long stiff horizontal neck, deep monumental torso, complete tail and exactly four splayed reptilian feet are visible. The warmer animal separates from the cool marine shelf; the body is substantially heavier without literal sauropod feet, skull or upright neck.",
+      "reviewedAt": "2026-09-13T18:54:11.138683Z"
     }
   }
 }

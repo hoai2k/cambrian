@@ -193,7 +193,7 @@ follow the instanced-prop rules on the requests page.
 
 | Id | Blocked on | Clips |
 | --- | --- | --- |
-| `tanystropheus` | A2 S01 | Procedural 13-joint neck with the rib struts as ridges. `Watch` (idle, head under the surface), `Lower` (telegraph), `SnapLeft`, `SnapRight`, `Drag`, `Retract`, `Severed` (body one-shot), `Flee`. |
+| `tanystropheus` | A2 S01 (**pose in redraw** — see `canonical/review.md`) | Procedural 13-joint neck with the rib struts as ridges. `Watch` (idle, head under the surface), `Lower` (telegraph), `SnapLeft`, `SnapRight`, `Drag`, `Retract`, `Severed` (body one-shot), `Flee`. **Spend the budget on the neck and head.** This animal strikes into the water from the bank, so the neck and head are nearly all a player ever sees; the torso, limbs and tail are usually out of frame behind the shoreline and can be comparatively simple. The neck is also the species' identifying feature and every candidate pose so far has under-length it against the trunk. |
 | `mystriosuchus` | A2 S02 | `Float` (crest showing), `Lunge`, `Bite`, `SlideIn`, `Bask`. |
 | `macrocnemus` | A2 S03 | `Stand`, `Run`, `Bolt`. |
 | `coelophysis` (optional) | A2 S04 | `Drink`, `Snatch`, `Look`. |
