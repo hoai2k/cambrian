@@ -29,7 +29,7 @@
     "bytes": 2003506
   },
   "artifact": {
-    "path": "intake/triassic-tests/shonisaurus/shonisaurus.raw.glb",
+    "path": "tools/triassic/creatures/shonisaurus/tripo-raw/shonisaurus.raw.glb",
     "bytes": 1335372,
     "sha256": "576114e5d8e4b3eabfd97148a515cc8f9f4567788478791a4441eb85606b6330",
     "source_output_field": "model_url"

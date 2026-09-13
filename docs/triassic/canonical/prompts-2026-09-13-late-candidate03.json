@@ -1,0 +1,70 @@
+{
+  "schemaVersion": 1,
+  "createdAt": "2026-09-13",
+  "tool": "builtin image_gen.imagegen",
+  "purpose": "Candidate03 canonical redraws from current human notes; no automatic promotion or approval.",
+  "externalInputs": [],
+  "subjects": {
+    "mystriosuchus": {
+      "status": "greenlit-and-promoted",
+      "candidate": "mystriosuchus-candidate03.png",
+      "original": "mystriosuchus-candidate02.png",
+      "reviewerNote": "Draw a picture from deep underwater instead of at the top of the water.",
+      "prompt": "Use case: precise-object-edit. Edit this candidate02 canonical Mystriosuchus paleoart image. Preserve this exact animal's long slender crocodile-like snout, head, armored back, dark charcoal and ochre mottled hide, robust crocodilian torso, four folded swimming limbs and gently sculling complete tail. The single requested change is viewpoint and underwater depth: camera and entire animal are now DEEP BELOW the water surface, in open blue marine water about 15–20 metres down. The whole animal is clearly visible fully submerged, cruising horizontally several metres above a distant rocky/sandy seabed. Camera at animal level in a three-quarter side view, head toward right, full tail at left. The top of the image is blue water fading upward, NO waterline, NO above-water sky, NO trees or shoreline, NO surface-breaking eyes or crest, NO split-level shot. Atmospheric blue depth with gentle filtered shafts of sunlight from far above, sufficient natural lighting and contrast to read every armor plate and the complete silhouette. All visible feet remain folded backward along flanks, not walking, preserve four limbs total and no extra appendages. Whole animal comfortably inside frame with about 6% margin and tail fully visible. Photorealistic paleoart matching input quality, landscape 1536x1024. No labels, text, people or new animals.",
+      "generatedSource": "/Users/hoai/.codex/generated_images/01a09b1b-790b-7903-aa75-f1b8f3100478/exec-f4ea9822-3597-4bcc-b6c9-fe4474d2a7a6.png",
+      "inputImage": "/Users/hoai/Documents/Stuff/Generations/cambrian/local/expansion-repo/docs/triassic/canonical/mystriosuchus-candidate02.png",
+      "sha256": "27ee24ccfedbeee8afb16942ba4ea77172063e4f4fa72af3e34deb1efee8e150",
+      "originalSha256": "67e0f18bb7bd773de1ede087d995db874c632597cd5098aa78da8d2ad7fb0fde",
+      "dimensions": [
+        1536,
+        1024
+      ],
+      "visualReview": "Full animal is fully underwater, with complete tail and armored body above deeper seabed. No sky, shoreline or split waterline; folded near limbs retained and far limbs naturally occluded.",
+      "reviewedAt": "2026-09-13T15:04:15.933Z"
+    },
+    "rhaeticosaurus": {
+      "status": "greenlit-and-promoted",
+      "candidate": "rhaeticosaurus-candidate03.png",
+      "original": "rhaeticosaurus-candidate02.png",
+      "reviewerNote": "It has 2 back fins on the same side, that's not right",
+      "prompt": "Use case: precise-object-edit. Correct ONLY the hind flipper placement of this canonical Rhaeticosaurus mertensi. Preserve accepted head, short neck, barrel torso, mottled slate-and-cream pigmentation, both existing shoulder foreflippers, natural soft skin, sunlight and blue-water reef environment, overall camera and swimming pose. Current error: both rear flippers emerge from the SAME visible pelvic flank. Remove that duplicated same-side small rear flipper completely and replace with the anatomically opposite-side hind flipper. Exactly FOUR flippers total: one foreflipper rooted on left shoulder, one on right shoulder, one hind flipper rooted on left pelvis, one on right pelvis. Exactly ONE large hind flipper remains on the near side, extending down-right from near pelvis. The other hind flipper belongs on the FAR side: its root is obscured by the torso, and its paddle is visible emerging from BEHIND THE LOWER BELLY on the opposite side, just left of the tail base, projecting diagonally toward the background-left. Make the two pelvic flippers unmistakably BILATERAL rather than two successive fins on the same side. If needed adjust the hind flippers' stroke angles a little so their silhouettes are separately legible. The narrow pointed unfinned tail extends centrally from between the two pelvic roots. No dorsal fin, tail fluke, extra fin, duplicate stump or fifth flipper. All four flipper tips and full tail stay within canvas with comfortable margins. Photorealistic scientific paleoart, landscape 1536x1024. No labels, text or guides.",
+      "generatedSource": "/Users/hoai/.codex/generated_images/01a09b1b-790b-7903-aa75-f1b8f3100478/exec-a3dfcf72-1c44-4196-aacf-7777a6a99d63.png",
+      "inputImage": "/Users/hoai/Documents/Stuff/Generations/cambrian/local/expansion-repo/docs/triassic/canonical/rhaeticosaurus-candidate02.png",
+      "revisions": [
+        {
+          "prompt": "Use case: precise-object-edit. Preserve this exact Rhaeticosaurus animal design, head, neck length, body proportions, blue-gray and cream mottling, photorealistic skin and underwater sunlit reef scene. Fix the anatomy visibility: there must be exactly FOUR clearly visible flippers arranged BILATERALLY like a four-flipper plesiosaur. The image currently shows only three distinct paddles. Shift the camera modestly HIGHER to an elevated dorsal three-quarter view, just enough to see both sides of the broad body. Head remains facing front-left. Show the left and right shoulder paddles as one opposed pair and the left and right pelvic paddles as the second opposed pair. Near shoulder paddle spreads toward lower LEFT, near pelvic paddle spreads toward lower RIGHT. Far shoulder paddle emerges visibly from opposite shoulder behind the upper-left edge of torso toward upper LEFT; far pelvic paddle emerges visibly from opposite pelvis behind upper-right edge of torso toward upper RIGHT. FOUR complete paddles with four separate natural side roots, all tips visible, no overlap hiding a paddle. The far hind paddle must attach to the SIDE of the pelvis below the back contour, not sprout as a dorsal fin from the spine. A single short thin unfinned tail extends centrally backwards between the hind pair. No dorsal fin, no fish tail fin, no fifth appendage, no paired fins on same flank. Keep anatomically accurate plesiosaur flippers long, broad-based and tapering, front and rear comparable. Full body framed with 8% margin, no cropped fins. No labels, text or arrows. Landscape 1536x1024.",
+          "reference": "/Users/hoai/.codex/generated_images/01a09b1b-790b-7903-aa75-f1b8f3100478/exec-40c0046d-8259-4315-b064-fffad1b408ba.png"
+        },
+        {
+          "prompt": "Edit ONLY one defect in this image: it has FIVE flippers; remove the extra flipper pointing DOWN-LEFT from UNDER the NECK. It is the paddle whose tip is in the lower-left quadrant near x=220,y=780 on this 1536x1024 image. Completely erase that single down-left paddle and reconstruct the blue water/reef behind it and continuous cream underside where its root was. Preserve the OTHER FOUR flippers exactly: top-left far shoulder flipper, large foreground down-right near shoulder flipper, upper-right far pelvic flipper, and lower-right near pelvic flipper. Preserve the short central tail, body, head, pose, mottled skin, background and all four retained paddles unchanged. Final animal must have exactly FOUR paddles, one on each shoulder and one on each pelvic side. No other changes.",
+          "reference": "/Users/hoai/.codex/generated_images/01a09b1b-790b-7903-aa75-f1b8f3100478/exec-4e8cfa41-4a97-44a6-b82b-1b7570f7e49f.png"
+        }
+      ],
+      "sha256": "985a1fd49416c86a7769e0251800b8589efe1dc950af349da2367065db0f0a2f",
+      "originalSha256": "586c9a073d5711e2c50d692bc3ade7ea85af420db636cf39caf2174dde4ad6f5",
+      "dimensions": [
+        1536,
+        1024
+      ],
+      "visualReview": "Exactly four visible paddles after targeted correction: bilateral shoulder pair and bilateral pelvic pair, plus one short central unfinned tail. Slightly elevated dorsal oblique view separates opposite-side appendages. All flipper tips in frame, no extra fifth paddle.",
+      "reviewedAt": "2026-09-13T15:03:39.359Z"
+    },
+    "tanystropheus": {
+      "status": "reviewed-replace",
+      "candidate": "tanystropheus-candidate03.png",
+      "original": "tanystropheus-candidate02.png",
+      "reviewerNote": "Can you use this as a reference: https://clickpetroleoegas.com.br/wp-content/uploads/2026/01/Tanystropheus-hydroides.jpg . Note the sauropod body and long neck reaching out over the water.",
+      "prompt": "Use case: precise-object-edit. Redraw this canonical Tanystropheus hydroides as a clearly readable FULL-BODY 3D modeling reference following reviewer: 'Should be more apatasaurus sized - huge. And also, let's keep the background a bit different color and show the whole animal including feet so it's easier to translate into a 3d model reference'. This is intentional immense GAME-ART SCALE, not a claim of fossil body size. Preserve Tanystropheus species anatomy: extremely long slender stiff almost horizontal neck with small narrow reptilian head, dark brown/cream banded mottling, long tapering reptilian tail, low broad reptile trunk, exactly four splayed reptilian legs ending in long distinct toes. Do NOT turn it into Apatosaurus anatomy: no upright sauropod legs, elephant feet, massive upright giraffe neck or dinosaur skull. Make the animal read as truly gigantic with a heavy monumental torso and huge limbs, its trunk towering over person-sized coastal boulders, distant full-grown horsetail trees appearing small relative to it; no humans. Recompose to show the ENTIRE animal from head to terminal tail tip and ALL FOUR FEET completely unobscured in frame with visible toes. Three-quarter side view, camera a little above the feet, whole animal framed with 6% clear margin on every side. The long stiff neck extends low to RIGHT from broad shoulders, tail curls in a gentle arc toward LEFT, no tight loop. Four feet splayed apart on a pale cool BLUE-GRAY wet limestone marine shelf with only a very thin clear water film, no submerged or hidden toes, no foreground objects hiding feet, no water refraction across legs. Keep the cool pale blue/cyan sea and blue-gray distant cliffs distinctly different in hue/value from warm brown animal for clean silhouette separation; background simple and softly out of focus, not same colored rocks behind torso. Crisp richly detailed photorealistic paleoart, realistic scales, very large physical presence but accurate long-neck reptile body proportions. Landscape 1536x1024, no text, labels, scale bars or extra animals.",
+      "generatedSource": "/Users/hoai/.codex/generated_images/01a09b1b-790b-7903-aa75-f1b8f3100478/exec-cea37851-e50f-458f-b42a-aaeb1115016e.png",
+      "inputImage": "/Users/hoai/Documents/Stuff/Generations/cambrian/local/expansion-repo/docs/triassic/canonical/tanystropheus-candidate02.png",
+      "sha256": "771ff3a86f17256e474d3ed3806ddd27d54e8a5bf979c1741352fa31830e81d6",
+      "originalSha256": "0dcd532862769dedfeaf4ab6b445109ce526d22434855efe021e1878c5e8a29a",
+      "dimensions": [
+        1536,
+        1024
+      ],
+      "visualReview": "Full head, very long horizontal neck, torso, entire tail tip and four splayed feet visible on cool blue-gray wet shelf. Warm banded reptile contrasted against cool coast; heavier giant game-art body, distant trees/cliffs and full-foot visibility. No sauropod head or upright neck. Far hind foot partly behind torso but foot itself visible.",
+      "reviewedAt": "2026-09-13T15:07:22.780Z"
+    }
+  }
+}

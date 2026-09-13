@@ -1,0 +1,105 @@
+{
+  "schema_version": 1,
+  "input": {
+    "path": "tools/triassic/creatures/birgeria/tripo-raw/birgeria.raw.glb",
+    "bytes": 1525312,
+    "sha256": "69dde4465d3842bb17b4f0a30082978e3802bed980e693e183e6c019a7bf3b48"
+  },
+  "summary": {
+    "mesh_objects": 1,
+    "vertices": 11706,
+    "faces": 19848,
+    "triangles": 19848,
+    "connected_components": 62,
+    "materials": 1,
+    "textures": 3
+  },
+  "bounds": {
+    "min_xyz": [
+      -0.5,
+      -0.279008,
+      -0.315289
+    ],
+    "max_xyz": [
+      0.5,
+      0.279008,
+      0.315289
+    ],
+    "center_xyz": [
+      0,
+      0,
+      0
+    ],
+    "size_xyz": [
+      1,
+      0.558016,
+      0.630579
+    ]
+  },
+  "meshes": [
+    {
+      "object": "tripo_node_3dc0dbb9-5dd8-407f-9f76-5500d926e63f",
+      "mesh": "tripo_mesh_3dc0dbb9-5dd8-407f-9f76-5500d926e63f",
+      "vertices": 11706,
+      "edges": 31492,
+      "faces": 19848,
+      "triangles": 19848,
+      "connected_components": 62,
+      "material_slots": [
+        "tripo_material_3dc0dbb9-5dd8-407f-9f76-5500d926e63f"
+      ]
+    }
+  ],
+  "materials": [
+    {
+      "name": "tripo_material_3dc0dbb9-5dd8-407f-9f76-5500d926e63f",
+      "image_textures": [
+        "Color_3dc0dbb9-5dd8-407f-9f76-5500d926e63f",
+        "NormalGL_3dc0dbb9-5dd8-407f-9f76-5500d926e63f",
+        "ORM_3dc0dbb9-5dd8-407f-9f76-5500d926e63f"
+      ]
+    }
+  ],
+  "textures": [
+    {
+      "name": "Color_3dc0dbb9-5dd8-407f-9f76-5500d926e63f",
+      "width": 2048,
+      "height": 2048,
+      "channels": 4,
+      "packed": true,
+      "source": "FILE",
+      "colorspace": "sRGB"
+    },
+    {
+      "name": "NormalGL_3dc0dbb9-5dd8-407f-9f76-5500d926e63f",
+      "width": 2048,
+      "height": 2048,
+      "channels": 4,
+      "packed": true,
+      "source": "FILE",
+      "colorspace": "Non-Color"
+    },
+    {
+      "name": "ORM_3dc0dbb9-5dd8-407f-9f76-5500d926e63f",
+      "width": 2048,
+      "height": 2048,
+      "channels": 4,
+      "packed": true,
+      "source": "FILE",
+      "colorspace": "Non-Color"
+    }
+  ],
+  "renders": {
+    "side": "tools/triassic/creatures/birgeria/tripo-raw/review/side.png",
+    "top": "tools/triassic/creatures/birgeria/tripo-raw/review/top.png",
+    "three-quarter": "tools/triassic/creatures/birgeria/tripo-raw/review/three-quarter.png"
+  },
+  "preview": {
+    "path": "tools/triassic/creatures/birgeria/birgeria.preview.glb",
+    "triangle_limit": 40000,
+    "triangles_before": 19848,
+    "triangles_after": 19848,
+    "bytes": 1405984,
+    "sha256": "cf0066f158e010af6bf9144fb42178acf56ad8a50ea4ef5674c129f120b7eb32"
+  }
+}

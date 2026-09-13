@@ -1,0 +1,38 @@
+{
+  "schema_version": 1,
+  "name": "phragmoteuthis",
+  "task": {
+    "type": "image_to_model",
+    "status": "success",
+    "progress": 100,
+    "task_id": "134d8b07-886d-48cd-81b0-47f10eb496c5",
+    "created_at": "2026-09-13T15:55:57.826310Z",
+    "completed_at": "2026-09-13T15:57:11.776774Z",
+    "credits_consumed": 30,
+    "output": {
+      "model_url": "<redacted download URL>",
+      "rendered_image_url": "<redacted download URL>"
+    }
+  },
+  "request": {
+    "file": {
+      "file_token": "<uploaded at runtime>"
+    },
+    "model": "v3.1-20260211",
+    "face_limit": 20000,
+    "texture": true,
+    "pbr": true
+  },
+  "image": {
+    "path": "docs/triassic/canonical/model-inputs/phragmoteuthis/input.png",
+    "sha256": "9df35dff192ee8851f4d1b139cfbf0260e15559b4cd59db75739289c10f8e556",
+    "bytes": 1679310
+  },
+  "artifact": {
+    "path": "tools/triassic/creatures/phragmoteuthis/tripo-raw/phragmoteuthis.raw.glb",
+    "bytes": 1705664,
+    "sha256": "a78b5108eaea76da48c4c0bf5a28ee07da1c9b15121fd0200f4dc7f05bfa0427",
+    "source_output_field": "model_url"
+  },
+  "downloaded_at": "2026-09-13T15:57:21.136Z"
+}

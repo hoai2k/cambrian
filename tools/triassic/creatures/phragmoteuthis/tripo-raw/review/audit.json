@@ -1,0 +1,105 @@
+{
+  "schema_version": 1,
+  "input": {
+    "path": "tools/triassic/creatures/phragmoteuthis/tripo-raw/phragmoteuthis.raw.glb",
+    "bytes": 1705664,
+    "sha256": "a78b5108eaea76da48c4c0bf5a28ee07da1c9b15121fd0200f4dc7f05bfa0427"
+  },
+  "summary": {
+    "mesh_objects": 1,
+    "vertices": 12412,
+    "faces": 19932,
+    "triangles": 19932,
+    "connected_components": 128,
+    "materials": 1,
+    "textures": 3
+  },
+  "bounds": {
+    "min_xyz": [
+      -0.5,
+      -0.143826,
+      -0.127797
+    ],
+    "max_xyz": [
+      0.5,
+      0.143826,
+      0.127797
+    ],
+    "center_xyz": [
+      0,
+      0,
+      0
+    ],
+    "size_xyz": [
+      1,
+      0.287652,
+      0.255594
+    ]
+  },
+  "meshes": [
+    {
+      "object": "tripo_node_134d8b07-886d-48cd-81b0-47f10eb496c5",
+      "mesh": "tripo_mesh_134d8b07-886d-48cd-81b0-47f10eb496c5",
+      "vertices": 12412,
+      "edges": 32216,
+      "faces": 19932,
+      "triangles": 19932,
+      "connected_components": 128,
+      "material_slots": [
+        "tripo_material_134d8b07-886d-48cd-81b0-47f10eb496c5"
+      ]
+    }
+  ],
+  "materials": [
+    {
+      "name": "tripo_material_134d8b07-886d-48cd-81b0-47f10eb496c5",
+      "image_textures": [
+        "Color_134d8b07-886d-48cd-81b0-47f10eb496c5",
+        "NormalGL_134d8b07-886d-48cd-81b0-47f10eb496c5",
+        "ORM_134d8b07-886d-48cd-81b0-47f10eb496c5"
+      ]
+    }
+  ],
+  "textures": [
+    {
+      "name": "Color_134d8b07-886d-48cd-81b0-47f10eb496c5",
+      "width": 2048,
+      "height": 2048,
+      "channels": 4,
+      "packed": true,
+      "source": "FILE",
+      "colorspace": "sRGB"
+    },
+    {
+      "name": "NormalGL_134d8b07-886d-48cd-81b0-47f10eb496c5",
+      "width": 2048,
+      "height": 2048,
+      "channels": 4,
+      "packed": true,
+      "source": "FILE",
+      "colorspace": "Non-Color"
+    },
+    {
+      "name": "ORM_134d8b07-886d-48cd-81b0-47f10eb496c5",
+      "width": 2048,
+      "height": 2048,
+      "channels": 4,
+      "packed": true,
+      "source": "FILE",
+      "colorspace": "Non-Color"
+    }
+  ],
+  "renders": {
+    "side": "tools/triassic/creatures/phragmoteuthis/tripo-raw/review/side.png",
+    "top": "tools/triassic/creatures/phragmoteuthis/tripo-raw/review/top.png",
+    "three-quarter": "tools/triassic/creatures/phragmoteuthis/tripo-raw/review/three-quarter.png"
+  },
+  "preview": {
+    "path": "tools/triassic/creatures/phragmoteuthis/phragmoteuthis.preview.glb",
+    "triangle_limit": 40000,
+    "triangles_before": 19932,
+    "triangles_after": 19932,
+    "bytes": 1585836,
+    "sha256": "c00c71573f3adc3157f0bdd09f4deada27b5e6aa0827b7ba98c1793420c6f00c"
+  }
+}

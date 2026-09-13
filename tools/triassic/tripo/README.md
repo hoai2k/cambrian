@@ -54,3 +54,26 @@ The review writes `audit.json` plus `side.png`, `top.png`, and `three-quarter.pn
 records triangles, materials, used image textures, world-space bounds, and connected mesh
 components. When `--preview` is present it exports a separate texture-preserving GLB capped at
 40,000 triangles. The imported raw GLB is only read and hashed.
+
+## Batch preservation and static review
+
+After `run-batch.mjs` has downloaded some or all of a saved plan, inspect the routine processing
+work without changing files:
+
+```sh
+node tools/triassic/tripo/process-batch.mjs local/triassic-authoring/batch-plan.json
+```
+
+Pass `--process` to preserve each completed raw GLB and sanitized metadata under
+`tools/triassic/creatures/<id>/tripo-raw/`, create `<id>.preview.glb`, and run `review.py` with two
+Blender threads. Working review output goes to `local/triassic-authoring/<id>/tripo-review/`; its
+sanitized audit and three renders are copied into the preserved `tripo-raw/review/` subtree.
+
+```sh
+node tools/triassic/tripo/process-batch.mjs local/triassic-authoring/batch-plan.json --process
+```
+
+Only successful local results whose image and artifact hashes match the current plan are eligible.
+A matching preserved result is resumed or skipped; a different existing raw body, metadata record,
+preview without a matching audit, or review from another body stops processing. This command never
+submits a job, rigs a model, or changes shipped, registry, canonical-approval, or manifest state.

@@ -6,8 +6,9 @@
   "subjects": {
     "cymbospondylus": {
       "turnaround": "not-started",
-      "canonical": "approved",
-      "awaitingReview": "a regenerated candidate is in the viewer beside the pose it replaces"
+      "canonical": "greenlit",
+      "decidedAt": "2026-09-13T13:52:17.045Z",
+      "promotedFrom": "candidate02"
     },
     "shonisaurus": {
       "canonical": "delivered",
@@ -36,8 +37,9 @@
     },
     "rhaeticosaurus": {
       "turnaround": "not-started",
-      "canonical": "approved",
-      "awaitingReview": "a regenerated candidate is in the viewer beside the pose it replaces"
+      "canonical": "greenlit",
+      "decidedAt": "2026-09-13T15:03:39.359Z",
+      "promotedFrom": "candidate03"
     },
     "atopodentatus": {
       "canonical": "greenlit",
@@ -66,8 +68,9 @@
     },
     "aphaneramma": {
       "turnaround": "not-started",
-      "canonical": "approved",
-      "awaitingReview": "a regenerated candidate is in the viewer beside the pose it replaces"
+      "canonical": "greenlit",
+      "decidedAt": "2026-09-13T15:03:56.373Z",
+      "promotedFrom": "candidate03"
     },
     "mixosaurus": {
       "canonical": "greenlit",
@@ -104,8 +107,9 @@
     },
     "odontochelys": {
       "turnaround": "not-started",
-      "canonical": "approved",
-      "awaitingReview": "a regenerated candidate is in the viewer beside the pose it replaces"
+      "canonical": "greenlit",
+      "decidedAt": "2026-09-13T13:57:25.792Z",
+      "promotedFrom": "candidate02"
     },
     "ceratites": {
       "canonical": "greenlit",
@@ -120,17 +124,26 @@
     },
     "tanystropheus": {
       "turnaround": "not-started",
-      "canonical": "approved",
-      "awaitingReview": "a regenerated candidate is in the viewer beside the pose it replaces"
+      "awaitingReview": "a regenerated candidate is in the viewer beside the pose it replaces",
+      "reviewedCandidate": "candidate03",
+      "canonical": "needs-rework",
+      "reworkToward": {
+        "kind": "candidate",
+        "label": "candidate03"
+      },
+      "reworkNote": "Can you use this as a reference: https://clickpetroleoegas.com.br/wp-content/uploads/2026/01/Tanystropheus-hydroides.jpg . Note the sauropod body and long neck reaching out over the water.",
+      "decidedAt": "2026-09-13T15:07:22.780Z"
     },
     "mystriosuchus": {
       "turnaround": "not-started",
-      "canonical": "approved",
-      "awaitingReview": "a regenerated candidate is in the viewer beside the pose it replaces"
+      "canonical": "greenlit",
+      "decidedAt": "2026-09-13T15:04:15.933Z",
+      "promotedFrom": "candidate03"
     },
     "macrocnemus": {
-      "canonical": "approved",
-      "turnaround": "not-started"
+      "canonical": "greenlit",
+      "turnaround": "not-started",
+      "decidedAt": "2026-09-13T13:59:36.493Z"
     },
     "coelophysis": {
       "canonical": "greenlit",
@@ -141,7 +154,8 @@
       "canonical": "greenlit",
       "turnaround": "not-started",
       "decidedAt": "2026-09-13T01:05:52.838Z",
-      "greenlitImage": "male"
+      "greenlitImage": "male",
+      "reviewedCandidate": "male"
     },
     "voltzia": {
       "canonical": "approved",

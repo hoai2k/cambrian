@@ -8,7 +8,7 @@ from mathutils.bvhtree import BVHTree
 from math import sin,cos,pi
 HERE=os.path.dirname(os.path.abspath(__file__)); ROOT=os.path.abspath(os.path.join(HERE,'../../../..'))
 LOCAL=os.path.join(ROOT,'local/triassic-authoring/nothosaurus'); OUT=os.path.join(ROOT,'public/assets/triassic/creatures'); os.makedirs(LOCAL,exist_ok=True);os.makedirs(OUT,exist_ok=True)
-RAW=os.path.join(ROOT,'intake/triassic-tests/nothosaurus/nothosaurus.raw.glb'); ID='nothosaurus'
+RAW=os.path.join(HERE,'tripo-raw/nothosaurus.raw.glb'); ID='nothosaurus'
 CLIPS={'Idle':2.4,'Swim':1.8,'Sprint':1.2,'TurnLeft':1.6,'TurnRight':1.6,'Dive':1.4,'Rise':1.4,'Attack':1.,'Bite':.5,'Heavy':1.1,'Hit':.6,'Death':1.6,'Guard':1.,'Parry':.4,'Dodge':.5,'Eat':1.6,'Stagger':1.2,'Ability':1.0,'Grab':1.2,'Breath':2.4,'Growth':1.5}
 LOOPS=['Idle','Swim','Sprint','Guard','Eat'];SCALE=5
 bpy.ops.object.select_all(action='SELECT');bpy.ops.object.delete(use_global=False)
@@ -31,17 +31,25 @@ for c in components:
  if len(c)<8:bmesh.ops.delete(bm,geom=c,context='VERTS')
 bmesh.ops.recalc_face_normals(bm,faces=list(bm.faces));bm.to_mesh(auth.data);bm.free()
 source_triangles=len(auth.data.polygons)
-# Store albedo samples on POINT colors, averaged across UV seams; preserve embedded normal map.
+# Preserve the full original 2K albedo. White COLOR_0 enables runtime recoloring without
+# multiplying the texture by a second baked copy of its own pigment. The generated normal
+# texture has exaggerated crumpled relief at strength 1; retain only restrained microrelief.
 mat=auth.data.materials[0];mat.name='Nothosaurus body pigmentation';bs=mat.node_tree.nodes.get('Principled BSDF');colnode=next(n for n in mat.node_tree.nodes if n.type=='TEX_IMAGE' and n.image and n.image.colorspace_settings.name=='sRGB');im=colnode.image
 pixels=np.array(im.pixels[:],dtype=np.float32).reshape(im.size[1],im.size[0],4);uv=auth.data.uv_layers.active
-colors=np.zeros((len(auth.data.vertices),4));cnt=np.zeros(len(colors))
-for loop in auth.data.loops:
- u,v=uv.data[loop.index].uv;rgb=pixels[int((v%1)*(im.size[1]-1)),int((u%1)*(im.size[0]-1)),:3];linear=np.where(rgb<=.04045,rgb/12.92,((rgb+.055)/1.055)**2.4);colors[loop.vertex_index,:3]+=linear;colors[loop.vertex_index,3]+=1;cnt[loop.vertex_index]+=1
-colors/=np.maximum(1,cnt[:,None]);layer=auth.data.color_attributes.new(name='Color',type='FLOAT_COLOR',domain='POINT')
-for i,c in enumerate(colors):layer.data[i].color=c
+layer=auth.data.color_attributes.new(name='Color',type='FLOAT_COLOR',domain='POINT')
+for item in layer.data:item.color=(1,1,1,1)
 for link in list(mat.node_tree.links):
- if link.to_node==bs and link.to_socket.name=='Base Color':mat.node_tree.links.remove(link)
-vc=mat.node_tree.nodes.new('ShaderNodeVertexColor');vc.layer_name='Color';mat.node_tree.links.new(vc.outputs['Color'],bs.inputs['Base Color']);bs.inputs['Metallic'].default_value=0;bs.inputs['Roughness'].default_value=.7
+ if link.to_node==bs and link.to_socket.name in ['Metallic','Roughness']:mat.node_tree.links.remove(link)
+bs.inputs['Metallic'].default_value=0;bs.inputs['Roughness'].default_value=.7
+for n in mat.node_tree.nodes:
+ if n.type=='NORMAL_MAP':n.inputs['Strength'].default_value=.15
+# Blender exposes this byte image as encoded sRGB samples; convert exactly once when
+# writing linear vertex pigment on the puppet. Bilinear lookup follows texel centers.
+def sample_albedo(u,v):
+ h,w=pixels.shape[:2];x=(float(u)%1)*w-.5;y=(float(v)%1)*h-.5;x0=math.floor(x);y0=math.floor(y);fx=x-x0;fy=y-y0
+ rgb=(pixels[y0%h,x0%w,:3]*(1-fx)*(1-fy)+pixels[y0%h,(x0+1)%w,:3]*fx*(1-fy)+pixels[(y0+1)%h,x0%w,:3]*(1-fx)*fy+pixels[(y0+1)%h,(x0+1)%w,:3]*fx*fy)
+ linear=np.where(rgb<=.04045,rgb/12.92,((rgb+.055)/1.055)**2.4)
+ return (*[float(x)for x in linear],1.)
 # Measure the actual input volume, then resurface its occupancy field. This is regenerated topology,
 # not the authored triangle mesh decimated into an LOD: no input vertex/face survives the remesh.
 puppet=auth.copy();puppet.data=auth.data.copy();bpy.context.collection.objects.link(puppet);puppet.name='Nothosaurus procedural volume puppet'
@@ -50,12 +58,16 @@ puppet.data.remesh_voxel_size=.007;puppet.data.remesh_voxel_adaptivity=0;puppet.
 bpy.ops.object.voxel_remesh()
 mod=puppet.modifiers.new('Volume surface relaxation','SMOOTH');mod.factor=.45;mod.iterations=2;bpy.ops.object.modifier_apply(modifier=mod.name)
 mod=puppet.modifiers.new('Puppet topology budget','DECIMATE');mod.ratio=.22;bpy.ops.object.modifier_apply(modifier=mod.name)
-# Sample original albedo at nearest original surface vertex to give the procedural twin coherent pigment.
+# Transfer pigment from the nearest source triangle's own interpolated UV, never
+# averaging unrelated atlas islands at welded seam vertices or using nearest-vertex colors.
+from mathutils.geometry import barycentric_transform
 bvh=BVHTree.FromPolygons([v.co for v in auth.data.vertices],[p.vertices[:]for p in auth.data.polygons],all_triangles=False)
 if puppet.data.color_attributes.get('Color'):puppet.data.color_attributes.remove(puppet.data.color_attributes['Color'])
 pl=puppet.data.color_attributes.new(name='Color',type='FLOAT_COLOR',domain='POINT')
 for v in puppet.data.vertices:
- hit=bvh.find_nearest(v.co);poly=auth.data.polygons[hit[2]];j=min(poly.vertices,key=lambda j:(auth.data.vertices[j].co-v.co).length_squared);pl.data[v.index].color=colors[j]
+ hit=bvh.find_nearest(v.co);poly=auth.data.polygons[hit[2]];assert len(poly.vertices)==3
+ p=[auth.data.vertices[j].co for j in poly.vertices];q=[Vector((*uv.data[j].uv,0))for j in poly.loop_indices]
+ sample=barycentric_transform(hit[0],p[0],p[1],p[2],q[0],q[1],q[2]);pl.data[v.index].color=sample_albedo(sample.x,sample.y)
 pmat=bpy.data.materials.new('Nothosaurus puppet body');pmat.use_nodes=True;pbs=pmat.node_tree.nodes.get('Principled BSDF');pvc=pmat.node_tree.nodes.new('ShaderNodeVertexColor');pvc.layer_name='Color';pmat.node_tree.links.new(pvc.outputs['Color'],pbs.inputs['Base Color']);pbs.inputs['Roughness'].default_value=.74;puppet.data.materials.clear();puppet.data.materials.append(pmat)
 for p in puppet.data.polygons:p.material_index=0
 # In raw space: X is snoutward, Z up, Y sideways. Global bone axes kept consistent.
@@ -161,7 +173,7 @@ bpy.ops.mesh.primitive_uv_sphere_add(segments=20,ring_count=12,location=tx((.354
 o=bpy.context.object;o.name='Seated jaw hinge tissue';o.scale=(.155,.11,.105);bpy.ops.object.transform_apply(location=False,rotation=False,scale=True)
 for v in o.data.vertices:v.co=o.matrix_world@v.co
 o.location=(0,0,0);o.parent=rig
-hm=bpy.data.materials.new('Nothosaurus jaw hinge body');hm.diffuse_color=(.28,.26,.20,1);o.data.materials.append(hm)
+hm=bpy.data.materials.new('Nothosaurus jaw hinge body');hm.diffuse_color=(.28,.26,.20,1);hm.use_nodes=True;hbs=hm.node_tree.nodes.get('Principled BSDF');hbs.inputs['Base Color'].default_value=(.28,.26,.20,1);hbs.inputs['Roughness'].default_value=.7;o.data.materials.append(hm)
 for n in ['skull','jaw']:o.vertex_groups.new(name=n)
 for v in o.data.vertices:
  t=max(0,min(1,(.395-v.co.z)/.1));o.vertex_groups['jaw'].add([v.index],t*.5,'REPLACE');o.vertex_groups['skull'].add([v.index],1-t*.5,'REPLACE')
@@ -281,7 +293,7 @@ for o,suffix in [(auth,''),(puppet,'.puppet')]:
  for p in [o,jawparts[o.name],rig]+sockets+oralparts:p.select_set(True)
  bpy.context.view_layer.objects.active=rig;bpy.ops.export_scene.gltf(filepath=os.path.join(OUT,ID+suffix+'.glb'),**kwargs);patch(os.path.join(OUT,ID+suffix+'.glb'))
 shutil.copyfile(os.path.join(OUT,ID+'.puppet.glb'),os.path.join(OUT,ID+'.lod1.glb'))
-meta={'id':ID,'name':'Nothosaurus','species':'Nothosaurus giganteus','description':'Canonical Tripo body and procedural volume twin with identical articulated rowing, tail, neck and jaw rig.','modelLength':5,'lengthMeters':6,'locomotion':'Swim','clips':list(CLIPS),'looping':LOOPS,'anchors':[a['name']for a in anchors],'puppet':'nothosaurus.puppet.glb','notes':['The curved tail and asymmetric paddle stance are retained from the accepted Tripo volume.','The procedural twin resurfaces a 0.007-unit voxel occupancy field, relaxes it and reduces the new topology. It does not reuse source vertices or faces.','Same rest rig, inverse binds, sockets and all 21 action sample arrays are used for authored and puppet. LOD deliberately retains all clips.','Tiny detached flakes removed at intake; true jaw split and internal oral surfaces added. Existing webbing retained where connected to digits.','Living colours, soft tissues and movements are artistic reconstruction. Ability performs the roster fang-trap clamp; Grab braces and tugs the held prey. Breath provides a separate in-place surface-breath/dive gesture. Locomotor translation remains engine-owned.']}
+meta={'id':ID,'name':'Nothosaurus','species':'Nothosaurus giganteus','description':'Canonical Tripo body and procedural volume twin with identical articulated rowing, tail, neck and jaw rig.','modelLength':5,'lengthMeters':6,'locomotion':'Swim','clips':list(CLIPS),'looping':LOOPS,'anchors':[a['name']for a in anchors],'puppet':'nothosaurus.puppet.glb','notes':['The curved tail and asymmetric paddle stance are retained from the accepted Tripo volume.','The procedural twin resurfaces a 0.007-unit voxel occupancy field, relaxes it and reduces the new topology. It does not reuse source vertices or faces.','Same rest rig, inverse binds, sockets and all 21 action sample arrays are used for authored and puppet. LOD deliberately retains all clips.','Original albedo retained with white COLOR_0; normal relief limited to 0.15 and skin set explicitly nonmetallic at roughness 0.7. Puppet pigment samples triangle-local UVs to avoid seam bleed. True jaw split and internal oral surfaces added; connected foot webbing retained.','Living colours, soft tissues and movements are artistic reconstruction. Ability performs the roster fang-trap clamp; Grab braces and tugs the held prey. Breath provides a separate in-place surface-breath/dive gesture. Locomotor translation remains engine-owned.']}
 open(os.path.join(OUT,ID+'.json'),'w').write(json.dumps(meta,indent=2))
 report={'sourceSha256':hashlib.sha256(open(RAW,'rb').read()).hexdigest(),'sourceTriangles':source_triangles,'removedFlakeVertices':removed,'fullTriangles':sum(len(p.vertices)-2 for p in auth.data.polygons)+sum(len(p.vertices)-2 for p in jawparts[auth.name].data.polygons)+sum(sum(len(p.vertices)-2 for p in o.data.polygons)for o in oralparts),'puppetTriangles':sum(len(p.vertices)-2 for p in puppet.data.polygons)+sum(len(p.vertices)-2 for p in jawparts[puppet.name].data.polygons)+sum(sum(len(p.vertices)-2 for p in o.data.polygons)for o in oralparts),'bones':len(B),'clips':CLIPS,'loopSeams':seams,'boundsAt13Phases':bounds,'surfaceDistanceMax':max(distances),'surfaceDistanceP95':float(np.quantile(distances,.95)),'profileTolerance':.2,'normalizedWeights':True,'rootStable':True,'noScaleChannels':True}
 open(os.path.join(HERE,'validation.json'),'w').write(json.dumps(report,indent=2))

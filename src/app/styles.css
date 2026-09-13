@@ -770,6 +770,11 @@ input[type='checkbox'] { width: 20px; height: 20px; accent-color: var(--ember); 
 .era-switch-blurb { font-size: 11px; color: var(--dim); }
 @media (max-width: 560px) { .era-switch { padding: 8px 11px; } .era-switch b { font-size: 12px; } .era-switch-blurb { display: none; } }
 .title-illustrated .press-start { margin: 14px 0; }
+/* The boot bar, under the loading line on the title screen. Narrow and quiet: the screen is
+   already the game's own painting, and this is a progress bar, not a boot screen. */
+.title-progress { width: min(60vw, 320px); margin: 0 auto 10px; }
+.title-progress .loading-bar { height: 6px; margin: 0; }
+.title-progress-status { margin: 8px 0 0; font-size: 12px; letter-spacing: .06em; color: var(--mist); }
 .loading-illustrated .loading-inner { width: min(92vw, 780px); }
 .loading-illustrated .title-logo.small .illustrated-logo { width: 100%; max-height: calc(100svh - 220px); object-fit: contain; }
 .loading-illustrated .loading-bar { margin-top: 16px; }

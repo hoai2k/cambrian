@@ -64,16 +64,28 @@ unless the user explicitly asks for a PR. Steps:
   must not statically import the audio library or the sim for the same reason. Headless tests that
   need the Devonian do the same: select the era, then `await import(...)` (`tools/devonian-test.ts`).
 - `/ancientseas/` is the trilogy's title page (entry `src/ancientseas/main.tsx`, data in
-  `src/ancientseas/page.ts`): the three games' titles as links, in two versions picked by
-  `?version=` (1, the default, is the three title paintings whole on the dark their vignettes run
-  out to; 2 is one plate in the paintings' style assembled from individually requested pieces —
-  `SLOTS`, placed by centre and width on a 16:10 desktop stage and a 9:25 phone stage). Every piece
-  it asks for has a brief in `docs/image-requests.md` and lands in `public/assets/ancientseas/`;
-  the page only ever loads what `src/ancientseas/delivered.json` lists (`npm run
-  ancientseas:delivered` regenerates it from the folder) and draws a shipped stand-in or a named
-  wash for the rest, so nothing asks the network for art that has not arrived. `npm run
-  ancientseas` checks all of it; `node tools/ancientseas-smoke.mjs <outdir>` screenshots both
-  versions against a preview build and follows the three links.
+  `src/ancientseas/page.ts`): one plate in the three games' own engraved style, filling the window,
+  with the three titles on it as links. It is `SLOTS` — pieces placed by centre and width on a
+  16:10 desktop stage and a 9:27 phone one — and the plate is built the same way three times over,
+  one big animal arching above each era's title with two bottom-dwellers gathered under it, because
+  an animal half behind another or a row spread evenly across all three eras reads as a mistake.
+  Titles clear the animals above them and carry a pale sepia halo drawn by the page, so a delivered
+  title is flat ink on transparency. `?version=1` still reaches the first draft (the three title
+  paintings whole on a dark ground) but neither version draws a switch between them: the parameter
+  is for comparing drafts, not something a visitor is offered. Every piece has a brief in
+  `docs/image-requests.md` (delivered ones move to the history) and lands in
+  `public/assets/ancientseas/`; the page only ever loads what `src/ancientseas/delivered.json`
+  lists (`npm run ancientseas:delivered` regenerates it from the folder) and draws a shipped
+  stand-in or a named wash for the rest, so nothing asks the network for art that has not arrived.
+  `npm run ancientseas` checks all of it; `node tools/ancientseas-smoke.mjs <outdir>` screenshots
+  the page against a preview build and follows the three links.
+- A game's title screen is drawn from the first frame, before the creatures have streamed in: it
+  used to wait for them, and until then the page was the sea the engine had already started
+  drawing, so arriving from a link showed the water and then cut to the title. It says it is
+  loading where PRESS START goes, and once the wait outlasts `WAIT_HINT` (700 ms, `useSlow` in
+  `src/app/Loading.tsx`) it grows a progress bar under that line. The full boot screen is for a
+  boot nobody is looking at a screen for — deep-linked to the roster — because over the title it
+  would be the title's own painting a second time.
 - An era's `assets.sfx` names the shared sound library (`assets/sfx/`): bites, hits and the UI are the
   same files in both eras. Era-specific samples are addressed as `<era>/<name>` and resolve under
   `assets/<era>/sfx/` regardless. The two always-on beds are named per era in `audio.loops`, and a
@@ -130,8 +142,13 @@ unless the user explicitly asks for a PR. Steps:
   that ships. A model landing also moves its canonical state to `delivered`, which
   `tools/triassic/apply-selections.mjs` derives from `tools/triassic/shipped.json`; a regenerated
   pose (a `candidate-awaiting-human-greenlight` in any `docs/triassic/canonical/prompts*.json`)
-  clears whatever was decided about the old one and sends the subject back to the undecided pile.
-  Run the tool with no arguments to reconcile the manifest with the tree.
+  clears whatever was decided about the old one and sends the subject back to the undecided pile —
+  unless a human has already ruled on that candidate (`reviewedCandidate`), or the reopen would
+  undo the decision it was meant to prompt. A **greenlit candidate becomes the pose**: the tool
+  renames it over `<id>.png`, keeps the loser under `canonical/backups/`, and marks the prompt
+  record answered, because everything downstream reads `<id>.png` and nothing else — leaving the
+  winner beside the picture it beat would send the loser to be built. Run the tool with no
+  arguments to reconcile the manifest with the tree.
 - An era's scenery pack must **name** every prop it draws with. An id it does not name falls back to
   the bare id under that era's own props folder, and an era whose folder is empty then asks the
   network for a GLB that was never there — silent everywhere but the network tab, which is how the

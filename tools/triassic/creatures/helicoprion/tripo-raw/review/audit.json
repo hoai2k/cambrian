@@ -1,0 +1,105 @@
+{
+  "schema_version": 1,
+  "input": {
+    "path": "tools/triassic/creatures/helicoprion/tripo-raw/helicoprion.raw.glb",
+    "bytes": 1331144,
+    "sha256": "f1a5749617f8c67c7b25edbbff6d14c0d0d0c7ee98536d8e1d2a5c61cb7dc6a1"
+  },
+  "summary": {
+    "mesh_objects": 1,
+    "vertices": 11602,
+    "faces": 19266,
+    "triangles": 19266,
+    "connected_components": 86,
+    "materials": 1,
+    "textures": 3
+  },
+  "bounds": {
+    "min_xyz": [
+      -0.245023,
+      -0.5,
+      -0.216153
+    ],
+    "max_xyz": [
+      0.245023,
+      0.5,
+      0.216153
+    ],
+    "center_xyz": [
+      0,
+      0,
+      0
+    ],
+    "size_xyz": [
+      0.490046,
+      1,
+      0.432307
+    ]
+  },
+  "meshes": [
+    {
+      "object": "tripo_node_c9d033c1-de7b-41b4-827c-f380e4d50e7c",
+      "mesh": "tripo_mesh_c9d033c1-de7b-41b4-827c-f380e4d50e7c",
+      "vertices": 11602,
+      "edges": 30782,
+      "faces": 19266,
+      "triangles": 19266,
+      "connected_components": 86,
+      "material_slots": [
+        "tripo_material_c9d033c1-de7b-41b4-827c-f380e4d50e7c"
+      ]
+    }
+  ],
+  "materials": [
+    {
+      "name": "tripo_material_c9d033c1-de7b-41b4-827c-f380e4d50e7c",
+      "image_textures": [
+        "Color_c9d033c1-de7b-41b4-827c-f380e4d50e7c",
+        "NormalGL_c9d033c1-de7b-41b4-827c-f380e4d50e7c",
+        "ORM_c9d033c1-de7b-41b4-827c-f380e4d50e7c"
+      ]
+    }
+  ],
+  "textures": [
+    {
+      "name": "Color_c9d033c1-de7b-41b4-827c-f380e4d50e7c",
+      "width": 2048,
+      "height": 2048,
+      "channels": 4,
+      "packed": true,
+      "source": "FILE",
+      "colorspace": "sRGB"
+    },
+    {
+      "name": "NormalGL_c9d033c1-de7b-41b4-827c-f380e4d50e7c",
+      "width": 2048,
+      "height": 2048,
+      "channels": 4,
+      "packed": true,
+      "source": "FILE",
+      "colorspace": "Non-Color"
+    },
+    {
+      "name": "ORM_c9d033c1-de7b-41b4-827c-f380e4d50e7c",
+      "width": 2048,
+      "height": 2048,
+      "channels": 4,
+      "packed": true,
+      "source": "FILE",
+      "colorspace": "Non-Color"
+    }
+  ],
+  "renders": {
+    "side": "tools/triassic/creatures/helicoprion/tripo-raw/review/side.png",
+    "top": "tools/triassic/creatures/helicoprion/tripo-raw/review/top.png",
+    "three-quarter": "tools/triassic/creatures/helicoprion/tripo-raw/review/three-quarter.png"
+  },
+  "preview": {
+    "path": "tools/triassic/creatures/helicoprion/helicoprion.preview.glb",
+    "triangle_limit": 40000,
+    "triangles_before": 19266,
+    "triangles_after": 19266,
+    "bytes": 1215376,
+    "sha256": "8c66c237f8adacf7429a422c2b51c7fad62181f33e007d696b01c697e4fd719e"
+  }
+}

@@ -5,15 +5,23 @@
   "exactSocketParity": true,
   "losslessAnimationPackaging": true,
   "losslessMeshAttributePackaging": true,
+  "nonfeedingJawMotion": false,
+  "mouthOpeningClips": [
+    "Bite",
+    "Attack",
+    "Heavy",
+    "Eat"
+  ],
   "full": {
+    "closedSurfaceWinding": [],
     "triangles": 117442,
-    "weightedVertices": 62445,
+    "weightedVertices": 62615,
     "bones": 21,
     "clips": [
       {
         "name": "Ability",
         "duration": 2.0999999046325684,
-        "dynamicChannels": 20,
+        "dynamicChannels": 19,
         "seam": 0
       },
       {
@@ -31,7 +39,7 @@
       {
         "name": "Death",
         "duration": 2.4000000953674316,
-        "dynamicChannels": 20,
+        "dynamicChannels": 19,
         "seam": 0
       },
       {
@@ -55,13 +63,13 @@
       {
         "name": "Growth",
         "duration": 2.200000047683716,
-        "dynamicChannels": 20,
+        "dynamicChannels": 18,
         "seam": 0
       },
       {
         "name": "Guard",
         "duration": 2.5999999046325684,
-        "dynamicChannels": 20,
+        "dynamicChannels": 18,
         "seam": 2.380711105928283e-19
       },
       {
@@ -73,13 +81,13 @@
       {
         "name": "Hit",
         "duration": 0.6666666865348816,
-        "dynamicChannels": 21,
+        "dynamicChannels": 20,
         "seam": 0
       },
       {
         "name": "Idle",
         "duration": 3.200000047683716,
-        "dynamicChannels": 20,
+        "dynamicChannels": 18,
         "seam": 2.645237003474206e-19
       },
       {
@@ -97,7 +105,7 @@
       {
         "name": "Sprint",
         "duration": 1.100000023841858,
-        "dynamicChannels": 20,
+        "dynamicChannels": 18,
         "seam": 3.4167646459207244e-18
       },
       {
@@ -109,7 +117,7 @@
       {
         "name": "Swim",
         "duration": 1.7999999523162842,
-        "dynamicChannels": 20,
+        "dynamicChannels": 18,
         "seam": 2.2043641609453735e-18
       },
       {
@@ -131,8 +139,8 @@
         "parent": "jaw",
         "translation": [
           0,
-          -0.9240002444313673,
-          0.024000100663776253
+          -0.9092178102598114,
+          0.16786014345180855
         ],
         "extras": {
           "cambrianAnchor": {
@@ -147,8 +155,8 @@
         "parent": "jaw",
         "translation": [
           0,
-          -0.23400016359321252,
-          0.02400007704607885
+          -0.22748966535941295,
+          0.07867456939886329
         ],
         "extras": {
           "cambrianAnchor": {
@@ -175,10 +183,52 @@
         }
       }
     ],
-    "bytes": 4387380,
-    "sha256": "355f2a7a51b4adf08d5d01561c8941d54437eaeb7ef6a842ade93298f44611b8"
+    "bytes": 7381764,
+    "sha256": "f4a1cc71bfb9920026a51467d5da83c74527be8c7d82c30974f1e15a7473c2f5"
   },
   "puppet": {
+    "closedSurfaceWinding": [
+      {
+        "mesh": "Puppet lower rostrum",
+        "signedVolume": 0.04339843679546321,
+        "doubleSided": false
+      },
+      {
+        "mesh": "Puppet measured crescent caudal",
+        "signedVolume": 0.047041548522666184,
+        "doubleSided": false
+      },
+      {
+        "mesh": "Puppet measured trunk",
+        "signedVolume": 2.9286169256213266,
+        "doubleSided": false
+      },
+      {
+        "mesh": "Puppet pectoral L",
+        "signedVolume": 0.04113304883907224,
+        "doubleSided": false
+      },
+      {
+        "mesh": "Puppet pectoral R",
+        "signedVolume": 0.0409959680774833,
+        "doubleSided": false
+      },
+      {
+        "mesh": "Puppet pelvic L",
+        "signedVolume": 0.019321120585719494,
+        "doubleSided": false
+      },
+      {
+        "mesh": "Puppet pelvic R",
+        "signedVolume": 0.0196388748991815,
+        "doubleSided": false
+      },
+      {
+        "mesh": "Puppet upper rostrum",
+        "signedVolume": 0.10510569893700393,
+        "doubleSided": false
+      }
+    ],
     "triangles": 10874,
     "weightedVertices": 5942,
     "bones": 21,
@@ -186,7 +236,7 @@
       {
         "name": "Ability",
         "duration": 2.0999999046325684,
-        "dynamicChannels": 20,
+        "dynamicChannels": 19,
         "seam": 0
       },
       {
@@ -204,7 +254,7 @@
       {
         "name": "Death",
         "duration": 2.4000000953674316,
-        "dynamicChannels": 20,
+        "dynamicChannels": 19,
         "seam": 0
       },
       {
@@ -228,13 +278,13 @@
       {
         "name": "Growth",
         "duration": 2.200000047683716,
-        "dynamicChannels": 20,
+        "dynamicChannels": 18,
         "seam": 0
       },
       {
         "name": "Guard",
         "duration": 2.5999999046325684,
-        "dynamicChannels": 20,
+        "dynamicChannels": 18,
         "seam": 2.380711105928283e-19
       },
       {
@@ -246,13 +296,13 @@
       {
         "name": "Hit",
         "duration": 0.6666666865348816,
-        "dynamicChannels": 21,
+        "dynamicChannels": 20,
         "seam": 0
       },
       {
         "name": "Idle",
         "duration": 3.200000047683716,
-        "dynamicChannels": 20,
+        "dynamicChannels": 18,
         "seam": 2.645237003474206e-19
       },
       {
@@ -270,7 +320,7 @@
       {
         "name": "Sprint",
         "duration": 1.100000023841858,
-        "dynamicChannels": 20,
+        "dynamicChannels": 18,
         "seam": 3.4167646459207244e-18
       },
       {
@@ -282,7 +332,7 @@
       {
         "name": "Swim",
         "duration": 1.7999999523162842,
-        "dynamicChannels": 20,
+        "dynamicChannels": 18,
         "seam": 2.2043641609453735e-18
       },
       {
@@ -304,8 +354,8 @@
         "parent": "jaw",
         "translation": [
           0,
-          -0.9240002444313673,
-          0.024000100663776253
+          -0.9092178102598114,
+          0.16786014345180855
         ],
         "extras": {
           "cambrianAnchor": {
@@ -320,8 +370,8 @@
         "parent": "jaw",
         "translation": [
           0,
-          -0.23400016359321252,
-          0.02400007704607885
+          -0.22748966535941295,
+          0.07867456939886329
         ],
         "extras": {
           "cambrianAnchor": {
@@ -348,7 +398,7 @@
         }
       }
     ],
-    "bytes": 586100,
-    "sha256": "0ba450afcdc3c24b41e8abb4c299a431f6e37d13c224c5b7b2eac8ceb1b8cada"
+    "bytes": 572216,
+    "sha256": "013710ef4131b066caf2fd9f77686bde299f60a05dd7f8132415031945950d9f"
   }
 }

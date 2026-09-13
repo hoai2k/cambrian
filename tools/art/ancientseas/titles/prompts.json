@@ -1,0 +1,52 @@
+{
+  "mode": "builtin imagegen",
+  "date": "2026-09-13",
+  "prompts": [
+    {
+      "file": "logo-engraved.webp",
+      "prompt": "Use case: logo-brand. Create a transparent raster wordmark for a natural-history game title page. Reference image is style reference only: match its engraved heavy Roman serif black ink, fine crosshatch and stippled ink wear, thin warm gold rim. Exact text: \"ANCIENT SEAS\" on one wide top line, \"TRILOGY\" centered beneath at 45 percent the top line cap height. All capitals. Flat antique letterpress engraving, no 3D bevel. Overall canvas 1536x512, lettering fills width with small safe margins. Genuine transparent alpha background including the counters of letters, no checkerboard baked in, no parchment, no backdrop, no ornament, no underline, no extra text. Every letter complete and easily legible. Intended to sit on near-black page."
+    },
+    {
+      "file": "title-trilogy.webp",
+      "prompt": "Use case: logo-brand. Generate ONLY the lettering for a fourth antique natural-history plate. Reference image is the stylistic reference: precisely match heavy engraved Roman serifs, near-black stippled ink with fine cross-hatching, a very fine PALE CREAM rim and soft subtle offset paper shadow. Exact text: \"ANCIENT SEAS\" across first line, \"TRILOGY\" centered below at about half the cap height. All capitals, handsome wide spacing, no swash ornament. Transparent alpha background with transparent counters; no paper, no creatures, no plants, no rules, no gold, no metallic effect. Intended for a warm parchment background. Requested canvas 2048x640; text fills almost the full width, small safe margins; both lines together centered in canvas."
+    },
+    {
+      "file": "title-cambrian.webp",
+      "prompt": "Use case: logo-brand. Isolate and recreate ONLY the two-line title lettering from the reference painting, with no scenery. Exact text top line \"CAMBRIAN\", bottom line \"CONQUEST\", no other words. Match the painting's heavy Roman serif lettering, oversized initial C in both lines, near-black stippled and crosshatched ink with very thin PALE CREAM rim and quiet offset shadow. No gold gilding, no shiny bevel. Genuine transparent alpha background, including letter counters. No plants, ornaments, lines, animals, parchment, glow, or baked checkerboard. Composition matches reference title block with both lines similar width, tightly stacked, complete and centered. Requested canvas 1536x640, typography fills most canvas with small safe margins."
+    },
+    {
+      "file": "title-devonian.webp",
+      "prompt": "Use case: logo-brand. Isolate and recreate ONLY the two-line title lettering from the reference painting, with no scenery. Exact text top line \"DEVONIAN\", bottom line \"DOMINATION\", no other words. Match the painting's heavy Roman serif lettering, oversized initial D in both lines, near-black stippled and crosshatched ink with very thin PALE CREAM rim and quiet offset shadow. No gold gilding, no shiny bevel. Genuine transparent alpha background, including letter counters. No plants, ornaments, lines, animals, parchment, glow, or baked checkerboard. Composition matches reference title block with both lines similar width, tightly stacked, complete and centered. Requested canvas 1536x640, typography fills most canvas with small safe margins."
+    },
+    {
+      "file": "title-triassic.webp",
+      "prompt": "Use case: logo-brand. Isolate and recreate ONLY the two-line title lettering from the reference painting, with no scenery. Exact text top line \"TRIASSIC\", bottom line \"TRIUMPH\", no other words. Match the painting's heavy Roman serif lettering, oversized initial T in both lines, near-black stippled and crosshatched ink with very thin PALE CREAM rim and quiet offset shadow. No gold gilding, no shiny bevel. Genuine transparent alpha background, including letter counters. No plants, ornaments, lines, animals, parchment, glow, or baked checkerboard. Composition matches reference title block with both lines similar width, tightly stacked, complete and centered. Requested canvas 1536x640, typography fills most canvas with small safe margins."
+    },
+    {
+      "file": "ground-parchment.webp",
+      "prompt": "Use case: stylized-concept. Generate the EMPTY parchment ground for a fourth antique natural-history plate. The reference paintings are style and color references ONLY. Remove all illustrations, letters, plants, seabed and ornaments: nothing drawn anywhere. A flat uninterrupted aged parchment surface, warm cream at the broad center, nuanced fine paper fibers, subdued mottling and foxing, darkening softly through ochre and umber to near-black (#070402) on ALL FOUR EDGES. Heavy oval vignette matching the reference paintings; edges seamlessly nearly black, substantial luminous central area occupying 70 percent of width and height. NO frame or visible physical paper boundary, no cracks, no burn holes, no writing, no forms or illustrations. Landscape canvas exactly 2048x1280, fully opaque. This will be the calm background behind separate engraved animal and text cutouts."
+    },
+    {
+      "file": "ground-seabed.webp",
+      "prompt": "Use case: stylized-concept. Create a very wide low horizontal strip of ancient seabed cut from the bottom of the reference natural-history painting. Style reference only: hand-coloured antique copperplate engraving with fine dense black crosshatching and stipple, muted ochre rocks, slate gray rubble, sage patches, dusty-red encrusting coral, two little scallop shells, small sea urchins, squat ochre sponges. All elements SMALL, subdued and low, continuous rocky shelf across the full width, no large hero object. Landscape strip aspect ratio 16:3, requested final canvas 2048x384. Lower part dense fine sand and rubble, irregular upper silhouette with a gentle fade into GENUINELY TRANSPARENT ALPHA above and between the highest stones, no opaque background, no checkerboard artwork. No creatures swimming, no tall plants, no text. Soft subtle offset shadow directly under rocks. Canvas subject must read as one continuous shelf spanning from left edge to right edge, as a footer below separate animals."
+    },
+    {
+      "file": "ground-seabed.webp",
+      "step": "alpha correction",
+      "prompt": "Use case: background-extraction. Edit the supplied seabed illustration: REMOVE ALL gray-and-white checkerboard pixels from above and below the shelf, replacing them with REAL TRANSPARENCY in the PNG alpha channel. The checkerboard is an error, it must not appear in the exported image. Preserve the entire illustrated shelf exactly, all rocks, shells, tiny sponges, muted hand-coloured engraving detail, the gentle under-shadow. Tight crop to the low wide shelf's bounding rectangle with small transparent margin above; preserve its natural wide proportions. No new illustrations, no typography, no solid backdrop. Output actual transparent PNG cutout."
+    },
+    {
+      "file": "ground-seabed.webp",
+      "step": "clean white extraction source",
+      "prompt": "Edit this seabed strip. Replace the entire checkerboard backdrop with PERFECTLY PURE SOLID WHITE (#FFFFFF), both above and below the illustrated shelf. No checks, no gray backdrop, no paper, no texture in white background. Preserve the continuous low rocky shelf, its shells, sponges, encrusting coral and urchins in exactly the same antique engraving style and muted colors. Remove the cast shadow. Cutout reference on pure solid white. Wide 2048x384 framing, close crop to shelf with 5 percent white margin above and below."
+    },
+    {
+      "file": "ornament-fleuron.webp",
+      "prompt": "Use case: logo-brand. Generate one small antique engraved fleuron matching the ornament between the lettering and animal in this reference painting: an upright fan-shaped scallop shell with its hinge centered at the bottom and long radiating ribs, ochre and pale cream ink wash, flanked symmetrically by low sweeping fine sage-green fern fronds. Fine black crosshatching and stipple, delicate hand-coloured natural-history copperplate engraving, muted pigments. Isolated ornament only, no words, no lines, no animals, no paper or ground. Genuine transparent alpha background including all gaps between fronds, not a drawn checkerboard. Requested canvas 512x384, centered complete ornament occupies 90 percent width and 70 percent height, elegant wide low silhouette."
+    },
+    {
+      "file": "favicon-master.png",
+      "prompt": "Use case: logo-brand. Create the favicon emblem derived from the reference fleuron: ONLY its central upright scallop shell, with the full scalloped fan shape, hinge at bottom, radiating engraved ribs, warm pale cream and ochre, dense fine black crosshatch and stipple. No fronds, leaves, plants or any other objects. True transparent alpha background around the shell, not a checkerboard. Complete isolated shell, centered with small margins, approximately square canvas. Match exactly this shell's antique hand-coloured engraved illustration style. No words, no logo lettering, no shadows beyond a tiny outline."
+    }
+  ]
+}
