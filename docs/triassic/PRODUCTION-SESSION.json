@@ -1,14 +1,15 @@
 {
   "schemaVersion": 1,
-  "updatedAt": "2026-09-13T14:50:54Z",
-  "phase": "review-window",
+  "updatedAt": "2026-09-13T15:03:20.423352+00:00",
+  "phase": "paused-complex-work-routine-tripo-only",
   "instructions": [
-    "Sync main; deliver requested imagery including any canonical redraws.",
-    "After committing images wait 30 minutes, then sync main and reevaluate human greenlights.",
-    "Generate all remaining greenlit creature Tripo bodies, playable before ambient, within available API wallet.",
-    "Process and commit all generated bodies before beginning new rigs.",
-    "Then rig and create procedural twins with identical animated skeletons, finishing and committing one creature at a time.",
-    "Remove preview warning only for a creature that completes the required pipeline and passes verification; record production completion rather than inventing human approval."
+    "User paused on2026-09-13: finish and push all current work.",
+    "Only simpler-agent Tripo generation, routine static Blender processing and main commits may continue.",
+    "Respect existing review window end2026-09-13T15:20:54Z; then syncmain and reevaluate greenlights.",
+    "Only generate from existing verified modelinput whose SHA matches currentlyselected human-greenlit canonical; playablebeforeambient, within655credit wallet (lastverified).",
+    "Process/preserve downloaded rawbodies and sanitizedprovenance; commitmain. Do not markraws as shipped gameassets.",
+    "STOP after routine rawmodels are delivered; no newimages, anatomical surgery, rigs, puppets or animations untiluserresumes.",
+    "Keep previewwarnings until completepipeline verified in a future resumed session."
   ],
   "apiWalletLastVerified": 655,
   "expectedCreditsPerGeneration": 30,
@@ -281,11 +282,11 @@
     }
   ],
   "notes": [
-    "All requested image batches pushed to main237bf24. Four candidate03 redraws await human review. Current19 greenlit inputs validated.",
-    "WAIT until15:20:54UTC on2026-09-13 before fresh sync + Tripo submissions. No new submissions yet.",
-    "Ancient Seas29files integrated, build/typecheck/260checks pass, Chrome visual review complete.",
-    "Shonisaurus existing-body lip/texture correction final QA underway; do not begin new rigs before raw batch stage finishes.",
-    "Next: syncmain, rebuildplan, run-batch within655credits, process-batch --process, review+commit allraws; then rig+puppet+animations onebyone with own commit/warning removal after QA."
+    "Imagerymain237bf24; correctedShonisaurus and checkpointmain926bc81.",
+    "Nineteen currentlygreenlit verified inputs; four candidate03 redraws awaitingreview. Newlygreenlit candidates without verifiedinputs stayblocked duringpause.",
+    "Routine batchscript resumes taskIDs; failedjobs stopratherthanpaidretry. APIcredential nevercommitted.",
+    "Resume complexwork onlyafter user explicitly resumes; then speciesby species pairedrig/puppet/actionQA andcommits."
   ],
-  "imageBatchMainCommit": "237bf24"
+  "imageBatchMainCommit": "237bf24",
+  "complexWorkPaused": true
 }
