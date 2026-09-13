@@ -63,6 +63,17 @@ unless the user explicitly asks for a PR. Steps:
   stay behind that import (or resolve lazily like `assetPaths` and `music()`); the entry page itself
   must not statically import the audio library or the sim for the same reason. Headless tests that
   need the Devonian do the same: select the era, then `await import(...)` (`tools/devonian-test.ts`).
+- `/ancientseas/` is the trilogy's title page (entry `src/ancientseas/main.tsx`, data in
+  `src/ancientseas/page.ts`): the three games' titles as links, in two versions picked by
+  `?version=` (1, the default, is the three title paintings whole on the dark their vignettes run
+  out to; 2 is one plate in the paintings' style assembled from individually requested pieces —
+  `SLOTS`, placed by centre and width on a 16:10 desktop stage and a 9:25 phone stage). Every piece
+  it asks for has a brief in `docs/image-requests.md` and lands in `public/assets/ancientseas/`;
+  the page only ever loads what `src/ancientseas/delivered.json` lists (`npm run
+  ancientseas:delivered` regenerates it from the folder) and draws a shipped stand-in or a named
+  wash for the rest, so nothing asks the network for art that has not arrived. `npm run
+  ancientseas` checks all of it; `node tools/ancientseas-smoke.mjs <outdir>` screenshots both
+  versions against a preview build and follows the three links.
 - An era's `assets.sfx` names the shared sound library (`assets/sfx/`): bites, hits and the UI are the
   same files in both eras. Era-specific samples are addressed as `<era>/<name>` and resolve under
   `assets/<era>/sfx/` regardless. The two always-on beds are named per era in `audio.loops`, and a
@@ -119,8 +130,13 @@ unless the user explicitly asks for a PR. Steps:
   that ships. A model landing also moves its canonical state to `delivered`, which
   `tools/triassic/apply-selections.mjs` derives from `tools/triassic/shipped.json`; a regenerated
   pose (a `candidate-awaiting-human-greenlight` in any `docs/triassic/canonical/prompts*.json`)
-  clears whatever was decided about the old one and sends the subject back to the undecided pile.
-  Run the tool with no arguments to reconcile the manifest with the tree.
+  clears whatever was decided about the old one and sends the subject back to the undecided pile —
+  unless a human has already ruled on that candidate (`reviewedCandidate`), or the reopen would
+  undo the decision it was meant to prompt. A **greenlit candidate becomes the pose**: the tool
+  renames it over `<id>.png`, keeps the loser under `canonical/backups/`, and marks the prompt
+  record answered, because everything downstream reads `<id>.png` and nothing else — leaving the
+  winner beside the picture it beat would send the loser to be built. Run the tool with no
+  arguments to reconcile the manifest with the tree.
 - An era's scenery pack must **name** every prop it draws with. An id it does not name falls back to
   the bare id under that era's own props folder, and an era whose folder is empty then asks the
   network for a GLB that was never there — silent everywhere but the network tab, which is how the

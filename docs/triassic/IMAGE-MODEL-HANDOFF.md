@@ -30,3 +30,38 @@ User requested authored Tripo plus procedural volume-matched puppet for both tes
 - Verification: exact decoded skeleton/inverse-bind/animation/anchor parity, finite normalized skinning, volume profiles, Blender multi-pose inspection, exported GLB playback, typecheck, build and Triassic tests. Future refinement may improve the original Tripo surface detail; do not call these human-finalized.
 
 Runtime verification also confirmed Idle/Swim/Sprint selection and fallback using actual CreatureView loads of both GLBs. Sprint enters above 1.2× cruise and exits at 1.1× to avoid flicker; its authored cadence is preserved. Local specimen viewer successfully loaded all four full/puppet selections with 21 and 19 clips, preview badges and working playback.
+
+## Mouth and material correction checkpoint (2026-09-13)
+- Shonisaurus authored and procedural bind geometry now closes the mouth. Only Bite, Attack, Heavy and Eat open it; all other clips, including Ability and Death, keep it shut. Exact 21-joint/19-clip/anchor parity remains. Closure probes exclude internal oral fillers and find no open rays in either rostrum. Evidence: `tools/triassic/creatures/shonisaurus/closed-mouth-review.jpg` and `mouth-closure-validation.json`. A tiny internal oral-web edge still stretches at maximum Heavy; no external tearing was observed. Models remain previews.
+- Nothosaurus preserves the original albedo texture, uses white vertex pigment on the authored skin to avoid multiplying colour twice, and reduces excessive normal-map relief to 0.15 with nonmetallic roughness 0.7. The source grey-white streaks remain: controlled original/processed comparisons and UV checks establish they came from Tripo. Meshes, weights, rigs and all 21 clips are unchanged. Evidence: `tools/triassic/creatures/nothosaurus/material-comparison.jpg` and `material-audit.json`.
+- Current bytes: Nothosaurus full 1,794,048 / puppet and LOD 686,620; Shonisaurus full 4,379,136 / puppet and LOD 572,216. Portraits were refreshed. Blender authoring files and detailed frames remain under `local/triassic-authoring/`.
+- Synced the upstream viewer Body switch: compare the pair on each animal's single entry, preserving camera and animation. Raw source files are now under each builder's `tripo-raw/` folder; reproduction paths were corrected after the upstream move.
+- Scope remaining: human review of these preview pairs, the broader queued creature/image work described above, and any future repaint of inherited source markings. This correction task does not finalize the models or start other creatures.
+
+- Live Three.js review additionally caught inward winding on procedural Shonisaurus shells that Blender had displayed two-sided. Closed shells now face outward, and the packaged-model validator enforces positive signed volume. Upper tooth winding was corrected too. Recheck actual single-sided game rendering after any future topology change.
+
+Validation for this checkpoint: typecheck and production build passed after merging upstream main; 370 Triassic checks and production CreatureView Idle/Swim/Sprint tests passed; both species retain exact paired rigs/clips/anchors. Live viewer confirmed smoother Nothosaurus surface, Shonisaurus closed Idle, and matching authored/procedural open Heavy poses after the winding correction.
+
+## Skinning review — 2026-09-13
+
+Both delivered bodies were skinned the way three.js does it, at 24 frames of every clip, and
+measured for stretch, face inversion, collapse and self-intersection. The skinning is sound:
+measured against body length the authored bodies deform as much as their procedural twins and no
+more (Nothosaurus Sprint 1.40% vs the twin's 1.44%), no faces collapse, and neither animal
+self-intersects in any clip. A ratio-based reading suggested otherwise at first and was wrong —
+×3 on a 0.035-unit edge and ×1.3 on a 0.224-unit edge are the same absolute movement, so a dense
+mesh flatters itself. Duplicated seam vertices were checked too: none carry mismatched weights.
+
+Two things are outstanding.
+
+**Shonisaurus' mouth inverts, and this is a regression.** At `Heavy` t=0.35 (and `Attack`, `Bite`)
+286 faces along the upper lip turn completely inside out — flip 1.00, the surface exactly
+reversed, on the `skull`/`jaw` boundary. The build before the jaw-closure change had **one**
+marginally inverted face at the same frame. Closing the jaws outside feeding moved the rest pose
+without the lip weights following it, so the lip now folds through itself the moment the jaw
+opens. It is plainly visible at any distance where the mouth is on screen.
+
+**Shonisaurus' skin texture is faceted.** The flank, belly and skull are covered in triangular
+starbursts. It is in the baked maps, not the mesh: the same geometry with the same vertex normals
+and no textures renders perfectly smooth. Nothosaurus' texture is clean, so this is one model's
+bake. Both need Blender, which is why they are recorded here rather than fixed in place.

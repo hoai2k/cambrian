@@ -12,6 +12,7 @@ const io=new NodeIO().registerExtensions(ALL_EXTENSIONS).registerDependencies({'
 const hash=a=>createHash('sha256').update(a).digest('hex');
 const arr=a=>Array.from(a?.getArray()??[]);
 const anchors=JSON.parse(fs.readFileSync(`${here}/anchors.json`));
+const feeding=new Set(['Bite','Attack','Heavy','Eat']);
 const meta=JSON.parse(fs.readFileSync(`${out}/shonisaurus.json`));
 const numDigest=a=>hash(Buffer.from(new Float64Array(arr(a)).buffer));
 function skeleton(doc){const skin=doc.getRoot().listSkins()[0];return {joints:skin.listJoints().map(n=>({name:n.getName(),parent:n.getParentNode()?.getName(),translation:n.getTranslation(),rotation:n.getRotation(),scale:n.getScale()})),inverseBind:numDigest(skin.getInverseBindMatrices())};}
@@ -19,9 +20,11 @@ function geometry(doc){return doc.getRoot().listMeshes().map(m=>({name:m.getName
 function clips(doc){return doc.getRoot().listAnimations().map(a=>({name:a.getName(),channels:a.listChannels().map(c=>({node:c.getTargetNode().getName(),path:c.getTargetPath(),input:numDigest(c.getSampler().getInput()),output:numDigest(c.getSampler().getOutput())})).sort((a,b)=>(a.node+a.path).localeCompare(b.node+b.path))})).sort((a,b)=>a.name.localeCompare(b.name));}
 function check(doc,label){
  const root=doc.getRoot(), animations=root.listAnimations(),names=animations.map(a=>a.getName());assert.deepEqual([...names].sort(),[...meta.clips].sort());
- const signatures=new Set();let weights=0,tris=0;
+ const signatures=new Set();let weights=0,tris=0;const winding=[];
  for(const m of root.listMeshes())for(const p of m.listPrimitives()){
   tris+=(p.getIndices()?.getCount()??p.getAttribute('POSITION').getCount())/3;
+  if(m.getName().startsWith('Puppet')){const vs=p.getAttribute('POSITION').getArray(),ids=p.getIndices().getArray();let volume=0;for(let k=0;k<ids.length;k+=3){const a=ids[k]*3,b=ids[k+1]*3,c=ids[k+2]*3;volume+=(vs[a]*(vs[b+1]*vs[c+2]-vs[b+2]*vs[c+1])+vs[a+1]*(vs[b+2]*vs[c]-vs[b]*vs[c+2])+vs[a+2]*(vs[b]*vs[c+1]-vs[b+1]*vs[c]))/6;}assert(volume>0,`${m.getName()}: inward single-sided shell`);winding.push({mesh:m.getName(),signedVolume:volume,doubleSided:p.getMaterial().getDoubleSided()});}
+
   for(const a of p.listAttributes())for(const n of arr(a))assert(Number.isFinite(n));
   const w=p.getAttribute('WEIGHTS_0');assert(w,`${label} ${m.getName()} is unskinned`);
   for(let i=0;i<w.getCount();i++){const v=w.getElement(i,[]);assert(Math.abs(v.reduce((a,b)=>a+b,0)-1)<1e-5);assert(v.every(n=>n>=0&&n<=1));weights++;}
@@ -34,6 +37,7 @@ function check(doc,label){
    let range=0;for(let i=0;i<values.length;i++)range=Math.max(range,Math.abs(values[i]-values[i%size]));
    if(path==='scale')assert(values.every(v=>Math.abs(v-1)<1e-6),'Animated scale forbidden');
    if(target==='root')assert(range<1e-6,'Root motion forbidden');
+   if(target==='jaw'&&!feeding.has(a.getName()))assert(range<1e-7,`${label} ${a.getName()}: mouth moves outside feeding`);
    if(range>1e-5&&path!=='scale')dynamic++;
    if(meta.looping.includes(a.getName())){let direct=0,negated=0;for(let k=0;k<size;k++){direct=Math.max(direct,Math.abs(values[k]-values[values.length-size+k]));negated=Math.max(negated,Math.abs(values[k]+values[values.length-size+k]));}seam=Math.max(seam,Math.min(direct,path==='rotation'?negated:Infinity));}
    signature.push([target,path,values]);
@@ -42,7 +46,7 @@ function check(doc,label){
  }
  const socketRecords=root.listNodes().filter(n=>n.getName().startsWith('anchor_')).map(n=>({name:n.getName(),parent:n.getParentNode().getName(),translation:n.getTranslation(),extras:n.getExtras()}));assert.equal(socketRecords.length,3);
  for(const n of socketRecords)assert.equal(n.parent,n.extras.cambrianAnchor.parentBone);
- return {triangles:tris,weightedVertices:weights,bones:skeleton(doc).joints.length,clips:measures,sockets:socketRecords};
+ return {closedSurfaceWinding:winding,triangles:tris,weightedVertices:weights,bones:skeleton(doc).joints.length,clips:measures,sockets:socketRecords};
 }
 const results={},docs={};
 for(const [src,suffix]of [['full',''],['puppet','.puppet']]){
@@ -53,7 +57,7 @@ for(const [src,suffix]of [['full',''],['puppet','.puppet']]){
 }
 assert.deepEqual(skeleton(docs.full),skeleton(docs.puppet));assert.deepEqual(clips(docs.full),clips(docs.puppet));assert.deepEqual(results.full.sockets,results.puppet.sockets);assert(results.puppet.triangles<results.full.triangles*.4);
 fs.copyFileSync(`${out}/shonisaurus.puppet.glb`,`${out}/shonisaurus.lod1.glb`);
-fs.writeFileSync(`${here}/validation.json`,JSON.stringify({passed:true,exactSkeletonParity:true,exactAnimationParity:true,exactSocketParity:true,losslessAnimationPackaging:true,losslessMeshAttributePackaging:true,...results},null,2)+'\n');
+fs.writeFileSync(`${here}/validation.json`,JSON.stringify({passed:true,exactSkeletonParity:true,exactAnimationParity:true,exactSocketParity:true,losslessAnimationPackaging:true,losslessMeshAttributePackaging:true,nonfeedingJawMotion:false,mouthOpeningClips:[...feeding],...results},null,2)+'\n');
 console.log(JSON.stringify({full:results.full.bytes,puppet:results.puppet.bytes,fullTriangles:results.full.triangles,puppetTriangles:results.puppet.triangles,bones:results.full.bones,clips:meta.clips.length,parity:'exact'},null,2));
 
 for(const kind of ['full','puppet']){const doc=docs[kind];for(const ext of doc.getRoot().listExtensionsUsed())if(ext.extensionName==='EXT_meshopt_compression')ext.dispose();await io.write(`${base}/shonisaurus.${kind}.decoded.glb`,doc);}
