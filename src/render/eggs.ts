@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import { lengthOf } from '../sim/actors';
+import { creature } from '../sim/creatures';
 import { HATCH_FREE, HATCH_TIME } from '../sim/game';
 import type { Actor } from '../sim/types';
 
@@ -53,19 +54,49 @@ class Egg {
   /** Where the body was while it was still inside; the shell stays here once it is out. */
   private at = new THREE.Vector3();
 
-  constructor(readonly actorId: number, at: THREE.Vector3, private radius: number, private yaw: number) {
+  constructor(readonly actorId: number, at: THREE.Vector3, private radius: number, private yaw: number,
+              private leathery = false) {
     // Two halves of one ovoid, cut by the vertical plane that holds the long axis: three.js sweeps
     // phi around Y from +Z, so half a turn from 0 is everything on one side of that plane and half
     // a turn from π is the other.
-    const shell = (phiStart: number) => {
-      const g = new THREE.SphereGeometry(1, SEGMENTS, RINGS, phiStart, Math.PI);
-      g.scale(0.82, 1, 0.82);
+    //
+    // A reptile's egg is not this smooth. Its shell is parchment over a soft interior, so it dimples
+    // and puckers where it rests and never takes a clean highlight: the vertices get a little
+    // low-frequency noise pushed along their own normals, which is what reads as leather at the size
+    // an egg is on screen. The noise is seeded from the actor so one egg is not a copy of the next,
+    // and it goes in before `base` is captured so every poke and every split works on the shape the
+    // shell actually has.
+    const wobble = (g: THREE.BufferGeometry, seed: number) => {
+      const p = g.attributes.position as THREE.BufferAttribute, n = g.attributes.normal as THREE.BufferAttribute;
+      const v = new THREE.Vector3(), nv = new THREE.Vector3();
+      for (let i = 0; i < p.count; i++) {
+        v.fromBufferAttribute(p, i); nv.fromBufferAttribute(n, i);
+        // Three octaves of cheap trig noise: a couple of broad hollows, then the grain over them.
+        const d = Math.sin(v.x * 5.1 + seed) * Math.cos(v.z * 4.3 - seed) * 0.055
+          + Math.sin(v.y * 8.7 - seed * 2) * 0.028
+          + Math.sin(v.x * 17 + v.y * 13 + v.z * 15 + seed * 3) * 0.012;
+        p.setXYZ(i, v.x + nv.x * d, v.y + nv.y * d, v.z + nv.z * d);
+      }
+      g.computeVertexNormals();
       return g;
     };
-    const mat = () => new THREE.MeshStandardMaterial({
-      color: 0xe6dcc4, emissive: 0x6a5a3a, emissiveIntensity: 0.12,
-      roughness: 0.55, metalness: 0, transparent: true, opacity: 0.9, side: THREE.DoubleSide,
-    });
+    const shell = (phiStart: number) => {
+      const g = new THREE.SphereGeometry(1, SEGMENTS, RINGS, phiStart, Math.PI);
+      // Leathery eggs are longer and narrower than the calcareous ovoid, and they sag.
+      g.scale(this.leathery ? 0.76 : 0.82, this.leathery ? 0.97 : 1, this.leathery ? 0.76 : 0.82);
+      return this.leathery ? wobble(g, actorId * 1.37 + phiStart) : g;
+    };
+    // Calcareous: cream, faintly translucent, a soft sheen. Leathery: opaque buff-olive parchment
+    // with no sheen at all — you cannot see the animal through it, which is most of the difference.
+    const mat = () => (this.leathery
+      ? new THREE.MeshStandardMaterial({
+        color: 0xbfae8c, emissive: 0x3a3423, emissiveIntensity: 0.08,
+        roughness: 0.95, metalness: 0, transparent: true, opacity: 1, side: THREE.DoubleSide, flatShading: false,
+      })
+      : new THREE.MeshStandardMaterial({
+        color: 0xe6dcc4, emissive: 0x6a5a3a, emissiveIntensity: 0.12,
+        roughness: 0.55, metalness: 0, transparent: true, opacity: 0.9, side: THREE.DoubleSide,
+      }));
     for (const phi of [0, Math.PI]) {
       const m = new THREE.Mesh(shell(phi), mat());
       m.frustumCulled = false;
@@ -144,7 +175,8 @@ class Egg {
     this.hinges[0].rotation.z = -swing;
     this.hinges[1].rotation.z = swing;
     const gone = t <= 0.86 ? 0 : Math.min(1, (t - 0.86) / 0.14);
-    for (const m of this.halves) (m.material as THREE.MeshStandardMaterial).opacity = 0.9 * (1 - gone);
+    const full = this.leathery ? 1 : 0.9;
+    for (const m of this.halves) (m.material as THREE.MeshStandardMaterial).opacity = full * (1 - gone);
     this.group.visible = gone < 1;
   }
 
@@ -173,7 +205,8 @@ export class Eggs {
       if (!egg) {
         // Sized to the body as it is inside, curled: the animal fills the egg, it does not float
         // in it. The sim keeps it at 62% of hatched length until the shell starts to give.
-        egg = new Egg(a.id, this.at, Math.max(0.12, lengthOf(a) * 0.36), a.yaw);
+        egg = new Egg(a.id, this.at, Math.max(0.12, lengthOf(a) * 0.36), a.yaw,
+          creature(a.creature).eggShell === 'leathery');
         this.live.set(a.id, egg);
         this.group.add(egg.group);
       }

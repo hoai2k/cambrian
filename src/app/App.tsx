@@ -751,8 +751,9 @@ export function App() {
    */
   const bootFraction = progress ? Math.min(1, progress.fraction * 4) : 0;
   const bootStatus = useMemo(() => {
+    // The line above the bar already says the sea is waking, so this says who and how far.
     const name = progress?.current ? creature(progress.current as never)?.name : undefined;
-    return `${name ? `Waking ${name}` : 'Waking the sea'}… ${Math.round(bootFraction * 100)}%`;
+    return `${name ? `${name} · ` : ''}${Math.round(bootFraction * 100)}%`;
   }, [progress, bootFraction]);
 
   /**

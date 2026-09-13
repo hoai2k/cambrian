@@ -301,17 +301,18 @@ export const TRIASSIC_RULES: EraRules = {
   canBreach(a) { return !creature(a.creature).shore && devCanBreach(a); },
   spawnY, wanderY,
 
-  /** Live-bearers are born at the surface, near the nursery; everything else hatches in cover. */
-  spawnPoint(g, center, id, scale, index) {
-    const def = creature(id);
-    if (def.birth === 'live' && stageForScale(def.adultLength, scale) === 0) {
-      const ang = (index * 1.7 + g.rng() * 0.6) % (Math.PI * 2), r = 6 + g.rng() * 6;
-      return { x: center.x + Math.cos(ang) * r, y: SURFACE_Y - 1.2 - def.adultLength * scale * 0.4, z: center.z + Math.sin(ang) * r };
-    }
-    return spawnInCover(g, center, id, scale, index);
-  },
+  /**
+   * Everything hatches in cover on the sea floor, the way it does in the other two eras.
+   *
+   * The live-bearers were briefly born at the surface instead — which is what the fossils say, and
+   * Keichousaurus and Dinocephalosaurus have the embryos to prove it — but it cost the series' one
+   * opening beat: you come out of an egg, on the bottom, held still while the shell gives. Dropping
+   * a player into open midwater instead is a worse first ten seconds than the biology is worth. The
+   * research is kept where it still pays: the same species get a grown adult of their own kind
+   * beside them for the first minute, which reads as the parental care viviparity implies.
+   */
+  spawnPoint: spawnInCover,
   botNursery, spawnProtect, sanctuary,
-  liveBirth: (a) => creature(a.creature).birth === 'live',
 
   moultScale: DEVONIAN_RULES.moultScale,
 
@@ -342,7 +343,7 @@ export const TRIASSIC_RULES: EraRules = {
     const t = triActor(g, p), def = creature(p.creature), rung = rungOf(p);
     if (def.breathing === 'air' && !t.atSurface && p.stamina < p.staminaMax * 0.2) return 'Nothing comes back down here. Go up for it.';
     if (t.shoreWarn > 0) return 'Something on the shore is fishing. Get deeper.';
-    if (g.time < 12) return def.birth === 'live' ? 'Born at the surface. Breathe, dive, feed; your mother stays a minute.' : rung === 1 ? 'Feed, hide, moult. Everything out there is bigger than you are today.' : rung === 2 ? 'Feed and keep near the top. Air is what effort costs.' : rung === 3 ? 'Hunt the shelf. Five stages between you and Prime, and every fight ends at the surface.' : 'Stay fed. The deep is yours; the flats are closed to you.';
+    if (g.time < 12) return def.birth === 'live' ? 'Out of the shell, and a parent of your own kind is with you for a minute. Breathe, dive, feed.' : rung === 1 ? 'Feed, hide, moult. Everything out there is bigger than you are today.' : rung === 2 ? 'Feed and keep near the top. Air is what effort costs.' : rung === 3 ? 'Hunt the shelf. Five stages between you and Prime, and every fight ends at the surface.' : 'Stay fed. The deep is yours; the flats are closed to you.';
     if (def.shell && g.time < 40) return 'Your funnel makes rise and sink free, and no direction is slow. Block withdraws into the shell.';
     if (def.sink && g.time < 40) return 'You settle when you stop. The floor is where you feed.';
     return undefined;

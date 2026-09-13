@@ -103,11 +103,19 @@ unless the user explicitly asks for a PR. Steps:
   `breathing: 'air'` is a stamina economy, not a meter (no recovery under water, a blow and a
   full bar at the surface, no drowning), armour has a facing (`armourFacing`), the sea floor sinks
   by biome (`environment.floorDepth` → `depthProfile` in `src/sim/world.ts`; the other eras leave
-  it out and keep their flat floor), live-bearers are born at the surface beside a mother
-  (`liveBirth`), and shore animals (`shore: true`, never pickable) are brainless actors pinned on
+  it out and keep their flat floor), and shore animals (`shore: true`, never pickable) are brainless actors pinned on
   the beach by `src/sim/triassic/shore.ts` that telegraph and strike into the water. No playable
   Triassic animal ever leaves the water; `shoreReach` is deliberately unused there.
   `npm run triassic` guards all of it.
+- Every Triassic animal hatches from an egg on the sea floor, as in the other two eras. The
+  live-bearers were briefly born at the surface instead — which is what the fossils say, and
+  Keichousaurus and Dinocephalosaurus preserve the embryos — but it cost the series its one opening
+  beat, and a player dropped into open midwater never sees the shell crack. `birth: 'live'` now only
+  puts a grown adult of the animal's own kind beside it for the first minute, which is the parental
+  care viviparity implies. A reptile's egg is *leathery* (`eggShell: 'leathery'`): opaque, matte,
+  dimpled, longer and narrower than the Cambrian's calcareous capsule, and set on the animal rather
+  than the era, because the roster also has two sharks, two fish, an amphibian and two cephalopods
+  that lay nothing of the kind (`src/render/eggs.ts`).
 - Triassic art is greenlit before it is built from. Each subject has one **canonical pose** in
   `docs/triassic/canonical/`, and the four-view modelling sheet, the Tripo generation and the
   shipped body are all derived from that one image — so a body that no longer matches its pose is
@@ -200,6 +208,13 @@ unless the user explicitly asks for a PR. Steps:
   apex into the direction of travel while it beats (`bellTilt`), so re-timing that clip breaks the
   lock — which is what the bell cases in `npm run locomotion` are there to catch. Which animal has what, and how well each is actually
   attested, is `docs/research/locomotion-ideas.md`.
+- A swimmer holds its head still, and `steadyHead` makes it do so after the mixer has written the
+  pose (`src/render/steady-head.ts`): the neck gives up a share of the yaw the clip put in the
+  skull, weighted toward the base so the neck absorbs the beat instead of the head snapping to
+  centre. The yaw has to be taken about *world up carried into the parent's frame* — a neck bone's
+  own axes run along the bone, so reading the local Euler's `y` measures a twist and comes out as
+  zero. It is a patch over a clip that swings its head at the stroke rate, asked for by name because
+  a Tanystropheus' neck is meant to swing; the clip is what should be fixed.
 - A body may shape itself to what it is on: `conformArms` bends a radial rig's arms onto the ground
   under them, or around a creature it is holding, after the mixer has written the pose
   (`src/render/conform.ts`, `npm run conform`). Presentation only, and asked for by name rather than

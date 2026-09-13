@@ -220,3 +220,51 @@ other seventeen, so the step list in [04](04-tripo-pipeline.md) is proven on the
 Tier 2 props can start at once; nothing blocks them, and the sea-lily garden and the flats are
 playable stand-in biomes as soon as `encrinus`, `diplopora`, `stromatolite` and `daonella-bed`
 exist.
+
+## Blender work requested — Nothosaurus `Swim` and `Sprint`, 13 September 2026
+
+**Needs Blender**, in `tools/triassic/creatures/nothosaurus/build.py`, and it must be re-exported to
+both the authored body and the procedural twin, which share the clips. Everything below is measured
+off the shipped GLB by skinning it the way the game does; the numbers are the cycle fraction at
+which each bone reaches its rearmost point.
+
+**The complaint.** In play the animal reads as walking, or as swimming backwards.
+
+**The cause is the limb sequence, not the tail.** The forelimbs row in *antiphase* — `fore_paddle_L`
+is furthest aft at 0.13 of the cycle, `fore_paddle_R` at 0.67, half a cycle apart — while the hind
+pair strokes *together* at 0.38. Left fore, then both hinds, then right fore is a trot: it is the
+gait of something walking on a floor, and the eye reads it as one whether or not there is a floor.
+The head then confirms it: the skull yaws at the stroke rate with the widest arc anywhere on the
+front of the animal (lateral swing 0.100 units against the chest's 0.003), which is the head-sway of
+a walking lizard rather than the steady head a swimmer holds.
+
+**What the animal actually did.** Nothosaurs are reconstructed as **paraxial rowers driven by the
+forelimbs**, with drag-based rowing rather than the lift-based underwater flight plesiosaurs later
+evolved: the limb sweeps back broadside-on for the power stroke, then feathers edge-on and returns.
+The decisive evidence for the sequence is trackway rather than anatomy — the Yunnan *Nothosaurus*
+trackways (Zhang et al. 2014, *Nature Communications*) preserve **paired** forelimb impressions, so
+the forelimbs rowed **bilaterally, together**. The hind limbs contribute little and trail. Trunk and
+tail undulation is auxiliary: steering and a little thrust, not the engine.
+
+**So:**
+
+1. **Put the forelimbs in phase.** Both furthest aft at the same moment. This is the whole fix; the
+   alternation is what makes it a gait.
+2. **Make the stroke asymmetric in time.** Right now each paddle's fore-aft trace rises and falls
+   evenly, so neither half reads as the push. Give the power sweep rearward the longer, broader half
+   of the cycle with the paddle broadside, and the recovery the shorter half with it feathered
+   edge-on. Without this the eye cannot tell which way the animal is pushing water, which is most of
+   where "backwards" comes from.
+3. **Quiet the head.** The skull should hold the line the shoulders hold; let the neck take the
+   body's beat. The renderer damps this at runtime meanwhile (`steadyHead`, `src/render/steady-head.ts`,
+   about a fifth of the swing) — that is a patch over the clip, and should come out once the clip is
+   right.
+4. **Let the hind limbs trail.** They currently stroke as hard as the forelimbs and on their own
+   rhythm; `hind_paddle_R` beats at four times the stroke rate against the left's two, which is a
+   flutter rather than a stroke. Reduce them to a slow, mostly passive sweep in phase with the fore
+   pair.
+5. **Do not touch the tail.** It is already correct and it is the one part that is: amplitude grows
+   cleanly from `tail_01` (0.015) to `tail_06` (0.398), and the wave lags rearward down the body.
+   `Sprint` shares the same faults and the same fix.
+
+Re-run the paired audits after the export so the twin keeps matching the body.
