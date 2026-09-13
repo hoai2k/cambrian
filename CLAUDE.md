@@ -64,16 +64,28 @@ unless the user explicitly asks for a PR. Steps:
   must not statically import the audio library or the sim for the same reason. Headless tests that
   need the Devonian do the same: select the era, then `await import(...)` (`tools/devonian-test.ts`).
 - `/ancientseas/` is the trilogy's title page (entry `src/ancientseas/main.tsx`, data in
-  `src/ancientseas/page.ts`): the three games' titles as links, in two versions picked by
-  `?version=` (1, the default, is the three title paintings whole on the dark their vignettes run
-  out to; 2 is one plate in the paintings' style assembled from individually requested pieces —
-  `SLOTS`, placed by centre and width on a 16:10 desktop stage and a 9:25 phone stage). Every piece
-  it asks for has a brief in `docs/image-requests.md` and lands in `public/assets/ancientseas/`;
-  the page only ever loads what `src/ancientseas/delivered.json` lists (`npm run
-  ancientseas:delivered` regenerates it from the folder) and draws a shipped stand-in or a named
-  wash for the rest, so nothing asks the network for art that has not arrived. `npm run
-  ancientseas` checks all of it; `node tools/ancientseas-smoke.mjs <outdir>` screenshots both
-  versions against a preview build and follows the three links.
+  `src/ancientseas/page.ts`): one plate in the three games' own engraved style, filling the window,
+  with the three titles on it as links. It is `SLOTS` — pieces placed by centre and width on a
+  16:10 desktop stage and a 9:27 phone one — and the plate is built the same way three times over,
+  one big animal arching above each era's title with two bottom-dwellers gathered under it, because
+  an animal half behind another or a row spread evenly across all three eras reads as a mistake.
+  Titles clear the animals above them and carry a pale sepia halo drawn by the page, so a delivered
+  title is flat ink on transparency. `?version=1` still reaches the first draft (the three title
+  paintings whole on a dark ground) but neither version draws a switch between them: the parameter
+  is for comparing drafts, not something a visitor is offered. Every piece has a brief in
+  `docs/image-requests.md` (delivered ones move to the history) and lands in
+  `public/assets/ancientseas/`; the page only ever loads what `src/ancientseas/delivered.json`
+  lists (`npm run ancientseas:delivered` regenerates it from the folder) and draws a shipped
+  stand-in or a named wash for the rest, so nothing asks the network for art that has not arrived.
+  `npm run ancientseas` checks all of it; `node tools/ancientseas-smoke.mjs <outdir>` screenshots
+  the page against a preview build and follows the three links.
+- A game's title screen is drawn from the first frame, before the creatures have streamed in: it
+  used to wait for them, and until then the page was the sea the engine had already started
+  drawing, so arriving from a link showed the water and then cut to the title. It says it is
+  loading where PRESS START goes, and once the wait outlasts `WAIT_HINT` (700 ms, `useSlow` in
+  `src/app/Loading.tsx`) it grows a progress bar under that line. The full boot screen is for a
+  boot nobody is looking at a screen for — deep-linked to the roster — because over the title it
+  would be the title's own painting a second time.
 - An era's `assets.sfx` names the shared sound library (`assets/sfx/`): bites, hits and the UI are the
   same files in both eras. Era-specific samples are addressed as `<era>/<name>` and resolve under
   `assets/<era>/sfx/` regardless. The two always-on beds are named per era in `audio.loops`, and a
@@ -91,11 +103,19 @@ unless the user explicitly asks for a PR. Steps:
   `breathing: 'air'` is a stamina economy, not a meter (no recovery under water, a blow and a
   full bar at the surface, no drowning), armour has a facing (`armourFacing`), the sea floor sinks
   by biome (`environment.floorDepth` → `depthProfile` in `src/sim/world.ts`; the other eras leave
-  it out and keep their flat floor), live-bearers are born at the surface beside a mother
-  (`liveBirth`), and shore animals (`shore: true`, never pickable) are brainless actors pinned on
+  it out and keep their flat floor), and shore animals (`shore: true`, never pickable) are brainless actors pinned on
   the beach by `src/sim/triassic/shore.ts` that telegraph and strike into the water. No playable
   Triassic animal ever leaves the water; `shoreReach` is deliberately unused there.
   `npm run triassic` guards all of it.
+- Every Triassic animal hatches from an egg on the sea floor, as in the other two eras. The
+  live-bearers were briefly born at the surface instead — which is what the fossils say, and
+  Keichousaurus and Dinocephalosaurus preserve the embryos — but it cost the series its one opening
+  beat, and a player dropped into open midwater never sees the shell crack. `birth: 'live'` now only
+  puts a grown adult of the animal's own kind beside it for the first minute, which is the parental
+  care viviparity implies. A reptile's egg is *leathery* (`eggShell: 'leathery'`): opaque, matte,
+  dimpled, longer and narrower than the Cambrian's calcareous capsule, and set on the animal rather
+  than the era, because the roster also has two sharks, two fish, an amphibian and two cephalopods
+  that lay nothing of the kind (`src/render/eggs.ts`).
 - Triassic art is greenlit before it is built from. Each subject has one **canonical pose** in
   `docs/triassic/canonical/`, and the four-view modelling sheet, the Tripo generation and the
   shipped body are all derived from that one image — so a body that no longer matches its pose is
@@ -188,6 +208,13 @@ unless the user explicitly asks for a PR. Steps:
   apex into the direction of travel while it beats (`bellTilt`), so re-timing that clip breaks the
   lock — which is what the bell cases in `npm run locomotion` are there to catch. Which animal has what, and how well each is actually
   attested, is `docs/research/locomotion-ideas.md`.
+- A swimmer holds its head still, and `steadyHead` makes it do so after the mixer has written the
+  pose (`src/render/steady-head.ts`): the neck gives up a share of the yaw the clip put in the
+  skull, weighted toward the base so the neck absorbs the beat instead of the head snapping to
+  centre. The yaw has to be taken about *world up carried into the parent's frame* — a neck bone's
+  own axes run along the bone, so reading the local Euler's `y` measures a twist and comes out as
+  zero. It is a patch over a clip that swings its head at the stroke rate, asked for by name because
+  a Tanystropheus' neck is meant to swing; the clip is what should be fixed.
 - A body may shape itself to what it is on: `conformArms` bends a radial rig's arms onto the ground
   under them, or around a creature it is holding, after the mixer has written the pose
   (`src/render/conform.ts`, `npm run conform`). Presentation only, and asked for by name rather than

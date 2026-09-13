@@ -1,0 +1,105 @@
+{
+  "schema_version": 1,
+  "input": {
+    "path": "tools/triassic/creatures/dinocephalosaurus/tripo-raw/dinocephalosaurus.raw.glb",
+    "bytes": 1613612,
+    "sha256": "df0704b432a7480952c58e16e04c258aef9d8c888b87eefb13968eeb412f0fd2"
+  },
+  "summary": {
+    "mesh_objects": 1,
+    "vertices": 11032,
+    "faces": 19286,
+    "triangles": 19286,
+    "connected_components": 39,
+    "materials": 1,
+    "textures": 3
+  },
+  "bounds": {
+    "min_xyz": [
+      -0.5,
+      -0.309067,
+      -0.377064
+    ],
+    "max_xyz": [
+      0.5,
+      0.309067,
+      0.377064
+    ],
+    "center_xyz": [
+      0,
+      0,
+      0
+    ],
+    "size_xyz": [
+      1,
+      0.618134,
+      0.754128
+    ]
+  },
+  "meshes": [
+    {
+      "object": "tripo_node_4f30c63b-3efd-40cd-bb73-4030c1acdd93",
+      "mesh": "tripo_mesh_4f30c63b-3efd-40cd-bb73-4030c1acdd93",
+      "vertices": 11032,
+      "edges": 30279,
+      "faces": 19286,
+      "triangles": 19286,
+      "connected_components": 39,
+      "material_slots": [
+        "tripo_material_4f30c63b-3efd-40cd-bb73-4030c1acdd93"
+      ]
+    }
+  ],
+  "materials": [
+    {
+      "name": "tripo_material_4f30c63b-3efd-40cd-bb73-4030c1acdd93",
+      "image_textures": [
+        "Color_4f30c63b-3efd-40cd-bb73-4030c1acdd93",
+        "NormalGL_4f30c63b-3efd-40cd-bb73-4030c1acdd93",
+        "ORM_4f30c63b-3efd-40cd-bb73-4030c1acdd93"
+      ]
+    }
+  ],
+  "textures": [
+    {
+      "name": "Color_4f30c63b-3efd-40cd-bb73-4030c1acdd93",
+      "width": 2048,
+      "height": 2048,
+      "channels": 4,
+      "packed": true,
+      "source": "FILE",
+      "colorspace": "sRGB"
+    },
+    {
+      "name": "NormalGL_4f30c63b-3efd-40cd-bb73-4030c1acdd93",
+      "width": 2048,
+      "height": 2048,
+      "channels": 4,
+      "packed": true,
+      "source": "FILE",
+      "colorspace": "Non-Color"
+    },
+    {
+      "name": "ORM_4f30c63b-3efd-40cd-bb73-4030c1acdd93",
+      "width": 2048,
+      "height": 2048,
+      "channels": 4,
+      "packed": true,
+      "source": "FILE",
+      "colorspace": "Non-Color"
+    }
+  ],
+  "renders": {
+    "side": "tools/triassic/creatures/dinocephalosaurus/tripo-raw/review/side.png",
+    "top": "tools/triassic/creatures/dinocephalosaurus/tripo-raw/review/top.png",
+    "three-quarter": "tools/triassic/creatures/dinocephalosaurus/tripo-raw/review/three-quarter.png"
+  },
+  "preview": {
+    "path": "tools/triassic/creatures/dinocephalosaurus/dinocephalosaurus.preview.glb",
+    "triangle_limit": 40000,
+    "triangles_before": 19286,
+    "triangles_after": 19286,
+    "bytes": 1497660,
+    "sha256": "82fd33934f48287495820ee56f5c7a85dc870a1080797dd09ac8be74ebb29dae"
+  }
+}

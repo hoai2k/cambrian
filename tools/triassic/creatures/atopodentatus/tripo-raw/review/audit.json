@@ -1,0 +1,105 @@
+{
+  "schema_version": 1,
+  "input": {
+    "path": "tools/triassic/creatures/atopodentatus/tripo-raw/atopodentatus.raw.glb",
+    "bytes": 1487900,
+    "sha256": "d15df84c130a33461a9e0c32b53d9d7889069f4ae1e4f7f064dfe17d52519cf8"
+  },
+  "summary": {
+    "mesh_objects": 1,
+    "vertices": 12059,
+    "faces": 19334,
+    "triangles": 19334,
+    "connected_components": 117,
+    "materials": 1,
+    "textures": 3
+  },
+  "bounds": {
+    "min_xyz": [
+      -0.5,
+      -0.2786,
+      -0.150972
+    ],
+    "max_xyz": [
+      0.5,
+      0.2786,
+      0.150972
+    ],
+    "center_xyz": [
+      0,
+      0,
+      0
+    ],
+    "size_xyz": [
+      1,
+      0.5572,
+      0.301944
+    ]
+  },
+  "meshes": [
+    {
+      "object": "tripo_node_c8b7e07d-3dfe-4b69-a4f9-2c2be73c77bb",
+      "mesh": "tripo_mesh_c8b7e07d-3dfe-4b69-a4f9-2c2be73c77bb",
+      "vertices": 12059,
+      "edges": 31276,
+      "faces": 19334,
+      "triangles": 19334,
+      "connected_components": 117,
+      "material_slots": [
+        "tripo_material_c8b7e07d-3dfe-4b69-a4f9-2c2be73c77bb"
+      ]
+    }
+  ],
+  "materials": [
+    {
+      "name": "tripo_material_c8b7e07d-3dfe-4b69-a4f9-2c2be73c77bb",
+      "image_textures": [
+        "Color_c8b7e07d-3dfe-4b69-a4f9-2c2be73c77bb",
+        "NormalGL_c8b7e07d-3dfe-4b69-a4f9-2c2be73c77bb",
+        "ORM_c8b7e07d-3dfe-4b69-a4f9-2c2be73c77bb"
+      ]
+    }
+  ],
+  "textures": [
+    {
+      "name": "Color_c8b7e07d-3dfe-4b69-a4f9-2c2be73c77bb",
+      "width": 2048,
+      "height": 2048,
+      "channels": 4,
+      "packed": true,
+      "source": "FILE",
+      "colorspace": "sRGB"
+    },
+    {
+      "name": "NormalGL_c8b7e07d-3dfe-4b69-a4f9-2c2be73c77bb",
+      "width": 2048,
+      "height": 2048,
+      "channels": 4,
+      "packed": true,
+      "source": "FILE",
+      "colorspace": "Non-Color"
+    },
+    {
+      "name": "ORM_c8b7e07d-3dfe-4b69-a4f9-2c2be73c77bb",
+      "width": 2048,
+      "height": 2048,
+      "channels": 4,
+      "packed": true,
+      "source": "FILE",
+      "colorspace": "Non-Color"
+    }
+  ],
+  "renders": {
+    "side": "tools/triassic/creatures/atopodentatus/tripo-raw/review/side.png",
+    "top": "tools/triassic/creatures/atopodentatus/tripo-raw/review/top.png",
+    "three-quarter": "tools/triassic/creatures/atopodentatus/tripo-raw/review/three-quarter.png"
+  },
+  "preview": {
+    "path": "tools/triassic/creatures/atopodentatus/atopodentatus.preview.glb",
+    "triangle_limit": 40000,
+    "triangles_before": 19334,
+    "triangles_after": 19334,
+    "bytes": 1371660,
+    "sha256": "569badc2582ce5687aec344a7741e8d60d4325b0de62ddf87af4854d9f1f8b6e"
+  }
+}

@@ -179,10 +179,28 @@ export interface CreatureDef {
    */
   shore?: boolean;
   /**
-   * How a new player of this species arrives. `live`: born at the surface beside an AI adult of
-   * its kind, which stays a minute. `egg` (the default): the Cambrian's egg on the sand in cover.
+   * How a new player of this species arrives. Everything hatches from an egg on the sand in cover;
+   * `live` additionally puts a grown adult of its own kind beside the hatchling for the first
+   * minute, which is the parental care the fossils' viviparity implies for these animals
+   * (Keichousaurus and Dinocephalosaurus both preserve embryos).
    */
   birth?: 'live' | 'egg';
+  /**
+   * What the shell is made of, where that is not the Cambrian's calcareous capsule. A reptile's
+   * egg is **leathery**: opaque, matte, dimpled, and duller — so a Triassic nest reads as reptile
+   * rather than as the same cream shell in a different sea. Presentation only (`src/render/eggs.ts`),
+   * and set on the animal rather than the era, because the Triassic also has sharks, fish, an
+   * amphibian and two cephalopods that lay nothing of the kind.
+   */
+  eggShell?: 'leathery';
+  /**
+   * Hold the head steady while swimming: the neck absorbs the body's beat instead of the skull
+   * swinging with it (`src/render/steady-head.ts`). For a rower whose clip yaws its head at the
+   * stroke rate this is the difference between swimming and walking on the spot — but it is asked
+   * for by name, because a Tanystropheus' neck is meant to swing and a body that leads with its
+   * head is meant to lead with it. Presentation only.
+   */
+  steadyHead?: boolean;
   /** Four-flipper underwater flight: fast acceleration and cruise, wide turns, no reverse. */
   flight?: boolean;
   /** A stiff body driven by the tail: the best sustained cruise, a long glide, a wide turn. */

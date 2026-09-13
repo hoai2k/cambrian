@@ -1,0 +1,105 @@
+{
+  "schema_version": 1,
+  "input": {
+    "path": "tools/triassic/creatures/coelophysis/tripo-raw/coelophysis.raw.glb",
+    "bytes": 1483572,
+    "sha256": "a9ea66a7183de767367fe7943d69f5d07fe306d7794ca3a56403d596d3070118"
+  },
+  "summary": {
+    "mesh_objects": 1,
+    "vertices": 11886,
+    "faces": 19646,
+    "triangles": 19646,
+    "connected_components": 96,
+    "materials": 1,
+    "textures": 3
+  },
+  "bounds": {
+    "min_xyz": [
+      -0.171477,
+      -0.5,
+      -0.306269
+    ],
+    "max_xyz": [
+      0.171477,
+      0.5,
+      0.306269
+    ],
+    "center_xyz": [
+      0,
+      0,
+      0
+    ],
+    "size_xyz": [
+      0.342955,
+      1,
+      0.612539
+    ]
+  },
+  "meshes": [
+    {
+      "object": "tripo_node_e32bb637-47e7-46df-8dff-9a6074e9631b",
+      "mesh": "tripo_mesh_e32bb637-47e7-46df-8dff-9a6074e9631b",
+      "vertices": 11886,
+      "edges": 31436,
+      "faces": 19646,
+      "triangles": 19646,
+      "connected_components": 96,
+      "material_slots": [
+        "tripo_material_e32bb637-47e7-46df-8dff-9a6074e9631b"
+      ]
+    }
+  ],
+  "materials": [
+    {
+      "name": "tripo_material_e32bb637-47e7-46df-8dff-9a6074e9631b",
+      "image_textures": [
+        "Color_e32bb637-47e7-46df-8dff-9a6074e9631b",
+        "NormalGL_e32bb637-47e7-46df-8dff-9a6074e9631b",
+        "ORM_e32bb637-47e7-46df-8dff-9a6074e9631b"
+      ]
+    }
+  ],
+  "textures": [
+    {
+      "name": "Color_e32bb637-47e7-46df-8dff-9a6074e9631b",
+      "width": 2048,
+      "height": 2048,
+      "channels": 4,
+      "packed": true,
+      "source": "FILE",
+      "colorspace": "sRGB"
+    },
+    {
+      "name": "NormalGL_e32bb637-47e7-46df-8dff-9a6074e9631b",
+      "width": 2048,
+      "height": 2048,
+      "channels": 4,
+      "packed": true,
+      "source": "FILE",
+      "colorspace": "Non-Color"
+    },
+    {
+      "name": "ORM_e32bb637-47e7-46df-8dff-9a6074e9631b",
+      "width": 2048,
+      "height": 2048,
+      "channels": 4,
+      "packed": true,
+      "source": "FILE",
+      "colorspace": "Non-Color"
+    }
+  ],
+  "renders": {
+    "side": "tools/triassic/creatures/coelophysis/tripo-raw/review/side.png",
+    "top": "tools/triassic/creatures/coelophysis/tripo-raw/review/top.png",
+    "three-quarter": "tools/triassic/creatures/coelophysis/tripo-raw/review/three-quarter.png"
+  },
+  "preview": {
+    "path": "tools/triassic/creatures/coelophysis/coelophysis.preview.glb",
+    "triangle_limit": 40000,
+    "triangles_before": 19646,
+    "triangles_after": 19646,
+    "bytes": 1365460,
+    "sha256": "cd945622320116fd716362bd02c2b1d66fecefc64d822c2328a86d9e68d17557"
+  }
+}
