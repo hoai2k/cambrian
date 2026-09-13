@@ -1,0 +1,16 @@
+{
+  "schemaVersion": 1,
+  "canonicalStatus": "greenlit",
+  "canonical": "canonical.png",
+  "canonicalSource": "../../hybodus.png",
+  "canonicalSha256": "2c2cb5011baf5e63b4760f289f7a7d8635568963d31a2df40e375fe9037b10bc",
+  "input": "input.png",
+  "inputSha256": "56d7e515ba7f0ca011c64bd9d535fb15d6cb8b32e6aae59bd8238cf4289565a7",
+  "turnaround": "turnaround.png",
+  "turnaroundSha256": "31c0fd0bb53298086acae40d90424949812ce4fcea22d2a72168e7260ca2181a",
+  "generator": "builtin imagegen",
+  "subjectSpec": "Hybodus with exactly two dorsal fins total, each with one leading spine; smooth blunt snout with no horns, tusks, barbels, or rostral spines; paired fins and heterocercal tail",
+  "inputPrompt": "Create ONE full-body subject derived strictly from the supplied approved canonical. Preserve canonical anatomy, proportions, head, appendage count and placement, silhouette, coloration, markings, and texture exactly; no redesign. Single clean three-quarter front view from slightly above in a straight neutral symmetric extended pose, with paired appendages separated and the entire subject fully framed on flat pale neutral studio gray. No water, scenery, text, labels, borders, cropping, or extra animals.",
+  "turnaroundPrompt": "Derive a clean four-view orthographic modeling sheet from the supplied approved canonical, which is the sole visual authority. Preserve exact anatomy, proportions, appendage count and placement, silhouette, coloration, markings, and texture. Use a pale neutral studio gray background and a 2x2 grid containing strict left profile, dorsal/top, frontal, and three-quarter front views; keep the entire subject and every extremity fully framed. No labels, text, scenery, or extra animals.",
+  "review": "Single input received a targeted correction removing a hallucinated third dorsal fin and now shows exactly two spined dorsal fins. Turnaround is qualitative and should not override canonical.png."
+}

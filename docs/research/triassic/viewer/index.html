@@ -229,6 +229,7 @@ const counts = () => {
 };
 
 function choose(id, shot) {
+  if (shot.kind === 'model-reference') return;
   sel[id] = { choice: shot.kind, ref: shot.ref, note: sel[id]?.note || '', at: new Date().toISOString() };
   saveSel(); refreshCounts(); render(); if (state.open) paint();
 }
@@ -387,8 +388,9 @@ function pane(side, s) {
     if (!c) return `<div class="pane"><span class="lab canon">canonical</span><p class="empty">No canonical image yet. Drop one at
       <code>docs/triassic/canonical/${s.id}.png</code> and run <code>npm run triassic:viewer</code>.</p></div>`;
     const shot = canonShot(s, state.ci), on = chosen === shot.ref;
-    return `<div class="pane"><span class="lab canon">${c.kind === 'turnaround' ? '3D model views' : 'canonical'}${c.label !== 'canonical' && c.kind !== 'turnaround' ? ' · ' + c.label : ''}</span>
-      <button class="pick${on ? ' on' : ''}" data-pick="${encodeURIComponent(shot.ref)}">${on ? '✓ Chosen' : 'Use as canon'}</button>
+    const modelReference = c.kind === 'model-reference';
+    return `<div class="pane"><span class="lab canon">${modelReference ? c.label : c.kind === 'turnaround' ? '3D model views' : c.kind === 'candidate' ? 'replacement candidate' : 'canonical'}${c.label !== 'canonical' && c.kind !== 'turnaround' && !modelReference ? ' · ' + c.label : ''}</span>
+      ${modelReference ? '' : `<button class="pick${on ? ' on' : ''}" data-pick="${encodeURIComponent(shot.ref)}">${on ? '✓ Chosen' : 'Use as canon'}</button>`}
       <img src="${c.src}" alt="${s.name} canonical"></div>`;
   }
   const im = s.images[Math.min(state.i, Math.max(0, s.images.length - 1))];
@@ -434,12 +436,16 @@ function paint() {
       <img src="${shot.thumb}" alt="" loading="lazy">
       ${isChosen(s.id, shot) ? '<span class="tick">✓</span>' : ''}
       ${shot.kind === 'turnaround' ? '<span class="kindtag">3D views</span>' : ''}
+      ${shot.kind === 'candidate' ? `<span class="kindtag">${shot.label}</span>` : ''}
+      ${shot.kind === 'model-reference' ? '<span class="kindtag">model reference</span>' : ''}
     </button>`;
   }).join('');
 
   const web = s.images[Math.min(state.i, Math.max(0, s.images.length - 1))];
   $('d-credit').innerHTML = state.mode === 'canon'
-    ? `<span><b>${s.canon[state.ci]?.kind === 'turnaround' ? 'Modelling sheet' : 'Canonical image'}</b> — our own art for this subject. Press <kbd>C</kbd> to flip back to the reference, <kbd>Enter</kbd> to choose it.</span>`
+    ? (s.canon[state.ci]?.kind === 'model-reference'
+      ? '<span><b>Modelling reference only</b> — derived from the greenlit pose. The canonical pose remains the authority; this reference cannot replace it.</span>'
+      : `<span><b>${s.canon[state.ci]?.kind === 'turnaround' ? 'Modelling sheet' : s.canon[state.ci]?.kind === 'candidate' ? 'Replacement candidate — choose to greenlight' : 'Canonical image'}</b> — our own art for this subject. Press <kbd>C</kbd> to flip back to the reference, <kbd>Enter</kbd> to choose it.</span>`)
     : (web ? (s.imagesAre ? `<span style="flex:1 1 100%;color:var(--coral)">⚠ ${s.imagesAre}</span>` : '')
         + `<span><b>${web.title}</b></span><span>${web.artist}</span><span>${web.licence}</span>`
         + `<a href="${web.page}" target="_blank" rel="noreferrer">file page</a>`
