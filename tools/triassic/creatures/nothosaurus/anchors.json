@@ -1,0 +1,34 @@
+{
+  "nothosaurus": [
+    {
+      "name": "anchor_mouth",
+      "bone": "jaw",
+      "point": [
+        -0.4399999976158142,
+        -2.4749999046325684,
+        0.4050000011920929
+      ],
+      "role": "mouth"
+    },
+    {
+      "name": "anchor_mouth_inside",
+      "bone": "skull",
+      "point": [
+        -0.23499999940395355,
+        -1.8300000429153442,
+        0.4099999964237213
+      ],
+      "role": "swallow"
+    },
+    {
+      "name": "anchor_attack_primary",
+      "bone": "skull",
+      "point": [
+        -0.4350000023841858,
+        -2.505000114440918,
+        0.38499999046325684
+      ],
+      "role": "attack"
+    }
+  ]
+}
