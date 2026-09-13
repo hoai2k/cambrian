@@ -81,6 +81,17 @@
       "prompt": "Use case: illustration. Asset type: separate animal cutout for the Ancient Seas Trilogy title plate. The attached title painting is a STYLE REFERENCE ONLY. Create a NEW drawing of ONLY the animal described, in the exact hand-coloured natural-history engraving style of that painting: dense fine black crosshatched and stippled ink, muted aged ochre/rust/slate blue/sage watercolor pigment, slightly worn pigment flecks, rich dark contour, fine warm pale edge accents. Perfectly flat pure WHITE #FFFFFF background, absolutely no checkerboard or parchment texture, for subsequent compositing as an isolated cutout. Include a very subtle soft offset light warm gray shadow immediately beneath the body silhouette only. No letters, text, caption, border, water, seabed, rocks, plants, other animals, or panel. Landscape canvas 1024x768, complete uncut animal prominently fills canvas with narrow safe margins. One Placodus marine reptile resting as if on seabed WITHOUT GROUND, facing LEFT with complete head at left and tapering muscular tail at right. Correct Placodus, not the turtle-like shelled animal at lower right of reference: barrel-shaped heavy low reptile torso, short robust neck, blunt broad lizard head with blunt protruding incisors, four short splayed webbed feet. Fine scales, olive/slate back, ochre underside, irregular small dorsal scutes allowed but NO turtle carapace and NO plastron; no long plesiosaur neck. Three-quarter side view, all four limbs distinguishable.",
       "reference": "/Users/hoai/Documents/Stuff/Generations/cambrian/local/expansion-repo/public/assets/triassic/brand/title.webp",
       "source": "/Users/hoai/.codex/generated_images/01a09b1b-790b-7903-aa75-f1b8f3100478/exec-abf24cce-e851-42d2-81d0-6b589462975d.png"
+    },
+    {
+      "id": "tiktaalik",
+      "prompt": "Use case: style-transfer. Asset type: transparent illustrated animal cutout for the Ancient Seas Trilogy title composition, final canvas 1024 × 768. Draw a scientifically recognizable Tiktaalik roseae resting on the seabed posture on its broad front fins, head raised and turned slightly toward the viewer, with its head facing LEFT. The animal must be isolated with no environment or ground drawn. Match the delivered cutout set exactly: fine engraved line work, muted hand-colouring, dark ink contour, dense cross-hatching, sharp transparent cutout edges, and a soft warm offset shadow beneath the complete animal. Preserve the flattened crocodile-like skull, small dorsal eyes, elongated fish body, paired lobe fins, scales, and tapering finned tail. Use muted olive and ochre mottling over a pale cream belly. Horizontal composition; the complete animal fills the 4:3 canvas edge to edge without cropping, head on the left and tail on the right. No ground, rock, water, plants, border, text, labels, logos, watermark, backdrop, or extra limbs.",
+      "references": [
+        "public/assets/ancientseas/animal-bothriolepis.webp",
+        "public/assets/ancientseas/animal-trilobite.webp",
+        "docs/reference/Tiktaalik.jpg"
+      ],
+      "initialSource": "/Users/hoai/.codex/generated_images/01a09ac3-37dc-7381-ad26-8d5c8cd87ad6/exec-39cd2ca3-b022-445a-ac15-02f21a4e7c48.png",
+      "source": "/Users/hoai/.codex/generated_images/01a09ac3-37dc-7381-ad26-8d5c8cd87ad6/exec-39b78f5a-93ca-4df1-a39d-34fd4193576c.png"
     }
   ]
 }

@@ -69,8 +69,12 @@ unless the user explicitly asks for a PR. Steps:
   16:10 desktop stage and a 9:27 phone one — and the plate is built the same way three times over,
   one big animal arching above each era's title with two bottom-dwellers gathered under it, because
   an animal half behind another or a row spread evenly across all three eras reads as a mistake.
-  Titles clear the animals above them and carry a pale sepia halo drawn by the page, so a delivered
-  title is flat ink on transparency. `?version=1` still reaches the first draft (the three title
+  Titles clear the animals above them and carry a faint sepia halo drawn by the page (one custom
+  property used by the resting *and* hover states, because `filter` replaces rather than adds),
+  so a delivered title is flat ink on transparency. The paper is the window's and the plate is
+  the composition's — parchment and seabed span the full width while the 16:10 arrangement is
+  centred in it — so a wide screen is filled rather than letterboxed, and a game's title and the
+  animal arching over it light together, because between them they are the link. `?version=1` still reaches the first draft (the three title
   paintings whole on a dark ground) but neither version draws a switch between them: the parameter
   is for comparing drafts, not something a visitor is offered. Every piece has a brief in
   `docs/image-requests.md` (delivered ones move to the history) and lands in

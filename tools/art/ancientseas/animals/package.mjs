@@ -5,9 +5,13 @@ import sharp from 'sharp';
 const base = path.dirname(new URL(import.meta.url).pathname);
 const destination = path.resolve(base, '../../../../public/assets/ancientseas');
 const assets = JSON.parse(fs.readFileSync(path.join(base, 'prompts.json'))).assets;
+const requested = new Set(process.argv.slice(2));
+const selectedAssets = assets.filter(({ id }) => requested.size === 0 || requested.has(id));
+const unknown = [...requested].filter(id => !assets.some(asset => asset.id === id));
+if (unknown.length) throw new Error(`Unknown asset id(s): ${unknown.join(', ')}`);
 const clamp = value => Math.max(0, Math.min(1, value));
-const report = [];
-for (const { id } of assets) {
+const generatedReport = [];
+for (const { id } of selectedAssets) {
   const source = path.join(base, `${id}-source.png`);
   const { data, info } = await sharp(source).ensureAlpha().raw().toBuffer({ resolveWithObject: true });
   // The brand key is designed for lettering. Painted animal shadows need a darker
@@ -53,7 +57,15 @@ for (const { id } of assets) {
   const meta = await sharp(file).metadata();
   const bytes = fs.statSync(file).size;
   if (bytes >= 600000 || meta.width !== 1024 || meta.height !== 768 || !meta.hasAlpha) throw new Error(`Invalid output ${id}`);
-  report.push({ id, file: path.relative(process.cwd(), file), width: meta.width, height: meta.height, bytes, alpha: true });
+  generatedReport.push({ id, file: path.relative(process.cwd(), file), width: meta.width, height: meta.height, bytes, alpha: true });
 }
-fs.writeFileSync(path.join(base, 'packaging-report.json'), JSON.stringify(report, null, 2) + '\n');
-console.log(report);
+const reportPath = path.join(base, 'packaging-report.json');
+const priorReport = requested.size && fs.existsSync(reportPath)
+  ? JSON.parse(fs.readFileSync(reportPath))
+  : [];
+const report = requested.size
+  ? [...priorReport.filter(item => !requested.has(item.id)), ...generatedReport]
+      .sort((a, b) => a.id.localeCompare(b.id))
+  : generatedReport;
+fs.writeFileSync(reportPath, JSON.stringify(report, null, 2) + '\n');
+console.log(generatedReport);

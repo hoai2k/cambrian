@@ -12,7 +12,7 @@ import { existsSync, readFileSync } from 'node:fs';
 import { CAMBRIAN } from '../src/content/cambrian';
 import { DEVONIAN } from '../src/content/devonian';
 import { TRIASSIC } from '../src/content/triassic';
-import { ANIMAL_ERA, ART_DIR, DEFAULT_VERSION, GAMES, REQUESTED, SLOTS, STAGE, TRILOGY_LOGO, isDelivered, parseVersion, sourceFor } from '../src/ancientseas/page';
+import { ANIMAL_ERA, ART_DIR, BIG_ANIMAL, DEFAULT_VERSION, GAMES, REQUESTED, SLOTS, STAGE, TRILOGY_LOGO, isDelivered, parseVersion, sourceFor } from '../src/ancientseas/page';
 
 let passes = 0;
 const ok = (cond: unknown, msg: string) => { assert.ok(cond, msg); passes++; };
@@ -129,9 +129,8 @@ for (const stage of ['desktop', 'mobile'] as const) {
  * *above* its title rather than across it. Its box may reach into the top of the title's box,
  * which is the margin over the capitals, and no further.
  */
-const BIG = { cambrian: 'anomalocaris', devonian: 'dunkleosteus', triassic: 'cymbospondylus' } as const;
 for (const stage of ['desktop', 'mobile'] as const) {
-  for (const [era, animalId] of Object.entries(BIG)) {
+  for (const [era, animalId] of Object.entries(BIG_ANIMAL)) {
     const t = SLOTS.find((s) => s.game === era)!, a = SLOTS.find((s) => s.id === animalId)!;
     const th = (t[stage].w * t.height / t.width) / STAGE[stage], ah = (a[stage].w * a.height / a.width) / STAGE[stage];
     const animalBottom = a[stage].y + ah / 2, lettersTop = t[stage].y - th / 2 + th * 0.25;
@@ -155,6 +154,25 @@ const css = readFileSync('src/ancientseas/ancientseas.css', 'utf8');
 ok(css.includes('aspect-ratio: 16 / 10'), 'the desktop stage is 16:10 in the stylesheet');
 ok(css.includes('aspect-ratio: 9 / 27'), 'the mobile stage is 9:27 in the stylesheet');
 eq([STAGE.desktop, STAGE.mobile], [10 / 16, 27 / 9], 'and page.ts agrees');
+
+/**
+ * A game is its title and the animal over it: both light when the pointer is on either, so every
+ * era needs a big animal named, and it has to be one the plate actually draws.
+ */
+eq(Object.keys(BIG_ANIMAL).sort(), GAMES.map((g) => g.id).sort(), 'every era names the animal that lights with its title');
+for (const id of Object.values(BIG_ANIMAL)) ok(SLOTS.some((s) => s.id === id && s.kind === 'animal'), `${id} is an animal on the plate`);
+ok(/BIG_ANIMAL\[era\] === slot\.id/.test(page), 'the page lights that animal with its title');
+/**
+ * `filter` replaces rather than adds, so a hover state that sets its own filter drops whatever the
+ * resting state had. The halo lives in one custom property used by both, which is the only way the
+ * two states cannot drift apart.
+ */
+const css2 = readFileSync('src/ancientseas/ancientseas.css', 'utf8');
+ok(/--as-halo:/.test(css2) && (css2.match(/filter: var\(--as-halo\)/g) ?? []).length >= 2, 'resting and hover titles carry the same halo');
+ok(!/a\.as-slot-title:hover[^}]*filter: brightness/.test(css2), 'and hover does not replace it with a bare brightness');
+// The paper is the window's, the plate is the composition's: that is what fills a wide screen.
+ok(/\.as-paper \{ position: absolute; inset: 0/.test(css2), 'the paper covers the window');
+ok(/\.as-stage \{[^}]*width: min\(100vw, calc\(100svh \* 1\.6\)\)/.test(css2), 'the plate keeps 16:10 inside it');
 
 // The withdrawn cutouts are gone from the page and from public/ (docs/image-requests.md says why).
 for (const gone of ['animal-opabinia.webp', 'animal-cladoselache.webp', 'animal-mixosaurus.webp', 'animal-ammonoid.webp']) {
