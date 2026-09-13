@@ -64,11 +64,15 @@ export function Viewer() {
    * and the clip keeps playing, which turns any difference between them into movement rather than
    * something to hold in your head across two list entries.
    */
-  const [body, setBody] = useState<'model' | 'puppet'>('model');
+  const [body, setBody] = useState<'model' | 'puppet' | 'generated'>('model');
   const requestedId = useRef('');
   const def = specimenByKey.get(id)!;
   const showPuppet = body === 'puppet' && !!def.puppet;
-  const modelPath = showPuppet ? def.puppet! : detail === 'reduced' && def.lod ? def.lod : def.model;
+  // The raw generated mesh, for an animal whose own body has not shipped: it is still borrowing
+  // somebody else's in play, and this is the only way to see the surface it will be built from.
+  const showGenerated = body === 'generated' && !!def.generated;
+  const modelPath = showGenerated ? def.generated!
+    : showPuppet ? def.puppet! : detail === 'reduced' && def.lod ? def.lod : def.model;
   const roster = SPECIMENS.filter(c => c.collection === collection);
   // Both eras are on this page, so a specimen's palette comes from its own pack, not ACTIVE_ERA.
   const defaultScheme = (key: string) => {
@@ -87,13 +91,16 @@ export function Viewer() {
   const [picks, setPicks] = useState<Picks>(readPicks);
   const [slots, setSlots] = useState<readonly Slot[]>([]);
   useEffect(() => { writeUrlState(id, mode === 'sculpt'); }, [id, mode]);
-  useEffect(() => { if (!def.puppet) setBody('model'); }, [def.puppet]);
+  useEffect(() => {
+    if (body === 'puppet' && !def.puppet) setBody('model');
+    if (body === 'generated' && !def.generated) setBody('model');
+  }, [body, def.puppet, def.generated]);
   // Sculpting needs a creature on stage; a prop or a load in progress has nothing to sculpt.
   // Not on the twin: a sculpt is the hand-off that goes into a builder's profile rows for the body
   // that ships, and one exported off the comparison body would name the right creature and describe
   // the wrong mesh.
-  const canSculpt = !isPropCollection(collection) && !showPuppet && !loading && !error && loadedId === id;
-  useEffect(() => { if (mode === 'sculpt' && (isPropCollection(collection) || showPuppet)) setMode('view'); }, [mode, collection, showPuppet]);
+  const canSculpt = !isPropCollection(collection) && !showPuppet && !showGenerated && !loading && !error && loadedId === id;
+  useEffect(() => { if (mode === 'sculpt' && (isPropCollection(collection) || showPuppet || showGenerated)) setMode('view'); }, [mode, collection, showPuppet, showGenerated]);
 
   // The show effect must not re-run when a pick changes, so it reads the picks through a ref.
   const picksRef = useRef(picks);
@@ -213,7 +220,7 @@ export function Viewer() {
         {def.kindNote && <p className="specimen-description">{def.kindNote}</p>}
         {def.description && <p className="specimen-description">{def.description}</p>}
         {def.lengthMeters != null && <p className="specimen-scale">Representative length: {new Intl.NumberFormat('en', { maximumSignificantDigits: 3 }).format(def.lengthMeters)} m · views individually framed</p>}
-        {collection !== 'cambrian' && <p className="specimen-downloads"><a href={`${ASSET_BASE}${def.model}`} download>Full model</a>{def.lod && <a href={`${ASSET_BASE}${def.lod}`} download>Reduced model</a>}{def.puppet && <a href={`${ASSET_BASE}${def.puppet}`} download>Procedural twin</a>}</p>}
+        {collection !== 'cambrian' && <p className="specimen-downloads"><a href={`${ASSET_BASE}${def.model}`} download>Full model</a>{def.lod && <a href={`${ASSET_BASE}${def.lod}`} download>Reduced model</a>}{def.puppet && <a href={`${ASSET_BASE}${def.puppet}`} download>Procedural twin</a>}{def.generated && <a href={`${ASSET_BASE}${def.generated}`} download>Generated mesh</a>}</p>}
         {def.lod && <label className="scheme-pick">
           <span>Model detail</span>
           <select aria-label="Model detail" value={detail} disabled={loading} onChange={e => setDetail(e.target.value as 'full' | 'reduced')}>
@@ -222,13 +229,21 @@ export function Viewer() {
           </select>
         </label>}
         {def.lod && <p className="hint">Switch detail to compare at the same view and animation time. Missing clips return to rest.</p>}
-        {def.puppet && <label className="scheme-pick">
+        {(def.puppet || def.generated) && <label className="scheme-pick">
           <span>Body</span>
-          <select aria-label="Which body" value={body} disabled={loading} onChange={e => setBody(e.target.value as 'model' | 'puppet')}>
-            <option value="model">Authored model</option>
-            <option value="puppet">Procedural twin</option>
+          <select aria-label="Which body" value={body} disabled={loading} onChange={e => setBody(e.target.value as 'model' | 'puppet' | 'generated')}>
+            <option value="model">{def.generated ? 'Borrowed body (in play)' : 'Authored model'}</option>
+            {def.puppet && <option value="puppet">Procedural twin</option>}
+            {def.generated && <option value="generated">Generated mesh (no rig)</option>}
           </select>
         </label>}
+        {def.generated && <p className="hint">
+          <strong>Generated mesh:</strong> the raw body this animal will be built from. It has no
+          skeleton, no animation clips and no anchors, and its orientation and scale are not yet
+          normalized for the engine, so it sits still and may not face the way the others do. It is
+          here to be looked at — the animal still borrows another era's body in play until this one
+          is cleaned, rigged and animated.
+        </p>}
         {def.puppet && <p className="hint">
           The twin is rebuilt to this body's own volume on the same skeleton, and is where the clips
           are animated before they are applied here. Switching holds the view and the frame, so a

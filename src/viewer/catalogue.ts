@@ -10,6 +10,7 @@ import { TRIASSIC_CREATURES } from '../content/triassic/creatures';
 import { TRIASSIC_SPECIMENS } from '../content/triassic/specimens';
 import { SCHEMES as TRIASSIC_SCHEMES, CREATURE_SCHEMES as TRIASSIC_DEFAULTS } from '../content/triassic/palettes';
 import triassicPending from '../content/triassic/pending-refinements.json';
+import previewBodies from '../content/triassic/preview-bodies.json';
 import { DEVONIAN_SPECIMENS } from '../content/devonian/specimens';
 import { DEVONIAN_CREATURES } from '../content/devonian/creatures';
 import devonianPending from '../content/devonian/pending-refinements.json';
@@ -63,12 +64,20 @@ export interface ViewerSpecimen {
    */
   puppet?: string;
   puppetNote?: string;
+  /**
+   * The raw generated mesh an animal will be built from, where it has one and no body has shipped.
+   * A static Tripo surface: no skeleton, no clips, and engine orientation and scale not yet
+   * normalized, so it is a thing to look at rather than a thing to animate or play.
+   */
+  generated?: string;
   image?: string;
   displayLength: number;
   lengthMeters?: number;
   looping: readonly string[];
 }
 const DEVONIAN_KIND = new Map(DEVONIAN_CREATURES.map(c => [c.id as string, { kind: c.kind, kindNote: c.kindNote }]));
+/** The raw generated body of each animal still waiting for one, by id. */
+const TRIASSIC_PREVIEW = new Map((previewBodies as { id: string; model: string }[]).map(b => [b.id, b.model]));
 /** The procedural twin of each animal that has one, by the animal's id. */
 const TRIASSIC_PUPPETS = new Map(TRIASSIC_SPECIMENS.filter(c => c.category === 'creature').map(c => [c.id, c]));
 /**
@@ -83,8 +92,6 @@ export const COLLECTIONS: readonly { id: CollectionId; name: string }[] = [
   { id: 'devonian', name: 'Devonian creatures' },
   { id: 'devonian-props', name: 'Devonian plants & props' },
   { id: 'triassic', name: `Triassic creatures${TRIASSIC_BORROWED ? ` (${TRIASSIC_BORROWED} borrowed bodies)` : ''}` },
-  // Empty until the first Triassic prop is generated, which the picker shows as a disabled option:
-  // the slot is visible, so a delivery has somewhere to go rather than somewhere to be invented.
   { id: 'triassic-props', name: 'Triassic plants & props' },
 ];
 /**
@@ -126,6 +133,7 @@ export const SPECIMENS: readonly ViewerSpecimen[] = [
     clipNotes: TRIASSIC_REFINEMENTS.clipNotes[c.id],
     model: TRIASSIC_PATHS.model(c.id), lod: TRIASSIC_PATHS.model(c.id, 1), image: TRIASSIC_PATHS.portrait(c.id, 'card'), displayLength: Math.min(c.adultLength, 8),
     puppet: TRIASSIC_PUPPETS.get(c.id)?.model, puppetNote: TRIASSIC_PUPPETS.get(c.id)?.description,
+    generated: TRIASSIC_PREVIEW.get(c.id),
     looping: ['Idle', 'Swim', 'Crawl', 'Guard', 'Eat', ...(c.abilityLoop ? ['Ability'] : [])],
   })),
   // Scenery only. A creature row in TRIASSIC_SPECIMENS is a procedural twin, and a twin is not a
@@ -136,7 +144,10 @@ export const SPECIMENS: readonly ViewerSpecimen[] = [
     key: `triassic:prop:${c.id}`, id: c.id, collection: 'triassic-props' as CollectionId,
     name: c.name, species: c.species, role: 'TRIASSIC · SCENERY',
     provenance: c.provenance, description: c.description,
-    modelStatus: TRIASSIC_REFINEMENTS.modelStatus[c.id] ?? c.modelStatus, modelNote: TRIASSIC_REFINEMENTS.modelNotes[c.id],
+    // A prop is not in the creature refinement queue, so its badge takes the reason the catalogue
+    // entry carries. Without it the warning showed with nothing behind it.
+    modelStatus: TRIASSIC_REFINEMENTS.modelStatus[c.id] ?? c.modelStatus,
+    modelNote: TRIASSIC_REFINEMENTS.modelNotes[c.id] ?? c.modelNote,
     clipNotes: TRIASSIC_REFINEMENTS.clipNotes[c.id], model: c.model, lod: c.lod, image: c.image,
     displayLength: 4, lengthMeters: c.lengthMeters, looping: c.looping,
   })),
