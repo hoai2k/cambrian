@@ -22,6 +22,41 @@ for(let t=0;t<60*12;t++){
 }
 assert(respawned>=0&&g.actors.includes(p),'Player must respawn in the world');
 assert(hatchSeen,'Respawn must play its hatch/moult state');
+// ---- you come back in the water you were living in ----
+// Every nursery sits a fixed eighty-eight units off the beach, and respawn used to send a player to
+// the nearest one. So an animal that had spent the match working its way out to the open sea was
+// returned to the shallows every time something killed it, and had to swim the distance again — a
+// death cost the swim on top of the rung it already costs. Inshore the nursery is still the answer,
+// because it is the hatchery and it is in the shore band anyway.
+{
+  const { shoreZ, shoreDistance, biomeAt } = await import('../src/sim/world');
+  const back = (out: number) => {
+    const w = new Game('rise', [{ creature: 'waptia', device: 'keyboard', ready: true }], 5);
+    w.skipHatch();
+    const q = w.players[0];
+    q.spawnProtect = 0;
+    q.pos = { x: 0, y: 6, z: shoreZ(0) - out };
+    const was = { s: shoreDistance(q.pos.x, q.pos.z), b: biomeAt(q.pos.x, q.pos.z) };
+    q.hp = -1;
+    const idle = new Map([[0, emptyInput()]]);
+    for (let t = 0; t < 60 * 25 && !isAlive(q); t++) { w.step(1 / 60, idle); w.events.length = 0; }
+    for (let t = 0; t < 40; t++) { w.step(1 / 60, idle); w.events.length = 0; }
+    return { was, now: { s: shoreDistance(q.pos.x, q.pos.z), b: biomeAt(q.pos.x, q.pos.z) }, alive: isAlive(q) };
+  };
+  for (const out of [300, 700, 1300]) {
+    const r = back(out);
+    assert(r.alive, `a body killed ${out} out comes back at all`);
+    assert(Math.abs(r.now.s - r.was.s) < 130,
+      `killed at s=${r.was.s.toFixed(0)} (${r.was.b}) it comes back near there, not at the beach — got s=${r.now.s.toFixed(0)} (${r.now.b})`);
+    console.log(`PASS  died ${r.was.b} s=${r.was.s.toFixed(0)} -> back ${r.now.b} s=${r.now.s.toFixed(0)}`);
+  }
+  // Inshore it is still the nursery: nothing is gained by inventing a second answer for water the
+  // nursery is already in.
+  const inshore = back(90);
+  assert(inshore.now.s < 200, `a death in the shore band still comes back inshore (s=${inshore.now.s.toFixed(0)})`);
+  console.log(`PASS  died inshore s=${inshore.was.s.toFixed(0)} -> back s=${inshore.now.s.toFixed(0)}`);
+}
+
 // ---- the egg holds the body to the crack, and no further ----
 {
   const { HATCH_TIME, HATCH_FREE, HATCH_HOLD } = await import('../src/sim/game');
