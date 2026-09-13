@@ -41,3 +41,27 @@ Runtime verification also confirmed Idle/Swim/Sprint selection and fallback usin
 - Live Three.js review additionally caught inward winding on procedural Shonisaurus shells that Blender had displayed two-sided. Closed shells now face outward, and the packaged-model validator enforces positive signed volume. Upper tooth winding was corrected too. Recheck actual single-sided game rendering after any future topology change.
 
 Validation for this checkpoint: typecheck and production build passed after merging upstream main; 370 Triassic checks and production CreatureView Idle/Swim/Sprint tests passed; both species retain exact paired rigs/clips/anchors. Live viewer confirmed smoother Nothosaurus surface, Shonisaurus closed Idle, and matching authored/procedural open Heavy poses after the winding correction.
+
+## Skinning review — 2026-09-13
+
+Both delivered bodies were skinned the way three.js does it, at 24 frames of every clip, and
+measured for stretch, face inversion, collapse and self-intersection. The skinning is sound:
+measured against body length the authored bodies deform as much as their procedural twins and no
+more (Nothosaurus Sprint 1.40% vs the twin's 1.44%), no faces collapse, and neither animal
+self-intersects in any clip. A ratio-based reading suggested otherwise at first and was wrong —
+×3 on a 0.035-unit edge and ×1.3 on a 0.224-unit edge are the same absolute movement, so a dense
+mesh flatters itself. Duplicated seam vertices were checked too: none carry mismatched weights.
+
+Two things are outstanding.
+
+**Shonisaurus' mouth inverts, and this is a regression.** At `Heavy` t=0.35 (and `Attack`, `Bite`)
+286 faces along the upper lip turn completely inside out — flip 1.00, the surface exactly
+reversed, on the `skull`/`jaw` boundary. The build before the jaw-closure change had **one**
+marginally inverted face at the same frame. Closing the jaws outside feeding moved the rest pose
+without the lip weights following it, so the lip now folds through itself the moment the jaw
+opens. It is plainly visible at any distance where the mouth is on screen.
+
+**Shonisaurus' skin texture is faceted.** The flank, belly and skull are covered in triangular
+starbursts. It is in the baked maps, not the mesh: the same geometry with the same vertex normals
+and no textures renders perfectly smooth. Nothosaurus' texture is clean, so this is one model's
+bake. Both need Blender, which is why they are recorded here rather than fixed in place.

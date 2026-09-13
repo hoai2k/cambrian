@@ -162,3 +162,7 @@ exports. New filenames ensure browsers request the new version.
 **2026-09-09:** the same art is now the in-game emblem too, so the browser tab and the mark beside
 the title on the pick screen are one animal rather than two. `npm run brand` derives
 `public/assets/brand/emblem.webp` (128 px, trimmed to the ink) from the 512 px favicon master.
+
+## Triassic air-status glyphs — 2026-09-13
+
+Delivered `public/assets/ui/air-recovery-off.svg` (barred breath/down-recovery mark) and `air-surface.svg` (upward breath arrow over waterline). Both use 64×64 viewBoxes, currentColor, and the shared breath glyph line weights. They are available for HUD integration.

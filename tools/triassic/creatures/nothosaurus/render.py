@@ -26,6 +26,9 @@ if '--extras-only' in sys.argv:
 if '--mouth-only' in sys.argv:
  pose('Bite',.25);render(REVIEW/'mouth-Bite.png',1000,750,(5,-3,.9),(-.33,-2.1,.38),1.3);sys.exit(0)
 pose('Idle',0)
+if SUFFIX and '--review-only'not in sys.argv:
+ render(OUT/'nothosaurus.puppet.png',1200,900)
+ if '--portrait-only'in sys.argv:sys.exit(0)
 if not SUFFIX and '--review-only'not in sys.argv:
  for suffix,w,h in [('select.png',1600,1200),('card.png',800,600),('thumb.png',256,192),('png',1200,900)]:render(OUT/('nothosaurus.'+suffix),w,h)
 for clip,t in [('Idle',0),('Swim',.225),('Swim',.675),('Swim',1.125),('Swim',1.575),('Sprint',.15),('Sprint',.45),('TurnLeft',.8),('TurnRight',.8),('Dive',.7),('Rise',.7),('Attack',.14),('Attack',.4),('Attack',.7),('Bite',.25),('Heavy',.15),('Heavy',.45),('Heavy',.8),('Hit',.3),('Death',1.6),('Guard',.5),('Parry',.2),('Dodge',.25),('Eat',.4),('Stagger',.6),('Ability',.5),('Grab',.6),('Breath',1.2),('Growth',.75)]:

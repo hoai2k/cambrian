@@ -1,0 +1,28 @@
+{
+  "schemaVersion": 1,
+  "updatedAt": "2026-09-13T14:15:08.419078+00:00",
+  "phase": "requested-images",
+  "instructions": [
+    "Sync main; deliver requested imagery including any canonical redraws.",
+    "After committing images wait 30 minutes, then sync main and reevaluate human greenlights.",
+    "Generate all remaining greenlit creature Tripo bodies, playable before ambient, within available API wallet.",
+    "Process and commit all generated bodies before beginning new rigs.",
+    "Then rig and create procedural twins with identical animated skeletons, finishing and committing one creature at a time.",
+    "Remove preview warning only for a creature that completes the required pipeline and passes verification; record production completion rather than inventing human approval."
+  ],
+  "apiWalletLastVerified": 655,
+  "expectedCreditsPerGeneration": 30,
+  "maximumNewSubmissionsAtCurrentCost": 21,
+  "alreadyDelivered": [
+    "nothosaurus",
+    "shonisaurus"
+  ],
+  "imageReviewWindowStart": null,
+  "imageReviewWindowEnd": null,
+  "creatures": [],
+  "notes": [
+    "Six canonical candidate02 images await human review; no fresh needs-rework entries at initial sync.",
+    "Ancient Seas Trilogy requested artwork delegated to trilogy_titles, trilogy_animals, trilogy_plants.",
+    "API credentials are not committed. Raw generation state stays local; only sanitized metadata is committed."
+  ]
+}
