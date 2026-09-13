@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 1,
+  "createdAt": "2026-09-13",
+  "tool": "builtin image_gen.imagegen",
+  "purpose": "First canonical poses for the fourteen original Tier 2 Triassic plant and prop subjects; awaiting human greenlight.",
+  "format": "2048x2048 PNG, isolated complete subject on pale neutral studio gray",
+  "subjects": {
+    "encrinus": {"sha256":"f95423d433e6cfab8b6ce602f967f7c53ec1eae16213ccd6cc6a60f0fccf1ab9","prompt":"Full side-on Encrinus from rootlike holdfast through segmented column to one open ten-armed featherlike crown; Muschelkalk sea-lily anatomy, no flower or scenery."},
+    "encrinus-litter": {"sha256":"5950b374335d0c7d170911c5f74735c87aa1f203e1ea840a2a1e3e2cb0def017","prompt":"High three-quarter low patch of loose star-centered crinoid columnals and short articulated stem fragments with a readable footprint; no living crown."},
+    "diplopora": {"sha256":"99b602fefc3a7fc9019d24f845a1a7428d511ff2289dc16a84f4a6a1c1c3f411","prompt":"Complete Diplopora calcified algal tuft: clustered cylindrical axes with orderly whorls of short radial branchlets and one holdfast; not a land plant or coral."},
+    "thecosmilia": {"sha256":"6001bcbb34d2fdc56c8def80115ea2e0d29be0dbc8d029368f5b9dd789b398cb","prompt":"Phaceloid Thecosmilia colony of separate unbranched parallel-to-diverging limestone corallite tubes, each ending in a star-septate calice; no trunk, foliage or green buds.","revision":"Corrected an initial plant-like result."},
+    "calcisponge": {"sha256":"00a334528cc26aa5af9f9231460964118ee9da2306de58bc8612fbac52e1e890","prompt":"Complete Triassic calcareous sponge with broad encrusting holdfast and irregular stack of porous bulbous chambers with visible excurrent openings."},
+    "placunopsis-mound": {"sha256":"f35a950b62d201618eedf2c14205a9d6ac1b7bc4f56c25ea20ac310cdc73152e","prompt":"High three-quarter plan view of a low broad Placunopsis bioherm made from hundreds of overlapping thin oyster-like shells with readable footprint."},
+    "daonella-bed": {"sha256":"cbe5fd81230bcd6b84e17df6c17897d3e7462b518724e93f8d9b500a7fa5f70c","prompt":"High three-quarter plan view of a thin dark shale slab densely covered in overlapping flat fan-shaped ribbed Daonella shells."},
+    "brachiopod-cluster": {"sha256":"5060b1ee034d3da237a4ec452f01b97b791b3d50a28d152b39d95899ccb3c9f1","prompt":"Compact cluster of eight to twelve biconvex bilaterally symmetrical Coenothyris lampshells attached around a low shared base."},
+    "cidaris": {"sha256":"ad92e31bbc434e60d76e8610eedc18c4c1f252b94da713da2fbfbb32cb07679b","prompt":"One complete Triassic cidaroid urchin with orderly test plates, sparse long club-shaped primary spines and fine secondary spines."},
+    "reef-block": {"sha256":"2edabdac965efab077dead9d937a81f013193ffae02644794c7ccbba45007520","prompt":"High three-quarter angular reef-margin limestone breccia block with fractured faces, chipped margins and embedded coral and shell fragments."},
+    "neocalamites": {"sha256":"904625d57811c9376f88cae464f500737e433081b16b0937aaa3e5954966b265","prompt":"Complete Neocalamites stand with clustered rhizome base, five to seven jointed stems of varied height and sparse narrow leaf whorls at nodes."},
+    "pleuromeia": {"sha256":"dbecdc9a993cab54d54b0c735f2303a011a38adde2001abe6d058b768624a118","prompt":"Early Triassic Pleuromeia with bulbous roots, one unbranched leaf-scarred stem, simple strap-leaf crown and one central cone; no palm leaflets.","revision":"Corrected an initial palm-like result."},
+    "bjuvia": {"sha256":"baa8408bd595f2c4ea45d18d4b5e49be20dbfcb9b289fc84bc95087a8abfcb50","prompt":"Complete low Bjuvia cycadophyte with broad roots, short armored stem and dense radial rosette of long stiff pinnate fronds."},
+    "shore-boulder": {"sha256":"1f99025b557514fa877ecc264df46825f16e797d95bf4c40e46321ce9c38ed30","prompt":"High three-quarter single red-sandstone shore boulder with broad base, sedimentary bedding, softened angular fractures and wave-cut grooves."}
+  }
+}

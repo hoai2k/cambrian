@@ -32,7 +32,19 @@ const DEPLOY_DIR = join(HERE, '../../../../public/research/triassic');
 const DEPLOY_WIDTH = 1400, DEPLOY_QUALITY = 82;
 const IMAGE_EXT = new Set(['.png', '.jpg', '.jpeg', '.webp', '.gif', '.avif']);
 
-const data = JSON.parse(await readFile(join(HERE, 'images.json'), 'utf8'));
+// `subjects.json` is the authoritative roster. `images.json` is only the last successful
+// Wikimedia snapshot and can legitimately lag a newly added subject, so merge by id instead of
+// silently dropping rows that do not have fetched references yet.
+const subjectData = JSON.parse(await readFile(join(HERE, 'subjects.json'), 'utf8'));
+const imageData = JSON.parse(await readFile(join(HERE, 'images.json'), 'utf8'));
+const fetchedById = new Map(imageData.groups.flatMap((g) => g.subjects).map((s) => [s.id, s.images ?? []]));
+const data = {
+  ...imageData,
+  groups: subjectData.groups.map((group) => ({
+    ...group,
+    subjects: group.subjects.map((subject) => ({ ...subject, images: fetchedById.get(subject.id) ?? [] })),
+  })),
+};
 const manifest = JSON.parse(await readFile(join(HERE, CANON_DIR, 'manifest.json'), 'utf8'));
 
 /**
