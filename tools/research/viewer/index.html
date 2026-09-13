@@ -122,6 +122,10 @@
   button.chip:disabled { opacity: .4; cursor: not-allowed; }
   .card.chosen { border-color: var(--pick); }
   .tag.pick { background: var(--pick); color: #06161c; border-color: var(--pick); font-weight: 700; left: auto; right: 7px; }
+  .strip button.gone { opacity: .3; filter: grayscale(1); }
+  .strip button.gone:hover { opacity: .55; }
+  .kindtag.rejected { background: var(--coral, #ff5b6e); color: #180a0c; }
+  .chip.reject { margin-left: auto; }
   .credit { padding: 7px 14px 11px; border-top: 1px solid var(--line); background: var(--ink);
     color: var(--mute); font-size: 12px; display: flex; gap: 14px; flex-wrap: wrap; }
   .credit b { color: var(--foam); font-weight: 550; }
@@ -180,6 +184,25 @@
 // The page is the same review for any era; `data.js` says which one it was bundled for.
 const ERA = window.REFERENCE_ERA;
 const DATA = window.REFERENCE_DATA, CANON = window.REFERENCE_CANONICAL || {}, REPO = window.REFERENCE_DECIDED || {};
+/**
+ * References a reviewer has thrown out, by subject, as a set of image titles.
+ *
+ * The first sweep of Commons is never the right set — for the plants especially it comes back
+ * mostly rock — so rejecting one has to mean something more than hiding it for the afternoon. It
+ * travels in the export, `tools/research/apply-rejections.mjs` writes it into the era's
+ * `rejected.json`, and the fetcher then never offers that picture again and goes looking for one
+ * more to take its place. This seeds from what has already been applied, so a reload shows the
+ * board as the repository has it, exactly as the decisions do.
+ */
+const REJECTED = window.REFERENCE_REJECTED || {};
+const rejects = Object.fromEntries(Object.entries(REJECTED).map(([id, list]) => [id, new Set(list)]));
+const isRejected = (id, title) => !!rejects[id]?.has(title);
+function toggleReject(id, title) {
+  const set = (rejects[id] ??= new Set());
+  set.has(title) ? set.delete(title) : set.add(title);
+  if (!set.size) delete rejects[id];
+  refreshCounts(); render(); paint();
+}
 document.title = `${ERA.name} reference viewer`;
 // getElementById rather than the `$` helper below: this runs at the top of the module, before it.
 document.getElementById('page-title').firstChild.textContent = `${ERA.name} reference viewer `;
@@ -339,8 +362,12 @@ $('export').addEventListener('click', () => {
     generated: new Date().toISOString(),
     dataGenerated: DATA.generated,
     summary: { subjects: all.length, decided: c.total, greenlit: c.green, replace: c.replace, changedHere: pending() },
-    howToApply: `${ERA.applyCmd} — greenlights the approved poses in ${ERA.canon}/manifest.json and writes the rework brief to ${ERA.canon}/review.md`,
+    howToApply: `${ERA.applyCmd} — greenlights the approved poses in ${ERA.canon}/manifest.json and writes the rework brief to ${ERA.canon}/review.md. `
+      + `Rejected references: node tools/research/apply-rejections.mjs ${ERA.id} <this file>`,
     selections: rows,
+    // Rejected references travel with the decisions: the same pass that says which picture an
+    // animal should be built from also says which of the pictures offered were no use.
+    rejected: Object.entries(rejects).filter(([, set]) => set.size).map(([id, set]) => ({ id, titles: [...set] })),
   };
   const blob = new Blob([JSON.stringify(out, null, 2)], { type: 'application/json' });
   const a = document.createElement('a');
@@ -479,24 +506,29 @@ function paint() {
   $('d-strip').innerHTML = allShots.map((shot, k) => {
     const canonSide = shot.side === 'canon';
     const cur = canonSide ? (state.mode === 'canon' && shot.k === state.ci) : (state.mode !== 'canon' && shot.k === state.i);
-    return `<button class="${canonSide ? 'c ' : ''}${isChosen(s.id, shot) ? 'picked' : ''}" data-shot="${k}" aria-current="${cur}" title="${shot.label}">
+    const gone = shot.side === 'web' && isRejected(s.id, shot.title);
+    return `<button class="${canonSide ? 'c ' : ''}${isChosen(s.id, shot) ? 'picked' : ''}${gone ? ' gone' : ''}" data-shot="${k}" aria-current="${cur}" title="${shot.label}">
       <img src="${shot.thumb}" alt="" loading="lazy">
       ${isChosen(s.id, shot) ? '<span class="tick">✓</span>' : ''}
       ${shot.kind === 'turnaround' ? '<span class="kindtag">3D views</span>' : ''}
       ${shot.kind === 'candidate' ? `<span class="kindtag">${shot.label}</span>` : ''}
       ${shot.kind === 'model-reference' ? '<span class="kindtag">model reference</span>' : ''}
+      ${shot.kind === 'model' ? '<span class="kindtag">built model</span>' : ''}
+      ${shot.side === 'web' && isRejected(s.id, shot.title) ? '<span class="kindtag rejected">rejected</span>' : ''}
     </button>`;
   }).join('');
 
   const web = s.images[Math.min(state.i, Math.max(0, s.images.length - 1))];
   $('d-credit').innerHTML = state.mode === 'canon'
-    ? (s.canon[state.ci]?.kind === 'model-reference'
+    ? (s.canon[state.ci]?.kind === 'model' ? '<span><b>The built model</b> — a render of the body the game actually draws, shown first so it can be held against the canonical pose it was built from. It is not a choice: the pose is what gets greenlit.</span>'
+      : s.canon[state.ci]?.kind === 'model-reference'
       ? '<span><b>Modelling reference only</b> — derived from the greenlit pose. The canonical pose remains the authority; this reference cannot replace it.</span>'
       : `<span><b>${s.canon[state.ci]?.kind === 'turnaround' ? 'Modelling sheet' : s.canon[state.ci]?.kind === 'candidate' ? 'Replacement candidate — choose to greenlight' : 'Canonical image'}</b> — our own art for this subject. Press <kbd>C</kbd> to flip back to the reference, <kbd>Enter</kbd> to choose it.</span>`)
     : (web ? (s.imagesAre ? `<span style="flex:1 1 100%;color:var(--coral)">⚠ ${s.imagesAre}</span>` : '')
         + `<span><b>${web.title}</b></span><span>${web.artist}</span><span>${web.licence}</span>`
         + `<a href="${web.page}" target="_blank" rel="noreferrer">file page</a>`
         + `<a href="${web.full}" target="_blank" rel="noreferrer">full size</a>`
+        + `<button class="chip reject" id="d-reject" data-title="${encodeURIComponent(web.title)}">${isRejected(s.id, web.title) ? 'Rejected — put it back' : 'Reject this reference'}</button>`
         + (web.description ? `<span style="flex:1 1 100%">${web.description}</span>` : '')
       : '<span>Nothing found. Try a different search term in subjects.json and re-run fetch-images.mjs.</span>');
 }
@@ -509,6 +541,10 @@ $('d-stage').addEventListener('click', (e) => {
   if (chosenRef(id) === ref && (verdictOf(id) === 'replace') === redo) { clearChoice(id); return; }
   const shot = shots(state.open).find((x) => x.ref === ref); if (!shot) return;
   redo ? redraw(id, shot) : choose(id, shot);
+});
+$('d-credit').addEventListener('click', (e) => {
+  const b = e.target.closest('#d-reject'); if (!b || !state.open) return;
+  toggleReject(state.open.id, decodeURIComponent(b.dataset.title));
 });
 $('d-strip').addEventListener('click', (e) => {
   const b = e.target.closest('[data-shot]'); if (!b || !state.open) return;
@@ -543,6 +579,13 @@ addEventListener('keydown', (e) => {
     return;
   }
   if (k === 'x') { e.preventDefault(); clearChoice(s.id); return; }
+  // Delete/Backspace throws out the reference being looked at. Only a web image: our own art is
+  // replaced through the canonical directory, never deleted from a review page.
+  if (e.key === 'Delete' || e.key === 'Backspace') {
+    const shot = currentShot();
+    if (shot && shot.side === 'web') { e.preventDefault(); toggleReject(s.id, shot.title); }
+    return;
+  }
   if (e.key === 'ArrowRight' || e.key === 'ArrowLeft') {
     e.preventDefault();
     const d = e.key === 'ArrowRight' ? 1 : -1;

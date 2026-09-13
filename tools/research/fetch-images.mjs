@@ -141,6 +141,17 @@ const subjectsFile = JSON.parse(await readFile(join(HERE, 'subjects.json'), 'utf
  * this file is reviewed art direction, and losing it to a transient network answer is worse than
  * having it a week stale.
  */
+/**
+ * Pictures a reviewer has thrown out, by subject. They are not offered again: the slot goes to the
+ * next candidate down, so each round is a better board than the last rather than the same one
+ * reshuffled. Written by tools/research/apply-rejections.mjs from a viewer export.
+ */
+let rejected = new Map();
+try {
+  const raw = JSON.parse(await readFile(join(HERE, 'rejected.json'), 'utf8'));
+  rejected = new Map(Object.entries(raw).map(([id, titles]) => [id, new Set(titles)]));
+} catch { /* nothing rejected yet */ }
+
 const previous = new Map();
 try {
   const old = JSON.parse(await readFile(join(HERE, 'images.json'), 'utf8'));
@@ -155,9 +166,12 @@ for (const group of subjectsFile.groups) {
     let picks = [];
     try {
       const infos = await imageInfo(await candidates(subject));
+      const no = rejected.get(subject.id);
       picks = infos
         .map((x) => ({ ...x, s: score(x.title, x.info, subject) }))
         .filter((x) => x.s > 0)
+        // A rejected title is treated as though Commons did not hold it.
+        .filter((x) => !no?.has(x.title.replace(/^File:/, '').replace(/_/g, ' ')))
         .sort((a, b) => b.s - a.s)
         .slice(0, PER_SUBJECT)
         .map(({ title, info, s }) => {
@@ -182,7 +196,8 @@ for (const group of subjectsFile.groups) {
     if (!picks.length && previous.has(subject.id)) { picks = previous.get(subject.id); kept = true; }
     if (!picks.length) empty.push(subject.id);
     total += picks.length;
-    console.log(`${subject.id.padEnd(24)} ${String(picks.length).padStart(2)} images${kept ? ' (kept, refresh found none)' : ''}`);
+    const dropped = rejected.get(subject.id)?.size ?? 0;
+    console.log(`${subject.id.padEnd(24)} ${String(picks.length).padStart(2)} images${kept ? ' (kept, refresh found none)' : ''}${dropped ? ` · ${dropped} rejected` : ''}`);
     outGroup.subjects.push({ ...subject, images: picks });
   }
   result.groups.push(outGroup);
