@@ -12,6 +12,8 @@ import { existsSync, readFileSync } from 'node:fs';
 import { CAMBRIAN } from '../src/content/cambrian';
 import { DEVONIAN } from '../src/content/devonian';
 import { TRIASSIC } from '../src/content/triassic';
+import { padDir, step } from '../src/ancientseas/picker';
+import { emptyControls } from '../src/input/input';
 import { ANIMAL_ERA, ART_DIR, BIG_ANIMAL, DEFAULT_VERSION, GAMES, REQUESTED, SLOTS, STAGE, TRILOGY_LOGO, isDelivered, parseVersion, sourceFor } from '../src/ancientseas/page';
 
 let passes = 0;
@@ -210,6 +212,30 @@ ok(!/--lift/.test(css2), 'and nothing moves a piece off its place to say it is c
 // The paper is the window's, the plate is the composition's: that is what fills a wide screen.
 ok(/\.as-paper \{ position: absolute; inset: 0/.test(css2), 'the paper covers the window');
 ok(/\.as-stage \{[^}]*width: min\(100vw, calc\(100svh \* 1\.6\)\)/.test(css2), 'the plate keeps 16:10 inside it');
+
+/**
+ * A pad walks the three games. The plate is links, which are a pointer's and a Tab key's business,
+ * so without this a player holding a controller has nothing to press.
+ */
+const ORDER = GAMES.map((g) => g.id);
+eq(step(null, 'right', ORDER), 'cambrian', 'a push right with nothing chosen starts at the near end');
+eq(step(null, 'left', ORDER), 'triassic', 'and a push left at the far one');
+eq(step('cambrian', 'right', ORDER), 'devonian', 'right walks along the plate');
+eq(step('triassic', 'right', ORDER), 'cambrian', 'and wraps rather than stopping');
+eq(step('cambrian', 'left', ORDER), 'triassic', 'as does left');
+eq(step('devonian', 'left', ORDER), 'cambrian', 'left walks back');
+const pad = (over: Partial<ReturnType<typeof emptyControls>>) => padDir({ ...emptyControls(), ...over });
+eq(pad({}), null, 'a pad at rest asks for nothing');
+eq(pad({ dright: true }), 'right', 'the d-pad asks');
+eq(pad({ dleft: true }), 'left', 'both ways');
+eq(pad({ ddown: true }), 'right', 'and down the column counts as along the row');
+eq(pad({ dup: true }), 'left', 'as does up');
+eq(pad({ mx: 0.9 }), 'right', 'a pushed stick asks');
+eq(pad({ mx: 0.2 }), null, 'a resting stick does not');
+eq(pad({ my: 0.8 }), 'right', 'and the stick answers on the column too');
+const picker = readFileSync('src/ancientseas/picker.ts', 'utf8');
+ok(/c\.confirm \|\| c\.menu/.test(picker) && !/anyButton/.test(picker), 'A and Start take the choice, not every button');
+ok(/pads === 0/.test(page), 'and nothing polls a pad that is not there');
 
 // The withdrawn cutouts are gone from the page and from public/ (docs/image-requests.md says why).
 for (const gone of ['animal-opabinia.webp', 'animal-cladoselache.webp', 'animal-mixosaurus.webp', 'animal-ammonoid.webp']) {

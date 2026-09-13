@@ -41,7 +41,7 @@ export interface GameLink {
   readonly art: string;
   readonly artWidth: number;
   readonly artHeight: number;
-  /** The engraved wordmark cut from that painting, on transparency. */
+  /** The wordmark the interface uses, which is the game's own (`npm run logos`). */
   readonly wordmark: string;
   /** Period, as the game's own copy puts it (`copy.taglineEm`); the test keeps these in step. */
   readonly when: string;
@@ -52,19 +52,19 @@ export const GAMES: readonly GameLink[] = [
   {
     id: 'cambrian', title: 'Cambrian Conquest', path: 'cambrian/',
     art: 'assets/brand/logo-illustrated.webp', artWidth: 1536, artHeight: 1024,
-    wordmark: 'assets/brand/logo-engraved.webp',
+    wordmark: 'assets/brand/logo-header.webp',
     when: '508 million years ago', tagline: 'Eat. Grow. Fight. Run.',
   },
   {
     id: 'devonian', title: 'Devonian Domination', path: 'devonian/',
     art: 'assets/devonian/brand/title.webp', artWidth: 1536, artHeight: 1024,
-    wordmark: 'assets/devonian/brand/logo-engraved.webp',
+    wordmark: 'assets/devonian/brand/logo-header.webp',
     when: '375 million years ago', tagline: 'Feed. Grow. Fight. Escape.',
   },
   {
     id: 'triassic', title: 'Triassic Triumph', path: 'triassic/',
     art: 'assets/triassic/brand/title.webp', artWidth: 1536, artHeight: 1024,
-    wordmark: 'assets/triassic/brand/logo-engraved.webp',
+    wordmark: 'assets/triassic/brand/logo-header.webp',
     when: '240 million years ago', tagline: 'Breathe. Dive. Hunt. Surface.',
   },
 ];
@@ -151,13 +151,13 @@ export const SLOTS: readonly Slot[] = [
   // The three game titles sit low enough to clear the animal arching over each of them: a title is
   // the one thing on the plate that has to read at a glance, so nothing crosses its letters.
   { id: 'cambrian', kind: 'title', label: 'Cambrian Conquest', file: `${ART_DIR}title-cambrian.webp`, width: 1536, height: 640, z: 30,
-    standIn: 'assets/brand/logo-engraved.webp', game: 'cambrian',
+    standIn: 'assets/brand/logo-header.webp', game: 'cambrian',
     desktop: { x: 18, y: 57, w: 26 }, mobile: { x: 50, y: 33, w: 74 } },
   { id: 'devonian', kind: 'title', label: 'Devonian Domination', file: `${ART_DIR}title-devonian.webp`, width: 1536, height: 640, z: 30,
-    standIn: 'assets/devonian/brand/logo-engraved.webp', game: 'devonian',
+    standIn: 'assets/devonian/brand/logo-header.webp', game: 'devonian',
     desktop: { x: 50, y: 57, w: 26 }, mobile: { x: 50, y: 61, w: 74 } },
   { id: 'triassic', kind: 'title', label: 'Triassic Triumph', file: `${ART_DIR}title-triassic.webp`, width: 1536, height: 640, z: 30,
-    standIn: 'assets/triassic/brand/logo-engraved.webp', game: 'triassic',
+    standIn: 'assets/triassic/brand/logo-header.webp', game: 'triassic',
     desktop: { x: 82, y: 57, w: 26 }, mobile: { x: 50, y: 89, w: 74 } },
 
   // ---- the shell fleuron the paintings put between title and animals ----
