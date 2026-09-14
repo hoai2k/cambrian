@@ -285,6 +285,15 @@ unless the user explicitly asks for a PR. Steps:
   one per instance from a hash of where it stands, and `src/sim` collides against the family's
   *union* envelope (`propShapeFor`), so a variant is presentation and the collider is never
   smaller than what was drawn. A mineral kind sets `maxLean: 0` and genuinely never bends.
+- A plant yields by *its own girth*, not by the size of what hits it (`stout` in `src/sim/flora.ts`,
+  measured against the plant's widest section). `give` already weighs body against plant, so weighing
+  girth on the body's radius too double-counts size and leaves an adult treating a sponge as thin
+  air. A slender stalk flattens — that flattening is how it yields, and is load-bearing — while
+  something as thick through as the animal keeps a lever under it and pushes back. Going over and
+  going round are exclusive: a dead-on contact (`straightOn`, the `HEAD_ON` cosine) suppresses the
+  sideways slide, because a slide that runs during the approach steals the climb it was meant to be
+  an alternative to. `npm run swim` holds the three outcomes — over the top, round the edge, and past
+  a thin stalk at the floor — and `tools/flora-test.ts` the physics under them.
 - Devonian scenery and biome plates are procedural stand-ins: flora kinds and their density table in
   `src/content/devonian/environment.ts` + `src/render/sea.ts`, plates from `npm run devonian:plates`.
   Authored sets replace them without touching placement; see `docs/redesign/09-devonian-remaining.md`.
