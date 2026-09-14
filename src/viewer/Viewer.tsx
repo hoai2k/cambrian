@@ -53,9 +53,12 @@ function readUrlState(): { key: string; mode: Mode } {
   const key = specimenByKey.has(requested) ? requested : SPECIMENS[0].key;
   const asked = params.get('mode');
   // None of the editing modes means anything on a prop: there is no body to reshape, no run to
-  // lengthen, and nothing to cut off one.
-  const editable = !isPropCollection(specimenByKey.get(key)?.collection);
-  const asking = asked === 'sculpt' || asked === 'mark' || asked === 'stretch';
+  // lengthen, and nothing to cut off one. Sculpting is narrower still — see `sculptable` below:
+  // a link to `mode=sculpt` on a Triassic animal opens the view rather than an editor that could
+  // not export anything portable.
+  const collection = specimenByKey.get(key)?.collection;
+  const editable = !isPropCollection(collection);
+  const asking = asked === 'mark' || asked === 'stretch' || (asked === 'sculpt' && collection !== 'triassic');
   return { key, mode: editable && asking ? asked as Mode : 'view' };
 }
 function writeUrlState(key: string, mode: Mode) {
@@ -139,7 +142,17 @@ export function Viewer() {
   // that ships, and one exported off the comparison body would name the right creature and describe
   // the wrong mesh.
   const ready = !loading && !error && loadedId === id;
-  const canSculpt = !isPropCollection(collection) && !showPuppet && !showGenerated && ready;
+  /**
+   * Sculpting is for a body a *builder* draws from profile rows. Its export is a hand-off into
+   * those rows (docs/viewer-sculpt.md) — the change goes into the builder, never into the GLB — so
+   * it only means anything where such a table is authored by hand, which is the Cambrian and the
+   * Devonian. A Triassic body is Tripo-derived: its builder measures its profile off the intake
+   * surface rather than authoring it, so a sculpt exported there would describe a table nobody
+   * writes and could not be ported into anything. The Triassic's two editors are Stretch, which
+   * lengthens a run of the raw generation, and Mark region, which says what to cut off it.
+   */
+  const sculptable = !isPropCollection(collection) && collection !== 'triassic';
+  const canSculpt = sculptable && !showPuppet && !showGenerated && ready;
   // Stretching is the other half of that split, and the opposite gate: it lengthens a run of a raw
   // generation before anyone cleans or rigs it, so it is offered only on the generated body and
   // never on a built one.
@@ -158,10 +171,10 @@ export function Viewer() {
    */
   const ownBody = !def.generated || !!def.inReview;
   useEffect(() => {
-    if (mode === 'sculpt' && (isPropCollection(collection) || showPuppet || showGenerated)) setMode('view');
+    if (mode === 'sculpt' && (!sculptable || showPuppet || showGenerated)) setMode('view');
     if (mode === 'stretch' && !showGenerated) setMode('view');
     if (mode === 'mark' && isPropCollection(collection)) setMode('view');
-  }, [mode, collection, showPuppet, showGenerated]);
+  }, [mode, collection, sculptable, showPuppet, showGenerated]);
 
   // The show effect must not re-run when a pick changes, so it reads the picks through a ref.
   const picksRef = useRef(picks);
@@ -338,7 +351,7 @@ export function Viewer() {
         <p className="hint">Drag to orbit · right-drag to pan · scroll to zoom</p>
         <div className="info-actions">
           <button className="ghost" onClick={() => sceneRef.current?.resetCamera()}>Reset view</button>
-          {!isPropCollection(collection) && ownBody && <button className="ghost" onClick={() => setMode('sculpt')} disabled={!canSculpt} title="Reshape the body on side and top drawings and export the change as a sculpt file">
+          {sculptable && ownBody && <button className="ghost" onClick={() => setMode('sculpt')} disabled={!canSculpt} title="Reshape the body on side and top drawings and export the change as a sculpt file">
             Edit sculpt{(() => { const d = getSculpt(id); return d && !isIdentity(d) ? ' (edited)' : ''; })()}
           </button>}
           {def.generated && <button className="ghost" onClick={() => { setBody('generated'); setMode('stretch'); }} disabled={!ready} title="Lengthen a run of this raw generation — a neck, a tail — between two cuts, and export the change to be baked into the GLB">

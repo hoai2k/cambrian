@@ -365,7 +365,12 @@ unless the user explicitly asks for a PR. Steps:
   reduced model, with an Edited/Original toggle for the preview. Undo/redo, in-memory only (a reload
   returns to what ships). *Export sculpt* writes `<id>-sculpt.json`, which is the hand-off for a
   builder port: the change goes into the builder's profile rows, never into the GLB
-  (`docs/viewer-sculpt.md`). `src/viewer/sculpt/profile.ts` is pure and `npm run sculpt` guards it;
+  (`docs/viewer-sculpt.md`). Sculpt is offered only where a builder authors a profile table by hand — the Cambrian and the
+  Devonian. A Triassic body is Tripo-derived and its builder *measures* its profile off the intake
+  surface rather than authoring one, so a sculpt exported there would describe a table nobody
+  writes; that era's editors are *Stretch* (lengthen a run of the raw generation) and *Mark region*
+  (say what to cut off it), and `?mode=sculpt` on a Triassic animal opens the view instead.
+  `src/viewer/sculpt/profile.ts` is pure and `npm run sculpt` guards it;
   `tools/sculpt-browser.mjs` drives the mode in a browser; `npm run sculpt:measure -- <glb> [sculpt.json]`
   measures a model the same way and reports how far a rebuilt candidate is from a sculpt's target,
   which is how a port is checked.
