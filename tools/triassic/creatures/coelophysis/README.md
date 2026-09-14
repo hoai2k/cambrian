@@ -123,7 +123,7 @@ skin at roughness 0.7.
 | Nearest twin-surface distance, 95th percentile | 0.0426 | 0.87 % | — |
 | Nearest twin-surface distance, 99th percentile | 0.1584 | 3.23 % | — |
 | Nearest twin-surface distance, maximum | 0.2396 | 4.89 % | — |
-| Authored vertices further than 3 % of body length from the twin | **137 of 10,043** | 1.4 % | — |
+| Authored vertices further than 3 % of body length from the twin | **137 of 10,172** | 1.4 % | — |
 | Appendage roots seated inside the intake surface | 0.0100–0.0131 raw | 1.0–1.3 % deep | inside |
 | Weights per vertex | max 4, mean 2.14 | — | ≤ 4, normalised |
 

@@ -181,15 +181,40 @@ animal. Three findings from that pass belong in this document because they gener
 
 - **The seed of a geodesic banding is not automatic on a standing animal.** A double sweep finds the
   two ends of the longest path over the surface, which on a swimmer is snout to tail tip and on a
-  long-legged land animal is a **claw** to the tail tip. Banding from there reads a shin as a neck —
-  which is the shape of the finding that left Macrocnemus CANNOT TELL in the proportion audit. Those
-  bodies are measured from two declared seeds, tail tip and snout, meeting at the shoulder.
+  long-legged land animal is a **claw** to the tail tip. Macrocnemus' longest geodesic runs from a
+  hind claw, and banding from there reads the shin as a neck. Those bodies are measured from two
+  declared seeds, tail tip and snout, meeting at the shoulder.
 - **Inside/outside cannot be taken from the nearest triangle's normal.** At the hips the nearest
   surface to a point on the midline is the inner face of a thigh, whose normal points across the
   midline, so a point plainly between the belly and the backbone reads as outside. Use ray parity.
 - **A rigid carry has to be gated by distance to its own axis, not only by station.** A hind claw
   sits behind the tail's base station, so an axial gate swings the whole leg round with the tail and
-  folds the surface at the hip. Each creature's
+  folds the surface at the hip.
+- **A jaw hinge is a measurement of the head, not of the skull bone.** Both Macrocnemus and
+  Coelophysis first took `HINGE_X` from the skull *bone*, which sits far forward along the neck
+  axis, and both got a mandible that was a sliver off the snout: at 28 degrees of jaw the mouth is
+  a few pixels of black at the tip. Take it from the head's own measured span — a third of the way
+  back from the snout — and the gape becomes legible. And check the gape by **rendering it from the
+  head's own frame**: a fixed world-space camera is over the top of the skull the moment the neck
+  swings down, and a gape that opens downward is invisible from there. A wide gape then exposes the
+  next thing, which is that the **throat has to be weighted to the jaw**: the mandible is skinned to
+  `jaw` and the throat behind it to the cervicals, and with nothing blending between them a wide
+  opening separates the two and the pale ventral skin reads as a slab hanging off a detached jaw.
+  A closed mouth hides all of this, so none of it shows until the hinge is right.
+- **An intake whose geometry depends on a texture read has no slack in that read.** These three
+  place the mouth seam by measuring the *pigment* — the painted mouth line — per station, so the
+  albedo sampler decides where the jaw is cut and therefore the triangle count. That is a good
+  technique and worth keeping, but it means the sampler is not a detail: reconstructing an
+  equivalent one reproduced Coelophysis byte for byte and moved Tanystropheus and Macrocnemus by six
+  and four triangles.
+- **Nothing was checking that a builder still imports.** `shorekit.Albedo` went missing from the kit
+  while all three builders called it, so as committed none of the three would run — found by going
+  back to rebuild one, not by any check, and long after the artefacts had shipped. A reproducible
+  builder that is only ever exercised when somebody rebuilds is not reproducible, it is merely
+  untested. `tools/triassic/shorekit-check.mjs` now resolves every `K.<name>` a builder reaches for
+  against the kit, statically and in a second, and runs in `npm run triassic`.
+
+Each creature's
 builder produces the cleaned authored body, the shared skeleton, the measured twin and the sampled
 performances; per-creature audits prove exact parity after packaging. Nothosaurus and Shonisaurus
 are the established examples. Their implementation choices are evidence for the contract, not a

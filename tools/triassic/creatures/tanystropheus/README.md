@@ -27,9 +27,9 @@ HUD is the telegraph the animal performs.
 
 | Delivery | Triangles | Packaged bytes |
 | --- | ---: | ---: |
-| `tanystropheus.glb` — authored Tripo body | 20,734 | see `delivery-files.json` |
-| `tanystropheus.puppet.glb` — procedural twin | 8,078 | " |
-| `tanystropheus.lod1.glb` — identical puppet alias | 8,078 | " |
+| `tanystropheus.glb` — authored Tripo body | 20,740 | see `delivery-files.json` |
+| `tanystropheus.puppet.glb` — procedural twin | 8,072 | " |
+| `tanystropheus.lod1.glb` — identical puppet alias | 8,072 | " |
 
 The reduced model is **39.0 %** of the authored triangles, inside the contract's 40 %. It is tighter
 than Placodus' 38.9 % or Dinocephalosaurus' 38.0 % for a reason worth knowing: this animal's
@@ -162,7 +162,7 @@ together).
 | Nearest twin-surface distance, 95th percentile | 0.00560 | 0.11 % | — |
 | Nearest twin-surface distance, 99th percentile | 0.00893 | 0.17 % | — |
 | Nearest twin-surface distance, maximum | 0.01552 | 0.30 % | — |
-| Authored vertices further than 3 % of body length from the twin | **0 of 9,909** | — | — |
+| Authored vertices further than 3 % of body length from the twin | **0 of 9,918** | — | — |
 | Appendage roots seated inside the intake surface | 0.0134–0.0348 raw | 1.0–2.7 % deep | inside |
 | Jaw hinge seated inside the head | 0.0059 raw | 39.6 % of the local head radius | inside |
 | Mouth interior, worst vertex | +0.0012 raw inside | — | inside |

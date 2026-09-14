@@ -14,6 +14,19 @@ writes a file outside the species its caller names.
 
 Raw-space convention, as in the other builders: the intake mesh is carried into Tripo metres with
 +X snoutward, +Y left and +Z up, and the engine transform `tx()` is applied once at the end.
+
+A note on `Albedo`, because it is the one part of this file with a history worth knowing. It went
+missing: the three builders all call `K.Albedo(auth)` and the class was not in the committed kit,
+so as committed **none of the three builders would run at all**, which was found by going back to
+rebuild one of them rather than by any check. It has been restored to the contract its callers
+need, but the restoration is a reconstruction and not the original, and it is *not* behaviourally
+free: the mouth seam is read off the pigment, so the sampling decides `JAW_FRACTION`, which decides
+where the jaw is cut. A rebuild with the restored class gives Macrocnemus 20,954 triangles against
+the 20,950 of the artefact that was committed before it went missing — four triangles, from a seam
+that moved by less than a texel's worth of luminance. The three animals were therefore rebuilt from
+this kit and re-audited, so that source and artefact agree; the lesson is that an intake whose
+*geometry* depends on a texture read has no slack in that read, and that nothing here checks a
+builder still imports.
 """
 import bpy
 import bmesh
@@ -22,7 +35,7 @@ import heapq
 import numpy as np
 from mathutils import Vector, Matrix, Quaternion
 from mathutils.bvhtree import BVHTree
-from mathutils.geometry import barycentric_transform
+from mathutils.geometry import barycentric_transform, intersect_point_tri
 from math import sin, cos, pi
 import json
 import struct
@@ -283,6 +296,84 @@ def authored_material(obj, name, relief=.15, roughness=.7):
     for item in layer.data:
         item.color = (1, 1, 1, 1)
     return mat
+
+
+# ---- the source texture ---------------------------------------------------------------------------
+
+class Albedo:
+    """The intake body's own painted texture, sampled through its own UVs.
+
+    Two quite different things need it and they need it the same way. The **twin** takes each new
+    vertex's colour from the point on the intake surface nearest it, which arrives as a polygon
+    index and a point on that polygon. The **mouth-line instrument** reads the painted seam off the
+    pigment station by station, and asks for a UV outright. So the image lookup, the wrap and the
+    polygon-to-UV interpolation live here once rather than twice in each of three builders.
+
+    The pixel buffer is pulled out whole with `foreach_get`: `img.pixels` is a Python-level
+    accessor and reading a 2048-square texture through it a million times over is minutes rather
+    than the second this takes. Blender hands back linear floats whatever the image's colour space,
+    which is what both callers want — a `FLOAT_COLOR` attribute is linear, and a luminance
+    comparison only has to be monotonic.
+    """
+
+    def __init__(self, obj):
+        self.obj = obj
+        self.uv = obj.data.uv_layers.active
+        assert self.uv is not None, 'the intake body has no active UV layer'
+        img = None
+        for m in obj.data.materials:
+            if not m or not m.use_nodes:
+                continue
+            for n in m.node_tree.nodes:
+                if n.type == 'TEX_IMAGE' and n.image:
+                    img = n.image
+                    break
+            if img:
+                break
+        assert img is not None, 'the intake body carries no image texture to read pigment from'
+        self.image = img
+        self.w, self.h = img.size
+        buf = np.empty(self.w * self.h * 4, dtype=np.float32)
+        img.pixels.foreach_get(buf)
+        self.px = buf.reshape(self.h, self.w, 4)
+
+    def at(self, u, v):
+        """One texel, wrapped. Returns RGBA as a plain tuple, which is what a colour slot takes."""
+        x = int((u % 1.0) * (self.w - 1) + .5) % self.w
+        y = int((v % 1.0) * (self.h - 1) + .5) % self.h
+        p = self.px[y, x]
+        return (float(p[0]), float(p[1]), float(p[2]), float(p[3]))
+
+    def triangle_uv(self, point, poly_index):
+        """The UV at a point lying on one polygon of the authored mesh, or None.
+
+        The polygon is fanned and the triangle that actually contains the point is the one used:
+        `barycentric_transform` happily extrapolates off the end of a triangle, so picking the
+        first of the fan every time would put a quad's far corner somewhere else on the texture.
+        """
+        me = self.obj.data
+        if poly_index is None or poly_index < 0 or poly_index >= len(me.polygons):
+            return None
+        p = me.polygons[poly_index]
+        vs = [me.vertices[i].co for i in p.vertices]
+        ls = [self.uv.data[li].uv for li in p.loop_indices]
+        if len(vs) < 3:
+            return None
+        fan = [(0, k, k + 1) for k in range(1, len(vs) - 1)]
+        pick = None
+        for a, b, c in fan:
+            if intersect_point_tri(point, vs[a], vs[b], vs[c]):
+                pick = (a, b, c)
+                break
+        a, b, c = pick if pick else fan[0]
+        try:
+            r = barycentric_transform(point, vs[a], vs[b], vs[c],
+                                      Vector((ls[a].x, ls[a].y, 0.)),
+                                      Vector((ls[b].x, ls[b].y, 0.)),
+                                      Vector((ls[c].x, ls[c].y, 0.)))
+        except ValueError:
+            return None            # a degenerate triangle has no barycentric frame
+        return r
 
 
 # ---- the procedural twin -------------------------------------------------------------------------

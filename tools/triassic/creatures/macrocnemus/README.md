@@ -25,9 +25,9 @@ back, and the two runs meet at the shoulder.
 
 | Delivery | Triangles |
 | --- | ---: |
-| `macrocnemus.glb` — authored Tripo body | 20,950 |
-| `macrocnemus.puppet.glb` — procedural twin | 7,914 |
-| `macrocnemus.lod1.glb` — identical puppet alias | 7,914 |
+| `macrocnemus.glb` — authored Tripo body | 20,954 |
+| `macrocnemus.puppet.glb` — procedural twin | 7,910 |
+| `macrocnemus.lod1.glb` — identical puppet alias | 7,910 |
 
 The reduced model is **37.8 %** of the authored triangles, inside the contract's 40 %. Files are in
 `public/assets/triassic/creatures/`, with studio, 1600 × 1200 transparent select, card and thumbnail
@@ -135,7 +135,7 @@ station and unioned in.
 | Maximum envelope difference | 0.0497 | **1.02 %** | 4 % |
 | Nearest twin-surface distance, 95th percentile | 0.0186 | 0.38 % | — |
 | Nearest twin-surface distance, maximum | 0.1521 | 3.11 % | — |
-| Authored vertices further than 3 % of body length from the twin | **1 of 10,133** | — | — |
+| Authored vertices further than 3 % of body length from the twin | **1 of 10,149** | — | — |
 | Appendage roots seated inside the intake surface | 0.0124–0.0193 raw | 1.2–1.9 % deep | inside |
 | Jaw hinge seated inside the head | see `validation.json` | as a fraction of the local head radius | inside |
 | Weights per vertex | max 4 | — | ≤ 4, normalised |
@@ -279,8 +279,33 @@ Tanystropheus and Coelophysis, which were built in the same pass.
   crops `tools/triassic/placeholder-portraits.mjs` writes.
 - **One region of the twin diverges.** The maximum nearest-surface distance is 3.1 % of body length
   against a 95th percentile of 0.38 %, which is the voxel field losing the finest toes. One vertex
-  of 10,133 is over 3 % out. A finer field would fix it and would cost the twin's triangle budget;
+  of 10,149 is over 3 % out. A finer field would fix it and would cost the twin's triangle budget;
   the envelope tolerance the contract actually sets is met four times over.
+- **The gape is the weakest thing about this animal, and it is a known defect with a diagnosis.**
+  At its widest — `Snatch` at 0.23, 28.6 degrees of jaw, which is *more* than Tanystropheus opens —
+  the mouth reads as a black triangle a few pixels across at the snout tip, with the cut edge of the
+  mandible showing beside it as a bare pale facet. It is not legible at any distance.
+
+  The cause is `HINGE_X = SKULL_PT[0] + .012`: the hinge is taken from the skull *bone*, which sits
+  0.90 of the way along the neck axis and so near the front of the head, and `is_jaw` therefore
+  cuts a sliver off the snout rather than a mandible. Coelophysis had exactly this and was fixed by
+  taking the hinge from the head's own measured span instead (`X_SNOUT - .66 * (X_SNOUT - HX[0])`);
+  Macrocnemus was not.
+
+  That fix was tried here and is **not** in this build, deliberately. It works as far as it goes —
+  the hinge moves to 0.401, the mandible becomes 481 triangles rather than a sliver, the hinge
+  seats at 0.50 of the head radius and the gape becomes a large legible wedge — but it exposes a
+  second defect underneath it that a small gape was hiding: **the throat does not follow the jaw.**
+  The mandible is weighted to `jaw` and the throat skin behind it to the cervicals, with nothing
+  blending between, so a wide gape separates the two and the animal's pale ventral throat reads as
+  a flat slab hanging off a detached lower jaw. The closed mouth is clean, which is why this was
+  invisible until the jaw could actually move. Deepening the oral lumen to the measured seam height
+  was tried and does not help: the slab is skin, not an unlined cavity.
+
+  So the whole fix is two changes, not one — the hinge, *and* `skin_weights` blending `jaw`
+  influence back into the throat over a distance behind the hinge, the way a limb root blends onto
+  the body bones under it. The second half needs its own verification pass and is not something to
+  land unlooked-at. Shipping the hinge alone would trade a quiet defect for a loud one.
 - **The teeth and the tooth rows are a reconstruction**, as the fangs are on Tanystropheus. The
   generation models none.
 - **There are no eye globes**, as on Nothosaurus, Placodus, Dinocephalosaurus and Tanystropheus. The
