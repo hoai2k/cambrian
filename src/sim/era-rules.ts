@@ -179,6 +179,18 @@ export interface EraRules {
    * shared tier name and nutrition ring are used.
    */
   scoreLine?(g: Game, a: Actor): { rank: string; progress: number } | undefined;
+  /**
+   * Presentation only: an animation this era wants played on a body that the shared state machine
+   * has nothing to say about. The Triassic's shore animals are the case it exists for — they are
+   * brainless, pinned, and never enter `attack` or `ability`, so the renderer would keep them on
+   * Idle through a telegraph and a strike that the simulation is really performing.
+   *
+   * It returns the clip the body should be *in* right now, and the renderer fires it as a one-shot
+   * when the name changes. Returning undefined leaves the shared state machine alone, which is
+   * what every other body gets. Nothing here may touch simulation state: it is read off state that
+   * has already been decided, so a replay is unaffected by whether anyone was watching.
+   */
+  clip?(a: Actor): { name: string; dur: number } | undefined;
 }
 
 export const RULES: EraRules | undefined = ACTIVE_ERA.id === 'devonian' ? DEVONIAN_RULES : ACTIVE_ERA.id === 'triassic' ? TRIASSIC_RULES : undefined;
