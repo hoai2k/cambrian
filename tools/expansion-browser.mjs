@@ -1,4 +1,5 @@
 import { chromium } from 'playwright-core';
+import { silenceCounter } from './qa-counter.mjs';
 import fs from 'node:fs';
 import path from 'node:path';
 const base=(process.env.QA_BASE_URL || 'http://127.0.0.1:5173').replace(/\/$/,'');
@@ -6,7 +7,7 @@ const viewerOnly=Boolean(process.env.QA_VIEWER_ONLY);
 const auditOnly=Boolean(process.env.QA_AUDIT_ONLY);
 const out=process.env.CAMBRIAN_QA_DIR || '../expansion-authoring/review';fs.mkdirSync(out,{recursive:true});
 const browser=await chromium.launch({executablePath:process.env.CHROME_PATH || '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',args:['--use-gl=angle','--use-angle=swiftshader','--enable-unsafe-swiftshader','--no-sandbox']});
-const page=await browser.newPage({viewport:{width:1440,height:1000}});
+const page=await browser.newPage({viewport:{width:1440,height:1000}});await silenceCounter(page);
 const errors=[];page.on('pageerror',e=>errors.push(e.stack || e.message));page.on('console',m=>{if(m.type()==='error')errors.push(m.text())});
 await page.addInitScript(()=>localStorage.setItem('cambrian-settings',JSON.stringify({quality:'low',muted:true,music:false})));
 try {

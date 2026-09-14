@@ -92,11 +92,15 @@ unfiltered view is still one click away on GoatCounter's own page.
 
 ## What is counted
 
-The five pages a link from outside can land on: the trilogy page, the three games, and the specimen
-viewer. `installStats()` is called from each one's entry (`src/*/main.tsx`) — after `selectEra` on
-the three game pages, so the page reads the same way everywhere, though the module reads neither
-the era nor the asset base and so has nothing to be too early for. The dev workbench is not
-counted, and neither is `/stats/` itself.
+The games, and only the games: the trilogy page and the three eras. `installStats()` is called from
+each one's entry (`src/*/main.tsx`) — after `selectEra` on the three game pages, so the page reads
+the same way everywhere, though the module reads neither the era nor the asset base and so has
+nothing to be too early for.
+
+Nothing else counts. The specimen viewer, the dev workbench and `/stats/` itself are all secondary
+pages, and a secondary page in the total makes it worse rather than fuller: the question here is
+"is anyone I don't know playing these?", and a viewer visit is almost always mine. The viewer did
+count briefly, and `npm run stats` now asserts that it does not, so it cannot drift back in.
 
 Local play is not counted either: `count.js` skips `localhost`, `127.x`, private ranges and
 `file://` on its own. That is what you want — the dashboard should be strangers, not you testing a

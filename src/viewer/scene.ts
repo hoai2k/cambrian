@@ -84,6 +84,23 @@ export interface MarkTarget {
 }
 /** Where a world point lands on the canvas, in CSS pixels, and how many of them a world unit spans there. */
 export interface Projection { x: number; y: number; scale: number }
+
+/**
+ * A mesh's shipped positions in the model's root frame, which is the frame both editors measure
+ * and warp in. Here rather than in either of them because it is about the shape of what
+ * `sculptTarget()` hands out.
+ */
+export function rootFramePositions(base: Float32Array, toRoot: THREE.Matrix4): Float32Array {
+  const e = toRoot.elements;
+  const out = new Float32Array(base.length);
+  for (let i = 0; i < base.length; i += 3) {
+    const x = base[i], y = base[i + 1], z = base[i + 2];
+    out[i] = e[0] * x + e[4] * y + e[8] * z + e[12];
+    out[i + 1] = e[1] * x + e[5] * y + e[9] * z + e[13];
+    out[i + 2] = e[2] * x + e[6] * y + e[10] * z + e[14];
+  }
+  return out;
+}
 export interface OrthoView {
   rect: Rect;
   /** The root-frame point at the centre of the view: [along the axis, up (side) or lateral (top)]. */
@@ -119,8 +136,8 @@ export interface ViewerScene {
   sculptTarget(): SculptTarget | undefined;
   /** Writes warped positions into every geometry (null restores the shipped ones); `finalize` recomputes normals. */
   applySculpt(fn: WarpFn | null, finalize: boolean): void;
-  /** Sculpt layout renders the orbit view into `main` and two orthographic views; single is the whole stage. */
-  setLayout(layout: 'single' | 'sculpt', main?: Rect): void;
+  /** The split layout renders the orbit view into `main` and two orthographic views; single is the whole stage. */
+  setLayout(layout: 'single' | 'split', main?: Rect): void;
   setOrthoView(view: 'side' | 'top', v: OrthoView): void;
   /** Stops the clips and puts the rig in its bind pose, or hands it back to the resting clip. */
   setRestPose(on: boolean): void;
@@ -285,7 +302,7 @@ export function createViewerScene(canvas: HTMLCanvasElement): ViewerScene {
   let markTargetCache: MarkTarget | undefined;
   /** Which mesh of the mark target a hit geometry is, so a pick can name the mesh it landed on. */
   let markIndexOf = new Map<THREE.BufferGeometry, number>();
-  let layout: 'single' | 'sculpt' = 'single';
+  let layout: 'single' | 'split' = 'single';
   let mainRect: Rect | undefined;
   const orthoViews: Partial<Record<'side' | 'top', OrthoView>> = {};
   const orthoCameras = { side: new THREE.OrthographicCamera(-1, 1, 1, -1, 0.1, 2000), top: new THREE.OrthographicCamera(-1, 1, 1, -1, 0.1, 2000) };
@@ -667,7 +684,7 @@ export function createViewerScene(canvas: HTMLCanvasElement): ViewerScene {
   function resize() {
     const w = canvas.clientWidth || 1, h = canvas.clientHeight || 1;
     renderer.setSize(w, h, false);
-    const r = layout === 'sculpt' && mainRect ? mainRect : { width: w, height: h };
+    const r = layout === 'split' && mainRect ? mainRect : { width: w, height: h };
     camera.aspect = Math.max(r.width, 1) / Math.max(r.height, 1);
     camera.updateProjectionMatrix();
   }
@@ -709,7 +726,7 @@ export function createViewerScene(canvas: HTMLCanvasElement): ViewerScene {
     controls.update();
     fill.position.copy(camera.position);
     fill.position.y += frameRadius * .4;
-    if (layout !== 'sculpt' || !mainRect) {
+    if (layout !== 'split' || !mainRect) {
       renderer.setScissorTest(false);
       renderer.setViewport(0, 0, canvas.clientWidth || 1, canvas.clientHeight || 1);
       renderer.render(scene, camera);

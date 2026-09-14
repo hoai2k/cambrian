@@ -1,4 +1,5 @@
 import { chromium } from 'playwright-core';
+import { silenceCounter } from '../qa-counter.mjs';
 import fs from 'node:fs';
 import assert from 'node:assert/strict';
 const base = (process.env.QA_BASE_URL || 'http://127.0.0.1:5173').replace(/\/$/, '');
@@ -8,6 +9,7 @@ const specimens = JSON.parse(fs.readFileSync('src/content/devonian/specimens.jso
 fs.mkdirSync(out, { recursive: true });
 const browser = await chromium.launch({ executablePath: '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome', args: ['--use-gl=angle', '--use-angle=swiftshader', '--enable-unsafe-swiftshader', '--no-sandbox'] });
 const page = await browser.newPage({ viewport: { width: 1440, height: 1000 } });
+await silenceCounter(page);
 const errors = [];
 page.on('pageerror', e => errors.push(e.message));
 page.on('response', r => { if (r.status() >= 400) errors.push(`${r.status()} ${r.url()}`); });

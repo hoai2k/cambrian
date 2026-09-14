@@ -62,6 +62,7 @@ every push to `main` (set the repository's Pages source to "GitHub Actions").
 | [`docs/environment-assets.md`](docs/environment-assets.md) | The seven biome props, nine biome paintings and five radar glyphs, and how the streamed sea consumes them. |
 | [`docs/art/colour-rendering.md`](docs/art/colour-rendering.md) | Runtime creature palettes and the portrait-variant fallback policy. |
 | [`docs/image-requests.md`](docs/image-requests.md) | Open image, glyph and prop requests — **currently none**. Delivered briefs: [`docs/image-requests-history.md`](docs/image-requests-history.md). |
+| [`docs/viewer-stretch.md`](docs/viewer-stretch.md) | The neck stretcher: lengthening a run of a raw generated body between two cuts, and baking it into the GLB. |
 | [`docs/stats.md`](docs/stats.md) | Visitor counting: what is recorded and what is not, how to switch it on, and how to read the numbers honestly. |
 | [`docs/audio-requests.md`](docs/audio-requests.md) | Sound and music requests, and what has been delivered. Extra music is optional; nothing waits on it. |
 
@@ -90,9 +91,11 @@ npm run portraits                 # palette-aware portraits match their snapshot
 run tools/audio-mix-test.ts       # audio density: how much of the reef's noise is in earshot
 run tools/harness.ts all 240      # balance: hunting, growth, escapes per creature
 run tools/harness.ts duel         # rival fights between creature pairs
+npm run stretch                   # the neck stretcher: the body held still, the head rigid, the region uniform
 npm run stats                     # the visitor counter: the site code, the per-game filters, every entry counted
 npm run preview & node tools/smoke.mjs /tmp   # needs Chromium; writes screenshots
 npm run preview & node tools/stats-smoke.mjs /tmp   # /stats/ off and on in a browser; gc.zgo.at is intercepted
+npm run preview & node tools/stretch-browser.mjs /tmp   # stretch mode: two cuts, one direction, the export
 npm run preview & node tools/biome-tour.mjs /tmp   # drives through every biome band; screenshots and streaming stats
 npm run preview & node tools/workbench-smoke.mjs /tmp   # audio workbench: plays sounds, flags missing samples
 ```
