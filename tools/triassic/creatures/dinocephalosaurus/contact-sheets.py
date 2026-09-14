@@ -12,7 +12,7 @@ sets = {
                              'Growth-0.75', 'Breathe-0.9'],
     'paired-era-clips-sheet': ['NeckStrike-0.2', 'NeckStrike-0.55', 'NeckStrike-0.9', 'NeckStrike-1.25',
                                'Ability-0.2', 'Ability-0.45', 'Ability-0.8',
-                               'Periscope-0.4', 'Periscope-1.6', 'Periscope-2.8', 'Breathe-2.1', 'mouth-NeckStrike'],
+                               'Periscope-0.4', 'Periscope-1.6', 'Periscope-2.8', 'Breathe-2.1', 'mouth-Attack'],
     # The one sheet this animal is judged on: the neck bending along its length, not at its base.
     'paired-neck-sheet': ['NeckStrike-0.0-nside', 'NeckStrike-0.2-nside', 'NeckStrike-0.4-nside', 'NeckStrike-0.55-nside',
                           'NeckStrike-0.7-nside', 'NeckStrike-0.9-nside', 'NeckStrike-1.2-nside',

@@ -38,6 +38,10 @@ def render(file, w=800, h=600, loc=(7.5, -5.5, 4.4), target=MID, scale=7.6):
 
 NECK = ([('NeckStrike', t) for t in [0., .2, .4, .55, .7, .9, 1.2]]
         + [('Periscope', t) for t in [.4, 1.6, 2.8]] + [('TurnLeft', .85), ('Guard', .6)])
+if '--mouth-only' in sys.argv:
+    for name, clip, t in [('mouth-closed', 'Idle', 0), ('mouth-Bite', 'Bite', .25), ('mouth-Attack', 'Attack', .14)]:
+        pose(clip, t); render(REVIEW / (name + '.png'), 1000, 750, (3.2, -5.6, .9), (0, -3.35, -.05), 1.5)
+    sys.exit(0)
 if '--neck-only' in sys.argv:
     for clip, t in NECK:
         pose(clip, t); render(REVIEW / ('%s-%s-nside.png' % (clip, t)), 900, 620, (8, -.85, .2), (0, -.85, .1), 7.8)
@@ -64,7 +68,8 @@ for name, loc, tgt, scale, w, h in [('side', (8, -.85, .1), (0, -.85, -.35), 7.6
                                     ('front', (0, -9.5, -.35), (0, -.85, -.35), 2.8, 1000, 750),
                                     ('belly', (0, -.85, -9), (0, -.85, 0), 8.0, 640, 900)]:
     pose('Idle', 0); render(REVIEW / (name + '.png'), w, h, loc, tgt, scale)
-for name, clip, t in [('mouth-closed', 'Idle', 0), ('mouth-Bite', 'Bite', .25), ('mouth-NeckStrike', 'NeckStrike', .55)]:
+MOUTH = [('mouth-closed', 'Idle', 0), ('mouth-Bite', 'Bite', .25), ('mouth-Attack', 'Attack', .14)]
+for name, clip, t in MOUTH:
     pose(clip, t); render(REVIEW / (name + '.png'), 1000, 750, (3.2, -5.6, .9), (0, -3.35, -.05), 1.5)
 for clip, t in NECK:
     pose(clip, t); render(REVIEW / ('%s-%s-nside.png' % (clip, t)), 900, 620, (8, -.85, .2), (0, -.85, .1), 7.8)
