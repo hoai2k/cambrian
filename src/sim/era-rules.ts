@@ -29,6 +29,15 @@ export interface EraHud {
   air?: boolean;
   /** Air-breathers: whether the last step found the body at the surface, breathing. */
   atSurface?: boolean;
+  /**
+   * Air-breathers: the breath being held, 1 at the surface down to 0. It is a clock on a dive, not
+   * a health bar — running it out stops stamina coming back, and nothing else by itself.
+   */
+  airLeft?: number;
+  /** The last minute of that breath, where the gauge flashes. */
+  airLow?: boolean;
+  /** Out of air *and* out of stamina: the body is going under, and hp is going with it. */
+  drowning?: boolean;
   /** 0..1 while a shore animal is winding up to strike at this player; 0 otherwise. */
   shoreWarn?: number;
   /** Held under by something that will not let it up: its bar is going and cannot come back. */

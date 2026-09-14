@@ -271,10 +271,20 @@ ok(RULES !== undefined && !RULES.growthByNutrition, 'Devonian rules active: grow
   for (const p of [tik, coc]) { p.hatching = false; p.state = 'free'; p.stateT = 0; p.stateDur = 0; p.spawnProtect = 0; p.pos.y = 20; p.prevT.y = 20; p.stamina = 0; }
   ok(RULES!.hud(g, 0)!.bimodal && !RULES!.hud(g, 1)!.bimodal, 'the HUD knows which bodies breathe both ways');
   const sink = new Map<number, InputFrame>([[0, { ...emptyInput(), sink: true }], [1, { ...emptyInput(), sink: true }]]);
-  for (let i = 0; i < 60 * 5; i++) { tik.pos.y = 20; coc.pos.y = 20; tick(g, sink); }
+  // One second, not five: at the shared rate a gill bar is full well inside five seconds, so the
+  // two ratios were being compared against a ceiling one of them had already hit and the lung
+  // looked worse than it is. A second is short enough that both are still climbing.
+  for (let i = 0; i < 60; i++) { tik.pos.y = 20; coc.pos.y = 20; tick(g, sink); }
   const lung = tik.stamina / tik.staminaMax, gill = coc.stamina / coc.staminaMax;
-  ok(gill > 0.5, `gills recover at the shared rate (${(gill * 100).toFixed(0)}% in 5 s)`);
-  ok(lung > 0 && lung < gill * 0.4, `lungs recover far slower under water (${(lung * 100).toFixed(0)}% against ${(gill * 100).toFixed(0)}%)`);
+  ok(gill > 0.1 && gill < 0.99, `gills recover at the shared rate and are still climbing (${(gill * 100).toFixed(0)}% in 1 s)`);
+  ok(lung > 0 && lung < gill * 0.95, `lungs recover slower under water (${(lung * 100).toFixed(0)}% against ${(gill * 100).toFixed(0)}%)`);
+  ok(Math.abs(RULES!.staminaRegen(g, tik) - 0.7) < 1e-9 && RULES!.staminaRegen(g, coc) === 1,
+    `and the hook says the share directly (${RULES!.staminaRegen(g, tik)})`);
+  // The point of the number: a lung that chose to fight at depth still has a bar to fight on. At a
+  // quarter rate it effectively did not, and the round trip stopped being a choice.
+  ok(lung > gill * 0.5, `a lung at depth is worse off, not shut off (${(lung * 100).toFixed(0)}% of the shared rate's ${(gill * 100).toFixed(0)}%)`);
+  // ...and five seconds still fills it, so the old end state is unchanged.
+  for (let i = 0; i < 60 * 5; i++) { tik.pos.y = 20; coc.pos.y = 20; tick(g, sink); }
   // ...and the whole bar is waiting at the surface.
   let gulps = 0;
   tik.pos.y = SURFACE_Y - 2; tik.prevT.y = tik.pos.y;
@@ -404,6 +414,14 @@ ok(RULES !== undefined && !RULES.growthByNutrition, 'Devonian rules active: grow
   ok(sT < sC, `Tiktaalik gets closer to the shore than Coccosteus (${sT.toFixed(1)} vs ${sC.toFixed(1)} from shoreZ ${shoreZ(tik.pos.x).toFixed(0)})`);
   ok(devActor(g, tik).beached, 'and counts as beached there');
   ok(!devActor(g, coc).beached, 'the fish never beaches');
+  // A breath taken on the sand breaks no water, and says so: `strength` on a gulp is what the
+  // renderer draws at the waterline over the body, and a beached animal is already in the air, so
+  // a splash drawn for it would hang above the beach with nothing under it.
+  devActor(g, tik).atSurface = false;
+  g.events.length = 0;
+  g.step(DT, inputs);   // not `tick`, which clears the events this is about
+  const sand = g.events.find((e) => e.kind === 'gulp' && e.actor === tik.id);
+  ok(!!sand && sand.strength === 0, `a breath on the sand breaks no water (strength ${sand?.strength})`);
 }
 
 // ---- armour ----

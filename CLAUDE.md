@@ -142,13 +142,26 @@ unless the user explicitly asks for a PR. Steps:
   branch on the era inside `game.ts`/`combat.ts`; add a hook. With `RULES` undefined the Cambrian
   takes exactly its old paths. The Triassic reuses the Devonian's five-stage ladder, feeding
   weights and fish swim model by importing them — none of that is Devonian — and adds its own:
-  `breathing: 'air'` is a stamina economy, not a meter (no recovery under water, a blow and a
-  full bar at the surface, no drowning), armour has a facing (`armourFacing`), the sea floor sinks
+  `breathing: 'air'` is a gauge *and* a stamina economy (`AIR_MAX`, five minutes, in
+  `src/sim/triassic/state.ts`), armour has a facing (`armourFacing`), the sea floor sinks
   by biome (`environment.floorDepth` → `depthProfile` in `src/sim/world.ts`; the other eras leave
   it out and keep their flat floor), and shore animals (`shore: true`, never pickable) are brainless actors pinned on
   the beach by `src/sim/triassic/shore.ts` that telegraph and strike into the water. No playable
   Triassic animal ever leaves the water; `shoreReach` is deliberately unused there.
   `npm run triassic` guards all of it.
+- A lungful is a gauge, and running it out is what the old flat rule now means. `AIR_MAX` seconds
+  of breath is filled whole by a blow at the surface and spent a second a second under water; while
+  it lasts an air-breather recovers stamina like anything else, so the deep is somewhere to hunt
+  rather than somewhere to visit on the bar you arrived with. Empty, the era's original rule bites:
+  no recovery at all. Drowning is what *that* costs and only in company — air gone **and** the bar
+  gone, over `DROWN_TIME`, which is seconds of visibly going under rather than a death on the frame
+  the two met, because the gauge has flashed for its last minute (`AIR_LOW`) by then and the climb
+  for air costs an air-breather nothing, so it is always escapable. Being held under is its own
+  case and has to be said outright now: nothing comes back while something has you, whatever is in
+  your chest, which is the promise the HUD was already making. An exhaustion hold eats the gauge
+  (`HELD_AIR_DRAIN`) as well as the bar — priced off `GRIP_BREAK`, so a hold carried to the end
+  costs about half a lungful — because a hold that only drained stamina stopped doing anything at
+  all once stamina came back under water. `npm run triassic` holds the lot.
 - The climb for air is the era's central act and must stay usable at every size. The shared rise
   rate is scaled by the body, but the water is not — the surface is the same twelve units above the
   shelf whether you hatched this minute or own the sea — so an air-breather's climb has a floor
