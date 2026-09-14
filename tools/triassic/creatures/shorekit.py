@@ -241,19 +241,39 @@ def curvature_over_section(pts, section):
     rig collapses the inside of the bend, so the mesh has to be unbent before binding.
 
     A run that is already straight has no curvature and returns `None` rather than dividing by zero.
+
+    The turning is measured on every third station, as the unbend in each builder already does:
+    band-to-band jitter is not anatomy, and summing it station by station reports a Tanystropheus
+    tail turning through 500 degrees and a Coelophysis neck through 1383, which are the numbers of a
+    noisy polyline rather than of an animal. The arc is measured on the full polyline, because
+    length is not inflated by jitter the way an angle sum is.
     """
     if len(pts) < 3 or section <= 0:
         return None
     arc = sum((pts[i + 1] - pts[i]).length for i in range(len(pts) - 1))
-    turn = turning(pts)
+    step = 3
+    coarse = pts[::step] + ([pts[-1]] if (len(pts) - 1) % step else [])
+    if len(coarse) < 3:
+        return None
+    turn = turning(coarse)
     if turn < 1e-6:
         return {'arc': round(arc, 4), 'totalTurningDeg': 0.0,
                 'meanCurvatureRadius': None, 'sectionRadius': round(section, 4),
                 'meanCurvatureRadiusOverSection': None}
     r = arc / math.radians(turn)
+    # A run that turns through more than a full circle has not been measured, it has been polluted:
+    # on a standing animal the band centroids where the limbs attach jump from side to side as each
+    # band picks up a different amount of leg, and the angle sum runs away. The number is still
+    # reported — it is evidence about the banding — but it is flagged, because the follow-up pass
+    # that re-bases these bodies on a neutral pose must not read a trunk's 577 degrees as anatomy.
+    reliable = turn <= 360.
     return {'arc': round(arc, 4), 'totalTurningDeg': round(turn, 1),
             'meanCurvatureRadius': round(r, 4), 'sectionRadius': round(section, 4),
-            'meanCurvatureRadiusOverSection': round(r / section, 2)}
+            'meanCurvatureRadiusOverSection': round(r / section, 2),
+            'reliable': reliable,
+            'unreliableBecause': None if reliable else
+            'the run turns through more than a full circle, which on a standing animal means the '
+            'band centroids are picking up limb geometry rather than the axis'}
 
 
 def limb_asymmetry(limbs, body_length, midline=0.):
@@ -432,8 +452,7 @@ class Albedo:
 
     def __init__(self, obj):
         self.obj = obj
-        self.uv = obj.data.uv_layers.active
-        assert self.uv is not None, 'the intake body has no active UV layer'
+        assert obj.data.uv_layers.active is not None, 'the intake body has no active UV layer'
         img = None
         for m in obj.data.materials:
             if not m or not m.use_nodes:
@@ -492,9 +511,17 @@ class Albedo:
         me = self.obj.data
         if poly_index is None or poly_index < 0 or poly_index >= len(me.polygons):
             return None
+        # The UV layer is looked up *now*, not cached in __init__. The builders split the body after
+        # this object is made — the jaw is cut off it — and a layer captured beforehand then indexes
+        # a mesh that has since changed: `wear_the_skin`, which runs after the split, asked loop
+        # 41112 of a layer holding 18612 and the build died. Holding the object and asking it for its
+        # current layer costs nothing and cannot go stale.
+        uv = me.uv_layers.active
+        if uv is None:
+            return None
         p = me.polygons[poly_index]
         vs = [me.vertices[i].co for i in p.vertices]
-        ls = [self.uv.data[li].uv for li in p.loop_indices]
+        ls = [uv.data[li].uv for li in p.loop_indices]
         if len(vs) < 3:
             return None
         fan = [(0, k, k + 1) for k in range(1, len(vs) - 1)]

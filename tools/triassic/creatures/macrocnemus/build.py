@@ -324,40 +324,40 @@ for n, d in seating.items():
     assert d > floor, ('a root sits outside the intake surface', n, d, floor)
 assert seating['jaw'] / HEAD_R > .25, ('the jaw hinge is not seated in the head', seating['jaw'], HEAD_R)
 
+REST_RUNS = {
+    'tail': [r for r in tail_line if r['geo'] <= TAIL_END][::-1],
+    'spine': [r for r in tail_line if r['geo'] > TAIL_END],
+    'neck': [r for r in neck_line if r['geo'] <= NECK_END][::-1]}
 # ---- how far the generation's own rest pose is from neutral ---------------------------------------
 # Two numbers, for the pass that will re-base every body on a `Neutral` clip (straight spine,
-# mirrored limbs, jaw closed). Measured here because the body is open and the axis is already banded.
+# mirrored limbs, jaw closed).
 #
 # 1. `meanCurvatureRadiusOverSection` per run, Dinocephalosaurus' measure: arc over total turning
-#    gives the radius the run curves on, divided by that run's own section radius. It says whether a
-#    curve is gentle *for a body that thick* — high means the rig can straighten it by rotating
-#    joints, low means the curve is tight enough for its girth that straightening it on the rig would
-#    collapse the inside of the bend, so the mesh has to be unbent before binding. That is the
+#    gives the radius the run curves on, divided by that run's own section radius, so it says whether
+#    a curve is gentle *for a body that thick*. High means the rig can straighten it by rotating
+#    joints; low means the curve is tight enough for its girth that straightening on the rig would
+#    collapse the inside of the bend and the mesh has to be unbent before binding — which is the
 #    decision this builder already had to make, now written down as a number.
+#
+#    It is measured on the **same rows the unbend uses**, not on the whole banding. A geodesic
+#    banding of a standing animal is contaminated at both ends: the far bands mix head with forefoot
+#    and the hip bands mix tail with hind leg, and summing centroid-to-centroid turning across that
+#    reports a neck bending through 896 degrees. Turning is coarsened to every third station for the
+#    same reason the unbend coarsens it — band-to-band jitter is not anatomy.
+#
 # 2. The left-right asymmetry of the paired limbs: the mean distance between each limb joint and its
 #    partner's mirrored position, over body length. These generations are drawn, not modelled to a
 #    rig, so the four limbs are posed mid-stride and do not match.
-#
-# The runs are split at this builder's *own* hips and shoulder rather than at a fraction, because the
-# three animals band their axes differently and a fraction does not mean the same thing to each.
-_rest_line = K.geodesic_line(auth, bands=110, seed_dir=SEED_TAIL)[0]
-_rest_axis = [Vector(r['c']) for r in _rest_line]
-_rest_r = [r['r'] for r in _rest_line]
-
-
-def _rest_nearest(p):
-    q = Vector(p)
-    return min(range(len(_rest_axis)), key=lambda i: (_rest_axis[i] - q).length)
-
-
-_i_hips, _i_shoulder = sorted((_rest_nearest(hips), _rest_nearest(shoulder)))
-rest_pose = {'curvature': {}, 'bandSplit': {'hips': _i_hips, 'shoulder': _i_shoulder,
-                                            'bands': len(_rest_axis)}}
-for _name, (_a, _b) in {'tail': (0, _i_hips), 'spine': (_i_hips, _i_shoulder),
-                        'neck': (_i_shoulder, len(_rest_axis) - 1)}.items():
-    _pts = _rest_axis[_a:_b + 1]
-    _sec = float(np.mean(_rest_r[_a:_b + 1])) if _b > _a else 0.
-    rest_pose['curvature'][_name] = K.curvature_over_section(_pts, _sec) if len(_pts) >= 3 else None
+rest_pose = {'curvature': {}, 'method': 'measured on the rows each run is unbent from, coarsened to '
+                                        'every third station; a geodesic banding of a standing '
+                                        'animal is contaminated by limb geometry at both ends'}
+for _name, _rows in REST_RUNS.items():
+    if len(_rows) < 4:
+        rest_pose['curvature'][_name] = None
+        continue
+    _pts = [Vector(r['c']) for r in _rows]
+    _sec = float(np.mean([r['r'] for r in _rows]))
+    rest_pose['curvature'][_name] = K.curvature_over_section(_pts, _sec)
 rest_pose['limbAsymmetry'] = K.limb_asymmetry(LIMBS, RAW_LENGTH, midline=float(np.median(co[:, 1])))
 print('REST_POSE', json.dumps(rest_pose))
 

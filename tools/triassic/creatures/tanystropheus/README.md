@@ -435,6 +435,55 @@ a redraw of the canonical pose. The absent eye globes are the same call — cutt
 separate globes would be inventing exterior shape, so the generation's sculpted-and-painted eyes
 stay.
 
+
+## Rest pose, mouth cut and limb sweep
+
+Numbers the re-basing pass asked for, measured while the body was open rather than re-derived later.
+
+**How far this generation's rest pose is from neutral.** `meanCurvatureRadiusOverSection` is
+Dinocephalosaurus' measure — the radius a run curves on, over that run's own section radius — so it
+says whether a curve is gentle *for a body that thick*. High means the rig can straighten it by
+rotating joints (Dinocephalosaurus' tail is about 20); low means the curve is tight enough for its
+girth that straightening on the rig collapses the inside of the bend and the mesh has to be unbent
+before binding. It is measured on the same rows this builder unbends from, coarsened to every third
+station.
+
+| Run | Turning | Section radius | Radius / section | Trustworthy |
+| --- | ---: | ---: | ---: | --- |
+| tail | 139.2° | 0.0195 | **6.08** | yes |
+| spine | 352.5° | 0.0686 | **0.94** | yes |
+| neck | 130.3° | 0.0199 | **15.38** | yes |
+
+**The trunk figure is not anatomy and is flagged as such.** A geodesic banding of a *standing*
+animal is contaminated where the limbs attach: each band picks up a different amount of leg, the
+centroids jump from side to side, and the angle sum runs away — which is why a short thick trunk
+reports more than a full circle of turning. The runs that matter for re-basing are the neck and the
+tail, and those are measured on rows the limbs are not in.
+
+**Paired-limb asymmetry**, the mean distance between each limb joint and its partner's mirrored
+position, over body length: **0.03135** (fore 0.02782) (hind 0.03488).
+These generations are drawn rather than modelled to a rig, so the four limbs are posed mid-stride
+and do not match; this is by how much.
+
+**The mouth cut against the measured lip line.** No modelled mouth slit on this head — the cavity
+instrument finds 1 vertices and none of them is a cavity — so the lip line is read off the
+albedo per station and the cut is the head's section at the median of those readings, which is
+Dinocephalosaurus' method. Max deviation of the cut from the per-station readings: **0.00899** of body
+length, worst at x = 0.5711. The readings themselves run 0.0388 to 0.588 of the head's
+section against the 0.2116 used, so the spread is wide and a single fraction is smoothing a
+contour that wanders — the deviation number is the honest size of that smoothing.
+
+**Limb sweep**, the total angle each limb root turns through per cycle (summed frame to frame, so a
+limb that goes forward, back and forward again has swept more than its extremes say):
+
+| Clip | Swept per cycle |
+| --- | --- |
+| `Sprint` | fore L 80.2°, fore R 80.2°, hind L 227.1°, hind R 227.1° |
+| `Crawl` | fore L 57.8°, fore R 57.8°, hind L 75.4°, hind R 75.4° |
+| `SnapLeft` | fore L 56.3°, fore R 35.4°, hind L 47.0°, hind R 24.9° |
+
+None of it. This animal stands on the beach and reaches; it never enters the water, so the paddling rule does not bear on it at all.
+
 ## What is still open
 
 - **The limb skinning tears, and this is the blocking defect on this animal.** It is *much* the mildest of the three and may well be shippable as it stands, but it is the same defect and it should be read next to the other two rather than on its own.

@@ -321,9 +321,59 @@ separated digits and no holes, so there is nothing to fill. Adding webbing would
 the animal does not have rather than closing a gap, and a long-toed terrestrial tanystropheid is not
 an animal the research gives webbed feet to.
 
+
+## Rest pose, mouth cut and limb sweep
+
+Numbers the re-basing pass asked for, measured while the body was open rather than re-derived later.
+
+**How far this generation's rest pose is from neutral.** `meanCurvatureRadiusOverSection` is
+Dinocephalosaurus' measure — the radius a run curves on, over that run's own section radius — so it
+says whether a curve is gentle *for a body that thick*. High means the rig can straighten it by
+rotating joints (Dinocephalosaurus' tail is about 20); low means the curve is tight enough for its
+girth that straightening on the rig collapses the inside of the bend and the mesh has to be unbent
+before binding. It is measured on the same rows this builder unbends from, coarsened to every third
+station.
+
+| Run | Turning | Section radius | Radius / section | Trustworthy |
+| --- | ---: | ---: | ---: | --- |
+| tail | 389.1° | 0.0159 | **5.85** | **no** — see below |
+| spine | 576.9° | 0.1345 | **0.53** | **no** — see below |
+| neck | 72.3° | 0.0283 | **7.77** | yes |
+
+**The trunk figure is not anatomy and is flagged as such.** A geodesic banding of a *standing*
+animal is contaminated where the limbs attach: each band picks up a different amount of leg, the
+centroids jump from side to side, and the angle sum runs away — which is why a short thick trunk
+reports more than a full circle of turning. The runs that matter for re-basing are the neck and the
+tail, and those are measured on rows the limbs are not in.
+
+**Paired-limb asymmetry**, the mean distance between each limb joint and its partner's mirrored
+position, over body length: **0.04077** (fore 0.0328) (hind 0.04874).
+These generations are drawn rather than modelled to a rig, so the four limbs are posed mid-stride
+and do not match; this is by how much.
+
+**The mouth cut against the measured lip line.** No modelled mouth slit on this head — the cavity
+instrument finds 9 vertices and none of them is a cavity — so the lip line is read off the
+albedo per station and the cut is the head's section at the median of those readings, which is
+Dinocephalosaurus' method. Max deviation of the cut from the per-station readings: **0.03114** of body
+length, worst at x = 0.3956. The readings themselves run 0.0888 to 0.6601 of the head's
+section against the 0.229 used, so the spread is wide and a single fraction is smoothing a
+contour that wanders — the deviation number is the honest size of that smoothing.
+
+**Limb sweep**, the total angle each limb root turns through per cycle (summed frame to frame, so a
+limb that goes forward, back and forward again has swept more than its extremes say):
+
+| Clip | Swept per cycle |
+| --- | --- |
+| `Run` | fore L 98.6°, fore R 99.6°, hind L 127.6°, hind R 127.6° |
+| `Charge` | fore L 289.8°, fore R 291.0°, hind L 390.6°, hind R 398.4° |
+| `Sprint` | fore L 67.7°, fore R 67.7°, hind L 129.2°, hind R 129.2° |
+| `Crawl` | fore L 56.0°, fore R 56.0°, hind L 71.1°, hind R 71.1° |
+
+`Charge` is the dash down into the shallows and is where it bears.
+
 ## What is still open
 
-- **The limb skinning tears, and this is the blocking defect on this animal.** The run that this animal exists for is the clip that tears worst, so the defect is squarely in the way of what it was built to do.
+- **The limb skinning tears — measurably, but on this animal not very visibly, and the gap between those two things is the point.** Its numbers are nearly Coelophysis' (23x against 25x), and yet its `Run` reads cleanly in the gait sheet: no ribbons, a coherent four-beat gait, feet that look like the generation's own long toes rather than torn geometry. Coelophysis at the same numbers has hind feet trailing off in plain sight. The difference is where the torn edges sit — this animal's worst ratio is in `Snatch`, a short clip, and its `Sprint` spread is in small feet — so the measurement over-states this animal and under-states that one. Read the number with the sheet, not instead of it.
 
   `node tools/triassic/skin-tears.mjs public/assets/triassic/creatures/macrocnemus.glb` sweeps every clip at
   17 phases and compares each triangle edge against its rest length. Every one of the twenty-six clips tears an edge past 2x. `Snatch` is the worst ratio at **23x** and `Sprint` the worst spread, with about 15,700 torn edge-instances and an edge reaching 0.304 on a body 4.89 long. `Run` is close behind at 11.9x. `hind_lower_L`, `hind_foot_L/R`, `body` and `chest` dominate throughout.

@@ -294,6 +294,56 @@ this is the animal whose feet are most on show, but the generation's feet are cl
 separated digits and no holes to fill, and a Chinle theropod at the water's edge is not an animal to
 give webbed feet to. What its feet actually need is the skinning fix, not more geometry.
 
+
+## Rest pose, mouth cut and limb sweep
+
+Numbers the re-basing pass asked for, measured while the body was open rather than re-derived later.
+
+**How far this generation's rest pose is from neutral.** `meanCurvatureRadiusOverSection` is
+Dinocephalosaurus' measure — the radius a run curves on, over that run's own section radius — so it
+says whether a curve is gentle *for a body that thick*. High means the rig can straighten it by
+rotating joints (Dinocephalosaurus' tail is about 20); low means the curve is tight enough for its
+girth that straightening on the rig collapses the inside of the bend and the mesh has to be unbent
+before binding. It is measured on the same rows this builder unbends from, coarsened to every third
+station.
+
+| Run | Turning | Section radius | Radius / section | Trustworthy |
+| --- | ---: | ---: | ---: | --- |
+| tail | 300.6° | 0.0219 | **5.24** | yes |
+| spine | 703.4° | 0.1481 | **0.43** | **no** — see below |
+| neck | 175.0° | 0.031 | **3.76** | yes |
+
+**The trunk figure is not anatomy and is flagged as such.** A geodesic banding of a *standing*
+animal is contaminated where the limbs attach: each band picks up a different amount of leg, the
+centroids jump from side to side, and the angle sum runs away — which is why a short thick trunk
+reports more than a full circle of turning. The runs that matter for re-basing are the neck and the
+tail, and those are measured on rows the limbs are not in.
+
+**Paired-limb asymmetry**, the mean distance between each limb joint and its partner's mirrored
+position, over body length: **0.06096** (fore 0.00333) (hind 0.11859).
+These generations are drawn rather than modelled to a rig, so the four limbs are posed mid-stride
+and do not match; this is by how much.
+
+**The mouth cut against the measured lip line.** No modelled mouth slit on this head — the cavity
+instrument finds 81 vertices and none of them is a cavity — so the lip line is read off the
+albedo per station and the cut is the head's section at the median of those readings, which is
+Dinocephalosaurus' method. Max deviation of the cut from the per-station readings: **0.06298** of body
+length, worst at x = 0.2826. The readings themselves run 0.1457 to 0.7776 of the head's
+section against the 0.6016 used, so the spread is wide and a single fraction is smoothing a
+contour that wanders — the deviation number is the honest size of that smoothing.
+
+**Limb sweep**, the total angle each limb root turns through per cycle (summed frame to frame, so a
+limb that goes forward, back and forward again has swept more than its extremes say):
+
+| Clip | Swept per cycle |
+| --- | --- |
+| `Run` | fore L 66.7°, fore R 66.0°, hind L 146.1°, hind R 147.8° |
+| `Charge` | fore L 225.4°, fore R 228.0°, hind L 436.9°, hind R 432.2° |
+| `Sprint` | fore L 49.2°, fore R 49.2°, hind L 141.5°, hind R 141.5° |
+| `Crawl` | fore L 29.5°, fore R 29.5°, hind L 82.7°, hind R 82.7° |
+
+`Charge` is the dash down into the shallows and is where it bears.
+
 ## What is still open
 
 - **Its builder briefly stopped running mid-pass, and the reason is worth keeping.** `build.py`
