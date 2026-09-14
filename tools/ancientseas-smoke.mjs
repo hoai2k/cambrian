@@ -2,6 +2,7 @@
 // the three game links followed. Usage: node tools/ancientseas-smoke.mjs <outdir>
 // Requires `npm run build && npx vite preview --port 4173` in another shell.
 import { chromium } from 'playwright-core';
+import { silenceCounter } from './qa-counter.mjs';
 const S = process.argv[2] ?? '.';
 // The three game links boot the real engine, so this needs the software renderer the other
 // browser smokes use; without it the sea never starts and the boot never finishes.
@@ -11,6 +12,7 @@ const check = (n, ok, d = '') => { console.log(`${ok ? 'PASS' : 'FAIL'}  ${n.pad
 for (const [name, viewport] of [['desktop', { width: 1440, height: 900 }], ['phone', { width: 390, height: 844 }]]) {
   for (const version of [1, 2]) {
     const page = await browser.newPage({ viewport });
+    await silenceCounter(page);
     const errors = [], missing = [];
     page.on('console', (m) => { if (m.type() === 'error') errors.push(m.text().slice(0, 200)); });
     page.on('pageerror', (e) => errors.push(e.message));
@@ -18,12 +20,28 @@ for (const [name, viewport] of [['desktop', { width: 1440, height: 900 }], ['pho
     await page.goto(`http://localhost:4173/?version=${version}`, { waitUntil: 'networkidle' });
     await page.waitForTimeout(800);
     await page.screenshot({ path: `${S}/ancientseas-v${version}-${name}.png`, fullPage: true });
-    // Three games, each reachable by its title and — in version 2 — by the animal over it, which
-    // is the same link twice and so one keyboard stop rather than two.
+    // What each game is drawn as, read off the page rather than from a list here: a game that is
+    // not out yet is marked, badged and not a link, and one that is open is a link and is not
+    // marked. Written this way, opening the third game is one line in page.ts and nothing here.
+    const state = await page.evaluate(() => ['cambrian', 'devonian', 'triassic'].map((id) => {
+      const el = document.querySelector(`[data-slot="${id}"]`) ?? document.querySelector(`.as-game-${id}`);
+      const caption = el?.querySelector('.as-caption small')?.textContent ?? '';
+      return {
+        id, drawn: !!el,
+        soon: !!el?.classList.contains('as-soon'),
+        link: el?.tagName === 'A' && !!el.getAttribute('href'),
+        badge: !!el?.querySelector('.as-badge') || /coming soon/i.test(caption),
+      };
+    }));
+    check(`v${version} ${name}: all three games are on the plate`, state.every((g) => g.drawn), state.map((g) => `${g.id}${g.drawn ? '' : ' MISSING'}`).join(' '));
+    check(`v${version} ${name}: a game not out yet is badged and is not a link`, state.filter((g) => g.soon).every((g) => g.badge && !g.link), state.filter((g) => g.soon).map((g) => `${g.id} badge:${g.badge} link:${g.link}`).join(' ') || 'none');
+    check(`v${version} ${name}: a game that is open is a link and is not badged`, state.filter((g) => !g.soon).every((g) => g.link && !g.badge), state.filter((g) => !g.soon).map((g) => `${g.id} badge:${g.badge} link:${g.link}`).join(' '));
     const links = await page.$$eval('a[href]', (as) => as.map((a) => ({ href: a.getAttribute('href'), tab: a.tabIndex >= 0 })));
     const games = links.filter((l) => /^\.\/(cambrian|devonian|triassic)\/$/.test(l.href ?? ''));
-    const where = [...new Set(games.map((l) => l.href))].sort();
-    check(`v${version} ${name}: the three games, once each`, where.length === 3 && games.filter((l) => l.tab).length === 3, `${where.join(' ')} · ${games.length} links, ${games.filter((l) => l.tab).length} tabbable`);
+    const where = [...new Set(games.map((l) => l.href))];
+    const opens = state.filter((g) => !g.soon);
+    // Each open game once for the keyboard, whichever half of it the pointer takes.
+    check(`v${version} ${name}: the open games, once each`, where.length === opens.length && games.filter((l) => l.tab).length === opens.length, `${where.join(' ')} · ${games.length} links, ${games.filter((l) => l.tab).length} tabbable`);
     const broken = await page.$$eval('img', (im) => im.filter((i) => !i.complete || i.naturalWidth === 0).map((i) => i.getAttribute('src')));
     check(`v${version} ${name}: every image drew`, broken.length === 0, broken.join(' '));
     check(`v${version} ${name}: nothing asked for a missing file`, missing.length === 0, missing.join(' '));
@@ -42,6 +60,7 @@ for (const [name, viewport] of [['desktop', { width: 1440, height: 900 }], ['pho
 // shows the player the sea for a moment and then cuts to the title — which reads as landing in
 // the wrong place. Checked at the first frame the app has mounted anything at all.
 const page = await browser.newPage({ viewport: { width: 1280, height: 800 } });
+await silenceCounter(page);
 const covering = () => page.waitForFunction(() => {
   const root = document.getElementById('root');
   if (!root || !root.firstElementChild) return false;
@@ -53,10 +72,13 @@ const covering = () => page.waitForFunction(() => {
   };
 }, null, { timeout: 20000 }).then((h) => h.jsonValue());
 
-for (const [href, url, title] of [['./cambrian/', 'http://localhost:4173/cambrian/', 'Cambrian Conquest'], ['./devonian/', 'http://localhost:4173/devonian/', 'Devonian Domination'], ['./triassic/', 'http://localhost:4173/triassic/', 'Triassic Triumph']]) {
+// The Triassic has no link on the plate, so it is opened by its address: its page is still there
+// and still works, and what changed is what the trilogy page offers.
+for (const [href, url, title] of [['./cambrian/', 'http://localhost:4173/cambrian/', 'Cambrian Conquest'], ['./devonian/', 'http://localhost:4173/devonian/', 'Devonian Domination'], [null, 'http://localhost:4173/triassic/', 'Triassic Triumph']]) {
   await page.goto('http://localhost:4173/', { waitUntil: 'load' });
-  await Promise.all([page.waitForURL(url, { timeout: 20000 }), page.click(`a[href="${href}"]`)]);
-  check(`link ${href} opens ${title}`, (await page.title()) === title, await page.title());
+  if (href) await Promise.all([page.waitForURL(url, { timeout: 20000 }), page.click(`a[href="${href}"]`)]);
+  else await page.goto(url, { waitUntil: 'load' });
+  check(`${href ? `link ${href} opens` : 'its own address still opens'} ${title}`, (await page.title()) === title, await page.title());
   const seen = await covering().catch((e) => ({ error: String(e).slice(0, 80) }));
   check(`${title}: a screen of its own, not the sea`, !!(seen.title || seen.boot), JSON.stringify(seen));
   // And one way off that screen that is not press start: back to the page these links came from.
@@ -79,6 +101,7 @@ for (const [href, url, title] of [['./cambrian/', 'http://localhost:4173/cambria
     navigator.getGamepads = () => [pad, null, null, null];
   });
   const page = await ctx.newPage();
+  await silenceCounter(page);
   await page.goto('http://localhost:4173/', { waitUntil: 'networkidle' });
   await page.evaluate(() => dispatchEvent(new Event('gamepadconnected')));
   const lit = () => page.$$eval('.as-lit', (n) => n.map((e) => e.getAttribute('data-slot')).join(' '));
@@ -95,11 +118,30 @@ for (const [href, url, title] of [['./cambrian/', 'http://localhost:4173/cambria
     return lit();
   };
   check('a pad lights nothing until it is used', (await lit()) === '');
-  check('d-pad right takes the first game', (await after(15, 'cambrian anomalocaris')) === 'cambrian anomalocaris', await lit());
-  check('and walks along the plate', (await after(15, 'devonian dunkleosteus')) === 'devonian dunkleosteus', await lit());
-  check('and back', (await after(14, 'cambrian anomalocaris')) === 'cambrian anomalocaris', await lit());
+  // The games it should walk, in the order they stand on the plate, read off the page: a game that
+  // is not out yet is not one of them, and opening it later changes this run without touching it.
+  const open = await page.$$eval('a[data-slot]', (as) => as
+    .filter((a) => a.querySelector('img')?.getAttribute('alt'))
+    .map((a) => a.getAttribute('data-slot')));
+  const litTitle = async () => (await lit()).split(' ')[0] ?? '';
+  const stepTo = async (button, want) => {
+    await press(button);
+    for (let i = 0; i < 12 && (await litTitle()) !== want; i++) await page.waitForTimeout(100);
+    return litTitle();
+  };
+  let walked = true, saw = [];
+  // One step further than there are games, to prove it wraps rather than stopping or stepping onto
+  // one that is not a way in.
+  for (let i = 0; i <= open.length; i++) {
+    const want = open[i % open.length];
+    const got = await stepTo(15, want);
+    saw.push(got);
+    if (got !== want) walked = false;
+  }
+  check(`the pad walks the ${open.length} open game(s) and wraps`, walked, `wanted ${open.join(' ')} + wrap · saw ${saw.join(' ')}`);
+  check('and never lights a game that is not a way in', (await page.$$eval('.as-soon.as-lit', (n) => n.length)) === 0);
   await press(0); // A
-  const opened = await page.waitForURL('**/cambrian/', { timeout: 10000 }).then(() => true).catch(() => false);
+  const opened = await page.waitForURL(`**/${open[0]}/`, { timeout: 10000 }).then(() => true).catch(() => false);
   check('A opens what is lit', opened, page.url());
   await ctx.close(); await plain.close();
 }
@@ -111,6 +153,7 @@ for (const [href, url, title] of [['./cambrian/', 'http://localhost:4173/cambria
 {
   const plain = await chromium.launch({ executablePath: '/opt/pw-browsers/chromium', args: ['--use-gl=angle', '--use-angle=swiftshader', '--enable-unsafe-swiftshader', '--no-sandbox'] });
   const page = await plain.newPage({ viewport: { width: 1280, height: 800 } });
+  await silenceCounter(page);
   const fs = () => page.evaluate(() => !!document.fullscreenElement);
 
   // On the roster, where a stray click starts nothing, so what is seen is the restore alone and

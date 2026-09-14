@@ -1,0 +1,58 @@
+{
+  "placodus.card.png": {
+    "bytes": 280999,
+    "sha256": "d1acfe765a017ab9e22ed80f782177d45accea452dca8e5d7b60d77eac8d49fe",
+    "dimensions": [
+      800,
+      600
+    ]
+  },
+  "placodus.glb": {
+    "bytes": 2111872,
+    "sha256": "58bd12ce335d244861808935b55212fc3254a496fe962c4aebc9dab7b1315ca1"
+  },
+  "placodus.json": {
+    "bytes": 2719,
+    "sha256": "14ec332f997b02538f785fc9f309332ef39750e2b90d58e9489f81c0d47909bf"
+  },
+  "placodus.lod1.glb": {
+    "bytes": 793848,
+    "sha256": "961e99bd4b45af68e66727a34b54b35ef0b09970d51d17727716450b7728ab7a"
+  },
+  "placodus.png": {
+    "bytes": 604503,
+    "sha256": "4148810bffe52c08ce1ece54c0018a0575855876c5de34090c76bcf34868a9fb",
+    "dimensions": [
+      1200,
+      900
+    ]
+  },
+  "placodus.puppet.glb": {
+    "bytes": 793848,
+    "sha256": "961e99bd4b45af68e66727a34b54b35ef0b09970d51d17727716450b7728ab7a"
+  },
+  "placodus.puppet.png": {
+    "bytes": 505034,
+    "sha256": "ef255f4e2a4e03459dd6277fd34db0b6e2fe714d499645fe324ee64e7dd4b493",
+    "dimensions": [
+      1200,
+      900
+    ]
+  },
+  "placodus.select.png": {
+    "bytes": 1050322,
+    "sha256": "dfb841202d0965973cac5f9c71907e8ba2600f7de021ce3bbd6a4579d1aa2190",
+    "dimensions": [
+      1600,
+      1200
+    ]
+  },
+  "placodus.thumb.png": {
+    "bytes": 35572,
+    "sha256": "0953e733bbb7eb650a9b1c20e7ac52c458d14178b2a748c3341190e33648080e",
+    "dimensions": [
+      256,
+      192
+    ]
+  }
+}

@@ -3,7 +3,7 @@ import { RULES } from './era-rules';
 import { BURROWERS, HEAVY_SPECIALS, DEFENSIVE_SPECIALS, CAMOUFLAGE_DRAIN, camouflageMatch, clearPursuit, stopHiding } from './concealment';
 import { abilitySpeed, beginExpansionAbility, beginHeavyStrike, heavyStrikeReach, specialHit, stepExpansionAbility, stepHeavyStrike, bloomRate, grazeRate } from './expansion-abilities';
 import { add, clamp, damp, dist, distXZ, dot, heading, len3, lerp, makeRng, norm, scale as vscale, sub, TAU, v3, wrapAngle, yawOf, type Rng, type Vec3 } from '../shared/math';
-import { applyScaleStats, bandOf, bodyGap, bodyRadius, canAct, clearanceOf, climbHeight, climbRise, floorClearance, glideOver, isAlive, isHidden, isInvulnerable, lengthOf, makeActor, massOf, speedFactor, staminaCost, surfaceGap } from './actors';
+import { applyScaleStats, bandOf, bodyGap, bodyRadius, canAct, clearanceOf, climbHeight, climbRise, floorClearance, glideOver, isAlive, isHidden, isInvulnerable, lengthOf, makeActor, massOf, speedFactor, staminaCost, surfaceGap, swimCeiling } from './actors';
 import { tierForScale, tierScale } from './tiers';
 import { makeBrain, peaceful, think, type AiWorld } from './ai';
 import { huntingPressure, phaseAt, untilNextPhase, type Phase } from './daynight';
@@ -359,6 +359,14 @@ interface Step {
  * a player still, and it is the point — you hatch once a life, and the first thing the sea shows
  * you is that you are the smallest thing in it.
  */
+/**
+ * How far out a death still counts as inshore, so the nursery is the right place to come back to.
+ * The nurseries sit 88 units off the beach and the shallows run out to about 135, so this covers
+ * the shore band and nothing beyond it: past here you are living somewhere, and `respawnAt` brings
+ * you back to it rather than to the beach.
+ */
+const RESPAWN_INSHORE = 170;
+
 export const HATCH_TIME = 5;
 /**
  * Where in that performance the seam gives, and with it the body: the player has their animal back
@@ -950,8 +958,8 @@ export class Game implements AiWorld {
     applyScaleStats(a, false);
     a.eaten = 0;
     a.stamina = a.staminaMax; a.poise = a.poiseMax;
-    // Back to a nursery near another player (the party stays together in an endless sea), or
-    // failing that the nearest one to where you died; never one a giant is loitering in.
+    // Back near another player (the party stays together in an endless sea), or failing that where
+    // you died.
     let ref = a.pos, refD = Infinity;
     for (const o of this.players) if (o !== a && isAlive(o)) { const d = distXZ(o.pos, a.pos); if (d < refD) { refD = d; ref = o.pos; } }
     const near = nearestNursery(ref.x, ref.z);
@@ -963,14 +971,51 @@ export class Game implements AiWorld {
       const score = danger * 100 + distXZ(ref, n) * 0.2;
       if (score < bd) { bd = score; nursery = n; }
     }
+    // `home` is still the nursery: it is where this animal hatched and what the teleport means.
+    // Where it comes *back* is a different question, and the answer is the water it was living in.
     a.home = { ...nursery };
-    this.world.loadAround(nursery);
-    a.pos = this.spawnPoint(nursery, a.creature, a.scale, a.player);
+    const at = this.respawnAt(ref, nursery);
+    this.world.loadAround(at);
+    a.pos = this.spawnPoint(at, a.creature, a.scale, a.player);
     a.vel = v3(); a.state = 'free'; a.stateT = 0; a.respawnT = 0; a.corpseT = 0; a.eaten = 0; a.eatBites = 0;
     stopHiding(a); a.camoStrength = 0; a.hideCd = 0; a.emergenceHeavy = false; a.spawnProtect = RULES?.spawnProtect(a) ?? 3.5; a.hitFlash = 0; a.abilityActive = false; a.abilityCd = 0; a.lockTarget = -1; a.hunted = 0; a.hunterId = -1; a.wasHunted = false; a.swallowedBy = -1; a.bank = 0; a.pitch = 0; a.climbTo = -Infinity; a.climbPush = 0; this.clearRide(a);
     a.yaw = Math.PI;
     this.beginHatch(a);
     void def;
+  }
+
+  /**
+   * Where a body comes back, given where it was and the nursery it hatched in.
+   *
+   * Dying used to send a player to the nearest nursery, and every nursery sits a fixed eighty-eight
+   * units off the beach — so an animal that had spent the whole match working its way out to the
+   * open sea was returned to the shallows every time something killed it, and had to swim the
+   * distance again. In a sea whose depth is the biome's own that is a longer walk back than it
+   * used to be, and it undoes the one thing the player was doing.
+   *
+   * So: come back in the water you were living in. Inshore that is still the nursery — it is the
+   * hatchery, it is safe by non-aggression, and it is in the shore band anyway, so nothing is
+   * gained by inventing a second answer for it. Further out, pick a spot around where you were at
+   * the same distance from shore, which is the same biome and the same depth, and away from
+   * whatever giant is in the area. A death still costs a rung and half the progress toward the
+   * next one; it does not also cost the swim.
+   */
+  private respawnAt(ref: Vec3, nursery: Vec3): Vec3 {
+    const s = shoreDistance(ref.x, ref.z);
+    if (s <= RESPAWN_INSHORE) return nursery;
+    let best = ref, bd = Infinity;
+    for (let i = 0; i < 8; i++) {
+      const ang = (i / 8) * TAU + this.rng() * 0.6;
+      const r = 30 + this.rng() * 70;
+      const p = { x: ref.x + Math.cos(ang) * r, y: 0, z: ref.z + Math.sin(ang) * r };
+      let danger = 0;
+      for (const g of this.actors) if (g.controller === 'giant' && isAlive(g) && distXZ(g.pos, p) < 70) danger += 1;
+      // Drifting in or out of the band you died in is what this is here to prevent, so it is
+      // scored heavily against; a giant in the area outweighs it anyway.
+      const score = danger * 100 + Math.abs(shoreDistance(p.x, p.z) - s) * 0.6;
+      if (score < bd) { bd = score; best = p; }
+    }
+    return best;
   }
 
   /**
@@ -1540,13 +1585,13 @@ export class Game implements AiWorld {
       if (a.grounded || a.pos.y <= floor) { a.pos.y = a.grounded ? damp(a.pos.y, floor, 18, dt) : floor; if (!a.grounded && a.hopVel < 0) { a.grounded = true; a.hopVel = 0; } }
       if (a.pos.y < floor) a.pos.y = floor;
       // a paddling crawler still cannot climb out of the sea
-      const ceiling = SURFACE_Y - 0.8 - clearanceOf(a);
+      const ceiling = swimCeiling(a);
       if (a.pos.y > ceiling) { a.pos.y = ceiling; if (a.vel.y > 0) a.vel.y = 0; if (a.hopVel > 0) a.hopVel = 0; }
     } else {
       // Riding the floor: a swimmer skims the sand and is carried up and over rocks rather than
       // stopped by them, so the climb reads as a swim rather than a step.
       if (a.pos.y < floor) { a.pos.y = floor; if (a.vel.y < 0) a.vel.y *= -0.2; }
-      const ceiling = SURFACE_Y - 0.8 - clearanceOf(a);
+      const ceiling = swimCeiling(a);
       if (a.airborne) {
         // back through the surface: the splash, and the water takes most of the fall out of it
         if (a.pos.y <= ceiling && a.vel.y < 0) {
@@ -1715,7 +1760,7 @@ export class Game implements AiWorld {
           // what it does when it gets there.
           const gripped = a.graspHold && this.closeGrip(a, t);
           if (gripped) { /* the pounce closed a grip; the release settles it */ }
-          else if (band === 'snack' && (t.controller === 'swarm' || (t.controller === 'ambient' && lengthOf(t) < L * 0.3))) this.consume(a, t);
+          else if (band === 'snack' && (t.controller === 'swarm' || (t.controller === 'ambient' && lengthOf(t) < L * 0.3))) this.takeWhole(a, t);
           else { const m = { ...def.heavy, name: 'Pounce', damage: def.heavy.damage * 1.35, poise: def.heavy.poise * 1.2, knockback: def.heavy.knockback * 0.8, lunge: 0 }; applyHit(this.hitCtx, a, t, m, 1.2); }
           this.events.push({ kind: 'pounce', pos: { ...a.pos }, actor: a.id, other: t.id, player: a.player, strength: L });
           a.vel = vscale(a.vel, 0.25); a.iframes = 0.1;
@@ -2524,7 +2569,7 @@ export class Game implements AiWorld {
         if (a.graspHold && a.grabbing < 0 && a.rideHost < 0 && this.closeGrip(a, o)) continue;
         const closing = clamp(dot(sub(a.vel, o.vel), norm(sub(o.pos, a.pos))) / (creature(a.creature).speed * speedFactor(a.scale) * 1.8), 0, 1.5);
         const band = bandOf(a, o);
-        if (band === 'snack' && (o.controller === 'swarm' || (o.controller === 'ambient' && lengthOf(o) < lengthOf(a) * 0.3))) { this.consume(a, o); continue; }
+        if (band === 'snack' && (o.controller === 'swarm' || (o.controller === 'ambient' && lengthOf(o) < lengthOf(a) * 0.3))) { this.takeWhole(a, o); continue; }
         const r = applyHit(this.hitCtx, a, o, m, closing);
         if (o.controller === 'player' && (band === 'rival')) this.flag(o, 'fought');
         void r;
@@ -2560,10 +2605,37 @@ export class Game implements AiWorld {
       // Only small wild things go down in one gulp. Players and bots always get a fight (three bites from a giant).
       if (o.controller !== 'swarm' && o.controller !== 'ambient') continue;
       if (o.controller === 'ambient' && lengthOf(o) > lengthOf(a) * 0.3) continue;
+      // Swimming through a cloud of plankton feeds you; swimming *at* an animal does not. For a
+      // player an animal is something to be caught — bitten, pounced on, taken in the mouth — and
+      // having one vanish as you closed on it was the whole of what made hunting feel like nothing
+      // happened. The reef's own predators still take a mouthful in passing.
+      if ((a.controller === 'player' || a.controller === 'bot') && o.controller !== 'swarm' && a.state !== 'attack' && a.state !== 'pounce') continue;
       // A nursery is a peace, and a mouthful taken in passing breaks it as surely as a hunt does.
       if (peaceful(o.pos) && a.lastHitBy !== o.id) continue;
-      if (dist(a.pos, o.pos) < L * 0.4 + bodyRadius(o) && (moving || a.state === 'attack')) this.consume(a, o);
+      if (dist(a.pos, o.pos) < L * 0.4 + bodyRadius(o) && (moving || a.state === 'attack')) this.takeWhole(a, o);
     }
+  }
+
+  /**
+   * Take a whole mouthful.
+   *
+   * A wild thing small enough to go down in one gulp is *removed* when wildlife takes it: nobody is
+   * watching, and a reef of grazers cannot afford a performance each. When a player takes one it is
+   * the whole point of the act, so it goes into the mouth and is eaten there — the body is carried
+   * along in front of the jaws and swallowed over the next second (`updateSwallowed`), which is the
+   * same performance a bigger kill already had. It used to vanish on contact, which read as prey
+   * evaporating as you reached it rather than as being caught.
+   */
+  private takeWhole(a: Actor, o: Actor) {
+    // A fish out of a school is a mouthful taken in passing, and a cloud of them is how a filter
+    // feeder eats: no ceremony there either, or crossing a shoal would be a hundred performances.
+    if (o.controller === 'swarm' || (a.controller !== 'player' && a.controller !== 'bot')) { this.consume(a, o); return; }
+    const ratio = clamp(lengthOf(o) / Math.max(lengthOf(a), 1e-3), 0.05, 1);
+    startSwallow(this.hitCtx, a, o);
+    // A mouthful is not a meal: the chew and the pause both follow how big the thing was.
+    o.stateDur = clamp(0.45 + ratio * 2.6, 0.45, 1.6);
+    a.holdT = clamp(ratio * 3, 0.3, 1.4);
+    this.flag(a, 'ate');
   }
 
   private consume(a: Actor, o: Actor) {

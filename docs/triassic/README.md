@@ -12,8 +12,10 @@ for the era's documents in one place next to `docs/devonian/`.
 | [02 · Biomes and depth](02-biomes-and-depth.md) | The nine biome slots recast for the Triassic, the water-depth profile (a sea floor that sinks toward the basin), and the prop and plant models each biome needs. |
 | [03 · Image and model requests](03-image-and-model-requests.md) | Every image and 3D model the era needs, in two tiers: Tier 1 goes through Tripo (all creatures, the shore animals, a few organic scenery pieces), Tier 2 is built in-house. Source-image briefs first, model requests against them second. |
 | [04 · Tripo pipeline](04-tripo-pipeline.md) | The production strategy: Tripo bodies on procedural skeletons, motion authored on the procedural twin and applied to the Tripo mesh; where the strategy is agreed with, where it is amended and why. |
+| [05 · The rest of the Mesozoic](05-mesozoic-expansion.md) | Widening the Triassic to the Jurassic and Cretaceous, or a fourth game: the mosasaurs, Archelon, pliosaurs, elasmosaurs, Leedsichthys, the marine crocodiles and diving birds, with kits on the existing traits; four new mechanics (the sky, the gape, weight, the bends); biomes; which twelve bodies to carry if the Triassic is widened instead. Proposal, not built. |
 | [canonical/](canonical/README.md) | The approved pose for each subject: the visual contract every model is made from, greenlit before anything is built from it. 26 images, plus the generated [review.md](canonical/review.md). |
 | [research.md](research.md) | The natural-history notes and sources the roster and biomes were drawn from, with confidence labels. |
+| [proportion-audit.md](proportion-audit.md) | Every Triassic body measured against that research, 13 September 2026: what each one's proportions actually are, which documented proportions they contradict, and whether the fix is a regeneration or a new canonical pose. |
 
 ## Built: the playable skeleton
 

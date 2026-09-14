@@ -135,19 +135,22 @@ for (const era of ['cambrian', 'devonian', 'triassic']) {
 
 // ---------------------------------------------------------------- the wiring
 
-// Every page a link from outside can land on. The workbench is a dev bench and /stats/ is ours,
-// so neither counts — but a game that forgets to call this is the whole failure mode above.
+// The games, and only the games. The counter is there to answer "is anyone I don't know playing
+// these?", so a page that is not one of them is noise in the total — but a game that forgets to
+// call this is the whole failure mode above.
 const ENTRIES = [
   'src/ancientseas/main.tsx', 'src/cambrian/main.tsx', 'src/devonian/main.tsx',
-  'src/triassic/main.tsx', 'src/viewer/main.tsx',
+  'src/triassic/main.tsx',
 ];
 for (const entry of ENTRIES) {
   const src = read(entry);
   ok(/\binstallStats\(\)/.test(src), `${entry} installs the counter`);
   ok(/from '\.\.?\/shared\/stats'/.test(src), `${entry} imports it from the one module`);
 }
-for (const entry of ['src/workbench/main.tsx']) {
-  ok(!/installStats/.test(read(entry)), `${entry} is a bench and is not counted`);
+// The secondary pages, which must stay uncounted. The viewer counted once and was taken back out:
+// asserting it stays out is what stops it drifting back in on the next pass through that file.
+for (const entry of ['src/workbench/main.tsx', 'src/viewer/main.tsx']) {
+  ok(!/installStats/.test(read(entry)), `${entry} is a secondary page and is not counted`);
 }
 
 // The three game pages choose an era before anything else runs, and the counter is called inside

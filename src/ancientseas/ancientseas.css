@@ -67,6 +67,14 @@ a:focus-visible { outline: 2px solid var(--as-gold); outline-offset: 6px; border
 .as-game:hover, .as-game:focus-visible { transform: translateY(-4px); }
 .as-game:focus-visible { outline: none; }
 .as-game:focus-visible .as-art { outline: 2px solid var(--as-gold); outline-offset: -2px; }
+/* A game that is not out yet: on the dark draft the same idea, quieter art and a badge in place of
+   the date it would otherwise carry. */
+.as-game.as-soon { cursor: default; }
+.as-game.as-soon .as-art { filter: grayscale(.6) brightness(.6); }
+.as-game.as-soon:hover { transform: none; }
+.as-game.as-soon .as-caption b { color: var(--as-cream-dim); }
+.as-game.as-soon .as-caption small { color: var(--as-gold-2); letter-spacing: .3em; }
+
 /* The paintings' vignettes reach near-black but not quite, and not evenly; the mask finishes the
    job so every edge ends in the page's own dark instead of a faint rectangle. */
 .as-art { display: block; width: 100%; height: auto; aspect-ratio: 3 / 2; object-fit: cover;
@@ -123,10 +131,34 @@ a:focus-visible { outline: 2px solid var(--as-gold); outline-offset: 6px; border
 .as-slot-animal { transition: transform .28s cubic-bezier(.2,.8,.2,1), filter .28s; }
 /* The animal is half of its game's link, so it takes the pointer that says so. */
 a.as-slot-animal { cursor: pointer; }
-.as-slot-animal.as-lit { --grow: 1.05; }
+/* The title and the animal are one link, so they answer as one: the same growth, from the same
+   class, on the same transition. Which half the pointer is over — or whether there is a pointer at
+   all — cannot change what the game does, and it did: the animal grew from `as-lit` while the
+   title grew only under a direct hover, and by a different amount, so a pad lifted the animal
+   alone and a pointer on the title lifted the two by different steps. */
+.as-slot-title.as-lit, .as-slot-animal.as-lit { --grow: 1.05; }
 .as-slot-animal.as-lit img { filter: brightness(1.05) drop-shadow(2px 7px 7px rgba(50, 32, 10, .32)); }
 .as-slot-animal.as-lit.as-src-stand-in img { filter: sepia(.25) contrast(.95) brightness(1.05) drop-shadow(2px 7px 7px rgba(50, 32, 10, .32)); }
 .as-slot-title.as-lit { filter: var(--as-halo) brightness(1.04); }
+
+/* A game that is not out yet. It keeps its place and its drawing and gives up everything that
+   makes it a way in: no lift under the pointer, no hand, and the ink sits back into the paper the
+   way an unfinished plate's does — faded and a little grey, still legible, plainly not for now. */
+.as-soon { cursor: default; }
+/* The fade goes on the drawing, not on the slot: a filter on the slot would take the badge down
+   with it, and the badge is the one thing here that has to be read. The title goes further back
+   than the animal — it is the control — but the animal stays a drawing rather than a ghost, or
+   the right-hand third of the plate reads as a rendering fault instead of a game that is coming. */
+.as-slot.as-soon { transition: none; }
+.as-slot-title.as-soon img { filter: var(--as-halo) saturate(.4) opacity(.45); }
+.as-slot-animal.as-soon img { filter: saturate(.55) opacity(.72); }
+/* The badge, under the title it belongs to: small engraved capitals on a torn slip of the paper,
+   which is the one thing on this plate that is allowed to look newer than the rest of it. */
+.as-badge { position: absolute; left: 50%; bottom: -16%; transform: translateX(-50%); white-space: nowrap;
+  font: 400 clamp(12px, 5.5cqw, 26px)/1 var(--as-serif); font-variant: small-caps; letter-spacing: .28em; padding: .42em .7em .38em .98em;
+  color: #160f06; background: linear-gradient(180deg, rgba(255, 250, 233, .96), rgba(233, 217, 178, .96));
+  border: 1px solid rgba(60, 42, 18, .45); border-radius: 2px; box-shadow: 0 2px 6px rgba(50, 32, 10, .35), inset 0 0 0 1px rgba(255, 252, 240, .5); }
+.as-slot-title { container-type: inline-size; }
 /* The shipped emblems standing in are lit for the dark UI; a touch of sepia and a shadow settles them onto paper. */
 .as-slot-animal.as-src-stand-in img { filter: sepia(.25) contrast(.95) drop-shadow(1px 3px 3px rgba(50, 32, 10, .3)); transform: scale(.8); transform-origin: 50% 0; }
 
@@ -140,9 +172,10 @@ a.as-slot-animal { cursor: pointer; }
    resting one; on an image it is a filter, on the typeset stand-in the same thing as a shadow. */
 .as-slot-title { --as-halo: drop-shadow(0 0 4px rgba(255, 247, 226, .55)) drop-shadow(0 1px 2px rgba(60, 40, 15, .22));
   text-decoration: none; transition: transform .28s cubic-bezier(.2,.8,.2,1), filter .28s; filter: var(--as-halo); }
-/* `filter` replaces rather than adds, so the hover state has to carry the halo itself or the
-   lettering loses its light the moment the pointer arrives. */
-a.as-slot-title:hover, a.as-slot-title:focus-visible { --grow: 1.03; filter: var(--as-halo) brightness(1.04); outline: none; }
+/* Hovering or focusing a title lights the whole game through `as-lit` above, which is where the
+   growth and the brightening live. All that is left here is to take the browser's own outline off
+   a focus that is already drawn as a lit game. */
+a.as-slot-title:hover, a.as-slot-title:focus-visible { outline: none; }
 a.as-slot-title:focus-visible img { outline: 2px solid #15100a; outline-offset: 8px; border-radius: 6px; }
 .as-slot-title.as-src-stand-in img { filter: drop-shadow(1px 3px 4px rgba(50, 32, 10, .3)); }
 .as-slot[data-slot='trilogy'] .as-title-text { height: 100%; align-content: center; }

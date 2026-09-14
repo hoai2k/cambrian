@@ -529,6 +529,20 @@ function nearestBones(g: AiWorld, a: Actor) {
   return best;
 }
 
+/**
+ * Whether a giant turns what it has seen into a hunt.
+ *
+ * Hunger decides, and nothing else does. Being seen used to be enough on its own — a clear sighting
+ * scored 2.8 and any giant that could see you came down, however recently it had eaten — so every
+ * giant in the sea was hunting the moment a player swam into the open, and a player who wanted to
+ * *approach* one (to ride it, to swim past it, to look at it) was eaten for trying. A fed giant is
+ * the least dangerous animal in the reef: it sees you, the head comes round, and it carries on with
+ * its route. Whether it is hungry follows the hour and the water it is over, which is where the
+ * rhythm of the day is set (`appetiteAt`) — so a giant is a threat often enough to be one, and not
+ * so often that the sea is nothing but red warnings.
+ */
+const wantsToHunt = (hungry: boolean, score: number) => hungry && score >= 2;
+
 export function thinkGiant(g: AiWorld, a: Actor, b: BrainState, dt: number): InputFrame {
   const out = emptyInput();
   const def = creature(a.creature);
@@ -536,8 +550,6 @@ export function thinkGiant(g: AiWorld, a: Actor, b: BrainState, dt: number): Inp
   b.goalT += dt; b.thinkT -= dt; b.hunger += dt;
   if (a.eats !== b.lastEats) { b.lastEats = a.eats; b.hunger = 0; }
   if (b.thinkT <= 0) { b.thinkT = 0.1; updateDetection(g, a, b, 0.1); }
-  const cur = b.target >= 0 ? g.byId(b.target) : undefined;
-  const curScore = cur ? (b.detection.get(cur.id) ?? 0) : 0;
   // Giants cruise high and only come down when hungry, or when something practically swims into
   // their mouth. Noticing is telegraphed before any dive.
   //
@@ -556,15 +568,21 @@ export function thinkGiant(g: AiWorld, a: Actor, b: BrainState, dt: number): Inp
     const found = bestDetected(b, 1, g);
     if (found) {
       const score = b.detection.get(found.id) ?? 0;
-      if (score >= 2.8 || (hungry && score >= 2)) { b.goal = 'hunt'; b.target = found.id; b.goalT = 0; b.lastSeen = { ...found.pos }; }
+      if (wantsToHunt(hungry, score)) { b.goal = 'hunt'; b.target = found.id; b.goalT = 0; b.lastSeen = { ...found.pos }; }
       else if (b.goal !== 'search') { b.goal = 'notice'; b.target = found.id; b.goalT = 0; }
     }
   }
+  // *After* the goal has been picked, not before it. Read at the top, this was one step stale: a
+  // giant that had just decided to notice something looked at the target it had a step ago, found
+  // nothing there, and dropped straight back to patrolling — every step, for ever. Nothing ever
+  // reached `notice`, which is the whole of a giant's tell before it comes down.
+  const cur = b.target >= 0 ? g.byId(b.target) : undefined;
+  const curScore = cur ? (b.detection.get(cur.id) ?? 0) : 0;
   switch (b.goal) {
     case 'notice': {
       // Turn toward it and hang in the water: the player sees the head swing round and the eye fill.
       if (cur && isAlive(cur)) { const to = norm(sub(cur.pos, a.pos)); out.worldMove = vscale({ x: to.x, y: 0, z: to.z }, 0.18); }
-      if (cur && isAlive(cur) && (curScore >= 2.8 || (hungry && curScore >= 2))) { b.goal = 'hunt'; b.goalT = 0; b.lastSeen = { ...cur.pos }; break; }
+      if (cur && isAlive(cur) && wantsToHunt(hungry, curScore)) { b.goal = 'hunt'; b.goalT = 0; b.lastSeen = { ...cur.pos }; break; }
       if (b.goalT > 3 || !cur || !isAlive(cur) || curScore < 0.6) {
         b.goal = 'patrol'; b.goalT = 0; b.target = -1;
         if (cur) b.detection.set(cur.id, Math.min(curScore, 0.8)); // it looked, it lost interest; do not re-notice instantly
@@ -596,7 +614,7 @@ export function thinkGiant(g: AiWorld, a: Actor, b: BrainState, dt: number): Inp
     }
     case 'search': {
       const found = bestDetected(b, 1.6, g);
-      if (found && (hungry || (b.detection.get(found.id) ?? 0) >= 2.8)) { b.goal = 'hunt'; b.target = found.id; b.goalT = 0; break; }
+      if (found && hungry) { b.goal = 'hunt'; b.target = found.id; b.goalT = 0; break; }
       if (b.lastSeen) steerToward(a, add(b.lastSeen, { x: Math.sin(g.time * 0.8) * 6, y: 2, z: Math.cos(g.time * 0.7) * 6 }), out, 0.5);
       if (b.goalT > 5) { b.goal = 'patrol'; b.goalT = 0; b.hunger = Math.min(b.hunger, 40); }
       break;

@@ -1,9 +1,18 @@
 [
   {
+    "id": "aphaneramma",
+    "model": "assets/triassic/creatures/aphaneramma.preview.glb",
+    "bytes": 1307736,
+    "sha256": "60fcca79756c6321a395ee551c518abd46f965caac043817ef1089601f8a73f6",
+    "yaw": 180,
+    "scale": 5.18,
+    "lengthUnits": 5.18
+  },
+  {
     "id": "askeptosaurus",
     "model": "assets/triassic/creatures/askeptosaurus.preview.glb",
-    "bytes": 1522268,
-    "sha256": "1c4cdc6d30e97d72a65162e7bafe85bd417c310ea3c0b500cbbe8398e7ee19e6",
+    "bytes": 1516160,
+    "sha256": "a57ec31122d5eeadd314b0c2eafa2f92d6b472054ff7d15adbb7a9e2808a92cd",
     "yaw": 0,
     "scale": 6.62,
     "lengthUnits": 6.62
@@ -12,7 +21,7 @@
     "id": "atopodentatus",
     "model": "assets/triassic/creatures/atopodentatus.preview.glb",
     "bytes": 1371660,
-    "sha256": "569badc2582ce5687aec344a7741e8d60d4325b0de62ddf87af4854d9f1f8b6e",
+    "sha256": "3cf3d4a23354c0b4606aad79b6327da351b82850e3db4e30dcdc77fbda296644",
     "yaw": -90,
     "scale": 7.32,
     "lengthUnits": 7.32
@@ -21,7 +30,7 @@
     "id": "birgeria",
     "model": "assets/triassic/creatures/birgeria.preview.glb",
     "bytes": 1405984,
-    "sha256": "cf0066f158e010af6bf9144fb42178acf56ad8a50ea4ef5674c129f120b7eb32",
+    "sha256": "3dcf1653da95899f27272bb5524c99478d723ead46409e96707a684762d9edf4",
     "yaw": -90,
     "scale": 5.53,
     "lengthUnits": 5.53
@@ -135,6 +144,15 @@
     "lengthUnits": 4
   },
   {
+    "id": "mystriosuchus",
+    "model": "assets/triassic/creatures/mystriosuchus.preview.glb",
+    "bytes": 1531012,
+    "sha256": "0877e8939be9e024aa3c8788ad70f43790993d8fb357dc05d3db8fb8ab24c361",
+    "yaw": 180,
+    "scale": 8.57,
+    "lengthUnits": 8.57
+  },
+  {
     "id": "odontochelys",
     "model": "assets/triassic/creatures/odontochelys.preview.glb",
     "bytes": 1470864,
@@ -147,7 +165,7 @@
     "id": "phragmoteuthis",
     "model": "assets/triassic/creatures/phragmoteuthis.preview.glb",
     "bytes": 1585836,
-    "sha256": "c00c71573f3adc3157f0bdd09f4deada27b5e6aa0827b7ba98c1793420c6f00c",
+    "sha256": "353fbaf4134cc22af038aed461071ffd5c49bd5c66c73df84960e50e808a9aa7",
     "yaw": -90,
     "scale": 2.42,
     "lengthUnits": 2.42
@@ -162,6 +180,15 @@
     "lengthUnits": 6.62
   },
   {
+    "id": "rhaeticosaurus",
+    "model": "assets/triassic/creatures/rhaeticosaurus.preview.glb",
+    "bytes": 1335868,
+    "sha256": "867bc10e01d1ff3ed4c387ab454e72ff42611c8a98a3c0044d9319746dea0938",
+    "yaw": 180,
+    "scale": 6.2892,
+    "lengthUnits": 7.32
+  },
+  {
     "id": "saurichthys",
     "model": "assets/triassic/creatures/saurichthys.preview.glb",
     "bytes": 1253544,
@@ -173,8 +200,8 @@
   {
     "id": "tanystropheus",
     "model": "assets/triassic/creatures/tanystropheus.preview.glb",
-    "bytes": 1472892,
-    "sha256": "540dd697ad385f628ee5f30f4fcc8741bad4cf3c9e131395db1f652e4aa90532",
+    "bytes": 1466260,
+    "sha256": "2eeedc87a9200d6084b1a60a52afb621bcbc2c01f67a8f2d97f9f56ee007cb11",
     "yaw": 0,
     "scale": 10.22,
     "lengthUnits": 10.22

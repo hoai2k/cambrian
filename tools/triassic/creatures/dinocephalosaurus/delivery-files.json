@@ -1,0 +1,58 @@
+{
+  "dinocephalosaurus.card.png": {
+    "bytes": 293114,
+    "sha256": "7a0328594249b98d48d0b695ad852d0eb209bdded2a911c9000cd3400b8d40e0",
+    "dimensions": [
+      800,
+      600
+    ]
+  },
+  "dinocephalosaurus.glb": {
+    "bytes": 2686276,
+    "sha256": "216e77811a9ba5aeed6ba23df400e59580f03ea8a34fc1a157d043f30cf0f51c"
+  },
+  "dinocephalosaurus.json": {
+    "bytes": 2862,
+    "sha256": "6c13cfea550f75cb752b0fe72cc9ecf890f9ca1cb85efd7b1ff5a4fd8086ab7d"
+  },
+  "dinocephalosaurus.lod1.glb": {
+    "bytes": 1490832,
+    "sha256": "a6c6c5cb25bbf02af760c103ec65230509c2ff9d62e0e59026c697bf8c0abd0e"
+  },
+  "dinocephalosaurus.png": {
+    "bytes": 625545,
+    "sha256": "0e8701984e390ae20239f059d93231f8fd4e7fca218e2bc0e97f0d319a1a7c08",
+    "dimensions": [
+      1200,
+      900
+    ]
+  },
+  "dinocephalosaurus.puppet.glb": {
+    "bytes": 1490832,
+    "sha256": "a6c6c5cb25bbf02af760c103ec65230509c2ff9d62e0e59026c697bf8c0abd0e"
+  },
+  "dinocephalosaurus.puppet.png": {
+    "bytes": 380349,
+    "sha256": "3ebb66eee8a1e04ea64764b79d87131a41a3814f67066cf0335482166db874ab",
+    "dimensions": [
+      1200,
+      900
+    ]
+  },
+  "dinocephalosaurus.select.png": {
+    "bytes": 1078312,
+    "sha256": "2ffc06c1eb261cc841fad2325ac342e1791e093fbd4170e3626f8380cd6a0f8f",
+    "dimensions": [
+      1600,
+      1200
+    ]
+  },
+  "dinocephalosaurus.thumb.png": {
+    "bytes": 36590,
+    "sha256": "79cec689fca367d4337536c6e65a18f861871b3004d0dbc3c4fc23bd1c663c05",
+    "dimensions": [
+      256,
+      192
+    ]
+  }
+}

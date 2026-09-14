@@ -14,7 +14,7 @@ import { DEVONIAN } from '../src/content/devonian';
 import { TRIASSIC } from '../src/content/triassic';
 import { padDir, step } from '../src/ancientseas/picker';
 import { emptyControls } from '../src/input/input';
-import { ANIMAL_ERA, ART_DIR, BIG_ANIMAL, DEFAULT_VERSION, GAMES, REQUESTED, SLOTS, STAGE, TRILOGY_LOGO, isDelivered, parseVersion, sourceFor } from '../src/ancientseas/page';
+import { ANIMAL_ERA, ART_DIR, BIG_ANIMAL, COMING_SOON, DEFAULT_VERSION, GAMES, OPEN_GAMES, REQUESTED, SLOTS, STAGE, TRILOGY_LOGO, isDelivered, parseVersion, sourceFor } from '../src/ancientseas/page';
 
 let passes = 0;
 const ok = (cond: unknown, msg: string) => { assert.ok(cond, msg); passes++; };
@@ -206,6 +206,14 @@ ok(/aria-hidden=\{isTitle \? undefined : true\}/.test(page) && /tabIndex=\{isTit
 const css2 = readFileSync('src/ancientseas/ancientseas.css', 'utf8');
 ok(/--as-halo:/.test(css2) && (css2.match(/filter: var\(--as-halo\)/g) ?? []).length >= 2, 'resting and hover titles carry the same halo');
 ok(!/a\.as-slot-title:hover[^}]*filter: brightness/.test(css2), 'and hover does not replace it with a bare brightness');
+/**
+ * The two halves of a game answer as one. They grew from two different rules once — the animal
+ * from the lit state, the title only under a direct hover and by a smaller step — so a pad lifted
+ * the animal alone and a pointer on the title lifted the two by different amounts.
+ */
+ok(/\.as-slot-title\.as-lit, \.as-slot-animal\.as-lit \{ --grow: [\d.]+; \}/.test(css2), 'the title and the animal grow from one rule, by one amount');
+ok(!/a\.as-slot-title:hover[^}]*--grow/.test(css2), 'and no hover grows a title on its own');
+ok((css2.match(/transition: transform \.28s cubic-bezier\(\.2,\.8,\.2,1\), filter \.28s/g) ?? []).length >= 2, 'on the same transition');
 // A lit animal comes up in size where it stands: a drawing on paper that slides has come loose.
 ok(/\.as-slot-animal\.as-lit \{ --grow: [\d.]+; \}/.test(css2), 'the lit animal grows');
 ok(!/--lift/.test(css2), 'and nothing moves a piece off its place to say it is chosen');
@@ -217,13 +225,19 @@ ok(/\.as-stage \{[^}]*width: min\(100vw, calc\(100svh \* 1\.6\)\)/.test(css2), '
  * A pad walks the three games. The plate is links, which are a pointer's and a Tab key's business,
  * so without this a player holding a controller has nothing to press.
  */
-const ORDER = GAMES.map((g) => g.id);
-eq(step(null, 'right', ORDER), 'cambrian', 'a push right with nothing chosen starts at the near end');
-eq(step(null, 'left', ORDER), 'triassic', 'and a push left at the far one');
-eq(step('cambrian', 'right', ORDER), 'devonian', 'right walks along the plate');
-eq(step('triassic', 'right', ORDER), 'cambrian', 'and wraps rather than stopping');
-eq(step('cambrian', 'left', ORDER), 'triassic', 'as does left');
-eq(step('devonian', 'left', ORDER), 'cambrian', 'left walks back');
+// Written against whichever games are open rather than against today's three, so opening the
+// third one is the one line in page.ts and nothing here.
+const ORDER = OPEN_GAMES.map((g) => g.id);
+const [first, last] = [ORDER[0], ORDER[ORDER.length - 1]];
+ok(ORDER.length >= 1, 'at least one game is a way in');
+eq(step(null, 'right', ORDER), first, 'a push right with nothing chosen starts at the near end');
+eq(step(null, 'left', ORDER), last, 'and a push left at the far open one');
+eq(step(last, 'right', ORDER), first, 'right wraps rather than stopping, past anything not out yet');
+eq(step(first, 'left', ORDER), last, 'as does left');
+if (ORDER.length > 1) {
+  eq(step(first, 'right', ORDER), ORDER[1], 'right walks along the plate');
+  eq(step(ORDER[1], 'left', ORDER), first, 'left walks back');
+}
 const pad = (over: Partial<ReturnType<typeof emptyControls>>) => padDir({ ...emptyControls(), ...over });
 eq(pad({}), null, 'a pad at rest asks for nothing');
 eq(pad({ dright: true }), 'right', 'the d-pad asks');
@@ -236,6 +250,28 @@ eq(pad({ my: 0.8 }), 'right', 'and the stick answers on the column too');
 const picker = readFileSync('src/ancientseas/picker.ts', 'utf8');
 ok(/c\.confirm \|\| c\.menu/.test(picker) && !/anyButton/.test(picker), 'A and Start take the choice, not every button');
 ok(/pads === 0/.test(page), 'and nothing polls a pad that is not there');
+
+/**
+ * A game that is not out yet is on the plate and is not a way in. It keeps its title, its animal
+ * and its place — the plate is the trilogy, and a gap where the third game goes says less than the
+ * third game does — and gives up the link, the lighting and the pointer, with a badge saying why.
+ */
+eq(OPEN_GAMES.map((g) => g.id), GAMES.filter((g) => !g.comingSoon).map((g) => g.id), 'what the pad and the keys walk is exactly what is open');
+ok(OPEN_GAMES.length >= 1, 'and something is');
+ok(GAMES.some((g) => g.comingSoon) || OPEN_GAMES.length === GAMES.length, 'a game is either open or badged, never neither');
+ok(/soon \? \(/.test(page) || /if \(soon\)/.test(page), 'the page draws it as something other than a link');
+ok(/const lit = partOfLink && !soon/.test(page), 'it does not light under the pointer');
+ok(/OPEN_GAMES\.find\(\(g\) => g\.id === era\)/.test(page), 'and nothing can steer into it');
+ok(/className="as-badge"/.test(page) && new RegExp(COMING_SOON).test(COMING_SOON), 'the badge says what it is');
+ok(/\.as-badge \{/.test(css2), 'and has somewhere to be drawn');
+/**
+ * The whole switch is one line: `comingSoon: true` on a game in page.ts. Everything above reads
+ * that flag rather than naming a game, so deleting the line opens the game in every sense at once
+ * — and these checks go on passing, which is the point of writing them this way.
+ */
+ok(/\*\*This one line is the whole switch\.\*\*/.test(readFileSync('src/ancientseas/page.ts', 'utf8')), 'and the flag says so where someone will read it');
+// Its own page is untouched: this is about what the trilogy page offers, not whether the game runs.
+ok(existsSync('triassic/index.html'), 'the game itself is still there');
 
 // The withdrawn cutouts are gone from the page and from public/ (docs/image-requests.md says why).
 for (const gone of ['animal-opabinia.webp', 'animal-cladoselache.webp', 'animal-mixosaurus.webp', 'animal-ammonoid.webp']) {

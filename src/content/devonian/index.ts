@@ -3,7 +3,7 @@ import type { DevonianCreatureId } from './ids';
 import type { Slot } from '../../shared/palettes';
 import { DEVONIAN_CREATURES } from './creatures';
 import { SNACK_SCHOOLS, GIANTS } from './ecology';
-import { BIOME_NAMES, BIOME_DANGER, ATMOS, SAND_COLORS, FLORA_BASE, FLORA_DENSITY, FLORA_PROPS, SURFACE_Y } from './environment';
+import { BIOME_NAMES, BIOME_DANGER, ATMOS, SAND_COLORS, FLORA_BASE, FLORA_DENSITY, FLORA_PROPS, SURFACE_Y, FLOOR_DEPTH } from './environment';
 import { MUSIC } from './music';
 import { DEVONIAN_SCENERY } from './scenery';
 import { SCHEMES, CREATURE_SCHEMES } from './palettes';
@@ -71,7 +71,7 @@ export const DEVONIAN = defineEra({
     title: ['dunkleosteus', 'cladoselache', 'coccosteus', 'doryaspis'],
   },
   ecology: { schools: SNACK_SCHOOLS, giants: GIANTS, shadow: { creature: 'titanichthys', scale: 1.0 } },
-  environment: { biomeNames: BIOME_NAMES, biomeDanger: BIOME_DANGER, atmosphere: ATMOS, sandColors: SAND_COLORS, floraColors: FLORA_BASE, flora: FLORA_DENSITY, floraProps: FLORA_PROPS, surfaceY: SURFACE_Y },
+  environment: { biomeNames: BIOME_NAMES, biomeDanger: BIOME_DANGER, atmosphere: ATMOS, sandColors: SAND_COLORS, floraColors: FLORA_BASE, flora: FLORA_DENSITY, floraProps: FLORA_PROPS, surfaceY: SURFACE_Y, floorDepth: FLOOR_DEPTH },
   assets: {
     creatures: 'assets/devonian/creatures/', defaultPortraits: 'assets/devonian/creatures/',
     // Scenery is this era's own: the instanced exports built by tools/devonian/props/instance.mjs

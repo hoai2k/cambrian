@@ -1,8 +1,8 @@
 import { clamp, distXZ, heading, type Vec3 } from '../../shared/math';
 import { makeBrain } from '../ai';
 import type { EraHud, EraRules } from '../era-rules';
-import { applyScaleStats, isAlive, lengthOf, speedFactor } from '../actors';
-import type { HitContext } from '../combat';
+import { applyScaleStats, brokeSurface, isAlive, lengthOf, speedFactor } from '../actors';
+import { kill, type HitContext } from '../combat';
 import { creature } from '../creatures';
 import type { CreatureId } from '../../content/ids';
 import type { Game } from '../game';
@@ -13,7 +13,7 @@ import { ADULT_STAGE, devActor, PRIME_STAGE, RUNG_NAMES, STAGE_AT, STAGES, stage
 import { botNursery, canBreach as devCanBreach, sanctuary, spawnInCover, spawnProtect, spawnY, swim as devSwim, wanderY } from '../devonian/swim';
 import { camoDrain, installTriassicSpecials, stepAbility, useAbility, ySpecial } from './specials';
 import { stepShore } from './shore';
-import { triActor, triState } from './state';
+import { AIR_LOW, AIR_MAX, triActor, triState } from './state';
 
 /**
  * The Triassic era rules (docs/triassic/01-triassic-design.md).
@@ -53,23 +53,74 @@ let lastGame: Game | undefined;
 const players = (g: Game) => g.actors.filter(isPlayerish);
 const rungOf = (a: Actor) => creature(a.creature).rung ?? 2;
 const breathesAir = (a: Actor) => creature(a.creature).breathing === 'air';
-/** At the surface: the top few units, scaled a little by the body. */
-const atSurface = (a: Actor) => a.pos.y > SURFACE_Y - 3 - lengthOf(a) * 0.3;
+/**
+ * At the surface means *at* the surface: the body's back is out of the water (`brokeSurface`), or
+ * it has left the water altogether on a breach.
+ *
+ * This used to be a band — the top three units and a bit more for a long body — which made a
+ * breath something you took while still plainly under water. A Cymbospondylus counted as breathing
+ * nearly nine units down. The blow then had nothing to draw, because there was nothing happening
+ * at the waterline, and the climb ended before it reached the top. The band is gone: a lung has to
+ * come up for air.
+ */
+const atSurface = (a: Actor) => brokeSurface(a);
 
 // ---- the hit context the era's own strikes use (the game's is private; these are its public parts) ----
 const hitCtxFor = (g: Game): HitContext => ({ events: g.events, byId: (id) => g.byId(id), time: g.time, rng: g.rng, armour: (att, vic, dir) => TRIASSIC_RULES.armour(att, vic, dir) });
 
 // ---- air ----
+/**
+ * A lungful is a gauge, not a switch.
+ *
+ * The era used to say "no recovery under water, everything at the surface", which made every
+ * descent a slow strangling: a body that had spent its bar on the way down could do nothing but
+ * climb back, and the deep was somewhere you visited rather than hunted in. The gauge splits that
+ * into two clocks. `AIR_MAX` seconds of breath is the long one, and while it lasts the body works
+ * as any other does — stamina comes back normally, at depth, on the hunt. When it runs out the old
+ * rule bites: recovery stops. Drowning is what that costs, and only then — air gone *and* the bar
+ * gone, which is a body that has kept swimming hard with nothing left to swim on.
+ *
+ * `DROWN_TIME` is the last of it. Death is not the instant the two meet: the gauge has flashed for
+ * a minute by then, and a body dying on the frame its bar touched zero would read as a hit from
+ * nowhere. It is seconds of visibly going under, and they are escapable — the surface is always
+ * reachable, because the climb for air costs an air-breather nothing.
+ */
+const DROWN_TIME = 8;
+/** How much surface a neck sent up alone breaks, against a whole body's 1. */
+const NECK_BREATH = 0.3;
+/** Seconds of held breath an exhaustion hold costs per second: half a lungful over a full grip. */
+const HELD_AIR_DRAIN = 10;
+/** The breath left at which a bot starts for the surface: long enough to climb from the deepest water. */
+const AIR_BOT_SEEK = 90;
 function updateAir(g: Game, a: Actor, dt: number) {
   const t = triActor(g, a);
   if (!breathesAir(a)) return;
   const up = atSurface(a) && a.grabbedBy < 0;
   if (up && !t.atSurface) {
-    // the blow: the bar comes back whole, and the radar hears it — unless the head comes up alone
+    // The blow. `strength` is how much water the breath breaks, which is what the surface draws:
+    // a whole body coming up against a neck sent up on its own, which is Tanystropheus' whole
+    // trick and should still ripple.
     a.stamina = a.staminaMax;
-    if (a.controller === 'player') g.events.push({ kind: 'gulp', pos: { ...a.pos }, actor: a.id, player: a.player, strength: creature(a.creature).ability === 'neckStrike' ? 0 : 1 });
+    if (a.controller === 'player') g.events.push({ kind: 'gulp', pos: { ...a.pos }, actor: a.id, player: a.player, strength: creature(a.creature).ability === 'neckStrike' ? NECK_BREATH : 1 });
   }
   if (up) a.stamina = Math.max(a.stamina, a.staminaMax * 0.98);
+  // the gauge: filled by a breath, spent by the second under water
+  t.air = up ? AIR_MAX : Math.max(0, t.air - dt);
+  // A bot goes up for air. The shared brain has no notion of breathing at all — it steers for food,
+  // cover and threats and nothing else — so a gauge that can kill would kill every bot air-breather
+  // in the sea on a timer, which is not a rule the player is subject to so much as a bug with a
+  // clock on it. The assist is the same climb the player gets for free and it only ever lifts, so
+  // a bot that is eating or fleeing still does that; it simply does it on the way up.
+  if (a.controller === 'bot' && !up && isAlive(a) && a.grabbedBy < 0 && t.air < AIR_BOT_SEEK) {
+    a.vel.y = Math.max(a.vel.y, RISE_RATE * speedFactor(a.scale) * AIR_CLIMB_FLOOR);
+  }
+  // drowning: out of air and out of effort together, for long enough to see it happen
+  if (!up && t.air <= 0 && a.stamina <= 0 && isAlive(a)) {
+    t.drownT += dt;
+    a.hp = Math.max(0, a.hp - (a.hpMax / DROWN_TIME) * dt);
+    a.sinceHit = 0;
+    if (a.hp <= 0) kill(hitCtxFor(g), a);
+  } else t.drownT = 0;
   t.atSurface = up;
   // winded: a quiet heartbeat under a quarter bar that quickens as the rest goes
   t.windT += dt;
@@ -82,11 +133,19 @@ function updateAir(g: Game, a: Actor, dt: number) {
     // continuously and silently; the sound is only there to make you feel it, so it stays slow.
     if (t.windT >= WINDED_EVERY - 1.4 * hard) { t.windT = 0; g.events.push({ kind: 'winded', pos: { ...a.pos }, actor: a.id, player: a.player, strength: hard }); }
   } else if (up) t.windT = 0;
-  // held under: whatever holds it keeps it from the air, and an exhaustion hold wears it faster
+  // Held under: whatever holds it keeps it from the air, and an exhaustion hold is about exactly
+  // that. Once the gauge exists the hold has to attack the gauge, or it stops meaning anything —
+  // a held body on a full chest recovers as fast as the hold drains it and nothing happens. A grip
+  // breaks at GRIP_BREAK either way, so `HELD_AIR_DRAIN` is priced off that: a hold carried to the
+  // end costs about half a lungful, which is a real bite on the next dive rather than a death by
+  // itself, and finishes a body that was already low.
   if (a.grabbedBy >= 0) {
     t.heldT += dt;
     const holder = g.byId(a.grabbedBy);
-    if (holder && creature(holder.creature).ability === 'exhaustionHold') a.stamina = Math.max(0, a.stamina - 6 * dt);
+    if (holder && creature(holder.creature).ability === 'exhaustionHold') {
+      a.stamina = Math.max(0, a.stamina - 6 * dt);
+      t.air = Math.max(0, t.air - HELD_AIR_DRAIN * dt);
+    }
   } else t.heldT = 0;
 }
 
@@ -359,11 +418,21 @@ export const TRIASSIC_RULES: EraRules = {
     return 0;
   },
 
-  /** Stamina recovery: nothing under water for an air-breather, halved in the cold for anything not warm-blooded. */
+  /**
+   * Stamina recovery: an air-breather recovers on the breath it is holding and nothing once that is
+   * gone, and anything not warm-blooded recovers half as well in the cold. What the gauge changed
+   * is *when* the lung costs anything — under water on a full chest a lung is simply a lung.
+   */
   staminaRegen(g, a) {
     const def = creature(a.creature);
     let k = 1;
-    if (def.breathing === 'air') k = triActor(g, a).atSurface ? 1 : 0;
+    if (def.breathing === 'air') {
+      const t = triActor(g, a);
+      // Held under is its own case: the HUD has always promised that nothing comes back until you
+      // are loose, and before the gauge that was true only because nothing came back under water
+      // at all. It has to be said outright now.
+      k = a.grabbedBy >= 0 ? 0 : t.atSurface || t.air > 0 ? 1 : 0;
+    }
     if (!def.warmBlooded && def.breathing !== 'gill') k *= 1 - (1 - COLD_REGEN) * clamp(coldAt(a), 0, 1);
     return k;
   },
@@ -400,7 +469,10 @@ export const TRIASSIC_RULES: EraRules = {
   onRespawn(g, a) {
     DEVONIAN_RULES.onRespawn(g, a);
     const t = triActor(g, a);
-    t.atSurface = false; t.windT = 0; t.heldT = 0; t.podShield = 0; t.strokeT = 0; t.shoreWarn = 0; t.sawT = 0;
+    // The gauge comes back with the body. A hatchling that respawned on the empty chest it drowned
+    // with would start the next life already out of air, and drown again the moment its bar went.
+    t.atSurface = false; t.air = AIR_MAX; t.drownT = 0;
+    t.windT = 0; t.heldT = 0; t.podShield = 0; t.strokeT = 0; t.shoreWarn = 0; t.sawT = 0;
     if (creature(a.creature).birth === 'live' && devActor(g, a).stage === 0) { t.calfT = MOTHER_T; t.mother = -1; }
   },
 
@@ -415,6 +487,8 @@ export const TRIASSIC_RULES: EraRules = {
     return {
       standing: d.standing, stageProgress: stageProgress(d), rung: rungOf(p), rungName: RUNG_NAMES_TRI[rungOf(p)], stage: STAGES[d.stage],
       bimodal: def.breathing === 'bimodal', air: def.breathing === 'air', atSurface: t.atSurface, shoreWarn: t.shoreWarn, heldUnder: def.breathing === 'air' && p.grabbedBy >= 0,
+      airLeft: def.breathing === 'air' ? clamp(t.air / AIR_MAX, 0, 1) : undefined,
+      airLow: def.breathing === 'air' && t.air < AIR_LOW, drowning: t.drownT > 0,
       beached: false, primeT: d.primeT, inDeadZone: false, deadZones: [],
     };
   },

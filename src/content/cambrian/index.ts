@@ -4,7 +4,7 @@ import { CAMBRIAN_CLIP_NOTES, CAMBRIAN_MODEL_NOTES, CAMBRIAN_MODEL_STATUS } from
 import { defineEra } from '../era';
 import { CAMBRIAN_CREATURES } from './creatures';
 import { SNACK_SCHOOLS, GIANTS } from './ecology';
-import { BIOME_NAMES, BIOME_DANGER, ATMOS, SAND_COLORS, FLORA_BASE } from './environment';
+import { BIOME_NAMES, BIOME_DANGER, ATMOS, SAND_COLORS, FLORA_BASE, FLOOR_DEPTH } from './environment';
 import { SCHEMES, CREATURE_SCHEMES } from './palettes';
 import modelBytes from '../../render/asset-sizes.json';
 import authoredColors from '../../shared/authored-colors.json';
@@ -30,7 +30,7 @@ export const CAMBRIAN = defineEra({
     title: ['anomalocaris', 'waptia', 'opabinia', 'marrella'],
   },
   ecology: { schools: SNACK_SCHOOLS, giants: GIANTS, shadow: { creature: 'anomalocaris', scale: 6.0 } },
-  environment: { biomeNames: BIOME_NAMES, biomeDanger: BIOME_DANGER, atmosphere: ATMOS, sandColors: SAND_COLORS, floraColors: FLORA_BASE },
+  environment: { biomeNames: BIOME_NAMES, biomeDanger: BIOME_DANGER, atmosphere: ATMOS, sandColors: SAND_COLORS, floraColors: FLORA_BASE, floorDepth: FLOOR_DEPTH },
   assets: {
     creatures: 'assets/creatures/', defaultPortraits: 'assets/creatures/defaults/',
     props: 'assets/props/', biomes: 'assets/biomes/', ui: 'assets/ui/', sfx: 'assets/sfx/', music: 'music/',
