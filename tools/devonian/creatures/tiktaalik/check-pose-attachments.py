@@ -1,8 +1,14 @@
-"""Independent evaluated-mesh checks: fin-root burial and tooth-base attachment in every action."""
+"""Independent evaluated-mesh checks: fin-root burial and tooth-base attachment in every action.
+
+TIKTAALIK_BLEND (default tiktaalik-v2.blend) selects the frozen .blend to open; TIKTAALIK_CHECK_SUFFIX
+(default v2) selects the report filename (pose-attachments-<suffix>.json), so a v3 candidate can be
+checked without overwriting the v2 report.
+"""
 import bpy,os,json,numpy as np
 from mathutils import Vector
 from mathutils.bvhtree import BVHTree
-HERE=os.path.dirname(os.path.abspath(__file__));LOCAL=os.path.abspath(os.path.join(HERE,'../../../../../devonian-authoring/tiktaalik'));bpy.ops.wm.open_mainfile(filepath=os.path.join(LOCAL,'tiktaalik-v2.blend'));obj=bpy.data.objects['tiktaalik'];rig=bpy.data.objects['tiktaalik_rig'];scene=bpy.context.scene;mesh=obj.data;uv=mesh.uv_layers.active.data
+BLEND=os.environ.get('TIKTAALIK_BLEND','tiktaalik-v2.blend');SUFFIX=os.environ.get('TIKTAALIK_CHECK_SUFFIX','v2')
+HERE=os.path.dirname(os.path.abspath(__file__));LOCAL=os.path.abspath(os.path.join(HERE,'../../../../../devonian-authoring/tiktaalik'));bpy.ops.wm.open_mainfile(filepath=os.path.join(LOCAL,BLEND));obj=bpy.data.objects['tiktaalik'];rig=bpy.data.objects['tiktaalik_rig'];scene=bpy.context.scene;mesh=obj.data;uv=mesh.uv_layers.active.data
 bodyFaces=[tuple(p.vertices)for p in mesh.polygons if p.material_index==0]
 oralFaces=[tuple(p.vertices)for p in mesh.polygons if p.material_index==0 and min(uv[i].uv.y for i in p.loop_indices)>=.79999]
 finRoots={};toothVerts=set()
@@ -46,4 +52,4 @@ for action in sorted(bpy.data.actions,key=lambda a:a.name):
    p=co[ids].mean(0);hit,n,idx,dist=oral.find_nearest(Vector(p));distances.append(float(dist))
   results.append({'clip':action.name,'phase':phase,'finRoots':roots,'maximumToothBaseToLiningDistance':max(distances)});ev.to_mesh_clear()
 report={'sampledPoses':len(results),'toothBases':len(toothBases),'finRoots':{k:len(v)for k,v in finRoots.items()},'allFinRootCentroidsBuried':all(v['insideContinuousBody']for r in results for v in r['finRoots'].values()),'maximumToothBaseToLiningDistance':max(r['maximumToothBaseToLiningDistance']for r in results),'results':results}
-open(os.path.join(HERE,'pose-attachments-v2.json'),'w').write(json.dumps(report,indent=2));print(json.dumps({k:v for k,v in report.items()if k!='results'},indent=2))
+open(os.path.join(HERE,'pose-attachments-'+SUFFIX+'.json'),'w').write(json.dumps(report,indent=2));print(json.dumps({k:v for k,v in report.items()if k!='results'},indent=2))

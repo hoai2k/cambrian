@@ -8,7 +8,7 @@ import { applyScaleStats, bodyRadius, clearanceOf, climbHeight, climbRise, floor
 import { boulderQ, boulderTop, groundHeight, resolveStatic, rockRadius, sampleHeight, type Boulder, type StaticContact, type WorldData } from '../src/sim/world';
 import { creature } from '../src/sim/creatures';
 import { floraSize } from '../src/sim/flora';
-import { fitCameraArm, PITCH_DOWN, PITCH_UP } from '../src/render/engine';
+import { BREATH_PEEK, fitCameraArm, PITCH_DOWN, PITCH_UP } from '../src/render/engine';
 
 let failed = 0;
 const check = (n: string, ok: boolean, d: string) => { console.log(`${ok ? 'PASS' : 'FAIL'}  ${n.padEnd(58)} ${d}`); if (!ok) failed++; };
@@ -312,6 +312,19 @@ const rockWorld = (boulders: Boulder[]) => ({
     `y=${lifted.y.toFixed(2)}, lift ${lifted.lift.toFixed(2)}`);
   const under = fitCameraArm(38.5, 1.3, 5, 1.2, sand(0), 39);
   check('and aiming down at the surface tips the same way, not through it', under.y <= 39 + 1e-9 && under.lift < 0, `y=${under.y.toFixed(2)}, lift ${under.lift.toFixed(2)}`);
+
+  // The breath. The camera's ceiling is what kept a blow looking like it never happened: it is
+  // pinned just under the waterline at all times, so the one moment the animal is at the top, the
+  // view is still the water. A blow raises that ceiling for BREATH_PEEK, and the check is simply
+  // that raising it is what carries the camera over — pass the same shot the two ceilings and only
+  // the raised one comes out above the surface.
+  check('the peek is long enough to see the spray land', BREATH_PEEK >= 0.9, `${BREATH_PEEK}s`);
+  const surface = 39, shot = () => fitCameraArm(40, 0.2, 5, 1.2, sand(0), surface - 0.4);
+  const held = shot();
+  check('without it the camera is held under the waterline', held.y <= surface - 0.4 + 1e-9, `y=${held.y.toFixed(2)} against a surface at ${surface}`);
+  const peeked = fitCameraArm(40, 0.2, 5, 1.2, sand(0), (surface - 0.4) + 1 * (4 * 0.5 + 1.6));
+  check('...and a blow lifts it clear of the water', peeked.y > surface, `y=${peeked.y.toFixed(2)} against a surface at ${surface}`);
+  check('...and it is the ceiling that does it, not the shot', peeked.dist === held.dist, `arm ${held.dist.toFixed(2)} either way`);
 }
 
 // --- the radar says how far above or below a contact is ---

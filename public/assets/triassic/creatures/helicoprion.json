@@ -1,0 +1,60 @@
+{
+  "id": "helicoprion",
+  "name": "Helicoprion",
+  "species": "Helicoprion davisii",
+  "provenance": "Early Permian \u00b7 Phosphoria Formation, Idaho \u2014 on this roster as a labelled relict",
+  "description": "Fusiform eugeneodont with the single tooth whorl seated in the lower-jaw symphysis. Authored Tripo body and measured procedural volume twin share one armature, one set of inverse binds, one set of sockets and one set of actions.",
+  "modelLength": 5.0,
+  "lengthMeters": 5,
+  "locomotion": "Swim",
+  "clips": [
+    "Idle",
+    "Swim",
+    "Sprint",
+    "TurnLeft",
+    "TurnRight",
+    "Dive",
+    "Rise",
+    "Attack",
+    "Bite",
+    "Heavy",
+    "Hit",
+    "Death",
+    "Guard",
+    "Parry",
+    "Dodge",
+    "Eat",
+    "Stagger",
+    "Ability",
+    "Grab",
+    "Breath",
+    "Growth"
+  ],
+  "looping": [
+    "Idle",
+    "Swim",
+    "Sprint",
+    "Guard",
+    "Eat",
+    "Grab"
+  ],
+  "anchors": [
+    "anchor_mouth",
+    "anchor_mouth_inside",
+    "anchor_attack_primary"
+  ],
+  "puppet": "helicoprion.puppet.glb",
+  "sources": [
+    "docs/triassic/canonical/helicoprion.png",
+    "tools/triassic/creatures/helicoprion/tripo-raw/helicoprion.raw.glb"
+  ],
+  "notes": [
+    "An obligate swimmer: the performance is body-caudal undulation with the paired fins as control surfaces. Nothing rows, walks, hauls out or surfaces.",
+    "The twin resurfaces a 0.0052-unit voxel occupancy field of the authored body, relaxes it and reduces the new topology. It reuses no source vertex or face.",
+    "The lower jaw is a skinned hinge rather than a cut shell: this generation already carries a modelled oral cavity, and the whorl touches the palate, so no separating surface exists that does not slice one of them.",
+    "Original albedo retained with white COLOR_0, normal relief 0.15, explicitly nonmetallic skin at roughness 0.62. Twin pigment samples triangle-local UVs to avoid seam bleed.",
+    "Breath is gill ventilation held in place, not a surface breath: this animal has gills and never goes up.",
+    "The whorl is the generated surface, measured and kept rather than re-modelled: 97.9 % of it is seated inside the lower jaw with only its front arc exposed, as the canonical pose draws it. Its form is a rosette rather than a legible spiral, and the generation also gave the animal upper-jaw teeth it did not have. See the README.",
+    "Living colours, soft tissue and movement are artistic reconstruction. Whorl-saw grip, travel and capture rules remain engine-owned."
+  ]
+}

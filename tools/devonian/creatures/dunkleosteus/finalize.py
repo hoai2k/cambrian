@@ -1,8 +1,9 @@
 """Remove exporter-created identity scale tracks; audit decoded geometry/rig/clips."""
-import json,struct,math,hashlib
+import json,struct,math,hashlib,os
 from pathlib import Path
 import numpy as np
-H=Path(__file__).resolve().parent;R=H.parents[3];O=R/'public/assets/devonian/creatures'
+H=Path(__file__).resolve().parent;R=H.parents[3];O=Path(os.environ.get('DUNK_OUT',str(R/'public/assets/devonian/creatures')))
+VALIDATION=Path(os.environ.get('DUNK_VALIDATION',str(H/'validation.json')))
 
 def read(p):
  b=p.read_bytes();N=struct.unpack_from('<I',b,12)[0];d=json.loads(b[20:20+N]);start=20+N;size=struct.unpack_from('<I',b,start)[0];return d,b[start+8:start+8+size]
@@ -65,5 +66,5 @@ for suffix in ['','.lod1']:
  results.append({'file':p.name,'bytes':p.stat().st_size,'vertices':verts,'triangles':tri,'bounds':span.tolist(),'bones':len(d['skins'][0]['joints']),'sockets':sockets,'clips':motions,'feedingArticulation':jawproof,'removedIdentityScaleChannels':removed,'sha256':hashlib.sha256(p.read_bytes()).hexdigest()})
 assert results[1]['triangles']/results[0]['triangles']<.4
 meta=json.loads((O/'dunkleosteus.json').read_text());meta['modelLength']=results[0]['bounds'][2];meta['clips']=[x['name'] for x in results[0]['clips']];(O/'dunkleosteus.json').write_text(json.dumps(meta,indent=2)+'\n')
-(H/'validation.json').write_text(json.dumps({'checks':'finite transforms, normalized weights, root stable, identity-scale removal, unique motion, seamless loops, socket bind alignment, true LOD reduction','models':results,'lodTriangleRatio':results[1]['triangles']/results[0]['triangles']},indent=2)+'\n')
+VALIDATION.write_text(json.dumps({'checks':'finite transforms, normalized weights, root stable, identity-scale removal, unique motion, seamless loops, socket bind alignment, true LOD reduction','models':results,'lodTriangleRatio':results[1]['triangles']/results[0]['triangles']},indent=2)+'\n')
 print(json.dumps({'models':[{k:v for k,v in r.items()if k in ['file','bytes','triangles','vertices','bounds','bones']}for r in results],'lodRatio':results[1]['triangles']/results[0]['triangles']}))

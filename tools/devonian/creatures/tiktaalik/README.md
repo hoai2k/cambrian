@@ -66,3 +66,18 @@ in `docs/devonian/refinement-queue.md` for concrete sculpt, eye, fin and materia
 The image and copy/hash-verified model/source backup are under local/devonian-authoring.
 Do not rerun the old builder into an existing candidate or treat old eye audits as approval
 for future geometry. Finish the redesign before fresh general quality audits.
+
+## V3 shipped — 12 September 2026
+
+`anatomy_v3.py` + `build_v3.py` (with `materials_v3.py` writing `*-v3.png` maps and
+`render-portraits-v3.py`) port the approved study off the user reference
+(`docs/reference/Tiktaalik.jpg`): a fuller, rounder trunk with real shoulder and pelvis volume (the
+neck pinch at y=−1.05/−.68 gone, the trunk wider and deeper through −.2..1.65, the body section
+exponent 1.0), a broad rounded-arrow snout (front stations deeper and narrower, the longitudinal
+sweep `1.30·|c|^2.6` instead of `1.46·|c|^1.85`), fuller pectoral limbs. The oral tube's front ring
+now reads its half-width from `SEC[0][1]` — it was a literal .63 and poked through the narrower
+snout at the corners (oral clearance 20/625 negative → 0/625, min +0.024 vs V2's +0.012). Eye audit
+83.2% / 83.1% full, 83.3% / 83.2% reduced (V2 71.1 / 70.8). Packaging exact round-trip PASS at
+135,948 / 38,060 triangles; intake, check-export, check-pose-attachments PASS; portraits from the V3
+build; `anchors.json` is V3's. `build.py` still reproduces V2. The user accepted the study on 12
+September; badge cleared.

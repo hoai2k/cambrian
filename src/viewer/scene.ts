@@ -42,6 +42,76 @@ export const orderClips = (names: string[]) =>
 
 export interface PlaybackState { time: number; duration: number; paused: boolean }
 
+/** A rectangle on the canvas in CSS pixels, y down from the top edge. */
+export interface Rect { x: number; y: number; width: number; height: number }
+
+/** One mesh of the specimen for sculpting: its base positions and the transform into the root frame. */
+export interface SculptMesh {
+  geometry: THREE.BufferGeometry;
+  base: Float32Array;
+  toRoot: THREE.Matrix4;
+  fromRoot: THREE.Matrix4;
+  /** Eye geometry: a mesh, material or parent bone named for the eye. */
+  eye: boolean;
+  name: string;
+}
+export interface SculptTarget {
+  meshes: SculptMesh[];
+  /** The mouth socket in the root frame, when the model has one. */
+  mouth?: [number, number, number];
+  /** Whether anything on stage is skinned — a built body is, a raw generation is not. */
+  skinned: boolean;
+}
+export type WarpFn = (x: number, y: number, z: number, out: [number, number, number], eye?: boolean) => void;
+
+/**
+ * One mesh of the specimen for region marking. Two coordinate systems, both needed: `world` is
+ * where the pointer's ray lands, so it is what a brush radius is measured in; `local` is what the
+ * file stores, so it is what a region file's bounds are quoted in and what a cutting script can
+ * check the indices against. `index` is the mesh's place in load order, which is the address a
+ * region file uses — names survive neither exporters nor Blender's own uniquifying.
+ */
+export interface MarkMesh {
+  index: number;
+  name: string;
+  count: number;
+  world: Float32Array;
+  local: Float32Array;
+}
+export interface MarkTarget {
+  meshes: MarkMesh[];
+  /** The body's radius and centre in world units, so a brush can be sized against the animal. */
+  radius: number;
+  centre: [number, number, number];
+}
+/** Where a world point lands on the canvas, in CSS pixels, and how many of them a world unit spans there. */
+export interface Projection { x: number; y: number; scale: number }
+
+/**
+ * A mesh's shipped positions in the model's root frame, which is the frame both editors measure
+ * and warp in. Here rather than in either of them because it is about the shape of what
+ * `sculptTarget()` hands out.
+ */
+export function rootFramePositions(base: Float32Array, toRoot: THREE.Matrix4): Float32Array {
+  const e = toRoot.elements;
+  const out = new Float32Array(base.length);
+  for (let i = 0; i < base.length; i += 3) {
+    const x = base[i], y = base[i + 1], z = base[i + 2];
+    out[i] = e[0] * x + e[4] * y + e[8] * z + e[12];
+    out[i + 1] = e[1] * x + e[5] * y + e[9] * z + e[13];
+    out[i + 2] = e[2] * x + e[6] * y + e[10] * z + e[14];
+  }
+  return out;
+}
+export interface OrthoView {
+  rect: Rect;
+  /** The root-frame point at the centre of the view: [along the axis, up (side) or lateral (top)]. */
+  centre: [number, number];
+  /** Root-frame units per CSS pixel. */
+  unitsPerPixel: number;
+  axis: 'x' | 'z';
+}
+
 export interface ViewerScene {
   /** Loads a creature and returns its clip names in button order. */
   show(specimen: ViewerSpecimen, options?: { preserveView?: boolean }): Promise<string[]>;
@@ -64,6 +134,28 @@ export interface ViewerScene {
   /** The clip currently driving the rig, so the button grid can follow auto-returns. */
   onClip(cb: (name: string) => void): void;
   resetCamera(): void;
+  /** The specimen's geometry in its root frame, for the sculpt editor to measure and warp. */
+  sculptTarget(): SculptTarget | undefined;
+  /** Writes warped positions into every geometry (null restores the shipped ones); `finalize` recomputes normals. */
+  applySculpt(fn: WarpFn | null, finalize: boolean): void;
+  /** The split layout renders the orbit view into `main` and two orthographic views; single is the whole stage. */
+  setLayout(layout: 'single' | 'split', main?: Rect): void;
+  setOrthoView(view: 'side' | 'top', v: OrthoView): void;
+  /** Stops the clips and puts the rig in its bind pose, or hands it back to the resting clip. */
+  setRestPose(on: boolean): void;
+  /** The specimen's vertices for region marking, in world and in the file's own coordinates. */
+  markTarget(): MarkTarget | undefined;
+  /** What the pointer is over, in world space: canvas CSS pixels in, the surface point out. */
+  markPick(x: number, y: number): { point: [number, number, number]; mesh: number } | undefined;
+  /** Where a world point is on the canvas, for drawing the brush where the reviewer is pointing. */
+  markProject(point: readonly [number, number, number]): Projection | undefined;
+  /** Lights the marked vertices (null clears the overlay). One mask per mesh, a byte per vertex. */
+  showMarks(marks: readonly Uint8Array[] | null): void;
+  /**
+   * Hands the left button to the brush and orbiting to the right, or gives the orbit its usual
+   * buttons back. The scene owns it because OrbitControls owns the canvas's pointer events.
+   */
+  setMarkInteraction(on: boolean): void;
   dispose(): void;
 }
 
@@ -208,6 +300,17 @@ export function createViewerScene(canvas: HTMLCanvasElement): ViewerScene {
   let clipCb: (name: string) => void = () => {};
   let playbackCb: (state: PlaybackState) => void = () => {};
   let lastPlaybackUpdate = 0;
+  let sculptTarget: SculptTarget | undefined;
+  let markTargetCache: MarkTarget | undefined;
+  /** Which mesh of the mark target a hit geometry is, so a pick can name the mesh it landed on. */
+  let markIndexOf = new Map<THREE.BufferGeometry, number>();
+  let layout: 'single' | 'split' = 'single';
+  let mainRect: Rect | undefined;
+  const orthoViews: Partial<Record<'side' | 'top', OrthoView>> = {};
+  const orthoCameras = { side: new THREE.OrthographicCamera(-1, 1, 1, -1, 0.1, 2000), top: new THREE.OrthographicCamera(-1, 1, 1, -1, 0.1, 2000) };
+  let modelCenter = new THREE.Vector3();
+  let modelUnit = 1;
+  let restPose = false;
 
   function reportPlayback() {
     playbackCb({ time: current?.time ?? 0, duration: current?.getClip().duration ?? 0,
@@ -230,6 +333,8 @@ export function createViewerScene(canvas: HTMLCanvasElement): ViewerScene {
     if (source) disposeAsset(source);
     source = undefined;
     model = undefined; mixer = undefined; current = undefined;
+    sculptTarget = undefined;
+    markTargetCache = undefined; markIndexOf = new Map(); markPoints.visible = false;
     actions = new Map();
     paused = false;
     setClip('');
@@ -273,6 +378,11 @@ export function createViewerScene(canvas: HTMLCanvasElement): ViewerScene {
     // Keep the established Cambrian display scale. Devonian is a specimen collection with
     // consistent framing; its researched real-world size is labelled separately.
     const src = SkeletonUtils.clone(gltf.scene);
+    // A raw generated body points wherever its generation pointed it. Turning it before the box is
+    // measured means the framing, the radius and the centring all describe the body as shown, and
+    // nothing downstream has to know the mesh was estimated rather than built.
+    if (specimen.previewYaw) src.rotation.y = THREE.MathUtils.degToRad(specimen.previewYaw);
+    src.updateMatrixWorld(true);
     const box = new THREE.Box3().setFromObject(src);
     const size = box.getSize(new THREE.Vector3());
     const center = box.getCenter(new THREE.Vector3());
@@ -292,6 +402,8 @@ export function createViewerScene(canvas: HTMLCanvasElement): ViewerScene {
 
     model = src;
     stage.add(model);
+    modelCenter = center.clone(); modelUnit = unit;
+    sculptTarget = buildSculptTarget(src);
     mixer = new THREE.AnimationMixer(model);
     for (const clip of gltf.animations) actions.set(clip.name, mixer.clipAction(clip));
     mixer.addEventListener('finished', (event) => {
@@ -354,6 +466,236 @@ export function createViewerScene(canvas: HTMLCanvasElement): ViewerScene {
     reportPlayback();
   }
 
+  // ---- sculpting ----
+  // Geometry positions are in each mesh's own space; the sculpt document works in the model's
+  // root frame, so each mesh carries the transform between the two. A skinned mesh's geometry is
+  // its bind pose, which is what the exporters place at the node's own transform, so the same
+  // matrix serves it. Meshes sharing a geometry (a depth pre-pass twin) count once.
+  function buildSculptTarget(root: THREE.Object3D): SculptTarget {
+    root.updateMatrixWorld(true);
+    const rootInverse = root.matrixWorld.clone().invert();
+    const seen = new Set<THREE.BufferGeometry>();
+    const meshes: SculptMesh[] = [];
+    root.traverse((o) => {
+      if (!(o instanceof THREE.Mesh) || o.userData.depthPrepass) return;
+      const position = o.geometry.getAttribute('position');
+      if (!position || seen.has(o.geometry)) return;
+      seen.add(o.geometry);
+      const toRoot = rootInverse.clone().multiply(o.matrixWorld);
+      const mats = Array.isArray(o.material) ? o.material : [o.material];
+      const names = [o.name, ...mats.map((m) => m?.name ?? '')];
+      let parent: THREE.Object3D | null = o.parent;
+      while (parent && parent !== root) { names.push(parent.name); parent = parent.parent; }
+      const eye = names.some((n) => /eye|ocul|orbit/i.test(n) && !/eyelid|socket/i.test(n));
+      meshes.push({ geometry: o.geometry, base: Float32Array.from(position.array as ArrayLike<number>), toRoot, fromRoot: toRoot.clone().invert(), eye, name: o.name });
+    });
+    let mouth: [number, number, number] | undefined;
+    const socket = root.getObjectByName('anchor_mouth');
+    if (socket) {
+      const p = socket.getWorldPosition(new THREE.Vector3()).applyMatrix4(rootInverse);
+      mouth = [p.x, p.y, p.z];
+    }
+    let skinned = false;
+    root.traverse((o) => { if (o instanceof THREE.SkinnedMesh) skinned = true; });
+    return { meshes, mouth, skinned };
+  }
+
+  function applySculpt(fn: WarpFn | null, finalize: boolean) {
+    if (!sculptTarget) return;
+    const v = new THREE.Vector3();
+    const out: [number, number, number] = [0, 0, 0];
+    for (const m of sculptTarget.meshes) {
+      const attr = m.geometry.getAttribute('position') as THREE.BufferAttribute;
+      const dst = attr.array as Float32Array;
+      if (!fn) dst.set(m.base);
+      else for (let i = 0; i < m.base.length; i += 3) {
+        v.set(m.base[i], m.base[i + 1], m.base[i + 2]).applyMatrix4(m.toRoot);
+        fn(v.x, v.y, v.z, out, m.eye);
+        v.set(out[0], out[1], out[2]).applyMatrix4(m.fromRoot);
+        dst[i] = v.x; dst[i + 1] = v.y; dst[i + 2] = v.z;
+      }
+      attr.needsUpdate = true;
+      if (finalize) { m.geometry.computeVertexNormals(); m.geometry.computeBoundingSphere(); m.geometry.computeBoundingBox(); }
+    }
+  }
+
+  // ---- region marking ----
+  // Marking asks different questions of the same meshes than sculpting does, so it walks them
+  // itself rather than bending SculptTarget to fit: it keeps the eyes (an unwanted fin is no more
+  // anatomy than an eye is, and a reviewer may need to mark either), it numbers the meshes in load
+  // order because that number is what the exported file addresses them by, and it carries world
+  // positions because a brush is a sphere the reviewer sees on screen.
+  function buildMarkTarget(root: THREE.Object3D): MarkTarget {
+    root.updateMatrixWorld(true);
+    const seen = new Set<THREE.BufferGeometry>();
+    const meshes: MarkMesh[] = [];
+    const box = new THREE.Box3();
+    const v = new THREE.Vector3();
+    root.traverse((o) => {
+      if (!(o instanceof THREE.Mesh) || o.userData.depthPrepass) return;
+      const position = o.geometry.getAttribute('position');
+      if (!position || seen.has(o.geometry)) return;
+      seen.add(o.geometry);
+      // The shipped positions, not whatever a sculpt has warped them to: a region file's bounds
+      // have to describe the mesh as the cutting script will find it in the file.
+      const sculpted = sculptTarget?.meshes.find((m) => m.geometry === o.geometry);
+      const local = sculpted ? sculpted.base : Float32Array.from(position.array as ArrayLike<number>);
+      const count = local.length / 3;
+      const world = new Float32Array(local.length);
+      for (let i = 0; i < local.length; i += 3) {
+        v.set(local[i], local[i + 1], local[i + 2]).applyMatrix4(o.matrixWorld);
+        world[i] = v.x; world[i + 1] = v.y; world[i + 2] = v.z;
+        box.expandByPoint(v);
+      }
+      markIndexOf.set(o.geometry, meshes.length);
+      meshes.push({ index: meshes.length, name: o.name || o.geometry.name || `mesh ${meshes.length}`, count, world, local });
+    });
+    const centre = box.isEmpty() ? FOCUS.clone() : box.getCenter(new THREE.Vector3());
+    const radius = box.isEmpty() ? 1 : box.getSize(new THREE.Vector3()).length() * 0.5;
+    return { meshes, radius, centre: [centre.x, centre.y, centre.z] };
+  }
+
+  // The marks themselves: one point per marked vertex, in world space, drawn over the body. The
+  // depth nudge in the vertex shader is what keeps them visible — a point sitting exactly on the
+  // surface it was picked off loses the depth test to it on half the frames — while leaving them
+  // properly hidden by anything genuinely in front, so a mark on the far flank stays on the far
+  // flank when the reviewer orbits.
+  const markGeo = G(new THREE.BufferGeometry());
+  markGeo.setAttribute('position', new THREE.BufferAttribute(new Float32Array(3), 3).setUsage(THREE.DynamicDrawUsage));
+  const markPoints = new THREE.Points(markGeo, M(new THREE.ShaderMaterial({
+    transparent: true, depthWrite: false,
+    vertexShader: `void main(){vec4 mv=modelViewMatrix*vec4(position,1.);gl_Position=projectionMatrix*mv;gl_Position.z-=.0016*gl_Position.w;gl_PointSize=clamp(520./max(1.,-mv.z),3.,9.);}`,
+    fragmentShader: `void main(){float r=length(gl_PointCoord-.5)*2.;if(r>1.)discard;gl_FragColor=vec4(1.,.18,.62,.92-.25*r);}`,
+  })));
+  markPoints.frustumCulled = false;
+  markPoints.visible = false;
+  markPoints.renderOrder = 3;
+  scene.add(markPoints);
+  const raycaster = new THREE.Raycaster();
+
+  function markTarget(): MarkTarget | undefined {
+    if (!model) return undefined;
+    if (!markTargetCache) markTargetCache = buildMarkTarget(model);
+    return markTargetCache;
+  }
+
+  function markPick(x: number, y: number) {
+    if (!model) return undefined;
+    // Mark mode runs in the single layout, so the whole canvas is the orbit camera's viewport.
+    const w = canvas.clientWidth || 1, h = canvas.clientHeight || 1;
+    raycaster.setFromCamera(new THREE.Vector2((x / w) * 2 - 1, -(y / h) * 2 + 1), camera);
+    const hits = raycaster.intersectObject(model, true);
+    const hit = hits.find((i) => i.object instanceof THREE.Mesh && !i.object.userData.depthPrepass);
+    if (!hit) return undefined;
+    markTarget();   // the pick names a mesh, so the target (and its index map) has to exist
+    const index = markIndexOf.get((hit.object as THREE.Mesh).geometry) ?? 0;
+    return { point: [hit.point.x, hit.point.y, hit.point.z] as [number, number, number], mesh: index };
+  }
+
+  function markProject(point: readonly [number, number, number]): Projection | undefined {
+    const w = canvas.clientWidth || 1, h = canvas.clientHeight || 1;
+    const p = new THREE.Vector3(point[0], point[1], point[2]);
+    const depth = p.clone().sub(camera.position).dot(camera.getWorldDirection(new THREE.Vector3()));
+    p.project(camera);
+    // One world unit at that depth, in CSS pixels: the perspective camera's half-height at the
+    // depth the point sits at is what a metre of brush radius has to be divided by.
+    const halfHeight = Math.tan(THREE.MathUtils.degToRad(camera.fov / 2)) * Math.max(depth, 1e-3);
+    return { x: (p.x + 1) / 2 * w, y: (1 - p.y) / 2 * h, scale: (h / 2) / Math.max(halfHeight, 1e-6) };
+  }
+
+  function showMarks(marks: readonly Uint8Array[] | null) {
+    const target = markTargetCache;
+    if (!marks || !target) { markPoints.visible = false; return; }
+    let n = 0;
+    for (const mask of marks) for (let i = 0; i < mask.length; i++) if (mask[i]) n++;
+    const attr = markGeo.getAttribute('position') as THREE.BufferAttribute;
+    if (attr.count < Math.max(n, 1)) {
+      markGeo.setAttribute('position', new THREE.BufferAttribute(new Float32Array(Math.max(n, 1) * 3), 3).setUsage(THREE.DynamicDrawUsage));
+    }
+    const dst = (markGeo.getAttribute('position') as THREE.BufferAttribute).array as Float32Array;
+    let w = 0;
+    for (let m = 0; m < marks.length; m++) {
+      const mask = marks[m], mesh = target.meshes[m];
+      if (!mesh) continue;
+      for (let i = 0; i < mask.length; i++) {
+        if (!mask[i]) continue;
+        dst[w++] = mesh.world[i * 3]; dst[w++] = mesh.world[i * 3 + 1]; dst[w++] = mesh.world[i * 3 + 2];
+      }
+    }
+    (markGeo.getAttribute('position') as THREE.BufferAttribute).needsUpdate = true;
+    markGeo.setDrawRange(0, n);
+    markPoints.visible = n > 0;
+  }
+
+  function setMarkInteraction(on: boolean) {
+    controls.mouseButtons = on
+      // Left paints, so the orbit must not have it. Right orbits (and, with a modifier, pans,
+      // which OrbitControls already does for whichever button it turns), middle dollies.
+      ? { LEFT: null, MIDDLE: THREE.MOUSE.DOLLY, RIGHT: THREE.MOUSE.ROTATE }
+      : { LEFT: THREE.MOUSE.ROTATE, MIDDLE: THREE.MOUSE.DOLLY, RIGHT: THREE.MOUSE.PAN };
+    if (!on) { markPoints.visible = false; }
+  }
+
+  function setRestPose(on: boolean) {
+    restPose = on;
+    if (!model) return;
+    if (on) {
+      mixer?.stopAllAction();
+      mixer?.update(0);
+      model.traverse((o) => { if (o instanceof THREE.SkinnedMesh) o.skeleton.pose(); });
+      current = undefined; setClip('');
+    } else if (restingClip && actions.has(restingClip)) {
+      paused = false;
+      play(restingClip, false);
+    }
+  }
+
+  /** A root-frame point as the scene shows it: the model is centred on FOCUS and scaled to its display length. */
+/**
+ * A root-frame point as the scene shows it.
+ *
+ * Through the model's own world matrix rather than by hand, because a raw generated body is
+ * *turned* before it is framed (`previewYaw`) and the editors measure it in the frame the file is
+ * in, which is the one before that turn. Centring and scaling it by hand was right while those two
+ * frames were the same and silently wrong the moment one of them was rotated: the drawings would
+ * show a body lying one way and place the cuts as though it lay another.
+ */
+  const rootToWorld = (x: number, y: number, z: number) => {
+    const p = new THREE.Vector3(x, y, z);
+    if (model) { model.updateMatrixWorld(); return p.applyMatrix4(model.matrixWorld); }
+    return p.sub(modelCenter).multiplyScalar(modelUnit).add(FOCUS);
+  };
+  /** The model's own turn, for the orthographic cameras: they frame root axes, not world ones. */
+  const rootTurn = () => (model ? model.getWorldQuaternion(new THREE.Quaternion()) : new THREE.Quaternion());
+
+  function placeOrtho(view: 'side' | 'top') {
+    const v = orthoViews[view];
+    if (!v) return;
+    const cam = orthoCameras[view];
+    const halfW = v.rect.width / 2 * v.unitsPerPixel * modelUnit, halfH = v.rect.height / 2 * v.unitsPerPixel * modelUnit;
+    cam.left = -halfW; cam.right = halfW; cam.top = halfH; cam.bottom = -halfH;
+    cam.updateProjectionMatrix();
+    const axisZ = v.axis === 'z';
+    // Screen-right is always +axis. Side: look across the body with +y up. Top: look down, with an
+    // up vector that keeps +axis on the right (that fixes the lateral sign the editor mirrors).
+    const c = axisZ ? new THREE.Vector3(modelCenter.x, 0, v.centre[0]) : new THREE.Vector3(v.centre[0], 0, modelCenter.z);
+    if (view === 'side') {
+      c.y = v.centre[1];
+      const target = rootToWorld(c.x, c.y, c.z);
+      const away = (axisZ ? new THREE.Vector3(-1, 0, 0) : new THREE.Vector3(0, 0, 1)).applyQuaternion(rootTurn());
+      cam.up.set(0, 1, 0).applyQuaternion(rootTurn());
+      cam.position.copy(target).addScaledVector(away, 500);
+      cam.lookAt(target);
+    } else {
+      c.y = modelCenter.y;
+      if (axisZ) c.x = v.centre[1]; else c.z = -v.centre[1];
+      const target = rootToWorld(c.x, c.y, c.z);
+      cam.up.set(axisZ ? 1 : 0, 0, axisZ ? 0 : -1).applyQuaternion(rootTurn());
+      cam.position.copy(target).add(new THREE.Vector3(0, 500, 0).applyQuaternion(rootTurn()));
+      cam.lookAt(target);
+    }
+  }
+
   // ---- loop ----
   const clock = new THREE.Clock();
   let time = 0, raf = 0, disposed = false;
@@ -361,7 +703,8 @@ export function createViewerScene(canvas: HTMLCanvasElement): ViewerScene {
   function resize() {
     const w = canvas.clientWidth || 1, h = canvas.clientHeight || 1;
     renderer.setSize(w, h, false);
-    camera.aspect = w / h;
+    const r = layout === 'split' && mainRect ? mainRect : { width: w, height: h };
+    camera.aspect = Math.max(r.width, 1) / Math.max(r.height, 1);
     camera.updateProjectionMatrix();
   }
   const ro = new ResizeObserver(resize);
@@ -402,8 +745,35 @@ export function createViewerScene(canvas: HTMLCanvasElement): ViewerScene {
     controls.update();
     fill.position.copy(camera.position);
     fill.position.y += frameRadius * .4;
+    if (layout !== 'split' || !mainRect) {
+      renderer.setScissorTest(false);
+      renderer.setViewport(0, 0, canvas.clientWidth || 1, canvas.clientHeight || 1);
+      renderer.render(scene, camera);
+      return;
+    }
+    const H = canvas.clientHeight || 1;
+    const viewport = (r: Rect) => {
+      renderer.setViewport(r.x, H - r.y - r.height, r.width, r.height);
+      renderer.setScissor(r.x, H - r.y - r.height, r.width, r.height);
+    };
+    renderer.setScissorTest(true);
+    viewport(mainRect);
     renderer.render(scene, camera);
+    // The two drawings: no water, no fog, no snow — a flat ground so the silhouette reads.
+    const savedBg = scene.background, savedFog = scene.fog;
+    scene.background = ORTHO_BG; scene.fog = null;
+    surface.visible = false; shafts.visible = false; particles.visible = false;
+    for (const view of ['side', 'top'] as const) {
+      const v = orthoViews[view];
+      if (!v || v.rect.width < 2 || v.rect.height < 2) continue;
+      placeOrtho(view);
+      viewport(v.rect);
+      renderer.render(scene, orthoCameras[view]);
+    }
+    surface.visible = true; shafts.visible = true; particles.visible = true;
+    scene.background = savedBg; scene.fog = savedFog;
   }
+  const ORTHO_BG = new THREE.Color('#0a2f38');
   tick();
 
   return {
@@ -426,6 +796,17 @@ export function createViewerScene(canvas: HTMLCanvasElement): ViewerScene {
     activeSlots() { return recolor?.slots ?? []; },
     onClip(cb) { clipCb = cb; cb(currentName); },
     resetCamera: frame,
+    sculptTarget() { return sculptTarget; },
+    applySculpt,
+    // A new viewport shape needs the specimen framed again for it.
+    setLayout(next, main) { const changed = next !== layout; layout = next; mainRect = main; resize(); if (changed) frame(); },
+    setOrthoView(view, v) { orthoViews[view] = v; },
+    setRestPose,
+    markTarget,
+    markPick,
+    markProject,
+    showMarks,
+    setMarkInteraction,
     dispose() {
       if (disposed) return;
       disposed = true;

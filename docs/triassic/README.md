@@ -1,0 +1,101 @@
+# Triassic — the third era
+
+Design and asset planning for the third installment: a Triassic sea, after the Cambrian
+(`/`) and the Devonian (`/devonian/`). Nothing here is built; this directory is the brief the
+build will work from, in the same shape as `docs/redesign/07-devonian-design.md` and
+`08-devonian-domination.md` were for the second era, kept together here because the user asked
+for the era's documents in one place next to `docs/devonian/`.
+
+| Doc | Contents |
+| --- | --- |
+| [01 · Design](01-triassic-design.md) | The pitch and the era mechanics (air as the cost of effort, live birth, the shore that reaches in, depth), the 21 playable creatures with their natural history and in-game effects, the non-playable shore animals (Tanystropheus and company), alternates. |
+| [02 · Biomes and depth](02-biomes-and-depth.md) | The nine biome slots recast for the Triassic, the water-depth profile (a sea floor that sinks toward the basin), and the prop and plant models each biome needs. |
+| [03 · Image and model requests](03-image-and-model-requests.md) | Every image and 3D model the era needs, in two tiers: Tier 1 goes through Tripo (all creatures, the shore animals, a few organic scenery pieces), Tier 2 is built in-house. Source-image briefs first, model requests against them second. |
+| [04 · Tripo pipeline](04-tripo-pipeline.md) | The production strategy: Tripo bodies on procedural skeletons, motion authored on the procedural twin and applied to the Tripo mesh; where the strategy is agreed with, where it is amended and why. |
+| [05 · The rest of the Mesozoic](05-mesozoic-expansion.md) | Widening the Triassic to the Jurassic and Cretaceous, or a fourth game: the mosasaurs, Archelon, pliosaurs, elasmosaurs, Leedsichthys, the marine crocodiles and diving birds, with kits on the existing traits; four new mechanics (the sky, the gape, weight, the bends); biomes; which twelve bodies to carry if the Triassic is widened instead. Proposal, not built. |
+| [canonical/](canonical/README.md) | The approved pose for each subject: the visual contract every model is made from, greenlit before anything is built from it. 26 images, plus the generated [review.md](canonical/review.md). |
+| [research.md](research.md) | The natural-history notes and sources the roster and biomes were drawn from, with confidence labels. |
+| [proportion-audit.md](proportion-audit.md) | Every Triassic body measured against that research, 13 September 2026: what each one's proportions actually are, which documented proportions they contradict, and whether the fix is a regeneration or a new canonical pose. |
+
+## Built: the playable skeleton
+
+The era is **playable at `/triassic/`** as of 12 September 2026, ahead of its art. What exists:
+
+- `src/content/triassic/` — the pack: 21 playable animals and the four shore animals, the biomes,
+  depth table, ecology, schemes, music rotation and sound map, the refinement queue (every model
+  outstanding) and `index.ts` with the borrowed bodies.
+- `src/sim/triassic/` — the rules behind the `RULES?.` hooks (`rules.ts`), the era's specials
+  (`specials.ts`), and the shore animals (`shore.ts`).
+- The engine seams the era needed, all optional and unused by the other eras: `breathing: 'air'`,
+  `armourFacing`, `warmBlooded`, `riseRate`, `shore`, `birth`, `flight`, `thunniform`, `sink`,
+  `neckReach`, `paddleRow`, `pod`, `peaceful` on `CreatureDef`; `environment.floorDepth` and the
+  per-biome sea floor in `src/sim/world.ts`; `liveBirth` on the era rules; `'<era>/<id>'` stand-ins
+  that borrow another era's body, and `standInsPlayable`, which lets them be picked; the HUD's
+  air and shore warnings; three-way era links on the title and pick screens.
+- **Every model is a borrowed Devonian body** (`TRIASSIC_STAND_INS`), recoloured with the
+  animal's scheme, with placeholder portraits cut from the canonical poses
+  (`tools/triassic/placeholder-portraits.mjs`), procedural biome plates if the paintings are ever missing (`npm run triassic:plates`)
+  and placeholder brand art (`npm run triassic:brand`) — except that the wordmark, the composed
+  title art and the nine painted biome plates have since been **delivered**
+  (`public/assets/triassic/brand/manifest.json`, `tools/triassic/environment-image-prompts.json`;
+  the plates are wired by name through `BIOME_PLATES`), so only the emblem is still a placeholder.
+  The scenery source sheets for the four organic props sit in `intake/triassic/scenery/`, waiting
+  for their Tripo generations. When a real model lands: put the GLB, LOD,
+  portraits and JSON in `public/assets/triassic/creatures/`, list the id in
+  `tools/triassic/shipped.json`, run `node tools/update-asset-sizes.mjs`, and the stand-in and the
+  preview badge go away on their own; `npm run triassic` checks both halves.
+- Movement stats are generated: `docs/research/triassic-swimming.json` → `npm run triassic:stats`.
+- `npm run triassic` is the era's headless suite (the pack, the floor, air, armour facing, birth,
+  the shore, every animal's specials, the ladder, determinism).
+
+What is *not* built, in the order it is worth doing: the viewer's Triassic collection (the
+catalogue only lists the first two eras); the shore animals' own clips and the strike as an
+animation (today it is a hit and an event on a borrowed body); the calf's birth performance and
+the blow's spray at the surface; the log rafts as a floating, grippable prop; authored Triassic
+scenery kinds (every plant is a re-tinted Devonian procedural kind); the era's own sounds
+(`docs/audio-requests.md`); and the balance pass, since every number was set by feel.
+
+## Where it will live when built
+
+Following the era boundary in [06](../redesign/06-era-content.md), and now in place: `src/content/triassic/` for the
+pack, `src/sim/triassic/` for the rules behind the `RULES?.` hooks, `/triassic/` as the entry
+(`src/triassic/main.tsx` selecting the era before importing the app), `public/assets/triassic/`
+for the assets, `tools/triassic/` for the builders and checks, and `docs/triassic/` (this
+directory) for the era's own documents. No playable animal ever leaves the water.
+
+## Looking at it
+
+[games.hoai.net/cambrian/research/triassic/](https://games.hoai.net/cambrian/research/triassic/)
+puts every subject side by side with reference images from Wikimedia Commons, with a key that flips
+between the reference and our canonical pose. Its source is
+[`docs/research/triassic/viewer/`](../research/triassic/viewer/), whose `index.html` also opens
+straight off the disk; `npm run triassic:viewer` regenerates both after a new pose lands.
+
+It is also where the **greenlight** happens: pick the image each animal should be built from, export
+the decisions, and `node tools/triassic/apply-selections.mjs <file>` records them in
+[canonical/manifest.json](canonical/manifest.json) and writes the rework brief to
+[canonical/review.md](canonical/review.md). A pose is greenlit before its modelling sheet and its
+Tripo generation are made, never after — see [04](04-tripo-pipeline.md).
+
+## Open decisions
+
+Three things the documents could not settle and the user should:
+
+1. **Helicoprion.** It has no Triassic record (Permian only; see [research.md](research.md#corrections-that-changed-the-design)).
+   It is on the roster as asked, designed to ship as a **labelled relict**; the honest Triassic
+   alternative, *Fadenia*, takes the same kit. [01 · T05](01-triassic-design.md#t05--helicoprion--the-whorl-a-relict-by-choice).
+2. **The Tripo account**: whether its plan permits commercial use of the output, and whether
+   multi-view input is available. [04](04-tripo-pipeline.md#what-tripo-is-asked-for-and-what-it-is-not).
+3. **A dinosaur on the shore.** Tanystropheus, the animal the "necks that reach in" idea is built
+   on, is not a dinosaur. A *Coelophysis* at the estuary is listed as an optional shore animal if
+   one is wanted. [01 · The shore animals](01-triassic-design.md#the-shore-animals).
+
+## Resume point
+
+Written in one session on 12 September 2026 and complete as a proposal: all five documents are
+in, and the research behind them is compiled in `research.md` from four parallel literature
+searches (sauropterygians and placodonts; ichthyosaurs; other reptiles and amphibians; fish,
+invertebrates and environments), every subject with sources and confidence labels. The next
+step is not more writing: it is the answers to the three decisions above, then the reference
+boards (A1 in [03](03-image-and-model-requests.md)) and the four pipeline-proving generations
+named at the end of that document.

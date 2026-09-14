@@ -30,3 +30,15 @@ Twenty-five anatomical joints include skull, hinged jaw, paired tusk platforms, 
 node tools/devonian/creatures/onychodus/motion-review.mjs
 node tools/devonian/creatures/onychodus/audit-export.mjs
 ```
+
+## V2 shipped — 12 September 2026
+
+`build_v2.py` ports the approved head study off the user reference (`docs/reference/Onychodus.jpg`):
+a nose station at y=−2.56 closing a blunt, deep snout; a lip ridge along the long gape; the dermal
+cranial bones mapped as suture grooves on the skull roof and cheek (`groove()` over a segment list
+in (y, angle) space); the paired tusk whorls brought forward to y=−2.28 with longer tusks whose tips
+sit at the upper lip when closed and show in Bite and Attack; the eye larger and higher at
+(±.30, −2.10, .265), audited at 73.6% / 73.3% inside the head (full) and 73.3% / 73.5% (reduced);
+anchors moved to the new snout tip. Packaging exact round-trip PASS at 139,544 / 39,064 triangles;
+intake PASS; portraits from the V2 build. `build.py` still reproduces V1. The user accepted the
+study on 12 September; badge cleared.

@@ -1,7 +1,10 @@
 """Read-only raw GLB material/skin/action validation for the authored Cladoselache exports."""
-import json,struct,hashlib,math
+import json,struct,hashlib,math,os
 from pathlib import Path
-here=Path(__file__).resolve().parent;root=here.parents[3];out=root.parent/'devonian-authoring/cladoselache/v2-candidate';reports=[]
+here=Path(__file__).resolve().parent;root=here.parents[3]
+# CLADOSELACHE_CANDIDATE overrides which candidate directory is validated (e.g. a v3-candidate
+# built by build_v3.py); default is unchanged so this still checks the shipped v2 candidate.
+out=Path(os.environ.get('CLADOSELACHE_CANDIDATE',str(root.parent/'devonian-authoring/cladoselache/v2-candidate')));reports=[]
 for suffix in ['', '.lod1']:
  path=out/('cladoselache'+suffix+'.glb');raw=path.read_bytes();n=struct.unpack_from('<I',raw,12)[0];g=json.loads(raw[20:20+n]);blob=raw[28+n:]
  def data(ai):
@@ -25,4 +28,7 @@ for suffix in ['', '.lod1']:
  assert len(signatures)==len(set(signatures))
  reports.append({'file':str(path),'sha256':hashlib.sha256(raw).hexdigest(),'bytes':len(raw),'clips':names,'distinctMotions':len(signatures),'materials':primitiveReports,'rootStable':True,'scaleChannels':False})
 assert len(reports[0]['clips'])==18;assert set(reports[1]['clips'])=={'Idle','Swim','Death'}
-(here/'export-review-v2.json').write_text(json.dumps({'id':'cladoselache','fullColorPolicy':'White COLOR_0 multiplied by UV albedo; no duplicate pigment darkening.','lodColorPolicy':'Texture-free, atlas-sampled linear vertex pigment.','exports':reports},indent=2));print('PASS',[(r['file'],r['bytes'],r['distinctMotions'])for r in reports])
+# Report written next to the checked candidate (not the tracked export-review-v2.json) whenever
+# CLADOSELACHE_CANDIDATE points somewhere other than the shipped v2-candidate.
+reviewPath=(here/'export-review-v2.json')if'CLADOSELACHE_CANDIDATE'not in os.environ else(out/'export-review.json')
+reviewPath.write_text(json.dumps({'id':'cladoselache','fullColorPolicy':'White COLOR_0 multiplied by UV albedo; no duplicate pigment darkening.','lodColorPolicy':'Texture-free, atlas-sampled linear vertex pigment.','exports':reports},indent=2));print('PASS',[(r['file'],r['bytes'],r['distinctMotions'])for r in reports])

@@ -99,4 +99,18 @@ export const clips = [
       legs(P, t, 1, { amp: .45, loopU: u });
     },
   },
+  {
+    name: 'Grab', duration: 1.1, loop: true,
+    // Held rather than eaten: the paddles stay raked all the way in against the mouth, the front
+    // legs keep a loose grip on the catch, the body stays crouched under it, and the legs and
+    // antennae carry on at a quiet fraction of their cruising beat.
+    pose(u, P, t) {
+      const ph = 2 * Math.PI * u;
+      paddles(P, { rake: 1.0 + .05 * Math.sin(ph), sweep: .15 });
+      body(P, { crouch: .5 + .04 * Math.sin(ph), nod: .05 });
+      for (const [row] of ROWS) for (let i = 0; i < 4; i++) P.bend(`leg_${pad(i)}_${row}`, FWD, .12 * Math.sin(ph - i * .6));
+      antennae(P, .3, ph);
+      legs(P, t, 1, { amp: .3, loopU: u });
+    },
+  },
 ];

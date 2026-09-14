@@ -1,8 +1,12 @@
 import type { EraDefinition } from '../era';
 
-/** Brand assets consumed by the Devonian era. */
+/**
+ * Brand assets consumed by the Devonian era. The wordmark is `logo-header.webp`, which
+ * `npm run logos` derives from the delivered `logo-engraved.webp` so the three games' marks read
+ * alike at interface size; the delivered mark stays beside it untouched.
+ */
 export const DEVONIAN_BRAND = {
-  logo: 'assets/devonian/brand/logo-engraved.webp',
+  logo: 'assets/devonian/brand/logo-header.webp',
   illustration: 'assets/devonian/brand/title.webp',
   emblem: 'assets/devonian/brand/emblem.webp',
 } as const satisfies Pick<EraDefinition['assets'], 'logo' | 'illustration' | 'emblem'>;

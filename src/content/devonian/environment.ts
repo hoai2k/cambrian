@@ -49,6 +49,30 @@ export const FLORA_BASE: Record<string, string> = {
  */
 export const SURFACE_Y = 64;
 
+/**
+ * How deep the water is over each biome — the floor is the surface less this, blended by the biome
+ * weights, so the way out to the open sea is a slope rather than a step (`depthProfile` in
+ * src/sim/world.ts).
+ *
+ * The sea used to be one depth everywhere: a flat sixty-four units of water from the beach to the
+ * basin, which made distance from the shore a change of scenery and nothing else. Now the shore is
+ * the shallowest thing in the era — thirty-four units, near the Cambrian's forty, so a hatchling
+ * starts somewhere its own size — and the floor falls away as you leave it. What that buys is the
+ * era's own mechanic: the lungs recover badly under water and completely at the surface, so depth
+ * is the price of being out where the big animals are, and it is a price that rises the further
+ * out you go.
+ *
+ * It is not a long swim to deep water. The channels carve down from about 170 units out, so the
+ * first place that is properly deep is close enough to reach and shallow enough to leave; the
+ * mud shelf sits near the old flat depth, so the middle of the map feels as it did; and only the
+ * reef front and the open sea are a real descent. The reef itself builds *up* toward the light,
+ * which is what a stromatoporoid does, so it is the one thing offshore that is shallower than what
+ * surrounds it.
+ */
+export const FLOOR_DEPTH: Record<Biome, number> = {
+  nursery: 26, shallows: 34, boulders: 46, flats: 52, shelf: 58, forest: 62, channel: 78, escarpment: 96, basin: 124,
+};
+
 export const FLORA_DENSITY: Record<Biome, Partial<Record<FloraKind, number>>> = {
   shallows: { reed: 16, crinoid: 1.2, log: 2.5, bryozoan: 0.8, tabulate: 0.6, frondTower: 2 },
   nursery: { reed: 26, crinoid: 12, log: 6, bryozoan: 5, rugose: 3, frondTower: 3 },   // thick enough to hide in; a giant still gets through

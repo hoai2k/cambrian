@@ -1,0 +1,107 @@
+{
+  "schema_version": 1,
+  "input": {
+    "path": "tools/triassic/creatures/rhaeticosaurus/tripo-raw/rhaeticosaurus.raw.glb",
+    "bytes": 1451024,
+    "sha256": "53a1cbe8cbfb45a20ce603493c40ae34add0b67f5d195540a5d9c62028bb5efe"
+  },
+  "summary": {
+    "mesh_objects": 1,
+    "vertices": 11078,
+    "faces": 19154,
+    "triangles": 19154,
+    "connected_components": 51,
+    "materials": 1,
+    "textures": 3
+  },
+  "bounds": {
+    "min_xyz": [
+      -0.5,
+      -0.49885,
+      -0.185656
+    ],
+    "max_xyz": [
+      0.5,
+      0.49885,
+      0.185656
+    ],
+    "center_xyz": [
+      0.0,
+      0.0,
+      0.0
+    ],
+    "size_xyz": [
+      1.0,
+      0.997699,
+      0.371312
+    ]
+  },
+  "meshes": [
+    {
+      "object": "tripo_node_fc7ac57e-a434-417d-9c85-cd53116e6664",
+      "mesh": "tripo_mesh_fc7ac57e-a434-417d-9c85-cd53116e6664",
+      "vertices": 11078,
+      "edges": 30181,
+      "faces": 19154,
+      "triangles": 19154,
+      "connected_components": 51,
+      "material_slots": [
+        "tripo_material_fc7ac57e-a434-417d-9c85-cd53116e6664"
+      ]
+    }
+  ],
+  "materials": [
+    {
+      "name": "tripo_material_fc7ac57e-a434-417d-9c85-cd53116e6664",
+      "image_textures": [
+        "Color_fc7ac57e-a434-417d-9c85-cd53116e6664",
+        "NormalGL_fc7ac57e-a434-417d-9c85-cd53116e6664",
+        "ORM_fc7ac57e-a434-417d-9c85-cd53116e6664"
+      ]
+    }
+  ],
+  "textures": [
+    {
+      "name": "Color_fc7ac57e-a434-417d-9c85-cd53116e6664",
+      "width": 2048,
+      "height": 2048,
+      "channels": 4,
+      "packed": true,
+      "source": "FILE",
+      "colorspace": "sRGB"
+    },
+    {
+      "name": "NormalGL_fc7ac57e-a434-417d-9c85-cd53116e6664",
+      "width": 2048,
+      "height": 2048,
+      "channels": 4,
+      "packed": true,
+      "source": "FILE",
+      "colorspace": "Non-Color"
+    },
+    {
+      "name": "ORM_fc7ac57e-a434-417d-9c85-cd53116e6664",
+      "width": 2048,
+      "height": 2048,
+      "channels": 4,
+      "packed": true,
+      "source": "FILE",
+      "colorspace": "Non-Color"
+    }
+  ],
+  "renders": {
+    "side": "tools/triassic/creatures/rhaeticosaurus/tripo-raw/review/side.png",
+    "top": "tools/triassic/creatures/rhaeticosaurus/tripo-raw/review/top.png",
+    "three-quarter": "tools/triassic/creatures/rhaeticosaurus/tripo-raw/review/three-quarter.png"
+  },
+  "preview": {
+    "path": "tools/triassic/creatures/rhaeticosaurus/rhaeticosaurus.preview.glb",
+    "triangle_limit": 40000,
+    "triangles_before": 19154,
+    "triangles_after": 19154,
+    "bytes": 1335860,
+    "sha256": "3f758e2a5df17756022b92bbf97ed42cd68315ad6abc6d9b94fb945491150df7"
+  },
+  "reviewStatus": "rejected-repair-candidate",
+  "reviewNote": "Generated from superseded short-neck input. Preserved at user request for possible Blender neck extension; not approved or final."
+}

@@ -1,0 +1,105 @@
+{
+  "schema_version": 1,
+  "input": {
+    "path": "tools/triassic/creatures/placodus/tripo-raw/placodus.raw.glb",
+    "bytes": 1737372,
+    "sha256": "da0e59fb34fee098f9fdd2da12b95ce1a48de640db1b34428c9b1575508eed84"
+  },
+  "summary": {
+    "mesh_objects": 1,
+    "vertices": 11515,
+    "faces": 19189,
+    "triangles": 19189,
+    "connected_components": 81,
+    "materials": 1,
+    "textures": 3
+  },
+  "bounds": {
+    "min_xyz": [
+      -0.5,
+      -0.324407,
+      -0.187844
+    ],
+    "max_xyz": [
+      0.5,
+      0.324407,
+      0.187844
+    ],
+    "center_xyz": [
+      0,
+      0,
+      0
+    ],
+    "size_xyz": [
+      1,
+      0.648813,
+      0.375688
+    ]
+  },
+  "meshes": [
+    {
+      "object": "tripo_node_29cee7a9-c253-42f0-8149-d238b9273d2a",
+      "mesh": "tripo_mesh_29cee7a9-c253-42f0-8149-d238b9273d2a",
+      "vertices": 11515,
+      "edges": 30623,
+      "faces": 19189,
+      "triangles": 19189,
+      "connected_components": 81,
+      "material_slots": [
+        "tripo_material_29cee7a9-c253-42f0-8149-d238b9273d2a"
+      ]
+    }
+  ],
+  "materials": [
+    {
+      "name": "tripo_material_29cee7a9-c253-42f0-8149-d238b9273d2a",
+      "image_textures": [
+        "Color_29cee7a9-c253-42f0-8149-d238b9273d2a",
+        "NormalGL_29cee7a9-c253-42f0-8149-d238b9273d2a",
+        "ORM_29cee7a9-c253-42f0-8149-d238b9273d2a"
+      ]
+    }
+  ],
+  "textures": [
+    {
+      "name": "Color_29cee7a9-c253-42f0-8149-d238b9273d2a",
+      "width": 2048,
+      "height": 2048,
+      "channels": 4,
+      "packed": true,
+      "source": "FILE",
+      "colorspace": "sRGB"
+    },
+    {
+      "name": "NormalGL_29cee7a9-c253-42f0-8149-d238b9273d2a",
+      "width": 2048,
+      "height": 2048,
+      "channels": 4,
+      "packed": true,
+      "source": "FILE",
+      "colorspace": "Non-Color"
+    },
+    {
+      "name": "ORM_29cee7a9-c253-42f0-8149-d238b9273d2a",
+      "width": 2048,
+      "height": 2048,
+      "channels": 4,
+      "packed": true,
+      "source": "FILE",
+      "colorspace": "Non-Color"
+    }
+  ],
+  "renders": {
+    "side": "tools/triassic/creatures/placodus/tripo-raw/review/side.png",
+    "top": "tools/triassic/creatures/placodus/tripo-raw/review/top.png",
+    "three-quarter": "tools/triassic/creatures/placodus/tripo-raw/review/three-quarter.png"
+  },
+  "preview": {
+    "path": "tools/triassic/creatures/placodus/placodus.preview.glb",
+    "triangle_limit": 40000,
+    "triangles_before": 19189,
+    "triangles_after": 19189,
+    "bytes": 1622000,
+    "sha256": "21489b61773f3be56ecee97b86eeb2b1403bd0396e579a645c5ef60d9e7cdad8"
+  }
+}

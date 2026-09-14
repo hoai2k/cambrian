@@ -1,0 +1,412 @@
+{
+  "sourceSha256": "d9761e0182886d8aa5ba634c2af42add4a492fea8b272b607b3791619eee78ee",
+  "setae": {
+    "fineSetalBases": 558,
+    "maximumSignedDistanceFromCuticle": -0.0011384400550014107,
+    "allInsideOrAtSurface": true,
+    "method": "Basal-ring centroids against nearest actual cuticle triangle and oriented normal in bind pose; each bristle shares its supporting cuticle article bone."
+  },
+  "sampledPoses": 76,
+  "walkingLegArticleCounts": {
+    "WL1L": 9,
+    "WL1R": 9,
+    "WL2L": 10,
+    "WL2R": 10,
+    "WL3L": 10,
+    "WL3R": 10,
+    "WL4L": 10,
+    "WL4R": 10
+  },
+  "maximumArticulationGap": 0.0,
+  "oralVertexCount": 440,
+  "oralBones": [
+    "oralTip"
+  ],
+  "eyes": {
+    "status": "not-applicable",
+    "reason": "Fossil ocular bumps reinterpreted as cuticular/sensory tubercles by Sabroux2024. Actual lens positions unresolved; no invented eye globes."
+  },
+  "scope": "Bone-chain joint alignment and oral binding, not a universal mesh-intersection proof. Actual exported visual review also required.",
+  "results": [
+    {
+      "clip": "Ability",
+      "phase": 0,
+      "maximumArticulationGap": 0.0
+    },
+    {
+      "clip": "Ability",
+      "phase": 0.3,
+      "maximumArticulationGap": 0.0
+    },
+    {
+      "clip": "Ability",
+      "phase": 0.5,
+      "maximumArticulationGap": 0.0
+    },
+    {
+      "clip": "Ability",
+      "phase": 1,
+      "maximumArticulationGap": 0.0
+    },
+    {
+      "clip": "Attack",
+      "phase": 0,
+      "maximumArticulationGap": 0.0
+    },
+    {
+      "clip": "Attack",
+      "phase": 0.3,
+      "maximumArticulationGap": 0.0
+    },
+    {
+      "clip": "Attack",
+      "phase": 0.5,
+      "maximumArticulationGap": 0.0
+    },
+    {
+      "clip": "Attack",
+      "phase": 1,
+      "maximumArticulationGap": 0.0
+    },
+    {
+      "clip": "Bite",
+      "phase": 0,
+      "maximumArticulationGap": 0.0
+    },
+    {
+      "clip": "Bite",
+      "phase": 0.3,
+      "maximumArticulationGap": 0.0
+    },
+    {
+      "clip": "Bite",
+      "phase": 0.5,
+      "maximumArticulationGap": 0.0
+    },
+    {
+      "clip": "Bite",
+      "phase": 1,
+      "maximumArticulationGap": 0.0
+    },
+    {
+      "clip": "Death",
+      "phase": 0,
+      "maximumArticulationGap": 0.0
+    },
+    {
+      "clip": "Death",
+      "phase": 0.3,
+      "maximumArticulationGap": 0.0
+    },
+    {
+      "clip": "Death",
+      "phase": 0.5,
+      "maximumArticulationGap": 0.0
+    },
+    {
+      "clip": "Death",
+      "phase": 1,
+      "maximumArticulationGap": 0.0
+    },
+    {
+      "clip": "Dive",
+      "phase": 0,
+      "maximumArticulationGap": 0.0
+    },
+    {
+      "clip": "Dive",
+      "phase": 0.3,
+      "maximumArticulationGap": 0.0
+    },
+    {
+      "clip": "Dive",
+      "phase": 0.5,
+      "maximumArticulationGap": 0.0
+    },
+    {
+      "clip": "Dive",
+      "phase": 1,
+      "maximumArticulationGap": 0.0
+    },
+    {
+      "clip": "Dodge",
+      "phase": 0,
+      "maximumArticulationGap": 0.0
+    },
+    {
+      "clip": "Dodge",
+      "phase": 0.3,
+      "maximumArticulationGap": 0.0
+    },
+    {
+      "clip": "Dodge",
+      "phase": 0.5,
+      "maximumArticulationGap": 0.0
+    },
+    {
+      "clip": "Dodge",
+      "phase": 1,
+      "maximumArticulationGap": 0.0
+    },
+    {
+      "clip": "Eat",
+      "phase": 0,
+      "maximumArticulationGap": 0.0
+    },
+    {
+      "clip": "Eat",
+      "phase": 0.3,
+      "maximumArticulationGap": 0.0
+    },
+    {
+      "clip": "Eat",
+      "phase": 0.5,
+      "maximumArticulationGap": 0.0
+    },
+    {
+      "clip": "Eat",
+      "phase": 1,
+      "maximumArticulationGap": 0.0
+    },
+    {
+      "clip": "Grab",
+      "phase": 0,
+      "maximumArticulationGap": 0.0
+    },
+    {
+      "clip": "Grab",
+      "phase": 0.3,
+      "maximumArticulationGap": 0.0
+    },
+    {
+      "clip": "Grab",
+      "phase": 0.5,
+      "maximumArticulationGap": 0.0
+    },
+    {
+      "clip": "Grab",
+      "phase": 1,
+      "maximumArticulationGap": 0.0
+    },
+    {
+      "clip": "Guard",
+      "phase": 0,
+      "maximumArticulationGap": 0.0
+    },
+    {
+      "clip": "Guard",
+      "phase": 0.3,
+      "maximumArticulationGap": 0.0
+    },
+    {
+      "clip": "Guard",
+      "phase": 0.5,
+      "maximumArticulationGap": 0.0
+    },
+    {
+      "clip": "Guard",
+      "phase": 1,
+      "maximumArticulationGap": 0.0
+    },
+    {
+      "clip": "Heavy",
+      "phase": 0,
+      "maximumArticulationGap": 0.0
+    },
+    {
+      "clip": "Heavy",
+      "phase": 0.3,
+      "maximumArticulationGap": 0.0
+    },
+    {
+      "clip": "Heavy",
+      "phase": 0.5,
+      "maximumArticulationGap": 0.0
+    },
+    {
+      "clip": "Heavy",
+      "phase": 1,
+      "maximumArticulationGap": 0.0
+    },
+    {
+      "clip": "Hit",
+      "phase": 0,
+      "maximumArticulationGap": 0.0
+    },
+    {
+      "clip": "Hit",
+      "phase": 0.3,
+      "maximumArticulationGap": 0.0
+    },
+    {
+      "clip": "Hit",
+      "phase": 0.5,
+      "maximumArticulationGap": 0.0
+    },
+    {
+      "clip": "Hit",
+      "phase": 1,
+      "maximumArticulationGap": 0.0
+    },
+    {
+      "clip": "Idle",
+      "phase": 0,
+      "maximumArticulationGap": 0.0
+    },
+    {
+      "clip": "Idle",
+      "phase": 0.3,
+      "maximumArticulationGap": 0.0
+    },
+    {
+      "clip": "Idle",
+      "phase": 0.5,
+      "maximumArticulationGap": 0.0
+    },
+    {
+      "clip": "Idle",
+      "phase": 1,
+      "maximumArticulationGap": 0.0
+    },
+    {
+      "clip": "Moult",
+      "phase": 0,
+      "maximumArticulationGap": 0.0
+    },
+    {
+      "clip": "Moult",
+      "phase": 0.3,
+      "maximumArticulationGap": 0.0
+    },
+    {
+      "clip": "Moult",
+      "phase": 0.5,
+      "maximumArticulationGap": 0.0
+    },
+    {
+      "clip": "Moult",
+      "phase": 1,
+      "maximumArticulationGap": 0.0
+    },
+    {
+      "clip": "Parry",
+      "phase": 0,
+      "maximumArticulationGap": 0.0
+    },
+    {
+      "clip": "Parry",
+      "phase": 0.3,
+      "maximumArticulationGap": 0.0
+    },
+    {
+      "clip": "Parry",
+      "phase": 0.5,
+      "maximumArticulationGap": 0.0
+    },
+    {
+      "clip": "Parry",
+      "phase": 1,
+      "maximumArticulationGap": 0.0
+    },
+    {
+      "clip": "Rise",
+      "phase": 0,
+      "maximumArticulationGap": 0.0
+    },
+    {
+      "clip": "Rise",
+      "phase": 0.3,
+      "maximumArticulationGap": 0.0
+    },
+    {
+      "clip": "Rise",
+      "phase": 0.5,
+      "maximumArticulationGap": 0.0
+    },
+    {
+      "clip": "Rise",
+      "phase": 1,
+      "maximumArticulationGap": 0.0
+    },
+    {
+      "clip": "Stagger",
+      "phase": 0,
+      "maximumArticulationGap": 0.0
+    },
+    {
+      "clip": "Stagger",
+      "phase": 0.3,
+      "maximumArticulationGap": 0.0
+    },
+    {
+      "clip": "Stagger",
+      "phase": 0.5,
+      "maximumArticulationGap": 0.0
+    },
+    {
+      "clip": "Stagger",
+      "phase": 1,
+      "maximumArticulationGap": 0.0
+    },
+    {
+      "clip": "Swim",
+      "phase": 0,
+      "maximumArticulationGap": 0.0
+    },
+    {
+      "clip": "Swim",
+      "phase": 0.3,
+      "maximumArticulationGap": 0.0
+    },
+    {
+      "clip": "Swim",
+      "phase": 0.5,
+      "maximumArticulationGap": 0.0
+    },
+    {
+      "clip": "Swim",
+      "phase": 1,
+      "maximumArticulationGap": 0.0
+    },
+    {
+      "clip": "TurnLeft",
+      "phase": 0,
+      "maximumArticulationGap": 0.0
+    },
+    {
+      "clip": "TurnLeft",
+      "phase": 0.3,
+      "maximumArticulationGap": 0.0
+    },
+    {
+      "clip": "TurnLeft",
+      "phase": 0.5,
+      "maximumArticulationGap": 0.0
+    },
+    {
+      "clip": "TurnLeft",
+      "phase": 1,
+      "maximumArticulationGap": 0.0
+    },
+    {
+      "clip": "TurnRight",
+      "phase": 0,
+      "maximumArticulationGap": 0.0
+    },
+    {
+      "clip": "TurnRight",
+      "phase": 0.3,
+      "maximumArticulationGap": 0.0
+    },
+    {
+      "clip": "TurnRight",
+      "phase": 0.5,
+      "maximumArticulationGap": 0.0
+    },
+    {
+      "clip": "TurnRight",
+      "phase": 1,
+      "maximumArticulationGap": 0.0
+    }
+  ]
+}

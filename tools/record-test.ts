@@ -10,6 +10,8 @@
  * that decide, so a recording that disagreed with the game would be a bug in the game.
  */
 import assert from 'node:assert/strict';
+import { applyScaleStats, bodyRadius, lengthOf } from '../src/sim/actors';
+import { creature } from '../src/sim/creatures';
 import { Game } from '../src/sim/game';
 import { emptyInput, type InputFrame } from '../src/sim/types';
 import {
@@ -61,7 +63,8 @@ function exported(): Record<string, unknown> {
   return JSON.parse(captured) as Record<string, unknown>;
 }
 
-type Sample = { t: number; why: string; state: string; graspT: number; rideHost: number; near: { gap: number; band: string }[]; input: Record<string, unknown> };
+type Near = { id: number; what: string; band: string; gap: number; dist: number; offAim: number };
+type Sample = { t: number; why: string; state: string; graspT: number; rideHost: number; near: Near[]; input: Record<string, unknown> };
 
 // --- a grab that works: the recording says so, and says what it took hold of ---
 {
@@ -140,6 +143,37 @@ type Sample = { t: number; why: string; state: string; graspT: number; rideHost:
   ok(grabs.length > 0, `a grab across slow frames is still recorded (${grabs.length})`);
   ok(grabs.length === new Set(grabs.map((e) => `${e.t}:${e.kind}`)).size,
     '...exactly once, not once per sub-step');
+}
+
+// --- the body a recording is about is in the record, however big it is ---
+// The first real recording of a failed grab carried 1133 samples and not one of them listed a
+// single neighbour: the player was a hatchling three quarters of a unit long, the range was six of
+// *its* body lengths from *its* centre, and the giant it was clinging to had its middle twice that
+// far away. The one animal the recording existed to explain never appeared in it. What is near has
+// to be measured the way a grip is measured — surface to surface.
+{
+  const g = new Game('reef', [{ creature: 'opabinia', device: 'keyboard', ready: true }], 21);
+  const p = g.players[0]; p.spawnProtect = 0; p.vel = { x: 0, y: 0, z: 0 };
+  // A hatchling: the size the player actually was, not the adult the other cases use.
+  p.scale = 0.18; applyScaleStats(p, creature('opabinia'));
+  const o = g.spawn('anomalocaris', 'giant', { x: 40, y: 14, z: -70 }, 6);
+  o.brain = undefined; o.spawnProtect = 0; o.yaw = Math.PI; o.vel = { x: 0, y: 0, z: 0 };
+  // Alongside the flank, a body's length off its surface — close by every measure the grip uses,
+  // and far outside any radius drawn round the hatchling's own centre.
+  p.pos = { x: 40 + bodyRadius(o) + lengthOf(p), y: 14, z: -70 };
+  p.yaw = -Math.PI / 2;
+  g.hash.rebuild(g.actors);
+  const frame: InputFrame = { ...emptyInput(), camYaw: -Math.PI / 2, heavy: true };
+  resetRecording(); startRecording();
+  for (let i = 0; i < 30; i++) { g.step(1 / 60, new Map([[0, frame]])); recordStep(g, p, frame, g.events); g.events.length = 0; }
+  stopRecording();
+  const rec = exported() as unknown as { samples: Sample[] };
+  const first = rec.samples[0];
+  const anom = first.near.find((n) => n.what === 'Anomalocaris');
+  ok(!!anom, `a giant whose centre is ${first.near.length ? '' : 'far '}off is still in the record`);
+  ok(!!anom && anom.gap < lengthOf(p) * 6 && anom.dist > lengthOf(p) * 6,
+    `...found by the gap between the surfaces (${anom?.gap}), not the distance between the centres (${anom?.dist})`);
+  ok(!!anom && anom.band === 'giant', `...and it is read as what it is: ${anom?.band}`);
 }
 
 // --- the recorder is off unless it is asked for, and stays off ---

@@ -107,8 +107,14 @@ export function driftRise(time: number): number {
  * The carry is an acceleration rather than a multiplier, so it settles against the same damping
  * every body already has instead of compounding step on step, and it is worth the same whether the
  * animal is strolling or sprinting — the stems give you a pull, not a percentage.
+ *
+ * Tuned against a nearly flat seabed, and the seabed is not flat any more: every era's floor now
+ * follows its biomes, which puts real relief into water that used to be level. A walker crossing a
+ * bed on relief takes a bent track through it and fewer stems come within reach, so the pull a bed
+ * was worth fell by half — eleven per cent further through the weed than in the open, down to four.
+ * This is the same carry it was always meant to be, priced for the sea it is actually in.
  */
-export const WEED_PULL = 24;
+export const WEED_PULL = 30;
 /** ...and it has the leverage of something several times its size against a stem it can grip. */
 export const WEED_LEVERAGE = 3;
 

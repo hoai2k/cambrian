@@ -1,7 +1,7 @@
 """Read-only raw GLB material/skin/action validation for the authored Palaeoisopus exports."""
-import json,struct,hashlib,math
+import json,struct,hashlib,math,os
 from pathlib import Path
-here=Path(__file__).resolve().parent;root=here.parents[3];out=root.parent/'devonian-authoring/palaeoisopus/v1-candidate';reports=[]
+here=Path(__file__).resolve().parent;root=here.parents[3];ANATOMY=os.environ.get('PAL_ANATOMY','v1');out=root.parent/('devonian-authoring/palaeoisopus/'+ANATOMY+'-candidate');reports=[]
 for suffix in ['', '.lod1']:
  path=out/('palaeoisopus'+suffix+'.glb');raw=path.read_bytes();n=struct.unpack_from('<I',raw,12)[0];g=json.loads(raw[20:20+n]);blob=raw[28+n:]
  def data(ai):
@@ -33,4 +33,4 @@ for suffix in ['', '.lod1']:
  reports.append({'file':str(path),'sha256':hashlib.sha256(raw).hexdigest(),'bytes':len(raw),'clips':names,'distinctMotions':len(signatures),'materials':primitiveReports,'rootStable':True,'scaleChannels':False,'anchors':sorted(anchorGraph),'skeleton':skeleton})
 assert reports[0]['anchors']==reports[1]['anchors'];assert reports[0]['skeleton']==reports[1]['skeleton']
 assert len(reports[0]['clips'])==19;assert set(reports[1]['clips'])=={'Idle','Swim','Death'}
-(here/'export-review-v1.json').write_text(json.dumps({'id':'palaeoisopus','fullColorPolicy':'White COLOR_0 multiplied by UV albedo; no duplicate pigment darkening.','lodColorPolicy':'Texture-free, atlas-sampled linear vertex pigment.','exports':reports},indent=2));print('PASS',[(r['file'],r['bytes'],r['distinctMotions'])for r in reports])
+(here/('export-review-'+ANATOMY+'.json')).write_text(json.dumps({'id':'palaeoisopus','fullColorPolicy':'White COLOR_0 multiplied by UV albedo; no duplicate pigment darkening.','lodColorPolicy':'Texture-free, atlas-sampled linear vertex pigment.','exports':reports},indent=2));print('PASS',[(r['file'],r['bytes'],r['distinctMotions'])for r in reports])

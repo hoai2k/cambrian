@@ -26,8 +26,26 @@ const EVERY = 2;
 const MAX_SAMPLES = 9000;
 /** How many bodies around the player to write down each sample, nearest first. */
 const NEIGHBOURS = 4;
-/** How far out to look for them, in the player's own body lengths. */
+/**
+ * How close a body has to be to be written down, as a gap between the two surfaces measured in the
+ * player's own body lengths.
+ *
+ * It used to be a radius round the player's centre, in the same units, and that made the recorder
+ * blind to exactly the animal a recording is usually about. A hatchling three quarters of a unit
+ * long clinging to the flank of a giant is four and a half units from its own centre at most — and
+ * the giant's *centre* is half its length away, ten units or more. So the one body in the frame
+ * that mattered never appeared in the list, in any sample, while the simulation's own account of
+ * the frame was naming it. Everything a grip is decided on is a surface-to-surface measure
+ * (`bodyGap`); the list of what is near has to be the same measure or it does not describe the
+ * same scene.
+ */
 const NEIGHBOUR_RANGE = 6;
+/**
+ * How wide to ask the world for candidates before ranking them by that gap. Centre-to-centre, and
+ * generous, because a body whose surface is a hand's breadth away can have its middle a long way
+ * off. Anything this pulls in that is not actually close is dropped by the gap test.
+ */
+const QUERY_RANGE = 60;
 
 const r2 = (n: number) => Math.round(n * 100) / 100;
 const r3 = (n: number) => Math.round(n * 1000) / 1000;
@@ -40,6 +58,8 @@ interface Near {
   len: number;
   /** Centre to centre, and surface to surface — the second is what every reach test uses. */
   dist: number; gap: number;
+  /** Where it is and which way it faces, so a ride can be checked against the body carrying it. */
+  pos: [number, number, number]; yaw: number;
   /** How far off dead ahead it is, in degrees, measured in the yaw plane as the grip measures it. */
   offAim: number;
   /** Things that take a body out of the running for a grip before anything else is considered. */
@@ -58,6 +78,8 @@ interface Sample {
   /** The grip: armed, how long for, whether it is spent, and what it has hold of. */
   graspHold: boolean; graspT: number; graspSpent: boolean;
   grabbing: number; grabbedBy: number; rideHost: number; riddenBy: number; rideT: number;
+  /** Seconds since the grip actually met the other body, -1 while still closing. Every window runs from it. */
+  gripSyncT: number;
   /** Aiming and the lunge, which is the other half of how a grip is reached. */
   aiming: boolean; aimTarget: number; aimInRange: boolean; lockTarget: number;
   pounceCd: number; dashCd: number; hitStop: number; iframes: number;
@@ -160,8 +182,13 @@ function pressed(f: InputFrame): Record<string, number | boolean> {
 function near(g: Game, a: Actor): Near[] {
   const L = lengthOf(a), h = { x: Math.sin(a.yaw), z: Math.cos(a.yaw) };
   const list: Near[] = [];
-  for (const o of g.nearby(a.pos, L * NEIGHBOUR_RANGE)) {
+  const reach = L * NEIGHBOUR_RANGE;
+  for (const o of g.nearby(a.pos, QUERY_RANGE)) {
     if (o.id === a.id) continue;
+    const gap = bodyGap(o, a);
+    // The host of a ride is always written down, however big it is and wherever its middle is: it
+    // is the subject of the recording whenever there is one.
+    if (gap > reach && o.id !== a.rideHost && o.id !== a.grabbing && o.id !== a.grabbedBy) continue;
     const dx = o.pos.x - a.pos.x, dy = o.pos.y - a.pos.y, dz = o.pos.z - a.pos.z;
     const flat = Math.hypot(dx, dz);
     const cos = flat > 1e-6 ? (dx * h.x + dz * h.z) / flat : 1;
@@ -173,7 +200,8 @@ function near(g: Game, a: Actor): Near[] {
       band: bandOf(a, o),
       len: r2(lengthOf(o)),
       dist: r2(Math.hypot(dx, dy, dz)),
-      gap: r2(bodyGap(o, a)),
+      gap: r2(gap),
+      pos: [r2(o.pos.x), r2(o.pos.y), r2(o.pos.z)], yaw: r3(o.yaw),
       offAim: Math.round((Math.acos(Math.max(-1, Math.min(1, cos))) * 180) / Math.PI),
       ...(isInvulnerable(o) ? { invulnerable: true } : {}),
       ...(o.state === 'grabbed' || o.state === 'swallowed' ? { held: true } : {}),
@@ -218,7 +246,7 @@ export function recordStep(g: Game, a: Actor, input: InputFrame, evs: readonly W
     scale: r2(a.scale), len: r2(lengthOf(a)), tier: a.tier,
     hp: Math.round(a.hp), stamina: Math.round(a.stamina), exhausted: r2(a.exhausted),
     graspHold: a.graspHold, graspT: r2(a.graspT), graspSpent: a.graspSpent,
-    grabbing: a.grabbing, grabbedBy: a.grabbedBy, rideHost: a.rideHost, riddenBy: a.riddenBy, rideT: r2(a.rideT),
+    grabbing: a.grabbing, grabbedBy: a.grabbedBy, rideHost: a.rideHost, riddenBy: a.riddenBy, rideT: r2(a.rideT), gripSyncT: r2(a.gripSyncT),
     aiming: a.aiming, aimTarget: input.aimTarget, aimInRange: a.aimInRange, lockTarget: a.lockTarget,
     pounceCd: r2(a.pounceCd), dashCd: r2(a.dashCd), hitStop: r2(a.hitStop), iframes: r2(a.iframes),
     grounded: a.grounded,

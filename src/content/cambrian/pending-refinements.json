@@ -1,19 +1,5 @@
 [
   {
-    "id": "odaraia",
-    "status": "pending",
-    "scope": "total-rework",
-    "model": true,
-    "clips": [
-      "Bite",
-      "Attack",
-      "Heavy",
-      "Eat"
-    ],
-    "clipReason": "Queued for the articulated attack and feeding pass: re-authored so the animal's real appendages, joint chains and mouth placement drive the motion \u2014 deliberate preparation, a directed reach, then recovery \u2014 instead of rigid whole-part rotations. Reviewed clip by clip.",
-    "reason": "Full rebuild from the user's references: a many-legged shrimp-like body inside a real curved semi-transparent shell, inverted swimming pose, and staggered metachronal limb motion. The articulated attack and feeding pass is folded into the new rig. Current model stays playable until the replacement is reviewed."
-  },
-  {
     "id": "anomalocaris",
     "status": "pending",
     "scope": "attack-feeding-animation",

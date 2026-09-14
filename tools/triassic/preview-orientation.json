@@ -1,0 +1,37 @@
+{
+  "$comment": [
+    "Estimated orientation of each raw generated Triassic body, read off fixed-world-axis renders",
+    "(tools/triassic/preview-orient.py) rather than guessed from the mesh. `yaw` is the rotation in",
+    "degrees about +y that brings the animal's head round to +z, which is where every shipped body",
+    "keeps it: nothosaurus carries anchor_mouth at z +2.48 of a 5.00 extent, coccosteus at +1.83 of",
+    "4.45. Up is +y in every one of these files, so no pitch or roll is estimated.",
+    "",
+    "These are ESTIMATES for previewing and nothing else. They are not a substitute for the",
+    "orientation and scale normalization the pipeline does when a body is cleaned and rigged, and",
+    "tools/triassic/preview-bodies.mjs deletes the whole preview entry the day the real body ships.",
+    "A yaw here that turns out wrong costs a preview that faces the wrong way, never a shipped asset."
+  ],
+  "yaw": {
+    "askeptosaurus": 0,
+    "atopodentatus": -90,
+    "birgeria": -90,
+    "cartorhynchus": 180,
+    "ceratites": 0,
+    "coelophysis": 0,
+    "cymbospondylus": 180,
+    "dinocephalosaurus": -90,
+    "helicoprion": 0,
+    "henodus": -90,
+    "hupehsuchus": 180,
+    "hybodus": 180,
+    "keichousaurus": 180,
+    "macrocnemus": 0,
+    "mixosaurus": 180,
+    "odontochelys": 180,
+    "phragmoteuthis": -90,
+    "placodus": -90,
+    "saurichthys": 180,
+    "tanystropheus": 0,
+    "rhaeticosaurus": 180
+  }
+}

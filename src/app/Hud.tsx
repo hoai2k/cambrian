@@ -40,10 +40,11 @@ export function Hud({ snapshot }: { snapshot: HudSnapshot }) {
  * `updateAim` picks its target by angular distance from the camera's forward axis, so with it gone
  * the centre of the view is still the aim point — implied rather than drawn.
  *
- * Three things survive it, and they are all the player's own doing rather than a readout of the
+ * Four things survive it, and they are all the player's own doing rather than a readout of the
  * world: a menu they opened themselves (teleport, change-creature, the held scoreboard), the fade
- * that takes the screen on a respawn, and the line that says what killed them — without that last
- * one a death is a fade to black with no account of itself.
+ * that takes the screen on a respawn, the line that says what killed them — without that last one
+ * a death is a fade to black with no account of itself — and the grip, which is the player holding
+ * a button down and is the one thing on the screen that says the button is doing anything.
  */
 function PlayerPanel({ p }: { p: PlayerHud }) {
   const s = p.scheme;
@@ -54,6 +55,7 @@ function PlayerPanel({ p }: { p: PlayerHud }) {
       {p.teleport && <TeleportMenu t={p.teleport} s={s} />}
       {p.swap && <SwapMenu swap={p.swap} s={s} />}
       {p.board && <Scoreboard board={p.board} me={p.index} />}
+      {p.grip && p.alive && <GripPanel grip={p.grip} s={s} />}
       <div className="fade" style={{ opacity: p.fade }} />
       {p.spectating && !p.alive && (
         <div className="spectating"><b>SPECTATING</b><span style={{ color: p.spectating.color }}>{p.spectating.name} · {creature(p.spectating.creature).name}</span></div>
@@ -110,7 +112,30 @@ function SensePanel({ p }: { p: PlayerHud }) {
         <div className="bars">
           <div className="name-row"><b>{def.name}</b><span className="tier-name">{p.tierName}</span>{p.protect && <span className="protect">PROTECTED</span>}</div>
           <div className="bar hp"><i style={{ width: `${(p.hp / p.hpMax) * 100}%` }} /></div>
-          <div className={`bar stamina ${p.exhausted ? 'exhausted' : ''}`}><i style={{ width: `${(p.stamina / p.staminaMax) * 100}%` }} /></div>
+          <div className={`bar stamina ${p.exhausted ? 'exhausted' : ''}`}>
+            <i style={{ width: `${(p.stamina / p.staminaMax) * 100}%` }} />
+            {/* The era's one new rule, on the bar it is about. An air-breather's stamina does not
+                come back under water and fills at the surface, and the bar said nothing about
+                either — so the game said it in a sentence, twice, and then in a sound once a
+                second. A mark on the bar says it continuously and silently: barred while the
+                recovery is off, an arrow up once the bar is spent and the fix is the surface. */}
+            {/* The mark is now about the breath being *gone*, which is the only state that stops
+                recovery. While there is air in the chest a lung is simply a lung. */}
+            {p.era?.air && !p.era.atSurface && (p.era.airLeft ?? 1) <= 0
+              && <i className={`air-mark ${p.stamina < p.staminaMax * 0.25 ? 'urgent' : ''}`}
+                   role="img"
+                   aria-label={p.stamina < p.staminaMax * 0.25 ? 'Surface for air' : 'Out of air: no stamina recovery'}
+                   style={{ maskImage: `url(${appBase()}${assetPaths.ui(p.stamina < p.staminaMax * 0.25 ? 'air-surface.svg' : 'air-recovery-off.svg')})` }} />}
+          </div>
+          {/* The breath being held, under the bar it governs. It is a clock on a dive rather than a
+              second health bar, so it is thin and quiet until its last minute, when it flashes. */}
+          {p.era?.airLeft != null && (
+            <div className={`bar air ${p.era.airLow ? 'low' : ''}`}
+                 role="img"
+                 aria-label={`Air ${Math.round(p.era.airLeft * 100)}%${p.era.airLow ? ', surface soon' : ''}`}>
+              <i style={{ width: `${p.era.airLeft * 100}%` }} />
+            </div>
+          )}
         </div>
       </div>
       {p.era && <EraStatus era={p.era} alive={p.alive} />}
@@ -174,6 +199,59 @@ function SensePanel({ p }: { p: PlayerHud }) {
         </div>
       )}
     </>
+  );
+}
+
+/**
+ * What you have hold of, while you have hold of it.
+ *
+ * The grip used to happen entirely in silence: a recording of a player trying to grab a giant had
+ * the grip closing three separate times and carrying them thirteen seconds, while the player — who
+ * could see none of that — reported that grabbing did not work. Every part of it was already
+ * knowable, so this says all of it: what is in the grip, what letting go would do to it, and how
+ * long that stays true. Without the last line a ride is a thing that happens *to* you.
+ *
+ * A settled ride shows no clock, because there is nothing timing it: holding on costs nothing and
+ * ends when the player lets go. What the bar counts, when there is one, is a window that is about
+ * to change what the button means.
+ */
+function GripPanel({ grip, s }: { grip: NonNullable<PlayerHud['grip']>; s: Scheme }) {
+  if (grip.kind === 'spent') {
+    return (
+      <div className="grip-panel spent">
+        <b>GRIP GIVEN OUT</b>
+        <span>Let go before trying again</span>
+      </div>
+    );
+  }
+  if (grip.kind === 'held') {
+    return (
+      <div className="grip-panel lost" style={{ color: BAND_COLOR[grip.band] }}>
+        <b>{grip.name.toUpperCase()} HAS YOU</b>
+        <div className="bar grip"><i style={{ width: `${(grip.left ?? 1) * 100}%` }} /></div>
+        <span>{key('dash', s)} to break free · easier while it is pulling</span>
+      </div>
+    );
+  }
+  const ride = grip.kind === 'ride';
+  // What letting go would do, in the player's own words. The two windows both run from contact and
+  // both change what the button means, so the line changes with them rather than describing a grip
+  // in general.
+  const say = {
+    strike: 'Release NOW to strike',
+    eat: 'Release to eat it',
+    escape: 'It is working loose — let go or lose it',
+    nothing: `${key('light', s)} bite · release to let go`,
+  }[grip.release];
+  return (
+    <div className={`grip-panel ${grip.release === 'strike' ? 'strike' : ''} ${grip.release === 'escape' ? 'lost' : ''}`} style={{ color: BAND_COLOR[grip.band] }}>
+      <b>{ride ? 'HOLDING ON' : 'IN YOUR JAWS'} · {grip.name}</b>
+      {/* A bar only while something is actually running down — the strike window on a ride, the
+          meal window on a mouthful. A settled ride has no clock, so it is given nothing that looks
+          like one. */}
+      {grip.left !== undefined && <div className="bar grip"><i style={{ width: `${grip.left * 100}%` }} /></div>}
+      <span>{say}</span>
+    </div>
   );
 }
 
@@ -397,11 +475,18 @@ const RUNG_NUMERALS = ['', 'I', 'II', 'III', 'IV'];
  */
 function EraStatus({ era, alive }: { era: EraHud; alive: boolean }) {
   if (!alive) return null;
-  const warn = era.inDeadZone ? (era.bimodal ? 'DEAD WATER · your lungs are fine, their gills are not' : 'DEAD WATER · no oxygen, get out') : era.beached ? 'ON THE SAND · nothing with gills can follow' : '';
+  const warn = era.inDeadZone ? (era.bimodal ? 'DEAD WATER · your lungs are fine, their gills are not' : 'DEAD WATER · no oxygen, get out')
+    : era.beached ? 'ON THE SAND · nothing with gills can follow'
+    : era.heldUnder ? 'HELD UNDER · nothing comes back until you are loose'
+    : (era.shoreWarn ?? 0) > 0 ? 'SOMETHING ON THE SHORE · it is reaching for you'
+    : era.drowning ? 'DROWNING · get to the surface'
+    : era.air && !era.atSurface && (era.airLeft ?? 1) <= 0 ? 'OUT OF AIR · nothing comes back until you breathe'
+    : era.airLow ? 'AIR RUNNING OUT · start for the surface' : '';
+  const danger = (era.inDeadZone && !era.bimodal) || era.heldUnder || (era.shoreWarn ?? 0) > 0 || !!era.drowning || !!era.airLow;
   return (
     <div className="era-status">
       {era.primeT > 0 && <div className="dominant"><span>PRIME</span><b>{Math.max(0, Math.ceil(90 - era.primeT))}</b></div>}
-      {warn && <div className={`era-warn ${era.inDeadZone && !era.bimodal ? 'danger' : ''}`}>{warn}</div>}
+      {warn && <div className={`era-warn ${danger ? 'danger' : ''}`}>{warn}</div>}
     </div>
   );
 }

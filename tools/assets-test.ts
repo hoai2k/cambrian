@@ -11,6 +11,8 @@ import { existsSync } from 'node:fs';
 import { CAMBRIAN } from '../src/content/cambrian';
 import { DEVONIAN } from '../src/content/devonian';
 import { DEVONIAN_SAMPLES } from '../src/content/devonian/sfx';
+import { TRIASSIC } from '../src/content/triassic';
+import { TRIASSIC_SAMPLES } from '../src/content/triassic/sfx';
 import { createAssetPaths } from '../src/content/asset-paths';
 import { SAMPLES } from '../src/audio/audio';
 import type { EraDefinition } from '../src/content/era';
@@ -33,7 +35,7 @@ const sfxPath = (era: EraDefinition, name: string) =>
 /** Cambrian is the shared/default library; the Devonian adds its own on top. */
 const CAMBRIAN_SAMPLES = { ...SAMPLES };
 
-for (const [era, extra] of [[CAMBRIAN, {}], [DEVONIAN, DEVONIAN_SAMPLES]] as const) {
+for (const [era, extra] of [[CAMBRIAN, {}], [DEVONIAN, DEVONIAN_SAMPLES], [TRIASSIC, TRIASSIC_SAMPLES]] as const) {
   console.log(`\n--- ${era.id} ---`);
   const paths = createAssetPaths(era);
   const standIns = era.assets.standIns ?? {};
@@ -45,8 +47,9 @@ for (const [era, extra] of [[CAMBRIAN, {}], [DEVONIAN, DEVONIAN_SAMPLES]] as con
   const missingLods = ids.filter((id) => !existsSync(pub(paths.model(id, 1))));
   check('...and a reduced copy', missingLods.length === 0, missingLods.join(','));
 
-  // portraits: required for creatures with art of their own, absent by design for stand-ins
-  const own = ids.filter((id) => !(id in standIns));
+  // portraits: required for creatures with art of their own, absent by design for stand-ins —
+  // unless the era plays its borrowed bodies, in which case every swimmer needs its placeholder
+  const own = ids.filter((id) => era.assets.standInsPlayable ? !era.creatures.find((c) => c.id === id)?.shore : !(id in standIns));
   for (const kind of ['thumb', 'select'] as const) {
     const missing = own.filter((id) => !existsSync(pub(paths.portrait(id, kind))));
     check(`every delivered creature has a ${kind}`, missing.length === 0, missing.join(',') || `${own.length} creatures`);
@@ -68,10 +71,10 @@ for (const [era, extra] of [[CAMBRIAN, {}], [DEVONIAN, DEVONIAN_SAMPLES]] as con
   check('title art exists', existsSync(pub(era.assets.illustration)), era.assets.illustration);
   if (era.copy.mobileIllustration) check('portrait title art exists', existsSync(pub(era.copy.mobileIllustration)), era.copy.mobileIllustration);
 
-  // nothing points into the other era's tree
-  const otherDir = era.id === 'cambrian' ? 'assets/devonian/' : null;
+  // nothing points into the other era's tree (a body borrowed across eras is the one sanctioned exception)
+  const otherDir = era.id === 'cambrian' ? 'assets/devonian/' : era.id === 'triassic' ? 'assets/devonian/' : null;
   if (otherDir) {
-    const strays = [paths.model(ids[0]), paths.portrait(own[0], 'thumb'), paths.biome('shelf'), paths.ui('mode-rise.webp')].filter((p) => p.includes(otherDir));
+    const strays = [...(ids[0] in standIns && String(standIns[ids[0] as keyof typeof standIns]).includes('/') ? [] : [paths.model(ids[0])]), paths.portrait(own[0], 'thumb'), paths.biome('shelf'), paths.ui('mode-rise.webp')].filter((p) => p.includes(otherDir));
     check('no path reaches into the other era', strays.length === 0, strays.join(','));
   }
 }

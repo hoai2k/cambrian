@@ -1,7 +1,11 @@
 """Read-only raw GLB material/skin/action validation for the authored Acanthostega exports."""
-import json,struct,hashlib,math
+import json,struct,hashlib,math,os
 from pathlib import Path
-here=Path(__file__).resolve().parent;root=here.parents[3];out=root.parent/'devonian-authoring/acanthostega/v1-candidate';reports=[]
+here=Path(__file__).resolve().parent;root=here.parents[3]
+# ACA_CANDIDATE_DIR points this check at a candidate build (e.g. a v2-candidate/) instead of the
+# shipped v1-candidate/; ACA_EXPORT_REPORT redirects the written report so a candidate run never
+# overwrites the tracked export-review-v1.json.
+out=Path(os.environ['ACA_CANDIDATE_DIR'])if os.environ.get('ACA_CANDIDATE_DIR')else root.parent/'devonian-authoring/acanthostega/v1-candidate';reports=[]
 for suffix in ['', '.lod1']:
  path=out/('acanthostega'+suffix+'.glb');raw=path.read_bytes();n=struct.unpack_from('<I',raw,12)[0];g=json.loads(raw[20:20+n]);blob=raw[28+n:]
  def data(ai):
@@ -33,4 +37,5 @@ for suffix in ['', '.lod1']:
  reports.append({'file':str(path),'sha256':hashlib.sha256(raw).hexdigest(),'bytes':len(raw),'clips':names,'distinctMotions':len(signatures),'materials':primitiveReports,'rootStable':True,'scaleChannels':False,'anchors':sorted(anchorGraph),'skeleton':skeleton})
 assert reports[0]['anchors']==reports[1]['anchors'];assert reports[0]['skeleton']==reports[1]['skeleton']
 assert len(reports[0]['clips'])==18;assert set(reports[1]['clips'])=={'Idle','Swim','Death'}
-(here/'export-review-v1.json').write_text(json.dumps({'id':'acanthostega','fullColorPolicy':'White COLOR_0 multiplied by UV albedo; no duplicate pigment darkening.','lodColorPolicy':'Texture-free, atlas-sampled linear vertex pigment.','exports':reports},indent=2));print('PASS',[(r['file'],r['bytes'],r['distinctMotions'])for r in reports])
+report_path=Path(os.environ['ACA_EXPORT_REPORT'])if os.environ.get('ACA_EXPORT_REPORT')else here/'export-review-v1.json'
+report_path.write_text(json.dumps({'id':'acanthostega','fullColorPolicy':'White COLOR_0 multiplied by UV albedo; no duplicate pigment darkening.','lodColorPolicy':'Texture-free, atlas-sampled linear vertex pigment.','exports':reports},indent=2));print('PASS',[(r['file'],r['bytes'],r['distinctMotions'])for r in reports])

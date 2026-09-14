@@ -66,6 +66,9 @@ export class GameAudio {
   private sfxBus?: GainNode;
   private ambGain?: GainNode;
   private tensionGain?: GainNode;
+  /** The sprint wash: a loop held at silence and wound up while a local player is driving. */
+  private sprintGain?: GainNode;
+  private sprintStarted = false;
   private musicGain?: GainNode;
   private musicStarted = false;
   private music?: MusicVoice;
@@ -113,6 +116,7 @@ export class GameAudio {
     // Sample-based ambience and tension (start silent, fade in once loaded)
     this.ambGain = ctx.createGain(); this.ambGain.gain.value = 0; this.ambGain.connect(this.master);
     this.tensionGain = ctx.createGain(); this.tensionGain.gain.value = 0; this.tensionGain.connect(this.master);
+    this.sprintGain = ctx.createGain(); this.sprintGain.gain.value = 0; this.sprintGain.connect(this.master);
     this.musicGain = ctx.createGain(); this.musicGain.gain.value = 0; this.musicGain.connect(this.master);
     if (this.ambience) this.startSoundtrack();
     void this.preload();
@@ -326,6 +330,31 @@ export class GameAudio {
     this.ambGain.gain.linearRampToValueAtTime(0.55, t + 2.5);
   }
   private startDrone() { if (this.tensionGain) this.startLoop(loops().drone, this.tensionGain); }
+
+  /**
+   * How hard the local player is driving, 0..1 — the wash of water over a body that is sprinting.
+   *
+   * Sprinting used to be a *sting*: one whoosh on every press, at the loudest volume in the game,
+   * and on a body over `HUGE_LENGTH` the giant's own surge sample. Sprint is not an event, it is a
+   * thing you are doing, sometimes for a minute at a time, so it is a bed now: a loop that fades up
+   * while the body is driving and away when it stops, well under the ambience. The sample is the
+   * delivered `burst` whoosh looped on itself (see `startLoop` for the seam) until there is a
+   * purpose-made one — docs/audio-requests.md has the ask.
+   */
+  setSprint(level: number) {
+    if (!this.ctx || !this.sprintGain) return;
+    const want = Math.max(0, Math.min(1, level));
+    const name = SAMPLES.burst?.[0];
+    if (!this.sprintStarted && want > 0 && name) {
+      if (!this.buffers.has(name)) { void this.load(name); return; }   // next frame, with the sound
+      this.sprintStarted = true;
+      this.startLoop(name, this.sprintGain);
+    }
+    // Quiet: this sits under the reef rather than over it. Up quickly, out slowly, so a tap is a
+    // swell rather than a click and letting go trails off the way the water would.
+    const now = this.ctx.currentTime;
+    this.sprintGain.gain.setTargetAtTime(want * 0.16, now, want > 0 ? 0.08 : 0.25);
+  }
 
   resume() { this.ctx?.resume(); }
   setVolume(v: number) { this.volume = v; this.applyGain(); }

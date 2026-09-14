@@ -1,0 +1,97 @@
+{
+  "schema_version": 1,
+  "input": {
+    "path": "tools/triassic/creatures/nothosaurus/tripo-raw/nothosaurus.raw.glb",
+    "bytes": 1541680,
+    "sha256": "5cb48becbdcbbc3863519bca8a2bb99c5129c6a0e5b1affb6252e15e01c49604"
+  },
+  "summary": {
+    "mesh_objects": 1,
+    "vertices": 11534,
+    "faces": 19250,
+    "triangles": 19250,
+    "connected_components": 79,
+    "materials": 1,
+    "textures": 3
+  },
+  "bounds": {
+    "min_xyz": [
+      -0.5,
+      -0.331899,
+      -0.131867
+    ],
+    "max_xyz": [
+      0.5,
+      0.331899,
+      0.131867
+    ],
+    "center_xyz": [
+      0.0,
+      0.0,
+      0.0
+    ],
+    "size_xyz": [
+      1.0,
+      0.663797,
+      0.263733
+    ]
+  },
+  "meshes": [
+    {
+      "object": "tripo_node_ea4528e3-1f9a-42f4-b0c4-2b84b879ff7c",
+      "mesh": "tripo_mesh_ea4528e3-1f9a-42f4-b0c4-2b84b879ff7c",
+      "vertices": 11534,
+      "edges": 30705,
+      "faces": 19250,
+      "triangles": 19250,
+      "connected_components": 79,
+      "material_slots": [
+        "tripo_material_ea4528e3-1f9a-42f4-b0c4-2b84b879ff7c"
+      ]
+    }
+  ],
+  "materials": [
+    {
+      "name": "tripo_material_ea4528e3-1f9a-42f4-b0c4-2b84b879ff7c",
+      "image_textures": [
+        "Color_ea4528e3-1f9a-42f4-b0c4-2b84b879ff7c",
+        "NormalGL_ea4528e3-1f9a-42f4-b0c4-2b84b879ff7c",
+        "ORM_ea4528e3-1f9a-42f4-b0c4-2b84b879ff7c"
+      ]
+    }
+  ],
+  "textures": [
+    {
+      "name": "Color_ea4528e3-1f9a-42f4-b0c4-2b84b879ff7c",
+      "width": 2048,
+      "height": 2048,
+      "channels": 4,
+      "packed": true,
+      "source": "FILE",
+      "colorspace": "sRGB"
+    },
+    {
+      "name": "NormalGL_ea4528e3-1f9a-42f4-b0c4-2b84b879ff7c",
+      "width": 2048,
+      "height": 2048,
+      "channels": 4,
+      "packed": true,
+      "source": "FILE",
+      "colorspace": "Non-Color"
+    },
+    {
+      "name": "ORM_ea4528e3-1f9a-42f4-b0c4-2b84b879ff7c",
+      "width": 2048,
+      "height": 2048,
+      "channels": 4,
+      "packed": true,
+      "source": "FILE",
+      "colorspace": "Non-Color"
+    }
+  ],
+  "renders": {
+    "side": "tools/triassic/creatures/nothosaurus/tripo-raw/review/side.png",
+    "top": "tools/triassic/creatures/nothosaurus/tripo-raw/review/top.png",
+    "three-quarter": "tools/triassic/creatures/nothosaurus/tripo-raw/review/three-quarter.png"
+  }
+}

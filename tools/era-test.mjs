@@ -3,10 +3,10 @@ import fs from 'node:fs';
 import { build } from 'esbuild';
 
 const result = await build({
-  stdin: { contents: "export * from './src/content'; export * from './src/content/era'; export * from './src/content/asset-paths'; export { CAMBRIAN } from './src/content/cambrian'; export { DEVONIAN } from './src/content/devonian'; export { CAMBRIAN_PENDING } from './src/content/cambrian/model-status'; export { default as DEVONIAN_PENDING } from './src/content/devonian/pending-refinements.json';", resolveDir: process.cwd() },
+  stdin: { contents: "export * from './src/content'; export * from './src/content/era'; export * from './src/content/asset-paths'; export { CAMBRIAN } from './src/content/cambrian'; export { DEVONIAN } from './src/content/devonian'; export { TRIASSIC } from './src/content/triassic'; export { CAMBRIAN_PENDING } from './src/content/cambrian/model-status'; export { default as DEVONIAN_PENDING } from './src/content/devonian/pending-refinements.json'; export { default as TRIASSIC_PENDING } from './src/content/triassic/pending-refinements.json';", resolveDir: process.cwd() },
   bundle: true, platform: 'node', format: 'esm', write: false,
 });
-const { ACTIVE_ERA: era, defineEra, createAssetPaths, CAMBRIAN, DEVONIAN, CAMBRIAN_PENDING, DEVONIAN_PENDING } = await import(`data:text/javascript;base64,${Buffer.from(result.outputFiles[0].text).toString('base64')}`);
+const { ACTIVE_ERA: era, defineEra, createAssetPaths, CAMBRIAN, DEVONIAN, TRIASSIC, CAMBRIAN_PENDING, DEVONIAN_PENDING, TRIASSIC_PENDING } = await import(`data:text/javascript;base64,${Buffer.from(result.outputFiles[0].text).toString('base64')}`);
 assert.equal(era.id, 'cambrian');
 assert.equal(era.creatures.length, 21);
 assert.equal(era.defaults.player, 'anomalocaris');
@@ -31,6 +31,14 @@ assert.equal(alternative.model('example', 1), 'assets/devonian/creatures/example
 assert.equal(alternative.portrait('example', 'select'), 'assets/devonian/portraits/example.select.png');
 assert.equal(alternative.music('Test Track'), 'assets/devonian/music/Test%20Track.mp3');
 assert.equal(paths.model('pikaia'), 'assets/creatures/pikaia.glb');
+// A pack may borrow another era's delivered body until its own lands: '<era>/<id>' resolves into
+// that era's creature folder (the Triassic does this for its whole roster today).
+const borrowing = createAssetPaths({ ...era, assets: { ...era.assets, creatures: 'assets/triassic/creatures/', standIns: { pikaia: 'devonian/cladoselache' } } });
+assert.equal(borrowing.model('pikaia'), 'assets/devonian/creatures/cladoselache.glb');
+assert.equal(borrowing.model('pikaia', 1), 'assets/devonian/creatures/cladoselache.lod1.glb');
+assert.equal(borrowing.model('opabinia'), 'assets/triassic/creatures/opabinia.glb');
+assert.equal(TRIASSIC.id, 'triassic');
+assert.ok(TRIASSIC.assets.standInsPlayable, 'the Triassic plays its borrowed bodies');
 
 // Every animal shows the everyday group it belongs to beside its genus — unless the group name is
 // the less familiar of the two, or is still unsettled, in which case it shows nothing. That is a
@@ -55,6 +63,7 @@ for (const c of era.creatures) {
 for (const { name, era: e, pending } of [
   { name: 'Cambrian', era: CAMBRIAN, pending: CAMBRIAN_PENDING },
   { name: 'Devonian', era: DEVONIAN, pending: DEVONIAN_PENDING },
+  { name: 'Triassic', era: TRIASSIC, pending: TRIASSIC_PENDING },
 ]) {
   const status = e.assets.modelStatus ?? {};
   const notes = e.assets.modelNotes ?? {};
@@ -70,7 +79,13 @@ for (const { name, era: e, pending } of [
   }
 
   const previews = Object.entries(status).filter(([, v]) => v === 'preview').map(([id]) => id);
-  assert.ok(previews.length, `${name}: expected some preview models`);
+  // An era with nothing queued is the finished state, not a broken table: the Cambrian reached it
+  // when Odaraia shipped. What must hold either way is that the derived table and the queue agree
+  // in both directions, so a badge can never appear without outstanding work or go missing while
+  // work remains.
+  for (const p of pending.filter((p) => p.model)) {
+    assert.equal(status[p.id], 'preview', `${name}/${p.id} has queued model work but shows no preview badge`);
+  }
   for (const id of previews) {
     assert.ok(notes[id]?.length > 60, `${name}/${id} is a preview model with no note saying what remains`);
     assert.ok(pending.some((p) => p.id === id && p.model), `${name}/${id} shows a preview badge with no outstanding model work`);
@@ -91,4 +106,4 @@ for (const { name, era: e, pending } of [
   }
 }
 
-console.log('PASS: era validation, all 21 model/portrait paths and byte sizes, group labels, model/animation badge split with reasons, and independent future asset namespaces');
+console.log('PASS: era validation, all 21 model/portrait paths and byte sizes, group labels, model/animation badge split with reasons for all three eras, cross-era stand-ins, and independent future asset namespaces');

@@ -1,0 +1,402 @@
+{
+  "checks": "finite transforms, normalized weights, root stable, identity-scale removal, unique motion, seamless loops, per-material vertex-colour layout, socket bind alignment, true LOD reduction",
+  "models": [
+    {
+      "file": "bothriolepis.glb",
+      "bytes": 14545688,
+      "vertices": 59349,
+      "triangles": 115280,
+      "bounds": [
+        2.129995107650757,
+        0.9925012290477753,
+        5.0000001192092896
+      ],
+      "bones": 12,
+      "boneNames": [
+        "root",
+        "body",
+        "oral",
+        "pectoral_L",
+        "pectoral_tip_L",
+        "pectoral_R",
+        "pectoral_tip_R",
+        "tail_base",
+        "tail_mid",
+        "dorsal",
+        "tail_tip",
+        "caudal"
+      ],
+      "textures": 12,
+      "materials": [
+        "bothriolepis shield armour",
+        "bothriolepis dermal pectorals",
+        "bothriolepis scaleless posterior",
+        "bothriolepis oral mucosa",
+        "bothriolepis oral rim armour",
+        "bothriolepis pectoral roots",
+        "bothriolepis dermal articulation",
+        "bothriolepis rostral cap",
+        "M01 small embedded eye Closed inset eye L",
+        "M01 small embedded eye Closed inset eye R"
+      ],
+      "vertexColourByMaterial": {
+        "bothriolepis shield armour": {
+          "white_fraction": 1.0,
+          "mean": [
+            1.0,
+            1.0,
+            1.0
+          ]
+        },
+        "bothriolepis dermal pectorals": {
+          "white_fraction": 1.0,
+          "mean": [
+            1.0,
+            1.0,
+            1.0
+          ]
+        },
+        "bothriolepis scaleless posterior": {
+          "white_fraction": 1.0,
+          "mean": [
+            1.0,
+            1.0,
+            1.0
+          ]
+        },
+        "bothriolepis oral mucosa": {
+          "white_fraction": 1.0,
+          "mean": [
+            1.0,
+            1.0,
+            1.0
+          ]
+        },
+        "bothriolepis oral rim armour": {
+          "white_fraction": 1.0,
+          "mean": [
+            1.0,
+            1.0,
+            1.0
+          ]
+        },
+        "bothriolepis pectoral roots": {
+          "white_fraction": 0.0,
+          "mean": [
+            0.05008,
+            0.05273,
+            0.02679
+          ]
+        },
+        "bothriolepis dermal articulation": {
+          "white_fraction": 0.0,
+          "mean": [
+            0.04134,
+            0.03763,
+            0.01826
+          ]
+        },
+        "bothriolepis rostral cap": {
+          "white_fraction": 0.0,
+          "mean": [
+            0.06197,
+            0.05246,
+            0.02682
+          ]
+        }
+      },
+      "sockets": [
+        {
+          "name": "anchor_mouth",
+          "point": [
+            0.0,
+            -0.356914902236689,
+            1.4581677086783296
+          ]
+        },
+        {
+          "name": "anchor_mouth_inside",
+          "point": [
+            0.0,
+            -0.2370617195460862,
+            1.3656754931606534
+          ]
+        },
+        {
+          "name": "anchor_attack_primary",
+          "point": [
+            0.0,
+            -0.1550000354206357,
+            1.544999997544807
+          ]
+        }
+      ],
+      "clips": [
+        {
+          "name": "Ability",
+          "duration": 1.8000000715255737,
+          "motion": 14.567,
+          "digest": "92cf509285552696d09237f81b2b15a5670ea32eafbb051d29842e553d57c85f"
+        },
+        {
+          "name": "Attack",
+          "duration": 0.9999999403953552,
+          "motion": 11.37,
+          "digest": "b1af8b8fc695d138927d2fa721f5a6baed54d4cbb8f0e85df55d80ca4db77596"
+        },
+        {
+          "name": "Bite",
+          "duration": 0.5,
+          "motion": 2.177,
+          "digest": "f4321fbee975b345276b6505a7e0bfd48bedfcb0c937c63ff9b62eebed89b952"
+        },
+        {
+          "name": "Death",
+          "duration": 1.600000023841858,
+          "motion": 40.512,
+          "digest": "b75d69298dcb0248b233faf3ed2c9eb125bea767e62de919f4dd61dc1b3fc44a"
+        },
+        {
+          "name": "Dive",
+          "duration": 1.399999976158142,
+          "motion": 11.572,
+          "digest": "2eabcd737509d1659da506dfea5a8f79ca9e75b21b4690bf13de10df69dfd745"
+        },
+        {
+          "name": "Dodge",
+          "duration": 0.4000000059604645,
+          "motion": 5.506,
+          "digest": "03265d89cd6fe62ba1641d421afe039a18063b634c73c504091ce694536e1306"
+        },
+        {
+          "name": "Eat",
+          "duration": 1.2000000476837158,
+          "motion": 6.919,
+          "digest": "7b169bcf7cde2b8d10494a2bf30dda472dce01e140a46279ea8d1cfe0c4febd9"
+        },
+        {
+          "name": "Growth",
+          "duration": 1.5,
+          "motion": 9.411,
+          "digest": "59261cbb61cf698989fa013e9b499d9ad852aa4e7eabcaf22b343d136d712088"
+        },
+        {
+          "name": "Guard",
+          "duration": 0.9999999403953552,
+          "motion": 3.362,
+          "digest": "daaf725b938ed7d4ed854c7d4e775b955a8722d2805f7e41a0b4f682274e7df3"
+        },
+        {
+          "name": "Heavy",
+          "duration": 1.100000023841858,
+          "motion": 13.734,
+          "digest": "942d6fb90f9a41e2c06f494ab1a4e4c2c2f313450764ebf1a45ea7f2a846fb15"
+        },
+        {
+          "name": "Hit",
+          "duration": 0.5999999642372131,
+          "motion": 3.114,
+          "digest": "dff69c077daf078ec7bc31e4163aab508b43cb4083df859fccde7ad49c9c805c"
+        },
+        {
+          "name": "Idle",
+          "duration": 2.4000000953674316,
+          "motion": 8.618,
+          "digest": "f7cc0c10ef46dcbc354b8d5fd755057bb6fb8dc2af8e8d3367f01cc33cf6bdee"
+        },
+        {
+          "name": "Parry",
+          "duration": 0.3333333432674408,
+          "motion": 2.298,
+          "digest": "48ea38a045a43ff59537a48241ef4e57676696486183e69d73aaa9498797288e"
+        },
+        {
+          "name": "Rise",
+          "duration": 1.399999976158142,
+          "motion": 11.572,
+          "digest": "6a1bf4a31a548e026997fb6f3d42535b67f5d98fb468463be618ccfa1e8fa9c7"
+        },
+        {
+          "name": "Stagger",
+          "duration": 1.2000000476837158,
+          "motion": 8.486,
+          "digest": "ab4892b788ab41fe1be29c730b95b64dfdcc415580ab3048f513b21c7632bfad"
+        },
+        {
+          "name": "Swim",
+          "duration": 2.4000000953674316,
+          "motion": 35.035,
+          "digest": "8d87df55089fd4a001a25e2690fa14eee1d93c9a2b7ed23d66347b587cd14aba"
+        },
+        {
+          "name": "TurnLeft",
+          "duration": 1.600000023841858,
+          "motion": 19.25,
+          "digest": "68f3437d65cef7e8a127e6ce9b5564d5ada8f56db6996c5292ad4bd82825dd56"
+        },
+        {
+          "name": "TurnRight",
+          "duration": 1.600000023841858,
+          "motion": 19.246,
+          "digest": "bc17905f9471103439133895ca65113bdf63c165d68a9bad5e8476cef5a91939"
+        }
+      ],
+      "removedIdentityScaleChannels": 0,
+      "sha256": "18ce8f082b90c3db534be3e747fe3bfe6f38b178ff3770dcd0d3fc7d93cdb227"
+    },
+    {
+      "file": "bothriolepis.lod1.glb",
+      "bytes": 1275056,
+      "vertices": 17007,
+      "triangles": 32276,
+      "bounds": [
+        2.129949927330017,
+        0.9923832416534424,
+        5.0000011920928955
+      ],
+      "bones": 12,
+      "boneNames": [
+        "root",
+        "body",
+        "oral",
+        "pectoral_L",
+        "pectoral_tip_L",
+        "pectoral_R",
+        "pectoral_tip_R",
+        "tail_base",
+        "tail_mid",
+        "dorsal",
+        "tail_tip",
+        "caudal"
+      ],
+      "textures": 0,
+      "materials": [
+        "bothriolepis shield armour",
+        "bothriolepis dermal pectorals",
+        "bothriolepis scaleless posterior",
+        "bothriolepis oral mucosa",
+        "bothriolepis oral rim armour",
+        "bothriolepis pectoral roots",
+        "bothriolepis dermal articulation",
+        "bothriolepis rostral cap",
+        "M01 small embedded eye Closed inset eye L",
+        "M01 small embedded eye Closed inset eye R"
+      ],
+      "vertexColourByMaterial": {
+        "bothriolepis shield armour": {
+          "white_fraction": 0.0,
+          "mean": [
+            0.05577,
+            0.04817,
+            0.0245
+          ]
+        },
+        "bothriolepis dermal pectorals": {
+          "white_fraction": 0.0,
+          "mean": [
+            0.05714,
+            0.05121,
+            0.02477
+          ]
+        },
+        "bothriolepis scaleless posterior": {
+          "white_fraction": 0.0,
+          "mean": [
+            0.04443,
+            0.04736,
+            0.02626
+          ]
+        },
+        "bothriolepis oral mucosa": {
+          "white_fraction": 0.0,
+          "mean": [
+            0.05298,
+            0.03982,
+            0.02441
+          ]
+        },
+        "bothriolepis oral rim armour": {
+          "white_fraction": 0.0,
+          "mean": [
+            0.06673,
+            0.05903,
+            0.03357
+          ]
+        },
+        "bothriolepis pectoral roots": {
+          "white_fraction": 0.0,
+          "mean": [
+            0.05066,
+            0.05255,
+            0.02662
+          ]
+        },
+        "bothriolepis dermal articulation": {
+          "white_fraction": 0.0,
+          "mean": [
+            0.04435,
+            0.03951,
+            0.01909
+          ]
+        },
+        "bothriolepis rostral cap": {
+          "white_fraction": 0.0,
+          "mean": [
+            0.0539,
+            0.05151,
+            0.02646
+          ]
+        }
+      },
+      "sockets": [
+        {
+          "name": "anchor_mouth",
+          "point": [
+            0.0,
+            -0.356914902236689,
+            1.4581677086783296
+          ]
+        },
+        {
+          "name": "anchor_mouth_inside",
+          "point": [
+            0.0,
+            -0.2370617195460862,
+            1.3656754931606534
+          ]
+        },
+        {
+          "name": "anchor_attack_primary",
+          "point": [
+            0.0,
+            -0.1550000354206357,
+            1.544999997544807
+          ]
+        }
+      ],
+      "clips": [
+        {
+          "name": "Death",
+          "duration": 1.600000023841858,
+          "motion": 40.512,
+          "digest": "b75d69298dcb0248b233faf3ed2c9eb125bea767e62de919f4dd61dc1b3fc44a"
+        },
+        {
+          "name": "Idle",
+          "duration": 2.4000000953674316,
+          "motion": 8.618,
+          "digest": "f7cc0c10ef46dcbc354b8d5fd755057bb6fb8dc2af8e8d3367f01cc33cf6bdee"
+        },
+        {
+          "name": "Swim",
+          "duration": 2.4000000953674316,
+          "motion": 35.035,
+          "digest": "8d87df55089fd4a001a25e2690fa14eee1d93c9a2b7ed23d66347b587cd14aba"
+        }
+      ],
+      "removedIdentityScaleChannels": 0,
+      "sha256": "29b96be157aa5060fb37bce83bc20a34ee89d4291d8a3cd1187e18079d4cddee"
+    }
+  ],
+  "lodTriangleRatio": 0.27997918112421927
+}

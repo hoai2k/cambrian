@@ -2,6 +2,7 @@ import { clamp, heading, v3, type Vec3 } from '../shared/math';
 import { creature, naturalSizing, type CreatureId } from './creatures';
 import { tierForScale } from './tiers';
 import type { Actor, Band, Controller } from './types';
+import { SURFACE_Y } from './world';
 
 export const lengthOf = (a: Actor) => creature(a.creature).adultLength * a.scale;
 /**
@@ -47,6 +48,23 @@ export const bodyGap = (a: Actor, b: Actor) => surfaceGap(a, b.pos) - bodyRadius
  * rest of the sim reasons about (hiding, spawning, the AI's idea of "near the bottom").
  */
 export const floorClearance = (a: Actor) => clearanceOf(a) * (creature(a.creature).ground ? 1 : 0.45);
+/**
+ * The top of the water, for a body of this size: how high its centre may go while it is still
+ * swimming rather than airborne. A body held here has its back *at* the surface, which is what
+ * breaking the surface means and what a breath is drawn on.
+ *
+ * It lives here because three places need to agree about it — the movement clamp in game.ts and
+ * both eras' idea of being at the surface — and when they disagreed the answer was a band a few
+ * units deep in which a body was "at the surface" without ever reaching it.
+ */
+export const swimCeiling = (a: Actor) => SURFACE_Y - 0.8 - clearanceOf(a);
+/**
+ * How far under that ceiling still counts as a breath. A body pressed against the ceiling sits
+ * exactly on it, so this only has to cover the frame or two either side of arriving.
+ */
+export const BREATH_REACH = 0.6;
+/** Is this body's back out of the water — at the ceiling, or clear of it altogether? */
+export const brokeSurface = (a: Actor) => a.airborne || a.pos.y >= swimCeiling(a) - BREATH_REACH;
 /**
  * How far a body can be lifted in one step and still read as swimming rather than stepping. Rocks
  * are domes: anything shallow enough to be carried over inside this budget is simply not collided
@@ -102,7 +120,7 @@ export function makeActor(id: number, creatureId: CreatureId, controller: Contro
     corpseT: 0, eaten: 0, eatBites: 0, killer: -1, noise: 0.5, cover: 0, stillness: 0,
     dodgeDir: v3(0, 0, 1), dodgeTapT: 0, hopVel: 0, grounded: true, climbPush: 0, climbTo: -Infinity, airborne: false,
     prev: { light: false, heavy: false, ability: false, dodge: false, guard: false, lock: false, sense: false, rise: false, burst: false, dash: false, aim: false },
-    respawnT: 0, reviveT: 0, carriedTop: false, hatching: false, dashHoldT: 0, dashUsed: false, pounceCd: 0, dashCd: 0, sinceHit: 99, lastHitBy: -1, swallowedBy: -1, holdT: 0, graspHold: false, graspT: 0, graspSpent: false, rideHost: -1, rideT: 0, rideOff: v3(), riddenBy: -1, deathY: 0, sparkled: false, tumble: v3(), aimInRange: false, aiming: false, kills: 0, eats: 0, escapes: 0, hunted: 0, hunterId: -1, wasHunted: false, seen: 0, bubbles: 0,
+    respawnT: 0, reviveT: 0, carriedTop: false, hatching: false, dashHoldT: 0, dashUsed: false, pounceCd: 0, dashCd: 0, sinceHit: 99, lastHitBy: -1, swallowedBy: -1, holdT: 0, graspHold: false, graspT: 0, graspSpent: false, rideHost: -1, rideT: 0, rideOff: v3(), riddenBy: -1, gripSyncT: -1, drive: v3(), deathY: 0, sparkled: false, tumble: v3(), aimInRange: false, aiming: false, kills: 0, eats: 0, escapes: 0, hunted: 0, hunterId: -1, wasHunted: false, seen: 0, bubbles: 0,
     spawnProtect: controller === 'player' ? 3 : 0,
     home: { ...pos }, teleportCd: 0,
     prevT: { x: pos.x, y: pos.y, z: pos.z, yaw: 0, pitch: 0, bank: 0 },

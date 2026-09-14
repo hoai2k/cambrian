@@ -1,0 +1,66 @@
+[
+  {
+    "file": "logo-engraved.webp",
+    "width": 1536,
+    "height": 512,
+    "bytes": 283312,
+    "alpha": true,
+    "whiteKeyed": false
+  },
+  {
+    "file": "title-trilogy.webp",
+    "width": 2048,
+    "height": 640,
+    "bytes": 392292,
+    "alpha": true,
+    "whiteKeyed": false
+  },
+  {
+    "file": "title-cambrian.webp",
+    "width": 1536,
+    "height": 640,
+    "bytes": 381414,
+    "alpha": true,
+    "whiteKeyed": false
+  },
+  {
+    "file": "title-devonian.webp",
+    "width": 1536,
+    "height": 640,
+    "bytes": 384240,
+    "alpha": true,
+    "whiteKeyed": false
+  },
+  {
+    "file": "title-triassic.webp",
+    "width": 1536,
+    "height": 640,
+    "bytes": 362062,
+    "alpha": true,
+    "whiteKeyed": false
+  },
+  {
+    "file": "ground-parchment.webp",
+    "width": 2048,
+    "height": 1280,
+    "bytes": 433374,
+    "alpha": false,
+    "whiteKeyed": false
+  },
+  {
+    "file": "ground-seabed.webp",
+    "width": 2048,
+    "height": 384,
+    "bytes": 343044,
+    "alpha": true,
+    "whiteKeyed": true
+  },
+  {
+    "file": "ornament-fleuron.webp",
+    "width": 512,
+    "height": 384,
+    "bytes": 68102,
+    "alpha": true,
+    "whiteKeyed": false
+  }
+]

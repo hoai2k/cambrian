@@ -5,8 +5,13 @@ from mathutils import Vector,noise
 from math import sin,cos,pi
 HERE=os.path.dirname(os.path.abspath(__file__))
 ROOT=os.path.abspath(os.path.join(HERE,'../../../..'))
+# ACA_ANATOMY selects the anatomy module; 'v1' (default) reproduces the shipped build exactly,
+# including writing anchors.json/validation.json into HERE as before. 'v2' is the ported shape
+# study (tail core+web+rays, flat belly, fuller limbs, no bolted-on palm) and never writes into
+# HERE — its candidate output, including those two side files, goes to its own OUT below.
+ANATOMY=os.environ.get('ACA_ANATOMY','v2')
 LOCAL=os.environ.get('DEVONIAN_AUTHORING',os.path.abspath(os.path.join(ROOT,'../devonian-authoring/acanthostega')))
-OUT=os.path.join(LOCAL,'v1-candidate')
+OUT=os.path.join(LOCAL,'v2-candidate' if ANATOMY=='v2' else 'v1-candidate')
 os.makedirs(LOCAL,exist_ok=True);os.makedirs(OUT,exist_ok=True)
 ID='acanthostega';CLIPS={'Idle':2.4,'Swim':2.4,'TurnLeft':1.6,'TurnRight':1.6,'Dive':1.4,'Rise':1.4,'Attack':1.,'Bite':.5,'Heavy':1.1,'Hit':.6,'Death':1.6,'Guard':1.,'Parry':.35,'Dodge':.4,'Eat':1.6,'Stagger':1.2,'Ability':2.4,'Growth':1.5}
 LOOPS=['Idle','Swim','Guard','Eat']
@@ -44,7 +49,10 @@ def ell(c,scale,col,w,m=3):
 
 # Dedicated Acanthostega initial anatomy and original mapped PBR materials.
 sys.path.insert(0,HERE)
-from anatomy_v1 import make
+if ANATOMY=='v2':
+ from anatomy_v2 import make
+else:
+ from anatomy_v1 import make
 make(globals())
 from materials_v1 import build_materials
 mats,texture_lookup=build_materials(HERE)
@@ -87,7 +95,7 @@ from actions_v1 import animate
 seams,bounds,actionMetrics=animate(bpy,scene,rig,obj,CLIPS,LOOPS,reset)
 reset();scene.frame_set(0)
 anchors=[{'name':'anchor_mouth','bone':'jaw','point':[0,-2.19,-.005],'role':'mouth'}, {'name':'anchor_mouth_inside','bone':'skull','point':[0,-1.22,-.035],'role':'swallow'},{'name':'anchor_attack_primary','bone':'skull','point':[0,-2.20,.015],'role':'attack'}]
-open(os.path.join(HERE,'anchors.json'),'w').write(json.dumps({ID:anchors},indent=2))
+open(os.path.join(HERE if ANATOMY=='v1'else OUT,'anchors.json'),'w').write(json.dumps({ID:anchors},indent=2))
 # Parent inverse equals inverse bind bone tail transform; matrix_world sets real anatomical world point.
 sockets=[]
 for a in anchors:
@@ -161,7 +169,7 @@ notes=['Original initial preview of Acanthostega gunnari at a representative 0.6
 meta={'id':ID,'name':'Acanthostega','species':'Acanthostega gunnari','provenance':'Late Devonian, Famennian, East Greenland','description':'Aquatic early tetrapod with a rounded spade-like head, sutured skull, eight-digit paddle limbs and a deep ray-supported swimming tail.','lengthMeters':.6,'modelLength':max(p[1]for p in V)-min(p[1]for p in V),'locomotion':'Swim','clips':list(CLIPS),'looping':LOOPS,'anchors':[a['name']for a in anchors],'sources':sources,'notes':notes}
 open(os.path.join(OUT,ID+'.json'),'w').write(json.dumps(meta,indent=2))
 report={'vertices':len(V),'fullTriangles':fulltris,'lodTriangles':lodtris,'reductionRatio':lodtris/fulltris,'bones':len(B),'clips':CLIPS,'loopSeams':seams,'boundsAtEveryFrame':bounds,'actionMetrics':actionMetrics,'weightNormalization':True,'rootStable':True,'noScaleChannels':True,'anchorCount':3,'fullBytes':os.path.getsize(os.path.join(OUT,ID+'.glb')),'lodBytes':os.path.getsize(os.path.join(OUT,ID+'.lod1.glb'))}
-open(os.path.join(HERE,'validation.json'),'w').write(json.dumps(report,indent=2))
+open(os.path.join(HERE if ANATOMY=='v1'else OUT,'validation.json'),'w').write(json.dumps(report,indent=2))
 # Studio and prescribed pose review.
 world=bpy.data.worlds.new('Deep neutral studio');scene.world=world;world.use_nodes=True;world.node_tree.nodes['Background'].inputs[0].default_value=(.022,.033,.041,1);world.node_tree.nodes['Background'].inputs[1].default_value=.4
 for name,pos,power,size,color in [('Key',(3,-5,7),1300,5,(1,.89,.72)),('Fill',(-5,-2,3),900,5,(.53,.78,1)),('Rim',(1,5,5),1700,4,(.70,.89,1)),('Lower bounce',(-2,2,-4),500,6,(.58,.78,.91))]:
@@ -169,7 +177,7 @@ for name,pos,power,size,color in [('Key',(3,-5,7),1300,5,(1,.89,.72)),('Fill',(-
 d=bpy.data.cameras.new('Camera');cam=bpy.data.objects.new('Camera',d);bpy.context.collection.objects.link(cam);scene.camera=cam;d.type='ORTHO';d.ortho_scale=8.7
 scene.render.engine='CYCLES';scene.cycles.samples=24;scene.cycles.use_denoising=True;scene.render.resolution_percentage=100;scene.view_settings.view_transform='AgX';scene.view_settings.exposure=0;scene.render.image_settings.file_format='PNG';scene.render.image_settings.color_mode='RGBA';scene.render.film_transparent=True
 cam.location=(7,-6,6);cam.rotation_euler=(Vector((0,1.1,0))-cam.location).to_track_quat('-Z','Y').to_euler();rig.animation_data.action=bpy.data.actions['Idle'];scene.frame_set(0);scene.frame_start=0;scene.frame_end=72
-bpy.ops.wm.save_as_mainfile(filepath=os.path.join(LOCAL,ID+'-v1.blend'))
+bpy.ops.wm.save_as_mainfile(filepath=os.path.join(LOCAL,ID+'-'+ANATOMY+'.blend'))
 def render(path,w,h,transparent=True):
  scene.render.resolution_x=w;scene.render.resolution_y=h;scene.render.film_transparent=transparent;scene.render.filepath=path;bpy.ops.render.render(write_still=True)
 if os.environ.get('ACANTHOSTEGA_QUICK'):

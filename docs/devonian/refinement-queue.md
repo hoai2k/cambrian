@@ -349,3 +349,51 @@ a preview; small LOD crease/pigment and broader controller/art polish remain.
 ## Closing checkpoint — 8 September 2026
 
 Titanichthys V3 is on mainbc5a2d0 and Dunkleosteus linear-color LOD05 on mainff9a853, both retained as previews. Coccosteus candidate07 passes its full/reduced surface review but awaits final oral/eye/motion/runtime/package checks before replacement. Bothriolepis M04 remains held for nuchal/rostral shading and coarse relief after the mouth improvement. Odaraia material02 direction is accepted and production-plan03 is saved; rig/baking/game transparency/actions/export remain. No general audit of an obsolete model should precede its complete rework. Resume details and exact evidence are in `docs/devonian/current-state.md`. Work paused at the user's request.
+
+## 11–12 September 2026 — triage, small fixes and the first reference-led rebuilds
+
+Blender 5.2 now runs in the session (`npm run blender`), so the whole builder → package → check →
+audit path runs in one place; the staging is `docs/model-queue-plan.md`, the resume point
+`docs/model-queue-state.md`.
+
+- **Triage of the eight no-reference previews**: Walliserops, Furcaster and Michelinoceras read as
+  the animals they are — badges cleared. Eldredgeops (occipital joint opened at the Ability peak)
+  and Manticoceras (umbilicus open to a third of the diameter where its own sources say small)
+  were fixed, approved and shipped; badges cleared. Acanthostega, Jaekelopterus and Palaeoisopus
+  were promoted with written findings and their silhouette redesigns approved as studies.
+- **Cheirolepis V3** shipped: the reference-led face, seated fin roots and swept fins
+  (`tools/devonian/creatures/cheirolepis/README.md`).
+- **Titanichthys, Gemuendina, Dunkleosteus** accepted by the user as published; badges cleared.
+  Dunkleosteus' "paler LOD" was a builder regression, fixed in `build_v2.py`; the shipped asset
+  was already right.
+- **Coccosteus** shipped on 13 September: the user delivered candidate07 itself to
+  `intake/coccosteus-candidate07/`, which made re-deriving the frozen recipe unnecessary. Both
+  gates the pause handoff asked for passed and the badge is cleared
+  (`tools/devonian/creatures/coccosteus/README.md`).
+- **Doryaspis** waits on the mouth-position decision recorded in `rework-v3/root-review-clay01.md`.
+- **Acanthostega V2, Jaekelopterus V2, Palaeoisopus V2, Cladoselache V3, Tiktaalik V3** shipped
+  from their approved silhouette studies (groups A/B): tail fin along the tail and a flat belly;
+  stepped flattened opisthosoma and blade rami; oar-blade articles; fin outlines; the snout and
+  flattened skull. Badges cleared.
+- **Onychodus V2, Rhinodipterus V3, Nahecaris V2** (group C) shipped under the "continue to the
+  end" instruction: the tooth whorl and tusks, the lungfish eye and head, the phyllocarid carapace
+  and abdomen. Badges cleared.
+- **Stethacanthus V3** shipped: deeper head and trunk, wide pectorals, broad-rooted brush,
+  heterocercal tail; eye embedding 91%. Its `finalize_v3.py` strips the Blender 5.2.1 exporter's
+  identity scale tracks, which intake otherwise refuses — the same artifact hit Jaekelopterus and
+  Rhinodipterus.
+- **Bothriolepis V3** shipped: material01–04 re-derived on Linux and verified by value, the M04
+  diagnostic proved the nuchal seam geometric, M05 resolved the shield and the rostral cap and
+  halved the microrelief, and `build_v3.py` rigged it with V2's bones and clips (eye audit 96%).
+  Badge cleared.
+- **Odaraia** (Cambrian, tracked here because it shares the pipeline) shipped: clay02/material02
+  re-derived with the accepted geometry hash reproduced exactly, then the production rig, 19 clips
+  (Grab included), LOD and export built to `production-plan03.md`, verified in the renderer, which
+  needed two translucency fixes for a shell over a solid body.
+- **Doryaspis** unblocked: the mouth is terminal, at the very front of the snout-like body, above
+  the saw that projects from the lower jaw. V3 in progress (clay02 → materials → rig).
+- **Grab everywhere**: the user's rule is that every model carries a Grab clip; 26 shipped models
+  lacked one and are getting it through `tools/creatures/motion/apply.mjs`.
+
+Still carrying `model: true`: none of the total reworks. Coccosteus shipped from the delivered
+candidate07 on 13 September and Doryaspis V3 on 12 September.

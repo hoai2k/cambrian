@@ -3,16 +3,16 @@ import { RULES } from './era-rules';
 import { BURROWERS, HEAVY_SPECIALS, DEFENSIVE_SPECIALS, CAMOUFLAGE_DRAIN, camouflageMatch, clearPursuit, stopHiding } from './concealment';
 import { abilitySpeed, beginExpansionAbility, beginHeavyStrike, heavyStrikeReach, specialHit, stepExpansionAbility, stepHeavyStrike, bloomRate, grazeRate } from './expansion-abilities';
 import { add, clamp, damp, dist, distXZ, dot, heading, len3, lerp, makeRng, norm, scale as vscale, sub, TAU, v3, wrapAngle, yawOf, type Rng, type Vec3 } from '../shared/math';
-import { applyScaleStats, bandOf, bodyGap, bodyRadius, canAct, clearanceOf, climbHeight, climbRise, floorClearance, glideOver, isAlive, isHidden, isInvulnerable, lengthOf, makeActor, massOf, speedFactor, staminaCost, surfaceGap } from './actors';
+import { applyScaleStats, bandOf, bodyGap, bodyRadius, canAct, clearanceOf, climbHeight, climbRise, floorClearance, glideOver, isAlive, isHidden, isInvulnerable, lengthOf, makeActor, massOf, speedFactor, staminaCost, surfaceGap, swimCeiling } from './actors';
 import { tierForScale, tierScale } from './tiers';
 import { makeBrain, peaceful, think, type AiWorld } from './ai';
 import { huntingPressure, phaseAt, untilNextPhase, type Phase } from './daynight';
-import { applyHit, endRide, kill, RIDE_MAX, RIDE_STAMINA, rideHold, startSwallow, takeHold, takeRide, type HitContext } from './combat';
+import { applyHit, endRide, GRIP_BREAK, GRIP_MEAL, GRIP_STRAIN, GRIP_STRIKE, kill, rideHold, startSwallow, takeHold, takeRide, type HitContext } from './combat';
 import { creature, CREATURE_IDS, PLAYABLE_IDS, type CreatureId, type MoveDef } from './creatures';
 import { resolveFlora, stepFlora, type FloraContact } from './flora';
 import { SpatialHash } from './spatial';
 import { clampMark, fillOf, ladderFill, ladderMark, ladderRung, ladderScale, LADDER_TOP, MARK_NEAR_TOP } from './ladder';
-import { emptyInput, isCoop, TIER_NAMES, TIER_NEED, type Actor, type BrainState, type InputFrame, type Mode, type PlayerSetup, type Prompt, type SiltCloud, type Tier, type WorldEvent } from './types';
+import { emptyInput, isCoop, TIER_NAMES, TIER_NEED, type Actor, type Band, type BrainState, type InputFrame, type Mode, type PlayerSetup, type Prompt, type SiltCloud, type Tier, type WorldEvent } from './types';
 import { BIOME_NAMES, biomeAt, biomeWeights, coverAt, groundHeight, LIGHT_WINDOW_Y, type Landmark, type LandmarkKind, microbialAt, nearestNursery, nurseryAt, nurseryFactor, resolveStatic, RISE_RATE, sampleCurrent, sampleHeight, shoreDistance, shoreZ, type StaticContact, SURFACE_Y, World, type Biome, type Boulder, type Cover, type Flora, type WorldData } from './world';
 import { areaProfile, bandScale, drawBand, headroom, PASSER_BY } from './population';
 import { columnY, DIP_CHANCE, DRIFT_CURRENT, driftRise, flipLaunch, FLIP_STAMINA, PULSE_CYCLE, pulseRefilling, pulseThrust, punting, rowWalkCurrent } from './locomotion';
@@ -240,13 +240,25 @@ const GRASP_HOLD = 0.18, BITE_GRASP_HOLD = 0.45;
 /** What this animal's grip costs it: how far it reaches and how long it must hold, by build. */
 export const gripReach = (def: ReturnType<typeof creature>, L: number) => L * (def.grasp ? GRASP_REACH : BITE_GRASP_REACH);
 export const gripHold = (def: ReturnType<typeof creature>) => (def.grasp ? GRASP_HOLD : BITE_GRASP_HOLD);
-/**
- * How long a grip on something too big to bite may be held and still count as a strike rather than
- * a ride. Long enough to cover the third of a second a player's grip is held open for whatever the
- * button does (see `updateRide`), short enough that settling in to be carried is unmistakably a
- * different thing from grabbing and shoving off.
- */
-const GRIP_BITE = 0.7;
+/** What a player has hold of, as the HUD needs to show it. See `Game.gripFor`. */
+export interface GripHud {
+  /** Clinging to something its own size or bigger, carrying a mouthful, held in something else's jaws, or holding a spent button. */
+  kind: 'ride' | 'hold' | 'held' | 'spent';
+  /** What is in the grip. Empty for `spent`, which has nothing in it. */
+  name: string; band: Band;
+  /**
+   * What letting go *right now* would do — the only thing about a grip a player needs decided in
+   * the moment. A grip has two windows and they both run from contact: release a ride inside
+   * `GRIP_STRIKE` and it is the blow the grip stood in for, past it the animal never knew you were
+   * there; release a mouthful inside `GRIP_MEAL` and you eat it, past it it has worked loose.
+   */
+  release: 'strike' | 'eat' | 'escape' | 'nothing';
+  /**
+   * How much of that window is left, 1 → 0, or absent when nothing is running down — which a ride
+   * settles into once it has stopped being an attack, and is the honest thing to show then.
+   */
+  left?: number;
+}
 /**
  * How far past its own pounce range an animal will look for something to take hold of. Wide enough
  * to find a full-grown giant across open water — they are the reason the pursuit exists — and it
@@ -347,6 +359,14 @@ interface Step {
  * a player still, and it is the point — you hatch once a life, and the first thing the sea shows
  * you is that you are the smallest thing in it.
  */
+/**
+ * How far out a death still counts as inshore, so the nursery is the right place to come back to.
+ * The nurseries sit 88 units off the beach and the shallows run out to about 135, so this covers
+ * the shore band and nothing beyond it: past here you are living somewhere, and `respawnAt` brings
+ * you back to it rather than to the beach.
+ */
+const RESPAWN_INSHORE = 170;
+
 export const HATCH_TIME = 5;
 /**
  * Where in that performance the seam gives, and with it the body: the player has their animal back
@@ -938,8 +958,8 @@ export class Game implements AiWorld {
     applyScaleStats(a, false);
     a.eaten = 0;
     a.stamina = a.staminaMax; a.poise = a.poiseMax;
-    // Back to a nursery near another player (the party stays together in an endless sea), or
-    // failing that the nearest one to where you died; never one a giant is loitering in.
+    // Back near another player (the party stays together in an endless sea), or failing that where
+    // you died.
     let ref = a.pos, refD = Infinity;
     for (const o of this.players) if (o !== a && isAlive(o)) { const d = distXZ(o.pos, a.pos); if (d < refD) { refD = d; ref = o.pos; } }
     const near = nearestNursery(ref.x, ref.z);
@@ -951,14 +971,51 @@ export class Game implements AiWorld {
       const score = danger * 100 + distXZ(ref, n) * 0.2;
       if (score < bd) { bd = score; nursery = n; }
     }
+    // `home` is still the nursery: it is where this animal hatched and what the teleport means.
+    // Where it comes *back* is a different question, and the answer is the water it was living in.
     a.home = { ...nursery };
-    this.world.loadAround(nursery);
-    a.pos = this.spawnPoint(nursery, a.creature, a.scale, a.player);
+    const at = this.respawnAt(ref, nursery);
+    this.world.loadAround(at);
+    a.pos = this.spawnPoint(at, a.creature, a.scale, a.player);
     a.vel = v3(); a.state = 'free'; a.stateT = 0; a.respawnT = 0; a.corpseT = 0; a.eaten = 0; a.eatBites = 0;
     stopHiding(a); a.camoStrength = 0; a.hideCd = 0; a.emergenceHeavy = false; a.spawnProtect = RULES?.spawnProtect(a) ?? 3.5; a.hitFlash = 0; a.abilityActive = false; a.abilityCd = 0; a.lockTarget = -1; a.hunted = 0; a.hunterId = -1; a.wasHunted = false; a.swallowedBy = -1; a.bank = 0; a.pitch = 0; a.climbTo = -Infinity; a.climbPush = 0; this.clearRide(a);
     a.yaw = Math.PI;
     this.beginHatch(a);
     void def;
+  }
+
+  /**
+   * Where a body comes back, given where it was and the nursery it hatched in.
+   *
+   * Dying used to send a player to the nearest nursery, and every nursery sits a fixed eighty-eight
+   * units off the beach — so an animal that had spent the whole match working its way out to the
+   * open sea was returned to the shallows every time something killed it, and had to swim the
+   * distance again. In a sea whose depth is the biome's own that is a longer walk back than it
+   * used to be, and it undoes the one thing the player was doing.
+   *
+   * So: come back in the water you were living in. Inshore that is still the nursery — it is the
+   * hatchery, it is safe by non-aggression, and it is in the shore band anyway, so nothing is
+   * gained by inventing a second answer for it. Further out, pick a spot around where you were at
+   * the same distance from shore, which is the same biome and the same depth, and away from
+   * whatever giant is in the area. A death still costs a rung and half the progress toward the
+   * next one; it does not also cost the swim.
+   */
+  private respawnAt(ref: Vec3, nursery: Vec3): Vec3 {
+    const s = shoreDistance(ref.x, ref.z);
+    if (s <= RESPAWN_INSHORE) return nursery;
+    let best = ref, bd = Infinity;
+    for (let i = 0; i < 8; i++) {
+      const ang = (i / 8) * TAU + this.rng() * 0.6;
+      const r = 30 + this.rng() * 70;
+      const p = { x: ref.x + Math.cos(ang) * r, y: 0, z: ref.z + Math.sin(ang) * r };
+      let danger = 0;
+      for (const g of this.actors) if (g.controller === 'giant' && isAlive(g) && distXZ(g.pos, p) < 70) danger += 1;
+      // Drifting in or out of the band you died in is what this is here to prevent, so it is
+      // scored heavily against; a giant in the area outweighs it anyway.
+      const score = danger * 100 + Math.abs(shoreDistance(p.x, p.z) - s) * 0.6;
+      if (score < bd) { bd = score; best = p; }
+    }
+    return best;
   }
 
   /**
@@ -968,7 +1025,7 @@ export class Game implements AiWorld {
    * the old second-long swell out of nothing, because it did not come from an egg.
    */
   private beginHatch(a: Actor) {
-    const egg = ladderRung(this, a) === 0;
+    const egg = ladderRung(this, a) === 0 && !RULES?.liveBirth?.(a);
     a.hatching = true; a.state = 'moult'; a.stateT = 0; a.stateDur = egg ? HATCH_HOLD : 1.0;
     a.vel = v3();
     if (egg) this.layEgg(a);
@@ -1129,6 +1186,13 @@ export class Game implements AiWorld {
     const baseCruise = def.speed * sf * slowMult * (a.controller === 'swarm' ? 0.62 : giantish ? 0.55 : 1) * (paddling ? PADDLE_SPEED : 1);
     const sw = RULES && controllable ? RULES.swim(this, a, dir, mag, baseCruise, burstIn > 0.1 && !a.prev.burst) : undefined;
     const cruise = baseCruise * (sw?.speed ?? 1);
+    // What this body is asking for, whatever its state lets it do about it. Everything below takes
+    // the wish away again for a body that is staggered, grabbed or mid-lunge; the tug of war needs
+    // the wish itself, from both ends of a grip.
+    a.drive = mag > 0
+      ? { x: dir.x * mag * cruise, y: dir.y * mag * cruise, z: dir.z * mag * cruise }
+      : v3();
+    if (!def.ground) a.drive.y += input.rise ? RISE_RATE * sf : input.sink ? -RISE_RATE * sf : 0;
     const cur = sampleCurrent(v3(), a.pos.x, a.pos.y, a.pos.z, this.time);
     // A drifter on a neutral stick gives up steering and takes the whole current; a walking body
     // down on the floor holds station against it. Everything else feels the usual fraction.
@@ -1167,8 +1231,26 @@ export class Game implements AiWorld {
       // surface unasked (a lung that needs air). Holding sink is always the way to stay down.
       desired.y += RULES ? RULES.rise(this, a, input, base, burstMult) : input.rise ? base : input.sink ? -base : 0;
     }
+    // A mouthful is not cargo: it is pulling too. What the pair does is both wishes summed and
+    // shared out by weight, so a heavy animal that wants nothing still drags on whatever is
+    // carrying it, one that pulls the same way helps, and one that pulls the other way cancels it
+    // out. This is the whole of push-and-pull; what it wears out is decided where `grabT` lives.
+    if (a.grabbing >= 0) {
+      const v = this.idMap.get(a.grabbing);
+      if (v && v.state === 'grabbed') {
+        const share = clamp(massOf(v) / (massOf(a) + massOf(v)), 0, 0.85);
+        desired.x = desired.x * (1 - share) + v.drive.x * share;
+        desired.y = desired.y * (1 - share) + v.drive.y * share;
+        desired.z = desired.z * (1 - share) + v.drive.z * share;
+      }
+    }
     let rate = def.agility;
-    if (mag === 0 && controllable) rate = def.glide; // glide out
+    // Glide is for a body that has been asked for *nothing*. Rise and sink are asks like any other,
+    // and leaving them out meant holding the climb button alone put the animal in its slowest
+    // acceleration: a hatchling Nothosaurus took four and a half seconds to reach even two thirds
+    // of a climb speed that was already too small, which in an era where air is the economy reads
+    // as the button not working.
+    if (mag === 0 && controllable && !input.rise && !input.sink) rate = def.glide; // glide out
     if (a.state === 'stagger' || a.state === 'grabbed') { desired = v3(); rate = 2.5; }
     // A tail-flip is ballistic: the reflex has fired and there is nothing to steer with until it lands.
     if (a.state === 'dodge' || a.state === 'attack' || a.state === 'eating' || a.state === 'moult' || a.state === 'grabbing' || a.state === 'parry') rate = a.state === 'dodge' ? (def.tailFlip ? 0.25 : 1.4) : 3;
@@ -1503,13 +1585,13 @@ export class Game implements AiWorld {
       if (a.grounded || a.pos.y <= floor) { a.pos.y = a.grounded ? damp(a.pos.y, floor, 18, dt) : floor; if (!a.grounded && a.hopVel < 0) { a.grounded = true; a.hopVel = 0; } }
       if (a.pos.y < floor) a.pos.y = floor;
       // a paddling crawler still cannot climb out of the sea
-      const ceiling = SURFACE_Y - 0.8 - clearanceOf(a);
+      const ceiling = swimCeiling(a);
       if (a.pos.y > ceiling) { a.pos.y = ceiling; if (a.vel.y > 0) a.vel.y = 0; if (a.hopVel > 0) a.hopVel = 0; }
     } else {
       // Riding the floor: a swimmer skims the sand and is carried up and over rocks rather than
       // stopped by them, so the climb reads as a swim rather than a step.
       if (a.pos.y < floor) { a.pos.y = floor; if (a.vel.y < 0) a.vel.y *= -0.2; }
-      const ceiling = SURFACE_Y - 0.8 - clearanceOf(a);
+      const ceiling = swimCeiling(a);
       if (a.airborne) {
         // back through the surface: the splash, and the water takes most of the fall out of it
         if (a.pos.y <= ceiling && a.vel.y < 0) {
@@ -1678,7 +1760,7 @@ export class Game implements AiWorld {
           // what it does when it gets there.
           const gripped = a.graspHold && this.closeGrip(a, t);
           if (gripped) { /* the pounce closed a grip; the release settles it */ }
-          else if (band === 'snack' && (t.controller === 'swarm' || (t.controller === 'ambient' && lengthOf(t) < L * 0.3))) this.consume(a, t);
+          else if (band === 'snack' && (t.controller === 'swarm' || (t.controller === 'ambient' && lengthOf(t) < L * 0.3))) this.takeWhole(a, t);
           else { const m = { ...def.heavy, name: 'Pounce', damage: def.heavy.damage * 1.35, poise: def.heavy.poise * 1.2, knockback: def.heavy.knockback * 0.8, lunge: 0 }; applyHit(this.hitCtx, a, t, m, 1.2); }
           this.events.push({ kind: 'pounce', pos: { ...a.pos }, actor: a.id, other: t.id, player: a.player, strength: L });
           a.vel = vscale(a.vel, 0.25); a.iframes = 0.1;
@@ -1701,7 +1783,42 @@ export class Game implements AiWorld {
       const g = a.grabbedBy >= 0 ? this.idMap.get(a.grabbedBy) : undefined;
       if (!g || g.state !== 'grabbing' || g.grabbing !== a.id) { a.state = 'free'; a.stateT = 0; a.grabbedBy = -1; }
       else {
-        if (justLight || justHeavy || justDodge) a.grabT -= 0.28;
+        if (justLight || justHeavy) a.grabT -= 0.28;
+        // Pulling against the grip wears it, and only pulling *against* it does. A holder that
+        // lets itself drift along with what it has hold of is the hardest to get out of — that is
+        // the price of not going anywhere while you hold something — and one that is hauling its
+        // catch somewhere is fighting the catch for every unit of it.
+        const pull = len3(g.drive), heave = len3(a.drive);
+        const opposed = pull > 0.15 && heave > 0.15
+          ? Math.max(0, -dot(g.drive, a.drive) / (pull * heave)) * Math.min(1, heave / Math.max(0.3, lengthOf(a)))
+          : 0;
+        a.grabT -= opposed * GRIP_STRAIN * dt;
+        // A dash is the way out, and what it does depends on what the holder is doing. Against one
+        // that is pulling, the two forces tear the grip open and the dash is the escape. Against
+        // one that has gone slack there is nothing to tear against, so the dash takes the holder
+        // with it: you get away with your captor rather than from it, slower by what it weighs.
+        if ((justDodge || justDash) && a.stamina >= 10 && a.exhausted === 0) {
+          // Uncapped, unlike the blend above: what the blend needs a ceiling for is not letting a
+          // heavy catch steer its holder outright, but a *tow* is exactly the case where weight
+          // should be allowed to win. Hauling something six times your length off with you should
+          // be very nearly futile, and a ceiling here made it merely inconvenient.
+          const share = clamp(massOf(g) / (massOf(a) + massOf(g)), 0, 0.995);
+          if (pull > 0.15) {
+            this.breakLoose(g, a);
+            g.graspSpent = true;                          // torn open: the button has to come up
+            this.startDodge(a, def, dir, mag, L, sf);
+          } else {
+            // Towing. The shove goes on the holder, because the holder is what carries the pair —
+            // this body is pinned to it — and it is scaled down by the holder's share of the
+            // weight, so hauling something big off with you barely moves.
+            const d = mag > 0.2 ? dir : vscale(heading(a.yaw), -1);
+            const power = 7.5 * Math.sqrt(sf) * (1 - share);
+            g.vel.x += d.x * power; g.vel.z += d.z * power;
+            if (!creature(g.creature).ground) g.vel.y += d.y * power * 0.7;
+            a.stamina -= 10; a.dodgeTapT = 0.35;
+            this.events.push({ kind: 'dodge', pos: { ...a.pos }, actor: a.id, player: a.player, strength: L });
+          }
+        }
         // Held at the point the grip actually has. `grabOff` is that point in this body's own
         // frame, so it turns with the body; the grabber's end of it is its mouth. Sized by both
         // animals rather than only the grabber, a mouthful of any size ends up mouth-to-body
@@ -1716,7 +1833,13 @@ export class Game implements AiWorld {
         // Fast enough to read as being carried rather than towed, and snapped once it is there so
         // the pair are rigidly joined and the grip does not visibly slip while the grabber turns.
         a.pos.x = damp(a.pos.x, target.x, 22, dt); a.pos.y = damp(a.pos.y, target.y, 22, dt); a.pos.z = damp(a.pos.z, target.z, 22, dt);
-        if (Math.hypot(a.pos.x - target.x, a.pos.y - target.y, a.pos.z - target.z) < lengthOf(a) * 0.05) a.pos = { ...target };
+        // Contact, from the mouthful's side: the grip has finished closing and the two are joined.
+        // The clock belongs to the grabber, because it is the grabber's release it decides, and it
+        // is set here because this is where the coming-together actually happens.
+        if (Math.hypot(a.pos.x - target.x, a.pos.y - target.y, a.pos.z - target.z) < lengthOf(a) * 0.05) {
+          a.pos = { ...target };
+          if (g.gripSyncT < 0) g.gripSyncT = 0;
+        }
         a.vel = v3();
         if (a.grabT <= 0) { a.state = 'free'; a.stateT = 0; a.grabbedBy = -1; g.state = 'free'; g.stateT = 0; g.grabbing = -1; g.graspSpent = true; a.iframes = 0.4; }
       }
@@ -1724,28 +1847,52 @@ export class Game implements AiWorld {
       const v = a.grabbing >= 0 ? this.idMap.get(a.grabbing) : undefined;
       if (!v || v.state !== 'grabbed') { a.state = 'free'; a.stateT = 0; a.grabbing = -1; }
       else {
-        // A grasping player holding the button is *holding*, not crushing: the grip keeps what it
-        // caught for as long as the button is down — the grip's own clock stops, though what is in
-        // it can still struggle out — and the meal is what happens when the button comes up.
-        // Everything else, a bot's grasp or a move that grabs on its own, squeezes as it always did.
-        const holdingOn = a.graspHold && !!def.grasp && a.controller === 'player';
+        // A player holding the button is *holding*, not crushing: the grip keeps what it caught for
+        // as long as the button is down — the grip's own clock stops, though what is in it can
+        // still struggle out — and the meal is what happens when the button comes up. Nothing a
+        // grip has hold of is hurt by the holding, whatever the body doing it: the grasping
+        // appendages make a grip easier to close and further to reach with, and that is the whole
+        // of what they change. Everything else, a bot's grasp or a move that grabs on its own,
+        // squeezes as it always did — that is an attack, not a grip.
+        const holdingOn = a.graspHold && a.controller === 'player';
         if (!holdingOn) v.grabT -= dt;
-        // crush ticks
-        if (!holdingOn && Math.floor(a.stateT * 2.5) !== Math.floor((a.stateT - dt) * 2.5)) {
+        if (a.gripSyncT >= 0) a.gripSyncT += dt;
+        // Crush ticks — and a player's grip never has them, button down or up.
+        //
+        // Gating this on the button alone meant the squeeze landed on the *release* frame: the
+        // grip spends a moment winding down after the button comes up, and a mouthful was crushed
+        // to death in it. Something held harmlessly for five seconds then died as it was let go,
+        // which is the one thing a grip is not supposed to be able to do. What is left here is what
+        // it was always for: a bot's grasp, and a move that grabs on its own. Those are attacks.
+        const crushes = a.controller !== 'player';
+        if (crushes && Math.floor(a.stateT * 2.5) !== Math.floor((a.stateT - dt) * 2.5)) {
           v.hp -= 6 * clamp(Math.pow(L / lengthOf(v), 1.6), 0.2, 4); v.hitFlash = 0.3;
           this.events.push({ kind: 'hit', pos: { ...v.pos }, actor: a.id, other: v.id, strength: 0.4, player: v.player });
           if (v.hp <= 0) { a.state = 'free'; a.grabbing = -1; if (lengthOf(a) >= lengthOf(v) * 1.35) startSwallow(this.hitCtx, a, v); else kill(this.hitCtx, v, a); }
         }
-        // A grasping player holds on for as long as the button is down. Letting go of something
-        // small is a mouthful — that is what the grip was for — and letting go of a peer is just
-        // letting go: it has taken the crushing, and the throw is the end of the exchange.
+        // Nothing stays in a grip it did not agree to for ever. Holding costs the holder nothing,
+        // so without this it would cost the held animal everything — carried around indefinitely by
+        // something that need not even be paying attention. Past `GRIP_BREAK` from contact it is
+        // out, whatever the button is doing.
+        if (a.gripSyncT >= GRIP_BREAK && v.state === 'grabbed') {
+          this.breakLoose(a, v);
+        }
+        // A player holds on for as long as the button is down. Letting go of something small is a
+        // mouthful — that is what the grip was for — and letting go of a peer is just letting go.
         const holding = a.graspHold && a.state === 'grabbing' && v.state === 'grabbed';
         if (holding) a.stateDur = a.stateT + 0.4;
         else if (a.stateT >= a.stateDur && v.state === 'grabbed') {
+          // What you held and could swallow, you eat — if you eat it while it is still worth
+          // eating. Past `GRIP_MEAL` the animal has had every chance: carrying prey around in your
+          // jaws for five seconds is not a meal you are having, and it works itself loose and goes.
+          // Timed from contact, like everything else a grip comes to.
           const swallowable = bandOf(a, v) === 'snack' || bandOf(a, v) === 'prey';
-          if (swallowable && !!def.grasp && a.controller === 'player') {
+          const inTime = a.gripSyncT >= 0 && a.gripSyncT < GRIP_MEAL;
+          if (swallowable && a.controller === 'player' && inTime) {
             v.grabbedBy = -1; a.grabbing = -1;
             startSwallow(this.hitCtx, a, v);
+          } else if (swallowable && a.controller === 'player') {
+            this.breakLoose(a, v);
           } else {
             // throw
             const h = heading(a.yaw);
@@ -1862,15 +2009,22 @@ export class Game implements AiWorld {
   }
 
   /**
-   * Hold on to something bigger. The rider is pinned to the spot it took hold of, in the host's own
-   * frame, so the host tows it around and through whatever it swims through. The ride does no damage
-   * — biting the thing you are holding on to is a separate decision, and the light attack still
-   * works while clinging, which is what makes that possible.
+   * Hold on to something your own size or bigger. The rider is pinned to the spot it took hold of,
+   * in the host's own frame, so the host tows it around and through whatever it swims through.
    *
-   * It ends when the player lets go, when the grip runs out (`RIDE_MAX`) or the arms tire
-   * (`RIDE_STAMINA`), when the host throws itself sideways — a dash or a dodge shakes a rider off,
-   * which is the host's answer to being ridden — or when either animal stops being in a state to
-   * hold on: dead, grabbed, staggered, hidden or swallowed.
+   * The grip does no damage and costs nothing to keep. Not a blow that lingers, not a clock the
+   * player is spending, not a bar draining while they hang there: taking hold of an animal is one
+   * of the things a body can simply be doing, and it goes on until they let go. It used to end
+   * itself after nine seconds and land a strike if it was released inside the first fraction of a
+   * second, which made the whole thing an attack wearing a grip's clothes — you could not ride
+   * anything without hurting it, and you could not ride it for long. Biting what you are holding on
+   * to is a separate decision, and the light attack still works while clinging, which is what makes
+   * that possible.
+   *
+   * It ends when the player lets go, when the host throws itself sideways — a dash or a dodge
+   * shakes a rider off, which is the host's own answer to being ridden and the only thing that is
+   * not the rider's choice — or when either animal stops being in a state to hold on: dead,
+   * grabbed, staggered, hidden or swallowed.
    */
   private updateRide(a: Actor, def: ReturnType<typeof creature>, input: InputFrame, dt: number) {
     const host = this.idMap.get(a.rideHost);
@@ -1880,21 +2034,23 @@ export class Game implements AiWorld {
       || host.state === 'grabbed' || host.state === 'swallowed') { endRide(a, host); return; }
     if (host.state === 'dodge') { endRide(a, host, true); return; }                 // shaken off
     a.rideT += dt;
-    // Holding on is free. It used to drain the bar and drop the rider the moment it emptied, which
-    // made the ride something you were spending rather than something you were doing — and a
-    // player who had just spent their stamina getting to a giant could not then hold on to it.
-    // `RIDE_MAX` is the whole of the limit now: the arms tire, on their own clock.
-    const spent = a.rideT > RIDE_MAX;
-    if (spent || (player && !a.graspHold && a.rideT > 0.35)) {
-      // Letting go early is the blow that was never struck taking hold: a grip closed and released
-      // inside `GRIP_BITE` is an attack that used the hold to land, and past it the animal has
-      // settled into a ride and gets off the way it got on — without troubling what carried it.
-      if (player && !a.graspHold && a.rideT <= GRIP_BITE && isAlive(host)) {
+    if (a.gripSyncT >= 0) a.gripSyncT += dt;
+    // Holding on is free and has no end of its own. `rideT` is the time since the grip closed, and
+    // the only thing it is for is the short grace below.
+    //
+    // That grace is the frame the grip was closed in: a pounce that arrives as a grip does so while
+    // the button is still travelling, and without it a hold could be dropped before the player had
+    // any chance to keep it.
+    if (player && !a.graspHold && a.rideT > 0.35) {
+      // Grab and let go and it is the blow the grip stood in for — and the animal comes looking for
+      // whoever did it. Hold on past `GRIP_STRIKE` and the grip has stopped being an attack: it
+      // does nothing at all, and the host never learns it has a passenger.
+      //
+      // Judged from contact, so the fraction of a second the bodies spend coming together is not
+      // charged to the player as time spent holding on.
+      if (a.gripSyncT >= 0 && a.gripSyncT <= GRIP_STRIKE && isAlive(host)) {
         applyHit(this.hitCtx, a, host, { ...def.heavy, name: 'Grip', lunge: 0 }, 1);
       }
-      // A grip that gave out stays given out until the button comes up: the arms are tired, and
-      // holding the button through the failure must not simply take hold again next frame.
-      if (spent) a.graspSpent = true;
       endRide(a, host); return;
     }
     const h = heading(host.yaw);
@@ -1909,7 +2065,12 @@ export class Game implements AiWorld {
     a.pos.x = damp(a.pos.x, target.x, 22, dt);
     a.pos.y = damp(a.pos.y, target.y, 22, dt);
     a.pos.z = damp(a.pos.z, target.z, 22, dt);
-    if (Math.hypot(a.pos.x - target.x, a.pos.y - target.y, a.pos.z - target.z) < lengthOf(a) * 0.05) a.pos = { ...target };
+    // Contact: the grip has stopped closing and the two bodies are together. Everything a grip
+    // comes to is timed from this frame, and the renderer takes its bone hold from here too.
+    if (Math.hypot(a.pos.x - target.x, a.pos.y - target.y, a.pos.z - target.z) < lengthOf(a) * 0.05) {
+      a.pos = { ...target };
+      if (a.gripSyncT < 0) a.gripSyncT = 0;
+    }
     a.vel = { x: host.vel.x, y: host.vel.y, z: host.vel.z };
     a.grounded = false; a.hopVel = 0; a.climbTo = -Infinity;
     if (player) this.flag(a, 'ride');
@@ -2099,7 +2260,10 @@ export class Game implements AiWorld {
     }
     if (!best) { why(nearestWhy || 'nothing within reach to take hold of'); return 'none'; }
     const band = bandOf(a, best);
-    const bigger = band === 'threat' || band === 'giant';
+    // Ridden, or taken into the jaws? Only what this body could actually swallow is a mouthful;
+    // its own size and up is something to hold on to. Same rule as `closeGrip`, which is where a
+    // grip closed by a lunge or a landing blow decides it.
+    const bigger = band !== 'snack' && band !== 'prey';
     const name = `${creature(best.creature).name} (${band}, gap ${bd.toFixed(2)})`;
     if (bigger && gripButton && def.grasp) {
       const took = takeRide(this.hitCtx, a, best);
@@ -2120,17 +2284,38 @@ export class Game implements AiWorld {
     return took ? 'took' : 'closing';
   }
 
+  /**
+   * A grip ends with what it was holding simply getting away: not thrown, not hurt, not eaten.
+   *
+   * Three things arrive here — a release that came too late to be a meal, the grip's own time
+   * running out, and (from the other side) a dash that tore it open — and they are the same event
+   * from the held animal's point of view, so they are one piece of code. Nothing a grip holds is
+   * ever hurt by the holding, and that has to include the moment it stops.
+   */
+  private breakLoose(holder: Actor, held: Actor) {
+    held.state = 'free'; held.stateT = 0; held.grabbedBy = -1; held.iframes = 0.4;
+    holder.state = 'free'; holder.stateT = 0; holder.grabbing = -1; holder.gripSyncT = -1;
+    held.escapes++;
+    if (held.brain) { held.brain.goal = 'flee'; held.brain.target = holder.id; held.brain.goalT = 0; }
+    this.events.push({ kind: 'escape', pos: { ...held.pos }, actor: held.id, other: holder.id, player: held.player });
+  }
+
   /** Why this player's grip did or did not close, last time the question was asked. */
   graspReason(id: number): string { return this.graspReasons.get(id) ?? ''; }
 
   /**
    * Close whatever grip suits the far body's size, and say whether one closed. A mouthful is held
-   * in the mouth; anything over the rival band is held on to. Neither costs it any health — what
-   * the grip comes to is settled when the button comes up, not when it shuts.
+   * in the mouth; anything from the animal's own size upwards is held on to. Neither costs it any
+   * health — what the grip comes to is settled when the button comes up, not when it shuts, and for
+   * anything too big to swallow it comes to nothing at all.
    */
   private closeGrip(a: Actor, o: Actor): boolean {
     const band = bandOf(a, o);
-    const took = band === 'threat' || band === 'giant' ? takeRide(this.hitCtx, a, o) : takeHold(this.hitCtx, a, o);
+    // A grip is for holding on to. Only what this body could actually swallow is taken into the
+    // jaws as a mouthful; everything from its own size upwards is ridden. A rival used to be
+    // crushed and thrown, which meant the one animal most worth clinging to — something that can
+    // fight back and is going somewhere — was the one thing a grip could not hold on to.
+    const took = band === 'snack' || band === 'prey' ? takeHold(this.hitCtx, a, o) : takeRide(this.hitCtx, a, o);
     // The other way a grip closes — a lunge or a strike arriving — reports itself to the recorder
     // as the direct reach does, so a recording accounts for every hold however it was got.
     if (a.controller === 'player') {
@@ -2384,7 +2569,7 @@ export class Game implements AiWorld {
         if (a.graspHold && a.grabbing < 0 && a.rideHost < 0 && this.closeGrip(a, o)) continue;
         const closing = clamp(dot(sub(a.vel, o.vel), norm(sub(o.pos, a.pos))) / (creature(a.creature).speed * speedFactor(a.scale) * 1.8), 0, 1.5);
         const band = bandOf(a, o);
-        if (band === 'snack' && (o.controller === 'swarm' || (o.controller === 'ambient' && lengthOf(o) < lengthOf(a) * 0.3))) { this.consume(a, o); continue; }
+        if (band === 'snack' && (o.controller === 'swarm' || (o.controller === 'ambient' && lengthOf(o) < lengthOf(a) * 0.3))) { this.takeWhole(a, o); continue; }
         const r = applyHit(this.hitCtx, a, o, m, closing);
         if (o.controller === 'player' && (band === 'rival')) this.flag(o, 'fought');
         void r;
@@ -2420,10 +2605,37 @@ export class Game implements AiWorld {
       // Only small wild things go down in one gulp. Players and bots always get a fight (three bites from a giant).
       if (o.controller !== 'swarm' && o.controller !== 'ambient') continue;
       if (o.controller === 'ambient' && lengthOf(o) > lengthOf(a) * 0.3) continue;
+      // Swimming through a cloud of plankton feeds you; swimming *at* an animal does not. For a
+      // player an animal is something to be caught — bitten, pounced on, taken in the mouth — and
+      // having one vanish as you closed on it was the whole of what made hunting feel like nothing
+      // happened. The reef's own predators still take a mouthful in passing.
+      if ((a.controller === 'player' || a.controller === 'bot') && o.controller !== 'swarm' && a.state !== 'attack' && a.state !== 'pounce') continue;
       // A nursery is a peace, and a mouthful taken in passing breaks it as surely as a hunt does.
       if (peaceful(o.pos) && a.lastHitBy !== o.id) continue;
-      if (dist(a.pos, o.pos) < L * 0.4 + bodyRadius(o) && (moving || a.state === 'attack')) this.consume(a, o);
+      if (dist(a.pos, o.pos) < L * 0.4 + bodyRadius(o) && (moving || a.state === 'attack')) this.takeWhole(a, o);
     }
+  }
+
+  /**
+   * Take a whole mouthful.
+   *
+   * A wild thing small enough to go down in one gulp is *removed* when wildlife takes it: nobody is
+   * watching, and a reef of grazers cannot afford a performance each. When a player takes one it is
+   * the whole point of the act, so it goes into the mouth and is eaten there — the body is carried
+   * along in front of the jaws and swallowed over the next second (`updateSwallowed`), which is the
+   * same performance a bigger kill already had. It used to vanish on contact, which read as prey
+   * evaporating as you reached it rather than as being caught.
+   */
+  private takeWhole(a: Actor, o: Actor) {
+    // A fish out of a school is a mouthful taken in passing, and a cloud of them is how a filter
+    // feeder eats: no ceremony there either, or crossing a shoal would be a hundred performances.
+    if (o.controller === 'swarm' || (a.controller !== 'player' && a.controller !== 'bot')) { this.consume(a, o); return; }
+    const ratio = clamp(lengthOf(o) / Math.max(lengthOf(a), 1e-3), 0.05, 1);
+    startSwallow(this.hitCtx, a, o);
+    // A mouthful is not a meal: the chew and the pause both follow how big the thing was.
+    o.stateDur = clamp(0.45 + ratio * 2.6, 0.45, 1.6);
+    a.holdT = clamp(ratio * 3, 0.3, 1.4);
+    this.flag(a, 'ate');
   }
 
   private consume(a: Actor, o: Actor) {
@@ -3084,6 +3296,67 @@ export class Game implements AiWorld {
     for (const pr of this.progress) pr.prompts.push({ text, t });
   }
 
+  /**
+   * What this player has hold of, for the HUD.
+   *
+   * A grip was the one thing the game did that it never said it was doing. A recording of a player
+   * trying to grab a giant showed the grip closing three times, carrying them for thirteen seconds
+   * between them — and the player reporting, in good faith, that grabbing did not work. Nothing on
+   * the screen changed when the grip closed, nothing named the button that bites what you are
+   * clinging to, and nothing said a mouthful had struggled out and the button had to come up before
+   * the grip would close again. All of that is knowable; none of it was shown. So the simulation
+   * says it, here, where the struggle clock and the spent flag already live, rather than leaving
+   * the HUD to guess at them.
+   */
+  gripFor(i: number): GripHud | undefined {
+    const p = this.players[i];
+    if (!p || !isAlive(p)) return undefined;
+    if (p.rideHost >= 0) {
+      const host = this.idMap.get(p.rideHost);
+      if (!host) return undefined;
+      const name = creature(host.creature).name, band = bandOf(p, host);
+      // Inside the strike window there is something running down and it matters: let go now and it
+      // is a blow. Once it has passed, nothing is running — the ride lasts as long as the player
+      // wants it to — so there is no bar, because a bar there would be a promise the grip does not
+      // make.
+      const held = p.gripSyncT;
+      if (held >= 0 && held <= GRIP_STRIKE) {
+        return { kind: 'ride', name, band, release: 'strike', left: clamp(1 - held / GRIP_STRIKE, 0, 1) };
+      }
+      return { kind: 'ride', name, band, release: 'nothing' };
+    }
+    if (p.state === 'grabbing' && p.grabbing >= 0) {
+      const v = this.idMap.get(p.grabbing);
+      if (!v) return undefined;
+      const band = bandOf(p, v);
+      // A mouthful is eaten when the button comes up, and until then it is only held — the crush
+      // went with everything else that hurt what a grip had hold of. What the bar counts is the
+      // window in which it is still a meal: carry it around past `GRIP_MEAL` and it gets away.
+      const held = p.gripSyncT;
+      const inTime = held >= 0 && held < GRIP_MEAL;
+      // Two windows, one after the other: while it is still a meal the bar counts that down, and
+      // after it the bar counts what is left before the animal works itself out on its own.
+      return {
+        kind: 'hold', name: creature(v.creature).name, band,
+        release: inTime || held < 0 ? 'eat' : 'escape',
+        left: held < 0 ? 1
+          : inTime ? clamp(1 - held / GRIP_MEAL, 0, 1)
+          : clamp(1 - (held - GRIP_MEAL) / (GRIP_BREAK - GRIP_MEAL), 0, 1),
+      };
+    }
+    // Being held is the other half of a grip, and the half nobody was told anything about. A player
+    // in something's jaws could see their own health going and no way out of it; there is a way out
+    // of it, and it is one button.
+    if (p.state === 'grabbed' && p.grabbedBy >= 0) {
+      const by = this.idMap.get(p.grabbedBy);
+      if (by) return { kind: 'held', name: creature(by.creature).name, band: bandOf(p, by), release: 'nothing', left: clamp(p.grabT / 1.6, 0, 1) };
+    }
+    // The arms have given out and the button is still down. Two and a half seconds of pressing
+    // harder and nothing happening reads as a broken mechanic; one line saying so reads as a rule.
+    if (p.graspSpent && p.graspHold) return { kind: 'spent', name: '', band: 'rival', release: 'nothing' };
+    return undefined;
+  }
+
   /** The line to show this player right now, if any. Prompts expire; the newest wins. */
   noticeFor(i: number): string | undefined {
     const pr = this.progress[i];
@@ -3130,7 +3403,7 @@ export class Game implements AiWorld {
     if (!f.has('ability')) return '{ability}: hide. Burrowers bury for free; camouflage copies nearby colours and uses stamina.';
     if (!f.has('lock') && this.time > 30) return 'Hold {aim} to aim at prey. When the crosshair fills, {heavy} pounces.';
     // Graspers have a second way to use the same buttons, and nothing else in the game teaches it.
-    if (creature(p.creature).grasp && p.tier >= 1 && !f.has('ride')) return 'Hold {heavy} and you take hold. Let go of prey to eat it; take hold of something bigger and ride it, then {light} to bite.';
+    if (creature(p.creature).grasp && p.tier >= 1 && !f.has('ride')) return 'Hold {heavy} and you take hold — it costs nothing and hurts nothing. Let go of prey to eat it; hold on to anything your own size or bigger and ride it, then {light} to bite.';
     if (!f.has('teleport') && this.time > 60 && (this.players.length > 1 || distXZ(p.pos, p.home) > 150)) return '{teleport}: teleport home, or to another player.';
     return undefined;
   }

@@ -1,14 +1,16 @@
 // Headless smoke test: title → select → play, plus a giant-scale run. Usage: node tools/smoke.mjs <outdir>
 import { chromium } from 'playwright-core';
+import { silenceCounter } from './qa-counter.mjs';
 const S = process.argv[2] ?? '.';
 const browser = await chromium.launch({ executablePath: '/opt/pw-browsers/chromium', args: ['--use-gl=angle', '--use-angle=swiftshader', '--enable-unsafe-swiftshader', '--ignore-gpu-blocklist', '--no-sandbox'] });
 const page = await browser.newPage({ viewport: { width: 960, height: 540 } });
+await silenceCounter(page);
 const errors = [];
 page.on('console', (m) => { if (m.type() === 'error') errors.push(`[${m.type()}] ${m.text().slice(0, 300)}`); });
 page.on('pageerror', (e) => errors.push('[pageerror] ' + e.message + '\n' + (e.stack || '').split('\n').slice(0, 4).join('\n')));
 await page.addInitScript(() => localStorage.setItem('cambrian-settings', JSON.stringify({ quality: 'low', lookSpeed: 1, invertY: false, volume: 0.8, muted: true })));
 const shot = (name) => page.screenshot({ path: `${S}/shot-${name}.png`, timeout: 120000 });
-await page.goto('http://localhost:4173/', { waitUntil: 'load' });
+await page.goto('http://localhost:4173/cambrian/', { waitUntil: 'load' });
 await page.waitForTimeout(9000);
 await shot('title');
 await page.keyboard.press('Enter'); await page.waitForTimeout(1200);

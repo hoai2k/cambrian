@@ -1,0 +1,38 @@
+{
+  "schema_version": 1,
+  "name": "atopodentatus",
+  "task": {
+    "type": "image_to_model",
+    "status": "success",
+    "progress": 100,
+    "task_id": "c8b7e07d-3dfe-4b69-a4f9-2c2be73c77bb",
+    "created_at": "2026-09-13T15:33:19.578081Z",
+    "completed_at": "2026-09-13T15:35:19.904898Z",
+    "credits_consumed": 30,
+    "output": {
+      "model_url": "<redacted download URL>",
+      "rendered_image_url": "<redacted download URL>"
+    }
+  },
+  "request": {
+    "file": {
+      "file_token": "<uploaded at runtime>"
+    },
+    "model": "v3.1-20260211",
+    "face_limit": 20000,
+    "texture": true,
+    "pbr": true
+  },
+  "image": {
+    "path": "docs/triassic/canonical/model-inputs/atopodentatus/input.png",
+    "sha256": "e1632ba77da43e48262803b43796fd91da044cdb0b0d38a5a4717c052a5fa2e3",
+    "bytes": 1881071
+  },
+  "artifact": {
+    "path": "tools/triassic/creatures/atopodentatus/tripo-raw/atopodentatus.raw.glb",
+    "bytes": 1487900,
+    "sha256": "d15df84c130a33461a9e0c32b53d9d7889069f4ae1e4f7f064dfe17d52519cf8",
+    "source_output_field": "model_url"
+  },
+  "downloaded_at": "2026-09-13T15:35:22.297Z"
+}
