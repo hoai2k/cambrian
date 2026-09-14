@@ -135,13 +135,17 @@ recorded in `docs/triassic/proportion-audit.md` (each flipper 0.36 of a body len
 flank, span 1.00 L, against about 0.25 L for a plesiosaur forelimb). The tails are a generation
 defect; the flipper length is drawn that way in the pose, so that one needs a redraw first.
 
-## Not defects
+## Not defects, and one that has been resolved
 
-**Mystriosuchus and Aphaneramma are missing because they were never generated.** They are the only
-two animals on the roster with a greenlit canonical pose and no Tripo body at all — Nothosaurus and
-Shonisaurus also have no preview, but only because they have shipped and their previews retired on
-schedule. Nothing is broken; the generations do not exist. They cannot be reviewed, built or
-compared until someone makes them, and they are the first thing to ask Tripo for.
+**Mystriosuchus and Aphaneramma have now been generated** (14 September 2026) and are in. They were
+the last two subjects with a greenlit pose and no Tripo body; the generations were made outside
+this session and handed over through `intake/`, and both match their poses — the long-snouted
+temnospondyl with sprawling limbs and spotted flanks, and the scute-backed phytosaur. Both arrived
+head at −z and carry an estimated yaw of 180.
+
+Nothosaurus and Shonisaurus still have no preview, and should not: they have shipped, and
+`preview-bodies.mjs` retires a preview the day its animal lands. **Every subject on the roster now
+has either a generation or a body.**
 
 ## What unblocks the welded ones, and how to use it
 

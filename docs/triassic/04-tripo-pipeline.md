@@ -150,6 +150,37 @@ Two rules that follow from the steps:
   existing model. Do not stop solely to manufacture a new approval gate, and do not call a fix
   approved until the evidence actually supports it.
 
+## Which steps need a judgement and which are mechanical
+
+A body is twelve steps, and they are not the same kind of work. The distinction matters when the
+build is handed to somebody — or something — other than whoever wrote this page, because half the
+list is a decision that cannot be checked by a script and the other half is a command with a
+verifiable result. Splitting a build along that line is how several bodies get built at once
+without each of them needing the care of the first.
+
+**Judgement.** Steps 4, 6 and 9, and the reading in 7 and 11. Which way a generation is actually
+lying (its bounding box lies — Rhaeticosaurus' flippers span further than it is long — so the frame
+comes off the mouth socket, the authored `previewYaw`, or the albedo's countershading, in that
+order). Where the jaw hinge is and what shape the mouth cut takes, which differs per animal:
+Placodus' slit is modelled and can be measured by casting head normals back into the mesh;
+Dinocephalosaurus has no modelled mouth at all, so the line is read off the albedo and the same
+method finds nothing. Whether a run of body is the wrong *length* rather than the wrong shape, and
+where the two stretch cuts go. Whether a clip **reads** — a neck strike that is merely correct is
+not the same as one that is exciting — and whether a collapsed appendage has left a bump.
+
+**Mechanical.** Steps 3, 5, 8, 10 and 12, and the running of every check. Sending a builder to
+`/opt/blender/blender --background`, re-running it after an edit, packaging, `node
+tools/update-asset-sizes.mjs`, `npm run triassic`, publishing previews, refreshing a manifest,
+producing contact sheets. Each of these either succeeds with a number that can be compared against
+the tolerances in the step list or fails with a traceback, and neither outcome is a matter of
+opinion.
+
+The practical consequence: a build that is following an established per-creature pattern is
+mechanical almost end to end and wants the cheapest hands that can run a command and read a
+traceback; the first body of a new *kind* — the first shore animal, the first cephalopod — is
+mostly judgement and wants the most capable. Anything that ends in "does this look right" is
+judgement whatever step it sits in.
+
 ## What Tripo is asked for, and what it is not
 
 Tripo is asked for **bodies**: every creature in the roster and the shore animals, plus the

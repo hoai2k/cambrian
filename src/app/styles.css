@@ -287,7 +287,9 @@ h3 { font-size: 13px; letter-spacing: .12em; color: var(--ember); margin: 14px 0
 .hint { position: absolute; left: 50%; bottom: 5.4em; transform: translateX(-50%); margin: 0; padding: .6em 1.1em; border-radius: 1em; background: rgba(6,22,28,.72); border: 1px solid rgba(255,179,107,.5); color: var(--foam); font-weight: 700; font-size: 1em; white-space: nowrap; animation: rise-in .4s both; max-width: 90%; text-overflow: ellipsis; overflow: hidden; }
 .hint.danger { border-color: var(--coral); color: #ffd4da; }
 .marker { position: absolute; width: calc(.7em * var(--s)); height: calc(.7em * var(--s)); transform: translate(-50%, -50%) rotate(45deg); border: 2px solid currentColor; border-radius: 2px; opacity: .8; box-shadow: 0 0 8px currentColor; transition: left .1s linear, top .1s linear; }
-.marker-giant { animation: blink .8s infinite; }
+/* Only a mark that is *about* you blinks. It used to be every giant-band body on screen. */
+.marker.hot { animation: blink .8s infinite; }
+.marker:not(.hot) { opacity: .55; box-shadow: none; }
 .hunter-arrow { position: absolute; left: 50%; top: 50%; color: var(--coral); font-size: 2.2em; text-shadow: 0 0 14px var(--coral); }
 .hunter-arrow span { display: inline-block; transform: rotate(90deg); }
 /* Death: a line low on the viewport, not a panel over it. You watch what got you finish the job;
