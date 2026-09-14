@@ -41,6 +41,7 @@ export class Attachments {
   /** Which bone each rider has hold of, and where on it. See `gripOn`. */
   private grips = new Map<number, { host: number; bone: string; local: THREE.Vector3; rest: THREE.Quaternion }>();
   private bonePoint = new THREE.Vector3();
+  private boneOrigin = new THREE.Vector3(); private surfacePoint = new THREE.Vector3();
   private boneInv = new THREE.Matrix4();
   private boneQuat = new THREE.Quaternion();
   private swingQuat = new THREE.Quaternion();
@@ -290,7 +291,14 @@ export class Attachments {
       // A correction, not a placement: the simulation already has the body against the host, and
       // this closes the last of the gap. Bounded so a rig whose socket is somewhere unexpected
       // cannot fling the animal across the sea.
-      const limit = lengthOf(rider) * 0.5;
+      //
+      // The bound has to pay for both halves of that gap, and they are sized by different animals.
+      // Seating the rider's own socket is rider-sized; coming in from the simulation's capsule to
+      // the host's actual skin is host-sized, and on a giant that is several times a small rider's
+      // whole body. At half the rider's length a hatchling on an Anomalocaris had its correction
+      // clipped long before it reached the animal, so it stayed out in the water however well the
+      // grip was placed — which is the other half of the same bug.
+      const limit = lengthOf(rider) * 0.5 + bodyRadius(host);
       if (this.target.length() > limit) this.target.setLength(limit);
       rv.group.position.add(this.target);
     }
@@ -315,6 +323,17 @@ export class Attachments {
     const bone = hv.anchors.nearestBone(this.bonePoint);
     if (!bone) return undefined;
     bone.updateWorldMatrix(true, false);
+    // Put the hold on the animal rather than on the capsule the simulation holds it against.
+    // `rideHold` is a point a fixed fraction of the body's length out from its axis, which for
+    // anything much thinner than it is long — an Anomalocaris, a Tanystropheus' neck — is open
+    // water beside the animal. The bone the grip follows would then carry that empty-water point
+    // faithfully for the whole ride, which is a rider gripping nothing, exactly as reported. So
+    // walk the same line in to where the body actually is: out from the bone through the hold
+    // point, and back until the drawn surface stops it.
+    bone.getWorldPosition(this.boneOrigin);
+    if (hv.anchors.surfaceToward(this.boneOrigin, this.bonePoint, hv.visibleLength, this.surfacePoint)) {
+      this.bonePoint.copy(this.surfacePoint);
+    }
     // The hold point in the bone's own frame, and the bone's rest rotation, so what is applied
     // later is the bone's *change* since contact rather than its absolute orientation.
     const local = this.bonePoint.clone().applyMatrix4(this.boneInv.copy(bone.matrixWorld).invert());
