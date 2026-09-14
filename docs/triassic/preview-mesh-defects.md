@@ -66,6 +66,7 @@ There are two ways to act on it, and **the collapse is the right one for anythin
 | **Askeptosaurus** | the extra belly fin | 628 verts | 0.1823 → 0.0097 (**5.3%**) |
 | **Rhaeticosaurus** | the two spare tail blades | 361 verts | 0.1186 → 0.0073 (**6.1%**) |
 | **Atopodentatus** | the ventral fins | 1054 verts | 0.1838 → 0.0137 (**7.4%**) |
+| **Birgeria** | the second dorsal fin | 151 verts | 0.1131 → 0.0010 (**0.9%**) |
 
 All four are the published previews now; the untouched generations remain in
 `tools/triassic/creatures/<id>/tripo-raw/`. Rhaeticosaurus' neck stretch was re-baked on top, and
@@ -119,7 +120,6 @@ first).
 
 | Animal | Reported | Status |
 |---|---|---|
-| **Birgeria** | a second dorsal fin, where the research says "single dorsal set far back" | welded |
 | **Mixosaurus** | a deeply forked lunate fluke it should not have | welded |
 | **Helicoprion** | pelvic and anal fins, against *Fadenia*'s "no pelvic fins" | welded, **and in the greenlit pose** — needs a redraw, not just a regeneration |
 
