@@ -1,0 +1,41 @@
+{
+  "schemaVersion": 1,
+  "createdAt": "2026-09-14",
+  "tool": "builtin image_gen.imagegen",
+  "purpose": "Mesozoic expansion canonical candidates requested by user. Pending human review; no model generation authorized for these images.",
+  "designSource": "../05-mesozoic-expansion.md",
+  "subjects": {
+    "mosasaurus": {
+      "scientificName": "Mosasaurus hoffmannii",
+      "status": "pending-review",
+      "candidate": "mosasaurus.png",
+      "prompt": "Use case: scientific-educational. Create one beautiful canonical paleoart image of Mosasaurus hoffmannii for a realistic prehistoric marine animal game. Original composition, not copied artwork. A single complete living adult Mosasaurus swims powerfully through deep blue Maastrichtian seawater, gently banking, head to left and its complete tail toward right. Wide landscape 3:2 image. Low-foreshortening side / slightly elevated three-quarter view shows its whole silhouette with generous water margins, all tail tips and flipper tips fully inside frame. Realistic robust elongate marine lizard: long deep wedge-shaped skull around one eighth of total length, strong jaw, small lateral eye, nostrils high on snout before eyes; lips naturally almost closed with a few restrained conical cutting teeth showing. Short muscular neck smoothly joins deep streamlined trunk and muscular tapering tail. EXACTLY FOUR limb flippers: one left and one right foreflipper at shoulders, one left and one right smaller hindflipper at hips. Pose all four independently and anatomically attached, near pair angled down toward camera, far pair angled gently above body silhouette so each is readable. Smooth paddle outlines enclosing all digits; no exposed feet or claws. Tail is long, about half total length, curves gently laterally and ends in a VERTICAL crescent-shaped bilobed hypocercal fin: larger lower lobe and slightly smaller upper lobe, like an upside-down asymmetric shark tail. No fin on the back. Fine small reptile scales, dark slate charcoal dorsal skin with restrained olive mottling fading into pale gray cream underside, living skin with subtle irregularities. Naturalistic high-end 3D-style paleoart, convincing large animal mass, beautiful shafts of filtered surface sunlight and blue underwater depth, suspended particles, distant pale seafloor barely visible below. Subject dominates frame, no other foreground animals or obscuring plants. Correct lizard face, not crocodilian armour, not whale; no dorsal fin, no horizontal whale fluke, no shark gills, no spines, no extra fins, no text, labels, border or watermark. This is a clear canonical anatomy portrait in a dynamic ocean setting, not a feeding or attack scene.",
+      "refinementPrompt": "Refine the supplied Mosasaurus canonical image, keeping its rendering quality, blue ocean, head shape, scale texture, coloration, deep body, same side-view swimming composition and complete animal in frame. Two strict anatomy corrections only. FIRST: the small fin currently projecting above the middle-rear back must be visibly a far-side HIND LIMB FLIPPER, with its attachment at the far hip. Reposition that far hind flipper so it projects below the abdomen, visible just to the LEFT of the already visible near hindflipper, pointing down-left, with a readable separated tip. The entire dorsal outline from head to tail must be smooth with NO dorsal fin. Keep exactly four limb flippers total: the two existing front flippers, the existing near hindflipper, and the repositioned far hindflipper. SECOND: reshape only the crescent tail fin at right into the correct vertical hypocercal mosasaur fluke: its LOWER lobe must extend noticeably farther from the tail axis and be larger and more swept than its UPPER lobe. The tail axis curves gently downward into the larger lower lobe. Keep a smaller fleshy upper lobe, clear concave notch between the lobes. It must resemble an upside-down asymmetric shark tail, not an ordinary shark tail or horizontal whale tail. Maintain a single tail and all tips inside frame. Increase surrounding water margin slightly so no extremity approaches the edge. No extra fins, no text.",
+      "generatedSource": "/Users/hoai/.codex/generated_images/01a0a140-ae49-7f13-8ee4-3c47006d07c4/exec-df4d9132-d568-45f0-b6ab-bacd8eebfbdc.png",
+      "inputImages": [],
+      "refinementInput": "Original generated candidate (not retained in repo): exec-3bfe240f-7707-4f13-b89a-3ba4465a8814.png",
+      "sourceNotes": "references/mosasaurus/README.md",
+      "visualReview": "Full silhouette and all four limb flippers readable. Smooth dorsal profile without dorsal fin; final asymmetric vertical fluke has larger lower lobe. Small scales, strong lizard jaw and restrained countershading. Color pattern and exact soft-tissue outline are reconstruction choices. Natural perspective foreshortens tail; neutral model views should establish proportions after human review.",
+      "dimensions": [
+        1536,
+        1024
+      ],
+      "sha256": "ed1705f7a87a55d581ad79265db58db914f1d28f7fe49fb86f32c530ebb4c730"
+    },
+    "archelon": {
+      "scientificName": "Archelon ischyros",
+      "status": "pending-review",
+      "candidate": "archelon.png",
+      "prompt": "Use case: scientific-educational. Create one original high-quality canonical paleoart image of Archelon ischyros for a realistic prehistoric marine animal game, in a wide landscape 3:2 frame. A single complete enormous adult Archelon swimming and gently banking in clear blue Late Cretaceous Western Interior Seaway water above a distant pale chalk-and-shell seafloor. Dynamic elevated front-left three-quarter view, head toward left, broad carapace shown from above, modest foreshortening. The whole animal, every flipper tip and tail tip inside image with comfortable margins; no cropping. Archelon anatomy is crucial: large elongated narrow turtle skull with strongly hooked toothless upper beak, a short stout extended neck, broad low gently flattened leathery carapace supported by underlying ribs with subtly scalloped edges. Matte dark olive-brown leathery skin with natural wrinkles and subtle mottling, very gentle ribs visible beneath living flesh. Shell NOT a hard plated dome: no polygonal scute pattern, no tortoise shell, no exaggerated seven sharp leatherback ridges. EXACTLY FOUR flippers: two extremely long blade-shaped foreflippers extending at the shoulders on opposite sides, and two substantially shorter broad hind paddles at rear corners. Each foreflipper has long continuous leading edge and tapered rounded tip, its length comparable to shell width, far larger than hindflippers. Spread the two front flippers in an active powerful banking stroke with both fully readable; near front flipper arcs down toward foreground, far front flipper up and away; near and far hind paddles both separately visible beside the rear shell. Small single tapered pointed tail projects from exact center behind shell between hindflippers. No feet or protruding toes or extra appendages. Strong low turtle body with pale sandy throat and soft underside, natural little lateral eye, beak clearly visible in profile. Beautiful naturalistic high-end 3D-style paleoart with subtle filtered sunlight, realistic skin microtexture, ocean depth and suspended particles; massive living animal, graceful swimming, calm blue space around silhouette. No other foreground animals, no plants covering animal, no fish fused to flippers, no labels, text, watermark, logos, border or multi-panel layout. Scientific anatomy portrait, not monster design.",
+      "generatedSource": "/Users/hoai/.codex/generated_images/01a0a140-ae49-7f13-8ee4-3c47006d07c4/exec-9536956f-d21d-44f8-be72-a6369c9dd08d.png",
+      "inputImages": [],
+      "sourceNotes": "references/archelon/README.md",
+      "visualReview": "Complete turtle including four separate flippers and central pointed tail. Front flippers much larger than rear paddles. Low leathery carapace without hard polygonal scutes; hooked toothless beak, short extended neck. Foreflipper tip margins are narrow but intact. Color and surface markings are reconstruction choices.",
+      "dimensions": [
+        1536,
+        1024
+      ],
+      "sha256": "b13a789ee7d652da36c78b97dd7031b848aab464fecff1cde5302a6b18dabc53"
+    }
+  }
+}
