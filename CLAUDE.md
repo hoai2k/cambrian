@@ -299,6 +299,56 @@ unless the user explicitly asks for a PR. Steps:
   `main` on its own rather than waiting on the three others being built beside it. Bodies are built
   several at a time in separate worktrees, and a batch that merges as a batch holds a finished animal
   hostage to whichever of its siblings turned out hardest.
+- **Tripo is fed one view of one animal, never a contact sheet.** The input is a single clean
+  three-quarter view on flat pale grey, with no text, labels, borders, cropping or extra animals —
+  the `inputPrompt` in each `docs/triassic/canonical/model-inputs/<id>/metadata.json` is the exact
+  wording, and the four-view `turnaround.png` beside it is a *human review* artefact that is
+  deliberately never submitted. This is not a preference: a delivered six-panel modelling sheet for
+  Archelon, fed whole, came back as **six turtles in one GLB**, each with a sixth of the triangle
+  budget, because the generator read the panels as a scene. The same sheet's quarter-perspective
+  panel, cropped out on its own and padded back onto the sheet's grey so nothing is cut, gave one
+  turtle at 19,058 triangles. Reference art that arrives as a sheet is therefore *cropped to one
+  panel* before it is submitted, and the panel used is preserved as `tripo-raw/input.png`.
+- A subject whose **era is not settled** is not on the roster, and that is load-bearing rather than
+  bookkeeping: being in `TRIASSIC_CREATURES` is what puts an animal in the sea, in
+  `population.ts`'s tables and on the pick screen, so adding a Cretaceous animal there would answer
+  the open question in `docs/triassic/05-mesozoic-expansion.md` by accident. `src/content/triassic/expansion.json`
+  is the register for them — Archelon and Mosasaurus so far — and it reaches exactly two places:
+  `preview-bodies.mjs` reads a length from it (an off-roster subject has no `adultLength` to scale a
+  preview by, and without one the publisher refuses and blocks every other preview with it), and the
+  viewer catalogue lists them in the Triassic collection marked `offRoster`. Such a body borrows
+  nothing, because it is in no sea, so the *Model* control must not offer it a "borrowed body in
+  play" stage and the downloads line must not call a raw generation the full model.
+- **A mouth must read as a mouth, not as a hole in the model**, and the standing bar for every
+  Triassic body is three things. *Inside*: one **closed skinned lining** — roof on the skull, floor
+  on the jaw, wall stretching between them — wound inwards, with the skin double-sided behind it as
+  a backstop. Two separate tubes look identical at rest and part the moment the jaw swings, which is
+  how Placodus came to open onto transparency. Proving it needs care: render at full gape against a
+  saturated backdrop *with and without* a backface-cull shim and compare the two, because comparing
+  against the plain background measures the backdrop rather than the gape and passes whatever the
+  mesh does. *The cut*: the jaw seam follows the model's own lip contour rather than running straight
+  near it — cast head vertex normals back into the mesh and fit a curve to the hits where a slit is
+  modelled (Placodus), and read the lip line off the albedo where none is (Dinocephalosaurus, where
+  the first method finds zero vertices). A fish is often genuinely straight and is the easy case;
+  reptiles and amphibians have subtle lips and are where a straight cut shows. *The anchors*:
+  `anchor_mouth` (role mouth) on the jaw, `anchor_mouth_inside` (role swallow) on the skull, and
+  `anchor_attack_primary` (role attack) on the bone that actually delivers the blow — which is **not**
+  the skull for an animal whose attack is a neck, a tail or a tentacle rather than a bite.
+  Where a generation was **authored with the mouth open**, the open mouth is a pose and not the
+  animal: the jaw closes in the neutral pose, so `Idle`, `Swim`, `Sprint`, the turns, `Dive` and
+  `Rise` all run with it shut, and only `Bite`, `Attack`, `Heavy` and `Eat` open it. The generation's
+  own gaping pose stays exactly where a gaping pose belongs, which is the stills. This is not free,
+  and is why a generation is still asked for with the mouth closed: teeth modelled apart tend to
+  interpenetrate when they are first brought together, the oral cavity Tripo modelled has to fold
+  rather than be built, and closing is a large jaw rotation, so the pose the animal spends almost
+  all its time in becomes the most deformed one.
+- **A limbed swimmer's dash has to paddle.** The Triassic's reptiles and amphibians did not scull
+  along on a tail beat, and a Sprint clip that waggles the limbs while the body does the work reads
+  as a fish with legs attached. The stroke runs from the limb stretched forward to flush with the
+  body and back, and the builder records the total swept angle at each limb root per cycle in its
+  `validation.json`, so "the limbs move" is a number rather than an impression. Attack clips are the
+  same question asked of the weapon: a long neck, a tail or a pair of tentacles is what that animal
+  attacks *with*, and a clip that leaves it hanging has not used the animal.
 - Devonian specimens land in batches (`tools/devonian/shipped.json`). When one lands: run
   `node tools/update-asset-sizes.mjs` (refreshes `src/content/devonian/asset-sizes.json`), remove its
   entry from `DEVONIAN_STAND_INS` in `src/content/devonian/index.ts`, and run `npm run devonian`.
