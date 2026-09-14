@@ -1,0 +1,34 @@
+{
+  "dinocephalosaurus": [
+    {
+      "name": "anchor_mouth",
+      "bone": "jaw",
+      "point": [
+        0.007061949465423822,
+        -3.5769002437591553,
+        -0.16454364359378815
+      ],
+      "role": "mouth"
+    },
+    {
+      "name": "anchor_mouth_inside",
+      "bone": "skull",
+      "point": [
+        0.00725748622789979,
+        -3.4110302925109863,
+        -0.10615133494138718
+      ],
+      "role": "swallow"
+    },
+    {
+      "name": "anchor_attack_primary",
+      "bone": "skull",
+      "point": [
+        0.004939100239425898,
+        -3.6123290061950684,
+        -0.15981930494308472
+      ],
+      "role": "attack"
+    }
+  ]
+}

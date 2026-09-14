@@ -3,7 +3,7 @@ import type { DevonianCreatureId } from './ids';
 import type { Slot } from '../../shared/palettes';
 import { DEVONIAN_CREATURES } from './creatures';
 import { SNACK_SCHOOLS, GIANTS } from './ecology';
-import { BIOME_NAMES, BIOME_DANGER, ATMOS, SAND_COLORS, FLORA_BASE, FLORA_DENSITY, FLORA_PROPS, SURFACE_Y } from './environment';
+import { BIOME_NAMES, BIOME_DANGER, ATMOS, SAND_COLORS, FLORA_BASE, FLORA_DENSITY, FLORA_PROPS, SURFACE_Y, FLOOR_DEPTH } from './environment';
 import { MUSIC } from './music';
 import { DEVONIAN_SCENERY } from './scenery';
 import { SCHEMES, CREATURE_SCHEMES } from './palettes';
@@ -50,7 +50,7 @@ const authoredCreatures = Object.fromEntries(DEVONIAN_CREATURES.map((c) => {
 export const DEVONIAN = defineEra({
   id: 'devonian',
   title: 'Devonian Domination',
-  copy: { tagline: 'Feed. Grow. Fight. Escape.', taglineEm: '375 million years ago, the sea had a pecking order.', loading: 'FILLING THE BASIN…', lose: 'THE SEA WINS', settingsKey: 'devonian-settings', mobileIllustration: DEVONIAN_BRAND_EXTRAS.mobileIllustration, sibling: { title: 'Cambrian Conquest', path: '', blurb: '133 million years earlier', logo: 'assets/brand/logo-engraved.webp' } },
+  copy: { tagline: 'Feed. Grow. Fight. Escape.', taglineEm: '375 million years ago, the sea had a pecking order.', loading: 'FILLING THE BASIN…', lose: 'THE SEA WINS', settingsKey: 'devonian-settings', mobileIllustration: DEVONIAN_BRAND_EXTRAS.mobileIllustration, trilogy: { title: 'Ancient Seas Trilogy', path: '', blurb: 'All three games' }, sibling: { title: 'Cambrian Conquest', path: 'cambrian/', blurb: '133 million years earlier', logo: 'assets/brand/logo-header.webp' }, siblings: [{ title: 'Triassic Triumph', path: 'triassic/', blurb: '135 million years later', logo: 'assets/triassic/brand/logo-header.webp' }] },
   modes: [
     // The same three modes as the Cambrian, in the same order: this era changes the sea and the
     // animals in it, not what a match is.
@@ -71,7 +71,7 @@ export const DEVONIAN = defineEra({
     title: ['dunkleosteus', 'cladoselache', 'coccosteus', 'doryaspis'],
   },
   ecology: { schools: SNACK_SCHOOLS, giants: GIANTS, shadow: { creature: 'titanichthys', scale: 1.0 } },
-  environment: { biomeNames: BIOME_NAMES, biomeDanger: BIOME_DANGER, atmosphere: ATMOS, sandColors: SAND_COLORS, floraColors: FLORA_BASE, flora: FLORA_DENSITY, floraProps: FLORA_PROPS, surfaceY: SURFACE_Y },
+  environment: { biomeNames: BIOME_NAMES, biomeDanger: BIOME_DANGER, atmosphere: ATMOS, sandColors: SAND_COLORS, floraColors: FLORA_BASE, flora: FLORA_DENSITY, floraProps: FLORA_PROPS, surfaceY: SURFACE_Y, floorDepth: FLOOR_DEPTH },
   assets: {
     creatures: 'assets/devonian/creatures/', defaultPortraits: 'assets/devonian/creatures/',
     // Scenery is this era's own: the instanced exports built by tools/devonian/props/instance.mjs

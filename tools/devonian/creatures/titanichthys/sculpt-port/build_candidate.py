@@ -2,7 +2,7 @@
 materials (the shipped body/oral/fin PNGs, reused via a fresh smart_project UV unwrap -- the same
 algorithm materials_02.py used, since geometry changed only at the snout), baked vertex pigment
 for the LOD, all 18 procedural clips and the five anchors (mouth/attack anchors follow the moved
-nose through the same nose_warp used to build it). Reuses rig_actions_01.py/export_patch_02.py
+nose through the same nose_loft used to build it). Reuses rig_actions_01.py/export_patch_02.py
 from rework-v3 unmodified (pure logic, no Blender-version or prior-file coupling) rather than
 re-deriving skeleton/animation/anchor code that already exists and matches this geometry exactly.
 
@@ -30,9 +30,9 @@ from export_patch_02 import patch_export
 
 # The mouth/attack anchors sit forward of the neck, in the region the nose warp reshapes; move
 # them with it so the oral/attack sockets stay on the (now longer, narrower) snout. The support
-# anchors are aft on the pectoral fins and pass through nose_warp unchanged (it is identity there).
+# anchors are aft on the pectoral fins and pass through nose_loft unchanged (it is identity there).
 for spec in ra.ANCHORS:
-    spec['point'] = tuple(geometry.nose_warp(Vector(spec['point'])))
+    spec['point'] = tuple(geometry.nose_loft(Vector(spec['point'])))
 
 bpy.ops.object.select_all(action='SELECT')
 bpy.ops.object.delete(use_global=False)

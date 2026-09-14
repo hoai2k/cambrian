@@ -1,5 +1,5 @@
-import { clamp } from '../shared/math';
-import { floraPropId, propShape } from '../content/prop-shapes';
+import { clamp, smoothstep } from '../shared/math';
+import { propShapeFor } from '../content/prop-shapes';
 import { fpMax, fpReachAt, FOOTPRINT_BANDS, ROUND, type Footprint, type Reach } from './footprint';
 import { bodyRadius } from './actors';
 import { WEED_LEVERAGE, WEED_PULL } from './locomotion';
@@ -73,6 +73,12 @@ export const FLORA_PHYS: Record<FloraKind, FloraPhys> = {
   reed: { h: 1.8, r: 0.25, profile: (f) => 0.25 + 0.75 * f, rigidity: 0.12, maxLean: 0.9, k: 14, c: 2.0, drag: 1.5 },
   // Log: a trunk lying on the sand. Rigid; `r` is half its length, so it reads as a low round obstacle.
   log: { h: 0.5, r: 1.3, profile: () => 1, rigidity: 30, maxLean: 0.02, k: 80, c: 12, drag: 0.2 },
+  // Triassic substrate. Mineral, not growth: nothing here bends, sways or gives, so each is rigid
+  // with no lean, and the heights are the authored meshes' own (the union over a family's
+  // variants, which is what `npm run props` checks these against).
+  stromatolite: { h: 0.314, r: 0.37, profile: (t) => 1 - t * 0.55, rigidity: 100, maxLean: 0, k: 200, c: 20, drag: 0.1 },
+  saltCrust: { h: 0.097, r: 0.51, profile: () => 1, rigidity: 100, maxLean: 0, k: 200, c: 20, drag: 0.05 },
+  mudRipple: { h: 0.184, r: 1.0, profile: () => 1, rigidity: 100, maxLean: 0, k: 200, c: 20, drag: 0.05 },
 };
 
 /**
@@ -83,7 +89,7 @@ export const FLORA_PHYS: Record<FloraKind, FloraPhys> = {
  */
 interface KindShape { bands: readonly Footprint[]; unit: number; widest: number }
 const KIND_SHAPE = Object.fromEntries((Object.keys(FLORA_PHYS) as FloraKind[]).map((kind) => {
-  const shape = propShape(floraPropId(kind));
+  const shape = propShapeFor(kind);
   const P = FLORA_PHYS[kind];
   // A round stand-in is one band of unit circle, scaled by its own radius and tapered by `profile`.
   const bands: readonly Footprint[] = shape
@@ -97,6 +103,21 @@ const KIND_SHAPE = Object.fromEntries((Object.keys(FLORA_PHYS) as FloraKind[]).m
 export const floraReachOf = (kind: FloraKind) => KIND_SHAPE[kind].widest * KIND_SHAPE[kind].unit;
 
 const BEND_EXP = 1.3;
+/**
+ * Where a plant stops being a stem to push past and starts being a body to get over, as the
+ * fraction of the plant's own widest girth that is present at the height the contact happens.
+ *
+ * Below `STEM_GIRTH` this part of the plant is a stalk and yields — being pushed aside is what a
+ * stalk is for. Above `BODY_GIRTH` it is the plant's bulk and holds. This replaces deciding by how
+ * far the plant had already been bent, which could not tell a broad firm base from a narrow foot:
+ * both ended up flat, and a flattened plant stops resisting, so a trilobite walked through the
+ * middle of a sac sponge. It is deliberately a fact about the plant and not about the body — how
+ * the two sizes weigh against each other is `give`, and saying it twice made an adult treat every
+ * sponge in the sea as thin air.
+ */
+const STEM_GIRTH = 0.45, BODY_GIRTH = 0.65;
+/** How much leverage a body gets over a plant it is pushing near the foot. See `lever` below. */
+const BEND_LEVER = 0.3;
 const EPS = 1e-3;
 const floraReachScratch: Reach = { d: 0, reach: 0, nx: 0, nz: 1 };
 
@@ -160,7 +181,24 @@ export function resolveFlora(world: WorldData, a: Actor, dt: number, scratch: Fl
 
     // Bend the plant away from the body by its share. Near the base a small bend moves the contact
     // point very little, so the plant reads as rigid down there.
-    const want = Math.min(pen * give / lean, maxB * 0.5);
+    //
+    // Whether the body has met this plant where the plant is *broad* or where it is a stem — the
+    // fraction of its own girth that is present at the contact height, off the mesh (`rp` is the
+    // footprint's half-width there). A sac sponge is a bulb sitting on the sand and is two thirds
+    // of its width down at the foot; a spine sponge is a tall stalk and is barely a third. That is
+    // the difference between a thing to get over and a thing to push past, and it belongs to the
+    // plant: measuring it against the *body* instead would say the same sponge is an obstacle to a
+    // hatchling and thin air to an adult, which `give` already says, once, from the size of both.
+    const stout = smoothstep(STEM_GIRTH, BODY_GIRTH, rp / Math.max(S.widest * u, EPS));
+    // The bend a body asks for to clear its own width is `pen / lean`, which is the geometry — but
+    // `lean` goes to nothing at the root, so as written the ask went to infinity down there. A
+    // crawler standing a third of a unit off the sand flattened a firm sponge in two steps and then
+    // walked through it, because a flattened plant stops resisting. The leverage is floored where
+    // there is plant enough to lean on, which is what the line above this promises: near the foot a
+    // body leans on a stem rather than felling it. A stalk narrower than the body keeps the old
+    // unfloored give, because being pushed aside is exactly what should happen to it.
+    const lever = Math.max(lean, BEND_LEVER * stout);
+    const want = Math.min(pen * give / lever, maxB * 0.5);
     const bx = f.bx - nx * want, bz = f.bz - nz * want;
     const bl = Math.hypot(bx, bz);
     if (bl > maxB) { f.bx = bx * maxB / bl; f.bz = bz * maxB / bl; } else { f.bx = bx; f.bz = bz; }
@@ -169,16 +207,24 @@ export function resolveFlora(world: WorldData, a: Actor, dt: number, scratch: Fl
     f.bvx += vel.x * shove; f.bvz += vel.z * shove;
     activate(world, f);
 
-    // Nudge the body out by the rest. A plant that is flat on the floor stops resisting.
-    const bendFrac = Math.min(1, Math.hypot(f.bx, f.bz) / maxB);
-    const resist = (1 - give) * (1 - bendFrac * bendFrac);
+    // Nudge the body out by the rest. A plant that is flat on the floor stops resisting, and one
+    // that cannot bend at all never stops — `maxB` is zero for the mineral kinds (a stromatolite
+    // dome, a salt crust), and dividing by it put a NaN into the push and from there into the hp
+    // and stamina of everything that touched one.
+    const bendFrac = maxB > EPS ? Math.min(1, Math.hypot(f.bx, f.bz) / maxB) : 0;
+    const resist = (1 - give) * stout * (1 - bendFrac * bendFrac);
     const push = pen * resist;
     pos.x += nx * push; pos.z += nz * push;
+    const vn = vel.x * nx + vel.z * nz;
+    // Driving at the middle of it, rather than catching an edge. Worked out once, because it
+    // decides both of the two things that can happen next and they are alternatives: you go over a
+    // plant or you go round it, never both.
+    const straightOn = vlen > 0.05 && -vn / vlen > HEAD_ON;
     // Record it for the climb: a plant is something to go round, unless the body is driving at the
     // middle of it, in which case going over is what was meant.
     if (out && push > 1e-3) {
       out.blocked = true;
-      if (vlen > 0.05 && -(vel.x * nx + vel.z * nz) / vlen > HEAD_ON) {
+      if (straightOn) {
         out.headOn = true;
         out.top = Math.max(out.top, f.pos.y + H + ra * 0.6);
       }
@@ -186,10 +232,16 @@ export function resolveFlora(world: WorldData, a: Actor, dt: number, scratch: Fl
     // Kill the inward velocity component by the same fraction so you slide rather than judder, and
     // turn part of it sideways, toward whichever side of the stem you are already on, so a near
     // head-on contact steers you around the plant instead of parking you against it.
-    const vn = vel.x * nx + vel.z * nz;
+    //
+    // Not a dead-on one, though. The steer is for the glancing contacts it is named for; applied to
+    // a body driving at the centre it took the animal off the line before the climb it had just
+    // asked for could start — one frame of head-on contact, then the deflection dropped the
+    // alignment out of range and the plant was walked round at floor level instead of over. It only
+    // showed once plants stopped being flattened, because until then a firm base gave way and there
+    // was nothing to be deflected by.
     if (vn < 0) {
       vel.x -= nx * vn * resist; vel.z -= nz * vn * resist;
-      if (vlen > 0.05) {
+      if (vlen > 0.05 && !straightOn) {
         const px = -vel.z / vlen, pz = vel.x / vlen;
         let side = nx * px + nz * pz;
         if (Math.abs(side) < 0.02) side = Math.sin(f.rot * 7.3 + a.id);

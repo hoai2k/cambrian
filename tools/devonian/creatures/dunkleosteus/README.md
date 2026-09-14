@@ -96,3 +96,61 @@ All four portraits are derived from the final source. `action-review.jpg` is the
 
 Current shipped version is preview pending the focused face pass in
 `docs/devonian/refinement-queue.md`. Previous final reports apply only to the preserved backup.
+
+## V3 — sculpt port (12 September 2026)
+
+The user sculpted this head in the viewer's sculpt mode and exported
+`docs/sculpts/dunkleosteus-sculpt.json`: the crown raised **+3.2% / +13.1% / +25.4%** at stations
+16, 17 and 18 (axis .94 / 1.12 / 1.31), the nose **lowered 12.5%** at station 19 (axis 1.49), small
+axial shifts at those four stations (+.003, +.008, +.039, −.034) and two pulled dorsal tangents at
+stations 18 and 19. Ventral, width and everything behind station 15 were left alone.
+
+`build_v3.py` carries it as the viewer itself carries it. The exported station table is embedded
+verbatim (`SCULPT`) and `sculpt_warp()` reimplements `profileWarp` from
+`src/viewer/sculpt/profile.ts` in the builder's frame (the sculpt's axis is −y, its up is z): the
+axial shifts as the same piecewise-linear axis remap, the dorsal edit as the same scale of a
+vertex's height above the local centre line, both pulled tangents in the same cubic Hermite — so
+the tangents **are** carried, not approximated. It runs once, as a single per-vertex pass at the
+end of the geometry pass, over the head, jaw, oral lining, all three ray-cast-fitted gnathal
+blades, both eye globes and the three feeding sockets; V2's 8-point head cage (`ORIG8`) is
+untouched. Because it is a warp by each vertex's own axial position and not a move of isolated
+rows, relative spacing is preserved and everything seated against the head follows it with no
+separate seating logic. Over the head the vertical scale runs 1.00 → 1.13 and back to 0.94 at the
+snout tip, with no shear, so the eyes keep their seat (0.87 of each globe inside the skin, as
+fitted) and the blades keep their bite. Behind station 15 the warp is the identity.
+
+A first port (kept only in the session log) overrode the head rows' dorsal values with the
+sculpt's station numbers directly. It scored better against `sculpt:measure`'s station-19 target
+and was rejected on the judge sheet: a station number is a *window extreme*, not the outline at
+that point, so forcing it flattened the cranial roof into a slab, squared the snout off and opened
+a gap around the supragnathal blade.
+
+Measured (`npm run sculpt:measure`):
+
+* Against the shipped model's own envelope (`--against`, the fair check for what did not change):
+  stations 0–15 agree to **0.0–0.1%** on dorsal, ventral and width — the port changes nothing
+  behind the head. Stations 16–19 read dorsal **+1.4 / +6.2 / +22.2 / +32.7%**, ventral 0–3%,
+  width 0.1–7.6%: the crown raise and the shortened snout, and nothing else.
+* Against the sculpt's own target curves: unchanged stations sit within **±1%** of the viewer's own
+  warp of the shipped GLB at every station (the port reproduces that warp to ~0.001 units); the
+  changed stations read −1.1 / −4.0 / −3.9% at 16–18 and **+65.5%** at station 19. That last figure
+  is not a defect of the port: the viewer's own warp of the shipped GLB measures the same +65.5%
+  there. `sculpt:measure` reads a station as the extreme over a window half a station's spacing
+  either side, and station 19's window is the half-window behind the snout tip, where the edited
+  spline — running down from a crown raised 25% at station 18 — still sits well above the shipped
+  one. The sculpt's station numbers and the curve the viewer warps by cannot both be satisfied
+  there; the preview the user approved is the warp, so the warp is what shipped.
+
+The shipped GLB, LOD and four portraits are now this V3 candidate
+(`../devonian-authoring/dunkleosteus/sculpt-candidate2/`, packaged with `tools/devonian/package.mjs`
+and re-carrying the `Grab` performance through `tools/creatures/motion/apply.mjs`).
+`validation_v3.json` holds its geometry, rig, clip and socket evidence. Reproduce with:
+
+```sh
+DUNK_OUT=<candidate dir> /opt/blender/blender --background --factory-startup --python tools/devonian/creatures/dunkleosteus/build_v3.py
+DUNK_OUT=<candidate dir> python3 tools/devonian/creatures/dunkleosteus/finalize_v3.py
+DUNK_OUT=<candidate dir> python3 tools/devonian/creatures/dunkleosteus/portraits_v3.py
+```
+
+`DUNK_SKIP_RENDER=1` on the build skips the studio and review renders (GLBs only). The builder
+refuses any `DUNK_OUT` under `public/`.

@@ -1,10 +1,11 @@
 # 04 · The Tripo pipeline: generated bodies, procedural rigs, authored motion
 
-**Status:** proposed production strategy, 12 September 2026. Nothing here is built. The
-Cambrian and Devonian rosters were sculpted in Blender by hand and by builder script; the Triassic
-is the first era planned around a generative image-to-3D model (Tripo) for the bodies. This
-document states the strategy as proposed, says where it is agreed with, where it is changed and
-why, and lays out the step list an author follows per creature.
+**Status:** active production pipeline, updated 13 September 2026. Nothosaurus and Shonisaurus
+already ship as paired authored Tripo bodies and measured procedural twins on exact shared rigs;
+the rest of the roster is not thereby claimed complete. The Cambrian and Devonian rosters were
+sculpted in Blender by hand and by builder script; the Triassic is the first era using generated
+image-to-3D bodies as preserved source surfaces. This document records the established process and
+the checks an author follows per creature.
 
 ## The proposal, as stated
 
@@ -18,7 +19,7 @@ why, and lays out the step list an author follows per creature.
 The goal: Tripo's surface quality in the shipped game, with animation as strong as the procedural
 rigs have given the earlier eras.
 
-## Assessment: agreed, with three changes
+## Established approach
 
 The goal is right and the order is nearly right. Tripo is good at what the builders are worst
 at, a convincing, continuous, textured skin with fine surface detail, and poor at exactly what the
@@ -49,28 +50,64 @@ proposed below; a body outside it goes back to the profile rows, never to the Tr
 **3. The procedural twin is not thrown away: it ships as the distant model.** The contract wants a
 reduced model with the same skeleton, sockets and locomotion clips (`<id>.lod1.glb`, at most 40 %
 of the triangles). The twin is exactly that, already rigged and already animated, and it is a
-better LOD than any decimation of the Tripo mesh because its silhouette was verified against the
-Tripo mesh. So the twin costs nothing extra; it is a deliverable. It is also the **fallback**: a
-Tripo body that fails verification twice ships as its twin, which is the Devonian route and is
-known to work.
+better LOD than an unrelated decimation because its volume and silhouette are verified against the
+Tripo mesh. The first two deliveries establish two valid construction methods. Shonisaurus uses
+measured axial and spanwise lofts where those describe its trunk, rostra, flippers and caudal
+crescent well. Nothosaurus uses a fresh voxel-occupancy volume resurfacing where lofting would erase
+the canonical curved tail, asymmetry and individual paddle silhouettes. The voxel twin reuses no
+source vertices or faces. Both methods must meet the same envelope, surface-distance, rig, clip and
+anchor checks. The twin is also the **fallback** when the authored surface cannot be made to deform
+cleanly without losing identity.
 
-Two risks the proposal does not mention, and should:
+**4. One image is greenlit first, and everything is built from that image.** The pipeline has a
+gate before it has a generation. Each subject gets one **canonical pose** — the approved picture of
+that animal — and a human says yes to it before any modelling sheet, any Tripo job or any Blender
+work happens. Everything downstream is derived from that single image and from nothing else, so
+there is one place where the animal is decided and one thing to argue about. A pose that is not
+greenlit is regenerated, not worked around: fixing a body at the mesh stage means the picture and
+the model disagree from then on, and nobody can say which is the animal.
+
+The review is [the reference viewer](https://games.hoai.net/cambrian/research/triassic/). It puts
+each pose beside reference art from Wikimedia Commons, flips between them in place on **C**, and
+takes a decision per subject: choose our own pose and it is greenlit; choose a reference instead
+and the pose is regenerated steered toward that picture. *Export selections* writes the decisions
+out, and `node tools/triassic/apply-selections.mjs <file>` records them in
+`docs/triassic/canonical/manifest.json` and writes the rework brief to
+`docs/triassic/canonical/review.md`. Nothing reaches step 3 below without a `greenlit` state.
+
+Two risks require explicit handling:
 
 - **Tripo bodies are closed shells.** There is no mouth interior, no separate jaw, no eye globe,
   and paired limbs are sometimes fused to the flank or to each other. The production contract
   requires an articulated jaw with palate, walls, floor and throat, eyes at least half inside the
   head, and fins seated inside the trunk. Every Tripo creature needs a Blender surgery pass (cut the
   jaw, build the mouth, set the eyes, free the flippers) *before* skinning, and the step list budgets
-  it. For the long-necked animals, Tanystropheus and Dinocephalosaurus, the neck is better built
-  procedurally as a lofted tube on the skeleton and stitched to the Tripo head and trunk than taken
-  from Tripo, whose necks come out as lumpy cylinders with no vertebral rhythm.
-- **Colour has to become vertex colour.** The game recolours a creature by rebuilding each pixel from
-  its vertex colour against a white base colour, with a normal map as the only texture
-  (`docs/creature-intake.md`). Tripo gives a PBR albedo with light baked into it. Bake the albedo
-  to `COLOR_0` and a normal map, de-light it (divide out the ambient term, which Tripo's studio
-  lighting makes fairly uniform), and inspect under the viewer's neutral light. Embedded albedo is
-  allowed by the contract where the vertex bake loses something that matters (Henodus' shell
-  plates, the ammonoid's ribs).
+  it. For the long-necked animals, Tanystropheus and Dinocephalosaurus, the final neck topology is
+  better rebuilt procedurally as a lofted tube on the skeleton than taken directly from Tripo,
+  whose necks come out as lumpy cylinders with no vertebral rhythm. Their modeling inputs still
+  show the complete approved neck: it is the mandatory length and silhouette reference for that
+  rebuild, never permission to generate a short-necked body.
+- **Preserve the source texture before simplifying materials.** Controlled Nothosaurus and
+  Shonisaurus comparisons showed that baking Tripo albedo into sparse `COLOR_0`, especially across
+  UV seams, discarded markings and helped produce the crumpled light/dark appearance when combined
+  with full-strength normal and ORM inputs. The established authored-body material retains the
+  original UV albedo, sets `COLOR_0` to white as a neutral runtime multiplier, uses explicitly
+  nonmetallic rough skin, and keeps only restrained normal relief (0.15 in both delivered builds).
+  Preserve the raw textures and UVs and verify them under identical neutral lights. A texture-free
+  twin may sample pigment from the nearest source triangle's interpolated UV, as Nothosaurus does;
+  it must not average unrelated atlas-seam vertices. Do not prefer a vertex bake when the original
+  UV albedo is cleaner evidence.
+
+## Current production order
+
+Generation and body authoring are separate bounded phases. First, `run-batch.mjs` completes or
+resumes only the human-greenlit jobs in the saved plan. Then `process-batch.mjs --process` verifies
+the plan image and downloaded artifact hashes, preserves every untouched raw GLB and sanitized
+metadata under `tools/triassic/creatures/<id>/tripo-raw/`, and runs `tools/triassic/tripo/review.py`.
+All completed raw source packages and their audits are reviewed and committed before another rig is
+started. Rigging then proceeds **one creature at a time** through anatomy, deformation, motion,
+material, packaging and visual QA, so a finding on one body changes the next build rather than
+being repeated across a parallel batch.
 
 ## The step list, per creature
 
@@ -81,26 +118,68 @@ in-house.
 | # | Step | Produces | Check |
 | --- | --- | --- | --- |
 | 1 | **Reference board** from the sources in [01](01-triassic-design.md): skeletal, size, the anatomy that must be right. | `docs/triassic/boards/<id>.md` with cited images | Reviewed once; uncertainties labelled supported / inferred / artistic. |
-| 2 | **Source images for Tripo.** Three orthographic views (left, top, front) and one three-quarter, of the reconstructed animal on a plain mid-grey ground, neutral light, mouth closed, limbs in the rest pose the rig wants (flippers half-spread, neck straight). Generated from the board with the image tool; prompts kept beside them. | `intake/triassic/<id>/source-*.png` | Views agree with each other (the top view's width matches the side view's height at every station, within a tenth) — a disagreement here becomes a warped body. |
-| 3 | **Tripo generation**, multi-view where the plan allows it, single-image (the side view) otherwise. Keep the job id, the prompt, the seed and the raw output. | `local/triassic-authoring/<id>/tripo/` | Watertight; symmetric about the sagittal plane to within 2 % of length; no fused limbs. Regenerate rather than repair anything that fails this. |
-| 4 | **Intake surgery** in Blender (scripted where possible, `tools/triassic/intake.py`): scale to the board's `lengthMeters` and the era's unit rule, orient +Z forward +Y up, quad-remesh to a deformable density (about 20–40 k faces for a full model), cut and hinge the jaw, model the mouth interior, seat eye globes, separate rigid parts (shell, carapace, tooth plates), free and re-seat paired flippers so their roots sit inside the trunk. | `<id>.intake.blend` | Eye-containment audit (`tools/devonian/eye-audit.py` pattern); the fin-seating assertion from the builders. |
+| 1b | **The canonical pose**, generated from the board: one picture of the whole animal — silhouette, species-defining anatomy, the complete tail, every limb and fin — in the rest pose the rig wants (flippers half-spread, neck straight, mouth closed). **This is the thing that gets greenlit**, and every later step reads it. | `docs/triassic/canonical/<id>.png` | A human chooses it in the viewer against the reference art; `manifest.json` reads `greenlit`. Not greenlit means regenerate toward the chosen reference and review again — never carry on. |
+| 2 | **The four-view modelling sheet**, generated *from the greenlit pose* and never from prose: left, top, front and three-quarter of that same animal on a pale neutral studio grey. | `intake/triassic/<id>/turnaround.png` and `source-*.png` | The views agree with each other and with the pose (the top view's width matches the side view's height at every station, within a tenth) — a disagreement here becomes a warped body. The sheet shows in the viewer beside its pose as *3D views*. |
+| 3 | **Tripo generation and raw preservation.** `tools/triassic/tripo/run-batch.mjs` resumes bounded jobs from the saved plan; `process-batch.mjs` independently verifies the input and artifact hashes, preserves the exact raw file, sanitizes API metadata and runs the unchanged static `review.py`. | Working download in `local/triassic-authoring/<id>/tripo/`; immutable source, audit and three review renders in `tools/triassic/creatures/<id>/tripo-raw/`; `<id>.preview.glb` | GLB signature and hashes agree with the plan and metadata; full silhouette and appendages survive generation; connected components, materials, textures and bounds are recorded. Reject a generation whose anatomical identity or fused/missing appendages cannot be corrected without redesigning it. |
+| 4 | **Intake surgery** in Blender, kept reproducible in `tools/triassic/creatures/<id>/build.py`: scale and orient +Z forward/+Y up, weld only coincident seam vertices, remove proven debris, cut and hinge the jaw, model the mouth interior, seat eye globes, separate rigid parts and correct paired appendage roots. Preserve the raw GLB unchanged. | Local authoring `.blend` and reproducible per-creature build tooling | Per-creature eye containment, appendage-root seating, mouth closure and mesh-integrity audits. Any correction is bounded and measured against body length. |
 | 5 | **Measure** the intake mesh into a profile table. | `<id>-profile.json` (the sculpt-export format) | Twenty stations, both drawings, eyes and mouth as features. |
-| 6 | **Procedural twin**: a Triassic builder (`tools/triassic/creatures/<id>/build.py`, Blender 5.2) takes the profile and the board's joint stations and generates the armature *and* a lofted proxy body on it, with weights seated by the builders' fin rule. This is the skeleton every later step uses. | `<id>.twin.glb` (rigged, weighted, sockets) | `sculpt:measure` twin vs. intake mesh: every station within **4 % of body length** in each of dorsal, ventral and width; flipper root and jaw hinge within **2 %**. Outside that, edit the profile rows and rebuild — never the mesh. |
-| 7 | **Human verification** in the viewer: twin and intake mesh overlaid (the sculpt mode's Edited / Original toggle), side, top and front. Sign-off is recorded in the creature's README with the measure output pasted in. | README entry | A named reviewer; the measure numbers beside their note. |
+| 6 | **Procedural twin and shared armature.** The per-creature builder chooses measured lofts, a new voxel-volume resurfacing, or a combination according to the body. It generates the twin on the same armature, joint rest transforms and sockets that the authored body will use. | `<id>.puppet.glb` and byte-identical `<id>.lod1.glb`, rigged and weighted; measured profile/volume record | Section envelopes remain within **4 % of body length** in dorsal, ventral and width; appendage roots and jaw hinge within **2 %**. Record surface-distance and volume comparisons where applicable. Exact skeleton, inverse-bind, socket and anchor parity is mandatory. |
+| 7 | **Measured and visual QA:** compare authored body and twin from side, top, front/three-quarter, mouth closeups and diagnostic overlays. Record what automation proves and what remains inferred. Human approval of the canonical image remains mandatory; authorized production completion does not wait solely for a newly named human model approval after these checks pass. Never describe Codex or automated QA as independent human sign-off. | Per-creature README, validation JSON and review sheets | Measurements beside the visual findings; explicit limitations; no fabricated reviewer or approval claim. A material anatomical uncertainty stays visible as a preview limitation or returns to the canonical/generation stage. |
 | 8 | **Skin the Tripo mesh to the twin's armature.** Weights transferred from the twin by nearest surface, then the rigid parts locked to their single bone, the flipper roots re-blended onto the trunk bones under them, and paired fins weighted radially so a seated root follows the flank. | `<id>.skinned.blend` | Normalised non-zero weights; rigid armour moves with one bone only; the deformation sheet in step 10 is where bad weights show. |
 | 9 | **Author the clips** as a performance in code against the skeleton (`performances/<id>.mjs`, the `Pose` grammar in `tools/creatures/motion/rig.mjs`), sampled first onto the **twin**. The twin deforms cleanly and renders fast, so the contact sheets iterate in minutes. Locomotion is the era's own set: flipper flight, paddle rowing, thunniform tail beat, jet, and the breath cycle (surface, blow, dive). | `performances/<id>.mjs`; the twin with clips | `pose-check.mjs` for socket travel; contact sheets from `review.py`; the contract's timing and loop checks. |
-| 10 | **Apply the same performance to the skinned Tripo body** with `apply.mjs`. Same bones, same sockets: this is a write, not a retarget. Render the same contact sheets. | `<id>.glb` | Sheets from the twin and the body side by side; any difference is a weight, never a clip, and goes back to step 8. |
-| 11 | **Colour bake**: albedo to `COLOR_0`, de-lit; normal map; optional embedded albedo where the bake loses it. Studio and select portraits from the shipped model. | textures, four portraits | Neutral-light inspection; `npm run cards`; the stale-image check in `npm run check`. |
-| 12 | **Package**: full model meshopt-compressed, the twin as `<id>.lod1.glb` with Idle, Swim, Death, anchors appended, metadata JSON, README with the reproduction commands. | the delivered set | `tools/devonian/check.mjs`-style validation ported to `tools/triassic/check.mjs`; `npm run check --strict`. |
+| 10 | **Apply the exact same sampled performance to the authored body.** Both exports carry identical joint names, hierarchy, rest transforms, inverse binds, action sample times/values and anchors. This is a shared rig, not retargeting. Render the same contact sheets. | `<id>.glb` | Package audits compare decoded animation arrays, rigs and sockets exactly; side-by-side deformation differences go back to weights or geometry, never to a second clip set. |
+| 11 | **Material and portraits:** retain the original UV albedo on the authored surface, use white `COLOR_0`, explicit roughness/metallic values and restrained source-normal relief. Build the twin's reduced material from verified UV sampling where needed. Render studio, select, card, thumbnail and diagnostic material comparisons. | Embedded authored textures/material, reduced twin material, portraits and comparison sheets | Same-camera/same-light comparisons; UV and source-albedo hashes; neutral-light and live single-sided viewer inspection. Do not hide source markings or known defects behind a new procedural paint job. |
+| 12 | **Package and validate:** meshopt-compress the full model, keep the twin as the puppet and byte-identical LOD where the contract allows, append metadata, and document exact reproduction commands. | Public creature asset family plus `tools/triassic/creatures/<id>/` reports and tooling | Per-creature audits such as `nothosaurus/audit.mjs`, `nothosaurus/material-audit.mjs`, `shonisaurus/package-audit.mjs`, `shonisaurus/deformation-audit.py` and `shonisaurus/material-audit.mjs`; then the repository's Triassic and creature-asset checks. Future creatures add equivalent checks rather than claiming these two species' scripts validate them. |
 
 Two rules that follow from the steps:
 
+- **The canonical pose is the animal.** Steps 2 onward are derivations of it, so a change of shape
+  goes back to the pose, a fresh generation and another greenlight — never into a later artefact.
+  A model that no longer matches its greenlit pose is the model that is wrong.
 - **The Tripo mesh is never edited after step 4.** Everything downstream reads it. A change of
   shape goes back to the source images and a fresh generation, so the provenance chain stays whole.
 - **The profile table is the hand-off**, exactly as the viewer's sculpt export is for the Cambrian:
   a reviewer who wants the belly deeper edits rows, rebuilds the twin, and the measure tells them
   whether the Tripo body still matches. If it does not, that is a new generation, not a Blender
   push-and-pull.
+- **A discovered implementation defect follows the correction route already authorized for the
+  production run.** Preserve the raw source and a controlled before state, isolate geometry,
+  material, skinning or animation as the cause, make the smallest bounded correction, rerun the
+  affected measured and visual audits, and update the README honestly. Return to the canonical
+  review only when the proposed correction would change the approved animal rather than repair the
+  existing model. Do not stop solely to manufacture a new approval gate, and do not call a fix
+  approved until the evidence actually supports it.
+
+## Which steps need a judgement and which are mechanical
+
+A body is twelve steps, and they are not the same kind of work. The distinction matters when the
+build is handed to somebody — or something — other than whoever wrote this page, because half the
+list is a decision that cannot be checked by a script and the other half is a command with a
+verifiable result. Splitting a build along that line is how several bodies get built at once
+without each of them needing the care of the first.
+
+**Judgement.** Steps 4, 6 and 9, and the reading in 7 and 11. Which way a generation is actually
+lying (its bounding box lies — Rhaeticosaurus' flippers span further than it is long — so the frame
+comes off the mouth socket, the authored `previewYaw`, or the albedo's countershading, in that
+order). Where the jaw hinge is and what shape the mouth cut takes, which differs per animal:
+Placodus' slit is modelled and can be measured by casting head normals back into the mesh;
+Dinocephalosaurus has no modelled mouth at all, so the line is read off the albedo and the same
+method finds nothing. Whether a run of body is the wrong *length* rather than the wrong shape, and
+where the two stretch cuts go. Whether a clip **reads** — a neck strike that is merely correct is
+not the same as one that is exciting — and whether a collapsed appendage has left a bump.
+
+**Mechanical.** Steps 3, 5, 8, 10 and 12, and the running of every check. Sending a builder to
+`/opt/blender/blender --background`, re-running it after an edit, packaging, `node
+tools/update-asset-sizes.mjs`, `npm run triassic`, publishing previews, refreshing a manifest,
+producing contact sheets. Each of these either succeeds with a number that can be compared against
+the tolerances in the step list or fails with a traceback, and neither outcome is a matter of
+opinion.
+
+The practical consequence: a build that is following an established per-creature pattern is
+mechanical almost end to end and wants the cheapest hands that can run a command and read a
+traceback; the first body of a new *kind* — the first shore animal, the first cephalopod — is
+mostly judgement and wants the most capable. Anything that ends in "does this look right" is
+judgement whatever step it sits in.
 
 ## What Tripo is asked for, and what it is not
 
@@ -111,17 +190,17 @@ It is not asked for anything instanced by the thousand (a sea-lily, a reed, a sh
 a rock), because those want a few hundred clean triangles with a single material and a base pivot,
 which a builder script produces better and reproducibly — the Tier 2 list.
 
-Two practical points to settle before the first generation, both of them plan questions rather
-than technical ones: whether the Tripo plan in use permits commercial use of the output and
-how its outputs are licensed (record the answer in `docs/triassic/README.md` and the per-creature
-README), and whether multi-view input is available on it, since the single-image path guesses the
-top view and the guess is what step 2's cross-check is there to catch.
+Before each paid batch, confirm and record that the Tripo plan in use permits the intended use and
+how its outputs are licensed. The current runner submits the one dedicated input image recorded in
+the batch plan. If a later plan enables a true multi-view request, record that capability and the
+exact submitted views rather than retroactively describing a single-image body as multi-view.
 
 ## How this changes the intake documents
 
-`docs/creature-intake.md` stays the contract: the clip set, the anchors, the portraits, the
-recolour rule. The Triassic adds one directory of tooling (`tools/triassic/`: `intake.py`,
-`creatures/<id>/build.py`, `check.mjs`) and one convention: a creature's builder produces a
-skeleton and a twin, not a finished body, and the shipped body is the Tripo mesh on that skeleton.
-`tools/creatures/motion/apply.mjs` is used as it is; its `--out DIR --review` dry run is the
-step 10 sheet.
+`docs/creature-intake.md` stays the delivery contract for clips, anchors, portraits and runtime
+materials. The Triassic adds the bounded generation/review tools in `tools/triassic/tripo/` and a
+self-contained source/report directory at `tools/triassic/creatures/<id>/`. Each creature's
+builder produces the cleaned authored body, the shared skeleton, the measured twin and the sampled
+performances; per-creature audits prove exact parity after packaging. Nothosaurus and Shonisaurus
+are the established examples. Their implementation choices are evidence for the contract, not a
+claim that every later anatomy should use identical topology or that the remaining models exist.

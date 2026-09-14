@@ -187,11 +187,23 @@ for an obligate air breather: one would need its own mechanic (a meter, a
 warning, a death) and should arrive with it.
 
 What lungs buy is a **place to go**. Under water these three recover stamina at
-a quarter of everyone else's rate, which makes them poor at long chases and
+`WATER_REGEN` of everyone else's rate, which makes them worse at long chases and
 grinding fights; break the surface and the whole bar comes back at once, with a
 short "second wind" (a free sprint) on top. Their game is the round trip — and
 the surface is where the water is brightest and every rung IV shadow is
 watching it.
+
+Breaking the surface means breaking it: the body's back is out of the water (`brokeSurface`), or
+it is up on the sand, which is what having limbs is for. It was a band a few units deep, so a
+breath was taken while the animal was still plainly under water and nothing happened at the
+waterline to show it.
+
+That share began at a quarter and is now 0.7. A lung under water should be a
+worse gill, not a shut one: at a quarter a bimodal animal that chose to fight at
+depth effectively had no bar to fight on, so the round trip stopped being a
+choice it made and became the only way it could be played. The surface is still
+plainly the better place to be — the whole bar at once, and a free sprint with
+it — which is all the rule ever needed to say.
 
 So everything about them points up. They climb half again as fast as the shared
 rise rate, a sprint carries into the climb rather than only into the swim, and

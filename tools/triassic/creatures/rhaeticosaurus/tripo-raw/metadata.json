@@ -1,0 +1,54 @@
+{
+  "schema_version": 1,
+  "name": "rhaeticosaurus",
+  "status": "rejected-repair-candidate",
+  "reason": "Superseded short-neck input; retained at user request for possible Blender neck repair. Do not treat as approved or final.",
+  "task": {
+    "type": "image_to_model",
+    "status": "success",
+    "progress": 100,
+    "input": {
+      "pbr": true,
+      "file": {
+        "type": "jpeg",
+        "object": {
+          "key": "tcli_2f16803761ed4cf0af45a11555b61c60/20260913/fc7ac57e-a434-417d-9c85-cd53116e6664/image.jpeg",
+          "bucket": "tripo-data"
+        }
+      },
+      "texture": true,
+      "export_uv": true,
+      "face_limit": 20000,
+      "model_version": "v3.1-20260211",
+      "geometry_quality": "standard",
+      "enable_image_autofix": false
+    },
+    "output": {
+      "model_url": "<redacted download URL>",
+      "rendered_image_url": "<redacted download URL>"
+    },
+    "task_id": "fc7ac57e-a434-417d-9c85-cd53116e6664",
+    "created_at": "2026-09-13T21:29:58.516680Z",
+    "completed_at": "2026-09-13T21:31:16.415123Z",
+    "credits_consumed": 30
+  },
+  "request": {
+    "file": {},
+    "model": "v3.1-20260211",
+    "face_limit": 20000,
+    "texture": true,
+    "pbr": true
+  },
+  "image": {
+    "path": "tools/triassic/creatures/rhaeticosaurus/tripo-raw/source-input-rejected-short-neck.png",
+    "sha256": "a4b81c90676e080d40bb9dadd1122c19ef941492d05a91382249d31184e4cc16",
+    "bytes": 2136660
+  },
+  "artifact": {
+    "path": "tools/triassic/creatures/rhaeticosaurus/tripo-raw/rhaeticosaurus.raw.glb",
+    "bytes": 1451024,
+    "sha256": "53a1cbe8cbfb45a20ce603493c40ae34add0b67f5d195540a5d9c62028bb5efe",
+    "source_output_field": "model_url"
+  },
+  "downloaded_at": "2026-09-13T21:36:10.033Z"
+}

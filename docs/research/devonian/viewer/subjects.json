@@ -1,0 +1,526 @@
+{
+  "groups": [
+    {
+      "id": "playable",
+      "name": "Playable roster",
+      "note": "The 21 playable animals (C01–C21 of 07-devonian-design.md). All have delivered models; this board is for authoring a canonical pose per animal and then correcting the model against it. Lengths are the representative and maximum real lengths from docs/research/devonian-swimming.json, not game units.",
+      "subjects": [
+        {
+          "id": "dunkleosteus",
+          "name": "Dunkleosteus terrelli",
+          "wiki": "Dunkleosteus",
+          "search": "Dunkleosteus",
+          "role": "C01 · Rung IV giant · the jaws that cut through armour",
+          "len": "3.35–4.1 m",
+          "imagesAre": "Most Commons material is the old long-bodied reconstruction. The shipped body follows Engelman's short, deep trunk (fineness 2.7–3.2); judge the pose against that, not against the museum silhouette."
+        },
+        {
+          "id": "titanichthys",
+          "name": "Titanichthys",
+          "wiki": "Titanichthys",
+          "search": "Titanichthys",
+          "role": "C02 · Rung IV giant · the toothless gape, a filter feeder",
+          "len": "5–7 m"
+        },
+        {
+          "id": "coccosteus",
+          "name": "Coccosteus cuspidatus",
+          "wiki": "Coccosteus",
+          "search": "Coccosteus",
+          "role": "C03 · Rung II · the small arthrodire, armour in front and a flexible tail",
+          "len": "35–40 cm"
+        },
+        {
+          "id": "bothriolepis",
+          "name": "Bothriolepis canadensis",
+          "wiki": "Bothriolepis",
+          "search": "Bothriolepis",
+          "role": "C04 · Rung II · the boxy antiarch with jointed armoured arms",
+          "len": "0.4–1.7 m"
+        },
+        {
+          "id": "gemuendina",
+          "name": "Gemuendina stuertzi",
+          "wiki": "Gemuendina",
+          "search": "Gemuendina",
+          "role": "C05 · Rung II · the flattened ray-shaped placoderm that buries itself",
+          "len": "0.3–1 m"
+        },
+        {
+          "id": "doryaspis",
+          "name": "Doryaspis nathorsti",
+          "wiki": "Doryaspis",
+          "search": "Doryaspis",
+          "role": "C06 · Rung II · the jawless shield with a long oral projection",
+          "len": "~20 cm"
+        },
+        {
+          "id": "cladoselache",
+          "name": "Cladoselache fyleri",
+          "wiki": "Cladoselache",
+          "search": "Cladoselache",
+          "role": "C07 · Rung III · the first shark shape, the fastest straight line",
+          "len": "1.5–2 m"
+        },
+        {
+          "id": "stethacanthus",
+          "name": "Stethacanthus",
+          "wiki": "Stethacanthus",
+          "search": "Stethacanthus",
+          "role": "C08 · Rung III · the anvil brush on its back, a bluff",
+          "len": "0.7–3 m",
+          "imagesAre": "Most illustrated Stethacanthus material is Carboniferous (S. altonensis). The roster entry is a Late Devonian representative of the same symmoriiform grade."
+        },
+        {
+          "id": "cheirolepis",
+          "name": "Cheirolepis trailli",
+          "wiki": "Cheirolepis",
+          "search": "Cheirolepis trailli",
+          "role": "C09 · Rung II · the shoaling ray-fin, everyfish",
+          "len": "35–55 cm",
+          "imagesAre": "Cheirolepis is also a fossil conifer genus (Cheirolepidiaceae). Searching the species keeps the fish; anything leafy on this board is the plant."
+        },
+        {
+          "id": "rhinodipterus",
+          "name": "Rhinodipterus kimberleyensis",
+          "wiki": "Rhinodipterus",
+          "search": "Rhinodipterus",
+          "role": "C10 · Rung II · the lungfish that breathes air",
+          "len": "40–60 cm",
+          "imagesAre": "Very little of Rhinodipterus on Commons. Expect a thin board; other Gogo dipnoans are the nearest comparison and are not this genus."
+        },
+        {
+          "id": "onychodus",
+          "name": "Onychodus jandemarrai",
+          "wiki": "Onychodus",
+          "search": "Onychodus",
+          "role": "C11 · Rung III · the tusk whorls, the largest hunter",
+          "len": "1.5–4 m"
+        },
+        {
+          "id": "tiktaalik",
+          "name": "Tiktaalik roseae",
+          "wiki": "Tiktaalik",
+          "search": "Tiktaalik",
+          "role": "C12 · Rung III · the neck and the weight-bearing fins, the shallows ambusher",
+          "len": "1.5–2.75 m"
+        },
+        {
+          "id": "acanthostega",
+          "name": "Acanthostega gunnari",
+          "wiki": "Acanthostega",
+          "search": "Acanthostega",
+          "role": "C13 · Rung II · eight fingers, an aquatic early tetrapod",
+          "len": "0.6–1 m"
+        },
+        {
+          "id": "eldredgeops",
+          "name": "Eldredgeops rana",
+          "wiki": "Eldredgeops",
+          "search": "Eldredgeops rana",
+          "role": "C14 · Rung I · the schizochroal eyes, and a shell that enrolls",
+          "len": "6–13 cm",
+          "imagesAre": "Most specimens on Commons are filed under the older name Phacops rana and will not reach this board. If it comes back thin, search Phacops rana by hand — it is the same animal."
+        },
+        {
+          "id": "walliserops",
+          "name": "Walliserops trifurcatus",
+          "wiki": "Walliserops",
+          "search": "Walliserops",
+          "role": "C15 · Rung I · the trident nobody can explain",
+          "len": "6–10 cm",
+          "imagesAre": "Moroccan trilobite material on Commons includes restored and composite specimens. Prefer museum-credited images for the trident's real proportions."
+        },
+        {
+          "id": "jaekelopterus",
+          "name": "Jaekelopterus rhenaniae",
+          "wiki": "Jaekelopterus",
+          "search": "Jaekelopterus",
+          "role": "C16 · Rung III · the largest sea scorpion, claws first",
+          "len": "2.5–2.6 m"
+        },
+        {
+          "id": "nahecaris",
+          "name": "Nahecaris stuertzi",
+          "wiki": "Nahecaris",
+          "search": "Nahecaris",
+          "role": "C17 · Rung I · the phyllocarid scavenger, first to the corpse",
+          "len": "12–15 cm"
+        },
+        {
+          "id": "furcaster",
+          "name": "Furcaster palaeozoicus",
+          "wiki": "Furcaster",
+          "search": "Furcaster",
+          "role": "C18 · Rung I · the brittle star, five arms and no hurry",
+          "len": "8–10 cm"
+        },
+        {
+          "id": "palaeoisopus",
+          "name": "Palaeoisopus problematicus",
+          "wiki": "Palaeoisopus",
+          "search": "Palaeoisopus",
+          "role": "C19 · Rung I · the sea spider that swims",
+          "len": "12.5–25 cm"
+        },
+        {
+          "id": "manticoceras",
+          "name": "Manticoceras",
+          "wiki": "Manticoceras",
+          "search": "Manticoceras",
+          "role": "C20 · Rung I · the coiled goniatite that hangs in the water",
+          "len": "10–17 cm",
+          "imagesAre": "The shell is well known; the soft body is not preserved. Anything with tentacles on this board is interpretation."
+        },
+        {
+          "id": "michelinoceras",
+          "name": "Michelinoceras",
+          "wiki": "Michelinoceras",
+          "search": "Michelinoceras",
+          "role": "C21 · Rung II · the straight shell that swims backwards",
+          "len": "0.5–1 m",
+          "imagesAre": "Orthocone shells are common on Commons; Michelinoceras by name is not. Soft body and resting trim are unconstrained."
+        }
+      ]
+    },
+    {
+      "id": "attached",
+      "name": "Attached organisms and shell props",
+      "note": "B01–B12 of the design brief, shipped as 20 prop GLBs in public/assets/devonian/props/. One subject per family; the -v2 variants are the same organism and share this board. These are model requests, not animals.",
+      "subjects": [
+        {
+          "id": "massive-stromatoporoid",
+          "name": "Stromatoporoid massive dome",
+          "wiki": "Stromatoporoidea",
+          "search": "stromatoporoid Devonian",
+          "role": "B01 · The reef's dome-builder · Clathrodictyon-type sponge",
+          "len": "~1.2 m dome",
+          "imagesAre": "Stromatoporoids are sponges, not stromatolites — reject anything filed as a microbial mat. Most files are cut sections and weathered domes; the living surface is interpretation."
+        },
+        {
+          "id": "branching-stromatoporoid",
+          "name": "Amphipora branching stromatoporoid",
+          "wiki": "Amphipora",
+          "search": "Amphipora",
+          "role": "B02 · Slender branching sponge thickets",
+          "len": "~12 cm branches"
+        },
+        {
+          "id": "encrusting-stromatoporoid",
+          "name": "Stromatoporoid encrusting growth",
+          "wiki": "Stromatoporoidea",
+          "search": "stromatoporoid encrusting",
+          "role": "B03 · Thin layered growth over whatever it sits on",
+          "len": "~0.7 m patch"
+        },
+        {
+          "id": "massive-tabulate-coral",
+          "name": "Favosites",
+          "wiki": "Favosites",
+          "search": "Favosites",
+          "role": "B04 · Honeycomb tabulate colony",
+          "len": "0.2–0.3 m colony"
+        },
+        {
+          "id": "branching-tabulate-coral",
+          "name": "Striatopora branching tabulate coral",
+          "wiki": "Tabulata",
+          "search": "Striatopora",
+          "role": "B05 · Delicate branching skeletal framework",
+          "len": "~15 cm",
+          "imagesAre": "Striatopora is thinly represented. Thamnopora and Cladopora are the same Devonian branching growth form and will not reach this board by name — search them by hand if it comes back empty."
+        },
+        {
+          "id": "solitary-rugose-coral",
+          "name": "Heliophyllum solitary rugose coral",
+          "wiki": "Heliophyllum",
+          "search": "Heliophyllum",
+          "role": "B06 · The horn coral · skeleton and living oral surface",
+          "len": "~10 cm"
+        },
+        {
+          "id": "colonial-rugose-coral",
+          "name": "Hexagonaria colonial rugose coral",
+          "wiki": "Hexagonaria",
+          "search": "Hexagonaria",
+          "role": "B07 · Connected corallites in a Devonian colony",
+          "len": "~10 cm colony",
+          "imagesAre": "Much of what Commons holds is polished Petoskey stone: the same coral, cut and polished, not a living surface."
+        },
+        {
+          "id": "stalked-crinoid",
+          "name": "Crinoid stalked camerate",
+          "wiki": "Crinoid",
+          "search": "Devonian crinoid",
+          "role": "B08 · Stem, attachment, cup and feeding arms",
+          "len": "stem 0.5–0.7 m"
+        },
+        {
+          "id": "brachiopod-bed",
+          "name": "Mucrospirifer brachiopod bed",
+          "wiki": "Mucrospirifer",
+          "search": "Mucrospirifer",
+          "role": "B09 · Ribbed lampshells on the floor · not generic clams",
+          "len": "0.15–0.25 m patch"
+        },
+        {
+          "id": "bryozoan-colony",
+          "name": "Fenestella fenestrate bryozoan",
+          "wiki": "Fenestella (bryozoan)",
+          "search": "Fenestella bryozoan",
+          "role": "B10 · Lace colony of repeated zooids",
+          "len": "~6 cm"
+        },
+        {
+          "id": "gastropod-shells",
+          "name": "Platyceras gastropod shells",
+          "wiki": "Platyceras",
+          "search": "Platyceras",
+          "role": "B11 · Small coiled shells, mostly empty",
+          "len": "~18 cm cluster"
+        },
+        {
+          "id": "small-bivalves",
+          "name": "Modiomorpha bivalves",
+          "wiki": "Modiomorpha",
+          "search": "Modiomorpha",
+          "role": "B12 · Paired valves and hinge, Devonian outlines",
+          "len": "~18 cm cluster",
+          "imagesAre": "Modiomorpha is thinly covered on Commons. Any Devonian bivalve slab is a fair comparison for outline and hinge; a modern clam is not."
+        }
+      ]
+    },
+    {
+      "id": "plants",
+      "name": "Plants and algae",
+      "note": "P01–P05. These do not all belong together: marine algae, early terrestrial vegetation and later forest trees are separate collections with separate regional tags.",
+      "subjects": [
+        {
+          "id": "rhynia",
+          "name": "Rhynia gwynne-vaughanii",
+          "wiki": "Rhynia",
+          "search": "Rhynia",
+          "role": "P01 · Leafless branching axes · the Rhynie chert plant, not shoreline grass",
+          "len": "~20 cm"
+        },
+        {
+          "id": "asteroxylon",
+          "name": "Asteroxylon mackiei",
+          "wiki": "Asteroxylon",
+          "search": "Asteroxylon",
+          "role": "P02 · Early lycophyte · do not enlarge it into a later giant lycopsid",
+          "len": "~40 cm"
+        },
+        {
+          "id": "cladoxylopsid-tree",
+          "name": "Wattieza cladoxylopsid tree",
+          "wiki": "Wattieza",
+          "search": "Wattieza",
+          "role": "P03 · Devonian tree architecture · not a palm and not a tree fern",
+          "len": "5–7 m",
+          "imagesAre": "Commons has little of the whole tree. The Gilboa stumps, filed as Eospermatopteris, are the same plant's base and will not reach this board by name."
+        },
+        {
+          "id": "archaeopteris",
+          "name": "Archaeopteris",
+          "wiki": "Archaeopteris",
+          "search": "Archaeopteris",
+          "role": "P04 · The late Devonian woody tree · a spore-bearer, not a flowering tree",
+          "len": "6–8 m as built"
+        },
+        {
+          "id": "marine-algae",
+          "name": "Devonian marine algal thalli",
+          "search": "Devonian algae",
+          "role": "P05 · Sheet, tuft and branching thalli · no kelp forest, no seagrass",
+          "len": "~20 cm tufts",
+          "imagesAre": "Fossil Devonian algae are barely represented. This board is deliberately broad — anything with a modern kelp or seagrass silhouette is the wrong evidence."
+        }
+      ]
+    },
+    {
+      "id": "geology",
+      "name": "Geological and organic props",
+      "note": "G01–G12. Named for material and form rather than for their role in the game. G08, G09 and G12 are derived from approved shell, crinoid and creature anatomy rather than generic bones and shells.",
+      "subjects": [
+        {
+          "id": "carbonate-outcrop",
+          "name": "Limestone carbonate outcrop",
+          "wiki": "Limestone",
+          "search": "Devonian limestone outcrop",
+          "role": "G01 · Low slab, mound and vertical face · submerged weathering",
+          "len": "~1.8 m"
+        },
+        {
+          "id": "reef-framework",
+          "name": "Reef framework limestone",
+          "wiki": "Reef",
+          "search": "Devonian reef limestone",
+          "role": "G02 · Buttress, overhang and low shelf of the reef itself",
+          "len": "~1.4 m section"
+        },
+        {
+          "id": "carbonate-rubble",
+          "name": "Limestone rubble fragments",
+          "wiki": "Limestone",
+          "search": "limestone rubble",
+          "role": "G03 · Angular and rounded fragments · exposed interiors",
+          "len": "~0.8 m"
+        },
+        {
+          "id": "fine-sediment-bed",
+          "name": "Mud fine sediment bed",
+          "search": "mud seafloor sediment",
+          "role": "G04 · Low-relief rippled and smooth mud · material-driven detail",
+          "len": "2 m patch"
+        },
+        {
+          "id": "sand-pebble-bed",
+          "name": "Sand and pebble bed",
+          "wiki": "Ripple marks",
+          "search": "rippled sand pebbles",
+          "role": "G05 · Two grain mixes and scattered stones",
+          "len": "2 m patch"
+        },
+        {
+          "id": "eroded-bank",
+          "name": "Bank erosion at a channel margin",
+          "search": "river bank erosion",
+          "role": "G06 · Sloped bank, undercut and exposed face · the unrooted version",
+          "len": "~3 m"
+        },
+        {
+          "id": "large-boulder",
+          "name": "Boulder weathered silicate",
+          "wiki": "Boulder",
+          "search": "submerged boulder",
+          "role": "G07 · The rock slot · grain and mineral vary by region",
+          "len": "~1.2 m"
+        },
+        {
+          "id": "shell-hash",
+          "name": "Coquina shell hash",
+          "wiki": "Coquina",
+          "search": "coquina",
+          "role": "G08 · Broken shell fragments · not a field of giant valves",
+          "len": "~0.3 m patch"
+        },
+        {
+          "id": "crinoid-debris",
+          "name": "Crinoid columnal debris",
+          "wiki": "Crinoid",
+          "search": "crinoid columnals",
+          "role": "G09 · Disarticulated stem pieces · millimetres, not boulders",
+          "len": "~0.2 m scatter"
+        },
+        {
+          "id": "submerged-log",
+          "name": "Callixylon submerged log",
+          "wiki": "Callixylon",
+          "search": "Callixylon",
+          "role": "G10 · Intact, broken and part-buried timber · Archaeopteris wood",
+          "len": "~3.3 m"
+        },
+        {
+          "id": "root-bearing-bank",
+          "name": "Archaeopteris root-bearing bank",
+          "wiki": "Archaeopteris",
+          "search": "Archaeopteris roots",
+          "role": "G11 · Roots in a bank face · no generic mangrove prop",
+          "len": "~3.4 m"
+        },
+        {
+          "id": "organic-remains",
+          "name": "Dunkleosteus gnathal plates",
+          "wiki": "Dunkleosteus",
+          "search": "Dunkleosteus jaw",
+          "role": "G12 · Disarticulated remains · the era's carrion prop",
+          "len": "~1.2 m"
+        }
+      ]
+    },
+    {
+      "id": "environments",
+      "name": "Regional environments",
+      "note": "E01–E09. Nine separate reference environments, not nine neighbouring zones of one place. A fossil deposit is not a living surface: pyritised Hunsrück slabs and desert-weathered Moroccan exposures are burial and later erosion, not the sea these animals lived in.",
+      "subjects": [
+        {
+          "id": "hunsruck-shelf",
+          "name": "Hunsrück Slate marine shelf",
+          "wiki": "Hunsrück Slate",
+          "search": "Hunsrück Slate",
+          "role": "E01 · Early Devonian mud shelf · Gemuendina, Nahecaris, Furcaster, Palaeoisopus",
+          "len": "biome reference",
+          "imagesAre": "Almost everything on Commons is a pyritised fossil slab or a slate quarry. The animals were not metallic gold and the seabed was not quarried slate."
+        },
+        {
+          "id": "morocco-shelf",
+          "name": "Morocco Devonian shelf",
+          "wiki": "Anti-Atlas",
+          "search": "Devonian Morocco",
+          "role": "E02 · The Walliserops-bearing carbonate shelf",
+          "len": "biome reference",
+          "imagesAre": "Modern desert exposure of Devonian rock does not establish a desert shoreline in the original marine setting."
+        },
+        {
+          "id": "orcadian-lake",
+          "name": "Orcadian Basin lake",
+          "wiki": "Orcadian Basin",
+          "search": "Orcadian Basin",
+          "role": "E03 · Middle Devonian lake · Coccosteus and Cheirolepis",
+          "len": "biome reference"
+        },
+        {
+          "id": "gogo-reef",
+          "name": "Gogo Formation reef",
+          "wiki": "Gogo Formation",
+          "search": "Gogo Formation",
+          "role": "E04 · Late Devonian reef system · Onychodus and Rhinodipterus",
+          "len": "biome reference"
+        },
+        {
+          "id": "miguasha",
+          "name": "Miguasha National Park",
+          "wiki": "Miguasha National Park",
+          "search": "Miguasha",
+          "role": "E05 · Late Devonian waterway · Bothriolepis and Cheirolepis",
+          "len": "biome reference"
+        },
+        {
+          "id": "cleveland-shale",
+          "name": "Cleveland Shale offshore sea",
+          "wiki": "Cleveland Shale",
+          "search": "Cleveland Shale",
+          "role": "E06 · Latest Devonian offshore sea · Dunkleosteus and Cladoselache · not a coral garden",
+          "len": "biome reference"
+        },
+        {
+          "id": "ellesmere-channel",
+          "name": "Ellesmere Island Devonian channel",
+          "wiki": "Fram Formation",
+          "search": "Ellesmere Island",
+          "role": "E07 · Broad shallow channel with submerged timber · Tiktaalik",
+          "len": "biome reference",
+          "imagesAre": "Commons has modern Arctic Ellesmere landscapes, not the Fram Formation setting. Useful for water and bank structure only."
+        },
+        {
+          "id": "greenland-floodplain",
+          "name": "Greenland Devonian floodplain",
+          "wiki": "Britta Dal Formation",
+          "search": "East Greenland Devonian",
+          "role": "E08 · Acanthostega's shallow water body · its own sediment and vegetation",
+          "len": "biome reference",
+          "imagesAre": "Nothing on Commons shows the Britta Dal Formation as a living place; expect modern East Greenland landscape and outcrop."
+        },
+        {
+          "id": "svalbard-water",
+          "name": "Svalbard Old Red Sandstone",
+          "wiki": "Wood Bay Formation",
+          "search": "Svalbard Devonian",
+          "role": "E09 · Early Devonian water bodies · Doryaspis · distinct from the later wooded settings",
+          "len": "biome reference"
+        }
+      ]
+    }
+  ]
+}

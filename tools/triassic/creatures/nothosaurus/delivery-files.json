@@ -1,0 +1,66 @@
+{
+  "nothosaurus.card.png": {
+    "bytes": 208352,
+    "sha256": "efa01c1f0653c7650819af281f6a726be1677d778f7512701e2cc0a59d76f551",
+    "dimensions": [
+      800,
+      600
+    ],
+    "alphaRange": [
+      0,
+      255
+    ]
+  },
+  "nothosaurus.glb": {
+    "bytes": 1794664,
+    "sha256": "7d4e8774b84924d3b738a3760a9aadca81240f67bde56d939e0d5c999a612535"
+  },
+  "nothosaurus.json": {
+    "bytes": 1759,
+    "sha256": "2db4b7c668c4483f27bd1840db7fa0826bb9f04ff7013b193af895d1efac629a"
+  },
+  "nothosaurus.lod1.glb": {
+    "bytes": 687232,
+    "sha256": "72eb60e953bd2e7a2b78d89a9b842c501956a400a2765ccccc828bad2544cd6f"
+  },
+  "nothosaurus.png": {
+    "bytes": 445696,
+    "sha256": "c8f12fc7709c1728d9b6af3a3cf7fe6db49bba653fe67308940fabb39d5f60fd",
+    "dimensions": [
+      1200,
+      900
+    ],
+    "alphaRange": [
+      0,
+      255
+    ]
+  },
+  "nothosaurus.puppet.glb": {
+    "bytes": 687232,
+    "sha256": "72eb60e953bd2e7a2b78d89a9b842c501956a400a2765ccccc828bad2544cd6f"
+  },
+  "nothosaurus.select.png": {
+    "bytes": 769587,
+    "sha256": "9b18f1723eec8fa05bb42128906a13a00718ae5d873fc53eac3e5a58ce94b70f",
+    "dimensions": [
+      1600,
+      1200
+    ],
+    "alphaRange": [
+      0,
+      255
+    ]
+  },
+  "nothosaurus.thumb.png": {
+    "bytes": 26695,
+    "sha256": "62ec512453fc52a58a39321ee6b539a1ca72c4c1692a07c0e0a0f968844621ee",
+    "dimensions": [
+      256,
+      192
+    ],
+    "alphaRange": [
+      0,
+      255
+    ]
+  }
+}

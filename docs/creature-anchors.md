@@ -33,7 +33,7 @@ A GLB cannot bind itself to another actor or delete prey. The delivered TypeScri
 
 ## Validation
 
-Run `npm run typecheck`, `npm run build`, `node --experimental-transform-types tools/anchors-test.mjs` and `node tools/feeding-test.mjs` from the repository root (Node 22.7+). The headless tests stub texture decoding and exercise actual GLTF loading, cloned sockets, transformed-instance IK, attack aiming on every rig and LOD, and the production attachment pass for all 21 species (grasp, limb and mouth-only feeding, strike aiming and release). They do not test visual texture quality or physical controller input.
+Run `npm run typecheck`, `npm run build` and `npm run rigs` from the repository root (Node 22.7+). `npm run rigs` is `tools/anchors-test.mjs` followed by `tools/feeding-test.mjs`, and it runs in the deploy gate, so a rig regression fails the build rather than waiting for somebody to read this page. The headless tests stub texture decoding and exercise actual GLTF loading, cloned sockets, transformed-instance IK, attack aiming on every rig and LOD, and the production attachment pass for all 21 species (grasp, limb and mouth-only feeding, strike aiming and release). They do not test visual texture quality or physical controller input.
 
 All 42 GLBs remain below 25 MB. The 26 expansion files retain 140 anatomical sockets per detail level. Full-detail Olenoides adds 9,696 triangles; LOD1 adds 2,160. Authoring validation checked all 30 leg roots over nine samples of each of 18 clips and found them enclosed by the new tissue.
 

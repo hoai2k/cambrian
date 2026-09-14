@@ -2,10 +2,12 @@
 // seconds (src/render/eggs.ts). Needs `npx vite preview --port 4173` running.
 // Usage: node tools/egg-shot.mjs   → /tmp/claude-0/shots/egg-*.png
 import { chromium } from 'playwright-core';
+import { silenceCounter } from './qa-counter.mjs';
 const S = process.argv[3] ?? '/tmp/claude-0/shots';
-const BASE = process.argv[2] ?? 'http://localhost:4173/';
+const BASE = process.argv[2] ?? 'http://localhost:4173/cambrian/';
 const browser = await chromium.launch({ executablePath: '/opt/pw-browsers/chromium', args: ['--use-gl=angle','--use-angle=swiftshader','--enable-unsafe-swiftshader','--ignore-gpu-blocklist','--no-sandbox'] });
 const page = await browser.newPage({ viewport: { width: 900, height: 520 } });
+await silenceCounter(page);
 page.on('pageerror', e => console.log('[pageerror]', e.message));
 page.on('console', m => { if (m.type()==='error') console.log('[err]', m.text().slice(0,200)); });
 await page.addInitScript(() => localStorage.setItem('cambrian-settings', JSON.stringify({ quality: 'low', lookSpeed: 1, invertY: false, volume: 0, muted: true })));

@@ -1,0 +1,866 @@
+{
+  "method": "vertical ray casts up and down from every vertex in the head band; a vertex with mesh above it and mesh below it is inside the mouth, one with mesh above and nothing below is on the ventral silhouette. Shape is measured about a centre fitted in the sagittal plane; dentition is found as protrusion out of a vertex's own two-ring neighbourhood along its normal.",
+  "source": {
+    "file": "tools/triassic/creatures/helicoprion/tripo-raw/helicoprion.raw.glb",
+    "note": "the generation, before the builder touches it",
+    "bodyLength": 1.0,
+    "snoutY": -0.5,
+    "vertices": 9615,
+    "connectedComponents": 1,
+    "largestComponents": [
+      9615
+    ],
+    "whorlVertices": 382,
+    "whorlEnclosedByTheChin": 374,
+    "whorlOnTheVentralSilhouette": 8,
+    "whorlEnclosedFraction": 0.9790575916230366,
+    "whorlExtentFractionOfBodyLength": [
+      0.03913959860801697,
+      0.13885977864265442
+    ],
+    "exposedArcFractionOfBodyLength": [
+      0.06303316354751587,
+      0.09234026074409485
+    ],
+    "clearanceAboveTheChin": {
+      "method": "for each enclosed whorl vertex, the gap to the chin skin straight below it",
+      "min": 0.0001827624364523217,
+      "median": 0.021279900334775448,
+      "max": 0.062249716371297836
+    },
+    "whorlLateralHalfWidth": 0.0805145651102066,
+    "symphysealMassWithinThreeHundredthsOfTheMidline": 0.8089005235602095,
+    "upperJawSurfaceVertices": 157,
+    "upperJawToothMaterial": 0,
+    "upperJawMaximumProtrusion": 0.0016844026563975429,
+    "lowerJawSurfaceVerticesOutsideTheSymphysis": 0,
+    "lowerJawToothMaterialOutsideTheSymphysis": 0,
+    "lowerJawMaximumProtrusionOutsideTheSymphysis": null,
+    "protrusionThreshold": 0.0018,
+    "spiral": {
+      "fittedCentreYZ": [
+        -0.3985352888703346,
+        -0.04846583977341652
+      ],
+      "largestRadialGapPerRay": {
+        "rays": 65,
+        "max": 0.04896414777302228,
+        "mean": 0.01534565454393357,
+        "raysWithAGapOverOnePercentOfBodyLength": 43
+      },
+      "medianRadialSpreadInSevenPointFiveDegreeBins": 0.01580996187576006,
+      "meanRadius": 0.023060674563550765,
+      "radialSpreadOverMeanRadius": 0.6855810671188676,
+      "angularBins": 72,
+      "emptyAngularBins": 0,
+      "angularBinsWithFewerThanThreeVertices": 13,
+      "occupancy": [
+        8,
+        4,
+        1,
+        4,
+        1,
+        1,
+        5,
+        1,
+        3,
+        4,
+        3,
+        2,
+        3,
+        3,
+        4,
+        4,
+        7,
+        9,
+        5,
+        2,
+        7,
+        13,
+        7,
+        7,
+        5,
+        3,
+        1,
+        4,
+        3,
+        2,
+        5,
+        4,
+        7,
+        2,
+        6,
+        4,
+        3,
+        8,
+        4,
+        2,
+        4,
+        9,
+        7,
+        8,
+        9,
+        7,
+        12,
+        8,
+        5,
+        1,
+        5,
+        8,
+        6,
+        7,
+        6,
+        9,
+        7,
+        9,
+        4,
+        4,
+        9,
+        10,
+        17,
+        4,
+        3,
+        6,
+        5,
+        3,
+        1,
+        2,
+        9,
+        7
+      ],
+      "radialMaxPerBin": [
+        0.023694436497175436,
+        0.023253924773031044,
+        0.03503210038032351,
+        0.04007541518214625,
+        0.03453244634595593,
+        0.015600784622098128,
+        0.04074586642264707,
+        0.0029520784033473203,
+        0.027080813429574472,
+        0.013067487537079302,
+        0.015493973299645521,
+        0.01513614611060238,
+        0.018592292882531104,
+        0.014174792397688953,
+        0.01840219813711661,
+        0.01099432084462762,
+        0.01379029414015468,
+        0.010135890180451228,
+        0.01331408162820606,
+        0.013659752964725682,
+        0.014152471359517776,
+        0.014497921675985341,
+        0.00820323773749379,
+        0.013589981774051726,
+        0.01577066418843831,
+        0.01508936260153156,
+        0.005921585475520198,
+        0.01695024804043839,
+        0.017415145143090976,
+        0.015644538811350424,
+        0.018864190587281605,
+        0.02238146411243161,
+        0.02781481079486801,
+        0.02827995945687132,
+        0.03273764910766071,
+        0.033864843205903265,
+        0.03076223759314539,
+        0.03755607566278452,
+        0.03727336622526061,
+        0.035463211026978796,
+        0.022291368158636388,
+        0.031362463716527705,
+        0.039143425276825704,
+        0.03356250180864114,
+        0.0360940551515934,
+        0.02803521433316671,
+        0.03379853366251485,
+        0.03253039506189444,
+        0.03218879914627532,
+        0.02094316870898307,
+        0.030941161099033023,
+        0.08522058353083158,
+        0.05589868606969333,
+        0.034238819051898114,
+        0.03903759041636825,
+        0.06324780766086312,
+        0.05495549845333141,
+        0.03988773079394691,
+        0.0334741472517514,
+        0.024548043968555686,
+        0.048834030450326145,
+        0.0898923086055863,
+        0.09330401157459314,
+        0.02511846488280838,
+        0.03365165345735317,
+        0.038643501432279986,
+        0.030539001001618042,
+        0.0321468009794539,
+        0.03860500037713602,
+        0.025155867321652748,
+        0.03174326473291744,
+        0.03820602228408068
+      ],
+      "radialPeakCount": 21,
+      "radialPeaks": [
+        {
+          "binDegrees": 15,
+          "radius": 0.04007541518214625
+        },
+        {
+          "binDegrees": 30,
+          "radius": 0.04074586642264707
+        },
+        {
+          "binDegrees": 40,
+          "radius": 0.027080813429574472
+        },
+        {
+          "binDegrees": 50,
+          "radius": 0.015493973299645521
+        },
+        {
+          "binDegrees": 60,
+          "radius": 0.018592292882531104
+        },
+        {
+          "binDegrees": 70,
+          "radius": 0.01840219813711661
+        },
+        {
+          "binDegrees": 80,
+          "radius": 0.01379029414015468
+        },
+        {
+          "binDegrees": 105,
+          "radius": 0.014497921675985341
+        },
+        {
+          "binDegrees": 120,
+          "radius": 0.01577066418843831
+        },
+        {
+          "binDegrees": 140,
+          "radius": 0.017415145143090976
+        },
+        {
+          "binDegrees": 175,
+          "radius": 0.033864843205903265
+        },
+        {
+          "binDegrees": 185,
+          "radius": 0.03755607566278452
+        },
+        {
+          "binDegrees": 210,
+          "radius": 0.039143425276825704
+        },
+        {
+          "binDegrees": 220,
+          "radius": 0.0360940551515934
+        },
+        {
+          "binDegrees": 230,
+          "radius": 0.03379853366251485
+        },
+        {
+          "binDegrees": 255,
+          "radius": 0.08522058353083158
+        },
+        {
+          "binDegrees": 275,
+          "radius": 0.06324780766086312
+        },
+        {
+          "binDegrees": 310,
+          "radius": 0.09330401157459314
+        },
+        {
+          "binDegrees": 325,
+          "radius": 0.038643501432279986
+        },
+        {
+          "binDegrees": 340,
+          "radius": 0.03860500037713602
+        },
+        {
+          "binDegrees": 355,
+          "radius": 0.03820602228408068
+        }
+      ],
+      "peakAngularSpacingDegrees": {
+        "min": 10.0,
+        "max": 35.0,
+        "mean": 17.142857142857142,
+        "coefficientOfVariation": 0.4551658224492761
+      },
+      "peakRadii": {
+        "min": 0.01379029414015468,
+        "max": 0.09330401157459314,
+        "ratioMaxOverMin": 6.7659188865964675
+      },
+      "peakRadiusRisesInStepsOf": [
+        10,
+        20
+      ]
+    },
+    "stations": [
+      {
+        "y": -0.47,
+        "frac": 0.030000000000000027,
+        "whorlVertices": 0,
+        "whorlLowestZ": null,
+        "ventralSilhouetteZ": 0.0026931629981845617,
+        "whorlAboveTheSilhouetteBy": null
+      },
+      {
+        "y": -0.45999999999999996,
+        "frac": 0.040000000000000036,
+        "whorlVertices": 11,
+        "whorlLowestZ": 0.017517950385808945,
+        "ventralSilhouetteZ": -0.0036517512053251266,
+        "whorlAboveTheSilhouetteBy": 0.02116970159113407
+      },
+      {
+        "y": -0.44999999999999996,
+        "frac": 0.050000000000000044,
+        "whorlVertices": 2,
+        "whorlLowestZ": 0.019635263830423355,
+        "ventralSilhouetteZ": -0.009944559074938297,
+        "whorlAboveTheSilhouetteBy": 0.029579822905361652
+      },
+      {
+        "y": -0.43999999999999995,
+        "frac": 0.06000000000000005,
+        "whorlVertices": 3,
+        "whorlLowestZ": -0.0598260797560215,
+        "ventralSilhouetteZ": -0.07172147929668427,
+        "whorlAboveTheSilhouetteBy": 0.011895399540662766
+      },
+      {
+        "y": -0.42999999999999994,
+        "frac": 0.07000000000000006,
+        "whorlVertices": 22,
+        "whorlLowestZ": -0.06913036108016968,
+        "ventralSilhouetteZ": -0.07750623673200607,
+        "whorlAboveTheSilhouetteBy": 0.008375875651836395
+      },
+      {
+        "y": -0.41999999999999993,
+        "frac": 0.08000000000000007,
+        "whorlVertices": 40,
+        "whorlLowestZ": -0.0671052634716034,
+        "ventralSilhouetteZ": -0.08750703930854797,
+        "whorlAboveTheSilhouetteBy": 0.02040177583694458
+      },
+      {
+        "y": -0.4099999999999999,
+        "frac": 0.09000000000000008,
+        "whorlVertices": 45,
+        "whorlLowestZ": -0.06515875458717346,
+        "ventralSilhouetteZ": -0.08885570615530014,
+        "whorlAboveTheSilhouetteBy": 0.02369695156812668
+      },
+      {
+        "y": -0.3999999999999999,
+        "frac": 0.10000000000000009,
+        "whorlVertices": 103,
+        "whorlLowestZ": -0.06593751162290573,
+        "ventralSilhouetteZ": -0.0923035591840744,
+        "whorlAboveTheSilhouetteBy": 0.02636604756116867
+      },
+      {
+        "y": -0.3899999999999999,
+        "frac": 0.1100000000000001,
+        "whorlVertices": 79,
+        "whorlLowestZ": -0.06221482902765274,
+        "ventralSilhouetteZ": -0.08176920562982559,
+        "whorlAboveTheSilhouetteBy": 0.01955437660217285
+      },
+      {
+        "y": -0.3799999999999999,
+        "frac": 0.1200000000000001,
+        "whorlVertices": 55,
+        "whorlLowestZ": -0.05863526463508606,
+        "ventralSilhouetteZ": -0.08059468865394592,
+        "whorlAboveTheSilhouetteBy": 0.021959424018859863
+      },
+      {
+        "y": -0.3699999999999999,
+        "frac": 0.13000000000000012,
+        "whorlVertices": 18,
+        "whorlLowestZ": -0.056942060589790344,
+        "ventralSilhouetteZ": -0.0788208544254303,
+        "whorlAboveTheSilhouetteBy": 0.021878793835639954
+      },
+      {
+        "y": -0.3599999999999999,
+        "frac": 0.14000000000000012,
+        "whorlVertices": 4,
+        "whorlLowestZ": -0.05053950101137161,
+        "ventralSilhouetteZ": -0.07647164165973663,
+        "whorlAboveTheSilhouetteBy": 0.02593214064836502
+      },
+      {
+        "y": -0.34999999999999987,
+        "frac": 0.15000000000000013,
+        "whorlVertices": 0,
+        "whorlLowestZ": null,
+        "ventralSilhouetteZ": -0.07499288767576218,
+        "whorlAboveTheSilhouetteBy": null
+      },
+      {
+        "y": -0.33999999999999986,
+        "frac": 0.16000000000000014,
+        "whorlVertices": 0,
+        "whorlLowestZ": null,
+        "ventralSilhouetteZ": -0.07649052143096924,
+        "whorlAboveTheSilhouetteBy": null
+      },
+      {
+        "y": -0.32999999999999985,
+        "frac": 0.17000000000000015,
+        "whorlVertices": 0,
+        "whorlLowestZ": null,
+        "ventralSilhouetteZ": -0.07729087024927139,
+        "whorlAboveTheSilhouetteBy": null
+      }
+    ]
+  },
+  "built": {
+    "file": "local/triassic-authoring/helicoprion/helicoprion.unpacked.glb",
+    "note": "the shipped authored body, decoded by audit.mjs --decode; coordinates divided by the builder's 5x so both bodies are measured in one space",
+    "bodyLength": 0.9999999403953552,
+    "snoutY": -0.4999999701976776,
+    "vertices": 12845,
+    "connectedComponents": 151,
+    "largestComponents": [
+      9615,
+      1442,
+      12,
+      12
+    ],
+    "whorlVertices": 3230,
+    "whorlEnclosedByTheChin": 3199,
+    "whorlOnTheVentralSilhouette": 31,
+    "whorlEnclosedFraction": 0.9904024767801858,
+    "whorlExtentFractionOfBodyLength": [
+      0.06269789115773983,
+      0.12459111956305025
+    ],
+    "exposedArcFractionOfBodyLength": [
+      0.06269789115773983,
+      0.07970539210470867
+    ],
+    "clearanceAboveTheChin": {
+      "method": "for each enclosed whorl vertex, the gap to the chin skin straight below it",
+      "min": 1.81354934625233e-07,
+      "median": 0.0012541250325739384,
+      "max": 0.044392943382263184
+    },
+    "whorlLateralHalfWidth": 0.0064999996684491634,
+    "symphysealMassWithinThreeHundredthsOfTheMidline": 1.0,
+    "upperJawSurfaceVertices": 126,
+    "upperJawToothMaterial": 0,
+    "upperJawMaximumProtrusion": 0.0008241406875213132,
+    "lowerJawSurfaceVerticesOutsideTheSymphysis": 29,
+    "lowerJawToothMaterialOutsideTheSymphysis": 0,
+    "lowerJawMaximumProtrusionOutsideTheSymphysis": 0.0007640403989316981,
+    "protrusionThreshold": 0.0018,
+    "spiral": {
+      "fittedCentreYZ": [
+        -0.42337610721588137,
+        -0.0334501827834174
+      ],
+      "largestRadialGapPerRay": {
+        "rays": 69,
+        "max": 0.016732835377942828,
+        "mean": 0.006885293162366043,
+        "raysWithAGapOverOnePercentOfBodyLength": 9
+      },
+      "medianRadialSpreadInSevenPointFiveDegreeBins": 0.014303509987160108,
+      "meanRadius": 0.0191613262468053,
+      "radialSpreadOverMeanRadius": 0.7464780779224445,
+      "angularBins": 72,
+      "emptyAngularBins": 1,
+      "angularBinsWithFewerThanThreeVertices": 10,
+      "occupancy": [
+        2,
+        1,
+        2,
+        0,
+        7,
+        4,
+        3,
+        5,
+        2,
+        5,
+        13,
+        7,
+        5,
+        7,
+        21,
+        12,
+        15,
+        28,
+        12,
+        25,
+        30,
+        50,
+        56,
+        46,
+        73,
+        82,
+        68,
+        138,
+        114,
+        176,
+        169,
+        216,
+        152,
+        200,
+        164,
+        191,
+        158,
+        148,
+        136,
+        114,
+        90,
+        98,
+        49,
+        60,
+        46,
+        42,
+        11,
+        28,
+        16,
+        15,
+        24,
+        7,
+        5,
+        13,
+        11,
+        7,
+        3,
+        2,
+        3,
+        4,
+        5,
+        2,
+        3,
+        2,
+        4,
+        1,
+        2,
+        3,
+        4,
+        4,
+        5,
+        4
+      ],
+      "radialMaxPerBin": [
+        0.0064831866998929,
+        0.005666917454271623,
+        0.001207713895614062,
+        null,
+        0.015149035876574039,
+        0.015526815243775614,
+        0.006856572219197276,
+        0.008765983810328499,
+        0.009253171052851438,
+        0.018776600444118517,
+        0.019321846160608242,
+        0.013808678050053667,
+        0.012889941953645914,
+        0.023225592465362075,
+        0.023830918833800018,
+        0.015589441468947468,
+        0.027895659620433395,
+        0.028499467280616135,
+        0.021918686851480493,
+        0.03243959369516469,
+        0.033004387924925445,
+        0.02668134234109073,
+        0.03713593063770159,
+        0.030448154238001388,
+        0.04074347973014578,
+        0.033696888625591885,
+        0.04339294902276478,
+        0.04371289723560179,
+        0.03922030101852917,
+        0.04595760456250946,
+        0.040866243917250994,
+        0.0474147857934787,
+        0.04175427462337297,
+        0.04806506739684901,
+        0.0389542124321937,
+        0.047970197602684096,
+        0.04783120571616771,
+        0.04121945118369942,
+        0.04703720873003005,
+        0.039725504126682444,
+        0.04529795187295308,
+        0.03754049262518592,
+        0.042814715802439195,
+        0.04235540276581601,
+        0.03202378996985773,
+        0.02544073607056192,
+        0.02849089423329419,
+        0.02792141584739389,
+        0.021124725748568766,
+        0.02457574694774781,
+        0.023969375156444137,
+        0.017046315286191407,
+        0.011686721927122298,
+        0.02051775831513429,
+        0.012953318378347954,
+        0.008883798578092727,
+        0.008012890188560369,
+        0.016732835377942828,
+        0.016218299196624233,
+        0.009872331538671201,
+        0.00948084618539265,
+        0.007234749481334373,
+        0.005897898089089771,
+        0.013973106395570842,
+        0.013681253262743703,
+        0.00548724450080069,
+        0.0027535188786320447,
+        0.007880663488523173,
+        0.002941404832633864,
+        0.008093936205777898,
+        0.013296166784527453,
+        0.013360122472012324
+      ],
+      "radialPeakCount": 22,
+      "radialPeaks": [
+        {
+          "binDegrees": 25,
+          "radius": 0.015526815243775614
+        },
+        {
+          "binDegrees": 50,
+          "radius": 0.019321846160608242
+        },
+        {
+          "binDegrees": 70,
+          "radius": 0.023830918833800018
+        },
+        {
+          "binDegrees": 85,
+          "radius": 0.028499467280616135
+        },
+        {
+          "binDegrees": 100,
+          "radius": 0.033004387924925445
+        },
+        {
+          "binDegrees": 110,
+          "radius": 0.03713593063770159
+        },
+        {
+          "binDegrees": 120,
+          "radius": 0.04074347973014578
+        },
+        {
+          "binDegrees": 135,
+          "radius": 0.04371289723560179
+        },
+        {
+          "binDegrees": 145,
+          "radius": 0.04595760456250946
+        },
+        {
+          "binDegrees": 155,
+          "radius": 0.0474147857934787
+        },
+        {
+          "binDegrees": 165,
+          "radius": 0.04806506739684901
+        },
+        {
+          "binDegrees": 175,
+          "radius": 0.047970197602684096
+        },
+        {
+          "binDegrees": 190,
+          "radius": 0.04703720873003005
+        },
+        {
+          "binDegrees": 200,
+          "radius": 0.04529795187295308
+        },
+        {
+          "binDegrees": 210,
+          "radius": 0.042814715802439195
+        },
+        {
+          "binDegrees": 230,
+          "radius": 0.02849089423329419
+        },
+        {
+          "binDegrees": 245,
+          "radius": 0.02457574694774781
+        },
+        {
+          "binDegrees": 265,
+          "radius": 0.02051775831513429
+        },
+        {
+          "binDegrees": 285,
+          "radius": 0.016732835377942828
+        },
+        {
+          "binDegrees": 315,
+          "radius": 0.013973106395570842
+        },
+        {
+          "binDegrees": 335,
+          "radius": 0.007880663488523173
+        },
+        {
+          "binDegrees": 355,
+          "radius": 0.013360122472012324
+        }
+      ],
+      "peakAngularSpacingDegrees": {
+        "min": 10.0,
+        "max": 30.0,
+        "mean": 16.363636363636363,
+        "coefficientOfVariation": 0.38188130791298674
+      },
+      "peakRadii": {
+        "min": 0.007880663488523173,
+        "max": 0.04806506739684901,
+        "ratioMaxOverMin": 6.099114302602501
+      },
+      "peakRadiusRisesInStepsOf": [
+        11,
+        21
+      ]
+    },
+    "stations": [
+      {
+        "y": -0.47,
+        "frac": 0.02999997198581531,
+        "whorlVertices": 0,
+        "whorlLowestZ": null,
+        "ventralSilhouetteZ": 0.0007125490810722113,
+        "whorlAboveTheSilhouetteBy": null
+      },
+      {
+        "y": -0.45999999999999996,
+        "frac": 0.039999972581861803,
+        "whorlVertices": 0,
+        "whorlLowestZ": null,
+        "ventralSilhouetteZ": -0.00415995717048645,
+        "whorlAboveTheSilhouetteBy": null
+      },
+      {
+        "y": -0.44999999999999996,
+        "frac": 0.049999973177908295,
+        "whorlVertices": 0,
+        "whorlLowestZ": null,
+        "ventralSilhouetteZ": -0.009571855887770653,
+        "whorlAboveTheSilhouetteBy": null
+      },
+      {
+        "y": -0.43999999999999995,
+        "frac": 0.05999997377395479,
+        "whorlVertices": 12,
+        "whorlLowestZ": -0.04864075779914856,
+        "ventralSilhouetteZ": -0.04864075779914856,
+        "whorlAboveTheSilhouetteBy": 0.0
+      },
+      {
+        "y": -0.42999999999999994,
+        "frac": 0.06999997437000129,
+        "whorlVertices": 130,
+        "whorlLowestZ": -0.061896320432424545,
+        "ventralSilhouetteZ": -0.07623063027858734,
+        "whorlAboveTheSilhouetteBy": 0.014334309846162796
+      },
+      {
+        "y": -0.41999999999999993,
+        "frac": 0.07999997496604777,
+        "whorlVertices": 620,
+        "whorlLowestZ": -0.06592949479818344,
+        "ventralSilhouetteZ": -0.08305563777685165,
+        "whorlAboveTheSilhouetteBy": 0.017126142978668213
+      },
+      {
+        "y": -0.4099999999999999,
+        "frac": 0.08999997556209427,
+        "whorlVertices": 1293,
+        "whorlLowestZ": -0.06767825782299042,
+        "ventralSilhouetteZ": -0.08622009307146072,
+        "whorlAboveTheSilhouetteBy": 0.018541835248470306
+      },
+      {
+        "y": -0.3999999999999999,
+        "frac": 0.09999997615814075,
+        "whorlVertices": 825,
+        "whorlLowestZ": -0.0672493427991867,
+        "ventralSilhouetteZ": -0.08768434822559357,
+        "whorlAboveTheSilhouetteBy": 0.02043500542640686
+      },
+      {
+        "y": -0.3899999999999999,
+        "frac": 0.10999997675418725,
+        "whorlVertices": 300,
+        "whorlLowestZ": -0.06435799598693848,
+        "ventralSilhouetteZ": -0.08315998315811157,
+        "whorlAboveTheSilhouetteBy": 0.018801987171173096
+      },
+      {
+        "y": -0.3799999999999999,
+        "frac": 0.11999997735023374,
+        "whorlVertices": 50,
+        "whorlLowestZ": -0.05819813162088394,
+        "ventralSilhouetteZ": -0.0820133239030838,
+        "whorlAboveTheSilhouetteBy": 0.02381519228219986
+      },
+      {
+        "y": -0.3699999999999999,
+        "frac": 0.12999997794628024,
+        "whorlVertices": 0,
+        "whorlLowestZ": null,
+        "ventralSilhouetteZ": -0.08013396710157394,
+        "whorlAboveTheSilhouetteBy": null
+      },
+      {
+        "y": -0.3599999999999999,
+        "frac": 0.13999997854232674,
+        "whorlVertices": 0,
+        "whorlLowestZ": null,
+        "ventralSilhouetteZ": -0.07700745016336441,
+        "whorlAboveTheSilhouetteBy": null
+      },
+      {
+        "y": -0.34999999999999987,
+        "frac": 0.1499999791383732,
+        "whorlVertices": 0,
+        "whorlLowestZ": null,
+        "ventralSilhouetteZ": -0.07563542574644089,
+        "whorlAboveTheSilhouetteBy": null
+      },
+      {
+        "y": -0.33999999999999986,
+        "frac": 0.1599999797344197,
+        "whorlVertices": 0,
+        "whorlLowestZ": null,
+        "ventralSilhouetteZ": -0.07649052888154984,
+        "whorlAboveTheSilhouetteBy": null
+      },
+      {
+        "y": -0.32999999999999985,
+        "frac": 0.1699999803304662,
+        "whorlVertices": 0,
+        "whorlLowestZ": null,
+        "ventralSilhouetteZ": -0.07729087024927139,
+        "whorlAboveTheSilhouetteBy": null
+      }
+    ]
+  }
+}

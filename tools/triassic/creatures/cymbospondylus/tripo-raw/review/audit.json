@@ -1,0 +1,105 @@
+{
+  "schema_version": 1,
+  "input": {
+    "path": "tools/triassic/creatures/cymbospondylus/tripo-raw/cymbospondylus.raw.glb",
+    "bytes": 1449948,
+    "sha256": "62c5f531d6b860e1d001116975d5bf087e0d1dfbcaf61b9ab36ebfae9ba279b5"
+  },
+  "summary": {
+    "mesh_objects": 1,
+    "vertices": 11128,
+    "faces": 19182,
+    "triangles": 19182,
+    "connected_components": 47,
+    "materials": 1,
+    "textures": 3
+  },
+  "bounds": {
+    "min_xyz": [
+      -0.214312,
+      -0.5,
+      -0.213444
+    ],
+    "max_xyz": [
+      0.214312,
+      0.5,
+      0.213444
+    ],
+    "center_xyz": [
+      0,
+      0,
+      0
+    ],
+    "size_xyz": [
+      0.428623,
+      1,
+      0.426888
+    ]
+  },
+  "meshes": [
+    {
+      "object": "tripo_node_655e68fc-e2d8-45d5-bc83-ad29b1cf40e0",
+      "mesh": "tripo_mesh_655e68fc-e2d8-45d5-bc83-ad29b1cf40e0",
+      "vertices": 11128,
+      "edges": 30263,
+      "faces": 19182,
+      "triangles": 19182,
+      "connected_components": 47,
+      "material_slots": [
+        "tripo_material_655e68fc-e2d8-45d5-bc83-ad29b1cf40e0"
+      ]
+    }
+  ],
+  "materials": [
+    {
+      "name": "tripo_material_655e68fc-e2d8-45d5-bc83-ad29b1cf40e0",
+      "image_textures": [
+        "Color_655e68fc-e2d8-45d5-bc83-ad29b1cf40e0",
+        "NormalGL_655e68fc-e2d8-45d5-bc83-ad29b1cf40e0",
+        "ORM_655e68fc-e2d8-45d5-bc83-ad29b1cf40e0"
+      ]
+    }
+  ],
+  "textures": [
+    {
+      "name": "Color_655e68fc-e2d8-45d5-bc83-ad29b1cf40e0",
+      "width": 2048,
+      "height": 2048,
+      "channels": 4,
+      "packed": true,
+      "source": "FILE",
+      "colorspace": "sRGB"
+    },
+    {
+      "name": "NormalGL_655e68fc-e2d8-45d5-bc83-ad29b1cf40e0",
+      "width": 2048,
+      "height": 2048,
+      "channels": 4,
+      "packed": true,
+      "source": "FILE",
+      "colorspace": "Non-Color"
+    },
+    {
+      "name": "ORM_655e68fc-e2d8-45d5-bc83-ad29b1cf40e0",
+      "width": 2048,
+      "height": 2048,
+      "channels": 4,
+      "packed": true,
+      "source": "FILE",
+      "colorspace": "Non-Color"
+    }
+  ],
+  "renders": {
+    "side": "tools/triassic/creatures/cymbospondylus/tripo-raw/review/side.png",
+    "top": "tools/triassic/creatures/cymbospondylus/tripo-raw/review/top.png",
+    "three-quarter": "tools/triassic/creatures/cymbospondylus/tripo-raw/review/three-quarter.png"
+  },
+  "preview": {
+    "path": "tools/triassic/creatures/cymbospondylus/cymbospondylus.preview.glb",
+    "triangle_limit": 40000,
+    "triangles_before": 19182,
+    "triangles_after": 19182,
+    "bytes": 1334636,
+    "sha256": "2f9b83b19c44bf0048ed0fd7871b6d673156627deb57e43c2eb6acea3afcaddc"
+  }
+}

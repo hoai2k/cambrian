@@ -1,0 +1,9 @@
+{
+  "schemaVersion": 1,
+  "canonicalStatus": "greenlit",
+  "input": "input.png",
+  "turnaround": "turnaround.png",
+  "generator": "builtin imagegen",
+  "prompt": "Create a production 3D-model-generation input image derived strictly from this approved shonisaurus canonical. ONE full-body animal only, three-quarter slightly elevated view, neutral symmetrical extended pose with straight entire tail, all four limbs separated and clearly visible, no overlaps or extra appendages. Match the reference anatomy, head, body thickness, fin shapes, skin markings and coloration exactly; no redesign. Remove environment and swimming bend. Pale neutral gray flat studio background, soft even lighting, no shadow drama, no labels or text. Keep entire snout, tail and every limb within generous frame margins. Jaw only slightly parted. This is a single model input, not a collage or turnaround sheet.",
+  "review": "Single input preserves canonical body, head, markings, all four separated flippers and entire tail. Turnaround qualitative only; top-view tail includes perspective drift. Use single input for Tripo, canonical remains authority."
+}

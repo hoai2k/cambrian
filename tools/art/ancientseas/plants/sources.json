@@ -1,0 +1,7 @@
+[
+  {"file":"plant-crinoid.webp","source":"crinoid.png","size":[768,1024],"keyWhite":true},
+  {"file":"plant-sea-fern.webp","source":"sea-fern.png","size":[1024,768],"keyWhite":true},
+  {"file":"plant-red-coral.webp","source":"red-coral.png","size":[768,1024],"keyWhite":false},
+  {"file":"plant-tube-sponge.webp","source":"tube-sponge.png","size":[768,1024],"keyWhite":true},
+  {"file":"plant-brain-coral.webp","source":"brain-coral.png","size":[1024,768],"keyWhite":true}
+]

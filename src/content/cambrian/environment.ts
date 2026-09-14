@@ -13,6 +13,29 @@ export const BIOME_DANGER: Record<Biome, number> = {
   shallows: 0.08, nursery: 0.04, shelf: 0.4, forest: 0.5, boulders: 0.5, flats: 0.32, channel: 0.72, escarpment: 0.8, basin: 0.92,
 };
 
+/**
+ * How deep the water is over each biome. The floor is the surface (40) less this, blended by the
+ * biome weights, so leaving one biome for another is a slope you can feel (`depthProfile` in
+ * src/sim/world.ts).
+ *
+ * Gentler than the other two on purpose. The Devonian runs a hatchling's thirty-four units to a
+ * hundred and eleven and the Triassic is wider still, because in both of them depth is a cost the
+ * player is spending — the climb for air. Nothing in the Cambrian breathes, so depth here is not a
+ * price, it is a *reading*: enough of a step between neighbours that crossing into a biome shows
+ * in the water over your head before the fog and the sand have finished changing. The whole column
+ * goes from twenty-four to seventy-two, under three times over, where the Devonian's is nearly five.
+ *
+ * The shallows are the shallowest thing in the sea, as in every era. The rest was already varying
+ * before this table — but incoherently, because the old profile carved and heaped by *distance*
+ * while the biomes are a mosaic: the boulder fields averaged fifty-two units of water against the
+ * escarpment's forty-six, so the drop at the reef front read as shallower than the rocks behind it
+ * and depth told a player nothing about where they were. The shelf and the sponge forest keep the
+ * depths they have always had, so the water most of a match is played in is unchanged.
+ */
+export const FLOOR_DEPTH: Record<Biome, number> = {
+  nursery: 24, shallows: 28, boulders: 34, flats: 37, shelf: 41, forest: 45, channel: 52, escarpment: 58, basin: 72,
+};
+
 export const ATMOS: Record<Biome, { fog: string; density: number; sky: number; sun: number; sand: string }> = {
   shallows: { fog: '#1f8994', density: 0.82, sky: 2.1, sun: 3.5, sand: '#c8c3a0' },
   nursery: { fog: '#106572', density: 1.0, sky: 1.8, sun: 3.0, sand: '#a3a682' },
