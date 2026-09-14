@@ -163,6 +163,17 @@ whose 4-connected region does not reach the image border is background seen *thr
 the delivered body that count is **zero, in all twelve frames**, against one 87-pixel slot in the
 fore-right paddle before the seating was deepened.
 
+### The webbing does not tear
+
+`node tools/triassic/skin-tears.mjs` measures every triangle edge against its rest length over all
+21 clips, which is the check the paired audits structurally cannot make — they measure where
+vertices *are*, and travel from rest stays bounded while a foot is pulled inside out. Against the
+body before the webbing and the body after it, the table is **identical**: worst 2.98x on
+`fore_upper_R` in Sprint, 2.77x on `tail_01` in Dodge, 2.58x in Guard, 29/6/14 edges past 2x, 3 of
+21 clips. The webbing adds 11,254 edges to the measurement and **not one of them tears**: the
+membrane is skinned by the same `weights()` the flesh around it uses, from its own position, so it
+moves with the paddle rather than being stretched across the joint.
+
 What it is not: the membrane is a smooth sheet. It carries the skin's painted markings, stretched
 between the toes, but it has no relief of its own — no wrinkles, no radiating folds along the digit
 lines, nothing where it meets the toe. Close up it reads as skin pulled between the digits rather

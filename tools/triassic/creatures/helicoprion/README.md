@@ -430,6 +430,18 @@ Two things the pictures show that the numbers do not:
    wants resurfacing at a finer voxel than the body.
 5. **Surface distance max 1.70 %**, 95th percentile 0.57 % — back to the first delivery's figures,
    because the body is the first delivery's geometry with 164 vertices nudged.
+5b. **The skin tears at the pectoral roots, and always has.**
+   `node tools/triassic/skin-tears.mjs public/assets/triassic/creatures/helicoprion.glb` measures
+   every edge against its rest length over all 21 clips: the worst is **11.68x on `pec_upper_R`**
+   in Parry, with 263 edges past 2x, and 17 of 21 clips tear something. The bones named are
+   `chest`, `pec_upper_L/R` — the paired-fin roots — so this is the fin weighting, not the whorl,
+   and it is not something this work introduced. For scale, the era's cleanest body (Nothosaurus)
+   is 2.98x. It wants a pass over the pectoral weights before this animal ships.
+5c. **Reverting the coil halved the tearing.** The same tool on the coil body measured **23.10x on
+   `skull`** with 991 torn edges in Bite alone, all of them skull and jaw: the coil rode the `jaw`
+   bone at weight 1 while the palate it touched rode `skull`, so every edge across that contact was
+   pulled the whole width of the gape. Restoring the generated whorl takes Bite from 22.05x/991 to
+   4.20x/179 and the worst clip from 23.10x to 11.68x. Nothing in the paired audits could see it.
 6. **The bind pose has an open mouth** and cannot be given a closed one, because the whorl is
    already at occlusion. Every clip opens from there.
 7. **No material-comparison study** of the kind Nothosaurus needed was done, because no crumpled
