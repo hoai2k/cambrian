@@ -303,13 +303,25 @@ world travel remains engine-owned.
   **only if the loaded model has that clip**. Every body that does not — the borrowed Devonian
   stand-ins the roster still uses, Mystriosuchus, anything in the other two eras — is exactly as it
   was.
-- `tools/triassic-test.ts` covers it: the telegraph names `Lower` at 1.5 s, the strike names a snap
-  and a side at 0.6 s, and a body that is not on a post is left to the shared state machine.
+- The **sever** names `Severed`. `kill()` would otherwise route the one death this animal has its
+  own clip for to the shared `Death` one-shot, so the post carries a `severed` flag that outlives
+  `cleared` — `cleared` stops the step loop, the flag is what `shoreClip` reads — and the neck goes
+  down the way it was authored to while the carcass lies on the bank.
+- Which **side** the head goes is taken from the animal's own facing, not from a comparison of
+  world x. `src/render/creature.ts` states the convention: increasing yaw turns a creature to its
+  left, so its right is `(-cos yaw, 0, sin yaw)`, which at the pinned `yaw = PI` is **+x**. The
+  first version of this read "larger x is to its left" and so named the snap that swings the head
+  *away* from what it is striking — a bug no other check here could see, because the hit lands
+  either way. `sideOf` asks the facing.
+- `tools/triassic-test.ts` covers all of it: the telegraph names `Lower` at 1.5 s, the strike names
+  a snap at 0.6 s, a target on each side is struck with the snap that goes toward it, the severed
+  neck names `Severed` at 2.2 s, and a body that is not on a post is left to the shared state
+  machine.
 
-What is **not** wired: `Drag` and `Severed` have no caller. `shore.ts` does not take a hold today —
-its snack-sized second bite is an `applyHit`, not a `takeHold` — and the sever is a `kill`, which
-routes to the shared `Death` one-shot rather than to this animal's own. Both are one line each in
-`shoreClip` once the mechanic wants them, and the clips are there waiting.
+What is **not** wired: `Drag` has no caller. `shore.ts` does not take a hold today — its
+snack-sized second bite is an `applyHit`, not a `takeHold` — so there is nothing being dragged up
+the beach to play it over. It is one line in `shoreClip` once the mechanic takes a hold, and the
+clip is there waiting.
 
 ## Verification
 
@@ -393,5 +405,5 @@ Macrocnemus and Coelophysis, which were built in the same pass.
 - **The head is proportionally large.** The skull measures 7.8 % of the body against the 2.6 % the
   138 mm CT skull on a 5.25 m animal gives. That is the greenlit pose's reading and not this
   build's to change.
-- `Drag` and `Severed` have no caller yet (see **Wiring** above).
+- `Drag` has no caller yet: nothing in `shore.ts` takes a hold (see **Wiring** above).
 - Living colours, soft tissues and movements are artistic reconstruction.

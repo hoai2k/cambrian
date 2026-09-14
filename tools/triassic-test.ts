@@ -433,6 +433,45 @@ for (const [id, kind] of [['mixosaurus', 'a live-bearer'], ['placodus', 'an egg-
     neck.lastHitBy = notho.id; neck.sinceHit = 0; neck.hp -= 5;
     tick(g);
     ok(!isAlive(neck) && boom.cleared, 'a rung III bite on the neck while it is out severs it: the bank is clear');
+    // The sever is the one death this animal has a clip for, and it is the clip that plays. A post
+    // that is cleared any other way (the body simply gone) says nothing and the shared death runs.
+    const dead = RULES!.clip?.(neck);
+    ok(dead?.name === 'Severed' && dead.dur === 2.2, `the severed neck names Severed (${dead?.name ?? 'nothing'})`);
+  }
+}
+
+// ---- the snap goes toward what it is striking, not away from it ----
+{
+  // `src/render/creature.ts`: increasing yaw turns a creature to its left, so its right is
+  // (-cos yaw, 0, sin yaw). A shore animal is pinned facing the sea at yaw = PI, where that is +x.
+  // Reading "larger x is to its left" named the snap that swings the head the wrong way, which is
+  // invisible to every other check here: the hit lands either way.
+  const g = new Game('reef', [{ creature: 'keichousaurus', device: 'keyboard', ready: true }]);
+  g.skipHatch();
+  run(g, 0.5);
+  const p = g.players[0];
+  const boom = [...shorePosts(g, { x: 0, y: 0, z: 0 }, 3000)].find((q) => q.kind === 'tanystropheus');
+  ok(!!boom, 'a Tanystropheus to test the sides on');
+  if (boom) {
+    const neck = g.byId(boom.actor)!;
+    const right = { x: -Math.cos(neck.yaw), z: Math.sin(neck.yaw) };
+    for (const [label, sign, want] of [['its left', -1, 'SnapLeft'], ['its right', 1, 'SnapRight']] as const) {
+      boom.phase = 'watch'; boom.t = 0; boom.target = -1;
+      const off = lengthOf(neck) * 0.3 * sign;
+      const put = () => {
+        p.pos = { x: neck.pos.x + right.x * off, y: SURFACE_Y - 1.5, z: neck.pos.z - 2 + right.z * off };
+        p.vel = { x: 0, y: 0, z: 0 }; p.hp = p.hpMax; p.spawnProtect = 0; p.iframes = 0;
+        p.state = 'free'; p.hatching = false;
+      };
+      put(); p.prevT.x = p.pos.x; p.prevT.y = p.pos.y; p.prevT.z = p.pos.z;
+      let named: string | undefined;
+      for (let i = 0; i < 60 * 3 && !named; i++) {
+        put(); tick(g);
+        const c = RULES!.clip?.(neck);
+        if (c && c.name.startsWith('Snap')) named = c.name;
+      }
+      ok(named === want, `a target on ${label} is struck with ${want} (got ${named ?? 'no snap'})`);
+    }
   }
 }
 

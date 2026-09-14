@@ -202,6 +202,27 @@ on the shared state machine's Idle. Giving it a telegraph would be giving it a c
 can never ask for. Tanystropheus and Coelophysis have those four; this one has a run instead, which
 is what the design and the reviewer both asked of it.
 
+**And nothing plays that run yet.** This is the honest gap in this delivery and it is worth being
+plain about. `Run`, `Charge`, `Snatch` and `Retreat` have no caller: `shoreClip` names a clip per
+*phase*, this animal only ever has the `watch` phase, and so it stands on its bank doing nothing.
+
+That is not a bug in `shore.ts` so much as a mechanic that was never written. The design
+([01-triassic-design.md](../../../../docs/triassic/01-triassic-design.md) · S03) asks for exactly
+one behaviour — "**it bolts** when a player nears the shallows and is a rare snack if it wades" —
+and a bolt is the one thing the shore-animal class cannot currently express: `pin()` writes the
+body back to its post every single step, and every other shore animal is *supposed* to be pinned.
+Making this one move means either unpinning an actor class whose whole contract is that it does
+not move, or giving it a brain, and both are design decisions rather than wiring. So it was left,
+deliberately, rather than half-done.
+
+What a future pass needs: a `flee` phase entered when a player comes inside some radius, a post
+position that is allowed to travel up the beach while that phase runs, and a return to the post
+when it ends. `shoreClip` then names `Retreat` on entry and `Run` for the travel, which is what
+they were authored for and why `Run` is a travelling gait rather than a walk on the spot. `Charge`
+and `Snatch` are for the design's "rare snack if it wades" and want a reach this animal does not
+have; they are speculative and a reviewer may well decide an ambient-only animal should not strike
+at all, in which case they are two clips of dead weight in a 1.94 MB file and cost nothing else.
+
 ## Verification
 
 `node tools/triassic/creatures/macrocnemus/audit.mjs --package --decode` binds the checks to the

@@ -262,6 +262,13 @@ Tanystropheus and Macrocnemus, which were built in the same pass.
 - **There are no eye globes**, as across the era.
 - **The limbs are posed and asymmetric** — the generation is drawn mid-stride — and the rig is built
   to each limb's own axis rather than making them match.
+- **The shore chain is wired; the run is not.** `reachOf` in `src/sim/triassic/shore.ts` gives this
+  animal `L * 0.6`, so it reaches the `lower`, `strike` and `rest` phases and `shoreClip` names
+  `Lower`, `SnapLeft`/`SnapRight` and `Retract` — those four play. `Run`, `Charge` and `Retreat`
+  have no caller, for the same reason as Macrocnemus': a shore animal is pinned to its post every
+  step, so there is no phase in which it travels. They are there for the mechanic the design
+  describes (S04: it "snatches a hatchling or anything small in the last stretch of shallows and
+  otherwise ignores the water") once something asks a shore animal to move.
 - `Run`'s and `Charge`'s cadences are authored judgements, not numbers taken from a speed the
   simulation uses: nothing in `src/sim` asks a shore animal to move.
 - Living colours, soft tissues and movements are artistic reconstruction.

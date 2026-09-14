@@ -30,8 +30,10 @@ const POST_SPACING = 170, POST_REACH = 260;
 const TELEGRAPH = 1.5, COOLDOWN = 6, SURFACE_BAND = 4;
 /** How long the recovery off a strike reads for; the rest of the cooldown is the watch again. */
 const RECOVER = 0.9;
+/** The severed-neck death, which runs once and then holds its last frame as the carcass. */
+const SEVERED = 2.2;
 
-interface Post { k: number; actor: number; kind: CreatureId; pos: Vec3; phase: 'watch' | 'lower' | 'strike' | 'rest'; t: number; target: number; cleared: boolean; side: 1 | -1; }
+interface Post { k: number; actor: number; kind: CreatureId; pos: Vec3; phase: 'watch' | 'lower' | 'strike' | 'rest'; t: number; target: number; cleared: boolean; side: 1 | -1; severed: boolean; }
 interface ShoreState { posts: Map<number, Post>; }
 /**
  * The post a shore animal is standing at, keyed by the body itself. The renderer asks what a body
@@ -67,6 +69,20 @@ function reachOf(a: Actor): number {
   return 0;
 }
 
+/**
+ * Which side of itself a body is on: +1 to the animal's left, -1 to its right.
+ *
+ * This is taken from the animal's own facing and not from a bare comparison of world x. A shore
+ * animal is pinned at `yaw = PI`, and the renderer's own rule is that increasing yaw turns a
+ * creature to its left, so its right is `(-cos yaw, 0, sin yaw)` — which at yaw = PI is *+x*. The
+ * first version of this read "larger x is to its left" and so named the snap that swings the head
+ * away from what it is striking at. Asking the facing keeps it right if the pin ever changes.
+ */
+function sideOf(a: Actor, from: Vec3, to: Vec3): 1 | -1 {
+  const rx = -Math.cos(a.yaw), rz = Math.sin(a.yaw);
+  return (to.x - from.x) * rx + (to.z - from.z) * rz > 0 ? -1 : 1;
+}
+
 function pin(a: Actor, pos: Vec3) {
   a.pos.x = pos.x; a.pos.y = pos.y; a.pos.z = pos.z;
   a.prevT.x = pos.x; a.prevT.y = pos.y; a.prevT.z = pos.z;
@@ -82,7 +98,7 @@ function ensurePosts(g: Game) {
     for (let k = k0; k <= k1; k++) {
       if (s.posts.has(k)) continue;
       const kind = kindAt(k, seed);
-      if (!kind) { s.posts.set(k, { k, actor: -1, kind: 'macrocnemus', pos: { x: 0, y: 0, z: 0 }, phase: 'rest', t: 0, target: -1, cleared: true, side: 1 }); continue; }
+      if (!kind) { s.posts.set(k, { k, actor: -1, kind: 'macrocnemus', pos: { x: 0, y: 0, z: 0 }, phase: 'rest', t: 0, target: -1, cleared: true, side: 1, severed: false }); continue; }
       const x = k * POST_SPACING + (hash(k, seed, 2) - 0.5) * 70;
       const a = g.spawn(kind, 'ambient', { x, y: SURFACE_Y, z: shoreZ(x) }, 1);
       // just above the waterline, its front over the water: the post sits a little way up the ramp
@@ -90,7 +106,7 @@ function ensurePosts(g: Game) {
       const y = Math.max(sampleHeight(x, z), SURFACE_Y - 0.5) + clearanceOf(a) * 0.6;
       const pos = { x, y, z };
       pin(a, pos);
-      const post: Post = { k, actor: a.id, kind, pos, phase: 'watch', t: 0, target: -1, cleared: false, side: 1 };
+      const post: Post = { k, actor: a.id, kind, pos, phase: 'watch', t: 0, target: -1, cleared: false, side: 1, severed: false };
       s.posts.set(k, post); postOf.set(a, post);
     }
   }
@@ -123,7 +139,12 @@ export function stepShore(g: Game, ctx: HitContext, dt: number) {
     // runner have no neck to lose and the phytosaur is armoured; only the boom pays this price.
     if (def.id === 'tanystropheus' && post.phase !== 'watch' && post.phase !== 'rest' && a.sinceHit < dt * 2 && a.lastHitBy >= 0) {
       const attacker = g.byId(a.lastHitBy);
-      if (attacker && (creature(attacker.creature).rung ?? 1) >= 3) { kill(ctx, a, attacker); post.cleared = true; continue; }
+      if (attacker && (creature(attacker.creature).rung ?? 1) >= 3) {
+        // The bank is clear, but the body is still on it for as long as a corpse lasts, and the
+        // sever is the one death this animal has a clip for. `cleared` stops the step loop; the
+        // flag is what `shoreClip` reads, so the neck goes down the way it was authored to.
+        kill(ctx, a, attacker); post.cleared = true; post.severed = true; continue;
+      }
     }
     pin(a, post.pos);
     a.hp = Math.min(a.hpMax, a.hp + 2 * dt);                   // it heals on the bank; nothing keeps it hurt but a sever
@@ -132,7 +153,7 @@ export function stepShore(g: Game, ctx: HitContext, dt: number) {
     switch (post.phase) {
       case 'watch': {
         const o = reachable(g, post, a);
-        if (o) { post.phase = 'lower'; post.t = 0; post.target = o.id; post.side = o.pos.x >= post.pos.x ? 1 : -1; }
+        if (o) { post.phase = 'lower'; post.t = 0; post.target = o.id; post.side = sideOf(a, post.pos, o.pos); }
         break;
       }
       case 'lower': {
@@ -179,7 +200,9 @@ export function shorePosts(g: Game, near: Vec3, r: number) {
  */
 export function shoreClip(a: Actor): { name: string; dur: number } | undefined {
   const post = postOf.get(a);
-  if (!post || post.cleared) return undefined;
+  if (!post) return undefined;
+  if (post.severed) return { name: 'Severed', dur: SEVERED };
+  if (post.cleared) return undefined;
   switch (post.phase) {
     case 'lower': return { name: 'Lower', dur: TELEGRAPH };
     case 'strike': return { name: post.side > 0 ? 'SnapLeft' : 'SnapRight', dur: 0.6 };
