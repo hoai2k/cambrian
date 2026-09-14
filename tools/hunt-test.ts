@@ -129,4 +129,33 @@ for (const [creatureId, mode, scale] of [['waptia', 'rise', 0.25], ['anomalocari
     `eats ${eats}->${p.eats}`);
 }
 
+// --- the warning is about intent, not about size ---
+{
+  const { comingFor, applyScaleStats: scaleStats } = await import('../src/sim/actors');
+  const { makeBrain } = await import('../src/sim/ai');
+  const g = new Game('reef', [{ creature: 'opabinia', device: 'keyboard', ready: true }], 5);
+  const p = g.players[0]; p.scale = 1; scaleStats(p, false); p.pos = { ...OPEN }; p.spawnProtect = 1e9;
+  for (const o of [...g.actors]) if (o.controller !== 'player') g.remove(o);
+  const big = g.spawn('anomalocaris', 'giant', { x: OPEN.x, y: OPEN.y + 2, z: OPEN.z + 14 }, 3.2);
+  big.brain = makeBrain('giant', { ...big.pos }, g.rng, {});
+  run(g, emptyInput(), 2);
+  big.brain.goal = 'patrol'; big.brain.target = -1;
+  check('a giant going about its business is not a warning', !comingFor(big, p) && bandOf(p, big) === 'giant',
+    `band ${bandOf(p, big)} goal ${big.brain.goal}`);
+  const quiet = g.radarFor(0, 400).find((b) => b.id === big.id);
+  check('...and its radar contact is not marked hunting', !!quiet && !quiet.hunting, `blip ${quiet ? quiet.kind : 'none'}`);
+  // Set and read without stepping: a giant's own brain would think again in between, and what is
+  // under test is what the marks make of the state, not how the state was arrived at.
+  big.brain.goal = 'hunt'; big.brain.target = p.id;
+  check('one that has picked you out is', comingFor(big, p), `goal ${big.brain.goal} target ${big.brain.target}`);
+  const hot = g.radarFor(0, 400).find((b) => b.id === big.id);
+  check('...and so is its contact', !!hot && hot.hunting, `hunting=${hot?.hunting}`);
+  // Something its own size that has squared up to it counts too: aggression is not about being big.
+  const rival = g.spawn('opabinia', 'ambient', { x: OPEN.x + 4, y: OPEN.y, z: OPEN.z + 4 }, 1);
+  rival.brain = makeBrain('needs', { ...rival.pos }, g.rng, {});
+  rival.brain.goal = 'fight'; rival.brain.target = p.id;
+  check('a neighbour picking a fight is a warning at any size', comingFor(rival, p) && bandOf(p, rival) === 'rival',
+    `band ${bandOf(p, rival)}`);
+}
+
 console.log(failed ? `\n${failed} FAILED` : '\nall hunt tests passed'); process.exit(failed ? 1 : 0);

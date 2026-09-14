@@ -32,7 +32,7 @@ for(const suffix of ['', '.puppet','.lod1']){
   fs.writeFileSync(file,bytes);d=after;
  }
  const c=clips(d),sk=skeleton(d),so=sockets(d);
- assert.equal(c.length,21);assert.equal(sk[0].joints.length,27);assert.equal(so.length,3);
+ assert.equal(c.length,21);assert.equal(sk[0].joints.length,30);assert.equal(so.length,3);
  if(!suffix){report.rig=sk;report.sockets=so;report.clipSignatures=c.map(a=>({name:a.name,sha256:hash(JSON.stringify(a))}));}
  else {assert.deepEqual(sk,report.rig,'rig parity');assert.deepEqual(so,report.sockets,'anchor parity');assert.deepEqual(c.map(a=>({name:a.name,sha256:hash(JSON.stringify(a))})),report.clipSignatures,'exact clip parity');}
  const signatures=new Set();
@@ -66,14 +66,20 @@ for(const suffix of ['','.puppet']){
    }
    const metric=name=>{const values=rows.map(row=>row[name][2]),minimum=Math.min(...values),maximum=Math.max(...values);return {rearPhase:rows[values.indexOf(minimum)].phase,travel:maximum-minimum};};
    const foreL=metric('fore_paddle_L'),foreR=metric('fore_paddle_R'),hindL=metric('hind_paddle_L'),hindR=metric('hind_paddle_R');
-   const lateral=name=>Math.max(...rows.map(row=>row[name][0]))-Math.min(...rows.map(row=>row[name][0]));
-   const skullLateral=lateral('skull'),chestLateral=lateral('chest'),foreRear=(foreL.rearPhase+foreR.rearPhase)/2;
+   const spanOn=(name,axis)=>Math.max(...rows.map(row=>row[name][axis]))-Math.min(...rows.map(row=>row[name][axis]));
+   const lateral=name=>spanOn(name,0);
+   const skullLateral=lateral('skull'),chestLateral=lateral('chest'),skullVertical=spanOn('skull',1),foreRear=(foreL.rearPhase+foreR.rearPhase)/2;
    assert(phaseGap(foreL.rearPhase,foreR.rearPhase)<=1/120,clipName+' forelimbs must row together');
    assert(foreRear>=.64&&foreRear<=.71,clipName+' power stroke must occupy the long part of the cycle');
    assert(phaseGap(hindL.rearPhase,foreRear)<=.12&&phaseGap(hindR.rearPhase,foreRear)<=.12,clipName+' hind limbs must trail the paired forelimb stroke');
    assert((hindL.travel+hindR.travel)<(foreL.travel+foreR.travel)*.65,clipName+' hind stroke must remain secondary');
    assert(skullLateral<.02&&skullLateral<Math.max(.012,chestLateral*4),clipName+' skull must hold the shoulder line');
-   report.gait.push({clip:clipName,foreL,foreR,hindL,hindR,skullLateral,chestLateral,powerFraction:foreRear,recoveryFraction:1-foreRear});
+   // The neck is nearly twice as long as it was, so the same cervical rotations would swing the
+   // head twice as far: the builder divides each joint's share by the length of the chain, and
+   // this is what holds it to that. Vertical is measured as well as lateral because a longer neck
+   // fails upwards first - the locomotor clips zero the cervical yaw but keep a little pitch.
+   assert(skullVertical<.05,clipName+' skull must not bob with the stroke');
+   report.gait.push({clip:clipName,foreL,foreR,hindL,hindR,skullLateral,skullVertical,chestLateral,powerFraction:foreRear,recoveryFraction:1-foreRear});
   }
  }
 }
