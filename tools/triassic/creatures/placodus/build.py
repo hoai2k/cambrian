@@ -105,6 +105,11 @@ if STRAIGHTEN:assert abs(straightening['tipLateralMeanAfter'])<.012,straightenin
 
 # ---- material: keep the source albedo, neutral white COLOR_0, restrained relief ---------------
 mat=auth.data.materials[0];mat.name='Placodus body pigmentation'
+# The source material culls its backfaces, which is right for a closed shell and wrong for this
+# one: cutting the jaw off leaves both halves open along the mouth, so a culled skin is a hole an
+# open gape looks straight out of. The lining below is what an open mouth is meant to show; this is
+# the backstop under it, and it costs the runtime nothing but a little overdraw inside the head.
+mat.use_backface_culling=False
 bs=mat.node_tree.nodes.get('Principled BSDF')
 colnode=next(n for n in mat.node_tree.nodes if n.type=='TEX_IMAGE' and n.image and n.image.colorspace_settings.name=='sRGB')
 im=colnode.image
@@ -246,9 +251,84 @@ for key,(pts,names) in LIMBS.items():seating[names[0]]=depth(pts[0])
 seating['jaw']=depth((.404,0,-.014));seating['gastralia']=depth((.065,0,-.070))
 for n,d in seating.items():assert d>.018,('appendage root outside the trunk',n,d)
 
-# ---- cut a true articulated lower jaw, and the gastral basket as its own rigid part ------------
+# ---- measure the mouth the source actually modelled -------------------------------------------
+# The generated head carries a real mouth: a slit with an interior, not a line painted on the skin.
+# A vertex whose own outward normal runs straight back into the mesh within MOUTH_GAP is looking
+# across that slit at the lip opposite, so the set of them is the oral cavity, and its mid height
+# at each station is where the jaw has to come away. Measuring it is the whole of this correction.
+# The shipped cut was the straight ramp -.041-.20*(x-HINGE_X), which is the tangent to that curve
+# at the corner and nothing else: by the snout it ran 0.006 raw high, taking a band of upper lip
+# down with the jaw, and it sawed straight through the procumbent chisels at the tip.
 HINGE_X=.420
-def seam(x):return -.041-.20*(x-HINGE_X)
+MOUTH_GAP=.030
+def cavity_of(o):
+ bv=BVHTree.FromPolygons([v.co for v in o.data.vertices],[p.vertices[:] for p in o.data.polygons],all_triangles=False)
+ pts=[]
+ for v in o.data.vertices:
+  if v.co.x<.36 or abs(v.co.y)>.08 or not -.10<v.co.z<.02:continue
+  hit=bv.ray_cast(v.co+v.normal*3e-4,v.normal,MOUTH_GAP)
+  if hit[0] is not None:pts.append(v.co[:])
+ return np.array(pts)
+CAV=cavity_of(auth)
+assert len(CAV)>120,('the mouth cavity did not measure',len(CAV))
+def profile(lo,hi,step,half):
+ xs=[];mid=[];wide=[];tall=[]
+ for x in np.arange(lo,hi+1e-9,step):
+  m=(CAV[:,0]>=x-half)&(CAV[:,0]<x+half)
+  if m.sum()<4:continue
+  q=CAV[m];a=float(np.percentile(q[:,2],6));b=float(np.percentile(q[:,2],94))
+  xs.append(float(x));mid.append((a+b)/2);tall.append((b-a)/2)
+  wide.append(float(np.percentile(np.abs(q[:,1]),92)))
+ return np.array(xs),np.array(mid),np.array(wide),np.array(tall)
+def blur(v,s=2.):
+ i=np.arange(len(v));return np.array([float((v*np.exp(-.5*((i-k)/s)**2)).sum()/np.exp(-.5*((i-k)/s)**2).sum()) for k in i])
+MX,MID,WIDE,TALL=profile(.410,.480,.0025,.006)
+MID=blur(MID);WIDE=blur(WIDE);TALL=blur(TALL)
+def seam(x):return float(np.interp(x,MX,MID))
+assert -.045<seam(HINGE_X)<-.036,seam(HINGE_X)
+assert seam(MX[-1])<seam(HINGE_X)-.012,(seam(MX[-1]),seam(HINGE_X))
+
+# ---- the teeth, measured the same way ---------------------------------------------------------
+# A tooth is a patch of the snout standing proud of the same surface smoothed: connected, and
+# further out than a voxel. The four procumbent chisels are the only things out there that clear
+# TOOTH_PROUD, and the cut must not pass through one -- the shipped ramp halved both of the big
+# pair, which is what reads in a render as teeth on the upper jaw and teeth on the lower with a
+# seam between them.
+TOOTH_PROUD=.0060
+def protrusions(o,front=.44,floor=.0034):
+ sm=o.copy();sm.data=o.data.copy();bpy.context.collection.objects.link(sm)
+ bpy.context.view_layer.objects.active=sm
+ m=sm.modifiers.new('Snout detail reference','SMOOTH');m.factor=.6;m.iterations=8
+ bpy.ops.object.modifier_apply(modifier=m.name)
+ bv=BVHTree.FromPolygons([v.co for v in sm.data.vertices],[p.vertices[:] for p in sm.data.polygons],all_triangles=False)
+ co=np.array([v.co[:] for v in o.data.vertices]);out=np.zeros(len(co))
+ for i,v in enumerate(o.data.vertices):
+  if v.co.x<front:continue
+  loc,nor,idx,dist=bv.find_nearest(v.co)
+  out[i]=dist*(1 if (v.co-loc).dot(nor)>0 else -1)
+ bpy.data.objects.remove(sm)
+ adj=[[] for _ in range(len(co))]
+ for e in o.data.edges:
+  a,b=e.vertices;adj[a].append(b);adj[b].append(a)
+ mask=(co[:,0]>front)&(out>floor);seen=np.zeros(len(co),bool);groups=[]
+ for i in np.nonzero(mask)[0]:
+  if seen[i]:continue
+  stack=[i];seen[i]=True;g=[]
+  while stack:
+   q=stack.pop();g.append(q)
+   for w in adj[q]:
+    if mask[w] and not seen[w]:seen[w]=True;stack.append(w)
+  if len(g)>=6:groups.append(g)
+ groups.sort(key=len,reverse=True)
+ return co,out,groups
+SNOUT_CO,PROUD,PATCHES=protrusions(auth)
+TEETH=[g for g in PATCHES if PROUD[g].max()>=TOOTH_PROUD]
+assert len(TEETH)>=3,('the chisels did not measure',len(PATCHES),len(TEETH))
+# The mouth ends where the cavity does, and the jaw is cut off square just behind the chisels
+# rather than carried on to the snout tip: forward of that the only things left are those teeth,
+# which hang from the premaxilla over the outside of the mandible and belong whole to the skull.
+JAW_FRONT_X=float(np.floor((min(SNOUT_CO[g][:,0].min() for g in TEETH)-.0009)*1e4)/1e4)
+assert MX[0]+.02<JAW_FRONT_X<MX[-1],(JAW_FRONT_X,MX[0],MX[-1])
 # The gastral basket footprint: a flat-sided superellipse under the belly, measured off the pale
 # plated panel in the source albedo (x -0.12 to 0.25, half width 0.135) and capped above the
 # flank so the cut never climbs out of the belly.
@@ -256,15 +336,31 @@ GC,GX,GY,GZ=.065,.185,.135,-.045
 def is_armour(c):
  u=(c.x-GC)/GX;v=c.y/GY
  return c.z<GZ and (u**4+v*v)<1.
-def is_jaw(c):return c.x>HINGE_X and c.z<seam(c.x)-1e-7
+def is_jaw(c):return HINGE_X<c.x<JAW_FRONT_X and c.z<seam(c.x)-1e-7
 parts={}
-def split(o,label,test,plane=None):
- if plane:
-  bm=bmesh.new();bm.from_mesh(o.data)
-  for co,no in plane:
-   bmesh.ops.bisect_plane(bm,geom=list(bm.verts)+list(bm.edges)+list(bm.faces),dist=1e-7,
-    plane_co=co,plane_no=no,clear_inner=False,clear_outer=False)
-  bm.to_mesh(o.data);bm.free()
+def bisect_mouth(o):
+ """Open the cut before taking it: the two vertical bounds as planes, the seam as a curve.
+
+ A curve cannot be a bisection plane, so the head is sheared vertically by -seam(x) first, which
+ carries the curve onto the plane z=0 exactly; the cut is taken there and the shear undone, so
+ every vertex the cut adds lands on the seam itself and every vertex that was already there comes
+ back to where it was. Only the head is offered to the seam pass, so the rest of the body keeps
+ its topology."""
+ bm=bmesh.new();bm.from_mesh(o.data)
+ for cx in [HINGE_X,JAW_FRONT_X]:
+  bmesh.ops.bisect_plane(bm,geom=list(bm.verts)+list(bm.edges)+list(bm.faces),dist=1e-7,
+   plane_co=(cx,0,0),plane_no=(1,0,0),clear_inner=False,clear_outer=False)
+ for v in bm.verts:v.co.z-=seam(v.co.x)
+ head=[f for f in bm.faces if f.calc_center_median().x>HINGE_X-.03]
+ verts=set();edges=set()
+ for f in head:
+  verts.update(f.verts);edges.update(f.edges)
+ bmesh.ops.bisect_plane(bm,geom=list(verts)+list(edges)+head,dist=1e-7,
+  plane_co=(0,0,0),plane_no=(0,0,1),clear_inner=False,clear_outer=False)
+ for v in bm.verts:v.co.z+=seam(v.co.x)
+ bm.to_mesh(o.data);bm.free()
+def split(o,label,test,mouth=False):
+ if mouth:bisect_mouth(o)
  part=o.copy();part.data=o.data.copy();part.name=o.name+' '+label;bpy.context.collection.objects.link(part)
  for target,keep in [(o,False),(part,True)]:
   bm=bmesh.new();bm.from_mesh(target.data)
@@ -276,8 +372,16 @@ def split(o,label,test,plane=None):
  parts.setdefault(label,{})[o.name]=part
  return part
 for o in [auth,puppet]:
- split(o,'lower jaw',is_jaw,plane=[((HINGE_X,0,0),(1,0,0)),((HINGE_X,0,seam(HINGE_X)),(.20,0,1))])
+ split(o,'lower jaw',is_jaw,mouth=True)
  split(o,'ventral gastral armour',is_armour)
+# Every measured tooth must belong whole to one jaw, and the chisels to the skull.
+toothcheck=[]
+for g in TEETH+[q for q in PATCHES if q not in TEETH]:
+ p=SNOUT_CO[g];below=sum(1 for c in p if is_jaw(Vector((float(c[0]),float(c[1]),float(c[2])))));tooth=PROUD[g].max()>=TOOTH_PROUD
+ toothcheck.append({'vertices':len(g),'x':[float(p[:,0].min()),float(p[:,0].max())],
+  'y':[float(p[:,1].min()),float(p[:,1].max())],'z':[float(p[:,2].min()),float(p[:,2].max())],
+  'proudMax':float(PROUD[g].max()),'tooth':bool(tooth),'onJaw':int(below),'onSkull':int(len(g)-below)})
+ if tooth:assert below==0,('a chisel is cut by the jaw seam',toothcheck[-1])
 
 arm=bpy.data.armatures.new('Placodus shared skeleton');rig=bpy.data.objects.new('Placodus_Rig',arm)
 bpy.context.collection.objects.link(rig);bpy.context.view_layer.objects.active=rig;rig.select_set(True)
@@ -312,10 +416,17 @@ for label,bonename in [('lower jaw','jaw'),('ventral gastral armour','gastralia'
   mo=o.modifiers.new('Rigid '+bonename,'ARMATURE');mo.object=rig;o.parent=rig
 
 # ---- mouth interior: the palate Placodus is named for ------------------------------------------
+# The lining faces *inwards*: what an open mouth shows is the far wall of the lumen, and the near
+# wall has to be got out of the way, so this one material is the one thing here that culls its
+# backfaces. The skin does the opposite (below), because a cut shell is no longer closed.
 mouthmat=bpy.data.materials.new('Placodus mouth interior');mouthmat.use_nodes=True
+mouthmat.use_backface_culling=True
 mbs=mouthmat.node_tree.nodes.get('Principled BSDF')
-mbs.inputs['Base Color'].default_value=(.085,.036,.030,1);mbs.inputs['Roughness'].default_value=.62
-mouthmat.diffuse_color=(.085,.036,.030,1)
+# Lighter than the shipped 0.085 red-black, which was so near black that a lined mouth and an
+# unlined one photographed the same: what closes the hole has to be seen to have closed it.
+MOUTH_COLOUR=(.26,.115,.10,1)
+mbs.inputs['Base Color'].default_value=MOUTH_COLOUR;mbs.inputs['Roughness'].default_value=.62
+mouthmat.diffuse_color=MOUTH_COLOUR
 toothmat=bpy.data.materials.new('Placodus crushing teeth');toothmat.use_nodes=True
 tbs=toothmat.node_tree.nodes.get('Principled BSDF')
 tbs.inputs['Base Color'].default_value=(.74,.70,.60,1);tbs.inputs['Roughness'].default_value=.32
@@ -327,41 +438,86 @@ def rigid(o,bonename,material):
  o.parent=rig;mo=o.modifiers.new('Jaw articulation','ARMATURE');mo.object=rig
  for p in o.data.polygons:p.use_smooth=True
  oralparts.append(o);return o
-def oral(name,lift,bonename):
- verts=[];faces=[];rings=14;ring=10
- for i in range(rings):
-  u=i/(rings-1);x=HINGE_X+.004+.072*u
-  wy=.001+.030*(sin(pi*min(1.,u*1.05))**.6)
-  wz=.0016+.0032*sin(pi*u)
-  for j in range(ring):
-   th=j*2*pi/ring
-   verts.append(tx((x,wy*cos(th),seam(x)+lift+wz*sin(th))))
- for i in range(rings-1):
-  for j in range(ring):
-   a=i*ring+j;b=i*ring+(j+1)%ring;faces.append((a,b,b+ring,a+ring))
- faces.append(tuple(reversed(range(ring))));faces.append(tuple(range((rings-1)*ring,rings*ring)))
- me=bpy.data.meshes.new(name);me.from_pydata(verts,[],faces);me.update()
- o=bpy.data.objects.new(name,me);bpy.context.collection.objects.link(o)
- return rigid(o,bonename,mouthmat)
-oral('Oral floor',-.0035,'jaw');oral('Palate',.0045,'skull')
-# Bean-shaped crushing bosses: three pairs on the palate, three on the mandible.
-for label,lift,bonename in [('Palate crushing teeth',.0055,'skull'),('Mandibular crushing teeth',-.0045,'jaw')]:
+# The old floor and palate were two ribbons 0.031 wide up the middle of a mouth measured at 0.042,
+# ending short of both the corner and the front, so an open jaw showed unlined gape at exactly the
+# places a gape is seen from. This is one lining on the cavity's own measured section, running from
+# behind the hinge to the front of the mandible, and it is *skinned* rather than split: the floor
+# follows the jaw, the roof follows the skull and the wall between them stretches, so no opening
+# the clips reach can part it.
+MOUTH_BACK=HINGE_X-.022
+MOUTH_FRONT=JAW_FRONT_X+.004
+# Seating here is not a ray or a nearest-distance: a point in the lumen is *outside* the closed
+# shell, and the axis of a nearly shut mouth is as often in flesh as in air, so neither test can be
+# trusted. What can be is the measurement itself -- the section is the cavity's own 92nd-percentile
+# half-width and 92nd-to-6th-percentile height, drawn in by LINING_INSET, so every ring vertex is
+# inside the span of surface vertices that bound the mouth at that station.
+LINING_INSET=.95
+def mouth_section(x):
+ e=smooth((x-MOUTH_BACK)/.016)*smooth((MOUTH_FRONT-x)/.005)
+ w=float(np.interp(x,MX,WIDE))*LINING_INSET*(.16+.84*e)
+ h=max(float(np.interp(x,MX,TALL))*LINING_INSET,.0022)*(.30+.70*e)
+ return w,h
+LINING_RINGS,LINING_RING=22,14
+lin_raw=[];verts=[];faces=[]
+for i in range(LINING_RINGS):
+ x=MOUTH_BACK+(MOUTH_FRONT-MOUTH_BACK)*(i/(LINING_RINGS-1));w,h=mouth_section(x)
+ for j in range(LINING_RING):
+  th=j*2*pi/LINING_RING;p=Vector((x,w*cos(th),seam(x)+h*sin(th)))
+  lin_raw.append(p);verts.append(tx(p))
+# Wound inwards: the lumen is what is looked into, so the near wall must cull and the far wall draw.
+for i in range(LINING_RINGS-1):
+ for j in range(LINING_RING):
+  a=i*LINING_RING+j;b=i*LINING_RING+(j+1)%LINING_RING
+  faces.append((a,a+LINING_RING,b+LINING_RING,b))
+faces.append(tuple(range(LINING_RING)))
+faces.append(tuple(reversed(range((LINING_RINGS-1)*LINING_RING,LINING_RINGS*LINING_RING))))
+me=bpy.data.meshes.new('Oral cavity lining');me.from_pydata(verts,[],faces);me.update()
+lining=bpy.data.objects.new('Oral cavity lining',me);bpy.context.collection.objects.link(lining)
+lining.location=(0,0,0);lining.data.materials.append(mouthmat)
+for n in ['skull','jaw']:lining.vertex_groups.new(name=n)
+for idx,p in enumerate(lin_raw):
+ w,h=mouth_section(p.x)
+ t=smooth(.5+.5*(seam(p.x)-p.z)/max(h,1e-6))
+ g=t*smooth((p.x-HINGE_X)/.014)*smooth((MOUTH_FRONT-p.x)/.006)
+ lining.vertex_groups['jaw'].add([idx],g,'REPLACE');lining.vertex_groups['skull'].add([idx],1-g,'REPLACE')
+for p in lining.data.polygons:p.use_smooth=True
+mo=lining.modifiers.new('Oral membrane','ARMATURE');mo.object=rig;lining.parent=rig
+oralparts.append(lining)
+# What went wrong before is a lining narrower than the mouth, so that is what is asserted: across
+# the stations the cavity was measured at, the lining carries the mouth's own section. (The shipped
+# ribbons were 0.031 at their widest against a mouth measured at 0.042, and stopped 0.004 short of
+# the hinge and 0.004 short of the mandible's front.)
+mouth_cover=[]
+for k,x in enumerate(MX):
+ if not MOUTH_BACK+.016<x<MOUTH_FRONT-.005:continue
+ w,h=mouth_section(float(x))
+ mouth_cover.append([round(float(x),4),round(w/float(WIDE[k]),3),round(h/max(float(TALL[k]),1e-6),3)])
+ assert w>=float(WIDE[k])*.90,('the oral lining is narrower than the mouth',x,w,WIDE[k])
+ assert h>=float(TALL[k])*.85,('the oral lining is shallower than the mouth',x,h,TALL[k])
+# Bean-shaped crushing bosses: three pairs on the palate, three on the mandible, seated in the
+# measured lumen rather than at a fixed offset, so the crush the clips perform is actually shown.
+for label,side,bonename in [('Palate crushing teeth',1,'skull'),('Mandibular crushing teeth',-1,'jaw')]:
  verts=[];faces=[]
  for k,(x,r) in enumerate([(.437,.0105),(.455,.0115),(.472,.0095)]):
+  w,h=mouth_section(x);lift=side*h*.46
   for sgn in (1,-1):
-   base=len(verts);cy=sgn*(.0125+.0035*k)
+   base=len(verts);cy=sgn*min(.0125+.0035*k,max(.005,w*.52))
    for a in range(7):
     for b in range(5):
      th=a*2*pi/7;ph=-pi/2+pi*b/4
-     verts.append(tx((x+r*1.25*cos(ph)*cos(th),cy+r*cos(ph)*sin(th),seam(x)+lift+(.42*r)*sin(ph)*(1 if lift>0 else -1))))
+     verts.append(tx((x+r*1.25*cos(ph)*cos(th),cy+r*cos(ph)*sin(th),seam(x)+lift+(.42*r)*sin(ph)*side)))
    for a in range(7):
     for b in range(4):
      p0=base+a*5+b;p1=base+((a+1)%7)*5+b;faces.append((p0,p1,p1+1,p0+1))
  me=bpy.data.meshes.new(label);me.from_pydata(verts,[],faces);me.update()
  o=bpy.data.objects.new(label,me);bpy.context.collection.objects.link(o);rigid(o,bonename,toothmat)
-# A closed cheek envelope around the actual hinge so no membrane stretches across the gape.
-bpy.ops.mesh.primitive_uv_sphere_add(segments=18,ring_count=10,location=tx((HINGE_X-.004,0,-.034)))
-o=bpy.context.object;o.name='Seated jaw hinge tissue';o.scale=(.095,.080,.070)
+# A closed cheek envelope around the actual hinge. It has to cover the jaw's own rear face -- the
+# square the cut leaves at x=HINGE_X, from the seam down to the chin -- because that face swings
+# into view the moment the mouth opens and is flat skin with the texture drawn across it. The old
+# envelope reached only to raw z -0.048 and left the lower half of it bare.
+HINGE_Z=(seam(HINGE_X)-.078)/2
+bpy.ops.mesh.primitive_uv_sphere_add(segments=18,ring_count=10,location=tx((HINGE_X-.006,0,HINGE_Z)))
+o=bpy.context.object;o.name='Seated jaw hinge tissue';o.scale=(.210,.105,.104)
 bpy.ops.object.transform_apply(location=False,rotation=False,scale=True)
 for v in o.data.vertices:v.co=o.matrix_world@v.co
 o.location=(0,0,0)
@@ -371,10 +527,12 @@ hbs.inputs['Roughness'].default_value=.7;hm.diffuse_color=(.30,.28,.23,1)
 o.data.materials.clear();o.data.materials.append(hm)
 for n in ['skull','jaw']:o.vertex_groups.new(name=n)
 for v in o.data.vertices:
- t=max(0.,min(1.,(tx((0,0,-.030)).z-v.co.z)/(.055*SCALE)))
+ t=max(0.,min(1.,(seam(HINGE_X)*SCALE-v.co.z)/(.040*SCALE)))
  o.vertex_groups['jaw'].add([v.index],t*.5,'REPLACE');o.vertex_groups['skull'].add([v.index],1-t*.5,'REPLACE')
 for p in o.data.polygons:p.use_smooth=True
 mo=o.modifiers.new('Hinge skin','ARMATURE');mo.object=rig;o.parent=rig;oralparts.append(o)
+hinge_depth=min(depth(Vector((-v.co.y/SCALE,v.co.x/SCALE,v.co.z/SCALE))) for v in o.data.vertices)
+assert hinge_depth>-.004,('the hinge envelope breaks the skin',hinge_depth)
 
 # ---- measured comparison of the two actual surfaces --------------------------------------------
 AUTH_GROUP=[auth,parts['lower jaw'][auth.name],parts['ventral gastral armour'][auth.name]]
@@ -415,7 +573,9 @@ open(os.path.join(HERE,'placodus-profile.json'),'w').write(json.dumps({
  'method':'21 exact plane-intersection envelopes of both actual meshes (body, lower jaw and ventral armour); 0.0055 raw-space voxel occupancy resurfacing',
  'bodyLength':model_length,'stations':profile,'maximumEnvelopeDifference':worst,
  'surfaceDistanceMax':max(distances),'surfaceDistanceP95':float(np.quantile(distances,.95)),
- 'surfaceTolerance':.25,'surfaceOutliersOver0p15':surface_outliers,'surfaceOutlierRegion':'the source lip crease at raw x 0.42, a fold finer than the 0.0055 voxel','seatingDepthRaw':seating,'tailStraightening':straightening},indent=2))
+ 'surfaceTolerance':.25,'surfaceOutliersOver0p15':surface_outliers,'surfaceOutlierRegion':'the source lip crease at raw x 0.42, a fold finer than the 0.0055 voxel','seatingDepthRaw':seating,
+ 'mouthSeam':[[round(float(a),5),round(float(b),5)] for a,b in zip(MX,MID)],'jawFrontX':JAW_FRONT_X,
+ 'liningCoverage':mouth_cover,'tailStraightening':straightening},indent=2))
 
 # ---- performance ------------------------------------------------------------------------------
 scene=bpy.context.scene;scene.render.fps=30;rig.animation_data_create()
@@ -664,6 +824,15 @@ report={'sourceSha256':hashlib.sha256(open(RAW,'rb').read()).hexdigest(),
  'modelLength':model_length,'maximumEnvelopeDifference':worst,'envelopeTolerance':.2,'envelopeTolerancePercent':4.,
  'surfaceDistanceMax':max(distances),'surfaceDistanceP95':float(np.quantile(distances,.95)),'surfaceDistanceP99':float(np.quantile(distances,.99)),'surfaceOutliersOver0p15':surface_outliers,'surfaceVertices':len(distances),
  'seatingDepthRaw':seating,'maxInfluences':max(influences),'meanInfluences':float(np.mean(influences)),
+ 'mouth':{'method':'the modelled oral cavity, found by casting each head vertex normal back into the mesh over %.3f raw units; the seam is the mid height of that cavity per station and the lining is its measured section'%MOUTH_GAP,
+  'cavityVertices':int(len(CAV)),'hingeX':HINGE_X,'jawFrontX':JAW_FRONT_X,
+  'seam':[[round(float(a),5),round(float(b),5)] for a,b in zip(MX,MID)],
+  'cavityHalfWidth':[[round(float(a),5),round(float(b),5)] for a,b in zip(MX,WIDE)],
+  'cavityHalfHeight':[[round(float(a),5),round(float(b),5)] for a,b in zip(MX,TALL)],
+  'shippedSeamError':[[round(float(a),5),round(float((-.041-.20*(a-HINGE_X))-b),5)] for a,b in zip(MX,MID)],
+  'toothProudThreshold':TOOTH_PROUD,'snoutPatches':toothcheck,
+  'liningInset':LINING_INSET,'liningCoverage':mouth_cover,'liningRings':LINING_RINGS,'liningRing':LINING_RING,
+  'liningBackX':MOUTH_BACK,'liningFrontX':MOUTH_FRONT,'skinDoubleSided':True,'liningCullsBackfaces':True},
  'tailStraightening':straightening,
  'normalizedWeights':True,'rootStable':True,'armourBoneUnanimated':True,'noScaleChannels':True}
 open(os.path.join(HERE,'validation.json'),'w').write(json.dumps(report,indent=2))

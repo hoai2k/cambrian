@@ -200,7 +200,12 @@ unless the user explicitly asks for a PR. Steps:
   twin rebuilt to its own volume on the same skeleton, sharing inverse binds, clips and anchors.
   That pairing is the pipeline's verification step, so the specimen viewer swaps between them in
   place — same camera, same scale, same clip at the same frame (`puppet` on `ViewerSpecimen`,
-  the *Body* control in `src/viewer/Viewer.tsx`) — and a twin is never a second row in the roster.
+  the one *Model* control in `src/viewer/Viewer.tsx`) — and a twin is never a second row in the roster.
+  That control lists what a specimen actually has rather than crossing two axes: a paired body's LOD1
+  **is** its twin, the same file byte for byte, so *Reduced model* and *Procedural twin* were two
+  names for one thing under two dropdowns until they were merged. An animal whose own body is not
+  built has no full model to offer — `model` resolves for it to the body it borrows in play — so its
+  raw generation heads the list.
   Sculpt is off on the twin: a sculpt is the hand-off into a builder's profile rows for the body
   that ships. A model landing also moves its canonical state to `delivered`, which
   `tools/triassic/apply-selections.mjs` derives from `tools/triassic/shipped.json`; a regenerated
@@ -365,10 +370,54 @@ unless the user explicitly asks for a PR. Steps:
   reduced model, with an Edited/Original toggle for the preview. Undo/redo, in-memory only (a reload
   returns to what ships). *Export sculpt* writes `<id>-sculpt.json`, which is the hand-off for a
   builder port: the change goes into the builder's profile rows, never into the GLB
-  (`docs/viewer-sculpt.md`). `src/viewer/sculpt/profile.ts` is pure and `npm run sculpt` guards it;
+  (`docs/viewer-sculpt.md`). Sculpt is offered only where a builder authors a profile table by hand — the Cambrian and the
+  Devonian. A Triassic body is Tripo-derived and its builder *measures* its profile off the intake
+  surface rather than authoring one, so a sculpt exported there would describe a table nobody
+  writes; that era's editors are *Stretch* (lengthen a run of the raw generation) and *Mark region*
+  (say what to cut off it), and `?mode=sculpt` on a Triassic animal opens the view instead.
+  `src/viewer/sculpt/profile.ts` is pure and `npm run sculpt` guards it;
   `tools/sculpt-browser.mjs` drives the mode in a browser; `npm run sculpt:measure -- <glb> [sculpt.json]`
   measures a model the same way and reports how far a rebuilt candidate is from a sculpt's target,
   which is how a port is checked.
+- The viewer also has a **mark mode** (`&mode=mark`, the *Mark region* button), which is the answer
+  to geometry that is welded to the body and should not be there — the extra fins and spare tails on
+  the raw generated meshes, where 19 of the 21 bodies are one connected surface and only a human can
+  say which fin is wanted (`docs/triassic/preview-mesh-defects.md`). Left-drag paints a world-space
+  brush over the vertices and right-drag orbits; *Export region* writes `<id>-region.json`: vertex
+  indices into one exact file, with that file's sha256 and the box the marked vertices occupy, so
+  `tools/triassic/cut-region.py` can refuse a region marked on a mesh that has since changed rather
+  than delete geometry at random. It marks on **whatever body is on stage**, the generated mesh
+  included — which is the whole point of it, and where sculpt mode refuses. The cut lands in the
+  gitignored workbench (`local/triassic/cuts/`) and never over the source, and never in `public/`
+  either: a stray `.glb` in the creature folder reads to `review-bodies.mjs` as an animal's own body
+  awaiting review. Installing a cut mesh is a separate human decision.
+  `src/viewer/mark/region.ts` is pure and `npm run mark` guards it, `tools/mark-browser.mjs` drives
+  the mode in a browser, and `docs/viewer-mark.md` is the schema and the whole workflow.
+- Sculpt reshapes a body; the **neck stretcher** lengthens one. A Tripo generation's commonest
+  fault is the one a profile table cannot reach — a run of body that is the wrong *length*, a
+  Dinocephalosaurus with a lizard's neck — so the viewer offers exactly one of the two at a time:
+  sculpt on a shipped rigged body, stretch (`&mode=stretch`) on a raw generated one, because a
+  sculpt exported off an unrigged mesh would name a model nobody ships. The edit is two cuts across
+  the body, one direction and a factor (`src/viewer/stretch/stretch.ts`): behind the first cut
+  nothing moves at all, past the second the head is carried rigidly, and between them the body is
+  scaled uniformly along the direction — linear, because easing would pile the new length into the
+  middle of the neck and pinch it at both ends. Both cuts are square to that one direction rather
+  than each carrying their own: what is wanted is to *aim* the lengthening, and sharing it makes
+  the map an exact uniform scale. The seam is real and is why the cuts are placed by hand — put
+  them where the body already changes. It is offered on a *built* body too, and there it means
+  something else: the editor holds the rig at rest and the export is a measurement (`appliesTo`),
+  because every clip these files carry re-specifies each joint's translation on every frame — a
+  warped bind pose would show at rest and then flail — so the numbers go to the animal's builder,
+  where the rig and the clips are generated downstream of the mesh and follow it by themselves.
+  Which way a body lies is never taken from its bounding box if anything better exists: the mouth
+  socket, then the generation's authored `previewYaw`, then the box, and the panel says which and
+  lets a human override it — because Rhaeticosaurus' flippers span further than it is long, so its
+  box says the animal runs across itself. `npm run stretch` and
+  `node tools/stretch-browser.mjs` check it; `npm run triassic:stretch -- <file> --write` bakes a
+  *generation's* stretch into `tools/triassic/creatures/<id>/<id>.preview.glb` (never into
+  `tripo-raw/`, and it refuses a rigged body by name), importing the viewer's own `warp()` so the
+  file is what was previewed and reading the result back to prove it. `docs/viewer-stretch.md` is
+  the whole of it; Blender work it implies goes in `docs/triassic/builder-requests.md`.
 - `?debug=local` on any game page (`/cambrian/?debug=local`, `/devonian/?debug=local`) opens an editor for that
   era's saved state — `src/app/DebugLocal.tsx`, gated by `src/shared/debug.ts`, mounted by
   `src/app/Root.tsx` so both entry points get it without knowing about it. A new thing kept in
@@ -452,7 +501,11 @@ unless the user explicitly asks for a PR. Steps:
   `/cambrian/` rather than an unfiltered dashboard, since one GoatCounter site counts a whole domain
   and `hoai` also holds other games. `npm run stats` models the matching and checks every view
   counts what it claims; `node tools/stats-smoke.mjs <outdir>` drives both states in a browser with
-  `gc.zgo.at` intercepted; `docs/stats.md` is the whole of it.
+  `gc.zgo.at` intercepted; `docs/stats.md` is the whole of it. Every *other* browser tool answers
+  that request with an empty script (`silenceCounter` in `tools/qa-counter.mjs`, called on each
+  page it opens): a network that blocks the counter makes the browser log a console error, and
+  these tools fail on console errors — one blocked counter would otherwise fail a check about
+  creature meshes.
 - All docs live in `docs/`. Design docs are in `docs/redesign/`. Image, glyph and prop
   needs go in `docs/image-requests.md` and move to `docs/image-requests-history.md` once
   delivered and integrated; sound and music needs go in `docs/audio-requests.md`.
