@@ -303,7 +303,73 @@
       "peakRadiusRisesInStepsOf": [
         10,
         20
-      ]
+      ],
+      "symphysealVertices": 321,
+      "radialGapsOverTheVertices": {
+        "rays": 61,
+        "max": 0.04896414777302228,
+        "mean": 0.014761424587381628,
+        "raysWithAGapOverOnePercentOfBodyLength": 39,
+        "worstRaysDegreesAndGap": [
+          [
+            310.0,
+            0.04896
+          ],
+          [
+            305.0,
+            0.03485
+          ],
+          [
+            290.0,
+            0.02738
+          ],
+          [
+            250.0,
+            0.02712
+          ],
+          [
+            325.0,
+            0.02638
+          ],
+          [
+            30.0,
+            0.02551
+          ]
+        ]
+      },
+      "surfaceSamples": 74360,
+      "radialGapsOverTheSurface": {
+        "rays": 72,
+        "max": 0.0543220557693572,
+        "mean": 0.006043447706088428,
+        "raysWithAGapOverOnePercentOfBodyLength": 11,
+        "worstRaysDegreesAndGap": [
+          [
+            315.0,
+            0.05432
+          ],
+          [
+            310.0,
+            0.03307
+          ],
+          [
+            305.0,
+            0.03252
+          ],
+          [
+            225.0,
+            0.01578
+          ],
+          [
+            230.0,
+            0.01563
+          ],
+          [
+            235.0,
+            0.01441
+          ]
+        ]
+      }
     },
     "stations": [
       {
@@ -433,312 +499,383 @@
     "note": "the shipped authored body, decoded by audit.mjs --decode; coordinates divided by the builder's 5x so both bodies are measured in one space",
     "bodyLength": 0.9999999403953552,
     "snoutY": -0.4999999701976776,
-    "vertices": 12845,
-    "connectedComponents": 151,
+    "vertices": 9615,
+    "connectedComponents": 1,
     "largestComponents": [
-      9615,
-      1442,
-      12,
-      12
+      9615
     ],
-    "whorlVertices": 3230,
-    "whorlEnclosedByTheChin": 3199,
-    "whorlOnTheVentralSilhouette": 31,
-    "whorlEnclosedFraction": 0.9904024767801858,
+    "whorlVertices": 369,
+    "whorlEnclosedByTheChin": 361,
+    "whorlOnTheVentralSilhouette": 8,
+    "whorlEnclosedFraction": 0.978319783197832,
     "whorlExtentFractionOfBodyLength": [
-      0.06269789115773983,
-      0.12459111956305025
+      0.03913963074324314,
+      0.13885975711701853
     ],
     "exposedArcFractionOfBodyLength": [
-      0.06269789115773983,
-      0.07970539210470867
+      0.06303316730458541,
+      0.09234029605032779
     ],
     "clearanceAboveTheChin": {
       "method": "for each enclosed whorl vertex, the gap to the chin skin straight below it",
-      "min": 1.81354934625233e-07,
-      "median": 0.0012541250325739384,
-      "max": 0.044392943382263184
+      "min": 0.00018272527086082846,
+      "median": 0.021619165316224098,
+      "max": 0.062249720096588135
     },
-    "whorlLateralHalfWidth": 0.0064999996684491634,
-    "symphysealMassWithinThreeHundredthsOfTheMidline": 1.0,
-    "upperJawSurfaceVertices": 126,
+    "whorlLateralHalfWidth": 0.0805145651102066,
+    "symphysealMassWithinThreeHundredthsOfTheMidline": 0.8021680216802168,
+    "upperJawSurfaceVertices": 158,
     "upperJawToothMaterial": 0,
-    "upperJawMaximumProtrusion": 0.0008241406875213132,
-    "lowerJawSurfaceVerticesOutsideTheSymphysis": 29,
+    "upperJawMaximumProtrusion": 0.0015790671099431837,
+    "lowerJawSurfaceVerticesOutsideTheSymphysis": 0,
     "lowerJawToothMaterialOutsideTheSymphysis": 0,
-    "lowerJawMaximumProtrusionOutsideTheSymphysis": 0.0007640403989316981,
+    "lowerJawMaximumProtrusionOutsideTheSymphysis": null,
     "protrusionThreshold": 0.0018,
     "spiral": {
       "fittedCentreYZ": [
-        -0.42337610721588137,
-        -0.0334501827834174
+        -0.3910562574863434,
+        -0.03813358880579472
       ],
       "largestRadialGapPerRay": {
-        "rays": 69,
-        "max": 0.016732835377942828,
-        "mean": 0.006885293162366043,
-        "raysWithAGapOverOnePercentOfBodyLength": 9
+        "rays": 66,
+        "max": 0.06423617837841934,
+        "mean": 0.01729805458926715,
+        "raysWithAGapOverOnePercentOfBodyLength": 52
       },
-      "medianRadialSpreadInSevenPointFiveDegreeBins": 0.014303509987160108,
-      "meanRadius": 0.0191613262468053,
-      "radialSpreadOverMeanRadius": 0.7464780779224445,
+      "medianRadialSpreadInSevenPointFiveDegreeBins": 0.015728285047464277,
+      "meanRadius": 0.02394574663628592,
+      "radialSpreadOverMeanRadius": 0.6568300118748687,
       "angularBins": 72,
-      "emptyAngularBins": 1,
-      "angularBinsWithFewerThanThreeVertices": 10,
+      "emptyAngularBins": 2,
+      "angularBinsWithFewerThanThreeVertices": 16,
       "occupancy": [
         2,
-        1,
         2,
+        13,
+        4,
+        12,
+        3,
+        5,
+        2,
+        3,
+        5,
+        5,
+        9,
+        14,
+        23,
+        12,
+        12,
+        14,
+        4,
+        5,
+        2,
+        3,
+        7,
+        3,
+        1,
+        1,
+        6,
+        4,
+        4,
+        3,
+        1,
+        4,
+        2,
+        7,
+        4,
+        3,
+        4,
+        2,
+        3,
+        2,
+        1,
+        3,
+        4,
         0,
-        7,
         4,
         3,
         5,
+        6,
+        5,
+        3,
+        4,
+        0,
+        2,
+        3,
+        3,
+        6,
         2,
         5,
-        13,
-        7,
+        4,
         5,
-        7,
-        21,
+        4,
+        4,
+        6,
+        2,
+        18,
         12,
-        15,
-        28,
-        12,
-        25,
-        30,
-        50,
-        56,
-        46,
-        73,
-        82,
-        68,
-        138,
-        114,
-        176,
-        169,
-        216,
-        152,
-        200,
-        164,
-        191,
-        158,
-        148,
-        136,
-        114,
-        90,
-        98,
-        49,
-        60,
-        46,
-        42,
-        11,
-        28,
-        16,
-        15,
-        24,
-        7,
+        6,
         5,
-        13,
-        11,
         7,
         3,
-        2,
-        3,
-        4,
+        7,
         5,
-        2,
-        3,
-        2,
-        4,
-        1,
-        2,
-        3,
-        4,
-        4,
-        5,
-        4
+        7
       ],
       "radialMaxPerBin": [
-        0.0064831866998929,
-        0.005666917454271623,
-        0.001207713895614062,
+        0.02435244259096675,
+        0.02647372217296601,
+        0.04641598692202645,
+        0.03772913452899156,
+        0.045160819038888536,
+        0.05077738999432607,
+        0.04605414689897901,
+        0.052680348313379435,
+        0.027351699499730896,
+        0.03968743318634548,
+        0.02824895746456044,
+        0.031237320018356614,
+        0.030802566914945286,
+        0.025722551641266855,
+        0.02362921893256885,
+        0.024073214321260965,
+        0.02374559770165554,
+        0.02205664235019268,
+        0.023931126885843944,
+        0.020374921751284872,
+        0.022316363986979976,
+        0.02229159717916148,
+        0.020180772429468787,
+        0.020859337418480058,
+        0.021460390648029768,
+        0.022626789528958306,
+        0.024792917431054932,
+        0.0261168547064027,
+        0.025765968363204966,
+        0.027291494742568295,
+        0.02909931053623004,
+        0.024927892794729803,
+        0.025423725489339747,
+        0.03069212953716946,
+        0.012876532889991346,
+        0.02860271300612557,
+        0.011349342300274104,
+        0.0188206440806296,
+        0.02051458530656541,
+        0.02469359273247757,
+        0.027815532388148483,
+        0.021784145160662398,
         null,
-        0.015149035876574039,
-        0.015526815243775614,
-        0.006856572219197276,
-        0.008765983810328499,
-        0.009253171052851438,
-        0.018776600444118517,
-        0.019321846160608242,
-        0.013808678050053667,
-        0.012889941953645914,
-        0.023225592465362075,
-        0.023830918833800018,
-        0.015589441468947468,
-        0.027895659620433395,
-        0.028499467280616135,
-        0.021918686851480493,
-        0.03243959369516469,
-        0.033004387924925445,
-        0.02668134234109073,
-        0.03713593063770159,
-        0.030448154238001388,
-        0.04074347973014578,
-        0.033696888625591885,
-        0.04339294902276478,
-        0.04371289723560179,
-        0.03922030101852917,
-        0.04595760456250946,
-        0.040866243917250994,
-        0.0474147857934787,
-        0.04175427462337297,
-        0.04806506739684901,
-        0.0389542124321937,
-        0.047970197602684096,
-        0.04783120571616771,
-        0.04121945118369942,
-        0.04703720873003005,
-        0.039725504126682444,
-        0.04529795187295308,
-        0.03754049262518592,
-        0.042814715802439195,
-        0.04235540276581601,
-        0.03202378996985773,
-        0.02544073607056192,
-        0.02849089423329419,
-        0.02792141584739389,
-        0.021124725748568766,
-        0.02457574694774781,
-        0.023969375156444137,
-        0.017046315286191407,
-        0.011686721927122298,
-        0.02051775831513429,
-        0.012953318378347954,
-        0.008883798578092727,
-        0.008012890188560369,
-        0.016732835377942828,
-        0.016218299196624233,
-        0.009872331538671201,
-        0.00948084618539265,
-        0.007234749481334373,
-        0.005897898089089771,
-        0.013973106395570842,
-        0.013681253262743703,
-        0.00548724450080069,
-        0.0027535188786320447,
-        0.007880663488523173,
-        0.002941404832633864,
-        0.008093936205777898,
-        0.013296166784527453,
-        0.013360122472012324
+        0.023592389699040508,
+        0.015407452403798795,
+        0.021076463088048534,
+        0.019513706148137005,
+        0.01979433324499533,
+        0.0185230623195977,
+        0.019694250851806823,
+        null,
+        0.07353165692905207,
+        0.01924950054842559,
+        0.015823546022167317,
+        0.04507763533826841,
+        0.026730229176157794,
+        0.024330085519342144,
+        0.05466478618870653,
+        0.04739204653794551,
+        0.027403961972032768,
+        0.03345102364144863,
+        0.033905675743628357,
+        0.02724828184155669,
+        0.09133812292973413,
+        0.08927318589025424,
+        0.04696954758226232,
+        0.039482275039290284,
+        0.040143889361969685,
+        0.04093838129534174,
+        0.035834901968882144,
+        0.032790360854416646,
+        0.04463100607928758
       ],
-      "radialPeakCount": 22,
+      "radialPeakCount": 24,
       "radialPeaks": [
         {
+          "binDegrees": 10,
+          "radius": 0.04641598692202645
+        },
+        {
           "binDegrees": 25,
-          "radius": 0.015526815243775614
+          "radius": 0.05077738999432607
         },
         {
-          "binDegrees": 50,
-          "radius": 0.019321846160608242
+          "binDegrees": 35,
+          "radius": 0.052680348313379435
         },
         {
-          "binDegrees": 70,
-          "radius": 0.023830918833800018
+          "binDegrees": 45,
+          "radius": 0.03968743318634548
         },
         {
-          "binDegrees": 85,
-          "radius": 0.028499467280616135
+          "binDegrees": 55,
+          "radius": 0.031237320018356614
+        },
+        {
+          "binDegrees": 75,
+          "radius": 0.024073214321260965
+        },
+        {
+          "binDegrees": 90,
+          "radius": 0.023931126885843944
         },
         {
           "binDegrees": 100,
-          "radius": 0.033004387924925445
-        },
-        {
-          "binDegrees": 110,
-          "radius": 0.03713593063770159
-        },
-        {
-          "binDegrees": 120,
-          "radius": 0.04074347973014578
+          "radius": 0.022316363986979976
         },
         {
           "binDegrees": 135,
-          "radius": 0.04371289723560179
+          "radius": 0.0261168547064027
         },
         {
-          "binDegrees": 145,
-          "radius": 0.04595760456250946
-        },
-        {
-          "binDegrees": 155,
-          "radius": 0.0474147857934787
+          "binDegrees": 150,
+          "radius": 0.02909931053623004
         },
         {
           "binDegrees": 165,
-          "radius": 0.04806506739684901
+          "radius": 0.03069212953716946
         },
         {
           "binDegrees": 175,
-          "radius": 0.047970197602684096
-        },
-        {
-          "binDegrees": 190,
-          "radius": 0.04703720873003005
+          "radius": 0.02860271300612557
         },
         {
           "binDegrees": 200,
-          "radius": 0.04529795187295308
+          "radius": 0.027815532388148483
         },
         {
-          "binDegrees": 210,
-          "radius": 0.042814715802439195
+          "binDegrees": 215,
+          "radius": 0.023592389699040508
         },
         {
-          "binDegrees": 230,
-          "radius": 0.02849089423329419
+          "binDegrees": 225,
+          "radius": 0.021076463088048534
+        },
+        {
+          "binDegrees": 235,
+          "radius": 0.01979433324499533
         },
         {
           "binDegrees": 245,
-          "radius": 0.02457574694774781
+          "radius": 0.019694250851806823
         },
         {
-          "binDegrees": 265,
-          "radius": 0.02051775831513429
+          "binDegrees": 255,
+          "radius": 0.07353165692905207
+        },
+        {
+          "binDegrees": 270,
+          "radius": 0.04507763533826841
         },
         {
           "binDegrees": 285,
-          "radius": 0.016732835377942828
+          "radius": 0.05466478618870653
+        },
+        {
+          "binDegrees": 305,
+          "radius": 0.033905675743628357
         },
         {
           "binDegrees": 315,
-          "radius": 0.013973106395570842
+          "radius": 0.09133812292973413
         },
         {
-          "binDegrees": 335,
-          "radius": 0.007880663488523173
+          "binDegrees": 340,
+          "radius": 0.04093838129534174
         },
         {
           "binDegrees": 355,
-          "radius": 0.013360122472012324
+          "radius": 0.04463100607928758
         }
       ],
       "peakAngularSpacingDegrees": {
         "min": 10.0,
-        "max": 30.0,
-        "mean": 16.363636363636363,
-        "coefficientOfVariation": 0.38188130791298674
+        "max": 35.0,
+        "mean": 15.0,
+        "coefficientOfVariation": 0.408248290463863
       },
       "peakRadii": {
-        "min": 0.007880663488523173,
-        "max": 0.04806506739684901,
-        "ratioMaxOverMin": 6.099114302602501
+        "min": 0.019694250851806823,
+        "max": 0.09133812292973413,
+        "ratioMaxOverMin": 4.637806414522969
       },
       "peakRadiusRisesInStepsOf": [
-        11,
-        21
-      ]
+        9,
+        23
+      ],
+      "symphysealVertices": 308,
+      "radialGapsOverTheVertices": {
+        "rays": 57,
+        "max": 0.039912751199188454,
+        "mean": 0.016906530420107393,
+        "raysWithAGapOverOnePercentOfBodyLength": 47,
+        "worstRaysDegreesAndGap": [
+          [
+            315.0,
+            0.03991
+          ],
+          [
+            340.0,
+            0.03527
+          ],
+          [
+            10.0,
+            0.03117
+          ],
+          [
+            35.0,
+            0.02727
+          ],
+          [
+            25.0,
+            0.02687
+          ],
+          [
+            30.0,
+            0.02567
+          ]
+        ]
+      },
+      "surfaceSamples": 72465,
+      "radialGapsOverTheSurface": {
+        "rays": 72,
+        "max": 0.05605358957676108,
+        "mean": 0.0075460384290675815,
+        "raysWithAGapOverOnePercentOfBodyLength": 16,
+        "worstRaysDegreesAndGap": [
+          [
+            310.0,
+            0.05605
+          ],
+          [
+            315.0,
+            0.03861
+          ],
+          [
+            320.0,
+            0.03503
+          ],
+          [
+            20.0,
+            0.01959
+          ],
+          [
+            25.0,
+            0.01704
+          ],
+          [
+            65.0,
+            0.01466
+          ]
+        ]
+      }
     },
     "stations": [
       {
@@ -746,103 +883,103 @@
         "frac": 0.02999997198581531,
         "whorlVertices": 0,
         "whorlLowestZ": null,
-        "ventralSilhouetteZ": 0.0007125490810722113,
+        "ventralSilhouetteZ": 0.002693143440410495,
         "whorlAboveTheSilhouetteBy": null
       },
       {
         "y": -0.45999999999999996,
         "frac": 0.039999972581861803,
-        "whorlVertices": 0,
-        "whorlLowestZ": null,
-        "ventralSilhouetteZ": -0.00415995717048645,
-        "whorlAboveTheSilhouetteBy": null
+        "whorlVertices": 11,
+        "whorlLowestZ": 0.017517929896712303,
+        "ventralSilhouetteZ": -0.003651769831776619,
+        "whorlAboveTheSilhouetteBy": 0.021169699728488922
       },
       {
         "y": -0.44999999999999996,
         "frac": 0.049999973177908295,
-        "whorlVertices": 0,
-        "whorlLowestZ": null,
-        "ventralSilhouetteZ": -0.009571855887770653,
-        "whorlAboveTheSilhouetteBy": null
+        "whorlVertices": 2,
+        "whorlLowestZ": 0.019635243341326714,
+        "ventralSilhouetteZ": -0.009944576770067215,
+        "whorlAboveTheSilhouetteBy": 0.02957982011139393
       },
       {
         "y": -0.43999999999999995,
         "frac": 0.05999997377395479,
-        "whorlVertices": 12,
-        "whorlLowestZ": -0.04864075779914856,
-        "ventralSilhouetteZ": -0.04864075779914856,
-        "whorlAboveTheSilhouetteBy": 0.0
+        "whorlVertices": 3,
+        "whorlLowestZ": -0.059826094657182693,
+        "ventralSilhouetteZ": -0.07172148674726486,
+        "whorlAboveTheSilhouetteBy": 0.011895392090082169
       },
       {
         "y": -0.42999999999999994,
         "frac": 0.06999997437000129,
-        "whorlVertices": 130,
-        "whorlLowestZ": -0.061896320432424545,
-        "ventralSilhouetteZ": -0.07623063027858734,
-        "whorlAboveTheSilhouetteBy": 0.014334309846162796
+        "whorlVertices": 21,
+        "whorlLowestZ": -0.06913036853075027,
+        "ventralSilhouetteZ": -0.07803508639335632,
+        "whorlAboveTheSilhouetteBy": 0.008904717862606049
       },
       {
         "y": -0.41999999999999993,
         "frac": 0.07999997496604777,
-        "whorlVertices": 620,
-        "whorlLowestZ": -0.06592949479818344,
-        "ventralSilhouetteZ": -0.08305563777685165,
-        "whorlAboveTheSilhouetteBy": 0.017126142978668213
+        "whorlVertices": 40,
+        "whorlLowestZ": -0.06710527092218399,
+        "ventralSilhouetteZ": -0.08750704675912857,
+        "whorlAboveTheSilhouetteBy": 0.02040177583694458
       },
       {
         "y": -0.4099999999999999,
         "frac": 0.08999997556209427,
-        "whorlVertices": 1293,
-        "whorlLowestZ": -0.06767825782299042,
-        "ventralSilhouetteZ": -0.08622009307146072,
-        "whorlAboveTheSilhouetteBy": 0.018541835248470306
+        "whorlVertices": 45,
+        "whorlLowestZ": -0.06515876203775406,
+        "ventralSilhouetteZ": -0.0893092229962349,
+        "whorlAboveTheSilhouetteBy": 0.024150460958480835
       },
       {
         "y": -0.3999999999999999,
         "frac": 0.09999997615814075,
-        "whorlVertices": 825,
-        "whorlLowestZ": -0.0672493427991867,
-        "ventralSilhouetteZ": -0.08768434822559357,
-        "whorlAboveTheSilhouetteBy": 0.02043500542640686
+        "whorlVertices": 93,
+        "whorlLowestZ": -0.06593751907348633,
+        "ventralSilhouetteZ": -0.092303566634655,
+        "whorlAboveTheSilhouetteBy": 0.02636604756116867
       },
       {
         "y": -0.3899999999999999,
         "frac": 0.10999997675418725,
-        "whorlVertices": 300,
-        "whorlLowestZ": -0.06435799598693848,
-        "ventralSilhouetteZ": -0.08315998315811157,
-        "whorlAboveTheSilhouetteBy": 0.018801987171173096
+        "whorlVertices": 78,
+        "whorlLowestZ": -0.062059130519628525,
+        "ventralSilhouetteZ": -0.08203013241291046,
+        "whorlAboveTheSilhouetteBy": 0.019971001893281937
       },
       {
         "y": -0.3799999999999999,
         "frac": 0.11999997735023374,
-        "whorlVertices": 50,
-        "whorlLowestZ": -0.05819813162088394,
-        "ventralSilhouetteZ": -0.0820133239030838,
-        "whorlAboveTheSilhouetteBy": 0.02381519228219986
+        "whorlVertices": 54,
+        "whorlLowestZ": -0.058456894010305405,
+        "ventralSilhouetteZ": -0.08059469610452652,
+        "whorlAboveTheSilhouetteBy": 0.022137802094221115
       },
       {
         "y": -0.3699999999999999,
         "frac": 0.12999997794628024,
-        "whorlVertices": 0,
-        "whorlLowestZ": null,
-        "ventralSilhouetteZ": -0.08013396710157394,
-        "whorlAboveTheSilhouetteBy": null
+        "whorlVertices": 18,
+        "whorlLowestZ": -0.056641679257154465,
+        "ventralSilhouetteZ": -0.0788208618760109,
+        "whorlAboveTheSilhouetteBy": 0.02217918261885643
       },
       {
         "y": -0.3599999999999999,
         "frac": 0.13999997854232674,
-        "whorlVertices": 0,
-        "whorlLowestZ": null,
-        "ventralSilhouetteZ": -0.07700745016336441,
-        "whorlAboveTheSilhouetteBy": null
+        "whorlVertices": 4,
+        "whorlLowestZ": -0.05053950473666191,
+        "ventralSilhouetteZ": -0.07647164911031723,
+        "whorlAboveTheSilhouetteBy": 0.02593214437365532
       },
       {
         "y": -0.34999999999999987,
         "frac": 0.1499999791383732,
         "whorlVertices": 0,
         "whorlLowestZ": null,
-        "ventralSilhouetteZ": -0.07563542574644089,
+        "ventralSilhouetteZ": -0.07499289512634277,
         "whorlAboveTheSilhouetteBy": null
       },
       {
