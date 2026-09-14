@@ -1,6 +1,6 @@
 # Defects in the raw Tripo preview bodies
 
-What a reviewer sees in the specimen viewer when the *Body* control is on **Generated mesh**: extra
+What a reviewer sees in the specimen viewer when the *Model* control is on **Generated mesh**: extra
 fins, spare tails, a floating flake beside one animal, a sliver beside another's neck, and two
 animals missing altogether. This records which of those have been fixed, which cannot be fixed by
 script and why, and which are not defects at all.
