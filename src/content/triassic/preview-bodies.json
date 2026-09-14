@@ -164,10 +164,10 @@
   {
     "id": "rhaeticosaurus",
     "model": "assets/triassic/creatures/rhaeticosaurus.preview.glb",
-    "bytes": 1320232,
-    "sha256": "41fef31957d942a181e638b90c3928621e99b905bd3c3737caacbd3b0a53aa73",
+    "bytes": 1320236,
+    "sha256": "6188fe3ef85752c5c9fd14839361c0167faaf3ad23f1529afa938a4daa5eda58",
     "yaw": 180,
-    "scale": 7.32,
+    "scale": 6.2892,
     "lengthUnits": 7.32
   },
   {
