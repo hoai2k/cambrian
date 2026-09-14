@@ -20,7 +20,7 @@ const { devActor, stageScale, ADULT_STAGE, PRIME_STAGE, STAGE_AT } = await impor
 const { AIR_LOW, AIR_MAX, triActor } = await import('../src/sim/triassic/state');
 /** Mirrors AIR_BOT_SEEK in the rules: the breath at which a bot starts up. Kept here so the test says what it is testing. */
 const AIR_BOT_SEEK_T = 80;
-const { shorePosts } = await import('../src/sim/triassic/shore');
+const { shoreClip, shorePosts } = await import('../src/sim/triassic/shore');
 const { brokeSurface, isAlive, lengthOf, bandOf, swimCeiling } = await import('../src/sim/actors');
 const { PLAYABLE, creature, CREATURES } = await import('../src/sim/creatures');
 const { emptyInput } = await import('../src/sim/types');
@@ -401,14 +401,24 @@ for (const [id, kind] of [['mixosaurus', 'a live-bearer'], ['placodus', 'an egg-
     p.spawnProtect = 0; p.iframes = 0;
     const hp0 = p.hp;
     let warned = 0, hit = false;
+    const clipsSeen = new Map<string, number>();
     for (let i = 0; i < 60 * 4; i++) {
       p.pos = { x: neck.pos.x, y: SURFACE_Y - 1.5, z: neck.pos.z - lengthOf(neck) * 0.3 }; p.vel = { x: 0, y: 0, z: 0 };
       tick(g);
+      const c = RULES!.clip?.(neck); if (c) clipsSeen.set(c.name, c.dur);
       const w = RULES!.hud(g, 0)?.shoreWarn ?? 0; if (w > warned) warned = w;
       if (p.hp < hp0 - 1) { hit = true; break; }
     }
     ok(warned > 0.5, `the strike is telegraphed on the HUD (warn reached ${warned.toFixed(2)})`);
     ok(hit, `and it lands (hp ${hp0.toFixed(0)} → ${p.hp.toFixed(0)})`);
+    // The performance is the same clock as the mechanic: the cycle names a clip per phase and the
+    // two clips the sim times against are exactly as long as it holds them (shoreClip is what the
+    // renderer asks, and it says nothing at all about any animal that is not on a post).
+    ok(clipsSeen.has('Lower') && clipsSeen.get('Lower') === 1.5, 'the telegraph names Lower, at TELEGRAPH');
+    ok([...clipsSeen.keys()].some((n) => n === 'SnapLeft' || n === 'SnapRight'),
+      `the strike names a snap and a side (${[...clipsSeen.keys()].join(', ')})`);
+    for (const [n, d] of clipsSeen) if (n.startsWith('Snap')) ok(d === 0.6, `${n} is the strike window`);
+    ok(shoreClip(p) === undefined, 'a body that is not on a post is left to the shared state machine');
     ok(isAlive(neck) && Math.abs(neck.pos.x - boom.pos.x) < 1e-6, 'the shore animal never leaves its post');
     // deep water is out of its reach (the strike may well have killed a Keichousaurus outright:
     // a respawned body is protected, and the protection is stripped so the test is about reach)
@@ -423,6 +433,78 @@ for (const [id, kind] of [['mixosaurus', 'a live-bearer'], ['placodus', 'an egg-
     neck.lastHitBy = notho.id; neck.sinceHit = 0; neck.hp -= 5;
     tick(g);
     ok(!isAlive(neck) && boom.cleared, 'a rung III bite on the neck while it is out severs it: the bank is clear');
+    // The sever is the one death this animal has a clip for, and it is the clip that plays. A post
+    // that is cleared any other way (the body simply gone) says nothing and the shared death runs.
+    const dead = RULES!.clip?.(neck);
+    ok(dead?.name === 'Severed' && dead.dur === 2.2, `the severed neck names Severed (${dead?.name ?? 'nothing'})`);
+  }
+}
+
+// ---- Coelophysis reaches too, and names the same chain ----
+{
+  // Tanystropheus is not the only animal on a bank that strikes: `reachOf` gives Coelophysis
+  // 0.6 of its length (the design's S04 — it "snatches a hatchling or anything small in the last
+  // stretch of shallows"), and its body carries the same four clips. Macrocnemus is the one that
+  // genuinely has no reach, and the check below says so rather than leaving it implied.
+  const g = new Game('reef', [{ creature: 'keichousaurus', device: 'keyboard', ready: true }]);
+  g.skipHatch();
+  run(g, 0.5);
+  const posts = shorePosts(g, { x: 0, y: 0, z: 0 }, 6000);
+  const kinds = new Set(posts.map((p) => p.kind));
+  ok(kinds.has('coelophysis'), `a Coelophysis stands on a bank somewhere (${[...kinds].join(', ')})`);
+  const theropod = posts.find((p) => p.kind === 'coelophysis');
+  if (theropod) {
+    const a = g.byId(theropod.actor)!;
+    const named = new Map<string, string>();
+    for (const phase of ['lower', 'strike', 'rest'] as const) {
+      theropod.phase = phase; theropod.t = 0;
+      const c = RULES!.clip?.(a);
+      if (c) named.set(phase, c.name);
+    }
+    ok(named.get('lower') === 'Lower', `its telegraph names Lower (${named.get('lower')})`);
+    ok((named.get('strike') ?? '').startsWith('Snap'), `its strike names a snap (${named.get('strike')})`);
+    ok(named.get('rest') === 'Retract', `its recovery names Retract (${named.get('rest')})`);
+  }
+  const runner = posts.find((p) => p.kind === 'macrocnemus');
+  if (runner) {
+    const a = g.byId(runner.actor)!;
+    ok(runner.phase === 'watch', 'Macrocnemus never leaves the watch: the design makes it ambient only');
+    ok(RULES!.clip?.(a) === undefined, 'so nothing names a clip for it and the shared state machine keeps it');
+  }
+}
+
+// ---- the snap goes toward what it is striking, not away from it ----
+{
+  // `src/render/creature.ts`: increasing yaw turns a creature to its left, so its right is
+  // (-cos yaw, 0, sin yaw). A shore animal is pinned facing the sea at yaw = PI, where that is +x.
+  // Reading "larger x is to its left" named the snap that swings the head the wrong way, which is
+  // invisible to every other check here: the hit lands either way.
+  const g = new Game('reef', [{ creature: 'keichousaurus', device: 'keyboard', ready: true }]);
+  g.skipHatch();
+  run(g, 0.5);
+  const p = g.players[0];
+  const boom = [...shorePosts(g, { x: 0, y: 0, z: 0 }, 3000)].find((q) => q.kind === 'tanystropheus');
+  ok(!!boom, 'a Tanystropheus to test the sides on');
+  if (boom) {
+    const neck = g.byId(boom.actor)!;
+    const right = { x: -Math.cos(neck.yaw), z: Math.sin(neck.yaw) };
+    for (const [label, sign, want] of [['its left', -1, 'SnapLeft'], ['its right', 1, 'SnapRight']] as const) {
+      boom.phase = 'watch'; boom.t = 0; boom.target = -1;
+      const off = lengthOf(neck) * 0.3 * sign;
+      const put = () => {
+        p.pos = { x: neck.pos.x + right.x * off, y: SURFACE_Y - 1.5, z: neck.pos.z - 2 + right.z * off };
+        p.vel = { x: 0, y: 0, z: 0 }; p.hp = p.hpMax; p.spawnProtect = 0; p.iframes = 0;
+        p.state = 'free'; p.hatching = false;
+      };
+      put(); p.prevT.x = p.pos.x; p.prevT.y = p.pos.y; p.prevT.z = p.pos.z;
+      let named: string | undefined;
+      for (let i = 0; i < 60 * 3 && !named; i++) {
+        put(); tick(g);
+        const c = RULES!.clip?.(neck);
+        if (c && c.name.startsWith('Snap')) named = c.name;
+      }
+      ok(named === want, `a target on ${label} is struck with ${want} (got ${named ?? 'no snap'})`);
+    }
   }
 }
 

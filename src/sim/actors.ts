@@ -103,6 +103,25 @@ export function applyScaleStats(a: Actor, keepFraction = true) {
   a.stamina = Math.min(a.stamina || a.staminaMax, a.staminaMax);
 }
 
+/**
+ * Whether `o` is actually coming for `a`: hunting it, fighting it, or seeing it off its own ground.
+ *
+ * Being *large* is not this. A giant on its patrol route is no more dangerous than the water it is
+ * swimming in, and a warning drawn over every big animal means "something big is there", which the
+ * animal's own size already said. The colour of a mark is for intent; the glyph under it is still
+ * the size band.
+ */
+export const comingFor = (o: Actor, a: Actor): boolean => {
+  if (o.id === a.id || !isAlive(o)) return false;
+  // A body somebody is steering says so by aiming: it has no brain to read.
+  if (o.controller === 'player' || o.controller === 'bot') {
+    if (o.lockTarget === a.id && (o.aiming || o.state === 'attack' || o.state === 'pounce')) return true;
+  }
+  const b = o.brain;
+  if (!b || b.target !== a.id) return false;
+  return b.goal === 'hunt' || b.goal === 'fight' || b.goal === 'defend';
+};
+
 export function makeActor(id: number, creatureId: CreatureId, controller: Controller, pos: Vec3, scale: number, player = -1): Actor {
   const a: Actor = {
     id, creature: creatureId, controller, player,
