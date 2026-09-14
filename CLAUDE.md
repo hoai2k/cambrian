@@ -369,6 +369,20 @@ unless the user explicitly asks for a PR. Steps:
   `tools/sculpt-browser.mjs` drives the mode in a browser; `npm run sculpt:measure -- <glb> [sculpt.json]`
   measures a model the same way and reports how far a rebuilt candidate is from a sculpt's target,
   which is how a port is checked.
+- The viewer also has a **mark mode** (`&mode=mark`, the *Mark region* button), which is the answer
+  to geometry that is welded to the body and should not be there — the extra fins and spare tails on
+  the raw generated meshes, where 19 of the 21 bodies are one connected surface and only a human can
+  say which fin is wanted (`docs/triassic/preview-mesh-defects.md`). Left-drag paints a world-space
+  brush over the vertices and right-drag orbits; *Export region* writes `<id>-region.json`: vertex
+  indices into one exact file, with that file's sha256 and the box the marked vertices occupy, so
+  `tools/triassic/cut-region.py` can refuse a region marked on a mesh that has since changed rather
+  than delete geometry at random. It marks on **whatever body is on stage**, the generated mesh
+  included — which is the whole point of it, and where sculpt mode refuses. The cut lands in the
+  gitignored workbench (`local/triassic/cuts/`) and never over the source, and never in `public/`
+  either: a stray `.glb` in the creature folder reads to `review-bodies.mjs` as an animal's own body
+  awaiting review. Installing a cut mesh is a separate human decision.
+  `src/viewer/mark/region.ts` is pure and `npm run mark` guards it, `tools/mark-browser.mjs` drives
+  the mode in a browser, and `docs/viewer-mark.md` is the schema and the whole workflow.
 - `?debug=local` on any game page (`/cambrian/?debug=local`, `/devonian/?debug=local`) opens an editor for that
   era's saved state — `src/app/DebugLocal.tsx`, gated by `src/shared/debug.ts`, mounted by
   `src/app/Root.tsx` so both entry points get it without knowing about it. A new thing kept in

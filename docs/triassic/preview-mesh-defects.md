@@ -69,11 +69,23 @@ Shonisaurus also have no preview, but only because they have shipped and their p
 schedule. Nothing is broken; the generations do not exist. They cannot be reviewed, built or
 compared until someone makes them, and they are the first thing to ask Tripo for.
 
-## What would unblock the welded ones
+## What unblocks the welded ones, and how to use it
 
 Automatic detection cannot separate an unwanted fin from a wanted one — both are the same surface,
 and only a human knows which is which. What a script *can* do is act precisely on a region a human
-points at. A selection tool in the specimen viewer — circle or paint the offending geometry on the
-model, export the vertex region, and let a builder cut exactly that — turns every row in the
-welded table from "needs a regeneration" into "needs thirty seconds of pointing". That is the
-cheapest way to clear this list, and it reuses the machinery sculpt mode already has.
+points at, and that is now built: **mark mode** in the specimen viewer
+(`/viewer/?specimen=<key>&mode=mark`, the *Mark region* button) paints the offending geometry onto
+the generated mesh itself and exports the vertex region, and
+`tools/triassic/cut-region.py` cuts exactly that and nothing else. Every row in the welded table
+goes from "needs a regeneration" to "needs thirty seconds of pointing".
+
+    # paint the fins in the viewer, export <id>-region.json, then:
+    /opt/blender/blender --background --factory-startup --python tools/triassic/cut-region.py \
+        -- <id>-region.json          # lands in local/triassic/cuts/, with before/after renders
+
+The whole of it — the brush, the file's schema, what the cutter refuses and what it will not
+attempt — is `docs/viewer-mark.md`. Two things it deliberately does not do: it never writes into
+`public/` at all (the cut lands in the gitignored workbench, because a stray `.glb` in the creature
+folder reads to `review-bodies.mjs` as a delivered body), and it does not decide anything. Whether a
+cut mesh replaces the preview it came from is a human call, and Helicoprion's row is still a redraw
+either way, because its pelvic and anal fins are in the greenlit pose.
