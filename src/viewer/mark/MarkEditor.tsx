@@ -232,7 +232,7 @@ export function MarkEditor({ scene, specimen, model, sha256, canvas, onExit }: P
         {error && <p className="sculpt-error">{error}</p>}
         <p className="hint">
           Paint over the geometry that should not be there — an extra fin, a spare tail — and export
-          it. The file is a list of vertex indices into <code>{model.split('/').pop()}</code>;
+          it. The file is a list of vertex indices into <code>{model.split('/').pop()}</code>;{' '}
           <code>tools/triassic/cut-region.py</code> cuts exactly those and nothing else.
         </p>
         <p className="mark-count" data-marked={marked} data-total={total}>{describeMarked(marked, total)}</p>
