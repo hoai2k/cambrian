@@ -62,10 +62,10 @@ There are two ways to act on it, and **the collapse is the right one for anythin
 
 | Animal | Region | Painted | Stands proud of its own base |
 |---|---|---:|---|
-| **Rhaeticosaurus** | the two spare tail blades | 361 verts | 0.1211 → 0.0086 (**7.1%**) |
-| **Phragmoteuthis** | the extra fin on top | — | 0.0887 → 0.0019 (**2.2%**) |
-| **Atopodentatus** | the ventral fins | 1054 verts | 0.1760 → 0.0219 (**12.5%**) |
-| **Askeptosaurus** | the extra belly fin | 628 verts | 0.1720 → 0.0289 (**16.8%**) |
+| **Phragmoteuthis** | the extra fin on top | — | 0.0899 → 0.0019 (**2.1%**) |
+| **Askeptosaurus** | the extra belly fin | 628 verts | 0.1823 → 0.0097 (**5.3%**) |
+| **Rhaeticosaurus** | the two spare tail blades | 361 verts | 0.1186 → 0.0073 (**6.1%**) |
+| **Atopodentatus** | the ventral fins | 1054 verts | 0.1838 → 0.0137 (**7.4%**) |
 
 All four are the published previews now; the untouched generations remain in
 `tools/triassic/creatures/<id>/tripo-raw/`. Rhaeticosaurus' neck stretch was re-baked on top, and
@@ -84,9 +84,20 @@ thickness (`--through`, default 0.01, which reaches the far side of a blade with
 open water to the body).
 
 **A pinned ring has to hold the surface somewhere.** Collapsing onto a fixed base leaves a thin
-spike standing on the old attachment, which is exactly what Askeptosaurus did. Relaxing the region
-*and* its base together, held only at the far edge of the blend band, lets the attachment close
-over and takes the spike with it.
+spike standing on the old attachment, which is exactly what Askeptosaurus did. So the last stage
+sets everything from the appendage out to the near edge of the blend band free at full weight and
+runs to convergence, which erases the attachment rather than merely flattening it.
+
+**And its boundary has to be two rings deep, not one.** The marked region is an *indicator of which
+bulge to remove*, not an exact outline — a reviewer paints it approximately and should not have to
+be careful — so the answer must not depend on where the painting stopped. One pinned ring fixes
+only position, so the solution meets the body at a crease and, being harmonic, comes out flatter
+than the flank around it: a shallow dish where the fin was. Two pinned rings fix position *and*
+slope, a cheap stand-in for the thin-plate solve this really wants, and the patch leaves the body
+tangent to it instead of denting into it. That took Askeptosaurus from 16.8% to 5.3%.
+
+Widening the band past 8 does not help and starts to hurt — at 12 and 18 rings the fairing reaches
+into real anatomy and the number goes back up — so 8 is the default and `--band` is the knob.
 
 ### What it costs
 
@@ -94,6 +105,11 @@ The texture over a collapsed appendage is that appendage's own texture, squeezed
 along for the ride, so a large collapse leaves a smear where the fin was. That is a fair trade in a
 preview whose whole purpose is to show the animal's shape, and it is gone the day a real body is
 built.
+
+And none of these reaches exactly zero: a few per cent of the original bulge survives as a slight
+fullness rather than a clean flank. The aim is to leave no trace, and 2–7% is close to it at
+swimming distance but is not literally nothing. Where it matters, the honest fix is a regeneration
+from a corrected pose, not a harder smooth.
 
 ## Still welded, not yet smoothed
 

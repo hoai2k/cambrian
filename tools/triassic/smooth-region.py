@@ -42,7 +42,7 @@ OUT = opt('--out', os.path.join('local', 'triassic', 'smoothed'))
 # only settles around 600 (21%, and unchanged at 3000). It costs nothing — a few hundred nodes and
 # a few hundred passes is milliseconds — so the default is past convergence rather than short of it.
 COLLAPSE = opt('--collapse', 600)     # Laplacian passes over the marked region, ring pinned
-BAND = opt('--band', 6)               # how many rings beyond the marked region get relaxed
+BAND = opt('--band', 8)               # how many rings beyond the marked region get relaxed
 BAND_ITERS = opt('--band-iters', 60)  # passes over that band, weighted by distance from the region
 # A reviewer paints from where they are standing, so a thin blade gets marked on the side facing
 # them and not on the side facing away. Collapse only the near side and the far side holds the fin
@@ -217,14 +217,30 @@ for entry in region['meshes']:
         for a in sh:
             shell_w[a] = 0.75 * (1 - d / max(len(shells), 1)) ** 1.5
     relax(set(shell_w), lambda a: shell_w[a], BAND_ITERS)
-    # 3. The base itself lets go. Step 1 pins the ring, which is what makes the appendage sink into
-    # it — but a pinned ring has to hold the surface somewhere, so what is left is a thin spike
-    # standing on the old attachment. Askeptosaurus' belly fin collapsed to exactly that. Relaxing
-    # the region *and* its base together, held only at the far edge of the blend band, lets the
-    # attachment close over and the spike go with it.
-    inner = marked_nodes | {a for sh in shells[:-1] for a in sh} if len(shells) > 1 else marked_nodes
-    weight3 = lambda a: 1.0 if a in marked_nodes else shell_w.get(a, 0.0) + 0.25
-    relax(inner, weight3, COLLAPSE)
+    # 3. Everything inside a *doubled* boundary is re-faired, to convergence.
+    #
+    # Steps 1 and 2 sink the appendage and take the bump out of its base, which is not the same as
+    # leaving no trace of it. The marked region is an indicator of which bulge to remove rather
+    # than an exact boundary — a reviewer paints it approximately, and should not have to be
+    # careful — so the answer must not depend on where the painting stopped. Here everything from
+    # the appendage out to the near edge of the blend band is set free at full weight, and the
+    # solve runs until it stops moving. What it converges to is the surface the body's own skin
+    # spans across the gap.
+    #
+    # The boundary is the outermost TWO shells rather than one, and that is the whole trick. One
+    # pinned ring fixes only position, so the solution meets the body at a crease and, being
+    # harmonic, is flatter than the flank around it — a shallow dish where the fin was. Two pinned
+    # rings fix position *and* slope, which is a cheap stand-in for the thin-plate solve this
+    # really wants, and the patch leaves the body tangent to it instead of denting into it.
+    free = marked_nodes | {a for sh in shells[:-2] for a in sh}
+    prev = None
+    for _ in range(40):
+        before = [pos[a].copy() for a in free]
+        relax(free, lambda a: 1.0, 50)
+        shift = max((pos[a] - b).length for a, b in zip(free, before)) if free else 0.0
+        if prev is not None and shift < 1e-6:
+            break
+        prev = shift
 
     moved = 0
     for i in range(N):

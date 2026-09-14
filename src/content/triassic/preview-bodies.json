@@ -3,7 +3,7 @@
     "id": "askeptosaurus",
     "model": "assets/triassic/creatures/askeptosaurus.preview.glb",
     "bytes": 1516160,
-    "sha256": "3df70718826b76a4a327797be033a379e34a51c913590964f210d9c31594bf49",
+    "sha256": "a57ec31122d5eeadd314b0c2eafa2f92d6b472054ff7d15adbb7a9e2808a92cd",
     "yaw": 0,
     "scale": 6.62,
     "lengthUnits": 6.62
@@ -12,7 +12,7 @@
     "id": "atopodentatus",
     "model": "assets/triassic/creatures/atopodentatus.preview.glb",
     "bytes": 1371660,
-    "sha256": "c1731a62b2d7ba865946355c6c7edc6aefd02a19abf27699604d16acd39f64de",
+    "sha256": "3cf3d4a23354c0b4606aad79b6327da351b82850e3db4e30dcdc77fbda296644",
     "yaw": -90,
     "scale": 7.32,
     "lengthUnits": 7.32
@@ -147,7 +147,7 @@
     "id": "phragmoteuthis",
     "model": "assets/triassic/creatures/phragmoteuthis.preview.glb",
     "bytes": 1585836,
-    "sha256": "fd363ac4d67bd0b6107a101035f8b10a171fa9a0620acb752e17a467a1ba1c86",
+    "sha256": "353fbaf4134cc22af038aed461071ffd5c49bd5c66c73df84960e50e808a9aa7",
     "yaw": -90,
     "scale": 2.42,
     "lengthUnits": 2.42
@@ -165,7 +165,7 @@
     "id": "rhaeticosaurus",
     "model": "assets/triassic/creatures/rhaeticosaurus.preview.glb",
     "bytes": 1335868,
-    "sha256": "356bf2dd8772da089145281d6d01de1fc7c685404e2de9cfb7d326ad8d4fc211",
+    "sha256": "867bc10e01d1ff3ed4c387ab454e72ff42611c8a98a3c0044d9319746dea0938",
     "yaw": 180,
     "scale": 6.2892,
     "lengthUnits": 7.32
