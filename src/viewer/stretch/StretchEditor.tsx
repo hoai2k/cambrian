@@ -4,8 +4,8 @@ import { rootFramePositions, type OrthoView, type Rect, type ViewerScene } from 
 import { History } from '../sculpt/history';
 import {
   MAX_FACTOR, MAX_TILT, MIN_FACTOR, axes, exportDoc, flipForward, headFractionAt, isIdentity, levelTilt,
-  measureStretch, regionLength, resetAll, resetFactor, setFactor, setPlaneAt, setTilt, shiftOf, stretchDirection,
-  warp, type PlaneName, type StretchDoc,
+  measureStretch, regionLength, resetAll, resetFactor, setAxis, setFactor, setPlaneAt, setTilt, shiftOf,
+  stretchDirection, warp, type PlaneName, type StretchDoc,
 } from './stretch';
 import { getStretch, setStretch } from './store';
 
@@ -80,7 +80,9 @@ export function StretchEditor({ scene, specimen, model, onExit }: Props) {
     let d = getStretch(specimen.key);
     if (!d || d.model !== model) {
       try {
-        d = measureStretch({ chunks, mouth: target.mouth }, { key: specimen.key, id: specimen.id, collection: specimen.collection, model });
+        d = measureStretch(
+          { chunks, mouth: target.mouth, yaw: specimen.previewYaw, rigged: target.skinned },
+          { key: specimen.key, id: specimen.id, collection: specimen.collection, model });
       } catch (e) { setError((e as Error).message); return; }
     }
     historyRef.current = new History(d);
@@ -88,7 +90,15 @@ export function StretchEditor({ scene, specimen, model, onExit }: Props) {
     setActive('to'); setPreviewOriginal(false);
     scene.setRestPose(true);
     scene.applySculpt(isIdentity(d) ? null : warp(d), true);
-    return () => { scene.setRestPose(false); };
+    const rigged = target.skinned;
+    return () => {
+      // A raw generation keeps its stretch on the stage, the way a sculpt does. A built body must
+      // not: the warp is written into the bind pose, and once a clip plays its vertices are swung
+      // about joints that were left where they were — a neck that stretches correctly at rest and
+      // flails the moment it moves. It is put back on the way out.
+      if (rigged) scene.applySculpt(null, true);
+      scene.setRestPose(false);
+    };
   }, [scene, specimen, model]);
 
   // ---- every document change reaches the scene and the session store ----
@@ -325,9 +335,17 @@ export function StretchEditor({ scene, specimen, model, onExit }: Props) {
           <button className="ghost" onClick={() => step(resetFactor(doc))} disabled={!edited}>Reset stretch</button>
           <button className="ghost" onClick={() => step(resetAll(doc))}>Reset all</button>
         </div>
+        <h3>Orientation</h3>
+        <p className="hint">{FRAME_NOTE[doc.frameSource]}</p>
         <div className="sculpt-actions">
-          <button className="ghost" onClick={() => step(flipForward(doc))} title="A raw generation carries no mouth socket, so which end is the head is a guess until you say">
-            Head is at the {doc.frame.forward === 1 ? 'right' : 'left'} →
+          {(['x', 'z'] as const).map((a) => (
+            <button key={a} className={`ghost ${doc.frame.axis === a ? 'primary' : ''}`} aria-pressed={doc.frame.axis === a}
+              onClick={() => step(setAxis(doc, a))} title="Which way the body runs. Changing it re-frames both drawings and puts the cuts back at the defaults.">
+              Body along {a.toUpperCase()}
+            </button>
+          ))}
+          <button className="ghost" onClick={() => step(flipForward(doc))} title="Which end the head is at. Flipping turns the lengthening round and leaves the cuts where they are drawn.">
+            Head {doc.frame.forward === 1 ? 'right' : 'left'} →
           </button>
         </div>
       </>}
@@ -340,7 +358,9 @@ export function StretchEditor({ scene, specimen, model, onExit }: Props) {
       <div className="sculpt-foot">
         <button className="ghost primary" onClick={exportStretch} disabled={!doc}>Export stretch</button>
         <button className="ghost" onClick={onExit}>Back to view</button>
-        <p className="hint">Nothing is saved. The exported file is baked into the GLB by <code>tools/triassic/stretch.mjs</code>.</p>
+        <p className="hint">{doc?.rigged
+          ? 'Nothing is saved, and a built body cannot be baked: its clips re-specify every joint on every frame. The exported file is the measurement to take to the builder.'
+          : <>Nothing is saved. The exported file is baked into the GLB by <code>npm run triassic:stretch</code>.</>}</p>
       </div>
     </aside>
   );
@@ -486,6 +506,14 @@ function tiltFromLine(doc: StretchDoc, view: ViewName, da: number, dv: number): 
   const t = view === 'side' ? angle : latSign(doc) * angle;
   return Math.max(-MAX_TILT, Math.min(MAX_TILT, t));
 }
+
+/** Where the frame came from, in the panel's words. The guess is the one worth flagging. */
+const FRAME_NOTE: Record<StretchDoc['frameSource'], string> = {
+  mouth: 'Taken from the mouth socket: this body says where its own head is.',
+  yaw: 'Taken from the generation\u2019s authored turn, which says where its head was before it was faced forward.',
+  bounds: 'Guessed from the bounding box \u2014 the only signal this body carries. If the drawings look like a view from the front, the box\u2019s longest side runs across the animal (wide flippers do this): set the axis yourself.',
+  manual: 'Set by hand.',
+};
 
 const fmt = (v: number, signed = false) => `${signed && v > 0 ? '+' : ''}${Number.isFinite(v) ? v.toFixed(3) : '—'}`;
 const deg = (r: number) => Math.round(r * 180 / Math.PI * 10) / 10;

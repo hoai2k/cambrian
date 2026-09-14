@@ -49,6 +49,19 @@ let doc;
 try { doc = fromExport(payload); } catch (e) { console.error(`! ${e.message}`); process.exit(1); }
 
 const id = doc.id;
+if (doc.rigged) {
+  // Not a refusal to be worked around. Every clip in a built body re-specifies each joint's
+  // translation on every frame, so a warped bind pose shows at rest and is both overridden and
+  // deformed — swinging about joints left behind — the moment anything plays. Making it stick
+  // would mean rewriting 27 joints across 21 clips outside Blender, which is the one thing the
+  // project's own notes say not to do.
+  console.error(`! ${files[0]} was measured on ${id}'s built body, which is rigged and animated.`);
+  console.error('  A stretch cannot be baked into it: every clip re-specifies each joint every frame,');
+  console.error('  so the change would show at rest and break the moment anything played.');
+  console.error(`  Take the numbers to the builder instead (tools/triassic/creatures/${id}/build.py),`);
+  console.error('  or, for a factor a stretch cannot carry, back to the canonical pose. docs/viewer-stretch.md.');
+  process.exit(1);
+}
 const source = path.join('tools/triassic/creatures', id, `${id}.preview.glb`);
 if (!fs.existsSync(source)) {
   console.error(`! no generated body at ${source} — a stretch applies to the raw generation, not to a shipped model`);
