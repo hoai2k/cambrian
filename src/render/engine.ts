@@ -5,11 +5,11 @@ import { audio, SAMPLES } from '../audio/audio';
 import { distanceAtten, HUGE_LENGTH } from '../audio/mix';
 import { applyMouse, emptyControls, gamepads, KeyboardInput, MouseLook, readGamepad, rumble, type RawControls } from '../input/input';
 import { clamp, damp, TAU, wrapAngle } from '../shared/math';
-import { bandOf, isAlive, isHidden, lengthOf } from '../sim/actors';
+import { bandOf, comingFor, isAlive, isHidden, lengthOf } from '../sim/actors';
 import { creature, type CreatureId } from '../sim/creatures';
 import { CORPSE_WINDOW, DEATH_FADE, Game, radarRange as radarReach, type GripHud, type ScoreHeader, type ScoreRow, type TeleportDest } from '../sim/game';
 import type { Phase } from '../sim/daynight';
-import { BAND_COLOR, emptyInput, isCoop, TIER_NAMES, TIER_NEED, type Actor, type Band, type InputFrame, type Mode, type PlayerSetup } from '../sim/types';
+import { BAND_COLOR, CALM_MARK, emptyInput, isCoop, TIER_NAMES, TIER_NEED, type Actor, type Band, type InputFrame, type Mode, type PlayerSetup } from '../sim/types';
 import { recordStep, recordingPhase } from '../app/debug-record';
 import { BIOME_NAMES, biomeAt, coverAt, groundHeight, nurseryAt, sampleHeight, SURFACE_Y, type Biome, type Boulder, type LandmarkKind } from '../sim/world';
 import { AssetQueue, type AssetProgress } from './assets';
@@ -53,7 +53,7 @@ export interface PlayerHud {
    * who by, for the line of text that plays over the watch.
    */
   death?: { eaten: boolean; by?: string };
-  bandMarkers: { x: number; y: number; band: Band; size: number }[];
+  bandMarkers: { x: number; y: number; band: Band; size: number; hot: boolean }[];
   /** Dominant biome under the player. */
   biome: string;
   /** The hour of the day, for the dial above the radar. */
@@ -1276,7 +1276,10 @@ export class Engine {
           const v = this.tmpProj.set(a.pos.x, a.pos.y + lengthOf(a) * 0.4, a.pos.z).project(cs.camera);
           if (v.z > 1 || Math.abs(v.x) > 1 || Math.abs(v.y) > 1) continue;
           if (band === 'rival' && d > L * 12 + 10 && p.senseT <= 0) continue;
-          markers.push({ x: (v.x + 1) / 2, y: (1 - v.y) / 2, band, size: clamp(lengthOf(a) / Math.max(d, 1) * 8, 0.4, 1.6) });
+          // Red is for something that is actually coming for you. Everything else is a calm mark
+          // whose glyph still says how big it is — a marker over every large animal in sight made
+          // the warning mean "big", which is not what a warning is for.
+          markers.push({ x: (v.x + 1) / 2, y: (1 - v.y) / 2, band, size: clamp(lengthOf(a) / Math.max(d, 1) * 8, 0.4, 1.6), hot: comingFor(a, p) });
         }
       }
       // Radar: reach grows with the creature, contacts rotate into the camera frame (up = camera forward).
@@ -1298,7 +1301,9 @@ export class Engine {
             ? undefined : b.dy > 0 ? 'above' as const : 'below' as const;
           // A shoal overhead is a different decision from one on the sand — rise for it, or dive —
           // so it gets its own colour rather than sitting on the dial as the same green mark.
-          const color = b.kind === 'player' ? PLAYER_COLORS[b.id % 4] : b.kind === 'giant' ? BAND_COLOR.giant : b.kind === 'threat' ? BAND_COLOR.threat
+          // Same rule as the on-screen marks: the dial goes red for a contact that is hunting you,
+          // and a big animal going about its business is a contact like any other.
+          const color = b.kind === 'player' ? PLAYER_COLORS[b.id % 4] : b.hunting ? BAND_COLOR.giant : b.kind === 'giant' || b.kind === 'threat' ? CALM_MARK
             : b.kind === 'food' ? (level === 'above' ? FOOD_ABOVE : BAND_COLOR.snack) : b.kind === 'home' ? '#9be9ff' : b.kind === 'landmark' ? '#ffd9a0'
             : b.kind === 'territory' ? BAND_COLOR.rival : '#d9cfa4';
           blips.push({ x, y, kind: b.kind, color, beyond, hunting: b.hunting, distance: b.distance, r: b.radius != null ? b.radius / radarRange : undefined, level });

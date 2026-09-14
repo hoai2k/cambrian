@@ -361,6 +361,12 @@ unless the user explicitly asks for a PR. Steps:
   no approaching one to ride it. A fed giant notices — the head comes round, which is the tell — and
   goes back to its route; how often one is hungry follows the hour and the water it is over
   (`appetiteAt`), which is where the rhythm of the day is set. `npm run hunt` covers both halves.
+- A warning is about intent, never about size. The colour of a band marker and of a radar contact is
+  red only for a body that is actually coming for you (`comingFor` in `src/sim/actors.ts`: hunting,
+  fighting or seeing you off its ground — and for a steered body, aiming at you); everything else is
+  the one calm mark (`CALM_MARK`), and the glyph under it still says which size band it is. Drawn
+  over every large animal in sight, red meant "something big is there", which the animal's own size
+  had already said. The 3D highlight was already intent-based and is where the rule came from.
 - A mouthful a *player* takes is taken in the mouth: `takeWhole` in `src/sim/game.ts` sends it
   through `startSwallow`, so the body is carried in front of the jaws and eaten over the next second
   rather than vanishing on contact, and swimming into an animal no longer eats it at all — a player
