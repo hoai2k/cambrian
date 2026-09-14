@@ -121,10 +121,11 @@
                 only on theirs.</li>
               <li>Push to <code>main</code>. The next deploy starts counting.</li>
             </ol>
-            <p>One site covers all five counted pages: GoatCounter records the path of every visit,
-            so the three games, the trilogy page and the viewer are told apart by filtering rather
+            <p>One site covers all four counted pages: GoatCounter records the path of every visit,
+            so the three games and the trilogy page are told apart by filtering rather
             than by keeping separate counters — and one site can hold other games on the same domain
-            without their visits landing in these views. The dev workbench is not counted. Counting
+            without their visits landing in these views. Only the games are counted: the specimen
+            viewer, the dev workbench and this page are not. Counting
             starts the moment it is switched on — visits before that are gone, because Pages keeps
             no log to backfill from.</p>
           </div>`;
@@ -133,7 +134,7 @@
           `<button class="chip" data-i="${i}" data-view="${v.id}" aria-pressed="${i === 0}">${v.name}</button>`).join('');
         mount.innerHTML = `
           <div class="panel">
-            <p>All five counted pages report to one counter, so <strong>All of it</strong> is the
+            <p>All four counted pages report to one counter, so <strong>All of it</strong> is the
             trilogy whole — every page under <code>/cambrian/</code>, which is where this site is
             published. The other chips narrow it to one game, and each filter is anchored to the
             path, so a game's view is that game and nothing that merely mentions it. The same

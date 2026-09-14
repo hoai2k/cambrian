@@ -200,7 +200,12 @@ unless the user explicitly asks for a PR. Steps:
   twin rebuilt to its own volume on the same skeleton, sharing inverse binds, clips and anchors.
   That pairing is the pipeline's verification step, so the specimen viewer swaps between them in
   place — same camera, same scale, same clip at the same frame (`puppet` on `ViewerSpecimen`,
-  the *Body* control in `src/viewer/Viewer.tsx`) — and a twin is never a second row in the roster.
+  the one *Model* control in `src/viewer/Viewer.tsx`) — and a twin is never a second row in the roster.
+  That control lists what a specimen actually has rather than crossing two axes: a paired body's LOD1
+  **is** its twin, the same file byte for byte, so *Reduced model* and *Procedural twin* were two
+  names for one thing under two dropdowns until they were merged. An animal whose own body is not
+  built has no full model to offer — `model` resolves for it to the body it borrows in play — so its
+  raw generation heads the list.
   Sculpt is off on the twin: a sculpt is the hand-off into a builder's profile rows for the body
   that ships. A model landing also moves its canonical state to `delivered`, which
   `tools/triassic/apply-selections.mjs` derives from `tools/triassic/shipped.json`; a regenerated
@@ -365,10 +370,29 @@ unless the user explicitly asks for a PR. Steps:
   reduced model, with an Edited/Original toggle for the preview. Undo/redo, in-memory only (a reload
   returns to what ships). *Export sculpt* writes `<id>-sculpt.json`, which is the hand-off for a
   builder port: the change goes into the builder's profile rows, never into the GLB
-  (`docs/viewer-sculpt.md`). `src/viewer/sculpt/profile.ts` is pure and `npm run sculpt` guards it;
+  (`docs/viewer-sculpt.md`). Sculpt is offered only where a builder authors a profile table by hand — the Cambrian and the
+  Devonian. A Triassic body is Tripo-derived and its builder *measures* its profile off the intake
+  surface rather than authoring one, so a sculpt exported there would describe a table nobody
+  writes; that era's editors are *Stretch* (lengthen a run of the raw generation) and *Mark region*
+  (say what to cut off it), and `?mode=sculpt` on a Triassic animal opens the view instead.
+  `src/viewer/sculpt/profile.ts` is pure and `npm run sculpt` guards it;
   `tools/sculpt-browser.mjs` drives the mode in a browser; `npm run sculpt:measure -- <glb> [sculpt.json]`
   measures a model the same way and reports how far a rebuilt candidate is from a sculpt's target,
   which is how a port is checked.
+- The viewer also has a **mark mode** (`&mode=mark`, the *Mark region* button), which is the answer
+  to geometry that is welded to the body and should not be there — the extra fins and spare tails on
+  the raw generated meshes, where 19 of the 21 bodies are one connected surface and only a human can
+  say which fin is wanted (`docs/triassic/preview-mesh-defects.md`). Left-drag paints a world-space
+  brush over the vertices and right-drag orbits; *Export region* writes `<id>-region.json`: vertex
+  indices into one exact file, with that file's sha256 and the box the marked vertices occupy, so
+  `tools/triassic/cut-region.py` can refuse a region marked on a mesh that has since changed rather
+  than delete geometry at random. It marks on **whatever body is on stage**, the generated mesh
+  included — which is the whole point of it, and where sculpt mode refuses. The cut lands in the
+  gitignored workbench (`local/triassic/cuts/`) and never over the source, and never in `public/`
+  either: a stray `.glb` in the creature folder reads to `review-bodies.mjs` as an animal's own body
+  awaiting review. Installing a cut mesh is a separate human decision.
+  `src/viewer/mark/region.ts` is pure and `npm run mark` guards it, `tools/mark-browser.mjs` drives
+  the mode in a browser, and `docs/viewer-mark.md` is the schema and the whole workflow.
 - Sculpt reshapes a body; the **neck stretcher** lengthens one. A Tripo generation's commonest
   fault is the one a profile table cannot reach — a run of body that is the wrong *length*, a
   Dinocephalosaurus with a lizard's neck — so the viewer offers exactly one of the two at a time:

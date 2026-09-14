@@ -32,6 +32,7 @@
     "ancientseas:delivered": "node tools/ancientseas/delivered.mjs",
     "fullscreen": "esbuild tools/fullscreen-test.ts --bundle --platform=node --format=esm --outfile=node_modules/.cache/fullscreen-test.mjs && node node_modules/.cache/fullscreen-test.mjs",
     "focus": "esbuild tools/focus-test.ts --bundle --platform=node --format=esm --outfile=node_modules/.cache/focus-test.mjs && node node_modules/.cache/focus-test.mjs",
+    "mark": "esbuild tools/mark-test.ts --bundle --platform=node --format=esm --outfile=node_modules/.cache/mark-test.mjs && node node_modules/.cache/mark-test.mjs",
     "sculpt": "esbuild tools/sculpt-test.ts --bundle --platform=node --format=esm --outfile=node_modules/.cache/sculpt-test.mjs && node node_modules/.cache/sculpt-test.mjs",
     "sculpt:measure": "esbuild tools/sculpt-measure.ts --bundle --platform=node --format=esm --packages=external --outfile=node_modules/.cache/sculpt-measure.mjs && node node_modules/.cache/sculpt-measure.mjs",
     "stretch": "esbuild tools/stretch-test.ts --bundle --platform=node --format=esm --outfile=node_modules/.cache/stretch-test.mjs && node node_modules/.cache/stretch-test.mjs",

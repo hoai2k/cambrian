@@ -83,8 +83,8 @@ await withSite('smoketest', async () => {
   check('on: a direct link out to GoatCounter', link.startsWith('https://smoketest.goatcounter.com'), link);
   await page.close();
 
-  // Every page a stranger can land on asks for the counter once, against the configured endpoint.
-  for (const path of ['/', '/cambrian/', '/devonian/', '/triassic/', '/viewer/']) {
+  // Every counted page asks for the counter once, against the configured endpoint.
+  for (const path of ['/', '/cambrian/', '/devonian/', '/triassic/']) {
     const game = await browser.newPage();
     const asked = [];
     await game.route('**gc.zgo.at/**', (r) => {
@@ -99,6 +99,22 @@ await withSite('smoketest', async () => {
     check(`on: ${path} points at the configured endpoint`,
       endpoint === 'https://smoketest.goatcounter.com/count', endpoint);
     await game.close();
+  }
+
+  // And the secondary pages ask for nothing at all. This is the half that the source test cannot
+  // prove: a page counts if anything it imports calls installStats, so the only honest check is to
+  // open it and watch whether gc.zgo.at is asked for.
+  for (const path of ['/viewer/', '/workbench/', '/stats/']) {
+    const page = await browser.newPage();
+    const asked = [];
+    await page.route('**gc.zgo.at/**', (r) => {
+      asked.push(r.request().url());
+      r.fulfill({ status: 200, contentType: 'application/javascript', body: '' });
+    });
+    await page.goto(`${BASE}${path}`, { waitUntil: 'domcontentloaded' });
+    await page.waitForTimeout(1500);
+    check(`on: ${path} is not counted`, asked.length === 0, `${asked.length} request(s)`);
+    await page.close();
   }
 });
 

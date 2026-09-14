@@ -79,6 +79,12 @@ export interface ViewerSpecimen {
   previewYaw?: number;
   previewLength?: number;
   /**
+   * The generated mesh's hash from `preview-bodies.json`. A region marked on a body is a list of
+   * vertex indices into one exact file, so the export carries the hash and `cut-region.py` refuses
+   * a region whose mesh has been regenerated underneath it.
+   */
+  generatedSha256?: string;
+  /**
    * True while this animal's own body is built but not yet in tools/triassic/shipped.json. The
    * game still draws the body it borrows and the animal keeps its warning; the viewer shows the
    * real thing, because deciding whether it ships is what the viewer is for.
@@ -91,7 +97,7 @@ export interface ViewerSpecimen {
 }
 const DEVONIAN_KIND = new Map(DEVONIAN_CREATURES.map(c => [c.id as string, { kind: c.kind, kindNote: c.kindNote }]));
 /** The raw generated body of each animal still waiting for one, by id. */
-const TRIASSIC_PREVIEW = new Map((previewBodies as { id: string; model: string; yaw: number; lengthUnits: number | null }[])
+const TRIASSIC_PREVIEW = new Map((previewBodies as { id: string; model: string; yaw: number; lengthUnits: number | null; sha256: string }[])
   .map(b => [b.id, b]));
 /** The procedural twin of each animal that has one, by the animal's id. */
 const TRIASSIC_PUPPETS = new Map(TRIASSIC_SPECIMENS.filter(c => c.category === 'creature').map(c => [c.id, c]));
@@ -164,6 +170,7 @@ export const SPECIMENS: readonly ViewerSpecimen[] = [
     generated: TRIASSIC_PREVIEW.get(c.id)?.model,
     previewYaw: TRIASSIC_PREVIEW.get(c.id)?.yaw,
     previewLength: TRIASSIC_PREVIEW.get(c.id)?.lengthUnits ?? undefined,
+    generatedSha256: TRIASSIC_PREVIEW.get(c.id)?.sha256,
     inReview: TRIASSIC_REVIEW.has(c.id),
     looping: ['Idle', 'Swim', 'Crawl', 'Guard', 'Eat', ...(c.abilityLoop ? ['Ability'] : [])],
   })),
