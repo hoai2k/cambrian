@@ -12,6 +12,7 @@ import { SCHEMES as TRIASSIC_SCHEMES, CREATURE_SCHEMES as TRIASSIC_DEFAULTS } fr
 import triassicPending from '../content/triassic/pending-refinements.json';
 import previewBodies from '../content/triassic/preview-bodies.json';
 import reviewBodies from '../content/triassic/review-bodies.json';
+import expansion from '../content/triassic/expansion.json';
 import { DEVONIAN_SPECIMENS } from '../content/devonian/specimens';
 import { DEVONIAN_CREATURES } from '../content/devonian/creatures';
 import devonianPending from '../content/devonian/pending-refinements.json';
@@ -84,6 +85,13 @@ export interface ViewerSpecimen {
    * a region whose mesh has been regenerated underneath it.
    */
   generatedSha256?: string;
+  /**
+   * True for a subject that is being built but is on no era's roster — see
+   * `src/content/triassic/expansion.json`. It borrows no body, because it is in no sea: where it
+   * ends up is the open question, so the viewer must not offer a "borrowed body in play" stage
+   * that would be a lie about a game it is not in.
+   */
+  offRoster?: boolean;
   /**
    * True while this animal's own body is built but not yet in tools/triassic/shipped.json. The
    * game still draws the body it borrows and the animal keeps its warning; the viewer shows the
@@ -174,6 +182,26 @@ export const SPECIMENS: readonly ViewerSpecimen[] = [
     inReview: TRIASSIC_REVIEW.has(c.id),
     looping: ['Idle', 'Swim', 'Crawl', 'Guard', 'Eat', ...(c.abilityLoop ? ['Ability'] : [])],
   })),
+  // Subjects whose body is being built but whose era is undecided. They are deliberately absent
+  // from TRIASSIC_CREATURES — roster membership is what puts an animal in the sea — so they are
+  // listed here instead, and carry no borrowed body, no portrait and no roster length.
+  ...(expansion.subjects as { id: string; name: string; species: string; kind: string; kindNote: string; role: string; provenance: string; tagline: string; lengthMeters: number; adultLength: number }[])
+    .filter(s => TRIASSIC_PREVIEW.has(s.id))
+    .map(s => ({
+      key: `triassic:${s.id}`, id: s.id, collection: 'triassic' as const,
+      name: s.name, species: s.species, kind: s.kind, kindNote: s.kindNote,
+      role: `OFF-ROSTER · ${s.role}`, provenance: s.provenance,
+      description: `Not on any roster yet: ${s.tagline}`,
+      modelStatus: 'preview' as const,
+      modelNote: 'Raw generation only — no rig, clips or anchors yet, and which game this animal belongs to is undecided (docs/triassic/05-mesozoic-expansion.md).',
+      model: TRIASSIC_PREVIEW.get(s.id)!.model,
+      generated: TRIASSIC_PREVIEW.get(s.id)!.model,
+      previewYaw: TRIASSIC_PREVIEW.get(s.id)!.yaw,
+      previewLength: TRIASSIC_PREVIEW.get(s.id)!.lengthUnits ?? undefined,
+      generatedSha256: TRIASSIC_PREVIEW.get(s.id)!.sha256,
+      offRoster: true, displayLength: Math.min(s.adultLength, 8), lengthMeters: s.lengthMeters,
+      looping: [] as readonly string[],
+    })),
   // Scenery only. A creature row in TRIASSIC_SPECIMENS is a procedural twin, and a twin is not a
   // second animal: it is the same animal drawn the other way, so it belongs behind a switch on
   // the roster entry it belongs to (`TRIASSIC_PUPPETS` above) rather than beside it in the list,
