@@ -369,6 +369,22 @@ unless the user explicitly asks for a PR. Steps:
   `tools/sculpt-browser.mjs` drives the mode in a browser; `npm run sculpt:measure -- <glb> [sculpt.json]`
   measures a model the same way and reports how far a rebuilt candidate is from a sculpt's target,
   which is how a port is checked.
+- Sculpt reshapes a body; the **neck stretcher** lengthens one. A Tripo generation's commonest
+  fault is the one a profile table cannot reach — a run of body that is the wrong *length*, a
+  Dinocephalosaurus with a lizard's neck — so the viewer offers exactly one of the two at a time:
+  sculpt on a shipped rigged body, stretch (`&mode=stretch`) on a raw generated one, because a
+  sculpt exported off an unrigged mesh would name a model nobody ships. The edit is two cuts across
+  the body, one direction and a factor (`src/viewer/stretch/stretch.ts`): behind the first cut
+  nothing moves at all, past the second the head is carried rigidly, and between them the body is
+  scaled uniformly along the direction — linear, because easing would pile the new length into the
+  middle of the neck and pinch it at both ends. Both cuts are square to that one direction rather
+  than each carrying their own: what is wanted is to *aim* the lengthening, and sharing it makes
+  the map an exact uniform scale. The seam is real and is why the cuts are placed by hand — put
+  them where the body already changes. `npm run stretch` and `node tools/stretch-browser.mjs`
+  check it; `npm run triassic:stretch -- <file> --write` bakes it into
+  `tools/triassic/creatures/<id>/<id>.preview.glb` (never into `tripo-raw/`), importing the
+  viewer's own `warp()` so the file is what was previewed, and reading the result back to prove it.
+  `docs/viewer-stretch.md` is the whole of it.
 - `?debug=local` on any game page (`/cambrian/?debug=local`, `/devonian/?debug=local`) opens an editor for that
   era's saved state — `src/app/DebugLocal.tsx`, gated by `src/shared/debug.ts`, mounted by
   `src/app/Root.tsx` so both entry points get it without knowing about it. A new thing kept in
@@ -452,7 +468,11 @@ unless the user explicitly asks for a PR. Steps:
   `/cambrian/` rather than an unfiltered dashboard, since one GoatCounter site counts a whole domain
   and `hoai` also holds other games. `npm run stats` models the matching and checks every view
   counts what it claims; `node tools/stats-smoke.mjs <outdir>` drives both states in a browser with
-  `gc.zgo.at` intercepted; `docs/stats.md` is the whole of it.
+  `gc.zgo.at` intercepted; `docs/stats.md` is the whole of it. Every *other* browser tool answers
+  that request with an empty script (`silenceCounter` in `tools/qa-counter.mjs`, called on each
+  page it opens): a network that blocks the counter makes the browser log a console error, and
+  these tools fail on console errors — one blocked counter would otherwise fail a check about
+  creature meshes.
 - All docs live in `docs/`. Design docs are in `docs/redesign/`. Image, glyph and prop
   needs go in `docs/image-requests.md` and move to `docs/image-requests-history.md` once
   delivered and integrated; sound and music needs go in `docs/audio-requests.md`.

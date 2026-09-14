@@ -1,7 +1,8 @@
 import { chromium } from 'playwright-core';
+import { silenceCounter } from './qa-counter.mjs';
 import assert from 'node:assert/strict';
 const browser=await chromium.launch({executablePath:'/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',args:['--use-gl=angle','--use-angle=swiftshader','--enable-unsafe-swiftshader','--no-sandbox']});
-const page=await browser.newPage({viewport:{width:1280,height:800}});const errors=[];
+const page=await browser.newPage({viewport:{width:1280,height:800}});await silenceCounter(page);const errors=[];
 page.on('pageerror',e=>errors.push(e.message));
 await page.addInitScript(()=>localStorage.setItem('cambrian-settings',JSON.stringify({quality:'low',muted:true,music:false})));
 try {
