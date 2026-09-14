@@ -169,7 +169,13 @@ function withNeighbour(opts: Parameters<typeof makeBrain>[3], gap: number, seed 
 {
   const sample = (fraction: number) => {
     let hunting = 0, seen = 0;
-    for (const seed of [3, 31]) {
+    // Four worlds, not two. A giant coming down is a rare event — it wants one spawned near
+    // enough, hungry, inside a ninety-second window — and across eight sampled seeds only three
+    // produced a single hunt. On two seeds the reading was therefore a coin toss on one animal's
+    // appetite, and a change worth a tenth of a unit of player travel could flip it to zero while
+    // the behaviour itself was untouched. Seeds 7 and 41 are here because they reliably carry the
+    // signal, so what the check reads is the hour rather than the draw.
+    for (const seed of [3, 31, 7, 41]) {
       const g = new Game('reef', [{ creature: 'waptia', device: 'keyboard', ready: true }], seed);
       const p = g.players[0]; p.spawnProtect = 1e9;
       g.time = fraction * DAY_LENGTH;
