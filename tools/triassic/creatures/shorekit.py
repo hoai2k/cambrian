@@ -229,6 +229,69 @@ def turning(pts):
     return sum(math.degrees(T[i].angle(T[i + 1])) for i in range(len(T) - 1))
 
 
+def curvature_over_section(pts, section):
+    """How bent a run of body is, in units of its own thickness.
+
+    `meanCurvatureRadiusOverSection`, the measure Dinocephalosaurus' builder introduced: the arc
+    length divided by the total turning gives the mean radius the run curves on, and dividing that
+    by the run's own section radius says whether the curve is gentle or tight *for a body that
+    thick*. It is the number that decides how a generation's rest pose can be brought to neutral —
+    a high ratio (Dinocephalosaurus' tail is about 20) is a gentle sweep the rig can straighten by
+    rotating joints, and a low one is a curve so tight for its girth that straightening it on the
+    rig collapses the inside of the bend, so the mesh has to be unbent before binding.
+
+    A run that is already straight has no curvature and returns `None` rather than dividing by zero.
+    """
+    if len(pts) < 3 or section <= 0:
+        return None
+    arc = sum((pts[i + 1] - pts[i]).length for i in range(len(pts) - 1))
+    turn = turning(pts)
+    if turn < 1e-6:
+        return {'arc': round(arc, 4), 'totalTurningDeg': 0.0,
+                'meanCurvatureRadius': None, 'sectionRadius': round(section, 4),
+                'meanCurvatureRadiusOverSection': None}
+    r = arc / math.radians(turn)
+    return {'arc': round(arc, 4), 'totalTurningDeg': round(turn, 1),
+            'meanCurvatureRadius': round(r, 4), 'sectionRadius': round(section, 4),
+            'meanCurvatureRadiusOverSection': round(r / section, 2)}
+
+
+def limb_asymmetry(limbs, body_length, midline=0.):
+    """How far a generation's paired limbs are from being mirror images of each other.
+
+    The mean distance between each limb joint and its partner's mirrored position, over body length.
+    These generations are *drawn*, not modelled to a rig, so the four limbs are posed mid-stride and
+    do not match: this says by how much, in one number, for the pass that will re-base every body on
+    a neutral pose. `midline` is the body's own lateral centre, which is not always zero.
+
+    `limbs` is the builder's own {key: (points, names)} table; keys are paired by everything except
+    a trailing L/R.
+    """
+    pairs, total, n = [], 0., 0
+    for key, (pts, _) in limbs.items():
+        if not key.endswith('L'):
+            continue
+        partner = key[:-1] + 'R'
+        if partner not in limbs:
+            continue
+        other = limbs[partner][0]
+        joints = min(len(pts), len(other))
+        d = 0.
+        for i in range(joints):
+            a = Vector(pts[i])
+            b = Vector(other[i])
+            b = Vector((b.x, 2 * midline - b.y, b.z))        # mirrored across the body's midline
+            d += (a - b).length
+        pairs.append({'pair': key[:-1], 'joints': joints,
+                      'meanJointOffset': round(d / joints, 5),
+                      'overBodyLength': round(d / joints / body_length, 5)})
+        total += d
+        n += joints
+    return {'pairs': pairs,
+            'meanJointOffset': round(total / n, 5) if n else None,
+            'overBodyLength': round(total / n / body_length, 5) if n else None}
+
+
 def rigid_carry(cur, tgt, cur_frames=None, tgt_frames=None):
     """Return a map that carries every point rigidly from one polyline's frames onto another's.
 

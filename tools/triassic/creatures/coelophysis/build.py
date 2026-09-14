@@ -306,6 +306,43 @@ for n, d in seating.items():
     assert d > floor, ('a root sits outside the intake surface', n, d, floor)
 assert seating['jaw'] / HEAD_R > .24, ('the jaw hinge is not seated in the head', seating['jaw'], HEAD_R)
 
+# ---- how far the generation's own rest pose is from neutral ---------------------------------------
+# Two numbers, for the pass that will re-base every body on a `Neutral` clip (straight spine,
+# mirrored limbs, jaw closed). Measured here because the body is open and the axis is already banded.
+#
+# 1. `meanCurvatureRadiusOverSection` per run, Dinocephalosaurus' measure: arc over total turning
+#    gives the radius the run curves on, divided by that run's own section radius. It says whether a
+#    curve is gentle *for a body that thick* — high means the rig can straighten it by rotating
+#    joints, low means the curve is tight enough for its girth that straightening it on the rig would
+#    collapse the inside of the bend, so the mesh has to be unbent before binding. That is the
+#    decision this builder already had to make, now written down as a number.
+# 2. The left-right asymmetry of the paired limbs: the mean distance between each limb joint and its
+#    partner's mirrored position, over body length. These generations are drawn, not modelled to a
+#    rig, so the four limbs are posed mid-stride and do not match.
+#
+# The runs are split at this builder's *own* hips and shoulder rather than at a fraction, because the
+# three animals band their axes differently and a fraction does not mean the same thing to each.
+_rest_line = K.geodesic_line(auth, bands=110, seed_dir=SEED_TAIL)[0]
+_rest_axis = [Vector(r['c']) for r in _rest_line]
+_rest_r = [r['r'] for r in _rest_line]
+
+
+def _rest_nearest(p):
+    q = Vector(p)
+    return min(range(len(_rest_axis)), key=lambda i: (_rest_axis[i] - q).length)
+
+
+_i_hips, _i_shoulder = sorted((_rest_nearest(hips), _rest_nearest(shoulder)))
+rest_pose = {'curvature': {}, 'bandSplit': {'hips': _i_hips, 'shoulder': _i_shoulder,
+                                            'bands': len(_rest_axis)}}
+for _name, (_a, _b) in {'tail': (0, _i_hips), 'spine': (_i_hips, _i_shoulder),
+                        'neck': (_i_shoulder, len(_rest_axis) - 1)}.items():
+    _pts = _rest_axis[_a:_b + 1]
+    _sec = float(np.mean(_rest_r[_a:_b + 1])) if _b > _a else 0.
+    rest_pose['curvature'][_name] = K.curvature_over_section(_pts, _sec) if len(_pts) >= 3 else None
+rest_pose['limbAsymmetry'] = K.limb_asymmetry(LIMBS, RAW_LENGTH, midline=float(np.median(co[:, 1])))
+print('REST_POSE', json.dumps(rest_pose))
+
 # ---- the mouth ---------------------------------------------------------------------------------
 MOUTH_GAP = .026
 CAVITY = K.mouth_cavity(auth, on_head, MOUTH_GAP)
@@ -612,6 +649,9 @@ firsts = {}
 lasts = {}
 bounds = {}
 gait_track = {}
+LIMB_ROOTS = [n for n in ('fore_upper_L', 'fore_upper_R', 'hind_upper_L', 'hind_upper_R')
+              if n in B]
+limb_track = {}
 strike_track = {}
 
 for clip, duration in CLIPS.items():
@@ -990,6 +1030,9 @@ for clip, duration in CLIPS.items():
             strike_track.setdefault(clip, []).append(
                 [u] + [float(pb['neck_%02d' % i].rotation_euler.z) for i in range(CERVICALS)]
                 + [float(skull.rotation_euler.z)])
+        limb_track.setdefault(clip, []).append(
+            [[float(pb[_n].rotation_euler.x), float(pb[_n].rotation_euler.y),
+              float(pb[_n].rotation_euler.z)] for _n in LIMB_ROOTS])
         for q in pb:
             if q.name != 'root':
                 q.keyframe_insert('rotation_euler', frame=f)
@@ -1051,6 +1094,54 @@ for clip, rows in strike_track.items():
     # The opposite assertion to Tanystropheus': this neck is flexible, so the work is *spread*.
     assert strike_report[clip]['medianOverMaxJointAmplitude'] > .5, strike_report[clip]
     assert inorder >= CERVICALS - 1, strike_report[clip]
+
+# ---- how far each limb root actually swings, per cycle --------------------------------------------
+# The total angle a limb root turns through over a whole clip, summed frame to frame rather than
+# taken as a peak-to-peak range: a limb that goes forward, back and forward again has swept more than
+# its extremes say, and the peak-to-peak is reported beside it so the two can be read together.
+#
+# The user's paddling rule — a reptile's dash in water sweeping a limb from stretched forward all the
+# way back to flush with the body — bears on `Charge`, the dash down into the shallows.
+limb_sweep = {}
+for _clip, _rows in limb_track.items():
+    _per = {}
+    for _j, _n in enumerate(LIMB_ROOTS):
+        _seq = [r[_j] for r in _rows]
+        _tot = 0.
+        for _i in range(1, len(_seq)):
+            _tot += math.sqrt(sum((_seq[_i][_k] - _seq[_i - 1][_k]) ** 2 for _k in range(3)))
+        _per[_n] = {'sweptDeg': round(math.degrees(_tot), 1),
+                    'peakToPeakDeg': [round(math.degrees(max(s[_k] for s in _seq)
+                                                         - min(s[_k] for s in _seq)), 1)
+                                      for _k in range(3)]}
+    limb_sweep[_clip] = _per
+print('LIMB_SWEEP', json.dumps({k: v for k, v in limb_sweep.items() if k in ('Run', 'Charge', 'Sprint', 'Crawl')}))
+
+# ---- how far the mouth cut is from the lip line it was measured from ------------------------------
+# The cut is the head's own section at one measured fraction of its height, and the pigment
+# instrument reads that fraction station by station. This is the largest gap between the two, over
+# body length: it says whether one fraction really does follow this animal's lip contour or whether
+# the contour wanders and a single number is smoothing it away. Both are reported, because a large
+# spread with a small deviation means something different from the reverse.
+_dev, _worst = 0., None
+for _x, _frac, _c in pigment_rows:
+    _lo, _hi = head_lo(_x), head_hi(_x)
+    _d = abs((_lo + (_hi - _lo) * _frac) - seam(_x))
+    if _d > _dev:
+        _dev, _worst = _d, {'x': round(_x, 4), 'measuredFraction': round(_frac, 4),
+                            'usedFraction': round(JAW_FRACTION, 4),
+                            'sectionHeight': round(_hi - _lo, 5)}
+_fracs = [r[1] for r in pigment_rows]
+mouth_cut = {'maxDeviationRaw': round(_dev, 5),
+             'maxDeviationOverBodyLength': round(_dev / RAW_LENGTH, 5),
+             'worstStation': _worst, 'stations': len(pigment_rows),
+             'measuredFractionMin': round(min(_fracs), 4),
+             'measuredFractionMax': round(max(_fracs), 4),
+             'measuredFractionMedianUsed': round(JAW_FRACTION, 4),
+             'method': 'no modelled mouth slit on this head (the cavity instrument finds no cavity), '
+                       'so the lip line is read off the albedo per station and the cut is the head '
+                       'section at the median of those readings'}
+print('MOUTH_CUT', json.dumps(mouth_cut))
 
 # ---- anchors, export -------------------------------------------------------------------------------
 anchors = [
@@ -1127,7 +1218,7 @@ report = {
     'jawHingeDepthAsFractionOfHeadRadius': seating['jaw'] / HEAD_R,
     'oralInteriorDepthRaw': oral_depth, 'oralSeatingCorrection': oral_seating,
     'maxInfluences': max(influences), 'meanInfluences': float(np.mean(influences)),
-    'trunkYawCorrectionDegrees': round(math.degrees(trunk_yaw), 3), 'unbending': unbending,
+    'trunkYawCorrectionDegrees': round(math.degrees(trunk_yaw), 3), 'unbending': unbending, 'restPose': rest_pose,
     'caudalChainStart': float(TAIL_START), 'pelvisFractionOfTrunk': PELVIS, 'skullFractionOfNeck': SKULL_T,
     'mouth': {'method': 'no modelled cavity on this head; the seam follows the head\'s own measured '
                         'section at the painted mouth line\'s measured height, and the teeth are authored',
@@ -1137,6 +1228,7 @@ report = {
               'hingeX': HINGE_X, 'mouthBackX': MOUTH_BACK, 'mouthFrontX': MOUTH_FRONT,
               'liningInset': LINING_INSET, 'liningCullsBackfaces': True, 'skinDoubleSided': True},
     'gait': gait_report, 'strike': strike_report, 'shoreChainHandover': handover,
+    'limbSweep': limb_sweep, 'mouthCut': mouth_cut,
     'normalizedWeights': True, 'rootStable': True, 'noScaleChannels': True}
 open(os.path.join(HERE, 'validation.json'), 'w').write(json.dumps(report, indent=2))
 bpy.ops.wm.save_as_mainfile(filepath=os.path.join(LOCAL, ID + '-paired.blend'))
