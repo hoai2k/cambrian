@@ -1,21 +1,38 @@
-"""Where the tooth whorl actually sits in the raw Tripo body, measured rather than eyeballed.
+"""What the tooth whorl actually is, measured on the generated source and on the shipped body.
 
-The question this answers is the one the proportion audit raised: is the whorl a toothed disc
-hanging outside and below the chin (the "pizza cutter" reconstruction Tapanila & Pruitt 2013
-overturned), or is it seated in the lower-jaw symphysis with only its front arc exposed, which is
-what the greenlit canonical pose draws?
+Two questions, and they have different answers.
 
-The test is a ray, not an opinion. For every vertex in the head band, cast straight up and
-straight down:
+**Where does it sit?** That one was settled by this script's first version and nothing here
+changes it. The proportion audit had concluded that the whorl was modelled as a toothed disc
+hanging outside and below the chin — the "pizza cutter" reconstruction Tapanila & Pruitt 2013
+overturned. The test is a ray, not an opinion. For every vertex in the head band, cast straight up
+and straight down:
 
   * something above it and something below it  -> the vertex is inside the mouth cavity
   * something above it and nothing below it    -> the vertex is on the ventral silhouette
   * nothing above it                           -> the vertex is outer skin (back, flanks, snout)
 
-A whorl seated inside the jaw is almost entirely the first case. A disc hanging off the chin is
-almost entirely the second.
+A whorl seated in the symphysis is almost entirely the first case, and the generated one was:
+374 of 382 vertices. What the audit had measured was the dropped mandible of an open-mouthed
+generation. The whorl was in the right place.
 
-  /opt/blender/blender -b --factory-startup --python tools/triassic/creatures/helicoprion/whorl-audit.py
+**What shape is it?** That one the delivery got wrong, and a reviewer looking at the shipped body
+said so: holes, and inconsistent shape. This version measures the shape too, so the complaint is
+numbers before it is a fix. A whorl is one logarithmic spiral of crowns, so:
+
+  * fit a centre in the sagittal plane and take every vertex's angle and radius about it;
+  * count the angular sectors that hold almost nothing — that is what "holes" means;
+  * find the radial peaks, which are the crowns, and measure how evenly they are spaced and
+    whether their radii actually grow outward, which is what a spiral means.
+
+And it counts the dentition the animal never had. *Helicoprion* had no upper teeth at all — the
+whorl bit against a cartilage pad — and none along the mandible outside the symphysis. Teeth are
+found as protrusions: how far a vertex stands out of its own two-ring neighbourhood along its
+normal. Smooth lining is near zero; a crown is not.
+
+    node tools/triassic/creatures/helicoprion/audit.mjs --decode     # writes the unpacked body
+    /opt/blender/blender -b --factory-startup --python \
+        tools/triassic/creatures/helicoprion/whorl-audit.py
 """
 import bpy, bmesh, json, os, sys
 import numpy as np
@@ -23,24 +40,10 @@ from mathutils import Vector
 from mathutils.bvhtree import BVHTree
 
 HERE = os.path.dirname(os.path.abspath(__file__))
+ROOT = os.path.abspath(os.path.join(HERE, '../../../..'))
 RAW = os.path.join(HERE, 'tripo-raw/helicoprion.raw.glb')
-
-bpy.ops.object.select_all(action='SELECT')
-bpy.ops.object.delete(use_global=False)
-bpy.ops.import_scene.gltf(filepath=RAW)
-o = next(x for x in bpy.context.scene.objects if x.type == 'MESH')
-bm = bmesh.new()
-bm.from_mesh(o.data)
-bmesh.ops.remove_doubles(bm, verts=list(bm.verts), dist=1e-6)
-bm.to_mesh(o.data)
-bm.free()
-
-co = np.array([v.co[:] for v in o.data.vertices])
-nr = np.array([v.normal[:] for v in o.data.vertices])
-LENGTH = float(co[:, 1].max() - co[:, 1].min())        # 1.0 raw unit, head at -Y
-SNOUT = float(co[:, 1].min())
-bvh = BVHTree.FromPolygons([v.co for v in o.data.vertices],
-                           [p.vertices[:] for p in o.data.polygons], all_triangles=False)
+BUILT = os.path.join(ROOT, 'local/triassic-authoring/helicoprion/helicoprion.unpacked.glb')
+SCALE = 5.
 
 # The surface that separates palate from mandible down the head, measured in `build.py` from the
 # palate above and the whorl/mouth floor below; used here only to tell upper teeth from lower.
@@ -48,156 +51,271 @@ _ZSEP = [(-.50, -.030), (-.46, -.030), (-.44, -.026), (-.43, -.013), (-.42, -.00
          (-.40, -.003), (-.39, -.004), (-.38, -.008), (-.37, -.009), (-.36, -.012), (-.35, -.022),
          (-.34, -.030), (-.32, -.040), (-.30, -.050)]
 UPPER_JAW_FLOOR = lambda y: float(np.interp(y, [a for a, _ in _ZSEP], [b for _, b in _ZSEP]))
-
 UP, DOWN = Vector((0, 0, 1)), Vector((0, 0, -1))
-rows = []
-for i, p in enumerate(co):
-    y = p[1]
-    if not (-.47 < y < -.33):
-        continue
-    start = Vector(p)
-    above = bvh.ray_cast(start + UP * 3e-4, UP, .6)
-    below = bvh.ray_cast(start + DOWN * 3e-4, DOWN, .6)
-    rows.append({'i': i, 'frac': (y - SNOUT) / LENGTH, 'x': float(p[0]), 'y': float(y), 'z': float(p[2]),
-                 'nz': float(nr[i][2]),
-                 'above': None if above[0] is None else float(above[3]),
-                 'below': None if below[0] is None else float(below[3])})
+PROTRUSION = .0018      # a vertex standing this far out of its neighbourhood is a crown, not gum
 
-# The whorl is the tooth material in the lower jaw: it faces up or outward into the cavity, it is
-# roofed by the palate, and it lives in the anterior half of the gape.
-whorl = [r for r in rows if r['above'] is not None and r['nz'] > .15 and r['y'] < -.36]
-enclosed = [r for r in whorl if r['below'] is not None]
-exposed = [r for r in whorl if r['below'] is None]
 
-ventral = {}
-for r in rows:
-    if r['below'] is None and r['above'] is not None:
-        key = round(r['y'], 3)
-        ventral[key] = min(ventral.get(key, 1.), r['z'])
+def load(path, scale):
+    bpy.ops.object.select_all(action='SELECT')
+    bpy.ops.object.delete(use_global=False)
+    bpy.ops.import_scene.gltf(filepath=path)
+    o = next(x for x in bpy.context.scene.objects if x.type == 'MESH')
+    bm = bmesh.new()
+    bm.from_mesh(o.data)
+    bmesh.ops.remove_doubles(bm, verts=list(bm.verts), dist=1e-6)
+    bm.to_mesh(o.data)
+    bm.free()
+    if scale != 1.:
+        for v in o.data.vertices:
+            v.co = v.co / scale
+        o.data.update()
+    return o
 
-report = {
-    'source': 'tools/triassic/creatures/helicoprion/tripo-raw/helicoprion.raw.glb',
-    'bodyLength': LENGTH, 'snoutY': SNOUT,
+
+def adjacency(me):
+    n = len(me.vertices)
+    ev = np.array([e.vertices[:] for e in me.edges], dtype=np.int64)
+    counts = np.zeros(n, dtype=np.int64)
+    np.add.at(counts, ev[:, 0], 1)
+    np.add.at(counts, ev[:, 1], 1)
+    ptr = np.zeros(n + 1, dtype=np.int64)
+    ptr[1:] = np.cumsum(counts)
+    idx = np.zeros(int(ptr[-1]), dtype=np.int64)
+    fill = ptr[:-1].copy()
+    for a, b in ev:
+        idx[fill[a]] = b; fill[a] += 1
+        idx[fill[b]] = a; fill[b] += 1
+    return ptr, idx
+
+
+def protrusions(me, ptr, idx, rings=2):
+    P = np.array([v.co[:] for v in me.vertices])
+    N = np.array([v.normal[:] for v in me.vertices])
+    M = P.copy()
+    for _ in range(rings):
+        M = np.add.reduceat(M[idx], ptr[:-1], axis=0) / np.diff(ptr).reshape(-1, 1)
+    return ((P - M) * N).sum(1)
+
+
+def islands(me, ptr, idx):
+    """Which connected component each vertex belongs to, largest first. On the shipped body the
+    whorl is its own set of islands, so it needs no threshold to be found."""
+    label = np.full(len(me.vertices), -1, dtype=np.int64)
+    order = []
+    for start in range(len(me.vertices)):
+        if label[start] >= 0:
+            continue
+        stack, members = [start], []
+        label[start] = len(order)
+        while stack:
+            q = stack.pop()
+            members.append(q)
+            for j in idx[ptr[q]:ptr[q + 1]]:
+                if label[j] < 0:
+                    label[j] = len(order)
+                    stack.append(int(j))
+        order.append(members)
+    biggest = int(np.argmax([len(m) for m in order]))
+    return label, biggest, sorted((len(m) for m in order), reverse=True)
+
+
+def spiral(W):
+    """Fit a centre in the sagittal plane and describe the material about it: where the holes are,
+    how many crowns there are, how evenly they are spaced and whether they grow outward."""
+    def spread(c):
+        d = W[:, 1:3] - c
+        r = np.hypot(d[:, 0], d[:, 1])
+        b = ((np.arctan2(d[:, 1], d[:, 0]) + np.pi) / (2 * np.pi) * 48).astype(int) % 48
+        tot, n = 0., 0
+        for k in range(48):
+            s = r[b == k]
+            if len(s) >= 4:
+                tot += float(np.percentile(s, 90) - np.percentile(s, 10)); n += 1
+        return tot / max(1, n), n
+
+    lo, hi = W[:, 1:3].min(0), W[:, 1:3].max(0)
+    best = None
+    for gy in np.linspace(lo[0], hi[0], 41):
+        for gz in np.linspace(lo[1], hi[1], 41):
+            s, n = spread(np.array([gy, gz]))
+            if n >= 36 and (best is None or s < best[0]):
+                best = (s, gy, gz)
+    C = np.array(best[1:])
+    d = W[:, 1:3] - C
+    TH, R = np.arctan2(d[:, 1], d[:, 0]), np.hypot(d[:, 0], d[:, 1])
+    NB = 72
+    bins = ((TH + np.pi) / (2 * np.pi) * NB).astype(int) % NB
+    occ = [int((bins == b).sum()) for b in range(NB)]
+    rmax = np.array([float(R[bins == b].max()) if (bins == b).any() else np.nan for b in range(NB)])
+    peaks = []
+    for b in range(NB):
+        if np.isnan(rmax[b]):
+            continue
+        l, r2 = rmax[(b - 1) % NB], rmax[(b + 1) % NB]
+        if (np.isnan(l) or rmax[b] >= l) and (np.isnan(r2) or rmax[b] > r2):
+            peaks.append((b, float(rmax[b])))
+    # "Holes" made into a number that means the same thing on both bodies: walking out from the
+    # fitted centre along each of 72 rays, how big is the largest gap between one piece of whorl
+    # material and the next before the outermost one? A filled coil closes every gap; a rosette of
+    # separate spikes does not, and that gap is what a reviewer reads as a hole.
+    gaps = []
+    for b in range(NB):
+        rs = np.sort(R[bins == b])
+        if len(rs) < 2:
+            continue
+        gaps.append(float(max(rs[0], float(np.diff(rs).max()))))
+    out = {
+        'fittedCentreYZ': [float(C[0]), float(C[1])],
+        'largestRadialGapPerRay': {
+            'rays': len(gaps), 'max': max(gaps) if gaps else None,
+            'mean': float(np.mean(gaps)) if gaps else None,
+            'raysWithAGapOverOnePercentOfBodyLength': int(sum(1 for g in gaps if g > .01))},
+        'medianRadialSpreadInSevenPointFiveDegreeBins': float(best[0]),
+        'meanRadius': float(R.mean()),
+        'radialSpreadOverMeanRadius': float(best[0] / R.mean()),
+        'angularBins': NB,
+        'emptyAngularBins': int(sum(1 for c in occ if c == 0)),
+        'angularBinsWithFewerThanThreeVertices': int(sum(1 for c in occ if c < 3)),
+        'occupancy': occ,
+        'radialMaxPerBin': [None if np.isnan(v) else float(v) for v in rmax],
+        'radialPeakCount': len(peaks),
+        'radialPeaks': [{'binDegrees': b * 360 // NB, 'radius': v} for b, v in peaks],
+    }
+    if len(peaks) > 1:
+        order = sorted(peaks)
+        gaps = [((order[(i + 1) % len(order)][0] - order[i][0]) % NB) * 360 / NB
+                for i in range(len(order))]
+        rs = [v for _, v in order]
+        mono = sum(1 for i in range(len(rs) - 1) if rs[i + 1] > rs[i])
+        out['peakAngularSpacingDegrees'] = {
+            'min': min(gaps), 'max': max(gaps), 'mean': float(np.mean(gaps)),
+            'coefficientOfVariation': float(np.std(gaps) / np.mean(gaps))}
+        out['peakRadii'] = {'min': min(rs), 'max': max(rs), 'ratioMaxOverMin': max(rs) / min(rs)}
+        out['peakRadiusRisesInStepsOf'] = [mono, len(rs) - 1]
+    return out
+
+
+def audit(o, whorl_by_island):
+    me = o.data
+    co = np.array([v.co[:] for v in me.vertices])
+    nr = np.array([v.normal[:] for v in me.vertices])
+    length = float(co[:, 1].max() - co[:, 1].min())
+    snout = float(co[:, 1].min())
+    bvh = BVHTree.FromPolygons([v.co for v in me.vertices],
+                               [p.vertices[:] for p in me.polygons], all_triangles=False)
+    ptr, idx = adjacency(me)
+    prot = protrusions(me, ptr, idx)
+    label, biggest, sizes = islands(me, ptr, idx)
+
+    rows = []
+    for i, p in enumerate(co):
+        if not (-.47 < p[1] < -.33):
+            continue
+        s = Vector(p)
+        above = bvh.ray_cast(s + UP * 3e-4, UP, .6)
+        below = bvh.ray_cast(s + DOWN * 3e-4, DOWN, .6)
+        rows.append({'i': i, 'frac': (p[1] - snout) / length, 'x': float(p[0]), 'y': float(p[1]),
+                     'z': float(p[2]), 'nz': float(nr[i][2]),
+                     'above': None if above[0] is None else float(above[3]),
+                     'below': None if below[0] is None else float(below[3])})
+
+    if whorl_by_island:
+        # The shipped whorl is generated as its own islands, so it names itself.
+        whorl = [r for r in rows if label[r['i']] != biggest]
+        whorl_index = set(int(i) for i in np.nonzero(label != biggest)[0])
+    else:
+        whorl = [r for r in rows if r['above'] is not None and r['nz'] > .15 and r['y'] < -.36]
+        whorl_index = set(r['i'] for r in whorl)
+    enclosed = [r for r in whorl if r['below'] is not None]
+    exposed = [r for r in whorl if r['below'] is None]
+
+    ventral = {}
+    for r in rows:
+        if r['below'] is None and r['above'] is not None:
+            key = round(r['y'], 3)
+            ventral[key] = min(ventral.get(key, 1.), r['z'])
+
+    # Dentition the animal did not have, found as protrusion rather than by pointing at a row.
+    upper = [r for r in rows if r['i'] not in whorl_index and r['above'] is not None
+             and r['below'] is not None and r['nz'] < -.15 and r['y'] < -.35
+             and r['z'] > UPPER_JAW_FLOOR(r['y']) - .40 * abs(r['x'])]
+    lower = [r for r in rows if r['i'] not in whorl_index and r['above'] is not None
+             and r['nz'] > .15 and r['y'] < -.35 and abs(r['x']) >= .030
+             and r['z'] < UPPER_JAW_FLOOR(r['y']) - .40 * abs(r['x'])]
+    report = {
+        'bodyLength': length, 'snoutY': snout,
+        'vertices': len(me.vertices), 'connectedComponents': len(sizes),
+        'largestComponents': sizes[:4],
+        'whorlVertices': len(whorl),
+        'whorlEnclosedByTheChin': len(enclosed),
+        'whorlOnTheVentralSilhouette': len(exposed),
+        'whorlEnclosedFraction': len(enclosed) / max(1, len(whorl)),
+        'whorlExtentFractionOfBodyLength': [min(r['frac'] for r in whorl),
+                                            max(r['frac'] for r in whorl)],
+        'exposedArcFractionOfBodyLength': ([min(r['frac'] for r in exposed),
+                                            max(r['frac'] for r in exposed)] if exposed else None),
+        'clearanceAboveTheChin': {
+            'method': 'for each enclosed whorl vertex, the gap to the chin skin straight below it',
+            'min': min((r['below'] for r in enclosed), default=None),
+            'median': float(np.median([r['below'] for r in enclosed])) if enclosed else None,
+            'max': max((r['below'] for r in enclosed), default=None)},
+        'whorlLateralHalfWidth': max(abs(r['x']) for r in whorl),
+        'symphysealMassWithinThreeHundredthsOfTheMidline':
+            sum(1 for r in whorl if abs(r['x']) < .030) / max(1, len(whorl)),
+        'upperJawSurfaceVertices': len(upper),
+        'upperJawToothMaterial': sum(1 for r in upper if prot[r['i']] > PROTRUSION),
+        'upperJawMaximumProtrusion': max((float(prot[r['i']]) for r in upper), default=None),
+        'lowerJawSurfaceVerticesOutsideTheSymphysis': len(lower),
+        'lowerJawToothMaterialOutsideTheSymphysis':
+            sum(1 for r in lower if prot[r['i']] > PROTRUSION),
+        'lowerJawMaximumProtrusionOutsideTheSymphysis':
+            max((float(prot[r['i']]) for r in lower), default=None),
+        'protrusionThreshold': PROTRUSION,
+        'spiral': spiral(np.array([[r['x'], r['y'], r['z']] for r in whorl])),
+    }
+    stations = []
+    for y in np.arange(-.47, -.325, .01):
+        band = [r for r in whorl if abs(r['y'] - y) < .005]
+        chin = [z for k, z in ventral.items() if abs(k - y) < .005]
+        low = min((r['z'] for r in band), default=None)
+        floor = min(chin) if chin else None
+        stations.append({
+            'y': float(y), 'frac': float((y - snout) / length),
+            'whorlVertices': len(band), 'whorlLowestZ': low, 'ventralSilhouetteZ': floor,
+            'whorlAboveTheSilhouetteBy': None if low is None or floor is None else low - floor})
+    report['stations'] = stations
+    return report
+
+
+out = {
     'method': 'vertical ray casts up and down from every vertex in the head band; a vertex with '
               'mesh above it and mesh below it is inside the mouth, one with mesh above and '
-              'nothing below is on the ventral silhouette',
-    'whorlVertices': len(whorl),
-    'whorlEnclosedByTheChin': len(enclosed),
-    'whorlOnTheVentralSilhouette': len(exposed),
-    'whorlEnclosedFraction': len(enclosed) / max(1, len(whorl)),
-    'whorlExtentFractionOfBodyLength': [min(r['frac'] for r in whorl), max(r['frac'] for r in whorl)],
-    'exposedArcFractionOfBodyLength': ([min(r['frac'] for r in exposed), max(r['frac'] for r in exposed)]
-                                       if exposed else None),
-    'clearanceAboveTheChin': {
-        'method': 'for each enclosed whorl vertex, the gap to the chin skin straight below it',
-        'min': min((r['below'] for r in enclosed), default=None),
-        'median': float(np.median([r['below'] for r in enclosed])) if enclosed else None,
-        'max': max((r['below'] for r in enclosed), default=None),
-    },
-    'whorlLateralHalfWidth': max(abs(r['x']) for r in whorl),
-    'whorlLateralHalfWidthFractionOfBodyLength': max(abs(r['x']) for r in whorl) / LENGTH,
-    'symphysealMassWithinThreeHundredthsOfTheMidline':
-        sum(1 for r in whorl if abs(r['x']) < .030) / max(1, len(whorl)),
-    'upwardFacingToothMaterialOutsideTheSymphysis':
-        sum(1 for r in whorl if abs(r['x']) >= .030) / max(1, len(whorl)),
-    # The palate. Helicoprion had no upper teeth at all: the whorl occluded against a cartilage
-    # pad (Tapanila & Pruitt 2013). Anything counted here is dentition the animal did not have.
-    'upperJawToothMaterial': sum(
-        1 for r in rows if r['above'] is not None and r['below'] is not None and r['nz'] < -.15
-        and r['z'] > UPPER_JAW_FLOOR(r['y']) - .40 * abs(r['x']) and r['y'] < -.35),
-    'lowerJawToothMaterialOutsideTheSymphysis': sum(
-        1 for r in rows if r['above'] is not None and r['nz'] > .15
-        and r['z'] < UPPER_JAW_FLOOR(r['y']) - .40 * abs(r['x'])
-        and abs(r['x']) >= .030 and r['y'] < -.35),
+              'nothing below is on the ventral silhouette. Shape is measured about a centre '
+              'fitted in the sagittal plane; dentition is found as protrusion out of a vertex\'s '
+              'own two-ring neighbourhood along its normal.',
+    'source': {'file': 'tools/triassic/creatures/helicoprion/tripo-raw/helicoprion.raw.glb',
+               'note': 'the generation, before the builder touches it'},
+    'built': {'file': 'local/triassic-authoring/helicoprion/helicoprion.unpacked.glb',
+              'note': 'the shipped authored body, decoded by audit.mjs --decode; coordinates '
+                      'divided by the builder\'s 5x so both bodies are measured in one space'},
 }
-stations = []
-for y in np.arange(-.47, -.325, .01):
-    band = [r for r in whorl if abs(r['y'] - y) < .005]
-    chin = [z for k, z in ventral.items() if abs(k - y) < .005]
-    stations.append({
-        'y': float(y), 'frac': float((y - SNOUT) / LENGTH),
-        'whorlVertices': len(band),
-        'whorlLowestZ': min((r['z'] for r in band), default=None),
-        'ventralSilhouetteZ': min(chin) if chin else None,
-        'whorlAboveTheSilhouetteBy': (min(chin) if chin else 0) and
-                                     (min((r['z'] for r in band), default=0) - min(chin) if band and chin else None),
-    })
-report['stations'] = stations
-open(os.path.join(HERE, 'whorl-audit.json'), 'w').write(json.dumps(report, indent=2) + '\n')
-print('WHORL_AUDIT', json.dumps({k: report[k] for k in
-      ('whorlVertices', 'whorlEnclosedByTheChin', 'whorlOnTheVentralSilhouette',
-       'whorlEnclosedFraction', 'whorlExtentFractionOfBodyLength', 'exposedArcFractionOfBodyLength',
-       'whorlLateralHalfWidthFractionOfBodyLength',
-       'symphysealMassWithinThreeHundredthsOfTheMidline',
-       'upwardFacingToothMaterialOutsideTheSymphysis',
-       'upperJawToothMaterial',
-       'lowerJawToothMaterialOutsideTheSymphysis')}, indent=2))
-for s in stations:
-    print('  frac %.3f  whorl n=%3d lowest %s  ventral %s' % (
-        s['frac'], s['whorlVertices'],
-        'n/a' if s['whorlLowestZ'] is None else '%+.4f' % s['whorlLowestZ'],
-        'n/a' if s['ventralSilhouetteZ'] is None else '%+.4f' % s['ventralSilhouetteZ']))
+out['source'].update(audit(load(RAW, 1.), whorl_by_island=False))
+if os.path.exists(BUILT):
+    out['built'].update(audit(load(BUILT, SCALE), whorl_by_island=True))
+else:
+    out['built']['error'] = 'not found: run audit.mjs --decode first'
+open(os.path.join(HERE, 'whorl-audit.json'), 'w').write(json.dumps(out, indent=2) + '\n')
 
-# ------------------------------------------------------------- the picture ----
-# A cutaway is the only honest way to show this: the near half of the head is removed, the whorl
-# is painted, and what is above and below it is visible in one frame.
-if '--no-render' not in sys.argv:
-    whorl_index = {r['i'] for r in whorl}
-    half = o.copy()
-    half.data = o.data.copy()
-    bpy.context.collection.objects.link(half)
-    bm = bmesh.new()
-    bm.from_mesh(half.data)
-    bmesh.ops.delete(bm, geom=[f for f in bm.faces if f.calc_center_median().x > .004], context='FACES')
-    bmesh.ops.delete(bm, geom=[v for v in bm.verts if not v.link_faces], context='VERTS')
-    bm.to_mesh(half.data)
-    bm.free()
-    half.data.materials.clear()
-    paint = half.data.color_attributes.new(name='WhorlPaint', type='FLOAT_COLOR', domain='POINT')
-    keep = {tuple(round(c, 6) for c in co[i]) for i in whorl_index}
-    painted = 0
-    for v in half.data.vertices:
-        if tuple(round(c, 6) for c in v.co) in keep:
-            paint.data[v.index].color = (.85, .10, .06, 1)
-            painted += 1
-        else:
-            paint.data[v.index].color = (.62, .60, .58, 1)
-    m = bpy.data.materials.new('Cutaway')
-    m.use_nodes = True
-    bsdf = m.node_tree.nodes.get('Principled BSDF')
-    vc = m.node_tree.nodes.new('ShaderNodeVertexColor')
-    vc.layer_name = 'WhorlPaint'
-    m.node_tree.links.new(vc.outputs['Color'], bsdf.inputs['Base Color'])
-    bsdf.inputs['Roughness'].default_value = .7
-    half.data.materials.append(m)
-    for f in half.data.polygons:
-        f.material_index = 0
-    o.hide_render = True
-    s = bpy.context.scene
-    s.render.engine = 'CYCLES'
-    s.cycles.device = 'CPU'
-    s.cycles.samples = 24
-    s.cycles.use_denoising = True
-    s.render.film_transparent = False
-    s.view_settings.view_transform = 'Standard'
-    s.world.use_nodes = True
-    s.world.node_tree.nodes['Background'].inputs[0].default_value = (.05, .06, .07, 1)
-    s.world.node_tree.nodes['Background'].inputs[1].default_value = 1.
-    for loc, power in [((4, -2, 3), 240), ((2, -1, -3), 160), ((3, 1, 1), 200)]:
-        bpy.ops.object.light_add(type='AREA', location=loc)
-        lamp = bpy.context.object
-        lamp.data.energy = power
-        lamp.data.size = 3
-        lamp.rotation_euler = (Vector((0, -.42, -.02)) - lamp.location).to_track_quat('-Z', 'Y').to_euler()
-    bpy.ops.object.camera_add()
-    cam = bpy.context.object
-    s.camera = cam
-    cam.data.type = 'ORTHO'
-    cam.data.ortho_scale = .21
-    cam.location = (1.2, -.415, -.022)
-    cam.rotation_euler = (Vector((0, -.415, -.022)) - cam.location).to_track_quat('-Z', 'Y').to_euler()
-    s.render.resolution_x, s.render.resolution_y = 1100, 800
-    s.render.image_settings.file_format = 'JPEG'
-    s.render.filepath = os.path.join(HERE, 'whorl-section.jpg')
-    bpy.ops.render.render(write_still=True)
-    print('WHORL_SECTION painted', painted, 'of', len(half.data.vertices), '->', s.render.filepath)
+brief = ['whorlVertices', 'whorlEnclosedFraction', 'whorlOnTheVentralSilhouette',
+         'upperJawToothMaterial', 'lowerJawToothMaterialOutsideTheSymphysis']
+for side in ('source', 'built'):
+    if 'whorlVertices' not in out[side]:
+        print(side, out[side].get('error'))
+        continue
+    s = out[side]
+    print(side, json.dumps({k: s[k] for k in brief}))
+    print(' ', json.dumps({k: s['spiral'][k] for k in
+                           ('angularBinsWithFewerThanThreeVertices', 'radialPeakCount',
+                            'radialSpreadOverMeanRadius', 'peakRadiusRisesInStepsOf',
+                            'largestRadialGapPerRay')
+                           if k in s['spiral']}))
