@@ -494,6 +494,17 @@ export class Engine {
       });
     }
 
+    // The sprint bed follows whichever local body is driving hardest, and only while it has the
+    // stamina to be driving at all — an empty bar is a body labouring, not one surging.
+    let sprint = 0;
+    if (!this.attract && running) {
+      for (const [i, f] of inputs) {
+        const p = game.players[i];
+        if (p && isAlive(p) && p.exhausted === 0 && p.stamina > 0) sprint = Math.max(sprint, Math.min(1, f.burst));
+      }
+    }
+    audio.setSprint(sprint);
+
     // Fixed step. Capped at 3 sub-steps so a slow frame cannot spiral into more simulation work.
     const tSim = performance.now();
     if (running) {
@@ -1159,7 +1170,11 @@ export class Engine {
         case 'disintegrate': { this.sparkles.emit(e.pos, Math.round(28 + (e.strength ?? 1) * 10), 0.5 + (e.strength ?? 1) * 0.25, 0.9, 0.06, 2.2); world('disintegrate', e.pos, 0.6); break; }
         case 'routed': { world('routed', e.pos, 0.8); this.impacts.spawn(e.pos, '#9ff6ff', 2.5, 0.6); break; }
         case 'pounce': { this.impacts.spawn(e.pos, '#ffe08a', 1.2 + (e.strength ?? 1) * 0.5, 0.35); this.bubbles.emit(e.pos, 24, 0.9, 4, 0.08); world('pounce', e.pos, 1.3); if (e.player != null && e.player >= 0) { const d = padOf(e.player); if (typeof d === 'number') rumble(d, 0.7, 0.4, 140); this.shake(e.player, 0.6); } break; }
-        case 'burst': { const b = game.byId(e.actor); world(b && RULES?.jet(b) ? 'jet' : heavy('burst', e.actor), e.pos); if (b && RULES?.jet(b)) this.bubbles.emit(e.pos, 30, 0.9, 3, 0.1, 1.4); break; }
+        // A jet is a discrete shove — a nautiloid empties its funnel and stops — so it keeps its
+        // sting. Ordinary sprinting is a bed instead (`audio.setSprint`, driven below from the
+        // frame's own inputs): it is held down for minutes at a time, and one loud whoosh per press
+        // was the single most repeated sound in the game.
+        case 'burst': { const b = game.byId(e.actor); if (b && RULES?.jet(b)) { world('jet', e.pos); this.bubbles.emit(e.pos, 30, 0.9, 3, 0.1, 1.4); } break; }
         // Coming out of an egg. There is no shell-crack sample yet (docs/audio-requests.md), so it
         // borrows the hatch-in sound rather than synthesising a stand-in for one.
         case 'hatch': { if (e.player != null && e.player >= 0) audio.play('respawn'); else world('respawn', e.pos, 1, 0.5); break; }

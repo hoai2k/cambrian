@@ -350,6 +350,16 @@ unless the user explicitly asks for a PR. Steps:
   water and complete at the surface — so distance out costs the climb for air. A body placed at an
   *absolute* y is a bug in a sea like this: ask the seabed where the water is (`openWater` in
   `tools/devonian-test.ts` is the pattern).
+- A giant hunts when it is hungry and not otherwise (`wantsToHunt` in `src/sim/ai.ts`): being seen
+  used to be reason enough, so every giant that could see a player came down on them and there was
+  no approaching one to ride it. A fed giant notices — the head comes round, which is the tell — and
+  goes back to its route; how often one is hungry follows the hour and the water it is over
+  (`appetiteAt`), which is where the rhythm of the day is set. `npm run hunt` covers both halves.
+- A mouthful a *player* takes is taken in the mouth: `takeWhole` in `src/sim/game.ts` sends it
+  through `startSwallow`, so the body is carried in front of the jaws and eaten over the next second
+  rather than vanishing on contact, and swimming into an animal no longer eats it at all — a player
+  has to bite or pounce. The reef's own predators, and anything out of a school, still go down in
+  one gulp with no ceremony.
 - What lives where is the place's own business, not the player's: `src/sim/population.ts` gives every
   210-unit area a size profile and a density from a hash bent by the biome (hatcheries inshore, grown
   animals in the deep), pure in the place and the world seed so an area is the same when you return.

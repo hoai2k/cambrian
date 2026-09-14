@@ -1760,7 +1760,7 @@ export class Game implements AiWorld {
           // what it does when it gets there.
           const gripped = a.graspHold && this.closeGrip(a, t);
           if (gripped) { /* the pounce closed a grip; the release settles it */ }
-          else if (band === 'snack' && (t.controller === 'swarm' || (t.controller === 'ambient' && lengthOf(t) < L * 0.3))) this.consume(a, t);
+          else if (band === 'snack' && (t.controller === 'swarm' || (t.controller === 'ambient' && lengthOf(t) < L * 0.3))) this.takeWhole(a, t);
           else { const m = { ...def.heavy, name: 'Pounce', damage: def.heavy.damage * 1.35, poise: def.heavy.poise * 1.2, knockback: def.heavy.knockback * 0.8, lunge: 0 }; applyHit(this.hitCtx, a, t, m, 1.2); }
           this.events.push({ kind: 'pounce', pos: { ...a.pos }, actor: a.id, other: t.id, player: a.player, strength: L });
           a.vel = vscale(a.vel, 0.25); a.iframes = 0.1;
@@ -2569,7 +2569,7 @@ export class Game implements AiWorld {
         if (a.graspHold && a.grabbing < 0 && a.rideHost < 0 && this.closeGrip(a, o)) continue;
         const closing = clamp(dot(sub(a.vel, o.vel), norm(sub(o.pos, a.pos))) / (creature(a.creature).speed * speedFactor(a.scale) * 1.8), 0, 1.5);
         const band = bandOf(a, o);
-        if (band === 'snack' && (o.controller === 'swarm' || (o.controller === 'ambient' && lengthOf(o) < lengthOf(a) * 0.3))) { this.consume(a, o); continue; }
+        if (band === 'snack' && (o.controller === 'swarm' || (o.controller === 'ambient' && lengthOf(o) < lengthOf(a) * 0.3))) { this.takeWhole(a, o); continue; }
         const r = applyHit(this.hitCtx, a, o, m, closing);
         if (o.controller === 'player' && (band === 'rival')) this.flag(o, 'fought');
         void r;
@@ -2605,10 +2605,37 @@ export class Game implements AiWorld {
       // Only small wild things go down in one gulp. Players and bots always get a fight (three bites from a giant).
       if (o.controller !== 'swarm' && o.controller !== 'ambient') continue;
       if (o.controller === 'ambient' && lengthOf(o) > lengthOf(a) * 0.3) continue;
+      // Swimming through a cloud of plankton feeds you; swimming *at* an animal does not. For a
+      // player an animal is something to be caught — bitten, pounced on, taken in the mouth — and
+      // having one vanish as you closed on it was the whole of what made hunting feel like nothing
+      // happened. The reef's own predators still take a mouthful in passing.
+      if ((a.controller === 'player' || a.controller === 'bot') && o.controller !== 'swarm' && a.state !== 'attack' && a.state !== 'pounce') continue;
       // A nursery is a peace, and a mouthful taken in passing breaks it as surely as a hunt does.
       if (peaceful(o.pos) && a.lastHitBy !== o.id) continue;
-      if (dist(a.pos, o.pos) < L * 0.4 + bodyRadius(o) && (moving || a.state === 'attack')) this.consume(a, o);
+      if (dist(a.pos, o.pos) < L * 0.4 + bodyRadius(o) && (moving || a.state === 'attack')) this.takeWhole(a, o);
     }
+  }
+
+  /**
+   * Take a whole mouthful.
+   *
+   * A wild thing small enough to go down in one gulp is *removed* when wildlife takes it: nobody is
+   * watching, and a reef of grazers cannot afford a performance each. When a player takes one it is
+   * the whole point of the act, so it goes into the mouth and is eaten there — the body is carried
+   * along in front of the jaws and swallowed over the next second (`updateSwallowed`), which is the
+   * same performance a bigger kill already had. It used to vanish on contact, which read as prey
+   * evaporating as you reached it rather than as being caught.
+   */
+  private takeWhole(a: Actor, o: Actor) {
+    // A fish out of a school is a mouthful taken in passing, and a cloud of them is how a filter
+    // feeder eats: no ceremony there either, or crossing a shoal would be a hundred performances.
+    if (o.controller === 'swarm' || (a.controller !== 'player' && a.controller !== 'bot')) { this.consume(a, o); return; }
+    const ratio = clamp(lengthOf(o) / Math.max(lengthOf(a), 1e-3), 0.05, 1);
+    startSwallow(this.hitCtx, a, o);
+    // A mouthful is not a meal: the chew and the pause both follow how big the thing was.
+    o.stateDur = clamp(0.45 + ratio * 2.6, 0.45, 1.6);
+    a.holdT = clamp(ratio * 3, 0.3, 1.4);
+    this.flag(a, 'ate');
   }
 
   private consume(a: Actor, o: Actor) {
