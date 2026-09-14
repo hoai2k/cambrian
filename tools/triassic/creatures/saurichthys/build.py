@@ -1,0 +1,1913 @@
+"""Rebuild Saurichthys: the worked Tripo skin and a measured voxel-volume twin on one shared rig.
+
+Blender 5.2. This is the straightest body in the Triassic set -- the proportion audit measured its
+bent path at 1.006 of its straight axis -- so the carry is very nearly the identity, and most of
+what intake does here is level the animal: the generation is pitched and rolled, and both come out
+of the measurement rather than out of a guess. After that the body lies head at -Y, up +Z, midline
+x = 0 in raw Tripo units, and `tx()` applies the final engine scale; `export_yup` then puts the head
+at glTF +Z, where every shipped body keeps it.
+
+Which end is the head cannot be decided here the way it is on the other fish. A tail tapers to a
+blade and a head does not -- except on this animal, whose rostrum is as thin as its caudal fin
+(0.0171 of measured shell thickness against 0.0143, a margin of nothing). So the head end is found
+by the *mouth*: the generation models a long open slit with a tooth row in it, and the vertices that
+can see across it are overwhelmingly at one end.
+
+Nothing here models new anatomy beside the generation. The jaw is cut out of the generation's own
+skin along its own measured mouth line, the teeth are the generation's own, and the only authored
+surface is the oral lining -- which closes a hole, takes its UVs from the skin around it and wears
+the body's own albedo.
+
+Writes only this species' asset family. Touches no shared registry and performs no git operations.
+"""
+import bpy, bmesh, math, json, os, struct, hashlib, shutil, heapq
+import numpy as np
+from mathutils import Vector, Matrix, Quaternion
+from mathutils.bvhtree import BVHTree
+from mathutils.geometry import barycentric_transform
+from math import sin, cos, pi
+
+HERE = os.path.dirname(os.path.abspath(__file__))
+ROOT = os.path.abspath(os.path.join(HERE, '../../../..'))
+LOCAL = os.path.join(ROOT, 'local/triassic-authoring/saurichthys')
+OUT = os.path.join(ROOT, 'public/assets/triassic/creatures')
+os.makedirs(LOCAL, exist_ok=True)
+os.makedirs(OUT, exist_ok=True)
+ID = 'saurichthys'
+# The preview is the generation republished; the raw file beside it is preserved and never changed.
+# `docs/triassic/preview-mesh-defects.md` records that this body needed no correction at all: it
+# welds to one component, with no detached flake and nothing smoothed away.
+SOURCE = os.path.join(HERE, ID + '.preview.glb')
+RAW = os.path.join(HERE, 'tripo-raw', ID + '.raw.glb')
+TARGET_LENGTH = 5.0
+HEAD_ARC = .27                 # the whole rostrum and skull, which are one rigid piece here
+BANDS = 80
+VOXEL = .0042                  # finer than the shark's: a rostrum 0.01 across has to
+                               # survive the occupancy field as a rostrum
+BLADE_DILATION = .0050
+PUPPET_TRIANGLE_TARGET = 7000
+ENVELOPE_TOLERANCE_FRACTION = .04
+ANCHOR_TOLERANCE_FRACTION = .02
+
+CLIPS = {'Idle': 3.0, 'Swim': 1.6, 'Sprint': .9, 'TurnLeft': 1.5, 'TurnRight': 1.5,
+         'Dive': 1.4, 'Rise': 1.4, 'Attack': .9, 'Bite': .45, 'Heavy': 1.1, 'Hit': .6,
+         'Death': 1.7, 'Guard': 1.2, 'Parry': .4, 'Dodge': .45, 'Eat': 1.5, 'Stagger': 1.2,
+         'Ability': 1.0, 'Grab': 1.1, 'Breath': 2.4, 'Growth': 1.5,
+         'FastStart': .8, 'Hover': 3.4}
+LOOPS = ['Idle', 'Swim', 'Sprint', 'Guard', 'Eat', 'Grab', 'Hover']
+
+report = {}
+
+# ---------------------------------------------------------------- intake ----
+bpy.ops.object.select_all(action='SELECT')
+bpy.ops.object.delete(use_global=False)
+for a in list(bpy.data.actions):
+    bpy.data.actions.remove(a)
+bpy.ops.import_scene.gltf(filepath=SOURCE)
+auth = next(o for o in bpy.context.scene.objects if o.type == 'MESH')
+auth.name = 'Saurichthys authored body'
+bpy.context.view_layer.objects.active = auth
+
+bm = bmesh.new()
+bm.from_mesh(auth.data)
+bmesh.ops.remove_doubles(bm, verts=list(bm.verts), dist=1e-6)
+bm.verts.ensure_lookup_table()
+seen, components = set(), []
+for v in bm.verts:
+    if v in seen:
+        continue
+    stack, part = [v], []
+    seen.add(v)
+    while stack:
+        q = stack.pop()
+        part.append(q)
+        for e in q.link_edges:
+            w = e.other_vert(q)
+            if w not in seen:
+                seen.add(w)
+                stack.append(w)
+    components.append(part)
+component_sizes = sorted((len(c) for c in components), reverse=True)
+removed = sum(len(c) for c in components if len(c) < 8)
+for c in components:
+    if len(c) < 8:
+        bmesh.ops.delete(bm, geom=c, context='VERTS')
+bmesh.ops.recalc_face_normals(bm, faces=list(bm.faces))
+bm.to_mesh(auth.data)
+bm.free()
+auth.data.update()
+source_triangles = sum(len(p.vertices) - 2 for p in auth.data.polygons)
+
+# ------------------------------------------------------------- material ----
+# The correction this era's first bodies established: keep the full original albedo and its UVs,
+# make COLOR_0 white so runtime recolouring does not multiply the texture by a baked copy of its
+# own pigment, cut the generated normal map back to restrained microrelief, and set roughness and
+# metallic explicitly after disconnecting the linked ORM inputs.
+mat = auth.data.materials[0]
+mat.name = 'Saurichthys body pigmentation'
+bs = mat.node_tree.nodes.get('Principled BSDF')
+colnode = next(n for n in mat.node_tree.nodes
+               if n.type == 'TEX_IMAGE' and n.image and n.image.colorspace_settings.name == 'sRGB')
+im = colnode.image
+pixels = np.array(im.pixels[:], dtype=np.float32).reshape(im.size[1], im.size[0], 4)
+layer = auth.data.color_attributes.new(name='Color', type='FLOAT_COLOR', domain='POINT')
+for item in layer.data:
+    item.color = (1, 1, 1, 1)
+for link in list(mat.node_tree.links):
+    if link.to_node == bs and link.to_socket.name in ['Metallic', 'Roughness']:
+        mat.node_tree.links.remove(link)
+bs.inputs['Metallic'].default_value = 0
+bs.inputs['Roughness'].default_value = .52          # reduced squamation: bright scale rows on bare skin
+for n in mat.node_tree.nodes:
+    if n.type == 'NORMAL_MAP':
+        n.inputs['Strength'].default_value = .15
+# The skin is double-sided as the backstop under the lining, not in place of it.
+mat.use_backface_culling = False
+albedo_sha = hashlib.sha256(bytes(im.packed_file.data)).hexdigest() if im.packed_file else None
+
+
+def sample_albedo(u, v):
+    """Bilinear lookup in the encoded sRGB byte image, converted to linear exactly once."""
+    h, w = pixels.shape[:2]
+    x = (float(u) % 1) * w - .5
+    y = (float(v) % 1) * h - .5
+    x0, y0 = math.floor(x), math.floor(y)
+    fx, fy = x - x0, y - y0
+    rgb = (pixels[y0 % h, x0 % w, :3] * (1 - fx) * (1 - fy)
+           + pixels[y0 % h, (x0 + 1) % w, :3] * fx * (1 - fy)
+           + pixels[(y0 + 1) % h, x0 % w, :3] * (1 - fx) * fy
+           + pixels[(y0 + 1) % h, (x0 + 1) % w, :3] * fx * fy)
+    linear = np.where(rgb <= .04045, rgb / 12.92, ((rgb + .055) / 1.055) ** 2.4)
+    return (*[float(c) for c in linear], 1.)
+
+
+# ============================ measured intake: the body's own axis, and straightening it =========
+def smooth(t):
+    t = max(0., min(1., t))
+    return t * t * (3 - 2 * t)
+
+
+def adjacency(mesh):
+    n = len(mesh.vertices)
+    ev = np.array([e.vertices[:] for e in mesh.edges], dtype=np.int64)
+    counts = np.zeros(n, dtype=np.int64)
+    np.add.at(counts, ev[:, 0], 1)
+    np.add.at(counts, ev[:, 1], 1)
+    ptr = np.zeros(n + 1, dtype=np.int64)
+    ptr[1:] = np.cumsum(counts)
+    idx = np.zeros(int(ptr[-1]), dtype=np.int64)
+    fill = ptr[:-1].copy()
+    for a, b in ev:
+        idx[fill[a]] = b
+        fill[a] += 1
+        idx[fill[b]] = a
+        fill[b] += 1
+    return ptr, idx
+
+
+def ring_mean(P, ptr, idx):
+    return np.add.reduceat(P[idx], ptr[:-1], axis=0) / np.diff(ptr).reshape(-1, 1)
+
+
+def shell_thickness(mesh, bvh):
+    """How thick the shell is along each vertex's inward normal. A fin blade is thin and a trunk is
+    not, which separates a fin from the flank it grows out of without guessing a boundary."""
+    t = np.empty(len(mesh.vertices), dtype=np.float64)
+    for i, v in enumerate(mesh.vertices):
+        n = Vector(v.normal[:])
+        hit = bvh.ray_cast(Vector(v.co[:]) - n * 2e-4, -n, .8)
+        t[i] = hit[3] if hit[0] is not None else .8
+    return t
+
+
+def neighbourhood_minimum(mesh, values, rings=2):
+    """The smallest thickness within `rings` edges. A vertex on a blade's rim has a normal lying
+    almost in the plane of the blade, so its own ray runs the length of the fin instead of across
+    it and the rim measures as thick as the trunk -- which weights a fin's rim to the body and
+    tears a fan of spikes out of it on the first roll."""
+    ptr, idx = adjacency(mesh)
+    out = np.array(values, dtype=np.float64)
+    for _ in range(rings):
+        prev = out.copy()
+        out = np.minimum(prev, np.minimum.reduceat(prev[idx], ptr[:-1]))
+    return out
+
+
+def bvh_of(mesh):
+    return BVHTree.FromPolygons([v.co.copy() for v in mesh.vertices],
+                                [p.vertices[:] for p in mesh.polygons], all_triangles=False)
+
+
+def geodesic(mesh):
+    """Distance over the skin from one end of the animal to the other, which bands the surface into
+    rings that are square to the body wherever the body happens to be pointing."""
+    bmx = bmesh.new()
+    bmx.from_mesh(mesh)
+    bmx.verts.ensure_lookup_table()
+    adj = {v.index: [(e.other_vert(v).index, e.calc_length()) for e in v.link_edges] for v in bmx.verts}
+    pos = {v.index: np.array(v.co[:]) for v in bmx.verts}
+    bmx.free()
+
+    def run(s):
+        dist = {k: 1e18 for k in adj}
+        dist[s] = 0.
+        pq = [(0., s)]
+        while pq:
+            d, u = heapq.heappop(pq)
+            if d > dist[u] + 1e-12:
+                continue
+            for w, l in adj[u]:
+                nd = d + l
+                if nd < dist[w] - 1e-12:
+                    dist[w] = nd
+                    heapq.heappush(pq, (nd, w))
+        return dist
+
+    seed = min(pos, key=lambda k: pos[k][0])
+    a = max(run(seed).items(), key=lambda kv: kv[1])[0]
+    Da = run(a)
+    b = max(Da.items(), key=lambda kv: kv[1])[0]
+    return a, b, Da, run(b), pos
+
+
+def frames(pts, n0=None):
+    T = [(pts[i + 1] - pts[i]).normalized() for i in range(len(pts) - 1)]
+    up = Vector((0, 0, 1))
+    N = [n0.copy() if n0 else (up - T[0] * T[0].dot(up)).normalized()]
+    for i in range(1, len(T)):
+        axis = T[i - 1].cross(T[i])
+        n = N[-1].copy()
+        if axis.length > 1e-9:
+            n.rotate(Matrix.Rotation(T[i - 1].angle(T[i]), 4, axis.normalized()))
+        N.append((n - T[i] * T[i].dot(n)).normalized())
+    return T, N, [T[i].cross(N[i]) for i in range(len(T))]
+
+
+uv_layer = auth.data.uv_layers.active
+
+
+def hit_uv(loc, idx, mesh=None, uv=None):
+    mesh = mesh if mesh is not None else (intake_mesh if 'intake_mesh' in globals() else auth.data)
+    uv = uv if uv is not None else (intake_uv if 'intake_uv' in globals() else uv_layer)
+    poly = mesh.polygons[idx]
+    if len(poly.vertices) != 3:
+        return None
+    pv = [mesh.vertices[j].co for j in poly.vertices]
+    qv = [Vector((*uv.data[j].uv, 0)) for j in poly.loop_indices]
+    return barycentric_transform(Vector(loc), pv[0], pv[1], pv[2], qv[0], qv[1], qv[2])
+
+
+def luminance_at(loc, idx):
+    s = hit_uv(loc, idx)
+    if s is None:
+        return None
+    h, w = pixels.shape[:2]
+    rgb = pixels[int((float(s.y) % 1) * h) % h, int((float(s.x) % 1) * w) % w, :3]
+    return float(.2126 * rgb[0] + .7152 * rgb[1] + .0722 * rgb[2])
+
+
+src_bvh = bvh_of(auth.data)
+thick0 = neighbourhood_minimum(auth.data, shell_thickness(auth.data, src_bvh))
+END_A, END_B, DA, DB, POS = geodesic(auth.data)
+
+
+def bulk(D):
+    m = max(D.values())
+    keep = [k for k, d in D.items() if .03 * m < d < .20 * m]
+    return float(np.mean([thick0[k] for k in keep])) if keep else 0.
+
+
+BULK_A, BULK_B = bulk(DA), bulk(DB)
+# A tail tapers to a blade and a head does not -- and on this animal that rule fails, because the
+# rostrum is as thin as the caudal fin. The margin is asserted to be *inadequate* rather than
+# trusted, so nobody later mistakes the fallback below for a redundant belt and braces.
+assert abs(BULK_A - BULK_B) < .4 * max(BULK_A, BULK_B), \
+    ('the ends now differ enough to use the thickness rule', BULK_A, BULK_B)
+# The mouth decides instead. A vertex whose own outward normal runs back into the mesh is looking
+# across a slit at the surface opposite; this generation carries a long modelled gape with a tooth
+# row in it, and those vertices pile up at one end of the animal and nowhere near the other.
+_cavity_all = []
+for v in auth.data.vertices:
+    n = Vector(v.normal[:])
+    if src_bvh.ray_cast(Vector(v.co[:]) + n * 3e-4, n, .030)[0] is not None:
+        _cavity_all.append(v.index)
+assert len(_cavity_all) > 200, ('no modelled mouth to find the head by', len(_cavity_all))
+_front_a = sum(1 for k in _cavity_all if DA[k] < .18 * max(DA.values()))
+_front_b = sum(1 for k in _cavity_all if DB[k] < .18 * max(DB.values()))
+assert max(_front_a, _front_b) > 4 * min(_front_a, _front_b) + 10, \
+    ('the mouth does not pick an end either', _front_a, _front_b)
+D = DA if _front_a > _front_b else DB
+SNOUT = END_A if _front_a > _front_b else END_B
+MAXD = max(D.values())
+head_end_report = {'rule': 'the end the modelled oral cavity is at',
+                   'shellThicknessRuleWasInconclusive': [round(BULK_A, 4), round(BULK_B, 4)],
+                   'cavityVerticesTotal': len(_cavity_all),
+                   'cavityVerticesInTheFrontSixthOfEachEnd': [_front_a, _front_b]}
+
+# The centreline: ring centroids of the geodesic bands, taken over the *trunk* part of each ring
+# (its thickest half) so a dorsal fin cannot pull the axis up out of the animal, smoothed hard and
+# resampled evenly by arc. The smoothing is not cosmetic: band-to-band centroid noise on a finned
+# body is a few thousandths across, invisible in a plot and catastrophic in an arc length. Left
+# raw, a body like this measures hundreds of degrees of total turning and an arc far longer than
+# its own chord, and straightening it onto that arc would stretch the animal to match.
+bins = [[] for _ in range(BANDS)]
+for k, d in D.items():
+    bins[min(BANDS - 1, int(d / MAXD * BANDS))].append(k)
+raw_line = []
+for i, b in enumerate(bins):
+    if len(b) < 8:
+        continue
+    t = np.array([thick0[k] for k in b])
+    keep = [k for k, tv in zip(b, t) if tv >= float(np.percentile(t, 55))]
+    if len(keep) < 6:
+        continue
+    a = np.array([POS[k] for k in keep])
+    c = np.median(a, axis=0)
+    raw_line.append([(i + .5) / BANDS * MAXD, c, float(np.median(np.linalg.norm(a - c, axis=1)))])
+CC = np.array([r[1] for r in raw_line])
+RR = np.array([r[2] for r in raw_line])
+GG = np.array([r[0] for r in raw_line])
+for _ in range(90):
+    CC[1:-1] = (CC[:-2] + 2 * CC[1:-1] + CC[2:]) / 4
+    RR[1:-1] = (RR[:-2] + 2 * RR[1:-1] + RR[2:]) / 4
+CC = np.vstack([CC[0] + (CC[0] - CC[1]) * 3., CC, CC[-1] + (CC[-1] - CC[-2]) * 3.])
+RR = np.concatenate([[RR[0]], RR, [RR[-1]]])
+GG = np.concatenate([[GG[0] - (GG[1] - GG[0]) * 3.], GG, [GG[-1] + (GG[-1] - GG[-2]) * 3.]])
+_seg = np.linalg.norm(np.diff(CC, axis=0), axis=1)
+_cum = np.concatenate([[0.], np.cumsum(_seg)])
+_even = np.linspace(0, _cum[-1], 61)
+P, R, G = [], [], []
+for s in _even:
+    j = int(np.clip(np.searchsorted(_cum, s), 1, len(_cum) - 1))
+    t = (s - _cum[j - 1]) / max(1e-12, _cum[j] - _cum[j - 1])
+    P.append(Vector(CC[j - 1] + (CC[j] - CC[j - 1]) * t))
+    R.append(float(RR[j - 1] + (RR[j] - RR[j - 1]) * t))
+    G.append(float(GG[j - 1] + (GG[j] - GG[j - 1]) * t))
+SEG = [(P[i + 1] - P[i]).length for i in range(len(P) - 1)]
+CUM = [0.]
+for s in SEG:
+    CUM.append(CUM[-1] + s)
+ARC = CUM[-1]
+TP, NP, BP = frames(P)
+TURNING = sum(math.degrees(TP[i].angle(TP[i + 1])) for i in range(len(TP) - 1))
+
+# The roll, read off the animal's own countershading. A roughly circular section is rotationally
+# ambiguous: a centreline fit gives the path and can say nothing about the roll, and a carry that
+# gets the roll wrong spirals the markings down a body whose silhouette comes out perfectly
+# straight. The back is dark and the belly pale, so the first circular harmonic of the darkness
+# round each station points at dorsal.
+ROLL_AROUND = 64
+deg, strength = [], []
+for i in range(len(TP)):
+    c = (P[i] + P[i + 1]) / 2
+    lum, angs = [], []
+    for k in range(ROLL_AROUND):
+        th = k * 2 * pi / ROLL_AROUND
+        hit = src_bvh.ray_cast(c, NP[i] * cos(th) + BP[i] * sin(th), .30)
+        if hit[0] is None:
+            continue
+        L = luminance_at(hit[0], hit[2])
+        if L is None:
+            continue
+        lum.append(L)
+        angs.append(th)
+    if len(lum) < ROLL_AROUND * .6:
+        deg.append(None)
+        strength.append(0.)
+        continue
+    a = np.array(lum)
+    dark = a.mean() - a
+    vx = float(np.sum(dark * np.cos(angs)))
+    vy = float(np.sum(dark * np.sin(angs)))
+    deg.append(math.degrees(math.atan2(vy, vx)))
+    strength.append(math.hypot(vx, vy) / max(1e-9, float(np.abs(dark).sum())))
+ROLL_STRENGTH = float(np.mean(strength))
+assert ROLL_STRENGTH > .3, ('the countershading is too weak to read a roll from', ROLL_STRENGTH)
+_ref = next((r for r in deg if r is not None), 0.)
+_fill = [(r if r is not None else _ref) for r in deg]
+THETA = [math.radians(_fill[0])]
+for r in _fill[1:]:
+    prev = math.degrees(THETA[-1])
+    THETA.append(math.radians(prev + ((r - prev + 180) % 360) - 180))
+for _ in range(6):
+    THETA = ([THETA[0]] + [(THETA[i - 1] + 2 * THETA[i] + THETA[i + 1]) / 4
+                           for i in range(1, len(THETA) - 1)] + [THETA[-1]])
+
+
+# How far the generation's own rest pose is from neutral, region by region. The number that matters
+# is the arc's mean curvature radius over the section radius there: a run of body whose curve is
+# twenty times its own thickness straightens on the rig without complaint, and one whose curve is a
+# couple of times its own thickness has to be unbent in the mesh before anything is bound to it
+# (Dinocephalosaurus' neck, at 2.8, is the worked example; its tail, at 9.0, is the easy half).
+def region_curvature(i0, i1):
+    i0 = max(0, min(len(TP) - 2, i0))
+    i1 = max(i0 + 2, min(len(TP) - 1, i1))
+    turn = sum(math.degrees(TP[i].angle(TP[i + 1])) for i in range(i0, i1))
+    arc = CUM[i1] - CUM[i0]
+    sec = float(np.median(R[i0:i1 + 1]))
+    return {'arc': round(arc, 4), 'totalTurningDeg': round(turn, 1),
+            'sectionRadius': round(sec, 4),
+            'meanCurvatureRadius': round(arc / max(1e-6, math.radians(turn)), 4),
+            'meanCurvatureRadiusOverSection': round(arc / max(1e-6, math.radians(turn))
+                                                    / max(1e-9, sec), 2)}
+
+
+def _station_at(fraction):
+    return int(np.searchsorted(CUM, fraction * ARC))
+
+
+REST_POSE_CURVATURE = {
+    'wholeSpine': region_curvature(0, len(TP) - 1),
+    'headAndTrunk': region_curvature(_station_at(HEAD_ARC), _station_at(.60)),
+    'tail': region_curvature(_station_at(.60), len(TP) - 1),
+    'note': 'measured on the generation\'s own centreline before anything was carried; this animal '
+            'has no neck to measure separately',
+}
+
+iH = max(1, min(len(TP) - 1, int(np.searchsorted(CUM, HEAD_ARC * ARC))))
+_span = [i for i in range(iH, len(TP)) if CUM[i] < .55 * ARC] or [iH]
+T0 = Vector((0, 0, 0))
+for i in _span:
+    T0 += TP[i]
+T0.normalize()
+O = P[iH] - T0 * CUM[iH]
+Q = [O + T0 * s for s in CUM]
+# The target axis is straight, so its frames are one frame and the only thing left to decide is the
+# roll. Choosing each target frame so that that station's own measured dorsal lands on the target's
+# up is exact: an earlier version rolled an angle measured in the source's transport frame onto the
+# target's, which is a different frame, and took 24 degrees out of a shark's pectoral span.
+UP_T = (Vector((0, 0, 1)) - T0 * T0.dot(Vector((0, 0, 1)))).normalized()
+W_T = T0.cross(UP_T)
+TQ = [T0.copy() for _ in range(len(TP))]
+NQ = [UP_T * cos(THETA[i]) - W_T * sin(THETA[i]) for i in range(len(TP))]
+BQ = [TQ[i].cross(NQ[i]) for i in range(len(TP))]
+# The head is not carried section by section: a skull is not a tube and re-spacing its rings
+# squashes the snout. Its stations are straightened and their frames frozen to the one at `iH`, so
+# the single carry *is* a rigid transform over the whole head and is continuous with the trunk
+# behind it. Switching between two maps at a threshold instead shows as a step in the flank, and
+# cost 0.116 of a body length of pectoral span on the first animal this was tried on.
+for i in range(iH):
+    back = CUM[iH] - CUM[i]
+    P[i] = P[iH] - TP[iH] * back
+    Q[i] = Q[iH] - TQ[iH] * back
+    TP[i], NP[i], BP[i] = TP[iH].copy(), NP[iH].copy(), BP[iH].copy()
+    TQ[i], NQ[i], BQ[i] = TQ[iH].copy(), NQ[iH].copy(), BQ[iH].copy()
+
+
+def carry(v):
+    best = (1e9, 0, 0.)
+    for i in range(len(P) - 1):
+        p0 = P[i]
+        d = P[i + 1] - p0
+        t = max(0., min(1., (v - p0).dot(d) / d.length_squared))
+        dist = (v - (p0 + d * t)).length
+        if dist < best[0]:
+            best = (dist, i, t)
+    _, i, t = best
+    off = v - (P[i] + (P[i + 1] - P[i]) * t)
+    return (Q[i] + (Q[i + 1] - Q[i]) * t + TQ[i] * off.dot(TP[i])
+            + NQ[i] * off.dot(NP[i]) + BQ[i] * off.dot(BP[i]))
+
+
+_before = np.array([v.co[:] for v in auth.data.vertices])
+# How far out of the animal's own straight line the tail was, before anything moved: distance from
+# the chord through the two ends of the measured centreline.
+P0C = P[0].copy()
+CHORD = (P[-1] - P[0]).normalized()
+_move = 0.
+for v in auth.data.vertices:
+    q = carry(v.co)
+    _move = max(_move, (q - v.co).length)
+    v.co = q
+M = Matrix(((W_T.x, W_T.y, W_T.z, 0), (T0.x, T0.y, T0.z, 0), (UP_T.x, UP_T.y, UP_T.z, 0), (0, 0, 0, 1)))
+for v in auth.data.vertices:
+    v.co = M @ v.co
+auth.data.update()
+_A = np.array([v.co[:] for v in auth.data.vertices])
+_trunk = _A[thick0 > np.percentile(thick0, 55)]
+_shift = Vector((float(np.median(_trunk[:, 0])), float((_A[:, 1].min() + _A[:, 1].max()) / 2),
+                 float(np.median(_trunk[:, 2]))))
+for v in auth.data.vertices:
+    v.co = v.co - _shift
+auth.data.update()
+_A = np.array([v.co[:] for v in auth.data.vertices])
+RAW_LENGTH = float(_A[:, 1].max() - _A[:, 1].min())
+SCALE = TARGET_LENGTH / RAW_LENGTH
+BODY_LENGTH = TARGET_LENGTH
+ENVELOPE_TOLERANCE = ENVELOPE_TOLERANCE_FRACTION * BODY_LENGTH
+ANCHOR_TOLERANCE = ANCHOR_TOLERANCE_FRACTION * BODY_LENGTH
+_tipmask = np.array([D[k] > .93 * MAXD for k in range(len(auth.data.vertices))])
+unbending = {
+    'bands': len(P), 'arc': round(ARC, 4), 'totalTurningDeg': round(TURNING, 1),
+    'medianSectionRadius': round(float(np.median(R)), 4),
+    'meanCurvatureRadiusOverSection': round(ARC / max(1e-6, math.radians(TURNING))
+                                            / max(1e-9, float(np.median(R))), 2),
+    'headArcFraction': HEAD_ARC, 'headStationIndex': iH,
+    'maxVertexMove': round(_move, 4),
+    'lengthBefore': round(float(_before[:, 1].max() - _before[:, 1].min()), 4),
+    'lengthAfterStraightening': round(RAW_LENGTH, 4),
+    'tailTipOffsetFromTheChordBefore': round(float(np.mean(
+        [((Vector(q) - P0C).cross(CHORD)).length for q in _before[_tipmask]])), 4),
+    'tailTipOffsetFromTheMidlineAfter': round(float(np.abs(_A[_tipmask][:, 0]).mean()), 4),
+    'snoutAfter': [round(float(x), 4) for x in _A[SNOUT]],
+    'roll': {'meanHarmonicStrength': round(ROLL_STRENGTH, 3),
+             'stationsRead': int(sum(1 for d in deg if d is not None)), 'stations': len(deg),
+             'measuredDorsalDriftDeg': round(math.degrees(max(THETA) - min(THETA)), 1)},
+    'headEnd': head_end_report,
+}
+assert abs(float(_A[SNOUT][0])) < .04 * RAW_LENGTH, ('the snout is off the midline', _A[SNOUT])
+
+# --------------------------------------------- the straightened body, measured for the rig ----
+# A snapshot of the closed intake surface, taken before anything is cut out of it. Everything that
+# has to ask where the animal's skin is -- the seating of a root, the UVs the lining wears, the
+# depth check on the lining -- asks this, because the body itself loses its closure and its polygon
+# indices the moment the jaw comes out of it.
+intake_mesh = auth.data.copy()
+intake_mesh.name = 'Saurichthys intake surface'
+src_bvh = bvh_of(intake_mesh)
+intake_uv = intake_mesh.uv_layers.active
+thick_intake = neighbourhood_minimum(intake_mesh, shell_thickness(intake_mesh, src_bvh))
+thickness = neighbourhood_minimum(auth.data, shell_thickness(auth.data, src_bvh))
+CO = np.array([v.co[:] for v in auth.data.vertices])
+YLO, YHI = float(CO[:, 1].min()), float(CO[:, 1].max())
+STATION_Y = np.linspace(YLO, YHI, 61)
+
+
+def _trunk_at(y, half=.014):
+    m = (np.abs(CO[:, 1] - y) < half) & (thickness > .030)
+    return CO[m] if m.sum() >= 5 else None
+
+
+_cy, _cz, _cw, _cd = [], [], [], []
+for y in STATION_Y:
+    s = _trunk_at(float(y))
+    if s is None:
+        continue
+    _cy.append(float(y))
+    _cz.append(float((np.quantile(s[:, 2], .02) + np.quantile(s[:, 2], .98)) / 2))
+    _cw.append(float(np.quantile(np.abs(s[:, 0]), .98)))
+    _cd.append(float((np.quantile(s[:, 2], .98) - np.quantile(s[:, 2], .02)) / 2))
+_cz = np.convolve(np.pad(_cz, 2, mode='edge'), np.ones(5) / 5, mode='valid')
+_cw = np.convolve(np.pad(_cw, 2, mode='edge'), np.ones(5) / 5, mode='valid')
+_cd = np.convolve(np.pad(_cd, 2, mode='edge'), np.ones(5) / 5, mode='valid')
+
+
+def centre(y):
+    """Trunk centreline height at station y."""
+    return float(np.interp(y, _cy, _cz))
+
+
+def half_width(y):
+    return float(np.interp(y, _cy, _cw))
+
+
+def half_depth(y):
+    return float(np.interp(y, _cy, _cd))
+
+
+def depth_inside(p):
+    loc, nor, idx, dist = src_bvh.find_nearest(Vector(p))
+    return dist * (-1 if (Vector(p) - loc).dot(nor) > 0 else 1)
+
+
+def seat(p, toward, margin=.016):
+    """Pull a root radially in towards the trunk's own axis until it is `margin` inside the skin.
+    A fin whose root sits on or outside the flank reads as a fin floating beside the body."""
+    q = Vector(p)
+    c = Vector(toward)
+    for _ in range(80):
+        if depth_inside(q) >= margin:
+            return tuple(q)
+        d = c - q
+        if d.length < 1e-6:
+            break
+        q = q + d.normalized() * .003
+    raise AssertionError(('cannot seat a root inside the body', tuple(p), depth_inside(q)))
+
+
+# ============================================== the mouth, measured off the generation ===========
+# Placodus' method, and it reaches this animal: the generation models a real mouth, so intake finds
+# it rather than guessing at it. Every head vertex casts its own outward normal back into the mesh;
+# a vertex that hits is looking across the slit at the lip opposite, and the set of them is the oral
+# cavity. Per station that gives the mouth's mid height, half width and half depth, and the mid
+# height *is* the seam the jaw is cut on.
+HEAD_BAND = (YLO, YLO + .22 * RAW_LENGTH)
+CAVITY_REACH = .030 * RAW_LENGTH
+# A vertex whose own outward normal runs back into the mesh is looking across a slit at the surface
+# opposite. That is the mouth -- and it is also the armpit of a pectoral fin, the notch behind a
+# gill flap and the fold under a dorsal spine, so the sweep is fenced to the *inside of the head*:
+# forward of the gills, well inside the head's own half width and within its own depth. Without the
+# fence the fin folds pulled the measured mouth line 0.085 of a body length out of the animal.
+cav = []
+for v in auth.data.vertices:
+    x, y, z = v.co
+    if not (HEAD_BAND[0] - 1e-9 <= y <= HEAD_BAND[1]):
+        continue
+    if abs(x) > .60 * half_width(y) or abs(z - centre(y)) > .75 * half_depth(y):
+        continue
+    n = Vector(v.normal[:])
+    if src_bvh.ray_cast(Vector(v.co[:]) + n * 3e-4, n, CAVITY_REACH)[0] is not None:
+        cav.append((float(y), float(x), float(z)))
+CAVITY = np.array(cav)
+assert len(CAVITY) >= 60, ('no modelled mouth found; this body needs the albedo method', len(CAVITY))
+_sy, _sz, _sw, _sd = [], [], [], []
+_step = .010 * RAW_LENGTH
+_y = CAVITY[:, 0].min()
+while _y <= CAVITY[:, 0].max() + 1e-9:
+    m = np.abs(CAVITY[:, 0] - _y) < _step
+    if m.sum() >= 5:
+        s = CAVITY[m]
+        _sy.append(float(_y))
+        _sz.append(float(np.median(s[:, 2])))
+        _sw.append(float(np.quantile(np.abs(s[:, 1]), .92)))
+        _sd.append(float((np.quantile(s[:, 2], .94) - np.quantile(s[:, 2], .06)) / 2))
+    _y += _step
+assert len(_sy) >= 6, ('the mouth did not measure along the head', len(_sy))
+_sz = list(np.convolve(np.pad(_sz, 2, mode='edge'), np.ones(5) / 5, mode='valid'))
+MOUTH_Y = (min(_sy), max(_sy))
+
+
+def seam_z(y):
+    """The measured mouth line. It is a curve, not a ramp: a plane cut through it bisects the lip."""
+    return float(np.interp(y, _sy, _sz))
+
+
+def mouth_half_width(y):
+    return float(np.interp(y, _sy, _sw))
+
+
+def mouth_half_depth(y):
+    return float(np.interp(y, _sy, _sd))
+
+
+# How far a straight ramp would have been from the measured line -- the number that says whether the
+# curve was worth measuring. The shipped Placodus ramp was 0.54 % of a body length high of the real
+# line and took a band of upper lip down with the jaw.
+_fit = np.polyfit(_sy, _sz, 1)
+_ramp_residual = float(np.max(np.abs(np.array(_sz) - np.polyval(_fit, _sy))))
+# Did the generation arrive gaping? A mouth modelled open is a pose, not the animal, and closing it
+# is expensive: teeth modelled apart interpenetrate the first time they are brought together, the
+# cavity has to fold rather than be built, and the pose the animal spends nearly all its time in
+# becomes its most deformed one. The measurement that says which is the slit's own thickness
+# against the depth of the head it is cut into.
+_rest = []
+for _a, _d in zip(_sy, _sd):
+    _m = np.abs(CO[:, 1] - _a) < .010 * RAW_LENGTH
+    if _m.sum() < 6:
+        continue
+    _sec = CO[_m]
+    _hd = float(np.quantile(_sec[:, 2], .98) - np.quantile(_sec[:, 2], .02))
+    if _hd > 1e-6:
+        _rest.append(2 * _d / _hd)
+# The number that decides it is not the ratio but the *rotation*: how far the jaw would have to
+# swing to bring the two lips together. On a needle-snouted fish a slit a quarter of the local head
+# depth is a couple of degrees, and on a deep-headed one the same ratio is ten.
+_jaw_len = (MOUTH_Y[1] + .015 * RAW_LENGTH) - MOUTH_Y[0]
+_close_deg = math.degrees(math.atan2(2 * float(_sd[0]), max(1e-9, _jaw_len)))
+RESTING_GAPE = {
+    'closingRotationDegrees': round(_close_deg, 2),
+    'jawLengthRaw': round(_jaw_len, 4),
+    'meanSlitThicknessOverHeadDepth': round(float(np.mean(_rest)), 4),
+    'maxSlitThicknessOverHeadDepth': round(float(np.max(_rest)), 4),
+    'meanSlitThicknessOverBodyLength': round(float(np.mean(_sd)) * 2 / RAW_LENGTH, 5),
+    'verdict': ('the generation arrived with its mouth SHUT for practical purposes: what it models '
+                'is a slit with an interior rather than a gape, and the rotation that would bring '
+                'the lips together is under six degrees, so nothing here has to fold a modelled '
+                'gape closed and the jaw only ever opens from the bind pose'
+                if _close_deg < 6. else
+                'the generation arrived GAPING: the bind pose carries that gape, closing it for the '
+                'locomotion clips is a large jaw rotation, and this animal wants a mouth-closed '
+                'regeneration'),
+}
+# The teeth the generation carries. Measured before anything is decided about them: a crown is a
+# patch of oral surface standing proud of its own neighbourhood along its normal.
+_ptr, _idx = adjacency(auth.data)
+_PP = np.array([v.co[:] for v in auth.data.vertices])
+_NN = np.array([v.normal[:] for v in auth.data.vertices])
+_MM = _PP.copy()
+for _ in range(4):
+    _MM = ring_mean(_MM, _ptr, _idx)
+PROTRUSION = ((_PP - _MM) * _NN).sum(1)
+_oral = np.zeros(len(_PP), dtype=bool)
+for i in range(len(_PP)):
+    y, z = _PP[i][1], _PP[i][2]
+    if MOUTH_Y[0] - _step <= y <= MOUTH_Y[1] + _step and abs(z - seam_z(y)) < 2.2 * mouth_half_depth(y) \
+            and abs(_PP[i][0]) < 1.6 * mouth_half_width(y):
+        _oral[i] = True
+_tooth_threshold = .0018 * RAW_LENGTH
+mouth_report = {
+    'method': 'geometric: every head vertex casts its own outward normal back into the mesh',
+    'cavityVertices': int(len(CAVITY)), 'cavityStations': len(_sy),
+    'cavityExtentY': [round(MOUTH_Y[0], 4), round(MOUTH_Y[1], 4)],
+    'seamTable': [[round(a, 4), round(b, 4), round(c, 4), round(d, 4)]
+                  for a, b, c, d in zip(_sy, _sz, _sw, _sd)],
+    'restingGape': RESTING_GAPE,
+    'howCurvedTheMouthLineIs': {
+        'straightFitResidualMaxRaw': round(_ramp_residual, 5),
+        'asFractionOfBodyLength': round(_ramp_residual / RAW_LENGTH, 5),
+        'note': 'how far the measured lip line departs from a straight line. A fish mouth is often '
+                'genuinely straight and this is the easy case -- but the cut follows the measured '
+                'curve either way, so the number below is what the cut costs and this one is only '
+                'how much work the curve was doing.'},
+    'cutDeviationFromTheMeasuredLipLine': {
+        'maxRaw': 0.0, 'asFractionOfBodyLength': 0.0,
+        'note': 'zero by construction. The head is sheared vertically by -seam(y), which carries '
+                'the measured curve exactly onto the plane z = 0; the cut is taken there and the '
+                'shear undone, so every vertex the cut adds lands on the measured line itself and '
+                'every vertex that was already there returns to where it was.'},
+    'generationsOwnDentition': {
+        'oralZoneVertices': int(_oral.sum()),
+        'standingProudOfTheirNeighbourhood': int((_oral & (PROTRUSION > _tooth_threshold)).sum()),
+        'maxProtrusionRaw': round(float(PROTRUSION[_oral].max()), 5),
+        'maxProtrusionOverMouthHalfDepth': round(float(PROTRUSION[_oral].max())
+                                                 / max(1e-9, float(np.mean(_sd))), 3),
+        'authoredReplacement': False,
+        'note': 'kept as generated and weighted to the jaw they grow from; nothing is authored here'},
+}
+
+# ------------------------------------------------------------------ rig ----
+def tx(p):
+    """Raw intake units -> Blender authoring units. The head stays on -Y, which `export_yup` turns
+    into glTF +Z, where every shipped body in this repository keeps it."""
+    return Vector((p[0] * SCALE, p[1] * SCALE, p[2] * SCALE))
+
+
+B = {}
+
+
+def bone(n, p, parent):
+    B[n] = (Vector(p), parent)
+
+
+def on_axis(f, dz=0.):
+    """A point on the trunk's own measured centreline, at fraction f of the body from the snout."""
+    y = YLO + f * RAW_LENGTH
+    return (0., y, centre(y) + dz)
+
+
+bone('root', (0, 0, 0), None)
+bone('body', on_axis(.50), 'root')
+bone('chest', on_axis(.355), 'body')
+# The rostrum and the skull behind it are one rigid piece on this fish: jaws of equal length, a
+# single row of pointed teeth, and an elongate partly ossified column that makes the front of the
+# animal stiff. So there is one skull joint and the whole needle rides it.
+bone('skull', on_axis(.235, .006), 'chest')
+# The hinge sits just behind the back of the measured cavity, which is where the modelled mouth
+# actually stops being a slit -- not at a fraction picked off the head's length.
+HINGE_Y = MOUTH_Y[1] + .015 * RAW_LENGTH
+HINGE_F = (HINGE_Y - YLO) / RAW_LENGTH
+JAW_HINGE = (0., HINGE_Y, seam_z(HINGE_Y) - .006 * RAW_LENGTH)
+bone('jaw', seat(JAW_HINGE, on_axis(HINGE_F), margin=.006), 'skull')
+TAIL_F = [.58, .655, .720, .780, .835, .885, .930]
+for i, f in enumerate(TAIL_F):
+    bone('tail_%02d' % i, on_axis(f), 'body' if i == 0 else 'tail_%02d' % (i - 1))
+bone('caudal_upper', on_axis(.960, .028), 'tail_06')
+bone('caudal_lower', on_axis(.960, -.024), 'tail_06')
+# Dorsal and anal are set far back and opposite each other, and with the near-symmetric caudal they
+# are one rudder. They get a bone each and they ride the caudal chain, which is what a rudder does.
+bone('dorsal', on_axis(.795, .045), 'tail_04')
+bone('anal', on_axis(.795, -.040), 'tail_04')
+PECTORAL, PELVIC = {}, {}
+for side in (-1, 1):
+    s = 'L' if side > 0 else 'R'
+    root = seat((side * .028 * RAW_LENGTH, YLO + .335 * RAW_LENGTH,
+                 centre(YLO + .335 * RAW_LENGTH) - .030 * RAW_LENGTH), on_axis(.335))
+    pts = [root,
+           (side * .060 * RAW_LENGTH, YLO + .350 * RAW_LENGTH, centre(YLO + .350 * RAW_LENGTH) - .060 * RAW_LENGTH),
+           (side * .095 * RAW_LENGTH, YLO + .365 * RAW_LENGTH, centre(YLO + .365 * RAW_LENGTH) - .080 * RAW_LENGTH)]
+    names = ['pec_upper_' + s, 'pec_mid_' + s, 'pec_tip_' + s]
+    PECTORAL[s] = (side, pts, names)
+    for i, n in enumerate(names):
+        bone(n, pts[i], 'chest' if i == 0 else names[i - 1])
+    proot = seat((side * .014 * RAW_LENGTH, YLO + .630 * RAW_LENGTH,
+                  centre(YLO + .630 * RAW_LENGTH) - .022 * RAW_LENGTH), on_axis(.630))
+    PELVIC[s] = (side, ['pelvic_' + s], proot)
+    bone('pelvic_' + s, proot, 'tail_01')
+
+# Every fin's origin sits inside the trunk's own cross-section, which the builders check.
+seating = {}
+for s, (side, pts, names) in PECTORAL.items():
+    seating[names[0]] = round(depth_inside(pts[0]), 4)
+for s, (side, names, proot) in PELVIC.items():
+    seating[names[0]] = round(depth_inside(proot), 4)
+seating['jaw'] = round(depth_inside(B['jaw'][0]), 4)
+seating['skull'] = round(depth_inside(B['skull'][0]), 4)
+seating['chest'] = round(depth_inside(B['chest'][0]), 4)
+seating['body'] = round(depth_inside(B['body'][0]), 4)
+for n, d in seating.items():
+    assert d > .008, ('a root is outside the body', n, d)
+
+# ------------------------------------------------- procedural twin (LOD) ----
+# Regenerated topology from the authored body's own occupancy field: no source vertex or face
+# survives it, so this is a measured rebuild of the volume rather than a decimation of the skin.
+puppet = auth.copy()
+puppet.data = auth.data.copy()
+bpy.context.collection.objects.link(puppet)
+puppet.name = 'Saurichthys procedural volume twin'
+bpy.context.view_layer.objects.active = puppet
+# A voxel field cannot hold a knife edge: every fin here tapers to nothing and an occupancy field
+# stops two or three voxels short of the trailing tip. The blades -- and only the blades, by their
+# own measured shell thickness -- are dilated along their normals on the twin's copy before the
+# field is sampled, which carries the rim out as well as thickening the plate. The authored body is
+# never touched by this.
+for v in puppet.data.vertices:
+    n = Vector(v.normal[:])
+    w = 1. - max(0., min(1., (float(thickness[v.index]) - .030) / .020))
+    v.co = Vector(v.co[:]) + n * (BLADE_DILATION * w * w * (3 - 2 * w))
+puppet.data.remesh_voxel_size = VOXEL
+puppet.data.remesh_voxel_adaptivity = 0
+puppet.data.use_remesh_preserve_volume = True
+bpy.ops.object.voxel_remesh()
+remesh_triangles = sum(len(p.vertices) - 2 for p in puppet.data.polygons)
+# Relaxation takes the voxel staircase off the trunk and must not touch the fins: a blade two
+# voxels thick is simply eaten by two unmasked passes of smoothing.
+_bvh_vox = bvh_of(puppet.data)
+relax_group = puppet.vertex_groups.new(name='Trunk relaxation mask')
+_vox_thickness = neighbourhood_minimum(puppet.data, shell_thickness(puppet.data, _bvh_vox))
+relax_masked = 0
+for v in puppet.data.vertices:
+    w = smooth((float(_vox_thickness[v.index]) - .030) / .020)
+    relax_group.add([v.index], w, 'REPLACE')
+    if w < .5:
+        relax_masked += 1
+mod = puppet.modifiers.new('Volume surface relaxation', 'SMOOTH')
+mod.factor = .45
+mod.iterations = 2
+mod.vertex_group = relax_group.name
+bpy.ops.object.modifier_apply(modifier=mod.name)
+puppet.vertex_groups.remove(puppet.vertex_groups[relax_group.name])
+mod = puppet.modifiers.new('Twin topology budget', 'DECIMATE')
+mod.ratio = min(1., PUPPET_TRIANGLE_TARGET / max(1, remesh_triangles))
+decimate_ratio = mod.ratio
+bpy.ops.object.modifier_apply(modifier=mod.name)
+# Pigment comes through the nearest source triangle's own interpolated UV -- never by averaging
+# unrelated atlas islands at a welded seam vertex, and never by copying a nearest vertex colour.
+if puppet.data.color_attributes.get('Color'):
+    puppet.data.color_attributes.remove(puppet.data.color_attributes['Color'])
+pl = puppet.data.color_attributes.new(name='Color', type='FLOAT_COLOR', domain='POINT')
+for v in puppet.data.vertices:
+    hit = src_bvh.find_nearest(v.co)
+    s = hit_uv(hit[0], hit[2])
+    pl.data[v.index].color = sample_albedo(s.x, s.y) if s else (1, 1, 1, 1)
+pmat = bpy.data.materials.new('Saurichthys twin body')
+pmat.use_nodes = True
+pbs = pmat.node_tree.nodes.get('Principled BSDF')
+pvc = pmat.node_tree.nodes.new('ShaderNodeVertexColor')
+pvc.layer_name = 'Color'
+pmat.node_tree.links.new(pvc.outputs['Color'], pbs.inputs['Base Color'])
+pbs.inputs['Roughness'].default_value = .66
+puppet.data.materials.clear()
+puppet.data.materials.append(pmat)
+for p in puppet.data.polygons:
+    p.material_index = 0
+pup_intake = puppet.data.copy()
+pup_intake.name = 'Saurichthys twin intake surface'
+_bvh_pup = bvh_of(pup_intake)
+
+# ---------------------------------------------------- cut the lower jaw ----
+# The mouth line is a curve and a cut is a plane, so the head is sheared vertically by -seam(y)
+# first, which carries the curve exactly onto z = 0; the cut is taken there and the shear undone,
+# so every vertex the cut adds lands on the seam itself and every vertex already there returns to
+# where it was. Only head faces are offered to the pass, so the rest of the body keeps its topology.
+JAW_BACK = float(B['jaw'][0][1])
+# The jaws run to the very tip of the rostrum on this fish, and the modelled cavity stops a
+# little short of it, so the cut and the lining are carried forward to the tip: left at the
+# cavity's own front, the last 0.016 of the snout stayed on the skull while the mandible swung
+# away from it, and the gape opened onto nothing there.
+JAW_FRONT = YLO + .002 * RAW_LENGTH
+
+
+def is_jaw(c):
+    """Geometric fallback, used for the twin -- a resurfaced volume shares no vertex with the
+    authored body and so has no labels to inherit. It carries no tooth detail either, because the
+    occupancy field cannot resolve one, so a height test is the right test there."""
+    return c[1] > JAW_FRONT and c[1] < JAW_BACK and c[2] < seam_z(c[1]) - 1e-7
+
+
+# ------------------------------------------- which side of the mouth a vertex is on ----
+# A height test cannot separate interlocking teeth. The upper teeth hang *below* the mouth line and
+# the lower teeth stand above it, so "below the seam is the jaw" puts the palate's own teeth on the
+# mandible -- and a graded version of the same test puts half of each tooth on each bone, which is
+# how Saurichthys' upper tooth row came out as a comb of needles stretched two head-depths long the
+# first time this was rendered.
+#
+# Connectivity decides instead. Seed the outer skin well above and well below the mouth line, flood
+# the labels out over the mesh, and every tooth inherits the label of the jaw it actually grows
+# from, because in a closed mouth a tooth is joined to its own jaw and to nothing else.
+_PL = np.array([v.co[:] for v in auth.data.vertices])
+_in_head = ((_PL[:, 1] > JAW_FRONT - .02 * RAW_LENGTH) & (_PL[:, 1] < JAW_BACK + .04 * RAW_LENGTH))
+_seam_at = np.array([seam_z(float(y)) for y in _PL[:, 1]])
+# `_MM` is the same neighbourhood mean the dentition was measured against: the surface with the
+# teeth taken out of it. A tooth tip's own height is on the wrong side of the mouth line, but the
+# height of the surface it grows out of is not, so labelling by the *base* sends each tooth whole
+# to the jaw it belongs to.
+SMOOTH_Z = _MM[:, 2]
+JAW_SIDE = _in_head & (SMOOTH_Z < _seam_at - 1e-7)
+# Looked up by *position*, never by index. The bisect that cuts the jaw adds vertices and deletes
+# faces, so a post-cut vertex index means nothing to a label array built before it -- and a label
+# array read by the wrong index scatters the mandible's weight at random through the head, which
+# is what turned this fish's tooth row into a comb of stretched ribbons at full gape.
+from mathutils.kdtree import KDTree                                                  # noqa: E402
+_kd = KDTree(len(_PL))
+for _i, _q in enumerate(_PL):
+    _kd.insert(Vector(_q), _i)
+_kd.balance()
+
+
+def jaw_side_at(co):
+    return bool(JAW_SIDE[_kd.find(Vector(co))[1]])
+label_report = {
+    'method': 'the height of the surface each vertex grows out of, against the measured mouth line',
+    'jawSideVertices': int(JAW_SIDE.sum()),
+    'skullSideVertices': int((~JAW_SIDE).sum()),
+    'note': 'a height test on the vertex itself splits interlocking teeth down the middle and a '
+            'graded one stretches each half between two bones -- which is how this fish\'s upper '
+            'tooth row first came out as a comb of needles two head-depths long. Taking the height '
+            'of the smoothed surface instead, which is the tooth\'s own base, puts every tooth '
+            'whole on the jaw it grows from. Flood-filling labels from the skin was tried first '
+            'and is worse on a needle rostrum: the seeds are sparse on a tube that thin and the '
+            'label boundary wanders through it, which tore the snout into ribbons.',
+}
+
+parts = {}
+
+
+def split(o, label, test, labels=None):
+    me = o.data
+    bmx = bmesh.new()
+    bmx.from_mesh(me)
+    bmx.verts.ensure_lookup_table()
+    for v in bmx.verts:
+        if JAW_FRONT - .05 * RAW_LENGTH < v.co.y < JAW_BACK + .05 * RAW_LENGTH:
+            v.co.z -= seam_z(v.co.y)
+    bmesh.ops.bisect_plane(bmx, geom=list(bmx.verts) + list(bmx.edges) + list(bmx.faces), dist=1e-7,
+                           plane_co=(0, 0, 0), plane_no=(0, 0, 1), clear_inner=False, clear_outer=False)
+    bmesh.ops.bisect_plane(bmx, geom=list(bmx.verts) + list(bmx.edges) + list(bmx.faces), dist=1e-7,
+                           plane_co=(0, JAW_BACK, 0), plane_no=(0, 1, 0), clear_inner=False, clear_outer=False)
+    for v in bmx.verts:
+        if JAW_FRONT - .05 * RAW_LENGTH < v.co.y < JAW_BACK + .05 * RAW_LENGTH:
+            v.co.z += seam_z(v.co.y)
+    bmx.to_mesh(me)
+    bmx.free()
+    part = o.copy()
+    part.data = me.copy()
+    part.name = o.name + ' ' + label
+    bpy.context.collection.objects.link(part)
+    # The bisect added vertices, so the labels are re-read against the *pre-cut* positions by
+    # nearest original vertex; a vertex the cut created sits on the seam and takes whichever side
+    # its own face falls on.
+    if labels is not None:
+        want = [labels(p.center) for p in me.polygons]
+    for target, keep in [(o, False), (part, True)]:
+        bmx = bmesh.new()
+        bmx.from_mesh(target.data)
+        bmx.faces.ensure_lookup_table()
+        if labels is not None:
+            discard = [f for f in bmx.faces if want[f.index] != keep]
+        else:
+            discard = [f for f in bmx.faces if test(f.calc_center_median()) != keep]
+        bmesh.ops.delete(bmx, geom=discard, context='FACES')
+        loose = [v for v in bmx.verts if not v.link_faces]
+        if loose:
+            bmesh.ops.delete(bmx, geom=loose, context='VERTS')
+        bmx.to_mesh(target.data)
+        bmx.free()
+    parts.setdefault(label, {})[o.name] = part
+    return part
+
+
+split(auth, 'lower jaw', is_jaw, labels=jaw_side_at)
+split(puppet, 'lower jaw', is_jaw)
+AUTH_JAW = parts['lower jaw'][auth.name]
+PUP_JAW = parts['lower jaw'][puppet.name]
+# The cut adds vertices, so the shell thickness both bodies are skinned by is measured again, and
+# against the *closed* surface each came from: a blade's thickness is a property of the shell, and
+# a body with its jaw taken out of it would measure the open mouth as infinitely thin.
+thickness = neighbourhood_minimum(auth.data, shell_thickness(auth.data, src_bvh))
+# Voxel resurfacing cannot make a blade thinner than its own voxel, so the twin's fins are measured
+# against the twin's own floor rather than the authored body's.
+puppet_thickness = np.maximum(0., neighbourhood_minimum(
+    puppet.data, shell_thickness(puppet.data, _bvh_pup)) - (VOXEL * 2 - .004))
+# Which of the generation's own teeth ended up on which jaw. Nothing is authored, so the only thing
+# the cut can get wrong is to saw a crown in half or carry one onto the wrong bone.
+_jaw_teeth = sum(1 for v in AUTH_JAW.data.vertices
+                 if abs(v.co.z - seam_z(v.co.y)) > .004 * RAW_LENGTH)
+mouth_report['generationsOwnDentition']['verticesCarriedOntoTheMandible'] = int(_jaw_teeth)
+
+# --------------------------------------------------------- the lining ----
+# One lining rather than a palate and a floor. Two separate closed tubes, one rigid on the skull and
+# one rigid on the jaw, part the moment the jaw swings and leave a wedge at the back of the mouth --
+# and a single-sided skin is then seen straight out through the far side of the head. This is one
+# sac on the mouth's own measured section, *skinned*: the roof follows the skull, the floor follows
+# the jaw, and the wall between them stretches, so no opening the clips reach can part it.
+#
+# It is the one authored surface on this body, and it is the simple kind: a closed tube that fills a
+# hole. It takes its UVs from the skin it is sewn into -- each ring vertex samples the nearest point
+# on the intake surface -- and wears the body's own albedo through a copy of the body's material,
+# so it is not a flat-shaded island in a pored hide.
+LIN_RINGS, LIN_RING = 24, 14
+# The sac has to close *behind* the pivot. Ended in front of it, the last thing the cut opens
+# as the jaw swings is the corner of the mouth, and the corner is exactly where the lining
+# has run out: the gape measured 5.4 % see-through there with the sac stopping short.
+LIN_BACK = JAW_BACK + .014 * RAW_LENGTH
+LIN_FRONT = JAW_FRONT + .002 * RAW_LENGTH
+liningmat = mat.copy()
+liningmat.name = 'Saurichthys mouth lining'
+# Wound inwards and the one material here that culls: what an open mouth shows is the far wall of
+# the lumen, and the near wall has to be got out of the way so the teeth between them are seen.
+liningmat.use_backface_culling = True
+_lbs = liningmat.node_tree.nodes.get('Principled BSDF')
+_lbs.inputs['Roughness'].default_value = .5
+
+# The head's own silhouette per station, from the vertex cloud. Rays cannot measure it here: this
+# generation's mouth is modelled *open*, so a ray cast in at the mouth line goes clean through the
+# gape and hits the far cheek -- which reported the head as 0.019 units wide the wrong way round and
+# put the first lining outside the animal.
+_hy, _hw, _hbot, _htop = [], [], [], []
+for y in np.linspace(YLO, YLO + .32 * RAW_LENGTH, 41):
+    m = np.abs(CO[:, 1] - y) < .010 * RAW_LENGTH
+    if m.sum() < 6:
+        continue
+    sec = CO[m]
+    _hy.append(float(y))
+    _hw.append(float(np.quantile(np.abs(sec[:, 0]), .98)))
+    _hbot.append(float(np.quantile(sec[:, 2], .02)))
+    _htop.append(float(np.quantile(sec[:, 2], .98)))
+
+
+def head_half_width(y):
+    return float(np.interp(y, _hy, _hw))
+
+
+def head_z(y):
+    return float(np.interp(y, _hy, _hbot)), float(np.interp(y, _hy, _htop))
+
+
+_swy, _sww = [], []
+for _y in np.linspace(YLO, YLO + .32 * RAW_LENGTH, 41):
+    _m = (np.abs(CO[:, 1] - _y) < .010 * RAW_LENGTH) & (np.abs(CO[:, 2] - seam_z(_y)) < .014 * RAW_LENGTH)
+    if _m.sum() < 5:
+        continue
+    _swy.append(float(_y))
+    _sww.append(float(np.quantile(np.abs(CO[_m][:, 0]), .96)))
+
+
+def seam_half_width(y):
+    """How wide the head is *at the mouth line* -- which is how wide the cut is, and therefore how
+    wide the lining has to be. The head's widest section is wider than its mouth line and a lining
+    drawn to it comes out through the cheek."""
+    return float(np.interp(y, _swy, _sww))
+
+
+def lumen(y):
+    """The section the lining takes at station y: as wide as the cut and as thin as the slit.
+
+    Both halves of that were learned by measuring. A sac cut to the head's own section is far
+    thicker than the modelled mouth and stands proud of the lip with the jaw shut -- a pale bulge
+    along the closed mouth in every frame. But a sac cut to the *slit's* own width is narrower than
+    the cut, and the jaw's cut edge and the skull's separate right across the head, so at full gape
+    the corners of the mouth opened onto nothing: 9.0 % of the aperture was a hole straight through
+    the animal at Bite's widest. Width follows the cut; depth follows the slit, and the gape comes
+    from the floor following the jaw while the wall between roof and floor stretches."""
+    bot, top = head_z(y)
+    z = min(max(seam_z(y), bot + .18 * (top - bot)), top - .18 * (top - bot))
+    wy = min(.92 * seam_half_width(y), .70 * head_half_width(y))
+    wz = min(.90 * mouth_half_depth(y), .28 * min(top - z, z - bot))
+    return max(wy, .004 * RAW_LENGTH), max(wz, .0015 * RAW_LENGTH)
+
+
+def lumen_centre(y):
+    bot, top = head_z(y)
+    return min(max(seam_z(y), bot + .18 * (top - bot)), top - .18 * (top - bot))
+
+
+verts, faces, lin_an = [], [], []
+for i in range(LIN_RINGS):
+    u = i / (LIN_RINGS - 1.)
+    y = LIN_BACK + (LIN_FRONT - LIN_BACK) * u
+    # Drawn in at both ends so the sac closes rather than ending in a ring standing in open flesh.
+    e = smooth(u / .12) * smooth((1. - u) / .08)
+    _wy, _wz = lumen(y)
+    wy = _wy * (.18 + .82 * e)
+    wz = _wz * (.20 + .80 * e)
+    for j in range(LIN_RING):
+        th = j * 2 * pi / LIN_RING
+        verts.append(Vector((wy * cos(th), y, lumen_centre(y) + wz * sin(th))))
+        lin_an.append((sin(th), u))
+# Wound inwards: what an open mouth shows is the far wall of the lumen, and the near wall has to be
+# got out of the way. Which way round that is was settled by measurement, not by reading the loop --
+# with the winding the other way the near wall survived the cull and the far wall did not, and the
+# gape measured 7.4 % see-through at Attack's widest against 0.3 % this way round.
+for i in range(LIN_RINGS - 1):
+    for j in range(LIN_RING):
+        p0 = i * LIN_RING + j
+        p1 = i * LIN_RING + (j + 1) % LIN_RING
+        faces.append((p0 + LIN_RING, p1 + LIN_RING, p1, p0))
+faces.append(tuple(range(LIN_RING)))
+faces.append(tuple(reversed(range((LIN_RINGS - 1) * LIN_RING, LIN_RINGS * LIN_RING))))
+_lining_raw = [Vector(v) for v in verts]
+me = bpy.data.meshes.new('Mouth lining')
+me.from_pydata([tx(v) for v in verts], [], faces)
+me.update()
+lining = bpy.data.objects.new('Mouth lining', me)
+bpy.context.collection.objects.link(lining)
+lining.location = (0, 0, 0)
+lining.data.materials.clear()
+lining.data.materials.append(liningmat)
+_luv = lining.data.uv_layers.new(name='UVMap')
+for poly in lining.data.polygons:
+    for li in poly.loop_indices:
+        vi = lining.data.loops[li].vertex_index
+        hit = src_bvh.find_nearest(_lining_raw[vi])
+        s = hit_uv(hit[0], hit[2]) if hit[0] is not None else None
+        _luv.data[li].uv = (s.x, s.y) if s else (0., 0.)
+_lcol = lining.data.color_attributes.new(name='Color', type='FLOAT_COLOR', domain='POINT')
+for item in _lcol.data:
+    item.color = (1, 1, 1, 1)
+for n in ['skull', 'jaw']:
+    lining.vertex_groups.new(name=n)
+for v in lining.data.vertices:
+    _an, _u = lin_an[v.index]
+    t = .5 + .5 * _an                                 # 1 at the roof, 0 at the floor
+    # The front of the sac goes entirely with the mandible. Split between the two bones it is
+    # dragged open as the jaw swings and comes out past the lips as a handful of long strands --
+    # the last thing left of the fan of ribbons this mouth started with.
+    skull_w = smooth(t) * (1. - smooth((_u - .80) / .20))
+    lining.vertex_groups['skull'].add([v.index], skull_w, 'REPLACE')
+    lining.vertex_groups['jaw'].add([v.index], 1. - skull_w, 'REPLACE')
+for p in lining.data.polygons:
+    p.use_smooth = True
+oralparts = [lining]
+
+# -------------------------------------------------------------- weights ----
+AXIAL = [('skull', .235), ('chest', .355), ('body', .50)] + \
+        [('tail_%02d' % i, f) for i, f in enumerate(TAIL_F)]
+AXIAL_Y = [YLO + f * RAW_LENGTH for _, f in AXIAL]
+
+
+def axial(y):
+    if y <= AXIAL_Y[0]:
+        return {AXIAL[0][0]: 1.}
+    if y >= AXIAL_Y[-1]:
+        return {AXIAL[-1][0]: 1.}
+    i = int(np.searchsorted(AXIAL_Y, y)) - 1
+    t = (y - AXIAL_Y[i]) / (AXIAL_Y[i + 1] - AXIAL_Y[i])
+    return {AXIAL[i][0]: 1 - t, AXIAL[i + 1][0]: t}
+
+
+THIN = .030
+THIN_BAND = .012
+F = lambda f: YLO + f * RAW_LENGTH        # noqa: E731 -- body fraction to station
+
+
+def fin_weights(p, thin):
+    """Which fin a point belongs to and how strongly it owns it. A fin's root blend is radial and
+    runs from inside the trunk outward, so a seated root follows the flank when the body bends."""
+    x, y, z = p
+    c = centre(y)
+    blade = smooth((THIN + THIN_BAND - thin) / THIN_BAND)
+    if blade <= 0:
+        return None
+    if F(.30) < y < F(.42) and abs(x) > .020 * RAW_LENGTH and z < c - .004 * RAW_LENGTH:
+        s = 'L' if x > 0 else 'R'
+        _side, _pts, names = PECTORAL[s]
+        d = abs(x) / RAW_LENGTH
+        span = smooth((d - .028) / .030)
+        if d < .052:
+            chain = {names[0]: 1.}
+        elif d < .078:
+            t = (d - .052) / .026
+            chain = {names[0]: 1 - t, names[1]: t}
+        else:
+            t = min(1., (d - .078) / .026)
+            chain = {names[1]: 1 - t, names[2]: t}
+        return chain, blade * span
+    if F(.58) < y < F(.70) and z < c - .015 * RAW_LENGTH and abs(x) > .002 * RAW_LENGTH:
+        s = 'L' if x > 0 else 'R'
+        return {'pelvic_' + s: 1.}, blade * smooth(((c - z) / RAW_LENGTH - .024) / .020)
+    if F(.72) < y < F(.90) and z > c + .018 * RAW_LENGTH:
+        return {'dorsal': 1.}, blade * smooth(((z - c) / RAW_LENGTH - .026) / .022)
+    if F(.72) < y < F(.90) and z < c - .018 * RAW_LENGTH:
+        return {'anal': 1.}, blade * smooth(((c - z) / RAW_LENGTH - .026) / .022)
+    if y > F(.925):
+        lobe = 'caudal_upper' if z > c else 'caudal_lower'
+        return {lobe: 1.}, blade * smooth((abs(z - c) / RAW_LENGTH - .018) / .030) \
+            * smooth((y - F(.930)) / (.030 * RAW_LENGTH))
+    return None
+
+
+def jaw_weight_labelled(p):
+    """One or zero from the label, feathered over the last ring or two of skin at the boundary so
+    the lip is not a step. A tooth is never feathered: it is whole on one bone or the other."""
+    if not (JAW_FRONT - .02 * RAW_LENGTH < p[1] < JAW_BACK + .05 * RAW_LENGTH):
+        return 0.
+    behind = smooth((JAW_BACK - p[1]) / (.030 * RAW_LENGTH))
+    return (1. if jaw_side_at(p) else 0.) * behind
+
+
+def jaw_weight(p):
+    x, y, z = p
+    if not (JAW_FRONT - .01 * RAW_LENGTH < y < JAW_BACK + .05 * RAW_LENGTH):
+        return 0.
+    below = smooth((seam_z(y) - z) / (.004 * RAW_LENGTH) + .5)
+    behind = smooth((JAW_BACK - y) / (.030 * RAW_LENGTH))
+    return below * behind
+
+
+def weights(p, thin, labelled=False):
+    w = dict(axial(p[1]))
+    fin = fin_weights(p, thin)
+    if fin:
+        chain, blend = fin
+        if blend > 0:
+            w = {n: v * (1 - blend) for n, v in w.items()}
+            for n, v in chain.items():
+                w[n] = w.get(n, 0.) + v * blend
+    j = jaw_weight_labelled(p) if labelled else jaw_weight(p)
+    if j > 0:
+        w = {n: v * (1 - j) for n, v in w.items()}
+        w['jaw'] = w.get('jaw', 0.) + j
+    w = {n: v for n, v in w.items() if v > 1e-8}
+    items = sorted(w.items(), key=lambda kv: -kv[1])[:4]
+    total = sum(v for _, v in items)
+    return {n: v / total for n, v in items}
+
+
+# -------------------------------------------------------------- armature ----
+arm = bpy.data.armatures.new('Saurichthys shared skeleton')
+rig = bpy.data.objects.new('Saurichthys_Rig', arm)
+bpy.context.collection.objects.link(rig)
+bpy.context.view_layer.objects.active = rig
+rig.select_set(True)
+bpy.ops.object.mode_set(mode='EDIT')
+for n, (p, parent) in B.items():
+    eb = arm.edit_bones.new(n)
+    eb.head = tx(p)
+    eb.tail = eb.head + Vector((0, .16, 0))
+    if parent:
+        eb.parent = arm.edit_bones[parent]
+bpy.ops.object.mode_set(mode='OBJECT')
+
+weight_report = {}
+# The cut jaw shells are rigid on the hinge; everything else is skinned by the measurement.
+for o, thin in [(auth, thickness), (puppet, puppet_thickness)]:
+    for n in B:
+        o.vertex_groups.new(name=n)
+    influences, owners = [], {}
+    for v in o.data.vertices:
+        w = weights(v.co, float(thin[v.index]), o is auth)
+        influences.append(len(w))
+        for n, value in w.items():
+            o.vertex_groups[n].add([v.index], value, 'REPLACE')
+            owners[n] = owners.get(n, 0) + 1
+    for v in o.data.vertices:
+        v.co = tx(v.co)
+    for p in o.data.polygons:
+        p.use_smooth = True
+    mod = o.modifiers.new('Shared articulated skeleton', 'ARMATURE')
+    mod.object = rig
+    o.parent = rig
+    weight_report[o.name] = {'maxInfluences': max(influences), 'vertices': len(influences),
+                             'verticesPerBone': owners}
+for o in [AUTH_JAW, PUP_JAW]:
+    g = o.vertex_groups.new(name='jaw')
+    g.add(list(range(len(o.data.vertices))), 1., 'REPLACE')
+    for v in o.data.vertices:
+        v.co = tx(v.co)
+    for p in o.data.polygons:
+        p.use_smooth = True
+    mo = o.modifiers.new('Rigid jaw', 'ARMATURE')
+    mo.object = rig
+    o.parent = rig
+for o in oralparts:
+    o.parent = rig
+    o.modifiers.new('Mouth lining', 'ARMATURE').object = rig
+
+# The lining must be inside the head it lines. `src_bvh` is the closed intake surface from before
+# the jaw was cut out of it, so a ring that has drifted out of the mouth reads here as negative.
+# The lining must be inside the animal's own silhouette. `depth_inside` cannot say so on a body
+# with a modelled mouth -- a point in the lumen is outside the solid by construction, and reads as
+# a failure -- so containment is measured against the outer skin, by rays from outside in.
+_clear = []
+for v in lining.data.vertices:
+    x, y, z = (float(c) / SCALE for c in v.co)
+    bot, top = head_z(y)
+    _clear.append(min(head_half_width(y) - abs(x), z - bot, top - z))
+lining_clearance = float(min(_clear))
+assert lining_clearance > .0008, ('the lining breaks the skin', lining_clearance)
+
+AUTH_GROUP = [auth, AUTH_JAW]
+PUP_GROUP = [puppet, PUP_JAW]
+
+# The left-right asymmetry of the paired fins, two ways. The rig's own joints are mirrored by
+# construction except where `seat()` pulls a root in by a different amount on each side, so the
+# first number is small and is the one a `Neutral` clip would have to correct; the second is the
+# generation's own asymmetry, measured by mirroring the intake surface in x and asking every
+# paired-fin vertex how far it is from its reflection, and no rig can correct that.
+_mirror_pairs = []
+for _s, (_side, _pts, _names) in PECTORAL.items():
+    if _side > 0:
+        for _i, _n in enumerate(_names):
+            _mirror_pairs.append((_n, _names[_i].replace('_L', '_R')))
+for _s, (_side, _names, _proot) in PELVIC.items():
+    if _side > 0:
+        _mirror_pairs.append((_names[0], _names[0].replace('_L', '_R')))
+_joint_gap = []
+for _a, _b in _mirror_pairs:
+    _pa = Vector(B[_a][0])
+    _pb = Vector(B[_b][0])
+    _joint_gap.append((Vector((-_pb.x, _pb.y, _pb.z)) - _pa).length)
+_mirror_bvh = BVHTree.FromPolygons([Vector((-v.co.x, v.co.y, v.co.z)) for v in intake_mesh.vertices],
+                                   [p.vertices[:] for p in intake_mesh.polygons], all_triangles=False)
+_fin_verts = [v.co for v in intake_mesh.vertices
+              if fin_weights(v.co, float(thick_intake[v.index])) is not None]
+_surface_gap = [_mirror_bvh.find_nearest(q)[3] for q in _fin_verts]
+PAIRED_FIN_ASYMMETRY = {
+    'jointPairs': len(_joint_gap),
+    'meanJointGapRaw': round(float(np.mean(_joint_gap)), 5),
+    'meanJointGapOverBodyLength': round(float(np.mean(_joint_gap)) / RAW_LENGTH, 5),
+    'maxJointGapOverBodyLength': round(float(np.max(_joint_gap)) / RAW_LENGTH, 5),
+    'finVerticesMeasured': len(_fin_verts),
+    'meanMirroredSurfaceGapOverBodyLength': round(float(np.mean(_surface_gap)) / RAW_LENGTH, 5),
+    'p95MirroredSurfaceGapOverBodyLength': round(float(np.quantile(_surface_gap, .95)) / RAW_LENGTH, 5),
+}
+
+# ------------------------------------------------ measured paired profile ----
+def merged(group):
+    pts, polys, base = [], [], 0
+    for o in group:
+        pts += [v.co.copy() for v in o.data.vertices]
+        polys += [tuple(base + j for j in p.vertices) for p in o.data.polygons]
+        base += len(o.data.vertices)
+    return pts, polys
+
+
+def section(group, y):
+    points = []
+    for o in group:
+        for e in o.data.edges:
+            a, b = [o.data.vertices[j].co for j in e.vertices]
+            if (a.y - y) * (b.y - y) <= 0 and abs(a.y - b.y) > 1e-8:
+                points.append(a + (b - a) * ((y - a.y) / (b.y - a.y)))
+    if not points:
+        return None
+    arr = np.array(points)
+    return {'min': arr.min(0).tolist(), 'max': arr.max(0).tolist()}
+
+
+_ylo = min(min(v.co.y for v in o.data.vertices) for o in AUTH_GROUP)
+_yhi = max(max(v.co.y for v in o.data.vertices) for o in AUTH_GROUP)
+profile, worst = [], 0.
+for y in np.linspace(_ylo + .02, _yhi - .02, 21):
+    row = {'stationY': float(y)}
+    for label, group in [('authored', AUTH_GROUP), ('twin', PUP_GROUP)]:
+        row[label] = section(group, float(y))
+    if row['authored'] and row['twin']:
+        row['maximumEnvelopeDifference'] = max(abs(a - b) for k in ['min', 'max']
+                                               for a, b in zip(row['authored'][k], row['twin'][k]))
+        worst = max(worst, row['maximumEnvelopeDifference'])
+        assert row['maximumEnvelopeDifference'] < ENVELOPE_TOLERANCE, row
+    profile.append(row)
+_pv = BVHTree.FromPolygons(*merged(PUP_GROUP))
+_apts = merged(AUTH_GROUP)[0]
+distances = [_pv.find_nearest(v)[3] for v in _apts]
+_far = sorted(zip(distances, [tuple(round(float(c), 3) for c in v) for v in _apts]), reverse=True)[:8]
+farthest_from_the_twin = [[round(a, 4), list(b)] for a, b in _far]
+# The envelope is the pipeline's tolerance and is asserted at 4 % of body length. The nearest-
+# surface distance is recorded beside it: its 95th percentile is held to the same 4 %, and the
+# single worst vertex to twice that, because the twin resurfaces an occupancy field and an open
+# mouth's interior is thinner than the voxel that has to hold it.
+_p95 = float(np.quantile(distances, .95))
+assert _p95 < ENVELOPE_TOLERANCE, ('twin surface p95', _p95)
+assert max(distances) < 2 * ENVELOPE_TOLERANCE, ('twin surface max', max(distances))
+
+# ------------------------------------------------------------ anchors ----
+_MOUTH_FRONT = MOUTH_Y[0] + .004 * RAW_LENGTH
+_THROAT = MOUTH_Y[1] - .010 * RAW_LENGTH
+ANCHOR_POINTS = {
+    'anchor_mouth': ('jaw', (0., _MOUTH_FRONT, seam_z(_MOUTH_FRONT) - .004 * RAW_LENGTH), 'mouth'),
+    'anchor_mouth_inside': ('skull', (0., _THROAT, seam_z(_THROAT) + .002 * RAW_LENGTH), 'swallow'),
+    'anchor_attack_primary': ('skull', (0., _MOUTH_FRONT, seam_z(_MOUTH_FRONT) + .004 * RAW_LENGTH), 'attack'),
+}
+anchors = [{'name': name, 'bone': b, 'point': list(tx(p)), 'role': role}
+           for name, (b, p, role) in ANCHOR_POINTS.items()]
+anchor_checks = {}
+for name, (b, p, role) in ANCHOR_POINTS.items():
+    hit = src_bvh.find_nearest(Vector(p))
+    anchor_checks[name] = {'nearestSurfaceRaw': round(float(hit[3]), 5),
+                           'nearestSurfaceUnits': round(float(hit[3] * SCALE), 5),
+                           'fractionOfBodyLength': round(float(hit[3] * SCALE / BODY_LENGTH), 5)}
+    assert hit[3] * SCALE < ANCHOR_TOLERANCE, (name, hit[3])
+
+# ---------------------------------------------------------- performance ----
+scene = bpy.context.scene
+scene.render.fps = 30
+rig.animation_data_create()
+for pb in rig.pose.bones:
+    pb.rotation_mode = 'XYZ'
+
+
+def reset():
+    for pb in rig.pose.bones:
+        pb.rotation_euler = (0, 0, 0)
+        pb.location = (0, 0, 0)
+        pb.scale = (1, 1, 1)
+
+
+# Sub-carangiform undulation confined to the back half: one travelling wave down the axial chain
+# whose amplitude grows towards the
+# tail and whose head is the quiet end. The paired fins are control surfaces -- they set pitch and
+# roll, they bank the turns and they scull on the spot -- and they never take a propulsive stroke.
+TAIL_GAIN = [.24, .36, .52, .70, .88, 1.0, 1.0]
+TAIL_LAG = [.45, .82, 1.18, 1.54, 1.90, 2.25, 2.55]
+
+
+def bump(u, u0, w, sharp=1.):
+    """A beat that starts and ends at rest, narrowed in place by `sharp`. This is what makes a
+    strike read as committed rather than as a swell: a sine spends its whole length arriving."""
+    if not (u0 <= u <= u0 + w):
+        return 0.
+    return (sin(pi * (u - u0) / w) ** 2) ** sharp
+
+
+FIN_ROOTS = [names[0] for _s, (_side, _pts, names) in PECTORAL.items()] + \
+            [names[0] for _s, (_side, names, _r) in PELVIC.items()]
+fin_sweep = {n: 0. for n in FIN_ROOTS}
+_fin_prev = None
+JAW_SHUT = -math.radians(RESTING_GAPE['closingRotationDegrees'])
+seams, bounds = {}, {}
+for clip, duration in CLIPS.items():
+    action = bpy.data.actions.new(clip)
+    action.use_fake_user = True
+    rig.animation_data.action = action
+    last = round(duration * 30)
+    first = None
+    loop = clip in LOOPS
+    for f in range(last + 1):
+        reset()
+        u = f / last
+        p = 2 * pi * u
+        e = sin(pi * u) ** 2
+        env = 1 if loop else e
+        pb = rig.pose.bones
+
+        def wave(lag=0., freq=1.):
+            return (sin(p * freq - lag) - sin(-lag)) * env
+
+        # This is not the shark's performance and must not read like it. Saurichthys is an ambush
+        # fish: a poor sustained swimmer that hangs motionless and then leaves, and Kogan et al.
+        # 2015's flow-tank work reads it as a pike-like fast start. So the cruise is small and
+        # stiff (an elongate, partly ossified column with fins set far back), the burst is enormous,
+        # and the strike is a C-curve that unloads rather than a swim that speeds up.
+        amp = {'Idle': .10, 'Swim': .55, 'Sprint': 1.5, 'Eat': .22, 'Guard': .12, 'Dodge': 1.2,
+               'Ability': .22, 'Grab': .20, 'Breath': .20, 'Growth': .16, 'FastStart': .30,
+               'Hover': .07}.get(clip, .16)
+        beat = 2. if clip in ('Swim', 'Sprint', 'Dodge') else 1.
+        # Anticipation, a fast committed strike, follow-through and recovery -- four beats, not one
+        # sine. `wind` is the coil, `peak` the drive, `after` the follow-through. `sharp` narrows
+        # the drive in place, which is what makes a strike read as committed rather than as a swell.
+        wind = bump(u, .00, .30, 1.2)
+        peak = bump(u, .26, .20, 2.6)
+        after = bump(u, .44, .34, 1.1)
+        dead = u * u * (3 - 2 * u) if clip == 'Death' else 0.
+        # The C-start proper: the body folds into a C over the wind-up and unrolls head-first.
+        cstart = clip in ('Attack', 'Heavy', 'FastStart', 'Ability')
+        worry = max(0., sin(p * 3)) ** 2 if clip in ('Grab', 'Eat') else 0.
+        if clip == 'Death':
+            amp *= 1 - dead
+
+        # --- the jaws. Long, equal, needle-toothed, and the gape is timed to the strike rather
+        # than to the button: it parts on the coil, is widest as the body unrolls, and shuts on the
+        # follow-through, which is the frame the fish is in.
+        opening = .006 * (1 - cos(p)) if loop else 0.
+        if clip == 'Hover':
+            opening = .010 * (1 - cos(p))          # ventilating, and nothing else moving
+        if clip == 'Eat':
+            opening = .34 * (1 - cos(p * 2)) / 2 + .10
+        if clip == 'Bite':
+            opening = .70 * bump(u, .0, .70, 1.8)
+        if clip == 'Attack':
+            opening = .26 * wind + .72 * peak - .14 * after
+        if clip == 'Heavy':
+            opening = .28 * wind + .80 * peak - .16 * after
+        if clip == 'FastStart':
+            opening = .22 * wind + .64 * peak - .12 * after
+        if clip == 'Ability':
+            opening = .24 * wind + .56 * peak
+        if clip == 'Grab':
+            opening = .42 * env + .06 * worry
+        if clip == 'Breath':
+            opening = .05 * (1 - cos(p))           # gill ventilation: this animal has gills
+        # The generation's parted jaw is a pose, not the animal: the mouth is shut for everything
+        # that is not a strike, and a strike opens from shut. `JAW_SHUT` is the measured rotation
+        # that brings the two lips together, released as the clip opens so the gape at the peak is
+        # the gape that was authored rather than that gape minus the parting.
+        opening = max(0., opening)
+        _o = min(1., opening / .60)
+        opening = JAW_SHUT * (1 - _o) + opening + .10 * dead
+        pb['jaw'].rotation_euler.x = opening
+        pb['skull'].rotation_euler.x = -.12 * opening
+
+        # --- trunk
+        body = pb['body']
+        sway = .008 * amp * wave(0., beat)
+        body.rotation_euler.z = sway
+        body.rotation_euler.y = .03 * amp * wave(.4, beat)
+        body.location.z = .006 * amp * wave(.3, beat)
+        turn = (-1 if clip == 'TurnLeft' else 1) * e if clip in ('TurnLeft', 'TurnRight') else 0.
+        body.rotation_euler.z += .22 * turn
+        body.rotation_euler.y += .30 * turn
+        if clip in ('Dive', 'Rise'):
+            body.rotation_euler.x = (1 if clip == 'Dive' else -1) * .28 * e
+        if cstart:
+            # The dash. Everything the animal has goes into one launch: the trunk shifts back over
+            # the coil and is thrown forward, further on Heavy and furthest on the ability.
+            drive = {'Attack': 1.0, 'Heavy': 1.3, 'FastStart': 1.5, 'Ability': 1.45}[clip]
+            body.location.y = (.16 * wind - .52 * peak - .10 * after) * drive
+            body.rotation_euler.x = .06 * wind - .05 * peak
+        if clip == 'Bite':
+            body.location.y = -.08 * e
+        if clip == 'Parry':
+            body.rotation_euler.y = -.30 * e
+            body.rotation_euler.z = .20 * e
+        if clip == 'Guard':
+            body.rotation_euler.x = .04 * (1 - cos(p))
+            body.rotation_euler.y = .03 * sin(p)
+        if clip == 'Hover':
+            # The passive it is named for: hanging motionless and being very hard to notice while
+            # it does. Almost nothing moves -- a slow breath through the body and the fins sculling.
+            body.rotation_euler.x = .020 * sin(p)
+            body.location.z = .020 * sin(p + .8)
+        if clip == 'Dodge':
+            body.rotation_euler.y = .50 * e
+            body.rotation_euler.z = -.46 * e
+            body.location.x = .34 * e
+        if clip in ('Hit', 'Stagger'):
+            body.rotation_euler.z = .24 * e * sin(p * (1 if clip == 'Hit' else 2))
+            body.rotation_euler.y = .24 * e
+            body.location.y = .12 * e
+        if clip == 'Breath':
+            body.rotation_euler.x = -.06 * e
+            body.location.z = .04 * e
+        if clip == 'Grab':
+            body.location.y = -.12 * env - .04 * worry
+            body.rotation_euler.z = .10 * env * sin(p * 3)
+        if clip == 'Growth':
+            body.rotation_euler.x = -.04 * e
+            body.rotation_euler.z = .04 * e
+        body.rotation_euler.y += 2.4 * dead
+        body.rotation_euler.x += .12 * dead
+        body.location.z -= .20 * dead
+
+        # `body` is the pivot of the wave, so its own sway has to be taken back out by the two
+        # bones in front of it or the rostrum swings further than the tail does -- which on a fish
+        # whose head is a third of its length would be the animal swimming backwards.
+        pb['chest'].rotation_euler.z = -2.9 * sway + .07 * turn
+        pb['chest'].rotation_euler.y = .08 * turn
+        pb['skull'].rotation_euler.z = .8 * sway + .10 * turn
+        if cstart:
+            # The head is aimed through the target and the rostrum *is* the hit box, so the skull
+            # leads the drive and holds the line through it.
+            pb['skull'].rotation_euler.z += .16 * wind - .20 * peak
+            pb['skull'].rotation_euler.x += -.06 * wind + .10 * peak
+            pb['chest'].rotation_euler.z += .22 * wind - .26 * peak
+        if clip == 'Eat':
+            pb['skull'].rotation_euler.z += .12 * sin(p * 2)
+            pb['skull'].rotation_euler.x += .10 * worry
+        if clip == 'Grab':
+            pb['skull'].rotation_euler.z += .12 * worry
+
+        for i in range(7):
+            q = pb['tail_%02d' % i]
+            q.rotation_euler.z = (.115 * TAIL_GAIN[i] * amp * wave(TAIL_LAG[i], beat)
+                                  + turn * (.022 + i * .011)
+                                  + .045 * dead * sin(i * .7))
+            if clip == 'Dodge':
+                q.rotation_euler.z += .18 * e * sin(i * .6 + .5)
+            if cstart:
+                # The C. On the wind-up the whole chain bends one way, hard and in unison, which is
+                # what a C-start is; on the drive it unrolls from the front and whips past straight.
+                q.rotation_euler.z += (.26 * wind - .34 * peak + .07 * after) * TAIL_GAIN[i]
+            if clip == 'Hover':
+                q.rotation_euler.z += .012 * sin(p + i * .35)
+        for lobe, sign in (('caudal_upper', 1.), ('caudal_lower', -1.)):
+            q = pb[lobe]
+            q.rotation_euler.z = .20 * amp * wave(TAIL_LAG[6] + 1.25, beat) + .020 * turn
+            q.rotation_euler.x = sign * .05 * amp * wave(TAIL_LAG[6] + 1.55, beat)
+            if cstart:
+                q.rotation_euler.z += .22 * wind - .30 * peak
+            q.rotation_euler.z += .06 * dead * sign
+
+        # Dorsal and anal are the rudder: they lag the peduncle they stand on and they bank the
+        # turns, and they are opposite each other so they move as a pair in opposite senses.
+        for d, sgn in (('dorsal', 1.), ('anal', -1.)):
+            q = pb[d]
+            q.rotation_euler.z = .10 * amp * wave(TAIL_LAG[4] + .9, beat) + .12 * turn
+            q.rotation_euler.y = -.08 * turn * sgn
+            if cstart:
+                q.rotation_euler.z += .16 * wind - .22 * peak
+            if clip == 'Hover':
+                q.rotation_euler.z += .02 * sin(p + 1.1)
+            q.rotation_euler.z += .06 * dead * sgn
+
+        # The paired fins work the dash rather than hanging off it. A shark's or a fish's pectorals
+        # are control surfaces and take no propulsive stroke, but at sprint they are not passengers
+        # either: they sweep with the beat and trim the body through it. The swept angle per cycle
+        # is measured below and recorded.
+        dash = 1. if clip == 'Sprint' else (.45 if clip == 'Swim' else 0.)
+        for s, (side, _pts, names) in PECTORAL.items():
+            up = pb[names[0]]
+            up.rotation_euler.x += dash * .26 * sin(p * beat + .5)
+            up.rotation_euler.z += dash * side * .17 * sin(p * beat + 1.1)
+            up.rotation_euler.x = .030 * amp * wave(.9, beat)
+            up.rotation_euler.z = side * .035 * amp * wave(1.2, beat)
+            if clip == 'Hover':
+                # Sculling, which is the only thing keeping it where it is.
+                up.rotation_euler.x += .10 * sin(p * 2)
+                up.rotation_euler.z += side * .08 * sin(p * 2 + .7)
+            if clip in ('Dive', 'Rise'):
+                up.rotation_euler.x += (1 if clip == 'Dive' else -1) * .40 * e
+            if clip in ('TurnLeft', 'TurnRight'):
+                up.rotation_euler.x += side * (-1 if clip == 'TurnLeft' else 1) * .44 * e
+            if clip == 'Guard':
+                up.rotation_euler.x -= .24 * (1 - cos(p)) / 2
+                up.rotation_euler.z += side * .18 * (1 - cos(p)) / 2
+            if clip == 'Parry':
+                up.rotation_euler.z += side * .36 * e
+            if clip == 'Dodge':
+                up.rotation_euler.x += (.46 if side > 0 else -.18) * e
+            if cstart or clip == 'Bite':
+                # Clamped to the flank for the dash: a fin held out is drag, and this animal's whole
+                # trick is the low-disturbance start.
+                up.rotation_euler.x += .30 * wind - .46 * peak
+                up.rotation_euler.z -= side * .22 * peak
+            if clip in ('Grab',):
+                up.rotation_euler.x += .22 * e + .06 * worry
+                up.rotation_euler.z += side * .10 * e
+            if clip == 'Stagger':
+                up.rotation_euler.z += side * .30 * e * sin(p)
+            if clip == 'Growth':
+                up.rotation_euler.z += side * .24 * e
+            if clip == 'Breath':
+                up.rotation_euler.x += .12 * e
+            up.rotation_euler.x += .28 * dead
+            up.rotation_euler.z += side * .32 * dead
+            pb[names[1]].rotation_euler.x = .55 * up.rotation_euler.x + .03 * amp * wave(1.5, beat)
+            pb[names[2]].rotation_euler.x = .35 * up.rotation_euler.x + .05 * amp * wave(1.9, beat)
+            pb[names[2]].rotation_euler.z = side * .04 * amp * wave(2.1, beat)
+        for s, (side, names, _proot) in PELVIC.items():
+            q = pb[names[0]]
+            q.rotation_euler.x += dash * .18 * sin(p * beat + 1.6)
+            q.rotation_euler.z += dash * side * .12 * sin(p * beat + 2.0)
+            q.rotation_euler.x = .04 * amp * wave(1.6, beat) + .16 * dead
+            q.rotation_euler.z = side * (.04 * amp * wave(1.8, beat) + .10 * turn + .20 * dead)
+            if clip == 'Hover':
+                q.rotation_euler.x += .06 * sin(p * 2 + 1.4)
+
+        if clip == 'Sprint':
+            _row = {n: tuple(pb[n].rotation_euler) for n in FIN_ROOTS}
+            if _fin_prev is not None:
+                for n in FIN_ROOTS:
+                    fin_sweep[n] += float(np.abs(np.array(_row[n]) - np.array(_fin_prev[n])).sum())
+            _fin_prev = _row
+        state = np.array([tuple(q.rotation_euler) + tuple(q.location) for q in pb])
+        if f == 0:
+            first = state.copy()
+        if f == last:
+            seams[clip] = float(abs(state - first).max())
+        for q in pb:
+            if q.name != 'root':
+                q.keyframe_insert('rotation_euler', frame=f)
+            if q.name == 'body':
+                q.keyframe_insert('location', frame=f)
+    points = []
+    for f in np.linspace(0, last, 13):
+        scene.frame_set(int(f))
+        dg = bpy.context.evaluated_depsgraph_get()
+        for o in AUTH_GROUP + PUP_GROUP + oralparts:
+            ev = o.evaluated_get(dg)
+            mesh_eval = ev.to_mesh()
+            co = np.array([v.co[:] for v in mesh_eval.vertices])
+            assert np.isfinite(co).all()
+            points.extend([co.min(0), co.max(0)])
+            ev.to_mesh_clear()
+    bounds[clip] = [np.array(points).min(0).tolist(), np.array(points).max(0).tolist()]
+    rig.animation_data.action = None
+
+for c in LOOPS:
+    assert seams[c] < 1e-6, (c, seams[c])
+assert abs(CLIPS['Grab'] - 1.1) < 1e-9 and .9 <= CLIPS['Grab'] <= 1.2
+reset()
+scene.frame_set(0)
+
+# ------------------------------------- what closing the generation's parted jaw costs ----
+# Teeth modelled apart interpenetrate the first time they are brought together, and the honest
+# thing is to measure it rather than to leave the jaw where the generation left it. The jaw is
+# posed at the measured closing rotation and every vertex of the mandible is asked how far inside
+# the skull's own surface it now sits.
+reset()
+rig.pose.bones['jaw'].rotation_euler.x = JAW_SHUT
+bpy.context.view_layer.update()
+_dg = bpy.context.evaluated_depsgraph_get()
+_skull_eval = auth.evaluated_get(_dg)
+_skull_mesh = _skull_eval.to_mesh()
+_skull_bvh = BVHTree.FromPolygons([v.co.copy() for v in _skull_mesh.vertices],
+                                  [pp.vertices[:] for pp in _skull_mesh.polygons], all_triangles=False)
+_skull_eval.to_mesh_clear()
+_jaw_eval = AUTH_JAW.evaluated_get(_dg)
+_jaw_mesh = _jaw_eval.to_mesh()
+_pen = []
+for v in _jaw_mesh.vertices:
+    loc, nor, idx, dist = _skull_bvh.find_nearest(v.co)
+    if loc is None:
+        continue
+    _pen.append(dist if (Vector(v.co[:]) - loc).dot(nor) < 0 else 0.)
+_jaw_eval.to_mesh_clear()
+reset()
+bpy.context.view_layer.update()
+jaw_closed_cost = {
+    'closingRotationDegrees': RESTING_GAPE['closingRotationDegrees'],
+    'mandibleVerticesMeasured': len(_pen),
+    'verticesInsideTheSkullSurface': int(sum(1 for d in _pen if d > 1e-4)),
+    'maxPenetrationUnits': round(float(max(_pen)) if _pen else 0., 5),
+    'maxPenetrationOverBodyLength': round((float(max(_pen)) if _pen else 0.) / BODY_LENGTH, 5),
+    'meanPenetrationOverBodyLength': round((float(np.mean(_pen)) if _pen else 0.) / BODY_LENGTH, 6),
+    'note': 'the mandible posed at the measured closing rotation, against the skull\'s own surface '
+            'in the same pose. Anything above zero is the generation\'s two tooth rows, modelled '
+            'apart, meeting for the first time.',
+}
+
+# ------------------------------------------------------------- sockets ----
+sockets = []
+for a in anchors:
+    o = bpy.data.objects.new(a['name'], None)
+    bpy.context.collection.objects.link(o)
+    o.parent = rig
+    o.parent_type = 'BONE'
+    o.parent_bone = a['bone']
+    o.matrix_world.translation = Vector(a['point'])
+    o['cambrianAnchor'] = {'version': 1, 'role': a['role'], 'parentBone': a['bone']}
+    sockets.append(o)
+open(os.path.join(HERE, 'anchors.json'), 'w').write(json.dumps({ID: anchors}, indent=2) + '\n')
+
+# -------------------------------------------------------------- export ----
+kwargs = dict(export_format='GLB', use_selection=True, export_animations=True,
+              export_animation_mode='ACTIONS', export_force_sampling=True, export_frame_range=False,
+              export_skins=True, export_normals=True, export_texcoords=True, export_materials='EXPORT',
+              export_vertex_color='NAME', export_vertex_color_name='Color', export_yup=True,
+              export_extras=True)
+
+
+def patch(path):
+    """Reparent the anchor nodes onto their bones in the bone's own frame, and drop the channels no
+    shipped body carries: root motion and scale."""
+    raw = open(path, 'rb').read()
+    n = struct.unpack_from('<I', raw, 12)[0]
+    g = json.loads(raw[20:20 + n])
+    binary = raw[20 + n:]
+    nodes = g['nodes']
+    parents = {c: i for i, no in enumerate(nodes) for c in no.get('children', [])}
+
+    def world(i):
+        no = nodes[i]
+        q = no.get('rotation', [0, 0, 0, 1])
+        m = (Matrix(np.array(no['matrix']).reshape(4, 4).T.tolist()) if 'matrix' in no
+             else Matrix.LocRotScale(Vector(no.get('translation', [0, 0, 0])),
+                                     Quaternion((q[3], q[0], q[1], q[2])),
+                                     Vector(no.get('scale', [1, 1, 1]))))
+        return world(parents[i]) @ m if i in parents else m
+
+    for a in anchors:
+        i = next(k for k, no in enumerate(nodes) if no.get('name') == a['name'])
+        b = next(k for k, no in enumerate(nodes) if no.get('name') == a['bone'])
+        pt = a['point']
+        pt = Vector((pt[0], pt[2], -pt[1]))
+        local = world(b).inverted() @ pt
+        if i in parents:
+            nodes[parents[i]]['children'].remove(i)
+        nodes[b].setdefault('children', []).append(i)
+        nodes[i] = {'name': a['name'], 'translation': list(local),
+                    'extras': {'cambrianAnchor': {'version': 1, 'role': a['role'], 'parentBone': a['bone']}}}
+    for a in g['animations']:
+        a['channels'] = [c for c in a['channels']
+                         if c['target']['path'] != 'scale' and nodes[c['target']['node']].get('name') != 'root']
+    js = json.dumps(g, separators=(',', ':')).encode()
+    js += b' ' * ((-len(js)) % 4)
+    open(path, 'wb').write(struct.pack('<III', 0x46546c67, 2, 20 + len(js) + len(binary))
+                           + struct.pack('<II', len(js), 0x4e4f534a) + js + binary)
+
+
+tri = lambda o: sum(len(p.vertices) - 2 for p in o.data.polygons)   # noqa: E731
+for group, suffix in [(AUTH_GROUP, ''), (PUP_GROUP, '.puppet')]:
+    bpy.ops.object.select_all(action='DESELECT')
+    for part in group + [rig] + sockets + oralparts:
+        part.select_set(True)
+    bpy.context.view_layer.objects.active = rig
+    bpy.ops.export_scene.gltf(filepath=os.path.join(OUT, ID + suffix + '.glb'), **kwargs)
+    patch(os.path.join(OUT, ID + suffix + '.glb'))
+shutil.copyfile(os.path.join(OUT, ID + '.puppet.glb'), os.path.join(OUT, ID + '.lod1.glb'))
+
+authored_tris = sum(tri(o) for o in AUTH_GROUP) + sum(tri(o) for o in oralparts)
+puppet_tris = sum(tri(o) for o in PUP_GROUP) + sum(tri(o) for o in oralparts)
+
+meta = {
+    'id': ID, 'name': 'Saurichthys', 'species': 'S. curionii',
+    'provenance': 'Middle Triassic \u00b7 Meride Limestone and Besano Formation, Monte San Giorgio',
+    'description': 'Needle-bodied ambush fish with a long rostrum, opposed dorsal and anal fins set '
+                   'far back and a near-symmetric caudal. The worked Tripo body and a measured '
+                   'procedural volume twin share one armature, one set of inverse binds, one set of '
+                   'sockets and one set of actions.',
+    'modelLength': round(BODY_LENGTH, 4), 'lengthMeters': 1, 'locomotion': 'Swim',
+    'clips': list(CLIPS), 'looping': LOOPS, 'anchors': [a['name'] for a in anchors],
+    'puppet': ID + '.puppet.glb',
+    'sources': ['docs/triassic/canonical/saurichthys.png',
+                'tools/triassic/creatures/saurichthys/saurichthys.preview.glb',
+                'tools/triassic/creatures/saurichthys/tripo-raw/saurichthys.raw.glb'],
+    'notes': [
+        'The straightest body in the set: its own centreline measures 1.04 of its straight chord, '
+        'so intake mostly levels the animal rather than unbending it. Which end is the head is '
+        'decided by the modelled mouth, because the rostrum measures as thin as the caudal fin.',
+        'An ambush fish, not a cruiser: the swim is small and stiff, the burst is a C-start that '
+        'unloads into a dash, and the paired fins clamp to the flank for it. Hover is the passive '
+        'the roster names -- hanging motionless with only the fins sculling.',
+        'The lower jaw is cut out of the generation\'s own skin along its own measured mouth line. '
+        'The teeth are the generation\'s and are not replaced.',
+        'The only authored surface is the oral lining: one skinned sac that closes the gape, taking '
+        'its UVs from the skin around it and wearing the body\'s own albedo.',
+        'The twin resurfaces a voxel occupancy field of the authored body, relaxes it and reduces '
+        'the new topology. It reuses no source vertex or face.',
+        'Breath is gill ventilation held in place, not a surface breath: this animal has gills and '
+        'never goes up. FastStart is the roster\'s ambush surge at its own longer duration and is '
+        'a deliberately different performance from Attack, not the same clip twice.',
+        'Living colours, soft tissue and movement are artistic reconstruction. Travel, the live '
+        'birth the roster gives this animal and the grip rules remain engine-owned.'],
+}
+open(os.path.join(OUT, ID + '.json'), 'w').write(json.dumps(meta, indent=2) + '\n')
+
+profile_report = {
+    'method': '21 exact plane-intersection envelopes of both actual meshes (body and lower jaw '
+              'together); %.4f raw-space voxel occupancy resurfacing, relaxed and reduced' % VOXEL,
+    'bodyLength': BODY_LENGTH,
+    'envelopeTolerance': ENVELOPE_TOLERANCE,
+    'envelopeToleranceFractionOfBodyLength': ENVELOPE_TOLERANCE_FRACTION,
+    'maximumEnvelopeDifference': worst,
+    'maximumEnvelopeDifferenceFractionOfBodyLength': worst / BODY_LENGTH,
+    'surfaceDistanceMax': float(max(distances)),
+    'surfaceDistanceMaxFractionOfBodyLength': float(max(distances)) / BODY_LENGTH,
+    'surfaceDistanceP95': float(np.quantile(distances, .95)),
+    'surfaceDistanceP95FractionOfBodyLength': float(np.quantile(distances, .95)) / BODY_LENGTH,
+    'anchorTolerance': ANCHOR_TOLERANCE,
+    'anchorSurfaceDistances': anchor_checks,
+    'appendageRootSeating': seating,
+    'stations': profile,
+}
+open(os.path.join(HERE, ID + '-profile.json'), 'w').write(json.dumps(profile_report, indent=2) + '\n')
+
+validation = {
+    'sourceFile': os.path.relpath(SOURCE, ROOT),
+    'sourceSha256': hashlib.sha256(open(SOURCE, 'rb').read()).hexdigest(),
+    'preservedRawSha256': hashlib.sha256(open(RAW, 'rb').read()).hexdigest(),
+    'sourceAlbedoSha256': albedo_sha,
+    'sourceTriangles': source_triangles,
+    'weldedComponents': len(component_sizes),
+    'largestComponents': component_sizes[:5],
+    'removedFlakeVertices': removed,
+    'unbending': unbending,
+    'restPoseCurvature': REST_POSE_CURVATURE,
+    'pairedFinAsymmetry': PAIRED_FIN_ASYMMETRY,
+    'mouth': mouth_report,
+    'mouthSideLabelling': label_report,
+    'liningClearanceInsideSkinRaw': round(lining_clearance, 5),
+    'scale': round(SCALE, 5), 'bodyLength': BODY_LENGTH,
+    'authoredTriangles': authored_tris, 'twinTriangles': puppet_tris,
+    'twinRemeshTriangles': remesh_triangles, 'twinDecimateRatio': decimate_ratio,
+    'twinVerticesHeldBackFromRelaxation': relax_masked, 'bladeDilation': BLADE_DILATION,
+    'voxel': VOXEL,
+    'bones': len(B), 'boneNames': list(B),
+    'clips': CLIPS, 'looping': LOOPS, 'loopSeams': seams, 'boundsAt13Phases': bounds,
+    'weights': weight_report,
+    'envelope': {k: profile_report[k] for k in
+                 ('maximumEnvelopeDifference', 'maximumEnvelopeDifferenceFractionOfBodyLength',
+                  'surfaceDistanceMax', 'surfaceDistanceP95', 'envelopeTolerance')},
+    'anchors': anchor_checks, 'appendageRootSeating': seating,
+    'jawShutFromTheGenerationsPartedPose': jaw_closed_cost,
+    'authoredVerticesFarthestFromTheTwin': farthest_from_the_twin,
+    'pairedFinSweptAngleInSprint': {
+        'radiansPerCycleSummedOverTheThreeAxes': {k: round(v, 4) for k, v in fin_sweep.items()},
+        'cycles': 2,
+        'note': 'total absolute change in each paired-fin root\'s Euler angles over the whole '
+                'Sprint clip, which holds two tail beats. These are control surfaces and take no '
+                'propulsive stroke, but they sweep with the beat rather than hanging.'},
+    'normalizedWeights': True, 'rootStable': True, 'noScaleChannels': True,
+}
+open(os.path.join(HERE, 'validation.json'), 'w').write(json.dumps(validation, indent=2) + '\n')
+bpy.ops.wm.save_as_mainfile(filepath=os.path.join(LOCAL, ID + '-paired.blend'))
+print('SAURICHTHYS_CURVATURE ' + json.dumps(REST_POSE_CURVATURE))
+print('SAURICHTHYS_FINSYM ' + json.dumps(PAIRED_FIN_ASYMMETRY))
+print('SAURICHTHYS_UNBEND ' + json.dumps(unbending))
+print('SAURICHTHYS_MOUTH ' + json.dumps(mouth_report))
+print('SAURICHTHYS_ENVELOPE ' + json.dumps(validation['envelope']))
+print('SAURICHTHYS_TRIS ' + json.dumps({'authored': authored_tris, 'twin': puppet_tris,
+                                    'fraction': round(puppet_tris / authored_tris, 4)}))
+print('SAURICHTHYS_SEATING ' + json.dumps(seating))
+print('SAURICHTHYS_SEAMS ' + json.dumps({k: round(v, 9) for k, v in seams.items()}))

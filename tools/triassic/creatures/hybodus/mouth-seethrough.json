@@ -1,0 +1,240 @@
+{
+  "method": "rendered against a saturated magenta backdrop at the phase each clip opens its own gape widest, framed in the skull's own frame; a backdrop-coloured pixel enclosed by the silhouette is a hole through the animal. Rendered twice, with and without the backface-cull shim, because the runtime culls and CYCLES does not.",
+  "backdrop": [
+    1.0,
+    0.0,
+    1.0
+  ],
+  "rows": [
+    {
+      "clip": "Idle",
+      "frame": 31,
+      "jawRadians": -0.2958,
+      "holePixels": 43,
+      "silhouettePixels": 276927,
+      "seeThroughPercent": 0.016,
+      "seeThroughPercentWithoutTheCullShim": 0.016,
+      "meanImageDifferenceCulledVsNot": 0.0015
+    },
+    {
+      "clip": "Swim",
+      "frame": 22,
+      "jawRadians": -0.2959,
+      "holePixels": 29,
+      "silhouettePixels": 276782,
+      "seeThroughPercent": 0.01,
+      "seeThroughPercentWithoutTheCullShim": 0.01,
+      "meanImageDifferenceCulledVsNot": 0.0
+    },
+    {
+      "clip": "Sprint",
+      "frame": 13,
+      "jawRadians": -0.2959,
+      "holePixels": 44,
+      "silhouettePixels": 276555,
+      "seeThroughPercent": 0.016,
+      "seeThroughPercentWithoutTheCullShim": 0.016,
+      "meanImageDifferenceCulledVsNot": 0.0
+    },
+    {
+      "clip": "TurnLeft",
+      "frame": 0,
+      "jawRadians": -0.3267,
+      "holePixels": 26,
+      "silhouettePixels": 276557,
+      "seeThroughPercent": 0.009,
+      "seeThroughPercentWithoutTheCullShim": 0.009,
+      "meanImageDifferenceCulledVsNot": 0.0
+    },
+    {
+      "clip": "TurnRight",
+      "frame": 0,
+      "jawRadians": -0.3267,
+      "holePixels": 26,
+      "silhouettePixels": 276557,
+      "seeThroughPercent": 0.009,
+      "seeThroughPercentWithoutTheCullShim": 0.009,
+      "meanImageDifferenceCulledVsNot": 0.0
+    },
+    {
+      "clip": "Dive",
+      "frame": 0,
+      "jawRadians": -0.3267,
+      "holePixels": 26,
+      "silhouettePixels": 276557,
+      "seeThroughPercent": 0.009,
+      "seeThroughPercentWithoutTheCullShim": 0.009,
+      "meanImageDifferenceCulledVsNot": 0.0
+    },
+    {
+      "clip": "Rise",
+      "frame": 0,
+      "jawRadians": -0.3267,
+      "holePixels": 26,
+      "silhouettePixels": 276557,
+      "seeThroughPercent": 0.009,
+      "seeThroughPercentWithoutTheCullShim": 0.009,
+      "meanImageDifferenceCulledVsNot": 0.0
+    },
+    {
+      "clip": "Attack",
+      "frame": 10,
+      "jawRadians": 0.6949,
+      "holePixels": 4403,
+      "silhouettePixels": 305102,
+      "seeThroughPercent": 1.443,
+      "seeThroughPercentWithoutTheCullShim": 1.443,
+      "meanImageDifferenceCulledVsNot": 0.0
+    },
+    {
+      "clip": "Bite",
+      "frame": 4,
+      "jawRadians": 0.8415,
+      "holePixels": 1872,
+      "silhouettePixels": 300486,
+      "seeThroughPercent": 0.623,
+      "seeThroughPercentWithoutTheCullShim": 0.623,
+      "meanImageDifferenceCulledVsNot": 0.0
+    },
+    {
+      "clip": "Heavy",
+      "frame": 12,
+      "jawRadians": 0.8687,
+      "holePixels": 2161,
+      "silhouettePixels": 317289,
+      "seeThroughPercent": 0.681,
+      "seeThroughPercentWithoutTheCullShim": 0.681,
+      "meanImageDifferenceCulledVsNot": 0.0
+    },
+    {
+      "clip": "Hit",
+      "frame": 0,
+      "jawRadians": -0.3267,
+      "holePixels": 26,
+      "silhouettePixels": 276557,
+      "seeThroughPercent": 0.009,
+      "seeThroughPercentWithoutTheCullShim": 0.009,
+      "meanImageDifferenceCulledVsNot": 0.0
+    },
+    {
+      "clip": "Death",
+      "frame": 43,
+      "jawRadians": -0.2068,
+      "holePixels": 189,
+      "silhouettePixels": 267756,
+      "seeThroughPercent": 0.071,
+      "seeThroughPercentWithoutTheCullShim": 0.071,
+      "meanImageDifferenceCulledVsNot": 0.0
+    },
+    {
+      "clip": "Guard",
+      "frame": 14,
+      "jawRadians": -0.296,
+      "holePixels": 53,
+      "silhouettePixels": 277004,
+      "seeThroughPercent": 0.019,
+      "seeThroughPercentWithoutTheCullShim": 0.019,
+      "meanImageDifferenceCulledVsNot": 0.0
+    },
+    {
+      "clip": "Parry",
+      "frame": 0,
+      "jawRadians": -0.3267,
+      "holePixels": 26,
+      "silhouettePixels": 276557,
+      "seeThroughPercent": 0.009,
+      "seeThroughPercentWithoutTheCullShim": 0.009,
+      "meanImageDifferenceCulledVsNot": 0.0
+    },
+    {
+      "clip": "Dodge",
+      "frame": 0,
+      "jawRadians": -0.3267,
+      "holePixels": 26,
+      "silhouettePixels": 276557,
+      "seeThroughPercent": 0.009,
+      "seeThroughPercentWithoutTheCullShim": 0.009,
+      "meanImageDifferenceCulledVsNot": 0.0
+    },
+    {
+      "clip": "Eat",
+      "frame": 29,
+      "jawRadians": 0.5355,
+      "holePixels": 2329,
+      "silhouettePixels": 293357,
+      "seeThroughPercent": 0.794,
+      "seeThroughPercentWithoutTheCullShim": 0.794,
+      "meanImageDifferenceCulledVsNot": 0.0
+    },
+    {
+      "clip": "Stagger",
+      "frame": 0,
+      "jawRadians": -0.3267,
+      "holePixels": 26,
+      "silhouettePixels": 276557,
+      "seeThroughPercent": 0.009,
+      "seeThroughPercentWithoutTheCullShim": 0.009,
+      "meanImageDifferenceCulledVsNot": 0.0
+    },
+    {
+      "clip": "Ability",
+      "frame": 12,
+      "jawRadians": 0.1984,
+      "holePixels": 1095,
+      "silhouettePixels": 283996,
+      "seeThroughPercent": 0.386,
+      "seeThroughPercentWithoutTheCullShim": 0.386,
+      "meanImageDifferenceCulledVsNot": 0.0
+    },
+    {
+      "clip": "Grab",
+      "frame": 20,
+      "jawRadians": 0.4739,
+      "holePixels": 3198,
+      "silhouettePixels": 306972,
+      "seeThroughPercent": 1.042,
+      "seeThroughPercentWithoutTheCullShim": 1.042,
+      "meanImageDifferenceCulledVsNot": 0.0
+    },
+    {
+      "clip": "Breath",
+      "frame": 29,
+      "jawRadians": -0.1723,
+      "holePixels": 166,
+      "silhouettePixels": 277640,
+      "seeThroughPercent": 0.06,
+      "seeThroughPercentWithoutTheCullShim": 0.06,
+      "meanImageDifferenceCulledVsNot": 0.0
+    },
+    {
+      "clip": "Growth",
+      "frame": 0,
+      "jawRadians": -0.3267,
+      "holePixels": 26,
+      "silhouettePixels": 276557,
+      "seeThroughPercent": 0.009,
+      "seeThroughPercentWithoutTheCullShim": 0.009,
+      "meanImageDifferenceCulledVsNot": 0.0
+    },
+    {
+      "clip": "Shake",
+      "frame": 15,
+      "jawRadians": 0.4876,
+      "holePixels": 1868,
+      "silhouettePixels": 339892,
+      "seeThroughPercent": 0.55,
+      "seeThroughPercentWithoutTheCullShim": 0.55,
+      "meanImageDifferenceCulledVsNot": 0.0
+    },
+    {
+      "clip": "SpineBrace",
+      "frame": 14,
+      "jawRadians": -0.2344,
+      "holePixels": 94,
+      "silhouettePixels": 278086,
+      "seeThroughPercent": 0.034,
+      "seeThroughPercentWithoutTheCullShim": 0.034,
+      "meanImageDifferenceCulledVsNot": 0.0
+    }
+  ]
+}
