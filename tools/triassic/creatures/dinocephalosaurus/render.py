@@ -27,6 +27,13 @@ bpy.ops.object.camera_add(); cam = bpy.context.object; s.camera = cam; cam.data.
 MID = (0, -.85, -.35)
 
 
+# `--only Eat,Grab` re-renders just those clips' frames. Every other clip's samples are identical
+# across a rebuild that touched neither, so re-rendering the whole set to change two of them is
+# forty minutes of CPU for nothing. It filters review frames only; the portraits ignore it.
+ONLY = (sys.argv[sys.argv.index('--only') + 1].split(',')) if '--only' in sys.argv else None
+keep = lambda clip: ONLY is None or clip in ONLY
+
+
 def pose(clip, t):
     a = next(a for a in bpy.data.actions if a.name == clip or a.name.endswith('_' + clip) or a.name.endswith('|' + clip))
     rig.animation_data.action = a
@@ -123,15 +130,18 @@ POSES = [('Idle', 0), ('Swim', 0), ('Swim', .5), ('Swim', 1.), ('Swim', 1.5), ('
          ('NeckStrike', .2), ('NeckStrike', .55), ('NeckStrike', .9), ('NeckStrike', 1.25),
          ('Periscope', .4), ('Periscope', 1.6), ('Periscope', 2.8), ('Breathe', .9), ('Breathe', 2.1)]
 for clip, t in POSES:
+    if not keep(clip): continue
     pose(clip, t); render(REVIEW / ('%s-%s.png' % (clip, t)))
-for name, loc, tgt, scale, w, h in [('side', (8, -.85, .1), (0, -.85, -.35), 7.6, 1000, 750),
+for name, loc, tgt, scale, w, h in ([] if ONLY else [('side', (8, -.85, .1), (0, -.85, -.35), 7.6, 1000, 750),
                                     ('top', (0, -.85, 9), (0, -.85, 0), 8.0, 640, 900),
                                     ('front', (0, -9.5, -.35), (0, -.85, -.35), 2.8, 1000, 750),
-                                    ('belly', (0, -.85, -9), (0, -.85, 0), 8.0, 640, 900)]:
+                                    ('belly', (0, -.85, -9), (0, -.85, 0), 8.0, 640, 900)]):
     pose('Idle', 0); render(REVIEW / (name + '.png'), w, h, loc, tgt, scale)
 MOUTH = [('mouth-closed', 'Idle', 0), ('mouth-Bite', 'Bite', .25), ('mouth-Attack', 'Attack', .14)]
 for name, clip, t in MOUTH:
+    if not keep(clip): continue
     pose(clip, t); render(REVIEW / (name + '.png'), 1000, 750, (3.2, -5.6, .9), (0, -3.35, -.05), 1.5)
 for clip, t in NECK:
+    if not keep(clip): continue
     pose(clip, t); render(REVIEW / ('%s-%s-nside.png' % (clip, t)), 900, 620, (8, -.85, .2), (0, -.85, .1), 7.8)
     pose(clip, t); render(REVIEW / ('%s-%s-ntop.png' % (clip, t)), 640, 900, (0, -.85, 9), (0, -.85, 0), 8.0)

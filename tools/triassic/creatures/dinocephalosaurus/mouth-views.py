@@ -49,10 +49,15 @@ for loc, power in [((3, -5, 5), 1000), ((-3, -1, 3), 600), ((0, 4, 4), 1100), ((
     bpy.ops.object.light_add(type='AREA'); o = bpy.context.object; o.location = loc; o.data.energy = power; o.data.size = 5
     o.rotation_euler = (Vector((0, -3.35, 0)) - o.location).to_track_quat('-Z', 'Y').to_euler()
 bpy.ops.object.camera_add(); cam = bpy.context.object; s.camera = cam; cam.data.type = 'ORTHO'
-TGT = (0, -3.35, -.05)
 W, H = 900, 720
-VIEWS = [('quarter', (2.0, -4.9, .8), 1.5), ('front', (0, -5.6, .10), 1.2), ('side', (4.2, -3.35, -.05), 1.5)]
-SHOTS = [('Bite', .25), ('Attack', .14), ('NeckStrike', .52), ('Idle', 0.)]
+# Offsets in the SKULL's own frame, not fixed points in the world: the neck throws the head most of
+# two body lengths and turns it right over, so a camera parked where the head rests at Idle
+# photographs empty water on half these clips, and one held level to the world looks at the top of
+# the head on the rest. The side view is also framed tight, because the measurement below counts
+# background enclosed by a silhouette and a neck curving through the frame encloses plenty of it.
+VIEWS = [('quarter', (2.0, -1.55, .85), 1.5), ('front', (0, -2.25, .15), 1.2), ('side', (4.2, 0, 0), .85)]
+# Each attack at the phase its own gape is widest, which is the aperture worth measuring.
+SHOTS = [('Bite', .185), ('Attack', .47), ('Heavy', .624), ('NeckStrike', .728), ('Idle', 0.)]
 
 
 def pose(clip, t):
@@ -60,6 +65,9 @@ def pose(clip, t):
     rig.animation_data.action = a
     if a.slots: rig.animation_data.action_slot = a.slots[0]
     s.frame_set(round(t * 30))
+    bpy.context.view_layer.update()
+    b = rig.pose.bones['skull']
+    return rig.matrix_world @ b.head, (rig.matrix_world @ b.matrix).to_3x3().normalized()
 
 
 def render(file, loc, target, scale, w=W, h=H):
@@ -86,8 +94,11 @@ def seethrough(path, w=W, h=H):
 
 out = {}
 for clip, t in SHOTS:
-    for name, loc, scale in VIEWS:
-        pose(clip, t); f = render(OUTDIR / ('%s-%s-%s%s.png' % (clip, t, name, SUFFIX)), loc, TGT, scale)
+    for name, off, scale in VIEWS:
+        head, R = pose(clip, t)
+        # The snout runs ahead of the skull joint, so the frame is centred a little in front of it.
+        tgt = head + R @ Vector((0, -.16, -.02))
+        f = render(OUTDIR / ('%s-%s-%s%s.png' % (clip, t, name, SUFFIX)), tgt + R @ Vector(off), tgt, scale)
         if name == 'side':
             hole, enclosed = seethrough(f)
             out['%s %.2f' % (clip, t)] = {'holePixels': hole, 'enclosedPixels': enclosed,

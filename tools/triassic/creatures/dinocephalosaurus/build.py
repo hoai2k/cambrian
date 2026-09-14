@@ -950,6 +950,16 @@ for clip, duration in CLIPS.items():
             x = (u - u0 - lead * ph) / w
             return (sin(pi * x) ** 2) ** sharp if 0. < x < 1. else 0.
 
+        def peristalsis(u0, w, lead, ph):
+            """A travelling BULGE rather than a travelling bend: each joint goes one way and then
+            the other as the wave passes it, so the chain's net curvature stays about where it was
+            and what reads is a swelling moving along the neck. The same bump with one sign bends
+            the whole neck progressively instead, which on a swallow reads as the head being
+            dropped under the chest."""
+            assert u0 >= 0. and u0 + w + lead <= 1. + 1e-9, ('a travelling bulge outruns the clip', clip)
+            x = (u - u0 - lead * ph) / w
+            return sin(2 * pi * x) if 0. < x < 1. else 0.
+
         amp = AMP.get(clip, .25)
         peak = sin(pi * (u - .24) / .4) ** 2 if .24 < u < .64 else 0
         wind = sin(pi * u / .28) ** 2 if u < .28 else 0
@@ -1060,13 +1070,15 @@ for clip, duration in CLIPS.items():
                 # A piscivore does not chew: it throws the fish back and swallows it, and on a neck
                 # this long the swallow is a bolus you can watch travel. The toss is head-up at the
                 # front of the loop; the bolus then runs the other way, skull to shoulder.
-                pit += .45 - .70 * pulse(.16, 3) * (1 - .30 * ph) \
-                    + .34 * runs(.30, .34, .34, 1. - ph) + .10 * sin(p * 2 - lag * .3)
-                yaw += .30 * runs(.28, .32, .32, 1. - ph) * sin(pi * ph) + .12 * sin(p - lag * .5)
+                # The old clip held the head a long way down for the whole loop, which buried the
+                # swallow: at NK the 0.45 baseline is most of a right angle of neck.
+                pit += .16 - .80 * pulse(.16, 3) * (1 - .30 * ph) \
+                    + 1.05 * peristalsis(.30, .34, .34, 1. - ph) + .10 * sin(p * 2 - lag * .3)
+                yaw += .22 * peristalsis(.28, .32, .32, 1. - ph) * sin(pi * ph) + .12 * sin(p - lag * .5)
             if clip == 'Grab':
                 # Holding something that does not want to be held: the neck is braced back and hauls
                 # in heaves, with a worrying shake running out to the head between them.
-                pit += -.62 * (1 - .4 * ph) + .34 * sin(p * 2 - lag * .35) + .14 * sin(p * 4 - lag * .6)
+                pit += -.44 * (1 - .4 * ph) + .34 * sin(p * 2 - lag * .35) + .14 * sin(p * 4 - lag * .6)
                 yaw += .55 * sin(p * 2 - lag * .9) + .26 * sin(p * 4 - lag * 1.4)
             if clip == 'Periscope':
                 # head up, body level: the column stands and then sways along its length
