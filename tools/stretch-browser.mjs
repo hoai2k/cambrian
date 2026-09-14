@@ -14,6 +14,10 @@
  *
  * It also checks the split with sculpt from the outside: a generated body offers Stretch and not
  * Edit sculpt, because a sculpt exported off a body with no rig would name a model nobody ships.
+ *
+ * Then a second pass on a *built* body, which is a different contract: the drawings must be framed
+ * from the body's own mouth socket rather than from its bounding box, and the export must say it
+ * is a measurement for a builder rather than something the bake can apply.
  */
 import { chromium } from 'playwright-core';
 import { silenceCounter } from './qa-counter.mjs';
@@ -123,8 +127,40 @@ try {
   assert.equal(new URL(page.url()).searchParams.get('mode'), null, 'leaving stretch mode clears it from the URL');
   assert.equal(new URL(page.url()).searchParams.get('specimen'), key, 'the specimen stays');
 
+  // ---- a built body: framed from its own landmark, and a measurement rather than a bake ----
+  const built = 'triassic:nothosaurus';
+  await page.goto(`${base}/viewer/?specimen=${encodeURIComponent(built)}`, { waitUntil: 'networkidle', timeout: 120000 });
+  await page.waitForFunction((k) => document.querySelector('.clips')?.getAttribute('data-loaded-specimen') === k, built, { timeout: 90000 });
+  await page.getByRole('button', { name: /^Stretch/ }).click();
+  await page.waitForSelector('.stretch-panel', { timeout: 30000 });
+  await page.waitForTimeout(1500);
+  const orientation = await page.locator('.stretch-panel .hint').filter({ hasText: /Taken from|Guessed|Set by hand/ }).first().textContent();
+  assert.match(orientation, /mouth socket/i, 'a body with a mouth socket is framed from it, not from its box');
+  assert.equal(await page.locator('.stretch-panel button[aria-pressed="true"]').filter({ hasText: /^Body along/ }).count(), 1,
+    'and the axis it chose is shown, and can be changed');
+  // The axis control re-frames rather than pretending: the cuts start again on the new axis.
+  const along = await page.locator('.stretch-panel button', { hasText: 'Body along X' });
+  const beforeAxis = Number(await field('From · body side').inputValue());
+  await along.click(); await page.waitForTimeout(400);
+  assert.notEqual(Number(await field('From · body side').inputValue()), beforeAxis, 'changing the axis puts the cuts back on it');
+  await page.getByRole('button', { name: 'Body along Z', exact: true }).click(); await page.waitForTimeout(400);
+
+  await page.getByRole('button', { name: '2×', exact: true }).click();
+  await page.waitForTimeout(400);
+  const builtDownload = page.waitForEvent('download');
+  await page.getByRole('button', { name: /^Export stretch/ }).click();
+  const builtFile = path.join(out, 'stretch-export-built.json');
+  await (await builtDownload).saveAs(builtFile);
+  const built2 = JSON.parse(fs.readFileSync(builtFile, 'utf8'));
+  assert.equal(built2.creature.rigged, true, 'the export knows the body is rigged');
+  assert.equal(built2.appliesTo, 'builder', 'and that it is a measurement, not something to bake');
+  // The axis was set by hand above, and the file says so — a frame a human chose must not read as
+  // one the tool worked out, or a reviewer cannot tell a correction from a guess.
+  assert.equal(built2.frame.source, 'manual', 'and that the frame was set by hand rather than found');
+
   assert.deepEqual(errors, [], 'no page errors');
-  console.log('PASS: stretch mode — two cuts on both views, one shared direction, the slider, the export and undo');
+  console.log('PASS: stretch mode — two cuts on both views, one shared direction, the slider, the export and undo;');
+  console.log('      a built body framed from its mouth socket, re-framed by hand, exported as a builder measurement');
 } finally {
   await browser.close();
 }

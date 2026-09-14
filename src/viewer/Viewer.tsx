@@ -170,10 +170,6 @@ export function Viewer() {
    */
   const sculptable = !isPropCollection(collection) && collection !== 'triassic';
   const canSculpt = sculptable && !showPuppet && !showGenerated && ready;
-  // Stretching is the other half of that split, and the opposite gate: it lengthens a run of a raw
-  // generation before anyone cleans or rigs it, so it is offered only on the generated body and
-  // never on a built one.
-  const canStretch = showGenerated && ready;
   // Marking works on whatever body is on stage, the generated mesh above all: that raw surface is
   // the one carrying fins nobody asked for, and it is the reason the mode exists. A prop is the
   // only thing it refuses — there is nothing on a stromatolite for a builder to cut away.
@@ -187,9 +183,12 @@ export function Viewer() {
    * sculpt is exactly right.
    */
   const ownBody = !def.generated || !!def.inReview;
+  const canStretch = !isPropCollection(collection) && !showPuppet && ready && (showGenerated || ownBody);
   useEffect(() => {
     if (mode === 'sculpt' && (!sculptable || showPuppet || showGenerated)) setMode('view');
-    if (mode === 'stretch' && !showGenerated) setMode('view');
+    // Stretch is the one mode a *built* body still answers: there it is a measurement rather than
+    // an edit, so all it refuses is a prop and the comparison twin.
+    if (mode === 'stretch' && (isPropCollection(collection) || showPuppet)) setMode('view');
     if (mode === 'mark' && isPropCollection(collection)) setMode('view');
   }, [mode, collection, sculptable, showPuppet, showGenerated]);
 
@@ -224,6 +223,7 @@ export function Viewer() {
         // A sculpt made this session follows the creature back onto the stage, full or reduced.
         const sculpt = getSculpt(id);
         if (sculpt && !isIdentity(sculpt)) sceneRef.current?.applySculpt(warp(sculpt), true);
+        // Only a raw generation keeps its stretch on the stage; a rigged one would flail once a clip played.
         const stretch = showGenerated ? getStretch(id) : undefined;
         if (stretch && stretch.model === modelPath && !stretchIsIdentity(stretch)) sceneRef.current?.applySculpt(stretchWarp(stretch), true);
         setClips(names); setSlots(sceneRef.current?.activeSlots() ?? []); setLoading(false); setLoadedId(id);
@@ -362,7 +362,10 @@ export function Viewer() {
           {sculptable && ownBody && <button className="ghost" onClick={() => setMode('sculpt')} disabled={!canSculpt} title="Reshape the body on side and top drawings and export the change as a sculpt file">
             Edit sculpt{(() => { const d = getSculpt(id); return d && !isIdentity(d) ? ' (edited)' : ''; })()}
           </button>}
-          {def.generated && <button className="ghost" onClick={() => { setStageId('generated'); setMode('stretch'); }} disabled={!ready} title="Lengthen a run of this raw generation — a neck, a tail — between two cuts, and export the change to be baked into the GLB">
+          {!isPropCollection(collection) && <button className="ghost" onClick={() => { if (def.generated && !def.inReview) setStageId('generated'); setMode('stretch'); }} disabled={!canStretch}
+            title={def.generated && !def.inReview
+              ? 'Lengthen a run of this raw generation — a neck, a tail — between two cuts, and export the change to be baked into the GLB'
+              : 'Lengthen a run of this body between two cuts and measure it. A built body is held at rest and cannot be baked: the numbers go to its builder.'}>
             Stretch{(() => { const d = getStretch(id); return d && !stretchIsIdentity(d) ? ' (edited)' : ''; })()}
           </button>}
           {!isPropCollection(collection) && <button className="ghost" onClick={() => setMode('mark')} disabled={!canMark} title="Paint the geometry that should not be there and export it as a region file for tools/triassic/cut-region.py">

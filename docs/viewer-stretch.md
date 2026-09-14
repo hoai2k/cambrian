@@ -16,12 +16,26 @@ So the two tools are separate and the viewer offers exactly one of them at a tim
 
 | | Sculpt | Stretch |
 | --- | --- | --- |
-| On | a shipped, rigged body | a raw generated body (`*.preview.glb`) |
+| On | a built, rigged body | any of an animal's own bodies |
 | Changes | proportions, station by station | the length of one run of body |
-| Hand-off | into a builder's profile rows | baked into the GLB, before rigging |
 
-The split is a gate, not a convention: a sculpt exported off a body with no rig would name a model
-nobody ships, and a stretch of a shipped body would be a change no builder could reproduce.
+Sculpt is offered only on a body the animal actually owns: exported off an unrigged generation it
+would name a model nobody ships. Stretch is offered on both, but means something different on each,
+and the exported file says which:
+
+- **On a raw generation** it is an edit. `npm run triassic:stretch` bakes it into the GLB, before
+  anything is cleaned, rigged or animated. `appliesTo: "generated-glb"`.
+- **On a built body** it is a *measurement*. The editor holds the rig at rest, where the warp is
+  exact, so a length can be chosen by eye on the real animal; the numbers then go to that animal's
+  builder. `appliesTo: "builder"`, and the bake refuses the file by name.
+
+The reason a built body cannot be baked is in its clips, not in the warp. Every clip these files
+carry re-specifies each joint's translation on every frame — Nothosaurus is 27 joints across 21
+clips — so a warped bind pose shows correctly at rest and is then both overridden and deformed,
+swinging about joints left where they were, the moment anything plays. Making it stick would mean
+re-authoring every clip outside Blender, which is the one thing this project's notes say not to do.
+The editor puts the warp back when you leave, so a stretched bind pose never reaches a playing
+animation.
 
 ## The edit
 
@@ -55,15 +69,42 @@ through the middle of a smooth flank shows as a faint crease at a large factor. 
 cuts are yours to place: put them where the body already changes — the shoulder, the base of the
 skull — and there is nothing to see.
 
+## Which way the body lies
+
+Everything else is meaningless if this is wrong, and getting it wrong is easy: a *bounding box*
+says Rhaeticosaurus runs across its own flippers, because its paddles span further than it is long.
+A tool that believes the box draws the "side view" from the front and lays its cuts along the wings.
+
+So the frame is taken from the best statement available, and the panel says which was used:
+
+| Source | What it is |
+| --- | --- |
+| `mouth` | The body's own `anchor_mouth`. A built body says where its head is; nothing beats that. |
+| `yaw` | The generation's authored turn (`preview-orientation.json`) — how far about +y brings its head round to +z, so it says where the head was before that. Exact for a quarter turn; an off-cardinal estimate is refused rather than rounded. |
+| `bounds` | The box. Only when a body carries no other signal, and the one that can be wrong. |
+| `manual` | Someone set it. |
+
+The **Orientation** controls override any of them: *Body along X / Z* re-frames both drawings (and
+starts the cuts again, because a coordinate on the old axis means nothing on the new one), and
+*Head left / right* turns the lengthening round while leaving the cut lines exactly where they are
+drawn. An override is recorded as `manual` in the export, so a frame a human chose never reads as
+one the tool worked out.
+
+The yaws are estimates, and their own file says a wrong one "costs a preview that faces the wrong
+way, never a shipped asset". Rhaeticosaurus is currently one of those: its side view is a true
+profile with the head at +z, which is not what its stored yaw of 180 claims. Set the orientation by
+hand there until the estimate is corrected.
+
+No third view is needed. Side and top are the two that matter for aiming a length — up-and-down and
+left-and-right — and a front view would add a picture without adding a control.
+
 ## Using it
 
-Open a Triassic animal that is still borrowing a body, switch *Body* to **Generated mesh**, and
-press **Stretch**. (Pressing *Stretch* from the roster does both.)
+Open the animal and press **Stretch**. For one still borrowing a body that also switches *Body* to
+the generated mesh, which is what the stretch applies to.
 
-1. **Check which end the head is at.** A raw generation carries no mouth socket, so the tool
-   assumes the head faces +axis — true of our exporters, not necessarily of a generation whose
-   orientation has not been normalized. The button says which end it is assuming; one click flips
-   it. Flipping reverses the direction exactly and leaves both cut lines drawn where they are.
+1. **Check the orientation panel.** If it says the frame was guessed from the bounding box, look at
+   the drawings before trusting them.
 2. **Place the cuts.** Drag a line along the body. The two may not cross; they stop a hundredth of
    the body apart.
 3. **Aim it.** Drag either handle on either cut. Both cuts turn together, in that view only — the
@@ -107,6 +148,33 @@ Positions move, normals follow the inverse transpose of the map and tangents the
 generated mesh keeps its own shading instead of being reshaded wholesale by a
 `computeVertexNormals` it never asked for. Textures, materials and the node graph pass through
 untouched.
+
+## Worked example: the Nothosaurus neck
+
+The animal this tool was wanted for, and a good illustration of both what it can and cannot do.
+
+*Nothosaurus giganteus* should carry a neck about a fifth of its length; the shipped body carries
+the head almost on the shoulders. Measured on `nothosaurus.glb`, the local half-width steps from
+0.808 to 0.223 in one 0.075 slice at z ≈ 1.61 — a shoulder, then a head, with a short neck between
+them.
+
+Cuts at z 1.500 (in the shoulder) and 1.790 (the base of the skull) take a region of 0.290, which
+is 5.8% of the body. At 2× that becomes 11.6%, at 3× 17.4% — the genus's defining proportion,
+nearly. It reads well in the viewer at both.
+
+That is a better result than the earlier study reached
+(`tools/triassic/creatures/nothosaurus/neck-study.py`, and its render beside it), and the
+difference is entirely in where the cuts went. That study stretched the *visible* neck alone — a
+band of 0.17 — so reaching the same proportion needed a factor of five to seven, and at that factor
+the UVs smear into a blank untextured sock. Spreading the same lengthening over a region that
+includes textured shoulder costs a 2–3× smear instead, which the mottled hide carries.
+
+It still cannot be baked, for the reason above: Nothosaurus is rigged and every clip re-specifies
+every joint. What the export gives you is the instruction —  region, direction and factor — for
+`tools/triassic/creatures/nothosaurus/build.py`. And for the full one-fifth the honest route is
+still the one already queued in
+`docs/triassic/canonical/prompts-2026-09-13-nothosaurus-neck.json`: back to the pose, because a
+stretch can lengthen a neck but cannot invent the cervical anatomy to fill it.
 
 ## Files
 

@@ -62,6 +62,7 @@ every push to `main` (set the repository's Pages source to "GitHub Actions").
 | [`docs/environment-assets.md`](docs/environment-assets.md) | The seven biome props, nine biome paintings and five radar glyphs, and how the streamed sea consumes them. |
 | [`docs/art/colour-rendering.md`](docs/art/colour-rendering.md) | Runtime creature palettes and the portrait-variant fallback policy. |
 | [`docs/image-requests.md`](docs/image-requests.md) | Open image, glyph and prop requests — **currently none**. Delivered briefs: [`docs/image-requests-history.md`](docs/image-requests-history.md). |
+| [`docs/triassic/builder-requests.md`](docs/triassic/builder-requests.md) | Blender work queued on a Triassic creature builder, measured and written up. |
 | [`docs/viewer-stretch.md`](docs/viewer-stretch.md) | The neck stretcher: lengthening a run of a raw generated body between two cuts, and baking it into the GLB. |
 | [`docs/stats.md`](docs/stats.md) | Visitor counting: what is recorded and what is not, how to switch it on, and how to read the numbers honestly. |
 | [`docs/audio-requests.md`](docs/audio-requests.md) | Sound and music requests, and what has been delivered. Extra music is optional; nothing waits on it. |

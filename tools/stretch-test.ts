@@ -19,8 +19,8 @@
 import assert from 'node:assert/strict';
 import {
   MAX_FACTOR, MAX_TILT, MIN_FACTOR, axisAt, cloneDoc, exportDoc, flipForward, fromExport, headFractionAt, isIdentity,
-  levelTilt, measureStretch, normalWarp, regionLength, resetAll, resetFactor, setFactor, setPlaneAt, setTilt,
-  shiftOf, stretchDirection, warp, type StretchDoc, type Vec3,
+  frameFromMouth, frameFromYaw, levelTilt, measureStretch, normalWarp, regionLength, reframe, resetAll, resetFactor,
+  setAxis, setFactor, setPlaneAt, setTilt, shiftOf, stretchDirection, warp, type StretchDoc, type Vec3,
 } from '../src/viewer/stretch/stretch';
 import { History } from '../src/viewer/sculpt/history';
 
@@ -68,6 +68,63 @@ ok(alongX.frame.axis === 'x', 'a body lying along x is read along x');
 // A mouth socket at the low end says the head is there, whatever the exporter's habit.
 const reversed = measureStretch({ chunks, mouth: [0, 0, -4] }, meta);
 ok(reversed.frame.forward === -1, 'a mouth socket at the low end puts the head at the low end');
+
+// ------------------------------------------------------------------------------- which way it lies
+
+/**
+ * The frame is the one thing that, got wrong, makes every other number meaningless — and the
+ * bounding box gets it wrong on a real animal in the roster. Rhaeticosaurus' flippers span further
+ * than its body is long, so the longest side of its box runs *across* it: a tool that trusts the
+ * box draws the side view from the front and lays its cuts along the wings.
+ */
+{
+  // A wide-flippered body: 2 long in z, but 3 across in x because of the paddles.
+  const winged: number[] = [];
+  for (let i = 0; i <= 20; i++) winged.push(0, 0, -1 + 2 * (i / 20));       // the body, along z
+  for (let i = 0; i <= 20; i++) winged.push(-1.5 + 3 * (i / 20), 0, 0);     // the flippers, across x
+  const chunk = [new Float32Array(winged)];
+
+  const guessed = measureStretch({ chunks: chunk }, meta);
+  ok(guessed.frame.axis === 'x' && guessed.frameSource === 'bounds',
+    'the box alone picks the flipper span, which is the bug this exists to name');
+
+  // The authored yaw says where the head was before the body was faced forward, and that is exact.
+  const byYaw = measureStretch({ chunks: chunk, yaw: 180 }, meta);
+  ok(byYaw.frame.axis === 'z' && byYaw.frame.forward === -1 && byYaw.frameSource === 'yaw',
+    'the generation\u2019s own yaw picks the body, flippers or no flippers');
+  near(byYaw.bounds.length, 2, 1e-6, 'and the body measures its own length, not its span');
+  near(byYaw.bounds.width, 3, 1e-6, '...with the span as its width');
+
+  // A mouth socket beats everything: it is the body saying where its head is.
+  const byMouth = measureStretch({ chunks: chunk, mouth: [0, 0, 1], yaw: 180 }, meta);
+  ok(byMouth.frame.axis === 'z' && byMouth.frame.forward === 1 && byMouth.frameSource === 'mouth',
+    'a mouth socket outranks the authored yaw, and disagrees with it here');
+}
+
+// Every quarter turn, and only quarter turns: an off-cardinal estimate says nothing about an axis.
+for (const [yaw, axis, forward] of [[0, 'z', 1], [180, 'z', -1], [-180, 'z', -1], [-90, 'x', 1], [90, 'x', -1], [270, 'x', 1], [-270, 'x', -1], [360, 'z', 1]] as [number, 'x' | 'z', 1 | -1][]) {
+  const f = frameFromYaw(yaw);
+  ok(f?.axis === axis && f.forward === forward, `yaw ${yaw} puts the head at ${forward > 0 ? '+' : '\u2212'}${axis}`);
+}
+for (const yaw of [37, -12, 0.5, NaN]) ok(frameFromYaw(yaw) === null, `yaw ${yaw} is no statement about a cardinal axis`);
+ok(frameFromMouth([-1, -1, -1], [1, 1, 1], [0, 0, 0]) === null, 'a mouth at the centre says nothing');
+ok(frameFromMouth([-1, -1, -1], [1, 1, 1], [0, .5, -.9])?.forward === -1, 'and one at the low end says so');
+
+// Changing the frame by hand re-derives everything the old axis decided, and says a human did it.
+{
+  const wrong = measureStretch({ chunks: [new Float32Array([-1.5, 0, -1, 1.5, .3, 1])] }, meta);
+  ok(wrong.frame.axis === 'x', 'a body wider than it is long is read along its width');
+  const fixed = setAxis(wrong, 'z');
+  ok(fixed.frame.axis === 'z' && fixed.frameSource === 'manual', 'and can be set right by hand');
+  near(fixed.bounds.length, 2, 1e-9, 'the bounds follow the new axis');
+  near(fixed.bounds.width, 3, 1e-9, '...and so does what counts as width');
+  ok(fixed.from < fixed.to && fixed.from >= -1 && fixed.to <= 1, 'and the cuts start again on it, inside the body');
+  ok(setAxis(fixed, 'z') === fixed, 'setting the axis it already has changes nothing');
+  ok(reframe(fixed, { axis: 'x', forward: 1, up: 'y' }).bounds.length === 3, 'reframing measures the other way round again');
+  // The measured box survives every reframe, or the second one would have nothing to work from.
+  assert.deepEqual(setAxis(setAxis(wrong, 'z'), 'x').box, wrong.box, 'the box is carried through');
+  passes++;
+}
 
 // ---------------------------------------------------------------------- the neck, straight back
 
@@ -240,6 +297,13 @@ near(levelTilt(tilted).from, tilted.from, 1e-12, '...without moving the cuts');
   near(payload.region.length * payload.region.factor, payload.region.stretched, 1e-6, 'and what that comes to');
   near(payload.direction.tiltSideDegrees, 30, 1e-3, 'angles are given in degrees as well as radians');
   ok(payload.creature.vertices === base.vertices, 'and the vertex count the stretch was measured on');
+  ok(payload.appliesTo === 'generated-glb' && payload.creature.rigged === false,
+    'an unrigged body\u2019s stretch is one the bake can apply');
+  ok(payload.frame.source === tilted.frameSource, 'and the file says how the frame was decided');
+  const rigged = exportDoc({ ...tilted, rigged: true });
+  ok(rigged.appliesTo === 'builder' && /cannot be baked|refuses/.test(rigged.note),
+    'a built body\u2019s stretch says it is a measurement, not a bake');
+  ok(fromExport(JSON.parse(JSON.stringify(rigged))).rigged === true, 'and the flag survives the round trip');
   near(payload.planes.from.headFraction, headFractionAt(tilted, tilted.from), 1e-4, 'each cut says where it sits on the body');
 
   // The file is the whole hand-off: a warp rebuilt from it must agree vertex for vertex.

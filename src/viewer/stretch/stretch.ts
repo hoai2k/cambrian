@@ -62,12 +62,24 @@ export interface StretchDoc {
   collection: string;
   model: string;
   frame: StretchFrame;
+  /** Where the frame came from, so a wrong guess can be seen and said. */
+  frameSource: FrameSource;
+  /** The measured box in the root frame, which is what a change of frame re-derives `bounds` from. */
+  box: { lo: Vec3; hi: Vec3 };
   bounds: {
     length: number; height: number; width: number;
     axisMin: number; axisMax: number; lateralMid: number; upMid: number;
   };
   /** How many vertices the measured mesh had, so a stretch cannot be applied to a different body. */
   vertices: number;
+  /**
+   * Whether the body carries a skeleton. A generated mesh does not, and a stretch of it is baked
+   * into the GLB; a built body does, and every clip in these files re-specifies each joint's
+   * translation on every frame, so a warped bind pose would show at rest and be overridden — and
+   * deformed about joints left behind — the moment anything played. There the stretch is a
+   * measurement to hand a builder, and the bake refuses it by name.
+   */
+  rigged: boolean;
   /** Where the cuts sit along the body axis: `from` nearer the tail, `to` nearer the head. */
   from: number;
   to: number;
@@ -83,6 +95,49 @@ export interface StretchDoc {
   tiltTop: number;
   /** The region's new length as a multiple of its own. 1 changes nothing. */
   factor: number;
+}
+
+/**
+ * How a body's frame was decided, best first.
+ *
+ * The bounding box is last for a reason, and the reason has a name: Rhaeticosaurus. Its flipper
+ * span is wider than the animal is long, so the longest side of its box runs *across* it, and a
+ * tool that trusts the box draws the "side view" from the front and lays its cuts along the wings.
+ * The box is a guess about a shape; the other three are statements about this body.
+ */
+export type FrameSource = 'mouth' | 'yaw' | 'bounds' | 'manual';
+
+/**
+ * The frame a generated body's authored yaw implies.
+ *
+ * `previewYaw` is how many degrees about +y turn this generation's head round to +z, which is
+ * where every built body keeps it — so it says exactly where the head was before the turn: 0 is
+ * already +z, 180 is −z, −90 is +x and +90 is −x. An off-cardinal estimate says nothing about a
+ * cardinal axis and is refused rather than rounded into a wrong answer.
+ */
+export function frameFromYaw(yaw: number): StretchFrame | null {
+  if (!Number.isFinite(yaw)) return null;
+  const quarter = yaw / 90;
+  if (Math.abs(quarter - Math.round(quarter)) > 1e-6) return null;
+  switch (((Math.round(quarter) % 4) + 4) % 4) {
+    case 0: return { axis: 'z', forward: 1, up: 'y' };
+    case 2: return { axis: 'z', forward: -1, up: 'y' };
+    case 3: return { axis: 'x', forward: 1, up: 'y' };   // −90
+    default: return { axis: 'x', forward: -1, up: 'y' }; // +90
+  }
+}
+
+/**
+ * The frame a mouth socket implies: the head is where the mouth is, on whichever horizontal axis
+ * it sits furthest along. `frameFor` uses the socket only to pick the *sign* after the box has
+ * picked the axis, which is right for bodies the exporters lay out and wrong for anything else.
+ */
+export function frameFromMouth(lo: readonly number[], hi: readonly number[], mouth: readonly number[]): StretchFrame | null {
+  const dx = mouth[0] - (lo[0] + hi[0]) / 2, dz = mouth[2] - (lo[2] + hi[2]) / 2;
+  if (Math.abs(dx) < 1e-6 && Math.abs(dz) < 1e-6) return null;
+  return Math.abs(dx) > Math.abs(dz)
+    ? { axis: 'x', forward: dx >= 0 ? 1 : -1, up: 'y' }
+    : { axis: 'z', forward: dz >= 0 ? 1 : -1, up: 'y' };
 }
 
 /**
@@ -218,8 +273,12 @@ export function normalWarp(doc: StretchDoc): (x: number, y: number, z: number, n
 export interface StretchInput {
   /** Positions in the root frame as flat xyz triples, in any number of chunks. */
   chunks: ArrayLike<number>[];
-  /** The mouth socket, when the model has one; it says which end the head is. */
+  /** The mouth socket, when the model has one: the best statement of where the head is. */
   mouth?: [number, number, number];
+  /** A generated body's authored yaw (`previewYaw`), when it has one. */
+  yaw?: number;
+  /** Whether the body carries a skeleton. */
+  rigged?: boolean;
 }
 
 /**
@@ -255,21 +314,51 @@ export function measureStretch(input: StretchInput, meta: { key: string; id: str
     }
   }
   if (!Number.isFinite(lo[0])) throw new Error('measureStretch: no vertices');
-  const frame = frameFor(lo, hi, input.mouth);
-  const { A, L } = axes(frame);
+  // Best statement first: the model's own landmark, then what the pipeline authored about this
+  // generation, then — only if neither exists — the shape of the box.
+  const byMouth = input.mouth ? frameFromMouth(lo, hi, input.mouth) : null;
+  const byYaw = input.yaw === undefined ? null : frameFromYaw(input.yaw);
+  const frame = byMouth ?? byYaw ?? frameFor(lo, hi, input.mouth);
+  const frameSource: FrameSource = byMouth ? 'mouth' : byYaw ? 'yaw' : 'bounds';
   const doc: StretchDoc = {
-    version: 1, ...meta, frame, vertices,
+    version: 1, ...meta, frame, frameSource, vertices, rigged: !!input.rigged,
+    box: { lo: [lo[0], lo[1], lo[2]], hi: [hi[0], hi[1], hi[2]] },
+    bounds: { length: 0, height: 0, width: 0, axisMin: 0, axisMax: 0, lateralMid: 0, upMid: 0 },
+    from: 0, to: 0, tiltSide: 0, tiltTop: 0, factor: 1,
+  };
+  return reframe(doc, frame, frameSource);
+}
+
+/**
+ * Put the body in a different frame: re-derive the bounds from the measured box and start the cuts
+ * again at the defaults.
+ *
+ * The cuts cannot be carried across. They are coordinates on one axis, and the whole point of
+ * changing the frame is that it was the wrong axis — a number that meant "a third of the way down
+ * the body" would land somewhere across the flippers.
+ */
+export function reframe(doc: StretchDoc, frame: StretchFrame, frameSource: FrameSource = 'manual'): StretchDoc {
+  const { A, L } = axes(frame);
+  const { lo, hi } = doc.box;
+  const next: StretchDoc = {
+    ...doc, frame, frameSource,
+    box: { lo: [...lo] as Vec3, hi: [...hi] as Vec3 },
     bounds: {
       length: Math.max(hi[A] - lo[A], 1e-6), height: hi[1] - lo[1], width: hi[L] - lo[L],
       axisMin: lo[A], axisMax: hi[A],
       lateralMid: (lo[L] + hi[L]) / 2, upMid: (lo[1] + hi[1]) / 2,
     },
-    from: 0, to: 0, tiltSide: 0, tiltTop: 0, factor: 1,
+    tiltSide: 0, tiltTop: 0,
+    from: 0, to: 0,
   };
-  doc.from = axisAt(doc, DEFAULT_FROM);
-  doc.to = axisAt(doc, DEFAULT_TO);
-  return doc;
+  next.from = axisAt(next, DEFAULT_FROM);
+  next.to = axisAt(next, DEFAULT_TO);
+  return next;
 }
+
+/** Which way the body runs. Changing it re-derives everything the old axis decided. */
+export const setAxis = (doc: StretchDoc, axis: 'x' | 'z'): StretchDoc =>
+  axis === doc.frame.axis ? doc : reframe(doc, { ...doc.frame, axis });
 
 // ---------------------------------------------------------------------------------------------
 // Edits
@@ -277,7 +366,10 @@ export function measureStretch(input: StretchInput, meta: { key: string; id: str
 
 export type PlaneName = 'from' | 'to';
 
-export const cloneDoc = (doc: StretchDoc): StretchDoc => ({ ...doc, bounds: { ...doc.bounds }, frame: { ...doc.frame } });
+export const cloneDoc = (doc: StretchDoc): StretchDoc => ({
+  ...doc, bounds: { ...doc.bounds }, frame: { ...doc.frame },
+  box: { lo: [...doc.box.lo] as Vec3, hi: [...doc.box.hi] as Vec3 },
+});
 
 /**
  * Slide a cut along the body.
@@ -348,6 +440,7 @@ export function resetAll(doc: StretchDoc): StretchDoc {
 export function flipForward(doc: StretchDoc): StretchDoc {
   const next = cloneDoc(doc);
   next.frame = { ...doc.frame, forward: doc.frame.forward === 1 ? -1 : 1 };
+  next.frameSource = 'manual';
   next.from = doc.to; next.to = doc.from;
   next.tiltSide = -doc.tiltSide; next.tiltTop = -doc.tiltTop;
   return next;
@@ -382,9 +475,15 @@ export function exportDoc(doc: StretchDoc) {
     format: 'cambrian-stretch',
     version: doc.version,
     generated: new Date().toISOString(),
-    creature: { key: doc.key, id: doc.id, collection: doc.collection, model: doc.model, vertices: doc.vertices },
+    creature: { key: doc.key, id: doc.id, collection: doc.collection, model: doc.model, vertices: doc.vertices, rigged: doc.rigged },
+    /**
+     * What this file is for. A generated body's stretch is baked into its GLB; a built body's is a
+     * measurement, because every clip in a built file re-specifies each joint's translation on
+     * every frame and a warped bind pose would be overridden the moment anything played.
+     */
+    appliesTo: doc.rigged ? 'builder' : 'generated-glb',
     frame: {
-      ...doc.frame,
+      ...doc.frame, source: doc.frameSource,
       note: `Model root frame, unscaled. The body runs along ${doc.frame.axis}; the head is at the ${doc.frame.forward === 1 ? 'high' : 'low'} end. Both cuts are square to \`direction\`, which is the unit vector below; tiltSide is the angle its line makes in the side view and tiltTop the angle in the top view, in radians from straight down the body.`,
     },
     bounds: doc.bounds,
@@ -402,7 +501,10 @@ export function exportDoc(doc: StretchDoc) {
       percentOfBody: round(base / doc.bounds.length * 100, 2),
     },
     changed: !isIdentity(doc),
-    note: 'Vertices on the body side of `from` are unchanged; vertices on the head side of `to` move by direction.vector × region.shift; between the cuts a vertex moves by that times its own fraction through the region, measured along the direction. Normals follow the inverse transpose of that map. See docs/viewer-stretch.md; `npm run triassic:stretch -- <this file>` applies it.',
+    note: 'Vertices on the body side of `from` are unchanged; vertices on the head side of `to` move by direction.vector × region.shift; between the cuts a vertex moves by that times its own fraction through the region, measured along the direction. Normals follow the inverse transpose of that map. See docs/viewer-stretch.md.'
+      + (doc.rigged
+        ? ' This body is rigged, so nothing here can be baked into its GLB: `npm run triassic:stretch` refuses it. The numbers are the measurement to take to the builder — and, for a large factor, to the canonical pose.'
+        : ' `npm run triassic:stretch -- <this file> --write` applies it.'),
     stretch: doc,
   };
 }
