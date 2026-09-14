@@ -86,10 +86,9 @@ export const pathFilter = (path: string, exact = false): string =>
 export const STATS_VIEWS: readonly {
   id: string; name: string; blurb: string; path: string; exact?: boolean;
 }[] = [
-  { id: 'all', name: 'All of it', blurb: 'Every Ancient Seas page together \u2014 the trilogy page, the three games and the viewer.', path: '/cambrian/' },
+  { id: 'all', name: 'All of it', blurb: 'Every counted Ancient Seas page together \u2014 the trilogy page and the three games.', path: '/cambrian/' },
   { id: 'trilogy', name: 'Trilogy page', blurb: 'The plate with the three games on it, and nothing under it \u00b7 the site root', path: '/cambrian/', exact: true },
   { id: 'cambrian', name: 'Cambrian Conquest', blurb: '508 million years ago \u00b7 /cambrian/', path: '/cambrian/cambrian/' },
   { id: 'devonian', name: 'Devonian Domination', blurb: '375 million years ago \u00b7 /devonian/', path: '/cambrian/devonian/' },
   { id: 'triassic', name: 'Triassic Triumph', blurb: '240 million years ago \u00b7 /triassic/', path: '/cambrian/triassic/' },
-  { id: 'viewer', name: 'Specimen viewer', blurb: 'The models, out of the game \u00b7 /viewer/', path: '/cambrian/viewer/' },
 ];
