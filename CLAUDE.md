@@ -232,6 +232,23 @@ unless the user explicitly asks for a PR. Steps:
   the Devonian's procedural stand-ins. Never point a Triassic kind at a Devonian mesh in the
   scenery pack: a wrong genus placed by the thousand is worse than an honestly generic shape, and
   which stand-in the game plays with is `environment.ts`'s business.
+- On a Tripo-sourced body, **what may be authored is decided by how simple the shape is**, not by a
+  list of parts. The generations carry a level of surface detail our own modelling does not match,
+  so a *complicated* part built by hand reads as built by hand: smooth where the neighbourhood is
+  pored, even where it is irregular. A simple one does not. Closing a hole is simple and is always
+  fair game; webbing between the digits of a foot has some shape to it but not much, and is within
+  reach; a spiral of a hundred and fifty tooth crowns is not, and the authored one was rejected on
+  sight. So the question to ask is how much shape is being invented, and the first move is still to
+  reshape what the generation already carries — stretch it, squish it, fuse it, copy it — because
+  geometry taken from the body always matches the body.
+  Whatever is authored must **wear the creature's own texture**: it takes its UVs from the
+  surrounding surface and samples the same albedo, so a patch is not a smooth flat-shaded island in
+  a pored hide. A remesh that drops the UVs in its region has not finished the job.
+  When a fault is past that bar, the answer is to say so and show what it costs, not to quietly
+  model the missing part: the routes out are a regeneration or, where the pose is what is wrong, a
+  redraw. None of this binds the Cambrian or the Devonian, whose bodies are procedural in the first
+  place and may be changed however their builders like.
+
 - A delivered Triassic body arrives **paired**: the authored (Tripo-derived) model and a procedural
   twin rebuilt to its own volume on the same skeleton, sharing inverse binds, clips and anchors.
   That pairing is the pipeline's verification step, so the specimen viewer swaps between them in
@@ -268,6 +285,70 @@ unless the user explicitly asks for a PR. Steps:
   `node tools/update-asset-sizes.mjs`, and the stand-in and preview badge clear themselves. Its
   movement fields are generated like the Devonian's: `docs/research/triassic-swimming.json` →
   `npm run triassic:stats`; never hand-edit them.
+- **A playable Triassic animal swims; it does not walk.** Several generations arrive posed for land —
+  the crocodilians most obviously, and the sprawling temnospondyl — because that is the pose that
+  shows the animal best in a still. It is not the pose the game spends its time in: no playable
+  Triassic animal ever leaves the water, so `Swim`, `Sprint`, `TurnLeft`/`TurnRight`, `Dive` and
+  `Rise` are what carry the body, and a walk or a crawl is an *extra* clip beside them rather than
+  the locomotion the rest is built on. Placodus is the pattern: its `validation.json` records
+  `locomotion: 'Swim'` and its `Crawl` sits alongside the swim set. The exception is the animals that
+  are not playable at all — the shore animals (`shore: true`), which stand on the beach and strike
+  into the water, and for whom the land motion *is* the primary.
+- A creature is merged the day it is finished, not the day its batch is. The "finish on `main`"
+  policy at the top of this file is per *animal*: a body that is built, packaged and checked goes to
+  `main` on its own rather than waiting on the three others being built beside it. Bodies are built
+  several at a time in separate worktrees, and a batch that merges as a batch holds a finished animal
+  hostage to whichever of its siblings turned out hardest.
+- **Tripo is fed one view of one animal, never a contact sheet.** The input is a single clean
+  three-quarter view on flat pale grey, with no text, labels, borders, cropping or extra animals —
+  the `inputPrompt` in each `docs/triassic/canonical/model-inputs/<id>/metadata.json` is the exact
+  wording, and the four-view `turnaround.png` beside it is a *human review* artefact that is
+  deliberately never submitted. This is not a preference: a delivered six-panel modelling sheet for
+  Archelon, fed whole, came back as **six turtles in one GLB**, each with a sixth of the triangle
+  budget, because the generator read the panels as a scene. The same sheet's quarter-perspective
+  panel, cropped out on its own and padded back onto the sheet's grey so nothing is cut, gave one
+  turtle at 19,058 triangles. Reference art that arrives as a sheet is therefore *cropped to one
+  panel* before it is submitted, and the panel used is preserved as `tripo-raw/input.png`.
+- A subject whose **era is not settled** is not on the roster, and that is load-bearing rather than
+  bookkeeping: being in `TRIASSIC_CREATURES` is what puts an animal in the sea, in
+  `population.ts`'s tables and on the pick screen, so adding a Cretaceous animal there would answer
+  the open question in `docs/triassic/05-mesozoic-expansion.md` by accident. `src/content/triassic/expansion.json`
+  is the register for them — Archelon and Mosasaurus so far — and it reaches exactly two places:
+  `preview-bodies.mjs` reads a length from it (an off-roster subject has no `adultLength` to scale a
+  preview by, and without one the publisher refuses and blocks every other preview with it), and the
+  viewer catalogue lists them in the Triassic collection marked `offRoster`. Such a body borrows
+  nothing, because it is in no sea, so the *Model* control must not offer it a "borrowed body in
+  play" stage and the downloads line must not call a raw generation the full model.
+- **A mouth must read as a mouth, not as a hole in the model**, and the standing bar for every
+  Triassic body is three things. *Inside*: one **closed skinned lining** — roof on the skull, floor
+  on the jaw, wall stretching between them — wound inwards, with the skin double-sided behind it as
+  a backstop. Two separate tubes look identical at rest and part the moment the jaw swings, which is
+  how Placodus came to open onto transparency. Proving it needs care: render at full gape against a
+  saturated backdrop *with and without* a backface-cull shim and compare the two, because comparing
+  against the plain background measures the backdrop rather than the gape and passes whatever the
+  mesh does. *The cut*: the jaw seam follows the model's own lip contour rather than running straight
+  near it — cast head vertex normals back into the mesh and fit a curve to the hits where a slit is
+  modelled (Placodus), and read the lip line off the albedo where none is (Dinocephalosaurus, where
+  the first method finds zero vertices). A fish is often genuinely straight and is the easy case;
+  reptiles and amphibians have subtle lips and are where a straight cut shows. *The anchors*:
+  `anchor_mouth` (role mouth) on the jaw, `anchor_mouth_inside` (role swallow) on the skull, and
+  `anchor_attack_primary` (role attack) on the bone that actually delivers the blow — which is **not**
+  the skull for an animal whose attack is a neck, a tail or a tentacle rather than a bite.
+  Where a generation was **authored with the mouth open**, the open mouth is a pose and not the
+  animal: the jaw closes in the neutral pose, so `Idle`, `Swim`, `Sprint`, the turns, `Dive` and
+  `Rise` all run with it shut, and only `Bite`, `Attack`, `Heavy` and `Eat` open it. The generation's
+  own gaping pose stays exactly where a gaping pose belongs, which is the stills. This is not free,
+  and is why a generation is still asked for with the mouth closed: teeth modelled apart tend to
+  interpenetrate when they are first brought together, the oral cavity Tripo modelled has to fold
+  rather than be built, and closing is a large jaw rotation, so the pose the animal spends almost
+  all its time in becomes the most deformed one.
+- **A limbed swimmer's dash has to paddle.** The Triassic's reptiles and amphibians did not scull
+  along on a tail beat, and a Sprint clip that waggles the limbs while the body does the work reads
+  as a fish with legs attached. The stroke runs from the limb stretched forward to flush with the
+  body and back, and the builder records the total swept angle at each limb root per cycle in its
+  `validation.json`, so "the limbs move" is a number rather than an impression. Attack clips are the
+  same question asked of the weapon: a long neck, a tail or a pair of tentacles is what that animal
+  attacks *with*, and a clip that leaves it hanging has not used the animal.
 - Devonian specimens land in batches (`tools/devonian/shipped.json`). When one lands: run
   `node tools/update-asset-sizes.mjs` (refreshes `src/content/devonian/asset-sizes.json`), remove its
   entry from `DEVONIAN_STAND_INS` in `src/content/devonian/index.ts`, and run `npm run devonian`.
@@ -361,6 +442,12 @@ unless the user explicitly asks for a PR. Steps:
   no approaching one to ride it. A fed giant notices — the head comes round, which is the tell — and
   goes back to its route; how often one is hungry follows the hour and the water it is over
   (`appetiteAt`), which is where the rhythm of the day is set. `npm run hunt` covers both halves.
+- A warning is about intent, never about size. The colour of a band marker and of a radar contact is
+  red only for a body that is actually coming for you (`comingFor` in `src/sim/actors.ts`: hunting,
+  fighting or seeing you off its ground — and for a steered body, aiming at you); everything else is
+  the one calm mark (`CALM_MARK`), and the glyph under it still says which size band it is. Drawn
+  over every large animal in sight, red meant "something big is there", which the animal's own size
+  had already said. The 3D highlight was already intent-based and is where the rule came from.
 - A mouthful a *player* takes is taken in the mouth: `takeWhole` in `src/sim/game.ts` sends it
   through `startSwallow`, so the body is carried in front of the jaws and eaten over the next second
   rather than vanishing on contact, and swimming into an animal no longer eats it at all — a player
@@ -514,6 +601,26 @@ unless the user explicitly asks for a PR. Steps:
   dash decides between the two: against a holder that is pulling it tears the grip open, against a
   slack one it shoves the holder instead, scaled by an *uncapped* mass share so hauling something
   six times your length is very nearly futile. `npm run grab` covers all of it.
+- A grip is drawn on the host's *geometry*, not on the capsule the simulation holds it against.
+  `rideHold` puts the grip `bodyRadius` out from the host's axis — about a fifth of its length —
+  which is roughly the skin on a body as round as it is long and open water beside a long flat one:
+  Anomalocaris is 0.11 of its length thick against a capsule of 0.22, so a rider sat a fifth of a
+  body length off the animal, and because the grip then follows a bone that empty-water point was
+  carried around faithfully for the whole ride. `CreatureAnchors.surfaceToward` closes it with one
+  ray, cast once when the grip lands, in from outside along the line the simulation chose — inward
+  because the mesh is front-side-only and a ray starting inside passes out through faces it cannot
+  see. It corrects in both directions: a flank wider than the capsule pushes the grip out. The
+  render-side correction bound has to pay for that, so it is the rider's own half-length *plus*
+  `bodyRadius(host)` — at half the rider's length a hatchling's correction was clipped to a third
+  of the gap and it stayed in the water however well the grip was placed. `src/sim` keeps its
+  capsule and stays deterministic; `node --experimental-transform-types tools/anchors-test.mjs`
+  measures the gap against the real meshes.
+- Riding frames the *host*. A camera held on a hatchling clinging to a giant sits a body length off
+  a very small animal with the giant filling the screen as a wall, and it is also pinned to the one
+  body carrying the per-frame correction that seats the grip on moving geometry, so it inherits
+  that animation's jitter. `rideBlend` in `updateCamera` eases the look point and the magnification
+  onto the host while the ride lasts and back again when it ends, because letting go should not be
+  a cut.
 - A grip is drawn on the host's *animation*, not on its rigid frame. `rideHold` is a point offset
   from the host's centre — where a rigid capsule's surface would be — and a swimming animal's flank
   sweeps and its tail beats right past it, so a rider pinned there holds still while the thing it is

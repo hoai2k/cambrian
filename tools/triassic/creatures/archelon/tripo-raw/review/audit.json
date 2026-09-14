@@ -1,0 +1,102 @@
+{
+  "schema_version": 1,
+  "input": {
+    "path": "/home/user/cambrian/local/triassic-authoring/archelon/tripo-single/archelon.raw.glb",
+    "bytes": 1036352,
+    "sha256": "a1249e0663310b750bee1eb894914ca0018f5359cd8d5e5a3b9fdf8b8e1b3aa9"
+  },
+  "summary": {
+    "mesh_objects": 1,
+    "vertices": 11081,
+    "faces": 19058,
+    "triangles": 19058,
+    "connected_components": 49,
+    "materials": 1,
+    "textures": 3
+  },
+  "bounds": {
+    "min_xyz": [
+      -0.468635,
+      -0.5,
+      -0.146998
+    ],
+    "max_xyz": [
+      0.468635,
+      0.5,
+      0.146998
+    ],
+    "center_xyz": [
+      0.0,
+      0.0,
+      0.0
+    ],
+    "size_xyz": [
+      0.937269,
+      1.0,
+      0.293995
+    ]
+  },
+  "meshes": [
+    {
+      "object": "tripo_node_be26ca9b-cd4a-4014-807e-ab41305d3819",
+      "mesh": "tripo_mesh_be26ca9b-cd4a-4014-807e-ab41305d3819",
+      "vertices": 11081,
+      "edges": 30090,
+      "faces": 19058,
+      "triangles": 19058,
+      "connected_components": 49,
+      "material_slots": [
+        "tripo_material_be26ca9b-cd4a-4014-807e-ab41305d3819"
+      ]
+    }
+  ],
+  "materials": [
+    {
+      "name": "tripo_material_be26ca9b-cd4a-4014-807e-ab41305d3819",
+      "image_textures": [
+        "Color_be26ca9b-cd4a-4014-807e-ab41305d3819",
+        "NormalGL_be26ca9b-cd4a-4014-807e-ab41305d3819",
+        "ORM_be26ca9b-cd4a-4014-807e-ab41305d3819"
+      ]
+    }
+  ],
+  "textures": [
+    {
+      "name": "Color_be26ca9b-cd4a-4014-807e-ab41305d3819",
+      "width": 2048,
+      "height": 2048,
+      "channels": 4,
+      "packed": true,
+      "source": "FILE",
+      "colorspace": "sRGB"
+    },
+    {
+      "name": "NormalGL_be26ca9b-cd4a-4014-807e-ab41305d3819",
+      "width": 2048,
+      "height": 2048,
+      "channels": 4,
+      "packed": true,
+      "source": "FILE",
+      "colorspace": "Non-Color"
+    },
+    {
+      "name": "ORM_be26ca9b-cd4a-4014-807e-ab41305d3819",
+      "width": 2048,
+      "height": 2048,
+      "channels": 4,
+      "packed": true,
+      "source": "FILE",
+      "colorspace": "Non-Color"
+    }
+  ],
+  "renders": {},
+  "renderNote": "renders skipped: no EGL in this container; see the CYCLES sheet beside this file",
+  "preview": {
+    "path": "/home/user/cambrian/tools/triassic/creatures/archelon/archelon.preview.glb",
+    "triangle_limit": 40000,
+    "triangles_before": 19058,
+    "triangles_after": 19058,
+    "bytes": 921768,
+    "sha256": "de38a2c5ea08bd7ec256698d6e311931efdd5fc5850a1434e0144046644a800f"
+  }
+}

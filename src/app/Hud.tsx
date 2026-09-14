@@ -6,7 +6,7 @@ import { PLAYER_COLORS } from '../render/engine';
 import type { EraHud } from '../sim/era-rules';
 import { creature } from '../sim/creatures';
 import { BIOME_ART, biomeArtPath, radarGlyphPath } from '../shared/environment-assets';
-import { BAND_COLOR } from '../sim/types';
+import { BAND_COLOR, CALM_MARK } from '../sim/types';
 import { CreaturePortrait } from './CreaturePortrait';
 import { appBase } from '../shared/base';
 import { fillControls, key, type Scheme } from '../shared/controls';
@@ -92,7 +92,7 @@ function SensePanel({ p }: { p: PlayerHud }) {
     <>
       <div className="health-vignette" aria-hidden="true" style={{ opacity: healthWarning }} />
       {p.bandMarkers.map((m, k) => (
-        <span key={k} className={`marker marker-${m.band}`} style={{ left: `${m.x * 100}%`, top: `${m.y * 100}%`, ['--s' as string]: m.size, maskImage: `url(${appBase()}${assetPaths.ui(`band-${m.band}.svg`)})`, color: BAND_COLOR[m.band] }} />
+        <span key={k} className={`marker marker-${m.band}${m.hot ? ' hot' : ''}`} style={{ left: `${m.x * 100}%`, top: `${m.y * 100}%`, ['--s' as string]: m.size, maskImage: `url(${appBase()}${assetPaths.ui(`band-${m.band}.svg`)})`, color: m.hot ? BAND_COLOR.giant : CALM_MARK }} />
       ))}
       {p.hunterAngle != null && (
         <div className="hunter-arrow" style={{ transform: `translate(-50%,-50%) rotate(${-p.hunterAngle}rad) translate(min(38vh, 34%))`, opacity: 0.4 + p.hunted * 0.6 }}>

@@ -150,6 +150,37 @@ Two rules that follow from the steps:
   existing model. Do not stop solely to manufacture a new approval gate, and do not call a fix
   approved until the evidence actually supports it.
 
+## Which steps need a judgement and which are mechanical
+
+A body is twelve steps, and they are not the same kind of work. The distinction matters when the
+build is handed to somebody — or something — other than whoever wrote this page, because half the
+list is a decision that cannot be checked by a script and the other half is a command with a
+verifiable result. Splitting a build along that line is how several bodies get built at once
+without each of them needing the care of the first.
+
+**Judgement.** Steps 4, 6 and 9, and the reading in 7 and 11. Which way a generation is actually
+lying (its bounding box lies — Rhaeticosaurus' flippers span further than it is long — so the frame
+comes off the mouth socket, the authored `previewYaw`, or the albedo's countershading, in that
+order). Where the jaw hinge is and what shape the mouth cut takes, which differs per animal:
+Placodus' slit is modelled and can be measured by casting head normals back into the mesh;
+Dinocephalosaurus has no modelled mouth at all, so the line is read off the albedo and the same
+method finds nothing. Whether a run of body is the wrong *length* rather than the wrong shape, and
+where the two stretch cuts go. Whether a clip **reads** — a neck strike that is merely correct is
+not the same as one that is exciting — and whether a collapsed appendage has left a bump.
+
+**Mechanical.** Steps 3, 5, 8, 10 and 12, and the running of every check. Sending a builder to
+`/opt/blender/blender --background`, re-running it after an edit, packaging, `node
+tools/update-asset-sizes.mjs`, `npm run triassic`, publishing previews, refreshing a manifest,
+producing contact sheets. Each of these either succeeds with a number that can be compared against
+the tolerances in the step list or fails with a traceback, and neither outcome is a matter of
+opinion.
+
+The practical consequence: a build that is following an established per-creature pattern is
+mechanical almost end to end and wants the cheapest hands that can run a command and read a
+traceback; the first body of a new *kind* — the first shore animal, the first cephalopod — is
+mostly judgement and wants the most capable. Anything that ends in "does this look right" is
+judgement whatever step it sits in.
+
 ## What Tripo is asked for, and what it is not
 
 Tripo is asked for **bodies**: every creature in the roster and the shore animals, plus the
@@ -168,7 +199,116 @@ exact submitted views rather than retroactively describing a single-image body a
 
 `docs/creature-intake.md` stays the delivery contract for clips, anchors, portraits and runtime
 materials. The Triassic adds the bounded generation/review tools in `tools/triassic/tripo/` and a
-self-contained source/report directory at `tools/triassic/creatures/<id>/`. Each creature's
+self-contained source/report directory at `tools/triassic/creatures/<id>/`.
+
+The three **shore animals** — Tanystropheus, Macrocnemus and Coelophysis — were built in one pass
+rather than one at a time, and they share the generic half of the intake through
+`tools/triassic/creatures/shorekit.py`: the weld, the geodesic centreline, the rigid-section carry,
+the voxel twin, the arc-length skinning, the mouth measurement, the envelope comparison and the
+export patch. What stays in each `build.py` is everything that is that species. The earlier builders
+are untouched and stay self-contained; the split exists because copying fifty kilobytes of identical
+intake three times would have guaranteed the three drifted apart on the parts that are *not* the
+animal. Three findings from that pass belong in this document because they generalise:
+
+- **The seed of a geodesic banding is not automatic on a standing animal.** A double sweep finds the
+  two ends of the longest path over the surface, which on a swimmer is snout to tail tip and on a
+  long-legged land animal is a **claw** to the tail tip. Macrocnemus' longest geodesic runs from a
+  hind claw, and banding from there reads the shin as a neck. Those bodies are measured from two
+  declared seeds, tail tip and snout, meeting at the shoulder.
+- **Inside/outside cannot be taken from the nearest triangle's normal.** At the hips the nearest
+  surface to a point on the midline is the inner face of a thigh, whose normal points across the
+  midline, so a point plainly between the belly and the backbone reads as outside. Use ray parity.
+- **A rigid carry has to be gated by distance to its own axis, not only by station.** A hind claw
+  sits behind the tail's base station, so an axial gate swings the whole leg round with the tail and
+  folds the surface at the hip.
+- **A jaw hinge is a measurement of the head, not of the skull bone.** Both Macrocnemus and
+  Coelophysis first took `HINGE_X` from the skull *bone*, which sits far forward along the neck
+  axis, and both got a mandible that was a sliver off the snout: at 28 degrees of jaw the mouth is
+  a few pixels of black at the tip. Take it from the head's own measured span — a third of the way
+  back from the snout — and the gape becomes legible. And check the gape by **rendering it from the
+  head's own frame**: a fixed world-space camera is over the top of the skull the moment the neck
+  swings down, and a gape that opens downward is invisible from there. A wide gape then exposes the
+  next thing, which is that the **throat has to be weighted to the jaw**: the mandible is skinned to
+  `jaw` and the throat behind it to the cervicals, and with nothing blending between them a wide
+  opening separates the two and the pale ventral skin reads as a slab hanging off a detached jaw.
+  A closed mouth hides all of this, so none of it shows until the hinge is right.
+- **An intake whose geometry depends on a texture read has no slack in that read, and the sampler
+  must decode sRGB.** These three place the mouth seam by measuring the *pigment* — the painted
+  mouth line — per station, so the albedo sampler decides where the jaw is cut and therefore the
+  triangle count. It is a good technique and worth keeping, but it means the sampler is not a
+  detail. When `shorekit.Albedo` had to be reconstructed, the first attempt sampled Blender's pixel
+  buffer as it comes; that buffer holds *stored* values, and the two consumers disagree about what
+  that means. The twin writes them straight into a linear FLOAT_COLOR attribute, while the authored
+  body goes through the image texture where the shader decodes them — so an undecoded sampler makes
+  the twin the brighter of the two for the same skin (mean vertex colour 0.46 against the body's
+  0.24) *and* moves the geometry: Tanystropheus' seam read 0.32 of the head's section instead of
+  0.21, and Coelophysis' went past the 0.65 its own builder refuses above, so that animal would not
+  build. With the decode, all three reproduce their original geometry exactly.
+
+  The trap inside the trap: a **monotonic** transform of the luminance is not neutral here. The seam
+  is the split that maximises the *difference of the means* above and below it, and a difference of
+  means is not invariant under a curve. It is easy to reason that a gamma cannot move an ordering
+  and therefore cannot move the seam; it moves it a tenth of the head's section.
+- **Authored geometry has to wear the creature's texture, and a flat material is the tell.** What may
+  be authored on a Tripo body is decided by how much shape is invented — closing a hole is always
+  fair game, foot webbing is within reach, a tooth whorl is not — but the requirement that carries
+  the rule is the texture, not the shape: a patch takes its UVs from the surrounding surface and
+  samples the same albedo, so it is never a smooth flat-shaded island in a pored hide. The three
+  shore animals each closed the square face their own jaw cut leaves with a small ellipsoid and gave
+  it a flat brown material, which is precisely the failure. `shorekit.wear_the_skin` now hands every
+  loop of such a patch the UV of the nearest point on the intake surface and the body's own
+  material, and the build refuses a patch with any loop it could not project. Do it *after* seating,
+  so the UVs answer where the patch finally sits. The oral lining and the teeth are the exception in
+  the other direction: they are interior, they are meant to read as a mouth rather than as hide, and
+  they keep their own materials.
+- **Where a vertex *is* does not tell you whether the skin is intact.** This is the most important
+  thing this pass found and it invalidated a check the pipeline had been trusting. The paired audits
+  play 61 phases of every clip through the real GLTFLoader and AnimationMixer and measure every
+  skinned vertex — travel from rest, bounds, envelopes — and all of it passed on a Coelophysis whose
+  hind feet trail off in ribbons and whose skull shears into a flat blade. Travel from rest stays
+  bounded the whole time: no vertex moves more than 15 % of body length even while the foot it
+  belongs to is pulled inside out. What is wrong is not where the vertices are but **how far apart
+  they are from each other**, and only comparing each triangle edge against its rest length sees it.
+  `tools/triassic/skin-tears.mjs` does that, over every clip. It needs two thresholds, not one: a
+  ratio to catch the stretch and an absolute floor of about 1.5 % of body length to discard the
+  noise, because the oral lining and teeth carry edges a thousandth of a body long and a 12x stretch
+  of one of those is invisible — ranking on ratio alone put Tanystropheus' jaw above Coelophysis'
+  feet, which is backwards.
+
+  Swept across every body built so far, it is **not** a regression in the shore animals' kit and
+  **not** inherent to the pipeline — it tracks how hard an animal swings a limb:
+
+  | Body | Worst | Torn edges | Where |
+  | --- | ---: | ---: | --- |
+  | Nothosaurus | 2.98x | 29 | essentially clean — the reference body |
+  | Dinocephalosaurus | 56.8x | 12 | twelve *tiny* oral edges, 0.002 to 0.086; clean in effect |
+  | Tanystropheus | 6.1x | moderate | feet and jaw corner; its shore chain barely tears |
+  | Placodus | 12.4x | 432 | `fore_paddle_L`, `fore_lower_L` — genuinely torn, and already delivered |
+  | Macrocnemus | 23.3x | ~15,700 in Sprint | `hind_lower`, `hind_foot`, `body`, `chest` |
+  | Coelophysis | 25.3x | ~16,500 in the snaps | the same bones |
+
+  Read it as: Nothosaurus proves the pipeline can produce intact limb skinning, so this is a fixable
+  fault and not a property of Tripo bodies; Placodus shows it is not new with the shore animals; and
+  the two runners show what it costs once a limb actually travels. Dinocephalosaurus is the reason
+  the absolute floor matters — on ratio alone it is the worst body in the era and in reality it is
+  one of the best. The fault is in the limb weighting, not in any animal's clips.
+- **Blender exits 0 when a builder raises, and that has cost more than anything else here.** In
+  `--background --python` mode the traceback goes to stdout and the process still reports success,
+  so a chain that checks exit codes calls a failed build a good one — and the previous artefacts sit
+  there looking fresh. That is how a Coelophysis build that stopped on its own mouth-line assertion
+  was recorded as "BUILD OK", and how the stale file it left behind was then taken as proof that the
+  builder reproduced byte for byte. `shorekit` now installs an excepthook that flushes and calls
+  `os._exit(1)`, so a failing build fails its caller; every builder that imports the kit gets it,
+  and the self-contained ones want the same three lines. Do not trust a build you have not seen the
+  final report line from.
+- **Nothing was checking that a builder still imports.** `shorekit.Albedo` went missing from the kit
+  while all three builders called it, so as committed none of the three would run — found by going
+  back to rebuild one, not by any check, and long after the artefacts had shipped. A reproducible
+  builder that is only ever exercised when somebody rebuilds is not reproducible, it is merely
+  untested. `tools/triassic/shorekit-check.mjs` now resolves every `K.<name>` a builder reaches for
+  against the kit, statically and in a second, and runs in `npm run triassic`.
+
+Each creature's
 builder produces the cleaned authored body, the shared skeleton, the measured twin and the sampled
 performances; per-creature audits prove exact parity after packaging. Nothosaurus and Shonisaurus
 are the established examples. Their implementation choices are evidence for the contract, not a

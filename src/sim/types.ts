@@ -14,6 +14,13 @@ export const TIER_SCALE = [0.25, 0.5, 1.0, 1.7, 2.6] as const;
 export const TIER_NEED = [30, 60, 85, 120, Infinity] as const;
 
 export type Band = 'snack' | 'prey' | 'rival' | 'threat' | 'giant';
+/**
+ * The mark for something that is not after you: one colour whatever its size, because size is the
+ * glyph's job and the colour is the warning's. `BAND_COLOR.giant` — the red — is reserved for a
+ * body that is actually coming for you (`comingFor` in actors.ts).
+ */
+export const CALM_MARK = '#d9cfa4';
+
 export const BAND_COLOR: Record<Band, string> = {
   snack: '#7ef0a8', prey: '#5fd9d1', rival: '#ffc45c', threat: '#ff8a3d', giant: '#ff4b5c',
 };

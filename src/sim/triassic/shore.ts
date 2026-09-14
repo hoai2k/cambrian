@@ -21,14 +21,26 @@ import { triActor } from './state';
  * out severs it — the animal dies where it stands, the carcass is carrion, and the bank is clear
  * for the rest of the match.
  *
- * Presentation is the borrowed body until the real rigs land; the strike is a hit and an event,
- * not yet a clip, so nothing here depends on an animation that does not exist.
+ * The cycle is also a performance, and `shoreClip` below is where the two meet. The simulation
+ * decides the phase; the renderer asks what the body should be doing and plays it. A model that
+ * has no such clip simply keeps the shared state machine's Idle, so this depends on nothing: the
+ * borrowed Devonian bodies are exactly as they were.
  */
 const POST_SPACING = 170, POST_REACH = 260;
 const TELEGRAPH = 1.5, COOLDOWN = 6, SURFACE_BAND = 4;
+/** How long the recovery off a strike reads for; the rest of the cooldown is the watch again. */
+const RECOVER = 0.9;
+/** The severed-neck death, which runs once and then holds its last frame as the carcass. */
+const SEVERED = 2.2;
 
-interface Post { k: number; actor: number; kind: CreatureId; pos: Vec3; phase: 'watch' | 'lower' | 'strike' | 'rest'; t: number; target: number; cleared: boolean; }
+interface Post { k: number; actor: number; kind: CreatureId; pos: Vec3; phase: 'watch' | 'lower' | 'strike' | 'rest'; t: number; target: number; cleared: boolean; side: 1 | -1; severed: boolean; }
 interface ShoreState { posts: Map<number, Post>; }
+/**
+ * The post a shore animal is standing at, keyed by the body itself. The renderer asks what a body
+ * should be doing and has no Game to ask with, and an Actor belongs to exactly one match, so this
+ * is unambiguous across games and needs no cleanup. Written only by `ensurePosts` below.
+ */
+const postOf = new WeakMap<Actor, Post>();
 const states = new WeakMap<Game, ShoreState>();
 const stateFor = (g: Game) => { let s = states.get(g); if (!s) { s = { posts: new Map() }; states.set(g, s); } return s; };
 
@@ -57,6 +69,20 @@ function reachOf(a: Actor): number {
   return 0;
 }
 
+/**
+ * Which side of itself a body is on: +1 to the animal's left, -1 to its right.
+ *
+ * This is taken from the animal's own facing and not from a bare comparison of world x. A shore
+ * animal is pinned at `yaw = PI`, and the renderer's own rule is that increasing yaw turns a
+ * creature to its left, so its right is `(-cos yaw, 0, sin yaw)` — which at yaw = PI is *+x*. The
+ * first version of this read "larger x is to its left" and so named the snap that swings the head
+ * away from what it is striking at. Asking the facing keeps it right if the pin ever changes.
+ */
+function sideOf(a: Actor, from: Vec3, to: Vec3): 1 | -1 {
+  const rx = -Math.cos(a.yaw), rz = Math.sin(a.yaw);
+  return (to.x - from.x) * rx + (to.z - from.z) * rz > 0 ? -1 : 1;
+}
+
 function pin(a: Actor, pos: Vec3) {
   a.pos.x = pos.x; a.pos.y = pos.y; a.pos.z = pos.z;
   a.prevT.x = pos.x; a.prevT.y = pos.y; a.prevT.z = pos.z;
@@ -72,7 +98,7 @@ function ensurePosts(g: Game) {
     for (let k = k0; k <= k1; k++) {
       if (s.posts.has(k)) continue;
       const kind = kindAt(k, seed);
-      if (!kind) { s.posts.set(k, { k, actor: -1, kind: 'macrocnemus', pos: { x: 0, y: 0, z: 0 }, phase: 'rest', t: 0, target: -1, cleared: true }); continue; }
+      if (!kind) { s.posts.set(k, { k, actor: -1, kind: 'macrocnemus', pos: { x: 0, y: 0, z: 0 }, phase: 'rest', t: 0, target: -1, cleared: true, side: 1, severed: false }); continue; }
       const x = k * POST_SPACING + (hash(k, seed, 2) - 0.5) * 70;
       const a = g.spawn(kind, 'ambient', { x, y: SURFACE_Y, z: shoreZ(x) }, 1);
       // just above the waterline, its front over the water: the post sits a little way up the ramp
@@ -80,7 +106,8 @@ function ensurePosts(g: Game) {
       const y = Math.max(sampleHeight(x, z), SURFACE_Y - 0.5) + clearanceOf(a) * 0.6;
       const pos = { x, y, z };
       pin(a, pos);
-      s.posts.set(k, { k, actor: a.id, kind, pos, phase: 'watch', t: 0, target: -1, cleared: false });
+      const post: Post = { k, actor: a.id, kind, pos, phase: 'watch', t: 0, target: -1, cleared: false, side: 1, severed: false };
+      s.posts.set(k, post); postOf.set(a, post);
     }
   }
 }
@@ -112,7 +139,12 @@ export function stepShore(g: Game, ctx: HitContext, dt: number) {
     // runner have no neck to lose and the phytosaur is armoured; only the boom pays this price.
     if (def.id === 'tanystropheus' && post.phase !== 'watch' && post.phase !== 'rest' && a.sinceHit < dt * 2 && a.lastHitBy >= 0) {
       const attacker = g.byId(a.lastHitBy);
-      if (attacker && (creature(attacker.creature).rung ?? 1) >= 3) { kill(ctx, a, attacker); post.cleared = true; continue; }
+      if (attacker && (creature(attacker.creature).rung ?? 1) >= 3) {
+        // The bank is clear, but the body is still on it for as long as a corpse lasts, and the
+        // sever is the one death this animal has a clip for. `cleared` stops the step loop; the
+        // flag is what `shoreClip` reads, so the neck goes down the way it was authored to.
+        kill(ctx, a, attacker); post.cleared = true; post.severed = true; continue;
+      }
     }
     pin(a, post.pos);
     a.hp = Math.min(a.hpMax, a.hp + 2 * dt);                   // it heals on the bank; nothing keeps it hurt but a sever
@@ -121,7 +153,7 @@ export function stepShore(g: Game, ctx: HitContext, dt: number) {
     switch (post.phase) {
       case 'watch': {
         const o = reachable(g, post, a);
-        if (o) { post.phase = 'lower'; post.t = 0; post.target = o.id; }
+        if (o) { post.phase = 'lower'; post.t = 0; post.target = o.id; post.side = sideOf(a, post.pos, o.pos); }
         break;
       }
       case 'lower': {
@@ -153,4 +185,28 @@ export function stepShore(g: Game, ctx: HitContext, dt: number) {
 /** For the HUD and the tests: the posts near a point. */
 export function shorePosts(g: Game, near: Vec3, r: number) {
   return [...stateFor(g).posts.values()].filter((p) => !p.cleared && dist(p.pos, near) < r);
+}
+
+/**
+ * What a shore animal's body should be doing, for the renderer (`EraRules.clip`). Presentation
+ * only — it reads the phase the step above already decided and writes nothing.
+ *
+ * The clip names and their durations are the ones the built bodies carry
+ * (`tools/triassic/creatures/<id>/`): Lower runs exactly TELEGRAPH, SnapLeft/SnapRight exactly the
+ * strike window, and Retract the first RECOVER of the cooldown, so the performance and the
+ * mechanic are the same clock rather than two clocks that happen to agree. A body that has not
+ * landed yet — or one that borrows a Devonian stand-in — simply does not have these clips, and the
+ * renderer falls back to the shared state machine.
+ */
+export function shoreClip(a: Actor): { name: string; dur: number } | undefined {
+  const post = postOf.get(a);
+  if (!post) return undefined;
+  if (post.severed) return { name: 'Severed', dur: SEVERED };
+  if (post.cleared) return undefined;
+  switch (post.phase) {
+    case 'lower': return { name: 'Lower', dur: TELEGRAPH };
+    case 'strike': return { name: post.side > 0 ? 'SnapLeft' : 'SnapRight', dur: 0.6 };
+    case 'rest': return post.t < RECOVER ? { name: 'Retract', dur: RECOVER } : undefined;
+    default: return undefined;
+  }
 }
