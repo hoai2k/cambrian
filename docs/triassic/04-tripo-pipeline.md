@@ -207,6 +207,23 @@ animal. Three findings from that pass belong in this document because they gener
   technique and worth keeping, but it means the sampler is not a detail: reconstructing an
   equivalent one reproduced Coelophysis byte for byte and moved Tanystropheus and Macrocnemus by six
   and four triangles.
+- **Where a vertex *is* does not tell you whether the skin is intact.** This is the most important
+  thing this pass found and it invalidated a check the pipeline had been trusting. The paired audits
+  play 61 phases of every clip through the real GLTFLoader and AnimationMixer and measure every
+  skinned vertex — travel from rest, bounds, envelopes — and all of it passed on a Coelophysis whose
+  hind feet trail off in ribbons and whose skull shears into a flat blade. Travel from rest stays
+  bounded the whole time: no vertex moves more than 15 % of body length even while the foot it
+  belongs to is pulled inside out. What is wrong is not where the vertices are but **how far apart
+  they are from each other**, and only comparing each triangle edge against its rest length sees it.
+  `tools/triassic/skin-tears.mjs` does that, over every clip. It needs two thresholds, not one: a
+  ratio to catch the stretch and an absolute floor of about 1.5 % of body length to discard the
+  noise, because the oral lining and teeth carry edges a thousandth of a body long and a 12x stretch
+  of one of those is invisible — ranking on ratio alone put Tanystropheus' jaw above Coelophysis'
+  feet, which is backwards. What it says today: Tanystropheus peaks at 6.1x and its shore chain
+  barely tears at all, Macrocnemus reaches 23x and Coelophysis 25x, both dominated by `hind_foot`,
+  `hind_lower`, `body` and `chest` — so the fault is in the shared limb skinning rather than in any
+  animal's clips, and it shows in proportion to how hard an animal swings a limb. It is why a
+  standing animal came through this pass in far better shape than either runner.
 - **Nothing was checking that a builder still imports.** `shorekit.Albedo` went missing from the kit
   while all three builders called it, so as committed none of the three would run — found by going
   back to rebuild one, not by any check, and long after the artefacts had shipped. A reproducible

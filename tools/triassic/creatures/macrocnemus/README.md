@@ -273,6 +273,26 @@ Tanystropheus and Coelophysis, which were built in the same pass.
 
 ## What is still open
 
+- **The limb skinning tears, and this is the blocking defect on this animal.** The run that this animal exists for is the clip that tears worst, so the defect is squarely in the way of what it was built to do.
+
+  `node tools/triassic/skin-tears.mjs public/assets/triassic/creatures/macrocnemus.glb` sweeps every clip at
+  17 phases and compares each triangle edge against its rest length. Every one of the twenty-six clips tears an edge past 2x. `Snatch` is the worst ratio at **23x** and `Sprint` the worst spread, with about 15,700 torn edge-instances and an edge reaching 0.304 on a body 4.89 long. `Run` is close behind at 11.9x. `hind_lower_L`, `hind_foot_L/R`, `body` and `chest` dominate throughout.
+
+  The paired audit does not catch this and could not: it plays 61 phases of every clip through the
+  real loader and mixer and checks where every skinned vertex *is* — travel from rest, bounds,
+  envelopes — and travel from rest stays bounded the whole time. No vertex moves more than 15 % of
+  body length even while the foot it belongs to is pulled inside out. What is wrong is not where
+  the vertices are but how far apart they are from each other. That instrument is new, it is in the
+  repository as `tools/triassic/skin-tears.mjs`, and it is not yet wired into any audit because the
+  right threshold per animal is a judgement a reviewer should make rather than one to bake in
+  unlooked-at.
+
+  The fault is in the shared limb skinning (`skin_weights` and `Limb` in `shorekit.py`), not in the
+  clips: the clips ask for ordinary limb swings and the weights do not hold the geometry together
+  through them. The evidence that it is the limbs is that Tanystropheus — which shares every line
+  of that code — is an order of magnitude better, and the only difference is that it stands at a
+  post and barely swings a limb.
+
 - Macrocnemus is **not** in `tools/triassic/shipped.json` and its preview badge is **not** cleared.
   That is the reviewer's call after looking at the sheets.
 - The four portraits in `public/assets/triassic/creatures/` are now model renders rather than the

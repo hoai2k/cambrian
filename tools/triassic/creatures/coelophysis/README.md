@@ -249,6 +249,26 @@ Tanystropheus and Macrocnemus, which were built in the same pass.
 
 ## What is still open
 
+- **The limb skinning tears, and this is the blocking defect on this animal.** A running theropod is the hardest case in the set and it fails: the hind feet trail off in ribbons and the skull shears into a flat blade in the strike. It is visible in the sheets at gameplay scale, not only close up.
+
+  `node tools/triassic/skin-tears.mjs public/assets/triassic/creatures/coelophysis.glb` sweeps every clip at
+  17 phases and compares each triangle edge against its rest length. Twenty-eight of twenty-nine clips tear an edge past 2x. `SnapLeft` and `SnapRight` are the worst at **25x**, with about 16,500 torn edge-instances across the phases and a single edge going from 0.019 to 0.573 — on a body 4.90 long, that is one edge spanning an eighth of the whole animal. `Run`, `Sprint`, `Swim`, `Charge` and `Retreat` are all over 9x and all dominated by `hind_foot_L`, `hind_foot_R`, `body` and `chest`.
+
+  The paired audit does not catch this and could not: it plays 61 phases of every clip through the
+  real loader and mixer and checks where every skinned vertex *is* — travel from rest, bounds,
+  envelopes — and travel from rest stays bounded the whole time. No vertex moves more than 15 % of
+  body length even while the foot it belongs to is pulled inside out. What is wrong is not where
+  the vertices are but how far apart they are from each other. That instrument is new, it is in the
+  repository as `tools/triassic/skin-tears.mjs`, and it is not yet wired into any audit because the
+  right threshold per animal is a judgement a reviewer should make rather than one to bake in
+  unlooked-at.
+
+  The fault is in the shared limb skinning (`skin_weights` and `Limb` in `shorekit.py`), not in the
+  clips: the clips ask for ordinary limb swings and the weights do not hold the geometry together
+  through them. The evidence that it is the limbs is that Tanystropheus — which shares every line
+  of that code — is an order of magnitude better, and the only difference is that it stands at a
+  post and barely swings a limb.
+
 - Coelophysis is **not** in `tools/triassic/shipped.json` and its preview badge is **not** cleared.
   That is the reviewer's call after looking at the sheets.
 - **The hands are the twin's weak point** (see the measurements above): 1.4 % of authored vertices
