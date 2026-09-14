@@ -3,7 +3,7 @@
     "Estimated orientation of each raw generated Triassic body, read off fixed-world-axis renders",
     "(tools/triassic/preview-orient.py) rather than guessed from the mesh. `yaw` is the rotation in",
     "degrees about +y that brings the animal's head round to +z, which is where every shipped body",
-    "keeps it: nothosaurus carries anchor_mouth at z +2.48 of a 5.00 extent, coccosteus at +1.83 of",
+    "keeps it: nothosaurus carries anchor_mouth at z +2.73 of a 5.26 extent, coccosteus at +1.83 of",
     "4.45. Up is +y in every one of these files, so no pitch or roll is estimated.",
     "",
     "These are ESTIMATES for previewing and nothing else. They are not a substitute for the",

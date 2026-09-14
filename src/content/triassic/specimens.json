@@ -6,7 +6,7 @@
   "category": "creature",
   "modelStatus": "preview",
   "provenance": "Middle Triassic; approved canonical image, Tripo image-to-model body, and independently rebuilt procedural volume twin",
-  "description": "A procedural comparison body built to the delivered Tripo volume and animated on the same 27-joint rig as the textured runtime model.",
+  "description": "A procedural comparison body built to the delivered Tripo volume and animated on the same 30-joint rig as the textured runtime model.",
   "model": "assets/triassic/creatures/nothosaurus.puppet.glb",
   "lod": "assets/triassic/creatures/nothosaurus.puppet.glb",
   "image": "assets/triassic/creatures/nothosaurus.thumb.png",
