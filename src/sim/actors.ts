@@ -2,6 +2,7 @@ import { clamp, heading, v3, type Vec3 } from '../shared/math';
 import { creature, naturalSizing, type CreatureId } from './creatures';
 import { tierForScale } from './tiers';
 import type { Actor, Band, Controller } from './types';
+import { SURFACE_Y } from './world';
 
 export const lengthOf = (a: Actor) => creature(a.creature).adultLength * a.scale;
 /**
@@ -47,6 +48,23 @@ export const bodyGap = (a: Actor, b: Actor) => surfaceGap(a, b.pos) - bodyRadius
  * rest of the sim reasons about (hiding, spawning, the AI's idea of "near the bottom").
  */
 export const floorClearance = (a: Actor) => clearanceOf(a) * (creature(a.creature).ground ? 1 : 0.45);
+/**
+ * The top of the water, for a body of this size: how high its centre may go while it is still
+ * swimming rather than airborne. A body held here has its back *at* the surface, which is what
+ * breaking the surface means and what a breath is drawn on.
+ *
+ * It lives here because three places need to agree about it — the movement clamp in game.ts and
+ * both eras' idea of being at the surface — and when they disagreed the answer was a band a few
+ * units deep in which a body was "at the surface" without ever reaching it.
+ */
+export const swimCeiling = (a: Actor) => SURFACE_Y - 0.8 - clearanceOf(a);
+/**
+ * How far under that ceiling still counts as a breath. A body pressed against the ceiling sits
+ * exactly on it, so this only has to cover the frame or two either side of arriving.
+ */
+export const BREATH_REACH = 0.6;
+/** Is this body's back out of the water — at the ceiling, or clear of it altogether? */
+export const brokeSurface = (a: Actor) => a.airborne || a.pos.y >= swimCeiling(a) - BREATH_REACH;
 /**
  * How far a body can be lifted in one step and still read as swimming rather than stepping. Rocks
  * are domes: anything shallow enough to be carried over inside this budget is simply not collided

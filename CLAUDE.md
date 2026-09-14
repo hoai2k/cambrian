@@ -168,6 +168,17 @@ unless the user explicitly asks for a PR. Steps:
   (`HELD_AIR_DRAIN`) as well as the bar — priced off `GRIP_BREAK`, so a hold carried to the end
   costs about half a lungful — because a hold that only drained stamina stopped doing anything at
   all once stamina came back under water. `npm run triassic` holds the lot.
+- The surface is the surface, not a band near it. Both eras' idea of being up for air is
+  `brokeSurface` in `src/sim/actors.ts`: the body is pressed against `swimCeiling` — the same
+  ceiling `game.ts` clamps a swimmer to, so its back is *at* the waterline — or it is airborne. It
+  used to be the top three units plus more for a long body, which meant a Cymbospondylus counted as
+  breathing nearly nine units down: the blow had nothing to break at the waterline, and the climb
+  ended before it reached the top. The ceiling lives in `actors.ts` precisely because three places
+  have to agree about it. And the camera has to come up too — it is pinned under the waterline at
+  all times (the ceiling passed to `fitCameraArm`; only a breach lifted it), so the one moment the
+  animal is at the top the view was still the water. A blow raises that ceiling for `BREATH_PEEK`,
+  eased in and out, and the player sees the spray and their own back in it. `npm run swim` holds the
+  camera half and `npm run triassic` the rule.
 - The climb for air is the era's central act and must stay usable at every size. The shared rise
   rate is scaled by the body, but the water is not — the surface is the same twelve units above the
   shelf whether you hatched this minute or own the sea — so an air-breather's climb has a floor

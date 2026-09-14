@@ -106,7 +106,7 @@ export interface EngineCallbacks {
 
 export const PLAYER_COLORS = ['#61f2d5', '#ffb457', '#c7a3ff', '#ff86a4'];
 
-interface CamState { showBoard: boolean; hatchShot: number; yaw: number; pitch: number; zoom: number; fade: number; aimBlend: number; aimTarget: number; aimSnapT: number; pos: THREE.Vector3; look: THREE.Vector3; shake: number; camera: THREE.PerspectiveCamera; lockBlend: number; lastPos: THREE.Vector3; frustum: THREE.Frustum; projScreen: THREE.Matrix4; tele: TeleMenu; }
+interface CamState { showBoard: boolean; hatchShot: number; breathT: number; yaw: number; pitch: number; zoom: number; fade: number; aimBlend: number; aimTarget: number; aimSnapT: number; pos: THREE.Vector3; look: THREE.Vector3; shake: number; camera: THREE.PerspectiveCamera; lockBlend: number; lastPos: THREE.Vector3; frustum: THREE.Frustum; projScreen: THREE.Matrix4; tele: TeleMenu; }
 /** Per-player teleport menu state: opened with D-pad down, steered with the D-pad or stick, A confirms, B closes. */
 /**
  * The D-pad-down menu. A list of places to go, plus one entry that opens a second page: the roster,
@@ -187,6 +187,12 @@ export function fitCameraArm(baseY: number, pitch: number, dist: number, minDist
   const clamped = clamp(y, sandAt(d), ceiling);
   return { dist: d, y: clamped, lift: clamped - y };
 }
+/**
+ * How long the camera rides above the waterline after a blow. Long enough to see the spray land —
+ * the droplets live about a second — and short enough that it reads as part of the breath rather
+ * than the camera having changed its mind about where it lives.
+ */
+export const BREATH_PEEK = 1.1;
 export const PITCH_UP = -0.95;   // ~54° above the horizon
 export const PITCH_DOWN = 1.32;  // ~76° below it, near enough straight down at the seabed
 /**
@@ -385,7 +391,7 @@ export class Engine {
     this.cams = setups.map((_, i) => {
       const p = this.game!.players[i];
       const cam = new THREE.PerspectiveCamera(60, 1, 0.08, 420);
-      const cs: CamState = { showBoard: false, hatchShot: -1, yaw: p.yaw, pitch: 0.2, zoom: 1, fade: 0, aimBlend: 0, aimTarget: -1, aimSnapT: 0, pos: new THREE.Vector3(p.pos.x - Math.sin(p.yaw) * 6, p.pos.y + 2.5, p.pos.z - Math.cos(p.yaw) * 6), look: new THREE.Vector3(p.pos.x, p.pos.y, p.pos.z), shake: 0, camera: cam, lockBlend: 0, lastPos: new THREE.Vector3(p.pos.x, p.pos.y, p.pos.z), frustum: new THREE.Frustum(), projScreen: new THREE.Matrix4(), tele: freshTele() };
+      const cs: CamState = { showBoard: false, hatchShot: -1, breathT: 0, yaw: p.yaw, pitch: 0.2, zoom: 1, fade: 0, aimBlend: 0, aimTarget: -1, aimSnapT: 0, pos: new THREE.Vector3(p.pos.x - Math.sin(p.yaw) * 6, p.pos.y + 2.5, p.pos.z - Math.cos(p.yaw) * 6), look: new THREE.Vector3(p.pos.x, p.pos.y, p.pos.z), shake: 0, camera: cam, lockBlend: 0, lastPos: new THREE.Vector3(p.pos.x, p.pos.y, p.pos.z), frustum: new THREE.Frustum(), projScreen: new THREE.Matrix4(), tele: freshTele() };
       cam.position.copy(cs.pos); cam.lookAt(cs.look);
       return cs;
     });
@@ -825,9 +831,17 @@ export class Engine {
     // camera *inside* a rock simply sees out of it — the far side of a closed mesh is not drawn —
     // so it passes through and keeps looking at the creature. Hence the sand itself here, and not
     // `groundHeight`, which counts boulder tops as floor.
+    // The camera lives under the water: its ceiling is just below the waterline, and only a breach
+    // lifts it. That is why a breath read as not having happened — the one moment the animal is at
+    // the top, the view is still the water. So a blow lifts it too, briefly, on `breathT`: up over
+    // the surface to see the spray and the animal's back in it, and back under. Eased both ways,
+    // faster up than down, because a cut to the sky and back is a flinch rather than a breath.
+    cs.breathT = Math.max(0, cs.breathT - dt);
+    const peek = cs.breathT <= 0 ? 0 : Math.sin(Math.min(1, cs.breathT / BREATH_PEEK) * Math.PI) ** 0.6;
+    const ceiling = p.airborne ? SURFACE_Y + 40 : (SURFACE_Y - 0.4) + peek * (L * 0.5 + 1.6);
     const fit = fitCameraArm(lookAt.y + L * 0.18, pitch, dist, L * CAMERA_CLOSE,
       (d) => { place(d); return sampleHeight(desired.x, desired.z) + CAMERA_SAND; },
-      p.airborne ? SURFACE_Y + 40 : SURFACE_Y - 0.4);
+      ceiling);
     place(fit.dist);
     desired.y = fit.y;
     // The rig had to be lifted off its arm, so the look point goes with it rather than the view
@@ -1181,6 +1195,10 @@ export class Engine {
           // nothing at all when the breath was taken on the sand and the sea is below the animal.
           if (broken > 0) this.splash.burst({ x: e.pos.x, y: SURFACE_Y, z: e.pos.z }, 0.3 + 0.5 * broken, 'out', bl * 0.5 * broken);
           this.bubbles.emit(e.pos, 24, 1.0, 3, 0.09, 1.4);
+          // ...and the camera comes up with the animal to watch it happen. It is otherwise held
+          // under the waterline at all times (see the ceiling in `updateCamera`), so a breath took
+          // place just off the top of the screen and the player's own view of it was the water.
+          if (broken > 0 && e.player != null && e.player >= 0) { const cs = this.cams[e.player]; if (cs) cs.breathT = BREATH_PEEK; }
           personal('gulp');
           break;
         }

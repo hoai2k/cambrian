@@ -193,6 +193,11 @@ short "second wind" (a free sprint) on top. Their game is the round trip — and
 the surface is where the water is brightest and every rung IV shadow is
 watching it.
 
+Breaking the surface means breaking it: the body's back is out of the water (`brokeSurface`), or
+it is up on the sand, which is what having limbs is for. It was a band a few units deep, so a
+breath was taken while the animal was still plainly under water and nothing happened at the
+waterline to show it.
+
 That share began at a quarter and is now 0.7. A lung under water should be a
 worse gill, not a shut one: at a quarter a bimodal animal that chose to fight at
 depth effectively had no bar to fight on, so the round trip stopped being a

@@ -21,7 +21,7 @@ const { AIR_LOW, AIR_MAX, triActor } = await import('../src/sim/triassic/state')
 /** Mirrors AIR_BOT_SEEK in the rules: the breath at which a bot starts up. Kept here so the test says what it is testing. */
 const AIR_BOT_SEEK_T = 80;
 const { shorePosts } = await import('../src/sim/triassic/shore');
-const { isAlive, lengthOf, bandOf } = await import('../src/sim/actors');
+const { brokeSurface, isAlive, lengthOf, bandOf, swimCeiling } = await import('../src/sim/actors');
 const { PLAYABLE, creature, CREATURES } = await import('../src/sim/creatures');
 const { emptyInput } = await import('../src/sim/types');
 const { sampleHeight, shoreZ, shoreDistance, SURFACE_Y, FLOOR_DEPTH, biomeAt, nurseryAt, groundHeight, LIGHT_WINDOW_Y } = await import('../src/sim/world');
@@ -111,7 +111,7 @@ ok(opener && fs.existsSync(`public/${decodeURIComponent(paths.music(opener.name)
   ok(notho.stamina <= 20.01, `out of air it recovers nothing (${notho.stamina.toFixed(1)} after 3 s from 20)`);
   ok(RULES!.staminaRegen(g, notho) === 0, 'and the regen hook says so directly');
   // up for air: the bar comes back whole and the blow is heard
-  notho.pos.y = SURFACE_Y - 1.5; notho.prevT.y = notho.pos.y;
+  notho.pos.y = swimCeiling(notho); notho.prevT.y = notho.pos.y;   // at the top, not near it
   g.step(DT, new Map()); const blew = g.events.some((e) => e.kind === 'gulp' && e.actor === notho.id);
   ok(blew, 'breaking the surface is a blow (a gulp event)');
   // `strength` on a gulp is how much water the breath breaks, which is what the renderer draws at
@@ -128,7 +128,7 @@ ok(opener && fs.existsSync(`public/${decodeURIComponent(paths.music(opener.name)
     const n = gn.players[0];
     n.pos.y = groundHeight(gn.world, n.pos.x, n.pos.z, []) + lengthOf(n) * 0.6; n.prevT.y = n.pos.y;
     run(gn, 1); gn.events.length = 0;
-    n.pos.y = SURFACE_Y - 1.5; n.prevT.y = n.pos.y;
+    n.pos.y = swimCeiling(n); n.prevT.y = n.pos.y;   // at the top, not near it
     gn.step(DT, new Map());
     const neck = gn.events.find((e) => e.kind === 'gulp');
     ok(!!neck && (neck.strength ?? 0) > 0 && (neck.strength ?? 1) < 1,
@@ -174,7 +174,7 @@ ok(opener && fs.existsSync(`public/${decodeURIComponent(paths.music(opener.name)
 
   // a breath fills it whole, from empty
   triActor(g, p).air = 0;
-  p.pos.y = SURFACE_Y - 1.5; p.prevT.y = p.pos.y;
+  p.pos.y = swimCeiling(p); p.prevT.y = p.pos.y;   // at the top, not near it
   run(g, 0.02);
   ok(triActor(g, p).air === AIR_MAX, 'one breath at the surface fills the gauge from empty');
 
@@ -231,10 +231,42 @@ ok(opener && fs.existsSync(`public/${decodeURIComponent(paths.music(opener.name)
   triActor(g2, q).air = 0; q.stamina = 0;
   run(g2, 2);
   const hurt = q.hp;
-  q.pos.y = SURFACE_Y - 1.5; q.prevT.y = q.pos.y;
+  q.pos.y = swimCeiling(q); q.prevT.y = q.pos.y;   // at the top, not near it
   run(g2, 2);
   ok(isAlive(q) && q.hp >= hurt && triActor(g2, q).air === AIR_MAX && q.stamina > 0,
     `surfacing ends the drowning and hands back both (hp ${q.hp.toFixed(0)}, air ${triActor(g2, q).air}, stamina ${q.stamina.toFixed(0)})`);
+}
+
+// ---- the surface is the surface, not a band near it ----
+//
+// It used to be the top three units plus a bit more for a long body, so a Cymbospondylus counted as
+// breathing nearly nine units down: the blow had nothing to break at the waterline, the climb ended
+// before it reached the top, and a player who had "surfaced" was looking at open water.
+{
+  const g = new Game('reef', [{ creature: 'cymbospondylus', device: 'keyboard', ready: true }]);
+  g.skipHatch();
+  const p = g.players[0];
+  const L = lengthOf(p), ceiling = swimCeiling(p);
+  ok(SURFACE_Y - ceiling < 0.8 + L * 0.25, `the ceiling puts a body's back at the waterline (${(SURFACE_Y - ceiling).toFixed(1)} under it, body ${L.toFixed(1)} long)`);
+  // where the old band ended for this animal, and well inside it
+  const oldBand = SURFACE_Y - 3 - L * 0.3;
+  ok(oldBand < ceiling - 2, `the old band began a long way down for a big body (${(SURFACE_Y - oldBand).toFixed(1)} units under the surface)`);
+  const at = (y: number) => { p.pos.y = y; p.prevT.y = y; p.airborne = false; return brokeSurface(p); };
+  ok(!at(oldBand + 0.5), `inside the old band is no longer at the surface (y ${(oldBand + 0.5).toFixed(1)})`);
+  ok(!at(ceiling - 2), `nor is two units under the ceiling (y ${(ceiling - 2).toFixed(1)})`);
+  ok(at(ceiling), `pressed against the ceiling is (y ${ceiling.toFixed(1)})`);
+  p.airborne = true;
+  ok(at(ceiling - 20) === false || brokeSurface(p), 'and a body clear of the water always is');
+  p.airborne = false;
+  // ...and the breath follows it: no gulp in the old band, one on arriving at the top
+  const gulpAt = (y: number) => {
+    triActor(g, p).atSurface = false; triActor(g, p).air = 100;
+    p.pos.y = y; p.prevT.y = y;
+    g.events.length = 0; g.step(DT, new Map());
+    return g.events.some((e) => e.kind === 'gulp' && e.actor === p.id);
+  };
+  ok(!gulpAt(oldBand + 0.5), 'no breath is taken in the old band');
+  ok(gulpAt(ceiling), 'a breath is taken at the top');
 }
 
 // ---- birth: everything hatches from an egg on the floor, and the live-bearers get a parent ----
