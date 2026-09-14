@@ -257,6 +257,15 @@ def carry(v):
     return Q[i] + (Q[i + 1] - Q[i]) * t + TQ[i] * off.dot(TP[i]) + NQ[i] * off.dot(NP[i]) + BQ[i] * off.dot(BP[i])
 
 
+# The generation's own pose, kept aside before anything is unbent. It is what the roster's
+# portraits are rendered from -- the reviewer asked for the animal's initial generated pose in any
+# still, and for the straightened body as the base the animations are built on, and those are two
+# different jobs for two different shapes. It carries no rig, no jaw cut and no mouth interior:
+# it is a still, at rest, with the mouth closed, and the material is the same datablock as the
+# shipped body's, so it is lit and shaded identically. It is written to the workbench, never to
+# public/, because it is a camera subject and not a delivery.
+posed = auth.copy(); posed.data = auth.data.copy()
+posed.name = 'Dinocephalosaurus generated pose'; bpy.context.collection.objects.link(posed)
 posed_head = np.array([auth.data.vertices[k].co[:] for k in D if D[k] < HEAD_GEO])
 neck_move = 0.
 if UNBEND:
@@ -350,6 +359,11 @@ def seat(p, toward, margin=.022):
 
 # ---- material: keep the source albedo, neutral white COLOR_0, restrained relief -------------------
 mat.name = 'Dinocephalosaurus body pigmentation'
+# The source material culls its backfaces, which is right for a closed shell and wrong for this
+# one: cutting the jaw off leaves both halves open along the mouth, so a culled skin is a hole an
+# open gape looks straight out of. The lining below is what an open mouth is meant to show; this is
+# the backstop under it, and it costs the runtime nothing but a little overdraw inside the head.
+mat.use_backface_culling = False
 bs = mat.node_tree.nodes.get('Principled BSDF')
 layer = auth.data.color_attributes.new(name='Color', type='FLOAT_COLOR', domain='POINT')
 for item in layer.data: item.color = (1, 1, 1, 1)
@@ -455,8 +469,111 @@ def head_r(a):
     return HEAD_PROFILE[-1][1]
 
 
+# ---- the mouth, measured off the head rather than assumed ---------------------------------------
+# Placodus' cavity method does not reach this animal: casting every head vertex's own normal back
+# into the mesh finds *nothing* (0 vertices against Placodus' 120-plus), because this generation
+# has no modelled slit at all -- the snout is one smooth closed tube and the mouth is painted on
+# it. So the mouth is read off the albedo instead, which is the technique this build already
+# trusts for the neck's roll, and for the same reason: the animal's own colouring is the only
+# measurement there is.
+def head_local_raw(c):
+    d = Vector(c) - HEAD_P0; return d.dot(HEAD_DIR), d.dot(HEAD_UP), d.dot(HEAD_SIDE)
+
+
+HEAD_BVH = BVHTree.FromPolygons([v.co.copy() for v in auth.data.vertices],
+                                [p.vertices[:] for p in auth.data.polygons], all_triangles=False)
+HEAD_AROUND = 96
+
+
+def head_ring(a, up, side):
+    """Every surface hit round one head station, with the albedo luminance at each."""
+    c = HEAD_P0 + HEAD_DIR * a; rows = []
+    for k in range(HEAD_AROUND):
+        th = k * 2 * pi / HEAD_AROUND
+        hit = HEAD_BVH.ray_cast(c, up * cos(th) + side * sin(th), .12)
+        if hit[0] is None: continue
+        s = hit_uv(hit[0], hit[2])
+        if s is None: continue
+        h, w = pixels.shape[:2]
+        rgb = pixels[int((float(s.y) % 1) * h) % h, int((float(s.x) % 1) * w) % w, :3]
+        rows.append((th, Vector(hit[0]), float(.2126 * rgb[0] + .7152 * rgb[1] + .0722 * rgb[2])))
+    return rows
+
+
+# The head's roll was inherited from the neck's parallel-transport normal, which this build already
+# knows drifts 117.6 degrees from the measured dorsal across the neck -- so the frame the whole
+# mouth was built in was rolled most of a right angle, and the jaw was being cut off the side of
+# the snout. Measure the head's own dorsal the way the neck's is measured: the first circular
+# harmonic of the darkness round each station, which for a countershaded animal points at the back.
+_hv = [0., 0.]; _hstr = []
+for _j in range(20):
+    _rows = head_ring(HEAD_LEN * (_j + .5) / 20., HEAD_UP, HEAD_SIDE)
+    if len(_rows) < HEAD_AROUND * .6: continue
+    _L = np.array([r[2] for r in _rows]); _dark = _L.mean() - _L
+    _vx = float(np.sum(_dark * np.cos([r[0] for r in _rows])))
+    _vy = float(np.sum(_dark * np.sin([r[0] for r in _rows])))
+    _hv[0] += _vx; _hv[1] += _vy; _hstr.append(math.hypot(_vx, _vy) / max(1e-9, float(np.abs(_dark).sum())))
+HEAD_ROLL = math.atan2(_hv[1], _hv[0])
+head_roll_report = {'stations': len(_hstr), 'meanHarmonicStrength': round(float(np.mean(_hstr)), 3),
+                    'inheritedFrameRollErrorDeg': round(math.degrees(HEAD_ROLL), 1)}
+assert head_roll_report['meanHarmonicStrength'] > .3, ('the head has no countershading to roll on', head_roll_report)
+HEAD_UP = (HEAD_UP * cos(HEAD_ROLL) + HEAD_SIDE * sin(HEAD_ROLL)).normalized()
+HEAD_SIDE = HEAD_DIR.cross(HEAD_UP)
+
+# ---- the mouth line, read off the same colouring -------------------------------------------------
+# With the frame square the pale belly runs from about 110 to 250 degrees round every station, and
+# the light/dark boundary on each flank is the lip. Crossing height per station, both sides averaged
+# (this animal is not symmetric: the two flanks disagree by about a tenth of a radius), lightly
+# smoothed along the head, is the seam the jaw is cut on. It replaces a straight ramp at a fixed
+# -0.38 of the local radius, which was the shape assumed rather than measured.
+SEAM_STATIONS = 24
+_sa = []; _sn = []; _sides = []
+for _j in range(SEAM_STATIONS):
+    _a = HEAD_LEN * (_j + .5) / SEAM_STATIONS
+    _rows = head_ring(_a, HEAD_UP, HEAD_SIDE)
+    if len(_rows) < HEAD_AROUND * .6: continue
+    _L = np.array([r[2] for r in _rows]); _lo, _hi = float(np.percentile(_L, 8)), float(np.percentile(_L, 92))
+    if _hi - _lo < .12: continue
+    _mid = (_lo + _hi) / 2; _found = []
+    # Outwards from the belly, not inwards from the back: the pale belly is one solid block and the
+    # step off it is sharp, where the dark back is mottled and crossed mid-value several times.
+    for _end in (0, 2 * pi):
+        _q = sorted([r for r in _rows if min(_end, pi) <= r[0] <= max(_end, pi)], key=lambda r: abs(r[0] - pi))
+        if not _q or _q[0][2] < _mid: continue
+        for _i in range(1, len(_q)):
+            if _q[_i][2] < _mid <= _q[_i - 1][2]:
+                _d = _q[_i][2] - _q[_i - 1][2]
+                _t = 0. if abs(_d) < 1e-9 else max(0., min(1., (_mid - _q[_i - 1][2]) / _d))
+                _found.append(float((_q[_i - 1][1] + (_q[_i][1] - _q[_i - 1][1]) * _t - HEAD_P0).dot(HEAD_UP)))
+                break
+    if len(_found) != 2: continue
+    _sa.append(_a); _sn.append(sum(_found) / 2); _sides.append(abs(_found[0] - _found[1]))
+assert len(_sa) >= SEAM_STATIONS * .6, ('the mouth line did not measure', len(_sa))
+_sn = [_sn[0]] + [(_sn[i - 1] + 2 * _sn[i] + _sn[i + 1]) / 4 for i in range(1, len(_sn) - 1)] + [_sn[-1]]
+SEAM_A = np.array(_sa); SEAM_N = np.array(_sn)
 HINGE_A = .30 * HEAD_LEN                           # along the head axis, back of the tooth row
-JAW_PT = HEAD_P0 + HEAD_DIR * HINGE_A - HEAD_UP * (.30 * head_r(HINGE_A))
+# The jaw is cut with planes, so what the cut can follow is a ramp; the measurement's job is to say
+# which ramp. Least squares over the jaw's own run, and the build refuses a fit that leaves the
+# measured line further from it than a fifth of the local radius -- which is the check Placodus'
+# straight ramp would have failed, its residual being a whole chisel deep.
+_fitm = (SEAM_A >= HINGE_A)
+_fit = np.polyfit(SEAM_A[_fitm], SEAM_N[_fitm], 1)
+SEAM_SLOPE = float(_fit[0]); SEAM0 = float(np.polyval(_fit, HINGE_A))
+_resid = [(float(a), float(n - np.polyval(_fit, a)), float(head_r(a))) for a, n in zip(SEAM_A[_fitm], SEAM_N[_fitm])]
+_worst = max(_resid, key=lambda r: abs(r[1] / r[2]))
+mouth_report = {'stations': len(SEAM_A), 'headRoll': head_roll_report,
+                'seam': [[round(float(a), 5), round(float(n), 5)] for a, n in zip(SEAM_A, SEAM_N)],
+                'seamOverLocalRadius': [round(float(n / max(1e-9, head_r(a))), 3) for a, n in zip(SEAM_A, SEAM_N)],
+                'flankDisagreementMaxRaw': round(float(max(_sides)), 5),
+                'rampAtHinge': round(SEAM0, 5), 'rampSlope': round(SEAM_SLOPE, 4),
+                'rampResidualMaxRaw': round(abs(_worst[1]), 5),
+                'rampResidualMaxOverLocalRadius': round(abs(_worst[1] / _worst[2]), 3)}
+assert mouth_report['rampResidualMaxOverLocalRadius'] < .20, ('the mouth line is not a ramp', mouth_report)
+print('MOUTH_SEAM', json.dumps(mouth_report))
+# The hinge sits just under the measured mouth line and is then seated towards the head's own axis,
+# because a snout this slender leaves very little head under the seam to hang a pivot in.
+JAW_PT = Vector(seat(HEAD_P0 + HEAD_DIR * HINGE_A + HEAD_UP * (SEAM0 - .22 * head_r(HINGE_A)),
+                     tuple(HEAD_P0 + HEAD_DIR * HINGE_A), margin=.015))
 bone('jaw', tuple(JAW_PT), 'skull')
 TAIL_PTS = [tuple(TGT[i]) for i in [0, 1, 2, 3, 4, 5, 6, 7]][:CAUDALS]
 for i, p in enumerate(TAIL_PTS): bone('tail_%02d' % i, p, 'body' if i == 0 else 'tail_%02d' % (i - 1))
@@ -571,11 +688,9 @@ def head_local(c):
     d = Vector(c) - HEAD_P0; return d.dot(HEAD_DIR), d.dot(HEAD_UP), d.dot(HEAD_SIDE)
 
 
-# The mouth seam has to stay a straight line in this frame, because the jaw is cut with planes;
-# it is fitted to sit at about 0.38 of the local radius below the head axis at both ends.
-SEAM0 = -.38 * head_r(HINGE_A); SEAM_SLOPE = (-.38 * head_r(HEAD_LEN) - SEAM0) / (HEAD_LEN - HINGE_A)
-
-
+# The mouth seam stays a straight line in this frame, because the jaw is cut with planes; SEAM0 and
+# SEAM_SLOPE are now the least-squares fit to the mouth line measured off the albedo above, rather
+# than a fixed fraction of the local radius assumed at both ends.
 def seam_n(a): return SEAM0 + SEAM_SLOPE * (a - HINGE_A)
 
 
@@ -638,6 +753,9 @@ mouthmat = bpy.data.materials.new('Dinocephalosaurus mouth interior'); mouthmat.
 mbs = mouthmat.node_tree.nodes.get('Principled BSDF')
 mbs.inputs['Base Color'].default_value = (.090, .038, .034, 1); mbs.inputs['Roughness'].default_value = .62
 mouthmat.diffuse_color = (.090, .038, .034, 1)
+# Wound inwards and the one material here that culls: what an open mouth shows is the far wall of
+# the lumen, and the near wall has to be got out of the way so the teeth between them are seen.
+mouthmat.use_backface_culling = True
 toothmat = bpy.data.materials.new('Dinocephalosaurus fangs'); toothmat.use_nodes = True
 tbs = toothmat.node_tree.nodes.get('Principled BSDF')
 tbs.inputs['Base Color'].default_value = (.78, .74, .64, 1); tbs.inputs['Roughness'].default_value = .30
@@ -656,25 +774,47 @@ def rigid(o, bonename, material):
 def head_point(a, n, b): return HEAD_P0 + HEAD_DIR * a + HEAD_UP * n + HEAD_SIDE * b
 
 
-def oral(name, lift, bonename):
-    verts = []; faces = []; rings = 16; ring = 10
-    for i in range(rings):
-        u = i / (rings - 1); a = HINGE_A + .004 + (HEAD_LEN - HINGE_A - .012) * u
-        wy = .55 * head_r(a) * (sin(pi * min(1., u * 1.06)) ** .30)
-        wz = .22 * head_r(a) * (sin(pi * min(1., u * 1.06)) ** .30)
-        for j in range(ring):
-            th = j * 2 * pi / ring
-            verts.append(tx(head_point(a, seam_n(a) + lift + wz * sin(th), wy * cos(th))))
-    for i in range(rings - 1):
-        for j in range(ring):
-            p0 = i * ring + j; p1 = i * ring + (j + 1) % ring; faces.append((p0, p1, p1 + ring, p0 + ring))
-    faces.append(tuple(reversed(range(ring)))); faces.append(tuple(range((rings - 1) * ring, rings * ring)))
-    me = bpy.data.meshes.new(name); me.from_pydata(verts, [], faces); me.update()
-    o = bpy.data.objects.new(name, me); bpy.context.collection.objects.link(o)
-    return rigid(o, bonename, mouthmat)
+# One lining rather than a palate and a floor. Two separate closed tubes, one rigid on the skull and
+# one rigid on the jaw, part the moment the jaw swings and leave a wedge at the back of the mouth
+# that a single-sided skin is seen straight out through -- Placodus' fault exactly. This is one sac
+# on the head's own radius profile, *skinned*: the roof follows the skull, the floor follows the
+# jaw, and the wall between them stretches, so no opening the clips reach can open it.
+LINING_RINGS, LINING_RING = 26, 14
+LIN_BACK = HINGE_A - .005
+LIN_FRONT = HEAD_LEN - .004
 
 
-oral('Oral floor', -.0026, 'jaw'); oral('Palate', .0030, 'skull')
+def lining_section(a, u):
+    # Drawn in at both ends so the sac closes rather than ending in a ring standing in open flesh.
+    e = smooth(u / .12) * smooth((1. - u) / .07)
+    return .55 * head_r(a) * (.16 + .84 * e), .30 * head_r(a) * (.20 + .80 * e)
+
+
+verts = []; faces = []; lin_an = []
+for i in range(LINING_RINGS):
+    u = i / (LINING_RINGS - 1.); a = LIN_BACK + (LIN_FRONT - LIN_BACK) * u
+    wy, wz = lining_section(a, u)
+    for j in range(LINING_RING):
+        th = j * 2 * pi / LINING_RING
+        verts.append(tx(head_point(a, seam_n(a) + wz * sin(th), wy * cos(th))))
+        lin_an.append(sin(th))
+for i in range(LINING_RINGS - 1):
+    for j in range(LINING_RING):
+        p0 = i * LINING_RING + j; p1 = i * LINING_RING + (j + 1) % LINING_RING
+        faces.append((p0, p1, p1 + LINING_RING, p0 + LINING_RING))
+faces.append(tuple(reversed(range(LINING_RING))))
+faces.append(tuple(range((LINING_RINGS - 1) * LINING_RING, LINING_RINGS * LINING_RING)))
+me = bpy.data.meshes.new('Mouth lining'); me.from_pydata(verts, [], faces); me.update()
+_lin = bpy.data.objects.new('Mouth lining', me); bpy.context.collection.objects.link(_lin)
+_lin.location = (0, 0, 0); _lin.data.materials.clear(); _lin.data.materials.append(mouthmat)
+for n in ['skull', 'jaw']: _lin.vertex_groups.new(name=n)
+for v in _lin.data.vertices:
+    t = .5 + .5 * lin_an[v.index]                      # 1 at the roof, 0 at the floor
+    _lin.vertex_groups['skull'].add([v.index], smooth(t), 'REPLACE')
+    _lin.vertex_groups['jaw'].add([v.index], 1. - smooth(t), 'REPLACE')
+_lin.parent = rig; _lin.modifiers.new('Mouth lining', 'ARMATURE').object = rig
+for p in _lin.data.polygons: p.use_smooth = True
+oralparts.append(_lin)
 # The fang trap: a long slender snout of interlocking conical teeth, the front pair the largest.
 for label, lift, bonename, sgnz in [('Upper fangs', .0026, 'skull', -1), ('Lower fangs', -.0024, 'jaw', 1)]:
     verts = []; faces = []
@@ -798,6 +938,18 @@ for clip, duration in CLIPS.items():
         wave = lambda lag=0, freq=1: (sin(p * freq - lag) - sin(-lag)) * env
         pulse = lambda c, k: ((1 + cos(p - 2 * pi * c)) / 2) ** k
         sbump = lambda x, y: (sin(pi * (u - x) / (y - x)) ** 2 if x < u < y else 0.)
+
+        # A bump that RUNS DOWN THE CHAIN: joint `ph` starts it `lead * ph` of the clip after the
+        # shoulder does, so the shape arrives at the skull last. `sharp` above 1 narrows the bump
+        # in place, which is what makes a strike read as committed rather than as a swell. Safe in
+        # a looping clip as long as u0 + w + lead <= 1, because it is then zero at both ends.
+        def runs(u0, w, lead, ph, sharp=1.):
+            # The bump must have finished at the skull end by the end of the clip, or the last
+            # frame does not match the first and the clip cannot be blended out of.
+            assert u0 >= 0. and u0 + w + lead <= 1. + 1e-9, ('a travelling bump outruns the clip', clip, u0, w, lead)
+            x = (u - u0 - lead * ph) / w
+            return (sin(pi * x) ** 2) ** sharp if 0. < x < 1. else 0.
+
         amp = AMP.get(clip, .25)
         peak = sin(pi * (u - .24) / .4) ** 2 if .24 < u < .64 else 0
         wind = sin(pi * u / .28) ** 2 if u < .28 else 0
@@ -807,12 +959,14 @@ for clip, duration in CLIPS.items():
         if clip == 'Death': amp *= 1 - dead
         # ---- jaw.  A fang trap opens wide and shuts on a fish; there is nothing to chew.
         opening = .010 * (1 - cos(p)) if loop else 0
-        if clip == 'Eat': opening = .13 * (1 - cos(p * 2))
-        if clip == 'Bite': opening = .42 * sin(pi * u) ** 2
-        if clip == 'Attack': opening = .38 * wind + .06 * peak
-        if clip == 'Heavy': opening = .44 * wind + .04 * peak
-        if clip == 'Ability': opening = .40 * sbump(.10, .58) + .05 * sbump(.60, 1.)
-        if clip == 'NeckStrike': opening = .12 * sbump(0, .34) + .46 * sbump(.34, .70) + .06 * sbump(.72, 1.)
+        if clip == 'Eat': opening = .34 * pulse(.16, 3) + .10 * pulse(.62, 5)
+        # The gape is timed to the strike rather than to the button: it parts on the cock, is widest
+        # as the neck unrolls, and shuts on the follow-through, which is the frame the fish is in.
+        if clip == 'Bite': opening = .10 * sbump(0, .16) + .50 * sbump(.10, .64) + .06 * sbump(.66, 1.)
+        if clip == 'Attack': opening = .12 * sbump(0, .30) + .50 * sbump(.26, .68) + .06 * sbump(.70, 1.)
+        if clip == 'Heavy': opening = .14 * sbump(0, .34) + .56 * sbump(.30, .74) + .06 * sbump(.76, 1.)
+        if clip == 'Ability': opening = .12 * sbump(0, .26) + .48 * sbump(.22, .64) + .05 * sbump(.66, 1.)
+        if clip == 'NeckStrike': opening = .12 * sbump(0, .34) + .52 * sbump(.32, .72) + .06 * sbump(.74, 1.)
         if clip == 'Grab': opening = .16 + .05 * sin(p)
         if clip == 'Periscope': opening = .03 * pulse(.5, 6)
         if clip == 'Breathe': opening = .06 * pulse(.28, 6) + .06 * pulse(.70, 6)
@@ -843,34 +997,77 @@ for clip, duration in CLIPS.items():
                 yaw += .060 * amp * wave(lag) + turn * .34 * (1 - .35 * ph)
                 pit += .040 * amp * wave(lag + .7)
             if clip in ['Dive', 'Rise']: pit += (1 if clip == 'Dive' else -1) * .45 * e * (1 - .3 * ph)
-            if clip == 'Dodge': yaw += .55 * e * sin(2.2 * ph + .4)
+            if clip == 'Dodge':
+                # The head goes first and the rest of the chain follows it out of the way, so the
+                # dodge reads as the animal taking its head off the line rather than sliding.
+                yaw += .55 * e * sin(2.2 * ph + .4) + 1.15 * runs(0., .42, .26, 1. - ph, 1.4)
+                pit += -.45 * runs(.02, .40, .24, 1. - ph)
             if clip in ['Hit', 'Stagger']:
                 yaw += .50 * e * sin(p * (1 if clip == 'Hit' else 2) - lag * .5)
                 pit += .30 * e * sin(p * 2 - lag * .4)
             if clip == 'Death':
                 yaw += dead * .70 * sin(1.9 * ph + .6); pit += dead * .45 * (1 - .5 * ph)
             if clip == 'Guard':
-                # the neck folds back over the shoulder, which is the only cover this animal has
-                yaw += .90 * sin(pi * ph) * (1 - .2 * ph) * (.4 + .6 * e); pit += .30 * e * (1 - ph)
+                # The neck folds back over the shoulder, which is the only cover this animal has --
+                # but folded is also cocked, so it is held as a loaded S with the head drawn back
+                # and up over the withers, breathing rather than merely tucked away.
+                yaw += .90 * sin(pi * ph) * (1 - .2 * ph) * (.4 + .6 * e) + .34 * sin(pi * ph * 2.1) * (.5 + .5 * e)
+                pit += .30 * e * (1 - ph) - .55 * (1 - .3 * ph) * (.55 + .45 * e) + .07 * sin(p - lag * .5)
             if clip == 'Parry': yaw += .50 * e * sin(2.6 * ph)
             if clip in ['Attack', 'Heavy']:
-                # coil, then the strike runs down the chain from the shoulder to the skull
-                coil = -.45 * wind * sin(pi * ph)
-                lash = sin(pi * min(1., max(0., (u - .24 - ph * .16) / .34))) ** 2
-                pit += coil * .45 + (.55 if clip == 'Heavy' else .38) * lash * (1 - .4 * ph)
-                yaw += coil + lash * (1.10 if clip == 'Heavy' else .95)
+                # This animal is a neck with a body attached, so an attack is the neck's: it cocks
+                # back into an S with the head drawn up over the shoulders, holds for a beat, then
+                # unrolls head-last and drives the skull forward and down, overshoots past straight
+                # and gathers. Anticipation, a fast committed strike, follow-through, recovery --
+                # not a lash bolted onto a sine.
+                big = clip == 'Heavy'
+                ck = sbump(0, .36 if big else .32)                            # the cock
+                dr = runs(.30 if big else .26, .34, .24, ph, 1.7)             # the drive, travelling
+                ov = runs(.56 if big else .50, .24, .18, ph)                  # follow-through
+                st = sbump(.80 if big else .74, 1.)                           # gather
+                pit += (-.70 if big else -.58) * ck * (1 - .30 * ph) \
+                    + (.95 if big else .78) * dr * (1 - .22 * ph) \
+                    + (.22 if big else .18) * ov * (1 - .5 * ph) - .12 * st * (1 - ph)
+                yaw += (-.62 if big else -.52) * ck * sin(pi * ph * 1.25) \
+                    + (1.60 if big else 1.34) * dr * (1 - .18 * ph) \
+                    - (.34 if big else .28) * ov * sin(pi * ph) - .20 * st * sin(pi * ph * .8)
             if clip in ['Ability', 'NeckStrike']:
-                # the lateral snap: the neck loads into an S and unrolls it head-last
-                w0, w1 = (.08, .56) if clip == 'Ability' else (.06, .68)
-                load = sbump(0, w1 * .72)
-                go = sin(pi * min(1., max(0., (u - w0 - ph * .26) / (w1 - w0)))) ** 2
-                back = sbump(w1, 1.)
-                yaw += -.70 * load * sin(pi * ph * 1.3) + 1.55 * go * (1 - .22 * ph) - .30 * back * sin(pi * ph)
-                pit += .22 * load * (1 - ph) - .18 * go
-            if clip == 'Bite': pit += -.30 * e * (1 - .5 * ph)
-            if clip == 'Eat': pit += .45 + .20 * sin(p * 2 - lag * .3)
+                # The hunting strike. The chain loads into a deep lateral S with the head carried
+                # back and high, unrolls it head-last, and the skull is thrown through the target
+                # and down; then the S re-forms the other way as the neck comes back, which is the
+                # recovery reading as a recovery. NeckStrike is the longer, deeper performance and
+                # Ability the roster's tighter one -- a different take, not the same clip twice.
+                long_ = clip == 'NeckStrike'
+                load = sbump(0, .40 if long_ else .34)
+                hold = sbump(.30 if long_ else .26, .46 if long_ else .40)
+                go = runs(.34 if long_ else .28, .32, .28, ph, 1.6)
+                thr = runs(.44 if long_ else .38, .28, .26, ph)
+                back = sbump(.68 if long_ else .62, 1.)
+                # The sweep is large on purpose -- this is the animal's hunting kit -- but the throw
+                # is kept short of curling the head back under the shoulder: a neck that wraps round
+                # its own chest reads as a knot rather than as a strike.
+                yaw += -(.92 if long_ else .78) * load * sin(pi * ph * 1.3) \
+                    + (1.78 if long_ else 1.58) * go * (1 - .22 * ph) \
+                    - (.30 if long_ else .26) * back * sin(pi * ph * 1.15)
+                pit += -(.80 if long_ else .66) * load * (1 - .30 * ph) - .24 * hold * (1 - ph) \
+                    + (.72 if long_ else .62) * thr * (1 - .20 * ph) \
+                    - (.14 if long_ else .12) * back * (1 - .4 * ph)
+            if clip == 'Bite':
+                # Half a second, so the whole of it is the snap: a short sharp cock and a stab.
+                pit += -.34 * sbump(0, .24) * (1 - .4 * ph) + .78 * runs(.14, .26, .18, ph, 2.) * (1 - .25 * ph)
+                yaw += -.22 * sbump(0, .22) * sin(pi * ph) + .50 * runs(.16, .26, .18, ph, 1.8)
+            if clip == 'Eat':
+                # A piscivore does not chew: it throws the fish back and swallows it, and on a neck
+                # this long the swallow is a bolus you can watch travel. The toss is head-up at the
+                # front of the loop; the bolus then runs the other way, skull to shoulder.
+                pit += .45 - .70 * pulse(.16, 3) * (1 - .30 * ph) \
+                    + .34 * runs(.30, .34, .34, 1. - ph) + .10 * sin(p * 2 - lag * .3)
+                yaw += .30 * runs(.28, .32, .32, 1. - ph) * sin(pi * ph) + .12 * sin(p - lag * .5)
             if clip == 'Grab':
-                pit += -.35 * (1 - .4 * ph) + .16 * sin(p * 3 - lag * .5); yaw += .25 * sin(p * 2 - lag * .8)
+                # Holding something that does not want to be held: the neck is braced back and hauls
+                # in heaves, with a worrying shake running out to the head between them.
+                pit += -.62 * (1 - .4 * ph) + .34 * sin(p * 2 - lag * .35) + .14 * sin(p * 4 - lag * .6)
+                yaw += .55 * sin(p * 2 - lag * .9) + .26 * sin(p * 4 - lag * 1.4)
             if clip == 'Periscope':
                 # head up, body level: the column stands and then sways along its length
                 pit += -1.25 * (1 - .25 * ph) + .14 * sin(p - lag * .5); yaw += .18 * sin(p - lag * .8)
@@ -900,9 +1097,16 @@ for clip, duration in CLIPS.items():
             if clip in ['Dive', 'Rise']:
                 d = 1 if clip == 'Dive' else -1
                 body.rotation_euler.x = d * .24 * e; pb['chest'].rotation_euler.x = d * .08 * e
-            if clip == 'Attack': body.location.y = .08 * wind - .26 * peak; body.rotation_euler.x = .05 * wind - .07 * peak
-            if clip == 'Heavy': body.location.y = .12 * wind - .34 * peak; body.rotation_euler.x = .08 * wind - .10 * peak; body.rotation_euler.z = -.05 * wind + .09 * peak
-            if clip == 'Bite': body.location.y = -.05 * e
+            # The trunk shifts its weight behind the neck rather than doing the striking: back on
+            # the cock, forward as the chain unrolls.
+            if clip == 'Attack':
+                body.location.y = .09 * sbump(0, .32) - .28 * sbump(.26, .70)
+                body.rotation_euler.x = .05 * sbump(0, .32) - .08 * sbump(.26, .70)
+            if clip == 'Heavy':
+                body.location.y = .14 * sbump(0, .36) - .38 * sbump(.30, .76)
+                body.rotation_euler.x = .09 * sbump(0, .36) - .12 * sbump(.30, .76)
+                body.rotation_euler.z = -.06 * sbump(0, .36) + .10 * sbump(.30, .76)
+            if clip == 'Bite': body.location.y = .04 * sbump(0, .24) - .12 * sbump(.14, .62)
             if clip == 'Parry': body.rotation_euler.y = .26 * e; body.rotation_euler.z = .12 * e; body.location.z = -.16 * e
             if clip == 'Guard': body.location.z = -.16 - .03 * (1 - cos(p)); body.rotation_euler.x = .03 * (1 - cos(p))
             if clip == 'Dodge': body.rotation_euler.y = .34 * e; body.rotation_euler.z = -.26 * e; body.location.x = .34 * e; body.location.z = .26 * e
@@ -1005,6 +1209,15 @@ for group, suffix in [(AUTH_GROUP, ''), (PUP_GROUP, '.puppet')]:
     bpy.ops.export_scene.gltf(filepath=os.path.join(OUT, ID + suffix + '.glb'), **kwargs); patch(os.path.join(OUT, ID + suffix + '.glb'))
 shutil.copyfile(os.path.join(OUT, ID + '.puppet.glb'), os.path.join(OUT, ID + '.lod1.glb'))
 
+# The generated pose, in the same units and axes as the delivery, for the portrait camera.
+for v in posed.data.vertices: v.co = tx(v.co)
+for p in posed.data.polygons: p.use_smooth = True
+posed_bounds = [[round(float(f([v.co[i] for v in posed.data.vertices])), 4) for i in range(3)] for f in (min, max)]
+bpy.ops.object.select_all(action='DESELECT'); posed.select_set(True); bpy.context.view_layer.objects.active = posed
+os.makedirs(LOCAL, exist_ok=True)
+bpy.ops.export_scene.gltf(filepath=os.path.join(LOCAL, ID + '.posed.glb'),
+                          **{**kwargs, 'export_animations': False, 'export_skins': False})
+
 authored_tris = sum(tri(o) for o in AUTH_GROUP) + sum(tri(o) for o in oralparts)
 puppet_tris = sum(tri(o) for o in PUP_GROUP) + sum(tri(o) for o in oralparts)
 meta = {'id': ID, 'name': 'Dinocephalosaurus', 'species': 'Dinocephalosaurus orientalis',
@@ -1038,6 +1251,7 @@ report = {'sourceSha256': hashlib.sha256(open(RAW, 'rb').read()).hexdigest(),
           'surfaceVertices': len(distances), 'seatingDepthRaw': seating,
           'maxInfluences': max(influences), 'meanInfluences': float(np.mean(influences)),
           'neckUnbending': unbending, 'tailStraightening': straightening,
+          'mouth': mouth_report, 'posedPortraitBounds': posed_bounds,
           'headAxis': {'origin': [round(float(x), 4) for x in HEAD_P0], 'direction': [round(float(x), 4) for x in HEAD_DIR],
                        'length': round(HEAD_LEN, 4), 'profile': [[round(a, 3), round(r, 4)] for a, r in HEAD_PROFILE],
                        'hingeAlongHead': round(HINGE_A, 4)},
