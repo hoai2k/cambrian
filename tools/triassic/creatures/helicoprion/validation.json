@@ -7,12 +7,96 @@
     9615
   ],
   "removedFlakeVertices": 0,
-  "authoredTriangles": 19253,
-  "twinTriangles": 7098,
-  "twinRemeshTriangles": 68024,
-  "twinDecimateRatio": 0.10437492281198502,
-  "twinVerticesHeldBackFromRelaxation": 12384,
+  "authoredTriangles": 25113,
+  "twinTriangles": 7100,
+  "twinRemeshTriangles": 67764,
+  "twinDecimateRatio": 0.10477539896965027,
+  "twinVerticesHeldBackFromRelaxation": 12065,
   "bladeDilation": 0.005,
+  "whorl": {
+    "crowns": 149,
+    "volutions": 6.785516602742508,
+    "crownsPerVolution": 22,
+    "angularSpacingDegrees": 16.363636363636363,
+    "expansionPerVolution": 1.32,
+    "crownHeightOverBaseRadius": 0.38,
+    "innerBaseRadius": 0.003861946824561104,
+    "outerBaseRadius": 0.024999999999999998,
+    "tipRadius": 0.034499999999999996,
+    "plateHalfThicknessAtTheRim": 0.0041,
+    "centreYZ": [
+      -0.40850000000000003,
+      -0.03688591575048514
+    ],
+    "vertices": 3230,
+    "triangles": 5860,
+    "firstVertexIndex": 9615,
+    "firstCrownVertexIndex": 11057,
+    "enamelUV": [
+      0.20437800884246826,
+      0.30965638160705566
+    ],
+    "enamelLuminance": 0.8285365700721741,
+    "roofClearance": 0.012991320868249508,
+    "halfWidth": 0.006500000134110451,
+    "extentY": [
+      -0.4373021125793457,
+      -0.3754088878631592
+    ],
+    "extentZ": [
+      -0.06767825037240982,
+      -0.008151154965162277
+    ],
+    "crownHeightRange": [
+      0.0014675397933332196,
+      0.0095
+    ],
+    "strippedDentition": {
+      "oralVertices": 1547,
+      "seedVertices": 377,
+      "flattenedVertices": 1511,
+      "protrusionThreshold": 0.0018,
+      "maxProtrusionBefore": 0.007180411668134475,
+      "maxProtrusionAfter": 0.0038701009805601197,
+      "protrudingBefore": 377,
+      "protrudingAfter": 333,
+      "displacementCap": 0.03,
+      "maxVertexMovement": 0.007146415003243035
+    },
+    "strippedGeneratedWhorl": {
+      "inTheAnteriorOralBox": 690,
+      "whorlSeedVertices": 516,
+      "whorlVerticesRelaxed": 674,
+      "displacementCap": 0.03,
+      "maxVertexMovement": 0.030000000000000006
+    },
+    "strippedDentitionLaterPasses": [
+      {
+        "oralVertices": 1538,
+        "seedVertices": 149,
+        "flattenedVertices": 1468,
+        "protrusionThreshold": 0.0018,
+        "maxProtrusionBefore": 0.007058291931905293,
+        "maxProtrusionAfter": 0.003690318389926908,
+        "protrudingBefore": 149,
+        "protrudingAfter": 139,
+        "displacementCap": 0.03,
+        "maxVertexMovement": 0.005571255356649783
+      },
+      {
+        "oralVertices": 1537,
+        "seedVertices": 139,
+        "flattenedVertices": 1452,
+        "protrusionThreshold": 0.0018,
+        "maxProtrusionBefore": 0.003690318389926908,
+        "maxProtrusionAfter": 0.003447169748437584,
+        "protrudingBefore": 139,
+        "protrudingAfter": 144,
+        "displacementCap": 0.03,
+        "maxVertexMovement": 0.0019990181318870655
+      }
+    ]
+  },
   "bones": 23,
   "boneNames": [
     "root",
@@ -97,7 +181,7 @@
     "Idle": [
       [
         -1.2486679553985596,
-        -2.5147926807403564,
+        -2.5150177478790283,
         -1.1058669090270996
       ],
       [
@@ -109,7 +193,7 @@
     "Swim": [
       [
         -1.2542520761489868,
-        -2.5147926807403564,
+        -2.5150177478790283,
         -1.131137728691101
       ],
       [
@@ -121,7 +205,7 @@
     "Sprint": [
       [
         -1.4917762279510498,
-        -2.5147926807403564,
+        -2.5150177478790283,
         -1.1447978019714355
       ],
       [
@@ -133,7 +217,7 @@
     "TurnLeft": [
       [
         -1.2445309162139893,
-        -2.5147926807403564,
+        -2.5150177478790283,
         -1.1754193305969238
       ],
       [
@@ -145,7 +229,7 @@
     "TurnRight": [
       [
         -1.4027061462402344,
-        -2.5147926807403564,
+        -2.5150177478790283,
         -1.179649829864502
       ],
       [
@@ -157,7 +241,7 @@
     "Dive": [
       [
         -1.2452867031097412,
-        -2.5280332565307617,
+        -2.527864933013916,
         -1.0988352298736572
       ],
       [
@@ -169,7 +253,7 @@
     "Rise": [
       [
         -1.2516262531280518,
-        -2.5147926807403564,
+        -2.5150177478790283,
         -1.6587305068969727
       ],
       [
@@ -181,7 +265,7 @@
     "Attack": [
       [
         -1.2536296844482422,
-        -2.818704128265381,
+        -2.8188118934631348,
         -1.2096586227416992
       ],
       [
@@ -193,7 +277,7 @@
     "Bite": [
       [
         -1.2542520761489868,
-        -2.5147926807403564,
+        -2.5150177478790283,
         -1.243530511856079
       ],
       [
@@ -205,7 +289,7 @@
     "Heavy": [
       [
         -1.479438304901123,
-        -2.7856860160827637,
+        -2.785639762878418,
         -1.4966434240341187
       ],
       [
@@ -217,7 +301,7 @@
     "Hit": [
       [
         -1.457306146621704,
-        -2.5147926807403564,
+        -2.5150177478790283,
         -1.353175163269043
       ],
       [
@@ -229,7 +313,7 @@
     "Death": [
       [
         -1.4972708225250244,
-        -2.5279347896575928,
+        -2.5278282165527344,
         -1.6268627643585205
       ],
       [
@@ -241,7 +325,7 @@
     "Guard": [
       [
         -1.2541264295578003,
-        -2.5280191898345947,
+        -2.5279202461242676,
         -1.2824130058288574
       ],
       [
@@ -253,7 +337,7 @@
     "Parry": [
       [
         -1.2445309162139893,
-        -2.5147926807403564,
+        -2.5150177478790283,
         -1.3298945426940918
       ],
       [
@@ -265,7 +349,7 @@
     "Dodge": [
       [
         -1.4430816173553467,
-        -2.5147926807403564,
+        -2.5150177478790283,
         -1.2720470428466797
       ],
       [
@@ -277,7 +361,7 @@
     "Eat": [
       [
         -1.2486679553985596,
-        -2.5147926807403564,
+        -2.5150177478790283,
         -1.1058669090270996
       ],
       [
@@ -289,7 +373,7 @@
     "Stagger": [
       [
         -1.4341754913330078,
-        -2.5147926807403564,
+        -2.5150177478790283,
         -1.3588205575942993
       ],
       [
@@ -301,7 +385,7 @@
     "Ability": [
       [
         -1.282326579093933,
-        -2.792329788208008,
+        -2.7925305366516113,
         -1.1080777645111084
       ],
       [
@@ -313,7 +397,7 @@
     "Grab": [
       [
         -1.315127968788147,
-        -2.6656675338745117,
+        -2.6659035682678223,
         -1.1954623460769653
       ],
       [
@@ -325,7 +409,7 @@
     "Breath": [
       [
         -1.2456365823745728,
-        -2.5147926807403564,
+        -2.5150177478790283,
         -1.173743724822998
       ],
       [
@@ -337,7 +421,7 @@
     "Growth": [
       [
         -1.2445309162139893,
-        -2.5147926807403564,
+        -2.5150177478790283,
         -1.106324553489685
       ],
       [
@@ -350,12 +434,12 @@
   "weights": {
     "Helicoprion authored body": {
       "maxInfluences": 4,
-      "vertices": 9615,
+      "vertices": 12845,
       "verticesPerBone": {
-        "jaw": 948,
+        "jaw": 4267,
         "pec_upper_R": 373,
-        "chest": 3340,
-        "skull": 2790,
+        "chest": 3339,
+        "skull": 2695,
         "body": 2174,
         "tail_06": 570,
         "tail_05": 498,
@@ -378,55 +462,55 @@
     },
     "Helicoprion procedural volume twin": {
       "maxInfluences": 4,
-      "vertices": 3547,
+      "vertices": 3550,
       "verticesPerBone": {
-        "tail_06": 177,
-        "tail_05": 171,
-        "tail_04": 211,
-        "caudal_upper": 171,
-        "caudal_lower": 169,
-        "tail_03": 268,
-        "tail_02": 317,
-        "tail_01": 381,
-        "tail_00": 353,
-        "body": 618,
-        "pelvic_R": 65,
-        "pelvic_L": 68,
-        "dorsal": 194,
-        "chest": 1036,
-        "skull": 976,
-        "pec_upper_L": 146,
-        "pec_mid_L": 173,
-        "pec_tip_L": 115,
-        "pec_upper_R": 149,
-        "pec_tip_R": 117,
-        "pec_mid_R": 180,
-        "jaw": 352
+        "tail_06": 182,
+        "tail_05": 174,
+        "tail_04": 215,
+        "caudal_upper": 174,
+        "caudal_lower": 176,
+        "tail_03": 274,
+        "tail_02": 326,
+        "tail_01": 395,
+        "tail_00": 371,
+        "body": 653,
+        "pelvic_R": 67,
+        "pelvic_L": 71,
+        "dorsal": 197,
+        "chest": 1070,
+        "skull": 930,
+        "pec_upper_L": 149,
+        "pec_mid_L": 180,
+        "pec_tip_L": 119,
+        "pec_upper_R": 155,
+        "pec_tip_R": 121,
+        "pec_mid_R": 187,
+        "jaw": 305
       }
     }
   },
   "envelope": {
     "maximumEnvelopeDifference": 0.03901398181915283,
     "maximumEnvelopeDifferenceFractionOfBodyLength": 0.007802796363830566,
-    "surfaceDistanceMax": 0.08661874383687973,
-    "surfaceDistanceP95": 0.028280870430171485,
+    "surfaceDistanceMax": 0.12054963409900665,
+    "surfaceDistanceP95": 0.03128797784447669,
     "envelopeTolerance": 0.2
   },
   "anchors": {
     "anchor_mouth": {
-      "nearestSurfaceRaw": 0.0010650703916326165,
-      "nearestSurfaceUnits": 0.005325351958163083,
-      "fractionOfBodyLength": 0.0010650703916326165
+      "nearestSurfaceRaw": 0.00030059224809519947,
+      "nearestSurfaceUnits": 0.0015029612404759973,
+      "fractionOfBodyLength": 0.00030059224809519947
     },
     "anchor_mouth_inside": {
-      "nearestSurfaceRaw": 0.012147903442382812,
-      "nearestSurfaceUnits": 0.06073951721191406,
-      "fractionOfBodyLength": 0.012147903442382812
+      "nearestSurfaceRaw": 0.0031078653410077095,
+      "nearestSurfaceUnits": 0.015539326705038548,
+      "fractionOfBodyLength": 0.0031078653410077095
     },
     "anchor_attack_primary": {
-      "nearestSurfaceRaw": 0.003797616343945265,
-      "nearestSurfaceUnits": 0.018988081719726324,
-      "fractionOfBodyLength": 0.003797616343945265
+      "nearestSurfaceRaw": 0.0029539598617702723,
+      "nearestSurfaceUnits": 0.014769799308851361,
+      "fractionOfBodyLength": 0.0029539598617702723
     }
   },
   "normalizedWeights": true,
