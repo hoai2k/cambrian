@@ -219,6 +219,13 @@ down the neck in order, and refuses a handover that does not close.
 Sheets, rendered from the decoded packaged files through identical cameras and lights for both
 models:
 
+> **The sheets below are not in the tree.** They are rendered from the decoded packaged files by
+> `render.py` and `contact-sheets.py`, and this animal's builder no longer runs (see the top of
+> *What is still open*), so there is no build of the current source to render. Rendering the
+> *original* delivery would produce sheets of a body that the committed source cannot make, which is
+> worse than having none. Tanystropheus' and Macrocnemus' sheets are present and current. The links
+> stay so the list of what a reviewer should be given is on the record.
+
 - **[The strike, side and top, phase by phase](paired-strike-sheet.jpg)**
 - **[The stride and the dash](paired-gait-sheet.jpg)**
 - [Side, top, front, belly and mouth comparison](paired-volume-sheet.jpg)
