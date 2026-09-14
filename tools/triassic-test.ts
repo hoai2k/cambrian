@@ -17,7 +17,9 @@ selectEra(TRIASSIC);
 const { Game } = await import('../src/sim/game');
 const { RULES } = await import('../src/sim/era-rules');
 const { devActor, stageScale, ADULT_STAGE, PRIME_STAGE, STAGE_AT } = await import('../src/sim/devonian/state');
-const { triActor } = await import('../src/sim/triassic/state');
+const { AIR_LOW, AIR_MAX, triActor } = await import('../src/sim/triassic/state');
+/** Mirrors AIR_BOT_SEEK in the rules: the breath at which a bot starts up. Kept here so the test says what it is testing. */
+const AIR_BOT_SEEK_T = 80;
 const { shorePosts } = await import('../src/sim/triassic/shore');
 const { isAlive, lengthOf, bandOf } = await import('../src/sim/actors');
 const { PLAYABLE, creature, CREATURES } = await import('../src/sim/creatures');
@@ -98,13 +100,40 @@ ok(opener && fs.existsSync(`public/${decodeURIComponent(paths.music(opener.name)
   run(g, 1);
   notho.stamina = 20; hyb.stamina = 20;
   run(g, 3);
-  ok(notho.stamina <= 20.01, `an air-breather recovers nothing under water (${notho.stamina.toFixed(1)} after 3 s from 20)`);
+  // On the breath it is holding a lung is simply a lung: the gauge is the clock, not the bar.
+  ok(notho.stamina > 40, `an air-breather on a full chest recovers like anything else (${notho.stamina.toFixed(1)} after 3 s from 20)`);
   ok(hyb.stamina > 40, `a gill-breather recovers as it always did (${hyb.stamina.toFixed(1)} after 3 s from 20)`);
-  ok(RULES!.staminaRegen(g, notho) === 0 && RULES!.staminaRegen(g, hyb) === 1, 'the regen hook says so directly');
+  ok(RULES!.staminaRegen(g, notho) === 1 && RULES!.staminaRegen(g, hyb) === 1, 'the regen hook says so directly');
+  // ...and once the breath is gone, the old rule bites: nothing comes back at all.
+  triActor(g, notho).air = 0;
+  notho.stamina = 20;
+  run(g, 3);
+  ok(notho.stamina <= 20.01, `out of air it recovers nothing (${notho.stamina.toFixed(1)} after 3 s from 20)`);
+  ok(RULES!.staminaRegen(g, notho) === 0, 'and the regen hook says so directly');
   // up for air: the bar comes back whole and the blow is heard
   notho.pos.y = SURFACE_Y - 1.5; notho.prevT.y = notho.pos.y;
-  g.step(DT, new Map()); const blew = g.events.some((e) => e.kind === 'gulp' && e.actor === notho.id); g.events.length = 0;
+  g.step(DT, new Map()); const blew = g.events.some((e) => e.kind === 'gulp' && e.actor === notho.id);
   ok(blew, 'breaking the surface is a blow (a gulp event)');
+  // `strength` on a gulp is how much water the breath breaks, which is what the renderer draws at
+  // the surface over it. A body coming up breaks all of it; Tanystropheus sends a neck up alone and
+  // breaks a little. Nothing here may send 0, which means "no water broken" and draws nothing.
+  const blow = g.events.find((e) => e.kind === 'gulp' && e.actor === notho.id);
+  ok(blow?.strength === 1, `a whole body coming up breaks the surface fully (strength ${blow?.strength})`);
+  g.events.length = 0;
+  {
+    // Dinocephalosaurus sends the neck up on its own, which should still ripple — a breath that
+    // drew nothing at the surface is the thing this was reported as.
+    const gn = new Game('reef', [{ creature: 'dinocephalosaurus', device: 'keyboard', ready: true }]);
+    gn.skipHatch();
+    const n = gn.players[0];
+    n.pos.y = groundHeight(gn.world, n.pos.x, n.pos.z, []) + lengthOf(n) * 0.6; n.prevT.y = n.pos.y;
+    run(gn, 1); gn.events.length = 0;
+    n.pos.y = SURFACE_Y - 1.5; n.prevT.y = n.pos.y;
+    gn.step(DT, new Map());
+    const neck = gn.events.find((e) => e.kind === 'gulp');
+    ok(!!neck && (neck.strength ?? 0) > 0 && (neck.strength ?? 1) < 1,
+      `a neck sent up alone breaks some of the surface, not none and not all (strength ${neck?.strength})`);
+  }
   ok(notho.stamina > notho.staminaMax * 0.95, `and the bar comes back whole (${notho.stamina.toFixed(0)}/${notho.staminaMax})`);
   ok(RULES!.hud(g, 0)?.air === true && RULES!.hud(g, 0)?.atSurface === true, 'the HUD knows it breathes air and is at the surface');
   // the climb is free
@@ -117,7 +146,95 @@ ok(opener && fs.existsSync(`public/${decodeURIComponent(paths.music(opener.name)
   run(g, 2);
   ok(notho.stamina < 60 - 8, `held under by an exhaustion hold, the bar goes (${notho.stamina.toFixed(1)} from 60)`);
   ok(RULES!.hud(g, 0)?.heldUnder === true, 'the HUD says held under');
+  // ...and it costs the breath as well, which is what being held *under* means now the gauge exists
+  ok(triActor(g, notho).air < AIR_MAX - 15, `and the breath goes with it (${triActor(g, notho).air.toFixed(0)} of ${AIR_MAX} after 2 s)`);
+  ok(RULES!.staminaRegen(g, notho) === 0, 'nothing comes back while it is held, whatever is in its chest');
   notho.grabbedBy = -1; giant.grabbing = -1;
+}
+
+// ---- the air gauge: a clock on a dive, and what running it out actually costs ----
+//
+// The era used to say "no recovery under water" flatly, which made the deep somewhere you visited
+// on the bar you arrived with. The gauge splits that in two: five minutes of working normally, then
+// the old rule. Drowning is what the second half costs, and only when the bar is gone with it.
+{
+  const g = new Game('reef', [{ creature: 'nothosaurus', device: 'keyboard', ready: true }]);
+  g.skipHatch();
+  const p = g.players[0];
+  const deep = () => { p.pos.y = groundHeight(g.world, p.pos.x, p.pos.z, []) + lengthOf(p) * 0.6; p.prevT.y = p.pos.y; };
+  deep(); run(g, 1);
+  ok(AIR_MAX === 300, `a lungful is five minutes (${AIR_MAX} s)`);
+  ok(Math.abs(triActor(g, p).air - (AIR_MAX - 1)) < 0.2, `and it goes down a second a second (${triActor(g, p).air.toFixed(1)} after 1 s)`);
+
+  // the gauge reaches the HUD, and flashes for its last minute and not before
+  const airAt = (left: number) => { triActor(g, p).air = left; deep(); run(g, 0.02); return RULES!.hud(g, 0)!; };
+  ok(Math.abs((airAt(AIR_MAX * 0.5).airLeft ?? -1) - 0.5) < 0.02, 'the HUD carries the gauge as a fraction');
+  ok(airAt(AIR_LOW + 20).airLow === false, `above the last minute it does not flash (${AIR_LOW + 20} s left)`);
+  ok(airAt(AIR_LOW - 20).airLow === true, `inside the last minute it does (${AIR_LOW - 20} s left)`);
+
+  // a breath fills it whole, from empty
+  triActor(g, p).air = 0;
+  p.pos.y = SURFACE_Y - 1.5; p.prevT.y = p.pos.y;
+  run(g, 0.02);
+  ok(triActor(g, p).air === AIR_MAX, 'one breath at the surface fills the gauge from empty');
+
+  // out of air alone does not drown: a body that stops swimming keeps its bar and lives
+  deep(); triActor(g, p).air = 0; p.stamina = p.staminaMax; p.hp = p.hpMax;
+  run(g, 6);
+  ok(p.hp === p.hpMax && isAlive(p), `out of air but not out of effort, nothing happens (hp ${p.hp.toFixed(0)}/${p.hpMax})`);
+
+  // out of air *and* out of stamina: hp goes, and it is seconds of going under rather than a switch
+  deep(); triActor(g, p).air = 0; p.stamina = 0;
+  run(g, 2);
+  ok(p.hp < p.hpMax && isAlive(p), `out of both, hp starts to go (${p.hp.toFixed(0)}/${p.hpMax} after 2 s)`);
+  ok(RULES!.hud(g, 0)?.drowning === true, 'and the HUD says drowning');
+  const half = p.hp;
+  run(g, 8);
+  ok(!isAlive(p), `and it finishes the job (hp ${half.toFixed(0)} → ${p.hp.toFixed(0)})`);
+
+  // A bot is subject to the same rule and must not simply die of it: the shared brain steers for
+  // food and threats and knows nothing about breathing, so the era has to send it up itself.
+  {
+    const gb = new Game('hunted', [{ creature: 'nothosaurus', device: 'keyboard', ready: true }]);
+    gb.skipHatch();
+    const bot = gb.actors.find((a) => a.controller === 'bot' && creature(a.creature).breathing === 'air');
+    ok(!!bot, 'the match has a bot to watch');
+    if (bot) {
+      bot.pos.y = groundHeight(gb.world, bot.pos.x, bot.pos.z, []) + lengthOf(bot) * 0.6; bot.prevT.y = bot.pos.y;
+      triActor(gb, bot).air = AIR_BOT_SEEK_T;
+      const startY = bot.pos.y;
+      run(gb, 20);
+      ok(bot.pos.y > startY + 2, `a bot low on air climbs for the surface (${startY.toFixed(1)} → ${bot.pos.y.toFixed(1)})`);
+      run(gb, 240);
+      ok(isAlive(bot) && triActor(gb, bot).air > 0, `and does not quietly drown on the clock (air ${triActor(gb, bot).air.toFixed(0)}, hp ${bot.hp.toFixed(0)})`);
+    }
+  }
+
+  // ...and the next life starts on a full chest. Respawning on the breath it drowned with would
+  // put a body straight back into the drowning window the moment its bar went.
+  {
+    const gr = new Game('reef', [{ creature: 'nothosaurus', device: 'keyboard', ready: true }]);
+    gr.skipHatch();
+    const r = gr.players[0];
+    triActor(gr, r).air = 0; triActor(gr, r).drownT = 4;
+    RULES!.onRespawn(gr, r);
+    ok(triActor(gr, r).air === AIR_MAX && triActor(gr, r).drownT === 0,
+      `a respawn hands back a whole breath (air ${triActor(gr, r).air}, drownT ${triActor(gr, r).drownT})`);
+  }
+
+  // the escape is real: the surface is reachable from the drowning window and ends it
+  const g2 = new Game('reef', [{ creature: 'nothosaurus', device: 'keyboard', ready: true }]);
+  g2.skipHatch();
+  const q = g2.players[0];
+  q.pos.y = groundHeight(g2.world, q.pos.x, q.pos.z, []) + lengthOf(q) * 0.6; q.prevT.y = q.pos.y;
+  run(g2, 1);
+  triActor(g2, q).air = 0; q.stamina = 0;
+  run(g2, 2);
+  const hurt = q.hp;
+  q.pos.y = SURFACE_Y - 1.5; q.prevT.y = q.pos.y;
+  run(g2, 2);
+  ok(isAlive(q) && q.hp >= hurt && triActor(g2, q).air === AIR_MAX && q.stamina > 0,
+    `surfacing ends the drowning and hands back both (hp ${q.hp.toFixed(0)}, air ${triActor(g2, q).air}, stamina ${q.stamina.toFixed(0)})`);
 }
 
 // ---- birth: everything hatches from an egg on the floor, and the live-bearers get a parent ----

@@ -49,24 +49,35 @@ of bodies the sea had never seen before and, in half the cases, never saw again.
 
 ### Air and stamina
 
-A new `breathing: 'air'` value beside `'gill'` and `'bimodal'`, and it works on the bar the game
-already draws. An air-breather's **stamina drains at the ordinary rate and does not come back at
-all under water.** Breaking the surface refills it, fast, with a visible **blow**: spray, the era's
-signature sound, and a ping on the radar of anything hunting. That is the whole mechanic. There is
-no breath meter, no countdown and no drowning, and nothing on this roster has to touch land.
+A new `breathing: 'air'` value beside `'gill'` and `'bimodal'`. It works on the bar the game
+already draws, and on a gauge of its own beneath it. Breaking the surface refills both, fast, with
+a visible **blow**: spray at the waterline, the era's signature sound, and a ping on the radar of
+anything hunting. Nothing on this roster has to touch land.
 
-It is the Devonian's bimodal trade taken to its end. There, lungs bought a quarter-rate recovery
-under water and a full bar at the surface; here an air-breather gets nothing under water and
-everything at the top, and a gill-breather recovers anywhere, which is its whole advantage. A
-Saurichthys never comes up and never needs to. A Nothosaurus that has just run a fish down is
-empty until it does.
+**Revised.** This began as "stamina does not come back at all under water", with no meter, no
+countdown and no drowning — deliberately, because it was the cheapest shape that made the surface
+matter. It made the deep somewhere you *visited* on the bar you arrived with, rather than somewhere
+you hunted, and it is now a gauge: `AIR_MAX` (five minutes) of breath, spent a second a second under
+water and filled whole by a blow. While it lasts an air-breather recovers like anything else. Empty,
+the original rule bites exactly as written — nothing comes back — and **drowning** is what that
+costs, but only in company: air gone *and* the bar gone, bled over `DROWN_TIME` rather than switched,
+because the gauge has flashed for its last minute (`AIR_LOW`) by then and the climb for air is free,
+so it is always escapable. Being held under is its own case: nothing comes back while something has
+you, whatever is in your chest, and an exhaustion hold eats the gauge as well as the bar.
+
+It is the Devonian's bimodal trade taken to its end. There, lungs buy a reduced recovery under
+water (`WATER_REGEN`, since raised from a quarter to 0.7 — a lung under water is a worse gill, not
+a shut one) and a full bar at the surface; here an air-breather works normally on the breath it is
+holding and gets nothing once that is gone, and a gill-breather recovers anywhere with no clock at
+all, which is its whole advantage. A Saurichthys never comes up and never needs to. A Nothosaurus
+that has just run a fish down has five minutes to find out whether it can afford the next one.
 
 Three consequences are the reason to build it this way:
 
-- **Lying still is free.** A body that spends nothing keeps what it has, so an ambusher can wait on
-  the bottom as long as it likes. What costs air is *effort* — the chase, the fight, the escape —
-  which is exactly where the tension belongs, and it means the rule never nags a player who is
-  hunting patiently.
+- **Lying still is nearly free.** A body that spends nothing keeps its bar, so an ambusher can wait
+  on the bottom for as long as its breath lasts. Under the first draft that was *forever*, which was
+  the tell that the rule had no clock in it at all; the gauge puts one bound on the wait and nothing
+  else, and effort — the chase, the fight, the escape — is still what actually empties the bar.
 - **Every fight has a second half.** Win a long exchange in deep water and you are empty at the
   bottom of a column you now have to climb, in the open, blowing, where everything can see you.
   A Devonian fight ended when someone died; this one ends at the surface.
@@ -160,10 +171,11 @@ which is one reason they own the deep.
 In order of size. Nothing here touches `game.ts` or `combat.ts` directly; each is a `RULES?.` hook
 in `src/sim/era-rules.ts` or an era field read through `creature()`.
 
-1. **Air**: `breathing: 'air'`, the stamina-recovery gate, the surface state, the blow and its
-   sounds, the radar ping, and the bar's "recovery off" mark. Hooks: `staminaRegen` (return zero
-   under water for an air-breather) and `atSurface`. There is no meter, no drowning and no death
-   to build, which is most of why this shape was chosen.
+1. **Air**: `breathing: 'air'`, the gauge, the stamina-recovery gate, the surface state, the blow
+   and its sounds, the radar ping, and the bar's "out of air" mark. Hooks: `staminaRegen` (zero
+   once the gauge is empty, or while the body is held under) and `atSurface`. The meter, the
+   drowning and the death the first draft avoided are all built; what they cost is one number on
+   the per-actor state and one branch in the regen hook.
 2. **Per-biome floor depth**: `environment.floorDepth`, the `sampleHeight` change and the
    `tools/world-test.ts` assertions in [02](02-biomes-and-depth.md#depth-the-engine-change).
 3. **Shore animals**: a placed actor class with a reach test against the surface gap (the grip's
