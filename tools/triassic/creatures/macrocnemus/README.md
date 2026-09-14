@@ -328,6 +328,14 @@ an animal the research gives webbed feet to.
   `node tools/triassic/skin-tears.mjs public/assets/triassic/creatures/macrocnemus.glb` sweeps every clip at
   17 phases and compares each triangle edge against its rest length. Every one of the twenty-six clips tears an edge past 2x. `Snatch` is the worst ratio at **23x** and `Sprint` the worst spread, with about 15,700 torn edge-instances and an edge reaching 0.304 on a body 4.89 long. `Run` is close behind at 11.9x. `hind_lower_L`, `hind_foot_L/R`, `body` and `chest` dominate throughout.
 
+
+  Swept across the era it is **not** a regression in this kit and **not** inherent to the pipeline.
+  Nothosaurus peaks at 2.98x with 29 torn edges and is essentially clean; Dinocephalosaurus' 56.8x
+  is twelve *tiny* oral edges (0.002 to 0.086) and is clean in effect; Placodus — delivered and
+  reviewed long before these three — tears at 12.4x in its paddles. So the pipeline can produce
+  intact limb skinning, this did not start here, and what decides it is how hard an animal swings a
+  limb. That makes it a fixable fault in the limb weighting rather than a property of Tripo bodies.
+
   The paired audit does not catch this and could not: it plays 61 phases of every clip through the
   real loader and mixer and checks where every skinned vertex *is* — travel from rest, bounds,
   envelopes — and travel from rest stays bounded the whole time. No vertex moves more than 15 % of

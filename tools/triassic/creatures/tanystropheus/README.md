@@ -442,6 +442,14 @@ stay.
   `node tools/triassic/skin-tears.mjs public/assets/triassic/creatures/tanystropheus.glb` sweeps every clip at
   17 phases and compares each triangle edge against its rest length. Fifteen of twenty-eight clips tear an edge past 2x, but the worst ratio is **6.1x** (`Sprint`) against 23x and 25x on the other two, and the worst absolute stretch is 0.026 to 0.154 on a body 5.16 long — three per cent of the animal, in a foot, in a clip this animal hardly uses. The shore chain it is judged on is the cleanest part: `Lower` peaks at 2.1x and `Retract` tears nothing at all. `SnapLeft`/`SnapRight` reach 5.6x on the skull, which is the jaw corner rather than the neck, and is not visible in the strike sheet.
 
+
+  Swept across the era it is **not** a regression in this kit and **not** inherent to the pipeline.
+  Nothosaurus peaks at 2.98x with 29 torn edges and is essentially clean; Dinocephalosaurus' 56.8x
+  is twelve *tiny* oral edges (0.002 to 0.086) and is clean in effect; Placodus — delivered and
+  reviewed long before these three — tears at 12.4x in its paddles. So the pipeline can produce
+  intact limb skinning, this did not start here, and what decides it is how hard an animal swings a
+  limb. That makes it a fixable fault in the limb weighting rather than a property of Tripo bodies.
+
   The paired audit does not catch this and could not: it plays 61 phases of every clip through the
   real loader and mixer and checks where every skinned vertex *is* — travel from rest, bounds,
   envelopes — and travel from rest stays bounded the whole time. No vertex moves more than 15 % of

@@ -231,11 +231,25 @@ animal. Three findings from that pass belong in this document because they gener
   ratio to catch the stretch and an absolute floor of about 1.5 % of body length to discard the
   noise, because the oral lining and teeth carry edges a thousandth of a body long and a 12x stretch
   of one of those is invisible — ranking on ratio alone put Tanystropheus' jaw above Coelophysis'
-  feet, which is backwards. What it says today: Tanystropheus peaks at 6.1x and its shore chain
-  barely tears at all, Macrocnemus reaches 23x and Coelophysis 25x, both dominated by `hind_foot`,
-  `hind_lower`, `body` and `chest` — so the fault is in the shared limb skinning rather than in any
-  animal's clips, and it shows in proportion to how hard an animal swings a limb. It is why a
-  standing animal came through this pass in far better shape than either runner.
+  feet, which is backwards.
+
+  Swept across every body built so far, it is **not** a regression in the shore animals' kit and
+  **not** inherent to the pipeline — it tracks how hard an animal swings a limb:
+
+  | Body | Worst | Torn edges | Where |
+  | --- | ---: | ---: | --- |
+  | Nothosaurus | 2.98x | 29 | essentially clean — the reference body |
+  | Dinocephalosaurus | 56.8x | 12 | twelve *tiny* oral edges, 0.002 to 0.086; clean in effect |
+  | Tanystropheus | 6.1x | moderate | feet and jaw corner; its shore chain barely tears |
+  | Placodus | 12.4x | 432 | `fore_paddle_L`, `fore_lower_L` — genuinely torn, and already delivered |
+  | Macrocnemus | 23.3x | ~15,700 in Sprint | `hind_lower`, `hind_foot`, `body`, `chest` |
+  | Coelophysis | 25.3x | ~16,500 in the snaps | the same bones |
+
+  Read it as: Nothosaurus proves the pipeline can produce intact limb skinning, so this is a fixable
+  fault and not a property of Tripo bodies; Placodus shows it is not new with the shore animals; and
+  the two runners show what it costs once a limb actually travels. Dinocephalosaurus is the reason
+  the absolute floor matters — on ratio alone it is the worst body in the era and in reality it is
+  one of the best. The fault is in the limb weighting, not in any animal's clips.
 - **Blender exits 0 when a builder raises, and that has cost more than anything else here.** In
   `--background --python` mode the traceback goes to stdout and the process still reports success,
   so a chain that checks exit codes calls a failed build a good one — and the previous artefacts sit
