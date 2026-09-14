@@ -89,7 +89,13 @@ unless the user explicitly asks for a PR. Steps:
   lists (`npm run ancientseas:delivered` regenerates it from the folder) and draws a shipped
   stand-in or a named wash for the rest, so nothing asks the network for art that has not arrived.
   A game is its title *and* the animal arching over it: both carry the link and light together,
-  with the picture kept out of the keyboard's way so a game is one stop rather than two.
+  with the picture kept out of the keyboard's way so a game is one stop rather than two. A game
+  that is not out yet (`comingSoon` on its `GameLink`; the Triassic, for now) keeps its title, its
+  animal and its place on the plate and gives up the link, the lighting and the pointer, with a
+  *Coming soon* badge under the title — the plate is the trilogy, and a gap where the third game
+  goes says less than the third game does. `OPEN_GAMES` is what the pad and the arrow keys walk,
+  so nothing can steer into it. Its own page is untouched: this is what the trilogy page offers,
+  not whether the game runs, and `/triassic/` still opens by address.
   `npm run ancientseas` checks all of it; `node tools/ancientseas-smoke.mjs <outdir>` screenshots
   the page against a preview build and follows the three links.
 - The wordmark the interface draws is derived, not delivered: `npm run logos`

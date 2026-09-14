@@ -14,7 +14,7 @@ import { DEVONIAN } from '../src/content/devonian';
 import { TRIASSIC } from '../src/content/triassic';
 import { padDir, step } from '../src/ancientseas/picker';
 import { emptyControls } from '../src/input/input';
-import { ANIMAL_ERA, ART_DIR, BIG_ANIMAL, DEFAULT_VERSION, GAMES, REQUESTED, SLOTS, STAGE, TRILOGY_LOGO, isDelivered, parseVersion, sourceFor } from '../src/ancientseas/page';
+import { ANIMAL_ERA, ART_DIR, BIG_ANIMAL, COMING_SOON, DEFAULT_VERSION, GAMES, OPEN_GAMES, REQUESTED, SLOTS, STAGE, TRILOGY_LOGO, isDelivered, parseVersion, sourceFor } from '../src/ancientseas/page';
 
 let passes = 0;
 const ok = (cond: unknown, msg: string) => { assert.ok(cond, msg); passes++; };
@@ -217,12 +217,12 @@ ok(/\.as-stage \{[^}]*width: min\(100vw, calc\(100svh \* 1\.6\)\)/.test(css2), '
  * A pad walks the three games. The plate is links, which are a pointer's and a Tab key's business,
  * so without this a player holding a controller has nothing to press.
  */
-const ORDER = GAMES.map((g) => g.id);
+const ORDER = OPEN_GAMES.map((g) => g.id);
 eq(step(null, 'right', ORDER), 'cambrian', 'a push right with nothing chosen starts at the near end');
-eq(step(null, 'left', ORDER), 'triassic', 'and a push left at the far one');
+eq(step(null, 'left', ORDER), 'devonian', 'and a push left at the far open one');
 eq(step('cambrian', 'right', ORDER), 'devonian', 'right walks along the plate');
-eq(step('triassic', 'right', ORDER), 'cambrian', 'and wraps rather than stopping');
-eq(step('cambrian', 'left', ORDER), 'triassic', 'as does left');
+eq(step('devonian', 'right', ORDER), 'cambrian', 'and wraps rather than stopping, past the game that is not out');
+eq(step('cambrian', 'left', ORDER), 'devonian', 'as does left');
 eq(step('devonian', 'left', ORDER), 'cambrian', 'left walks back');
 const pad = (over: Partial<ReturnType<typeof emptyControls>>) => padDir({ ...emptyControls(), ...over });
 eq(pad({}), null, 'a pad at rest asks for nothing');
@@ -236,6 +236,22 @@ eq(pad({ my: 0.8 }), 'right', 'and the stick answers on the column too');
 const picker = readFileSync('src/ancientseas/picker.ts', 'utf8');
 ok(/c\.confirm \|\| c\.menu/.test(picker) && !/anyButton/.test(picker), 'A and Start take the choice, not every button');
 ok(/pads === 0/.test(page), 'and nothing polls a pad that is not there');
+
+/**
+ * A game that is not out yet is on the plate and is not a way in. It keeps its title, its animal
+ * and its place — the plate is the trilogy, and a gap where the third game goes says less than the
+ * third game does — and gives up the link, the lighting and the pointer, with a badge saying why.
+ */
+eq(GAMES.filter((g) => g.comingSoon).map((g) => g.id), ['triassic'], 'the Triassic is the one not open yet');
+eq(OPEN_GAMES.map((g) => g.id), ['cambrian', 'devonian'], 'and the pad and the keys walk the rest');
+ok(GAMES.every((g) => g.comingSoon || OPEN_GAMES.includes(g)), 'every other game is open');
+ok(/soon \? \(/.test(page) || /if \(soon\)/.test(page), 'the page draws it as something other than a link');
+ok(/const lit = partOfLink && !soon/.test(page), 'it does not light under the pointer');
+ok(/OPEN_GAMES\.find\(\(g\) => g\.id === era\)/.test(page), 'and nothing can steer into it');
+ok(/className="as-badge"/.test(page) && new RegExp(COMING_SOON).test(COMING_SOON), 'the badge says what it is');
+ok(/\.as-badge \{/.test(readFileSync('src/ancientseas/ancientseas.css', 'utf8')), 'and has somewhere to be drawn');
+// Its own page is untouched: this is about what the trilogy page offers, not whether the game runs.
+ok(existsSync('triassic/index.html'), 'the game itself is still there');
 
 // The withdrawn cutouts are gone from the page and from public/ (docs/image-requests.md says why).
 for (const gone of ['animal-opabinia.webp', 'animal-cladoselache.webp', 'animal-mixosaurus.webp', 'animal-ammonoid.webp']) {

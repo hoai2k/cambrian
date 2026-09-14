@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { appBase } from '../shared/base';
-import { ANIMAL_ERA, BIG_ANIMAL, GAMES, SLOTS, TRILOGY_LOGO, isDelivered, parseVersion, sourceFor, type EraId, type Slot } from './page';
+import { ANIMAL_ERA, BIG_ANIMAL, COMING_SOON, GAMES, OPEN_GAMES, SLOTS, TRILOGY_LOGO, isDelivered, parseVersion, sourceFor, type EraId, type Slot } from './page';
 import { poll, step, type Dir } from './picker';
 
 /** The page is the app root, so `assets/...` and each game's folder hang directly off it. */
@@ -42,16 +42,22 @@ function VersionOne() {
         <p className="as-rule" aria-hidden="true">— ❧ —</p>
       </header>
       <nav className="as-games" aria-label="The three games">
-        {GAMES.map((g) => (
-          <a key={g.id} className={`as-game as-game-${g.id}`} href={url(g.path)}>
-            <img className="as-art" src={url(g.art)} width={g.artWidth} height={g.artHeight} alt="" decoding="async" />
-            <span className="as-caption">
-              <b>{g.title}</b>
-              <small>{g.when}</small>
-              <em>{g.tagline}</em>
-            </span>
-          </a>
-        ))}
+        {GAMES.map((g) => {
+          const inside = (
+            <>
+              <img className="as-art" src={url(g.art)} width={g.artWidth} height={g.artHeight} alt="" decoding="async" />
+              <span className="as-caption">
+                <b>{g.title}</b>
+                <small>{g.comingSoon ? COMING_SOON : g.when}</small>
+                <em>{g.tagline}</em>
+              </span>
+            </>
+          );
+          const cls = `as-game as-game-${g.id}${g.comingSoon ? ' as-soon' : ''}`;
+          return g.comingSoon
+            ? <div key={g.id} className={cls} aria-label={`${g.title} — ${COMING_SOON}`}>{inside}</div>
+            : <a key={g.id} className={cls} href={url(g.path)}>{inside}</a>;
+        })}
       </nav>
     </main>
   );
@@ -82,8 +88,15 @@ function SlotView({ slot, active, onActive }: { slot: Slot; active: EraId | null
    */
   const partOfLink = era !== undefined && (slot.kind === 'title' || BIG_ANIMAL[era] === slot.id);
   const game = partOfLink ? GAMES.find((g) => g.id === era) : undefined;
-  const lit = partOfLink && era === active;
-  const cls = `as-slot as-slot-${slot.kind} as-src-${source.kind}${slot.fill ? ' as-slot-fill' : ''}${lit ? ' as-lit' : ''}`;
+  /**
+   * A game that is not out yet keeps its place on the plate and loses everything that makes it a
+   * way in: the title and the animal over it stop being a link, stop lighting, and go quiet in the
+   * paper, with the badge saying why. It is still drawn, because the plate is the trilogy and a
+   * gap where the third game goes says less than the third game does.
+   */
+  const soon = !!game?.comingSoon;
+  const lit = partOfLink && !soon && era === active;
+  const cls = `as-slot as-slot-${slot.kind} as-src-${source.kind}${slot.fill ? ' as-slot-fill' : ''}${lit ? ' as-lit' : ''}${soon ? ' as-soon' : ''}`;
 
   if (slot.id === 'trilogy') {
     // The trilogy title is the one slot whose stand-in is typeset rather than drawn.
@@ -98,6 +111,14 @@ function SlotView({ slot, active, onActive }: { slot: Slot; active: EraId | null
     : <img src={url(source.src)} alt={game && slot.kind === 'title' ? game.title : ''} width={slot.width} height={slot.height} decoding="async" />;
   if (game) {
     const isTitle = slot.kind === 'title';
+    const badge = isTitle && soon ? <span className="as-badge">{COMING_SOON}</span> : null;
+    if (soon) {
+      return (
+        <div className={cls} style={style} data-slot={slot.id} aria-hidden={isTitle ? undefined : true} aria-label={isTitle ? `${game.title} — ${COMING_SOON}` : undefined}>
+          {body}{badge}
+        </div>
+      );
+    }
     return (
       <a
         className={cls} style={style} data-slot={slot.id} href={url(game.path)}
@@ -144,9 +165,9 @@ function usePad(chosen: EraId | null, onMove: (era: EraId) => void, onOpen: () =
     const frame = () => {
       const { dir, confirm } = poll(held);
       const { chosen: at, onMove: move, onOpen: open } = state.current;
-      if (dir) move(step(at, dir, GAMES.map((g) => g.id)));
+      if (dir) move(step(at, dir, OPEN_GAMES.map((g) => g.id)));
       // Nothing chosen yet and a button pressed: take the first game rather than doing nothing.
-      else if (confirm) { if (at === null) move(GAMES[0].id); else open(); }
+      else if (confirm) { if (at === null) move(OPEN_GAMES[0].id); else open(); }
       raf = requestAnimationFrame(frame);
     };
     raf = requestAnimationFrame(frame);
@@ -157,7 +178,8 @@ function usePad(chosen: EraId | null, onMove: (era: EraId) => void, onOpen: () =
 function VersionTwo() {
   const [active, setActive] = useState<EraId | null>(null);
   const go = useCallback((era: EraId) => {
-    const game = GAMES.find((g) => g.id === era);
+    // Only a game that is open: nothing should be able to steer into one that is not a link.
+    const game = OPEN_GAMES.find((g) => g.id === era);
     if (game) location.href = url(game.path);
   }, []);
   usePad(active, setActive, () => active && go(active));
@@ -179,7 +201,7 @@ function VersionTwo() {
       if (e.metaKey || e.ctrlKey || e.altKey) return;
       const dir: Dir | null = e.key === 'ArrowRight' || e.key === 'ArrowDown' ? 'right'
         : e.key === 'ArrowLeft' || e.key === 'ArrowUp' ? 'left' : null;
-      if (dir) { e.preventDefault(); setActive((at) => step(at, dir, GAMES.map((g) => g.id))); return; }
+      if (dir) { e.preventDefault(); setActive((at) => step(at, dir, OPEN_GAMES.map((g) => g.id))); return; }
       if ((e.key === 'Enter' || e.key === ' ') && active && !(e.target as HTMLElement | null)?.closest?.('a')) { e.preventDefault(); go(active); }
     };
     addEventListener('keydown', key);
