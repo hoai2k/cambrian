@@ -12,7 +12,7 @@ import { DEVONIAN_RULES } from '../devonian/rules';
 import { ADULT_STAGE, devActor, PRIME_STAGE, RUNG_NAMES, STAGE_AT, STAGES, stageForScale, stageProgress, stageScale } from '../devonian/state';
 import { botNursery, canBreach as devCanBreach, sanctuary, spawnInCover, spawnProtect, spawnY, swim as devSwim, wanderY } from '../devonian/swim';
 import { camoDrain, installTriassicSpecials, stepAbility, useAbility, ySpecial } from './specials';
-import { stepShore } from './shore';
+import { shoreClip, stepShore } from './shore';
 import { AIR_LOW, AIR_MAX, triActor, triState } from './state';
 
 /**
@@ -479,6 +479,13 @@ export const TRIASSIC_RULES: EraRules = {
   updateModes: DEVONIAN_RULES.updateModes,
   continueMatch: DEVONIAN_RULES.continueMatch,
   scoreLine(g, a) { const d = devActor(g, a); return { rank: `${STAGES[d.stage]} · ${RUNG_NAMES_TRI[rungOf(a)]}`, progress: stageProgress(d) }; },
+
+  /**
+   * The shore animals' performance. They are pinned and brainless, so the shared state machine
+   * never leaves Idle for them and a telegraph the simulation is really running would be invisible.
+   * Presentation only, and only for `shore: true`: everything else in the era is untouched.
+   */
+  clip(a) { return creature(a.creature).shore ? shoreClip(a) : undefined; },
 
   hud(g, i): EraHud | undefined {
     const p = g.players[i]; if (!p) return undefined;
