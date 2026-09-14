@@ -37,6 +37,11 @@ const lengths = new Map();
 {
   const src = fs.readFileSync('src/content/triassic/creatures.ts', 'utf8');
   for (const m of src.matchAll(/id:\s*'([a-z]+)'[\s\S]{0,1200}?adultLength:\s*([\d.]+)/g)) lengths.set(m[1], Number(m[2]));
+  // A subject whose era is not settled has no roster entry to read a length from, on purpose:
+  // being on the roster is what puts an animal in the sea. It carries its own length instead, so a
+  // body under construction can still be previewed at the size it would be.
+  for (const s of JSON.parse(fs.readFileSync('src/content/triassic/expansion.json', 'utf8')).subjects)
+    if (!lengths.has(s.id)) lengths.set(s.id, s.adultLength);
 }
 
 /** Longest horizontal extent of the mesh, which is what the roster length is a length of. */

@@ -299,6 +299,26 @@ unless the user explicitly asks for a PR. Steps:
   `main` on its own rather than waiting on the three others being built beside it. Bodies are built
   several at a time in separate worktrees, and a batch that merges as a batch holds a finished animal
   hostage to whichever of its siblings turned out hardest.
+- **Tripo is fed one view of one animal, never a contact sheet.** The input is a single clean
+  three-quarter view on flat pale grey, with no text, labels, borders, cropping or extra animals —
+  the `inputPrompt` in each `docs/triassic/canonical/model-inputs/<id>/metadata.json` is the exact
+  wording, and the four-view `turnaround.png` beside it is a *human review* artefact that is
+  deliberately never submitted. This is not a preference: a delivered six-panel modelling sheet for
+  Archelon, fed whole, came back as **six turtles in one GLB**, each with a sixth of the triangle
+  budget, because the generator read the panels as a scene. The same sheet's quarter-perspective
+  panel, cropped out on its own and padded back onto the sheet's grey so nothing is cut, gave one
+  turtle at 19,058 triangles. Reference art that arrives as a sheet is therefore *cropped to one
+  panel* before it is submitted, and the panel used is preserved as `tripo-raw/input.png`.
+- A subject whose **era is not settled** is not on the roster, and that is load-bearing rather than
+  bookkeeping: being in `TRIASSIC_CREATURES` is what puts an animal in the sea, in
+  `population.ts`'s tables and on the pick screen, so adding a Cretaceous animal there would answer
+  the open question in `docs/triassic/05-mesozoic-expansion.md` by accident. `src/content/triassic/expansion.json`
+  is the register for them — Archelon and Mosasaurus so far — and it reaches exactly two places:
+  `preview-bodies.mjs` reads a length from it (an off-roster subject has no `adultLength` to scale a
+  preview by, and without one the publisher refuses and blocks every other preview with it), and the
+  viewer catalogue lists them in the Triassic collection marked `offRoster`. Such a body borrows
+  nothing, because it is in no sea, so the *Model* control must not offer it a "borrowed body in
+  play" stage and the downloads line must not call a raw generation the full model.
 - Devonian specimens land in batches (`tools/devonian/shipped.json`). When one lands: run
   `node tools/update-asset-sizes.mjs` (refreshes `src/content/devonian/asset-sizes.json`), remove its
   entry from `DEVONIAN_STAND_INS` in `src/content/devonian/index.ts`, and run `npm run devonian`.
