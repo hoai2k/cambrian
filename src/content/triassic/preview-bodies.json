@@ -2,8 +2,8 @@
   {
     "id": "askeptosaurus",
     "model": "assets/triassic/creatures/askeptosaurus.preview.glb",
-    "bytes": 1516160,
-    "sha256": "92eccf60942151a8914a90d9133a64fb54359b9b5d7a9914ad6e12d3a49e9035",
+    "bytes": 1489188,
+    "sha256": "951c6c7d87fd02a4d213954c0c6627fae1743ab74e533ba0c1a0d9a08dcfb5a1",
     "yaw": 0,
     "scale": 6.62,
     "lengthUnits": 6.62
@@ -164,8 +164,8 @@
   {
     "id": "rhaeticosaurus",
     "model": "assets/triassic/creatures/rhaeticosaurus.preview.glb",
-    "bytes": 1335868,
-    "sha256": "da01dfc20c839ff87ec39ffb9159af890588cc2a7c7d3db022dd5b1c5604d830",
+    "bytes": 1320236,
+    "sha256": "6188fe3ef85752c5c9fd14839361c0167faaf3ad23f1529afa938a4daa5eda58",
     "yaw": 180,
     "scale": 6.2892,
     "lengthUnits": 7.32

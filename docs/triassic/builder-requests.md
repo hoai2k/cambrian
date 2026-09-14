@@ -135,3 +135,12 @@ Its frame came from the authored yaw, which for this animal is one of the wrong 
 the body instead. That is the same shape either way — the two differ by a rigid translation, and
 everything downstream measures a bounding box — but the animal now sits off-centre in its own root
 frame. Correcting the yaw to 0 would fix both that and the preview's facing.
+
+The spare-tail cut landed on this body in parallel, so the bake's vertex-count guard refused the
+stretch on the cut mesh, which is what that guard is for. It was legitimate to go on here and the
+recorded file says why: the cut is a **pure deletion** — all 368 removed vertices are gone, every
+surviving one is at exactly the position it held, and the bounding box is unchanged — so the cut
+planes sit where they were and the same warp lands on the same surface. The stretch was
+re-expressed against the cut mesh (same cuts, same direction, same factor, re-measured vertex
+count) and re-applied. Any edit that *moved* geometry would not have qualified, and the answer
+there is to re-cut in the viewer.
