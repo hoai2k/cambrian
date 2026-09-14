@@ -134,10 +134,15 @@ export function Viewer() {
   // the wrong mesh.
   const ready = !loading && !error && loadedId === id;
   const canSculpt = !isPropCollection(collection) && !showPuppet && !showGenerated && ready;
-  // Stretching is the other half of that split, and the opposite gate: it lengthens a run of a raw
-  // generation before anyone cleans or rigs it, so it is offered only on the generated body and
-  // never on a built one.
-  const canStretch = showGenerated && ready;
+  /**
+   * Stretching is offered on any of an animal's own bodies, not only the raw generation.
+   *
+   * On a generation it is an edit, baked into the GLB before anything is built from it. On a built
+   * body it is a *measurement* — the editor holds the rig at rest, where the warp is exact, so a
+   * length can be chosen by eye on the real animal and handed to the builder. Both are worth
+   * having and the export says which it is. Not on the twin, which is the comparison body, and not
+   * on a body borrowed in play, which belongs to another animal.
+   */
   /**
    * Whether `model` is this animal's own body or one it borrows in play.
    *
@@ -147,9 +152,10 @@ export function Viewer() {
    * sculpt is exactly right.
    */
   const ownBody = !def.generated || !!def.inReview;
+  const canStretch = !isPropCollection(collection) && !showPuppet && ready && (showGenerated || ownBody);
   useEffect(() => {
     if (mode === 'sculpt' && (isPropCollection(collection) || showPuppet || showGenerated)) setMode('view');
-    if (mode === 'stretch' && !showGenerated) setMode('view');
+    if (mode === 'stretch' && (isPropCollection(collection) || showPuppet)) setMode('view');
   }, [mode, collection, showPuppet, showGenerated]);
 
   // The show effect must not re-run when a pick changes, so it reads the picks through a ref.
@@ -183,6 +189,7 @@ export function Viewer() {
         // A sculpt made this session follows the creature back onto the stage, full or reduced.
         const sculpt = getSculpt(id);
         if (sculpt && !isIdentity(sculpt)) sceneRef.current?.applySculpt(warp(sculpt), true);
+        // Only a raw generation keeps its stretch on the stage; a rigged one would flail once a clip played.
         const stretch = showGenerated ? getStretch(id) : undefined;
         if (stretch && stretch.model === modelPath && !stretchIsIdentity(stretch)) sceneRef.current?.applySculpt(stretchWarp(stretch), true);
         setClips(names); setSlots(sceneRef.current?.activeSlots() ?? []); setLoading(false); setLoadedId(id);
@@ -321,7 +328,10 @@ export function Viewer() {
           {!isPropCollection(collection) && ownBody && <button className="ghost" onClick={() => setMode('sculpt')} disabled={!canSculpt} title="Reshape the body on side and top drawings and export the change as a sculpt file">
             Edit sculpt{(() => { const d = getSculpt(id); return d && !isIdentity(d) ? ' (edited)' : ''; })()}
           </button>}
-          {def.generated && <button className="ghost" onClick={() => { setBody('generated'); setMode('stretch'); }} disabled={!ready} title="Lengthen a run of this raw generation — a neck, a tail — between two cuts, and export the change to be baked into the GLB">
+          {!isPropCollection(collection) && <button className="ghost" onClick={() => { if (def.generated && !def.inReview) setBody('generated'); setMode('stretch'); }} disabled={!canStretch && !(def.generated && ready)}
+            title={def.generated && !def.inReview
+              ? 'Lengthen a run of this raw generation — a neck, a tail — between two cuts, and export the change to be baked into the GLB'
+              : 'Lengthen a run of this body between two cuts and measure it. A built body is held at rest and cannot be baked: the numbers go to its builder.'}>
             Stretch{(() => { const d = getStretch(id); return d && !stretchIsIdentity(d) ? ' (edited)' : ''; })()}
           </button>}
         </div>

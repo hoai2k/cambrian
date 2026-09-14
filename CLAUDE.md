@@ -380,11 +380,20 @@ unless the user explicitly asks for a PR. Steps:
   middle of the neck and pinch it at both ends. Both cuts are square to that one direction rather
   than each carrying their own: what is wanted is to *aim* the lengthening, and sharing it makes
   the map an exact uniform scale. The seam is real and is why the cuts are placed by hand — put
-  them where the body already changes. `npm run stretch` and `node tools/stretch-browser.mjs`
-  check it; `npm run triassic:stretch -- <file> --write` bakes it into
-  `tools/triassic/creatures/<id>/<id>.preview.glb` (never into `tripo-raw/`), importing the
-  viewer's own `warp()` so the file is what was previewed, and reading the result back to prove it.
-  `docs/viewer-stretch.md` is the whole of it.
+  them where the body already changes. It is offered on a *built* body too, and there it means
+  something else: the editor holds the rig at rest and the export is a measurement (`appliesTo`),
+  because every clip these files carry re-specifies each joint's translation on every frame — a
+  warped bind pose would show at rest and then flail — so the numbers go to the animal's builder,
+  where the rig and the clips are generated downstream of the mesh and follow it by themselves.
+  Which way a body lies is never taken from its bounding box if anything better exists: the mouth
+  socket, then the generation's authored `previewYaw`, then the box, and the panel says which and
+  lets a human override it — because Rhaeticosaurus' flippers span further than it is long, so its
+  box says the animal runs across itself. `npm run stretch` and
+  `node tools/stretch-browser.mjs` check it; `npm run triassic:stretch -- <file> --write` bakes a
+  *generation's* stretch into `tools/triassic/creatures/<id>/<id>.preview.glb` (never into
+  `tripo-raw/`, and it refuses a rigged body by name), importing the viewer's own `warp()` so the
+  file is what was previewed and reading the result back to prove it. `docs/viewer-stretch.md` is
+  the whole of it; Blender work it implies goes in `docs/triassic/builder-requests.md`.
 - `?debug=local` on any game page (`/cambrian/?debug=local`, `/devonian/?debug=local`) opens an editor for that
   era's saved state — `src/app/DebugLocal.tsx`, gated by `src/shared/debug.ts`, mounted by
   `src/app/Root.tsx` so both entry points get it without knowing about it. A new thing kept in

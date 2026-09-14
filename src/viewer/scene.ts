@@ -59,6 +59,8 @@ export interface SculptTarget {
   meshes: SculptMesh[];
   /** The mouth socket in the root frame, when the model has one. */
   mouth?: [number, number, number];
+  /** Whether anything on stage is skinned — a built body is, a raw generation is not. */
+  skinned: boolean;
 }
 export type WarpFn = (x: number, y: number, z: number, out: [number, number, number], eye?: boolean) => void;
 
@@ -453,7 +455,9 @@ export function createViewerScene(canvas: HTMLCanvasElement): ViewerScene {
       const p = socket.getWorldPosition(new THREE.Vector3()).applyMatrix4(rootInverse);
       mouth = [p.x, p.y, p.z];
     }
-    return { meshes, mouth };
+    let skinned = false;
+    root.traverse((o) => { if (o instanceof THREE.SkinnedMesh) skinned = true; });
+    return { meshes, mouth, skinned };
   }
 
   function applySculpt(fn: WarpFn | null, finalize: boolean) {
@@ -490,7 +494,22 @@ export function createViewerScene(canvas: HTMLCanvasElement): ViewerScene {
   }
 
   /** A root-frame point as the scene shows it: the model is centred on FOCUS and scaled to its display length. */
-  const rootToWorld = (x: number, y: number, z: number) => new THREE.Vector3(x, y, z).sub(modelCenter).multiplyScalar(modelUnit).add(FOCUS);
+/**
+ * A root-frame point as the scene shows it.
+ *
+ * Through the model's own world matrix rather than by hand, because a raw generated body is
+ * *turned* before it is framed (`previewYaw`) and the editors measure it in the frame the file is
+ * in, which is the one before that turn. Centring and scaling it by hand was right while those two
+ * frames were the same and silently wrong the moment one of them was rotated: the drawings would
+ * show a body lying one way and place the cuts as though it lay another.
+ */
+  const rootToWorld = (x: number, y: number, z: number) => {
+    const p = new THREE.Vector3(x, y, z);
+    if (model) { model.updateMatrixWorld(); return p.applyMatrix4(model.matrixWorld); }
+    return p.sub(modelCenter).multiplyScalar(modelUnit).add(FOCUS);
+  };
+  /** The model's own turn, for the orthographic cameras: they frame root axes, not world ones. */
+  const rootTurn = () => (model ? model.getWorldQuaternion(new THREE.Quaternion()) : new THREE.Quaternion());
 
   function placeOrtho(view: 'side' | 'top') {
     const v = orthoViews[view];
@@ -506,16 +525,16 @@ export function createViewerScene(canvas: HTMLCanvasElement): ViewerScene {
     if (view === 'side') {
       c.y = v.centre[1];
       const target = rootToWorld(c.x, c.y, c.z);
-      const away = axisZ ? new THREE.Vector3(-1, 0, 0) : new THREE.Vector3(0, 0, 1);
-      cam.up.set(0, 1, 0);
+      const away = (axisZ ? new THREE.Vector3(-1, 0, 0) : new THREE.Vector3(0, 0, 1)).applyQuaternion(rootTurn());
+      cam.up.set(0, 1, 0).applyQuaternion(rootTurn());
       cam.position.copy(target).addScaledVector(away, 500);
       cam.lookAt(target);
     } else {
       c.y = modelCenter.y;
       if (axisZ) c.x = v.centre[1]; else c.z = -v.centre[1];
       const target = rootToWorld(c.x, c.y, c.z);
-      cam.up.set(axisZ ? 1 : 0, 0, axisZ ? 0 : -1);
-      cam.position.copy(target).add(new THREE.Vector3(0, 500, 0));
+      cam.up.set(axisZ ? 1 : 0, 0, axisZ ? 0 : -1).applyQuaternion(rootTurn());
+      cam.position.copy(target).add(new THREE.Vector3(0, 500, 0).applyQuaternion(rootTurn()));
       cam.lookAt(target);
     }
   }
