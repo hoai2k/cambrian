@@ -440,6 +440,39 @@ for (const [id, kind] of [['mixosaurus', 'a live-bearer'], ['placodus', 'an egg-
   }
 }
 
+// ---- Coelophysis reaches too, and names the same chain ----
+{
+  // Tanystropheus is not the only animal on a bank that strikes: `reachOf` gives Coelophysis
+  // 0.6 of its length (the design's S04 — it "snatches a hatchling or anything small in the last
+  // stretch of shallows"), and its body carries the same four clips. Macrocnemus is the one that
+  // genuinely has no reach, and the check below says so rather than leaving it implied.
+  const g = new Game('reef', [{ creature: 'keichousaurus', device: 'keyboard', ready: true }]);
+  g.skipHatch();
+  run(g, 0.5);
+  const posts = shorePosts(g, { x: 0, y: 0, z: 0 }, 6000);
+  const kinds = new Set(posts.map((p) => p.kind));
+  ok(kinds.has('coelophysis'), `a Coelophysis stands on a bank somewhere (${[...kinds].join(', ')})`);
+  const theropod = posts.find((p) => p.kind === 'coelophysis');
+  if (theropod) {
+    const a = g.byId(theropod.actor)!;
+    const named = new Map<string, string>();
+    for (const phase of ['lower', 'strike', 'rest'] as const) {
+      theropod.phase = phase; theropod.t = 0;
+      const c = RULES!.clip?.(a);
+      if (c) named.set(phase, c.name);
+    }
+    ok(named.get('lower') === 'Lower', `its telegraph names Lower (${named.get('lower')})`);
+    ok((named.get('strike') ?? '').startsWith('Snap'), `its strike names a snap (${named.get('strike')})`);
+    ok(named.get('rest') === 'Retract', `its recovery names Retract (${named.get('rest')})`);
+  }
+  const runner = posts.find((p) => p.kind === 'macrocnemus');
+  if (runner) {
+    const a = g.byId(runner.actor)!;
+    ok(runner.phase === 'watch', 'Macrocnemus never leaves the watch: the design makes it ambient only');
+    ok(RULES!.clip?.(a) === undefined, 'so nothing names a clip for it and the shared state machine keeps it');
+  }
+}
+
 // ---- the snap goes toward what it is striking, not away from it ----
 {
   // `src/render/creature.ts`: increasing yaw turns a creature to its left, so its right is
