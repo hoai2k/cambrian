@@ -285,6 +285,20 @@ unless the user explicitly asks for a PR. Steps:
   `node tools/update-asset-sizes.mjs`, and the stand-in and preview badge clear themselves. Its
   movement fields are generated like the Devonian's: `docs/research/triassic-swimming.json` →
   `npm run triassic:stats`; never hand-edit them.
+- **A playable Triassic animal swims; it does not walk.** Several generations arrive posed for land —
+  the crocodilians most obviously, and the sprawling temnospondyl — because that is the pose that
+  shows the animal best in a still. It is not the pose the game spends its time in: no playable
+  Triassic animal ever leaves the water, so `Swim`, `Sprint`, `TurnLeft`/`TurnRight`, `Dive` and
+  `Rise` are what carry the body, and a walk or a crawl is an *extra* clip beside them rather than
+  the locomotion the rest is built on. Placodus is the pattern: its `validation.json` records
+  `locomotion: 'Swim'` and its `Crawl` sits alongside the swim set. The exception is the animals that
+  are not playable at all — the shore animals (`shore: true`), which stand on the beach and strike
+  into the water, and for whom the land motion *is* the primary.
+- A creature is merged the day it is finished, not the day its batch is. The "finish on `main`"
+  policy at the top of this file is per *animal*: a body that is built, packaged and checked goes to
+  `main` on its own rather than waiting on the three others being built beside it. Bodies are built
+  several at a time in separate worktrees, and a batch that merges as a batch holds a finished animal
+  hostage to whichever of its siblings turned out hardest.
 - Devonian specimens land in batches (`tools/devonian/shipped.json`). When one lands: run
   `node tools/update-asset-sizes.mjs` (refreshes `src/content/devonian/asset-sizes.json`), remove its
   entry from `DEVONIAN_STAND_INS` in `src/content/devonian/index.ts`, and run `npm run devonian`.
