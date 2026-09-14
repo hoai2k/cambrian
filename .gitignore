@@ -7,3 +7,11 @@ dist
 /shot-*.png
 /viewer-*.png
 __pycache__/
+
+# Agent worktrees: an isolated agent gets a full checkout of this repository under here, so
+# committing it would commit a copy of the tree into itself.
+/.claude/worktrees/
+# The creature builders' scratch: editable Blender projects, decoded review GLBs, logs and
+# individual frames (see the Nothosaurus and Shonisaurus pipeline READMEs, which point at it).
+# Deliverables land in public/assets/ and tools/triassic/creatures/<id>/; this is the workbench.
+/local/

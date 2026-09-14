@@ -8,6 +8,7 @@
  * to confirm the specimen is kept by the URL while the sculpt is not.
  */
 import { chromium } from 'playwright-core';
+import { silenceCounter } from './qa-counter.mjs';
 import fs from 'node:fs';
 import path from 'node:path';
 import assert from 'node:assert/strict';
@@ -18,6 +19,7 @@ fs.mkdirSync(out, { recursive: true });
 const key = 'devonian:creature:cheirolepis';
 const browser = await chromium.launch({ executablePath: process.env.CHROME_PATH || '/opt/pw-browsers/chromium', args: ['--no-sandbox', '--use-gl=angle', '--use-angle=swiftshader', '--enable-unsafe-swiftshader', '--ignore-gpu-blocklist'] });
 const page = await browser.newPage({ viewport: { width: 1400, height: 900 } });
+await silenceCounter(page);
 const errors = [];
 page.on('pageerror', (e) => errors.push(e.message)); page.on('console', (m) => { if (m.type() === 'error') errors.push(m.text()); });
 await page.addInitScript(() => localStorage.setItem('cambrian-settings', JSON.stringify({ quality: 'low', muted: true, music: false })));

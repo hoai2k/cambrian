@@ -1,8 +1,9 @@
 import assert from 'node:assert/strict';
 import { chromium } from 'playwright-core';
+import { silenceCounter } from '../qa-counter.mjs';
 const browser=await chromium.launch({executablePath:'/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',headless:true});
 const base=process.env.ART_CHECK_URL || 'http://127.0.0.1:5176';
-const page=await browser.newPage({viewport:{width:1440,height:1000}});const errors=[];page.on('pageerror',e=>errors.push(e.stack));
+const page=await browser.newPage({viewport:{width:1440,height:1000}});await silenceCounter(page);const errors=[];page.on('pageerror',e=>errors.push(e.stack));
 await page.goto(base+'/');await page.locator('.title').waitFor({timeout:60000});await page.locator('.title').click();await page.locator('.select').waitFor();
 await page.evaluate(async()=>await Promise.all([...document.querySelectorAll('.select img')].map(i=>i.decode())));
 assert.equal(await page.locator('.roster-grid img[src*="/schemes/"]').count(),12);
@@ -10,7 +11,7 @@ assert.equal(await page.locator('.roster-grid img[src*="/defaults/"]').count(),9
 assert.match(await page.locator('.hero img').getAttribute('src'),/schemes\/anomalocaris/);
 await page.screenshot({path:'/tmp/cambrian-palette-select.png',animations:'disabled'});
 // Actual failed fetches for both thumbnail and hero must recover to default, without loops.
-const broken=await browser.newPage({viewport:{width:1440,height:1000}});let rejected=0;
+const broken=await browser.newPage({viewport:{width:1440,height:1000}});await silenceCounter(broken);let rejected=0;
 await broken.route('**/assets/creatures/schemes/anomalocaris.*.png',route=>{rejected++;return route.abort();});
 await broken.goto(base+'/');await broken.locator('.title').waitFor({timeout:60000});await broken.locator('.title').click();
 await broken.waitForFunction(()=>document.querySelector('.hero img')?.getAttribute('src')?.includes('/defaults/anomalocaris.select.png'));

@@ -36,17 +36,23 @@ const EXUVIA_COVER = 8;
  *
  * Nothing on this roster is lung-only (see `breathing` in src/content/creature-types.ts): the three
  * animals with lungs kept their gills, so none of them can drown and none of them carries a meter
- * that runs out. What lungs buy them is a *place to go*. Under water they recover stamina at a
- * quarter of everyone else's rate, which makes them poor at long chases and grinding fights; break
- * the surface and the whole bar comes back at once, along with a free sprint. Their game is the
- * round trip.
+ * that runs out. What lungs buy them is a *place to go*. Under water they recover stamina at
+ * `WATER_REGEN` of everyone else's rate, which makes them worse at long chases and grinding
+ * fights without making them unable to fight at all; break the surface and the whole bar comes
+ * back at once, along with a free sprint. Their game is the round trip.
  *
  * Everything about them therefore points up. They climb half again as fast as anything else, a
  * sprint carries into the climb, and the climb is free: driving upward costs no stamina at all, and
  * on an empty bar a sprint or a dash still fires with only its upward part — there is always a way
  * back to the surface, however spent you are. Nothing here can be taxed for going to breathe.
  */
-const WATER_REGEN = 0.25, AIR_CLIMB = 1.5;
+/**
+ * A lung under water is a worse gill, not a shut one. At a quarter rate a bimodal animal that chose
+ * to fight at depth had effectively no bar at all, so the round trip stopped being a choice and
+ * became the only way to play one; 0.7 leaves the surface clearly better without making everywhere
+ * else unplayable.
+ */
+const WATER_REGEN = 0.7, AIR_CLIMB = 1.5;
 /** The stamina left, under water, at which the body starts to sound winded — a quarter bar. */
 const WINDED_BELOW = 0.25;
 
@@ -127,7 +133,10 @@ function updateBreath(g: Game, a: Actor, d: DevActor, dt: number) {
   if (creature(a.creature).breathing !== 'bimodal') return;
   const up = a.pos.y > SURFACE_Y - 3 - lengthOf(a) * 0.3 || d.beached;
   if (up && !d.atSurface && a.controller === 'player') {
-    g.events.push({ kind: 'gulp', pos: { ...a.pos }, actor: a.id, player: a.player });
+    // `strength` is how much water the breath breaks, for the surface the renderer draws on it.
+    // A beached animal is already in the air — the sea is somewhere below it — so it breaks none,
+    // and a splash drawn at the waterline above it would hang over the sand.
+    g.events.push({ kind: 'gulp', pos: { ...a.pos }, actor: a.id, player: a.player, strength: d.beached ? 0 : 1 });
     a.burstT = Math.max(a.burstT, 1.5);
   }
   if (up) a.stamina = a.staminaMax;

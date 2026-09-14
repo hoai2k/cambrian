@@ -1,0 +1,117 @@
+{
+  "format": "cambrian-stretch",
+  "version": 1,
+  "generated": "2026-09-14T01:15:06.144Z",
+  "creature": {
+    "key": "triassic:rhaeticosaurus",
+    "id": "rhaeticosaurus",
+    "collection": "triassic",
+    "model": "assets/triassic/creatures/rhaeticosaurus.preview.glb",
+    "vertices": 11078,
+    "rigged": false
+  },
+  "appliesTo": "generated-glb",
+  "frame": {
+    "axis": "z",
+    "forward": -1,
+    "up": "y",
+    "source": "yaw",
+    "note": "Model root frame, unscaled. The body runs along z; the head is at the low end. Both cuts are square to `direction`, which is the unit vector below; tiltSide is the angle its line makes in the side view and tiltTop the angle in the top view, in radians from straight down the body."
+  },
+  "bounds": {
+    "length": 0.9976994395256042,
+    "height": 0.3713117837905884,
+    "width": 1,
+    "axisMin": -0.4988497197628021,
+    "axisMax": 0.4988497197628021,
+    "lateralMid": 0,
+    "upMid": 0
+  },
+  "planes": {
+    "from": {
+      "at": 0.35293331406915807,
+      "headFraction": 0.8537,
+      "centre": [
+        0,
+        0,
+        0.352933
+      ]
+    },
+    "to": {
+      "at": 0.22061641447683572,
+      "headFraction": 0.7211,
+      "centre": [
+        0,
+        0,
+        0.220616
+      ]
+    }
+  },
+  "direction": {
+    "vector": [
+      -0.000947,
+      -0.560027,
+      -0.828474
+    ],
+    "tiltSide": -0.5944181527492133,
+    "tiltTop": -0.001143621165719916,
+    "tiltSideDegrees": -34.058,
+    "tiltTopDegrees": -0.066
+  },
+  "region": {
+    "length": 0.109621,
+    "stretched": 0.310228,
+    "factor": 2.83,
+    "shift": 0.200607,
+    "percentOfBody": 10.99
+  },
+  "changed": true,
+  "note": "Vertices on the body side of `from` are unchanged; vertices on the head side of `to` move by direction.vector × region.shift; between the cuts a vertex moves by that times its own fraction through the region, measured along the direction. Normals follow the inverse transpose of that map. See docs/viewer-stretch.md. `npm run triassic:stretch -- <this file> --write` applies it.",
+  "stretch": {
+    "version": 1,
+    "key": "triassic:rhaeticosaurus",
+    "id": "rhaeticosaurus",
+    "collection": "triassic",
+    "model": "assets/triassic/creatures/rhaeticosaurus.preview.glb",
+    "frame": {
+      "axis": "z",
+      "forward": -1,
+      "up": "y"
+    },
+    "frameSource": "yaw",
+    "vertices": 11078,
+    "rigged": false,
+    "box": {
+      "lo": [
+        -0.5,
+        -0.1856558918952942,
+        -0.4988497197628021
+      ],
+      "hi": [
+        0.5,
+        0.1856558918952942,
+        0.4988497197628021
+      ]
+    },
+    "bounds": {
+      "length": 0.9976994395256042,
+      "height": 0.3713117837905884,
+      "width": 1,
+      "axisMin": -0.4988497197628021,
+      "axisMax": 0.4988497197628021,
+      "lateralMid": 0,
+      "upMid": 0
+    },
+    "from": 0.35293331406915807,
+    "to": 0.22061641447683572,
+    "tiltSide": -0.5944181527492133,
+    "tiltTop": -0.001143621165719916,
+    "factor": 2.83
+  },
+  "reexported": {
+    "from": "rhaeticosaurus.stretch.json",
+    "why": "The spare tails were re-done as a collapse rather than a cut (docs/triassic/preview-mesh-defects.md): nothing is deleted, so the vertices the cut had removed are back and the count returns to what the stretch was first exported against. The collapse moved vertices only at the tail, between glTF z -0.425 and -0.267; this stretch is at the head end, cutting at +0.353 and +0.221. Nothing the warp reads is affected -- it uses the two cut positions, the direction, the factor, and bounds.upMid and bounds.lateralMid, which are both 0 and stay 0 -- so the cuts, the direction and the factor are still the ones chosen by eye. bounds.length is quoted for display and the tolerance only.",
+    "verticesWere": 10710,
+    "verticesNow": 11078
+  }
+}

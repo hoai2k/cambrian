@@ -1170,7 +1170,20 @@ export class Engine {
           if (e.player != null && e.player >= 0) { const d = padOf(e.player); if (typeof d === 'number') rumble(d, Math.min(1, 0.5 * s), 0.6, 220); this.shake(e.player, 0.6 * s); }
           break;
         }
-        case 'gulp': { this.bubbles.emit(e.pos, 24, 1.0, 3, 0.09, 1.4); personal('gulp'); break; }
+        // The blow. The body itself never leaves the water for this — the swim ceiling holds it a
+        // little under the surface — so with only bubbles under the camera a breath looked exactly
+        // like not taking one, and a player who had surfaced could not tell that they had. The
+        // surface says it instead: a head-sized crown of spray and a ring spreading off it, at
+        // SURFACE_Y above the body rather than at the body, which is where the water is broken.
+        case 'gulp': {
+          const b = game.byId(e.actor), bl = b ? lengthOf(b) : 1, broken = e.strength ?? 1;
+          // `strength` is how much water this breath breaks: a whole body, a neck sent up alone, or
+          // nothing at all when the breath was taken on the sand and the sea is below the animal.
+          if (broken > 0) this.splash.burst({ x: e.pos.x, y: SURFACE_Y, z: e.pos.z }, 0.3 + 0.5 * broken, 'out', bl * 0.5 * broken);
+          this.bubbles.emit(e.pos, 24, 1.0, 3, 0.09, 1.4);
+          personal('gulp');
+          break;
+        }
         // The winded heartbeat, and a thin trickle of bubbles escaping with it: a body that
         // recovers badly under water, running low on stamina and a long way from the surface that
         // would hand it all back. `strength` is how spent it is.

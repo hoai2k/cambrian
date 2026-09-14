@@ -82,9 +82,11 @@ Two risks require explicit handling:
   requires an articulated jaw with palate, walls, floor and throat, eyes at least half inside the
   head, and fins seated inside the trunk. Every Tripo creature needs a Blender surgery pass (cut the
   jaw, build the mouth, set the eyes, free the flippers) *before* skinning, and the step list budgets
-  it. For the long-necked animals, Tanystropheus and Dinocephalosaurus, the neck is better built
-  procedurally as a lofted tube on the skeleton and stitched to the Tripo head and trunk than taken
-  from Tripo, whose necks come out as lumpy cylinders with no vertebral rhythm.
+  it. For the long-necked animals, Tanystropheus and Dinocephalosaurus, the final neck topology is
+  better rebuilt procedurally as a lofted tube on the skeleton than taken directly from Tripo,
+  whose necks come out as lumpy cylinders with no vertebral rhythm. Their modeling inputs still
+  show the complete approved neck: it is the mandatory length and silhouette reference for that
+  rebuild, never permission to generate a short-necked body.
 - **Preserve the source texture before simplifying materials.** Controlled Nothosaurus and
   Shonisaurus comparisons showed that baking Tripo albedo into sparse `COLOR_0`, especially across
   UV seams, discarded markings and helped produce the crumpled light/dark appearance when combined

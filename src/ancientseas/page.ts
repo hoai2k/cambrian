@@ -46,6 +46,12 @@ export interface GameLink {
   /** Period, as the game's own copy puts it (`copy.taglineEm`); the test keeps these in step. */
   readonly when: string;
   readonly tagline: string;
+  /**
+   * A game that is on the plate but not yet a way in: drawn, named, badged, and not a link. Its
+   * page is still there and still works — this is what the trilogy page offers a visitor, not
+   * whether the game runs.
+   */
+  readonly comingSoon?: boolean;
 }
 
 export const GAMES: readonly GameLink[] = [
@@ -66,8 +72,14 @@ export const GAMES: readonly GameLink[] = [
     art: 'assets/triassic/brand/title.webp', artWidth: 1536, artHeight: 1024,
     wordmark: 'assets/triassic/brand/logo-header.webp',
     when: '240 million years ago', tagline: 'Breathe. Dive. Hunt. Surface.',
+    comingSoon: true,
   },
 ];
+
+/** The games a visitor can actually go to: what the pad walks and the keyboard steps through. */
+export const OPEN_GAMES: readonly GameLink[] = GAMES.filter((g) => !g.comingSoon);
+/** What a game not yet open says for itself, in place of being a link. */
+export const COMING_SOON = 'Coming soon';
 
 /** Where every piece the trilogy page asks for lives once delivered. */
 export const ART_DIR = 'assets/ancientseas/';

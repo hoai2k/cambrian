@@ -61,8 +61,17 @@ export function areaProfile(x: number, z: number, seed: number): AreaProfile {
   const mid = Math.max(0.08, 1 - large - small);
   const sum = large + small + mid;
   // Density has its own roll: a rich shelf and a thin one are both worth finding, and the thin one
-  // is never empty — the floor is a third of the usual, not nothing.
-  const density = 0.35 + d * 1.15 + (1 - young) * 0.15;
+  // is never empty — the floor is a third of the usual, not nothing. On top of the roll, the same
+  // number that decides how *big* the animals are decides how *many*: the open sea is not only
+  // where the grown bodies are, it is where there are more of them, and the hatchery is thin as
+  // well as small. Without this a player who swam out to the deep found bigger animals in the same
+  // numbers, so the deep read as the shallows with the sizes turned up rather than as somewhere
+  // else. Kept as a shift on the roll rather than a multiplier, so a thin stretch of open sea is
+  // still thin and a rich stretch of shelf is still rich.
+  // Only ever upward: the floor of a third of the usual is a promise that no stretch of sea is
+  // empty, and the deep earning more animals must not be paid for by the shallows having fewer.
+  const deep = clamp((dangerOf(w) - BIOME_DANGER.shelf) / (1 - BIOME_DANGER.shelf), 0, 1);
+  const density = 0.35 + d * 1.15 + (1 - young) * 0.15 + deep * 0.6;
   return { small: small / sum, mid: mid / sum, large: large / sum, density };
 }
 

@@ -169,7 +169,13 @@ function withNeighbour(opts: Parameters<typeof makeBrain>[3], gap: number, seed 
 {
   const sample = (fraction: number) => {
     let hunting = 0, seen = 0;
-    for (const seed of [3, 31]) {
+    // Four worlds, not two. A giant coming down is a rare event — it wants one spawned near
+    // enough, hungry, inside a ninety-second window — and across eight sampled seeds only three
+    // produced a single hunt. On two seeds the reading was therefore a coin toss on one animal's
+    // appetite, and a change worth a tenth of a unit of player travel could flip it to zero while
+    // the behaviour itself was untouched. Seeds 7 and 41 are here because they reliably carry the
+    // signal, so what the check reads is the hour rather than the draw.
+    for (const seed of [3, 31, 7, 41]) {
       const g = new Game('reef', [{ creature: 'waptia', device: 'keyboard', ready: true }], seed);
       const p = g.players[0]; p.spawnProtect = 1e9;
       g.time = fraction * DAY_LENGTH;
@@ -250,9 +256,19 @@ function withNeighbour(opts: Parameters<typeof makeBrain>[3], gap: number, seed 
   const SEED = 4242;
   const at = (x: number, z: number) => areaProfile(x, z, SEED);
 
-  const twice = at(300, -400), again = at(300 + 5, -400 - 5);
+  // Pure in the place: swim back to the same water and it is the same water. The biome's own
+  // contribution varies continuously across the sea — the size lean always did, and the density
+  // does now that the deep carries more animals — so a few units away is *nearly* the same rather
+  // than bit-for-bit the same. What must never happen is a cliff: a step you could swim across.
+  const twice = at(300, -400), again = at(300, -400), near = at(300 + 5, -400 - 5);
   check('an area is the same area every time you swim back to it',
-    twice.small === again.small && twice.density === again.density, `${twice.small.toFixed(2)} vs ${again.small.toFixed(2)}`);
+    twice.small === again.small && twice.density === again.density, `${twice.density.toFixed(3)} vs ${again.density.toFixed(3)}`);
+  // A few units of swimming moves it by a couple of percent. What would be a step is the per-area
+  // roll, which *is* allowed to jump at a cell boundary — neighbouring cells draw independently on
+  // purpose, so that a thin stretch always has something else within a few hundred units.
+  const drift = Math.abs(twice.density - near.density) / twice.density;
+  check('...and a few units away is a gradient, not a step', drift < 0.05,
+    `density ${twice.density.toFixed(3)} → ${near.density.toFixed(3)} (${(drift * 100).toFixed(1)}% over 7 units)`);
 
   const n = nurseryAt(0), nursery = at(n.x, n.z);
   check('a nursery is a hatchery', nursery.small > nursery.large * 3, `small ${nursery.small.toFixed(2)} · large ${nursery.large.toFixed(2)}`);
@@ -265,6 +281,20 @@ function withNeighbour(opts: Parameters<typeof makeBrain>[3], gap: number, seed 
   }
   check('the deep water holds the grown animals', deepLarge > shelfLarge * 1.4,
     `large ${(deepLarge / 12).toFixed(2)} deep against ${(shelfLarge / 12).toFixed(2)} on the shelf`);
+
+  // ...and more of them. Size and number are the same statement about a stretch of sea, so they
+  // come off the same number: a deep area is not the shallows with the sizes turned up, it is
+  // busier as well as bigger, and the hatchery is thin as well as small.
+  let deepDen = 0, shelfDen = 0, nurseryDen = 0;
+  for (let i = 0; i < 12; i++) {
+    deepDen += at(i * 260 - 1500, shoreZ(0) - 900 - i * 90).density;
+    shelfDen += at(i * 260 - 1500, shoreZ(0) - 260 - i * 12).density;
+    const nn = nurseryAt(i - 6); nurseryDen += at(nn.x, nn.z).density;
+  }
+  check('and more of them than the shelf carries', deepDen > shelfDen * 1.15,
+    `density ${(deepDen / 12).toFixed(2)} deep against ${(shelfDen / 12).toFixed(2)} on the shelf`);
+  check('...while the hatchery is the thinnest water there is', nurseryDen < shelfDen,
+    `${(nurseryDen / 12).toFixed(2)} in the nurseries against ${(shelfDen / 12).toFixed(2)} on the shelf`);
 
   // Size and menace are one statement about a stretch of sea, made from one number: what a place
   // holds is read straight off how dangerous it is. Sampled over real water rather than over

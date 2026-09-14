@@ -10,6 +10,8 @@ import { TRIASSIC_CREATURES } from '../content/triassic/creatures';
 import { TRIASSIC_SPECIMENS } from '../content/triassic/specimens';
 import { SCHEMES as TRIASSIC_SCHEMES, CREATURE_SCHEMES as TRIASSIC_DEFAULTS } from '../content/triassic/palettes';
 import triassicPending from '../content/triassic/pending-refinements.json';
+import previewBodies from '../content/triassic/preview-bodies.json';
+import reviewBodies from '../content/triassic/review-bodies.json';
 import { DEVONIAN_SPECIMENS } from '../content/devonian/specimens';
 import { DEVONIAN_CREATURES } from '../content/devonian/creatures';
 import devonianPending from '../content/devonian/pending-refinements.json';
@@ -63,14 +65,50 @@ export interface ViewerSpecimen {
    */
   puppet?: string;
   puppetNote?: string;
+  /**
+   * The raw generated mesh an animal will be built from, where it has one and no body has shipped.
+   * A static Tripo surface: no skeleton, no clips, and engine orientation and scale not yet
+   * normalized, so it is a thing to look at rather than a thing to animate or play.
+   */
+  generated?: string;
+  /**
+   * Estimated degrees about +y to bring the generated mesh's head round to +z, where every shipped
+   * body keeps it, and the length the roster gives the animal. Both are previewing estimates read
+   * off fixed-axis renders, not the normalization the pipeline does when a body is rigged.
+   */
+  previewYaw?: number;
+  previewLength?: number;
+  /**
+   * The generated mesh's hash from `preview-bodies.json`. A region marked on a body is a list of
+   * vertex indices into one exact file, so the export carries the hash and `cut-region.py` refuses
+   * a region whose mesh has been regenerated underneath it.
+   */
+  generatedSha256?: string;
+  /**
+   * True while this animal's own body is built but not yet in tools/triassic/shipped.json. The
+   * game still draws the body it borrows and the animal keeps its warning; the viewer shows the
+   * real thing, because deciding whether it ships is what the viewer is for.
+   */
+  inReview?: boolean;
   image?: string;
   displayLength: number;
   lengthMeters?: number;
   looping: readonly string[];
 }
 const DEVONIAN_KIND = new Map(DEVONIAN_CREATURES.map(c => [c.id as string, { kind: c.kind, kindNote: c.kindNote }]));
+/** The raw generated body of each animal still waiting for one, by id. */
+const TRIASSIC_PREVIEW = new Map((previewBodies as { id: string; model: string; yaw: number; lengthUnits: number | null; sha256: string }[])
+  .map(b => [b.id, b]));
 /** The procedural twin of each animal that has one, by the animal's id. */
 const TRIASSIC_PUPPETS = new Map(TRIASSIC_SPECIMENS.filter(c => c.category === 'creature').map(c => [c.id, c]));
+/**
+ * Bodies that are built and waiting on a human, by id. They are not in shipped.json, so every
+ * runtime path still resolves them to the body they borrow in play; this is the one register that
+ * points at the real files, and it exists because without it a finished animal is invisible to the
+ * person whose job is to approve it. An entry retires itself when the animal ships.
+ */
+const TRIASSIC_REVIEW = new Map((reviewBodies as { id: string; model: string; puppet: string | null; lod: string | null; clips: string[] }[])
+  .map(b => [b.id, b]));
 /**
  * How many Triassic animals are still wearing somebody else's body. The label says so rather than
  * letting the collection look finished, and it clears itself: `standIns` empties an entry at a
@@ -83,8 +121,6 @@ export const COLLECTIONS: readonly { id: CollectionId; name: string }[] = [
   { id: 'devonian', name: 'Devonian creatures' },
   { id: 'devonian-props', name: 'Devonian plants & props' },
   { id: 'triassic', name: `Triassic creatures${TRIASSIC_BORROWED ? ` (${TRIASSIC_BORROWED} borrowed bodies)` : ''}` },
-  // Empty until the first Triassic prop is generated, which the picker shows as a disabled option:
-  // the slot is visible, so a delivery has somewhere to go rather than somewhere to be invented.
   { id: 'triassic-props', name: 'Triassic plants & props' },
 ];
 /**
@@ -124,8 +160,18 @@ export const SPECIMENS: readonly ViewerSpecimen[] = [
     provenance: c.locality ?? 'Triassic', description: TRIASSIC.assets.standIns?.[c.id] ? `Borrowed body: ${String(TRIASSIC.assets.standIns[c.id]).replace('devonian/', 'Devonian ')}. ${c.tagline}` : c.tagline,
     modelStatus: TRIASSIC_REFINEMENTS.modelStatus[c.id], modelNote: TRIASSIC_REFINEMENTS.modelNotes[c.id],
     clipNotes: TRIASSIC_REFINEMENTS.clipNotes[c.id],
-    model: TRIASSIC_PATHS.model(c.id), lod: TRIASSIC_PATHS.model(c.id, 1), image: TRIASSIC_PATHS.portrait(c.id, 'card'), displayLength: Math.min(c.adultLength, 8),
-    puppet: TRIASSIC_PUPPETS.get(c.id)?.model, puppetNote: TRIASSIC_PUPPETS.get(c.id)?.description,
+    // A body in review is this animal's own; only without one does the roster path apply, and for
+    // an unshipped animal that resolves to the body it borrows.
+    model: TRIASSIC_REVIEW.get(c.id)?.model ?? TRIASSIC_PATHS.model(c.id),
+    lod: TRIASSIC_REVIEW.get(c.id)?.lod ?? TRIASSIC_PATHS.model(c.id, 1),
+    image: TRIASSIC_PATHS.portrait(c.id, 'card'), displayLength: Math.min(c.adultLength, 8),
+    puppet: TRIASSIC_REVIEW.get(c.id)?.puppet ?? TRIASSIC_PUPPETS.get(c.id)?.model,
+    puppetNote: TRIASSIC_PUPPETS.get(c.id)?.description,
+    generated: TRIASSIC_PREVIEW.get(c.id)?.model,
+    previewYaw: TRIASSIC_PREVIEW.get(c.id)?.yaw,
+    previewLength: TRIASSIC_PREVIEW.get(c.id)?.lengthUnits ?? undefined,
+    generatedSha256: TRIASSIC_PREVIEW.get(c.id)?.sha256,
+    inReview: TRIASSIC_REVIEW.has(c.id),
     looping: ['Idle', 'Swim', 'Crawl', 'Guard', 'Eat', ...(c.abilityLoop ? ['Ability'] : [])],
   })),
   // Scenery only. A creature row in TRIASSIC_SPECIMENS is a procedural twin, and a twin is not a
@@ -136,7 +182,10 @@ export const SPECIMENS: readonly ViewerSpecimen[] = [
     key: `triassic:prop:${c.id}`, id: c.id, collection: 'triassic-props' as CollectionId,
     name: c.name, species: c.species, role: 'TRIASSIC · SCENERY',
     provenance: c.provenance, description: c.description,
-    modelStatus: TRIASSIC_REFINEMENTS.modelStatus[c.id] ?? c.modelStatus, modelNote: TRIASSIC_REFINEMENTS.modelNotes[c.id],
+    // A prop is not in the creature refinement queue, so its badge takes the reason the catalogue
+    // entry carries. Without it the warning showed with nothing behind it.
+    modelStatus: TRIASSIC_REFINEMENTS.modelStatus[c.id] ?? c.modelStatus,
+    modelNote: TRIASSIC_REFINEMENTS.modelNotes[c.id] ?? c.modelNote,
     clipNotes: TRIASSIC_REFINEMENTS.clipNotes[c.id], model: c.model, lod: c.lod, image: c.image,
     displayLength: 4, lengthMeters: c.lengthMeters, looping: c.looping,
   })),
