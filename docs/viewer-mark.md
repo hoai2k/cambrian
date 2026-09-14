@@ -11,7 +11,7 @@ point; `tools/triassic/cut-region.py` is what acts on the pointing.
 
 Unlike sculpt mode, it works on **whatever body is on stage**, the *Generated mesh* above all —
 that raw surface is the one carrying the fins nobody asked for. Props are the only thing it
-refuses. Marks are indices into one exact file, so the Body control starts a fresh region.
+refuses. Marks are indices into one exact file, so the *Model* control starts a fresh region.
 
 ## Marking
 
