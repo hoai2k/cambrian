@@ -1,0 +1,29 @@
+{
+  "schemaVersion": 1,
+  "createdAt": "2026-09-13",
+  "canonicalStatus": "greenlit",
+  "canonical": "canonical.png",
+  "canonicalSource": "../../rhaeticosaurus.png",
+  "canonicalSha256": "985a1fd49416c86a7769e0251800b8589efe1dc950af349da2367065db0f0a2f",
+  "input": "input.png",
+  "inputSha256": "a4b81c90676e080d40bb9dadd1122c19ef941492d05a91382249d31184e4cc16",
+  "turnaround": "turnaround.png",
+  "turnaroundSha256": "147c56de9d52a56c8a11e5530111c5833139423ee3dc057ee1d1847d7cf1cb0c",
+  "generator": "builtin imagegen",
+  "subjectSpec": "Rhaeticosaurus mertensi, early plesiosaur with a clearly elongated muscular neck approximately 2.5 head lengths from skull to shoulder, broad low head, rounded barrel torso, exactly four broad paddles in bilateral shoulder/pelvic pairs, and a short narrow pointed unfinned tail",
+  "inputPrompt": "Use case: precise object edit for 3D model generation. The neck must be clearly elongated: approximately 2.5 head lengths from the back of the skull to the shoulder girdle, with a smooth muscular taper and clear separation between head and foreflipper roots. Preserve the approved mottled slate-gray and cream identity, barrel torso, broad low closed-mouth head, exactly four bilateral shoulder/pelvic flippers, and short narrow unfinned tail on neutral pale gray. No dorsal fin, tail fin, extra appendage, crop, text, or scenery.",
+  "turnaroundPrompt": "Use case: qualitative four-view 3D modeling reference. Preserve the same corrected long-neck Rhaeticosaurus consistently in strict left profile, dorsal/top, frontal, and three-quarter views. Neck is approximately 2.5 head lengths from skull to shoulder; exactly four bilateral shoulder/pelvic flippers and a short narrow unfinned tail in every view. Preserve colors and markings on neutral pale gray; no extra fins, labels, or cropping.",
+  "review": "Both assets derive only from the human-greenlit candidate03 canonical. Input is a complete neutral three-quarter body on pale gray, with all four paddles distinct. Turnaround shows profile, dorsal, frontal and three-quarter views; every panel retains exactly four paddles. These remain qualitative modeling guides; canonical.png is the identity authority.",
+  "correction": "2026-09-13 user review: replaced the initial short-neck modeling references before any approved Tripo generation; the corrected neck is visibly elongated in both input and turnaround.",
+  "files": {
+    "canonical.png": {
+      "sha256": "985a1fd49416c86a7769e0251800b8589efe1dc950af349da2367065db0f0a2f"
+    },
+    "input.png": {
+      "sha256": "96446306b8b4c27a7160a456f811523541ce0cd0cfac0f99fb4d87b41b54b37a"
+    },
+    "turnaround.png": {
+      "sha256": "5bfb7c30ca3c4fbfaf1238c7b1c026a5642d465b0b40fd66d8621abe758cca89"
+    }
+  }
+}

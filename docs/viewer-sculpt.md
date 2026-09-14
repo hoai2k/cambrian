@@ -132,4 +132,10 @@ to build to — and `height` scales them vertically. The builder's own
 coordinate frame differs from the GLB's (Blender is z-up and its exporter maps y to −z), so the
 port converts through `frame`, and the rebuilt creature goes through the usual pipeline
 (`docs/creature-intake.md`, or the Devonian package/check/audit path) and back into the viewer to
-compare against the sculpt that asked for it.
+compare against the sculpt that asked for it: `npm run sculpt:measure -- <candidate.glb>
+<sculpt.json>` reports the deviation from the sculpt's edited curves at every station, and
+`--against <shipped.glb>` the deviation from the shipped model's own envelope at the candidate's
+stations, which is the fair check for the stations the sculpt left alone once a port has moved the
+grid. A rebuild that carries no UV map or materials is a *deformation source*: finish it with
+`tools/devonian/transplant-positions.mjs`, which keeps the shipped GLB whole and takes only the
+rebuild's vertex positions, matched through a base rebuild with the edit off.

@@ -5,9 +5,11 @@
 // Usage: node tools/workbench-smoke.mjs <outdir>
 // Requires `npm run build && npx vite preview --port 4173` in another shell.
 import { chromium } from 'playwright-core';
+import { silenceCounter } from './qa-counter.mjs';
 const S = process.argv[2] ?? '.';
 const browser = await chromium.launch({ executablePath: '/opt/pw-browsers/chromium', args: ['--autoplay-policy=no-user-gesture-required', '--no-sandbox'] });
 const page = await browser.newPage({ viewport: { width: 1180, height: 1000 } });
+await silenceCounter(page);
 const errors = [];
 page.on('console', (m) => { if (m.type() === 'error' && !/fonts\.googleapis|ERR_CONNECTION/.test(m.text())) errors.push(`[error] ${m.text().slice(0, 300)}`); });
 page.on('pageerror', (e) => errors.push('[pageerror] ' + e.message));

@@ -13,6 +13,7 @@ import { Hud } from './Hud';
 import { LoadingScreen, useSlow } from './Loading';
 import { Dialogs, PauseMenu, Results, type MenuItem } from './Overlays';
 import { debugGame } from '../shared/debug';
+import { enterFullscreen, rememberFullscreen, restoreFullscreenOnGesture } from '../shared/fullscreen';
 import { exportRecording, recordingPhase, resetRecording, startRecording, stopRecording } from './debug-record';
 import { atMain, cycle, groupsFor, stops, type Focus, type FocusGroup } from './focus-ring';
 import { rectsOf, step as spatialStep, type Dir } from './spatial-nav';
@@ -218,12 +219,21 @@ export function App() {
     try { localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings)); } catch { /* ignore */ }
   }, [settings]);
 
-  // Fullscreen tracking
+  /**
+   * Fullscreen tracking, and carrying it across a change of game.
+   *
+   * Every entry and exit is written down (`rememberFullscreen`), including the exit the browser
+   * performs when this document is replaced by another game's — so the page the player lands on
+   * knows they were in fullscreen and puts itself back on their first click or key there, which on
+   * a title screen is the press that starts the game anyway. See src/shared/fullscreen.ts for why
+   * it cannot simply be kept.
+   */
   useEffect(() => {
-    const on = () => setIsFs(!!document.fullscreenElement);
+    const on = () => { setIsFs(!!document.fullscreenElement); rememberFullscreen(!!document.fullscreenElement); };
     document.addEventListener('fullscreenchange', on);
     return () => document.removeEventListener('fullscreenchange', on);
   }, []);
+  useEffect(() => restoreFullscreenOnGesture(), []);
   const toggleFullscreen = useCallback(async () => {
     try {
       if (document.fullscreenElement) await document.exitFullscreen();
@@ -277,15 +287,16 @@ export function App() {
   }, []);
 
   // ---- Screen transitions ----
-  const startFromTitle = useCallback((device: PlayerSetup['device'], viaGesture: boolean) => {
+  const startFromTitle = useCallback((device: PlayerSetup['device']) => {
     audio.init(); audio.resume(); audio.play('ui-start');
     updatePlayers([{ creature: ACTIVE_ERA.defaults.player, device, ready: false }]);
     go('select');
-    // Try for fullscreen on the way in; if the browser will not, say nothing. Starting from a pad
-    // is not a gesture it counts, and a transient refusal is not worth a message either.
-    if (viaGesture) void toggleFullscreen();
-    else if (!document.fullscreenElement) void document.documentElement.requestFullscreen({ navigationUI: 'hide' }).catch(() => {});
-  }, [go, toggleFullscreen, updatePlayers]);
+    // Be fullscreen on the way in; if the browser will not, say nothing. Starting from a pad is not
+    // a gesture it counts, and a transient refusal is not worth a message either. Not a toggle: a
+    // player who is already fullscreen — which, since the preference now rides across a change of
+    // game, is the usual way to arrive — would otherwise be taken straight back out of it.
+    enterFullscreen();
+  }, [go, updatePlayers]);
 
   /**
    * The setups as the simulation wants them: the roster plus, for anyone who asked and has a record
@@ -494,7 +505,7 @@ export function App() {
    */
   const cycleFocus = useCallback((dir: number, owner: number | 'keyboard') => {
     const ring = groupsFor(screenRef.current, pausedRef.current || screenRef.current === 'results', {
-      sibling: !!ACTIVE_ERA.copy.sibling, icons: toolbarRef.current !== 'hidden',
+      link: !!ACTIVE_ERA.copy.trilogy, icons: toolbarRef.current !== 'hidden',
     });
     const all = stops(ring, { era: groupEls('era').length, modes: groupEls('modes').length, icons: groupEls('icons').length });
     const f = focusRef.current;
@@ -540,7 +551,7 @@ export function App() {
             else if (just('confirm')) runFocused();
             else if (just('back')) setFocusBoth(atMain());
           }
-          else if (c.any && !(p?.any)) startFromTitle(gp.index, false);
+          else if (c.any && !(p?.any)) startFromTitle(gp.index);
         } else if (s === 'select') {
           const ps = playersRef.current;
           const idx = ps.findIndex((x) => x.device === gp.index);
@@ -629,7 +640,7 @@ export function App() {
       if ((e.target as HTMLElement | null)?.matches?.('input,textarea,select')) return;
       const s = screenRef.current;
       if (dialogRef.current) { if (e.code === 'Escape') openDialog(null); return; }
-      if (s === 'title') { if (!e.metaKey && !e.ctrlKey && e.code !== 'F11') startFromTitle('keyboard', true); return; }
+      if (s === 'title') { if (!e.metaKey && !e.ctrlKey && e.code !== 'F11') startFromTitle('keyboard'); return; }
       if (s === 'select') {
         const ps = playersRef.current;
         const idx = ps.findIndex((x) => x.device === 'keyboard');
@@ -744,6 +755,17 @@ export function App() {
    * through is a flicker, not information.
    */
   const bootSlow = useSlow(!loaded);
+  /**
+   * How far the boot has got, and what it is doing. The fraction is scaled because the assets the
+   * loader counts go on arriving long after the game is playable: what the player is waiting for
+   * is the first quarter of them.
+   */
+  const bootFraction = progress ? Math.min(1, progress.fraction * 4) : 0;
+  const bootStatus = useMemo(() => {
+    // The line above the bar already says the sea is waking, so this says who and how far.
+    const name = progress?.current ? creature(progress.current as never)?.name : undefined;
+    return `${name ? `${name} · ` : ''}${Math.round(bootFraction * 100)}%`;
+  }, [progress, bootFraction]);
 
   /**
    * The icon buttons sit in somebody's viewport, so they answer to whether that somebody asked for
@@ -775,8 +797,27 @@ export function App() {
       <div className="sea-canvas" ref={canvasRef} aria-label="Cambrian sea" />
       <div className="vignette" />
 
-      {!loaded && bootSlow && <LoadingScreen progress={progress} fraction={progress ? Math.min(1, progress.fraction * 4) : 0} />}
-      {screen === 'title' && loaded && <TitleScreen loaded={loaded} onStart={() => startFromTitle('keyboard', true)} padCount={padCount} eraFocused={focus.group === 'era'} />}
+      {/*
+        * The boot screen is for a boot the player is not already looking at a screen for: deep
+        * linked to the roster, say. On the title it would be the title's own painting a second
+        * time over the title itself, so the title carries the bar instead.
+        */}
+      {!loaded && bootSlow && screen !== 'title' && <LoadingScreen progress={progress} fraction={bootFraction} />}
+      {/*
+        * The title screen is drawn from the first frame, before the creatures have streamed in. It
+        * used to wait for `loaded`, and until then the only thing on the page was the sea the
+        * engine had already started drawing — so arriving from a link showed the game's water for
+        * a moment and then cut to the title, which read as landing in the wrong place. It has
+        * always known how to draw itself unloaded (the era's loading line in place of PRESS
+        * START), and a key or a pad button has always been able to start from it either way, so
+        * the wait bought nothing. The boot screen still stacks over it when a load is slow.
+        */}
+      {screen === 'title' && (
+        <TitleScreen
+          loaded={loaded} onStart={() => startFromTitle('keyboard')} padCount={padCount} eraFocused={focus.group === 'era'}
+          progress={bootSlow ? bootFraction : null} status={bootSlow ? bootStatus : undefined}
+        />
+      )}
 
       {screen === 'select' && (
         <SelectScreen

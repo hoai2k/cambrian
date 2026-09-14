@@ -32,27 +32,32 @@ Shore distance `s` is the world's own measure (`shoreDistance`). Danger is on th
 the music, HUD and ambient size read. Depth is the **target water depth** in world units, the
 distance from the surface to the sea floor's mean level in that biome, which is the new field
 (see *Depth*, below). The Devonian column is 64 deep everywhere but the shore; this one runs from
-8 to about 96.
+10 to 88. **As built** (`src/content/triassic/environment.ts`): the surface sits at 30 with the
+lagoon floor at zero, as the other eras keep their shelf, and the table below is the one in the
+code — shallows 10, shore 13, lagoon 30, garden 32, reef 24, pavement 34, channels 46, front 52,
+basin 88. The proportions are the design's; the absolute numbers were fitted to a shelf at zero
+so nothing in the shared engine that assumes a floor near zero had to move.
 
 | Slot | Triassic biome | Drawn from | `s` (approx.) | Danger | Depth | Character |
 | --- | --- | --- | --- | --- | --- | --- |
-| `shallows` | **Gypsum Flats** | Gipskeuper lagoons, Late Triassic Germany (Henodus' home) | 0–130 | 0.08 | 8–12 | Hypersaline, hot, blinding. Salt crusts, microbial domes, almost no plants. Too shallow for anything over rung III. |
-| `nursery` | **Conifer Shore** | Grès à Voltzia and Muschelkalk margins, Middle Triassic | pockets to ~90 | 0.05 | 10–16 | Estuary mouths under Voltzia and horsetail stands; brackish, silty, thick with cover. Where live-bearers calve and egg-layers haul out. The shore animals stand here. |
-| `shelf` | **Dasyclad Lagoon** | Wetterstein / Latemar platform interior, Middle Triassic Dolomites | 130–660 | 0.35 | 22–30 | Milky turquoise platform water over meadows of *Diplopora* algae and shell sand. The default open lagoon. |
-| `forest` | **Sea-Lily Garden** | Trochitenkalk, Muschelkalk sea | mosaic | 0.42 | 26–34 | *Encrinus* meadows, stems a body-length tall, columnals carpeting the floor. Cover for the middle rungs; a placodont's larder beneath. |
-| `boulders` | **Sponge-Coral Reef** | Wetterstein and Dachstein reefs, Middle–Late Triassic Alps | mosaic | 0.50 | 16–28 | Bushes of *Thecosmilia*, calcisponge mounds, *Tubiphytes* crusts; the reef crests rise to within eight units of the surface. Chambers, overhangs, the one place the floor comes up to meet the air-breathers. |
-| `flats` | **Shell Pavement** | Daonella / Halobia beds; Muschelkalk *Placunopsis* mounds | inshore mosaic | 0.30 | 28–36 | Flat, bright, a floor of flat-clam shells and ceratite drift. Nothing to hide in; everything to crush. Placodus territory. |
-| `channel` | **Margin Channels** | Latemar / Marmolada platform margin, tidal passes | 200 on | 0.70 | 40–52 | Tidal cuts through the platform edge, current-swept, breccia blocks, dark water. The commute between the lagoon and the deep. |
-| `escarpment` | **Reef Front** | Dachstein reef slope; Guanling basin margin | ~700 | 0.80 | 30 → 70 | The wall. Reef talus sliding into the dark, log rafts drifting overhead, and the giants' first appearance. |
-| `basin` | **Black Basin** | Besano / Monte San Giorgio; Fossil Hill, Nevada | 760 on | 0.92 | 80–96 | An intraplatform basin with an anoxic floor: laminated black mud, no floor life at all, ash beds. Everything that lives here lives in the water column and breathes at the top. |
+| `shallows` | **Gypsum Flats** | Gipskeuper lagoons, Late Triassic Germany (Henodus' home) | 0–130 | 0.08 | 10 | Hypersaline, hot, blinding. Salt crusts, microbial domes, almost no plants. Too shallow for anything over rung III. |
+| `nursery` | **Conifer Shore** | Grès à Voltzia and Muschelkalk margins, Middle Triassic | pockets to ~90 | 0.05 | 13 | Estuary mouths under Voltzia and horsetail stands; brackish, silty, thick with cover. Where live-bearers calve and everything else lays in the reeds. The shore animals stand here. |
+| `shelf` | **Dasyclad Lagoon** | Wetterstein / Latemar platform interior, Middle Triassic Dolomites | 130–660 | 0.35 | 30 | Milky turquoise platform water over meadows of *Diplopora* algae and shell sand. The default open lagoon. |
+| `forest` | **Sea-Lily Garden** | Trochitenkalk, Muschelkalk sea | mosaic | 0.42 | 32 | *Encrinus* meadows, stems a body-length tall, columnals carpeting the floor. Cover for the middle rungs; a placodont's larder beneath. |
+| `boulders` | **Sponge-Coral Reef** | Wetterstein and Dachstein reefs, Middle–Late Triassic Alps | mosaic | 0.50 | 24 (crests to 17) | Bushes of *Thecosmilia*, calcisponge mounds, *Tubiphytes* crusts; the reef crests rise to within eight units of the surface. Chambers, overhangs, the one place the floor comes up to meet the air-breathers. |
+| `flats` | **Shell Pavement** | Daonella / Halobia beds; Muschelkalk *Placunopsis* mounds | inshore mosaic | 0.30 | 34 | Flat, bright, a floor of flat-clam shells and ceratite drift. Nothing to hide in; everything to crush. Placodus territory. |
+| `channel` | **Margin Channels** | Latemar / Marmolada platform margin, tidal passes | 200 on | 0.70 | 46 | Tidal cuts through the platform edge, current-swept, breccia blocks, dark water. The commute between the lagoon and the deep. |
+| `escarpment` | **Reef Front** | Dachstein reef slope; Guanling basin margin | ~700 | 0.80 | 52 | The wall. Reef talus sliding into the dark, log rafts drifting overhead, and the giants' first appearance. |
+| `basin` | **Black Basin** | Besano / Monte San Giorgio; Fossil Hill, Nevada | 760 on | 0.92 | 88 | An intraplatform basin with an anoxic floor: laminated black mud, no floor life at all, ash beds. Everything that lives here lives in the water column and breathes at the top. |
 
 Blended per point exactly as danger is, so the transitions read as slopes and not steps.
 
 ### What the depths do
 
-- **Breath is the era's clock** ([01 · Breath](01-triassic-design.md#breath)). A dive to the
-  floor of the basin and back costs a rung III animal most of a breath; a dive to the flats costs
-  nothing. Depth is how the world prices the map.
+- **Air is what effort costs** ([01 · Air and stamina](01-triassic-design.md#air-and-stamina)). An
+  air-breather recovers no stamina under water at all, so depth is the price of going back for
+  more: a fight on the floor of the basin ends with an eighty-unit climb on an empty bar, and the
+  same fight on the flats ends beside the surface. Depth is how the world prices the map.
 - **Big bodies need water.** A body cannot enter water shallower than about its own height plus
   clearance (the existing `clearance` field in body lengths). At 8–12 the Gypsum Flats exclude
   rungs III and IV outright, which makes the flats a sanctuary for the small at the price of heat
@@ -60,13 +65,19 @@ Blended per point exactly as danger is, so the transitions read as slopes and no
   Shore admits a nothosaur but not an ichthyosaur, which is what puts the calving shallows in the
   amphibious animals' hands.
 - **The floor feeders have a ceiling.** Placodus, Henodus, Odontochelys and Atopodentatus feed
-  on and near the bottom, and cannot hold their breath long enough to work a floor 50 deep. Their
+  on and near the bottom, and a floor 50 deep is too far from the air to work for long. Their
   range is the platform; the deep is where they are prey.
 - **The basin has no floor to hide on.** Below a threshold the water is dead (the Devonian's
   anoxia hook, `RULES.anoxia`, reused): the bottom twenty units of the Black Basin drain stamina
   and are entered only to escape. The basin's cover is overhead, in the log rafts.
 
-### Depth: the engine change
+### Depth: the engine change (built)
+
+*Built as described below, 12 September 2026:* `environment.floorDepth` on the era, `FLOOR_DEPTH`
+and `depthProfile` in `src/sim/world.ts`, and the assertions in `tools/triassic-test.ts` (the
+flats thin, the platform a lagoon deep, the basin three, the beach climbing to a unit above the
+waterline, the floor never within four units of the surface off the beach). The Cambrian and the
+Devonian leave the field out and take exactly their old path.
 
 `sampleHeight` in `src/sim/world.ts` undulates the floor around zero and climbs it to the
 waterline in the last 48 units of shore; channels carve seven, the escarpment drops thirteen. The
@@ -90,8 +101,8 @@ Two things follow that the earlier eras did not have to think about:
 
 - **Rise rate scales with depth** already (`RISE_RATE` is proportional to `SURFACE_Y`); a 96
   column makes every animal climb 1.5× faster than in the Devonian in absolute terms, which is
-  right for a sea of air-breathers and wrong for a placodont. The per-creature rise rate the breath
-  mechanic wants is in [01](01-triassic-design.md#breath).
+  right for a sea of air-breathers and wrong for a placodont. The per-creature rise rate this needs
+  is in [01](01-triassic-design.md#air-and-stamina).
 - **The light window** (`LIGHT_WINDOW_Y`, nine below the surface) is where the era plays, so the
   surface needs its own presentation budget: a visible underside with refracted sky, blow spray,
   drift logs and floating shells, and a surfaced camera that reads as *out*, not clipped.

@@ -1,0 +1,105 @@
+{
+  "schema_version": 1,
+  "input": {
+    "path": "tools/triassic/creatures/hupehsuchus/tripo-raw/hupehsuchus.raw.glb",
+    "bytes": 1352456,
+    "sha256": "71e4996a3b8c974def89747e786d9b57c52045183d1a2baf4a33b3e90cb25762"
+  },
+  "summary": {
+    "mesh_objects": 1,
+    "vertices": 11063,
+    "faces": 19542,
+    "triangles": 19542,
+    "connected_components": 40,
+    "materials": 1,
+    "textures": 3
+  },
+  "bounds": {
+    "min_xyz": [
+      -0.200305,
+      -0.5,
+      -0.088855
+    ],
+    "max_xyz": [
+      0.200305,
+      0.5,
+      0.088855
+    ],
+    "center_xyz": [
+      0,
+      0,
+      0
+    ],
+    "size_xyz": [
+      0.400609,
+      1,
+      0.17771
+    ]
+  },
+  "meshes": [
+    {
+      "object": "tripo_node_b7ba49b5-f9ac-4ed5-9f40-f08ec5ad994c",
+      "mesh": "tripo_mesh_b7ba49b5-f9ac-4ed5-9f40-f08ec5ad994c",
+      "vertices": 11063,
+      "edges": 30565,
+      "faces": 19542,
+      "triangles": 19542,
+      "connected_components": 40,
+      "material_slots": [
+        "tripo_material_b7ba49b5-f9ac-4ed5-9f40-f08ec5ad994c"
+      ]
+    }
+  ],
+  "materials": [
+    {
+      "name": "tripo_material_b7ba49b5-f9ac-4ed5-9f40-f08ec5ad994c",
+      "image_textures": [
+        "Color_b7ba49b5-f9ac-4ed5-9f40-f08ec5ad994c",
+        "NormalGL_b7ba49b5-f9ac-4ed5-9f40-f08ec5ad994c",
+        "ORM_b7ba49b5-f9ac-4ed5-9f40-f08ec5ad994c"
+      ]
+    }
+  ],
+  "textures": [
+    {
+      "name": "Color_b7ba49b5-f9ac-4ed5-9f40-f08ec5ad994c",
+      "width": 2048,
+      "height": 2048,
+      "channels": 4,
+      "packed": true,
+      "source": "FILE",
+      "colorspace": "sRGB"
+    },
+    {
+      "name": "NormalGL_b7ba49b5-f9ac-4ed5-9f40-f08ec5ad994c",
+      "width": 2048,
+      "height": 2048,
+      "channels": 4,
+      "packed": true,
+      "source": "FILE",
+      "colorspace": "Non-Color"
+    },
+    {
+      "name": "ORM_b7ba49b5-f9ac-4ed5-9f40-f08ec5ad994c",
+      "width": 2048,
+      "height": 2048,
+      "channels": 4,
+      "packed": true,
+      "source": "FILE",
+      "colorspace": "Non-Color"
+    }
+  ],
+  "renders": {
+    "side": "tools/triassic/creatures/hupehsuchus/tripo-raw/review/side.png",
+    "top": "tools/triassic/creatures/hupehsuchus/tripo-raw/review/top.png",
+    "three-quarter": "tools/triassic/creatures/hupehsuchus/tripo-raw/review/three-quarter.png"
+  },
+  "preview": {
+    "path": "tools/triassic/creatures/hupehsuchus/hupehsuchus.preview.glb",
+    "triangle_limit": 40000,
+    "triangles_before": 19542,
+    "triangles_after": 19542,
+    "bytes": 1234968,
+    "sha256": "da38d1761028720d60112aface293f7b0dae38d956e40b49354ea533b158ec98"
+  }
+}

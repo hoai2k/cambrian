@@ -1,0 +1,152 @@
+{
+  "source": "tools/triassic/creatures/helicoprion/tripo-raw/helicoprion.raw.glb",
+  "bodyLength": 1.0,
+  "snoutY": -0.5,
+  "method": "vertical ray casts up and down from every vertex in the head band; a vertex with mesh above it and mesh below it is inside the mouth, one with mesh above and nothing below is on the ventral silhouette",
+  "whorlVertices": 382,
+  "whorlEnclosedByTheChin": 374,
+  "whorlOnTheVentralSilhouette": 8,
+  "whorlEnclosedFraction": 0.9790575916230366,
+  "whorlExtentFractionOfBodyLength": [
+    0.03913959860801697,
+    0.13885977864265442
+  ],
+  "exposedArcFractionOfBodyLength": [
+    0.06303316354751587,
+    0.09234026074409485
+  ],
+  "clearanceAboveTheChin": {
+    "method": "for each enclosed whorl vertex, the gap to the chin skin straight below it",
+    "min": 0.0001827624364523217,
+    "median": 0.021279900334775448,
+    "max": 0.062249716371297836
+  },
+  "whorlLateralHalfWidth": 0.0805145651102066,
+  "whorlLateralHalfWidthFractionOfBodyLength": 0.0805145651102066,
+  "symphysealMassWithinThreeHundredthsOfTheMidline": 0.8089005235602095,
+  "upwardFacingToothMaterialOutsideTheSymphysis": 0.19109947643979058,
+  "upperJawToothMaterial": 157,
+  "lowerJawToothMaterialOutsideTheSymphysis": 51,
+  "stations": [
+    {
+      "y": -0.47,
+      "frac": 0.030000000000000027,
+      "whorlVertices": 0,
+      "whorlLowestZ": null,
+      "ventralSilhouetteZ": 0.0026931629981845617,
+      "whorlAboveTheSilhouetteBy": null
+    },
+    {
+      "y": -0.45999999999999996,
+      "frac": 0.040000000000000036,
+      "whorlVertices": 11,
+      "whorlLowestZ": 0.017517950385808945,
+      "ventralSilhouetteZ": -0.0036517512053251266,
+      "whorlAboveTheSilhouetteBy": 0.02116970159113407
+    },
+    {
+      "y": -0.44999999999999996,
+      "frac": 0.050000000000000044,
+      "whorlVertices": 2,
+      "whorlLowestZ": 0.019635263830423355,
+      "ventralSilhouetteZ": -0.009944559074938297,
+      "whorlAboveTheSilhouetteBy": 0.029579822905361652
+    },
+    {
+      "y": -0.43999999999999995,
+      "frac": 0.06000000000000005,
+      "whorlVertices": 3,
+      "whorlLowestZ": -0.0598260797560215,
+      "ventralSilhouetteZ": -0.07172147929668427,
+      "whorlAboveTheSilhouetteBy": 0.011895399540662766
+    },
+    {
+      "y": -0.42999999999999994,
+      "frac": 0.07000000000000006,
+      "whorlVertices": 22,
+      "whorlLowestZ": -0.06913036108016968,
+      "ventralSilhouetteZ": -0.07750623673200607,
+      "whorlAboveTheSilhouetteBy": 0.008375875651836395
+    },
+    {
+      "y": -0.41999999999999993,
+      "frac": 0.08000000000000007,
+      "whorlVertices": 40,
+      "whorlLowestZ": -0.0671052634716034,
+      "ventralSilhouetteZ": -0.08750703930854797,
+      "whorlAboveTheSilhouetteBy": 0.02040177583694458
+    },
+    {
+      "y": -0.4099999999999999,
+      "frac": 0.09000000000000008,
+      "whorlVertices": 45,
+      "whorlLowestZ": -0.06515875458717346,
+      "ventralSilhouetteZ": -0.08885570615530014,
+      "whorlAboveTheSilhouetteBy": 0.02369695156812668
+    },
+    {
+      "y": -0.3999999999999999,
+      "frac": 0.10000000000000009,
+      "whorlVertices": 103,
+      "whorlLowestZ": -0.06593751162290573,
+      "ventralSilhouetteZ": -0.0923035591840744,
+      "whorlAboveTheSilhouetteBy": 0.02636604756116867
+    },
+    {
+      "y": -0.3899999999999999,
+      "frac": 0.1100000000000001,
+      "whorlVertices": 79,
+      "whorlLowestZ": -0.06221482902765274,
+      "ventralSilhouetteZ": -0.08176920562982559,
+      "whorlAboveTheSilhouetteBy": 0.01955437660217285
+    },
+    {
+      "y": -0.3799999999999999,
+      "frac": 0.1200000000000001,
+      "whorlVertices": 55,
+      "whorlLowestZ": -0.05863526463508606,
+      "ventralSilhouetteZ": -0.08059468865394592,
+      "whorlAboveTheSilhouetteBy": 0.021959424018859863
+    },
+    {
+      "y": -0.3699999999999999,
+      "frac": 0.13000000000000012,
+      "whorlVertices": 18,
+      "whorlLowestZ": -0.056942060589790344,
+      "ventralSilhouetteZ": -0.0788208544254303,
+      "whorlAboveTheSilhouetteBy": 0.021878793835639954
+    },
+    {
+      "y": -0.3599999999999999,
+      "frac": 0.14000000000000012,
+      "whorlVertices": 4,
+      "whorlLowestZ": -0.05053950101137161,
+      "ventralSilhouetteZ": -0.07647164165973663,
+      "whorlAboveTheSilhouetteBy": 0.02593214064836502
+    },
+    {
+      "y": -0.34999999999999987,
+      "frac": 0.15000000000000013,
+      "whorlVertices": 0,
+      "whorlLowestZ": null,
+      "ventralSilhouetteZ": -0.07499288767576218,
+      "whorlAboveTheSilhouetteBy": null
+    },
+    {
+      "y": -0.33999999999999986,
+      "frac": 0.16000000000000014,
+      "whorlVertices": 0,
+      "whorlLowestZ": null,
+      "ventralSilhouetteZ": -0.07649052143096924,
+      "whorlAboveTheSilhouetteBy": null
+    },
+    {
+      "y": -0.32999999999999985,
+      "frac": 0.17000000000000015,
+      "whorlVertices": 0,
+      "whorlLowestZ": null,
+      "ventralSilhouetteZ": -0.07729087024927139,
+      "whorlAboveTheSilhouetteBy": null
+    }
+  ]
+}

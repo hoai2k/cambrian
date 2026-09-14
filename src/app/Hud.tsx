@@ -112,7 +112,19 @@ function SensePanel({ p }: { p: PlayerHud }) {
         <div className="bars">
           <div className="name-row"><b>{def.name}</b><span className="tier-name">{p.tierName}</span>{p.protect && <span className="protect">PROTECTED</span>}</div>
           <div className="bar hp"><i style={{ width: `${(p.hp / p.hpMax) * 100}%` }} /></div>
-          <div className={`bar stamina ${p.exhausted ? 'exhausted' : ''}`}><i style={{ width: `${(p.stamina / p.staminaMax) * 100}%` }} /></div>
+          <div className={`bar stamina ${p.exhausted ? 'exhausted' : ''}`}>
+            <i style={{ width: `${(p.stamina / p.staminaMax) * 100}%` }} />
+            {/* The era's one new rule, on the bar it is about. An air-breather's stamina does not
+                come back under water and fills at the surface, and the bar said nothing about
+                either — so the game said it in a sentence, twice, and then in a sound once a
+                second. A mark on the bar says it continuously and silently: barred while the
+                recovery is off, an arrow up once the bar is spent and the fix is the surface. */}
+            {p.era?.air && !p.era.atSurface
+              && <i className={`air-mark ${p.stamina < p.staminaMax * 0.25 ? 'urgent' : ''}`}
+                   role="img"
+                   aria-label={p.stamina < p.staminaMax * 0.25 ? 'Surface for air' : 'No stamina recovery under water'}
+                   style={{ maskImage: `url(${appBase()}${assetPaths.ui(p.stamina < p.staminaMax * 0.25 ? 'air-surface.svg' : 'air-recovery-off.svg')})` }} />}
+          </div>
         </div>
       </div>
       {p.era && <EraStatus era={p.era} alive={p.alive} />}
@@ -452,11 +464,16 @@ const RUNG_NUMERALS = ['', 'I', 'II', 'III', 'IV'];
  */
 function EraStatus({ era, alive }: { era: EraHud; alive: boolean }) {
   if (!alive) return null;
-  const warn = era.inDeadZone ? (era.bimodal ? 'DEAD WATER · your lungs are fine, their gills are not' : 'DEAD WATER · no oxygen, get out') : era.beached ? 'ON THE SAND · nothing with gills can follow' : '';
+  const warn = era.inDeadZone ? (era.bimodal ? 'DEAD WATER · your lungs are fine, their gills are not' : 'DEAD WATER · no oxygen, get out')
+    : era.beached ? 'ON THE SAND · nothing with gills can follow'
+    : era.heldUnder ? 'HELD UNDER · nothing comes back until you are loose'
+    : (era.shoreWarn ?? 0) > 0 ? 'SOMETHING ON THE SHORE · it is reaching for you'
+    : era.air && !era.atSurface ? 'NO AIR DOWN HERE · stamina returns at the surface' : '';
+  const danger = (era.inDeadZone && !era.bimodal) || era.heldUnder || (era.shoreWarn ?? 0) > 0;
   return (
     <div className="era-status">
       {era.primeT > 0 && <div className="dominant"><span>PRIME</span><b>{Math.max(0, Math.ceil(90 - era.primeT))}</b></div>}
-      {warn && <div className={`era-warn ${era.inDeadZone && !era.bimodal ? 'danger' : ''}`}>{warn}</div>}
+      {warn && <div className={`era-warn ${danger ? 'danger' : ''}`}>{warn}</div>}
     </div>
   );
 }

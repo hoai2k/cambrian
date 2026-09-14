@@ -1,0 +1,138 @@
+{
+  "stage": "initial Blender-authored scenery library; not placed in runtime",
+  "units": "game units, authored at requested scale-1 proportions",
+  "assets": [
+    {
+      "id": "triassic-stromatolite-1",
+      "family": "stromatolite",
+      "variant": 1,
+      "status": "preview",
+      "path": "assets/triassic/props-instanced/triassic-stromatolite-1.glb",
+      "portrait": "assets/triassic/props-instanced/triassic-stromatolite-1.png",
+      "source": "tools/triassic/props/sources/triassic-stromatolite-1.blend",
+      "triangles": 640,
+      "dimensionsXYZ": [
+        0.726319,
+        0.314,
+        0.622398
+      ],
+      "pivot": "base centre",
+      "static": true,
+      "meshCount": 1,
+      "materialCount": 1,
+      "vertexColours": true,
+      "sha256": "7b9d1acb8cbc88b8af00acc160720c6e4c60d3911b85af5ee16e36e51ed9e570",
+      "bytes": 15360
+    },
+    {
+      "id": "triassic-stromatolite-2",
+      "family": "stromatolite",
+      "variant": 2,
+      "status": "preview",
+      "path": "assets/triassic/props-instanced/triassic-stromatolite-2.glb",
+      "portrait": "assets/triassic/props-instanced/triassic-stromatolite-2.png",
+      "source": "tools/triassic/props/sources/triassic-stromatolite-2.blend",
+      "triangles": 640,
+      "dimensionsXYZ": [
+        0.724986,
+        0.24492,
+        0.736862
+      ],
+      "pivot": "base centre",
+      "static": true,
+      "meshCount": 1,
+      "materialCount": 1,
+      "vertexColours": true,
+      "sha256": "954f763c773bc1cf1f52b0a352920d024e4dc2f2f9446bf4185c3863fd73b5c8",
+      "bytes": 15356
+    },
+    {
+      "id": "triassic-salt-crust-1",
+      "family": "salt-crust",
+      "variant": 1,
+      "status": "preview",
+      "path": "assets/triassic/props-instanced/triassic-salt-crust-1.glb",
+      "portrait": "assets/triassic/props-instanced/triassic-salt-crust-1.png",
+      "source": "tools/triassic/props/sources/triassic-salt-crust-1.blend",
+      "triangles": 240,
+      "dimensionsXYZ": [
+        1.021331,
+        0.096948,
+        0.849751
+      ],
+      "pivot": "base centre",
+      "static": true,
+      "meshCount": 1,
+      "materialCount": 1,
+      "vertexColours": true,
+      "sha256": "b29d259689c275eeb8cbec15471f193af2e01423200fbd284c631f97fe4dbf27",
+      "bytes": 24472
+    },
+    {
+      "id": "triassic-salt-crust-2",
+      "family": "salt-crust",
+      "variant": 2,
+      "status": "preview",
+      "path": "assets/triassic/props-instanced/triassic-salt-crust-2.glb",
+      "portrait": "assets/triassic/props-instanced/triassic-salt-crust-2.png",
+      "source": "tools/triassic/props/sources/triassic-salt-crust-2.blend",
+      "triangles": 240,
+      "dimensionsXYZ": [
+        1.009537,
+        0.096792,
+        0.981424
+      ],
+      "pivot": "base centre",
+      "static": true,
+      "meshCount": 1,
+      "materialCount": 1,
+      "vertexColours": true,
+      "sha256": "7357b85d0bc8e23da227a3b0b472cd5fab48f09e1c6e9ad93c14df695bd56e97",
+      "bytes": 24408
+    },
+    {
+      "id": "triassic-mud-ripple-1",
+      "family": "mud-ripple",
+      "variant": 1,
+      "status": "preview",
+      "path": "assets/triassic/props-instanced/triassic-mud-ripple-1.glb",
+      "portrait": "assets/triassic/props-instanced/triassic-mud-ripple-1.png",
+      "source": "tools/triassic/props/sources/triassic-mud-ripple-1.blend",
+      "triangles": 712,
+      "dimensionsXYZ": [
+        2.0,
+        0.183995,
+        1.7
+      ],
+      "pivot": "base centre",
+      "static": true,
+      "meshCount": 1,
+      "materialCount": 1,
+      "vertexColours": true,
+      "sha256": "8abc940f18fec049e07db968badbe8d68a1fe0f9841a8b07e7bd56681de4affb",
+      "bytes": 16900
+    },
+    {
+      "id": "triassic-mud-ripple-2",
+      "family": "mud-ripple",
+      "variant": 2,
+      "status": "preview",
+      "path": "assets/triassic/props-instanced/triassic-mud-ripple-2.glb",
+      "portrait": "assets/triassic/props-instanced/triassic-mud-ripple-2.png",
+      "source": "tools/triassic/props/sources/triassic-mud-ripple-2.blend",
+      "triangles": 712,
+      "dimensionsXYZ": [
+        2.0,
+        0.184,
+        1.7
+      ],
+      "pivot": "base centre",
+      "static": true,
+      "meshCount": 1,
+      "materialCount": 1,
+      "vertexColours": true,
+      "sha256": "d69fa04ba418c104497a005fadfaa23e659bd2c5aab012f12f073675d758e144",
+      "bytes": 16900
+    }
+  ]
+}

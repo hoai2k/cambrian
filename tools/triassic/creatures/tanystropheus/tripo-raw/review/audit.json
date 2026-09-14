@@ -1,0 +1,105 @@
+{
+  "schema_version": 1,
+  "input": {
+    "path": "tools/triassic/creatures/tanystropheus/tripo-raw/tanystropheus.raw.glb",
+    "bytes": 1590656,
+    "sha256": "b4ca21e0cfaec7f6ed3c332cb57162658a977c49833b5c44812cbf0cb4853af2"
+  },
+  "summary": {
+    "mesh_objects": 1,
+    "vertices": 12173,
+    "faces": 19588,
+    "triangles": 19588,
+    "connected_components": 143,
+    "materials": 1,
+    "textures": 3
+  },
+  "bounds": {
+    "min_xyz": [
+      -0.5,
+      -0.370835,
+      -0.10175
+    ],
+    "max_xyz": [
+      0.5,
+      0.370835,
+      0.10175
+    ],
+    "center_xyz": [
+      0,
+      0,
+      0
+    ],
+    "size_xyz": [
+      1,
+      0.741671,
+      0.203501
+    ]
+  },
+  "meshes": [
+    {
+      "object": "tripo_node_aa7cb744-2664-426b-9e1e-a21ff6e96ec8",
+      "mesh": "tripo_mesh_aa7cb744-2664-426b-9e1e-a21ff6e96ec8",
+      "vertices": 12173,
+      "edges": 31618,
+      "faces": 19588,
+      "triangles": 19588,
+      "connected_components": 143,
+      "material_slots": [
+        "tripo_material_aa7cb744-2664-426b-9e1e-a21ff6e96ec8"
+      ]
+    }
+  ],
+  "materials": [
+    {
+      "name": "tripo_material_aa7cb744-2664-426b-9e1e-a21ff6e96ec8",
+      "image_textures": [
+        "Color_aa7cb744-2664-426b-9e1e-a21ff6e96ec8",
+        "NormalGL_aa7cb744-2664-426b-9e1e-a21ff6e96ec8",
+        "ORM_aa7cb744-2664-426b-9e1e-a21ff6e96ec8"
+      ]
+    }
+  ],
+  "textures": [
+    {
+      "name": "Color_aa7cb744-2664-426b-9e1e-a21ff6e96ec8",
+      "width": 2048,
+      "height": 2048,
+      "channels": 4,
+      "packed": true,
+      "source": "FILE",
+      "colorspace": "sRGB"
+    },
+    {
+      "name": "NormalGL_aa7cb744-2664-426b-9e1e-a21ff6e96ec8",
+      "width": 2048,
+      "height": 2048,
+      "channels": 4,
+      "packed": true,
+      "source": "FILE",
+      "colorspace": "Non-Color"
+    },
+    {
+      "name": "ORM_aa7cb744-2664-426b-9e1e-a21ff6e96ec8",
+      "width": 2048,
+      "height": 2048,
+      "channels": 4,
+      "packed": true,
+      "source": "FILE",
+      "colorspace": "Non-Color"
+    }
+  ],
+  "renders": {
+    "side": "tools/triassic/creatures/tanystropheus/tripo-raw/review/side.png",
+    "top": "tools/triassic/creatures/tanystropheus/tripo-raw/review/top.png",
+    "three-quarter": "tools/triassic/creatures/tanystropheus/tripo-raw/review/three-quarter.png"
+  },
+  "preview": {
+    "path": "tools/triassic/creatures/tanystropheus/tanystropheus.preview.glb",
+    "triangle_limit": 40000,
+    "triangles_before": 19588,
+    "triangles_after": 19588,
+    "bytes": 1472892,
+    "sha256": "540dd697ad385f628ee5f30f4fcc8741bad4cf3c9e131395db1f652e4aa90532"
+  }
+}

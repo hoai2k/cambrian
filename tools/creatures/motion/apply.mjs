@@ -69,7 +69,10 @@ function snapshot(d) {
   return {
     nodes: r.listNodes().map((n) => [n.getName(), n.getTranslation(), n.getRotation(), n.getScale(), n.listChildren().map((c) => c.getName()), n.getExtras()]),
     skins: r.listSkins().map((s) => [s.listJoints().map((j) => j.getName()), s.getSkeleton()?.getName(), digest(s.getInverseBindMatrices())]),
-    meshes: r.listMeshes().map((m) => [m.getName(), m.listPrimitives().map((p) => [p.listSemantics(), p.listSemantics().map((s) => digest(p.getAttribute(s))), indexDigest(p), p.getMaterial()?.getName(), p.getMode()])]),
+    // Attribute order within a primitive carries no meaning in glTF, and dedup() can reshuffle it
+    // (seen on files with duplicate-content COLOR_0/COLOR_1 or TANGENT/JOINTS_0 accessors), so the
+    // semantics are sorted before comparing rather than compared position-by-position.
+    meshes: r.listMeshes().map((m) => [m.getName(), m.listPrimitives().map((p) => { const sem = [...p.listSemantics()].sort(); return [sem, sem.map((s) => digest(p.getAttribute(s))), indexDigest(p), p.getMaterial()?.getName(), p.getMode()]; })]),
     materials: r.listMaterials().map((m) => [m.getName(), JSON.stringify(m.toJSON?.() ?? {}), m.getBaseColorFactor(), m.getBaseColorTexture()?.getName(), m.getNormalTexture()?.getName(), m.getMetallicRoughnessTexture()?.getName(), m.getAlphaMode(), m.getDoubleSided()]),
     textures: r.listTextures().map((t) => [t.getName(), t.getMimeType(), hash(t.getImage())]),
     kept: r.listAnimations().filter((a) => !clips.some((c) => c.name === a.getName())).map((a) => [a.getName(), a.listChannels().map((c) => [c.getTargetNode().getName(), c.getTargetPath(), digest(c.getSampler().getInput()), digest(c.getSampler().getOutput()), c.getSampler().getInterpolation()])]),

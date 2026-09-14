@@ -1,0 +1,106 @@
+[
+  {
+    "id": "ammonoid",
+    "file": "public/assets/ancientseas/animal-ammonoid.webp",
+    "width": 1024,
+    "height": 768,
+    "bytes": 267450,
+    "alpha": true
+  },
+  {
+    "id": "anomalocaris",
+    "file": "public/assets/ancientseas/animal-anomalocaris.webp",
+    "width": 1024,
+    "height": 768,
+    "bytes": 203976,
+    "alpha": true
+  },
+  {
+    "id": "bothriolepis",
+    "file": "public/assets/ancientseas/animal-bothriolepis.webp",
+    "width": 1024,
+    "height": 768,
+    "bytes": 202044,
+    "alpha": true
+  },
+  {
+    "id": "cladoselache",
+    "file": "public/assets/ancientseas/animal-cladoselache.webp",
+    "width": 1024,
+    "height": 768,
+    "bytes": 141900,
+    "alpha": true
+  },
+  {
+    "id": "cymbospondylus",
+    "file": "public/assets/ancientseas/animal-cymbospondylus.webp",
+    "width": 1024,
+    "height": 768,
+    "bytes": 155578,
+    "alpha": true
+  },
+  {
+    "id": "dunkleosteus",
+    "file": "public/assets/ancientseas/animal-dunkleosteus.webp",
+    "width": 1024,
+    "height": 768,
+    "bytes": 220932,
+    "alpha": true
+  },
+  {
+    "id": "hallucigenia",
+    "file": "public/assets/ancientseas/animal-hallucigenia.webp",
+    "width": 1024,
+    "height": 768,
+    "bytes": 236780,
+    "alpha": true
+  },
+  {
+    "id": "mixosaurus",
+    "file": "public/assets/ancientseas/animal-mixosaurus.webp",
+    "width": 1024,
+    "height": 768,
+    "bytes": 122898,
+    "alpha": true
+  },
+  {
+    "id": "nautiloid",
+    "file": "public/assets/ancientseas/animal-nautiloid.webp",
+    "width": 1024,
+    "height": 768,
+    "bytes": 288238,
+    "alpha": true
+  },
+  {
+    "id": "opabinia",
+    "file": "public/assets/ancientseas/animal-opabinia.webp",
+    "width": 1024,
+    "height": 768,
+    "bytes": 193592,
+    "alpha": true
+  },
+  {
+    "id": "placodont",
+    "file": "public/assets/ancientseas/animal-placodont.webp",
+    "width": 1024,
+    "height": 768,
+    "bytes": 198950,
+    "alpha": true
+  },
+  {
+    "id": "tiktaalik",
+    "file": "public/assets/ancientseas/animal-tiktaalik.webp",
+    "width": 1024,
+    "height": 768,
+    "bytes": 151734,
+    "alpha": true
+  },
+  {
+    "id": "trilobite",
+    "file": "public/assets/ancientseas/animal-trilobite.webp",
+    "width": 1024,
+    "height": 768,
+    "bytes": 203018,
+    "alpha": true
+  }
+]

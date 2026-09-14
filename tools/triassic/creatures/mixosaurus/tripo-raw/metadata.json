@@ -1,0 +1,38 @@
+{
+  "schema_version": 1,
+  "name": "mixosaurus",
+  "task": {
+    "type": "image_to_model",
+    "status": "success",
+    "progress": 100,
+    "task_id": "6af8c703-b983-4b3e-b0f1-a0303a535207",
+    "created_at": "2026-09-13T15:44:14.785693Z",
+    "completed_at": "2026-09-13T15:45:24.508070Z",
+    "credits_consumed": 30,
+    "output": {
+      "model_url": "<redacted download URL>",
+      "rendered_image_url": "<redacted download URL>"
+    }
+  },
+  "request": {
+    "file": {
+      "file_token": "<uploaded at runtime>"
+    },
+    "model": "v3.1-20260211",
+    "face_limit": 20000,
+    "texture": true,
+    "pbr": true
+  },
+  "image": {
+    "path": "docs/triassic/canonical/model-inputs/mixosaurus/input.png",
+    "sha256": "149c8843bdd6c1410f5c21b506ee85e79d3b3f0709fdc3ee16ebd94a501d01a3",
+    "bytes": 1763142
+  },
+  "artifact": {
+    "path": "tools/triassic/creatures/mixosaurus/tripo-raw/mixosaurus.raw.glb",
+    "bytes": 1449064,
+    "sha256": "3078ee238d387222165d30d7bf3910f62b889c06712c798c775cd84e23002f3a",
+    "source_output_field": "model_url"
+  },
+  "downloaded_at": "2026-09-13T15:45:38.751Z"
+}

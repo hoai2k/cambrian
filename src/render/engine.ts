@@ -11,7 +11,7 @@ import { CORPSE_WINDOW, DEATH_FADE, Game, radarRange as radarReach, type GripHud
 import type { Phase } from '../sim/daynight';
 import { BAND_COLOR, emptyInput, isCoop, TIER_NAMES, TIER_NEED, type Actor, type Band, type InputFrame, type Mode, type PlayerSetup } from '../sim/types';
 import { recordStep, recordingPhase } from '../app/debug-record';
-import { BIOME_NAMES, biomeAt, groundHeight, nurseryAt, sampleHeight, SURFACE_Y, type Biome, type Boulder, type LandmarkKind } from '../sim/world';
+import { BIOME_NAMES, biomeAt, coverAt, groundHeight, nurseryAt, sampleHeight, SURFACE_Y, type Biome, type Boulder, type LandmarkKind } from '../sim/world';
 import { AssetQueue, type AssetProgress } from './assets';
 import { fillOf, ladderName } from '../sim/ladder';
 import { CreatureView, ensureLoaded, loadedSync, type Lod } from './creature';
@@ -106,7 +106,7 @@ export interface EngineCallbacks {
 
 export const PLAYER_COLORS = ['#61f2d5', '#ffb457', '#c7a3ff', '#ff86a4'];
 
-interface CamState { showBoard: boolean; yaw: number; pitch: number; zoom: number; fade: number; aimBlend: number; aimTarget: number; aimSnapT: number; pos: THREE.Vector3; look: THREE.Vector3; shake: number; camera: THREE.PerspectiveCamera; lockBlend: number; lastPos: THREE.Vector3; frustum: THREE.Frustum; projScreen: THREE.Matrix4; tele: TeleMenu; }
+interface CamState { showBoard: boolean; hatchShot: number; yaw: number; pitch: number; zoom: number; fade: number; aimBlend: number; aimTarget: number; aimSnapT: number; pos: THREE.Vector3; look: THREE.Vector3; shake: number; camera: THREE.PerspectiveCamera; lockBlend: number; lastPos: THREE.Vector3; frustum: THREE.Frustum; projScreen: THREE.Matrix4; tele: TeleMenu; }
 /** Per-player teleport menu state: opened with D-pad down, steered with the D-pad or stick, A confirms, B closes. */
 /**
  * The D-pad-down menu. A list of places to go, plus one entry that opens a second page: the roster,
@@ -385,7 +385,7 @@ export class Engine {
     this.cams = setups.map((_, i) => {
       const p = this.game!.players[i];
       const cam = new THREE.PerspectiveCamera(60, 1, 0.08, 420);
-      const cs: CamState = { showBoard: false, yaw: p.yaw, pitch: 0.2, zoom: 1, fade: 0, aimBlend: 0, aimTarget: -1, aimSnapT: 0, pos: new THREE.Vector3(p.pos.x - Math.sin(p.yaw) * 6, p.pos.y + 2.5, p.pos.z - Math.cos(p.yaw) * 6), look: new THREE.Vector3(p.pos.x, p.pos.y, p.pos.z), shake: 0, camera: cam, lockBlend: 0, lastPos: new THREE.Vector3(p.pos.x, p.pos.y, p.pos.z), frustum: new THREE.Frustum(), projScreen: new THREE.Matrix4(), tele: freshTele() };
+      const cs: CamState = { showBoard: false, hatchShot: -1, yaw: p.yaw, pitch: 0.2, zoom: 1, fade: 0, aimBlend: 0, aimTarget: -1, aimSnapT: 0, pos: new THREE.Vector3(p.pos.x - Math.sin(p.yaw) * 6, p.pos.y + 2.5, p.pos.z - Math.cos(p.yaw) * 6), look: new THREE.Vector3(p.pos.x, p.pos.y, p.pos.z), shake: 0, camera: cam, lockBlend: 0, lastPos: new THREE.Vector3(p.pos.x, p.pos.y, p.pos.z), frustum: new THREE.Frustum(), projScreen: new THREE.Matrix4(), tele: freshTele() };
       cam.position.copy(cs.pos); cam.lookAt(cs.look);
       return cs;
     });
@@ -757,6 +757,26 @@ export class Engine {
     const jumped = cs.lastPos.distanceTo(pp) > 20;
     cs.lastPos.copy(pp);
     if (jumped) { cs.yaw = p.yaw; cs.fade = 1; }
+    // The opening shot. A hatch is five seconds the player cannot act in, and it is the one thing
+    // every match opens on — so the camera picks the side the shell can actually be seen from
+    // rather than simply sitting behind the animal, which is as likely to be behind a log or a
+    // Tanystropheus' flank as not. Chosen once, on the frame the egg appears, and then left alone:
+    // a camera that kept re-deciding would swing about while the player watched.
+    const inShell = p.hatching && p.state === 'moult' && p.stateDur > 1.5;
+    if (inShell && cs.hatchShot !== p.id) {
+      cs.hatchShot = p.id;
+      let bestYaw = cs.yaw, bestSeen = -Infinity;
+      for (let i = 0; i < 8; i++) {
+        const yaw = (i / 8) * Math.PI * 2;
+        // Where the arm would put the camera at this yaw, at the egg's own height.
+        const cx = pp.x - Math.sin(yaw) * dist, cz = pp.z - Math.cos(yaw) * dist;
+        const cy = Math.max(pp.y + L * 0.6, sampleHeight(cx, cz) + L * CAMERA_SAND);
+        // Least covered camera spot wins: what hides a body there is what would stand in the way.
+        const seen = -coverAt(this.game!.world, { x: cx, y: cy, z: cz }, L, []);
+        if (seen > bestSeen) { bestSeen = seen; bestYaw = yaw; }
+      }
+      cs.yaw = bestYaw;
+    } else if (!inShell && cs.hatchShot === p.id) cs.hatchShot = -1;
     // Eaten: ride along with the predator, from the same angle, until the respawn — you are inside
     // it, so it is where you are. Killed any other way, the shot stays on your own body drifting
     // up: whatever landed the blow has moved on, and following it would be a camera nobody asked
@@ -920,7 +940,8 @@ export class Engine {
   private breathe(game: Game, keep: Set<number>) {
     for (const [id, v] of this.views) {
       const a = keep.has(id) ? game.byId(id) : undefined;
-      if (!a || !isAlive(a) || isHidden(a) || creature(a.creature).breathing !== 'bimodal') { this.breath.delete(id); continue; }
+      const breathing = a ? creature(a.creature).breathing : undefined;
+      if (!a || !isAlive(a) || isHidden(a) || (breathing !== 'bimodal' && breathing !== 'air')) { this.breath.delete(id); continue; }
       const L = lengthOf(a);
       const prev = this.breath.get(id);
       this.breath.set(id, { stamina: a.stamina, owed: prev?.owed ?? 0 });
@@ -1155,8 +1176,10 @@ export class Engine {
         // would hand it all back. `strength` is how spent it is.
         case 'winded': {
           const s = e.strength ?? 0;
-          this.bubbles.emit(e.pos, 2 + Math.round(4 * s), 0.5, 2, 0.05, 1);
-          personal('winded', 0.35 + 0.45 * s);
+          // Under the camera's nose a puff of bubbles every beat reads as a white flash, so the
+          // spill is a thin one and the cue is quiet: this is a body running low, not an alarm.
+          this.bubbles.emit(e.pos, 1 + Math.round(2 * s), 0.4, 1.4, 0.04, 0.8);
+          personal('winded', 0.18 + 0.22 * s);
           break;
         }
         case 'anoxia': { personal('anoxia', 0.8); break; }

@@ -33,6 +33,16 @@ export interface EraCopy {
    * its whole roster into this page's bundle and read ACTIVE_ERA at import time.
    */
   readonly sibling?: { readonly title: string; readonly path: string; readonly blurb: string; readonly logo: string };
+  /**
+   * The trilogy's own page, which is the site root and holds all three games. It is what the title
+   * screen offers, in place of a link per era: three games make three corners of links out of a
+   * screen that is meant to say press start, and the page they all point at is one click from any
+   * of them anyway. `sibling`/`siblings` stay for the pick screen, where going straight to another
+   * game's roster saves the player a screen.
+   */
+  readonly trilogy?: { readonly title: string; readonly path: string; readonly blurb: string };
+  /** The other eras, when there are more than one: the picker lists these after `sibling`. */
+  readonly siblings?: readonly { readonly title: string; readonly path: string; readonly blurb: string; readonly logo: string }[];
 }
 
 /** Render-only replacements for existing scenery placements; never changes world generation. */
@@ -44,7 +54,17 @@ export interface InstancedScenery {
     readonly bend?: boolean;
     readonly doubleSided?: boolean;
   }>>;
-  readonly flora: Readonly<Partial<Record<FloraKind, string>>>;
+  /**
+   * Which prop draws each plant kind. A kind may name **several**, and then it is one family with
+   * that many authored shapes — two ripple phases, two crust rims, a taller dome and a lower one —
+   * and the renderer picks per instance so a field of them does not read as one mesh repeated.
+   * The design's prop table assumes this throughout ("three variants by size", "four variants").
+   *
+   * The simulation does not choose: it collides against the family's *union* envelope, the widest
+   * each band gets over all the variants (`propShapeFor`). So a variant is presentation, `src/sim`
+   * stays free of it, and the collider is never smaller than the thing that was drawn.
+   */
+  readonly flora: Readonly<Partial<Record<FloraKind, string | readonly string[]>>>;
   /** Dense authored flora can opt into the existing high tier; rocks are independent. */
   readonly minimumFloraQuality?: 'high';
   readonly rocks?: Readonly<Partial<Record<'boulder' | 'blade-spire' | 'talus-shard' | 'pebble-cluster', string>>>;
@@ -101,6 +121,18 @@ export interface EraDefinition {
      * the Cambrian's 40. A pelagic roster wants more water over the floor than a benthic one.
      */
     readonly surfaceY?: number;
+    /**
+     * Target water depth per biome, world units below the surface: the sea floor sinks toward the
+     * deep biomes and rises toward the flats. Blended by the biome weights, so the slopes are
+     * slopes. Absent — the Cambrian and the Devonian — the floor undulates around zero everywhere
+     * and only the shore, the channels and the escarpment move it (docs/triassic/02-biomes-and-depth.md).
+     */
+    readonly floorDepth?: Record<Biome, number>;
+    /**
+     * The file (no extension) under `assets.biomes` that paints each slot, where it is not the
+     * slot id itself: the Triassic's plates were delivered under the biomes' own names.
+     */
+    readonly biomePlates?: Partial<Record<Biome, string>>;
     readonly biomeNames: Record<Biome, string>;
     readonly biomeDanger: Record<Biome, number>;
   };
@@ -138,7 +170,14 @@ export interface EraDefinition {
      * Creatures whose own model is still in production borrow another roster member's GLB (and
      * its LOD), recoloured with their scheme. Removed entry by entry as deliveries land.
      */
-    readonly standIns?: Readonly<Partial<Record<CreatureId, CreatureId>>>;
+    readonly standIns?: Readonly<Partial<Record<CreatureId, CreatureId | `${string}/${string}`>>>;
+    /**
+     * Borrowed bodies may be picked. The Devonian keeps its stand-ins off the roster because a
+     * borrowed body has no portrait; an era that ships placeholder portraits for its whole roster
+     * (the Triassic, from its canonical poses) can let every animal be played while its models are
+     * still in production. The preview badge says what state the art is in either way.
+     */
+    readonly standInsPlayable?: boolean;
   };
   readonly audio: {
     readonly music: readonly MusicTrack[];
@@ -166,7 +205,11 @@ export function defineEra(def: EraDefinition): EraDefinition {
   for (const id of references) if (!ids.has(id)) throw new Error(`${def.id}: creature ${id} is outside the roster`);
   if (!def.ecology.giants.length) throw new Error(`${def.id}: a giant habitat is required for patrol placement`);
   for (const id of ids) if (!((def.assets.modelBytes[id] ?? 0) > 0)) throw new Error(`${def.id}: missing model size for ${id}`);
-  for (const [id, standIn] of Object.entries(def.assets.standIns ?? {})) if (!ids.has(id as CreatureId) || !standIn || !ids.has(standIn) || def.assets.standIns?.[standIn]) throw new Error(`${def.id}: stand-in ${id} → ${standIn} must map a roster member to a delivered one`);
+  for (const [id, standIn] of Object.entries(def.assets.standIns ?? {})) {
+    if (!ids.has(id as CreatureId) || !standIn) throw new Error(`${def.id}: stand-in ${id} → ${standIn} must map a roster member to a delivered one`);
+    if (standIn.includes('/')) continue;                       // another era's delivered body: checked by that era's own tests
+    if (!ids.has(standIn as CreatureId) || def.assets.standIns?.[standIn as CreatureId]) throw new Error(`${def.id}: stand-in ${id} → ${standIn} must map a roster member to a delivered one`);
+  }
   for (const id of ids) if (!def.presentation.authoredColors.creatures[id]) throw new Error(`${def.id}: missing authored colours for ${id}`);
   if (!def.presentation.schemes.length) throw new Error(`${def.id}: a default colour scheme is required`);
   if (!def.audio.music.length) throw new Error(`${def.id}: a soundtrack is required`);

@@ -1,0 +1,111 @@
+{
+  "format": "cambrian-stretch",
+  "version": 1,
+  "generated": "2026-09-14T00:59:39.361Z",
+  "creature": {
+    "key": "triassic:nothosaurus",
+    "id": "nothosaurus",
+    "collection": "triassic",
+    "model": "assets/triassic/creatures/nothosaurus.glb",
+    "vertices": 12868,
+    "rigged": true
+  },
+  "appliesTo": "builder",
+  "frame": {
+    "axis": "z",
+    "forward": 1,
+    "up": "y",
+    "source": "mouth",
+    "note": "Model root frame, unscaled. The body runs along z; the head is at the high end. Both cuts are square to `direction`, which is the unit vector below; tiltSide is the angle its line makes in the side view and tiltTop the angle in the top view, in radians from straight down the body."
+  },
+  "bounds": {
+    "length": 5,
+    "height": 1.3186662197113037,
+    "width": 3.3189857006073,
+    "axisMin": -2.5,
+    "axisMax": 2.5,
+    "lateralMid": 0,
+    "upMid": 0
+  },
+  "planes": {
+    "from": {
+      "at": 1.3950956484794046,
+      "headFraction": 0.221,
+      "centre": [
+        0,
+        0,
+        1.395096
+      ]
+    },
+    "to": {
+      "at": 1.8717986749838416,
+      "headFraction": 0.1256,
+      "centre": [
+        0,
+        0,
+        1.871799
+      ]
+    }
+  },
+  "direction": {
+    "vector": [
+      -0.121141,
+      0.656791,
+      0.744278
+    ],
+    "tiltSide": 0.7230360173192247,
+    "tiltTop": -0.16134802596290843,
+    "tiltSideDegrees": 41.427,
+    "tiltTopDegrees": -9.245
+  },
+  "region": {
+    "length": 0.3548,
+    "stretched": 0.698955,
+    "factor": 1.97,
+    "shift": 0.344156,
+    "percentOfBody": 7.1
+  },
+  "changed": true,
+  "note": "Vertices on the body side of `from` are unchanged; vertices on the head side of `to` move by direction.vector × region.shift; between the cuts a vertex moves by that times its own fraction through the region, measured along the direction. Normals follow the inverse transpose of that map. See docs/viewer-stretch.md. This body is rigged, so nothing here can be baked into its GLB: `npm run triassic:stretch` refuses it. The numbers are the measurement to take to the builder — and, for a large factor, to the canonical pose.",
+  "stretch": {
+    "version": 1,
+    "key": "triassic:nothosaurus",
+    "id": "nothosaurus",
+    "collection": "triassic",
+    "model": "assets/triassic/creatures/nothosaurus.glb",
+    "frame": {
+      "axis": "z",
+      "forward": 1,
+      "up": "y"
+    },
+    "frameSource": "mouth",
+    "vertices": 12868,
+    "rigged": true,
+    "box": {
+      "lo": [
+        -1.65949285030365,
+        -0.6593331098556519,
+        -2.5
+      ],
+      "hi": [
+        1.65949285030365,
+        0.6593331098556519,
+        2.5
+      ]
+    },
+    "bounds": {
+      "length": 5,
+      "height": 1.3186662197113037,
+      "width": 3.3189857006073,
+      "axisMin": -2.5,
+      "axisMax": 2.5,
+      "lateralMid": 0,
+      "upMid": 0
+    },
+    "from": 1.3950956484794046,
+    "to": 1.8717986749838416,
+    "tiltSide": 0.7230360173192247,
+    "tiltTop": -0.16134802596290843,
+    "factor": 1.97
+  }
+}

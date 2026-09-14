@@ -359,6 +359,14 @@ interface Step {
  * a player still, and it is the point — you hatch once a life, and the first thing the sea shows
  * you is that you are the smallest thing in it.
  */
+/**
+ * How far out a death still counts as inshore, so the nursery is the right place to come back to.
+ * The nurseries sit 88 units off the beach and the shallows run out to about 135, so this covers
+ * the shore band and nothing beyond it: past here you are living somewhere, and `respawnAt` brings
+ * you back to it rather than to the beach.
+ */
+const RESPAWN_INSHORE = 170;
+
 export const HATCH_TIME = 5;
 /**
  * Where in that performance the seam gives, and with it the body: the player has their animal back
@@ -950,8 +958,8 @@ export class Game implements AiWorld {
     applyScaleStats(a, false);
     a.eaten = 0;
     a.stamina = a.staminaMax; a.poise = a.poiseMax;
-    // Back to a nursery near another player (the party stays together in an endless sea), or
-    // failing that the nearest one to where you died; never one a giant is loitering in.
+    // Back near another player (the party stays together in an endless sea), or failing that where
+    // you died.
     let ref = a.pos, refD = Infinity;
     for (const o of this.players) if (o !== a && isAlive(o)) { const d = distXZ(o.pos, a.pos); if (d < refD) { refD = d; ref = o.pos; } }
     const near = nearestNursery(ref.x, ref.z);
@@ -963,14 +971,51 @@ export class Game implements AiWorld {
       const score = danger * 100 + distXZ(ref, n) * 0.2;
       if (score < bd) { bd = score; nursery = n; }
     }
+    // `home` is still the nursery: it is where this animal hatched and what the teleport means.
+    // Where it comes *back* is a different question, and the answer is the water it was living in.
     a.home = { ...nursery };
-    this.world.loadAround(nursery);
-    a.pos = this.spawnPoint(nursery, a.creature, a.scale, a.player);
+    const at = this.respawnAt(ref, nursery);
+    this.world.loadAround(at);
+    a.pos = this.spawnPoint(at, a.creature, a.scale, a.player);
     a.vel = v3(); a.state = 'free'; a.stateT = 0; a.respawnT = 0; a.corpseT = 0; a.eaten = 0; a.eatBites = 0;
     stopHiding(a); a.camoStrength = 0; a.hideCd = 0; a.emergenceHeavy = false; a.spawnProtect = RULES?.spawnProtect(a) ?? 3.5; a.hitFlash = 0; a.abilityActive = false; a.abilityCd = 0; a.lockTarget = -1; a.hunted = 0; a.hunterId = -1; a.wasHunted = false; a.swallowedBy = -1; a.bank = 0; a.pitch = 0; a.climbTo = -Infinity; a.climbPush = 0; this.clearRide(a);
     a.yaw = Math.PI;
     this.beginHatch(a);
     void def;
+  }
+
+  /**
+   * Where a body comes back, given where it was and the nursery it hatched in.
+   *
+   * Dying used to send a player to the nearest nursery, and every nursery sits a fixed eighty-eight
+   * units off the beach — so an animal that had spent the whole match working its way out to the
+   * open sea was returned to the shallows every time something killed it, and had to swim the
+   * distance again. In a sea whose depth is the biome's own that is a longer walk back than it
+   * used to be, and it undoes the one thing the player was doing.
+   *
+   * So: come back in the water you were living in. Inshore that is still the nursery — it is the
+   * hatchery, it is safe by non-aggression, and it is in the shore band anyway, so nothing is
+   * gained by inventing a second answer for it. Further out, pick a spot around where you were at
+   * the same distance from shore, which is the same biome and the same depth, and away from
+   * whatever giant is in the area. A death still costs a rung and half the progress toward the
+   * next one; it does not also cost the swim.
+   */
+  private respawnAt(ref: Vec3, nursery: Vec3): Vec3 {
+    const s = shoreDistance(ref.x, ref.z);
+    if (s <= RESPAWN_INSHORE) return nursery;
+    let best = ref, bd = Infinity;
+    for (let i = 0; i < 8; i++) {
+      const ang = (i / 8) * TAU + this.rng() * 0.6;
+      const r = 30 + this.rng() * 70;
+      const p = { x: ref.x + Math.cos(ang) * r, y: 0, z: ref.z + Math.sin(ang) * r };
+      let danger = 0;
+      for (const g of this.actors) if (g.controller === 'giant' && isAlive(g) && distXZ(g.pos, p) < 70) danger += 1;
+      // Drifting in or out of the band you died in is what this is here to prevent, so it is
+      // scored heavily against; a giant in the area outweighs it anyway.
+      const score = danger * 100 + Math.abs(shoreDistance(p.x, p.z) - s) * 0.6;
+      if (score < bd) { bd = score; best = p; }
+    }
+    return best;
   }
 
   /**
@@ -980,7 +1025,7 @@ export class Game implements AiWorld {
    * the old second-long swell out of nothing, because it did not come from an egg.
    */
   private beginHatch(a: Actor) {
-    const egg = ladderRung(this, a) === 0;
+    const egg = ladderRung(this, a) === 0 && !RULES?.liveBirth?.(a);
     a.hatching = true; a.state = 'moult'; a.stateT = 0; a.stateDur = egg ? HATCH_HOLD : 1.0;
     a.vel = v3();
     if (egg) this.layEgg(a);
@@ -1200,7 +1245,12 @@ export class Game implements AiWorld {
       }
     }
     let rate = def.agility;
-    if (mag === 0 && controllable) rate = def.glide; // glide out
+    // Glide is for a body that has been asked for *nothing*. Rise and sink are asks like any other,
+    // and leaving them out meant holding the climb button alone put the animal in its slowest
+    // acceleration: a hatchling Nothosaurus took four and a half seconds to reach even two thirds
+    // of a climb speed that was already too small, which in an era where air is the economy reads
+    // as the button not working.
+    if (mag === 0 && controllable && !input.rise && !input.sink) rate = def.glide; // glide out
     if (a.state === 'stagger' || a.state === 'grabbed') { desired = v3(); rate = 2.5; }
     // A tail-flip is ballistic: the reflex has fired and there is nothing to steer with until it lands.
     if (a.state === 'dodge' || a.state === 'attack' || a.state === 'eating' || a.state === 'moult' || a.state === 'grabbing' || a.state === 'parry') rate = a.state === 'dodge' ? (def.tailFlip ? 0.25 : 1.4) : 3;

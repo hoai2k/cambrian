@@ -4,7 +4,7 @@ import type { Screen } from './App';
  * What the shoulder buttons cycle through on a screen.
  *
  * A pad can only point at one thing at a time, and most screens have more than one thing worth
- * pointing at: the era link, the choice the screen is actually about, the mode chips, the icon
+ * pointing at: the trilogy link, the choice the screen is actually about, the mode chips, the icon
  * buttons in the corner. The sticks and D-pad belong to whichever of those is in hand, and LB/RB
  * hand them to the next one along — the same gesture that already switched modes, generalised, so
  * there is one thing to learn rather than a different rule per screen.
@@ -15,8 +15,8 @@ import type { Screen } from './App';
 export type FocusGroup = 'era' | 'main' | 'modes' | 'icons';
 
 export interface FocusOpts {
-  /** The title screen offers the other era, bottom left — but only when there is one. */
-  sibling: boolean;
+  /** The title screen offers the trilogy's page, bottom left — but only when the era names one. */
+  link: boolean;
   /** The icon buttons hide themselves when a player has asked for a bare sea. */
   icons: boolean;
 }
@@ -24,7 +24,7 @@ export interface FocusOpts {
 /** The ring for a screen, in screen order. Always contains `main`. */
 export function groupsFor(screen: Screen, menuOpen: boolean, o: FocusOpts): FocusGroup[] {
   const ring: FocusGroup[] = [];
-  if (screen === 'title' && o.sibling) ring.push('era');
+  if (screen === 'title' && o.link) ring.push('era');
   ring.push('main');
   if (screen === 'select') ring.push('modes');
   if (o.icons) ring.push('icons');

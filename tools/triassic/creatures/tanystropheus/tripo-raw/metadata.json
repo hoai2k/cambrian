@@ -1,0 +1,38 @@
+{
+  "schema_version": 1,
+  "name": "tanystropheus",
+  "task": {
+    "type": "image_to_model",
+    "status": "success",
+    "progress": 100,
+    "task_id": "aa7cb744-2664-426b-9e1e-a21ff6e96ec8",
+    "created_at": "2026-09-13T19:47:17.689599Z",
+    "completed_at": "2026-09-13T19:48:35.834719Z",
+    "credits_consumed": 30,
+    "output": {
+      "model_url": "<redacted download URL>",
+      "rendered_image_url": "<redacted download URL>"
+    }
+  },
+  "request": {
+    "file": {
+      "file_token": "<uploaded at runtime>"
+    },
+    "model": "v3.1-20260211",
+    "face_limit": 20000,
+    "texture": true,
+    "pbr": true
+  },
+  "image": {
+    "path": "docs/triassic/canonical/model-inputs/tanystropheus/input.png",
+    "sha256": "53927cf8b3507d983ebc2d72fd32c24f965ad9bfa12753816a2671d50c45dd3e",
+    "bytes": 1300806
+  },
+  "artifact": {
+    "path": "tools/triassic/creatures/tanystropheus/tripo-raw/tanystropheus.raw.glb",
+    "bytes": 1590656,
+    "sha256": "b4ca21e0cfaec7f6ed3c332cb57162658a977c49833b5c44812cbf0cb4853af2",
+    "source_output_field": "model_url"
+  },
+  "downloaded_at": "2026-09-13T19:48:41.645Z"
+}

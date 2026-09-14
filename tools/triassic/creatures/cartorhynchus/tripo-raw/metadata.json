@@ -1,0 +1,38 @@
+{
+  "schema_version": 1,
+  "name": "cartorhynchus",
+  "task": {
+    "type": "image_to_model",
+    "status": "success",
+    "progress": 100,
+    "task_id": "0934f26f-24dd-4e66-9616-30250a630939",
+    "created_at": "2026-09-13T15:51:21.534019Z",
+    "completed_at": "2026-09-13T15:52:40.017199Z",
+    "credits_consumed": 30,
+    "output": {
+      "model_url": "<redacted download URL>",
+      "rendered_image_url": "<redacted download URL>"
+    }
+  },
+  "request": {
+    "file": {
+      "file_token": "<uploaded at runtime>"
+    },
+    "model": "v3.1-20260211",
+    "face_limit": 20000,
+    "texture": true,
+    "pbr": true
+  },
+  "image": {
+    "path": "docs/triassic/canonical/model-inputs/cartorhynchus/input.png",
+    "sha256": "e6f763ba27de1154c0e2923a02c15a4d0a52bf5ce3e762829113dc51908b7a10",
+    "bytes": 1967898
+  },
+  "artifact": {
+    "path": "tools/triassic/creatures/cartorhynchus/tripo-raw/cartorhynchus.raw.glb",
+    "bytes": 1430596,
+    "sha256": "edbb71276d4a9c831b1498afc748a6b0767f30d02561da0916918a1a67864f61",
+    "source_output_field": "model_url"
+  },
+  "downloaded_at": "2026-09-13T15:52:44.854Z"
+}
