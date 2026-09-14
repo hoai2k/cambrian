@@ -75,8 +75,17 @@ export function Viewer() {
    * and the clip keeps playing, which turns any difference between them into movement rather than
    * something to hold in your head across two list entries.
    */
-  const [body, setBody] = useState<'model' | 'puppet' | 'generated'>(
-    initial.current.mode === 'stretch' && specimenByKey.get(initial.current.key)?.generated ? 'generated' : 'model');
+  const openingBody = (key: string, mode?: Mode): 'model' | 'generated' => {
+    const c = specimenByKey.get(key)!;
+    // A stretch is an edit to the raw generation, so a link into it opens that body even for an
+    // animal whose built body is waiting on a human and would otherwise win below.
+    if (mode === 'stretch' && c.generated) return 'generated';
+    // A body that is built and waiting on a human is the thing to open on, even though the animal
+    // also still has the raw mesh it was built from. Only when there is no built body does the
+    // generated mesh win, because then `model` is somebody else's body borrowed in play.
+    return c.generated && !c.inReview ? 'generated' : 'model';
+  };
+  const [body, setBody] = useState<'model' | 'puppet' | 'generated'>(() => openingBody(initial.current.key, initial.current.mode));
   const requestedId = useRef('');
   const def = specimenByKey.get(id)!;
   const showPuppet = body === 'puppet' && !!def.puppet;
@@ -107,6 +116,18 @@ export function Viewer() {
     if (body === 'puppet' && !def.puppet) setBody('model');
     if (body === 'generated' && !def.generated) setBody('model');
   }, [body, def.puppet, def.generated]);
+  // Which body a specimen *opens* on. An animal that has a generated mesh is by definition one
+  // whose own body has not shipped — the manifest retires the preview the day it does — so what
+  // `model` resolves to for it is the Devonian fish it borrows in play. Opening there made the
+  // page look like it had never been told about the generated meshes: a reviewer asking to see the
+  // Triassic body got a Devonian one and no reason to touch the Body control. So it opens on the
+  // animal's own mesh instead, and a reviewer's explicit choice holds until they change specimen.
+  const opened = useRef(id);
+  useEffect(() => {
+    if (opened.current === id) return;   // not a specimen change: leave a reviewer's own choice alone
+    opened.current = id;
+    setBody(openingBody(id));
+  }, [id]);
   // Sculpting needs a creature on stage; a prop or a load in progress has nothing to sculpt.
   // Not on the twin: a sculpt is the hand-off that goes into a builder's profile rows for the body
   // that ships, and one exported off the comparison body would name the right creature and describe
@@ -115,8 +136,17 @@ export function Viewer() {
   const canSculpt = !isPropCollection(collection) && !showPuppet && !showGenerated && ready;
   // Stretching is the other half of that split, and the opposite gate: it lengthens a run of a raw
   // generation before anyone cleans or rigs it, so it is offered only on the generated body and
-  // never on one that has shipped.
+  // never on a built one.
   const canStretch = showGenerated && ready;
+  /**
+   * Whether `model` is this animal's own body or one it borrows in play.
+   *
+   * An animal with a generated mesh and nothing built yet resolves `model` to a Devonian fish, and
+   * a sculpt of that would name the right creature and describe somebody else's body — so it is
+   * not offered one. An animal whose body is built and waiting on a human has both, and there the
+   * sculpt is exactly right.
+   */
+  const ownBody = !def.generated || !!def.inReview;
   useEffect(() => {
     if (mode === 'sculpt' && (isPropCollection(collection) || showPuppet || showGenerated)) setMode('view');
     if (mode === 'stretch' && !showGenerated) setMode('view');
@@ -145,7 +175,9 @@ export function Viewer() {
     requestedId.current = id;
     // Set the scheme before the model is built so it never appears in the wrong palette first.
     sceneRef.current?.setScheme(picksRef.current[id] ?? defaultScheme(id));
-    sceneRef.current?.show({ ...def, model: modelPath }, { preserveView: true })
+    // The yaw is the generated mesh's alone: the shipped body and the twin are already built to
+    // the engine's convention and must not be turned.
+    sceneRef.current?.show({ ...def, model: modelPath, previewYaw: showGenerated ? def.previewYaw : 0 }, { preserveView: true })
       .then((names) => {
         if (cancelled) return;
         // A sculpt made this session follows the creature back onto the stage, full or reduced.
@@ -157,7 +189,7 @@ export function Viewer() {
       })
       .catch((e: Error) => { if (!cancelled) { setError(e.message); setLoading(false); } });
     return () => { cancelled = true; };
-  }, [id, modelPath]);
+  }, [id, modelPath, showGenerated, def.previewYaw]);
 
   useEffect(() => { sceneRef.current?.setSpeed(speed); }, [speed]);
   useEffect(() => { sceneRef.current?.setScheme(schemeId); }, [schemeId]);
@@ -257,17 +289,26 @@ export function Viewer() {
         {(def.puppet || def.generated) && <label className="scheme-pick">
           <span>Body</span>
           <select aria-label="Which body" value={body} disabled={loading} onChange={e => setBody(e.target.value as 'model' | 'puppet' | 'generated')}>
-            <option value="model">{def.generated ? 'Borrowed body (in play)' : 'Authored model'}</option>
+            <option value="model">{def.inReview ? 'Authored model (in review)' : def.generated ? 'Borrowed body (in play)' : 'Authored model'}</option>
             {def.puppet && <option value="puppet">Procedural twin</option>}
             {def.generated && <option value="generated">Generated mesh (no rig)</option>}
           </select>
         </label>}
+        {def.inReview && <p className="hint">
+          <strong>Awaiting review:</strong> this animal's own body, twin and clips are built, but it
+          is not in <code>shipped.json</code> yet — so the game still draws the body it borrows and
+          the animal keeps its warning. Everything on this page is the real thing; what is being
+          decided is whether it ships. The raw mesh it was built from is still under <em>Body</em>.
+        </p>}
         {def.generated && <p className="hint">
           <strong>Generated mesh:</strong> the raw body this animal will be built from. It has no
-          skeleton, no animation clips and no anchors, and its orientation and scale are not yet
-          normalized for the engine, so it sits still and may not face the way the others do. It is
-          here to be looked at — the animal still borrows another era's body in play until this one
-          is cleaned, rigged and animated.
+          skeleton, no animation clips and no anchors, so it sits still. Its facing and its size here
+          are <em>estimates</em> — the mesh arrives pointing wherever it was generated and normalized
+          to one unit, and it has been turned to face the way the shipped bodies do{def.previewLength
+            ? ` and taken up to the ${def.previewLength} units the roster gives the animal` : ''}. Both
+          are redone properly when the body is cleaned and rigged, and every bit of this preview is
+          thrown away the day the real one lands. Until then the animal still borrows another era's
+          body in play.
         </p>}
         {def.puppet && <p className="hint">
           The twin is rebuilt to this body's own volume on the same skeleton, and is where the clips
@@ -277,7 +318,7 @@ export function Viewer() {
         <p className="hint">Drag to orbit · right-drag to pan · scroll to zoom</p>
         <div className="info-actions">
           <button className="ghost" onClick={() => sceneRef.current?.resetCamera()}>Reset view</button>
-          {!isPropCollection(collection) && !def.generated && <button className="ghost" onClick={() => setMode('sculpt')} disabled={!canSculpt} title="Reshape the body on side and top drawings and export the change as a sculpt file">
+          {!isPropCollection(collection) && ownBody && <button className="ghost" onClick={() => setMode('sculpt')} disabled={!canSculpt} title="Reshape the body on side and top drawings and export the change as a sculpt file">
             Edit sculpt{(() => { const d = getSculpt(id); return d && !isIdentity(d) ? ' (edited)' : ''; })()}
           </button>}
           {def.generated && <button className="ghost" onClick={() => { setBody('generated'); setMode('stretch'); }} disabled={!ready} title="Lengthen a run of this raw generation — a neck, a tail — between two cuts, and export the change to be baked into the GLB">

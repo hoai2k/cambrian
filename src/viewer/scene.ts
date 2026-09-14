@@ -336,6 +336,11 @@ export function createViewerScene(canvas: HTMLCanvasElement): ViewerScene {
     // Keep the established Cambrian display scale. Devonian is a specimen collection with
     // consistent framing; its researched real-world size is labelled separately.
     const src = SkeletonUtils.clone(gltf.scene);
+    // A raw generated body points wherever its generation pointed it. Turning it before the box is
+    // measured means the framing, the radius and the centring all describe the body as shown, and
+    // nothing downstream has to know the mesh was estimated rather than built.
+    if (specimen.previewYaw) src.rotation.y = THREE.MathUtils.degToRad(specimen.previewYaw);
+    src.updateMatrixWorld(true);
     const box = new THREE.Box3().setFromObject(src);
     const size = box.getSize(new THREE.Vector3());
     const center = box.getCenter(new THREE.Vector3());

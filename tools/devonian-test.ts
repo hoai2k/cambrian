@@ -25,7 +25,17 @@ const { tierScale } = await import('../src/sim/tiers');
 const { TIER_SCALE } = await import('../src/sim/types');
 const { creature } = await import('../src/sim/creatures');
 const { emptyInput } = await import('../src/sim/types');
-const { shoreZ, shoreDistance, SURFACE_Y, generateChunk, biomeAt, nurseryAt, chunkCoord, LOG_SHORE_RANGE, groundHeight } = await import('../src/sim/world');
+const { shoreZ, shoreDistance, SURFACE_Y, sampleHeight, generateChunk, biomeAt, nurseryAt, chunkCoord, LOG_SHORE_RANGE, groundHeight } = await import('../src/sim/world');
+/**
+ * Mid-water at a point: clear of the floor and clear of the surface.
+ *
+ * Swimming cases used to be set down at a fixed y, which worked while the Devonian floor was flat
+ * at about zero everywhere. It is not any more — the sea slopes from the shore, so the floor in the
+ * shallows is up at +30 — and a body placed at an absolute depth started buried, where the terrain
+ * shoved it about and a test about which way a dash goes was really measuring a collision. Ask the
+ * seabed where the water is instead.
+ */
+const openWater = (x: number, z: number) => (sampleHeight(x, z) + SURFACE_Y) / 2;
 type FloraKind = import('../src/sim/world').FloraKind;
 type Biome = import('../src/sim/world').Biome;
 type InputFrame = import('../src/sim/types').InputFrame;
@@ -428,7 +438,7 @@ ok(RULES !== undefined && !RULES.growthByNutrition, 'Devonian rules active: grow
     const g = new Game('reef', [{ creature: id, device: 'keyboard', ready: true }]);
     g.skipHatch();
     const p = g.players[0];
-    p.pos = { x: 0, y: -14, z: 0 }; p.vel = { x: 0, y: 0, z: 0 }; p.yaw = 0; p.spawnProtect = 999;
+    p.pos = { x: 0, y: openWater(0, 0), z: 0 }; p.vel = { x: 0, y: 0, z: 0 }; p.yaw = 0; p.spawnProtect = 999;
     const push = (my: number): InputFrame => ({ ...emptyInput(), my, burst: gear === 'sprint' ? 1 : 0, dash: gear === 'dash' });
     for (let i = 0; i < 90; i++) { tick(g, new Map<number, InputFrame>([[0, push(stick)]])); p.spawnProtect = 999; }
     const turned = { z: p.pos.z, astern: astern(p), yaw: p.yaw };
@@ -464,7 +474,7 @@ ok(RULES !== undefined && !RULES.growthByNutrition, 'Devonian rules active: grow
     const g = new Game('reef', [{ creature: id, device: 'keyboard', ready: true }]);
     g.skipHatch();
     const p = g.players[0];
-    p.pos = { x: 0, y: -14, z: 0 }; p.vel = { x: 0, y: 0, z: 0 }; p.yaw = 0; p.spawnProtect = 999;
+    p.pos = { x: 0, y: openWater(0, 0), z: 0 }; p.vel = { x: 0, y: 0, z: 0 }; p.yaw = 0; p.spawnProtect = 999;
     const step = (f: Partial<InputFrame> = {}) => { tick(g, new Map<number, InputFrame>([[0, { ...emptyInput(), ...f } as InputFrame]])); p.spawnProtect = 999; };
     for (let i = 0; i < 20; i++) step();
     const from = { ...p.pos }, fromYaw = p.yaw;
@@ -753,10 +763,34 @@ const { TIER_SCALE } = await import('../src/sim/types');
   ok(d.standing > s0, `sweeping the floor feeds growth (${s0.toFixed(1)} → ${d.standing.toFixed(1)})`);
 }
 
+// ---- the sea slopes: shallow at the shore, deep where the big animals are ----
+// It used to be one depth from the beach to the basin — a flat sixty-four units everywhere — so
+// leaving the shore changed the scenery and nothing else. Now the floor falls away as you go, which
+// is what makes depth a thing a player spends: the lungs recover badly under water and completely
+// at the surface, so being out where the big bodies are costs a longer climb for air.
+{
+  const water = (s: number) => {
+    let sum = 0, n = 0;
+    for (let dx = -600; dx <= 600; dx += 25) { sum += SURFACE_Y - sampleHeight(dx, shoreZ(dx) - s); n++; }
+    return sum / n;
+  };
+  const shore = water(80), mid = water(250), front = water(700), open = water(1400);
+  ok(shore < 42, `the shore is shallow, near the Cambrian's forty (${shore.toFixed(0)} of water)`);
+  ok(mid > shore + 15, `the floor falls away from it (${shore.toFixed(0)} → ${mid.toFixed(0)} by 250 out)`);
+  ok(open > front && front > mid, `and keeps falling to the open sea (${mid.toFixed(0)} → ${front.toFixed(0)} → ${open.toFixed(0)})`);
+  ok(open > 100, `the open sea is deep water (${open.toFixed(0)})`);
+  // Deep water has to be reachable, not a pilgrimage: the channels carve down from about 170 out.
+  const early = water(200);
+  ok(early > shore * 1.4, `deep water is close in (${early.toFixed(0)} of water only 200 from the beach, against ${shore.toFixed(0)} at the shore)`);
+  // The shore is the shallowest thing in the era, which is the whole shape of it.
+  const deepest = Math.max(...[250, 450, 700, 1000, 1400, 1900].map(water));
+  ok(shore < Math.min(...[250, 450, 700, 1000, 1400, 1900].map(water)), `nothing offshore is shallower than the shore (shore ${shore.toFixed(0)}, deepest ${deepest.toFixed(0)})`);
+}
+
 // ---- a pelagic sea: a deep column, tall scenery in it, bodies that live mid-water ----
 {
   const { FLORA_PHYS } = await import('../src/sim/flora');
-  ok(SURFACE_Y >= 60, `the Devonian water column is deep (surface at ${SURFACE_Y}, the Cambrian's is 40)`);
+  ok(SURFACE_Y >= 60, `the Devonian surface is high (at ${SURFACE_Y}, the Cambrian's is 40)`);
   ok(FLORA_PHYS.lilyColumn.h >= 8 && FLORA_PHYS.frondTower.h >= 5, `tall kinds reach into the column (lily ${FLORA_PHYS.lilyColumn.h}, frond tower ${FLORA_PHYS.frondTower.h})`);
   const g = new Game('rise', [{ creature: 'cladoselache', device: 'keyboard', ready: true }, { creature: 'bothriolepis', device: 0, ready: true }]);
   g.skipHatch();
