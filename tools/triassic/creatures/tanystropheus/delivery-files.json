@@ -1,0 +1,58 @@
+{
+  "tanystropheus.card.png": {
+    "bytes": 176730,
+    "sha256": "43cd081734b35aa2b16e4e0131760eba32aae941bb1ee7d57d1a76c6fe0a64b3",
+    "dimensions": [
+      800,
+      600
+    ]
+  },
+  "tanystropheus.glb": {
+    "bytes": 2405376,
+    "sha256": "851a758dbb51b19b8d89c2896f8cb082f62e49edc9927559e92989e34c55c21a"
+  },
+  "tanystropheus.json": {
+    "bytes": 3308,
+    "sha256": "18a45a62cde67716d5aa37b26f2b5c2d4c8209373f514b0e49a7964c4e27e181"
+  },
+  "tanystropheus.lod1.glb": {
+    "bytes": 1183624,
+    "sha256": "53e2a76ac7c913b3772ea5270621c9fee9c1f4d0a7c5c6e841c64b2641dbe556"
+  },
+  "tanystropheus.png": {
+    "bytes": 379713,
+    "sha256": "dae4e52303e44378daf7f966490a598ec0749f28ea22bd6d4005c1b0c0ed7cce",
+    "dimensions": [
+      1200,
+      900
+    ]
+  },
+  "tanystropheus.puppet.glb": {
+    "bytes": 1183624,
+    "sha256": "53e2a76ac7c913b3772ea5270621c9fee9c1f4d0a7c5c6e841c64b2641dbe556"
+  },
+  "tanystropheus.puppet.png": {
+    "bytes": 361150,
+    "sha256": "af8bcb8eaa7ebae44a9004e57d71b3b04a5d12c410c4582caabd1402cc21fc0d",
+    "dimensions": [
+      1200,
+      900
+    ]
+  },
+  "tanystropheus.select.png": {
+    "bytes": 657592,
+    "sha256": "4f4fc23442cc588cfeda50fd35c3de9524c809506d71b3cf8747da2dfb736616",
+    "dimensions": [
+      1600,
+      1200
+    ]
+  },
+  "tanystropheus.thumb.png": {
+    "bytes": 22104,
+    "sha256": "a286d3405b1e9036f6a923b3d7d4a6c3666b574aa867bb41e669d70230e86cde",
+    "dimensions": [
+      256,
+      192
+    ]
+  }
+}

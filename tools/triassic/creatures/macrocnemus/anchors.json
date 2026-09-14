@@ -1,0 +1,34 @@
+{
+  "macrocnemus": [
+    {
+      "name": "anchor_mouth",
+      "bone": "jaw",
+      "point": [
+        0.14878471195697784,
+        -2.3828213214874268,
+        0.8740612268447876
+      ],
+      "role": "mouth"
+    },
+    {
+      "name": "anchor_mouth_inside",
+      "bone": "skull",
+      "point": [
+        0.15727971494197845,
+        -2.4081430435180664,
+        0.8958194255828857
+      ],
+      "role": "swallow"
+    },
+    {
+      "name": "anchor_attack_primary",
+      "bone": "skull",
+      "point": [
+        0.16334544122219086,
+        -2.4628212451934814,
+        0.8973276019096375
+      ],
+      "role": "attack"
+    }
+  ]
+}

@@ -14,6 +14,7 @@ import { schemeForCreature } from '../shared/palettes';
 import { creature, type CreatureId } from '../sim/creatures';
 import { lengthOf } from '../sim/actors';
 import { bellPhase, bellTilt } from '../sim/locomotion';
+import { RULES } from '../sim/era-rules';
 import type { Actor } from '../sim/types';
 import { appBase } from '../shared/base';
 import type { AuthoredFeeding } from './attachments';
@@ -90,6 +91,8 @@ export class CreatureView {
   private baseOpacity: number[] = [];
   private baseTransparent: boolean[] = [];
   private spine: THREE.Bone[] = [];
+  /** The era-driven clip this body is in, so a change of phase fires a new one-shot. */
+  private eraClip?: string;
   private wasAttack = false; private wasHit = false; private wasDead = false; private wasStagger = false; private wasDodge = false; private wasParry = false;
   private shield: THREE.Mesh;
   private shieldMat: THREE.MeshBasicMaterial;
@@ -348,6 +351,16 @@ export class CreatureView {
         if (!this.bellPulsing) this.loco?.setEffectiveTimeScale(
           moving ? this.sprinting ? clamp(rateScale, 0.8, 1.35) : clamp((beat / cruise) * rateScale, 0.5, 2.6) : 0.75 * rateScale,
         );
+      }
+      // An era's own performance, for a body the shared state machine has nothing to say about:
+      // the Triassic's shore animals are pinned and brainless and would otherwise watch, telegraph
+      // and strike entirely in Idle. It names the clip the body should be *in*, and a change of
+      // name is what fires it; a model without that clip is left to the state machine below.
+      const era = RULES?.clip?.(a);
+      const eraName = era && this.has(era.name) ? era.name : undefined;
+      if (eraName !== this.eraClip) {
+        this.eraClip = eraName;
+        if (eraName && era) this.playOnce(eraName, era.dur, false);
       }
       // one-shots
       const inAttack = a.state === 'attack' || a.state === 'grabbing' || a.state === 'pounce' || (a.state === 'ability' && !held);

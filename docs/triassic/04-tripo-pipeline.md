@@ -168,7 +168,28 @@ exact submitted views rather than retroactively describing a single-image body a
 
 `docs/creature-intake.md` stays the delivery contract for clips, anchors, portraits and runtime
 materials. The Triassic adds the bounded generation/review tools in `tools/triassic/tripo/` and a
-self-contained source/report directory at `tools/triassic/creatures/<id>/`. Each creature's
+self-contained source/report directory at `tools/triassic/creatures/<id>/`.
+
+The three **shore animals** — Tanystropheus, Macrocnemus and Coelophysis — were built in one pass
+rather than one at a time, and they share the generic half of the intake through
+`tools/triassic/creatures/shorekit.py`: the weld, the geodesic centreline, the rigid-section carry,
+the voxel twin, the arc-length skinning, the mouth measurement, the envelope comparison and the
+export patch. What stays in each `build.py` is everything that is that species. The earlier builders
+are untouched and stay self-contained; the split exists because copying fifty kilobytes of identical
+intake three times would have guaranteed the three drifted apart on the parts that are *not* the
+animal. Three findings from that pass belong in this document because they generalise:
+
+- **The seed of a geodesic banding is not automatic on a standing animal.** A double sweep finds the
+  two ends of the longest path over the surface, which on a swimmer is snout to tail tip and on a
+  long-legged land animal is a **claw** to the tail tip. Banding from there reads a shin as a neck —
+  which is the shape of the finding that left Macrocnemus CANNOT TELL in the proportion audit. Those
+  bodies are measured from two declared seeds, tail tip and snout, meeting at the shoulder.
+- **Inside/outside cannot be taken from the nearest triangle's normal.** At the hips the nearest
+  surface to a point on the midline is the inner face of a thigh, whose normal points across the
+  midline, so a point plainly between the belly and the backbone reads as outside. Use ray parity.
+- **A rigid carry has to be gated by distance to its own axis, not only by station.** A hind claw
+  sits behind the tail's base station, so an axial gate swings the whole leg round with the tail and
+  folds the surface at the hip. Each creature's
 builder produces the cleaned authored body, the shared skeleton, the measured twin and the sampled
 performances; per-creature audits prove exact parity after packaging. Nothosaurus and Shonisaurus
 are the established examples. Their implementation choices are evidence for the contract, not a

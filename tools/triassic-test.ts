@@ -20,7 +20,7 @@ const { devActor, stageScale, ADULT_STAGE, PRIME_STAGE, STAGE_AT } = await impor
 const { AIR_LOW, AIR_MAX, triActor } = await import('../src/sim/triassic/state');
 /** Mirrors AIR_BOT_SEEK in the rules: the breath at which a bot starts up. Kept here so the test says what it is testing. */
 const AIR_BOT_SEEK_T = 80;
-const { shorePosts } = await import('../src/sim/triassic/shore');
+const { shoreClip, shorePosts } = await import('../src/sim/triassic/shore');
 const { brokeSurface, isAlive, lengthOf, bandOf, swimCeiling } = await import('../src/sim/actors');
 const { PLAYABLE, creature, CREATURES } = await import('../src/sim/creatures');
 const { emptyInput } = await import('../src/sim/types');
@@ -401,14 +401,24 @@ for (const [id, kind] of [['mixosaurus', 'a live-bearer'], ['placodus', 'an egg-
     p.spawnProtect = 0; p.iframes = 0;
     const hp0 = p.hp;
     let warned = 0, hit = false;
+    const clipsSeen = new Map<string, number>();
     for (let i = 0; i < 60 * 4; i++) {
       p.pos = { x: neck.pos.x, y: SURFACE_Y - 1.5, z: neck.pos.z - lengthOf(neck) * 0.3 }; p.vel = { x: 0, y: 0, z: 0 };
       tick(g);
+      const c = RULES!.clip?.(neck); if (c) clipsSeen.set(c.name, c.dur);
       const w = RULES!.hud(g, 0)?.shoreWarn ?? 0; if (w > warned) warned = w;
       if (p.hp < hp0 - 1) { hit = true; break; }
     }
     ok(warned > 0.5, `the strike is telegraphed on the HUD (warn reached ${warned.toFixed(2)})`);
     ok(hit, `and it lands (hp ${hp0.toFixed(0)} → ${p.hp.toFixed(0)})`);
+    // The performance is the same clock as the mechanic: the cycle names a clip per phase and the
+    // two clips the sim times against are exactly as long as it holds them (shoreClip is what the
+    // renderer asks, and it says nothing at all about any animal that is not on a post).
+    ok(clipsSeen.has('Lower') && clipsSeen.get('Lower') === 1.5, 'the telegraph names Lower, at TELEGRAPH');
+    ok([...clipsSeen.keys()].some((n) => n === 'SnapLeft' || n === 'SnapRight'),
+      `the strike names a snap and a side (${[...clipsSeen.keys()].join(', ')})`);
+    for (const [n, d] of clipsSeen) if (n.startsWith('Snap')) ok(d === 0.6, `${n} is the strike window`);
+    ok(shoreClip(p) === undefined, 'a body that is not on a post is left to the shared state machine');
     ok(isAlive(neck) && Math.abs(neck.pos.x - boom.pos.x) < 1e-6, 'the shore animal never leaves its post');
     // deep water is out of its reach (the strike may well have killed a Keichousaurus outright:
     // a respawned body is protected, and the protection is stripped so the test is about reach)
