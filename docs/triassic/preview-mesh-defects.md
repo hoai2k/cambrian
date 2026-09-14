@@ -40,37 +40,69 @@ Both were genuinely separate components and are gone. The originals are untouche
 `npm run triassic:previews`, which refreshed their hashes in the manifest. Before/after renders in
 side and top view confirm nothing else changed.
 
-## Cut by hand, with the marking tool
+## Smoothed away by hand, with the marking tool
 
 Welded geometry cannot be found automatically — an unwanted fin and a wanted one are the same
 surface, and only a human knows which is which. Mark mode says which (`docs/viewer-mark.md`, and
 the section at the end of this page): paint the geometry, export a region pinned to the model's
-hash, cut exactly that.
+hash, and act on exactly that.
 
-| Animal | Region | Cut | Result |
+There are two ways to act on it, and **the collapse is the right one for anything welded**:
+
+- `tools/triassic/cut-region.py` **deletes** the marked vertices. Right for detached debris, wrong
+  for an appendage — a raw Tripo body is a soup of unstitched patches, so the rim of a cut is a set
+  of arcs rather than a closed loop, a fill has nothing to span, and the animal is left with a hole.
+  Rhaeticosaurus' spare tails cut cleanly and still left 34 open edges.
+- `tools/triassic/smooth-region.py` **shrinks it to nothing**. Nothing is deleted and no topology
+  changes, so no hole can appear. It is a constrained Laplacian solve — a soap film: pin the base
+  ring, average everything inside it, and the appendage sinks into the body it grows from. Then the
+  skin *around* the base is relaxed too, with the weight falling off over several rings, so the old
+  attachment does not read as a bump; and finally the base itself is let go, held only at the far
+  edge of the blend, which is what takes out the last spike.
+
+| Animal | Region | Painted | Stands proud of its own base |
 |---|---|---:|---|
-| **Askeptosaurus** | the extra belly fin | 628 verts, 5.72% | gone; 13 rim edges left open |
-| **Rhaeticosaurus** | the two spare tail blades | 361 verts, 3.26% | both gone, the real tail untouched; 34 rim edges left open |
+| **Rhaeticosaurus** | the two spare tail blades | 361 verts | 0.1211 → 0.0086 (**7.1%**) |
+| **Phragmoteuthis** | the extra fin on top | — | 0.0887 → 0.0019 (**2.2%**) |
+| **Atopodentatus** | the ventral fins | 1054 verts | 0.1760 → 0.0219 (**12.5%**) |
+| **Askeptosaurus** | the extra belly fin | 628 verts | 0.1720 → 0.0289 (**16.8%**) |
 
-Both cuts landed exactly where they were marked — drift 0.00000 of an allowed 0.01000 — with the
-model hash verified before either ran, and both were checked before and after from side, top and
-close up. The cut meshes are now the published previews; the untouched generations remain in
-`tools/triassic/creatures/<id>/tripo-raw/`.
+All four are the published previews now; the untouched generations remain in
+`tools/triassic/creatures/<id>/tripo-raw/`. Rhaeticosaurus' neck stretch was re-baked on top, and
+its hand-off records why that was still the stretch that was chosen by eye.
 
-**The rims are left open**, and that is inherent rather than a bug to chase: a raw Tripo body is a
-soup of unstitched patches, so the rim of a cut is a set of arcs rather than a closed loop and a
-fill has nothing to span. The tool stitches the rim, fills what it can and says plainly when it
-cannot. A small notch in a disposable preview is a far smaller lie than a spare tail.
+### Three things the tool had to learn, all of them by being run
 
-## Still welded, not yet cut
+**Laplacian smoothing is diffusion, so it converges slowly.** At 60 passes Rhaeticosaurus' blades
+were still stubs at 68% of their protrusion; the answer only settles around 600, and is unchanged
+at 3000. It costs milliseconds, so the default is past convergence rather than short of it.
 
-Each of these is part of the single connected surface. They can be cut the same way as the two
-above, or fixed properly by a **regeneration** (or, where the pose is also wrong, a redraw first).
+**A reviewer paints from where they are standing.** A thin blade gets marked on the side facing
+them and not the side facing away, and collapsing only the near side leaves the far side holding
+the fin out — Askeptosaurus' belly fin barely moved until the marked set was grown through the
+thickness (`--through`, default 0.01, which reaches the far side of a blade without reaching across
+open water to the body).
+
+**A pinned ring has to hold the surface somewhere.** Collapsing onto a fixed base leaves a thin
+spike standing on the old attachment, which is exactly what Askeptosaurus did. Relaxing the region
+*and* its base together, held only at the far edge of the blend band, lets the attachment close
+over and takes the spike with it.
+
+### What it costs
+
+The texture over a collapsed appendage is that appendage's own texture, squeezed — the UVs come
+along for the ride, so a large collapse leaves a smear where the fin was. That is a fair trade in a
+preview whose whole purpose is to show the animal's shape, and it is gone the day a real body is
+built.
+
+## Still welded, not yet smoothed
+
+Each of these is part of the single connected surface. They can be smoothed away the same way as
+the four above, or fixed properly by a **regeneration** (or, where the pose is also wrong, a redraw
+first).
 
 | Animal | Reported | Status |
 |---|---|---|
-| **Atopodentatus** | three fins on the underside that should not be there | welded |
-| **Phragmoteuthis** | an extra fin on top | welded |
 | **Birgeria** | a second dorsal fin, where the research says "single dorsal set far back" | welded |
 | **Mixosaurus** | a deeply forked lunate fluke it should not have | welded |
 | **Helicoprion** | pelvic and anal fins, against *Fadenia*'s "no pelvic fins" | welded, **and in the greenlit pose** — needs a redraw, not just a regeneration |

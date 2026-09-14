@@ -7,7 +7,7 @@
     "id": "rhaeticosaurus",
     "collection": "triassic",
     "model": "assets/triassic/creatures/rhaeticosaurus.preview.glb",
-    "vertices": 10710,
+    "vertices": 11078,
     "rigged": false
   },
   "appliesTo": "generated-glb",
@@ -79,7 +79,7 @@
       "up": "y"
     },
     "frameSource": "yaw",
-    "vertices": 10710,
+    "vertices": 11078,
     "rigged": false,
     "box": {
       "lo": [
@@ -109,9 +109,9 @@
     "factor": 2.83
   },
   "reexported": {
-    "from": "rhaetico.json",
-    "why": "The generation was cut after this stretch was exported (spare tails removed, docs/triassic/preview-mesh-defects.md). The cut is a pure deletion — every surviving vertex is exactly where it was and the bounding box is unchanged — so the cuts, the direction and the factor are still the ones that were chosen by eye. Only the vertex count the bake checks against has changed, and this file records the mesh it was actually applied to.",
-    "verticesWere": 11078,
-    "verticesNow": 10710
+    "from": "rhaeticosaurus.stretch.json",
+    "why": "The spare tails were re-done as a collapse rather than a cut (docs/triassic/preview-mesh-defects.md): nothing is deleted, so the vertices the cut had removed are back and the count returns to what the stretch was first exported against. The collapse moved vertices only at the tail, between glTF z -0.425 and -0.267; this stretch is at the head end, cutting at +0.353 and +0.221. Nothing the warp reads is affected -- it uses the two cut positions, the direction, the factor, and bounds.upMid and bounds.lateralMid, which are both 0 and stay 0 -- so the cuts, the direction and the factor are still the ones chosen by eye. bounds.length is quoted for display and the tolerance only.",
+    "verticesWere": 10710,
+    "verticesNow": 11078
   }
 }
