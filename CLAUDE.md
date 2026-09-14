@@ -232,16 +232,22 @@ unless the user explicitly asks for a PR. Steps:
   the Devonian's procedural stand-ins. Never point a Triassic kind at a Devonian mesh in the
   scenery pack: a wrong genus placed by the thousand is worse than an honestly generic shape, and
   which stand-in the game plays with is `environment.ts`'s business.
-- A Tripo-sourced body is **worked, not authored**. The generations carry a level of surface detail
-  our own modelling does not match, so a part built by hand next to them reads as a part built by
-  hand: smooth where the neighbourhood is pored, even where it is irregular. So the Triassic's
-  builders reshape what the generation already carries — stretch it, squish it, fuse it, copy it —
-  and do not model new anatomy beside it. The one exception is a **tooth or a horn**, which may be
-  authored, and which must then *embed* in the generation's own flesh rather than sit on it. When a
-  fault cannot be fixed within that rule, the answer is to say so and show what it costs, not to
-  quietly model the missing part: the routes out are a regeneration or, where the pose is what is
-  wrong, a redraw. None of this binds the Cambrian or the Devonian, whose bodies are procedural in
-  the first place and may be changed however their builders like.
+- On a Tripo-sourced body, **what may be authored is decided by how simple the shape is**, not by a
+  list of parts. The generations carry a level of surface detail our own modelling does not match,
+  so a *complicated* part built by hand reads as built by hand: smooth where the neighbourhood is
+  pored, even where it is irregular. A simple one does not. Closing a hole is simple and is always
+  fair game; webbing between the digits of a foot has some shape to it but not much, and is within
+  reach; a spiral of a hundred and fifty tooth crowns is not, and the authored one was rejected on
+  sight. So the question to ask is how much shape is being invented, and the first move is still to
+  reshape what the generation already carries — stretch it, squish it, fuse it, copy it — because
+  geometry taken from the body always matches the body.
+  Whatever is authored must **wear the creature's own texture**: it takes its UVs from the
+  surrounding surface and samples the same albedo, so a patch is not a smooth flat-shaded island in
+  a pored hide. A remesh that drops the UVs in its region has not finished the job.
+  When a fault is past that bar, the answer is to say so and show what it costs, not to quietly
+  model the missing part: the routes out are a regeneration or, where the pose is what is wrong, a
+  redraw. None of this binds the Cambrian or the Devonian, whose bodies are procedural in the first
+  place and may be changed however their builders like.
 
 - A delivered Triassic body arrives **paired**: the authored (Tripo-derived) model and a procedural
   twin rebuilt to its own volume on the same skeleton, sharing inverse binds, clips and anchors.
