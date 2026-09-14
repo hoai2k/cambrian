@@ -1,7 +1,7 @@
 import { clamp, distXZ, heading, type Vec3 } from '../../shared/math';
 import { makeBrain } from '../ai';
 import type { EraHud, EraRules } from '../era-rules';
-import { applyScaleStats, isAlive, lengthOf, speedFactor } from '../actors';
+import { applyScaleStats, brokeSurface, isAlive, lengthOf, speedFactor } from '../actors';
 import { kill, type HitContext } from '../combat';
 import { creature } from '../creatures';
 import type { CreatureId } from '../../content/ids';
@@ -53,8 +53,17 @@ let lastGame: Game | undefined;
 const players = (g: Game) => g.actors.filter(isPlayerish);
 const rungOf = (a: Actor) => creature(a.creature).rung ?? 2;
 const breathesAir = (a: Actor) => creature(a.creature).breathing === 'air';
-/** At the surface: the top few units, scaled a little by the body. */
-const atSurface = (a: Actor) => a.pos.y > SURFACE_Y - 3 - lengthOf(a) * 0.3;
+/**
+ * At the surface means *at* the surface: the body's back is out of the water (`brokeSurface`), or
+ * it has left the water altogether on a breach.
+ *
+ * This used to be a band — the top three units and a bit more for a long body — which made a
+ * breath something you took while still plainly under water. A Cymbospondylus counted as breathing
+ * nearly nine units down. The blow then had nothing to draw, because there was nothing happening
+ * at the waterline, and the climb ended before it reached the top. The band is gone: a lung has to
+ * come up for air.
+ */
+const atSurface = (a: Actor) => brokeSurface(a);
 
 // ---- the hit context the era's own strikes use (the game's is private; these are its public parts) ----
 const hitCtxFor = (g: Game): HitContext => ({ events: g.events, byId: (id) => g.byId(id), time: g.time, rng: g.rng, armour: (att, vic, dir) => TRIASSIC_RULES.armour(att, vic, dir) });

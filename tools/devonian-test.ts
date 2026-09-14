@@ -17,7 +17,7 @@ const { Game } = await import('../src/sim/game');
 const { RULES } = await import('../src/sim/era-rules');
 const { stateFor, devActor, stageScale, ADULT_STAGE, PRIME_STAGE, STAGE_AT, HOLD_TO_WIN } = await import('../src/sim/devonian/state');
 const { coverAt } = await import('../src/sim/world');
-const { applyScaleStats, bandOf, isAlive, lengthOf } = await import('../src/sim/actors');
+const { applyScaleStats, bandOf, isAlive, lengthOf, swimCeiling } = await import('../src/sim/actors');
 const { PLAYABLE } = await import('../src/sim/creatures');
 const { hasEquivalentSizing, naturalSizing, setEquivalentSizing } = await import('../src/sim/creatures');
 const { massOf } = await import('../src/sim/actors');
@@ -287,7 +287,7 @@ ok(RULES !== undefined && !RULES.growthByNutrition, 'Devonian rules active: grow
   for (let i = 0; i < 60 * 5; i++) { tik.pos.y = 20; coc.pos.y = 20; tick(g, sink); }
   // ...and the whole bar is waiting at the surface.
   let gulps = 0;
-  tik.pos.y = SURFACE_Y - 2; tik.prevT.y = tik.pos.y;
+  tik.pos.y = swimCeiling(tik); tik.prevT.y = tik.pos.y;   // at the top, not near it
   g.step(1 / 60, new Map([[0, emptyInput()], [1, emptyInput()]]));
   for (const e of g.events) if (e.kind === 'gulp') gulps++;
   g.events.length = 0;

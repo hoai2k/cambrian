@@ -54,6 +54,13 @@ already draws, and on a gauge of its own beneath it. Breaking the surface refill
 a visible **blow**: spray at the waterline, the era's signature sound, and a ping on the radar of
 anything hunting. Nothing on this roster has to touch land.
 
+**The surface is the surface.** Being up for air means the body's back is out of the water —
+pressed against the swim ceiling, or clear of it on a breach — and not "somewhere near the top".
+It was a band three units deep and more for a long body, so a Cymbospondylus breathed nearly nine
+units down, the blow had nothing to break at the waterline, and the climb stopped short of it. The
+camera comes up with the animal for a moment (`BREATH_PEEK`), because it is otherwise pinned under
+the waterline and the one moment worth seeing happened just off the top of the screen.
+
 **Revised.** This began as "stamina does not come back at all under water", with no meter, no
 countdown and no drowning — deliberately, because it was the cheapest shape that made the surface
 matter. It made the deep somewhere you *visited* on the bar you arrived with, rather than somewhere
