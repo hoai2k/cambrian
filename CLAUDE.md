@@ -232,6 +232,17 @@ unless the user explicitly asks for a PR. Steps:
   the Devonian's procedural stand-ins. Never point a Triassic kind at a Devonian mesh in the
   scenery pack: a wrong genus placed by the thousand is worse than an honestly generic shape, and
   which stand-in the game plays with is `environment.ts`'s business.
+- A Tripo-sourced body is **worked, not authored**. The generations carry a level of surface detail
+  our own modelling does not match, so a part built by hand next to them reads as a part built by
+  hand: smooth where the neighbourhood is pored, even where it is irregular. So the Triassic's
+  builders reshape what the generation already carries — stretch it, squish it, fuse it, copy it —
+  and do not model new anatomy beside it. The one exception is a **tooth or a horn**, which may be
+  authored, and which must then *embed* in the generation's own flesh rather than sit on it. When a
+  fault cannot be fixed within that rule, the answer is to say so and show what it costs, not to
+  quietly model the missing part: the routes out are a regeneration or, where the pose is what is
+  wrong, a redraw. None of this binds the Cambrian or the Devonian, whose bodies are procedural in
+  the first place and may be changed however their builders like.
+
 - A delivered Triassic body arrives **paired**: the authored (Tripo-derived) model and a procedural
   twin rebuilt to its own volume on the same skeleton, sharing inverse binds, clips and anchors.
   That pairing is the pipeline's verification step, so the specimen viewer swaps between them in
