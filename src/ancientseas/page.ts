@@ -50,6 +50,12 @@ export interface GameLink {
    * A game that is on the plate but not yet a way in: drawn, named, badged, and not a link. Its
    * page is still there and still works — this is what the trilogy page offers a visitor, not
    * whether the game runs.
+   *
+   * **This one line is the whole switch.** Deleting `comingSoon: true` from a game below opens it
+   * again everywhere at once: the title and its animal become the link they were, they light and
+   * grow under the pointer and the pad again, the badge goes, `OPEN_GAMES` includes it so the pad
+   * and the arrow keys walk it, and both checks follow — they read this flag rather than naming a
+   * game, so nothing else has to be edited to let the third game out.
    */
   readonly comingSoon?: boolean;
 }

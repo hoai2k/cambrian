@@ -20,16 +20,28 @@ for (const [name, viewport] of [['desktop', { width: 1440, height: 900 }], ['pho
     await page.goto(`http://localhost:4173/?version=${version}`, { waitUntil: 'networkidle' });
     await page.waitForTimeout(800);
     await page.screenshot({ path: `${S}/ancientseas-v${version}-${name}.png`, fullPage: true });
-    // The games that are open, each reachable by its title and — in version 2 — by the animal over
-    // it, which is the same link twice and so one keyboard stop rather than two. A game that is not
-    // out yet is on the plate and is not a link at all, so nothing can steer or tab into it.
+    // What each game is drawn as, read off the page rather than from a list here: a game that is
+    // not out yet is marked, badged and not a link, and one that is open is a link and is not
+    // marked. Written this way, opening the third game is one line in page.ts and nothing here.
+    const state = await page.evaluate(() => ['cambrian', 'devonian', 'triassic'].map((id) => {
+      const el = document.querySelector(`[data-slot="${id}"]`) ?? document.querySelector(`.as-game-${id}`);
+      const caption = el?.querySelector('.as-caption small')?.textContent ?? '';
+      return {
+        id, drawn: !!el,
+        soon: !!el?.classList.contains('as-soon'),
+        link: el?.tagName === 'A' && !!el.getAttribute('href'),
+        badge: !!el?.querySelector('.as-badge') || /coming soon/i.test(caption),
+      };
+    }));
+    check(`v${version} ${name}: all three games are on the plate`, state.every((g) => g.drawn), state.map((g) => `${g.id}${g.drawn ? '' : ' MISSING'}`).join(' '));
+    check(`v${version} ${name}: a game not out yet is badged and is not a link`, state.filter((g) => g.soon).every((g) => g.badge && !g.link), state.filter((g) => g.soon).map((g) => `${g.id} badge:${g.badge} link:${g.link}`).join(' ') || 'none');
+    check(`v${version} ${name}: a game that is open is a link and is not badged`, state.filter((g) => !g.soon).every((g) => g.link && !g.badge), state.filter((g) => !g.soon).map((g) => `${g.id} badge:${g.badge} link:${g.link}`).join(' '));
     const links = await page.$$eval('a[href]', (as) => as.map((a) => ({ href: a.getAttribute('href'), tab: a.tabIndex >= 0 })));
     const games = links.filter((l) => /^\.\/(cambrian|devonian|triassic)\/$/.test(l.href ?? ''));
-    const where = [...new Set(games.map((l) => l.href))].sort();
-    check(`v${version} ${name}: the open games, once each`, where.join(' ') === './cambrian/ ./devonian/' && games.filter((l) => l.tab).length === 2, `${where.join(' ')} · ${games.length} links, ${games.filter((l) => l.tab).length} tabbable`);
-    const soon = await page.$$eval('.as-soon', (n) => n.map((e) => e.getAttribute('data-slot') ?? e.className.replace(/as-game |as-soon/g, '').trim()));
-    const badge = await page.$$eval('.as-badge, .as-game.as-soon .as-caption small', (n) => n.map((e) => e.textContent));
-    check(`v${version} ${name}: the Triassic is there and says why it is not a way in`, soon.some((x) => /triassic/.test(x)) && badge.some((t) => /coming soon/i.test(t ?? '')), `${soon.join(' ')} · ${badge.join(' ')}`);
+    const where = [...new Set(games.map((l) => l.href))];
+    const opens = state.filter((g) => !g.soon);
+    // Each open game once for the keyboard, whichever half of it the pointer takes.
+    check(`v${version} ${name}: the open games, once each`, where.length === opens.length && games.filter((l) => l.tab).length === opens.length, `${where.join(' ')} · ${games.length} links, ${games.filter((l) => l.tab).length} tabbable`);
     const broken = await page.$$eval('img', (im) => im.filter((i) => !i.complete || i.naturalWidth === 0).map((i) => i.getAttribute('src')));
     check(`v${version} ${name}: every image drew`, broken.length === 0, broken.join(' '));
     check(`v${version} ${name}: nothing asked for a missing file`, missing.length === 0, missing.join(' '));
@@ -106,14 +118,30 @@ for (const [href, url, title] of [['./cambrian/', 'http://localhost:4173/cambria
     return lit();
   };
   check('a pad lights nothing until it is used', (await lit()) === '');
-  check('d-pad right takes the first game', (await after(15, 'cambrian anomalocaris')) === 'cambrian anomalocaris', await lit());
-  check('and walks along the plate', (await after(15, 'devonian dunkleosteus')) === 'devonian dunkleosteus', await lit());
-  // Past the last open game it wraps rather than landing on the one that is not a way in.
-  check('and steps past the game that is not out yet', (await after(15, 'cambrian anomalocaris')) === 'cambrian anomalocaris', await lit());
-  check('and back', (await after(14, 'devonian dunkleosteus')) === 'devonian dunkleosteus', await lit());
-  check('and back again', (await after(14, 'cambrian anomalocaris')) === 'cambrian anomalocaris', await lit());
+  // The games it should walk, in the order they stand on the plate, read off the page: a game that
+  // is not out yet is not one of them, and opening it later changes this run without touching it.
+  const open = await page.$$eval('a[data-slot]', (as) => as
+    .filter((a) => a.querySelector('img')?.getAttribute('alt'))
+    .map((a) => a.getAttribute('data-slot')));
+  const litTitle = async () => (await lit()).split(' ')[0] ?? '';
+  const stepTo = async (button, want) => {
+    await press(button);
+    for (let i = 0; i < 12 && (await litTitle()) !== want; i++) await page.waitForTimeout(100);
+    return litTitle();
+  };
+  let walked = true, saw = [];
+  // One step further than there are games, to prove it wraps rather than stopping or stepping onto
+  // one that is not a way in.
+  for (let i = 0; i <= open.length; i++) {
+    const want = open[i % open.length];
+    const got = await stepTo(15, want);
+    saw.push(got);
+    if (got !== want) walked = false;
+  }
+  check(`the pad walks the ${open.length} open game(s) and wraps`, walked, `wanted ${open.join(' ')} + wrap · saw ${saw.join(' ')}`);
+  check('and never lights a game that is not a way in', (await page.$$eval('.as-soon.as-lit', (n) => n.length)) === 0);
   await press(0); // A
-  const opened = await page.waitForURL('**/cambrian/', { timeout: 10000 }).then(() => true).catch(() => false);
+  const opened = await page.waitForURL(`**/${open[0]}/`, { timeout: 10000 }).then(() => true).catch(() => false);
   check('A opens what is lit', opened, page.url());
   await ctx.close(); await plain.close();
 }

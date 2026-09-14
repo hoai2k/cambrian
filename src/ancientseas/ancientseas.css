@@ -131,7 +131,12 @@ a:focus-visible { outline: 2px solid var(--as-gold); outline-offset: 6px; border
 .as-slot-animal { transition: transform .28s cubic-bezier(.2,.8,.2,1), filter .28s; }
 /* The animal is half of its game's link, so it takes the pointer that says so. */
 a.as-slot-animal { cursor: pointer; }
-.as-slot-animal.as-lit { --grow: 1.05; }
+/* The title and the animal are one link, so they answer as one: the same growth, from the same
+   class, on the same transition. Which half the pointer is over — or whether there is a pointer at
+   all — cannot change what the game does, and it did: the animal grew from `as-lit` while the
+   title grew only under a direct hover, and by a different amount, so a pad lifted the animal
+   alone and a pointer on the title lifted the two by different steps. */
+.as-slot-title.as-lit, .as-slot-animal.as-lit { --grow: 1.05; }
 .as-slot-animal.as-lit img { filter: brightness(1.05) drop-shadow(2px 7px 7px rgba(50, 32, 10, .32)); }
 .as-slot-animal.as-lit.as-src-stand-in img { filter: sepia(.25) contrast(.95) brightness(1.05) drop-shadow(2px 7px 7px rgba(50, 32, 10, .32)); }
 .as-slot-title.as-lit { filter: var(--as-halo) brightness(1.04); }
@@ -167,9 +172,10 @@ a.as-slot-animal { cursor: pointer; }
    resting one; on an image it is a filter, on the typeset stand-in the same thing as a shadow. */
 .as-slot-title { --as-halo: drop-shadow(0 0 4px rgba(255, 247, 226, .55)) drop-shadow(0 1px 2px rgba(60, 40, 15, .22));
   text-decoration: none; transition: transform .28s cubic-bezier(.2,.8,.2,1), filter .28s; filter: var(--as-halo); }
-/* `filter` replaces rather than adds, so the hover state has to carry the halo itself or the
-   lettering loses its light the moment the pointer arrives. */
-a.as-slot-title:hover, a.as-slot-title:focus-visible { --grow: 1.03; filter: var(--as-halo) brightness(1.04); outline: none; }
+/* Hovering or focusing a title lights the whole game through `as-lit` above, which is where the
+   growth and the brightening live. All that is left here is to take the browser's own outline off
+   a focus that is already drawn as a lit game. */
+a.as-slot-title:hover, a.as-slot-title:focus-visible { outline: none; }
 a.as-slot-title:focus-visible img { outline: 2px solid #15100a; outline-offset: 8px; border-radius: 6px; }
 .as-slot-title.as-src-stand-in img { filter: drop-shadow(1px 3px 4px rgba(50, 32, 10, .3)); }
 .as-slot[data-slot='trilogy'] .as-title-text { height: 100%; align-content: center; }

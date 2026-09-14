@@ -95,7 +95,13 @@ unless the user explicitly asks for a PR. Steps:
   *Coming soon* badge under the title — the plate is the trilogy, and a gap where the third game
   goes says less than the third game does. `OPEN_GAMES` is what the pad and the arrow keys walk,
   so nothing can steer into it. Its own page is untouched: this is what the trilogy page offers,
-  not whether the game runs, and `/triassic/` still opens by address.
+  not whether the game runs, and `/triassic/` still opens by address. **That one line is the whole
+  switch**: deleting `comingSoon: true` opens the game in every sense at once, and both checks read
+  the flag rather than naming a game, so nothing else needs editing — which is checked by flipping
+  it, not by assertion. A game's title and the animal over it also grow together, by one amount
+  from one rule (`.as-slot-title.as-lit, .as-slot-animal.as-lit`), because they are one link: the
+  growth was split across the lit state and a title-only hover once, and a pad then lifted the
+  animal alone while a pointer lifted the two by different steps.
   `npm run ancientseas` checks all of it; `node tools/ancientseas-smoke.mjs <outdir>` screenshots
   the page against a preview build and follows the three links.
 - The wordmark the interface draws is derived, not delivered: `npm run logos`
