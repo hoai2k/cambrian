@@ -1,7 +1,7 @@
 import { ClipQueuedBadge, ModelStatusBadge } from '../shared/ModelStatusBadge';
 import { CreaturePortrait } from '../app/CreaturePortrait';
 import { useEffect, useRef, useState } from 'react';
-import { COLLECTIONS, isPropCollection, paletteFor, SPECIMENS, specimenByKey, type CollectionId } from './catalogue';
+import { COLLECTIONS, isPropCollection, paletteFor, SPECIMENS, specimenByKey, type CollectionId, type ViewerSpecimen } from './catalogue';
 import { scheme, SLOT_LABEL, type Slot } from '../shared/palettes';
 import { ASSET_BASE, createViewerScene, isReplaced, replacedName, type PlaybackState, type ViewerScene } from './scene';
 import { SculptEditor } from './sculpt/SculptEditor';
@@ -76,33 +76,56 @@ export function Viewer() {
   const [collection, setCollection] = useState<CollectionId>(specimenByKey.get(initial.current.key)!.collection);
   const [id, setId] = useState(initial.current.key);
   const [mode, setMode] = useState<Mode>(initial.current.mode);
-  const [detail, setDetail] = useState<'full' | 'reduced'>('full');
   /**
-   * Which body of a pair is on stage. The procedural twin is built to the generated model's own
-   * volume on the same skeleton, and the whole point of having both is that a human can see one
-   * become the other — so this swaps in place: the stage is not cleared, the camera is preserved,
-   * and the clip keeps playing, which turns any difference between them into movement rather than
-   * something to hold in your head across two list entries.
+   * What can be on stage, as one list rather than two crossed axes.
+   *
+   * There used to be a *Model detail* control (full / reduced) and a *Body* control (authored /
+   * twin / generated), and for the Triassic they overlapped: a paired body's LOD1 **is** its
+   * procedural twin — the same file, byte for byte, on all four delivered bodies — so "Reduced
+   * model" and "Procedural twin" were two names for one thing under two dropdowns. The other eras
+   * have no twin at all, so their Body control never appeared and only the detail axis was real.
+   *
+   * So there is one control, and it lists what this specimen actually has. An animal whose own
+   * body is not built has no full model to offer — `model` resolves for it to the body it borrows
+   * in play — so the raw generation stands in at the head of the list, which is what the roster's
+   * preview badge already says about it.
    */
-  const openingBody = (key: string, mode?: Mode): 'model' | 'generated' => {
-    const c = specimenByKey.get(key)!;
-    // A stretch is an edit to the raw generation, so a link into it opens that body even for an
-    // animal whose built body is waiting on a human and would otherwise win below.
-    if (mode === 'stretch' && c.generated) return 'generated';
-    // A body that is built and waiting on a human is the thing to open on, even though the animal
-    // also still has the raw mesh it was built from. Only when there is no built body does the
-    // generated mesh win, because then `model` is somebody else's body borrowed in play.
-    return c.generated && !c.inReview ? 'generated' : 'model';
+  type Stage = { id: string; label: string; model: string; kind: 'full' | 'reduced' | 'twin' | 'generated' | 'borrowed' };
+  const stages = (c: ViewerSpecimen): Stage[] => {
+    const own = !c.generated || !!c.inReview;
+    const out: Stage[] = [];
+    if (own) out.push({ id: 'full', label: c.inReview ? 'Full model (in review)' : 'Full model', model: c.model, kind: 'full' });
+    // A paired body's twin *is* its reduced model, so it is named once, as the thing it is.
+    if (c.puppet) out.push({ id: 'twin', label: 'Procedural twin · reduced', model: c.puppet, kind: 'twin' });
+    else if (c.lod && own) out.push({ id: 'reduced', label: 'Reduced model', model: c.lod, kind: 'reduced' });
+    if (c.generated) out.push({ id: 'generated', label: 'Generated mesh (no rig)', model: c.generated, kind: 'generated' });
+    if (!own) out.push({ id: 'borrowed', label: 'Borrowed body (in play)', model: c.model, kind: 'borrowed' });
+    return out;
   };
-  const [body, setBody] = useState<'model' | 'puppet' | 'generated'>(() => openingBody(initial.current.key, initial.current.mode));
+  /**
+   * Which of them is on stage. Swapping happens in place — the stage is not cleared, the camera is
+   * preserved and the clip keeps playing — because the point of a pair is seeing one become the
+   * other, and a difference you have to hold in your head across two list entries is not seen.
+   *
+   * A specimen opens on the head of its own list: its full model where it has one, the raw
+   * generation where it does not. A link into stretch mode is the exception, since a stretch is an
+   * edit to the raw generation and must open on it even for an animal whose built body would win.
+   */
+  const opening = (key: string, mode?: Mode): string => {
+    const list = stages(specimenByKey.get(key)!);
+    if (mode === 'stretch' && list.some(o => o.kind === 'generated')) return 'generated';
+    return list[0].id;
+  };
+  const [stageId, setStageId] = useState<string>(() => opening(initial.current.key, initial.current.mode));
   const requestedId = useRef('');
   const def = specimenByKey.get(id)!;
-  const showPuppet = body === 'puppet' && !!def.puppet;
+  const choices = stages(def);
+  const stage = choices.find(o => o.id === stageId) ?? choices[0];
+  const showPuppet = stage.kind === 'twin';
   // The raw generated mesh, for an animal whose own body has not shipped: it is still borrowing
   // somebody else's in play, and this is the only way to see the surface it will be built from.
-  const showGenerated = body === 'generated' && !!def.generated;
-  const modelPath = showGenerated ? def.generated!
-    : showPuppet ? def.puppet! : detail === 'reduced' && def.lod ? def.lod : def.model;
+  const showGenerated = stage.kind === 'generated';
+  const modelPath = stage.model;
   const roster = SPECIMENS.filter(c => c.collection === collection);
   // Both eras are on this page, so a specimen's palette comes from its own pack, not ACTIVE_ERA.
   const defaultScheme = (key: string) => {
@@ -121,21 +144,15 @@ export function Viewer() {
   const [picks, setPicks] = useState<Picks>(readPicks);
   const [slots, setSlots] = useState<readonly Slot[]>([]);
   useEffect(() => { writeUrlState(id, mode); }, [id, mode]);
-  useEffect(() => {
-    if (body === 'puppet' && !def.puppet) setBody('model');
-    if (body === 'generated' && !def.generated) setBody('model');
-  }, [body, def.puppet, def.generated]);
-  // Which body a specimen *opens* on. An animal that has a generated mesh is by definition one
-  // whose own body has not shipped — the manifest retires the preview the day it does — so what
-  // `model` resolves to for it is the Devonian fish it borrows in play. Opening there made the
-  // page look like it had never been told about the generated meshes: a reviewer asking to see the
-  // Triassic body got a Devonian one and no reason to touch the Body control. So it opens on the
-  // animal's own mesh instead, and a reviewer's explicit choice holds until they change specimen.
+  // Re-pick the opening model when the specimen changes, and only then: a reviewer who has chosen
+  // to look at the twin keeps looking at it. What the list opens on is `opening()` above — for an
+  // animal still borrowing a body in play that is its own raw generation, because opening on the
+  // Devonian fish it borrows made the page look like it had never been told the generation existed.
   const opened = useRef(id);
   useEffect(() => {
     if (opened.current === id) return;   // not a specimen change: leave a reviewer's own choice alone
     opened.current = id;
-    setBody(openingBody(id));
+    setStageId(opening(id));
   }, [id]);
   // Sculpting needs a creature on stage; a prop or a load in progress has nothing to sculpt.
   // Not on the twin: a sculpt is the hand-off that goes into a builder's profile rows for the body
@@ -311,27 +328,18 @@ export function Viewer() {
         {def.description && <p className="specimen-description">{def.description}</p>}
         {def.lengthMeters != null && <p className="specimen-scale">Representative length: {new Intl.NumberFormat('en', { maximumSignificantDigits: 3 }).format(def.lengthMeters)} m · views individually framed</p>}
         {collection !== 'cambrian' && <p className="specimen-downloads"><a href={`${ASSET_BASE}${def.model}`} download>Full model</a>{def.lod && <a href={`${ASSET_BASE}${def.lod}`} download>Reduced model</a>}{def.puppet && <a href={`${ASSET_BASE}${def.puppet}`} download>Procedural twin</a>}{def.generated && <a href={`${ASSET_BASE}${def.generated}`} download>Generated mesh</a>}</p>}
-        {def.lod && <label className="scheme-pick">
-          <span>Model detail</span>
-          <select aria-label="Model detail" value={detail} disabled={loading} onChange={e => setDetail(e.target.value as 'full' | 'reduced')}>
-            <option value="full">Full model</option>
-            <option value="reduced">Reduced model</option>
+        {choices.length > 1 && <label className="scheme-pick">
+          <span>Model</span>
+          <select aria-label="Which model" value={stage.id} disabled={loading} onChange={e => setStageId(e.target.value)}>
+            {choices.map(o => <option key={o.id} value={o.id}>{o.label}</option>)}
           </select>
         </label>}
-        {def.lod && <p className="hint">Switch detail to compare at the same view and animation time. Missing clips return to rest.</p>}
-        {(def.puppet || def.generated) && <label className="scheme-pick">
-          <span>Body</span>
-          <select aria-label="Which body" value={body} disabled={loading} onChange={e => setBody(e.target.value as 'model' | 'puppet' | 'generated')}>
-            <option value="model">{def.inReview ? 'Authored model (in review)' : def.generated ? 'Borrowed body (in play)' : 'Authored model'}</option>
-            {def.puppet && <option value="puppet">Procedural twin</option>}
-            {def.generated && <option value="generated">Generated mesh (no rig)</option>}
-          </select>
-        </label>}
+        {choices.length > 1 && <p className="hint">Swapping holds the view and the animation time, so a difference between two of these reads as movement. Missing clips return to rest.</p>}
         {def.inReview && <p className="hint">
           <strong>Awaiting review:</strong> this animal's own body, twin and clips are built, but it
           is not in <code>shipped.json</code> yet — so the game still draws the body it borrows and
           the animal keeps its warning. Everything on this page is the real thing; what is being
-          decided is whether it ships. The raw mesh it was built from is still under <em>Body</em>.
+          decided is whether it ships. The raw mesh it was built from is still in the <em>Model</em> list.
         </p>}
         {def.generated && <p className="hint">
           <strong>Generated mesh:</strong> the raw body this animal will be built from. It has no
@@ -354,7 +362,7 @@ export function Viewer() {
           {sculptable && ownBody && <button className="ghost" onClick={() => setMode('sculpt')} disabled={!canSculpt} title="Reshape the body on side and top drawings and export the change as a sculpt file">
             Edit sculpt{(() => { const d = getSculpt(id); return d && !isIdentity(d) ? ' (edited)' : ''; })()}
           </button>}
-          {def.generated && <button className="ghost" onClick={() => { setBody('generated'); setMode('stretch'); }} disabled={!ready} title="Lengthen a run of this raw generation — a neck, a tail — between two cuts, and export the change to be baked into the GLB">
+          {def.generated && <button className="ghost" onClick={() => { setStageId('generated'); setMode('stretch'); }} disabled={!ready} title="Lengthen a run of this raw generation — a neck, a tail — between two cuts, and export the change to be baked into the GLB">
             Stretch{(() => { const d = getStretch(id); return d && !stretchIsIdentity(d) ? ' (edited)' : ''; })()}
           </button>}
           {!isPropCollection(collection) && <button className="ghost" onClick={() => setMode('mark')} disabled={!canMark} title="Paint the geometry that should not be there and export it as a region file for tools/triassic/cut-region.py">

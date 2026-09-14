@@ -200,7 +200,12 @@ unless the user explicitly asks for a PR. Steps:
   twin rebuilt to its own volume on the same skeleton, sharing inverse binds, clips and anchors.
   That pairing is the pipeline's verification step, so the specimen viewer swaps between them in
   place — same camera, same scale, same clip at the same frame (`puppet` on `ViewerSpecimen`,
-  the *Body* control in `src/viewer/Viewer.tsx`) — and a twin is never a second row in the roster.
+  the one *Model* control in `src/viewer/Viewer.tsx`) — and a twin is never a second row in the roster.
+  That control lists what a specimen actually has rather than crossing two axes: a paired body's LOD1
+  **is** its twin, the same file byte for byte, so *Reduced model* and *Procedural twin* were two
+  names for one thing under two dropdowns until they were merged. An animal whose own body is not
+  built has no full model to offer — `model` resolves for it to the body it borrows in play — so its
+  raw generation heads the list.
   Sculpt is off on the twin: a sculpt is the hand-off into a builder's profile rows for the body
   that ships. A model landing also moves its canonical state to `delivered`, which
   `tools/triassic/apply-selections.mjs` derives from `tools/triassic/shipped.json`; a regenerated
