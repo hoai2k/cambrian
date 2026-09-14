@@ -20,7 +20,7 @@
         "min": [
           -0.03130260109901428,
           -3.5859017372131348,
-          -0.16221976280212402
+          -0.16221973299980164
         ],
         "max": [
           0.037098757922649384,
@@ -28,7 +28,7 @@
           -0.09769099950790405
         ]
       },
-      "maximumEnvelopeDifference": 0.004082486033439636
+      "maximumEnvelopeDifference": 0.004082515835762024
     },
     {
       "stationY": -3.3129017181396483,
@@ -151,7 +151,7 @@
           -0.09738924354314804
         ],
         "max": [
-          0.15351833403110504,
+          0.15351834893226624,
           -2.2209017276763916,
           0.24030046164989471
         ]
@@ -595,14 +595,14 @@
   "envelopeTolerance": 0.22,
   "envelopeTolerancePercent": 4.0,
   "surfaceDistanceMax": 0.0338234007358551,
-  "surfaceDistanceP95": 0.003863716765772547,
+  "surfaceDistanceP95": 0.0039288273081183435,
   "surfaceOutliersOver0p15": 0,
   "seatingDepthRaw": {
     "fore_upper_L": 0.0899,
     "fore_upper_R": 0.0241,
     "hind_upper_L": 0.0458,
     "hind_upper_R": 0.0327,
-    "jaw": 0.0195,
+    "jaw": 0.0168,
     "neck_00": 0.0552,
     "skull": 0.0304,
     "chest": 0.0374

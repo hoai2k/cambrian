@@ -4,8 +4,8 @@
     "model": "assets/triassic/creatures/dinocephalosaurus.glb",
     "puppet": "assets/triassic/creatures/dinocephalosaurus.puppet.glb",
     "lod": "assets/triassic/creatures/dinocephalosaurus.lod1.glb",
-    "bytes": 2696404,
-    "sha256": "089baf2d78d47d5b9734297ee408e62870041cfe729ccf4790be4d2d9a80cc55",
+    "bytes": 2686276,
+    "sha256": "216e77811a9ba5aeed6ba23df400e59580f03ea8a34fc1a157d043f30cf0f51c",
     "clips": [
       "Ability",
       "Attack",
