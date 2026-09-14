@@ -473,16 +473,14 @@ stay.
 - The four portraits in `public/assets/triassic/creatures/` are now model renders rather than the
   crops `tools/triassic/placeholder-portraits.mjs` writes; re-running that tool would put the crops
   back.
-- **The mouth line is measured off the pigment, and the measurement moved.** It now reads **0.317**
-  of the head's section, which is about the third a gharial-like snout suggests. The build that
-  first shipped read 0.21 and this README used to record that as a known oddity — "the mandible is
-  shallow" — so the new figure is the more plausible one, but the reason it changed is worth being
-  straight about: it changed because `shorekit.Albedo`, the class that samples the painted texture,
-  had gone missing and was reconstructed (see the kit's own note). The reconstruction is not the
-  original sampler, and on this animal it reads the seam eleven points of the head's section higher.
-  Contrast behind the reading is 0.232 and the gape renders clearly, so this build is the better of
-  the two; but a reviewer should know that the number is a reconstruction's reading and not the
-  one the first delivery was judged on.
+- **The mandible is shallow**, because the painted mouth line sits low: 0.212 of the head's section
+  rather than the third or so a gharial-like snout suggests. It is measured, the contrast behind the
+  measurement is 0.227, and the gape reads clearly at the distances the sheets show — but the reading
+  itself is a judgement about a painted line on a head three hundred vertices across, and a reviewer
+  who thinks the mouth should sit higher is arguing with the generation, not with the measurement.
+  (This figure was briefly 0.317 mid-pass, while `shorekit.Albedo` was being reconstructed without
+  its sRGB decode. It is back to the original's 0.21156143783228093 exactly; the kit's header note
+  has the story.)
 - **The fangs are a reconstruction.** They are the animal's single most characteristic feature and
   the generation has none, so they are authored into the lumen at a size and a rake taken from the
   skull CT descriptions rather than measured off anything in this file.

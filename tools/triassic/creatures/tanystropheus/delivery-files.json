@@ -1,47 +1,47 @@
 {
   "tanystropheus.card.png": {
-    "bytes": 176917,
-    "sha256": "ff617b0a560406ed398f26c9ad281fa13f649f9994124ee8bb4b642a92e61b6d",
+    "bytes": 176920,
+    "sha256": "971bb4733d79f29bf1318e9fba936bbd616ac88ff353a72b409b9f3ffa732028",
     "dimensions": [
       800,
       600
     ]
   },
   "tanystropheus.glb": {
-    "bytes": 2405320,
-    "sha256": "848269c4764136c5b38a80016d61466e6e7139fed00182c2326d2f2487db5d0f"
+    "bytes": 2404600,
+    "sha256": "bf11b0484241f8a32d703182d8d682e3f2a5a75c6596b1a62cca67b0406fd0ce"
   },
   "tanystropheus.json": {
     "bytes": 3308,
     "sha256": "18a45a62cde67716d5aa37b26f2b5c2d4c8209373f514b0e49a7964c4e27e181"
   },
   "tanystropheus.lod1.glb": {
-    "bytes": 1183904,
-    "sha256": "481e3a2327c3c303b18f2d8ea85cc7a153b282cad755646dab34f5249f3d046a"
+    "bytes": 1943340,
+    "sha256": "c833dc3dbd6fe9f488be1f6c20f288c860d1ec7ba04bfee8957c0992a170b77f"
   },
   "tanystropheus.png": {
-    "bytes": 379765,
-    "sha256": "f4c1b0691c303d8911bbc464fe4ed67a8b575ffadfc4dced5daebe373efcbbba",
+    "bytes": 379766,
+    "sha256": "59cbd0af7c781b0c75f87b2bd006ac821702e45363172ef9e7233fa8680140af",
     "dimensions": [
       1200,
       900
     ]
   },
   "tanystropheus.puppet.glb": {
-    "bytes": 1183904,
-    "sha256": "481e3a2327c3c303b18f2d8ea85cc7a153b282cad755646dab34f5249f3d046a"
+    "bytes": 1943340,
+    "sha256": "c833dc3dbd6fe9f488be1f6c20f288c860d1ec7ba04bfee8957c0992a170b77f"
   },
   "tanystropheus.puppet.png": {
-    "bytes": 348074,
-    "sha256": "b4425990ab83f392c5ec71d188a1d36b16ac03a68455ab89ad72c210f6c2993b",
+    "bytes": 348079,
+    "sha256": "53b511c2f557566d214fec52be11b6038158addd8df0ef821b5d5f4b05b0be7d",
     "dimensions": [
       1200,
       900
     ]
   },
   "tanystropheus.select.png": {
-    "bytes": 657554,
-    "sha256": "0ab01778c9b084996f7d7dfa2fd1e460dc70a2e72180efdcc7dba763dc007f09",
+    "bytes": 657553,
+    "sha256": "c9262d94ad640eb24835d592c30342699a8914e50c0d00cfcf9ad0cac7598fc2",
     "dimensions": [
       1600,
       1200
@@ -49,7 +49,7 @@
   },
   "tanystropheus.thumb.png": {
     "bytes": 22113,
-    "sha256": "48f3c28aa430a5bb7ffe047ca8732f4fab7532492f1d36a02148bb3d8e744c0a",
+    "sha256": "32370e9c723260c9009554b4010409b3c3edea6ca428aa07b806d20bbc0682ad",
     "dimensions": [
       256,
       192

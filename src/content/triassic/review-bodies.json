@@ -4,8 +4,8 @@
     "model": "assets/triassic/creatures/coelophysis.glb",
     "puppet": "assets/triassic/creatures/coelophysis.puppet.glb",
     "lod": "assets/triassic/creatures/coelophysis.lod1.glb",
-    "bytes": 2168196,
-    "sha256": "35aec56ecd0caf0484e0ba50919bdcec747c64286b1dba8bf79c5ec569e82505",
+    "bytes": 2167312,
+    "sha256": "738ad0047905e1b9948468f5f0533be32791241b38ef174784f066bc88bea968",
     "clips": [
       "Ability",
       "Attack",
@@ -108,8 +108,8 @@
     "model": "assets/triassic/creatures/macrocnemus.glb",
     "puppet": "assets/triassic/creatures/macrocnemus.puppet.glb",
     "lod": "assets/triassic/creatures/macrocnemus.lod1.glb",
-    "bytes": 1944428,
-    "sha256": "a48704f551d3468c472224e90a03ad4ace39fb116db8b3677e7bd2ce0323de58",
+    "bytes": 1943708,
+    "sha256": "63e705fcd747604443cd1fc91176c1ca54c15fb0dad7af0a2b2ac0e75873c7ca",
     "clips": [
       "Ability",
       "Attack",
@@ -179,8 +179,8 @@
     "model": "assets/triassic/creatures/tanystropheus.glb",
     "puppet": "assets/triassic/creatures/tanystropheus.puppet.glb",
     "lod": "assets/triassic/creatures/tanystropheus.lod1.glb",
-    "bytes": 2404600,
-    "sha256": "bf11b0484241f8a32d703182d8d682e3f2a5a75c6596b1a62cca67b0406fd0ce",
+    "bytes": 2404628,
+    "sha256": "2fec30f9ed58b9b851a7be159aec84972ebdde73c23adb2053eab967df722d4e",
     "clips": [
       "Ability",
       "Attack",

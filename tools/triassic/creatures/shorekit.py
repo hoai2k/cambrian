@@ -28,17 +28,26 @@ Raw-space convention, as in the other builders: the intake mesh is carried into 
 +X snoutward, +Y left and +Z up, and the engine transform `tx()` is applied once at the end.
 
 A note on `Albedo`, because it is the one part of this file with a history worth knowing. It went
-missing: the three builders all call `K.Albedo(auth)` and the class was not in the committed kit,
-so as committed **none of the three builders would run at all**, which was found by going back to
-rebuild one of them rather than by any check. It has been restored to the contract its callers
-need, but the restoration is a reconstruction and not the original, and it is *not* behaviourally
-free: the mouth seam is read off the pigment, so the sampling decides `JAW_FRACTION`, which decides
-where the jaw is cut. A rebuild with the restored class gives Macrocnemus 20,954 triangles against
-the 20,950 of the artefact that was committed before it went missing — four triangles, from a seam
-that moved by less than a texel's worth of luminance. The three animals were therefore rebuilt from
-this kit and re-audited, so that source and artefact agree; the lesson is that an intake whose
-*geometry* depends on a texture read has no slack in that read, and that nothing here checks a
-builder still imports.
+missing: all three builders call `K.Albedo(auth)` and the class was not in the committed kit, so as
+committed **none of them would run at all** — found by going back to rebuild one, not by any check,
+and long after the artefacts had shipped. `tools/triassic/shorekit-check.mjs` now resolves every
+`K.<name>` a builder reaches for, statically and without Blender, so that cannot happen quietly
+again.
+
+Reconstructing it took one non-obvious step, which is why this note is here. The first attempt
+sampled the pixel buffer as it comes and produced bodies that were *nearly* right: the twin's mean
+vertex colour came out 0.46 against the 0.24 of the body it doubles for, and the measured mouth line
+moved — Tanystropheus from 0.21 to 0.32 of the head's section, Coelophysis past the 0.65 its own
+builder refuses above, so that animal would not build at all. The missing step is the **sRGB
+decode** (`_to_linear`): `img.pixels` hands back the stored values, the twin writes them straight
+into a linear FLOAT_COLOR attribute, and the authored body goes through the image texture where the
+shader decodes them. With it, all three reproduce their original geometry exactly and Tanystropheus'
+seam comes back to 0.21156143783228093 against the original's 0.21156143783228093.
+
+Two things to keep from that. A monotonic transform of the luminance is **not** neutral for the
+mouth line, because the seam is the split that maximises a *difference of means* and that is not
+invariant under a curve. And an intake whose geometry depends on a texture read has no slack in
+that read at all.
 """
 import bpy
 import bmesh
@@ -331,6 +340,17 @@ def authored_material(obj, name, relief=.15, roughness=.7):
 
 # ---- the source texture ---------------------------------------------------------------------------
 
+def _to_linear(c):
+    """The sRGB transfer function, inverted.
+
+    Worth saying why this is not neutral for the mouth line: the seam is the split that maximises
+    the difference of the mean luminance above it and below it, and a difference of means is *not*
+    invariant under a curve. So decoding moves the measured seam, which is how a missing decode
+    turned into a body that would not build.
+    """
+    return c / 12.92 if c <= .04045 else ((c + .055) / 1.055) ** 2.4
+
+
 class Albedo:
     """The intake body's own painted texture, sampled through its own UVs.
 
@@ -369,13 +389,25 @@ class Albedo:
         self.px = buf.reshape(self.h, self.w, 4)
 
     def at(self, u, v):
-        """Bilinear, wrapped. Returns RGBA as a plain tuple, which is what a colour slot takes.
+        """Bilinear, wrapped, **decoded to linear**. RGBA as a plain tuple, what a colour slot takes.
 
-        Bilinear rather than nearest because the *geometry* depends on this: the mouth seam is
-        placed by measuring the pigment, so the sampler decides where the jaw is cut. Nearest-texel
-        quantises every read to one of 2048 rows and pushed Coelophysis' measured seam to 0.656 of
-        the head's section, past the 0.65 its own builder refuses — a body that would not build at
-        all. Interpolating is both the more faithful reconstruction and the more stable one.
+        The decode is the whole of it and is not optional. `img.pixels` hands back the stored values;
+        the twin writes them straight into a linear FLOAT_COLOR attribute while the authored body
+        goes through the image texture, where the shader decodes them — so sampling without decoding
+        makes the twin the brighter of the two for the same skin, measured at a mean vertex colour of
+        0.46 against the body's 0.24. It also moves the *geometry*, because the mouth seam is placed
+        by measuring this pigment: undecoded, Tanystropheus' seam reads 0.32 of the head's section
+        instead of 0.21 and Coelophysis' goes past the 0.65 its own builder refuses above, so that
+        animal does not build at all. With the decode all three reproduce their original geometry
+        exactly.
+
+        V is *not* flipped: Blender's UV layer and its pixel buffer are both bottom-up, so they
+        agree. Flipping it was tried and reads the mirror of the atlas — Tanystropheus' seam goes to
+        0.83 and several stations return negative contrast, the instrument saying it is looking in
+        the wrong place.
+
+        Bilinear rather than nearest is the smaller point, but keep it: quantising every read to one
+        of 2048 rows is avoidable noise in a measurement the jaw cut depends on.
         """
         fx = (u % 1.0) * (self.w - 1)
         fy = (v % 1.0) * (self.h - 1)
@@ -384,7 +416,8 @@ class Albedo:
         tx_, ty = fx - x0, fy - y0
         p = (self.px[y0, x0] * (1 - tx_) * (1 - ty) + self.px[y0, x1] * tx_ * (1 - ty)
              + self.px[y1, x0] * (1 - tx_) * ty + self.px[y1, x1] * tx_ * ty)
-        return (float(p[0]), float(p[1]), float(p[2]), float(p[3]))
+        rgb = tuple(_to_linear(float(c)) for c in p[:3])
+        return (rgb[0], rgb[1], rgb[2], float(p[3]))
 
     def triangle_uv(self, point, poly_index):
         """The UV at a point lying on one polygon of the authored mesh, or None.

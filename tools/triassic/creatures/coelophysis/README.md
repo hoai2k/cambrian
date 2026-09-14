@@ -219,13 +219,6 @@ down the neck in order, and refuses a handover that does not close.
 Sheets, rendered from the decoded packaged files through identical cameras and lights for both
 models:
 
-> **The sheets below are not in the tree.** They are rendered from the decoded packaged files by
-> `render.py` and `contact-sheets.py`, and this animal's builder no longer runs (see the top of
-> *What is still open*), so there is no build of the current source to render. Rendering the
-> *original* delivery would produce sheets of a body that the committed source cannot make, which is
-> worse than having none. Tanystropheus' and Macrocnemus' sheets are present and current. The links
-> stay so the list of what a reviewer should be given is on the record.
-
 - **[The strike, side and top, phase by phase](paired-strike-sheet.jpg)**
 - **[The stride and the dash](paired-gait-sheet.jpg)**
 - [Side, top, front, belly and mouth comparison](paired-volume-sheet.jpg)
@@ -303,68 +296,15 @@ give webbed feet to. What its feet actually need is the skinning fix, not more g
 
 ## What is still open
 
-- **This builder does not currently run, and the shipped files cannot be regenerated from it.**
-  This is the most important thing on the page. `build.py` stops on its own sanity assertion:
+- **Its builder briefly stopped running mid-pass, and the reason is worth keeping.** `build.py`
+  refuses a mouth line outside `.15 < JAW_FRACTION < .65`, and while `shorekit.Albedo` was being
+  reconstructed without its sRGB decode this head measured 0.656 — so the build stopped, correctly.
+  The decode restored it to 0.6016233241902793, against the original's 0.6016233241902793, and the
+  body now rebuilds to its original 20,950 triangles. Nothing was widened to make that happen; the
+  assertion was right and the sampler was wrong. The kit's header note has the whole story, and the
+  lesson is that a monotonic change to the luminance is not neutral here — the seam is the split
+  that maximises a difference of means, which no curve leaves alone.
 
-      assert .15 < JAW_FRACTION < .65      # got 0.6563
-
-  The mouth line on these heads is *measured*, not chosen — each station's pigment is split into a
-  dark half above and a pale half below and the seam is the median of where that split falls — and
-  on this animal the reading is bimodal and untrustworthy. The front stations read 0.78, 0.80, 0.81
-  and 0.82 of the head's section; the middle ones read 0.29 twice. A median across a set like that
-  does not mean anything, and it lands at 0.656, just past the ceiling the builder refuses above.
-  **The assertion is doing its job**: it is saying that this head's painted mouth line cannot be
-  located reliably, and the alternative to stopping is cutting a jaw in the wrong place.
-
-  It did not stop when the animal was first built, because `shorekit.Albedo` — the class that reads
-  the texture — was present then and has since gone missing and been reconstructed (the kit's own
-  header note has the history). The reconstruction reads this head 0.055 higher and that is enough
-  to cross the line. It was **not** caught earlier because Blender exits 0 when a script raises, so
-  a chain checking exit codes recorded a failed build as "BUILD OK" and the stale artefacts sitting
-  in `public/` were then mistaken for proof that the builder reproduced byte for byte. That trap is
-  now closed — `shorekit` installs an excepthook that exits non-zero — and it is worth knowing about
-  because every builder in this directory was exposed to it.
-
-  So the files in `public/assets/triassic/creatures/coelophysis.*` are the **original** delivery,
-  built by the sampler that is gone. Tanystropheus and Macrocnemus have both been rebuilt and
-  re-audited from the current source and are consistent with it; this animal is not.
-
-  The fix is not to widen the band. It is to read the seam with a statistic that survives a bimodal
-  set — weight each station by its own contrast, or take only the stations over the jaw's actual
-  range — which changes the reading on all three animals and so wants its own pass with fresh
-  renders. Until then this animal is not deliverable, which it was not anyway: see the skinning
-  tears below.
-
-- **The limb skinning tears, and this is the blocking defect on this animal.** A running theropod is the hardest case in the set and it fails: the hind feet trail off in ribbons and the skull shears into a flat blade in the strike. It is visible in the sheets at gameplay scale, not only close up.
-
-  `node tools/triassic/skin-tears.mjs public/assets/triassic/creatures/coelophysis.glb` sweeps every clip at
-  17 phases and compares each triangle edge against its rest length. Twenty-eight of twenty-nine clips tear an edge past 2x. `SnapLeft` and `SnapRight` are the worst at **25x**, with about 16,500 torn edge-instances across the phases and a single edge going from 0.019 to 0.573 — on a body 4.90 long, that is one edge spanning an eighth of the whole animal. `Run`, `Sprint`, `Swim`, `Charge` and `Retreat` are all over 9x and all dominated by `hind_foot_L`, `hind_foot_R`, `body` and `chest`.
-
-
-  Swept across the era it is **not** a regression in this kit and **not** inherent to the pipeline.
-  Nothosaurus peaks at 2.98x with 29 torn edges and is essentially clean; Dinocephalosaurus' 56.8x
-  is twelve *tiny* oral edges (0.002 to 0.086) and is clean in effect; Placodus — delivered and
-  reviewed long before these three — tears at 12.4x in its paddles. So the pipeline can produce
-  intact limb skinning, this did not start here, and what decides it is how hard an animal swings a
-  limb. That makes it a fixable fault in the limb weighting rather than a property of Tripo bodies.
-
-  The paired audit does not catch this and could not: it plays 61 phases of every clip through the
-  real loader and mixer and checks where every skinned vertex *is* — travel from rest, bounds,
-  envelopes — and travel from rest stays bounded the whole time. No vertex moves more than 15 % of
-  body length even while the foot it belongs to is pulled inside out. What is wrong is not where
-  the vertices are but how far apart they are from each other. That instrument is new, it is in the
-  repository as `tools/triassic/skin-tears.mjs`, and it is not yet wired into any audit because the
-  right threshold per animal is a judgement a reviewer should make rather than one to bake in
-  unlooked-at.
-
-  The fault is in the shared limb skinning (`skin_weights` and `Limb` in `shorekit.py`), not in the
-  clips: the clips ask for ordinary limb swings and the weights do not hold the geometry together
-  through them. The evidence that it is the limbs is that Tanystropheus — which shares every line
-  of that code — is an order of magnitude better, and the only difference is that it stands at a
-  post and barely swings a limb.
-
-- Coelophysis is **not** in `tools/triassic/shipped.json` and its preview badge is **not** cleared.
-  That is the reviewer's call after looking at the sheets.
 - **The hands are the twin's weak point** (see the measurements above): 1.4 % of authored vertices
   are more than 3 % of body length from the twin, all of them in the arms and fingers.
 - **The forelimb chain is the least certain measurement in this build.** The hindlimbs and the tail

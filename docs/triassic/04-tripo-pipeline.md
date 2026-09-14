@@ -201,12 +201,23 @@ animal. Three findings from that pass belong in this document because they gener
   `jaw` and the throat behind it to the cervicals, and with nothing blending between them a wide
   opening separates the two and the pale ventral skin reads as a slab hanging off a detached jaw.
   A closed mouth hides all of this, so none of it shows until the hinge is right.
-- **An intake whose geometry depends on a texture read has no slack in that read.** These three
-  place the mouth seam by measuring the *pigment* — the painted mouth line — per station, so the
-  albedo sampler decides where the jaw is cut and therefore the triangle count. That is a good
-  technique and worth keeping, but it means the sampler is not a detail: reconstructing an
-  equivalent one reproduced Coelophysis byte for byte and moved Tanystropheus and Macrocnemus by six
-  and four triangles.
+- **An intake whose geometry depends on a texture read has no slack in that read, and the sampler
+  must decode sRGB.** These three place the mouth seam by measuring the *pigment* — the painted
+  mouth line — per station, so the albedo sampler decides where the jaw is cut and therefore the
+  triangle count. It is a good technique and worth keeping, but it means the sampler is not a
+  detail. When `shorekit.Albedo` had to be reconstructed, the first attempt sampled Blender's pixel
+  buffer as it comes; that buffer holds *stored* values, and the two consumers disagree about what
+  that means. The twin writes them straight into a linear FLOAT_COLOR attribute, while the authored
+  body goes through the image texture where the shader decodes them — so an undecoded sampler makes
+  the twin the brighter of the two for the same skin (mean vertex colour 0.46 against the body's
+  0.24) *and* moves the geometry: Tanystropheus' seam read 0.32 of the head's section instead of
+  0.21, and Coelophysis' went past the 0.65 its own builder refuses above, so that animal would not
+  build. With the decode, all three reproduce their original geometry exactly.
+
+  The trap inside the trap: a **monotonic** transform of the luminance is not neutral here. The seam
+  is the split that maximises the *difference of the means* above and below it, and a difference of
+  means is not invariant under a curve. It is easy to reason that a gamma cannot move an ordering
+  and therefore cannot move the seam; it moves it a tenth of the head's section.
 - **Authored geometry has to wear the creature's texture, and a flat material is the tell.** What may
   be authored on a Tripo body is decided by how much shape is invented — closing a hole is always
   fair game, foot webbing is within reach, a tooth whorl is not — but the requirement that carries
