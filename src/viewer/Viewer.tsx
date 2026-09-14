@@ -5,6 +5,7 @@ import { COLLECTIONS, isPropCollection, paletteFor, SPECIMENS, specimenByKey, ty
 import { scheme, SLOT_LABEL, type Slot } from '../shared/palettes';
 import { ASSET_BASE, createViewerScene, isReplaced, replacedName, type PlaybackState, type ViewerScene } from './scene';
 import { SculptEditor } from './sculpt/SculptEditor';
+import { MarkEditor } from './mark/MarkEditor';
 import { getSculpt } from './sculpt/store';
 import { isIdentity, warp } from './sculpt/profile';
 
@@ -30,21 +31,28 @@ function readPicks(): Picks {
   }
 }
 
+/** What the page is doing with the specimen: looking at it, reshaping it, or marking it up. */
+type Mode = 'view' | 'sculpt' | 'mark';
+
 /**
  * The page remembers which specimen it is showing in the URL (`?specimen=<key>`, and `&mode=sculpt`
- * while sculpting), so a reload — or a link — comes back to the same creature. Nothing else is
- * kept there: the view, the clip and any sculpt in progress start over.
+ * or `&mode=mark` while sculpting or marking), so a reload — or a link — comes back to the same
+ * creature. Nothing else is kept there: the view, the clip, any sculpt in progress and any marked
+ * region start over.
  */
-function readUrlState(): { key: string; sculpt: boolean } {
+function readUrlState(): { key: string; mode: Mode } {
   const params = new URLSearchParams(location.search);
   const requested = params.get('specimen') ?? '';
   const key = specimenByKey.has(requested) ? requested : SPECIMENS[0].key;
-  return { key, sculpt: params.get('mode') === 'sculpt' && !isPropCollection(specimenByKey.get(key)?.collection) };
+  const asked = params.get('mode');
+  // Neither mode means anything on a prop: there is no body to reshape and nothing to cut off one.
+  const editable = !isPropCollection(specimenByKey.get(key)?.collection);
+  return { key, mode: editable && (asked === 'sculpt' || asked === 'mark') ? asked : 'view' };
 }
-function writeUrlState(key: string, sculpt: boolean) {
+function writeUrlState(key: string, mode: Mode) {
   const params = new URLSearchParams(location.search);
   params.set('specimen', key);
-  if (sculpt) params.set('mode', 'sculpt'); else params.delete('mode');
+  if (mode === 'view') params.delete('mode'); else params.set('mode', mode);
   const url = `${location.pathname}?${params.toString()}${location.hash}`;
   if (url !== `${location.pathname}${location.search}${location.hash}`) history.replaceState(null, '', url);
 }
@@ -55,7 +63,7 @@ export function Viewer() {
   const initial = useRef(readUrlState());
   const [collection, setCollection] = useState<CollectionId>(specimenByKey.get(initial.current.key)!.collection);
   const [id, setId] = useState(initial.current.key);
-  const [mode, setMode] = useState<'view' | 'sculpt'>(initial.current.sculpt ? 'sculpt' : 'view');
+  const [mode, setMode] = useState<Mode>(initial.current.mode);
   const [detail, setDetail] = useState<'full' | 'reduced'>('full');
   /**
    * Which body of a pair is on stage. The procedural twin is built to the generated model's own
@@ -97,7 +105,7 @@ export function Viewer() {
   const [loadedId, setLoadedId] = useState('');
   const [picks, setPicks] = useState<Picks>(readPicks);
   const [slots, setSlots] = useState<readonly Slot[]>([]);
-  useEffect(() => { writeUrlState(id, mode === 'sculpt'); }, [id, mode]);
+  useEffect(() => { writeUrlState(id, mode); }, [id, mode]);
   useEffect(() => {
     if (body === 'puppet' && !def.puppet) setBody('model');
     if (body === 'generated' && !def.generated) setBody('model');
@@ -120,6 +128,11 @@ export function Viewer() {
   // the wrong mesh.
   const canSculpt = !isPropCollection(collection) && !showPuppet && !showGenerated && !loading && !error && loadedId === id;
   useEffect(() => { if (mode === 'sculpt' && (isPropCollection(collection) || showPuppet || showGenerated)) setMode('view'); }, [mode, collection, showPuppet, showGenerated]);
+  // Marking works on whatever body is on stage, the generated mesh above all: that raw surface is
+  // the one carrying fins nobody asked for, and it is the reason the mode exists. A prop is the
+  // only thing it refuses — there is nothing on a stromatolite for a builder to cut away.
+  const canMark = !isPropCollection(collection) && !loading && !error && loadedId === id;
+  useEffect(() => { if (mode === 'mark' && isPropCollection(collection)) setMode('view'); }, [mode, collection]);
 
   // The show effect must not re-run when a pick changes, so it reads the picks through a ref.
   const picksRef = useRef(picks);
@@ -185,7 +198,7 @@ export function Viewer() {
   const changed = roster.filter((c) => (picks[c.key] ?? defaultScheme(c.key)) !== defaultScheme(c.key)).length;
 
   return (
-    <div className={`viewer ${mode === 'sculpt' ? 'sculpting' : ''}`} data-mode={mode}>
+    <div className={`viewer ${mode === 'sculpt' ? 'sculpting' : ''}${mode === 'mark' ? ' marking' : ''}`} data-mode={mode}>
       <div className="stage">
         <canvas ref={canvasRef} className="viewer-canvas" />
         {/* The notice sits on the stage, over where the specimen will stand. `status` stays in the
@@ -202,6 +215,15 @@ export function Viewer() {
           and puts its panel where the info card was. */}
       {mode === 'sculpt' && canSculpt && sceneRef.current && (
         <SculptEditor key={id} scene={sceneRef.current} specimen={def} onExit={() => setMode('view')} />
+      )}
+
+      {/* Mark mode keeps the ordinary single-stage layout — the brush paints on the orbit view
+          itself — and only takes the info card's place with its panel. The marks are indices into
+          the body actually on stage, so the editor is keyed by that as well as by the specimen. */}
+      {mode === 'mark' && canMark && sceneRef.current && canvasRef.current && (
+        <MarkEditor key={`${id}|${modelPath}`} scene={sceneRef.current} specimen={def} model={modelPath}
+          sha256={showGenerated ? def.generatedSha256 : undefined}
+          canvas={canvasRef.current} onExit={() => setMode('view')} />
       )}
 
       <aside className="specimens" aria-label="Specimens">
@@ -284,6 +306,9 @@ export function Viewer() {
           <button className="ghost" onClick={() => sceneRef.current?.resetCamera()}>Reset view</button>
           {!isPropCollection(collection) && <button className="ghost" onClick={() => setMode('sculpt')} disabled={!canSculpt} title="Reshape the body on side and top drawings and export the change as a sculpt file">
             Edit sculpt{(() => { const d = getSculpt(id); return d && !isIdentity(d) ? ' (edited)' : ''; })()}
+          </button>}
+          {!isPropCollection(collection) && <button className="ghost" onClick={() => setMode('mark')} disabled={!canMark} title="Paint the geometry that should not be there and export it as a region file for tools/triassic/cut-region.py">
+            Mark region
           </button>}
         </div>
 
