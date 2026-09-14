@@ -12,6 +12,19 @@ s=bpy.context.scene;s.render.fps=30;s.render.engine='CYCLES';s.cycles.samples=16
 s.render.resolution_percentage=100;s.render.image_settings.file_format='PNG';s.render.image_settings.color_mode='RGBA'
 s.render.film_transparent=True;s.view_settings.view_transform='AgX'
 s.world.use_nodes=True;s.world.node_tree.nodes['Background'].inputs[1].default_value=.35
+# CYCLES ignores `use_backface_culling`, so a review render would show the near wall of the mouth
+# lining that the runtime throws away. Emulate the cull, so a sheet shows what a player sees.
+for m in bpy.data.materials:
+ if not m.use_nodes or not m.use_backface_culling:continue
+ nt=m.node_tree;out=next(n for n in nt.nodes if n.type=='OUTPUT_MATERIAL')
+ link=next((l for l in nt.links if l.to_node==out and l.to_socket.name=='Surface'),None)
+ if link:
+  src=link.from_socket;nt.links.remove(link)
+  geo=nt.nodes.new('ShaderNodeNewGeometry');tr=nt.nodes.new('ShaderNodeBsdfTransparent')
+  mix=nt.nodes.new('ShaderNodeMixShader')
+  nt.links.new(geo.outputs['Backfacing'],mix.inputs['Fac'])
+  nt.links.new(src,mix.inputs[1]);nt.links.new(tr.outputs['BSDF'],mix.inputs[2])
+  nt.links.new(mix.outputs['Shader'],out.inputs['Surface'])
 rig=next(o for o in s.objects if o.type=='ARMATURE')
 for tr in rig.animation_data.nla_tracks:tr.mute=True
 for loc,power in [((3,-5,5),1000),((-3,-1,3),600),((0,4,4),1100),((0,-5,-2),230)]:
