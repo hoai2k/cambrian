@@ -150,7 +150,7 @@ meshes (body and lower jaw together).
 | Nearest twin-surface distance, 95th percentile | 0.00386 | 0.07 % | — |
 | Nearest twin-surface distance, maximum | 0.03382 | 0.62 % | — |
 | Appendage roots seated inside the intake surface | 0.024–0.090 raw | 1.5–5.4 % deep | inside |
-| Jaw hinge seated inside the head | 0.0195 raw | 1.2 % deep, 59 % of the local head radius | inside |
+| Jaw hinge seated inside the head | 0.0195 raw | 1.2 % deep, 74 % of the local head radius | inside |
 | Neck root (`neck_00`) seated inside the chest | 0.0552 raw | 3.3 % deep | inside |
 
 No authored vertex is further than 0.034 from the twin — there is no outlier region at all on this
