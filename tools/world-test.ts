@@ -16,6 +16,40 @@ const run = (g: Game, f: InputFrame, steps: number) => { const m = new Map([[0, 
   check('seabed reaches the surface at the waterline', sampleHeight(0, z0) >= SURFACE_Y - 3, `h=${sampleHeight(0, z0).toFixed(1)} surface=${SURFACE_Y}`);
   check('seabed is swimmable 30 units out', sampleHeight(0, z0 - 30) < SURFACE_Y - 8, `h=${sampleHeight(0, z0 - 30).toFixed(1)}`);
   check('the basin is deep', sampleHeight(0, z0 - 1000) < -8, `h=${sampleHeight(0, z0 - 1000).toFixed(1)}`);
+  // --- depth is a reading of where you are ---
+  // The sea varied before this, but by *distance*, while the biomes are a mosaic — so the boulder
+  // fields averaged deeper water than the escarpment, and the drop at the reef front read as
+  // shallower than the rocks behind it. Depth now comes off the biome (`environment.floorDepth`),
+  // so crossing into one shows in the water over your head. Gently, here: nothing in the Cambrian
+  // breathes, so depth is not a cost the way it is in the eras with lungs, and the whole column
+  // runs under three times over against the Devonian's nearly five.
+  {
+    const acc: Record<string, { sum: number; n: number }> = {};
+    for (let dx = -3000; dx <= 3000; dx += 41) for (let s = 20; s < 2000; s += 27) {
+      const b = biomeAt(dx, z0 - s);
+      (acc[b] ??= { sum: 0, n: 0 });
+      acc[b].sum += SURFACE_Y - sampleHeight(dx, z0 - s); acc[b].n++;
+    }
+    const depth = (b: Biome) => acc[b].sum / acc[b].n;
+    const inshore = Math.max(depth('shallows'), depth('nursery'));
+    const others = BIOMES.filter((b) => b !== 'shallows' && b !== 'nursery');
+    check('the shore is the shallowest water in the sea', others.every((b) => depth(b) > inshore),
+      `inshore ${inshore.toFixed(1)} against ${others.map((b) => `${b} ${depth(b).toFixed(0)}`).join(', ')}`);
+    // The ladder a player reads on the way out. The reef rises, as a reef does, so the boulder
+    // fields are not on it — but the front of the escarpment must be deeper than they are, which
+    // is exactly what the old profile got backwards.
+    const ladder: Biome[] = ['shallows', 'flats', 'shelf', 'forest', 'channel', 'escarpment', 'basin'];
+    const steps = ladder.slice(1).map((b, i) => depth(b) - depth(ladder[i]));
+    check('...and each biome out from it is deeper than the last', steps.every((d) => d > 0),
+      ladder.map((b) => `${b} ${depth(b).toFixed(0)}`).join(' < '));
+    check('...by enough to notice', steps.every((d) => d > 2.5), `smallest step ${Math.min(...steps).toFixed(1)} units`);
+    check('the reef front is deeper than the rocks behind it', depth('escarpment') > depth('boulders'),
+      `escarpment ${depth('escarpment').toFixed(1)} against boulders ${depth('boulders').toFixed(1)}`);
+    // Gentler than the eras where depth is a price. The Devonian runs about 4.8 times over.
+    const range = depth('basin') / depth('shallows');
+    check('the Cambrian varies gently', range > 1.8 && range < 3.2, `deepest is ${range.toFixed(1)}x the shallowest`);
+  }
+
   let wander = 0;
   for (let x = -3000; x <= 3000; x += 50) wander = Math.max(wander, Math.abs(shoreZ(x) - 88));
   check('the coast wanders but stays a coast', wander > 15 && wander < 70, `max offset ${wander.toFixed(1)}`);
