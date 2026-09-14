@@ -2,6 +2,7 @@
 // the three game links followed. Usage: node tools/ancientseas-smoke.mjs <outdir>
 // Requires `npm run build && npx vite preview --port 4173` in another shell.
 import { chromium } from 'playwright-core';
+import { silenceCounter } from './qa-counter.mjs';
 const S = process.argv[2] ?? '.';
 // The three game links boot the real engine, so this needs the software renderer the other
 // browser smokes use; without it the sea never starts and the boot never finishes.
@@ -11,6 +12,7 @@ const check = (n, ok, d = '') => { console.log(`${ok ? 'PASS' : 'FAIL'}  ${n.pad
 for (const [name, viewport] of [['desktop', { width: 1440, height: 900 }], ['phone', { width: 390, height: 844 }]]) {
   for (const version of [1, 2]) {
     const page = await browser.newPage({ viewport });
+    await silenceCounter(page);
     const errors = [], missing = [];
     page.on('console', (m) => { if (m.type() === 'error') errors.push(m.text().slice(0, 200)); });
     page.on('pageerror', (e) => errors.push(e.message));
@@ -42,6 +44,7 @@ for (const [name, viewport] of [['desktop', { width: 1440, height: 900 }], ['pho
 // shows the player the sea for a moment and then cuts to the title — which reads as landing in
 // the wrong place. Checked at the first frame the app has mounted anything at all.
 const page = await browser.newPage({ viewport: { width: 1280, height: 800 } });
+await silenceCounter(page);
 const covering = () => page.waitForFunction(() => {
   const root = document.getElementById('root');
   if (!root || !root.firstElementChild) return false;
@@ -79,6 +82,7 @@ for (const [href, url, title] of [['./cambrian/', 'http://localhost:4173/cambria
     navigator.getGamepads = () => [pad, null, null, null];
   });
   const page = await ctx.newPage();
+  await silenceCounter(page);
   await page.goto('http://localhost:4173/', { waitUntil: 'networkidle' });
   await page.evaluate(() => dispatchEvent(new Event('gamepadconnected')));
   const lit = () => page.$$eval('.as-lit', (n) => n.map((e) => e.getAttribute('data-slot')).join(' '));
@@ -111,6 +115,7 @@ for (const [href, url, title] of [['./cambrian/', 'http://localhost:4173/cambria
 {
   const plain = await chromium.launch({ executablePath: '/opt/pw-browsers/chromium', args: ['--use-gl=angle', '--use-angle=swiftshader', '--enable-unsafe-swiftshader', '--no-sandbox'] });
   const page = await plain.newPage({ viewport: { width: 1280, height: 800 } });
+  await silenceCounter(page);
   const fs = () => page.evaluate(() => !!document.fullscreenElement);
 
   // On the roster, where a stray click starts nothing, so what is seen is the restore alone and

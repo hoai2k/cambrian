@@ -7,6 +7,9 @@ import { ASSET_BASE, createViewerScene, isReplaced, replacedName, type PlaybackS
 import { SculptEditor } from './sculpt/SculptEditor';
 import { getSculpt } from './sculpt/store';
 import { isIdentity, warp } from './sculpt/profile';
+import { StretchEditor } from './stretch/StretchEditor';
+import { getStretch } from './stretch/store';
+import { isIdentity as stretchIsIdentity, warp as stretchWarp } from './stretch/stretch';
 
 const SPEEDS = [0.25, 0.5, 1, 2];
 
@@ -30,21 +33,29 @@ function readPicks(): Picks {
   }
 }
 
+type Mode = 'view' | 'sculpt' | 'stretch';
+
 /**
  * The page remembers which specimen it is showing in the URL (`?specimen=<key>`, and `&mode=sculpt`
- * while sculpting), so a reload — or a link — comes back to the same creature. Nothing else is
- * kept there: the view, the clip and any sculpt in progress start over.
+ * or `&mode=stretch` while editing), so a reload — or a link — comes back to the same creature.
+ * Nothing else is kept there: the view, the clip and any edit in progress start over.
+ *
+ * `mode=stretch` does not also restore the generated body it applies to, because which body is on
+ * stage is not in the URL at all; the editor is shown only once one is, and the mode falls back to
+ * the view until then.
  */
-function readUrlState(): { key: string; sculpt: boolean } {
+function readUrlState(): { key: string; mode: Mode } {
   const params = new URLSearchParams(location.search);
   const requested = params.get('specimen') ?? '';
   const key = specimenByKey.has(requested) ? requested : SPECIMENS[0].key;
-  return { key, sculpt: params.get('mode') === 'sculpt' && !isPropCollection(specimenByKey.get(key)?.collection) };
+  const asked = params.get('mode');
+  const mode: Mode = (asked === 'sculpt' || asked === 'stretch') && !isPropCollection(specimenByKey.get(key)?.collection) ? asked : 'view';
+  return { key, mode };
 }
-function writeUrlState(key: string, sculpt: boolean) {
+function writeUrlState(key: string, mode: Mode) {
   const params = new URLSearchParams(location.search);
   params.set('specimen', key);
-  if (sculpt) params.set('mode', 'sculpt'); else params.delete('mode');
+  if (mode === 'view') params.delete('mode'); else params.set('mode', mode);
   const url = `${location.pathname}?${params.toString()}${location.hash}`;
   if (url !== `${location.pathname}${location.search}${location.hash}`) history.replaceState(null, '', url);
 }
@@ -55,7 +66,7 @@ export function Viewer() {
   const initial = useRef(readUrlState());
   const [collection, setCollection] = useState<CollectionId>(specimenByKey.get(initial.current.key)!.collection);
   const [id, setId] = useState(initial.current.key);
-  const [mode, setMode] = useState<'view' | 'sculpt'>(initial.current.sculpt ? 'sculpt' : 'view');
+  const [mode, setMode] = useState<Mode>(initial.current.mode);
   const [detail, setDetail] = useState<'full' | 'reduced'>('full');
   /**
    * Which body of a pair is on stage. The procedural twin is built to the generated model's own
@@ -64,7 +75,8 @@ export function Viewer() {
    * and the clip keeps playing, which turns any difference between them into movement rather than
    * something to hold in your head across two list entries.
    */
-  const [body, setBody] = useState<'model' | 'puppet' | 'generated'>('model');
+  const [body, setBody] = useState<'model' | 'puppet' | 'generated'>(
+    initial.current.mode === 'stretch' && specimenByKey.get(initial.current.key)?.generated ? 'generated' : 'model');
   const requestedId = useRef('');
   const def = specimenByKey.get(id)!;
   const showPuppet = body === 'puppet' && !!def.puppet;
@@ -90,7 +102,7 @@ export function Viewer() {
   const [loadedId, setLoadedId] = useState('');
   const [picks, setPicks] = useState<Picks>(readPicks);
   const [slots, setSlots] = useState<readonly Slot[]>([]);
-  useEffect(() => { writeUrlState(id, mode === 'sculpt'); }, [id, mode]);
+  useEffect(() => { writeUrlState(id, mode); }, [id, mode]);
   useEffect(() => {
     if (body === 'puppet' && !def.puppet) setBody('model');
     if (body === 'generated' && !def.generated) setBody('model');
@@ -99,8 +111,16 @@ export function Viewer() {
   // Not on the twin: a sculpt is the hand-off that goes into a builder's profile rows for the body
   // that ships, and one exported off the comparison body would name the right creature and describe
   // the wrong mesh.
-  const canSculpt = !isPropCollection(collection) && !showPuppet && !showGenerated && !loading && !error && loadedId === id;
-  useEffect(() => { if (mode === 'sculpt' && (isPropCollection(collection) || showPuppet || showGenerated)) setMode('view'); }, [mode, collection, showPuppet, showGenerated]);
+  const ready = !loading && !error && loadedId === id;
+  const canSculpt = !isPropCollection(collection) && !showPuppet && !showGenerated && ready;
+  // Stretching is the other half of that split, and the opposite gate: it lengthens a run of a raw
+  // generation before anyone cleans or rigs it, so it is offered only on the generated body and
+  // never on one that has shipped.
+  const canStretch = showGenerated && ready;
+  useEffect(() => {
+    if (mode === 'sculpt' && (isPropCollection(collection) || showPuppet || showGenerated)) setMode('view');
+    if (mode === 'stretch' && !showGenerated) setMode('view');
+  }, [mode, collection, showPuppet, showGenerated]);
 
   // The show effect must not re-run when a pick changes, so it reads the picks through a ref.
   const picksRef = useRef(picks);
@@ -131,6 +151,8 @@ export function Viewer() {
         // A sculpt made this session follows the creature back onto the stage, full or reduced.
         const sculpt = getSculpt(id);
         if (sculpt && !isIdentity(sculpt)) sceneRef.current?.applySculpt(warp(sculpt), true);
+        const stretch = showGenerated ? getStretch(id) : undefined;
+        if (stretch && stretch.model === modelPath && !stretchIsIdentity(stretch)) sceneRef.current?.applySculpt(stretchWarp(stretch), true);
         setClips(names); setSlots(sceneRef.current?.activeSlots() ?? []); setLoading(false); setLoadedId(id);
       })
       .catch((e: Error) => { if (!cancelled) { setError(e.message); setLoading(false); } });
@@ -164,7 +186,7 @@ export function Viewer() {
   const changed = roster.filter((c) => (picks[c.key] ?? defaultScheme(c.key)) !== defaultScheme(c.key)).length;
 
   return (
-    <div className={`viewer ${mode === 'sculpt' ? 'sculpting' : ''}`} data-mode={mode}>
+    <div className={`viewer ${mode === 'sculpt' ? 'sculpting' : mode === 'stretch' ? 'stretching' : ''}`} data-mode={mode}>
       <div className="stage">
         <canvas ref={canvasRef} className="viewer-canvas" />
         {/* The notice sits on the stage, over where the specimen will stand. `status` stays in the
@@ -181,6 +203,9 @@ export function Viewer() {
           and puts its panel where the info card was. */}
       {mode === 'sculpt' && canSculpt && sceneRef.current && (
         <SculptEditor key={id} scene={sceneRef.current} specimen={def} onExit={() => setMode('view')} />
+      )}
+      {mode === 'stretch' && canStretch && sceneRef.current && (
+        <StretchEditor key={`${id}-stretch`} scene={sceneRef.current} specimen={def} model={modelPath} onExit={() => setMode('view')} />
       )}
 
       <aside className="specimens" aria-label="Specimens">
@@ -252,8 +277,11 @@ export function Viewer() {
         <p className="hint">Drag to orbit · right-drag to pan · scroll to zoom</p>
         <div className="info-actions">
           <button className="ghost" onClick={() => sceneRef.current?.resetCamera()}>Reset view</button>
-          {!isPropCollection(collection) && <button className="ghost" onClick={() => setMode('sculpt')} disabled={!canSculpt} title="Reshape the body on side and top drawings and export the change as a sculpt file">
+          {!isPropCollection(collection) && !def.generated && <button className="ghost" onClick={() => setMode('sculpt')} disabled={!canSculpt} title="Reshape the body on side and top drawings and export the change as a sculpt file">
             Edit sculpt{(() => { const d = getSculpt(id); return d && !isIdentity(d) ? ' (edited)' : ''; })()}
+          </button>}
+          {def.generated && <button className="ghost" onClick={() => { setBody('generated'); setMode('stretch'); }} disabled={!ready} title="Lengthen a run of this raw generation — a neck, a tail — between two cuts, and export the change to be baked into the GLB">
+            Stretch{(() => { const d = getStretch(id); return d && !stretchIsIdentity(d) ? ' (edited)' : ''; })()}
           </button>}
         </div>
 

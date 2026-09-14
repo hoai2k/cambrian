@@ -128,6 +128,22 @@ export interface MeasureInput {
   eyes?: ArrayLike<number>[];
 }
 
+/**
+ * Which way a body lies in its own root frame: the long horizontal axis, and which end the head
+ * is at. Exported because the stretch editor has to agree with the sculpt editor about this —
+ * two tools drawing the same animal's "side view" from two different rules would each be
+ * self-consistent and mutually wrong.
+ *
+ * The head is the end nearer the mouth socket. Without one — a raw generation has no anchors —
+ * assume the head faces +axis, which is what both eras' exporters produce.
+ */
+export function frameFor(lo: readonly number[], hi: readonly number[], mouth?: readonly number[]): SculptFrame {
+  const axis: 'x' | 'z' = hi[0] - lo[0] > hi[2] - lo[2] ? 'x' : 'z';
+  const A = axis === 'x' ? 0 : 2;
+  const forward: 1 | -1 = mouth ? (mouth[A] - (lo[A] + hi[A]) / 2 >= 0 ? 1 : -1) : 1;
+  return { axis, forward, up: 'y' };
+}
+
 export function measure(input: MeasureInput, meta: { key: string; id: string; collection: string; model: string }, count = STATION_COUNT): SculptDoc {
   // The silhouette is the whole animal, eyes included; the surface the eyes are seated against is
   // the body without them.
@@ -140,13 +156,9 @@ export function measure(input: MeasureInput, meta: { key: string; id: string; co
   }
   if (!Number.isFinite(lo[0])) throw new Error('measure: no vertices');
   const size = [hi[0] - lo[0], hi[1] - lo[1], hi[2] - lo[2]];
-  const axis: 'x' | 'z' = size[0] > size[2] ? 'x' : 'z';
+  const { axis, forward } = frameFor(lo, hi, input.mouth);
   const A = axis === 'x' ? 0 : 2, L = axis === 'x' ? 2 : 0;
   const length = Math.max(size[A], 1e-6);
-  // The head is the end nearer the mouth; without a socket assume the head faces +axis, which is
-  // what both eras' exporters produce.
-  let forward: 1 | -1 = 1;
-  if (input.mouth) forward = input.mouth[A] - (lo[A] + hi[A]) / 2 >= 0 ? 1 : -1;
 
   const n = Math.max(2, count);
   const h = length / (n - 1);

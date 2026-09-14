@@ -1,6 +1,7 @@
 import { chromium } from 'playwright-core';
+import { silenceCounter } from '../qa-counter.mjs';
 const browser=await chromium.launch({executablePath:'/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',headless:true});
-const page=await browser.newPage({viewport:{width:1440,height:1000}});const errors=[];page.on('pageerror',e=>errors.push(e.stack));
+const page=await browser.newPage({viewport:{width:1440,height:1000}});await silenceCounter(page);const errors=[];page.on('pageerror',e=>errors.push(e.stack));
 await page.goto(process.env.ART_CHECK_URL || 'http://127.0.0.1:5174/');await page.locator('.title').waitFor({timeout:60000});
 await page.screenshot({animations:'disabled',path:'/tmp/cambrian-title.png'});await page.locator('.title').click();await page.locator('.select').waitFor();
 await page.evaluate(async()=>{await Promise.all([...document.images].map(i=>i.decode()))});
