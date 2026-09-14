@@ -128,11 +128,27 @@ export const flatsFactor = (x: number, z: number, s = shoreDistance(x, z)) =>
   smoothstep(0.62, 0.72, flatsNoise(x, z)) * smoothstep(120, 165, s) * (1 - smoothstep(380, 520, s));
 
 /** Nearest nursery centre to (x, z). Nurseries are a jittered row along the shore; index 0 is at the origin. */
+/**
+ * Where each nursery is jittered to, kept because working it out is not free and this is now on the
+ * hot path. `nurseryFactor` is part of `biomeWeights`, `biomeWeights` is part of `depthProfile`,
+ * and `depthProfile` is every ground sample in an era whose floor follows its biomes — so the three
+ * `makeRng` calls a `nearestNursery` used to cost were being paid per sample per step. `makeRng`
+ * builds four closures and an object, and `shoreZ` is three noise samples; three of each on every
+ * query to the seabed took the step in a full world from 4 ms to nearly 12. A nursery's place is a
+ * pure function of its index and of nothing else — no world seed — so remembering it is exact.
+ */
+const nurserySpot = new Map<number, { x: number; z: number }>();
 export function nurseryAt(index: number): Vec3 {
-  const h = makeRng(0x5ab7 ^ (index * 2654435761 >>> 0));
-  const jx = index === 0 ? 0 : (h() - 0.5) * 90, jz = index === 0 ? 0 : (h() - 0.5) * 26;
-  const x = index * NURSERY_SPACING + jx;
-  return { x, y: 0, z: shoreZ(x) - NURSERY_OFF - jz };
+  let p = nurserySpot.get(index);
+  if (!p) {
+    const h = makeRng(0x5ab7 ^ (index * 2654435761 >>> 0));
+    const jx = index === 0 ? 0 : (h() - 0.5) * 90, jz = index === 0 ? 0 : (h() - 0.5) * 26;
+    const x = index * NURSERY_SPACING + jx;
+    p = { x, z: shoreZ(x) - NURSERY_OFF - jz };
+    nurserySpot.set(index, p);
+  }
+  // A fresh vector every time: callers put these in the world and some of them move what they get.
+  return { x: p.x, y: 0, z: p.z };
 }
 export function nurseryIndexNear(x: number) { return Math.round(x / NURSERY_SPACING); }
 export function nearestNursery(x: number, z: number): { index: number; pos: Vec3; d: number } {
@@ -155,8 +171,9 @@ const scratchW: BiomeWeights = { shallows: 0, nursery: 0, shelf: 0, forest: 0, b
  * · channels cut through from 200 on · the escarpment drops away at ~700 · basin beyond, with
  * deep sponge gardens and boulder mounds as the mosaic continues at lower density.
  */
-export function biomeWeights(x: number, z: number, out: BiomeWeights = scratchW): BiomeWeights {
-  const s = shoreDistance(x, z);
+export function biomeWeights(x: number, z: number, out: BiomeWeights = scratchW, sIn?: number): BiomeWeights {
+  // `s` is three noise samples, and on the depth path the caller has already paid for it.
+  const s = sIn ?? shoreDistance(x, z);
   const rag = (noise2(x / 90 + 5, z / 90 + 5) - 0.5) * 70;   // ragged band edges
   let rest = 1;
   const take = (w: number) => { w = clamp(w, 0, rest); rest -= w; return w; };
@@ -202,13 +219,16 @@ export function biomeAt(x: number, z: number): Biome {
  */
 export function sampleHeight(x: number, z: number) {
   const s = shoreDistance(x, z);
-  const rag = (noise2(x / 90 + 5, z / 90 + 5) - 0.5) * 70;
   let h = -0.55
     + 0.9 * Math.sin(x * 0.045 + 0.7) * Math.cos(z * 0.039)
     + 0.45 * Math.sin(x * 0.093 + z * 0.037)
     + 0.18 * Math.sin(z * 0.2 + x * 0.107)
     + (fbm2(x * 0.02 + 7, z * 0.02 + 3) - 0.5) * 3.2;
+  // Before the ragged band edges, which only the flat-floor path below uses: on the depth path the
+  // raggedness is already in the biome weights, and computing it here was a noise sample a step
+  // spent thousands of times over and threw away.
   if (FLOOR_DEPTH) return depthProfile(x, z, s, h);
+  const rag = (noise2(x / 90 + 5, z / 90 + 5) - 0.5) * 70;
   // shore: the shallows sit a few units high, then the beach climbs to the waterline over the last 48 units
   h += 8 * (1 - smoothstep(40, 140, s));
   if (s < 48) h += (SURFACE_Y + 1 - 8) * Math.pow(1 - smoothstep(0, 48, s), 1.7);
@@ -238,7 +258,7 @@ export function sampleHeight(x: number, z: number) {
  */
 const scratchDepthW: BiomeWeights = { shallows: 0, nursery: 0, shelf: 0, forest: 0, boulders: 0, flats: 0, channel: 0, escarpment: 0, basin: 0 };
 function depthProfile(x: number, z: number, s: number, u: number): number {
-  const w = biomeWeights(x, z, scratchDepthW);
+  const w = biomeWeights(x, z, scratchDepthW, s);
   let depth = 0;
   for (const b of BIOMES) depth += w[b] * FLOOR_DEPTH![b];
   // the reef comes up to meet the air-breathers: ridges a player can follow, never a single bump

@@ -8,7 +8,7 @@ import { HEAVY_SPECIALS } from '../src/sim/concealment';
 import { emptyInput } from '../src/sim/types';
 import { Game } from '../src/sim/game';
 import { makeBrain } from '../src/sim/ai';
-import { SURFACE_Y } from '../src/sim/world';
+import { sampleHeight, SURFACE_Y } from '../src/sim/world';
 import { HEAVY_SPECIALS } from '../src/sim/concealment';
 
 assert.equal(CREATURES.length, 21);
@@ -99,11 +99,33 @@ for(const id of ['burgessomedusa','ctenorhabdotus'] as const){
 {
   const strikers = CREATURES.filter((c) => HEAVY_SPECIALS.has(c.ability));
   assert(strikers.length >= 8, 'no heavy strikes to check');
+  /**
+   * Open water over the flattest ground within reach of the origin, worked out from the seabed
+   * rather than written down.
+   *
+   * This used to start the body at y = 12, which was mid-water while the Cambrian floor sat near
+   * zero. The floor follows its biomes now and at the origin it is up at 12.3 — so the attacker
+   * began a third of a unit *underground*, and the target, spawned dead ahead at the attacker's own
+   * height, was buried in a seabed that rises toward the shore. A strike the crosshair promised
+   * then landed on terrain. Flat ground is what makes "dead ahead and at the same depth" mean
+   * anything at all, and the height comes from the sea rather than from a number that was true once.
+   */
+  const strikeSpot = (() => {
+    let best = { x: 0, z: 0 }, bestVar = Infinity;
+    for (let x = -120; x <= 120; x += 8) for (let z = -40; z >= -220; z -= 8) {
+      const h0 = sampleHeight(x, z);
+      let v = 0;
+      for (let d = -24; d <= 24; d += 6) v = Math.max(v, Math.abs(sampleHeight(x, z + d) - h0), Math.abs(sampleHeight(x + d, z) - h0));
+      if (v < bestVar) { bestVar = v; best = { x, z }; }
+    }
+    return { x: best.x, y: (sampleHeight(best.x, best.z) + SURFACE_Y) / 2, z: best.z };
+  })();
   for (const def of strikers) {
     assert(HEAVY_STRIKE[def.ability], `${def.id}: a heavy special with no reach at all`);
     const g = new Game('reef', [{ creature: def.id, device: 'keyboard', ready: true }], 91);
     const a = g.players[0];
-    a.pos = { x: 0, y: 12, z: 0 }; a.yaw = 0;
+    a.pos = { x: strikeSpot.x, y: strikeSpot.y, z: strikeSpot.z }; a.yaw = 0;
+    g.world.loadAround(a.pos);
     // Let a benthic creature settle onto the seabed first, so the target sits at its own depth.
     for (let i = 0; i < 60; i++) g.step(1 / 60, new Map([[0, emptyInput()]]));
     a.yaw = 0; a.vel = { x: 0, y: 0, z: 0 }; a.stamina = a.staminaMax; a.abilityCd = 0; a.exhausted = 0;
