@@ -40,16 +40,36 @@ Both were genuinely separate components and are gone. The originals are untouche
 `npm run triassic:previews`, which refreshed their hashes in the manifest. Before/after renders in
 side and top view confirm nothing else changed.
 
-## Cannot be fixed here — these are welded into the body
+## Cut by hand, with the marking tool
 
-Each of these is part of the single connected surface, so removing it is surgery, not filtering.
-The route is a **regeneration** (or, where the pose is also wrong, a redraw first).
+Welded geometry cannot be found automatically — an unwanted fin and a wanted one are the same
+surface, and only a human knows which is which. Mark mode says which (`docs/viewer-mark.md`, and
+the section at the end of this page): paint the geometry, export a region pinned to the model's
+hash, cut exactly that.
+
+| Animal | Region | Cut | Result |
+|---|---|---:|---|
+| **Askeptosaurus** | the extra belly fin | 628 verts, 5.72% | gone; 13 rim edges left open |
+| **Rhaeticosaurus** | the two spare tail blades | 361 verts, 3.26% | both gone, the real tail untouched; 34 rim edges left open |
+
+Both cuts landed exactly where they were marked — drift 0.00000 of an allowed 0.01000 — with the
+model hash verified before either ran, and both were checked before and after from side, top and
+close up. The cut meshes are now the published previews; the untouched generations remain in
+`tools/triassic/creatures/<id>/tripo-raw/`.
+
+**The rims are left open**, and that is inherent rather than a bug to chase: a raw Tripo body is a
+soup of unstitched patches, so the rim of a cut is a set of arcs rather than a closed loop and a
+fill has nothing to span. The tool stitches the rim, fills what it can and says plainly when it
+cannot. A small notch in a disposable preview is a far smaller lie than a spare tail.
+
+## Still welded, not yet cut
+
+Each of these is part of the single connected surface. They can be cut the same way as the two
+above, or fixed properly by a **regeneration** (or, where the pose is also wrong, a redraw first).
 
 | Animal | Reported | Status |
 |---|---|---|
 | **Atopodentatus** | three fins on the underside that should not be there | welded |
-| **Rhaeticosaurus** | two extra tail blades either side of the real tail, in addition to its four correctly placed flippers | welded — and see below |
-| **Askeptosaurus** | an extra fin on the belly (separate from the flake, which is fixed) | welded |
 | **Phragmoteuthis** | an extra fin on top | welded |
 | **Birgeria** | a second dorsal fin, where the research says "single dorsal set far back" | welded |
 | **Mixosaurus** | a deeply forked lunate fluke it should not have | welded |
