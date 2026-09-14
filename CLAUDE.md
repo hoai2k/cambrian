@@ -232,6 +232,17 @@ unless the user explicitly asks for a PR. Steps:
   the Devonian's procedural stand-ins. Never point a Triassic kind at a Devonian mesh in the
   scenery pack: a wrong genus placed by the thousand is worse than an honestly generic shape, and
   which stand-in the game plays with is `environment.ts`'s business.
+- A Tripo-sourced body is **worked, not authored**. The generations carry a level of surface detail
+  our own modelling does not match, so a part built by hand next to them reads as a part built by
+  hand: smooth where the neighbourhood is pored, even where it is irregular. So the Triassic's
+  builders reshape what the generation already carries — stretch it, squish it, fuse it, copy it —
+  and do not model new anatomy beside it. The one exception is a **tooth or a horn**, which may be
+  authored, and which must then *embed* in the generation's own flesh rather than sit on it. When a
+  fault cannot be fixed within that rule, the answer is to say so and show what it costs, not to
+  quietly model the missing part: the routes out are a regeneration or, where the pose is what is
+  wrong, a redraw. None of this binds the Cambrian or the Devonian, whose bodies are procedural in
+  the first place and may be changed however their builders like.
+
 - A delivered Triassic body arrives **paired**: the authored (Tripo-derived) model and a procedural
   twin rebuilt to its own volume on the same skeleton, sharing inverse binds, clips and anchors.
   That pairing is the pipeline's verification step, so the specimen viewer swaps between them in
@@ -356,6 +367,16 @@ unless the user explicitly asks for a PR. Steps:
   water and complete at the surface — so distance out costs the climb for air. A body placed at an
   *absolute* y is a bug in a sea like this: ask the seabed where the water is (`openWater` in
   `tools/devonian-test.ts` is the pattern).
+- A giant hunts when it is hungry and not otherwise (`wantsToHunt` in `src/sim/ai.ts`): being seen
+  used to be reason enough, so every giant that could see a player came down on them and there was
+  no approaching one to ride it. A fed giant notices — the head comes round, which is the tell — and
+  goes back to its route; how often one is hungry follows the hour and the water it is over
+  (`appetiteAt`), which is where the rhythm of the day is set. `npm run hunt` covers both halves.
+- A mouthful a *player* takes is taken in the mouth: `takeWhole` in `src/sim/game.ts` sends it
+  through `startSwallow`, so the body is carried in front of the jaws and eaten over the next second
+  rather than vanishing on contact, and swimming into an animal no longer eats it at all — a player
+  has to bite or pounce. The reef's own predators, and anything out of a school, still go down in
+  one gulp with no ceremony.
 - What lives where is the place's own business, not the player's: `src/sim/population.ts` gives every
   210-unit area a size profile and a density from a hash bent by the biome (hatcheries inshore, grown
   animals in the deep), pure in the place and the world seed so an area is the same when you return.

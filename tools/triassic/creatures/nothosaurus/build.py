@@ -15,6 +15,57 @@ bpy.ops.object.select_all(action='SELECT');bpy.ops.object.delete(use_global=Fals
 for a in list(bpy.data.actions):bpy.data.actions.remove(a)
 bpy.ops.import_scene.gltf(filepath=RAW);auth=next(o for o in bpy.context.scene.objects if o.type=='MESH');auth.name='Nothosaurus authored body'
 bpy.context.view_layer.objects.active=auth
+# --- The neck -----------------------------------------------------------------------------------
+# Nothosaurus giganteus carries a neck about a fifth of its length. The canonical pose this body was
+# generated from draws the head almost on the shoulders, and the shipped body reproduces that pose
+# faithfully, so the fix that matters is a redraw (docs/triassic/canonical/prompts-2026-09-13-
+# nothosaurus-neck.json). This is the cheaper half-measure that can be done now, and it goes here:
+# `neck-stretch-request.json` is the viewer's stretch export for this animal, `appliesTo: "builder"`.
+# A rigged GLB cannot take a warped bind pose, because every clip in one re-specifies each joint's
+# translation on every frame; in this script the mesh comes first and the rig, the axial weights,
+# the procedural twin and all 21 clips are generated downstream of it, so the warp lands before any
+# of them and everything else follows by itself.
+#
+# A port of `warp()` and `normalWarp()` in src/viewer/stretch/stretch.ts, reading that file's own
+# numbers rather than retyped ones, so what lands is what was measured. The document is written in
+# the exported model's root frame (glTF: body along +z, head at +z, +y up, five units long); raw
+# space here is x snoutward, z up, y sideways, at 1/SCALE of it. tx() is the same permutation, so
+# the two frames differ by an axis swap and one uniform scale, and the warp is the same map in each.
+STRETCH=json.load(open(os.path.join(HERE,'neck-stretch-request.json')))['stretch']
+def to_model(p):x,y,z=p;return [y*SCALE,z*SCALE,x*SCALE]
+def to_raw(g):return Vector((g[2]/SCALE,g[0]/SCALE,g[1]/SCALE))
+def _stretch_geometry(d):
+ # Both cuts share one normal, built as forward + tan(tiltSide)*up + tan(tiltTop)*lateral, so the
+ # region is a true uniform scale along it and "how far through" is plain distance over length.
+ lim=70*pi/180;cl=lambda v:max(-lim,min(lim,v));A=0 if d['frame']['axis']=='x'else 2;L=2-A;U=1
+ n=[0,0,0];n[A]=d['frame']['forward'];n[U]=math.tan(cl(d['tiltSide']));n[L]=math.tan(cl(d['tiltTop']))
+ v=[c/(math.hypot(*n)or 1)for c in n];ends=[]
+ for at in [d['from'],d['to']]:
+  c=[0,0,0];c[A]=at;c[U]=d['bounds']['upMid'];c[L]=d['bounds']['lateralMid'];ends.append(sum(c[i]*v[i]for i in range(3)))
+ span=ends[1]-ends[0];return v,ends[0],(1e-9 if abs(span)<1e-9 else span),(d['to']-d['from'])*v[A]*(d['factor']-1)
+SDIR,SBASE,SSPAN,SSHIFT=_stretch_geometry(STRETCH)
+def _through(g):return (g[0]*SDIR[0]+g[1]*SDIR[1]+g[2]*SDIR[2]-SBASE)/SSPAN
+def stretch_raw(p):
+ # Behind the first cut nothing moves; past the second the head is carried whole; between them a
+ # point moves by the whole shift times its own fraction through the region, along the direction.
+ g=to_model(p);t=max(0.,min(1.,_through(g)));return to_raw([g[i]+SDIR[i]*SSHIFT*t for i in range(3)])
+def stretch_normal(p,n):
+ # Inside the region the map is a uniform scale by `factor` along d and nothing across it, so a
+ # normal follows its inverse transpose, I-(1-1/factor)*d dT. Carrying the shading normals is what
+ # saves recomputing - and so reshading - every face of an animal whose neck alone changed.
+ g=to_model(p);s=_through(g)
+ if s<=0 or s>=1:return Vector(n)
+ m=to_model(n);k=1-1/STRETCH['factor'];dn=sum(m[i]*SDIR[i]for i in range(3))*k
+ out=to_raw([m[i]-SDIR[i]*dn for i in range(3)]);return out.normalized()if out.length>1e-9 else Vector(n)
+corner=[tuple(l.vector)for l in auth.data.corner_normals];source=[v.co.copy()for v in auth.data.vertices]
+for v in auth.data.vertices:v.co=stretch_raw(v.co)
+auth.data.normals_split_custom_set([stretch_normal(source[l.vertex_index],corner[i])for i,l in enumerate(auth.data.loops)])
+# Forward of the second cut the map is one rigid shift, and everything this builder authors on the
+# head takes it: the jaw cut, the mouth seam, the oral surfaces, the hinge, the sockets and the
+# skull and jaw bones. Keeping it as the warp rather than as a typed number means a re-measured
+# stretch moves all of them together.
+HEAD=stretch_raw((.5,0,.1))-Vector((.5,0,.1))
+neck_stretch={'from':STRETCH['from'],'to':STRETCH['to'],'factor':STRETCH['factor'],'tiltSideDegrees':round(STRETCH['tiltSide']*180/pi,3),'tiltTopDegrees':round(STRETCH['tiltTop']*180/pi,3),'shift':SSHIFT,'headShift':[round(v,6)for v in HEAD],'verticesInRegion':sum(1 for q in source if 0<_through(to_model(q))<1),'verticesCarried':sum(1 for q in source if _through(to_model(q))>=1),'sourceVertices':len(source)}
 # Weld texture seams for topology analysis, retaining loop UVs. Remove only tiny detached flakes.
 bm=bmesh.new();bm.from_mesh(auth.data);bmesh.ops.remove_doubles(bm,verts=list(bm.verts),dist=1e-6);bm.verts.ensure_lookup_table();seen=set();components=[]
 for v in bm.verts:
@@ -76,7 +127,26 @@ def center(x):return Vector([x]+[float(np.interp(x,[p[0]for p in CENTERS],[p[k]f
 def tx(p):x,y,z=p;return Vector((y*SCALE,-x*SCALE,z*SCALE))
 B={}
 def bone(n,p,parent):B[n]=(Vector(p),parent)
-bone('root',(0,0,0),None);bone('body',(.06,0,-.035),'root');bone('chest',(.19,-.008,-.025),'body');bone('neck_base',(.265,-.013,.004),'chest');bone('neck_mid',(.303,-.025,.043),'neck_base');bone('neck_tip',(.336,-.038,.074),'neck_mid');bone('skull',(.355,-.04,.086),'neck_tip');bone('jaw',(.36,-.044,.084),'skull')
+bone('root',(0,0,0),None);bone('body',(.06,0,-.035),'root');bone('chest',(.19,-.008,-.025),'body')
+# Six cervical controls where three used to sit. The stretch nearly doubles the neck and only one
+# of the old three falls inside it, so the new length would hang rigidly off the last of them and
+# read as a rod; bones bend geometry that already exists, and lengthening without re-boning is
+# worse than doing neither. The chain is the old one's centreline taken through the stretch and
+# resampled at even arc length: five segments of 0.171 in a 5.26 body against the two of 0.257 it
+# had, so the articulation is denser than before rather than merely as dense, and the clips'
+# per-joint phasing spreads over a longer neck instead of bending it twice as far.
+# Nothosaurs carry 19-25 cervicals, so six is still a summary; it is enough for a smooth arc.
+def resample(points,n):
+ lens=[(points[i+1]-points[i]).length for i in range(len(points)-1)];out=[]
+ for k in range(n):
+  u=sum(lens)*k/(n-1)
+  for i,L in enumerate(lens):
+   if u<=L or i==len(lens)-1:out.append(points[i]+(points[i+1]-points[i])*(u/L));break
+   u-=L
+ return out
+NECK=['neck_base','neck_01','neck_02','neck_03','neck_04','neck_tip']
+for i,(n,q) in enumerate(zip(NECK,resample([stretch_raw(q)for q in [(.265,-.013,.004),(.303,-.025,.043),(.336,-.038,.074)]],len(NECK)))):bone(n,q,'chest'if i==0 else NECK[i-1])
+bone('skull',stretch_raw((.355,-.04,.086)),NECK[-1]);bone('jaw',stretch_raw((.36,-.044,.084)),'skull')
 for i,x in enumerate([-.035,-.10,-.17,-.24,-.31,-.38,-.445]):bone('tail_%02d'%i,center(x),'body'if i==0 else'tail_%02d'%(i-1))
 LIMBS={}
 for side in [-1,1]:
@@ -86,20 +156,23 @@ for side in [-1,1]:
   names=[kind+'_upper_'+s,kind+'_lower_'+s,kind+'_paddle_'+s];LIMBS[kind+s]=(pts,names)
   for i,n in enumerate(names):bone(n,pts[i],('chest'if kind=='fore'else'tail_00')if i==0 else names[i-1])
 # Cut a true articulated lower jaw along the mouth seam for both bodies, preserving the exterior.
-def seam(x):return .084-.010*(x-.36)
+# The jaw cut and the mouth seam are authored on the head, which the stretch carries whole, so
+# both are the original constants taken through the same shift and the cut still lands on the seam.
+JAWCUT=.355+HEAD.x
+def seam(x):return .084-.010*(x-.36-HEAD.x)+HEAD.z
 jawparts={}
 def split_jaw(o):
  bm=bmesh.new();bm.from_mesh(o.data)
  # Make both boundary planes explicit before splitting; no triangles straddle the hinge.
- bmesh.ops.bisect_plane(bm,geom=list(bm.verts)+list(bm.edges)+list(bm.faces),dist=1e-7,plane_co=(.355,0,0),plane_no=(1,0,0),clear_inner=False,clear_outer=False)
- bmesh.ops.bisect_plane(bm,geom=list(bm.verts)+list(bm.edges)+list(bm.faces),dist=1e-7,plane_co=(.36,0,seam(.36)),plane_no=(.01,0,1),clear_inner=False,clear_outer=False)
+ bmesh.ops.bisect_plane(bm,geom=list(bm.verts)+list(bm.edges)+list(bm.faces),dist=1e-7,plane_co=(JAWCUT,0,0),plane_no=(1,0,0),clear_inner=False,clear_outer=False)
+ bmesh.ops.bisect_plane(bm,geom=list(bm.verts)+list(bm.edges)+list(bm.faces),dist=1e-7,plane_co=(.36+HEAD.x,0,seam(.36+HEAD.x)),plane_no=(.01,0,1),clear_inner=False,clear_outer=False)
  bm.to_mesh(o.data);bm.free()
  jaw=o.copy();jaw.data=o.data.copy();jaw.name=o.name+' lower jaw';bpy.context.collection.objects.link(jaw)
  for target,keep_lower in [(o,False),(jaw,True)]:
   bm=bmesh.new();bm.from_mesh(target.data)
   discard=[]
   for f in bm.faces:
-   c=f.calc_center_median();lower=c.x>.355 and c.z<seam(c.x)-1e-7
+   c=f.calc_center_median();lower=c.x>JAWCUT and c.z<seam(c.x)-1e-7
    if lower!=keep_lower:discard.append(f)
   bmesh.ops.delete(bm,geom=discard,context='FACES')
   loose=[v for v in bm.verts if not v.link_faces]
@@ -108,7 +181,12 @@ def split_jaw(o):
  jawparts[o.name]=jaw
 for o in [auth,puppet]:split_jaw(o)
 # Region-restricted skin: trunk blends longitudinally, limbs radially blend into their own root.
-AXIAL=[('tail_06',-.48),('tail_05',-.412),('tail_04',-.345),('tail_03',-.275),('tail_02',-.205),('tail_01',-.135),('tail_00',-.066),('body',.064),('chest',.22),('neck_base',.277),('neck_mid',.316),('neck_tip',.343),('skull',.385)]
+# Every cervical needs its own station or the skin does not follow it. Each keeps the same small
+# lead ahead of its own head that the three used to carry, measured on the stretched chain; the
+# skull's station takes the head's rigid shift, which leaves the blend either side of the jaw cut
+# exactly the fraction it was.
+AXIAL=[('tail_06',-.48),('tail_05',-.412),('tail_04',-.345),('tail_03',-.275),('tail_02',-.205),('tail_01',-.135),('tail_00',-.066),('body',.064),('chest',.22)]+[(n,B[n][0].x+(.007 if n==NECK[-1]else .012))for n in NECK]+[('skull',.385+HEAD.x)]
+assert all(AXIAL[i][1]<AXIAL[i+1][1]for i in range(len(AXIAL)-1)),AXIAL
 def axial(x):
  xs=[v for _,v in AXIAL]
  if x<=xs[0]:return {AXIAL[0][0]:1.}
@@ -117,7 +195,7 @@ def axial(x):
 def weights(p,isjaw=False):
  x,y,z=p
  if isjaw:return {'jaw':1.}
- if x>.355:return {'skull':1.}
+ if x>JAWCUT:return {'skull':1.}
  w=axial(x)
  for key,(pts,names) in LIMBS.items():
   s=1 if key.endswith('L')else-1
@@ -156,7 +234,7 @@ def oral(name,z,bone_name,material):
  # Closed inner tissue follows the same curved snout centerline as the source.
  verts=[];faces=[]
  for i in range(18):
-  u=i/17;x=.361+.134*u;cy=float(np.interp(x,[.36,.40,.44,.48,.50],[-.045,-.055,-.071,-.087,-.091]));width=.021*(sin(pi*u)**.5)+.002
+  u=i/17;x=.361+HEAD.x+.134*u;cy=HEAD.y+float(np.interp(x-HEAD.x,[.36,.40,.44,.48,.50],[-.045,-.055,-.071,-.087,-.091]));width=.021*(sin(pi*u)**.5)+.002
   for j in range(12):
    theta=j*2*pi/12;verts.append(tx((x,cy+width*cos(theta),seam(x)+(z-.084)+.0015*sin(theta))))
  for i in range(17):
@@ -169,19 +247,23 @@ def oral(name,z,bone_name,material):
 mouthmat=bpy.data.materials.new('Nothosaurus mouth interior');mouthmat.diffuse_color=(.075,.032,.025,1);mouthmat.use_nodes=True;mouthmat.node_tree.nodes.get('Principled BSDF').inputs['Base Color'].default_value=(.075,.032,.025,1)
 oralparts=[oral('Oral floor',.083,'jaw',mouthmat),oral('Palate',.085,'skull',mouthmat)]
 # A small closed cheek envelope surrounds the actual jaw hinge and follows both lips.
-bpy.ops.mesh.primitive_uv_sphere_add(segments=20,ring_count=12,location=tx((.354,-.043,.076)))
+bpy.ops.mesh.primitive_uv_sphere_add(segments=20,ring_count=12,location=tx(stretch_raw((.354,-.043,.076))))
 o=bpy.context.object;o.name='Seated jaw hinge tissue';o.scale=(.155,.11,.105);bpy.ops.object.transform_apply(location=False,rotation=False,scale=True)
 for v in o.data.vertices:v.co=o.matrix_world@v.co
 o.location=(0,0,0);o.parent=rig
 hm=bpy.data.materials.new('Nothosaurus jaw hinge body');hm.diffuse_color=(.28,.26,.20,1);hm.use_nodes=True;hbs=hm.node_tree.nodes.get('Principled BSDF');hbs.inputs['Base Color'].default_value=(.28,.26,.20,1);hbs.inputs['Roughness'].default_value=.7;o.data.materials.append(hm)
 for n in ['skull','jaw']:o.vertex_groups.new(name=n)
 for v in o.data.vertices:
- t=max(0,min(1,(.395-v.co.z)/.1));o.vertex_groups['jaw'].add([v.index],t*.5,'REPLACE');o.vertex_groups['skull'].add([v.index],1-t*.5,'REPLACE')
+ t=max(0,min(1,(.395+HEAD.z*SCALE-v.co.z)/.1));o.vertex_groups['jaw'].add([v.index],t*.5,'REPLACE');o.vertex_groups['skull'].add([v.index],1-t*.5,'REPLACE')
 for p in o.data.polygons:p.use_smooth=True
 mo=o.modifiers.new('Hinge skin','ARMATURE');mo.object=rig;oralparts.append(o)
 
 # Measured/profile evidence compares both surfaces in rest; nearest-distance works for asymmetry.
 rawco=np.array([v.co[:]for v in auth.data.vertices]);pco=np.array([v.co[:]for v in puppet.data.vertices]);pv=BVHTree.FromPolygons([v.co for v in puppet.data.vertices],[p.vertices[:]for p in puppet.data.polygons]);distances=[pv.find_nearest(v.co)[3]for v in auth.data.vertices]
+allco=np.concatenate([np.array([v.co[:]for v in o.data.vertices])for o in [auth,puppet]+list(jawparts.values())])
+# The stretch makes the animal longer, so the stations and the declared length are read off the
+# built meshes rather than assumed: for an unstretched body this is the old -2.45..2.45 exactly.
+AXIS_LO=float(allco[:,1].min());AXIS_HI=float(allco[:,1].max());MODEL_LENGTH=AXIS_HI-AXIS_LO
 def section(objects,y):
  points=[]
  for o in objects:
@@ -191,13 +273,13 @@ def section(objects,y):
  if not points:return None
  a=np.array(points);return {'min':a.min(0).tolist(),'max':a.max(0).tolist()}
 profile=[]
-for y in np.linspace(-2.45,2.45,21):
+for y in np.linspace(AXIS_LO+.05,AXIS_HI-.05,21):
  row={'stationY':float(y)}
  for label,o in [('authored',auth),('puppet',puppet)]:row[label]=section([o,jawparts[o.name]],y)
  if row['authored'] and row['puppet']:
   row['maximumEnvelopeDifference']=max(abs(a-b)for k in ['min','max']for a,b in zip(row['authored'][k],row['puppet'][k]));assert row['maximumEnvelopeDifference']<.2,row
  profile.append(row)
-open(os.path.join(HERE,'nothosaurus-profile.json'),'w').write(json.dumps({'method':'21 exact plane-intersection envelopes; asymmetry retained; 0.007 raw-space voxel occupancy resurfacing','bodyLength':5,'stations':profile,'surfaceDistanceMax':max(distances),'surfaceDistanceP95':float(np.quantile(distances,.95)),'surfaceTolerance':.2},indent=2))
+open(os.path.join(HERE,'nothosaurus-profile.json'),'w').write(json.dumps({'method':'21 exact plane-intersection envelopes; asymmetry retained; 0.007 raw-space voxel occupancy resurfacing','bodyLength':MODEL_LENGTH,'neckStretch':neck_stretch,'stations':profile,'surfaceDistanceMax':max(distances),'surfaceDistanceP95':float(np.quantile(distances,.95)),'surfaceTolerance':.2},indent=2))
 assert max(distances)<.2
 scene=bpy.context.scene;scene.render.fps=30;rig.animation_data_create()
 for pb in rig.pose.bones:pb.rotation_mode='XYZ'
@@ -247,13 +329,18 @@ for clip,duration in CLIPS.items():
   if clip=='Growth':body.rotation_euler.x=-.045*e;body.rotation_euler.y=.04*e
   body.rotation_euler.y+=1.18*dead;body.rotation_euler.x+=.10*dead;body.location.z-=.18*dead
   pb['chest'].rotation_euler.z=(0 if locomotor else .022*amp*wave(.5))+.075*turn
-  for j,n in enumerate(['neck_base','neck_mid','neck_tip']):
+  share=3./len(NECK)
+  for j,n in enumerate(NECK):
    # Locomotion holds the skull on the shoulder line. Turns and authored actions
    # still use the neck; only the obsolete stroke-rate walking sway is removed.
-   pb[n].rotation_euler.z=(0 if locomotor else .025*amp*wave(.9+j*.4))+.04*turn
-   pb[n].rotation_euler.x=-.04*wind+.055*peak if clip in ['Attack','Heavy']else(-.055*e if clip=='Breath'else .008*wave(j*.4))
+   # Each joint's share is divided by the length of the chain, so six cervicals spread the bend
+   # the three used to carry between them rather than bending a neck that is now nearly twice as
+   # long twice as far - the phase lag off the joint's own index is what makes it an arc.
+   pb[n].rotation_euler.z=((0 if locomotor else .025*amp*wave(.9+j*.4))+.04*turn)*share
+   pb[n].rotation_euler.x=(-.04*wind+.055*peak if clip in ['Attack','Heavy']else(-.055*e if clip=='Breath'else .008*wave(j*.4)))*share
   if clip in ['Ability','Grab']:
-   pb['neck_mid'].rotation_euler.z=.055*e*sin(p*(2 if clip=='Ability'else 3));pb['neck_tip'].rotation_euler.x=.04*e
+   # The middle of the neck and its last joint, by index rather than by name.
+   pb[NECK[len(NECK)//2]].rotation_euler.z=.055*e*sin(p*(2 if clip=='Ability'else 3));pb[NECK[-1]].rotation_euler.x=.04*e
   for i in range(7):
    q=pb['tail_%02d'%i];q.rotation_euler.z=(.045+i*.012)*amp*wave(i*.48,2 if clip in ['Swim','Sprint']else 1)+.045*dead*sin(i*.7)+turn*(.022+i*.008)
    if clip=='Dodge':q.rotation_euler.z+=.13*e*sin(i*.7+.5)
@@ -299,7 +386,8 @@ for clip,duration in CLIPS.items():
  bounds[clip]=[np.array(points).min(0).tolist(),np.array(points).max(0).tolist()];rig.animation_data.action=None
 for c in set(CLIPS)-{'Death'}:assert seams[c]<1e-6
 reset();scene.frame_set(0)
-anchors=[{'name':'anchor_mouth','bone':'jaw','point':list(tx((.495,-.088,.081))),'role':'mouth'},{'name':'anchor_mouth_inside','bone':'skull','point':list(tx((.366,-.047,.082))),'role':'swallow'},{'name':'anchor_attack_primary','bone':'skull','point':list(tx((.501,-.087,.077))),'role':'attack'}]
+# The sockets sit on the head and move with it: all three are forward of the second cut.
+anchors=[{'name':'anchor_mouth','bone':'jaw','point':list(tx(stretch_raw((.495,-.088,.081)))),'role':'mouth'},{'name':'anchor_mouth_inside','bone':'skull','point':list(tx(stretch_raw((.366,-.047,.082)))),'role':'swallow'},{'name':'anchor_attack_primary','bone':'skull','point':list(tx(stretch_raw((.501,-.087,.077)))),'role':'attack'}]
 sockets=[]
 for a in anchors:
  o=bpy.data.objects.new(a['name'],None);bpy.context.collection.objects.link(o);o.parent=rig;o.parent_type='BONE';o.parent_bone=a['bone'];o.matrix_world.translation=Vector(a['point']);o['cambrianAnchor']={'version':1,'role':a['role'],'parentBone':a['bone']};sockets.append(o)
@@ -321,9 +409,9 @@ for o,suffix in [(auth,''),(puppet,'.puppet')]:
  for p in [o,jawparts[o.name],rig]+sockets+oralparts:p.select_set(True)
  bpy.context.view_layer.objects.active=rig;bpy.ops.export_scene.gltf(filepath=os.path.join(OUT,ID+suffix+'.glb'),**kwargs);patch(os.path.join(OUT,ID+suffix+'.glb'))
 shutil.copyfile(os.path.join(OUT,ID+'.puppet.glb'),os.path.join(OUT,ID+'.lod1.glb'))
-meta={'id':ID,'name':'Nothosaurus','species':'Nothosaurus giganteus','description':'Canonical Tripo body and procedural volume twin with identical articulated rowing, tail, neck and jaw rig.','modelLength':5,'lengthMeters':6,'locomotion':'Swim','clips':list(CLIPS),'looping':LOOPS,'anchors':[a['name']for a in anchors],'puppet':'nothosaurus.puppet.glb','notes':['The curved tail and asymmetric paddle stance are retained from the accepted Tripo volume.','The procedural twin resurfaces a 0.007-unit voxel occupancy field, relaxes it and reduces the new topology. It does not reuse source vertices or faces.','Same rest rig, inverse binds, sockets and all 21 action sample arrays are used for authored and puppet. LOD deliberately retains all clips.','Original albedo retained with white COLOR_0; normal relief limited to 0.15 and skin set explicitly nonmetallic at roughness 0.7. Puppet pigment samples triangle-local UVs to avoid seam bleed. True jaw split and internal oral surfaces added; connected foot webbing retained.','Living colours, soft tissues and movements are artistic reconstruction. Ability performs the roster fang-trap clamp; Grab braces and tugs the held prey. Breath provides a separate in-place surface-breath/dive gesture. Locomotor translation remains engine-owned.']}
+meta={'id':ID,'name':'Nothosaurus','species':'Nothosaurus giganteus','description':'Canonical Tripo body with its neck lengthened from the measured viewer stretch, and a procedural volume twin resurfaced from the same mesh, sharing an articulated rowing, tail, six-joint cervical and jaw rig.','modelLength':round(MODEL_LENGTH,4),'lengthMeters':6,'locomotion':'Swim','clips':list(CLIPS),'looping':LOOPS,'anchors':[a['name']for a in anchors],'puppet':'nothosaurus.puppet.glb','notes':['The curved tail and asymmetric paddle stance are retained from the accepted Tripo volume.','The procedural twin resurfaces a 0.007-unit voxel occupancy field, relaxes it and reduces the new topology. It does not reuse source vertices or faces.','Same rest rig, inverse binds, sockets and all 21 action sample arrays are used for authored and puppet. LOD deliberately retains all clips.','The neck is lengthened by the measured stretch in neck-stretch-request.json, applied to the intake mesh before anything is derived from it, so the twin, the rig, the weights, the sockets and every clip follow it. Six cervical controls replace three; the albedo and UVs are the originals, so the neck pigment stretches with the neck.','Original albedo retained with white COLOR_0; normal relief limited to 0.15 and skin set explicitly nonmetallic at roughness 0.7. Puppet pigment samples triangle-local UVs to avoid seam bleed. True jaw split and internal oral surfaces added; connected foot webbing retained.','Living colours, soft tissues and movements are artistic reconstruction. Ability performs the roster fang-trap clamp; Grab braces and tugs the held prey. Breath provides a separate in-place surface-breath/dive gesture. Locomotor translation remains engine-owned.']}
 open(os.path.join(OUT,ID+'.json'),'w').write(json.dumps(meta,indent=2))
-report={'sourceSha256':hashlib.sha256(open(RAW,'rb').read()).hexdigest(),'sourceTriangles':source_triangles,'removedFlakeVertices':removed,'fullTriangles':sum(len(p.vertices)-2 for p in auth.data.polygons)+sum(len(p.vertices)-2 for p in jawparts[auth.name].data.polygons)+sum(sum(len(p.vertices)-2 for p in o.data.polygons)for o in oralparts),'puppetTriangles':sum(len(p.vertices)-2 for p in puppet.data.polygons)+sum(len(p.vertices)-2 for p in jawparts[puppet.name].data.polygons)+sum(sum(len(p.vertices)-2 for p in o.data.polygons)for o in oralparts),'bones':len(B),'clips':CLIPS,'loopSeams':seams,'boundsAt13Phases':bounds,'surfaceDistanceMax':max(distances),'surfaceDistanceP95':float(np.quantile(distances,.95)),'profileTolerance':.2,'normalizedWeights':True,'rootStable':True,'noScaleChannels':True}
+report={'sourceSha256':hashlib.sha256(open(RAW,'rb').read()).hexdigest(),'sourceTriangles':source_triangles,'removedFlakeVertices':removed,'fullTriangles':sum(len(p.vertices)-2 for p in auth.data.polygons)+sum(len(p.vertices)-2 for p in jawparts[auth.name].data.polygons)+sum(sum(len(p.vertices)-2 for p in o.data.polygons)for o in oralparts),'puppetTriangles':sum(len(p.vertices)-2 for p in puppet.data.polygons)+sum(len(p.vertices)-2 for p in jawparts[puppet.name].data.polygons)+sum(sum(len(p.vertices)-2 for p in o.data.polygons)for o in oralparts),'bones':len(B),'neckJoints':len(NECK),'neckStretch':neck_stretch,'modelLength':MODEL_LENGTH,'clips':CLIPS,'loopSeams':seams,'boundsAt13Phases':bounds,'surfaceDistanceMax':max(distances),'surfaceDistanceP95':float(np.quantile(distances,.95)),'profileTolerance':.2,'normalizedWeights':True,'rootStable':True,'noScaleChannels':True}
 open(os.path.join(HERE,'validation.json'),'w').write(json.dumps(report,indent=2))
 # Save editable source with both renderable bodies. Export selection is the only difference.
 bpy.ops.wm.save_as_mainfile(filepath=os.path.join(LOCAL,'nothosaurus-paired.blend'))

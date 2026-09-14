@@ -7,121 +7,76 @@ Every builder here is Blender 5.2 Python — `npm run blender` installs the pinn
 `/opt/blender` first, and shipped GLBs are meshopt-compressed so Blender's importer needs
 `npx @gltf-transform/cli cp in.glb out.glb` to read one.
 
----
-
-## 1. Nothosaurus: lengthen the neck, and give it bones to bend at
-
-**Status:** open, measured by hand in the viewer, not started.
-**Builder:** `tools/triassic/creatures/nothosaurus/build.py`.
-**The measurement:** `tools/triassic/creatures/nothosaurus/neck-stretch-request.json` — a
-`cambrian-stretch` file exported from the viewer's stretch mode, `appliesTo: "builder"`.
-
-### What is wrong
-
-*Nothosaurus giganteus* should carry a neck about a fifth of its length. The shipped body carries
-the head almost on the shoulders: measured on `nothosaurus.glb`, the local half-width steps from
-0.808 to 0.223 in one 0.075 slice at z ≈ 1.61. There is a neck, and between the shoulder and the
-base of the skull it is a fraction of what it should be.
-
-The pose it was built from draws it that way, which is why
-`docs/triassic/canonical/prompts-2026-09-13-nothosaurus-neck.json` asks for a redraw. This request
-is the cheaper half-measure that can be done now, and does not replace it.
-
-### The change, as exported
-
-In the model's own root frame (glTF, unscaled, body along +z, head at +z):
-
-| | |
-| --- | --- |
-| First cut (`from`) | z **1.395** — inside the shoulder |
-| Second cut (`to`) | z **1.872** — forward of the skull's own joint |
-| Direction | **41.4° up** in the side view, **−9.2°** in the top view |
-| Factor | **1.97×** |
-| Region | 0.355 → 0.699, so 7.1% of the body → 14.0% |
-| The head moves | 0.344 along (−0.121, 0.657, 0.744) |
-
-Applied offline to look at it, that moves 3,257 of 12,868 vertices and leaves the trunk and tail
-untouched. The tilted far cut clears the skull: `neck_tip`, `skull` and `jaw` all fall on its head
-side and are carried whole, so the cranium keeps its shape and its size. The neck rises from the
-shoulders rather than running straight out, which is what the up-tilt is for.
-
-The map, exactly: a vertex behind the first cut does not move; one past the second moves by the
-whole shift; one between moves by the shift times its own fraction through the region, measured
-along the direction. That is `warp()` in `src/viewer/stretch/stretch.ts` — the request file carries
-the numbers it takes, so nothing here has to be retyped.
-
-### The neck needs more bones, and this is why
-
-The rig has three joints between chest and skull. Against the cuts above they fall out like this:
-
-| Joint | z | Where the stretch leaves it |
-| --- | --- | --- |
-| `chest` | 0.950 | behind the cuts — fixed |
-| `neck_base` | 1.325 | behind the cuts — fixed |
-| `neck_mid` | 1.515 | 69% through the region |
-| `neck_tip` | 1.680 | past them — carried whole |
-| `skull` | 1.775 | past them — carried whole |
-
-So a neck nearly twice as long would have **one** joint inside it, with the rest of the new length
-hanging rigidly off `neck_tip`. It would read as a rod. The lengthening and the re-boning are one
-job, not two: doing only the first is worse than doing neither.
-
-Current neck spacing is about 0.19 / 0.165 / 0.095. To keep that articulation density over a 0.699
-neck wants four or five segments in it — **six neck joints instead of three** is a good target,
-taking the rig from 27 to 30. Nothosaurs carry 19–25 cervicals, so six is still a summary, but it
-is enough for a smooth arc.
-
-### Where it goes
-
-`build.py` line 16 imports the raw Tripo body and every later step is generated *downstream* of
-that mesh, which is the whole reason to do this in the builder:
-
-```python
-bpy.ops.import_scene.gltf(filepath=RAW); auth = ...   # line 16
-# ← the stretch goes here: move every vertex of `auth` by the map above, in this same frame
-```
-
-Then the three places the neck is named:
-
-- **line 79** — the `bone(...)` chain. `neck_base`/`neck_mid`/`neck_tip` become the longer series,
-  spaced along the lengthened run.
-- **line 111** — `AXIAL`, the axial weighting table. Every new joint needs its station, or the skin
-  will not follow it.
-- **lines 250–256** — the clip generator already loops the neck by name and phases each joint by
-  its index (`wave(.9 + j*.4)`), so a longer list spreads the existing motion across it for free.
-  The two hardcoded touches just below (`pb['neck_mid']`, `pb['neck_tip']` for *Ability* and
-  *Grab*) want expressing as "the middle of the neck" and "the last neck joint" by index rather
-  than by name.
-
-Because the rig, the weights, the twin and all 21 clips are generated from the mesh in this one
-script, **everything follows**: the procedural twin resurfaces the stretched volume, the bones sit
-on the longer neck, and the clips are re-sampled against it. That is what the shipped GLB cannot
-offer — there, 27 joints across 21 clips already carry baked translation on every frame.
-
-### What it costs, honestly
-
-The albedo is the original Tripo texture and the UVs are not re-projected, so the neck's pigment
-stretches with it. At 2× over a region that starts inside textured shoulder that is a visible
-smear on a mottled hide, not the blank untextured sock that
-`tools/triassic/creatures/nothosaurus/neck-study.py` produced at ×5–7 — that study stretched only
-the 0.17 *visible* neck, so it needed a far larger factor for the same result. Compare the two
-before committing.
-
-A stretch also cannot invent cervical anatomy: the result is a longer version of this neck, not the
-nineteen-vertebra neck of the genus. For that, the pose.
-
-### Done means
-
-- `build.py` rebuilt; packaging and `tools/triassic/creatures/nothosaurus/audit.mjs` pass.
-- The pair still agrees: the twin is resurfaced from the same mesh, so it lengthens with it.
-- Anchors re-measured — `anchor_mouth` sits at z +2.475 today and moves with the head.
-- `npm run triassic` and `node tools/update-asset-sizes.mjs`.
-- The swimming clips looked at in the viewer. A longer neck on the same rotations swings further,
-  and `Swim`/`Sprint` are the two clips that were corrected to hold the head still.
+No requests are open. Finished ones are below.
 
 ---
 
 ## Done
+
+### Nothosaurus: neck lengthened in the builder, and re-boned to bend (14 September 2026)
+
+Done as one job, because the two halves are one job: bones bend geometry that already exists, so
+adding joints to a 0.17 neck would have given a very articulated short neck, and warping alone would
+have left a neck nearly twice as long with **one** joint inside it and the rest hanging rigidly off
+`neck_tip`. Both, then.
+
+**The warp.** `neck-stretch-request.json` is applied at the top of `build.py`, immediately after the
+intake import at line 16 and before anything is derived from that mesh — which is the whole reason
+this belongs in the builder: the rig, the axial weights, the procedural twin, the three sockets and
+all 21 clips are generated downstream of it and followed by themselves. No Tripo regeneration was
+needed and none was done. The code is a port of `warp()` and `normalWarp()` from
+`src/viewer/stretch/stretch.ts` reading that file's own numbers, so what shipped is what was
+measured: cuts at glTF z 1.395 and 1.872, 41.4° up and −9.2° across, factor 1.97, region 0.355 →
+0.699 — 7.1% of the body it was, 13.3% of the body it now is. 551 of the 11,534 intake vertices lie inside the region and 1,385
+are carried whole; shading normals follow the map's inverse transpose rather than being recomputed,
+so no face outside the neck is reshaded. The body is now 5.256 units long instead of 5.000, and
+`modelLength` is measured off the built meshes rather than typed.
+
+**The bones.** Six cervical controls where three used to sit — `neck_base`, `neck_01`…`neck_04`,
+`neck_tip` — taking the rig from 27 joints to 30. They are the old chain's centreline taken through
+the same stretch and resampled at even arc length: `neck_base` to `neck_tip` is five segments of
+0.171 where it was two of 0.257, so the articulation is denser than it was rather than merely as
+dense. `AXIAL` gains a station per joint, each with the same small lead ahead of
+its own head; the skull's station takes the head's rigid shift, which leaves the blend either side
+of the jaw cut exactly the fraction it was. The clip generator's per-joint share is divided by the
+length of the chain, so six spread the bend the three had between them instead of doubling it, and
+the two hardcoded touches for *Ability* and *Grab* now name the middle of the neck and its last
+joint by index. Everything else the builder authors on the head — the jaw cut, the mouth seam, the
+oral floor and palate, the hinge tissue and the three sockets — goes through the same warp, so
+`anchor_mouth` moved from z +2.475 to +2.731 with the head.
+
+**Checks.** Packaging and `audit.mjs` pass (the joint-count assertion went 27 → 30, and the gait
+audit gained a skull **vertical** travel check, because a longer neck fails upwards first).
+`npm run triassic` (619 checks), `npm run typecheck`, `npm run build` and
+`node tools/update-asset-sizes.mjs` all pass. Pair agreement is unchanged where it is measured
+grid-free: nearest puppet-surface distance max 0.11904 / P95 0.01018, against 0.11304 / 0.01020.
+Portraits and review sheets were re-rendered.
+
+**Swim and Sprint still hold the head still**, which CLAUDE.md requires and which no renderer-side
+pose patch may be reintroduced to achieve. Measured over 121 phases: skull lateral travel 0.008 /
+0.012 units (was 0.006 / 0.009 — the head sits further from the roll axis, and the locomotor clips
+still zero the cervical yaw outright) and vertical travel 0.024 / 0.041 (was 0.026 / 0.043, i.e.
+slightly less, because dividing the per-joint share offsets the longer lever). Both are now
+asserted.
+
+**What it looks like, honestly.** Rendered textured, side-on and three-quarter, at four times the
+portrait magnification: the neck reads as a neck rather than a head on shoulders, and bent through
+`TurnLeft` its silhouette is a smooth arc with no faceting — so **no edge loops were added**. The
+band keeps real density (551 vertices over 0.355, halving from 1,553 to 788 per unit of length), and
+interpolation would have added resolution and nothing else; it cannot invent scales or cervical
+anatomy. The pigment smear is real but mild: the UVs are not re-projected, so the dorsal mottling is
+drawn out lengthwise and the pale ventral throat reads slightly soft against the crisper flank. It
+is visible if you look for it and it is nothing like the blank pale sock `neck-study.py` produced at
+×5–×7 — that study stretched only the 0.17 *visible* neck, so it needed a far larger factor for the
+same reach, and its axis-aligned band tore `Seated jaw hinge tissue` in half. The tilted far cut
+here clears that mesh entirely (its furthest-back corner sits at 1.09 of the region) and carries it
+whole.
+
+This is still the half-measure it was written as. It does not give the genus its 19–25 cervicals and
+it does not redraw the pigment; `docs/triassic/canonical/prompts-2026-09-13-nothosaurus-neck.json`
+is the real fix and stands unchanged. Nothosaurus is shipped and human-approved, so
+`tools/triassic/shipped.json` and the preview badge were deliberately left alone — that status is
+the reviewer's.
 
 ### Rhaeticosaurus: neck lengthened in the generation (14 September 2026)
 
