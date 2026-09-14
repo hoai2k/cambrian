@@ -38,8 +38,8 @@
     "model": "assets/triassic/creatures/helicoprion.glb",
     "puppet": "assets/triassic/creatures/helicoprion.puppet.glb",
     "lod": "assets/triassic/creatures/helicoprion.lod1.glb",
-    "bytes": 1501548,
-    "sha256": "776681bbe064f6d8c70c6e67169bafbec72dd408fb24731e98343407486c6829",
+    "bytes": 1670568,
+    "sha256": "a50fc6a703a95f9eac89e66a9f1083d57d6f72d0094c15cf4205815f9363f89e",
     "clips": [
       "Ability",
       "Attack",

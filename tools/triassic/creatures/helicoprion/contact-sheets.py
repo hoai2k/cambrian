@@ -43,3 +43,26 @@ for sheet, names in SETS.items():
             d.text((x + 8, y + 7), kind + ' / ' + n, fill='white')
     img.save(dest / (sheet + '.jpg'), quality=92)
     print('wrote', sheet + '.jpg', img.size)
+
+# The whorl was rebuilt after a reviewer read the delivered one as holes and inconsistent shape,
+# and that is a judgement by eye, so the before and after stand side by side. The "before" frames
+# are the previous delivery's, kept in `local/triassic-authoring/helicoprion/whorl-before/`; they
+# cannot be re-rendered once the body has changed, so the sheet is only rebuilt while they exist.
+before = base / 'whorl-before'
+after = base / 'authored-review'
+PAIRS = ['whorl-side-Idle-0', 'whorl-side-Bite-0.25', 'whorl-side-Attack-0.4',
+         'whorl-3q-Idle-0', 'whorl-3q-Bite-0.25', 'whorl-3q-Attack-0.4']
+if before.is_dir() and all((before / (n + '.png')).exists() for n in PAIRS):
+    w, h = 400, 400
+    img = Image.new('RGB', (w * len(PAIRS), h * 2), (26, 30, 36))
+    d = ImageDraw.Draw(img)
+    for i, n in enumerate(PAIRS):
+        for j, (kind, folder) in enumerate([('before', before), ('after', after)]):
+            p = folder / (n + '.png')
+            assert p.exists(), p
+            src = Image.open(p).convert('RGBA')
+            src.thumbnail((w, h - 26))
+            img.paste(src, (i * w + (w - src.width) // 2, j * h + 24), src)
+            d.text((i * w + 8, j * h + 7), kind + ' / ' + n, fill='white')
+    img.save(dest / 'whorl-before-after.jpg', quality=90)
+    print('wrote whorl-before-after.jpg', img.size)

@@ -79,6 +79,18 @@ def render(file, w=800, h=600, loc=(7, -5, 4.2), target=(0, 0, 0), scale=6.4):
 # under the snout, which is what the mouth cameras are aimed at.
 MOUTH = dict(loc=(3.4, -3.6, -.2), target=(0, -2.15, -.15), scale=1.5)
 BELOW = dict(loc=(.2, -2.6, -3.4), target=(0, -2.05, -.12), scale=1.6)
+# Close on the whorl itself: the reviewer judges this feature by eye, so it gets a camera that
+# fills the frame with it rather than with the head. Side is the plane the coil lies in; the
+# three-quarter looks in past the snout with the gape open, which is how a player meets it.
+WHORL_SIDE = dict(loc=(5, -2.05, -.13), target=(0, -2.05, -.13), scale=1.0)
+WHORL_3Q = dict(loc=(2.6, -4.2, -1.1), target=(0, -2.1, -.20), scale=1.15)
+
+if '--whorl-only' in sys.argv:
+    for clip, t in [('Idle', 0), ('Bite', .25), ('Attack', .4)]:
+        pose(clip, t)
+        render(REVIEW / ('whorl-side-%s-%s.png' % (clip, t)), 1000, 1000, **WHORL_SIDE)
+        render(REVIEW / ('whorl-3q-%s-%s.png' % (clip, t)), 1000, 1000, **WHORL_3Q)
+    sys.exit(0)
 
 if '--mouth-only' in sys.argv:
     pose('Bite', .25)
