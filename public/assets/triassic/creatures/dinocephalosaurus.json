@@ -1,0 +1,62 @@
+{
+  "id": "dinocephalosaurus",
+  "name": "Dinocephalosaurus",
+  "species": "Dinocephalosaurus orientalis",
+  "description": "The generated Tripo body unbent out of its pose and its procedural volume twin on one 57-joint rig: thirty-two cervicals, an articulated fang-trap jaw, four paddles and an undulating tail.",
+  "modelLength": 5.5,
+  "lengthMeters": 5.5,
+  "locomotion": "Swim",
+  "clips": [
+    "Idle",
+    "Swim",
+    "Sprint",
+    "TurnLeft",
+    "TurnRight",
+    "Dive",
+    "Rise",
+    "Attack",
+    "Bite",
+    "Heavy",
+    "Hit",
+    "Death",
+    "Guard",
+    "Parry",
+    "Dodge",
+    "Eat",
+    "Stagger",
+    "Ability",
+    "Grab",
+    "Breath",
+    "Growth",
+    "NeckStrike",
+    "Periscope",
+    "Breathe"
+  ],
+  "looping": [
+    "Idle",
+    "Swim",
+    "Sprint",
+    "Guard",
+    "Eat",
+    "Grab",
+    "Periscope",
+    "Breathe"
+  ],
+  "anchors": [
+    "anchor_mouth",
+    "anchor_mouth_inside",
+    "anchor_attack_primary"
+  ],
+  "puppet": "dinocephalosaurus.puppet.glb",
+  "notes": [
+    "The neck is the generation's own: every generated vertex, its UVs and the source albedo are kept. Intake unbends it by carrying each cross-section rigidly from its measured centreline frame onto a target axis of the same segment lengths, so no section is stretched, sheared or thinned and the neck's arc length, depth and width survive exactly. UNBEND=False in build.py rebuilds the generated pose.",
+    "The roll of that carry is measured off the animal's own countershading rather than fitted: a round section is rotationally ambiguous, so the dark-back/pale-belly seam is what says which way is up. Parallel transport disagrees with the colour by up to 118 degrees across this neck.",
+    "The target axis leaves the shoulder along the neck's own tangent and eases to level, so the root section is not rotated and the trunk is never disturbed.",
+    "Thirty-two cervical joints, as Spiekman et al. 2024 count them. Every clip drives the chain as a travelling curve with a per-joint lag; the neck does not pivot at its base.",
+    "The generated tail was swept 0.21 of a body length out of the midline and is unbent by the same carry on a far gentler curve.",
+    "The twin resurfaces a 0.0050-unit voxel occupancy field, relaxes it and reduces the new topology. It reuses no source vertex or face.",
+    "Same rest rig, inverse binds, sockets and all 24 action sample arrays for authored body and puppet. The LOD keeps every clip.",
+    "Original albedo retained with white COLOR_0; normal relief limited to 0.15 and skin explicitly nonmetallic at roughness 0.7.",
+    "Living colours, soft tissues and movements are artistic reconstruction. Ability is the roster's 1.0 s neck strike; NeckStrike is the longer hunting version, Periscope the held head-up column, Breathe the settled surface loop. Locomotor translation remains engine-owned."
+  ]
+}
