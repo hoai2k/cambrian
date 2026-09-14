@@ -1,6 +1,6 @@
 import { clamp, dist, distXZ, heading, type Vec3 } from '../../shared/math';
 import type { EraHud, EraRules } from '../era-rules';
-import { applyScaleStats, bandOf, isAlive, isHidden, lengthOf, speedFactor } from '../actors';
+import { applyScaleStats, bandOf, brokeSurface, isAlive, isHidden, lengthOf, speedFactor } from '../actors';
 import { creature } from '../creatures';
 import type { Game } from '../game';
 import type { Actor, InputFrame, Mode, WorldEvent } from '../types';
@@ -131,7 +131,10 @@ function checkStage(g: Game, a: Actor, d: DevActor) {
  */
 function updateBreath(g: Game, a: Actor, d: DevActor, dt: number) {
   if (creature(a.creature).breathing !== 'bimodal') return;
-  const up = a.pos.y > SURFACE_Y - 3 - lengthOf(a) * 0.3 || d.beached;
+  // At the surface means *at* it: the body's back is out of the water, or it is up on the sand.
+  // This was a band three units deep and more for a long body, so a breath was taken while still
+  // plainly under water — nothing broke at the waterline, and the blow had nothing to draw.
+  const up = brokeSurface(a) || d.beached;
   if (up && !d.atSurface && a.controller === 'player') {
     // `strength` is how much water the breath breaks, for the surface the renderer draws on it.
     // A beached animal is already in the air — the sea is somewhere below it — so it breaks none,
