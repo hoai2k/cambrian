@@ -536,7 +536,6 @@ for o, bonename in FANGS:
 # A closed envelope on the hinge, covering the square face the cut leaves at HINGE_X from the seam
 # down to the chin: that face swings into view the moment the mouth opens and is flat skin with the
 # texture drawn across it.
-hingemat = K.flat_material('Tanystropheus jaw hinge body', (.32, .29, .24, 1), .7)
 hz = (seam(HINGE_X) + head_lo(HINGE_X)) / 2
 bpy.ops.mesh.primitive_uv_sphere_add(segments=12, ring_count=8, location=tx((HINGE_X - .004, 0, hz)))
 hinge = bpy.context.object
@@ -547,8 +546,6 @@ bpy.ops.object.transform_apply(location=False, rotation=False, scale=True)
 for v in hinge.data.vertices:
     v.co = hinge.matrix_world @ v.co
 hinge.location = (0, 0, 0)
-hinge.data.materials.clear()
-hinge.data.materials.append(hingemat)
 for n in ['skull', 'jaw']:
     hinge.vertex_groups.new(name=n)
 for v in hinge.data.vertices:
@@ -579,6 +576,14 @@ def mouth_axis(p):
 oral_seating = {o.name: K.seat_inside(o, mouth_axis, depth, to_raw, to_engine) for o in oralparts}
 oral_part_depth = {o.name: min(depth(to_raw(v.co)) for v in o.data.vertices) for o in oralparts}
 oral_depth = min(oral_part_depth.values())
+# The hinge plug closes a hole this build's own cut leaves in the head, and CLAUDE.md is explicit
+# that whatever is authored wears the creature's own texture rather than a flat colour: it takes its
+# UVs from the surrounding surface and samples the same albedo, so it is not a smooth island in a
+# pored hide. Done here, after seating, so the UVs answer where the patch finally sits. The lining
+# and the teeth are deliberately left alone — they are interior and are meant to read as a mouth.
+hinge_uv = K.wear_the_skin(hinge, auth, albedo, mat, to_raw)
+print('HINGE_UV', json.dumps(hinge_uv))
+assert hinge_uv['unprojected'] == 0, ('the hinge patch has loops with no skin to take a UV from', hinge_uv)
 print('ORAL_DEPTH', json.dumps(oral_part_depth), json.dumps(oral_seating))
 assert oral_depth > -1e-4, ('the mouth interior breaks the skin', oral_part_depth)
 

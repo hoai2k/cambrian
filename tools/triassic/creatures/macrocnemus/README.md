@@ -271,6 +271,56 @@ only this species' asset family; it touches no shared registry and performs no g
 generic intake machinery it calls is `tools/triassic/creatures/shorekit.py`, shared with
 Tanystropheus and Coelophysis, which were built in the same pass.
 
+
+## Worked, not authored
+
+`CLAUDE.md`: on a Tripo-sourced body **what may be authored is decided by how simple the shape is**,
+not by a list of parts — closing a hole is always fair game, foot webbing is within reach, a spiral
+of a hundred and fifty tooth crowns is not — and *whatever is authored must wear the creature's own
+texture*, taking its UVs from the surrounding surface so it is not a smooth flat-shaded island in a
+pored hide. The first move is still to reshape what the generation already carries, because geometry
+taken from the body always matches the body.
+
+This build predates that rule being written down, so here is the audit against it, part by part.
+
+| Part | Shape invented | Texture |
+| --- | --- | --- |
+| Body | None — the welded intake surface, reshaped | The source albedo, untouched |
+| Lower jaw | None — the same surface, cut along the measured mouth line | " |
+| Procedural twin | None — the intake *volume* resurfaced | Vertex colours sampled from the same albedo |
+| Seated jaw hinge tissue | An ellipsoid closing the square face this build's own cut leaves | **The creature's own**, see below |
+| Oral cavity lining | A tube on the head's measured section | Its own — it is a mouth, not hide |
+| Upper and lower tooth rows | Small cones | Their own, for the same reason |
+
+**Nothing invents much shape.** The only exterior-facing authored geometry is the hinge plug, and it
+is an ellipsoid filling a hole this build made — the simplest case the rule names, and one that
+would not exist at all if the jaw were not cut. No new anatomy is modelled beside the generation.
+
+**The hinge plug wears the skin.** It used to carry a flat brown material, which is exactly the
+"smooth flat-shaded island in a pored hide" the rule is about. `wear_the_skin` in `shorekit.py` now
+gives every one of its 360 loops the UV of the point on the intake surface nearest it and hands it
+the body's own material, so it samples the same albedo as the skin it closes and the texture runs
+continuously across the join. The build asserts that no loop is left unprojected. It is done after
+`seat_inside`, so the UVs answer where the patch finally sits, and the packaged file carries one
+material fewer than before.
+
+The lining and the teeth are deliberately left on their own materials: they are interior, they are
+meant to read as a mouth rather than as hide, and the reviewer has said the lining is fine as it is.
+All three are pulled inside the intake surface before export and the build asserts it — the
+shallowest oral vertex sits 0.00122 raw units *inside* the closed surface, so the teeth embed in flesh
+and protrude into the lumen rather than standing on the skin.
+
+The gape defect in **What is still open** below sits comfortably inside this rule, which is worth
+saying because it means the fix stays available. The mandible is too small because the hinge was
+measured off the wrong thing — that is a *cut* moving. The throat that then fails to follow it is a
+*weighting* problem. Neither wants new geometry.
+
+**Foot webbing was considered and is not wanted here.** The rule names it as within reach, and this
+animal runs on land where its feet are seen; but the generation's feet are closed surfaces with
+separated digits and no holes, so there is nothing to fill. Adding webbing would be inventing shape
+the animal does not have rather than closing a gap, and a long-toed terrestrial tanystropheid is not
+an animal the research gives webbed feet to.
+
 ## What is still open
 
 - **The limb skinning tears, and this is the blocking defect on this animal.** The run that this animal exists for is the clip that tears worst, so the defect is squarely in the way of what it was built to do.

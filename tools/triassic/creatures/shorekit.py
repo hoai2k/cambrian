@@ -12,6 +12,18 @@ is everything that is that species: its orientation and unbending, its skeleton,
 anchors and its whole performance. Nothing here knows the name of an animal, reads a registry or
 writes a file outside the species its caller names.
 
+A Tripo body is **worked, not authored** (`CLAUDE.md`): these generations carry more surface detail
+than our own modelling matches, so anything built by hand beside them reads as built by hand. That
+rule is why this kit's shape tools are all *reshaping* tools — `rigid_carry`, `carry_run`,
+`yaw_straight_target`, `bisect_mouth`, `split` — and why the only geometry it creates from nothing is
+the mouth: `oral_lining`, which is explicitly exempt because a gape that shows through a head is
+worse than an authored interior, and the tooth rows each builder makes, which are the stated
+tooth exception and which `seat_inside` embeds in the generation's own flesh rather than standing
+them on it. Do not add a shape generator here for exterior anatomy. If a body is the wrong *shape*,
+the answers are to reshape it with the tools above or to stretch it (`docs/viewer-stretch.md`); if it
+is missing something, the answer is to say so and show what it costs — a regeneration, or a redraw
+where the pose is what is wrong.
+
 Raw-space convention, as in the other builders: the intake mesh is carried into Tripo metres with
 +X snoutward, +Y left and +Z up, and the engine transform `tx()` is applied once at the end.
 
@@ -38,7 +50,26 @@ from mathutils.bvhtree import BVHTree
 from mathutils.geometry import barycentric_transform, intersect_point_tri
 from math import sin, cos, pi
 import json
+import os
 import struct
+import sys
+
+
+# Blender exits 0 when a script raises. In `--background --python` mode the traceback goes to stdout
+# and the process still reports success, so a chain that checks exit codes calls a failed build a
+# good one and leaves the previous artefacts sitting there looking fresh. That is not hypothetical:
+# it is how a Coelophysis build that stopped on its own mouth-line assertion was recorded as "BUILD
+# OK", and how the stale file it left behind was then mistaken for proof that the builder reproduced
+# byte for byte. Every builder imports this module, so installing the hook here fixes all of them.
+def _die(exc_type, exc, tb):
+    import traceback
+    traceback.print_exception(exc_type, exc, tb)
+    sys.stdout.flush()
+    sys.stderr.flush()
+    os._exit(1)
+
+
+sys.excepthook = _die
 
 
 def smooth(t):
@@ -338,10 +369,21 @@ class Albedo:
         self.px = buf.reshape(self.h, self.w, 4)
 
     def at(self, u, v):
-        """One texel, wrapped. Returns RGBA as a plain tuple, which is what a colour slot takes."""
-        x = int((u % 1.0) * (self.w - 1) + .5) % self.w
-        y = int((v % 1.0) * (self.h - 1) + .5) % self.h
-        p = self.px[y, x]
+        """Bilinear, wrapped. Returns RGBA as a plain tuple, which is what a colour slot takes.
+
+        Bilinear rather than nearest because the *geometry* depends on this: the mouth seam is
+        placed by measuring the pigment, so the sampler decides where the jaw is cut. Nearest-texel
+        quantises every read to one of 2048 rows and pushed Coelophysis' measured seam to 0.656 of
+        the head's section, past the 0.65 its own builder refuses — a body that would not build at
+        all. Interpolating is both the more faithful reconstruction and the more stable one.
+        """
+        fx = (u % 1.0) * (self.w - 1)
+        fy = (v % 1.0) * (self.h - 1)
+        x0, y0 = int(fx), int(fy)
+        x1, y1 = min(x0 + 1, self.w - 1), min(y0 + 1, self.h - 1)
+        tx_, ty = fx - x0, fy - y0
+        p = (self.px[y0, x0] * (1 - tx_) * (1 - ty) + self.px[y0, x1] * tx_ * (1 - ty)
+             + self.px[y1, x0] * (1 - tx_) * ty + self.px[y1, x1] * tx_ * ty)
         return (float(p[0]), float(p[1]), float(p[2]), float(p[3]))
 
     def triangle_uv(self, point, poly_index):
@@ -821,6 +863,47 @@ def oral_lining(name, stations, section, seam, tx, rings=22, ring=14, centre=Non
     bpy.context.collection.objects.link(obj)
     obj.location = (0, 0, 0)
     return obj, lin_raw
+
+
+def wear_the_skin(obj, source, albedo, material, to_raw=None):
+    """Give an authored patch the creature's own texture instead of a flat colour.
+
+    `CLAUDE.md`: whatever is authored must wear the creature's own texture — it takes its UVs from
+    the surrounding surface and samples the same albedo, so a patch is not a smooth flat-shaded
+    island in a pored hide. That is what this does, and it is the requirement that makes
+    hole-filling geometry acceptable at all.
+
+    Every loop of `obj` is given the UV of the point on `source` nearest its vertex, so the patch
+    reads the albedo exactly where the skin around it does and the texture runs continuously across
+    the join. The patch then takes the body's own material, not one of its own: same image, same
+    relief, same two-sidedness, and one less material in the file.
+
+    This is for a patch that fills a hole in the skin. It is *not* for the oral lining or the teeth,
+    which are interior and are meant to look like a mouth rather than like hide.
+
+    `to_raw` carries a patch's vertices back into the intake surface's own space, because the
+    authored parts are built in engine space and the intake mesh is still in raw Tripo metres.
+    Call this *after* `seat_inside`, so the UVs answer where the patch finally sits.
+    """
+    bvh = BVHTree.FromPolygons([v.co for v in source.data.vertices],
+                               [poly_.vertices[:] for poly_ in source.data.polygons],
+                               all_triangles=False)
+    uvl = obj.data.uv_layers.get('UVMap') or obj.data.uv_layers.new(name='UVMap')
+    missed = 0
+    for poly_ in obj.data.polygons:
+        for vi, li in zip(poly_.vertices, poly_.loop_indices):
+            co = obj.data.vertices[vi].co
+            hit = bvh.find_nearest(to_raw(co) if to_raw else co)
+            uv = albedo.triangle_uv(hit[0], hit[2]) if hit and hit[0] is not None else None
+            if uv is None:
+                missed += 1
+                continue
+            uvl.data[li].uv = (uv.x, uv.y)
+    obj.data.materials.clear()
+    obj.data.materials.append(material)
+    for poly_ in obj.data.polygons:
+        poly_.material_index = 0
+    return {'loops': len(obj.data.loops), 'unprojected': missed}
 
 
 def flat_material(name, colour, roughness=.62, cull=False):

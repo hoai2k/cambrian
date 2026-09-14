@@ -207,6 +207,18 @@ animal. Three findings from that pass belong in this document because they gener
   technique and worth keeping, but it means the sampler is not a detail: reconstructing an
   equivalent one reproduced Coelophysis byte for byte and moved Tanystropheus and Macrocnemus by six
   and four triangles.
+- **Authored geometry has to wear the creature's texture, and a flat material is the tell.** What may
+  be authored on a Tripo body is decided by how much shape is invented — closing a hole is always
+  fair game, foot webbing is within reach, a tooth whorl is not — but the requirement that carries
+  the rule is the texture, not the shape: a patch takes its UVs from the surrounding surface and
+  samples the same albedo, so it is never a smooth flat-shaded island in a pored hide. The three
+  shore animals each closed the square face their own jaw cut leaves with a small ellipsoid and gave
+  it a flat brown material, which is precisely the failure. `shorekit.wear_the_skin` now hands every
+  loop of such a patch the UV of the nearest point on the intake surface and the body's own
+  material, and the build refuses a patch with any loop it could not project. Do it *after* seating,
+  so the UVs answer where the patch finally sits. The oral lining and the teeth are the exception in
+  the other direction: they are interior, they are meant to read as a mouth rather than as hide, and
+  they keep their own materials.
 - **Where a vertex *is* does not tell you whether the skin is intact.** This is the most important
   thing this pass found and it invalidated a check the pipeline had been trusting. The paired audits
   play 61 phases of every clip through the real GLTFLoader and AnimationMixer and measure every
@@ -224,6 +236,15 @@ animal. Three findings from that pass belong in this document because they gener
   `hind_lower`, `body` and `chest` — so the fault is in the shared limb skinning rather than in any
   animal's clips, and it shows in proportion to how hard an animal swings a limb. It is why a
   standing animal came through this pass in far better shape than either runner.
+- **Blender exits 0 when a builder raises, and that has cost more than anything else here.** In
+  `--background --python` mode the traceback goes to stdout and the process still reports success,
+  so a chain that checks exit codes calls a failed build a good one — and the previous artefacts sit
+  there looking fresh. That is how a Coelophysis build that stopped on its own mouth-line assertion
+  was recorded as "BUILD OK", and how the stale file it left behind was then taken as proof that the
+  builder reproduced byte for byte. `shorekit` now installs an excepthook that flushes and calls
+  `os._exit(1)`, so a failing build fails its caller; every builder that imports the kit gets it,
+  and the self-contained ones want the same three lines. Do not trust a build you have not seen the
+  final report line from.
 - **Nothing was checking that a builder still imports.** `shorekit.Albedo` went missing from the kit
   while all three builders called it, so as committed none of the three would run — found by going
   back to rebuild one, not by any check, and long after the artefacts had shipped. A reproducible

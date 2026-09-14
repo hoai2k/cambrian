@@ -247,7 +247,86 @@ only this species' asset family; it touches no shared registry and performs no g
 generic intake machinery it calls is `tools/triassic/creatures/shorekit.py`, shared with
 Tanystropheus and Macrocnemus, which were built in the same pass.
 
+
+## Worked, not authored
+
+`CLAUDE.md`: on a Tripo-sourced body **what may be authored is decided by how simple the shape is**,
+not by a list of parts — closing a hole is always fair game, foot webbing is within reach, a spiral
+of a hundred and fifty tooth crowns is not — and *whatever is authored must wear the creature's own
+texture*, taking its UVs from the surrounding surface so it is not a smooth flat-shaded island in a
+pored hide. The first move is still to reshape what the generation already carries, because geometry
+taken from the body always matches the body.
+
+This build predates that rule being written down, so here is the audit against it, part by part.
+
+| Part | Shape invented | Texture |
+| --- | --- | --- |
+| Body | None — the welded intake surface, reshaped | The source albedo, untouched |
+| Lower jaw | None — the same surface, cut along the measured mouth line | " |
+| Procedural twin | None — the intake *volume* resurfaced | Vertex colours sampled from the same albedo |
+| Seated jaw hinge tissue | An ellipsoid closing the square face this build's own cut leaves | **The creature's own**, see below |
+| Oral cavity lining | A tube on the head's measured section | Its own — it is a mouth, not hide |
+| Upper and lower tooth rows | Small recurved cones | Their own, for the same reason |
+
+**Nothing invents much shape.** The only exterior-facing authored geometry is the hinge plug, and it
+is an ellipsoid filling a hole this build made — the simplest case the rule names, and one that
+would not exist at all if the jaw were not cut. No new anatomy is modelled beside the generation.
+
+**The hinge plug wears the skin.** It used to carry a flat brown material, which is exactly the
+"smooth flat-shaded island in a pored hide" the rule is about. `wear_the_skin` in `shorekit.py` now
+gives every one of its 360 loops the UV of the point on the intake surface nearest it and hands it
+the body's own material, so it samples the same albedo as the skin it closes and the texture runs
+continuously across the join. The build asserts that no loop is left unprojected. It is done after
+`seat_inside`, so the UVs answer where the patch finally sits, and the packaged file carries one
+material fewer than before.
+
+The lining and the teeth are deliberately left on their own materials: they are interior, they are
+meant to read as a mouth rather than as hide, and the reviewer has said the lining is fine as it is.
+All three are pulled inside the intake surface before export and the build asserts it — the
+shallowest oral vertex sits 0.00121 raw units *inside* the closed surface, so the teeth embed in flesh
+and protrude into the lumen rather than standing on the skin.
+
+The blocking defect in **What is still open** below is skinning, not geometry, so this rule does not
+stand in the way of fixing it: no part of the answer involves modelling anything.
+
+**Foot webbing was considered and is not wanted here** either. The rule names it as within reach and
+this is the animal whose feet are most on show, but the generation's feet are closed surfaces with
+separated digits and no holes to fill, and a Chinle theropod at the water's edge is not an animal to
+give webbed feet to. What its feet actually need is the skinning fix, not more geometry.
+
 ## What is still open
+
+- **This builder does not currently run, and the shipped files cannot be regenerated from it.**
+  This is the most important thing on the page. `build.py` stops on its own sanity assertion:
+
+      assert .15 < JAW_FRACTION < .65      # got 0.6563
+
+  The mouth line on these heads is *measured*, not chosen — each station's pigment is split into a
+  dark half above and a pale half below and the seam is the median of where that split falls — and
+  on this animal the reading is bimodal and untrustworthy. The front stations read 0.78, 0.80, 0.81
+  and 0.82 of the head's section; the middle ones read 0.29 twice. A median across a set like that
+  does not mean anything, and it lands at 0.656, just past the ceiling the builder refuses above.
+  **The assertion is doing its job**: it is saying that this head's painted mouth line cannot be
+  located reliably, and the alternative to stopping is cutting a jaw in the wrong place.
+
+  It did not stop when the animal was first built, because `shorekit.Albedo` — the class that reads
+  the texture — was present then and has since gone missing and been reconstructed (the kit's own
+  header note has the history). The reconstruction reads this head 0.055 higher and that is enough
+  to cross the line. It was **not** caught earlier because Blender exits 0 when a script raises, so
+  a chain checking exit codes recorded a failed build as "BUILD OK" and the stale artefacts sitting
+  in `public/` were then mistaken for proof that the builder reproduced byte for byte. That trap is
+  now closed — `shorekit` installs an excepthook that exits non-zero — and it is worth knowing about
+  because every builder in this directory was exposed to it.
+
+  So the files in `public/assets/triassic/creatures/coelophysis.*` are the **original** delivery,
+  built by the sampler that is gone. Tanystropheus and Macrocnemus have both been rebuilt and
+  re-audited from the current source and are consistent with it; this animal is not.
+
+  The fix is not to widen the band. It is to read the seam with a statistic that survives a bimodal
+  set — weight each station by its own contrast, or take only the stations over the jaw's actual
+  range — which changes the reading on all three animals and so wants its own pass with fresh
+  renders. Until then this animal is not deliverable, which it was not anyway: see the skinning
+  tears below.
 
 - **The limb skinning tears, and this is the blocking defect on this animal.** A running theropod is the hardest case in the set and it fails: the hind feet trail off in ribbons and the skull shears into a flat blade in the strike. It is visible in the sheets at gameplay scale, not only close up.
 

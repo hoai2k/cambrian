@@ -377,6 +377,64 @@ writes only this species' asset family; it touches no shared registry and perfor
 The generic intake machinery it calls is `tools/triassic/creatures/shorekit.py`, shared with
 Macrocnemus and Coelophysis, which were built in the same pass.
 
+
+## Worked, not authored
+
+`CLAUDE.md`: on a Tripo-sourced body **what may be authored is decided by how simple the shape is**,
+not by a list of parts — closing a hole is always fair game, foot webbing is within reach, a spiral
+of a hundred and fifty tooth crowns is not — and *whatever is authored must wear the creature's own
+texture*, taking its UVs from the surrounding surface so it is not a smooth flat-shaded island in a
+pored hide. The first move is still to reshape what the generation already carries, because geometry
+taken from the body always matches the body.
+
+This build predates that rule being written down, so here is the audit against it, part by part.
+
+| Part | Shape invented | Texture |
+| --- | --- | --- |
+| Body | None — the welded intake surface, reshaped | The source albedo, untouched |
+| Lower jaw | None — the same surface, cut along the measured mouth line | " |
+| Procedural twin | None — the intake *volume* resurfaced | Vertex colours sampled from the same albedo |
+| Seated jaw hinge tissue | An ellipsoid closing the square face this build's own cut leaves | **The creature's own**, see below |
+| Oral cavity lining | A tube on the head's measured section | Its own — it is a mouth, not hide |
+| 20 fish-trap fangs | Cones on a measured rake | Their own, for the same reason |
+
+**Nothing invents much shape.** The only exterior-facing authored geometry is the hinge plug, and it
+is an ellipsoid filling a hole this build made — the simplest case the rule names, and one that
+would not exist at all if the jaw were not cut. No new anatomy is modelled beside the generation.
+
+**The hinge plug wears the skin.** It used to carry a flat brown material, which is exactly the
+"smooth flat-shaded island in a pored hide" the rule is about. `wear_the_skin` in `shorekit.py` now
+gives every one of its 360 loops the UV of the point on the intake surface nearest it and hands it
+the body's own material, so it samples the same albedo as the skin it closes and the texture runs
+continuously across the join. The build asserts that no loop is left unprojected. It is done after
+`seat_inside`, so the UVs answer where the patch finally sits, and the packaged file carries one
+material fewer than before.
+
+The lining and the teeth are deliberately left on their own materials: they are interior, they are
+meant to read as a mouth rather than as hide, and the reviewer has said the lining is fine as it is.
+All three are pulled inside the intake surface before export and the build asserts it — the
+shallowest oral vertex sits 0.00053 raw units *inside* the closed surface, so the teeth embed in flesh
+and protrude into the lumen rather than standing on the skin.
+
+**The neck did not need lengthening and was not lengthened**, which is the thing the rule bears on
+most for this animal. `node tools/triassic/neck-fraction.mjs public/assets/triassic/creatures/tanystropheus.glb`
+measures **2.453 units of neck on a 5.159-unit body — 47.6 %, on thirteen cervicals** — against the
+research's "about 5-6 m, of which the neck is half" on "only thirteen" hyperelongate cervicals. The
+generation delivers the proportion the research asks for, so the neck here is the generation's own,
+carried rigidly section by section onto a straight axis. (Measured as the sum of each cervical's own
+local bone offset, which is independent of every rotation above it; differencing accumulated world
+positions gives a different and wrong answer on a rig laid out along a curved axis.) Had it come up
+short, the answer would have been to stretch it — `docs/viewer-stretch.md`, and Nothosaurus'
+builder, which lengthened its intake neck 1.97x with the rig, weights, twin and clips regenerating
+downstream — and not to model one.
+
+What the rule *does* catch is in **What is still open** below, and the answer there is the one the
+rule prescribes: say what it costs rather than model the missing part. The head is proportionally
+large (7.8 % of the body against the 2.6 % the CT skull gives) and the route out is a regeneration or
+a redraw of the canonical pose. The absent eye globes are the same call — cutting and seating
+separate globes would be inventing exterior shape, so the generation's sculpted-and-painted eyes
+stay.
+
 ## What is still open
 
 - **The limb skinning tears, and this is the blocking defect on this animal.** It is *much* the mildest of the three and may well be shippable as it stands, but it is the same defect and it should be read next to the other two rather than on its own.
@@ -407,12 +465,16 @@ Macrocnemus and Coelophysis, which were built in the same pass.
 - The four portraits in `public/assets/triassic/creatures/` are now model renders rather than the
   crops `tools/triassic/placeholder-portraits.mjs` writes; re-running that tool would put the crops
   back.
-- **The mandible is shallow**, because the painted mouth line sits low: 0.21 of the head's section
-  rather than the third or so a gharial-like snout suggests. It is measured, the contrast behind
-  the measurement is strong, and the gape reads clearly at the distances the sheets show — but the
-  reading itself is a judgement about a painted line on a head three hundred vertices across, and a
-  reviewer who thinks the mouth should sit higher is arguing with the generation, not with the
-  measurement.
+- **The mouth line is measured off the pigment, and the measurement moved.** It now reads **0.317**
+  of the head's section, which is about the third a gharial-like snout suggests. The build that
+  first shipped read 0.21 and this README used to record that as a known oddity — "the mandible is
+  shallow" — so the new figure is the more plausible one, but the reason it changed is worth being
+  straight about: it changed because `shorekit.Albedo`, the class that samples the painted texture,
+  had gone missing and was reconstructed (see the kit's own note). The reconstruction is not the
+  original sampler, and on this animal it reads the seam eleven points of the head's section higher.
+  Contrast behind the reading is 0.232 and the gape renders clearly, so this build is the better of
+  the two; but a reviewer should know that the number is a reconstruction's reading and not the
+  one the first delivery was judged on.
 - **The fangs are a reconstruction.** They are the animal's single most characteristic feature and
   the generation has none, so they are authored into the lumen at a size and a rake taken from the
   skull CT descriptions rather than measured off anything in this file.
