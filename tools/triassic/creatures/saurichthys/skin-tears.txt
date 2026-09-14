@@ -1,0 +1,25 @@
+
+public/assets/triassic/creatures/saurichthys.glb   35437 edges x 17 phases x 23 clips
+clip           worst  on bone             >2x  worst bones
+Death         23.11x  pec_tip_R           674  0.011->0.251  chest:316 pec_tip_R:150 pec_mid_L:65 pec_mid_R:63
+TurnLeft      21.08x  pec_tip_R           521  0.011->0.229  chest:248 pec_tip_R:146 pec_mid_R:59 pec_upper_R:32
+Dive          20.84x  pec_tip_R           614  0.011->0.226  chest:291 pec_tip_R:146 pec_mid_R:58 pec_mid_L:57
+FastStart     20.15x  pec_tip_R           439  0.011->0.219  chest:102 tail_02:64 skull:56 pec_tip_R:55
+Attack        20.09x  pec_tip_R           436  0.011->0.218  chest:98 skull:63 tail_02:57 pec_tip_R:54
+Grab          19.36x  pec_tip_R          1570  0.011->0.210  jaw:504 skull:487 chest:287 pec_tip_R:152
+Ability       19.31x  pec_tip_R           376  0.011->0.210  chest:93 tail_02:57 pec_tip_R:47 dorsal:38
+Heavy         19.12x  pec_tip_R           418  0.011->0.208  chest:95 skull:66 tail_02:53 jaw:48
+TurnRight     17.51x  pec_tip_R           514  0.011->0.190  chest:204 pec_tip_R:110 pec_mid_L:57 tail_02:39
+Bite          16.86x  pec_tip_R           591  0.011->0.183  skull:230 jaw:174 chest:92 pec_tip_R:56
+Rise          16.24x  pec_tip_R           301  0.011->0.176  chest:144 pec_tip_R:109 pec_mid_L:24 pec_mid_R:19
+Parry         14.87x  pec_tip_R           525  0.011->0.162  chest:248 pec_tip_R:132 pec_mid_L:53 pec_mid_R:46
+Sprint        12.11x  pec_tip_R           696  0.011->0.132  tail_02:173 chest:156 pec_tip_R:124 dorsal:114
+Guard         10.86x  pec_tip_R           176  0.011->0.118  chest:77 pec_tip_R:74 pec_mid_R:13 pec_mid_L:12
+Growth        10.29x  pec_tip_R           347  0.011->0.112  chest:161 pec_tip_R:102 pec_mid_L:36 pec_mid_R:31
+Dodge          9.34x  pec_mid_L           358  0.017->0.162  tail_02:79 chest:77 pec_mid_L:69 dorsal:60
+Stagger        8.05x  pec_tip_R           122  0.011->0.087  chest:60 pec_tip_R:44 pec_mid_L:10 pec_mid_R:8
+Breath         7.06x  pec_tip_R           148  0.011->0.077  chest:83 pec_tip_R:62 pec_mid_R:3
+Hover          5.29x  chest               105  0.018->0.095  chest:61 pec_tip_R:41 pec_mid_R:3
+Eat            5.27x  skull               300  0.018->0.092  jaw:156 skull:144
+Swim           3.00x  tail_02              74  0.032->0.094  dorsal:24 tail_02:20 chest:18 pec_tip_R:12
+21 of 23 clips tear an edge past 2x

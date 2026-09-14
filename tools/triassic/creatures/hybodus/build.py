@@ -14,7 +14,20 @@ the body's own albedo.
 
 Writes only this species' asset family. Touches no shared registry and performs no git operations.
 """
-import bpy, bmesh, math, json, os, struct, hashlib, shutil, heapq
+import bpy, bmesh, math, json, os, struct, hashlib, shutil, heapq, sys
+
+# Blender exits 0 even when a script raises, so a build that failed halfway reports success
+# and leaves yesterday's GLB on disk looking fresh. Fail the process instead.
+_prev_hook = sys.excepthook
+
+
+def _die(t, v, tb):
+    _prev_hook(t, v, tb)
+    sys.stdout.flush()
+    os._exit(1)
+
+
+sys.excepthook = _die
 import numpy as np
 from mathutils import Vector, Matrix, Quaternion
 from mathutils.bvhtree import BVHTree
@@ -939,6 +952,15 @@ def split(o, label, test, labels=None):
         loose = [v for v in bmx.verts if not v.link_faces]
         if loose:
             bmesh.ops.delete(bmx, geom=loose, context='VERTS')
+        if target is part:
+            # Close the mandible. A cut shell is open along the seam, and its inside faces away
+            # from anyone looking into the gape -- so under a single-sided draw the open mouth
+            # shows straight out through the bottom of the jaw. Filling the cut's own boundary is
+            # the simplest kind of authored geometry there is: no new shape, no new vertices, and
+            # the UVs are the ring's own.
+            bmx.faces.ensure_lookup_table()
+            bmesh.ops.holes_fill(bmx, edges=[e for e in bmx.edges if e.is_boundary], sides=0)
+            bmesh.ops.recalc_face_normals(bmx, faces=list(bmx.faces))
         bmx.to_mesh(target.data)
         bmx.free()
     parts.setdefault(label, {})[o.name] = part
@@ -1040,8 +1062,16 @@ def lumen(y):
     from the floor following the jaw while the wall between roof and floor stretches."""
     bot, top = head_z(y)
     z = min(max(seam_z(y), bot + .18 * (top - bot)), top - .18 * (top - bot))
-    wy = min(.92 * seam_half_width(y), .70 * head_half_width(y))
-    wz = min(.90 * mouth_half_depth(y), .28 * min(top - z, z - bot))
+    # Flush with the cut, not inside it. At 0.92 the sac was an eighth narrower than the cut
+    # it has to back, and the corner of the mouth opened onto the backdrop -- 1,486 pixels
+    # of it under an all-backfaces-culled shim.
+    wy = min(1.00 * seam_half_width(y), .95 * head_half_width(y))
+    # Deep enough at rest that opening it is a stretch rather than an unfolding. Drawn to the
+    # slit's own thickness the sac's wall is four thousandths of a unit long at rest and a
+    # quarter of a unit at full gape, and `tools/triassic/skin-tears.mjs` reads that ratio --
+    # 77x -- as the worst tear on the animal. It is the inside of a mouth and it is meant to
+    # stretch, but a sac that starts with some depth in it starts nearer where it ends.
+    wz = min(1.9 * mouth_half_depth(y), .45 * (z - bot))
     return max(wy, .004 * RAW_LENGTH), max(wz, .0015 * RAW_LENGTH)
 
 
@@ -1055,13 +1085,24 @@ for i in range(LIN_RINGS):
     u = i / (LIN_RINGS - 1.)
     y = LIN_BACK + (LIN_FRONT - LIN_BACK) * u
     # Drawn in at both ends so the sac closes rather than ending in a ring standing in open flesh.
-    e = smooth(u / .12) * smooth((1. - u) / .08)
+    # Drawn in at the ends so the sac closes rather than ending in a ring standing in open
+    # flesh -- but only just at the back. Tapered over the last eighth there, the tube
+    # pinched to a fifth of its width exactly where the cut is widest, and the corner of the
+    # mouth opened onto the backdrop at full gape.
+    e = smooth(u / .035) * smooth((1. - u) / .08)
     _wy, _wz = lumen(y)
     wy = _wy * (.18 + .82 * e)
     wz = _wz * (.20 + .80 * e)
     for j in range(LIN_RING):
         th = j * 2 * pi / LIN_RING
-        verts.append(Vector((wy * cos(th), y, lumen_centre(y) + wz * sin(th))))
+        # The roof sits *on* the cut rather than above it. An ellipse centred on the mouth
+        # line leaves a crescent between its roof and the ring the cut left in the skull,
+        # and a ray into the gape goes over the sac, through that ring and out of the top
+        # of the head. Flattening the upper half onto the seam seals it; the lower half is
+        # what the jaw carries down, and the wall between the two is what stretches.
+        _s_th = sin(th)
+        verts.append(Vector((wy * cos(th), y,
+                             lumen_centre(y) + wz * _s_th * (.10 if _s_th > 0 else 1.))))
         lin_an.append((sin(th), u))
 # Wound inwards: what an open mouth shows is the far wall of the lumen, and the near wall has to be
 # got out of the way. Which way round that is was settled by measurement, not by reading the loop --
@@ -1108,6 +1149,49 @@ for p in lining.data.polygons:
     p.use_smooth = True
 oralparts = [lining]
 
+# The hinge envelope. The cut leaves a square face at the back of the mandible and a matching edge
+# on the skull, and as the jaw swings a wedge opens between them behind the lumen the lining fills.
+# Placodus had the same thing and closed it the same way: one blunt ellipsoid seated inside the head
+# at the pivot, skinned half to each bone so it rolls with the joint instead of tearing. It is
+# invisible from outside -- it never leaves the head -- and it is the simplest shape there is.
+_hb, _ht = head_z(HINGE_Y)
+_hr = max(.018 * RAW_LENGTH, 1.02 * head_half_width(HINGE_Y))
+_hz = min(max(seam_z(HINGE_Y), _hb + .3 * (_ht - _hb)), _ht - .3 * (_ht - _hb))
+bpy.ops.mesh.primitive_uv_sphere_add(segments=16, ring_count=9,
+                                     location=tx((0., HINGE_Y, _hz)))
+hinge = bpy.context.object
+hinge.name = 'Seated jaw hinge tissue'
+hinge.scale = (_hr * SCALE, _hr * 1.35 * SCALE, (_ht - _hb) * .78 * SCALE)
+bpy.ops.object.transform_apply(location=False, rotation=False, scale=True)
+for v in hinge.data.vertices:
+    v.co = hinge.matrix_world @ v.co
+hinge.location = (0, 0, 0)
+hinge.data.materials.clear()
+hinge.data.materials.append(liningmat)
+_huv = hinge.data.uv_layers.new(name='UVMap')
+for poly in hinge.data.polygons:
+    for li in poly.loop_indices:
+        q = Vector(hinge.data.vertices[hinge.data.loops[li].vertex_index].co[:]) / SCALE
+        hit = src_bvh.find_nearest(q)
+        sm = hit_uv(hit[0], hit[2]) if hit[0] is not None else None
+        _huv.data[li].uv = (sm.x, sm.y) if sm else (0., 0.)
+_hcol = hinge.data.color_attributes.new(name='Color', type='FLOAT_COLOR', domain='POINT')
+for item in _hcol.data:
+    item.color = (1, 1, 1, 1)
+for n in ['skull', 'jaw']:
+    hinge.vertex_groups.new(name=n)
+# Rigid on the skull, not shared with the jaw. Split half and half it shears with every degree
+# the joint turns, and `tools/triassic/skin-tears.mjs` reads that as the worst tear on the animal --
+# 48.9x, on an envelope nobody ever sees. Rigid it cannot tear at all, and it still does its job:
+# the mandible's own cut face is capped, so what this has to cover is the hole the jaw swings away
+# from, which belongs to the skull.
+for v in hinge.data.vertices:
+    hinge.vertex_groups['skull'].add([v.index], 1., 'REPLACE')
+    hinge.vertex_groups['jaw'].add([v.index], 0., 'REPLACE')
+for poly in hinge.data.polygons:
+    poly.use_smooth = True
+oralparts.append(hinge)
+
 # -------------------------------------------------------------- weights ----
 AXIAL = [('skull', .145), ('chest', .27), ('body', .46)] + \
         [('tail_%02d' % i, f) for i, f in enumerate(TAIL_F)]
@@ -1141,7 +1225,9 @@ def fin_weights(p, thin):
         s = 'L' if x > 0 else 'R'
         _side, _pts, names = PECTORAL[s]
         d = abs(x) / RAW_LENGTH
-        span = smooth((d - .060) / .060)
+        # A wide, gentle root blend: narrow, adjacent vertices at the root end up on different
+        # bones and the edge between them is torn through the whole stroke.
+        span = smooth((d - .040) / .100)
         if d < .115:
             chain = {names[0]: 1.}
         elif d < .165:
@@ -1192,10 +1278,12 @@ def weights(p, thin, labelled=False):
             w = {n: v * (1 - blend) for n, v in w.items()}
             for n, v in chain.items():
                 w[n] = w.get(n, 0.) + v * blend
-    j = jaw_weight_labelled(p) if labelled else jaw_weight(p)
-    if j > 0:
-        w = {n: v * (1 - j) for n, v in w.items()}
-        w['jaw'] = w.get('jaw', 0.) + j
+    # No jaw term. The mandible is a separate rigid object after the cut, so anything left on this
+    # body belongs to the skull -- and giving part of it to the jaw tears every edge that crosses
+    # the label boundary, because the label is binary and the two ends of such an edge then follow
+    # two bones through the whole gape. That was the worst tear on this animal at 76.8x, on the
+    # skin either side of the lip, and it is gone rather than reduced.
+    _ = labelled
     w = {n: v for n, v in w.items() if v > 1e-8}
     items = sorted(w.items(), key=lambda kv: -kv[1])[:4]
     total = sum(v for _, v in items)
