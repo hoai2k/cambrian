@@ -808,6 +808,18 @@ for clip, duration in CLIPS.items():
         turn = (-1 if clip == 'TurnLeft' else 1) * e if clip in ('TurnLeft', 'TurnRight') else 0.
         if clip == 'Death':
             amp *= 1 - dead
+        # **The crown's strike is a gather, a reach and a close, in that order.** The first pass
+        # built it out of `wind` and `peak`, which shot the tentacles forward on the *windup* and
+        # then spent the whole of the strike hauling them back: measured on the shipped Attack, the
+        # attack anchor reached its furthest forward at u=0.25 and its furthest back at u=0.44. A
+        # tentacle that is retracting at the moment of the blow is a jab that has already missed,
+        # and the note this was raised on says so plainly -- the heavy is a *hook latch*, and what
+        # it should read as is a lithe grab forward rather than a hit. So the gather is small and
+        # early, the reach is large and held open long enough to arrive, and the close follows it.
+        # All three are zero at u=0 and u=1, which is what a looping Grab needs.
+        gather = sin(pi * u / .28) ** 2 if u < .28 else 0.
+        reach = sin(pi * (u - .15) / .81) ** 2 if .15 < u < .96 else 0.
+        close = sin(pi * (u - .42) / .54) ** 2 if .42 < u < .96 else 0.
 
         # ---- the fins. **This is the locomotion.** A wave runs down each fin from front to back,
         # and the two run together at cruise and split in a turn, which is how a body with no front
@@ -875,29 +887,35 @@ for clip, duration in CLIPS.items():
 
         # ---- the head and the tail cone.
         hd = pb['head']
-        withdraw = (e if clip == 'Heavy' else 1. if clip == 'Guard' else
+        # Heavy is **not** a withdraw on this animal: `heavy: 'Hook latch'` is the tentacle pair
+        # going out and catching, and pulling the head back through it cancelled a third of the
+        # protraction the strike is made of. The clips that do withdraw are the ones that mean it.
+        withdraw = (1. if clip == 'Guard' else
                     .55 * e if clip in ('Hit', 'Stagger', 'Parry') else dead)
         hd.rotation_euler.x = -.08 * pump + .10 * withdraw + (.12 * peak if clip == 'Attack' else 0.)
         hd.rotation_euler.z = turn * .22
         hd.location.y = .020 * withdraw * SCALE
+        if clip in ('Attack', 'Bite', 'Grab', 'Heavy'):
+            # **On this body the reach is a protraction, and it has to be.** The arms already lie
+            # along the animal's own axis at rest -- their tips sit at the very front of the
+            # bounding box -- so there is no rotation that carries them further forward: swinging
+            # them harder in the "forward" direction takes them up over the head instead, which the
+            # first correction did and which measured as 0.048 of forward travel against 0.321 of
+            # back. A squid pushing its crown out is a real movement and it is the one that reads,
+            # so the head carries the whole crown forward through the reach and gathers a little
+            # before it. The head is the arms' parent, so this is the one channel that moves all
+            # twelve of them the same way.
+            hd.location.y += (.011 * gather - .050 * reach) * SCALE
         pb['tail'].rotation_euler.z = turn * .12 + .10 * sin(p * beats - 1.8) * env * finamp * 2
         pb['tail'].rotation_euler.x = .16 * dead
 
-        # ---- the beak, shut everywhere but the clips that use it.
-        opening = .02 * (1 - cos(p)) * env if clip in ('Idle', 'Breath') else 0.
-        if clip == 'Eat':
-            opening = .34 * (1 - cos(p * 2)) / 2
-        if clip == 'Bite':
-            opening = .64 * sin(pi * u) ** 2
-        if clip == 'Attack':
-            opening = .18 * wind + .56 * peak
-        if clip == 'Heavy':
-            opening = .26 * peak                     # the hook latch closes on the catch
-        if clip == 'Grab':
-            opening = .20 * e
-        opening += .30 * dead
-        pb['jaw'].rotation_euler.x = opening
-        pb['skull'].rotation_euler.x = -.30 * opening
+        # ---- the beak. **It is not animated, in any clip.** A beak inside an arm crown sits at the
+        # bottom of a well of arms and is never on screen: what this animal reaches with, catches
+        # with and is read by is the crown and its two tentacles, and `anchor_mouth` on a still
+        # `jaw` is all the rest of the game needs in order to know where a mouthful goes. So the two
+        # mouth bones hold their bind pose and the clips spend their motion where it can be seen.
+        pb['jaw'].rotation_euler.x = 0.
+        pb['skull'].rotation_euler.x = 0.
 
         # ---- the arms. Eight of them fan and curl; the two tentacles shoot out and snap back,
         # because that is what a decabrachian catches with and `heavy: 'Hook latch'` is the move.
@@ -921,17 +939,28 @@ for clip, duration in CLIPS.items():
             if clip in ('Dive', 'Rise'):
                 sweep = .14 * e * (1 + .6 * ventral * (1 if clip == 'Dive' else -1))
             if clip in ('Attack', 'Bite', 'Grab', 'Heavy'):
-                if tentacle and clip in ('Attack', 'Heavy'):
-                    # The strike: the tentacles shoot forward past the arms, then haul back in.
-                    sweep = -1.15 * wind + 1.05 * peak
-                    curl = 1.0 * peak
-                else:
-                    sweep = (-.25 * wind + .70 * peak if clip == 'Attack'
-                             else .85 * e if clip == 'Grab'
-                             else .45 * sin(pi * u) ** 2 if clip == 'Bite'
-                             else .55 * peak)
-                    curl = (.85 * peak if clip == 'Attack' else e if clip == 'Grab'
-                            else .45 * sin(pi * u) ** 2 if clip == 'Bite' else .60 * peak)
+                # Negative sweep carries an appendage forward past the head; positive folds it back
+                # over the mantle, which is what Guard does and what a strike must not. The
+                # tentacles go furthest, because they are the two that catch: a decabrachian's
+                # strike is the pair shooting out and closing, with the eight arms following them
+                # out to gather whatever they came back with.
+                # **A grab, not a hit: the crown opens, the head drives it forward, and it shuts.**
+                # None of that is a swing, and on this body none of it can be. These arms already
+                # lie along the animal's own axis with their tips at the very front of its bounding
+                # box, so there is no rotation that carries them further forward -- swinging them
+                # "forward" about the crown tangent takes them up over the head (measured: 0.048 of
+                # forward travel against 0.321 of back) and converging them further takes them past
+                # the axis and down its other side (0.099 against 0.120). So the reach is the head's
+                # protraction, above, and the crown's own part of the move is opening around it and
+                # closing on it. The two tentacles open least and shut hardest and latest: that is
+                # the pair closing on whatever the eight have gathered, which is what `heavy:
+                # 'Hook latch'` names.
+                out = {'Attack': .62, 'Bite': .56, 'Grab': .58, 'Heavy': .72}[clip]
+                shut = {'Attack': .80, 'Bite': .62, 'Grab': .95, 'Heavy': .95}[clip]
+                hold = max(gather, reach)
+                sweep = .14 * out * gather - .08 * out * reach
+                spread = (.70 if tentacle else .85) * out * hold - (1.30 if tentacle else .85) * shut * close
+                curl = shut * close * (1.35 if tentacle else .80)
             if clip == 'Eat':
                 sweep = .55 + .18 * sin(p * 2 - phase)
                 curl = .45 + .18 * sin(p * 2 - phase)
