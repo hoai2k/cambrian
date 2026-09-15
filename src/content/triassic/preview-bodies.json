@@ -1,14 +1,5 @@
 [
   {
-    "id": "archelon",
-    "model": "assets/triassic/creatures/archelon.preview.glb",
-    "bytes": 921768,
-    "sha256": "de38a2c5ea08bd7ec256698d6e311931efdd5fc5850a1434e0144046644a800f",
-    "yaw": 180,
-    "scale": 9.26,
-    "lengthUnits": 9.26
-  },
-  {
     "id": "askeptosaurus",
     "model": "assets/triassic/creatures/askeptosaurus.preview.glb",
     "bytes": 1516160,
@@ -43,15 +34,6 @@
     "yaw": 0,
     "scale": 3.77,
     "lengthUnits": 3.77
-  },
-  {
-    "id": "mosasaurus",
-    "model": "assets/triassic/creatures/mosasaurus.preview.glb",
-    "bytes": 1058724,
-    "sha256": "ac7cd1a4dd508db597bc7c455624d0ecc99b1388161df1b1c91848170a23ffdb",
-    "yaw": 270,
-    "scale": 16.42,
-    "lengthUnits": 16.42
   },
   {
     "id": "odontochelys",
