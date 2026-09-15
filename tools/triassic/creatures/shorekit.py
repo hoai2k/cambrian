@@ -1091,7 +1091,7 @@ def split(obj, label, test, parts):
 
 
 def oral_lining(name, stations, section, seam, tx, rings=22, ring=14, centre=None, power=2.,
-                overlap=.16, throat=.18, swell=1.60, behind=.16, room=None, fill=.90):
+                overlap=.16, throat=.18, swell=1.60, behind=0., room=None, fill=.90):
     """A **palate on the skull and a floor on the jaw**, each closed on its own.
 
     This used to be one sac whose wall stretched between the two bones, and the wall is the reason

@@ -1160,7 +1160,7 @@ def mouth_room(y):
 
 _lining_raw, faces, _lin_palate = T.oral_shells(
     lumen_centre, lumen_shells, LIN_BACK, LIN_FRONT, rings=LIN_RINGS, ring=LIN_RING,
-    axis='y', swell=1.10, behind=.08, room=mouth_room)
+    axis='y', swell=1.10, room=mouth_room)
 verts = list(_lining_raw)
 me = bpy.data.meshes.new('Mouth lining')
 me.from_pydata([tx(v) for v in verts], [], faces)

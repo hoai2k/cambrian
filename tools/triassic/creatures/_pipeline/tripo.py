@@ -616,8 +616,8 @@ def _superellipse(th, power):
 
 
 def oral_shells(seam, section, u_back, u_front, rings=24, ring=14, centre=None, power=2.,
-                fit=None, overlap=.16, throat=.18, swell=1.60, behind=.16, axis='y',
-                point=None, room=None, fill=.90, shell_power=5.):
+                fit=None, overlap=.16, throat=.18, swell=1.60, behind=0., axis='y',
+                point=None, room=None, fill=.90, shell_power=5., buried=.78):
     """The mouth as **two independently closed surfaces**: a palate on the skull, a floor on the jaw.
 
     This replaces one sac whose wall stretched between the two jaws. That sac was built to stop an
@@ -682,9 +682,14 @@ def oral_shells(seam, section, u_back, u_front, rings=24, ring=14, centre=None, 
 
     def shell(is_floor):
         base = len(raw)
-        # The palate starts *behind* the mouth, the floor at the hinge: what closes the throat is
-        # the palate, and it is rigid on the skull, so carrying it back into the head costs nothing
-        # and is the only thing on the line a ray takes into the corner of an open mouth.
+        # `behind` carries the palate back past the mouth, and it is **zero** by default. It was
+        # written before the room was measured, when the only way to reach the throat was to keep
+        # going; it never moved a gape count by one, and where the seam and the head's lateral axis
+        # are extrapolations -- which is all they can be behind the last measured station -- the
+        # room measured on them is nonsense and the palate comes out through the top of the skull.
+        # Atopodentatus put a flat pink slab over its own braincase that way, and its own section
+        # hull passed it, because a hull over sections is not the skin. What closes the throat is
+        # the rear cap at `u_back` itself, which `room` fills across the whole head.
         lo = 0. if is_floor else -behind
         for i in range(rings):
             q = lo + (1. - lo) * (i / (rings - 1))
@@ -711,7 +716,7 @@ def oral_shells(seam, section, u_back, u_front, rings=24, ring=14, centre=None, 
             if is_floor:
                 # Shrunk at the throat so its rear cap is strictly inside the palate's, never
                 # coincident with it: two surfaces in the same place fight rather than close.
-                up, dn, wid = hd * overlap, max(hd, rd), max(w, rw) * (1. - .10 * back)
+                up, dn, wid = hd * overlap, max(hd, rd * buried), max(w, rw) * (1. - .10 * back)
             else:
                 # **The throat is the head's, not the mouth's.** A palate that stops at the lumen's
                 # own section leaves a lateral gap between its edge and the skin at the corner of
@@ -727,8 +732,17 @@ def oral_shells(seam, section, u_back, u_front, rings=24, ring=14, centre=None, 
                 # a pink nub out through the top of Cymbospondylus' snout, because the lumen's own
                 # floored half-depth times 1.6 is more head than there is.
                 if room is not None:
-                    up, dn, wid = max(hu, ru), max(hd * (overlap + (1. - overlap) * back),
-                                                   rd * back), max(w, rw)
+                    # **The far side of each shell is held short of the skin.** A shell's outer
+                    # half is buried: what has to reach the skin is its width, because that is what
+                    # a line of sight into the gape passes beside, and its mouth-facing surface,
+                    # because that is what the mouth is. The roof of a palate is seen by nothing,
+                    # and drawn to the same fraction of the measured room as the width it came out
+                    # through the top of Atopodentatus' braincase -- passed by that builder's own
+                    # section hull, because a hull over sections is not the skin. Held at `buried`
+                    # it moves no gape count on any body and cannot break a skull.
+                    up, dn, wid = max(hu, ru * buried), \
+                        max(hd * (overlap + (1. - overlap) * back), rd * back * buried), \
+                        max(w, rw)
                 else:
                     s = 1. + (swell - 1.) * back
                     up, dn, wid = hu * s, hd * (overlap + (1. - overlap) * back) * s, w * s
@@ -813,7 +827,7 @@ def oral_object(name, tx, raw, faces, n_palate, material=None, rig=None, measure
 
 def lining(name, rig, tx, seam, section, y_back, y_front, jaw_blend, material,
            rings=24, ring=14, centre_x=None, power=2., fit=None, overlap=.16, throat=.18,
-           swell=1.60, behind=.16, room=None, fill=.90, shell_power=5.):
+           swell=1.60, behind=0., room=None, fill=.90, shell_power=5., buried=.78):
     """A palate on the skull and a floor on the jaw -- see `oral_shells` for the whole argument.
 
     The signature is the one the twelve builders on this kit already call, so that the change is one
@@ -826,7 +840,7 @@ def lining(name, rig, tx, seam, section, y_back, y_front, jaw_blend, material,
                                        centre=centre_x, power=power, fit=fit,
                                        overlap=overlap, throat=throat, swell=swell,
                                        behind=behind, room=room, fill=fill,
-                                       shell_power=shell_power, axis='y')
+                                       shell_power=shell_power, buried=buried, axis='y')
     return oral_object(name, tx, raw, faces, n_palate, material, rig,
                        measured_room=room is not None), raw
 
