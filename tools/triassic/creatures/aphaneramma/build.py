@@ -770,13 +770,68 @@ def reset():
         pb.scale = (1, 1, 1)
 
 
-# **An anguilliform wave, and four limbs rowing on the same beat.** The research gives this animal
-# an elongate anguilliform swim, so the gain climbs monotonically from the shoulder to the tail tip
-# and the lag spreads a full wavelength over the body. What the era's own rule adds is that a
-# limbed swimmer's dash has to *paddle*: the limbs are not along for the ride here, they take a
-# real rearward stroke in Swim and a harder one in Sprint, and the swept angle at each root is
-# measured from the limb's own direction below rather than read off an Euler channel.
+# **An anguilliform wave, and four limbs stroking on the same beat.** The research gives this animal
+# an elongate anguilliform swim and its own family supports it -- trematosaurids are the most fully
+# aquatic temnospondyls there are, and Wantzosaurus is read as swimming by lateral undulation -- so
+# the wave is the locomotion and it carries the better part of a wavelength from the shoulder to the
+# tail tip. What the era's own rule adds is that a limbed swimmer's dash has to *paddle*: the limbs
+# are not along for the ride here, and the swept angle at each root is measured from the limb's own
+# direction below rather than read off an Euler channel.
+#
+# What both halves of that were getting wrong, and what this pass is: the wave did not travel (0.19
+# of a cycle over the whole tail, which is a hinge rather than a wave) and the limb stroke was
+# centred on the generation's own land sprawl, swinging as far forward of straight-out-sideways as
+# behind it. Between them that is a walk performed in midwater with the body held stiff, which is
+# what a waddle is. The wave now runs the length of the animal and the stroke runs from the limb
+# stretched forward to the limb flush with the flank, which is both the era's rule and what a
+# crocodilian or a salamander in water actually does (`docs/research/locomotion-ideas.md`).
 AXIAL_CHAIN = ['neck_00', 'chest', 'body'] + ['tail_%02d' % i for i in range(len(TAIL_Y))]
+# **The wave is written as a shape and the joint angles are solved out of it.** A per-joint gain
+# with a per-joint lag is not the same thing as a travelling wave, and on this body it was not one:
+# measured on the shipped Swim, the lateral extreme walked only 0.19 of a cycle from the first
+# caudal joint to the last, which is a tail flapping about a hinge rather than a wave running down
+# a body. That is most of why the limbs read as the locomotion and the swim read as a waddle --
+# the thing that should have been carrying the animal was barely moving.
+#
+# So `axial_yaw` names the curve the animal is asked to make: a sine of `WAVE_TURNS` wavelengths
+# between the snout and the tail tip, with the amplitude growing tailward off a node at the head.
+# Each joint's yaw is then the *difference of the slopes* of the two segments it joins, which
+# reproduces that curve exactly and is stable -- the obvious alternative, solving each station's
+# offset in turn, has to correct the accumulated error of everything in front of it across the
+# 0.055 between two caudal joints, and blows up to a fifth of a radian doing it.
+#
+# The chain is rooted at `body`, in the middle: joints forward of it carry the head and joints
+# behind it carry the tail, so the two halves are walked outwards from there. `body`'s own yaw is
+# the trunk's own heading and bends nothing, which is why it can be as large as it likes.
+SNOUT_WAVE_Y = Y0 + .01
+TAIL_TIP_Y = TAIL_Y[-1] + .050
+WAVE_SPAN = TAIL_TIP_Y - SNOUT_WAVE_Y
+WAVE_TURNS = .70          # wavelengths carried on the body at once
+WAVE_POWER = 3.2          # how the amplitude grows tailward
+WAVE_NODE = .04           # the head's share of the tail tip's amplitude
+WAVE_TIP = .050           # the tail tip's own amplitude, raw, at amp 1
+
+
+def axial_yaw(ph, tip):
+    """Per-joint yaw realising a lateral wave that travels head to tail."""
+    def lateral(y):
+        t = (y - SNOUT_WAVE_Y) / WAVE_SPAN
+        return tip * (WAVE_NODE + (1 - WAVE_NODE) * t ** WAVE_POWER) * sin(ph - 2 * pi * WAVE_TURNS * t)
+
+    def slope(a, b):
+        return (lateral(b) - lateral(a)) / (b - a)
+
+    trunk = slope(CHEST_Y, TAIL_Y[0])
+    fore = slope(CHEST_Y, NECK_Y)
+    head = slope(NECK_Y, SNOUT_WAVE_Y)
+    out = {'body': -trunk, 'chest': trunk - fore, 'neck_00': fore - head}
+    ys = [BODY_Y] + list(TAIL_Y) + [TAIL_TIP_Y]
+    prev = trunk
+    for j in range(len(TAIL_Y)):
+        cur = slope(TAIL_Y[j], ys[j + 2])
+        out['tail_%02d' % j] = prev - cur
+        prev = cur
+    return out
 # **The ramp at the pelvis is where the skin tears, not the tail tip.** A first pass ran the gain
 # 0.16 at the trunk and 0.34 at the first tail joint -- a doubling across one joint, right where the
 # hind limbs hang off it -- and `skin-tears.mjs` read 5.45x with 397 of the torn edges on `tail_00`.
@@ -910,17 +965,16 @@ for clip, duration in CLIPS.items():
         body.location.z -= .22 * dead
 
         # --- the axial wave. This is how the animal swims.
+        swing = axial_yaw(p * beat, WAVE_TIP * amp)
+        rest_swing = {} if loop else axial_yaw(0., WAVE_TIP * amp)
         for i, n in enumerate(AXIAL_CHAIN):
             q = pb[n]
-            # **A per-joint angle that looks small sums down eleven joints.** At 0.105 rad per
-            # unit of gain each tail joint turns at most seven degrees, which reads as nothing on
-            # its own -- and the review renders showed the tail hooked through about 128 degrees at
-            # the peak of the cruise stroke, over a rest curve of about 45. Halving it leaves the
-            # wave plainly readable (the tip sweeps roughly 60 degrees over a cycle) and stops the
-            # animal tying itself in a knot. Nothing else measured here saw it: travel, phase
-            # ordering, amplitude growth and the tear sweep were all fine at the larger number,
-            # which is why the sheet is rendered and looked at.
-            z = .052 * GAIN[i] * amp * wave(i, beat)
+            # **A per-joint angle that looks small sums down eleven joints**, and the shape the sum
+            # makes is the thing to hold rather than the angles: an earlier pass ran these joints
+            # at twice this and the review renders showed the tail hooked through about 128 degrees
+            # at the peak of the stroke, over a rest curve of about 45. `axial_yaw` fixes the curve
+            # instead, so the amplitude and the wavelength are the knobs and the angles fall out.
+            z = (swing[n] - rest_swing.get(n, 0.)) * (1. if loop else env)
             z += turn * (.028 + .005 * i)
             z += .045 * dead * sin(i * .8)
             if clip in ('Attack', 'Heavy', 'Ability'):
@@ -961,19 +1015,32 @@ for clip, duration in CLIPS.items():
             kind = key[:-1]
             up = pb[names[0]]
             ph = p * beat - STROKE_LAG[key]
-            stroke = sin(ph)
             recover = cos(ph)
-            # How far the limb swings, per clip. It is the animal's reach and not the clip's
-            # energy, so Sprint strokes harder rather than the same stroke faster.
-            reach = {'Sprint': 1.00, 'Swim': .72, 'Crawl': .86, 'Idle': .16, 'Breathe': .18,
-                     'Eat': .20, 'Guard': .18, 'Grab': .20}.get(clip, .24)
+            # 0 is the limb stretched forward, 1 is the limb back and flush with the flank.
+            swing = (1 + sin(ph)) / 2
+            # How far the limb swings, per clip, root to root. It is the animal's reach and not the
+            # clip's energy, so Sprint strokes harder rather than the same stroke faster.
+            travel = {'Sprint': 1.95, 'Swim': 1.60, 'Crawl': 1.72, 'Idle': .32, 'Breathe': .36,
+                      'Eat': .40, 'Guard': .36, 'Grab': .40}.get(clip, .48)
+            # **Where that travel sits is what stopped the swim reading as a waddle.** The stroke
+            # used to be centred on the generation's own land sprawl -- as far forward of
+            # straight-out-sideways as it went behind it -- which is a walk performed in midwater.
+            # The stroke a sprawling amphibian in water actually takes runs from the limb stretched
+            # forward to the limb flush with the body, which is the era's standing rule, so the
+            # swim clips carry a rearward `tuck` and the stroke reaches out of it and drives back
+            # into it. `Crawl` keeps the old centring, because on land the limb does swing both
+            # ways about the shoulder. `adduct` is the other half of flush: a crocodilian or a
+            # salamander swimming holds its limbs in against the flank to get them out of the
+            # water's way, hardest at the end of the drive.
+            tuck = {'Swim': .70, 'Sprint': .85, 'Idle': .16}.get(clip, travel * .5)
+            adduct = {'Swim': .30, 'Sprint': .38, 'Idle': .08}.get(clip, 0.)
             gainf = 1.0 if kind == 'fore' else 1.08
-            # The power stroke is backwards and downwards: `.z` sweeps the limb fore and aft about
-            # the shoulder, `.y` lifts and lowers it, `.x` feathers the hand so it is edge-on
-            # through the recovery and broadside through the drive.
-            up.rotation_euler.z = s * reach * stroke * gainf
-            up.rotation_euler.y = s * .34 * reach * recover * gainf
-            up.rotation_euler.x = -.40 * reach * recover * gainf
+            # `.z` sweeps the limb fore and aft about the shoulder, `.y` lifts and lowers it -- and
+            # for this animal adducts it -- and `.x` feathers the hand so it is edge-on through the
+            # recovery and broadside through the drive.
+            up.rotation_euler.z = s * (tuck - travel * (1 - swing)) * gainf
+            up.rotation_euler.y = s * (adduct * (.30 + .70 * swing) + .17 * travel * recover) * gainf
+            up.rotation_euler.x = -.20 * travel * recover * gainf
             if clip in ('Dive', 'Rise'):
                 up.rotation_euler.x += (1 if clip == 'Dive' else -1) * .42 * e
             if clip in ('TurnLeft', 'TurnRight'):
@@ -1003,7 +1070,7 @@ for clip, duration in CLIPS.items():
             # feathers on the recovery rather than following the upper limb rigidly.
             lag = sin(ph - .85)
             for j, share, feather, lagshare in ((1, .18, .50, .16), (2, .12, .34, .22)):
-                pb[names[j]].rotation_euler.z = share * up.rotation_euler.z + s * lagshare * reach * lag
+                pb[names[j]].rotation_euler.z = share * up.rotation_euler.z + s * lagshare * travel * .5 * lag
                 pb[names[j]].rotation_euler.x = feather * up.rotation_euler.x
 
         state = np.array([tuple(q.rotation_euler) + tuple(q.location) for q in pb])
