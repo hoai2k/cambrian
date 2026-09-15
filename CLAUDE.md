@@ -437,6 +437,27 @@ unless the user explicitly asks for a PR. Steps:
   water and complete at the surface — so distance out costs the climb for air. A body placed at an
   *absolute* y is a bug in a sea like this: ask the seabed where the water is (`openWater` in
   `tools/devonian-test.ts` is the pattern).
+- The seabed is the hot path. A full world's step asks `sampleHeight` some four hundred and fifty
+  times, and in an era with `floorDepth` each of those runs `depthProfile` → `biomeWeights` → a
+  dozen noise samples, so a term added to a field function in `src/sim/world.ts` is paid thousands
+  of times a second. The rule there is that **a weight of zero means the noise behind it is never
+  read**: the shelf mosaic's three noises (one an fbm, so six samples) inshore of the 120 units
+  where its band weight starts, the channel's ridge noise inside the 170 where its band starts, and
+  the boulder fbm off the boulder fields were all being computed and then multiplied by zero, and
+  between them they were a third of the step. `nurseryFactor` is the same lesson in allocation: it
+  wants one number, and `nearestNursery` builds eight objects to hand it one, on every ground
+  sample. Guard a new term by the weight that scales it — and prove the guard **exact** rather than
+  nearly right, by hashing `sampleHeight`, `biomeWeights` and `channelFactor` over a grid in all
+  three eras before and after. Anything else silently redraws the world under every saved seed.
+- The `tools/*-test.ts` suites are the sim's own guards, and most of them now have an npm script:
+  `npm run sim` is the whole sweep (about twenty minutes) and `npm run sim:gate` is the cheap half
+  (about a minute), which is what the deploy workflow runs. Wire a new suite into both — a guard
+  with no script is one nobody runs, which is how `tools/flora-test.ts`'s step-cost check came to be
+  failing on `main` for a day unnoticed. That check is wall clock and so machine-dependent: the same
+  commit has measured 6.6 ms on one quiet 4-core machine and 8.9 ms on another, so its 8 ms is a
+  ceiling with room under it rather than a target, and tightening it towards whatever the fastest
+  machine to hand reports makes it fail everywhere else. Read the note beside it before touching the
+  number.
 - A giant hunts when it is hungry and not otherwise (`wantsToHunt` in `src/sim/ai.ts`): being seen
   used to be reason enough, so every giant that could see a player came down on them and there was
   no approaching one to ride it. A fed giant notices — the head comes round, which is the tell — and
