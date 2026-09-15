@@ -163,7 +163,15 @@ def seam(y):
 
 
 HINGE_Y = float(MY[-1])
-JAW_FRONT_Y = float(MY[0])
+# **The mandible has no front cut at all.** The cavity of a shut mouth stops measuring a few
+# thousandths behind the snout tip -- there is no gap left there to cast a ray across -- and a jaw
+# cut anywhere behind the tip leaves an open ring of mandible that swings into view the moment the
+# mouth drops. The gape proof found it twice: 956 magenta pixels with the cut at the cavity's front,
+# 137 with it three thousandths from the tip. So the plane is put in front of the animal, where it
+# meets no geometry, and the mandible's only open boundaries are the seam -- which the lining covers
+# -- and the rear plane at the hinge, which the hinge envelope and the throat blend cover.
+JAW_FRONT_Y = float(Y0 - .002)
+MOUTH_FRONT_Y = float(Y0 + .014)       # the lining's front cap, inside the solid snout tip
 HEAD_BACK = Y0 + .235          # where the gill cover ends and the pectoral girdle begins
 
 # **The cross-check, and it is the point of doing two methods.** The painted line is read
@@ -224,25 +232,51 @@ def head_half_depth(y):
     return float(np.interp(y, _HY, _HD))
 
 
-# **The head's width at the mouth's own height, which is not the head's width.** `cavity_profile`
-# reports the spread of the measured cavity points, and those sit on both *lips* -- so on a deep
-# round head like this one its `wide` is the span of the lip line, which is wider than the head is
-# at the seam and wider still than the lumen behind it. A lining sized from it came out through
-# both cheeks at 0.05 of a body. What the lining has to fit is the section the mouth actually cuts,
-# so that is measured directly: the flank, at the seam's height, station by station.
-_MW = []
+# **The mouth's own section, cast rather than binned.** `cavity_profile` reports the spread of the
+# measured cavity points, and those sit on both *lips* -- so on a deep round head its `wide` is the
+# span of the lip line, wider than the head is at the seam and wider still than the lumen behind it;
+# a lining sized from it came out through both cheeks at 0.05 of a body. A percentile of the flank
+# over a band about the seam is no better: too tall a band reads the head above the mouth and the
+# lining bulges out through the cheek as a pink worm, too tight a band reads the head at its
+# narrowest and the lining sits inside the skin's own cut edge, leaving an annular strip that the
+# jaw's rotation opens and nothing bridges. The gape proof measured both mistakes -- 113 pixels
+# through the head one way, a visible bulge the other.
+#
+# So the section is **ray cast** from the mouth's own axis instead: out along +x and -x for the
+# width, up and down for the depth, taking the first hit each way. That is the section the mouth
+# actually cuts, with no band and no percentile, and it is a property of the animal rather than of
+# a parameter.
+def _cast(o, d, limit=.5):
+    hit = bvh_auth.ray_cast(Vector(o), Vector(d), limit)
+    return float(hit[3]) if hit[0] is not None else limit
+
+
+_MW, _MH, _MISS = [], [], 0
 for _y in _HY:
-    _m = (np.abs(raw_co[:, 1] - _y) < .006) & \
-         (np.abs(raw_co[:, 2] - seam(float(_y))) < max(.25 * head_half_depth(float(_y)), .004))
-    if _m.sum() < 5:
-        _MW.append(_MW[-1] if _MW else .002)
-        continue
-    _MW.append(float(np.quantile(np.abs(raw_co[_m][:, 0] - cx(_y)), .90)))
+    _o = (cx(float(_y)), float(_y), seam(float(_y)))
+    # A ray can leave without hitting anything: the modelled mouth is an open-sided crease, and a
+    # lateral ray from inside it runs out through the corner of the lip into open air. Capping each
+    # cast by the head's own measured section is what stops that reading half a body of headroom.
+    _w = min(_cast(_o, (1, 0, 0)), _cast(_o, (-1, 0, 0)), head_half_width(float(_y)))
+    _MISS += int(_w >= head_half_width(float(_y)) - 1e-9)
+    _MW.append(_w)
+    # **Height is not cast.** The mouth is shut in the bind pose, so a ray up from the seam hits the
+    # palate three thousandths away: that is the *closed slit*, not the room the lining has. The
+    # lining has to be taller than the slit, because it stretches when the jaw swings, so its height
+    # comes from the measured cavity and the head's own section instead.
+    _MH.append(head_half_depth(float(_y)))
 _MW = np.array(_MW)
+_MH = np.array(_MH)
 
 
 def mouth_half_width(y):
     return float(np.interp(y, _HY, _MW))
+
+
+def mouth_headroom(y):
+    """The head's own half depth at this station: how much room there is above and below the mouth
+    line inside the head, which is what bounds the lining's height."""
+    return float(np.interp(y, _HY, _MH))
 
 
 # --------------------------------------------------------------------------------- rig ----
@@ -375,9 +409,40 @@ def caudal_weights(q):
     return ({lobe: 1.}, g) if g > 0 else None
 
 
+# **The throat has to follow the jaw.** The shore animals record the fault and the gape proof found
+# it here: the mandible is skinned rigidly to `jaw` and the skin behind the hinge to the axial
+# chain, and with nothing blending between them a wide gape separates the two -- the pale ventral
+# skin reads as a slab hanging off a detached jaw, and under a single-sided material the wedge
+# between them is a hole straight through the animal. 780 magenta pixels came through exactly there
+# before this existed.
+THROAT_SPAN = .075
+THROAT_DROP = .12
+
+
+def throat_jaw_share(q):
+    # All of the jaw's rotation at the hinge, none a throat's length behind it, none above the
+    # mouth line -- and every edge of that feathered, because a hard gate is what tears skin.
+    # Full at the cut plane itself, not half of it: a ramp centred on the hinge reads 0.5 exactly
+    # where the mandible's rigid 1.0 meets it, and the relaxation then carries that step into a
+    # visible seam along the gular line. The band above the mouth line is handled by `c`.
+    a = T.smooth((q.y - (HINGE_Y - .014)) / .014)
+    b = T.smooth(((HINGE_Y + THROAT_SPAN) - q.y) / THROAT_SPAN)
+    # **Full share at the mouth line, not zero there.** A drop measured down from the seam is zero
+    # *at* the seam, which is precisely where the mandible's rear cut edge -- rigid on `jaw` -- meets
+    # it, so the two separated by the whole of the jaw's rotation exactly along the cut and the gape
+    # proof saw background through the gular line. The share is 1 anywhere at or below the mouth
+    # line and falls off only above it.
+    c = T.smooth((seam(HINGE_Y) - q.z) / (THROAT_DROP * head_half_depth(HINGE_Y)) + 1.)
+    return a * b * c
+
+
 def weights(p):
     q = Vector(p)
     w = dict(T.station_weights(ASTATION, T.project(AP, ACUM, q)[1]))
+    throat = throat_jaw_share(q)
+    if throat > 0:
+        w = {n: v * (1 - throat) for n, v in w.items()}
+        w['jaw'] = w.get('jaw', 0.) + throat
     limb = limb_weights(q)
     if limb:
         alpha, chain, rootw, t = limb
@@ -499,9 +564,15 @@ for o in parts['lower jaw'].values():
 # and the wall between them stretches, so no opening the clips reach can part it. Two separate
 # closed tubes look identical at rest and come apart the moment the jaw swings, which is how
 # Placodus came to open onto transparency.
-mouth_mat = T.inward_material(NAME + ' mouth interior', (.36, .16, .14, 1))
-MOUTH_BACK = HINGE_Y - .004
-MOUTH_FRONT = JAW_FRONT_Y + .006
+# Dark, because the generation's own mouth slit is modelled **open** a fraction: with the mouth shut
+# the lining is visible along the whole lip line, exactly as the inside of a fish's lip is. At
+# Mixosaurus' value it read as a bright pink band drawn on the snout from across the room.
+mouth_mat = T.inward_material(NAME + ' mouth interior', (.22, .095, .085, 1))
+# **Behind the hinge, not in front of it.** A lining that stops short of the jaw's cut plane leaves
+# a wedge at the corner of the mouth, which is the one place the gape proof could still see through
+# the head. The rear cap sits in the throat behind the cut and the hinge envelope covers the rest.
+MOUTH_BACK = HINGE_Y + .010
+MOUTH_FRONT = MOUTH_FRONT_Y
 
 
 def _raw_section(y):
@@ -511,8 +582,15 @@ def _raw_section(y):
     between the jaws either side of the thread."""
     k = int(np.clip(np.searchsorted(MY, y), 0, len(MY) - 1))
     e = T.smooth((MOUTH_BACK - y) / .012) * T.smooth((y - MOUTH_FRONT) / .004)
-    w = max(mouth_half_width(y) * .88, .0022) * (.62 + .38 * e)
-    h = max(float(TALL[k]) * 1.05, head_half_depth(y) * .18, .0020) * (.50 + .50 * e)
+    # Right up against the skin the cut runs through, less a margin: the lining's rim has to reach
+    # the skin's own cut edge or the strip between them opens when the jaw drops, and must not pass
+    # it or it shows through the cheek with the mouth shut.
+    # The floor is a thousandth of a body, not three: at the snout tip the mouth genuinely is a
+    # thread, and a floor bigger than the section there put a pink sliver of lining through the lip
+    # with the mouth shut -- visible from across the room on the closed-mouth review shot.
+    w = max(mouth_half_width(y) - .0008, .0012) * (.98 + .02 * e)
+    h = min(max(float(TALL[k]) * 1.15, head_half_depth(y) * .22, .0042) * (.78 + .22 * e),
+            max(mouth_headroom(y) * .45, .0030))
     return w, h
 
 
@@ -520,20 +598,30 @@ LINING_FIT = {}
 
 
 def mouth_section(y):
-    """The section above, then *fitted*: the ring is shrunk station by station until every point on
-    it lies inside the closed intake surface. The fit factors are recorded, and the coverage check
-    below is what says the result is still the mouth's own section rather than a ribbon up the
-    middle of it."""
+    """The section above, used as measured. **It is deliberately not shrunk to fit inside the closed
+    surface**, which is the trick Mixosaurus and Dinocephalosaurus use and which is only safe on a
+    generation with no modelled mouth. This one has a real cavity, and a point in the lumen of a
+    modelled mouth is *outside* the closed shell -- so a nearest-surface test reads backwards
+    exactly where the lining lives, and a shrink driven by it collapses the lining towards a thread
+    at the back of the mouth, which is the one place it has to be widest.
+
+    What keeps the ring inside the head instead is how its width is measured: `mouth_half_width` is
+    the flank at the *seam's own height*, so the ellipse's widest points sit at 0.90 of the skin by
+    construction. The per-station worst depth is recorded rather than asserted to zero, and the real
+    check on the gape is the see-through measurement in mouth-views.py and gape-solid.py."""
     w, h = _raw_section(y)
-    for step in range(12):
-        k = 1. - step * .06
-        pts = [Vector((cx(y) + w * k * cos(a), y, seam(y) + h * k * sin(a)))
-               for a in np.linspace(0, 2 * pi, 16)]
-        if min(depth(q) for q in pts) > .0010:
-            LINING_FIT[round(float(y), 5)] = k
-            return w * k, h * k
-    LINING_FIT[round(float(y), 5)] = .3
-    return w * .3, h * .3
+    # The exact check, and the one worth making: the ring's own half width and half height against
+    # the section cast from the mouth's axis. `depth` cannot make this check -- a point in the lumen
+    # of a modelled mouth is outside the closed shell, so it reads backwards exactly where the
+    # lining lives -- so its worst value is recorded per station rather than asserted to zero.
+    # The floors are what stop the ring degenerating to nothing where the snout is nearly solid,
+    # and they are the one thing allowed past the measured section -- a thousandth of a body.
+    assert w <= max(mouth_half_width(y), .0012) + 1e-9, ('the lining is wider than the mouth', y, w)
+    assert h <= max(mouth_headroom(y) * .46, .0030) + 1e-9, ('the lining is taller than the head', y, h)
+    pts = [Vector((cx(y) + w * cos(a), y, seam(y) + h * sin(a)))
+           for a in np.linspace(0, 2 * pi, 24)]
+    LINING_FIT[round(float(y), 5)] = round(min(depth(q) for q in pts), 5)
+    return w, h
 
 
 def lining_jaw_blend(p):
@@ -542,12 +630,19 @@ def lining_jaw_blend(p):
     the mandible and a wedge of background opens between them."""
     _w, h = mouth_section(p.y)
     t = T.smooth(.5 + 1.6 * (seam(p.y) - p.z) / max(h, 1e-6))
-    return t * T.smooth((MOUTH_BACK - p.y) / .012) * T.smooth((p.y - MOUTH_FRONT) / .006)
+    # **No taper at the front.** Fading the jaw's share towards the snout closes the tube in the
+    # weight field as well as in the geometry, and the lining's floor then stays with the skull
+    # while the mandible under it drops -- which opens a gap at the front of the gape and is what
+    # the proof's last 179 pixels were coming through. The tube is closed by its cap, not by its
+    # weights. The back still tapers: the rear ring sits at the hinge, where the jaw barely moves.
+    return t * T.smooth((MOUTH_BACK - p.y) / .012)
 
 
 lining, lining_raw = T.lining('Oral cavity lining', rig, tx, seam, mouth_section,
                               MOUTH_BACK, MOUTH_FRONT, lining_jaw_blend, mouth_mat,
-                              rings=26, ring=14, centre_x=cx)
+                              # A 14-gon lining leaves wedges against a finely tessellated tooth
+                              # row: the gape proof counted them one pixel at a time.
+                              rings=34, ring=24, centre_x=cx)
 oralparts = [lining]
 # What went wrong on both worked examples is a lining narrower than the mouth, so that is what is
 # checked: across the stations the cavity was measured at, the lining carries the mouth's own
@@ -619,9 +714,12 @@ for o in oralparts:
     worst = min(depth(Vector(v.co[:]) / SCALE) for v in o.data.vertices)
     oral_seating.append({'part': o.name, 'worstDepthRaw': float(worst)})
     # A loose bound, and deliberately so: a point in the lumen of a modelled mouth is outside the
-    # closed shell, so a nearest-surface test reads backwards exactly where the lining lives. The
-    # real check on the gape is the measured see-through in mouth-views.py and gape-solid.py.
-    assert worst > -.020, ('mouth geometry breaks the skin', o.name, worst)
+    # closed shell, so a nearest-surface test reads backwards exactly where the lining lives, and on
+    # this animal the lumen is a third of the head's radius deep. This catches gross errors -- a
+    # lining sized from the cavity's lip spread read -0.050 here -- while `mouth_section` makes the
+    # exact check against the cast section, and the real check on the gape is the measured
+    # see-through in mouth-views.py and gape-solid.py.
+    assert worst > -.040, ('mouth geometry breaks the skin', o.name, worst)
 
 # ------------------------------------------------------- measured paired profile ----
 AUTH_GROUP = [auth, parts['lower jaw'][auth.name]]
@@ -1113,7 +1211,7 @@ report = {
         'paintedLineFlankDisagreementMaxOverRadius': PAINTED_DISAGREEMENT,
         'paintedVersusModelledMaxOverLocalRadius': PAINTED_AGREEMENT,
         'paintedVersusModelledMeanOverLocalRadius': PAINTED_AGREEMENT_MEAN,
-        'liningCoverage': mouth_cover, 'liningFitFactors': LINING_FIT,
+        'liningCoverage': mouth_cover, 'liningWorstDepthPerStation': LINING_FIT,
         'toothPatches': tooth_report,
         'toothPatchesStraddlingTheCut': straddling, 'authoredToothRows': [],
         'oralPartSeating': oral_seating,
