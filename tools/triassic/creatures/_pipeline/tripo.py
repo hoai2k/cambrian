@@ -582,7 +582,7 @@ def protrusions(o, y_front, floor=.0034):
 
 
 def lining(name, rig, tx, seam, section, y_back, y_front, jaw_blend, material,
-           rings=24, ring=14, centre_x=None):
+           rings=24, ring=14, centre_x=None, power=2., fit=None):
     """One **skinned** lining on the mouth's own measured section, wound inwards.
 
     Both worked examples shipped two separate closed tubes -- a palate rigid on the skull and a
@@ -591,6 +591,21 @@ def lining(name, rig, tx, seam, section, y_back, y_front, jaw_blend, material,
     wrong for one cut in half, so what showed through that wedge was the far side of the head. Here
     the roof follows the skull, the floor follows the jaw and the wall between them stretches, so
     no opening the clips reach can part it.
+
+    `power` is the section's superellipse exponent, 2 for a plain ellipse. **A mouth's section is
+    not an ellipse**, and on a deep head the difference is a hole: an ellipse narrows towards its
+    poles, so at the height the mandible's rim reaches at full gape the lining is a fraction of the
+    width the mouth is, and the gape shows background down both sides of the jaw. Rhaeticosaurus
+    needed one -- an ellipse narrows towards its floor -- and the bodies built before this option
+    existed keep the ellipse they were measured with.
+
+    `fit`, where a builder supplies it, corrects each ring vertex **on its own**: given the point
+    and its station it returns the point pulled back inside the skin. Shrinking a whole ring by one
+    factor instead couples its two axes, and on a deep head that is a hole -- a floor set deep
+    enough to sit inside the mandible rather than stipple against it took Rhaeticosaurus' *width*
+    down to 0.68 of the mouth's own, the far wall then stopped short of the mandible's rim, and the
+    gape showed background down the jaw line. A per-vertex fit gives the mouth's own section rather
+    than the largest ellipse that fits inside it.
     """
     raw, verts, faces = [], [], []
     # The lining rides the body's **measured** centreline, not the file's x = 0. Three of these
@@ -603,7 +618,14 @@ def lining(name, rig, tx, seam, section, y_back, y_front, jaw_blend, material,
         w, h = section(y)
         for j in range(ring):
             th = j * TAU / ring
-            p = Vector((cxf(y) + w * math.cos(th), y, seam(y) + h * math.sin(th)))
+            c, sn = math.cos(th), math.sin(th)
+            if power != 2.:
+                e = 2. / power
+                c = math.copysign(abs(c) ** e, c)
+                sn = math.copysign(abs(sn) ** e, sn)
+            p = Vector((cxf(y) + w * c, y, seam(y) + h * sn))
+            if fit is not None:
+                p = fit(p, y)
             raw.append(p)
             verts.append(tx(p))
     for i in range(rings - 1):

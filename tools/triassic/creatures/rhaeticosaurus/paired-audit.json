@@ -3,24 +3,24 @@
   "models": [
     {
       "suffix": "",
-      "bytes": 1992484,
-      "sha256": "6109db046d45380f773d355e597439f634b28973b6b02ee7be136be7cf700d49",
-      "triangles": 21080,
-      "vertices": 12240
+      "bytes": 1996152,
+      "sha256": "225bf6c039aa8aa32422c3aa243f8782fe31d7f13825f0c4a0150c67a7b90064",
+      "triangles": 21320,
+      "vertices": 12360
     },
     {
       "suffix": ".puppet",
-      "bytes": 835768,
-      "sha256": "05a48bd9c3f98d2872de117f2b303b33e6391849ad7cfc034d9044ebf06c8e74",
-      "triangles": 7342,
-      "vertices": 3789
+      "bytes": 839428,
+      "sha256": "a590a42eec29464dfe3026401d39c3faf54075aede84b8352311378f3600ef65",
+      "triangles": 7582,
+      "vertices": 3909
     },
     {
       "suffix": ".lod1",
-      "bytes": 835768,
-      "sha256": "05a48bd9c3f98d2872de117f2b303b33e6391849ad7cfc034d9044ebf06c8e74",
-      "triangles": 7342,
-      "vertices": 3789
+      "bytes": 839428,
+      "sha256": "a590a42eec29464dfe3026401d39c3faf54075aede84b8352311378f3600ef65",
+      "triangles": 7582,
+      "vertices": 3909
     }
   ],
   "clips": 23,
@@ -101,7 +101,7 @@
     },
     {
       "name": "Attack",
-      "sha256": "e2941bfc70ab49e0f75e3ce51cf74d08a369bb72a2479793102d15db57de534f"
+      "sha256": "89bf930699bbce3210585d5269faa9ea7e2a0a5b44ac924306074d9f2818b5b7"
     },
     {
       "name": "Bite",
@@ -149,7 +149,7 @@
     },
     {
       "name": "Heavy",
-      "sha256": "58575080745277232b815d4febc35125f2236ad0db3e22417b89d3764b70745b"
+      "sha256": "e6d2ecb89a83be99c3569c31dcc281321f64d0eb13299cc9f535048d49a78760"
     },
     {
       "name": "Hit",
@@ -188,7 +188,7 @@
       "sha256": "1062202d88e97112e9a2696ba391badf017fdbf76e837af5f197d7cb708447f1"
     }
   ],
-  "twinTriangleFraction": 0.34829222011385197,
+  "twinTriangleFraction": 0.3556285178236398,
   "playback": [
     {
       "suffix": "",
@@ -579,16 +579,16 @@
   "strike": [
     {
       "clip": "Attack",
-      "snoutPathLength": 2.875838742953498,
-      "snoutReach": 1.0374165321459663,
+      "snoutPathLength": 2.8720506820850313,
+      "snoutReach": 1.0373150706958856,
       "skullReach": 0.7606289384647856,
       "chestReach": 0.4687970181022528,
       "halfTravelInFractionOfClip": 0.2916666666666667
     },
     {
       "clip": "Heavy",
-      "snoutPathLength": 4.674392492579168,
-      "snoutReach": 1.4335039454731653,
+      "snoutPathLength": 4.666088893817264,
+      "snoutReach": 1.4320640697311824,
       "skullReach": 1.005862244512932,
       "chestReach": 0.4687971698673303,
       "halfTravelInFractionOfClip": 0.2916666666666667
@@ -654,10 +654,10 @@
     },
     {
       "clip": "Attack",
-      "maxOpenRadians": 0.4794822496743988,
+      "maxOpenRadians": 0.42953613462964535,
       "minRadians": -1.1175867342674164e-8,
       "peakPhase": 0.4583333333333333,
-      "mouthSocketTravelInSkullFrame": 0.21846027549027072
+      "mouthSocketTravelInSkullFrame": 0.19607583539500983
     },
     {
       "clip": "Bite",
@@ -668,10 +668,10 @@
     },
     {
       "clip": "Heavy",
-      "maxOpenRadians": 0.6000000974387893,
+      "maxOpenRadians": 0.470000077165886,
       "minRadians": -1.979055905261344e-8,
       "peakPhase": 0.4791666666666667,
-      "mouthSocketTravelInSkullFrame": 0.2718851109235959
+      "mouthSocketTravelInSkullFrame": 0.21422068479161607
     },
     {
       "clip": "Hit",
@@ -810,9 +810,9 @@
     },
     {
       "clip": "Attack",
-      "anchor_mouth": 0.9893804042225427,
-      "anchor_mouth_inside": 0.7671346343168199,
-      "anchor_attack_primary": 1.0374165321459663
+      "anchor_mouth": 0.989712431032863,
+      "anchor_mouth_inside": 0.7670572735129493,
+      "anchor_attack_primary": 1.0373150706958856
     },
     {
       "clip": "Bite",
@@ -822,9 +822,9 @@
     },
     {
       "clip": "Heavy",
-      "anchor_mouth": 1.3353579093886985,
-      "anchor_mouth_inside": 1.0185218943943533,
-      "anchor_attack_primary": 1.4335039454731653
+      "anchor_mouth": 1.3378874391099314,
+      "anchor_mouth_inside": 1.0180820368472896,
+      "anchor_attack_primary": 1.4320640697311824
     },
     {
       "clip": "Hit",

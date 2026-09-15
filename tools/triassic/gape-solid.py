@@ -34,6 +34,16 @@ OUT.mkdir(parents=True, exist_ok=True)
 # A backdrop the animal cannot produce: full-intensity magenta. Every one of these bodies is a brown
 # or grey hide over a dark red mouth, so any magenta pixel inside the silhouette is background seen
 # through the animal.
+#
+# **The test for it has to be the backdrop, not a half-space.** At `r > .5, g < .3, b > .5` it was
+# loose enough to catch the animal: a magenta *world* also lights the scene, and Rhaeticosaurus'
+# oral lining -- (0.30, 0.13, 0.115), the same dark red Mixosaurus ships -- renders under it at
+# (0.73, 0.29, 0.51), inside that window by a hair on green. 394 of the 508 pixels that failed this
+# body at full gape were its own mouth, correctly drawn and correctly front-facing, and no change to
+# the geometry moved the count by a single pixel because the count was never about the geometry. The
+# discriminator is **blue**: the backdrop renders at 0.93 and above, a lit red lining at about half
+# that. Tightening the test can only ever *reduce* a count, so nothing that passed before can fail
+# now, and the flood fill from the frame edge is unaffected because the surround is saturated.
 BACKDROP = (1.0, 0.0, 1.0, 1.0)
 
 
@@ -136,7 +146,7 @@ def enclosed_backdrop(px, w, h):
     """
     def is_bg(i):
         r, g, b = px[i * 4], px[i * 4 + 1], px[i * 4 + 2]
-        return r > .5 and g < .3 and b > .5
+        return r > .75 and g < .45 and b > .75
 
     seen = bytearray(w * h)
     stack = []
@@ -176,7 +186,7 @@ for (clip, t, fa), (_, _, fb) in zip(solid, culled):
                if max(abs(pa[i * 4 + k] - pb_[i * 4 + k]) for k in range(3)) > 0.08)
     def bg(px, i):
         r, g, b = px[i * 4], px[i * 4 + 1], px[i * 4 + 2]
-        return r > .5 and g < .3 and b > .5
+        return r > .75 and g < .45 and b > .75
 
     # A hole is backdrop the cull *opened*: backdrop in the culled pass, body in the solid pass, and
     # not touching backdrop in the solid pass either — that last clause is what throws away the
