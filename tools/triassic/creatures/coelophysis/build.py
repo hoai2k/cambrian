@@ -58,7 +58,9 @@ PUPPET_BUDGET = 7000
 # carry a 141-degree swing. It does not wash the limbs out — the lower-limb region *gains* skin
 # (1369 vertices to 1731), its mean share of its own bones rises from 0.925 to 0.962 and its mean
 # travel in `Run` from 0.594 to 0.636, because the feet follow their own bones where they used to
-# be part trunk.
+# be part trunk. Re-measured after the inter-joint blend was made a fraction of each limb's own
+# segments rather than a constant copied from a flipper, 6 passes still read 6.31x against 14's
+# 4.46x, so the passes are doing work the blend was not hiding.
 RELAX_PASSES = 14
 
 SEED_TAIL = (0, 1, 0)
@@ -506,9 +508,17 @@ RADII = {'fore': (.008, .011, .026, .022), 'hind': (.014, .018, .040, .034)}
 # widened from the kit's 0.022, for the reason Rhaeticosaurus' flipper was.
 LIMB_FITS, LIMB_RADII = [], {}
 for key, (pts, names) in LIMBS.items():
-    limb = K.Limb(pts, names, RADII[key[:4]], .045, AXIAL, blend=.040)
+    # No `blend` here: each joint takes a fraction of the segments it joins. A constant 0.040 was
+    # copied from Rhaeticosaurus' flipper, and on this animal's forelimb — segments of 0.087, 0.046
+    # and 0.036 — that band is wider than two whole segments, which hands every vertex all four
+    # joints at nearly one weight and then has `relax_weights` trim a *different* four on
+    # neighbouring vertices. See `K.Limb`.
+    limb = K.Limb(pts, names, RADII[key[:4]], .045, AXIAL)
     limb.measured, fill = K.measure_radii(auth, limb, t_floor=.48, margin=.010, span=.42)
-    LIMB_RADII[key] = {'rows': [[round(x, 5) for x in r] for r in limb.measured], **fill}
+    LIMB_RADII[key] = {'rows': [[round(x, 5) for x in r] for r in limb.measured],
+                       'jointBlend': [round(b, 5) for b in limb.blend],
+                       'segments': [round(limb.cum[i + 1] - limb.cum[i], 5)
+                                    for i in range(len(limb.cum) - 1)], **fill}
     LIMB_FITS.append(limb)
 print('LIMB_RADII', json.dumps(LIMB_RADII))
 
@@ -574,8 +584,13 @@ bpy.ops.mesh.primitive_uv_sphere_add(segments=12, ring_count=8,
                                      location=tx((HINGE_X - .003, head_y(min(HINGE_X, HX[-1])), hz)))
 hinge = bpy.context.object
 hinge.name = 'Seated jaw hinge tissue'
-hinge.scale = (float(np.interp(MOUTH_BACK, HX, HW)) * .92 * SCALE, .014 * SCALE,
-               max(seam(MOUTH_BACK) - head_lo(MOUTH_BACK), .004) * .62 * SCALE)
+# **Bigger than it was**, and measured rather than left where it started: at 0.92 of the head's
+# width and 0.014 of a body long it left `Heavy` showing 24 px of backdrop through the corner of the
+# mouth, and at 1.10 and 0.030 that shot reads 0. `seat_inside` pulls it back inside the head
+# afterwards, so the cost of asking for too much is nothing and the cost of asking for too little is
+# a hole.
+hinge.scale = (float(np.interp(MOUTH_BACK, HX, HW)) * 1.10 * SCALE, .030 * SCALE,
+               max(seam(MOUTH_BACK) - head_lo(MOUTH_BACK), .004) * .85 * SCALE)
 bpy.ops.object.transform_apply(location=False, rotation=False, scale=True)
 for v in hinge.data.vertices:
     v.co = hinge.matrix_world @ v.co

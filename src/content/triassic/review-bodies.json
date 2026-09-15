@@ -101,8 +101,8 @@
     "model": "assets/triassic/creatures/coelophysis.glb",
     "puppet": "assets/triassic/creatures/coelophysis.puppet.glb",
     "lod": "assets/triassic/creatures/coelophysis.lod1.glb",
-    "bytes": 2167620,
-    "sha256": "9db4839895705268737a92bf0be0cdc81fc9271d25a5d03d15b727df82edfa08",
+    "bytes": 2219984,
+    "sha256": "99f3270a65a1f07cbf10b3d2e93369f1298d0111db6e5a0ea640f281ed9b0994",
     "clips": [
       "Ability",
       "Attack",
@@ -371,8 +371,8 @@
     "model": "assets/triassic/creatures/macrocnemus.glb",
     "puppet": "assets/triassic/creatures/macrocnemus.puppet.glb",
     "lod": "assets/triassic/creatures/macrocnemus.lod1.glb",
-    "bytes": 1943820,
-    "sha256": "92fb11405a4c2905fe38fe9fd5e419297222bafce4f253ee0aba584f82e29ebd",
+    "bytes": 2004572,
+    "sha256": "4980648fe4bded9fc143a79c7faf617807bb66ee63a9997eeebe037aa3868071",
     "clips": [
       "Ability",
       "Attack",
@@ -539,8 +539,8 @@
     "model": "assets/triassic/creatures/saurichthys.glb",
     "puppet": "assets/triassic/creatures/saurichthys.puppet.glb",
     "lod": "assets/triassic/creatures/saurichthys.lod1.glb",
-    "bytes": 1802240,
-    "sha256": "a4a4c88e6c66be2baf132ae932eb9d5a70b0dfd6c79e11a3c3a8d62ed0a07c09",
+    "bytes": 1802244,
+    "sha256": "d18e6f65551eddee06113f07d8f96ead90d6b260481daa988d4c6bdc31e6d993",
     "clips": [
       "Ability",
       "Attack",

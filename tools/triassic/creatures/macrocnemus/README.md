@@ -379,7 +379,7 @@ changed.
 
 | | Before | After |
 | --- | ---: | ---: |
-| Worst **skin** edge, `tools/triassic/skin-tears.mjs` | 23.31x | **2.95x** |
+| Worst **skin** edge, `tools/triassic/skin-tears.mjs` | 23.31x | **2.94x** |
 | Mandible | 74 triangles, a sliver off the snout | **384 triangles**, a lizard's jaw |
 | Jaw hinge, as a fraction of the head's span behind the snout | 0.28 | **0.66** |
 | `gape-solid.py`, backdrop seen through the body at full gape | — (the jaw barely opened) | **0 px**, tolerance 12 |
@@ -470,9 +470,17 @@ whose second arm handed out a flat 1.0, and the distal limb radius is measured o
 `K.measure_radii` rather than authored, the limb being flooded from its tip over the mesh's own
 edges so that the measurement cannot walk into the trunk.
 
-At **2.95x** this is now the cleanest limbed skin in the era after Rhaeticosaurus' 2.81x, ahead of
+And the blend between a limb's joints is a **fraction of that limb's own segments**, not a constant
+copied from another animal: 0.024 and 0.013 at this forelimb's elbow and wrist, where a flipper's
+0.050 would have been a band wider than two whole segments and would have handed every vertex all
+four joints at nearly one weight.
+
+At **2.94x** this is now the cleanest limbed skin in the era after Rhaeticosaurus' 2.81x, ahead of
 Nothosaurus' 2.98x. What remains is `body` against `hind_upper_L` in `Sprint`, an edge going 0.027
 to 0.079 — a thigh fused to a trunk, which is a real blend rather than a gate.
+
+The gape record is [`gape-solid.json`](gape-solid.json): **0 px** through the body on all six shots,
+against a tolerance of 12.
 
 ## What is still open
 

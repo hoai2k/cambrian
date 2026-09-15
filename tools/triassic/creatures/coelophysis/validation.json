@@ -398,7 +398,7 @@
     "SnapLeft": [
       [
         -0.9578274488449097,
-        -3.0134668350219727,
+        -3.040013313293457,
         -1.5815237760543823
       ],
       [
@@ -410,7 +410,7 @@
     "SnapRight": [
       [
         -0.8263967037200928,
-        -2.9564809799194336,
+        -2.9930529594421387,
         -1.5815237760543823
       ],
       [
@@ -485,15 +485,15 @@
   "jawHingeHeadRadius": 0.039531254182781736,
   "headLateralOffset": -0.014340609418346313,
   "jawHingeDepthAsFractionOfHeadRadius": 0.3115909749946572,
-  "oralInteriorDepthRaw": 0.0012080473825335503,
+  "oralInteriorDepthRaw": 0.0012003843439742923,
   "oralSeatingCorrection": {
     "Oral cavity lining": 0.02280637106597714,
     "Upper tooth row": 0.012409905579224844,
     "Lower tooth row": 0.01381744039035736,
-    "Seated jaw hinge tissue": 0.02855093317124204
+    "Seated jaw hinge tissue": 0.03921014786881546
   },
   "maxInfluences": 4,
-  "meanInfluences": 3.6432612570719987,
+  "meanInfluences": 3.602805549097109,
   "trunkYawCorrectionDegrees": -62.116,
   "unbending": {
     "applied": true,
@@ -1750,6 +1750,15 @@
           0.04308
         ]
       ],
+      "jointBlend": [
+        0.016,
+        0.0126
+      ],
+      "segments": [
+        0.08709,
+        0.04571,
+        0.036
+      ],
       "flooded": 428,
       "reach": 0.1191,
       "seedVertex": 2760,
@@ -1782,6 +1791,15 @@
           0.05615,
           0.068
         ]
+      ],
+      "jointBlend": [
+        0.016,
+        0.0126
+      ],
+      "segments": [
+        0.09869,
+        0.04571,
+        0.036
       ],
       "flooded": 332,
       "reach": 0.1119,
@@ -1816,6 +1834,15 @@
           0.08702
         ]
       ],
+      "jointBlend": [
+        0.02671,
+        0.02671
+      ],
+      "segments": [
+        0.17089,
+        0.07632,
+        0.07981
+      ],
       "flooded": 724,
       "reach": 0.1822,
       "seedVertex": 6229,
@@ -1849,6 +1876,15 @@
           0.08508
         ]
       ],
+      "jointBlend": [
+        0.02688,
+        0.02585
+      ],
+      "segments": [
+        0.20325,
+        0.07681,
+        0.07385
+      ],
       "flooded": 787,
       "reach": 0.206,
       "seedVertex": 8075,
@@ -1880,12 +1916,12 @@
     "edges": 33645,
     "bodyLength": 4.897,
     "skin": {
-      "worstRatio": 4.44,
+      "worstRatio": 4.46,
       "clip": "Sprint",
       "bone": "body",
       "grewFrom": 0.0296,
-      "grewTo": 0.1313,
-      "instancesOverTwice": 2637
+      "grewTo": 0.1319,
+      "instancesOverTwice": 2648
     },
     "oralLining": {
       "worstRatio": 9.26,

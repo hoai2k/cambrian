@@ -1,20 +1,19 @@
 {
-  "id": "macrocnemus",
-  "backdrop": [
-    1.0,
-    0.0,
-    1.0,
-    1.0
-  ],
+  "tool": "/opt/blender/blender -b --factory-startup --python tools/triassic/gape-solid.py -- macrocnemus Snatch@0.24 Bite@0.20 Heavy@0.13 Ability@0.53 Attack@0.14 Eat@1.05",
+  "backdropTest": "r > 0.90, g < 0.20, b > 0.90",
+  "pixelsPerFrame": 378000,
+  "tolerance": 12,
+  "maxSeenThroughTheBody": 0,
+  "note": "the cull is the worst case a single-sided renderer would draw; the shipped body material is double-sided. Every shot is clean.",
   "shots": [
     {
       "clip": "Snatch",
       "t": 0.24,
       "pixels": 378000,
       "differingPixels": 12699,
-      "holesOpenedByCulling": 27,
+      "holesOpenedByCulling": 26,
       "seenThroughTheBody": 0,
-      "backdropInBothPasses": 1
+      "backdropInBothPasses": 0
     },
     {
       "clip": "Bite",
@@ -23,7 +22,7 @@
       "differingPixels": 11321,
       "holesOpenedByCulling": 22,
       "seenThroughTheBody": 0,
-      "backdropInBothPasses": 43
+      "backdropInBothPasses": 0
     },
     {
       "clip": "Heavy",
@@ -39,7 +38,7 @@
       "t": 0.53,
       "pixels": 378000,
       "differingPixels": 976,
-      "holesOpenedByCulling": 23,
+      "holesOpenedByCulling": 26,
       "seenThroughTheBody": 0,
       "backdropInBothPasses": 0
     },
@@ -48,20 +47,18 @@
       "t": 0.14,
       "pixels": 378000,
       "differingPixels": 8492,
-      "holesOpenedByCulling": 23,
+      "holesOpenedByCulling": 24,
       "seenThroughTheBody": 0,
-      "backdropInBothPasses": 31
+      "backdropInBothPasses": 0
     },
     {
       "clip": "Eat",
       "t": 1.05,
       "pixels": 378000,
       "differingPixels": 675,
-      "holesOpenedByCulling": 22,
+      "holesOpenedByCulling": 23,
       "seenThroughTheBody": 0,
-      "backdropInBothPasses": 84
+      "backdropInBothPasses": 0
     }
-  ],
-  "tolerance": 12,
-  "note": "Rendered from the packaged body decoded by audit.mjs --decode. The cull shim is the worst case a single-sided renderer would draw; the shipped skin material is double-sided."
+  ]
 }

@@ -71,7 +71,7 @@ import sys
 # how Coelophysis reached 25.25x and Macrocnemus 23.31x while every body using the marine kit sat
 # between 1.4x and 12x. See `tools/triassic/creatures/_pipeline/tripo.py` for the whole argument.
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), '_pipeline'))
-from tripo import relax_weights                                               # noqa: E402,F401
+from tripo import relax_weights, rim_flange, cap_cut                          # noqa: E402,F401
 
 
 # Blender exits 0 when a script raises. In `--background --python` mode the traceback goes to stdout
@@ -661,14 +661,24 @@ class Limb:
     authored figure is never overruled downwards: see `measure_radii` for why.
     """
 
-    def __init__(self, pts, names, radii, seat, axial, blend=.022):
+    def __init__(self, pts, names, radii, seat, axial, blend=None, blend_fraction=.35):
         self.P, self.cum = poly(pts)
         self.names = names
         self.radii = radii
         self.measured = None
         self.seat = seat
-        self.blend = blend
         self.rootw = axial.of(pts[0])
+        # **The blend at a joint is a fraction of the segments that joint joins, never a number.**
+        # A constant copied between animals is the fault that produces radiating spikes and ribboned
+        # feet, and it is not obvious from the code: Rhaeticosaurus' 0.050 is a sixth of a flipper
+        # reaching 0.30 from the axis, and the same figure on a theropod's forelimb — segments of
+        # 0.069, 0.046 and 0.036 — is a band **wider than two whole segments**. `limb_chain` then
+        # hands every vertex all four joints at nearly one weight, that busts the four-influence
+        # budget once the root station is added, and `relax_weights` trims a *different* four on
+        # neighbouring vertices, which is a worse discontinuity than any gate.
+        seg = [self.cum[i + 1] - self.cum[i] for i in range(len(self.cum) - 1)]
+        self.blend = blend if blend is not None else \
+            [max(min(seg[k - 1], seg[k]) * blend_fraction, 1e-4) for k in range(1, len(seg))]
 
     def authored(self, t):
         r = self.radii
@@ -683,17 +693,20 @@ class Limb:
         return rin, rout
 
     def chain(self, s, blend=None):
-        blend = self.blend if blend is None else blend
+        """Which bone of this limb owns arc length `s`, blended over each joint's own width."""
+        b = self.blend if blend is None else blend
+        if not isinstance(b, (list, tuple)):
+            b = [b] * (len(self.names) - 1)
         c = self.cum
         n = self.names
         if len(n) == 3:
-            tl = smooth((s - (c[1] - blend)) / (2 * blend))
-            tp = smooth((s - (c[2] - blend)) / (2 * blend))
+            tl = smooth((s - (c[1] - b[0])) / (2 * b[0]))
+            tp = smooth((s - (c[2] - b[1])) / (2 * b[1]))
             return {n[0]: 1 - tl, n[1]: tl * (1 - tp), n[2]: tl * tp}
         out = {}
         for k in range(len(n)):
-            lo = smooth((s - (c[k] - blend)) / (2 * blend)) if k > 0 else 1.
-            hi = 1 - smooth((s - (c[k + 1] - blend)) / (2 * blend)) if k + 1 < len(c) else 1.
+            lo = smooth((s - (c[k] - b[k - 1])) / (2 * b[k - 1])) if k > 0 else 1.
+            hi = 1 - smooth((s - (c[k + 1] - b[k])) / (2 * b[k])) if k + 1 < len(c) and k < len(b) else 1.
             out[n[k]] = lo * hi
         total = sum(out.values()) or 1.
         return {k: v / total for k, v in out.items()}
@@ -1074,45 +1087,6 @@ def split(obj, label, test, parts):
         bm.free()
     parts.setdefault(label, {})[obj.name] = part
     return part
-
-
-def rim_flange(obj, axis_of, amount):
-    """Fold the open rim of a cut mouth inwards, so the lip is not one polygon thick.
-
-    **A rim with no thickness is a hole to anything looking along it.** Where the mouth is cut, both
-    halves end in a boundary edge, and at a grazing angle that edge *is* the silhouette: the quad
-    the eye meets there is nearly edge-on, and whether its geometry is wound towards the camera or
-    away is decided by a rounding error in the pose. A single-sided pass then drops it and shows the
-    world through the lip. That was the whole of Macrocnemus' residual gape leak — 19 pixels at the
-    mandible's rear rim which four corrections to the lining, two to the hinge plug and a reduction
-    of the gape itself did not move by one, because none of them was about the rim.
-
-    The fold is `extrude_edge_only` along the boundary, with the new ring drawn towards the mouth's
-    own axis. Blender keeps the extrusion's winding consistent with the faces it grew from, so the
-    lip's outer side is the skin's outer side folded inwards, which is what a lip is. It is the
-    "closing a hole is simple and is always fair game" case in `CLAUDE.md`, not a shape invented for
-    the animal: every vertex of it comes from the generation's own rim.
-
-    Returns the number of vertices added.
-    """
-    bm = bmesh.new()
-    bm.from_mesh(obj.data)
-    border = [e for e in bm.edges if len(e.link_faces) == 1]
-    if not border:
-        bm.free()
-        return 0
-    grown = bmesh.ops.extrude_edge_only(bm, edges=border)['geom']
-    added = [g for g in grown if isinstance(g, bmesh.types.BMVert)]
-    for v in added:
-        a = amount(v.co) if callable(amount) else amount
-        d = Vector(axis_of(v.co)) - v.co
-        if a > 0 and d.length > 1e-9:
-            v.co = v.co + d.normalized() * a
-    bm.normal_update()
-    bm.to_mesh(obj.data)
-    obj.data.update()
-    bm.free()
-    return len(added)
 
 
 def oral_lining(name, stations, section, seam, tx, rings=22, ring=14, centre=None, power=2.):

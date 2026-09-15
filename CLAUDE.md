@@ -326,7 +326,26 @@ unless the user explicitly asks for a PR. Steps:
   how Placodus came to open onto transparency. Proving it needs care: render at full gape against a
   saturated backdrop *with and without* a backface-cull shim and compare the two, because comparing
   against the plain background measures the backdrop rather than the gape and passes whatever the
-  mesh does. *The cut*: the jaw seam follows the model's own lip contour rather than running straight
+  mesh does. **And the test for "this pixel is the backdrop" has been too loose twice, the same way
+  both times**: a magenta world lights the animal too, so a half-space catches it. At
+  `r > .5, g < .3, b > .5` it caught Rhaeticosaurus' own lit lining; tightened to
+  `r > .75, g < .45, b > .75` it caught Saurichthys' pale silvery *skin*, which renders at about
+  (0.78, 0.44, 0.76) and sat inside that window by one part in two hundred on green, while the
+  backdrop itself comes back below 0.063 on green in every render this repository has made. It is
+  now `r > .90, g < .20, b > .90`, measured against the backdrop rather than set by eye; across 33
+  shots on 7 bodies nothing went up, Keichousaurus and Henodus went to 0 and Saurichthys 17 px to 3.
+  The tell was the same both times and is worth watching for in any check whose number will not
+  move: **a count that does not move under a correction is a count about something else**, and the
+  way to find out what a failing pixel *is*, is to cast a ray through it and ask every surface on
+  the line rather than keep changing geometry and re-reading renders.
+  Two shapes close a mouth that a lining alone does not. `T.rim_flange` folds the open rim of a cut
+  inwards, because a boundary edge is one polygon thick and at a grazing angle that edge *is* the
+  silhouette — 19 px on Macrocnemus that four corrections to its lining and two to its hinge plug
+  did not move; the fold has to run out before the snout, where the two rims meet round the front of
+  the mouth and folding both of them inwards parts them instead of closing them. `T.cap_cut` closes
+  the cross-section a plane cut leaves through a head, which is the back wall of the mouth and is
+  otherwise simply absent — Coelophysis' `SnapRight` sees straight through it into the neck and is
+  the era's one open gape failure. *The cut*: the jaw seam follows the model's own lip contour rather than running straight
   near it — cast head vertex normals back into the mesh and fit a curve to the hits where a slit is
   modelled (Placodus), and read the lip line off the albedo where none is (Dinocephalosaurus, where
   the first method finds zero vertices). There is a **third** case, found on Keichousaurus: the
@@ -401,10 +420,27 @@ unless the user explicitly asks for a PR. Steps:
   at full gape says only that the mouth opened — Hupehsuchus' 50x is the lining working, not a torn
   head. Two builders split it locally before it was split centrally; the tool now reports both and
   ranks on skin, matching those builders' own figures exactly. True era-wide skin picture:
-  Shonisaurus 1.44x, Keichousaurus 2.34x, Cymbospondylus 2.48x, Nothosaurus 2.98x, Saurichthys
-  3.61x, Mixosaurus 3.62x, Henodus 4.81x, Cartorhynchus 5.17x, Hupehsuchus 5.79x, Hybodus 5.93x,
-  Dinocephalosaurus 7.00x, Helicoprion 11.68x, Placodus 12.36x, Macrocnemus 23.31x, Coelophysis
-  25.25x. The last two are the outstanding repair work.
+  Shonisaurus 1.44x, Keichousaurus 2.34x, Cymbospondylus 2.48x, Rhaeticosaurus 2.81x, Macrocnemus
+  2.94x, Nothosaurus 2.98x, Birgeria 3.46x, Saurichthys 3.61x, Mixosaurus 3.62x, Coelophysis 4.46x,
+  Henodus 4.81x, Cartorhynchus 5.17x, Hupehsuchus 5.79x, Hybodus 5.93x, Dinocephalosaurus 7.00x,
+  Helicoprion 11.68x, Placodus 12.36x. Placodus and Helicoprion are the outstanding repair work:
+  Coelophysis came down from 25.25x and Macrocnemus from 23.31x.
+- **A skin weighting is three things, and the era has now paid for each of them separately.** The
+  *relaxation* — diffusion over the mesh's own edge graph, coupled by inverse edge length, trimmed
+  to four influences every pass, sliver runs welded into one weight set — is the one that stops a
+  gate tearing a skin, and `shorekit` did not have it at all until Coelophysis was repaired, which
+  is the whole reason the three shore animals sat at 25.3x, 23.3x and 6.1x while every body on the
+  marine kit sat between 1.4x and 12x. It is imported into `shorekit` from `_pipeline/tripo.py`
+  rather than copied, so there is one of it. The *radius* inside which a vertex is wholly a limb's
+  is measured rather than authored (`K.measure_radii`), and how it is measured matters: the limb is
+  flooded from its tip over the mesh's own edges and never allowed below an arc position past the
+  knee, because "nearer this limb's polyline than the axial one" puts half the animal in the distal
+  bin — a polyline ends at its last joint and everything past the foot clamps to it — and the belly
+  in the thigh. And the *blend between a limb's joints* is a fraction of that limb's own segments,
+  never a number: Rhaeticosaurus' 0.050 is a sixth of a flipper reaching 0.30 from the axis, and on
+  a theropod's forelimb, whose segments are 0.087, 0.046 and 0.036, the same figure is a band wider
+  than two whole segments — it hands every vertex all four joints at one weight and then has the
+  relaxation trim a *different* four on its neighbours.
 - **A weighting scheme is shaped by the body it was written for.** Nothosaurus' is the era's
   cleanest at 2.98x and the obvious one to copy, and copied unchanged onto Henodus it tore to
   **64.9x** — its "outboard of |y| 0.09 means on the limb" test assumes a narrow trunk, and Henodus'

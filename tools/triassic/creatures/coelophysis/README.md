@@ -349,7 +349,8 @@ limb that goes forward, back and forward again has swept more than its extremes 
 This body shipped at **25.25x** on `tools/triassic/skin-tears.mjs`, the worst in the era: the hind
 feet trailed off in ribbons at gameplay scale, and the builder that made it said so and called it
 not deliverable. It now reads **4.44x**, behind Nothosaurus' 2.98x and Rhaeticosaurus' 2.81x and
-ahead of everything else with limbs. Nothing about the animal changed — same raw generation, same
+ahead of everything else with limbs. A fourth correction, below, moved it to **4.46x**: the same
+figure, and the right way to arrive at it. Nothing about the animal changed — same raw generation, same
 skeleton, same clips, same 20,950 triangles. Three faults in the *weights*, and each was worth a
 different amount:
 
@@ -389,7 +390,8 @@ refuses a fill that spans more than 0.42. The measured foot radius is 0.0739 aga
 and the blend onto the body bones under it is what makes a seated root follow the flank.
 
 **Fourteen relaxation passes, and the number is measured.** Four read 7.01x, eight 5.68x, fourteen
-4.44x. It does not wash the limbs out, which is the thing to check when a diffusion improves a tear
+4.44x — and 6 still read 6.31x after the inter-joint blend was corrected below, so the passes are
+doing work the blend was not hiding. It does not wash the limbs out, which is the thing to check when a diffusion improves a tear
 figure: the lower-limb region *gains* skin (1,369 vertices to 1,731), its mean share of its own
 bones rises from 0.925 to 0.962, and its mean travel in `Run` from 0.594 to 0.636 — the feet follow
 their own bones where they used to be part trunk.
@@ -398,6 +400,63 @@ What is left at 4.44x is the **hip**, `body` against `hind_upper_R` in `Sprint`,
 to 0.131. That is a thigh fused to a trunk carrying a 141° swing, and it is a real blend rather than
 a gate: the era's own floor for a limbed animal is around 3x and this is the hardest-swinging limb
 in it.
+
+## The gape, which this pass measured for the first time and did not wholly fix
+
+`gape-solid.py` had never been run on this animal. Run now, six of seven shots are clean and one is
+not; the record is in [`gape-solid.json`](gape-solid.json).
+
+| shot | jaw | opened by culling | seen through the body |
+| --- | ---: | ---: | ---: |
+| `SnapLeft` @ 0.20 | 32.7° | 94 | 0 |
+| `Bite` @ 0.20 | 29.8° | 87 | 0 |
+| `Heavy` @ 0.13 | 28.1° | 90 | 0 |
+| `Ability` @ 0.53 | 25.9° | 882 | 0 |
+| `Eat` @ 0.70 | — | 1,378 | 0 |
+| `Attack` @ 0.35 | — | 48 | 0 |
+| **`SnapRight` @ 0.20** | 32.7° | 2,704 | **2,505** |
+
+**`SnapRight` is a pre-existing defect, not one this pass made.** The body as it shipped reads
+**2,496** on the same shot under the same tool; this build reads 2,505, and `Heavy` went from 24 to
+0 along the way because the hinge plug was enlarged.
+
+What it is, as far as measurement goes: a line of sight enters the open gape and leaves through the
+**neck**. A ray cast through the failing pixels meets exactly one surface on the whole line, in
+either direction, back-facing, and the polygons it meets are weighted `neck_04` and `neck_05` —
+0.035 of a body *behind* the hinge. In the solid pass those pixels render as the unlit inside of a
+far wall, (28, 17, 10) and (4, 0, 1); under the cull they are the backdrop exactly. So it is real
+geometry, and it is the throat: the plane cut at the hinge opens the head across its whole section,
+the mandible is taken out of it, and behind the lumen there is nothing between the mouth and the
+inside of the neck.
+
+`SnapLeft` is the mirror clip at the same jaw angle and reads 0, because the two turn the head
+opposite ways and the proof frames itself off the jaw — only one of them looks down that line.
+
+Six corrections were tried and **not one moved the count by more than a hundred pixels**, which is
+the tell the tool's own header warns about:
+
+| tried | `SnapRight` |
+| --- | ---: |
+| as shipped | 2,496 |
+| the lining's floor made to follow the mandible outright, no taper at either end | 2,526 |
+| a lip folded onto both cut rims (`rim_flange`) | 1,837 |
+| the lumen dropped onto its own axis and deepened to fill the mandible | 1,835 |
+| the lumen rebuilt as a wide thin slot cast at the mouth line, squircle section | 2,411 |
+| a fan cap across the cut's rear cross-section (`cap_cut`) | 2,411 |
+| the hinge plug enlarged 1.10 × 0.030 × 0.85 | 2,505 |
+| the strike's gape capped at 0.44 rad, below `Bite`'s | 2,883 (worse) |
+
+Two of those are kept because they are right in themselves and cost nothing: the bigger hinge plug,
+which cleared `Heavy`, and `K.rim_flange` and `K.cap_cut` in the kit, which cleared Macrocnemus
+outright. The rest were reverted, because a change that does not move the number it was made for is
+a change to defend later for no reason.
+
+What is left to try, for whoever picks this up: the throat wants a **back wall** rather than a plug,
+and closing it properly means splitting the cut half's single boundary loop — which runs forward
+along the mouth line, round the snout and back across at the hinge — into an aperture and a rear
+arc, and capping only the arc. `K.cap_cut` fans the run of the boundary that lies behind the hinge,
+and on this body it took 65 faces and still did not close the line; the run it finds is not the
+whole arc. Getting that right is a bounded piece of work and it is the next thing to do here.
 
 ## What is still open
 
@@ -410,6 +469,10 @@ in it.
   lesson is that a monotonic change to the luminance is not neutral here — the seam is the split
   that maximises a difference of means, which no curve leaves alone.
 
+- **`SnapRight` shows 2,505 pixels of backdrop through the throat under a backface cull**, and the
+  section above has the whole measurement and the eight things that did not fix it. It is
+  pre-existing — the shipped body reads 2,496 on the same shot — and it is the outstanding work on
+  this animal now that the skinning is repaired.
 - **The hands are the twin's weak point** (see the measurements above): 1.4 % of authored vertices
   are more than 3 % of body length from the twin, all of them in the arms and fingers.
 - **The forelimb chain is the least certain measurement in this build.** The hindlimbs and the tail

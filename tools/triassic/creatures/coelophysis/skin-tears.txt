@@ -1,14 +1,14 @@
 
 public/assets/triassic/creatures/coelophysis.glb   33645 edges x 17 phases x 29 clips
 clip            skin  on bone             all     >2x  worst bones
-Sprint         4.44x  body              4.44x     966  0.030->0.131  hind_upper_R:490 body:220 hind_upper_L:219 tail_00:37
-Run            4.32x  hind_upper_R      4.32x     516  0.020->0.087  hind_upper_R:276 body:109 skull:68 hind_upper_L:41
-Retreat        3.98x  hind_upper_R      3.98x     176  0.020->0.080  hind_upper_R:102 body:40 skull:24 hind_upper_L:7
-Swim           3.77x  body              3.77x     426  0.030->0.111  hind_upper_R:242 body:104 hind_upper_L:72 tail_00:8
-Charge         3.74x  hind_upper_R      4.74x     263  0.020->0.075  hind_upper_R:92 skull:79 jaw:51 body:37
-SnapRight      2.89x  body              9.26x     737  0.030->0.085  skull:260 jaw:249 neck_04:138 chest:33
-SnapLeft       2.86x  body              9.26x     760  0.030->0.085  skull:260 jaw:249 neck_04:154 chest:40
-Crawl          2.68x  hind_upper_R      2.68x      32  0.031->0.083  hind_upper_R:28 body:4
+Sprint         4.46x  body              4.46x     960  0.030->0.132  hind_upper_R:488 body:220 hind_upper_L:215 tail_00:37
+Run            4.32x  hind_upper_R      4.32x     523  0.020->0.087  hind_upper_R:278 body:109 skull:68 hind_upper_L:46
+Retreat        3.99x  hind_upper_R      3.99x     174  0.020->0.080  hind_upper_R:102 body:40 skull:24 hind_upper_L:5
+Swim           3.78x  body              3.78x     426  0.030->0.112  hind_upper_R:244 body:103 hind_upper_L:72 tail_00:7
+Charge         3.74x  hind_upper_R      4.74x     271  0.020->0.075  hind_upper_R:98 skull:79 jaw:51 body:39
+SnapRight      2.95x  body              9.26x     738  0.030->0.087  skull:260 jaw:249 neck_04:138 hind_upper_R:33
+SnapLeft       2.93x  body              9.26x     762  0.030->0.086  skull:260 jaw:249 neck_04:154 chest:40
+Crawl          2.68x  hind_upper_R      2.68x      33  0.031->0.083  hind_upper_R:29 body:4
 Death          2.03x  hind_upper_R      4.73x     177  0.037->0.075  skull:95 jaw:81 hind_upper_R:1
 Eat            1.97x  neck_04           6.79x     458  0.053->0.105  jaw:246 skull:212
 Heavy          1.84x  neck_04           7.78x     169  0.053->0.098  jaw:86 skull:83
@@ -19,4 +19,4 @@ Bite           1.40x  neck_04           8.55x     613  0.053->0.074  skull:314 j
 Breath         1.05x  hind_upper_R      2.67x      29  0.080->0.084  skull:29
 Grab           1.04x  skull             5.10x     538  0.083->0.087  jaw:281 skull:257
 17 of 29 clips tear an edge past 2x
-worst SKIN 4.44x · worst including the oral lining 9.26x (the lining is a sac built to stretch; the skin figure is the one to judge)
+worst SKIN 4.46x · worst including the oral lining 9.26x (the lining is a sac built to stretch; the skin figure is the one to judge)

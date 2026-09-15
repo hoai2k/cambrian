@@ -2,22 +2,22 @@
   "models": [
     {
       "suffix": "",
-      "bytes": 2004440,
-      "sha256": "329704a2dab4315a822c0813681d00862bbb0281b82d7601e8bfd0f17d84b6e0",
+      "bytes": 2004572,
+      "sha256": "4980648fe4bded9fc143a79c7faf617807bb66ee63a9997eeebe037aa3868071",
       "triangles": 21720,
       "vertices": 13058
     },
     {
       "suffix": ".puppet",
-      "bytes": 1498028,
-      "sha256": "2a042c9517fd5bf965736a485f0fe23c540830bb0761ef61cda7cf1001e93d30",
+      "bytes": 1497648,
+      "sha256": "6bd1871024707bbed0f7be5c9e8a3f128476ef05d197e8f5373b18ccf8cfc95f",
       "triangles": 8466,
       "vertices": 4380
     },
     {
       "suffix": ".lod1",
-      "bytes": 1498028,
-      "sha256": "2a042c9517fd5bf965736a485f0fe23c540830bb0761ef61cda7cf1001e93d30",
+      "bytes": 1497648,
+      "sha256": "6bd1871024707bbed0f7be5c9e8a3f128476ef05d197e8f5373b18ccf8cfc95f",
       "triangles": 8466,
       "vertices": 4380
     }
@@ -235,7 +235,7 @@
           "clip": "Crawl",
           "duration": 1.399999976158142,
           "samples": 61,
-          "maxVertexTravel": 0.7248563860666706
+          "maxVertexTravel": 0.7270543248179276
         },
         {
           "clip": "Death",
@@ -319,7 +319,7 @@
           "clip": "Run",
           "duration": 0.6333333253860474,
           "samples": 61,
-          "maxVertexTravel": 1.5389948206949173
+          "maxVertexTravel": 1.54109082979924
         },
         {
           "clip": "Snatch",

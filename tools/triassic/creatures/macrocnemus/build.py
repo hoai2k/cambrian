@@ -636,9 +636,14 @@ RADII = {'fore': (.010, .013, .030, .026), 'hind': (.012, .016, .036, .030)}
 # the limb, and on this body a lower limb is about a sixth of it across.
 LIMB_FITS, LIMB_RADII = [], {}
 for key, (pts, names) in LIMBS.items():
-    limb = K.Limb(pts, names, RADII[key[:4]], .045, AXIAL, blend=.040)
+    # No `blend` here: each joint takes a fraction of the segments it joins, never a constant copied
+    # from another animal's limb. See `K.Limb`.
+    limb = K.Limb(pts, names, RADII[key[:4]], .045, AXIAL)
     limb.measured, fill = K.measure_radii(auth, limb, t_floor=.48, margin=.010, span=.36)
-    LIMB_RADII[key] = {'rows': [[round(x, 5) for x in r] for r in limb.measured], **fill}
+    LIMB_RADII[key] = {'rows': [[round(x, 5) for x in r] for r in limb.measured],
+                       'jointBlend': [round(b, 5) for b in limb.blend],
+                       'segments': [round(limb.cum[i + 1] - limb.cum[i], 5)
+                                    for i in range(len(limb.cum) - 1)], **fill}
     LIMB_FITS.append(limb)
 print('LIMB_RADII', json.dumps(LIMB_RADII))
 
