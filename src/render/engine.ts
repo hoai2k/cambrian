@@ -2,7 +2,7 @@ import { ACTIVE_ERA } from '../content';
 import { BURROWERS, hideLabel } from '../sim/concealment';
 import * as THREE from 'three';
 import { audio, SAMPLES } from '../audio/audio';
-import { distanceAtten, HUGE_LENGTH } from '../audio/mix';
+import { distanceAtten, hugeLength } from '../audio/mix';
 import { applyMouse, emptyControls, gamepads, KeyboardInput, MouseLook, readGamepad, rumble, type RawControls } from '../input/input';
 import { clamp, damp, TAU, wrapAngle } from '../shared/math';
 import { bandOf, comingFor, isAlive, isHidden, lengthOf } from '../sim/actors';
@@ -1183,7 +1183,7 @@ export class Engine {
       const heavy = (kind: string, id: number | undefined) => {
         const a = id != null ? game.byId(id) : undefined;
         const big = `${kind}-huge`;
-        return a && lengthOf(a) >= HUGE_LENGTH && SAMPLES[big] ? big : kind;
+        return a && lengthOf(a) >= hugeLength() && SAMPLES[big] ? big : kind;
       };
       switch (e.kind) {
         case 'hit': {
