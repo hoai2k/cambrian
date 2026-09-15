@@ -1,14 +1,5 @@
 [
   {
-    "id": "aphaneramma",
-    "model": "assets/triassic/creatures/aphaneramma.preview.glb",
-    "bytes": 1307736,
-    "sha256": "60fcca79756c6321a395ee551c518abd46f965caac043817ef1089601f8a73f6",
-    "yaw": 180,
-    "scale": 5.18,
-    "lengthUnits": 5.18
-  },
-  {
     "id": "archelon",
     "model": "assets/triassic/creatures/archelon.preview.glb",
     "bytes": 921768,
@@ -61,15 +52,6 @@
     "yaw": 270,
     "scale": 16.42,
     "lengthUnits": 16.42
-  },
-  {
-    "id": "mystriosuchus",
-    "model": "assets/triassic/creatures/mystriosuchus.preview.glb",
-    "bytes": 1531012,
-    "sha256": "0877e8939be9e024aa3c8788ad70f43790993d8fb357dc05d3db8fb8ab24c361",
-    "yaw": 180,
-    "scale": 8.57,
-    "lengthUnits": 8.57
   },
   {
     "id": "odontochelys",
