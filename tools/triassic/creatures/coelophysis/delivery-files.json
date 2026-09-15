@@ -8,16 +8,16 @@
     ]
   },
   "coelophysis.glb": {
-    "bytes": 2167312,
-    "sha256": "738ad0047905e1b9948468f5f0533be32791241b38ef174784f066bc88bea968"
+    "bytes": 2220320,
+    "sha256": "938606e2ff9d64b6d9a79ac723cb86be4c94d4b8cad4929039164697b68b2843"
   },
   "coelophysis.json": {
     "bytes": 2803,
     "sha256": "ec22e865ea63f64ac0f829c5e3891a8e6d854838d2d8554b2fb3a6dc7d253cc6"
   },
   "coelophysis.lod1.glb": {
-    "bytes": 1715620,
-    "sha256": "cd91d658740b40be0e41536cee80e255cb59c34abf5630691b66b73839419fb4"
+    "bytes": 1730068,
+    "sha256": "e20bc090a83b705fe23f27b5e05b7544ef4c8334fb86cc987a2c427207765e7d"
   },
   "coelophysis.png": {
     "bytes": 484423,
@@ -28,8 +28,8 @@
     ]
   },
   "coelophysis.puppet.glb": {
-    "bytes": 1715620,
-    "sha256": "cd91d658740b40be0e41536cee80e255cb59c34abf5630691b66b73839419fb4"
+    "bytes": 1730068,
+    "sha256": "e20bc090a83b705fe23f27b5e05b7544ef4c8334fb86cc987a2c427207765e7d"
   },
   "coelophysis.puppet.png": {
     "bytes": 448484,

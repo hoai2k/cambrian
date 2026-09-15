@@ -63,6 +63,16 @@ import os
 import struct
 import sys
 
+# `relax_weights` is not copied here, it is *the* one from the marine kit. It is the single thing
+# that stops a gate tearing a skin -- diffusion over the mesh's own edge graph coupled by inverse
+# edge length, trimmed to four influences every pass, with sliver runs welded into one weight set --
+# and two implementations of it would drift apart exactly where a builder could least afford it.
+# The shore animals were built before it existed and were bound straight off their gates; that is
+# how Coelophysis reached 25.25x and Macrocnemus 23.31x while every body using the marine kit sat
+# between 1.4x and 12x. See `tools/triassic/creatures/_pipeline/tripo.py` for the whole argument.
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), '_pipeline'))
+from tripo import relax_weights                                               # noqa: E402,F401
+
 
 # Blender exits 0 when a script raises. In `--background --python` mode the traceback goes to stdout
 # and the process still reports success, so a chain that checks exit codes calls a failed build a
@@ -643,16 +653,37 @@ class AxialChain:
 
 
 class Limb:
-    """One appendage as its own root→…→tip polyline with a radius that widens toward the foot."""
+    """One appendage as its own root→…→tip polyline with a radius that widens toward the foot.
 
-    def __init__(self, pts, names, radii, seat, axial):
+    `radii` is the authored quadratic `(r_in0, r_in1, r_out0, r_out1)` — the radius as `r0 + r1·t²`.
+    `measured`, once `measure_radii` has read the distal limb off the body, is a list of
+    `(t, r_in, r_out)` rows that **widens** that quadratic where the limb is out in the open. The
+    authored figure is never overruled downwards: see `measure_radii` for why.
+    """
+
+    def __init__(self, pts, names, radii, seat, axial, blend=.022):
         self.P, self.cum = poly(pts)
         self.names = names
-        self.radii = radii             # (r_in0, r_in1, r_out0, r_out1)
+        self.radii = radii
+        self.measured = None
         self.seat = seat
+        self.blend = blend
         self.rootw = axial.of(pts[0])
 
-    def chain(self, s, blend=.022):
+    def authored(self, t):
+        r = self.radii
+        return r[0] + r[1] * t * t, r[2] + r[3] * t * t
+
+    def radius(self, t):
+        rin, rout = self.authored(t)
+        if self.measured:
+            ts = [row[0] for row in self.measured]
+            rin = max(rin, float(np.interp(t, ts, [row[1] for row in self.measured])))
+            rout = max(rout, float(np.interp(t, ts, [row[2] for row in self.measured])))
+        return rin, rout
+
+    def chain(self, s, blend=None):
+        blend = self.blend if blend is None else blend
         c = self.cum
         n = self.names
         if len(n) == 3:
@@ -666,6 +697,98 @@ class Limb:
             out[n[k]] = lo * hi
         total = sum(out.values()) or 1.
         return {k: v / total for k, v in out.items()}
+
+
+def measure_radii(obj, limb, t_floor=.5, bins=4, inner=.99, outer=.999, margin=.018,
+                  fade=.15, span=.65):
+    """Measure, off the body itself, the radius inside which a vertex is wholly this limb's.
+
+    **A radius guessed for a paddle is wrong for anything that swings.** The kit's fins take a
+    percentile of a blade's own distances as the inner radius and blend from there out; the marine
+    kit shipped the **55th**, which leaves nearly half the blade on a partial alpha. On a fin that
+    steers nobody notices. On Rhaeticosaurus' flippers, sweeping 130°, the relaxation then spread
+    *trunk* weight right out along the blade and `skin-tears.mjs` read 7.9x; the **92nd** percentile
+    took it to 2.81x, the cleanest skin in the era. **A running biped swings harder than anything**,
+    and Coelophysis' authored `(.014, .018, .040, .034)` hind radius left its toes carrying
+    `hind_foot_L = 0.565` against `tail_00 = 0.298` and `body = 0.137` — 44 % of a *toe* on the
+    trunk, which is why its feet trailed off in ribbons at 13.6x even after the weights were relaxed.
+
+    **What the limb is, is found by walking the mesh, not by a distance test.** Rhaeticosaurus could
+    take the percentile over a flipper's own vertex cluster because a thin-shell clustering had
+    already said which vertices those were. Here there is no cluster, and the obvious substitute —
+    "nearer this limb's polyline than the axial one" — is wrong in two ways at once. A limb polyline
+    ends at its last joint, so everything past the foot projects to that one point with its arc
+    length clamped, and half the animal lands in the distal bin: measured that way Coelophysis' foot
+    radius read 0.22 of a body, three times the leg's own thickness. And proximally the trunk is
+    nearer the thigh's line than the spine's, so the belly joins the thigh.
+
+    So the limb is **flooded** from its tip over the mesh's own edges, never letting the arc position
+    fall below `t_floor`, which is past the knee. The fill stops where the limb meets the body
+    because that is where `t` drops, and it cannot reach the other leg or the tail because neither is
+    joined to the foot inside that region. `span` asserts that what came back is limb-sized: a fill
+    whose bounding box is more than that fraction of the body has leaked, and the build should stop
+    rather than skin a trunk onto a foot.
+
+    Because the flood *is* the segmentation, `inner` is near the top of it rather than at the 92nd
+    percentile the marine kit takes over a cluster. A percentile leaves the outermost tenth of the
+    limb on a partial alpha, and on a blade that steers nobody notices; on a theropod's splayed toes
+    that tenth is the part that swings furthest, and at the 92nd they still came out
+    `hind_foot_R = 0.62` against `body = 0.37` — an 11.19x tear. Nothing in that bin but the limb is
+    inside the radius anyway: at `t_floor` and beyond, the flood has already said what is there.
+
+    Below the flood the authored radius stands, and that is deliberate. Proximally a limb *is* fused
+    to the trunk, the root is seated inside it, and the blend onto the body bones under it is what
+    makes a seated root follow the flank. The measurement only ever widens, and only out in the open.
+
+    Returns the `(t, r_in, r_out)` rows `Limb.radius` interpolates, and a record of the fill.
+    """
+    P, cum, total = limb.P, limb.cum, limb.cum[-1]
+    verts = obj.data.vertices
+    dist = np.empty(len(verts))
+    tpos = np.empty(len(verts))
+    for v in verts:
+        d, s = project(P, cum, Vector(v.co))
+        dist[v.index] = d
+        tpos[v.index] = s / total
+    tip = Vector(P[-1])
+    seed = min(range(len(verts)), key=lambda i: (Vector(verts[i].co) - tip).length)
+    adj = [[] for _ in verts]
+    for e in obj.data.edges:
+        a, b = e.vertices
+        adj[a].append(b)
+        adj[b].append(a)
+    seen = {seed}
+    stack = [seed]
+    while stack:
+        i = stack.pop()
+        for j in adj[i]:
+            if j in seen or tpos[j] < t_floor:
+                continue
+            seen.add(j)
+            stack.append(j)
+    fill = np.array(sorted(seen))
+    assert len(fill) > 40, ('nothing flooded from this limb tip', limb.names, len(fill))
+    box = np.array([verts[int(i)].co[:] for i in fill])
+    reach = float((box.max(axis=0) - box.min(axis=0)).max())
+    assert reach < span, ('the limb flood leaked out of the limb', limb.names, reach, span)
+    rows = []
+    for b in range(bins):
+        t0 = t_floor + (1. - t_floor) * b / bins
+        t1 = t_floor + (1. - t_floor) * (b + 1) / bins
+        m = fill[(tpos[fill] >= t0) & (tpos[fill] < (t1 if b + 1 < bins else 1.0001))]
+        if len(m) < 12:
+            continue
+        d = dist[m]
+        rows.append([(t0 + t1) / 2, float(np.quantile(d, inner)), float(np.quantile(d, outer))])
+    assert rows, ('the limb flood filled no bin', limb.names, len(fill))
+    for r in rows:
+        r[2] = max(r[2] + margin, r[1] * 1.10)
+    # The authored radius at the station just inside the flood, so the interpolation ramps onto the
+    # measurement rather than stepping onto it.
+    t_hand = max(0., rows[0][0] - fade)
+    rows.insert(0, [t_hand, *limb.authored(t_hand)])
+    return [tuple(r) for r in rows], {'flooded': int(len(fill)), 'reach': round(reach, 4),
+                                      'seedVertex': int(seed), 'tFloor': t_floor}
 
 
 def skin_weights(q, axial, limbs, extra=None):
@@ -682,9 +805,7 @@ def skin_weights(q, axial, limbs, extra=None):
     for limb in limbs:
         dist, s = project(limb.P, limb.cum, v)
         t = s / limb.cum[-1]
-        r = limb.radii
-        rin = r[0] + r[1] * t * t
-        rout = r[2] + r[3] * t * t
+        rin, rout = limb.radius(t)
         if dist >= rout:
             continue
         alpha = (1. if dist <= rin else smooth(1 - (dist - rin) / (rout - rin))) * smooth(s / limb.seat)
@@ -1061,12 +1182,25 @@ def build_armature(bones, tx, name, rigname):
     return rig
 
 
-def bind(obj, rig, bones, weightfn, tx, influences):
-    """Weight, carry into engine space and bind. Raw coordinates are gone after this."""
+def bind(obj, rig, bones, weightfn, tx, influences, passes=4, hold=.45):
+    """Weight, relax over the surface, carry into engine space and bind.
+
+    The relaxation is not a polish step, it is the load-bearing half. `weightfn` is a stack of
+    gates -- a radius round a limb polyline, a height off the axis, an arc position -- and a gate
+    always has an edge: two vertices a hundredth of a body apart land on opposite sides of one and
+    the skin between them is asked to span the difference between two bones. Bound straight off the
+    gates, this kit's three animals read 25.25x, 23.31x and 5.0x on `tools/triassic/skin-tears.mjs`
+    while every body on the marine kit, which has always relaxed, sat far below that.
+
+    Raw coordinates are gone after this, so the diffusion runs first: it couples by inverse edge
+    length, which is measured in whatever units `obj` is currently in.
+    """
     for n in bones:
         obj.vertex_groups.new(name=n)
+    relaxed = relax_weights(obj, [weightfn(v.co) for v in obj.data.vertices],
+                            passes=passes, hold=hold)
     for v in obj.data.vertices:
-        w = weightfn(v.co)
+        w = relaxed[v.index]
         influences.append(len(w))
         for n, val in w.items():
             obj.vertex_groups[n].add([v.index], val, 'REPLACE')

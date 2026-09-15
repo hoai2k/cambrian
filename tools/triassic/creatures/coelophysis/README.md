@@ -344,6 +344,61 @@ limb that goes forward, back and forward again has swept more than its extremes 
 
 `Charge` is the dash down into the shallows and is where it bears.
 
+## The skinning, which was the blocking defect and is not any more
+
+This body shipped at **25.25x** on `tools/triassic/skin-tears.mjs`, the worst in the era: the hind
+feet trailed off in ribbons at gameplay scale, and the builder that made it said so and called it
+not deliverable. It now reads **4.44x**, behind Nothosaurus' 2.98x and Rhaeticosaurus' 2.81x and
+ahead of everything else with limbs. Nothing about the animal changed — same raw generation, same
+skeleton, same clips, same 20,950 triangles. Three faults in the *weights*, and each was worth a
+different amount:
+
+| | Worst skin edge | What it was |
+| --- | ---: | --- |
+| As shipped | 25.25x | |
+| Feather the gates, relax the weights | 13.59x | `trunk_pullback` handed out `pull = 1.0` flat |
+| Measure the limb radius | 11.19x → 7.01x | the toes were on a partial alpha |
+| Relax harder | **4.44x** | the hip is a real blend and wants a longer ramp |
+
+**The gate that cost the most was one line.** `trunk_pullback` pulls shoulder geometry the neck's
+arc claims back onto `chest`, and it was three hard tests — behind the shoulder, *and* either wider
+than 0.034 or more than 0.055 off the spine. The second arm of that `or` gave `pull = 1.0` with no
+ramp at all, so a vertex 0.0551 off the spine went wholly to `chest` while its neighbour a
+hundredth away at 0.0549 kept `neck_04` entire. That pair *is* the 25.25x edge: 0.019 to 0.480 in
+`SnapRight`, one edge spanning a tenth of the animal, with 165 more edges across the skin carrying
+a full 2.0 of weight difference. Every gate is a product of slopes now.
+
+**`shorekit` did not relax its weights at all, and the marine kit always has.** That is the whole
+reason the three shore animals sat at 25.3x, 23.3x and 6.1x while every body built on
+`_pipeline/tripo.py` sat between 1.4x and 12x. `K.bind` now runs the marine kit's own
+`relax_weights` — imported, not copied — so there is one implementation of the thing that stops a
+gate tearing a skin.
+
+**The radius was written for a paddle.** The authored hind radius `(.014, .018, .040, .034)` left
+the toes carrying `hind_foot_L = 0.565` against `tail_00 = 0.298` and `body = 0.137`: 44 % of a toe
+on the trunk. `K.measure_radii` reads it off the body instead — and the part worth keeping is
+*how*, because the obvious membership test is wrong in two ways at once. A limb polyline ends at
+its last joint, so everything past the foot projects to that one point with its arc length clamped
+and lands in the distal bin; measured that way this leg's foot radius read 0.22 of a body, three
+times the leg's own thickness. And proximally the trunk is nearer the thigh's line than the
+spine's, so the belly joins the thigh. The limb is therefore **flooded from its tip over the mesh's
+own edges**, never letting the arc position drop below `t_floor = 0.48`, which is past the knee:
+724 vertices on the left leg spanning 0.18 of a body, 787 on the right spanning 0.21, and the build
+refuses a fill that spans more than 0.42. The measured foot radius is 0.0739 against the authored
+0.0437, and the proximal radius is left authored on purpose — there a limb *is* fused to the trunk
+and the blend onto the body bones under it is what makes a seated root follow the flank.
+
+**Fourteen relaxation passes, and the number is measured.** Four read 7.01x, eight 5.68x, fourteen
+4.44x. It does not wash the limbs out, which is the thing to check when a diffusion improves a tear
+figure: the lower-limb region *gains* skin (1,369 vertices to 1,731), its mean share of its own
+bones rises from 0.925 to 0.962, and its mean travel in `Run` from 0.594 to 0.636 — the feet follow
+their own bones where they used to be part trunk.
+
+What is left at 4.44x is the **hip**, `body` against `hind_upper_R` in `Sprint`, an edge going 0.030
+to 0.131. That is a thigh fused to a trunk carrying a 141° swing, and it is a real blend rather than
+a gate: the era's own floor for a limbed animal is around 3x and this is the hardest-swinging limb
+in it.
+
 ## What is still open
 
 - **Its builder briefly stopped running mid-pass, and the reason is worth keeping.** `build.py`
@@ -354,39 +409,6 @@ limb that goes forward, back and forward again has swept more than its extremes 
   assertion was right and the sampler was wrong. The kit's header note has the whole story, and the
   lesson is that a monotonic change to the luminance is not neutral here — the seam is the split
   that maximises a difference of means, which no curve leaves alone.
-
-- **The limb skinning tears, and this is the blocking defect on this animal.** A running theropod is
-  the hardest case in the set and it fails: the hind feet trail off in ribbons and the skull shears
-  into a flat blade in the strike. It is visible in the sheets at gameplay scale, not only close up.
-
-  `node tools/triassic/skin-tears.mjs public/assets/triassic/creatures/coelophysis.glb` sweeps every
-  clip at 17 phases and compares each triangle edge against its rest length. Twenty-eight of
-  twenty-nine clips tear an edge past 2x. `SnapLeft` and `SnapRight` are the worst at **25x**, with
-  about 16,500 torn edge-instances across the phases and a single edge going from 0.019 to 0.573 —
-  on a body 4.90 long, one edge spanning an eighth of the whole animal. `Run`, `Sprint`, `Swim`,
-  `Charge` and `Retreat` are all over 9x and all dominated by `hind_foot_L`, `hind_foot_R`, `body`
-  and `chest`.
-
-  Swept across the era it is **not** a regression in this kit and **not** inherent to the pipeline.
-  Nothosaurus peaks at 2.98x with 29 torn edges and is essentially clean; Dinocephalosaurus' 56.8x
-  is twelve *tiny* oral edges (0.002 to 0.086) and is clean in effect; Placodus — delivered and
-  reviewed long before these three — tears at 12.4x in its paddles. So the pipeline can produce
-  intact limb skinning, this did not start here, and what decides it is how hard an animal swings a
-  limb. That makes it a fixable fault in the limb weighting rather than a property of Tripo bodies.
-
-  The paired audit does not catch this and could not: it plays 61 phases of every clip through the
-  real loader and mixer and checks where every skinned vertex *is* — travel from rest, bounds,
-  envelopes — and travel from rest stays bounded the whole time. No vertex moves more than 15 % of
-  body length even while the foot it belongs to is pulled inside out. What is wrong is not where the
-  vertices are but how far apart they are from each other. That instrument is new, it is in the
-  repository as `tools/triassic/skin-tears.mjs`, and it is not yet wired into any audit because the
-  right threshold per animal is a judgement a reviewer should make rather than one to bake in
-  unlooked-at.
-
-  The fault is in the shared limb skinning (`skin_weights` and `Limb` in `shorekit.py`), not in the
-  clips: the clips ask for ordinary limb swings and the weights do not hold the geometry together
-  through them. This rule does not stand in the way of fixing it — no part of the answer involves
-  modelling anything.
 
 - **The hands are the twin's weak point** (see the measurements above): 1.4 % of authored vertices
   are more than 3 % of body length from the twin, all of them in the arms and fingers.
