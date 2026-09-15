@@ -12,6 +12,8 @@ import { CheckIcon, ChevronDown, Emblem, KeyboardIcon, PadIcon } from './icons';
 import { appBase } from '../shared/base';
 import { btn, fillControls, key, type Scheme } from '../shared/controls';
 import { fillOf, ladderName, rungOf } from '../sim/ladder';
+import { gridColumns, rosterGrid, sameSlot, type ExtraId, type Slot } from './roster-grid';
+import { ERA_NAME, type EraId } from '../content/visitors';
 
 interface Props {
   players: PlayerSetup[]; mode: Mode; modes: Mode[]; modeInfo: Record<Mode, { name: string; blurb: string; players: string }>;
@@ -27,6 +29,14 @@ interface Props {
   onPick: (i: number, c: CreatureId) => void; onReady: (i: number) => void; onRemove: (i: number) => void;
   onMode: (m: Mode) => void; onStart: () => void; onBack: () => void;
   onCarry: (i: number) => void;
+  /** The buttons in the grid beside the creatures, in the order they stand. */
+  extras: ExtraId[];
+  /** Press one of them, for the seat that is on it. */
+  onExtra: (i: number, id: ExtraId) => void;
+  /** How many animals this device has earned from the other games. */
+  visitorCount: number;
+  /** Which game a visitor is from, for the crew card. */
+  visitorEra?: (id: CreatureId) => EraId | undefined;
 }
 
 /**
@@ -169,14 +179,19 @@ function FitName({ name }: { name: string }) {
 }
 
 const stat = (v: number, max: number) => Math.round((v / max) * 5);
+export { gridColumns };
 const ASSETS = appBase();
 
-/** Grid columns: three rows at most, so 21 creatures sit in 7 x 3 and 8 sit in 4 x 2. */
-export const gridColumns = (n: number) => Math.max(4, Math.ceil(n / 3));
+/** What each of the grid's buttons says. Short, because the tile is smaller than a card. */
+const EXTRA_LABEL: Record<ExtraId, { name: string; glyph: string; title: string }> = {
+  random: { name: 'Random', glyph: '?', title: 'Random · pick a creature for me' },
+  visitors: { name: 'Visitors', glyph: '★', title: 'Visitors · animals you have taken to the top in the other games' },
+};
 
 export function SelectScreen(p: Props) {
   const s = p.scheme;
-  const cols = gridColumns(CREATURES.length);
+  const grid = rosterGrid(CREATURES.map((c) => c.id), p.extras);
+  const cols = grid.cols;
   const compact = p.players.length >= 3;
   // Controllers the game can see that have not joined yet, and joined players whose controller
   // has since gone away (an Xbox pad that went to sleep looks exactly like an unplugged one).
@@ -203,7 +218,7 @@ export function SelectScreen(p: Props) {
         {/* ---- roster grid ---- */}
         <div className={`roster-grid ${cols >= 6 ? 'dense' : ''}`} role="listbox" aria-label="Creatures" style={{ ['--cols' as string]: cols }}>
           {CREATURES.map((c) => {
-            const hovering = p.players.map((pl, i) => ({ pl, i })).filter(({ pl }) => pl.creature === c.id);
+            const hovering = p.players.map((pl, i) => ({ pl, i })).filter(({ pl }) => !pl.cursor && pl.creature === c.id);
             const lockedBy = hovering.filter(({ pl }) => pl.ready);
             const cls = ['cell', hovering.length ? 'hover' : '', lockedBy.length ? 'locked' : ''].join(' ');
             return (
@@ -218,6 +233,29 @@ export function SelectScreen(p: Props) {
                   {hovering.map(({ i, pl }) => <i key={i} style={{ ['--c' as string]: PLAYER_COLORS[i], ['--k' as string]: i }} className={pl.ready ? 'ring locked' : 'ring'} />)}
                 </span>
                 {lockedBy.map(({ i }) => <span key={'b' + i} className="lock-badge" style={{ background: PLAYER_COLORS[i] }}>P{i + 1}</span>)}
+              </button>
+            );
+          })}
+          {/* The grid's buttons. Placed from the same model the cursor walks, at the column that
+              model puts them in — right-aligned under the last card column, on the final row where
+              it has room and on a row of their own where it has not, so the roster's own alignment
+              never moves. Smaller than a card, because they are not animals. */}
+          {grid.cells.filter((c) => c.slot.kind === 'extra').map(({ slot, row, col }) => {
+            const id = slot.id as ExtraId;
+            const on = p.players.map((pl, i) => ({ pl, i })).filter(({ pl }) => pl.cursor === id);
+            const label = EXTRA_LABEL[id];
+            return (
+              <button key={id} role="option" aria-selected={on.length > 0}
+                className={`cell extra extra-${id} ${on.length ? 'hover' : ''}`}
+                style={{ gridColumn: col + 1, gridRow: `span 3`, ['--c' as string]: on.length ? PLAYER_COLORS[on[0].i] : 'var(--foam)', ['--extra-row' as string]: row }}
+                onClick={() => { const i = p.players.findIndex((pl) => !pl.ready && typeof pl.device === 'string'); p.onExtra(i >= 0 ? i : 0, id); }}
+                title={label.title} aria-label={label.title}>
+                <span className="extra-glyph" aria-hidden="true">{label.glyph}</span>
+                <span className="extra-name">{label.name}</span>
+                {id === 'visitors' && p.visitorCount > 0 && <span className="extra-count">{p.visitorCount}</span>}
+                <span className="cell-rings">
+                  {on.map(({ i }) => <i key={i} style={{ ['--c' as string]: PLAYER_COLORS[i], ['--k' as string]: i }} className="ring" />)}
+                </span>
               </button>
             );
           })}
@@ -241,14 +279,23 @@ export function SelectScreen(p: Props) {
                   <button className="remove" aria-label={`Remove player ${i + 1}`} onClick={() => p.onRemove(i)}>×</button>
                 </div>
                 <div className="hero">
-                  <CreaturePortrait key={def.id} creatureId={def.id} kind="select" assetBase={ASSETS} alt={`${def.name} reconstruction`} draggable={false} />
+                  {/* A seat drawn in another palette because it is the second on this creature shows
+                      that palette here, so a player knows which animal in the water is theirs before
+                      the match starts. Falls back to the authored render where no portrait has been
+                      baked for the scheme, which is most of them. */}
+                  <CreaturePortrait key={`${def.id}:${pl.scheme ?? ''}`} creatureId={def.id} kind="select" schemeId={pl.scheme} assetBase={ASSETS} alt={`${def.name} reconstruction`} draggable={false} />
                 </div>
                 <CopyBox>
                   <span className="role">{def.ground ? 'SEAFLOOR' : 'SWIMMER'} · {def.role}</span>
                   <h2>{def.name}</h2>
                   <small className="provenance">{def.kind && <b className="kind">{def.kind}</b>}{def.species} · {def.provenance ?? def.locality ?? 'Burgess Shale'}{cm != null && <> · <b className="real-size">{cm} cm</b></>}</small>
                   <p className="tagline">{def.tagline}</p>
-                  <BestRun mark={p.best[def.id]} carrying={!!p.carry[i]} rise={p.mode === 'rise'} scheme={s} onToggle={() => p.onCarry(i)} />
+                  {/* A visitor is not this game's animal and does not carry this game's record, so
+                      the growth badge has nothing to say about it. What it says instead is where the
+                      animal is from and how to look through the others you have earned. */}
+                  {pl.visitorScale
+                    ? <p className="visitor-note"><b>VISITOR</b> · {ERA_NAME[(p.visitorEra?.(pl.creature) ?? 'devonian')]} · left / right for the others</p>
+                    : <BestRun mark={p.best[def.id]} carrying={!!p.carry[i]} rise={p.mode === 'rise'} scheme={s} onToggle={() => p.onCarry(i)} />}
                   {!compact && (
                     <>
                       <div className="stats">

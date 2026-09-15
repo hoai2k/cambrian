@@ -42,3 +42,29 @@ sit at the upper lip when closed and show in Bite and Attack; the eye larger and
 anchors moved to the new snout tip. Packaging exact round-trip PASS at 139,544 / 39,064 triangles;
 intake PASS; portraits from the V2 build. `build.py` still reproduces V1. The user accepted the
 study on 12 September; badge cleared.
+
+## Front dentition and a taller snout — 15 September 2026
+
+The four large tusks a side stood on a narrow crescent tube arching through the mouth, and it held
+their bases .07 above the mouth line. Read from outside that was teeth on a connector rather than
+teeth in a jaw; read with the mouth shut, three of the four came out through the roof of the
+snout, ivory tips standing where a nose would be. They are now the lower jaw's own front teeth:
+`TUSKS` seats each one on the jaw's own inner surface (`jawInner`, the same expression the oral
+grid uses, so a tooth seated there is in the tissue rather than beside it) inside the marginal
+row, with the crowns unchanged in height and lean and the first tube sample buried so the crown
+grows out of the gum. The crescent is gone, and with it the two `whorl` bones and the interpreted
+4° adjustment they carried — the tusks are rigid with the jaw, which is all the evidence supports
+(whorl movement during feeding is disputed within Andrews et al.).
+
+Making room was two changes. The palate's paired receiving recesses either side of the median
+ridge (Campbell & Barwick figure 8) carry forward and out to cover the new stations (`palate`),
+and its ceiling now follows the snout's own skin `ORAL_WALL` below it rather than a flat `z+up`: a
+recess this deep measured against a flat ceiling walks out through the side of the rostrum, where
+the skin has already curved away — tried, and it put the palate 0.11 outside the snout at
+y=−2.47. The snout's roof rose .055 over the rostrum and .035 at the brow (`HEAD`'s third column),
+which `docs/reference/Onychodus.jpg` shows over the tusks anyway.
+
+That the closed mouth actually holds them is an assertion in the builder, not a look: each crown
+is swept at twelve points against the palate directly over it and against the palate's lateral
+reach at that station. `validation.json` records the result — `oralClearanceClosed` 0.0460 and
+`tuskLateralRoom` 0.1122. Packaging exact round-trip PASS at 136,624 / 38,246 triangles; 23 bones.

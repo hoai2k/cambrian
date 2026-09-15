@@ -28,7 +28,7 @@ SETS = {
 for sheet, names in SETS.items():
     w, h = 360, 280
     cols = 2 if len(names) < 4 else 4
-    rows = (len(names) * 2 + cols - 1) // cols
+    rows = (len(names) + cols - 1) // cols
     img = Image.new('RGB', (w * cols, h * rows), (26, 30, 36))
     d = ImageDraw.Draw(img)
     for i, n in enumerate(names):
@@ -37,17 +37,38 @@ for sheet, names in SETS.items():
             assert p.exists(), p
             src = Image.open(p).convert('RGBA')
             src.thumbnail((w, h - 26))
-            index = i * 2 + j
+            index = i
             x, y = (index % cols) * w, (index // cols) * h
             img.paste(src, (x + (w - src.width) // 2, y + 24), src)
             d.text((x + 8, y + 7), kind + ' / ' + n, fill='white')
     img.save(dest / (sheet + '.jpg'), quality=92)
     print('wrote', sheet + '.jpg', img.size)
 
-# The whorl was rebuilt after a reviewer read the delivered one as holes and inconsistent shape,
-# and that is a judgement by eye, so the before and after stand side by side. The "before" frames
-# are the previous delivery's, kept in `local/triassic-authoring/helicoprion/whorl-before/`; they
-# cannot be re-rendered once the body has changed, so the sheet is only rebuilt while they exist.
+# The same whorl under its generated albedo and under one flat material. A reviewer read the
+# delivered whorl as "holes and inconsistent shape"; measured on the surface rather than on its
+# 382 vertices the geometry is a solid spiral saw, and this pair is why: the dark ragged blotches
+# are painted into the Tripo texture, and the shape under them is clean.
+after = base / 'authored-review'
+MATERIAL = ['whorl-side-Idle-0', 'whorl-side-Bite-0.25', 'whorl-side-Attack-0.4',
+            'whorl-3q-Idle-0', 'whorl-3q-Bite-0.25', 'whorl-3q-Attack-0.4']
+if all((after / (n + '.png')).exists() and (after / ('flat-' + n + '.png')).exists()
+       for n in MATERIAL):
+    w, h = 400, 400
+    img = Image.new('RGB', (w * len(MATERIAL), h * 2), (26, 30, 36))
+    d = ImageDraw.Draw(img)
+    for i, n in enumerate(MATERIAL):
+        for j, (kind, prefix) in enumerate([('generated albedo', ''), ('one flat material', 'flat-')]):
+            src = Image.open(after / (prefix + n + '.png')).convert('RGBA')
+            src.thumbnail((w, h - 26))
+            img.paste(src, (i * w + (w - src.width) // 2, j * h + 24), src)
+            d.text((i * w + 8, j * h + 7), kind + ' / ' + n, fill='white')
+    img.save(dest / 'whorl-albedo.jpg', quality=90)
+    print('wrote whorl-albedo.jpg', img.size)
+
+# The record of the authored coil that was built and then rejected on sight: the generation's own
+# whorl above, the logarithmic coil that briefly replaced it below. The coil is reverted and the
+# frames cannot be re-rendered, so this sheet is only rebuilt while both folders exist; the file
+# it wrote is kept in the directory as the reason that route is closed.
 before = base / 'whorl-before'
 after = base / 'authored-review'
 PAIRS = ['whorl-side-Idle-0', 'whorl-side-Bite-0.25', 'whorl-side-Attack-0.4',
@@ -57,12 +78,13 @@ if before.is_dir() and all((before / (n + '.png')).exists() for n in PAIRS):
     img = Image.new('RGB', (w * len(PAIRS), h * 2), (26, 30, 36))
     d = ImageDraw.Draw(img)
     for i, n in enumerate(PAIRS):
-        for j, (kind, folder) in enumerate([('before', before), ('after', after)]):
+        for j, (kind, folder) in enumerate([("the generation's whorl", before),
+                                            ('the authored coil, rejected', after)]):
             p = folder / (n + '.png')
             assert p.exists(), p
             src = Image.open(p).convert('RGBA')
             src.thumbnail((w, h - 26))
             img.paste(src, (i * w + (w - src.width) // 2, j * h + 24), src)
             d.text((i * w + 8, j * h + 7), kind + ' / ' + n, fill='white')
-    img.save(dest / 'whorl-before-after.jpg', quality=90)
-    print('wrote whorl-before-after.jpg', img.size)
+    img.save(dest / 'whorl-coil-rejected.jpg', quality=90)
+    print('wrote whorl-coil-rejected.jpg', img.size)

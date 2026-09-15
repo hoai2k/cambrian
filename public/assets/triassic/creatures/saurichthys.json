@@ -1,0 +1,64 @@
+{
+  "id": "saurichthys",
+  "name": "Saurichthys",
+  "species": "S. curionii",
+  "provenance": "Middle Triassic \u00b7 Meride Limestone and Besano Formation, Monte San Giorgio",
+  "description": "Needle-bodied ambush fish with a long rostrum, opposed dorsal and anal fins set far back and a near-symmetric caudal. The worked Tripo body and a measured procedural volume twin share one armature, one set of inverse binds, one set of sockets and one set of actions.",
+  "modelLength": 5.0,
+  "lengthMeters": 1,
+  "locomotion": "Swim",
+  "clips": [
+    "Idle",
+    "Swim",
+    "Sprint",
+    "TurnLeft",
+    "TurnRight",
+    "Dive",
+    "Rise",
+    "Attack",
+    "Bite",
+    "Heavy",
+    "Hit",
+    "Death",
+    "Guard",
+    "Parry",
+    "Dodge",
+    "Eat",
+    "Stagger",
+    "Ability",
+    "Grab",
+    "Breath",
+    "Growth",
+    "FastStart",
+    "Hover"
+  ],
+  "looping": [
+    "Idle",
+    "Swim",
+    "Sprint",
+    "Guard",
+    "Eat",
+    "Grab",
+    "Hover"
+  ],
+  "anchors": [
+    "anchor_mouth",
+    "anchor_mouth_inside",
+    "anchor_attack_primary"
+  ],
+  "puppet": "saurichthys.puppet.glb",
+  "sources": [
+    "docs/triassic/canonical/saurichthys.png",
+    "tools/triassic/creatures/saurichthys/saurichthys.preview.glb",
+    "tools/triassic/creatures/saurichthys/tripo-raw/saurichthys.raw.glb"
+  ],
+  "notes": [
+    "The straightest body in the set: its own centreline measures 1.04 of its straight chord, so intake mostly levels the animal rather than unbending it. Which end is the head is decided by the modelled mouth, because the rostrum measures as thin as the caudal fin.",
+    "An ambush fish, not a cruiser: the swim is small and stiff, the burst is a C-start that unloads into a dash, and the paired fins clamp to the flank for it. Hover is the passive the roster names -- hanging motionless with only the fins sculling.",
+    "The lower jaw is cut out of the generation's own skin along its own measured mouth line. The teeth are the generation's and are not replaced.",
+    "The only authored surface is the oral lining: one skinned sac that closes the gape, taking its UVs from the skin around it and wearing the body's own albedo.",
+    "The twin resurfaces a voxel occupancy field of the authored body, relaxes it and reduces the new topology. It reuses no source vertex or face.",
+    "Breath is gill ventilation held in place, not a surface breath: this animal has gills and never goes up. FastStart is the roster's ambush surge at its own longer duration and is a deliberately different performance from Attack, not the same clip twice.",
+    "Living colours, soft tissue and movement are artistic reconstruction. Travel, the live birth the roster gives this animal and the grip rules remain engine-owned."
+  ]
+}

@@ -18,10 +18,15 @@ import { exportRecording, recordingPhase, resetRecording, startRecording, stopRe
 import { atMain, cycle, groupsFor, stops, type Focus, type FocusGroup } from './focus-ring';
 import { rectsOf, step as spatialStep, type Dir } from './spatial-nav';
 import { gridColumns, SelectScreen } from './Select';
+import { gridStep, rosterGrid, sameSlot, type ExtraId, type Slot } from './roster-grid';
+import { earnedVisitorsHere, type EraId, type Visitor } from '../content/visitors';
+import { registerVisitorAssets } from '../content/asset-paths';
+import { admitVisitors } from '../sim/creatures';
 import { TitleScreen } from './Title';
 import { Toolbar } from './Toolbar';
 import { toolbarPlace } from './toolbar-place';
 import { menuScheme } from '../shared/controls';
+import { assignSeatSchemes } from '../shared/seat-schemes';
 import { freshCursor, menuPress, MENU_LOCKOUT, type MenuCursor, type MenuEvent } from './menu-cursor';
 
 export type Screen = 'title' | 'select' | 'playing' | 'results';
@@ -153,6 +158,27 @@ export function App() {
   const [carry, setCarry] = useState<boolean[]>([]);
   const carryRef = useRef<boolean[]>([]);
   /**
+   * The buttons in the pick grid beside the creatures. Random is always there; Visitors only where
+   * this device has taken something to the top in another game. Held in a ref as well as state
+   * because the cursor maths runs from callbacks that must see the current grid, and the grid the
+   * cursor walks has to be the grid that is drawn.
+   */
+  /**
+   * Animals earned in the other games, read off this device's other records. Empty until something
+   * has been taken to the top somewhere else, which is when the Visitors button appears at all.
+   */
+  const visitors = useMemo(() => earnedVisitorsHere(ACTIVE_ERA.id as EraId), []);
+  useEffect(() => {
+    if (!visitors.length) return;
+    admitVisitors(visitors.map((v) => v.def));
+    registerVisitorAssets(visitors.map((v) => ({ id: v.id, era: v.era })));
+  }, [visitors]);
+  const extras = useMemo<ExtraId[]>(() => (visitors.length ? ['random', 'visitors'] : ['random']), [visitors]);
+  const extrasRef = useRef<ExtraId[]>(extras);
+  extrasRef.current = extras;
+  const visitorsRef = useRef<Visitor[]>(visitors);
+  visitorsRef.current = visitors;
+  /**
    * What this match has added to the record, so the results screen can mark it new.
    *
    * It has to be accumulated as it happens rather than worked out at the end. The record is
@@ -165,7 +191,15 @@ export function App() {
   const clearFresh = useCallback(() => { freshRef.current = emptyCodex(); setFresh(freshRef.current); }, []);
   const setCarryBoth = useCallback((c: boolean[]) => { carryRef.current = c; setCarry(c); }, []);
 
-  const updatePlayers = useCallback((p: PlayerSetup[]) => { playersRef.current = p; setPlayers(p); }, []);
+  /**
+   * Every change to the lineup goes through here, which is why the seats' colours are settled here
+   * too: two players on the same animal have to be told apart, and the one place that knows the
+   * whole lineup is the one place that can say which of them is the duplicate.
+   */
+  const updatePlayers = useCallback((p: PlayerSetup[]) => {
+    const settled = assignSeatSchemes(p, Math.random);
+    playersRef.current = settled; setPlayers(settled);
+  }, []);
   /**
    * Fold what a match finds into the record as it finds it — biomes swum through, landmarks come
    * across, species taken to the top, growth marks moved.
@@ -205,6 +239,10 @@ export function App() {
       onProgress: (p) => setProgress(p),
     });
     engineRef.current = engine;
+    // Visitors stream like anything else. Queued here rather than where they are registered,
+    // because the queue builds its URLs from `assetPaths` and there is no queue to add them to
+    // until the engine exists.
+    for (const v of visitorsRef.current) engine.assets.addVisitor(v.id);
     engine.setLook(settings.lookSpeed, settings.invertY);
     return () => { engine.dispose(); engineRef.current = null; };
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -435,25 +473,38 @@ export function App() {
    * that row every horizontal press landed back on the creature you were already on. The default
    * pick sat there, which made the first thing a Devonian player ever pressed do nothing.
    *
-   * So left and right walk the roster itself and always move, wrapping at the ends; up and down
-   * move by a row and clamp into a short one. Both are what a grid of tiles is expected to do,
-   * and neither can be a no-op.
+   * So left and right walk the grid itself and always move, wrapping at the ends; up and down move
+   * by a row and land on the nearest column that is occupied. Both are what a grid of tiles is
+   * expected to do, and neither can be a no-op.
+   *
+   * The grid also holds buttons now — Random, and Visitors where the player has earned one — so
+   * this walks a *model* of the layout (src/app/roster-grid.ts) rather than indexing the roster.
+   * A button has a position and no index in the creature list, and arithmetic over the roster
+   * would put the cursor on one tile while another lit up.
    */
   const moveCursor = useCallback((index: number, dx: number, dy: number) => {
     const ps = [...playersRef.current];
-    const p = ps[index]; if (!p || p.ready) return;
-    const n = CREATURES.length, cols = gridColumns(n), rows = Math.ceil(n / cols);
-    const i = CREATURE_IDS.indexOf(p.creature);
-    if (i < 0 || n === 0) return;
-    let j = i;
-    if (dx) j = (i + dx + n) % n;
-    if (dy) {
-      const r = (Math.floor(j / cols) + dy + rows) % rows;
-      const rowLength = Math.min(cols, n - r * cols);
-      j = r * cols + Math.min(j % cols, rowLength - 1);
+    const p = ps[index]; if (!p) return;
+    // A seat that has taken the Visitors button is locked in on purpose, and left and right walk
+    // the animals it has earned rather than the grid behind them. This is the one place a locked
+    // seat still answers the stick.
+    if (p.cursor === 'visitors' && p.ready) {
+      const list = visitorsRef.current;
+      if (!list.length || !dx) return;
+      const at = Math.max(0, list.findIndex((v) => v.id === p.creature));
+      const v = list[(at + dx + list.length) % list.length];
+      ps[index] = { ...p, creature: v.id as CreatureId, visitorScale: v.scale };
+      updatePlayers(ps); audio.play('ui-move');
+      return;
     }
-    if (j === i || j < 0 || j >= n) return;
-    ps[index] = { ...p, creature: CREATURE_IDS[j] };
+    if (p.ready) return;
+    const model = rosterGrid(CREATURE_IDS, extrasRef.current);
+    const from: Slot = p.cursor ? { kind: 'extra', id: p.cursor } : { kind: 'creature', id: p.creature };
+    const to = gridStep(model, from, dx, dy);
+    if (sameSlot(to, from)) return;
+    ps[index] = to.kind === 'extra'
+      ? { ...p, cursor: to.id }
+      : { ...p, cursor: undefined, creature: to.id as CreatureId };
     updatePlayers(ps); audio.play('ui-move');
   }, [updatePlayers]);
   const cycleCreature = useCallback((index: number, dir: number) => moveCursor(index, dir, 0), [moveCursor]);
@@ -462,9 +513,52 @@ export function App() {
     ps[index] = { ...ps[index], creature: c }; updatePlayers(ps); audio.play('ui-move');
   }, [updatePlayers]);
   const toggleReady = useCallback((index: number) => {
-    const ps = [...playersRef.current]; if (!ps[index]) return;
-    ps[index] = { ...ps[index], ready: !ps[index].ready }; updatePlayers(ps); audio.play(ps[index].ready ? 'ui-confirm' : 'ui-back');
+    const ps = [...playersRef.current]; const p = ps[index]; if (!p) return;
+    const ready = !p.ready;
+    // Letting go of a visitor hands the local roster back: the seat keeps an animal this sea has,
+    // rather than a foreign body it is no longer locked in on.
+    ps[index] = ready || !p.visitorScale
+      ? { ...p, ready }
+      : { ...p, ready, visitorScale: undefined, cursor: undefined, creature: ACTIVE_ERA.defaults.player };
+    updatePlayers(ps); audio.play(ready ? 'ui-confirm' : 'ui-back');
   }, [updatePlayers]);
+  /**
+   * Take whatever the cursor is on. On a creature that is locking in, which is what confirm has
+   * always meant here; on one of the grid's buttons it is pressing the button.
+   *
+   * Random hands you a creature and leaves the cursor on it rather than locking in as well: it is
+   * an answer to "I don't mind", not a commitment, and a player who dislikes the roll should be
+   * able to press it again or walk away from it.
+   */
+  const activate = useCallback((index: number) => {
+    const ps = [...playersRef.current];
+    const p = ps[index]; if (!p) return;
+    if (p.cursor === 'random' && !p.ready) {
+      const pool = CREATURE_IDS.filter((id) => id !== p.creature);
+      const pick = (pool.length ? pool : CREATURE_IDS)[Math.floor(Math.random() * (pool.length || CREATURE_IDS.length))];
+      ps[index] = { ...p, cursor: undefined, creature: pick };
+      updatePlayers(ps); audio.play('ui-confirm');
+      return;
+    }
+    if (p.cursor === 'visitors' && !p.ready) {
+      const v = visitorsRef.current[0];
+      if (v) {
+        ps[index] = { ...p, creature: v.id as CreatureId, visitorScale: v.scale, ready: true };
+        updatePlayers(ps); audio.play('ui-confirm');
+        return;
+      }
+    }
+    if (p.ready) startMatch(); else toggleReady(index);
+  }, [startMatch, toggleReady, updatePlayers]);
+  /** A pointer press on one of the grid's buttons: put that seat's cursor on it, then take it. */
+  const pressExtra = useCallback((index: number, id: ExtraId) => {
+    const ps = [...playersRef.current];
+    const p = ps[index]; if (!p || p.ready) return;
+    ps[index] = { ...p, cursor: id };
+    playersRef.current = ps;
+    updatePlayers(ps);
+    activate(index);
+  }, [activate, updatePlayers]);
   /**
    * Start as a hatchling, or carry on from the furthest this creature has been taken in Rise.
    *
@@ -575,7 +669,7 @@ export function App() {
             const lastRep = repeat.get(gp.index) ?? 0;
             if (dx || dy) { moveCursor(idx, dx, dy); repeat.set(gp.index, now); }
             else if ((stickX || stickY) && now - lastRep > 240) { moveCursor(idx, stickX, stickY); repeat.set(gp.index, now); }
-            if (just('confirm')) { if (ps[idx].ready) startMatch(); else toggleReady(idx); }
+            if (just('confirm')) activate(idx);
             if (just('back')) { if (ps[idx].ready) toggleReady(idx); else removePlayer(idx); }
             if (just('menu')) startMatch();
             // Hatch, or carry on from your record. On `light` — X — because it is the one attack
@@ -632,7 +726,7 @@ export function App() {
     // padIndices is deliberately not a dependency: it is written from inside this loop, and
     // listing it would tear the loop down and rebuild it every time a pad connects, losing the
     // button edges held in `prev`.
-  }, [addPlayer, changeMode, menuInput, moveCursor, openDialog, removePlayer, setPausedBoth, startFromTitle, startMatch, toggleCarry, toggleReady]);
+  }, [activate, addPlayer, changeMode, menuInput, moveCursor, openDialog, removePlayer, setPausedBoth, startFromTitle, startMatch, toggleCarry, toggleReady]);
 
   // ---- Keyboard menu navigation ----
   useEffect(() => {
@@ -649,7 +743,7 @@ export function App() {
           if (e.code === 'ArrowLeft' || e.code === 'KeyA') moveCursor(idx, -1, 0);
           if (e.code === 'ArrowDown' || e.code === 'KeyS') moveCursor(idx, 0, 1);
           if (e.code === 'ArrowUp' || e.code === 'KeyW') moveCursor(idx, 0, -1);
-          if (e.code === 'Space' || e.code === 'Enter') { e.preventDefault(); if (ps[idx].ready) startMatch(); else toggleReady(idx); }
+          if (e.code === 'Space' || e.code === 'Enter') { e.preventDefault(); activate(idx); }
           if (e.code === 'Escape') { if (ps[idx].ready) toggleReady(idx); else backToTitle(); }
           // The keyboard's own way to the same choice the pad makes with Y.
           if (e.code === 'KeyC') toggleCarry(idx);
@@ -683,7 +777,7 @@ export function App() {
     };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
-  }, [addKeyboard, backToTitle, changeMode, menuInput, moveCursor, openDialog, setPausedBoth, startFromTitle, startMatch, toggleCarry, toggleReady]);
+  }, [activate, addKeyboard, backToTitle, changeMode, menuInput, moveCursor, openDialog, setPausedBoth, startFromTitle, startMatch, toggleCarry, toggleReady]);
 
   // Idle-time preloading: tell the loader what is most likely to be needed next.
   useEffect(() => {
@@ -824,6 +918,8 @@ export function App() {
           players={players} mode={mode} modes={MODES} modeInfo={modeInfo} allReady={allReady} padIndices={padIndices}
           scheme={scheme}
           best={best} carry={carry} modeFocus={focus.group === 'modes' ? focus.index : -1}
+          extras={extras} onExtra={pressExtra}
+          visitorCount={visitors.length} visitorEra={(id) => visitors.find((v) => v.id === id)?.era}
           onPick={setCreature} onReady={toggleReady} onRemove={removePlayer}
           onMode={changeMode} onStart={startMatch} onBack={backToTitle} onCarry={toggleCarry}
         />

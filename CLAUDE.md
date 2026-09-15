@@ -329,7 +329,12 @@ unless the user explicitly asks for a PR. Steps:
   mesh does. *The cut*: the jaw seam follows the model's own lip contour rather than running straight
   near it — cast head vertex normals back into the mesh and fit a curve to the hits where a slit is
   modelled (Placodus), and read the lip line off the albedo where none is (Dinocephalosaurus, where
-  the first method finds zero vertices). A fish is often genuinely straight and is the easy case;
+  the first method finds zero vertices). There is a **third** case, found on Keichousaurus: the
+  albedo method reads the *countershading* boundary, which on a long-necked swimmer runs from high
+  on the neck downward and put the seam 0.82 of the local radius above the head axis. What that
+  generation paints is a thin dark line on the pale lower flank, so the lip is the darkest row of
+  each flank *within the pale zone* — a different feature in the same image. Check which feature a
+  method has actually found before trusting it. A fish is often genuinely straight and is the easy case;
   reptiles and amphibians have subtle lips and are where a straight cut shows. *The anchors*:
   `anchor_mouth` (role mouth) on the jaw, `anchor_mouth_inside` (role swallow) on the skull, and
   `anchor_attack_primary` (role attack) on the bone that actually delivers the blow — which is **not**
@@ -342,6 +347,23 @@ unless the user explicitly asks for a PR. Steps:
   interpenetrate when they are first brought together, the oral cavity Tripo modelled has to fold
   rather than be built, and closing is a large jaw rotation, so the pose the animal spends almost
   all its time in becomes the most deformed one.
+- **A joint that owns no skin is a silent defect, and it makes other measurements lie.** Hybodus'
+  `caudal_upper` and Saurichthys' `pelvic_L`, `pelvic_R` and `caudal_lower` each owned *zero*
+  vertices: their clips swung joints that moved nothing, and the per-limb swept angles those
+  builders recorded were measurements of nothing at all. Nothing caught it — the paired audits check
+  parity, `skin-tears.mjs` checks edges that exist, and a weightless joint appears in neither. The
+  causes are anatomical rather than careless, which is why reading the weight table would not have
+  found them either: a heterocercal tail's long lobe carries the vertebral column and reads as
+  trunk, and a pelvic bone at 0.63 of the body cannot claim a blade sitting at 0.50-0.60.
+  `tools/triassic/idle-bones.mjs --all` now runs inside `npm run triassic` over every delivered
+  body. The rig's `root` is excluded: it carries the body rather than skin and the clip contract
+  forbids it moving, so it owns nothing by design on every body in every era.
+- **A weighting scheme is shaped by the body it was written for.** Nothosaurus' is the era's
+  cleanest at 2.98x and the obvious one to copy, and copied unchanged onto Henodus it tore to
+  **64.9x** — its "outboard of |y| 0.09 means on the limb" test assumes a narrow trunk, and Henodus'
+  carapace is half a body length wide, so 84% of a forelimb's weight landed in the top of the shell.
+  Bounding the limb radially against its own bone chain, keeping the along-limb ramp, gave 4.81x.
+  So a copied rig is a starting point to be re-measured on the new animal, never a transplant.
 - **A limbed swimmer's dash has to paddle.** The Triassic's reptiles and amphibians did not scull
   along on a tail beat, and a Sprint clip that waggles the limbs while the body does the work reads
   as a fish with legs attached. The stroke runs from the limb stretched forward to flush with the
@@ -437,6 +459,27 @@ unless the user explicitly asks for a PR. Steps:
   water and complete at the surface — so distance out costs the climb for air. A body placed at an
   *absolute* y is a bug in a sea like this: ask the seabed where the water is (`openWater` in
   `tools/devonian-test.ts` is the pattern).
+- The seabed is the hot path. A full world's step asks `sampleHeight` some four hundred and fifty
+  times, and in an era with `floorDepth` each of those runs `depthProfile` → `biomeWeights` → a
+  dozen noise samples, so a term added to a field function in `src/sim/world.ts` is paid thousands
+  of times a second. The rule there is that **a weight of zero means the noise behind it is never
+  read**: the shelf mosaic's three noises (one an fbm, so six samples) inshore of the 120 units
+  where its band weight starts, the channel's ridge noise inside the 170 where its band starts, and
+  the boulder fbm off the boulder fields were all being computed and then multiplied by zero, and
+  between them they were a third of the step. `nurseryFactor` is the same lesson in allocation: it
+  wants one number, and `nearestNursery` builds eight objects to hand it one, on every ground
+  sample. Guard a new term by the weight that scales it — and prove the guard **exact** rather than
+  nearly right, by hashing `sampleHeight`, `biomeWeights` and `channelFactor` over a grid in all
+  three eras before and after. Anything else silently redraws the world under every saved seed.
+- The `tools/*-test.ts` suites are the sim's own guards, and most of them now have an npm script:
+  `npm run sim` is the whole sweep (about twenty minutes) and `npm run sim:gate` is the cheap half
+  (about a minute), which is what the deploy workflow runs. Wire a new suite into both — a guard
+  with no script is one nobody runs, which is how `tools/flora-test.ts`'s step-cost check came to be
+  failing on `main` for a day unnoticed. That check is wall clock and so machine-dependent: the same
+  commit has measured 6.6 ms on one quiet 4-core machine and 8.9 ms on another, so its 8 ms is a
+  ceiling with room under it rather than a target, and tightening it towards whatever the fastest
+  machine to hand reports makes it fail everywhere else. Read the note beside it before touching the
+  number.
 - A giant hunts when it is hungry and not otherwise (`wantsToHunt` in `src/sim/ai.ts`): being seen
   used to be reason enough, so every giant that could see a player came down on them and there was
   no approaching one to ride it. A fed giant notices — the head comes round, which is the tell — and
@@ -493,6 +536,43 @@ unless the user explicitly asks for a PR. Steps:
   derives both eras' tables and `npm run eras` enforces the split — an entry must claim model or
   clip work, whichever it claims must carry its reason, and animation-only work must not badge the
   animal.
+- Two seats on the same animal are drawn in different colours. The first seat on a creature keeps
+  its authored palette — a player alone is never recoloured — and every seat after it is repainted
+  from the era's own pack (`assignSeatSchemes` in `src/shared/seat-schemes.ts`, settled in
+  `updatePlayers`, which is the one choke point every lineup change goes through). Assignment is
+  sticky: a seat holding a usable scheme keeps it, so changing seat three's creature does not
+  re-roll seat two's. `PlayerSetup.scheme` carries it and `src/sim` never reads it. The renderer
+  takes it per frame (`seatScheme` on `CreatureView`), not at construction, because a view is
+  rebuilt when the body or the LOD changes and camouflage re-derives the blend base every frame.
+  `npm run seats` — one process per era, because these modules read `ACTIVE_ERA` at module top and
+  a loop silently tests all three as the Cambrian.
+- The pick grid holds buttons as well as creatures (Random, and Visitors where one has been
+  earned), so its layout is a *model* both the screen and the cursor read
+  (`src/app/roster-grid.ts`, `npm run roster`). Navigation used to be index arithmetic over the
+  roster, safe only because the tiles were rendered from that same array in that same order; a
+  button has a position and no index, and getting it wrong is silent — the cursor lands on one tile
+  while another lights up. Buttons are right-aligned: the rightmost columns of the last row where
+  it has room, a row of their own where it has not, so the roster's own alignment never moves.
+  Nothing in the model touches the DOM, which is what makes the grid the test walks the grid that
+  is drawn.
+- **Visitors.** Take a creature to the top of its own game and it turns up in the other two, at the
+  size it finishes at — a Prime Dunkleosteus in the Cambrian is five times longer than anything
+  that sea holds, which is the reward rather than a balance problem. Three things make it cheap:
+  every era's `creatures.ts` imports nothing but types, so reading another roster costs the array
+  and no module graph; all three games are pages of one build on one origin, so the Cambrian can
+  read `devonian-settings-codex` directly; and an asset path can already name another era's folder.
+  It must **not** go through `loadCodex`, which filters ids against the *active* roster and would
+  strip every foreign id. A visitor is admitted to `creature()` through its own map
+  (`admitVisitors`/`isVisitor` in `src/sim/creatures.ts`) and deliberately never joins `CREATURES`
+  or `PLAYABLE` — the roster is what the grid draws, what bots are drawn from and what the sea is
+  populated with, and a visitor is none of that. `PlayerSetup.visitorScale` overrides every other
+  answer about starting size and skips the egg. The one rule they get is that they must fit:
+  `deepEnoughFor` in `game.ts` walks out from shore until the column holds the body, because
+  distance from shore is what buys depth in every era. Anything with no queue entry must not crash
+  the preloader — `prioritize` tolerates ids it has never heard of, and `addVisitor` gives them a
+  real one. `npm run visitors` covers all three eras; the apex scales and asset folders are written
+  out in `src/content` (which may not reach up into `src/sim`) and checked against the real
+  constants there, so they cannot drift.
 - Menu cursors move by where the buttons are, not by list order: `src/app/spatial-nav.ts` resolves a
   direction against the buttons' own rectangles, so the pause and results rows answer left and
   right, a column answers up and down, and the unused axis falls back to list order so no press is
@@ -560,6 +640,19 @@ unless the user explicitly asks for a PR. Steps:
   `tripo-raw/`, and it refuses a rigged body by name), importing the viewer's own `warp()` so the
   file is what was previewed and reading the result back to prove it. `docs/viewer-stretch.md` is
   the whole of it; Blender work it implies goes in `docs/triassic/builder-requests.md`.
+- A bare `?debug` on the site root (`/?debug`) opens the index of every one of these tools —
+  `src/ancientseas/DebugIndex.tsx`, data in `src/ancientseas/debug-index.ts`, mounted by
+  `src/ancientseas/main.tsx` the way `Root.tsx` mounts the state editor. It is the trilogy page's
+  because what it lists spans all three games and five standalone pages, so no one game is their
+  home. It takes the *valueless* parameter deliberately, so it can never collide with a named
+  screen: every `?debug=<something>` is one specific tool and `?debug` alone is the list of them,
+  and on a game page a bare `?debug` still opens nothing at all. Anything new reachable only by
+  knowing a parameter belongs on it — that is the whole point, since knowing the parameter used to
+  mean already knowing the tool existed. The data is pure so `npm run ancientseas` checks it
+  headless: every page behind a link exists, every game parameter is still read by the module named
+  in `reads`, no two rows claim one URL, and every row carries a sentence rather than only a name.
+  `node tools/debug-index-smoke.mjs <outdir>` follows every link in a browser against a preview
+  build, which is the half a headless test cannot vouch for.
 - `?debug=local` on any game page (`/cambrian/?debug=local`, `/devonian/?debug=local`) opens an editor for that
   era's saved state — `src/app/DebugLocal.tsx`, gated by `src/shared/debug.ts`, mounted by
   `src/app/Root.tsx` so both entry points get it without knowing about it. A new thing kept in

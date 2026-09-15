@@ -1,0 +1,23 @@
+{
+  "skinTears": {
+    "tool": "node tools/triassic/skin-tears.mjs public/assets/triassic/creatures/keichousaurus.glb",
+    "worstEdgeStretch": 6.57,
+    "worstClip": "Bite",
+    "worstBone": "skull",
+    "worstEdgeFromTo": [0.023, 0.148],
+    "clipsOverTwoTimes": 9,
+    "worstOutsideTheOralLining": 2.34,
+    "worstOutsideTheOralLiningClip": "Sprint",
+    "worstOutsideTheOralLiningBone": "chest",
+    "reference": "Nothosaurus 2.98x clean, Tanystropheus 6.1x, Placodus 12.4x, Coelophysis 25.3x",
+    "note": "Two numbers, because they are two different things. The skin proper -- trunk, neck, tail, all four limbs -- peaks at 2.34x in Sprint, which is cleaner than Nothosaurus, the era's reference body. Every figure above that is the oral lining and the jaw/skull weights it carries, doing what the lining is for: its wall stretches between a roof on the skull and a floor on the jaw as the mouth opens, and on a head whose jaw is 12 % of the body length that stretch is real. It was 15.05x when the lining's front cap pinched to a knot of thousandth-of-a-body edges, and coarsening the ring from 14 points to 10 and holding a floor under the taper took it to 6.57x; a finer ring only makes each wall edge shorter and its ratio larger without changing how far the mandible actually travels."
+  },
+  "gapeSolid": {
+    "tool": "/opt/blender/blender -b --factory-startup --python tools/triassic/gape-solid.py -- keichousaurus Bite@0.25 Heavy@0.1 Attack@0.1 Eat@0.4 Ability@0.1",
+    "verdict": "PASS",
+    "maxSeenThroughTheBody": 11,
+    "ofPixels": 378000,
+    "tolerance": 12,
+    "note": "Three separate leaks were closed to get here, and each named a different mistake in the lining. The mandible's tip swung out from under a lining whose front was pinned 100 % to the skull -- the floor of the mouth at the front IS the tip of the mandible, so the jaw's share now runs to the front cap. The mouth opened onto the backfacing inside of the lower jaw, because a lining drawn as a symmetric tube about its own lip line has a floor where a real mouth has a deep one and a shallow palate. And the last of it was at the commissure, where the lining's reach is now measured by ray from each seam station rather than taken as a fraction of the head's mean radius."
+  }
+}

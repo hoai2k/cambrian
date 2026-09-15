@@ -35,6 +35,19 @@ jobs:
       # and take about eight seconds together — cheap enough that a rig regression can no
       # longer sit unnoticed behind a doc that says to run them by hand.
       - run: npm run rigs
+      # The cheap half of the sim suites, `npm run sim` being the whole sweep (22 minutes, which is
+      # why only this half is here). It exists because `tools/flora-test.ts`'s step-cost guard had
+      # been failing on main for a day without anything noticing: the gate never ran it, and until
+      # now neither did any npm script, so the only way to run it was to type the tsx line by hand.
+      # The guard is wall clock and this runner is not the machine anyone measured on, so the
+      # threshold is a ceiling with about 45% of room under it rather than a mark to hit — see the
+      # note in tools/flora-test.ts before tightening it.
+      - run: npm run sim:gate
+      # The site root and the debug entry points. Both are sub-second pure-TypeScript checks,
+      # and between them they hold the trilogy page's links and the parameter that opens each
+      # development tool — including that a bare ?debug never opens anything on a game page.
+      - run: npm run ancientseas
+      - run: npm run debug
       - run: npm run portraits
       # The feedback button exists only in a build that was given somewhere to send to. Unset —
       # a fork, or a repository variable that got lost — publishes the site without the button

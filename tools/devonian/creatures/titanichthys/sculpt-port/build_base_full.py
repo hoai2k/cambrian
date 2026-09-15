@@ -5,11 +5,24 @@ per-mesh decimate ratios for a matching LOD1. No rig, no textures, no pigment: t
 needs to carry positions in the same primitive shape as the candidate rebuild.
 
 Reads (does not modify) this directory's geometry.py and rework-v3/rig_actions_01.py. Writes
-into /home/user/devonian-authoring/titanichthys/sculpt-base/ (outside the repo). build_base.py
-beside this is the bare geometry-only proof; this is the file the transplant needs.
+into /home/user/devonian-authoring/titanichthys/sculpt-base/ (outside the repo), or `--out DIR`.
+build_base.py beside this is the bare geometry-only proof; this is the file the transplant needs.
 
     /opt/blender/blender --background --factory-startup \
-        --python tools/devonian/creatures/titanichthys/sculpt-port/build_base_full.py
+        --python tools/devonian/creatures/titanichthys/sculpt-port/build_base_full.py \
+        -- [--nose-edit | --previous-nose] [--out DIR]
+
+Which snout it builds is the caller's to say, because a transplant's base is whatever the model
+on disk actually carries, not the unedited body forever:
+
+    (default)         geometry.build(nose_edit=False) -- the proportions before any sculpt port.
+    --nose-edit       the current `_NOSE_WIDTH`/shift/dorsal/ventral curves.
+    --previous-nose   the same, with `_NOSE_WIDTH_PREVIOUS` swapped in: the snout the first port
+                      shipped, which is the base the 14 September nose rework transplants against.
+
+With `--nose-edit` this file also builds the *candidate* for that rework: a position transplant
+reads positions only, so the rig, textures, pigment and clips build_candidate.py carries are not
+needed for one.
 """
 import bpy
 import math
@@ -18,7 +31,9 @@ from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
 REWORK = HERE.parent / 'rework-v3'
-OUT = Path('/home/user/devonian-authoring/titanichthys/sculpt-base')
+argv = sys.argv[sys.argv.index('--') + 1:] if '--' in sys.argv else []
+OUT = Path(argv[argv.index('--out') + 1] if '--out' in argv
+           else '/home/user/devonian-authoring/titanichthys/sculpt-base')
 OUT.mkdir(parents=True, exist_ok=True)
 
 sys.path.insert(0, str(HERE))
@@ -26,12 +41,16 @@ sys.path.insert(0, str(REWORK))
 import geometry
 import rig_actions_01 as ra
 
+if '--previous-nose' in argv:
+    geometry._NOSE_WIDTH = geometry._NOSE_WIDTH_PREVIOUS
+nose_edit = '--nose-edit' in argv or '--previous-nose' in argv
+
 bpy.ops.object.select_all(action='SELECT')
 bpy.ops.object.delete(use_global=False)
 for block in list(bpy.data.materials):
     bpy.data.materials.remove(block)
 
-built = geometry.build(nose_edit=False)
+built = geometry.build(nose_edit=nose_edit)
 body, eye_L, eye_R = built['body'], built['eye_L'], built['eye_R']
 fins = built['fins']
 meshes = built['meshes']

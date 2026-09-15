@@ -9,6 +9,16 @@ as one multiplier in hp() (SUTURES/groove() copied verbatim from the study), the
 forward and lengthened, and the eye made larger and set higher. Candidate output, anchors.json and
 validation.json all go to the local authoring/candidate directories, never into this tracked
 directory, so build.py's shipped anchors/validation stay untouched by this file.
+
+14 September: the front dentition. The four large tusks a side stood on a narrow crescent tube
+arching through the mouth — teeth on a connector rather than teeth in a jaw — and it held their
+bases .07 above the mouth line, so with the mouth shut three of the four came out through the roof
+of the snout. They are now the lower jaw's own front teeth, seated on its floor (`jawInner`,
+`TUSKS`) inside the marginal row, with their crowns unchanged in height and lean; the crescent and
+its two `whorl` bones are gone, and the tusks ride the jaw like every other tooth in it. The
+palate's paired receiving recesses were carried forward and widened to take them (`palate`), and
+the snout's roof raised over the rostrum to cover that — the reference has a deep snout there
+anyway. That the closed mouth actually holds them is an assertion over each crown, not a look.
 """
 import bpy,bmesh,math,os,sys,json,struct
 import numpy as np
@@ -56,7 +66,6 @@ def ell(c,scale,col,w,m=3):
  c=Vector(c)
  grid(17,32,lambda i,j:vertex(c+Vector((scale[0]*sin(pi*i/16)*cos(2*pi*j/32),scale[1]*sin(pi*i/16)*sin(2*pi*j/32),scale[2]*cos(pi*i/16))),col,w,(j/32,i/16),False),m,True)
 
-for s in [-1,1]:bone('whorl'+('L'if s==1 else'R'),(s*.105,-2.28,.070),'jaw')
 
 # Gogo Onychodus: oval trunk and deep, scaled, nearly diphycercal tail axis.
 sections=[(-1.25,.425,.47,.02),(-.8,.45,.52,.015),(-.2,.435,.51,.008),(.4,.40,.47,.01),(1.,.33,.40,.015),(1.6,.26,.32,.025),(2.2,.20,.255,.035),(2.8,.13,.20,.045),(3.3,.065,.13,.052),(3.7,.022,.055,.06),(3.92,.002,.007,.062)]
@@ -84,8 +93,14 @@ rows=grid(157,80,torso,0,True);face(rows[-1],0)
 # the paired symphysial tusks. The braincase remains a closed solid above it.
 # The head study (pass 2): a deeper nose station that closes the blunt snout, a lip ridge along
 # the mouth line and mapped dermal cranial bones carried as suture-groove relief on the upper shell.
-HEAD=[(-2.56,.010,.010,.010,.09),(-2.5,.22,.150,.130,.08),(-2.4,.30,.250,.165,.08),(-2.15,.38,.340,.215,.09),(-1.85,.42,.410,.275,.07),(-1.55,.435,.460,.380,.04),(-1.25,.425,.47,.47,.02)]
+# (y, half-width, roof above the mouth line, jaw below it, mouth-line z). The roof column is the
+# taller snout of 14 September: the head rose .035 at the brow and .055 over the rostrum, which is
+# both what docs/reference/Onychodus.jpg shows over the tusks and the room the front dentition
+# needs to close inside. The last row is the body's own section at y=-1.25 and is not the head's
+# to change.
+HEAD=[(-2.56,.010,.010,.010,.09),(-2.5,.22,.205,.130,.08),(-2.4,.30,.305,.165,.08),(-2.15,.38,.375,.215,.09),(-1.85,.42,.432,.275,.07),(-1.55,.435,.465,.380,.04),(-1.25,.425,.47,.47,.02)]
 HEAD_Y0=HEAD[0][0];HEAD_LEN=-1.25-HEAD_Y0
+ORAL_WALL=.026
 def hd(y):return interpolate(HEAD,y)
 def jw(y):
  q=max(0,min(1,(-1.25-y)/.13));return {'jaw':q,'skull':1-q}
@@ -114,16 +129,46 @@ def hp(y,a):
  f=1+.05*math.exp(-(sin(a)/.20)**2)*smooth((-1.45-y)/.25)*smooth((y+2.56)/.06)
  if top and y<-1.28:f-=.022*groove(y,a)*smooth((-1.30-y)/.08)
  return Vector((w*f*cos(a),y,z+ht*f*sin(a)))
+def jawInner(y,u):
+ """A point on the lower jaw's own inner surface: u=0 the floor's midline, u=+-1 its lip line.
+ The same expression the oral grid uses for `low and inside`, so a tooth seated here is seated in
+ the tissue rather than beside it."""
+ a=3*pi/2+u*pi/2;p=hp(y,a);p.x*=.93;p.z+=.012-.018*sin(a);return p
+# The parasymphysial tusks, as the lower jaw's own front teeth. They were a separate crescent
+# platform until 14 September -- a narrow tube arching through the mouth with the four tusks
+# standing on it, which read as teeth on a connector rather than teeth in a jaw, and which held
+# their crowns .07 above the mouth line: closed, the three front ones came out through the top of
+# the snout. Seated on the jaw's own floor (y, u along it), with the crowns unchanged in height
+# and lean, they close inside the widened palatal recesses -- which the assertion below measures
+# rather than assumes.
+TUSKS=[(-2.48,.26,.17,-.030),(-2.42,.30,.20,-.020),(-2.36,.33,.19,-.005),(-2.30,.36,.16,.015)]
+def palate(y,a):
+ """The upper head's inner surface at (y, a): paired receiving recesses either side of a median
+ ridge (Campbell & Barwick figure 8), carried forward and widened on 14 September to take the
+ front tusks where they now stand. The ceiling follows the snout's own skin a wall's thickness
+ below it rather than a flat z+up -- a recess this deep measured against a flat ceiling walks out
+ through the side of the rostrum, where the skin has already curved away."""
+ p=hp(y,a);roof=p.z;p.x*=.92;w,up,lo,z=hd(y)
+ recess=.19*smooth((y+2.57)/.10)*math.exp(-((abs(p.x)-.130)/.085)**4-((y+2.40)/.30)**4)
+ p.z=min(roof-ORAL_WALL,z+.009+recess-.035*sin(a));return p
+def palateAbove(y,x):
+ """Where the palate is directly above (y, x): |x| falls monotonically with the angle across the
+ upper half, so one bisection finds the angle that stands over a crown."""
+ lo_a,hi_a=pi/2,0.
+ for _ in range(50):
+  mid=(lo_a+hi_a)/2
+  if abs(palate(y,mid).x)<abs(x):lo_a=mid
+  else:hi_a=mid
+ return palate(y,(lo_a+hi_a)/2)
 for low in [False,True]:
  mi=7 if low else 6;surfaces=[]
  for inside in [False,True]:
   def hv(i,j):
    y=HEAD_Y0+HEAD_LEN*i/72;a=(pi if low else 0)+pi*j/56;p=hp(y,a)
    if inside:
-    if low:p.x*=.93;p.z+=.018*sin(a)*-1+.012
+    if low:p=jawInner(y,(a-3*pi/2)/(pi/2))
     else:
-     p.x*=.92;w,up,lo,z=hd(y);q=max(0,min(1,(y+2.46)/.12));fossa=.205*q*q*(3-2*q)*math.exp(-((abs(p.x)-.105)/.075)**4-((y+2.15)/.31)**4)
-     p.z=min(z+up-.018,z+.009+fossa-.035*sin(a))
+     p=palate(y,a)
    col= pigment(y,a)
    if inside:
     fade=max(0,min(1,(y+2.5)/(.04 if low else .12)));fade=fade*fade*(3-2*fade);col=tuple(c*(1-fade)+d*fade for c,d in zip(col,(.086,.039,.033)))
@@ -165,18 +210,12 @@ for side in [-1,1]:
    tube(pts,[.011,.007,.0007],(.56,.47,.28),jw(y)if low else'skull',2,9)
  for k,y in enumerate(np.linspace(-2.02,-1.46,13)):
   w,up,lo,z=hd(y);x=side*(w*.66);base=Vector((x,y,z-.015));tube([base,base+Vector((side*.003,.014,-.035)),base+Vector((-side*.009,.033,-.07))],[.010,.007,.0007],(.53,.43,.25),'skull',2,8)
- # Paired crescent cartilage platforms, each with four curved functional tusks.
- bn='whorl'+('L'if side==1 else'R');center=Vector((side*.105,-2.28,.070));steps=49;cr=[]
- for i in range(steps):
-  a=-.68+1.75*i/(steps-1);c=center+Vector((0,-.21*cos(a),.11*sin(a)))
-  cr.append([vertex(c+Vector((.026*cos(j*2*pi/16),0,.026*sin(j*2*pi/16))),(.13,.065,.045),bn,(i/(steps-1),j/16))for j in range(16)])
- for i in range(steps-1):
-  for j in range(16):face((cr[i][j],cr[i][(j+1)%16],cr[i+1][(j+1)%16],cr[i+1][j]),4)
- face(cr[0],4);face(cr[-1],4)
- for k,a in enumerate([-.56,-.04,.46,.98]):
-  base=center+Vector((0,-.21*cos(a),.11*sin(a)));h=[.17,.20,.19,.16][k];lean=[-.105,-.052,.006,.066][k]
-  pts=[base+Vector((0,lean*(t*t-.20*t),h*t))for t in np.linspace(0,1,13)]
-  tube(pts,[.022*(1-t)**.72+.0006 for t in np.linspace(0,1,13)],(.59,.49,.29),bn,2,13)
+ # The four big front teeth, rooted in the jaw's own floor inside the marginal row (TUSKS above).
+ for y0,u,h,lean in TUSKS:
+  seat=jawInner(y0,side*u)
+  # The first sample is buried, so the crown rises out of the tissue instead of standing on it.
+  ts=np.linspace(-.08,1,14);pts=[seat+Vector((0,lean*(t*t-.20*t),h*t))for t in ts]
+  tube(pts,[.022*max(0,1-t)**.72+.0006 for t in ts],(.59,.49,.29),jw(y0),2,13)
  # Deeply embedded dark globes, avoiding bright annular iris geometry.
  eye=Vector((side*.30,-2.10,.265));ell(eye,(.070,.095,.090),(.002,.004,.003),'skull')
  # Paired nasal openings lie lateral to the enlarged internasal tusk recesses.
@@ -191,6 +230,21 @@ for side in [-1,1]:
  # Sensory pore pattern stays fine and conforms to the skull.
  for k in range(18):
   y=-2.28+.05*k;p=hp(y,.35+.30*sin(k*.18));p.x*=side;p-=Vector((side*.003,0,.003));ell(p,(.004,.005,.004),(.035,.039,.02),'skull',4)
+
+# Closed, every tusk crown has to be inside the head: the arrangement this replaced stood the
+# crowns .07 above the mouth line on their platform, and three of the four came out through the
+# roof of the snout. Measured along each crown rather than at its tip, against the palate directly
+# over it, and against the lateral reach of the palate at that station -- a crown outside that is
+# in the lip wall rather than in the mouth.
+oralClearance=1e9;lateralRoom=1e9
+for y0,u,h,lean in TUSKS:
+ for side in [-1,1]:
+  seat=jawInner(y0,side*u)
+  for t in np.linspace(.15,1.,12):
+   p=seat+Vector((0,lean*(t*t-.20*t),h*float(t)))
+   oralClearance=min(oralClearance,palateAbove(p.y,p.x).z-p.z);lateralRoom=min(lateralRoom,abs(palate(p.y,0).x)-abs(p.x))
+assert oralClearance>.02,'Tusk crowns reach the palate with the mouth closed: %.4f'%oralClearance
+assert lateralRoom>.05,'Tusk crowns reach the lip wall: %.4f'%lateralRoom
 
 def fin(name,origin,boundary,base,tip=None,thickness=.012,rays=9):
  origin=Vector(origin);controls=list(map(Vector,boundary));boundary=[]
@@ -319,9 +373,6 @@ for clip,duration in CLIPS.items():
    if clip in ['TurnLeft','TurnRight']:q.rotation_euler.z+=(-1 if clip=='TurnLeft'else 1)*(.04+i*.008)*e
   pb['caudal'].rotation_euler.z=0 # Keep scaled caudal axis and membrane attached.
   pb['dorsal2'].rotation_euler.y=.035*amp*wave(2.3)+.08*dead
-  # Whorl deployment is disputed even among the describing authors. Only a
-  # restrained 4-degree interpreted adjustment accompanies jaw opening.
-  for side in [-1,1]:pb['whorl'+('L'if side==1 else'R')].rotation_euler.x=-min(.07,opening*.14)
   pb['dorsal'].rotation_euler.y=.025*amp*wave(1.6)+.06*dead
   pb['anal'].rotation_euler.y=.045*amp*wave(2.0)+.09*dead
   for s in [-1,1]:
@@ -420,9 +471,9 @@ for g in [full,lod]:
 assert lodtris/fulltris<.4
 
 sources=[{'title':'Andrews et al. 2006, The structure of Onychodus jandemarrai, Gogo; anatomy and competing functional interpretations','url':'https://doi.org/10.1017/S0263593300001309'},{'title':'Campbell and Barwick 2006, illustrated Onychodontiform oral anatomy','url':'https://ijdb.ehu.eus/article/pdf/052125kc'}]
-notes=['Gogo O. jandemarrai reconstruction; 1.5 m represents the proportional estimate in the original paper from an isolated large tusk, not a measured whole individual.','Paired anterior tusk platforms are distinct from marginal and palatal teeth. Motion of the whorls during feeding is disputed within Andrews et al.; the slight modeled adjustment is an interpretation, not an established mechanical cycle.','Incomplete fin outlines are comparative; the caudal is nearly diphycercal without an extended coelacanth filament. Pectoral mobility is deliberately restrained.','Living pigment, soft tissue thickness and animations are interpreted. Original material swatch is imagegen; surface anatomy is authored in Blender.']
+notes=['Gogo O. jandemarrai reconstruction; 1.5 m represents the proportional estimate in the original paper from an isolated large tusk, not a measured whole individual.','The enlarged parasymphysial tusks are modelled as the lower jaw\u2019s own front teeth, rooted in its floor inside the marginal row and distinct from the marginal and palatal dentitions. They are rigid with the jaw: whorl movement during feeding is disputed within Andrews et al., and nothing here asserts it. Closed, every crown is measured clear of the palate that receives it.','Incomplete fin outlines are comparative; the caudal is nearly diphycercal without an extended coelacanth filament. Pectoral mobility is deliberately restrained.','Living pigment, soft tissue thickness and animations are interpreted. Original material swatch is imagegen; surface anatomy is authored in Blender.']
 meta={'id':ID,'name':'Onychodus','species':'Onychodus jandemarrai','provenance':'Late Devonian (Frasnian), Gogo Formation, Western Australia','description':'Robust lobe-finned fish with paired crescent-shaped lower-jaw tusk platforms, interleaved marginal and palatal teeth, oval scales, lobed fins and a nearly symmetrical deep tail.','lengthMeters':1.5,'modelLength':max(p[1]for p in V)-min(p[1]for p in V),'locomotion':'Swim','clips':list(CLIPS),'looping':LOOPS,'anchors':[a['name']for a in anchors],'sources':sources,'notes':notes}
 open(os.path.join(OUT,ID+'.json'),'w').write(json.dumps(meta,indent=2))
-report={'vertices':len(V),'fullTriangles':fulltris,'lodTriangles':lodtris,'reductionRatio':lodtris/fulltris,'bones':len(B),'clips':CLIPS,'loopSeams':seams,'boundsAtFivePhases':bounds,'weightNormalization':True,'rootStable':True,'noScaleChannels':True,'anchorCount':3,'fullBytes':os.path.getsize(os.path.join(OUT,ID+'.glb')),'lodBytes':os.path.getsize(os.path.join(OUT,ID+'.lod1.glb'))}
+report={'vertices':len(V),'fullTriangles':fulltris,'lodTriangles':lodtris,'reductionRatio':lodtris/fulltris,'bones':len(B),'clips':CLIPS,'loopSeams':seams,'boundsAtFivePhases':bounds,'weightNormalization':True,'rootStable':True,'noScaleChannels':True,'anchorCount':3,'oralClearanceClosed':oralClearance,'tuskLateralRoom':lateralRoom,'fullBytes':os.path.getsize(os.path.join(OUT,ID+'.glb')),'lodBytes':os.path.getsize(os.path.join(OUT,ID+'.lod1.glb'))}
 open(os.path.join(OUT,'validation.json'),'w').write(json.dumps(report,indent=2))
 bpy.ops.wm.save_as_mainfile(filepath=os.path.join(LOCAL,ID+'-v2.blend'))

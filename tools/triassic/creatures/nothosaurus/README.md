@@ -4,9 +4,9 @@ The delivered Tripo body and procedural puppet preserve the canonical model's cu
 
 | Delivery | Triangles | Packaged bytes |
 | --- | ---: | ---: |
-| `nothosaurus.glb` — authored Tripo body | 21,204 | 1,847,372 |
-| `nothosaurus.puppet.glb` — procedural twin | 9,342 | 746,752 |
-| `nothosaurus.lod1.glb` — identical puppet alias | 9,342 | 746,752 |
+| `nothosaurus.glb` — authored Tripo body, with authored foot webbing | 28,712 | 1,993,448 |
+| `nothosaurus.puppet.glb` — procedural twin | 9,366 | 747,388 |
+| `nothosaurus.lod1.glb` — identical puppet alias | 9,366 | 747,388 |
 
 Files are in `public/assets/triassic/creatures/`, with matching studio, 1600 × 1200 transparent select, card and thumbnail portraits, plus metadata. Meshopt packaging preserves mesh attributes and animation sample values exactly. Textures are embedded. The model is 5.256 engine authoring units long — 5.000 before the neck was lengthened, and the runtime normalizes by the body's own box either way — faces +Z in glTF and uses +Y up; runtime applies the species' natural size. The research registry supplies the 6 m representative length.
 
@@ -16,9 +16,9 @@ The preserved source is `tools/triassic/creatures/nothosaurus/tripo-raw/nothosau
 
 The twin is a procedural **volume resurfacing**, rather than a generic anatomical substitute or a decimation of the authored faces. Blender regenerates topology from a 0.007 raw-unit voxel occupancy field, relaxes that surface twice, and reduces the new topology to the puppet budget. Source vertices and faces are not reused. This preserves the asymmetric tail sweep and individual paddle silhouettes that a symmetrical ellipsoid proxy would lose. Puppet pigment is sampled through each nearest source triangle’s interpolated UV. The authored body retains the full embedded original albedo with white vertex colors, restrained normal relief (0.15) and explicitly nonmetallic skin at roughness 0.7.
 
-Intake welds coincident texture-seam vertices and removes ten collapsed triangles; the detached-flake threshold removed no vertices. Connected foot webbing is retained. A true, separate lower-jaw shell is cut along the mouth seam and rigidly skinned to its hinge. Curved oral floor, palate and seated hinge tissue close the interior and prevent a stretched membrane across the open gape. The source's fine surface and tooth detail remains limited by the Tripo reconstruction.
+Intake welds coincident texture-seam vertices and removes ten collapsed triangles; the detached-flake threshold removed no vertices. It then closes the five hairline slivers the welded mesh still carries and authors the webbing between the digits of all four paddles — see *The webbing* below. A true, separate lower-jaw shell is cut along the mouth seam and rigidly skinned to its hinge. Curved oral floor, palate and seated hinge tissue close the interior and prevent a stretched membrane across the open gape. The source's fine surface and tooth detail remains limited by the Tripo reconstruction.
 
-`nothosaurus-profile.json` records **21 exact plane-intersection envelopes** of both actual meshes, spaced over the built body's own axial extent rather than a typed range. Maximum width/dorsal/ventral envelope difference is **0.13856 units (2.64% of body length)**; the tolerance is 0.2 units (4%). That number rose from 0.05646 when the stations moved with the lengthened body: the two rows over 0.12 are the fore- and hind-paddle stations, where the voxel resurfacing rounds the webbed digits, and the old grid happened to fall between them. The grid-free measure is the one to read for pair agreement, and it did not move: nearest puppet-surface distance over authored body vertices has maximum **0.11904 (2.26%)** and 95th percentile **0.01018 (0.19%)**, against 0.11304 and 0.01020 before. The joint and socket coordinates are shared, so their parity error is zero. These are generated measurements, not a claimed new human anatomical sign-off.
+`nothosaurus-profile.json` records **21 exact plane-intersection envelopes** of both actual meshes, spaced over the built body's own axial extent rather than a typed range. Maximum width/dorsal/ventral envelope difference is **0.13596 units (2.59% of body length)**; the tolerance is 0.2 units (4%). The two rows over 0.12 are the fore- and hind-paddle stations, where the voxel resurfacing rounds the webbed digits. The grid-free measure is the one to read for pair agreement: nearest puppet-surface distance over authored body vertices has maximum **0.11904 (2.26%)** and 95th percentile **0.01621 (0.31%)**. The webbing moved both a little — the envelope figure down from 0.13856 as the twin now has a paddle to round rather than five separate digits, and the 95th percentile up from 0.01018, because the membrane is a thin sheet and the twin's 0.007 voxel thickens it. The joint and socket coordinates are shared, so their parity error is zero. These are generated measurements, not a claimed new human anatomical sign-off.
 
 ## Rig and motion
 
@@ -46,6 +46,7 @@ Visual QA inspected the exported models through the same side, top, mouth and ac
 - [Remaining actions, including Sprint / Fang Trap / Grab / Breath](paired-actions-sheet.jpg)
 - [Paired rowing from above](paired-gait-sheet.jpg)
 - [Side, top and mouth comparison](paired-volume-sheet.jpg)
+- [The four webbed paddles against magenta](webbed-feet-sheet.jpg)
 
 The current portraits and action sheets are rendered from decoded packaged files after the material correction. Packing assertions establish unchanged geometry and animation values. No independent human review is invented by this automated QA record.
 
@@ -58,10 +59,127 @@ Run from the repository root with Blender 5.2 and installed project Node depende
 node tools/triassic/creatures/nothosaurus/audit.mjs --package --decode
 /Applications/Blender.app/Contents/MacOS/Blender -b -t 2 --python tools/triassic/creatures/nothosaurus/render.py -- --decoded
 /Applications/Blender.app/Contents/MacOS/Blender -b -t 2 --python tools/triassic/creatures/nothosaurus/render.py -- --decoded --puppet
+/Applications/Blender.app/Contents/MacOS/Blender -b -t 2 --python tools/triassic/creatures/nothosaurus/render.py -- --decoded --feet-only
 python3 tools/triassic/creatures/nothosaurus/contact-sheets.py
 ```
 
 The paired editable Blender project, decoded review GLBs, logs and individual frames live in `local/triassic-authoring/nothosaurus/`. `build.py` authors both geometry and performance and writes only this species' asset family. It does not modify shared registries or perform git operations. The macOS sandbox may block Metal initialization even for background work; the same Blender command succeeds with its normal approved desktop permissions.
+
+
+
+## The webbing, and the five slivers — 14 September 2026
+
+`docs/triassic/research.md` line 44 asks this animal for *"webbed, paddle-like feet with retained
+digits"*. The generation delivered the digits and no web. Rendered against a saturated ground —
+which is how it was found, because against the sea a gap between two toes is just a dark patch —
+**all four paddles showed background straight through the notches between the digits**, and there
+was one outright hole in the fore paddle between two of them. The hind feet read as clawed hands,
+not as paddles: five long free digits, splayed, with the notches open to the background for most of
+their length.
+
+The gaps are **absent geometry, not open boundaries**. The welded intake carries ten boundary edges
+in five two-edge slivers of perimeter 0.006–0.011 engine units, all on the flank and the ankles and
+none of them between the toes. So the fix is a membrane.
+
+### What the membrane is
+
+Authored, but **shaped by measurement rather than invented**, and it wears the animal's own skin.
+Per paddle, in `web_paddle`:
+
+1. the foot is taken as the vertices within `WEB_FOOT_R` of the paddle joint and forward of the
+   wrist — the same two points the rig's limb chain is built on;
+2. it is projected onto the horizontal plane (all four paddles sit within 15° of it, measured) and
+   its silhouette rasterised at `WEB_CELL` = 0.0018 raw, about 60 cells across a foot;
+3. the web is the **morphological closing** of that silhouette minus the silhouette itself — a disc
+   of `WEB_CLOSE` = 0.026 rolled over the outline — which is exactly the notches between the toes,
+   and which leaves a webbed foot its scalloped concave free edge without anybody drawing one;
+4. its two faces are the paddle's **own upper and lower surfaces**, extrapolated off the digits into
+   the notches and then relaxed, so the membrane meets each digit at that digit's own surface and
+   curves as the foot curves rather than sitting flat;
+5. the thickness tapers to `WEB_TAPER` = 0.28 of the local flesh at the free edge;
+6. it is **seated, not butted**: a collar of cells over the digits themselves is carried at
+   `WEB_SEAT` = 0.78 of their thickness, so the sheet runs inside the toe and no seam shows.
+
+The patch is then smoothed, triangulated and decimated to `WEB_DECIMATE` = 0.30, given the body's
+material and a white COLOR_0, and joined to the authored mesh before anything is derived from it —
+so the procedural twin resurfaces the webbed volume, the rig's own `weights()` skins the membrane
+to the paddle bones by position like any other flesh, the profile stations measure it, and all 21
+clips are sampled against it.
+
+### It wears the animal's own skin
+
+Every web vertex takes a UV from the nearest point on the original surface, through that triangle's
+own barycentric map — the same lookup the twin's pigment uses. Nearest-surface alone is not enough:
+where the nearest digit changes, the UV field jumps, and the albedo then draws **contour lines
+across the membrane**, which the first build did visibly. So the vertices that are seated inside a
+digit (within `WEB_PIN` = 0.0016 of the original surface) keep their measured UVs and the free sheet
+between the digits is relaxed to them over `WEB_UV_RELAX` = 120 passes. The result is one continuous
+map: the same 2K Tripo albedo runs from one toe across the web to the next.
+
+Nothing is remeshed and no UVs are lost anywhere. The original surface is untouched; the membrane is
+added to it.
+
+| | fore L | fore R | hind L | hind R |
+| --- | ---: | ---: | ---: | ---: |
+| web cells (the notch area itself) | 238 | 332 | 455 | 376 |
+| patch cells, with the seated collar | 1,389 | 2,010 | 1,689 | 1,628 |
+| vertices seated in a digit, keeping measured UVs | 397 | 523 | 393 | 447 |
+| vertices whose UVs are relaxed between them | 385 | 612 | 543 | 462 |
+| vertices / triangles delivered | 782 / 1,568 | 1,135 / 2,270 | 936 / 1,868 | 909 / 1,814 |
+
+The four membranes add **7,520 triangles**, a 39 % increase on the intake mesh, and 146 kB packaged.
+Most of that is the collar rather than the web: the notches themselves are 1,401 cells of the 6,716
+the patches cover. The seating depth was set by the hole check below, not by eye — at
+`WEB_COLLAR` 4.5 / `WEB_SEAT` 0.78 one slit stayed open between a web edge and a digit, at 7.0/0.66
+it was six pixels, and at 9.0/0.60 it is gone. The build is reproducible: two consecutive runs
+write byte-identical GLBs before packaging (meshopt's own stream differs by a few bytes between
+packagings, which is why the packager verifies by value).
+
+### The five slivers
+
+Each is a hairline crack whose two sides are separate vertices a few ten-thousandths apart, not a
+hole with an area. Naming the missing triangle only moves the crack along — it closes two of the
+five and leaves the third side of each new triangle open — so they are closed by a second weld pass
+at `SLIVER_WELD` = 5e-4 raw, which merges **six vertices of 9,608** and drops twelve degenerate
+faces. Open boundary edges go from **10 to 0**; the only boundary the delivered body carries is the
+jaw cut, which is meant to be there. 0.0025 engine units is under three millimetres on a six-metre
+animal.
+
+### What the renders show
+
+`render.py -- --feet-only` puts a camera on each paddle from above, from below and from outside,
+against a **magenta ground**, which is how the gaps were found and is the only way to be sure they
+are gone. Idle, so nothing is hidden by a pose.
+
+[`webbed-feet-sheet.jpg`](webbed-feet-sheet.jpg) is the twelve frames.
+
+**Before:** five splayed digits per foot with the ground visible between every pair, an outright
+hole on the fore paddle, and the hind feet reading as hands.
+**After:** four webbed paddles with a scalloped free edge, the digits still legible as ridges inside
+the membrane, and no background anywhere between them.
+
+That last clause is counted rather than judged. In each of the twelve frames, every background pixel
+whose 4-connected region does not reach the image border is background seen *through* the foot. On
+the delivered body that count is **zero, in all twelve frames**, against one 87-pixel slot in the
+fore-right paddle before the seating was deepened.
+
+### The webbing does not tear
+
+`node tools/triassic/skin-tears.mjs` measures every triangle edge against its rest length over all
+21 clips, which is the check the paired audits structurally cannot make — they measure where
+vertices *are*, and travel from rest stays bounded while a foot is pulled inside out. Against the
+body before the webbing and the body after it, the table is **identical**: worst 2.98x on
+`fore_upper_R` in Sprint, 2.77x on `tail_01` in Dodge, 2.58x in Guard, 29/6/14 edges past 2x, 3 of
+21 clips. The webbing adds 11,254 edges to the measurement and **not one of them tears**: the
+membrane is skinned by the same `weights()` the flesh around it uses, from its own position, so it
+moves with the paddle rather than being stretched across the joint.
+
+What it is not: the membrane is a smooth sheet. It carries the skin's painted markings, stretched
+between the toes, but it has no relief of its own — no wrinkles, no radiating folds along the digit
+lines, nothing where it meets the toe. Close up it reads as skin pulled between the digits rather
+than as webbing with its own anatomy. The digits keep the generation's downward curl, so the paddles
+still read a little like curled hands from some angles; a paddle-like *stance* is a pose question,
+not a mesh one.
 
 
 ## Material investigation and correction — 13 September 2026

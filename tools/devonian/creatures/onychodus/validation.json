@@ -1,9 +1,9 @@
 {
-  "vertices": 72944,
-  "fullTriangles": 139544,
-  "lodTriangles": 39064,
-  "reductionRatio": 0.27994037722868775,
-  "bones": 25,
+  "vertices": 71480,
+  "fullTriangles": 136624,
+  "lodTriangles": 38246,
+  "reductionRatio": 0.2799361751961588,
+  "bones": 23,
   "clips": {
     "Idle": 2.4,
     "Swim": 2.4,
@@ -120,7 +120,7 @@
     "Attack": [
       [
         -0.870104968547821,
-        -2.7892727851867676,
+        -2.7892723083496094,
         -0.7396453022956848
       ],
       [
@@ -266,6 +266,8 @@
   "rootStable": true,
   "noScaleChannels": true,
   "anchorCount": 3,
-  "fullBytes": 9970880,
-  "lodBytes": 2353028
+  "oralClearanceClosed": 0.04604807496070862,
+  "tuskLateralRoom": 0.11219403147697449,
+  "fullBytes": 9809340,
+  "lodBytes": 2300364
 }
