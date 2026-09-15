@@ -102,6 +102,9 @@ export const shoreDistance = (x: number, z: number) => shoreZ(x) - z;
 const channelField = (x: number, z: number) => noise2(x / 380 + 17, z / 240 + 5) * 0.8 + noise2(x / 120 + 4, z / 95 + 8) * 0.2;
 /** 0..1 channel presence: 1 in the middle of a channel, 0 on the flanks. Only beyond the nursery band. */
 export function channelFactor(x: number, z: number, s = shoreDistance(x, z)) {
+  // Inside 170 units the band weight below is exactly zero, so the ridge noise would be three
+  // samples taken and multiplied away. Every ground query and every actor's current asks for this.
+  if (s <= 170) return 0;
   const n = channelField(x, z) - 0.5;
   const w = 0.028 + 0.012 * noise2(x / 60, z / 60);          // channels widen and narrow
   return Math.exp(-((n / w) ** 2)) * smoothstep(170, 260, s);
@@ -138,7 +141,8 @@ export const flatsFactor = (x: number, z: number, s = shoreDistance(x, z)) =>
  * pure function of its index and of nothing else — no world seed — so remembering it is exact.
  */
 const nurserySpot = new Map<number, { x: number; z: number }>();
-export function nurseryAt(index: number): Vec3 {
+/** The remembered place itself. Shared and never handed out — see `nurseryAt`. */
+function nurserySpotAt(index: number) {
   let p = nurserySpot.get(index);
   if (!p) {
     const h = makeRng(0x5ab7 ^ (index * 2654435761 >>> 0));
@@ -147,6 +151,10 @@ export function nurseryAt(index: number): Vec3 {
     p = { x, z: shoreZ(x) - NURSERY_OFF - jz };
     nurserySpot.set(index, p);
   }
+  return p;
+}
+export function nurseryAt(index: number): Vec3 {
+  const p = nurserySpotAt(index);
   // A fresh vector every time: callers put these in the world and some of them move what they get.
   return { x: p.x, y: 0, z: p.z };
 }
@@ -157,9 +165,20 @@ export function nearestNursery(x: number, z: number): { index: number; pos: Vec3
   for (let i = i0 - 1; i <= i0 + 1; i++) { const p = nurseryAt(i); const d = Math.hypot(p.x - x, p.z - z); if (d < best.d) best = { index: i, pos: p, d }; }
   return best;
 }
+/**
+ * How far the nearest nursery is, and nothing else. Remembering where the nurseries are took the
+ * noise out of this, but `nearestNursery` still builds four vectors and up to four result objects
+ * on every call, and `nurseryFactor` — which wants one number — is part of `biomeWeights`, so a
+ * full world's step was allocating some three thousand of them a step for the garbage collector.
+ */
+function nurseryDistance(x: number, z: number) {
+  const i0 = nurseryIndexNear(x);
+  let d = Infinity;
+  for (let i = i0 - 1; i <= i0 + 1; i++) { const p = nurserySpotAt(i); const dd = Math.hypot(p.x - x, p.z - z); if (dd < d) d = dd; }
+  return d;
+}
 export function nurseryFactor(x: number, z: number) {
-  const n = nearestNursery(x, z);
-  return 1 - smoothstep(NURSERY_R * 0.6, NURSERY_R, n.d);
+  return 1 - smoothstep(NURSERY_R * 0.6, NURSERY_R, nurseryDistance(x, z));
 }
 
 export interface BiomeWeights { shallows: number; nursery: number; shelf: number; forest: number; boulders: number; flats: number; channel: number; escarpment: number; basin: number; }
@@ -183,14 +202,20 @@ export function biomeWeights(x: number, z: number, out: BiomeWeights = scratchW,
   const esc = smoothstep(650, 700, s + rag) * (1 - smoothstep(740, 800, s + rag));
   out.escarpment = take(esc);
   const deep = smoothstep(760, 830, s + rag);
-  const f = forestNoise(x, z), r = rockNoise(x, z), fl = flatsNoise(x, z);
-  const forest = smoothstep(0.56, 0.66, f) * (1 - deep * 0.55);
-  const rocks = smoothstep(0.6, 0.72, r) * (0.55 + 0.45 * smoothstep(450, 650, s)) * (1 - deep * 0.4);
-  const flats = smoothstep(0.62, 0.72, fl) * (1 - smoothstep(380, 520, s)) * (1 - forest);
+  // The shelf mosaic starts 120 units out. Inshore of that the band weight is exactly zero and its
+  // three noises — one of them an fbm, so six samples between them — are read and multiplied away.
   const mosaic = smoothstep(120, 165, s);
-  out.forest = take(forest * mosaic);
-  out.boulders = take(rocks * mosaic);
-  out.flats = take(flats * mosaic);
+  if (mosaic > 0) {
+    const f = forestNoise(x, z), r = rockNoise(x, z), fl = flatsNoise(x, z);
+    const forest = smoothstep(0.56, 0.66, f) * (1 - deep * 0.55);
+    const rocks = smoothstep(0.6, 0.72, r) * (0.55 + 0.45 * smoothstep(450, 650, s)) * (1 - deep * 0.4);
+    const flats = smoothstep(0.62, 0.72, fl) * (1 - smoothstep(380, 520, s)) * (1 - forest);
+    out.forest = take(forest * mosaic);
+    out.boulders = take(rocks * mosaic);
+    out.flats = take(flats * mosaic);
+  } else {
+    out.forest = 0; out.boulders = 0; out.flats = 0;
+  }
   out.basin = take(deep);
   out.shelf = rest;
   return out;
@@ -264,7 +289,9 @@ function depthProfile(x: number, z: number, s: number, u: number): number {
   // the reef comes up to meet the air-breathers: ridges a player can follow, never a single bump
   const crest = w.boulders > 0.01 ? w.boulders * 7 * smoothstep(0.5, 0.75, fbm2(x * 0.035 + 11, z * 0.035 + 4)) : 0;
   // boulder fields are rough and a little high; the flats are flat
-  const rocks = w.boulders * (0.6 + fbm2(x * 0.06, z * 0.06)) * 1.2;
+  // Guarded like the crest above it: off the boulder fields this fbm was four samples taken and
+  // multiplied by a zero weight.
+  const rocks = w.boulders > 0 ? w.boulders * (0.6 + fbm2(x * 0.06, z * 0.06)) * 1.2 : 0;
   const flat = w.flats;
   let h = SURFACE_Y - depth + u * (1 - flat * 0.8) + crest + rocks;
   // the shore: the beach climbs to a unit above the waterline over the last 48 units

@@ -329,7 +329,12 @@ unless the user explicitly asks for a PR. Steps:
   mesh does. *The cut*: the jaw seam follows the model's own lip contour rather than running straight
   near it — cast head vertex normals back into the mesh and fit a curve to the hits where a slit is
   modelled (Placodus), and read the lip line off the albedo where none is (Dinocephalosaurus, where
-  the first method finds zero vertices). A fish is often genuinely straight and is the easy case;
+  the first method finds zero vertices). There is a **third** case, found on Keichousaurus: the
+  albedo method reads the *countershading* boundary, which on a long-necked swimmer runs from high
+  on the neck downward and put the seam 0.82 of the local radius above the head axis. What that
+  generation paints is a thin dark line on the pale lower flank, so the lip is the darkest row of
+  each flank *within the pale zone* — a different feature in the same image. Check which feature a
+  method has actually found before trusting it. A fish is often genuinely straight and is the easy case;
   reptiles and amphibians have subtle lips and are where a straight cut shows. *The anchors*:
   `anchor_mouth` (role mouth) on the jaw, `anchor_mouth_inside` (role swallow) on the skull, and
   `anchor_attack_primary` (role attack) on the bone that actually delivers the blow — which is **not**
@@ -342,6 +347,12 @@ unless the user explicitly asks for a PR. Steps:
   interpenetrate when they are first brought together, the oral cavity Tripo modelled has to fold
   rather than be built, and closing is a large jaw rotation, so the pose the animal spends almost
   all its time in becomes the most deformed one.
+- **A weighting scheme is shaped by the body it was written for.** Nothosaurus' is the era's
+  cleanest at 2.98x and the obvious one to copy, and copied unchanged onto Henodus it tore to
+  **64.9x** — its "outboard of |y| 0.09 means on the limb" test assumes a narrow trunk, and Henodus'
+  carapace is half a body length wide, so 84% of a forelimb's weight landed in the top of the shell.
+  Bounding the limb radially against its own bone chain, keeping the along-limb ramp, gave 4.81x.
+  So a copied rig is a starting point to be re-measured on the new animal, never a transplant.
 - **A limbed swimmer's dash has to paddle.** The Triassic's reptiles and amphibians did not scull
   along on a tail beat, and a Sprint clip that waggles the limbs while the body does the work reads
   as a fish with legs attached. The stroke runs from the limb stretched forward to flush with the
@@ -437,6 +448,27 @@ unless the user explicitly asks for a PR. Steps:
   water and complete at the surface — so distance out costs the climb for air. A body placed at an
   *absolute* y is a bug in a sea like this: ask the seabed where the water is (`openWater` in
   `tools/devonian-test.ts` is the pattern).
+- The seabed is the hot path. A full world's step asks `sampleHeight` some four hundred and fifty
+  times, and in an era with `floorDepth` each of those runs `depthProfile` → `biomeWeights` → a
+  dozen noise samples, so a term added to a field function in `src/sim/world.ts` is paid thousands
+  of times a second. The rule there is that **a weight of zero means the noise behind it is never
+  read**: the shelf mosaic's three noises (one an fbm, so six samples) inshore of the 120 units
+  where its band weight starts, the channel's ridge noise inside the 170 where its band starts, and
+  the boulder fbm off the boulder fields were all being computed and then multiplied by zero, and
+  between them they were a third of the step. `nurseryFactor` is the same lesson in allocation: it
+  wants one number, and `nearestNursery` builds eight objects to hand it one, on every ground
+  sample. Guard a new term by the weight that scales it — and prove the guard **exact** rather than
+  nearly right, by hashing `sampleHeight`, `biomeWeights` and `channelFactor` over a grid in all
+  three eras before and after. Anything else silently redraws the world under every saved seed.
+- The `tools/*-test.ts` suites are the sim's own guards, and most of them now have an npm script:
+  `npm run sim` is the whole sweep (about twenty minutes) and `npm run sim:gate` is the cheap half
+  (about a minute), which is what the deploy workflow runs. Wire a new suite into both — a guard
+  with no script is one nobody runs, which is how `tools/flora-test.ts`'s step-cost check came to be
+  failing on `main` for a day unnoticed. That check is wall clock and so machine-dependent: the same
+  commit has measured 6.6 ms on one quiet 4-core machine and 8.9 ms on another, so its 8 ms is a
+  ceiling with room under it rather than a target, and tightening it towards whatever the fastest
+  machine to hand reports makes it fail everywhere else. Read the note beside it before touching the
+  number.
 - A giant hunts when it is hungry and not otherwise (`wantsToHunt` in `src/sim/ai.ts`): being seen
   used to be reason enough, so every giant that could see a player came down on them and there was
   no approaching one to ride it. A fed giant notices — the head comes round, which is the tell — and

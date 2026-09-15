@@ -17,6 +17,10 @@ the surface as smooth as the shipped one by construction, and it is measured: th
 99th-percentile face-normal angle is 39.7 degrees against the unedited rebuild's 40.4, and the
 neck's 33.4 against 32.4 (`solve_nose.py`).
 
+The snout's width taper was re-authored again on 14 September (see `_NOSE_WIDTH`): smooth by that
+measure it was, but it ended on a floor rather than closing, and the tab that left standing off
+the prow is what the user asked to have smoothed out.
+
 Call `build(nose_edit)` inside a fresh Blender scene. Returns the constructed objects.
 """
 import bpy
@@ -40,10 +44,26 @@ from mathutils.kdtree import KDTree
 # the rebuilt model land on the sculpt's edited curves, and stations 0-14 stay exactly as shipped.
 NECK_AXIS = 1.08
 _NOSE_SHIFT = [(NECK_AXIS, 0.), (1.55, .0066), (1.9765, .0111), (2.3561, .1516), (2.7357, .2293)]
+# The width curve behind axis 2.15 is the first port's, untouched. Ahead of it the taper is
+# re-authored so the snout *closes*: the first port fell to a .221 floor at 2.55 and held it to
+# the frontmost row, and the rostral shelf that overhangs the mouth (the preoral cage row reaches
+# 0.14 further forward than the mouth rim does) was left wrapping a nose that no longer had the
+# width to carry it. What that squeezed out was a parallel-sided tab standing off the prow, a
+# hand's breadth wide and pinched either side of its root, with the shield falling away into a
+# hollow behind each shoulder -- read head-on, a nose with two nostrils. Ending the taper at the
+# frontmost row instead lets the prow converge to a rounded point, and spreading the same
+# narrowing over .49 of axis rather than .30 takes the hollows out with it.
 _NOSE_WIDTH = [(NECK_AXIS, 1.), (1.15, .9836), (1.25, .9537), (1.4, .896), (1.55, .887),
                (1.7, .9636), (1.8, 1.0104), (1.95, 1.0051), (2.05, .988), (2.15, .964),
-               (2.25, .9), (2.35, .6658), (2.45, .3976), (2.55, .221), (2.65, .221),
-               (2.7357, .221)]
+               (2.25, .90), (2.35, .795), (2.45, .66), (2.55, .50), (2.62, .385),
+               (2.68, .255), (2.7357, .10)]
+# The tab-ended curve the model on disk was built with. A position transplant matches the
+# candidate against a base that reproduces the *shipped* vertices, so the base for this rework is
+# this curve, not the unedited body: `build_base_full.py --previous-nose`.
+_NOSE_WIDTH_PREVIOUS = [(NECK_AXIS, 1.), (1.15, .9836), (1.25, .9537), (1.4, .896), (1.55, .887),
+                        (1.7, .9636), (1.8, 1.0104), (1.95, 1.0051), (2.05, .988), (2.15, .964),
+                        (2.25, .9), (2.35, .6658), (2.45, .3976), (2.55, .221), (2.65, .221),
+                        (2.7357, .221)]
 _NOSE_DORSAL = [(NECK_AXIS, 1.), (1.6, 1.), (1.85, .982), (2.05, .9682), (2.25, .962),
                 (2.45, .929), (2.62, .862), (2.7357, .86)]
 _NOSE_VENTRAL = [(NECK_AXIS, 1.), (1.6, .9607), (1.85, 1.075), (2.05, 1.085), (2.25, 1.1),
