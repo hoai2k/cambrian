@@ -37,30 +37,46 @@ head and neck much deeper top and bottom (stations 15-18, dorsal +26/+56/+28/+25
 
 SEC's h and z columns carry the dorsal and ventral asks. They are not independent of each other:
 in the trunk the section runs z-h..z+h, over the head it runs -.015-.44h..z+h, and the two blend
-over -1.10..-.45, so each row solves h and z together from the pair of percentages its own station
-asks for. A station is a windowed extreme over a grid that is not the builder's, and the flank's
-longitudinal sweep puts a row's widest points a long way behind its own station, so the table was
-solved rather than typed: port, build, `npm run sculpt:measure`, divide each row by the deviation
-it came back with, repeat. Three rounds; every station lands within ~3% of the sculpt's curves
-except four, all of which are the metric rather than the shape:
- - station 17's dorsal reads +9.9%. The station's extreme there is the eye globe, not the roof:
-   the roof under it measures 0.3778 against a target of 0.377, and the pair stand .034 proud of
-   it, which is what a dorsal eye does and what the shipped model did too (its own station 17 was
-   the eye's top as well).
- - station 19's dorsal reads +6.0% — .009 of a unit at the very tip of the snout, where the row
-   itself is pinned to what shipped.
- - station 14's ventral +6.3% and station 2's ventral -5.7%: the deepest point of the belly and of
-   the tail fall between rows, and pulling either further to chase the window put a kink in the
-   profile on the round before.
- - station 16's width is left 6.1% under its target, which is the one place the port does not
-   follow the sculpt. That station's width is the snout's flank, swept back by surf()'s own
-   longitudinal map, and the same SEC rows feed stations 17-19 at every other angle, where the
-   sculpt asks for no change at all: +9.7% at 16 cannot be had without +9.7% at 17-19 too.
+over -1.10..-.45, so each row solves h and z together.
+
+15 September: how they are solved was rewritten, because the first attempt put an indent in the
+snout. It read the *station table* — a windowed extreme on a grid that is not the builder's — and
+corrected each row proportionally against it, three rounds. That metric cannot see a dip: a
+station reports the highest point in its window, so a back that humps and then troughs inside one
+window measures exactly as well as a smooth one. Every station landed within a few percent and the
+head came out with a local maximum at y=-2.25 and a local minimum at y=-2.00, a visible dent in
+front of the eye. Optimising against the measuring stick rather than the thing it measures.
+
+What the user approved is the preview, and the preview is `profileWarp` in
+src/viewer/sculpt/profile.ts: at each axis it reads the base and edited dorsal/ventral curves,
+moves the section's midline to the edited midline, and scales the half-height about it — one
+number, since a midline defined as the midpoint of two curves makes the "above" and "below" ratios
+algebraically the same. `port-sculpt.mjs` beside this file applies exactly that to the builder's
+own rows, importing `evaluate` from the viewer module rather than reimplementing its Hermite. One
+pass, nothing free in it, and the rows land on a smooth curve because the curves they are read off
+are smooth: the lofted back now wanders 0.2% of its own depth outside its rows against the
+0.3% the pre-sculpt table managed and the 1.9% of the indent (`checkLoft`, asserted at build).
+
+Measured against the viewer's own preview — the shipped mesh with `profileWarp` applied to every
+vertex — this table is within 2.4% of the local depth at every station on both curves, where the
+three-round table was out by 7.7%. Measured against `npm run sculpt:measure` it looks *worse*
+than that table did, and deliberately so: that tool reads the target curve *linearly* between
+stations while the viewer previews it as a cubic Hermite, and each station is a windowed extreme
+half a station wide, so the two disagree wherever the edited curve bends sharply between stations.
+Station 19 is the extreme of it — the sculpt pins the snout tip to no change while station 18 asks
++50% ventral, and the Hermite between them deepens everything inside station 19's window. The
+viewer's own preview reads +26.4% there; this build reads +25.9%.
+
+The width column is *not* re-derived here and is the three-round table's, within 4% of the
+preview: it carries no visible artefact, and the snout's width is the one place the port knowingly
+departs from the sculpt. That station's width is the snout's flank, swept back by surf()'s own
+longitudinal map, and the same SEC rows feed stations 17-19 at every other angle, where the sculpt
+asks for no change at all: +9.7% at 16 cannot be had without +9.7% at 17-19 too.
 """
 import math,numpy as np
 from math import sin,cos,pi,exp
 from mathutils import Vector
-SEC=[(-2.8,.52,.04,-.01),(-2.63,.6,.12686,.02186),(-2.35,.67,.21392,.03755),(-1.9,.725,.35345,-.10518),(-1.45,.75,.44578,-.04345),(-1.05,.73,.56309,-.08261),(-.68,.71,.47499,-.06441),(-.2,.7,.40522,-.00502),(.45,.64451,.40899,.00048),(1.1,.61662,.36461,-.00044),(1.65,.5172,.31099,.00029),(2.25,.32,.23953,-.00047),(2.85,.1394,.29113,.00628),(3.4,.0557,.41114,.00198),(3.85,.02568,.32429,-.02934),(4.23,.00894,.14198,.00165),(4.43,.0004,.003,0)]
+SEC=[(-2.8,.52,.04,-.01),(-2.63,.6,.17019,-.0058),(-2.35,.67,.26716,-.03387),(-1.9,.725,.39487,-.12002),(-1.45,.75,.46084,-.05797),(-1.05,.73,.49454,-.04053),(-.68,.71,.45279,-.04029),(-.2,.7,.41419,-.01316),(.45,.64451,.405,0),(1.1,.61662,.365,0),(1.65,.5172,.31,0),(2.25,.32,.23974,-.00033),(2.85,.1394,.30395,.00579),(3.4,.0557,.4137,.00175),(3.85,.02568,.33827,-.02443),(4.23,.00894,.14957,-.00998),(4.43,.0004,.003,0)]
 # The sculpt's top view pulled the fore body's outline in over the pectoral fin (stations 12-15,
 # -7.7% to -18.7%). Out there that outline *is* the fin, so the port narrows the fin rather than
 # the trunk under it: one lateral scale per control row, solved against the sculpt's own stations,
@@ -113,8 +129,32 @@ def oralPoint(t,a):
 def oralWeight(t,a):
  s=sin(a);c=cos(a);yy=oralPoint(t,a).y;jaw=float(smooth((-s-.05)/.50)*(1-smooth((yy+1.55)/.37))*(1-smooth((t-.25)/.55)));cheek=float(.48*abs(c)**4*(1-jaw)*(1-smooth((t-.08)/.68)));throat=float(.32*sin(pi*t)**2*(1-jaw-cheek))
  return {'jaw':jaw,'cheek'+('L'if c>0 else'R'):cheek,'throat':throat,'skull':1-jaw-cheek-throat}
+def dorsalLine(y):
+ w,h,z=section(y);return float(z+h)
+def ventralLine(y):
+ w,h,z=section(y);head=1-smooth((y+1.10)/.65);return float((z-h)*(1-head)+(-.015-.44*h)*head)
+def checkLoft(tol=.01):
+ """The lofted back must stay inside the rows it passes between.
+
+ A station in a sculpt is the *highest* point in a window, so a back that humps and then troughs
+ inside one window measures exactly as well as a smooth one: the first port of the 14 September
+ sculpt solved these rows against that metric and corrected them three times over, and what it
+ left was a local maximum at y=-2.25 and a local minimum at y=-2.00 -- an indent in the snout in
+ front of the eye that every station still read as within a few percent. So the shape is asserted
+ here instead, where the metric cannot reach: between each pair of rows the dorsal line may not
+ leave the range its own two rows span by more than `tol` of the section's height. The shipped
+ table runs to 0.3% and the table this file carries to 0.2%; the indent was 1.9%."""
+ worst=(0.,None)
+ for k in range(len(SEC)-1):
+  a,b=SEC[k][0],SEC[k+1][0];lo=min(dorsalLine(a),dorsalLine(b));hi=max(dorsalLine(a),dorsalLine(b))
+  for i in range(1,80):
+   y=a+(b-a)*i/80.;v=dorsalLine(y);height=max(1e-6,v-ventralLine(y));out=max(v-hi,lo-v)/height
+   if out>worst[0]:worst=(out,(round(y,3),round(v,5),round(lo,5),round(hi,5)))
+ assert worst[0]<=tol,'Dorsal line wanders %.2f%% of its own depth outside its rows at y=%s'%(100*worst[0],worst[1])
+ return worst
 def make(g):
  vertex,face,grid,tube=(g[k]for k in ['vertex','face','grid','tube']);g.update(surf=surf,bw=bw,sections=SEC)
+ g['loftExcursion']=checkLoft()[0]
  n=128;ys=np.linspace(-2.8,4.43,290)
  def surface(y,a):
   p=surf(y,a);p[1]=physical_y(p[1]);return p
