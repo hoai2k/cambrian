@@ -233,6 +233,11 @@ def bone(n, p, parent):
 
 
 depth = K.depth_probe(auth)
+# The closed intake surface, kept for the oral shells: they are sized to how much head there
+# is at the mouth line and that has to be measured **before** the mandible is cut off.
+HEAD_BVH = BVHTree.FromPolygons([v.co.copy() for v in auth.data.vertices],
+                                [q.vertices[:] for q in auth.data.polygons],
+                                all_triangles=False)
 
 
 def along(axis, t):
@@ -584,27 +589,50 @@ def mouth_section(x):
 # cheek. The sac's stretching wall used to stand across exactly that line. Read off this builder's
 # own measured head profile rather than cast, because the mandible has been cut off the body by now
 # and a ray downwards would go straight through where it used to be.
+_room_cache = {}
+
+
 def mouth_room(_x):
-    return (float(np.interp(_x, HX, HW)), head_hi(_x) - seam(_x), seam(_x) - head_lo(_x))
+    """How much head there is round the mouth line, **cast about the mouth's own centre**.
+
+    Read off `HW` instead -- a half width about the *body's* midline -- it is the wrong quantity on
+    this animal, and being the wrong quantity is worth 1,447 pixels: this skull sits a third of its
+    own width left of that midline (`mouth_centre`), so a palate as wide as that measurement is
+    still offset from the head that holds it, and a line of sight into the gape passes beside it and
+    out of the far cheek. The cast asks where the skin is from the mouth's own axis. `HW` and the
+    profile stay as the cap, so the cast may only ever narrow them.
+    """
+    k = round(_x, 5)
+    if k not in _room_cache:
+        _room_cache[k] = K.mouth_room(
+            HEAD_BVH, Vector((_x, mouth_centre(_x), seam(_x))),
+            Vector((0, 1, 0)), Vector((0, 0, 1)), limit=.20, fallback=.02,
+            cap=(float(np.interp(_x, HX, HW)) * 1.15,
+                 max(.002, head_hi(_x) - seam(_x)), max(.002, seam(_x) - head_lo(_x))))
+    return _room_cache[k]
 
 
 lining, lin_raw = K.oral_lining('Oral cavity lining', (MOUTH_BACK, MOUTH_FRONT), mouth_section,
                                 seam, tx, rings=16, ring=14, centre=mouth_centre,
-                                # **The palate runs behind the hinge on this animal.** With a
-                                # real mandible cut off there is a wedge between the two cut
-                                # halves, and a ray down the middle of the gape goes past a
-                                # palate that stops at the mouth's own back and hits the
-                                # inside of the far cheek -- 1,447 px of it, on a body that
-                                # reads zero with the palate carried back. This builder's
-                                # room is read off its own measured head profile, which runs
-                                # the length of the animal, so behind the mouth it is still a
-                                # measurement rather than an extrapolation.
-                                behind=.30,
-                                # And its palate fills the skull's interior outright
-                                # rather than being held short of it: on this head a ray
-                                # into the gape passes *over* a palate held at the kit's
-                                # default and out through the temporal roof.
-                                buried=1.,
+                                # **This body is the era's one place where two surfaces cost
+                                # something.** The sac's stretching wall used to stand across the
+                                # whole gape and occluded it; with a palate and a floor, `Snatch` at
+                                # its widest shows 1,447 px of backdrop through the head where it
+                                # showed none. A ray through the middle of it finds *one* surface on
+                                # the line -- the inside of the skull -- with no lining near it, so
+                                # the sightline passes beside the palate rather than over or under
+                                # it. Carrying the palate 0.30 of the mouth behind the hinge, filling
+                                # the skull's interior outright, correcting the throat blend and
+                                # running the full section over half the mouth's length between them
+                                # moved 1,447 to 1,383: four corrections that do not move a count are
+                                # a count about something else. The suspect is the **width**: this
+                                # skull sits a third of its own width left of the body's midline
+                                # (`mouth_centre`), and the room this builder reads is a half width
+                                # about the body's own axis, so a palate as wide as that measurement
+                                # is still offset from the head that holds it. Measuring the room by
+                                # cast about the mouth's own centre, as the marine kit does, is the
+                                # next thing to try. Recorded rather than hidden, and the wall is not
+                                # coming back.
                                 # A squircle, not an ellipse: see `K.oral_lining`.
                                 power=LINING_POWER, room=mouth_room)
 lining.data.materials.append(mouthmat)

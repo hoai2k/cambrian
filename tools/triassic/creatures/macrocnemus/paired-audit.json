@@ -2,22 +2,22 @@
   "models": [
     {
       "suffix": "",
-      "bytes": 2005548,
-      "sha256": "a1bf024b22a47f0b57a9d42ed668662b6804102b1f858b872fa448ef714a7b26",
+      "bytes": 2005496,
+      "sha256": "13dd6793162869766f85f0d90b395728cbc575187b931f9c38d4da568d296ac8",
       "triangles": 21828,
       "vertices": 13114
     },
     {
       "suffix": ".puppet",
-      "bytes": 1498620,
-      "sha256": "22ab222cf8d0801bde5ed2680b2f694fd4157570b2320e7e292e2016f9f449e9",
+      "bytes": 1498580,
+      "sha256": "7c5f95e5f2b02c184541569f7875564c239cf65587690505407adaa9a6b16a18",
       "triangles": 8574,
       "vertices": 4436
     },
     {
       "suffix": ".lod1",
-      "bytes": 1498620,
-      "sha256": "22ab222cf8d0801bde5ed2680b2f694fd4157570b2320e7e292e2016f9f449e9",
+      "bytes": 1498580,
+      "sha256": "7c5f95e5f2b02c184541569f7875564c239cf65587690505407adaa9a6b16a18",
       "triangles": 8574,
       "vertices": 4436
     }
@@ -223,7 +223,7 @@
           "clip": "Breath",
           "duration": 2,
           "samples": 61,
-          "maxVertexTravel": 0.5209692128357025
+          "maxVertexTravel": 0.5164630480411211
         },
         {
           "clip": "Charge",
@@ -289,7 +289,7 @@
           "clip": "Hit",
           "duration": 0.5,
           "samples": 61,
-          "maxVertexTravel": 0.48486907307683635
+          "maxVertexTravel": 0.4837036013690861
         },
         {
           "clip": "Idle",
@@ -301,7 +301,7 @@
           "clip": "Parry",
           "duration": 0.30000001192092896,
           "samples": 61,
-          "maxVertexTravel": 0.4813678482338855
+          "maxVertexTravel": 0.47625410621722736
         },
         {
           "clip": "Retreat",

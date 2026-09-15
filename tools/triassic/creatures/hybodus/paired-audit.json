@@ -2,22 +2,22 @@
   "models": [
     {
       "suffix": "",
-      "bytes": 1841988,
-      "sha256": "7543f3d818fcc92f7f60b7a2e856e5d115bc19767d17690d39f55f42a1eef3ea",
+      "bytes": 1841996,
+      "sha256": "dc6b5f76fb8e8d57ef1fdb4f60920a0c7981cc8d14d4cd5616beb6c256fc8a6a",
       "triangles": 22331,
       "vertices": 13307
     },
     {
       "suffix": ".puppet",
-      "bytes": 1321944,
-      "sha256": "90a1662e3af10ab72f5a32bddcd593073bf4244ffdce760cc0d49a0b92cb887f",
+      "bytes": 1321952,
+      "sha256": "f862c32898bf7ffbcd49994a1048cc4ffef99af2ecc54215484c7fc52f79afc1",
       "triangles": 8190,
       "vertices": 4186
     },
     {
       "suffix": ".lod1",
-      "bytes": 1321944,
-      "sha256": "90a1662e3af10ab72f5a32bddcd593073bf4244ffdce760cc0d49a0b92cb887f",
+      "bytes": 1321952,
+      "sha256": "f862c32898bf7ffbcd49994a1048cc4ffef99af2ecc54215484c7fc52f79afc1",
       "triangles": 8190,
       "vertices": 4186
     }
@@ -705,8 +705,8 @@
     "Mouth_lining": {
       "worstRatio": 1.0000000922675274,
       "clip": "Death",
-      "grewFrom": 0.17787474530063338,
-      "grewTo": 0.1778747617126963,
+      "grewFrom": 0.22377790489753357,
+      "grewTo": 0.22377792554496753,
       "edgesOver2x": 0
     },
     "Hybodus_authored_body_lower_jaw": {

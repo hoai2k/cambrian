@@ -72,7 +72,7 @@ import sys
 # between 1.4x and 12x. See `tools/triassic/creatures/_pipeline/tripo.py` for the whole argument.
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), '_pipeline'))
 from tripo import relax_weights, rim_flange, cap_cut                          # noqa: E402,F401
-from tripo import oral_shells, oral_object                                    # noqa: E402,F401
+from tripo import oral_shells, oral_object, mouth_room                        # noqa: E402,F401
 
 
 # Blender exits 0 when a script raises. In `--background --python` mode the traceback goes to stdout

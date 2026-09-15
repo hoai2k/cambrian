@@ -441,9 +441,9 @@
   "jawHingeHeadRadius": 0.033916642054059996,
   "headLateralOffset": 0.013911303468977114,
   "jawHingeDepthAsFractionOfHeadRadius": 0.3834627788576666,
-  "oralInteriorDepthRaw": -0.0016291094943881035,
+  "oralInteriorDepthRaw": 0.00012034643441438675,
   "oralSeatingCorrection": {
-    "Oral cavity lining": 0.013309268151604377,
+    "Oral cavity lining": 0.008417234435249865,
     "Upper tooth row": 0.0025432465658884115,
     "Lower tooth row": 0.0018737601449019506,
     "Seated jaw hinge tissue": 0.0
