@@ -434,14 +434,15 @@ puppet, pup_thickness, twin_report, _bvh = T.build_twin(
     triangle_target=PUPPET_TRIANGLE_TARGET, sample_albedo=sample_albedo,
     blade_dilation=.0035, thin=THIN, band=THIN_BAND, roughness=.70)
 
-mouth_cut = {}
-for o, key in ((auth, 'authored'), (puppet, 'twin')):
-    n, pts = cut_peristome(o)
-    mouth_cut[key] = {'facesRemoved': int(n), 'rimVertices': int(len(pts))}
-    if key == 'authored':
-        PERISTOME = pts
-    assert n >= (7 if key == 'authored' else 3), ('the peristome cut found no faces on the ' + key, n)
-    assert len(pts) >= (9 if key == 'authored' else 5), ('the peristome left no rim on the ' + key, len(pts))
+# **The peristome is not cut and there is no mouth modelled here at all.** It used to be: a hole in
+# the crown, a sac sewn to its rim and two authored mandibles behind it. A beak inside an arm crown
+# is a mouth the player never sees -- it faces down the crown's own axis, inside a thicket of arms --
+# and the whole of it was geometry invented to close a hole that was itself invented. The generation
+# models no mouth, so the crown stays closed and `anchor_mouth`, `anchor_mouth_inside` and
+# `anchor_attack_primary` below are all the simulation ever needed. `cut_peristome` is kept because
+# it is the measurement the anchors are placed from, and because a later pass may want the hole back.
+mouth_cut = {'authored': {'facesRemoved': 0, 'rimVertices': 0},
+             'twin': {'facesRemoved': 0, 'rimVertices': 0}, 'cut': False}
 mouth_cut.update({'centre': MOUTH_P.round(5).tolist(), 'normal': M_N.round(4).tolist(),
                   'radius': round(MOUTH_R, 5), 'rootSpread': round(ROOT_SPREAD, 5),
                   'armBandRadius': round(ARM_BAND, 5),
@@ -682,54 +683,20 @@ assert not idle, ('a joint owns no skin at all', idle)
 thin_joints = sorted(((n, round(weight_tally[n] / sum(weight_tally.values()), 6))
                       for n in weight_tally if weight_tally[n] / sum(weight_tally.values()) < .0005))
 
-# ----------------------------------------------- the mouth interior: one closed skinned lining ----
-# Roof on the skull, floor on the jaw, wall stretching between them, wound inwards so the near wall
-# culls and the far wall draws, with the skin double-sided behind it as the backstop. One lining,
-# not two tubes: two tubes look identical at rest and part the moment the beak opens, which is how
-# Placodus came to open onto transparency.
-mouth_material = T.inward_material(NAME + ' mouth interior', (.21, .085, .085, 1), roughness=.60)
-beak_material = T.opaque_material(NAME + ' beak', (.055, .042, .036, 1), roughness=.34)
+# --------------------------------------------------------- the mouth: an anchor and nothing else ----
+# There is no oral geometry on this animal. See the note at the peristome above: a beak inside an arm
+# crown is never seen, and the lining and the two mandibles that used to stand here were built to
+# close a hole this builder had itself cut. `MOUTH_R` and `MOUTH_P` survive because they are the
+# measurement the mouth anchors are placed from, and `skull` and `jaw` survive because the lip band
+# of the crown's own skin is weighted to them, so they are joints that own skin and the clips that
+# move them move the animal rather than a prop.
 oralparts = []
-LINING_RINGS, LINING_RING = 16, 14
-
-
-def axial_room(margin=.006, limit=.30, step=.002):
-    """How far back the head goes on the mouth's own axis. The lining's closed end has to be inside
-    the animal, and a fraction of the mouth radius is not a measurement of that."""
-    inside, room = False, 0.
-    for t in np.arange(step, limit, step):
-        d = depth(Vector((MOUTH_P - M_N * float(t)).tolist()))
-        if d >= margin:
-            inside, room = True, float(t)
-        elif inside:
-            break
-    return room
-
-
-HEAD_ROOM = axial_room()
-LINING_DEPTH = min(MOUTH_R * 2.3, HEAD_ROOM * .80)
-assert LINING_DEPTH > MOUTH_R * .8, ('no room for a mouth behind the peristome', HEAD_ROOM)
+MOUTH_DEPTH = MOUTH_R * 2.3                 # how far inside the crown `anchor_mouth_inside` sits
 
 
 def mouth_point(a, dn, ds):
     return Vector((MOUTH_P + M_N * a + M_DN * dn + M_DS * ds).tolist())
 
-
-_lining, _lining_raw = T.crown_lining(
-    NAME + ' oral lining', rig, tx, PERISTOME, MOUTH_P, M_N, M_DN, M_DS,
-    into_head=LINING_DEPTH, skin_weights=weights, material=mouth_material,
-    rings=LINING_RINGS, ring=LINING_RING)
-oralparts.append(_lining)
-
-
-for _label, _bone, _sign in ((' upper mandible', 'skull', -1), (' lower mandible', 'jaw', 1)):
-    oralparts.append(T.crown_beak(NAME + _label, rig, _bone, tx, MOUTH_P, M_N, M_DN, M_DS,
-                                  MOUTH_R, _sign, beak_material))
-
-# The lining's closed end must be inside the head, or an open mouth shows a sac hanging in the water.
-lining_back = Vector(np.asarray(_lining_raw)[-LINING_RING:].mean(0).tolist())
-lining_depth_raw = depth(lining_back)
-assert lining_depth_raw > .004, ('the lining reaches outside the head', round(float(lining_depth_raw), 5))
 
 # --------------------------------------------- measured comparison of the two real surfaces ----
 auth_v = np.array([v.co[:] for v in auth.data.vertices])
@@ -1034,7 +1001,7 @@ anchors = [
     {'name': 'anchor_mouth', 'bone': 'jaw', 'role': 'mouth',
      'point': list(tx(mouth_point(MOUTH_R * .70, MOUTH_R * .14, 0)))},
     {'name': 'anchor_mouth_inside', 'bone': 'skull', 'role': 'swallow',
-     'point': list(tx(mouth_point(-LINING_DEPTH * .55, 0, 0)))},
+     'point': list(tx(mouth_point(-MOUTH_DEPTH * .55, 0, 0)))},
     {'name': 'anchor_attack_primary', 'bone': '%s_%02d' % (VENTRAL_ARM['name'], ARM_SEG - 1),
      'role': 'attack', 'point': list(tx(Vector(arm_tip_point(VENTRAL_ARM).tolist()))),
      'chain': ['%s_%02d' % (VENTRAL_ARM['name'], i) for i in range(ARM_SEG)]},
@@ -1132,10 +1099,10 @@ meta = {'id': ID, 'name': NAME, 'species': 'Ceratites nodosus',
             'The shell is one rigid bone with no animation channel in any clip, parented to the '
             'body so the whole animal still rolls. A bone that never moves relative to its parent '
             'cannot tear the skin it shares with it, which is what makes a coil this large safe.',
-            'The generation models no mouth, and casting head normals back into the mesh finds '
-            'neighbouring arms across the crown gaps rather than a lip opposite, so the peristome '
-            'is authored on the crown axis with one closed skinned lining behind it and two '
-            'mandibles. The skin is double-sided as the backstop.',
+            'The generation models no mouth, and this animal is not given one: a beak inside an '
+            'arm crown faces down the crown axis inside a thicket of arms and is never in frame, '
+            'so the crown stays the closed surface it was delivered as and the three mouth and '
+            'attack anchors are the whole of it.',
             'This animal jets (`shell: true`) but is not a `swimStyle: pulse` swimmer, so nothing '
             'scrubs its Swim clip to a simulation phase; the clip is an honest repeating funnel '
             'pump rather than a one-PULSE_CYCLE squeeze, which would drift against the thrust.',
@@ -1169,11 +1136,9 @@ report = {'id': ID, 'intake': intake, 'coil': coil_report,
           'jointsBelowHalfAPercentOfSkin': thin_joints,
           'armSweepDegreesPerCycle': arm_sweep, 'funnelSweepDegreesPerCycle': funnel_sweep,
           'curvature': curvature, 'pairedAppendageAsymmetry': asymmetry,
-          'mouth': dict(mouth_cut, liningRings=LINING_RINGS, liningRing=LINING_RING,
-                        liningDepth=LINING_DEPTH,
-                        liningNearestSurfaceDepthRaw=round(float(lining_depth_raw), 5),
-                        skinDoubleSided=True, liningCullsBackfaces=True, oneClosedLining=True,
-                        beak='two authored mandibles, 7 sections each, rigid on skull and jaw'),
+          'mouth': dict(mouth_cut, modelled=False, anchorDepth=round(MOUTH_DEPTH, 5),
+                        note='no peristome cut, no lining and no beak: a mouth inside an arm crown '
+                             'is never seen, so the anchors are the whole of it'),
           'albedoSha256': albedo_sha,
           'shellIsRigid': True, 'shellHasNoChannels': True,
           'normalizedWeights': True, 'rootStable': True, 'noScaleChannels': True}

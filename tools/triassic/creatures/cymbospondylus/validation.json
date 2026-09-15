@@ -828,9 +828,9 @@
       "radiusOuter": 0.06119582561443898
     }
   },
-  "authoredTriangles": 21132,
-  "twinTriangles": 8422,
-  "twinTriangleFraction": 0.3985424947946243,
+  "authoredTriangles": 20600,
+  "twinTriangles": 7982,
+  "twinTriangleFraction": 0.3874757281553398,
   "twinRemeshTriangles": 56404,
   "twinDecimateRatio": 0.11701297760009766,
   "twinVerticesHeldBackFromRelaxation": 9104,
@@ -1328,40 +1328,40 @@
   "weights": {
     "Cymbospondylus authored body": {
       "maxInfluences": 4,
-      "vertices": 9482,
+      "vertices": 9336,
       "verticesPerBone": {
         "tail_01": 1689,
-        "tail_00": 1839,
+        "tail_00": 1836,
         "tail_02": 2232,
-        "fore_mid_R": 549,
+        "fore_mid_R": 546,
         "fore_tip_R": 256,
-        "chest": 3999,
-        "body": 4376,
-        "tail_04": 639,
-        "tail_03": 1760,
+        "chest": 3989,
+        "body": 4364,
+        "tail_04": 636,
+        "tail_03": 1757,
         "tail_05": 478,
         "hind_upper_R": 733,
-        "neck": 1410,
-        "skull": 1082,
-        "fore_mid_L": 619,
-        "fore_upper_L": 925,
+        "neck": 1321,
+        "skull": 957,
+        "fore_mid_L": 616,
+        "fore_upper_L": 922,
         "fore_tip_L": 287,
-        "fore_upper_R": 874,
+        "fore_upper_R": 871,
         "hind_mid_R": 472,
         "hind_mid_L": 587,
-        "hind_tip_L": 292,
+        "hind_tip_L": 293,
         "hind_upper_L": 782,
         "tail_08": 364,
-        "tail_07": 504,
-        "caudal_upper": 376,
-        "tail_06": 517,
+        "tail_07": 501,
+        "caudal_upper": 373,
+        "tail_06": 514,
         "hind_tip_R": 221,
         "caudal_lower": 249
       }
     },
     "Cymbospondylus procedural volume twin": {
       "maxInfluences": 4,
-      "vertices": 3449,
+      "vertices": 3339,
       "verticesPerBone": {
         "caudal_lower": 183,
         "tail_08": 225,
@@ -1384,17 +1384,17 @@
         "chest": 1570,
         "fore_upper_L": 380,
         "fore_upper_R": 377,
-        "neck": 688,
+        "neck": 638,
         "fore_mid_R": 255,
         "fore_tip_R": 117,
         "fore_mid_L": 276,
         "fore_tip_L": 122,
-        "skull": 637
+        "skull": 527
       }
     }
   },
   "maxInfluences": 4,
-  "meanInfluences": 3.0458587889567705,
+  "meanInfluences": 3.0738461538461537,
   "mouth": {
     "method": "modelled cavity",
     "note": "Placodus' geometric method: every head vertex casts its own outward normal back into the mesh over 0.030 raw units, and a vertex that hits is looking across the slit at the lip opposite. The albedo fallback Dinocephalosaurus needed was not used, because this generation models a real mouth.",
@@ -2345,7 +2345,7 @@
     "oralPartSeating": [
       {
         "part": "Oral cavity lining",
-        "worstDepthRaw": -0.007572114001959562
+        "worstDepthRaw": -0.013390489853918552
       },
       {
         "part": "Seated jaw hinge tissue",
@@ -2357,7 +2357,7 @@
     "maximumEnvelopeDifference": 0.22690588235855103,
     "maximumEnvelopeDifferenceFractionOfBodyLength": 0.03781764705975851,
     "surfaceDistanceMax": 0.1810218244791031,
-    "surfaceDistanceP95": 0.030984362401068215,
+    "surfaceDistanceP95": 0.03052835799753664,
     "envelopeTolerance": 0.24
   },
   "anchors": {

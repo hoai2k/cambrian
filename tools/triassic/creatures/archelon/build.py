@@ -638,10 +638,29 @@ def mouth_section(y):
 # The jaw share is written over the built rings below, so the lining is constructed with a
 # placeholder here: the share wants each ring vertex's own height against its own section, which
 # is a measurement of the geometry rather than of the station it was asked for.
+# How much head there is round the mouth line at each station. **This is what the palate and the
+# floor are each sized to fill**, and it is the difference between two shells and one sac: the
+# measured cavity of a shut mouth is much narrower than the head that holds it, so two shells drawn
+# to the lumen alone leave a gap either side of them and a ray into the gape passes between them and
+# hits the inside of the far cheek. The sac's stretching wall used to stand across exactly that line.
+# Cast inwards from outside the animal, on the closed intake surface before the jaw comes off --
+# see `T.mouth_room` for why outwards is wrong wherever a generation models a real oral cavity.
+_room_cache = {}
+
+
+def mouth_room(_y):
+    k = round(_y, 5)
+    if k not in _room_cache:
+        _room_cache[k] = T.mouth_room(bvh_auth, Vector((cx(_y), _y, seam(_y))),
+                                      Vector((1, 0, 0)), Vector((0, 0, 1)),
+                                      limit=.20, fallback=.02)
+    return _room_cache[k]
+
+
 lining, lining_raw = T.lining('Oral cavity lining', rig, tx, seam, mouth_section,
                               MOUTH_BACK, MOUTH_FRONT, (lambda _p: 0.), mouth_mat,
                               rings=26, ring=22, centre_x=cx, power=LINING_POWER,
-                              fit=None)
+                              fit=None, room=mouth_room)
 oralparts = [lining]
 mouth_cover = []
 for _y in np.linspace(MOUTH_FRONT + .004, MOUTH_BACK - .004, 12):

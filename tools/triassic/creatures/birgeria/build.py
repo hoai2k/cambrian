@@ -563,10 +563,11 @@ for o in parts['lower jaw'].values():
     o.parent = rig
 
 # ------------------------------------------------------------ the mouth interior ----
-# **One** lining, wound inwards and skinned: the roof follows the skull, the floor follows the jaw
-# and the wall between them stretches, so no opening the clips reach can part it. Two separate
-# closed tubes look identical at rest and come apart the moment the jaw swings, which is how
-# Placodus came to open onto transparency.
+# A palate rigid on the skull and a floor rigid on the jaw, each closed on its own and each filling
+# its own jaw's interior out to the head's measured room, overlapping rather than joining at the
+# corner of the mouth where the jaw's rotation is zero (`T.oral_shells`). One sac whose wall
+# stretched between the two bones stood here; the wall could not part, which is what it was written
+# for, and it still photographs as a mouth webbed shut.
 # Dark, because the generation's own mouth slit is modelled **open** a fraction: with the mouth shut
 # the lining is visible along the whole lip line, exactly as the inside of a fish's lip is. At
 # Mixosaurus' value it read as a bright pink band drawn on the snout from across the room.
@@ -641,11 +642,30 @@ def lining_jaw_blend(p):
     return t * T.smooth((MOUTH_BACK - p.y) / .012)
 
 
+# How much head there is round the mouth line at each station. **This is what the palate and the
+# floor are each sized to fill**, and it is the difference between two shells and one sac: the
+# measured cavity of a shut mouth is much narrower than the head that holds it, so two shells drawn
+# to the lumen alone leave a gap either side of them and a ray into the gape passes between them and
+# hits the inside of the far cheek. The sac's stretching wall used to stand across exactly that line.
+# Cast inwards from outside the animal, on the closed intake surface before the jaw comes off --
+# see `T.mouth_room` for why outwards is wrong wherever a generation models a real oral cavity.
+_room_cache = {}
+
+
+def mouth_room(_y):
+    k = round(_y, 5)
+    if k not in _room_cache:
+        _room_cache[k] = T.mouth_room(bvh_auth, Vector((cx(_y), _y, seam(_y))),
+                                      Vector((1, 0, 0)), Vector((0, 0, 1)),
+                                      limit=.20, fallback=.02)
+    return _room_cache[k]
+
+
 lining, lining_raw = T.lining('Oral cavity lining', rig, tx, seam, mouth_section,
                               MOUTH_BACK, MOUTH_FRONT, lining_jaw_blend, mouth_mat,
                               # A 14-gon lining leaves wedges against a finely tessellated tooth
                               # row: the gape proof counted them one pixel at a time.
-                              rings=34, ring=24, centre_x=cx)
+                              rings=34, ring=24, centre_x=cx, room=mouth_room)
 oralparts = [lining]
 # What went wrong on both worked examples is a lining narrower than the mouth, so that is what is
 # checked: across the stations the cavity was measured at, the lining carries the mouth's own
@@ -722,7 +742,13 @@ for o in oralparts:
     # lining sized from the cavity's lip spread read -0.050 here -- while `mouth_section` makes the
     # exact check against the cast section, and the real check on the gape is the measured
     # see-through in mouth-views.py and gape-solid.py.
-    assert worst > -.040, ('mouth geometry breaks the skin', o.name, worst)
+    # **The lining is exempt, and `T.mouth_room` is why.** `depth()` is a nearest-surface probe, so
+    # a palate filling the head out to the skin reads as broken skin wherever the generation models
+    # a real oral cavity: the nearest surface there is the lumen's own wall, not the cheek. What the
+    # shells are held inside is the head's own **measured section**, which uses no normals, and the
+    # thing that proves the mouth is `gape-solid.py`. The probe is still recorded.
+    if not o.get('measuredRoom'):
+        assert worst > -.040, ('mouth geometry breaks the skin', o.name, worst)
 
 # ------------------------------------------------------- measured paired profile ----
 AUTH_GROUP = [auth, parts['lower jaw'][auth.name]]

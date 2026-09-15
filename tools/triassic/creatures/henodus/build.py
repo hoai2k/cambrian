@@ -546,9 +546,11 @@ for o in parts['lower jaw'].values():
 # wall has to be got out of the way, so this one material is the one thing here that culls its
 # backfaces. The skin does the opposite, because a cut shell is no longer closed.
 #
-# It is ONE lining, not a floor and a palate: two separate tubes look identical at rest and part
-# the moment the jaw swings, which is how Placodus came to open onto transparency. The floor
-# follows the jaw, the roof follows the skull, and the wall between them stretches.
+# A palate rigid on the skull and a floor rigid on the jaw, each closed on its own and each filling
+# its own jaw's interior out to the head's measured room, overlapping rather than joining at the
+# corner of the mouth where the jaw's rotation is zero (`T.oral_shells`). One sac whose wall
+# stretched between the two bones stood here; the wall could not part, which is what it was written
+# for, and it still photographs as a mouth webbed shut.
 mouthmat = bpy.data.materials.new('Henodus mouth interior'); mouthmat.use_nodes = True
 mouthmat.use_backface_culling = True
 mbs = mouthmat.node_tree.nodes.get('Principled BSDF')
@@ -568,14 +570,33 @@ def mouth_section(x):
     return w, h
 
 
+# How much head there is round the mouth line at each station: what the palate and the floor are
+# each sized to fill. Two shells drawn to the lumen alone leave a gap either side of them, and a ray
+# into the gape passes between them and hits the inside of the far cheek -- the line the sac's
+# stretching wall used to stand across. Cast inwards on the closed intake surface (`inside`, built
+# before the jaw is cut off): this generation models a real slit, so a ray cast *outwards* from the
+# mouth axis would stop on the lumen's own wall and measure the mouth all over again.
+_room_cache = {}
+
+
+def mouth_room(x):
+    k = round(x, 5)
+    if k not in _room_cache:
+        _room_cache[k] = T.mouth_room(inside, Vector((x, 0, seam(x))), Vector((0, 1, 0)),
+                                      Vector((0, 0, 1)), limit=.20, fallback=.02)
+    return _room_cache[k]
+
+
 LINING_RINGS, LINING_RING = 20, 14
 # A palate rigid on the skull and a floor rigid on the jaw, each closed on its own, overlapping at
 # the corner of the mouth where the jaw's rotation is zero: `T.oral_shells`, shared with the era.
 # What stood here was one sac whose wall stretched between the two bones. The wall could not part,
 # which is what it was written for, and it was still wrong: it photographs as a mouth webbed shut.
 lin_raw, faces, n_palate = T.oral_shells(seam, mouth_section, MOUTH_BACK, MOUTH_FRONT,
-                                         rings=LINING_RINGS, ring=LINING_RING, axis='x')
-lining = T.oral_object('Oral cavity lining', tx, lin_raw, faces, n_palate, mouthmat, rig)
+                                         rings=LINING_RINGS, ring=LINING_RING, axis='x',
+                                         room=mouth_room)
+lining = T.oral_object('Oral cavity lining', tx, lin_raw, faces, n_palate, mouthmat, rig,
+                       measured_room=True)
 oralparts.append(lining)
 # Recorded, not asserted, and Placodus says why: a point in the lumen is OUTSIDE the closed shell,
 # because the shell folds in through the modelled slit, so a nearest-surface depth on a lining

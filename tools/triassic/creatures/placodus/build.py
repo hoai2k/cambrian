@@ -440,12 +440,11 @@ def rigid(o,bonename,material):
  o.parent=rig;mo=o.modifiers.new('Jaw articulation','ARMATURE');mo.object=rig
  for p in o.data.polygons:p.use_smooth=True
  oralparts.append(o);return o
-# The old floor and palate were two ribbons 0.031 wide up the middle of a mouth measured at 0.042,
-# ending short of both the corner and the front, so an open jaw showed unlined gape at exactly the
-# places a gape is seen from. This is one lining on the cavity's own measured section, running from
-# behind the hinge to the front of the mandible, and it is *skinned* rather than split: the floor
-# follows the jaw, the roof follows the skull and the wall between them stretches, so no opening
-# the clips reach can part it.
+# A palate rigid on the skull and a floor rigid on the jaw, each closed on its own and each filling
+# its own jaw's interior out to the head's measured room, overlapping rather than joining at the
+# corner of the mouth where the jaw's rotation is zero (`T.oral_shells`). One sac whose wall
+# stretched between the two bones stood here; the wall could not part, which is what it was written
+# for, and it still photographs as a mouth webbed shut.
 MOUTH_BACK=HINGE_X-.022
 MOUTH_FRONT=JAW_FRONT_X+.004
 # Seating here is not a ray or a nearest-distance: a point in the lumen is *outside* the closed
@@ -459,6 +458,16 @@ def mouth_section(x):
  w=float(np.interp(x,MX,WIDE))*LINING_INSET*(.16+.84*e)
  h=max(float(np.interp(x,MX,TALL))*LINING_INSET,.0022)*(.30+.70*e)
  return w,h
+# How much head there is round the mouth line at each station -- what the palate and the floor are
+# each sized to fill. Measured by ray cast on the closed intake surface (`inside`, built before the
+# jaw is cut off), not by `depth()`: this generation models a real slit, and beside a modelled slit
+# a nearest-surface probe answers about the lumen's own wall rather than the skull.
+_room={}
+def mouth_room(x):
+ k=round(x,5)
+ if k not in _room:
+  _room[k]=T.mouth_room(inside,Vector((x,0,seam(x))),Vector((0,1,0)),Vector((0,0,1)),limit=.20,fallback=.02)
+ return _room[k]
 LINING_RINGS,LINING_RING=22,14
 # A palate rigid on the skull and a floor rigid on the jaw, each closed on its own and overlapping
 # rather than joining at the corner of the mouth -- `T.oral_shells`, shared with every other body in
@@ -469,8 +478,9 @@ LINING_RINGS,LINING_RING=22,14
 # closed by itself, which no rotation can undo, and the overlap is at the hinge, where the jaw's
 # rotation is zero by definition.
 lin_raw,faces,n_palate=T.oral_shells(seam,mouth_section,MOUTH_BACK,MOUTH_FRONT,
-                                     rings=LINING_RINGS,ring=LINING_RING,axis='x')
-lining=T.oral_object('Oral cavity lining',tx,lin_raw,faces,n_palate,mouthmat,rig)
+                                     rings=LINING_RINGS,ring=LINING_RING,axis='x',
+                                     room=mouth_room)
+lining=T.oral_object('Oral cavity lining',tx,lin_raw,faces,n_palate,mouthmat,rig,measured_room=True)
 oralparts.append(lining)
 # What went wrong before is a lining narrower than the mouth, so that is what is asserted: across
 # the stations the cavity was measured at, the lining carries the mouth's own section. (The shipped

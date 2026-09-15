@@ -319,11 +319,50 @@ unless the user explicitly asks for a PR. Steps:
   viewer catalogue lists them in the Triassic collection marked `offRoster`. Such a body borrows
   nothing, because it is in no sea, so the *Model* control must not offer it a "borrowed body in
   play" stage and the downloads line must not call a raw generation the full model.
-- **A mouth must read as a mouth, not as a hole in the model**, and the standing bar for every
-  Triassic body is three things. *Inside*: one **closed skinned lining** — roof on the skull, floor
-  on the jaw, wall stretching between them — wound inwards, with the skin double-sided behind it as
-  a backstop. Two separate tubes look identical at rest and part the moment the jaw swings, which is
-  how Placodus came to open onto transparency. Proving it needs care: render at full gape against a
+- **A mouth must read as a mouth — not as a hole in the model, and not as a mouth webbed shut**,
+  and the standing bar for every Triassic body is three things. *Inside*: **a palate and a floor**
+  (`T.oral_shells` in `_pipeline/tripo.py`, imported by `shorekit` so there is one of it) — two
+  independently closed surfaces, the palate rigid on `skull` and the floor rigid on `jaw`, each
+  filling its own jaw's interior out to the head's own measured room at the mouth line, and
+  **overlapping rather than joining** at the corner of the mouth and behind the hinge. The skin
+  stays double-sided behind them as the backstop.
+  What stood here until now was one closed skinned sac whose wall stretched between the two bones,
+  and it is worth knowing why, because the reasoning was sound: two separate *tubes* drawn to the
+  lumen part the moment the jaw swings, and Placodus opened onto transparency exactly that way. The
+  sac closed that and was still wrong — the wall it stretches **is** a mouth webbed shut, and on
+  Cymbospondylus at `Heavy` it photographs as a flat pink triangle filling the whole gape from hinge
+  to snout. A reviewer looking at four bodies called it gum, and it is not anatomy: a mouth is a
+  palate closing the skull's interior, a floor closing the mandible's, and open space between them.
+  **Three things make two surfaces safe where two tubes were not.** Each is closed *on its own*, so
+  no rotation can part it — there is no seam anywhere. The overlap is **at the hinge**, where the
+  jaw's rotation is zero by definition, so it survives any gape while the separation forward of it
+  grows exactly as the mouth does. And each is sized to the **head**, not to the lumen
+  (`T.mouth_room`): the measured cavity of a shut mouth is far narrower than the head that holds it
+  — Placodus' is 0.042 half-wide in a head more than twice that — so shells drawn to the lumen alone
+  leave a gap either side of them, and a ray into the gape passes between them and hits the inside
+  of the far cheek. That is the line the old wall stood across, and it is worth 309 px against 4.
+  `mouth_room` is cast **inwards from outside the animal**: cast outwards from the mouth axis, the
+  first thing a ray meets on a generation that models a real cavity is the cavity's own wall a few
+  thousandths away, so the palate is sized to the mouth all over again and the number does not move.
+  Two more shape rules follow from the same measurement. The shells are wound **outwards** and their
+  normals recalculated, because a closed solid shows its front faces to everything outside it and a
+  cull can never take a face that is doing work — the old sac had to be wound inwards and that
+  winding was load-bearing. And the half of each shell that **faces the mouth** is a squircle rather
+  than an ellipse, because an ellipse narrows towards its poles and a little way off the mouth line
+  the shell is a fraction of the width it has at the lip: on Placodus that one change is 90 px
+  against 4. The far half keeps the caller's own exponent, and the squircle runs back to it over the
+  throat, because a squircle whose two semi-axes are both the head's puts its diagonal corner 23 %
+  outside the head — which broke Cymbospondylus' cheek.
+  One guard had to move with all this. A builder's nearest-surface seating check (`depth()`) reads a
+  palate that fills the head as broken skin wherever the generation models a real oral cavity,
+  because the nearest surface there is the lumen's own wall: Cymbospondylus reads −0.0134 against a
+  −0.012 bound and **does not move** under any correction to the shape. So the lining is exempt from
+  it (`measuredRoom` on the object), the probe is recorded, and what containment rests on is the
+  head's own measured section — which is the rule this file already states for anything beside a
+  modelled mouth. `gape-solid.py` is what proves the mouth.
+  Seeing daylight between the jaws of a gharial-snouted animal **is** what an open mouth looks like,
+  and `gape-solid.py` has always allowed it: backdrop present in **both** of its passes is honest
+  gape, and only backdrop the cull *opens* is a hole. Proving it needs care: render at full gape against a
   saturated backdrop *with and without* a backface-cull shim and compare the two, because comparing
   against the plain background measures the backdrop rather than the gape and passes whatever the
   mesh does. **And the test for "this pixel is the backdrop" has been too loose twice, the same way
@@ -366,7 +405,21 @@ unless the user explicitly asks for a PR. Steps:
   interpenetrate when they are first brought together, the oral cavity Tripo modelled has to fold
   rather than be built, and closing is a large jaw rotation, so the pose the animal spends almost
   all its time in becomes the most deformed one.
-- **A beak inside an arm crown is a mouth, and almost nothing about a jawed head applies to it.**
+- **A beak inside an arm crown is a mouth nobody ever sees, so neither cephalopod has one.**
+  Ceratites and Phragmoteuthis carry no peristome cut, no lining and no beak: the crown stays the
+  closed surface the generation delivered, and `anchor_mouth`, `anchor_mouth_inside` and
+  `anchor_attack_primary` are the whole of the mouth, which is all the simulation ever asks for. A
+  beak faces down the crown's own axis inside a thicket of arms and is never in frame, and every
+  piece of geometry that used to stand there was invented to close a hole the builder had itself
+  cut. The bones stay: the lip band of the crown's own skin is weighted to `skull` and `jaw`, so
+  they are joints that own skin and the clips that move them move the animal.
+  `T.crown_lining`, `T.crown_beak` and `tools/triassic/gape-crown.py` are unused and **kept**, with
+  the measurement they rest on, because the shape question is real and a later pass may want the
+  mouth back. What follows is why they are the way they are, if it ever is wanted again — and note
+  that `gape-crown.py` still carries the *first* and loosest backdrop discriminator, so its figures
+  below were never trustworthy and it would need the current `r > .90, g < .20, b > .90` before it
+  could judge anything.
+  **Almost nothing about a jawed head applies to a crown.**
   Neither cephalopod's generation models a mouth at all, and Placodus' method — cast head vertex
   normals back into the mesh and fit the hits — returns hundreds of them spread over the whole crown,
   because what a normal meets across a gap there is the *neighbouring arm*. That is a third way that

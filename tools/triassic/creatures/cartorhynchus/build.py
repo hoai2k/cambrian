@@ -387,10 +387,11 @@ for o in parts['lower jaw'].values():
     o.parent = rig
 
 # ------------------------------------------------------------ the mouth interior ----
-# One lining, wound inwards and *skinned*: the roof follows the skull, the floor follows the jaw
-# and the wall between them stretches, so no opening the clips reach can part it. Both worked
-# examples shipped two split tubes that opened a wedge at the back of the mouth, and because the
-# source material culls its backfaces, what showed through that wedge was the far side of the head.
+# A palate rigid on the skull and a floor rigid on the jaw, each closed on its own and each filling
+# its own jaw's interior out to the head's measured room, overlapping rather than joining at the
+# corner of the mouth where the jaw's rotation is zero (`T.oral_shells`). One sac whose wall
+# stretched between the two bones stood here; the wall could not part, which is what it was written
+# for, and it still photographs as a mouth webbed shut.
 mouth_mat = T.inward_material(NAME + ' mouth interior', (.30, .13, .115, 1))
 MOUTH_BACK = HINGE_Y - .004
 MOUTH_FRONT = JAW_FRONT_Y + .006
@@ -464,9 +465,28 @@ def lining_jaw_blend(p):
     return t * T.smooth((MOUTH_BACK - p.y) / .012) * T.smooth((p.y - MOUTH_FRONT) / .006)
 
 
+# How much head there is round the mouth line at each station. **This is what the palate and the
+# floor are each sized to fill**, and it is the difference between two shells and one sac: the
+# measured cavity of a shut mouth is much narrower than the head that holds it, so two shells drawn
+# to the lumen alone leave a gap either side of them and a ray into the gape passes between them and
+# hits the inside of the far cheek. The sac's stretching wall used to stand across exactly that line.
+# Cast inwards from outside the animal, on the closed intake surface before the jaw comes off --
+# see `T.mouth_room` for why outwards is wrong wherever a generation models a real oral cavity.
+_room_cache = {}
+
+
+def mouth_room(_y):
+    k = round(_y, 5)
+    if k not in _room_cache:
+        _room_cache[k] = T.mouth_room(bvh_auth, Vector((cx(_y), _y, seam(_y))),
+                                      Vector((1, 0, 0)), Vector((0, 0, 1)),
+                                      limit=.20, fallback=.02)
+    return _room_cache[k]
+
+
 lining, lining_raw = T.lining('Oral cavity lining', rig, tx, seam, mouth_section,
                               MOUTH_BACK, MOUTH_FRONT, lining_jaw_blend, mouth_mat,
-                              rings=26, ring=14, centre_x=cx)
+                              rings=26, ring=14, centre_x=cx, room=mouth_room)
 oralparts = [lining]
 # What went wrong on both worked examples is a lining narrower than the mouth, so that is what
 # is checked: across the stations the lip was measured at, the lining carries the head's own
@@ -550,7 +570,13 @@ for o in oralparts:
     # exactly where the lining lives. This catches gross errors -- a lining built on the file's
     # midline instead of the measured one came out at -0.019 here -- and the real check on the
     # gape is the measured see-through in mouth-views.py.
-    assert worst > -.012, ('mouth geometry breaks the skin', o.name, worst)
+    # **The lining is exempt, and `T.mouth_room` is why.** `depth()` is a nearest-surface probe, so
+    # a palate filling the head out to the skin reads as broken skin wherever the generation models
+    # a real oral cavity: the nearest surface there is the lumen's own wall, not the cheek. What the
+    # shells are held inside is the head's own **measured section**, which uses no normals, and the
+    # thing that proves the mouth is `gape-solid.py`. The probe is still recorded.
+    if not o.get('measuredRoom'):
+        assert worst > -.012, ('mouth geometry breaks the skin', o.name, worst)
 
 # ------------------------------------------------------- measured paired profile ----
 AUTH_GROUP = [auth, parts['lower jaw'][auth.name]]

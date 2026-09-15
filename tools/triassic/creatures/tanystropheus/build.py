@@ -462,8 +462,19 @@ def mouth_section(x):
 # The lumen is a long thin sac on a head a thirtieth of the animal, so it is drawn with the
 # fewest rings that still follow the taper: every triangle in here is paid for twice, once on the
 # authored body and once on the twin, and the reduced model has to stay inside 40 % of the whole.
+# How much head there is round the mouth line at each station. **This is what the palate and the
+# floor are each sized to fill**, and it is the difference between two shells and one sac: the lumen
+# is much narrower than the head that holds it, so two shells drawn to the lumen alone leave a gap
+# either side of them and a ray into the gape passes between them and hits the inside of the far
+# cheek. The sac's stretching wall used to stand across exactly that line. Read off this builder's
+# own measured head profile rather than cast, because the mandible has been cut off the body by now
+# and a ray downwards would go straight through where it used to be.
+def mouth_room(_x):
+    return (float(np.interp(_x, SX, SW)), head_hi(_x) - seam(_x), seam(_x) - head_lo(_x))
+
+
 lining, lin_raw = K.oral_lining('Oral cavity lining', (MOUTH_BACK, MOUTH_FRONT), mouth_section,
-                                seam, tx, rings=18, ring=12)
+                                seam, tx, rings=18, ring=12, room=mouth_room)
 lining.data.materials.append(mouthmat)
 
 # The fish trap: interlocking long recurved fangs at the front of both jaws, the feature the skull

@@ -548,13 +548,32 @@ def lining_jaw_blend(p):
     return t
 
 
+# How much head there is round the mouth line at each station. **This is what the palate and the
+# floor are each sized to fill**, and it is the difference between two shells and one sac: the
+# measured cavity of a shut mouth is much narrower than the head that holds it, so two shells drawn
+# to the lumen alone leave a gap either side of them and a ray into the gape passes between them and
+# hits the inside of the far cheek. The sac's stretching wall used to stand across exactly that line.
+# Cast inwards from outside the animal, on the closed intake surface before the jaw comes off --
+# see `T.mouth_room` for why outwards is wrong wherever a generation models a real oral cavity.
+_room_cache = {}
+
+
+def mouth_room(_y):
+    k = round(_y, 5)
+    if k not in _room_cache:
+        _room_cache[k] = T.mouth_room(bvh_auth, Vector((cx(_y), _y, seam(_y))),
+                                      Vector((1, 0, 0)), Vector((0, 0, 1)),
+                                      limit=.20, fallback=.02)
+    return _room_cache[k]
+
+
 lining, lining_raw = T.lining('Oral cavity lining', rig, tx, seam, mouth_section,
                               MOUTH_BACK, MOUTH_FRONT, lining_jaw_blend, mouth_mat,
                               # A squircle, not an ellipse: see `T.lining`. An ellipse narrows
                               # towards its floor, and at the height the mandible's rim reaches at
                               # full gape it was a fraction of the mouth's width.
                               rings=30, ring=24, centre_x=cx, power=LINING_POWER,
-                              fit=fit_lining_point)
+                              fit=fit_lining_point, room=mouth_room)
 oralparts = [lining]
 mouth_cover = []
 for r in PAINTED:
@@ -627,7 +646,13 @@ oral_seating = []
 for o in oralparts:
     worst = min(depth(Vector(v.co[:]) / SCALE) for v in o.data.vertices)
     oral_seating.append({'part': o.name, 'worstDepthRaw': float(worst)})
-    assert worst > -.012, ('mouth geometry breaks the skin', o.name, worst)
+    # **The lining is exempt, and `T.mouth_room` is why.** `depth()` is a nearest-surface probe, so
+    # a palate filling the head out to the skin reads as broken skin wherever the generation models
+    # a real oral cavity: the nearest surface there is the lumen's own wall, not the cheek. What the
+    # shells are held inside is the head's own **measured section**, which uses no normals, and the
+    # thing that proves the mouth is `gape-solid.py`. The probe is still recorded.
+    if not o.get('measuredRoom'):
+        assert worst > -.012, ('mouth geometry breaks the skin', o.name, worst)
 
 # ------------------------------------------------------- measured paired profile ----
 AUTH_GROUP = [auth, parts['lower jaw'][auth.name]]

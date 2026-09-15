@@ -463,10 +463,12 @@ for o in parts['lower jaw'].values():
     for p in o.data.polygons: p.use_smooth = True
     mo = o.modifiers.new('Rigid lower jaw', 'ARMATURE'); mo.object = rig; o.parent = rig
 
-# ---- mouth interior: one closed skinned lining ----------------------------------------------------
-# Roof on the skull, floor on the jaw, wall stretching between them, wound inwards so the near wall
-# culls and the far wall draws, with the skin double-sided behind it. One lining, not two tubes:
-# two tubes look identical at rest and part the moment the jaw swings.
+# ---- mouth interior: a palate and a floor -------------------------------------------------------
+# A palate rigid on the skull and a floor rigid on the jaw, each closed on its own and each filling
+# its own jaw's interior out to the head's measured room, overlapping rather than joining at the
+# corner of the mouth where the jaw's rotation is zero (`T.oral_shells`). One sac whose wall
+# stretched between the two bones stood here; the wall could not part, which is what it was written
+# for, and it still photographs as a mouth webbed shut.
 mouthmat = bpy.data.materials.new('Keichousaurus mouth interior'); mouthmat.use_nodes = True
 mouthmat.use_backface_culling = True
 mbs = mouthmat.node_tree.nodes.get('Principled BSDF')
@@ -517,8 +519,14 @@ LINING_RINGS, LINING_RING = 18, 10
 # head's normal, which is what the `point` hook is for.
 lin_raw, faces, n_palate = T.oral_shells(seam_n, mouth_section, MOUTH_BACK, MOUTH_FRONT,
                                          rings=LINING_RINGS, ring=LINING_RING,
-                                         point=(lambda a, lat, n_: head_point(a, n_, lat)))
-lining = T.oral_object('Oral cavity lining', tx, lin_raw, faces, n_palate, mouthmat, rig)
+                                         point=(lambda a, lat, n_: head_point(a, n_, lat)),
+                                         # What the palate and the floor each fill: the head's own
+                                         # room at the mouth line. `mouth_extent` casts outwards
+                                         # from the mouth axis, which is honest here and only here
+                                         # -- this generation models no slit for a ray to stop on.
+                                         room=mouth_extent)
+lining = T.oral_object('Oral cavity lining', tx, lin_raw, faces, n_palate, mouthmat, rig,
+                       measured_room=True)
 oralparts.append(lining)
 # This generation models no slit, so the shell is smooth and a nearest-surface depth on a lining
 # vertex means what it says -- unlike Placodus, where the shell folds in through a real slit and

@@ -5,8 +5,8 @@
   "removedFlakeVertices": 0,
   "remeshTriangles": 83996,
   "puppetBudget": 6500,
-  "fullTriangles": 21701,
-  "puppetTriangles": 8446,
+  "fullTriangles": 21697,
+  "puppetTriangles": 8442,
   "parts": {
     "authoredBody": 17362,
     "authoredJaw": 706,
@@ -14,7 +14,7 @@
     "puppetBody": 6183,
     "puppetJaw": 160,
     "puppetArmour": 495,
-    "sharedOral": 1608
+    "sharedOral": 1604
   },
   "bones": 26,
   "clips": {

@@ -796,10 +796,19 @@ def lining_section(a):
     return .55 * head_r(a) * (.16 + .84 * e), .30 * head_r(a) * (.20 + .80 * e)
 
 
+def lining_room(a):
+    # What the palate and the floor each fill: the head's own room at the mouth line, off the
+    # measured radius profile. The mouth line sits `seam_n` off the head's axis, so the roof and
+    # the floor are not the same distance away.
+    r = head_r(max(0., min(HEAD_LEN, a)))
+    return r * .92, max(.002, r - seam_n(a)), max(.002, r + seam_n(a))
+
+
 _lin_raw, _lin_faces, _lin_palate = T.oral_shells(
     seam_n, lining_section, LIN_BACK, LIN_FRONT, rings=LINING_RINGS, ring=LINING_RING,
-    point=(lambda a, lat, n_: head_point(a, n_, lat)))
-_lin = T.oral_object('Mouth lining', tx, _lin_raw, _lin_faces, _lin_palate, mouthmat, rig)
+    point=(lambda a, lat, n_: head_point(a, n_, lat)), room=lining_room)
+_lin = T.oral_object('Mouth lining', tx, _lin_raw, _lin_faces, _lin_palate, mouthmat, rig,
+                     measured_room=True)
 oralparts.append(_lin)
 # The fang trap: a long slender snout of interlocking conical teeth, the front pair the largest.
 for label, lift, bonename, sgnz in [('Upper fangs', .0026, 'skull', -1), ('Lower fangs', -.0024, 'jaw', 1)]:

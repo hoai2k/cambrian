@@ -1025,11 +1025,11 @@ _jaw_teeth = sum(1 for v in AUTH_JAW.data.vertices
 mouth_report['generationsOwnDentition']['verticesCarriedOntoTheMandible'] = int(_jaw_teeth)
 
 # --------------------------------------------------------- the lining ----
-# One lining rather than a palate and a floor. Two separate closed tubes, one rigid on the skull and
-# one rigid on the jaw, part the moment the jaw swings and leave a wedge at the back of the mouth --
-# and a single-sided skin is then seen straight out through the far side of the head. This is one
-# sac on the mouth's own measured section, *skinned*: the roof follows the skull, the floor follows
-# the jaw, and the wall between them stretches, so no opening the clips reach can part it.
+# A palate rigid on the skull and a floor rigid on the jaw, each closed on its own and each filling
+# its own jaw's interior out to the head's measured room, overlapping rather than joining at the
+# corner of the mouth where the jaw's rotation is zero (`T.oral_shells`). One sac whose wall
+# stretched between the two bones stood here; the wall could not part, which is what it was written
+# for, and it still photographs as a mouth webbed shut.
 #
 # It is the one authored surface on this body, and it is the simple kind: a closed tube that fills a
 # hole. It takes its UVs from the skin it is sewn into -- each ring vertex samples the nearest point
@@ -1148,9 +1148,19 @@ def lumen_shells(y):
     return wy, max(_roof_lift + .10 * wz, _throat * .9 * (_top - _c)), _floor_drop
 
 
+# How much head there is round the mouth line at each station: what the palate and the floor are
+# each sized to fill, off this builder's own measured head section. Two shells drawn to the lumen
+# alone leave a gap either side of them, and a ray into the gape passes between them and hits the
+# inside of the far cheek -- which is the line the sac's stretching wall used to stand across.
+def mouth_room(y):
+    _b, _t = head_z(y)
+    _c = lumen_centre(y)
+    return head_half_width(y), _t - _c, _c - _b
+
+
 _lining_raw, faces, _lin_palate = T.oral_shells(
     lumen_centre, lumen_shells, LIN_BACK, LIN_FRONT, rings=LIN_RINGS, ring=LIN_RING,
-    axis='y', swell=1.10, behind=.08)
+    axis='y', swell=1.10, behind=.08, room=mouth_room)
 verts = list(_lining_raw)
 me = bpy.data.meshes.new('Mouth lining')
 me.from_pydata([tx(v) for v in verts], [], faces)
