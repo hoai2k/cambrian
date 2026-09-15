@@ -370,9 +370,13 @@ unless the user explicitly asks for a PR. Steps:
   failure and stays one: 2,505 px before, 2,493 after, unmoved by `cap_cut`, by a rim flange and by
   the shells themselves, which is a count about something else. **Macrocnemus** is the one place two
   surfaces cost something — the sac's wall was occluding a sightline that passes *beside* a palate
-  rather than over or under it, and `Snatch` at its widest went from 0 px to 1,460. Its builder records
-  the whole hunt; the width of the room is the suspect, because that skull sits a third of its own
-  width off the midline the room was read about.
+  rather than over or under it, and `Snatch` at its widest went from 0 px to 1,460. Its builder
+  records the whole hunt — five corrections, including casting the room about the mouth's own centre
+  because that skull sits a third of its own width off the midline it was read about, and the count
+  has not moved by one. What the rays say is that no oral geometry lies on that line **at all**, so
+  the shells are not merely too small; the instrument for the next pass is a render with the oral
+  materials painted an emissive marker, the way `gape-crown.py` does it, so "where the mouth is
+  drawn" is a mask rather than a guess.
   Seeing daylight between the jaws of a gharial-snouted animal **is** what an open mouth looks like,
   and `gape-solid.py` has always allowed it: backdrop present in **both** of its passes is honest
   gape, and only backdrop the cull *opens* is a hole. Proving it needs care: render at full gape against a
