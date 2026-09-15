@@ -123,6 +123,16 @@ if '--tops-only' not in sys.argv and ('--portraits-only' in sys.argv or '--revie
             render(HERE / 'portraits' / name, w, h)
     if '--portraits-only' in sys.argv:
         sys.exit(0)
+    if TWIN:
+        # The twin's *portrait* is a delivered asset the specimen viewer draws, so it is rendered
+        # above and kept. Its review pose set is not: the sheets are the authored body alone now,
+        # because a twin has no fin rays and no lip corners, so a clip that reads perfectly on it
+        # can be tearing the shipping body to ribbons -- which is exactly what was happening here
+        # and was invisible in the paired pictures. The pairing is checked by measurement instead:
+        # the envelope and nearest-surface numbers in `validation.json`, and the rig, clip and
+        # anchor parity assertions in `audit.mjs`. It was also the expensive half of a build, at
+        # dozens of Cycles-on-CPU frames.
+        sys.exit(0)
 
 if '--tops-only' in sys.argv:
     TOPS_ONLY = True

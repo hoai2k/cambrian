@@ -1,6 +1,6 @@
 """Assemble the paired review sheets from the renders of the exported Saurichthys GLBs.
 
-Run after render.py has produced both `authored-review/` and `twin-review/`:
+Run after render.py has produced `authored-review/`:
 
   python3 tools/triassic/creatures/saurichthys/contact-sheets.py
 """
@@ -30,21 +30,26 @@ SETS = {
                            'mouth-Heavy-0.5', 'mouth-front-Heavy-0.5'],
 }
 
+# One column, the authored body. The sheets used to pair every frame with the same frame on the
+# twin, and the comparison almost never earned its cost: a twin has no fin rays and no lip corners,
+# so a clip that reads perfectly on it can be tearing the shipping body to ribbons -- which is what
+# happened here, at 56x and 23x, invisible in the paired pictures. The pairing is still checked,
+# by measurement rather than by eye: the envelope and nearest-surface numbers in `validation.json`
+# and the rig, clip and anchor parity assertions in `audit.mjs`. What the eye is for is the body
+# that ships.
 for sheet, names in SETS.items():
     w, h = 360, 280
     cols = 2 if len(names) < 4 else 4
-    rows = (len(names) * 2 + cols - 1) // cols
+    rows = (len(names) + cols - 1) // cols
     img = Image.new('RGB', (w * cols, h * rows), (26, 30, 36))
     d = ImageDraw.Draw(img)
     for i, n in enumerate(names):
-        for j, kind in enumerate(['authored', 'twin']):
-            p = base / (kind + '-review') / (n + '.png')
-            assert p.exists(), p
-            src = Image.open(p).convert('RGBA')
-            src.thumbnail((w, h - 26))
-            index = i * 2 + j
-            x, y = (index % cols) * w, (index // cols) * h
-            img.paste(src, (x + (w - src.width) // 2, y + 24), src)
-            d.text((x + 8, y + 7), kind + ' / ' + n, fill='white')
+        p = base / 'authored-review' / (n + '.png')
+        assert p.exists(), p
+        src = Image.open(p).convert('RGBA')
+        src.thumbnail((w, h - 26))
+        x, y = (i % cols) * w, (i // cols) * h
+        img.paste(src, (x + (w - src.width) // 2, y + 24), src)
+        d.text((x + 8, y + 7), n, fill='white')
     img.save(dest / (sheet + '.jpg'), quality=90)
     print('wrote', sheet + '.jpg', img.size)

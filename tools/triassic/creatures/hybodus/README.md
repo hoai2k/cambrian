@@ -343,7 +343,7 @@ node tools/triassic/creatures/hybodus/audit.mjs --package --decode
 /opt/blender/blender -b --factory-startup --python tools/triassic/gape-solid.py -- hybodus Heavy@0.50 Attack@0.43 Bite@0.17
 node tools/triassic/skin-tears.mjs public/assets/triassic/creatures/hybodus.glb
 /opt/blender/blender --background --factory-startup --python tools/triassic/creatures/hybodus/render.py -- --decoded
-/opt/blender/blender --background --factory-startup --python tools/triassic/creatures/hybodus/render.py -- --decoded --twin
+/opt/blender/blender --background --factory-startup --python tools/triassic/creatures/hybodus/render.py -- --decoded --twin   # the twin's portrait only
 python3 tools/triassic/creatures/hybodus/contact-sheets.py
 node tools/triassic/review-bodies.mjs
 ```
@@ -370,8 +370,14 @@ Repository checks run green with these files present: `npm run triassic`, `npm r
 `npm run build`, `npm run eras`, `npm run props`. `node tools/update-asset-sizes.mjs` is a no-op, as
 it should be: it records only ids listed in `shipped.json`, and this one deliberately is not.
 
-Sheets, rendered from the decoded packaged files through identical cameras and lights for both
-models:
+Sheets, rendered from the decoded packaged file. They are the **authored body alone** — the second
+column used to be the same frame on the twin, and that comparison almost never earned its cost: a
+twin has no fin rays and no lip corners, so a clip that reads perfectly on it can be tearing the
+shipping body to ribbons, which is exactly what was happening here at 56× and was invisible in the
+paired pictures. The pairing is still checked, by measurement rather than by eye — the envelope and
+nearest-surface numbers above, and the rig, clip and anchor parity assertions in `audit.mjs` — and
+`render.py --twin` still renders the twin's delivered portrait and then stops. (The files keep the
+`paired-` prefix the rest of the era uses.)
 
 - [Side, top and front](paired-volume-sheet.jpg) — the two silhouettes against each other.
 - [Deformation](paired-deformation-sheet.jpg) — Idle, the Swim cycle, both turns, Dive and Rise.
@@ -393,7 +399,8 @@ models:
 
 I rendered every clip and looked at the sheets; there was no human reviewer and none is claimed.
 
-What I saw: the trunk and fins deform cleanly through the whole set; the beat runs back from a still
+What I saw, on the authored body, which is the one that ships and the only one the sheets now draw:
+the trunk and fins deform cleanly through the whole set; the beat runs back from a still
 head with the caudal lobe trailing the peduncle; the two dorsals and their spines hold their shape;
 the turns bank and the bank is flown on the pectorals; the gape opens as a real dark cavity with the
 tooth rows on their own jaws and closes to a clean lip line. Death rolls the animal belly-up and

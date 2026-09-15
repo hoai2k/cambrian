@@ -279,7 +279,7 @@ node tools/triassic/creatures/saurichthys/audit.mjs --package --decode
 /opt/blender/blender -b --factory-startup --python tools/triassic/gape-solid.py -- saurichthys Heavy@0.50 Attack@0.40 Bite@0.15
 node tools/triassic/skin-tears.mjs public/assets/triassic/creatures/saurichthys.glb
 /opt/blender/blender --background --factory-startup --python tools/triassic/creatures/saurichthys/render.py -- --decoded
-/opt/blender/blender --background --factory-startup --python tools/triassic/creatures/saurichthys/render.py -- --decoded --twin
+/opt/blender/blender --background --factory-startup --python tools/triassic/creatures/saurichthys/render.py -- --decoded --twin   # the twin's portrait only
 python3 tools/triassic/creatures/saurichthys/contact-sheets.py
 node tools/triassic/review-bodies.mjs
 ```
@@ -300,8 +300,14 @@ by surface so the oral lining — which is built to stretch — cannot mask a we
 Repository checks run green: `npm run triassic`, `npm run typecheck`, `npm run build`,
 `npm run eras`, `npm run props`.
 
-Sheets, rendered from the decoded packaged files through identical cameras and lights for both
-models: [volume](paired-volume-sheet.jpg), [deformation](paired-deformation-sheet.jpg),
+Sheets, rendered from the decoded packaged file, and of the **authored body alone**: the second
+column used to be the same frame on the twin, and that comparison almost never earned its cost — a
+twin has no fin rays and no lip corners, so a clip that reads perfectly on it can be tearing the
+shipping body, which is what was happening here at 23× and was invisible in the paired pictures. The
+pairing is still checked by measurement — the envelope and nearest-surface numbers above and the
+rig, clip and anchor parity assertions in `audit.mjs` — and `render.py --twin` still renders the
+twin's delivered portrait and then stops. The files keep the `paired-` prefix the rest of the era
+uses: [volume](paired-volume-sheet.jpg), [deformation](paired-deformation-sheet.jpg),
 [the lunge](paired-lunge-sheet.jpg), [remaining actions](paired-actions-sheet.jpg),
 [the beat from above](paired-beat-sheet.jpg), [this animal's own clips](paired-era-clips-sheet.jpg),
 [the mouth](paired-mouth-sheet.jpg).
@@ -310,7 +316,8 @@ models: [volume](paired-volume-sheet.jpg), [deformation](paired-deformation-shee
 
 I rendered every clip and looked at the sheets; there was no human reviewer and none is claimed.
 
-What I saw: the needle body is straight and level, the opposed dorsal and anal read as one rudder
+What I saw, on the authored body, which is the one that ships and the only one the sheets now draw:
+the needle body is straight and level, the opposed dorsal and anal read as one rudder
 with the caudal, the rostrum holds its line through the dash, and the gape opens as a long lined
 cavity with both tooth rows on their own jaws.
 
