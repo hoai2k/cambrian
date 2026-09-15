@@ -19,6 +19,9 @@ import { atMain, cycle, groupsFor, stops, type Focus, type FocusGroup } from './
 import { rectsOf, step as spatialStep, type Dir } from './spatial-nav';
 import { gridColumns, SelectScreen } from './Select';
 import { gridStep, rosterGrid, sameSlot, type ExtraId, type Slot } from './roster-grid';
+import { earnedVisitorsHere, type EraId, type Visitor } from '../content/visitors';
+import { registerVisitorAssets } from '../content/asset-paths';
+import { admitVisitors } from '../sim/creatures';
 import { TitleScreen } from './Title';
 import { Toolbar } from './Toolbar';
 import { toolbarPlace } from './toolbar-place';
@@ -160,9 +163,21 @@ export function App() {
    * because the cursor maths runs from callbacks that must see the current grid, and the grid the
    * cursor walks has to be the grid that is drawn.
    */
-  const extras = useMemo<ExtraId[]>(() => ['random'], []);
+  /**
+   * Animals earned in the other games, read off this device's other records. Empty until something
+   * has been taken to the top somewhere else, which is when the Visitors button appears at all.
+   */
+  const visitors = useMemo(() => earnedVisitorsHere(ACTIVE_ERA.id as EraId), []);
+  useEffect(() => {
+    if (!visitors.length) return;
+    admitVisitors(visitors.map((v) => v.def));
+    registerVisitorAssets(visitors.map((v) => ({ id: v.id, era: v.era })));
+  }, [visitors]);
+  const extras = useMemo<ExtraId[]>(() => (visitors.length ? ['random', 'visitors'] : ['random']), [visitors]);
   const extrasRef = useRef<ExtraId[]>(extras);
   extrasRef.current = extras;
+  const visitorsRef = useRef<Visitor[]>(visitors);
+  visitorsRef.current = visitors;
   /**
    * What this match has added to the record, so the results screen can mark it new.
    *
@@ -224,6 +239,10 @@ export function App() {
       onProgress: (p) => setProgress(p),
     });
     engineRef.current = engine;
+    // Visitors stream like anything else. Queued here rather than where they are registered,
+    // because the queue builds its URLs from `assetPaths` and there is no queue to add them to
+    // until the engine exists.
+    for (const v of visitorsRef.current) engine.assets.addVisitor(v.id);
     engine.setLook(settings.lookSpeed, settings.invertY);
     return () => { engine.dispose(); engineRef.current = null; };
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -465,7 +484,20 @@ export function App() {
    */
   const moveCursor = useCallback((index: number, dx: number, dy: number) => {
     const ps = [...playersRef.current];
-    const p = ps[index]; if (!p || p.ready) return;
+    const p = ps[index]; if (!p) return;
+    // A seat that has taken the Visitors button is locked in on purpose, and left and right walk
+    // the animals it has earned rather than the grid behind them. This is the one place a locked
+    // seat still answers the stick.
+    if (p.cursor === 'visitors' && p.ready) {
+      const list = visitorsRef.current;
+      if (!list.length || !dx) return;
+      const at = Math.max(0, list.findIndex((v) => v.id === p.creature));
+      const v = list[(at + dx + list.length) % list.length];
+      ps[index] = { ...p, creature: v.id as CreatureId, visitorScale: v.scale };
+      updatePlayers(ps); audio.play('ui-move');
+      return;
+    }
+    if (p.ready) return;
     const model = rosterGrid(CREATURE_IDS, extrasRef.current);
     const from: Slot = p.cursor ? { kind: 'extra', id: p.cursor } : { kind: 'creature', id: p.creature };
     const to = gridStep(model, from, dx, dy);
@@ -481,8 +513,14 @@ export function App() {
     ps[index] = { ...ps[index], creature: c }; updatePlayers(ps); audio.play('ui-move');
   }, [updatePlayers]);
   const toggleReady = useCallback((index: number) => {
-    const ps = [...playersRef.current]; if (!ps[index]) return;
-    ps[index] = { ...ps[index], ready: !ps[index].ready }; updatePlayers(ps); audio.play(ps[index].ready ? 'ui-confirm' : 'ui-back');
+    const ps = [...playersRef.current]; const p = ps[index]; if (!p) return;
+    const ready = !p.ready;
+    // Letting go of a visitor hands the local roster back: the seat keeps an animal this sea has,
+    // rather than a foreign body it is no longer locked in on.
+    ps[index] = ready || !p.visitorScale
+      ? { ...p, ready }
+      : { ...p, ready, visitorScale: undefined, cursor: undefined, creature: ACTIVE_ERA.defaults.player };
+    updatePlayers(ps); audio.play(ready ? 'ui-confirm' : 'ui-back');
   }, [updatePlayers]);
   /**
    * Take whatever the cursor is on. On a creature that is locking in, which is what confirm has
@@ -501,6 +539,14 @@ export function App() {
       ps[index] = { ...p, cursor: undefined, creature: pick };
       updatePlayers(ps); audio.play('ui-confirm');
       return;
+    }
+    if (p.cursor === 'visitors' && !p.ready) {
+      const v = visitorsRef.current[0];
+      if (v) {
+        ps[index] = { ...p, creature: v.id as CreatureId, visitorScale: v.scale, ready: true };
+        updatePlayers(ps); audio.play('ui-confirm');
+        return;
+      }
     }
     if (p.ready) startMatch(); else toggleReady(index);
   }, [startMatch, toggleReady, updatePlayers]);
@@ -873,6 +919,7 @@ export function App() {
           scheme={scheme}
           best={best} carry={carry} modeFocus={focus.group === 'modes' ? focus.index : -1}
           extras={extras} onExtra={pressExtra}
+          visitorCount={visitors.length} visitorEra={(id) => visitors.find((v) => v.id === id)?.era}
           onPick={setCreature} onReady={toggleReady} onRemove={removePlayer}
           onMode={changeMode} onStart={startMatch} onBack={backToTitle} onCarry={toggleCarry}
         />

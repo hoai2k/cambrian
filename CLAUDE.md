@@ -493,6 +493,43 @@ unless the user explicitly asks for a PR. Steps:
   derives both eras' tables and `npm run eras` enforces the split — an entry must claim model or
   clip work, whichever it claims must carry its reason, and animation-only work must not badge the
   animal.
+- Two seats on the same animal are drawn in different colours. The first seat on a creature keeps
+  its authored palette — a player alone is never recoloured — and every seat after it is repainted
+  from the era's own pack (`assignSeatSchemes` in `src/shared/seat-schemes.ts`, settled in
+  `updatePlayers`, which is the one choke point every lineup change goes through). Assignment is
+  sticky: a seat holding a usable scheme keeps it, so changing seat three's creature does not
+  re-roll seat two's. `PlayerSetup.scheme` carries it and `src/sim` never reads it. The renderer
+  takes it per frame (`seatScheme` on `CreatureView`), not at construction, because a view is
+  rebuilt when the body or the LOD changes and camouflage re-derives the blend base every frame.
+  `npm run seats` — one process per era, because these modules read `ACTIVE_ERA` at module top and
+  a loop silently tests all three as the Cambrian.
+- The pick grid holds buttons as well as creatures (Random, and Visitors where one has been
+  earned), so its layout is a *model* both the screen and the cursor read
+  (`src/app/roster-grid.ts`, `npm run roster`). Navigation used to be index arithmetic over the
+  roster, safe only because the tiles were rendered from that same array in that same order; a
+  button has a position and no index, and getting it wrong is silent — the cursor lands on one tile
+  while another lights up. Buttons are right-aligned: the rightmost columns of the last row where
+  it has room, a row of their own where it has not, so the roster's own alignment never moves.
+  Nothing in the model touches the DOM, which is what makes the grid the test walks the grid that
+  is drawn.
+- **Visitors.** Take a creature to the top of its own game and it turns up in the other two, at the
+  size it finishes at — a Prime Dunkleosteus in the Cambrian is five times longer than anything
+  that sea holds, which is the reward rather than a balance problem. Three things make it cheap:
+  every era's `creatures.ts` imports nothing but types, so reading another roster costs the array
+  and no module graph; all three games are pages of one build on one origin, so the Cambrian can
+  read `devonian-settings-codex` directly; and an asset path can already name another era's folder.
+  It must **not** go through `loadCodex`, which filters ids against the *active* roster and would
+  strip every foreign id. A visitor is admitted to `creature()` through its own map
+  (`admitVisitors`/`isVisitor` in `src/sim/creatures.ts`) and deliberately never joins `CREATURES`
+  or `PLAYABLE` — the roster is what the grid draws, what bots are drawn from and what the sea is
+  populated with, and a visitor is none of that. `PlayerSetup.visitorScale` overrides every other
+  answer about starting size and skips the egg. The one rule they get is that they must fit:
+  `deepEnoughFor` in `game.ts` walks out from shore until the column holds the body, because
+  distance from shore is what buys depth in every era. Anything with no queue entry must not crash
+  the preloader — `prioritize` tolerates ids it has never heard of, and `addVisitor` gives them a
+  real one. `npm run visitors` covers all three eras; the apex scales and asset folders are written
+  out in `src/content` (which may not reach up into `src/sim`) and checked against the real
+  constants there, so they cannot drift.
 - Menu cursors move by where the buttons are, not by list order: `src/app/spatial-nav.ts` resolves a
   direction against the buttons' own rectangles, so the pause and results rows answer left and
   right, a column answers up and down, and the unused axis falls back to list order so no press is

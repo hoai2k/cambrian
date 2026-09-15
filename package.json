@@ -29,6 +29,7 @@
     "progress": "esbuild tools/progress-test.ts --bundle --platform=node --format=esm --outfile=node_modules/.cache/progress-test.mjs && node node_modules/.cache/progress-test.mjs cambrian && node node_modules/.cache/progress-test.mjs devonian && node node_modules/.cache/progress-test.mjs triassic",
     "codex": "esbuild tools/codex-test.ts --bundle --platform=node --format=esm --outfile=node_modules/.cache/codex-test.mjs && node node_modules/.cache/codex-test.mjs cambrian && node node_modules/.cache/codex-test.mjs devonian && node node_modules/.cache/codex-test.mjs triassic",
     "roster": "npx tsx tools/roster-grid-test.ts",
+    "visitors": "esbuild tools/visitors-test.ts --bundle --platform=node --format=esm --outfile=node_modules/.cache/visitors-test.mjs && node node_modules/.cache/visitors-test.mjs cambrian && node node_modules/.cache/visitors-test.mjs devonian && node node_modules/.cache/visitors-test.mjs triassic",
     "seats": "esbuild tools/seat-scheme-test.ts --bundle --platform=node --format=esm --outfile=node_modules/.cache/seat-scheme-test.mjs && node node_modules/.cache/seat-scheme-test.mjs cambrian && node node_modules/.cache/seat-scheme-test.mjs devonian && node node_modules/.cache/seat-scheme-test.mjs triassic",
     "ancientseas": "esbuild tools/ancientseas-test.ts --bundle --platform=node --format=esm --outfile=node_modules/.cache/ancientseas-test.mjs && node node_modules/.cache/ancientseas-test.mjs && node tools/ancientseas/delivered.mjs --check",
     "ancientseas:delivered": "node tools/ancientseas/delivered.mjs",

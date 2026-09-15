@@ -271,6 +271,12 @@ export interface PlayerSetup {
    * match have something real to use. Never read by `src/sim`.
    */
   cursor?: 'random' | 'visitors';
+  /**
+   * This seat is playing an animal from another game (src/content/visitors.ts), at the body scale
+   * the top of *its own* ladder is worth. Set, it replaces every other answer about how big this
+   * player starts: a visitor arrives finished, because finishing is what earned it.
+   */
+  visitorScale?: number;
 }
 
 /** The three modes, shared by both eras: an era changes the sea and the animals, not the match. */

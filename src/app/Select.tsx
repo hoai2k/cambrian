@@ -13,6 +13,7 @@ import { appBase } from '../shared/base';
 import { btn, fillControls, key, type Scheme } from '../shared/controls';
 import { fillOf, ladderName, rungOf } from '../sim/ladder';
 import { gridColumns, rosterGrid, sameSlot, type ExtraId, type Slot } from './roster-grid';
+import { ERA_NAME, type EraId } from '../content/visitors';
 
 interface Props {
   players: PlayerSetup[]; mode: Mode; modes: Mode[]; modeInfo: Record<Mode, { name: string; blurb: string; players: string }>;
@@ -32,6 +33,10 @@ interface Props {
   extras: ExtraId[];
   /** Press one of them, for the seat that is on it. */
   onExtra: (i: number, id: ExtraId) => void;
+  /** How many animals this device has earned from the other games. */
+  visitorCount: number;
+  /** Which game a visitor is from, for the crew card. */
+  visitorEra?: (id: CreatureId) => EraId | undefined;
 }
 
 /**
@@ -247,6 +252,7 @@ export function SelectScreen(p: Props) {
                 title={label.title} aria-label={label.title}>
                 <span className="extra-glyph" aria-hidden="true">{label.glyph}</span>
                 <span className="extra-name">{label.name}</span>
+                {id === 'visitors' && p.visitorCount > 0 && <span className="extra-count">{p.visitorCount}</span>}
                 <span className="cell-rings">
                   {on.map(({ i }) => <i key={i} style={{ ['--c' as string]: PLAYER_COLORS[i], ['--k' as string]: i }} className="ring" />)}
                 </span>
@@ -284,7 +290,12 @@ export function SelectScreen(p: Props) {
                   <h2>{def.name}</h2>
                   <small className="provenance">{def.kind && <b className="kind">{def.kind}</b>}{def.species} · {def.provenance ?? def.locality ?? 'Burgess Shale'}{cm != null && <> · <b className="real-size">{cm} cm</b></>}</small>
                   <p className="tagline">{def.tagline}</p>
-                  <BestRun mark={p.best[def.id]} carrying={!!p.carry[i]} rise={p.mode === 'rise'} scheme={s} onToggle={() => p.onCarry(i)} />
+                  {/* A visitor is not this game's animal and does not carry this game's record, so
+                      the growth badge has nothing to say about it. What it says instead is where the
+                      animal is from and how to look through the others you have earned. */}
+                  {pl.visitorScale
+                    ? <p className="visitor-note"><b>VISITOR</b> · {ERA_NAME[(p.visitorEra?.(pl.creature) ?? 'devonian')]} · left / right for the others</p>
+                    : <BestRun mark={p.best[def.id]} carrying={!!p.carry[i]} rise={p.mode === 'rise'} scheme={s} onToggle={() => p.onCarry(i)} />}
                   {!compact && (
                     <>
                       <div className="stats">
