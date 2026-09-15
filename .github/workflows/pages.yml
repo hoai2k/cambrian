@@ -35,6 +35,11 @@ jobs:
       # and take about eight seconds together — cheap enough that a rig regression can no
       # longer sit unnoticed behind a doc that says to run them by hand.
       - run: npm run rigs
+      # The site root and the debug entry points. Both are sub-second pure-TypeScript checks,
+      # and between them they hold the trilogy page's links and the parameter that opens each
+      # development tool — including that a bare ?debug never opens anything on a game page.
+      - run: npm run ancientseas
+      - run: npm run debug
       - run: npm run portraits
       # The feedback button exists only in a build that was given somewhere to send to. Unset —
       # a fork, or a repository variable that got lost — publishes the site without the button

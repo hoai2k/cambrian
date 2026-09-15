@@ -560,6 +560,19 @@ unless the user explicitly asks for a PR. Steps:
   `tripo-raw/`, and it refuses a rigged body by name), importing the viewer's own `warp()` so the
   file is what was previewed and reading the result back to prove it. `docs/viewer-stretch.md` is
   the whole of it; Blender work it implies goes in `docs/triassic/builder-requests.md`.
+- A bare `?debug` on the site root (`/?debug`) opens the index of every one of these tools —
+  `src/ancientseas/DebugIndex.tsx`, data in `src/ancientseas/debug-index.ts`, mounted by
+  `src/ancientseas/main.tsx` the way `Root.tsx` mounts the state editor. It is the trilogy page's
+  because what it lists spans all three games and five standalone pages, so no one game is their
+  home. It takes the *valueless* parameter deliberately, so it can never collide with a named
+  screen: every `?debug=<something>` is one specific tool and `?debug` alone is the list of them,
+  and on a game page a bare `?debug` still opens nothing at all. Anything new reachable only by
+  knowing a parameter belongs on it — that is the whole point, since knowing the parameter used to
+  mean already knowing the tool existed. The data is pure so `npm run ancientseas` checks it
+  headless: every page behind a link exists, every game parameter is still read by the module named
+  in `reads`, no two rows claim one URL, and every row carries a sentence rather than only a name.
+  `node tools/debug-index-smoke.mjs <outdir>` follows every link in a browser against a preview
+  build, which is the half a headless test cannot vouch for.
 - `?debug=local` on any game page (`/cambrian/?debug=local`, `/devonian/?debug=local`) opens an editor for that
   era's saved state — `src/app/DebugLocal.tsx`, gated by `src/shared/debug.ts`, mounted by
   `src/app/Root.tsx` so both entry points get it without knowing about it. A new thing kept in
