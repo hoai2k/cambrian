@@ -1,0 +1,34 @@
+{
+  "mosasaurus": [
+    {
+      "name": "anchor_mouth",
+      "bone": "jaw",
+      "point": [
+        -0.013315927237272263,
+        -1.93149995803833,
+        -0.12388994544744492
+      ],
+      "role": "mouth"
+    },
+    {
+      "name": "anchor_mouth_inside",
+      "bone": "skull",
+      "point": [
+        -0.01945694349706173,
+        -0.9815000295639038,
+        0.19386863708496094
+      ],
+      "role": "swallow"
+    },
+    {
+      "name": "anchor_attack_primary",
+      "bone": "skull",
+      "point": [
+        -0.013315927237272263,
+        -1.9515000581741333,
+        0.46025070548057556
+      ],
+      "role": "attack"
+    }
+  ]
+}

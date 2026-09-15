@@ -12,8 +12,6 @@
     "A yaw here that turns out wrong costs a preview that faces the wrong way, never a shipped asset."
   ],
   "yaw": {
-    "archelon": 180,
-    "askeptosaurus": 0,
-    "mosasaurus": 270
+    "askeptosaurus": 0
   }
 }

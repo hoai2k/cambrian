@@ -1,0 +1,64 @@
+{
+  "id": "mosasaurus",
+  "name": "Mosasaurus",
+  "species": "Mosasaurus hoffmannii",
+  "provenance": "Late Cretaceous \u00b7 Maastricht",
+  "offRoster": true,
+  "description": "A marine lizard with a lunate tail and a second row of teeth in its palate: the last of the Cretaceous sea's top predators. Authored Tripo body and measured procedural volume twin share one armature, one set of inverse binds, one set of sockets and one set of actions.",
+  "modelLength": 5.0,
+  "lengthMeters": 13.0,
+  "locomotion": "Swim",
+  "clips": [
+    "Idle",
+    "Swim",
+    "Sprint",
+    "TurnLeft",
+    "TurnRight",
+    "Dive",
+    "Rise",
+    "Attack",
+    "Bite",
+    "Heavy",
+    "Hit",
+    "Death",
+    "Guard",
+    "Parry",
+    "Dodge",
+    "Eat",
+    "Stagger",
+    "Ability",
+    "Grab",
+    "Breath",
+    "Growth",
+    "Breathe"
+  ],
+  "looping": [
+    "Idle",
+    "Swim",
+    "Sprint",
+    "Guard",
+    "Eat",
+    "Grab",
+    "Breathe"
+  ],
+  "anchors": [
+    "anchor_mouth",
+    "anchor_mouth_inside",
+    "anchor_attack_primary"
+  ],
+  "puppet": "mosasaurus.puppet.glb",
+  "sources": [
+    "tools/triassic/creatures/mosasaurus/tripo-raw/mosasaurus.raw.glb",
+    "tools/triassic/creatures/mosasaurus/tripo-raw/input.png"
+  ],
+  "notes": [
+    "Off the roster on purpose: Mosasaurus is Late Cretaceous, not Triassic, and is registered in src/content/triassic/expansion.json rather than in TRIASSIC_CREATURES. It reaches the game as a standing visitor and is in no sea and no population table.",
+    "Which end is the head is decided by the flippers, not the silhouette: both ends of this generation are thin and deep, and the shared frame's default sign puts the head at the tail. The pair of paddles nearest the head must also be the larger pair, which the build asserts.",
+    "The generation was authored GAPING. That is a pose, not the animal: the jaw is shut in Idle, Swim, Sprint, the turns, Dive and Rise and opens only for Bite, Attack, Heavy and Eat. What closing it costs is measured in validation.json under jawClosedCost.",
+    "The mouth line is read geometrically and needs no pigment at all: a vertical line through an open mouth crosses the surface four times and through a shut head twice, so the hinge is the station that count drops and the seam is the middle of the gap. On this body the teeth are painted rather than modelled, so a protrusion pass would not have found them.",
+    "A tail swimmer, not a rower: the thrust is a travelling wave growing towards a lunate fluke, and the four paddles are control surfaces. Their swept angle is recorded per clip and the build refuses a paddle that does not steer the turn.",
+    "Eat is a ratchet rather than a chew: mosasaurs carried a second tooth row on the pterygoids and worked prey back with it, so the clip opens, drives the head forward over the carcass and draws it back, three times.",
+    "The twin resurfaces a voxel occupancy field of the authored body, relaxes it and reduces the new topology. It reuses no source vertex or face.",
+    "Living colours, soft tissues and movements are artistic reconstruction. World travel remains engine-owned."
+  ]
+}
