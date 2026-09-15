@@ -831,6 +831,18 @@ for clip, duration in CLIPS.items():
         turn = (-1 if clip == 'TurnLeft' else 1) * e if clip in ('TurnLeft', 'TurnRight') else 0.
         if clip == 'Death':
             amp *= 1 - dead
+        # **The crown's strike is a gather, a reach and a close, in that order and in those
+        # proportions.** The first pass built it out of `wind` and `peak`, which put a small reach
+        # forward on the windup and then the whole of the strike's throw *backwards* -- measured on
+        # the shipped Attack, the attack anchor went 0.30 forward over the first eighth of the clip
+        # and 1.16 back over the next third. An animal that pulls its arms in at the moment of the
+        # blow is not striking, it is flinching, and that is exactly how it read. So the gather is
+        # small and short, the reach is large and held open long enough to arrive somewhere, and
+        # the close comes after the reach rather than with it. All three are zero at u=0 and u=1,
+        # which is what a looping Grab needs.
+        gather = sin(pi * u / .30) ** 2 if u < .30 else 0.
+        reach = sin(pi * (u - .16) / .80) ** 2 if .16 < u < .96 else 0.
+        close = sin(pi * (u - .42) / .54) ** 2 if .42 < u < .96 else 0.
 
         # ---- the jet. Two pumps a loop in Swim, two in half the time in Sprint. The squeeze is a
         # fast contraction and a slow refill, which is what a funnel does, but it is NOT locked to a
@@ -875,23 +887,14 @@ for clip, duration in CLIPS.items():
         if clip in ('TurnLeft', 'TurnRight'):
             hd.rotation_euler.z = turn * .26
 
-        # ---- the beak. Shut everywhere but the clips that use it, which is the era's standing rule.
-        opening = .02 * (1 - cos(p)) * env if clip in ('Idle', 'Breath') else 0.
-        if clip == 'Eat':
-            opening = .34 * (1 - cos(p * 2)) / 2
-        if clip == 'Bite':
-            opening = .62 * sin(pi * u) ** 2
-        if clip == 'Attack':
-            opening = .22 * wind + .58 * peak
-        if clip == 'Heavy':
-            opening = .10 * (1 - e)
-        if clip == 'Grab':
-            opening = .18 * e
-        if clip == 'Ability':
-            opening = .04 * e
-        opening += .30 * dead
-        pb['jaw'].rotation_euler.x = opening
-        pb['skull'].rotation_euler.x = -.30 * opening
+        # ---- the beak. **It is not animated, in any clip.** A beak inside an arm crown is buried
+        # under thirteen arms and is never on screen: what this animal reaches with, catches with
+        # and is read by is the crown, and `anchor_mouth` on the `jaw` bone is all the rest of the
+        # game needs to know where a mouthful goes. So the two mouth bones hold their bind pose and
+        # the clips spend their motion where it can be seen. The sockets still ride `jaw` and
+        # `skull`, and the lining still wears the skin's own weights.
+        pb['jaw'].rotation_euler.x = 0.
+        pb['skull'].rotation_euler.x = 0.
 
         # ---- the arms. The crown is this animal's reach, its grip and half its silhouette, so
         # every clip has to use it. `spread` fans the crown open, `sweep` drives it back along the
@@ -921,10 +924,14 @@ for clip, duration in CLIPS.items():
             if clip in ('Dive', 'Rise'):
                 sweep = .16 * e * (1 + .6 * ventral * (1 if clip == 'Dive' else -1))
             if clip in ('Attack', 'Bite', 'Grab'):
-                # The strike is the crown closing, which is what this animal attacks with.
-                sweep = -.30 * wind + .75 * peak if clip == 'Attack' else (
-                    .85 * e if clip == 'Grab' else .45 * sin(pi * u) ** 2)
-                curl = (.9 * peak if clip == 'Attack' else e if clip == 'Grab' else .5 * sin(pi * u) ** 2)
+                # The strike is the crown reaching out and closing on what it reached. Negative
+                # sweep carries the arms forward past the aperture; positive folds them back over
+                # it, which is what Heavy (this animal's move is literally called Withdraw) does
+                # and what these three must not.
+                sweep = {'Attack': .20 * gather - .86 * reach,
+                         'Bite': .14 * gather - .62 * reach,
+                         'Grab': .18 * gather - .82 * reach}[clip]
+                curl = {'Attack': .74, 'Bite': .50, 'Grab': .88}[clip] * close
             if clip == 'Eat':
                 sweep = .55 + .18 * sin(p * 2 - phase)
                 curl = .45 + .18 * sin(p * 2 - phase)

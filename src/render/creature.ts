@@ -1,4 +1,5 @@
 import { assetPaths } from '../content/asset-paths';
+import { isOralGeometryNamed } from '../shared/oral-geometry';
 import * as THREE from 'three';
 import { CreatureAnchors } from './anchors';
 import { GLTFLoader, type GLTF } from 'three/examples/jsm/loaders/GLTFLoader.js';
@@ -144,6 +145,11 @@ export class CreatureView {
     this.model.traverse((o) => {
       if (o instanceof THREE.Mesh) {
         o.castShadow = true; o.receiveShadow = true; o.frustumCulled = false;
+        // The authored mouth interior is not drawn in the game. Its first form read as gum filling
+        // the mouth and its replacement is still being judged; the simulation reaches a mouth
+        // through bones, so this costs nothing but the sight of it.
+        const matNames = (Array.isArray(o.material) ? o.material : [o.material]).map((m) => m?.name);
+        if (isOralGeometryNamed(o.name, matNames)) o.visible = false;
         const mats = Array.isArray(o.material) ? o.material : [o.material];
         const cloned = mats.map((m) => { const c = (m as THREE.MeshStandardMaterial).clone(); return c; });
         o.material = Array.isArray(o.material) ? cloned : cloned[0];

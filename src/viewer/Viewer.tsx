@@ -139,6 +139,15 @@ export function Viewer() {
     return p.defaults[c.id] ?? p.schemes[0].id;
   };
   const [clips, setClips] = useState<string[]>([]);
+  /**
+   * Whether to draw the authored mouth geometry — the palate and floor that close each jaw, the
+   * hinge tissue, a cephalopod's beak. **Off by default, and off in the game entirely**, because
+   * its first form read as gum filling the mouth; on shows what is currently authored, off shows
+   * the mouth the generation actually arrived with. It survives a change of specimen on purpose:
+   * comparing mouths means comparing across animals.
+   */
+  const [oralGeometry, setOralGeometry] = useState(false);
+  const [hasOral, setHasOral] = useState(false);
   const [active, setActive] = useState('');
   const [loop, setLoop] = useState(false);
   const [speed, setSpeed] = useState(1);
@@ -213,7 +222,7 @@ export function Viewer() {
 
   useEffect(() => {
     let cancelled = false;
-    setLoading(true); setLoadedId(''); setError(''); setClips([]); setSlots([]);
+    setLoading(true); setLoadedId(''); setError(''); setClips([]); setSlots([]); setHasOral(false);
     // The specimen on stage leaves before the next one is fetched: watching the last creature
     // repaint into the new one's colours, then pop out of frame, read as a glitch.
     if (requestedId.current !== id) sceneRef.current?.clear();
@@ -232,6 +241,7 @@ export function Viewer() {
         const stretch = showGenerated ? getStretch(id) : undefined;
         if (stretch && stretch.model === modelPath && !stretchIsIdentity(stretch)) sceneRef.current?.applySculpt(stretchWarp(stretch), true);
         setClips(names); setSlots(sceneRef.current?.activeSlots() ?? []); setLoading(false); setLoadedId(id);
+        setHasOral(sceneRef.current?.hasOralGeometry() ?? false);
       })
       .catch((e: Error) => { if (!cancelled) { setError(e.message); setLoading(false); } });
     return () => { cancelled = true; };
@@ -239,6 +249,7 @@ export function Viewer() {
 
   useEffect(() => { sceneRef.current?.setSpeed(speed); }, [speed]);
   useEffect(() => { sceneRef.current?.setScheme(schemeId); }, [schemeId]);
+  useEffect(() => { sceneRef.current?.setOralGeometry(oralGeometry); }, [oralGeometry, loadedId]);
   useEffect(() => {
     try { sessionStorage.setItem(STORE_KEY, JSON.stringify(picks)); } catch { /* private mode: picks stay in memory */ }
   }, [picks]);
@@ -340,6 +351,17 @@ export function Viewer() {
           </select>
         </label>}
         {choices.length > 1 && <p className="hint">Swapping holds the view and the animation time, so a difference between two of these reads as movement. Missing clips return to rest.</p>}
+        {hasOral && <><label className="toggle">
+          <input type="checkbox" checked={oralGeometry} onChange={(e) => setOralGeometry(e.target.checked)} />
+          <span>Mouth geometry</span>
+        </label>
+        <p className="hint">
+          The palate and floor that close each jaw, the tissue at the hinge, and a beak where there
+          is one, are <em>authored</em> rather than generated. <strong>The game does not draw any of
+          it</strong> and this starts off, because the first form of it read as gum filling the
+          mouth; turn it on to see what is currently authored, and off for the mouth the generation
+          arrived with. The setting follows you from one animal to the next.
+        </p></>}
         {def.inReview && <p className="hint">
           <strong>Awaiting review:</strong> this animal's own body, twin and clips are built, but it
           is not in <code>shipped.json</code> yet — so the game still draws the body it borrows and

@@ -2,24 +2,24 @@
   "models": [
     {
       "suffix": "",
-      "bytes": 1802244,
-      "sha256": "d18e6f65551eddee06113f07d8f96ead90d6b260481daa988d4c6bdc31e6d993",
-      "triangles": 22152,
-      "vertices": 13517
+      "bytes": 1792452,
+      "sha256": "51e72a47746c58b1c232365fd1a13d011cf3640fa5d2dfb3fa54d1b2cc31b109",
+      "triangles": 21828,
+      "vertices": 13310
     },
     {
       "suffix": ".puppet",
-      "bytes": 1318796,
-      "sha256": "6009a44b70606322a8bf7d54aedeb10491fba62b586799fced5184d419cb4003",
-      "triangles": 8530,
-      "vertices": 4389
+      "bytes": 1309004,
+      "sha256": "7dd8309f90bfe5df298b84e1f9540a5dc6625f1a42a17f3140148da4a072d1ce",
+      "triangles": 8206,
+      "vertices": 4182
     },
     {
       "suffix": ".lod1",
-      "bytes": 1318796,
-      "sha256": "6009a44b70606322a8bf7d54aedeb10491fba62b586799fced5184d419cb4003",
-      "triangles": 8530,
-      "vertices": 4389
+      "bytes": 1309004,
+      "sha256": "7dd8309f90bfe5df298b84e1f9540a5dc6625f1a42a17f3140148da4a072d1ce",
+      "triangles": 8206,
+      "vertices": 4182
     }
   ],
   "clips": 23,
@@ -186,7 +186,7 @@
       "sha256": "cdeb72ff3322f75c691d84b48c027e82ac4fd7aad2029f82588b70ae6ee8ed3f"
     }
   ],
-  "twinTriangleFraction": 0.38506681112314917,
+  "twinTriangleFraction": 0.37593916071101335,
   "playback": [
     {
       "suffix": "",
@@ -702,13 +702,6 @@
       "grewFrom": 0.023875433930215025,
       "grewTo": 0.08611216413657156,
       "edgesOver2x": 30
-    },
-    "Seated_jaw_hinge_tissue": {
-      "worstRatio": 1.0000001374563523,
-      "clip": "Death",
-      "grewFrom": 0.10274267431147661,
-      "grewTo": 0.10274268843410986,
-      "edgesOver2x": 0
     },
     "Saurichthys_authored_body_lower_jaw": {
       "worstRatio": 1.000000069159676,

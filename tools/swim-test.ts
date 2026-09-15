@@ -8,7 +8,8 @@ import { applyScaleStats, bodyRadius, clearanceOf, climbHeight, climbRise, floor
 import { boulderQ, boulderTop, groundHeight, resolveStatic, rockRadius, sampleHeight, type Boulder, type StaticContact, type WorldData } from '../src/sim/world';
 import { creature } from '../src/sim/creatures';
 import { floraSize } from '../src/sim/flora';
-import { BREATH_PEEK, fitCameraArm, PITCH_DOWN, PITCH_UP } from '../src/render/engine';
+import { BREATH_PEEK, climbAimHold, DASH_AIM_GRACE, fitCameraArm, PITCH_DOWN, PITCH_UP, swimPitch } from '../src/render/engine';
+import { damp } from '../src/shared/math';
 
 let failed = 0;
 const check = (n: string, ok: boolean, d: string) => { console.log(`${ok ? 'PASS' : 'FAIL'}  ${n.padEnd(58)} ${d}`); if (!ok) failed++; };
@@ -327,6 +328,63 @@ const rockWorld = (boulders: Boulder[]) => ({
   check('...and it is the ceiling that does it, not the shot', peeked.dist === held.dist, `arm ${held.dist.toFixed(2)} either way`);
 }
 
+// --- a chain of upward dashes climbs, instead of flattening out between the presses ---
+{
+  // The player's own loop, closed: the pad's pitch drift decides the aim, the aim is the dash's
+  // vertical (`dir.y` is exactly -sin(camPitch) on a full-forward stick), and the simulation's own
+  // cooldown decides when the next press lands. Run it twice over the same seed, once with the
+  // hold and once without, and compare the second dash with the first. Each dash is measured by
+  // the aim it was actually given, which is one frame behind the press: the renderer cannot know
+  // a dash fired until the step it fired in has run, so the hold arms a frame late by
+  // construction and the aim gives up that one frame of drift and no more.
+  const dt = 1 / 60;
+  const chain = (holdOn: boolean, waitFor: (cd: number, t: number) => boolean) => {
+    const g = new Game('reef', [{ creature: 'anomalocaris', device: 'keyboard', ready: true }], 5);
+    const p = g.players[0]; p.spawnProtect = 0;
+    p.pos = { x: p.pos.x, y: sampleHeight(p.pos.x, p.pos.z) + 6, z: p.pos.z };
+    g.world.loadAround(p.pos);
+    let pitch = PITCH_UP, hold = 0, t = 0;             // aimed straight up, as a climb is
+    /** One rendered frame: the camera decides, the stick is handed the decision, the sim steps. */
+    const frame = (dash: boolean) => {
+      hold = holdOn ? climbAimHold(hold, pitch, p.dashCd, dt) : 0;
+      if (hold === 0) pitch = damp(pitch, 0.2, 0.6, dt);
+      p.stamina = p.staminaMax;                        // the bar is not what is being measured
+      const aim = -Math.sin(swimPitch(pitch));         // the climb this frame's aim is worth: dir.y
+      g.step(dt, new Map([[0, { ...emptyInput(), my: 1, camYaw: Math.PI, camPitch: swimPitch(pitch), dash }]]));
+      g.events.length = 0; t += dt;
+      return aim;
+    };
+    const first = frame(true), firstRise = p.vel.y;
+    while (waitFor(p.dashCd, t)) frame(false);         // the button released, so the next press counts
+    const second = frame(true);
+    return { first, second, firstRise, secondRise: p.vel.y, pitch, t };
+  };
+  const ready = (cd: number) => cd > 0;                // press again the moment the dash is back
+  const held = chain(true, ready), loose = chain(false, ready);
+  check('a dash aimed up keeps its aim for the whole cooldown', held.second > held.first * 0.999,
+    `${held.first.toFixed(3)} → ${held.second.toFixed(3)} over ${held.t.toFixed(2)}s`);
+  check('...so the second dash climbs as hard as the first', held.secondRise > held.firstRise * 0.99,
+    `${held.firstRise.toFixed(2)} then ${held.secondRise.toFixed(2)} units/s up`);
+  check('...which the drift alone did not', loose.second < loose.first * 0.85 && loose.secondRise < held.secondRise * 0.9,
+    `${loose.first.toFixed(3)} → ${loose.second.toFixed(3)}, rise ${loose.secondRise.toFixed(2)} against ${held.secondRise.toFixed(2)}`);
+  // The grace is reaction time on top of the cooldown, and past it the drift is only delayed:
+  // holding the aim must not become a second resting pitch the camera never leaves.
+  const late = chain(true, (cd, t) => cd > 0 || t < 0.55 + DASH_AIM_GRACE * 0.8);
+  check('...and a press a beat late still has the aim', late.second > late.first * 0.999, `after ${late.t.toFixed(2)}s`);
+  const abandoned = chain(true, (_cd, t) => t < 6);
+  check('but a player who stops dashing gets the level view back', Math.abs(abandoned.pitch - 0.2) < 0.06,
+    `pitch settled at ${abandoned.pitch.toFixed(2)} (resting 0.2)`);
+  // Downward is the drift doing its job: a held dive would be the camera swimming a body into
+  // the sand, which is what the flat slice on that side exists to prevent.
+  let down = PITCH_DOWN, downHold = 0;
+  for (let i = 0; i < 33; i++) { downHold = climbAimHold(downHold, down, 0.55 - i * dt, dt); if (downHold === 0) down = damp(down, 0.2, 0.6, dt); }
+  check('a dash aimed down is not held', down < PITCH_DOWN - 0.1 && downHold === 0, `${PITCH_DOWN.toFixed(2)} → ${down.toFixed(2)}`);
+  // And looking up without dashing is untouched: the hold belongs to a dash, not to the aim.
+  let idle = PITCH_UP, idleHold = 0;
+  for (let i = 0; i < 33; i++) { idleHold = climbAimHold(idleHold, idle, 0, dt); if (idleHold === 0) idle = damp(idle, 0.2, 0.6, dt); }
+  check('...and looking up without dashing drifts as it always did', idle > PITCH_UP + 0.1, `${PITCH_UP.toFixed(2)} → ${idle.toFixed(2)}`);
+}
+
 // --- the radar says how far above or below a contact is ---
 {
   const g = new Game('reef', [{ creature: 'anomalocaris', device: 'keyboard', ready: true }], 11);
@@ -353,5 +411,5 @@ const rockWorld = (boulders: Boulder[]) => ({
 }
 
 check('no climb ever asked for a jump', jumped === 0, `${jumped} oversized lifts`);
-console.log(failed ? `FAILED (${failed})` : 'PASS: sprint endurance, floor grazing, rock colliders, ride-over, camera reach, radar height');
+console.log(failed ? `FAILED (${failed})` : 'PASS: sprint endurance, floor grazing, rock colliders, ride-over, camera reach, the dash chain, radar height');
 process.exit(failed ? 1 : 0);

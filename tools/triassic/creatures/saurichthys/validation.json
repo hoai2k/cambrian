@@ -220,21 +220,22 @@
     "note": "a height test on the vertex itself splits interlocking teeth down the middle and a graded one stretches each half between two bones -- which is how this fish's upper tooth row first came out as a comb of needles two head-depths long. Taking the height of the smoothed surface instead, which is the tooth's own base, puts every tooth whole on the jaw it grows from. Flood-filling labels from the skin was tried first and is worse on a needle rostrum: the seeds are sparse on a tube that thin and the label boundary wanders through it, which tore the snout into ribbons."
   },
   "hingePlug": {
-    "inwardPullStepsToFitInsideTheSilhouette": 1497,
-    "plugVertices": 164,
-    "nominalRadiiUnits": [
-      0.3987,
-      0.99,
-      0.3967
-    ],
-    "clearanceInsideSilhouetteRaw": 0.00404,
-    "note": "rigid on the skull, shaped like the head section at the pivot rather than like a ball, and fitted so it cannot come out through the cheek."
+    "plug": "none",
+    "why": "the plug this builder shipped was fitted against an np.interp clearance test that clamps rather than refusing, so it passed while standing 1.29 units clear of the snout with 126 of its 207 vertices outside the animal; it is the spike and the white shoulder in the delivered renders.",
+    "seenThroughTheBodyAtAttack043": {
+      "giantPlugOutsideTheAnimal": 1,
+      "containedPlugAt0.6x": 666,
+      "containedPlugAt1.8x": 44,
+      "roofOnlyPlug": 625,
+      "noPlug": 667
+    },
+    "whatIsLeft": "the cut rim, one polygon thick and at a grazing angle, which a fold closes and a plug can only mask by standing outside the skin. The shipped body material is double-sided, so none of it is drawn at runtime."
   },
   "liningClearanceInsideSkinRaw": 0.00184,
   "scale": 4.67977,
   "bodyLength": 5.0,
-  "authoredTriangles": 22152,
-  "twinTriangles": 8530,
+  "authoredTriangles": 21828,
+  "twinTriangles": 8206,
   "twinRemeshTriangles": 54464,
   "twinDecimateRatio": 0.11934489011764526,
   "twinVerticesHeldBackFromRelaxation": 7923,

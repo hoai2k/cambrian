@@ -29,6 +29,12 @@ const CLIP_ORDER = [
 ];
 
 /** A clip kept for comparison after being re-authored: `replaced/<Name>` (tools/creatures/motion). */
+import { isOralGeometryNamed } from '../shared/oral-geometry';
+
+/** Whether a loaded mesh is authored mouth geometry (see `src/shared/oral-geometry.ts`). */
+export const isOralGeometry = (o: THREE.Mesh) =>
+  isOralGeometryNamed(o.name, (Array.isArray(o.material) ? o.material : [o.material]).map((m) => m?.name));
+
 export const REPLACED_PREFIX = 'replaced/';
 export const isReplaced = (name: string) => name.startsWith(REPLACED_PREFIX);
 /** The name a replaced clip had, and that its replacement now carries. */
@@ -143,6 +149,10 @@ export interface ViewerScene {
   setOrthoView(view: 'side' | 'top', v: OrthoView): void;
   /** Stops the clips and puts the rig in its bind pose, or hands it back to the resting clip. */
   setRestPose(on: boolean): void;
+  /** Show or hide the authored mouth geometry, so the generation's own mouth can be seen plain. */
+  setOralGeometry(on: boolean): void;
+  /** Whether the specimen on stage has any authored mouth geometry to hide. */
+  hasOralGeometry(): boolean;
   /** The specimen's vertices for region marking, in world and in the file's own coordinates. */
   markTarget(): MarkTarget | undefined;
   /** What the pointer is over, in world space: canvas CSS pixels in, the surface point out. */
@@ -282,6 +292,8 @@ export function createViewerScene(canvas: HTMLCanvasElement): ViewerScene {
   scene.add(stage);
 
   let model: THREE.Object3D | undefined;
+  /** Survives a change of specimen, because a reviewer comparing mouths is comparing across them. */
+  let oralGeometry = false;
   let source: GLTF | undefined;
   let mixer: THREE.AnimationMixer | undefined;
   let actions = new Map<string, THREE.AnimationAction>();
@@ -402,6 +414,7 @@ export function createViewerScene(canvas: HTMLCanvasElement): ViewerScene {
 
     model = src;
     stage.add(model);
+    applyOralGeometry();
     modelCenter = center.clone(); modelUnit = unit;
     sculptTarget = buildSculptTarget(src);
     mixer = new THREE.AnimationMixer(model);
@@ -636,6 +649,17 @@ export function createViewerScene(canvas: HTMLCanvasElement): ViewerScene {
     if (!on) { markPoints.visible = false; }
   }
 
+  /** Applies the current oral-geometry setting to whatever is on stage. Re-applied on every load. */
+  function applyOralGeometry() {
+    model?.traverse((o) => { if (o instanceof THREE.Mesh && isOralGeometry(o)) o.visible = oralGeometry; });
+  }
+  function setOralGeometry(on: boolean) { oralGeometry = on; applyOralGeometry(); }
+  function hasOralGeometry() {
+    let found = false;
+    model?.traverse((o) => { if (o instanceof THREE.Mesh && isOralGeometry(o)) found = true; });
+    return found;
+  }
+
   function setRestPose(on: boolean) {
     restPose = on;
     if (!model) return;
@@ -802,6 +826,8 @@ export function createViewerScene(canvas: HTMLCanvasElement): ViewerScene {
     setLayout(next, main) { const changed = next !== layout; layout = next; mainRect = main; resize(); if (changed) frame(); },
     setOrthoView(view, v) { orthoViews[view] = v; },
     setRestPose,
+    setOralGeometry,
+    hasOralGeometry,
     markTarget,
     markPick,
     markProject,

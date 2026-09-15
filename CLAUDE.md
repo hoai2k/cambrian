@@ -185,6 +185,22 @@ unless the user explicitly asks for a PR. Steps:
   animal is at the top the view was still the water. A blow raises that ceiling for `BREATH_PEEK`,
   eased in and out, and the player sees the spray and their own back in it. `npm run swim` holds the
   camera half and `npm run triassic` the rule.
+- **A dash aimed up keeps its aim until the next dash is ready.** The pad's pitch drifts back to
+  level whenever the right stick is let go, which is what makes it feel like it is swimming for
+  you — and it is also what made a *series* of upward dashes unusable: a dash is 0.42 s and its
+  cooldown 0.55 s, the drift ran through both on a 1.7-second time constant, and by the time the
+  button came back the aim had flattened, so the second dash went along the surface rather than
+  through it. Breaking the surface is what a chain of dashes is for. `climbAimHold` in
+  `src/render/engine.ts` suspends the drift while a dash fired above the horizon is still on
+  cooldown and for `DASH_AIM_GRACE` (reaction time) past it, reading the simulation's own
+  `dashCd` rather than naming a number `src/sim` owns — so a tail flip's longer cooldown is
+  followed for free. Only the *drift* is held, never the stick, so a player who wants to level off
+  still does it the moment they ask; and only upward, because the drift on the downward side is
+  doing its job — `FLAT_DOWN` exists so a resting view is not a dive into the seabed, and a held
+  dive would be the camera swimming a body into the sand. It arms one frame late by construction
+  (the renderer cannot know a dash fired until that step has run) and gives up that one frame of
+  drift and no more. `npm run swim` closes the loop end to end — camera drift into the stick into
+  the real cooldown — and measures the second dash's own rise against the first's.
 - The climb for air is the era's central act and must stay usable at every size. The shared rise
   rate is scaled by the body, but the water is not — the surface is the same twelve units above the
   shelf whether you hatched this minute or own the sea — so an air-breather's climb has a floor
@@ -319,11 +335,28 @@ unless the user explicitly asks for a PR. Steps:
   viewer catalogue lists them in the Triassic collection marked `offRoster`. Such a body borrows
   nothing, because it is in no sea, so the *Model* control must not offer it a "borrowed body in
   play" stage and the downloads line must not call a raw generation the full model.
-- **A mouth must read as a mouth, not as a hole in the model**, and the standing bar for every
-  Triassic body is three things. *Inside*: one **closed skinned lining** — roof on the skull, floor
-  on the jaw, wall stretching between them — wound inwards, with the skin double-sided behind it as
-  a backstop. Two separate tubes look identical at rest and part the moment the jaw swings, which is
-  how Placodus came to open onto transparency. Proving it needs care: render at full gape against a
+- **A mouth must read as a mouth, not as a hole in the model — and never as a mouthful of gum.**
+  *Inside*, the rule is now the opposite of what it was, and the old form is the thing to watch for:
+  a single **closed sac whose wall stretches between the jaws** was specified here for months, and
+  the moment anyone looked at the animals it was obvious — the mouths were filled with gum. A mouth
+  is not a bag. Do not rebuild that. **The top and the bottom are separate areas, filled
+  separately if they are filled at all**: a *palate* closing the skull's own opening, rigid to the
+  skull's bones, and a *floor* closing the mandible's, rigid to the jaw's, overlapping at the corner
+  and behind the hinge rather than joined, so each half is closed on its own whatever the jaw does
+  and there is no wall anywhere to stretch. The warning the old rule carried — that two separate
+  tubes part when the jaw swings, which is how Placodus came to open onto transparency — was true of
+  two *tubes* sharing a seam, and is answered by closing each half rather than by joining them.
+  **And the first question is whether a mouth needs filling at all.** Several do not: Shonisaurus and
+  Dinocephalosaurus among them. A generation that models no cavity, or whose head is closed behind
+  the lip, needs an anchor and nothing else — and a beak inside an arm crown needs an anchor and
+  nothing else in every case, which is why both cephalopods have none. Authored geometry in a mouth
+  is a cost (it is invented shape on a Tripo body, against the simplicity bar), so it is justified
+  per animal by a gape that actually shows through, never added as a matter of course.
+  **None of it is drawn at present**: `src/shared/oral-geometry.ts` is the one classifier, the game
+  hides everything it matches and the viewer's *Mouth geometry* switch starts off, so what is on
+  screen is the mouth each generation arrived with. The simulation reaches a mouth through
+  `anchor_mouth` and `anchor_mouth_inside`, which are bones, so none of this is load-bearing.
+  Whatever fills a mouth, the proof is unchanged and proving it needs care: render at full gape against a
   saturated backdrop *with and without* a backface-cull shim and compare the two, because comparing
   against the plain background measures the backdrop rather than the gape and passes whatever the
   mesh does. **And the test for "this pixel is the backdrop" has been too loose twice, the same way
@@ -373,12 +406,13 @@ unless the user explicitly asks for a PR. Steps:
   method can lie, after Keichousaurus' countershading. So the peristome is authored on the crown's
   own axis, which is the mean direction of the arms rather than the surface normal at the dome (one
   facet's shape, and on Phragmoteuthis 0.34 forward and 0.94 ventral — a lining built back along it
-  left the head after 0.022). `T.crown_lining` then sews the sac to the skin's measured cut rim: its
-  first rings take the skin's own weights, because round a peristome the skin belongs to the lips,
-  the head and the arms standing over it and not to the jaw, and its first two rings are a flange
-  wider than the hole and set behind it, because a lining that merely meets the rim is edge-on to
-  anything looking into the mouth and those are the quads a cull takes away. `T.crown_beak` is the
-  two mandibles. **And `gape-solid.py` can neither aim nor judge on this shape**: it frames off the
+  left the head after 0.022). **Neither cephalopod is given a modelled mouth at all now**: a beak and
+  a peristome lining were built (`T.crown_lining` sewing a sac to the measured cut rim, `T.crown_beak`
+  the two mandibles) and were retired with the rest of the sac work — a beak the size these arms hide
+  is shape being invented rather than taken from the generation, and what the game needs there is the
+  `anchor_mouth`/`anchor_attack_primary` anchors, which cost no geometry. Keep the crown-axis
+  measurement (it is what places those anchors) and do not rebuild the sac.
+  **And `gape-solid.py` can neither aim nor judge on this shape**: it frames off the
   `jaw` bone's side, which on a crown is outside a thicket of arms, and its verdict is opened
   backdrop the body *encloses* — a crown encloses background between every pair of arms, so a sliver
   at an arm's silhouette counts as if it were the mouth. `tools/triassic/gape-crown.py` keeps the
@@ -415,16 +449,18 @@ unless the user explicitly asks for a PR. Steps:
 - **The oral lining is not skin, and ranking it as skin hides the number that matters.**
   `skin-tears.mjs` names the *bone* an edge belongs to, and the lining is weighted to `skull` and
   `jaw` exactly like the face around it, so the two were indistinguishable: Cymbospondylus read
-  9.98x on `skull` while its skin was 2.48x. The lining is one skinned sac whose roof rides the
-  skull and floor rides the jaw, so its rest length at a shut mouth is nearly nothing and its ratio
+  9.98x on `skull` while its skin was 2.48x. Any oral surface has a roof riding the skull and a floor
+  riding the jaw, so its rest length at a shut mouth is nearly nothing and its ratio
   at full gape says only that the mouth opened — Hupehsuchus' 50x is the lining working, not a torn
   head. Two builders split it locally before it was split centrally; the tool now reports both and
   ranks on skin, matching those builders' own figures exactly. True era-wide skin picture:
   Shonisaurus 1.44x, Keichousaurus 2.34x, Mosasaurus 2.54x, Cymbospondylus 2.48x, Rhaeticosaurus 2.81x, Macrocnemus
-  2.94x, Nothosaurus 2.98x, Birgeria 3.46x, Saurichthys 3.61x, Archelon 3.86x, Mixosaurus 3.62x, Coelophysis 4.46x,
-  Henodus 4.81x, Cartorhynchus 5.17x, Hupehsuchus 5.79x, Hybodus 5.93x, Dinocephalosaurus 7.00x,
+  2.94x, Nothosaurus 2.98x, Tanystropheus 3.00x, Birgeria 3.46x, Saurichthys 3.61x, Cartorhynchus 3.72x,
+  Archelon 3.86x, Mixosaurus 3.62x, Aphaneramma 4.45x, Coelophysis 4.46x, Mystriosuchus 4.48x,
+  Henodus 4.81x, Hupehsuchus 5.79x, Hybodus 5.93x, Dinocephalosaurus 7.00x,
   Helicoprion 11.68x, Placodus 12.36x. Placodus and Helicoprion are the outstanding repair work:
-  Coelophysis came down from 25.25x and Macrocnemus from 23.31x.
+  Coelophysis came down from 25.25x, Macrocnemus from 23.31x, Tanystropheus from 6.09x and
+  Cartorhynchus from 5.17x.
 - **A skin weighting is three things, and the era has now paid for each of them separately.** The
   *relaxation* — diffusion over the mesh's own edge graph, coupled by inverse edge length, trimmed
   to four influences every pass, sliver runs welded into one weight set — is the one that stops a
@@ -474,11 +510,12 @@ unless the user explicitly asks for a PR. Steps:
   through the head's **own measured section**, which uses no normals: 13 % of the mandible and 0.72 %
   of a body length. And the lining is where the real work is. At the snout the closing rotation is
   *defined* as the one that carries the mandible's dorsal margin exactly onto the palate's ventral
-  one, so a lining floor riding the jaw at weight 1 arrives exactly where its own roof already is,
-  the sac is degenerate at the shut pose, and rounding decides which side of the roof each vertex
-  lands on — a pink shard through the top of the snout. Hold the floor at 0.93, build the tube a
-  fourteenth of the local gape *below* the mouth line so its floor starts inside the jaw's flesh and
-  its roof finishes inside the skull's, and size it on the **measured gape** rather than on
+  one, so anything riding the jaw at weight 1 arrives exactly where the palate already is, the two
+  surfaces are coincident at the shut pose, and rounding decides which side of the roof each vertex
+  lands on — a pink shard through the top of the snout. That is the geometry argument against the
+  one-sac lining restated, and it applies to a *floor* too: hold it at 0.93, set it a fourteenth of
+  the local gape *below* the mouth line so it starts inside the jaw's flesh, and size it on the
+  **measured gape** rather than on
   `cavity_profile` (a cast over the front quarter of a body whose forelimbs sit behind the skull
   mostly finds the gap between a paddle and a flank: x ±0.24 where the head is 0.08 across).
   And read the gape as the **largest** empty interval on a vertical line, not the first: six surface
@@ -490,6 +527,33 @@ unless the user explicitly asks for a PR. Steps:
   carapace is half a body length wide, so 84% of a forelimb's weight landed in the top of the shell.
   Bounding the limb radially against its own bone chain, keeping the along-limb ramp, gave 4.81x.
   So a copied rig is a starting point to be re-measured on the new animal, never a transplant.
+- **A part cut onto another bone's shell is out of reach of every weighting, and reads as a limb
+  left behind.** The jaw cut on the shore kit was a band in `y` below the mouth line with no bound
+  in `x`, and both Aphaneramma's and Mystriosuchus' generations stand with the right forelimb tucked
+  forward under the snout — so the arm was cut into the lower-jaw shell, which is rigid on `jaw` at
+  weight 1. 411 of the 637 vertices round Aphaneramma's `fore_foot_R` were in that shell, 64.5 % of
+  the neighbourhood read as `jaw` against 0.2 % of trunk weight on the other side, and the foot's
+  skin travelled 0.45 of the distance its own joint did where every other foot was 1.04 to 1.11.
+  Nothing in `weights()` could reach it: the repair is that **the cut asks the question the skinning
+  already asks** — a vertex is a limb's where it is nearer that limb's own polyline than the body's
+  axial one — so the two cannot disagree about which vertices are an arm. A width bound is not
+  enough on a long-snouted animal, whose snout is narrow and whose hand is broad. The tell is the
+  cut shell's own bounding box: a mandible is not a body-length deep. `local`-side proof is a lag
+  measurement — skin travel round a joint over that joint's own travel — because neither
+  `skin-tears.mjs` nor `idle-bones.mjs` can see this at all.
+- **A containment test written on `np.interp` cannot fail outside its own table**, because
+  `np.interp` clamps rather than refusing. Hybodus' and Saurichthys' hinge plugs were "fitted" by
+  asking whether each vertex was inside `head_half_width(y)` and between `head_z(y)` — both
+  interpolations over the head's measured stations — so a vertex a quarter of a body length ahead of
+  the snout was measured against the section at the snout tip and passed. They reported a clearance
+  of +0.004 while standing 1.29 units clear of the nose with 126 of 207 vertices outside the animal,
+  and that plug is the pale spike and bloated white shoulder those two shipped with. A head is also
+  not a box: `|x| < halfWidth` and `bot < z < top` are both satisfied up in the open water at the
+  corner. What answers exactly is **ray parity against the closed intake surface** — a point inside
+  a closed surface crosses it an odd number of times on the way out, which uses no normals and no
+  table — with a second parity test against the lining sac, because a modelled open mouth is an
+  invagination and a point in the lumen is outside the solid by construction.
+
 - **A limbed swimmer's dash has to paddle.** The Triassic's reptiles and amphibians did not scull
   along on a tail beat, and a Sprint clip that waggles the limbs while the body does the work reads
   as a fish with legs attached. The stroke runs from the limb stretched forward to flush with the

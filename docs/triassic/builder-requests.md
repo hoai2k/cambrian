@@ -99,3 +99,30 @@ planes sit where they were and the same warp lands on the same surface. The stre
 re-expressed against the cut mesh (same cuts, same direction, same factor, re-measured vertex
 count) and re-applied. Any edit that *moved* geometry would not have qualified, and the answer
 there is to re-cut in the viewer.
+
+
+## Helicoprion — a regeneration with the mouth shut
+
+**Raised by the animation pass, September 2026.** The shipped body cannot close its mouth, and it is
+the mesh rather than the rig that cannot.
+
+This generation was authored gaping and the bind pose carries the gape, so every clip it had held
+the animal's mouth open, Idle included. The builder now measures a closing rotation and the resting
+clips sit in it: 23.5 degrees, chosen as the largest rotation that keeps 95 % of the tooth whorl
+under the palate, against the 18.5 the midline gape alone would ask for. In profile that shuts the
+mouth, and profile is the view this animal is mostly seen in.
+
+Head-on it does not, and cannot. The modelled gape is a **notch cut into the front of the head**, not
+a jaw that can swing to. Measured section by section across the mouth (`JAW_PROBE=1` on the builder
+prints it), the jaw owns skin only within 0.018 to 0.039 of the centre line while the skull reaches
+0.071 to 0.082, and the skull's own ventral surface at those stations sits *above* the mandible: the
+lower rim of the aperture belongs to the upper jaw for almost its whole width, and there is no
+mandibular flank in the mesh to raise. A vertical line 0.05 off the midline passes through solid head
+at every station from the snout to the hinge — two crossings, no void — which is the same fact from
+the other side.
+
+No weighting fixes it. The lower lip is not there to be weighted. The routes out are the era's
+standard two: a regeneration asked for with the mouth closed, which is what the pipeline asks for and
+did not get here, or accepting the profile close and leaving the front view as it is. Nothing should
+be modelled by hand: a lower jaw and a lip line are a long way past what this era allows to be
+authored onto a Tripo body.
