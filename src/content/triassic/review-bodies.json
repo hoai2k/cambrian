@@ -33,6 +33,37 @@
     ]
   },
   {
+    "id": "ceratites",
+    "model": "assets/triassic/creatures/ceratites.glb",
+    "puppet": "assets/triassic/creatures/ceratites.puppet.glb",
+    "lod": "assets/triassic/creatures/ceratites.lod1.glb",
+    "bytes": 3009564,
+    "sha256": "77732267e3a0170e6a92519d1878bdf0721a4cb296f34ef6103f4f192f7c4bcc",
+    "clips": [
+      "Ability",
+      "Attack",
+      "Bite",
+      "Breath",
+      "Death",
+      "Dive",
+      "Dodge",
+      "Eat",
+      "Grab",
+      "Growth",
+      "Guard",
+      "Heavy",
+      "Hit",
+      "Idle",
+      "Parry",
+      "Rise",
+      "Sprint",
+      "Stagger",
+      "Swim",
+      "TurnLeft",
+      "TurnRight"
+    ]
+  },
+  {
     "id": "coelophysis",
     "model": "assets/triassic/creatures/coelophysis.glb",
     "puppet": "assets/triassic/creatures/coelophysis.puppet.glb",

@@ -1,0 +1,19 @@
+
+public/assets/triassic/creatures/ceratites.glb   33697 edges x 17 phases x 21 clips
+clip            skin  on bone             all     >2x  worst bones
+Guard          4.34x  head              4.34x     632  0.036->0.157  arm_00_04:250 arm_10_04:136 head:110 arm_12_04:68
+Heavy          4.17x  head              4.17x     204  0.036->0.151  arm_00_04:60 arm_10_04:58 head:34 arm_12_04:28
+Grab           3.35x  head              3.35x     116  0.036->0.121  arm_10_04:41 arm_12_04:22 head:19 arm_00_04:19
+Attack         3.00x  head              3.00x      33  0.036->0.109  arm_10_04:10 arm_12_04:8 head:8 arm_00_03:4
+Eat            2.80x  arm_00_03         2.80x      74  0.046->0.130  head:26 arm_12_04:18 arm_00_03:13 arm_10_04:10
+Stagger        2.42x  arm_00_03         2.42x      14  0.046->0.112  head:6 arm_00_03:5 arm_10_04:3
+Hit            2.41x  arm_00_03         2.41x      13  0.046->0.112  arm_00_03:5 head:5 arm_10_04:3
+Parry          2.40x  arm_00_03         2.40x      11  0.046->0.111  arm_00_03:5 arm_10_04:3 head:3
+Bite           2.17x  arm_00_03         2.17x       3  0.046->0.100  arm_00_03:3
+Swim           2.12x  head              2.12x       4  0.041->0.088  head:2 arm_00_04:2
+Sprint         2.11x  head              2.11x       4  0.041->0.087  head:2 arm_00_04:2
+Dodge          2.00x  head              2.00x       0  0.041->0.083  
+TurnLeft       1.72x  arm_00_03         1.72x       0  0.046->0.080  
+Rise           1.65x  body              1.65x       0  0.046->0.075  
+11 of 21 clips tear an edge past 2x
+worst SKIN 4.34x · worst including the oral lining 4.34x

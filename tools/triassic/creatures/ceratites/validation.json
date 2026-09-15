@@ -1,0 +1,1065 @@
+{
+  "id": "ceratites",
+  "intake": {
+    "looseVertsBeforeWeld": 14597,
+    "vertsAfterWeld": 9659,
+    "components": 1,
+    "largestComponents": [
+      9659
+    ],
+    "removedFlakeVertices": 0,
+    "sourceTriangles": 19390,
+    "sourceSha256": "6bc7e4710e0b36cde6b7b1da77c653fa3f49edc27a930790c5895fc74c8c91f1",
+    "sliverWeld": 0.0005,
+    "openEdgesAtTextureWeld": 36,
+    "openEdgesAtSliverWeld": 0,
+    "weldedTriangles": 19346,
+    "weldedVertices": 9637
+  },
+  "coil": {
+    "axisInFile": [
+      0.9997,
+      -0.0205,
+      0.0135
+    ],
+    "centre": [
+      -0.0037,
+      0.22888,
+      0.02131
+    ],
+    "leastSquaresRadius": 0.2085,
+    "outerWhorlRadius": 0.301,
+    "bulkVertices": 2397,
+    "singularValues": [
+      1.0,
+      0.8369,
+      0.5658
+    ],
+    "armsCentroid": [
+      0.0039,
+      -0.0826,
+      -0.0613
+    ]
+  },
+  "armCutSweep": 2.6995676087913436e-33,
+  "armCount": 13,
+  "armCutRadius": 0.18,
+  "arms": [
+    {
+      "name": "arm_00",
+      "vertices": 198,
+      "reach": 0.3145,
+      "graphLength": 0.1773,
+      "meanBandRadius": 0.034,
+      "thetaDegrees": -166.0
+    },
+    {
+      "name": "arm_01",
+      "vertices": 223,
+      "reach": 0.3938,
+      "graphLength": 0.3009,
+      "meanBandRadius": 0.023,
+      "thetaDegrees": -159.9
+    },
+    {
+      "name": "arm_02",
+      "vertices": 219,
+      "reach": 0.3896,
+      "graphLength": 0.2516,
+      "meanBandRadius": 0.0214,
+      "thetaDegrees": -131.4
+    },
+    {
+      "name": "arm_03",
+      "vertices": 203,
+      "reach": 0.3762,
+      "graphLength": 0.3367,
+      "meanBandRadius": 0.0235,
+      "thetaDegrees": -130.2
+    },
+    {
+      "name": "arm_04",
+      "vertices": 131,
+      "reach": 0.3925,
+      "graphLength": 0.2821,
+      "meanBandRadius": 0.0239,
+      "thetaDegrees": -120.7
+    },
+    {
+      "name": "arm_05",
+      "vertices": 265,
+      "reach": 0.3869,
+      "graphLength": 0.2969,
+      "meanBandRadius": 0.0237,
+      "thetaDegrees": -118.2
+    },
+    {
+      "name": "arm_06",
+      "vertices": 259,
+      "reach": 0.3996,
+      "graphLength": 0.331,
+      "meanBandRadius": 0.0242,
+      "thetaDegrees": -56.7
+    },
+    {
+      "name": "arm_07",
+      "vertices": 171,
+      "reach": 0.3795,
+      "graphLength": 0.2677,
+      "meanBandRadius": 0.0194,
+      "thetaDegrees": -49.7
+    },
+    {
+      "name": "arm_08",
+      "vertices": 212,
+      "reach": 0.4668,
+      "graphLength": 0.3659,
+      "meanBandRadius": 0.027,
+      "thetaDegrees": -40.0
+    },
+    {
+      "name": "arm_09",
+      "vertices": 130,
+      "reach": 0.3084,
+      "graphLength": 0.1852,
+      "meanBandRadius": 0.0162,
+      "thetaDegrees": -27.7
+    },
+    {
+      "name": "arm_10",
+      "vertices": 233,
+      "reach": 0.4086,
+      "graphLength": 0.306,
+      "meanBandRadius": 0.0239,
+      "thetaDegrees": 19.3
+    },
+    {
+      "name": "arm_11",
+      "vertices": 150,
+      "reach": 0.4072,
+      "graphLength": 0.27,
+      "meanBandRadius": 0.0202,
+      "thetaDegrees": 25.1
+    },
+    {
+      "name": "arm_12",
+      "vertices": 250,
+      "reach": 0.4542,
+      "graphLength": 0.3293,
+      "meanBandRadius": 0.026,
+      "thetaDegrees": 90.7
+    }
+  ],
+  "twin": {
+    "twinRemeshTriangles": 213436,
+    "twinDecimateRatio": 0.03373376652598381,
+    "twinVerticesHeldBackFromRelaxation": 49071,
+    "voxel": 0.0046,
+    "bladeDilation": 0.0035
+  },
+  "puppetTriangleTarget": 7200,
+  "fullTriangles": 19666,
+  "puppetTriangles": 7687,
+  "parts": {
+    "authoredBody": 19118,
+    "twinBody": 7139,
+    "sharedOral": 548
+  },
+  "bones": 72,
+  "clips": {
+    "Idle": 2.6,
+    "Swim": 2.0,
+    "Sprint": 1.1,
+    "TurnLeft": 1.6,
+    "TurnRight": 1.6,
+    "Dive": 1.4,
+    "Rise": 1.4,
+    "Attack": 1.0,
+    "Bite": 0.5,
+    "Heavy": 1.2,
+    "Hit": 0.6,
+    "Death": 1.8,
+    "Guard": 1.2,
+    "Parry": 0.4,
+    "Dodge": 0.5,
+    "Eat": 1.6,
+    "Stagger": 1.2,
+    "Ability": 1.2,
+    "Grab": 1.2,
+    "Breath": 2.4,
+    "Growth": 1.5
+  },
+  "looping": [
+    "Idle",
+    "Swim",
+    "Sprint",
+    "Guard",
+    "Eat",
+    "Grab",
+    "Breath"
+  ],
+  "loopSeams": {
+    "Idle": 2.4492935397342132e-17,
+    "Swim": 0.0,
+    "Sprint": 0.0,
+    "TurnLeft": 8.248678958590156e-33,
+    "TurnRight": 8.248678958590156e-33,
+    "Dive": 6.298990804004863e-33,
+    "Rise": 6.298990804004863e-33,
+    "Attack": 1.7334337904792109e-34,
+    "Bite": 9.298510759257633e-33,
+    "Heavy": 1.136574320613737e-32,
+    "Hit": 5.274554089418963e-33,
+    "Death": 0.30000001192092896,
+    "Guard": 0.0,
+    "Parry": 5.2771794825831276e-33,
+    "Dodge": 8.248678958590156e-33,
+    "Eat": 0.0,
+    "Stagger": 5.274029157722924e-33,
+    "Ability": 1.8183319873396793e-33,
+    "Grab": 2.6995675923855084e-33,
+    "Breath": 0.0,
+    "Growth": 1.2982441545454548e-33
+  },
+  "boundsAt13Phases": {
+    "Idle": [
+      [
+        -1.8690580129623413,
+        -2.4832472801208496,
+        -1.7300010919570923
+      ],
+      [
+        1.8654794692993164,
+        2.5,
+        1.7496733665466309
+      ]
+    ],
+    "Swim": [
+      [
+        -1.8411662578582764,
+        -2.6350629329681396,
+        -1.7288596630096436
+      ],
+      [
+        2.0159995555877686,
+        2.5,
+        1.7496733665466309
+      ]
+    ],
+    "Sprint": [
+      [
+        -1.8529542684555054,
+        -2.6365015506744385,
+        -1.765945315361023
+      ],
+      [
+        2.0160155296325684,
+        2.5,
+        1.7496733665466309
+      ]
+    ],
+    "TurnLeft": [
+      [
+        -2.032195806503296,
+        -2.513841390609741,
+        -1.7364519834518433
+      ],
+      [
+        1.8857532739639282,
+        2.5,
+        1.7496733665466309
+      ]
+    ],
+    "TurnRight": [
+      [
+        -1.8758950233459473,
+        -2.513841390609741,
+        -1.7364519834518433
+      ],
+      [
+        1.9390482902526855,
+        2.5,
+        1.7496733665466309
+      ]
+    ],
+    "Dive": [
+      [
+        -1.8758950233459473,
+        -2.513841390609741,
+        -1.7364519834518433
+      ],
+      [
+        1.8857532739639282,
+        2.5,
+        1.7496733665466309
+      ]
+    ],
+    "Rise": [
+      [
+        -1.8758950233459473,
+        -2.513841390609741,
+        -1.7364519834518433
+      ],
+      [
+        1.8857532739639282,
+        2.5,
+        1.7496733665466309
+      ]
+    ],
+    "Attack": [
+      [
+        -1.8827476501464844,
+        -2.6526808738708496,
+        -1.833489179611206
+      ],
+      [
+        1.9941048622131348,
+        2.5,
+        1.7496733665466309
+      ]
+    ],
+    "Bite": [
+      [
+        -1.8758950233459473,
+        -2.513841390609741,
+        -1.7364519834518433
+      ],
+      [
+        1.8857532739639282,
+        2.5,
+        1.7496733665466309
+      ]
+    ],
+    "Heavy": [
+      [
+        -1.8758950233459473,
+        -2.513841390609741,
+        -1.7942159175872803
+      ],
+      [
+        1.8857532739639282,
+        2.5,
+        1.749674916267395
+      ]
+    ],
+    "Hit": [
+      [
+        -1.8758950233459473,
+        -2.513841390609741,
+        -1.7874507904052734
+      ],
+      [
+        1.8857532739639282,
+        2.5,
+        1.7496744394302368
+      ]
+    ],
+    "Death": [
+      [
+        -1.8800897598266602,
+        -2.487015724182129,
+        -1.9377247095108032
+      ],
+      [
+        1.8635066747665405,
+        2.5,
+        1.7496750354766846
+      ]
+    ],
+    "Guard": [
+      [
+        -1.3377718925476074,
+        -1.1904716491699219,
+        -1.7983943223953247
+      ],
+      [
+        1.2576712369918823,
+        2.5,
+        1.749674916267395
+      ]
+    ],
+    "Parry": [
+      [
+        -1.8758950233459473,
+        -2.513841390609741,
+        -1.7884684801101685
+      ],
+      [
+        1.8857532739639282,
+        2.5,
+        1.7496744394302368
+      ]
+    ],
+    "Dodge": [
+      [
+        -1.8856879472732544,
+        -2.6420536041259766,
+        -1.7659913301467896
+      ],
+      [
+        2.0129756927490234,
+        2.5,
+        1.7496733665466309
+      ]
+    ],
+    "Eat": [
+      [
+        -1.6410131454467773,
+        -2.110459327697754,
+        -1.6942099332809448
+      ],
+      [
+        1.591524362564087,
+        2.5,
+        1.7496733665466309
+      ]
+    ],
+    "Stagger": [
+      [
+        -1.8758950233459473,
+        -2.513841390609741,
+        -1.7872591018676758
+      ],
+      [
+        1.8857532739639282,
+        2.5,
+        1.7496744394302368
+      ]
+    ],
+    "Ability": [
+      [
+        -1.8758950233459473,
+        -2.513841390609741,
+        -1.7364519834518433
+      ],
+      [
+        1.8857532739639282,
+        2.5,
+        1.7496733665466309
+      ]
+    ],
+    "Grab": [
+      [
+        -1.8771032094955444,
+        -2.5071024894714355,
+        -1.763363003730774
+      ],
+      [
+        1.8721098899841309,
+        2.5,
+        1.7496733665466309
+      ]
+    ],
+    "Breath": [
+      [
+        -1.8761701583862305,
+        -2.5077779293060303,
+        -1.73244309425354
+      ],
+      [
+        1.8816825151443481,
+        2.5,
+        1.7496733665466309
+      ]
+    ],
+    "Growth": [
+      [
+        -1.8758950233459473,
+        -2.513841390609741,
+        -1.7364519834518433
+      ],
+      [
+        1.8857532739639282,
+        2.5,
+        1.7496733665466309
+      ]
+    ]
+  },
+  "modelLength": 5.0,
+  "maximumEnvelopeDifference": 0.14462268352508545,
+  "envelopeTolerance": 0.2,
+  "envelopeTolerancePercent": 4.0,
+  "surfaceDistanceMax": 0.187527135014534,
+  "surfaceDistanceP95": 0.03442718796432019,
+  "surfaceDistanceP99": 0.0881294992566107,
+  "surfaceOutliersOver0p12": 31,
+  "surfaceVertices": 9554,
+  "seatingDepthRaw": {
+    "shell": 0.0731,
+    "head": 0.08636,
+    "funnel": 0.08766,
+    "crown": 0.05561,
+    "arm_00_00": 0.02497,
+    "arm_01_00": 0.01554,
+    "arm_02_00": 0.01974,
+    "arm_03_00": 0.01706,
+    "arm_04_00": 0.01046,
+    "arm_05_00": 0.01059,
+    "arm_06_00": 0.01004,
+    "arm_07_00": 0.01035,
+    "arm_08_00": 0.01031,
+    "arm_09_00": 0.01471,
+    "arm_10_00": 0.01425,
+    "arm_11_00": 0.01031,
+    "arm_12_00": 0.01169
+  },
+  "maxInfluences": 4,
+  "meanInfluences": 2.884785257386537,
+  "jointsBelowHalfAPercentOfSkin": [],
+  "armSweepDegreesPerCycle": {
+    "Idle": {
+      "arm_00": 10.6,
+      "arm_01": 10.6,
+      "arm_02": 10.6,
+      "arm_03": 10.6,
+      "arm_04": 10.6,
+      "arm_05": 10.6,
+      "arm_06": 10.6,
+      "arm_07": 10.6,
+      "arm_08": 10.6,
+      "arm_09": 10.6,
+      "arm_10": 10.6,
+      "arm_11": 10.6,
+      "arm_12": 10.6
+    },
+    "Swim": {
+      "arm_00": 57.9,
+      "arm_01": 57.9,
+      "arm_02": 58.1,
+      "arm_03": 58.1,
+      "arm_04": 58.1,
+      "arm_05": 58.1,
+      "arm_06": 58.3,
+      "arm_07": 58.3,
+      "arm_08": 58.3,
+      "arm_09": 58.2,
+      "arm_10": 58.0,
+      "arm_11": 58.0,
+      "arm_12": 57.6
+    },
+    "Sprint": {
+      "arm_00": 57.2,
+      "arm_01": 57.2,
+      "arm_02": 57.4,
+      "arm_03": 57.4,
+      "arm_04": 57.5,
+      "arm_05": 57.5,
+      "arm_06": 57.7,
+      "arm_07": 57.7,
+      "arm_08": 57.7,
+      "arm_09": 57.7,
+      "arm_10": 57.5,
+      "arm_11": 57.4,
+      "arm_12": 57.0
+    },
+    "TurnLeft": {
+      "arm_00": 35.0,
+      "arm_01": 34.5,
+      "arm_02": 30.2,
+      "arm_03": 29.9,
+      "arm_04": 27.8,
+      "arm_05": 27.2,
+      "arm_06": 11.1,
+      "arm_07": 9.6,
+      "arm_08": 7.7,
+      "arm_09": 5.8,
+      "arm_10": 4.9,
+      "arm_11": 5.5,
+      "arm_12": 19.9
+    },
+    "TurnRight": {
+      "arm_00": 5.0,
+      "arm_01": 5.5,
+      "arm_02": 9.5,
+      "arm_03": 9.8,
+      "arm_04": 11.8,
+      "arm_05": 12.4,
+      "arm_06": 28.3,
+      "arm_07": 29.8,
+      "arm_08": 31.7,
+      "arm_09": 33.6,
+      "arm_10": 34.5,
+      "arm_11": 33.9,
+      "arm_12": 19.5
+    },
+    "Dive": {
+      "arm_00": 12.5,
+      "arm_01": 11.6,
+      "arm_02": 8.2,
+      "arm_03": 8.1,
+      "arm_04": 7.3,
+      "arm_05": 7.1,
+      "arm_06": 7.2,
+      "arm_07": 7.8,
+      "arm_08": 8.8,
+      "arm_09": 10.3,
+      "arm_10": 17.1,
+      "arm_11": 18.0,
+      "arm_12": 22.9
+    },
+    "Rise": {
+      "arm_00": 16.6,
+      "arm_01": 17.4,
+      "arm_02": 20.9,
+      "arm_03": 21.0,
+      "arm_04": 21.8,
+      "arm_05": 22.0,
+      "arm_06": 21.5,
+      "arm_07": 20.9,
+      "arm_08": 19.8,
+      "arm_09": 18.3,
+      "arm_10": 11.5,
+      "arm_11": 10.7,
+      "arm_12": 6.0
+    },
+    "Attack": {
+      "arm_00": 136.6,
+      "arm_01": 136.5,
+      "arm_02": 136.3,
+      "arm_03": 136.3,
+      "arm_04": 136.4,
+      "arm_05": 136.4,
+      "arm_06": 136.3,
+      "arm_07": 136.3,
+      "arm_08": 136.3,
+      "arm_09": 136.4,
+      "arm_10": 136.5,
+      "arm_11": 136.4,
+      "arm_12": 136.7
+    },
+    "Bite": {
+      "arm_00": 63.6,
+      "arm_01": 63.6,
+      "arm_02": 63.6,
+      "arm_03": 63.6,
+      "arm_04": 63.6,
+      "arm_05": 63.6,
+      "arm_06": 63.6,
+      "arm_07": 63.6,
+      "arm_08": 63.5,
+      "arm_09": 63.6,
+      "arm_10": 63.6,
+      "arm_11": 63.6,
+      "arm_12": 63.6
+    },
+    "Heavy": {
+      "arm_00": 156.9,
+      "arm_01": 156.8,
+      "arm_02": 156.4,
+      "arm_03": 156.4,
+      "arm_04": 156.6,
+      "arm_05": 156.6,
+      "arm_06": 156.5,
+      "arm_07": 156.4,
+      "arm_08": 156.4,
+      "arm_09": 156.6,
+      "arm_10": 156.8,
+      "arm_11": 156.7,
+      "arm_12": 157.1
+    },
+    "Hit": {
+      "arm_00": 73.1,
+      "arm_01": 73.1,
+      "arm_02": 73.1,
+      "arm_03": 73.1,
+      "arm_04": 73.1,
+      "arm_05": 73.1,
+      "arm_06": 72.9,
+      "arm_07": 72.9,
+      "arm_08": 72.8,
+      "arm_09": 72.9,
+      "arm_10": 72.9,
+      "arm_11": 72.9,
+      "arm_12": 73.0
+    },
+    "Death": {
+      "arm_00": 8.6,
+      "arm_01": 8.6,
+      "arm_02": 8.6,
+      "arm_03": 8.6,
+      "arm_04": 8.6,
+      "arm_05": 8.6,
+      "arm_06": 8.6,
+      "arm_07": 8.6,
+      "arm_08": 8.6,
+      "arm_09": 8.6,
+      "arm_10": 8.6,
+      "arm_11": 8.6,
+      "arm_12": 8.6
+    },
+    "Guard": {
+      "arm_00": 17.5,
+      "arm_01": 17.5,
+      "arm_02": 17.5,
+      "arm_03": 17.4,
+      "arm_04": 17.5,
+      "arm_05": 17.5,
+      "arm_06": 17.3,
+      "arm_07": 17.2,
+      "arm_08": 17.2,
+      "arm_09": 17.2,
+      "arm_10": 17.5,
+      "arm_11": 17.5,
+      "arm_12": 17.5
+    },
+    "Parry": {
+      "arm_00": 72.9,
+      "arm_01": 72.9,
+      "arm_02": 72.8,
+      "arm_03": 72.8,
+      "arm_04": 72.9,
+      "arm_05": 72.9,
+      "arm_06": 72.8,
+      "arm_07": 72.8,
+      "arm_08": 72.8,
+      "arm_09": 72.8,
+      "arm_10": 72.9,
+      "arm_11": 72.8,
+      "arm_12": 72.9
+    },
+    "Dodge": {
+      "arm_00": 32.2,
+      "arm_01": 32.2,
+      "arm_02": 32.2,
+      "arm_03": 32.2,
+      "arm_04": 32.1,
+      "arm_05": 32.1,
+      "arm_06": 31.5,
+      "arm_07": 31.4,
+      "arm_08": 31.3,
+      "arm_09": 31.2,
+      "arm_10": 31.1,
+      "arm_11": 31.2,
+      "arm_12": 31.9
+    },
+    "Eat": {
+      "arm_00": 49.4,
+      "arm_01": 49.5,
+      "arm_02": 49.5,
+      "arm_03": 49.6,
+      "arm_04": 49.8,
+      "arm_05": 49.8,
+      "arm_06": 49.8,
+      "arm_07": 49.7,
+      "arm_08": 49.7,
+      "arm_09": 49.9,
+      "arm_10": 49.7,
+      "arm_11": 49.8,
+      "arm_12": 49.8
+    },
+    "Stagger": {
+      "arm_00": 73.2,
+      "arm_01": 73.2,
+      "arm_02": 73.1,
+      "arm_03": 73.1,
+      "arm_04": 73.1,
+      "arm_05": 73.1,
+      "arm_06": 72.9,
+      "arm_07": 72.9,
+      "arm_08": 72.9,
+      "arm_09": 72.9,
+      "arm_10": 72.9,
+      "arm_11": 72.9,
+      "arm_12": 73.1
+    },
+    "Ability": {
+      "arm_00": 27.1,
+      "arm_01": 27.1,
+      "arm_02": 27.1,
+      "arm_03": 27.1,
+      "arm_04": 27.1,
+      "arm_05": 27.0,
+      "arm_06": 26.9,
+      "arm_07": 26.9,
+      "arm_08": 26.8,
+      "arm_09": 26.8,
+      "arm_10": 26.8,
+      "arm_11": 26.8,
+      "arm_12": 27.0
+    },
+    "Grab": {
+      "arm_00": 124.5,
+      "arm_01": 124.4,
+      "arm_02": 124.2,
+      "arm_03": 124.2,
+      "arm_04": 124.2,
+      "arm_05": 124.3,
+      "arm_06": 124.0,
+      "arm_07": 123.9,
+      "arm_08": 123.9,
+      "arm_09": 123.9,
+      "arm_10": 124.0,
+      "arm_11": 123.9,
+      "arm_12": 124.4
+    },
+    "Breath": {
+      "arm_00": 9.8,
+      "arm_01": 9.9,
+      "arm_02": 10.0,
+      "arm_03": 10.1,
+      "arm_04": 10.1,
+      "arm_05": 10.1,
+      "arm_06": 10.4,
+      "arm_07": 10.4,
+      "arm_08": 10.4,
+      "arm_09": 10.4,
+      "arm_10": 10.5,
+      "arm_11": 10.4,
+      "arm_12": 10.3
+    },
+    "Growth": {
+      "arm_00": 19.8,
+      "arm_01": 19.7,
+      "arm_02": 19.4,
+      "arm_03": 19.4,
+      "arm_04": 19.3,
+      "arm_05": 19.2,
+      "arm_06": 17.7,
+      "arm_07": 17.5,
+      "arm_08": 17.2,
+      "arm_09": 16.8,
+      "arm_10": 16.6,
+      "arm_11": 16.7,
+      "arm_12": 18.6
+    }
+  },
+  "funnelSweepDegreesPerCycle": {
+    "Idle": 11.5,
+    "Swim": 31.5,
+    "Sprint": 31.1,
+    "TurnLeft": 31.5,
+    "TurnRight": 31.5,
+    "Dive": 24.1,
+    "Rise": 24.1,
+    "Attack": 0.0,
+    "Bite": 0.0,
+    "Heavy": 7.9,
+    "Hit": 0.0,
+    "Death": 6.9,
+    "Guard": 3.2,
+    "Parry": 0.0,
+    "Dodge": 31.2,
+    "Eat": 0.0,
+    "Stagger": 0.0,
+    "Ability": 3.2,
+    "Grab": 0.0,
+    "Breath": 11.0,
+    "Growth": 0.0
+  },
+  "curvature": {
+    "arm_00": {
+      "stations": 4,
+      "straightStations": 0,
+      "meanCurvatureRadiusOverSection": 9.795538154120642,
+      "tightestCurvatureRadiusOverSection": 2.806846853268314,
+      "perStation": [
+        13.086,
+        3.339,
+        19.95,
+        2.807
+      ]
+    },
+    "arm_02": {
+      "stations": 4,
+      "straightStations": 0,
+      "meanCurvatureRadiusOverSection": 9.136412162044024,
+      "tightestCurvatureRadiusOverSection": 2.515678577689374,
+      "perStation": [
+        7.554,
+        16.462,
+        10.014,
+        2.516
+      ]
+    },
+    "arm_04": {
+      "stations": 4,
+      "straightStations": 0,
+      "meanCurvatureRadiusOverSection": 7.465650969855606,
+      "tightestCurvatureRadiusOverSection": 2.0584109007377562,
+      "perStation": [
+        14.213,
+        9.608,
+        3.983,
+        2.058
+      ]
+    },
+    "arm_06": {
+      "stations": 4,
+      "straightStations": 0,
+      "meanCurvatureRadiusOverSection": 9.625827107986893,
+      "tightestCurvatureRadiusOverSection": 3.355999406673909,
+      "perStation": [
+        23.337,
+        6.709,
+        5.102,
+        3.356
+      ]
+    },
+    "arm_08": {
+      "stations": 4,
+      "straightStations": 0,
+      "meanCurvatureRadiusOverSection": 10.021234243352096,
+      "tightestCurvatureRadiusOverSection": 3.565917927662496,
+      "perStation": [
+        16.034,
+        13.157,
+        7.328,
+        3.566
+      ]
+    },
+    "arm_10": {
+      "stations": 4,
+      "straightStations": 0,
+      "meanCurvatureRadiusOverSection": 10.649954680808271,
+      "tightestCurvatureRadiusOverSection": 3.1220458623352334,
+      "perStation": [
+        7.325,
+        26.935,
+        5.218,
+        3.122
+      ]
+    },
+    "arm_12": {
+      "stations": 4,
+      "straightStations": 0,
+      "meanCurvatureRadiusOverSection": 10.632590031484979,
+      "tightestCurvatureRadiusOverSection": 3.7568562924559643,
+      "perStation": [
+        6.774,
+        24.745,
+        7.254,
+        3.757
+      ]
+    },
+    "allArms": {
+      "meanCurvatureRadiusOverSection": 9.618172478521787,
+      "note": "per arm, the arm centreline against its own measured band radius"
+    }
+  },
+  "pairedAppendageAsymmetry": {
+    "method": "each arm against its reflection in the shell plane, the nearest arm by angle about the crown axis; an arm crown has no paired limbs",
+    "arms": {
+      "arm_00": {
+        "partner": "arm_09",
+        "angleMismatchDegrees": 13.73,
+        "meanMirrorDistanceOverBodyLength": 0.2203,
+        "maxMirrorDistanceOverBodyLength": 0.3333
+      },
+      "arm_01": {
+        "partner": "arm_09",
+        "angleMismatchDegrees": 7.62,
+        "meanMirrorDistanceOverBodyLength": 0.0973,
+        "maxMirrorDistanceOverBodyLength": 0.1336
+      },
+      "arm_02": {
+        "partner": "arm_07",
+        "angleMismatchDegrees": 1.15,
+        "meanMirrorDistanceOverBodyLength": 0.1272,
+        "maxMirrorDistanceOverBodyLength": 0.193
+      },
+      "arm_03": {
+        "partner": "arm_07",
+        "angleMismatchDegrees": 0.11,
+        "meanMirrorDistanceOverBodyLength": 0.0655,
+        "maxMirrorDistanceOverBodyLength": 0.0784
+      },
+      "arm_04": {
+        "partner": "arm_06",
+        "angleMismatchDegrees": 2.58,
+        "meanMirrorDistanceOverBodyLength": 0.0564,
+        "maxMirrorDistanceOverBodyLength": 0.1083
+      },
+      "arm_05": {
+        "partner": "arm_06",
+        "angleMismatchDegrees": 5.12,
+        "meanMirrorDistanceOverBodyLength": 0.0765,
+        "maxMirrorDistanceOverBodyLength": 0.1014
+      },
+      "arm_06": {
+        "partner": "arm_04",
+        "angleMismatchDegrees": 2.58,
+        "meanMirrorDistanceOverBodyLength": 0.0564,
+        "maxMirrorDistanceOverBodyLength": 0.1083
+      },
+      "arm_07": {
+        "partner": "arm_03",
+        "angleMismatchDegrees": 0.11,
+        "meanMirrorDistanceOverBodyLength": 0.0655,
+        "maxMirrorDistanceOverBodyLength": 0.0784
+      },
+      "arm_08": {
+        "partner": "arm_02",
+        "angleMismatchDegrees": 8.55,
+        "meanMirrorDistanceOverBodyLength": 0.3329,
+        "maxMirrorDistanceOverBodyLength": 0.5005
+      },
+      "arm_09": {
+        "partner": "arm_01",
+        "angleMismatchDegrees": 7.62,
+        "meanMirrorDistanceOverBodyLength": 0.0973,
+        "maxMirrorDistanceOverBodyLength": 0.1336
+      },
+      "arm_10": {
+        "partner": "arm_00",
+        "angleMismatchDegrees": 33.27,
+        "meanMirrorDistanceOverBodyLength": 0.137,
+        "maxMirrorDistanceOverBodyLength": 0.1811
+      },
+      "arm_11": {
+        "partner": "arm_00",
+        "angleMismatchDegrees": 39.11,
+        "meanMirrorDistanceOverBodyLength": 0.1743,
+        "maxMirrorDistanceOverBodyLength": 0.3102
+      },
+      "arm_12": {
+        "partner": "arm_11",
+        "angleMismatchDegrees": 64.16,
+        "meanMirrorDistanceOverBodyLength": 0.2679,
+        "maxMirrorDistanceOverBodyLength": 0.4644
+      }
+    },
+    "meanMirrorDistanceOverBodyLength": 0.1365,
+    "maxMirrorDistanceOverBodyLength": 0.5005,
+    "armCount": 13,
+    "oddArmCount": true
+  },
+  "mouth": {
+    "authored": {
+      "facesRemoved": 228,
+      "rimVertices": 60
+    },
+    "twin": {
+      "facesRemoved": 57,
+      "rimVertices": 26
+    },
+    "centre": [
+      0.0,
+      -0.13286,
+      -0.04404
+    ],
+    "normal": [
+      0.0,
+      -0.9041,
+      -0.4274
+    ],
+    "radius": 0.03654,
+    "rootSpread": 0.20662,
+    "armBandRadius": 0.02357,
+    "method": "authored on the crown axis: the generation models no mouth at all, and casting head normals back into the mesh finds neighbouring arms across the gaps rather than a lip opposite",
+    "liningRings": 16,
+    "liningRing": 14,
+    "liningDepth": 0.08403706670903291,
+    "liningNearestSurfaceDepthRaw": 0.03506,
+    "skinDoubleSided": true,
+    "liningCullsBackfaces": true,
+    "oneClosedLining": true,
+    "beak": "two authored mandibles, 7 sections each, rigid on skull and jaw"
+  },
+  "albedoSha256": "0b226a9541b36dabbf46fd51f29dc5dcba58cd58314e56221b3d0b939e63b4a4",
+  "shellIsRigid": true,
+  "shellHasNoChannels": true,
+  "normalizedWeights": true,
+  "rootStable": true,
+  "noScaleChannels": true,
+  "postBuildQA": null
+}
