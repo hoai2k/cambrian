@@ -629,10 +629,18 @@ lining, lin_raw = K.oral_lining('Oral cavity lining', (MOUTH_BACK, MOUTH_FRONT),
                                 # skull sits a third of its own width left of the body's midline
                                 # (`mouth_centre`), and the room this builder reads is a half width
                                 # about the body's own axis, so a palate as wide as that measurement
-                                # is still offset from the head that holds it. Measuring the room by
-                                # cast about the mouth's own centre, as the marine kit does, is the
-                                # next thing to try. Recorded rather than hidden, and the wall is not
-                                # coming back.
+                                # is still offset from the head that holds it. It now casts its
+                                # room about the mouth's own centre, as the marine kit does, with
+                                # the old profile kept as the cap -- and that did not move the count
+                                # either: 1,460. Five corrections, no movement. What is known is
+                                # what the rays say: the sightline carries one surface, the inside
+                                # of the skull, and no oral geometry lies anywhere near it, so the
+                                # shells are not merely too small -- they are not on that line at
+                                # all. Finding what is is the next pass's job, and the instrument
+                                # for it is a render with the oral materials painted an emissive
+                                # marker, the way `gape-crown.py` does, so "where the mouth is
+                                # drawn" is a mask rather than a guess. Recorded rather than hidden,
+                                # and the wall is not coming back.
                                 # A squircle, not an ellipse: see `K.oral_lining`.
                                 power=LINING_POWER, room=mouth_room)
 lining.data.materials.append(mouthmat)

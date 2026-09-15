@@ -360,6 +360,19 @@ unless the user explicitly asks for a PR. Steps:
   it (`measuredRoom` on the object), the probe is recorded, and what containment rests on is the
   head's own measured section — which is the rule this file already states for anything beside a
   modelled mouth. `gape-solid.py` is what proves the mouth.
+  **What the change cost, measured on every body.** Sixteen of nineteen jawed bodies read **0 px**
+  of backdrop through the head at full gape and two more read 1 and 4 — Placodus 36 to 4,
+  Cymbospondylus 28 to 1, Cartorhynchus 59 to 0, Atopodentatus 4 to 0, Saurichthys 3 to 0, and every
+  body that read 0 still does. The skin figures are untouched: every one of the era-wide numbers in
+  the tear rule below comes back to the digit, and a lining that used to read 9.98x on Cymbospondylus
+  and 50x on Hupehsuchus now stretches by *nothing*, because a palate and a floor are rigid.
+  Two bodies are not fixed and neither is hidden. **Coelophysis** is the era's standing open gape
+  failure and stays one: 2,505 px before, 2,493 after, unmoved by `cap_cut`, by a rim flange and by
+  the shells themselves, which is a count about something else. **Macrocnemus** is the one place two
+  surfaces cost something — the sac's wall was occluding a sightline that passes *beside* a palate
+  rather than over or under it, and `Snatch` at its widest went from 0 px to 1,460. Its builder records
+  the whole hunt; the width of the room is the suspect, because that skull sits a third of its own
+  width off the midline the room was read about.
   Seeing daylight between the jaws of a gharial-snouted animal **is** what an open mouth looks like,
   and `gape-solid.py` has always allowed it: backdrop present in **both** of its passes is honest
   gape, and only backdrop the cull *opens* is a hole. Proving it needs care: render at full gape against a

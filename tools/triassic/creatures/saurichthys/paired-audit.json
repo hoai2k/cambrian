@@ -2,22 +2,22 @@
   "models": [
     {
       "suffix": "",
-      "bytes": 1799740,
-      "sha256": "0bcc3f78ff2b9522bf9bd28f7720531cb3b9e3cd3a09c8b1eb0ad3fb0aedb740",
+      "bytes": 1799752,
+      "sha256": "1079ed1ef1164dbc6a35be66cfbb7dd469627d2722373bd0c882a5c63c24e56f",
       "triangles": 22148,
       "vertices": 13517
     },
     {
       "suffix": ".puppet",
-      "bytes": 1316268,
-      "sha256": "ddd46d31b56673a99c0bd2f974e006398f81b465b4758e0e77356ec793959b8e",
+      "bytes": 1316276,
+      "sha256": "9537ec56ed1b404c96825c7b577fae022c46641917a7fd0101a9ced4508026b3",
       "triangles": 8526,
       "vertices": 4389
     },
     {
       "suffix": ".lod1",
-      "bytes": 1316268,
-      "sha256": "ddd46d31b56673a99c0bd2f974e006398f81b465b4758e0e77356ec793959b8e",
+      "bytes": 1316276,
+      "sha256": "9537ec56ed1b404c96825c7b577fae022c46641917a7fd0101a9ced4508026b3",
       "triangles": 8526,
       "vertices": 4389
     }
@@ -704,10 +704,10 @@
       "edgesOver2x": 0
     },
     "Mouth_lining": {
-      "worstRatio": 1.0000001371674658,
+      "worstRatio": 1.0000001371674656,
       "clip": "Death",
-      "grewFrom": 0.12071719538730297,
-      "grewTo": 0.12071721194577473,
+      "grewFrom": 0.13095746672430103,
+      "grewTo": 0.13095748468740484,
       "edgesOver2x": 0
     },
     "Saurichthys_authored_body_lower_jaw": {
