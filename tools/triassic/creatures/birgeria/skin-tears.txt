@@ -1,0 +1,24 @@
+
+public/assets/triassic/creatures/birgeria.glb   35617 edges x 17 phases x 23 clips
+clip            skin  on bone             all     >2x  worst bones
+Dodge          3.46x  pec_upper_R       3.46x      94  0.029->0.102  pec_mid_R:63 pec_upper_R:25 chest:4 caudal_upper:2
+Death          2.91x  pec_upper_R       8.52x      85  0.029->0.086  pec_mid_R:31 skull:23 jaw:22 pec_upper_R:9
+TurnRight      2.72x  pec_upper_R       2.72x      22  0.029->0.080  pec_mid_R:19 pec_upper_R:3
+Gape           2.70x  pec_upper_R      27.18x    1540  0.029->0.080  skull:775 jaw:742 pec_mid_R:19 pec_upper_R:4
+FastStart      2.65x  anal              9.78x      94  0.041->0.108  tail_04:28 skull:22 jaw:22 anal:18
+Dive           2.55x  pec_upper_R       2.55x      13  0.029->0.075  pec_mid_R:12 pec_upper_R:1
+Grab           2.33x  pec_mid_R         5.88x      60  0.034->0.078  skull:27 jaw:27 pec_mid_R:6
+Sprint         2.21x  caudal_upper      2.21x      20  0.040->0.089  caudal_upper:12 tail_06:8
+TurnLeft       2.14x  anal              2.14x       4  0.042->0.090  anal:4
+Parry          1.94x  pec_mid_R         1.94x       0  0.044->0.085  
+Ability        1.72x  pec_mid_R        22.33x     540  0.044->0.075  skull:276 jaw:264
+Swim           1.71x  caudal_upper      1.71x       0  0.044->0.076  
+Attack         1.60x  pec_mid_R        17.02x     363  0.060->0.096  skull:195 jaw:168
+Heavy          1.60x  pec_mid_R        21.20x     500  0.060->0.096  skull:261 jaw:239
+Breath         1.60x  pec_mid_R         2.25x       2  0.060->0.096  skull:1 jaw:1
+Hit            1.41x  pec_mid_R         9.78x      50  0.060->0.084  skull:25 jaw:25
+Stagger        1.40x  pec_mid_R         9.78x      50  0.060->0.084  skull:25 jaw:25
+Eat            1.35x  pec_mid_R        15.55x     590  0.060->0.081  skull:314 jaw:276
+Bite           1.26x  chest            18.95x     446  0.067->0.084  skull:231 jaw:215
+17 of 23 clips tear an edge past 2x
+worst SKIN 3.46x · worst including the oral lining 27.18x (the lining is a sac built to stretch; the skin figure is the one to judge)

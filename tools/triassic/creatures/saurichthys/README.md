@@ -366,3 +366,15 @@ Honest limitations, worst first:
    in a close-up.
 9. Living colours, soft tissue and movement are artistic reconstruction. Travel, the live birth the
    roster gives this animal, and the grip rules remain engine-owned.
+
+## Re-checked under the corrected gape test — 15 September 2026
+
+`gape-solid.py` was found to identify its backdrop by a half-space, `r > .5, g < .3, b > .5`, which
+the era's standard lining renders *inside* under a magenta world. On Rhaeticosaurus that counted
+394 of 508 failing pixels as background when they were its own mouth, correctly drawn. The test now
+asks `r > .75, g < .45, b > .75`.
+
+**This body's failure survives the correction.** Re-run on the same three shots, it goes from 18 px
+to **17 px** against a tolerance of 12 — one pixel. So the hole is real geometry and not an artefact
+of the old threshold, and this animal still wants the fix. Nobody should read the tool correction as
+having cleared it.

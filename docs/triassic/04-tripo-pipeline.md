@@ -350,6 +350,68 @@ animal. Three findings from that pass belong in this document because they gener
   untested. `tools/triassic/shorekit-check.mjs` now resolves every `K.<name>` a builder reaches for
   against the kit, statically and in a second, and runs in `npm run triassic`.
 
+## What a fish and a flyer taught (Birgeria and Rhaeticosaurus)
+
+Four findings from the pair, each of them a thing the pipeline believed and got wrong rather than a
+detail of either animal.
+
+- **The kit's fin radius is written for a paddle, and a hydrofoil is not one.** `limb_weights` takes
+  the **55th percentile** of a blade's own distances to its polyline as the radius inside which a
+  vertex is wholly the limb's, and blends from there out to the 99.5th. That is right for a fin that
+  steers: it is nearly half the blade on a partial alpha, and on a fin that barely moves nobody
+  notices. On Rhaeticosaurus' flippers, which sweep 130 degrees, the weight relaxation then spread
+  *trunk* weight right out along the blade — vertices 1.35 units off the midline carrying 0.26 of
+  `chest` and 0.23 of `body` — and `skin-tears.mjs` read **7.9x** across those edges. More joints in
+  the blade, a wider chain blend and a gentler bend each moved it by under a tenth. The **92nd
+  percentile** took it to **2.81x**, the cleanest skin in the era. This is the concrete form of "a
+  copied rig is a starting point to be re-measured, never a transplant": what has to be re-measured
+  is not only where the bones go but how wide the thing on them is.
+
+- **A lining is fitted per vertex, not per ring, and a mouth's section is not an ellipse.** Shrinking
+  the whole ring by one factor until it is inside the skin couples its two axes: a floor set deep
+  enough to sit inside the mandible rather than stipple against it took Rhaeticosaurus' lining
+  *width* down to 0.68 of the mouth's own, the far wall stopped short of the mandible's rim, and the
+  gape showed background down the jaw line. `tripo.lining` now takes a superellipse `power` and an
+  optional per-vertex `fit`; both default to what the earlier bodies were measured with.
+
+- **Which measurement sizes the lining depends on whether the mouth is modelled.** `cavity_profile`'s
+  `wide` is the spread of the measured cavity points, and those sit on both *lips*, so on a deep
+  round head it is the span of the lip **line** — wider than the head is at the seam and wider still
+  than the lumen behind it. Birgeria's first lining came out through both cheeks at 0.05 of a body
+  from it. Binning the flank over a band about the seam only moves the mistake: too tall a band
+  reads the head above the mouth line and the lining bulges, too tight a band reads the head at its
+  narrowest and the lining sits inside the skin's own cut edge, leaving an annular strip that the
+  jaw's rotation opens and nothing bridges (113 magenta pixels one way, a visible pink bulge the
+  other). **Cast the section from the mouth's own axis** instead. Width can always be cast — a
+  lateral ray crosses the lumen and hits the cheek — but **height cannot be cast on a modelled
+  mouth**: the mouth is shut in the bind pose, so a ray up from the seam measures the *closed slit*,
+  three thousandths of a body. Where a cavity is modelled the depth probe also reads backwards
+  (a point in the lumen is outside the closed shell), so such a body is sized and never fitted.
+
+- **`gape-solid.py` was measuring its own backdrop loosely enough to catch the animal.** The test for
+  "is this pixel the magenta backdrop" was `r > .5, g < .3, b > .5` — a half-space rather than the
+  backdrop. A magenta *world* also lights the scene, and the era's standard oral lining
+  (0.30, 0.13, 0.115) renders under it at (0.73, 0.29, 0.51): inside that window by a hair on green.
+  394 of the 508 pixels that failed Rhaeticosaurus at full gape were its own mouth, correctly drawn
+  and correctly front-facing, and three successive changes to the geometry moved the count by not one
+  pixel — which is the tell, and is worth watching for in any check whose number will not move. The
+  discriminator is **blue**: the backdrop renders at 0.93 and above, a lit red lining at about half
+  that. The test is now `r > .75, g < .45, b > .75`; tightening can only reduce a count, and Birgeria
+  went 1 → 0, Mixosaurus 3 → 0 and Ceratites 6 → 6 on unchanged files.
+
+  What was left was not the mouth either: through the gap between an open jaw and the throat you can
+  see the **inside of the mandible's lower rear corner**, backfacing, and no lining covers that
+  because it is outside the mouth. That puts a **ceiling on the gape a given generation will carry** —
+  on Rhaeticosaurus, cut along the line it paints, the corner opens somewhere between 0.47 and 0.50
+  radians of jaw. A clip that wants more has to get it from reach instead.
+
+Two smaller things worth not relearning. **Which end of a fish is the head cannot come from the
+principal component's sign**, because a rostrum and a caudal lobe are both thin: it comes from the
+caudal blade, which is the deepest thin cluster at one end, and the builder asserts it. And a
+**swept angle read off an Euler channel is a measurement of the rig, not of the animal** — a rotation
+written on one axis is a stroke on one body and a twist on another, depending on how the bone rests.
+Rhaeticosaurus measures it from the limb's own direction, root joint to tip joint in world space.
+
 Each creature's
 builder produces the cleaned authored body, the shared skeleton, the measured twin and the sampled
 performances; per-creature audits prove exact parity after packaging. Nothosaurus and Shonisaurus
