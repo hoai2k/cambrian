@@ -128,6 +128,16 @@ unless the user explicitly asks for a PR. Steps:
   `src/app/Loading.tsx`) it grows a progress bar under that line. The full boot screen is for a
   boot nobody is looking at a screen for — deep-linked to the roster — because over the title it
   would be the title's own painting a second time.
+- **A seat is a claim, and arriving at a screen claims nothing.** Reaching the roster from another
+  game's picker (`deepLinkedToSelect`) used to open a keyboard seat on the era's default animal, so
+  the screen showed somebody playing before anybody had pressed anything. The keyboard now takes its
+  seat when it is *used to choose* — `setCreature` with nobody seated opens one, on the animal that
+  was clicked rather than on a default somebody has to correct, which is the same thing Enter and a
+  pad's A button have always done. That arrival also has to wake the audio: switching game is a page
+  **load**, so the new document has had no gesture of its own and its context starts suspended — the
+  title screen's press start is what normally wakes it, and a player who came in past the title
+  skipped that. Arriving cannot itself resume a context (it is not a gesture), so the page arms
+  `audio.init()`/`resume()` there and the first click or key does the rest.
 - Fullscreen rides across a change of game rather than surviving it, because it cannot survive it:
   it belongs to the document, switching game is a page load, and the new document may only enter
   on a user gesture of its own. (A query parameter would change nothing — `/cambrian/?game=devonian`

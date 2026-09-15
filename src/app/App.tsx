@@ -309,14 +309,24 @@ export function App() {
     return () => { for (const e of events) window.removeEventListener(e, mark); clearInterval(id); };
   }, [loaded]);
 
-  // Arriving on the roster from the other game's picker: the seat the title screen would have
-  // opened. Audio needs no help — any gesture wakes it below — and the parameter is cleared so the
-  // address bar stops claiming a screen the player may since have left.
+  // Arriving on the roster from the other game's picker.
+  //
+  // It used to open the seat the title screen would have — a keyboard player, on the era's default
+  // animal — and that is wrong twice over. A seat is a *claim*: it belongs to whoever pressed
+  // something to take it, and arriving at a screen is not pressing anything, so the roster would
+  // show somebody playing before anybody had chosen. (The keyboard takes its seat when it is used
+  // to choose: `setCreature` below opens one, as Enter and the pads always did.) And the audio it
+  // said needed no help does: switching game is a page *load*, so the new document has had no
+  // gesture of its own and its context starts suspended — the title screen's press start is what
+  // normally wakes it, and a player who skipped past the title skipped that too. Arriving is not a
+  // gesture either, so this cannot simply resume; what it can do is be ready the instant the first
+  // click or key lands, which is what `wake` below is for. What was lost was the *ui-start* that
+  // the press would have played, and the era's own beds and rotation starting with it.
   useEffect(() => {
     if (!deepLinkedToSelect()) return;
-    updatePlayers([{ creature: ACTIVE_ERA.defaults.player, device: 'keyboard', ready: false }]);
+    audio.init(); audio.resume();
     try { history.replaceState(null, '', location.pathname + location.hash); } catch { /* a file:// page has no history to rewrite */ }
-  }, [updatePlayers]);
+  }, []);
 
   // Any user gesture: wake audio (browsers require it)
   useEffect(() => {
@@ -510,7 +520,17 @@ export function App() {
   }, [updatePlayers]);
   const cycleCreature = useCallback((index: number, dir: number) => moveCursor(index, dir, 0), [moveCursor]);
   const setCreature = useCallback((index: number, c: CreatureId) => {
-    const ps = [...playersRef.current]; if (!ps[index] || ps[index].ready) return;
+    const ps = [...playersRef.current];
+    // Choosing an animal with nobody seated *is* the keyboard joining. A player who reached the
+    // roster without pressing start (from the other game's picker) has no seat, and clicking a
+    // creature is exactly the gesture that should open one — on the animal they clicked, rather
+    // than on a default somebody has to correct.
+    if (!ps.length && index === 0) {
+      updatePlayers([{ creature: c, device: 'keyboard', ready: false }]);
+      audio.init(); audio.resume(); audio.play('ui-join');
+      return;
+    }
+    if (!ps[index] || ps[index].ready) return;
     ps[index] = { ...ps[index], creature: c }; updatePlayers(ps); audio.play('ui-move');
   }, [updatePlayers]);
   const toggleReady = useCallback((index: number) => {
