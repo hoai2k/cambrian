@@ -34,7 +34,7 @@ node tools/triassic/idle-bones.mjs public/assets/triassic/creatures/odontochelys
 | Anchor surface distance, worst | 0.0035 of body length (tolerance 2 %) |
 | Limb root seating inside the trunk | 0.0152 – 0.0181 |
 | Jaw hinge / plastron bone seating | 0.0074 / 0.0353 |
-| Worst **skin** tear | **5.13×** (`Sprint`, `tail_00`) |
+| Worst **skin** tear | **5.12×** (`Sprint`, `tail_00`) |
 | Gape solid | **3 px** of 378,000 (tolerance 12) |
 | Idle bones | every joint owns skin |
 
@@ -134,8 +134,8 @@ nothing about this animal strikes with a neck, a tail or a limb.
 
 ## What the skinning cost, and what is still weak
 
-The worst skin tear is **5.13× in Sprint, on `tail_00`** — which is the hip, and `tail_00` is the
-hind limbs' parent. That is the weakest thing about this body. Four measured passes got it there
+The worst skin tear is **5.12× in Sprint, on `tail_00`** — which is the hip, and `tail_00` is the
+hind limbs' parent. That is the weakest thing about this body. Five measured passes got it there
 from **11.04×**:
 
 | Change | Worst skin |
@@ -143,7 +143,8 @@ from **11.04×**:
 | First build (kit defaults, blend 0.040, radius 92nd percentile, 4 relax passes) | 11.04× |
 | Root fade over 1.4 of the first bone, radius 88th, blend 0.060, 6 passes, gentler stroke | 7.02× |
 | Root fade 2.0, radius 84th, 9 passes, almost nothing at `tail_00` | 5.83× |
-| **Radii growing with arc length (`r·(1 + 0.6 t²)`, `r·(1 + 1.2 t²)`)** | **5.13×** |
+| **Radii growing with arc length (`r·(1 + 0.6 t²)`, `r·(1 + 1.2 t²)`)** | 5.13× |
+| Blend as a fraction of each limb’s own length (0.16), head-section and seam assertions | **5.12×** |
 
 That last one is the finding worth keeping. The kit takes one inner and one outer radius per limb,
 and beyond the outer one a vertex gets no limb weight at all. On a hydrofoil or a paddle that is
@@ -192,7 +193,7 @@ any body in this batch and is the obvious first item for the neutral pose.
 
 ## Limitations
 
-- **5.13× at the hip in Sprint** is the outstanding defect, and it is the hind limbs' root band
+- **5.12× at the hip in Sprint** is the outstanding defect, and it is the hind limbs' root band
   against `tail_00`. It is weights rather than geometry — the same clips on a straighter-limbed
   animal measure 3.4× — and the four passes above are recorded so the next attempt starts where this
   one stopped rather than at the beginning.
