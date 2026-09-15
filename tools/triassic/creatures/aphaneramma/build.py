@@ -449,21 +449,33 @@ THROAT_SPAN = .060
 THROAT_DROP = .16
 
 
+# **A throat has a width.** This gate was a band in `y` below a height in `z` and nothing at all in
+# `x`, so it claimed everything in that slab of the animal -- and this generation stands with its
+# **right forelimb tucked forward under the head**, inside the slab. 64.5 % of the skin round
+# `fore_foot_R` came out weighted to `jaw`, against 0.2 % of trunk weight round `fore_foot_L`, and
+# the right arm was carried by the mandible instead of by its own bones: measured against the joint
+# it belongs to, that foot's skin travelled 0.45 of the distance the joint did, where every other
+# foot on the animal is between 1.04 and 1.11. That is the leg that gets left behind.
+#
+# The bound is the trunk's **own measured half width** at that station -- which `trunk_centreline`
+# computes with the limb vertices dropped, so it is the neck's width and not the arm's.
+THROAT_WIDTH = 1.15
+
+
 def throat_jaw_share(q):
     a = T.smooth((q.y - (HINGE_Y - .016)) / .016)
     b = T.smooth(((HINGE_Y + THROAT_SPAN) - q.y) / THROAT_SPAN)
     c = T.smooth((seam(HINGE_Y) - q.z) / (THROAT_DROP * head_half_depth(HINGE_Y)) + 1.)
-    return a * b * c
+    hw = max(half_width(q.y), 1e-6)
+    d = T.smooth((THROAT_WIDTH * hw - abs(q.x - cx(q.y))) / (.30 * hw))
+    return a * b * c * d
 
 
 def weights(p):
     q = Vector(p)
     w = dict(T.station_weights(ASTATION, T.project(AP, ACUM, q)[1]))
-    throat = throat_jaw_share(q)
-    if throat > 0:
-        w = {n: v * (1 - throat) for n, v in w.items()}
-        w['jaw'] = w.get('jaw', 0.) + throat
     limb = limb_weights(q)
+    alpha = 0.
     if limb:
         alpha, chain, rootw, t = limb
         base = {}
@@ -474,6 +486,14 @@ def weights(p):
         w = {n: v * (1 - alpha) for n, v in base.items()}
         for n, v in chain.items():
             w[n] = w.get(n, 0.) + v * alpha
+    # **The limb is settled first and the throat takes only what is left of it.** Run the other way
+    # round -- which is how this builder had it -- the throat hands a vertex to `jaw`, the limb then
+    # blends *that* mixture back down by `1 - alpha`, and a tucked limb whose alpha is only about a
+    # third keeps two thirds of its flesh on the mandible. A limb is never throat.
+    throat = throat_jaw_share(q) * (1. - alpha)
+    if throat > 0:
+        w = {n: v * (1 - throat) for n, v in w.items()}
+        w['jaw'] = w.get('jaw', 0.) + throat
     w = {n: v for n, v in w.items() if v > 1e-8}
     items = sorted(w.items(), key=lambda kv: -kv[1])[:4]
     total = sum(v for _, v in items)
@@ -533,8 +553,33 @@ puppet, puppet_thickness, twin_report, bvh_src = T.build_twin(
 
 
 # --------------------------------------------------------------------- cut the jaw ----
+# **A mandible has a width, and this generation keeps its right forelimb tucked forward under the
+# snout.** The test was a band in `y` below the mouth line with nothing at all in `x`, so the cut
+# took the whole arm onto the mandible: 411 of the 637 vertices round `fore_foot_R` ended up in the
+# lower-jaw shell, which is rigid on `jaw` at weight 1, and no weighting could reach them -- 64.5 %
+# of that neighbourhood read as `jaw` against 0.2 % of trunk weight round `fore_foot_L`. Measured
+# against the joint it belongs to, the right forefoot's skin travelled 0.45 of the distance its own
+# joint did in `Swim`, where every other foot on the animal is 1.04 to 1.11. That is the leg the
+# animal leaves behind, and it is a cut rather than a weighting.
+#
+# The rule is the one the *skinning* already uses -- a vertex is a limb's where it is nearer that
+# limb's own polyline than the body's axial one -- so the cut and the weighting cannot disagree
+# about which vertices are an arm. A width bound alone is not enough here: at 1.35 of the trunk's
+# measured half width the cut still took 235 of those 637 vertices, because a long-snouted
+# temnospondyl's snout is narrow and its hand is broad.
+def on_a_limb(c):
+    da, _sa = T.project(AP, ACUM, c)
+    for _key, (P, cum, _n, _r) in LIMB_FIT.items():
+        dist, s = T.project(P, cum, c)
+        if dist < da and s > cum[-1] * .25:
+            return True
+    return False
+
+
 def is_jaw(c):
-    return JAW_FRONT_Y - .004 < c.y < HINGE_Y and c.z < seam(c.y) - 1e-7
+    if not (JAW_FRONT_Y - .004 < c.y < HINGE_Y and c.z < seam(c.y) - 1e-7):
+        return False
+    return not on_a_limb(c)
 
 
 parts = {}
