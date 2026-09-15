@@ -710,6 +710,11 @@ a beach. The Triassic leaves it alone; see [Nobody leaves the water](#nobody-lea
 Non-playable, modelled, rigged and animated; placed on the beach strip and the estuary banks by
 the world as landmarks are. Their job is the fourth pillar. All are Tier 1 model requests.
 
+> **Where this is going:** the shore as built strikes at anything passing and is permanent.
+> [06 · The shore comes and goes](06-shore-visitors.md) is the plan to make it a *trap* rather
+> than a wall — a stillness trigger, the runners' dash-and-retreat, and banks that empty and
+> refill — and supersedes the per-animal "in the game" paragraphs below where they differ.
+
 A word on the brief's phrase *dinosaur necks*: Tanystropheus is an archosauromorph, a cousin of
 the line that led to crocodiles and dinosaurs, not a dinosaur, and no dinosaur is known to have
 fished from a Triassic shore. The idea is right and Tanystropheus is the animal for it; the codex
