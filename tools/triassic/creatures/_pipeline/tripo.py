@@ -833,6 +833,105 @@ def crown_beak(name, rig, bone_name, tx, centre, axis, dn_axis, ds_axis, radius,
     return o
 
 
+def cap_cut(obj, near, outward):
+    """Close the cross-section a mouth cut leaves through the head, and nothing else.
+
+    **A plane cut through a head leaves the head open across its whole section**, and where the
+    mandible is then taken away that opening is the back wall of the mouth -- except that there is
+    no wall. A line of sight into an open gape runs backwards through it, down the throat and out
+    through the neck: one surface on the whole ray, backfacing, which is what `gape-solid.py` counts
+    and what a ray cast through the failing pixels finds. Coelophysis' `SnapRight` showed 2,500
+    pixels of it on polygons weighted `neck_04` and `neck_05`, and nothing done to the lining, the
+    lumen, the cut rim or the hinge plug moved the number, because none of them is the back wall.
+
+    A hinge plug is the usual answer and it is an ellipsoid, so it fills a section's middle and
+    leaves its corners. This fills the section itself. The whole boundary of a cut half is **one**
+    loop -- forward along the mouth line on one side, round the snout, back along the other, and
+    across at the hinge -- so `holes_fill` over it would seal the mouth shut. `near` picks out the
+    run of it that crosses at the hinge, and that run alone is fanned to its own centroid. `outward`
+    is the direction the new faces should face, so a skull's cap faces into its mouth and a
+    mandible's away from it.
+
+    No new shape is invented: every vertex of the fan but its hub is one the cut already made, and
+    the hub is their mean. `CLAUDE.md` is explicit that closing a hole is always fair game.
+    """
+    bm = bmesh.new()
+    bm.from_mesh(obj.data)
+    sel = [e for e in bm.edges
+           if len(e.link_faces) == 1 and near(e.verts[0].co) and near(e.verts[1].co)]
+    if len(sel) < 3:
+        bm.free()
+        return 0
+    verts = []
+    for e in sel:
+        for v in e.verts:
+            if v not in verts:
+                verts.append(v)
+    hub = bm.verts.new(sum((v.co for v in verts), Vector()) / len(verts))
+    made = []
+    for e in sel:
+        try:
+            made.append(bm.faces.new((e.verts[0], e.verts[1], hub)))
+        except ValueError:
+            pass
+    # The run is an arc, not a loop: its two ends are the corners of the mouth, and the fan leaves
+    # one triangle between them. Those are the vertices the run touches only once.
+    ends = [v for v in verts if sum(1 for e in sel if v in e.verts) == 1]
+    if len(ends) == 2:
+        try:
+            made.append(bm.faces.new((ends[0], ends[1], hub)))
+        except ValueError:
+            pass
+    for f in made:
+        f.normal_update()
+        if f.normal.dot(outward) < 0:
+            f.normal_flip()
+    bm.normal_update()
+    bm.to_mesh(obj.data)
+    obj.data.update()
+    bm.free()
+    return len(made)
+
+
+def rim_flange(obj, axis_of, amount):
+    """Fold the open rim of a cut mouth inwards, so the lip is not one polygon thick.
+
+    **A rim with no thickness is a hole to anything looking along it.** Where the mouth is cut, both
+    halves end in a boundary edge, and at a grazing angle that edge *is* the silhouette: the quad
+    the eye meets there is nearly edge-on, and whether its geometry is wound towards the camera or
+    away is decided by a rounding error in the pose. A single-sided pass then drops it and shows the
+    world through the lip. That was the whole of Macrocnemus' residual gape leak — 19 pixels at the
+    mandible's rear rim which four corrections to the lining, two to the hinge plug and a reduction
+    of the gape itself did not move by one, because none of them was about the rim.
+
+    The fold is `extrude_edge_only` along the boundary, with the new ring drawn towards the mouth's
+    own axis. Blender keeps the extrusion's winding consistent with the faces it grew from, so the
+    lip's outer side is the skin's outer side folded inwards, which is what a lip is. It is the
+    "closing a hole is simple and is always fair game" case in `CLAUDE.md`, not a shape invented for
+    the animal: every vertex of it comes from the generation's own rim.
+
+    Returns the number of vertices added.
+    """
+    bm = bmesh.new()
+    bm.from_mesh(obj.data)
+    border = [e for e in bm.edges if len(e.link_faces) == 1]
+    if not border:
+        bm.free()
+        return 0
+    grown = bmesh.ops.extrude_edge_only(bm, edges=border)['geom']
+    added = [g for g in grown if isinstance(g, bmesh.types.BMVert)]
+    for v in added:
+        a = amount(v.co) if callable(amount) else amount
+        d = Vector(axis_of(v.co)) - v.co
+        if a > 0 and d.length > 1e-9:
+            v.co = v.co + d.normalized() * a
+    bm.normal_update()
+    bm.to_mesh(obj.data)
+    obj.data.update()
+    bm.free()
+    return len(added)
+
+
 def inward_material(name, colour, roughness=.62):
     m = bpy.data.materials.new(name)
     m.use_nodes = True

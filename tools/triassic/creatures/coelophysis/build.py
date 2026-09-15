@@ -51,6 +51,17 @@ CAUDALS = 10
 UNBEND_TAIL = True
 VOXEL = 0.0034                 # the shins and the tail tip measure r ~ 0.006
 PUPPET_BUDGET = 7000
+# The kit's three passes spread an influence about two rings, which is enough to turn a gate into a
+# ramp and is what every marine body ships with. A running theropod needs more, and the number is
+# measured rather than picked: 4 passes read 7.01x, 8 read 5.68x and 14 read **4.44x**, with the
+# remaining tear at the hip, where the thigh is genuinely fused to the trunk and any blend has to
+# carry a 141-degree swing. It does not wash the limbs out — the lower-limb region *gains* skin
+# (1369 vertices to 1731), its mean share of its own bones rises from 0.925 to 0.962 and its mean
+# travel in `Run` from 0.594 to 0.636, because the feet follow their own bones where they used to
+# be part trunk. Re-measured after the inter-joint blend was made a fraction of each limb's own
+# segments rather than a constant copied from a flipper, 6 passes still read 6.31x against 14's
+# 4.46x, so the passes are doing work the blend was not hiding.
+RELAX_PASSES = 14
 
 SEED_TAIL = (0, 1, 0)
 SEED_SNOUT = (0, -1, 1)
@@ -487,19 +498,56 @@ AXIAL_PTS = ([tuple(TAIL_PTS[-1])] + [tuple(p) for p in reversed(TAIL_PTS)]
 AXIAL_NAMES = (['tail_%02d' % i for i in range(CAUDALS - 1, -1, -1)] + ['body', 'chest']
                + ['neck_%02d' % i for i in range(CERVICALS)] + ['skull'])
 AXIAL = K.AxialChain(AXIAL_PTS, AXIAL_NAMES)
+# The authored radii these limbs were first bound with, kept for the record: `fore` and `hind` as
+# `r0 + r1·t²`. They are what left the toes on a partial alpha — see `K.measure_radii`.
 RADII = {'fore': (.008, .011, .026, .022), 'hind': (.014, .018, .040, .034)}
-LIMB_FITS = [K.Limb(pts, names, RADII[key[:4]], .045, AXIAL) for key, (pts, names) in LIMBS.items()]
+# **A running theropod swings harder than anything in the era, so the distal radius is measured off
+# the body rather than guessed.** `t_floor` is past the knee on the hindlimb and past the elbow on
+# the little arm; `span` is what refuses a flood that has walked out of the limb, and on this body
+# a leg is about 0.3 of it across. The blend between the joints of a limb taking a real stride is
+# widened from the kit's 0.022, for the reason Rhaeticosaurus' flipper was.
+LIMB_FITS, LIMB_RADII = [], {}
+for key, (pts, names) in LIMBS.items():
+    # No `blend` here: each joint takes a fraction of the segments it joins. A constant 0.040 was
+    # copied from Rhaeticosaurus' flipper, and on this animal's forelimb — segments of 0.087, 0.046
+    # and 0.036 — that band is wider than two whole segments, which hands every vertex all four
+    # joints at nearly one weight and then has `relax_weights` trim a *different* four on
+    # neighbouring vertices. See `K.Limb`.
+    limb = K.Limb(pts, names, RADII[key[:4]], .045, AXIAL)
+    limb.measured, fill = K.measure_radii(auth, limb, t_floor=.48, margin=.010, span=.42)
+    LIMB_RADII[key] = {'rows': [[round(x, 5) for x in r] for r in limb.measured],
+                       'jointBlend': [round(b, 5) for b in limb.blend],
+                       'segments': [round(limb.cum[i + 1] - limb.cum[i], 5)
+                                    for i in range(len(limb.cum) - 1)], **fill}
+    LIMB_FITS.append(limb)
+print('LIMB_RADII', json.dumps(LIMB_RADII))
 
 
 def trunk_pullback(v, w):
-    if v.x < SHOULDER.x + .06 and (abs(v.y) > .034 or abs(v.z - spine_z(v.x)) > .055):
-        pull = K.smooth((abs(v.y) - .034) / .018) if abs(v.y) > .034 else 1.
-        moved = sum(val for n, val in w.items() if n.startswith('neck'))
-        if moved > 0:
-            for n, val in list(w.items()):
-                if n.startswith('neck'):
-                    w[n] = val * (1 - pull)
-            w['chest'] = w.get('chest', 0) + moved * pull
+    """Shoulder geometry that the neck's own arc claims is pulled back onto `chest`.
+
+    **Every gate here is a slope, and the bid is their product.** It was three hard tests -- behind
+    `SHOULDER.x + .06`, *and* either wider than 0.034 or more than 0.055 off the spine -- and the
+    second arm of that `or` handed out `pull = 1.0` flat, so a vertex 0.0551 off the spine went
+    wholly to `chest` while the neighbour a hundredth away at 0.0549 kept `neck_04` entire. That
+    pair is the era's worst edge: 0.019 to 0.480 in `SnapRight`, a 25.25x tear on a body 4.90 long,
+    and 165 more edges across this skin carried a full 2.0 of weight difference. A blade runs past
+    the end of its window; a window with a soft edge has nowhere to run to.
+    """
+    behind = K.smooth(((SHOULDER.x + .06) - v.x) / .045)
+    if behind <= 0:
+        return w
+    wide = K.smooth((abs(v.y) - .034) / .018)
+    off = K.smooth((abs(v.z - spine_z(v.x)) - .046) / .020)
+    pull = behind * max(wide, off)
+    if pull <= 0:
+        return w
+    moved = sum(val for n, val in w.items() if n.startswith('neck'))
+    if moved > 0:
+        for n, val in list(w.items()):
+            if n.startswith('neck'):
+                w[n] = val * (1 - pull)
+        w['chest'] = w.get('chest', 0) + moved * pull
     return w
 
 
@@ -510,7 +558,7 @@ def weights(p):
 rig = K.build_armature(B, tx, 'Coelophysis shared skeleton', 'Coelophysis_Rig')
 influences = []
 for o in [auth, puppet]:
-    K.bind(o, rig, B, weights, tx, influences)
+    K.bind(o, rig, B, weights, tx, influences, passes=RELAX_PASSES)
 for o in parts['lower jaw'].values():
     K.bind_rigid(o, rig, 'jaw', tx)
 for n in ['skull', 'jaw']:
@@ -536,8 +584,13 @@ bpy.ops.mesh.primitive_uv_sphere_add(segments=12, ring_count=8,
                                      location=tx((HINGE_X - .003, head_y(min(HINGE_X, HX[-1])), hz)))
 hinge = bpy.context.object
 hinge.name = 'Seated jaw hinge tissue'
-hinge.scale = (float(np.interp(MOUTH_BACK, HX, HW)) * .92 * SCALE, .014 * SCALE,
-               max(seam(MOUTH_BACK) - head_lo(MOUTH_BACK), .004) * .62 * SCALE)
+# **Bigger than it was**, and measured rather than left where it started: at 0.92 of the head's
+# width and 0.014 of a body long it left `Heavy` showing 24 px of backdrop through the corner of the
+# mouth, and at 1.10 and 0.030 that shot reads 0. `seat_inside` pulls it back inside the head
+# afterwards, so the cost of asking for too much is nothing and the cost of asking for too little is
+# a hole.
+hinge.scale = (float(np.interp(MOUTH_BACK, HX, HW)) * 1.10 * SCALE, .030 * SCALE,
+               max(seam(MOUTH_BACK) - head_lo(MOUTH_BACK), .004) * .85 * SCALE)
 bpy.ops.object.transform_apply(location=False, rotation=False, scale=True)
 for v in hinge.data.vertices:
     v.co = hinge.matrix_world @ v.co
@@ -1229,6 +1282,7 @@ report = {
               'liningInset': LINING_INSET, 'liningCullsBackfaces': True, 'skinDoubleSided': True},
     'gait': gait_report, 'strike': strike_report, 'shoreChainHandover': handover,
     'limbSweep': limb_sweep, 'mouthCut': mouth_cut,
+    'limbRadii': LIMB_RADII, 'authoredLimbRadii': RADII, 'weightRelaxationPasses': RELAX_PASSES,
     'normalizedWeights': True, 'rootStable': True, 'noScaleChannels': True}
 open(os.path.join(HERE, 'validation.json'), 'w').write(json.dumps(report, indent=2))
 bpy.ops.wm.save_as_mainfile(filepath=os.path.join(LOCAL, ID + '-paired.blend'))
