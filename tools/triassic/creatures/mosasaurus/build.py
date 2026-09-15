@@ -86,6 +86,189 @@ skin_material.use_backface_culling = False    # the backstop behind the mouth li
 frame = T.measure_frame(auth, head_is_positive_pca=False, luminance_at=luminance_at)
 pigment = T.pigment_sampler(auth, sample_albedo)
 
+# ------------------------------------------------- the stud on the belly, taken back down ----
+# A human marked a box on the shipped body -- `docs/triassic/regions/mosasaurus-bump-region.json`,
+# 98 vertices, "an imprecise region selection, but inside it is a bump" -- so the box says where to
+# look and not what to remove. What is in it is a small conical stud standing off the ventral flank
+# between the two flippers, well off the midline. It is the generation's, not the builder's: nothing
+# here authors geometry. It is not anatomy either -- a mosasaur has no ventral appendage there, and
+# it reads in a side render as a stray nub on an otherwise smooth belly.
+#
+# Measured rather than taken from the mark: against a local high-pass (each vertex against the mean
+# of its two-ring, along its own normal) the body's median is 0.0031 and its 99.9th percentile
+# 0.0291 in shipped units, and inside the box fifteen vertices form one connected cluster standing
+# up to 0.0274 -- nine times the median. That cluster is the bump, and it is what is collapsed.
+#
+# **Collapsed, not cut.** `cut-region.py` deletes, which is right for detached debris and wrong for
+# something welded to the body: the rim of a cut through a Tripo patch soup is a set of arcs rather
+# than a loop and a fill has nothing to span. This is `smooth-region.py`'s method in the builder's
+# own terms -- pin the first unmarked ring, average everything inside it until it is a soap film
+# spanning that ring, then relax outward over several rings with the weight falling off, so the
+# collapsed base does not read as a dish. No vertex is deleted and no topology changes.
+#
+# The frame is already measured at this point, so the box's coordinates convert exactly: the glTF
+# exporter's +Y-up conversion is `glTF (x, y, z) = Blender (x, z, -y)`, and `tx` is a plain scale by
+# SCALE, so raw = (gx, -gz, gy) / SCALE.
+BUMP_CENTRE = Vector((.0357, .07955, -.08065))
+BUMP_SEARCH = .045          # encloses the marked box, and nothing else on this flank
+BUMP_PROUD = .0010          # raw units; the body's own median high-pass is 0.00062
+BUMP_BAND, BUMP_COLLAPSE, BUMP_BAND_ITERS = 6, 3000, 120
+_bw = 5e-4                                    # two patch corners this close are one point
+
+
+def _weld_graph(me):
+    """One graph over the patch soup. The generation arrives unstitched, so edges alone leave every
+    patch an island and a Laplacian pass smooths each separately, tearing them at the seams."""
+    node_of, members = {}, []
+    nid = [0] * len(me.vertices)
+    for i, v in enumerate(me.vertices):
+        k = (round(v.co.x / _bw), round(v.co.y / _bw), round(v.co.z / _bw))
+        if k not in node_of:
+            node_of[k] = len(members)
+            members.append([])
+        nid[i] = node_of[k]
+        members[nid[i]].append(i)
+    adj = [set() for _ in members]
+    for e in me.edges:
+        a, b = nid[e.vertices[0]], nid[e.vertices[1]]
+        if a != b:
+            adj[a].add(b)
+            adj[b].add(a)
+    return nid, members, adj
+
+
+_me = auth.data
+_nid, _members, _adj = _weld_graph(_me)
+_pos = [Vector(_me.vertices[m[0]].co) for m in _members]
+_ring2 = [set(_adj[a]) for a in range(len(_members))]
+for a in range(len(_members)):
+    for b in list(_adj[a]):
+        _ring2[a] |= _adj[b]
+    _ring2[a].discard(a)
+_nrm = [Vector(_me.vertices[m[0]].normal) for m in _members]
+_high = []
+for a in range(len(_members)):
+    if not _ring2[a]:
+        _high.append(0.)
+        continue
+    mean = Vector((0, 0, 0))
+    for b in _ring2[a]:
+        mean += _pos[b]
+    _high.append((_pos[a] - mean / len(_ring2[a])).dot(_nrm[a]))
+_near = [a for a in range(len(_members)) if (_pos[a] - BUMP_CENTRE).length < BUMP_SEARCH]
+_near_set = set(_near)
+assert _near, 'the marked box converted to a place with no geometry in it'
+_seed = max(_near, key=lambda a: _high[a])
+assert _high[_seed] > BUMP_PROUD * 3, \
+    ('nothing in the marked box stands proud of the belly; the frame or the conversion is wrong',
+     _high[_seed])
+_bump, _stack = {_seed}, [_seed]
+while _stack:
+    a = _stack.pop()
+    for b in _adj[a]:
+        if b not in _bump and _high[b] > BUMP_PROUD and (_pos[b] - BUMP_CENTRE).length < BUMP_SEARCH:
+            _bump.add(b)
+            _stack.append(b)
+# A bump, not a flipper: refuse to smooth anything that has walked off into the body.
+_bext = [max(_pos[a][k] for a in _bump) - min(_pos[a][k] for a in _bump) for k in range(3)]
+assert max(_bext) < .06, ('the proud cluster is too big to be the stud', _bext, len(_bump))
+
+# The stud sits on a slight mound of its own, so the collapse takes the first shell with it and
+# pins the second: a soap film spanning the cluster's own base ring leaves that mound standing, and
+# the residual only halved. `smooth-region.py` makes the same point about a collapsed base reading
+# as a bump; here the base is part of what is being taken down.
+_grow = {b for a in _bump for b in _adj[a]} - _bump
+_region = _bump | _grow
+_shells, _seen = [], set(_region)
+_front = {b for a in _region for b in _adj[a]} - _seen
+for _ in range(BUMP_BAND):
+    if not _front:
+        break
+    _shells.append(_front)
+    _seen |= _front
+    _front = {b for a in _front for b in _adj[a]} - _seen
+
+
+def _relax(nodes, weight, iters):
+    for _ in range(iters):
+        new = {}
+        for a in nodes:
+            if not _adj[a]:
+                continue
+            avg = Vector((0, 0, 0))
+            for b in _adj[a]:
+                avg += _pos[b]
+            new[a] = _pos[a] * (1 - weight(a)) + (avg / len(_adj[a])) * weight(a)
+        for a, p in new.items():
+            _pos[a] = p
+
+
+_shell0_pre = {b for a in _region for b in _adj[a]} - _region
+_sc0 = sum((_pos[a] for a in _shell0_pre), Vector((0, 0, 0))) / max(1, len(_shell0_pre))
+_sn0 = sum((_nrm[a] for a in _shell0_pre), Vector((0, 0, 0)))
+_sn0 = _sn0.normalized() if _sn0.length > 1e-9 else Vector((0, 0, 1))
+_height_before = max((_pos[a] - _sc0).dot(_sn0) for a in _region)
+_relax(_region, lambda a: 1., BUMP_COLLAPSE)
+_shell_w = {}
+for _i, _s in enumerate(_shells):
+    for a in _s:
+        _shell_w[a] = (1. - _i / max(1, len(_shells))) * .7
+_relax(set(_shell_w), lambda a: _shell_w[a], BUMP_BAND_ITERS)
+# The band moved the ring the film was pinned to, so the film is settled onto it again. Without
+# this the collapsed region is a soap film spanning where the ring *used* to be.
+_relax(_region, lambda a: 1., BUMP_COLLAPSE)
+for a, p in enumerate(_pos):
+    for i in _members[a]:
+        _me.vertices[i].co = p
+_me.update()
+
+
+
+def _hp(a):
+    if not _ring2[a]:
+        return 0.
+    mean = Vector((0, 0, 0))
+    for b in _ring2[a]:
+        mean += _pos[b]
+    return (_pos[a] - mean / len(_ring2[a])).dot(_nrm[a])
+
+
+_after_high = [_hp(a) for a in _region]
+# How far the thing actually stood off the belly, and how far it stands off now: the distance from
+# each region node to the plane the pinned shell sits in, along that plane's own normal. The
+# high-pass is a curvature measure and says nothing about height; this is the height.
+_shell0 = list(_shells[0]) if _shells else []
+_sc = sum((_pos[a] for a in _shell0), Vector((0, 0, 0))) / max(1, len(_shell0))
+_sn = sum((_nrm[a] for a in _shell0), Vector((0, 0, 0)))
+_sn = _sn.normalized() if _sn.length > 1e-9 else Vector((0, 0, 1))
+_height_after = max((_pos[a] - _sc).dot(_sn) for a in _region)
+# The bar is the belly it sits in, not a constant: a curved surface has a high-pass of its own, and
+# what "the stud is gone" means is that it is no prouder than the skin around it.
+_belly = [_hp(a) for a in (_near_set - _region)] or [0.]
+_belly.sort()
+_belly_p95 = _belly[int(len(_belly) * .95)]
+bump_report = {
+    'source': 'docs/triassic/regions/mosasaurus-bump-region.json',
+    'markedVerticesOnTheShippedBody': 98,
+    'what': 'a small conical stud standing off the ventral flank between the flippers, in the '
+            'generation and not in the builder; not anatomy, and not a fused fin -- no limb '
+            'cluster reaches it and it is one connected proud patch fifteen nodes across.',
+    'method': 'smooth-region.py\'s constrained Laplacian, in the builder: the first unmarked ring '
+              'is pinned, the cluster inside it is averaged to a soap film spanning that ring, and '
+              'six shells beyond it are relaxed with the weight falling off. Nothing is deleted.',
+    'nodesCollapsed': len(_bump), 'shellsRelaxed': [len(s) for s in _shells],
+    'proudBeforeRaw': round(_high[_seed], 5),
+    'proudAfterRaw': round(max(_after_high), 5),
+    'bellyAroundItP95Raw': round(_belly_p95, 5),
+    'heightAboveTheBaseRingBeforeRaw': round(_height_before, 5),
+    'heightAboveTheBaseRingAfterRaw': round(_height_after, 5),
+    'bodyMedianHighPassRaw': round(float(np.median(np.abs(np.array(_high)))), 5),
+    'extentRaw': [round(v, 5) for v in _bext],
+    'centreRaw': [round(v, 5) for v in BUMP_CENTRE],
+}
+assert _height_after < _height_before * .30, ('the stud did not come down', bump_report)
+print('MOSA_BUMP', json.dumps(bump_report))
+
 raw_co = np.array([v.co[:] for v in auth.data.vertices])
 Y0, Y1 = float(raw_co[:, 1].min()), float(raw_co[:, 1].max())
 
@@ -1270,6 +1453,7 @@ report = {
                  ('maximumEnvelopeDifference', 'maximumEnvelopeDifferenceFractionOfBodyLength',
                   'surfaceDistanceMax', 'surfaceDistanceP95', 'envelopeTolerance')},
     'anchors': anchor_checks,
+    'ventralStudRemoved': bump_report,
     'normalizedWeights': True, 'rootStable': True, 'noScaleChannels': True,
 }
 open(os.path.join(HERE, 'validation.json'), 'w').write(json.dumps(report, indent=2) + '\n')
