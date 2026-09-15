@@ -1,0 +1,73 @@
+{
+  "tool": "/opt/blender/blender -b --factory-startup --python tools/triassic/gape-solid.py -- coelophysis SnapRight@0.20 SnapLeft@0.20 Heavy@0.13 Ability@0.53 Bite@0.20 Eat@0.70 Attack@0.35",
+  "backdropTest": "r > 0.90, g < 0.20, b > 0.90",
+  "pixelsPerFrame": 378000,
+  "tolerance": 12,
+  "maxSeenThroughTheBody": 2505,
+  "note": "six of seven shots are clean. SnapRight is not, and it is a pre-existing defect this pass found rather than made: the body as shipped read 2,496 px on the same shot. The diagnosis is in the README.",
+  "shots": [
+    {
+      "clip": "SnapRight",
+      "t": 0.2,
+      "pixels": 378000,
+      "differingPixels": 45748,
+      "holesOpenedByCulling": 2704,
+      "seenThroughTheBody": 2505,
+      "backdropInBothPasses": 1
+    },
+    {
+      "clip": "SnapLeft",
+      "t": 0.2,
+      "pixels": 378000,
+      "differingPixels": 41780,
+      "holesOpenedByCulling": 94,
+      "seenThroughTheBody": 0,
+      "backdropInBothPasses": 0
+    },
+    {
+      "clip": "Heavy",
+      "t": 0.13,
+      "pixels": 378000,
+      "differingPixels": 31708,
+      "holesOpenedByCulling": 90,
+      "seenThroughTheBody": 0,
+      "backdropInBothPasses": 0
+    },
+    {
+      "clip": "Ability",
+      "t": 0.53,
+      "pixels": 378000,
+      "differingPixels": 7708,
+      "holesOpenedByCulling": 882,
+      "seenThroughTheBody": 0,
+      "backdropInBothPasses": 0
+    },
+    {
+      "clip": "Bite",
+      "t": 0.2,
+      "pixels": 378000,
+      "differingPixels": 34312,
+      "holesOpenedByCulling": 87,
+      "seenThroughTheBody": 0,
+      "backdropInBothPasses": 0
+    },
+    {
+      "clip": "Eat",
+      "t": 0.7,
+      "pixels": 378000,
+      "differingPixels": 18014,
+      "holesOpenedByCulling": 1378,
+      "seenThroughTheBody": 0,
+      "backdropInBothPasses": 0
+    },
+    {
+      "clip": "Attack",
+      "t": 0.35,
+      "pixels": 378000,
+      "differingPixels": 4676,
+      "holesOpenedByCulling": 48,
+      "seenThroughTheBody": 0,
+      "backdropInBothPasses": 0
+    }
+  ]
+}

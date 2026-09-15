@@ -77,7 +77,7 @@ export const GAMES: readonly GameLink[] = [
     id: 'triassic', title: 'Triassic Triumph', path: 'triassic/',
     art: 'assets/triassic/brand/title.webp', artWidth: 1536, artHeight: 1024,
     wordmark: 'assets/triassic/brand/logo-header.webp',
-    when: '240 million years ago', tagline: 'Breathe. Dive. Hunt. Surface.',
+    when: '240 million years ago', tagline: 'Dive. Hunt. Grow. Hold.',
     comingSoon: true,
   },
 ];

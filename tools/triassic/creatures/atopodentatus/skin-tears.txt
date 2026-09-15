@@ -1,0 +1,25 @@
+
+public/assets/triassic/creatures/atopodentatus.glb   37528 edges x 17 phases x 23 clips
+clip            skin  on bone             all     >2x  worst bones
+Heavy          3.90x  jaw               4.55x     131  0.025->0.099  neck_02:68 jaw:21 body:20 neck_01:6
+Sprint         3.42x  fore_upper_R      3.42x     280  0.024->0.082  fore_upper_R:82 body:72 chest:68 fore_upper_L:36
+Swim           2.73x  fore_upper_R      2.73x      56  0.031->0.085  fore_upper_R:22 chest:20 body:12 fore_upper_L:2
+TurnLeft       2.23x  chest             2.23x       3  0.034->0.075  chest:2 fore_upper_R:1
+Attack         2.05x  chest            21.01x     193  0.046->0.094  skull:112 jaw:77 chest:2 fore_upper_R:2
+Dodge          2.00x  fore_upper_L      2.00x       0  0.042->0.084  
+TurnRight      1.91x  fore_upper_L      1.91x       0  0.047->0.090  
+Ability        1.84x  neck_00          19.35x     326  0.065->0.119  skull:186 jaw:140
+Graze          1.84x  neck_00          19.35x     326  0.065->0.119  skull:186 jaw:140
+Death          1.83x  fore_upper_L     11.56x      17  0.042->0.077  skull:11 jaw:6
+Stagger        1.76x  chest            13.59x      70  0.046->0.081  jaw:36 skull:34
+Hit            1.75x  chest            13.61x      70  0.046->0.080  jaw:36 skull:34
+Dive           1.71x  chest             1.71x       0  0.046->0.079  
+Rise           1.71x  body              1.71x       0  0.052->0.089  
+Parry          1.60x  fore_upper_L      1.60x       0  0.047->0.075  
+Grab           1.51x  fore_upper_L      5.32x       5  0.059->0.088  skull:5
+Bite           1.42x  fore_upper_R     25.06x     249  0.054->0.077  skull:147 jaw:102
+Breath         1.38x  tail_00           5.66x       3  0.057->0.078  skull:3
+Eat            1.38x  jaw              21.22x     420  0.058->0.080  skull:252 jaw:168
+Breathe        1.35x  hind_upper_L      5.14x       5  0.056->0.076  skull:5
+15 of 23 clips tear an edge past 2x
+worst SKIN 3.90x · worst including the oral lining 25.06x (the lining is a sac built to stretch; the skin figure is the one to judge)

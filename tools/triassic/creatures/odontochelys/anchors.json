@@ -1,0 +1,34 @@
+{
+  "odontochelys": [
+    {
+      "name": "anchor_mouth",
+      "bone": "jaw",
+      "point": [
+        -0.06681936979293823,
+        -2.0342986583709717,
+        0.44818076491355896
+      ],
+      "role": "mouth"
+    },
+    {
+      "name": "anchor_mouth_inside",
+      "bone": "skull",
+      "point": [
+        -0.021542366594076157,
+        -1.8942986726760864,
+        0.44284817576408386
+      ],
+      "role": "swallow"
+    },
+    {
+      "name": "anchor_attack_primary",
+      "bone": "skull",
+      "point": [
+        -0.06681936979293823,
+        -2.0442986488342285,
+        0.4931807518005371
+      ],
+      "role": "attack"
+    }
+  ]
+}

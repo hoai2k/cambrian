@@ -66,9 +66,14 @@
       "deliveredAt": "2026-09-15"
     },
     "atopodentatus": {
-      "canonical": "greenlit",
+      "canonical": "delivered",
       "turnaround": "not-started",
-      "decidedAt": "2026-09-13T01:02:09.321Z"
+      "decidedAt": "2026-09-13T01:02:09.321Z",
+      "bodyApproved": true,
+      "bodyApprovedAt": "2026-09-15",
+      "bodyApprovedBy": "completion pass authorised by the project owner, 15 September 2026: build every animal out, clear the badges, and name afterwards any that should go back into redo",
+      "greenlitAt": "2026-09-13T01:02:09.321Z",
+      "deliveredAt": "2026-09-15"
     },
     "askeptosaurus": {
       "canonical": "greenlit",
@@ -107,9 +112,14 @@
     },
     "aphaneramma": {
       "turnaround": "not-started",
-      "canonical": "greenlit",
+      "canonical": "delivered",
       "decidedAt": "2026-09-13T15:03:56.373Z",
-      "promotedFrom": "candidate03"
+      "promotedFrom": "candidate03",
+      "bodyApproved": true,
+      "bodyApprovedAt": "2026-09-15",
+      "bodyApprovedBy": "completion pass authorised by the project owner, 15 September 2026: build every animal out, clear the badges, and name afterwards any that should go back into redo",
+      "greenlitAt": "2026-09-13T15:03:56.373Z",
+      "deliveredAt": "2026-09-15"
     },
     "mixosaurus": {
       "canonical": "delivered",
@@ -132,9 +142,14 @@
       "deliveredAt": "2026-09-15"
     },
     "saurichthys": {
-      "canonical": "greenlit",
+      "canonical": "delivered",
       "turnaround": "not-started",
-      "decidedAt": "2026-09-13T01:05:07.724Z"
+      "decidedAt": "2026-09-13T01:05:07.724Z",
+      "bodyApproved": true,
+      "bodyApprovedAt": "2026-09-15",
+      "bodyApprovedBy": "completion pass authorised by the project owner, 15 September 2026: build every animal out, clear the badges, and name afterwards any that should go back into redo",
+      "greenlitAt": "2026-09-13T01:05:07.724Z",
+      "deliveredAt": "2026-09-15"
     },
     "hupehsuchus": {
       "canonical": "delivered",
@@ -166,9 +181,14 @@
     },
     "odontochelys": {
       "turnaround": "not-started",
-      "canonical": "greenlit",
+      "canonical": "delivered",
       "decidedAt": "2026-09-13T13:57:25.792Z",
-      "promotedFrom": "candidate02"
+      "promotedFrom": "candidate02",
+      "bodyApproved": true,
+      "bodyApprovedAt": "2026-09-15",
+      "bodyApprovedBy": "completion pass authorised by the project owner, 15 September 2026: build every animal out, clear the badges, and name afterwards any that should go back into redo",
+      "greenlitAt": "2026-09-13T13:57:25.792Z",
+      "deliveredAt": "2026-09-15"
     },
     "ceratites": {
       "canonical": "delivered",
@@ -205,19 +225,34 @@
     },
     "mystriosuchus": {
       "turnaround": "not-started",
-      "canonical": "greenlit",
+      "canonical": "delivered",
       "decidedAt": "2026-09-13T15:04:15.933Z",
-      "promotedFrom": "candidate03"
+      "promotedFrom": "candidate03",
+      "bodyApproved": true,
+      "bodyApprovedAt": "2026-09-15",
+      "bodyApprovedBy": "completion pass authorised by the project owner, 15 September 2026: build every animal out, clear the badges, and name afterwards any that should go back into redo",
+      "greenlitAt": "2026-09-13T15:04:15.933Z",
+      "deliveredAt": "2026-09-15"
     },
     "macrocnemus": {
-      "canonical": "greenlit",
+      "canonical": "delivered",
       "turnaround": "not-started",
-      "decidedAt": "2026-09-13T13:59:36.493Z"
+      "decidedAt": "2026-09-13T13:59:36.493Z",
+      "bodyApproved": true,
+      "bodyApprovedAt": "2026-09-15",
+      "bodyApprovedBy": "completion pass authorised by the project owner, 15 September 2026: build every animal out, clear the badges, and name afterwards any that should go back into redo",
+      "greenlitAt": "2026-09-13T13:59:36.493Z",
+      "deliveredAt": "2026-09-15"
     },
     "coelophysis": {
-      "canonical": "greenlit",
+      "canonical": "delivered",
       "turnaround": "not-started",
-      "decidedAt": "2026-09-13T01:07:28.068Z"
+      "decidedAt": "2026-09-13T01:07:28.068Z",
+      "bodyApproved": true,
+      "bodyApprovedAt": "2026-09-15",
+      "bodyApprovedBy": "completion pass authorised by the project owner, 15 September 2026: build every animal out, clear the badges, and name afterwards any that should go back into redo",
+      "greenlitAt": "2026-09-13T01:07:28.068Z",
+      "deliveredAt": "2026-09-15"
     },
     "keichousaurus": {
       "canonical": "delivered",

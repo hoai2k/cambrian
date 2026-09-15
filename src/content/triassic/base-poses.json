@@ -1,0 +1,48 @@
+[
+  {
+    "id": "coelophysis",
+    "model": "assets/triassic/creatures/coelophysis.origpose.glb",
+    "bytes": 1483572,
+    "sha256": "a9ea66a7183de767367fe7943d69f5d07fe306d7794ca3a56403d596d3070118",
+    "changed": [
+      "the body unbent onto its own measured axis"
+    ]
+  },
+  {
+    "id": "dinocephalosaurus",
+    "model": "assets/triassic/creatures/dinocephalosaurus.origpose.glb",
+    "bytes": 1613612,
+    "sha256": "df0704b432a7480952c58e16e04c258aef9d8c888b87eefb13968eeb412f0fd2",
+    "changed": [
+      "the neck unbent onto its own measured axis",
+      "the tail straightened out of its sweep"
+    ]
+  },
+  {
+    "id": "macrocnemus",
+    "model": "assets/triassic/creatures/macrocnemus.origpose.glb",
+    "bytes": 1339712,
+    "sha256": "25fe69221698be87f6c7939edff529638baec8bc2b55988aeb315a865d14984a",
+    "changed": [
+      "the body unbent onto its own measured axis"
+    ]
+  },
+  {
+    "id": "placodus",
+    "model": "assets/triassic/creatures/placodus.origpose.glb",
+    "bytes": 1737372,
+    "sha256": "da0e59fb34fee098f9fdd2da12b95ce1a48de640db1b34428c9b1575508eed84",
+    "changed": [
+      "the tail straightened out of its sweep"
+    ]
+  },
+  {
+    "id": "tanystropheus",
+    "model": "assets/triassic/creatures/tanystropheus.origpose.glb",
+    "bytes": 1590656,
+    "sha256": "b4ca21e0cfaec7f6ed3c332cb57162658a977c49833b5c44812cbf0cb4853af2",
+    "changed": [
+      "the body unbent onto its own measured axis"
+    ]
+  }
+]

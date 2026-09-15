@@ -8,16 +8,16 @@
     ]
   },
   "macrocnemus.glb": {
-    "bytes": 1943708,
-    "sha256": "63e705fcd747604443cd1fc91176c1ca54c15fb0dad7af0a2b2ac0e75873c7ca"
+    "bytes": 2004572,
+    "sha256": "4980648fe4bded9fc143a79c7faf617807bb66ee63a9997eeebe037aa3868071"
   },
   "macrocnemus.json": {
     "bytes": 3026,
     "sha256": "32a2e41cd714440930af36ee7adc4d3be4f19ccc36b3198fe1acb6d0a1a9faaa"
   },
   "macrocnemus.lod1.glb": {
-    "bytes": 1472732,
-    "sha256": "1832a88de6a037f38297b305c0b037fb263639becc1a2d0065504228ce74b680"
+    "bytes": 1497648,
+    "sha256": "6bd1871024707bbed0f7be5c9e8a3f128476ef05d197e8f5373b18ccf8cfc95f"
   },
   "macrocnemus.png": {
     "bytes": 434291,
@@ -28,8 +28,8 @@
     ]
   },
   "macrocnemus.puppet.glb": {
-    "bytes": 1472732,
-    "sha256": "1832a88de6a037f38297b305c0b037fb263639becc1a2d0065504228ce74b680"
+    "bytes": 1497648,
+    "sha256": "6bd1871024707bbed0f7be5c9e8a3f128476ef05d197e8f5373b18ccf8cfc95f"
   },
   "macrocnemus.puppet.png": {
     "bytes": 407430,

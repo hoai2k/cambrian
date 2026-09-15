@@ -63,7 +63,34 @@ if (!process.env.TRIASSIC_SKIP_ASSETS) for (const c of TRIASSIC.creatures) {
   }
   for (const k of ['select', 'card', 'thumb'] as const) ok(fs.existsSync(`public/${paths.portrait(c.id, k)}`), `${c.id} has a ${k} portrait (placeholder from the canonical pose)`);
 }
-ok(Object.keys(TRIASSIC_STAND_INS).length === 25 - TRIASSIC_SHIPPED.length, 'every undelivered animal has a stand-in, and no delivered one does');
+// **`TRIASSIC_SHIPPED` is every id in the era's folder, not every id on its roster.** Archelon and
+// Mosasaurus are Late Cretaceous, are deliberately absent from TRIASSIC_CREATURES, and ship their
+// bodies here all the same; counting them against the roster made this read two stand-ins short.
+const SHIPPED_ROSTER = TRIASSIC.creatures.filter((c) => TRIASSIC_SHIPPED.includes(c.id)).length;
+ok(Object.keys(TRIASSIC_STAND_INS).length === 25 - SHIPPED_ROSTER, 'every undelivered animal has a stand-in, and no delivered one does');
+
+// ---- the standing guests: in the folder, off the roster ----
+{
+  const GUESTS = ['archelon', 'mosasaurus'];
+  for (const id of GUESTS) {
+    ok(!TRIASSIC.creatures.some((c) => c.id === id), `${id} is not on the roster (its era is undecided)`);
+    ok(!(id in (TRIASSIC.assets.standIns ?? {})), `${id} borrows nothing: it is in no sea`);
+    if (!process.env.TRIASSIC_SKIP_ASSETS && TRIASSIC_SHIPPED.includes(id)) {
+      for (const f of [`${id}.glb`, `${id}.puppet.glb`, `${id}.lod1.glb`, `${id}.json`]) {
+        ok(fs.existsSync(`public/assets/triassic/creatures/${f}`), `${id} ships ${f}`);
+      }
+      // **A guest needs its own portraits published, and nothing else will do it.** A roster animal
+      // keeps a placeholder card cut from its canonical pose until its model lands, which is why
+      // `render.py --portraits` deliberately writes into the creature folder rather than into
+      // `public/`. These two have no canonical pose and no placeholder: the pick screen draws a
+      // visitor's tile from `assets/triassic/creatures/<id>.<kind>.png`, so the renders are copied
+      // out of `portraits/` when the body ships, and this is the check that they were.
+      for (const k of ['select', 'card', 'thumb'] as const) {
+        ok(fs.existsSync(`public/assets/triassic/creatures/${id}.${k}.png`), `${id} has a published ${k} portrait`);
+      }
+    }
+  }
+}
 if (!process.env.TRIASSIC_SKIP_ASSETS) {
 for (const files of Object.values(TRIASSIC_SAMPLES)) for (const f of files) ok(fs.existsSync(`public/assets/${f.replace(/^([^/]+)\//, '$1/sfx/')}.mp3`), `${f} sample exists`);
 for (const b of ['shallows', 'nursery', 'shelf', 'forest', 'boulders', 'flats', 'channel', 'escarpment', 'basin']) ok(fs.existsSync(`public/${paths.biome(b)}`), `biome plate ${b} exists`);

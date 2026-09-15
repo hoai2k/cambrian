@@ -128,30 +128,71 @@ one-polygon-thick lip a pixel straddling that boundary is part skin and part not
 cut had, which is two hundredths of the body of open lip with nothing behind it.
 
 ```
-blender -b --python tools/triassic/gape-solid.py -- saurichthys Heavy@0.50 Attack@0.40 Bite@0.15
+/opt/blender/blender -b --factory-startup --python tools/triassic/gape-solid.py -- saurichthys Heavy@0.50 Attack@0.40 Bite@0.15
 ```
 
-**18 pixels of 378,000** at the worst of three shots — over the tool's tolerance of 12, and the one
-check on this animal that does not pass. It is recorded rather than worked around, and what it is
-matters: **no run of them is longer than two pixels**. They are isolated single pixels strung along
-the lip line and over the thin flaps of the generation's own gill cover and pectoral, where the
-surface is one polygon thick and losing its back face costs a sliver — not an opening you can see
-the world through. The shipped body material is **double-sided**, so none of them arise at runtime
-at all; the cull is the worst case a single-sided renderer would draw. The mouth itself is sealed:
-the aperture at full gape is solid lining in every shot.
+**3 pixels of 378,000** at the worst of three shots, against a tolerance of 12. The full record is
+in [`gape-solid.json`](gape-solid.json), which the builder now folds into `validation.json` so a
+rebuild cannot silently drop it. The mouth itself is sealed: the aperture at full gape is solid
+lining in every shot.
 
-| shot | differing pixels | opened by culling | seen through the body | longest run |
-| --- | ---: | ---: | ---: | ---: |
-| `Heavy` @ 0.50 | 6,248 | 8 | 8 | 2 |
-| `Attack` @ 0.40 | 6,243 | 11 | 11 | 2 |
-| `Bite` @ 0.15 | 68,157 | 23 | **18** | 1 |
+| shot | differing pixels | opened by culling | seen through the body |
+| --- | ---: | ---: | ---: |
+| `Heavy` @ 0.50 | 6,248 | 2 | 0 |
+| `Attack` @ 0.40 | 6,243 | 3 | 0 |
+| `Bite` @ 0.15 | 68,149 | 6 | **3** |
+
+### It read 17, and 14 of those were this fish's own skin
+
+This was the era's one recorded gape failure, and it stayed one through a tool correction that was
+supposed to have settled the question. On 15 September `gape-solid.py` was found to be identifying
+its backdrop by a half-space loose enough to catch a lit oral lining; tightened from
+`r > .5, g < .3, b > .5` to `r > .75, g < .45, b > .75`, this body went from 18 px to **17**, which
+was read — correctly, on the evidence then available — as proof that the remaining hole was real
+geometry.
+
+It was not. Tightened once, the window still caught the animal, and on this fish it caught the part
+of it that a magenta world lights most brightly: **the skin.** Saurichthys is a pale silvery fish,
+and its flank and lip line render under that world at about **(0.78, 0.44, 0.76)** — inside
+`r > .75, g < .45, b > .75` by one part in two hundred on green. Sampled directly, the failing
+pixels came back (203, 120, 198), (202, 117, 199), (192, 113, 192): pink, not magenta. The backdrop
+itself, measured over every render this repository has made, comes back with green below **0.063**
+and red and blue at 1.00.
+
+Two other things said the same before the colours were sampled. A ray cast through each failing
+pixel — reporting every surface it met and its own distance to each part, rather than reading a
+render — found **solid, front-facing skin at every one**. And the count would not move: the rim of
+the cut, the lining's width, its section, the hinge plug and the gape angle itself were each
+changed, and the number stayed at 17 at the same six screen positions. That is the tell the tool's
+own header warns about, and it had already caught Rhaeticosaurus once.
+
+So the discriminator is now measured against the backdrop rather than set by eye:
+`r > .90, g < .20, b > .90`, still three times wider in green than any backdrop pixel this
+repository has rendered, and a clear factor of two away from a lit pale hide. Re-run across every
+delivered body that uses this proof — 33 shots over 7 animals — nothing goes up:
+
+| body | before | after |
+| --- | ---: | ---: |
+| Birgeria | 0 | 0 |
+| Henodus | 2 | **0** |
+| Hybodus | 0 | 0 |
+| Keichousaurus | 6 | **0** |
+| Macrocnemus | 0 | 0 |
+| Rhaeticosaurus | 1 | **0** |
+| Saurichthys | 17 | **3** |
+
+**No geometry changed on this fish.** The body is the same one, from the same preserved source, and
+the paired audit says so by value. What was wrong was the instrument.
+
+What is left is three isolated pixels at the very edge of the frame, where a surface one polygon
+thick loses its back face at a grazing silhouette. The shipped body material is **double-sided**, so
+none of them arise at runtime at all; the cull is the worst case a single-sided renderer would draw.
 
 The figure started at 352 pixels, and the four corrections that took it down are each recorded in
 `build.py` where they were made: the sac's width flush to the cut, the roof flattened onto the seam,
 the overlap into the flesh, and the front taper. It was **5 pixels** at one point in this animal's
 history — with a hinge plug so large it stood out of the snout as a pale ball in every three-quarter
-render, on the twin as well as the authored body. Trading that ball for eighteen scattered pixels
-under a worst-case shim is the right way round, and it is the trade this file is recording.
+render, on the twin as well as the authored body. That trade is still the right way round.
 
 ## Rig
 
@@ -323,12 +364,12 @@ cavity with both tooth rows on their own jaws.
 
 Honest limitations, worst first:
 
-1. **The gape check does not pass.** 18 see-through pixels of 378,000 against a tolerance of 12,
-   under a shim that culls every backface. No run of them is longer than two pixels and the mouth
-   aperture itself is solid lining; they are the silhouette meeting the one-polygon-thick lip of a
-   needle rostrum and the thin flaps of the generation's gill cover. The shipped material is
-   double-sided so none of it arises at runtime. It is still a failing check and it is the first
-   thing a reviewer should look at. Full breakdown in the gape section above.
+1. **The gape check passes, at 3 see-through pixels of 378,000 against a tolerance of 12** — and
+   what changed to get there was the instrument, not the fish. The backdrop discriminator was
+   catching this animal's own pale skin. The whole argument and the era-wide re-run are in the gape
+   section above; no geometry changed. What is left is three isolated pixels at the edge of the
+   frame where a surface one polygon thick loses its back face, and the shipped material is
+   double-sided so none of it arises at runtime.
 2. **Skinning tears — mostly fixed, and here is what is left.** `node tools/triassic/skin-tears.mjs`
    reports a worst edge stretch of **6.56×** (Bite), against **23.11×** before the corrections in
    the Rig section. But the shared tool names the **bone** an edge follows, not the surface it is
@@ -369,12 +410,18 @@ Honest limitations, worst first:
 
 ## Re-checked under the corrected gape test — 15 September 2026
 
-`gape-solid.py` was found to identify its backdrop by a half-space, `r > .5, g < .3, b > .5`, which
-the era's standard lining renders *inside* under a magenta world. On Rhaeticosaurus that counted
-394 of 508 failing pixels as background when they were its own mouth, correctly drawn. The test now
-asks `r > .75, g < .45, b > .75`.
+`gape-solid.py` identified its backdrop by a half-space, and it has now been too loose twice, in the
+same way. At `r > .5, g < .3, b > .5` it caught a lit *oral lining*: on Rhaeticosaurus 394 of 508
+failing pixels were its own mouth, correctly drawn. Tightened to `r > .75, g < .45, b > .75`, this
+body went 18 px to **17**, and that one-pixel move was read as proof that the remaining hole was
+real geometry.
 
-**This body's failure survives the correction.** Re-run on the same three shots, it goes from 18 px
-to **17 px** against a tolerance of 12 — one pixel. So the hole is real geometry and not an artefact
-of the old threshold, and this animal still wants the fix. Nobody should read the tool correction as
-having cleared it.
+It was not. The window still caught the animal, and here it caught the **skin**: a pale silvery
+fish renders at about (0.78, 0.44, 0.76) under a magenta world, inside that window by one part in
+two hundred on green, while the backdrop itself comes back below 0.063 on green everywhere
+measured. The test is now `r > .90, g < .20, b > .90`, this body reads **3**, and across seven
+delivered animals and 33 shots nothing goes up. The section above has the evidence.
+
+Two lessons worth keeping. **A count that will not move is a count about something else** — that is
+now twice — and **the right way to find out what a failing pixel is, is to cast a ray through it**
+and ask every surface on the line, rather than to keep changing geometry and re-reading renders.
