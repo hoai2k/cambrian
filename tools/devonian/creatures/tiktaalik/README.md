@@ -81,3 +81,30 @@ snout at the corners (oral clearance 20/625 negative → 0/625, min +0.024 vs V2
 135,948 / 38,060 triangles; intake, check-export, check-pose-attachments PASS; portraits from the V3
 build; `anchors.json` is V3's. `build.py` still reproduces V2. The user accepted the study on 12
 September; badge cleared.
+
+## Sculpt port shipped — 15 September 2026
+
+The user's viewer sculpt (`docs/viewer-sculpt.md`) asked for a deeper, narrower animal: the head
+and neck much deeper top and bottom (stations 15–18, dorsal +26/+56/+28/+25%, ventral
++42/+76/+83/+50%), the tail deeper (stations 1–5), the trunk 1.4–5.8% narrower, the fore body's
+top-view outline pulled in 7.7–18.7% over the pectoral fin, and the eyes 0.077 in towards the
+midline. It lands in `anatomy_v3.py` alone — `SEC`'s `h`/`z` columns, `PEC_X`/`PEC_BONE` for the
+fin and its bone chain, and `EYE`/`EYE_DEPTH` — solved against `npm run sculpt:measure` over three
+build-and-correct rounds rather than typed, because a station is a windowed extreme on a grid that
+is not the builder's and the flank's own longitudinal sweep lands a row's widest points a long way
+behind its station. The file's docstring has the residuals: every station within ~3% except
+station 17's dorsal (the extreme there is the eye globe, and the roof under it measures 0.3778
+against a target of 0.377), station 19's dorsal (+6%, .009 of a unit at the snout tip), the two
+deepest ventral points (+6.3% / −5.7%), and station 16's width, the one place the port does not
+follow the sculpt — its +9.7% is the snout's swept flank, and the rows that carry it also carry
+stations 17–19, where the sculpt asks for nothing.
+
+Where the outline is the fin rather than the trunk, the fin is what narrows: `PEC_X` scales each
+pectoral control row's centre and its `.84w` lateral spread, never the `.54w` fore-and-aft sweep,
+and `PEC_BONE` moves the shoulder/elbow/distal/web joints with it. The eyes are seated by depth
+below the surface at their own station (`EYE_DEPTH`, the shipped pair's own .06825) instead of at a
+fixed z, because the roof over them rose with the deeper head and a fixed z would have buried them.
+
+Oral clearance 0/625 negative, minimum +0.0214 (V3's own +0.0241); the 126-pose attachment check
+passes all four fin-root centroids and all 72 tooth bases, maximum tooth-base-to-lining distance
+unchanged at 0.00427.
