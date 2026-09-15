@@ -236,16 +236,29 @@ JAW_FRONT_Y = float(Y0 - .004)
 HEAD_BACK = float(HINGE_Y + .080)
 # The mouth line: the middle of the gap between the mandible's dorsal margin and the palate's
 # ventral one, at each station the jaws are apart, smoothed and clamped.
+#
+# **The mouth is the LARGEST empty interval on the line, not the first one.** Six crossings turn up
+# wherever the modelled tongue rises into the lumen, and there the first empty interval is the
+# sliver between the mandible and the tongue -- 0.014 tall against the mouth's own 0.095. Read that
+# way the seam dives into the jaw for a third of the tooth row, the hinge lands in the wrong place,
+# and the oral lining built on it turns inside out when the jaw shuts and comes out through the top
+# of the snout. Interior intervals are (c1,c2), (c3,c4), ...; the mouth is the widest of them.
 _sy, _sz, _slow, _shigh = [], [], [], []
 for r in _open:
     c = r['crossings']
+    gaps = [(c[i + 1] - c[i], c[i], c[i + 1]) for i in range(1, len(c) - 1, 2)]
+    if not gaps:
+        continue
+    _g, _lo, _hi = max(gaps)
     _sy.append(r['y'])
-    _slow.append(c[1])
-    _shigh.append(c[2])
-    _sz.append((c[1] + c[2]) / 2)
+    _slow.append(_lo)
+    _shigh.append(_hi)
+    _sz.append((_lo + _hi) / 2)
 _sy = np.array(_sy)
-_sz = T.blur1d(np.array(_sz), 1.4)
-_slow, _shigh = np.array(_slow), np.array(_shigh)
+# Blurred together, so the seam stays the midpoint of the two margins the lining is built between.
+_slow = T.blur1d(np.array(_slow), 1.4)
+_shigh = T.blur1d(np.array(_shigh), 1.4)
+_sz = (_slow + _shigh) / 2
 GAPE_HEIGHT = _shigh - _slow
 
 
@@ -288,19 +301,26 @@ def head_half_depth(y):
 # rather than from a ray fired at the closed slit of a solid head. `T.mouth_cavity` returns 159
 # vertices at a 0.03 gap and 494 at 0.16; the 0.06 reading is used, which is wide enough to pair
 # the palate with the floor and narrow enough not to cross the whole head.
-CAV = T.mouth_cavity(auth, front_fraction=(HEAD_BACK - Y0) / (Y1 - Y0), gap=.060)
-assert len(CAV) >= 80, ('the modelled oral cavity did not measure', len(CAV))
+_CAV_ALL = T.mouth_cavity(auth, front_fraction=(HEAD_BACK - Y0) / (Y1 - Y0), gap=.060)
+# **A cast over the front quarter of a body finds more than a mouth**, and on a generation whose
+# forelimbs sit just behind the skull what it mostly finds is the gap between a paddle and the
+# flank: the raw cast reaches x +/-0.24 where the head is 0.03 to 0.08 across. Sized on that, the
+# oral lining came out as wide as the animal's head and hung out of its mouth as a pink slab. So
+# the cast is kept only where it can be a mouth -- inside the head's own section, in front of the
+# hinge -- and the section the lining is actually built on is the **measured gape**: the height
+# between the mandible's dorsal margin and the palate's ventral one, which the crossing scan
+# already has and which needs no cast at all.
+_keep = np.array([abs(float(p[0]) - cx(float(p[1]))) < head_half_width(float(p[1])) * 1.2
+                  and float(p[1]) < HINGE_Y + .02 for p in _CAV_ALL]) if len(_CAV_ALL) else None
+CAV = _CAV_ALL[_keep] if _keep is not None and _keep.any() else _CAV_ALL
+assert len(CAV) >= 40, ('the modelled oral cavity did not measure inside the head', len(CAV))
 CAV_SPREAD = float(CAV[:, 1].max() - CAV[:, 1].min())
-_cy, _cmid, _cw, _ch = T.cavity_profile(CAV, MOUTH_FRONT_Y + .004, HINGE_Y - .004, .006, .010)
-assert len(_cy) >= 8, ('too few cavity stations', len(_cy))
+_GAPE_H = (_shigh - _slow) / 2
 
 
-def cavity_half_width(y):
-    return float(np.interp(y, _cy, _cw))
-
-
-def cavity_half_depth(y):
-    return float(np.interp(y, _cy, _ch))
+def gape_half_height(y):
+    """Half the measured distance between the two lips: the mouth's own section, in height."""
+    return float(np.interp(y, _sy, _GAPE_H))
 
 
 # --------------------------------------------------------------------------------- rig ----
@@ -426,12 +446,16 @@ def limb_weights(q):
 
 # The throat follows the jaw: the mandible is rigid on `jaw` and the skin behind the hinge on the
 # axial chain, and with nothing blending between them a wide gape separates the two.
-THROAT_SPAN = .055
-THROAT_DROP = .16
+# **Wide, and reaching well down the throat.** The mandible's rear rim is a cut plane at the hinge
+# and swings up 33 degrees the moment the jaw shuts, so the skin behind it has to come with it or
+# a slit opens down the cheek -- 40 magenta pixels of one, in Idle and Eat and nowhere else, which
+# is the tell that it is the shut pose rather than the gape that opens it.
+THROAT_SPAN = .080
+THROAT_DROP = .40
 
 
 def throat_jaw_share(q):
-    a = T.smooth((q.y - (HINGE_Y - .014)) / .014)
+    a = T.smooth((q.y - (HINGE_Y - .022)) / .022)
     b = T.smooth(((HINGE_Y + THROAT_SPAN) - q.y) / THROAT_SPAN)
     c = T.smooth((seam(HINGE_Y) - q.z) / (THROAT_DROP * head_half_depth(HINGE_Y)) + 1.)
     return a * b * c
@@ -557,21 +581,51 @@ for o in parts['lower jaw'].values():
 mouth_mat = T.inward_material(NAME + ' mouth interior', (.44, .21, .21, 1))
 mouth_mat.use_backface_culling = False
 MOUTH_BACK = HINGE_Y + .022
-MOUTH_FRONT = MOUTH_FRONT_Y
+# **The lining ends where the gape does, not at the snout tip.** Run forward to Y0 the last rings
+# are built past the frontmost station the crossing scan ever measured open, on a clamped section
+# that belongs to a station further back, and inside a snout tip that is narrower than the section
+# it is given -- so when the jaw shuts they rotate up and out through the top of the nose.
+MOUTH_FRONT = float(_sy.min() + .034)
 
 
 def _raw_section(y):
-    e = T.smooth((MOUTH_BACK - y) / .014) * T.smooth((y - MOUTH_FRONT) / .006)
-    # Inside the cavity the generation already draws, not level with it: a lining on the measured
-    # section stipples against the modelled palate along its whole length.
-    w = max(min(cavity_half_width(y) * .88, head_half_width(y) * .82), .0015) * (.94 + .06 * e)
-    # **The height is bounded by the room above and below the seam, not by the head's half depth.**
-    # The mouth line is not the middle of the head -- it runs low through the skull -- so a lining
-    # sized on the section's half depth and centred on the seam reaches 0.014 out through the top
-    # of the skull. What is available is the smaller of the two clearances the seam actually has.
+    """The lining's section: a little **outside** the measured gape in the mouth, and a throat
+    behind the hinge.
+
+    **The floor has to sit inside the mandible, not above it, and on a body authored gaping that is
+    the whole difference between a mouth and a disaster.** Sized at 0.57 of the measured gape the
+    floor sat 0.023 above the mandible's own dorsal margin; both rotate by the same angle about the
+    same hinge when the jaw shuts, so the floor stayed 0.023 above the mandible all the way round --
+    and since the closing rotation is defined as the one that carries the mandible's margin onto the
+    palate's, that put the lining's floor 0.023 *through* the palate and out of the top of the
+    snout, as a pink slab the length of the head. At 1.06 of the measured gape the floor starts
+    just inside the jaw's flesh and finishes just inside the skull's, which is what lining a mouth
+    means.
+    """
+    e = T.smooth((MOUTH_BACK - y) / .014) * T.smooth((y - MOUTH_FRONT) / .020)
+    # Behind the hinge there is no gape to measure and the sac is a throat: a narrower tube on the
+    # head's own section, which is what has to be bridged when the mandible's rear rim swings.
+    throat = T.smooth((y - (HINGE_Y - .012)) / .030)
     room = min(cz(y) + head_half_depth(y) - seam(y), seam(y) - (cz(y) - head_half_depth(y)))
-    h = max(min(cavity_half_depth(y) * .80, max(room, .004) * .78), .0030) * (.70 + .30 * e)
+    w = max(head_half_width(y) * (.56 - .18 * throat), .0020) * (.96 + .04 * e)
+    h = (1 - throat) * gape_half_height(y) + throat * head_half_depth(y) * .28
+    # Tapered hard at both ends: the last ring of a tube is its cap, and a cap the full height of
+    # the local gape is a lid standing across the mouth rather than the end of a sac.
+    h = max(min(h, max(room, .004) * .92), .0035) * (.34 + .66 * e)
     return w, h
+
+
+def lining_axis(y):
+    """The tube's own centre, a little **below** the mouth line.
+
+    `T.lining` builds a section symmetric about whatever axis it is given, and a symmetric tube on
+    the seam puts its floor exactly on the mandible's dorsal margin and its roof exactly on the
+    palate's ventral one -- so both are level with a surface rather than inside one, and the floor
+    comes through the palate as soon as the closing rotation overshoots anywhere. Dropped by a
+    fourteenth of the local gape the floor starts inside the jaw's flesh and the roof finishes
+    inside the skull's, which is the same trick `fit` performs per vertex on a body whose mouth is
+    painted rather than modelled."""
+    return seam(y) - .07 * gape_half_height(y)
 
 
 LINING_FIT = {}
@@ -584,14 +638,21 @@ def mouth_section(y):
     return w, h
 
 
-lining, lining_raw = T.lining('Oral cavity lining', rig, tx, seam, mouth_section,
+lining, lining_raw = T.lining('Oral cavity lining', rig, tx, lining_axis, mouth_section,
                               MOUTH_BACK, MOUTH_FRONT, (lambda _p: 0.), mouth_mat,
                               rings=30, ring=24, centre_x=cx, power=LINING_POWER, fit=None)
 oralparts = [lining]
 lining_jaw = []
 for idx, p in enumerate(lining_raw):
     _w, h = mouth_section(p.y)
-    t = T.smooth(.5 + 1.6 * ((seam(p.y) + .45 * h) - p.z) / max(h, 1e-6))
+    # **The floor may not take the jaw's whole rotation**, and this is the one place on the animal
+    # where that is forced rather than chosen. At the snout the closing rotation is *defined* as the
+    # one that carries the mandible's dorsal margin exactly onto the palate's ventral one, so a
+    # lining floor riding the jaw at weight 1 arrives exactly where its own roof already is: the
+    # tube is degenerate at the shut pose and rounding decides which side of the roof each vertex
+    # lands, which is a pink shard through the top of the snout. Held at 0.93 the floor arrives a
+    # fifth of the local gape below the roof and the sac closes instead of crossing.
+    t = min(.93, T.smooth(.5 + 1.6 * ((lining_axis(p.y) + .45 * h) - p.z) / max(h, 1e-6)))
     lining.vertex_groups['jaw'].add([idx], t, 'REPLACE')
     lining.vertex_groups['skull'].add([idx], 1 - t, 'REPLACE')
     lining_jaw.append(round(float(t), 3))
@@ -600,8 +661,8 @@ mouth_cover = []
 for _y in np.linspace(MOUTH_FRONT + .006, MOUTH_BACK - .006, 14):
     y = float(_y)
     w, h = mouth_section(y)
-    mouth_cover.append([round(y, 4), round(w / max(cavity_half_width(y), 1e-9), 3),
-                        round(h / max(head_half_depth(y), 1e-9), 3)])
+    mouth_cover.append([round(y, 4), round(w / max(head_half_width(y), 1e-9), 3),
+                        round(h / max(gape_half_height(y), 1e-9), 3)])
     assert h >= .0012, ('the oral lining is flat', y, h)
 
 # The jaw hinge tissue, straddling the cut plane at the corner of the mouth. Sized off the head's
@@ -609,8 +670,8 @@ for _y in np.linspace(MOUTH_FRONT + .006, MOUTH_BACK - .006, 14):
 # there `find_nearest` returns the cavity's own wall and reports its normal's sign, not the skull's.
 hinge_mat = T.vertex_colour_material(NAME + ' jaw hinge body', roughness=.56)
 HINGE_CENTRE = (cx(HINGE_Y), HINGE_Y + .006, cz(HINGE_Y))
-HINGE_R = (head_half_width(HINGE_Y) * .86, .028, head_half_depth(HINGE_Y) * .70)
-HINGE_FIT = .60
+HINGE_R = (head_half_width(HINGE_Y) * .94, .058, head_half_depth(HINGE_Y) * .80)
+HINGE_FIT = .80
 HINGE_TRACE = []
 for step in range(24):
     k = 1. - step / 24
@@ -789,17 +850,17 @@ for clip, duration in CLIPS.items():
         # that was authored, not that gape minus the parting.
         opening = .010 * (1 - cos(p)) if loop else 0.
         if clip == 'Bite':
-            opening = .86 * ramp(u, .03, .18, 1.8) * (1 - ramp(u, .24, .40, 2.4))
+            opening = .46 * ramp(u, .03, .18, 1.8) * (1 - ramp(u, .24, .40, 2.4))
         elif clip == 'Attack':
-            opening = .30 * cock + .82 * ramp(u, .20, .42, 1.6) * (1 - ramp(u, .46, .64, 1.4))
+            opening = .18 * cock + .42 * ramp(u, .20, .42, 1.6) * (1 - ramp(u, .46, .64, 1.4))
         elif clip == 'Heavy':
-            opening = .34 * cock + .95 * ramp(u, .22, .44, 1.7) * (1 - ramp(u, .48, .66, 1.4))
+            opening = .20 * cock + .50 * ramp(u, .22, .44, 1.7) * (1 - ramp(u, .48, .66, 1.4))
         elif clip == 'Ability':
             opening = .14 * load
         elif clip == 'Grab':
-            opening = .26 + .08 * haul
+            opening = .20 + .06 * haul
         elif clip == 'Eat':
-            opening = .62 * ratchet + .06
+            opening = .34 * ratchet + .05
         elif clip == 'Breath':
             opening = .20 * spike(u, .30, .70, 1.)
         elif clip == 'Breathe':
@@ -811,7 +872,11 @@ for clip, duration in CLIPS.items():
         elif clip == 'Guard':
             opening = .04 * (1 - cos(p))
         opening = max(0., opening)
-        _o = min(1., opening / .70)
+        # **The bind pose is already a 33-degree gape**, so a clip's own opening is what it adds
+        # on top of that: 0.86 rad of Bite made an 82-degree mouth and the lining, correctly
+        # following it, read as a pouch wider than the jaw. Half that is still a wider bite than
+        # anything else in the era.
+        _o = min(1., opening / .40)
         gape = JAW_SHUT * (1 - _o) + opening
         pb['jaw'].rotation_euler.x = gape
         pb['skull'].rotation_euler.x = -.10 * opening
@@ -843,7 +908,12 @@ for clip, duration in CLIPS.items():
         if clip in ('Dive', 'Rise'):
             body.rotation_euler.x += (1 if clip == 'Dive' else -1) * .30 * e
         if clip in ('Attack', 'Heavy'):
-            body.location.y = .12 * cock - .52 * drive
+            # **Heavy commits the whole animal.** Built from the same shapes and numbers as Attack
+            # the two measured an identical 0.58 of snout reach, which is two names for one clip; a
+            # mosasaur's heavy attack is the same bite carried in further and held longer, so the
+            # lunge is deeper and the release later rather than the gape being wider still.
+            _commit = 1.34 if clip == 'Heavy' else 1.
+            body.location.y = .12 * cock - .52 * drive * _commit
             body.rotation_euler.x = .08 * cock - .10 * drive
         if clip == 'Ability':
             body.location.y = .14 * load - 1.30 * power
@@ -1188,8 +1258,8 @@ report = {
                        round(float(d), 5)]
                       for a, b, c, d in zip(_sy, _sz, _slow, _shigh)],
         'cavityVertices': int(len(CAV)), 'cavitySpreadY': CAV_SPREAD,
-        'cavitySection': [[round(float(a), 4), round(float(b), 5), round(float(c), 5)]
-                          for a, b, c in zip(_cy, _cw, _ch)],
+        'cavityVerticesBeforeTheHeadFilter': int(len(_CAV_ALL)),
+        'gapeHalfHeight': [[round(float(a), 4), round(float(b), 5)] for a, b in zip(_sy, _GAPE_H)],
         'liningCoverage': mouth_cover, 'liningFitFactors': LINING_FIT,
         'liningJawShare': lining_jaw,
         'toothPatches': tooth_report, 'toothPatchesStraddlingTheCut': straddling,

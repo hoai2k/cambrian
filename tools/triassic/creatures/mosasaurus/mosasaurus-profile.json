@@ -5,16 +5,16 @@
   "envelopeToleranceFractionOfBodyLength": 0.04,
   "maximumEnvelopeDifference": 0.06513845920562744,
   "maximumEnvelopeDifferenceFractionOfBodyLength": 0.013027691841125488,
-  "surfaceDistanceMax": 0.107784204185009,
-  "surfaceDistanceMaxFractionOfBodyLength": 0.021556840837001802,
-  "surfaceDistanceP95": 0.01714245229959488,
+  "surfaceDistanceMax": 0.1077841967344284,
+  "surfaceDistanceMaxFractionOfBodyLength": 0.02155683934688568,
+  "surfaceDistanceP95": 0.01678950786590576,
   "anchorTolerance": 0.1,
   "anchorSurfaceDistances": {
     "anchor_mouth": {
-      "nearestSurfaceRaw": 0.004560799337923527,
-      "nearestSurfaceUnits": 0.022803996689617634,
-      "fractionOfBodyLength": 0.004560799337923527,
-      "depthInsideSkinRaw": 0.004560799337923527
+      "nearestSurfaceRaw": 0.004397093318402767,
+      "nearestSurfaceUnits": 0.021985466592013836,
+      "fractionOfBodyLength": 0.004397093318402767,
+      "depthInsideSkinRaw": 0.004397093318402767
     },
     "anchor_mouth_inside": {
       "nearestSurfaceRaw": 0.015786506235599518,
@@ -23,10 +23,10 @@
       "depthInsideSkinRaw": 0.015786506235599518
     },
     "anchor_attack_primary": {
-      "nearestSurfaceRaw": 0.0004019419720862061,
-      "nearestSurfaceUnits": 0.0020097098604310304,
-      "fractionOfBodyLength": 0.0004019419720862061,
-      "depthInsideSkinRaw": -0.0004019419720862061
+      "nearestSurfaceRaw": 0.0009401406859979033,
+      "nearestSurfaceUnits": 0.004700703429989517,
+      "fractionOfBodyLength": 0.0009401406859979033,
+      "depthInsideSkinRaw": 0.0009401406859979033
     }
   },
   "appendageRootSeatingRaw": {
@@ -289,7 +289,7 @@
         "min": [
           -0.28754690289497375,
           -1.4474490880966187,
-          -0.10742826759815216
+          -0.10742827504873276
         ],
         "max": [
           0.24934273958206177,
