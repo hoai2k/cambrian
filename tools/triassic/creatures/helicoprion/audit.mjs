@@ -23,6 +23,7 @@ const base = 'public/assets/triassic/creatures/helicoprion';
 const here = 'tools/triassic/creatures/helicoprion';
 const local = 'local/triassic-authoring/helicoprion';
 const meta = JSON.parse(fs.readFileSync(base + '.json', 'utf8'));
+const validation = JSON.parse(fs.readFileSync(here + '/validation.json', 'utf8'));
 const CLIPS = meta.clips, LOOPS = meta.looping;
 const JOINTS = 23, SOCKETS = 3;
 
@@ -258,6 +259,7 @@ for (const suffix of ['', '.puppet']) {
       const gapeTravel = Math.max(...rows.map(r => Math.hypot(r.gape[0] - rows[0].gape[0], r.gape[1] - rows[0].gape[1], r.gape[2] - rows[0].gape[2])));
       report.jaw.push({
         clip: clipName, maxOpenRadians: Math.max(...angles), minRadians: Math.min(...angles),
+        peakPhase: rows[angles.indexOf(Math.max(...angles))].phase,
         mouthSocketTravelInSkullFrame: gapeTravel,
       });
     }
@@ -284,11 +286,31 @@ for (const g of report.gait) {
   // The caudal fin trails the peduncle, which is what makes a lunate tail a fin and not a plate.
   need(g.lag > 0.01 && g.lag < 0.30, `${g.clip}: the caudal lobe must lag the peduncle (${g.lag.toFixed(3)} of a beat)`);
 }
-for (const j of report.jaw) need(j.minRadians > -0.005, `${j.clip}: the jaw must never close past the bind pose (${j.minRadians.toFixed(4)} rad)`);
-need(report.jaw.find(j => j.clip === 'Bite').maxOpenRadians > 0.4, 'Bite must open the jaw wide');
-need(report.jaw.find(j => j.clip === 'Bite').mouthSocketTravelInSkullFrame > 0.15, 'the mouth socket must travel with the jaw');
-for (const name of ['Attack', 'Heavy', 'Eat', 'Ability', 'Grab']) {
-  need(report.jaw.find(j => j.clip === name).maxOpenRadians > 0.1, `${name} must open the jaw`);
+// **The bind pose is a gape and not an occlusion**, which is the correction this check carries.
+// It used to read "the jaw must never close past the bind pose", which is right for a generation
+// that arrived with its mouth shut and wrong for this one: it held the animal's mouth open in every
+// clip it has, Idle included. `validation.restingGape.closingRotationRadians` is the measured
+// rotation that brings the mandible's dorsal margin onto the palate's ventral one, and the jaw may
+// travel anywhere from there up. Nothing may go *past* shut, which would be teeth through a palate.
+const shut = -validation.restingGape.closingRotationRadians;
+const jaw = (n) => report.jaw.find((j) => j.clip === n);
+for (const j of report.jaw) {
+  need(j.minRadians > shut - 0.005, `${j.clip}: the jaw must not close past the measured shut pose (${j.minRadians.toFixed(4)} rad against ${shut.toFixed(4)})`);
+}
+// The clips that are not about swimming shut it. A ram feeder cruising open-mouthed is the animal
+// feeding; holding station open-mouthed is the animal forgetting to.
+for (const name of ['Idle', 'Guard']) {
+  need(jaw(name).maxOpenRadians < shut + 0.05, `${name} must hold the mouth shut (${jaw(name).maxOpenRadians.toFixed(4)})`);
+}
+// Eat is one bite: open off the shut pose, and shut again through the bind pose to swallow.
+need(jaw('Eat').maxOpenRadians > 0.4, 'Eat must open the jaw properly');
+need(jaw('Eat').minRadians < shut + 0.005, 'Eat must close the mouth fully to swallow');
+need(jaw('Eat').peakPhase > 0.1 && jaw('Eat').peakPhase < 0.45,
+  `Eat must open early and shut on the swallow (peak at ${jaw('Eat').peakPhase})`);
+need(jaw('Bite').maxOpenRadians > 0.4, 'Bite must open the jaw wide');
+need(jaw('Bite').mouthSocketTravelInSkullFrame > 0.15, 'the mouth socket must travel with the jaw');
+for (const name of ['Attack', 'Heavy', 'Ability', 'Grab']) {
+  need(jaw(name).maxOpenRadians > 0.1, `${name} must open the jaw`);
 }
 assert.equal(problems.join(' | '), '', 'measured performance checks');
 console.log(JSON.stringify({

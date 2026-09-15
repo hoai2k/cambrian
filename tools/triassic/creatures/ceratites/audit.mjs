@@ -19,8 +19,11 @@
  *    on the bone that delivers the blow and is not the skull for an animal that does not lead with
  *    a bite. Here it is an arm tip, so it has to travel further on the strike clips than the mouth
  *    socket does -- which is the difference between an animal that grabs and one that lunges.
- * 4. **Does the beak work as a jaw?** Shut outside the clips that use it, open on them, and the
- *    mouth socket travelling in the skull's own frame so the gape is the beak's and not the body's.
+ * 4. **Is the beak left alone?** It must be. A beak inside an arm crown is never on screen, so the
+ *    two mouth bones hold their bind pose in every clip and the mouth is an anchor and nothing more;
+ *    the check is that neither moves, measured in the skull's own frame.
+ * 5. **Does the strike reach, or does it recoil?** The attack anchor's forward excursion against its
+ *    rearward one, because a crown that pulls in at the moment of the blow reads as a retreat.
  *
  *   node tools/triassic/creatures/ceratites/audit.mjs --package --decode
  */
@@ -203,18 +206,46 @@ for (const c of ['Attack', 'Grab', 'Heavy']) {
 for (const c of ['Attack', 'Grab']) {
   need(anchor(c).anchor_attack_primary > 2 * anchor(c).anchor_mouth,
     `${c}: the attack anchor must out-travel the mouth (${anchor(c).anchor_attack_primary.toFixed(3)} vs ${anchor(c).anchor_mouth.toFixed(3)})`);
+  // **And a floor under it, because that ratio is now free.** With the beak held still the mouth
+  // socket does not move at all in these clips, so "twice the mouth" is twice nothing and passes
+  // whatever the crown does. What the rule is actually for is that the attack anchor is on the bone
+  // that delivers the blow, so the arm tip has to go somewhere: a tenth of a body length.
+  need(anchor(c).anchor_attack_primary > 0.5,
+    `${c}: the attack anchor must travel (${anchor(c).anchor_attack_primary.toFixed(3)})`);
   need(anchor(c).anchor_grasp > 0.2, `${c}: the grasp anchor must reach (${anchor(c).anchor_grasp.toFixed(3)})`);
 }
-// The beak is shut in the clips that are not about it, and open in the ones that are.
-for (const b of report.beak) need(b.minRadians > -0.02, `${b.clip}: the beak must not close past the bind pose`);
-for (const c of ['Swim', 'Sprint', 'TurnLeft', 'TurnRight', 'Dive', 'Rise']) {
-  need(beak(c).maxOpenRadians < 0.05, `${c}: the beak must stay shut (${beak(c).maxOpenRadians.toFixed(3)})`);
+// **The beak is not animated, in any clip, and that is the check.** It sits at the bottom of a
+// well of thirteen arms and is never on screen; what this animal reaches with, catches with and is
+// read by is the crown, and `anchor_mouth` riding a still `jaw` is the whole of what the game needs
+// to know about its mouth. A gape authored down there is motion spent where nothing can see it, and
+// it stretches the oral lining for nothing.
+for (const b of report.beak) {
+  need(Math.abs(b.maxOpenRadians) < 1e-4 && Math.abs(b.minRadians) < 1e-4,
+    `${b.clip}: the beak must not be animated (${b.maxOpenRadians.toFixed(5)} / ${b.minRadians.toFixed(5)})`);
+  need(b.mouthSocketTravelInSkullFrame < 1e-4,
+    `${b.clip}: the mouth socket must hold still in the skull's own frame (${b.mouthSocketTravelInSkullFrame.toFixed(5)})`);
 }
-need(beak('Bite').maxOpenRadians > 0.45, 'Bite must open the beak');
-for (const c of ['Attack', 'Eat']) need(beak(c).maxOpenRadians > 0.25, `${c} must open the beak`);
-need(beak('Bite').mouthSocketTravelInSkullFrame > 0.02, 'the mouth socket must travel with the beak');
-need(beak('Attack').peakPhase > 0.2 && beak('Attack').peakPhase < 0.7,
-  `Attack: the gape must peak on the strike (${beak('Attack').peakPhase})`);
+
+// --- 5. a strike reaches; a flinch recoils ------------------------------------------------------
+// The shipped Attack gathered the crown 0.30 forward over the first eighth of the clip and then
+// threw 1.16 of its travel *backwards*, which is the shape of an animal pulling its arms in and
+// reads as a retreat rather than a blow. So the attack anchor's own forward excursion is measured
+// against its rearward one, and the reach has to be both the larger and the later of the two.
+report.strike = [];
+for (const c of ['Attack', 'Bite', 'Grab']) {
+  const rows = track(c, ['anchor_attack_primary'], 48);
+  const z = rows.map((r) => r.anchor_attack_primary[2]);
+  const forward = Math.max(...z) - z[0];
+  const backward = z[0] - Math.min(...z);
+  const reachPhase = rows[z.indexOf(Math.max(...z))].phase;
+  const gatherPhase = rows[z.indexOf(Math.min(...z))].phase;
+  report.strike.push({ clip: c, forwardReach: forward, rearwardGather: backward, reachPhase, gatherPhase });
+  need(forward > 0.45, `${c}: the crown must reach (forward ${forward.toFixed(3)})`);
+  need(forward > 3 * backward,
+    `${c}: the crown must reach forward rather than recoil (forward ${forward.toFixed(3)} vs back ${backward.toFixed(3)})`);
+  need(reachPhase > gatherPhase,
+    `${c}: the reach must come after the gather (reach at ${reachPhase.toFixed(2)}, gather at ${gatherPhase.toFixed(2)})`);
+}
 
 assert.equal(problems.join(' | '), '', 'measured performance checks');
 console.log(JSON.stringify({
@@ -223,6 +254,7 @@ console.log(JSON.stringify({
   rigidShell: report.rigidShell,
   crown: report.crown.filter((c) => ['Idle', 'Swim', 'Sprint', 'Attack', 'Grab', 'Heavy', 'Guard'].includes(c.clip)),
   anchorTravel: report.anchorTravel.filter((r) => ['Swim', 'Attack', 'Grab', 'Bite', 'Eat'].includes(r.clip)),
-  beak: report.beak.filter((b) => ['Idle', 'Swim', 'Bite', 'Attack', 'Eat', 'Heavy'].includes(b.clip)),
+  beak: report.beak.filter((b) => ["Idle", "Swim", "Bite", "Attack", "Eat", "Heavy"].includes(b.clip)),
+  strike: report.strike,
   exactRigParity: true, exactAnimationParity: true, exactAnchorParity: true,
 }, null, 2));

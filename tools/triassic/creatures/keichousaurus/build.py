@@ -679,6 +679,39 @@ AMP = {'Idle': .30, 'Swim': 1., 'Sprint': 1.35, 'Shoal': .85, 'Eat': .25, 'Guard
        'Breath': .6, 'Dodge': 1.1, 'Ability': .35, 'Grab': .3, 'Growth': .4}
 ROW_REACH, ROW_SWEEP = .46, .40
 TAIL_N = len(TAIL_PTS)
+
+# ---- the caudal wave, written as displacement and solved back into joint angles ------------------
+# **A chain whose joint angles lag tailward does not necessarily look like a wave running tailward,
+# and this animal is where that was found.** Where a point on the body actually goes is the summed
+# swing of every joint in front of it times its own lever arm, so an amplitude that ramps hard
+# toward the tip lets the distal joints arrive nearly in phase with each other -- and a quarter of
+# a cycle AHEAD of the tail base, because the base is moved almost entirely by the trunk. Measured
+# on the shipped clip: tail_02, tail_04 and tail_06 all reached their extreme at u=0.94 while
+# tail_00 reached its own at u=0.19, which is a wave running tail to head and reads as the animal
+# swimming backwards. Every per-joint number in that clip was correct -- the lag grew tailward and
+# the gain grew tailward -- and the audit checked exactly those numbers, which is why it passed.
+#
+# So the target is the thing a viewer actually reads: the lateral offset each station is asked for.
+# The offsets are solved back into joint angles, which is one triangular pass, because a joint's
+# yaw moves a station by that yaw times the distance between them (small angle, `depth` of the
+# swing here is a fifth of a radian at worst).
+TAIL_X = [p[0] for p in TAIL_PTS]
+TAIL_TIP_X = -.520                    # the fin beyond the last joint, which is what an eye follows
+TAIL_WAVE_LAG = 2.85                  # radians of phase from the tail base to the tip: .45 of a cycle
+TAIL_WAVE_POW = 1.7                   # how the amplitude grows tailward
+
+
+def tail_yaw(ph, tip):
+    """Per-joint yaw realising a lateral wave that travels head to tail, tip amplitude `tip`."""
+    xs = TAIL_X + [TAIL_TIP_X]
+    span = TAIL_X[0] - TAIL_TIP_X
+    want = [tip * ((TAIL_X[0] - x) / span) ** TAIL_WAVE_POW * sin(ph - TAIL_WAVE_LAG * (TAIL_X[0] - x) / span)
+            for x in xs]
+    ang = []
+    for j in range(len(TAIL_X)):
+        have = sum(ang[a] * (xs[j + 1] - xs[a]) for a in range(j))
+        ang.append((want[j + 1] - have) / (xs[j + 1] - xs[j]))
+    return ang
 limb_sweep = {}
 seams = {}; bounds = {}
 for clip, duration in CLIPS.items():
@@ -712,10 +745,15 @@ for clip, duration in CLIPS.items():
         pb['jaw'].rotation_euler.x = opening; pb['skull'].rotation_euler.x = -.07 * opening
         body = pb['body']
         # ---- the tail. Long and light: it carries the wave, and the forelimbs row against it.
+        # The wave is a displacement target solved into angles (see `tail_yaw`), which is what
+        # makes it read as travelling tailward rather than merely lagging tailward.
+        tipamp = (.060 if rowing else .026) * amp
+        swing = tail_yaw(p, tipamp)
+        zero = [0.] * TAIL_N if loop else tail_yaw(0., tipamp)
         for i in range(TAIL_N):
             q = pb['tail_%02d' % i]
-            if rowing: q.rotation_euler.z = (.034 + .026 * i) * amp * sin(p - i * .48)
-            else: q.rotation_euler.z = (.020 + .012 * i) * amp * wave(i * .5) + turn * (.026 + .015 * i) + dead * .035 * sin(i * .6)
+            q.rotation_euler.z = (swing[i] - zero[i]) * (1 if loop else env)
+            if not rowing: q.rotation_euler.z += turn * (.026 + .015 * i) + dead * .035 * sin(i * .6)
             if clip == 'Dodge': q.rotation_euler.z += .13 * e * sin(i * .7 + .5)
             if clip in ['Dive', 'Rise']: q.rotation_euler.x = (1 if clip == 'Dive' else -1) * .030 * e * (1 + .12 * i)
             if clip == 'Death': q.rotation_euler.x += .03 * dead * sin(i * .5)
@@ -723,9 +761,15 @@ for clip, duration in CLIPS.items():
             # The row. Every stroke runs from the paddle stretched forward and flush with the flank
             # to the end of the sweep back; the hind pair runs half a cycle behind the fore pair,
             # and the fore pair does most of the work, as the research says it did.
-            body.rotation_euler.z = -.030 * amp * sin(p + .40)
-            pb['chest'].rotation_euler.z = .014 * amp * sin(p + 1.0)
-            pb[NECK[0]].rotation_euler.z = .016 * amp * sin(p + 1.5)
+            # The trunk does not yaw under the row. It used to, out of phase with the wave behind
+            # it, and since the trunk's own swing is what carries the head and the whole tail, that
+            # one term set the head's phase *ahead* of the tail's. What a rower's trunk actually
+            # does is roll toward the paddle that is driving, which is a different channel and
+            # cannot reverse anything.
+            head_sway = .25 if clip == 'Shoal' else 1.
+            body.rotation_euler.y = .055 * amp * sin(p + .5)
+            pb['chest'].rotation_euler.z = .008 * amp * head_sway * sin(p + 1.0)
+            pb[NECK[0]].rotation_euler.z = .012 * amp * head_sway * sin(p + 1.4)
             for key, (pts, names) in LIMBS.items():
                 s = 1 if key.endswith('L') else -1; hind = key.startswith('hind')
                 up, lo_, pad = pb[names[0]], pb[names[1]], pb[names[2]]
@@ -737,12 +781,20 @@ for clip, duration in CLIPS.items():
                 up.rotation_euler.y = s * (-.14 - .20 * gain * amp * cos(ph))
                 lo_.rotation_euler.x = -.12 + .30 * gain * amp * max(0., -stroke)
                 lo_.rotation_euler.z = s * .16 * gain * amp * stroke
-                pad.rotation_euler.x = .18 * gain * amp * sin(ph - 1.1)
+                # The blade is feathered, and the feather is what says which half of the stroke is
+                # the working one. `pad.x` is very nearly the paddle's own long axis here (the limb
+                # runs out and down, and the bone's local frame is the engine's), so it turns the
+                # blade edge-on rather than swinging it: broadside through the drive, knifed
+                # through the recovery. Without it the blade is broad to the water both ways and
+                # the eye has nothing to tell the power stroke from the return.
+                pad.rotation_euler.x = gain * amp * (.10 * max(0., stroke) - .42 * max(0., -stroke))
                 pad.rotation_euler.y = s * .14 * gain * amp * sin(ph - .8)
             if clip == 'Shoal':
-                # A shoal holds station: quicker beat, tighter body, the head steady.
-                body.rotation_euler.z *= .6
-                pb['skull'].rotation_euler.z = -.5 * (body.rotation_euler.z + pb['chest'].rotation_euler.z)
+                # A shoal holds station: quicker beat, tighter body, the head steady. `head_sway`
+                # has already quartered the two yaws that carry the skull; this takes the rest of
+                # it back out, so Shoal's head is measurably stiller than Swim's.
+                body.rotation_euler.y *= .6
+                pb['skull'].rotation_euler.z = -.7 * (pb['chest'].rotation_euler.z + pb[NECK[0]].rotation_euler.z)
         else:
             body.rotation_euler.y = .022 * amp * wave(.3); body.location.z = .08 * amp * wave(.2)
             body.rotation_euler.z = .22 * turn; body.rotation_euler.y += .12 * turn

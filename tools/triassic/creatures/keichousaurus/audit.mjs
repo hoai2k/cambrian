@@ -147,8 +147,34 @@ for (const suffix of ['', '.puppet']) {
         const d = (lags[i] - lags[i - 1] + 1) % 1;
         assert(d > .02 && d < .20, name + ' caudal wave must travel: joint ' + i + ' lag ' + d.toFixed(3));
       }
+      // **And the same question asked of where the tail actually goes.** The check above reads the
+      // authored joint angles, and a chain whose angles lag tailward can still put every distal
+      // station in phase with its neighbours and a quarter cycle ahead of the tail base, because a
+      // station's lateral position is the summed swing of every joint in front of it times its own
+      // lever arm. The shipped clip did exactly that -- angles lagging correctly, tail_02, tail_04
+      // and tail_06 all peaking at u=0.94 against tail_00 at u=0.19 -- and read as the animal
+      // swimming backwards. So the wave is measured where a viewer sees it: the world lateral
+      // extreme of each caudal joint, which must move steadily tailward down the chain.
+      const sidePeak = b => {
+        let best = -Infinity, at = 0;
+        for (const r of rows) if (r[b][0] > best) { best = r[b][0]; at = r.phase; }
+        return at;
+      };
+      const carried = [...Array(7).keys()].map(i => sidePeak('tail_0' + i));
+      let walked = 0;
+      for (let i = 1; i < 7; i++) {
+        const d = (carried[i] - carried[i - 1] + 1) % 1;
+        assert(d > .01 && d < .25, name + ' the tail must LOOK like it travels: station ' + i
+          + ' carries its extreme ' + d.toFixed(3) + ' of a cycle after the one in front of it');
+        walked += d;
+      }
+      assert(walked > .25, name + ' the caudal wave is nearly standing: ' + walked.toFixed(3) + ' of a cycle over the tail');
+      for (let i = 1; i < 7; i++) {
+        assert(span(rows, 'tail_0' + i, 0) > span(rows, 'tail_0' + (i - 1), 0),
+          name + ' the caudal sweep must grow tailward at station ' + i);
+      }
       assert(skull < .30, name + ' skull must not slew: ' + skull.toFixed(3));
-      report.gait.push({ clip: name, forePaddleTravel: fore, hindPaddleTravel: hind, tailTipTravel: tip, skullLateral: skull, forehindPhaseGap: gap, caudalPhaseLags: lags });
+      report.gait.push({ clip: name, forePaddleTravel: fore, hindPaddleTravel: hind, tailTipTravel: tip, skullLateral: skull, forehindPhaseGap: gap, caudalPhaseLags: lags, caudalCarriedPhase: carried, caudalCyclesOverTheTail: walked });
     }
     // Shoal is the tight schooling cruise: the same row, quieter in the body and steadier in the head.
     {

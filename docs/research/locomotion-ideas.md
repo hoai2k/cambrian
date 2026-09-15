@@ -206,6 +206,43 @@ gives up steering in exchange for free speed along the current, and an ambient p
 down by day for the soft-bodied animals, would make the water feel like it is going somewhere. It also
 pairs with the sinking in idea 1: the column stops being a flat plane you swim about on.
 
+## How a limbed swimmer actually swims
+
+Not a mechanic, and deliberately here rather than in `src/sim`: this is what the *clips* have to
+show, and it is written down because two Triassic swim clips were built without it and both read
+wrongly — one as a waddle, one as an animal swimming in reverse.
+
+**A limbed swimmer with a long body drives with its axis and keeps its limbs out of the way.**
+Crocodilians press all four limbs tightly against the flanks while swimming, turning the body into
+a streamlined tube, and take their thrust from lateral undulation of the tail; salamanders do the
+same, tucking the limbs in and raising undulation frequency and amplitude as they change from
+walking to swimming (**observed**, both). A limb that goes on paddling in midwater while the tail
+does the work is a walk performed in water, which is exactly what reads as a waddle.
+
+**Where limbs do work in water, the stroke reaches forward and sweeps back along the flank.** The
+elongate salamander *Siren lacertina* uses what its describers call a bipedal-undulatory gait:
+alternating forelimb strokes combined with a travelling axial wave (**observed**). The stroke runs
+from the limb stretched forward to the limb flush with the body — not fore and aft about a splayed
+sprawl, which is a walking excursion and belongs on land.
+
+**The Triassic's amphibians and reptiles split on this and the split is anatomical.** Trematosaurids
+— Aphaneramma's own family — are among the most fully aquatic temnospondyls: elongate, laterally
+compressed tails, poorly ossified limbs, slender snouts, and *Wantzosaurus* is read as swimming by
+lateral undulation (**well supported** for the group's aquatic habit, **inferred** for the mode).
+Metoposaurs are the opposite reading from the opposite anatomy: a rigid vertebral column and limb
+articulations that have them rowing with the limbs like a plesiosaur (**inferred**). So "temnospondyl"
+does not settle it — the body does, and a long flexible one undulates.
+
+**What an undulation has to do to read as one.** It is not enough for the joint angles to lag
+tailward; what a viewer reads is where each station on the body actually *goes*, which is the summed
+swing of every joint in front of it times its own lever arm. Keichousaurus' shipped swim had angles
+lagging correctly and still put its whole distal tail a quarter cycle *ahead* of the tail base, which
+reads as the animal going backwards; Aphaneramma's carried its lateral extreme only 0.19 of a cycle
+from the first caudal joint to the last, which is a tail flapping about a hinge. Half a cycle to a
+full one from shoulder to tail tip is what looks like a wave. Both builders now write the wave down
+as a *shape* and solve the joint angles out of it, and both audits measure the phase where it is
+seen rather than on the Euler channel.
+
 ## What I would not bother with
 
 - **Metachronal flap waves** (Anomalocaris, Cambroraster, the radiodonts). Real and well supported —
