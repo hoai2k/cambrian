@@ -33,12 +33,18 @@ export const SCHEMES: readonly Scheme[] = [
 ];
 
 /** Which scheme each creature is *proposed* in, for the viewer's dropdown and the borrowed bodies in play. */
+/**
+ * The scheme the game draws each animal in. **Empty but for one entry, on purpose.**
+ *
+ * Every Triassic animal used to name a scheme here, so nothing was ever drawn in the colours its
+ * own builder gave it — the roster arrived pre-recoloured. An animal with no entry falls back to
+ * its authored palette (`c.color`/`c.accent`, the fallback in `index.ts`), which is what a body
+ * carries out of its own build, and that is the right default: the alternates are for a *player*
+ * to choose and for the second seat on a shared creature to be told apart by, not for the animal
+ * to wear before anyone has asked.
+ *
+ * Shonisaurus keeps `basin-slate` because it genuinely suits it and was chosen deliberately.
+ */
 export const CREATURE_SCHEMES: Record<string, string> = {
-  cymbospondylus: 'basin-slate', shonisaurus: 'basin-slate', mixosaurus: 'basin-slate',
-  nothosaurus: 'reef-mottle', dinocephalosaurus: 'reef-mottle', askeptosaurus: 'reef-mottle', placodus: 'reef-mottle', hupehsuchus: 'reef-mottle',
-  henodus: 'gypsum-bone', odontochelys: 'gypsum-bone',
-  aphaneramma: 'estuary-olive', keichousaurus: 'estuary-olive', cartorhynchus: 'estuary-olive', tanystropheus: 'estuary-olive', mystriosuchus: 'estuary-olive',
-  hybodus: 'needle-silver', birgeria: 'needle-silver', saurichthys: 'needle-silver',
-  ceratites: 'ceratite-rib', phragmoteuthis: 'coleoid-glass', atopodentatus: 'hammerhead-moss', helicoprion: 'whorl-rust', rhaeticosaurus: 'flipper-blue',
-  macrocnemus: 'red-bed', coelophysis: 'red-bed',
+  shonisaurus: 'basin-slate',
 };
