@@ -2,24 +2,24 @@
   "models": [
     {
       "suffix": "",
-      "bytes": 2223996,
-      "sha256": "a7711271c7568c608c7bbbadca83f3d0e80d21bac60c00923171b6bc7ef45360",
-      "triangles": 21101,
-      "vertices": 13006
+      "bytes": 2233740,
+      "sha256": "aa326a4954fd6cf90e197f4a1d0e04944fcbc820749822dfd9b9f0cebb569900",
+      "triangles": 21531,
+      "vertices": 13244
     },
     {
       "suffix": ".puppet",
-      "bytes": 1731300,
-      "sha256": "fe87b733b22ae5aeb4e16bf62da4d3014db6aa7dc565e9a63b42915dd88a0747",
-      "triangles": 8284,
-      "vertices": 4381
+      "bytes": 1737520,
+      "sha256": "af49d17ac68012e3f1ff26a385ca16b1f13c2f2c969ee71eac5a3df20e844e30",
+      "triangles": 8536,
+      "vertices": 4511
     },
     {
       "suffix": ".lod1",
-      "bytes": 1731300,
-      "sha256": "fe87b733b22ae5aeb4e16bf62da4d3014db6aa7dc565e9a63b42915dd88a0747",
-      "triangles": 8284,
-      "vertices": 4381
+      "bytes": 1737520,
+      "sha256": "af49d17ac68012e3f1ff26a385ca16b1f13c2f2c969ee71eac5a3df20e844e30",
+      "triangles": 8536,
+      "vertices": 4511
     }
   ],
   "sockets": [
@@ -208,7 +208,7 @@
       "sha256": "239d0c6387b9746c90ee3252e5d80bb1983c22cd3f573ca5bb5d5fd6fb2de181"
     }
   ],
-  "lodTriangleFraction": 0.39258802900336476,
+  "lodTriangleFraction": 0.3964516278853746,
   "playback": [
     {
       "suffix": "",
@@ -235,7 +235,7 @@
           "clip": "Breath",
           "duration": 2,
           "samples": 61,
-          "maxVertexTravel": 0.5615509162681565
+          "maxVertexTravel": 0.5626151151896561
         },
         {
           "clip": "Charge",
@@ -277,7 +277,7 @@
           "clip": "Grab",
           "duration": 1,
           "samples": 61,
-          "maxVertexTravel": 0.15712705226669887
+          "maxVertexTravel": 0.1586926392224578
         },
         {
           "clip": "Growth",
@@ -414,7 +414,7 @@
           "clip": "Breath",
           "duration": 2,
           "samples": 61,
-          "maxVertexTravel": 0.5662937486405384
+          "maxVertexTravel": 0.5663051053234393
         },
         {
           "clip": "Charge",
@@ -456,7 +456,7 @@
           "clip": "Grab",
           "duration": 1,
           "samples": 61,
-          "maxVertexTravel": 0.15896574346568412
+          "maxVertexTravel": 0.1590214070915263
         },
         {
           "clip": "Growth",

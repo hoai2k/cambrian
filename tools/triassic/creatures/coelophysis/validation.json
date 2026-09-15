@@ -10,13 +10,13 @@
   "remeshTriangles": 92060,
   "puppetBudget": 7000,
   "voxel": 0.0034,
-  "fullTriangles": 21101,
-  "puppetTriangles": 8284,
+  "fullTriangles": 21531,
+  "puppetTriangles": 8536,
   "parts": {
-    "authoredBody": 18806,
-    "authoredJaw": 1351,
-    "puppetBody": 6851,
-    "puppetJaw": 489,
+    "authoredBody": 19034,
+    "authoredJaw": 1553,
+    "puppetBody": 6977,
+    "puppetJaw": 615,
     "sharedOral": 944
   },
   "bones": 35,
@@ -212,7 +212,7 @@
       [
         0.6874182224273682,
         2.62123441696167,
-        1.695745825767517
+        1.6957459449768066
       ]
     ],
     "Hit": [
@@ -302,7 +302,7 @@
     "Ability": [
       [
         -0.8517045974731445,
-        -2.6366987228393555,
+        -2.6366984844207764,
         -1.5521509647369385
       ],
       [
@@ -368,7 +368,7 @@
       [
         0.5893062949180603,
         2.486147880554199,
-        1.8832714557647705
+        1.88327157497406
       ]
     ],
     "Charge": [
@@ -409,7 +409,7 @@
     ],
     "SnapRight": [
       [
-        -0.8263967037200928,
+        -0.8263853788375854,
         -3.082576274871826,
         -1.5815237760543823
       ],
@@ -440,20 +440,20 @@
       [
         1.4139034748077393,
         2.4889299869537354,
-        1.718234658241272
+        1.7182347774505615
       ]
     ]
   },
   "modelLength": 4.897110939025879,
   "rawLength": 0.9794221520423889,
-  "maximumEnvelopeDifference": 0.1702791452407837,
+  "maximumEnvelopeDifference": 0.17982321977615356,
   "envelopeTolerance": 0.19588443756103516,
   "envelopeTolerancePercent": 4.0,
   "surfaceDistanceMax": 0.23964205384254456,
-  "surfaceDistanceP95": 0.042550579644739704,
-  "surfaceDistanceP99": 0.1578041733801368,
+  "surfaceDistanceP95": 0.040782315284013756,
+  "surfaceDistanceP99": 0.15664256274700233,
   "surfaceOutliersOverThreePercent": 137,
-  "surfaceVertices": 10174,
+  "surfaceVertices": 10389,
   "seatingDepthRaw": {
     "fore_upper_L": 0.011975751258432865,
     "fore_upper_R": 0.011286224238574505,
@@ -493,7 +493,7 @@
     "Seated jaw hinge tissue": 0.03921014786881546
   },
   "maxInfluences": 4,
-  "meanInfluences": 3.6131731886865555,
+  "meanInfluences": 3.606558630178872,
   "trunkYawCorrectionDegrees": -62.116,
   "unbending": {
     "applied": true,
@@ -1783,7 +1783,7 @@
         ],
         [
           0.805,
-          0.05433,
+          0.05432,
           0.06462
         ],
         [
@@ -1801,7 +1801,7 @@
         0.04571,
         0.036
       ],
-      "flooded": 332,
+      "flooded": 336,
       "reach": 0.1119,
       "seedVertex": 4243,
       "tFloor": 0.48

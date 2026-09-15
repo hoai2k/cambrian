@@ -176,12 +176,12 @@
     "bladeDilation": 0.0022
   },
   "puppetTriangleTarget": 7200,
-  "fullTriangles": 20387,
-  "puppetTriangles": 7861,
+  "fullTriangles": 19908,
+  "puppetTriangles": 7200,
   "parts": {
-    "authoredBody": 19591,
-    "twinBody": 7065,
-    "sharedOral": 796
+    "authoredBody": 19908,
+    "twinBody": 7200,
+    "sharedOral": 0
   },
   "bones": 77,
   "clips": {
@@ -498,10 +498,10 @@
   "envelopeTolerance": 0.2,
   "envelopeTolerancePercent": 4.0,
   "surfaceDistanceMax": 0.12192033976316452,
-  "surfaceDistanceP95": 0.02202659659087654,
-  "surfaceDistanceP99": 0.07147590011358251,
+  "surfaceDistanceP95": 0.02215403430163858,
+  "surfaceDistanceP99": 0.0703414161503316,
   "surfaceOutliersOver0p12": 2,
-  "surfaceVertices": 9827,
+  "surfaceVertices": 9948,
   "seatingDepthRaw": {
     "body": 0.058,
     "head": 0.04556,
@@ -530,11 +530,11 @@
     "arm_11_00": 0.00899
   },
   "maxInfluences": 4,
-  "meanInfluences": 3.5793051923795294,
+  "meanInfluences": 3.4680442804428044,
   "jointsBelowHalfAPercentOfSkin": [
     [
       "arm_02_00",
-      0.0003
+      0.000296
     ]
   ],
   "armSweepDegreesPerCycle": {
@@ -1156,13 +1156,14 @@
   },
   "mouth": {
     "authored": {
-      "facesRemoved": 317,
-      "rimVertices": 79
+      "facesRemoved": 0,
+      "rimVertices": 0
     },
     "twin": {
-      "facesRemoved": 128,
-      "rimVertices": 49
+      "facesRemoved": 0,
+      "rimVertices": 0
     },
+    "cut": false,
     "centre": [
       0.0,
       -0.15074,
@@ -1176,14 +1177,9 @@
     "radius": 0.02391,
     "armBandRadius": 0.01542,
     "method": "authored on the crown axis; the generation models no mouth, and casting head normals back into the mesh finds neighbouring arms across the crown gaps rather than a lip opposite",
-    "liningRings": 16,
-    "liningRing": 14,
-    "liningDepth": 0.05498738440782972,
-    "liningNearestSurfaceDepthRaw": 0.03351,
-    "skinDoubleSided": true,
-    "liningCullsBackfaces": true,
-    "oneClosedLining": true,
-    "beak": "two authored mandibles, 7 sections each, rigid on skull and jaw"
+    "modelled": false,
+    "anchorDepth": 0.05499,
+    "note": "no peristome cut, no lining and no beak: a mouth inside an arm crown is never seen, so the anchors are the whole of it"
   },
   "albedoSha256": "d775f7cc2edf8dc9842ff3d7741ec34459cabea9ad8cf74bc09765324e64e89b",
   "mantleIsStiff": true,

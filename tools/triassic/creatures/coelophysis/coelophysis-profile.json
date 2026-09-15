@@ -182,7 +182,7 @@
         "max": [
           0.382976770401001,
           -0.8495482206344604,
-          0.8026484251022339
+          0.8121924996376038
         ]
       },
       "puppet": {
@@ -197,7 +197,7 @@
           0.6323692798614502
         ]
       },
-      "maximumEnvelopeDifference": 0.1702791452407837
+      "maximumEnvelopeDifference": 0.17982321977615356
     },
     {
       "stationY": -0.7285666408538818,
@@ -210,7 +210,7 @@
         "max": [
           0.33422648906707764,
           -0.6061598658561707,
-          0.7329493165016174
+          0.7410162687301636
         ]
       },
       "puppet": {
@@ -225,7 +225,7 @@
           0.6481220722198486
         ]
       },
-      "maximumEnvelopeDifference": 0.0848272442817688
+      "maximumEnvelopeDifference": 0.09289419651031494
     },
     {
       "stationY": -0.48571109390258793,
@@ -238,7 +238,7 @@
         "max": [
           0.40488168597221375,
           -0.36329084634780884,
-          0.663250207901001
+          0.6698400378227234
         ]
       },
       "puppet": {
@@ -253,7 +253,7 @@
           0.6353174448013306
         ]
       },
-      "maximumEnvelopeDifference": 0.02793276309967041
+      "maximumEnvelopeDifference": 0.03452259302139282
     },
     {
       "stationY": -0.24285554695129408,
@@ -294,7 +294,7 @@
         "max": [
           0.6534287929534912,
           0.12242528796195984,
-          0.5238519906997681
+          0.527487576007843
         ]
       },
       "puppet": {
@@ -309,7 +309,7 @@
           0.4919471740722656
         ]
       },
-      "maximumEnvelopeDifference": 0.03190481662750244
+      "maximumEnvelopeDifference": 0.03554040193557739
     },
     {
       "stationY": 0.24285554695129408,
@@ -592,11 +592,11 @@
       "maximumEnvelopeDifference": 0.004393517971038818
     }
   ],
-  "maximumEnvelopeDifference": 0.1702791452407837,
+  "maximumEnvelopeDifference": 0.17982321977615356,
   "envelopeTolerance": 0.19588443756103516,
   "surfaceDistanceMax": 0.23964205384254456,
-  "surfaceDistanceP95": 0.042550579644739704,
-  "surfaceDistanceP99": 0.1578041733801368,
+  "surfaceDistanceP95": 0.040782315284013756,
+  "surfaceDistanceP99": 0.15664256274700233,
   "surfaceOutliersOverThreePercent": 137,
   "seatingDepthRaw": {
     "fore_upper_L": 0.011975751258432865,

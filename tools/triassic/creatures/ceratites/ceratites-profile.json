@@ -593,7 +593,7 @@
   ],
   "maximumEnvelopeDifference": 0.14462268352508545,
   "surfaceDistanceMax": 0.187527135014534,
-  "surfaceDistanceP95": 0.0346800273284316,
+  "surfaceDistanceP95": 0.03442454263567923,
   "seatingDepthRaw": {
     "shell": 0.0731,
     "head": 0.08636,
@@ -640,13 +640,14 @@
   },
   "mouth": {
     "authored": {
-      "facesRemoved": 143,
-      "rimVertices": 53
+      "facesRemoved": 0,
+      "rimVertices": 0
     },
     "twin": {
-      "facesRemoved": 48,
-      "rimVertices": 27
+      "facesRemoved": 0,
+      "rimVertices": 0
     },
+    "cut": false,
     "centre": [
       0.0,
       -0.11311,
