@@ -5,7 +5,7 @@ import { SCHEMES as CAMBRIAN_SCHEMES, CREATURE_SCHEMES as CAMBRIAN_DEFAULTS } fr
 import { SCHEMES as DEVONIAN_SCHEMES, CREATURE_SCHEMES as DEVONIAN_DEFAULTS } from '../content/devonian/palettes';
 import type { Scheme } from '../shared/palettes';
 import { assetPaths, createAssetPaths } from '../content/asset-paths';
-import { TRIASSIC } from '../content/triassic';
+import { TRIASSIC, TRIASSIC_SHIPPED } from '../content/triassic';
 import { TRIASSIC_CREATURES } from '../content/triassic/creatures';
 import { TRIASSIC_SPECIMENS } from '../content/triassic/specimens';
 import { SCHEMES as TRIASSIC_SCHEMES, CREATURE_SCHEMES as TRIASSIC_DEFAULTS } from '../content/triassic/palettes';
@@ -124,6 +124,8 @@ const TRIASSIC_REVIEW = new Map((reviewBodies as { id: string; model: string; pu
  * creatures*, with no edit here needed the day the models land.
  */
 const TRIASSIC_BORROWED = TRIASSIC_CREATURES.filter(c => TRIASSIC.assets.standIns?.[c.id]).length;
+/** Every Triassic-folder id whose own body has shipped, guests included. */
+const TRIASSIC_SHIPPED_IDS = new Set(TRIASSIC_SHIPPED);
 export const COLLECTIONS: readonly { id: CollectionId; name: string }[] = [
   { id: 'cambrian', name: 'Cambrian creatures' },
   { id: 'devonian', name: 'Devonian creatures' },
@@ -182,26 +184,46 @@ export const SPECIMENS: readonly ViewerSpecimen[] = [
     inReview: TRIASSIC_REVIEW.has(c.id),
     looping: ['Idle', 'Swim', 'Crawl', 'Guard', 'Eat', ...(c.abilityLoop ? ['Ability'] : [])],
   })),
-  // Subjects whose body is being built but whose era is undecided. They are deliberately absent
-  // from TRIASSIC_CREATURES — roster membership is what puts an animal in the sea — so they are
-  // listed here instead, and carry no borrowed body, no portrait and no roster length.
+  // Subjects whose era is undecided. They are deliberately absent from TRIASSIC_CREATURES —
+  // roster membership is what puts an animal in the sea — so they are listed here instead, and
+  // carry no borrowed body and no roster length.
+  //
+  // **Either state, not just the first.** This used to list only subjects with a published preview,
+  // which was right while both of them were raw generations and wrong the day either was built: a
+  // preview retires when its animal ships, so a shipped off-roster body would have vanished from
+  // the viewer altogether — the one place whose job is to show it.
   ...(expansion.subjects as { id: string; name: string; species: string; kind: string; kindNote: string; role: string; provenance: string; tagline: string; lengthMeters: number; adultLength: number }[])
-    .filter(s => TRIASSIC_PREVIEW.has(s.id))
-    .map(s => ({
-      key: `triassic:${s.id}`, id: s.id, collection: 'triassic' as const,
-      name: s.name, species: s.species, kind: s.kind, kindNote: s.kindNote,
-      role: `OFF-ROSTER · ${s.role}`, provenance: s.provenance,
-      description: `Not on any roster yet: ${s.tagline}`,
-      modelStatus: 'preview' as const,
-      modelNote: 'Raw generation only — no rig, clips or anchors yet, and which game this animal belongs to is undecided (docs/triassic/05-mesozoic-expansion.md).',
-      model: TRIASSIC_PREVIEW.get(s.id)!.model,
-      generated: TRIASSIC_PREVIEW.get(s.id)!.model,
-      previewYaw: TRIASSIC_PREVIEW.get(s.id)!.yaw,
-      previewLength: TRIASSIC_PREVIEW.get(s.id)!.lengthUnits ?? undefined,
-      generatedSha256: TRIASSIC_PREVIEW.get(s.id)!.sha256,
-      offRoster: true, displayLength: Math.min(s.adultLength, 8), lengthMeters: s.lengthMeters,
-      looping: [] as readonly string[],
-    })),
+    .filter(s => TRIASSIC_PREVIEW.has(s.id) || TRIASSIC_REVIEW.has(s.id) || TRIASSIC_SHIPPED_IDS.has(s.id))
+    .map(s => {
+      const built = TRIASSIC_REVIEW.get(s.id);
+      const shipped = TRIASSIC_SHIPPED_IDS.has(s.id);
+      return {
+        key: `triassic:${s.id}`, id: s.id, collection: 'triassic' as const,
+        name: s.name, species: s.species, kind: s.kind, kindNote: s.kindNote,
+        role: `OFF-ROSTER · ${s.role}`, provenance: s.provenance,
+        description: shipped || built
+          ? `On no roster, and a standing visitor in all three games: ${s.tagline}`
+          : `Not on any roster yet: ${s.tagline}`,
+        modelStatus: (shipped ? undefined : 'preview') as 'preview' | undefined,
+        modelNote: shipped ? undefined
+          : built
+            ? 'Built and awaiting review. Which game this animal belongs to is still undecided (docs/triassic/05-mesozoic-expansion.md); until then it reaches play only as a standing visitor.'
+            : 'Raw generation only — no rig, clips or anchors yet, and which game this animal belongs to is undecided (docs/triassic/05-mesozoic-expansion.md).',
+        model: built?.model ?? (shipped ? TRIASSIC_PATHS.model(s.id) : TRIASSIC_PREVIEW.get(s.id)!.model),
+        lod: built?.lod ?? (shipped ? TRIASSIC_PATHS.model(s.id, 1) : undefined),
+        puppet: built?.puppet ?? (shipped ? TRIASSIC_PATHS.model(s.id, 1) : undefined),
+        generated: TRIASSIC_PREVIEW.get(s.id)?.model,
+        previewYaw: TRIASSIC_PREVIEW.get(s.id)?.yaw,
+        previewLength: TRIASSIC_PREVIEW.get(s.id)?.lengthUnits ?? undefined,
+        generatedSha256: TRIASSIC_PREVIEW.get(s.id)?.sha256,
+        inReview: TRIASSIC_REVIEW.has(s.id),
+        offRoster: true, displayLength: Math.min(s.adultLength, 8), lengthMeters: s.lengthMeters,
+        // The loop set both guest builders declare. A preview has no clips at all and gets none.
+        looping: (shipped || built
+          ? ['Idle', 'Swim', 'Sprint', 'Guard', 'Eat', 'Grab', 'Breathe']
+          : []) as readonly string[],
+      };
+    }),
   // Scenery only. A creature row in TRIASSIC_SPECIMENS is a procedural twin, and a twin is not a
   // second animal: it is the same animal drawn the other way, so it belongs behind a switch on
   // the roster entry it belongs to (`TRIASSIC_PUPPETS` above) rather than beside it in the list,

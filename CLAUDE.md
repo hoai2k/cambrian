@@ -420,8 +420,8 @@ unless the user explicitly asks for a PR. Steps:
   at full gape says only that the mouth opened — Hupehsuchus' 50x is the lining working, not a torn
   head. Two builders split it locally before it was split centrally; the tool now reports both and
   ranks on skin, matching those builders' own figures exactly. True era-wide skin picture:
-  Shonisaurus 1.44x, Keichousaurus 2.34x, Cymbospondylus 2.48x, Rhaeticosaurus 2.81x, Macrocnemus
-  2.94x, Nothosaurus 2.98x, Birgeria 3.46x, Saurichthys 3.61x, Mixosaurus 3.62x, Coelophysis 4.46x,
+  Shonisaurus 1.44x, Keichousaurus 2.34x, Mosasaurus 2.54x, Cymbospondylus 2.48x, Rhaeticosaurus 2.81x, Macrocnemus
+  2.94x, Nothosaurus 2.98x, Birgeria 3.46x, Saurichthys 3.61x, Archelon 3.86x, Mixosaurus 3.62x, Coelophysis 4.46x,
   Henodus 4.81x, Cartorhynchus 5.17x, Hupehsuchus 5.79x, Hybodus 5.93x, Dinocephalosaurus 7.00x,
   Helicoprion 11.68x, Placodus 12.36x. Placodus and Helicoprion are the outstanding repair work:
   Coelophysis came down from 25.25x and Macrocnemus from 23.31x.
@@ -441,6 +441,49 @@ unless the user explicitly asks for a PR. Steps:
   a theropod's forelimb, whose segments are 0.087, 0.046 and 0.036, the same figure is a band wider
   than two whole segments — it hands every vertex all four joints at one weight and then has the
   relaxation trim a *different* four on its neighbours.
+- **Which end is the head is the frame's first decision and its sign is arbitrary.**
+  `T.measure_frame` takes the long axis from the first principal component and the *caller* supplies
+  the sign; eleven of the Triassic's twelve builders pass `head_is_positive_pca=True` and it is
+  right for all of them. It is wrong for Mosasaurus, and it is wrong **plausibly**, which is the
+  expensive part: both ends of that body are thin and deep (snout 0.021 half-width against 0.115
+  half-depth, caudal fluke 0.021 against 0.115), so every head measurement reads the tail and reports
+  it confidently — `T.mouth_cavity` returned zero vertices at every gap out to 0.16 ("this generation
+  models no mouth", which other bodies genuinely are), the fluke's fork measured as a 0.055-long
+  notch, and `painted_line` on inverted luminance fitted the tail's pale ventral keel with a
+  roughness of 0.022, *better* numbers than the read Rhaeticosaurus accepted. Four side renders of
+  "the head" are a convincing pair of gaping jaws. What settles it is the **flippers**: the pair
+  nearest the head is the larger pair on every tetrapod in these seas, so a builder asserts that
+  (`FORE_REACH > HIND_REACH * 1.25`) rather than assuming it, and a reversed frame then fails loudly.
+  Birgeria decides the same question off its caudal fin, for the same reason.
+- **`depth()` cannot seat anything beside a modelled mouth**, and it looks as if it can.
+  `T.depth_probe` returns distance to the nearest surface signed by that surface's normal, so next to
+  a modelled slit or cavity `find_nearest` answers about the *lumen's own wall* rather than the skull
+  — Archelon's hinge envelope read as outside the body at every size from 0.17 to 1.00 of its nominal
+  radius and inside below that, a discontinuity that is the slit being found and not the head being
+  small. Rhaeticosaurus' shrink-until-positive search is safe only because that generation paints its
+  mouth on a closed head. Where a mouth is modelled, record the probe and assert against the head's
+  own **measured section** instead, which uses no normals at all; Placodus and Henodus already record
+  rather than assert for the same reason, and the thing that actually proves a mouth is
+  `gape-solid.py`.
+- **Closing a generation that was authored gaping is priced in two numbers, and only one of them is
+  the answer.** Hybodus' `RESTING_GAPE` measures the rotation; the cost is then the mandible posed at
+  it, against the skull. Measured with a `find_nearest` normal-sign test beside a *modelled* oral
+  cavity that figure counts a mouth floor correctly inside the mouth as inside the skull, so it is an
+  upper bound — Mosasaurus reads 27 % of the mandible and 4.5 % of a body length that way. What the
+  question actually is, and what a reviewer should be shown, is how far the shut jaw pushes out
+  through the head's **own measured section**, which uses no normals: 13 % of the mandible and 0.72 %
+  of a body length. And the lining is where the real work is. At the snout the closing rotation is
+  *defined* as the one that carries the mandible's dorsal margin exactly onto the palate's ventral
+  one, so a lining floor riding the jaw at weight 1 arrives exactly where its own roof already is,
+  the sac is degenerate at the shut pose, and rounding decides which side of the roof each vertex
+  lands on — a pink shard through the top of the snout. Hold the floor at 0.93, build the tube a
+  fourteenth of the local gape *below* the mouth line so its floor starts inside the jaw's flesh and
+  its roof finishes inside the skull's, and size it on the **measured gape** rather than on
+  `cavity_profile` (a cast over the front quarter of a body whose forelimbs sit behind the skull
+  mostly finds the gap between a paddle and a flank: x ±0.24 where the head is 0.08 across).
+  And read the gape as the **largest** empty interval on a vertical line, not the first: six surface
+  crossings turn up wherever a modelled tongue rises into the lumen, and the first interval there is
+  the sliver between the mandible and the tongue.
 - **A weighting scheme is shaped by the body it was written for.** Nothosaurus' is the era's
   cleanest at 2.98x and the obvious one to copy, and copied unchanged onto Henodus it tore to
   **64.9x** — its "outboard of |y| 0.09 means on the limb" test assumes a narrow trunk, and Henodus'
@@ -670,6 +713,24 @@ unless the user explicitly asks for a PR. Steps:
   markup, because a results screen only exists after a match ends and a headless browser gets too
   few frames under the software renderer to finish one; its last check walks the promise end to
   end, from the record the screen draws to the visitor list the other games build out of it.
+  There is a **second kind**, and the first two arrived with the Cretaceous bodies: a **standing
+  guest**. Archelon and Mosasaurus belong to no game's roster at all, so `earnedVisitors` cannot
+  reach them — there is nothing to take them to the top of — and `standingVisitors` admits them
+  **unconditionally**, gated only on the body actually being shipped (an id with no entry in that
+  era's `asset-sizes.json` never becomes pickable, because a tile with nothing to draw is worse than
+  no tile). Everything else about them is a visitor: `admitVisitors`, never in `CREATURES` or
+  `PLAYABLE`, full grown at the ladder's top scale. `Visitor.era` stays the era whose **folder** holds
+  their files, because that is what `'<era>/<id>'` resolves against; where the animal is actually
+  *from* is `Visitor.origin`, a display string ("Late Cretaceous"), and anything that says where a
+  visitor is from reads that rather than looking the era's name up. Nothing is rippled through
+  `ERA_IDS`, `ROSTERS`, `SETTINGS_KEY` or `APEX_SCALE` — there is no fourth era id in the build — and
+  the two kinds are joined only in `visitorsHere`, so a test that wants to know nothing has been
+  earned does not have to subtract the guests first. The pick screen's Visitors label had to change
+  with them: "animals you have taken to the top in the other games" is not true of an animal nobody
+  earned. Their gameplay definitions are `src/content/triassic/guests.ts` and their ids are a union
+  of their own (`TriassicGuestId`) joined to `CreatureId` beside `TriassicCreatureId`, because
+  `BORROWED` and the palette tables are *total* records over that union and would otherwise start
+  demanding entries for a sea these two are not in.
 - Menu cursors move by where the buttons are, not by list order: `src/app/spatial-nav.ts` resolves a
   direction against the buttons' own rectangles, so the pause and results rows answer left and
   right, a column answers up and down, and the unused axis falls back to list order so no press is

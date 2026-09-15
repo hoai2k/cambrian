@@ -19,7 +19,9 @@ selectEra(era);
 let failed = 0;
 const check = (n: string, ok: boolean, d = '') => { console.log(`${ok ? 'PASS' : 'FAIL'}  ${n.padEnd(62)} ${d}`); if (!ok) failed++; };
 
-const { APEX_SCALE, ERA_IDS, earnedVisitors, visitorsFrom } = await import('../src/content/visitors');
+const { APEX_SCALE, ERA_IDS, earnedVisitors, standingVisitors, visitorsHere, visitorsFrom } = await import('../src/content/visitors');
+const { TRIASSIC_GUESTS } = await import('../src/content/triassic/guests');
+const TRIASSIC_BYTES = (await import('../src/content/triassic/asset-sizes.json')).default as Record<string, number>;
 type EraId = import('../src/content/visitors').EraId;
 const { registerVisitorAssets, assetPaths, createAssetPaths } = await import('../src/content/asset-paths');
 const { admitVisitors, creature, isVisitor, PLAYABLE_IDS, CREATURE_IDS } = await import('../src/sim/creatures');
@@ -81,6 +83,70 @@ const other: EraId[] = ERA_IDS.filter((e) => e !== playing);
   // A corrupt or absent record is an empty list, never a throw.
   store.set(`${other[0] === 'cambrian' ? 'cambrian' : other[0]}-settings-codex`, '{{{');
   check('a corrupt record is simply no visitors from there', Array.isArray(earnedVisitors(playing, read)));
+}
+
+// ---- the standing guests: admitted to every game, earned in none ----
+{
+  // Archelon and Mosasaurus are Late Cretaceous and on no roster at all (see
+  // src/content/triassic/expansion.json). There is no game to take them to the top of, so they are
+  // admitted unconditionally; the one thing they are gated on is the body existing.
+  const standing = standingVisitors(playing);
+  const shippedGuests = TRIASSIC_GUESTS.filter((g) => TRIASSIC_BYTES[g.id]);
+  check('every shipped guest is a standing visitor here', standing.length === shippedGuests.length,
+    `${standing.map((v) => v.id).join(', ') || 'none'} of ${TRIASSIC_GUESTS.length} guests`);
+  check('...and none of them is on this game\'s roster',
+    standing.every((v) => !PLAYABLE_IDS.includes(v.id as never) && !CREATURE_IDS.includes(v.id as never)));
+  // The gate, stated the other way round: a guest with no shipped model must not appear.
+  check('...a guest with no shipped body is not offered at all',
+    TRIASSIC_GUESTS.every((g) => !!TRIASSIC_BYTES[g.id] === standing.some((v) => v.id === g.id)),
+    TRIASSIC_GUESTS.map((g) => `${g.id}:${TRIASSIC_BYTES[g.id] ? 'shipped' : 'not built'}`).join(', '));
+  // `era` is where the files are; `origin` is where the animal is from. Saying 'Triassic' on a
+  // Cretaceous animal's crew card is the lie this split exists to prevent.
+  check('...filed under the era whose folder holds its files', standing.every((v) => v.era === 'triassic'));
+  check('...but saying where it is really from', standing.every((v) => v.origin === 'Late Cretaceous'),
+    standing.map((v) => `${v.id}: ${v.origin}`).join(', '));
+  check('...and marked as standing rather than earned', standing.every((v) => v.standing === true));
+  for (const v of standing) {
+    registerVisitorAssets([{ id: v.id, era: v.era }]);
+    check(`...${v.id}'s model resolves into the Triassic's folder`,
+      assetPaths.model(v.id) === `assets/triassic/creatures/${v.id}.glb`, assetPaths.model(v.id));
+  }
+  // The combined list is what the shell reads, and a guest is not a second class of thing in it.
+  const store = new Map<string, string>();
+  const both = visitorsHere(playing, (k) => store.get(k) ?? null);
+  check('a game with nothing earned still has its guests', both.length === standing.length);
+  check('...biggest first, guests sorted in with the rest',
+    both.every((v, i) => i === 0 || both[i - 1].length >= v.length), both.map((v) => v.length.toFixed(1)).join(' >= '));
+  const other0 = other[0];
+  const key = other0 === 'cambrian' ? 'cambrian-settings' : other0 === 'devonian' ? 'devonian-settings' : 'triassic-settings';
+  store.set(`${key}-codex`, JSON.stringify({ apex: [visitorsFrom(other0)[0].id] }));
+  const mixed = visitorsHere(playing, (k) => store.get(k) ?? null);
+  check('...and an earned one joins them rather than replacing them', mixed.length === standing.length + 1,
+    mixed.map((v) => `${v.id}(${v.standing ? 'standing' : 'earned'})`).join(', '));
+}
+
+// ---- a standing guest plays ----
+{
+  const standing = standingVisitors(playing);
+  if (standing.length) {
+    const big = standing.reduce((a, b) => (b.length > a.length ? b : a));
+    admitVisitors(standing.map((v) => v.def));
+    registerVisitorAssets(standing.map((v) => ({ id: v.id, era: v.era })));
+    check('a guest resolves as a creature', !!creature(big.id as never), `${big.id} → ${creature(big.id as never)?.name}`);
+    check('...and says it is a visitor', isVisitor(big.id));
+    const g = new Game('reef', [{ creature: big.id as never, device: 'keyboard', ready: true, visitorScale: big.scale }], 11);
+    const p = g.players[0];
+    check('...and can start a match', !!p && isAlive(p), `${big.id} at ${lengthOf(p).toFixed(1)} units`);
+    check('...full grown, in water deep enough to hold it',
+      SURFACE_Y - groundHeight(g.world, p.pos.x, p.pos.z, []) > lengthOf(p),
+      `${(SURFACE_Y - groundHeight(g.world, p.pos.x, p.pos.z, [])).toFixed(1)} units of water`);
+    check('...and not in an egg', !p.hatching);
+    const m = new Map([[0, { ...emptyInput(), worldMove: { x: 0, y: 0, z: 1 } }]]);
+    for (let i = 0; i < 60 * 3; i++) { g.step(1 / 60, m); g.events.length = 0; }
+    check('...and swims', isAlive(p) && Number.isFinite(p.pos.x) && Number.isFinite(p.pos.y), `y ${p.pos.y.toFixed(1)}`);
+  } else {
+    check('no guest body has shipped yet, so there is nothing to play', true);
+  }
 }
 
 // ---- a visitor is not part of this game's roster ----

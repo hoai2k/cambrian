@@ -1,5 +1,5 @@
 {
-  "note": "Subjects whose bodies are being built but whose era is not settled. docs/triassic/05-mesozoic-expansion.md asks whether the Mesozoic beyond the Triassic becomes a widening of this game or a fourth one, and names Archelon and the mosasaurs as the first asks either way. Until that is decided these animals are deliberately NOT in TRIASSIC_CREATURES: roster membership is what puts an animal in the sea, in the population tables and on the pick screen, so adding them there would answer the open question by accident. They appear in the specimen viewer, which is where a body under construction belongs, and nowhere else. adultLength is the Triassic's own rule, 4.0*m^0.55, so a body lands on the ladder the era already draws if it ends up here.",
+  "note": "Subjects whose bodies are being built but whose era is not settled. docs/triassic/05-mesozoic-expansion.md asks whether the Mesozoic beyond the Triassic becomes a widening of this game or a fourth one, and names Archelon and the mosasaurs as the first asks either way. Until that is decided these animals are deliberately NOT in TRIASSIC_CREATURES: roster membership is what puts an animal in the sea, in the population tables and on the pick screen, so adding them there would answer the open question by accident. They appear in the specimen viewer, which is where a body under construction belongs, and nowhere else. adultLength is the Triassic's own rule, 4.0*m^0.55, so a body lands on the ladder the era already draws if it ends up here. Each role and tagline here is what the pick screen and the specimen viewer show, and src/content/triassic/guests.ts reads this file for the descriptive half of each animal's CreatureDef rather than retyping it -- so this register reaches three places now, not two. adultLength is checked against the rule by tools/triassic/stats.mjs, which is what caught Mosasaurus at 16.42 where 4.0*13^0.55 rounds to 16.40.",
   "subjects": [
     {
       "id": "archelon",
@@ -7,8 +7,8 @@
       "species": "Archelon ischyros",
       "kind": "Sea turtle",
       "kindNote": "Protostegid, the largest turtle known; a strut framework of ribs under a leathery back rather than a solid shell.",
-      "role": "OPEN-WATER GRAZER",
-      "provenance": "Late Cretaceous · Pierre Shale, Western Interior Seaway",
+      "role": "Open-water grazer",
+      "provenance": "Late Cretaceous \u00b7 Pierre Shale, Western Interior Seaway",
       "tagline": "Four metres of turtle with a beak for ammonites and no shell worth the name.",
       "lengthMeters": 4.6,
       "adultLength": 9.26
@@ -19,11 +19,11 @@
       "species": "Mosasaurus hoffmannii",
       "kind": "Mosasaur",
       "kindNote": "A marine lizard, not a reptile of the Triassic lineages; the last of the Cretaceous sea's top predators.",
-      "role": "APEX PREDATOR",
-      "provenance": "Late Cretaceous · Maastricht",
+      "role": "Apex predator",
+      "provenance": "Late Cretaceous \u00b7 Maastricht",
       "tagline": "The sea taken over from below, by a lizard with a second set of teeth in its palate.",
       "lengthMeters": 13.0,
-      "adultLength": 16.42
+      "adultLength": 16.4
     }
   ]
 }
