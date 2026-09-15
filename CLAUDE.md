@@ -358,6 +358,18 @@ unless the user explicitly asks for a PR. Steps:
   `tools/triassic/idle-bones.mjs --all` now runs inside `npm run triassic` over every delivered
   body. The rig's `root` is excluded: it carries the body rather than skin and the clip contract
   forbids it moving, so it owns nothing by design on every body in every era.
+- **The oral lining is not skin, and ranking it as skin hides the number that matters.**
+  `skin-tears.mjs` names the *bone* an edge belongs to, and the lining is weighted to `skull` and
+  `jaw` exactly like the face around it, so the two were indistinguishable: Cymbospondylus read
+  9.98x on `skull` while its skin was 2.48x. The lining is one skinned sac whose roof rides the
+  skull and floor rides the jaw, so its rest length at a shut mouth is nearly nothing and its ratio
+  at full gape says only that the mouth opened — Hupehsuchus' 50x is the lining working, not a torn
+  head. Two builders split it locally before it was split centrally; the tool now reports both and
+  ranks on skin, matching those builders' own figures exactly. True era-wide skin picture:
+  Shonisaurus 1.44x, Keichousaurus 2.34x, Cymbospondylus 2.48x, Nothosaurus 2.98x, Saurichthys
+  3.61x, Mixosaurus 3.62x, Henodus 4.81x, Cartorhynchus 5.17x, Hupehsuchus 5.79x, Hybodus 5.93x,
+  Dinocephalosaurus 7.00x, Helicoprion 11.68x, Placodus 12.36x, Macrocnemus 23.31x, Coelophysis
+  25.25x. The last two are the outstanding repair work.
 - **A weighting scheme is shaped by the body it was written for.** Nothosaurus' is the era's
   cleanest at 2.98x and the obvious one to copy, and copied unchanged onto Henodus it tore to
   **64.9x** — its "outboard of |y| 0.09 means on the limb" test assumes a narrow trunk, and Henodus'

@@ -1,0 +1,64 @@
+{
+  "id": "cartorhynchus",
+  "name": "Cartorhynchus",
+  "species": "Cartorhynchus lenticarpus",
+  "provenance": "Early Triassic \u00b7 Nanlinghu Formation, Majiashan, Chaohu, Anhui",
+  "description": "The most basal ichthyosauriform: a very short blunt snout, thick ballast ribs, a short trunk and enormous flexible-wristed flippers. Authored Tripo body and measured procedural volume twin share one armature, one set of inverse binds, one set of sockets and one set of actions.",
+  "modelLength": 3.0,
+  "lengthMeters": 0.4,
+  "locomotion": "Swim",
+  "clips": [
+    "Idle",
+    "Swim",
+    "Sprint",
+    "TurnLeft",
+    "TurnRight",
+    "Dive",
+    "Rise",
+    "Attack",
+    "Bite",
+    "Heavy",
+    "Hit",
+    "Death",
+    "Guard",
+    "Parry",
+    "Dodge",
+    "Eat",
+    "Stagger",
+    "Ability",
+    "Grab",
+    "Breath",
+    "Growth",
+    "Haul",
+    "Breathe"
+  ],
+  "looping": [
+    "Idle",
+    "Swim",
+    "Sprint",
+    "Guard",
+    "Eat",
+    "Grab",
+    "Breathe",
+    "Haul"
+  ],
+  "anchors": [
+    "anchor_mouth",
+    "anchor_mouth_inside",
+    "anchor_attack_primary"
+  ],
+  "puppet": "cartorhynchus.puppet.glb",
+  "sources": [
+    "docs/triassic/canonical/cartorhynchus.png",
+    "tools/triassic/creatures/cartorhynchus/tripo-raw/cartorhynchus.raw.glb"
+  ],
+  "notes": [
+    "The paddles are the engine. This is the one animal of the four whose forelimbs take a real stroke rather than steering -- a long power phase back and down, a feathered recovery, the hind pair a third of a beat behind -- because the research reads it as anguilliform at slow speed and paddle-assisted, on the shortest trunk in the set.",
+    "The wrist leads the elbow through the stroke, which is what *lenticarpus* means: a flipper-wrist so poorly ossified that Motani et al. read it as bending like a turtle's.",
+    "Haul is the flipper-walk: both pairs plant, the body is levered forward over them and the belly drags. It is the traversal the roster gives this animal and nothing else.",
+    "Ability is a suction snap, not a bite: the gape opens faster than it shuts and the head is drawn back as it does, because prey comes to the animal.",
+    "The mouth is the generation's own shallow groove, measured geometrically -- 26 vertices against Placodus' 193, which is what a very short blunt snout gives. The teeth are documented as molariform and invisible in side view, the generation carries none, and none was authored.",
+    "The twin resurfaces a voxel occupancy field of the authored body, relaxes it and reduces the new topology. It reuses no source vertex or face.",
+    "Living colours, soft tissues and movements are artistic reconstruction. World travel remains engine-owned."
+  ]
+}

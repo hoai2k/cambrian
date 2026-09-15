@@ -1,0 +1,34 @@
+{
+  "cymbospondylus": [
+    {
+      "name": "anchor_mouth",
+      "bone": "jaw",
+      "point": [
+        -0.008514372631907463,
+        -2.6283743381500244,
+        0.18332773447036743
+      ],
+      "role": "mouth"
+    },
+    {
+      "name": "anchor_mouth_inside",
+      "bone": "skull",
+      "point": [
+        0.008992224931716919,
+        -2.163374423980713,
+        0.19710731506347656
+      ],
+      "role": "swallow"
+    },
+    {
+      "name": "anchor_attack_primary",
+      "bone": "skull",
+      "point": [
+        -0.008514372631907463,
+        -2.664374351501465,
+        0.24332773685455322
+      ],
+      "role": "attack"
+    }
+  ]
+}
