@@ -18,24 +18,6 @@
     "lengthUnits": 6.62
   },
   {
-    "id": "coelophysis",
-    "model": "assets/triassic/creatures/coelophysis.preview.glb",
-    "bytes": 1365460,
-    "sha256": "cd945622320116fd716362bd02c2b1d66fecefc64d822c2328a86d9e68d17557",
-    "yaw": 0,
-    "scale": 7.32,
-    "lengthUnits": 7.32
-  },
-  {
-    "id": "macrocnemus",
-    "model": "assets/triassic/creatures/macrocnemus.preview.glb",
-    "bytes": 1219576,
-    "sha256": "b0be4e86e871266abd9e69a72c2b746cc18b54707e09e74dca09f6d74300cc66",
-    "yaw": 0,
-    "scale": 3.77,
-    "lengthUnits": 3.77
-  },
-  {
     "id": "mosasaurus",
     "model": "assets/triassic/creatures/mosasaurus.preview.glb",
     "bytes": 1058724,
@@ -43,14 +25,5 @@
     "yaw": 270,
     "scale": 16.42,
     "lengthUnits": 16.42
-  },
-  {
-    "id": "saurichthys",
-    "model": "assets/triassic/creatures/saurichthys.preview.glb",
-    "bytes": 1253544,
-    "sha256": "fb68c6c247d9a60f8ed4ac2580de2e3124dc70f54454c4a2d5eb5e894aae3478",
-    "yaw": 180,
-    "scale": 4,
-    "lengthUnits": 4
   }
 ]

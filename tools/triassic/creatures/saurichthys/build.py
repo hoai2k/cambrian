@@ -2184,6 +2184,13 @@ validation = {
                 'propulsive stroke, but they sweep with the beat rather than hanging.'},
     'normalizedWeights': True, 'rootStable': True, 'noScaleChannels': True,
 }
+# The gape proof is a render, so it cannot run inside the builder; its result is kept beside this
+# file as `gape-solid.json` and folded in here, so a rebuild no longer silently drops it. It carries
+# the command that produced it, and it is a measurement of the *last* build rather than of this one
+# -- which is only sound because the two are the same body, and the audit says so by value.
+_gape = os.path.join(HERE, 'gape-solid.json')
+if os.path.exists(_gape):
+    validation['gapeSolid'] = json.load(open(_gape))
 open(os.path.join(HERE, 'validation.json'), 'w').write(json.dumps(validation, indent=2) + '\n')
 bpy.ops.wm.save_as_mainfile(filepath=os.path.join(LOCAL, ID + '-paired.blend'))
 print('SAURICHTHYS_CURVATURE ' + json.dumps(REST_POSE_CURVATURE))
