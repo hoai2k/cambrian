@@ -1,0 +1,58 @@
+{
+  "macrocnemus.card.png": {
+    "bytes": 204933,
+    "sha256": "9cd97aa4224b7cbb24f6b54c001811b7c7b63b71981c79ffe0ffcbcba356b31e",
+    "dimensions": [
+      800,
+      600
+    ]
+  },
+  "macrocnemus.glb": {
+    "bytes": 1943708,
+    "sha256": "63e705fcd747604443cd1fc91176c1ca54c15fb0dad7af0a2b2ac0e75873c7ca"
+  },
+  "macrocnemus.json": {
+    "bytes": 3026,
+    "sha256": "32a2e41cd714440930af36ee7adc4d3be4f19ccc36b3198fe1acb6d0a1a9faaa"
+  },
+  "macrocnemus.lod1.glb": {
+    "bytes": 1472732,
+    "sha256": "1832a88de6a037f38297b305c0b037fb263639becc1a2d0065504228ce74b680"
+  },
+  "macrocnemus.png": {
+    "bytes": 434291,
+    "sha256": "95405b42e04aa802243a01336753a4346bb7b265dbfffe9649e3a8899416f2cf",
+    "dimensions": [
+      1200,
+      900
+    ]
+  },
+  "macrocnemus.puppet.glb": {
+    "bytes": 1472732,
+    "sha256": "1832a88de6a037f38297b305c0b037fb263639becc1a2d0065504228ce74b680"
+  },
+  "macrocnemus.puppet.png": {
+    "bytes": 407430,
+    "sha256": "e61e817ad826ad53a6e60a8068033115c22b80c4ebcf88d515230d2c050d4b88",
+    "dimensions": [
+      1200,
+      900
+    ]
+  },
+  "macrocnemus.select.png": {
+    "bytes": 741079,
+    "sha256": "1779334d52887b283f99f275f17c1e450902a5fc86911b9b2fa2a3f4f4f814e7",
+    "dimensions": [
+      1600,
+      1200
+    ]
+  },
+  "macrocnemus.thumb.png": {
+    "bytes": 26532,
+    "sha256": "aa6e82b680a4f30bb85c7c45377a8707c50297a9ae4228b7074e5d630145319a",
+    "dimensions": [
+      256,
+      192
+    ]
+  }
+}

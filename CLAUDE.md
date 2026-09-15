@@ -622,6 +622,26 @@ unless the user explicitly asks for a PR. Steps:
   dash decides between the two: against a holder that is pulling it tears the grip open, against a
   slack one it shoves the holder instead, scaled by an *uncapped* mass share so hauling something
   six times your length is very nearly futile. `npm run grab` covers all of it.
+- A grip is drawn on the host's *geometry*, not on the capsule the simulation holds it against.
+  `rideHold` puts the grip `bodyRadius` out from the host's axis — about a fifth of its length —
+  which is roughly the skin on a body as round as it is long and open water beside a long flat one:
+  Anomalocaris is 0.11 of its length thick against a capsule of 0.22, so a rider sat a fifth of a
+  body length off the animal, and because the grip then follows a bone that empty-water point was
+  carried around faithfully for the whole ride. `CreatureAnchors.surfaceToward` closes it with one
+  ray, cast once when the grip lands, in from outside along the line the simulation chose — inward
+  because the mesh is front-side-only and a ray starting inside passes out through faces it cannot
+  see. It corrects in both directions: a flank wider than the capsule pushes the grip out. The
+  render-side correction bound has to pay for that, so it is the rider's own half-length *plus*
+  `bodyRadius(host)` — at half the rider's length a hatchling's correction was clipped to a third
+  of the gap and it stayed in the water however well the grip was placed. `src/sim` keeps its
+  capsule and stays deterministic; `node --experimental-transform-types tools/anchors-test.mjs`
+  measures the gap against the real meshes.
+- Riding frames the *host*. A camera held on a hatchling clinging to a giant sits a body length off
+  a very small animal with the giant filling the screen as a wall, and it is also pinned to the one
+  body carrying the per-frame correction that seats the grip on moving geometry, so it inherits
+  that animation's jitter. `rideBlend` in `updateCamera` eases the look point and the magnification
+  onto the host while the ride lasts and back again when it ends, because letting go should not be
+  a cut.
 - A grip is drawn on the host's *animation*, not on its rigid frame. `rideHold` is a point offset
   from the host's centre — where a rigid capsule's surface would be — and a swimming animal's flank
   sweeps and its tail beats right past it, so a rider pinned there holds still while the thing it is

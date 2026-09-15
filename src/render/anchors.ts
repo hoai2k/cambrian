@@ -67,6 +67,43 @@ export class CreatureAnchors {
     }
     return best;
   }
+  /**
+   * A point on the animal's *drawn surface*, on the way out from `inside` towards `towards`.
+   *
+   * The simulation has no idea what shape an animal is. It holds a grip at an offset from the
+   * host's centre on a capsule of `bodyRadius` — about a fifth of the body's length — and for a
+   * body that is anything like as round as it is long that is close enough to the skin. An
+   * Anomalocaris is not: it is long, flat and narrow, so a fifth of its length out from its axis is
+   * open water beside it, and a rider pinned there is visibly holding nothing. Worse, it *stays*
+   * there: the bone the grip follows carries that empty-water point around faithfully for the whole
+   * ride.
+   *
+   * So the renderer asks the geometry. One ray, cast once when the grip lands, from outside the
+   * body inwards along the line the simulation chose: the first surface it meets is where the grip
+   * actually is. Inward rather than outward because the mesh is drawn front-side-only, so a ray
+   * starting inside the animal passes out through faces it cannot see. Presentation only — the
+   * simulation keeps its capsule and stays deterministic.
+   */
+  surfaceToward(inside: THREE.Vector3, towards: THREE.Vector3, outset: number, out: THREE.Vector3): boolean {
+    this.dir.copy(towards).sub(inside);
+    const reach = this.dir.length();
+    if (reach < 1e-6) return false;
+    this.dir.divideScalar(reach);
+    // Start clear of the body and come back in, so the first hit is the near surface.
+    this.rayFrom.copy(inside).addScaledVector(this.dir, reach + outset);
+    this.raycaster.set(this.rayFrom, this.dir.negate());
+    this.raycaster.far = reach + outset * 2;
+    this.hits.length = 0;
+    this.raycaster.intersectObject(this.model, true, this.hits);
+    if (!this.hits.length) return false;
+    out.copy(this.hits[0].point);
+    this.hits.length = 0;
+    return true;
+  }
+  private raycaster = new THREE.Raycaster();
+  private hits: THREE.Intersection[] = [];
+  private dir = new THREE.Vector3(); private rayFrom = new THREE.Vector3();
+
   /** A grasp chain exists: this rig can pick food up and carry it to the mouth. */
   get canGrasp() { return !!this.effector && this.chain.length > 0; }
   /** At least one attack socket can be steered toward a target. */

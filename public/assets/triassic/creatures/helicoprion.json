@@ -51,10 +51,10 @@
   "notes": [
     "An obligate swimmer: the performance is body-caudal undulation with the paired fins as control surfaces. Nothing rows, walks, hauls out or surfaces.",
     "The twin resurfaces a 0.0052-unit voxel occupancy field of the authored body, relaxes it and reduces the new topology. It reuses no source vertex or face.",
-    "The lower jaw is a skinned hinge rather than a cut shell: this generation already carries a modelled oral cavity, and the whorl sits at occlusion under the palate, so the mouth only ever opens.",
+    "The lower jaw is a skinned hinge rather than a cut shell: this generation already carries a modelled oral cavity, and the whorl touches the palate, so no separating surface exists that does not slice one of them.",
     "Original albedo retained with white COLOR_0, normal relief 0.15, explicitly nonmetallic skin at roughness 0.62. Twin pigment samples triangle-local UVs to avoid seam bleed.",
     "Breath is gill ventilation held in place, not a surface breath: this animal has gills and never goes up.",
-    "The tooth whorl is generated here rather than inherited: one logarithmic spiral of 149 crowns at a constant 16.36 degrees of spacing, growing monotonically outward on a filled plate, seated in the space the generation put its own whorl in. 99.0 % of it is inside the lower jaw with only its front arc exposed, as the canonical pose draws it. The generated whorl it replaces was a rosette of 382 vertices whose crown radii rose in ten steps of twenty; the dentition the animal never had -- upper jaw, and the mandible outside the symphysis -- is smoothed back into the lining. See the README.",
+    "The whorl is the generated surface, measured and kept rather than re-modelled: 97.9 % of it is seated inside the lower jaw with only its front arc exposed, as the canonical pose draws it. Its own narrow gaps are shut here by moving its own walls together; no coil is authored. Measured on the surface rather than on its 382 vertices it is already a solid spiral saw, and what reads as holes in a render is the generated albedo. The generation also gave the animal upper-jaw teeth it did not have. See the README.",
     "Living colours, soft tissue and movement are artistic reconstruction. Whorl-saw grip, travel and capture rules remain engine-owned."
   ]
 }
