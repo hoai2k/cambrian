@@ -468,11 +468,16 @@ unless the user explicitly asks for a PR. Steps:
 - **The oral lining is not skin, and ranking it as skin hides the number that matters.**
   `skin-tears.mjs` names the *bone* an edge belongs to, and the lining is weighted to `skull` and
   `jaw` exactly like the face around it, so the two were indistinguishable: Cymbospondylus read
-  9.98x on `skull` while its skin was 2.48x. The lining is one skinned sac whose roof rides the
-  skull and floor rides the jaw, so its rest length at a shut mouth is nearly nothing and its ratio
-  at full gape says only that the mouth opened — Hupehsuchus' 50x is the lining working, not a torn
-  head. Two builders split it locally before it was split centrally; the tool now reports both and
-  ranks on skin, matching those builders' own figures exactly. True era-wide skin picture:
+  9.98x on `skull` while its skin was 2.48x. The lining *was* one skinned sac whose roof rode the
+  skull and floor rode the jaw, so its rest length at a shut mouth was nearly nothing and its ratio
+  at full gape said only that the mouth opened — Hupehsuchus' 50x was the lining working, not a torn
+  head. Two builders split it locally before it was split centrally; the tool reports both and
+  ranks on skin, matching those builders' own figures exactly. **The split has since stopped being
+  load-bearing and is kept as a guard**: a palate and a floor are rigid, one bone each, so a lining
+  now stretches by nothing at all and the two numbers coincide — Cymbospondylus reports 2.48x skin
+  and 2.48x including the lining. A lining ratio above the skin's is now a defect rather than a
+  measurement of the gape. The skin figures themselves are untouched by the mouth work, because a
+  mouth is not skin: True era-wide skin picture:
   Shonisaurus 1.44x, Keichousaurus 2.34x, Mosasaurus 2.54x, Cymbospondylus 2.48x, Rhaeticosaurus 2.81x, Macrocnemus
   2.94x, Nothosaurus 2.98x, Birgeria 3.46x, Saurichthys 3.61x, Archelon 3.86x, Mixosaurus 3.62x, Coelophysis 4.46x,
   Henodus 4.81x, Cartorhynchus 5.17x, Hupehsuchus 5.79x, Hybodus 5.93x, Dinocephalosaurus 7.00x,

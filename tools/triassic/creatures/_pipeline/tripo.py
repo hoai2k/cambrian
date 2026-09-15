@@ -652,6 +652,11 @@ def oral_shells(seam, section, u_back, u_front, rings=24, ring=14, centre=None, 
     it is still what decides that the lining is never narrower than the mouth. `fit`, where a builder
     supplies it, still corrects each vertex on its own.
 
+    `room` is how much head there is at the mouth line, per station, and every shipped builder
+    supplies one. `swell` is the fallback for a builder that does not: a guess at the head, opening
+    the rear rings past the measured lumen. Where the room is known the guess is worse than the
+    measurement and is not added to it.
+
     Returns `(raw, faces, n_palate)`: raw points in the builder's own coordinates, quad faces over
     the two shells, and how many of the points are the palate's.
     """
@@ -716,10 +721,17 @@ def oral_shells(seam, section, u_back, u_front, rings=24, ring=14, centre=None, 
                 # throat is a wall across the head rather than a tube down the middle of it; it is
                 # the flange-behind-the-hole the cephalopod linings are built with, for the same
                 # reason. Macrocnemus reached the same answer by hand before this was shared.
-                s = 1. + (swell - 1.) * back
-                up = max(hu * s, ru)
-                dn = max(hd * (overlap + (1. - overlap) * back) * s, rd * back)
-                wid = max(w * s, rw)
+                # `swell` is what opens the rear rings **when the room has not been measured**: it
+                # is a guess at the head, and where the head is known it is worse than the
+                # measurement and must not be added to it. Applied on top of a measured room it put
+                # a pink nub out through the top of Cymbospondylus' snout, because the lumen's own
+                # floored half-depth times 1.6 is more head than there is.
+                if room is not None:
+                    up, dn, wid = max(hu, ru), max(hd * (overlap + (1. - overlap) * back),
+                                                   rd * back), max(w, rw)
+                else:
+                    s = 1. + (swell - 1.) * back
+                    up, dn, wid = hu * s, hd * (overlap + (1. - overlap) * back) * s, w * s
             for j in range(ring):
                 th = j * TAU / ring
                 # **The half that faces the mouth is a squircle, not an ellipse.** An ellipse
