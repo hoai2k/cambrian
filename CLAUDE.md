@@ -347,6 +347,41 @@ unless the user explicitly asks for a PR. Steps:
   interpenetrate when they are first brought together, the oral cavity Tripo modelled has to fold
   rather than be built, and closing is a large jaw rotation, so the pose the animal spends almost
   all its time in becomes the most deformed one.
+- **A beak inside an arm crown is a mouth, and almost nothing about a jawed head applies to it.**
+  Neither cephalopod's generation models a mouth at all, and Placodus' method — cast head vertex
+  normals back into the mesh and fit the hits — returns hundreds of them spread over the whole crown,
+  because what a normal meets across a gap there is the *neighbouring arm*. That is a third way that
+  method can lie, after Keichousaurus' countershading. So the peristome is authored on the crown's
+  own axis, which is the mean direction of the arms rather than the surface normal at the dome (one
+  facet's shape, and on Phragmoteuthis 0.34 forward and 0.94 ventral — a lining built back along it
+  left the head after 0.022). `T.crown_lining` then sews the sac to the skin's measured cut rim: its
+  first rings take the skin's own weights, because round a peristome the skin belongs to the lips,
+  the head and the arms standing over it and not to the jaw, and its first two rings are a flange
+  wider than the hole and set behind it, because a lining that merely meets the rim is edge-on to
+  anything looking into the mouth and those are the quads a cull takes away. `T.crown_beak` is the
+  two mandibles. **And `gape-solid.py` can neither aim nor judge on this shape**: it frames off the
+  `jaw` bone's side, which on a crown is outside a thicket of arms, and its verdict is opened
+  backdrop the body *encloses* — a crown encloses background between every pair of arms, so a sliver
+  at an arm's silhouette counts as if it were the mouth. `tools/triassic/gape-crown.py` keeps the
+  method and changes the aim and the verdict: down the crown axis, with a third render painting the
+  oral materials an emissive marker so "where the mouth is drawn" is a mask rather than a guess.
+  Ceratites ran 168 px through the body, 27 after the sew, 7 after the flange, against 12.
+- **A cephalopod's mantle cannot squeeze with a scale channel, and rotation is not a substitute.**
+  The packaging contract forbids scale outright, and a bone on the body axis rotating about that axis
+  carries a flank point round a circle of the same radius, which is not a contraction. Phragmoteuthis'
+  jet is two bones seated inside the flanks with **translation** channels, and its audit measures the
+  animal's own width rather than whether they were keyed: `Sprint` takes 0.207 off a 0.772 mantle,
+  `Ability` 0.331, and the clips that are not about the jet exactly 0.
+- **An appendage count is measured, and the highest settled count is the answer.** An arm crown fuses
+  near the base, so how many arms a cut sphere finds depends on its radius, and that dependence is
+  the measurement rather than a nuisance. Ceratites runs 6, 9, 11, 11, 12, 12, 12, 12, 13, 13, 13 from
+  radius 0.10 to 0.22: the 12 that holds over four radii is **not** the answer, because one of those
+  components is twice the size of its neighbours and is two arms still joined. The builders assert
+  both — a count that settles over three radii, and no surviving component still 1.75x its
+  neighbours. Phragmoteuthis settles on twelve where a decabrachian has ten, which is recorded as a
+  generation defect in `docs/triassic/preview-mesh-defects.md` and **not** smoothed away: which two
+  of twelve identical arms are the extra pair is not a question the geometry can answer, so choosing
+  two would be sculpting the animal rather than repairing the generation.
 - **A joint that owns no skin is a silent defect, and it makes other measurements lie.** Hybodus'
   `caudal_upper` and Saurichthys' `pelvic_L`, `pelvic_R` and `caudal_lower` each owned *zero*
   vertices: their clips swung joints that moved nothing, and the per-limb swept angles those
