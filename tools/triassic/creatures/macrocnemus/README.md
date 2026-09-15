@@ -371,69 +371,116 @@ limb that goes forward, back and forward again has swept more than its extremes 
 
 `Charge` is the dash down into the shallows and is where it bears.
 
+## The hinge, the throat, the rim and the skin: what this build repaired
+
+Four faults, all in this builder rather than in the generation, and they had to go together. The
+body ships from the same preserved source at the same triangle count; nothing about the animal
+changed.
+
+| | Before | After |
+| --- | ---: | ---: |
+| Worst **skin** edge, `tools/triassic/skin-tears.mjs` | 23.31x | **2.95x** |
+| Mandible | 74 triangles, a sliver off the snout | **384 triangles**, a lizard's jaw |
+| Jaw hinge, as a fraction of the head's span behind the snout | 0.28 | **0.66** |
+| `gape-solid.py`, backdrop seen through the body at full gape | — (the jaw barely opened) | **0 px**, tolerance 12 |
+
+### The hinge, and why it could not ship on its own
+
+`HINGE_X` was `SKULL_PT[0] + .012` — the skull *bone*, which sits 0.90 of the way along the neck
+axis and so near the front of the head. `is_jaw` therefore cut a sliver off the snout rather than a
+mandible, and the widest gape this animal has, `Snatch` at 28.6° of jaw, read as a black triangle a
+few pixels across with the cut edge showing beside it as a bare pale facet. The hinge now comes from
+the head's own measured span, `X_SNOUT - .66 * (X_SNOUT - HX[0])`, which is Coelophysis' fix.
+
+The previous build diagnosed this, tried it, and deliberately did not ship it, because it exposes a
+worse fault underneath: **the throat did not follow the jaw.** That is now fixed too, and so are two
+more that only a real gape could reveal.
+
+### The throat follows the jaw
+
+The mandible is rigid on `jaw` and the skin behind the hinge was on the axial chain, with nothing
+blending between them, so a wide gape separated the two and this animal's pale gular skin read as a
+slab hanging off a detached lower jaw. `throat_jaw_share` hands the skin behind the cut a share of
+`jaw`, **full at the mouth line and full at the cut plane** — not half of either, because a ramp
+centred on the cut reads 0.5 exactly where the mandible's own 1.0 meets it, and that step is the
+seam opening. Rhaeticosaurus and Birgeria each had to learn the same thing.
+
+It is bounded **radially about the hinge as well**, and that part is this animal's own. A window in
+the body axis alone is not enough here: the generation is drawn mid-stride with its neck raised, so
+its right hand sits at x 0.388, inside any x window the throat needs, a fifth of a body *below* the
+head. Gated on x and height only, 41 % of the hand went to `jaw` and the tear sweep read 15.09x on
+edges carrying `jaw = 0.58` against `fore_foot_R = 0.41`. A throat is a place on the animal, not a
+slab of space, and the build now measures what the share claims (153 vertices in a box 0.034 × 0.054
+× 0.043) and refuses one that has reached past the head.
+
+### The lining, measured from the mouth rather than from the head
+
+Three separate things were wrong with the lumen, and each is Birgeria's or Rhaeticosaurus' lesson
+arriving here:
+
+- **It stopped short of its own hinge.** The rearmost ring sat 0.004 in front of the cut and was
+  pinched to a seventh of its width there, while the cut ran full width to the hinge. It now starts
+  0.008 *behind* the cut at the head's own full section, and does not taper at the back at all.
+- **It was sized from the head at its broadest.** `HW` is a 96th percentile of |y| over the whole
+  section; the seam on this animal sits at 0.229 of the section, low on a head that tapers downward,
+  so 0.86 of the broadest measurement was wider than the head is where the mouth is. The width is
+  **cast** from the mouth's own axis now, which is what Birgeria's note says to do.
+- **And both sides are cast, not one.** `head_y` is the median of the section over a band, which on
+  a head that is drawn rather than mirrored is not the middle of the mouth. Taking the nearer wall
+  as the half-width put the lumen 0.86 of the way to one cheek and left a strip of open mouth beside
+  it on the other.
+
+Its floor also follows the mandible outright and tapers at neither end, where it used to fade over
+0.012 behind the hinge and 0.007 at the snout; and its section is a **squircle** (`power = 3.0`),
+because an ellipse narrows towards its floor and at the height the mandible's rim reaches at full
+gape it was a fraction of the mouth's own width.
+
+### The rim, which is what the last 19 pixels actually were
+
+After all of that the gape proof still read **19 px** at `Snatch`, at the same six screen positions
+it had read 18 at before any of it — and a count that will not move is the tell that nothing being
+changed is the thing that is wrong. A ray cast through those pixels, measuring its own distance to
+each part rather than reading renders, found it passing 0.004 from the mandible, 0.013 from the
+lining, and hitting the inside of the far cheek: it was slipping along the **mandible's cut rim**,
+which is one polygon thick. At a grazing angle that rim *is* the silhouette, and whether its last
+quad is wound towards the camera or away is decided by a rounding error in the pose.
+
+So both halves of the cut get a lip. `K.rim_flange` extrudes the boundary and draws the new ring
+towards the mouth's own axis; Blender keeps the extrusion's winding consistent with the faces it
+grew from, so the lip's outer side is the skin's outer side folded inwards, which is what a lip is.
+It is the "closing a hole is simple and is always fair game" case in `CLAUDE.md` — every vertex of
+it comes from the generation's own rim.
+
+The fold **runs out before the snout**: at the very tip the two rims meet round the front of the
+mouth, and folding both of them inwards there parts them instead of closing them. Folded to the tip
+it cost 12 px in *every* clip at *any* gape, which is again the signature of something that is not
+about the gape. Tapered away over the last 0.010, every shot reads 0.
+
+With the rim closed the gape needs no cap at all: `Snatch` keeps its full 0.50 rad — wider than
+Tanystropheus opens — and still measures 0 px through the body.
+
+### The skin
+
+`shorekit` did not relax its weights, and the marine kit always has. That is the whole reason this
+animal and Coelophysis sat at 23.3x and 25.3x while every body built on `_pipeline/tripo.py` sat
+between 1.4x and 12x. `K.bind` now runs that kit's own `relax_weights` — imported rather than
+copied, so there is one implementation of the thing that stops a gate tearing a skin — for 14
+passes. Beside it, `trunk_pullback`'s gates are a product of slopes rather than three hard tests
+whose second arm handed out a flat 1.0, and the distal limb radius is measured off the body by
+`K.measure_radii` rather than authored, the limb being flooded from its tip over the mesh's own
+edges so that the measurement cannot walk into the trunk.
+
+At **2.95x** this is now the cleanest limbed skin in the era after Rhaeticosaurus' 2.81x, ahead of
+Nothosaurus' 2.98x. What remains is `body` against `hind_upper_L` in `Sprint`, an edge going 0.027
+to 0.079 — a thigh fused to a trunk, which is a real blend rather than a gate.
+
 ## What is still open
 
-- **The limb skinning tears — measurably, but on this animal not very visibly, and the gap between those two things is the point.** Its numbers are nearly Coelophysis' (23x against 25x), and yet its `Run` reads cleanly in the gait sheet: no ribbons, a coherent four-beat gait, feet that look like the generation's own long toes rather than torn geometry. Coelophysis at the same numbers has hind feet trailing off in plain sight. The difference is where the torn edges sit — this animal's worst ratio is in `Snatch`, a short clip, and its `Sprint` spread is in small feet — so the measurement over-states this animal and under-states that one. Read the number with the sheet, not instead of it.
-
-  `node tools/triassic/skin-tears.mjs public/assets/triassic/creatures/macrocnemus.glb` sweeps every clip at
-  17 phases and compares each triangle edge against its rest length. Every one of the twenty-six clips tears an edge past 2x. `Snatch` is the worst ratio at **23x** and `Sprint` the worst spread, with about 15,700 torn edge-instances and an edge reaching 0.304 on a body 4.89 long. `Run` is close behind at 11.9x. `hind_lower_L`, `hind_foot_L/R`, `body` and `chest` dominate throughout.
-
-
-  Swept across the era it is **not** a regression in this kit and **not** inherent to the pipeline.
-  Nothosaurus peaks at 2.98x with 29 torn edges and is essentially clean; Dinocephalosaurus' 56.8x
-  is twelve *tiny* oral edges (0.002 to 0.086) and is clean in effect; Placodus — delivered and
-  reviewed long before these three — tears at 12.4x in its paddles. So the pipeline can produce
-  intact limb skinning, this did not start here, and what decides it is how hard an animal swings a
-  limb. That makes it a fixable fault in the limb weighting rather than a property of Tripo bodies.
-
-  The paired audit does not catch this and could not: it plays 61 phases of every clip through the
-  real loader and mixer and checks where every skinned vertex *is* — travel from rest, bounds,
-  envelopes — and travel from rest stays bounded the whole time. No vertex moves more than 15 % of
-  body length even while the foot it belongs to is pulled inside out. What is wrong is not where
-  the vertices are but how far apart they are from each other. That instrument is new, it is in the
-  repository as `tools/triassic/skin-tears.mjs`, and it is not yet wired into any audit because the
-  right threshold per animal is a judgement a reviewer should make rather than one to bake in
-  unlooked-at.
-
-  The fault is in the shared limb skinning (`skin_weights` and `Limb` in `shorekit.py`), not in the
-  clips: the clips ask for ordinary limb swings and the weights do not hold the geometry together
-  through them. The evidence that it is the limbs is that Tanystropheus — which shares every line
-  of that code — is an order of magnitude better, and the only difference is that it stands at a
-  post and barely swings a limb.
-
-- Macrocnemus is **not** in `tools/triassic/shipped.json` and its preview badge is **not** cleared.
-  That is the reviewer's call after looking at the sheets.
-- The four portraits in `public/assets/triassic/creatures/` are now model renders rather than the
-  crops `tools/triassic/placeholder-portraits.mjs` writes.
-- **One region of the twin diverges.** The maximum nearest-surface distance is 3.1 % of body length
-  against a 95th percentile of 0.38 %, which is the voxel field losing the finest toes. One vertex
-  of 10,149 is over 3 % out. A finer field would fix it and would cost the twin's triangle budget;
-  the envelope tolerance the contract actually sets is met four times over.
-- **The gape is the weakest thing about this animal, and it is a known defect with a diagnosis.**
-  At its widest — `Snatch` at 0.23, 28.6 degrees of jaw, which is *more* than Tanystropheus opens —
-  the mouth reads as a black triangle a few pixels across at the snout tip, with the cut edge of the
-  mandible showing beside it as a bare pale facet. It is not legible at any distance.
-
-  The cause is `HINGE_X = SKULL_PT[0] + .012`: the hinge is taken from the skull *bone*, which sits
-  0.90 of the way along the neck axis and so near the front of the head, and `is_jaw` therefore
-  cuts a sliver off the snout rather than a mandible. Coelophysis had exactly this and was fixed by
-  taking the hinge from the head's own measured span instead (`X_SNOUT - .66 * (X_SNOUT - HX[0])`);
-  Macrocnemus was not.
-
-  That fix was tried here and is **not** in this build, deliberately. It works as far as it goes —
-  the hinge moves to 0.401, the mandible becomes 481 triangles rather than a sliver, the hinge
-  seats at 0.50 of the head radius and the gape becomes a large legible wedge — but it exposes a
-  second defect underneath it that a small gape was hiding: **the throat does not follow the jaw.**
-  The mandible is weighted to `jaw` and the throat skin behind it to the cervicals, with nothing
-  blending between, so a wide gape separates the two and the animal's pale ventral throat reads as
-  a flat slab hanging off a detached lower jaw. The closed mouth is clean, which is why this was
-  invisible until the jaw could actually move. Deepening the oral lumen to the measured seam height
-  was tried and does not help: the slab is skin, not an unlined cavity.
-
-  So the whole fix is two changes, not one — the hinge, *and* `skin_weights` blending `jaw`
-  influence back into the throat over a distance behind the hinge, the way a limb root blends onto
-  the body bones under it. The second half needs its own verification pass and is not something to
-  land unlooked-at. Shipping the hinge alone would trade a quiet defect for a loud one.
+- Registering the model — `tools/triassic/shipped.json`, the stand-in and the preview badge — is not
+  done here. That is the ship-out pass's business and this build does not touch it.
+- **The twin's finest toes still diverge.** The maximum nearest-surface distance is 3.1 % of body
+  length against a 95th percentile of 0.38 %, which is the voxel field losing them. One vertex of
+  10,149 is over 3 % out; the envelope tolerance the contract sets is met four times over.
 - **The teeth and the tooth rows are a reconstruction**, as the fangs are on Tanystropheus. The
   generation models none.
 - **There are no eye globes**, as on Nothosaurus, Placodus, Dinocephalosaurus and Tanystropheus. The

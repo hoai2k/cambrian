@@ -1,0 +1,67 @@
+{
+  "id": "macrocnemus",
+  "backdrop": [
+    1.0,
+    0.0,
+    1.0,
+    1.0
+  ],
+  "shots": [
+    {
+      "clip": "Snatch",
+      "t": 0.24,
+      "pixels": 378000,
+      "differingPixels": 12699,
+      "holesOpenedByCulling": 27,
+      "seenThroughTheBody": 0,
+      "backdropInBothPasses": 1
+    },
+    {
+      "clip": "Bite",
+      "t": 0.2,
+      "pixels": 378000,
+      "differingPixels": 11321,
+      "holesOpenedByCulling": 22,
+      "seenThroughTheBody": 0,
+      "backdropInBothPasses": 43
+    },
+    {
+      "clip": "Heavy",
+      "t": 0.13,
+      "pixels": 378000,
+      "differingPixels": 10085,
+      "holesOpenedByCulling": 24,
+      "seenThroughTheBody": 0,
+      "backdropInBothPasses": 0
+    },
+    {
+      "clip": "Ability",
+      "t": 0.53,
+      "pixels": 378000,
+      "differingPixels": 976,
+      "holesOpenedByCulling": 23,
+      "seenThroughTheBody": 0,
+      "backdropInBothPasses": 0
+    },
+    {
+      "clip": "Attack",
+      "t": 0.14,
+      "pixels": 378000,
+      "differingPixels": 8492,
+      "holesOpenedByCulling": 23,
+      "seenThroughTheBody": 0,
+      "backdropInBothPasses": 31
+    },
+    {
+      "clip": "Eat",
+      "t": 1.05,
+      "pixels": 378000,
+      "differingPixels": 675,
+      "holesOpenedByCulling": 22,
+      "seenThroughTheBody": 0,
+      "backdropInBothPasses": 84
+    }
+  ],
+  "tolerance": 12,
+  "note": "Rendered from the packaged body decoded by audit.mjs --decode. The cull shim is the worst case a single-sided renderer would draw; the shipped skin material is double-sided."
+}

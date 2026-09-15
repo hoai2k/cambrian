@@ -1,0 +1,18 @@
+
+public/assets/triassic/creatures/macrocnemus.glb   34651 edges x 17 phases x 26 clips
+clip            skin  on bone             all     >2x  worst bones
+Sprint         2.95x  body              2.95x      80  0.027->0.079  hind_upper_L:35 body:25 hind_upper_R:20
+Snatch         2.79x  jaw              27.59x     261  0.027->0.075  jaw:138 skull:122 neck_03:1
+Ability        2.57x  hind_upper_L     21.30x     120  0.033->0.085  jaw:55 skull:46 hind_upper_L:10 hind_upper_R:5
+Swim           2.50x  body              2.50x      30  0.031->0.077  hind_upper_L:18 body:8 hind_upper_R:4
+Run            2.49x  body              2.49x      13  0.031->0.077  hind_upper_L:7 hind_upper_R:3 body:3
+Charge         2.35x  hind_upper_L     12.66x      46  0.033->0.078  jaw:20 skull:15 hind_upper_L:8 body:2
+Retreat        2.22x  neck_04           7.12x      10  0.039->0.087  jaw:4 neck_04:4 skull:1 body:1
+Heavy          1.35x  jaw              22.91x      85  0.065->0.087  jaw:45 skull:40
+Death          1.33x  hind_upper_L     13.70x      92  0.059->0.079  jaw:49 skull:43
+Eat            1.28x  neck_02          20.12x     246  0.064->0.081  jaw:136 skull:110
+Attack         1.26x  jaw              20.09x      85  0.065->0.081  jaw:46 skull:39
+Bite           1.10x  neck_02          25.50x     342  0.073->0.081  jaw:182 skull:160
+Grab           1.09x  skull            15.01x     341  0.077->0.084  jaw:181 skull:160
+13 of 26 clips tear an edge past 2x
+worst SKIN 2.95x · worst including the oral lining 27.59x (the lining is a sac built to stretch; the skin figure is the one to judge)

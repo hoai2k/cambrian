@@ -880,7 +880,7 @@ def depth_probe(obj):
     return depth
 
 
-def seat_inside(obj, axis_of, depth, to_raw, to_engine, margin=.0012, steps=40, rate=.10):
+def seat_inside(obj, axis_of, depth, to_raw, to_engine, margin=.0012, steps=40, rate=.10, keep=0.):
     """Pull every vertex of an authored interior part inside the closed intake surface.
 
     Dinocephalosaurus put its mouth outside the animal twice before an assertion caught it, and the
@@ -889,6 +889,14 @@ def seat_inside(obj, axis_of, depth, to_raw, to_engine, margin=.0012, steps=40, 
     every oral vertex is finally seated the way a fin root is — drawn radially towards the mouth's
     own axis until the measured depth says it is in. Returns the largest correction, in raw units,
     so a part that needed a lot of seating shows up as a number rather than silently.
+
+    `keep` is the least fraction of its own radius a vertex may retain, and a lining wants one.
+    Unclamped, forty steps at a tenth take a vertex 98 % of the way onto the axis, so a ring the
+    snout is narrower than **collapses to a point**: adjacent vertices end up 0.00017 apart, the
+    quads between them invert, and the moment those two vertices ride different bones the pair reads
+    as a **1076x** stretch — which is what Macrocnemus' lining did as soon as its floor was made to
+    follow the mandible properly. Rhaeticosaurus clamps its own fit at 0.615 for the same reason.
+    Zero, the default, is the behaviour every body built before this one was measured with.
     """
     worst = 0.
     for v in obj.data.vertices:
@@ -897,10 +905,14 @@ def seat_inside(obj, axis_of, depth, to_raw, to_engine, margin=.0012, steps=40, 
             continue
         a = axis_of(p)
         start = Vector(p)
+        floor = keep * (start - Vector(a)).length
         for _ in range(steps):
             if depth(p) >= margin:
                 break
-            p = p + (a - p) * rate
+            q = p + (Vector(a) - p) * rate
+            if floor and (q - Vector(a)).length < floor:
+                break
+            p = q
         worst = max(worst, (Vector(p) - start).length)
         v.co = to_engine(p)
     return worst
@@ -1064,7 +1076,46 @@ def split(obj, label, test, parts):
     return part
 
 
-def oral_lining(name, stations, section, seam, tx, rings=22, ring=14, centre=None):
+def rim_flange(obj, axis_of, amount):
+    """Fold the open rim of a cut mouth inwards, so the lip is not one polygon thick.
+
+    **A rim with no thickness is a hole to anything looking along it.** Where the mouth is cut, both
+    halves end in a boundary edge, and at a grazing angle that edge *is* the silhouette: the quad
+    the eye meets there is nearly edge-on, and whether its geometry is wound towards the camera or
+    away is decided by a rounding error in the pose. A single-sided pass then drops it and shows the
+    world through the lip. That was the whole of Macrocnemus' residual gape leak — 19 pixels at the
+    mandible's rear rim which four corrections to the lining, two to the hinge plug and a reduction
+    of the gape itself did not move by one, because none of them was about the rim.
+
+    The fold is `extrude_edge_only` along the boundary, with the new ring drawn towards the mouth's
+    own axis. Blender keeps the extrusion's winding consistent with the faces it grew from, so the
+    lip's outer side is the skin's outer side folded inwards, which is what a lip is. It is the
+    "closing a hole is simple and is always fair game" case in `CLAUDE.md`, not a shape invented for
+    the animal: every vertex of it comes from the generation's own rim.
+
+    Returns the number of vertices added.
+    """
+    bm = bmesh.new()
+    bm.from_mesh(obj.data)
+    border = [e for e in bm.edges if len(e.link_faces) == 1]
+    if not border:
+        bm.free()
+        return 0
+    grown = bmesh.ops.extrude_edge_only(bm, edges=border)['geom']
+    added = [g for g in grown if isinstance(g, bmesh.types.BMVert)]
+    for v in added:
+        a = amount(v.co) if callable(amount) else amount
+        d = Vector(axis_of(v.co)) - v.co
+        if a > 0 and d.length > 1e-9:
+            v.co = v.co + d.normalized() * a
+    bm.normal_update()
+    bm.to_mesh(obj.data)
+    obj.data.update()
+    bm.free()
+    return len(added)
+
+
+def oral_lining(name, stations, section, seam, tx, rings=22, ring=14, centre=None, power=2.):
     """One closed lining on the mouth's own measured section, wound inwards.
 
     What an open mouth shows is the far wall of the lumen, so the tube is wound with its normals
@@ -1080,6 +1131,13 @@ def oral_lining(name, stations, section, seam, tx, rings=22, ring=14, centre=Non
     `centre` is the head's own lateral axis at each station. It is not always zero: these
     generations are drawn, not symmetrical, and Macrocnemus' skull sits a third of its own width
     left of the body's midline. A lumen built on the body's midline would be outside that head.
+
+    `power` is the section's superellipse exponent, 2 for the plain ellipse the bodies built before
+    this option keep. **A mouth's section is not an ellipse**, and the difference is a hole: an
+    ellipse narrows towards its poles, so at the height the mandible's rim reaches at full gape the
+    lining is a fraction of the width the mouth is, and a line of sight slips over the rim, past the
+    lining and out to the inside of the far cheek. The marine kit learned this on Rhaeticosaurus;
+    Macrocnemus is where it reached this one, at 18 px that four other corrections did not move.
     """
     lin_raw = []
     verts = []
@@ -1089,8 +1147,13 @@ def oral_lining(name, stations, section, seam, tx, rings=22, ring=14, centre=Non
         w, h = section(x)
         for j in range(ring):
             th = j * 2 * pi / ring
+            c, sn = cos(th), sin(th)
+            if power != 2.:
+                e = 2. / power
+                c = math.copysign(abs(c) ** e, c)
+                sn = math.copysign(abs(sn) ** e, sn)
             cy = centre(x) if centre else 0.
-            p = Vector((x, cy + w * cos(th), seam(x) + h * sin(th)))
+            p = Vector((x, cy + w * c, seam(x) + h * sn))
             lin_raw.append(p)
             verts.append(tx(p))
     for i in range(rings - 1):
