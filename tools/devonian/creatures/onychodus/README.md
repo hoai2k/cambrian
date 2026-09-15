@@ -68,3 +68,17 @@ That the closed mouth actually holds them is an assertion in the builder, not a 
 is swept at twelve points against the palate directly over it and against the palate's lateral
 reach at that station. `validation.json` records the result — `oralClearanceClosed` 0.0460 and
 `tuskLateralRoom` 0.1122. Packaging exact round-trip PASS at 136,624 / 38,246 triangles; 23 bones.
+
+The eyes were not moved, and the roof that rose over them seats them deeper: the shared eye audit
+reads **82.33% / 82.07% inside (full)** and **82.22% / 82.34% (reduced)**, against 73.57 / 73.26
+and 73.30 / 73.53 before, every one a PASS on the 50% criterion and over the 65% target, with the
+head envelope closed and no non-manifold edges either side. Both globes still stand proud and
+still read as eyes — inspected at rest, at full gape, and in Heavy, TurnLeft and Death, where the
+socket neither tears nor opens (the globes and the skin around them are both skull-weighted, so
+they move rigidly together).
+
+`audit-selectors.json` is new and is why those numbers exist at all: without it the audit falls
+back to the mesh whose material ends in *body*, which for this animal is the trunk rather than the
+skull, and every globe measures 0% inside. One file serves both models, selecting by mesh name —
+the reduced model's materials carry a `.001` suffix, so a material-suffix selector matches nothing
+there. Reports in `eye-audit-full-v2.json` and `eye-audit-lod-v2.json`.
