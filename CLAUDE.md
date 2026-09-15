@@ -329,7 +329,12 @@ unless the user explicitly asks for a PR. Steps:
   mesh does. *The cut*: the jaw seam follows the model's own lip contour rather than running straight
   near it — cast head vertex normals back into the mesh and fit a curve to the hits where a slit is
   modelled (Placodus), and read the lip line off the albedo where none is (Dinocephalosaurus, where
-  the first method finds zero vertices). A fish is often genuinely straight and is the easy case;
+  the first method finds zero vertices). There is a **third** case, found on Keichousaurus: the
+  albedo method reads the *countershading* boundary, which on a long-necked swimmer runs from high
+  on the neck downward and put the seam 0.82 of the local radius above the head axis. What that
+  generation paints is a thin dark line on the pale lower flank, so the lip is the darkest row of
+  each flank *within the pale zone* — a different feature in the same image. Check which feature a
+  method has actually found before trusting it. A fish is often genuinely straight and is the easy case;
   reptiles and amphibians have subtle lips and are where a straight cut shows. *The anchors*:
   `anchor_mouth` (role mouth) on the jaw, `anchor_mouth_inside` (role swallow) on the skull, and
   `anchor_attack_primary` (role attack) on the bone that actually delivers the blow — which is **not**
@@ -342,6 +347,12 @@ unless the user explicitly asks for a PR. Steps:
   interpenetrate when they are first brought together, the oral cavity Tripo modelled has to fold
   rather than be built, and closing is a large jaw rotation, so the pose the animal spends almost
   all its time in becomes the most deformed one.
+- **A weighting scheme is shaped by the body it was written for.** Nothosaurus' is the era's
+  cleanest at 2.98x and the obvious one to copy, and copied unchanged onto Henodus it tore to
+  **64.9x** — its "outboard of |y| 0.09 means on the limb" test assumes a narrow trunk, and Henodus'
+  carapace is half a body length wide, so 84% of a forelimb's weight landed in the top of the shell.
+  Bounding the limb radially against its own bone chain, keeping the along-limb ramp, gave 4.81x.
+  So a copied rig is a starting point to be re-measured on the new animal, never a transplant.
 - **A limbed swimmer's dash has to paddle.** The Triassic's reptiles and amphibians did not scull
   along on a tail beat, and a Sprint clip that waggles the limbs while the body does the work reads
   as a fish with legs attached. The stroke runs from the limb stretched forward to flush with the
