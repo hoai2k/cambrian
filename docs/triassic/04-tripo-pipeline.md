@@ -150,6 +150,33 @@ Two rules that follow from the steps:
   existing model. Do not stop solely to manufacture a new approval gate, and do not call a fix
   approved until the evidence actually supports it.
 
+## What the twin is actually for, and what it is not
+
+Measured against six paired bodies rather than argued from the step list.
+
+**It does three jobs, and does them well.** It *is* the LOD1 — byte-identical, verified on
+Placodus, Helicoprion, Dinocephalosaurus, Tanystropheus, Henodus and Keichousaurus — so it is not
+extra work, it is the reduced model with a second use. It verifies the *measurement*: the 4 % / 2 %
+envelope and surface tolerances are twin-against-authored, which is what says the profile table
+describes the animal (Keichousaurus' one out-of-tolerance station came from exactly there). And it
+proves the shared rig: `exactRigParity`, `exactAnimationParity`, `exactAnchorParity` and
+`normalizedWeights` in each `paired-audit.json` are what let one authored performance drive both
+bodies rather than being retargeted.
+
+**It is not a rigging or animation instrument, and step 9 oversells it.** The rig is authored
+against bone names and rest transforms, and the twin is generated *on* that armature, so it cannot
+inform where a bone goes. Clips are authored once in code — `for clip, duration in CLIPS.items()` —
+and the identical sample arrays are written to both bodies; there is no separate pass in which a
+clip is iterated on the twin and then transferred.
+
+**And it can mislead, which is the part worth remembering.** A twin has no toes, no fin rays and no
+lip corners, so a clip that reads perfectly on it can be tearing the authored body to ribbons. The
+paired audit does not catch this and structurally cannot: it checks *parity*, not deformation
+quality. It passed on Coelophysis at 25.3x with its hind feet trailing off in ribbons, and would
+have passed on Henodus at 64.9x. That is why `tools/triassic/skin-tears.mjs` exists, and why
+**"the twin deforms cleanly" is never evidence that the authored body does.** Judge every clip on
+the body that ships.
+
 ## Which steps need a judgement and which are mechanical
 
 A body is twelve steps, and they are not the same kind of work. The distinction matters when the
