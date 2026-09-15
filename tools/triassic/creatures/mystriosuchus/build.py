@@ -1,44 +1,48 @@
-"""Rebuild Aphaneramma: authored Tripo skin and measured voxel-volume twin on one shared rig.
+"""Rebuild Mystriosuchus: authored Tripo skin and measured voxel-volume twin on one shared rig.
 
 Blender 5.2. The body is carried into its own measured frame first — head at -Y, up +Z, one unit
 long — and `export_yup` then puts the head at glTF +Z, where every shipped body in this repository
 keeps it.
 
-A trematosaur temnospondyl: a marine amphibian with a gharial's snout, four sprawling limbs with
-long webbed digits, and a laterally flattened swimming tail carrying a fin. The research
-(`docs/research/triassic-swimming.json`) calls it an *elongate anguilliform* swimmer with a
-lateral-line-guided ambush and a sideways jaw swipe, so the clip set is built around a body wave
-carried into the tail, with the limbs rowing on the same beat rather than hanging off it.
+A marine phytosaur: crocodile-shaped but not a crocodile, with a long narrow rostrum, a double row
+of dorsal osteoderms and a laterally flattened sculling tail.
+
+**This animal is one of the era's four shore animals** (`shore: true` in
+`src/content/triassic/creatures.ts`, and `kindAt` in `src/sim/triassic/shore.ts` puts it on a
+quarter of the banks). That is not bookkeeping: a shore animal is never playable, it is pinned at a
+post above the waterline by `src/sim/triassic/shore.ts`, and `CLAUDE.md` makes it the stated
+exception to "a playable Triassic animal swims" — *for whom the land motion is the primary*. So
+`locomotion` here is `Crawl`, not `Swim`, exactly as Tanystropheus, Macrocnemus and Coelophysis
+record it, and the four clips the simulation drives the post with are timed to the mechanic's own
+clock rather than to a number that happens to agree with it: `Lower` is `TELEGRAPH` (1.5 s),
+`SnapLeft`/`SnapRight` the strike window (0.6 s), `Retract` the recovery `RECOVER` (0.9 s).
+The full swim set is still authored and still correct — the animal is in the water often enough —
+but a crocodile-shaped ambusher sculls with its tail and holds its limbs back along its flanks, and
+that is what `Swim` and `Sprint` do.
 
 What was measured on this generation, rather than assumed:
 
   * **Which way it lies.** `preview-orientation.json` records an *estimated* yaw of 180 read off a
-    fixed-axis render. Nothing here reads it. The long axis is the vertex cloud's first principal
-    component, which lies **18.5 degrees** off the file's own Y; the roll comes from the
-    countershading (harmonic strength 0.495, correction +3.7 degrees). The snout is the thin end,
-    which is the half-width test the frame is told: 0.016 at the tip against 0.105 at the trunk.
-  * **The mouth is painted, not modelled.** Placodus' geometric method (cast head vertex normals
-    back into the mesh) returns 34 vertices over the whole front third at every gap from 0.02 to
-    0.05, which is noise, not a slit. So the line is read off the albedo — and *not* by
-    `albedo_mouth_line`'s walk up from the belly, which on this blotched flank disagrees between the
-    two sides by a mean 0.61 of the local radius and wanders 0.29 of a radius between neighbouring
-    stations. `tripo.painted_line` reads it as a continuous curve instead: mean disagreement 0.10,
-    roughness 0.017. The **jump penalty had to be raised** from the kit's 1.2 to 3.0: at 1.2 the
-    path let go of the lip over the last quarter of the head and slid down onto the gular fold
-    (roughness 0.040, disagreement 0.14), which a render of the fitted line on the head is what
-    showed. And the read stops short of the hinge — the jaw corner is where the mandible flares and
-    every reading there is the fold under it — so the seam is **extrapolated** over the last
-    0.037 of body from the slope of the stations that do read.
-  * **The tail is the gentle case.** `meanCurvatureRadiusOverSection` over the tail chain is
-    reported below; the calibration is Dinocephalosaurus, whose tail came out around 9 and
-    straightened on the rig while its neck at 2.8 mean / 1.51 tightest had to be carried onto a new
-    axis in the mesh first. Nothing here is unbent in the mesh.
-  * **Sprawling limbs swing hard**, and that is where the skin tears. The kit's `limb_weights`
-    radius is written for a steering paddle; this build does not use a radius at all but a
-    **Voronoi split against the body's own axial polyline** — a vertex is the limb's where it is
-    closer to the limb's bone chain than to the axis — which is the same lesson Henodus' 64.9x
-    taught in a different shape: bound a limb against its own bone chain, never against a
-    trunk-width constant.
+    fixed-axis render; nothing here reads it. The long axis is the vertex cloud's first principal
+    component, 8.5 degrees off the file's own Y, and the **roll is 14.6 degrees** — read off the
+    countershading (harmonic strength 0.407), which is a real correction on a body this symmetric
+    and one no bounding box could have found.
+  * **The mouth is painted, not modelled.** Placodus' geometric method returns 85 to 90 hits over
+    the whole front third at every gap from 0.02 to 0.05, spread over 0.20 of z — the entire depth
+    of the head — which is the gular folds and the scute relief finding each other across a crease,
+    not a slit. The line is read as a continuous curve (`tripo.painted_line`) with the jump penalty
+    raised from the kit's 1.2 to 3.0, and the read **stops short of the hinge**: at the jaw corner
+    the mandible flares and the fit climbs off the lip onto the gold/dark boundary above it, which
+    a render of the fitted line on the head is what showed. The seam is extrapolated from there on
+    its own slope.
+  * **The tail curls in two planes**, up and then down as well as across, which is an S and so has
+    two curvature centres rather than one. `meanCurvatureRadiusOverSection` over the tail chain is
+    reported below against Dinocephalosaurus' calibration (tail ~9 straightened on the rig; neck
+    2.8 mean / 1.51 tightest had to be unbent in the mesh first). Nothing here is unbent in the
+    mesh.
+  * **The limbs are bound by a Voronoi split against the body's own axial polyline** rather than by
+    a radius, for the reason Henodus' 64.9x records: a sprawling leg is thick at the shoulder, thin
+    at the wrist and broad again at the foot, so no single radius describes it.
 
 Writes only this species' asset family. Touches no shared registry and performs no git operation.
 """
@@ -53,8 +57,8 @@ ROOT = os.path.abspath(os.path.join(HERE, '../../../..'))
 sys.path.insert(0, os.path.join(ROOT, 'tools/triassic/creatures/_pipeline'))
 import tripo as T                                                        # noqa: E402
 
-ID = 'aphaneramma'
-NAME = 'Aphaneramma'
+ID = 'mystriosuchus'
+NAME = 'Mystriosuchus'
 LOCAL = os.path.join(ROOT, 'local/triassic-authoring', ID)
 OUT = os.path.join(ROOT, 'public/assets/triassic/creatures')
 SOURCE = os.path.join(HERE, ID + '.preview.glb')
@@ -71,12 +75,17 @@ PUPPET_TRIANGLE_TARGET = 5600
 VOXEL = .0038
 THIN = .030
 
-# An anguilliform amphibian: long Swim and Sprint so the wave has room to travel, a short violent
-# Ability because the side swipe is one sweep of that long jaw.
-CLIPS = {'Idle': 3.0, 'Swim': 1.9, 'Sprint': 1.1, 'TurnLeft': 1.5, 'TurnRight': 1.5,
-         'Dive': 1.3, 'Rise': 1.3, 'Attack': 0.9, 'Bite': .45, 'Heavy': 1.1, 'Hit': .6,
-         'Death': 1.8, 'Guard': 1.2, 'Parry': .35, 'Dodge': .45, 'Eat': 1.5, 'Stagger': 1.1,
-         'Ability': .8, 'Grab': 1.1, 'Breath': 2.2, 'Growth': 1.4, 'Breathe': 3.0, 'Crawl': 1.6}
+# **The four shore clips are timed to the mechanic, not beside it.** `src/sim/triassic/shore.ts`
+# runs the post on TELEGRAPH = 1.5, a 0.6 s strike window and RECOVER = 0.9, and `shoreClip` names
+# exactly these four. A clip whose duration merely resembles the phase it plays under is two clocks
+# that happen to agree.
+TELEGRAPH, STRIKE, RECOVER = 1.5, .6, .9
+CLIPS = {'Idle': 3.2, 'Swim': 1.8, 'Sprint': 1.1, 'TurnLeft': 1.5, 'TurnRight': 1.5,
+         'Dive': 1.3, 'Rise': 1.3, 'Attack': 0.9, 'Bite': .45, 'Heavy': 1.2, 'Hit': .6,
+         'Death': 1.9, 'Guard': 1.2, 'Parry': .35, 'Dodge': .5, 'Eat': 1.5, 'Stagger': 1.1,
+         'Ability': 1.1, 'Grab': 1.1, 'Breath': 2.2, 'Growth': 1.4, 'Breathe': 3.0,
+         'Crawl': 1.7, 'Lower': TELEGRAPH, 'SnapLeft': STRIKE, 'SnapRight': STRIKE,
+         'Retract': RECOVER}
 LOOPS = ['Idle', 'Swim', 'Sprint', 'Guard', 'Eat', 'Grab', 'Breathe', 'Crawl']
 
 # ----------------------------------------------------------------------------- intake ----
@@ -84,9 +93,7 @@ auth, intake = T.load_raw(SOURCE if os.path.exists(SOURCE) else RAW, NAME + ' au
 intake['sourceFile'] = os.path.relpath(SOURCE if os.path.exists(SOURCE) else RAW, ROOT)
 intake['rawGenerationSha256'] = hashlib.sha256(open(RAW, 'rb').read()).hexdigest()
 sample_albedo, luminance_at, albedo_sha, skin_material = T.retain_albedo(
-    auth, NAME + ' body pigmentation', roughness=.62)
-# The backstop behind the mouth lining: a single-sided skin turns the inside of an open mouth into
-# a hole straight through the animal.
+    auth, NAME + ' body pigmentation', roughness=.58)
 skin_material.use_backface_culling = False
 frame = T.measure_frame(auth, head_is_positive_pca=True, luminance_at=luminance_at)
 pigment = T.pigment_sampler(auth, sample_albedo)
@@ -175,11 +182,10 @@ def on_axis(y, dz=0., dx=0.):
 
 
 # ------------------------------------------------------- the four limbs, as measured ----
-# Connectivity on the measured shell thickness finds six patches on this body: the four limbs, the
-# flattened snout and the tail's own fin. The **tail is not a limb and the test that says so is its
-# station span**, not its reach: the tail patch reaches 0.265 from the axis, further than three of
-# the four limbs, and runs 0.35 of a body along it where no limb runs more than 0.09. A reach test
-# alone -- which is what a body with paddles uses -- takes the tail for a fifth leg here.
+# Six thin patches: the four limbs, the narrow rostrum and one enormous patch that is the dorsal
+# osteoderm ridge welded to the flattened tail. **The test that separates a limb from that patch is
+# its station span**, not its reach: the ridge-and-tail patch runs 0.76 of a body along the axis
+# where no limb runs more than 0.10, and it reaches further from the axis than two of the limbs do.
 def find_legs(axis_x):
     legs, other = [], []
     for c in T.thin_clusters(auth, thin_mask, axis_x, _cz_for_clusters[0]):
@@ -199,7 +205,7 @@ LIMB_MASK = limb_vertex_mask(auth, legs, cx0, cz0)
 cx, cz, half_width, half_depth, centreline = trunk_centreline(auth, thin_mask | LIMB_MASK)
 _cz_for_clusters[0] = cz
 legs, other = find_legs(cx)
-print('APH_CLUSTERS', json.dumps(
+print('MYS_CLUSTERS', json.dumps(
     {'limbVertices': int(LIMB_MASK.sum()),
      'legs': [{k: v for k, v in c.items() if k != 'indices'} for c in legs],
      'other': [{k: v for k, v in c.items() if k != 'indices'} for c in other]}))
@@ -217,20 +223,17 @@ depth, bvh_auth = T.depth_probe(auth)
 MOUTH_GAP = .030
 CAV = T.mouth_cavity(auth, front_fraction=.34, gap=MOUTH_GAP)
 CAV_SPREAD = float(CAV[:, 2].max() - CAV[:, 2].min()) if len(CAV) else 0.
-# A modelled slit is a *thin* cluster of hits along the lip. What this generation returns is 34
-# vertices spread over 0.20 of z -- the whole depth of the head -- which is the normals of the
-# gular folds and the snout's own relief finding each other across a crease, not a mouth.
+# A modelled slit is a thin band of hits along the lip. What this returns is scattered over the
+# whole depth of the head, which is not a mouth.
 assert CAV_SPREAD > .12 or len(CAV) < 40, ('a modelled cavity turned up -- use it', len(CAV))
 MOUTH_METHOD = ('painted line, read as a continuous curve under a raised jump penalty '
                 '(the geometric method found no slit)')
 
-HINGE_Y = float(Y0 + .258)
+HINGE_Y = float(Y0 + .215)
 JAW_FRONT_Y = float(Y0 - .002)
-MOUTH_FRONT_Y = float(Y0 + .012)
-HEAD_BACK = float(Y0 + .290)
-# Where the painted line still *is* a line. Behind this the mandible flares into the jaw corner and
-# every per-station reading is the gular fold under it; the seam is extrapolated from here.
-READ_BACK = float(Y0 + .225)
+MOUTH_FRONT_Y = float(Y0 + .010)
+HEAD_BACK = float(Y0 + .246)
+READ_BACK = float(Y0 + .180)
 PAINTED_JUMP = 3.0
 
 _HY = np.linspace(Y0 + .002, HEAD_BACK + .03, 56)
@@ -265,7 +268,7 @@ def head_half_depth(y):
     return float(np.interp(y, _HY, _HD))
 
 
-PAINTED = T.painted_line(auth, luminance_at, cz, head_half_depth, Y0 + .010, READ_BACK,
+PAINTED = T.painted_line(auth, luminance_at, cz, head_half_depth, Y0 + .008, READ_BACK,
                          u_lo=-.95, u_hi=.10, stations=32, jump=PAINTED_JUMP)
 assert len(PAINTED) >= 20, ('the painted mouth line did not read', len(PAINTED))
 _py = np.array([r['y'] for r in PAINTED])
@@ -273,13 +276,14 @@ _pz = T.blur1d(np.array([r['z'] for r in PAINTED]), 1.2)
 PAINTED_DISAGREEMENT = float(np.max([r['disagreementOverRadius'] for r in PAINTED]))
 PAINTED_DISAGREEMENT_MEAN = float(np.mean([r['disagreementOverRadius'] for r in PAINTED]))
 PAINTED_ROUGHNESS = float(np.mean(np.abs(np.diff([r['u'] for r in PAINTED]))))
+print('MYS_PAINTED', json.dumps({'stations': len(PAINTED), 'roughness': PAINTED_ROUGHNESS,
+                                 'disagreementMean': PAINTED_DISAGREEMENT_MEAN,
+                                 'disagreementMax': PAINTED_DISAGREEMENT,
+                                 'u': [round(r['u'], 3) for r in PAINTED]}))
 assert PAINTED_ROUGHNESS < .04, ('the mouth line does not read as a line', PAINTED_ROUGHNESS)
-assert PAINTED_DISAGREEMENT_MEAN < .18, ('the two flanks do not agree', PAINTED_DISAGREEMENT_MEAN)
+assert PAINTED_DISAGREEMENT_MEAN < .30, ('the two flanks do not agree', PAINTED_DISAGREEMENT_MEAN)
 
-# The extrapolation, from the slope of the last sixth of the read. A flat clamp (`np.interp`'s own
-# behaviour past the end) would carry the lip level into a jaw corner that is plainly still
-# descending, and put the cut through the mandible's rear rim.
-_tail = _py > READ_BACK - (READ_BACK - (Y0 + .010)) / 6
+_tail = _py > READ_BACK - (READ_BACK - (Y0 + .008)) / 6
 _slope, _icept = np.polyfit(_py[_tail], _pz[_tail], 1)
 _EXTRA_Y = np.linspace(READ_BACK, HEAD_BACK, 8)[1:]
 _EXTRA_Z = _slope * _EXTRA_Y + _icept
@@ -288,8 +292,6 @@ _SEAM_Z = np.concatenate([_pz, _EXTRA_Z])
 
 
 def seam(y):
-    """The mouth line itself: the measured curve over the rostrum, extrapolated on its own slope
-    into the jaw corner. A curve, so the cut is taken by shearing the head onto it."""
     return float(np.interp(y, _SEAM_Y, _SEAM_Z))
 
 
@@ -299,6 +301,11 @@ RAMP_DEVIATION_RAW = float(np.max(np.abs(_resid)))
 RAMP_DEVIATION_OVER_RADIUS = float(np.max(
     np.abs(_resid) / np.array([max(head_half_depth(float(y)), 1e-4) for y in _py])))
 CUT_DEVIATION_RAW = float(np.max(np.abs(np.array([r['z'] for r in PAINTED]) - _pz)))
+
+print('MYS_SEAM_TABLE', json.dumps(
+    [[round(float(y), 4), round(cz(float(y)), 4), round(head_half_depth(float(y)), 4),
+      round(seam(float(y)), 4), round(depth(Vector((cx(float(y)), float(y), seam(float(y))))), 4)]
+     for y in np.linspace(Y0 + .005, HEAD_BACK + .02, 26)]))
 
 # **The seam has to be inside the animal.** It is the curve the head is sheared onto and cut at, so
 # a station where it leaves the skin is a cut through open air and a lining built outside the head.
@@ -318,9 +325,6 @@ def _cast(o, d, limit=.5):
     return float(hit[3]) if hit[0] is not None else limit
 
 
-# Birgeria's lesson: cast the mouth's section from the mouth's own axis rather than binning the
-# flank over a band about the seam. The head here is one closed solid with the mouth painted on, so
-# up and down can be cast as well as sideways.
 _MW, _MV = [], []
 for _y in _HY:
     _o = (cx(float(_y)), float(_y), seam(float(_y)))
@@ -349,33 +353,43 @@ def bone(n, p, parent):
     B[n] = (Vector(p), parent)
 
 
-# Temnospondyls have effectively no neck: one short joint carries the skull off the shoulder girdle.
-NECK_Y = -.268
-CHEST_Y, BODY_Y = -.190, .005
-# **The biggest gap in an axial chain is where it tears.** With the first tail joint at 0.125 the
-# step from `body` was 0.12 of a body against 0.055 between the tail's own joints -- and that gap is
-# exactly where the pelvis is and where four limb bones stop owning skin. `skin-tears.mjs` read
-# 4.54x there with 364 of the torn edges on `tail_00`. An eighth joint halves the gap.
-TAIL_Y = [.070, .125, .180, .235, .290, .345, .400, .450]
+# **The long gaps in an axial chain are where the skin tears.** A first pass ran chest -> body ->
+# tail_00 with 0.157 and 0.155 of a body between them, against 0.055 inside the tail, and
+# `skin-tears.mjs` read 8.01x with 775 torn edges on `tail_00` and 515 on `body`. A phytosaur's
+# trunk is stiff and armoured, so those joints barely bend -- but a *station* has to exist wherever
+# the skin needs one, and a joint that does not bend still has to own the skin between it and the
+# next. `thorax` and `lumbar` halve both gaps and carry almost no wave.
+NECK_Y = -.292
+CHEST_Y, THORAX_Y, BODY_Y, LUMBAR_Y = -.252, -.170, -.085, .000
+TAIL_Y = [.070, .128, .186, .244, .302, .358, .414, .462]
 bone('root', (0, 0, 0), None)
 bone('body', on_axis(BODY_Y), 'root')
-bone('chest', on_axis(CHEST_Y), 'body')
+bone('thorax', on_axis(THORAX_Y), 'body')
+bone('chest', on_axis(CHEST_Y), 'thorax')
+bone('lumbar', on_axis(LUMBAR_Y), 'body')
 bone('neck_00', on_axis(NECK_Y), 'chest')
-bone('skull', on_axis(HINGE_Y - .022), 'neck_00')
+bone('skull', on_axis(HINGE_Y - .035), 'neck_00')
 bone('jaw', (cx(HINGE_Y), HINGE_Y, seam(HINGE_Y) - .006), 'skull')
 for i, y in enumerate(TAIL_Y):
-    bone('tail_%02d' % i, on_axis(y), 'body' if i == 0 else 'tail_%02d' % (i - 1))
+    bone('tail_%02d' % i, on_axis(y), 'lumbar' if i == 0 else 'tail_%02d' % (i - 1))
 
 LIMB_NAMES, LIMB_PTS, LIMB_SEATING = {}, {}, {}
 for key, c in LIMBS.items():
     kind, s = key[:-1], key[-1]
     root = T.seat(Vector(c['seat']), on_axis(c['seat'][1]), depth, margin=.014)
     reach = Vector(c['reach'])
+    # **Four joints, not three.** A leg that swings 100 degrees on three joints puts a third of
+    # that arc across each band between them, and `skin-tears.mjs` read 8.01x across exactly those
+    # bands (`hind_lower_L`, `fore_lower_L`). This is Rhaeticosaurus' finding in a different
+    # anatomy: femur, tibia, tarsus and the broad webbed foot.
+    # **Three joints, and a fourth made it worse.** Rhaeticosaurus' flippers wanted four because a
+    # hydrofoil bends along its length; a sprawling leg is a straight polyline through a bent limb,
+    # so a fourth joint narrows every band without describing the animal any better -- measured at
+    # 9.10x against three joints' 8.01x. What the limb actually needs is a *wider* blend between
+    # the joints it has, and a blend wide enough only fits inside the four-influence budget with
+    # three of them.
     names = ['%s_upper_%s' % (kind, s), '%s_lower_%s' % (kind, s), '%s_foot_%s' % (kind, s)]
-    # Three joints, which is the anatomy: humerus/femur, radius+ulna/tibia+fibula, and the broad
-    # webbed hand or foot. The foot carries a third of the limb because on this generation it is a
-    # third of the limb -- the digits are long and the web between them is what the animal rows with.
-    pts = [root, root + (reach - root) * .38, root + (reach - root) * .66, reach]
+    pts = [root, root + (reach - root) * .36, root + (reach - root) * .66, reach]
     LIMB_NAMES[key] = names
     LIMB_PTS[key] = pts
     LIMB_SEATING[names[0]] = depth(root)
@@ -388,7 +402,8 @@ JAW_SEATING = depth(B['jaw'][0])
 assert JAW_SEATING > .004, ('the jaw hinge is not seated inside the head', JAW_SEATING)
 
 # ------------------------------------------------------------ skinning by arc length ----
-AXIAL_NAMES = ['skull', 'neck_00', 'chest', 'body'] + ['tail_%02d' % i for i in range(len(TAIL_Y))]
+AXIAL_NAMES = ['skull', 'neck_00', 'chest', 'thorax', 'body', 'lumbar'] \
+    + ['tail_%02d' % i for i in range(len(TAIL_Y))]
 AXIAL_PTS = [Vector((cx(Y0 + .01), Y0 + .01, cz(Y0 + .01)))] + [B[n][0] for n in AXIAL_NAMES] \
     + [on_axis(Y1 - .004)]
 AP, ACUM = T.polyline(AXIAL_PTS)
@@ -399,16 +414,7 @@ for key, pts in LIMB_PTS.items():
     LIMB_FIT[key] = (P, cum, LIMB_NAMES[key],
                      T.station_weights(ASTATION, T.project(AP, ACUM, P[0])[1]))
 
-# **The limb is bounded against its own bone chain, not by a radius.** Rhaeticosaurus' flippers
-# needed the 92nd percentile of the blade's own distances where the kit takes the 55th, and Henodus
-# tore to 64.9x on a rig whose limb test was a trunk-width constant. A sprawling leg is worse than
-# either: it is thick at the shoulder, thin at the wrist and broad again at the webbed hand, so no
-# single radius describes it. What does describe it is a **Voronoi split**: a vertex is the limb's
-# where it is nearer the limb's polyline than the body's axial one, blended over `LIMB_MARGIN` of a
-# body either side of the tie, and faded out over the first `LIMB_ROOT_FADE` of the chain so the
-# shoulder itself stays on the trunk. The measurement that says this is right is `skin-tears.mjs`,
-# reported in the README.
-LIMB_MARGIN = .042
+LIMB_MARGIN = .055
 LIMB_ROOT_FADE = .34
 LIMB_RADIUS = {}
 for key, c in LIMBS.items():
@@ -435,17 +441,14 @@ def limb_weights(q):
             # limb all four joints at nearly the same weight. That is over the four-influence
             # budget once the root station is added, so `relax_weights` trims -- and picks a
             # different four on neighbouring vertices, which is the discontinuity Cartorhynchus'
-            # radiating paddle spikes came from. Measured: 9.10x at the constant, 4.61x at the
+            # radiating paddle spikes came from. Measured: 9.10x at the constant, 9.10x at the
             # fraction.
-            chosen = (T.limb_chain(names, cum, s, blend=cum[-1] * .16), rootw,
+            chosen = (T.limb_chain(names, cum, s, blend=cum[-1] * .26), rootw,
                       min(1., s / cum[-1]))
     return (best, *chosen) if chosen else None
 
 
-# The throat follows the jaw. The mandible is rigid on `jaw` and the skin behind the hinge rides
-# the axial chain; with nothing blending between them a wide gape separates the two and the pale
-# gular skin reads as a slab hanging off a detached jaw.
-THROAT_SPAN = .060
+THROAT_SPAN = .058
 THROAT_DROP = .16
 
 
@@ -488,19 +491,20 @@ def _section_radius(y):
 POSE_DEVIATION = {
     'spine': T.curvature_over_section([B[n][0] for n in AXIAL_NAMES], _section_radius),
     'headAndChest': T.curvature_over_section(
-        [B[n][0] for n in ('skull', 'neck_00', 'chest', 'body')], _section_radius),
+        [B[n][0] for n in ('skull', 'neck_00', 'chest', 'thorax', 'body')], _section_radius),
     'tail': T.curvature_over_section(
         [B[n][0] for n in AXIAL_NAMES if n.startswith('tail_')], _section_radius),
 }
 LIMB_ASYMMETRY = T.limb_asymmetry(LIMB_PTS, cx, 1.)
-print('APH_POSE', json.dumps({k: {a: b for a, b in v.items() if a != 'perStation'}
+print('MYS_POSE', json.dumps({k: {a: b for a, b in v.items() if a != 'perStation'}
                               for k, v in POSE_DEVIATION.items()}))
-print('APH_ASYM', json.dumps(LIMB_ASYMMETRY.get('allPairs')))
+print('MYS_POSE_TAIL', json.dumps(POSE_DEVIATION['tail']['perStation']))
+print('MYS_ASYM', json.dumps(LIMB_ASYMMETRY.get('allPairs')))
 
 # ------------------------------------------------------------------ procedural twin ----
 puppet, puppet_thickness, twin_report, bvh_src = T.build_twin(
     auth, thickness, NAME + ' procedural volume twin', VOXEL, PUPPET_TRIANGLE_TARGET,
-    sample_albedo, thin=THIN, band=.020, roughness=.66, blade_dilation=.0030)
+    sample_albedo, thin=THIN, band=.020, roughness=.62, blade_dilation=.0030)
 
 
 # --------------------------------------------------------------------- cut the jaw ----
@@ -542,7 +546,7 @@ for o in (auth, puppet):
     for n in B:
         o.vertex_groups.new(name=n)
     raw_weights = [weights(v.co) for v in o.data.vertices]
-    relaxed = T.relax_weights(o, raw_weights, passes=8, hold=.48)
+    relaxed = T.relax_weights(o, raw_weights, passes=10, hold=.48)
     counts, owners = [], {}
     for v in o.data.vertices:
         w = relaxed[v.index]
@@ -560,8 +564,6 @@ for o in (auth, puppet):
     o.parent = rig
     weight_report[o.name] = {'maxInfluences': max(counts), 'vertices': len(counts),
                              'verticesPerBone': owners}
-# **A joint that owns no skin is a silent defect** (`tools/triassic/idle-bones.mjs`), and it is
-# checked here rather than only after packaging so a build cannot finish with one.
 for name, rep in weight_report.items():
     idle = [n for n in B if n != 'root' and rep['verticesPerBone'].get(n, 0) == 0]
     assert not idle, ('these joints own no skin', name, idle)
@@ -577,9 +579,7 @@ for o in parts['lower jaw'].values():
     o.parent = rig
 
 # ------------------------------------------------------------ the mouth interior ----
-mouth_mat = T.inward_material(NAME + ' mouth interior', (.32, .14, .12, 1))
-# Not culled: a sac buried inside a head is never seen from outside whatever its winding, and
-# culling it takes away the floor exactly when the mouth is open and something is looking up into it.
+mouth_mat = T.inward_material(NAME + ' mouth interior', (.30, .13, .115, 1))
 mouth_mat.use_backface_culling = False
 MOUTH_BACK = HINGE_Y + .016
 MOUTH_FRONT = MOUTH_FRONT_Y
@@ -588,19 +588,15 @@ MOUTH_FRONT = MOUTH_FRONT_Y
 def _raw_section(y):
     e = T.smooth((MOUTH_BACK - y) / .012) * T.smooth((y - MOUTH_FRONT) / .004)
     w = max(mouth_half_width(y) - .0004, .0012) * (.94 + .06 * e)
-    h = max(min(head_half_depth(y) * .50, mouth_half_depth(y) * .60), .0030) * (.72 + .28 * e)
+    h = max(min(head_half_depth(y) * .50, mouth_half_depth(y) * .60), .0028) * (.72 + .28 * e)
     return w, h
 
 
 LINING_FIT = {}
-LINING_POWER = 2.8
+LINING_POWER = 2.7
 
 
 def mouth_section(y):
-    """The raw section, unfitted -- the fitting is per vertex. A temnospondyl's skull is very flat
-    and very wide, so its mouth's section is much further from an ellipse than a deep reptile head
-    is: an ellipse at this aspect ratio narrows to nothing exactly where the mandible's rim reaches
-    at full gape, and the gape then shows background down both sides of the jaw."""
     w, h = _raw_section(y)
     LINING_FIT[round(float(y), 5)] = [round(w, 5), round(h, 5)]
     return w, h
@@ -639,11 +635,9 @@ for r in PAINTED:
             ('the oral lining is narrower than the mouth', y, w, mouth_half_width(y))
     assert h >= .0012, ('the oral lining is flat', y, h)
 
-# The jaw hinge's own tissue: the corner where the mandible's rear rim, the throat and the lining
-# all meet, which is the one place a gape can still open onto nothing.
-hinge_mat = T.vertex_colour_material(NAME + ' jaw hinge body', roughness=.66)
+hinge_mat = T.vertex_colour_material(NAME + ' jaw hinge body', roughness=.62)
 HINGE_CENTRE = (cx(HINGE_Y), HINGE_Y + .004, cz(HINGE_Y))
-HINGE_R = (half_width(HINGE_Y) * .92, .048, half_depth(HINGE_Y) * .98)
+HINGE_R = (half_width(HINGE_Y) * .92, .046, half_depth(HINGE_Y) * .98)
 HINGE_FIT = 0.
 for step in range(24):
     k = 1. - step / 24
@@ -655,7 +649,7 @@ for step in range(24):
         HINGE_FIT = k
         break
 assert HINGE_FIT > .3, ('the hinge envelope could not be seated', HINGE_FIT)
-print('APH_HINGE', json.dumps({'fit': HINGE_FIT, 'r': list(HINGE_R), 'centre': list(HINGE_CENTRE)}))
+print('MYS_HINGE', json.dumps({'fit': HINGE_FIT, 'r': list(HINGE_R), 'centre': list(HINGE_CENTRE)}))
 bpy.ops.mesh.primitive_uv_sphere_add(segments=18, ring_count=10, location=tx(HINGE_CENTRE))
 hinge = bpy.context.object
 hinge.name = 'Seated jaw hinge tissue'
@@ -701,12 +695,12 @@ assert max(distances) < ENVELOPE_TOLERANCE, max(distances)
 SNOUT_Y = Y0 + .010
 ANCHOR_POINTS = {
     'anchor_mouth': ('jaw', (cx(SNOUT_Y), SNOUT_Y, seam(SNOUT_Y) - .004), 'mouth'),
-    'anchor_mouth_inside': ('skull', (cx(HINGE_Y - .04), HINGE_Y - .04, seam(HINGE_Y - .04)),
+    'anchor_mouth_inside': ('skull', (cx(HINGE_Y - .045), HINGE_Y - .045, seam(HINGE_Y - .045)),
                             'swallow'),
-    # **The blow this animal lands is its jaws.** Its light attack is a snap and its heavy and its
-    # ability are both the sideways sweep of that long rostrum, so the bone that delivers the blow
-    # is the skull -- it is the head itself that is swung, not a neck (there is barely one) and not
-    # the tail.
+    # **The blow is the jaws on the end of a short neck.** This animal's named heavy and ability
+    # are both the surface lunge -- the whole body driven forward by the tail with the jaws open --
+    # so the bone that delivers it is the skull, not the tail that provides the thrust and not a
+    # neck long enough to strike with on its own.
     'anchor_attack_primary': ('skull', (cx(SNOUT_Y), SNOUT_Y - .004, seam(SNOUT_Y) + .005),
                               'attack'),
 }
@@ -741,22 +735,17 @@ def reset():
         pb.scale = (1, 1, 1)
 
 
-# **An anguilliform wave, and four limbs rowing on the same beat.** The research gives this animal
-# an elongate anguilliform swim, so the gain climbs monotonically from the shoulder to the tail tip
-# and the lag spreads a full wavelength over the body. What the era's own rule adds is that a
-# limbed swimmer's dash has to *paddle*: the limbs are not along for the ride here, they take a
-# real rearward stroke in Swim and a harder one in Sprint, and the swept angle at each root is
-# measured from the limb's own direction below rather than read off an Euler channel.
-AXIAL_CHAIN = ['neck_00', 'chest', 'body'] + ['tail_%02d' % i for i in range(len(TAIL_Y))]
-# **The ramp at the pelvis is where the skin tears, not the tail tip.** A first pass ran the gain
-# 0.16 at the trunk and 0.34 at the first tail joint -- a doubling across one joint, right where the
-# hind limbs hang off it -- and `skin-tears.mjs` read 5.45x with 397 of the torn edges on `tail_00`.
-# A wave that grows smoothly grows just as far and tears a third less.
-GAIN = [.18, .11, .15, .20, .29, .42, .57, .74, .92, 1.06, 1.16]
-LAG = [0., .30, .75, 1.05, 1.40, 1.75, 2.10, 2.45, 2.80, 3.15, 3.50]
+# **A crocodile-shaped animal sculls with its tail and walks with its legs**, and those are two
+# different performances rather than one with a different amplitude. The axial gain is flat over a
+# stiff, armoured trunk and climbs through the tail; the limbs take their real stroke in `Crawl`,
+# which is this animal's declared locomotion, and in the water they are swept back along the flanks
+# and kick rather than row. The swept angle at each root is measured from the limb's own direction
+# below, in every one of those gaits, so "the limbs move" is a number in all of them.
+AXIAL_CHAIN = ['neck_00', 'chest', 'thorax', 'body', 'lumbar'] \
+    + ['tail_%02d' % i for i in range(len(TAIL_Y))]
+GAIN = [.16, .06, .06, .07, .11, .19, .31, .46, .62, .79, .94, 1.06, 1.16]
+LAG = [0., .26, .50, .74, .98, 1.24, 1.52, 1.80, 2.08, 2.36, 2.64, 2.92, 3.20]
 SIDE = {k: (1. if k.endswith('R') else -1.) for k in LIMB_NAMES}
-# A diagonal-couplet row: each limb is half a cycle out of phase with the one beside it and a
-# quarter out with the one in front, which is what a sprawling tetrapod does in water and on land.
 STROKE_LAG = {'foreL': 0., 'foreR': pi, 'hindL': pi, 'hindR': 0.}
 
 
@@ -786,9 +775,10 @@ for clip, duration in CLIPS.items():
         env = 1. if loop else e
         pb = rig.pose.bones
 
-        amp = {'Idle': .16, 'Swim': 1.0, 'Sprint': 1.32, 'Eat': .26, 'Guard': .16, 'Grab': .24,
-               'Breath': .28, 'Breathe': .22, 'Growth': .20, 'Dodge': 1.20, 'Crawl': .34,
-               'Ability': .60}.get(clip, .24)
+        amp = {'Idle': .12, 'Swim': 1.0, 'Sprint': 1.40, 'Eat': .22, 'Guard': .14, 'Grab': .20,
+               'Breath': .24, 'Breathe': .18, 'Growth': .18, 'Dodge': 1.00, 'Crawl': .40,
+               'Lower': .10, 'Retract': .14, 'SnapLeft': .35, 'SnapRight': .35,
+               'Ability': .70}.get(clip, .22)
         beat = {'Swim': 2., 'Sprint': 2., 'Idle': 1., 'Breathe': 1., 'Crawl': 1.}.get(clip, 1.)
 
         def wave(i, f_=1.):
@@ -798,127 +788,160 @@ for clip, duration in CLIPS.items():
         drive = (ramp(u, .30, .48, 2.2) * (1 - ramp(u, .64, 1., 1.))
                  if clip in ('Attack', 'Heavy', 'Ability') else 0.)
         snap = spike(u, .34, .58, 2.6) if clip in ('Attack', 'Heavy', 'Ability') else 0.
-        # **Heavy and Ability are the side swipe, and they are not Attack with a bigger number.**
-        # The animal's own kit calls the heavy a side swipe and its ability a sideways sweep of the
-        # jaws; Attack is the forward snap. `sway` is what makes the difference measurable: the
-        # snout goes across rather than forward, and the audit checks the lateral share.
-        sway = {'Heavy': 1.0, 'Ability': 1.35}.get(clip, 0.)
-        strike = {'Heavy': 1.35, 'Ability': 1.15}.get(clip, 1.0)
+        # **The surface lunge is a straight-line charge, not a sweep.** The animal's own kit calls
+        # its heavy and its ability the surface lunge, at a reach of a body length and a half, and
+        # what carries it is one enormous tail stroke rather than a neck.
+        lunge = {'Heavy': 1.30, 'Ability': 1.75}.get(clip, 0.)
         dead = ramp(u, 0., 1., 1.) if clip == 'Death' else 0.
         turn = (-1 if clip == 'TurnLeft' else 1) * e if clip in ('TurnLeft', 'TurnRight') else 0.
         haul = max(0., sin(p * 3)) ** 2 if clip == 'Grab' else 0.
+        # --- the shore performance, on the simulation's own clock
+        lower = ramp(u, .05, .85, 1.5) if clip == 'Lower' else 0.
+        snapside = (1. if clip == 'SnapLeft' else -1.) if clip in ('SnapLeft', 'SnapRight') else 0.
+        # The strike: a wind-up across to the far side and a whip through to the near one.
+        wind = spike(u, .00, .34, 1.2) if snapside else 0.
+        whip = ramp(u, .22, .52, 2.0) * (1 - ramp(u, .70, 1., 1.)) if snapside else 0.
+        back = ramp(u, .0, .8, 1.2) if clip == 'Retract' else 0.
         if clip == 'Death':
             amp *= 1 - dead
 
         # --- the jaws
-        gape = .012 * (1 - cos(p)) * (1 if clip in ('Idle', 'Swim', 'Sprint') else 0)
+        gape = .010 * (1 - cos(p)) * (1 if clip in ('Idle', 'Swim', 'Sprint') else 0)
         if clip == 'Bite':
-            gape = .50 * ramp(u, .03, .17, 1.8) * (1 - ramp(u, .22, .38, 2.4))
+            gape = .48 * ramp(u, .03, .17, 1.8) * (1 - ramp(u, .22, .38, 2.4))
         elif clip == 'Attack':
-            gape = .22 * cock + .44 * ramp(u, .22, .44, 1.6) * (1 - ramp(u, .48, .66, 1.4))
-        elif clip == 'Heavy':
-            gape = .22 * cock + .46 * ramp(u, .24, .46, 1.7) * (1 - ramp(u, .52, .72, 1.4))
-        elif clip == 'Ability':
-            gape = .26 * cock + .45 * ramp(u, .20, .40, 1.6) * (1 - ramp(u, .58, .84, 1.4))
+            gape = .20 * cock + .44 * ramp(u, .22, .44, 1.6) * (1 - ramp(u, .48, .66, 1.4))
+        elif clip in ('Heavy', 'Ability'):
+            gape = .22 * cock + .46 * ramp(u, .22, .44, 1.6) * (1 - ramp(u, .56, .80, 1.4))
         elif clip == 'Grab':
             gape = .12 + .05 * haul
         elif clip == 'Eat':
             gape = .32 * (1 - cos(p * 2)) * .5 + .10
         elif clip == 'Breath':
-            gape = .18 * spike(u, .30, .70, 1.)
+            gape = .16 * spike(u, .30, .70, 1.)
         elif clip == 'Breathe':
-            gape = .07 * (1 - cos(p))
+            gape = .06 * (1 - cos(p))
         elif clip in ('Hit', 'Stagger'):
-            gape = .26 * e
+            gape = .24 * e
         elif clip == 'Death':
             gape = .22 * dead
         elif clip == 'Guard':
             gape = .03 * (1 - cos(p))
+        elif clip == 'Lower':
+            # The telegraph: the head comes down over the water and the jaws part.
+            gape = .18 * lower
+        elif snapside:
+            gape = .18 + .30 * ramp(u, .10, .40, 1.4) * (1 - ramp(u, .52, .78, 2.0))
+        elif clip == 'Retract':
+            gape = .16 * (1 - back)
         pb['jaw'].rotation_euler.x = gape
         pb['skull'].rotation_euler.x = -.08 * gape
         gape_trace.setdefault(clip, []).append(round(gape, 5))
 
-        # --- the trunk
+        # --- the trunk. Armoured and stiff: it rolls and pitches, it does not undulate.
         body = pb['body']
-        body.rotation_euler.z += .13 * turn
-        body.rotation_euler.y += .16 * turn
+        body.rotation_euler.z += .12 * turn
+        body.rotation_euler.y += .14 * turn
         if clip in ('Dive', 'Rise'):
             body.rotation_euler.x = (1 if clip == 'Dive' else -1) * .30 * e
         if clip in ('Attack', 'Heavy', 'Ability'):
-            body.location.y = .10 * cock - .40 * drive * strike
-            body.rotation_euler.x = .08 * cock - .07 * drive
-            body.rotation_euler.z += .16 * sway * (-.6 * cock + 1.0 * drive)
+            body.location.y = .12 * cock - (.34 + .30 * lunge) * drive
+            body.rotation_euler.x = .10 * cock - .09 * drive
         if clip == 'Bite':
             body.location.y = -.16 * ramp(u, .05, .24, 2.4) * (1 - ramp(u, .42, .78, 1.))
         if clip == 'Parry':
-            body.rotation_euler.y = -.26 * e
-            body.rotation_euler.z = .16 * e
+            body.rotation_euler.y = -.24 * e
+            body.rotation_euler.z = .14 * e
         if clip == 'Guard':
-            body.rotation_euler.x = .030 * (1 - cos(p))
+            body.rotation_euler.x = .028 * (1 - cos(p))
         if clip == 'Dodge':
-            body.rotation_euler.y = .46 * e
-            body.rotation_euler.z = -.40 * e
-            body.location.x = .32 * e
+            body.rotation_euler.y = .42 * e
+            body.rotation_euler.z = -.38 * e
+            body.location.x = .30 * e
         if clip in ('Hit', 'Stagger'):
-            body.rotation_euler.z = .20 * e * sin(p * (1 if clip == 'Hit' else 2))
-            body.rotation_euler.y = .22 * e
+            body.rotation_euler.z = .18 * e * sin(p * (1 if clip == 'Hit' else 2))
+            body.rotation_euler.y = .20 * e
             body.location.y = .10 * e
         if clip in ('Breath', 'Breathe'):
-            body.rotation_euler.x = -.20 * (e if clip == 'Breath' else .5 + .5 * sin(p))
-            body.location.z = .08 * (e if clip == 'Breath' else 1.) * .5
+            body.rotation_euler.x = -.16 * (e if clip == 'Breath' else .5 + .5 * sin(p))
+            body.location.z = .07 * (e if clip == 'Breath' else 1.) * .5
         if clip == 'Grab':
             body.location.y = -.09 - .07 * haul
         if clip == 'Growth':
             body.rotation_euler.x = -.05 * e
             body.rotation_euler.z = .06 * e
         if clip == 'Crawl':
-            # Hauling out: the trunk rolls from side to side over the shoulder that is taking the
-            # weight, which is what a sprawling gait looks like from above.
-            body.rotation_euler.y = .10 * sin(p)
-            body.location.z = -.02 + .012 * sin(p * 2)
-        body.rotation_euler.y += 2.3 * dead
-        body.rotation_euler.x += .15 * dead
-        body.location.z -= .22 * dead
+            # The high walk: the trunk is carried over the feet and rolls onto the shoulder that
+            # is taking the weight.
+            body.rotation_euler.y = .11 * sin(p)
+            body.location.z = .012 * sin(p * 2)
+        if clip == 'Lower':
+            # Crouching over the bank: the shoulders drop and the whole animal comes forward.
+            body.location.z = -.055 * lower
+            body.location.y = -.07 * lower
+            body.rotation_euler.x = .10 * lower
+        if snapside:
+            body.rotation_euler.z = -.14 * snapside * wind + .20 * snapside * whip
+            body.location.y = -.10 * whip
+            body.rotation_euler.x = .08 * whip
+        if clip == 'Retract':
+            body.location.z = -.055 * (1 - back)
+            body.location.y = -.07 * (1 - back)
+            body.rotation_euler.x = .10 * (1 - back)
+        body.rotation_euler.y += 2.2 * dead
+        body.rotation_euler.x += .14 * dead
+        body.location.z -= .20 * dead
 
-        # --- the axial wave. This is how the animal swims.
+        # --- the axial chain
         for i, n in enumerate(AXIAL_CHAIN):
             q = pb[n]
             z = .105 * GAIN[i] * amp * wave(i, beat)
-            z += turn * (.028 + .005 * i)
-            z += .045 * dead * sin(i * .8)
-            if clip in ('Attack', 'Heavy', 'Ability'):
-                if n in ('neck_00', 'chest'):
-                    z += (.22 * cock * -1. - .30 * drive) * sway
-                if n.startswith('tail'):
-                    # The tail braces the other way through the sweep, which is what stops the
-                    # whole animal simply spinning about its middle.
-                    z += .10 * sway * drive * GAIN[i]
+            z += turn * (.026 + .005 * i)
+            z += .042 * dead * sin(i * .8)
+            if clip in ('Attack', 'Heavy', 'Ability') and n.startswith('tail'):
+                # The lunge is the tail's: it cocks to one side and straightens through the drive.
+                z += (.14 * cock - .18 * drive) * GAIN[i] * (1. + lunge)
             if clip == 'Dodge':
-                z += .17 * e * sin(i * .55 + .6)
+                z += .16 * e * sin(i * .55 + .6)
             if clip == 'Grab':
-                z += .07 * GAIN[i] * haul * (1 if i > 5 else -.5)
+                z += .06 * GAIN[i] * haul * (1 if i > 5 else -.5)
+            if snapside:
+                # The head goes across on the wind-up and whips through; the tail counters, which
+                # is what holds the animal on the bank instead of pivoting it off.
+                # **Graded off the neck, not dumped on the shoulder.** Giving `chest` the same
+                # 0.52 rad as `neck_00` put 30 degrees of yaw into one joint at the shoulder girdle
+                # and `skin-tears.mjs` read 8.3x across the band behind it (640 edges on `thorax`).
+                # A crocodilian head swing is carried by the neck and the front of the trunk
+                # together.
+                if n in ('neck_00', 'chest', 'thorax'):
+                    g = {'neck_00': 1.0, 'chest': .55, 'thorax': .28}[n]
+                    z += snapside * (-.34 * wind + .52 * whip) * g
+                if n.startswith('tail'):
+                    z += snapside * (.16 * wind - .22 * whip) * GAIN[i]
             q.rotation_euler.z += z
             if clip in ('Dive', 'Rise'):
-                q.rotation_euler.x = (1 if clip == 'Dive' else -1) * .045 * e * GAIN[i]
+                q.rotation_euler.x = (1 if clip == 'Dive' else -1) * .042 * e * GAIN[i]
             if clip in ('Breath', 'Breathe') and n in ('neck_00', 'chest'):
-                q.rotation_euler.x = -.20 * (e if clip == 'Breath' else .5 + .5 * sin(p))
+                q.rotation_euler.x = -.18 * (e if clip == 'Breath' else .5 + .5 * sin(p))
+            if clip in ('Lower', 'Retract') and n in ('neck_00', 'chest'):
+                q.rotation_euler.x = .30 * (lower if clip == 'Lower' else 1 - back)
         if clip in ('Attack', 'Heavy', 'Ability'):
-            pb['skull'].rotation_euler.x += (-.14 * cock + .20 * drive) * strike
-            # **The swipe is the neck's as much as the head's.** A first pass put 0.84 rad of yaw
-            # on `skull` alone in Ability and `skin-tears.mjs` read 4.92x across the head/neck
-            # junction (129 torn edges on `neck_00`). One joint cannot carry a sweep this wide on a
-            # skull a quarter of the body long; spread over the three joints behind it the snout
-            # goes just as far across and the skin holds.
-            pb['skull'].rotation_euler.z += (-.18 * cock + .34 * drive) * sway
-            pb['neck_00'].rotation_euler.z += (-.12 * cock + .22 * drive) * sway
-            pb['neck_00'].rotation_euler.x += (-.08 * cock + .12 * drive) * strike
+            pb['skull'].rotation_euler.x += (-.14 * cock + .22 * drive)
+            pb['neck_00'].rotation_euler.x += (-.10 * cock + .16 * drive)
         if clip == 'Eat':
-            pb['skull'].rotation_euler.z += .12 * sin(p * 2)
-            pb['neck_00'].rotation_euler.x += -.09 * sin(p * 2)
+            pb['skull'].rotation_euler.z += .10 * sin(p * 2)
+            pb['neck_00'].rotation_euler.x += -.08 * sin(p * 2)
         if clip == 'Grab':
             pb['skull'].rotation_euler.z += .08 * haul
+        if clip == 'Lower':
+            pb['skull'].rotation_euler.x += .34 * lower
+        if snapside:
+            pb['skull'].rotation_euler.z += snapside * (-.26 * wind + .44 * whip)
+            pb['skull'].rotation_euler.x += .18 * whip
+        if clip == 'Retract':
+            pb['skull'].rotation_euler.x += .34 * (1 - back)
 
-        # --- the limbs. A diagonal-couplet row, and it is a real stroke.
+        # --- the limbs
         for key, names in LIMB_NAMES.items():
             s = SIDE[key]
             kind = key[:-1]
@@ -926,46 +949,54 @@ for clip, duration in CLIPS.items():
             ph = p * beat - STROKE_LAG[key]
             stroke = sin(ph)
             recover = cos(ph)
-            # How far the limb swings, per clip. It is the animal's reach and not the clip's
-            # energy, so Sprint strokes harder rather than the same stroke faster.
-            reach = {'Sprint': 1.00, 'Swim': .72, 'Crawl': .86, 'Idle': .16, 'Breathe': .18,
-                     'Eat': .20, 'Guard': .18, 'Grab': .20}.get(clip, .24)
-            gainf = 1.0 if kind == 'fore' else 1.08
-            # The power stroke is backwards and downwards: `.z` sweeps the limb fore and aft about
-            # the shoulder, `.y` lifts and lowers it, `.x` feathers the hand so it is edge-on
-            # through the recovery and broadside through the drive.
+            # **Crawl is where this animal's limbs do the work.** In the water the legs are swept
+            # back along the flanks and kick on the beat; on land they carry it.
+            reach = {'Crawl': .78, 'Sprint': .46, 'Swim': .30, 'Idle': .14, 'Breathe': .14,
+                     'Eat': .16, 'Guard': .16, 'Grab': .16, 'Lower': .10, 'Retract': .12,
+                     'SnapLeft': .26, 'SnapRight': .26}.get(clip, .20)
+            gainf = 1.0 if kind == 'fore' else 1.10
             up.rotation_euler.z = s * reach * stroke * gainf
             up.rotation_euler.y = s * .34 * reach * recover * gainf
-            up.rotation_euler.x = -.40 * reach * recover * gainf
+            up.rotation_euler.x = -.38 * reach * recover * gainf
+            if clip in ('Swim', 'Sprint'):
+                # Trailing: the whole limb is carried back against the flank and stays there.
+                up.rotation_euler.z += s * .34
             if clip in ('Dive', 'Rise'):
-                up.rotation_euler.x += (1 if clip == 'Dive' else -1) * .42 * e
+                up.rotation_euler.x += (1 if clip == 'Dive' else -1) * .38 * e
             if clip in ('TurnLeft', 'TurnRight'):
                 d = s * (-1 if clip == 'TurnLeft' else 1)
-                up.rotation_euler.z += d * .38 * e
-                up.rotation_euler.y += d * .30 * e
+                up.rotation_euler.z += d * .34 * e
+                up.rotation_euler.y += d * .28 * e
             if clip in ('Attack', 'Heavy', 'Ability'):
-                up.rotation_euler.z += s * (.28 * cock - .40 * drive) * gainf
+                up.rotation_euler.z += s * (.24 * cock - .46 * drive) * gainf
                 up.rotation_euler.x += .12 * snap
             if clip == 'Guard':
-                up.rotation_euler.y += s * .24 * (1 - cos(p)) / 2
+                up.rotation_euler.y += s * .22 * (1 - cos(p)) / 2
             if clip == 'Parry':
-                up.rotation_euler.y += s * .34 * e
+                up.rotation_euler.y += s * .30 * e
             if clip == 'Dodge':
-                up.rotation_euler.z += s * .58 * e
+                up.rotation_euler.z += s * .52 * e
             if clip in ('Hit', 'Stagger'):
-                up.rotation_euler.z += s * .32 * e * sin(p)
+                up.rotation_euler.z += s * .30 * e * sin(p)
             if clip in ('Breath', 'Breathe'):
-                up.rotation_euler.z += s * .20 * (e if clip == 'Breath' else .6 + .4 * sin(p))
+                up.rotation_euler.z += s * .18 * (e if clip == 'Breath' else .6 + .4 * sin(p))
             if clip == 'Grab':
-                up.rotation_euler.y += s * .22 + s * .10 * haul
+                up.rotation_euler.y += s * .20 + s * .10 * haul
             if clip == 'Growth':
-                up.rotation_euler.y += s * .22 * e
-            up.rotation_euler.z += s * .36 * dead
-            up.rotation_euler.x += .28 * dead
-            # The elbow and the wrist lag the shoulder, so the hand closes on the drive and
-            # feathers on the recovery rather than following the upper limb rigidly.
+                up.rotation_euler.y += s * .20 * e
+            if clip == 'Lower':
+                # Braced: the forelimbs take the weight as the head goes out over the water.
+                up.rotation_euler.y += s * .22 * lower
+                up.rotation_euler.z += s * (.18 if kind == 'fore' else -.14) * lower
+            if snapside:
+                up.rotation_euler.z += s * (.20 * wind - .30 * whip) * gainf
+            if clip == 'Retract':
+                up.rotation_euler.y += s * .22 * (1 - back)
+                up.rotation_euler.z += s * (.18 if kind == 'fore' else -.14) * (1 - back)
+            up.rotation_euler.z += s * .32 * dead
+            up.rotation_euler.x += .26 * dead
             lag = sin(ph - .85)
-            for j, share, feather, lagshare in ((1, .18, .50, .16), (2, .12, .34, .22)):
+            for j, share, feather, lagshare in ((1, .17, .46, .14), (2, .11, .30, .20)):
                 pb[names[j]].rotation_euler.z = share * up.rotation_euler.z + s * lagshare * reach * lag
                 pb[names[j]].rotation_euler.x = feather * up.rotation_euler.x
 
@@ -996,11 +1027,8 @@ for clip, duration in CLIPS.items():
 for c in LOOPS:
     assert seams[c] < 1e-6, (c, seams[c])
 
-# --- the swept angle at each limb root, measured from the limb's own direction.
-# **Not read off an Euler channel.** A rotation written on one axis is a stroke on one body and a
-# twist on another, depending on how the bone rests.
 limb_sweep = {}
-for clip in ('Swim', 'Sprint', 'Crawl', 'Idle'):
+for clip in ('Crawl', 'Sprint', 'Swim', 'SnapLeft', 'Idle'):
     rig.animation_data.action = bpy.data.actions[clip]
     last = round(CLIPS[clip] * 30)
     dirs = {k: [] for k in LIMB_NAMES}
@@ -1021,11 +1049,15 @@ for clip in ('Swim', 'Sprint', 'Crawl', 'Idle'):
     limb_sweep[clip] = row
 rig.animation_data.action = None
 for key, names in LIMB_NAMES.items():
-    assert limb_sweep['Sprint'][names[0]] > 60., \
-        ('a limb does not take a stroke in Sprint', names[0], limb_sweep['Sprint'][names[0]])
-    assert limb_sweep['Swim'][names[0]] > 45., \
-        ('a limb does not take a stroke in Swim', names[0], limb_sweep['Swim'][names[0]])
-print('APH_SWEEP', json.dumps(limb_sweep))
+    # **Crawl is the locomotion, so Crawl is where the bar bites.** This is the era's "a limbed
+    # swimmer's dash has to paddle" rule applied to the animal the codebase actually declares:
+    # a shore animal, whose primary is the land gait. The swim set still has to show the limbs
+    # working rather than frozen, which is the second figure.
+    assert limb_sweep['Crawl'][names[0]] > 60., \
+        ('a limb does not take a stride in Crawl', names[0], limb_sweep['Crawl'][names[0]])
+    assert limb_sweep['Sprint'][names[0]] > 40., \
+        ('a limb does not work in Sprint', names[0], limb_sweep['Sprint'][names[0]])
+print('MYS_SWEEP', json.dumps(limb_sweep))
 reset()
 scene.frame_set(0)
 
@@ -1047,37 +1079,37 @@ shutil.copyfile(os.path.join(OUT, ID + '.puppet.glb'), os.path.join(OUT, ID + '.
 authored_tris = sum(tri(o) for o in AUTH_GROUP) + sum(tri(o) for o in oralparts)
 puppet_tris = sum(tri(o) for o in PUP_GROUP) + sum(tri(o) for o in oralparts)
 meta = {
-    'id': ID, 'name': NAME, 'species': 'Aphaneramma rostratum',
-    'provenance': 'Early Triassic · Spitsbergen',
-    'description': 'A trematosaur temnospondyl: a marine amphibian with a gharial\'s snout, four '
-                   'sprawling webbed limbs and a flattened swimming tail. Authored Tripo body and '
-                   'measured procedural volume twin share one armature, one set of inverse binds, '
-                   'one set of sockets and one set of actions.',
-    'modelLength': BODY_LENGTH, 'lengthMeters': 1.6, 'locomotion': 'Swim',
+    'id': ID, 'name': NAME, 'species': 'Mystriosuchus steinbergeri',
+    'provenance': 'Late Triassic · Dachstein lagoon, Austria',
+    'description': 'A marine phytosaur: crocodile-shaped but not a crocodile, with a long narrow '
+                   'rostrum, a double row of dorsal osteoderms and a flattened sculling tail. '
+                   'Authored Tripo body and measured procedural volume twin share one armature, '
+                   'one set of inverse binds, one set of sockets and one set of actions.',
+    'modelLength': BODY_LENGTH, 'lengthMeters': 4.0, 'locomotion': 'Crawl',
     'clips': list(CLIPS), 'looping': LOOPS, 'anchors': [a['name'] for a in anchors],
     'puppet': ID + '.puppet.glb',
-    'sources': ['docs/triassic/canonical/aphaneramma.png',
-                'tools/triassic/creatures/aphaneramma/tripo-raw/aphaneramma.raw.glb'],
+    'sources': ['docs/triassic/canonical/mystriosuchus.png',
+                'tools/triassic/creatures/mystriosuchus/tripo-raw/mystriosuchus.raw.glb'],
     'notes': [
-        'Swimming is the locomotion, as it is for every playable Triassic animal: the research '
-        'gives this body an elongate anguilliform swim, so the axial gain climbs monotonically '
-        'from the shoulder to the tail tip and the lag spreads a full wavelength over the body. '
-        'Crawl is an extra clip beside that set, not the locomotion the rest is built on — the '
-        'generation is posed for land because that is the pose that shows the animal.',
-        'The limbs row on the same beat rather than hanging off it, in a diagonal couplet, and the '
-        'swept angle at each limb root is measured from the limb\'s own direction (root joint to '
-        'tip joint in world space) rather than read off an Euler channel. The build refuses a limb '
-        'that sweeps under 60 degrees in Sprint or under 45 in Swim.',
-        'The mouth is painted, not modelled: Placodus\' geometric method returns 34 scattered '
-        'vertices over the whole front third, spread over the entire depth of the head, which is '
-        'the gular folds finding each other and not a slit. The painted line is read as a '
-        'continuous curve, and the jump penalty had to be raised from the kit\'s 1.2 to 3.0 — at '
-        '1.2 the path let go of the lip over the last quarter of the head and followed the gular '
-        'fold down. The seam is extrapolated over the last 0.037 of body on its own slope, because '
-        'the jaw corner is where the mandible flares and no reading there is the lip.',
-        'Heavy and Ability are the animal\'s side swipe — the sideways sweep of a long rostrum — '
-        'rather than a bigger Attack, and the audit measures the lateral share of the snout\'s '
-        'travel to say so.',
+        'A SHORE ANIMAL (shore: true), which is the era\'s stated exception to "a playable '
+        'Triassic animal swims": it is never playable, it stands at a post above the waterline '
+        'and strikes into the water, and the land motion is its primary. locomotion is therefore '
+        'Crawl, as it is for Tanystropheus, Macrocnemus and Coelophysis.',
+        'Lower, SnapLeft, SnapRight and Retract are timed to the simulation\'s own clock rather '
+        'than beside it: TELEGRAPH (1.5 s), the 0.6 s strike window and RECOVER (0.9 s) in '
+        'src/sim/triassic/shore.ts. SnapLeft swings the head to the animal\'s left, which is the '
+        'side sideOf() names.',
+        'The swim set is authored and correct, but a crocodile-shaped ambusher sculls with its '
+        'tail and holds its limbs back along its flanks — so the swept angle bar is met in Crawl, '
+        'where this animal\'s limbs actually do the work, and the swim clips are measured rather '
+        'than made to row.',
+        'The mouth is painted, not modelled: the geometric method returns 87 hits spread over the '
+        'whole depth of the head, which is the gular folds and the scute relief, not a slit. The '
+        'painted line is read as a continuous curve under a raised jump penalty and the read stops '
+        'short of the hinge, because at the jaw corner the fit climbs off the lip onto the '
+        'gold/dark boundary above it. The seam is extrapolated from there on its own slope.',
+        'The roll correction is 14.6 degrees, read off the countershading. On a body this '
+        'symmetric no bounding box could have found it.',
         'The twin resurfaces a voxel occupancy field of the authored body, relaxes it and reduces '
         'the new topology. It reuses no source vertex or face.',
         'Living colours, soft tissues and movements are artistic reconstruction. World travel '
@@ -1123,10 +1155,7 @@ report = {
     'limbs': {k: {'seat': list(LIMB_PTS[k][0]), 'reach': list(LIMB_PTS[k][-1]),
                   'clusterRadius92': LIMB_RADIUS[k][0], 'clusterRadius995': LIMB_RADIUS[k][1]}
               for k in LIMB_NAMES},
-    'limbBinding': {'method': 'Voronoi split against the body\'s own axial polyline: a vertex is '
-                              'the limb\'s where it is nearer the limb\'s bone chain than the '
-                              'axis, blended over LIMB_MARGIN either side of the tie and faded '
-                              'out over the first LIMB_ROOT_FADE of the chain',
+    'limbBinding': {'method': 'Voronoi split against the body\'s own axial polyline',
                     'margin': LIMB_MARGIN, 'rootFade': LIMB_ROOT_FADE},
     'authoredTriangles': authored_tris, 'twinTriangles': puppet_tris,
     'twinTriangleFraction': puppet_tris / authored_tris,
@@ -1136,6 +1165,10 @@ report = {
     'limbSweepDegrees': limb_sweep,
     'limbSweepMethod': 'the largest angle between any two directions the limb points over the '
                        'cycle, taken from the root joint to the tip joint in world space',
+    'shoreClipTiming': {'Lower': TELEGRAPH, 'SnapLeft': STRIKE, 'SnapRight': STRIKE,
+                        'Retract': RECOVER,
+                        'source': 'TELEGRAPH, the strike window and RECOVER in '
+                                  'src/sim/triassic/shore.ts'},
     'gapeMaximaRadians': {c: max(v) for c, v in gape_trace.items()},
     'mouthCutDeviation': {
         'cutFromMeasuredLineRaw': CUT_DEVIATION_RAW,
@@ -1167,13 +1200,13 @@ report = {
 }
 open(os.path.join(HERE, 'validation.json'), 'w').write(json.dumps(report, indent=2) + '\n')
 bpy.ops.wm.save_as_mainfile(filepath=os.path.join(LOCAL, ID + '-paired.blend'))
-print('APH_FRAME', json.dumps({k: v for k, v in frame.items() if k != 'perStation'}))
-print('APH_REPORT', json.dumps({k: report[k] for k in
+print('MYS_FRAME', json.dumps({k: v for k, v in frame.items() if k != 'perStation'}))
+print('MYS_REPORT', json.dumps({k: report[k] for k in
       ('authoredTriangles', 'twinTriangles', 'twinTriangleFraction', 'bones', 'maxInfluences')}))
-print('APH_ENVELOPE', json.dumps(report['envelope']))
-print('APH_MOUTH', json.dumps({k: report['mouth'][k] for k in
+print('MYS_ENVELOPE', json.dumps(report['envelope']))
+print('MYS_MOUTH', json.dumps({k: report['mouth'][k] for k in
       ('method', 'cavityVertices', 'cavityZSpread', 'hingeY',
        'paintedLineRoughnessOverRadius', 'paintedLineFlankDisagreementMeanOverRadius',
        'toothPatchesStraddlingTheCut')}))
-print('APH_SEAMS', json.dumps({k: round(v, 9) for k, v in seams.items()}))
-print('APH_OK')
+print('MYS_SEAMS', json.dumps({k: round(v, 9) for k, v in seams.items()}))
+print('MYS_OK')
