@@ -24,6 +24,25 @@ const { report, CLIPS, authored, write } = await auditPair({
   joints: 28, sockets: 3,
 });
 const track = tracker(authored);
+
+/** The angle, in degrees, between the tail's own chord (first tail joint to last) and the trunk's,
+ *  at its worst phase over the clip. This is the number a swim clip's amplitude has to be tuned
+ *  against, and it has to be taken from the joint **positions**: every bone in this rig rests with
+ *  an identity rotation and its local +Y along the straight body axis, so a bone's own direction
+ *  says nothing at all about the shape of the tail it sits in — measured that way a tail that
+ *  visibly hooks reads 9 degrees. A per-joint rotation that looks small also sums down eight
+ *  joints, and the rest curve the generation drew is added to all of it. */
+function tailBend(rows, from, to, a, b) {
+  const ang = (r) => {
+    const t = [r[to][0] - r[from][0], r[to][1] - r[from][1], r[to][2] - r[from][2]];
+    const s = [r[b][0] - r[a][0], r[b][1] - r[a][1], r[b][2] - r[a][2]];
+    const dot = t[0] * s[0] + t[1] * s[1] + t[2] * s[2];
+    const lt = Math.hypot(...t); const ls = Math.hypot(...s);
+    return Math.acos(Math.max(-1, Math.min(1, dot / Math.max(lt * ls, 1e-9)))) * 180 / Math.PI;
+  };
+  return Math.max(...rows.map(ang));
+}
+
 const LIMBS = ['fore_upper_L', 'fore_upper_R', 'hind_upper_L', 'hind_upper_R'];
 const TIPS = LIMBS.map((n) => `${n.replace('upper', 'foot')}:tip`);
 const AXIS = ['skull', 'neck_00', 'chest', 'thorax', 'body', 'lumbar', 'tail_00', 'tail_02', 'tail_05', 'tail_07'];
@@ -31,7 +50,7 @@ const AXIS = ['skull', 'neck_00', 'chest', 'thorax', 'body', 'lumbar', 'tail_00'
 // --- the gaits. Crawl is the locomotion; Swim and Sprint are a tail scull with the limbs trailed.
 report.gait = [];
 for (const clip of ['Crawl', 'Swim', 'Sprint']) {
-  const rows = track(clip, [...AXIS, ...TIPS, ...LIMBS, ...AXIS.map((n) => `${n}:yaw`),
+  const rows = track(clip, [...AXIS, ...TIPS, ...LIMBS, ...AXIS.filter((n) => !n.includes(':')).map((n) => `${n}:yaw`),
     ...LIMBS.map((n) => `${n}:yaw`), 'thorax:yaw', 'lumbar:yaw', 'tail_05:yaw']);
   // The channel is signed by side and the stroke is not: two limbs sweeping backwards together
   // carry opposite rotations about the body's long axis.
@@ -43,6 +62,7 @@ for (const clip of ['Crawl', 'Swim', 'Sprint']) {
     clip,
     travel,
     tailTipOverChest: travel.tail_07 / Math.max(travel.chest, 1e-6),
+    worstTailChordToTrunkDegrees: tailBend(rows, 'tail_00', 'tail_07', 'chest', 'body'),
     /** The armoured trunk's own bend, against the tail's, measured on the joint angles: a bone's
      *  head does not move when the bone rotates, so world travel would read the trunk as frozen
      *  whatever it did. */

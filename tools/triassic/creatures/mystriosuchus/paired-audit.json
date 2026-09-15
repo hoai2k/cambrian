@@ -3,22 +3,22 @@
   "models": [
     {
       "suffix": "",
-      "bytes": 2324244,
-      "sha256": "fa595e5042b7ba800fe65fdeee7ec7048fdbe03f89428ac4c921c8bd53c9a16d",
+      "bytes": 2324248,
+      "sha256": "27bfca6b93ca5a97c721962e6c994e6497437d186a5b65d73d9fc4f9f83e05ab",
       "triangles": 22406,
       "vertices": 13769
     },
     {
       "suffix": ".puppet",
-      "bytes": 854512,
-      "sha256": "4e714acafb2e5b53b2f5b3dfd4ee8cd4d849e87dd953b24be7fac4de8fb49640",
+      "bytes": 854520,
+      "sha256": "a117a8a6dcc42d09e99aa1e363b3dc8d1370be682dfabb684961886504f40e3b",
       "triangles": 7776,
       "vertices": 4102
     },
     {
       "suffix": ".lod1",
-      "bytes": 854512,
-      "sha256": "4e714acafb2e5b53b2f5b3dfd4ee8cd4d849e87dd953b24be7fac4de8fb49640",
+      "bytes": 854520,
+      "sha256": "a117a8a6dcc42d09e99aa1e363b3dc8d1370be682dfabb684961886504f40e3b",
       "triangles": 7776,
       "vertices": 4102
     }
@@ -565,6 +565,7 @@
         "hind_foot_R:tip": 1.75836308890982
       },
       "tailTipOverChest": 7.730695565850686,
+      "worstTailChordToTrunkDegrees": 15.88305181271616,
       "trunkBendOverTailBend": 0.11694162314158991,
       "limbTipTravel": {
         "fore_foot_L:tip": 1.3263427248109225,
@@ -595,6 +596,7 @@
         "hind_foot_R:tip": 0.934589672128508
       },
       "tailTipOverChest": 40.18872057014246,
+      "worstTailChordToTrunkDegrees": 21.418266909715378,
       "trunkBendOverTailBend": 0.1166427747740476,
       "limbTipTravel": {
         "fore_foot_L:tip": 0.6976373820166231,
@@ -625,6 +627,7 @@
         "hind_foot_R:tip": 1.3473217867789051
       },
       "tailTipOverChest": 39.6684175565776,
+      "worstTailChordToTrunkDegrees": 25.21224117663888,
       "trunkBendOverTailBend": 0.11633786782651423,
       "limbTipTravel": {
         "fore_foot_L:tip": 1.0271347107098863,

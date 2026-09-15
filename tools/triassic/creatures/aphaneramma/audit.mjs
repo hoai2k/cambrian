@@ -18,6 +18,25 @@ const { report, CLIPS, authored, write } = await auditPair({
   joints: 26, sockets: 3,
 });
 const track = tracker(authored);
+
+/** The angle, in degrees, between the tail's own chord (first tail joint to last) and the trunk's,
+ *  at its worst phase over the clip. This is the number a swim clip's amplitude has to be tuned
+ *  against, and it has to be taken from the joint **positions**: every bone in this rig rests with
+ *  an identity rotation and its local +Y along the straight body axis, so a bone's own direction
+ *  says nothing at all about the shape of the tail it sits in — measured that way a tail that
+ *  visibly hooks reads 9 degrees. A per-joint rotation that looks small also sums down eight
+ *  joints, and the rest curve the generation drew is added to all of it. */
+function tailBend(rows, from, to, a, b) {
+  const ang = (r) => {
+    const t = [r[to][0] - r[from][0], r[to][1] - r[from][1], r[to][2] - r[from][2]];
+    const s = [r[b][0] - r[a][0], r[b][1] - r[a][1], r[b][2] - r[a][2]];
+    const dot = t[0] * s[0] + t[1] * s[1] + t[2] * s[2];
+    const lt = Math.hypot(...t); const ls = Math.hypot(...s);
+    return Math.acos(Math.max(-1, Math.min(1, dot / Math.max(lt * ls, 1e-9)))) * 180 / Math.PI;
+  };
+  return Math.max(...rows.map(ang));
+}
+
 const LIMBS = ['fore_upper_L', 'fore_upper_R', 'hind_upper_L', 'hind_upper_R'];
 const TIPS = LIMBS.map((n) => `${n.replace('upper', 'foot')}:tip`);
 /** Head to tail tip, in order, so a travelling wave can be read off the joints themselves. */
@@ -26,13 +45,13 @@ const AXIS = ['skull', 'neck_00', 'chest', 'body', 'tail_00', 'tail_02', 'tail_0
 // --- locomotion. The wave grows towards the tail, and the limbs row on the same beat.
 report.wave = [];
 for (const clip of ['Swim', 'Sprint']) {
-  const rows = track(clip, [...AXIS, ...TIPS, ...LIMBS, ...AXIS.map((n) => `${n}:yaw`),
+  const rows = track(clip, [...AXIS, ...TIPS, ...LIMBS, ...AXIS.filter((n) => !n.includes(':')).map((n) => `${n}:yaw`),
     ...LIMBS.map((n) => `${n}:yaw`)]);
   const travel = Object.fromEntries([...AXIS, ...TIPS].map((n) => [n, lateral(rows, n)]));
   // An anguilliform swimmer's amplitude climbs monotonically from the shoulder back. Measured on
   // the joint angles rather than on world positions: the chain is rooted at mid-body, so the
   // joints in front of the pivot swing in antiphase with the ones behind it.
-  const amp = Object.fromEntries(AXIS.map((n) => [n, lateral(rows, `${n}:yaw`)]));
+  const amp = Object.fromEntries(AXIS.filter((n) => !n.includes(':')).map((n) => [n, lateral(rows, `${n}:yaw`)]));
   const order = ['chest', 'body', 'tail_00', 'tail_02', 'tail_05', 'tail_07'];
   let monotone = true;
   for (let i = 1; i < order.length; i++) if (amp[order[i]] < amp[order[i - 1]] * 0.98) monotone = false;
@@ -52,6 +71,7 @@ for (const clip of ['Swim', 'Sprint']) {
     jointAmplitude: amp,
     amplitudeGrowsTailward: monotone,
     tailTipOverChest: travel.tail_07 / Math.max(travel.chest, 1e-6),
+    worstTailChordToTrunkDegrees: tailBend(rows, 'tail_00', 'tail_07', 'chest', 'body'),
     limbTipTravel: Object.fromEntries(TIPS.map((n) => [n, travel[n]])),
     /** The diagonal couplet: a fore limb and the hind limb on the other side beat together... */
     ...beatLag(rows, 'hind_upper_R:stroke', 'fore_upper_L:stroke'),

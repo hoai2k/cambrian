@@ -22,8 +22,8 @@ node tools/triassic/idle-bones.mjs public/assets/triassic/creatures/aphaneramma.
 
 | | |
 | --- | --- |
-| Authored body | `aphaneramma.glb` — 22,479 triangles, the generation's own surface and UV albedo |
-| Procedural twin | `aphaneramma.puppet.glb` — 7,764 triangles (34.5 %), a voxel-occupancy resurfacing that reuses no source vertex or face |
+| Authored body | `aphaneramma.glb` — 22,477 triangles, the generation's own surface and UV albedo |
+| Procedural twin | `aphaneramma.puppet.glb` — 7,766 triangles (34.6 %), a voxel-occupancy resurfacing that reuses no source vertex or face |
 | Reduced model | `aphaneramma.lod1.glb` — **byte-identical to the twin** |
 | Rig | 26 joints, one armature, one set of inverse binds, one set of sockets, one set of actions on both bodies |
 | Clips | 23, of which 8 loop |
@@ -81,6 +81,14 @@ head and chest, 16.19 and 7.80. The calibration is Dinocephalosaurus — tail ar
 on the rig; neck 2.8 mean and 1.51 tightest, which had to be carried section by section onto a new
 axis in the mesh before binding. **Nothing here is unbent in the mesh**, and the later `Neutral`
 pose pass (task #24) can take this body's rest curve out on the rig.
+
+**But the ratio is not the whole of it, and this animal is what showed that.** It says how *tight*
+a bend is against the body's own thickness; it is silent about how far the run turns altogether.
+This tail turns **61.98 degrees** from its first segment to its last — 31.76 of it in one joint,
+`tail_05` → `tail_06`, at the base of the caudal fin — while reporting a comfortable 13.31. A long
+gentle curve through sixty degrees is exactly what an animal's tail hooking round behind it looks
+like, and the ratio calls it gentle. Both builders in this batch now record `restTurning` beside
+`poseDeviation` for that reason.
 
 Paired-limb asymmetry, for the same pass: **0.129 of a body length mean, 0.181 at worst**, and it is
 a *station* asymmetry rather than an angle one — the two forelimbs sit 0.10 of a body apart along
@@ -148,10 +156,11 @@ shoulder, thin at the wrist and broad again at the webbed foot, so no single rad
 | gentler gain ramp at the pelvis, wider Voronoi margin, 6 relax passes | 4.92x | `skull` in Ability |
 | the side swipe spread off the skull onto the neck behind it | 4.54x | `tail_00` in Sprint |
 | an **eighth tail joint**, halving the 0.12-of-a-body step from the trunk to the first tail joint | 4.42x | `tail_01` in Sprint |
-| the trunk axis above, plus 8 relax passes at hold 0.48 | **4.61x** | `tail_01` in Sprint |
+| the trunk axis above, plus 8 relax passes at hold 0.48 | 4.61x | `tail_01` in Sprint |
+| the swim wave halved (below) | **4.45x** | `tail_01` in Sprint |
 
-The last row is a tenth worse than the row before it and is the one that ships, because the row
-before it was measured against an axis that was in the wrong place. Era context: Rhaeticosaurus
+The fourth row is a tenth better than the fifth and is *not* the one that ships, because it was
+measured against an axis that was in the wrong place. Era context: Rhaeticosaurus
 2.81x is the cleanest, Nothosaurus 2.98x is the reference, Henodus 4.81x, Cartorhynchus 5.17x,
 Hupehsuchus 5.79x, Hybodus 5.93x. **Every one of the 26 joints owns skin** (`idle-bones.mjs`).
 
@@ -180,25 +189,38 @@ direction*, root joint to tip joint in world space, never off an Euler channel:
 
 | clip | `fore_upper_L` | `fore_upper_R` | `hind_upper_L` | `hind_upper_R` |
 | --- | ---: | ---: | ---: | ---: |
-| Sprint | 109.4° | 75.9° | 106.3° | 113.0° |
-| Swim | 80.6° | 56.9° | 80.2° | 82.7° |
-| Crawl | 97.0° | 69.7° | 93.8° | 102.7° |
-| Idle | 18.4° | 13.3° | 18.5° | 18.6° |
+| Sprint | 110.8° | 76.4° | 105.3° | 111.8° |
+| Swim | 81.8° | 57.5° | 79.1° | 81.7° |
+| Crawl | 97.3° | 69.8° | 93.5° | 102.3° |
+| Idle | 18.6° | 13.4° | 18.3° | 18.4° |
 
 The build refuses a limb under 60° in Sprint or 45° in Swim. `fore_upper_R` is the smallest in every
 clip because that limb is the one the generation posed furthest forward, so a given rotation covers
 less arc; it is the same stroke.
 
+**The wave was halved, and the reason it was halved turned out to be something else.** At 0.105
+radians per unit of gain each tail joint turns at most seven degrees, which reads as nothing on its
+own and sums down eleven joints; the review sheet showed the tail hooked right round at the peak of
+the cruise stroke, so the wave was cut to 0.052. Rendering the **raw generation** afterwards showed
+the hook is already there, before any rig — see *what is weak* below — so the wave was never the
+cause. The cut is kept anyway, on the number rather than on the picture: it took the worst skin
+tear from 4.61x to **4.45x**, and at 0.052 the tail's chord still swings **34.0 degrees** off the
+trunk at worst in Swim and 35.5 in Sprint (against 38.8 and 41.8 before), which is plainly a wave. `audit.mjs` records
+`worstTailChordToTrunkDegrees`, and it is taken from the joint **positions**: every bone in this
+rig rests with an identity rotation and its local +Y along the straight body axis, so a bone's own
+direction says nothing about the shape of the tail it sits in — measured that way a tail that
+visibly hooks reads nine degrees.
+
 In world travel, from `audit.mjs`: the wave amplitude grows tailward at every joint in both
-locomotion clips, the tail tip travels **18.2x** the shoulder in Swim, and the four foot tips travel
-1.27 to 1.83 units. The diagonal couplet's lag measures 0 to seven decimal places and the two limbs
+locomotion clips, the tail tip travels **19.5x** the shoulder in Swim, and the four foot tips travel
+1.31 to 1.80 units. The diagonal couplet's lag measures 0 to seven decimal places and the two limbs
 of a girdle are half a cycle apart — measured on the **stroke** rather than the raw yaw, because a
 left limb and a right limb sweeping backwards together carry opposite rotations about the body's
 long axis and read as half a cycle apart if the sign is not undone.
 
 `Heavy` and `Ability` are the animal's own named **side swipe** — the sideways sweep of a long
 rostrum — and not a bigger `Attack`. The audit measures the lateral share of the snout's excursion
-to say so: Attack **0.048**, Heavy **0.729**, Ability **0.772**, and Ability reaches 1.65 against
+to say so: Attack **0.05**, Heavy **0.73**, Ability **0.77**, and Ability reaches 1.65 against
 Attack's 0.48.
 
 ## Measured tolerances
@@ -212,7 +234,7 @@ Attack's 0.48.
 | `anchor_attack_primary` to the nearest surface | 0.0040 of body length | 2 % |
 | `anchor_mouth_inside`, inside the head | yes, 0.041 of body length from the surface | 5 % |
 | Limb roots seated inside the trunk | all four | > 0.010 raw |
-| Skin influences | 4 max, 3.24 mean | 4 |
+| Skin influences | 4 max, 3.18 mean | 4 |
 | Loop seams | 0.0 on all 8 looping clips | 1e-6 |
 
 `exactRigParity`, `exactAnimationParity`, `exactAnchorParity` and `normalizedWeights` all hold
@@ -223,8 +245,18 @@ between the authored body and the twin, and `lod1` is the twin byte for byte.
 - **Paired-limb asymmetry is large** (0.129 of a body length mean). That is the generation's pose
   and it is recorded for the `Neutral` pose pass rather than corrected here — correcting it would
   be sculpting the animal rather than repairing the model.
-- **4.61x is mid-pack, not clean.** The residue is concentrated on `tail_01`, where the pelvis, the
-  first tail joint, the hind limbs' roots and the base of the tail's own fin all meet. Rhaeticosaurus
+- **4.45x is mid-pack, not clean.** The residue is concentrated on `tail_01`, where the pelvis, the
+  first tail joint, the hind limbs' roots and the base of the tail's own fin all meet.
+- **The generation's tail is hooked right round, and this is the worst thing about this body.**
+  It sweeps out to 0.22 from the axis at 0.38 of a body and comes back to 0.09 at the tip, so it
+  crosses its own station: a slab across the body at the last few stations cuts the tail twice, and
+  the y-parameterised centreline every builder in this era measures folds the hook flat. That is
+  why `restTurning` reports a mild-sounding 61.98 degrees while a three-quarter render shows a
+  closed ring, and why `meanCurvatureRadiusOverSection` calls the tail comfortably gentle at 13.31.
+  It is in `tripo-raw/aphaneramma.raw.glb` before any rig, so nothing here caused it and nothing
+  here can take it out on the rig — the routes are a Neutral-pose **mesh** unbend or a
+  regeneration, both of which belong to the passes that own them. Recorded in
+  `docs/triassic/preview-mesh-defects.md`. Rhaeticosaurus
   got to 2.81x on a body whose limbs are blades, and nothing here matches that.
 - `fore_upper_R` sweeps 76° in Sprint against its partner's 109°, because the generation posed the
   two forelimbs at different stations and angles. The stroke is the same; the arc a straight

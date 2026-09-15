@@ -137,6 +137,12 @@ Measured on the corrected axis: tail **7.61 mean, 3.22 tightest**, per station
 `[8.8, 7.8, 15.6, 6.8, 3.5, 3.2]`. That is the **gentle case** against Dinocephalosaurus'
 calibration (tail around 9, straightened on the rig) and nothing here is unbent in the mesh.
 
+The ratio is not the whole of it — it says how *tight* a bend is against the body's own thickness
+and is silent about how far the run turns altogether — so the builders in this batch also record
+`restTurning`. This tail turns **44.58 degrees** from its first segment to its last (101.2 summed
+over the joints, of which 32.85 sit in one joint near the tip). Aphaneramma's turns 61.98 at a
+*more* comfortable ratio, which is the point.
+
 The head-and-neck run is the tight one: **2.44 mean, 1.55 tightest**, which is Dinocephalosaurus'
 neck territory (2.8 mean, 1.51 tightest, which *was* unbent in the mesh). It is a much shorter run —
 two joints over 0.06 of a body, against a neck that was most of the animal — and what it records is
@@ -156,7 +162,7 @@ of a body apart along the axis and the two hind limbs 0.046 apart.
 | + `thorax` and `lumbar`, halving both gaps; 4-joint limbs | 9.10x | *worse* — see below |
 | + limb blend as a fraction of the limb's own length | 8.32x | |
 | back to 3-joint limbs with a wider proportional blend; the snap graded off the shoulder | 7.65x | |
-| + a wider Voronoi margin, 10 relax passes, a shorter limb excursion in the water | **5.51x** | |
+| + a wider Voronoi margin, 10 relax passes, a shorter limb excursion in the water | **5.51x** | `hind_lower_L` in Crawl |
 
 Three findings worth keeping:
 
@@ -208,9 +214,12 @@ raw yaw, because a left limb and a right limb sweeping backwards together carry 
 about the body's long axis.
 
 **In the water the tail is the engine.** A crocodile-shaped ambusher sculls and holds its limbs back
-along its flanks; it does not row. The tail tip travels **41x** the shoulder in both `Swim` and
-`Sprint`, the armoured trunk's own bend is under a quarter of the tail's, and the limbs are trailed
-and kick rather than paddling. That is a deliberate departure from the era's "a limbed swimmer's
+along its flanks; it does not row. The tail tip travels **40x** the shoulder in both `Swim` and
+`Sprint`, the armoured trunk's own bend is under a quarter of the tail's, the tail's chord swings
+21.4 degrees off the trunk in `Swim` and 25.2 in `Sprint` (`worstTailChordToTrunkDegrees`, taken
+from the joint positions — every bone here rests with an identity rotation and its local +Y along
+the straight body axis, so a bone's own direction says nothing about the shape of the tail it sits
+in), and the limbs are trailed and kick rather than paddling. That is a deliberate departure from the era's "a limbed swimmer's
 dash has to paddle" rule, taken because the rule's own exception names this animal: it is a shore
 animal and its primary is the land gait. The audit still refuses frozen limbs in the water
 (every foot tip over 0.15 units).

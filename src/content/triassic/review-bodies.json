@@ -4,8 +4,8 @@
     "model": "assets/triassic/creatures/aphaneramma.glb",
     "puppet": "assets/triassic/creatures/aphaneramma.puppet.glb",
     "lod": "assets/triassic/creatures/aphaneramma.lod1.glb",
-    "bytes": 1904944,
-    "sha256": "d1e2b3060abdace49695baee1f0770f96891911d32789fde2b67f4e758436790",
+    "bytes": 1902124,
+    "sha256": "ede430169ca0449a76409410263bd174b59249fd041631e61ff510492747cf14",
     "clips": [
       "Ability",
       "Attack",
@@ -473,8 +473,8 @@
     "model": "assets/triassic/creatures/mystriosuchus.glb",
     "puppet": "assets/triassic/creatures/mystriosuchus.puppet.glb",
     "lod": "assets/triassic/creatures/mystriosuchus.lod1.glb",
-    "bytes": 2324244,
-    "sha256": "fa595e5042b7ba800fe65fdeee7ec7048fdbe03f89428ac4c921c8bd53c9a16d",
+    "bytes": 2324248,
+    "sha256": "27bfca6b93ca5a97c721962e6c994e6497437d186a5b65d73d9fc4f9f83e05ab",
     "clips": [
       "Ability",
       "Attack",

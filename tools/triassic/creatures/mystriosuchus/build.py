@@ -495,10 +495,39 @@ POSE_DEVIATION = {
     'tail': T.curvature_over_section(
         [B[n][0] for n in AXIAL_NAMES if n.startswith('tail_')], _section_radius),
 }
+def _turning(names):
+    """How far a run of the rest axis **turns in total**, in degrees.
+
+    `curvature_over_section` says how *tight* a bend is against the body's own thickness, which is
+    what decides rig-versus-mesh straightening -- and it is silent about how far the run turns
+    altogether. A long tail curving gently through ninety degrees reports a large, comfortable
+    ratio and still reads as a hook. Aphaneramma is the worked example: 13.3 mean and 3.97 tightest,
+    which is the gentle case by the ratio, over a tail that turns 62 degrees from its first segment
+    to its last. Both numbers are recorded, because the `Neutral` pose pass needs the second one to
+    know there is anything to do.
+    """
+    pts = [B[n][0] for n in names]
+    a = pts[1] - pts[0]
+    b = pts[-1] - pts[-2]
+    total = math.degrees(a.angle(b)) if a.length > 1e-9 and b.length > 1e-9 else 0.
+    steps = []
+    for i in range(1, len(pts) - 1):
+        u, v = pts[i] - pts[i - 1], pts[i + 1] - pts[i]
+        steps.append(round(math.degrees(u.angle(v)), 2) if u.length > 1e-9 and v.length > 1e-9 else 0.)
+    return {'firstToLastSegmentDegrees': round(total, 2), 'sumOfTurnsDegrees': round(sum(steps), 2),
+            'perJointDegrees': steps}
+
+
+REST_TURNING = {
+    'spine': _turning(AXIAL_NAMES),
+    'tail': _turning([n for n in AXIAL_NAMES if n.startswith('tail_')]),
+}
+
 LIMB_ASYMMETRY = T.limb_asymmetry(LIMB_PTS, cx, 1.)
 print('MYS_POSE', json.dumps({k: {a: b for a, b in v.items() if a != 'perStation'}
                               for k, v in POSE_DEVIATION.items()}))
 print('MYS_POSE_TAIL', json.dumps(POSE_DEVIATION['tail']['perStation']))
+print('MYS_TURN', json.dumps(REST_TURNING))
 print('MYS_ASYM', json.dumps(LIMB_ASYMMETRY.get('allPairs')))
 
 # ------------------------------------------------------------------ procedural twin ----
@@ -1161,7 +1190,8 @@ report = {
     'twinTriangleFraction': puppet_tris / authored_tris,
     **twin_report,
     'bones': len(B), 'boneNames': list(B),
-    'poseDeviation': POSE_DEVIATION, 'limbAsymmetry': LIMB_ASYMMETRY,
+    'poseDeviation': POSE_DEVIATION, 'restTurning': REST_TURNING,
+    'limbAsymmetry': LIMB_ASYMMETRY,
     'limbSweepDegrees': limb_sweep,
     'limbSweepMethod': 'the largest angle between any two directions the limb points over the '
                        'cycle, taken from the root joint to the tip joint in world space',
