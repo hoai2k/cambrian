@@ -1,5 +1,38 @@
 [
   {
+    "id": "atopodentatus",
+    "model": "assets/triassic/creatures/atopodentatus.glb",
+    "puppet": "assets/triassic/creatures/atopodentatus.puppet.glb",
+    "lod": "assets/triassic/creatures/atopodentatus.lod1.glb",
+    "bytes": 2092000,
+    "sha256": "560159cf55eb6b641474df85a737dd2f1169f12a3ee232bd8f2ba3b5813c55a1",
+    "clips": [
+      "Ability",
+      "Attack",
+      "Bite",
+      "Breath",
+      "Breathe",
+      "Death",
+      "Dive",
+      "Dodge",
+      "Eat",
+      "Grab",
+      "Graze",
+      "Growth",
+      "Guard",
+      "Heavy",
+      "Hit",
+      "Idle",
+      "Parry",
+      "Rise",
+      "Sprint",
+      "Stagger",
+      "Swim",
+      "TurnLeft",
+      "TurnRight"
+    ]
+  },
+  {
     "id": "birgeria",
     "model": "assets/triassic/creatures/birgeria.glb",
     "puppet": "assets/triassic/creatures/birgeria.puppet.glb",

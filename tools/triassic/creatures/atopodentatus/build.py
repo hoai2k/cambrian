@@ -243,6 +243,83 @@ def mouth_half_height(y):
     return float(np.interp(y, _sy, _st))
 
 
+# **How wide the head is at the mouth's own height**, which is not the same as how wide the head is.
+# A section's maximum half width is reached at whatever height the section happens to be widest, and
+# using that as the bound on the lining let the sac out to 0.067 at the corner of the mouth against a
+# measured section maximum of 0.071 -- and a superellipse's corner then stood proud of the cheek.
+# Measured from the vertex cloud in a band about the seam rather than cast: a lateral ray from the
+# mouth's axis is the obvious instrument and is what Rhaeticosaurus uses, but that head has no
+# modelled mouth. Here the lumen is real and carries a comb of needle teeth standing in it, and the
+# ray stops on the first one -- at y -0.273 it returned 0.009 for a mouth measured 0.088 wide, which
+# is a tooth and not the cheek.
+_MW = []
+for _y in _HY:
+    _yv = float(_y)
+    _m = (np.abs(raw_co[:, 1] - _yv) < .005) & (np.abs(raw_co[:, 2] - seam(_yv)) < .008)
+    _MW.append(float(np.abs(raw_co[_m, 0] - cx(_yv)).max()) if _m.sum() >= 4
+               else (_MW[-1] if _MW else .01))
+_MW = np.array(_MW)
+
+
+def head_half_width_at_the_mouth(y):
+    return float(np.interp(y, _HY, _MW))
+
+
+# **Containment is a silhouette test, and it has to be, because nothing else works on this head.**
+# Three instruments were tried and two of them cannot answer the question at all:
+#
+#   * the signed **depth probe** reads a point in the mouth's lumen as outside the animal, because
+#     the nearest surface to it is the lumen wall and that wall's normal points at it. Birgeria
+#     records this; here it makes every correctly placed lining vertex read as a fault.
+#   * **ray parity** fails for the same reason one level down: the modelled mouth is a *pocket* in
+#     a closed shell, so the lumen is genuinely exterior space and a ray from it crosses an odd
+#     number of faces exactly as a ray from outside the cheek does. 302 of 780 lining vertices
+#     read as outside, and they were the mouth.
+#   * the **section hull** does answer it. A mouth lumen is inside the convex hull of the head's
+#     own section at its station; a vertex that has come out through the cheek is not. That is the
+#     shape of the question, and the hull of a bar-shaped section is tight enough to be a real
+#     bound.
+def _hull(points):
+    """Andrew's monotone chain, counter-clockwise, for a small 2-D point set."""
+    pts = sorted(map(tuple, points))
+    if len(pts) < 3:
+        return pts
+
+    def half(seq):
+        out = []
+        for p in seq:
+            while len(out) >= 2 and ((out[-1][0] - out[-2][0]) * (p[1] - out[-2][1])
+                                     - (out[-1][1] - out[-2][1]) * (p[0] - out[-2][0])) <= 0:
+                out.pop()
+            out.append(p)
+        return out
+    return half(pts)[:-1] + half(reversed(pts))[:-1]
+
+
+_HULLS = {}
+for _i, _y in enumerate(_HY):
+    _m = np.abs(raw_co[:, 1] - float(_y)) < .006
+    _HULLS[_i] = _hull(raw_co[_m][:, [0, 2]]) if _m.sum() >= 6 else []
+
+
+def _hull_clearance(p):
+    """How far inside the head's own section hull p is, at the nearest measured station. Negative
+    means it has left the head."""
+    i = int(np.clip(np.searchsorted(_HY, float(p.y)), 0, len(_HY) - 1))
+    hull = _HULLS.get(i) or _HULLS.get(max(0, i - 1)) or []
+    if len(hull) < 3:
+        return 1.
+    worst = 1e9
+    for a, b in zip(hull, hull[1:] + hull[:1]):
+        ex, ez = b[0] - a[0], b[1] - a[1]
+        L = math.hypot(ex, ez)
+        if L < 1e-9:
+            continue
+        # counter-clockwise hull: inside is to the left of every edge
+        worst = min(worst, ((p.x - a[0]) * ez - (p.z - a[1]) * ex) / -L)
+    return worst
+
+
 # --------------------------------------------------------------------------------- rig ----
 def tx(p):
     return Vector((p[0] * SCALE, p[1] * SCALE, p[2] * SCALE))
@@ -255,7 +332,13 @@ def bone(n, p, parent):
     B[n] = (Vector(p), parent)
 
 
-NECK_Y = [-.165, -.115]                  # base of skull to shoulder; a short neck, as drawn
+# **Shoulder-ward first, skull-ward last**, because the axial polyline is assembled as
+# `skull` + the neck reversed + `chest`, and a list in the other order makes that polyline zigzag:
+# skull -0.232, neck -0.115, neck -0.165, chest -0.055 is not a path along an animal, and every
+# arc-length weight taken along it is measured on a fold. Three joints rather than two, because the
+# hammer sweep is a large rotation over a short neck and `skin-tears.mjs` read 6.21x across the band
+# between two of them; spread over three, the angle each one carries drops by a third.
+NECK_Y = [-.095, -.135, -.175]           # shoulder to base of skull; a short neck, as drawn
 CHEST_Y, BODY_Y = -.055, .080
 TAIL_Y = [.215, .285, .355, .430, .510, .590]
 bone('root', (0, 0, 0), None)
@@ -462,13 +545,23 @@ for o in parts['lower jaw'].values():
 # never seen from outside whatever its winding, because the skin is in front of it, so culling it
 # buys nothing and costs the one thing it exists for -- from below, looking up into an open mouth,
 # the floor is backfacing and a cull takes it away.
-mouth_mat = T.inward_material(NAME + ' mouth interior', (.30, .13, .115, 1))
+#
+# **Darker and rougher than the era's standard lining, because this mouth is seen from outside at
+# rest and none of the others are.** Every previous body's lining is hidden behind a shut lip and
+# only ever lit from inside an open mouth, where (0.30, 0.13, 0.115) at roughness 0.62 reads as a
+# dusty pink mouth. This generation's rostrum carries a comb of separate needle teeth with real
+# gaps between them, so at Idle the interior is *front lit through the fence* -- and the standard
+# colour read as a pink sausage lying along the bar. The raw generation shows the same slot as a
+# dark line, which is what a mouth behind a sieve of teeth looks like.
+mouth_mat = T.inward_material(NAME + ' mouth interior', (.15, .062, .055, 1), roughness=.82)
 mouth_mat.use_backface_culling = False
-MOUTH_BACK = HINGE_Y + .016
+MOUTH_BACK = HINGE_Y + .026
 MOUTH_FRONT = MOUTH_FRONT_Y
 
 LINING_FIT = {}
-LINING_POWER = 3.2      # the mouth of a T-bar is a flat slot, not an ellipse
+LINING_POWER = 2.6      # a flat slot rather than an ellipse, but not a box: at 3.2 the
+                        # section's corners stand nearly as far out as its axes do, and on a
+                        # head this thin that is what reaches the cheek first.
 
 
 def mouth_section(y):
@@ -493,11 +586,46 @@ def mouth_section(y):
     # same trap Birgeria records, in the shape a hammerhead gives it.
     zlo, zhi = head_z_range(y)
     room = min(zhi - seam(y), seam(y) - zlo)
-    w = max(min(mouth_half_width(y) * .94, head_outer_width(y) - .008), .0018) * (.92 + .08 * e)
-    h = max(min(mouth_half_height(y) * 1.05, head_half_depth(y) * .48, room * .55), .0025) \
+    # **Set back from the palate along the comb, full size at the corner**, and the split is what
+    # this animal needs. At 1.05 of the measured cavity the sac filled the slit exactly, so every
+    # interdental gap in the needle comb was a window onto it and the shut mouth read as a pink
+    # sausage along the bar. Taken down to 0.78 *everywhere* it left the corner of the mouth --
+    # where the mandible's rear rim, the throat and the sac all meet -- 26 pixels open at full
+    # gape, which is the one place a lining may not be small. `front` is 1 along the comb and 0 at
+    # the corner, so the sac is pulled off the teeth in front and left at full section behind.
+    front = T.smooth(((HINGE_Y - .045) - y) / .045)
+    back = 1. - front
+    w = max(min(mouth_half_width(y) * (.88 + .06 * back),
+                head_half_width_at_the_mouth(y) - .008,
+                head_outer_width(y) - .008), .0018) * (.92 + .08 * e)
+    h = max(min(mouth_half_height(y) * (.78 + .30 * back),
+                head_half_depth(y) * (.38 + .16 * back), room * (.50 + .06 * back)), .0022) \
         * (.76 + .24 * e)
     LINING_FIT[round(float(y), 5)] = [round(w, 5), round(h, 5)]
     return w, h
+
+
+def fit_lining_point(p, y):
+    """Pull one ring vertex radially in until it is inside the head's own section hull.
+
+    **A per-vertex fit, and against the hull rather than against the depth probe.** Rhaeticosaurus
+    established why the fit has to be per vertex -- shrinking a whole ring by one factor couples its
+    width to its height, and on a deep head that is a hole -- and said in the same breath that a
+    generation with a *modelled* mouth may be sized but never fitted, because the probe it used
+    reads backwards in a lumen. Both halves of that are right; what is wrong is treating the probe
+    as the only instrument. The section hull is not fooled by a pocket, so this body gets the per
+    vertex fit after all, on a reading that works where the mouth is modelled.
+    """
+    c = Vector((cx(y), y, seam(y)))
+    d = Vector(p) - c
+    for k in range(14):
+        q = c + d * (1. - k * .035)
+        if _hull_clearance(q) > .0025:
+            return q
+    # Clamped: a vertex allowed to collapse towards the axis crosses its neighbours, the quad
+    # between them inverts, and the tube's surface faces away from the camera right where the mouth
+    # is widest open.
+    return c + d * .545
 
 
 def lining_jaw_blend(p):
@@ -512,7 +640,8 @@ def lining_jaw_blend(p):
 
 lining, lining_raw = T.lining('Oral cavity lining', rig, tx, seam, mouth_section,
                               MOUTH_BACK, MOUTH_FRONT, lining_jaw_blend, mouth_mat,
-                              rings=30, ring=26, centre_x=cx, power=LINING_POWER)
+                              rings=30, ring=26, centre_x=cx, power=LINING_POWER,
+                              fit=fit_lining_point)
 oralparts = [lining]
 mouth_cover = []
 for _y in np.linspace(MOUTH_FRONT + .004, MOUTH_BACK - .010, 20):
@@ -538,19 +667,36 @@ hinge_mat = T.vertex_colour_material(NAME + ' jaw hinge body', roughness=.66)
 # cheek and the neck together: it gave a half width of 0.053 where the head measures 0.055 and a
 # half depth of 0.036 against 0.0355, and with a 0.044 half length in y the envelope would not seat
 # past a fifth of its size.
-HINGE_CENTRE = (cx(HINGE_Y), HINGE_Y + .003, cz(HINGE_Y))
-HINGE_R = (head_half_width(HINGE_Y) * .90, .026, head_half_depth(HINGE_Y) * .90)
+HINGE_CENTRE = (cx(HINGE_Y), HINGE_Y + .004, cz(HINGE_Y))
+HINGE_R = (head_half_width(HINGE_Y) * .95, .030, head_half_depth(HINGE_Y) * .95)
 HINGE_FIT = 0.
+
+
+def _in_head(q):
+    # Clearance inside the head's own silhouette at q's station, the smaller of the two axes.
+    #
+    # **Seated against the silhouette, not against the signed depth probe**, for the same reason
+    # the lining is: the probe's nearest surface to a point beside an open slit is the *lumen
+    # wall*, whose normal points at it, so a point in solid flesh reads as outside the animal.
+    # Sized that way this envelope fitted to only half its radius -- 0.025 against a head half
+    # width of 0.055 -- and so stopped well short of the sides, which is exactly where the corner
+    # of the mouth is. `gape-solid.py` then saw a 20-pixel sliver of backdrop at that corner in
+    # three clips out of four, and no change to the lining moved it, because it was never the
+    # lining.
+    zlo, zhi = head_z_range(float(q.y))
+    return min(head_outer_width(float(q.y)) - abs(q.x - cx(float(q.y))), q.z - zlo, zhi - q.z)
+
+
 for step in range(24):
     k = 1. - step / 24
     probe = [Vector((HINGE_CENTRE[0] + HINGE_R[0] * k * math.sin(b) * math.cos(a),
                      HINGE_CENTRE[1] + HINGE_R[1] * k * math.sin(b) * math.sin(a),
                      HINGE_CENTRE[2] + HINGE_R[2] * k * math.cos(b)))
              for a in np.linspace(0, 2 * pi, 20) for b in np.linspace(0, pi, 11)]
-    if min(depth(q) for q in probe) > .0030:
+    if min(_in_head(q) for q in probe) > .0025:
         HINGE_FIT = k
         break
-assert HINGE_FIT > .3, ('the hinge envelope could not be seated', HINGE_FIT)
+assert HINGE_FIT > .6, ('the hinge envelope could not be seated', HINGE_FIT)
 print('ATOPO_HINGE', json.dumps({'fit': HINGE_FIT, 'r': list(HINGE_R), 'centre': list(HINGE_CENTRE)}))
 bpy.ops.mesh.primitive_uv_sphere_add(segments=18, ring_count=10, location=tx(HINGE_CENTRE))
 hinge = bpy.context.object
@@ -582,6 +728,16 @@ oralparts.append(hinge)
 # point correctly inside the mouth reads as outside the animal. That is the reading Birgeria
 # records. Containment is therefore measured against the head's own outer silhouette instead:
 # every oral vertex must lie inside the section the generation actually drew at its station.
+LINING_CLEARANCE = min(_hull_clearance(Vector(v.co[:]) / SCALE) for v in lining.data.vertices)
+LINING_OUTSIDE = sum(1 for v in lining.data.vertices
+                     if _hull_clearance(Vector(v.co[:]) / SCALE) < 0)
+print('ATOPO_LINING_HULL', json.dumps(
+    {'vertices': len(lining.data.vertices), 'outsideTheSectionHull': LINING_OUTSIDE,
+     'worstClearance': LINING_CLEARANCE}))
+assert LINING_OUTSIDE == 0, \
+    ('the oral lining leaves the head', LINING_OUTSIDE, len(lining.data.vertices),
+     LINING_CLEARANCE)
+
 oral_seating = []
 for o in oralparts:
     worst_x, worst_z = 1e9, 1e9
@@ -658,11 +814,11 @@ def reset():
 # feather. That is asserted rather than assumed: the swept angle recorded below is measured from
 # the limb's own direction in world space, so it cannot be an artefact of which axis a rotation was
 # written on.
-AXIAL_CHAIN = ['neck_01', 'neck_00', 'chest', 'body'] \
+AXIAL_CHAIN = ['neck_02', 'neck_01', 'neck_00', 'chest', 'body'] \
     + ['tail_%02d' % i for i in range(len(TAIL_Y))]
 # A slow grazer with a long tail: little in the trunk, a real wave down the tail.
-GAIN = [.10, .06, .03, .04, .12, .22, .34, .48, .62, .78]
-LAG = [0., .20, .42, .70, 1.00, 1.30, 1.60, 1.90, 2.20, 2.50]
+GAIN = [.10, .08, .06, .03, .04, .12, .22, .34, .48, .62, .78]
+LAG = [0., .16, .32, .52, .80, 1.10, 1.40, 1.70, 2.00, 2.30, 2.60]
 SIDE = {k: (1. if k.endswith('R') else -1.) for k in LIMB_NAMES}
 # The hind pair rows a quarter cycle behind the fore, and the two sides alternate: a rower's gait,
 # not a flyer's synchronised beat.
@@ -804,16 +960,20 @@ for clip, duration in CLIPS.items():
             z += turn * (.030 + .006 * i)
             z += .050 * dead * sin(i * .8)
             if clip in ('Attack', 'Heavy'):
+                # **Only a token of lateral S.** Attack is the forward strike and Heavy the
+                # sideways one, and the audit measures exactly that -- how far the bar swings
+                # across against how far it reaches forward. Cocked into a real S the strike swung
+                # 0.556 across against 0.411 forward, which is the hammer's shape, not the bite's.
                 if n.startswith('neck') or n == 'skull':
-                    z += .30 * cock * (1 if i % 2 == 0 else -.6)
-                    z -= .22 * drive
+                    z += .07 * cock * (1 if i % 2 == 0 else -.6)
+                    z -= .05 * drive
             if clip == 'Heavy' and (n.startswith('neck') or n in ('chest',)):
-                z += .42 * hammer
+                z += .30 * hammer
             if clip == 'Dodge':
                 z += .16 * e * sin(i * .55 + .6)
             if graze and n.startswith('neck'):
                 # The head works side to side along the meadow: that is the scrape.
-                z += .26 * sin(p)
+                z += .18 * sin(p)
             if clip == 'Grab':
                 z += .08 * GAIN[i] * haul * (1 if i > 4 else -.5)
             q.rotation_euler.z += z
@@ -822,17 +982,17 @@ for clip, duration in CLIPS.items():
             if clip in ('Breath', 'Breathe') and n.startswith('neck'):
                 q.rotation_euler.x = -.16 * (e if clip == 'Breath' else .5 + .5 * sin(p))
             if graze and n.startswith('neck'):
-                q.rotation_euler.x = .22
+                q.rotation_euler.x = .15
         if clip == 'Heavy':
-            pb['skull'].rotation_euler.z += .70 * hammer
-            pb['skull'].rotation_euler.y += .20 * hammer
+            pb['skull'].rotation_euler.z += .55 * hammer
+            pb['skull'].rotation_euler.y += .18 * hammer
         if clip in ('Attack',):
             pb['skull'].rotation_euler.x += -.14 * cock + .22 * drive
-            for n in ('neck_00', 'neck_01'):
-                pb[n].rotation_euler.x += -.10 * cock + .14 * drive
+            for n in ('neck_00', 'neck_01', 'neck_02'):
+                pb[n].rotation_euler.x += -.07 * cock + .10 * drive
         if clip == 'Eat':
             pb['skull'].rotation_euler.z += .12 * sin(p * 2)
-            pb['neck_01'].rotation_euler.x += -.10 * sin(p * 2)
+            pb['neck_02'].rotation_euler.x += -.10 * sin(p * 2)
         if graze:
             pb['skull'].rotation_euler.x += .26
             pb['skull'].rotation_euler.z += .18 * sin(p)
@@ -1085,7 +1245,9 @@ report = {
         'paintedLineAgreementOverRadius': PAINTED_AGREEMENT,
         'paintedLine': [[round(r['y'], 4), round(r['z'], 5), round(r['u'], 3)] for r in PAINTED],
         'liningCoverage': mouth_cover, 'liningSection': LINING_FIT,
-        'liningFittedPerVertex': False,
+        'liningFittedPerVertex': True,
+        'liningWorstSectionHullClearance': float(LINING_CLEARANCE),
+        'liningVerticesOutsideTheSectionHull': int(LINING_OUTSIDE),
         'toothPatches': tooth_report,
         'toothPatchesStraddlingTheCut': straddling, 'authoredToothRows': [],
         'oralPartSeating': oral_seating,

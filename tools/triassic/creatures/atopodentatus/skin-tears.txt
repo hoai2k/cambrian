@@ -1,0 +1,25 @@
+
+public/assets/triassic/creatures/atopodentatus.glb   37528 edges x 17 phases x 23 clips
+clip            skin  on bone             all     >2x  worst bones
+Heavy          3.90x  jaw               4.55x     132  0.025->0.099  neck_02:68 jaw:21 body:21 neck_01:6
+Sprint         3.46x  fore_upper_R      3.46x     290  0.022->0.076  fore_upper_R:88 body:72 chest:68 fore_upper_L:36
+Swim           2.78x  fore_upper_R      2.78x      65  0.031->0.086  fore_upper_R:26 chest:18 body:12 fore_upper_L:6
+TurnLeft       2.24x  chest             2.24x       3  0.034->0.075  chest:2 fore_upper_R:1
+Attack         2.04x  chest            21.01x     193  0.046->0.093  skull:112 jaw:77 chest:2 fore_upper_R:2
+Dodge          2.02x  fore_upper_L      2.02x       2  0.042->0.085  fore_upper_L:2
+TurnRight      1.91x  fore_upper_L      1.91x       0  0.042->0.080  
+Death          1.88x  tail_00          11.56x      17  0.046->0.087  skull:11 jaw:6
+Ability        1.84x  neck_00          19.35x     326  0.065->0.119  skull:186 jaw:140
+Graze          1.84x  neck_00          19.35x     326  0.065->0.119  skull:186 jaw:140
+Stagger        1.75x  chest            13.59x      70  0.046->0.081  jaw:36 skull:34
+Hit            1.74x  chest            13.61x      70  0.046->0.080  jaw:36 skull:34
+Rise           1.72x  body              1.72x       0  0.052->0.090  
+Dive           1.71x  chest             1.71x       0  0.046->0.078  
+Parry          1.63x  chest             1.63x       0  0.058->0.094  
+Grab           1.53x  chest             5.32x       5  0.058->0.088  skull:5
+Bite           1.43x  fore_upper_R     25.06x     249  0.054->0.077  skull:147 jaw:102
+Breath         1.38x  tail_00           5.66x       3  0.057->0.078  skull:3
+Eat            1.38x  jaw              21.22x     420  0.058->0.080  skull:252 jaw:168
+Breathe        1.37x  hind_upper_L      5.14x       5  0.056->0.077  skull:5
+16 of 23 clips tear an edge past 2x
+worst SKIN 3.90x · worst including the oral lining 25.06x (the lining is a sac built to stretch; the skin figure is the one to judge)
