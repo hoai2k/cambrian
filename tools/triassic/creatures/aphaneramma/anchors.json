@@ -1,0 +1,34 @@
+{
+  "aphaneramma": [
+    {
+      "name": "anchor_mouth",
+      "bone": "jaw",
+      "point": [
+        -0.4714508056640625,
+        -2.5998997688293457,
+        0.4248397648334503
+      ],
+      "role": "mouth"
+    },
+    {
+      "name": "anchor_mouth_inside",
+      "bone": "skull",
+      "point": [
+        -0.05480451509356499,
+        -1.5598996877670288,
+        0.18930605053901672
+      ],
+      "role": "swallow"
+    },
+    {
+      "name": "anchor_attack_primary",
+      "bone": "skull",
+      "point": [
+        -0.4714508056640625,
+        -2.6198997497558594,
+        0.46983975172042847
+      ],
+      "role": "attack"
+    }
+  ]
+}
