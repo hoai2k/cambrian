@@ -319,11 +319,28 @@ unless the user explicitly asks for a PR. Steps:
   viewer catalogue lists them in the Triassic collection marked `offRoster`. Such a body borrows
   nothing, because it is in no sea, so the *Model* control must not offer it a "borrowed body in
   play" stage and the downloads line must not call a raw generation the full model.
-- **A mouth must read as a mouth, not as a hole in the model**, and the standing bar for every
-  Triassic body is three things. *Inside*: one **closed skinned lining** — roof on the skull, floor
-  on the jaw, wall stretching between them — wound inwards, with the skin double-sided behind it as
-  a backstop. Two separate tubes look identical at rest and part the moment the jaw swings, which is
-  how Placodus came to open onto transparency. Proving it needs care: render at full gape against a
+- **A mouth must read as a mouth, not as a hole in the model — and never as a mouthful of gum.**
+  *Inside*, the rule is now the opposite of what it was, and the old form is the thing to watch for:
+  a single **closed sac whose wall stretches between the jaws** was specified here for months, and
+  the moment anyone looked at the animals it was obvious — the mouths were filled with gum. A mouth
+  is not a bag. Do not rebuild that. **The top and the bottom are separate areas, filled
+  separately if they are filled at all**: a *palate* closing the skull's own opening, rigid to the
+  skull's bones, and a *floor* closing the mandible's, rigid to the jaw's, overlapping at the corner
+  and behind the hinge rather than joined, so each half is closed on its own whatever the jaw does
+  and there is no wall anywhere to stretch. The warning the old rule carried — that two separate
+  tubes part when the jaw swings, which is how Placodus came to open onto transparency — was true of
+  two *tubes* sharing a seam, and is answered by closing each half rather than by joining them.
+  **And the first question is whether a mouth needs filling at all.** Several do not: Shonisaurus and
+  Dinocephalosaurus among them. A generation that models no cavity, or whose head is closed behind
+  the lip, needs an anchor and nothing else — and a beak inside an arm crown needs an anchor and
+  nothing else in every case, which is why both cephalopods have none. Authored geometry in a mouth
+  is a cost (it is invented shape on a Tripo body, against the simplicity bar), so it is justified
+  per animal by a gape that actually shows through, never added as a matter of course.
+  **None of it is drawn at present**: `src/shared/oral-geometry.ts` is the one classifier, the game
+  hides everything it matches and the viewer's *Mouth geometry* switch starts off, so what is on
+  screen is the mouth each generation arrived with. The simulation reaches a mouth through
+  `anchor_mouth` and `anchor_mouth_inside`, which are bones, so none of this is load-bearing.
+  Whatever fills a mouth, the proof is unchanged and proving it needs care: render at full gape against a
   saturated backdrop *with and without* a backface-cull shim and compare the two, because comparing
   against the plain background measures the backdrop rather than the gape and passes whatever the
   mesh does. **And the test for "this pixel is the backdrop" has been too loose twice, the same way
@@ -373,12 +390,13 @@ unless the user explicitly asks for a PR. Steps:
   method can lie, after Keichousaurus' countershading. So the peristome is authored on the crown's
   own axis, which is the mean direction of the arms rather than the surface normal at the dome (one
   facet's shape, and on Phragmoteuthis 0.34 forward and 0.94 ventral — a lining built back along it
-  left the head after 0.022). `T.crown_lining` then sews the sac to the skin's measured cut rim: its
-  first rings take the skin's own weights, because round a peristome the skin belongs to the lips,
-  the head and the arms standing over it and not to the jaw, and its first two rings are a flange
-  wider than the hole and set behind it, because a lining that merely meets the rim is edge-on to
-  anything looking into the mouth and those are the quads a cull takes away. `T.crown_beak` is the
-  two mandibles. **And `gape-solid.py` can neither aim nor judge on this shape**: it frames off the
+  left the head after 0.022). **Neither cephalopod is given a modelled mouth at all now**: a beak and
+  a peristome lining were built (`T.crown_lining` sewing a sac to the measured cut rim, `T.crown_beak`
+  the two mandibles) and were retired with the rest of the sac work — a beak the size these arms hide
+  is shape being invented rather than taken from the generation, and what the game needs there is the
+  `anchor_mouth`/`anchor_attack_primary` anchors, which cost no geometry. Keep the crown-axis
+  measurement (it is what places those anchors) and do not rebuild the sac.
+  **And `gape-solid.py` can neither aim nor judge on this shape**: it frames off the
   `jaw` bone's side, which on a crown is outside a thicket of arms, and its verdict is opened
   backdrop the body *encloses* — a crown encloses background between every pair of arms, so a sliver
   at an arm's silhouette counts as if it were the mouth. `tools/triassic/gape-crown.py` keeps the
@@ -415,8 +433,8 @@ unless the user explicitly asks for a PR. Steps:
 - **The oral lining is not skin, and ranking it as skin hides the number that matters.**
   `skin-tears.mjs` names the *bone* an edge belongs to, and the lining is weighted to `skull` and
   `jaw` exactly like the face around it, so the two were indistinguishable: Cymbospondylus read
-  9.98x on `skull` while its skin was 2.48x. The lining is one skinned sac whose roof rides the
-  skull and floor rides the jaw, so its rest length at a shut mouth is nearly nothing and its ratio
+  9.98x on `skull` while its skin was 2.48x. Any oral surface has a roof riding the skull and a floor
+  riding the jaw, so its rest length at a shut mouth is nearly nothing and its ratio
   at full gape says only that the mouth opened — Hupehsuchus' 50x is the lining working, not a torn
   head. Two builders split it locally before it was split centrally; the tool now reports both and
   ranks on skin, matching those builders' own figures exactly. True era-wide skin picture:
@@ -474,11 +492,12 @@ unless the user explicitly asks for a PR. Steps:
   through the head's **own measured section**, which uses no normals: 13 % of the mandible and 0.72 %
   of a body length. And the lining is where the real work is. At the snout the closing rotation is
   *defined* as the one that carries the mandible's dorsal margin exactly onto the palate's ventral
-  one, so a lining floor riding the jaw at weight 1 arrives exactly where its own roof already is,
-  the sac is degenerate at the shut pose, and rounding decides which side of the roof each vertex
-  lands on — a pink shard through the top of the snout. Hold the floor at 0.93, build the tube a
-  fourteenth of the local gape *below* the mouth line so its floor starts inside the jaw's flesh and
-  its roof finishes inside the skull's, and size it on the **measured gape** rather than on
+  one, so anything riding the jaw at weight 1 arrives exactly where the palate already is, the two
+  surfaces are coincident at the shut pose, and rounding decides which side of the roof each vertex
+  lands on — a pink shard through the top of the snout. That is the geometry argument against the
+  one-sac lining restated, and it applies to a *floor* too: hold it at 0.93, set it a fourteenth of
+  the local gape *below* the mouth line so it starts inside the jaw's flesh, and size it on the
+  **measured gape** rather than on
   `cavity_profile` (a cast over the front quarter of a body whose forelimbs sit behind the skull
   mostly finds the gap between a paddle and a flank: x ±0.24 where the head is 0.08 across).
   And read the gape as the **largest** empty interval on a vertical line, not the first: six surface
