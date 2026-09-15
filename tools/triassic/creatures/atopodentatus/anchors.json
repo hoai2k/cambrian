@@ -1,0 +1,34 @@
+{
+  "atopodentatus": [
+    {
+      "name": "anchor_mouth",
+      "bone": "jaw",
+      "point": [
+        0.09154023230075836,
+        -1.639176368713379,
+        0.007889557629823685
+      ],
+      "role": "mouth"
+    },
+    {
+      "name": "anchor_mouth_inside",
+      "bone": "skull",
+      "point": [
+        0.011015418916940689,
+        -1.2191764116287231,
+        0.04994925856590271
+      ],
+      "role": "swallow"
+    },
+    {
+      "name": "anchor_attack_primary",
+      "bone": "skull",
+      "point": [
+        0.09154023230075836,
+        -1.6491763591766357,
+        0.057889558374881744
+      ],
+      "role": "attack"
+    }
+  ]
+}
