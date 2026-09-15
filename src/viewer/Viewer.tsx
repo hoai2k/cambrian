@@ -141,11 +141,12 @@ export function Viewer() {
   const [clips, setClips] = useState<string[]>([]);
   /**
    * Whether to draw the authored mouth geometry — the palate and floor that close each jaw, the
-   * hinge tissue, a cephalopod's beak. Off shows the mouth the generation actually arrived with,
-   * which is the only way to judge whether what was added belongs there. It survives a change of
-   * specimen on purpose: comparing mouths means comparing across animals.
+   * hinge tissue, a cephalopod's beak. **Off by default, and off in the game entirely**, because
+   * its first form read as gum filling the mouth; on shows what is currently authored, off shows
+   * the mouth the generation actually arrived with. It survives a change of specimen on purpose:
+   * comparing mouths means comparing across animals.
    */
-  const [oralGeometry, setOralGeometry] = useState(true);
+  const [oralGeometry, setOralGeometry] = useState(false);
   const [hasOral, setHasOral] = useState(false);
   const [active, setActive] = useState('');
   const [loop, setLoop] = useState(false);
@@ -356,9 +357,10 @@ export function Viewer() {
         </label>
         <p className="hint">
           The palate and floor that close each jaw, the tissue at the hinge, and a beak where there
-          is one, are <em>authored</em> rather than generated. Turn them off to see the mouth the
-          generation actually arrived with — which is the only way to judge whether what was added
-          belongs there. The setting follows you from one animal to the next.
+          is one, are <em>authored</em> rather than generated. <strong>The game does not draw any of
+          it</strong> and this starts off, because the first form of it read as gum filling the
+          mouth; turn it on to see what is currently authored, and off for the mouth the generation
+          arrived with. The setting follows you from one animal to the next.
         </p></>}
         {def.inReview && <p className="hint">
           <strong>Awaiting review:</strong> this animal's own body, twin and clips are built, but it
