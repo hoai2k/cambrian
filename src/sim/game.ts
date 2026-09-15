@@ -8,7 +8,7 @@ import { tierForScale, tierScale } from './tiers';
 import { makeBrain, peaceful, think, type AiWorld } from './ai';
 import { huntingPressure, phaseAt, untilNextPhase, type Phase } from './daynight';
 import { applyHit, endRide, GRIP_BREAK, GRIP_MEAL, GRIP_STRAIN, GRIP_STRIKE, kill, rideHold, startSwallow, takeHold, takeRide, type HitContext } from './combat';
-import { creature, CREATURE_IDS, PLAYABLE_IDS, type CreatureId, type MoveDef } from './creatures';
+import { creature, CREATURE_IDS, isVisitor, PLAYABLE_IDS, type CreatureId, type MoveDef } from './creatures';
 import { resolveFlora, stepFlora, type FloraContact } from './flora';
 import { SpatialHash } from './spatial';
 import { clampMark, fillOf, ladderFill, ladderMark, ladderRung, ladderScale, LADDER_TOP, MARK_NEAR_TOP } from './ladder';
@@ -466,8 +466,10 @@ export class Game implements AiWorld {
       // Both eras derive everything else from the body scale — the Cambrian's tier through
       // `tierForScale`, the Devonian's stage through `stageForScale` — so one number does it.
       const carry = mode === 'rise' ? clampMark(s.startRung ?? 0) : 0;
-      const startScale = carry > 0 ? ladderScale(s.creature, carry)
-        : RULES ? RULES.startScale(mode, this.eraRoleIndex(i), s.creature) : mode === 'rise' ? tierScale(s.creature, 0) : mode === 'hunted' ? (this.isHunter(i) ? 3.0 : tierScale(s.creature, 1)) : mode === 'reef' ? tierScale(s.creature, 2) : tierScale(s.creature, 1);
+      // A visitor arrives at the size it finishes its own game at, whatever this one's ladder or
+      // mode would have said. That is the reward, and it is deliberately not balanced.
+      const startScale = s.visitorScale ?? (carry > 0 ? ladderScale(s.creature, carry)
+        : RULES ? RULES.startScale(mode, this.eraRoleIndex(i), s.creature) : mode === 'rise' ? tierScale(s.creature, 0) : mode === 'hunted' ? (this.isHunter(i) ? 3.0 : tierScale(s.creature, 1)) : mode === 'reef' ? tierScale(s.creature, 2) : tierScale(s.creature, 1));
       const a = this.spawn(s.creature, 'player', this.spawnPoint(nursery, s.creature, startScale, i), startScale, i);
       // Arriving on the top rung means the goal is already behind you: no clock, just the sea.
       a.carriedTop = carry >= LADDER_TOP;
@@ -477,7 +479,8 @@ export class Game implements AiWorld {
       this.kept.push(new Map());
       this.progress.push({ prompts: [], flags: new Set(), deaths: 0, apexT: 0, message: '' });
       // Carrying a creature on part-grown skips the egg: that animal has already been through this.
-      if (carry === 0) hatchers.push(a);
+      // So does a visitor, which did its growing up in another sea.
+      if (carry === 0 && !s.visitorScale) hatchers.push(a);
     });
     if (mode === 'hunted') {
       // Fill to 4 with bots
@@ -554,7 +557,44 @@ export class Game implements AiWorld {
     return best;
   }
 
+  /**
+   * Water deep enough to hold a body of this length, starting from `center` and going out.
+   *
+   * A visitor is the size it finishes its *own* game at, which in this one can be far bigger than
+   * anything the sea was built for — a Prime Dunkleosteus is longer than the Cambrian's shallows
+   * are deep. That is the point of visitors and is not a thing to balance away, but a body that
+   * hatches into a seabed it does not fit in is stuck rather than impressive, so the one rule they
+   * get is this: go out until there is room. Distance from shore is what buys depth in every era
+   * (see `depthProfile`), so the search walks outward along that axis and gives up on the deepest
+   * thing it found rather than on nothing.
+   */
+  private deepEnoughFor(center: Vec3, L: number): Vec3 {
+    const want = L * 1.35 + 6;                                  // room to swim, not just to fit
+    let best = center, bestRoom = -Infinity;
+    for (let step = 0; step <= 24; step++) {
+      const out = step * 90;
+      const ang = this.rng() * TAU, jitter = this.rng() * 40;
+      const x = center.x + Math.cos(ang) * jitter;
+      const z = center.z - out - jitter;                        // away from the beach
+      const room = SURFACE_Y - groundHeight(this.world, x, z, this.scratchBoulders);
+      if (room > bestRoom) { bestRoom = room; best = { x, y: 0, z }; }
+      if (room >= want) return best;
+    }
+    return best;
+  }
+
   private spawnPoint(center: Vec3, c: CreatureId, s: number, index = 0): Vec3 {
+    // A visitor is placed by how much water it needs, before anything else gets a say: an era's
+    // own placement looks for cover to hide a hatchling in, and there is no cover in this sea big
+    // enough to mean anything to a body this size.
+    const vdef = creature(c);
+    if (isVisitor(c)) {
+      const L = vdef.adultLength * s;
+      const at = this.deepEnoughFor(center, L);
+      this.world.loadAround(at);
+      const g = groundHeight(this.world, at.x, at.z, this.scratchBoulders);
+      return { x: at.x, y: Math.min(SURFACE_Y - 1.5 - L * 0.1, g + Math.max(1.2 + L * 0.5, (SURFACE_Y - g) * 0.45)), z: at.z };
+    }
     const inCover = RULES?.spawnPoint(this, center, c, s, index);
     if (inCover) return inCover;
     const def = creature(c);

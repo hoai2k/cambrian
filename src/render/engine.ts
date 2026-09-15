@@ -935,6 +935,12 @@ export class Engine {
         this.views.set(a.id, v);
         v.update(a, 0, this.time, true);
       }
+      // A seat that is the second on its creature is drawn in another palette, so four players on
+      // four Anomalocaris are four different animals to look at. Read every frame rather than set
+      // once: a view is rebuilt when the body or the detail level changes, and the scheme has to
+      // survive that without the rebuild knowing about seats.
+      const seat = a.controller === 'player' && a.player >= 0 ? this.setups[a.player] : undefined;
+      if (v.seatScheme !== seat?.scheme) { v.seatScheme = seat?.scheme; v.refreshScheme(); }
       keep.add(a.id); count++;
       // Only nearby creatures cast shadows: the shadow pass has no frustum culling for these
       // meshes, so every distant swimmer was being rasterised into the shadow map for nothing.
